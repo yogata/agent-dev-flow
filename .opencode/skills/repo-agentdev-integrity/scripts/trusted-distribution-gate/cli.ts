@@ -16,6 +16,7 @@
 // validate itself, so the bootstrap report is produced by an independent
 // code path that reads base_oid only.
 
+import { parseArgs as nodeParseArgs } from "node:util";
 import { runLauncher } from "./launcher.ts";
 import { bootstrapDigestReport } from "./bootstrap-report.ts";
 import { ExitCode } from "./types.ts";
@@ -31,7 +32,84 @@ interface ParsedArgs {
   readonly bootstrap_mode: boolean;
 }
 
+// node:util.parseArgs への委譲（Issue #2354 / OU-003、DEC-019 決定1）。
+// 構文解析（値結合、`=` 形式、短縮クラスタ、`--`）は標準 API が行う。
+// 本 CLI は strict parser 契約（未知引数は無声受理しない）のため、未知 token を
+// 旧実装と同一のメッセージ・終了コードで拒否する。オプション間の必須検証は
+// mainInner 側の ADF 検証として残留する。
+// strict:false では値を持たない文字列オプションが true になるため、
+// token の value === undefined を値欠落（= 未指定）として扱う。
+
+const CLI_OPTIONS = {
+  "base-oid": { type: "string" },
+  "candidate-oid": { type: "string" },
+  "repo-root": { type: "string" },
+  "output-dir": { type: "string" },
+  "repository-identity": { type: "string" },
+  "default-branch": { type: "string" },
+  "bootstrap-report": { type: "string" },
+  "bootstrap-mode": { type: "boolean" },
+  "seed-mode": { type: "boolean" },
+  help: { type: "boolean", short: "h" },
+} as const;
+
+interface CliTokenOption {
+  kind: "option";
+  index: number;
+  name: string;
+  rawName: string;
+  value?: string;
+  inlineValue?: boolean;
+}
+interface CliTokenPositional {
+  kind: "positional";
+  index: number;
+  value: string;
+}
+interface CliTokenTerminator {
+  kind: "option-terminator";
+  index: number;
+}
+type CliToken = CliTokenOption | CliTokenPositional | CliTokenTerminator;
+
+function clusterArgIndexes(tokens: readonly CliToken[]): Set<number> {
+  const counts = new Map<number, number>();
+  for (const t of tokens) {
+    if (t.kind === "option" && !t.rawName.startsWith("--")) {
+      counts.set(t.index, (counts.get(t.index) ?? 0) + 1);
+    }
+  }
+  const clustered = new Set<number>();
+  for (const [index, count] of counts) {
+    if (count > 1) clustered.add(index);
+  }
+  return clustered;
+}
+
+function rejectUnknownArgument(a: string): never {
+  // Unknown args are an error: strict parser, no silent acceptance.
+  process.stderr.write(`cli.ts: unknown argument: ${a}\n`);
+  process.exit(ExitCode.InputContract);
+}
+
 function parseArgs(argv: readonly string[]): ParsedArgs {
+  const { tokens } = nodeParseArgs({
+    args: [...argv],
+    options: CLI_OPTIONS,
+    strict: false,
+    allowPositionals: true,
+    tokens: true,
+  }) as unknown as { tokens: CliToken[] };
+  const clustered = clusterArgIndexes(tokens);
+  const clusterShorts = new Map<number, string[]>();
+  for (const t of tokens) {
+    if (t.kind === "option" && clustered.has(t.index)) {
+      const shorts = clusterShorts.get(t.index) ?? [];
+      shorts.push(t.rawName.slice(1));
+      clusterShorts.set(t.index, shorts);
+    }
+  }
+
   const result: {
     mode: "run" | "report";
     base_oid?: string;
@@ -46,25 +124,57 @@ function parseArgs(argv: readonly string[]): ParsedArgs {
     default_branch: "main",
     bootstrap_mode: false,
   };
-  for (let i = 0; i < argv.length; i++) {
-    const a = argv[i] ?? "";
-    switch (a) {
-      case "--base-oid": result.base_oid = argv[++i]; break;
-      case "--candidate-oid": result.candidate_oid = argv[++i]; break;
-      case "--repo-root": result.repo_root = argv[++i]; break;
-      case "--output-dir": result.output_dir = argv[++i]; break;
-      case "--repository-identity": result.repository_identity = argv[++i]; break;
-      case "--default-branch": result.default_branch = argv[++i] ?? "main"; break;
-      case "--bootstrap-mode": result.bootstrap_mode = true; break;
-      case "--seed-mode": result.bootstrap_mode = true; break;
-      case "--bootstrap-report": result.mode = "report"; result.base_oid = argv[++i]; break;
-      case "--help": case "-h":
-        printUsage();
-        process.exit(0);
-      default:
-        // Unknown args are an error: strict parser, no silent acceptance.
-        process.stderr.write(`cli.ts: unknown argument: ${a}\n`);
-        process.exit(ExitCode.InputContract);
+
+  for (const t of tokens) {
+    if (t.kind === "option" && clustered.has(t.index)) {
+      // 短縮クラスタ（-hx 等）は分割前の元引数として拒否する。
+      rejectUnknownArgument("-" + (clusterShorts.get(t.index) ?? []).join(""));
+    }
+    if (t.kind === "positional") {
+      rejectUnknownArgument(t.value);
+    }
+    if (t.kind === "option-terminator") {
+      rejectUnknownArgument("--");
+    }
+    // t is an option token, not a cluster member.
+    if (t.inlineValue === true) {
+      // `--opt=value` 形式は旧実装では未知引数のため、元引数として拒否する。
+      rejectUnknownArgument(`${t.rawName}=${t.value}`);
+    }
+    if (t.name === "help") {
+      printUsage();
+      process.exit(0);
+    }
+    if (!(t.name in CLI_OPTIONS)) {
+      rejectUnknownArgument(t.rawName);
+    }
+    switch (t.name) {
+      case "base-oid":
+        result.base_oid = t.value;
+        break;
+      case "candidate-oid":
+        result.candidate_oid = t.value;
+        break;
+      case "repo-root":
+        result.repo_root = t.value;
+        break;
+      case "output-dir":
+        result.output_dir = t.value;
+        break;
+      case "repository-identity":
+        result.repository_identity = t.value;
+        break;
+      case "default-branch":
+        result.default_branch = t.value ?? "main";
+        break;
+      case "bootstrap-mode":
+      case "seed-mode":
+        result.bootstrap_mode = true;
+        break;
+      case "bootstrap-report":
+        result.mode = "report";
+        result.base_oid = t.value;
+        break;
     }
   }
   return result;

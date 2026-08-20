@@ -121,6 +121,103 @@ describe("parseArgs", () => {
   });
 });
 
+// 移行前受理・拒否挙動の固定（Issue #2354 / OU-003、REQ-044-003）。
+// 期待値は手書きループパーサの挙動であり、node:util.parseArgs 移行後も同一結果を要求する。
+describe("parseArgs acceptance data (pre-migration fix, OU-003)", () => {
+  it("consumes the next arg unconditionally as an option value (--root --profile)", () => {
+    const opts = parseArgs(["--root", "--profile", "nope"]);
+    expect(opts.root).toBe("--profile");
+    expect(opts.profile).toBe("source");
+    expect(opts.paths).toEqual(["nope"]);
+  });
+
+  it("ignores unknown options silently (--unknown v)", () => {
+    const opts = parseArgs(["--unknown", "v", "--json"]);
+    expect(opts.json).toBe(true);
+    expect(opts.paths).toEqual(["v"]);
+  });
+
+  it("ignores unknown short options (-x)", () => {
+    const opts = parseArgs(["-x", "src"]);
+    expect(opts.help).toBe(false);
+    expect(opts.paths).toEqual(["src"]);
+  });
+
+  it("ignores short option clusters (-hx keeps help false)", () => {
+    const opts = parseArgs(["-hx"]);
+    expect(opts.help).toBe(false);
+  });
+
+  it("ignores --option=value form for string options (--root=/x)", () => {
+    const opts = parseArgs(["--root=/x"]);
+    expect(opts.root).toBeUndefined();
+    expect(opts.paths).toEqual([]);
+  });
+
+  it("ignores --option=value form for boolean options (--json=true)", () => {
+    const opts = parseArgs(["--json=true"]);
+    expect(opts.json).toBe(false);
+  });
+
+  it("ignores --profile=release entirely (no archive requirement triggered)", () => {
+    const opts = parseArgs(["--profile=release", "--archive", "/tmp/x.zip"]);
+    expect(opts.profile).toBe("source");
+    expect(opts.archive).toBe("/tmp/x.zip");
+  });
+
+  it("treats -- as an inert arg and keeps parsing options after it (-- --json foo)", () => {
+    const opts = parseArgs(["--", "--json", "foo"]);
+    expect(opts.json).toBe(true);
+    expect(opts.paths).toEqual(["foo"]);
+  });
+
+  it("treats a lone -- before a path as inert (-- foo)", () => {
+    const opts = parseArgs(["--", "foo"]);
+    expect(opts.paths).toEqual(["foo"]);
+  });
+
+  it("consumes -- as an option value when it follows --root (--root -- x)", () => {
+    const opts = parseArgs(["--root", "--", "x"]);
+    expect(opts.root).toBe("--");
+    expect(opts.paths).toEqual(["x"]);
+  });
+
+  it("ignores a lone - as an unknown arg", () => {
+    const opts = parseArgs(["-", "foo"]);
+    expect(opts.paths).toEqual(["foo"]);
+  });
+
+  it("last occurrence wins for duplicate string options", () => {
+    expect(parseArgs(["--root", "a", "--root", "b"]).root).toBe("b");
+  });
+
+  it("duplicate boolean flags stay true", () => {
+    expect(parseArgs(["--json", "--json"]).json).toBe(true);
+  });
+
+  it("throws for an empty string value of --root", () => {
+    expect(() => parseArgs(["--root", ""])).toThrow(/--root requires a value/);
+  });
+
+  it("throws for an empty string value of --profile", () => {
+    expect(() => parseArgs(["--profile", ""])).toThrow(
+      /--profile requires a value/,
+    );
+  });
+
+  it("reports the first offending option in argv order (--profile nope --root)", () => {
+    expect(() => parseArgs(["--profile", "nope", "--root"])).toThrow(
+      /--profile must be one of/,
+    );
+  });
+
+  it("rejects an unknown --profile value passed after a valid --root", () => {
+    expect(() => parseArgs(["--root", "/r", "--profile", "nope"])).toThrow(
+      /--profile must be one of: source, installed, release \(got 'nope'\)/,
+    );
+  });
+});
+
 describe("printHelp", () => {
   it("outputs USAGE, OPTIONS, and EXIT CODES sections", () => {
     const logs: string[] = [];
