@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | `.opencode/commands/agentdev/` がジャンクション、シンボリックリンクでないことを確認後、配下のファイルから `generated_by: local-opencode-transform` 識別子を検出。識別子検出時は consumer-generated と判定し IR-016 を適用除外とする |
 | affected_artifacts | [.opencode/commands/agentdev/, .opencode/skills/agentdev-*/] |
 | related_req | [REQ-009-007, REQ-009-011, REQ-009-014] |
-| related_spec | [runtime-package-boundary.md] |
+| related_design | [runtime-package-boundary.md] |
 | gate_level | full-audit |
 | false_positive_risk | 低。ジャンクション検出と `generated_by` 識別子検出の組合せで確実に判定可能 |
 | regression_test | (未実装) |

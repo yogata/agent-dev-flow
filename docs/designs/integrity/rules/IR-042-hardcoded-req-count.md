@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | N件、範囲表記（REQ-001〜0NNN 等）抽出 → glob による実際の 現行 REQ ファイル数と照合 |
 | affected_artifacts | [SPEC, guides, AGENTS.md] |
 | related_req | [REQ-001] |
-| related_spec | [integrity-contracts.md] |
+| related_design | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 中。表記揺れ、retired 除外の判定に注意 |
 | regression_test | (手動確認) |

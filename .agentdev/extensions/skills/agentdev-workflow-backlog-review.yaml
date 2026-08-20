@@ -5,8 +5,8 @@ id: agentdev-workflow-backlog-review
 context:
   - id: must-1
     paths:
-      - "docs/specs/foundations/document-model.md"
-    purpose: "REQ/ADR/SPEC/guides/DOC-MAP の責務マトリックスと探索入口の確認"
+      - "docs/designs/foundations/document-model.md"
+    purpose: "REQ/ADR/Design/guides/DOC-MAP の責務マトリックスと探索入口の確認"
 
 rules: []
 

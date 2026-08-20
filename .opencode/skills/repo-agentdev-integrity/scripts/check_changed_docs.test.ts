@@ -70,6 +70,18 @@ function copyScripts(fixtureRoot: string): void {
   copyFileSync(SCRIPT_FILE, join(dest, "check_changed_docs.ts"));
   copyFileSync(CLI_UTILS_FILE, join(dest, "cli_utils.ts"));
   copyFileSync(HISTORY_EXEMPTION_FILE, join(dest, "ir057_history_exemption.ts"));
+  const dataDir = join(
+    fixtureRoot,
+    ".opencode",
+    "skills",
+    "repo-agentdev-integrity",
+    "data",
+  );
+  mkdirp(dataDir);
+  copyFileSync(
+    join(SCRIPT_DIR, "..", "data", "obsolete-path-map.yaml"),
+    join(dataDir, "obsolete-path-map.yaml"),
+  );
 }
 
 // Required TargetedDocsReport fields (REQ-0158 Phase 2 / AG-002 / Epic #1515 OU-005 TS-013).
@@ -83,7 +95,7 @@ const REQUIRED_FIELDS = [
   "failures",
   "warnings",
   "doc_map_update_required",
-  "spec_readme_update_required",
+  "design_readme_update_required",
   "requirements_readme_update_required",
   "full_docs_check_recommended",
   "extensions_check_required",
@@ -115,13 +127,13 @@ function buildMinimalFixture(root: string): void {
     "utf-8",
   );
 
-  const specsDir = join(root, "docs", "specs");
-  mkdirp(specsDir);
+  const designsDir = join(root, "docs", "designs");
+  mkdirp(designsDir);
   writeFileSync(
-    join(specsDir, "fixture-spec.md"),
+    join(designsDir, "fixture-design.md"),
     [
       "---",
-      "title: fixture spec",
+      "title: fixture design",
       "status: accepted",
       "---",
       "",
@@ -144,44 +156,43 @@ function initGitFixture(root: string): void {
   execSync('git commit -q -m "init fixture" --no-verify', { cwd: root });
 }
 
-function addSupersededFixtures(root: string): void {
-  const specsDir = join(root, "docs", "specs");
+function addStatusFixtures(root: string): void {
+  const designsDir = join(root, "docs", "designs");
   writeFileSync(
-    join(specsDir, "superseded-valid.md"),
+    join(designsDir, "accepted-valid.md"),
     [
       "---",
-      "title: superseded valid spec",
-      "status: superseded",
-      "superseded_by: SPEC-0451",
+      "title: accepted valid design",
+      "status: accepted",
       "---",
       "",
-      "# Superseded valid",
+      "# Accepted valid",
       "",
-      "Fixture content for superseded_by valid test.",
+      "Fixture content for accepted status test.",
       "",
     ].join("\n"),
     "utf-8",
   );
   writeFileSync(
-    join(specsDir, "superseded-invalid.md"),
+    join(designsDir, "superseded-outdated.md"),
     [
       "---",
-      "title: superseded invalid spec",
+      "title: superseded outdated design",
       "status: superseded",
       "---",
       "",
-      "# Superseded invalid",
+      "# Superseded outdated",
       "",
-      "Missing superseded_by frontmatter.",
+      "superseded is no longer a valid Design status (2-value lifecycle).",
       "",
     ].join("\n"),
     "utf-8",
   );
   writeFileSync(
-    join(specsDir, "unknown-status.md"),
+    join(designsDir, "unknown-status.md"),
     [
       "---",
-      "title: unknown status spec",
+      "title: unknown status design",
       "status: foobar",
       "---",
       "",
@@ -202,7 +213,7 @@ beforeAll(() => {
   mkdirp(GIT_FIXTURE_ROOT);
   buildMinimalFixture(FIXTURE_ROOT);
   buildMinimalFixture(GIT_FIXTURE_ROOT);
-  addSupersededFixtures(FIXTURE_ROOT);
+  addStatusFixtures(FIXTURE_ROOT);
   copyScripts(FIXTURE_ROOT);
   copyScripts(GIT_FIXTURE_ROOT);
   initGitFixture(GIT_FIXTURE_ROOT);
@@ -220,9 +231,9 @@ describe("TS-004 / AG-002: TargetedDocsReport JSON schema", () => {
   it("JSON output contains all 11 required fields", () => {
     const r = runScript(FIXTURE_ROOT, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--files",
-      "docs/specs/fixture-spec.md",
+      "docs/designs/fixture-design.md",
       "--json",
     ]);
     expect(r.exitCode).toBe(0);
@@ -235,9 +246,9 @@ describe("TS-004 / AG-002: TargetedDocsReport JSON schema", () => {
   it("JSON output does NOT contain doc_inputs_check_required", () => {
     const r = runScript(FIXTURE_ROOT, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--files",
-      "docs/specs/fixture-spec.md",
+      "docs/designs/fixture-design.md",
       "--json",
     ]);
     const parsed = JSON.parse(r.stdout);
@@ -247,12 +258,12 @@ describe("TS-004 / AG-002: TargetedDocsReport JSON schema", () => {
   });
 
   it("workflow field reflects the --workflow argument", () => {
-    for (const wf of ["req-save", "spec-save", "case-run", "case-close", "docs-check"]) {
+    for (const wf of ["req-save", "design-save", "case-run", "case-close", "docs-check"]) {
       const r = runScript(FIXTURE_ROOT, [
         "--workflow",
         wf,
         "--files",
-        "docs/specs/fixture-spec.md",
+        "docs/designs/fixture-design.md",
         "--json",
       ]);
       // exitCode differs by workflow (some emit strict failures when coupled
@@ -265,13 +276,13 @@ describe("TS-004 / AG-002: TargetedDocsReport JSON schema", () => {
   it("files_checked includes the supplied file when it matches the profile", () => {
     const r = runScript(FIXTURE_ROOT, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--files",
-      "docs/specs/fixture-spec.md",
+      "docs/designs/fixture-design.md",
       "--json",
     ]);
     const parsed = JSON.parse(r.stdout);
-    expect(parsed.files_checked).toContain("docs/specs/fixture-spec.md");
+    expect(parsed.files_checked).toContain("docs/designs/fixture-design.md");
   });
 
   it("failures array entries carry the documented sub-fields", () => {
@@ -282,7 +293,7 @@ describe("TS-004 / AG-002: TargetedDocsReport JSON schema", () => {
       "--workflow",
       "docs-check",
       "--files",
-      "docs/specs/does-not-exist.md",
+      "docs/designs/does-not-exist.md",
       "--json",
     ]);
     const parsed = JSON.parse(r.stdout);
@@ -299,9 +310,9 @@ describe("TS-004 / AG-002: TargetedDocsReport JSON schema", () => {
   it("declared_files_check is null when --declared-files is not supplied", () => {
     const r = runScript(FIXTURE_ROOT, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--files",
-      "docs/specs/fixture-spec.md",
+      "docs/designs/fixture-design.md",
       "--json",
     ]);
     const parsed = JSON.parse(r.stdout);
@@ -311,11 +322,11 @@ describe("TS-004 / AG-002: TargetedDocsReport JSON schema", () => {
   it("declared_files_check is populated when --declared-files is supplied", () => {
     const r = runScript(FIXTURE_ROOT, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--files",
-      "docs/specs/fixture-spec.md",
+      "docs/designs/fixture-design.md",
       "--declared-files",
-      "docs/specs/fixture-spec.md",
+      "docs/designs/fixture-design.md",
       "--json",
     ]);
     const parsed = JSON.parse(r.stdout);
@@ -336,7 +347,7 @@ describe("TS-004: text output reports every required field name", () => {
     failures: "failures:",
     warnings: "warnings:",
     doc_map_update_required: "doc_map_update_required:",
-    spec_readme_update_required: "spec_readme_update_required:",
+    design_readme_update_required: "design_readme_update_required:",
     requirements_readme_update_required: "requirements_readme_update_required:",
     full_docs_check_recommended: "full_docs_check_recommended:",
     extensions_check_required: "extensions_check_required:",
@@ -346,9 +357,9 @@ describe("TS-004: text output reports every required field name", () => {
   it("text output mentions every required field via its stable token", () => {
     const r = runScript(FIXTURE_ROOT, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--files",
-      "docs/specs/fixture-spec.md",
+      "docs/designs/fixture-design.md",
     ]);
     expect(r.exitCode).toBe(0);
     for (const field of REQUIRED_FIELDS) {
@@ -360,7 +371,7 @@ describe("TS-004: text output reports every required field name", () => {
   });
 
   it("text output and JSON output agree on workflow value", () => {
-    const args = ["--workflow", "spec-save", "--files", "docs/specs/fixture-spec.md"];
+    const args = ["--workflow", "design-save", "--files", "docs/designs/fixture-design.md"];
     const jsonRun = runScript(FIXTURE_ROOT, [...args, "--json"]);
     const textRun = runScript(FIXTURE_ROOT, args);
     const parsed = JSON.parse(jsonRun.stdout);
@@ -370,11 +381,11 @@ describe("TS-004: text output reports every required field name", () => {
   it("text output mentions declared_files_check section when populated", () => {
     const r = runScript(FIXTURE_ROOT, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--files",
-      "docs/specs/fixture-spec.md",
+      "docs/designs/fixture-design.md",
       "--declared-files",
-      "docs/specs/fixture-spec.md",
+      "docs/designs/fixture-design.md",
     ]);
     expect(r.stdout).toContain("declared_files_check");
   });
@@ -391,7 +402,7 @@ describe("Wave 2 Phase 3 regression: --files + empty files_checked => FAILURE", 
       "--workflow",
       "docs-check",
       "--files",
-      "docs/specs/does-not-exist.md",
+      "docs/designs/does-not-exist.md",
       "--json",
     ]);
     expect(r.exitCode).not.toBe(0);
@@ -402,7 +413,7 @@ describe("Wave 2 Phase 3 regression: --files + empty files_checked => FAILURE", 
       "--workflow",
       "docs-check",
       "--files",
-      "docs/specs/does-not-exist.md",
+      "docs/designs/does-not-exist.md",
       "--json",
     ]);
     const parsed = JSON.parse(r.stdout);
@@ -418,7 +429,7 @@ describe("Wave 2 Phase 3 regression: --files + empty files_checked => FAILURE", 
       "--workflow",
       "docs-check",
       "--files",
-      "docs/specs/does-not-exist.md",
+      "docs/designs/does-not-exist.md",
       "--json",
     ]);
     const parsed = JSON.parse(r.stdout);
@@ -434,7 +445,7 @@ describe("Wave 2 Phase 3 regression: --files + empty files_checked => FAILURE", 
       "--workflow",
       "docs-check",
       "--files",
-      "docs/specs/does-not-exist.md",
+      "docs/designs/does-not-exist.md",
       "--json",
     ]);
     const parsed = JSON.parse(r.stdout);
@@ -456,7 +467,7 @@ describe("Wave 2 Phase 3 regression: --files + empty files_checked => FAILURE", 
       "--workflow",
       "req-save",
       "--files",
-      "docs/specs/fixture-spec.md",
+      "docs/designs/fixture-design.md",
       "--json",
     ]);
     expect(r.exitCode).not.toBe(0);
@@ -474,7 +485,7 @@ describe("Wave 2 Phase 3 regression: --base-ref + empty files_checked => WARNING
     // GIT_FIXTURE_ROOT has one commit and HEAD...HEAD is empty.
     const r = runScript(GIT_FIXTURE_ROOT, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--base-ref",
       "HEAD",
       "--json",
@@ -485,7 +496,7 @@ describe("Wave 2 Phase 3 regression: --base-ref + empty files_checked => WARNING
   it("adds a warning message describing the empty base-ref case", () => {
     const r = runScript(GIT_FIXTURE_ROOT, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--base-ref",
       "HEAD",
       "--json",
@@ -502,7 +513,7 @@ describe("Wave 2 Phase 3 regression: --base-ref + empty files_checked => WARNING
   it("does NOT emit a TARGET-EMPTY failure for the empty base-ref case", () => {
     const r = runScript(GIT_FIXTURE_ROOT, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--base-ref",
       "HEAD",
       "--json",
@@ -517,7 +528,7 @@ describe("Wave 2 Phase 3 regression: --base-ref + empty files_checked => WARNING
   it("does NOT classify the case as 'sufficiency of target selection'", () => {
     const r = runScript(GIT_FIXTURE_ROOT, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--base-ref",
       "HEAD",
       "--json",
@@ -544,7 +555,7 @@ describe("CLI contract", () => {
   it("missing --workflow exits with EXIT_ERROR (2)", () => {
     const r = runScript(FIXTURE_ROOT, [
       "--files",
-      "docs/specs/fixture-spec.md",
+      "docs/designs/fixture-design.md",
       "--json",
     ]);
     expect(r.exitCode).toBe(2);
@@ -555,7 +566,7 @@ describe("CLI contract", () => {
       "--workflow",
       "bogus-workflow",
       "--files",
-      "docs/specs/fixture-spec.md",
+      "docs/designs/fixture-design.md",
       "--json",
     ]);
     expect(r.exitCode).toBe(2);
@@ -564,7 +575,7 @@ describe("CLI contract", () => {
   it("missing both --files and --base-ref exits with EXIT_ERROR (2)", () => {
     const r = runScript(FIXTURE_ROOT, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--json",
     ]);
     expect(r.exitCode).toBe(2);
@@ -573,9 +584,9 @@ describe("CLI contract", () => {
   it("accepts --fail-level warning (loose mode) without error", () => {
     const r = runScript(FIXTURE_ROOT, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--files",
-      "docs/specs/fixture-spec.md",
+      "docs/designs/fixture-design.md",
       "--fail-level",
       "warning",
       "--json",
@@ -597,9 +608,9 @@ describe("Cross-cutting: doc_inputs_check_required must stay removed", () => {
   it("JSON output key set is exactly the 11 required fields (no extras, no missing)", () => {
     const r = runScript(FIXTURE_ROOT, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--files",
-      "docs/specs/fixture-spec.md",
+      "docs/designs/fixture-design.md",
       "--json",
     ]);
     const parsed = JSON.parse(r.stdout);
@@ -613,49 +624,31 @@ describe("Cross-cutting: doc_inputs_check_required must stay removed", () => {
   });
 });
 
-// ─── Issue #1671 TS-004: SPEC status superseded_by handling ─────────────────
+// ─── Issue #2349 TS-004: Design status 2値 (draft/accepted) 検証 ────────────
 
-describe("Issue #1671 TS-004: SPEC status superseded_by handling (ADR-0123, REQ-0101-076)", () => {
-  it("superseded + superseded_by 設定済み → SPEC-STATUS failure なし (exit 0)", () => {
+describe("Issue #2349 TS-004: Design status 2値 (REQ-001-025)", () => {
+  it("accepted → DESIGN-STATUS failure なし (exit 0)", () => {
     const r = runScript(FIXTURE_ROOT, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--files",
-      "docs/specs/superseded-valid.md",
+      "docs/designs/accepted-valid.md",
       "--json",
     ]);
     expect(r.exitCode).toBe(0);
     const parsed = JSON.parse(r.stdout);
     const statusFailures = parsed.failures.filter(
-      (f: { rule_id: string }) => f.rule_id === "SPEC-STATUS",
+      (f: { rule_id: string }) => f.rule_id === "DESIGN-STATUS",
     );
     expect(statusFailures).toEqual([]);
   });
 
-  it("superseded + superseded_by 未設定 → SPEC-STATUS strict failure (exit 非0)", () => {
+  it("superseded（旧状態値）→ DESIGN-STATUS warning", () => {
     const r = runScript(FIXTURE_ROOT, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--files",
-      "docs/specs/superseded-invalid.md",
-      "--json",
-    ]);
-    expect(r.exitCode).not.toBe(0);
-    const parsed = JSON.parse(r.stdout);
-    const target = parsed.failures.find(
-      (f: { rule_id: string; severity: string }) =>
-        f.rule_id === "SPEC-STATUS" && f.severity === "strict",
-    );
-    expect(target).toBeDefined();
-    expect(target.message).toContain("superseded_by");
-  });
-
-  it("不正 status → SPEC-STATUS warning", () => {
-    const r = runScript(FIXTURE_ROOT, [
-      "--workflow",
-      "spec-save",
-      "--files",
-      "docs/specs/unknown-status.md",
+      "docs/designs/superseded-outdated.md",
       "--json",
       "--fail-level",
       "warning",
@@ -663,19 +656,38 @@ describe("Issue #1671 TS-004: SPEC status superseded_by handling (ADR-0123, REQ-
     const parsed = JSON.parse(r.stdout);
     const target = parsed.failures.find(
       (f: { rule_id: string; severity: string }) =>
-        f.rule_id === "SPEC-STATUS" && f.severity === "warning",
+        f.rule_id === "DESIGN-STATUS" && f.severity === "warning",
+    );
+    expect(target).toBeDefined();
+    expect(target.message).toContain("superseded");
+  });
+
+  it("不正 status → DESIGN-STATUS warning", () => {
+    const r = runScript(FIXTURE_ROOT, [
+      "--workflow",
+      "design-save",
+      "--files",
+      "docs/designs/unknown-status.md",
+      "--json",
+      "--fail-level",
+      "warning",
+    ]);
+    const parsed = JSON.parse(r.stdout);
+    const target = parsed.failures.find(
+      (f: { rule_id: string; severity: string }) =>
+        f.rule_id === "DESIGN-STATUS" && f.severity === "warning",
     );
     expect(target).toBeDefined();
     expect(target.message).toContain("foobar");
   });
 
-  it("status 欠落 → accepted 相当 → SPEC-STATUS failure なし", () => {
-    const specsDir = join(FIXTURE_ROOT, "docs", "specs");
+  it("status 欠落 → accepted 相当 → DESIGN-STATUS failure なし", () => {
+    const designsDir = join(FIXTURE_ROOT, "docs", "designs");
     writeFileSync(
-      join(specsDir, "status-missing.md"),
+      join(designsDir, "status-missing.md"),
       [
         "---",
-        "title: status missing spec",
+        "title: status missing design",
         "---",
         "",
         "# Status missing",
@@ -687,20 +699,19 @@ describe("Issue #1671 TS-004: SPEC status superseded_by handling (ADR-0123, REQ-
     );
     const r = runScript(FIXTURE_ROOT, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--files",
-      "docs/specs/status-missing.md",
+      "docs/designs/status-missing.md",
       "--json",
     ]);
     expect(r.exitCode).toBe(0);
     const parsed = JSON.parse(r.stdout);
     const statusFailures = parsed.failures.filter(
-      (f: { rule_id: string }) => f.rule_id === "SPEC-STATUS",
+      (f: { rule_id: string }) => f.rule_id === "DESIGN-STATUS",
     );
     expect(statusFailures).toEqual([]);
   });
 });
-
 // ─── Issue #1784 / OU-007: line-level semantic diff for update flags ────────
 // check_changed_docs.ts の更新要否フラグを行レベル意味差分（導出元影響）ベースへ限定。
 // SPEC targeted-docs-guard-implementation.md「full_docs_check_recommended 条件」節。
@@ -719,17 +730,17 @@ function commitAll(root: string, message: string): void {
   execSync(`git commit -q -m "${message}" --no-verify`, { cwd: root });
 }
 
-function writeSpecFile(
+function writeDesignFile(
   root: string,
   name: string,
   title: string,
   status: string,
   body: string,
 ): void {
-  const specsDir = join(root, "docs", "specs");
-  mkdirp(specsDir);
+  const designsDir = join(root, "docs", "designs");
+  mkdirp(designsDir);
   writeFileSync(
-    join(specsDir, name),
+    join(designsDir, name),
     [
       "---",
       `title: ${title}`,
@@ -776,15 +787,15 @@ describe("Issue #1784 TS-010: trivial body-only change does NOT trigger update f
 
   beforeAll(() => {
     mkdirp(NEG_ROOT);
-    writeSpecFile(NEG_ROOT, "body-only.md", "body only spec", "accepted", "Original body content.");
+    writeDesignFile(NEG_ROOT, "body-only.md", "body only design", "accepted", "Original body content.");
     writeReqFile(NEG_ROOT, "REQ-9001.md", "REQ-9001", "body only req", "Original req body.");
     setupGitFixture(NEG_ROOT);
 
     // 相互参照追記 + 相対パス是正 + 表記修正: frontmatter 値は不変
-    writeSpecFile(
+    writeDesignFile(
       NEG_ROOT,
       "body-only.md",
-      "body only spec",
+      "body only design",
       "accepted",
       [
         "Fixed typo in body.",
@@ -796,17 +807,17 @@ describe("Issue #1784 TS-010: trivial body-only change does NOT trigger update f
     copyScripts(NEG_ROOT);
   });
 
-  it("spec-save: SPEC body-only change → spec_readme_update_required=false", () => {
+  it("design-save: Design body-only change → design_readme_update_required=false", () => {
     const r = runScript(NEG_ROOT, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--files",
-      "docs/specs/body-only.md",
+      "docs/designs/body-only.md",
       "--json",
     ]);
     expect(r.exitCode).toBe(0);
     const parsed = JSON.parse(r.stdout);
-    expect(parsed.spec_readme_update_required).toBe(false);
+    expect(parsed.design_readme_update_required).toBe(false);
   });
 
   it("req-save: REQ body-only change → requirements_readme_update_required=false", () => {
@@ -822,12 +833,12 @@ describe("Issue #1784 TS-010: trivial body-only change does NOT trigger update f
     expect(parsed.requirements_readme_update_required).toBe(false);
   });
 
-  it("SPEC body-only change → extensions_check_required=false", () => {
+  it("Design body-only change → extensions_check_required=false", () => {
     const r = runScript(NEG_ROOT, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--files",
-      "docs/specs/body-only.md",
+      "docs/designs/body-only.md",
       "--json",
     ]);
     const parsed = JSON.parse(r.stdout);
@@ -848,42 +859,42 @@ describe("Issue #1784 TS-010: trivial body-only change does NOT trigger update f
 });
 
 describe("Issue #1784 TS-011: lifecycle / frontmatter change triggers update flags", () => {
-  it("TS-011a: added SPEC → spec_readme_update_required=true, extensions_check_required=true", () => {
+  it("TS-011a: added Design → design_readme_update_required=true, extensions_check_required=true", () => {
     const root = join(TEMP_ROOT, "issue1784-add");
     mkdirp(root);
     setupGitFixture(root);
-    writeSpecFile(root, "new-spec.md", "new spec", "accepted", "New spec body.");
+    writeDesignFile(root, "new-spec.md", "new spec", "accepted", "New spec body.");
     copyScripts(root);
 
     const r = runScript(root, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--files",
-      "docs/specs/new-spec.md",
+      "docs/designs/new-spec.md",
       "--json",
     ]);
     const parsed = JSON.parse(r.stdout);
-    expect(parsed.spec_readme_update_required).toBe(true);
+    expect(parsed.design_readme_update_required).toBe(true);
     expect(parsed.extensions_check_required).toBe(true);
   });
 
-  it("TS-011b: SPEC frontmatter title change → spec_readme_update_required=true", () => {
+  it("TS-011b: Design frontmatter title change → design_readme_update_required=true", () => {
     const root = join(TEMP_ROOT, "issue1784-fm-spec");
     mkdirp(root);
-    writeSpecFile(root, "fm-spec.md", "original title", "accepted", "Body content.");
+    writeDesignFile(root, "fm-spec.md", "original title", "accepted", "Body content.");
     setupGitFixture(root);
-    writeSpecFile(root, "fm-spec.md", "changed title", "accepted", "Body content.");
+    writeDesignFile(root, "fm-spec.md", "changed title", "accepted", "Body content.");
     copyScripts(root);
 
     const r = runScript(root, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--files",
-      "docs/specs/fm-spec.md",
+      "docs/designs/fm-spec.md",
       "--json",
     ]);
     const parsed = JSON.parse(r.stdout);
-    expect(parsed.spec_readme_update_required).toBe(true);
+    expect(parsed.design_readme_update_required).toBe(true);
     expect(parsed.extensions_check_required).toBe(true);
   });
 
@@ -907,75 +918,75 @@ describe("Issue #1784 TS-011: lifecycle / frontmatter change triggers update fla
     expect(parsed.extensions_check_required).toBe(true);
   });
 
-  it("TS-011d: SPEC status change (draft→accepted) → spec_readme_update_required=true", () => {
+  it("TS-011d: Design status change (draft→accepted) → design_readme_update_required=true", () => {
     const root = join(TEMP_ROOT, "issue1784-status");
     mkdirp(root);
-    writeSpecFile(root, "status-spec.md", "status spec", "draft", "Body content.");
+    writeDesignFile(root, "status-spec.md", "status spec", "draft", "Body content.");
     setupGitFixture(root);
-    writeSpecFile(root, "status-spec.md", "status spec", "accepted", "Body content.");
+    writeDesignFile(root, "status-spec.md", "status spec", "accepted", "Body content.");
     copyScripts(root);
 
     const r = runScript(root, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--files",
-      "docs/specs/status-spec.md",
+      "docs/designs/status-spec.md",
       "--json",
     ]);
     const parsed = JSON.parse(r.stdout);
-    expect(parsed.spec_readme_update_required).toBe(true);
+    expect(parsed.design_readme_update_required).toBe(true);
   });
 
-  it("TS-011e: deleted SPEC (--base-ref) → spec_readme_update_required=true", () => {
+  it("TS-011e: deleted Design (--base-ref) → design_readme_update_required=true", () => {
     const root = join(TEMP_ROOT, "issue1784-delete");
     mkdirp(root);
-    writeSpecFile(root, "del-spec.md", "delete spec", "accepted", "Body content.");
+    writeDesignFile(root, "del-spec.md", "delete spec", "accepted", "Body content.");
     const sha1 = setupGitFixture(root);
-    rmSync(join(root, "docs", "specs", "del-spec.md"));
+    rmSync(join(root, "docs", "designs", "del-spec.md"));
     commitAll(root, "delete spec");
     copyScripts(root);
 
     const r = runScript(root, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--base-ref",
       sha1,
       "--json",
     ]);
     expect(r.exitCode).toBe(0);
     const parsed = JSON.parse(r.stdout);
-    expect(parsed.files_checked).toContain("docs/specs/del-spec.md");
-    expect(parsed.spec_readme_update_required).toBe(true);
+    expect(parsed.files_checked).toContain("docs/designs/del-spec.md");
+    expect(parsed.design_readme_update_required).toBe(true);
     expect(parsed.extensions_check_required).toBe(true);
   });
 
   it("TS-011f: body-only change does NOT trigger (negative cross-check)", () => {
     const root = join(TEMP_ROOT, "issue1784-body-only-pos");
     mkdirp(root);
-    writeSpecFile(root, "body-spec.md", "body spec", "accepted", "Original body.");
+    writeDesignFile(root, "body-spec.md", "body spec", "accepted", "Original body.");
     setupGitFixture(root);
-    writeSpecFile(root, "body-spec.md", "body spec", "accepted", "Updated body with typo fix.");
+    writeDesignFile(root, "body-spec.md", "body spec", "accepted", "Updated body with typo fix.");
     copyScripts(root);
 
     const r = runScript(root, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--files",
-      "docs/specs/body-spec.md",
+      "docs/designs/body-spec.md",
       "--json",
     ]);
     const parsed = JSON.parse(r.stdout);
-    expect(parsed.spec_readme_update_required).toBe(false);
+    expect(parsed.design_readme_update_required).toBe(false);
     expect(parsed.extensions_check_required).toBe(false);
   });
 });
 
-// ─── Issue #2138 TS-005: SPEC 判定（frontmatter・配置ディレクトリ、AG-007）───
+// ─── Issue #2138 TS-005: Design 判定（frontmatter・配置ディレクトリ、AG-007）───
 // 非 SPEC ファイル（baseline snapshot、歴史記録ファイル）に対する
-// spec_readme_update_required / extensions_check_required 誤検出が 0 件であることを
+// design_readme_update_required / extensions_check_required 誤検出が 0 件であることを
 // 正常/異常 fixture で検証する。
 
-function writeBaselineLikeFile(
+function writeReportLikeFile(
   root: string,
   relDir: string,
   name: string,
@@ -997,14 +1008,14 @@ function writeBaselineLikeFile(
       "",
       `# ${title}`,
       "",
-      "Baseline snapshot fixture for SPEC 判定 test.",
+      "Baseline snapshot fixture (Report) for Design 判定 test.",
       "",
     ].join("\n"),
     "utf-8",
   );
 }
 
-function writeAuditLikeFile(
+function writeReportAuditLikeFile(
   root: string,
   relDir: string,
   name: string,
@@ -1027,76 +1038,76 @@ function writeAuditLikeFile(
       "",
       `# ${title}`,
       "",
-      "Audit record fixture for SPEC 判定 test.",
+      "Audit record fixture (Report) for Design 判定 test.",
       "",
     ].join("\n"),
     "utf-8",
   );
 }
 
-describe("Issue #2138 TS-005: SPEC 判定 — 正常 fixture（SPEC は登録候補として検出）", () => {
-  it("added SPEC under docs/specs/integrity/ → spec_readme_update_required=true", () => {
+describe("Issue #2138 TS-005: Design 判定 — 正常 fixture（SPEC は登録候補として検出）", () => {
+  it("added Design under docs/designs/integrity/ → design_readme_update_required=true", () => {
     const root = join(TEMP_ROOT, "issue2138-spec-pos");
     mkdirp(root);
     setupGitFixture(root);
-    mkdirp(join(root, "docs", "specs", "integrity"));
-    writeSpecFile(
+    mkdirp(join(root, "docs", "designs", "integrity"));
+    writeDesignFile(
       root,
       "integrity/guard-spec-fixture.md",
-      "guard spec fixture",
+      "guard design fixture",
       "accepted",
-      "Real SPEC fixture body.",
+      "Real Design fixture body.",
     );
     copyScripts(root);
 
     const r = runScript(root, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--files",
-      "docs/specs/integrity/guard-spec-fixture.md",
+      "docs/designs/integrity/guard-spec-fixture.md",
       "--json",
     ]);
     expect(r.exitCode).toBe(0);
     const parsed = JSON.parse(r.stdout);
-    expect(parsed.spec_readme_update_required).toBe(true);
+    expect(parsed.design_readme_update_required).toBe(true);
     expect(parsed.extensions_check_required).toBe(true);
   });
 
-  it("added SPEC under docs/specs/foundations/ → spec_readme_update_required=true", () => {
+  it("added Design under docs/designs/foundations/ → design_readme_update_required=true", () => {
     const root = join(TEMP_ROOT, "issue2138-spec-foundations");
     mkdirp(root);
     setupGitFixture(root);
-    mkdirp(join(root, "docs", "specs", "foundations"));
-    writeSpecFile(
+    mkdirp(join(root, "docs", "designs", "foundations"));
+    writeDesignFile(
       root,
       "foundations/foundation-spec-fixture.md",
-      "foundation spec fixture",
+      "foundation design fixture",
       "accepted",
-      "Real SPEC fixture body.",
+      "Real Design fixture body.",
     );
     copyScripts(root);
 
     const r = runScript(root, [
       "--workflow",
-      "spec-save",
+      "design-save",
       "--files",
-      "docs/specs/foundations/foundation-spec-fixture.md",
+      "docs/designs/foundations/foundation-spec-fixture.md",
       "--json",
     ]);
     expect(r.exitCode).toBe(0);
     const parsed = JSON.parse(r.stdout);
-    expect(parsed.spec_readme_update_required).toBe(true);
+    expect(parsed.design_readme_update_required).toBe(true);
   });
 });
 
-describe("Issue #2138 TS-005: SPEC 判定 — 異常 fixture（非 SPEC の誤検出 0 件）", () => {
-  it("added baseline snapshot under baselines/ → 誤検出 0 件", () => {
-    const root = join(TEMP_ROOT, "issue2138-baseline");
+describe("Issue #2349 TS-005: Report 分離後の Design 判定（docs/reports は登録候補外）", () => {
+  it("added baseline snapshot under docs/reports/integrity/baselines/ → 誤検出 0 件", () => {
+    const root = join(TEMP_ROOT, "issue2349-baseline");
     mkdirp(root);
     setupGitFixture(root);
-    writeBaselineLikeFile(
+    writeReportLikeFile(
       root,
-      "docs/specs/integrity/baselines",
+      "docs/reports/integrity/baselines",
       "pre-audit-fixture.md",
       "fixture baseline snapshot",
     );
@@ -1104,24 +1115,24 @@ describe("Issue #2138 TS-005: SPEC 判定 — 異常 fixture（非 SPEC の誤�
 
     const r = runScript(root, [
       "--workflow",
-      "spec-save",
+      "case-run",
       "--files",
-      "docs/specs/integrity/baselines/pre-audit-fixture.md",
+      "docs/reports/integrity/baselines/pre-audit-fixture.md",
       "--json",
     ]);
     expect(r.exitCode).toBe(0);
     const parsed = JSON.parse(r.stdout);
-    expect(parsed.spec_readme_update_required).toBe(false);
+    expect(parsed.design_readme_update_required).toBe(false);
     expect(parsed.extensions_check_required).toBe(false);
   });
 
-  it("added audit record under audits/ → 誤検出 0 件", () => {
-    const root = join(TEMP_ROOT, "issue2138-audit");
+  it("added audit record under docs/reports/integrity/audits/ → 誤検出 0 件", () => {
+    const root = join(TEMP_ROOT, "issue2349-audit");
     mkdirp(root);
     setupGitFixture(root);
-    writeAuditLikeFile(
+    writeReportAuditLikeFile(
       root,
-      "docs/specs/integrity/audits",
+      "docs/reports/integrity/audits",
       "audit-fixture.md",
       "fixture audit record",
     );
@@ -1129,70 +1140,45 @@ describe("Issue #2138 TS-005: SPEC 判定 — 異常 fixture（非 SPEC の誤�
 
     const r = runScript(root, [
       "--workflow",
-      "spec-save",
+      "case-run",
       "--files",
-      "docs/specs/integrity/audits/audit-fixture.md",
+      "docs/reports/integrity/audits/audit-fixture.md",
       "--json",
     ]);
     expect(r.exitCode).toBe(0);
     const parsed = JSON.parse(r.stdout);
-    expect(parsed.spec_readme_update_required).toBe(false);
+    expect(parsed.design_readme_update_required).toBe(false);
     expect(parsed.extensions_check_required).toBe(false);
   });
 
-  it("history-frontmatter file outside history dirs → frontmatter 判定で誤検出 0 件", () => {
-    const root = join(TEMP_ROOT, "issue2138-misplaced");
+  it("report title change (lifecycle 影響あり) → docs/reports は Design 登録候補外", () => {
+    const root = join(TEMP_ROOT, "issue2349-report-title");
     mkdirp(root);
-    setupGitFixture(root);
-    writeBaselineLikeFile(
+    writeReportLikeFile(
       root,
-      "docs/specs/integrity",
-      "misplaced-snapshot-fixture.md",
-      "misplaced baseline snapshot",
+      "docs/reports/integrity",
+      "report-fixture.md",
+      "original report title",
+    );
+    setupGitFixture(root);
+    writeReportLikeFile(
+      root,
+      "docs/reports/integrity",
+      "report-fixture.md",
+      "changed report title",
     );
     copyScripts(root);
 
     const r = runScript(root, [
       "--workflow",
-      "spec-save",
+      "case-run",
       "--files",
-      "docs/specs/integrity/misplaced-snapshot-fixture.md",
+      "docs/reports/integrity/report-fixture.md",
       "--json",
     ]);
     expect(r.exitCode).toBe(0);
     const parsed = JSON.parse(r.stdout);
-    expect(parsed.spec_readme_update_required).toBe(false);
-    expect(parsed.extensions_check_required).toBe(false);
-  });
-
-  it("baseline title change (lifecycle 影響あり) → 配置ディレクトリ判定で誤検出 0 件", () => {
-    const root = join(TEMP_ROOT, "issue2138-baseline-title");
-    mkdirp(root);
-    writeBaselineLikeFile(
-      root,
-      "docs/specs/integrity/baselines",
-      "pre-audit-fixture.md",
-      "original baseline title",
-    );
-    setupGitFixture(root);
-    writeBaselineLikeFile(
-      root,
-      "docs/specs/integrity/baselines",
-      "pre-audit-fixture.md",
-      "changed baseline title",
-    );
-    copyScripts(root);
-
-    const r = runScript(root, [
-      "--workflow",
-      "spec-save",
-      "--files",
-      "docs/specs/integrity/baselines/pre-audit-fixture.md",
-      "--json",
-    ]);
-    expect(r.exitCode).toBe(0);
-    const parsed = JSON.parse(r.stdout);
-    expect(parsed.spec_readme_update_required).toBe(false);
+    expect(parsed.design_readme_update_required).toBe(false);
     expect(parsed.extensions_check_required).toBe(false);
   });
 });

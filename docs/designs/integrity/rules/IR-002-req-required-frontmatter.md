@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | frontmatter field 存在確認 |
 | affected_artifacts | [現行 REQ] |
 | related_req | [REQ-010-001] |
-| related_spec | [integrity-contracts.md] |
+| related_design | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 低。必須 field 欠落は確実な NG |
 | regression_test | commands_structure.test.ts |

@@ -24,7 +24,7 @@ const FIXTURE_SCRIPT_DIR = join(
   "repo-agentdev-integrity",
   "scripts",
 );
-const RULES_DIR = join(TEMP_ROOT, "docs", "specs", "integrity", "rules");
+const RULES_DIR = join(TEMP_ROOT, "docs", "designs", "integrity", "rules");
 
 type GuardReport = {
   readonly failures: readonly {
@@ -89,7 +89,7 @@ function runGuardForRelPath(relPath: string): {
 beforeAll(() => {
   mkdirSync(FIXTURE_SCRIPT_DIR, { recursive: true });
   mkdirSync(RULES_DIR, { recursive: true });
-  mkdirSync(join(TEMP_ROOT, "docs", "specs", "integrity"), {
+  mkdirSync(join(TEMP_ROOT, ".opencode", "skills", "repo-agentdev-integrity", "data"), {
     recursive: true,
   });
 
@@ -102,7 +102,7 @@ beforeAll(() => {
   }
 
   writeFileSync(
-    join(TEMP_ROOT, "docs", "specs", "integrity", "obsolete-path-map.yaml"),
+    join(TEMP_ROOT, ".opencode", "skills", "repo-agentdev-integrity", "data", "obsolete-path-map.yaml"),
     [
       "entries:",
       "legacy_local_generation_vocabulary:",
@@ -121,9 +121,9 @@ beforeAll(() => {
 
   for (const rel of [
     "docs/requirements/REQ-009.md",
-    "docs/specs/local/runtime-package-boundary.md",
+    "docs/designs/local/runtime-package-boundary.md",
     "docs/guides/glossary.md",
-    "docs/specs/local/local-generation.md",
+    "docs/designs/local/local-generation.md",
     "docs/something.test.ts",
   ]) {
     writeFixtureAtRelPath(rel);
@@ -138,7 +138,7 @@ describe("isIr057PathExempt pure predicate (shared semantics)", () => {
   it("exempts the canonical IR-046 rule file by exact name", () => {
     expect(
       isIr057PathExempt(
-        "docs/specs/integrity/rules/IR-046-consumer-generated-repo-type-fp-prevention.md",
+        "docs/designs/integrity/rules/IR-046-consumer-generated-repo-type-fp-prevention.md",
       ),
     ).toBe(true);
   });
@@ -146,7 +146,7 @@ describe("isIr057PathExempt pure predicate (shared semantics)", () => {
   it("exempts the canonical IR-048 rule file by exact name", () => {
     expect(
       isIr057PathExempt(
-        "docs/specs/integrity/rules/IR-048-generated-by-identifier-integrity.md",
+        "docs/designs/integrity/rules/IR-048-generated-by-identifier-integrity.md",
       ),
     ).toBe(true);
   });
@@ -154,29 +154,29 @@ describe("isIr057PathExempt pure predicate (shared semantics)", () => {
   it("exempts the IR-057 rule definition by exact name", () => {
     expect(
       isIr057PathExempt(
-        "docs/specs/integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md",
+        "docs/designs/integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md",
       ),
     ).toBe(true);
   });
 
   it("does NOT exempt an IR-046 near-name (no wildcard)", () => {
     expect(
-      isIr057PathExempt("docs/specs/integrity/rules/IR-046-unrelated-topic.md"),
+      isIr057PathExempt("docs/designs/integrity/rules/IR-046-unrelated-topic.md"),
     ).toBe(false);
   });
 
   it("does NOT exempt an IR-048 near-name (no wildcard)", () => {
     expect(
-      isIr057PathExempt("docs/specs/integrity/rules/IR-048-unrelated-topic.md"),
+      isIr057PathExempt("docs/designs/integrity/rules/IR-048-unrelated-topic.md"),
     ).toBe(false);
   });
 
-  it("exempts SPEC-listed fixtures: obsolete-path-map, catalog, rule-ownership, REQ-009, runtime-package-boundary, glossary", () => {
-    expect(isIr057PathExempt("docs/specs/integrity/obsolete-path-map.yaml")).toBe(true);
-    expect(isIr057PathExempt("docs/specs/integrity/integrity-rule-catalog.md")).toBe(true);
-    expect(isIr057PathExempt("docs/specs/integrity/rule-ownership.md")).toBe(true);
+  it("exempts Design-listed fixtures: obsolete-path-map, catalog, rule-ownership, REQ-009, runtime-package-boundary, glossary", () => {
+    expect(isIr057PathExempt(".opencode/skills/repo-agentdev-integrity/data/obsolete-path-map.yaml")).toBe(true);
+    expect(isIr057PathExempt("docs/designs/integrity/integrity-rule-catalog.md")).toBe(true);
+    expect(isIr057PathExempt("docs/designs/integrity/rule-ownership.md")).toBe(true);
     expect(isIr057PathExempt("docs/requirements/REQ-009.md")).toBe(true);
-    expect(isIr057PathExempt("docs/specs/local/runtime-package-boundary.md")).toBe(true);
+    expect(isIr057PathExempt("docs/designs/local/runtime-package-boundary.md")).toBe(true);
     expect(isIr057PathExempt("docs/guides/glossary.md")).toBe(true);
   });
 
@@ -200,7 +200,7 @@ describe("isIr057PathExempt pure predicate (shared semantics)", () => {
   });
 
   it("does NOT exempt stale local-generation path", () => {
-    expect(isIr057PathExempt("docs/specs/local/local-generation.md")).toBe(false);
+    expect(isIr057PathExempt("docs/designs/local/local-generation.md")).toBe(false);
   });
 
   it("does NOT exempt deleted REQ-0141 / REQ-0158 (stale exemptions removed)", () => {
@@ -220,7 +220,7 @@ describe("IR-057 rule-definition exemptions (targeted guard)", () => {
     // Given: IR-046 defines detection of the retired generated_by identifier.
     // When: the targeted docs guard checks that rule definition.
     const result = runGuardForRelPath(
-      "docs/specs/integrity/rules/IR-046-consumer-generated-repo-type-fp-prevention.md",
+      "docs/designs/integrity/rules/IR-046-consumer-generated-repo-type-fp-prevention.md",
     );
 
     // Then: the documented IR-046 exemption prevents an IR-057 failure.
@@ -232,7 +232,7 @@ describe("IR-057 rule-definition exemptions (targeted guard)", () => {
     // Given: IR-048 defines detection of the retired generated_by identifier.
     // When: the targeted docs guard checks that rule definition.
     const result = runGuardForRelPath(
-      "docs/specs/integrity/rules/IR-048-generated-by-identifier-integrity.md",
+      "docs/designs/integrity/rules/IR-048-generated-by-identifier-integrity.md",
     );
 
     // Then: the documented IR-048 exemption prevents an IR-057 failure.
@@ -244,7 +244,7 @@ describe("IR-057 rule-definition exemptions (targeted guard)", () => {
     // Given: an ordinary rule file contains the retired identifier.
     // When: the targeted docs guard checks that file.
     const result = runGuardForRelPath(
-      "docs/specs/integrity/rules/IR-049-non-exempt-fixture.md",
+      "docs/designs/integrity/rules/IR-049-non-exempt-fixture.md",
     );
 
     // Then: IR-057 remains strict outside the documented exemptions.
@@ -252,7 +252,7 @@ describe("IR-057 rule-definition exemptions (targeted guard)", () => {
     expect(result.report.failures).toContainEqual(
       expect.objectContaining({
         rule_id: "IR-057",
-        file: "docs/specs/integrity/rules/IR-049-non-exempt-fixture.md",
+        file: "docs/designs/integrity/rules/IR-049-non-exempt-fixture.md",
       }),
     );
   });
@@ -261,7 +261,7 @@ describe("IR-057 rule-definition exemptions (targeted guard)", () => {
     // Given: a rule file with an IR-046 prefix but not the canonical name.
     // When: the targeted docs guard checks that file.
     const result = runGuardForRelPath(
-      "docs/specs/integrity/rules/IR-046-unrelated-topic.md",
+      "docs/designs/integrity/rules/IR-046-unrelated-topic.md",
     );
 
     // Then: the near-name is not exempt; IR-057 fires.
@@ -269,7 +269,7 @@ describe("IR-057 rule-definition exemptions (targeted guard)", () => {
     expect(result.report.failures).toContainEqual(
       expect.objectContaining({
         rule_id: "IR-057",
-        file: "docs/specs/integrity/rules/IR-046-unrelated-topic.md",
+        file: "docs/designs/integrity/rules/IR-046-unrelated-topic.md",
       }),
     );
   });
@@ -278,7 +278,7 @@ describe("IR-057 rule-definition exemptions (targeted guard)", () => {
     // Given: a rule file with an IR-048 prefix but not the canonical name.
     // When: the targeted docs guard checks that file.
     const result = runGuardForRelPath(
-      "docs/specs/integrity/rules/IR-048-unrelated-topic.md",
+      "docs/designs/integrity/rules/IR-048-unrelated-topic.md",
     );
 
     // Then: the near-name is not exempt; IR-057 fires.
@@ -286,16 +286,16 @@ describe("IR-057 rule-definition exemptions (targeted guard)", () => {
     expect(result.report.failures).toContainEqual(
       expect.objectContaining({
         rule_id: "IR-057",
-        file: "docs/specs/integrity/rules/IR-048-unrelated-topic.md",
+        file: "docs/designs/integrity/rules/IR-048-unrelated-topic.md",
       }),
     );
   });
 });
 
 describe("IR-057 SPEC-listed fixture exemptions (targeted guard)", () => {
-  it("does not flag legacy vocab in docs/specs/local/runtime-package-boundary.md", () => {
+  it("does not flag legacy vocab in docs/designs/local/runtime-package-boundary.md", () => {
     const result = runGuardForRelPath(
-      "docs/specs/local/runtime-package-boundary.md",
+      "docs/designs/local/runtime-package-boundary.md",
     );
     expect(result.exitCode).toBe(0);
     expect(result.report.failures).toEqual([]);
@@ -325,7 +325,7 @@ describe("IR-057 stale exemption removal (targeted guard)", () => {
     // Given: the stale local-generation.md path contains legacy vocab.
     // When: the targeted docs guard checks that file.
     const result = runGuardForRelPath(
-      "docs/specs/local/local-generation.md",
+      "docs/designs/local/local-generation.md",
     );
 
     // Then: the stale exemption is removed; IR-057 fires.
@@ -333,7 +333,7 @@ describe("IR-057 stale exemption removal (targeted guard)", () => {
     expect(result.report.failures).toContainEqual(
       expect.objectContaining({
         rule_id: "IR-057",
-        file: "docs/specs/local/local-generation.md",
+        file: "docs/designs/local/local-generation.md",
       }),
     );
   });

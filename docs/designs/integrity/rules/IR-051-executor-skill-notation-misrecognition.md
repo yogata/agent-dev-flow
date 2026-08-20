@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | 既知 command 名、harness 名、subagent 名（語彙レジストリ `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` 参照）の出現位置から一定文字距離内（同一段落、同行、隣接リスト項目等）の「スキル」「skill」表記を検出。コードブロック内の例示、IR ルール本文中のパターン説明、誤認説明の否定文脈（「skill ではない」等）は除外対象 |
 | affected_artifacts | [REQ, SPEC, guides, commands, skills] |
 | related_req | [v2:REQ-0140-027, REQ-010-010] |
-| related_spec | [integrity-contracts.md, document-type-responsibilities.md] |
+| related_design | [integrity-contracts.md, document-type-responsibilities.md] |
 | gate_level | full-audit |
 | false_positive_risk | 高。文脈判断が必要（例: 「`agentdev-doc-writing` skill」は正当、command 名を skill と表記は誤認）。意味判断を要する境界ケースは inspect-skills（REQ-010-010）、doc-writing（v2:REQ-0140-027）が意味的診断を担う。本ルールは機械的パターンマッチングで判定可能な範囲（既知名 + 近接 skill 表記）に限定 |
 | regression_test | (未実装)。既知 true positive として過去の委譲契約バグ周辺の skill 表記を回帰テストで検証 |

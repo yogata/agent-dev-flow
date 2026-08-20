@@ -4,16 +4,16 @@
  * AUTOGEN ブロック（`<!-- AUTOGEN:BEGIN:id=xxx -->`〜`<!-- AUTOGEN:END -->`）を含む
  * 索引ファイル群について、ソース（frontmatter / ファイル名 / status）の rename や
  * status 変更後に AUTOGEN ブロックが陳腐化しているかを検出する。
- * 不合格時は再生成対象を報告し、自動修復は行わない（autogen-freshness-gate SPEC）。
+ * 不合格時は再生成対象を報告し、自動修復は行わない（autogen-freshness-gate Design）。
  *
  * IR-061（check_integrity.ts checkIndexGenerationConsistency）が同一の不整合を
  * 「内容不一致」として検出するのに対し、本 gate は鮮度の「種別」
  * （rename / status_change / content_change）を分類して報告する。両検査は独立し、
  * いずれか単独の実施要否にも他方の結果は影響しない。
  *
- * 参考 SPEC:  `docs/specs/integrity/autogen-freshness-gate.md`（REQ-010-059）
- * 参考 IR:    `docs/specs/integrity/rules/IR-061-index-generation-consistency.md`
- * 参考 SC-002: `docs/specs/integrity/index-auto-generation.md`（定期再生成）
+ * 参考 Design:  `docs/designs/integrity/autogen-freshness-gate.md`（REQ-010-059）
+ * 参考 IR:    `docs/designs/integrity/rules/IR-061-index-generation-consistency.md`
+ * 参考 SC-002: `docs/designs/integrity/index-auto-generation.md`（定期再生成）
  *
  * 使用資産: `cli_utils.ts`, `generate_indexes.ts`（生成ロジック再利用）
  * require/import 混在許容（AG-001、既存資産踏襲）。
@@ -32,7 +32,6 @@ import {
   collectReqFiles,
   collectRetiredReqFiles,
   collectReqMetrics,
-  collectSpecMetrics,
   generateCatalogBlocks,
   generateRuleOwnershipAppendix,
   generateDecisionBaselineCaption,
@@ -43,10 +42,8 @@ import {
   generateReqActiveTable,
   generateReqRetiredTable,
   generateReqMetricsTable,
-  generateSpecMetricsTable,
   generateReadmeReqSummaryCount,
   deriveReqMetricsMeasureDate,
-  deriveSpecMetricsMeasureDate,
   CATALOG_PRE_BLOCK_ID,
   CATALOG_POST_BLOCK_ID,
   RULE_OWNERSHIP_BLOCK_ID,
@@ -61,7 +58,6 @@ import {
   REQ_ACTIVE_TABLE_BLOCK_ID,
   REQ_RETIRED_TABLE_BLOCK_ID,
   REQ_METRICS_BLOCK_ID,
-  SPEC_METRICS_BLOCK_ID,
   README_REQ_SUMMARY_COUNT_BLOCK_ID,
 } from "./generate_indexes.ts";
 
@@ -76,7 +72,7 @@ const USAGE =
 
 // ─── 出力契約 ─────────────────────────────────────────────────────────────
 
-/** 鮮度違反の種別。autogen-freshness-gate SPEC「鮮度判定基準」に対応。 */
+/** 鮮度違反の種別。autogen-freshness-gate Design「鮮度判定基準」に対応。 */
 type StaleKind = "rename" | "status_change" | "content_change";
 
 interface FreshnessFinding {
@@ -166,16 +162,16 @@ export function parseTableRow(line: string): string[] | null {
  *
  * 判定規則（リスト順、最初に該当したものを優先）:
  *   1. 行数の増減 → rename（行の追加・削除 = ファイル追加・削除・rename とみなす）
- *   2. SPEC metrics 表の同行異 status 列 → status_change
+ *   2. Decision baseline 表の同行異 status 列 → status_change
  *   3. Decision README 表の同行異 status 列 → status_change
  *   4. REQ metrics 表の同行異シグナル/備考列 → content_change（status 列を持たないため）
  *   5. 上記以外の不一致 → content_change
  *
  * 注意: 本判定は「鮮度種別の優先的付与」であり、絶対的分類ではない。
- * 例えば SPEC rename に伴いSPEC行数も変化した場合、行追加・削除を伴えば rename、
+ * 例えば Design rename に伴いDesign行数も変化した場合、行追加・削除を伴えば rename、
  * 同行の値変化だけなら status_change / content_change となる。
  * IR-061 は同一不整合を「内容不一致」として扱い、本 gate と判定基準が異なっても
- * 両検査の実施要否は互いに影響しない（独立実施原則、SPEC「鮮度判定基準」）。
+ * 両検査の実施要否は互いに影響しない（独立実施原則、Design「鮮度判定基準」）。
  */
 export function classifyStaleness(
   blockId: string,
@@ -201,18 +197,6 @@ export function classifyStaleness(
   const expCells = parseTableRow(exp);
 
   if (curCells && expCells && curCells.length > 0 && expCells.length > 0) {
-    // SPEC metrics 表（SPEC_METRICS_BLOCK_ID）: 列構成 = SPEC | SPEC 行数 | status | ドメイン分類
-    // status 列（index 2）のみ変化 → status_change
-    if (blockId === SPEC_METRICS_BLOCK_ID && curCells.length >= 4 && expCells.length >= 4) {
-      if (curCells[0] === expCells[0] && curCells[2] !== expCells[2]) {
-        return {
-          kind: "status_change",
-          detail:
-            `SPEC status changed without regeneration. path=${curCells[0]}, ` +
-            `status current="${curCells[2]}" expected="${expCells[2]}".`,
-        };
-      }
-    }
     // Decision baseline 表: 列構成 = Decision番号 | タイトル | ステータス | 作成日
     // status 列（index 2）のみ変化 → status_change
     if (
@@ -274,18 +258,16 @@ interface BlockTarget {
 function buildBlockTargets(root: string): BlockTarget[] {
   const targets: BlockTarget[] = [];
 
-  const rulesDir = path.join(root, "docs", "specs", "integrity", "rules");
+  const rulesDir = path.join(root, "docs", "designs", "integrity", "rules");
   const catalogPath = path.join(
     root,
-    "docs",
-    "specs",
+    "docs", "designs",
     "integrity",
     "integrity-rule-catalog.md",
   );
   const ruleOwnershipPath = path.join(
     root,
-    "docs",
-    "specs",
+    "docs", "designs",
     "integrity",
     "rule-ownership.md",
   );
@@ -293,12 +275,11 @@ function buildBlockTargets(root: string): BlockTarget[] {
   const decisionRetiredDir = path.join(decisionsDir, "retired");
   const reqDir = path.join(root, "docs", "requirements");
   const reqRetiredDir = path.join(reqDir, "retired");
-  const specsDir = path.join(root, "docs", "specs");
+  const designsDir = path.join(root, "docs", "designs");
   const decisionReadmePath = path.join(decisionsDir, "README.md");
   const reqReadmePath = path.join(reqDir, "README.md");
-  const qualityDir = path.join(specsDir, "quality");
+  const qualityDir = path.join(designsDir, "quality");
   const reqHealthMetricsPath = path.join(qualityDir, "req-health-metrics.md");
-  const specHealthMetricsPath = path.join(qualityDir, "spec-health-metrics.md");
   const docsReadmePath = path.join(root, "docs", "README.md");
 
   // catalog（pre/post IR-045 gap 2ブロック）。IR ファイルが存在しない場合は対象外。
@@ -390,7 +371,8 @@ function buildBlockTargets(root: string): BlockTarget[] {
 
   // DOC-MAP（docmap-inventory）検査は docs/DOC-MAP.md 廃止（DEC-009、REQ-013）に伴い除去。
 
-  // REQ / SPEC health-metrics（各1ブロック）。計測日は対象ドキュメント群の最終コミット日付（SC-002「計測日導出」）。
+  // REQ health-metrics（1ブロック）。計測日は対象ドキュメント群の最終コミット日付（SC-002「計測日導出」）。
+  // Design 計測例（design-health-metrics）は Design 文書への永続化を廃止（Issue #2349、RU-0001 AG-002）。
   if (fs.existsSync(reqDir)) {
     const reqMetrics = collectReqMetrics(reqDir);
     const reqMeasureDate = deriveReqMetricsMeasureDate(
@@ -411,24 +393,6 @@ function buildBlockTargets(root: string): BlockTarget[] {
       expected: generateReqMetricsTable(reqMetrics, reqMeasureDate),
     });
   }
-  const specMetrics = collectSpecMetrics(specsDir);
-  const specMeasureDate = deriveSpecMetricsMeasureDate(
-    root,
-    specsDir,
-    specMetrics,
-  );
-  if (specMeasureDate === null) {
-    console.error(
-      `[check_autogen_freshness] measure date derivation failed for docs/specs/**/*.md ` +
-        `(no commit history or git failure)`,
-    );
-    process.exit(EXIT_ERROR);
-  }
-  targets.push({
-    file: specHealthMetricsPath,
-    blockId: SPEC_METRICS_BLOCK_ID,
-    expected: generateSpecMetricsTable(specMetrics, specMeasureDate),
-  });
 
   // docs/README.md（1ブロック）。REQ ファイル群が存在しない場合は計測不能のため対象外。
   if (fs.existsSync(reqDir) && fs.existsSync(reqRetiredDir)) {
@@ -567,7 +531,7 @@ function formatText(report: FreshnessReport): string {
     lines.push("## 再生成手順");
     lines.push("");
     lines.push(
-      "AUTOGEN ブロックが陳腐化しています。次のコマンドで再生成してください（autogen-freshness-gate SPEC、不合格時の処置）。",
+      "AUTOGEN ブロックが陳腐化しています。次のコマンドで再生成してください（autogen-freshness-gate Design、不合格時の処置）。",
     );
     lines.push("");
     lines.push(
@@ -656,13 +620,13 @@ EXIT CODES:
 
 STALENESS CLASSIFICATION:
   rename           Source file add / remove / rename detected (block size differs)
-  status_change    Same source id but status column changed (SPEC / Decision status)
+  status_change    Same source id but status column changed (Decision status)
   content_change   Other content drift (line count, title, caption, link, etc.)
 
 RELATED:
-  - SPEC: docs/specs/integrity/autogen-freshness-gate.md (REQ-010-059)
-  - IR:   docs/specs/integrity/rules/IR-061-index-generation-consistency.md
-  - SC-002: docs/specs/integrity/index-auto-generation.md
+  - Design: docs/designs/integrity/autogen-freshness-gate.md (REQ-010-059)
+  - IR:   docs/designs/integrity/rules/IR-061-index-generation-consistency.md
+  - SC-002: docs/designs/integrity/index-auto-generation.md
   - Regeneration: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts
   - docs-check: /repo/docs-check (Step 1)
 `;

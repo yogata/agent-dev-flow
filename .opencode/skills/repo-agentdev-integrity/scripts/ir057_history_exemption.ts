@@ -1,7 +1,7 @@
 /**
  * ir057_history_exemption.ts — IR-057 文書レベル履歴注記 exemption（Issue #1768）
  *
- * IR-057 SPEC「例外登録（現行ADRの履歴記載）」セクション（docs/specs/integrity/
+ * IR-057 Design「例外登録（現行ADRの履歴記載）」セクション（docs/designs/integrity/
  * rules/IR-057-obsolete-spec-path-after-domain-split.md）に基づく免除判定の
  * 純粋関数群。targeted guard（check_changed_docs.ts）と full audit
  * （check_integrity.ts）で同じ例外規則を使用する（REQ-0144-024）。
@@ -222,7 +222,7 @@ export function isIr057LineExempt(
 
 // ===== パス単位免除（IR-057 SPEC exemption 表、REQ-0144-024）=====
 //
-// SPEC docs/specs/integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md
+// SPEC docs/designs/integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md
 // 「exemption（検出対象外）」セクションが列挙するファイルを免除する。
 // targeted guard（check_changed_docs.ts）と full audit（check_integrity.ts）で
 // 同一の免除集合を使用し、検出器間の判定乖離を防ぐ。
@@ -231,18 +231,18 @@ export function isIr057LineExempt(
 // ルールファイル」「IR-057 ルール説明としての旧パス例」として列挙する。
 // ワイルドカードではなく正確なファイル名で列挙し、near-name が免除されないことを保証する。
 const IR_057_EXEMPT_RULE_FILES: ReadonlySet<string> = new Set([
-  "docs/specs/integrity/rules/IR-046-consumer-generated-repo-type-fp-prevention.md",
-  "docs/specs/integrity/rules/IR-048-generated-by-identifier-integrity.md",
-  "docs/specs/integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md",
+  "docs/designs/integrity/rules/IR-046-consumer-generated-repo-type-fp-prevention.md",
+  "docs/designs/integrity/rules/IR-048-generated-by-identifier-integrity.md",
+  "docs/designs/integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md",
 ]);
 
 // SPEC exemption 表が正規の参照文書として列挙する repo-relative exact paths。
 const IR_057_EXEMPT_EXACT_PATHS: ReadonlySet<string> = new Set([
-  "docs/specs/integrity/obsolete-path-map.yaml",
-  "docs/specs/integrity/integrity-rule-catalog.md",
-  "docs/specs/integrity/rule-ownership.md",
+  ".opencode/skills/repo-agentdev-integrity/data/obsolete-path-map.yaml",
+  "docs/designs/integrity/integrity-rule-catalog.md",
+  "docs/designs/integrity/rule-ownership.md",
   "docs/requirements/REQ-009.md",
-  "docs/specs/local/runtime-package-boundary.md",
+  "docs/designs/local/runtime-package-boundary.md",
   "docs/guides/glossary.md",
   ".opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts",
 ]);

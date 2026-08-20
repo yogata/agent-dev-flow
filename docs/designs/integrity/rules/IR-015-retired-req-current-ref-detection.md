@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | 現行 docs 内の 廃止 REQ 参照検出、コンテキスト判定 |
 | affected_artifacts | [REQ, SPEC, guides] |
 | related_req | [REQ-010] |
-| related_spec | [integrity-contracts.md] |
+| related_design | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 中 |
 | regression_test | commands_e2e.test.ts |

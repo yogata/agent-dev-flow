@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | directory 名と frontmatter name の比較 |
 | affected_artifacts | [skills] |
 | related_req | [REQ-010] |
-| related_spec | [integrity-contracts.md] |
+| related_design | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 低 |
 | regression_test | lint_skills.test.ts |

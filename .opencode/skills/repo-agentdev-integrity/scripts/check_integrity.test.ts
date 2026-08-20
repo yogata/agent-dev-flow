@@ -118,10 +118,10 @@ function buildValidFixture(root: string): void {
     "utf-8",
   );
 
-  const specsDir = join(root, "docs", "specs");
-  mkdirp(specsDir);
+  const designsDir = join(root, "docs", "designs");
+  mkdirp(designsDir);
   writeFileSync(
-    join(specsDir, "system.md"),
+    join(designsDir, "system.md"),
     [
       "# System",
       "",
@@ -139,13 +139,13 @@ function buildValidFixture(root: string): void {
     ].join("\n"),
     "utf-8",
   );
-  writeFileSync(join(specsDir, "patterns.md"), "# Patterns\n", "utf-8");
+  writeFileSync(join(designsDir, "patterns.md"), "# Patterns\n", "utf-8");
 
   // REQ-0108-268: foundations/system.md は expanded-readme-sync チェック対象。
   // agentdev/ 配下の全コマンド名を含め、同チェックを OK にする。
-  mkdirp(join(specsDir, "foundations"));
+  mkdirp(join(designsDir, "foundations"));
   writeFileSync(
-    join(specsDir, "foundations", "system.md"),
+    join(designsDir, "foundations", "system.md"),
     [
       "# System (foundations)",
       "",
@@ -164,16 +164,16 @@ function buildValidFixture(root: string): void {
     "utf-8",
   );
   writeFileSync(
-    join(specsDir, "foundations", "patterns.md"),
+    join(designsDir, "foundations", "patterns.md"),
     "# Patterns (foundations)\n",
     "utf-8",
   );
   writeFileSync(
-    join(specsDir, "README.md"),
+    join(designsDir, "README.md"),
     [
-      "# SPEC Index",
+      "# Design Index",
       "",
-      "| SPEC | status |",
+      "| Design | status |",
       "|------|--------|",
       "| foundations/system.md | accepted |",
       "| foundations/patterns.md | accepted |",
@@ -191,7 +191,7 @@ function buildValidFixture(root: string): void {
       "| 分類 | パス |",
       "|------|------|",
       "| REQ | docs/requirements/REQ-0001.md |",
-      "| SPEC | docs/specs/system.md |",
+      "| Design | docs/designs/system.md |",
       "",
     ].join("\n"),
     "utf-8",
@@ -446,12 +446,12 @@ function buildInvalidFixture(root: string): void {
     "utf-8",
   );
 
-  const specsDir = join(root, "docs", "specs");
-  mkdirp(specsDir);
+  const designsDir = join(root, "docs", "designs");
+  mkdirp(designsDir);
 
-  // IR-045 fixture: SPEC file with undocumented English abstract term
+  // IR-045 fixture: Design file with undocumented English abstract term
   writeFileSync(
-    join(specsDir, "doc-quality-fixture.md"),
+    join(designsDir, "doc-quality-fixture.md"),
     [
       "# Doc Quality Fixture",
       "",
@@ -462,11 +462,11 @@ function buildInvalidFixture(root: string): void {
   );
 
   writeFileSync(
-    join(specsDir, "README.md"),
+    join(designsDir, "README.md"),
     [
-      "# SPEC Index",
+      "# Design Index",
       "",
-      "| SPEC | status |",
+      "| Design | status |",
       "|------|--------|",
       "| foundations/missing-spec.md | draft |",
       "",
@@ -680,11 +680,11 @@ describe("valid fixture (all checks pass or info-only)", () => {
     expect(check.level).toBe("ok");
   });
 
-  it("specs existence check passes", () => {
+  it("designs existence check passes", () => {
     const r = runScript(VALID_ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
     const specResults = parsed.results.filter(
-      (res: { category: string }) => res.category === "Specs",
+      (res: { category: string }) => res.category === "Designs",
     );
     expect(specResults.length).toBeGreaterThanOrEqual(1);
     for (const sr of specResults) {
@@ -766,12 +766,12 @@ describe("invalid fixture detects violations", () => {
     expect(badRef.level).toBe("ng");
   });
 
-  it("detects missing spec files", () => {
+  it("detects missing design files", () => {
     const r = runScript(INVALID_ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
     const specNg = parsed.results.filter(
       (res: { category: string; level: string }) =>
-        res.category === "Specs" && res.level === "ng",
+        res.category === "Designs" && res.level === "ng",
     );
     expect(specNg.length).toBeGreaterThan(0);
   });
@@ -853,8 +853,8 @@ describe("Classification Policy (--classification flag)", () => {
 
 // REQ-0108-197: Classification Policy verification scenarios (structural)
 describe("Classification Policy structural verification", () => {
-  it("6 classifications are recognized: REQ, ADR, SPEC, Guide, Report, DOC-MAP", () => {
-    const expectedClassifications = ["REQ", "ADR", "SPEC", "Guide", "Report", "DOC-MAP"];
+  it("6 classifications are recognized: REQ, Decision, Design, Guide, Report, DOC-MAP", () => {
+    const expectedClassifications = ["REQ", "Decision", "Design", "Guide", "Report", "DOC-MAP"];
     expect(expectedClassifications.length).toBe(6);
 
     const r = runScript(VALID_ROOT, ["--classification", "--json"]);
@@ -880,8 +880,8 @@ describe("Classification Policy structural verification", () => {
     expect(Array.isArray(retiredAdrWarnings)).toBe(true);
   });
 
-  it("report documents found in .agentdev/integrity/reports/", () => {
-    const reportsDir = join(VALID_ROOT, ".agentdev", "integrity", "reports");
+  it("report documents found in docs/reports/", () => {
+    const reportsDir = join(VALID_ROOT, "docs", "reports");
     const r = runScript(VALID_ROOT, ["--classification", "--json"]);
     const parsed = JSON.parse(r.stdout);
     const reportResult = parsed.results.find(
@@ -1011,9 +1011,9 @@ describe("Capture boundary checks", () => {
   });
 });
 
-// ─── IR-044: REQ/SPEC boundary violation (REQ-0108-259) ──────────────────────
+// ─── IR-044: REQ/Design boundary violation (REQ-0108-259) ──────────────────────
 // Dedicated fixture with REQ requirement table rows covering:
-//   - true positive (SPEC detail, no exemption context)
+//   - true positive (Design detail, no exemption context)
 //   - pure pattern-match detection (no meaning-based context exemption)
 
 const IR044_ROOT = join(TEMP_ROOT, "ir044");
@@ -1047,7 +1047,7 @@ function buildIr044Fixture(root: string): void {
     "utf-8",
   );
 
-  // REQ-9001: true positive — SPEC detail (enum list) without any exemption context
+  // REQ-9001: true positive — Design detail (enum list) without any exemption context
   writeFileSync(
     join(reqDir, "REQ-9001.md"),
     [
@@ -1066,7 +1066,7 @@ function buildIr044Fixture(root: string): void {
     "utf-8",
   );
 
-  // REQ-9002: false positive — delegation context exempts SPEC keyword
+  // REQ-9002: false positive — delegation context exempts Design keyword
   writeFileSync(
     join(reqDir, "REQ-9002.md"),
     [
@@ -1079,13 +1079,13 @@ function buildIr044Fixture(root: string): void {
       "",
       "| ID | 要件 |",
       "|----|------|",
-      "| REQ-9002-001 | fixture 詳細は委譲先 SPEC に配置すること |",
+      "| REQ-9002-001 | fixture 詳細は委譲先 Design に配置すること |",
       "",
     ].join("\n"),
     "utf-8",
   );
 
-  // REQ-9003: false positive — negation context exempts SPEC keyword
+  // REQ-9003: false positive — negation context exempts Design keyword
   writeFileSync(
     join(reqDir, "REQ-9003.md"),
     [
@@ -1123,7 +1123,7 @@ function buildIr044Fixture(root: string): void {
     "utf-8",
   );
 
-  // REQ-9005: true positive — Step number SPEC detail
+  // REQ-9005: true positive — Step number Design detail
   writeFileSync(
     join(reqDir, "REQ-9005.md"),
     [
@@ -1142,9 +1142,9 @@ function buildIr044Fixture(root: string): void {
     "utf-8",
   );
 
-  // REQ-9006: false positive — meta scope rule context exempts SPEC keyword
-  // (REQ-0145-012). Line declares the REQ/SPEC boundary by naming SPEC types
-  // as territory; it does not contain SPEC detail, it defines the boundary.
+  // REQ-9006: false positive — meta scope rule context exempts Design keyword
+  // (REQ-0145-012). Line declares the REQ/Design boundary by naming Design types
+  // as territory; it does not contain Design detail, it defines the boundary.
   writeFileSync(
     join(reqDir, "REQ-9006.md"),
     [
@@ -1157,13 +1157,13 @@ function buildIr044Fixture(root: string): void {
       "",
       "| ID | 要件 |",
       "|----|------|",
-      "| REQ-9006-001 | REQ は対象とする外部契約を記述する文章主体であり、SPEC は現在の実装体系を示す スキーマ、コマンド体系、ルールカタログ、enum、format、必要パラメータを記述する文章主体であること |",
+      "| REQ-9006-001 | REQ は対象とする外部契約を記述する文章主体であり、Design は現在の実装体系を示す スキーマ、コマンド体系、ルールカタログ、enum、format、必要パラメータを記述する文章主体であること |",
       "",
     ].join("\n"),
     "utf-8",
   );
 
-  // REQ-9007: false positive — behavior predicate context exempts SPEC keyword
+  // REQ-9007: false positive — behavior predicate context exempts Design keyword
   // (REQ-0145-012). Existence predicate + drift-target type modifier without
   // quantity/content specification.
   writeFileSync(
@@ -1184,7 +1184,7 @@ function buildIr044Fixture(root: string): void {
     "utf-8",
   );
 
-  // REQ-9008: true positive — 手順 N (kanji step reference) SPEC detail.
+  // REQ-9008: true positive — 手順 N (kanji step reference) Design detail.
   // "手順 N" is a Japanese step-reference variant covered by REQ-0136-031.
   writeFileSync(
     join(reqDir, "REQ-9008.md"),
@@ -1220,7 +1220,7 @@ function buildIr044Fixture(root: string): void {
       "",
       "| ID | 要件 |",
       "|----|------|",
-      "| REQ-9009-001 | 全現行 REQ の要件行は command 定義または SPEC の Step 番号を直接参照せず、機能名・フェーズ名で参照すること。検出の詳細シグナルは SPEC に配置すること |",
+      "| REQ-9009-001 | 全現行 REQ の要件行は command 定義または Design の Step 番号を直接参照せず、機能名・フェーズ名で参照すること。検出の詳細シグナルは Design に配置すること |",
       "",
     ].join("\n"),
     "utf-8",
@@ -1228,7 +1228,7 @@ function buildIr044Fixture(root: string): void {
 
   // REQ-9010: true positive — behavior predicate with count rule (REQ-0145-013 guard).
   // Line contains "仕組みが存在すること" (behavior predicate) AND "3件" (count rule).
-  // REQ-0145-013 guard rejects exemption → still detected as SPEC detail violation.
+  // REQ-0145-013 guard rejects exemption → still detected as Design detail violation.
   writeFileSync(
     join(reqDir, "REQ-9010.md"),
     [
@@ -1269,7 +1269,7 @@ function buildIr044Fixture(root: string): void {
   );
 
   // REQ-9012: false positive — META rule line with 切り出し/配置 declaration.
-  // Line contains SPEC target types (enum) but declares they should be placed in SPEC.
+  // Line contains Design target types (enum) but declares they should be placed in Design.
   // isMetaRuleLine pattern (1) exempts → NOT detected.
   writeFileSync(
     join(reqDir, "REQ-9012.md"),
@@ -1283,28 +1283,28 @@ function buildIr044Fixture(root: string): void {
       "",
       "| ID | 要件 |",
       "|----|------|",
-      "| REQ-9012-001 | REQ 要件行に混入する enum 値一覧は SPEC に切り出す対象であること |",
+      "| REQ-9012-001 | REQ 要件行に混入する enum 値一覧は Design に切り出す対象であること |",
       "",
     ].join("\n"),
     "utf-8",
   );
 
-  // REQ-9013: false positive — META rule line with 委譲 to SPEC/catalog.
-  // Line contains SPEC detail keyword (checker) but delegates to SPEC/catalog.
-  // isMetaRuleLine pattern (4) exempts (委譲 + SPEC/catalog keyword) → NOT detected.
+  // REQ-9013: false positive — META rule line with 委譲 to Design/catalog.
+  // Line contains Design detail keyword (checker) but delegates to Design/catalog.
+  // isMetaRuleLine pattern (4) exempts (委譲 + Design/catalog keyword) → NOT detected.
   writeFileSync(
     join(reqDir, "REQ-9013.md"),
     [
       "---",
       "id: REQ-9013",
-      "title: IR-044 META rule line (委譲 to SPEC)",
+      "title: IR-044 META rule line (委譲 to Design)",
       "created: 2025-01-01",
       "updated: 2025-01-01",
       "---",
       "",
       "| ID | 要件 |",
       "|----|------|",
-      "| REQ-9013-001 | checker 個別ルールと検出条件は SPEC または rule catalog に委譲すること |",
+      "| REQ-9013-001 | checker 個別ルールと検出条件は Design または rule catalog に委譲すること |",
       "",
     ].join("\n"),
     "utf-8",
@@ -1312,9 +1312,9 @@ function buildIr044Fixture(root: string): void {
 
   // Empty adr/specs/skills to satisfy other checks minimally
   mkdirp(join(root, "docs", "adr"));
-  mkdirp(join(root, "docs", "specs"));
+  mkdirp(join(root, "docs", "designs"));
   writeFileSync(join(root, "docs", "adr", "README.md"), "# ADR\n", "utf-8");
-  writeFileSync(join(root, "docs", "specs", "README.md"), "# SPEC\n", "utf-8");
+  writeFileSync(join(root, "docs", "designs", "README.md"), "# Design\n", "utf-8");
 }
 
 describe("IR-044 req-spec-boundary-violation (REQ-0108-259)", () => {
@@ -1324,7 +1324,7 @@ describe("IR-044 req-spec-boundary-violation (REQ-0108-259)", () => {
     copyScripts(IR044_ROOT);
   });
 
-  it("detects true positive: SPEC detail without exemption (enum list)", () => {
+  it("detects true positive: Design detail without exemption (enum list)", () => {
     const r = runScript(IR044_ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
@@ -1336,7 +1336,7 @@ describe("IR-044 req-spec-boundary-violation (REQ-0108-259)", () => {
     expect(violations.length).toBeGreaterThanOrEqual(1);
   });
 
-  it("detects true positive: Step number SPEC detail", () => {
+  it("detects true positive: Step number Design detail", () => {
     const r = runScript(IR044_ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
@@ -1348,7 +1348,7 @@ describe("IR-044 req-spec-boundary-violation (REQ-0108-259)", () => {
     expect(violations.length).toBeGreaterThanOrEqual(1);
   });
 
-  it("detects true positive: 手順 N step-reference SPEC detail", () => {
+  it("detects true positive: 手順 N step-reference Design detail", () => {
     const r = runScript(IR044_ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
@@ -1396,7 +1396,7 @@ describe("IR-044 req-spec-boundary-violation (REQ-0108-259)", () => {
     expect(violations.length).toBe(0);
   });
 
-  it("does NOT flag META rule line with REQ/SPEC definitional structure (REQ-0145-012 META exemption)", () => {
+  it("does NOT flag META rule line with REQ/Design definitional structure (REQ-0145-012 META exemption)", () => {
     const r = runScript(IR044_ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
@@ -1420,7 +1420,7 @@ describe("IR-044 req-spec-boundary-violation (REQ-0108-259)", () => {
     expect(violations.length).toBe(0);
   });
 
-  it("does NOT flag META rule line with 委譲 to SPEC/catalog (REQ-0145-012 META exemption)", () => {
+  it("does NOT flag META rule line with 委譲 to Design/catalog (REQ-0145-012 META exemption)", () => {
     const r = runScript(IR044_ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
@@ -1474,8 +1474,8 @@ function buildIr053Fixture(root: string): void {
   );
   mkdirp(join(root, "docs", "adr"));
   writeFileSync(join(root, "docs", "adr", "README.md"), "# ADR\n", "utf-8");
-  mkdirp(join(root, "docs", "specs"));
-  writeFileSync(join(root, "docs", "specs", "README.md"), "# SPEC\n", "utf-8");
+  mkdirp(join(root, "docs", "designs"));
+  writeFileSync(join(root, "docs", "designs", "README.md"), "# Design\n", "utf-8");
 
   // True positive: direct gh invocation in prose (inline code span, NOT a code block).
   const cmdDir = join(root, "src", "opencode", "commands", "agentdev");
@@ -1599,7 +1599,7 @@ describe("IR-053 gh-direct-invocation (REQ-0152-001/002)", () => {
 // ─── IR-055: runtime-unresolved-reference (REQ-0108-263, REQ-0108-264) ─────────
 // Fixture covers:
 //   - strict pattern detection (REQ-NNNN, REQ-NNNN-NNN, ADR-NNNN, src/opencode/, /repo/, repo-*)
-//   - heuristic pattern detection (docs/specs/, docs/guides/, GitHub URL, line-number ref)
+//   - heuristic pattern detection (docs/designs/, docs/guides/, GitHub URL, line-number ref)
 //   - code-block exemption
 //   - template placeholder exemption (token-neighborhood narrowing, CR-002)
 //   - exemption paths (vocabulary-registry.md, integrity-rule-catalog.md)
@@ -1640,8 +1640,8 @@ function buildIr055Fixture(root: string): void {
   );
   mkdirp(join(root, "docs", "adr"));
   writeFileSync(join(root, "docs", "adr", "README.md"), "# ADR\n", "utf-8");
-  mkdirp(join(root, "docs", "specs"));
-  writeFileSync(join(root, "docs", "specs", "README.md"), "# SPEC\n", "utf-8");
+  mkdirp(join(root, "docs", "designs"));
+  writeFileSync(join(root, "docs", "designs", "README.md"), "# Design\n", "utf-8");
 
   // Strict violations: command file containing all strict patterns including
   // DEC-NNN (current Decision convention) and ADR-NNNN (legacy residual).
@@ -1695,7 +1695,7 @@ function buildIr055Fixture(root: string): void {
       "",
       "- sample",
       "",
-      "See docs/specs/system.md for system spec.",
+      "See docs/designs/system.md for system design.",
       "See docs/guides/quickstart.md for guide.",
       "Main repo: https://github.com/yogata/agent-dev-flow/blob/main/README.md",
       "See system.md#L42 for line detail.",
@@ -1776,9 +1776,9 @@ function buildIr055Fixture(root: string): void {
       "# Placeholder narrowing command",
       "",
       "Replace REQ-{NNNN}; see REQ-4321 for the concrete case.",
-      "Templated path docs/specs/<skills/agentdev-artifact-graph>.md stays exempt.",
-      "Brace-set glob docs/specs/{commands,skills}/** stays exempt.",
-      "Bare glob `docs/specs/**` next to `docs/specs/{a,b}/**` stays checked.",
+      "Templated path docs/designs/<skills/agentdev-artifact-graph>.md stays exempt.",
+      "Brace-set glob docs/designs/{commands,skills}/** stays exempt.",
+      "Bare glob `docs/designs/**` next to `docs/designs/{a,b}/**` stays checked.",
       "",
     ].join("\n"),
     "utf-8",
@@ -1891,13 +1891,13 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
     expect(hits.length).toBeGreaterThanOrEqual(1);
   });
 
-  it("detects heuristic pattern docs/specs/", () => {
+  it("detects heuristic pattern docs/designs/", () => {
     const r = runScript(IR055_ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
     const hits = parsed.results.filter(
       (res: { check: string; evidence?: string }) =>
         res.check === "runtime-unresolved-reference" &&
-        res.evidence === "docs/specs/",
+        res.evidence === "docs/designs/",
     );
     expect(hits.length).toBeGreaterThanOrEqual(1);
   });
@@ -1953,7 +1953,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
     const heuristicHit = parsed.results.find(
       (res: { check: string; evidence?: string; finding_level?: string }) =>
         res.check === "runtime-unresolved-reference" &&
-        res.evidence === "docs/specs/" &&
+        res.evidence === "docs/designs/" &&
         res.finding_level === "heuristic",
     );
     expect(heuristicHit).toBeDefined();
@@ -2042,7 +2042,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
       (res: { check: string; evidence?: string; file?: string; line?: number }) =>
         res.check === "runtime-unresolved-reference" &&
         (res.file ?? "").includes("placeholder-narrow-cmd.md") &&
-        res.evidence === "docs/specs/" &&
+        res.evidence === "docs/designs/" &&
         (res.line === 9 || res.line === 10),
     );
     expect(hits.length).toBe(0);
@@ -2055,7 +2055,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
       (res: { check: string; evidence?: string; file?: string; line?: number }) =>
         res.check === "runtime-unresolved-reference" &&
         (res.file ?? "").includes("placeholder-narrow-cmd.md") &&
-        res.evidence === "docs/specs/" &&
+        res.evidence === "docs/designs/" &&
         res.line === 11,
     );
     expect(hits.length).toBeGreaterThanOrEqual(1);
@@ -2133,8 +2133,8 @@ function buildIr058Fixture(root: string): void {
   );
   mkdirp(join(root, "docs", "adr"));
   writeFileSync(join(root, "docs", "adr", "README.md"), "# ADR\n", "utf-8");
-  mkdirp(join(root, "docs", "specs"));
-  writeFileSync(join(root, "docs", "specs", "README.md"), "# SPEC\n", "utf-8");
+  mkdirp(join(root, "docs", "designs"));
+  writeFileSync(join(root, "docs", "designs", "README.md"), "# Design\n", "utf-8");
   writeFileSync(join(root, "docs", "DOC-MAP.md"), "# DOC-MAP\n\n| 分類 | パス |\n|------|------|\n| REQ | docs/requirements/REQ-9301.md |\n", "utf-8");
 
   // Distribution skill that references both a projection-only skill and a repo-* skill.
@@ -2419,8 +2419,8 @@ function buildNgBaselineFixture(root: string): void {
   mkdirp(join(root, "docs", "adr"));
   writeFileSync(join(root, "docs", "adr", "README.md"), "# ADR\n", "utf-8");
 
-  mkdirp(join(root, "docs", "specs"));
-  writeFileSync(join(root, "docs", "specs", "README.md"), "# SPEC\n", "utf-8");
+  mkdirp(join(root, "docs", "designs"));
+  writeFileSync(join(root, "docs", "designs", "README.md"), "# Design\n", "utf-8");
 
   // Guide file referencing three non-existent REQ IDs. Each unique ref emits
   // one broken-req-ref NG with evidence = "REQ-NNNN".
@@ -2602,7 +2602,7 @@ describe("NG baseline aggregation / provenance / classification (Issue #1780, RE
   it("TS-004: --update-ng-baseline adds only approved deltas with provenance/reason; unmanaged NGs are not absorbed", () => {
     // Additions manifest: approve REQ-9003 only. Do NOT include the other
     // fixture NGs (e.g. command-readme-sync, skill-prefix) — those must stay
-    // out of the baseline per SPEC.
+    // out of the baseline per design.
     const manifestPath = join(NGBASELINE_ROOT, "additions-manifest.json");
     writeFileSync(
       manifestPath,
@@ -3013,21 +3013,21 @@ describe("WP-3 execution profiles (Issue #1928)", () => {
       "---\nname: agentdev-demo\ndescription: demo skill\n---\n# agentdev-demo\n## USE FOR\n- x\n## DO NOT USE FOR\n- y\n",
     );
 
-    const specsDir = join(profileRoot, "docs", "specs");
-    mkdirp(specsDir);
+    const designsDir = join(profileRoot, "docs", "designs");
+    mkdirp(designsDir);
     writeFileSync(
-      join(specsDir, "README.md"),
+      join(designsDir, "README.md"),
       [
-        "# SPEC index",
+        "# Design index",
         "",
-        "| SPEC | status | 責務 |",
+        "| Design | status | 責務 |",
         "|------|--------|------|",
         "| foundations/system.md | accepted | system |",
         "",
       ].join("\n"),
       "utf-8",
     );
-    const sysDir = join(specsDir, "foundations");
+    const sysDir = join(designsDir, "foundations");
     mkdirp(sysDir);
     writeFileSync(join(sysDir, "system.md"), "# System\n", "utf-8");
   });

@@ -5,7 +5,7 @@
  * by scanning the real workflow files and verifying structural routing tokens:
  *
  *   - single-Issue route: case-close STEP-3 Step 3-1
- *       (references/docs-and-spec-promotion.md)
+ *       (references/docs-and-design-promotion.md)
  *   - Epic Wave route: case-close STEP-E4-1
  *       (references/epic-wave-close.md)
  *   - case-run post-implementation final gate: case-run 配布依存境界の最終
@@ -51,7 +51,7 @@ function readFileIfExists(p: string): string | null {
 
 const CASE_RUN_COMMAND = resolveWorkflowPath("commands/agentdev/case-run.md");
 const DOCS_AND_SPEC_PROMOTION = resolveWorkflowPath(
-  "skills/agentdev-workflow-case-close/references/docs-and-spec-promotion.md",
+  "skills/agentdev-workflow-case-close/references/docs-and-design-promotion.md",
 );
 const EPIC_WAVE_CLOSE = resolveWorkflowPath(
   "skills/agentdev-workflow-case-close/references/epic-wave-close.md",
@@ -134,7 +134,7 @@ describe("distribution-boundary final gate routing contract", () => {
     const step31 = extractSection(content, "### STEP-3-1:");
 
     it("Step 3-1 section exists", () => {
-      assertSectionExists(step31, "docs-and-spec-promotion.md");
+      assertSectionExists(step31, "docs-and-design-promotion.md");
     });
 
     it(`section contains detector entry point: ${DETECTOR_ENTRYPOINT}`, () => {
@@ -182,12 +182,12 @@ describe("distribution-boundary final gate routing contract", () => {
   describe("case-close SKILL control plane table structure declares the gate in both routes", () => {
     const content = readFileIfExists(CASE_CLOSE_SKILL) ?? "";
 
-    it("docs-and-spec-promotion row exists in control plane table", () => {
-      const docsRow = content.match(/\|\s*STEP-[^\n]*docs-and-spec-promotion\.md[^\n]*\n/);
+    it("docs-and-design-promotion row exists in control plane table", () => {
+      const docsRow = content.match(/\|\s*STEP-[^\n]*docs-and-design-promotion\.md[^\n]*\n/);
       expect(docsRow).not.toBeNull();
       if (docsRow !== null) {
         expect(docsRow[0]).toContain(
-          "[references/docs-and-spec-promotion.md](references/docs-and-spec-promotion.md)",
+          "[references/docs-and-design-promotion.md](references/docs-and-design-promotion.md)",
         );
       }
     });
@@ -271,12 +271,12 @@ describe("distribution-boundary final gate routing contract", () => {
 
     it("SKILL.md control plane declares the final gate in both route rows", () => {
       const skillContent = readFileIfExists(CASE_CLOSE_SKILL) ?? "";
-      const singleRow = skillContent.match(/\|\s*STEP-3\s*\|[^\n]*docs-and-spec-promotion[^\n]*\n/);
+      const singleRow = skillContent.match(/\|\s*STEP-3\s*\|[^\n]*docs-and-design-promotion[^\n]*\n/);
       const epicRow = skillContent.match(/\|\s*STEP-E1[〜~]E6\s*\|[^\n]*\n/);
       expect(singleRow).not.toBeNull();
       expect(epicRow).not.toBeNull();
       if (singleRow !== null) {
-        expect(singleRow[0]).toContain("docs-and-spec-promotion.md");
+        expect(singleRow[0]).toContain("docs-and-design-promotion.md");
       }
       if (epicRow !== null) {
         expect(epicRow[0]).toContain("epic-wave-close.md");

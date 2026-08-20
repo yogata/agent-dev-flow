@@ -1,71 +1,41 @@
 {
   "version": 1,
   "rule_id": "IR-055",
-  "generated_at": "2026-08-18",
+  "generated_at": "2026-08-20",
   "entries": [
     {
       "file": "src/opencode/commands/agentdev/README.md",
-      "pattern": "docs/specs/",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 1
     },
     {
-      "file": "src/opencode/commands/agentdev/inspect-docs.md",
-      "pattern": "docs/guides/",
-      "severity": "heuristic",
-      "count": 1
-    },
-    {
-      "file": "src/opencode/commands/agentdev/inspect-docs.md",
-      "pattern": "docs/specs/",
-      "severity": "heuristic",
-      "count": 5
-    },
-    {
-      "file": "src/opencode/commands/agentdev/inspect-skills.md",
-      "pattern": "docs/guides/",
-      "severity": "heuristic",
-      "count": 1
-    },
-    {
-      "file": "src/opencode/commands/agentdev/inspect-skills.md",
-      "pattern": "docs/specs/",
-      "severity": "heuristic",
-      "count": 5
-    },
-    {
-      "file": "src/opencode/commands/agentdev/spec-save.md",
-      "pattern": "docs/specs/",
+      "file": "src/opencode/commands/agentdev/design-save.md",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 6
     },
     {
-      "file": "src/opencode/skills/agentdev-artifact-graph/SKILL.md",
-      "pattern": "docs/specs/",
+      "file": "src/opencode/commands/agentdev/inspect-docs.md",
+      "pattern": "docs/designs/",
+      "severity": "heuristic",
+      "count": 5
+    },
+    {
+      "file": "src/opencode/commands/agentdev/inspect-docs.md",
+      "pattern": "docs/guides/",
       "severity": "heuristic",
       "count": 1
     },
     {
-      "file": "src/opencode/skills/agentdev-artifact-graph/SKILL.md",
-      "pattern": "repo-*",
-      "severity": "strict",
-      "count": 1
-    },
-    {
-      "file": "src/opencode/skills/agentdev-artifact-graph/SKILL.md",
-      "pattern": "src/opencode/",
-      "severity": "strict",
-      "count": 1
-    },
-    {
-      "file": "src/opencode/skills/agentdev-artifact-graph/references/augmentation.md",
-      "pattern": "docs/specs/",
+      "file": "src/opencode/commands/agentdev/inspect-skills.md",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
-      "count": 1
+      "count": 5
     },
     {
-      "file": "src/opencode/skills/agentdev-artifact-graph/scripts/effectiveness/README.md",
-      "pattern": "docs/specs/",
+      "file": "src/opencode/commands/agentdev/inspect-skills.md",
+      "pattern": "docs/guides/",
       "severity": "heuristic",
       "count": 1
     },
@@ -77,13 +47,13 @@
     },
     {
       "file": "src/opencode/skills/agentdev-backlog-integration/SKILL.md",
-      "pattern": "docs/specs/",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 3
     },
     {
       "file": "src/opencode/skills/agentdev-command-authoring/SKILL.md",
-      "pattern": "docs/specs/",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 3
     },
@@ -100,32 +70,38 @@
       "count": 3
     },
     {
+      "file": "src/opencode/skills/agentdev-design-file-manager/SKILL.md",
+      "pattern": "docs/designs/",
+      "severity": "heuristic",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-design-file-manager/references/design-lifecycle-application.md",
+      "pattern": "docs/designs/",
+      "severity": "heuristic",
+      "count": 1
+    },
+    {
       "file": "src/opencode/skills/agentdev-doc-diagnostics/SKILL.md",
-      "pattern": "docs/specs/",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 2
     },
     {
       "file": "src/opencode/skills/agentdev-doc-writing/SKILL.md",
-      "pattern": "docs/specs/",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 3
     },
     {
-      "file": "src/opencode/skills/agentdev-doc-writing/SKILL.md",
-      "pattern": "src/opencode/",
-      "severity": "strict",
-      "count": 2
-    },
-    {
       "file": "src/opencode/skills/agentdev-doc-writing/references/document-boundaries.md",
-      "pattern": "docs/guides/",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 1
     },
     {
       "file": "src/opencode/skills/agentdev-doc-writing/references/document-boundaries.md",
-      "pattern": "docs/specs/",
+      "pattern": "docs/guides/",
       "severity": "heuristic",
       "count": 1
     },
@@ -143,7 +119,7 @@
     },
     {
       "file": "src/opencode/skills/agentdev-epic-tracker/SKILL.md",
-      "pattern": "docs/specs/",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 3
     },
@@ -161,15 +137,9 @@
     },
     {
       "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
-      "pattern": "docs/specs/",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 4
-    },
-    {
-      "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
-      "pattern": "src/opencode/",
-      "severity": "strict",
-      "count": 7
     },
     {
       "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
@@ -185,7 +155,7 @@
     },
     {
       "file": "src/opencode/skills/agentdev-inspect-skills/references/spec-operation-contract-consistency.md",
-      "pattern": "docs/specs/",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 1
     },
@@ -197,19 +167,19 @@
     },
     {
       "file": "src/opencode/skills/agentdev-learning-capture/SKILL.md",
-      "pattern": "docs/specs/",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 3
     },
     {
       "file": "src/opencode/skills/agentdev-learning-pipeline/references/disposition-and-artifact-schema.md",
-      "pattern": "docs/specs/",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 4
     },
     {
       "file": "src/opencode/skills/agentdev-quality-gates/SKILL.md",
-      "pattern": "docs/specs/",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 3
     },
@@ -221,25 +191,25 @@
     },
     {
       "file": "src/opencode/skills/agentdev-req-analysis/SKILL.md",
-      "pattern": "docs/specs/",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 3
     },
     {
       "file": "src/opencode/skills/agentdev-req-analysis/references/analysis-viewpoints.md",
-      "pattern": "docs/specs/",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 1
     },
     {
       "file": "src/opencode/skills/agentdev-req-analysis/references/investigation-scope-refinement.md",
-      "pattern": "docs/specs/",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 1
     },
     {
       "file": "src/opencode/skills/agentdev-req-analysis/references/req-define-detailed-gates.md",
-      "pattern": "docs/specs/",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 1
     },
@@ -257,15 +227,9 @@
     },
     {
       "file": "src/opencode/skills/agentdev-req-file-manager/SKILL.md",
-      "pattern": "docs/specs/",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 3
-    },
-    {
-      "file": "src/opencode/skills/agentdev-req-file-manager/SKILL.md",
-      "pattern": "src/opencode/",
-      "severity": "strict",
-      "count": 1
     },
     {
       "file": "src/opencode/skills/agentdev-req-file-manager/references/numbering-and-validation.md",
@@ -275,15 +239,21 @@
     },
     {
       "file": "src/opencode/skills/agentdev-req-file-manager/templates/doc_requirement.md",
-      "pattern": "docs/specs/",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 1
     },
     {
       "file": "src/opencode/skills/agentdev-req-structure-diagnostics/SKILL.md",
-      "pattern": "docs/specs/",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 3
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-structure-diagnostics/references/req-structure-review.md",
+      "pattern": "docs/designs/",
+      "severity": "heuristic",
+      "count": 2
     },
     {
       "file": "src/opencode/skills/agentdev-req-structure-diagnostics/references/req-structure-review.md",
@@ -293,19 +263,13 @@
     },
     {
       "file": "src/opencode/skills/agentdev-req-structure-diagnostics/references/req-structure-review.md",
-      "pattern": "docs/specs/",
-      "severity": "heuristic",
-      "count": 2
-    },
-    {
-      "file": "src/opencode/skills/agentdev-req-structure-diagnostics/references/req-structure-review.md",
       "pattern": "src/opencode/",
       "severity": "strict",
       "count": 6
     },
     {
       "file": "src/opencode/skills/agentdev-skill-authoring/SKILL.md",
-      "pattern": "docs/specs/",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 3
     },
@@ -316,15 +280,27 @@
       "count": 1
     },
     {
-      "file": "src/opencode/skills/agentdev-workflow-case-close/SKILL.md",
-      "pattern": "repo-*",
-      "severity": "strict",
-      "count": 1
+      "file": "src/opencode/skills/agentdev-workflow-design-save/SKILL.md",
+      "pattern": "docs/designs/",
+      "severity": "heuristic",
+      "count": 7
     },
     {
-      "file": "src/opencode/skills/agentdev-workflow-case-run/SKILL.md",
-      "pattern": "repo-*",
-      "severity": "strict",
+      "file": "src/opencode/skills/agentdev-workflow-design-save/references/placement-and-save.md",
+      "pattern": "docs/designs/",
+      "severity": "heuristic",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-design-save/references/verification-and-persistence.md",
+      "pattern": "docs/designs/",
+      "severity": "heuristic",
+      "count": 6
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-inspect-docs/references/scan-and-doc-diagnostics.md",
+      "pattern": "docs/designs/",
+      "severity": "heuristic",
       "count": 1
     },
     {
@@ -334,14 +310,8 @@
       "count": 1
     },
     {
-      "file": "src/opencode/skills/agentdev-workflow-inspect-docs/references/scan-and-doc-diagnostics.md",
-      "pattern": "docs/specs/",
-      "severity": "heuristic",
-      "count": 1
-    },
-    {
       "file": "src/opencode/skills/agentdev-workflow-orchestration/SKILL.md",
-      "pattern": "docs/specs/",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 3
     },
@@ -371,33 +341,15 @@
     },
     {
       "file": "src/opencode/skills/agentdev-workflow-req-save/references/indexes-and-persistence.md",
-      "pattern": "docs/specs/",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 1
     },
     {
       "file": "src/opencode/skills/agentdev-workflow-req-save/references/precheck-and-req-ops.md",
-      "pattern": "docs/specs/",
+      "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 1
-    },
-    {
-      "file": "src/opencode/skills/agentdev-workflow-spec-save/SKILL.md",
-      "pattern": "docs/specs/",
-      "severity": "heuristic",
-      "count": 7
-    },
-    {
-      "file": "src/opencode/skills/agentdev-workflow-spec-save/references/placement-and-save.md",
-      "pattern": "docs/specs/",
-      "severity": "heuristic",
-      "count": 2
-    },
-    {
-      "file": "src/opencode/skills/agentdev-workflow-spec-save/references/verification-and-persistence.md",
-      "pattern": "docs/specs/",
-      "severity": "heuristic",
-      "count": 6
     }
   ]
 }

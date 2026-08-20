@@ -5,22 +5,22 @@ id: agentdev-workflow-case-open
 context:
   - id: must-1
     paths:
-      - "docs/specs/workflows/epic-wave-model.md"
+      - "docs/designs/workflows/epic-wave-model.md"
     purpose: Epic/Wave/Issue 実行モデルと連結成分ベース構成生成の確認
   - id: workflow-contracts
     when: ワークフロー契約（フェーズ、SSoT 遷移）参照時
     paths:
-      - "docs/specs/workflows/workflow-contracts.md"
+      - "docs/designs/workflows/workflow-contracts.md"
     purpose: パイプライン概要と共通フェーズ契約の確認
   - id: req-define-test-strategy
     when: "req-define のテスト戦略セクション参照時"
     paths:
-      - "docs/specs/commands/req-define.md"
+      - "docs/designs/commands/req-define.md"
     purpose: Issue 本文の test strategy 項目構造の確認
   - id: integration-target-and-experiment-case
     when: 統合先と実証Caseの Issue 構成（統合先記録、実証Case識別情報、評価契約投影、統合先同期確認）参照時
     paths:
-      - "docs/specs/commands/case-open.md"
+      - "docs/designs/commands/case-open.md"
     purpose: 統合先と実証CaseのIssue構成セクションの実行詳細確認
 
 rules:

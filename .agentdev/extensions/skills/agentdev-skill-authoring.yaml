@@ -6,12 +6,12 @@ context:
   - id: backticks-threshold
     when: backticks 識別子判定閾値参照時
     paths:
-      - "docs/specs/integrity/backticks-identifier-threshold.md"
+      - "docs/designs/integrity/backticks-identifier-threshold.md"
     purpose: backticks 必須と任意の機械判定閾値の確認
   - id: artifact-contracts
     when: アーティファクト間契約参照時
     paths:
-      - "docs/specs/responsibilities/artifact-contracts.md"
+      - "docs/designs/responsibilities/artifact-contracts.md"
     purpose: SKILL.md の入出力と依存方向の確認
 
 rules: []

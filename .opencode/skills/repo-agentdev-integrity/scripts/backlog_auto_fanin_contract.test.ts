@@ -39,8 +39,7 @@ function resolveSkillFile(...segments: string[]): string {
 
 const SPEC_PATH = path.join(
   REPO_ROOT,
-  "docs",
-  "specs",
+  "docs", "designs",
   "skills",
   "agentdev-workflow-backlog-auto.md",
 );

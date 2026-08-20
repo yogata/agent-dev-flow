@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | 正規表現パターンマッチング（walkMarkdown / collectAgentdevSkillMarkdown による走査）。Decision ID は `DEC-\d{3}`、旧形式 residual は `ADR-\d{4}` を検出。code block 内部、template placeholder（`{xxx}`）、vocabulary-registry.md / integrity-rule-catalog.md / rules/IR-055-*.md 自身等の正当使用例外パスは exemption 対象とする。`v2:ADR-\d{4}` は履歴参照保護（AG-010）のため `v2:` prefix ありは検出対象外 |
 | affected_artifacts | [src/opencode/commands/agentdev/**/*.md, src/opencode/skills/agentdev-*/**/*.md, src/opencode/skills/agentdev-*/references/**/*.md, src/opencode/skills/agentdev-*/SKILL.md] |
 | related_req | [REQ-002-079, REQ-002-080, REQ-002-081, REQ-028-009] |
-| related_spec | [integrity-rule-catalog.md, integrity-contracts.md] |
+| related_design | [integrity-rule-catalog.md, integrity-contracts.md] |
 | gate_level | full-audit, delta-guard, impact-guard |
 | false_positive_risk | 中。code block 内部、template placeholder（`{xxx}`）、vocabulary-registry.md 等の正当使用例外パスは exemption 対象とする。`integrity-rule-catalog.md` 自身のルール記述も exemption 対象とする。exemption 設計を誤ると true positive が誤って免除される |
 | regression_test | check_integrity.test.ts。各検出パターン（REQ-NNNN、REQ-NNNN-NNN、DEC-NNN、residual ADR-NNNN、`src/opencode/`、`docs/designs/`、`docs/guides/`、`/repo/*`、`repo-*`、本体 docs URL、line number 付き参照）を含む fixture で検出されること、exemption 対象が報告されないことを検証する |

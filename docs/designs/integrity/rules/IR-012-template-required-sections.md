@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | template ファイルの構造検証 |
 | affected_artifacts | [templates] |
 | related_req | [REQ-010 (workflow template 構造)] |
-| related_spec | [integrity-contracts.md] |
+| related_design | [integrity-contracts.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 低 |
 | regression_test | check_templates.test.ts |

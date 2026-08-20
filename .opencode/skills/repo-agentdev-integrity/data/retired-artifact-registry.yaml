@@ -4,9 +4,9 @@
 # Detection-view derived from canonical sources per Phase 3 §6.1 of
 # cross-cutting-integration-design-20260811.md.
 #
-# Canonical sources (SPEC is authoritative; this YAML is a detection view):
-#   - docs/specs/responsibilities/req-impact-map.md (## Retired cross-references)
-#   - docs/specs/foundations/numbering-policy.md (欠番表)
+# Canonical sources (Design is authoritative; this YAML is a detection view):
+#   - docs/designs/responsibilities/req-impact-map.md (## Retired cross-references)
+#   - docs/designs/foundations/numbering-policy.md (欠番表)
 #   - docs/decisions/DEC-013.md (AG-008 tombstone abolition)
 #
 # Consumed by:
@@ -14,13 +14,13 @@
 #
 # Phase 5 (OU-006 #2082) implementation. Each entry class drives one facet of
 # the common detector; severities/gate_levels are owned by the individual IR
-# files in docs/specs/integrity/rules/.
+# files in docs/designs/integrity/rules/.
 
 schema_version: 1
 generated_at: 2026-08-11
 canonical_sources:
-  - docs/specs/responsibilities/req-impact-map.md
-  - docs/specs/foundations/numbering-policy.md
+  - docs/designs/responsibilities/req-impact-map.md
+  - docs/designs/foundations/numbering-policy.md
   - docs/decisions/DEC-013.md
 
 # IR-025 (retired ADR path rule): 4-digit v2:ADR-NNNN filenames must NOT exist
@@ -39,7 +39,7 @@ retired_adr_path_patterns:
 retired_decisions_as_current_baseline:
   description: |
     Retired/superseded Decision IDs that must not be cited as current
-    authoritative baseline in active REQ/SPEC/guide bodies. Historical
+    authoritative baseline in active REQ/Design/guide bodies. Historical
     references with explicit `v2:` prefix or inside retired/ sections are
     exempt.
   retired_ids:
@@ -65,6 +65,6 @@ retired_readme_coverage_targets:
     - path: docs/decisions/README.md
       artifact_kind: decision
       rule_refs: [IR-038, IR-061]
-    - path: docs/specs/README.md
-      artifact_kind: spec
+    - path: docs/designs/README.md
+      artifact_kind: design
       rule_refs: [IR-054, IR-061]

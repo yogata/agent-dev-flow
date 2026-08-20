@@ -7,7 +7,7 @@
 // cross-cutting-integration-design-20260811.md. Detection data is loaded from
 // data/delegation-contract-patterns.yaml. The YAML is a detection-view;
 // canonical rules live in IR-032 / IR-033 files and in
-// docs/specs/workflows/delegation-contracts.md.
+// docs/designs/workflows/delegation-contracts.md.
 //
 // Exit codes: 0 ok, 1 violation, 2 error.
 

@@ -1,10 +1,10 @@
 # distribution-targets.yaml
 #
-# Detection-view derived from docs/specs/local/runtime-package-boundary.md per
+# Detection-view derived from docs/designs/local/runtime-package-boundary.md per
 # Phase 3 §6.3 of cross-cutting-integration-design-20260811.md.
 #
-# Canonical source (SPEC is authoritative; this YAML is a detection view):
-#   - docs/specs/local/runtime-package-boundary.md
+# Canonical source (Design is authoritative; this YAML is a detection view):
+#   - docs/designs/local/runtime-package-boundary.md
 #
 # Consumed by:
 #   - check_distribution_boundary.ts (extended for IR-046, IR-047, IR-048)
@@ -15,7 +15,7 @@
 
 schema_version: 1
 generated_at: 2026-08-11
-canonical_source: docs/specs/local/runtime-package-boundary.md
+canonical_source: docs/designs/local/runtime-package-boundary.md
 
 # IR-046 (consumer-generated repo type false-positive prevention): consumer
 # installation must not generate artifacts that look like self-hosting repo

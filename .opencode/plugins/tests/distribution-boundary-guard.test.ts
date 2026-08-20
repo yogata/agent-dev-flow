@@ -83,14 +83,14 @@ describe("evaluateWriteContent - write tool gate", () => {
   test("blocks write introducing producer-internal docs URL", () => {
     const r = evaluateWriteContent(
       "src/opencode/commands/agentdev/sample.md",
-      "see https://github.com/yogata/agent-dev-flow/blob/main/docs/specs/foo.md",
+      "see https://github.com/yogata/agent-dev-flow/blob/main/docs/designs/foo.md",
     );
     expect(r.ok).toBe(false);
   });
   test("allows write with template placeholders only", () => {
     const r = evaluateWriteContent(
       "src/opencode/commands/agentdev/sample.md",
-      "template: docs/specs/<domain>/<spec>.md is fine. ADR-{NNNN} also fine.",
+      "template: docs/designs/<domain>/<spec>.md is fine. ADR-{NNNN} also fine.",
     );
     expect(r.ok).toBe(true);
   });
@@ -103,7 +103,7 @@ describe("evaluateWriteContent - write tool gate", () => {
   });
   test("skips non-distributed paths (docs/, scripts/)", () => {
     const r = evaluateWriteContent(
-      "docs/specs/integrity/distribution-boundary.md",
+      "docs/designs/integrity/distribution-boundary.md",
       "ref ADR-0135",
     );
     expect(r.ok).toBe(true);
@@ -248,7 +248,7 @@ describe("evaluateApplyPatch - apply_patch tool gate", () => {
       "*** Begin Patch",
       "*** Add File: src/opencode/commands/agentdev/new.md",
       "+# clean",
-      "+template docs/specs/<x>.md allowed",
+      "+template docs/designs/<x>.md allowed",
       "*** End Patch",
     ].join("\n");
     const r = evaluateApplyPatch(patchText);
@@ -286,7 +286,7 @@ describe("evaluateApplyPatch - apply_patch tool gate", () => {
   });
   test("malformed patch returns adapter-failure (gate-not-passed, not clean)", () => {
     const r = evaluateApplyPatch("not a real patch at all");
-    // Per SPEC: inspection errors are gate-not-passed. Malformed patch input
+    // Per Design: inspection errors are gate-not-passed. Malformed patch input
     // should NOT silently pass.
     expect(r.ok).toBe(false);
     if (!r.ok) {
@@ -338,7 +338,7 @@ describe("Stage B regression: distributed path coverage", () => {
     ).toBe(true);
   });
   test("non-distributed paths are skipped", () => {
-    expect(isDistributedPath("docs/specs/foo.md")).toBe(false);
+    expect(isDistributedPath("docs/designs/foo.md")).toBe(false);
     expect(isDistributedPath("scripts/install.ps1")).toBe(false);
     expect(isDistributedPath("README.md")).toBe(false);
   });

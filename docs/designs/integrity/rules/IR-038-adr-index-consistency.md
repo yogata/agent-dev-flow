@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | `docs/decisions/README.md` の Current Baseline View / Retired View と実 Decision ファイル一覧の双方向差分を検出 |
 | affected_artifacts | [Decision, Decision index] |
 | related_req | [REQ-001-047, REQ-001-048] |
-| related_spec | [integrity-contracts.md, document-model.md] |
+| related_design | [integrity-contracts.md, document-model.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 低。ファイル一覧と index の差分は確実 |
 | regression_test | (未実装) |

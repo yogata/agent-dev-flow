@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | command 本文から種別パス（variant path）抽出 → 存在確認。パス成分を囲む Markdown backtick（インラインコード修飾）はパス解決前に除去する（REQ-036-008） |
 | affected_artifacts | [commands, templates] |
 | related_req | [REQ-036-008] |
-| related_spec | [integrity-contracts.md] |
+| related_design | [integrity-contracts.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 低。backtick 囲みパス成分は code formatting として扱いパス解決前に除去するため、backtick 起因の偽陽性は発生しない（REQ-036-008） |
 | regression_test | commands_structure.test.ts |

@@ -31,7 +31,7 @@ IR-050（load_skills 誤指定検出）・IR-051（実行主体 skill 表記誤�
 | `/agentdev/case-auto` | 公開 command | `/agentdev/*` 名前空間 |
 | `/agentdev/req-define` | 公開 command | `/agentdev/*` 名前空間 |
 | `/agentdev/req-save` | 公開 command | `/agentdev/*` 名前空間 |
-| `/agentdev/spec-save` | 公開 command | `/agentdev/*` 名前空間 |
+| `/agentdev/design-save` | 公開 command | `/agentdev/*` 名前空間 |
 | `/agentdev/intake-capture` | 公開 command | `/agentdev/*` 名前空間 |
 | `/agentdev/intake-from-github` | 公開 command | `/agentdev/*` 名前空間 |
 | `/agentdev/intake-promote` | 公開 command | `/agentdev/*` 名前空間 |
@@ -180,7 +180,7 @@ IR-051「実行主体 skill 表記誤認検出」の「一定文字距離内」�
 | 旧任意キーワード | 許可表現（「〜してよい」） | 許容仕様・設計余地・将来候補として扱う（REQ-0102-026） |
 | 旧必須キーワード | 必達要件記述 | 検証可能な自然文として記述する（REQ-0102-027） |
 | 括弧付き旧 marker | （不要、自然文で記述） | 旧 marker を除去し、必達要件または許可表現として記述する（REQ-0102-028） |
-| 旧語彙ルール | 必達要件 | SPEC は新規要件ではなく現在仕様・契約記述に限定する（REQ-0102-024） |
+| 旧語彙ルール | 必達要件 | Design は新規要件ではなく現在仕様・契約記述に限定する（REQ-0102-024） |
 
 除外: integrity rule 定義内の検出パターン説明、retired 文書、negative example、vocabulary-registry.md 自体
 
@@ -265,15 +265,15 @@ docs-check の機械化原則徹底（REQ-0108-056/254/261/262）に基づき、
 
 | 英語普通名詞 | 推奨訳 | 由来 | IR-044 扱い | IR-044 適用除外根拠 |
 |------------|--------|------|------------|-------------------|
-| `fixture` | テストデータ/検査データ | 専門カタカナ語 | 対象外（正規使用） | テスト手法概念。REQ/SPEC 両域で正規使用 |
-| `variant` | 種別/バリエーション/形式 | 専門カタカナ語 | 対象外（正規使用） | 種別分類のドメイン概念。REQ/SPEC 両域で正規使用 |
-| `provider` | 提供元 | 専門カタカナ語 | 対象外（正規使用） | 提供元分類のドメイン概念。REQ/SPEC 両域で正規使用 |
-| `baseline` | 基準 | 専門カタカナ語 | 対象外（正規使用） | baseline_status 等の基準概念。REQ/SPEC 両域で正規使用 |
-| `finding` | 検出事項 | 専門カタカナ語 | 対象外（正規使用） | inspect-* 検出結果単位のドメイン概念。REQ/SPEC 両域で正規使用 |
-| `promoted artifact` | 採用済み成果物 | 専門カタカナ語 | 対象外（正規使用） | intake/learning/inspect pipeline 成果物単位のドメイン概念。REQ/SPEC 両域で正規使用 |
-| `self-hosting` | 本体リポジトリ | 複合技術語（普通名詞明記） | 対象外（正規使用） | 配布基盤アーキテクチャ概念。REQ/SPEC 両域で正規使用 |
+| `fixture` | テストデータ/検査データ | 専門カタカナ語 | 対象外（正規使用） | テスト手法概念。REQ/Design 両域で正規使用 |
+| `variant` | 種別/バリエーション/形式 | 専門カタカナ語 | 対象外（正規使用） | 種別分類のドメイン概念。REQ/Design 両域で正規使用 |
+| `provider` | 提供元 | 専門カタカナ語 | 対象外（正規使用） | 提供元分類のドメイン概念。REQ/Design 両域で正規使用 |
+| `baseline` | 基準 | 専門カタカナ語 | 対象外（正規使用） | baseline_status 等の基準概念。REQ/Design 両域で正規使用 |
+| `finding` | 検出事項 | 専門カタカナ語 | 対象外（正規使用） | inspect-* 検出結果単位のドメイン概念。REQ/Design 両域で正規使用 |
+| `promoted artifact` | 採用済み成果物 | 専門カタカナ語 | 対象外（正規使用） | intake/learning/inspect pipeline 成果物単位のドメイン概念。REQ/Design 両域で正規使用 |
+| `self-hosting` | 本体リポジトリ | 複合技術語（普通名詞明記） | 対象外（正規使用） | 配布基盤アーキテクチャ概念。REQ/Design 両域で正規使用 |
 | `junction` | ジャンクション | 複合技術語 | 対象外（正規使用） | Windows 実装環境固有のファイルシステム概念。実装詳細文脈で正規使用 |
-| `frontmatter` | YAML フロントマター | frontmatter 訳語 | 対象外（正規使用） | 文書フォーマット概念。REQ/SPEC 両域で正規使用 |
+| `frontmatter` | YAML フロントマター | frontmatter 訳語 | 対象外（正規使用） | 文書フォーマット概念。REQ/Design 両域で正規使用 |
 
 ### integrity-rule-catalog.md / rules/ 掲載語
 
@@ -281,13 +281,13 @@ docs-check の機械化原則徹底（REQ-0108-056/254/261/262）に基づき、
 
 | 英語普通名詞 | 用途 | IR-044 扱い | IR-044 適用除外根拠 |
 |------------|------|------------|-------------------|
-| `drift` | 文書の drift（REQ/SPEC の不一致、陳腐化） | 対象外（正規使用） | IR-044 自体の検出対象概念。integrity SPEC での記述が正規使用 |
-| `regression` | 回帰（regression test、回帰検出） | 対象外（正規使用） | regression test 概念。integrity SPEC での記述が正規使用 |
-| `gate` | 品質ゲート（QG-1〜QG-4、gate level） | 対象外（正規使用） | 品質ゲート概念。integrity SPEC での記述が正規使用 |
-| `severity` | 重要度（strict / heuristic / observation） | 対象外（正規使用） | IR severity 分類概念。integrity SPEC での記述が正規使用 |
-| `category` | カテゴリ（IR の分類） | 対象外（正規使用） | IR category 分類概念。integrity SPEC での記述が正規使用 |
-| `schema` | スキーマ（IR のフィールド定義） | 対象外（正規使用） | IR フィールド定義概念。integrity SPEC での記述が正規使用 |
-| `observation` | 観察（severity の1つ） | 対象外（正規使用） | severity 値の1つ。integrity SPEC での記述が正規使用 |
+| `drift` | 文書の drift（REQ/Design の不一致、陳腐化） | 対象外（正規使用） | IR-044 自体の検出対象概念。integrity Design での記述が正規使用 |
+| `regression` | 回帰（regression test、回帰検出） | 対象外（正規使用） | regression test 概念。integrity Design での記述が正規使用 |
+| `gate` | 品質ゲート（QG-1〜QG-4、gate level） | 対象外（正規使用） | 品質ゲート概念。integrity Design での記述が正規使用 |
+| `severity` | 重要度（strict / heuristic / observation） | 対象外（正規使用） | IR severity 分類概念。integrity Design での記述が正規使用 |
+| `category` | カテゴリ（IR の分類） | 対象外（正規使用） | IR category 分類概念。integrity Design での記述が正規使用 |
+| `schema` | スキーマ（IR のフィールド定義） | 対象外（正規使用） | IR フィールド定義概念。integrity Design での記述が正規使用 |
+| `observation` | 観察（severity の1つ） | 対象外（正規使用） | severity 値の1つ。integrity Design での記述が正規使用 |
 
 ### PR #1177 候補語 4 種の妥当性検証（RU-0008）
 
@@ -295,7 +295,7 @@ PR #1177 で候補語対照表に追加された 4 種（`baseline`, `provider`,
 
 ## IR-055 runtime-unresolved-reference 対照（REQ-0108-263/264）
 
-配布物（`src/opencode/commands/agentdev/**/*.md`、`src/opencode/skills/agentdev-*/**/*.md`）内の導入先未解決参照検出パターン。consumer 環境で解決できない参照を機械的パターンマッチングで検出する。検出対象パターンと severity 分類は [rules/IR-055-runtime-unresolved-reference.md](../../../docs/specs/integrity/rules/IR-055-runtime-unresolved-reference.md) が原本。
+配布物（`src/opencode/commands/agentdev/**/*.md`、`src/opencode/skills/agentdev-*/**/*.md`）内の導入先未解決参照検出パターン。consumer 環境で解決できない参照を機械的パターンマッチングで検出する。検出対象パターンと severity 分類は [rules/IR-055-runtime-unresolved-reference.md](../../../docs/designs/integrity/rules/IR-055-runtime-unresolved-reference.md) が原本。
 
 | パターン | severity | 備考 |
 |----------|----------|------|
@@ -305,12 +305,12 @@ PR #1177 で候補語対照表に追加された 4 種（`baseline`, `provider`,
 | `src/opencode/` | strict | 原本側リポジトリパス。consumer 環境に存在しない |
 | `/repo/` | strict | repo-local command 参照（`/repo/docs-check` 等） |
 | `repo-*` | strict | repo-local skill 参照（`repo-agentdev-integrity` 等） |
-| `docs/specs/` | heuristic | 本体内部 docs 参照。consumer 環境に存在しない可能性が高い |
+| `docs/designs/` | heuristic | 本体内部 docs 参照。consumer 環境に存在しない可能性が高い |
 | `docs/guides/` | heuristic | 本体内部 docs 参照 |
 | `github.com/yogata/agent-dev-flow/(blob|tree|issues|pull)/` | heuristic | 本体リポジトリ固有 URL |
 | `file.md#L<N>` | heuristic | 行番号付き参照。本体側の改修で容易に陳腐化する |
 
-exemption: code block 内部、template placeholder（`{xxx}`）、`vocabulary-registry.md` / `integrity-rule-catalog.md` / `rules/IR-055-*` 自身は正当使用として検出対象外とする（SPEC IR-055「exemption」参照）。
+exemption: code block 内部、template placeholder（`{xxx}`）、`vocabulary-registry.md` / `integrity-rule-catalog.md` / `rules/IR-055-*` 自身は正当使用として検出対象外とする（Design IR-055「exemption」参照）。
 
 段階導入（REQ-0108-264）: baseline 既知違反は `info`（報告のみ、fail なし）。新規違反は strict→`ng`、heuristic→`warning`（delta guard / impact guard で fail）。baseline ファイル（`.opencode/skills/repo-agentdev-integrity/baselines/ir-055-baseline.json`）は `--update-ir055-baseline` で再生成する。baseline 0 到達後に full audit を fail gate 化する。
 

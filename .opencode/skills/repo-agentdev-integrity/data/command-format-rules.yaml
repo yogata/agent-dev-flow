@@ -1,10 +1,10 @@
 # command-format-rules.yaml
 #
-# Detection-view derived from docs/specs/authoring/command-file-format.md per
+# Detection-view derived from docs/designs/authoring/command-file-format.md per
 # Phase 3 §6.2 of cross-cutting-integration-design-20260811.md.
 #
-# Canonical source (SPEC is authoritative; this YAML is a detection view):
-#   - docs/specs/authoring/command-file-format.md
+# Canonical source (Design is authoritative; this YAML is a detection view):
+#   - docs/designs/authoring/command-file-format.md
 #
 # Consumed by:
 #   - check_command_format.ts (extended for IR-028, IR-029, IR-030, IR-031)
@@ -14,7 +14,7 @@
 
 schema_version: 1
 generated_at: 2026-08-11
-canonical_source: docs/specs/authoring/command-file-format.md
+canonical_source: docs/designs/authoring/command-file-format.md
 
 # IR-028 (Command top-level Step integer-only): top-level Step headings under
 # ## 手順 must use integer numbering (### Step N:). Ranges (Step N〜M) and

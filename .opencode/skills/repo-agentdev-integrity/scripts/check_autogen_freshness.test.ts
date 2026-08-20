@@ -7,7 +7,6 @@
 import { describe, expect, test } from "bun:test";
 import {
   CATALOG_PRE_BLOCK_ID,
-  SPEC_METRICS_BLOCK_ID,
   DECISION_BASELINE_TABLE_BLOCK_ID,
   DECISION_RETIRED_TABLE_BLOCK_ID,
   findAutogenBlocks,
@@ -85,9 +84,11 @@ describe("parseTableRow", () => {
 // ─── classifyStaleness ───────────────────────────────────────────────────
 
 describe("classifyStaleness", () => {
+  const GENERIC_BLOCK_ID = "generic-metrics-block";
+
   test("行数増減は rename", () => {
     const result = classifyStaleness(
-      SPEC_METRICS_BLOCK_ID,
+      GENERIC_BLOCK_ID,
       ["| a | 1 | accepted | q |"],
       ["| a | 1 | accepted | q |", "| b | 2 | draft | w |"],
       1,
@@ -99,7 +100,7 @@ describe("classifyStaleness", () => {
 
   test("行数減少も rename、delta 負", () => {
     const result = classifyStaleness(
-      SPEC_METRICS_BLOCK_ID,
+      GENERIC_BLOCK_ID,
       ["| a | 1 | accepted | q |", "| b | 2 | draft | w |"],
       ["| a | 1 | accepted | q |"],
       1,
@@ -108,23 +109,19 @@ describe("classifyStaleness", () => {
     expect(result.detail).toContain("delta=-1");
   });
 
-  test("SPEC metrics 同行 status 列変化は status_change", () => {
+  test("status 列構造を持たない表の同行変化は content_change", () => {
     const result = classifyStaleness(
-      SPEC_METRICS_BLOCK_ID,
+      GENERIC_BLOCK_ID,
       ["| quality/foo.md | 100 | draft | quality |"],
       ["| quality/foo.md | 100 | accepted | quality |"],
       0,
     );
-    expect(result.kind).toBe("status_change");
-    expect(result.detail).toContain("SPEC status changed");
-    expect(result.detail).toContain("quality/foo.md");
-    expect(result.detail).toContain('current="draft"');
-    expect(result.detail).toContain('expected="accepted"');
+    expect(result.kind).toBe("content_change");
   });
 
-  test("SPEC metrics 同行でも path 異なる場合は content_change", () => {
+  test("同行でも key 列が異なる場合は content_change", () => {
     const result = classifyStaleness(
-      SPEC_METRICS_BLOCK_ID,
+      GENERIC_BLOCK_ID,
       ["| quality/old.md | 100 | accepted | quality |"],
       ["| quality/new.md | 100 | accepted | quality |"],
       0,
@@ -165,9 +162,9 @@ describe("classifyStaleness", () => {
     expect(result.detail).toContain("content differs");
   });
 
-  test("SPEC metrics 行数値変化は content_change", () => {
+  test("行数値変化は content_change", () => {
     const result = classifyStaleness(
-      SPEC_METRICS_BLOCK_ID,
+      GENERIC_BLOCK_ID,
       ["| quality/foo.md | 100 | accepted | quality |"],
       ["| quality/foo.md | 105 | accepted | quality |"],
       0,
@@ -178,7 +175,7 @@ describe("classifyStaleness", () => {
   test("不一致インデックスが本文範囲外でも安全に判定", () => {
     // currentBody が空で expectedBody のみ存在する場合の mismatchIndex=0
     const result = classifyStaleness(
-      SPEC_METRICS_BLOCK_ID,
+      GENERIC_BLOCK_ID,
       [],
       ["| quality/foo.md | 100 | accepted | quality |"],
       0,

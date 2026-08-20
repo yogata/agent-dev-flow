@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | `load_skills\s*=\s*\["([^"]+)"\]` パターンから各要素を抽出し、各要素が `/` 先頭形式（command 名）であるか、`agentdev-*` プレフィックスを持たない既知 command 名（語彙レジストリ `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` 参照）であるかを照合。コードブロック内の例示、検出用文字列、IR ルール本文中のパターン説明は除外対象 |
 | affected_artifacts | [commands, skills, SPEC] |
 | related_req | [v2:REQ-0140-027, REQ-010-010] |
-| related_spec | [integrity-contracts.md, document-type-responsibilities.md] |
+| related_design | [integrity-contracts.md, document-type-responsibilities.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 低。`/` 先頭形式は確実な command 名指示。`agentdev-*` プレフィックスを持たない識別子は語彙レジストリとの照合で判定。コードブロック例示、IR パターン説明は除外が必要 |
 | regression_test | (未実装)。既知 true positive として過去の `load_skills` への command 誤指定を回帰テストで検証 |

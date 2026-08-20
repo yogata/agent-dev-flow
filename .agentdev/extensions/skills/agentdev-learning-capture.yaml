@@ -6,7 +6,7 @@ context:
   - id: design-principles
     when: 設計原則参照時
     paths:
-      - "docs/specs/foundations/design-principles.md"
+      - "docs/designs/foundations/design-principles.md"
     purpose: learning capture の設計原則と境界の確認
 
 rules: []

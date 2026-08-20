@@ -1,10 +1,10 @@
 # delegation-contract-patterns.yaml
 #
-# Detection-view derived from docs/specs/workflows/delegation-contracts.md per
+# Detection-view derived from docs/designs/workflows/delegation-contracts.md per
 # Phase 3 §6.4 of cross-cutting-integration-design-20260811.md.
 #
-# Canonical source (SPEC is authoritative; this YAML is a detection view):
-#   - docs/specs/workflows/delegation-contracts.md
+# Canonical source (Design is authoritative; this YAML is a detection view):
+#   - docs/designs/workflows/delegation-contracts.md
 #
 # Consumed by:
 #   - check_delegation_contract_residual.ts (IR-032, IR-033)
@@ -15,7 +15,7 @@
 
 schema_version: 1
 generated_at: 2026-08-11
-canonical_source: docs/specs/workflows/delegation-contracts.md
+canonical_source: docs/designs/workflows/delegation-contracts.md
 
 # IR-032 (delegation_type / on_result required-envelope prohibition):
 # Command/skill bodies must not treat `delegation_type` or `on_result` as

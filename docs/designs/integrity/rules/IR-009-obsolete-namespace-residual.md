@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | 正規表現パターンマッチ |
 | affected_artifacts | [REQ, SPEC, guides, skills, commands] |
 | related_req | [REQ-036-004] |
-| related_spec | [integrity-contracts.md] |
+| related_design | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 中。検出対象外パスの設定に注意 |
 | regression_test | commands_e2e.test.ts |

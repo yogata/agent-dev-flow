@@ -100,10 +100,10 @@ describe("checkSkillRenameSymmetry (integration against real repo)", () => {
     expect(typeof report.ok).toBe("boolean");
     expect(Array.isArray(report.failures)).toBe(true);
     expect(typeof report.stats.skills_scanned).toBe("number");
-    expect(typeof report.stats.specs_scanned).toBe("number");
+    expect(typeof report.stats.designs_scanned).toBe("number");
     expect(typeof report.stats.graph_skill_nodes_scanned).toBe("number");
     expect(report.stats.skills_scanned).toBeGreaterThan(0);
-    expect(report.stats.specs_scanned).toBeGreaterThan(0);
+    expect(report.stats.designs_scanned).toBeGreaterThan(0);
   });
 
   test("superseded SPEC without skill dir is not flagged as path-symmetry violation", () => {

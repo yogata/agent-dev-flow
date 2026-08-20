@@ -75,7 +75,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 両者の整合性は docs-check IR-061 検査が検証する。
 
 <!-- AUTOGEN:BEGIN:id=rule-ownership-ir-crossref -->
-| IR ID | title | Related REQ | Related SPEC |
+| IR ID | title | Related REQ | Related Design |
 |-------|-------|-------------|--------------|
 | IR-001 | 現行 REQ frontmatter id ↔ ファイル名 | REQ-010-001, REQ-001 | integrity-contracts.md |
 | IR-002 | 現行 REQ 必須 frontmatter fields | REQ-010-001 | integrity-contracts.md |

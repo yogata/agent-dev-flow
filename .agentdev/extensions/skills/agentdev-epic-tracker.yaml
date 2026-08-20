@@ -6,7 +6,7 @@ context:
   - id: epic-wave-model
     when: Epic/Wave モデル参照時
     paths:
-      - "docs/specs/workflows/epic-wave-model.md"
+      - "docs/designs/workflows/epic-wave-model.md"
     purpose: "Epic ステータス追跡テーブルと per-Epic 単一書き手の確認"
 
 rules: []

@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | 現行 docs 内の 廃止 ADR 参照検出、コンテキスト判定 |
 | affected_artifacts | [REQ, SPEC, guides] |
 | related_req | [REQ-001-048, REQ-001-050] |
-| related_spec | [integrity-contracts.md, document-model.md] |
+| related_design | [integrity-contracts.md, document-model.md] |
 | gate_level | full-audit |
 | false_positive_risk | 中。履歴参照の文脈判定に注意 |
 | regression_test | (手動確認) |

@@ -20,7 +20,7 @@ updated: 2026-08-20
 | detection_method | 具体ID、具体パス、固定URLのパターン検出と generic/template 許容、個別承認例外判定 |
 | affected_artifacts | `src/opencode/commands/**`, `src/opencode/skills/**`, template, script ソースなど配布対象テキスト成果物全般 |
 | related_req | REQ-029 |
-| related_spec | `distribution-boundary.md`, `foundations/project-extensions.md`, `integrity-rule-catalog.md` |
+| related_design | `distribution-boundary.md`, `foundations/project-extensions.md`, `integrity-rule-catalog.md` |
 | gate_level | full-audit |
 | false_positive_risk | テンプレートプレースホルダー、検査対象宣言、索引参照を exemption で抑制する |
 | regression_test | 具体ID、具体パス、固定URL、各 exemption、generic/template 許容、個別承認例外の正常・異常 fixture を検証する |

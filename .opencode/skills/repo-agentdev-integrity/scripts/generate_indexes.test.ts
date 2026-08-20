@@ -6,7 +6,7 @@
  *   - ignores backtick-wrapped marker strings in prose (negative cases)
  *   - handles boundary cases where backticks are adjacent to marker lines
  *
- * SPEC: docs/specs/integrity/index-auto-generation.md「AUTOGEN marker 検出契約」
+ * Design: docs/designs/integrity/index-auto-generation.md「AUTOGEN marker 検出契約」
  * Background: PR #1718 workaround (HTML comment syntax abstraction) addressed
  * a symptom where backtick-wrapped marker strings in spec-health-metrics.md L26
  * were misrecognized as real markers, causing generate_indexes.ts to stop.
@@ -23,10 +23,9 @@ import {
   extractAutogenBeginId,
   findAutogenBlocks,
   replaceAutogenBlock,
-  countSpecBodyLines,
+  countDesignBodyLines,
   deriveMeasureDateFromLastCommit,
   deriveReqMetricsMeasureDate,
-  deriveSpecMetricsMeasureDate,
 } from "./generate_indexes.ts";
 import { findRepoRoot } from "./cli_utils.ts";
 
@@ -138,7 +137,7 @@ describe("findAutogenBlocks", () => {
 
   it("detects only the real block when prose has backtick-wrapped markers (mixed)", () => {
     const content = [
-      "# SPEC",
+      "# Design",
       "",
       "AUTOGENブロックは`<!-- AUTOGEN:BEGIN:id=... -->`から対応する`<!-- AUTOGEN:END -->`までを除外する。",
       "",
@@ -217,7 +216,7 @@ describe("replaceAutogenBlock", () => {
   });
 });
 
-describe("countSpecBodyLines", () => {
+describe("countDesignBodyLines", () => {
   it("excludes a real AUTOGEN block from the body count", () => {
     const content = [
       "---",
@@ -234,7 +233,7 @@ describe("countSpecBodyLines", () => {
       "After.",
     ].join("\n");
 
-    const count = countSpecBodyLines(content);
+    const count = countDesignBodyLines(content);
     expect(count).toBe(4);
   });
 
@@ -248,7 +247,7 @@ describe("countSpecBodyLines", () => {
       "AUTOGENブロックは`<!-- AUTOGEN:BEGIN:id=... -->`から対応する`<!-- AUTOGEN:END -->`までを除外する。",
     ].join("\n");
 
-    const count = countSpecBodyLines(content);
+    const count = countDesignBodyLines(content);
     expect(count).toBe(3);
   });
 
@@ -257,21 +256,21 @@ describe("countSpecBodyLines", () => {
       "---",
       "title: Test",
       "---",
-      "# SPEC",
+      "# Design",
       "",
       "AUTOGENブロックは`<!-- AUTOGEN:BEGIN:id=... -->`から除外する。",
       "",
       "## Metrics",
       "",
       "<!-- AUTOGEN:BEGIN:id=spec-metrics -->",
-      "| SPEC | 行数 |",
+      "| Design | 行数 |",
       "|---|---|",
       "<!-- AUTOGEN:END -->",
       "",
       "Footer.",
     ].join("\n");
 
-    const count = countSpecBodyLines(content);
+    const count = countDesignBodyLines(content);
     expect(count).toBe(8);
   });
 });
@@ -330,36 +329,16 @@ describe("deriveMeasureDateFromLastCommit", () => {
   });
 });
 
-describe("deriveReq/SpecMetricsMeasureDate", () => {
+describe("deriveReqMetricsMeasureDate", () => {
   const root = path.join(TMP_ROOT, "repo");
   if (!fs.existsSync(root)) {
     fs.mkdirSync(path.join(root, "docs", "requirements"), {
-      recursive: true,
-    });
-    fs.mkdirSync(path.join(root, "docs", "specs", "quality"), {
-      recursive: true,
-    });
-    fs.mkdirSync(path.join(root, "docs", "specs", "integrity"), {
       recursive: true,
     });
     execSync("git init -q -b main", { cwd: root });
     execSync('git config user.email "t@t"', { cwd: root });
     execSync('git config user.name "t"', { cwd: root });
 
-    fs.writeFileSync(
-      path.join(root, "docs", "specs", "integrity", "index-auto-generation.md"),
-      "# spec A\n",
-    );
-    commitAllWithDate(root, "add spec A", "2026-01-01T12:00:00+09:00");
-    fs.writeFileSync(
-      path.join(root, "docs", "specs", "quality", "spec-health-metrics.md"),
-      "# metrics\n",
-    );
-    commitAllWithDate(
-      root,
-      "add spec-health-metrics",
-      "2026-02-02T12:00:00+09:00",
-    );
     fs.writeFileSync(
       path.join(root, "docs", "requirements", "REQ-001.md"),
       "# req\n",
@@ -375,58 +354,6 @@ describe("deriveReq/SpecMetricsMeasureDate", () => {
         [{ id: "REQ-001", num: 1, lineCount: 1, signal: "+0", note: "" }],
       ),
     ).toBe("2026-03-03");
-  });
-
-  it("excludes metrics files themselves from spec measure date derivation", () => {
-    const metrics = [
-      {
-        relPath: "quality/req-health-metrics.md",
-        lineCount: 1,
-        status: "accepted",
-        domain: "quality",
-      },
-      {
-        relPath: "quality/spec-health-metrics.md",
-        lineCount: 1,
-        status: "accepted",
-        domain: "quality",
-      },
-      {
-        relPath: "integrity/index-auto-generation.md",
-        lineCount: 1,
-        status: "accepted",
-        domain: "integrity",
-      },
-    ];
-    // 除外なしの群最大値は spec-health-metrics.md の 2026-02-02 だが、メトリクスファイル自体は導出対象外。
-    expect(
-      deriveSpecMetricsMeasureDate(root, path.join(root, "docs", "specs"), metrics),
-    ).toBe("2026-01-01");
-  });
-
-  it("takes the max last-commit date of the non-excluded group", () => {
-    fs.writeFileSync(
-      path.join(root, "docs", "specs", "integrity", "other.md"),
-      "# spec B\n",
-    );
-    commitAllWithDate(root, "add spec B", "2026-04-04T12:00:00+09:00");
-    const metrics = [
-      {
-        relPath: "quality/spec-health-metrics.md",
-        lineCount: 1,
-        status: "accepted",
-        domain: "quality",
-      },
-      {
-        relPath: "integrity/other.md",
-        lineCount: 1,
-        status: "accepted",
-        domain: "integrity",
-      },
-    ];
-    expect(
-      deriveSpecMetricsMeasureDate(root, path.join(root, "docs", "specs"), metrics),
-    ).toBe("2026-04-04");
   });
 });
 

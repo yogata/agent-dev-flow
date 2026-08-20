@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | glob で reference/ ディレクトリ検索 |
 | affected_artifacts | [skills] |
 | related_req | [REQ-002-013, 039, REQ-037-006, 007] |
-| related_spec | [artifact-responsibilities.md] |
+| related_design | [artifact-responsibilities.md] |
 | gate_level | full-audit |
 | false_positive_risk | なし |
 | regression_test | lint_skills.test.ts |

@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | 正規表現で廃止 skill 名検出 |
 | affected_artifacts | [commands, skills, SPEC] |
 | related_req | [REQ-010] |
-| related_spec | [integrity-contracts.md] |
+| related_design | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 低 |
 | regression_test | commands_e2e.test.ts |

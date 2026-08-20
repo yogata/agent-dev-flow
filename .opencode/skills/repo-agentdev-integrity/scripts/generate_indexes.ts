@@ -2,14 +2,14 @@
  * Index auto-generation script (SC-002 Phase C, IR-061).
  *
  * 対象索引（Wave 1）:
- *   - `docs/specs/integrity/integrity-rule-catalog.md`（catalog IR エントリ一覧）
- *   - `docs/specs/integrity/rule-ownership.md`（IR 別関連マッピング appendix）
+ *   - `docs/designs/integrity/integrity-rule-catalog.md`（catalog IR エントリ一覧）
+ *   - `docs/designs/integrity/rule-ownership.md`（IR 別関連マッピング appendix）
  *
  * 自動生成マーカー（HTML コメント形式）で囲まれた領域を実ファイルから再生成する。
  * docs-check（`check_integrity.ts`）の IR-061 検査が整合性を検証する。
  *
- * 参考 SPEC: `docs/specs/integrity/index-auto-generation.md`（SC-002）
- * 参考 IR:   `docs/specs/integrity/rules/IR-061-index-generation-consistency.md`
+ * 参考 Design: `docs/designs/integrity/index-auto-generation.md`（SC-002）
+ * 参考 IR:   `docs/designs/integrity/rules/IR-061-index-generation-consistency.md`
  *
  * 使用資産: `cli_utils.ts`（parseArgs, findRepoRoot, EXIT_*）
  * require/import 混在許容（AG-001、既存資産踏襲）。
@@ -30,7 +30,7 @@ const DESCRIPTION =
 const USAGE =
   "bun run generate_indexes.ts [--help] [--dry-run] [--root <path>]";
 
-// 自動生成マーカー形式（SC-002 SPEC、IR-061 準拠）:
+// 自動生成マーカー形式（SC-002 Design、IR-061 準拠）:
 //   <!-- AUTOGEN:BEGIN:id=<id> -->
 //   ... 自動生成領域 ...
 //   <!-- AUTOGEN:END -->
@@ -158,13 +158,13 @@ export interface IrInfo {
   relPath: string;
   /** related_req 一覧（例: ["REQ-0108-001", "REQ-0101"]）。 */
   relatedReq: string[];
-  /** related_spec 一覧（例: ["integrity-contracts.md"]）。 */
-  relatedSpec: string[];
+  /** related_design 一覧（例: ["integrity-contracts.md"]）。 */
+  relatedDesign: string[];
 }
 
 /**
  * IR 個別ファイル（rules/IR-NNN-{slug}.md）からメタデータを抽出する。
- * frontmatter に id/related_req/related_spec が含まれる場合（IR-061 形式）はそれを優先し、
+ * frontmatter に id/related_req/related_design が含まれる場合（IR-061 形式）はそれを優先し、
  * 含まれない場合は本文の Field/Value 表（IR-001..IR-060 形式）から抽出する。
  */
 function extractIrInfo(fullPath: string, relPath: string): IrInfo | null {
@@ -190,25 +190,25 @@ function extractIrInfo(fullPath: string, relPath: string): IrInfo | null {
     }
   }
 
-  // frontmatter から related_req/related_spec を取得（IR-061 等の新形式）。
+  // frontmatter から related_req/related_design を取得（IR-061 等の新形式）。
   const fm = parseFrontmatter(content);
   let relatedReq: string[] = [];
-  let relatedSpec: string[] = [];
+  let relatedDesign: string[] = [];
   if (fm) {
     const rr = fm["related_req"];
     if (Array.isArray(rr)) relatedReq = rr;
     else if (typeof rr === "string") relatedReq = [rr];
-    const rs = fm["related_spec"];
-    if (Array.isArray(rs)) relatedSpec = rs;
-    else if (typeof rs === "string") relatedSpec = [rs];
+    const rs = fm["related_design"];
+    if (Array.isArray(rs)) relatedDesign = rs;
+    else if (typeof rs === "string") relatedDesign = [rs];
   }
 
   // frontmatter に無い場合は本文 Field/Value 表から抽出（IR-001..IR-060 形式）。
   if (relatedReq.length === 0) {
     relatedReq = parseBodyTableArray(content, "related_req");
   }
-  if (relatedSpec.length === 0) {
-    relatedSpec = parseBodyTableArray(content, "related_spec");
+  if (relatedDesign.length === 0) {
+    relatedDesign = parseBodyTableArray(content, "related_design");
   }
 
   return {
@@ -218,7 +218,7 @@ function extractIrInfo(fullPath: string, relPath: string): IrInfo | null {
     filename,
     relPath,
     relatedReq,
-    relatedSpec,
+    relatedDesign,
   };
 }
 
@@ -260,7 +260,7 @@ function listFiles(dirPath: string): string[] {
 }
 
 /**
- * docs/specs/integrity/rules/ 配下の IR-*.md を収集し、IR 番号順に返す。
+ * docs/designs/integrity/rules/ 配下の IR-*.md を収集し、IR 番号順に返す。
  */
 export function collectIrFiles(rulesDir: string): IrInfo[] {
   const files = listFiles(rulesDir).filter((f) => /^IR-\d+-.*\.md$/.test(f));
@@ -314,7 +314,7 @@ export function generateCatalogBlocks(
 function formatRuleOwnershipLine(info: IrInfo): string {
   const reqCell = info.relatedReq.length > 0 ? info.relatedReq.join(", ") : "-";
   const specCell =
-    info.relatedSpec.length > 0 ? info.relatedSpec.join(", ") : "-";
+    info.relatedDesign.length > 0 ? info.relatedDesign.join(", ") : "-";
   // 表セル内のパイプを回避するため改行・パイプを空白へ置換。
   const safeTitle = info.title.replace(/\|/g, "/").replace(/\n/g, " ");
   return `| ${info.id} | ${safeTitle} | ${reqCell} | ${specCell} |`;
@@ -322,7 +322,7 @@ function formatRuleOwnershipLine(info: IrInfo): string {
 
 export function generateRuleOwnershipAppendix(infos: IrInfo[]): string[] {
   const lines: string[] = [];
-  lines.push("| IR ID | title | Related REQ | Related SPEC |");
+  lines.push("| IR ID | title | Related REQ | Related Design |");
   lines.push("|-------|-------|-------------|--------------|");
   for (const info of infos) {
     lines.push(formatRuleOwnershipLine(info));
@@ -779,7 +779,7 @@ export function generateAdrRetiredTable(
 // ─── AG-008: Decision README 生成 (DEC-009) ─────────────────────────────────
 
 // docs/decisions/README.md 内の AUTOGEN block ID。
-// index-auto-generation SPEC「AUTOGEN block ID 命名パターン」採用 ID 参照例の
+// index-auto-generation Design「AUTOGEN block ID 命名パターン」採用 ID 参照例の
 // Decision README 系。旧 ADR README（docs/adr/README.md、adr-* block ID 群）は
 // DEC-009 で廃止済みであり採用しない。
 export const DECISION_BASELINE_COUNT_BLOCK_ID = "decision-baseline-count";
@@ -909,7 +909,7 @@ export const DOCMAP_INVENTORY_BLOCK_ID = "docmap-inventory";
 /**
  * DOC-MAP インベントリブロック（件数 + ファイル群参照）。
  * docs/requirements/REQ-*.md, docs/requirements/retired/REQ-*.md,
- * docs/adr/ADR-*.md, docs/adr/retired/ADR-*.md, docs/specs/ 配下 .md から再生成。
+ * docs/adr/ADR-*.md, docs/adr/retired/ADR-*.md, docs/designs/ 配下 .md から再生成。
  */
 export function generateDocMapInventory(args: {
   activeReqCount: number;
@@ -931,15 +931,15 @@ export function generateDocMapInventory(args: {
   } else {
     lines.push(`- ADR: ${args.activeAdrCount}件（\`docs/adr/ADR-*.md\`）`);
   }
-  lines.push(`- SPEC: ${args.specCount}件（\`docs/specs/**/*.md\`）`);
+  lines.push(`- Design: ${args.specCount}件（\`docs/designs/**/*.md\`）`);
   return lines;
 }
 
 /**
- * docs/specs/ 配下の .md を再帰収集して件数を返える（check_integrity.ts と同ロジック）。
+ * docs/designs/ 配下の .md を再帰収集して件数を返える（check_integrity.ts と同ロジック）。
  */
-export function countSpecFiles(specsDir: string): number {
-  if (!fs.existsSync(specsDir)) return 0;
+export function countDesignFiles(designsDir: string): number {
+  if (!fs.existsSync(designsDir)) return 0;
   let count = 0;
   const walk = (dir: string): void => {
     const entries = fs.readdirSync(dir, { withFileTypes: true }) as import("fs").Dirent[];
@@ -952,7 +952,7 @@ export function countSpecFiles(specsDir: string): number {
       }
     }
   };
-  walk(specsDir);
+  walk(designsDir);
   return count;
 }
 
@@ -966,7 +966,7 @@ export const README_REQ_SUMMARY_COUNT_BLOCK_ID = "readme-req-summary-count";
  *
  * docs/README.md は入口文書であり、REQ 詳細一覧は docs/requirements/README.md へ誘導する。
  * 件数表明のみを AUTOGEN 化し、続く説明文（範囲、関連 ADR 等）は人手編集領域として残置する
- * （SC-002 SPEC「件数表明」自動生成原則、Wave 5 Phase E 残）。
+ * （SC-002 Design「件数表明」自動生成原則、Wave 5 Phase E 残）。
  */
 export function generateReadmeReqSummaryCount(args: {
   activeReqCount: number;
@@ -975,10 +975,9 @@ export function generateReadmeReqSummaryCount(args: {
   return [`現行 REQ: ${args.activeReqCount}件、廃止済み: ${args.retiredReqCount}件`];
 }
 
-// ─── AG-006候補5: REQ/SPEC 健全性メトリクス計測例生成 (Phase C 拡張) ────────
+// ─── AG-006候補5: REQ 健全性メトリクス計測例生成 (Phase C 拡張) ────────
 
 export const REQ_METRICS_BLOCK_ID = "req-metrics-measurement-example";
-export const SPEC_METRICS_BLOCK_ID = "spec-metrics-measurement-example";
 
 /** REQ 要件行数シグナル閾値（req-health-metrics.md L42-46 準拠）。 */
 function computeReqLineSignal(lineCount: number): string {
@@ -1004,14 +1003,14 @@ export function countReqRequirementLines(
 }
 
 /**
- * SPEC ファイル本文行数を計測する（spec-health-metrics.md L22 準拠）。
+ * Design ファイル本文行数を計測する（design-health-metrics.md 準拠）。
  * frontmatter（先頭 `---`〜`---`）、HTML コメント（`<!--`〜`-->`、複数行可）、
  * AUTOGEN ブロック（`<!-- AUTOGEN:BEGIN:id=xxx -->`〜`<!-- AUTOGEN:END -->`）を除外。
- * AUTOGEN ブロックを除外することで、SPEC 健全性（人手執筆部分の肥大化検出）と
+ * AUTOGEN ブロックを除外することで、Design 健全性（人手執筆部分の肥大化検出）と
  * べき等性（AUTOGEN ブロック自身が計測結果に影響しない）を両立する。
  * コメント開始/終了と同一行にある本文は除外せず残置する（コメント自身のみ除去）。
  */
-export function countSpecBodyLines(content: string): number {
+export function countDesignBodyLines(content: string): number {
   const lines = content.split("\n");
   let start = 0;
   // frontmatter を読み飛ばす。
@@ -1079,17 +1078,6 @@ export interface ReqMetricInfo {
   note: string;
 }
 
-export interface SpecMetricInfo {
-  /** SPEC ファイルの docs/specs/ からの相対パス（例: "quality/req-health-metrics.md"）。 */
-  relPath: string;
-  /** SPEC 本文行数。 */
-  lineCount: number;
-  /** frontmatter status（欠落時は "-"）。 */
-  status: string;
-  /** ドメイン分類（commands/skills/workflows/foundations/responsibilities/quality/integrity/local/authoring/uncategorized）。 */
-  domain: string;
-}
-
 /**
  * 既存の手動記載備考を優先保持するための内部マップ。
  * req-health-metrics.md「現行 REQ の計測例（参照値）」に既出の8件を混合領域として保持。
@@ -1103,7 +1091,7 @@ const REQ_METRICS_HANDCURATED_NOTES: Record<string, string> = {
   "REQ-0112": "ADR ライフサイクル",
   "REQ-0119": "コマンド、スキル責務分界",
   "REQ-0108": "docs-check / Validation",
-  "REQ-0136": "REQ/SPEC/ADR 適正運用自動化",
+  "REQ-0136": "REQ/Design/ADR 適正運用自動化",
 };
 
 /**
@@ -1159,115 +1147,6 @@ export function generateReqMetricsTable(
   lines.push(`計測日: ${measureDate}。`);
   return lines;
 }
-
-/**
- * SPEC ファイルの相対パスからドメイン分類を抽出する。
- * docs/specs/{domain}/{file} の形式を想定。未知のトップレベルディレクトリは uncategorized。
- * _template.md は collectSpecMetrics 側で除外済みを前提。
- */
-export function extractSpecDomain(relPath: string): string {
-  const known = [
-    "commands",
-    "skills",
-    "workflows",
-    "foundations",
-    "responsibilities",
-    "quality",
-    "integrity",
-    "local",
-    "authoring",
-  ];
-  const firstSep = relPath.indexOf("/");
-  if (firstSep === -1) return "uncategorized";
-  const top = relPath.slice(0, firstSep);
-  return known.includes(top) ? top : "uncategorized";
-}
-
-/**
- * docs/specs/ 配下の .md ファイルを再帰収集し、本文行数・status・ドメイン分類を算出する。
- * _template.md は除外。SPEC 行数降順でソート（同値の場合は relPath 昇順）。
- */
-export function collectSpecMetrics(specsDir: string): SpecMetricInfo[] {
-  const metrics: SpecMetricInfo[] = [];
-  const walk = (dir: string, relPrefix: string): void => {
-    let entries: import("fs").Dirent[];
-    try {
-      entries = fs.readdirSync(dir, { withFileTypes: true }) as import("fs").Dirent[];
-    } catch {
-      return;
-    }
-    for (const entry of entries) {
-      const full = path.join(dir, entry.name);
-      const rel = relPrefix === "" ? entry.name : `${relPrefix}/${entry.name}`;
-      if (entry.isDirectory()) {
-        walk(full, rel);
-        continue;
-      }
-      if (!entry.name.endsWith(".md")) continue;
-      if (entry.name === "_template.md") continue;
-      const content = readText(full);
-      if (content === null) continue;
-      const lineCount = countSpecBodyLines(content);
-      const fm = parseFrontmatter(content);
-      let status = "-";
-      if (fm && typeof fm["status"] === "string") status = fm["status"];
-      metrics.push({
-        relPath: rel,
-        lineCount,
-        status,
-        domain: extractSpecDomain(rel),
-      });
-    }
-  };
-  walk(specsDir, "");
-  metrics.sort((a, b) => {
-    if (b.lineCount !== a.lineCount) return b.lineCount - a.lineCount;
-    return a.relPath < b.relPath ? -1 : a.relPath > b.relPath ? 1 : 0;
-  });
-  return metrics;
-}
-
-/**
- * spec-health-metrics.md「SPEC 計測例」AUTOGEN ブロック本体を生成する。
- * 出力形式:
- *   | SPEC | SPEC 行数 | status | ドメイン分類 |
- *   |---|---|---|---|
- *   | path/to/spec.md | N | status | domain |
- *   ...
- *   (空行)
- *   計測日: YYYY-MM-DD
- */
-export function generateSpecMetricsTable(
-  metrics: SpecMetricInfo[],
-  measureDate: string,
-): string[] {
-  const lines: string[] = [];
-  lines.push("| SPEC | SPEC 行数 | status | ドメイン分類 |");
-  lines.push("|---|---|---|---|");
-  for (const m of metrics) {
-    lines.push(
-      `| ${m.relPath} | ${m.lineCount} | ${m.status} | ${m.domain} |`,
-    );
-  }
-  lines.push("");
-  lines.push(`計測日: ${measureDate}。`);
-  return lines;
-}
-
-/**
- * SPEC メトリクス計測日導出の対象外 relPath（specsDir 相対）。
- *
- * 計測例 AUTOGEN ブロックを持つメトリクスファイル自体を導出対象から除外する。
- * 自身の AUTOGEN 更新コミットが SPEC 群の最終コミット日付を押し上げ、再生成と
- * 検出が連鎖する自己増幅を防ぐ（「SPEC 行数計測の AUTOGEN ブロック除外」と同種の
- * 計測器独立性原則）。
- */
-export const SPEC_METRICS_MEASURE_DATE_EXCLUDED: ReadonlySet<string> =
-  new Set([
-    "quality/req-health-metrics.md",
-    "quality/spec-health-metrics.md",
-  ]);
-
 /**
  * 対象ドキュメント群の最終コミット日付（YYYY-MM-DD）を導出する（SC-002「計測日導出」）。
  *
@@ -1326,25 +1205,6 @@ export function deriveReqMetricsMeasureDate(
     metrics.map((m) => path.join(reqDir, `${m.id}.md`)),
   );
 }
-
-/**
- * spec-metrics 計測日を導出する。対象は SPEC メトリクスの計測対象ファイル群から
- * 計測例 AUTOGEN ブロックを持つメトリクスファイル自体
- * （SPEC_METRICS_MEASURE_DATE_EXCLUDED）を除外した群とする。
- */
-export function deriveSpecMetricsMeasureDate(
-  root: string,
-  specsDir: string,
-  metrics: SpecMetricInfo[],
-): string | null {
-  return deriveMeasureDateFromLastCommit(
-    root,
-    metrics
-      .filter((m) => !SPEC_METRICS_MEASURE_DATE_EXCLUDED.has(m.relPath))
-      .map((m) => path.join(specsDir, m.relPath)),
-  );
-}
-
 // ─── main ──────────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
@@ -1378,28 +1238,27 @@ EXIT CODES:
 
 TARGET FILES (SC-002 Phase C):
   Wave 1:
-    - docs/specs/integrity/integrity-rule-catalog.md (catalog IR entries, 2 blocks around IR-045 gap)
-    - docs/specs/integrity/rule-ownership.md (IR cross-reference appendix)
+    - docs/designs/integrity/integrity-rule-catalog.md (catalog IR entries, 2 blocks around IR-045 gap)
+    - docs/designs/integrity/rule-ownership.md (IR cross-reference appendix)
   Wave 2 (AG-008/009/013, DEC-009):
     - docs/decisions/README.md (decision-* baseline/status/retired blocks; skipped when absent)
     - docs/requirements/README.md (active/retired REQ tables)
     - docs/DOC-MAP.md (inventory stats; legacy, skipped when absent)
   Wave 3 (AG-006 候補5):
-    - docs/specs/quality/req-health-metrics.md (REQ line count + signal table)
-    - docs/specs/quality/spec-health-metrics.md (SPEC line count + status + domain table)
-  Wave 5 (Phase E 残):
+    - docs/designs/quality/req-health-metrics.md (REQ line count + signal table)
+      Wave 5 (Phase E 残):
     - docs/README.md (REQ count summary only; detailed table is hand-curated)
 
 GENERATION SOURCE:
-  - docs/specs/integrity/rules/IR-*.md (frontmatter + body Field/Value table)
+  - docs/designs/integrity/rules/IR-*.md (frontmatter + body Field/Value table)
   - docs/decisions/DEC-*.md, docs/decisions/retired/DEC-*.md (frontmatter; DEC-009)
   - docs/requirements/REQ-*.md, docs/requirements/retired/REQ-*.md (frontmatter, requirement line count)
-  - docs/specs/**/*.md (file count, body line count, frontmatter status)
+  - docs/designs/**/*.md (file count, body line count, frontmatter status)
   - docs/adr/ADR-*.md (legacy; DOC-MAP inventory count only, used when docs/DOC-MAP.md exists)
 
 RELATED:
-  - SPEC: docs/specs/integrity/index-auto-generation.md (SC-002)
-  - IR:   docs/specs/integrity/rules/IR-061-index-generation-consistency.md
+  - Design: docs/designs/integrity/index-auto-generation.md (SC-002)
+  - IR:   docs/designs/integrity/rules/IR-061-index-generation-consistency.md
   - docs-check: check_integrity.ts checkIndexGenerationConsistency (IR-061)
 `;
     console.log(helpText);
@@ -1414,22 +1273,19 @@ RELATED:
 
   const rulesDir = path.join(
     root,
-    "docs",
-    "specs",
+    "docs", "designs",
     "integrity",
     "rules",
   );
   const catalogPath = path.join(
     root,
-    "docs",
-    "specs",
+    "docs", "designs",
     "integrity",
     "integrity-rule-catalog.md",
   );
   const ruleOwnershipPath = path.join(
     root,
-    "docs",
-    "specs",
+    "docs", "designs",
     "integrity",
     "rule-ownership.md",
   );
@@ -1439,16 +1295,12 @@ RELATED:
   const decisionRetiredDir = path.join(decisionsDir, "retired");
   const reqDir = path.join(root, "docs", "requirements");
   const reqRetiredDir = path.join(reqDir, "retired");
-  const specsDir = path.join(root, "docs", "specs");
+  const designsDir = path.join(root, "docs", "designs");
   const decisionReadmePath = path.join(decisionsDir, "README.md");
   const reqReadmePath = path.join(reqDir, "README.md");
   const docMapPath = path.join(root, "docs", "DOC-MAP.md");
-  const qualityDir = path.join(specsDir, "quality");
+  const qualityDir = path.join(designsDir, "quality");
   const reqHealthMetricsPath = path.join(qualityDir, "req-health-metrics.md");
-  const specHealthMetricsPath = path.join(
-    qualityDir,
-    "spec-health-metrics.md",
-  );
 
   if (!fs.existsSync(rulesDir)) {
     console.error(`[generate_indexes] rules dir not found: ${rulesDir}`);
@@ -1496,7 +1348,6 @@ RELATED:
   const reqRetiredTable = generateReqRetiredTable(reqRetiredInfos);
 
   const reqMetrics = collectReqMetrics(reqDir);
-  const specMetrics = collectSpecMetrics(specsDir);
   const reqMeasureDate = deriveReqMetricsMeasureDate(root, reqDir, reqMetrics);
   if (reqMeasureDate === null) {
     console.error(
@@ -1505,23 +1356,7 @@ RELATED:
     );
     process.exit(EXIT_ERROR);
   }
-  const specMeasureDate = deriveSpecMetricsMeasureDate(
-    root,
-    specsDir,
-    specMetrics,
-  );
-  if (specMeasureDate === null) {
-    console.error(
-      `[generate_indexes] measure date derivation failed for docs/specs/**/*.md ` +
-        `(no commit history or git failure)`,
-    );
-    process.exit(EXIT_ERROR);
-  }
   const reqMetricsTable = generateReqMetricsTable(reqMetrics, reqMeasureDate);
-  const specMetricsTable = generateSpecMetricsTable(
-    specMetrics,
-    specMeasureDate,
-  );
 
   const readmeReqSummary = generateReadmeReqSummaryCount({
     activeReqCount: reqInfos.length,
@@ -1703,7 +1538,7 @@ RELATED:
       retiredReqCount: reqRetiredInfos.length,
       activeAdrCount: collectAdrFiles(adrDir).length,
       retiredAdrCount: collectRetiredAdrFiles(adrRetiredDir).length,
-      specCount: countSpecFiles(specsDir),
+      specCount: countDesignFiles(designsDir),
     });
     const docMapBlocks = findAutogenBlocks(docMapOriginal);
     if (!docMapBlocks.some((b) => b.id === DOCMAP_INVENTORY_BLOCK_ID)) {
@@ -1745,31 +1580,6 @@ RELATED:
   );
   if (reqMetricsUpdated !== reqMetricsOriginal) {
     updates.push({ file: reqHealthMetricsPath, content: reqMetricsUpdated });
-  }
-
-  // spec-health-metrics 更新 (AG-006 候補5, Wave 3)
-  const specMetricsOriginal = readText(specHealthMetricsPath);
-  if (specMetricsOriginal === null) {
-    console.error(
-      `[generate_indexes] spec-health-metrics not found: ${specHealthMetricsPath}`,
-    );
-    process.exit(EXIT_ERROR);
-  }
-  if (!findAutogenBlocks(specMetricsOriginal).some(
-    (b) => b.id === SPEC_METRICS_BLOCK_ID,
-  )) {
-    console.error(
-      `[generate_indexes] spec-health-metrics AUTOGEN marker not found. Expected id: ${SPEC_METRICS_BLOCK_ID}`,
-    );
-    process.exit(EXIT_ERROR);
-  }
-  const specMetricsUpdated = replaceAutogenBlock(
-    specMetricsOriginal,
-    SPEC_METRICS_BLOCK_ID,
-    specMetricsTable,
-  );
-  if (specMetricsUpdated !== specMetricsOriginal) {
-    updates.push({ file: specHealthMetricsPath, content: specMetricsUpdated });
   }
 
   // docs/README.md 更新 (Phase E 残, Wave 5)
@@ -1819,9 +1629,6 @@ RELATED:
     );
     console.log(
       `[generate_indexes] req-health-metrics: ${reqMetrics.length} REQs (measure date ${reqMeasureDate})`,
-    );
-    console.log(
-      `[generate_indexes] spec-health-metrics: ${specMetrics.length} SPECs (measure date ${specMeasureDate})`,
     );
     console.log(
       `[generate_indexes] docs/README.md: REQ summary active=${reqInfos.length} retired=${reqRetiredInfos.length}`,

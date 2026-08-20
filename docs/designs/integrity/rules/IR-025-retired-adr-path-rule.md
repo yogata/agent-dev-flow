@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | `docs/decisions/(ADR-\d{4}|DEC-\d{4,})\.md` パターンのファイル名確認（現行3桁ID `DEC-001〜DEC-{NNN}` のみ許容。4桁の v2:ADR-0000〜v2:ADR-0099 形式は禁止） |
 | affected_artifacts | [Decision] |
 | related_req | [REQ-001-047, REQ-001-048] |
-| related_spec | [integrity-contracts.md, document-model.md] |
+| related_design | [integrity-contracts.md, document-model.md] |
 | gate_level | full-audit |
 | false_positive_risk | なし。番号帯マッチングは確実 |
 | regression_test | (未実装) |

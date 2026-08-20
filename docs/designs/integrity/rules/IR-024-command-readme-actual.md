@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | README からコマンド名抽出 → glob と照合 |
 | affected_artifacts | [command README, commands] |
 | related_req | [REQ-001-026, REQ-010-003] |
-| related_spec | [integrity-contracts.md] |
+| related_design | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 低 |
 | regression_test | commands_structure.test.ts |

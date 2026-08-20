@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | `delegation_type` / `on_result` 周辺文脈を検出し、必須 envelope 表現ではなく任意、参考分類の表現であることを確認 |
 | affected_artifacts | [commands, SPEC, skills] |
 | related_req | [REQ-003-017, REQ-003-018] |
-| related_spec | [workflow-contracts.md, artifact-contracts.md] |
+| related_design | [workflow-contracts.md, artifact-contracts.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 中。taxonomy 定義、任意ラベル説明、旧語検出用文字列は許容 |
 | regression_test | (未実装) |

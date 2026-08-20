@@ -123,12 +123,12 @@ function buildFixture(root: string): void {
     join(root, "docs", "adr", "README.md"),
     "# ADR\n",
   );
-  writeFixtureFile(join(root, "docs", "specs", "README.md"), "# SPEC\n");
+  writeFixtureFile(join(root, "docs", "designs", "README.md"), "# Design\n");
 
-  // 監査記録（配置ディレクトリベースの免除対象）。表内の REQ-9999 参照は
-  // 行単位の退休語彙を持たないため、免除規定なしでは retired 参照系 warning となる。
+  // 監査記録（docs/reports 配下の Report。Issue #2349 Report分離により Design 走査対象外）。
+  // 表内の REQ-9999 参照は retired 参照系 warning の対象にならない。
   writeFixtureFile(
-    join(root, "docs", "specs", "integrity", "audits", "retired-ref-audit-fixture.md"),
+    join(root, "docs", "reports", "integrity", "audits", "retired-ref-audit-fixture.md"),
     [
       "---",
       "id: AUDIT-RETIRED-REF-FIXTURE",
@@ -147,10 +147,9 @@ function buildFixture(root: string): void {
     ].join("\n"),
   );
 
-  // baseline snapshot（frontmatter 信号キー baseline_for ベースの免除対象）。
-  // 監査ディレクトリ外に配置し、信号キーのみで免除されることを固定する。
+  // baseline snapshot（docs/reports 配下の Report。Issue #2349 Report分離により Design 走査対象外）。
   writeFixtureFile(
-    join(root, "docs", "specs", "integrity", "snapshot-fixture.md"),
+    join(root, "docs", "reports", "integrity", "snapshot-fixture.md"),
     [
       "---",
       "id: BASELINE-RETIRED-REF-FIXTURE",
@@ -171,7 +170,7 @@ function buildFixture(root: string): void {
 
   // 対照群: 履歴文脈のない通常 SPEC ファイル。免除を適用しない範囲の固定。
   writeFixtureFile(
-    join(root, "docs", "specs", "integrity", "control-spec-fixture.md"),
+    join(root, "docs", "designs", "integrity", "control-design-fixture.md"),
     [
       "# 対照 SPEC フィクスチャ",
       "",
@@ -219,12 +218,12 @@ describe("history record exemption for retired-reference detections", () => {
     expect(baselineFindings).toEqual([]);
   });
 
-  it("履歴文脈のない通常 SPEC ファイルの retired 参照は警告され続ける", () => {
+  it("履歴文脈のない通常 Design ファイルの retired 参照は警告され続ける", () => {
     const report = runChecker(TEMP_ROOT);
     const controlFindings = report.results.filter(
       (r) =>
         RETIRED_REF_CHECKS.has(r.check) &&
-        (r.file ?? "").includes("control-spec-fixture"),
+        (r.file ?? "").includes("control-design-fixture"),
     );
     expect(controlFindings.length).toBeGreaterThan(0);
   });

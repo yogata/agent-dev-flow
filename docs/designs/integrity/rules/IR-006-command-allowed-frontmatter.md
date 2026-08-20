@@ -16,7 +16,7 @@ updated: 2026-08-06
 | detection_method | frontmatter field 列挙 → 許可リストと照合 |
 | affected_artifacts | [commands] |
 | related_req | [REQ-002-015, REQ-039-002] |
-| related_spec | [integrity-contracts.md, artifact-contracts.md] |
+| related_design | [integrity-contracts.md, artifact-contracts.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 低 |
 | regression_test | command_fixtures.test.ts |

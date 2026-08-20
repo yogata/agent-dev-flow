@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | 廃止 REQ ファイル一覧と retired/README.md のエントリを双方向差分で照合 |
 | affected_artifacts | [廃止 REQ, retired README] |
 | related_req | [REQ-001] |
-| related_spec | [integrity-contracts.md] |
+| related_design | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 低。ファイル一覧とエントリの差分 |
 | regression_test | (未実装) |

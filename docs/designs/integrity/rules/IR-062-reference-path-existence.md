@@ -40,7 +40,7 @@ strict（参照切れは broken-reference として即時修正対象）
 | detection_method | `checkScriptTemplateReferencePaths`（check_integrity.ts）によるパス抽出と存在確認 |
 | affected_artifacts | [commands, skills, templates, scripts, references] |
 | related_req | [REQ-028-012, REQ-010] |
-| related_spec | [integrity-contracts.md, agentdev-skill-authoring.md, agentdev-command-authoring.md] |
+| related_design | [integrity-contracts.md, agentdev-skill-authoring.md, agentdev-command-authoring.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 低。CJK 句読点隣接はパスセグメント正規表現で終端する。reference ファイルの他 skill 資産への正当な裸パス言及は文脈解決で対象外とする |
 | regression_test | `check_reference_paths.test.ts`（ネスト参照の正常/異常、reference ファイル走査、CJK 句読点隣接、cross-skill 文脈解決を同一ケースで整備） |

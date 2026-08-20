@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | `check_integrity.ts` の `checkDistributionUntrackedSkillReference` が実装する。ステップ1: `.opencode/skills/` 配下のディレクトリ一覧から `src/opencode/skills/` に存在しないもの（projection-only）を抽出し、`repo-*` プレフィックス（REQ-001 repo-local）を除外する。ステップ2: 各 projection-only スキル名について、配布物ファイル群を走査し、パス参照（`.opencode/skills/<name>`、`src/opencode/skills/<name>`）、バッククォート参照（`` `<name>` ``）、日本語散文参照（`<name> スキル`、`<name>スキル`）、`load_skills` リテラル参照のいずれかで出現するか確認する。出現した場合は src 昇格を促す NG を出力する |
 | affected_artifacts | [src/opencode/commands/agentdev/**/*.md, src/opencode/skills/**/*.md, .opencode/skills/<name>/] |
 | related_req | [REQ-002-001, REQ-002-002, REQ-002-003] |
-| related_spec | [../integrity/integrity-rule-catalog.md, ../local/runtime-package-boundary.md] |
+| related_design | [../integrity/integrity-rule-catalog.md, ../local/runtime-package-boundary.md] |
 | gate_level | full-audit, delta-guard, impact-guard |
 | false_positive_risk | 低。スキル名は kebab-case であり語境界マッチで偽陽性は限定的。`repo-*` プレフィックスは REQ-001 により repo-local として除外。ルールカタログ・vocabulary-registry・IR-058 ルールファイル自体・runtime-package-boundary SPEC は検出語を正当に含むため exemption 対象とする |
 | regression_test | `check_integrity.test.ts` の `IR-058 distribution-untracked-skill-reference` ブロック。projection-only かつ配布物から参照されるスキルを置いた fixture で NG が出力されること、参照無し fixture で OK が出力されること、`repo-*` スキルは参照されても検出されないことを検証する |

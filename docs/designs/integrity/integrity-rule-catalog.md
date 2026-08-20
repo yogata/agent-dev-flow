@@ -25,7 +25,7 @@ updated: 2026-08-18
 | detection_method | string | 検出方法（正規表現、構造解析、存在確認等） |
 | affected_artifacts | list[str] | 対象アーティファクト種別 |
 | related_req | list[str] | 関連 REQ ID |
-| related_spec | list[str] | 関連 SPEC ファイル |
+| related_design | list[str] | 関連 SPEC ファイル |
 | gate_level | enum | full-audit / delta-guard / impact-guard |
 | false_positive_risk | string | 誤検知リスクと対策 |
 | regression_test | string | 回帰テストの有無、ID |
@@ -178,7 +178,7 @@ candidate 状態の IR は catalog への本エントリ追加を含まず、別
 | detection_method | retired REQ/SPEC ID リストをソースとした本文横断検索。活性 REQ/SPEC への言及は対象外。supersede 元への言及は文脈判定で finding 扱い |
 | affected_artifacts | `src/opencode/commands/**`, `src/opencode/skills/**`, `docs/guides/**` |
 | related_req | REQ-010, REQ-010 |
-| related_spec | `docs/designs/foundations/document-model.md`（SPEC ライフサイクル superseded） |
+| related_design | `docs/designs/foundations/document-model.md`（SPEC ライフサイクル superseded） |
 | gate_level | full-audit |
 | false_positive_risk | supersede 元への妥当な文脈参照。finding 扱いで人間確認を挟む |
 | regression_test | （未実装） |

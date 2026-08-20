@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | `check_command_format.ts` により command 定義ファイルを走査。`## 手順` 配下の Step 見出し、参照、numbered list、ガードレール番号を正規表現で検出し、command-file-format.md の規約と照合 |
 | affected_artifacts | [commands] |
 | related_req | [v2:REQ-0143, REQ-010] |
-| related_spec | [command-file-format.md, integrity-contracts.md] |
+| related_design | [command-file-format.md, integrity-contracts.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 低。正規表現による機械的検出。`## 手順` 配下判定、ガードレール行（`- G\d+:`）の形式照合により誤検知リスクを最小化 |
 | regression_test | check_command_format.test.ts |

@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | ID set の intersection 確認 |
 | affected_artifacts | [現行 REQ, 廃止 REQ] |
 | related_req | [REQ-010] |
-| related_spec | [integrity-contracts.md] |
+| related_design | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | なし |
 | regression_test | commands_structure.test.ts |

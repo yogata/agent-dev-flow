@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | README から REQ ID 抽出 → glob 結果と照合 |
 | affected_artifacts | [REQ index, 現行 REQ] |
 | related_req | [REQ-010-003] |
-| related_spec | [integrity-contracts.md] |
+| related_design | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 低 |
 | regression_test | commands_structure.test.ts |

@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | Decision から REQ ID 抽出 → 存在確認、逆方向も確認。Decision ID 抽出は `DEC-\d{3}`（`v2:` prefix 除外）。旧 `ADR-\d{4}` 参照が現行 docs に残存する場合は移行漏れ（residual）として検出する |
 | affected_artifacts | [Decision, REQ, Decision index] |
 | related_req | [REQ-010-005] |
-| related_spec | [integrity-contracts.md] |
+| related_design | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 中。廃止 REQ 参照は別 rule で判定 |
 | regression_test | check_integrity.test.ts |

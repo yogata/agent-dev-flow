@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | frontmatter status field 検査 |
 | affected_artifacts | [ADR] |
 | related_req | [REQ-010] |
-| related_spec | [integrity-contracts.md] |
+| related_design | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 低 |
 | regression_test | check_integrity.test.ts |

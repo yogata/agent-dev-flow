@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | `Findings`, `Capture候補`, `Intake` 周辺の見出しを検出し、current/source の見出し統一と REQ-003-021 の検出目的例外を判定 |
 | affected_artifacts | [commands, command projection, SPEC, integrity rules] |
 | related_req | [REQ-003-014, REQ-003-020, REQ-003-021] |
-| related_spec | [workflow-contracts.md] |
+| related_design | [workflow-contracts.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 高。通常語としての findings、旧語検出パターン、projection 側の比較対象を除外する必要がある |
 | regression_test | (未実装) |
