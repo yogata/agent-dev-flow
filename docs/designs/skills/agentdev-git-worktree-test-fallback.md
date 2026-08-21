@@ -4,6 +4,7 @@ status: draft
 created: "2026-08-09"
 updated: "2026-08-18"
 ---
+<!-- ADF-COVERS(implementation): REQ-018-001, REQ-018-002 -->
 
 # agentdev-git-worktree 構造系テスト fallback 契約
 

@@ -1,4 +1,6 @@
 // ADF-COVERS(verification): REQ-002-013, REQ-002-014, REQ-002-015
+// ADF-COVERS(implementation): REQ-018-001
+// ADF-COVERS(verification): REQ-018-001, REQ-018-002
 import { describe, it, expect } from "bun:test";
 import * as fs from "fs";
 import * as path from "path";

@@ -1,3 +1,4 @@
+<!-- ADF-COVERS(implementation): REQ-018-002 -->
 # Worktree 作成、削除、ブランチ操作の詳細手順
 
 ## 作成手順
