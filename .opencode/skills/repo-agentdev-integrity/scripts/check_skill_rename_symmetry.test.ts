@@ -1,3 +1,4 @@
+// ADF-COVERS(verification): REQ-010-063
 /**
  * Tests for check_skill_rename_symmetry.ts (REQ-026).
  *

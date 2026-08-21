@@ -2,6 +2,7 @@
 name: agentdev-gh-cli
 description: AgentDevFlow のローカル版 I/O 境界（REQ-0150, ADR-0130）。標準版 agentdev-gh-cli と同一の手続き名で、Issue/PR 相当の読み書きを Case ファイル（`.agentdev/cases/case-{NNNN}.md`）へ読み替える。上位 command/skill は標準版と同じく agentdev-gh-cli のみを参照し、ローカル版であることを意識しない。USE FOR: Case ファイル作成、Case ファイル本文読込、Case ファイル本文更新、作業ログ追記、PR 相当セクション（マージ前確認・Design確定候補・Findings）読み書き、マージ結果記録、Case close、書き込み後 VERIFY。DO NOT USE FOR: 本文生成、完了判定、Epic 依存判定、capture 分類（domain skill 担当）、一般 git 操作（agentdev-git-worktree 担当）。
 ---
+<!-- ADF-COVERS(implementation): REQ-011-006, REQ-011-007 -->
 
 # agentdev-gh-cli（ローカル版）
 

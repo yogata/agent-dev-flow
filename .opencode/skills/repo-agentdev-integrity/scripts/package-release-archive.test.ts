@@ -1,4 +1,5 @@
 // ADF-COVERS(verification): REQ-009-009, REQ-009-045
+// ADF-COVERS(verification): REQ-010-060
 // Regression harness for scripts/package-release-archive.ps1.
 //
 // Proves the hardening contract (Issue #2092 / DEC-014 decision 7):

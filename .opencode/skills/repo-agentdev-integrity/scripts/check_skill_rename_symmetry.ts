@@ -1,3 +1,4 @@
+// ADF-COVERS(implementation): REQ-010-063
 // Skill rename symmetry checker (REQ-026).
 //
 // Deterministic checks for skill rename operations. Verifies three symmetries

@@ -1,3 +1,4 @@
+// ADF-COVERS(implementation): REQ-010-011
 /**
  * Index auto-generation script (SC-002 Phase C, IR-061).
  *

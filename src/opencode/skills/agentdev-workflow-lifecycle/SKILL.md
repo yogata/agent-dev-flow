@@ -4,6 +4,7 @@ description: Provides development workflow phase definitions, SSoT transitions, 
 ---
 <!-- ADF-COVERS(implementation): REQ-001-052, REQ-001-053, REQ-001-054 -->
 <!-- ADF-COVERS(implementation): REQ-005-005, REQ-005-006, REQ-005-007, REQ-005-008, REQ-005-009, REQ-005-010, REQ-005-011, REQ-005-012, REQ-005-013, REQ-005-014, REQ-005-015, REQ-005-016, REQ-005-017, REQ-005-018, REQ-005-019, REQ-005-020, REQ-005-021, REQ-005-022, REQ-005-023 -->
+<!-- ADF-COVERS(implementation): REQ-011-016 -->
 
 # AgentDevFlow ライフサイクルスキル
 

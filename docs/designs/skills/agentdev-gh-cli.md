@@ -4,6 +4,7 @@ status: accepted
 created: "2026-08-15"
 updated: "2026-08-18"
 ---
+<!-- ADF-COVERS(implementation): REQ-011-001, REQ-011-003, REQ-011-004, REQ-011-005, REQ-011-009, REQ-011-013, REQ-011-015 -->
 
 # `agentdev-gh-cli` Design
 

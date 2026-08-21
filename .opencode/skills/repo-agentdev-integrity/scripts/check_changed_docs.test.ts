@@ -1,3 +1,4 @@
+// ADF-COVERS(verification): REQ-010-005, REQ-010-012
 /**
  * check_changed_docs.test.ts - Regression test for Targeted Docs Guard.
  *

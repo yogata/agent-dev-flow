@@ -1,3 +1,4 @@
+// ADF-COVERS(implementation): REQ-010-008
 /**
  * check_test_impact.ts — Test impact detection gate (REQ-019).
  *

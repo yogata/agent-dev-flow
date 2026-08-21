@@ -1,3 +1,4 @@
+// ADF-COVERS(verification): REQ-010-008
 /**
  * check_test_impact.test.ts — Test impact detection gate regression test.
  *
