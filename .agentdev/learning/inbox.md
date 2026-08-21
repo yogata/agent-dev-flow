@@ -416,3 +416,39 @@
 - **想定反映先**: checker-execution-contracts Design「再帰ファイル探索と CLI 引数解析の標準API移行」、glob_walk.ts（repo-local・distributed 両版）
 - **関連**: PR 2357、Issue 2353、Epic 2351
 - **タグ**: `#node-fs-glob` `#bun` `#windows` `#再帰列挙`
+
+---
+
+## 2026-08-21: worktree で bun test に ./ prefix なしの相対パスを渡すと filters did not match になる
+
+- **問題事象**: worktree 内で `bun test .opencode/skills/repo-agentdev-integrity/scripts/`（`./` prefix なし）を実行したところ「filters did not match any test files」になり、テストが1件も実行されなかった。`./` prefix 付き（`./.opencode/skills/repo-agentdev-integrity/scripts/`）の正規形では正常に実行された。
+- **発生局面**: 実装（case-run の検証実行、worktree 環境）
+- **検知方法**: 実行時の「filters did not match any test files」メッセージと実行 0 tests
+- **根本原因**: bun test のフィルタ引数はパス接頭辞として解釈され、`./` prefix の有無でマッチ判定が変わる
+- **自律対応内容**: 正規形（`./` prefix 付きディレクトリ明示）で再実行し、full suite を正常実行した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/Design影響**: なし（docs-check 契約（REQ-0108 系）の「`./` prefix 付き明示指定が必須」規定の裏付けとなる観察事例）
+- **横展開観点**: bun test を扱う全検証手順。AG-035 の起動コマンド記録様式と併せ、フィルタ形式も `./` prefix 付き正規形に揃える
+- **再発条件**: worktree 等で `./` prefix なしの相対パスを bun test のフィルタに渡す場合
+- **予防策候補**: 検証手順の標準形を `./` prefix 付きディレクトリ明示で固定する（docs-check 契約と同一形式への統一）
+- **想定反映先**: agentdev-quality-gates の full integrity suite 運用、case-run / case-close のテスト実行手順
+- **関連**: PR 2368、Issue 2362、Epic 2358、先行学び（bun test の実行 cwd による拾い上げ差、PR 2283/2284 の entry）
+- **タグ**: `#bun-test` `#filter` `#worktree`
+
+---
+
+## 2026-08-21: worktree の tsc --noEmit 検証は投影構成の node_modules コピーを前置する必要がある
+
+- **問題事象**: worktree で tsc --noEmit 検証（7 tsconfig 対象）を実行する際、gitignore 対象の node_modules は worktree へ伝播しないため、メインリポジトリから対象 scripts 配下の node_modules をコピーする必要があった（`.opencode/node_modules`、`.opencode/plugins/node_modules`、artifact-validation、req-file-manager）。
+- **発生局面**: 実装（case-run の tsc --noEmit 検証、worktree 環境）
+- **検知方法**: tsc 実行時の型解決エラー（node:fs 型未解決系、TS2345 等）
+- **根本原因**: git worktree は追跡ファイルのみ展開し、node_modules（gitignore・非追跡）は新しい worktree に存在しない。tsc 検証は bun test と異なり scripts 単位の bun install では解決しない投影構成（.opencode ルート等）の node_modules を参照する
+- **自律対応内容**: メインリポジトリから対象ディレクトリの node_modules をコピーして tsc --noEmit を実施した（design-file-manager・req-file-manager の失敗は base で同一エラーを実証済みの pre-existing と区別記録）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/Design影響**: なし（worktree 構造的制約の tsc 実行時側面。先行学び「worktree の scripts ディレクトリは node_modules 未解決で開始し bun test が大量 fail する」の tsc 側面に相当）
+- **横展開観点**: worktree で tsc --noEmit を実行する全場面。投影（.opencode）と原本（src/opencode）の両構成の node_modules 配置差を把握しておく
+- **再発条件**: worktree で tsc --noEmit を実行し、依存 node_modules が worktree 側に存在しない場合
+- **予防策候補**: worktree の tsc 検証手順に node_modules コピー（または投影構成を含む依存解決）の前置を明示する
+- **想定反映先**: agentdev-git-worktree-test-fallback Design（worktree 環境要件）、case-run の検証手順
+- **関連**: PR 2368、Issue 2362、Epic 2358、先行学び（2026-08-20 worktree node_modules と bun install、PR 2356/PR 2355 由来の entry）
+- **タグ**: `#worktree` `#tsc` `#node_modules`
