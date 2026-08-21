@@ -1,3 +1,4 @@
+// ADF-COVERS(verification): REQ-044-001, REQ-044-003
 /**
  * 再帰列挙契約の回帰テスト（OU-002、TS-003）。
  *

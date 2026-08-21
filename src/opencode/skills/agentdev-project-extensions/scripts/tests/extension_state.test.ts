@@ -1,3 +1,4 @@
+// ADF-COVERS(verification): REQ-044-001, REQ-044-002, REQ-044-005
 /**
  * Regression tests for the shared extension load-time state machine.
  *

@@ -1,3 +1,4 @@
+// ADF-COVERS(implementation): REQ-044-001, REQ-044-003
 /**
  * CLI utilities for AgentDevFlow validator scripts.
  * Provides common argument parsing, output formatting, and exit code constants.
