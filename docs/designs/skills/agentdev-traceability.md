@@ -5,6 +5,8 @@ created: "2026-08-21"
 updated: "2026-08-21"
 ---
 
+<!-- ADF-COVERS(design): REQ-012-027, REQ-012-028, REQ-012-033, REQ-012-042 -->
+
 ## 目的
 
 標準配布スキル `agentdev-traceability` は、最小 TIM（foundations/traceability-model.md）に基づき、要件と成果物の明示的な対応関係について coverage、impact、check の3能力を提供する。正規成果物を直接走査し、対応関係をその場で解決する。旧 `agentdev-artifact-graph` の後継であり、旧公開APIとの互換層を持たない（REQ-012、DEC-017）。
