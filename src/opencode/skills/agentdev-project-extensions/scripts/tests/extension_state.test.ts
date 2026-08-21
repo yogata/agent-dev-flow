@@ -154,7 +154,7 @@ describe("resolveExtensionState (regression cases)", () => {
       "rules:",
       "  - id: rule-1",
       "    when: implementation",
-      "    skill: agentdev-artifact-graph",
+      "    skill: agentdev-req-analysis",
       "checks:",
       "  - id: check-1",
       "    skill: repo-agentdev-integrity",

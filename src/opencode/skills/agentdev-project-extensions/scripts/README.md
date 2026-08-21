@@ -17,7 +17,7 @@ anchor、alias、カスタムタグ、複数ドキュメントは保証対象外
 
 ## 依存
 
-`zod` は本 `package.json` / `bun.lock` で管理する（実行時パッケージ境界、agentdev-artifact-graph scripts と同一経路）。
+`zod` は本 `package.json` / `bun.lock` で管理する（実行時パッケージ境界、配布スキル scripts と同一経路）。
 利用時は本ディレクトリで `bun install` を実行して `node_modules/` を生成する。
 
 ```powershell

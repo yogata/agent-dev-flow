@@ -85,7 +85,6 @@ bun .opencode/skills/agentdev-traceability/scripts/src/check.ts --root . --req R
 
 ## 対象外
 
-- 旧 `agentdev-artifact-graph` 公開API（neighbors、path、provenance、related、dependency、implementation、diagnostics）の互換層
 - 一般文書探索、任意経路探索、構造診断、依存関係探索
 - 派生索引（`.agentdev/graph/` 等）の生成・鮮度管理
 - OpenFastTrace、Eclipse Capra、専用グラフDBの実行依存
@@ -94,6 +93,5 @@ bun .opencode/skills/agentdev-traceability/scripts/src/check.ts --root . --req R
 ## See Also
 
 - **Design**: `agentdev-traceability` Design（本スキルの原本仕様）
-- **agentdev-artifact-graph**: 前身の標準機能（撤去は別途。本スキルは互換層を持たない）
 - **トレーサビリティ要件**: producer 側リポジトリの要件インデックスを参照
 - **最小トレーサビリティモデル採用の意思決定**: producer 側リポジトリの Decision インデックスを参照

@@ -1,7 +1,7 @@
 // ADF-COVERS(implementation): REQ-010-063
 // Skill rename symmetry checker (REQ-026).
 //
-// Deterministic checks for skill rename operations. Verifies three symmetries
+// Deterministic checks for skill rename operations. Verifies symmetries
 // that must hold after a rename:
 //
 //   REQ-026-001 (path-symmetry):
@@ -14,11 +14,8 @@
 //     Design frontmatter `title` must contain the skill name token matching
 //     the Design filename stem.
 //
-//   REQ-026-003 (graph-node):
-//     Artifact Graph skill nodes (`.agentdev/graph/nodes.jsonl`) must match
-//     the current skill directory names. Orphans (graph node without dir)
-//     and missing (dir without graph node) are reported as warnings because
-//     the graph is regenerated data and may lag behind the source.
+//   REQ-026-003 (graph-node) was abolished with the Artifact Graph retirement
+//   (DEC-017, Issue #2362).
 //
 // Scope: distribution skills `agentdev-*` only. Repo-local skills
 // (`repo-agentdev-*` under `.opencode/skills/`) and third-party skills
@@ -31,8 +28,7 @@ const fs = require("fs") as typeof import("fs");
 
 export type SymmetryCategory =
   | "path-symmetry"
-  | "frontmatter-id"
-  | "graph-node";
+  | "frontmatter-id";
 
 export type SymmetryLevel = "ng" | "warning" | "ok" | "info";
 
@@ -51,17 +47,13 @@ export interface SymmetryReport {
   stats: {
     skills_scanned: number;
     designs_scanned: number;
-    graph_skill_nodes_scanned: number;
     path_symmetry_violations: number;
     frontmatter_id_violations: number;
-    graph_node_violations: number;
-    graph_missing: boolean;
   };
 }
 
 const DISTRIBUTION_SKILLS_PARENT = "src/opencode/skills";
 const DESIGNS_SKILLS_DIR = "docs/designs/skills";
-const GRAPH_NODES_PATH = ".agentdev/graph/nodes.jsonl";
 const TEMPLATE_DESIGN = "_template.md";
 
 function dirExists(p: string): boolean {
@@ -317,104 +309,23 @@ function checkFrontmatterId(
   return failures;
 }
 
-interface GraphSkillNode {
-  id: string;
-  label: string;
-}
-
-/**
- * Read `.agentdev/graph/nodes.jsonl` and extract skill nodes.
- * Returns null when the graph is absent (caller reports info, not failure).
- */
-function readGraphSkillNodes(repoRoot: string): GraphSkillNode[] | null {
-  const nodesPath = path.join(repoRoot, GRAPH_NODES_PATH);
-  const text = readText(nodesPath);
-  if (text === null) return null;
-  const out: GraphSkillNode[] = [];
-  for (const line of text.split(/\r?\n/)) {
-    if (!line.trim()) continue;
-    try {
-      const obj = JSON.parse(line);
-      if (obj && obj.type === "skill" && typeof obj.id === "string") {
-        out.push({ id: obj.id, label: obj.label || obj.id });
-      }
-    } catch {
-      // skip malformed lines silently; graph integrity is owned elsewhere
-    }
-  }
-  return out;
-}
-
-/**
- * REQ-026-003: Artifact Graph skill node integrity.
- *
- * Graph node labels must match current distribution skill names. Orphans and
- * missing entries indicate the graph was not regenerated after a rename.
- */
-function checkGraphNodeIntegrity(
-  skills: SkillEntry[],
-  graphNodes: GraphSkillNode[] | null,
-): SymmetryFailure[] {
-  const failures: SymmetryFailure[] = [];
-  if (graphNodes === null) {
-    // graph absent: not a violation, callers handle via stats.graph_missing
-    return failures;
-  }
-  const skillNames = new Set(skills.map((s) => s.name));
-  const graphLabels = new Set(graphNodes.map((n) => n.label));
-
-  for (const node of graphNodes) {
-    if (!skillNames.has(node.label)) {
-      failures.push({
-        category: "graph-node",
-        level: "warning",
-        message:
-          `Artifact Graph skill node \`${node.label}\` has no matching distribution skill directory (graph likely stale after rename/removal)`,
-        evidence: node.id,
-        expected: `${DISTRIBUTION_SKILLS_PARENT}/${node.label}/`,
-      });
-    }
-  }
-
-  for (const skill of skills) {
-    if (!graphLabels.has(skill.name)) {
-      failures.push({
-        category: "graph-node",
-        level: "warning",
-        message:
-          `distribution skill \`${skill.name}\` is not present in Artifact Graph (graph likely stale after rename/add)`,
-        evidence: skill.dir,
-        expected: `skill:${skill.name}`,
-      });
-    }
-  }
-
-  return failures;
-}
-
 export function checkSkillRenameSymmetry(repoRoot: string): SymmetryReport {
   const skills = listDistributionSkills(repoRoot);
   const designs = listDesigns(repoRoot);
-  const graphNodes = readGraphSkillNodes(repoRoot);
 
   const pathFailures = checkPathSymmetry(skills, designs);
   const frontmatterFailures = checkFrontmatterId(skills, designs);
-  const graphFailures = checkGraphNodeIntegrity(skills, graphNodes);
 
   const failures: SymmetryFailure[] = [
     ...pathFailures,
     ...frontmatterFailures,
-    ...graphFailures,
   ];
 
   const stats = {
     skills_scanned: skills.length,
     designs_scanned: designs.length,
-    graph_skill_nodes_scanned: graphNodes ? graphNodes.length : 0,
     path_symmetry_violations: pathFailures.length,
     frontmatter_id_violations: frontmatterFailures.length,
-    graph_node_violations: graphFailures.length,
-    graph_missing: graphNodes === null,
   };
 
   const blocking = failures.filter(
@@ -447,7 +358,6 @@ ARGUMENTS:
 CHECKS:
   path-symmetry    REQ-026-001: src/opencode/skills/{X} <-> docs/designs/skills/{X}.md
   frontmatter-id   REQ-026-002: SKILL.md name == dir, Design title token == filename stem
-  graph-node       REQ-026-003: Artifact Graph skill nodes match skill directories
 
 EXIT CODES:
   0  No issues found

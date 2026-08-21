@@ -10,8 +10,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 <!-- AUTOGEN:END -->
 
 現行要件は35件である（REQ-013 は後継 REQ-012 への移行として、REQ-022〜REQ-024 は達成済みとして、REQ-025・REQ-026・REQ-028 は移管完了に伴う恒常行移行済みとして、REQ-020・REQ-040 は最小トレーサビリティモデルへの再設計による後継 REQ-012 統合として retired/ へ移行、REQ-036〜REQ-044 を追加。番号には欠番が存在する）。
-REQ-022 の規範内容は、後継の [agentdev-artifact-graph Design](designs/skills/agentdev-artifact-graph.md)「augmentation 配置先」節が正規所有する。
-REQ-024 の抽出規則と warning 分類は、後継の [agentdev-artifact-graph Design](designs/skills/agentdev-artifact-graph.md)「check_graph.ts 抽出規則と warning 分類」節と `scripts/lib/checker.ts` が正規所有する。
+REQ-022・REQ-024 の旧規範内容（augmentation 配置先、check_graph.ts 抽出規則と warning 分類）は旧 Artifact Graph とともに廃止された（DEC-017）。履歴は retired REQ ファイルと版管理で参照できる。
 各 REQ の詳細は各 REQ ファイル本文を参照。
 
 | REQ | タイトル |

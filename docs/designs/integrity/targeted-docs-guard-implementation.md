@@ -180,17 +180,13 @@ rename 後に両者が同一 name であることが必須。
 Design ファイルの frontmatter id が物理 path と一致することを検証する。
 不一致の場合は warn または error として報告する。
 
-### Artifact Graph node 関係整合検査
-
-rename 後に旧 name の node が Artifact Graph に残存していないこと、
-新 name への関係が更新されていることを検証する。
+旧「Artifact Graph node 関係整合検査」（rename 後の旧 name node 残存・関係更新の検証）は、Artifact Graph の撤去（DEC-017、Issue #2362）に伴い廃止した。
 
 ### 実装
 
-3 検査は `.opencode/skills/repo-agentdev-integrity/scripts/check_skill_rename_symmetry.ts` が deterministic に実行する。
+2 検査は `.opencode/skills/repo-agentdev-integrity/scripts/check_skill_rename_symmetry.ts` が deterministic に実行する。
 対象は配布 skill `agentdev-*`（`src/opencode/skills/` 配下）とし、repo-local skill (`repo-agentdev-*`) および `agentdev-` prefix を持たない skill は対象外（REQ-002 配布物境界）。
 `status: superseded` の Design に対応する skill dir 欠落は許容し、`status: draft` の場合は warning とする。
-Artifact Graph が未生成（`.agentdev/graph/nodes.jsonl` 不在）の場合は graph-node 検査を info として扱い、阻断しない。
 
 ## 関連
 

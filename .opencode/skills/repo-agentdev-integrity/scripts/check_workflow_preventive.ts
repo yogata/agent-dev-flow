@@ -34,8 +34,7 @@
  * Structured exemptions (AG-008 false-positive records, kept here so future
  * checker false positives are self-documenting):
  *   - check 4: *.test.ts fixtures that intentionally build the legacy path to
- *     validate containment detection (agentdev-artifact-graph containment
- *     tests)
+ *     validate containment detection
  *   - check 4: abolition-declaration lines (lines mentioning the legacy path
  *     together with 廃止 / 後方互換で読まない / migration-required declare the
  *     abolition itself; agentdev-project-extensions SKILL.md)

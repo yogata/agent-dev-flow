@@ -186,15 +186,6 @@
     {
       "category": "Decision",
       "check": "accepted-adr-only-citation",
-      "file": "docs/designs/skills/agentdev-artifact-graph.md",
-      "evidence": "DEC-005",
-      "count": 1,
-      "provenance": "superseded",
-      "reason": "superseded: 廃止済み DEC-005 は DEC-006 への移行履歴文脈で引用している。SPEC 再構成（OU-009 docs 横断是正）で解消するまでの承認（Issue #2136 NG21 外 warning 分類）"
-    },
-    {
-      "category": "Decision",
-      "check": "accepted-adr-only-citation",
       "file": "docs/designs/workflows/delegation-contracts.md",
       "evidence": "DEC-008",
       "count": 1,

@@ -1780,7 +1780,7 @@ function buildIr055Fixture(root: string): void {
       "# Placeholder narrowing command",
       "",
       "Replace REQ-{NNNN}; see REQ-4321 for the concrete case.",
-      "Templated path docs/designs/<skills/agentdev-artifact-graph>.md stays exempt.",
+      "Templated path docs/designs/<skills/agentdev-traceability>.md stays exempt.",
       "Brace-set glob docs/designs/{commands,skills}/** stays exempt.",
       "Bare glob `docs/designs/**` next to `docs/designs/{a,b}/**` stays checked.",
       "",
