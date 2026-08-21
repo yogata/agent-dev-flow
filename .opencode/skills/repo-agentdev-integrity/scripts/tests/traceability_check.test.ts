@@ -1,6 +1,7 @@
 // ADF-COVERS(verification): REQ-012-047
 //
-// agentdev-traceability 配布スキル check の6種検査の検証（OU-002、Issue #2360）。
+// agentdev-traceability 配布スキル check の元来の6種検査の検証（OU-002、Issue #2360）。
+// 7種目（invalid-catalog-refs）は traceability_verification_scope.test.ts が検証する。
 // 不正な対応宣言、未知の成果物役割、存在しない要件への参照、
 // 実装対応の欠落、検証対応の欠落の個別検出、正常な Design 対応0件を異常としないこと。
 
