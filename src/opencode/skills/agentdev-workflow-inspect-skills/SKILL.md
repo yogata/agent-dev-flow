@@ -83,17 +83,14 @@ STEP ラベルは工程順序の整理ラベルであり、**resume point では
 - `agentdev-git-worktree`: ドメイン状態永続化プロシージャ（並列実行安全ステージング含む）
 - `agentdev-conventional-commits`: commit message 規約
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
-- `agentdev-artifact-graph`: トレーサビリティ派生索引への高位問い合わせ（diagnostics、構造診断候補の探索。fail-open）
 
-## Artifact Graph 利用
+## 候補探索（独立探索手段）
 
-本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（diagnostics）を構造診断候補の探索に利用できる。
-self-hosting augmentation が利用可能な場合、command と skill 関係、command と extension と skill 関係、予期しない delegation、orphan skill candidate の候補を探索できる（STEP-2 の入力）。
-問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` Design（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
+本スキルの構造診断候補の探索は、README 索引、配布物定義（command、skill、extension）の直接読取、`rg` 等の独立探索手段で行う。
+agentdev-traceability の coverage、impact、check を一般文書探索、構造診断、依存関係探索の用途に利用しない。
+候補には command と skill 関係、command と extension と skill 関係、予期しない delegation、orphan skill candidate を含む（STEP-2 の入力）。
 
-- Graph は候補提供者であり、委譲先 skill 実在などの決定的検査は docs-check、整合性ルール群が所有する。本スキルは Graph 構造候補を未検証 evidence として意味診断の入力に利用し、構造診断と意味診断を区別する
-- consumer 環境で対応 node type、relation type が存在しない場合は異常とせず、配布物定義の直接読取、`rg` などの従来の診断経路で継続する
-- 派生索引が不在、破損、生成失敗、問い合わせ失敗、候補過多の場合も従来の診断経路で workflow を継続する（fail-open）。派生索引側の障害だけを理由に本 workflow を停止しない
+- 委譲先 skill 実在などの決定的検査は docs-check、整合性ルール群が所有する。本スキルは探索で得た候補を未検証 evidence として意味診断の入力に利用し、構造診断と意味診断を区別する
 
 ## Workflow Extension 読込契約
 

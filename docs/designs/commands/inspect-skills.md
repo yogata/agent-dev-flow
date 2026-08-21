@@ -2,8 +2,10 @@
 title: inspect-skills Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-15
+updated: 2026-08-21
 ---
+
+<!-- ADF-COVERS(implementation): REQ-021-021 -->
 
 # inspect-skills Design
 
@@ -66,14 +68,14 @@ Command→Skill 参照妥当性と Skill 構造を、検査対象を直接修正
 - Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
-## Artifact Graph 利用
+## 候補探索（独立探索手段）
 
-inspect-skills は self-hosting augmentation が利用可能な場合、Artifact Graph を用いて command と skill 関係, command と extension と skill 関係, 予期しない delegation, orphan skill candidate の候補を探索できる。
+inspect-skills の構造診断候補の探索は、README 索引、配布物定義（command, skill, extension）の直接読取、`rg` 等の独立探索手段で行う（REQ-021-021）。
+agentdev-traceability の coverage, impact, check を一般文書探索、構造診断、依存関係探索の用途に利用しない。
 
-Graph は候補提供者であり、委譲先 skill 実在の決定的検査は ADR-006 が定める通り docs-check, IR-056 が所有する。
-inspect-skills は REQ-036-012〜016 が定める意味診断を担当し、Graph 構造候補を未検証 evidence として意味診断の入力に利用する。
-
-consumer 環境に対応 node type または relation type が存在しない場合は異常とせず従来の診断経路を継続する。
+- 候補には command と skill 関係, command と extension と skill 関係, 予期しない delegation, orphan skill candidate を含める
+- 委譲先 skill 実在などの決定的検査は docs-check, 整合性ルール群が所有する。inspect-skills は REQ-036-012〜016 が定める意味診断を担当し、探索で得た候補を未検証 evidence として意味診断の入力に利用する
+- 構造診断と意味診断を区別する
 
 ## 参照する横断 Design
 

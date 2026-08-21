@@ -46,9 +46,9 @@ context:
     purpose: docs/designs/README.md 経由で Design 一覧と status を参照してよい
 
 rules:
-  - id: artifact-graph-candidate-discovery
-    when: 既存REQ、関連ADR・Design、構造的所有者重複の候補を探索するとき。利用不能時は従来の探索手段で続行する
-    skill: agentdev-artifact-graph
+  - id: traceability-impact-confirmation
+    when: 既存の明示的な対応関係と変更影響候補の確認に coverage、impact を利用するとき。利用不能時は README 索引、正規成果物の直接読取、rg 等の独立探索手段で続行する
+    skill: agentdev-traceability
 
 checks: []
 

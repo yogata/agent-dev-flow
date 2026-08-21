@@ -2,8 +2,10 @@
 title: design-save Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-15
+updated: 2026-08-21
 ---
+
+<!-- ADF-COVERS(implementation): REQ-021-013, REQ-021-020 -->
 
 # design-save Design
 
@@ -220,13 +222,15 @@ target_area 見出し検索は `agentdev-design-file-manager/scripts/src/search-
 Design operation の旧別名（`spec-create` / `spec-update` / `spec-append`）と新別名（`design-create` / `design-update` / `design-append`）は受理しない（REQ-008-058）。
 旧別名が指定された場合は形式不正としてエラー中止し、req-define 差し戻しを推奨する。
 
-## Artifact Graph 利用
+## トレーサビリティ能力の利用
 
-design-save は対応 REQ、同一または関連 canonical owner を持つ Design、関連 command, skill, integrity rule の探索に Artifact Graph を利用できる。
-Graph は候補提供者であり、target_area, 正規配置先, Design 操作分類の最終判断は正規成果物本文と独立探索手段での確認後に下す。
-共通利用原則の防護事項は `agentdev-artifact-graph` Design「ワークフロー利用」を参照。
+design-save は、req-define で Design action と対象要件の対応が明示的に確定している場合、その情報を利用して Design 文書と要件の対応関係を対応宣言として保存できる（REQ-021-013）。
+対応宣言の表記仕様は `agentdev-traceability` Design「対応宣言の表記」が正規所有し、本 Design は表記仕様を再定義しない。
 
-Graph 不在、stale、consumer 環境に対応 node type または relation type が存在しない場合は、従来の探索経路で継続し、workflow を停止しない（fail-open）。
+- Design 本文の自由記述から対象要件を再推論して正規の対応関係を生成しない
+- Design 文書の対応付けは任意とし、Design action が存在しない要件の処理を妨げない
+- 対応 REQ、同一または関連 canonical owner を持つ Design、関連 command, skill, integrity rule の探索は、README 索引、正規成果物の直接読取、`rg` 等の独立探索手段で行う（agentdev-traceability を一般文書探索、依存関係探索へ利用しない）
+- 中断後の再実行では、正規成果物に保存済みの対応宣言を再利用し、同じ対応宣言を重複生成しない（REQ-021-020）
 
 ## 参照する横断 Design
 

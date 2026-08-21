@@ -2,8 +2,10 @@
 title: req-save Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-15
+updated: 2026-08-21
 ---
+
+<!-- ADF-COVERS(implementation): REQ-021-012 -->
 
 # req-save Design
 
@@ -101,6 +103,7 @@ req-save は check_integrity.ts（全体監査）を使用しない（保存工�
 ## 対象外
 
 - REQ/Decision 対象 artifact_actions がない場合の Design ファイル作成、編集（G01、no-op 完了）
+- トレーサビリティ対応（実装対応、検証対応）の作成（REQ-021-012。req-save は正式な要件IDの保存を担当し、対応宣言を作成する責務を持たない。新規要件の保存時点で対応が存在しないことを理由に req-save を失敗させない）
 - `docs/requirements/**`、`docs/decisions/**`、`docs/README.md`、`.agentdev/drafts/**` 以外のファイル作成、編集（G02、G03）
 - ドラフトファイル不存在時の実行（G04、エラー中止）
 - REQ番号の空き番号再利用（G05、`agentdev-req-file-manager` 採番ルール遵守）

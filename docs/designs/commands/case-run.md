@@ -2,8 +2,10 @@
 title: case-run Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-19
+updated: 2026-08-21
 ---
+
+<!-- ADF-COVERS(implementation): REQ-021-015, REQ-021-016, REQ-021-017, REQ-021-019, REQ-021-020, REQ-021-022 -->
 
 # case-run Design
 
@@ -210,17 +212,18 @@ verification-only PR は case-close の targeted docs guard で files_checked �
 - case-close は files_checked 空を検出した場合、v2:REQ-0158-002 に基づき verification-only 判定ステップを経て PASS 処理する（false-clean 3層防御との相互作用は case-close Design 参照）
 - case-run 側は PR 作成までを責務とし、verification-only 判定自体は case-close が行う（単一書き手: case-close、REQ-011 完了条件チェックボックス専任責務）
 
-## Artifact Graph 利用
+## トレーサビリティ能力の利用
 
-case-run での Artifact Graph 利用は REQ-017-010 が定める境界内で補助用途に限定する。
-補助用途は Issue に記録された対象から予期しない依存または参照が見つかった場合の補助探索, acceptance criteria の検証根拠への到達, case-open 時点からの関係差異確認を含む。
+case-run の実行担当（委譲内サブエージェント）は、対象要件について `agentdev-traceability` の coverage で既存の対応関係を確認しながら、実際に要件を実現する成果物へ実装対応を、実際に要件を検証する恒常的な検証手段へ検証対応を、対応宣言として正規成果物へ明示する（REQ-021-015）。
+実行担当は PR 作成前に対象要件について check を実行し、実装対応、検証対応、対応宣言の整合性を検査する（REQ-021-016）。
+対応宣言の表記仕様は `agentdev-traceability` Design「対応宣言の表記」が正規所有する。
 
-Graph で発見した候補のうち Issue scope 内の内部実装影響は case-run が自律処理する。
-scope, 完了条件, REQ, Decision, Design, 必須品質統制の変更が必要な場合は blocked として case-update 連携とする。
-証拠源（Graph, rg, filesystem scan の別）にかかわらず case-run は既存 scope を超える変更を自律拡大しない。
-本制限は REQ-017-010 の境界を変更せず、Graph 利用時の適用を明確化する。
-
-Graph 不在、stale、consumer 環境に対応 node type または relation type が存在しない場合は、従来の探索経路で継続し、workflow を停止しない（fail-open）。
+- 単に変更されたファイルであることを理由に、そのファイルを要件へ自動的に対応付けない
+- check の不合格が承認済み対象範囲内で修正可能な場合は、修正して再検証する
+- 要件変更、対象範囲拡大、追加設計判断、外部依存解消が必要な場合は反復を停止し、blocked として必要な判断事項を報告する（REQ-021-017）。証拠源にかかわらず既存 scope を超える変更を自律拡大しない
+- 検証対応は「何が要件を検証するか」という検証手段との恒常的な対応関係であり、「今回その検証を実行して合格したか」という実行結果は Issue, PR, QG 側で扱う。特定時点の検証結果を対応宣言として保存しない（REQ-021-019）
+- 中断後の再実行では、正規成果物に保存済みの対応関係を再利用し、同じ対応宣言を重複生成しない（REQ-021-020）
+- agentdev-traceability の不在、実行失敗、空結果、候補過多だけを理由として workflow を停止しない（fail-open）。README 索引、正規成果物の直接読取、`rg` 等の独立探索手段で継続し、正規成果物そのものの異常とトレーサビリティ機能側の異常を区別する
 
 ## 参照する横断 Design
 

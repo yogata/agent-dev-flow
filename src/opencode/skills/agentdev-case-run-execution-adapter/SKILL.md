@@ -69,9 +69,11 @@ harness execution mechanism は本 SKILL の規範対象外とし、`references/
 
 1. **Issue 読込**: 対象 Issue 本文、受け入れ基準を読み込む。実行 command が Issue を success criteria に分解する
 2. **context 再確認**: ADR/ REQ/ Design/ docs/ repository context を再確認し、実装が既存の決定事項に矛盾しないことを担保する。
-トレーサビリティ派生索引への高位問い合わせ（implementation）を実行対象と正規成果物の実現関係確認の候補探索に利用できる（`agentdev-artifact-graph` 経由）。
-問い合わせ結果は候補提供であり最終判断としない、新規の依存関係、実行構成、Wave 構成、実行順序の設計には使用しない、派生索引の不在、破損、生成失敗、問い合わせ失敗、候補過多の場合は代替探索で継続する（fail-open）
+トレーサビリティ能力（`agentdev-traceability` の coverage）を、対象要件と正規成果物の既存の対応関係確認に利用できる。
+問い合わせ結果は候補提供であり最終判断としない、新規の依存関係、実行構成、Wave 構成、実行順序の設計には使用しない、機能の不在、実行失敗、空結果、候補過多の場合は README 索引、正規成果物の直接読取、`rg` 等の代替探索で継続する（fail-open）
 3. **実装、検証、PR 作成**: 実行 command に従い evidence-backed に実装を実行し、品質ゲートを通して PR 作成手続き（`agentdev-gh-cli`）で PR を作成する。
+実際に要件を実現する成果物へ実装対応を、実際に要件を検証する恒常的な検証手段へ検証対応を、対応宣言として正規成果物へ明示する（単に変更されたファイルであることを理由に、そのファイルを要件へ自動的に対応付けない）。
+PR 作成前に `agentdev-traceability` の check を実行し、対象要件の実装対応、検証対応、対応宣言の整合性を検査する。check の不合格が承認済み対象範囲内で修正可能な場合は修正して再検証し、要件変更、対象範囲拡大、追加設計判断、外部依存解消が必要な場合は blocked として判断事項を報告する。
 ハーネスの plan artifact 等の中間成果物は解釈せず、PR URL で最終結果を受領する。
 実装完了後、test strategy 項目の test-fix ループ（後述）を実行する
 4. **blocker 処理**: 回答可能な blocker（ADR/REQ/Design/docs/Issue本文で回答できるもの）は自律的に実行 command 内で再評価できる

@@ -126,19 +126,21 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 - `agentdev-quality-gates`: QG-3 前置 staleness check
 - `agentdev-gh-cli`: Issue 本文読取等の I/O 手続き
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
-- `agentdev-artifact-graph`: トレーサビリティ派生索引への高位問い合わせ（実行対象と正規成果物の実現関係確認のみ。fail-open）
+- `agentdev-traceability`: トレーサビリティ能力（coverage、check。委譲内の対応関係確認と PR 作成前検査。fail-open）
 - integrity checker skill（リポジトリ固有・配布対象外）: check_changed_docs.ts（targeted docs guard）、check_extensions.ts（IR-{NNN}）、check_distribution_boundary.ts（配布依存境界）
 
-## Artifact Graph 利用
+## トレーサビリティ能力の利用
 
-本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせのうち implementation を、既に決定された実装対象（Issue 本文）と正規成果物の実現関係確認（STEP-S2 の関連Decision確認、委譲内 context 再確認）に利用できる。
-問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` Design（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
-問い合わせ目的を指定し、返された候補を用いて判断する。
+case-run の実行担当（委譲内サブエージェント）は、対象要件について `agentdev-traceability` の coverage で既存の対応関係を確認しながら、実装対応と検証対応を対応宣言として正規成果物へ明示する（STEP-S2 の関連Decision確認、委譲内 context 再確認）。
+実行担当は PR 作成前に check を実行し、対象要件の実装対応、検証対応、対応宣言の整合性を検査する。
+対応宣言の表記仕様は `agentdev-traceability` Design「対応宣言の表記」が正規所有し、本スキルは表記仕様を再定義しない。
 
-- トレーサビリティ問い合わせを利用して新規の依存関係、実行構成、Wave 構成、実行順序を設計しない。依存関係と実行構成の決定責務は上流工程（case-open の execution_unit 構成、Epic Wave モデル）が所有する
-- 問い合わせ結果は候補提供であり、実現関係の確認は正規成果物本文と `rg` 等の独立探索で行う。Issue scope、完了条件、REQ、Decision、Design、必須品質統制の変更が必要な候補は blocked として case-update 連携とし、scope の自律拡大は行わない
-- 派生索引の不在、生成失敗、空結果、候補過多だけを理由として「関係なし」「影響なし」と判断しない
-- 派生索引が不在、破損、生成失敗、問い合わせ失敗、候補過多の場合は、README 索引、正規成果物の直接読取、`rg`、ファイル探索などの代替探索で workflow を継続する（fail-open）。正規成果物そのものの異常と派生索引側の異常を区別する
+- 単に変更されたファイルであることを理由に、そのファイルを要件へ自動的に対応付けない
+- check の不合格が承認済み対象範囲内で修正可能な場合は修正して再検証する。要件変更、対象範囲拡大、追加設計判断、外部依存解消が必要な場合は blocked として必要な判断事項を報告する
+- 検証対応は「何が要件を検証するか」という検証手段との恒常的な対応関係であり、「今回その検証を実行して合格したか」という実行結果は Issue、PR、QG 側で扱う
+- 中断後の再実行では、正規成果物に保存済みの対応関係を再利用し、同じ対応宣言を重複生成しない
+- トレーサビリティ能力を利用して新規の依存関係、実行構成、Wave 構成、実行順序を設計しない。依存関係と実行構成の決定責務は上流工程（case-open の execution_unit 構成、Epic Wave モデル）が所有する
+- agentdev-traceability の不在、実行失敗、空結果、候補過多だけを理由として workflow を停止しない（fail-open）。README 索引、正規成果物の直接読取、`rg` 等の独立探索手段で継続し、正規成果物そのものの異常とトレーサビリティ機能側の異常を区別する
 
 ## Workflow Extension 読込
 

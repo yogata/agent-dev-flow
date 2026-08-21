@@ -3,16 +3,13 @@ kind: capability-skill-extension
 id: agentdev-adversarial-review
 
 context:
-  - id: artifact-graph-spec
-    when: Artifact Graphを論点候補の探索に使用するとき
+  - id: design-index
+    when: レビュー対象候補と evidence を README 索引、正規成果物の直接読取、rg 等の独立探索手段で探索するとき
     paths:
-      - "docs/designs/skills/agentdev-artifact-graph.md"
-    purpose: 派生索引の利用上の防護と障害耐性の確認
+      - "docs/designs/README.md"
+    purpose: Design 一覧と入口表を起点としたレビュー対象候補の探索
 
-rules:
-  - id: artifact-graph-deliberation-candidates
-    when: 複数規範関係、循環、集中ノード、孤立候補、複数経路から審議論点の候補を探索するとき。利用不能時は従来の探索手段で続行する
-    skill: agentdev-artifact-graph
+rules: []
 
 checks: []
 

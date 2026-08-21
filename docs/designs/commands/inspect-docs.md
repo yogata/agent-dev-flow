@@ -2,8 +2,10 @@
 title: inspect-docs Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-15
+updated: 2026-08-21
 ---
+
+<!-- ADF-COVERS(implementation): REQ-021-021 -->
 
 # inspect-docs Design
 
@@ -66,16 +68,14 @@ REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて De
 - Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
-## Artifact Graph 利用
+## 候補探索（独立探索手段）
 
-inspect-docs は Artifact Graph を構造診断候補の探索に利用する。
-候補には unresolved reference, superseded artifact への現行参照, dangling relation, provenance 欠落, orphan candidate, 不自然な relation path, structural duplicate candidate を含む。
+inspect-docs の構造診断候補の探索は、README 索引、正規成果物の直接読取、`rg` 等の独立探索手段で行う（REQ-021-021）。
+agentdev-traceability の coverage, impact, check を一般文書探索、構造診断、依存関係探索の用途に利用しない。
 
-Graph は候補提供者であり、決定的検査（参照実在, 委譲先 skill 実在, YAML 構文, 必須 field）は ADR-006 が定める通り docs-check, IR-056 が所有する。
-inspect-docs は REQ-036-006〜011 が定める意味診断を担当し、Graph 構造候補を未検証 evidence として意味診断の入力に利用する。
-構造診断と意味診断を区別し、SPLIT, MERGE, MOVE, DUPLICATE, RETIRE, DRIFT 等の意味判断を Graph の構造情報だけから確定しない。
-
-consumer 環境に対応 node type または relation type が存在しない場合は異常とせず従来の診断経路を継続する。
+- 候補には未解決参照、superseded 成果物への現行参照、参照先が取得できない記述、正規所有者のいない成果物、構造的重複候補を含める
+- 決定的検査（参照実在, 委譲先 skill 実在, YAML 構文, 必須 field）は docs-check, 整合性ルール群が所有する。inspect-docs は REQ-036-006〜011 が定める意味診断を担当し、探索で得た候補を未検証 evidence として意味診断の入力に利用する
+- 構造診断と意味診断を区別し、SPLIT, MERGE, MOVE, DUPLICATE, RETIRE, DRIFT 等の意味判断を候補の構造情報だけから確定しない
 
 ## 参照する横断 Design
 

@@ -14,9 +14,9 @@ context:
     purpose: "case-run 3フェーズ構成と自律修正ループ契約の確認"
 
 rules:
-  - id: artifact-graph-implementation-context
-    when: 実装対象に関係するREQ、Design、整合性ルール、周辺成果物の候補を探索するとき。利用不能時は従来の探索手段で続行する
-    skill: agentdev-artifact-graph
+  - id: traceability-check-before-pr
+    when: 対象要件の対応関係確認と PR 作成前の対応宣言整合性検査（check）を実施するとき。利用不能時は README 索引、正規成果物の直接読取、rg 等の独立探索手段で続行する
+    skill: agentdev-traceability
 
 checks: []
 

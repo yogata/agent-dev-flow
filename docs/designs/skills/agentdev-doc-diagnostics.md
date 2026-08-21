@@ -2,8 +2,10 @@
 title: agentdev-doc-diagnostics Design
 status: draft
 created: 2026-07-22
-updated: 2026-08-19
+updated: 2026-08-21
 ---
+
+<!-- ADF-COVERS(implementation): REQ-021-021 -->
 
 # agentdev-doc-diagnostics Design
 
@@ -16,7 +18,7 @@ docs 横断の診断カテゴリ、共通証拠構造、共通 finding 出力契
 
 `inspect-docs` command の実行時に docs 横断診断の実行を担う診断判断 skill の責務、対象外、境界を定義する。
 REQ 固有診断（`agentdev-req-structure-diagnostics`）、文意品質（`agentdev-doc-writing`）との責務重複を防ぎ、docs 横断診断の正規所有者を一つに定める。
-探索・導線（索引からの到達性）は README 索引（`docs/designs/README.md` 等の入口表）とトレーサビリティ派生索引（`agentdev-artifact-graph`）が担い、本 skill の診断対象外とする。
+探索・導線（索引からの到達性）は README 索引（`docs/designs/README.md` 等の入口表）と独立探索手段（正規成果物の直接読取、`rg` 等）が担い、本 skill の診断対象外とする。
 名称は REQ-036-013 の diagnostics 許容例外境界に基づき `agentdev-doc-diagnostics` を維持する（CR-001）。
 
 ## 適用対象
@@ -39,7 +41,7 @@ REQ 固有診断（`agentdev-req-structure-diagnostics`）、文意品質（`age
 - Issue、PR 操作（case-* command の責務）
 - REQ 固有の SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断（`agentdev-req-structure-diagnostics` の責務）
 - 文意品質診断（`agentdev-doc-writing` の責務）
-- 探索・導線（README 索引とトレーサビリティ派生索引 `agentdev-artifact-graph` の責務）
+- 探索・導線（README 索引と独立探索手段（正規成果物の直接読取、`rg` 等）の責務）
 
 ## 提供する判断・操作
 
@@ -67,13 +69,13 @@ inspect-docs の診断観点は正規の観点レジストリが所有する（R
 ## 現在の動作
 
 - inspect-docs command は診断の実行と finding 出力を担い、診断カテゴリ、証拠構造、出力契約、ルーティングは本 skill が一次所有する（REQ-039-004）
-- REQ 固有診断（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）は `agentdev-req-structure-diagnostics`、文意品質は `agentdev-doc-writing` が残留する。探索・導線は README 索引とトレーサビリティ派生索引（`agentdev-artifact-graph`）が担う（廃止済み探索順スキルの後継構成）
+- REQ 固有診断（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）は `agentdev-req-structure-diagnostics`、文意品質は `agentdev-doc-writing` が残留する。探索・導線は README 索引と独立探索手段（正規成果物の直接読取、`rg` 等）が担う（廃止済み探索順スキルの後継構成）
 - 本 skill は横断編成と結果統合のみを所有し、専門診断の再定義を行わない
 - 診断対象は読み取り専用とし、許可される副作用は `.agentdev/inspect/inbox/*.md` の生成と `.agentdev/inspect/` 配下の git 永続化（commit / push）のみ（REQ-002-140-151、inspect lifecycle 準拠）
 
 ## 境界
 
-`agentdev-doc-writing`（文意品質）、`agentdev-req-structure-diagnostics`（REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）、README 索引、トレーサビリティ派生索引 `agentdev-artifact-graph`（探索・導線）との責務重複がないこと。
+`agentdev-doc-writing`（文意品質）、`agentdev-req-structure-diagnostics`（REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）、README 索引と独立探索手段（正規成果物の直接読取、`rg` 等、探索・導線）との責務重複がないこと。
 docs 横断診断は本 skill が正規の所有者となる（REQ-036-013 の diagnostics 許容例外境界、CR-001）。
 
 ## 対象外

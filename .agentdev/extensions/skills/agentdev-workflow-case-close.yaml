@@ -30,9 +30,9 @@ context:
     purpose: "docs/designs/integrity/integrity-rule-catalog.md 経由で関連 IR を確認してよい"
 
 rules:
-  - id: artifact-graph-closure-observation
-    when: 鮮度、未解決参照、存在しないノードへの関係、根拠欠落、関係閉包の候補を観測するとき。利用不能時は従来の検査手段で続行する
-    skill: agentdev-artifact-graph
+  - id: traceability-qg4-independent-recheck
+    when: QG-4 で対象要件の実装対応・検証対応の完全性を独立して再検査するとき。利用不能時は既存の品質ゲート、targeted docs guard、rg 等の従来の検査手段で続行する
+    skill: agentdev-traceability
 
 checks:
   - id: autogen-index-regeneration-diff

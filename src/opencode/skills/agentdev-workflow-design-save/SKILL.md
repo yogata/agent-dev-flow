@@ -91,19 +91,17 @@ design-save workflow は次の11 STEP で構成する。
 - `agentdev-conventional-commits`: commit message 生成
 - `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ（明示パスステージ、`git commit -- <paths>`）
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
-- `agentdev-artifact-graph`: トレーサビリティ派生索引への高位問い合わせ（対応 REQ、同一 canonical owner の Design、関連 command、skill、integrity rule の探索。fail-open）
 - integrity checker skill（AG-{NNN} detector、repo 固有）: check_changed_docs.ts（--workflow design-save）
 
-## Artifact Graph 利用
+## トレーサビリティ能力の利用
 
-本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（related）を利用できる。
-対応 REQ、同一 canonical owner の Design、関連 command、skill、integrity rule の探索（STEP-3 配置先解決、STEP-4 Design 分離基準の最終確認）を補助する。
-問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` Design（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
-問い合わせ目的を指定し、返された候補を用いて判断する。
+design-save は、req-define で Design action と対象要件の対応が明示的に確定している場合、その情報を利用して Design 文書と要件の対応関係を対応宣言として正規成果物へ保存できる。
+対応宣言の表記仕様は `agentdev-traceability` Design「対応宣言の表記」が正規所有し、本スキルは表記仕様を再定義しない。
 
-- 問い合わせ結果は候補提供であり、Design 正規配置先、target_area、canonical owner、Design 操作分類の判断は正規成果物本文と `rg` 等の独立探索での確認後に下す
-- 派生索引の不在、生成失敗、空結果、候補過多だけを理由として「関係なし」「影響なし」と判断しない
-- 派生索引が不在、破損、生成失敗、問い合わせ失敗、候補過多の場合は、README 索引、正規成果物の直接読取、`rg`、ファイル探索などの代替探索で workflow を継続する（fail-open）。正規成果物そのものの異常と派生索引側の異常を区別する
+- Design 本文の自由記述から対象要件を再推論して正規の対応関係を生成しない
+- Design 文書の対応付けは任意とし、Design action が存在しない要件の処理を妨げない
+- 対応 REQ、同一 canonical owner の Design、関連 command、skill、integrity rule の探索（STEP-3 配置先解決、STEP-4 Design 分離基準の最終確認）は、README 索引、正規成果物の直接読取、`rg` 等の独立探索手段で行う（agentdev-traceability を一般文書探索、依存関係探索へ利用しない）
+- 中断後の再実行では、正規成果物に保存済みの対応宣言を再利用し、同じ対応宣言を重複生成しない
 
 ## Workflow Extension 読込
 

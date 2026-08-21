@@ -56,15 +56,15 @@ Reviewer と Reviewee の双方が自身の以前の主張を撤回、限定、�
 OpenAI/Codex adversarial-review 等の外部知見を観点、問い、failure mode、検証方法を構成する知識源として活用する。
 実行時の外部サービス・外部リポジトリへの必須依存にせず、必要な知見を ADF 側の配布可能なレビュー知識として保持する。
 
-## Artifact Graph 利用
+## 候補探索（独立探索手段）
 
-本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（diagnostics、および論点に応じた他の問い合わせ）を、レビュー対象候補と evidence の探索に利用できる。
-論点候補には複数の規範的成果物から到達する対象、複数経路、cycle、relation 集中ノード、isolated node、複数 owner または governing relation を持つ候補を含む。
-問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` Design（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
+本スキルのレビュー対象候補と evidence の探索は、README 索引、正規成果物の直接読取、`rg` 等の独立探索手段で行う。
+agentdev-traceability の coverage、impact、check を一般文書探索、構造診断、依存関係探索の用途に利用しない。
+論点候補には複数の規範的成果物から到達する対象、複数経路、循環、関係の集中する対象、孤立候補、複数 owner を持つ候補を含む。
 
-- Graph から得た情報は未検証 evidence として扱い、Reviewer または Reviewee の対論、正規成果物確認を経ずに finding を確定しない
-- 問い合わせ結果は候補提供であり、レビュー結論の確定根拠としない
-- 派生索引が不在、破損、生成失敗、問い合わせ失敗、候補過多の場合は、正規成果物の直接読取、`rg`、ファイル探索などの従来の探索手段で審議を継続する（fail-open）。派生索引側の障害だけを理由に審議を停止しない
+- 探索で得た情報は未検証 evidence として扱い、Reviewer または Reviewee の対論、正規成果物確認を経ずに finding を確定しない
+- 探索は evidence の収集に利用するものであり、レビュー結論の確定根拠としない
+- 探索手段の障害だけを理由に審議を停止しない
 
 ## 振る舞いプロトコルと合意候補再検証
 
@@ -129,6 +129,5 @@ user-decision-required の位置づけ（case-run result enum の第5状態で�
 - **agentdev-quality-gates**: QG-1〜QG-4 品質ゲート基準
 - **agentdev-doc-diagnostics**: 証拠付き finding の診断
 - **agentdev-skill-authoring**: スキル設計とレビュー規約
-- **`agentdev-artifact-graph`**: トレーサビリティ派生索引への高位問い合わせ（ワークフロー利用の割り当ては同 Design が正規所有）
 - **Design `docs/designs/<skills/agentdev-adversarial-review>.md`**: 振る舞い契約の正典
 - **references/adversarial-review-protocol.md**: 審議プロトコルの詳細手続き

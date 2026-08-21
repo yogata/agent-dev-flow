@@ -93,18 +93,17 @@ req-define workflow は次の11 STEP で構成する。
 - `agentdev-workflow-lifecycle`: work_type・Scale 判定、前工程引き継ぎ判定
 - `agentdev-adversarial-review`: 経路A review 呼出
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
-- `agentdev-artifact-graph`: トレーサビリティ派生索引への高位問い合わせ（既存 REQ、関連 Decision、関連 Design、影響候補の探索。fail-open）
+- `agentdev-traceability`: トレーサビリティ能力（coverage、impact。既存の明示的な対応関係と変更影響候補の確認。fail-open）
 
-## Artifact Graph 利用
+## トレーサビリティ能力の利用
 
-本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（related、impact、必要に応じて dependency）を利用できる。
-既存 REQ、関連 Decision、関連 Design、canonical owner、変更影響候補の探索（STEP-3 既存REQ照合、STEP-4 要件展開）を補助する。
-問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` Design（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
-問い合わせ目的を指定し、返された候補を用いて判断する。
+本スキルは `agentdev-traceability` の coverage と impact を、既存の明示的な対応関係と変更影響候補の確認（STEP-3 既存REQ照合、STEP-4 要件展開）に利用できる。
+問い合わせ結果は候補提供であり、変更対象、正規所有者、対象範囲の確定に用いない。
 
-- 問い合わせ結果は候補提供であり、CREATE、APPEND、UPDATE、SPLIT、MERGE、意味的重複、canonical owner の判断は正規成果物本文と `rg` 等の独立探索での確認後に下す
-- 派生索引の不在、生成失敗、空結果、候補過多だけを理由として「関係なし」「影響なし」と判断しない
-- 派生索引が不在、破損、生成失敗、問い合わせ失敗、候補過多の場合は、README 索引、正規成果物の直接読取、`rg`、ファイル探索などの代替探索で workflow を継続する（fail-open）。正規成果物そのものの異常と派生索引側の異常を区別する
+- トレーサビリティ情報だけで変更対象、正規所有者、対象範囲を確定しない
+- impact の空結果を「影響なし」の根拠としない
+- 将来作成される実装成果物または検証手段との対応関係を推測して正規情報として保存しない
+- agentdev-traceability の不在、実行失敗、空結果、候補過多だけを理由として workflow を停止しない（fail-open）。README 索引、正規成果物の直接読取、`rg` 等の独立探索手段で継続し、正規成果物そのものの異常とトレーサビリティ機能側の異常を区別する
 
 ## Workflow Extension 読込
 
