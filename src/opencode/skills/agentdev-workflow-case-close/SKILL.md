@@ -3,6 +3,7 @@ name: agentdev-workflow-case-close
 description: "case-close command の workflow 実装本体。PR マージ（squash merge 先の統合先解決、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase）、統合先ブランチ同期時のリスク事前検出、QG-4 最終完了判定ゲート、docs 検証・Design 確定（Design status 昇格）、Capture 回収（PR 本文→intake/learning 分離）、実証最終クローズ（最終評価結果の導出と Issue 最終コメント正規記録、正式化経路案内）、Epic Wave クローズを所有する。USE FOR: case-close 実行時の workflow 制御（単一 Issue クローズ・Epic Wave クローズ・PR マージ・QG-4・Design 確定・Capture 回収・実証最終クローズ）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 <!-- ADF-COVERS(implementation): REQ-003-015, REQ-003-016, REQ-003-019, REQ-003-026 -->
+<!-- ADF-COVERS(implementation): REQ-006-105 -->
 
 # case-close workflow スキル
 
