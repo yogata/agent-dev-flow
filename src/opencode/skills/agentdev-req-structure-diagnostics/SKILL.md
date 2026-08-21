@@ -3,6 +3,7 @@ name: agentdev-req-structure-diagnostics
 description: inspect-docs コマンドの REQ 構造診断ロジックの知識ベース。USE FOR: REQ参照ID整合性確認、第一参照導線確認、現行/廃止/世代境界確認、6観点診断（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）、未処理成果物確認、問題候補出力スキーマ。DO NOT USE FOR: backlog 統合手順、intake pipeline、work_type 判定。
 ---
 <!-- ADF-COVERS(verification): REQ-001-050, REQ-001-051, REQ-001-052 -->
+<!-- ADF-COVERS(implementation): REQ-036-007 -->
 
 # REQ 構造診断知識ベース
 

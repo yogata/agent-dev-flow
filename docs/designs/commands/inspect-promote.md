@@ -5,6 +5,7 @@ created: 2026-06-21
 updated: 2026-08-19
 ---
 <!-- ADF-COVERS(implementation): REQ-015-005 -->
+<!-- ADF-COVERS(implementation): REQ-036-001, REQ-036-002, REQ-036-004, REQ-036-017, REQ-036-018, REQ-036-019, REQ-036-020, REQ-036-021, REQ-036-022 -->
 
 # inspect-promote Design
 

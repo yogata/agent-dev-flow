@@ -4,6 +4,7 @@ description: Diagnoses Command to Skill reference validity, Skill structure, exe
 ---
 <!-- ADF-COVERS(verification): REQ-005-014 -->
 <!-- ADF-COVERS(verification): REQ-016-001, REQ-016-002, REQ-016-003, REQ-016-004, REQ-016-005, REQ-016-006, REQ-016-007, REQ-016-008, REQ-016-009, REQ-016-010 -->
+<!-- ADF-COVERS(implementation): REQ-036-013, REQ-036-014, REQ-036-015, REQ-036-023 -->
 
 # Inspect Skills
 

@@ -4,6 +4,7 @@ description: "case-run command の workflow 実装本体。単一 Issue 実行�
 ---
 <!-- ADF-COVERS(implementation): REQ-007-001, REQ-007-002, REQ-007-003, REQ-007-004, REQ-007-005 -->
 <!-- ADF-COVERS(implementation): REQ-031-001, REQ-031-002, REQ-031-003, REQ-031-004, REQ-031-005, REQ-031-006, REQ-031-009, REQ-031-010, REQ-031-011, REQ-031-012, REQ-031-015, REQ-031-016, REQ-031-017, REQ-031-018, REQ-031-019, REQ-031-020, REQ-031-021, REQ-031-022, REQ-031-023, REQ-031-024 -->
+<!-- ADF-COVERS(implementation): REQ-035-011 -->
 
 # case-run workflow スキル
 
