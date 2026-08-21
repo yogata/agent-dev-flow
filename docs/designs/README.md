@@ -111,7 +111,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [skills/agentdev-req-file-manager.md](skills/agentdev-req-file-manager.md) | accepted | 中核 | REQ ファイル管理 |
 | [skills/agentdev-req-structure-diagnostics.md](skills/agentdev-req-structure-diagnostics.md) | accepted | 中核 | REQ 構造診断 |
 | [skills/agentdev-artifact-graph.md](skills/agentdev-artifact-graph.md) | draft | 中核 | Artifact Graph 標準配布スキル（生成、検査、問い合わせ、open extensibility、augmentation） |
-| [skills/agentdev-traceability.md](skills/agentdev-traceability.md) | draft | 中核 | トレーサビリティ標準配布スキル（coverage、impact、check、対応宣言の解析、正規成果物の直接走査）。agentdev-artifact-graph の後継（REQ-012、DEC-017） |
+| [skills/agentdev-traceability.md](skills/agentdev-traceability.md) | accepted | 中核 | トレーサビリティ標準配布スキル（coverage、impact、check、対応宣言の解析、正規成果物の直接走査）。agentdev-artifact-graph の後継（REQ-012、DEC-017） |
 | [skills/agentdev-decision-file-manager.md](skills/agentdev-decision-file-manager.md) | accepted | 中核 | Decision ファイル管理 |
 | [skills/agentdev-decision-guidelines.md](skills/agentdev-decision-guidelines.md) | accepted | 中核 | Decision 要否判定 |
 | [skills/agentdev-architecture-advisory.md](skills/agentdev-architecture-advisory.md) | accepted | 中核 | アーキテクチャ助言 |
