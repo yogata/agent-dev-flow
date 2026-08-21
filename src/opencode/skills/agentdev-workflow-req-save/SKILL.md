@@ -4,6 +4,7 @@ description: "req-save command の workflow 実装本体。壁打ち成果物（
 ---
 <!-- ADF-COVERS(implementation): REQ-004-011, REQ-004-012, REQ-004-013, REQ-004-021, REQ-004-040, REQ-004-044, REQ-004-045 -->
 <!-- ADF-COVERS(implementation): REQ-006-106, REQ-006-111 -->
+<!-- ADF-COVERS(implementation): REQ-008-014, REQ-008-031, REQ-008-045, REQ-008-046, REQ-008-050 -->
 
 # req-save workflow スキル
 

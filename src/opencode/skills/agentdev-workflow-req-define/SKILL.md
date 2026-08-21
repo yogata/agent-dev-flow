@@ -3,6 +3,7 @@ name: agentdev-workflow-req-define
 description: "req-define command の workflow 実装本体。セッションコンテキスト検知・入力解決から壁打ち対話、既存REQ照合、要件展開、Decision判断、要件doc（draft-data）生成、work_type・Scale 判定、adversarial-review 経路A、ドラフト保存、要件doc確認、完了報告までの対話型 workflow 制御を所有する。USE FOR: req-define 実行時の workflow 制御（対話開始・HITL・blocked・resume・draft 生成）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 <!-- ADF-COVERS(implementation): REQ-004-001, REQ-004-002, REQ-004-004, REQ-004-010, REQ-004-014, REQ-004-015, REQ-004-016, REQ-004-017, REQ-004-018, REQ-004-019, REQ-004-020, REQ-004-022, REQ-004-023, REQ-004-034, REQ-004-035, REQ-004-036, REQ-004-037, REQ-004-038, REQ-004-039, REQ-004-042, REQ-004-043, REQ-004-046, REQ-004-047, REQ-004-048, REQ-004-049, REQ-004-050, REQ-004-051, REQ-004-052, REQ-004-053, REQ-004-054 -->
+<!-- ADF-COVERS(implementation): REQ-008-022, REQ-008-032, REQ-008-033, REQ-008-041, REQ-008-047, REQ-008-048, REQ-008-049, REQ-008-052, REQ-008-053 -->
 
 # req-define workflow スキル
 
