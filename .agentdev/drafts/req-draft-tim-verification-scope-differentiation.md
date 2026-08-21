@@ -144,6 +144,12 @@ draft-data:
       ACT-REQ-002: "applied: REQ-001 update（REQ-001-045 要件行の削除、frontmatter updated 2026-08-20 から 2026-08-21 へ更新。履歴注記の本文追記なし）"
       ACT-DEC-001: "applied: DEC-017 update（決定1・決定4 の置換、結果影響へ REQ-001-045 廃止の1行追記）"
     design_save_pending_actions: [ACT-DESIGN-001, ACT-DESIGN-002]
+  design_save_result:
+    updated_designs: [docs/designs/foundations/traceability-model.md]
+    created_designs: [docs/designs/foundations/references/verification-scope-catalog.md]
+    artifact_action_results:
+      ACT-DESIGN-001: "applied: traceability-model update（「対応関係の完全性規則」節を区分適用版9項目へ置換。status は accepted のまま維持、frontmatter updated は 2026-08-21 が既存値のため変更なし）"
+      ACT-DESIGN-002: "applied: references/verification-scope-catalog.md create（検証対応要否カタログ新規作成、status: draft。references 同伴ファイルのため designs README 一覧へは独立行登録なし）"
   test_strategy:
     - id: TS-001
       target_item: AG-001/AG-003
