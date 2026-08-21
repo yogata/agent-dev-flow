@@ -9,6 +9,7 @@
 // ADF-COVERS(verification): REQ-011-002, REQ-011-008, REQ-011-014
 // ADF-COVERS(verification): REQ-031-011, REQ-031-012, REQ-031-014
 // ADF-COVERS(verification): REQ-032-004, REQ-032-005
+// ADF-COVERS(verification): REQ-037-008, REQ-037-010
 import {
   EXIT_OK,
   EXIT_NG,

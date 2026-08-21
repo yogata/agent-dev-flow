@@ -5,6 +5,7 @@ created: 2026-06-21
 updated: 2026-08-19
 ---
 <!-- ADF-COVERS(implementation): REQ-015-006 -->
+<!-- ADF-COVERS(implementation): REQ-037-001, REQ-037-003, REQ-037-004, REQ-037-005 -->
 
 # intake-promote Design
 

@@ -2,6 +2,7 @@
 name: agentdev-intake-pipeline
 description: intake-from-github（GitHub残課題抽出）と intake-promote（review、分類、振り分け）の知識ベース。USE FOR: GitHub intake 抽出ロジック（期間解釈、データ取得、構造的検出、LLM解析、item生成）、intake-promote の review・分類・整形・振り分け基準、promoted 保存と Git 永続化手順。DO NOT USE FOR: Issue 作成、RU 生成、REQ 構造診断。
 ---
+<!-- ADF-COVERS(implementation): REQ-037-001, REQ-037-004, REQ-037-006, REQ-037-007, REQ-037-009 -->
 
 # Intake パイプライン知識ベース
 

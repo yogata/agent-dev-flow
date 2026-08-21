@@ -3,6 +3,7 @@ name: agentdev-workflow-learning-promote
 description: "learning-promote command の workflow 実装本体。inbox.md エントリの読込・正規化、問題クラス分類・8軸評価・evaluation-report 生成、廃棄判定・既存対策確認、adversarial-review 経路D、自律確定判定とユーザー判断必要項目の HITL、採用済み成果物生成・deferred 移動・prune・git 永続化の各 STEP を独立 resume point として所有する。USE FOR: learning-promote 実行時の workflow 制御。DO NOT USE FOR: 学びの検知・抽出・inbox.md 蓄積、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 <!-- ADF-COVERS(implementation): REQ-003-055, REQ-003-056 -->
+<!-- ADF-COVERS(implementation): REQ-038-002, REQ-038-003, REQ-038-004, REQ-038-005 -->
 
 # learning-promote workflow スキル
 
