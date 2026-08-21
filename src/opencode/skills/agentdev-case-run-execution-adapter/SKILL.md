@@ -4,6 +4,7 @@ description: "case-run external execution adapter. USE FOR: connecting case-run 
 ---
 <!-- ADF-COVERS(implementation): REQ-011-010, REQ-011-011, REQ-011-012, REQ-011-017 -->
 <!-- ADF-COVERS(implementation): REQ-015-010, REQ-015-011 -->
+<!-- ADF-COVERS(implementation): REQ-031-007, REQ-031-008 -->
 
 # case-run 外部実行アダプター（External Execution Adapter）
 

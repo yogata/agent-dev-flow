@@ -1,5 +1,6 @@
 // ADF-COVERS(verification): REQ-001-017
 // ADF-COVERS(implementation): REQ-010-005, REQ-010-012
+// ADF-COVERS(verification): REQ-032-020
 /**
  * check_changed_docs.ts — Targeted docs guard (v2:REQ-0158-003).
  *

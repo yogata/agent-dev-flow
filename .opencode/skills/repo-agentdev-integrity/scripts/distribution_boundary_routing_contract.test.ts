@@ -1,3 +1,4 @@
+// ADF-COVERS(verification): REQ-029-008
 /**
  * Structural contract test for the distribution-boundary final gate routing.
  *
