@@ -179,7 +179,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | foundations/design-principles.md | accepted | 設計原則 | アーキテクチャ設計原則 |
 | foundations/project-extensions.md | accepted | Project Extensions | 実行時プロジェクト固有追加・拡張機構（`.agentdev/extensions/**`）、extension schema、実行時読み込み契約、project-local skill 委譲、配布物具体参照禁止（REQ-002） |
 | foundations/harness-separation-model.md | accepted | harness 分離モデル | 配布物と harness 実行制御の責務分離モデル。配布物の大多数を harness 非依存とし、依存具体を references/ へ集約 |
-| foundations/traceability-model.md | draft | 最小トレーサビリティモデル（TIM） | 要件を中心とした最小 TIM のモデル要素（要件行、対応関係（covers）、design/implementation/verification の3役割）、対応関係の完全性規則、用語政策を正規所有（REQ-012、DEC-017） |
+| foundations/traceability-model.md | accepted | 最小トレーサビリティモデル（TIM） | 要件を中心とした最小 TIM のモデル要素（要件行、対応関係（covers）、design/implementation/verification の3役割）、対応関係の完全性規則、用語政策を正規所有（REQ-012、DEC-017） |
 | foundations/references/concrete-abstraction.md | accepted | 配布物具体参照の抽象化参照 | 配布物から harness 固有・実装固有の具体を抽象化する手順の参照。harness-separation-model.md、responsibility-boundary-purification.md から参照される |
 
 #### responsibilities/（文書種別、成果物責務）
