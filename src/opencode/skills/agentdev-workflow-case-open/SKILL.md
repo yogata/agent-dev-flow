@@ -5,6 +5,7 @@ description: "case-open command の workflow 実装本体。要件定義から G
 <!-- ADF-COVERS(implementation): REQ-003-025, REQ-003-027 -->
 <!-- ADF-COVERS(implementation): REQ-008-010, REQ-008-011, REQ-008-036, REQ-008-037 -->
 <!-- ADF-COVERS(implementation): REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-005, REQ-030-006, REQ-030-014, REQ-030-015, REQ-030-016, REQ-030-017, REQ-030-018, REQ-030-019, REQ-030-020, REQ-030-021 -->
+<!-- ADF-COVERS(implementation): REQ-043-013, REQ-043-014, REQ-043-027 -->
 
 # case-open workflow スキル
 

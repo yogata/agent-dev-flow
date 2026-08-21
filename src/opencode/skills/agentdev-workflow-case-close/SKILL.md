@@ -5,6 +5,8 @@ description: "case-close command の workflow 実装本体。PR マージ（squa
 <!-- ADF-COVERS(implementation): REQ-003-015, REQ-003-016, REQ-003-019, REQ-003-026 -->
 <!-- ADF-COVERS(implementation): REQ-006-105 -->
 <!-- ADF-COVERS(implementation): REQ-032-001, REQ-032-002, REQ-032-003, REQ-032-004, REQ-032-005, REQ-032-007, REQ-032-008, REQ-032-010, REQ-032-012, REQ-032-013, REQ-032-014, REQ-032-015, REQ-032-016, REQ-032-017, REQ-032-018, REQ-032-019, REQ-032-020, REQ-032-021 -->
+<!-- ADF-COVERS(implementation): REQ-042-006, REQ-042-008, REQ-042-011 -->
+<!-- ADF-COVERS(implementation): REQ-043-008, REQ-043-017, REQ-043-018, REQ-043-020, REQ-043-024, REQ-043-028 -->
 
 # case-close workflow スキル
 

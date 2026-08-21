@@ -4,6 +4,7 @@
 // ADF-COVERS(implementation): REQ-018-001
 // ADF-COVERS(verification): REQ-018-001, REQ-018-002
 // ADF-COVERS(verification): REQ-036-002
+// ADF-COVERS(verification): REQ-041-001, REQ-041-016
 /**
  * E2E workflow tests for all agentdev command definitions.
  * REQ-0030-009: Normal-path E2E tests for all commands

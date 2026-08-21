@@ -4,6 +4,7 @@ status: accepted
 created: 2026-08-17
 updated: 2026-08-18
 ---
+<!-- ADF-COVERS(implementation): REQ-041-003, REQ-041-004, REQ-041-005, REQ-041-006, REQ-041-009, REQ-041-010, REQ-041-011, REQ-041-012, REQ-041-013, REQ-041-014, REQ-041-015 -->
 
 # agentdev-workflow-backlog-auto Design
 

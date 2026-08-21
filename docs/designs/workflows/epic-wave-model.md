@@ -5,6 +5,7 @@ created: 2026-06-21
 updated: 2026-08-19
 ---
 <!-- ADF-COVERS(implementation): REQ-035-001, REQ-035-002, REQ-035-003, REQ-035-004, REQ-035-005, REQ-035-006, REQ-035-007, REQ-035-008, REQ-035-009, REQ-035-010, REQ-035-011, REQ-035-012 -->
+<!-- ADF-COVERS(implementation): REQ-043-026, REQ-043-027 -->
 
 # Epic / Wave / Issue 実行モデル
 

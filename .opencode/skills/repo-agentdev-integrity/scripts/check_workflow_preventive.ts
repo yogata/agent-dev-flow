@@ -2,6 +2,7 @@
 // ADF-COVERS(verification): REQ-005-013
 // ADF-COVERS(verification): REQ-027-002
 // ADF-COVERS(verification): REQ-034-007, REQ-034-008, REQ-034-009
+// ADF-COVERS(verification): REQ-041-002
 /**
  * Workflow preventive checker (AG-008, OU-007 / Issue #2107).
  *

@@ -4,6 +4,7 @@ description: Manages Issue/PR description and comment templates, selection rules
 ---
 <!-- ADF-COVERS(implementation): REQ-007-002, REQ-007-003, REQ-007-005 -->
 <!-- ADF-COVERS(implementation): REQ-017-003 -->
+<!-- ADF-COVERS(implementation): REQ-043-016, REQ-043-020 -->
 
 # Issue テンプレート管理スキル
 

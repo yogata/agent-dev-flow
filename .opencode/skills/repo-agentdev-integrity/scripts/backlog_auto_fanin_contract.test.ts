@@ -1,3 +1,4 @@
+// ADF-COVERS(verification): REQ-041-004, REQ-041-010, REQ-041-011, REQ-041-012, REQ-041-013, REQ-041-014
 /**
  * Contract tests for the backlog-auto fan-in result-state mapping table.
  *
