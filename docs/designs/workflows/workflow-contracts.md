@@ -4,6 +4,7 @@ status: accepted
 created: 2026-06-21
 updated: 2026-08-19
 ---
+<!-- ADF-COVERS(implementation): REQ-003-021, REQ-003-022, REQ-003-023, REQ-003-055, REQ-003-056 -->
 
 # ワークフロー契約（横断）
 

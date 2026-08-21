@@ -5,6 +5,7 @@ created: 2026-06-21
 updated: 2026-07-27
 ---
 <!-- ADF-COVERS(implementation): REQ-002-033, REQ-002-034 -->
+<!-- ADF-COVERS(implementation): REQ-003-001, REQ-003-002, REQ-003-003, REQ-003-004, REQ-003-006, REQ-003-011, REQ-003-012, REQ-003-014, REQ-003-020 -->
 
 # サブエージェント委譲契約（横断）
 

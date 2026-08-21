@@ -2,6 +2,7 @@
 name: agentdev-workflow-case-auto
 description: "case-auto command の workflow 実装本体。req-save → design-save → case-open → case-run → case-close の自走 orchestration、orchestration stage モデル、Wave 反復制御、bounded parent decision resolution、コンフリクト解消 Level 2/3、停止理由分類、adversarial-review 経路H 停止伝播、結果集約を所有する。USE FOR: case-auto 実行時の workflow 制御（入力解決・工程分岐・orchestration・停止検出・停止理由分類）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
+<!-- ADF-COVERS(implementation): REQ-003-017, REQ-003-018 -->
 
 # case-auto workflow スキル
 

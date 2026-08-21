@@ -2,6 +2,7 @@
 name: agentdev-adversarial-review
 description: "対論型レビューの実行入口。Orchestrator、Reviewer、Reviewee の3論理的役割で構成される審議を通じて本質的争点を抽出する。動的レビュー戦略の構成、対称的相互反証、戦略メタ反証、合意候補形成後の再検証（convergence audit）を行う。USE FOR: 要件案、設計案、規格・仕様案、計画案、実装案の本質的合意形成、未解決争点のユーザー質問化。DO NOT USE FOR: 通常のコードレビューやテストや機械的検査、実装実行やファイル保存やIssue・PR更新、ユーザー承認代行。"
 ---
+<!-- ADF-COVERS(implementation): REQ-003-030, REQ-003-031, REQ-003-032, REQ-003-033, REQ-003-034, REQ-003-035, REQ-003-036, REQ-003-037, REQ-003-038, REQ-003-039, REQ-003-040, REQ-003-041, REQ-003-042, REQ-003-043, REQ-003-044, REQ-003-045, REQ-003-046, REQ-003-047, REQ-003-048, REQ-003-049, REQ-003-050, REQ-003-051, REQ-003-052, REQ-003-053, REQ-003-054 -->
 
 # 対論型レビュー（agentdev-adversarial-review）
 

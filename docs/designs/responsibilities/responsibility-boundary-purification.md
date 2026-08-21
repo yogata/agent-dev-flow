@@ -4,6 +4,7 @@ status: accepted
 created: 2026-07-14
 updated: 2026-07-27
 ---
+<!-- ADF-COVERS(implementation): REQ-003-028, REQ-003-029 -->
 
 # 責務境界浄化: 所有/非所有リスト詳細
 
