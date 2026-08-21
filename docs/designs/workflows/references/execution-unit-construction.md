@@ -4,6 +4,7 @@ status: accepted
 created: 2026-07-25
 updated: 2026-08-18
 ---
+<!-- ADF-COVERS(implementation): REQ-030-007, REQ-030-008, REQ-030-009 -->
 
 # execution_unit 構成アルゴリズム参照
 

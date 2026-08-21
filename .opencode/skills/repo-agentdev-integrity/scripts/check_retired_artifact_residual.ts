@@ -1,3 +1,4 @@
+// ADF-COVERS(verification): REQ-001-012, REQ-001-013
 // check_retired_artifact_residual.ts
 //
 // Common detector for IR-025 (retired ADR path rule), IR-037

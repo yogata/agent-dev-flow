@@ -6,6 +6,8 @@ updated: 2026-08-21
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-021 -->
+<!-- ADF-COVERS(implementation): REQ-036-001, REQ-036-002, REQ-036-006, REQ-036-007, REQ-036-008, REQ-036-009, REQ-036-010, REQ-036-011, REQ-036-024 -->
+<!-- ADF-COVERS(implementation): REQ-036-001, REQ-036-004, REQ-036-006, REQ-036-008, REQ-036-009, REQ-036-010 -->
 
 # inspect-docs Design
 

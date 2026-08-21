@@ -4,6 +4,8 @@ status: accepted
 created: 2026-08-20
 updated: 2026-08-15
 ---
+<!-- ADF-COVERS(implementation): REQ-003-013 -->
+<!-- ADF-COVERS(implementation): REQ-007-006, REQ-007-007, REQ-007-008, REQ-007-009 -->
 
 # 品質ゲート
 

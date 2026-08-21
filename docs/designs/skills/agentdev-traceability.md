@@ -10,7 +10,7 @@ updated: "2026-08-21"
 
 ## 目的
 
-標準配布スキル `agentdev-traceability` は、最小 TIM（foundations/traceability-model.md）に基づき、要件と成果物の明示的な対応関係について coverage、impact、check の3能力を提供する。正規成果物を直接走査し、対応関係をその場で解決する。旧 `agentdev-artifact-graph` の後継であり、旧公開APIとの互換層を持たない（REQ-012、DEC-017）。
+標準配布スキル `agentdev-traceability` は、最小 TIM（foundations/traceability-model.md）に基づき、要件と成果物の明示的な対応関係について coverage、impact、check の3能力を提供する。正規成果物を直接走査し、対応関係をその場で解決する（REQ-012、DEC-017。前身機能の廃止と移行の経緯は DEC-017 が記録する）。
 
 ## 適用対象
 
@@ -57,12 +57,10 @@ updated: "2026-08-21"
 ## 実装構成
 
 - 標準実装は正規成果物（docs/requirements/、docs/designs/、実装・検証成果物）を直接走査する。`.agentdev/graph/` 等の派生 Graph を必須入力・必須生成物としない
-- 現行 Artifact Graph のファイル探索、Markdown 解析、要件ID解決、存在確認等の実装資産は、本 Design に適合する場合のみ再利用する（graph 生成、鮮度管理、拡張機構は再利用しない）
 - 将来、直接走査が実運用上の問題として観測された場合、coverage、impact、check の外部契約を変えずにキャッシュまたは索引を追加できる構造とする
 - OpenFastTrace、Eclipse Capra、専用グラフDBを標準実行依存として導入しない
 
 ## 対象外
 
-- 旧公開API（neighbors、path、provenance、related、dependency、implementation、diagnostics）の互換層
 - ワークフロー統合の工程割り当て（REQ-021、各 command Design）
 - 性能の数値基準（受け入れ基準を設けない）

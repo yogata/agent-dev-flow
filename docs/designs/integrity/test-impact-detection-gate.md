@@ -4,6 +4,7 @@ status: draft
 created: "2026-08-09"
 updated: "2026-08-09"
 ---
+<!-- ADF-COVERS(implementation): REQ-019-001, REQ-019-002 -->
 
 # テスト影響範囲検出 gate
 

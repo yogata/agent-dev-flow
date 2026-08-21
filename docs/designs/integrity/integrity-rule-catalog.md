@@ -4,6 +4,7 @@ status: accepted
 created: 2026-08-20
 updated: 2026-08-18
 ---
+<!-- ADF-COVERS(implementation): REQ-010-009 -->
 
 # 整合性ルールカタログ
 

@@ -4,6 +4,7 @@ status: draft
 created: 2026-07-22
 updated: 2026-07-24
 ---
+<!-- ADF-COVERS(implementation): REQ-001-042 -->
 
 # agentdev-artifact-validation Design
 

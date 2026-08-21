@@ -1,3 +1,9 @@
+// ADF-COVERS(verification): REQ-001-031
+// ADF-COVERS(verification): REQ-002-011, REQ-002-027
+// ADF-COVERS(verification): REQ-009-012
+// ADF-COVERS(implementation): REQ-010-060
+// ADF-COVERS(verification): REQ-010-001
+// ADF-COVERS(verification): REQ-029-001, REQ-029-002, REQ-029-003, REQ-029-004, REQ-029-005, REQ-029-006, REQ-029-007, REQ-029-008
 // Distribution reference boundary checker (adapter).
 //
 // This file is the adapter over the canonical side-effect-free detector at

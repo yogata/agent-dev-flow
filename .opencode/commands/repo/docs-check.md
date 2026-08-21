@@ -2,6 +2,7 @@
 description: docs整合性検査（旧称: integrity-check）。agent-dev-flow repo self-audit（repo-local, not distributed to consumers）
 agent: sisyphus
 ---
+<!-- ADF-COVERS(implementation): REQ-010-001, REQ-010-002, REQ-010-003, REQ-010-004 -->
 
 # Repo Self-Audit: Docs Check
 

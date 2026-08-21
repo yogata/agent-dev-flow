@@ -4,6 +4,8 @@ status: accepted
 created: 2026-07-04
 updated: 2026-08-20
 ---
+<!-- ADF-COVERS(implementation): REQ-002-030, REQ-002-031 -->
+<!-- ADF-COVERS(implementation): REQ-002-030, REQ-002-031, REQ-044-001, REQ-044-002, REQ-044-005 -->
 
 # Project Extensions
 

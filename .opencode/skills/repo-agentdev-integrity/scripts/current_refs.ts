@@ -1,3 +1,4 @@
+// ADF-COVERS(verification): REQ-001-014
 const V2_PREFIX = "v2:";
 const CURRENT_REQ_REF_RE = /\bREQ-\d{3,4}\b/g;
 const CURRENT_ADR_REF_RE = /\bADR-\d{3,4}\b/g;

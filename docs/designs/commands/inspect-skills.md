@@ -6,6 +6,8 @@ updated: 2026-08-21
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-021 -->
+<!-- ADF-COVERS(implementation): REQ-036-001, REQ-036-002, REQ-036-012, REQ-036-013, REQ-036-014, REQ-036-015, REQ-036-016 -->
+<!-- ADF-COVERS(implementation): REQ-036-001, REQ-036-012, REQ-036-016 -->
 
 # inspect-skills Design
 

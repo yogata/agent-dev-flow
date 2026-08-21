@@ -1,3 +1,4 @@
+// ADF-COVERS(verification): REQ-002-030, REQ-002-031
 /**
  * Project Extensions integrity checker (IR-056), new-kind era.
  *

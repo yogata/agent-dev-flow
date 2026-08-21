@@ -4,6 +4,9 @@ status: accepted
 created: 2026-06-21
 updated: 2026-07-27
 ---
+<!-- ADF-COVERS(implementation): REQ-003-005 -->
+<!-- ADF-COVERS(implementation): REQ-006-105, REQ-006-106, REQ-006-107, REQ-006-108, REQ-006-109, REQ-006-111 -->
+<!-- ADF-COVERS(implementation): REQ-037-008, REQ-037-009, REQ-037-010 -->
 
 # キャプチャ境界（Capture Boundaries）
 

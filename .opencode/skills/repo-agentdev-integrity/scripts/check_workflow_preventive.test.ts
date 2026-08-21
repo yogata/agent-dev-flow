@@ -257,7 +257,7 @@ describe("check 4: legacy-extension-residual", () => {
   test("detection fixture (*.test.ts) building the legacy path is exempted", () => {
     const root = buildFixture(tmpBase, {
       extraDistributionFile: {
-        rel: "src/opencode/skills/agentdev-artifact-graph/scripts/tests/containment.test.ts",
+        rel: "src/opencode/skills/agentdev-sample-skill/scripts/tests/containment.test.ts",
         content:
           "test(\"containment\", () => {\n  const dir = join(root, \".agentdev/extensions/commands\");\n});\n",
       },

@@ -1,3 +1,6 @@
+// ADF-COVERS(verification): REQ-002-030, REQ-002-031
+// ADF-COVERS(verification): REQ-044-002
+// ADF-COVERS(verification): REQ-044-001, REQ-044-002, REQ-044-005
 /**
  * Tests for check_extensions.ts (IR-056 validation, new-kind era).
  *

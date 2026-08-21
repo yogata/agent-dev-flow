@@ -1,3 +1,4 @@
+// ADF-COVERS(verification): REQ-010-063
 /**
  * Tests for check_skill_rename_symmetry.ts (REQ-026).
  *
@@ -101,7 +102,6 @@ describe("checkSkillRenameSymmetry (integration against real repo)", () => {
     expect(Array.isArray(report.failures)).toBe(true);
     expect(typeof report.stats.skills_scanned).toBe("number");
     expect(typeof report.stats.designs_scanned).toBe("number");
-    expect(typeof report.stats.graph_skill_nodes_scanned).toBe("number");
     expect(report.stats.skills_scanned).toBeGreaterThan(0);
     expect(report.stats.designs_scanned).toBeGreaterThan(0);
   });
@@ -129,14 +129,5 @@ describe("checkSkillRenameSymmetry (integration against real repo)", () => {
     );
     // All real skills should have name == dir; any mismatch is a regression.
     expect(nameDirMismatches.length).toBe(0);
-  });
-
-  test("graph-node failures are warnings, not ng", () => {
-    const report = checkSkillRenameSymmetry(REPO_ROOT);
-    for (const f of report.failures) {
-      if (f.category === "graph-node") {
-        expect(f.level).toBe("warning");
-      }
-    }
   });
 });

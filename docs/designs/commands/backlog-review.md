@@ -6,6 +6,8 @@ updated: 2026-08-21
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-021 -->
+<!-- ADF-COVERS(implementation): REQ-015-008 -->
+<!-- ADF-COVERS(implementation): REQ-039-001, REQ-039-002, REQ-039-003, REQ-039-004, REQ-039-005 -->
 
 # backlog-review Design
 

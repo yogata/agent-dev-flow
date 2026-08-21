@@ -1,3 +1,4 @@
+// ADF-COVERS(verification): REQ-029-001, REQ-029-002, REQ-029-003, REQ-029-005, REQ-029-006, REQ-029-007
 // Canonical side-effect-free distribution boundary detector — entry point.
 //
 // Stable implementation contract per docs/designs/integrity/distribution-boundary.md.

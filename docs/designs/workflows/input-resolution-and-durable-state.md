@@ -4,6 +4,8 @@ status: draft
 created: 2026-08-10
 updated: 2026-08-15
 ---
+<!-- ADF-COVERS(implementation): REQ-002-036 -->
+<!-- ADF-COVERS(implementation): REQ-005-024 -->
 
 # Input Resolution and Durable State
 

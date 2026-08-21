@@ -4,6 +4,7 @@ status: accepted
 created: 2026-06-21
 updated: 2026-07-27
 ---
+<!-- ADF-COVERS(implementation): REQ-001-050, REQ-001-051, REQ-004-004, REQ-004-005, REQ-004-006 -->
 
 # `agentdev-req-file-manager` Design
 

@@ -4,6 +4,9 @@ status: accepted
 created: 2026-08-15
 updated: 2026-08-20
 ---
+<!-- ADF-COVERS(implementation): REQ-002-035 -->
+<!-- ADF-COVERS(implementation): REQ-010-062 -->
+<!-- ADF-COVERS(implementation): REQ-010-010 -->
 
 # checker 実行契約と検出基盤規則
 

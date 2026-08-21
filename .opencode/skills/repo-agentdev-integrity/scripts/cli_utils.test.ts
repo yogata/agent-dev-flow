@@ -1,3 +1,4 @@
+// ADF-COVERS(verification): REQ-044-003
 import { describe, it, expect } from "bun:test";
 import {
   EXIT_OK,

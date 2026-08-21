@@ -1,3 +1,4 @@
+// ADF-COVERS(implementation): REQ-044-001
 // node:fs glob ベースの再帰列挙共有ヘルパー（OU-002、checker-execution-contracts Design
 // 「再帰ファイル探索と CLI 引数解析の標準API移行」節）。
 //

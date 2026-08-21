@@ -1,3 +1,4 @@
+// ADF-COVERS(verification): REQ-010-059
 /**
  * check_autogen_freshness.test.ts — bun:test 単体テスト。
  *

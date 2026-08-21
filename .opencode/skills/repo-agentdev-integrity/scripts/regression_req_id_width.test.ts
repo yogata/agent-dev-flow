@@ -1,3 +1,4 @@
+// ADF-COVERS(verification): REQ-001-009
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { mkdirSync, rmSync, writeFileSync } from "fs";
 import { join } from "path";

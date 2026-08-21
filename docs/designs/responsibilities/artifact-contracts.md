@@ -4,6 +4,7 @@ status: accepted
 created: 2026-08-20
 updated: 2026-08-10
 ---
+<!-- ADF-COVERS(implementation): REQ-002-005, REQ-002-006, REQ-002-016, REQ-002-034 -->
 
 # アーティファクト契約
 

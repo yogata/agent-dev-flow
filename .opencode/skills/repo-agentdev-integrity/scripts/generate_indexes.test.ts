@@ -1,3 +1,4 @@
+// ADF-COVERS(verification): REQ-010-011
 /**
  * Regression tests for AUTOGEN marker detection (Issue #1771, RU-0002).
  *

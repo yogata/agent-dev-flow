@@ -1,3 +1,4 @@
+<!-- ADF-COVERS(implementation): REQ-001-055 -->
 # agent-dev-flow
 
 AgentDevFlow プラグインの設定を管理するリポジトリ。AI エージェントによる開発ワークフローを支えるコマンド・スキル・ドキュメントを一元管理する。

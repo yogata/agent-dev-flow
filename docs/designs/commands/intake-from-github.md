@@ -4,6 +4,7 @@ status: accepted
 created: 2026-06-21
 updated: 2026-08-15
 ---
+<!-- ADF-COVERS(implementation): REQ-037-001, REQ-037-004, REQ-037-006, REQ-037-007 -->
 
 # intake-from-github Design
 
