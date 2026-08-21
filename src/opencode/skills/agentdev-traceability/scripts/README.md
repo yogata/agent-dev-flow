@@ -9,12 +9,13 @@ scripts/
 ├── package.json
 ├── tsconfig.json
 ├── lib/
-│   ├── declarations.ts   # ADF-COVERS 対応宣言の解析（行単位パターン照合、意味推定なし）
-│   ├── corpus.ts         # 正規成果物コーパスの直接走査（派生 Graph 非依存）
-│   ├── requirements.ts   # 現行要件行ID（docs/requirements/REQ-{NNNN}.md）の収集
-│   ├── query.ts          # coverage・impact の公開契約（純粋関数）
-│   ├── check.ts          # check の6種検査（純粋関数）
-│   └── cli_utils.ts      # argv 解析、JSON 出力、エラー終了
+│   ├── declarations.ts       # ADF-COVERS 対応宣言の解析（行単位パターン照合、意味推定なし）
+│   ├── corpus.ts             # 正規成果物コーパスの直接走査（派生 Graph 非依存）
+│   ├── requirements.ts       # 現行要件行ID（docs/requirements/REQ-{NNNN}.md）の収集
+│   ├── verification_scope.ts # 検証対応要否カタログの解析・範囲展開（不在時は全行必須）
+│   ├── query.ts              # coverage・impact の公開契約（純粋関数）
+│   ├── check.ts              # check の7種検査（純粋関数）
+│   └── cli_utils.ts          # argv 解析、JSON 出力、エラー終了
 └── src/
     ├── coverage.ts       # CLI: coverage
     ├── impact.ts         # CLI: impact

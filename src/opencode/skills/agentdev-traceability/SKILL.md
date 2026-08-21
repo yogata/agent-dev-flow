@@ -1,6 +1,6 @@
 ---
 name: agentdev-traceability
-description: Provides requirement-artifact traceability (coverage, impact, check) via direct scanning of ADF-COVERS declarations. USE FOR: retrieving artifacts covering a requirement, reverse lookup of covered requirements, change re-confirmation candidates via artifact-requirement-artifact hops, declaration integrity checks (malformed declarations, unknown roles, unknown requirement references, missing implementation or verification, unavailable evidence). DO NOT USE FOR: document exploration, path search, diagnostics, dependency exploration, index management, semantic inference of coverage.
+description: Provides requirement-artifact traceability (coverage, impact, check) via direct scanning of ADF-COVERS declarations. USE FOR: retrieving artifacts covering a requirement, reverse lookup of covered requirements, change re-confirmation candidates via artifact-requirement-artifact hops, declaration integrity checks (malformed declarations, unknown roles, unknown requirement references, verification-scope catalog entry validation, missing implementation or verification, unavailable evidence). DO NOT USE FOR: document exploration, path search, diagnostics, dependency exploration, index management, semantic inference of coverage.
 ---
 
 # agentdev-traceability
@@ -46,10 +46,11 @@ Design を正規原本とし、SKILL.md は実行入口および skill 固有の
 |---|---|---|---|
 | `src/coverage.ts` | coverage | `--root` + `--req` または `--artifact` | 要件起点: 役割付き対応関係の全件（`relations`, `counts`, `truncated: false`）/ 成果物起点: 当該成果物の対応要件（`relations`, `emptyResult`） |
 | `src/impact.ts` | impact | `--root` + `--req` または `--artifact` | 要件起点: 再確認候補 / 成果物起点: `viaRequirements` + `recheckCandidates`。空結果は `emptyResult: true` と `note`（影響なしの証明ではない旨）で明示 |
-| `src/check.ts` | check | `--root`（任意: `--req` で完全性検査対象限定、`--artifact` で根拠検査追加） | 6種検査の `checks`（項目ごと pass / fail と findings）と `summary` |
+| `src/check.ts` | check | `--root`（任意: `--req` で完全性検査対象限定、`--artifact` で根拠検査追加） | 7種検査の `checks`（項目ごと pass / fail と findings）と `summary` |
 
-check の6種検査: `malformed-declarations`（形式・構文違反）、`unknown-roles`（未知の成果物役割）、`unknown-req-refs`（存在しない要件への参照）、`missing-implementation`（実装対応の欠落）、`missing-verification`（検証対応の欠落）、`evidence-unavailable`（根拠箇所を取得できない状態）。
+check の7種検査: `malformed-declarations`（形式・構文違反）、`unknown-roles`（未知の成果物役割）、`unknown-req-refs`（存在しない要件への参照）、`invalid-catalog-refs`（検証対応要否カタログの無効なエントリ・参照）、`missing-implementation`（実装対応の欠落）、`missing-verification`（検証対応の欠落。検証対応必須行のみ計上）、`evidence-unavailable`（根拠箇所を取得できない状態）。
 Design 対応（design 役割）0件のみを理由に異常としない。
+検証対応の要否区分は検証対応要否カタログ（`docs/designs/foundations/references/verification-scope-catalog.md` の `## 任意行エントリ` 節、要件行ID の列挙または同一REQファイル内の範囲表現）が所有する。check はカタログを既定パスから自動的に読み込み、カタログが存在しない場合は全要件行を検証対応必須として扱う（安全側既定）。
 
 ### 実行方法
 
@@ -80,7 +81,7 @@ bun .opencode/skills/agentdev-traceability/scripts/src/check.ts --root . --req R
 - coverage は明示された対応関係を全件返す。候補数上限、ランキング、探索深度による切り捨てを行わない
 - impact の探索範囲は成果物 ↔ 要件 ↔ 成果物（固定2ホップ）であり、任意深度のグラフ探索を行わない。空結果を「影響なし」の証明として扱わない
 - 現行要件の判定は `docs/requirements/REQ-{NNNN}.md` 直下の要件テーブル行（`REQ-{NNNN}-{MMM}`）を標準とする。`retired/` サブディレクトリは廃止扱い
-- 完全性の基準は実装対応1件以上かつ検証対応1件以上（Design 対応は任意）
+- 完全性の基準は、実装対応は全現行要件行で1件以上、検証対応は検証対応必須行（検証対応要否カタログの未登録行）で1件以上（Design 対応は任意）。未登録の要件行は検証対応必須として扱う（安全側既定）
 
 ## 対象外
 

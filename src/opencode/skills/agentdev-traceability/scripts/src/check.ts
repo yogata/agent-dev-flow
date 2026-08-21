@@ -1,4 +1,5 @@
-// check CLI。対応宣言コーパスの6種検査（lib/check.ts の公開契約）。
+// check CLI。対応宣言コーパスの7種検査（lib/check.ts の公開契約）。
+// 検証対応要否カタログ（既定パス、不在時は全要件行が検証対応必須）も自動的に読み込む。
 //
 // 使い方:
 //   bun scripts/src/check.ts --root .
@@ -11,6 +12,7 @@ import { fail, emitJson, normalizeArtifactPath, parseArgs } from "../lib/cli_uti
 import { locateEvidence, scanCorpus } from "../lib/corpus.ts";
 import { runChecks } from "../lib/check.ts";
 import { currentRequirementLineIds } from "../lib/requirements.ts";
+import { resolveVerificationScopeFromRoot } from "../lib/verification_scope.ts";
 
 const args = parseArgs(process.argv.slice(2));
 const root = args.get("root");
@@ -36,7 +38,9 @@ if (artifact) {
 
 const scan = scanCorpus(root!);
 const knownReqIds = currentRequirementLineIds(root!);
+const verificationScope = resolveVerificationScopeFromRoot(root!, knownReqIds);
 const report = runChecks(scan, knownReqIds, {
+  verificationScope,
   ...(completenessReqIds ? { completenessReqIds } : {}),
   ...(evidenceArtifacts.length > 0 ? { evidenceArtifacts } : {}),
 });

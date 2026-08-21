@@ -94,7 +94,8 @@ describe("派生 Graph が存在しない状態での3能力の動作（AC-001�
     const known = currentRequirementLineIds(ROOT);
     expect(known).toContain("REQ-910-001");
     const report = runChecks(scan, known, { completenessReqIds: ["REQ-910-001"] });
-    expect(report.summary).toEqual({ pass: 6, fail: 0 });
+    // 7種検査（invalid-catalog-refs 追加に伴い 6 → 7。フィクスチャにカタログはなく pass）
+    expect(report.summary).toEqual({ pass: 7, fail: 0 });
   });
 });
 
