@@ -4,6 +4,7 @@ status: accepted
 created: 2026-06-21
 updated: 2026-08-15
 ---
+<!-- ADF-COVERS(implementation): REQ-011-010, REQ-011-011, REQ-011-012, REQ-011-017, REQ-015-010, REQ-015-011, REQ-031-007, REQ-031-008 -->
 
 # `agentdev-case-run-execution-adapter` Design
 

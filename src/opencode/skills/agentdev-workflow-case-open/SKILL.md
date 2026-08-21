@@ -2,10 +2,6 @@
 name: agentdev-workflow-case-open
 description: "case-open command の workflow 実装本体。要件定義から GitHub Issue（Epic flow / Standard flow）作成までの制御構造、execution contract 確定、execution_unit 構成、draft/RU 削除クリーンアップを所有する。USE FOR: case-open 実行時の workflow 制御（Issue 本文生成・execution contract 確定・execution_unit 構成・preflight・Epic flow/Standard flow）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
-<!-- ADF-COVERS(implementation): REQ-003-025, REQ-003-027 -->
-<!-- ADF-COVERS(implementation): REQ-008-010, REQ-008-011, REQ-008-036, REQ-008-037 -->
-<!-- ADF-COVERS(implementation): REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-005, REQ-030-006, REQ-030-014, REQ-030-015, REQ-030-016, REQ-030-017, REQ-030-018, REQ-030-019, REQ-030-020, REQ-030-021 -->
-<!-- ADF-COVERS(implementation): REQ-043-013, REQ-043-014, REQ-043-027 -->
 
 # case-open workflow スキル
 

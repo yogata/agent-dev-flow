@@ -1,4 +1,3 @@
-<!-- ADF-COVERS(implementation): REQ-011-013 -->
 # 標準版実装手順（GitHub 版）
 
 `agentdev-gh-cli` の各手続きの標準版（GitHub 版）実装手順。

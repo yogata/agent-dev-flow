@@ -5,6 +5,7 @@ created: 2026-06-21
 updated: 2026-08-15
 ---
 <!-- ADF-COVERS(implementation): REQ-033-001, REQ-033-002, REQ-033-003, REQ-033-004, REQ-033-005 -->
+<!-- ADF-COVERS(implementation): REQ-033-001, REQ-033-003, REQ-033-004, REQ-033-005 -->
 
 # case-update Design
 

@@ -2,10 +2,6 @@
 name: agentdev-workflow-lifecycle
 description: Provides development workflow phase definitions, SSoT transitions, work_type classification, scale assessment, command mappings, and docs structure for the agentdev command pipeline. USE FOR: determining workflow phases, work_type classification and scale assessment, resolving command dependencies, understanding docs/ directory layout. DO NOT USE FOR: specific command execution logic, requirement analysis, compliance checking.
 ---
-<!-- ADF-COVERS(implementation): REQ-001-052, REQ-001-053, REQ-001-054 -->
-<!-- ADF-COVERS(implementation): REQ-005-005, REQ-005-006, REQ-005-007, REQ-005-008, REQ-005-009, REQ-005-010, REQ-005-011, REQ-005-012, REQ-005-013, REQ-005-014, REQ-005-015, REQ-005-016, REQ-005-017, REQ-005-018, REQ-005-019, REQ-005-020, REQ-005-021, REQ-005-022, REQ-005-023 -->
-<!-- ADF-COVERS(implementation): REQ-011-016 -->
-<!-- ADF-COVERS(implementation): REQ-043-001 -->
 
 # AgentDevFlow ライフサイクルスキル
 

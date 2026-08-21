@@ -4,6 +4,7 @@ status: accepted
 created: 2026-06-21
 updated: 2026-08-15
 ---
+<!-- ADF-COVERS(implementation): REQ-001-048, REQ-001-049, REQ-001-050, REQ-004-007, REQ-004-008, REQ-004-009, REQ-004-024, REQ-004-025, REQ-004-026, REQ-004-027, REQ-004-028, REQ-004-029, REQ-004-030, REQ-004-031, REQ-004-032, REQ-004-033, REQ-004-050, REQ-004-051, REQ-004-052 -->
 
 # `agentdev-req-analysis` Design
 

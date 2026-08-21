@@ -1,4 +1,3 @@
-// ADF-COVERS(implementation): REQ-044-001, REQ-044-002, REQ-044-005
 /**
  * Shared Project Extensions load-time state machine (distribution side).
  *

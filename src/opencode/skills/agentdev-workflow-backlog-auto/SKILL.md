@@ -2,7 +2,6 @@
 name: agentdev-workflow-backlog-auto
 description: "backlog-auto command の workflow 実装本体。orchestration stage 構成（stage 1: inspect-docs 単独直列、stage 2: 昇格3系統の並行実行と競合直列化、stage 3: backlog-review）、fan-in 判定、停止伝播、resume 契約を所有する。USE FOR: backlog-auto 実行時の workflow 制御（工程間順序制御、昇格3系統の並行実行と競合処理の直列化、fan-in 判定、停止伝播、再開）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）、子ワークフロー内部の分類、評価、昇格、RU 生成ロジックの所有（各子 Workflow Skill が正規の処理主体）。"
 ---
-<!-- ADF-COVERS(implementation): REQ-041-002, REQ-041-003, REQ-041-004, REQ-041-005, REQ-041-006, REQ-041-007, REQ-041-008, REQ-041-009, REQ-041-010, REQ-041-011, REQ-041-012, REQ-041-013, REQ-041-014, REQ-041-015, REQ-041-016 -->
 
 # backlog-auto workflow スキル
 

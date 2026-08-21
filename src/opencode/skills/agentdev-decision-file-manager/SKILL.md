@@ -2,8 +2,6 @@
 name: agentdev-decision-file-manager
 description: Manages Decision numbering and decision record file operations (CREATE/APPEND/UPDATE). USE FOR: creating Decision files, appending sections, updating existing Decisions. DO NOT USE FOR: evaluating whether a Decision is needed, analyzing requirement quality, general document management.
 ---
-<!-- ADF-COVERS(implementation): REQ-001-056, REQ-001-057, REQ-001-058, REQ-001-059, REQ-001-060 -->
-<!-- ADF-COVERS(implementation): REQ-004-044, REQ-004-045 -->
 
 # Decisionファイル管理
 

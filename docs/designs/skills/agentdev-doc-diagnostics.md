@@ -6,6 +6,8 @@ updated: 2026-08-21
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-021 -->
+<!-- ADF-COVERS(verification): REQ-001-020 -->
+<!-- ADF-COVERS(implementation): REQ-036-003, REQ-036-005, REQ-036-011, REQ-036-023, REQ-036-024 -->
 
 # agentdev-doc-diagnostics Design
 

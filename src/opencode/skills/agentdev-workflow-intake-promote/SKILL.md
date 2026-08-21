@@ -2,8 +2,6 @@
 name: agentdev-workflow-intake-promote
 description: "intake-promote command の workflow 実装本体。inbox 内 intake item の classification（確認・読込・評価・暫定分類・自律確定候補判定）、review（adversarial-review 経路C）、HITL（ユーザー判断必要 item の承認・分類確定）、persistence（採用 item 整形・promoted 保存）、destructive handling（振り分け・inbox 削除・破壊的変更の明示承認・git 永続化）の各 STEP を独立 resume point として所有する。USE FOR: intake-promote 実行時の workflow 制御。DO NOT USE FOR: inbox item の新規保存、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
-<!-- ADF-COVERS(implementation): REQ-003-055, REQ-003-056 -->
-<!-- ADF-COVERS(implementation): REQ-037-003, REQ-037-004, REQ-037-005 -->
 
 # intake-promote workflow スキル
 

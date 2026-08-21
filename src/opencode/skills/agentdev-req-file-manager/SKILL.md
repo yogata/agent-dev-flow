@@ -2,8 +2,6 @@
 name: agentdev-req-file-manager
 description: Manages REQ numbering and requirement file operations (CREATE/APPEND/UPDATE). USE FOR: creating requirement files, appending sections, updating existing requirements, matching existing REQs for CREATE/APPEND/UPDATE judgment, deleting requirement unit files. DO NOT USE FOR: analyzing requirement quality, creating Decision files, requirement gathering.
 ---
-<!-- ADF-COVERS(implementation): REQ-001-050, REQ-001-051 -->
-<!-- ADF-COVERS(implementation): REQ-004-004, REQ-004-005, REQ-004-006 -->
 
 # REQファイル管理
 

@@ -2,7 +2,6 @@
 name: agentdev-workflow-case-update
 description: "case-update command の workflow 実装本体。既存 Case の本文更新（--body）、コメント追加（--comment）、REQ ファイル更新（--req）、レビューNG専用フロー（--review-ng）の4分岐と Issue 番号解決、現在状態取得、完了報告の制御を所有する。USE FOR: case-update 実行時の workflow 制御（更新種別分岐・テンプレート構造維持・APPEND vs UPDATE 判定）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
-<!-- ADF-COVERS(implementation): REQ-033-001, REQ-033-003, REQ-033-004, REQ-033-005 -->
 
 # case-update workflow スキル
 

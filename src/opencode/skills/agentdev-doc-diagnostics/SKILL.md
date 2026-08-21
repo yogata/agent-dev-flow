@@ -2,8 +2,6 @@
 name: agentdev-doc-diagnostics
 description: docs 横断診断カテゴリ、共通証拠構造、共通 finding 出力契約、文書種別別診断へのルーティングを提供する診断判断 skill。USE FOR: docs 横断の診断判定規則、共通証拠構造（finding schema、severity、信頼度）、診断に必要な reference・script の選択、文書種別別診断へのルーティング。DO NOT USE FOR: 診断対象の修正、検出事項の分類・採用・処分、REQ 構造診断、文意品質診断。
 ---
-<!-- ADF-COVERS(verification): REQ-001-020 -->
-<!-- ADF-COVERS(implementation): REQ-036-003, REQ-036-005, REQ-036-011, REQ-036-023, REQ-036-024 -->
 
 # docs 横断診断知識ベース（doc-diagnostics）
 

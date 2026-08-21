@@ -2,9 +2,6 @@
 name: agentdev-case-run-execution-adapter
 description: "case-run external execution adapter. USE FOR: connecting case-run issue execution to 実行担当サブエージェント via adapter skill delegation, handling completed-pr/blocked/failed/delegation-unavailable results. DO NOT USE FOR: workflow state management, Issue completion checkbox evaluation."
 ---
-<!-- ADF-COVERS(implementation): REQ-011-010, REQ-011-011, REQ-011-012, REQ-011-017 -->
-<!-- ADF-COVERS(implementation): REQ-015-010, REQ-015-011 -->
-<!-- ADF-COVERS(implementation): REQ-031-007, REQ-031-008 -->
 
 # case-run 外部実行アダプター（External Execution Adapter）
 

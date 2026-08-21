@@ -2,8 +2,6 @@
 name: agentdev-skill-authoring
 description: Provides quality criteria and best practices for authoring OpenCode SKILL.md files across five evaluation axes and four check protocols. USE FOR: creating or improving skills, reviewing skill quality, designing skill structure, writing trigger descriptions, planning progressive disclosure. DO NOT USE FOR: creating command definitions, general coding tasks, simple documentation fixes.
 ---
-<!-- ADF-COVERS(implementation): REQ-002-013, REQ-002-014, REQ-002-015 -->
-<!-- ADF-COVERS(verification): REQ-002-004 -->
 
 # スキル作成ベストプラクティス
 

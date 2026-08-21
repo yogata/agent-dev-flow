@@ -4,6 +4,7 @@ status: accepted
 created: 2026-06-21
 updated: 2026-07-18
 ---
+<!-- ADF-COVERS(implementation): REQ-003-007, REQ-003-008, REQ-003-009, REQ-003-010 -->
 
 # `agentdev-architecture-advisory` Design（アーキテクチャ助言、req-define 事前確認）
 

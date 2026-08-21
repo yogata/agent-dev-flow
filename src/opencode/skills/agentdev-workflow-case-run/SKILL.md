@@ -2,11 +2,6 @@
 name: agentdev-workflow-case-run
 description: "case-run command の workflow 実装本体。単一 Issue 実行（single workflow）と Epic Wave 実行（epic-wave workflow）の 1:N 分離構成、実行担当サブエージェント委譲（最大5件並列）、fan-out・fan-in、partial result、child task recovery、result 4状態処理を所有する。USE FOR: case-run 実行時の workflow 制御（single Issue 実行・Epic Wave 実行・再開フェーズ判定・委譲・前置/最終 gate）。DO NOT USE FOR: 実装実行そのもの（委譲内の実行担当サブエージェントが担う）、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
-<!-- ADF-COVERS(implementation): REQ-007-001, REQ-007-002, REQ-007-003, REQ-007-004, REQ-007-005 -->
-<!-- ADF-COVERS(implementation): REQ-031-001, REQ-031-002, REQ-031-003, REQ-031-004, REQ-031-005, REQ-031-006, REQ-031-009, REQ-031-010, REQ-031-011, REQ-031-012, REQ-031-015, REQ-031-016, REQ-031-017, REQ-031-018, REQ-031-019, REQ-031-020, REQ-031-021, REQ-031-022, REQ-031-023, REQ-031-024 -->
-<!-- ADF-COVERS(implementation): REQ-035-011 -->
-<!-- ADF-COVERS(implementation): REQ-042-001, REQ-042-002, REQ-042-003, REQ-042-005, REQ-042-006, REQ-042-007, REQ-042-011 -->
-<!-- ADF-COVERS(implementation): REQ-043-007, REQ-043-011, REQ-043-015, REQ-043-021 -->
 
 # case-run workflow スキル
 

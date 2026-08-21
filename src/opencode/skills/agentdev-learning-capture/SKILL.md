@@ -2,7 +2,6 @@
 name: agentdev-learning-capture
 description: Agent-first extraction and capture of learnings from problems autonomously detected/avoided/corrected. Covers CI failures, template deviations, gh/git workarounds, reopen causes, and implementation errors. USE FOR: case-close post-processing, post-incident capture, workflow deviation detection. DO NOT USE FOR: general note-taking, documentation generation, ADR/REQ/spec creation.
 ---
-<!-- ADF-COVERS(implementation): REQ-038-001 -->
 
 # `agentdev-learning-capture`
 

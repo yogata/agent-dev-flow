@@ -2,7 +2,6 @@
 name: agentdev-decision-guidelines
 description: Evaluates whether architectural decisions require a Decision record. USE FOR: proposing architecture changes, selecting tech stacks, making hard-to-reverse technical decisions. DO NOT USE FOR: creating or managing Decision files, requirement analysis, implementation planning.
 ---
-<!-- ADF-COVERS(implementation): REQ-001-023, REQ-001-024 -->
 
 # Decision評価ガイドライン
 

@@ -5,6 +5,7 @@ created: 2026-06-23
 updated: 2026-08-10
 ---
 <!-- ADF-COVERS(implementation): REQ-001-001, REQ-001-002, REQ-001-003, REQ-001-004, REQ-001-005, REQ-001-006 -->
+<!-- ADF-COVERS(implementation): REQ-001-017, REQ-001-018, REQ-001-019 -->
 
 # 文書種別責務、配置基準
 
