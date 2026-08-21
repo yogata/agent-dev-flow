@@ -4,6 +4,7 @@ status: accepted
 created: 2026-08-20
 updated: 2026-08-10
 ---
+<!-- ADF-COVERS(implementation): REQ-001-008, REQ-001-010, REQ-001-011, REQ-001-012, REQ-001-013, REQ-001-014, REQ-001-015, REQ-001-016, REQ-001-030, REQ-001-046, REQ-001-047 -->
 
 # 文書フォーマット規約
 

@@ -4,6 +4,7 @@ status: accepted
 created: 2026-07-12
 updated: 2026-08-15
 ---
+<!-- ADF-COVERS(implementation): REQ-001-031, REQ-001-032 -->
 
 # harness 分離モデル
 

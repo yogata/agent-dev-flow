@@ -1,3 +1,4 @@
+// ADF-COVERS(verification): REQ-002-033
 // check_delegation_contract_residual.ts
 //
 // Common detector for IR-032 (delegation_type / on_result required-envelope

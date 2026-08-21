@@ -1,3 +1,4 @@
+// ADF-COVERS(verification): REQ-002-001, REQ-002-002, REQ-002-003, REQ-002-017, REQ-002-030, REQ-002-031
 /**
  * Workflow preventive checker (AG-008, OU-007 / Issue #2107).
  *

@@ -4,6 +4,7 @@ status: accepted
 created: 2026-06-21
 updated: 2026-08-15
 ---
+<!-- ADF-COVERS(implementation): REQ-001-034, REQ-001-043 -->
 
 # RU / 採用済み成果物 / draft ライフサイクル
 

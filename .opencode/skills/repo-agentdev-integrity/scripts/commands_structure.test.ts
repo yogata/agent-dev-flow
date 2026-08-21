@@ -1,3 +1,4 @@
+// ADF-COVERS(verification): REQ-002-001, REQ-002-002
 /**
  * Structure validation tests for command definition files.
  *

@@ -4,6 +4,7 @@ status: accepted
 created: 2026-08-20
 updated: 2026-08-15
 ---
+<!-- ADF-COVERS(implementation): REQ-002-007, REQ-002-008, REQ-002-011, REQ-002-019, REQ-002-020, REQ-002-027 -->
 
 # 実行時パッケージ境界
 

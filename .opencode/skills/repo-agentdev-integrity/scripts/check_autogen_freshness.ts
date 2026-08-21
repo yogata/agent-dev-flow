@@ -1,3 +1,4 @@
+// ADF-COVERS(verification): REQ-001-026, REQ-001-028
 /**
  * check_autogen_freshness.ts — AUTOGEN ブロック鮮度検出 gate (REQ-010-059).
  *

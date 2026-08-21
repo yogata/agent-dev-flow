@@ -4,6 +4,7 @@ status: accepted
 created: 2026-06-21
 updated: 2026-07-27
 ---
+<!-- ADF-COVERS(implementation): REQ-002-033, REQ-002-034 -->
 
 # サブエージェント委譲契約（横断）
 

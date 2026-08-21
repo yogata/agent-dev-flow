@@ -4,6 +4,7 @@ status: accepted
 created: 2026-07-19
 updated: 2026-08-11
 ---
+<!-- ADF-COVERS(implementation): REQ-001-008, REQ-001-009, REQ-001-013, REQ-001-042 -->
 
 # 採番管理 Design
 
