@@ -6,6 +6,7 @@ updated: 2026-08-21
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-011, REQ-021-022 -->
+<!-- ADF-COVERS(implementation): REQ-015-004 -->
 
 # req-define Design
 

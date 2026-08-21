@@ -6,6 +6,7 @@ updated: 2026-08-21
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-015, REQ-021-016, REQ-021-017, REQ-021-019, REQ-021-020, REQ-021-022 -->
+<!-- ADF-COVERS(implementation): REQ-015-010, REQ-015-011 -->
 
 # case-run Design
 

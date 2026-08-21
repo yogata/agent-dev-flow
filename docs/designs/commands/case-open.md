@@ -6,6 +6,7 @@ updated: 2026-08-21
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-014 -->
+<!-- ADF-COVERS(implementation): REQ-015-009 -->
 
 # case-open Design
 

@@ -4,6 +4,7 @@ status: accepted
 created: 2026-06-21
 updated: 2026-08-19
 ---
+<!-- ADF-COVERS(implementation): REQ-015-012 -->
 
 # case-auto Design
 

@@ -3,6 +3,7 @@ name: agentdev-inspect-skills
 description: Diagnoses Command to Skill reference validity, Skill structure, execution subject classification, and semantic integrity across Command/Skill definitions without changing files. USE FOR: reference validity diagnosis, skill granularity and structure review, execution subject misclassification detection, semantic duplication/contradiction/contract-missing detection, stale references in distributions. DO NOT USE FOR: modifying files, creating issues, executing fixes.
 ---
 <!-- ADF-COVERS(verification): REQ-005-014 -->
+<!-- ADF-COVERS(verification): REQ-016-001, REQ-016-002, REQ-016-003, REQ-016-004, REQ-016-005, REQ-016-006, REQ-016-007, REQ-016-008, REQ-016-009, REQ-016-010 -->
 
 # Inspect Skills
 
