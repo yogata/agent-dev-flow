@@ -82,17 +82,15 @@ STEP ラベルは工程順序の整理ラベルであり、**resume point では
 - `agentdev-git-worktree`: ドメイン状態永続化プロシージャ（並列実行安全ステージング含む）
 - `agentdev-conventional-commits`: commit message 規約
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
-- `agentdev-artifact-graph`: トレーサビリティ派生索引への高位問い合わせ（diagnostics、構造診断候補の探索。fail-open）
 
-## Artifact Graph 利用
+## 候補探索（独立探索手段）
 
-本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（diagnostics）を構造診断候補の探索に利用できる。
-候補には unresolved reference、superseded artifact への現行参照、dangling relation、provenance 欠落、orphan candidate、不自然な relation path、structural duplicate candidate を含む（STEP-2 意味診断の入力）。
-問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` Design（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
+本スキルの構造診断候補の探索は、README 索引、正規成果物の直接読取、`rg` 等の独立探索手段で行う。
+agentdev-traceability の coverage、impact、check を一般文書探索、構造診断、依存関係探索の用途に利用しない。
+候補には未解決参照、superseded 成果物への現行参照、参照先が取得できない記述、正規所有者のいない成果物、構造的重複候補を含む（STEP-2 意味診断の入力）。
 
-- Graph は候補提供者であり、決定的検査（参照実在、委譲先 skill 実在、YAML 構文、必須 field）は docs-check、整合性ルール群が所有する。本スキルは Graph 構造候補を未検証 evidence として意味診断の入力に利用し、構造診断と意味診断を区別する
-- SPLIT、MERGE、MOVE、DUPLICATE、RETIRE、DRIFT 等の意味判断を問い合わせ結果の構造情報だけから確定しない
-- 派生索引が不在、破損、生成失敗、問い合わせ失敗、候補過多の場合は、正規成果物の直接読取、`rg`、ファイル探索などの従来の診断経路で workflow を継続する（fail-open）。派生索引側の障害だけを理由に本 workflow を停止しない
+- 決定的検査（参照実在、委譲先 skill 実在、YAML 構文、必須 field）は docs-check、整合性ルール群が所有する。本スキルは探索で得た候補を未検証 evidence として意味診断の入力に利用し、構造診断と意味診断を区別する
+- SPLIT、MERGE、MOVE、DUPLICATE、RETIRE、DRIFT 等の意味判断を候補の構造情報だけから確定しない
 
 ## Workflow Extension 読込契約
 

@@ -2,8 +2,10 @@
 title: case-close Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-19
+updated: 2026-08-21
 ---
+
+<!-- ADF-COVERS(implementation): REQ-021-018, REQ-021-019, REQ-021-022 -->
 
 # case-close Design
 
@@ -144,15 +146,16 @@ Epic Issue 本文の `## 完了条件` セクションを読み込み、全完�
 - Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
-## Artifact Graph 利用
+## トレーサビリティ能力の利用（QG-4 独立再検査）
 
-case-close は Artifact Graph を変更後の関係整合性検証に利用する。
-確認対象は Graph の生成と鮮度, Graph integrity, unresolved relation, dangling relation, provenance defect, Graph と独立確認結果との差異である。
-Graph defect と canonical defect を区別する。
+case-close は QG-4 の一部として、対象要件の実装対応と検証対応の完全性を `agentdev-traceability` の check で正規成果物から独立して再検査する（REQ-021-018）。
+case-run 側の事前検査とは独立に実施する。検証手段との対応関係と「今回その検証を実行して合格したか」という実行結果（Issue, PR, QG の記録）を分離して扱う（REQ-021-019）。
 
-Graph 自体の生成または問い合わせ失敗のみを理由に case-close を失敗させず、fail-open して従来の検証経路で継続する。
-正規成果物側の実不整合が確認された場合は既存の品質ゲート, 受け入れ条件に従って fail とする。
-共通利用原則の防護事項は `agentdev-artifact-graph` Design「ワークフロー利用」を参照。
+- 対象要件に実装対応または検証対応の欠落が残る場合はマージせず停止する
+- 不足する対応関係を自動追加または修正せず、検査失敗を case-run 側の修正対象として差し戻せる
+- 移行期間中（全現行要件の対応付け完了まで）は QG-4 の対応完全性検査を強制しない（有効化は別途判断）。移行期間中に検査を実行した場合は、結果を参考情報として報告できる
+- agentdev-traceability の不在、実行失敗、空結果、候補過多だけを理由に case-close を失敗させない（fail-open）。正規成果物そのものの異常とトレーサビリティ機能側の異常を区別する
+- 正規成果物側の実不整合が確認された場合は、既存の品質ゲート, 受け入れ条件に従って fail とする
 
 ## 参照する横断 Design
 

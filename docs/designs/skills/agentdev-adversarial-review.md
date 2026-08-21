@@ -2,8 +2,10 @@
 title: agentdev-adversarial-review Design
 status: accepted
 created: 2026-08-09
-updated: 2026-08-15
+updated: 2026-08-21
 ---
+
+<!-- ADF-COVERS(implementation): REQ-021-021 -->
 
 # agentdev-adversarial-review Design
 
@@ -250,16 +252,15 @@ Reviewer と Reviewee は双方とも、必要に応じて複数のサブエー�
 agentdev-adversarial-review 自身による対象ファイル変更、レビュー結果のファイル保存、commit、push、merge、Issue と PR の作成・更新・コメント、レビュー結果の自動適用、ユーザー承認代行を行わない。
 レビュー結果保存用の新しい正規成果物種別を導入しない。
 
-## Artifact Graph 利用
+## 候補探索（独立探索手段）
 
-agentdev-adversarial-review は Artifact Graph をレビュー対象候補, evidence の探索に利用する。
-論点候補には複数の規範的成果物から到達する対象, 複数経路, cycle, relation 集中ノード, isolated node, 複数 owner または governing relation を持つ候補を含む。
+agentdev-adversarial-review のレビュー対象候補と evidence の探索は、README 索引、正規成果物の直接読取、`rg` 等の独立探索手段で行う（REQ-021-021）。
+agentdev-traceability の coverage, impact, check を一般文書探索、構造診断、依存関係探索の用途に利用しない。
+論点候補には複数の規範的成果物から到達する対象、複数経路、循環、関係の集中する対象、孤立候補、複数 owner を持つ候補を含む。
 
-Graph から得た情報は未検証 evidence として扱い、Reviewer または Reviewee の対論, 正規成果物確認を経ずに finding を確定しない。
-Graph はレビュー結論の確定ではなく evidence 探索に利用する。
-共通利用原則の防護事項は `agentdev-artifact-graph` Design「ワークフロー利用」を参照。
-
-Graph 不在、stale、consumer 環境に対応 node type または relation type が存在しない場合は、従来のレビュー経路で継続し、review を停止しない（fail-open）。
+- 探索で得た情報は未検証 evidence として扱い、Reviewer または Reviewee の対論, 正規成果物確認を経ずに finding を確定しない
+- 探索は evidence の収集に利用するものであり、レビュー結論の確定根拠としない
+- 探索手段の障害だけを理由に審議を停止しない
 
 ## QG、通常レビュー、診断との責務分界
 - QG-1〜QG-4 を代替しない。

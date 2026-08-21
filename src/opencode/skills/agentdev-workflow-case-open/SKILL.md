@@ -88,19 +88,15 @@ case-open workflow は次の6 STEP で構成する。
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 - `agentdev-adversarial-review`: 経路F review 呼出
 - `agentdev-learning-capture` / `agentdev-intake-pipeline`: deviation capture 委譲（STEP-4/5 で実観測時）
-- `agentdev-artifact-graph`: トレーサビリティ派生索引への高位問い合わせ（変更影響候補の評価。fail-open）
 
-## Artifact Graph 利用
+## トレーサビリティ能力の利用
 
-本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（impact、dependency）を利用できる。
-Issue の対象範囲、完了条件、test strategy の確定前に変更影響候補を評価し、候補を in scope、verification only、out of scope に分類する（STEP-2、STEP-3）。
-問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` Design（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
-問い合わせ目的を指定し、返された候補を用いて判断する。
+case-open は、上流工程（req-define）で確定した対象要件と実行契約を Issue へ引き継ぐ。
+Issue の対象範囲、完了条件、test strategy の確定（STEP-2、STEP-3）は、上流工程の引き継ぎ情報（draft-data、artifact_actions、operation_units）を基に行う。
 
-- 問い合わせ結果は候補提供であり、対象範囲の分類判断は正規成果物本文と `rg` 等の独立探索での確認後に下す
-- 必須品質統制の導出は artifact type から品質能力キーへの変換（品質統制 routing Design が定める）に従い、問い合わせで得た関係から必須 skill を直接決定しない
-- 派生索引の不在、生成失敗、空結果、候補過多だけを理由として「関係なし」「影響なし」と判断しない
-- 派生索引が不在、破損、生成失敗、問い合わせ失敗、候補過多の場合は、README 索引、正規成果物の直接読取、`rg`、ファイル探索などの代替探索で workflow を継続する（fail-open）。正規成果物そのものの異常と派生索引側の異常を区別する
+- req-define と重複して一般的な変更影響探索や依存関係探索を行い、対象範囲を再決定しない
+- 引き継ぎ情報に欠落があり変更影響候補の確認が必要な場合は、req-define へ差し戻す
+- 必須品質統制の導出は artifact type から品質能力キーへの変換（品質統制 routing Design が定める）に従う
 
 ## Workflow Extension 読込
 

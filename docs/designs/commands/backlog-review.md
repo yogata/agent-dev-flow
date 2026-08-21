@@ -2,8 +2,10 @@
 title: backlog-review Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-15
+updated: 2026-08-21
 ---
+
+<!-- ADF-COVERS(implementation): REQ-021-021 -->
 
 # backlog-review Design
 
@@ -61,16 +63,14 @@ updated: 2026-08-15
 - Workflow Skill の単独起動防止（soft guard）は Workflow Skill description の DO NOT USE FOR トリガーにより実効する（command 定義本文に soft guard 宣言節を持たない構成である）。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
-## Artifact Graph 利用
+## 候補探索（独立探索手段）
 
-backlog-review は入力成果物に含まれる REQ, Decision, Design, canonical owner 等の明示情報を起点として既存正規成果物との関係候補を Artifact Graph 経由で取得できる。
-候補には統合, 分割, depends_on 解決の補助 evidence を含む。
+backlog-review は、入力成果物に含まれる REQ, Decision, Design, canonical owner 等の明示情報を起点として、README 索引、正規成果物の直接読取、`rg` 等の独立探索手段で既存正規成果物との関係候補を探索する（REQ-021-021）。
+agentdev-traceability の coverage, impact, check を一般文書探索、構造診断、依存関係探索の用途に利用しない。
 
-Graph は候補提供者であり、統合, 分割, depends_on, 意味的重複の最終判断は正規成果物本文と独立探索手段での確認後に下す。
-promoted artifact 自体を Graph の正規 node とすることは必須でない。
-共通利用原則の防護事項は `agentdev-artifact-graph` Design「ワークフロー利用」を参照。
-
-Graph 不在、stale、consumer 環境に対応 node type または relation type が存在しない場合は、従来の探索経路で継続し、workflow を停止しない（fail-open）。
+- 候補には統合, 分割, depends_on 解決の補助 evidence を含める
+- 統合, 分割, depends_on, 意味的重複の最終判断は正規成果物本文と独立探索手段での確認後に下す
+- promoted artifact 自体を特定の探索機構の正規 node とすることは必須でない
 
 ## 参照する横断 Design
 

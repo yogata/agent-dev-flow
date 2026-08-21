@@ -2,8 +2,10 @@
 title: req-define Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-19
+updated: 2026-08-21
 ---
+
+<!-- ADF-COVERS(implementation): REQ-021-011, REQ-021-022 -->
 
 # req-define Design
 
@@ -450,13 +452,15 @@ auto_gate:
 - Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
-## Artifact Graph 利用
+## トレーサビリティ能力の利用
 
-req-define は既存 REQ、関連 Decision と Design、canonical owner、構造的所有者重複、downstream 変更影響候補の探索に Artifact Graph を利用できる。
-Graph は候補提供者であり、CREATE, APPEND, UPDATE, SPLIT, MERGE, 意味的重複, canonical owner の最終判断は正規成果物本文と独立探索手段（`glob`, `grep`, `rg` 等）での確認後に下す。
-共通利用原則の防護事項は `agentdev-artifact-graph` Design「ワークフロー利用」を参照。
+req-define は、既存の明示的な対応関係（`agentdev-traceability` の coverage）と impact を変更影響候補の確認に利用できる（REQ-021-011）。
+問い合わせ結果は候補提供であり、CREATE, APPEND, UPDATE, SPLIT, MERGE, 意味的重複, canonical owner の最終判断は正規成果物本文と独立探索手段（README 索引、正規成果物の直接読取、`glob`, `grep`, `rg` 等）での確認後に下す。
 
-Graph 不在、stale、consumer 環境に対応 node type または relation type が存在しない場合は、従来の探索経路で継続し、workflow を停止しない（fail-open）。
+- トレーサビリティ情報だけで変更対象、正規所有者、対象範囲を確定しない
+- impact の空結果を「影響なし」の根拠としない
+- 将来作成される実装成果物または検証手段との対応関係を推測して正規情報として保存しない
+- agentdev-traceability の不在、実行失敗、空結果、候補過多だけを理由として workflow を停止しない（fail-open）。独立探索手段で継続し、正規成果物そのものの異常とトレーサビリティ機能側の異常を区別する
 
 ## 参照する横断 Design
 

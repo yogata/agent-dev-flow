@@ -101,17 +101,17 @@ gate 違反時は両ルートとも PR マージを停止する。
 - `agentdev-workflow-orchestration`: capture 境界（intake/learning 分離）
 - `agentdev-conventional-commits`: GitHub auto-close 回避ガイドライン
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
-- `agentdev-artifact-graph`: トレーサビリティ派生索引（変更後の整合性確認、verification feedback。fail-open）
+- `agentdev-traceability`: トレーサビリティ能力（check。QG-4 の対応完全性の独立再検査。fail-open）
 - integrity checker skill（リポジトリ固有・配布対象外）: check_changed_docs.ts（targeted docs guard）、check_extensions.ts（IR-{NNN}）
 
-## Artifact Graph 利用
+## トレーサビリティ能力の利用（QG-4 独立再検査）
 
-本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引を、変更後の整合性確認（必要に応じて）に利用できる。
-確認対象は変更後の派生索引の生成と鮮度、整合性、unresolved relation、dangling relation、provenance defect、独立確認結果との差異である（STEP-3 docs 検証）。
-問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` Design（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
+本スキルは QG-4 の一部として、対象要件の実装対応と検証対応の完全性を `agentdev-traceability` の check で正規成果物から独立して再検査できる（STEP-3 docs 検証）。
+case-run 側の事前検査とは独立に実施する。検証手段との対応関係と「今回その検証を実行して合格したか」という実行結果（Issue、PR、QG の記録）を分離して扱う。
 
-- Graph defect（派生索引側の抽出問題）と canonical defect（正規成果物側の実不整合）を区別する
-- 派生索引の不在、破損、生成失敗、問い合わせ失敗、候補過多のみを理由に本 workflow を失敗させない（fail-open）。代替検証経路（既存の品質ゲート、targeted docs guard、`rg` 等の独立探索）で継続する
+- 対象要件に実装対応または検証対応の欠落が残る場合はマージせず停止する。不足する対応関係を自動追加または修正せず、検査失敗を case-run 側の修正対象として差し戻す
+- 移行期間中（全現行要件の対応付け完了まで）は QG-4 の対応完全性検査を強制しない（有効化は別途判断）。移行期間中に検査を実行した場合は、結果を参考情報として報告できる
+- agentdev-traceability の不在、実行失敗、空結果、候補過多のみを理由に本 workflow を失敗させない（fail-open）。代替検証経路（既存の品質ゲート、targeted docs guard、`rg` 等の独立探索）で継続し、正規成果物そのものの異常とトレーサビリティ機能側の異常を区別する
 - 正規成果物側の実不整合が確認された場合は、既存の品質ゲート、受け入れ条件に従って fail とする
 
 ## Workflow Extension 読込

@@ -2,8 +2,10 @@
 title: case-open Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-19
+updated: 2026-08-21
 ---
+
+<!-- ADF-COVERS(implementation): REQ-021-014 -->
 
 # case-open Design
 
@@ -203,17 +205,14 @@ child Issue テンプレートの「レビュー判断」セクションは親 E
 `review_dispositions` を持たない旧ドラフトを case-open は入力として拒否しない（DEC-003 準拠）。
 フィールド欠落時は「レビュー判断」セクションへ「該当なし」と記載する。
 
-## Artifact Graph 利用
+## トレーサビリティ能力の利用
 
-case-open は Issue の対象範囲, 完了条件, test strategy, 必須 skill, 検証事項を確定する前に Artifact Graph による変更影響候補を評価する。
-候補には REQ, Decision, Design, command, skill, extension, integrity rule, 関連 source_file を含められる。
-Graph 候補は正規成果物または独立した探索手段で確認した上で in scope, verification only, out of scope に分類する。
+case-open は、上流工程（req-define）で確定した対象要件と実行契約を Issue へ引き継ぐ（REQ-021-014）。
+Issue の対象範囲, 完了条件, test strategy, 必須 skill, 検証事項は、上流工程の引き継ぎ情報（draft-data、artifact_actions、operation_units）を基に確定する。
 
-必須品質能力の導出は `artifact-quality-control-routing` Design が定める artifact type から品質能力キーへの変換に従い、Graph の delegates_to, governs 関係から必須 skill を直接決定しない。
-Graph は変更成果物候補と関連規則候補の探索のみを担当する。
-共通利用原則の防護事項は `agentdev-artifact-graph` Design「ワークフロー利用」を参照。
-
-Graph 不在、stale、consumer 環境に対応 node type または relation type が存在しない場合は、従来の探索経路で継続し、workflow を停止しない（fail-open）。
+- req-define と重複して一般的な変更影響探索や依存関係探索を行い、対象範囲を再決定しない
+- 引き継ぎ情報に欠落があり変更影響候補の確認（REQ-017-010）が必要な場合は、req-define へ差し戻す
+- 必須品質能力の導出は `artifact-quality-control-routing` Design が定める artifact type から品質能力キーへの変換に従う
 
 ## 参照する横断 Design
 
