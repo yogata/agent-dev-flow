@@ -26,7 +26,7 @@ structured_context:
   open_items:
     - {未確定事項。判断主体・判断条件が必要な場合に付ける}
   canonical_references:
-    - {当該作業で使用すべき解決済み参照先。正規原本（source）、実行時投影（projection）、双方確認の別を含む}
+    - {当該作業で使用すべき解決済み参照先。正規原本（source）、実行時投影（projection）、双方確認の別を含む。判別は参照先解決ポリシー（references/reference-resolution.md）に従う}
   stop_conditions:
     - {停止条件。実行契約上の停止条件、既確定文書への変更要件等}
   expected_output: {期待する実行結果（成果物と受理基準の要約）}
@@ -44,13 +44,14 @@ structured_context:
 - case-auto 等の orchestrator による工程委譲では、委譲 prompt の入力内に構造化文脈を直列化する（委譲時の形式に従う）。
 - 手動で次のコマンドを起動する運用では、構造化文脈は独立した受け渡し媒体を新設せず、既存の durable state（要件doc、Issue 本文、PR 本文等の正規成果物）から次工程が再構成する。
 - 各フィールドの値は要約と正規参照先で構成し、全文履歴や巨大な計画本文の複製を含めない。
+- canonical_references の各項目は、配布物参照において目的判別（正規原本確認、実行時投影確認、双方整合確認）を含める。判別と直列化の表記は本スキルの参照先解決ポリシー（`references/reference-resolution.md`）に従う。
 
 ## 消費契約（後工程の責務）
 
 - 後工程は引き継がれた確定済み事項（resolved_context）を初期文脈として利用し、同じ情報をゼロから探索、再構築することを原則としない。
 - 独立検証、鮮度確認、矛盾検出、正規成果物との整合確認を目的とする再確認は維持する。初期文脈の利用はこれらの再確認の実施を省略する根拠にしない。
 - 未確定事項（open_items）は前工程の判断待ち状態の引継ぎとして扱い、後工程が独断で確定しない。
-- 当該作業で使用すべき解決済み参照先（canonical_references）は、探索の起点として利用する。正規原本と実行時投影の別の判定契約は本参照の適用範囲外とし、参照先解決の契約に従う。
+- 当該作業で使用すべき解決済み参照先（canonical_references）は、探索の起点として利用する。正規原本（source）と実行時投影（projection）の別の判定は、本スキルの参照先解決ポリシー（`references/reference-resolution.md`）に従う。
 - 構造化文脈と durable state（正規成果物）が矛盾する場合は、正規成果物を正とし、矛盾を検出事項として報告する。
 
 ## 制約
@@ -66,4 +67,5 @@ structured_context:
 - `<workflows/workflow-contracts>` Design「工程間構造化文脈引き継ぎ契約」（原本仕様）
 - `<workflows/delegation-contracts>` Design「構造化文脈引き継ぎ（委譲時）の直列化契約」（委譲時の原本仕様）
 - `agentdev-case-run-execution-adapter` スキルの委譲プロンプト雛形（委譲時の直列化形式、意味対応先）
+- 参照先解決ポリシー（`references/reference-resolution.md`。canonical_references の source / projection 目的判別）
 - 前工程からの引き継ぎ 共通方針（agentdev_handoff、consumer リポジトリの引き継ぎ停止）
