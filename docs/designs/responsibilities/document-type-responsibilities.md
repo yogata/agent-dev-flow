@@ -2,7 +2,7 @@
 title: 文書種別責務・配置基準
 status: accepted
 created: 2026-06-23
-updated: 2026-08-10
+updated: 2026-08-22
 ---
 <!-- ADF-COVERS(implementation): REQ-001-001, REQ-001-002, REQ-001-003, REQ-001-004, REQ-001-005, REQ-001-006 -->
 <!-- ADF-COVERS(implementation): REQ-001-017, REQ-001-018, REQ-001-019 -->
@@ -287,7 +287,9 @@ SSoT, HITL は略語のまま使用。
 em-dash（`—`、`―`）は japanese-tech-writing L17 に従い、同格、補足は括弧（``）で、言い換え、敷衍は句点で2文分割または読点でつなぐ。
 コロン（`:`）による置換は行わない。
 
-テーブルセル内の em-dash（`| — |`、N/A プレースホルダ用途）は `| - |`（ハイフン1文字）へ機械置換する。
+テーブルセル内の em-dash（`| — |`）は、N/A プレースホルダと判別されたセルを `| - |`（ハイフン1文字）へ機械置換する（判別基準は PR 2271。肯定記号と対で用いる意図的マトリックス表記は置換しない）。
+プレースホルダセルに em-dash を使用しない置換表記は正規表記として確定済みであり、[integrity-rule-catalog.md](../integrity/integrity-rule-catalog.md)「IR-055 プレースホルダ表記の確定」の確定表記と表現を整合させる。
+実装運用への影響はなく、判定は機械的である。
 本文中の em-dash とは意味が異なり、文脈判断を要しない安全な機械置換である。
 検出後の文脈判定パターン（A: label—explanation、B: 句点直後、C: 括弧内既存、D: テーブルセル、ママ）の詳細は algorithm SSoT（mechanical-replacement-rules.md）Section 2 を参照。
 

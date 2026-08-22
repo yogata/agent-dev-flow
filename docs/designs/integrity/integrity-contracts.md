@@ -2,7 +2,7 @@
 title: 整合性契約
 status: accepted
 created: 2026-08-20
-updated: 2026-08-18
+updated: 2026-08-22
 ---
 <!-- ADF-COVERS(implementation): REQ-010-006 -->
 <!-- ADF-COVERS(implementation): REQ-036-022 -->
@@ -376,6 +376,12 @@ baseline は `category` / `check` / `file` / `evidence` の4組を bucket key �
 RuntimeReference baseline（IR-055、前節）は heuristic 違反の段階導入を目的とし、本 NG baseline は strict 違反（`ng` / `warning`）の既知集合を管理して「既知違反の解消」により strict pass を到達可能にすることを目的とする。
 両 baseline は独立に運用し、相互に影響しない。
 NG baseline は v2:REQ-0161-005（旧 `docs/requirements/v2:REQ-0161.md`、現 `docs/requirements/retired/v2:REQ-0161.md`）から Design 統合された恒久契約である。
+
+整合性契約の補完:
+
+- 参照パス導入の列挙化（許容参照パスを明示的に列挙する）
+- NG baseline 運用手順節へ衝突時 semantic（max 採用）を明文化する
+- baseline の環境別表記統合と導入運用（環境差異の統合記録）
 
 ### baseline entry 運用契約（機械生成・パス bucket key・生成環境・報告分類）
 

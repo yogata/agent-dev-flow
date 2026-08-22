@@ -2,7 +2,7 @@
 title: checker 実行契約と検出基盤規則
 status: accepted
 created: 2026-08-15
-updated: 2026-08-20
+updated: 2026-08-22
 ---
 <!-- ADF-COVERS(implementation): REQ-002-035 -->
 <!-- ADF-COVERS(implementation): REQ-010-062 -->
@@ -80,6 +80,13 @@ checker 群の再帰ファイル探索と CLI 引数解析の標準 API への�
 - 移行前に各処理の現在の受理・拒否挙動（正常入力、空入力、値欠落、未知オプション、短縮オプション、位置引数、サブコマンド、重複オプション、`--`、`--option=value`、再帰列挙の対象ファイル集合・リンク追跡・隠しディレクトリ・欠落ディレクトリ挙動）をテストデータとして固定する
 - 標準 API が受理できる形式を、その事実だけで新規の公開 CLI 仕様として追加しない。既存仕様で保証していない形式の公開仕様化を行わない
 - 対応する ADF 実行環境で `node:fs` glob または `node:util.parseArgs` が利用不能な場合は代替 API へ無断変更せず blocked として再判断する
+
+checker 実行契約の補完（RU-0003 + RU-0009 data yaml 追随を同一ファイルへ集約）:
+
+- CLI 引数解析は bun parseargs 標準APIへの移行を約束し、独自解析の二重経路を残さない（REQ-044-001 準拠）
+- 再帰ファイル探索は node:fs glob（新規 glob 共通ヘルパー限定）へ移行し、エラー伝播方針を明記する
+- 列挙件数突合規約と checker 起動 cwd 前提を契約化する（走査信頼性）
+- data yaml 宣言的データ運用: data yaml 新設時は消費者実装を同時確定する
 
 ## 対象外
 

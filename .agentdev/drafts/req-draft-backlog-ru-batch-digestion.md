@@ -2,6 +2,7 @@
 draft_type: req_draft
 topic_slug: backlog-ru-batch-digestion
 status: saved
+design_actions_consumed: true
 created_at: 2026-08-22T18:42:31+09:00
 source_rus: [RU-0001, RU-0002, RU-0003, RU-0004, RU-0005, RU-0006, RU-0007, RU-0008, RU-0009]
 ---
