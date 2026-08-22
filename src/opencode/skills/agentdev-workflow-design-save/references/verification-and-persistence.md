@@ -74,6 +74,7 @@ Design 一覧表の整合を確認し、targeted docs guard と extension 更新
 Design 新規作成時は `docs/designs/README.md` の Design 一覧表に追加済みであることを確認する（STEP-6 で実施済みの場合は重複確認）。
 Design 一覧表の整合は Design 探索導線の維持に必要な更新のみを対象とし、要件、判断、仕様の更新は含まない。
 
+- **Design バッチ更新時の参照先用語横断確認**: 同一実行で複数の Design へ一括反映（バッチ更新）する場合、各 Design 本文が他の成果物（Design、command、skill 等）を整合先として引用する箇所について、引用した用語が参照先成果物に実在するかを横断確認する。参照先成果物に存在しない用語（未定義用語）を発見した場合は、実在する表現へ修正するか当該引用を除去してから保存を確定する。確認結果は STEP-11 の完了報告に含める。単一 Design のみを更新する場合は本確認を省略できる
 - **extension 更新要否の確認**: Design の追加、移動、分割が `.agentdev/extensions/**` に影響するか確認する。移動または分割により extension 参照先 Design パスが変わる場合、当該 extension の context paths を更新する。extension 参照先 Design を移動した場合はエラーとし、design-save 自身は移動を完了させずユーザー判断を仰ぐ（check #5 strict 違反を防止）。Design 新規作成で既存 command/skill の実行時参照が増える場合、対応 extension の `context` への追加をユーザーに提案する（直接編集しない）
 - **targeted docs guard**: 変更 Design ファイルと連動ファイル（`docs/designs/README.md`）に対し `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_changed_docs.ts --workflow design-save --files <changed Design files> --json` を実行する（bun run 起動。モード使い分けの標準は コミット前の worktree 上での検証 = `--base-ref`、コミット後・PR 作成後の main 環境 = `--files` であり、保存直後ファイルの直接指定には `--files` を使用する。PowerShell で複数パスを渡す場合は配列変数経由（`$files = @('a.md','b.md')` を `--files $files` で渡す）または個別渡しとし、引用符まとめ渡し（`--files "a.md b.md"`）は使用しない）。`failures` に strict severity を含む場合は保存工程を継続せず修正して再実行する。`spec_readme_update_required` が true の場合は STEP-6 の更新要否判定に反映する。`full_docs_check_recommended` が true の場合は全体監査（self-hosting リポジトリ限定の自己監査コマンド）の実行をユーザーに提案する
 
@@ -88,6 +89,7 @@ Design 一覧表の整合は Design 探索導線の維持に必要な更新の�
 ### Completion Verification
 
 - targeted docs guard の failures に strict severity を含まないこと
+- Design バッチ更新（同一実行で複数 Design への一括反映）時は参照先用語の実在確認が完了していること
 
 ### Resume-Idempotency
 

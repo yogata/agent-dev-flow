@@ -24,6 +24,7 @@ Epic 実証（Epic Issue 本文の実証Case状態情報で共有評価ブラン
 - 現在 Wave の全子Issue マージ、クローズ完了（E4-1 最終 gate 違反子Issue は `blocked` としてマージ対象外、Epic status table へ反映）
 - Epic status table 更新完了（単一書き手 case-close のみ）
 - Epic Issue 完了条件チェックボックス最終評価・更新（QG-4 観点8、中間 Wave vs 最終 Wave 評価スコープ切替）
+- 当該 Wave スコープの一時成果物残留確認結果（残留時は当該 Wave を完了扱いにしない）
 - 最終 Wave 判定結果（Epic クローズ または 残 Wave 通知）
 - Epic 実証の最終 Wave 判定時: 最終評価結果の導出と Epic Issue 最終コメント正規記録、正式化経路案内（中間Waveでは案内しない）
 
@@ -80,18 +81,28 @@ gate 違反子Issue は本シーケンスの対象外とする。
 - Capture 回収（PR 本文の `## Findings / Capture候補` から intake/learning 分離）
 - コンフリクト解消（Level 1 rebase パス、Level 2/3 は case-auto エスカレーション）
 
-### E5: Epic status table 更新（単一書き手 case-close のみ）
+### E5: Epic Issue 本文更新（Epic status table 更新、完了条件チェックボックス評価、単一書き手 case-close のみ）
 
 Epic Issue 本文のステータス追跡テーブルを更新。
 **単一書き手制約**: case-close のみが実施（case-run は読み取りのみ、case-auto は Wave 反復制御のみで直接書き込まない、last-write-wins 競合防止）。
 
-### E5b: Epic Issue 完了条件チェックボックス最終評価・更新
+#### E5-1: Epic Issue 完了条件チェックボックス最終評価・更新
 
 QG-4 観点8 に基づく評価スコープ切替（中間 Wave vs 最終 Wave）を実施し、Epic Issue の完了条件チェックボックスを最終評価・更新する。
 
+完了条件チェックボックスの項目が字母後綴（a/b）形式の副項目列挙（「(a) …」「(b) …」等）を含む場合は、チェックボックス単位ではなく副項目単位で評価スコープを決定する（観点8 判定マトリクスを各副項目に適用）。
+中間 Wave では当該 Wave の PR 対象範囲に含まれる副項目のみ達成を評価し、範囲外の副項目は後続 Wave での評価対象として保留する（未達とは判定しない）。
+チェックボックスは全副項目の達成が確認できるまで更新しない。
+
 ### E6: 最終 Wave 判定
 
-- **全子Issue completed** → Epic Issue クローズ
+#### E6-1: 当該 Wave スコープの一時成果物残留確認
+
+最終 Wave 判定の前に、当該 Wave スコープの一時成果物（draft、RU、検出事項等のドメイン状態）の残留を確認する。
+あわせて当該実行で `.agentdev/tmp/` に作成した一時ファイルの残存を確認する（single-Issue ルートの STEP-6-6 と同一趣旨）。
+残留を検出した場合は当該 Wave を完了扱いにせず、残留内容と対応方針を構造化エラーで報告して停止する（自動削除しない）。
+
+- **全子Issue completed かつ一時成果物残留なし** → Epic Issue クローズ
 - **以外** → 残 Wave 通知（次 Wave の case-run 実行をユーザーに促す）
 
 **Epic 実証の最終 case-close（全子Issue completed で Epic クローズする場合のみ）**:
@@ -113,11 +124,12 @@ QG-4 観点8 に基づく評価スコープ切替（中間 Wave vs 最終 Wave�
 
 ## Evidence
 
-- Epic Issue 本文読取結果、Epic 実証判定根拠（実証Case状態情報と共有評価ブランチ）、E4-1 最終 gate の JSON 結果（子Issue 別）、マージ・クローズ結果、Epic status table 更新の VERIFY 結果、最終 Wave 判定根拠、Epic 実証最終クローズ時は最終評価結果の導出根拠と Epic Issue 最終コメントの VERIFY 結果
+- Epic Issue 本文読取結果、Epic 実証判定根拠（実証Case状態情報と共有評価ブランチ）、E4-1 最終 gate の JSON 結果（子Issue 別）、マージ・クローズ結果、Epic status table 更新の VERIFY 結果、一時成果物残留確認結果、最終 Wave 判定根拠、Epic 実証最終クローズ時は最終評価結果の導出根拠と Epic Issue 最終コメントの VERIFY 結果
 
 ## Completion Verification
 
 - E4-2 対象が E4-1 合格子Issue のみであること。`blocked`/`failed` を `completed` に上書きしていないこと。Epic status table 更新後の再読込 VERIFY が合格であること。Epic 実証の最終 Wave では新しい評価を開始せず最終評価結果が Epic Issue 最終コメントへ正規記録済みであり、正式化経路案内を含むこと（中間Waveでは案内していないこと）
+- 当該 Wave スコープの一時成果物（draft、RU、検出事項等）の残留と当該実行で `.agentdev/tmp/` に作成した一時ファイルの残存を E6-1 で確認済みであり、残留時は当該 Wave を完了扱いしていないこと
 
 ## Resume-Idempotency
 
@@ -130,6 +142,7 @@ QG-4 観点8 に基づく評価スコープ切替（中間 Wave vs 最終 Wave�
 - PR 作成済み子Issue 一覧、各子Issue の E4-1 最終 gate 結果（合格 / 違反 / スキップ）
 - 各子Issue のマージ・クローズ・評価状態（E4-2 対象は E4-1 合格子Issue のみ）
 - Epic status table 更新状態、Epic Issue 完了条件チェックボックス評価状態
+- 当該 Wave スコープの一時成果物残留確認状態（E6-1）
 - Epic 実証の最終評価結果導出・Epic Issue 最終コメント正規記録状態、正式化案内実施状態
 - 最終 Wave 判定結果
 
@@ -155,3 +168,4 @@ QG-4 観点8 に基づく評価スコープ切替（中間 Wave vs 最終 Wave�
 - G24・不変条件（Epic Issue 本文ステータス追跡テーブルの更新は case-close 単一書き手、case-run は読み取りのみ、case-auto は直接書き込まない、Epic Wave クローズは現在 Wave の `running` 子Issue のみ対象、`blocked`/ `failed` を `completed` に上書きしない、べき等性）
 - E4-1 gate 違反子Issue は `blocked` へ遷移し E4-2 マージ並列シーケンスの対象外、`completed` へ上書きしない（べき等性、case-close G24 準拠）
 - 不変条件（Epic 実証の最終 Wave は新しい評価を始めず最終評価結果を Epic Issue 最終コメントへ正規記録し正式化経路 req-define <実証Issue> を案内する、Epic 中間Waveでは正式化案内を出さない、後続 req-define を自動実行しない）
+- 不変条件（E6-1 は当該 Wave スコープの一時成果物（draft、RU、検出事項等）残留と当該実行で `.agentdev/tmp/` に作成した一時ファイルの残存を確認し、残留時は当該 Wave を完了扱いにしない）

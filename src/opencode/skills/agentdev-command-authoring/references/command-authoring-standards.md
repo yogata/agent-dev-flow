@@ -511,16 +511,16 @@ capture_handoff:
 
 ### 定義
 
-```markdown
-### Step N: {検査名}（delegated_check）
+delegated_check は工程表（前出出力検証表）の行として記述する。
+公開 command の手順セクションの正規形は表形式であり、`### Step N` 見出しの逐次列挙は使用しない。
 
-- **委譲先**: skill `{skill-name}`, reference `{path}`
-- **入力**: {検査対象、参照基準、除外対象}
-- **副作用境界**: 検査対象を直接修正しない。許可操作は `read_files` / `inspect_content` / `return_evidence` 等。保存、Issue / PR 更新、commit、push、ユーザー確認は禁止
-- **返却形式**: `pass` / `warn` / `fail` / `partial`、要約、根拠、親判断事項、副作用なしの明示
-- **capture handoff**: intake / learning 候補は保存せず親へ返す
-- **制約**: 検証結果の最終判断は本コマンドが保持する
+```markdown
+| 工程 | 前提条件 | 出力契約 | 検証基準 |
+|---|---|---|---|
+| STEP-N {検査名}（delegated_check、委譲先: skill `{skill-name}`） | {検査対象、参照基準、除外対象の確定} | `pass` / `warn` / `fail` / `partial`、要約、根拠、親判断事項、intake / learning 候補（保存せず親へ返す） | 副作用なし（許可操作は `read_files` / `inspect_content` / `return_evidence` 等。保存、Issue / PR 更新、commit、push、ユーザー確認は委譲しない）。検証結果の最終判断は本コマンドが保持すること |
 ```
+
+委譲先の記述は skill 名と責務名までとし、他 skill の内部 reference path（`references/*.md`）は直接指定しない（「他 Skill 参照境界」参照）。
 
 ### 制約
 
