@@ -1,0 +1,71 @@
+# skill-projection-manifest.yaml
+#
+# IR-068 (Issue #2383 (d)、inspect F-01): src 側スキル集合と .opencode 投影スキル
+# 集合の突合検査（skill-projection-manifest）が使用する検出データ。
+#
+# 本 YAML は検出ビューであり、スキル集合の正規情報源は src/opencode/skills/ の
+# ディレクトリ列挙である（宣言的データ YAML の schema 原則、
+# docs/designs/integrity/checker-execution-contracts.md）。
+# 投影（.opencode/skills junction）の契約は docs/designs/local/runtime-package-boundary.md
+# が正規所有する。
+#
+# 同期条件: src/opencode/skills/ へのスキル追加・削除・リネームは本マニフェストを
+# 同一 PR で更新すること。manifest ↔ src の不一致は check_integrity.ts
+# （IR-068 skill-projection-manifest）が strict fail として検出する。
+# 投影比較は junction 環境（.opencode/skills に非 repo-* ディレクトリが存在する場合）
+# のみ実施し、worktree（junction 未伝播、REQ-018）では info で skip する。
+
+schema_version: 1
+generated_at: 2026-08-22
+
+skills:
+  - agentdev-adversarial-review
+  - agentdev-architecture-advisory
+  - agentdev-artifact-validation
+  - agentdev-backlog-integration
+  - agentdev-case-run-execution-adapter
+  - agentdev-command-authoring
+  - agentdev-command-creator
+  - agentdev-conventional-commits
+  - agentdev-decision-file-manager
+  - agentdev-decision-guidelines
+  - agentdev-design-file-manager
+  - agentdev-doc-diagnostics
+  - agentdev-doc-writing
+  - agentdev-epic-tracker
+  - agentdev-gh-cli
+  - agentdev-git-worktree
+  - agentdev-inspect-skills
+  - agentdev-intake-pipeline
+  - agentdev-issue-management
+  - agentdev-learning-capture
+  - agentdev-learning-pipeline
+  - agentdev-project-extensions
+  - agentdev-quality-gates
+  - agentdev-req-analysis
+  - agentdev-req-file-manager
+  - agentdev-req-structure-diagnostics
+  - agentdev-skill-authoring
+  - agentdev-traceability
+  - agentdev-workflow-backlog-auto
+  - agentdev-workflow-backlog-review
+  - agentdev-workflow-case-auto
+  - agentdev-workflow-case-close
+  - agentdev-workflow-case-open
+  - agentdev-workflow-case-run
+  - agentdev-workflow-case-update
+  - agentdev-workflow-design-save
+  - agentdev-workflow-inspect-docs
+  - agentdev-workflow-inspect-promote
+  - agentdev-workflow-inspect-skills
+  - agentdev-workflow-intake-capture
+  - agentdev-workflow-intake-from-github
+  - agentdev-workflow-intake-promote
+  - agentdev-workflow-learning-promote
+  - agentdev-workflow-lifecycle
+  - agentdev-workflow-orchestration
+  - agentdev-workflow-req-define
+  - agentdev-workflow-req-save
+  - agentdev-workflow-routing
+  - agentdev-workflow-templates
+  - japanese-tech-writing

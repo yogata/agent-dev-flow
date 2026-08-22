@@ -2947,6 +2947,1941 @@
       "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
     },
     {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": ".agentdev/extensions/skills/agentdev-workflow-case-auto.yaml",
+      "evidence": "REQ-006-112",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/decisions/DEC-008.md",
+      "evidence": "REQ-006-112",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/decisions/DEC-008.md",
+      "evidence": "REQ-006-113",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/decisions/DEC-008.md",
+      "evidence": "REQ-006-114",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/decisions/DEC-008.md",
+      "evidence": "REQ-006-086",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/decisions/DEC-008.md",
+      "evidence": "REQ-006-085",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/decisions/DEC-008.md",
+      "evidence": "REQ-006-024",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/decisions/DEC-008.md",
+      "evidence": "REQ-006-025",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/decisions/DEC-011.md",
+      "evidence": "REQ-002-022",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/decisions/DEC-013.md",
+      "evidence": "REQ-010-053",
+      "count": 4,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/decisions/DEC-014.md",
+      "evidence": "REQ-002-028",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/decisions/DEC-017.md",
+      "evidence": "REQ-001-045",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/decisions/README.md",
+      "evidence": "REQ-010-053",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/decisions/README.md",
+      "evidence": "REQ-006-112",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/backlog-review.md",
+      "evidence": "REQ-004-087",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-082",
+      "count": 4,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-006",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-110",
+      "count": 5,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-026",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-073",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-051",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-055",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-057",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-012",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-014",
+      "count": 3,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-013",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-024",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-018",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-015",
+      "count": 3,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-016",
+      "count": 6,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-084",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-053",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-092",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-027",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-114",
+      "count": 4,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-112",
+      "count": 6,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-094",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-028",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-113",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-085",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-086",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-close.md",
+      "evidence": "REQ-006-028",
+      "count": 3,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-close.md",
+      "evidence": "REQ-006-029",
+      "count": 3,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-close.md",
+      "evidence": "REQ-006-021",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-close.md",
+      "evidence": "REQ-006-027",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-close.md",
+      "evidence": "REQ-006-025",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-close.md",
+      "evidence": "REQ-006-024",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-close.md",
+      "evidence": "REQ-006-026",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-close.md",
+      "evidence": "REQ-006-030",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-005-042",
+      "count": 3,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-006-027",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-006-009",
+      "count": 3,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-006-026",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-006-006",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-006-028",
+      "count": 3,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-006-021",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-006-022",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-006-023",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-006-008",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-005-041",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-006-024",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-006-025",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-006-087",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-006-088",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-006-005",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-006-007",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-006-015",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-006-017",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-006-010",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-006-011",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-006-089",
+      "count": 3,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-006-095",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-006-101",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-open.md",
+      "evidence": "REQ-006-093",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-run.md",
+      "evidence": "REQ-006-029",
+      "count": 3,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-run.md",
+      "evidence": "REQ-006-023",
+      "count": 3,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-run.md",
+      "evidence": "REQ-006-016",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-run.md",
+      "evidence": "REQ-006-030",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-run.md",
+      "evidence": "REQ-006-025",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-run.md",
+      "evidence": "REQ-006-031",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-run.md",
+      "evidence": "REQ-006-035",
+      "count": 3,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-run.md",
+      "evidence": "REQ-006-033",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-run.md",
+      "evidence": "REQ-006-007",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-run.md",
+      "evidence": "REQ-006-034",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-run.md",
+      "evidence": "REQ-006-021",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-run.md",
+      "evidence": "REQ-006-087",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-run.md",
+      "evidence": "REQ-006-026",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-run.md",
+      "evidence": "REQ-006-088",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-run.md",
+      "evidence": "REQ-006-028",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-run.md",
+      "evidence": "REQ-006-014",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/design-save.md",
+      "evidence": "REQ-001-029",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/design-save.md",
+      "evidence": "REQ-001-069",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/design-save.md",
+      "evidence": "REQ-006-087",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/design-save.md",
+      "evidence": "REQ-006-091",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/intake-promote.md",
+      "evidence": "REQ-004-087",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/learning-promote.md",
+      "evidence": "REQ-004-087",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/req-define.md",
+      "evidence": "REQ-004-072",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/req-define.md",
+      "evidence": "REQ-004-073",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/req-define.md",
+      "evidence": "REQ-004-087",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/req-define.md",
+      "evidence": "REQ-004-088",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/req-define.md",
+      "evidence": "REQ-004-083",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/req-define.md",
+      "evidence": "REQ-004-084",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/req-define.md",
+      "evidence": "REQ-004-085",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/req-define.md",
+      "evidence": "REQ-004-078",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/req-define.md",
+      "evidence": "REQ-004-079",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/req-define.md",
+      "evidence": "REQ-008-059",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/req-define.md",
+      "evidence": "REQ-001-068",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/req-save.md",
+      "evidence": "REQ-004-081",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/req-save.md",
+      "evidence": "REQ-006-087",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/req-save.md",
+      "evidence": "REQ-006-090",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/foundations/design-principles.md",
+      "evidence": "REQ-005-034",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/foundations/design-principles.md",
+      "evidence": "REQ-001-029",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/foundations/design-principles.md",
+      "evidence": "REQ-002-163",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/foundations/document-model.md",
+      "evidence": "REQ-001-037",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/foundations/document-model.md",
+      "evidence": "REQ-001-068",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/foundations/document-model.md",
+      "evidence": "REQ-001-069",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/foundations/document-model.md",
+      "evidence": "REQ-006-083",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/foundations/document-model.md",
+      "evidence": "REQ-001-045",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/foundations/document-model.md",
+      "evidence": "REQ-001-067",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/foundations/harness-separation-model.md",
+      "evidence": "REQ-002-021",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/foundations/harness-separation-model.md",
+      "evidence": "REQ-002-028",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/integrity/docs-spec-rebuild-integrity.md",
+      "evidence": "REQ-002-028",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/integrity/docs-spec-rebuild-integrity.md",
+      "evidence": "REQ-002-029",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/integrity/integrity-contracts.md",
+      "evidence": "REQ-001-069",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/integrity/integrity-contracts.md",
+      "evidence": "REQ-001-067",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/integrity/integrity-rule-catalog.md",
+      "evidence": "REQ-002-021",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/integrity/integrity-rule-catalog.md",
+      "evidence": "REQ-002-028",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/integrity/integrity-rule-catalog.md",
+      "evidence": "REQ-002-079",
+      "count": 3,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/integrity/rule-ownership.md",
+      "evidence": "REQ-002-044",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/local/runtime-package-boundary.md",
+      "evidence": "REQ-002-061",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/local/runtime-package-boundary.md",
+      "evidence": "REQ-002-064",
+      "count": 3,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/local/runtime-package-boundary.md",
+      "evidence": "REQ-002-056",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/local/runtime-package-boundary.md",
+      "evidence": "REQ-002-063",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/local/runtime-package-boundary.md",
+      "evidence": "REQ-002-065",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/quality/req-health-metrics.md",
+      "evidence": "REQ-001-069",
+      "count": 4,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/quality/req-health-metrics.md",
+      "evidence": "REQ-001-068",
+      "count": 3,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/quality/req-health-metrics.md",
+      "evidence": "REQ-001-079",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/artifact-contracts.md",
+      "evidence": "REQ-002-021",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/artifact-contracts.md",
+      "evidence": "REQ-002-045",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/artifact-contracts.md",
+      "evidence": "REQ-002-103",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/artifact-contracts.md",
+      "evidence": "REQ-002-104",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/artifact-contracts.md",
+      "evidence": "REQ-002-105",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/artifact-contracts.md",
+      "evidence": "REQ-002-159",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/artifact-contracts.md",
+      "evidence": "REQ-001-029",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/artifact-contracts.md",
+      "evidence": "REQ-002-046",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/artifact-contracts.md",
+      "evidence": "REQ-002-129",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/artifact-contracts.md",
+      "evidence": "REQ-002-126",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/artifact-contracts.md",
+      "evidence": "REQ-002-130",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/artifact-contracts.md",
+      "evidence": "REQ-002-136",
+      "count": 3,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/artifact-contracts.md",
+      "evidence": "REQ-002-132",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/artifact-contracts.md",
+      "evidence": "REQ-002-140",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/artifact-contracts.md",
+      "evidence": "REQ-002-135",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/artifact-contracts.md",
+      "evidence": "REQ-002-131",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/artifact-contracts.md",
+      "evidence": "REQ-006-083",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/artifact-responsibilities.md",
+      "evidence": "REQ-002-057",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/document-type-responsibilities.md",
+      "evidence": "REQ-001-069",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/document-type-responsibilities.md",
+      "evidence": "REQ-001-079",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/document-type-responsibilities.md",
+      "evidence": "REQ-001-066",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/req-impact-map.md",
+      "evidence": "REQ-002-021",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/req-impact-map.md",
+      "evidence": "REQ-002-028",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/req-impact-map.md",
+      "evidence": "REQ-001-067",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/responsibility-boundary-purification.md",
+      "evidence": "REQ-006-089",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/responsibility-boundary-purification.md",
+      "evidence": "REQ-006-091",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/responsibility-boundary-purification.md",
+      "evidence": "REQ-006-093",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/responsibility-boundary-purification.md",
+      "evidence": "REQ-006-090",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/responsibility-boundary-purification.md",
+      "evidence": "REQ-001-079",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/responsibility-boundary-purification.md",
+      "evidence": "REQ-001-069",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-artifact-validation.md",
+      "evidence": "REQ-002-160",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-artifact-validation.md",
+      "evidence": "REQ-002-159",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-artifact-validation.md",
+      "evidence": "REQ-001-029",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-case-run-execution-adapter.md",
+      "evidence": "REQ-006-021",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-design-file-manager.md",
+      "evidence": "REQ-002-159",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-doc-diagnostics.md",
+      "evidence": "REQ-002-140",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-epic-tracker.md",
+      "evidence": "REQ-006-030",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-intake-pipeline.md",
+      "evidence": "REQ-006-021",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-issue-management.md",
+      "evidence": "REQ-006-024",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-learning-capture.md",
+      "evidence": "REQ-006-021",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-req-analysis.md",
+      "evidence": "REQ-001-067",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-req-analysis.md",
+      "evidence": "REQ-001-068",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-workflow-lifecycle.md",
+      "evidence": "REQ-004-056",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/backlog-artifact-lifecycle.md",
+      "evidence": "REQ-001-069",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/capture-boundaries.md",
+      "evidence": "REQ-006-021",
+      "count": 6,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/delegation-contracts.md",
+      "evidence": "REQ-006-087",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/delegation-contracts.md",
+      "evidence": "REQ-006-092",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/delegation-contracts.md",
+      "evidence": "REQ-006-093",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/delegation-contracts.md",
+      "evidence": "REQ-006-112",
+      "count": 4,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/delegation-contracts.md",
+      "evidence": "REQ-006-113",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/delegation-contracts.md",
+      "evidence": "REQ-006-085",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/epic-wave-model.md",
+      "evidence": "REQ-006-004",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/epic-wave-model.md",
+      "evidence": "REQ-006-019",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/epic-wave-model.md",
+      "evidence": "REQ-006-020",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/epic-wave-model.md",
+      "evidence": "REQ-006-012",
+      "count": 4,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/epic-wave-model.md",
+      "evidence": "REQ-006-030",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/epic-wave-model.md",
+      "evidence": "REQ-006-026",
+      "count": 4,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/epic-wave-model.md",
+      "evidence": "REQ-006-021",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/epic-wave-model.md",
+      "evidence": "REQ-006-086",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/epic-wave-model.md",
+      "evidence": "REQ-006-014",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/epic-wave-model.md",
+      "evidence": "REQ-006-013",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/epic-wave-model.md",
+      "evidence": "REQ-006-018",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/epic-wave-model.md",
+      "evidence": "REQ-006-024",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/epic-wave-model.md",
+      "evidence": "REQ-006-015",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/epic-wave-model.md",
+      "evidence": "REQ-006-091",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/epic-wave-model.md",
+      "evidence": "REQ-006-005",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/epic-wave-model.md",
+      "evidence": "REQ-006-016",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/epic-wave-model.md",
+      "evidence": "REQ-006-027",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/epic-wave-model.md",
+      "evidence": "REQ-006-089",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/workflow-contracts.md",
+      "evidence": "REQ-005-048",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/workflow-contracts.md",
+      "evidence": "REQ-005-049",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/workflow-contracts.md",
+      "evidence": "REQ-006-017",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/workflow-contracts.md",
+      "evidence": "REQ-001-037",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/workflow-contracts.md",
+      "evidence": "REQ-006-112",
+      "count": 2,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/workflow-contracts.md",
+      "evidence": "REQ-006-085",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/workflow-contracts.md",
+      "evidence": "REQ-006-015",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/requirements/REQ-008.md",
+      "evidence": "REQ-008-059",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/requirements/REQ-027.md",
+      "evidence": "REQ-002-022",
+      "count": 1,
+      "provenance": "issue-2383-ir067-initial-baseline",
+      "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
@@ -4439,6 +6374,69 @@
       "count": 1,
       "provenance": "legacy",
       "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
+    },
+    {
+      "category": "SkillProjection",
+      "check": "skill-projection-manifest",
+      "file": null,
+      "evidence": "projection-missing:agentdev-design-file-manager",
+      "count": 1,
+      "provenance": "issue-2383-f01-junction-rebuild-pending",
+      "reason": "Issue #2383 F-01 known projection divergence. junctions under the skills projection dir are gitignored local-ops state (RD-002, PR-scope-external): rebuild via the install script -Mode apply after merge resolves this entry."
+    },
+    {
+      "category": "SkillProjection",
+      "check": "skill-projection-manifest",
+      "file": null,
+      "evidence": "projection-missing:agentdev-traceability",
+      "count": 1,
+      "provenance": "issue-2383-f01-junction-rebuild-pending",
+      "reason": "Issue #2383 F-01 known projection divergence. junctions under the skills projection dir are gitignored local-ops state (RD-002, PR-scope-external): rebuild via the install script -Mode apply after merge resolves this entry."
+    },
+    {
+      "category": "SkillProjection",
+      "check": "skill-projection-manifest",
+      "file": null,
+      "evidence": "projection-missing:agentdev-workflow-backlog-auto",
+      "count": 1,
+      "provenance": "issue-2383-f01-junction-rebuild-pending",
+      "reason": "Issue #2383 F-01 known projection divergence. junctions under the skills projection dir are gitignored local-ops state (RD-002, PR-scope-external): rebuild via the install script -Mode apply after merge resolves this entry."
+    },
+    {
+      "category": "SkillProjection",
+      "check": "skill-projection-manifest",
+      "file": null,
+      "evidence": "projection-missing:agentdev-workflow-design-save",
+      "count": 1,
+      "provenance": "issue-2383-f01-junction-rebuild-pending",
+      "reason": "Issue #2383 F-01 known projection divergence. junctions under the skills projection dir are gitignored local-ops state (RD-002, PR-scope-external): rebuild via the install script -Mode apply after merge resolves this entry."
+    },
+    {
+      "category": "SkillProjection",
+      "check": "skill-projection-manifest",
+      "file": null,
+      "evidence": "projection-broken:agentdev-artifact-graph",
+      "count": 1,
+      "provenance": "issue-2383-f01-junction-rebuild-pending",
+      "reason": "Issue #2383 F-01 known stale junction (unresolvable projection entry). junctions under the skills projection dir are gitignored local-ops state (RD-002, PR-scope-external): rebuild via the install script -Mode apply after merge resolves this entry."
+    },
+    {
+      "category": "SkillProjection",
+      "check": "skill-projection-manifest",
+      "file": null,
+      "evidence": "projection-broken:agentdev-spec-file-manager",
+      "count": 1,
+      "provenance": "issue-2383-f01-junction-rebuild-pending",
+      "reason": "Issue #2383 F-01 known stale junction (unresolvable projection entry). junctions under the skills projection dir are gitignored local-ops state (RD-002, PR-scope-external): rebuild via the install script -Mode apply after merge resolves this entry."
+    },
+    {
+      "category": "SkillProjection",
+      "check": "skill-projection-manifest",
+      "file": null,
+      "evidence": "projection-broken:agentdev-workflow-spec-save",
+      "count": 1,
+      "provenance": "issue-2383-f01-junction-rebuild-pending",
+      "reason": "Issue #2383 F-01 known stale junction (unresolvable projection entry). junctions under the skills projection dir are gitignored local-ops state (RD-002, PR-scope-external): rebuild via the install script -Mode apply after merge resolves this entry."
     },
     {
       "category": "Specs",

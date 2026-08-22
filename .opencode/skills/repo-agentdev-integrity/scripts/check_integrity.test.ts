@@ -3824,3 +3824,531 @@ describe("IR-065/IR-066 vocabulary map drift (REQ-047-004, Issue #2373)", () => 
     expect(drift[0].evidence).toBe("checker-only:0,yaml-only:0,rule-mismatch:1");
   });
 });
+
+// ─── IR-066 vocabulary extension (Issue #2383 (b) v1〜v4 再走査採用分) ────────
+// Fixture kinds: 正常例 (現行名称のみ), 違反例 (旧 command 名・旧 skill 名の現行参照),
+// 境界例 (否定文脈「廃止する」), 許容例 (DEC-006 exemption_files・superseded Decision),
+// 再現例 (F-01 stale junction 旧称 agentdev-spec-file-manager / agentdev-workflow-spec-save)。
+
+const IR066EXT_ROOT = join(TEMP_ROOT, "ir066ext");
+
+function buildIr066ExtFixture(root: string): void {
+  buildIr065Fixture(root);
+
+  const cmdDir = join(root, "src", "opencode", "commands", "agentdev");
+  // 違反例 + 再現例（F-01 stale junction 旧称）
+  writeFileSync(
+    join(cmdDir, "retired-name-cmd.md"),
+    [
+      "---",
+      "description: retired name violation command",
+      "agent: test-agent",
+      "---",
+      "",
+      "extension 検査は inspect-extensions を起動する。",
+      "",
+      "SPEC ファイル操作は agentdev-spec-file-manager へ委譲する。",
+      "",
+      "Design 保存工程は agentdev-workflow-spec-save が担う。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 境界例: 否定文脈（廃止する）内の言及は検出しない
+  const designDir = join(root, "docs", "designs", "skills");
+  writeFileSync(
+    join(designDir, "negation-design.md"),
+    "# Negation design\n\n旧 command である inspect-extensions を独立公開 command として廃止する。\n",
+    "utf-8",
+  );
+
+  // 許容例: DEC-006 は exemption_files（inspect-extensions 廃止の移行記録）
+  writeFileSync(
+    join(root, "docs", "decisions", "DEC-006.md"),
+    [
+      "---",
+      "id: DEC-006",
+      "title: inspect 3-command normalization",
+      "status: accepted",
+      "---",
+      "",
+      "# DEC-006",
+      "",
+      "inspect-extensions を独立公開 command として廃止し、責務を移管する。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 正常例: 現行名称（inspect-skills / agentdev-design-file-manager / agentdev-workflow-design-save）
+  writeFileSync(
+    join(designDir, "current-ext-design.md"),
+    [
+      "# Current extension design",
+      "",
+      "extension 検査の意味診断は inspect-skills が担う。",
+      "",
+      "Design ファイル操作は agentdev-design-file-manager へ、保存工程は agentdev-workflow-design-save へ委譲する。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+}
+
+describe("IR-066 vocabulary extension (Issue #2383 (b) resweep adoption)", () => {
+  beforeAll(() => {
+    mkdirp(IR066EXT_ROOT);
+    buildIr066ExtFixture(IR066EXT_ROOT);
+  });
+
+  it("passes current command/skill names (正常例)", () => {
+    const r = runScript(IR066EXT_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { category: string; file?: string }) =>
+        res.category === "LegacyPathName" &&
+        (res.file ?? "").includes("current-ext-design.md"),
+    );
+    expect(violations.length).toBe(0);
+  });
+
+  it("detects retired command and skill names as current references (違反例・再現例)", () => {
+    const r = runScript(IR066EXT_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const evidence = parsed.results
+      .filter(
+        (res: { category: string; file?: string }) =>
+          res.category === "LegacyPathName" &&
+          (res.file ?? "").includes("retired-name-cmd.md"),
+      )
+      .map((res: { evidence?: string }) => res.evidence ?? "");
+    expect(evidence).toContain(
+      "inspect-extensions-command:inspect-extensions",
+    );
+    expect(evidence).toContain(
+      "agentdev-spec-file-manager-skill:agentdev-spec-file-manager",
+    );
+    expect(evidence).toContain(
+      "agentdev-workflow-spec-save-skill:agentdev-workflow-spec-save",
+    );
+  });
+
+  it("does not flag negation-context mentions (境界例)", () => {
+    const r = runScript(IR066EXT_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { category: string; file?: string }) =>
+        res.category === "LegacyPathName" &&
+        (res.file ?? "").includes("negation-design.md"),
+    );
+    expect(violations.length).toBe(0);
+  });
+
+  it("exempts DEC-006 migration record via exemption_files (許容例)", () => {
+    const r = runScript(IR066EXT_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { category: string; file?: string }) =>
+        res.category === "LegacyPathName" &&
+        (res.file ?? "").endsWith("docs/decisions/DEC-006.md"),
+    );
+    expect(violations.length).toBe(0);
+  });
+});
+
+// ─── IR-067 referenced-req-row-existence (REQ-010-069, Issue #2383 (a)) ───────
+// Fixture kinds: 正常例 (実在行 ID の引用), 違反例 (ファントム行 ID),
+// 境界例 (v2: プレフィックス・プレースホルダー・旧4桁番号帯・code span),
+// 許容例 (_template.md・AUTOGEN ブロック・IR ルール説明文),
+// 再現例 (PR 2284 ファントム REQ-010-NNN 引用残存)。
+
+const IR067_ROOT = join(TEMP_ROOT, "ir067");
+
+function buildIr067Fixture(root: string): void {
+  const reqDir = join(root, "docs", "requirements");
+  mkdirp(reqDir);
+  writeFileSync(
+    join(reqDir, "README.md"),
+    "# Requirements\n\n| ID | Title |\n|----|-------|\n| REQ-930 | IR-067 fixture |\n",
+    "utf-8",
+  );
+  writeFileSync(
+    join(reqDir, "REQ-930.md"),
+    [
+      "---",
+      "id: REQ-930",
+      "title: IR-067 fixture",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "## 要件",
+      "",
+      "| ID | 要件 |",
+      "|---|---|",
+      "| REQ-930-001 | 実在する要件行その1 |",
+      "| REQ-930-002 | 実在する要件行その2 |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+  mkdirp(join(root, "docs", "designs"));
+  writeFileSync(join(root, "docs", "designs", "README.md"), "# Design\n", "utf-8");
+
+  const designDir = join(root, "docs", "designs", "skills");
+  mkdirp(designDir);
+
+  // 正常例: 実在行 ID の引用
+  writeFileSync(
+    join(designDir, "ok-design.md"),
+    "# Ok design\n\n本検査は REQ-930-001 および REQ-930-002 を満たす。\n",
+    "utf-8",
+  );
+
+  // 違反例 + 再現例: ファントム行 ID（PR 2284 と同種の未コミット草案番号）
+  writeFileSync(
+    join(designDir, "phantom-design.md"),
+    [
+      "# Phantom design",
+      "",
+      "本検査は REQ-930-099 を満たす（未コミット草案番号の引用残存）。",
+      "",
+      "REQ-930-100 も引用する。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 境界例: v2: プレフィックス、プレースホルダー様式例示、旧4桁番号帯、code span
+  writeFileSync(
+    join(designDir, "boundary-design.md"),
+    [
+      "# Boundary design",
+      "",
+      "歴史識別子 v2:REQ-0158-004 は許容する。",
+      "",
+      "様式例示 REQ-930-NNN はプレースホルダーであり実在検査対象外である。",
+      "",
+      "旧番号帯 REQ-0136-029 は現行3桁番号帯の検査対象外である。",
+      "",
+      "`REQ-930-099` は code span 内の様式例示である。",
+      "",
+      "```",
+      "REQ-930-099 inside fenced code block",
+      "```",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 許容例: _template.md と AUTOGEN ブロック
+  writeFileSync(
+    join(designDir, "_template.md"),
+    "# Template\n\nREQ-930-099 はテンプレート内の例示である。\n",
+    "utf-8",
+  );
+  writeFileSync(
+    join(designDir, "autogen-design.md"),
+    [
+      "# Autogen design",
+      "",
+      "<!-- AUTOGEN:BEGIN:id=demo -->",
+      "REQ-930-099 inside autogen block",
+      "<!-- AUTOGEN:END -->",
+      "",
+      "本文は実在する REQ-930-001 のみ引用する。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 許容例: IR ルール説明文（例示用 ID を含む自己参照的資料、v2:REQ-0145-015）
+  const rulesDir = join(root, "docs", "designs", "integrity", "rules");
+  mkdirp(rulesDir);
+  writeFileSync(
+    join(rulesDir, "IR-0999-demo-rule.md"),
+    "# IR-0999 demo rule\n\n検出例: REQ-930-099 の引用は検出する。\n",
+    "utf-8",
+  );
+
+  copyScripts(root);
+}
+
+describe("IR-067 referenced-req-row-existence (REQ-010-069, Issue #2383 (a))", () => {
+  beforeAll(() => {
+    mkdirp(IR067_ROOT);
+    buildIr067Fixture(IR067_ROOT);
+  });
+
+  it("passes citations of existing requirement rows (正常例)", () => {
+    const r = runScript(IR067_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { category: string; file?: string }) =>
+        res.category === "ReqCitation" &&
+        (res.file ?? "").includes("ok-design.md"),
+    );
+    expect(violations.length).toBe(0);
+  });
+
+  it("detects phantom row citations (違反例)", () => {
+    const r = runScript(IR067_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const evidence = parsed.results
+      .filter(
+        (res: { category: string; level: string; file?: string }) =>
+          res.category === "ReqCitation" &&
+          res.level === "ng" &&
+          (res.file ?? "").includes("phantom-design.md"),
+      )
+      .map((res: { evidence?: string }) => res.evidence ?? "");
+    expect(evidence).toContain("REQ-930-099");
+    expect(evidence).toContain("REQ-930-100");
+  });
+
+  it("tolerates v2: prefix, placeholders, 4-digit legacy band, and code spans (境界例)", () => {
+    const r = runScript(IR067_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { category: string; file?: string }) =>
+        res.category === "ReqCitation" &&
+        (res.file ?? "").includes("boundary-design.md"),
+    );
+    expect(violations.length).toBe(0);
+  });
+
+  it("exempts templates, AUTOGEN blocks, and IR rule description files (許容例)", () => {
+    const r = runScript(IR067_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { category: string; file?: string }) =>
+        res.category === "ReqCitation" &&
+        ((res.file ?? "").includes("_template.md") ||
+          (res.file ?? "").includes("autogen-design.md") ||
+          (res.file ?? "").includes("IR-0999-demo-rule.md")),
+    );
+    expect(violations.length).toBe(0);
+  });
+
+  it("reproduces the PR 2284 phantom citation pattern as strict ng (再現例)", () => {
+    const r = runScript(IR067_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const phantom = parsed.results.find(
+      (res: { category: string; level: string; evidence?: string; file?: string }) =>
+        res.category === "ReqCitation" &&
+        res.level === "ng" &&
+        res.evidence === "REQ-930-099" &&
+        (res.file ?? "").includes("phantom-design.md"),
+    );
+    expect(phantom).toBeDefined();
+    expect(phantom.finding_level).toBe("strict");
+    expect(phantom.message).toContain("Phantom REQ row citation");
+  });
+});
+
+// ─── IR-068 skill-projection-manifest (Issue #2383 (d), inspect F-01) ────────
+// Fixture kinds: 正常例 (manifest ↔ src 一致), 違反例 (manifest 陳腐化・投影乖離),
+// 境界例 (worktree = junction 不在では投影比較を skip),
+// 許容例 (repo-* スキルは投影専用として許容),
+// 再現例 (F-01: src に存在するスキルの投影欠落 + 撤去済みスキルの stale junction)。
+
+const IR068_ROOT = join(TEMP_ROOT, "ir068");
+const IR068_MANIFEST_REL_PATH = join(
+  ".opencode",
+  "skills",
+  "repo-agentdev-integrity",
+  "data",
+  "skill-projection-manifest.yaml",
+);
+
+function buildIr068BaseFixture(root: string): void {
+  const reqDir = join(root, "docs", "requirements");
+  mkdirp(reqDir);
+  writeFileSync(
+    join(reqDir, "README.md"),
+    "# Requirements\n\n| ID | Title |\n|----|-------|\n| REQ-9306 | IR-068 fixture |\n",
+    "utf-8",
+  );
+  writeFileSync(
+    join(reqDir, "REQ-9306.md"),
+    "---\nid: REQ-9306\ntitle: IR-068 fixture\ncreated: 2025-01-01\nupdated: 2025-01-01\n---\n\nBody.\n",
+    "utf-8",
+  );
+  mkdirp(join(root, "docs", "designs"));
+  writeFileSync(join(root, "docs", "designs", "README.md"), "# Design\n", "utf-8");
+
+  for (const skill of ["agentdev-alpha-skill", "agentdev-beta-skill"]) {
+    const skillDir = join(root, "src", "opencode", "skills", skill);
+    mkdirp(skillDir);
+    writeFileSync(
+      join(skillDir, "SKILL.md"),
+      `---\nname: ${skill}\ndescription: fixture skill\n---\n# ${skill}\n`,
+      "utf-8",
+    );
+  }
+
+  writeFile(
+    join(root, ...IR068_MANIFEST_REL_PATH.split(/[\\/]/g)),
+    [
+      "schema_version: 1",
+      "generated_at: 2026-08-22",
+      "",
+      "skills:",
+      "  - agentdev-alpha-skill",
+      "  - agentdev-beta-skill",
+      "",
+    ].join("\n"),
+  );
+
+  copyScripts(root);
+}
+
+function writeIr068Manifest(root: string, lines: string[]): void {
+  writeFile(
+    join(root, ...IR068_MANIFEST_REL_PATH.split(/[\\/]/g)),
+    lines.join("\n") + "\n",
+  );
+}
+
+describe("IR-068 skill-projection-manifest (Issue #2383 (d), inspect F-01)", () => {
+  it("passes when manifest matches src enumeration without projection (正常例・境界例: worktree safe)", () => {
+    const root = join(IR068_ROOT, "ok");
+    mkdirp(root);
+    buildIr068BaseFixture(root);
+    const r = runScript(root, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const ngFindings = parsed.results.filter(
+      (res: { category: string; level: string }) =>
+        res.category === "SkillProjection" && res.level === "ng",
+    );
+    expect(ngFindings.length).toBe(0);
+    const skip = parsed.results.find(
+      (res: { category: string; level: string; check: string }) =>
+        res.category === "SkillProjection" &&
+        res.level === "info" &&
+        res.check === "skill-projection-manifest",
+    );
+    expect(skip).toBeDefined();
+    expect(skip.message).toContain("junction-absent");
+  });
+
+  it("detects stale manifest entries both directions (違反例: データ鮮度)", () => {
+    const root = join(IR068_ROOT, "stale-manifest");
+    mkdirp(root);
+    buildIr068BaseFixture(root);
+    writeIr068Manifest(root, [
+      "schema_version: 1",
+      "generated_at: 2026-08-22",
+      "",
+      "skills:",
+      "  - agentdev-alpha-skill",
+      "  - agentdev-ghost-skill",
+    ]);
+    const r = runScript(root, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const evidence = parsed.results
+      .filter(
+        (res: { category: string; level: string }) =>
+          res.category === "SkillProjection" && res.level === "ng",
+      )
+      .map((res: { evidence?: string }) => res.evidence ?? "");
+    expect(evidence).toContain("manifest-only:agentdev-ghost-skill");
+    expect(evidence).toContain("src-only:agentdev-beta-skill");
+  });
+
+  it("reproduces F-01: projection missing from src and stale junction extra (違反例・再現例)", () => {
+    const root = join(IR068_ROOT, "projection-divergence");
+    mkdirp(root);
+    buildIr068BaseFixture(root);
+    // src に design-save 相当を追加（F-01: workflow-design-save 投影欠落）
+    const addedSkill = join(root, "src", "opencode", "skills", "agentdev-workflow-design-save");
+    mkdirp(addedSkill);
+    writeFileSync(
+      join(addedSkill, "SKILL.md"),
+      "---\nname: agentdev-workflow-design-save\ndescription: fixture skill\n---\n# agentdev-workflow-design-save\n",
+      "utf-8",
+    );
+    writeIr068Manifest(root, [
+      "schema_version: 1",
+      "generated_at: 2026-08-22",
+      "",
+      "skills:",
+      "  - agentdev-alpha-skill",
+      "  - agentdev-beta-skill",
+      "  - agentdev-workflow-design-save",
+    ]);
+    // 投影: alpha のみ junction、beta/design-save 欠落、stale junction agentdev-artifact-graph 残存
+    for (const proj of ["agentdev-alpha-skill", "agentdev-artifact-graph", "repo-local-helper"]) {
+      const projDir = join(root, ".opencode", "skills", proj);
+      mkdirp(projDir);
+      writeFileSync(join(projDir, "SKILL.md"), `---\nname: ${proj}\ndescription: p\n---\n# ${proj}\n`, "utf-8");
+    }
+    // F-01 stale junction（リンク先欠損）の再現: エントリは存在するがディレクトリとして
+    // 解決できない投影エントリ（実環境の broken junction と同一の分類経路）
+    writeFileSync(
+      join(root, ".opencode", "skills", "agentdev-spec-file-manager"),
+      "stale junction placeholder (non-directory entry)",
+      "utf-8",
+    );
+    const r = runScript(root, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const evidence = parsed.results
+      .filter(
+        (res: { category: string; level: string }) =>
+          res.category === "SkillProjection" && res.level === "ng",
+      )
+      .map((res: { evidence?: string }) => res.evidence ?? "");
+    expect(evidence).toContain("projection-missing:agentdev-beta-skill");
+    expect(evidence).toContain("projection-missing:agentdev-workflow-design-save");
+    expect(evidence).toContain("projection-extra:agentdev-artifact-graph");
+    expect(evidence).toContain("projection-broken:agentdev-spec-file-manager");
+  });
+
+  it("tolerates repo-* projection-only skills (許容例)", () => {
+    const root = join(IR068_ROOT, "repo-local");
+    mkdirp(root);
+    buildIr068BaseFixture(root);
+    const projDir = join(root, ".opencode", "skills", "repo-agentdev-integrity");
+    mkdirp(projDir);
+    writeFileSync(join(projDir, "SKILL.md"), "---\nname: repo-agentdev-integrity\ndescription: p\n---\n# repo\n", "utf-8");
+    const alphaDir = join(root, ".opencode", "skills", "agentdev-alpha-skill");
+    mkdirp(alphaDir);
+    writeFileSync(join(alphaDir, "SKILL.md"), "---\nname: agentdev-alpha-skill\ndescription: p\n---\n# a\n", "utf-8");
+    const betaDir = join(root, ".opencode", "skills", "agentdev-beta-skill");
+    mkdirp(betaDir);
+    writeFileSync(join(betaDir, "SKILL.md"), "---\nname: agentdev-beta-skill\ndescription: p\n---\n# b\n", "utf-8");
+    const r = runScript(root, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const ngFindings = parsed.results.filter(
+      (res: { category: string; level: string }) =>
+        res.category === "SkillProjection" && res.level === "ng",
+    );
+    expect(ngFindings.length).toBe(0);
+  });
+
+  it("reports invalid or duplicate manifest entries instead of silently skipping (silent skip 禁止)", () => {
+    const root = join(IR068_ROOT, "schema-warning");
+    mkdirp(root);
+    buildIr068BaseFixture(root);
+    writeIr068Manifest(root, [
+      "schema_version: 1",
+      "generated_at: 2026-08-22",
+      "",
+      "skills:",
+      "  - agentdev-alpha-skill",
+      "  - agentdev-alpha-skill",
+      "  - Invalid_Name!",
+    ]);
+    const r = runScript(root, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const warnings = parsed.results.filter(
+      (res: { category: string; level: string; check: string }) =>
+        res.category === "SkillProjection" &&
+        res.level === "warning" &&
+        res.check === "skill-projection-manifest",
+    );
+    expect(warnings.length).toBe(2);
+  });
+});
+

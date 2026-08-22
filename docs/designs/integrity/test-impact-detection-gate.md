@@ -1,8 +1,8 @@
 ---
 title: "テスト影響範囲検出 gate"
 status: draft
-created: "2026-08-09"
-updated: "2026-08-09"
+created: 2026-08-09
+updated: 2026-08-22
 ---
 <!-- ADF-COVERS(implementation): REQ-019-001, REQ-019-002 -->
 
@@ -19,7 +19,7 @@ REQ-019 が WHAT（検出できること、検出対象・契機・処置の明�
   - Design 相対パス（例: `docs/designs/integrity/test-impact-detection-gate.md`）の文字列参照
   - Design basename（例: `test-impact-detection-gate.md`）の文字列参照
   - REQ ID（例: `REQ-019`）、Decision ID（例: `DEC-001`）の文字列参照（当該 ID を frontmatter に持つ REQ/Decision が変更対象に含まれる場合）
-- 検出対象外: node_modules/、`.worktrees/`、`.agentdev-plugin/`、`docs/requirements/retired/`、`docs/decisions/retired/`
+- 検出対象外: 任意階層の node_modules/（`src/opencode/skills/*/scripts/node_modules` 等の依存パッケージテストを含む。Issue #2383 (c)）、`.worktrees/`、`.agentdev-plugin/`、`docs/requirements/retired/`、`docs/decisions/retired/`
 
 ## 検出契機
 
