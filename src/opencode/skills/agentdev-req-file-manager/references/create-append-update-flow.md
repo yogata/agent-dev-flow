@@ -1,6 +1,6 @@
 # CREATE/APPEND/UPDATE 操作と判定フロー
 
-本ファイルは `agentdev-req-file-manager` SKILL.md の補助資料であり、REQファイル操作モード（CREATE、APPEND、UPDATE）の詳細定義、状況判定基準、APPEND/UPDATE判定フロー、廃止宣言 APPEND の precedent 利用を扱う。
+本ファイルは `agentdev-req-file-manager` SKILL.md の補助資料であり、REQファイル操作モード（CREATE、APPEND、UPDATE）の詳細定義、状況判定基準、APPEND/UPDATE判定フロー、廃止宣言 APPEND の precedent 利用、機械置換手順の適用と参照検査観点を扱う。
 SKILL.md 本文では3モードの要点のみを提示し、個別の操作条件とフロー詳細は本ファイルを参照する。
 
 ## ファイル操作モード
@@ -75,3 +75,21 @@ precedentに従うことで書式設計のコストを削減し、REQ間で廃�
 - 既存要件行の内容修正（テキスト置換、表現変更）
 - frontmatter フィールドの変更（title変更等）
 - 「目的」「適用範囲」セクションの内容修正
+
+## 機械置換手順の適用（3段階）と参照検査観点
+
+REQ ファイル操作のうち機械置換に該当する操作（UPDATE のテキスト置換、廃止宣言 APPEND の precedent 書式再利用）は、`agentdev-doc-writing` スキルの references/mechanical-replacement-rules.md「機械置換手順の設計原則（3段階）」に従う。
+本節は同原則の REQ 操作への適用を定める。
+
+### 3段階の適用
+
+| 段階 | REQ 操作での実施内容 |
+|---|---|
+| 1. old 側 grep 実在確認 | UPDATE 対象の既存要件行、セクション内容が REQ ファイルに実在することを grep で確認する。廃止宣言 APPEND では precedent 行を `docs/requirements/` 配下から検索し、実在を確認する |
+| 2. 置換実行 | 段階1で確認した対象に対してのみ置換、追記を実行する |
+| 3. 置換後 MISS 確認 | UPDATE では旧表現を再 grep し、0 件であることを確認する。廃止宣言 APPEND では対象 REQ 番号と理由の差し替え後の行内容が意図どおりであることを確認する |
+
+### 参照検査観点
+
+- **参照実在確認**: precedent 行、要件行 ID、参照先セクションの実在を grep またはファイル読込で検証する。存在しない precedent、要件行 ID を対象とする追記、置換を行わない
+- **変動値分離**: 要件テーブル照合の錨は要件行 ID と行内容であり、テーブル内の相対行位置ではない。要件行の追記、並べ替えで行位置は変動するため、行位置を錨とした照合を行わない
