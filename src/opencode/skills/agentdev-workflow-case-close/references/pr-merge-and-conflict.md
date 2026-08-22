@@ -55,6 +55,8 @@ STEP-4-1 で解決した当該 Case の統合先（PR の base）へ PR merge �
 
 **対応記録コメント**: Issue に対応記録コメントを追加（テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_*.md` から Read して `agentdev-gh-cli` の VERIFY 操作に従って内容検証）。
 
+**対応記録コメントへの検証差分記録**: case-close が実施した各検証（QG-4 完了条件評価、docs 検証・配布依存境界 最終 gate、トレーサビリティ独立再検査等）について、対応記録コメントへ検証差分を記録する。形式は `agentdev-workflow-templates` の検証差分セクション規約（PR テンプレート形式と同一のテーブル）に従い、実行工程 case-close の行として検証種別、検証結果、finding 差分（新規、修正済み、既出、撤回、無効の5分類）を記録する。finding 差分は前段階（case-run）の PR 本文検証差分セクションの記録との差分で分類し、同種検証の工程間比較を可能にする。品質ゲート完了報告の既存の修正証跡記録を本記録で置換しない。
+
 **`--delete-branch` 使用禁止**: PR マージ時に `--delete-branch` オプションを使用しない（アクティブ worktree に checkout されたブランチで local 削除が失敗し remote 削除フェーズへ到達しないため）。
 ブランチ削除は STEP-6 で独立実施する。
 
