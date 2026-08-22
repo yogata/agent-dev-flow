@@ -97,6 +97,22 @@ presence-based 判定により新旧 Issue を識別する。
 presence-based 判定に用いる新契約必須セクションの一覧から実証Case専用要素（評価契約・対象評価ブランチ）を除外する。実証Case専用要素の有無は新契約 Issue の判定条件としない。
 テンプレート（`issue_desc_feature.md`、`issue_desc_child.md`）の Execution Contract セクション構造は `agentdev-workflow-templates` を参照。
 
+### 実行識別情報セクションの生成（2-7）
+
+Issue 本文生成時に、実行識別情報セクションへ次の値を記録する。
+セクション形式、key 一覧、機械的解析規則は `agentdev-workflow-templates` の実行識別情報セクション規約に従う。
+
+- **adf_case**: 対象 Case の Issue 番号。Standard flow では生成中の本 Issue、Epic flow では親 Epic Issue の番号を記録する
+- **adf_phase**: `case-open` を記録する（当該記録を生成した ADF 工程）
+- **adf_execution_unit**: 処理対象の実行単位。standard flow では `standard:#N`（本 Issue）、Epic flow では Epic Issue に `epic:#N`、子 Issue に `standard:#N`（当該子 Issue）を記録する
+- **adf_upstream_confirmed**: 前工程で確定した事項を識別子中心で記録する（req-save/design-save の commit SHA、確定済み REQ/Decision/Design の識別子）。bugfix 等で前工程がない場合は `N/A` と記録する
+- **adf_harness_ref**: 任意。harness 側識別子は取得可能な場合のみ記録し、必須契約としない
+
+識別情報の一部が取得不能でも本 STEP を停止せず、欠落値には `N/A` を記録する。
+本文生成時点で番号が確定しない自己参照値（Standard Issue の `adf_case` と `adf_execution_unit`、子Issue の `adf_execution_unit`）はプレースホルダのまま作成し、STEP-5 の作成後埋め戻し（issue-creation-flows 参照）で確定番号へ置換する。
+本セクションは新規作成 Issue のみに適用し、既存 Issue 本文への遡及適用は行わない。
+実行識別情報の記録先割当は workflow-contracts Design「ADF 実行識別情報の記録契約」に従う。
+
 ## 共通ルール（STEP 全体適用）
 
 - **VERIFY**: gh CLI 書込後は毎回 `agentdev-gh-cli` VERIFY 操作で検証
@@ -104,17 +120,17 @@ presence-based 判定に用いる新契約必須セクションの一覧から�
 
 ## Result
 
-- Issue 本文候補（execution contract 反映済み）
+- Issue 本文候補（execution contract 反映済み、実行識別情報セクション記録済み）
 - QG-2 完了条件網羅性検証合格
 - test_strategy 埋め込み済み（3 要素構造）
 
 ## Evidence
 
-- Issue 本文候補のファイルパス、QG-2 検証結果、execution contract 確定結果、test_strategy 反映状態、統合先記録と実証Case識別情報の反映状態
+- Issue 本文候補のファイルパス、QG-2 検証結果、execution contract 確定結果、test_strategy 反映状態、統合先記録と実証Case識別情報の反映状態、実行識別情報セクションの記録状態
 
 ## Completion Verification
 
-- QG-2 が合格であり（fail 時は req-define 差し戻し推奨）、execution contract 必須セクション（実証Case専用要素を除く）が本文候補へ付与されていること
+- QG-2 が合格であり（fail 時は req-define 差し戻し推奨）、execution contract 必須セクション（実証Case専用要素を除く）と実行識別情報セクションが本文候補へ付与されていること
 
 ## Resume-Idempotency
 
