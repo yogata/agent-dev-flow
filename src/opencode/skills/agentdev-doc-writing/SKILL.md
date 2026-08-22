@@ -68,7 +68,7 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 | SKILL.md 構造 | SKILL.md の概要節（description frontmatter）と機能節（`##` セクション群）の重複を検出する。REQ の優先度軸（重複度合い、文書の影響度）に基づき、優先度高位から順に查読する。詳細は Design「SKILL 構造」「SKILL.md概要節と機能節の役割分担」参照 | document-type-responsibilities Design |
 | 実行主体分類 | 文書内で言及される実行主体（command / skill / subagent / harness）の分類が正確か。誤認（command を skill と呼ぶ、harness を skill と呼ぶ、subagent を skill と呼ぶ）を検出する | [execution-subject-classification.md](references/execution-subject-classification.md) |
 | 検出→書き換え | 英語混じり表現、抽象語の具体的書き換え、LLM 表現パターンの検出と書き換え | [rewrite-patterns.md](references/rewrite-patterns.md) |
-| 機械判定可能な是正 | 中黒、em-dash、一文一行、LLM 表現の機械判定アルゴリズム。検出、許容/是正の二値判定を集約 | [mechanical-replacement-rules.md](references/mechanical-replacement-rules.md) |
+| 機械判定可能な是正 | 中黒、em-dash、一文一行、LLM 表現の機械判定アルゴリズム。検出、許容/是正の二値判定を集約。機械置換手順の3段階設計原則（old 側 grep 実在確認、置換後 MISS 確認）と参照検査観点（参照実在確認、変動値分離）を含む | [mechanical-replacement-rules.md](references/mechanical-replacement-rules.md) |
 | 日本語置換辞書 | forbidden / review / allowed_identifier / reconstruct 区分の不自然表現置換辞書 | [japanese-replacement-dictionary.md](references/japanese-replacement-dictionary.md) |
 | 査読出力 | 残す/分割/移送/削除候補の分類、修正文案 | [review-output.md](references/review-output.md) |
 

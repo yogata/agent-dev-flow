@@ -56,9 +56,33 @@ checker の新規実装・修正時に適用するパターンマッチと網羅
 ## 宣言的データ YAML の schema 原則
 
 検出用の宣言的データ YAML（retired-artifact-registry、command-format-rules、delegation-contract-patterns、
-distribution-targets）は、正となる schema を Design が所有する。各 YAML は検出用ビューであり、
+distribution-targets、obsolete-path-map、obsolete-vocabulary-map、skill-projection-manifest）は、
+正となる schema を Design が所有する。各 YAML は検出用ビューであり、
 正規契約の情報源とはしない。
 YAML と正 Design の不一致は検査で検出対象とする。
+
+## data yaml 宣言的データ運用
+
+data yaml の新設は、当該 yaml を読み込む消費者実装（checker スクリプト側の検査処理と契約テスト）を
+同一 PR で同時に確定する。
+消費者を実装しない data yaml の単独新設、単独拡張を許容しない。
+
+- **新設**: data yaml を追加する変更は、当該 yaml を読み込む checker 実装と契約テストを同一 PR に含める。
+  既存 data yaml の拡張（キー追加、検出語彙追加等）も同一契約に従う
+- **同期**: data yaml と消費者の不一致は drift 検査で strict fail として検出する。
+  「パターンマッチ・網羅検査設計の標準規約」の宣言的データの silent skip 禁止と同一規定であり、
+  黙って読み飛ばさない
+- **検出ビュー**: data yaml は検出用ビューであり、正規契約の情報源とはしない
+  （「宣言的データ YAML の schema 原則」準拠）
+
+実装実例（新設時の消費者実装同時確定の参照例）:
+
+- `data/obsolete-vocabulary-map.yaml`: 消費者は check_integrity.ts の IR-065 / IR-066 語彙パターン検査
+  （IR065_VOCAB_PATTERNS / IR066_VOCAB_PATTERNS 定数）。語彙 ID 集合と rule 割当の不一致は
+  obsolete-vocabulary-map-drift 検査が strict fail で検出する（REQ-047-004）
+- `data/skill-projection-manifest.yaml`: 消費者は check_integrity.ts の IR-068 skill-projection-manifest
+  検査（src 側スキル集合と投影スキル集合の突合）。manifest と src のスキル集合不一致は strict fail で
+  検出する。worktree（junction 未伝播）では投影比較を info で skip する
 
 ## detector 命名規約
 

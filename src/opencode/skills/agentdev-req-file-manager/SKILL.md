@@ -202,7 +202,7 @@ SKILL.md 本文から遅延読み込みされる詳細資料。
 | ファイル | 内容 |
 |----------|------|
 | [references/numbering-and-validation.md](references/numbering-and-validation.md) | REQ番号採番、要件行ID、REQ-ID 安定ID、ファイル配置、frontmatterバリデーション、分類ゲート、HOW 除去後の acceptance criteria 順位検証 |
-| [references/create-append-update-flow.md](references/create-append-update-flow.md) | CREATE/APPEND/UPDATE 操作モード、状況判定、APPEND/UPDATE判定フロー、廃止宣言 APPEND の precedent 利用 |
+| [references/create-append-update-flow.md](references/create-append-update-flow.md) | CREATE/APPEND/UPDATE 操作モード、状況判定、APPEND/UPDATE判定フロー、廃止宣言 APPEND の precedent 利用、機械置換手順の3段階適用と参照検査観点（参照実在確認、変動値分離） |
 | [references/matching-and-merge.md](references/matching-and-merge.md) | 既存REQ照合方法論、整合性チェック、関連情報管理、マージ競合対応パターン |
 | [references/req-save-procedure.md](references/req-save-procedure.md) | req-save の詳細手順（分類ゲート検査、文書分類適合確認、REQファイル操作、インデックス/ハブ更新、リモート同期と hash 検証、RU パス保存禁止） |
 
