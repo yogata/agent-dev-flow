@@ -52,3 +52,67 @@
 - **想定反映先**: agentdev-gh-cli references（REST API PATCH 標準手続き系への注記候補）
 - **関連**: Issue #2379 コメント修正（numeric id 5379964457）
 - **タグ**: `#gh-cli` `#rest-api`
+
+## 手順文書への CLI オプション記載は実装の argv 解析と突合する
+
+- **問題事象**: 継承ドラフトが存在しない CLI オプション（`--root`）を gate 手順に記載していた。対象スクリプト（check_distribution_boundary.ts）の実際の argv 解析は位置引数（repoRoot）であり、手順どおりに実行すると引数エラーになる
+- **発生局面**: 仕様引き継ぎ（継承ドラフトからの手順転記、Issue #2386 の case work）
+- **検知方法**: 対象スクリプトの argv 解析実装との突合（PR #2394 の検証時）
+- **根本原因**: 手順文書を CLI リファレンスや慣例から推測で記載し、実装の引数解析を確認しなかった
+- **自律対応内容**: 位置引数 repoRoot による読取専用実行として手順を修正し、実行形態契約へ明記した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（agentdev-workflow-case-run STEP-S5-1 の実行形態として反映済み）
+- **横展開観点**: 手順文書へ CLI オプション・引数形式を記載するすべての場面
+- **再発条件**: 実装の引数解析を確認せずに CLI オプションを文書化した場合
+- **予防策候補**: 手順文書への CLI 記載時に対象スクリプトの argv 解析実装との突合を必須手順とする
+- **想定反映先**: agentdev-skill-authoring の記載様式ガイド、agentdev-workflow-case-run 委譲手順
+- **関連**: PR #2394 本文、Issue #2386
+- **タグ**: `#cli-contract` `#argv-parsing` `#skill-authoring`
+
+## NG baseline の bucket key evidence は語彙置換で陳腐化する
+
+- **問題事象**: NG baseline の bucket key（category/check/file/evidence）の evidence 文字列が、本文の機械的語彙置換（SPEC→Design 等）で不一致化して未管理 NG 化した（#2350 の改名で既存 baseline entry の evidence が陳腐化。LifecycleBoundary 3件が該当事例として PR #2395 の検証で確認）
+- **発生局面**: 検証（docs-check、語彙置換系の横断 PR）
+- **検知方法**: check_integrity.ts の未管理 NG 検出（baseline-known に一致しない evidence）
+- **根本原因**: baseline entry の evidence が本文の語彙に依存する構造であり、語彙置換系の横断変更が baseline の再登録・純減を要求することを完了条件に含めていなかった
+- **自律対応内容**: PR #2395 で該当事例を把握・記録し、Wave 2 マージ後の case-close 独立再検証で当該3件が解消済み（#2396 の docs 修正と DEC-016/017 昇格による）ことを確認した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（integrity-contracts Design の baseline 運用手順の運用知見）
+- **横展開観点**: 語彙置換・改名を伴う横断 PR すべて
+- **再発条件**: 語彙置換系の横断 PR で影響を受ける baseline entry の再確認を行わない場合
+- **予防策候補**: 語彙置換系の横断 PR では影響を受ける baseline entry の再確認を完了条件へ含める
+- **想定反映先**: integrity-contracts Design の NG baseline 運用手順、check_changed_docs の検査項目候補
+- **関連**: PR #2395 本文、Issue #2383、PR #2350
+- **タグ**: `#ng-baseline` `#vocabulary-replacement` `#docs-check`
+
+## PR 本文の close キーワードはマージ時に Issue を自動クローズする（Refs: 形式を使う）
+
+- **問題事象**: PR #2396 本文「関連Issue」の `Closes #2385` 記載により、マージ時に GitHub が Issue #2385 を自動クローズした。case-close の正規手順（QG-4 チェックボックス評価 → 対応記録コメント → close）より先にクローズが発生し、順序逸脱が生じた（コミットメッセージに close キーワードが無くても、PR 本文の close キーワードはマージ時に有効）
+- **発生局面**: 実行（case-close の PR マージ、Epic #2378 Wave 2）
+- **検知方法**: マージ後の gh issue list 状態確認（#2385 が CLOSED、他4件は OPEN）
+- **根本原因**: PR テンプレート（agentdev-workflow-templates/templates/pr_desc.md）の関連Issue セクションが `Closes #$ISSUE_NUMBER` を既定としており、agentdev-conventional-commits の GitHub auto-close 回避ガイドライン（コミットメッセージ向け）と PR 本文経路の自動クローズ挙動が整合していない
+- **自律対応内容**: クローズ済み #2385 に対して QG-4 評価・本文 [x] 化・対応記録コメントを事後実施し、完了状態（CLOSED/COMPLETED）が正しい終状態であることを VERIFY の上で維持した。逸脱はコメントの「備考（クローズ経緯）」に正規記録した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（テンプレート修正候補として intake ではなく本 learning 記録で保管。PR 本文のみを capture 入力源とする capture 境界に従い、本件は学び検知（テンプレート逸脱）として learning へ記録）
+- **横展開観点**: PR 本文を作成するすべての case work、PR テンプレートの関連Issue 記法
+- **再発条件**: PR 本文の関連Issue セクションに close キーワード（Closes/Fixes/Resolves）を含めた場合
+- **予防策候補**: pr_desc.md テンプレートの関連Issue 記法を `Refs: #N` 形式へ変更する（agentdev-workflow-templates 修正候補）、case-close 側でマージ前に PR 本文へ close キーワードが無いかを検査する
+- **想定反映先**: agentdev-workflow-templates の pr_desc.md、agentdev-workflow-case-close の PR マージ手順（本文検査の追加候補）
+- **関連**: PR #2396、Issue #2385、Epic #2378 Wave 2 case-close
+- **タグ**: `#github-autoclose` `#pr-template` `#case-close`
+
+## lint_skills の See Also 参照検査は junction 投影の状態で結果が変わる
+
+- **問題事象**: main repo root（junction 伝播あり・投影欠落残存）で lint_skills.ts を実行した際、src 側に実在する agentdev-design-file-manager への See Also 参照（agentdev-artifact-validation）が broken reference NG（delta）として検出された。lint の See Also 参照解決はスキャン面（.opencode/skills 投影 or src/opencode/skills 実体、REQ-018 fallback）で構成されるため、投影欠落（F-01）環境では偽 NG になる。worktree（junction 未伝播 → src スキャン）では同 NG は出ない
+- **発生局面**: 検証（case-close の QG-4 独立再検証、main repo root）
+- **検知方法**: lint_skills.ts の NG 出力と src/opencode/skills 実体との突合、投影ディレクトリ列挙（投影欠落4件を確認）
+- **根本原因**: F-01 junction 投影乖離が未解消のまま投影面をスキャンする lint を実行した
+- **自律対応内容**: sync-self-opencode.ps1 -Mode apply で junction を再構築（投影欠落4件作成・orphan 3件削除、RD-002 の PR #2395 マージ後運用タスクとして実施）し、再実行で NG 0 を確認した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（IR-068 skill-projection-manifest により投影乖離は恒常検出化済み）
+- **横展開観点**: main repo root で lint_skills・投影面スキャン系検査を実行するすべての場面
+- **再発条件**: junction 投影が陳腐化した状態で投影面スキャンの lint を実行した場合
+- **予防策候補**: main repo root で lint_skills を実行する前に IR-068（check_integrity の SkillProjection）で投影整合を確認、または junction 再構築を前置する
+- **想定反映先**: agentdev-quality-gates の QG-4 実行前提、repo-agentdev-integrity の lint 実行契約（環境ラベル記録との併用）
+- **関連**: PR #2395（IR-068）、RD-002、Epic #2378 Wave 2 case-close
+- **タグ**: `#lint-skills` `#junction` `#ir068` `#environment-label`
