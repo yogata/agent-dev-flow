@@ -64,6 +64,7 @@ updated: 2026-06-28
 | v2:REQ-0143 | Command 定義ファイルフォーマット標準化 | IR-049 | commands, command-file-format.md |
 | REQ-010 | docs-check/integrity 運用是正 | IR-016, IR-052 | integrity scripts, docs-check, Design |
 | REQ-010 | docs-check/integrity 検出設計改善 | IR-044, IR-050, IR-051, IR-052 | integrity-rule-catalog.md, integrity scripts |
+| REQ-010 | docs-check 新規機械検査クラス（Gxx 不変量、未解決プレースホルダー、廃止語彙、旧パス・削除済み名称） | IR-063, IR-064, IR-065, IR-066 | integrity-rule-catalog.md, integrity scripts, data/obsolete-vocabulary-map.yaml, NG baseline |
 | REQ-003 | 実行契約、委譲、プロセス設計 | IR-006, IR-032, IR-033 | commands, Design |
 | REQ-003 | 文書化規律、HITL境界 | IR-013, IR-019, IR-035 | docs, commands, skills, guides |
 | REQ-006 | RU群バッチ処理と複数 execution_unit 並列実行 | IR-006, IR-016 | commands |

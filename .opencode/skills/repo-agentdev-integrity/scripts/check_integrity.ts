@@ -4908,6 +4908,9 @@ function checkSkillCategoryGap(
     ["Runtime reference", ["RuntimeUnresolvedReference"]],
     ["Distribution untracked skill", ["DistributionUntrackedSkillReference"]],
     ["Skill rename 対称性", ["SkillRenameSymmetry"]],
+    ["Guardrail number invariant", ["GuardrailNumberInvariant"]],
+    ["Unresolved placeholder", ["UnresolvedPlaceholder"]],
+    ["Obsolete vocabulary & legacy path", ["ObsoleteVocabulary"]],
   ]);
 
   let foundGap = false;
@@ -8862,6 +8865,597 @@ function checkSkillSeeAlsoReference(skillsDir: string, root: string): CheckResul
   return results;
 }
 
+// ─── IR-063 / IR-064 / IR-065 / IR-066 (Issue #2372, REQ-010-064..067) ──────
+// Wave 1 監査（AUDIT-REQ-045-CONSISTENCY）と Wave 2 正規化
+// （NORMALIZATION-REQ-046）後の状態を機械検査で固定する新規検査クラス群。
+// 検出シグナル・許容条件の詳細は docs/designs/integrity/rules/IR-063..066 が所有する。
+
+// IR-063 (REQ-010-064): 公開 command のガードレール番号 (Gxx) 不変条件。
+// 定義行様式は `- Gxx: ...`（Wave 1 監査観点V6 と同一抽出パターン）。
+const GUARDRAIL_DEF_LINE_RE = /^[-*]\s+(?:\*\*)?`?G(\d{2})`?(?:\*\*)?\s*[:：]/;
+const GUARDRAIL_REF_RE = /\bG(\d{2})\b/g;
+
+function collectPublicCommandMarkdown(root: string): string[] {
+  const cmdDir = path.join(root, "src", "opencode", "commands", "agentdev");
+  if (!fs.existsSync(cmdDir)) return [];
+  // 直下の .md のみ（templates/ サブディレクトリと README.md は対象外）
+  return listFiles(cmdDir)
+    .filter((f) => f !== "README.md")
+    .map((f) => path.join(cmdDir, f));
+}
+
+function guardrailNg(
+  relPath: string,
+  line: number,
+  message: string,
+  evidence: string,
+  expected: string,
+): CheckResult {
+  return ng("GuardrailNumber", "guardrail-number-invariant", message, relPath, line, {
+    evidence,
+    expected,
+    route: "intake",
+    finding_category: "document-drift",
+    finding_level: "strict",
+  });
+}
+
+function checkGuardrailNumberInvariant(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const files = collectPublicCommandMarkdown(root);
+  let violationCount = 0;
+  for (const fullPath of files) {
+    const relPath = resolveRelative(fullPath, root);
+    const content = readText(fullPath);
+    if (!content) continue;
+    const lines = content.split("\n");
+
+    // 定義抽出（出現順。重複検出のため同一番号の行リストを保持）
+    const defLineIdx = new Map<string, number[]>();
+    const defOrder: string[] = [];
+    lines.forEach((line, idx) => {
+      const m = line.match(GUARDRAIL_DEF_LINE_RE);
+      if (!m) return;
+      const num = m[1];
+      if (!defLineIdx.has(num)) defOrder.push(num);
+      const arr = defLineIdx.get(num) ?? [];
+      arr.push(idx);
+      defLineIdx.set(num, arr);
+    });
+    // Gxx 定義を持たない command は検査対象外（ガードレール定義は必須でない）
+    if (defOrder.length === 0) continue;
+
+    // 1. 開始番号（G01 起点）
+    const first = defOrder[0];
+    if (first !== "01") {
+      violationCount++;
+      results.push(
+        guardrailNg(
+          relPath,
+          (defLineIdx.get(first)?.[0] ?? 0) + 1,
+          `Guardrail numbers must start at G01: first defined guardrail is G${first} (REQ-010-064, IR-063)`,
+          `start-number:G${first}`,
+          "first guardrail definition is G01",
+        ),
+      );
+    }
+
+    // 2. 欠番（定義番号は連番であること）
+    const nums = defOrder.map((n) => parseInt(n, 10));
+    for (let i = 1; i < nums.length; i++) {
+      if (nums[i] === nums[i - 1] + 1) continue;
+      const prev = String(nums[i - 1]).padStart(2, "0");
+      const next = String(nums[i]).padStart(2, "0");
+      for (let g = nums[i - 1] + 1; g < nums[i]; g++) {
+        const gStr = String(g).padStart(2, "0");
+        violationCount++;
+        results.push(
+          guardrailNg(
+            relPath,
+            (defLineIdx.get(next)?.[0] ?? 0) + 1,
+            `Guardrail number gap detected: G${gStr} is missing between G${prev} and G${next} (REQ-010-064, IR-063)`,
+            `gap:G${gStr}`,
+            `guardrail numbers are sequential (G${prev} directly followed by G${next} leaves G${gStr} unused)`,
+          ),
+        );
+      }
+    }
+
+    // 3. 重複（同一番号の定義は 1 回のみ）
+    for (const [num, idxs] of defLineIdx) {
+      if (idxs.length <= 1) continue;
+      violationCount++;
+      results.push(
+        guardrailNg(
+          relPath,
+          idxs[1] + 1,
+          `Duplicate guardrail number definition: G${num} is defined ${idxs.length} times (REQ-010-064, IR-063)`,
+          `duplicate:G${num}`,
+          `G${num} is defined exactly once`,
+        ),
+      );
+    }
+
+    // 4. 未定義参照（本文中の Gxx は同一ファイルの定義へ解決されること）
+    lines.forEach((line, idx) => {
+      if (GUARDRAIL_DEF_LINE_RE.test(line)) return;
+      GUARDRAIL_REF_RE.lastIndex = 0;
+      let m2: RegExpExecArray | null;
+      const reported = new Set<string>();
+      while ((m2 = GUARDRAIL_REF_RE.exec(line)) !== null) {
+        if (defLineIdx.has(m2[1])) continue;
+        if (reported.has(m2[1])) continue;
+        reported.add(m2[1]);
+        violationCount++;
+        results.push(
+          guardrailNg(
+            relPath,
+            idx + 1,
+            `Body references undefined guardrail number G${m2[1]}: no matching definition in this command (REQ-010-064, IR-063)`,
+            `undefined-reference:G${m2[1]}`,
+            `G${m2[1]} is defined in the same command file`,
+          ),
+        );
+      }
+    });
+  }
+  if (violationCount === 0) {
+    results.push(
+      ok(
+        "GuardrailNumber",
+        "guardrail-number-invariant",
+        `IR-063 guardrail-number-invariant: ${files.length} public commands scanned, 0 violations (REQ-010-064)`,
+      ),
+    );
+  }
+  return results;
+}
+
+// IR-064 (REQ-010-065): 実行時配布対象に残る未解決プレースホルダー。
+// ID プレフィックスは文書 ID 系接頭辞に限定する（Wave 1 監査観点V5 と同じ限定列挙。
+// UTF-{N} 等の文字コード様式表記を誤検出しない）。
+const IR064_TODO_MARKER_RE = /\b(TODO|FIXME|XXX|HACK)\b/g;
+const IR064_ID_PLACEHOLDER_RE =
+  /\b(?:REQ|DEC|ADR|AG|QG|IR|RU|TS|OU|AC|CR|EC|SC|ACT|DD|DESIGN|RD|SPEC|WS|GMT)-\{[^}]*\}/g;
+
+function isIr064TemplatePath(relPath: string): boolean {
+  return (
+    relPath.startsWith("src/opencode/commands/agentdev/templates/") ||
+    /^src\/opencode\/skills\/[^/]+\/templates\//.test(relPath) ||
+    /(^|\/)_template\.md$/.test(relPath)
+  );
+}
+
+// マッチ位置が括弧（ASCII / 全角）の内側か（委譲注記様式（DEC-{N}、REQ-{NNNN}-{NNN}）の許容判定）。
+function isIr064InsideParentheses(line: string, matchIndex: number): boolean {
+  let depth = 0;
+  for (let i = 0; i < matchIndex && i < line.length; i++) {
+    const c = line[i];
+    if (c === "(" || c === "（") depth++;
+    else if (c === ")" || c === "）") depth = Math.max(0, depth - 1);
+  }
+  return depth > 0;
+}
+
+// マッチ位置が全角引用「」の内側か（検出キーワードの列挙例示の許容判定）。
+function isIr064InsideQuoteBracket(line: string, matchIndex: number): boolean {
+  let inQuote = false;
+  for (let i = 0; i < matchIndex && i < line.length; i++) {
+    if (line[i] === "「") inQuote = true;
+    else if (line[i] === "」") inQuote = false;
+  }
+  return inQuote;
+}
+
+function collectDistributionMarkdown(root: string): string[] {
+  const targets: string[] = [];
+  const commandDir = path.join(root, "src", "opencode", "commands", "agentdev");
+  if (fs.existsSync(commandDir)) {
+    targets.push(
+      ...globWalkRel(commandDir, { extensions: [".md"] }).map((rel) =>
+        path.join(commandDir, ...rel.split("/")),
+      ),
+    );
+  }
+  const skillRoot = path.join(root, "src", "opencode", "skills");
+  if (fs.existsSync(skillRoot)) {
+    for (const dir of listDirs(skillRoot)) {
+      if (!dir.startsWith("agentdev-")) continue;
+      const skillDir = path.join(skillRoot, dir);
+      targets.push(
+        ...globWalkRel(skillDir, { extensions: [".md"] }).map((rel) =>
+          path.join(skillDir, ...rel.split("/")),
+        ),
+      );
+    }
+  }
+  return targets;
+}
+
+function checkUnresolvedPlaceholder(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const files = collectDistributionMarkdown(root);
+  let todoCount = 0;
+  let placeholderCount = 0;
+  for (const fullPath of files) {
+    const relPath = resolveRelative(fullPath, root);
+    const content = readText(fullPath);
+    if (!content) continue;
+    const isTemplate = isIr064TemplatePath(relPath);
+    const lines = content.split("\n");
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (isIr057InCodeBlock(lines, i)) continue;
+
+      // (a) 未解決 TODO 系マーカー（引用「」内の語彙列挙、code span 内は許容）
+      IR064_TODO_MARKER_RE.lastIndex = 0;
+      let m: RegExpExecArray | null;
+      while ((m = IR064_TODO_MARKER_RE.exec(line)) !== null) {
+        if (isInsideCodeSpan(line, m.index)) continue;
+        if (isIr064InsideQuoteBracket(line, m.index)) continue;
+        if (isTemplate) continue;
+        todoCount++;
+        results.push(
+          ng(
+            "UnresolvedPlaceholder",
+            "unresolved-placeholder",
+            `Unresolved TODO-family marker '${m[1]}' remains in distribution target (REQ-010-065, IR-064)`,
+            relPath,
+            i + 1,
+            {
+              evidence: `todo-marker:${m[1]}`,
+              expected: "resolve the marker or move the note to a non-distribution document",
+              route: "intake",
+              finding_category: "document-drift",
+              finding_level: "strict",
+            },
+          ),
+        );
+      }
+
+      // (b) ID 系プレースホルダーの裸出力（様式例示の場所: code span・括弧内・
+      // テンプレートは許容。それ以外の本文裸出力は heuristic）
+      IR064_ID_PLACEHOLDER_RE.lastIndex = 0;
+      let m2: RegExpExecArray | null;
+      const reported = new Set<string>();
+      while ((m2 = IR064_ID_PLACEHOLDER_RE.exec(line)) !== null) {
+        if (isInsideCodeSpan(line, m2.index)) continue;
+        if (isIr064InsideParentheses(line, m2.index)) continue;
+        if (isTemplate) continue;
+        if (reported.has(m2[0])) continue;
+        reported.add(m2[0]);
+        placeholderCount++;
+        results.push(
+          warn(
+            "UnresolvedPlaceholder",
+            "unresolved-placeholder",
+            `ID placeholder '${m2[0]}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064)`,
+            relPath,
+            i + 1,
+            {
+              evidence: `id-placeholder:${m2[0]}`,
+              expected:
+                "wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value",
+              route: "intake",
+              finding_category: "document-drift",
+              finding_level: "heuristic",
+            },
+          ),
+        );
+      }
+    }
+  }
+  if (todoCount === 0 && placeholderCount === 0) {
+    results.push(
+      ok(
+        "UnresolvedPlaceholder",
+        "unresolved-placeholder",
+        `IR-064 unresolved-placeholder: ${files.length} distribution files scanned, 0 violations (REQ-010-065)`,
+      ),
+    );
+  }
+  return results;
+}
+
+// IR-065 (REQ-010-066) / IR-066 (REQ-010-067): 廃止語彙・旧パス・削除済み名称。
+// 許容条件の運用データ（existence_probe、exemption_files、否定文脈語）は
+// data/obsolete-vocabulary-map.yaml が宣言する。
+interface ObsoleteVocabEntry {
+  id: string;
+  rule: string;
+  probe: string;
+}
+
+interface ObsoleteVocabMap {
+  scopeInclude: string[];
+  scopeExclude: string[];
+  exemptionFiles: Map<string, string>;
+  negationTerms: string[];
+  vocab: ObsoleteVocabEntry[];
+}
+
+function unquoteYamlScalar(value: string): string {
+  const trimmed = value.trim();
+  if (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
+    return trimmed.slice(1, -1);
+  }
+  return trimmed;
+}
+
+function loadObsoleteVocabularyMap(root: string): ObsoleteVocabMap | null {
+  const mapPath = path.join(
+    root,
+    ".opencode",
+    "skills",
+    "repo-agentdev-integrity",
+    "data",
+    "obsolete-vocabulary-map.yaml",
+  );
+  const content = readText(mapPath);
+  if (!content) return null;
+  const map: ObsoleteVocabMap = {
+    scopeInclude: [],
+    scopeExclude: [],
+    exemptionFiles: new Map<string, string>(),
+    negationTerms: [],
+    vocab: [],
+  };
+  let section: "scope" | "exemption" | "negation" | "vocab" | null = null;
+  let subsection: "include" | "exclude" | null = null;
+  let currentExemption: { path?: string; reason?: string } | null = null;
+  let currentVocab: Partial<ObsoleteVocabEntry> | null = null;
+  for (const raw of content.split("\n")) {
+    const line = raw.replace(/\r$/, "");
+    if (/^#/.test(line) || line.trim() === "") continue;
+    if (/^scope:/.test(line)) {
+      section = "scope";
+      subsection = null;
+      continue;
+    }
+    if (/^exemption_files:/.test(line)) {
+      section = "exemption";
+      currentExemption = null;
+      continue;
+    }
+    if (/^negation_context_terms:/.test(line)) {
+      section = "negation";
+      continue;
+    }
+    if (/^vocabulary:/.test(line)) {
+      section = "vocab";
+      currentVocab = null;
+      continue;
+    }
+    if (section === "scope") {
+      const sub = line.match(/^\s{2}(include|exclude):/);
+      if (sub) {
+        subsection = sub[1] as "include" | "exclude";
+        continue;
+      }
+      const item = line.match(/^\s{4}-\s+(.+)$/);
+      if (item && subsection === "include") {
+        map.scopeInclude.push(unquoteYamlScalar(item[1]));
+      } else if (item && subsection === "exclude") {
+        map.scopeExclude.push(unquoteYamlScalar(item[1]));
+      }
+      continue;
+    }
+    if (section === "exemption") {
+      const pathMatch = line.match(/^\s{2}-\s+path:\s*(.+)$/);
+      if (pathMatch) {
+        currentExemption = { path: unquoteYamlScalar(pathMatch[1]) };
+        continue;
+      }
+      const reasonMatch = line.match(/^\s{4}reason:\s*(.+)$/);
+      if (reasonMatch && currentExemption) {
+        currentExemption.reason = unquoteYamlScalar(reasonMatch[1]);
+        if (currentExemption.path) {
+          map.exemptionFiles.set(currentExemption.path, currentExemption.reason ?? "");
+        }
+        continue;
+      }
+      continue;
+    }
+    if (section === "negation") {
+      const item = line.match(/^\s{2}-\s+(.+)$/);
+      if (item) map.negationTerms.push(unquoteYamlScalar(item[1]));
+      continue;
+    }
+    if (section === "vocab") {
+      const idMatch = line.match(/^\s{2}-\s+id:\s*(.+)$/);
+      if (idMatch) {
+        if (currentVocab && currentVocab.id) {
+          map.vocab.push({
+            id: currentVocab.id,
+            rule: currentVocab.rule ?? "",
+            probe: currentVocab.probe ?? "",
+          });
+        }
+        currentVocab = { id: unquoteYamlScalar(idMatch[1]) };
+        continue;
+      }
+      const ruleMatch = line.match(/^\s{4}rule:\s*(.+)$/);
+      if (ruleMatch && currentVocab) {
+        currentVocab.rule = unquoteYamlScalar(ruleMatch[1]);
+        continue;
+      }
+      const probeMatch = line.match(/^\s{4}existence_probe:\s*(.+)$/);
+      if (probeMatch && currentVocab) {
+        currentVocab.probe = unquoteYamlScalar(probeMatch[1]);
+        continue;
+      }
+    }
+  }
+  if (currentVocab && currentVocab.id) {
+    map.vocab.push({
+      id: currentVocab.id,
+      rule: currentVocab.rule ?? "",
+      probe: currentVocab.probe ?? "",
+    });
+  }
+  return map;
+}
+
+const IR065_VOCAB_PATTERNS: ReadonlyArray<{ id: string; pattern: RegExp }> = [
+  // bare ADR-NNN（v2: プレフィックス付きは許容済み識別子のため除外）
+  { id: "bare-adr-identifier", pattern: /(?<!v2:)(?<![\w-])ADR-\d{3,4}(?!\d)/g },
+  { id: "docs-adr-path", pattern: /docs\/adr\//g },
+  // Wave 2 (#2371) で解消済みの孤立注記。再発は即 fail（strict）
+  { id: "adr-kind-annotation", pattern: /（ADR）/g },
+  { id: "req-adr-kind-enumeration", pattern: /REQ\/ADR\//g },
+  { id: "artifact-graph-name", pattern: /\bArtifact Graph\b/g },
+  { id: "doc-map-name", pattern: /\bDOC-MAP\b/g },
+];
+
+const IR066_VOCAB_PATTERNS: ReadonlyArray<{ id: string; pattern: RegExp }> = [
+  { id: "docs-specs-path", pattern: /docs\/specs\//g },
+  { id: "agentdev-graph-path", pattern: /\.agentdev\/graph/g },
+  { id: "agentdev-artifact-graph-skill", pattern: /agentdev-artifact-graph/g },
+  { id: "check-graph-script", pattern: /\bcheck_graph\b/g },
+  { id: "agentdev-spec-compliance-skill", pattern: /agentdev-spec-compliance/g },
+  { id: "agentdev-adr-guidelines-skill", pattern: /agentdev-adr-guidelines/g },
+  { id: "agentdev-adr-file-manager-skill", pattern: /agentdev-adr-file-manager/g },
+  { id: "agentdev-doc-map-skill", pattern: /agentdev-doc-map/g },
+  { id: "agentdev-workflow-reporting-skill", pattern: /agentdev-workflow-reporting/g },
+];
+
+function isSupersededDecision(relPath: string, content: string): boolean {
+  if (!/^docs\/decisions\/[^/]+\.md$/.test(relPath)) return false;
+  const statusMatch = content.match(/^status:\s*(\S+)/m);
+  return statusMatch !== null && statusMatch[1] === "superseded";
+}
+
+// 「## 廃止済み要件」等の retired 系見出し配下の行か（retired/ ディレクトリと
+// 同種の履歴領域。docs/requirements/README.md の廃止済み REQ タイトル表を含む）。
+function isIr065UnderRetiredHeading(lines: string[], lineIdx: number): boolean {
+  let underRetired = false;
+  for (let i = 0; i <= lineIdx && i < lines.length; i++) {
+    const headingMatch = lines[i].match(/^#{1,6}\s+(.+)$/);
+    if (headingMatch) {
+      underRetired =
+        /\b(retired|historical)\b|履歴|過去経緯|廃止済み|廃止|retired-no-successor|historical-only/i.test(
+          headingMatch[1],
+        );
+    }
+  }
+  return underRetired;
+}
+
+function checkObsoleteVocabulary(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const map = loadObsoleteVocabularyMap(root);
+  if (!map) {
+    results.push(
+      info(
+        "ObsoleteVocabulary",
+        "obsolete-vocabulary-map-load",
+        "obsolete-vocabulary-map.yaml not found; IR-065/IR-066 skipped",
+      ),
+    );
+    return results;
+  }
+
+  // existence_probe: probe 先が実在する語彙は現行機能として存在するため検出対象外
+  const activeVocab = new Map<string, { rule: string }>();
+  for (const v of map.vocab) {
+    if (v.probe && fs.existsSync(path.join(root, ...v.probe.split("/")))) continue;
+    activeVocab.set(v.id, { rule: v.rule });
+  }
+
+  // 走査対象収集（scope.include 配下、scope.exclude 接頭辞除外、.md/.yaml/.yml）
+  const targetFiles: string[] = [];
+  for (const inc of map.scopeInclude) {
+    const abs = path.join(root, ...inc.split("/"));
+    if (!fs.existsSync(abs)) continue;
+    if (fs.statSync(abs).isDirectory()) {
+      const acc: string[] = [];
+      walkAllFiles(abs, acc);
+      targetFiles.push(...acc);
+    } else {
+      targetFiles.push(abs);
+    }
+  }
+  const scoped = targetFiles.filter((f) => {
+    const rel = resolveRelative(f, root);
+    if (map.scopeExclude.some((p) => rel.startsWith(p))) return false;
+    return /\.(md|yaml|yml)$/.test(f);
+  });
+
+  const allPatterns: ReadonlyArray<{ id: string; pattern: RegExp; rule: string }> = [
+    ...IR065_VOCAB_PATTERNS.map((p) => ({ ...p, rule: "IR-065" })),
+    ...IR066_VOCAB_PATTERNS.map((p) => ({ ...p, rule: "IR-066" })),
+  ];
+
+  let violationCount = 0;
+  for (const fullPath of scoped) {
+    const relPath = resolveRelative(fullPath, root);
+    // exemption_files（履歴説明として正当なファイル）
+    if (map.exemptionFiles.has(relPath)) continue;
+    const content = readText(fullPath);
+    if (!content) continue;
+    // superseded Decision は履歴文書としてファイル単位許容
+    if (isSupersededDecision(relPath, content)) continue;
+    const lines = content.split("\n");
+
+    for (const { id, pattern, rule } of allPatterns) {
+      if (!activeVocab.has(id)) continue;
+      const category = rule === "IR-065" ? "ObsoleteVocabulary" : "LegacyPathName";
+      const check = rule === "IR-065" ? "obsolete-vocabulary-current-use" : "legacy-path-removed-name";
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        pattern.lastIndex = 0;
+        let m: RegExpExecArray | null;
+        const reported = new Set<string>();
+        while ((m = pattern.exec(line)) !== null) {
+          if (isIr057InCodeBlock(lines, i)) break;
+          if (isInsideCodeSpan(line, m.index)) continue;
+          // retired 系見出し配下（廃止済み要件表等）は履歴領域として許容
+          if (isIr065UnderRetiredHeading(lines, i)) continue;
+          // 行レベル履歴マーカー（旧/移行/廃止/履歴/経緯 等）は許容
+          if (hasLineLevelHistoryMarker(line)) continue;
+          // 否定文脈（廃止機能を「使わないこと」を定める現行契約の記述）は許容
+          if (map.negationTerms.some((t) => line.includes(t))) continue;
+          if (reported.has(m[0])) continue;
+          reported.add(m[0]);
+          violationCount++;
+          const strict = id === "adr-kind-annotation";
+          const ctor = strict ? ng : warn;
+          results.push(
+            ctor(
+              category,
+              check,
+              `Obsolete ${rule === "IR-065" ? "vocabulary" : "path/removed name"} '${m[0]}' (${id}) used as current concept (REQ-010-${rule === "IR-065" ? "066" : "067"}, ${rule})`,
+              relPath,
+              i + 1,
+              {
+                evidence: `${id}:${m[0]}`,
+                expected: "replace with the current vocabulary or mark the mention as historical",
+                route: "intake",
+                finding_category: "obsolete-structure",
+                finding_level: strict ? "strict" : "heuristic",
+              },
+            ),
+          );
+        }
+      }
+    }
+  }
+  if (violationCount === 0) {
+    results.push(
+      ok(
+        "ObsoleteVocabulary",
+        "obsolete-vocabulary-current-use",
+        `IR-065/IR-066 obsolete vocabulary & legacy path: ${scoped.length} files scanned, 0 violations (REQ-010-066/067)`,
+      ),
+    );
+  }
+  return results;
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   let options;
@@ -9036,6 +9630,9 @@ async function main(): Promise<void> {
     ...checkRuntimeUnresolvedReference(root), // IR-055 (v2:REQ-0108-263/264)
     ...checkObsoleteSpecPath(root), // IR-057 (v2:REQ-0158-002)
     ...checkIndexGenerationConsistency(root), // IR-061 (SC-002 Phase C, 索引類自動生成整合性)
+    ...checkGuardrailNumberInvariant(root), // IR-063 (REQ-010-064, Issue #2372)
+    ...checkUnresolvedPlaceholder(root), // IR-064 (REQ-010-065, Issue #2372)
+    ...checkObsoleteVocabulary(root), // IR-065/IR-066 (REQ-010-066/067, Issue #2372)
   ];
 
   // WP-3 (Issue #1928): profile-gated projection checks. §7.3 source skips

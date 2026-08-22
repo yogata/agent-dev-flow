@@ -64,6 +64,9 @@ req-impact-map.md の配置移動は未確定事項とし、参照方向、利�
 | 36 | project-extensions-integrity（extensions 機構整合性検査） | REQ-002 (001-003) | integrity-rule-catalog.md (IR-056) | project extensions 機構（Design `../foundations/project-extensions.md`）の整合性検査。extension schema（5セクション構造）、kind/配置/id 対応、context.paths 実在、project-local skill 存在、旧 doc-inputs 残存検出、上書き意図検出、配布コード直接参照残存を検査。regression_test は `check_extensions.test.ts` が統合テストとして存在、正常系 ok=true 確認済み（Issue #1406 移行完了時）。旧機構から extensions 移行で再実装 |
 | 37 | IR 存在条件モデル（DEC-013 適用） | REQ-028 (008, 009, 010, 012; retired、恒常行は DEC-013 が移管受入れ), REQ-036 (022) | integrity-contracts.md | DEC-013 AG-008/009 適用後の IR モデルを所有。`lifecycle_state`、`enforcement_mode`、`baseline_status` を現行 IR 属性から削除し、「現存 IR = 現行 = executable detector」へ統一。8項目存在条件、finding-baseline 分類（finding 側）、新規 IR 登録 gate (a)/(b)、一時移行検査 registry を正規所有する。catalog（[integrity-rule-catalog.md](integrity-rule-catalog.md)）は schema 定義のみ重複所有し、判定規則は本ドメインへ委譲する |
 | 38 | skill 記述基準（層1〜2）機械検査（AG-005 規則群） | REQ-002, REQ-027 | agentdev-skill-authoring.md, command-file-format.md, integrity-rule-catalog.md（AG-005 規則群） | `lint_skills.ts` が検出する層1〜2記述基準検査（hard 6規則 + warn 1規則、RU-0018 / PR #2184）。検出規則の登録は integrity-rule-catalog「AG-005 規則群」節、正典は skill authoring Design と command-file-format Design。既知違反は `baselines/lint-skills-baseline.json` で管理 |
+| 39 | guardrail-number-invariant（ガードレール番号不変量検査） | REQ-010 (064, 068) | integrity-rule-catalog.md (IR-063) | 公開 command の Gxx 開始番号（G01 起点）・欠番・重複・未定義本文参照の検出（Issue #2372）。既知違反 14 command 分は NG baseline で管理し、B-01（採番規則 Design 確定）解消後に是正 |
+| 40 | unresolved-placeholder（未解決プレースホルダー検査） | REQ-010 (065, 068) | integrity-rule-catalog.md (IR-064) | 実行時配布対象の TODO 系マーカー（strict）と ID プレースホルダー裸出力（heuristic）。テンプレート・code span・括弧内等の許容条件付き（Issue #2372）。既知違反は NG baseline で管理 |
+| 41 | obsolete-vocabulary / legacy-path（廃止語彙・旧パス・削除済み名称検査） | REQ-010 (066, 067, 068) | integrity-rule-catalog.md (IR-065/IR-066) | 旧 ADR 表記等の廃止語彙と旧パス・削除済み名称の現行使用検出（Issue #2372）。許容条件の運用データは `data/obsolete-vocabulary-map.yaml`、検出シグナルは checker 実装が所有。v2: プレフィックス・履歴文脈・existence_probe 許容付き |
 
 ## IR 別関連マッピング（自動生成）
 
@@ -132,6 +135,10 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-060 | forbidden Japanese word detection | v2:REQ-0140（v2:REQ-0140-033, v2:REQ-0140-035, v2:REQ-0140-036）, REQ-010（文意判断は docs-check 対象外、本ルールは完全一致検出に限定） | ../responsibilities/document-type-responsibilities.md（不自然表現検出分類 P0〜P4）, ../../../src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md（forbidden 語リスト正）, integrity-rule-catalog.md |
 | IR-061 | 索引類自動生成整合性 | - | - |
 | IR-062 | skill/command パス参照実在 | REQ-010 | integrity-contracts.md, agentdev-skill-authoring.md, agentdev-command-authoring.md |
+| IR-063 | guardrail-number-invariant | REQ-010-064, REQ-010-068 | ../integrity-rule-catalog.md, ../../authoring/command-file-format.md |
+| IR-064 | unresolved-placeholder | REQ-010-065, REQ-010-068 | ../integrity-rule-catalog.md |
+| IR-065 | obsolete-vocabulary-current-use | REQ-010-066, REQ-010-068 | ../integrity-rule-catalog.md, data/obsolete-vocabulary-map.yaml |
+| IR-066 | legacy-path-removed-name | REQ-010-067, REQ-010-068 | ../integrity-rule-catalog.md, data/obsolete-vocabulary-map.yaml |
 <!-- AUTOGEN:END -->
 
 > **IR-019, IR-022, IR-026, IR-036 について（2026-08-11 移管）**: 4件の意味判断系 IR は docs-check 機械検出層から除外し、inspect/diagnostics 層（`/agentdev/inspect-docs`、`/agentdev/inspect-skills`、`agentdev-doc-writing` skill）へ移管した（retired REQ-028-007、DEC-006、Phase 3 §5.2）。
