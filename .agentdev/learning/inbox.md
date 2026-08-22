@@ -524,3 +524,39 @@
 - **想定反映先**: 横断是正 PR の手順、docs-check の AUTOGEN 運用
 - **関連**: PR 2375、Issue 2371、docs/designs/integrity/rule-ownership.md、docs/designs/quality/req-health-metrics.md
 - **タグ**: `#AUTOGEN` `#generate-indexes` `#横断正規化`
+
+---
+
+## 2026-08-22: 廃止語彙検出と検証 fixture の共存は existence_probe（実在なら検出 skip）で成立する
+
+- **問題事象**: 廃止語彙・旧パス検出（IR-065/066）の設計で、検証 fixture が旧体系のシグナル（docs/adr 配下参照等）を意図的に含むため、語彙検出だけでは valid fixture 自体を違反として検出する競合が発生した。「probe 先が現行実在すれば検出 skip」する existence_probe を data/obsolete-vocabulary-map.yaml へ宣言可能にすることで誤検出を抑止し、fixture との共存を実現した。
+- **発生局面**: 実装（case-run、新規機械検査クラスの許容条件設計）
+- **検知方法**: 回帰テストの許容例 fixture と実リポジトリ走査結果の突合（check_integrity の delta 集計）
+- **根本原因**: 検証 fixture は検出対象シグナルを同一リポジトリ内に保持するため、語彙一致だけでは「意図的な検証資材」と「現行参照の違反」を区別できない
+- **自律対応内容**: existence_probe を許容条件として導入し、語彙の実体が現行実在する場合は検出 skip する方式を実装・文書化した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/Design影響**: なし（IR-065/066 ルールファイルの許容条件として明記済み）
+- **横展開観点**: 検出対象シグナルを検証 fixture と同じリポジトリに持つ、今後の新規機械検査クラス設計全般
+- **再発条件**: 実体確認（probe）なしで語彙・パス一致のみの検出を実装する場合
+- **予防策候補**: 新規検査クラス設計時に検出 skip 条件（existence_probe 等）を許容条件として先行検討する
+- **想定反映先**: docs-check 新規検査クラスの設計指針、agentdev-doc-writing の検査設計記述
+- **関連**: PR 2376、Issue 2372、docs/designs/integrity/rules/IR-065-obsolete-vocabulary-current-use.md、data/obsolete-vocabulary-map.yaml
+- **タグ**: `#機械検査` `#existence-probe` `#fixture` `#IR-065`
+
+---
+
+## 2026-08-22: 新規検査クラス導入時の既知違反は additions manifest（provenance/reason 必須）で baseline 初期化する
+
+- **問題事象**: docs-check 新規機械検査クラス 4 種（IR-063〜066）の導入時点で既知違反 222 件が一斉に NG となり、full fail gate のままだと main の機械検査が赤のままワークフローが破壊される状態になる。既知違反を NG baseline additions manifest（provenance/reason 記録付き）で初期化し、delta 0 で導入することで、ワークフローを破壊せずに承認痕跡（v2:REQ-0161-005）を残した。
+- **発生局面**: 実装（case-run、新規機械検査クラスの main 状態への統合）
+- **検知方法**: check_integrity.ts の delta 集計（9 new unmanaged NG は Wave 2 以来の既知残存と一致することの確認）と bun test 全件実行
+- **根本原因**: 検査導入時点の既存資産は新契約未対応が正常状態であり、違反件数と直ちに是正可能な件数はイコールではない
+- **自律対応内容**: 既知違反 222 件を 3 provenance（issue-2372-ir063/064/065-initial-baseline）の additions として登録し、baseline-known を info 降格、新規カテゴリ delta 0 を確認した。承認判断（HITL）は intake item として回収し分離した
+- **ユーザー確認有無**: なし（baseline 承認は intake へ回収しユーザー判断へ委ねた）
+- **ADR/REQ/Design影響**: なし（IR-055 専用 baseline ファイルと ng-baseline additions manifest の使い分けは運用判断として学習記録側に残す）
+- **横展開観点**: 既存違反を伴う新規機械検査の追加全般。full fail gate と additions manifest 初期化の使い分け
+- **再発条件**: baseline 初期化なしに新規検査を導入し、既存資産の違反で main が赤固定になる場合
+- **予防策候補**: 新規検査クラス導入手順に「既知違反の additions manifest 初期化（provenance/reason 記録）と delta 0 確認」を標準ステップとして組み込む
+- **想定反映先**: docs-check の新規検査追加手順、IR ルールファイルの baseline 運用節
+- **関連**: PR 2376、Issue 2372、.opencode/skills/repo-agentdev-integrity/baselines/ng-baseline.json、intake item 2026-08-22-issue2372-ng-baseline-additions-approval.md
+- **タグ**: `#機械検査` `#baseline` `#ng-baseline` `#導入安全化`
