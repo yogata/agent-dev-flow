@@ -12,6 +12,22 @@ Pull Request作成時の本文テンプレート。
 
 [Issueの要約]
 
+## 実行識別情報
+<!-- 【必須】 -->
+
+<!-- 実行識別情報: workflow-contracts Design「ADF 実行識別情報の記録契約」に基づく構造化識別情報セクション。
+機械的解析は本セクション内の adf_ 接頭辞付き key-value 行を正とし、自由文中に偶然出現する ID に依存しない。
+adf_delegation は委譲 prompt の委譲識別情報ブロックから転記し、委譲実行と PR の対応付けの正規手段とする。
+harness 側識別子は取得可能な場合の付加情報に限定し、必須契約としない。
+識別情報の一部が取得不能な場合は「N/A」と記録し、workflow を停止しない。
+本セクションは新規作成 PR のみに適用し、既存 PR への遡及適用は行わない -->
+- adf_case: （対象 Case の Issue 番号。#N 形式）
+- adf_pr: （本 PR の番号。#N 形式）
+- adf_execution_unit: （実行単位。standard:#N または epic:#N。execution_unit 構成の既存定義に従う）
+- adf_delegation: （委譲単位識別子（DEL-{N}-{seq} 形式。N = Issue 番号、seq = 同一 Issue への委譲連番）と委譲目的。委譲 prompt の委譲識別情報ブロックから転記する）
+- adf_result: （実行結果。result 契約の4状態（completed-pr、blocked、failed、delegation-unavailable）。PR 作成時点は completed-pr と記録する）
+- adf_harness_ref: （任意。harness 側識別子（OpenCode session ID 等）。取得可能な場合のみ記載し、省略できる）
+
 ## 実装内容
 <!-- 【必須】 -->
 
