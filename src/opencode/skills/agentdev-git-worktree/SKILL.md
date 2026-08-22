@@ -65,6 +65,7 @@ detached worktree による baseline 比較を標準手順とする。
 | 作成、削除、ブランチ操作の詳細 | `references/worktree-operations.md` |
 | 統合先の解決、評価ブランチの作成・削除 | `references/worktree-operations.md` |
 | worktree 検証時の一時退避（stash 運用） | `references/worktree-operations.md` |
+| bun test 実行の環境前提（worktree 構造的制約、node_modules 未伝播） | `references/worktree-operations.md` |
 | git pull/push/hash検証の共通手順 | `references/git-common-procedures.md` |
 
 ## 禁止事項

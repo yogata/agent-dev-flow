@@ -168,6 +168,55 @@ case-close は完了条件を主評価値（識別子）で最終評価する。
 - **warn**: 完了条件が実測値中心で記載されており、識別子ベースの staleness check が困難。可能であれば識別子中心への記載見直しを推奨。
 - **N/A**: 完了条件が識別子を含まない性質（例: テキスト品質の主観評価）の場合、本観点は skip する。
 
+## bun test フル suite 正規形（実行形態契約）
+
+full integrity suite 合格判定に用いる bun test フル suite の実行形態を、次のとおり正規形として確定する。
+本契約は QG-4 の実行形態要件であり、実行環境の前提（worktree 構造的制約、依存パッケージ未伝播）は `agentdev-git-worktree` の worktree 構造的制約を参照する。
+
+### 3 cwd 分割実行
+
+フル suite（リポジトリ内の全 test ファイル）は、単一のカレントディレクトトリビアな実行（`bun test` 単体等）で代替しない。
+次の3分割実行とし、各実行の cwd はリポジトリルート（worktree root または main root）に統一する。
+各実行は `./` prefix 付きで対象ディレクトリを明示指定する。
+
+| 分割 | 対象 |
+|---|---|
+| ① integrity suite | integrity 検査スイート全体 |
+| ② src 側 skill script テスト | 配布 skill の script テスト群 |
+| ③ repo ルート系 guard テスト | plugins・発行系等の repo ルート直下テスト |
+
+起動コマンド（`<integrity-detector-skill>` は対象リポジトリの integrity 検査 skill 名に解決する）:
+
+```bash
+bun test ./.opencode/skills/<integrity-detector-skill>/scripts/
+bun test ./src/opencode/skills/
+bun test ./.opencode/plugins/ ./scripts/
+```
+
+- **依存パッケージ前置**: 分割② の実行前に、配布 skill `agentdev-project-extensions` の scripts ディレクトリで `bun install` を実行済みであること（zod 等の依存解決）。node_modules は gitignore 対象のため worktree へ未伝播であり、未実施の場合は integrity suite の一部テストも依存解決失敗で fail する
+
+  ```bash
+  bun install --cwd src/opencode/skills/agentdev-project-extensions/scripts
+  ```
+
+- **件数突合**: 各実行結果の「Ran N tests across M files」の N/M 件数突合を行う。直前実績と比較して件数が急減していないかの妥当性を検証する（固定値の期待値化は行わない）
+- **カレントディレクトトリビアな実行の禁止**: 対象スイートには cwd 依存テストが混在するため、`bun test` 単体等での実行で正規形を代替しない
+
+### 環境ラベル
+
+フル suite の実行記録には環境ラベルを付す。
+環境ラベルは次の3要素で構成する。
+
+- **実行環境**: worktree root または main root の別とパス
+- **junction 伝播状態**: worktree では `.opencode/skills/agentdev-*` junction の未伝播、main では junction 構成の鮮度（未再構築の stale junction 有無）
+- **依存パッケージ状態**: gitignore 対象 node_modules の伝播状態と `bun install` の要否・実施済み否か
+
+### fail 由来分類
+
+フル suite の合格判定は、fail 全件の由来分類（既知欠陥、環境依存、当該変更起因）と検証環境の記録を前提とする。
+未登録の既知欠陥と由来不明の fail を合格の根拠にしない。
+由来判定は remediation 開始前の baseline commit を基準とし、base ブランチ比較のみを pre-existing の証拠として採用しない。
+
 ## pass/ fail 基準
 
 - **pass**: 上記 1, 2, 6, 7, 8 を満たし（3, 4, 5, 9 は warn 以下）、マージ可能。

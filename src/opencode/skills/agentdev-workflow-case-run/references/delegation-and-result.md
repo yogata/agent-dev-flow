@@ -31,6 +31,13 @@
 - 実装実行を adapter skill（`agentdev-case-run-execution-adapter`）を読み込んだ実行担当サブエージェントへ委譲する（委譲 prompt 内で実行 command を指定）。起動手段は AGENTS.md および references/<harness>.md 参照。adapter protocol は同 skill 参照
 - **L2 タイムスタンプ計測**: 委譲起動直前・直後に壁時計タイムスタンプ（JST）を記録し、実行担当サブエージェント実行時間を計測する。併せて STEP-S3（worktree 設置）と STEP-S6（クリーンアップ）の開始・終了時刻を記録する
 - 委譲プロンプト、staleness check 結果の引き渡し、test strategy 項目の test-fix ループ、実行担当サブエージェントの責務（目標分解、各 criterion に observable evidence を要求、品質ゲートの実行、test-fix ループ）、委譲起動失敗・異常終了時の扱い（即 `failed` とせず実装完了・検証未完了として扱う）の詳細は `agentdev-case-run-execution-adapter` スキルを参照
+- **bun test フル suite 正規形**: test strategy の検証で bun test フル suite を実行する場合、正規形（3 cwd 分割実行・./ prefix・環境ラベル）に従う。正規形の規定は `agentdev-quality-gates`（QG-4 bun test フル suite 正規形）を正とする。3分割は integrity suite、src 側 skill script テスト、repo ルート系 guard テストで構成し、各実行の cwd はリポジトリルート（worktree root または main root）に統一する。実行担当サブエージェントは PR 本文に各分割実行の実行 cwd・起動コマンド形式・環境ラベル（worktree または main、junction 伝播状態、依存パッケージ状態）と fail 全件の由来分類（既知欠陥・環境依存・当該変更起因）を記録する。テスト環境前提（worktree の node_modules 未伝播と `bun install` 前置、main からの読取専用実行）は `agentdev-git-worktree` の worktree 構造的制約を参照する。起動コマンド（`<integrity-detector-skill>` は対象リポジトリの integrity 検査 skill 名に解決する）:
+
+  ```bash
+  bun test ./.opencode/skills/<integrity-detector-skill>/scripts/
+  bun test ./src/opencode/skills/
+  bun test ./.opencode/plugins/ ./scripts/
+  ```
 - **引き渡し**: 割り当てられた1 Issue の Issue番号、worktree root（相対パス指定、worktree 内制約）、ブランチ名、PR base（当該 Case の統合先。通常Caseは main、実証Caseは評価ブランチ。rebase・同期基準も同一の統合先を参照）
 - **実証Caseの委譲指示**: 実証Caseの場合、委譲プロンプトに評価ブランチを作業起点および PR base とすることと、評価ブランチ上で必要な実証手段の準備、実行、測定、観察、証拠生成、評価を行うことを含める。コード作成が不要な実証も許容し、実証コード・評価基盤・評価用データのみを変更対象とする PR、検証のみの PR を通常の Case と同一の経路で扱う（検証のみの PR は verification-only PR の既存経路に従う）。評価契約と test strategy は分離されており、test strategy は実証手段・計測手段・実証環境が正常に動作したかの検証を担う。実行側の自律判断で評価契約を変更しない
 - **実証Caseの PR 本文記録要素**: 実行担当サブエージェントが PR 本文に実際の実行条件、測定結果、観察結果、証拠、評価結果を記録するよう委譲プロンプトで指示する。評価ブランチ削除後も Issue/PR から必要な結果と証拠を追跡できる形式とする
