@@ -132,3 +132,19 @@
 - **想定反映先**: agentdev-doc-writing の機械置換手順（mechanical-replacement-rules.md）へ事前確認段階として反映する候補
 - **関連**: PR #2397、Issue #2387、Epic #2378 Wave 3 case-close
 - **タグ**: `#ag005` `#lint-skills` `#toc`
+
+## 機械置換スクリプトを別処理系へ移植する際の引数意味差異は段階3 MISS 確認で即時検出される
+
+- **問題事象**: X-4 分割スクリプトを Node.js へ移植した初回実行で、`String.prototype.substring`（第2引数 = 終了 index）と PowerShell `Substring`（第2引数 = 長さ）の引数意味の違いにより不正分割が発生した
+- **発生局面**: 実装（機械置換スクリプトの処理系間移植、Epic #2378 Wave 4）
+- **検知方法**: 3段階手順の段階3（MISS 確認）での再検出が新規違反21件として即時検出
+- **根本原因**: 移植時に両処理系の部分文字列 API の引数意味（終了 index か長さか）を照合しなかった
+- **自律対応内容**: `git checkout` で対象ファイルを復元し、引数意味を修正したうえで3段階手順を再実行して影響を排除した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（RU-0009 正式化の3段階手順の有効性を実証する事例）
+- **横展開観点**: 機械置換・機械判定スクリプトを別処理系へ移植するすべての場面
+- **再発条件**: 同一仕様の文字列操作 API を持つ別処理系へ引数意味を確認せず移植する場合
+- **予防策候補**: 機械置換スクリプト移植時に引数意味の照合を事前確認に含める
+- **想定反映先**: agentdev-doc-writing の機械置換手順（mechanical-replacement-rules.md）へ移植時事前確認として反映する候補
+- **関連**: PR #2398、Issue #2388、Epic #2378 Wave 4 case-close
+- **タグ**: `#mechanical-replacement` `#porting` `#three-stage-procedure`
