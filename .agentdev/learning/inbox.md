@@ -148,3 +148,20 @@
 - **想定反映先**: agentdev-doc-writing の機械置換手順（mechanical-replacement-rules.md）へ移植時事前確認として反映する候補
 - **関連**: PR #2398、Issue #2388、Epic #2378 Wave 4 case-close
 - **タグ**: `#mechanical-replacement` `#porting` `#three-stage-procedure`
+
+## 前段ドライバーのインフラ障害からの再開は差分の契約照合・作成後埋め戻し・検査タイミングの3点で完結できる
+
+- **問題事象**: 前段ドライバーが実装途中でインフラ障害により result 未返却で終了し、未コミット差分（11 ファイル）と未追跡ファイル（2 ファイル）が残留した。あわせて (a) Issue / PR 自身の番号を含む識別情報は作成前には確定せず、作成後埋め戻し手順が不明だと値が永久にプレースホルダのままになる箇所、(b) `check_changed_docs.ts` の `--base-ref` は `git diff base...HEAD`（コミット済み差分のみ）を対象とするため未コミット状態での実行は空振りする、の2点が判明した
+- **発生局面**: 実装（case-run 委譲、Epic 2399 Wave 1 基盤層。前段ドライバーの中断と後続ドライバーの再開）
+- **検知方法**: worktree の `git status` による生存差分検出、Issue・REQ・Design 契約との hunk 単位照合、テンプレート識別情報セクションの値検査、`check_changed_docs.ts` の実行タイミング検証
+- **根本原因**: インフラ障害による委譲の異常終了（計画起因ではない）。ならびに自己参照識別子の確定タイミングと検査コマンドの対象範囲（コミット済み差分のみ）が手順化されていなかった
+- **自律対応内容**: 生存差分を Issue・REQ・Design 契約に照合して hunk 単位で再検討し、妥当な差分は保持・補完して完遂した。自己参照識別子（`adf_case`、`adf_execution_unit` の自己参照、`adf_pr`）の作成後埋め戻し手順を case-open STEP-5 と adapter PR 作成に明文化した。`check_changed_docs.ts` はコミット後に実行する手順順序が有効であることを確認した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（REQ-048-005「取得不能識別子を必須契約とせず停止しない」の運用実例、DEC-011 会話記憶非依存再開の実証例）
+- **横展開観点**: 委譲異常終了後の再開すべて、自己参照識別子を含むテンプレート運用、`--base-ref` 系検査の実行タイミング
+- **再発条件**: 委譲が result 未返却で中断し差分が残留した場合、作成後埋め戻し手順なしに識別情報セクションを運用した場合、未コミット状態で `--base-ref` 検査を実行した場合
+- **予防策候補**: 再開時の差分再検討手順の標準化、作成後埋め戻し手順のテンプレート規約化（本 PR 2405 で適用済み）、検査はコミット後実行の順序徹底
+- **想定反映先**: agentdev-workflow-case-run の再開経過手順、agentdev-workflow-case-open・agentdev-case-run-execution-adapter の埋め戻し規約（本 PR 2405 で適用済み）
+- **関連**: PR 2405 本文、Issue 2400、Epic 2399 Wave 1 case-close
+- **タグ**: `#delegation-recovery` `#self-reference-ident` `#check-changed-docs` `#case-close`
+
