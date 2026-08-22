@@ -181,3 +181,19 @@
 - **関連**: PR 2404 本文、Issue 2401、Epic 2399 Wave 1 case-close
 - **タグ**: `#delegation-recovery` `#verification-progress` `#dec011`
 
+## 新規配布物ファイルの IR-055 delta は ADF-COVERS 宣言の PR 本文集約で回避する
+
+- **問題事象**: 新規配布物ファイル（reference-resolution.md）の作成過程で、素の REQ-NNNN/DEC-NNN ID 参照と src/opencode/ パス表記が IR-055（runtime-unresolved-reference）の delta 違反13件として fail 検出された。既存ファイルの同種表記は baseline 管理で info 降格されているが、新規ファイルは baseline 対象外のため fail になる
+- **発生局面**: 実装（新規配布物 reference ファイルの作成、Epic 2399 Wave 2、Issue 2402 の case work）
+- **検知方法**: bun test integrity suite の IR-055 delta 検出（fail）
+- **根本原因**: 既存ファイルで許容されている表記（inline パス参照、要件根拠の ID 引用）が新規ファイルでは違反になるという baseline 適用範囲の差を事前把握していなかった
+- **自律対応内容**: パス表記を fenced code block 内へ限定し、具体例を {skill} プレースホルダ形式に置換し、REQ/DEC ID 引用を配布物本文から除外して要件根拠を PR 本文の ADF-COVERS 宣言へ集約した。再検証で delta 0 を確認した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（IR-055・配布依存境界の既存規定の運用知見。PR 本文 ADF-COVERS 集約に伴うトレーサビリティ宣言カバレッジの観点は intake item（traceability-req048-declaration-corpus-gap）で別管理）
+- **横展開観点**: 新規配布物ファイルを作成するすべての場面
+- **再発条件**: 新規配布物に既存ファイルと同等の inline パス参照・concrete ID 記述を行った場合
+- **予防策候補**: 新規配布物作成時の「fenced code block + プレースホルダ + ID 引用排除（PR 本文 ADF-COVERS 宣言へ集約）」様式の徹底
+- **想定反映先**: agentdev-skill-authoring、agentdev-doc-writing の記載様式ガイド（既存学び「配布 skill への実行手順記載は fenced code block とプレースホルダーで書く」との統合候補）
+- **関連**: PR 2406 本文、Issue 2402、Epic 2399 Wave 2 case-close
+- **タグ**: `#ir055` `#new-distribution-file` `#adf-covers` `#skill-authoring`
+
