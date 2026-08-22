@@ -93,6 +93,7 @@ fan-in 判定モデルの詳細は `agentdev-epic-tracker` 参照。
 Windows + ジャンクション環境の worktree では `.opencode/skills/agentdev-*`、`.opencode/commands/agentdev/` が空になる（ジャンクション未伝播）。
 実行担当サブエージェントへ引き継ぐプロンプトには、以下を**必須項目**として明記する。
 
+- 構造化文脈（10意味: 目的、現在の ADF 工程、現在の実行単位、前工程で確定した事項、未確定事項、正規参照先、停止条件、期待する実行結果、後続工程へ渡すべき成果、計画変更を識別するための情報）を構造化して含めること（直列化形式は `agentdev-case-run-execution-adapter` スキルの委譲プロンプト雛形参照）
 - worktree 内 `.opencode/` は空（ジャンクション未伝播）であること
 - source（`src/opencode/`）と projection（`.opencode/`）の編集は手動両辺編集を行うこと
 - 同期スクリプト（`sync-self-opencode.ps1` 等）には依存しないこと

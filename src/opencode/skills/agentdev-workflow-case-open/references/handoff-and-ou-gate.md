@@ -27,6 +27,12 @@
 - **self-hosting リポジトリ**（ジャンクション or 実ディレクトリ）: 履歴メタデータとして処理を継続
 - **consumer リポジトリ**（コピー配置等）: Issue を作成せず停止し agent-dev-flow repository への手動取り込み対象として報告
 
+### 工程間構造化文脈の初期文脈利用
+
+前工程（req-define、req-save、design-save、case-auto 等）から構造化文脈が引き継がれている場合、前工程で確定した事項（保存済み REQ/Decision の有無、Design 消費済みフラグ、前工程完了度等）を初期文脈として利用し、同じ情報をゼロから探索、再構築することを原則としない。
+独立検証、鮮度確認、矛盾検出、正規成果物との整合確認を目的とする再確認（draft-data の `status`、`artifact_actions` と実ファイルの突合等）は維持する。
+構造化文脈が引き継がれていない場合は、durable state（要件doc、RU）から入力解決を行う（形式と制約は `agentdev-workflow-lifecycle` スキルの工程間構造化文脈引き継ぎ参照）。
+
 ### OU 選択ゲート（`operation_units` セクションがある場合）
 
 - **OU ID 指定あり**: 当該 OU のみを処理対象とする例外経路

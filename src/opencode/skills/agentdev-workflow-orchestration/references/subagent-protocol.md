@@ -88,6 +88,7 @@ oldString: "    const result = items.map(i => i.value);"
 
 driver 起動プロンプトには以下を明記する:
 
+- **構造化文脈（10意味）の直列化**: 目的、現在の ADF 工程、現在の実行単位、前工程で確定した事項、未確定事項、正規参照先、停止条件、期待する実行結果、後続工程へ渡すべき成果、計画変更を識別するための情報を構造化して含める。直列化形式は `agentdev-case-run-execution-adapter` スキルの委譲プロンプト雛形「構造化文脈の直列化（委譲時）」に従う。driver は前工程で確定した事項を初期文脈として利用し、独立検証、鮮度確認、矛盾検出、正規成果物との整合確認を目的とする再確認は維持する
 - **worktree 内 `.opencode/` は空**: ジャンクション未伝播のため `.opencode/skills/agentdev-*`、`.opencode/commands/agentdev/` が存在しない。`.opencode/skills/repo-*`（実ディレクトリ）のみ存在する
 - **source/ projection 手動両辺編集**: ジャンクション未伝播時は同期スクリプトで自動化できず、source（`src/opencode/`）と projection（`.opencode/`）を手動で両辺編集する運用をとる。agent-dev-flow 自己ホストの場合は source 編集後にメインリポジトリのジャンクションが merge 後に自動反映するため worktree での projection 手動編集は不要だが、consumer プロジェクト（ジャンクションなし、`.opencode/` が git 管理対象）では両辺の手動同期が必要
 - **同期スクリプト非依存**: `sync-self-opencode.ps1`、`install-consumer-opencode.ps1` を worktree 内で実行してジャンクションを再作成しない（worktree 汚染、競合リスク）。ジャンクション再作成は case-run 終了後にメインリポジトリで実施する

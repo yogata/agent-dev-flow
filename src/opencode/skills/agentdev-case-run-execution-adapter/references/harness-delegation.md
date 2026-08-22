@@ -19,6 +19,7 @@ case-run は AGENTS.md で選定された外部実行基盤のエージェント
 - [timeout、中断](#timeout中断)
 - [委譲プロンプト構築例](#委譲プロンプト構築例)
 - [委譲識別情報ブロック](#委譲識別情報ブロック)
+- [構造化文脈の直列化（委譲時）](#構造化文脈の直列化委譲時)
 - [委譲プロンプト雛形（委譲契約必須テンプレート）](#委譲プロンプト雛形委譲契約必須テンプレート)
 - [委譲プロトコルと category 設計](#委譲プロトコルと-category-設計)
 - [委譲起動失敗、異常終了時事後処理](#委譲起動失敗異常終了時事後処理)
@@ -101,6 +102,27 @@ case-run が実行担当サブエージェントを起動する際の委譲プ�
 - adf_child: DEL-{N}-1（子実行: 本委譲）
 </delegation-ident>
 
+<structured_context>
+purpose: Issue #N の実行契約（完了条件、test strategy、必須品質統制）を満たす実装と PR 作成
+workflow_phase: case-run（実装実行）
+execution_unit: Issue #N（単一 Issue 実行。委譲単位識別子: <委譲単位識別子>）
+resolved_context:
+  - 要件定義、Design は保存済み（正規情報源: 対象 REQ ファイル、Design ファイル）
+  - 前工程完了度: 完全完了（Issue 本文「## 補足情報」参照）
+open_items:
+  - なし（実行中に発生した場合は停止条件に従い blocked として報告）
+canonical_references:
+  - Issue 本文（実行契約。正規原本）
+  - docs/ 配下の対象 REQ、Decision、Design（正規原本）
+stop_conditions:
+  - 実行契約の不足、曖昧さ、矛盾、実現不能の検出（自律補完禁止）
+  - 既確定文書（REQ、Decision、Design）の変更、追加、撤回が必要と判明した場合
+expected_output: 実装済みブランチ + PR（PR 本文に検証証跡、Findings / Capture候補を含む）
+handoff_artifacts:
+  - PR 本文（検証結果、Findings / Capture候補、Design確定候補）
+plan_change: なし（委譲中に計画変更が生じた場合は result に理由を付して報告）
+</structured_context>
+
 <worktree>
 - worktree root: .worktrees/980-case/
 - branch: case-980
@@ -113,6 +135,7 @@ case-run が実行担当サブエージェントを起動する際の委譲プ�
 
 - `<execution-command> Implement Issue #N:`: 委譲 prompt 内で実行 command を起動し、Issue #N の実装を指示する
 - `<delegation-ident>`: 委譲識別情報ブロック。委譲目的、委譲単位識別子、親子実行関係を記録する（後述「委譲識別情報ブロック」参照）
+- `<structured_context>`: 構造化文脈（10意味）の直列化ブロック。後述「構造化文脈の直列化（委譲時）」の形式に従う
 - `<worktree>`: case-run が用意した worktree root とブランチ名を明示。メインリポジトリパスは含めない
 - `<Issue body>`: 対象 Issue の本文。実行担当サブエージェントは完了条件、受け入れ基準を success criteria に分解する
 
@@ -131,6 +154,58 @@ case-run が実行担当サブエージェントを起動する際の委譲プ�
 - 親子実行関係の識別は ADF が発行する委譲単位・実行単位識別子を正規手段とし、harness 側識別子（OpenCode session ID 等）は取得可能な場合の付加情報に限定する
 - 実行担当サブエージェントは PR 作成時、PR 本文の実行識別情報セクション（`agentdev-workflow-templates` の実行識別情報セクション規約参照）の `adf_delegation` へ委譲単位識別子と委譲目的を転記する。これにより委譲実行と PR の対応付けが機械的に可能になる
 - 委譲識別情報の一部が取得不能・発行不能でも委譲を停止しない。欠落値は `N/A` とする
+
+## 構造化文脈の直列化（委譲時）
+
+委譲 prompt は、委譲時最小契約（入力（inputs）、副作用境界（side_effect_boundary）、出力契約（output_contract）、capture 引継ぎ（capture_handoff））の骨格を変更せず、入力（inputs）内に構造化文脈を直列化する。
+原本仕様は delegation-contracts Design「構造化文脈引き継ぎ（委譲時）の直列化契約」であり、本節は配布物への適用形を定める。
+
+構造化文脈は次の意味を扱う。
+
+| 意味 | キー | 内容 |
+|---|---|---|
+| 目的 | `purpose` | 委譲の目的（実行契約の要約） |
+| 現在の ADF 工程 | `workflow_phase` | 委譲を起動する工程（case-run 等） |
+| 現在の実行単位 | `execution_unit` | 実行単位の識別子（Issue 番号、Wave、OU 等）と委譲単位識別子 |
+| 前工程で確定した事項 | `resolved_context` | 確定済み事項の要約と正規情報源の参照先 |
+| 未確定事項 | `open_items` | 未解決事項。判断主体、判断条件が必要な場合に付ける |
+| 正規参照先 | `canonical_references` | 当該作業で使用すべき解決済み参照先（正規原本、実行時投影、双方確認の別を含む） |
+| 停止条件 | `stop_conditions` | 委譲先が停止して報告すべき条件 |
+| 期待する実行結果 | `expected_output` | 成果物と受理基準の要約 |
+| 後続工程へ渡すべき成果 | `handoff_artifacts` | 後続工程が利用する成果（PR 本文、Issue コメント等） |
+| 計画変更を識別するための情報 | `plan_change` | 前提の変化、決定事項の追加・撤回、スコープ変更。変化なしの場合は「なし」を明示 |
+
+入力（inputs）内への直列化テンプレートは次のとおり。
+
+```yaml
+inputs:
+  structured_context:
+    purpose: {委譲の目的}
+    workflow_phase: {現在の ADF 工程}
+    execution_unit: {現在の実行単位（Issue 番号、Wave、OU 等の識別子と委譲単位識別子）}
+    resolved_context:
+      - {前工程で確定した事項の要約。正規情報源の参照先を付ける}
+    open_items:
+      - {未確定事項。判断主体・判断条件が必要な場合に付ける}
+    canonical_references:
+      - {当該作業で使用すべき解決済み参照先。正規原本（source）、実行時投影（projection）、双方確認の別を含む}
+    stop_conditions:
+      - {停止条件。実行契約上の停止条件、既確定文書への変更要件等}
+    expected_output: {期待する実行結果（成果物と受理基準の要約）}
+    handoff_artifacts:
+      - {後続工程へ渡すべき成果（PR 本文、Issue コメント、保存済み正規成果物等）}
+    plan_change: {計画変更を識別するための情報（前提の変化、決定事項の追加・撤回、スコープ変更）。変化なしの場合は「なし」を明示}
+  （委譲時最小契約の入力の既存内容。スコープ、制約等）
+```
+
+### 制約
+
+- 直列化に全文履歴や巨大な計画本文の複製を含めない。各フィールドは要約と正規参照先で構成する。
+- 構造化文脈は新しい正規情報源ではない。引き継ぎ内容は永続的な正規成果物（Issue 本文、PR 本文、RU、OU 等）から再構成可能であること。会話記憶に依存する再開を許可しない。
+- 委譲 prompt には対象 Case、Issue、PR（既知の場合）、ADF 工程、実行単位、委譲目的の識別情報を構造化して含める。委譲単位識別子は ADF が発行する識別情報の記録契約に従う。OpenCode 等の harness 側セッション識別子は、取得可能な場合の付加情報とし、必須契約としない。
+- 受領側（実行担当サブエージェント）は前工程で確定した事項（`resolved_context`）を初期文脈として利用し、同じ情報をゼロから探索、再構築することを原則としない。独立検証、鮮度確認、矛盾検出、正規成果物との整合確認を目的とする再確認は維持する。
+- 本テンプレートの適用範囲は case-run からの実行担当サブエージェント委譲に限らず、subagent 委譲する全場面（case-auto、case-open、case-run、case-update、case-close）で共通する（後述「委譲プロトコルと category 設計」と同一の適用範囲）。
+- 工程間（委譲を介さない工程の引き継ぎ）の構造化文脈は、同一の意味集合を `agentdev-workflow-lifecycle` スキルの工程間構造化文脈引き継ぎの形式（`structured_context` をトップレベルに持つ構造化ブロック）で扱う。本節の形式と意味対応を保つ。
 
 ## 委譲プロンプト雛形（委譲契約必須テンプレート）
 
