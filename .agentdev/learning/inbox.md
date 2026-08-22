@@ -488,3 +488,39 @@
 - **想定反映先**: Wave 3（Issue 2372）の docs-check 機械検査クラス設計（REQ-010-064〜068）
 - **関連**: PR 2374、Issue 2370、監査レポート F-019〜F-025
 - **タグ**: `#監査` `#check-integrity` `#delta-ng` `#観点V10`
+
+---
+
+## 2026-08-22: 配布物（src/opencode/**）への横断是正では Design パス参照・具体 DEC-NNN 記述が IR-055 の新規違反になる（修正適用前の再 grep が有効）
+
+- **問題事象**: REQ-046 横断正規化（PR 2375）で、旧 ADR 注記の是正候補として「Design パス参照への置換」「具体 DEC-NNN 記述」を適用したところ、いずれも IR-055 strict/heuristic の新規違反となった。2 回（command の docs/designs パス参照、skill の DEC-003/DEC-017 具体参照）差分レビューで検出し、「既存の skill 名参照・注記削除」方式へ切り替えた。
+- **発生局面**: 実装（case-run の横断正規化、修正適用〜差分レビュー）
+- **検知方法**: 差分レビューと IR-055 系検出（check_distribution_boundary / check_integrity）
+- **根本原因**: 配布物は consumer 環境で自己ホスト文書構造（docs/designs パス）やプロジェクト内部の具体 Decision ID を参照できない（配布依存境界）。是正候補の「正規契約への置換」が配布物では別の違反を生む
+- **自律対応内容**: 検出時に該当箇所を「既存の skill 名参照・原本（SSoT）宣言が根拠参照を保持する削除方式」へ差し戻し、再検査で合格とした
+- **ユーザー確認有無**: なし
+- **ADR/REQ/Design影響**: なし
+- **横展開観点**: 配布物を含む横断是正 PR 全般。修正適用前に IR-055 パターン（docs/designs パス、具体 DEC/REQ-NNN）の再 grep を行い、違反になる候補は削除方式等へ切り替える
+- **再発条件**: 配布物の正規化で Design パス参照や具体 DEC-NNN 記述を追加する場合
+- **予防策候補**: 横断是正 PR の修正適用前チェックへ IR-055 パターンの再 grep を組み込む
+- **想定反映先**: case-run の横断是正手順、agentdev-doc-writing の機械置換規則
+- **関連**: PR 2375、Issue 2371、docs/reports/integrity/normalizations/req-046-normalization-20260822.md
+- **タグ**: `#横断正規化` `#IR-055` `#配布物` `#distribution-boundary`
+
+---
+
+## 2026-08-22: AUTOGEN 表は生成元を正規化して再生成する（ブロック本文の直接編集は再生成で上書きされる）
+
+- **問題事象**: REQ-046 横断正規化（PR 2375）で rule-ownership の IR クロスリファレンス AUTOGEN 表を更新する際、AUTOGEN ブロック本文の直接編集では次回生成で上書きされるため、生成元（IR ルールファイルの related_req）を正規化して generate_indexes.ts で再生成する手順を取った（PC-07）。req-health-metrics の AUTOGEN ブロックも同様に再生成で反映した（PC-08、差分全行精査済み）。
+- **発生局面**: 実装（case-run の横断正規化、AUTOGEN 表を含む Design の更新）
+- **検知方法**: AUTOGEN ブロックの生成規約（機械生成必須契約）と再生成差分の全行精査
+- **根本原因**: AUTOGEN ブロックは generate_indexes.ts が単一の生成源であり、本文直接編集と生成結果が競合する
+- **自律対応内容**: 生成元（IR ルールファイルの related_req、REQ 行数等の計上元）を正規化し、generate_indexes.ts 再生成で AUTOGEN 表へ反映した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/Design影響**: なし（AUTOGEN 生成契約どおりの運用）
+- **横展開観点**: AUTOGEN ブロックを含む成果物（rule-ownership、req-health-metrics 等）の正規化・更新全般。編集対象が「生成元」か「生成成果物」かを最初に区別する
+- **再発条件**: AUTOGEN ブロック本文を直接編集して生成元を更新しない場合
+- **予防策候補**: AUTOGEN 表の変更要求では「生成元の正規化 → 再生成 → 差分精査」を標準手順とする
+- **想定反映先**: 横断是正 PR の手順、docs-check の AUTOGEN 運用
+- **関連**: PR 2375、Issue 2371、docs/designs/integrity/rule-ownership.md、docs/designs/quality/req-health-metrics.md
+- **タグ**: `#AUTOGEN` `#generate-indexes` `#横断正規化`
