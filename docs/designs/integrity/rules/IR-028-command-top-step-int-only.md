@@ -2,7 +2,7 @@
 title: "IR-028: Command 最上位 Step 整数化"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-08-22
 ---
 
 # IR-028: Command 最上位 Step 整数化
@@ -13,13 +13,13 @@ updated: 2026-08-20
 | description | Command の最上位 Step 見出し、参照が整数のみであり、`Step N.M` 形式の小数 Step が残存していないこと |
 | severity | strict |
 | category | obsolete-structure |
-| detection_method | `src/opencode/commands/agentdev/*.md` を対象に `Step \d+\.\d+` を検出。projection 側または integrity rule 内の旧語検出用文字列は REQ-003-021 により除外 |
+| detection_method | `src/opencode/commands/agentdev/*.md` を対象に `Step \d+\.\d+` を検出。projection 側または integrity rule 内の旧語検出用文字列は除外が必要 |
 | affected_artifacts | [commands, command projection, integrity rules] |
-| related_req | [REQ-003-005, REQ-003-007, REQ-003-021] |
-| related_design | [artifact-contracts.md, workflow-contracts.md] |
+| related_req | -（要件行レベルの正規所有者なし。サブステップ様式の正規契約は command-file-format.md が所有） |
+| related_design | [../../authoring/command-file-format.md, artifact-contracts.md, workflow-contracts.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 中。旧語検出用の正規表現文字列と projection 側の残存確認文は除外が必要 |
-| regression_test | (未実装) |
+| regression_test | `check_command_format.ts`（ir028-command-top-step-alphabet 検出、commands 両ディレクトリ走査） |
 | finding_route | intake |
 | triage_action | 小数 Step を整数 Step または N-M 形式のサブステップへ置換 |
-| last_verified | 2026-06-12 |
+| last_verified | 2026-08-22 |

@@ -3731,4 +3731,96 @@ describe("IR-065/IR-066 obsolete-vocabulary & legacy-path (REQ-010-066/067, Issu
     );
     expect(specCompliance.length).toBeGreaterThanOrEqual(1);
   });
+
+  it("reports no drift when the real yaml matches checker constants (正常例: 同期済み)", () => {
+    const r = runScript(IR065_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const drift = parsed.results.filter(
+      (res: { category: string; check: string }) =>
+        res.category === "ObsoleteVocabulary" && res.check === "obsolete-vocabulary-map-drift",
+    );
+    expect(drift.length).toBe(0);
+  });
+});
+
+// ─── IR-065/IR-066 vocabulary map drift (REQ-047-004, Issue #2373) ───────────
+// Fixture kinds: 違反例（模擬変更）3種 — yaml 側にのみ存在する語彙 ID（正規契約側
+// で語彙を追加し checker を未更新の状態）、checker 側にのみ存在する語彙 ID（yaml
+// から語彙を除去し checker を未更新の状態）、rule 割当の不一致。
+
+const IR065_DRIFT_ROOT = join(TEMP_ROOT, "ir065-drift");
+
+function buildIr065DriftFixture(
+  root: string,
+  patchYaml: (yaml: string) => string,
+): void {
+  buildIr065Fixture(root);
+  const yamlPath = join(
+    root,
+    ".opencode",
+    "skills",
+    "repo-agentdev-integrity",
+    "data",
+    "obsolete-vocabulary-map.yaml",
+  );
+  writeFileSync(yamlPath, patchYaml(readFileSync(yamlPath, "utf-8")), "utf-8");
+}
+
+function driftResults(root: string) {
+  const r = runScript(root, ["--json"]);
+  const parsed = JSON.parse(r.stdout);
+  return parsed.results.filter(
+    (res: { category: string; check: string }) =>
+      res.category === "ObsoleteVocabulary" && res.check === "obsolete-vocabulary-map-drift",
+  );
+}
+
+describe("IR-065/IR-066 vocabulary map drift (REQ-047-004, Issue #2373)", () => {
+  it("detects a vocabulary id declared in yaml but absent from checker constants (違反例: yaml-only)", () => {
+    const root = join(IR065_DRIFT_ROOT, "yaml-only");
+    mkdirp(root);
+    buildIr065DriftFixture(root, (yaml) =>
+      yaml.replace(
+        "  - id: doc-map-name\n    rule: IR-065\n    existence_probe: docs/DOC-MAP.md\n",
+        "  - id: doc-map-name\n    rule: IR-065\n    existence_probe: docs/DOC-MAP.md\n  - id: ghost-vocab\n    rule: IR-065\n    existence_probe: docs/ghost\n",
+      ),
+    );
+    const drift = driftResults(root);
+    expect(drift.length).toBe(1);
+    expect(drift[0].level).toBe("ng");
+    expect(drift[0].message).toContain("ghost-vocab");
+    expect(drift[0].evidence).toBe("checker-only:0,yaml-only:1,rule-mismatch:0");
+  });
+
+  it("detects a vocabulary id present in checker constants but removed from yaml (違反例: checker-only)", () => {
+    const root = join(IR065_DRIFT_ROOT, "checker-only");
+    mkdirp(root);
+    buildIr065DriftFixture(root, (yaml) =>
+      yaml.replace(
+        "  - id: doc-map-name\n    rule: IR-065\n    existence_probe: docs/DOC-MAP.md\n",
+        "",
+      ),
+    );
+    const drift = driftResults(root);
+    expect(drift.length).toBe(1);
+    expect(drift[0].level).toBe("ng");
+    expect(drift[0].message).toContain("doc-map-name");
+    expect(drift[0].evidence).toBe("checker-only:1,yaml-only:0,rule-mismatch:0");
+  });
+
+  it("detects rule assignment mismatch between yaml and checker constants (違反例: rule mismatch)", () => {
+    const root = join(IR065_DRIFT_ROOT, "rule-mismatch");
+    mkdirp(root);
+    buildIr065DriftFixture(root, (yaml) =>
+      yaml.replace(
+        "  - id: bare-adr-identifier\n    rule: IR-065\n",
+        "  - id: bare-adr-identifier\n    rule: IR-066\n",
+      ),
+    );
+    const drift = driftResults(root);
+    expect(drift.length).toBe(1);
+    expect(drift[0].level).toBe("ng");
+    expect(drift[0].message).toContain("bare-adr-identifier");
+    expect(drift[0].evidence).toBe("checker-only:0,yaml-only:0,rule-mismatch:1");
+  });
 });

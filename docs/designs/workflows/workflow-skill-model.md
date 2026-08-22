@@ -29,7 +29,7 @@ thin Command の workflow 節は次の3要素で構成する。
 2. 公開順序の要約（順序ラベル付きの見出し群。Workflow Skill 内部手順の複製ではなく、公開interface としての順序提示）
 3. soft guard 宣言（Workflow Skill の単独起動防止宣言。後述「soft guard の二層様式」）
 
-thin Command の workflow 節の順序ラベルは `### Step N` 形式に統一する。
+thin Command の workflow 節の順序ラベルは `authoring/command-file-format.md` が正規所有する様式（前出出力検証表、順序ラベル）に従う（Issue #2373、REQ-047-006。公開 command の `### Step N` 見出しは正規形の範囲外）。
 Workflow Skill 本文（SKILL.md、references/）の工程識別子は実番号形式（`STEP-1` 等）を用い、Command 定義の順序ラベルとは形式を区別して使い分ける。
 公開順序の要約の記述様式（前出出力検証表等）は `authoring/command-file-format.md` が正規所有する。詳細工程は Workflow Skill 側 STEP reference が所有し、本節は workflows 側の構成契約のみを記録する。
 

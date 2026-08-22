@@ -9390,6 +9390,50 @@ function checkObsoleteVocabulary(root: string): CheckResult[] {
     ...IR066_VOCAB_PATTERNS.map((p) => ({ ...p, rule: "IR-066" })),
   ];
 
+  // 検出シグナル（checker の IR065_/IR066_ 定数）と検出語彙宣言（yaml の
+  // vocabulary[]）の drift 検出（REQ-047-004、Issue #2373）。
+  // checker-execution-contracts「宣言的データの silent skip 禁止」の実装:
+  // 語彙 ID 集合・rule 割当が不一致の場合、検出を黙って読み飛ばさず報告する。
+  const declaredVocabRules = new Map<string, string>();
+  for (const v of map.vocab) declaredVocabRules.set(v.id, v.rule);
+  const checkerOnlyIds = allPatterns
+    .filter((p) => !declaredVocabRules.has(p.id))
+    .map((p) => `${p.id}(${p.rule})`);
+  const yamlOnlyIds = [...declaredVocabRules.keys()].filter(
+    (id) => !allPatterns.some((p) => p.id === id),
+  );
+  const ruleMismatches = allPatterns
+    .filter((p) => declaredVocabRules.has(p.id) && declaredVocabRules.get(p.id) !== p.rule)
+    .map((p) => `${p.id}: checker=${p.rule}, yaml=${declaredVocabRules.get(p.id)}`);
+  let driftDetected = false;
+  if (checkerOnlyIds.length > 0 || yamlOnlyIds.length > 0 || ruleMismatches.length > 0) {
+    driftDetected = true;
+    const parts: string[] = [];
+    if (checkerOnlyIds.length > 0)
+      parts.push(`checker-only vocabulary ids: ${checkerOnlyIds.join(", ")}`);
+    if (yamlOnlyIds.length > 0)
+      parts.push(`yaml-only vocabulary ids: ${yamlOnlyIds.join(", ")}`);
+    if (ruleMismatches.length > 0)
+      parts.push(`rule assignment mismatches: ${ruleMismatches.join(", ")}`);
+    results.push(
+      ng(
+        "ObsoleteVocabulary",
+        "obsolete-vocabulary-map-drift",
+        `IR-065/066 vocabulary map drift between data/obsolete-vocabulary-map.yaml vocabulary[] and checker IR065_/IR066_ pattern ids (${parts.join("; ")}) (REQ-047-004)`,
+        ".opencode/skills/repo-agentdev-integrity/data/obsolete-vocabulary-map.yaml",
+        undefined,
+        {
+          evidence: `checker-only:${checkerOnlyIds.length},yaml-only:${yamlOnlyIds.length},rule-mismatch:${ruleMismatches.length}`,
+          expected:
+            "keep vocabulary[] ids and rule assignments in sync with IR065_/IR066_ constants (same PR update)",
+          route: "intake",
+          finding_category: "obsolete-structure",
+          finding_level: "strict",
+        },
+      ),
+    );
+  }
+
   let violationCount = 0;
   for (const fullPath of scoped) {
     const relPath = resolveRelative(fullPath, root);
@@ -9444,7 +9488,7 @@ function checkObsoleteVocabulary(root: string): CheckResult[] {
       }
     }
   }
-  if (violationCount === 0) {
+  if (violationCount === 0 && !driftDetected) {
     results.push(
       ok(
         "ObsoleteVocabulary",
