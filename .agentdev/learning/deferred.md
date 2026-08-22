@@ -1301,3 +1301,63 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（learning-promote 2026-08-18 評価。出現1件だが反映先（case-run 前置 gate への dry-run チェック追加 / spec-save 完了報告での再生成案内）が明確で影響大（Epic 差戻し直結）。ユーザー承認（HITL）にて deferred 維持を確定。次回 living pool 再評価の最優先候補）
 
 ---
+
+## backlog 統合バッチの旧スナップショット分析から生成した Issue が作成時点で解消済みになる
+
+- **問題事象**: OU-0027（Issue 2222）の2成果物（テスト期待値更新・Epic 2134 クローズ）は、いずれも Issue 作成（2026-08-18 10:59 UTC）より前に PR 2155（08-16 02:26 マージ）と Epic クローズ（08-16 02:43）で完了していた。元分析（RU-0072）は PR 2155 マージ前のスナップショット由来で、no-change 完了（PR なし・完了判定記録コメントで close）となった。
+- **発生局面**: backlog-review（RU 生成）、case-open（Issue 作成）
+- **検知方法**: case-run 実行前の現状再検証で、期待値リテラルが実番号形式「### STEP-3-1:」へ更新済みであることと Epic 2134 が CLOSED であることを確認
+- **根本原因**: backlog 統合バッチで旧スナップショット由来の分析（RU）から Issue を生成する際、Issue 作成時点の最新 main での再検証を経ないまま Issue 化した
+- **自律対応内容**: 完了判定記録コメント（issuecomment-5329083755）を SSoT として no-change 完了扱いとし、PR 作成不能（同一 HEAD 間は GitHub が拒否）の制約を記録した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: 分析から Issue 生成まで時間差がある経路（backlog 統合バッチ）では、Issue 作成時に主要な完了条件を最新 main で再検証する工程が重複 Issue を防ぐ
+- **再発条件**: 旧スナップショット由来の RU から生成した Issue の対象が、生成前のマージで既に解消している場合
+- **予防策候補**: case-open（backlog 経路）に Issue 作成前の完了条件現状確認（already-done 検出）を組み込む
+- **想定反映先**: agentdev-workflow-case-open の preflight、agentdev-backlog-integration
+- **関連**: Issue 2222、RU-0072、PR 2155、Epic 2134、Issue 2219（同型の no-change 完了）
+- **タグ**: #backlog #case-open #freshness
+- **移動日**: 2026-08-22
+- **処分判定**: deferred（learning-promote 2026-08-22 評価。単発。case-open preflight への already-done 検出の反映候補として living pool で保持し次回再評価）
+
+---
+
+## augmentation の意味定義・役割宣言追加が変更対象成果物リストに事前明示されないまま実施された
+
+- **問題事象**: augmentation の意味定義・役割宣言追加（`.agentdev/artifact-graph.yaml`）は Issue 2204 の変更対象成果物リストに明示されていなかった。TIM 語彙カタログ SPEC が拡張関係型の意味定義場所を augmentation 宣言と定めているため、カタログ定義への置換の実体として実施し、解釈の明示を PR 2262 本文に記録した。
+- **発生局面**: 要件定義（case-open の execution contract 生成）、実装（case-run）
+- **検知方法**: 実装時の変更対象成果物リストと実際の変更内容の突合（PR 本文への解釈明示として記録）
+- **根本原因**: カタログ定義への置換に伴う augmentation 宣言の追従変更が、execution contract の変更対象成果物リスト作成時点で見えていなかった
+- **自律対応内容**: TIM 語彙カタログ SPEC の定める意味定義場所に従い augmentation 宣言として実施し、解釈を PR 本文に明示した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（augmentation 変更の実行契機明示の SPEC 層への取込みは intake item 化済み）
+- **横展開観点**: 関係意味・語彙の変更では定義場所（カタログ本体か augmentation 宣言か）を先に確定し、変更対象成果物リストへ反映する
+- **再発条件**: 拡張関係型の意味定義や役割宣言の変更を伴う Issue で、変更対象成果物リストに augmentation 宣言を明示しない場合
+- **予防策候補**: 語彙・関係意味の変更を伴う Issue の execution contract で augmentation 宣言（`.agentdev/artifact-graph.yaml`）を対象成果物候補として確認する
+- **想定反映先**: agentdev-workflow-case-open の execution contract 生成、REQ-017 Issue Execution Contract 運用
+- **関連**: PR 2262、Issue 2204、docs/specs/foundations/traceability-model.md、docs/specs/skills/agentdev-artifact-graph.md
+- **タグ**: #execution-contract #augmentation #tim
+- **移動日**: 2026-08-22
+- **処分判定**: deferred（learning-promote 2026-08-22 評価。単発、かつ artifact-graph 撤去（DEC-017）により反映先 `.agentdev/artifact-graph.yaml` の一部が消滅。「execution contract の変更対象成果物リスト網羅」という一般知見のみ living pool で保持）
+
+---
+
+## 2026-08-20: 大規模 PR の targeted docs guard --files 渡しでコマンド行長上限に近づくリスクと gh files API 100件上限
+
+- **問題事象**: case-close の targeted docs guard を --files モードで実行する際、gh pr view --json files は API 仕様により先頭100件しか返さず、524ファイル変更の PR（PR 2350）では実ファイル一覧が得られない。さらに全パスを引数渡しすると結合長 32,040 文字に達し、Windows のコマンド行上限（32,767）に近接して失敗リスクが生じる。
+- **発生局面**: 実行（case-close STEP-3-1 targeted docs guard、マージ後 main 環境）
+- **検知方法**: マージ前後コミット（8bf06c42..5111aac3）の git diff --name-only 件数（524）と gh API files 件数（100）の突合、結合文字数の実測
+- **根本原因**: gh REST API の files ページング仕様（100件上限）と、--files の引数展開がコマンド行経由であることの組合せ。
+- **自律対応内容**: 当該実行では git diff --name-only <マージ前コミット>..<マージ後コミット> で全ファイル一覧を確定し、同差分と等価なファイル集合を与える --base-ref <マージ前コミット> で guard を実行して exit 0（524 files_checked、failures 0）を確認した。
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/Design影響**: なし（check_changed_docs.ts の CLI 契約上、--base-ref と --files は排他の正当モード）
+- **横展開観点**: 大規模横断変更 PR（ファイル数が多い case-close）全般で発生し得る。
+- **再発条件**: 変更ファイル数が多い PR で --files に全パスを引数渡しする場合、または gh files API の先頭100件を前提に検査対象を確定する場合
+- **予防策候補**: 大規模 PR ではマージ前後コミットの git diff --name-only でファイル一覧を確定し、--base-ref <マージ前コミット>（等価ファイル集合）で guard を実行する手順を取る。
+- **想定反映先**: agentdev-workflow-case-close references/docs-and-design-promotion.md の targeted docs guard 手順、agentdev-gh-cli の PR 補助データ読込手続き
+- **関連**: PR 2350、Issue 2349
+- **タグ**: #case-close #targeted-docs-guard #files-mode #コマンド行上限
+- **移動日**: 2026-08-22
+- **処分判定**: deferred（learning-promote 2026-08-22 評価。単発だが --base-ref による回避手順の実効性が高い。大規模 PR の再発可能性を考慮し次回 living pool 再評価で昇華判断）
+
+---
