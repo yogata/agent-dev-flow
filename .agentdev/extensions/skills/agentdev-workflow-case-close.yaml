@@ -6,7 +6,7 @@ context:
   - id: must-1
     paths:
       - "docs/designs/foundations/document-model.md"
-    purpose: "REQ/ADR/Design/guides/DOC-MAP の責務マトリックスと文書間関係の確認"
+    purpose: "REQ/Decision/Design/guides の責務マトリックスと文書間関係の確認（document-model Design）"
   - id: case-auto-conflict-model
     when: "case-auto 並行実行時のコンフリクト解消モデル参照時"
     paths:
@@ -22,8 +22,6 @@ context:
     paths:
       - "docs/designs/integrity/index-auto-generation.md"
     purpose: "AUTOGEN block 自動生成機構と generate_indexes.ts の契約確認"
-  - id: discovery-1
-    purpose: "docs/DOC-MAP.md 経由で Design 確定対象と整合性ルールを探索してよい"
   - id: discovery-2
     purpose: docs/designs/README.md 経由で Design status と整合性ルールカタログを参照してよい
   - id: discovery-3

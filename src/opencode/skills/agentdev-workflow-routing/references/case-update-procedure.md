@@ -37,16 +37,16 @@ case-update `--req` は req-save へ委譲せず、直接 commit と push を行
 
 ## レビュー NG コメント
 
-入力条件は、`agentdev-spec-compliance` の乖離報告とユーザー承認済み判断が存在することとする。
+入力条件は、QG-3（実装乖離ゲート、`agentdev-quality-gates`）の乖離報告とユーザー承認済み判断が存在することとする。
 
-1. `agentdev-spec-compliance` の乖離報告から影響度、対象、内容、推奨アクション、理由を抽出する。
+1. QG-3（実装乖離ゲート、`agentdev-quality-gates`）の乖離報告から影響度、対象、内容、推奨アクション、理由を抽出する。
 2. 乖離タイプに基づき、spec-bug、impl-bug、scope-creep、テスト不足、品質基準未達へ分類する。
 3. spec-bug は REQ UPDATE とレビュー NG コメント投稿を行う。
 4. impl-bug はレビュー NG コメント投稿のみを行う。
 5. scope-creep は REQ UPDATE とレビュー NG コメント投稿を行う。
 6. テスト不足、品質基準未達はレビュー NG コメント投稿のみを行う。
 7. `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_review_ng.md` を Read tool で読み込み、必須セクション欠落時は生成をやり直す。
-8. `agentdev-spec-compliance` 結果をテンプレートの「仕様適合性 結果」セクションに展開する。
+8. QG-3 乖離検出結果をテンプレートの「仕様適合性 結果」セクションに展開する。
 9. NG 理由分類のチェックボックスを自動選択する。
 10. Issue コメント追加手続き（`agentdev-gh-cli`）でコメントを投稿する。
 

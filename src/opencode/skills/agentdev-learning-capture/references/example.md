@@ -132,7 +132,7 @@ SKILL.md 本文では実観測原則、 trigger、禁止事項、 split rule の
 
 - **問題事象**: Issue #{issue_number} の実装中、{REQ-ID} と specs/design-principles.md で定義されているエラー処理方針が矛盾していることを発見した
 - **発生局面**: 実装
-- **検知方法**: agentdev-spec-compliance スキルによる実装前チェック
+- **検知方法**: QG-3 乖離検出（`agentdev-quality-gates` スキル）によるチェック
 - **根本原因**: {REQ-ID} 作成時に design-principles.md の既存方針との整合性確認が漏れていた
 - **自律対応内容**: 矛盾点を整理し、ユーザーに確認して{REQ-ID} の該当セクションを修正
 - **ユーザー確認有無**: あり

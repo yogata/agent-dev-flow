@@ -6,7 +6,7 @@ context:
   - id: must-1
     paths:
       - "docs/designs/foundations/document-model.md"
-    purpose: "REQ/ADR/Design/guides/DOC-MAP の責務マトリックスと文書間関係の確認"
+    purpose: "REQ/Decision/Design/guides の責務マトリックスと文書間関係の確認（document-model Design）"
   - id: must-2
     paths:
       - docs/designs/foundations/patterns.md
@@ -40,8 +40,6 @@ context:
     paths:
       - "docs/designs/skills/agentdev-req-file-manager.md"
     purpose: REQ 番号採番と CREATE/APPEND/UPDATE 判定の確認
-  - id: discovery-1
-    purpose: "docs/DOC-MAP.md 経由で関連 Design を探索してよい"
   - id: discovery-2
     purpose: docs/designs/README.md 経由で Design 一覧と status を参照してよい
 

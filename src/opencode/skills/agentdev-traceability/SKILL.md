@@ -50,7 +50,7 @@ Design を正規原本とし、SKILL.md は実行入口および skill 固有の
 
 check の7種検査: `malformed-declarations`（形式・構文違反）、`unknown-roles`（未知の成果物役割）、`unknown-req-refs`（存在しない要件への参照）、`invalid-catalog-refs`（検証対応要否カタログの無効なエントリ・参照）、`missing-implementation`（実装対応の欠落）、`missing-verification`（検証対応の欠落。検証対応必須行のみ計上）、`evidence-unavailable`（根拠箇所を取得できない状態）。
 Design 対応（design 役割）0件のみを理由に異常としない。
-検証対応の要否区分は検証対応要否カタログ（`docs/designs/foundations/references/verification-scope-catalog.md` の `## 任意行エントリ` 節、要件行ID の列挙または同一REQファイル内の範囲表現）が所有する。check はカタログを既定パスから自動的に読み込み、カタログが存在しない場合は全要件行を検証対応必須として扱う（安全側既定）。
+検証対応の要否区分は検証対応要否カタログ（自己ホストリポジトリ内の `verification-scope-catalog.md` の `## 任意行エントリ` 節、要件行ID の列挙または同一REQファイル内の範囲表現）が所有する。check はカタログを既定パスから自動的に読み込み、カタログが存在しない場合（consumer 環境を含む）は全要件行を検証対応必須として扱う（安全側既定）。
 
 ### 実行方法
 

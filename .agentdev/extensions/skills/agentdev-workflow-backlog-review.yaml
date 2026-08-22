@@ -6,7 +6,7 @@ context:
   - id: must-1
     paths:
       - "docs/designs/foundations/document-model.md"
-    purpose: "REQ/ADR/Design/guides/DOC-MAP の責務マトリックスと探索入口の確認"
+    purpose: "REQ/Decision/Design/guides の責務マトリックスと探索入口の確認（document-model Design）"
 
 rules: []
 

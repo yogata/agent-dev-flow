@@ -21,11 +21,11 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 
 ## DO NOT USE FOR
 
-- ドキュメント内容の意味的妥当性判定（→ `agentdev-req-analysis`、`agentdev-adr-guidelines`）
+- ドキュメント内容の意味的妥当性判定（→ `agentdev-req-analysis`、`agentdev-decision-guidelines`）
 - ユーザー承認が必要かどうかの判断（→ 各コマンドの skill）
 - 要件分析・壁打ち（→ `agentdev-req-analysis`）
-- ADR 要否判断（→ `agentdev-adr-guidelines`）
-- `spec-bug` / `impl-bug` / `scope-creep` の最終分類（→ `agentdev-spec-compliance`）
+- Decision 要否判断（→ `agentdev-decision-guidelines`）
+- `spec-bug` / `impl-bug` / `scope-creep` の最終分類（→ `agentdev-quality-gates` QG-3、最終判断は case-update）
 - `gh` 書き込み検証の orchestration（→ `agentdev-gh-cli`）
 - 実装の自動修正（検査対象を直接修正しない原則。許可出力はレポート・intake item のみ）
 - Consumer project での整合性検査（本 skill は self-hosting repo のみ対象）

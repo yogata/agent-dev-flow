@@ -6,14 +6,12 @@ context:
   - id: must-1
     paths:
       - "docs/designs/foundations/document-model.md"
-    purpose: "REQ/ADR/Design/guides/DOC-MAP の責務マトリックスと探索入口の確認"
+    purpose: "REQ/Decision/Design/guides の責務マトリックスと探索入口の確認（document-model Design）"
   - id: docs-spec-rebuild-integrity
     when: 配布物整合性ルール参照時
     paths:
       - "docs/designs/integrity/docs-spec-rebuild-integrity.md"
     purpose: 配布物 ID 除去後の品質保持ルールの確認
-  - id: discovery-1
-    purpose: "docs/DOC-MAP.md 経由で診断対象 Design と文書群を探索してよい"
   - id: discovery-2
     purpose: docs/designs/README.md 経由で Design status とインデックスを参照してよい
 

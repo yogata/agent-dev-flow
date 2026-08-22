@@ -26,5 +26,5 @@ bun install
 bun test
 ```
 
-repo-local deterministic checker（`.opencode/skills/repo-agentdev-integrity/scripts/check_extensions.ts`）は
-本ディレクトリの `lib/extension_state.ts` を相対 import で参照する。配布側実装から repo-local 成果物への依存は持たない。
+自己ホストリポジトリの deterministic checker（`check_extensions.ts`）は
+本ディレクトリの `lib/extension_state.ts` を相対 import で参照する。配布側実装は自己ホストリポジトリ固有の成果物に依存しない。

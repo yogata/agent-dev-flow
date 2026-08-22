@@ -174,7 +174,7 @@ case-close(#epic) が実行結果として失敗を確定した場合のみ `fai
 
 ## Epic本文のconflictリスク
 
-Epic Issue 本文の書き込みは case-close(#epic) が単一書き手（ADR）であるため、サブエージェント間の同時書き込みConflictは発生しない。残るConflictリスクは case-close(#epic) 書き込みと手動編集の競合のみ:
+Epic Issue 本文の書き込みは case-close(#epic) が単一書き手であるため、サブエージェント間の同時書き込みConflictは発生しない。残るConflictリスクは case-close(#epic) 書き込みと手動編集の競合のみ:
 
 **conflictリスク**:
 - case-close(#epic) の Epic 本文更新と手動編集の競合
