@@ -60,7 +60,7 @@ Epic Wave クローズは STEP-1 のルーティングで分岐し、E1〜E6 と
 | STEP-4 | PR マージ・コンフリクト解消 | docs 検証合格（配布依存境界 最終 gate 含む） | マージ済みPR（squash merge 先は当該 Case の統合先）、HEAD commit hash 記録、コンフリクト Level 1 解消 or case-auto エスカレーション | [references/pr-merge-and-conflict.md](references/pr-merge-and-conflict.md) |
 | STEP-5 | Post-merge・Issue クローズ | PR マージ完了 | CI 通過確認、Issue 本文更新、実証最終クローズ（最終評価結果導出・Issue 最終コメント正規記録）、Issue close | [references/cleanup-and-capture.md](references/cleanup-and-capture.md) |
 | STEP-6 | クリーンアップ・Capture 回収・永続化 | Issue クローズ完了 | worktree/branch 削除、親Epic 自動クローズ、実行前同期、Capture 回収、学び検知、実証最終クローズの正式化案内、`.agentdev/` 永続化、tmp/ 残存確認、完了報告 | [references/cleanup-and-capture.md](references/cleanup-and-capture.md) |
-| STEP-E1〜E6 | Epic Wave クローズ（E4-1 配布依存境界 最終 gate 含む） | Epic Issue 番号受領、ステータス追跡テーブル存在 | 現在 Wave の子Issue 一括マージ・クローズ（E4-1 gate 違反子Issue は `blocked` でマージ対象外）、Epic status table 更新、最終 Wave 判定 | [references/epic-wave-close.md](references/epic-wave-close.md) |
+| STEP-E1〜E6 | Epic Wave クローズ（E4-1 配布依存境界 最終 gate 含む） | Epic Issue 番号受領、ステータス追跡テーブル存在 | 現在 Wave の子Issue 一括マージ・クローズ（E4-1 gate 違反子Issue は `blocked` でマージ対象外）、Epic status table 更新、当該 Wave スコープの一時成果物残留確認（E6-1、残留時は完了扱いにしない）、最終 Wave 判定 | [references/epic-wave-close.md](references/epic-wave-close.md) |
 
 ### STEP 間の依存と分岐
 
@@ -83,6 +83,7 @@ gate 違反時は両ルートとも PR マージを停止する。
 
 - 正常終了: 単一 Issue ルートはクリーンアップ・Capture 回収・永続化 STEP の完了報告まで。Epic Wave ルートは最終 Wave 判定（Epic クローズ または 残 Wave 通知）まで
 - 一時ファイル残存: 単一 Issue ルートの正常終了の前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（STEP-6-6 で確認。cleanup 規定は `agentdev-gh-cli`）
+- 一時成果物残留（Epic Wave ルート）: Epic Wave クローズの正常終了の前提として、当該 Wave スコープの一時成果物（draft、RU、検出事項等のドメイン状態）残留と当該実行で `.agentdev/tmp/` に作成した一時ファイルの残存がないこと（E6-1 で確認。残留時は当該 Wave を完了扱いにしない）
 - 停止終了: 未達チェックボックス残存（構造化エラー）、QG-4 不合格、配布依存境界 最終 gate 違反、mergeable ポーリング上限超過、Level 1 rebase 失敗（case-auto エスカレーション）
 
 ## 主要 Capability Skill 連携

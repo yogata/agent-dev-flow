@@ -57,7 +57,7 @@ design-save workflow は次の11 STEP で構成する。
 | STEP-4 | Design 分離基準の最終確認 | 配置先解決済み | 適合判定（安定契約例外は除外し follow-up 明示） | [references/placement-and-save.md](references/placement-and-save.md) |
 | STEP-5 | Design ファイル操作 | 適合判定済み | Design create / update 実行（並列化、宣言付与） | [references/placement-and-save.md](references/placement-and-save.md) |
 | STEP-6 | インデックス整合 | ファイル操作完了 | 新規 Design の README 一覧登録（check-entry-existence 検証） | [references/verification-and-persistence.md](references/verification-and-persistence.md) |
-| STEP-7 | Design 一覧整合確認 | インデックス整合完了 | targeted docs guard、extension 更新要否確認 | [references/verification-and-persistence.md](references/verification-and-persistence.md) |
+| STEP-7 | Design 一覧整合確認 | インデックス整合完了 | targeted docs guard、extension 更新要否確認、Design バッチ更新時の参照先用語実在確認 | [references/verification-and-persistence.md](references/verification-and-persistence.md) |
 | STEP-8 | ドラフト status 更新 | 一覧整合確認完了 | Design 消費済みフラグ（commit 対象に含む） | [references/verification-and-persistence.md](references/verification-and-persistence.md) |
 | STEP-9 | 変更範囲検証 | status 更新済み | check-change-impact 検証 | [references/verification-and-persistence.md](references/verification-and-persistence.md) |
 | STEP-10 | コミット・プッシュ | 変更範囲検証合格 | 明示パス commit、push | [references/verification-and-persistence.md](references/verification-and-persistence.md) |
