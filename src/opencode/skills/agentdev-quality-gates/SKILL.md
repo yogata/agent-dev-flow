@@ -78,6 +78,9 @@ QG-3/ QG-4 の fail 判定時、エージェントは推奨アクションを提
 
 QG-4（full integrity suite 合格基準）における bun test フル suite 正規形（3 cwd 分割実行・./ prefix・環境ラベル）は、本スキルが品質統制側として所有する。
 正規形の定義は [qg-4-final-acceptance.md](references/qg-4-final-acceptance.md)「bun test フル suite 正規形（実行形態契約）」を参照。
+フル suite の受理判断は機械受理基準（正規形実行記録・環境ラベル・件数突合・fail 全件由来分類の記録存在検証、由来不明 fail 0 件）により行う。
+手動判断（記録を伴わない裁量判断）で受理しない。
+基準の定義は同ファイル「機械受理基準」を参照。
 テスト環境前提（worktree 構造的制約、依存パッケージ未伝播、bun install 前置）は `agentdev-git-worktree` の worktree 構造的制約を参照する。
 
 ## See Also

@@ -124,9 +124,17 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 - **STEP-S3-2 worktree precondition gate**: `agentdev-git-worktree` の「worktree 内判定ヘルパー」に従い、当該 Issue の worktree+ブランチが作成済みであり、現在 worktree 内にいることを検証する。検証失敗時（worktree 未作成、メインリポジトリにいる）は実行担当サブエージェントを起動せず停止し、STEP-S3 へ戻るようユーザーに報告する
 - **STEP-S3-3 QG-3 前置 staleness check**: `agentdev-quality-gates` の「case-run 前置 staleness check」に従い、ファイルパス現行存在確認、検査結果件数再計測、差異検出時の引き渡し・case-update 連携を実行する。本検査は QG-3 本体（委譲先が実施する PR 作成直前ゲート）とは独立した前置検査であり、QG-3 deviation 分類運用、QG-3 本体実施要否には影響しない
 - **STEP-S3-4 docs/** 変更時の targeted docs guard: PR 対象ファイルに docs/** 変更を含む場合、委譲前に targeted docs guard を行う（`bun run .opencode/skills/<integrity-detector-skill>/scripts/check_changed_docs.ts --workflow case-run --base-ref <ベース> --json`、変更ファイルは worktree 内の git diff から取得。モード使い分けの標準は コミット前の worktree 上での検証 = `--base-ref`、コミット後・PR 作成後の main 環境 = `--files`。PowerShell で `--files` に複数パスを渡す場合は配列変数経由または個別渡しとし、引用符まとめ渡しは使用しない）。docs/** 変更を含まない PR ではスキップする。検出結果（failures の strict severity）は PR 本文の `## Findings / Capture候補` に `### docs-integrity` 小見出しで記録する（実行担当サブエージェント責務）
-- **STEP-S3-5 配布依存境界の事前委譲チェック（オプション）**: PR 対象ファイルに `src/opencode/{commands,skills}/**` 変更を含む場合、委譲前に事前チェックを実施できる。本チェックは予備的であり、本式の最終 gate は STEP-S5（実装後）で実行される。事前チェックで違反を検出した場合は委譲プロンプトで実行担当サブエージェントに引き渡す
+- **STEP-S3-5 配布依存境界の事前委譲 gate**: PR 対象ファイルに `src/opencode/{commands,skills}/**` 変更を含む場合、委譲前に事前 gate を必須実行する（オプション扱いは廃止）。本 gate と STEP-S5 の最終 gate（実装後）は重畳する検査経路であり、事前 gate を実施しても最終 gate を省略しない。事前 gate は次の2点を検証する
+  - 反映経路の確認: 配布物の変更が src 側（原本パス `src/opencode/{commands,skills}/**`）に位置することを確認する。`.opencode/` 投影パスへの直接変更を検出した場合は違反として扱う（配布物の変更は原本経由のみ許容）
+  - ベースライン取得: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_distribution_boundary.ts --profile source --json` を委譲前時点（base 状態）の worktree で実行し、base の違反ベースラインを取得する。ベースラインは委譲プロンプトに引き渡し、委譲先が最終 gate の違反を当該変更起因と既存起因に判別する入力とする
+  - 違反を検出した場合は委譲プロンプトで実行担当サブエージェントに引き渡す。src/opencode 変更を含まない PR ではスキップする
+- **STEP-S3-6 AUTOGEN 索引再生成 前置 gate**: PR 対象ファイルに AUTOGEN 生成元文書（REQ 実ファイル、Decision 実ファイル、Design 実ファイル群。件数・一覧・status 別ビュー・行数計測の AUTOGEN ブロック生成元。生成元の具体的なパス構成は対象リポジトリの integrity 検査 skill の定義に従う）の変更を含む場合、AUTOGEN 索引の再生成を委譲に先行して強制する
+  - 検出: worktree の git diff（統合先との比較）で AUTOGEN 生成元文書の変更（本文行数変更、rename、status 変更を含む）の有無を判定する。worktree 作成直後で diff が空の場合は Issue 本文の対象範囲・変更対象成果物の計画対象で判定する
+  - 強制内容: 検出時は委譲プロンプトに「実装完了前に AUTOGEN 索引再生成を実行し、再生成結果を PR 対象に含める」ことを必須指示として引き渡す（任意手順として扱わない）。再生成コマンドは `bun run .opencode/skills/<integrity-detector-skill>/scripts/generate_indexes.ts`（worktree 内で実行）
+  - 目的: SPEC 行数変更に伴う索引陳腐化を実装後の整合性検査で検出して停止する事態（PR #2253 の E5b 停止）の再発防止であり、索引再生成を前段の必須手順に位置付ける
+  - AUTOGEN 生成元文書を含まない PR ではスキップする
 
-**case-run が使用する検査ツール**（integrity 契約 Design「Workflow × 使用ツールマトリックス」参照）: check_changed_docs.ts（--workflow case-run、docs/** 変更を含む場合に委譲前に実行）、check_extensions.ts（`.opencode/commands/agentdev/**/*.md`、`.opencode/skills/agentdev-*/SKILL.md`、`.opencode/skills/agentdev-*/references/**/*.md`、`.agentdev/extensions/**` のいずれかを変更した場合に実行）、check_distribution_boundary.ts（--profile source、STEP-S5 で実装後 worktree の実際の配布ソース面を検査）、test_strategy（Issue 完了条件検証）
+**case-run が使用する検査ツール**（integrity 契約 Design「Workflow × 使用ツールマトリックス」参照）: check_changed_docs.ts（--workflow case-run、docs/** 変更を含む場合に委譲前に実行）、check_extensions.ts（`.opencode/commands/agentdev/**/*.md`、`.opencode/skills/agentdev-*/SKILL.md`、`.opencode/skills/agentdev-*/references/**/*.md`、`.agentdev/extensions/**` のいずれかを変更した場合に実行）、check_distribution_boundary.ts（--profile source / --profile link、STEP-S3-5 で base ベースライン取得、STEP-S5 で実装後の src 側原本面と .opencode 投影面を検査）、generate_indexes.ts（AUTOGEN 索引再生成、STEP-S3-6 の必須指示に基づき委譲内で実行）、test_strategy（Issue 完了条件検証）
 
 **checker コマンドの stdout 退避形式**: 上記 checker コマンドは exit code が意味を持つコマンド（非ゼロ exit = 違反検出等の観測対象）であるため、実行と stdout 取得は `agentdev-gh-cli` READ 手続きの「exit code が意味を持つコマンドの stdout 退避形式」に従う（`spawnSync` による status/ stdout 分離取得 + `fs.writeFileSync` の UTF‑8 明示書き出し）。
 非ゼロ exit 時も JSON レポート（stdout）を Evidence として保持し、`>` リダイレクトや PowerShell 変数格納で退避しない。

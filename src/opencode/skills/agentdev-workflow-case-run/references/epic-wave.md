@@ -78,7 +78,7 @@ Epic Issue 本文を読み込み（`agentdev-epic-tracker` 参照）、現在 re
 
 - `git fetch origin` を実行し統合先（STEP-W1 で確定した Epic の統合先）の鮮度を確認する（Wave 実行時、PR merge 後再開時は必須）
 - 子Issue ごとに worktree とブランチを作成する（`agentdev-git-worktree` 参照。作成元は当該 Epic の統合先を明示的に指定する。通常 Epic は従来どおり main を起点とし、Epic 実証は共有評価ブランチを起点とする。Epic 後続 Wave の作業起点も同一の統合先を参照。べき等チェック: 既存時はスキップ）
-- 子Issue ごとに前置 gate 群（single.md STEP-S3 の STEP-S3-2〜S3-5 と同一契約: worktree precondition gate、QG-3 前置 staleness check、docs/** 変更時 targeted docs guard、配布依存境界 事前チェック）を適用する
+- 子Issue ごとに前置 gate 群（single.md STEP-S3 の STEP-S3-2〜S3-6 と同一契約: worktree precondition gate、QG-3 前置 staleness check、docs/** 変更時 targeted docs guard、配布依存境界 事前 gate、AUTOGEN 索引再生成 前置 gate）を適用する
 - 子Issue ごとの worktree 設置の L2 タイムスタンプを記録する
 
 ### Result

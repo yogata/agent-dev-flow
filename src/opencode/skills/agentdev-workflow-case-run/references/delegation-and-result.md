@@ -30,8 +30,8 @@
 
 - 実装実行を adapter skill（`agentdev-case-run-execution-adapter`）を読み込んだ実行担当サブエージェントへ委譲する（委譲 prompt 内で実行 command を指定）。起動手段は AGENTS.md および references/<harness>.md 参照。adapter protocol は同 skill 参照
 - **L2 タイムスタンプ計測**: 委譲起動直前・直後に壁時計タイムスタンプ（JST）を記録し、実行担当サブエージェント実行時間を計測する。併せて STEP-S3（worktree 設置）と STEP-S6（クリーンアップ）の開始・終了時刻を記録する
-- 委譲プロンプト、staleness check 結果の引き渡し、test strategy 項目の test-fix ループ、実行担当サブエージェントの責務（目標分解、各 criterion に observable evidence を要求、品質ゲートの実行、test-fix ループ）、委譲起動失敗・異常終了時の扱い（即 `failed` とせず実装完了・検証未完了として扱う）の詳細は `agentdev-case-run-execution-adapter` スキルを参照
-- **bun test フル suite 正規形**: test strategy の検証で bun test フル suite を実行する場合、正規形（3 cwd 分割実行・./ prefix・環境ラベル）に従う。正規形の規定は `agentdev-quality-gates`（QG-4 bun test フル suite 正規形）を正とする。3分割は integrity suite、src 側 skill script テスト、repo ルート系 guard テストで構成し、各実行の cwd はリポジトリルート（worktree root または main root）に統一する。実行担当サブエージェントは PR 本文に各分割実行の実行 cwd・起動コマンド形式・環境ラベル（worktree または main、junction 伝播状態、依存パッケージ状態）と fail 全件の由来分類（既知欠陥・環境依存・当該変更起因）を記録する。テスト環境前提（worktree の node_modules 未伝播と `bun install` 前置、main からの読取専用実行）は `agentdev-git-worktree` の worktree 構造的制約を参照する。起動コマンド（`<integrity-detector-skill>` は対象リポジトリの integrity 検査 skill 名に解決する）:
+- 委譲プロンプト、前置 gate 結果の引き渡し（staleness check 差異、配布依存境界の違反ベースライン、AUTOGEN 索引再生成の必須指示）、test strategy 項目の test-fix ループ、実行担当サブエージェントの責務（目標分解、各 criterion に observable evidence を要求、品質ゲートの実行、test-fix ループ）、委譲起動失敗・異常終了時の扱い（即 `failed` とせず実装完了・検証未完了として扱う）の詳細は `agentdev-case-run-execution-adapter` スキルを参照
+- **bun test フル suite 正規形**: test strategy の検証で bun test フル suite を実行する場合、正規形（3 cwd 分割実行・./ prefix・環境ラベル）に従う。正規形の規定は `agentdev-quality-gates`（QG-4 bun test フル suite 正規形）を正とする。3分割は integrity suite、src 側 skill script テスト、repo ルート系 guard テストで構成し、各実行の cwd はリポジトリルート（worktree root または main root）に統一する。実行担当サブエージェントは PR 本文に各分割実行の実行 cwd・起動コマンド形式・環境ラベル（worktree または main、junction 伝播状態、依存パッケージ状態）と fail 全件の由来分類（既知欠陥・環境依存・当該変更起因）を記録する。当該記録はフル suite 受理判断の機械受理基準（`agentdev-quality-gates` QG-4 の bun test フル suite 正規形・機械受理基準）を満たす形式で記録する。受理判断は記録の機械的検証により行われ、手動判断（記録を伴わない裁量判断）で代替しない。テスト環境前提（worktree の node_modules 未伝播と `bun install` 前置、main からの読取専用実行）は `agentdev-git-worktree` の worktree 構造的制約を参照する。起動コマンド（`<integrity-detector-skill>` は対象リポジトリの integrity 検査 skill 名に解決する）:
 
   ```bash
   bun test ./.opencode/skills/<integrity-detector-skill>/scripts/
@@ -86,11 +86,13 @@
   - **failed**: repository context で回答不能な blocker。詳細本文は Issue コメントに構造化して記録済み。エラー処理に従い停止、ユーザー報告
   - **delegation-unavailable**: 実行インフラが委譲を起動できなかった状態。実行未試行のため `pending` に戻す
 - **L2 タイムスタンプ受け渡し**: result 状態（completed-pr/blocked/failed）にかかわらず、STEP-S3（worktree 設定）、STEP-S4（実行担当サブエージェント実行）で計測した L2 タイムスタンプを result に含める。case-auto は本 L2 内訳を case-run 委譲の L1 壁時計時間の内訳として読み取る
-- **STEP-S5-1: 配布依存境界の最終変更経路 gate（実装後、command 公開順序の STEP-S5 に対応）**: result が `completed-pr` の場合、STEP-S6 に進む前に、実装後の実際の worktree HEAD に対して最終 gate を行う（実装担当サブエージェントが追加した変更も含めて検査する）
+- **STEP-S5-1: 配布依存境界の最終変更経路 gate（実装後、command 公開順序の STEP-S5 に対応）**: result が `completed-pr` の場合、STEP-S6 に進む前に、実装後の実際の worktree HEAD に対して最終 gate を行う（実装担当サブエージェントが追加した変更も含めて検査する）。本 gate は src 側（原本）と .opencode 側（投影）の双方反映検証を必須とする
   - 実行条件: result が `completed-pr` であり、PR 対象ファイルに `src/opencode/{commands,skills}/**` 変更を含む場合。当該変更を含まない PR（docs のみ等）ではスキップする
-  - 実行コマンド: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_distribution_boundary.ts --profile source --json`。現在の worktree（実装後 HEAD）の配布物ソースツリーを検査する
+  - 実行コマンド（双方反映検証）:
+    - src 側（原本）: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_distribution_boundary.ts --profile source --json`。現在の worktree（実装後 HEAD）の配布物原本ツリーを検査する
+    - .opencode 側（投影）: 同スクリプトに `--profile link` を指定して `.opencode/` 投影を検査する。worktree は junction 未伝播（`agentdev-git-worktree` の worktree 構造的制約参照）のため投影が実体化していない場合は、位置引数（repoRoot）で junction 構成が維持された root を指定して読取専用実行し、実行環境と junction 伝播状態を環境ラベルとして gate 判定記録に含める。投影が実体化していないまま worktree で実行して検査対象がゼロとなった場合は gate-not-passed として扱う。link 検査は投影経路の健全性（投影が原本を正しく反映する状態）の検証であり、PR 変更分の内容検証は src 側検査が担う
   - **checker コマンドの stdout 退避形式**: 本 gate の checker コマンドは exit code が意味を持つコマンド（非ゼロ exit = 違反検出）であるため、実行と stdout 取得は `agentdev-gh-cli` READ 手続きの「exit code が意味を持つコマンドの stdout 退避形式」に従う（`spawnSync` による status/ stdout 分離取得 + `fs.writeFileSync` の UTF‑8 明示書き出し）。非ゼロ exit 時も JSON 実行結果（Evidence）を保持する
-  - 検出結果の分類: 検査エラー（読込不能、未分類エントリ、adapter 起動失敗）は全て gate-not-passed として扱う。clean として通過させない
+  - 検出結果の分類: 検査エラー（読込不能、未分類エントリ、adapter 起動失敗）は全て gate-not-passed として扱う。clean として通過させない。source / link いずれかの profile で違反または検査エラーが残存する場合、最終 gate 全体を通過扱いにしない（投影分離原則）
   - 違反検出時の停止契約（adapter result `blocked` とは区別）: 違反検出時は PR 本文の `## Findings / Capture候補` セクションに `### distribution-boundary` 小見出しで記録し、STEP-S6 へ進まず case-run を停止する。adapter result は `completed-pr` のまま変更せず、adapter result 契約の `blocked` へ上書きしない。停止理由は「配布依存境界 最終 gate 違反（PR 本文記録済み）」と報告し、SSoT は PR 本文とする。next action は同一 Issue で case-run を再実行し違反を修正する（worktree+ブランチ存活時は STEP-S3 をスキップし STEP-S4 から再開、べき等）。case-close へは進めない
 
 ### Result
@@ -99,11 +101,11 @@
 
 ### Evidence
 
-- result 状態と PR URL または Issue コメント、最終 gate の JSON 実行結果
+- result 状態と PR URL または Issue コメント、最終 gate の JSON 実行結果（source / link 各 profile、環境ラベル含む）
 
 ### Completion Verification
 
-- 4状態いずれかの処理が完了していること。completed-pr + src/opencode 変更時は最終 gate 合格（または違反記録済み停止）であること
+- 4状態いずれかの処理が完了していること。completed-pr + src/opencode 変更時は双方反映検証（source / link 両 profile）を伴う最終 gate 合格（または違反記録済み停止）であること
 
 ### Resume-Idempotency
 
@@ -118,7 +120,8 @@
 
 - `agentdev-case-run-execution-adapter`: adapter protocol、result 契約、経路G、異常終了時事後処理
 - `agentdev-workflow-orchestration`: 障害伝播、capture 境界
-- integrity checker skill（repo 固有）: check_distribution_boundary.ts（--profile source）
+- `agentdev-quality-gates`: QG-4 bun test フル suite 正規形（機械受理基準）
+- integrity checker skill（repo 固有）: check_distribution_boundary.ts（--profile source / --profile link）、generate_indexes.ts（AUTOGEN 索引再生成）
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 

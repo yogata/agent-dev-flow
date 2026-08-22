@@ -79,7 +79,7 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 |---|---|---|---|---|
 | STEP-S1 | フェーズ判定・再開ポイント検出 | case-run 起動（Issue番号受領） | 実行モード確定（single）、再開フェーズ判定、引き継ぎ停止判定 | [references/single.md](references/single.md) |
 | STEP-S2 | Issue 抽出・確認・判定 | 実行モード確定（single） | 要件doc・受け入れ基準抽出、関連Decision 確認、work_type metadata 整合確認、execution contract 消費境界適用 | [references/single.md](references/single.md) |
-| STEP-S3 | Worktree 作成・ブランチ準備・前置 gate 群 | Issue 判定完了 | worktree+ブランチ作成（べき等）、前置 gate 群（precondition / staleness / targeted docs / 事前委譲チェック）合格、L2 計測 | [references/single.md](references/single.md) |
+| STEP-S3 | Worktree 作成・ブランチ準備・前置 gate 群 | Issue 判定完了 | worktree+ブランチ作成（べき等）、前置 gate 群（precondition / staleness / targeted docs / 配布依存境界 事前 gate / AUTOGEN 索引再生成）合格、L2 計測 | [references/single.md](references/single.md) |
 | STEP-S4 | 実行担当サブエージェント委譲 | STEP-S3 合格（worktree 内検証済み） | 委譲起動、L2 計測、経路G（adapter 委譲内 adversarial-review） | [references/delegation-and-result.md](references/delegation-and-result.md) |
 | STEP-S5 | result 処理・配布依存境界 最終 gate | 委譲 result 受領 | result 4状態処理、配布依存境界 最終 gate 判定、L2 受け渡し | [references/delegation-and-result.md](references/delegation-and-result.md) |
 | STEP-S6 | worktree クリーンアップ確認・完了報告 | result 処理完了（completed-pr 時は最終 gate 合格後） | 未コミット変更確認、tmp/ 残存確認、完了報告（L2 内訳含む） | [references/single.md](references/single.md) |
@@ -123,11 +123,11 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 - `agentdev-workflow-lifecycle`: work_type 判定、引き継ぎ停止判定（runtime-package-boundary）
 - `agentdev-epic-tracker`: Epic Issue 本文読込、Wave 子Issue 特定、親Epic ステータス更新
 - `agentdev-req-analysis`: チェックボックス品質基準
-- `agentdev-quality-gates`: QG-3 前置 staleness check
+- `agentdev-quality-gates`: QG-3 前置 staleness check、QG-4 bun test フル suite 正規形（機械受理基準）
 - `agentdev-gh-cli`: Issue 本文読取等の I/O 手続き
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 - `agentdev-traceability`: トレーサビリティ能力（coverage、check。委譲内の対応関係確認と PR 作成前検査。fail-open）
-- integrity checker skill（リポジトリ固有・配布対象外）: check_changed_docs.ts（targeted docs guard）、check_extensions.ts（IR-{NNN}）、check_distribution_boundary.ts（配布依存境界）
+- integrity checker skill（リポジトリ固有・配布対象外）: check_changed_docs.ts（targeted docs guard）、check_extensions.ts（IR-{NNN}）、check_distribution_boundary.ts（配布依存境界、source / link 両 profile）、generate_indexes.ts（AUTOGEN 索引再生成）
 
 ## トレーサビリティ能力の利用
 
