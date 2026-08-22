@@ -6,10 +6,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 35件、廃止済み: 9件
+現行 REQ: 38件、廃止済み: 9件
 <!-- AUTOGEN:END -->
 
-現行要件は35件である（REQ-013 は後継 REQ-012 への移行として、REQ-022〜REQ-024 は達成済みとして、REQ-025・REQ-026・REQ-028 は移管完了に伴う恒常行移行済みとして、REQ-020・REQ-040 は最小トレーサビリティモデルへの再設計による後継 REQ-012 統合として retired/ へ移行、REQ-036〜REQ-044 を追加。番号には欠番が存在する）。
+現行要件は38件である（REQ-013 は後継 REQ-012 への移行として、REQ-022〜REQ-024 は達成済みとして、REQ-025・REQ-026・REQ-028 は移管完了に伴う恒常行移行済みとして、REQ-020・REQ-040 は最小トレーサビリティモデルへの再設計による後継 REQ-012 統合として retired/ へ移行、REQ-036〜REQ-047 を追加。番号には欠番が存在する）。
 REQ-022・REQ-024 の旧規範内容（augmentation 配置先、check_graph.ts 抽出規則と warning 分類）は旧 Artifact Graph とともに廃止された（DEC-017）。履歴は retired REQ ファイルと版管理で参照できる。
 各 REQ の詳細は各 REQ ファイル本文を参照。
 
@@ -50,6 +50,9 @@ REQ-022・REQ-024 の旧規範内容（augmentation 配置先、check_graph.ts �
 | [REQ-042](requirements/REQ-042.md) | Case統合先とブランチモデル |
 | [REQ-043](requirements/REQ-043.md) | 評価ブランチ実証ワークフロー |
 | [REQ-044](requirements/REQ-044.md) | 標準API委譲の状態制約 |
+| [REQ-045](requirements/REQ-045.md) | 現行成果物体系の整合性網羅監査 |
+| [REQ-046](requirements/REQ-046.md) | 横断正規化後の不変条件 |
+| [REQ-047](requirements/REQ-047.md) | 規則所有権の一方向化 |
 
 - [要件インデックス](requirements/README.md)
 
