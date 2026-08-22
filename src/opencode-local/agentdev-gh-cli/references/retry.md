@@ -1,7 +1,8 @@
 # リトライロジック（ローカル版）
 
 VERIFY 失敗時の3段階リトライロジック（REQ-0150-001, ADR-0130 decision #4, #5）。
-ローカル版は標準版（[../../skills/agentdev-gh-cli/references/retry.md](../../../skills/agentdev-gh-cli/references/retry.md)）と同一のリトライロジックを持つ。差分の種類に応じて対応を分類する。
+ローカル版は標準版（[../../skills/agentdev-gh-cli/references/retry.md](../../../skills/agentdev-gh-cli/references/retry.md)）と同一のリトライロジックを持つ。
+差分の種類に応じて対応を分類する。
 
 ローカル版ではネットワーク揺れや gh CLI の一時不具合は発生しないが、Write tool の一時失敗、ファイルハンドル競合、BOM 付き書き出し事故等の同種の差分に対して本ロジックを適用する。
 

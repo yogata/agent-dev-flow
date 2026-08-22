@@ -1,6 +1,6 @@
 ---
 name: agentdev-traceability
-description: Provides requirement-artifact traceability (coverage, impact, check) via direct scanning of ADF-COVERS declarations. USE FOR: retrieving artifacts covering a requirement, reverse lookup of covered requirements, change re-confirmation candidates via artifact-requirement-artifact hops, declaration integrity checks (malformed declarations, unknown roles, unknown requirement references, verification-scope catalog entry validation, missing implementation or verification, unavailable evidence). DO NOT USE FOR: document exploration, path search, diagnostics, dependency exploration, index management, semantic inference of coverage.
+description: Provides requirement-artifact traceability (coverage, impact, check) by scanning ADF-COVERS declarations. USE FOR: artifacts covering a requirement, reverse lookup of covered requirements, change re-confirmation candidates via artifact-requirement-artifact hops, declaration integrity checks (malformed declarations, unknown roles or requirement references, verification-scope catalog checks, missing implementation or verification, unavailable evidence). DO NOT USE FOR: document exploration, path search, diagnostics, dependency exploration, index management, semantic coverage inference.
 ---
 
 # agentdev-traceability
