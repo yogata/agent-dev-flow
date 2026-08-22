@@ -38,6 +38,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 | SSoT 遷移定義 | 本スキル | 全 workflow の STEP transition |
 | 上位への引き継ぎ判定 | 本スキル（`references/upstream-handoff.md`） | 全 workflow の `prepare` STEP |
 | 工程間構造化文脈引き継ぎ | 本スキル（`references/structured-stage-handoff.md`） | 全 workflow の STEP transition、完了報告 |
+| 参照先解決ポリシー（source / projection 目的判別） | 本スキル（`references/reference-resolution.md`） | 全 workflow の canonical_references 生成・消費、配布物参照の読み取り先解決 |
 
 STEP reference 8 要素、STEP 識別子、durable state 復元契約は `<workflows/step-reference-contract>` Design に従う。
 compaction 後の current STEP 復元、ToDo 使用、compaction 検出の実処理は harness 固有（AGENTS.md、harness reference）。

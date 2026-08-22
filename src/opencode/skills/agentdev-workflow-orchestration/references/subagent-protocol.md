@@ -98,6 +98,7 @@ oldString: "    const result = items.map(i => i.value);"
 driver 起動プロンプトには以下を明記する:
 
 - **構造化文脈（10意味）の直列化**: 委譲プロンプトの入力（inputs）内に構造化文脈を直列化して含める。意味の一覧と直列化形式は `agentdev-case-run-execution-adapter` スキルの委譲プロンプト雛形「構造化文脈の直列化（委譲時）」に従う。driver は前工程で確定した事項を初期文脈として利用し、独立検証、鮮度確認、矛盾検出、正規成果物との整合確認を目的とする再確認は維持する
+- **参照先の目的判別**: driver が配布物参照の読み取り先を解決する際は、実行目的（正規原本確認、実行時投影確認、双方整合確認）に基づいて判別する。判別ポリシーは `agentdev-workflow-lifecycle` スキルの参照先解決ポリシー（`references/reference-resolution.md`）参照。worktree はジャンクション未伝播のため、実行時投影確認には読取専用フォールバック（メインリポジトリ root 指定）を環境ラベル付きで適用する
 - **worktree 内 `.opencode/` は空**: ジャンクション未伝播のため `.opencode/skills/agentdev-*`、`.opencode/commands/agentdev/` が存在しない。`.opencode/skills/repo-*`（実ディレクトリ）のみ存在する
 - **source/ projection 手動両辺編集**: ジャンクション未伝播時は同期スクリプトで自動化できず、source（`src/opencode/`）と projection（`.opencode/`）を手動で両辺編集する運用をとる。agent-dev-flow 自己ホストの場合は source 編集後にメインリポジトリのジャンクションが merge 後に自動反映するため worktree での projection 手動編集は不要だが、consumer プロジェクト（ジャンクションなし、`.opencode/` が git 管理対象）では両辺の手動同期が必要
 - **同期スクリプト非依存**: `sync-self-opencode.ps1`、`install-consumer-opencode.ps1` を worktree 内で実行してジャンクションを再作成しない（worktree 汚染、競合リスク）。ジャンクション再作成は case-run 終了後にメインリポジトリで実施する
@@ -112,6 +113,7 @@ driver 起動プロンプトの末尾に以下を埋め込む:
 
 - 本 worktree の `.opencode/skills/agentdev-*`・`.opencode/commands/agentdev/` は空です（ジャンクション未伝播）。
 - source（`src/opencode/`）を編集してください。projection（`.opencode/`）の手動同期は不要です（メインリポジトリのジャンクションが merge 後に自動反映します）。
+- 参照先の読み取りは実行目的（正規原本確認、実行時投影確認、双方整合確認）に応じて判別してください。判別ポリシーは `agentdev-workflow-lifecycle` スキルの参照先解決ポリシー参照。実行時投影確認はメインリポジトリ root 指定の読取専用実行で代替できます（環境ラベル付きで記録）。
 - 同期スクリプト（sync-self-opencode.ps1 等）を worktree 内で実行しないでください。
 - `.opencode/skills/repo-*`（実ディレクトリ）は worktree にも伝播しているため直接編集してかまいません。
 ```
