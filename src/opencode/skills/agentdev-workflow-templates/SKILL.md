@@ -54,7 +54,7 @@ agentdev系コマンドで使用するIssue/PR本文、コメントテンプレ�
 | テスト結果 | 【必須】 | テスト結果の概要に加え、テスト実行形態として実行 cwd と起動コマンド形式（./ prefix・パス指定を含む）を記録する | 「該当なし」 |
 | 品質メトリクス | 【必須】 | テーブル形式（メトリクス/結果/基準/判定） | - |
 | Findings/ Intake候補 | 【必須】 | case-run で発見した本筋外 Finding（intake候補、learning候補）を記録。各項目に発見元、内容、分類（intake/learning）を含める | 「該当なし」 |
-| Design確定候補 | 【任意】 | case-run/ driver が実装時に発見した Design レベルの詳細（schema、enum、判定表、内部アルゴリズム等）。`Findings / Capture候補` とは別セクション。case-close Step 3 の Design 確定チェック入力となる | セクションごと省略 |
+| Design確定候補 | 【任意】 | case-run/ driver が実装時に発見した Design レベルの詳細（schema、enum、判定表、内部アルゴリズム等）。`Findings / Capture候補` とは別セクション。case-close STEP-3 の Design 確定チェック入力となる | セクションごと省略 |
 
 ### review_dispositions 証跡セクション（Issue本文テンプレート）
 

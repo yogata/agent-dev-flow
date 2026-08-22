@@ -135,58 +135,58 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 ### `/agentdev/req-define`
 
 - **公開契約**: 自然言語による要件説明 / Issue URL / 明示入力ファイル（RU 含む） → `.agentdev/drafts/req-draft-{topic-slug}.md`（構造化 `draft-data`）。壁打ちフェーズ専用、実装コード生成禁止。
-- **主要処理段階**: Step 1 セッションコンテキスト検知 → Step 2 明示入力読込 → Step 3 壁打ち → Step 4 既存REQ照合 → Step 5 要件展開（5-1〜5-6 変更影響抽出・分類ゲート・Decision要否・実行主体・test strategy）→ Step 6 Decision判断 → Step 7 要件doc生成 → Step 8 work_type → Step 9 Scale → 経路A adversarial-review → Step 10 ドラフト保存 → Step 11 確認 → Step 12 完了報告。
-- **分岐**: 引数あり/なし、Standard vs Epic（`scale: large`）、work_type（feature/bugfix/maintenance/docs_chore）、前工程引き継ぎ（`agentdev_handoff: true`）、Decision要否（5-4 → architecture-advisory）、SPLIT予兆計測（4-2/11-2）、adversarial-review skip 条件（L0/Decision対象なし）。
+- **主要処理段階**: STEP-1 セッションコンテキスト検知・入力解決 → STEP-2 壁打ち対話 → STEP-3 既存REQ照合 → STEP-4 要件展開（変更影響抽出・分類ゲート・Decision要否・実行主体・test strategy）→ STEP-5 Decision判断 → STEP-6 要件doc生成 → STEP-7 work_type・Scale 判定 → STEP-8 経路A adversarial-review → STEP-9 ドラフト保存 → STEP-10 要件doc確認 → STEP-11 完了報告。
+- **分岐**: 引数あり/なし、Standard vs Epic（`scale: large`）、work_type（feature/bugfix/maintenance/docs_chore）、前工程引き継ぎ（`agentdev_handoff: true`）、Decision要否（STEP-4 → architecture-advisory）、SPLIT予兆計測（STEP-3/10）、adversarial-review skip 条件（L0/Decision対象なし）。
 - **副作用**: `.agentdev/drafts/**` のみ作成・編集（G03）。`docs/`、`.opencode/`、git、Issue/PR は触れない。
-- **HITL**: Step 3 壁打ち対話、Step 9 Scale=large 分解計画協議、Step 11 要件doc提示（承認は求めず、次コマンド実行を確定意思表示とする）、SPLIT 要否提案、architecture-advisory の「ユーザー確認事項」ラベル。
+- **HITL**: STEP-2 壁打ち対話、STEP-7 Scale=large 分解計画協議、STEP-10 要件doc提示（承認は求めず、次コマンド実行を確定意思表示とする）、SPLIT 要否提案、architecture-advisory の「ユーザー確認事項」ラベル。
 - **並列性**: 持たない（単一の壁打ちセッションを前提）。
-- **resume**: ドラフトファイル（`.agentdev/drafts/req-draft-*.md`）が永続 resume 入力。Step 3 差し戻し、Step 4 SPLIT候補、5-4 blocked、6 blocked が明示的再開点。
+- **resume**: ドラフトファイル（`.agentdev/drafts/req-draft-*.md`）が永続 resume 入力。STEP-2 差し戻し、STEP-3 SPLIT候補、STEP-4 blocked、STEP-5 blocked が明示的再開点。
 - **durable state**: `draft-data`（`agreed_items` / `artifact_actions` / `operation_units` / `test_strategy` / `review_dispositions` / `case_open_hints` / `auto_gate`）、`status` frontmatter（未確定→確定）。会話コンテキストに依存しない（DEC-011 原則）。
 - **Harness依存**: LLM 推論による壁打ち、subagent 起動（`agentdev-architecture-advisory`、`agentdev-adversarial-review`）、拡張読込（`agentdev-project-extensions`）。
 - **Capability依存**: `agentdev-req-analysis`、`agentdev-req-file-manager`（照合）、`agentdev-decision-guidelines`、`agentdev-decision-file-manager`（参照のみ）、`agentdev-architecture-advisory`、`agentdev-workflow-lifecycle`、`agentdev-workflow-templates`（template 読込）、`agentdev-project-extensions`、`agentdev-adversarial-review`（経路A）。
-- **内部workflow候補**: 壁打ち対話workflow（Step 1〜3、5）、既存REQ照合workflow（Step 4 + 4-1/4-2 定量計測）、要件展開と分類ゲートworkflow（Step 5-1〜5-6）、Decision判断workflow（Step 6 + 副ステップ）、ドラフト保存workflow（Step 7 + 10 + 11）。Step 5-6 の test strategy 定義は Capability Skill 候補。
+- **内部workflow候補**: 壁打ち対話workflow（STEP-1〜2）、既存REQ照合workflow（STEP-3 + 定量計測）、要件展開と分類ゲートworkflow（STEP-4）、Decision判断workflow（STEP-5 + 副ステップ）、ドラフト保存workflow（STEP-6 + 9 + 10）。STEP-4 の test strategy 定義は Capability Skill 候補。
 
 ### `/agentdev/req-save`
 
 - **公開契約**: `.agentdev/drafts/req-draft-*.md`（REQ/Decision artifact_actions 含む） → `docs/requirements/REQ-*.md` / `docs/decisions/DEC-*.md` + README 更新 + commit/push。`work_type` 依存廃止、`artifact_actions` の有無で判定。
-- **主要処理段階**: Step 1 事前チェック → Step 2 ドラフト読込（hash 記録）→ Step 3 検証（3-1/3-2/3-3 artifact_actions ゲート）→ Step 4 REQ操作（4-0 QG-1 / 4-1/4-2/4-3 3フェーズ分離）→ Step 5 インデックス・ハブ → Step 6 Decision作成 → Step 7 docs整合性 → Step 8 README索引（targeted docs guard）→ Step 9 変更範囲（check-change-impact）→ Step 10 status 更新 → Step 11 commit/push（明示パス）→ Step 12 完了報告。
-- **分岐**: artifact_actions 有無（no-op）、CREATE/APPEND/UPDATE/SPLIT、Decision entry 有無（Step 6）、SPLIT 検出（`requirements-review-finding`）、REQ再構成候補検知（`intake/inbox/req-restructure`）、extension 更新要否、`full_docs_check_recommended` で `/repo/docs-check` 提案。
+- **主要処理段階**: STEP-1 事前チェック → STEP-2 ドラフト読込（hash 記録）→ STEP-3 ドラフト検証・処理対象確定（artifact_actions ゲート）→ STEP-4 REQファイル操作（QG-1 相当検証、3フェーズ分離）→ STEP-5 インデックス・ハブ → STEP-6 Decision作成 → STEP-7 docs整合性 → STEP-8 README索引（targeted docs guard）→ STEP-9 変更範囲・リモート同期（check-change-impact）→ STEP-10 status 更新 → STEP-11 commit/push（明示パス、OU 結果書き戻し）→ STEP-12 完了報告。
+- **分岐**: artifact_actions 有無（no-op）、CREATE/APPEND/UPDATE/SPLIT、Decision entry 有無（STEP-6）、SPLIT 検出（`requirements-review-finding`）、REQ再構成候補検知（`intake/inbox/req-restructure`）、extension 更新要否、`full_docs_check_recommended` で `/repo/docs-check` 提案。
 - **副作用**: `docs/requirements/**` / `docs/decisions/**` / `docs/README.md` / `.agentdev/drafts/**`（status更新）の編集。git commit/push（main ブランチ、明示パスステージング）。`.agentdev/intake/inbox/req-restructure/**` 生成（例外）。Issue 作成は禁止（G11）。
 - **HITL**: targeted docs guard の strict 違反時の停止指示待ち、check-change-impact violation 時の指示待ち、extension 更新のユーザー指示、`full_docs_check_recommended` true 時の `/repo/docs-check` 提案。
 - **並列性**: case-auto 並列委譲モデルあり（REQ/093）。採番バッチ[直列] → ファイル作成[並列 最大5件] → インデックス更新[直列]。直列集約対象（採番/index/draft/commit/push）は並列完了後に実行。
-- **resume**: `draft-data.status`（`saved`）、読込時 commit hash と pull 後 hash の一致検証（G08）。Step 4-0 QG-1 fail → req-define 差し戻し。
-- **durable state**: REQ/Decision ファイル、README 索引、draft status、commit hash、artifact_actions 処理結果（Step 11-1）と OU 結果の書き戻し。
+- **resume**: `draft-data.status`（`saved`）、読込時 commit hash と pull 後 hash の一致検証（G08）。STEP-4 QG-1 fail → req-define 差し戻し。
+- **durable state**: REQ/Decision ファイル、README 索引、draft status、commit hash、artifact_actions 処理結果と OU 結果の書き戻し（STEP-11）。
 - **Harness依存**: bash による決定的スクリプト呼出、並列実行安全ステージングプロシージャ、subagent 起動（委譲接続点）、拡張読込。
 - **Capability依存**: `agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-conventional-commits`、`agentdev-quality-gates`（QG-1）、`agentdev-artifact-validation`（check-entry-existence / check-change-impact / id↔filename）、`agentdev-git-worktree`（並列ステージング）、`agentdev-project-extensions`、`repo-agentdev-integrity`（check_changed_docs.ts）。
-- **内部workflow候補**: REQ保存workflow（採番→作成→QG-1→push、3フェーズ分離を含む）、Decision保存workflow（Step 6 + 妥当性再検証ゲート）、docs整合性確認workflow（Step 7-9 targeted docs guard + check-change-impact）。
+- **内部workflow候補**: REQ保存workflow（採番→作成→QG-1→push、3フェーズ分離を含む）、Decision保存workflow（STEP-6 + 妥当性再検証ゲート）、docs整合性確認workflow（STEP-7〜9 targeted docs guard + check-change-impact）。
 
 ### `/agentdev/design-save`
 
 - **公開契約**: `.agentdev/drafts/req-draft-*.md`（Design artifact_actions 含む） → `docs/designs/**/*.md` + README 一覧登録 + commit/push。`work_type` 依存廃止。
-- **主要処理段階**: Step 1 事前チェック → Step 2 Design artifact_actions 読込 → Step 3 配置先解決（search-target-area.ts）→ Step 4 Design分離基準最終確認 → Step 5 Design操作（5-1 並列 / 5-2 宣言付与）→ Step 6 インデックス（check-entry-existence）→ Step 7 一覧整合（targeted docs guard / extension 更新要否）→ Step 8 status 更新 → Step 9 変更範囲（check-change-impact）→ Step 10 commit/push → Step 11 完了報告。
+- **主要処理段階**: STEP-1 事前チェック → STEP-2 Design artifact_actions 読込 → STEP-3 配置先解決（search-target-area.ts）→ STEP-4 Design分離基準最終確認 → STEP-5 Designファイル操作（並列化・宣言付与）→ STEP-6 インデックス整合（check-entry-existence）→ STEP-7 一覧整合（targeted docs guard / extension 更新要否）→ STEP-8 status 更新 → STEP-9 変更範囲検証（check-change-impact）→ STEP-10 commit/push → STEP-11 完了報告。
 - **分岐**: artifact_actions 有無（no-op）、`artifact: design` 有無、create vs update、`target_area` 指定有無（置換 vs 追記）、`target_area` 複数マッチ（置換拒否 G09）、`target_area` 空（スキップ+follow-up）、安定契約例外除外、`full_docs_check_recommended`、Design 移動による extension 参照先変更（エラー停止）。
 - **副作用**: `docs/designs/**` / `.agentdev/drafts/**`（status更新）の編集、`docs/designs/README.md`（Design 一覧）。git commit/push。REQ/Decision/command/skill/template 編集禁止（G03）。
 - **HITL**: targeted docs guard strict 違反時停止、`spec_readme_update_required`、extension 参照先 Design 移動時のユーザー判断、`full_docs_check_recommended` true 時の `/repo/docs-check` 提案、配置先 Design 特定不能時の follow-up 明示。
 - **並列性**: case-auto 並列委譲モデルあり（REQ/093）。異なる `target` パスの create/update は L0 完全独立のため並列可能（最大5件）。同一 Design ファイルへの複数 action は順序依存のため直列サブセット。
 - **resume**: `draft-data` Design 消費済みフラグ、target_area マッチ結果、Design `status: draft` frontmatter。
-- **durable state**: Design ファイル（frontmatter: title/status/created/updated + 宣言節）、Design README 一覧エントリ、draft Design 消費フラグ。
+- **durable state**: Design ファイル（frontmatter: `title`/`status`/`created`/`updated` + 宣言節）、Design README 一覧エントリ、draft Design 消費フラグ。
 - **Harness依存**: bash による決定的スクリプト呼出（search-target-area.ts / check-entry-existence.ts / check-change-impact.ts）、並列実行安全ステージング、拡張読込。
 - **Capability依存**: `agentdev-design-file-manager`（target-area-matching / design-lifecycle-application）、`agentdev-conventional-commits`、`agentdev-artifact-validation`、`agentdev-git-worktree`、`agentdev-project-extensions`、`repo-agentdev-integrity`（check_changed_docs.ts）。
-- **内部workflow候補**: Design保存workflow（配置先解決→操作→宣言付与→push）、target_area セクション置換workflow（Step 5 + search-target-area ロジック）、Design 一覧整合workflow（Step 6 + 7）。
+- **内部workflow候補**: Design保存workflow（配置先解決→操作→宣言付与→push）、target_area セクション置換workflow（STEP-5 + search-target-area ロジック）、Design 一覧整合workflow（STEP-6〜7）。
 
 ### `/agentdev/case-open`
 
 - **公開契約**: 要件doc（構造化 `draft-data`） → GitHub Issue（ラベル付き、要件doc埋め込み）。壁打ち→構造的実行フェーズの境界。
-- **主要処理段階**: Step 1 引き継ぎ停止判定（1-1 OU選択ゲート）→ Step 2 Issue本文生成（2-1/1a/1b QG-2 / 2-2 test_strategy / 2-3/4/5 識別子中心 / 2-6 EC-1〜EC-8 execution contract 確定）→ Step 3 マルチREQ判定（3-1 自律構成生成）→ Step 4 規模判定（4-1 preflight）→ 経路F adversarial-review → Epic flow（Step 5-9）/ Standard flow（Step 10-12）→ Step 13 コメント追加 → Step 14 draft/RU削除（Form Zero + 即時push）→ Step 15 完了報告。
+- **主要処理段階**: STEP-1 引き継ぎ・OU選択 → STEP-2 Issue本文生成・execution contract 確定（QG-2 / test_strategy / 識別子中心 / EC-1〜EC-8）→ STEP-3 構成判定・preflight → STEP-4 経路F adversarial-review → STEP-5 Issue 作成（Epic flow / Standard flow）→ STEP-6 終了処理・クリーンアップ（コメント追加、draft/RU 削除、Form Zero + 即時push、完了報告）。
 - **分岐**: 引き継ぎ停止（self-hosting vs consumer）、OU ID 指定有無、Standard flow vs 単一REQ Epic flow vs マルチREQ Epic flow、`scale: standard` vs `large`、子Issue 10件上限（G05）、preflight 5項目、adversarial-review skip（Standard + 単一OU 機械的確定）、review 結果による QG-2/preflight 再実行 4パターン。
 - **副作用**: GitHub Issue 作成（agentdev-gh-cli）、コメント追加、draft/RU の `git rm` + commit + 即時 push（Form Zero）。`.agentdev/` 配下の capture 成果物保存（委譲）。Issue 本文のファイル経由渡し（G25、`[System.IO.File]::WriteAllText` UTF8 BOM なし LF）。REQ/Decision/Design ファイル編集は禁止。
 - **HITL**: adversarial-review 由来の unresolved 判断事項、preflight 失敗時の停止、QG-2 fail 時の req-define 差し戻し、execution contract EC-6 scope-affecting impact の確認、Capture結果 小節の保存報告。
-- **並列性**: Step 8 子Issue 作成の並列化（最大5件、3つの「5件」文脈の(1)に該当）。Epic Issue 作成・Wave 1 配置・ステータステーブル更新は親が直列集約。
-- **resume**: Issue番号（Standard）、Epic Issue番号 + ステータス追跡テーブル、OU の `result` フィールド（作成 Issue/Epic 番号の書き戻し）、draft/RU 削除残存検証（Step 14-2）。
+- **並列性**: STEP-5 子Issue 作成の並列化（最大5件、3つの「5件」文脈の(1)に該当）。Epic Issue 作成・Wave 1 配置・ステータステーブル更新は親が直列集約。
+- **resume**: Issue番号（Standard）、Epic Issue番号 + ステータス追跡テーブル、OU の `result` フィールド（作成 Issue/Epic 番号の書き戻し）、draft/RU 削除残存検証（STEP-6）。
 - **durable state**: GitHub Issue 本文（要件doc 埋め込み、execution contract 必須セクション、EC-7 adversarial-review 発動契約永続化）、Epic Issue ステータス追跡テーブル、Issue 番号、draft/RU 削除状態。
 - **Harness依存**: gh CLI（agentdev-gh-cli 経由）、subagent 起動（REQ 読解・テンプレート充足・完了条件抽出、adversarial-review）、ファイル経由 UTF8 BOM なし LF 一時ファイル、並列実行安全ステージング、拡張読込。
 - **Capability依存**: `agentdev-issue-management`、`agentdev-epic-tracker`、`agentdev-workflow-templates`、`agentdev-workflow-lifecycle`、`agentdev-quality-gates`（QG-2）、`agentdev-gh-cli`、`agentdev-git-worktree`、`agentdeq-req-file-manager`（RU削除）、`agentdev-project-extensions`、`agentdev-adversarial-review`（経路F）、`agentdev-learning-capture`/`agentdev-intake-pipeline`（deviation capture 委譲）。
-- **内部workflow候補**: execution_unit 構成workflow（Step 3-1 連結成分アルゴリズム + 3軸判断）、Epic flow Issue作成workflow（Step 5-9）、Standard flow Issue作成workflow（Step 10-12）、execution contract 確定workflow（Step 2-6 EC-1〜EC-8）、draft/RU 削除クリーンアップworkflow（Step 14 + Form Zero）。EC-2 必須品質統制導出と EC-6 scope-affecting impact 探索は Capability Skill 候補。
+- **内部workflow候補**: execution_unit 構成workflow（STEP-3 連結成分アルゴリズム + 3軸判断）、Issue作成workflow（STEP-5、Epic flow / Standard flow）、execution contract 確定workflow（STEP-2、EC-1〜EC-8）、draft/RU 削除クリーンアップworkflow（STEP-6 + Form Zero）。EC-2 必須品質統制導出と EC-6 scope-affecting impact 探索は Capability Skill 候補。
 
 ### `/agentdev/case-run`
 
@@ -194,7 +194,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **主要処理段階**: Phase single: STEP-S1 フェーズ判定・再開ポイント検出 → STEP-S2 Issue 抽出・確認・判定（execution contract 消費境界）→ STEP-S3 Worktree 作成・ブランチ準備・前置 gate 群（QG-3 前置 staleness check / targeted docs guard）→ STEP-S4 実行担当サブエージェント委譲（経路G adapter 内 adversarial-review）→ STEP-S5 result 処理・配布依存境界 最終 gate（4状態）→ STEP-S6 クリーンアップ + 完了報告（L2 タイムスタンプ）。Phase epic-wave: STEP-W1 Epic Issue 解析・Wave 選択 → STEP-W2 fan-out 準備 → STEP-W3 fan-out 並列委譲 → STEP-W4 fan-in・結果集約 → STEP-W5 Wave 完了報告。
 - **分岐**: 単一Issue 実行 vs Epic Wave 実行（最大5件並列）、再開フェーズ（準備/委譲/クリーンアップ）、`agentdev_handoff: true`、execution contract 消費原則（必須セクション有無で新旧Issue識別）、QG-3 前置 staleness check 差異、targeted docs guard 実行条件、result 4状態（completed-pr/blocked/failed/delegation-unavailable）、adversarial-review skip（自明な機械的反映）。
 - **副作用**: worktree 作成（`.worktrees/{N}-{type}/`）、ブランチ作成。実行担当サブエージェント経由で PR 作成、Issue コメント追加（blocked/failed SSoT）。case-run 本体は worktree root 配下以外を触れない（G04/G30/G31）。完了条件チェックボックスは更新しない（G24、case-close 責務）。
-- **HITL**: blocked/failed の停止・ユーザー報告、delegation-unavailable の pending 戻し、未コミット変更あり時のユーザー指示待ち（Step 8）、委譲内 adversarial-review の unresolved 判断事項。
+- **HITL**: blocked/failed の停止・ユーザー報告、delegation-unavailable の pending 戻し、未コミット変更あり時のユーザー指示待ち（STEP-S6）、委譲内 adversarial-review の unresolved 判断事項。
 - **並列性**: Epic Wave 実行モードで現在 ready な Wave の子Issue を最大5件並列委譲。1 Wave の実行（PR作成まで）で return、Wave 境界（マージ）は扱わない（case-close 責務）。
 - **resume**: 3フェーズのべき等性（準備: worktree+ブランチ存在 / 委譲: PR未作成 or result未確定 / クリーンアップ: result=completed-pr）。PR番号、PR URL、Issue コメント（blocked/failed SSoT）。
 - **durable state**: GitHub PR 本文（`## Findings / Capture候補` / `## Design確定候補` / `### stale-reference` / `### docs-integrity`）、Issue コメント（blocked/failed）、PR 番号、worktree+ブランチ、L2 タイムスタンプ。
@@ -205,7 +205,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 ### `/agentdev/case-update`
 
 - **公開契約**: Issue番号 + 更新内容（`--body`/`--comment`/`--req`/`--review-ng`） → 更新されたIssue本文 / コメント / REQファイル / レビューNGコメント。主にレビューNG時対応。
-- **主要処理段階**: Step 1 Issue番号解決 → Step 2 現在状態取得（フェーズ判定）→ Step 3 更新内容に応じて分岐（`--body` / `--comment` / `--req` / `--review-ng`、各テンプレート維持・必須セクション検査）→ Step 4 完了報告。
+- **主要処理段階**: STEP-1 Issue番号解決 → STEP-2 現在状態取得（フェーズ判定）→ STEP-3 更新内容に応じて分岐（`--body` / `--comment` / `--req` / `--review-ng`、各テンプレート維持・必須セクション検査）→ STEP-4 完了報告。
 - **分岐**: 更新種別4値（`--body`/`--comment`/`--req`/`--review-ng`）、APPEND vs UPDATE（REQファイル）、`--review-ng` 時の QG-3 乖離検出引用、フェーズ不変（G01）、CI/CD修正・自律修正ループは対象外（G02、case-run 責務）。
 - **副作用**: Issue本文更新 / コメント追加（agentdev-gh-cli）。`--req` は直接 commit+push（req-save 委譲しない、G03 対象外の明示例外）。`--review-ng` はコメント投稿とREQ更新判断。
 - **HITL**: 更新種別推論不能時のユーザー指定要求停止。各分岐で親エージェントが最終確定。
@@ -214,35 +214,35 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **durable state**: Issue 本文、コメント、REQ ファイル、commit。
 - **Harness依存**: gh CLI（agentdev-gh-cli 経由）、subagent 起動（候補番号抽出・本文案・必須セクション検査）、拡張読込。
 - **Capability依存**: `agentdev-workflow-routing`、`agentdev-workflow-lifecycle`、`agentdev-quality-gates`（QG-3、`--review-ng`）、`agentdev-gh-cli`、`agentdev-workflow-templates`、`agentdev-project-extensions`。
-- **内部workflow候補**: 更新種別別 dispatch workflow（Step 3 の4分岐）。`--review-ng` フロー（乖離タイプ分類+推奨アクション）は Capability Skill 候補。
+- **内部workflow候補**: 更新種別別 dispatch workflow（STEP-3 の4分岐）。`--review-ng` フロー（乖離タイプ分類+推奨アクション）は Capability Skill 候補。
 
 ### `/agentdev/case-close`
 
 - **公開契約**: Issue番号 + PR番号（自動検出可）/ Epic Issue番号 → マージ済みPR + クローズ済みCase + 削除済みブランチ・worktree。Epic Issue番号時は現在 Wave の一括クローズ。
-- **主要処理段ーズ**: Step 1 Issue番号解決（Epic判定）→ Epic Wave クローズ（E1-E6）or 単一Issueクローズ（Step 1-1 重複ファイルチェック → Step 2 QG-4 前提確認 → Step 3 docs検証 / 3-1 検査ツール / 3-2 Design確定フロー → Step 4 PRマージ（4-0 UNKNOWNポーリング / 4-1 先行commit検出 / 4-2 コンフリクト rebase）→ Step 5 Post-merge テスト戦略 → Step 6 Issueクローズ → Step 7 worktree削除 → Step 8 親Epic更新 → Step 9 実行前同期（9-1/9-2）→ Step 10 学び検知+Capture回収 → Step 11 永続化 → Step 12 完了報告）。
+- **主要処理段階**: STEP-1 Issue番号解決・ルーティング（Epic判定）→ Epic Wave クローズ（STEP-E1〜E6）or 単一Issueクローズ（STEP-2 QG-4 達成判定 → STEP-3 docs検証・Design確定（配布依存境界 最終 gate 含む）→ STEP-4 PRマージ・コンフリクト解消（mergeable UNKNOWN ポーリング / 先行commit検出 / Level 1 rebase）→ STEP-5 Post-merge・Issueクローズ → STEP-6 クリーンアップ・Capture回収・永続化（実行前同期、worktree/ブランチ削除、親Epic更新、完了報告））。
 - **分岐**: Epic Wave クローズ vs 単一Issue、mergeable UNKNOWN ポーリング、squash merge コンフリクト（Level 1 rebase → case-auto Level 2/3 エスカレーション）、QG-4 観点8（PR対象範囲 vs 全体）、Design確定候補処理3パターン（昇格/design-save提案/見送り）、Epic自動クローズ判定（全子Issue CLOSED）、auto-close 回避（commit message フォーマット）。
-- **副作用**: PR squash merge（`--delete-branch` 禁止、Step 7 で独立削除）、Issue close、worktree+ブランチ削除（local+remote）、Epic Issue 本文ステータステーブル更新（case-close 単一書き手）、Design `status` draft→accepted 昇格、`.agentdev/` commit/push、完了条件チェックボックス評価・更新（case-close 専任責務 G08/G20）。
+- **副作用**: PR squash merge（`--delete-branch` 禁止、STEP-6 で独立削除）、Issue close、worktree+ブランチ削除（local+remote）、Epic Issue 本文ステータステーブル更新（case-close 単一書き手）、Design `status` draft→accepted 昇格、`.agentdev/` commit/push、完了条件チェックボックス評価・更新（case-close 専任責務 G08/G20）。
 - **HITL**: docs/ 更新なし警告（G09）、targeted docs guard strict 違反停止、IR-056 違反停止、QG-4 未達チェックボックス停止（G08/G20）、Design確定候補の見送り判断、Capture回収の分離。
-- **並列性**: Epic Wave クローズ E4 で各子Issue の PRマージ・クローズ・完了条件評価・Capture回収・コンフリクト解消準備を「準並列化」（REQ）。
+- **並列性**: Epic Wave クローズ STEP-E4 で各子Issue の PRマージ・クローズ・完了条件評価・Capture回収・コンフリクト解消準備を「準並列化」（REQ）。
 - **resume**: HEAD commit hash（squash merge 後）、PR mergeable 状態、Issue OPEN/CLOSED 状態、Epic ステータステーブル、Design status、学びinbox/intake inbox。
 - **durable state**: マージコミット、クローズ済みIssue、削除済みブランチ/worktree、`.agentdev/learning/inbox.md`、`.agentdev/intake/inbox/`、Design status（draft→accepted）、Epic Issue ステータステーブル。
 - **Harness依存**: gh CLI（merge/mergeable ポーリング/close/ラベル）、git（pull --ff-only / rebase / reset / checkout 隔離worktreeのみ）、worktree 操作、subagent 起動（learning-capture）、タイムスタンプ、bash による check_changed_docs.ts / check_extensions.ts、拡張読込。
-- **Capability依存**: `agentdev-quality-gates`（QG-4 Final Acceptance Gate）、`agentdev-gh-cli`（merge/UNKNOWNポーリング/retry）、`agentdev-git-worktree`（重複チェック/rebaseパス/同期リスク検出/先行commit）、`agentdev-epic-tracker`（E1-E6）、`agentdev-design-file-manager`（design-lifecycle-application、Step 3-2）、`agentdev-workflow-templates`、`agentdev-learning-capture`、`agentdev-learning-pipeline`（deferred）、`agentdev-intake-pipeline`、`agentdev-workflow-orchestration`（capture境界）、`agentdev-project-extensions`、`repo-agentdev-integrity`（check_changed_docs.ts / check_extensions.ts）。
-- **内部workflow候補**: PRマージworkflow（Step 4 + 4-0/4-1/4-2 コンフリクト解消）、QG-4 達成判定workflow（Step 2 + 観点8 + 完了条件チェックボックス）、Design確定workflow（Step 3-2）、Capture回収workflow（Step 10、PR本文→intake/learning分離）、Epic Wave クローズworkflow（E1-E6）。Level 1 コンフリクト解消と Design status 昇格判断は Capability Skill 候補。
+- **Capability依存**: `agentdev-quality-gates`（QG-4 Final Acceptance Gate）、`agentdev-gh-cli`（merge/UNKNOWNポーリング/retry）、`agentdev-git-worktree`（重複チェック/rebaseパス/同期リスク検出/先行commit）、`agentdev-epic-tracker`（STEP-E1〜E6）、`agentdev-design-file-manager`（design-lifecycle-application、STEP-3）、`agentdev-workflow-templates`、`agentdev-learning-capture`、`agentdev-learning-pipeline`（deferred）、`agentdev-intake-pipeline`、`agentdev-workflow-orchestration`（capture境界）、`agentdev-project-extensions`、`repo-agentdev-integrity`（check_changed_docs.ts / check_extensions.ts）。
+- **内部workflow候補**: PRマージworkflow（STEP-4、コンフリクト解消 Level 1）、QG-4 達成判定workflow（STEP-2 + 観点8 + 完了条件チェックボックス）、Design確定workflow（STEP-3）、Capture回収workflow（STEP-6、PR本文→intake/learning分離）、Epic Wave クローズworkflow（STEP-E1〜E6）。Level 1 コンフリクト解消と Design status 昇格判断は Capability Skill 候補。
 
 ### `/agentdev/case-auto`
 
 - **公開契約**: 要件doc / Issue番号・URL → req-save → design-save → case-open → case-run → case-close を順次自走しマージまで完了。明示指定時のみの追加入口（標準workflowの置換えではない）。
-- **主要処理段階**: STEP-1 入力解決（JST 開始時刻記録）→ STEP-2 work_type 読取（参考）→ STEP-3 工程分岐（artifact_actions 動的判定 / auto_gate preflight）→ STEP-4 各工程実行（委譲起動 / case-run インライン / orchestration stage モデル / Wave 反復）→ STEP-5 工程間状態引き継ぎ → STEP-6 複数REQ対応 → STEP-7 停止条件検出・停止理由分類（11項目、7軸＋上位合意矛盾/新規ユーザー判断）→ 経路H adversarial-review 停止伝播 → bounded parent decision resolution → STEP-8 完了報告（L1 タイムスタンプ + 4次元集約 + OU処理ループ）。
+- **主要処理段階**: STEP-1 入力解決・開始時刻記録（JST）→ STEP-2 work_type 読取・工程分岐（artifact_actions 動的判定 / auto_gate preflight）→ STEP-3 orchestration 実行（委譲起動 / case-run インライン / orchestration stage モデル / Wave 反復）→ STEP-4 停止条件検出・停止理由分類（11項目、7軸＋上位合意矛盾/新規ユーザー判断）→ STEP-5 経路H adversarial-review 停止伝播 → STEP-6 bounded parent decision resolution → STEP-7 コンフリクト解消 Level 2/3 → STEP-8 完了報告（L1 タイムスタンプ + 4次元集約 + OU処理ループ）。
 - **分岐**: 入力モード（Issue番号/URL vs 要件doc 4パターン）、artifact_actions ベース分岐（req-save/design-saveスキップ可）、Epic Wave 反復（子Issue並列最大5件、直接制御 AG-003）、Standard flow vs Epic Issue flow、停止条件11項目、停止理由分類（7軸 + 上位合意矛盾/新規ユーザー判断）、コンフリクト Level 1/2/3 エスカレーション、経路H user-decision-required、bounded parent decision resolution（自律解決/作業仮定/上位合意矛盾/新規ユーザー判断）、delegation-unavailable。
 - **副作用**: req-save/design-save/case-open/case-close の各委譲起動、case-run インライン実行（実行担当サブエージェント委譲を含む）、GitHub Issue/PR/comment/merge/close（自走対象 G04）、remote branch 削除（自作branch限定 G05）、docs/ 更新（G06）。DB migration実行/deploy/apply/外部SaaS/認証は対象外（G02/G03）。Epic Issue 本文への直接書込はしない（G16、case-close 単一書き手）。
-- **HITL**: Step 7 停止条件（11項目）、経路H user-decision-required 待機、bounded parent decision resolution の上位合意矛盾/新規ユーザー判断、draft 0件時の req-define 実行要求。
+- **HITL**: STEP-4 停止条件（11項目）、経路H user-decision-required 待機、bounded parent decision resolution の上位合意矛盾/新規ユーザー判断、draft 0件時の req-define 実行要求。
 - **並列性**: orchestration stage モデル（stage 1 case-open 直列 / stage 2 case-run bg task 最大5件 / stage 3 case-close 直列集約）。OU 間は必須依存で結合した群は順次、必須依存なし群は並列。3つの「5件」文脈の区別（Wave 内子Issue/Phase 2 同時起動/execution_unit 全体）。順次フォールバック可能（G32）。bg task 破棄検知時の3状態回復。
 - **resume**: 入力解決結果、各工程の起動結果（Issue/PR番号）、RU パス、capture 対象情報、`case_auto_started_at`、L1 工程別タイムスタンプ、orchestration stage 別結果、bg task 状態、結果状態4次元。
 - **durable state**: 各工程の永続成果物（REQ/Decision/Design/Issue/PR/RU削除）、`case_auto_started_at`、L1 タイムスタンプ内訳、Epic Issue ステータステーブル（case-close が書込、case-auto は読取のみ）。
 - **Harness依存**: bg task API（最大5件）、subagent 起動（委譲工程）、context 管理（親コンテキスト非累積 G28）、タイムスタンプ計測（L1）、委譲起動判定、bg task 破棄検知・状態別回復、インライン case-run 実行、拡張読込。
 - **Capability依存**: `agentdev-workflow-orchestration`、`agentdev-case-run-execution-adapter`、`agentdev-git-worktree`、各工程の Capability Skill を継承（req-save/design-save/case-open/case-run/case-close の依存スキル群）、`agentdev-adversarial-review`（経路H 伝播受領、直接起動しない）、`agentdev-project-extensions`。
-- **内部workflow候補**: orchestration workflow（STEP-3〜6 + stage モデル + Wave 反復）、bounded parent decision resolution workflow（decision_context 解決）、コンフリクト解消 Level 2/3 workflow（インライン case-run 再実行 + オーケストレーション級判断）、停止理由分類workflow（STEP-7）。これらは case-auto 固有の orchestration として Workflow Skill 抽出の有力候補。bounded parent decision resolution と Wave 反復制御は Capability Skill 候補。
+- **内部workflow候補**: orchestration workflow（STEP-3 + stage モデル + Wave 反復）、bounded parent decision resolution workflow（decision_context 解決）、コンフリクト解消 Level 2/3 workflow（インライン case-run 再実行 + オーケストレーション級判断）、停止理由分類workflow（STEP-4）。これらは case-auto 固有の orchestration として Workflow Skill 抽出の有力候補。bounded parent decision resolution と Wave 反復制御は Capability Skill 候補。
 
 ### `/agentdev/intake-capture`
 
@@ -275,49 +275,49 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 ### `/agentdev/intake-promote`
 
 - **公開契約**: `.agentdev/intake/inbox/*.md` + ユーザーコンテキスト → `.agentdev/intake/promoted/*.md`（採用）+ 分類結果レポート。review/分類/整形を行い Issue 作成はしない。
-- **主要処理段階**: Step 1 inbox確認 → Step 2 item読込 → Step 3 review/評価 → Step 4 分類提示（4a 経路C adversarial-review 発動条件判定 / 4b review 呼出）→ Step 5 ユーザー確認（分類確定後 自動実行 REQ）→ Step 6 採用item整形 → Step 7 promoted保存 → Step 8 振り分け → Step 9 実行前同期 → Step 10 commit/push → Step 11 完了報告。
+- **主要処理段階**: STEP-1 classification（inbox 確認・item 読込・review/評価・暫定分類提示・自律確定候補判定）→ STEP-2 review（経路C adversarial-review、発動条件判定 / review 呼出）→ STEP-3 HITL（ユーザー確認・分類承認、分類確定後 自動実行 REQ）→ STEP-4 persistence（採用item整形・promoted保存）→ STEP-5 destructive handling（振り分け・inbox削除・実行前同期・commit/push）→ STEP-6 完了報告。
 - **分岐**: inbox 空、分類3値（採用/保留/却下）、adversarial-review skip（1件で自明/inbox空）、ユーザー明示指定時の必須発動、破壊的変更の明示承認維持（G18）、`accepted/` 廃止（G13/G14）、採用item inbox削除（G17）/reject item 即時削除（G19）。
 - **副作用**: `.agentdev/intake/promoted/` 保存、採用item の inbox 元ファイル削除、reject item の即時削除（commit message に却下理由）、`.agentdev/intake/` 配下 commit/push。Issue 作成・backlog-review 自動起動はしない（G01/G03）。
-- **HITL**: Step 5 ユーザー確認（分類確定、明示承認 G06/G07/G08）、破壊的変更の別承認（G18）、adversarial-review unresolved 判断事項。
+- **HITL**: STEP-3 ユーザー確認（分類確定、明示承認 G06/G07/G08）、破壊的変更の別承認（G18）、adversarial-review unresolved 判断事項。
 - **並列性**: 持たない（対話的 review、親エージェントが集約）。
 - **resume**: inbox item 一覧、暫定分類、ユーザー承認状態、分類確定状態。
 - **durable state**: `.agentdev/intake/promoted/*.md`、inbox 削除状態、分類結果レポート、commit hash。
 - **Harness依存**: subagent 起動（item 読込・整形案・review）、git（pull/commit/push、並列実行安全ステージング）、`agentdev-adversarial-review`（経路C）、拡張読込。
 - **Capability依存**: `agentdev-intake-pipeline`、`agentdev-git-worktree`、`agentdev-adversarial-review`（経路C）、`agentdev-project-extensions`。
-- **内部workflow候補**: review/分類workflow（Step 2-5 + 経路C）、採用item整形+保存+振り分けworkflow（Step 6-8）。分類ロジック（採用/保留/却下）は Capability Skill 候補（`agentdev-intake-pipeline` が所有）。
+- **内部workflow候補**: review/分類workflow（STEP-1〜3 + 経路C）、採用item整形+保存+振り分けworkflow（STEP-4〜5）。分類ロジック（採用/保留/却下）は Capability Skill 候補（`agentdev-intake-pipeline` が所有）。
 
 ### `/agentdev/learning-promote`
 
 - **公開契約**: `.agentdev/learning/inbox.md`（必須）+ `deferred.md`（任意） → `.agentdev/learning/promoted/{category}-{name}.md` + evaluation-report.md + deferred.md 追記 + inbox.md クリア。`.opencode/` 直接反映禁止、必ず backlog-review 経由。
-- **主要処理段階**: Step 1 inbox読込 → Step 2 deferred読込 → Step 3 正規化 → Step 4 問題クラス分類 → Step 5 8軸評価 → Step 6 evaluation-report生成 → Step 7 廃棄判定（11カテゴリ+duplicate、昇華可能性評価）→ Step 8 既存対策確認 → Step 8-R1 経路D adversarial-review 発動条件判定 → Step 8-R2 review 呼出（Step 6 戻しループ）→ Step 9 判定結果提示 → Step 10 ユーザー承認 → Step 11 実行前同期 → Step 12 採用済み成果物生成 → Step 13 deferred移動（原子的）→ Step 14 昇華時prune → Step 15 commit/push → Step 16 完了報告。
-- **分岐**: inbox 空、エントリ0件、廃棄判定13パターン、昇華可能性（無条件自動REQ化禁止 G10）、living pool 維持（deferred）、adversarial-review skip（1件重複確実/inbox空）、Step 6 戻しループ（review 反映時）、prune 対象/非対象、git pull/push 失敗停止。
+- **主要処理段階**: STEP-1 入力読込・正規化（inbox + deferred）→ STEP-2 評価（問題クラス分類・8軸評価・evaluation-report生成）→ STEP-3 判定（廃棄判定 11カテゴリ+duplicate、昇華可能性評価、既存対策確認）→ STEP-4 review（経路D adversarial-review、発動条件判定 / review 呼出、evaluation-report 戻しループ）→ STEP-5 判定確定（自律確定・HITL 承認）→ STEP-6 永続化（採用済み成果物生成・deferred移動・昇華時prune・commit/push、原子的）→ STEP-7 完了報告。
+- **分岐**: inbox 空、エントリ0件、廃棄判定13パターン、昇華可能性（無条件自動REQ化禁止 G10）、living pool 維持（deferred）、adversarial-review skip（1件重複確実/inbox空）、evaluation-report 戻しループ（STEP-4、review 反映時）、prune 対象/非対象、git pull/push 失敗停止。
 - **副作用**: `.agentdev/learning/promoted/` 保存、`.agentdev/learning/evaluation-report.md` 生成/更新、`.agentdev/learning/deferred.md` 追記（原子的操作）、`.agentdev/learning/inbox.md` クリア、prune、`.agentdev/learning/` 配下 commit/push（明示パス、`chore(agentdev): promote learning findings`）。`.opencode/` 直接書込禁止（G01）、case-run への直接受け渡し禁止（G03）。
-- **HITL**: Step 9-10 判定結果確認・修正・承認（判断確定 REQ）、Step 14 prune は Step 10 承認と同時に承認済み（自動実行 REQ）、破壊的変更の明示承認（G09）、adversarial-review unresolved 判断事項。
+- **HITL**: STEP-5 判定結果確認・修正・承認（判断確定 REQ）、STEP-6 prune は STEP-5 承認と同時に承認済み（自動実行 REQ）、破壊的変更の明示承認（G09）、adversarial-review unresolved 判断事項。
 - **並列性**: 持たない（inbox エントリを順次評価、原子的操作で inbox/deferred を一括処理）。
 - **resume**: inbox.md エントリ、deferred.md living pool、evaluation-report.md、廃棄判定結果、ユーザー承認状態。
 - **durable state**: `.agentdev/learning/promoted/*.md`、`evaluation-report.md`、`deferred.md`、`inbox.md`（ヘッダーのみクリア）、commit hash。
 - **Harness依存**: LLM 推論（8軸評価・廃棄判定）、subagent 起動（`agentdev-adversarial-review` 経路D）、git（pull/commit/push、並列実行安全ステージング）、原子的ファイル操作、拡張読込。
 - **Capability依存**: `agentdev-learning-pipeline`（8軸評価/廃棄判定/既存対策照合）、`agentdev-learning-capture`（参照）、`agentdev-git-worktree`、`agentdev-adversarial-review`（経路D）、`agentdev-project-extensions`。
-- **内部workflow候補**: 正規化/評価workflow（Step 3-8 + 8軸スコアリング）、廃棄判定+昇華可能性評価workflow（Step 7）、HITL+prune+永続化workflow（Step 9-15）。8軸評価ロジックと廃棄判定カテゴリは Capability Skill 候補（`agentdev-learning-pipeline` が所有）。
+- **内部workflow候補**: 正規化/評価workflow（STEP-1〜2 + 8軸スコアリング）、廃棄判定+昇華可能性評価workflow（STEP-3）、HITL+prune+永続化workflow（STEP-5〜6）。8軸評価ロジックと廃棄判定カテゴリは Capability Skill 候補（`agentdev-learning-pipeline` が所有）。
 
 ### `/agentdev/backlog-review`
 
 - **公開契約**: `.agentdev/{intake,learning,inspect}/promoted/*.md` → `.agentdev/backlog/req-units/RU-*.md` + 成功成果物削除。ユーザー承認後に RU を生成（承認は RU 作成承認を兼ねる）。
-- **主要処理段階**: Step 1 実行前同期 → Step 2 成果物検出（引数なし/あり）→ Step 3 読込+分析+暫定分類付与 → Step 4 統合/分割判定+depends_on依存解決（4-1 経路E adversarial-review）→ Step 5 矛盾検出+追加判断 → Step 6 RU生成（session由来RU含む）→ Step 7 成功成果物削除 → Step 8 Git永続化 → Step 9 完了報告。
+- **主要処理段階**: STEP-1 実行前同期・成果物検出（引数なし/あり）→ STEP-2 分析・暫定分類付与 → STEP-3 統合/分割判定+depends_on依存解決 → STEP-4 review（経路E adversarial-review、発動条件判定 / review 呼出）→ STEP-5 HITL（ユーザー承認、RU 生成承認を兼ねる）→ STEP-6 矛盾検出+追加判断 → STEP-7 RU生成（session由来RU含む）+成功成果物削除 → STEP-8 Git永続化・完了報告。
 - **分岐**: 成果物0件（正常終了）、引数指定、統合/分割判定、depends_on 依存解決、矛盾検出（partial success）、session由来RU（二段階承認）、adversarial-review skip（RU構成要素1件）、ユーザー明示指定時必須発動、矛盾なしの単一承認（REQ-015-008）。
 - **副作用**: `.agentdev/backlog/req-units/RU-*.md` 生成、成功成果物の削除、`.agentdev/` 配下 commit/push（明示パス、`chore(agentdev): generate requirement units via backlog-review`）。REQ ファイル保存（G01）/Issue 作成（G02）/inbox・deferred 更新（G04）は禁止。矛盾の自動解決はしない（G05）。
-- **HITL**: Step 4 後半ユーザー承認（構成案）、Step 5 矛盾検出時の追加判断（partial success）、Step 6 RU 生成承認（矛盾なければ Step 4 と単一承認）、adversarial-review unresolved 判断事項。
+- **HITL**: STEP-5 ユーザー承認（構成案、RU 生成承認を兼ねる）、STEP-6 矛盾検出時の追加判断（partial success、矛盾なければ単一承認）、adversarial-review unresolved 判断事項。
 - **並列性**: 持たない（対話的 review、親エージェントが集約）。
 - **resume**: 成果物検出結果、RU 構成案、統合/分割判定、depends_on 解決結果、矛盾検出結果、ユーザー承認状態。
 - **durable state**: `.agentdev/backlog/req-units/RU-*.md`、promoted 削除状態、commit hash。
 - **Harness依存**: LLM 推論（統合/分割/矛盾検出）、subagent 起動（`agentdev-adversarial-review` 経路E）、git（pull/commit/push、並列実行安全ステージング）、拡張読込。
 - **Capability依存**: `agentdev-backlog-integration`、`agentdev-git-worktree`、`agentdev-adversarial-review`（経路E）、`agentdev-project-extensions`。
-- **内部workflow候補**: 統合/分割判定workflow（Step 4 前半）、矛盾検出workflow（Step 5）、RU生成+削除+永続化workflow（Step 6-8）。統合/分割判定基準と depends_on 依存解決ルールは Capability Skill 候補（`agentdev-backlog-integration` が所有）。
+- **内部workflow候補**: 統合/分割判定workflow（STEP-3）、矛盾検出workflow（STEP-6）、RU生成+削除+永続化workflow（STEP-7〜8）。統合/分割判定基準と depends_on 依存解決ルールは Capability Skill 候補（`agentdev-backlog-integration` が所有）。
 
 ### `/agentdev/backlog-auto`
 
 - **公開契約**: 引数なし → backlog 整理サイクル（inspect-docs → 昇格3系統 → backlog-review）を1回起動で実行し RU 生成まで一巡。追加入口（標準の backlog 整理フローを置換しない）。子ワークフロー内部の分類、評価、昇格、RU 生成ロジックは再実装しない。
-- **主要処理段階**: Step 1 開始時刻記録・進行状態初期化（durable state 再構成）→ Step 2 stage 1 inspect-docs 単独直列 → Step 3 stage 2 昇格3系統（learning-promote / intake-promote / inspect-promote、競合処理の直列化）→ Step 4 fan-in 判定 → Step 5 stage 3 backlog-review → Step 6 完了報告（工程別結果、停止理由、再開コマンド提示）。
+- **主要処理段階**: STEP-1 開始時刻記録・進行状態初期化（durable state 再構成）→ STEP-2 stage 1 inspect-docs 単独直列 → STEP-3 stage 2 昇格3系統（learning-promote / intake-promote / inspect-promote、競合処理の直列化）→ STEP-4 fan-in 判定 → STEP-5 stage 3 backlog-review → STEP-6 完了報告（工程別結果、停止理由、再開コマンド提示）。
 - **分岐**: stage 1 停止経路（inspect-docs blocked/failed で下流非開始）、fan-in 判定（全系統正常完了 or 対象なし終了で開始可、1系統でも blocked・failed・未完了で開始不可）、系統別結果状態の読み替え（対象なし終了を正常扱い、learning-promote の inbox.md 不在を対象なし扱い）、部分停止時の独立系統継続、新規 promoted 0件でも backlog-review 実行、inspect-promote --auto 非有効化。
 - **副作用**: 各子コマンドの既存副作用のみ（`.agentdev/` 配下の成果物作成・削除、git commit/push、ユーザー対話）。backlog-auto 自身は新規副作用を追加しない。capture 系コマンド、inspect-skills、req-define、req-save、Issue/PR 作成の自動起動はしない（G03）。
 - **HITL**: 各子ワークフローの既存 HITL 境界を維持（新規判断境界を追加しない）。複数系統が判断待ちの場合はユーザー対話を直列化し系統識別付きで表示。
@@ -331,7 +331,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 ### `/agentdev/inspect-docs`
 
 - **公開契約**: なし（全対象成果物を自動スキャン） → 診断結果（セッション内 + `.agentdev/inspect/inbox/inspect-docs-finding-*.md`）。診断専用、検査対象を直接修正しない。
-- **主要処理段階**: Step 1 スキャン対象収集 → Step 2 REQ参照ID整合性 → Step 3 第一参照導線 → Step 4 現行/廃止/世代境界 → Step 5 Design意味診断 → Step 6 Decision意味診断 → Step 7 guides意味診断 → Step 8 README索引診断 → Step 9 REQ structure review（6観点）→ Step 10 文書分類一貫性検査 → Step 11 配布物整合性検査 → Step 12 docs-check route判定 → Step 13 未処理artifact確認 → Step 14 検出事項出力 → Step 15 実行前同期 → Step 16 commit/push → Step 17 完了報告。
+- **主要処理段階**: STEP-1 スキャン対象収集 → STEP-2 REQ体系・文書種別別意味診断（REQ参照ID整合性、第一参照導線、現行/廃止/世代境界、REQ/Decision/Design/guides/README 意味診断、REQ structure review 6観点、文書分類一貫性検査）→ STEP-3 配布物整合性検査・docs-check route判定（未処理artifact確認）→ STEP-4 検出事項出力・実行前同期・commit/push・完了報告。
 - **分岐**: スキャン対象ディレクトリ存在/不存在、ファイル読込失敗、source-of-truth priority（現行REQ > 承認済みADR > Design > guides）、NG分類（false positive/pre-existing/今回修正対象）、inspect-* routing（docs vs skills vs 両方）。
 - **副作用**: `.agentdev/inspect/inbox/inspect-docs-finding-*.md` 生成、`.agentdev/inspect/` 配下 commit/push（`chore(agentdev): capture inspect-docs finding`）。ファイル変更/作成/削除（G01 例外除く）、Issue/PR 作成（G02）、worktree（G03）、intake/learning/RU（G04）は禁止。
 - **HITL**: なし（診断専用、検出事項を提示するのみ）。source-of-truth priority は機械的（G05）。
@@ -340,12 +340,12 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **durable state**: `.agentdev/inspect/inbox/inspect-docs-finding-*.md`、commit hash。
 - **Harness依存**: LLM 推論（意味診断）、subagent 起動（`agentdev-req-structure-diagnostics` 等）、git、拡張読込。
 - **Capability依存**: `agentdev-req-structure-diagnostics`、`agentdev-doc-diagnostics`、`agentdev-doc-writing`（参照）、`agentdev-git-worktree`、`agentdev-project-extensions`。
-- **内部workflow候補**: docs 横断診断workflow（Step 1-13 + 6観点 review + 文書分類検査 + 配布物整合性）。診断カテゴリの routing と検査ロジックは Capability Skill 候補（`agentdev-doc-diagnostics`/`agentdev-req-structure-diagnostics` が所有）。
+- **内部workflow候補**: docs 横断診断workflow（STEP-1〜3 + 6観点 review + 文書分類検査 + 配布物整合性）。診断カテゴリの routing と検査ロジックは Capability Skill 候補（`agentdev-doc-diagnostics`/`agentdev-req-structure-diagnostics` が所有）。
 
 ### `/agentdev/inspect-skills`
 
 - **公開契約**: Command/Skill 定義ファイル群 → 診断レポート（セッション内 + `.agentdev/inspect/inbox/inspect-skills-finding-*.md`）。診断専用、検査対象を直接修正しない。
-- **主要処理段階**: Step 1 診断対象読込 → Step 2 各診断観点評価（`agentdev-inspect-skills`）→ Step 3 配布物構文健全性・責務整合診断 → Step 4 分類（NG分類表）→ Step 5 route提示 → Step 6 検出事項出力 → Step 7 実行前同期 → Step 8 commit/push → Step 9 完了報告。
+- **主要処理段階**: STEP-1 診断対象読込 → STEP-2 各診断観点評価・分類・route提示（`agentdev-inspect-skills`、配布物構文健全性・責務整合診断を含む）→ STEP-3 検出事項出力・実行前同期・commit/push・完了報告。
 - **分岐**: 対象ファイル存在/不存在、参照先 Skill 存在/不存在、source-of-truth、NG分類、inspect-* routing、自動修正しない（G05）。
 - **副作用**: `.agentdev/inspect/inbox/inspect-skills-finding-*.md` 生成、`.agentdev/inspect/` 配下 commit/push（`chore(agentdev): capture inspect-skills finding`）。ファイル変更/削除（G01例外）、Issue/PR（G02）、RU/intake/learning/backlog（G03）、branch/worktree（G04）は禁止。
 - **HITL**: なし（診断専用、推奨 route の提示に留める G05）。
@@ -354,21 +354,21 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **durable state**: `.agentdev/inspect/inbox/inspect-skills-finding-*.md`、commit hash。
 - **Harness依存**: LLM 推論（構文健全性・責務整合診断）、git、拡張読込。
 - **Capability依存**: `agentdev-inspect-skills`、`agentdev-git-worktree`、`agentdev-project-extensions`。
-- **内部workflow候補**: 参照妥当性診断workflow（Step 1-2）、配布物構文健全性・責務整合診断workflow（Step 3、docs-spec-rebuild-integrity 検査パターン）。診断観点（粒度・段階的開示・責務境界・canonical name・内部構造依存）は Capability Skill 候補（`agentdev-inspect-skills` が所有）。
+- **内部workflow候補**: 参照妥当性診断workflow（STEP-1〜2）、配布物構文健全性・責務整合診断workflow（STEP-2 診断観点、docs-spec-rebuild-integrity 検査パターン）。診断観点（粒度・段階的開示・責務境界・canonical name・内部構造依存）は Capability Skill 候補（`agentdev-inspect-skills` が所有）。
 
 ### `/agentdev/inspect-promote`
 
 - **公開契約**: `.agentdev/inspect/inbox/*.md` + `--auto`（省略可） → `.agentdev/inspect/promoted/*.md`（手動 promote）/ `.agentdev/intake/promoted/inspect-auto-*.md`（`--auto` 時）/ `auto-promote-log.md`（append-only）。分類・採用を行い Issue 作成はしない。
-- **主要処理段階**: Step 1 実行前同期 → Step 2 inboxスキャン → Step 3 検出事項分類（promote/defer/reject）→ Step 4 自動 promote（`--auto` opt-in 時）→ Step 4-1 経路B adversarial-review 発動条件判定 → Step 4-2 review 呼出 → Step 5 HITL確定（手動分類対象）→ Step 6 promote処理 → Step 7 reject処理（即時削除）→ Step 8 defer処理（残置）→ Step 9 完了報告 → Step 10 commit/push。
+- **主要処理段階**: STEP-1 実行前同期 → STEP-2 inboxスキャン → STEP-3 検出事項分類（暫定分類 promote/defer/reject）→ STEP-4 自動 promote（`--auto` opt-in 時、fast path）→ STEP-5 経路B adversarial-review（発動条件判定 / review 呼出）→ STEP-6 確定（自律確定判定と HITL 確定）→ STEP-7 処理実行（promote / reject 即時削除 / defer 残置）→ STEP-8 完了報告・永続化（commit/push）。
 - **分岐**: inbox 空（終了）、`--auto` opt-in 有無（fast path vs 手動分類）、自動 promote 対象カテゴリ（安定契約例外・否定文脈除外）、adversarial-review skip（`--auto` 経路/手動0件）、ユーザー明示指定時必須発動、reject 即時削除（`archive/rejected/` 廃止）、defer 残置、ユーザー全件 defer、promote/defer/reject/intake-or-learning 送付推奨。
 - **副作用**: `.agentdev/inspect/promoted/*.md` 保存、`.agentdev/intake/promoted/inspect-auto-*.md` 投入（`--auto`）、`.agentdev/inspect/promoted/auto-promote-log.md` 更新（append-only）、promote inbox 削除、reject 即時削除（commit message に却下理由）、defer 残置、`.agentdev/inspect/`+`.agentdev/intake/` 配下 commit/push（`chore(agentdev): promote inspect findings`）。
-- **HITL**: Step 5 HITL 確定（手動分類対象、`--auto` 対象外）、adversarial-review unresolved 判断事項。
+- **HITL**: STEP-6 HITL 確定（手動分類対象、`--auto` 対象外）、adversarial-review unresolved 判断事項。
 - **並列性**: 持たない（対話的 review、`--auto` fast path は一括処理）。
 - **resume**: inbox 検出事項一覧、暫定分類、`--auto` 実行ログ、HITL 承認状態。
 - **durable state**: `.agentdev/inspect/promoted/*.md`、`.agentdev/intake/promoted/inspect-auto-*.md`、`auto-promote-log.md`、inbox 削除状態、commit hash。
 - **Harness依存**: LLM 推論（分類）、subagent 起動（`agentdev-adversarial-review` 経路B）、git（pull/commit/push）、拡張読込。
 - **Capability依存**: workflow-contracts Design（自動 promote 対象カテゴリ、extension 経由）、`agentdev-git-worktree`、`agentdev-adversarial-review`（経路B）、`agentdev-project-extensions`。
-- **内部workflow候補**: 分類workflow（Step 3 + promote/defer/reject）、`--auto` fast path workflow（Step 4 + カテゴリマッチング + 自動投入）、HITL+永続化workflow（Step 5-10）。自動 promote 対象カテゴリと誤検知 revoke 手順は Capability Skill 候補（workflow-contracts Design が所有）。
+- **内部workflow候補**: 分類workflow（STEP-3 + promote/defer/reject）、`--auto` fast path workflow（STEP-4 + カテゴリマッチング + 自動投入）、HITL+永続化workflow（STEP-6〜8）。自動 promote 対象カテゴリと誤検知 revoke 手順は Capability Skill 候補（workflow-contracts Design が所有）。
 
 ### 横断観察（Cross-cutting observations）
 
@@ -379,7 +379,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **HITL 密度**: req-define（壁打ち・Scale協議・SPLIT提案）、case-open（execution contract・preflight）、intake-promote/learning-promote/backlog-review（分類承認）、inspect-promote（手動分類確定）が高 HITL。case-run/case-close/intake-capture/intake-from-github/inspect-docs/inspect-skills は低 HITL（委任・診断・保存専用）。case-auto は停止条件11項目と bounded parent decision resolution で本質的 HITL に集約。
 - **並列性の集中**: 並列実行モデルを持つ Command は req-save（3フェーズ分離）、design-save（異なる target で最大5件）、case-open（子Issue 作成最大5件）、case-run（Epic Wave 最大5件）、case-auto（orchestration stage 2 最大5件、execution_unit 全体は上限なし）、case-close（Epic Wave 準並列化）。3つの「5件」文脈の区別を要する（epic-wave-model Design）。それ以外は単一ワークフロー。
 - **内部workflow候補の分布**: case-open（execution_unit 構成・Epic flow・Standard flow・execution contract 確定・クリーンアップ）、case-close（PRマージ・QG-4 達成判定・Design確定・Capture回収・Epic Wave クローズ）、case-auto（orchestration・bounded parent decision resolution・コンフリクト解消 Level 2/3・停止理由分類）が Workflow Skill 抽出の有力候補。req-define（壁打ち・照合・要件展開・Decision判断）、req-save/design-save（保存3フェーズ）、intake-promote/learning-promote/backlog-review（review/分類ワークフロー）、inspect-docs（診断カタログ）も抽出候補。intake-capture/intake-from-github/case-update/inspect-skills/inspect-promote は単純または既存 Capability Skill でカバーされており抽出優先度低。
-- **Capability Skill 候補**: 全 Command 共通の git/gh I/O・決定的スクリプト・並列ステージング・target_area マッチング・8軸評価・廃棄判定カテゴリ・統合分割判定基準・自動 promote カテゴリ・adversarial-review 共通契約は既存 Capability Skill 群が所有。新規 Capability Skill 抽出の余地は test strategy 定義（req-define Step 5-6）、EC-2 必須品質統制導出（case-open）、EC-6 scope-affecting impact 探索（case-open）、コンフリクト Level 1 解消判断、Design status 昇格判断、bounded parent decision resolution、Wave 反復制御あたり。
+- **Capability Skill 候補**: 全 Command 共通の git/gh I/O・決定的スクリプト・並列ステージング・target_area マッチング・8軸評価・廃棄判定カテゴリ・統合分割判定基準・自動 promote カテゴリ・adversarial-review 共通契約は既存 Capability Skill 群が所有。新規 Capability Skill 抽出の余地は test strategy 定義（req-define STEP-4）、EC-2 必須品質統制導出（case-open）、EC-6 scope-affecting impact 探索（case-open）、コンフリクト Level 1 解消判断、Design status 昇格判断、bounded parent decision resolution、Wave 反復制御あたり。
 
 ## 代表ケース検証（REQ-027-003、DEC-010/011）
 
@@ -391,7 +391,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 | 代表ケース | 検証対象の性質 | 結果 | 備考 |
 |---|---|---|---|
 | case-run / case-auto | orchestration・resume・single/Epic Wave・parallelism・compaction | pass | Workflow Skill（`agentdev-workflow-orchestration`、`agentdev-workflow-case-auto`）が STEP model を所有。durable state、Input Resolution、並列child task 復元、3つの「5件」文脈の区別、compaction 復元契約を明示 |
-| req-define | interactive / HITL / loop を持つ workflow | pass with observations | `agentdev-req-analysis` Capability Skill は STEP model 連携を明示。command 本体は workflow 実装を直接所有（Workflow Skill 抽出は候補）。interactive 壁打ちセッションは harness 固有領域、ドラフト保存（Step 10）後の再開は durable state から復元可能 |
+| req-define | interactive / HITL / loop を持つ workflow | pass with observations | `agentdev-req-analysis` Capability Skill は STEP model 連携を明示。command 本体は workflow 実装を直接所有（Workflow Skill 抽出は候補）。interactive 壁打ちセッションは harness 固有領域、ドラフト保存（STEP-9）後の再開は durable state から復元可能 |
 | req-save / design-save | deterministic mutation / verification / commit を持つ workflow | pass with observations | 決定的スクリプト呼出（REQ番号採番、target_area 検索、`check-change-impact`）、QG-1、targeted docs guard、変更範囲検証を各所で実施。Capability Skill（`agentdev-req-file-manager`、`agentdev-design-file-manager`、`agentdev-artifact-validation`）は STEP model 連携を明示。command 本体は workflow 実装を直接所有（Workflow Skill 抽出は候補） |
 | intake-promote | classification / review / approval / irreversible action 境界を持つ workflow | pass with observations | 分類3値（採用/保留/却下）、adversarial-review 経路C、ユーザー承認（G06/G07/G08）、破壊的変更別承認（G18）、REQ-014-009 不可逆処理停止、分類承認後の自動実行（REQ）が明確。Capability Skill（`agentdev-intake-pipeline`）へ STEP model 連携セクションを付与済み（本 Issue で修正）。command 本体は workflow 実装を直接所有（Workflow Skill 抽出は候補） |
 

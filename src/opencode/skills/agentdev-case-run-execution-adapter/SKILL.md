@@ -147,7 +147,7 @@ capture 境界の詳細は `agentdev-workflow-orchestration` を参照。
 
 実装時に発見された Design レベルの詳細（Design に記載すべき schema、enum、判定表、内部アルゴリズム等）は PR 本文の `## Design確定候補` セクションに記録する。
 `## Findings / Capture候補` とは別セクションとし、混在させない。
-実行担当サブエージェントが記録し、case-close Step 3 の Design 確定チェックの入力となる。
+実行担当サブエージェントが記録し、case-close STEP-3 の Design 確定チェックの入力となる。
 
 ## 外部成果物の取扱い
 

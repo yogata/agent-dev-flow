@@ -180,7 +180,7 @@ case-auto の MUST NOT DO を「実質的 Design / REQ / ADR 内容編集禁止�
 |---|---|
 | Design / REQ / ADR 本文（要件行、判定基準、アーキテクチャ決定）の編集、追記、削除、リライト | 禁止（内容編集） |
 | 新規 Design frontmatter `status: draft` 付与（新規 Design 作成時） | 許可（lifecycle 状態遷移） |
-| 既存 Design frontmatter `status: accepted` 昇格 | 禁止（case-close Step 3 の責務） |
+| 既存 Design frontmatter `status: accepted` 昇格 | 禁止（case-close STEP-3 の責務） |
 | 既存 Design frontmatter `updated` 日付更新 | 許可（lifecycle メタデータ） |
 | `.agentdev/drafts/**` の status 更新 | 許可（ハンドオフ状態管理） |
 
