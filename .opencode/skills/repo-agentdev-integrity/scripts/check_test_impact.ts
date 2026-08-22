@@ -32,22 +32,30 @@ const USAGE =
   "bun run check_test_impact.ts [--base-ref <git-ref> | --files <path...>] [--test-glob <pattern>] [--json] [--root <path>]";
 const DEFAULT_TEST_GLOB = "**/*.test.ts";
 
-// Design 系ファイルのパス分類。docs/designs/**、docs/requirements/REQ-*、docs/adr/ADR-* を対象とする。
+// Design 系ファイルのパス分類。docs/designs/**、docs/requirements/REQ-*、docs/decisions/DEC-* を対象とする
+// （Issue #2383 (c): docs/adr/ は DEC-009 移行で廃止済みのため docs/decisions/ へ整合）。
 const Design_PATH_PATTERNS = [
   /^docs\/designs\/.*\.md$/,
   /^docs\/requirements\/REQ-.*\.md$/,
-  /^docs\/adr\/ADR-.*\.md$/,
+  /^docs\/decisions\/DEC-.*\.md$/,
 ];
 
-// 走査除外ディレクトリ（相対パス先頭一致）。ビルド成果物、外部依存、worktree、retired を除く。
+// 走査除外ディレクトリ。SCAN_EXCLUDE_DIRS は相対パス先頭一致、
+// SCAN_EXCLUDE_ANY_DEPTH_DIRS はパス区切りで区切られた任意階層のディレクトリ名一致。
+// ビルド成果物、外部依存、worktree、retired を除く
+// （Issue #2383 (c): node_modules は src/opencode/skills/*/scripts 配下等
+// 任意階層に出現するためセグメント一致で除外。旧 docs/adr/retired/ は
+// docs/decisions/retired/ へ整合）。
 const SCAN_EXCLUDE_DIRS = [
-  "node_modules/",
   ".worktrees/",
   ".agentdev-plugin/",
   ".git/",
   "docs/requirements/retired/",
-  "docs/adr/retired/",
+  "docs/decisions/retired/",
 ];
+
+// 任意階層の同名ディレクトリを除外する（依存パッケージのテスト混入防止、PR 2357 観測）。
+const SCAN_EXCLUDE_ANY_DEPTH_DIRS = ["node_modules"];
 
 // basename 照合の停止リスト。汎用名称は basename 単独では照合しない
 // （full-path 照合は継続して有効）。REQ/ADR ID 照合にも影響しない。
@@ -262,6 +270,8 @@ function classifySpecChanges(
 // ─── Layer 3: test file discovery ───────────────────────────────────────────
 
 function shouldExclude(relPath: string): boolean {
+  const segments = relPath.split("/");
+  if (segments.some((s) => SCAN_EXCLUDE_ANY_DEPTH_DIRS.includes(s))) return true;
   return SCAN_EXCLUDE_DIRS.some((d) => relPath.startsWith(d));
 }
 

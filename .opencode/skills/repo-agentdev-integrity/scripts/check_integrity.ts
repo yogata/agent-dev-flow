@@ -4911,6 +4911,8 @@ function checkSkillCategoryGap(
     ["Guardrail number invariant", ["GuardrailNumberInvariant"]],
     ["Unresolved placeholder", ["UnresolvedPlaceholder"]],
     ["Obsolete vocabulary & legacy path", ["ObsoleteVocabulary"]],
+    ["引用 REQ 行実在性", ["ReferencedReqRowExistence"]],
+    ["スキル集合突合（投影マニフェスト）", ["SkillProjectionManifest"]],
   ]);
 
   let foundGap = false;
@@ -9321,6 +9323,12 @@ const IR066_VOCAB_PATTERNS: ReadonlyArray<{ id: string; pattern: RegExp }> = [
   { id: "agentdev-adr-file-manager-skill", pattern: /agentdev-adr-file-manager/g },
   { id: "agentdev-doc-map-skill", pattern: /agentdev-doc-map/g },
   { id: "agentdev-workflow-reporting-skill", pattern: /agentdev-workflow-reporting/g },
+  // Issue #2383 (b): v1〜v4 監査観点再走査で採用した追加の廃止名称。
+  // 旧 command 名 inspect-extensions（DEC-006 で廃止）と F-01 stale junction
+  // 旧称 2 件（SPEC→Design 改称、Issue #2349）。
+  { id: "inspect-extensions-command", pattern: /\binspect-extensions\b/g },
+  { id: "agentdev-spec-file-manager-skill", pattern: /agentdev-spec-file-manager/g },
+  { id: "agentdev-workflow-spec-save-skill", pattern: /agentdev-workflow-spec-save/g },
 ];
 
 function isSupersededDecision(relPath: string, content: string): boolean {
@@ -9494,6 +9502,411 @@ function checkObsoleteVocabulary(root: string): CheckResult[] {
         "ObsoleteVocabulary",
         "obsolete-vocabulary-current-use",
         `IR-065/IR-066 obsolete vocabulary & legacy path: ${scoped.length} files scanned, 0 violations (REQ-010-066/067)`,
+      ),
+    );
+  }
+  return results;
+}
+
+// ─── IR-067: referenced-req-row-existence (REQ-010-069, Issue #2383 (a)) ─────
+// docs 本文が引用する階層 REQ 行 ID（REQ-NNN-NNN）の実在性を機械検査する。
+// ファントム引用（未コミット草案番号の引用残存、要件分割前の旧行 ID 残存）を検出する。
+// 階層 ID 検索の3点設計（checker-execution-contracts Design）:
+// (1) v2: プレフィックスを許容、(2) 表行先頭出現を実在の正とする、
+// (3) 前置一致除外（REQ-NNNN-NNN 旧番号帯・より長い ID への部分一致は検出しない）。
+// プレースホルダー許容（REQ-010-065）: 非数字部を含む様式例示（REQ-010-NNN 等）は
+// 正規表現上マッチしない。code span / code block、テンプレート領域（_template.md・
+// templates/）、IR ルール説明文（v2:REQ-0145-015）、AUTOGEN ブロック（checker-execution-contracts
+// 検出対象除外規定）、retired ディレクトリ、docs/reports/ を免除領域とする。
+const IR067_ROW_ID_RE = /(?<!v2:)(?<![\w-])REQ-(\d{3})-(\d{3})(?!\d)/g;
+
+function buildReqRowIndex(root: string): Set<string> {
+  const rows = new Set<string>();
+  const reqDir = path.join(root, "docs", "requirements");
+  for (const dir of [reqDir, path.join(reqDir, "retired")]) {
+    if (!fs.existsSync(dir)) continue;
+    for (const file of listFiles(dir)) {
+      if (!file.startsWith("REQ-") || file === "README.md") continue;
+      const content = readText(path.join(dir, file));
+      if (!content) continue;
+      for (const line of content.split("\n")) {
+        if (!line.trim().startsWith("|")) continue;
+        IR067_ROW_ID_RE.lastIndex = 0;
+        let m: RegExpExecArray | null;
+        while ((m = IR067_ROW_ID_RE.exec(line)) !== null) {
+          rows.add(m[0]);
+        }
+      }
+    }
+  }
+  return rows;
+}
+
+// AUTOGEN ブロック（<!-- AUTOGEN:BEGIN ... AUTOGEN:END -->）内の行は機械生成領域。
+function buildAutogenLineMask(lines: string[]): boolean[] {
+  const mask = new Array<boolean>(lines.length).fill(false);
+  let inBlock = false;
+  for (let i = 0; i < lines.length; i++) {
+    if (/<!--\s*AUTOGEN:BEGIN/.test(lines[i])) inBlock = true;
+    mask[i] = inBlock;
+    if (/<!--\s*AUTOGEN:END\s*-->/.test(lines[i])) inBlock = false;
+  }
+  return mask;
+}
+
+function checkReferencedReqRowExistence(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const rowIndex = buildReqRowIndex(root);
+  if (rowIndex.size === 0) {
+    results.push(
+      info(
+        "ReqCitation",
+        "referenced-req-row-existence",
+        "No REQ requirement rows indexed; IR-067 skipped (REQ-010-069)",
+      ),
+    );
+    return results;
+  }
+
+  const targets: string[] = [];
+  for (const rel of [
+    "docs/designs",
+    "docs/requirements",
+    "docs/decisions",
+    "docs/guides",
+    "src/opencode",
+    ".opencode/commands",
+    ".agentdev/extensions",
+  ]) {
+    const abs = path.join(root, ...rel.split("/"));
+    if (fs.existsSync(abs)) walkAllFiles(abs, targets);
+  }
+  for (const single of [
+    path.join(root, "README.md"),
+    path.join(root, "docs", "README.md"),
+  ]) {
+    if (fs.existsSync(single) && !targets.includes(single)) targets.push(single);
+  }
+
+  const excludes = [
+    "docs/requirements/retired/",
+    "docs/decisions/retired/",
+    "docs/reports/",
+    "src/opencode/commands/agentdev/templates/",
+  ];
+
+  let violationCount = 0;
+  for (const fullPath of targets) {
+    const relPath = resolveRelative(fullPath, root);
+    if (excludes.some((p) => relPath.startsWith(p))) continue;
+    if (isIr064TemplatePath(relPath)) continue;
+    if (isIntegrityRuleDescriptionFile(relPath)) continue;
+    const content = readText(fullPath);
+    if (!content) continue;
+    const lines = content.split("\n");
+    const autogenMask = buildAutogenLineMask(lines);
+    const reportedOnLine = new Set<string>();
+    for (let i = 0; i < lines.length; i++) {
+      if (isIr057InCodeBlock(lines, i)) continue;
+      if (autogenMask[i]) continue;
+      IR067_ROW_ID_RE.lastIndex = 0;
+      let m: RegExpExecArray | null;
+      while ((m = IR067_ROW_ID_RE.exec(lines[i])) !== null) {
+        if (isInsideCodeSpan(lines[i], m.index)) continue;
+        const id = m[0];
+        const dedupeKey = `${i}:${id}`;
+        if (reportedOnLine.has(dedupeKey)) continue;
+        reportedOnLine.add(dedupeKey);
+        if (rowIndex.has(id)) continue;
+        violationCount++;
+        results.push(
+          ng(
+            "ReqCitation",
+            "referenced-req-row-existence",
+            `Phantom REQ row citation '${id}' is referenced but no requirement row exists (REQ-010-069, IR-067)`,
+            relPath,
+            i + 1,
+            {
+              evidence: id,
+              expected: `${id} must exist as a requirement row in docs/requirements/REQ-${m[1]}.md`,
+              route: "intake",
+              finding_category: "document-drift",
+              finding_level: "strict",
+            },
+          ),
+        );
+      }
+    }
+  }
+  if (violationCount === 0) {
+    results.push(
+      ok(
+        "ReqCitation",
+        "referenced-req-row-existence",
+        `IR-067 referenced-req-row-existence: ${targets.length} files scanned, 0 phantom row citations (REQ-010-069)`,
+      ),
+    );
+  }
+  return results;
+}
+
+// ─── IR-068: skill-projection-manifest (Issue #2383 (d)、inspect F-01) ────────
+// src 側スキル集合（配布原本・SSoT）と .opencode 投影スキル集合の突合を検査データ化する。
+// 検査データ data/skill-projection-manifest.yaml は src/opencode/skills/ 列挙の検出ビュー
+// であり、manifest ↔ src の不一致はデータ鮮度 NG として検出する（宣言的データの
+// silent skip 禁止、checker-execution-contracts Design）。
+// 投影突合は junction 環境（.opencode/skills に非 repo-* ディレクトリが存在する場合）のみ
+// 実施する。git worktree は junction を再作成しないため（REQ-018、isInsideWorktree と同一
+// 構造的制約）、投影欠落は junction 不在と区別できず誤検出になる。junction 不在環境では
+// manifest ↔ src 比較のみ実施し投影比較を info で skip する。
+const IR068_MANIFEST_REL =
+  ".opencode/skills/repo-agentdev-integrity/data/skill-projection-manifest.yaml";
+
+function loadSkillProjectionManifest(
+  root: string,
+): { skills: string[] | null; warnings: string[] } {
+  const yamlPath = path.join(root, ...IR068_MANIFEST_REL.split("/"));
+  const content = readText(yamlPath);
+  if (!content) return { skills: null, warnings: [] };
+  const skills: string[] = [];
+  const warnings: string[] = [];
+  let inSkills = false;
+  for (const raw of content.split("\n")) {
+    const line = raw.replace(/\r$/, "");
+    if (!line.trim() || line.trim().startsWith("#")) continue;
+    if (/^skills:\s*$/.test(line)) {
+      inSkills = true;
+      continue;
+    }
+    if (/^[A-Za-z_][\w]*:/.test(line)) {
+      inSkills = false;
+      continue;
+    }
+    if (!inSkills) continue;
+    const m = line.match(/^\s*-\s+(.+)$/);
+    if (!m) continue;
+    const name = unquoteYamlScalar(m[1]);
+    if (!/^[a-z][a-z0-9-]*$/.test(name)) {
+      warnings.push(`invalid skill name '${name}' in ${IR068_MANIFEST_REL}`);
+      continue;
+    }
+    if (skills.includes(name)) {
+      warnings.push(`duplicate skill name '${name}' in ${IR068_MANIFEST_REL}`);
+      continue;
+    }
+    skills.push(name);
+  }
+  return { skills, warnings };
+}
+
+// 投影エントリ列挙（IR-068）: .opencode/skills の repo-* 以外のエントリを列挙する。
+// resolvable = 実体がディレクトリとして解決できるエントリ（junction を含む）。
+// broken = エントリが存在するがディレクトリとして解決できないもの
+// （リンク先欠損の stale junction、ディレクトリ以外の混入物）。
+// F-01 の stale junction（リンク先が src から削除済み）は listDirs の
+// statSync 追跡で除外されるため、ここではエントリ単位で把握する。
+function listProjectionSkillEntries(
+  dirPath: string,
+): { resolvable: Set<string>; broken: string[] } {
+  const resolvable = new Set<string>();
+  const broken: string[] = [];
+  let entries: import("fs").Dirent[];
+  try {
+    entries = fs.readdirSync(dirPath, {
+      withFileTypes: true,
+    }) as import("fs").Dirent[];
+  } catch {
+    return { resolvable, broken };
+  }
+  for (const entry of entries) {
+    if (entry.name.startsWith("repo-")) continue;
+    if (entry.isDirectory()) {
+      resolvable.add(entry.name);
+      continue;
+    }
+    // Windows junction は isDirectory() が false（libuv reparse point 挙動）。
+    // statSync でリンク先を解決する。解決不能（リンク先欠損）または
+    // ディレクトリ以外は broken（stale junction・混入物）として扱う。
+    try {
+      if (fs.statSync(path.join(dirPath, entry.name)).isDirectory()) {
+        resolvable.add(entry.name);
+      } else {
+        broken.push(entry.name);
+      }
+    } catch {
+      broken.push(entry.name);
+    }
+  }
+  return { resolvable, broken };
+}
+
+function checkSkillProjectionManifest(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const { skills: manifestSkills, warnings } = loadSkillProjectionManifest(root);
+  for (const w of warnings) {
+    results.push(
+      warn(
+        "SkillProjection",
+        "skill-projection-manifest",
+        `Manifest schema warning: ${w} (IR-068)`,
+        IR068_MANIFEST_REL,
+        undefined,
+        {
+          evidence: w,
+          expected: "manifest entries must be unique lowercase skill dir names",
+          route: "intake",
+          finding_category: "document-drift",
+          finding_level: "heuristic",
+        },
+      ),
+    );
+  }
+  const sourceSkillsDir = path.join(root, "src", "opencode", "skills");
+  if (!manifestSkills || !fs.existsSync(sourceSkillsDir)) {
+    results.push(
+      info(
+        "SkillProjection",
+        "skill-projection-manifest",
+        manifestSkills
+          ? `src/opencode/skills not found; IR-068 skipped`
+          : `${IR068_MANIFEST_REL} not found; IR-068 skipped`,
+      ),
+    );
+    return results;
+  }
+
+  const srcSet = new Set(listDirs(sourceSkillsDir));
+  const manifestSet = new Set(manifestSkills);
+  let violationCount = 0;
+
+  for (const name of [...manifestSet].sort()) {
+    if (!srcSet.has(name)) {
+      violationCount++;
+      results.push(
+        ng(
+          "SkillProjection",
+          "skill-projection-manifest",
+          `Manifest declares skill '${name}' but src/opencode/skills does not contain it (IR-068)`,
+          IR068_MANIFEST_REL,
+          undefined,
+          {
+            evidence: `manifest-only:${name}`,
+            expected: `remove '${name}' from the manifest or add src/opencode/skills/${name}/`,
+            route: "intake",
+            finding_category: "document-drift",
+            finding_level: "strict",
+          },
+        ),
+      );
+    }
+  }
+  for (const name of [...srcSet].sort()) {
+    if (!manifestSet.has(name)) {
+      violationCount++;
+      results.push(
+        ng(
+          "SkillProjection",
+          "skill-projection-manifest",
+          `Skill '${name}' exists in src/opencode/skills but is missing from ${IR068_MANIFEST_REL} (IR-068)`,
+          IR068_MANIFEST_REL,
+          undefined,
+          {
+            evidence: `src-only:${name}`,
+            expected: `add '${name}' to the manifest (detection view of src enumeration)`,
+            route: "intake",
+            finding_category: "document-drift",
+            finding_level: "strict",
+          },
+        ),
+      );
+    }
+  }
+
+  const projectionSkillsDir = path.join(root, ".opencode", "skills");
+  const { resolvable: projSet, broken: brokenProj } =
+    listProjectionSkillEntries(projectionSkillsDir);
+  if (projSet.size === 0 && brokenProj.length === 0) {
+    results.push(
+      info(
+        "SkillProjection",
+        "skill-projection-manifest",
+        "No non-repo projection entries under .opencode/skills (worktree / junction-absent environment); projection cross-check skipped, manifest↔src check only (IR-068, REQ-018)",
+      ),
+    );
+  } else {
+    for (const name of [...srcSet].sort()) {
+      if (!projSet.has(name)) {
+        violationCount++;
+        results.push(
+          ng(
+            "SkillProjection",
+            "skill-projection-manifest",
+            `Skill '${name}' exists in src/opencode/skills but is missing from .opencode/skills projection (IR-068)`,
+            undefined,
+            undefined,
+            {
+              evidence: `projection-missing:${name}`,
+              expected: `rebuild junctions (install-consumer-opencode.ps1 -Mode apply) or create .opencode/skills/${name}`,
+              route: "intake",
+              finding_category: "document-drift",
+              finding_level: "strict",
+            },
+          ),
+        );
+      }
+    }
+    for (const name of [...projSet].sort()) {
+      if (!srcSet.has(name)) {
+        violationCount++;
+        results.push(
+          ng(
+            "SkillProjection",
+            "skill-projection-manifest",
+            `Skill '${name}' exists in .opencode/skills projection but not in src/opencode/skills (stale junction, IR-068)`,
+            undefined,
+            undefined,
+            {
+              evidence: `projection-extra:${name}`,
+              expected: `remove the stale junction .opencode/skills/${name} (rebuild via install-consumer-opencode.ps1 -Mode apply)`,
+              route: "intake",
+              finding_category: "obsolete-structure",
+              finding_level: "strict",
+            },
+          ),
+        );
+      }
+    }
+    // F-01 stale junction（リンク先欠損）: エントリは存在するがディレクトリとして
+    // 解決できない投影エントリ。listDirs 経由の集合比較には現れないため個別に検出する。
+    for (const name of [...brokenProj].sort()) {
+      violationCount++;
+      results.push(
+        ng(
+          "SkillProjection",
+          "skill-projection-manifest",
+          `Projection entry '${name}' exists under .opencode/skills but does not resolve to a directory (broken junction or stray entry, IR-068)`,
+          undefined,
+          undefined,
+          {
+            evidence: `projection-broken:${name}`,
+            expected: `remove the stale junction .opencode/skills/${name} (rebuild via install-consumer-opencode.ps1 -Mode apply)`,
+            route: "intake",
+            finding_category: "obsolete-structure",
+            finding_level: "strict",
+          },
+        ),
+      );
+    }
+  }
+
+  if (violationCount === 0 && warnings.length === 0) {
+    results.push(
+      ok(
+        "SkillProjection",
+        "skill-projection-manifest",
+        `IR-068 skill-projection-manifest: ${srcSet.size} src skills match manifest${
+          projSet.size > 0 || brokenProj.length > 0 ? " and projection" : ""
+        } (Issue #2383 F-01)`,
       ),
     );
   }
@@ -9677,6 +10090,8 @@ async function main(): Promise<void> {
     ...checkGuardrailNumberInvariant(root), // IR-063 (REQ-010-064, Issue #2372)
     ...checkUnresolvedPlaceholder(root), // IR-064 (REQ-010-065, Issue #2372)
     ...checkObsoleteVocabulary(root), // IR-065/IR-066 (REQ-010-066/067, Issue #2372)
+    ...checkReferencedReqRowExistence(root), // IR-067 (REQ-010-069, Issue #2383 (a))
+    ...checkSkillProjectionManifest(root), // IR-068 (Issue #2383 (d), inspect F-01)
   ];
 
   // WP-3 (Issue #1928): profile-gated projection checks. §7.3 source skips

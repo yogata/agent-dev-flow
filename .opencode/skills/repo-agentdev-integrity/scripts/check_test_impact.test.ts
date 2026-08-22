@@ -292,6 +292,42 @@ describe("check_test_impact.ts stale candidate detection (TS-004)", () => {
     execSync(`git branch -q -D ${branch}`, { cwd: TEMP_ROOT });
   });
 
+  it("excludes dependency test files under nested node_modules from tests_scanned (Issue #2383 (c))", () => {
+    const branch = "test-nested-node-modules";
+    execSync(`git checkout -q main`, { cwd: TEMP_ROOT });
+    writeFile(
+      "docs/designs/integrity/impact-gate.md",
+      "---\ntitle: Impact Gate\nstatus: draft\n---\n# Impact Gate\n",
+    );
+    writeFile(
+      "src/scripts/impact.test.ts",
+      "// docs/designs/integrity/impact-gate.md\nimport { describe, it } from \"bun:test\";\ndescribe(\"i\", () => { it(\"ok\", () => {}); });\n",
+    );
+    writeFile(
+      "src/opencode/skills/demo/scripts/node_modules/zod/lib/dep.test.ts",
+      "// dependency test that must not be scanned\nimport { describe, it } from \"bun:test\";\ndescribe(\"dep\", () => { it(\"ok\", () => {}); });\n",
+    );
+    commitAll("add Design, referencing test, and nested node_modules dependency test");
+    execSync(`git checkout -q -b ${branch}`, { cwd: TEMP_ROOT });
+    writeFile(
+      "docs/designs/integrity/impact-gate.md",
+      "---\ntitle: Impact Gate\nstatus: draft\nupdated: 2026-08-22\n---\n# Impact Gate (revised)\n",
+    );
+    commitAll("revise impact-gate Design only");
+
+    const r = runScript(TEMP_ROOT, ["--base-ref", "main", "--json"]);
+    expect(r.exitCode).toBe(0);
+    const report = JSON.parse(r.stdout);
+    const scannedPaths = report.stale_candidates.map((f: any) => f.test_path);
+    expect(scannedPaths).toContain("src/scripts/impact.test.ts");
+    expect(
+      scannedPaths.some((p: string) => p.includes("node_modules")),
+    ).toBe(false);
+
+    execSync(`git checkout -q main`, { cwd: TEMP_ROOT });
+    execSync(`git branch -q -D ${branch}`, { cwd: TEMP_ROOT });
+  });
+
   it("JSON output contains required schema fields", () => {
     const branch = "test-schema";
     execSync(`git checkout -q -b ${branch}`, { cwd: TEMP_ROOT });

@@ -335,6 +335,9 @@ IR-065（廃止語彙の現行使用検出）と IR-066（旧パス・削除済�
 | `agentdev-adr-file-manager` | `agentdev-decision-file-manager` | IR-066 | DEC-009 決定14 |
 | `agentdev-doc-map` | （後継なし、Design 索引へ移行） | IR-066 | REQ-013 廃止済み |
 | `agentdev-workflow-reporting` | （完了報告は各工程の完了報告 template） | IR-066 | 廃止済み skill |
+| `inspect-extensions` | docs-check（IR-056 決定的検査）/ inspect-skills / inspect-promote | IR-066 | DEC-006 で廃止。Issue #2383 (b) 再走査採用 |
+| `agentdev-spec-file-manager` | `agentdev-design-file-manager` | IR-066 | SPEC→Design 再定義（Issue #2349）で改称。Issue #2383 (b) 再走査採用 |
+| `agentdev-workflow-spec-save` | `agentdev-workflow-design-save` | IR-066 | SPEC→Design 再定義（Issue #2349）で改称。Issue #2383 (b) 再走査採用 |
 
 ## メンテナンス
 

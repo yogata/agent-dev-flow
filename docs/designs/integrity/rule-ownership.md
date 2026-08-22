@@ -165,7 +165,9 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-063 | guardrail-number-invariant | REQ-010-064, REQ-010-068 | ../integrity-rule-catalog.md, ../../authoring/command-file-format.md |
 | IR-064 | unresolved-placeholder | REQ-010-065, REQ-010-068 | ../integrity-rule-catalog.md |
 | IR-065 | obsolete-vocabulary-current-use | REQ-010-066, REQ-010-068 | ../integrity-rule-catalog.md, data/obsolete-vocabulary-map.yaml |
-| IR-066 | legacy-path-removed-name | REQ-010-067, REQ-010-068 | ../integrity-rule-catalog.md, data/obsolete-vocabulary-map.yaml |
+| IR-066 | legacy-path-removed-name | REQ-010-067, REQ-010-068, REQ-010-070 | ../integrity-rule-catalog.md, data/obsolete-vocabulary-map.yaml |
+| IR-067 | referenced-req-row-existence | REQ-010-069, REQ-010-065, REQ-010-068 | ../integrity-rule-catalog.md, ../checker-execution-contracts.md |
+| IR-068 | skill-projection-manifest | REQ-010-068, REQ-018-002 | ../../local/runtime-package-boundary.md, ../checker-execution-contracts.md, ../integrity-rule-catalog.md |
 <!-- AUTOGEN:END -->
 
 > **IR-019, IR-022, IR-026, IR-036 について（2026-08-11 移管）**: 4件の意味判断系 IR は docs-check 機械検出層から除外し、inspect/diagnostics 層（`/agentdev/inspect-docs`、`/agentdev/inspect-skills`、`agentdev-doc-writing` skill）へ移管した（retired REQ-028-007、DEC-006、Phase 3 §5.2）。

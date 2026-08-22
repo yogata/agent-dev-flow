@@ -54,10 +54,12 @@ scope:
 # 履歴説明として語彙の言及が正当なファイル（検出基盤・正規契約上の言及）。
 # IR-057「例外登録（現行Decisionの履歴記載）」と同根の運用。
 exemption_files:
-  - path: docs/decisions/DEC-009.md
-    reason: "ADR→Decision 移行（1対1移行）の経緯を記載する正規 Decision。ADR-001..008 の旧識別子を移行説明として保持する"
+  - path: docs/decisions/DEC-006.md
+    reason: "inspect 3-command 構成への正規化の Decision。inspect-extensions 廃止と責務移管の経緯を移行記録として保持する（Issue #2383 (b) 再走査採用語彙）"
   - path: docs/decisions/DEC-007.md
     reason: "superseded Decision（Artifact Graph 標準化と配布スキル昇格）。履歴文書として旧語彙を保持する"
+  - path: docs/decisions/DEC-009.md
+    reason: "ADR→Decision 移行（1対1移行）の経緯を記載する正規 Decision。ADR-001..008 の旧識別子を移行説明として保持する"
   - path: docs/decisions/DEC-017.md
     reason: "Artifact Graph 廃止と最小トレーサビリティモデル採用の Decision。廃止経緯の正規記録"
   - path: docs/decisions/DEC-019.md
@@ -129,3 +131,13 @@ vocabulary:
   - id: agentdev-workflow-reporting-skill
     rule: IR-066
     existence_probe: src/opencode/skills/agentdev-workflow-reporting
+  # --- Issue #2383 (b): v1〜v4 監査観点再走査で採用した追加の廃止名称 ---
+  - id: inspect-extensions-command
+    rule: IR-066
+    existence_probe: src/opencode/commands/agentdev/inspect-extensions.md
+  - id: agentdev-spec-file-manager-skill
+    rule: IR-066
+    existence_probe: src/opencode/skills/agentdev-spec-file-manager
+  - id: agentdev-workflow-spec-save-skill
+    rule: IR-066
+    existence_probe: src/opencode/skills/agentdev-workflow-spec-save
