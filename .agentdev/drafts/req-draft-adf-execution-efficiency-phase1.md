@@ -2,6 +2,7 @@
 draft_type: req_draft
 topic_slug: adf-execution-efficiency-phase1
 status: saved
+design_actions_consumed: true
 created_at: 2026-08-23T00:35:37+09:00
 source_rus:
   - RU-0001

@@ -2,11 +2,12 @@
 title: サブエージェント委譲契約
 status: accepted
 created: 2026-06-21
-updated: 2026-07-27
+updated: 2026-08-23
 ---
 <!-- ADF-COVERS(implementation): REQ-002-033, REQ-002-034 -->
 <!-- ADF-COVERS(implementation): REQ-003-001, REQ-003-002, REQ-003-003, REQ-003-004, REQ-003-006, REQ-003-011, REQ-003-012, REQ-003-014, REQ-003-020 -->
 <!-- ADF-COVERS(implementation): REQ-011-011, REQ-011-012, REQ-011-017 -->
+<!-- ADF-COVERS(implementation): REQ-048-007, REQ-048-009, REQ-048-010, REQ-048-011 -->
 
 # サブエージェント委譲契約（横断）
 
@@ -275,3 +276,24 @@ adversarial-review の呼出失敗時（スキル不在、起動異常、timeout
 
 本節と adversarial-review Design「正規所有者マトリックス」節（REQ-014-011）との間で意味の重複、矛盾を生じない。
 委譲契約の一般概念（委譲時最小契約、委譲種別、制約）は本 Design の既存節が正であり、adversarial-review 固有の適用のみを本節が所有する。
+
+## 構造化文脈引き継ぎ（委譲時）の直列化契約
+
+委譲時最小契約（inputs、side_effect_boundary、output_contract、capture_handoff）の骨格を変更せず、inputs 内に構造化文脈を直列化する。構造化文脈は次の意味を扱う。
+
+- 目的（purpose）
+- 現在の ADF 工程（workflow_phase）
+- 現在の実行単位（execution_unit）
+- 前工程で確定した事項（resolved_context）
+- 未確定事項（open_items）
+- 正規参照先（canonical_references）
+- 停止条件（stop_conditions）
+- 期待する実行結果（expected_output）
+- 後続工程へ渡すべき成果（handoff_artifacts）
+- 計画変更を識別するための情報（plan_change）
+
+直列化に全文履歴や巨大な計画本文の複製を含めない。
+
+ADF は委譲単位識別子を発行し、親子実行関係の識別の正規手段とする。委譲 prompt には対象 Case、Issue、PR、ADF 工程、実行単位、委譲目的の識別情報を構造化して含める。OpenCode 等の harness 側セッション識別子は、取得可能な場合に付加情報として記録し、必須契約としない（REQ-011-018 準拠）。
+
+構造化文脈は新しい正規情報源ではない。引き継ぎ内容は永続的な正規成果物（Issue 本文、PR 本文、RU、OU 等）から再構成可能であること（DEC-011 準拠）。

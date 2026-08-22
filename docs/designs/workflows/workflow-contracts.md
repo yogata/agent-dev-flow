@@ -2,11 +2,13 @@
 title: ワークフロー契約（横断）
 status: accepted
 created: 2026-06-21
-updated: 2026-08-19
+updated: 2026-08-23
 ---
 <!-- ADF-COVERS(implementation): REQ-003-021, REQ-003-022, REQ-003-023, REQ-003-055, REQ-003-056 -->
 <!-- ADF-COVERS(implementation): REQ-005-001, REQ-005-002, REQ-005-003, REQ-005-004, REQ-005-025, REQ-005-026, REQ-005-027, REQ-005-028 -->
 <!-- ADF-COVERS(implementation): REQ-014-012 -->
+<!-- ADF-COVERS(implementation): REQ-048-007, REQ-048-008, REQ-048-009, REQ-048-010, REQ-048-011 -->
+<!-- ADF-COVERS(implementation): REQ-048-001, REQ-048-002, REQ-048-003, REQ-048-004, REQ-048-005, REQ-048-006, REQ-048-021 -->
 
 # ワークフロー契約（横断）
 
@@ -331,3 +333,26 @@ bounded parent decision resolution は新規の永続結果型を導入せず、
 
 **他 execution_unit への影響**: bounded parent decision resolution による停止は部分停止（REQ-006-015/016）であり、他の ready 対象の execution_unit がある場合は継続する。
 ある execution_unit の decision_context 解決で他 execution_unit がブロックされることはない。
+
+## 工程間構造化文脈引き継ぎ契約
+
+ADF の工程間の引き継ぎは、委譲時の構造化文脈と同一の意味集合（目的、現在の ADF 工程、現在の実行単位、前工程で確定した事項、未確定事項、正規参照先、停止条件、期待する実行結果、後続工程へ渡すべき成果、計画変更を識別するための情報）を扱う。工程間の直列化形式は本 Design が所有し、委譲時の直列化（delegation-contracts Design「構造化文脈引き継ぎ（委譲時）の直列化契約」）と意味対応を保つ。
+
+後工程は、引き継がれた確定済み事項を初期文脈として利用し、同じ情報をゼロから探索、再構築することを原則としない。独立検証、鮮度確認、矛盾検出、正規成果物との整合確認を目的とする再確認は維持する。
+
+引き継ぎ情報を REQ、Decision、Design、GitHub Issue、PR 等に代わる新たな正規情報源としない。引き継ぎ内容は永続的な正規成果物から再構成可能であり、会話記憶に依存する再開を許可しない（DEC-011 準拠）。
+
+当該作業で使用すべき解決済み参照先（正規原本、実行時投影、双方確認の別を含む）は、構造化文脈の正規参照先として後工程へ渡す。
+
+## ADF 実行識別情報の記録契約
+
+ADF 実行の識別情報（対象 Case、GitHub Issue、GitHub PR、ADF 工程、実行単位、委譲目的、実行結果、親子実行関係）の記録先を次のとおり一意に定め、工程間で一貫させる。
+
+- Issue 本文: 対象 Case、Issue、ADF 工程、実行単位、前工程で確定した事項
+- PR 本文: 対象 Case、PR、実行単位、実行結果、検証種別と検証結果
+- RU / OU: 要件単位・操作単位の識別情報
+- 委譲 prompt（委譲時）: 委譲目的、委譲単位識別子、親子実行関係
+
+実行単位の識別は epic-wave-model Design の execution_unit 構成の既存定義に接続し、新規の識別体系を並立させない。親子実行関係は ADF が発行する委譲単位・実行単位識別子を正規手段とし、harness 側識別子（OpenCode session ID 等）は取得可能な場合の付加情報に限定する（REQ-011-018 準拠）。
+
+OpenCode の実行履歴と ADF の識別情報の対応付けは、実行後の分析において OpenCode セッションデータと ADF 側識別情報を結合して行う。再分析の比較基線として、改善前分析で用いた定義（論理実行単位、正規化 path、集計方法）を参照可能な形で保存する。識別情報の一部が取得不能でも ADF workflow は停止しない。
