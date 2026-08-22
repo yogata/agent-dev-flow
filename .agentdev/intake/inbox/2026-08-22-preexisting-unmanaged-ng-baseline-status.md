@@ -21,4 +21,5 @@ check_integrity が exit 1 で終わる状態が継続する（既知・管理�
 
 - PR #2395 本文「Findings / Capture候補」（回収元: https://github.com/yogata/agent-dev-flow/pull/2395 ）
 - PR #2396 本文「check_integrity before/after」（回収元: https://github.com/yogata/agent-dev-flow/pull/2396 ）
+- PR #2397 本文「Findings / Capture候補」（Wave 3 時点でも同一7件が base 由来で未解決のまま残ることの再確認。重複新設せず本 item へ根拠追記で回収、回収元: https://github.com/yogata/agent-dev-flow/pull/2397 ）
 - case-close Wave 2 独立再検証（check_integrity.ts、main 74571d3f、junction 再構築後）: NG 7 / Warning 0

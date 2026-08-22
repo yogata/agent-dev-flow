@@ -116,3 +116,19 @@
 - **想定反映先**: agentdev-quality-gates の QG-4 実行前提、repo-agentdev-integrity の lint 実行契約（環境ラベル記録との併用）
 - **関連**: PR #2395（IR-068）、RD-002、Epic #2378 Wave 2 case-close
 - **タグ**: `#lint-skills` `#junction` `#ir068` `#environment-label`
+
+## AG-005「references 300行超は目次必須」は既存 reference への節追記で発火する
+
+- **問題事象**: 既存 reference への節追記で行数が300行超に到達すると lint_skills の AG-005（references 300行超は目次必須）が発火する。PR #2397 で mechanical-replacement-rules.md へ節を追記した際に発火し、目次追加で解消するまで1往復の手戻りが発生した
+- **発生局面**: 実装（既存 reference への節追記、Epic #2378 Wave 3）
+- **検知方法**: lint_skills.ts の AG-005 NG 出力
+- **根本原因**: 追加編集前に当該 reference の行数と目次有無を確認しなかった
+- **自律対応内容**: 該当 reference へ目次を追加して AG-005 を解消し、再実行で NG 0・Warning 0 を確認した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: 既存 reference へ節を追記するすべての編集
+- **再発条件**: 300行近辺の既存 reference に目次有無を確認せず節を追記する場合
+- **予防策候補**: 追加編集時に当該 reference の行数と目次有無を事前確認する
+- **想定反映先**: agentdev-doc-writing の機械置換手順（mechanical-replacement-rules.md）へ事前確認段階として反映する候補
+- **関連**: PR #2397、Issue #2387、Epic #2378 Wave 3 case-close
+- **タグ**: `#ag005` `#lint-skills` `#toc`
