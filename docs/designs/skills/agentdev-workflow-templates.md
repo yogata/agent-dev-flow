@@ -177,7 +177,8 @@ execution contract 責務が軽量なため）。
 
 ## テンプレート正規形（Parent 配置・Epic 追跡テーブル）
 
-Epic Issue・子 Issue テンプレートの次の正規形を本 Design が正規所有する。テンプレートコメント（issue_desc_child.md / issue_desc_epic.md）と agentdev-epic-tracker references は本正規形の実装ビューであり、乖離しない。
+Epic Issue・子 Issue テンプレートの次の正規形を本 Design が正規所有する。
+テンプレートコメント（issue_desc_child.md / issue_desc_epic.md）と agentdev-epic-tracker references は本正規形の実装ビューであり、乖離しない。
 
 ### Parent 配置の正規形
 

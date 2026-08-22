@@ -160,8 +160,8 @@ review 挿入位置は「暫定分類後・HITL 前」へ一意に特定する�
 | あり | あり | あり | 手動分類対象について default-on で発動（fast path 対象は迂回） |
 | あり | あり | なし | skip（review 対象なし、全件 fast path 完了） |
 | あり | なし | あり | 手動分類対象について default-on で発動 |
-| なし | — | あり | 手動分類対象について default-on で発動 |
-| なし | — | なし | skip（inbox 空、inbox スキャンで終了） |
+| なし | - | あり | 手動分類対象について default-on で発動 |
+| なし | - | なし | skip（inbox 空、inbox スキャンで終了） |
 
 ### 発動条件判定 Step（REQ-015-001、REQ-015-002、REQ-015-003）
 

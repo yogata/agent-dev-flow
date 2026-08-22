@@ -36,7 +36,7 @@ REQ/Decision 操作 skill（`agentdev-req-file-manager`、`agentdev-decision-fil
 - commit、push（command の責務）
 - 共通 script の重複実装（`agentdev-artifact-validation` の公開検証契約へ委譲）
 
-## 提供する判断・操作
+## 提供する判断、操作
 
 Design operation の公式 enum は `create` / `append` / `update` の3値であり、旧別名（`spec-create`、`spec-update`、`spec-append`）と新別名（`design-create`、`design-update`、`design-append`）を受け付けない（REQ-008-058）。
 

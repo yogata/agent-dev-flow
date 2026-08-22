@@ -31,7 +31,7 @@ updated: YYYY-MM-DD
 ## 適用対象
 USE FOR / DO NOT USE FOR を記述。
 
-## 提供する判断・操作
+## 提供する判断、操作
 再利用可能な判断基準・検査観点・操作手順を列挙。
 所有 script と公開検証契約（agentdev-artifact-validation 経由等）を明記。
 

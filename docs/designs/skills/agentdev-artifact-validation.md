@@ -35,7 +35,7 @@ REQ、Decision、Design 固有の内容判断を行わず、決定的検証の�
 - REQ 番号、Decision 番号、要件行 ID の採番（`agentdev-req-file-manager`、`agentdev-decision-file-manager` の責務）
 - target_area の検索（`agentdev-design-file-manager` の責務）
 
-## 提供する判断・操作
+## 提供する判断、操作
 
 - `check-frontmatter-consistency.ts`（frontmatter id ↔ ファイル名整合性確認、REQ/Decision 横断）の所有
 - `check-entry-existence.ts`（README エントリ存在確認）の所有

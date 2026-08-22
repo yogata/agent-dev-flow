@@ -45,7 +45,7 @@ REQ 固有診断（`agentdev-req-structure-diagnostics`）、文意品質（`age
 - 文意品質診断（`agentdev-doc-writing` の責務）
 - 探索・導線（README 索引と独立探索手段（正規成果物の直接読取、`rg` 等）の責務）
 
-## 提供する判断・操作
+## 提供する判断、操作
 
 - docs 横断診断カテゴリの定義（廃止 REQ/Design 由来記述残置、REQ/Design 境界違反、REQ 粒度過小 等）
 - 診断判定規則と証拠構造

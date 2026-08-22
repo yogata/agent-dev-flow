@@ -78,7 +78,8 @@ QG-4 の full integrity suite 実行における bun test の実行形態を次�
 - PR 本文・検証手順の証拠記録へ実行 cwd と起動コマンド形式（prefix・パス指定を含む）を明記することを要求する
 - cwd 依存テストが混在するスイートは、カレントディレクトトリビアな実行（`bun test` 単体等）で代替しない運用注記を付す
 
-QG-4 の識別子中心評価の構造は維持する（固定値期待値化による脆化を行わない）。case-close / docs-check の full suite 実行手順と PR 本文テンプレート（Test Strategy 結果欄）への記録欄追加は case 実施側の適用とする。
+QG-4 の識別子中心評価の構造は維持する（固定値期待値化による脆化を行わない）。
+case-close / docs-check の full suite 実行手順と PR 本文テンプレート（Test Strategy 結果欄）への記録欄追加は case 実施側の適用とする。
 
 ## 対象外
 
