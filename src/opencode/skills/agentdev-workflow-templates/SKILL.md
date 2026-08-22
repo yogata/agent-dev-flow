@@ -49,12 +49,58 @@ agentdev系コマンドで使用するIssue/PR本文、コメントテンプレ�
 | セクション | マーカー | 記述ルール | 該当なし時 |
 |---|---|---|---|
 | 概要 | 【必須】 | Issueの要約 | - |
+| 実行識別情報 | 【必須】 | 構造化識別情報セクション形式（後述「実行識別情報セクション」参照） | - |
 | 実装内容 | 【必須】 | 実装内容の概要 | - |
 | 完了条件 | 【必須】 | チェックボックス形式 | - |
 | テスト結果 | 【必須】 | テスト結果の概要に加え、テスト実行形態として実行 cwd と起動コマンド形式（./ prefix・パス指定を含む）を記録する | 「該当なし」 |
 | 品質メトリクス | 【必須】 | テーブル形式（メトリクス/結果/基準/判定） | - |
 | Findings/ Intake候補 | 【必須】 | case-run で発見した本筋外 Finding（intake候補、learning候補）を記録。各項目に発見元、内容、分類（intake/learning）を含める | 「該当なし」 |
 | Design確定候補 | 【任意】 | case-run/ driver が実装時に発見した Design レベルの詳細（schema、enum、判定表、内部アルゴリズム等）。`Findings / Capture候補` とは別セクション。case-close STEP-3 の Design 確定チェック入力となる | セクションごと省略 |
+
+### 実行識別情報セクション（Issue/PR テンプレート共通形式）
+
+Issue 本文テンプレートと PR 本文テンプレートに、ADF 実行の識別情報を構造化して記録する「実行識別情報」セクションを定義する。
+記録先割当と意味集合は workflow-contracts Design「ADF 実行識別情報の記録契約」が正規所有し、本スキルはテンプレートセクション形式を提供する。
+
+#### 対象テンプレートと記録内容
+
+| テンプレート | 記録する識別情報 |
+|---|---|
+| `issue_desc_feature.md` | 対象 Case、ADF 工程、実行単位、前工程で確定した事項 |
+| `issue_desc_bug.md` | 対象 Case、ADF 工程、実行単位、前工程で確定した事項 |
+| `issue_desc_epic.md` | 対象 Case、ADF 工程、実行単位、前工程で確定した事項 |
+| `issue_desc_child.md` | 対象 Case、ADF 工程、実行単位、前工程で確定した事項 |
+| `pr_desc.md` | 対象 Case、PR、実行単位、委譲単位識別子と委譲目的、実行結果 |
+
+#### セクション仕様
+
+- セクション見出しは「実行識別情報」とし、`<!-- 【必須】 -->` マーカー付きの必須セクションとする
+- セクション本文は `adf_` 接頭辞付きの key-value 行（`- adf_{key}: {value}`）で構成する
+- 機械的解析は本セクション内の key-value 行を正とし、自由文中に偶然出現する ID に依存しない
+- 実行単位の識別は execution_unit 構成の既存定義（standard / epic と Issue 番号）に接続し、新規の識別体系を並立させない
+- 委譲単位識別子は `DEL-{N}-{seq}` 形式（N = Issue 番号、seq = 同一 Issue への委譲連番）とし、ADF が発行する識別子を正規手段とする
+- harness 側識別子（OpenCode session ID 等）は任意キー `adf_harness_ref` に限定し、取得可能な場合の付加情報としてのみ記録する。必須契約としない
+- 識別情報の一部が取得不能な場合は「N/A」と記録し、workflow を停止しない
+- 値の記録は識別子中心で行う（Issue 番号、PR 番号、commit SHA、REQ/Decision/Design の識別子等）
+
+#### key 一覧
+
+| key | 対象 | 意味 |
+|---|---|---|
+| `adf_case` | Issue / PR | 対象 Case の Issue 番号（#N） |
+| `adf_phase` | Issue | 当該記録を生成した ADF 工程 |
+| `adf_execution_unit` | Issue / PR | 実行単位（standard:#N または epic:#N） |
+| `adf_upstream_confirmed` | Issue | 前工程で確定した事項（識別子中心） |
+| `adf_pr` | PR | 本 PR の番号（#N） |
+| `adf_delegation` | PR | 委譲単位識別子（DEL-{N}-{seq}）と委譲目的。委譲 prompt から転記 |
+| `adf_result` | PR | 実行結果（result 契約の4状態） |
+| `adf_harness_ref` | Issue / PR | 任意。harness 側識別子。取得可能な場合のみ |
+
+#### 配置規則と適用範囲
+
+- Issue テンプレートでは「概要」セクション（bug テンプレートでは「説明」セクション）の直後に配置する
+- PR テンプレートでは「概要」セクションの直後に配置する
+- 本セクションは新規作成の Issue / PR にのみ適用し、既存 Issue / PR への遡及適用は行わない
 
 ### review_dispositions 証跡セクション（Issue本文テンプレート）
 

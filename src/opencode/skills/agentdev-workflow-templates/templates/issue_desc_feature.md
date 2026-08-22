@@ -9,6 +9,20 @@ labels: enhancement
 
 [機能の概要（一言で説明）]
 
+## 実行識別情報
+<!-- 【必須】 -->
+
+<!-- 実行識別情報: workflow-contracts Design「ADF 実行識別情報の記録契約」に基づく構造化識別情報セクション。
+機械的解析は本セクション内の adf_ 接頭辞付き key-value 行を正とし、自由文中に偶然出現する ID に依存しない。
+harness 側識別子は取得可能な場合の付加情報に限定し、必須契約としない。
+識別情報の一部が取得不能な場合は「N/A」と記録し、workflow を停止しない。
+本セクションは新規作成 Issue のみに適用し、既存 Issue への遡及適用は行わない -->
+- adf_case: （対象 Case の Issue 番号。#N 形式。Standard flow では本 Issue、Epic flow では親 Epic Issue の番号）
+- adf_phase: case-open
+- adf_execution_unit: （実行単位。standard:#N または epic:#N。execution_unit 構成の既存定義に従い、新規の識別体系を並立させない）
+- adf_upstream_confirmed: （前工程で確定した事項。req-save、design-save の commit SHA と確定済み REQ、Decision、Design の識別子を識別子中心で記録。前工程がない場合は N/A）
+- adf_harness_ref: （任意。harness 側識別子（OpenCode session ID 等）。取得可能な場合のみ記載し、省略できる）
+
 ## 課題
 <!-- 【必須】 -->
 
