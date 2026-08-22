@@ -426,35 +426,10 @@ export function replaceAutogenBlock(
   return out.join("\n");
 }
 
-// ─── ADR / REQ collector (AG-008 / AG-009 / AG-013) ──────────────────────────
+// ─── REQ collector (AG-009) ─────────────────────────────────────────────────
 
 /**
- * ADR メタデータ（AG-008 ADR README 自動生成の_source）。
- * frontmatter から id/title/status/created を抽出する。
- */
-export interface AdrInfo {
-  /** ADR ID（例: "ADR-0101"）。 */
-  id: string;
-  /** ADR 数値部（例: 101）。ソート用。 */
-  num: number;
-  /** frontmatter title（例: "AgentDevFlow プラグイン名前空間の統一"）。 */
-  title: string;
-  /** frontmatter status（例: "accepted"）。 */
-  status: string;
-  /** frontmatter created（例: "2026-06-08"）。 */
-  created: string;
-  /** ファイル名（例: "ADR-0101.md"）。 */
-  filename: string;
-  /**
-   * README からの相対リンクパス。
-   * active ADR: "ADR-0101.md"
-   * retired ADR: "retired/ADR-0001.md"（adrDir からの相対）
-   */
-  relPath: string;
-}
-
-/**
- * REQ メタデータ（AG-009 REQ README / AG-013 DOC-MAP 自動生成の source）。
+ * REQ メタデータ（AG-009 REQ README 自動生成の source）。
  */
 export interface ReqInfo {
   /** REQ ID（例: "REQ-0101"）。 */
@@ -467,77 +442,6 @@ export interface ReqInfo {
   filename: string;
   /** README からの相対リンクパス。 */
   relPath: string;
-}
-
-/**
- * ADR-*.md からメタデータを抽出する。
- * retiredDirFromAdr: retired ファイルの場合 "retired/" prefix を付与（active は空文字）。
- */
-function extractAdrInfo(
-  fullPath: string,
-  relPath: string,
-): AdrInfo | null {
-  const content = readText(fullPath);
-  if (!content) return null;
-
-  const filename = path.basename(fullPath);
-  const idMatch = filename.match(/^ADR-(\d+)\.md$/);
-  if (!idMatch) return null;
-  const num = Number(idMatch[1]);
-  // 桁数をそのまま維持する。現行契約は3桁（ADR-001..ADR-999）、履歴 v2 は4桁（ADR-0001..）。
-  // padStart(4) で揃えると ADR-001 が ADR-0001 へ書き換わり契約衝突する。
-  const id = `ADR-${idMatch[1]}`;
-
-  const fm = parseFrontmatter(content);
-  let title = "";
-  let status = "";
-  let created = "";
-  if (fm) {
-    if (typeof fm["title"] === "string") title = fm["title"];
-    if (typeof fm["status"] === "string") status = fm["status"];
-    if (typeof fm["created"] === "string") created = fm["created"];
-  }
-  // title が frontmatter に無い場合は H1 から抽出（フォールバック）。
-  if (!title) {
-    const h1Match = content.match(/^#\s+(.+)$/m);
-    if (h1Match) {
-      const h1 = h1Match[1].trim();
-      const colonIdx = h1.indexOf(":");
-      title = colonIdx !== -1 ? h1.slice(colonIdx + 1).trim() : h1;
-    }
-  }
-
-  return { id, num, title, status, created, filename, relPath };
-}
-
-/**
- * docs/adr/ 配下の ADR-*.md を収集し、番号順に返す（retired/ 除く）。
- */
-export function collectAdrFiles(adrDir: string): AdrInfo[] {
-  const files = listFiles(adrDir).filter((f) => /^ADR-\d+\.md$/.test(f));
-  const infos: AdrInfo[] = [];
-  for (const f of files) {
-    const fullPath = path.join(adrDir, f);
-    const info = extractAdrInfo(fullPath, f);
-    if (info) infos.push(info);
-  }
-  infos.sort((a, b) => a.num - b.num);
-  return infos;
-}
-
-/**
- * docs/adr/retired/ 配下の ADR-*.md を収集し、番号順に返す。
- */
-export function collectRetiredAdrFiles(retiredDir: string): AdrInfo[] {
-  const files = listFiles(retiredDir).filter((f) => /^ADR-\d+\.md$/.test(f));
-  const infos: AdrInfo[] = [];
-  for (const f of files) {
-    const fullPath = path.join(retiredDir, f);
-    const info = extractAdrInfo(fullPath, `retired/${f}`);
-    if (info) infos.push(info);
-  }
-  infos.sort((a, b) => a.num - b.num);
-  return infos;
 }
 
 // ─── Decision collector (DEC-009) ───────────────────────────────────────────
@@ -694,87 +598,11 @@ export function collectRetiredReqFiles(retiredDir: string): ReqInfo[] {
   return infos;
 }
 
-// ─── AG-008: ADR README 生成（レガシー: check_integrity.ts IR-061 検査専用）──
-
-// ADR README 内の AUTOGEN ブロック ID。
-export const ADR_BASELINE_COUNT_BLOCK_ID = "adr-baseline-count";
-export const ADR_BASELINE_TABLE_BLOCK_ID = "adr-baseline-table";
-export const ADR_STATUS_ACCEPTED_BLOCK_ID = "adr-status-accepted";
-export const ADR_STATUS_PROPOSED_BLOCK_ID = "adr-status-proposed";
-export const ADR_STATUS_SUPERSEDED_BLOCK_ID = "adr-status-superseded";
-export const ADR_STATUS_DEPRECATED_BLOCK_ID = "adr-status-deprecated";
-export const ADR_RETIRED_TABLE_BLOCK_ID = "adr-retired-table";
-
 /**
  * 表セル内のパイプ・改行を回避する（catalog/rule-ownership 形式と同一）。
  */
 function sanitizeTableCell(text: string): string {
   return text.replace(/\|/g, "/").replace(/\n/g, " ");
-}
-
-/**
- * 現行基盤ビューの件数表明キャプション（1行）。
- * 形式: "現行の承認済み ADR はN件である。"
- * バージョン中立（v2 の ADR-01XX 番号帯を前提としない）。現行 ADR 数は
- * 引数 acceptedAdrs の length から導出する。
- */
-export function generateAdrBaselineCaption(
-  acceptedAdrs: AdrInfo[],
-): string[] {
-  return [
-    `現行の承認済み ADR は${acceptedAdrs.length}件である。`,
-  ];
-}
-
-/**
- * 現行基盤ビュー表（ヘッダー + accepted ADR 行）。
- */
-export function generateAdrBaselineTable(
-  acceptedAdrs: AdrInfo[],
-): string[] {
-  const lines: string[] = [];
-  lines.push("| ADR番号 | タイトル | ステータス | 作成日 |");
-  lines.push("|---------|---------|-----------|--------|");
-  for (const info of acceptedAdrs) {
-    lines.push(
-      `| ${info.id} | ${sanitizeTableCell(info.title)} | ${info.status} | ${info.created} |`,
-    );
-  }
-  return lines;
-}
-
-/**
- * ステータス別リスト（bullet 形式）。
- * 形式: "- [ADR-0101](ADR-0101.md)（title）"
- */
-export function generateAdrStatusList(
-  infos: AdrInfo[],
-  status: string,
-): string[] {
-  return infos
-    .filter((a) => a.status === status)
-    .map(
-      (info) => `- [${info.id}](${info.relPath})（${info.title}）`,
-    );
-}
-
-/**
- * 廃止済み履歴ビュー表（ヘッダー + retired ADR 行）。
- * 引き継ぎ先列は active ADR 側の supersedes 宣言から導出可能だが、
- * retired ADR frontmatter に該当フィールドが無いため本 PR では 3 列生成とする。
- */
-export function generateAdrRetiredTable(
-  retiredAdrs: AdrInfo[],
-): string[] {
-  const lines: string[] = [];
-  lines.push("| ADR番号 | タイトル | retired時ステータス |");
-  lines.push("|---------|---------|-------------------|");
-  for (const info of retiredAdrs) {
-    lines.push(
-      `| [${info.id}](${info.relPath}) | ${sanitizeTableCell(info.title)} | ${info.status} |`,
-    );
-  }
-  return lines;
 }
 
 // ─── AG-008: Decision README 生成 (DEC-009) ─────────────────────────────────
@@ -901,60 +729,6 @@ export function generateReqRetiredTable(retiredReqs: ReqInfo[]): string[] {
     );
   }
   return lines;
-}
-
-// ─── AG-013: DOC-MAP 生成 ────────────────────────────────────────────────────
-
-export const DOCMAP_INVENTORY_BLOCK_ID = "docmap-inventory";
-
-/**
- * DOC-MAP インベントリブロック（件数 + ファイル群参照）。
- * docs/requirements/REQ-*.md, docs/requirements/retired/REQ-*.md,
- * docs/adr/ADR-*.md, docs/adr/retired/ADR-*.md, docs/designs/ 配下 .md から再生成。
- */
-export function generateDocMapInventory(args: {
-  activeReqCount: number;
-  retiredReqCount: number;
-  activeAdrCount: number;
-  retiredAdrCount: number;
-  specCount: number;
-}): string[] {
-  const lines: string[] = [`- 現行 REQ: ${args.activeReqCount}件（\`docs/requirements/REQ-*.md\`）`];
-  // retired 実体が存在する場合のみパス文字列を伴う行を出力する。実体不在（件数0）のときに
-  // パス文字列を残すと、retired/ ディレクトリ削除後も grep 検出で残留参照のように見えるため。
-  if (args.retiredReqCount > 0) {
-    lines.push(`- 廃止済み REQ: ${args.retiredReqCount}件（\`docs/requirements/retired/REQ-*.md\`）`);
-  }
-  if (args.retiredAdrCount > 0) {
-    lines.push(
-      `- ADR: ${args.activeAdrCount}件（\`docs/adr/ADR-*.md\`）、retired: ${args.retiredAdrCount}件（\`docs/adr/retired/ADR-*.md\`）`,
-    );
-  } else {
-    lines.push(`- ADR: ${args.activeAdrCount}件（\`docs/adr/ADR-*.md\`）`);
-  }
-  lines.push(`- Design: ${args.specCount}件（\`docs/designs/**/*.md\`）`);
-  return lines;
-}
-
-/**
- * docs/designs/ 配下の .md を再帰収集して件数を返える（check_integrity.ts と同ロジック）。
- */
-export function countDesignFiles(designsDir: string): number {
-  if (!fs.existsSync(designsDir)) return 0;
-  let count = 0;
-  const walk = (dir: string): void => {
-    const entries = fs.readdirSync(dir, { withFileTypes: true }) as import("fs").Dirent[];
-    for (const entry of entries) {
-      const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        walk(full);
-      } else if (entry.name.endsWith(".md")) {
-        count++;
-      }
-    }
-  };
-  walk(designsDir);
-  return count;
 }
 
 // ─── AG-006候補2: docs/README.md 件数表明 (Phase E 残) ────────────────────────
@@ -1241,10 +1015,9 @@ TARGET FILES (SC-002 Phase C):
   Wave 1:
     - docs/designs/integrity/integrity-rule-catalog.md (catalog IR entries, 2 blocks around IR-045 gap)
     - docs/designs/integrity/rule-ownership.md (IR cross-reference appendix)
-  Wave 2 (AG-008/009/013, DEC-009):
+  Wave 2 (AG-008/009, DEC-009):
     - docs/decisions/README.md (decision-* baseline/status/retired blocks; skipped when absent)
     - docs/requirements/README.md (active/retired REQ tables)
-    - docs/DOC-MAP.md (inventory stats; legacy, skipped when absent)
   Wave 3 (AG-006 候補5):
     - docs/designs/quality/req-health-metrics.md (REQ line count + signal table)
       Wave 5 (Phase E 残):
@@ -1255,7 +1028,6 @@ GENERATION SOURCE:
   - docs/decisions/DEC-*.md, docs/decisions/retired/DEC-*.md (frontmatter; DEC-009)
   - docs/requirements/REQ-*.md, docs/requirements/retired/REQ-*.md (frontmatter, requirement line count)
   - docs/designs/**/*.md (file count, body line count, frontmatter status)
-  - docs/adr/ADR-*.md (legacy; DOC-MAP inventory count only, used when docs/DOC-MAP.md exists)
 
 RELATED:
   - Design: docs/designs/integrity/index-auto-generation.md (SC-002)
@@ -1290,8 +1062,6 @@ RELATED:
     "integrity",
     "rule-ownership.md",
   );
-  const adrDir = path.join(root, "docs", "adr");
-  const adrRetiredDir = path.join(adrDir, "retired");
   const decisionsDir = path.join(root, "docs", "decisions");
   const decisionRetiredDir = path.join(decisionsDir, "retired");
   const reqDir = path.join(root, "docs", "requirements");
@@ -1299,7 +1069,6 @@ RELATED:
   const designsDir = path.join(root, "docs", "designs");
   const decisionReadmePath = path.join(decisionsDir, "README.md");
   const reqReadmePath = path.join(reqDir, "README.md");
-  const docMapPath = path.join(root, "docs", "DOC-MAP.md");
   const qualityDir = path.join(designsDir, "quality");
   const reqHealthMetricsPath = path.join(qualityDir, "req-health-metrics.md");
 
@@ -1525,37 +1294,6 @@ RELATED:
   }
   if (reqReadmeUpdated !== reqReadmeOriginal) {
     updates.push({ file: reqReadmePath, content: reqReadmeUpdated });
-  }
-
-  // DOC-MAP 更新 (AG-013、レガシー)。docs/DOC-MAP.md 不在時はスキップ。
-  const docMapOriginal = readText(docMapPath);
-  if (docMapOriginal === null) {
-    console.log(
-      `[generate_indexes] DOC-MAP not found, skipping: ${docMapPath}`,
-    );
-  } else {
-    const docMapInventory = generateDocMapInventory({
-      activeReqCount: reqInfos.length,
-      retiredReqCount: reqRetiredInfos.length,
-      activeAdrCount: collectAdrFiles(adrDir).length,
-      retiredAdrCount: collectRetiredAdrFiles(adrRetiredDir).length,
-      specCount: countDesignFiles(designsDir),
-    });
-    const docMapBlocks = findAutogenBlocks(docMapOriginal);
-    if (!docMapBlocks.some((b) => b.id === DOCMAP_INVENTORY_BLOCK_ID)) {
-      console.error(
-        `[generate_indexes] DOC-MAP AUTOGEN marker not found. Expected id: ${DOCMAP_INVENTORY_BLOCK_ID}`,
-      );
-      process.exit(EXIT_ERROR);
-    }
-    const docMapUpdated = replaceAutogenBlock(
-      docMapOriginal,
-      DOCMAP_INVENTORY_BLOCK_ID,
-      docMapInventory,
-    );
-    if (docMapUpdated !== docMapOriginal) {
-      updates.push({ file: docMapPath, content: docMapUpdated });
-    }
   }
 
   // req-health-metrics 更新 (AG-006 候補5, Wave 3)

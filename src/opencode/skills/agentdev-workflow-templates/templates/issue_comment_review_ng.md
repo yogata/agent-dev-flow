@@ -44,7 +44,7 @@ about: レビュー結果がNGの場合に記録するコメントのテンプ�
 ## 仕様適合性 結果
 <!-- 【任意】 -->
 
-以下に`agentdev-spec-compliance`の乖離報告を引用:
+以下にQG-3（実装乖離ゲート、`agentdev-quality-gates`）の乖離報告を引用:
 
 ```
 ## 乖離検出報告

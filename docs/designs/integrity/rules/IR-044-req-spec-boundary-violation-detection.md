@@ -19,7 +19,7 @@ updated: 2026-06-28
 | related_design | [integrity-contracts.md, document-model.md] |
 | gate_level | full-audit |
 | false_positive_risk | 高。文脈解釈を要する免除（否定文脈、委譲文脈、メタスコープルール文脈、振る舞い述語文脈、安定契約パターン）は docs-check では実施せず inspect-docs へ委譲したため（REQ-010-002）、純粋なパターンマッチの false positive は inspect-docs での意味的再評価で事後処理する。META 規則行 exemption は行構造の機械判定に限定し、件数・内容を規定する Design 詳細列挙行は免除しない（REQ-010-012）。Step 番号直接参照パターンは数字を伴わない「Step 番号」「ステップ番号」語句を検出対象とせず、REQ-001-031 自身（原則宣言の META 規則行）を誤検知しない。これは語句「番号」と数字リテラルの機械的区別により保証し、文脈免除には依存しない。既知の true positive が META exemption により誤って免除されないことを回帰テストで検証する |
-| regression_test | `scripts/check_integrity.test.ts` の IR-044 正規スイート（v2:REQ-9001〜v2:REQ-9013）が真陽性保護と exemption 境界を検証する。Step 番号直接参照の true positive として v2:REQ-9005（`Step 3`）、v2:REQ-9008（`手順 4`）を含み、META 規則行 exemption（v2:REQ-9006/9012/9013）、REQ-001-031 META 規則行の誤検知非検出（v2:REQ-9009）、振る舞い述語 exemption（v2:REQ-9011/v2:REQ-9010 guard）を追加固定する（REQ-028-009 準拠） |
+| regression_test | `scripts/check_integrity.test.ts` の IR-044 正規スイート（v2:REQ-9001〜v2:REQ-9013）が真陽性保護と exemption 境界を検証する。Step 番号直接参照の true positive として v2:REQ-9005（`Step 3`）、v2:REQ-9008（`手順 4`）を含み、META 規則行 exemption（v2:REQ-9006/9012/9013）、REQ-001-031 META 規則行の誤検知非検出（v2:REQ-9009）、振る舞い述語 exemption（v2:REQ-9011/v2:REQ-9010 guard）を追加固定する（retired REQ-028-009 準拠） |
 | finding_route | req-define |
 | triage_action | 該当要件行の詳細を Design、ルールカタログ、コマンドリファレンス、スキルリファレンス、テスト文書のいずれかに移管し、REQ 側は外部契約、状態要件の要約に置き換える。Step 番号直接参照の triage は機能名・フェーズ名参照への置換とする（REQ-001-031）。文脈免除の境界判定は inspect-docs が担う |
 | last_verified | 2026-06-28 |
@@ -67,7 +67,7 @@ docs-check 側での機械免除は行わない（REQ-010-002 準拠）。
 
 **true positive 保護（回帰テスト）**:
 
-回帰テストで既知の true positive（Design 詳細が REQ に残留している実例）が META 規則行 exemption により誤って免除されないことを検証する（REQ-028-009 準拠）。
+回帰テストで既知の true positive（Design 詳細が REQ に残留している実例）が META 規則行 exemption により誤って免除されないことを検証する（retired REQ-028-009 準拠）。
 保護対象の真陽性は件数・内容を規定する Design 詳細の残留であり、META 規則行（責務範囲規定）には該当しないことをテストで固定する。
 
 **是正済み経緯（保護対象から除外）**: REQ-006-082、REQ-010-008 は #1109 PR で Design 詳細が REQ から Design へ移行済みであり、真陽性保護対象から除外する（REQ-036-005）。

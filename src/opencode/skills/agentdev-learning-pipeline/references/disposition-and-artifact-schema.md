@@ -59,7 +59,7 @@ living pool は終端保管ではなく、次回 `/agentdev/learning-promote` �
 - `.opencode/commands/` 配下の全コマンド
 - `.opencode/skills/` 配下の全スキル
 - `.opencode/skills/agentdev-workflow-templates/templates/` 配下
-- `.opencode/skills/agentdev-req-file-manager/templates/`, `agentdev-decision-file-manager/templates/`, `agentdev-spec-compliance/templates/` 配下
+- `.opencode/skills/agentdev-req-file-manager/templates/`, `agentdev-decision-file-manager/templates/` 配下
 - `docs/designs/`, `docs/decisions/`, `docs/requirements/` 配下
 
 ギャップ分類:

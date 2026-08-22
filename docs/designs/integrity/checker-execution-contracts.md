@@ -63,7 +63,7 @@ YAML と正 Design の不一致は検査で検出対象とする。
 ## detector 命名規約
 
 detector 実装は IR 識別子に基づく命名規約（checkIR_NNN_ 関数接頭辞、@ir タグ等）を持ち、
-IR から detector 実装への機械的逆引きを可能にする。共用 detector を許容する場合（REQ-028-001）も、
+IR から detector 実装への機械的逆引きを可能にする。共用 detector を許容する場合（retired REQ-028-001 由来）も、
 当該 IR への到達性を逆引き結果から追跡できることを維持する。
 
 ## 再帰ファイル探索と CLI 引数解析の標準API移行

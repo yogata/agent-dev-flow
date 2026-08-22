@@ -34,7 +34,7 @@ updated: 2026-08-18
 | triage_action | string | 新規検出時の対応アクション |
 | last_verified | date | 最終検証日 |
 
-### IR 属性モデル（DEC-013 適用、REQ-028-009/010）
+### IR 属性モデル（DEC-013 適用、retired REQ-028-009/010 から移管）
 
 DEC-013 AG-009 により、`lifecycle_state`、`enforcement_mode`、`baseline_status` は現行 IR 属性から削除した。
 「現存 IR = 現行 = executable detector」を成立させ、`active+none` の恒久状態を禁止する。
@@ -44,7 +44,7 @@ DEC-013 AG-009 により、`lifecycle_state`、`enforcement_mode`、`baseline_st
 finding-baseline 分類（new/known/resolved）は IR schema から分離し、finding 側の状態として [integrity-contracts.md](integrity-contracts.md)「finding-baseline 分類」で定義する。
 本カタログは finding-baseline 分類を再定義しない。
 
-`severity`、`gate_level` は現行 IR に対する独立軸として維持する（REQ-036-022、REQ-028-009 決定7）。
+`severity`、`gate_level` は現行 IR に対する独立軸として維持する（REQ-036-022、retired REQ-028-009 決定7）。
 IR lifecycle の代替とせず、実行可能 detector を持つ現行 IR の実行特性を表す。
 
 > **フィールド数**: 15 field から 12 field へ縮約した（`lifecycle_state`、`enforcement_mode`、`baseline_status` を削除）。
@@ -126,10 +126,10 @@ IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 か
 
 | IR | 旧タイトル | 移管先 | 根拠 |
 |---|---|---|---|
-| IR-019 | Guide 要件定義、契約記述検出 | inspect-docs（Guide 責務侵害観点） | Phase 3 §4.3、REQ-028-007 |
-| IR-022 | REQ 内部整合性 | inspect-docs（REQ 内部整合観点） | Phase 3 §4.3、REQ-028-007 |
-| IR-026 | ADR 誤分類兆候検出 | inspect-docs（Decision 誤分類観点） | Phase 3 §4.3、REQ-028-007 |
-| IR-036 | Decision-work-means-detection | inspect-docs（Decision work-means 観点） | Phase 3 §4.3、REQ-028-007 |
+| IR-019 | Guide 要件定義、契約記述検出 | inspect-docs（Guide 責務侵害観点） | Phase 3 §4.3、retired REQ-028-007 |
+| IR-022 | REQ 内部整合性 | inspect-docs（REQ 内部整合観点） | Phase 3 §4.3、retired REQ-028-007 |
+| IR-026 | ADR 誤分類兆候検出 | inspect-docs（Decision 誤分類観点） | Phase 3 §4.3、retired REQ-028-007 |
+| IR-036 | Decision-work-means-detection | inspect-docs（Decision work-means 観点） | Phase 3 §4.3、retired REQ-028-007 |
 
 > 識別子の再利用禁止は `foundations/numbering-policy.md` が保持し、履歴性は Git で担保する（DEC-013 AG-008）。
 
@@ -167,7 +167,7 @@ IR エントリ一覧（IR-046 以降）は `generate_indexes.ts` が自動生�
 ### 新規 IR 候補（candidate state、新規 IR 登録 gate 前）
 
 以下は検出ルールの設計とカタログ候補エントリ整備のみを行い、実装（`check_integrity.ts` 等の検出ロジック）は対象外とする。
-REQ-028-012 が定める新規 IR 登録 gate（(a) 存在資格 gate、(b) hard governance 追加 gate）に従い確定する。
+retired REQ-028-012 由来の新規 IR 登録 gate（(a) 存在資格 gate、(b) hard governance 追加 gate）に従い確定する。
 candidate 状態の IR は catalog への本エントリ追加を含まず、別途 Design または作業記録で管理する。
 
 | Field | 値 |
@@ -309,7 +309,7 @@ checkWorkflowStatusProhibition
 `repo-agentdev-integrity` SKILL.md が主体となり、以下を満たしてから追加する。
 
 1. **既存 NG への副作用評価**: 新ルールが既存ルールの誤検知を増加させないか。特に exemption 条件、baseline_status、severity 分類の整合性を確認する
-2. **catalog エントリ追加**: `integrity-rule-catalog.md` に12フィールド以上の IR エントリを追加する（DEC-013 適用後、field 数 ≥ 12）。新規 IR 登録 gate（REQ-028-012 (a)/(b)）の確認を必須とする
+2. **catalog エントリ追加**: `integrity-rule-catalog.md` に12フィールド以上の IR エントリを追加する（DEC-013 適用後、field 数 ≥ 12）。新規 IR 登録 gate（retired REQ-028-012 由来 (a)/(b)）の確認を必須とする
 3. **実装追加**: `check_integrity.ts` に検出関数を実装する。exemption 条件、false_positive_risk を実装に反映する
 4. **テストデータ更新**: `check_integrity.test.ts` の有効なテストデータ（valid fixture）が新ルールで NG とならないことを確認する（drift detection smoke test）
 5. **vocabulary-registry 同期**: 新ルールが語彙検出に関わる場合、`vocabulary-registry.md` を更新する

@@ -8,7 +8,7 @@ context:
     paths:
       - "docs/designs/integrity/docs-spec-rebuild-integrity.md"
     purpose: 配布物 ID 除去後の品質保持ルールの確認
-  - id: agentdev-gh-cli-spec
+  - id: agentdev-gh-cli-design
     when: "agentdev-gh-cli Design 参照時"
     paths:
       - "docs/designs/skills/agentdev-gh-cli.md"

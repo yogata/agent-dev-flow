@@ -123,7 +123,7 @@ REQ-002-028、029、035 は RETIRE 扱いとし、それぞれの検査（構文
 4. **改善ループ**: ルールカタログ / 基準 / 影響マップ / 例外を更新
 5. **記録**: トリアージ結果を整合性レポートに記録
 
-## IR → REQ 逆方向参照（ACT-SPEC-006、REQ-028-008）
+## IR → REQ 逆方向参照（ACT-SPEC-006、retired REQ-028-008 由来）
 
 本ファイル（REQ → 影響するルール/アーティファクト）と `../integrity/rule-ownership.md`（ルールドメイン → canonical REQ/Design）は逆方向の対応マップである（REQ-010-011）。
 両者の整合性維持運用は前節「同期更新が必要なケース」に従う。
@@ -137,13 +137,13 @@ DEC-013 AG-008 適用により file-backed tombstone（IR-011 型）を物理削
 ## Retired cross-references
 
 廃止 IR の交叉参照（v2:REQ-NNN 等）を再配置する節。
-AG-008（REQ-028-008）に基づき、file-backed tombstone の物理削除時に交叉参照を本節へ移行する。
+AG-008（retired REQ-028-008）に基づき、file-backed tombstone の物理削除時に交叉参照を本節へ移行する。
 各エントリは廃止 IR ID、旧交叉参照、再配置日、後続 REQ 等のメタデータを持つ（Phase 3 §7.3、`docs/designs/integrity/audits/cross-cutting-integration-design-20260811.md`）。
 
 ### IR-011 削除に伴う交叉参照再配置
 
 IR-011（Mapping table 全件記録、file-backed tombstone）の物理削除に伴い、交叉参照 `v2:REQ-0108-083`〜`v2:REQ-0108-088`（6件）を再配置する。
-当該 v2 要件群は tag `v2.4.0` 時点の mapping-table 全件記録契約を担い、現行 v3（REQ-001〜REQ-028）には該当しない。
+当該 v2 要件群は tag `v2.4.0` 時点の mapping-table 全件記録契約を担い、現行 v3（REQ-001〜REQ-028。ただし REQ-028 は retired）には該当しない。
 後続要件は存在しない（mapping-table 廃止済み、tombstone 廃止済み）。
 欠番管理は `../foundations/numbering-policy.md` の既知の欠番表が保持する。
 

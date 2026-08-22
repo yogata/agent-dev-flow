@@ -20,7 +20,7 @@ case-auto は下位 workflow 詳細処理を複製しない。
 
 ## project extensions
 
-本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-case-auto`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-case-auto.yaml`、kind: workflow-extension）を読み込む（ADR）。
+本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-case-auto`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-case-auto.yaml`、kind: workflow-extension）を読み込む。
 extension の5セクション（`context` / `rules` / `checks` / `acceptance_gates` / `must_not`）は標準動作に追加・拡張される（上書きではない）。
 存在しない場合は標準動作で続行し、破損時はエラー表示して当該 extension を無視し標準動作で続行する。
 詳細な読み込み契約は `agentdev-project-extensions` skill 参照

@@ -89,7 +89,7 @@ entries:
     new: "docs/designs/quality/req-health-metrics.md"
     severity: "ng"
   - old: "docs/specs/spec-health-metrics.md"
-    new: "docs/designs/quality/spec-health-metrics.md"
+    new: "docs/designs/quality/design-health-metrics.md"
     severity: "ng"
 
   # integrity/（整合性契約、ルール）
@@ -167,7 +167,7 @@ entries:
     new: "docs/designs/quality/req-health-metrics.md"
     severity: "ng"
   - old: "docs/specs/quality/spec-health-metrics.md"
-    new: "docs/designs/quality/spec-health-metrics.md"
+    new: "docs/designs/quality/design-health-metrics.md"
     severity: "ng"
   - old: "docs/specs/integrity/integrity-contracts.md"
     new: "docs/designs/integrity/integrity-contracts.md"

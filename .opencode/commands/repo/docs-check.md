@@ -56,4 +56,4 @@ agent-dev-flow リポジトリの自己監査コマンド。AgentDevFlow 管理�
 - G05: intake item は NG/WARNING finding から自動生成する。実行＝保存承認（REQ-0108-225）。採否は intake-promote に委譲（REQ-0108-226）。learning/RU/REQ の直接生成禁止（MUST NOT、REQ-0108-227）
 - G06: `gh` コマンドは使用しない
 - G07: `agentdev-req-analysis`（manual reference）の要件分析手法を参照して REQ フィールド検査
-- G08: `agentdev-adr-guidelines`（manual reference）の ADR 構造定義を参照して ADR フィールド検査
+- G08: `agentdev-decision-guidelines`（manual reference）および Decision lifecycle Design（`docs/designs/foundations/decision-lifecycle.md`）の Decision 構造定義を参照して Decision フィールド検査

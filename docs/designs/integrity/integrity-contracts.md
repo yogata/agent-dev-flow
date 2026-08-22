@@ -177,14 +177,14 @@ check_changed_docs.ts は以下の挙動Design 契約に従う: entry（引数�
 各層は他層の担当を重複して実施せず、検出内容に応じて適切な層へ委譲する。
 機械的検出で偽陽性となる意味的判断は inspect-skills へ、文書品質の査読は doc-writing skill へ、それぞれ振り分ける。
 
-## IR 存在条件モデル（DEC-013 適用、REQ-028-008/009/010/012）
+## IR 存在条件モデル（DEC-013 適用、retired REQ-028-008/009/010/012 から移管）
 
 DEC-013（AG-008 tombstone 廃止、AG-009 lifecycle/enforcement/baseline_status 簡素化）を適用し、IR の状態モデルを「現存 IR = 現行 = executable detector」へ統一した。
-`lifecycle_state`、`enforcement_mode`、`baseline_status` は現行 IR の属性から全て削除し、`active+none` の恒久状態を禁止する（REQ-028-009）。
-tombstone（IR-011 型 file-backed）は AG-008 により物理削除し、廃止 IR の履歴保存のみを目的とする file-backed tombstone を保持しない（REQ-028-008）。
+`lifecycle_state`、`enforcement_mode`、`baseline_status` は現行 IR の属性から全て削除し、`active+none` の恒久状態を禁止する（retired REQ-028-009）。
+tombstone（IR-011 型 file-backed）は AG-008 により物理削除し、廃止 IR の履歴保存のみを目的とする file-backed tombstone を保持しない（retired REQ-028-008）。
 識別子の再利用禁止は `foundations/numbering-policy.md` が保持し、履歴性は Git で担保する。
 
-### 8 項目存在条件（REQ-028-001）
+### 8 項目存在条件（retired REQ-028-001 から移管）
 
 現存 IR は次の8項目存在条件をすべて満たす場合にのみ現行成果物として存在できる。
 detector 関数の専有は必須ではなく、invariant ごとの到達性が追跡可能で回帰証拠が存在すれば他 IR との detector 共有を許容する。
@@ -199,9 +199,9 @@ detector 関数の専有は必須ではなく、invariant ごとの到達性が�
 7. 他 IR 非包含（独立 invariant を持つ）
 8. severity / gate_level 実行可能性（AG-009 決定7、実行中の IR に対する独立軸として維持）
 
-`severity`、`gate_level` は現行 IR に対する独立軸として維持し、IR lifecycle の代替にしない（REQ-036-022、REQ-028-009 決定7）。
+`severity`、`gate_level` は現行 IR に対する独立軸として維持し、IR lifecycle の代替にしない（REQ-036-022、retired REQ-028-009 決定7）。
 
-### 非実効 IR の禁止（REQ-028-002）
+### 非実効 IR の禁止（retired REQ-028-002 から移管）
 
 detector 不在、部分実装、test 不在、到達不能、finding 未接続の IR を恒久的な現行 IR として許容しない。
 必要な invariant は IMPLEMENT、不要な場合は DELETE/MERGE とする。
@@ -213,7 +213,7 @@ detector 不在、部分実装、test 不在、到達不能、finding 未接続�
 - `foundations/numbering-policy.md`: 欠番管理、識別子再利用禁止
 - `foundations/document-model.md`: IR frontmatter フィールド定義
 
-## finding-baseline 分類（REQ-028-009/010、TS-014）
+## finding-baseline 分類（retired REQ-028-009/010 から移管、TS-014）
 
 `baseline_status` を IR schema から分離し、finding 側の状態として定義する。
 IR は finding-baseline 分類を持たず、finding が生成される時に finding 側で new/known/resolved を判定する。
@@ -228,9 +228,9 @@ baseline 集合の管理は検出器（`check_integrity.ts`、`check_extensions.
 各 checker は baseline ファイル（`baselines/ng-baseline.json`、`baselines/ir-055-baseline.json` 等）を持ち、新規検出事項と既知事項を区別する（REQ-010-007、REQ-036-009）。
 IR 側で baseline を事前登録せず、finding が発生した時点で baseline 比較を行う。
 
-tombstone 群（IR-011 型 file-backed）の `baseline_status: superseded` 表現は AG-008 により物理削除で解消し、file-backed 上の baseline 属性は持たない（REQ-028-010）。
+tombstone 群（IR-011 型 file-backed）の `baseline_status: superseded` 表現は AG-008 により物理削除で解消し、file-backed 上の baseline 属性は持たない（retired REQ-028-010）。
 
-## 新規 IR 登録 gate（REQ-028-012、TS-020）
+## 新規 IR 登録 gate（retired REQ-028-012 から移管、TS-020）
 
 新規 IR 登録時に次の2種 gate を適用する。
 区別は `enforcement_mode` 非依存、blocking/non-blocking で判定する。
@@ -266,9 +266,9 @@ DEC-001 決定4 の7条件:
 
 新規 IR 登録時に `integrity-rule-catalog.md`「新規カテゴリ追加判定フロー（REQ-010-005）」へ従い gate を実施する。
 catalog エントリ追加前に (a) を、blocking IR の場合は (b) も確認する。
-gate 不合格の場合は新規 IR 登録を取り下げ、REQ-028-013「IR 件数削減数で評価しない」に従い別途 backlog → RU → req-define → req-save 経路で提起する。
+gate 不合格の場合は新規 IR 登録を取り下げ、retired REQ-028-013「IR 件数削減数で評価しない」に従い別途 backlog → RU → req-define → req-save 経路で提起する。
 
-## 一時移行検査 registry（REQ-028-006）
+## 一時移行検査 registry（retired REQ-028-006 から移管）
 
 一時移行検査（migration residual 等）は原則として恒久 IR とせず、期限/終了条件を持つ別種検査として扱う。
 別種検査の所在は対象 Design または migration plan 配下とし、終了条件監視機構（期限超過警告、または docs-check 等の既存鮮度監視経路の拡張）を規定する。
@@ -284,7 +284,7 @@ gate 不合格の場合は新規 IR 登録を取り下げ、REQ-028-013「IR 件
 
 継続的再発防止価値がある場合のみ恒久 IR へ昇格する。
 昇格時は新規 IR 登録 gate（前述）を適用する。
-REQ-028-006 の詳細運用は別途 design-save 工程で確定する。
+retired REQ-028-006 の詳細運用は別途 design-save 工程で確定する。
 
 ### IR-057 適用（REQ-028-006 移行判断、Phase 3 §7.2 判定）
 
@@ -412,7 +412,7 @@ docs-check は baseline 運用（IR-055）と path exemption（`IR055_EXEMPT_PAT
 |----------|----|------|
 | baseline 過大計上 | 実修復されていない違反を baseline count に含め報告を抑止する | 許容しない。baseline 更新は前節「RuntimeReference baseline 運用手順」の根因特定を経た場合のみ認める |
 | 広域 exemption | 対象を絞らない glob（`docs/**` 等）で検出を回避する | 許容しない。exemption は対象ファイル単位、かつ根拠文書化を必須とする |
-| 検出無効化 | check_integrity.ts の検出関数をコメントアウト、条件付きで回避 | 許容しない。検出の廃止は catalog↔実装双方向同期運用（REQ-010-003）に従い IR エントリの物理削除（AG-008、REQ-028-008）を行う |
+| 検出無効化 | check_integrity.ts の検出関数をコメントアウト、条件付きで回避 | 許容しない。検出の廃止は catalog↔実装双方向同期運用（REQ-010-003）に従い IR エントリの物理削除（AG-008、retired REQ-028-008）を行う |
 
 ### 除外設定の文書化要件
 
@@ -431,9 +431,9 @@ docs-check は baseline 運用（IR-055）と path exemption（`IR055_EXEMPT_PAT
 | イベント | catalog 側の処理 | 実装側の処理 |
 |---|---|---|
 | 整合性ルール削除 | 該当 IR エントリを catalog から物理削除（AG-008、REQ-028-008）。交叉参照は `responsibilities/req-impact-map.md` の Retired cross-references 節へ再配置する | 実装も削除 |
-| 実装削除 | 該当 IR エントリを catalog から物理削除。実装のみ残置は8項目存在条件（REQ-028-001）違反のため認めない | - |
-| 実装復活 | 復活時は新規 IR 登録 gate（REQ-028-012）を再適用する | - |
-| 新規ルール追加 | 新規 IR エントリを追加。新規 IR 登録 gate（REQ-028-012 (a)/(b)）を必須とする | 実装追加 |
+| 実装削除 | 該当 IR エントリを catalog から物理削除。実装のみ残置は8項目存在条件（retired REQ-028-001）違反のため認めない | - |
+| 実装復活 | 復活時は新規 IR 登録 gate（retired REQ-028-012 由来）を再適用する | - |
+| 新規ルール追加 | 新規 IR エントリを追加。新規 IR 登録 gate（retired REQ-028-012 由来 (a)/(b)）を必須とする | 実装追加 |
 
 docs-check 項目役割範囲（バックエンド対象 vs skill 定義対象）、対象ファイル設計（`.md` のみ、正当使用例外）、NG ルール間依存関係マップの詳細は [integrity-rule-catalog.md](integrity-rule-catalog.md) 参照。
 

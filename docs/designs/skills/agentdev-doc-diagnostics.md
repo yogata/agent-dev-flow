@@ -55,7 +55,7 @@ REQ 固有診断（`agentdev-req-structure-diagnostics`）、文意品質（`age
 
 ### 観点レジストリ
 
-inspect-docs の診断観点は正規の観点レジストリが所有する（REQ-028-014）。
+inspect-docs の診断観点は正規の観点レジストリが所有する（retired REQ-028-014 由来、現在は本 Design の references 配下レジストリが所有）。
 
 - **配置先**: `docs/designs/skills/agentdev-doc-diagnostics/references/perspective-registry.md`（本 Design の references 配下）
 - **schema**: 各観点エントリは観点ID（一意）、診断カテゴリ（SPLIT、MERGE、MOVE、DUPLICATE、RETIRE、DRIFT、残余参照、境界違反等）、適用文書種別、正規所有者 skill、詳細参照の項目を持つ

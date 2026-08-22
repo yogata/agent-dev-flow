@@ -19,7 +19,7 @@ last-write-wins 競合防止は case-close の単一書き手で維持される�
 
 ## project extensions
 
-本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-case-close`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-case-close.yaml`、kind: workflow-extension）を読み込む（ADR）。
+本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-case-close`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-case-close.yaml`、kind: workflow-extension）を読み込む。
 extension の5セクション（`context` / `rules` / `checks` / `acceptance_gates` / `must_not`）は標準動作に追加・拡張される（上書きではない）。
 存在しない場合は標準動作で続行し、破損時はエラー表示して当該 extension を無視し標準動作で続行する。
 詳細な読み込み契約は `agentdev-project-extensions` skill 参照

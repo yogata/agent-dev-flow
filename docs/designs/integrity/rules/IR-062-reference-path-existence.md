@@ -39,7 +39,7 @@ strict（参照切れは broken-reference として即時修正対象）
 | category | broken-reference |
 | detection_method | `checkScriptTemplateReferencePaths`（check_integrity.ts）によるパス抽出と存在確認 |
 | affected_artifacts | [commands, skills, templates, scripts, references] |
-| related_req | [REQ-028-012, REQ-010] |
+| related_req | [REQ-010] |
 | related_design | [integrity-contracts.md, agentdev-skill-authoring.md, agentdev-command-authoring.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 低。CJK 句読点隣接はパスセグメント正規表現で終端する。reference ファイルの他 skill 資産への正当な裸パス言及は文脈解決で対象外とする |
@@ -48,9 +48,9 @@ strict（参照切れは broken-reference として即時修正対象）
 | triage_action | 参照先実ファイルを作成する、または参照パスを修正する |
 | last_verified | 2026-08-16 |
 
-## 8項目存在条件の充足（REQ-028-012 (a)、IR 存在資格 gate）
+## 8項目存在条件の充足（retired REQ-028-012 由来 (a)、IR 存在資格 gate）
 
-1. canonical basis: REQ-028-012、`agentdev-skill-authoring.md`/`agentdev-command-authoring.md` の検証観点（参照先実ファイル存在確認）
+1. canonical basis: REQ-010、`agentdev-skill-authoring.md`/`agentdev-command-authoring.md` の検証観点（参照先実ファイル存在確認。旧 REQ-028-012 は retired）
 2. invariant: skill/command reference のパス参照は実ファイルを指す
 3. executable detector: `checkScriptTemplateReferencePaths`（check_integrity.ts。他検出との共有 detector）
 4. regression test: `check_reference_paths.test.ts`（正常/異常 fixture を同一ケースで保持）
@@ -76,4 +76,4 @@ strict（参照切れは broken-reference として即時修正対象）
 - 検出器: `.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts`（`checkScriptTemplateReferencePaths`）
 - 回帰テスト: `.opencode/skills/repo-agentdev-integrity/scripts/check_reference_paths.test.ts`
 - 実体化テンプレート: `src/opencode/skills/agentdev-workflow-templates/templates/case-open/`（standard.md、epic.md、multi-req-epic.md）
-- 関連 REQ: REQ-028-012（新規 IR 登録 gate）、REQ-010（docs-check）
+- 関連 REQ: REQ-010（docs-check）。旧 REQ-028-012（新規 IR 登録 gate、retired）

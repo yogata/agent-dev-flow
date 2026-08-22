@@ -11,8 +11,6 @@ context:
     paths:
       - docs/designs/foundations/patterns.md
     purpose: frontmatter、ID 体系、命名規則の確認
-  - id: discovery-1
-    purpose: "docs/DOC-MAP.md 経由で Design 配置先候補を探索してよい"
   - id: discovery-2
     purpose: docs/designs/README.md 経由で Design status 表と既存 Design 一覧を参照してよい
   - id: discovery-3

@@ -546,7 +546,7 @@ agent-dev-flow リポジトリの docs/designs/ 直下の基盤Designは、既�
 ### 整合性ルールの局所物理分離
 
 integrity-rule-catalog.md の個別ルール（IR-NNN）は integrity/rules/ サブディレクトリに分離する（REQ-001-008, v2:REQ-0155-007）。
-integrity-rule-catalog.md はスキーマ定義とルールインデックスを維持し、各ルールの12フィールド詳細は integrity/rules/IR-NNN-{slug}.md に配置する（DEC-013 適用: `lifecycle_state`、`enforcement_mode`、`baseline_status` 削除、REQ-028-009/010）。
+integrity-rule-catalog.md はスキーマ定義とルールインデックスを維持し、各ルールの12フィールド詳細は integrity/rules/IR-NNN-{slug}.md に配置する（DEC-013 適用: `lifecycle_state`、`enforcement_mode`、`baseline_status` 削除、retired REQ-028-009/010 から移管）。
 
 ### Design 健全性メトリクス
 

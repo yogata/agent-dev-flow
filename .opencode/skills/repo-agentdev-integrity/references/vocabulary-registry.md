@@ -96,15 +96,12 @@ IR-050・IR-051 の対象 skill 名（`agentdev-*` プレフィックス形式�
 
 | スキル名 | 備考 |
 |----------|------|
-| `agentdev-adr-file-manager` | ADR ファイル管理 |
-| `agentdev-adr-guidelines` | ADR ガイドライン |
 | `agentdev-architecture-advisory` | アーキテクチャ助言（req-define 事前確認） |
 | `agentdev-backlog-integration` | backlog 統合 |
 | `agentdev-case-run-execution-adapter` | case-run 外部実行アダプター |
 | `agentdev-command-authoring` | command 作成支援 |
 | `agentdev-command-creator` | command 生成 |
 | `agentdev-conventional-commits` | conventional commits 規約 |
-| `agentdev-doc-map` | DOC-MAP 管理 |
 | `agentdev-doc-writing` | 文書執筆品質 |
 | `agentdev-epic-tracker` | Epic 状態追跡 |
 | `agentdev-gh-cli` | gh CLI 操作 |
@@ -129,6 +126,9 @@ IR-050・IR-051 の対象 skill 名（`agentdev-*` プレフィックス形式�
 
 | 旧語彙 | 現行語彙 | 備考 |
 |--------|----------|------|
+| `agentdev-adr-file-manager` | `agentdev-decision-file-manager` | 廃止済み skill（DEC-009 決定14、IR-021 検出語彙） |
+| `agentdev-adr-guidelines` | `agentdev-decision-guidelines` | 廃止済み skill（DEC-009 決定14、IR-021 検出語彙） |
+| `agentdev-doc-map` | （後継 skill なし、`docs/designs/README.md` 索引へ移行） | 廃止済み skill（REQ-013、IR-021 検出語彙） |
 | `issue-lifecycle` | `agentdev-workflow-lifecycle` | 旧 skill name |
 | `issue-template-manager` | `agentdev-workflow-templates` | 旧 skill name |
 | `tips-pipeline-orchestration` | `agentdev-workflow-orchestration` | 旧 skill name |

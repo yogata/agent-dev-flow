@@ -92,11 +92,11 @@ em-dash（`—`、`―`）は japanese-tech-writing L17 に従い、同格、補
 | integrity-contracts Design「Workflow × 使用ツールマトリックス」 | 7 | 意図的マトリックス表記 | 恒久維持 |
 | inspect-promote Design（`--auto` opt-in 発動表） | 2 | N/A プレースホルダ | 置換対象（残存） |
 | project-extensions Design（extension 状態分類表の備考列） | 1 | N/A プレースホルダ | 置換対象（残存） |
-| agentdev-artifact-graph SKILL.md（問い合わせプロファイル表の探索方向列） | 1 | N/A プレースホルダ | 置換対象（残存） |
+| 旧 agentdev-artifact-graph SKILL.md（問い合わせプロファイル表の探索方向列。当該スキルは廃止済み） | 1 | N/A プレースホルダ | 解消済み（スキル実体の廃止に伴い解消） |
 | document-type-responsibilities Design、本ファイルのパターン説明行 | - | 適用除外（パターン説明文脈） | 維持 |
 
-置換対象（残存）4 セルの是正は本ルールの適用段階で実施する（規則確定と是正実施の分離）。
-src/opencode 側 1 セル（agentdev-artifact-graph）は機械是正 PR #2154 の merge 後に導入されたものであり、導入時検証での検出漏れを示す事例として扱う。
+置換対象（残存）3 セルの是正は本ルールの適用段階で実施する（規則確定と是正実施の分離）。
+旧 src/opencode 側 1 セル（旧 `agentdev-artifact-graph` スキル）は機械是正 PR #2154 の merge 後に導入されたものであり、導入時検証での検出漏れを示す事例として扱う（当該スキルの廃止に伴い解消済み）。
 
 ### 置換手順
 

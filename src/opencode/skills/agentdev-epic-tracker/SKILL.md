@@ -20,7 +20,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ## skill extension 参照方針
 
-本スキルは以下の方針に従う（ADR）。
+本スキルは以下の方針に従う。
 
 1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）のみを前提とし、`docs/designs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
 2. **extension の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill extension（`.agentdev/extensions/skills/agentdev-epic-tracker.yaml`）を読む。skill extension はスキル単位で1ファイルに集約し、reference ごとの extension は作らない
@@ -41,7 +41,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ## 常に守る不変条件
 
-- **単一書き手**: Epic Issue 本文のステータス追跡テーブルは case-close(#epic) のみが書き込む（ADR）。case-run(#epic)、case-auto は書き込まない
+- **単一書き手**: Epic Issue 本文のステータス追跡テーブルは case-close(#epic) のみが書き込む。case-run(#epic)、case-auto は書き込まない
 - **永続状態に書き込むステータス値**: `pending`/ `completed`/ `blocked`/ `failed` のみ。`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文には書き込まれない
 - **べき等性**: 既に `completed`/ `blocked`/ `failed` の行は更新対象外（スキップ）。case-close は確定済み終了状態を上書きしない
 - **一括更新順序**: 複数子Issueの一括更新時は子Issue番号の昇順

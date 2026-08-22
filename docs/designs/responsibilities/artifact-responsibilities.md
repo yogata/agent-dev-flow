@@ -53,13 +53,13 @@ REQ-003-033「責務ごとに最も安定した最小の定義元を正規とす
 | `agentdev-req-file-manager` | REQ 作成、APPEND、UPDATE、REQ 番号採番、要件行 ID 採番、REQ 固有整合性確認、REQ 固有 script 呼出契約 | Decision 操作、Design 操作、内容推論、ファイル編集を実行しない（所有者の案内のみ） |
 | `agentdev-decision-file-manager` | Decision 作成、APPEND、UPDATE、Decision 番号採番、Decision 固有整合性確認、Decision 固有 script 呼出契約 | REQ 操作、Design 操作、内容推論 |
 | `agentdev-design-file-manager` | Design 作成、更新、配置先判断、target_area による更新判断、Design ライフサイクル規則の適用と整合性確認、Design 固有 script の選択と呼出契約 | REQ 操作、Decision 操作、Design 内容の新規推論、accepted 昇格判断（case-close 責務、v2:ADR-0123 / REQ-001-024 準拠）、ユーザー承認、commit、push、共通 script の重複実行 |
-| `agentdev-doc-diagnostics` | docs 横断診断カテゴリ、共通証拠構造、共通 finding 出力契約、文書種別別診断へのルーティング | 診断対象の修正、promote 判断、REQ/Design/RU 保存、commit、push、Issue/PR 操作、REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断（`agentdev-req-structure-diagnostics`）、文意品質診断（`agentdev-doc-writing`）、探索順（`agentdev-doc-map`） |
+| `agentdev-doc-diagnostics` | docs 横断診断カテゴリ、共通証拠構造、共通 finding 出力契約、文書種別別診断へのルーティング | 診断対象の修正、promote 判断、REQ/Design/RU 保存、commit、push、Issue/PR 操作、REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断（`agentdev-req-structure-diagnostics`）、文意品質診断（`agentdev-doc-writing`）、探索順（`docs/designs/README.md` 索引） |
 | `agentdev-artifact-validation` | 文書種別横断の決定的検証 script、共有 lib、公開検証契約、JSON 結果契約（`check-frontmatter-consistency`、`check-entry-existence`、`check-change-impact` とそれらが利用する共有 lib、対応 test） | REQ/Decision/Design 固有の内容判断、ファイル編集、保存、ユーザー承認、commit、push、REQ 番号/Decision 番号/要件行 ID の採番、target_area の検索 |
 
 **重複なし確認**:
 
 - `agentdev-design-file-manager` は `agentdev-req-file-manager`（REQ 操作）、`agentdev-decision-file-manager`（Decision 操作）と責務重複しない（Design 操作のみを所有）
-- `agentdev-doc-diagnostics` は `agentdev-doc-writing`（文意品質）、`agentdev-doc-map`（探索順）、`agentdev-req-structure-diagnostics`（REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）と責務重複しない（横断編成と結果統合のみを所有）
+- `agentdev-doc-diagnostics` は `agentdev-doc-writing`（文意品質）、`docs/designs/README.md` 索引（探索順）、`agentdev-req-structure-diagnostics`（REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）と責務重複しない（横断編成と結果統合のみを所有）
 - `agentdev-artifact-validation` は内容判断、編集、保存を行わず、利用側（`agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-design-file-manager`、各 command）は公開検証契約のみへ依存する
 
 ## 責務境界原則
