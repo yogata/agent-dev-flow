@@ -72,6 +72,6 @@ OpenCode 内部構造（永続データの物理形式）への依存を配布�
 | 確認対象 | 結果 |
 |---|---|
 | 既存 Issue #2400（識別情報セクション導入前に起票） | 実行識別情報セクションなし。既存 Issue への遡及適用を行わない方針どおり。旧形式は自由文のみで、機械対応付けの対象外 |
-| 本 PR（導入後最初の新規作成 PR） | 実行識別情報セクションあり。`execution_ident_contract.test.ts` の `extractExecutionIdent` により全 key の機械復元を確認。対応付け率の分子となる新形式実行の実例 |
+| 本 PR #2405（導入後最初の新規作成 PR） | 実行識別情報セクションあり。`execution_ident_contract.test.ts` の `extractExecutionIdent` により全 key の機械復元を確認（PR 本文読み戻しに対して実施、`adf_pr` は作成後埋め戻しで確定）。対応付け率の分子となる新形式実行の実例 |
 | 委譲識別情報ブロック | 本実行の委譲は導入前形式で起動されたためブロックを含まない。PR 本文の `adf_delegation` に導入後形式で付番した値を記録し、以後の委譲からブロック付きで発行する |
 | 契約テスト | `bun test ./.opencode/skills/repo-agentdev-integrity/scripts/execution_ident_contract.test.ts` 50 pass（テンプレート構造、必須 key、harness 非必須化、欠落時非停止、既存必須セクションの残存を検証） |
