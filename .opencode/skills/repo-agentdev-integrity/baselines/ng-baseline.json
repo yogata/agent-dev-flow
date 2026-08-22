@@ -1,7 +1,7 @@
 {
   "version": 1,
   "rule_id": "NG-BASELINE",
-  "generated_at": "2026-08-15",
+  "generated_at": "2026-08-22",
   "entries": [
     {
       "category": "ADR",
@@ -236,6 +236,1266 @@
       "count": 1,
       "provenance": "proposed-decision-citation",
       "reason": "proposed-decision-citation: proposed Decision DEC-008 を根拠として引用する意図的な記述。Decision の accepted 昇格または SPEC 再構成（OU-009）で解消するまでの承認（Issue #2136 NG21 外 warning 分類）"
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/backlog-review.md",
+      "evidence": "gap:G03",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/backlog-review.md",
+      "evidence": "gap:G05",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/backlog-review.md",
+      "evidence": "gap:G07",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "start-number:G02",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G03",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G04",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G06",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G07",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G08",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G09",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G10",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G11",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G12",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G13",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G14",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G15",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G17",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G18",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G19",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G20",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G21",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G22",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G23",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G24",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G25",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G26",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G27",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G28",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G29",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G30",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G31",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "evidence": "gap:G32",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "evidence": "gap:G02",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "evidence": "gap:G03",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "evidence": "gap:G05",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "evidence": "gap:G06",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "evidence": "gap:G07",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "evidence": "gap:G09",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "evidence": "gap:G10",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "evidence": "gap:G11",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "evidence": "gap:G13",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "evidence": "gap:G14",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "evidence": "gap:G15",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "evidence": "gap:G16",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "evidence": "gap:G18",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "evidence": "gap:G19",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "evidence": "gap:G20",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "evidence": "gap:G22",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "evidence": "gap:G23",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "evidence": "gap:G25",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "evidence": "gap:G26",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-open.md",
+      "evidence": "start-number:G23",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-open.md",
+      "evidence": "gap:G24",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "start-number:G02",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G03",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G05",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G06",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G07",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G08",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G09",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G10",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G11",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G12",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G13",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G14",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G16",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G17",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G18",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G19",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G20",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G21",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G22",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G23",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G25",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G26",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G27",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G28",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G29",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G31",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "evidence": "gap:G32",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/case-update.md",
+      "evidence": "start-number:G08",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/design-save.md",
+      "evidence": "start-number:G02",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/design-save.md",
+      "evidence": "gap:G03",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/design-save.md",
+      "evidence": "gap:G04",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/design-save.md",
+      "evidence": "gap:G05",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/design-save.md",
+      "evidence": "gap:G07",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/design-save.md",
+      "evidence": "gap:G08",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/design-save.md",
+      "evidence": "gap:G09",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/design-save.md",
+      "evidence": "gap:G10",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/design-save.md",
+      "evidence": "gap:G11",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/inspect-promote.md",
+      "evidence": "gap:G03",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/inspect-promote.md",
+      "evidence": "gap:G04",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/inspect-promote.md",
+      "evidence": "gap:G05",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-capture.md",
+      "evidence": "gap:G02",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-capture.md",
+      "evidence": "gap:G04",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-capture.md",
+      "evidence": "gap:G05",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-capture.md",
+      "evidence": "gap:G06",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-capture.md",
+      "evidence": "gap:G07",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-capture.md",
+      "evidence": "gap:G08",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-capture.md",
+      "evidence": "gap:G09",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-capture.md",
+      "evidence": "gap:G10",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-capture.md",
+      "evidence": "gap:G11",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-from-github.md",
+      "evidence": "gap:G02",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-from-github.md",
+      "evidence": "gap:G03",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-from-github.md",
+      "evidence": "gap:G05",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-from-github.md",
+      "evidence": "gap:G06",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-from-github.md",
+      "evidence": "gap:G07",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-from-github.md",
+      "evidence": "gap:G08",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-from-github.md",
+      "evidence": "gap:G10",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-from-github.md",
+      "evidence": "gap:G11",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-promote.md",
+      "evidence": "gap:G02",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-promote.md",
+      "evidence": "gap:G03",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-promote.md",
+      "evidence": "gap:G04",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-promote.md",
+      "evidence": "gap:G05",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-promote.md",
+      "evidence": "gap:G07",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-promote.md",
+      "evidence": "gap:G09",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-promote.md",
+      "evidence": "gap:G10",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-promote.md",
+      "evidence": "gap:G11",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-promote.md",
+      "evidence": "gap:G13",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-promote.md",
+      "evidence": "gap:G14",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-promote.md",
+      "evidence": "gap:G15",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/intake-promote.md",
+      "evidence": "gap:G17",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/learning-promote.md",
+      "evidence": "gap:G02",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/learning-promote.md",
+      "evidence": "gap:G03",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/learning-promote.md",
+      "evidence": "gap:G04",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/learning-promote.md",
+      "evidence": "gap:G05",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/learning-promote.md",
+      "evidence": "gap:G08",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/req-define.md",
+      "evidence": "start-number:G03",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/req-define.md",
+      "evidence": "gap:G05",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/req-define.md",
+      "evidence": "gap:G06",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/req-define.md",
+      "evidence": "gap:G07",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/req-save.md",
+      "evidence": "start-number:G02",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/req-save.md",
+      "evidence": "gap:G03",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/req-save.md",
+      "evidence": "gap:G04",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/req-save.md",
+      "evidence": "gap:G05",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/req-save.md",
+      "evidence": "gap:G06",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/req-save.md",
+      "evidence": "gap:G07",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/req-save.md",
+      "evidence": "gap:G08",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/req-save.md",
+      "evidence": "gap:G09",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
+    },
+    {
+      "category": "GuardrailNumber",
+      "check": "guardrail-number-invariant",
+      "file": "src/opencode/commands/agentdev/req-save.md",
+      "evidence": "gap:G10",
+      "count": 1,
+      "provenance": "issue-2372-ir063-initial-baseline",
+      "reason": "REQ-010-064 (IR-063) detection rollout: pre-existing violations recorded in Wave 1 audit F-009 / Wave 2 NORMALIZATION-REQ-046 section 4 (14 commands with non-G01 start or gaps; renumbering intentionally not executed while B-01 remains blocked). Resolution follows B-01 Design decision."
     },
     {
       "category": "IndexGenerationConsistency",
@@ -1487,6 +2747,204 @@
       "count": 1,
       "provenance": "legacy",
       "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
+    },
+    {
+      "category": "ObsoleteVocabulary",
+      "check": "obsolete-vocabulary-current-use",
+      "file": ".agentdev/extensions/skills/agentdev-backlog-integration.yaml",
+      "evidence": "req-adr-kind-enumeration:REQ/ADR/",
+      "count": 1,
+      "provenance": "issue-2372-ir065-initial-baseline",
+      "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
+    },
+    {
+      "category": "ObsoleteVocabulary",
+      "check": "obsolete-vocabulary-current-use",
+      "file": ".agentdev/extensions/skills/agentdev-quality-gates.yaml",
+      "evidence": "req-adr-kind-enumeration:REQ/ADR/",
+      "count": 1,
+      "provenance": "issue-2372-ir065-initial-baseline",
+      "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
+    },
+    {
+      "category": "ObsoleteVocabulary",
+      "check": "obsolete-vocabulary-current-use",
+      "file": ".agentdev/extensions/skills/agentdev-req-analysis.yaml",
+      "evidence": "req-adr-kind-enumeration:REQ/ADR/",
+      "count": 1,
+      "provenance": "issue-2372-ir065-initial-baseline",
+      "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
+    },
+    {
+      "category": "ObsoleteVocabulary",
+      "check": "obsolete-vocabulary-current-use",
+      "file": "src/opencode/skills/agentdev-architecture-advisory/SKILL.md",
+      "evidence": "req-adr-kind-enumeration:REQ/ADR/",
+      "count": 3,
+      "provenance": "issue-2372-ir065-initial-baseline",
+      "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
+    },
+    {
+      "category": "ObsoleteVocabulary",
+      "check": "obsolete-vocabulary-current-use",
+      "file": "src/opencode/skills/agentdev-artifact-validation/SKILL.md",
+      "evidence": "req-adr-kind-enumeration:REQ/ADR/",
+      "count": 1,
+      "provenance": "issue-2372-ir065-initial-baseline",
+      "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
+    },
+    {
+      "category": "ObsoleteVocabulary",
+      "check": "obsolete-vocabulary-current-use",
+      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
+      "evidence": "req-adr-kind-enumeration:REQ/ADR/",
+      "count": 1,
+      "provenance": "issue-2372-ir065-initial-baseline",
+      "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
+    },
+    {
+      "category": "ObsoleteVocabulary",
+      "check": "obsolete-vocabulary-current-use",
+      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/references/adversarial-review-integration.md",
+      "evidence": "req-adr-kind-enumeration:REQ/ADR/",
+      "count": 4,
+      "provenance": "issue-2372-ir065-initial-baseline",
+      "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
+    },
+    {
+      "category": "ObsoleteVocabulary",
+      "check": "obsolete-vocabulary-current-use",
+      "file": "src/opencode/skills/agentdev-doc-diagnostics/SKILL.md",
+      "evidence": "req-adr-kind-enumeration:REQ/ADR/",
+      "count": 1,
+      "provenance": "issue-2372-ir065-initial-baseline",
+      "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
+    },
+    {
+      "category": "ObsoleteVocabulary",
+      "check": "obsolete-vocabulary-current-use",
+      "file": "src/opencode/skills/agentdev-doc-diagnostics/references/diagnostic-categories.md",
+      "evidence": "req-adr-kind-enumeration:REQ/ADR/",
+      "count": 2,
+      "provenance": "issue-2372-ir065-initial-baseline",
+      "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
+    },
+    {
+      "category": "ObsoleteVocabulary",
+      "check": "obsolete-vocabulary-current-use",
+      "file": "src/opencode/skills/agentdev-doc-diagnostics/references/diagnostic-routing.md",
+      "evidence": "req-adr-kind-enumeration:REQ/ADR/",
+      "count": 1,
+      "provenance": "issue-2372-ir065-initial-baseline",
+      "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
+    },
+    {
+      "category": "ObsoleteVocabulary",
+      "check": "obsolete-vocabulary-current-use",
+      "file": "src/opencode/skills/agentdev-doc-writing/SKILL.md",
+      "evidence": "req-adr-kind-enumeration:REQ/ADR/",
+      "count": 3,
+      "provenance": "issue-2372-ir065-initial-baseline",
+      "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
+    },
+    {
+      "category": "ObsoleteVocabulary",
+      "check": "obsolete-vocabulary-current-use",
+      "file": "src/opencode/skills/agentdev-doc-writing/references/document-boundaries.md",
+      "evidence": "req-adr-kind-enumeration:REQ/ADR/",
+      "count": 2,
+      "provenance": "issue-2372-ir065-initial-baseline",
+      "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
+    },
+    {
+      "category": "ObsoleteVocabulary",
+      "check": "obsolete-vocabulary-current-use",
+      "file": "src/opencode/skills/agentdev-doc-writing/references/mechanical-replacement-rules.md",
+      "evidence": "req-adr-kind-enumeration:REQ/ADR/",
+      "count": 1,
+      "provenance": "issue-2372-ir065-initial-baseline",
+      "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
+    },
+    {
+      "category": "ObsoleteVocabulary",
+      "check": "obsolete-vocabulary-current-use",
+      "file": "src/opencode/skills/agentdev-doc-writing/references/rewrite-patterns.md",
+      "evidence": "req-adr-kind-enumeration:REQ/ADR/",
+      "count": 1,
+      "provenance": "issue-2372-ir065-initial-baseline",
+      "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
+    },
+    {
+      "category": "ObsoleteVocabulary",
+      "check": "obsolete-vocabulary-current-use",
+      "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
+      "evidence": "req-adr-kind-enumeration:REQ/ADR/",
+      "count": 1,
+      "provenance": "issue-2372-ir065-initial-baseline",
+      "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
+    },
+    {
+      "category": "ObsoleteVocabulary",
+      "check": "obsolete-vocabulary-current-use",
+      "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
+      "evidence": "req-adr-kind-enumeration:REQ/ADR/",
+      "count": 1,
+      "provenance": "issue-2372-ir065-initial-baseline",
+      "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
+    },
+    {
+      "category": "ObsoleteVocabulary",
+      "check": "obsolete-vocabulary-current-use",
+      "file": "src/opencode/skills/agentdev-learning-pipeline/references/disposition-and-artifact-schema.md",
+      "evidence": "req-adr-kind-enumeration:REQ/ADR/",
+      "count": 1,
+      "provenance": "issue-2372-ir065-initial-baseline",
+      "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
+    },
+    {
+      "category": "ObsoleteVocabulary",
+      "check": "obsolete-vocabulary-current-use",
+      "file": "src/opencode/skills/agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md",
+      "evidence": "req-adr-kind-enumeration:REQ/ADR/",
+      "count": 1,
+      "provenance": "issue-2372-ir065-initial-baseline",
+      "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
+    },
+    {
+      "category": "ObsoleteVocabulary",
+      "check": "obsolete-vocabulary-current-use",
+      "file": "src/opencode/skills/agentdev-req-analysis/references/investigation-scope-refinement.md",
+      "evidence": "req-adr-kind-enumeration:REQ/ADR/",
+      "count": 4,
+      "provenance": "issue-2372-ir065-initial-baseline",
+      "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
+    },
+    {
+      "category": "ObsoleteVocabulary",
+      "check": "obsolete-vocabulary-current-use",
+      "file": "src/opencode/skills/agentdev-req-analysis/references/wall-methodology.md",
+      "evidence": "req-adr-kind-enumeration:REQ/ADR/",
+      "count": 1,
+      "provenance": "issue-2372-ir065-initial-baseline",
+      "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
+    },
+    {
+      "category": "ObsoleteVocabulary",
+      "check": "obsolete-vocabulary-current-use",
+      "file": "src/opencode/skills/agentdev-req-file-manager/references/numbering-and-validation.md",
+      "evidence": "req-adr-kind-enumeration:REQ/ADR/",
+      "count": 1,
+      "provenance": "issue-2372-ir065-initial-baseline",
+      "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
+    },
+    {
+      "category": "ObsoleteVocabulary",
+      "check": "obsolete-vocabulary-current-use",
+      "file": "src/opencode/skills/japanese-tech-writing/SKILL.md",
+      "evidence": "req-adr-kind-enumeration:REQ/ADR/",
+      "count": 1,
+      "provenance": "issue-2372-ir065-initial-baseline",
+      "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
     },
     {
       "category": "RuntimeReference",
@@ -2990,6 +4448,87 @@
       "count": 1,
       "provenance": "v3-migration",
       "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "UnresolvedPlaceholder",
+      "check": "unresolved-placeholder",
+      "file": "src/opencode/skills/agentdev-adversarial-review/SKILL.md",
+      "evidence": "id-placeholder:REQ-{NNNN}",
+      "count": 11,
+      "provenance": "issue-2372-ir064-initial-baseline",
+      "reason": "REQ-010-065 (IR-064) detection rollout: pre-existing bare ID placeholders used consistently as delegation-notation style. Style normalization (backticks or concrete IDs) is a Design candidate recorded in PR #2372; approve or remediate via intake."
+    },
+    {
+      "category": "UnresolvedPlaceholder",
+      "check": "unresolved-placeholder",
+      "file": "src/opencode/skills/agentdev-backlog-integration/SKILL.md",
+      "evidence": "id-placeholder:REQ-{NNNN}",
+      "count": 11,
+      "provenance": "issue-2372-ir064-initial-baseline",
+      "reason": "REQ-010-065 (IR-064) detection rollout: pre-existing bare ID placeholders used consistently as delegation-notation style. Style normalization (backticks or concrete IDs) is a Design candidate recorded in PR #2372; approve or remediate via intake."
+    },
+    {
+      "category": "UnresolvedPlaceholder",
+      "check": "unresolved-placeholder",
+      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
+      "evidence": "id-placeholder:REQ-{NNNN}",
+      "count": 11,
+      "provenance": "issue-2372-ir064-initial-baseline",
+      "reason": "REQ-010-065 (IR-064) detection rollout: pre-existing bare ID placeholders used consistently as delegation-notation style. Style normalization (backticks or concrete IDs) is a Design candidate recorded in PR #2372; approve or remediate via intake."
+    },
+    {
+      "category": "UnresolvedPlaceholder",
+      "check": "unresolved-placeholder",
+      "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
+      "evidence": "id-placeholder:IR-{NNN}",
+      "count": 2,
+      "provenance": "issue-2372-ir064-initial-baseline",
+      "reason": "REQ-010-065 (IR-064) detection rollout: pre-existing bare ID placeholders used consistently as delegation-notation style. Style normalization (backticks or concrete IDs) is a Design candidate recorded in PR #2372; approve or remediate via intake."
+    },
+    {
+      "category": "UnresolvedPlaceholder",
+      "check": "unresolved-placeholder",
+      "file": "src/opencode/skills/agentdev-intake-pipeline/SKILL.md",
+      "evidence": "id-placeholder:REQ-{NNNN}",
+      "count": 4,
+      "provenance": "issue-2372-ir064-initial-baseline",
+      "reason": "REQ-010-065 (IR-064) detection rollout: pre-existing bare ID placeholders used consistently as delegation-notation style. Style normalization (backticks or concrete IDs) is a Design candidate recorded in PR #2372; approve or remediate via intake."
+    },
+    {
+      "category": "UnresolvedPlaceholder",
+      "check": "unresolved-placeholder",
+      "file": "src/opencode/skills/agentdev-req-analysis/references/pass-criteria-writing-guide.md",
+      "evidence": "id-placeholder:REQ-{NNNN}",
+      "count": 5,
+      "provenance": "issue-2372-ir064-initial-baseline",
+      "reason": "REQ-010-065 (IR-064) detection rollout: pre-existing bare ID placeholders used consistently as delegation-notation style. Style normalization (backticks or concrete IDs) is a Design candidate recorded in PR #2372; approve or remediate via intake."
+    },
+    {
+      "category": "UnresolvedPlaceholder",
+      "check": "unresolved-placeholder",
+      "file": "src/opencode/skills/agentdev-req-analysis/references/test-strategy-numeric-threshold-guide.md",
+      "evidence": "id-placeholder:TS-{NNN}",
+      "count": 2,
+      "provenance": "issue-2372-ir064-initial-baseline",
+      "reason": "REQ-010-065 (IR-064) detection rollout: pre-existing bare ID placeholders used consistently as delegation-notation style. Style normalization (backticks or concrete IDs) is a Design candidate recorded in PR #2372; approve or remediate via intake."
+    },
+    {
+      "category": "UnresolvedPlaceholder",
+      "check": "unresolved-placeholder",
+      "file": "src/opencode/skills/agentdev-workflow-case-close/SKILL.md",
+      "evidence": "id-placeholder:IR-{NNN}",
+      "count": 1,
+      "provenance": "issue-2372-ir064-initial-baseline",
+      "reason": "REQ-010-065 (IR-064) detection rollout: pre-existing bare ID placeholders used consistently as delegation-notation style. Style normalization (backticks or concrete IDs) is a Design candidate recorded in PR #2372; approve or remediate via intake."
+    },
+    {
+      "category": "UnresolvedPlaceholder",
+      "check": "unresolved-placeholder",
+      "file": "src/opencode/skills/agentdev-workflow-case-run/SKILL.md",
+      "evidence": "id-placeholder:DEC-{N}",
+      "count": 1,
+      "provenance": "issue-2372-ir064-initial-baseline",
+      "reason": "REQ-010-065 (IR-064) detection rollout: pre-existing bare ID placeholders used consistently as delegation-notation style. Style normalization (backticks or concrete IDs) is a Design candidate recorded in PR #2372; approve or remediate via intake."
     }
   ]
 }

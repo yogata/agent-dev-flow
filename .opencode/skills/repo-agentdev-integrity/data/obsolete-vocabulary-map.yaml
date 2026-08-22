@@ -1,0 +1,126 @@
+# obsolete-vocabulary-map.yaml
+# REQ-010-066 / REQ-010-067 検出語彙の許容条件対照表（IR-065 / IR-066、Issue #2372）
+#
+# 検出シグナル（正規表現）は check_integrity.ts が所有する
+# （REQ-010 適用対象外宣言: 検出シグナルの正規表現、許容条件の判定実装は
+# integrity 関連 Design と checker 実装が所有）。本 yaml は語彙 ID ごとの
+# 運用データ（existence_probe、exemption_files）を宣言する。
+#
+# スキーマ:
+#   scope.include[]            : 走査対象ディレクトリ / ファイル（リポジトリルート相対）
+#   scope.exclude[]            : 走査除外パス接頭辞
+#   exemption_files[]          : {path, reason} 履歴説明として語彙の言及が正当なファイル
+#   negation_context_terms[]   : 行内に含まれる場合に語彙出現を「現行概念としての使用」と
+#                                しない否定文脈語
+#   vocabulary[]               : {id, rule, existence_probe} 検出語彙エントリ
+#     id                       : 語彙 ID（check_integrity.ts の語彙定義と対応）
+#     rule                     : 所有 IR（IR-065=廃止語彙 / IR-066=旧パス・削除済み名称）
+#     existence_probe          : 実在時に検出を skip するパス。probe 先が実在する場合、
+#                                当該語彙は現行機能として存在するため検出対象外とする
+#
+# Wave 1 監査（AUDIT-REQ-045-CONSISTENCY）観点V1/V2/V3/V4/V9、Wave 2 正規化
+# （NORMALIZATION-REQ-046）の再発防止として整備する。
+
+version: 1
+rule_ids:
+  - IR-065
+  - IR-066
+
+scope:
+  include:
+    - docs/designs
+    - docs/requirements
+    - docs/decisions
+    - docs/guides
+    - src/opencode
+    - .opencode/commands
+    - .agentdev/extensions
+  exclude:
+    - docs/requirements/retired/
+    - docs/decisions/retired/
+    - docs/reports/
+    - .opencode/skills/repo-agentdev-integrity/scripts/
+    - .opencode/skills/repo-agentdev-integrity/references/
+    - .opencode/skills/repo-agentdev-integrity/data/
+    - .opencode/skills/repo-agentdev-integrity/baselines/
+    - .opencode/skills/repo-agentdev-integrity/SKILL.md
+    - src/opencode/commands/agentdev/templates/
+
+# 履歴説明として語彙の言及が正当なファイル（検出基盤・正規契約上の言及）。
+# IR-057「例外登録（現行Decisionの履歴記載）」と同根の運用。
+exemption_files:
+  - path: docs/decisions/DEC-009.md
+    reason: "ADR→Decision 移行（1対1移行）の経緯を記載する正規 Decision。ADR-001..008 の旧識別子を移行説明として保持する"
+  - path: docs/decisions/DEC-007.md
+    reason: "superseded Decision（Artifact Graph 標準化と配布スキル昇格）。履歴文書として旧語彙を保持する"
+  - path: docs/decisions/DEC-017.md
+    reason: "Artifact Graph 廃止と最小トレーサビリティモデル採用の Decision。廃止経緯の正規記録"
+  - path: docs/decisions/DEC-019.md
+    reason: "一般処理の標準API委譲の Decision。旧スキルの依存実装（agentdev-artifact-graph）を参照例として記載する"
+  - path: docs/decisions/README.md
+    reason: "Decision 索引。superseded Decision のタイトル引用を含む"
+  - path: docs/designs/README.md
+    reason: "Design 索引・Report 分離規則。旧監査種別（DOC-MAP 監査）の言及が残る履歴文脈（解消要否は別途 intake 判断）"
+
+# 否定文脈許容: 行内にこれらの語がある場合の語彙出現は「現行概念としての使用」としない
+# （廃止機能を「使わないこと」を定める現行契約の記述は検出対象外）。
+negation_context_terms:
+  - 廃止
+  - 含めない
+  - とせず
+  - しないこと
+  - 生成しない
+  - 前提としない
+  - 対象外
+  - 撤去
+  - residual
+
+# 検出語彙エントリ（正規表現は check_integrity.ts の IR065_/IR066_ 定数が所有）
+vocabulary:
+  # --- IR-065（REQ-010-066）: 廃止語彙（種別・呼称・概念語） ---
+  - id: bare-adr-identifier
+    rule: IR-065
+    existence_probe: docs/adr
+  - id: docs-adr-path
+    rule: IR-065
+    existence_probe: docs/adr
+  - id: adr-kind-annotation
+    rule: IR-065
+    existence_probe: docs/adr
+  - id: req-adr-kind-enumeration
+    rule: IR-065
+    existence_probe: docs/adr
+  - id: artifact-graph-name
+    rule: IR-065
+    existence_probe: src/opencode/skills/agentdev-artifact-graph
+  - id: doc-map-name
+    rule: IR-065
+    existence_probe: docs/DOC-MAP.md
+  # --- IR-066（REQ-010-067）: 旧パス・削除済み名称 ---
+  - id: docs-specs-path
+    rule: IR-066
+    existence_probe: docs/specs
+  - id: agentdev-graph-path
+    rule: IR-066
+    existence_probe: .agentdev/graph
+  - id: agentdev-artifact-graph-skill
+    rule: IR-066
+    existence_probe: src/opencode/skills/agentdev-artifact-graph
+  - id: check-graph-script
+    rule: IR-066
+    existence_probe: src/opencode/skills/agentdev-artifact-graph
+  - id: agentdev-spec-compliance-skill
+    rule: IR-066
+    existence_probe: src/opencode/skills/agentdev-spec-compliance
+  - id: agentdev-adr-guidelines-skill
+    rule: IR-066
+    existence_probe: src/opencode/skills/agentdev-adr-guidelines
+  - id: agentdev-adr-file-manager-skill
+    rule: IR-066
+    existence_probe: src/opencode/skills/agentdev-adr-file-manager
+  - id: agentdev-doc-map-skill
+    rule: IR-066
+    existence_probe: src/opencode/skills/agentdev-doc-map
+  - id: agentdev-workflow-reporting-skill
+    rule: IR-066
+    existence_probe: src/opencode/skills/agentdev-workflow-reporting

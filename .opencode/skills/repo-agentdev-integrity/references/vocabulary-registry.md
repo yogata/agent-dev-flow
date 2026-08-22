@@ -314,6 +314,28 @@ exemption: code block 内部、template placeholder（`{xxx}`）、`vocabulary-r
 
 段階導入（REQ-0108-264）: baseline 既知違反は `info`（報告のみ、fail なし）。新規違反は strict→`ng`、heuristic→`warning`（delta guard / impact guard で fail）。baseline ファイル（`.opencode/skills/repo-agentdev-integrity/baselines/ir-055-baseline.json`）は `--update-ir055-baseline` で再生成する。baseline 0 到達後に full audit を fail gate 化する。
 
+## IR-065/IR-066 廃止語彙・旧パス検出対照（REQ-010-066/067）
+
+IR-065（廃止語彙の現行使用検出）と IR-066（旧パス・削除済み名称検出）の検出語彙対照（Issue #2372）。検出シグナル（正規表現）は `check_integrity.ts` が、許容条件の運用データ（existence_probe、exemption_files、否定文脈語）は `data/obsolete-vocabulary-map.yaml` が所有する。詳細は [rules/IR-065-obsolete-vocabulary-current-use.md](../../../docs/designs/integrity/rules/IR-065-obsolete-vocabulary-current-use.md) と [rules/IR-066-legacy-path-removed-name.md](../../../docs/designs/integrity/rules/IR-066-legacy-path-removed-name.md) 参照。
+
+| 旧語彙 | 現行語彙 | IR | 備考 |
+|--------|----------|----|------|
+| bare `ADR-NNN` | `DEC-NNN` / `v2:ADR-NNNN`（歴史識別子） | IR-065 | v2: プレフィックス付きは許容 |
+| `docs/adr/` | `docs/decisions/` | IR-065 | DEC-009 移行済み |
+| `（ADR）` 注記 | （Design 名）等の正規根拠参照、または注記削除 | IR-065 | strict。Wave 2 #2371 で解消済み |
+| `REQ/ADR/` 種別列挙 | `REQ/Decision/` | IR-065 | 既知 34 件は NG baseline 管理 |
+| `Artifact Graph` | 最小トレーサビリティモデル（TIM） | IR-065 | DEC-017 で廃止 |
+| `DOC-MAP` | `docs/designs/README.md` 索引 | IR-065 | REQ-013 廃止済み |
+| `docs/specs/` | `docs/designs/` | IR-066 | ドメイン分割移行済み |
+| `.agentdev/graph/` | 正規成果物の直接走査 | IR-066 | DEC-017 で廃止 |
+| `agentdev-artifact-graph` | `agentdev-traceability` | IR-066 | DEC-017 決定3 |
+| `check_graph` | `agentdev-traceability` の check | IR-066 | 削除済みスクリプト |
+| `agentdev-spec-compliance` | QG-3（`agentdev-quality-gates`） | IR-066 | Wave 2 C-03 で置換済み |
+| `agentdev-adr-guidelines` | `agentdev-decision-guidelines` | IR-066 | DEC-009 決定14 |
+| `agentdev-adr-file-manager` | `agentdev-decision-file-manager` | IR-066 | DEC-009 決定14 |
+| `agentdev-doc-map` | （後継なし、Design 索引へ移行） | IR-066 | REQ-013 廃止済み |
+| `agentdev-workflow-reporting` | （完了報告は各工程の完了報告 template） | IR-066 | 廃止済み skill |
+
 ## メンテナンス
 
 - 新規語彙の追加・旧語彙の変更は docs-check（/repo/docs-check）の検出パターンと同期すること

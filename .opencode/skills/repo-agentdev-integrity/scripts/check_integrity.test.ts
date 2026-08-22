@@ -3170,3 +3170,565 @@ describe("WP-3 execution profiles (Issue #1928)", () => {
     expect(installedNg.length).toBe(0);
   });
 });
+
+// ─── IR-063 guardrail-number-invariant (REQ-010-064, Issue #2372) ────────────
+// Fixture kinds per REQ-010-068: 正常例 (ok-cmd), 違反例 (violation-cmd),
+// 境界例 (boundary-cmd: single G01, defined reference), 許容例 (no-guardrail-cmd:
+// Gxx 未使用 command は対象外), 再現例 (f009-cmd: Wave 1 F-009 の req-define 形式).
+
+const IR063_ROOT = join(TEMP_ROOT, "ir063");
+
+function buildIr063Fixture(root: string): void {
+  const reqDir = join(root, "docs", "requirements");
+  mkdirp(reqDir);
+  writeFileSync(
+    join(reqDir, "README.md"),
+    "# Requirements\n\n| ID | Title |\n|----|-------|\n| REQ-9301 | IR-063 fixture |\n",
+    "utf-8",
+  );
+  writeFileSync(
+    join(reqDir, "REQ-9301.md"),
+    "---\nid: REQ-9301\ntitle: IR-063 fixture\ncreated: 2025-01-01\nupdated: 2025-01-01\n---\n\nBody.\n",
+    "utf-8",
+  );
+  mkdirp(join(root, "docs", "designs"));
+  writeFileSync(join(root, "docs", "designs", "README.md"), "# Design\n", "utf-8");
+
+  const cmdDir = join(root, "src", "opencode", "commands", "agentdev");
+  mkdirp(cmdDir);
+
+  writeFileSync(
+    join(cmdDir, "README.md"),
+    "# Commands\n\n| Command |\n|---------|\n| `agentdev/ok-cmd` |\n",
+    "utf-8",
+  );
+
+  // 正常例: G01 連番 + 定義済み参照
+  writeFileSync(
+    join(cmdDir, "ok-cmd.md"),
+    [
+      "---",
+      "description: ok command",
+      "agent: test-agent",
+      "---",
+      "",
+      "## ガードレール",
+      "",
+      "- G01: 編集スコープは限定する",
+      "- G02: 破壊的操作は行わない",
+      "- G03: レポートのみ出力する",
+      "",
+      "手順は G02 に従う。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 違反例: 非 G01 開始 + 重複 + 未定義参照
+  writeFileSync(
+    join(cmdDir, "violation-cmd.md"),
+    [
+      "---",
+      "description: violation command",
+      "agent: test-agent",
+      "---",
+      "",
+      "## ガードレール",
+      "",
+      "- G01: first guardrail",
+      "- G01: duplicate definition of G01",
+      "- G03: skips G02",
+      "",
+      "本文は G09 を参照する（未定義）。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 境界例: 最小構成（G01 単体）+ 定義行の直前参照
+  writeFileSync(
+    join(cmdDir, "boundary-cmd.md"),
+    [
+      "---",
+      "description: boundary command",
+      "agent: test-agent",
+      "---",
+      "",
+      "## ガードレール",
+      "",
+      "- G01: only guardrail",
+      "",
+      "G01 を適用する。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 許容例: Gxx を使用しない command（検査対象外）
+  writeFileSync(
+    join(cmdDir, "no-guardrail-cmd.md"),
+    [
+      "---",
+      "description: no guardrail command",
+      "agent: test-agent",
+      "---",
+      "",
+      "本文にガードレール番号を持たない。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 再現例: Wave 1 監査 F-009 の req-define.md 形式（G03/G04/G08 = 非 G01 開始 + 欠番）
+  writeFileSync(
+    join(cmdDir, "f009-cmd.md"),
+    [
+      "---",
+      "description: F-009 reproduction",
+      "agent: test-agent",
+      "---",
+      "",
+      "## ガードレール",
+      "",
+      "- G03: 編集スコープは限定する",
+      "- G04: 入力ファイルは参照専用とする",
+      "- G08: git コマンドは実行しない",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  copyScripts(root);
+}
+
+describe("IR-063 guardrail-number-invariant (REQ-010-064, Issue #2372)", () => {
+  beforeAll(() => {
+    mkdirp(IR063_ROOT);
+    buildIr063Fixture(IR063_ROOT);
+  });
+
+  it("passes a sequential G01-start command with resolved references (正常例)", () => {
+    const r = runScript(IR063_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { category: string; level: string; file?: string }) =>
+        res.category === "GuardrailNumber" &&
+        res.level !== "ok" &&
+        (res.file ?? "").includes("ok-cmd.md"),
+    );
+    expect(violations.length).toBe(0);
+  });
+
+  it("detects start-number, duplicate, and undefined-reference violations (違反例)", () => {
+    const r = runScript(IR063_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const byEvidence = parsed.results
+      .filter(
+        (res: { category: string; level: string; file?: string }) =>
+          res.category === "GuardrailNumber" &&
+          res.level === "ng" &&
+          (res.file ?? "").includes("violation-cmd.md"),
+      )
+      .map((res: { evidence?: string }) => res.evidence ?? "");
+    expect(byEvidence).toContain("duplicate:G01");
+    expect(byEvidence).toContain("gap:G02");
+    expect(byEvidence).toContain("undefined-reference:G09");
+  });
+
+  it("accepts a single-G01 minimal command and does not flag Gxx-free commands (境界例・許容例)", () => {
+    const r = runScript(IR063_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { category: string; level: string; file?: string }) =>
+        res.category === "GuardrailNumber" &&
+        res.level === "ng" &&
+        ((res.file ?? "").includes("boundary-cmd.md") ||
+          (res.file ?? "").includes("no-guardrail-cmd.md")),
+    );
+    expect(violations.length).toBe(0);
+  });
+
+  it("reproduces Wave 1 F-009 (non-G01 start and gaps, 再現例)", () => {
+    const r = runScript(IR063_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const byEvidence = parsed.results
+      .filter(
+        (res: { category: string; level: string; file?: string }) =>
+          res.category === "GuardrailNumber" &&
+          res.level === "ng" &&
+          (res.file ?? "").includes("f009-cmd.md"),
+      )
+      .map((res: { evidence?: string }) => res.evidence ?? "");
+    expect(byEvidence).toContain("start-number:G03");
+    expect(byEvidence).toContain("gap:G05");
+    expect(byEvidence).toContain("gap:G07");
+  });
+});
+
+// ─── IR-064 unresolved-placeholder (REQ-010-065, Issue #2372) ────────────────
+// Fixture kinds: 正常例 (ok-skill), 違反例 (violation-skill), 境界例 (boundary
+// lines in ok file), 許容例 (template file), 再現例 (Wave 1 audit viewpoint V5
+// pattern: bare TODO-family marker and bare ID placeholder).
+
+const IR064_ROOT = join(TEMP_ROOT, "ir064");
+
+function buildIr064Fixture(root: string): void {
+  const reqDir = join(root, "docs", "requirements");
+  mkdirp(reqDir);
+  writeFileSync(
+    join(reqDir, "README.md"),
+    "# Requirements\n\n| ID | Title |\n|----|-------|\n| REQ-9302 | IR-064 fixture |\n",
+    "utf-8",
+  );
+  writeFileSync(
+    join(reqDir, "REQ-9302.md"),
+    "---\nid: REQ-9302\ntitle: IR-064 fixture\ncreated: 2025-01-01\nupdated: 2025-01-01\n---\n\nBody.\n",
+    "utf-8",
+  );
+  mkdirp(join(root, "docs", "designs"));
+  writeFileSync(join(root, "docs", "designs", "README.md"), "# Design\n", "utf-8");
+
+  const cmdDir = join(root, "src", "opencode", "commands", "agentdev");
+  mkdirp(cmdDir);
+  writeFileSync(
+    join(cmdDir, "README.md"),
+    "# Commands\n\n| Command |\n|---------|\n| `agentdev/placeholder-cmd` |\n",
+    "utf-8",
+  );
+
+  // 正常例 + 境界例: code span 内・括弧内・「」引用列挙・code block 内は許容
+  writeFileSync(
+    join(cmdDir, "placeholder-cmd.md"),
+    [
+      "---",
+      "description: placeholder boundary command",
+      "agent: test-agent",
+      "---",
+      "",
+      "`REQ-{NNNN}` は code span 内の様式例示である。",
+      "",
+      "本コマンドは workflow 実装本体を委譲する（DEC-{N}、REQ-{NNNN}-{NNN})。",
+      "",
+      "検知キーワード:「TODO」「FIXME」等の列挙は引用例示である。",
+      "",
+      "```",
+      "REQ-{NNNN} inside fenced code block",
+      "TODO inside fenced code block",
+      "```",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  const skillDir = join(root, "src", "opencode", "skills", "agentdev-fixture-skill");
+  mkdirp(skillDir);
+
+  // 違反例 + 再現例: bare TODO マーカー（strict）と裸 ID プレースホルダー（heuristic）
+  writeFileSync(
+    join(skillDir, "SKILL.md"),
+    [
+      "---",
+      "name: agentdev-fixture-skill",
+      "description: fixture skill",
+      "---",
+      "",
+      "# agentdev-fixture-skill",
+      "",
+      "REQ-{NNNN} で定義される対象について、TODO を残さない。",
+      "",
+      "FIXME: 未解決の残置マーカー。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 許容例: command templates/ 配下と _template.md はテンプレート領域
+  const tplDir = join(cmdDir, "templates", "fixture");
+  mkdirp(tplDir);
+  writeFileSync(
+    join(tplDir, "standard.md"),
+    "REQ-{NNNN} と TODO はテンプレート内では許容される。\n",
+    "utf-8",
+  );
+  const skillTplDir = join(root, "src", "opencode", "skills", "agentdev-fixture-skill", "templates");
+  mkdirp(skillTplDir);
+  writeFileSync(
+    join(skillTplDir, "doc.md"),
+    "id: REQ-{NNNN}\n\nREQ-{NNNN} テンプレート。\n",
+    "utf-8",
+  );
+
+  copyScripts(root);
+}
+
+describe("IR-064 unresolved-placeholder (REQ-010-065, Issue #2372)", () => {
+  beforeAll(() => {
+    mkdirp(IR064_ROOT);
+    buildIr064Fixture(IR064_ROOT);
+  });
+
+  it("does not flag code span, parentheses, quote-enumeration, or fenced blocks (正常例・境界例)", () => {
+    const r = runScript(IR064_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { category: string; file?: string }) =>
+        res.category === "UnresolvedPlaceholder" &&
+        (res.file ?? "").includes("placeholder-cmd.md"),
+    );
+    expect(violations.length).toBe(0);
+  });
+
+  it("detects bare TODO-family marker as strict and bare ID placeholder as heuristic (違反例)", () => {
+    const r = runScript(IR064_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const levels = parsed.results
+      .filter(
+        (res: { category: string; file?: string }) =>
+          res.category === "UnresolvedPlaceholder" &&
+          (res.file ?? "").includes("agentdev-fixture-skill"),
+      )
+      .map((res: { level: string; evidence?: string }) => `${res.level}:${res.evidence}`);
+    expect(levels).toContain("ng:todo-marker:FIXME");
+    expect(levels).toContain("warning:id-placeholder:REQ-{NNNN}");
+  });
+
+  it("exempts command templates/ and skill templates/ directories (許容例)", () => {
+    const r = runScript(IR064_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { category: string; file?: string }) =>
+        res.category === "UnresolvedPlaceholder" &&
+        ((res.file ?? "").includes("/templates/") ||
+          (res.file ?? "").includes("\\templates\\")),
+    );
+    expect(violations.length).toBe(0);
+  });
+
+  it("does not treat non-ID brace tokens like UTF-{N} as placeholders (再現例の誤検出防止)", () => {
+    const r = runScript(IR064_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const utf = parsed.results.filter(
+      (res: { category: string; evidence?: string }) =>
+        res.category === "UnresolvedPlaceholder" &&
+        (res.evidence ?? "").includes("UTF"),
+    );
+    expect(utf.length).toBe(0);
+  });
+});
+
+// ─── IR-065/IR-066 obsolete-vocabulary & legacy-path (REQ-010-066/067, Issue #2372) ──
+// Fixture kinds: 正常例 (current vocabulary only), 違反例 (（ADR）注記・bare ADR
+// ・docs/specs/・廃止スキル名), 境界例 (v2:ADR-0123 は REQ-010-066 文言どおり許容),
+// 許容例 (superseded Decision・行履歴マーカー・否定文脈・existence_probe),
+// 再現例 (Wave 2 F-001 （ADR）注記・F-003 agentdev-spec-compliance 参照).
+
+const IR065_ROOT = join(TEMP_ROOT, "ir065");
+
+function buildIr065Fixture(root: string): void {
+  const reqDir = join(root, "docs", "requirements");
+  mkdirp(reqDir);
+  writeFileSync(
+    join(reqDir, "README.md"),
+    "# Requirements\n\n| ID | Title |\n|----|-------|\n| REQ-9303 | IR-065 fixture |\n",
+    "utf-8",
+  );
+  writeFileSync(
+    join(reqDir, "REQ-9303.md"),
+    "---\nid: REQ-9303\ntitle: IR-065 fixture\ncreated: 2025-01-01\nupdated: 2025-01-01\n---\n\nBody.\n",
+    "utf-8",
+  );
+  mkdirp(join(root, "docs", "designs"));
+  writeFileSync(join(root, "docs", "designs", "README.md"), "# Design\n", "utf-8");
+
+  // 正常例 + 境界例: 現行語彙（REQ/Decision/Design）と v2: プレフィックス付き歴史識別子
+  const designDir = join(root, "docs", "designs", "skills");
+  mkdirp(designDir);
+  writeFileSync(
+    join(designDir, "current-design.md"),
+    [
+      "# Current design",
+      "",
+      "REQ/Decision/Design/guides の現行種別列挙である。",
+      "",
+      "許容された歴史的識別子（v2:ADR-0123 等）は誤検出しない。",
+      "",
+      "`ADR-0099` は code span 内の様式例示である。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 許容例: superseded Decision はファイル単位で履歴文書
+  const decDir = join(root, "docs", "decisions");
+  mkdirp(decDir);
+  writeFileSync(
+    join(decDir, "DEC-9901.md"),
+    [
+      "---",
+      "id: DEC-9901",
+      "title: superseded decision",
+      "status: superseded",
+      "---",
+      "",
+      "# DEC-9901",
+      "",
+      "旧 Artifact Graph 標準化の決定。agentdev-artifact-graph への言及を履歴として保持する。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 違反例 + 再現例（F-001/F-003 相当）
+  const cmdDir = join(root, "src", "opencode", "commands", "agentdev");
+  mkdirp(cmdDir);
+  writeFileSync(
+    join(cmdDir, "README.md"),
+    "# Commands\n\n| Command |\n|---------|\n| `agentdev/vocab-cmd` |\n",
+    "utf-8",
+  );
+  writeFileSync(
+    join(cmdDir, "vocab-cmd.md"),
+    [
+      "---",
+      "description: vocabulary violation command",
+      "agent: test-agent",
+      "---",
+      "",
+      "project extension を読み込む（ADR）。",
+      "",
+      "設計判断の記録は ADR-0099 を参照する。",
+      "",
+      "仕様文書は docs/specs/foundations/system.md にある。",
+      "",
+      "乖離報告は agentdev-spec-compliance から抽出する。",
+      "",
+      "判断記録は docs/adr/ 配下のファイルを参照する。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 許容例: 行履歴マーカー・否定文脈
+  writeFileSync(
+    join(designDir, "history-design.md"),
+    [
+      "# History and negation design",
+      "",
+      "旧 ADR-0099 の記述は履歴マーカー付きのため許容される。",
+      "",
+      "`.agentdev/graph/` のような派生索引を標準動作に含めない（廃止）。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 境界例: existence_probe — agentdev-artifact-graph が実在すれば語彙検出を skip
+  const probeSkillDir = join(root, "src", "opencode", "skills", "agentdev-artifact-graph");
+  mkdirp(probeSkillDir);
+  writeFileSync(
+    join(probeSkillDir, "SKILL.md"),
+    "---\nname: agentdev-artifact-graph\ndescription: probe skill\n---\n# agentdev-artifact-graph\n",
+    "utf-8",
+  );
+  writeFileSync(
+    join(designDir, "probe-design.md"),
+    "# Probe design\n\nagentdev-artifact-graph が実在するため検出を skip する（existence_probe）。\n",
+    "utf-8",
+  );
+
+  // IR-065/066 は data/obsolete-vocabulary-map.yaml を読むため fixture へコピー
+  const dataDir = join(
+    root,
+    ".opencode",
+    "skills",
+    "repo-agentdev-integrity",
+    "data",
+  );
+  mkdirp(dataDir);
+  writeFileSync(
+    join(dataDir, "obsolete-vocabulary-map.yaml"),
+    readFileSync(
+      join(SCRIPT_DIR, "..", "data", "obsolete-vocabulary-map.yaml"),
+      "utf-8",
+    ),
+    "utf-8",
+  );
+
+  copyScripts(root);
+}
+
+describe("IR-065/IR-066 obsolete-vocabulary & legacy-path (REQ-010-066/067, Issue #2372)", () => {
+  beforeAll(() => {
+    mkdirp(IR065_ROOT);
+    buildIr065Fixture(IR065_ROOT);
+  });
+
+  it("passes current vocabulary and v2:-prefixed historical identifiers (正常例・境界例)", () => {
+    const r = runScript(IR065_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { category: string; file?: string }) =>
+        (res.category === "ObsoleteVocabulary" || res.category === "LegacyPathName") &&
+        (res.file ?? "").includes("current-design.md"),
+    );
+    expect(violations.length).toBe(0);
+  });
+
+  it("detects (ADR) annotation as strict and legacy identifiers as heuristic (違反例)", () => {
+    const r = runScript(IR065_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const found = parsed.results
+      .filter(
+        (res: { category: string; file?: string }) =>
+          (res.category === "ObsoleteVocabulary" || res.category === "LegacyPathName") &&
+          (res.file ?? "").includes("vocab-cmd.md"),
+      )
+      .map((res: { level: string; evidence?: string }) => `${res.level}:${res.evidence}`);
+    expect(found).toContain("ng:adr-kind-annotation:（ADR）");
+    expect(found).toContain("warning:bare-adr-identifier:ADR-0099");
+    expect(found).toContain("warning:docs-adr-path:docs/adr/");
+    expect(found).toContain("warning:docs-specs-path:docs/specs/");
+    expect(found).toContain("warning:agentdev-spec-compliance-skill:agentdev-spec-compliance");
+  });
+
+  it("exempts superseded decisions, line history markers, and negation contexts (許容例)", () => {
+    const r = runScript(IR065_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { category: string; file?: string }) =>
+        (res.category === "ObsoleteVocabulary" || res.category === "LegacyPathName") &&
+        ((res.file ?? "").includes("DEC-9901.md") ||
+          (res.file ?? "").includes("history-design.md")),
+    );
+    expect(violations.length).toBe(0);
+  });
+
+  it("skips vocabulary whose existence_probe target exists (境界例: existence_probe)", () => {
+    const r = runScript(IR065_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { category: string; file?: string }) =>
+        (res.category === "ObsoleteVocabulary" || res.category === "LegacyPathName") &&
+        (res.file ?? "").includes("probe-design.md"),
+    );
+    expect(violations.length).toBe(0);
+  });
+
+  it("reproduces Wave 2 F-001 ((ADR) annotation) and F-003 (agentdev-spec-compliance) residue (再現例)", () => {
+    const r = runScript(IR065_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const adrAnnotation = parsed.results.filter(
+      (res: { category: string; evidence?: string; level: string }) =>
+        res.category === "ObsoleteVocabulary" &&
+        res.level === "ng" &&
+        res.evidence === "adr-kind-annotation:（ADR）",
+    );
+    expect(adrAnnotation.length).toBeGreaterThanOrEqual(1);
+    const specCompliance = parsed.results.filter(
+      (res: { category: string; evidence?: string }) =>
+        res.category === "LegacyPathName" &&
+        res.evidence === "agentdev-spec-compliance-skill:agentdev-spec-compliance",
+    );
+    expect(specCompliance.length).toBeGreaterThanOrEqual(1);
+  });
+});
