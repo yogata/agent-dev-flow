@@ -1,7 +1,7 @@
 # 工程間構造化文脈引き継ぎ（structured-stage-handoff）
 
 AgentDevFlow の工程間（req-define → req-save → design-save → case-open → case-run → case-close、および上流工程（backlog-review 等）から req-define への接続）で引き継ぐ構造化文脈の、配布物側の直列化形式と生成・消費契約。
-原本仕様は workflow-contracts Design「工程間構造化文脈引き継ぎ契約」である（Design を正とし、本参照は配布物への適用形を定める）。
+原本仕様は `<workflows/workflow-contracts>` Design「工程間構造化文脈引き継ぎ契約」である（Design を正とし、本参照は配布物への適用形を定める）。
 
 ## 目的
 
@@ -59,10 +59,11 @@ structured_context:
 - 引き継ぎ内容は永続的な正規成果物から再構成可能であること。会話記憶に依存する再開を許可しない。
 - 引き継ぎに全文履歴または巨大な計画本文の毎回複製を含めない。
 - 構造化文脈の保存、検証のために新しい成果物種別、実行履歴 DB を新設しない。
-- 本参照は工程間の引き継ぎ形式の所有者であり、委譲時（実行担当サブエージェントへの委譲）の直列化形式を重复して定義しない。
+- 本参照は工程間の引き継ぎ形式の所有者であり、委譲時（実行担当サブエージェントへの委譲）の直列化形式を重複して定義しない。
 
 ## 参照
 
-- workflow-contracts Design「工程間構造化文脈引き継ぎ契約」（原本仕様）
-- `agentdev-case-run-execution-adapter` スキルの委譲プロンプト雛形（委譲時の直列化形式、意味対応 先）
+- `<workflows/workflow-contracts>` Design「工程間構造化文脈引き継ぎ契約」（原本仕様）
+- `<workflows/delegation-contracts>` Design「構造化文脈引き継ぎ（委譲時）の直列化契約」（委譲時の原本仕様）
+- `agentdev-case-run-execution-adapter` スキルの委譲プロンプト雛形（委譲時の直列化形式、意味対応先）
 - 前工程からの引き継ぎ 共通方針（agentdev_handoff、consumer リポジトリの引き継ぎ停止）

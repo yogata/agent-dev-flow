@@ -47,7 +47,7 @@ extension の5セクション（`context` / `rules` / `checks` / `acceptance_gat
 | STEP-S1 フェーズ判定・再開ポイント検出 | Issue 指定あり | 実行モードと再開ポイントの確定 | durable state から再開点が再構成できていること |
 | STEP-S2 Issue 抽出・確認・判定 | フェーズ判定済み | Issue 本文の要件doc・受け入れ基準 | Issue が実行可能状態（要件doc埋め込み済み）であること |
 | STEP-S3 Worktree 作成・ブランチ準備・前置 gate 群 | Issue 判定済み | worktree・ブランチ・前置 gate 合格結果 | QG 前置 staleness check 通過、worktree 隔離が検証済みであること |
-| STEP-S4 実行担当サブエージェント委譲 | 前置 gate 合格 | 委譲 result（4状態） | worktree root（相対パス）を引き渡し、result 契約に従って受領していること。委譲プロンプトが構造化文脈（目的、現在の ADF 工程、現在の実行単位、前工程で確定した事項、未確定事項、正規参照先、停止条件、期待する実行結果、後続工程へ渡すべき成果、計画変更を識別するための情報）を入力内に直列化していること |
+| STEP-S4 実行担当サブエージェント委譲 | 前置 gate 合格 | 委譲 result（4状態） | worktree root（相対パス）を引き渡し、result 契約に従って受領していること。委譲プロンプトが構造化文脈（10意味）を入力内に直列化していること（直列化形式は `agentdev-workflow-case-run` の委譲契約参照） |
 | STEP-S5 result 処理・配布依存境界 最終 gate | result 受領済み | result 処理結果・最終 gate 結果 | `completed-pr` 時は PR 番号・URL を確認、配布物変更を含む場合は最終 gate 通過であること |
 | STEP-S6 worktree クリーンアップ確認・完了報告 | result 処理済み | クリーンアップ確認・完了報告 | worktree 残留がなく、結果状態が報告されていること |
 

@@ -158,7 +158,7 @@ plan_change: なし（委譲中に計画変更が生じた場合は result に�
 ## 構造化文脈の直列化（委譲時）
 
 委譲 prompt は、委譲時最小契約（入力（inputs）、副作用境界（side_effect_boundary）、出力契約（output_contract）、capture 引継ぎ（capture_handoff））の骨格を変更せず、入力（inputs）内に構造化文脈を直列化する。
-原本仕様は delegation-contracts Design「構造化文脈引き継ぎ（委譲時）の直列化契約」であり、本節は配布物への適用形を定める。
+原本仕様は `<workflows/delegation-contracts>` Design「構造化文脈引き継ぎ（委譲時）の直列化契約」であり、本節は配布物への適用形を定める。
 
 構造化文脈は次の意味を扱う。
 
