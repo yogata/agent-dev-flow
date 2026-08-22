@@ -560,3 +560,39 @@
 - **想定反映先**: docs-check の新規検査追加手順、IR ルールファイルの baseline 運用節
 - **関連**: PR 2376、Issue 2372、.opencode/skills/repo-agentdev-integrity/baselines/ng-baseline.json、intake item 2026-08-22-issue2372-ng-baseline-additions-approval.md
 - **タグ**: `#機械検査` `#baseline` `#ng-baseline` `#導入安全化`
+
+---
+
+## 2026-08-22: 検出用データ yaml の「Consumed by」宣言は実装と乖離しやすい（実際に読む消費者の実装同時確定と同期条件併記が予防になる）
+
+- **問題事象**: REQ-047 一方向化（PR 2377）の所有権整理で、command-format-rules.yaml と distribution-targets.yaml の 2 件でヘッダー「Consumed by」宣言が実際の読み手と乖離していた（前者は check_command_format.ts と宣言しつつ未読、後者は check_distribution_boundary.ts と宣言しつつ lib 実装に埋め込まれ yaml は未読）。
+- **発生局面**: 実装（case-run の所有権整理、data yaml ヘッダー突合）
+- **検知方法**: 対象規則ごとの正規契約・派生定義・checker・test の対応整理（rule-ownership 一方向化マトリクス作成時の実読み取り突合）
+- **根本原因**: 宣言的データ yaml の新設時に消費者宣言を意図として記述し、実装の変化（checker が読まない構成への変更等）がヘッダーへ反映されない
+- **自律対応内容**: 2 件の宣言を実態へ訂正し、同期条件を yaml ヘッダーへ併記した。obsolete-vocabulary-map.yaml には checker 定数との drift 検査（obsolete-vocabulary-map-drift）を追加し機械検証した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/Design影響**: なし（REQ-047-003 の同期条件明示として実施）
+- **横展開観点**: 宣言的データ yaml（data/*.yaml）を新設・更新する場面全般
+- **再発条件**: yaml 新設時に消費者を実装と同時に確定せず、意図だけを宣言した場合
+- **予防策候補**: 宣言的データ yaml の新設手順へ「実際に読む消費者の実装同時確定」「ヘッダーへの同期条件併記」を組み込む
+- **想定反映先**: checker 共通実行契約（宣言的データ運用）、新規 data yaml 作成手順
+- **関連**: PR 2377、Issue 2373、data/command-format-rules.yaml、data/distribution-targets.yaml、data/obsolete-vocabulary-map.yaml
+- **タグ**: `#一方向化` `#宣言的データ` `#consumed-by`
+
+---
+
+## 2026-08-22: repo-agentdev-integrity 配下の checker は repo root 起点の起動が前提（scripts ディレクトリを cwd にすると repoRoot 解決誤りで zero-targets fail-closed）
+
+- **問題事象**: REQ-047（PR 2377）の検証で、check_distribution_boundary.ts を scripts ディレクトリを cwd にして起動すると repoRoot 解決が誤り、zero-targets で fail-closed した。worktree root（repo root 相当）起点では正しく走査し failures 0 となった。
+- **発生局面**: 実装（case-run の checker 実行）、検証（bun test は scripts ディレクトリ cwd、checker は repo root 起点という使い分けが実際に発生）
+- **検知方法**: checker の起動 cwd を変えた実行比較
+- **根本原因**: checker の repoRoot 解決が cwd 相対になっており、起動 cwd の前提が checker 共通実行契約に明記されていない
+- **自律対応内容**: repo root 起点で再実行し合格を確認。PR 本文の検証記録に起動前提（repo root 起点が前提）を明記した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/Design影響**: なし
+- **横展開観点**: bun test と checker 実行で cwd 前提が異なる運用全般。checker 起動手順の記載場所（契約文書、SKILL.md、command 定義）
+- **再発条件**: checker を scripts ディレクトリ等、repo root 以外を cwd に起動する場合
+- **予防策候補**: checker 共通実行契約へ起動 cwd 前提（repo root 起点）を明記する
+- **想定反映先**: checker 共通実行契約（integrity 関係 Design）、repo-agentdev-integrity SKILL.md
+- **関連**: PR 2377、Issue 2373
+- **タグ**: `#checker` `#起動cwd` `#fail-closed`
