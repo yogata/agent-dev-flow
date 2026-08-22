@@ -117,7 +117,7 @@ worktree/branch 削除、親Epic 自動クローズ判定、実行前同期、Ca
 
 ##### STEP-6-3-2: 統合先ブランチ同期リスク事前検出・代替同期手順選択
 
-`git pull --ff-only` 直前に、`agentdev-git-worktree` の「git main 同期リスク事前検出プロシージャ」に従い、worktree 状態（dirty tree）・並列実行による ref lock 競合・統合先以外のブランチ占有の3リスク事前検出と代替同期手順選択を実行する。
+`git pull --ff-only` 直前に、`agentdev-git-worktree` の「git 統合先同期リスク事前検出プロシージャ」に従い、worktree 状態（dirty tree）・並列実行による ref lock 競合・統合先以外のブランチ占有の3リスク事前検出と代替同期手順選択を実行する。
 同期対象のブランチは当該 Case の統合先（通常Caseは既定 main、実証Caseは対象評価ブランチ）である。通常Caseの `main` 同期手続きは従来どおりである。
 `agentdev-git-worktree` に従い `git pull --ff-only` を実行（ローカル変更事前チェック、hash 検証、不一致時は評価・承認のやり直し）。
 
@@ -212,7 +212,7 @@ GitHub 完了後に `.agentdev` push 失敗の場合は standard 種別を使用
 ## 関連 Capability Skill
 
 - `agentdev-gh-cli`: Issue 本文更新、Issue close、対応記録コメント VERIFY、子Issue 状態取得
-- `agentdev-git-worktree`: worktree/branch 削除、重複ファイルチェック、git main 同期リスク検出、`git pull --ff-only`、並列実行安全ステージング
+- `agentdev-git-worktree`: worktree/branch 削除、重複ファイルチェック、git 統合先同期リスク検出、`git pull --ff-only`、並列実行安全ステージング
 - `agentdev-epic-tracker`: 親Epic Issue 本文ステータステーブル更新、Epic 自動クローズ判定
 - `agentdev-learning-capture`: 学び検知・抽出（エージェント自律）
 - `agentdev-learning-pipeline`: deferred ルール、採用済み成果物取り込み判定

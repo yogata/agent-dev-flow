@@ -123,6 +123,10 @@ backreference `$N` 対策は「`-replace` 演算子右辺の `$N` を PowerShell
  ```
  [System.IO.File]::WriteAllText(".agentdev/tmp/gh-temp-{timestamp}.md", $content, (New-Object System.Text.UTF8Encoding($false)))
  ```
+ **`.agentdev/tmp/` の事前作成（mkdir 手順例）**: 一時ファイル書き出しの前に `.agentdev/tmp/` が存在しない場合は作成する（`WriteAllText` は親ディレクトリ不在時にエラーとなるため）。
+ - PowerShell: `New-Item -ItemType Directory -Force ".agentdev/tmp"`
+ - Node.js: `require('fs').mkdirSync('.agentdev/tmp', {recursive: true})`
+
  **`.agentdev/tmp/` 配置の理由**: `$env:TEMP/agentdev/`（システム一時ディレクトリ）から `.agentdev/tmp/`（workspace-local）へ変更する。
 workspace 配下へ配置することで worktree 削除時に一時ファイルが確実に破棄され、かつ VERIFY や事後調査が同一 workspace 内で完結する。
  **委譲時の代替一時ファイル配置先**: 実行担当サブエージェント委譲など、worktree 隔離境界により `.agentdev/**` への書き込みが禁止される場面では、一時ファイル配置先をリポジトリ外の一時領域（`$env:TEMP` 配下）に変更する。
