@@ -19,7 +19,7 @@ backlog-auto command の workflow 実装本体。
 - USE FOR: `/agentdev/backlog-auto` コマンド起動時の workflow 制御（工程間順序制御、昇格3系統の並行実行と競合処理の直列化、fan-in 判定、停止伝播、再開）
 - DO NOT USE FOR: 単独起動。子ワークフロー内部の分類、評価、昇格、RU 生成ロジックの所有（各子 Workflow Skill が正規の処理主体）
 
-## 提供する判断・操作
+## 提供する判断、操作
 
 - orchestration stage 構成（stage 1: inspect-docs 単独直列実行、stage 2: 昇格3系統、stage 3: backlog-review）
 - 直列化契約（Git 同期、commit、push、共有成果物への競合書き込み、ユーザー対話の排他）

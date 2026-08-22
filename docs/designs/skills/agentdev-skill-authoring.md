@@ -100,7 +100,8 @@ Skill 層（description の DO NOT USE FOR トリガー）と Command 層（本�
 
 ### 適用対象
 
-全 16 Workflow Skill（agentdev-workflow-*）の description。機械検査は全 Workflow Skill への簡潔トリガー項存在を肯定検証する。
+全 16 Workflow Skill（agentdev-workflow-*）の description。
+機械検査は全 Workflow Skill への簡潔トリガー項存在を肯定検証する。
 
 ## skill 記述基準（層1〜3）
 

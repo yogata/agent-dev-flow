@@ -104,7 +104,7 @@ deterministic checker は malformed を NG として報告してよいが、runt
 | YAML 構文エラー / 必須field欠落 / kind判定以前の破損 | エラー表示 + 当該extension無視 + 標準動作継続 | fail-open（REQ-002-031 準拠） |
 | `kind: command-extension` / `kind: skill-extension`（旧kind） | migration-required + stop | silent ignore しない |
 | 構文上有効だが `kind` が公式3値以外（未知kind） | schema violation + stop | fail-open しない |
-| 有効な新kind | 通常処理 | — |
+| 有効な新kind | 通常処理 | - |
 
 extension missing と legacy extension exists は別状態であり、前者は標準動作継続、後者は migration-required として停止する。
 

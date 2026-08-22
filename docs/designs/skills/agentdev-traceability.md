@@ -10,7 +10,8 @@ updated: "2026-08-21"
 
 ## 目的
 
-標準配布スキル `agentdev-traceability` は、最小 TIM（foundations/traceability-model.md）に基づき、要件と成果物の明示的な対応関係について coverage、impact、check の3能力を提供する。正規成果物を直接走査し、対応関係をその場で解決する（REQ-012、DEC-017。前身機能の廃止と移行の経緯は DEC-017 が記録する）。
+標準配布スキル `agentdev-traceability` は、最小 TIM（foundations/traceability-model.md）に基づき、要件と成果物の明示的な対応関係について coverage、impact、check の3能力を提供する。
+正規成果物を直接走査し、対応関係をその場で解決する（REQ-012、DEC-017。前身機能の廃止と移行の経緯は DEC-017 が記録する）。
 
 ## 適用対象
 
@@ -42,7 +43,8 @@ updated: "2026-08-21"
 
 ### check
 
-次を決定的に検査する。検査結果は項目ごとに pass / fail（欠落種別、対象要件、対象成果物付き）で返す。
+次を決定的に検査する。
+検査結果は項目ごとに pass / fail（欠落種別、対象要件、対象成果物付き）で返す。
 
 - 不正な対応宣言（形式・構文違反）
 - 未知の成果物役割
@@ -52,7 +54,9 @@ updated: "2026-08-21"
 - 検証対応の欠落（検証対応必須の現行要件行で0件。要否区分は検証対応要否カタログ、未登録行は必須）
 - 対応宣言の根拠箇所を取得できない状態（ファイル不在・読取不能）
 
-検証対応の要否区分は最小 TIM（foundations/traceability-model.md）が所有する検証対応要否カタログ（`docs/designs/foundations/references/verification-scope-catalog.md`、`## 任意行エントリ` 節）から解決する。check はカタログを既定パスから自動的に読み込み、範囲表現（同一REQファイル内の `REQ-{NNNN}-{MMM}..REQ-{NNNN}-{MMM}`）を既知要件行へ展開する。カタログが存在しない場合は全現行要件行を検証対応必須として扱う（安全側既定）。
+検証対応の要否区分は最小 TIM（foundations/traceability-model.md）が所有する検証対応要否カタログ（`docs/designs/foundations/references/verification-scope-catalog.md`、`## 任意行エントリ` 節）から解決する。
+check はカタログを既定パスから自動的に読み込み、範囲表現（同一REQファイル内の `REQ-{NNNN}-{MMM}..REQ-{NNNN}-{MMM}`）を既知要件行へ展開する。
+カタログが存在しない場合は全現行要件行を検証対応必須として扱う（安全側既定）。
 
 ## 実装構成
 

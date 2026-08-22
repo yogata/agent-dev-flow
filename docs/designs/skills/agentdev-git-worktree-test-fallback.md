@@ -31,7 +31,8 @@ main 等価再現の手順は次のとおりである。
 - src 側代替経路: `--profile source` 等の実行プロファイルで src/opencode/ 側の資産を直接参照して再実行する
 - 依存再導入: `bun install --cwd` で当該ツリーの node_modules を再設定して再実行する
 
-本手順は ir035 worktree 誤検出、check_extensions の cwd 依存・順序依存・worktree junction 失敗等、6件の反復観測クラスに根拠する。個別是正（checker 実装修正）は本 Design の手順確定とは分離して実施できる。
+本手順は ir035 worktree 誤検出、check_extensions の cwd 依存・順序依存・worktree junction 失敗等、6件の反復観測クラスに根拠する。
+個別是正（checker 実装修正）は本 Design の手順確定とは分離して実施できる。
 
 ## 関連
 
