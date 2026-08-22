@@ -58,7 +58,7 @@ REQ-022・REQ-024 の旧規範内容（augmentation 配置先、check_graph.ts �
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-019 の19件である（DEC-016、DEC-017、DEC-018、DEC-019 は proposed、DEC-005、DEC-007 は superseded）。
+現行 Decision は DEC-001 から DEC-019 の19件である（DEC-018、DEC-019 は proposed、DEC-005、DEC-007 は superseded）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |

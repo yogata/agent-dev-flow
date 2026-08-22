@@ -2,7 +2,7 @@
 title: Workflow Skill Model
 status: draft
 created: 2026-08-10
-updated: 2026-08-16
+updated: 2026-08-22
 ---
 <!-- ADF-COVERS(implementation): REQ-002-001, REQ-002-002, REQ-002-003, REQ-002-004, REQ-002-017, REQ-002-018, REQ-002-034 -->
 <!-- ADF-COVERS(implementation): REQ-027-001, REQ-027-002, REQ-027-003 -->
@@ -217,7 +217,7 @@ DEC-010 Inventory が挙げる新規 Capability Skill 候補。
 本 Design は候補の記録のみを所有し、個別抽出実装は別 Issue が担う。
 新規 Capability Skill は「Capability Skill の判定基準」を満たす場合にのみ作成し、既存 Capability Skill の再利用を優先する。
 
-- test strategy 定義（`req-define` Step 5-6 相当）
+- test strategy 定義（`req-define` STEP-4 相当）
 - EC-2 必須品質統制導出（`case-open` execution contract）
 - EC-6 scope-affecting impact 探索（`case-open` execution contract）
 - コンフリクト Level 1 解消判断（`case-close`）

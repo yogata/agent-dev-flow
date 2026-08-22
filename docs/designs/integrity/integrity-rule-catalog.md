@@ -109,7 +109,7 @@ IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 か
 - [IR-034: Skill 内部 section / protocol / Step 参照検出](rules/IR-034-skill-internal-section-step-reference-detection.md)
 - [IR-035: Skill See Also 検出観点](rules/IR-035-skill-see-also-detection-perspective.md)
 - [IR-037: retired-ADR-current-baseline-ref](rules/IR-037-retired-adr-current-baseline-ref.md)
-- [IR-038: Decision-index-consistency](rules/IR-038-adr-index-consistency.md)
+- [IR-038: Decision-index-consistency](rules/IR-038-decision-index-consistency.md)
 - [IR-039: index-req-title-consistency](rules/IR-039-index-req-title-consistency.md)
 - [IR-040: retired-req-authority-comment](rules/IR-040-retired-req-authority-comment.md)
 - [IR-041: retired-req-broken-link](rules/IR-041-retired-req-broken-link.md)

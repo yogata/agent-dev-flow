@@ -225,7 +225,7 @@ IR は finding-baseline 分類を持たず、finding が生成される時に fi
 | `resolved` | 実修復により現行の finding/baseline 集合から除去された検出事項。baseline 更新で除去される |
 
 baseline 集合の管理は検出器（`check_integrity.ts`、`check_extensions.ts`）が行う。
-各 checker は baseline ファイル（`baselines/ng-baseline.json`、`baselines/ir-055-baseline.json` 等）を持ち、新規検出事項と既知事項を区別する（REQ-010-007、REQ-036-009）。
+各 checker は baseline ファイル（`baselines/ng-baseline.json`、`baselines/ir-055-baseline.json` 等）を持ち、新規検出事項と既知事項を区別する（REQ-010-007）。
 IR 側で baseline を事前登録せず、finding が発生した時点で baseline 比較を行う。
 
 tombstone 群（IR-011 型 file-backed）の `baseline_status: superseded` 表現は AG-008 により物理削除で解消し、file-backed 上の baseline 属性は持たない（retired REQ-028-010）。
@@ -301,7 +301,7 @@ IR-050（load_skills 誤指定検出）、IR-051（実行主体 skill 表記誤�
 IR-051 の「一定文字距離内」は語彙レジストリで確定された具体閾値（文字数、行数）を使用する。
 閾値未確定時は heuristic として報告するが auto-promote 対象外とする。
 
-## reference-path-existence 検出における backtick 囲みパスの扱い（REQ-036-008）
+## reference-path-existence 検出における backtick 囲みパスの扱い（REQ-010-009）
 
 `checkScriptTemplateReferencePaths`（`check_integrity.ts`）は command 定義と SKILL.md から抽出したパス参照（`.opencode/**`、`scripts/*.ts`、`templates/*.md`、`references/*.md`）の実在確認を行う。
 このとき Markdown backtick で囲まれたパス成分はインラインコード修飾（code formatting）と解釈し、パス解決前に backtick を除去する（例: `.opencode/commands/agentdev/templates/case-close/\`agentdev-push-failed\`.md` → `.opencode/commands/agentdev/templates/case-close/agentdev-push-failed.md`）。
@@ -329,7 +329,7 @@ PR #2152（merge 4bf264b7）で実装された検出拡張4点を本節の正規
 
 実装は main 入り済みであり、本節は文面の追従として機能する。
 
-## RuntimeReference baseline 運用手順（REQ-036-009）
+## RuntimeReference baseline 運用手順（REQ-010-007）
 
 IR-055（runtime-unresolved-reference）は段階導入（REQ-010-007）のため、baseline 既知違反と新規違反を区別する。
 baseline は `.opencode/skills/repo-agentdev-integrity/baselines/ir-055-baseline.json` に格納する。
@@ -399,16 +399,16 @@ REQ-028 の RETIRE に伴い、次の恒常契約の移管を受入れる（詳�
 - 検出用の宣言的データ YAML は Design が正となる schema を持ち、YAML は検出用ビューとして扱うこと
 - detector 実装は IR 識別子に基づく命名規約を持ち、IR から detector 実装への機械的逆引きが可能であること
 
-## docs-check delta 検出における除外設定方針（REQ-036-010, REQ-036-003 準拠）
+## docs-check delta 検出における除外設定方針（REQ-010-007, REQ-010-009 準拠）
 
 docs-check は baseline 運用（IR-055）と path exemption（`IR055_EXEMPT_PATH_PATTERNS`）の二系統で検出対象を絞る。
-両者とも「正当な除外」と「NG 隠蔽」を区別して運用する（REQ-036-003）。
+両者とも「正当な除外」と「NG 隠蔽」を区別して運用する（REQ-010-007）。
 
 ### 正当な除外（legitimate exclusions）
 
 | 除外種別 | 対象 | 根拠 |
 |----------|------|------|
-| ルール自己参照 | `vocabulary-registry.md`、`integrity-rule-catalog.md`、`integrity-contracts.md`、`rules/IR-*.md`（全IRルールファイル、REQ-036-003）、`baselines/ir-055-baseline.json` | 検出ルール自体の記述、正規語彙の対照表はルールを説明するためにパターンを列挙する。これを検出するとルール自身が NG となるため自己参照除外とする。個別 IR ルールファイル（`rules/IR-*.md`）は検出ルールの説明文であり、例示用 ID、廃止 skill 例、廃止 ADR 番号帯例示は自己参照的な説明資料であるため、全検出関数（broken-reference, abolished-skill-references, obsolete-spec-path 等）の検出スコープから除外する（REQ-036-003） |
+| ルール自己参照 | `vocabulary-registry.md`、`integrity-rule-catalog.md`、`integrity-contracts.md`、`rules/IR-*.md`（全IRルールファイル、REQ-010-009）、`baselines/ir-055-baseline.json` | 検出ルール自体の記述、正規語彙の対照表はルールを説明するためにパターンを列挙する。これを検出するとルール自身が NG となるため自己参照除外とする。個別 IR ルールファイル（`rules/IR-*.md`）は検出ルールの説明文であり、例示用 ID、廃止 skill 例、廃止 ADR 番号帯例示は自己参照的な説明資料であるため、全検出関数（broken-reference, abolished-skill-references, obsolete-spec-path 等）の検出スコープから除外する（REQ-010-009） |
 | コードブロック内部 | ` ``` ` で囲まれた範囲 | 例示、パターン説明は検出対象外（integrity-rule-catalog.md「対象ファイル設計」準拠） |
 | template placeholder | `{xxx}` 形式のプレースホルダーを含む行 | プレースホルダーは実参照ではない |
 
@@ -428,7 +428,7 @@ docs-check は baseline 運用（IR-055）と path exemption（`IR055_EXEMPT_PAT
 2. 当該パスが履歴参照領域（retired 等）であること
 3. 当該パスが検出原理上の技術的除外であること（テスト fixture 等、検出すると恒久的に false となる場合）
 
-根拠なしの exemption 追加は NG 隠蔽（REQ-036-003 違反）として扱い、レビューで却下する。
+根拠なしの exemption 追加は NG 隠蔽（REQ-010-009 違反）として扱い、レビューで却下する。
 
 ## catalog ↔ 実装双方向同期運用（REQ-010-003/004）
 

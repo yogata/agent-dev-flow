@@ -2,7 +2,7 @@
 title: Epic / Wave / Issue 実行モデル
 status: accepted
 created: 2026-06-21
-updated: 2026-08-19
+updated: 2026-08-22
 ---
 <!-- ADF-COVERS(implementation): REQ-035-001, REQ-035-002, REQ-035-003, REQ-035-004, REQ-035-005, REQ-035-006, REQ-035-007, REQ-035-008, REQ-035-009, REQ-035-010, REQ-035-011, REQ-035-012 -->
 <!-- ADF-COVERS(implementation): REQ-043-026, REQ-043-027 -->
@@ -48,17 +48,17 @@ Issue:
 Epic は常に Wave 構造を持つ。
 依存関係がない場合は Wave 1 に全 Issue をまとめる。
 
-## execution_unit 定義（REQ-006-004）
+## execution_unit 定義（REQ-035-006）
 
 **execution_unit** は case-open が OU 群から生成する実行単位であり、`standard issue` または `epic issue` のいずれかである。
 Wave は execution_unit に含まず、Epic Issue 本文から読み取る内部構造として扱う。
 
 | execution_unit | 内部構造 | 実行契約 |
 |---|---|---|
-| standard issue | 単一 Issue、Wave なし | case-run / case-close が単一 Issue を処理（REQ-006-019, REQ-006-020） |
+| standard issue | 単一 Issue、Wave なし | case-run / case-close が単一 Issue を処理（REQ-031-006） |
 | epic issue | Wave 構造を持つ | case-run(#epic) / case-close(#epic) が Wave 反復で処理 |
 
-case-auto は複数 execution_unit 群を orchestration の対象とする（REQ-006-012）。
+case-auto は複数 execution_unit 群を orchestration の対象とする（REQ-034-018）。
 execution_unit 間の並列可否は連結成分（必須依存のみをエッジとする）で判定する。
 詳細は後述「連結成分ベース execution_unit 構成モデル」セクション参照。
 
@@ -74,7 +74,7 @@ execution_unit 間の並列可否は連結成分（必須依存のみをエッ�
 | `failed` | 実装、検証、CI、PR 作成などの実行結果として失敗した状態 | case-run |
 | `delegation-unavailable` | 実行インフラが委譲を起動できなかった状態。実行が試行されておらず、インフラ修正後に再実行可能 | case-run |
 
-- `skipped` は採用しない（REQ-006-030）。前提未達の Issue は `pending` のまま選択対象外となる。
+- `skipped` は採用しない（REQ-035-004）。前提未達の Issue は `pending` のまま選択対象外となる。
 - Wave 状態は保存しない。Wave 内 Issue 状態から導出する。
 - OU / Epic の状態は進捗集約として扱い、主たる実行状態は Issue 状態とする。
 - `ready` / `running` は case-run(#epic) の内部状態であり、Epic Issue 本文（永続状態）には書き込まれない。永続状態に書き込まれるのは `pending` → `completed` / `blocked` / `failed` / `delegation-unavailable` の遷移のみ（case-close が単一書き手）。
@@ -138,13 +138,13 @@ case-open は要件doc の operation_units を読み取り、以下を自律生�
 ### Wave 構成ルール
 
 - 直列化要因は必須依存のみ。必須依存のない子Issue は同一Wave で並列実行する
-- L2（ファイル衝突）は Wave 分離の理由としない。並列実行を許容し、コンフリクトは rebase で機械的解消する（コンフリクト解消 Level 1、REQ-003-006）
-- 最大5 Issues / 呼び出し（case-run Wave内並列上限、REQ-006-026）。execution_unit 間並列にグローバル上限は適用しない
+- L2（ファイル衝突）は Wave 分離の理由としない。並列実行を許容し、コンフリクトは rebase で機械的解消する（コンフリクト解消 Level 1、REQ-035-009）
+- 最大5 Issues / 呼び出し（case-run Wave内並列上限、REQ-031-015）。execution_unit 間並列にグローバル上限は適用しない
 - specs更新は親エージェントのみ（直列、Issue番号昇順）
 
 ## case-run Epic Wave 実行モデル
 
-case-run が Epic Issue 指定時の横断実行契約（REQ-006-026/027）。
+case-run が Epic Issue 指定時の横断実行契約（REQ-031-015/016）。
 詳細手順は `docs/designs/commands/case-run.md` 参照。
 
 - case-run(#epic) は Epic Issue 本文を読み込む（子Issue 一覧、Wave 構成、各子Issue status、PR 状態）
@@ -158,7 +158,7 @@ case-run(#epic) は Epic Issue 本文を読み取るのみで書き込まない�
 
 ## case-close Epic Wave クローズモデル
 
-case-close が Epic Issue 番号を受領した場合の PR マージ、子Issue クローズプロトコル（REQ-006-021〜023）。
+case-close が Epic Issue 番号を受領した場合の PR マージ、子Issue クローズプロトコル（REQ-032-015〜017）。
 詳細は `docs/designs/commands/case-close.md` 参照。
 
 1. Epic Issue 本文を読み取り、現在 Wave の PR作成済み子Issue を特定する
@@ -168,15 +168,15 @@ case-close が Epic Issue 番号を受領した場合の PR マージ、子Issue
 
 ## Epic 統率者契約（Epic Orchestrator Contract）
 
-scale: large（Epic）の場合、case-auto は Epic Issue に対し case-run(#epic) → case-close(#epic) の反復を実行する（REQ-006-086）。
-複数 execution_unit 並列実行時は、各 execution_unit に相当する Issue または Epic Issue に対し個別に処理する（REQ-006-012）。
+scale: large（Epic）の場合、case-auto は Epic Issue に対し case-run(#epic) → case-close(#epic) の反復を実行する（REQ-034-012）。
+複数 execution_unit 並列実行時は、各 execution_unit に相当する Issue または Epic Issue に対し個別に処理する（REQ-034-018）。
 詳細は `docs/designs/commands/case-auto.md` 参照。
 
 - case-auto: pipeline 制御（req-save→design-save→case-open→case-run→case-close）、execution_unit 群反復制御、OU 逐次処理。case-run は case-auto 内でインライン実行し、実行担当サブエージェントへの委譲を case-auto から直接行う（委譲起点の折りたたみ、多重委譲回避）
 - case-run: Epic Wave 実行時の子Issue 並列委譲、全委譲完了待機、結果収集、Findings / Capture候補件数の集約
 - case-close: Epic Wave クローズ時の PR マージ、子Issue クローズ、Epic Issue 本文ステータス追跡テーブルの単一書き手
 
-**per-Epic 単一書き手（REQ-006-021）**: 複数 execution_unit 並列実行時、Epic Issue 本文の単一書き手は per-Epic-Issue-body で維持される。
+**per-Epic 単一書き手（REQ-035-007）**: 複数 execution_unit 並列実行時、Epic Issue 本文の単一書き手は per-Epic-Issue-body で維持される。
 複数 case-close が並列実行されても、それぞれが書き込む Epic 本文は異なる。
 Epic Issue 1 件あたりの単一書き手制約は維持され、Epic 間で書き込み対象が衝突しない。
 
@@ -192,7 +192,7 @@ Epic Issue 1 件あたりの単一書き手制約は維持され、Epic 間で�
 **親コンテキスト非累積原則**: case-auto は子 Issue の実装詳細、実装過程ログを親コンテキストに保持しない。
 進行状態は永続状態（Issue / PR / `.agentdev/`）から再読込する。
 
-## 連結成分ベース execution_unit 構成モデル（REQ-006）
+## 連結成分ベース execution_unit 構成モデル（REQ-030-007/008）
 
 case-open は OU 群の依存グラフから連結成分（必須依存のみをエッジ）を計算し、各連結成分を出発点として3軸判断（依存強度、Epic サイズ、機能的一貫性）で execution_unit（standard | epic）を構成する。
 
@@ -225,15 +225,15 @@ case-open は OU 群の依存グラフから連結成分（必須依存のみを
 
 ### execution_unit 並列 orchestration
 
-case-auto は case-open が生成した execution_unit 群（standard | epic の混在）を処理対象とする（REQ-006-012）。
-必須依存（連結成分のエッジ）がない複数 execution_unit 間は並列実行できる（REQ-006-014）。
+case-auto は case-open が生成した execution_unit 群（standard | epic の混在）を処理対象とする（REQ-034-018）。
+必須依存（連結成分のエッジ）がない複数 execution_unit 間は並列実行できる（REQ-034-011）。
 
 並列実行の制約:
 
-- 同一 Epic 内の Wave 間は直列（REQ-006-013）
-- execution_unit 間の並列可否は連結成分（必須依存）のみで判定する。技術的依存レベル（L0-L3）は並列判定軸から外し、ファイル衝突（L2）があっても並列を許容する（REQ-006-014）
-- case-auto レベルでのグローバル並列上限は設定しない（REQ-006-018）。case-run 単位の5件上限（REQ-006-026 踏襲）のみを制御対象とする。N 個の execution_unit が並列実行された場合、N×5 件の委譲同時起動リスクを許容する（運用監視対象）
-- PR マージコンフリクト発生時は 3レベルコンフリクト解消モデル（REQ-003）に従う。Level 1 は case-close が rebase による機械的解消を試みる（REQ-006-024、REQ-003-001）。Level 2 は case-auto が両PRのdiffを読み取りコンフリクト文脈を付けて case-run へ再委譲する（最大2回、計3回の case-run 実行、REQ-003-003/004）。Level 3 は case-auto がマージ順序変更、blocked 単位の隔離（REQ-006-015 拡張）を行う。3段階すべてを試行しても解消できない場合のみ停止する（REQ-003-006）。worktree 分離により作業自体は並列可能であり、マージコンフリクト解決コストを受容する。詳細は `docs/designs/commands/case-auto.md` コンフリクト解消モデル、`docs/designs/commands/case-close.md` Step 4-2 参照
+- 同一 Epic 内の Wave 間は直列（REQ-034-012）
+- execution_unit 間の並列可否は連結成分（必須依存）のみで判定する。技術的依存レベル（L0-L3）は並列判定軸から外し、ファイル衝突（L2）があっても並列を許容する（REQ-034-011）
+- case-auto レベルでのグローバル並列上限は設定しない（REQ-034-011）。case-run 単位の5件上限（REQ-031-015 踏襲）のみを制御対象とする。N 個の execution_unit が並列実行された場合、N×5 件の委譲同時起動リスクを許容する（運用監視対象）
+- PR マージコンフリクト発生時は 3レベルコンフリクト解消モデル（REQ-003）に従う。Level 1 は case-close が rebase による機械的解消を試みる（REQ-032-010、REQ-003-016）。Level 2 は case-auto が両PRのdiffを読み取りコンフリクト文脈を付けて case-run へ再委譲する（最大2回、計3回の case-run 実行、REQ-003-017/018）。Level 3 は case-auto がマージ順序変更、blocked 単位の隔離（REQ-034-014 拡張）を行う。3段階すべてを試行しても解消できない場合のみ停止する（REQ-003-018）。worktree 分離により作業自体は並列可能であり、マージコンフリクト解決コストを受容する。詳細は `docs/designs/commands/case-auto.md` コンフリクト解消モデル、`docs/designs/commands/case-close.md` コンフリクト解消 rebase パス参照
 
 詳細な orchestration ロジック（blocked 部分停止、ready 継続判定フロー、execution_unit 群反復制御）は `docs/designs/commands/case-auto.md` 参照。
 
@@ -245,9 +245,9 @@ case-open、case-auto、case-run で参照される並列上限と停止条件�
 
 | 文脈 | 上限 | 根拠 |
 |---|---|---|
-| case-run Wave 内子 Issue 並列 | 5件 | REQ-006-026（同一 Wave 内の case-run サブエージェント並列起動上限） |
-| case-auto orchestration stage 2 同時起動数 | 5件 | REQ-006-091（orchestration stage における case-run bg task 同時起動数） |
-| execution_unit 全体並列 | 上限なし | REQ-006-018（必須依存がない execution_unit 群は全て並列実行可能） |
+| case-run Wave 内子 Issue 並列 | 5件 | REQ-031-015（同一 Wave 内の case-run サブエージェント並列起動上限） |
+| case-auto orchestration stage 2 同時起動数 | 5件 | REQ-034-027（orchestration stage における case-run bg task 同時起動数） |
+| execution_unit 全体並列 | 上限なし | REQ-034-011（必須依存がない execution_unit 群は全て並列実行可能） |
 
 3つの「5件」は別文脈であり、混同しない。
 
@@ -260,20 +260,20 @@ case-open は以下の場合に限り GitHub Issue 作成前に停止する。
 - 必須依存または機能的一貫性を維持したまま各 Epic を10子 Issue 以下へ分割できない場合
 - OU と Issue の対応を維持できない場合
 
-OU が複数存在すること、または OU 総数が10件を超えることだけでは停止しない（REQ-006-012、REQ-006-005/010）。
+OU が複数存在すること、または OU 総数が10件を超えることだけでは停止しない（REQ-030-012、REQ-030-005/010）。
 
 #### case-auto 停止理由分類
 
-case-auto は停止時に停止理由を以下の分類で報告する（REQ-006-016/108 拡張）。
+case-auto は停止時に停止理由を以下の分類で報告する（REQ-034-021/022 拡張）。
 
 - **req-define 合意要件からの逸脱**: case-open または後続工程が合意済み要件、対象外、受け入れ条件を変更した場合、合意されていない機能要件または制約を追加した場合、合意済み OU を欠落・統合・分割して要件の意味を変更した場合
-- **command 契約・実装不整合**: execution_unit へ分割可能であるにもかかわらず case-open が単一 Epic 子 Issue 上限により停止した場合、case-open または後続工程の実装が契約へ整合していない場合、構成生成事前検証（REQ-006-027）が実装されていない場合
+- **command 契約・実装不整合**: execution_unit へ分割可能であるにもかかわらず case-open が単一 Epic 子 Issue 上限により停止した場合、case-open または後続工程の実装が契約へ整合していない場合、構成生成事前検証（REQ-030-018）が実装されていない場合
 - **repo 外実体変更**: DB マイグレーション実行、デプロイ/apply、認証・秘密・権限変更が必要な場合
 - **CI/test/lint 失敗**: コンフリクト解消モデルの Level 2 まで試行しても自己修復不能な場合
 
 分類は再開コマンド選択とユーザー通知の精度向上が目的であり、HITL 境界の変更ではない。
 
-## ドラフト間並列実行モデル（REQ-006-089〜093）
+## ドラフト間並列実行モデル（REQ-034-025〜029）
 
 case-auto が複数の対象を処理する場合、orchestration stage モデルを適用する。
 stage 1 は case-open を順次実行し、stage 2 は case-run を bg task として最大5件ずつ並列実行し、stage 3 は case-close を順次実行する。
@@ -285,7 +285,7 @@ bg task API、実行エージェント選定、実行担当サブエージェン
 stage 2 の bg task がシステムにより破棄されたことを検知した場合、commit 済みで PR 未作成の状態と未コミット変更が残る状態を区別し、それぞれの状態に対応する回復パターンを適用する。
 並列実行が利用できない場合だけ順次フォールバックを使用し、理由を完了報告に残す。
 
-## 前工程完了度3段階分類（REQ-003-010）
+## 前工程完了度3段階分類（REQ-003-027）
 
 OU 属性「前工程完了度」を追加する。
 本属性は子 Issue 実行状態 enum（pending / ready / running / completed / blocked / failed / delegation-unavailable）とは直交する分類であり、前工程（req-save / design-save）の完了状況を表す。

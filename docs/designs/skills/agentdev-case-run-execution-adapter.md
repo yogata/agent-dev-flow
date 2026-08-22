@@ -68,7 +68,7 @@ command の具体名、起動手段は AGENTS.md および references/<harness>.
 
 本節は case-run 経路G（REQ-015）の adapter 委譲内における adversarial-review 統合の内部手続きを正典として所有する（REQ-014-011）。
 共通 caller integration 契約の正規所有者は adversarial-review Design であり（REQ-014-003）、本節は adapter 委譲内固有の実装方針形成、review 呼出、結果反映、blocked 遷移の手続きのみを所有する。
-挿入境界（委譲内実施、Step 6 投影、実装方針限定、blocked 遷移）の正規所有者は case-run command Design「adversarial-review 挿入境界（経路G: adapter 委譲内）」節であり、本節は再定義せず参照する。
+挿入境界（委譲内実施、STEP-S4 投影、実装方針限定、blocked 遷移）の正規所有者は case-run command Design「adversarial-review 挿入境界（経路G: adapter 委譲内）」節であり、本節は再定義せず参照する。
 adversarial-review 自身の振る舞い契約、再 review 条件、停止条件は adversarial-review Design を正とし、本節で再定義しない。
 
 ### 実装方針の形成と限定（REQ-015-010）
@@ -126,7 +126,7 @@ blocked 遷移の契約は case-run command Design「blocked 遷移」節を正�
 | 要件、仕様問題の検出 | REQ-015-011 | 要件、仕様に欠落、矛盾、曖昧さ、実現不可能な条件等を検出した場合、勝手に仕様変更、REQ 黙示変更、ADR 再解釈を行わず blocked へ遷移する |
 | unresolved 争点の残存 | REQ-014-009 | adversarial-review 審議で unresolved な本質的争点またはユーザー判断事項が残り、実装の最初の変更（不可逆処理）へ進めない場合、blocked へ遷移する |
 
-blocked 詳細本文（検出理由、対象 REQ/Decision/Design、想定される修正方向等）は Issue コメントに SSoT として構造化して記録する（result 契約「SSoT」節、case-run command Design Step 7 参照）。
+blocked 詳細本文（検出理由、対象 REQ/Decision/Design、想定される修正方向等）は Issue コメントに SSoT として構造化して記録する（result 契約「SSoT」節、case-run STEP-S5（result 処理）参照）。
 実行担当サブエージェントは blocked 遷移時に実装ファイル、PR、commit を残さず、worktree を実装前の状態に保つ。
 
 ### 従来フロー維持（REQ-015-003）
@@ -145,5 +145,5 @@ adversarial-review は delegation-contracts Design の `semantic_review`（書�
 ### 正規所有者マトリックス参照
 
 本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts Design「adversarial-review との委譲契約接続」節、case-run command Design「adversarial-review 挿入境界（経路G: adapter 委譲内）」節との間で意味の重複、矛盾を生じない。
-adapter 委譲内の内部手続き（実装方針形成、review 呼出、結果反映、blocked 遷移）のみを本節が所有し、挿入境界（委譲内実施、Step 6 投影）、実装方針限定の契約は case-run command Design を正とする。
+adapter 委譲内の内部手続き（実装方針形成、review 呼出、結果反映、blocked 遷移）のみを本節が所有し、挿入境界（委譲内実施、STEP-S4 投影）、実装方針限定の契約は case-run command Design を正とする。
 

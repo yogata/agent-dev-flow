@@ -69,7 +69,7 @@ case-close と QG-{N} は当該欄を完了条件の証拠ソースとして読�
 ## Design確定候補
 <!-- 【任意】 case-run/ driver が実装時に発見した Design レベルの詳細（Design に記載すべき schema、enum、判定表、内部アルゴリズム等）を記録する。
 `## Findings / Capture候補` とは別セクション。
-case-close Step 3 で Design 確定チェックの入力となり、draft → 承認済み 昇格または design-save 再起動の判断材料となる。
+case-close STEP-3 で Design 確定チェックの入力となり、draft → 承認済み 昇格または design-save 再起動の判断材料となる。
 Design確定候補がない場合はセクションごと省略する。
  -->
 

@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は13件、提案中の Decision は4件である。
+現行の承認済み Decision は15件、提案中の Decision は2件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -30,8 +30,8 @@
 | DEC-013 | IR 登録モデルの簡素化 — 現存 IR を実行可能な恒久統制に限定 | accepted | 2026-08-11 |
 | DEC-014 | 配布依存境界の多層 enforcement | accepted | 2026-08-11 |
 | DEC-015 | ADF決定論的実行中核と実行基盤実行機構の責務分界 | accepted | 2026-08-15 |
-| DEC-016 | 導入系スクリプトの副作用ゼロ原則 | proposed | 2026-08-15 |
-| DEC-017 | 最小トレーサビリティモデルの採用と Artifact Graph の廃止 | proposed | 2026-08-17 |
+| DEC-016 | 導入系スクリプトの副作用ゼロ原則 | accepted | 2026-08-15 |
+| DEC-017 | 最小トレーサビリティモデルの採用と Artifact Graph の廃止 | accepted | 2026-08-17 |
 | DEC-018 | 評価ブランチモデルとCase統合先の一般化 | proposed | 2026-08-19 |
 | DEC-019 | 一般処理の標準API委譲とADF固有意味論の所有境界 | proposed | 2026-08-20 |
 <!-- AUTOGEN:END -->
@@ -59,13 +59,13 @@
 - [DEC-013](DEC-013.md)（IR 登録モデルの簡素化 — 現存 IR を実行可能な恒久統制に限定）
 - [DEC-014](DEC-014.md)（配布依存境界の多層 enforcement）
 - [DEC-015](DEC-015.md)（ADF決定論的実行中核と実行基盤実行機構の責務分界）
+- [DEC-016](DEC-016.md)（導入系スクリプトの副作用ゼロ原則）
+- [DEC-017](DEC-017.md)（最小トレーサビリティモデルの採用と Artifact Graph の廃止）
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
-- [DEC-016](DEC-016.md)（導入系スクリプトの副作用ゼロ原則）
-- [DEC-017](DEC-017.md)（最小トレーサビリティモデルの採用と Artifact Graph の廃止）
 - [DEC-018](DEC-018.md)（評価ブランチモデルとCase統合先の一般化）
 - [DEC-019](DEC-019.md)（一般処理の標準API委譲とADF固有意味論の所有境界）
 <!-- AUTOGEN:END -->

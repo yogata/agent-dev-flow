@@ -87,7 +87,7 @@ unresolved は既存の HITL、blocker、case-auto 停止理由分類のいず�
 
 ### blocked 詳細本文の記録
 
-blocked 詳細本文（検出理由、対象 REQ/ADR/Design、想定される修正方向等）は Issue コメントに SSoT として構造化して記録する（result 契約「SSoT」節、case-run command Design Step 7 参照）。
+blocked 詳細本文（検出理由、対象 REQ/ADR/Design、想定される修正方向等）は Issue コメントに SSoT として構造化して記録する（result 契約「SSoT」節、case-run STEP-S5（result 処理）参照）。
 実行担当サブエージェントは blocked 遷移時に実装ファイル、PR、commit を残さず、worktree を実装前の状態に保つ。
 
 ## 従来フロー（review 非発動時）
@@ -107,6 +107,6 @@ adversarial-review は delegation-contracts Design の `semantic_review`（書�
 
 ## 参照契約
 
-挿入境界（委譲内実施、Step 6 投影、実装方針限定、blocked 遷移）は case-run command Design「adversarial-review 挿入境界（経路G: adapter 委譲内）」節が正であり、共通契約（任意性、副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱い）は adversarial-review Design「adversarial-review caller integration 共通契約」節が正とする。
+挿入境界（委譲内実施、STEP-S4 投影、実装方針限定、blocked 遷移）は case-run command Design「adversarial-review 挿入境界（経路G: adapter 委譲内）」節が正であり、共通契約（任意性、副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱い）は adversarial-review Design「adversarial-review caller integration 共通契約」節が正とする。
 本ファイルはこれらを再定義しない。
 adapter 委譲内の内部手続き（実装方針形成、review 呼出、結果反映、blocked 遷移）の詳細は `agentdev-case-run-execution-adapter` Design「adversarial-review 統合（実装方針→review→結果反映）」節が正とする。

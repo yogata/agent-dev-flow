@@ -7,7 +7,7 @@
 | status | 意味 | 遷移契機 |
 |--------|------|----------|
 | `draft` | design-save で保存された直後の状態。境界違反検査の対象外 | design-save が新規 Design 作成時に付与（既定値） |
-| `accepted` | case-close で Design 確定チェックを通過した状態。すべての integrity rule の検査対象 | case-close Step 3 で実装が Design 内容を検証した旨を確認時 |
+| `accepted` | case-close で Design 確定チェックを通過した状態。すべての integrity rule の検査対象 | case-close STEP-3 で実装が Design 内容を検証した旨を確認時 |
 
 `status` 欠落は後方互換のため `accepted` 相当として扱う。
 

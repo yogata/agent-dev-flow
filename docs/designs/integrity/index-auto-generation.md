@@ -2,7 +2,7 @@
 title: 索引類自動生成 Design
 status: accepted
 created: 2026-07-19
-updated: 2026-08-18
+updated: 2026-08-22
 ---
 <!-- ADF-COVERS(implementation): REQ-001-026, REQ-001-028 -->
 <!-- ADF-COVERS(implementation): REQ-010-011 -->
@@ -204,4 +204,4 @@ backtick 文脈判定のような部分一致ロジックは併用しない。
 
 - 関連 REQ: REQ-001（文書・REQ 管理基準）、REQ-001（Design status 追跡と draft 放置検出）
 - 関連 Design: `docs/designs/foundations/numbering-policy.md`（採番管理）、`docs/designs/integrity/integrity-rule-catalog.md`（整合性ルールカタログ）、`docs/designs/integrity/integrity-contracts.md`（整合性契約）
-- 検査契約: IR-061（index generation consistency）、IR-038（ADR index consistency）、IR-039（index REQ title consistency）、IR-042（hardcoded req count）
+- 検査契約: IR-061（index generation consistency）、IR-038（Decision-index-consistency）、IR-039（index REQ title consistency）、IR-042（hardcoded req count）
