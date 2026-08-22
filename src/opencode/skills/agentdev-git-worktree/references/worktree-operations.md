@@ -1,5 +1,18 @@
 # Worktree 作成、削除、ブランチ操作の詳細手順
 
+## 目次
+
+- [作成手順](#作成手順)
+- [評価ブランチの作成・削除（既存 Git 能力の再利用）](#評価ブランチの作成削除既存-git-能力の再利用)
+- [worktree 内判定ヘルパー](#worktree-内判定ヘルパー)
+- [worktree 標準運用ガイド](#worktree-標準運用ガイド)
+- [worktree 構造的制約（agentdev-git-worktree-test-fallback Design）](#worktree-構造的制約agentdev-git-worktree-test-fallback-design)
+- [bun test 実行の環境前提](#bun-test-実行の環境前提)
+- [git stash 運用手順（一時退避）](#git-stash-運用手順一時退避)
+- [削除手順](#削除手順)
+- [ツール実行規約](#ツール実行規約)
+- [Merge Conflict 対応パターン](#merge-conflict-対応パターン)
+
 ## 作成手順
 
 ### 1. 統合先の解決（worktree 作成元）
@@ -140,6 +153,15 @@ worktree は独立した working tree であるため、メインリポジトリ
 worktree 内で当該ファイルを参照する検査は失敗する。
 
 worktree 内で gitignore 対象ファイルを参照・編集する必要がある場合は、`git add -f` で強制追加して worktree の working tree に存在させるか、source パス（`src/opencode/`）へ fallback して参照する。
+
+### bun test 実行の環境前提
+
+bun test によるフル suite 実行は、次の環境前提を踏まえて実行する。
+フル suite の実行形態（3 cwd 分割実行・./ prefix・環境ラベル）の正規形は `agentdev-quality-gates`（QG-4 bun test フル suite 正規形）が品質統制側として所有する。
+
+- worktree は独立した working tree のため、gitignore 対象の `node_modules` は worktree へ未伝播である。フル suite 実行の前に、配布 skill `agentdev-project-extensions` の scripts ディレクトリで `bun install` を前置する（zod 等の依存解決）。未実施の場合、integrity suite の一部テストが依存解決失敗で fail する。前置の対象ディレクトリは正規形（`agentdev-quality-gates` QG-4 の依存パッケージ前置）を参照する
+- worktree の `.opencode/` 配下 junction は未伝播である。junction を前提とする構造系テストは source パス（SoT パス）への fallback で実行される
+- worktree の構造上の理由でテストスイートが実行できない場合は、メインリポジトリからの読取専用実行でエビデンスを採取できる。この場合は実行環境（worktree または main、junction 伝播状態、依存パッケージ状態）を環境ラベルとして検証記録に明記し、fail 全件の由来分類（既知欠陥・環境依存・当該変更起因）を行う
 
 ### junction 依存 checker の skip 挙動
 
