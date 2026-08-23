@@ -2,7 +2,7 @@
 title: Targeted Docs Guard 実装詳細
 status: accepted
 created: 2026-07-15
-updated: 2026-08-15
+updated: 2026-08-24
 ---
 
 # Targeted Docs Guard 実装詳細
@@ -167,26 +167,21 @@ TargetedDocsReport 型契約の正本は [integrity-contracts.md](integrity-cont
 
 ## skill rename 対称性検査観点
 
-skill rename を伴う作業手順において、以下の対称性検査を deterministic に実施する。
+check_skill_rename_symmetry が実施する検査契約。REQ-010-063 と同一の検査契約を反映する。
 
-### 物理 path 一致検査
-
-src/opencode/skills/{name} と docs/designs/skills/{name} の物理 path が
-一致することを検証する。
-rename 後に両者が同一 name であることが必須。
-
-### frontmatter id 一致検査
-
-Design ファイルの frontmatter id が物理 path と一致することを検証する。
-不一致の場合は warn または error として報告する。
-
-旧「Artifact Graph node 関係整合検査」（rename 後の旧 name node 残存・関係更新の検証）は、Artifact Graph の撤去（DEC-017、Issue #2362）に伴い廃止した。
+- 恒常検査は frontmatter id と物理 path の整合（SKILL.md frontmatter name ↔ Skill ディレクトリ名、
+  Design frontmatter 識別子 ↔ Design ファイルの物理 path）に限定する。不一致は warn または error として報告する
+- 配布 skill ごとに同名の Skill Design（docs/designs/skills/{skill-name}.md）の存在を恒常的な不変条件として要求しない。
+  Workflow Skill が専用の同名 Skill Design を持たないことは違反としない
+- src/opencode/skills/{name} と docs/designs/skills/{name} の物理 path 一致検査は、
+  skill rename を伴う変更に対してのみ実施する
+- status: superseded の Design に対応する skill dir 欠落の許容など既存の例外処理は維持する
 
 ### 実装
 
-2 検査は `.opencode/skills/repo-agentdev-integrity/scripts/check_skill_rename_symmetry.ts` が deterministic に実行する。
+`.opencode/skills/repo-agentdev-integrity/scripts/check_skill_rename_symmetry.ts` が上記契約を反映して deterministic に実行する。
 対象は配布 skill `agentdev-*`（`src/opencode/skills/` 配下）とし、repo-local skill (`repo-agentdev-*`) および `agentdev-` prefix を持たない skill は対象外（REQ-002 配布物境界）。
-`status: superseded` の Design に対応する skill dir 欠落は許容し、`status: draft` の場合は warning とする。
+`status: superseded` の Design に対応する skill dir 欠落は許容し、`status: draft` の場合は warning とする（既存の例外処理の維持）。
 
 ## 関連
 
