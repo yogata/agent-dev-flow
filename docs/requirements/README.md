@@ -25,7 +25,7 @@
 | [REQ-011](REQ-011.md) | I/O境界と外部連携手段 |
 | [REQ-012](REQ-012.md) | 成果物トレーサビリティ |
 | [REQ-014](REQ-014.md) | adversarial-review caller integration 共通契約 |
-| [REQ-015](REQ-015.md) | adversarial-review caller integration 7経路+case-auto |
+| [REQ-015](REQ-015.md) | adversarial-review caller integration（7 caller と case-auto 停止伝播） |
 | [REQ-016](REQ-016.md) | adversarial-review caller integration 横断整合 |
 | [REQ-017](REQ-017.md) | Issue Execution Contract |
 | [REQ-018](REQ-018.md) | worktree 構造的制約とテスト fallback |

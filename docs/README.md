@@ -28,7 +28,7 @@ REQ-022・REQ-024 の旧規範内容（augmentation 配置先、check_graph.ts �
 | [REQ-011](requirements/REQ-011.md) | I/O境界と外部連携手段 |
 | [REQ-012](requirements/REQ-012.md) | 成果物トレーサビリティ |
 | [REQ-014](requirements/REQ-014.md) | adversarial-review caller integration 共通契約 |
-| [REQ-015](requirements/REQ-015.md) | adversarial-review caller integration 7経路+case-auto |
+| [REQ-015](requirements/REQ-015.md) | adversarial-review caller integration（7 caller と case-auto 停止伝播） |
 | [REQ-016](requirements/REQ-016.md) | adversarial-review caller integration 横断整合 |
 | [REQ-017](requirements/REQ-017.md) | Issue Execution Contract |
 | [REQ-018](requirements/REQ-018.md) | worktree 構造的制約とテスト fallback |
