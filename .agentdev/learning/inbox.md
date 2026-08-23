@@ -278,3 +278,19 @@
 - **想定反映先**: agentdev-workflow-case-run の検証手順、配布依存境界 Design の gate 例外規定の検討
 - **関連**: PR #2414 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2414 ）
 - **タグ**: `#distribution-boundary` `#guard` `#temp-file` `#windows`
+
+## release archive 同梱配布物には実 REQ ID を書かずプレースホルダ表記を使う
+
+- **問題事象**: release archive に同梱される配布物（archive 専用 installer `scripts/consumer/archive/install.ps1`、`README-INSTALL.md`）に ADF-COVERS 宣言や実 REQ ID（REQ-050）を記述した結果、配布依存境界検査（archive profile）の concrete-id 違反 5 件が検出され、archive 生成（package-release-archive.ps1）が停止した（REQ-050 実装、TS-006 検証中）
+- **発生局面**: 実装（case-run、release archive 生成検証 TS-006）
+- **検知方法**: 配布依存境界検査（archive projection）の concrete-id 違反による archive 生成停止（exit 非 0）
+- **根本原因**: 配布物から正規 ID 汚染（concrete-id）を除外する配布依存境界の規約が、archive に同梱されるファイルにも適用される。対応宣言（ADF-COVERS）は host 専用ファイル（archive に入らないファイル）に配置すべきであるが、archive 同梱ファイルへ記述していた
+- **自律対応内容**: 配布物から宣言・実 ID を除去しプレースホルダ表記（`WP-{N}` 形式）へ変更して解消、再検証合格（PR #2416 検証差分 TS-006 行）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（REQ-050-010 の archive 投影契約の運用実例）
+- **横展開観点**: 今後 archive に同梱するファイル（README-INSTALL.md 等）を追加・更新する際、実 REQ ID や ADF-COVERS 宣言を持ち込まない。対応宣言は host 専用ファイル側に配置する
+- **再発条件**: archive 同梱配布物に実 ID や対応宣言を記述した場合
+- **予防策候補**: 配布物向け執筆時のプレースホルダ表記ルールの明文化（配布依存境界 Design の archive 公開前検査節への運用注記）
+- **想定反映先**: docs/designs/integrity/distribution-boundary.md（archive 公開前検査の運用注記）
+- **関連**: PR #2416 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2416 ）
+- **タグ**: `#distribution-boundary` `#archive` `#concrete-id`
