@@ -297,7 +297,7 @@ git worktree prune
 3. ローカルブランチを削除: `git branch -d {branch_name}`（必要時のみ `-D`）
 4. リモートブランチがある場合のみ削除: `git push origin --delete {branch_name}`
 
-**注意**: `install-consumer-opencode.ps1` が作成するジャンクション link 経由の worktree で発生する Windows 固有の挙動。
+**注意**: `install.ps1` が作成するジャンクション link 経由の worktree で発生する Windows 固有の挙動。
 背景: worktree ジャンクション削除フォールバック要件（関連Issue/PRは履歴参照）。
 
 ### 4. ローカルブランチの削除

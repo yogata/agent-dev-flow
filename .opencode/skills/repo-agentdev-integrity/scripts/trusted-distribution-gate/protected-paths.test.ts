@@ -5,6 +5,8 @@
 // to between base_oid and candidate_oid. Any such change is a trust
 // violation and the launcher must fail closed.
 
+// ADF-COVERS(verification): REQ-050-012
+
 import { describe, expect, test } from "bun:test";
 import {
   TRUST_ROOT_DIRECT_PATHS,
@@ -16,7 +18,7 @@ import {
 describe("protected-paths / TRUST_ROOT_DIRECT_PATHS", () => {
   test("includes the trusted launcher entry script", () => {
     expect(TRUST_ROOT_DIRECT_PATHS).toContain(
-      "scripts/trusted-distribution-gate.ps1",
+      "scripts/self/release/trusted-distribution-gate.ps1",
     );
   });
 
@@ -26,13 +28,14 @@ describe("protected-paths / TRUST_ROOT_DIRECT_PATHS", () => {
     expect(matched.length).toBeGreaterThan(0);
   });
 
-  test("includes the trusted installation scripts (Stage A only — Stage B scripts excluded, parent defect #3)", () => {
-    expect(TRUST_ROOT_DIRECT_PATHS).toContain("scripts/install-consumer-opencode.ps1");
-    expect(TRUST_ROOT_DIRECT_PATHS).toContain("scripts/check-consumer-opencode.ps1");
-    // scripts/install-from-archive.ps1 and scripts/package-release-archive.ps1
-    // are Stage B canonical scripts and are intentionally NOT protected.
-    expect(TRUST_ROOT_DIRECT_PATHS).not.toContain("scripts/install-from-archive.ps1");
-    expect(TRUST_ROOT_DIRECT_PATHS).not.toContain("scripts/package-release-archive.ps1");
+  test("includes the public entry and its dependency module (Stage A only — Stage B scripts excluded, parent defect #3)", () => {
+    expect(TRUST_ROOT_DIRECT_PATHS).toContain("scripts/install.ps1");
+    expect(TRUST_ROOT_DIRECT_PATHS).toContain("scripts/consumer/common.ps1");
+    // scripts/consumer/archive/install.ps1 and
+    // scripts/self/release/package-release-archive.ps1 are Stage B canonical
+    // scripts and are intentionally NOT protected.
+    expect(TRUST_ROOT_DIRECT_PATHS).not.toContain("scripts/consumer/archive/install.ps1");
+    expect(TRUST_ROOT_DIRECT_PATHS).not.toContain("scripts/self/release/package-release-archive.ps1");
   });
 
   test("protects runtime helpers blob-loader, boundary-runner, protected-check (parent defect #9)", () => {
@@ -68,7 +71,7 @@ describe("protected-paths / listAllProtectedPaths", () => {
       import_paths: [],
     };
     const all = listAllProtectedPaths(set);
-    expect(all).toContain("scripts/trusted-distribution-gate.ps1");
+    expect(all).toContain("scripts/self/release/trusted-distribution-gate.ps1");
   });
 
   test("includes transitive import paths when provided", () => {
@@ -96,12 +99,12 @@ describe("protected-paths / isProtectedPath", () => {
       direct_paths: TRUST_ROOT_DIRECT_PATHS,
       import_paths: [],
     };
-    expect(isProtectedPath("scripts/trusted-distribution-gate.ps1", set)).toBe(true);
+    expect(isProtectedPath("scripts/self/release/trusted-distribution-gate.ps1", set)).toBe(true);
   });
 
   test("returns false for an unrelated source file", () => {
     const set: ProtectedPathSet = {
-      direct_paths: ["scripts/trusted-distribution-gate.ps1"],
+      direct_paths: ["scripts/self/release/trusted-distribution-gate.ps1"],
       import_paths: [],
     };
     expect(isProtectedPath("src/opencode/commands/agentdev/case-run.md", set)).toBe(false);

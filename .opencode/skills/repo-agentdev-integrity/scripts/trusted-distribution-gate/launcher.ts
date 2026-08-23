@@ -19,8 +19,9 @@
 //      stage a verified ZIP under <outputRoot>/.trust-stage-<runid>/.
 //   7. Physically verify the archive-installed projection by extracting
 //      the STAGED ZIP (before publish), executing the BASE-OID
-//      install-from-archive.ps1 (never candidate or working tree), and
-//      comparing the installed files to the archive-installed manifest.
+//      scripts/consumer/archive/install.ps1 (never candidate or working
+//      tree), and comparing the installed files to the archive-installed
+//      manifest.
 //   8. Atomically publish the staged ZIP to the final path via
 //      `fs.linkSync` (atomic no-overwrite). Pre-existing final archives
 //      are never overwritten or removed.

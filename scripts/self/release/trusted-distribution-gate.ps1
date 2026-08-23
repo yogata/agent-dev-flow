@@ -70,6 +70,8 @@
         9  Unexpected                 — any uncaught exception (fail-closed)
 #>
 
+# ADF-COVERS(implementation): REQ-050-009
+
 #Requires -Version 7.0
 
 [CmdletBinding()]
@@ -87,9 +89,10 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-# Resolve the protected CLI entry next to this script. We do NOT honor any
-# override path: the CLI must be the committed protected file.
-$cliTs = Join-Path $PSScriptRoot '..\.opencode\skills\repo-agentdev-integrity\scripts\trusted-distribution-gate\cli.ts'
+# Resolve the protected CLI entry relative to this script
+# (scripts/self/release/ -> repo root is three levels up). We do NOT honor
+# any override path: the CLI must be the committed protected file.
+$cliTs = Join-Path (Join-Path $PSScriptRoot '..\..\..') '.opencode\skills\repo-agentdev-integrity\scripts\trusted-distribution-gate\cli.ts'
 if (-not (Test-Path -LiteralPath $cliTs)) {
     [Console]::Error.WriteLine("trusted-distribution-gate: protected cli.ts missing at $cliTs")
     exit 9

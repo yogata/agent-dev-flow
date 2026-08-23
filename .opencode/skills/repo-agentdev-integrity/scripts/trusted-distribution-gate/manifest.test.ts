@@ -9,6 +9,8 @@
 // archive has one extra subset (archive-extra); these subsets are not
 // public projection labels.
 
+// ADF-COVERS(verification): REQ-050-011
+
 import { describe, expect, test } from "bun:test";
 import {
   buildSourceManifest,
@@ -51,13 +53,13 @@ describe("manifest / isRequiredRuntimePath", () => {
 });
 
 describe("manifest / isRequiredBootstrapPath", () => {
-  test("accepts the two consumer-facing bootstrap scripts", () => {
-    expect(isRequiredBootstrapPath("scripts/install-consumer-opencode.ps1")).toBe(true);
-    expect(isRequiredBootstrapPath("scripts/check-consumer-opencode.ps1")).toBe(true);
+  test("accepts the public entry and its runtime dependency module (REQ-050-011)", () => {
+    expect(isRequiredBootstrapPath("scripts/install.ps1")).toBe(true);
+    expect(isRequiredBootstrapPath("scripts/consumer/common.ps1")).toBe(true);
   });
   test("rejects unrelated scripts", () => {
-    expect(isRequiredBootstrapPath("scripts/trusted-distribution-gate.ps1")).toBe(false);
-    expect(isRequiredBootstrapPath("scripts/apply-mechanical-replacement.ps1")).toBe(false);
+    expect(isRequiredBootstrapPath("scripts/self/release/trusted-distribution-gate.ps1")).toBe(false);
+    expect(isRequiredBootstrapPath("scripts/self/maintenance/apply-mechanical-replacement.ps1")).toBe(false);
   });
 });
 
@@ -66,12 +68,12 @@ describe("manifest / classifySourceSubset", () => {
     expect(classifySourceSubset("src/opencode/commands/agentdev/x.md")).toBe("runtime");
     expect(classifySourceSubset("src/opencode/skills/agentdev-foo/SKILL.md")).toBe("runtime");
   });
-  test("bootstrap for install/check scripts", () => {
-    expect(classifySourceSubset("scripts/install-consumer-opencode.ps1")).toBe("bootstrap");
-    expect(classifySourceSubset("scripts/check-consumer-opencode.ps1")).toBe("bootstrap");
+  test("bootstrap for the public entry and its dependency module", () => {
+    expect(classifySourceSubset("scripts/install.ps1")).toBe("bootstrap");
+    expect(classifySourceSubset("scripts/consumer/common.ps1")).toBe("bootstrap");
   });
-  test("archive-extra for install-from-archive and README-INSTALL", () => {
-    expect(classifySourceSubset("scripts/install-from-archive.ps1")).toBe("archive-extra");
+  test("archive-extra for the archive installer original and README-INSTALL", () => {
+    expect(classifySourceSubset("scripts/consumer/archive/install.ps1")).toBe("archive-extra");
     expect(classifySourceSubset("README-INSTALL.md")).toBe("archive-extra");
   });
   test("null for unrelated paths", () => {
@@ -86,15 +88,15 @@ describe("manifest / buildSourceManifest", () => {
       entry("src/opencode/commands/agentdev/case-run.md", "a".repeat(64), 10),
       entry("src/opencode/skills/agentdev-foo/SKILL.md", "b".repeat(64), 20),
       entry("src/opencode/skills/japanese-tech-writing/SKILL.md", "c".repeat(64), 30),
-      entry("scripts/install-consumer-opencode.ps1", "d".repeat(64), 40),
-      entry("scripts/check-consumer-opencode.ps1", "e".repeat(64), 50),
+      entry("scripts/install.ps1", "d".repeat(64), 40),
+      entry("scripts/consumer/common.ps1", "e".repeat(64), 50),
       entry("README.md", "f".repeat(64), 60),
     ];
     const m = buildSourceManifest(inputs);
     expect(m.projection).toBe("source");
     expect(m.entries.map((e) => e.path).sort()).toEqual([
-      "scripts/check-consumer-opencode.ps1",
-      "scripts/install-consumer-opencode.ps1",
+      "scripts/consumer/common.ps1",
+      "scripts/install.ps1",
       "src/opencode/commands/agentdev/case-run.md",
       "src/opencode/skills/agentdev-foo/SKILL.md",
       "src/opencode/skills/japanese-tech-writing/SKILL.md",
@@ -135,25 +137,25 @@ describe("manifest / buildLinkManifest", () => {
 });
 
 describe("manifest / buildArchiveManifest", () => {
-  test("archive = source-runtime + install-from-archive.ps1 + README-INSTALL.md", () => {
+  test("archive = source-runtime + archive installer original + README-INSTALL.md", () => {
     const runtime = [
       entry("src/opencode/commands/agentdev/case-run.md", "a".repeat(64), 10),
       entry("src/opencode/skills/agentdev-foo/SKILL.md", "b".repeat(64), 20),
     ];
     const extras: ManifestEntryInput[] = [
-      entry("scripts/install-from-archive.ps1", "d".repeat(64), 40),
+      entry("scripts/consumer/archive/install.ps1", "d".repeat(64), 40),
       entry("README-INSTALL.md", "e".repeat(64), 50),
     ];
     const m = buildArchiveManifest(runtime, extras);
     expect(m.entries.map((e) => e.path).sort()).toEqual([
       "README-INSTALL.md",
-      "scripts/install-from-archive.ps1",
+      "scripts/consumer/archive/install.ps1",
       "src/opencode/commands/agentdev/case-run.md",
       "src/opencode/skills/agentdev-foo/SKILL.md",
     ]);
   });
 
-  test("rejects when install-from-archive.ps1 missing", () => {
+  test("rejects when the archive installer original is missing", () => {
     const runtime = [
       entry("src/opencode/commands/agentdev/case-run.md", "a".repeat(64), 10),
     ];

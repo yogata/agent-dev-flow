@@ -77,9 +77,10 @@ src/opencode/                     # 原本（正規の定義ファイル）
   commands/agentdev/             # Command 原本
   skills/agentdev-*/             # Skill 原本
 scripts/
-  sync-self-opencode.ps1         # AgentDevFlow 本体リポジトリ用同期スクリプト
-  install-consumer-opencode.ps1  # 適用プロジェクト用インストールスクリプト
-  check-consumer-opencode.ps1    # 適用プロジェクト用状態確認スクリプト
+  self-sync.ps1                  # AgentDevFlow 本体リポジトリ用同期スクリプト（self-hosting 向け公開入口）
+  install.ps1                    # 適用プロジェクト用公開入口（install・check・dry-run）
+  consumer/                      # install.ps1 の内部処理（単体実行しない）
+  self/                          # self-hosting 固有の配布・検証・保守処理（単体実行しない）
 ```
 
 ### 適用プロジェクト（consumer-with-agentdev）
@@ -101,8 +102,8 @@ scripts/
   skills/agentdev-*/             # ジャンクション → .agentdev-plugin/src/opencode/skills/agentdev-*/
   skills/{local}-*/              # プロジェクト独自スキル（実ディレクトリ）
 scripts/
-  install-consumer-opencode.ps1  # 適用プロジェクト用インストールスクリプト
-  check-consumer-opencode.ps1    # 適用プロジェクト用状態確認スクリプト
+  install.ps1                    # 適用プロジェクト用公開入口（install・check・dry-run）
+  consumer/                      # install.ps1 の内部処理（単体実行しない）
 ```
 
 ### ディレクトリ責務の補足

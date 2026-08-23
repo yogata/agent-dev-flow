@@ -25,11 +25,15 @@
 //
 // Stage A/B boundary (parent defect #3):
 //   Stage A protects its own runtime closure plus the trusted launcher
-//   script and the consumer install/check scripts. Stage B canonically
-//   owns and modifies the archive packager (package-release-archive.ps1)
-//   and the archive installer (install-from-archive.ps1); they are NOT
+//   script and the consumer install entry with its runtime dependency
+//   (scripts/install.ps1 + scripts/consumer/common.ps1). Stage B canonically
+//   owns and modifies the archive packager
+//   (scripts/self/release/package-release-archive.ps1) and the archive
+//   installer original (scripts/consumer/archive/install.ps1); they are NOT
 //   protected by Stage A. Stage B's modifications to those two scripts
 //   must not re-trigger Stage A protected-path violation.
+
+// ADF-COVERS(implementation): REQ-050-012
 
 import * as fs from "fs";
 import * as path from "path";
@@ -97,12 +101,17 @@ const TRUST_ROOT_CONFIG: readonly string[] = [
 const TRUSTED_INSTALLATION_SCRIPTS: readonly string[] = [
   // The trusted launcher entry script (PowerShell primary). The Bash
   // companion, if any, would also be protected.
-  "scripts/trusted-distribution-gate.ps1",
-  // Trusted consumer install/check scripts (consumer-facing bootstrap).
-  "scripts/install-consumer-opencode.ps1",
-  "scripts/check-consumer-opencode.ps1",
-  // NOTE: scripts/install-from-archive.ps1 and scripts/package-release-archive.ps1
-  // are Stage B canonical scripts and are intentionally NOT protected by
+  "scripts/self/release/trusted-distribution-gate.ps1",
+  // Trusted consumer install entry (public entry, REQ-050-001) plus its
+  // runtime dependency module (scripts/consumer/common.ps1). The entry's
+  // execution dependency set is part of the trust root so a tampered or
+  // missing internal module cannot bootstrap a consumer (REQ-050-011,
+  // REQ-050-012).
+  "scripts/install.ps1",
+  "scripts/consumer/common.ps1",
+  // NOTE: scripts/consumer/archive/install.ps1 (archive-dedicated installer
+  // original) and scripts/self/release/package-release-archive.ps1 are
+  // Stage B canonical scripts and are intentionally NOT protected by
   // Stage A (parent defect #3).
 ];
 

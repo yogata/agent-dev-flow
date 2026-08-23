@@ -3,41 +3,43 @@
     Sync .opencode/ projection with selective junctions from src/opencode/ (self-hosting repo).
 
 .DESCRIPTION
-    本体（agent-dev-flow 自己ホスト）リポジトリ専用の同期スクリプト。導入先リポジトリでは
-    install-consumer-opencode.ps1 を使うこと。
+    本体（agent-dev-flow 自己ホスト）リポジトリ専用の同期スクリプト（self-hosting 向け公開入口）。
+    consumer リポジトリでは scripts/install.ps1 を使うこと（REQ-050-001）。consumer リポジトリで
+    実行した場合は変更前に停止して案内する（REQ-050-006）。
 
-    関連3モードの技術的差は以下の通り:
-    - check   : clone しない軽量確認（検証のみ、ファイル変更なし）。当スクリプトは clone せず、
+    関連3モードの技術的差は以下の通り（REQ-050-003）:
+    - check   : 乖離確認（検証のみ、ファイル変更なし）。当スクリプトは clone せず、
                 src/opencode/ と .opencode/ の乖離を報告する。
-    - dry-run : clone して予測（ファイル変更なし）。当スクリプトは原本ディレクトリを直接参照する
+    - dry-run : 変更予測（ファイル変更なし）。当スクリプトは原本ディレクトリを直接参照する
                 ため clone 相当の取得は不要、変更内容の予測のみを行う。
-    - apply   : clone して実行（ファイル変更あり）。当スクリプトは原本ディレクトリから junction
+    - apply   : 実行（ファイル変更あり）。当スクリプトは原本ディレクトリから junction
                 を再作成し、.opencode/ を同期する。
+
+    いずれのモードも provisioning（clone、fetch、reset）と network access を行わない（REQ-009-046、DEC-016）。
 
     Uses selective junctions instead of whole-directory junction:
     - .opencode/             = real directory (not a junction)
     - .opencode/commands/agentdev/  = junction -> src/opencode/commands/agentdev/
     - .opencode/skills/agentdev-*/  = individual junctions -> src/opencode/skills/agentdev-*/
 
-    Repo-local artifacts are excluded from junction management (ADR-0020):
+    Repo-local artifacts are excluded from junction management:
     - .opencode/commands/repo/      = real directory (not a junction, repo-local only)
     - .opencode/skills/repo-*/      = real directories (not junctions, repo-local only)
-
-    This script is intended for the self-hosting (agent-dev-flow) repository.
-    For consumer repositories, use install-consumer-opencode.ps1 instead.
 
 .PARAMETER Mode
     One of: dry-run, check, apply
     省略可能。引数なし起動時（-Mode 未指定）は対話ウィザードが起動し、Mode を問う（REQ-009-040）。
 
 .EXAMPLE
-    ./scripts/sync-self-opencode.ps1
+    ./scripts/self-sync.ps1
     引数なし起動時は対話ウィザードが Mode を問う（REQ-009-040）。
 
-    ./scripts/sync-self-opencode.ps1 -Mode dry-run
-    ./scripts/sync-self-opencode.ps1 -Mode check
-    ./scripts/sync-self-opencode.ps1 -Mode apply
+    ./scripts/self-sync.ps1 -Mode dry-run
+    ./scripts/self-sync.ps1 -Mode check
+    ./scripts/self-sync.ps1 -Mode apply
 #>
+
+# ADF-COVERS(implementation): REQ-050-001, REQ-050-003, REQ-050-005, REQ-050-006, REQ-050-007
 
 #Requires -Version 7.0
 
@@ -64,10 +66,11 @@ function Assert-SelfHostRepo {
     <#
     .SYNOPSIS
         本スクリプトが agent-dev-flow 本体リポジトリ配下で実行されているか検査する。
-        本体以外（導入先リポジトリ等）へコピーして実行された場合、停止する（REQ-009-041）。
+        本体以外（consumer リポジトリ等）へコピーして実行された場合、変更前に停止して
+        適切な公開入口を案内する（REQ-009-041、REQ-050-006）。
     #>
     if (-not (Test-Path -LiteralPath $SourceDir)) {
-        Write-Host "このスクリプトは AgentDevFlow 本体リポジトリ専用です。$RepoRoot には src\opencode がありません。導入先リポジトリでは install-consumer-opencode.ps1 を使ってください。"
+        Write-Host "このスクリプトは AgentDevFlow 本体リポジトリ専用です。$RepoRoot には src\opencode がありません。導入先リポジトリでは scripts/install.ps1 を使ってください。"
         exit 1
     }
 }

@@ -1,4 +1,5 @@
 <!-- ADF-COVERS(implementation): REQ-001-055 -->
+<!-- ADF-COVERS(implementation): REQ-050-014 -->
 # agent-dev-flow
 
 AgentDevFlow プラグインの設定を管理するリポジトリ。AI エージェントによる開発ワークフローを支えるコマンド・スキル・ドキュメントを一元管理する。
@@ -97,24 +98,24 @@ git clone https://github.com/yogata/agent-dev-flow.git .agentdev-plugin
 # 展開した中身（src/、scripts/ 等）を .agentdev-plugin/ 直下に配置
 
 # 2. install: 導入先リポジトリのルートで実行（junction を作成）
-./.agentdev-plugin/scripts/install-consumer-opencode.ps1 -Mode apply
+./.agentdev-plugin/scripts/install.ps1 -Mode apply
 ```
 
 ローカル版（ローカル版 OpenCode を利用する環境）のインストール。`-LocalMode` を付けると `agentdev-gh-cli` だけが `src/opencode-local/agentdev-gh-cli/` へ接続され、それ以外の command/skill は通常版と同じ `src/opencode/` 配下へ接続される（REQ-009、DEC-004）。
 
 ```powershell
-./.agentdev-plugin/scripts/install-consumer-opencode.ps1 -Mode apply -LocalMode
+./.agentdev-plugin/scripts/install.ps1 -Mode apply -LocalMode
 ```
 
 > ZIP 展開チェックアウト（`.git` なし）は正規の provisioning 形態だが、サポート対象外の環境である（不具合報告の受け付け対象外）。版の確認など git を前提とする運用には git clone を使う。
 >
-> スクリプトを `./scripts/` として導入先リポジトリに置く場合は、`.agentdev-plugin/` と同一のチェックアウトからコピーする（スクリプトとチェックアウトの版不一致を防ぐため）。
+> スクリプトを `./scripts/` として導入先リポジトリに置く場合は、`.agentdev-plugin/` と同一のチェックアウトから scripts/ ディレクトリ全体をコピーする（公開入口 `install.ps1` は内部処理 `scripts/consumer/` に依存するため、スクリプトとチェックアウトの版不一致を防ぐ）。
 
 ### 状態確認
 
 ```powershell
 # インストール状態を確認（リンクモードを自動検出して報告）
-./.agentdev-plugin/scripts/check-consumer-opencode.ps1
+./.agentdev-plugin/scripts/install.ps1 -Mode check
 ```
 
 チェックアウトの git リポジトリ性は乖離ではなく情報として報告される。版（commit/branch）は `.git` が存在する場合のみ表示され、ZIP 展開環境では unknown と表示される。
@@ -126,14 +127,14 @@ git clone https://github.com/yogata/agent-dev-flow.git .agentdev-plugin
 ```powershell
 # git clone 環境: チェックアウトを更新して再同期
 cd .agentdev-plugin && git pull && cd ..
-./.agentdev-plugin/scripts/install-consumer-opencode.ps1 -Mode apply
+./.agentdev-plugin/scripts/install.ps1 -Mode apply
 
 # ZIP 展開環境: ソース ZIP を再取得して .agentdev-plugin/ を差し替えた後、
 # 必要に応じて install を再実行する（再実行の要否は利用者の判断）
-# ./.agentdev-plugin/scripts/install-consumer-opencode.ps1 -Mode apply
+# ./.agentdev-plugin/scripts/install.ps1 -Mode apply
 
 # ローカル版環境の場合は -LocalMode を付けて再実行
-# ./.agentdev-plugin/scripts/install-consumer-opencode.ps1 -Mode apply -LocalMode
+# ./.agentdev-plugin/scripts/install.ps1 -Mode apply -LocalMode
 ```
 
 ### 推奨 .gitignore 設定

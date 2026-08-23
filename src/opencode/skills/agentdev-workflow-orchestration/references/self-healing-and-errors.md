@@ -73,7 +73,7 @@ CI/CD失敗を検出した場合、実装フェーズへループバックし自
 |------|------|
 | 発生条件 | worktree 内で整合性検査を実行し、`source-projection-sync` が「projection 側不存在」で失敗 |
 | 原因 | メインリポジトリで作成された `.opencode/` 配下のジャンクションリンクが worktree へ伝播していない。worktree は独立した作業ディレクトリであり、reparse point は複製されない |
-| 対処 | ジャンクションを再作成してから整合性検査を再実行する。再作成手順は README の Install/Update 手順（本体リポジトリ: `scripts/sync-self-opencode.ps1 -Mode apply`、consumer repo: `scripts/install-consumer-opencode.ps1 -Mode apply`）に準拠。本スキルで新規手順は定義しない |
+| 対処 | ジャンクションを再作成してから整合性検査を再実行する。再作成手順は README の Install/Update 手順（本体リポジトリ: `scripts/self-sync.ps1 -Mode apply`、consumer repo: `scripts/install.ps1 -Mode apply`）に準拠。本スキルで新規手順は定義しない |
 | 環境 | Windows + ジャンクション環境固有。Unix symlink 環境では発生しない |
 | フォールバックの限界 | `resolvePathWithFallback`はランタイム projection 不在時に `src/opencode/` 原本へ読み取りをフォールバックするが、source/projection 双方向の存在比較を要する `source-projection-sync` までは解決しない。破損ジャンクション検出ゲートも同様に worktree 内のジャンクション状態に依存する |
 | 自律修正対象外 | ジャンクション再作成は環境固有の作業であり要件、仕様の修正ではないため、自律修正ループの対象外。ユーザーへ状況と再作成手順への誘導を報告する |

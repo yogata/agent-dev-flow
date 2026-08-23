@@ -64,13 +64,13 @@ describe("cleanup warning preservation / per-call injected remover", () => {
       writeFix(repo, "src/opencode/commands/agentdev/case-run.md", "# case-run\n");
       writeFix(repo, "src/opencode/skills/agentdev-foo/SKILL.md", "# foo\n");
       writeFix(repo, "src/opencode/skills/japanese-tech-writing/SKILL.md", "# jtw\n");
-      writeFix(repo, "scripts/install-consumer-opencode.ps1", "# install\n");
-      writeFix(repo, "scripts/check-consumer-opencode.ps1", "# check\n");
+      writeFix(repo, "scripts/install.ps1", "# install\n");
+      writeFix(repo, "scripts/consumer/common.ps1", "# check\n");
       writeFix(repo, "README-INSTALL.md", "# readme\n");
-      writeFix(repo, "scripts/package-release-archive.ps1", "# placeholder\n");
-      writeFix(repo, "scripts/trusted-distribution-gate.ps1", "# placeholder\n");
+      writeFix(repo, "scripts/self/release/package-release-archive.ps1", "# placeholder\n");
+      writeFix(repo, "scripts/self/release/trusted-distribution-gate.ps1", "# placeholder\n");
       // BROKEN installer at base: exit 5.
-      writeFix(repo, "scripts/install-from-archive.ps1", "[CmdletBinding()] param([string]$S,[string]$T,[string]$M)\nexit 5\n");
+      writeFix(repo, "scripts/consumer/archive/install.ps1", "[CmdletBinding()] param([string]$S,[string]$T,[string]$M)\nexit 5\n");
       for (const ent of fs.readdirSync(trustAbs, { withFileTypes: true })) {
         if (!ent.isFile() || !ent.name.endsWith(".ts") || ent.name.endsWith(".test.ts") || ent.name.endsWith(".test-worker.ts") || ent.name.endsWith(".d.ts")) continue;
         writeFix(repo, `${trustRel}/${ent.name}`, `// ${ent.name}\n`);
@@ -130,8 +130,8 @@ describe("launcher / both-missing protected bootstrap scripts in seed mode", () 
     writeFix(repo, "src/opencode/skills/agentdev-foo/SKILL.md", "# foo\n");
     writeFix(repo, "src/opencode/skills/japanese-tech-writing/SKILL.md", "# jtw\n");
     writeFix(repo, "README-INSTALL.md", "# readme\n");
-    writeFix(repo, "scripts/package-release-archive.ps1", "# placeholder\n");
-    writeFix(repo, "scripts/install-from-archive.ps1", [
+    writeFix(repo, "scripts/self/release/package-release-archive.ps1", "# placeholder\n");
+    writeFix(repo, "scripts/consumer/archive/install.ps1", [
       "[CmdletBinding()] param([string]$S,[string]$T,[string]$M)", "$ErrorActionPreference='Stop'",
       "$cmds=Join-Path $S 'commands\\agentdev'; $skills=Join-Path $S 'skills'",
       "$cDst=Join-Path $T 'commands\\agentdev'; $sDst=Join-Path $T 'skills'",
@@ -140,12 +140,12 @@ describe("launcher / both-missing protected bootstrap scripts in seed mode", () 
       "Get-ChildItem -LiteralPath $skills -Directory | Where-Object { $_.Name -like 'agentdev-*' -or $_.Name -eq 'japanese-tech-writing' } | ForEach-Object { Get-ChildItem -LiteralPath $_.FullName -Recurse -File | ForEach-Object { $r=$_.FullName.Substring($skills.Length).TrimStart('\\','/'); $d=Join-Path $sDst $r; $p=Split-Path -Parent $d; if(-not(Test-Path $p)){New-Item -ItemType Directory -Path $p -Force|Out-Null}; Copy-Item -LiteralPath $_.FullName -Destination $d -Force } }",
       "exit 0", "",
     ].join("\n"));
-    if (!missing.includes("install-consumer")) writeFix(repo, "scripts/install-consumer-opencode.ps1", "# install\n");
-    if (!missing.includes("check-consumer")) writeFix(repo, "scripts/check-consumer-opencode.ps1", "# check\n");
+    if (!missing.includes("install-entry")) writeFix(repo, "scripts/install.ps1", "# install\n");
+    if (!missing.includes("common-module")) writeFix(repo, "scripts/consumer/common.ps1", "# check\n");
     execFileSync("git", ["add", "-A"], { cwd: repo });
     execFileSync("git", ["commit", "-q", "-m", "base"], { cwd: repo });
     const base = execFileSync("git", ["rev-parse", "HEAD"], { cwd: repo }).toString().trim();
-    writeFix(repo, "scripts/trusted-distribution-gate.ps1", "# ps1\n");
+    writeFix(repo, "scripts/self/release/trusted-distribution-gate.ps1", "# ps1\n");
     const td = ".opencode/skills/repo-agentdev-integrity/scripts/trusted-distribution-gate";
     writeFix(repo, `${td}/types.ts`, "// types\n");
     writeFix(repo, `${td}/protected-paths.ts`, "// pp\n");
@@ -155,8 +155,8 @@ describe("launcher / both-missing protected bootstrap scripts in seed mode", () 
     return { repo, base, candidate };
   }
 
-  test("both-missing install-consumer-opencode.ps1: exit 1, no archive", () => {
-    const { repo, base, candidate } = buildFixtureWithoutBootstrap(["install-consumer"]);
+  test("both-missing scripts/install.ps1: exit 1, no archive", () => {
+    const { repo, base, candidate } = buildFixtureWithoutBootstrap(["install-entry"]);
     try {
       const out = makeTmpDir("trust-bm-one-");
       const r = runLauncherWithDeps({
@@ -171,8 +171,8 @@ describe("launcher / both-missing protected bootstrap scripts in seed mode", () 
     } finally { try { fs.rmSync(repo, { recursive: true, force: true }); } catch (e) { void e; } }
   }, 120000);
 
-  test("both-missing check-consumer-opencode.ps1: exit 1, no archive", () => {
-    const { repo, base, candidate } = buildFixtureWithoutBootstrap(["check-consumer"]);
+  test("both-missing scripts/consumer/common.ps1: exit 1, no archive", () => {
+    const { repo, base, candidate } = buildFixtureWithoutBootstrap(["common-module"]);
     try {
       const out = makeTmpDir("trust-bm-check-");
       const r = runLauncherWithDeps({
@@ -187,7 +187,7 @@ describe("launcher / both-missing protected bootstrap scripts in seed mode", () 
   }, 120000);
 
   test("both-missing both bootstrap scripts: exit 1, no archive", () => {
-    const { repo, base, candidate } = buildFixtureWithoutBootstrap(["install-consumer", "check-consumer"]);
+    const { repo, base, candidate } = buildFixtureWithoutBootstrap(["install-entry", "common-module"]);
     try {
       const out = makeTmpDir("trust-bm-both-");
       const r = runLauncherWithDeps({

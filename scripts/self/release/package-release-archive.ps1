@@ -1,14 +1,24 @@
 [CmdletBinding()]
 param()
 
+# ADF-COVERS(implementation): REQ-050-009, REQ-050-010
+# ADF-COVERS(verification): REQ-050-010, REQ-050-011
+#
 # WP-3 (Issue #1928) §7.5.1: build a junction-free release archive from the
 # repo's src/opencode/ source tree. The archive contains:
 #   agentdev-release-<sha>/
 #     src/opencode/commands/agentdev/**.md
 #     src/opencode/skills/agentdev-*/**, japanese-tech-writing/**
-#     scripts/install-from-archive.ps1
+#     scripts/install.ps1            (projected from scripts/consumer/archive/install.ps1)
 #     README-INSTALL.md
 # Junctions are resolved to real file content so the archive is self-contained.
+#
+# REQ-050-010: the archive-dedicated installer original is kept at
+# scripts/consumer/archive/install.ps1, SEPARATE from the checkout consumer
+# entry (scripts/install.ps1). Inside the release archive it is placed under
+# the projection name scripts/install.ps1. The checkout edition and the
+# archive edition are different installation projections and are NOT forced
+# into one implementation.
 #
 # DEC-014 decision 7 / TS-008 / TS-010 (Issue #2092): before publishing the
 # final archive, two projection boundary inspections are run against the
@@ -17,12 +27,12 @@ param()
 # travels inside the archive):
 #   1. archive projection on the staged src/opencode/ content
 #   2. archive projection on the archive EXTRAS (README-INSTALL.md,
-#      scripts/install-from-archive.ps1) — these live outside src/opencode/
+#      scripts/install.ps1 archive edition) — these live outside src/opencode/
 #      so the host checker's archive profile would otherwise skip them
 #   3. archive-installed projection on the extracted+installed content
 # The final archive is published by an atomic no-clobber HARD LINK after
 # all validations pass. The link primitive lives in
-# scripts/publish-hard-link.ts (trusted host Bun helper that calls
+# scripts/self/release/publish-hard-link.ts (trusted host Bun helper that calls
 # `fs.linkSync` and fails with EEXIST on collision). PowerShell 10 / .NET
 # 10 does not surface [System.IO.File]::CreateHardLink, so the publish
 # primitive is delegated to the helper (same primitive Stage A uses).
@@ -49,18 +59,21 @@ $ErrorActionPreference = "Stop"
 
 # Write-Error under Stop mode throws and skips any subsequent `exit <N>`,
 # which would mask the documented exit code. Use [Console]::Error.WriteLine
-# + explicit exit (matches scripts/trusted-distribution-gate.ps1 pattern).
+# + explicit exit (matches scripts/self/release/trusted-distribution-gate.ps1 pattern).
 function Fail-Exit {
     param([int]$Code, [string]$Message)
     [Console]::Error.WriteLine($Message)
     exit $Code
 }
 
-$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+# scripts/self/release/ -> repo root is three levels up.
+$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
 
 $srcCommands = Join-Path $repoRoot "src\opencode\commands\agentdev"
 $srcSkills = Join-Path $repoRoot "src\opencode\skills"
-$installScript = Join-Path $PSScriptRoot "install-from-archive.ps1"
+# Archive-dedicated installer ORIGINAL (REQ-050-010). Travels inside the
+# archive under the projection name scripts/install.ps1.
+$installScript = Join-Path $repoRoot "scripts\consumer\archive\install.ps1"
 $readmeInstall = Join-Path $repoRoot "README-INSTALL.md"
 
 if (-not (Test-Path -LiteralPath $srcCommands)) {
@@ -70,7 +83,7 @@ if (-not (Test-Path -LiteralPath $srcSkills)) {
     Fail-Exit 2 "package-release-archive: required source directory missing: $srcSkills"
 }
 if (-not (Test-Path -LiteralPath $installScript)) {
-    Fail-Exit 2 "package-release-archive: trusted install-from-archive.ps1 missing: $installScript"
+    Fail-Exit 2 "package-release-archive: trusted archive installer original missing: $installScript (scripts/consumer/archive/install.ps1, REQ-050-010)"
 }
 
 # Trusted host checker (NOT the candidate copy inside the archive). Per
@@ -162,8 +175,11 @@ try {
     Get-ChildItem -LiteralPath $stageSkills -Recurse -Directory -Filter "node_modules" -ErrorAction SilentlyContinue |
         Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
-    # install-from-archive.ps1 must travel inside the archive.
-    Copy-Item -LiteralPath $installScript -Destination (Join-Path $stageScripts "install-from-archive.ps1") -Force
+    # The archive-dedicated installer travels inside the archive under the
+    # projection name scripts/install.ps1 (REQ-050-010). The checkout
+    # consumer entry (repository scripts/install.ps1) is a DIFFERENT
+    # installation projection and must NOT be forced into this archive.
+    Copy-Item -LiteralPath $installScript -Destination (Join-Path $stageScripts "install.ps1") -Force
 
     $readmePresent = $false
     if (Test-Path -LiteralPath $readmeInstall) {
@@ -184,16 +200,17 @@ try {
     # Pre-publication boundary inspection #2: archive EXTRAS. The host
     # checker's archive profile walks src/opencode/{commands/agentdev,
     # skills/<agentdev-*|japanese-tech-writing>}/** only, so it would
-    # silently skip README-INSTALL.md and scripts/install-from-archive.ps1.
-    # Build an auxiliary scan root with those files placed under
-    # src/opencode/commands/agentdev/ and re-invoke the same checker there.
+    # silently skip README-INSTALL.md and the archive edition of
+    # scripts/install.ps1. Build an auxiliary scan root with those files
+    # placed under src/opencode/commands/agentdev/ and re-invoke the same
+    # checker there.
     $extrasScanCommands = Join-Path $extrasScanRoot "src\opencode\commands\agentdev"
     New-Item -ItemType Directory -Path $extrasScanCommands -Force | Out-Null
-    Copy-Item -LiteralPath (Join-Path $stageScripts "install-from-archive.ps1") -Destination (Join-Path $extrasScanCommands "install-from-archive.ps1.archive-extra.ps1") -Force
+    Copy-Item -LiteralPath (Join-Path $stageScripts "install.ps1") -Destination (Join-Path $extrasScanCommands "install.ps1.archive-extra.ps1") -Force
     if ($readmePresent) {
         Copy-Item -LiteralPath (Join-Path $stageArchiveRoot "README-INSTALL.md") -Destination (Join-Path $extrasScanCommands "README-INSTALL.md") -Force
     }
-    Write-Host "package-release-archive: running archive projection boundary check on archive extras (README-INSTALL.md, install-from-archive.ps1)"
+    Write-Host "package-release-archive: running archive projection boundary check on archive extras (README-INSTALL.md, scripts/install.ps1 archive edition)"
     & bun run $boundaryChecker --profile archive $extrasScanRoot --json 2>&1 | Out-Host
     if ($LASTEXITCODE -ne 0) {
         Cleanup-Stage
@@ -221,24 +238,26 @@ try {
     $extractedRootPath = $extractedRoot.FullName
     $installedSrc = Join-Path $extractedRootPath "src\opencode"
     $installedTarget = Join-Path $installedRoot ".opencode"
-    # Verify the candidate archive CONTAINS install-from-archive.ps1 as an
-    # artifact. Presence is required; the file is NOT executed (Stage B
-    # byte-binding / untrusted-execution defense, Issue #2092).
-    $installFromArchive = Join-Path $extractedRootPath "scripts\install-from-archive.ps1"
+    # Verify the candidate archive CONTAINS the archive edition installer
+    # (scripts/install.ps1) as an artifact. Presence is required; the file
+    # is NOT executed (Stage B byte-binding / untrusted-execution defense,
+    # Issue #2092).
+    $installFromArchive = Join-Path $extractedRootPath "scripts\install.ps1"
     if (-not (Test-Path -LiteralPath $installFromArchive)) {
         Cleanup-Stage
-        Fail-Exit 9 "package-release-archive: install-from-archive.ps1 missing from extracted archive: $installFromArchive"
+        Fail-Exit 9 "package-release-archive: scripts/install.ps1 (archive edition) missing from extracted archive: $installFromArchive"
     }
-    # Run the TRUSTED host installer ($installScript at the release runner's
-    # working tree) against the extracted SOURCE, NOT the candidate copy
-    # extracted from the archive. The candidate archive's installer artifact
-    # is verified present above but never executed, so a mutated archive
-    # cannot run arbitrary code through its installer (in particular it
-    # cannot mutate $stagedZip between Compress-Archive and publication).
+    # Run the TRUSTED host installer original ($installScript at the release
+    # runner's working tree, scripts/consumer/archive/install.ps1) against
+    # the extracted SOURCE, NOT the candidate copy extracted from the
+    # archive. The candidate archive's installer artifact is verified
+    # present above but never executed, so a mutated archive cannot run
+    # arbitrary code through its installer (in particular it cannot mutate
+    # $stagedZip between Compress-Archive and publication).
     & powershell -NoProfile -ExecutionPolicy Bypass -File $installScript -Source $installedSrc -Target $installedTarget -Mode copy
     if ($LASTEXITCODE -ne 0) {
         Cleanup-Stage
-        Fail-Exit 9 "package-release-archive: trusted install-from-archive.ps1 exited with $LASTEXITCODE"
+        Fail-Exit 9 "package-release-archive: trusted archive installer exited with $LASTEXITCODE"
     }
     Write-Host "package-release-archive: running archive-installed projection boundary check"
     & bun run $boundaryChecker --profile archive-installed $installedRoot --json 2>&1 | Out-Host
@@ -249,7 +268,7 @@ try {
 
     # Atomic no-clobber hard-link publish (linearization point). The
     # final path is touched ONLY by the trusted host publish helper
-    # (scripts/publish-hard-link.ts) which calls `fs.linkSync(staged, final)`
+    # (scripts/self/release/publish-hard-link.ts) which calls `fs.linkSync(staged, final)`
     # and fails with EEXIST if final already exists at the moment of the
     # call. There is no pre-check + rename TOCTOU window. There is NO
     # copy fallback. There is NO rename fallback. There is NO Move-Item

@@ -13,7 +13,7 @@
 //   link              — runtime blobs mapped to .opencode/** paths.
 //                       Detection.projection = "link".
 //   archive           — runtime blobs (under candidate path) PLUS
-//                       archive-extra blobs (install-from-archive.ps1,
+//                       archive-extra blobs (scripts/consumer/archive/install.ps1,
 //                       README-INSTALL.md). Detection.projection = "archive".
 //   archive-installed — runtime blobs mapped to .opencode/** paths.
 //                       Detection.projection = "archive-installed".

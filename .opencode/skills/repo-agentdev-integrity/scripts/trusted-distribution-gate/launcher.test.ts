@@ -95,7 +95,7 @@ describe("launcher / runLauncher protected-path rejection", () => {
     const repo = makeFixtureRepo();
     try {
       const base = headOid(repo);
-      const candidate = commitTweak(repo, "scripts/trusted-distribution-gate.ps1", "# TAMPERED\n");
+      const candidate = commitTweak(repo, "scripts/self/release/trusted-distribution-gate.ps1", "# TAMPERED\n");
       expect(runLauncher(baseOpts(repo, base, candidate, "out-prot-entry")).exit_code).toBe(1);
     } finally {
       disposeRepo(repo);
@@ -151,7 +151,7 @@ describe("launcher / runLauncher protected-path rejection", () => {
     const repo = makeFixtureRepo();
     try {
       const base = headOid(repo);
-      const candidate = deleteAndCommit(repo, "scripts/install-consumer-opencode.ps1");
+      const candidate = deleteAndCommit(repo, "scripts/install.ps1");
       expect(runLauncher(baseOpts(repo, base, candidate, "out-prot-del")).exit_code).toBe(1);
     } finally {
       disposeRepo(repo);

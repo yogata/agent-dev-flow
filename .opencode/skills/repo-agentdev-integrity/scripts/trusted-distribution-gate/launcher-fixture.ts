@@ -94,14 +94,15 @@ export function makeFixtureRepo(): string {
   writeFix(repo, "src/opencode/commands/agentdev/case-run.md", "# case-run\n");
   writeFix(repo, "src/opencode/skills/agentdev-foo/SKILL.md", "# foo skill\n");
   writeFix(repo, "src/opencode/skills/japanese-tech-writing/SKILL.md", "# jtw\n");
-  writeFix(repo, "scripts/install-consumer-opencode.ps1", "# install\n");
-  writeFix(repo, "scripts/check-consumer-opencode.ps1", "# check\n");
-  // install-from-archive.ps1 is needed by the archive-installed physical
-  // verifier (read from BASE oid) but is NOT a protected Stage A path
-  // (Stage B owns it). A minimal real installer works for the verifier.
+  writeFix(repo, "scripts/install.ps1", "# install\n");
+  writeFix(repo, "scripts/consumer/common.ps1", "# common\n");
+  // scripts/consumer/archive/install.ps1 (archive-dedicated installer
+  // original) is needed by the archive-installed physical verifier (read
+  // from BASE oid) but is NOT a protected Stage A path (Stage B owns it).
+  // A minimal real installer works for the verifier.
   writeFix(
     repo,
-    "scripts/install-from-archive.ps1",
+    "scripts/consumer/archive/install.ps1",
     [
       "[CmdletBinding()]",
       "param(",
@@ -131,8 +132,8 @@ export function makeFixtureRepo(): string {
   for (const f of ["tsconfig.json", "package.json", "bun.lock", ".gitignore"]) {
     writeFix(repo, `${TRUST_DIR_REL}/${f}`, `# ${f}\n`);
   }
-  writeFix(repo, "scripts/trusted-distribution-gate.ps1", "# placeholder\n");
-  writeFix(repo, "scripts/package-release-archive.ps1", "# placeholder\n");
+  writeFix(repo, "scripts/self/release/trusted-distribution-gate.ps1", "# placeholder\n");
+  writeFix(repo, "scripts/self/release/package-release-archive.ps1", "# placeholder\n");
 
   execFileSync("git", ["add", "-A"], { cwd: repo });
   execFileSync("git", ["commit", "-q", "-m", "fixture"], { cwd: repo });

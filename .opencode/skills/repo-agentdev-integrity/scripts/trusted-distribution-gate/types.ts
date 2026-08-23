@@ -98,8 +98,8 @@ export const PROJECTIONS: readonly Projection[] = [
  */
 export type SourceSubset =
   | "runtime" // src/opencode/{commands/agentdev,skills/agentdev-*,skills/japanese-tech-writing}/**
-  | "bootstrap" // scripts/install-consumer-opencode.ps1, scripts/check-consumer-opencode.ps1
-  | "archive-extra"; // scripts/install-from-archive.ps1, README-INSTALL.md
+  | "bootstrap" // scripts/install.ps1, scripts/consumer/common.ps1
+  | "archive-extra"; // scripts/consumer/archive/install.ps1, README-INSTALL.md
 
 /** Single manifest entry: tracked path + blob digest. */
 export interface ManifestEntry {

@@ -7,10 +7,11 @@
 // module performs the real check:
 //
 //   1. Extract the STAGED archive into a fresh temp directory.
-//   2. Read scripts/install-from-archive.ps1 from the BASE oid via
-//      `git cat-file blob <base>:scripts/install-from-archive.ps1`. NEVER
-//      trust the candidate copy or the working tree — the candidate could
-//      have tampered with the installer to lie about its output.
+//   2. Read scripts/consumer/archive/install.ps1 (archive-dedicated
+//      installer original, REQ-050-010) from the BASE oid via
+//      `git cat-file blob <base>:scripts/consumer/archive/install.ps1`.
+//      NEVER trust the candidate copy or the working tree — the candidate
+//      could have tampered with the installer to lie about its output.
 //   3. Write the trusted installer into the temp dir.
 //   4. Execute it with array-form argv (no shell), pointing at the
 //      extracted archive's src/opencode tree as Source and a fresh temp
@@ -81,18 +82,18 @@ function verifyInDir(input: VerifyInstalledInput, work: string): VerifyInstalled
   }
 
   // Read trusted installer from BASE oid. The candidate may have tampered
-  // with scripts/install-from-archive.ps1 — we ignore the candidate copy.
+  // with the archive installer original — we ignore the candidate copy.
   let installerBytes: Uint8Array;
   try {
     installerBytes = readBlob(
       input.adapter,
       input.baseOid,
       "base-installer",
-      "scripts/install-from-archive.ps1",
+      "scripts/consumer/archive/install.ps1",
     );
   } catch (e) {
     if (e instanceof GitBlobMissingError) {
-      return mismatch(`trusted install-from-archive.ps1 missing at base oid ${input.baseOid}`);
+      return mismatch(`trusted archive installer (scripts/consumer/archive/install.ps1) missing at base oid ${input.baseOid}`);
     }
     throw e;
   }

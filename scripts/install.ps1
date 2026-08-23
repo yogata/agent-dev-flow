@@ -3,19 +3,23 @@
     Install AgentDevFlow runtime artifacts into a consumer repository.
 
 .DESCRIPTION
-    導入系スクリプト。3つのモードの技術的差は以下の通り（REQ-009-042）:
-    - check   : 検証のみ（ファイル変更なし）
+    consumer 向け公開入口。3つのモードの技術的差は以下の通り（REQ-009-042、REQ-050-002）:
+    - check   : 検証のみ（ファイル変更なし）。旧状態確認専用スクリプトの検査能力
+                （orphan 検出、版報告、link mode 検出を含む）を包含する（REQ-050-004）
     - dry-run : 変更予測（ファイル変更なし）
     - apply   : 実行（ファイル変更あり）
 
     いずれのモードも provisioning（clone、fetch、reset）と network access を行わず、
-    チェックアウト済みの .agentdev-plugin/ を前提に動作する（REQ-009-046、DEC-016）。
+    チェックアウト済みの .agentdev-plugin/ を前提に動作する（REQ-009-046、REQ-050-013、DEC-016）。
+
+    AgentDevFlow 本体リポジトリでは実行しないこと。本体リポジトリで実行した場合は
+    変更前に停止し、scripts/self-sync.ps1 へ案内する（REQ-050-006）。
 
     Creates junctions for public runtime artifacts ONLY:
     - .opencode/commands/agentdev/  = junction -> .agentdev-plugin/src/opencode/commands/agentdev/
     - .opencode/skills/agentdev-*/  = individual junctions -> .agentdev-plugin/src/opencode/skills/agentdev-*/
     - .opencode/skills/japanese-tech-writing/ = junction -> .agentdev-plugin/src/opencode/skills/japanese-tech-writing/
-      (distribution-dependent skill referenced by agentdev-doc-writing, ADR-{NNNN}/REQ-{NNNN}-{NNN})
+      (distribution-dependent skill referenced by agentdev-doc-writing)
 
     Does NOT touch repo-local commands/skills:
     - .opencode/commands/repo/      = real directory (repo-local only)
@@ -27,15 +31,18 @@
 
 .PARAMETER Mode
     One of: dry-run, check, apply
-    省略可能。引数なし起動時（-Mode 未指定）は対話ウィザードが起動し、Mode と環境を問う（REQ-{NNNN}-{NNN}）。
+    省略可能。引数なし起動時（-Mode 未指定）は対話ウィザードが起動し、Mode と環境を問う。
 
 .PARAMETER LocalMode
     Switch. When set, agentdev-gh-cli is junctioned to src/opencode-local/agentdev-gh-cli/
     instead of src/opencode/skills/agentdev-gh-cli/. All other agentdev-* command/skill
-    junctions target src/opencode/ as normal (REQ-{NNNN}-{NNN}, ADR-{NNNN} decision #3).
+    junctions target src/opencode/ as normal.
 
     判断基準: GitHub Issue/PR を使わずローカルファイル（.agentdev/cases/）で運用する環境
     （ローカル版 OpenCode）では -LocalMode を指定する。
+
+    -Mode check で -LocalMode を省略した場合、agentdev-gh-cli のリンク先から
+    link mode（通常 / local）を自動検出して報告する。
 
 .PARAMETER PluginDir
     Directory name for the agent-dev-flow checkout (default: .agentdev-plugin).
@@ -43,15 +50,17 @@
     上級者向け: チェックアウト配置先を変更する場合のみ指定。通常は既定値を使用する（REQ-009-043）。
 
 .EXAMPLE
-    ./scripts/install-consumer-opencode.ps1
-    引数なし起動時は対話ウィザードが Mode と環境を問う（REQ-{NNNN}-{NNN}）。
+    ./scripts/install.ps1
+    引数なし起動時は対話ウィザードが Mode と環境を問う。
 
-    ./scripts/install-consumer-opencode.ps1 -Mode dry-run
-    ./scripts/install-consumer-opencode.ps1 -Mode check
-    ./scripts/install-consumer-opencode.ps1 -Mode apply
-    ./scripts/install-consumer-opencode.ps1 -Mode apply -PluginDir .agentdev-plugin
-    ./scripts/install-consumer-opencode.ps1 -Mode apply -LocalMode
+    ./scripts/install.ps1 -Mode dry-run
+    ./scripts/install.ps1 -Mode check
+    ./scripts/install.ps1 -Mode apply
+    ./scripts/install.ps1 -Mode apply -PluginDir .agentdev-plugin
+    ./scripts/install.ps1 -Mode apply -LocalMode
 #>
+
+# ADF-COVERS(implementation): REQ-050-001, REQ-050-002, REQ-050-004, REQ-050-005, REQ-050-006, REQ-050-007, REQ-050-008, REQ-050-013
 
 #Requires -Version 7.0
 
@@ -67,8 +76,8 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-# 共有定義（URL・ブランチ定数、cwd 安全化、チェックアウト案内。RU-0014、AG-020）
-. (Join-Path $PSScriptRoot 'consumer-opencode-common.ps1')
+# 共有定義（URL・ブランチ定数、cwd 安全化、チェックアウト案内）
+. (Join-Path $PSScriptRoot 'consumer\common.ps1')
 
 $RepoRoot = $PWD.Path
 $PluginPath = Join-Path $RepoRoot $PluginDir
@@ -203,10 +212,19 @@ function Invoke-PluginCheckoutGuidance {
 
 # --- Main ---
 
-# cwd 安全化（REQ-{NNNN}-{NNN}）。ウィザードの前に通過すること。
+# cwd 安全化（REQ-009-041）。ウィザードの前に通過すること。
 Assert-ValidConsumerCwd
 
-# 引数なし起動時（-Mode 未指定）の対話ウィザード（REQ-{NNNN}-{NNN}）
+# 誤実行防止（REQ-050-006）: 実行ディレクトリ直下に src/opencode/ が存在する場合、
+# AgentDevFlow 本体リポジトリ（self-hosting 構成）と判定し、変更前に停止して案内する。
+# consumer ではチェックアウトは .agentdev-plugin/ 配下にあり、実行ディレクトリ直下に
+# src/opencode/ は存在しない（判定方式は runtime-package-boundary Design「誤実行防止の環境判定方式」）。
+if (Test-Path -LiteralPath (Join-Path $RepoRoot 'src\opencode')) {
+    Write-Host "このスクリプトは AgentDevFlow を導入するリポジトリ（consumer）専用です。現在のフォルダは AgentDevFlow 本体リポジトリです。本体リポジトリでは scripts/self-sync.ps1 を使ってください。"
+    exit 1
+}
+
+# 引数なし起動時（-Mode 未指定）の対話ウィザード
 if (-not $Mode) {
     Invoke-InstallWizard
 }
@@ -235,8 +253,26 @@ $targets = Get-ConsumerJunctionTargets
 
 if ($Mode -eq 'check') {
     Write-Host '=== Consumer Install Check ==='
-    if ($LocalMode) {
-        Write-Host '[INFO] LocalMode: agentdev-gh-cli redirects to src/opencode-local/agentdev-gh-cli/'
+
+    # Link mode 判定（REQ-050-004 継承能力）: -LocalMode 指定時は指定構成を期待値とする。
+    # 未指定時は agentdev-gh-cli のリンク先から link mode を自動検出して報告する
+    # （local: src/opencode-local/ へ解決される場合、consumer-generated と判定）。
+    $DetectedLocalMode = $false
+    $ghCliProjection = Join-Path $SkillsDir $LocalModeRedirectSkill
+    $ghCliLocalSource = Join-Path $LocalSourceDir $LocalModeRedirectSkill
+    if (Test-Junction -Path $ghCliProjection) {
+        $ghCliTarget = Get-JunctionTarget -Path $ghCliProjection
+        if ($ghCliTarget -and (Test-Path -LiteralPath $ghCliTarget) -and
+            (Test-Path -LiteralPath $ghCliLocalSource) -and
+            ((Resolve-Path -LiteralPath $ghCliTarget).Path -eq (Resolve-Path -LiteralPath $ghCliLocalSource).Path)) {
+            $DetectedLocalMode = $true
+        }
+    }
+    $ExpectedLocalMode = if ($LocalMode) { $true } else { $DetectedLocalMode }
+    if ($ExpectedLocalMode) {
+        Write-Host '[INFO] Link mode: local (consumer-generated) — agentdev-gh-cli -> src/opencode-local/'
+    } else {
+        Write-Host '[INFO] Link mode: normal (consumer-with-agentdev) — agentdev-gh-cli -> src/opencode/'
     }
     $divergences = 0
 
@@ -248,7 +284,7 @@ if ($Mode -eq 'check') {
         Write-Host "[OK] $PluginDir exists"
     }
 
-    # 2. Source directory (usable checkout 判定: .git の有無ではなく src/opencode/ の存在。ZIP 展開チェックアウトも正規の配置形態、AG-003/REQ-009-048)
+    # 2. Source directory (usable checkout 判定: .git の有無ではなく src/opencode/ の存在。ZIP 展開チェックアウトも正規の配置形態)
     if (-not (Test-Path -LiteralPath $SourceDir)) {
         Write-Host "[DIVERGENCE] Usable checkout not found: $PluginDir/src/opencode/ (git clone またはソース ZIP 展開が必要)"
         $divergences++
@@ -256,17 +292,37 @@ if ($Mode -eq 'check') {
         Write-Host "[OK] Usable checkout exists: $PluginDir/src/opencode/"
     }
 
-    # 2b. Local redirect source (LocalMode only)
-    if ($LocalMode) {
-        if (-not (Test-Path -LiteralPath $localRedirectSource)) {
-            Write-Host "[DIVERGENCE] LocalMode redirect source not found: $PluginDir/src/opencode-local/$LocalModeRedirectSkill/"
-            $divergences++
+    # 2b. Checkout version report (.git 存在時のみ、不在時 unknown。REQ-050-004 継承能力)
+    # git リポジトリ性は乖離ではなく情報として報告する。
+    if (Test-Path -LiteralPath $PluginPath) {
+        if (Test-Path -LiteralPath (Join-Path $PluginPath '.git')) {
+            Write-Host "[INFO] $PluginDir is a git repository"
+            Push-Location -LiteralPath $PluginPath
+            try {
+                $commit = git rev-parse --short HEAD 2>$null
+                $branch = git rev-parse --abbrev-ref HEAD 2>$null
+                Write-Host "[INFO] Checkout: $branch ($commit)"
+            }
+            finally {
+                Pop-Location
+            }
         } else {
-            Write-Host "[OK] LocalMode redirect source exists: $PluginDir/src/opencode-local/$LocalModeRedirectSkill/"
+            Write-Host "[INFO] $PluginDir is not a git repository (possibly a ZIP-expanded checkout; informational, not a divergence)"
+            Write-Host '[INFO] Checkout: unknown'
         }
     }
 
-    # 3. .opencode/ must be a real directory
+    # 3. Local redirect source (local mode only)
+    if ($ExpectedLocalMode) {
+        if (-not (Test-Path -LiteralPath $ghCliLocalSource)) {
+            Write-Host "[DIVERGENCE] Local redirect source not found: $PluginDir/src/opencode-local/$LocalModeRedirectSkill/"
+            $divergences++
+        } else {
+            Write-Host "[OK] Local redirect source exists: $PluginDir/src/opencode-local/$LocalModeRedirectSkill/"
+        }
+    }
+
+    # 4. .opencode/ must be a real directory
     if (Test-Junction -Path $ProjectionDir) {
         Write-Host '[DIVERGENCE] .opencode/ is a junction (must be real directory)'
         $divergences++
@@ -277,7 +333,7 @@ if ($Mode -eq 'check') {
         Write-Host '[OK] .opencode/ is a real directory'
     }
 
-    # 4. Parent directories
+    # 5. Parent directories
     foreach ($parentDir in @($CommandsDir, $SkillsDir)) {
         $parentRel = $parentDir.Substring($ProjectionDir.Length).TrimStart('\', '/')
         if (Test-Junction -Path $parentDir) {
@@ -291,17 +347,21 @@ if ($Mode -eq 'check') {
         }
     }
 
-    # 5. Check each expected junction
+    # 6. Check each expected junction
     foreach ($relPath in $targets) {
         $targetPath = Join-Path $ProjectionDir $relPath
         if (-not (Test-Path -LiteralPath $targetPath)) {
             Write-Host "[DIVERGENCE] Missing junction: $relPath"
             $divergences++
         } elseif (Test-Junction -Path $targetPath) {
-            $expectedSource = Get-TargetSourcePath -RelPath $relPath
+            $expectedSource = if ($ExpectedLocalMode -and $relPath -eq "skills\$LocalModeRedirectSkill") {
+                Join-Path $LocalSourceDir $LocalModeRedirectSkill
+            } else {
+                Join-Path $SourceDir $relPath
+            }
             $actualTarget = Get-JunctionTarget -Path $targetPath
             if ($actualTarget -and (Test-Path -LiteralPath $actualTarget) -and ((Resolve-Path -LiteralPath $actualTarget).Path -eq (Resolve-Path -LiteralPath $expectedSource).Path)) {
-                Write-Host "[OK] Junction: $relPath"
+                Write-Host "[OK] Junction: $relPath -> $actualTarget"
             } else {
                 Write-Host "[DIVERGENCE] Broken junction: $relPath (expected: $expectedSource, actual: $actualTarget)"
                 $divergences++
@@ -312,7 +372,29 @@ if ($Mode -eq 'check') {
         }
     }
 
-    # 6. Repo-local directories (informational)
+    # 7. Orphan detection (agentdev-* junctions that don't match source。REQ-050-004 継承能力)
+    Write-Host ''
+    Write-Host '--- Orphan junctions ---'
+    $orphansFound = $false
+    foreach ($parentRel in @('commands', 'skills')) {
+        $parentPath = Join-Path $ProjectionDir $parentRel
+        if (-not (Test-Path -LiteralPath $parentPath)) { continue }
+        Get-ChildItem -LiteralPath $parentPath -Directory -Force |
+            Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
+            ForEach-Object {
+                $junctionRel = "$parentRel\$($_.Name)"
+                if ($junctionRel -notin $targets) {
+                    Write-Host "[ORPHAN] Junction not from current source: $junctionRel"
+                    $orphansFound = $true
+                    $divergences++
+                }
+            }
+    }
+    if (-not $orphansFound) {
+        Write-Host '[OK] No orphan junctions detected'
+    }
+
+    # 8. Repo-local directories (informational)
     foreach ($cmdName in $RepoLocalCommandNames) {
         $repoLocalPath = Join-Path $CommandsDir $cmdName
         if (Test-Path -LiteralPath $repoLocalPath) {
@@ -331,7 +413,7 @@ if ($Mode -eq 'check') {
     if ($divergences -eq 0) {
         Write-Host 'No divergence detected. Consumer install is in sync.'
     } else {
-        Write-Host "$divergences divergence(s) detected."
+        Write-Host "$divergences divergence(s) detected. Run scripts/install.ps1 -Mode apply to fix."
     }
     exit $(if ($divergences -gt 0) { 1 } else { 0 })
 }

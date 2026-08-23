@@ -9,19 +9,24 @@
 //                      src/opencode/skills/japanese-tech-writing/**
 //                      (including tests, fixtures, README, package.json,
 //                      tsconfig, lockfiles, and metadata — none excluded)
-//                      PLUS the trusted consumer bootstrap scripts
-//                      scripts/install-consumer-opencode.ps1 and
-//                      scripts/check-consumer-opencode.ps1.
+//                      PLUS the trusted consumer bootstrap entry
+//                      scripts/install.ps1 and its runtime dependency
+//                      module scripts/consumer/common.ps1 (REQ-050-011:
+//                      the public entry and its execution dependency set
+//                      must be fully represented in the manifest).
 //
 //   link             — deterministic .opencode/** mapping of source-runtime
 //                      with identical blob digests.
 //
-//   archive          — source-runtime plus scripts/install-from-archive.ps1
-//                      and README-INSTALL.md, wrapped under
-//                      agentdev-release-<short>/ at archive root.
+//   archive          — source-runtime plus the archive-dedicated installer
+//                      original scripts/consumer/archive/install.ps1
+//                      (projected as scripts/install.ps1 inside the
+//                      archive, REQ-050-010) and README-INSTALL.md,
+//                      wrapped under agentdev-release-<short>/ at archive
+//                      root.
 //
 //   archive-installed — deterministic .opencode/** mapping of source-runtime
-//                      (no install-from-archive.ps1, no README-INSTALL.md;
+//                      (no archive installer, no README-INSTALL.md;
 //                      the installer is verified separately by trusted
 //                      deterministic mapping/digest comparison, never by
 //                      execution).
@@ -34,6 +39,9 @@
 // The builder is pure: it does not read git, the filesystem, or the network.
 // The launcher feeds it the candidate tree's git entries plus their
 // digests.
+
+// ADF-COVERS(implementation): REQ-050-011
+// ADF-COVERS(verification): REQ-050-011
 
 import type { ManifestEntry, ManifestSet, Projection, SourceSubset } from "./types.ts";
 
@@ -54,12 +62,15 @@ const RUNTIME_PREFIXES: readonly string[] = [
 ];
 
 const BOOTSTRAP_PATHS: readonly string[] = [
-  "scripts/install-consumer-opencode.ps1",
-  "scripts/check-consumer-opencode.ps1",
+  "scripts/install.ps1",
+  "scripts/consumer/common.ps1",
 ];
 
 const ARCHIVE_EXTRA_REQUIRED: readonly string[] = [
-  "scripts/install-from-archive.ps1",
+  // Archive-dedicated installer ORIGINAL (REQ-050-010). Inside the release
+  // archive it is placed under the projection name scripts/install.ps1 by
+  // the packager; the manifest tracks the repository original path.
+  "scripts/consumer/archive/install.ps1",
   "README-INSTALL.md",
 ];
 
@@ -138,9 +149,9 @@ function dedupeAndSort(
 
 /**
  * Build the canonical `source` projection. Source includes runtime
- * (src/opencode/**) AND bootstrap scripts (install-consumer-opencode.ps1,
- * check-consumer-opencode.ps1). Both are producer-authored text shipped to
- * the consumer.
+ * (src/opencode/**) AND bootstrap artifacts (scripts/install.ps1 plus its
+ * runtime dependency scripts/consumer/common.ps1, REQ-050-011). Both are
+ * producer-authored text shipped to the consumer.
  */
 export function buildSourceManifest(
   inputs: readonly ManifestEntryInput[],

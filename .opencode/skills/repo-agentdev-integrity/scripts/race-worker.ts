@@ -61,7 +61,7 @@ const digest = crypto.createHash("sha256").update(fs.readFileSync(stagedZip)).di
 
 // Call the real publish-hard-link helper
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..", "..");
-const PUBLISHER = path.join(REPO_ROOT, "scripts", "publish-hard-link.ts");
+const PUBLISHER = path.join(REPO_ROOT, "scripts", "self", "release", "publish-hard-link.ts");
 
 const r = spawnSync("bun", ["run", PUBLISHER, stagedZip, finalZip, digest], {
   encoding: "utf-8",

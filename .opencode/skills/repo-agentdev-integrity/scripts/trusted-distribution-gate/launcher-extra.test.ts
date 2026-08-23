@@ -79,7 +79,7 @@ describe("launcher / manifest mismatch", () => {
     const repo = makeFixtureRepo();
     try {
       const base = headOid(repo);
-      const candidate = commitTweak(repo, "scripts/check-consumer-opencode.ps1", "");
+      const candidate = commitTweak(repo, "scripts/consumer/common.ps1", "");
       // The file is now empty but still present; that's a content change →
       // exit 1 (protected-path modified), not exit 2 (manifest mismatch).
       expect(runLauncher(baseOpts(repo, base, candidate, "out-manifest")).exit_code).toBe(1);

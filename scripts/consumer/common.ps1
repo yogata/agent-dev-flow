@@ -1,16 +1,19 @@
 <#
 .SYNOPSIS
-    check-consumer-opencode.ps1 / install-consumer-opencode.ps1 共有定義モジュール。
+    scripts/install.ps1（consumer 向け公開入口）共有定義モジュール。
 
 .DESCRIPTION
-    導入系スクリプト2本の共通定義（既定リポジトリ URL・ブランチ定数、cwd 安全化、
-    チェックアウト未検出時の案内文言）を単一定義として所有する（RU-0014、AG-020）。
-    両スクリプトから dot-source され、二重管理を解消する。本モジュール単体では
-    実行しない。利用者可視挙動の変更を伴わない内部再構成である（DEC-016）。
+    consumer 向け導入系スクリプトの共通定義（既定リポジトリ URL・ブランチ定数、cwd 安全化、
+    チェックアウト未検出時の案内文言）を単一定義として所有する。
+    公開入口（scripts/install.ps1）から dot-source され、二重管理を解消する。本モジュール単体では
+    実行しない。単体実行を前提としない内部処理であるため scripts/ 直下には配置しない（REQ-050-009）。
+    利用者可視挙動の変更を伴わない内部再構成である（DEC-016）。
 
     スクリプトを `./scripts/` として導入先リポジトリに置く場合は本ファイルも
     同一チェックアウトからコピーすること（スクリプト群の版不一致防止）。
 #>
+
+# ADF-COVERS(implementation): REQ-050-009
 
 #Requires -Version 7.0
 
