@@ -326,3 +326,19 @@
 - **想定反映先**: agentdev-skill-authoring、docs/designs/integrity/rules/IR-055 の運用記録
 - **関連**: PR #2424 本文「検証差分」finding 差分（修正済み1件）、Issue 2418
 - **タグ**: `#ir055` `#distribution-boundary` `#skill-authoring`
+
+## REQ 行 append を伴う req-save での AUTOGEN 再生成漏れが再発（req-save @301cdc90）
+
+- **問題事象**: REQ-012-051（および REQ-021-023〜025）の要件行 append を伴う req-save（commit 301cdc90、Issue #2419 系列）実行後も docs/designs/quality/req-health-metrics.md の AUTOGEN ブロックが再生成されず、main の鮮度ずれが残存した。下流 case-run（PR #2423）の generate_indexes.ts 実行で解消するまで main の AUTOGEN は旧計測のままであった（本 inbox 既存エントリ「REQ 行 append を伴う req-save では AUTOGEN 索引の同 commit 再生成が必要」と同根の再発）
+- **発生局面**: 実装（req-save 工程、Issue #2419 系列）と検証（case-run の generate_indexes.ts 実行、PR #2423）
+- **検知方法**: PR #2423 の case-run で generate_indexes.ts を実行した際の req-health-metrics.md 差分（main の AUTOGEN 鮮度ずれ解消分として顕在化）
+- **根本原因**: 既存エントリと同一（req-save 手順側に AUTOGEN 再生成の契約が明確でない）。AG-009(a)（OU-008、Issue #2386）の動機提示後も req-save 単体では再生成が行われず、予防策が工程に組み込まれていないことを示す再発実例
+- **自律対応内容**: PR #2423 の case-run で bun run generate_indexes.ts により req-health-metrics.md を再生成し、PR へ同梱して解消した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（AG-009(a)（OU-008、Issue #2386）の優先度を裏付ける再発実例）
+- **横展開観点**: REQ 行 append を伴う req-save 実行時は常に AUTOGEN 対象索引（req-health-metrics.md 等）の再生成要否を確認する（既存エントリと同一）
+- **再発条件**: REQ 行 append を伴う req-save で AUTOGEN 再生成を省略した場合（2回目の発生）
+- **予防策候補**: req-save 手順への AUTOGEN 再生成前置の明記、または req-save 完了時の鮮度検査自動実行（既存エントリと同一。再発により優先度上昇）
+- **想定反映先**: agentdev-workflow-req-save 手順、docs/designs/integrity/checker-execution-contracts.md（AG-009(a) で扱う領域）
+- **関連**: PR #2423 本文「Findings / Capture候補」2件目（回収元: https://github.com/yogata/agent-dev-flow/pull/2423 ）、Issue #2419、commit 301cdc90、本 inbox 既存エントリ「REQ 行 append を伴う req-save では AUTOGEN 索引の同 commit 再生成が必要」（PR #2390、commit 340e7304）
+- **タグ**: `#req-save` `#autogen` `#freshness-gate` `#recurrence`
