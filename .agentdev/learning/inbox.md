@@ -197,3 +197,51 @@
 - **関連**: PR 2406 本文、Issue 2402、Epic 2399 Wave 2 case-close
 - **タグ**: `#ir055` `#new-distribution-file` `#adf-covers` `#skill-authoring`
 
+## Windows 環境の一時検証コードは repo 内 tmp 領域に配置する
+
+- **問題事象**: Windows 環境で `C:\WINDOWS\TEMP\` 直下へ `.ts` ファイルとして検証ドライバを書き込んだところ、配布依存境界の pre-write gate に block された（outside-root target 扱い）
+- **発生局面**: 実装（検証ドライバの作成・実行、Issue #2409 の case work）
+- **検知方法**: 配布依存境界 pre-write gate の block 検出
+- **根本原因**: 検証コードの配置先を OS 標準一時ディレクトリにした際、gate が repo root 外への書き込みを outside-root target として扱う構成を確認していなかった
+- **自律対応内容**: repo 内 `.agentdev/tmp/`（worktree 内）へ配置して実行し、実行後に削除する回避で検証を完結した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（配布依存境界の gate 挙動の運用知見）
+- **横展開観点**: Windows 環境で一時検証コード・ドライバを書き出すすべての場面
+- **再発条件**: repo 外の一時ディレクトリへ検証コードを書き出して gate 対象操作を実行する場合
+- **予防策候補**: 一時検証コードの配置先は repo 内 tmp 領域（`.agentdev/tmp/` 等）を標準とする
+- **想定反映先**: agentdev-git-worktree の検証実行手順、agentdev-workflow-case-run の委譲手順
+- **関連**: PR #2412 本文「Findings/ Capture候補」learning 1件目（回収元: https://github.com/yogata/agent-dev-flow/pull/2412 ）
+- **タグ**: `#windows` `#temp-file` `#distribution-boundary` `#pre-write-gate`
+
+## worktree で junction が未伝播の場合の整合性検証は repo-local 直実行と --root 読取専用実行で完結できる
+
+- **問題事象**: worktree（`.worktrees/2409-feature`）では `.opencode/` junction が未伝播のため、配布スキルのスクリプト（agentdev-traceability 等）を worktree 側から直接実行できなかった
+- **発生局面**: 検証（case-run・case-close の worktree での整合性検証、Issue #2409 の case work）
+- **検知方法**: worktree 内の `.opencode/` 配下の配布スキル不在確認
+- **根本原因**: junction は git 非追跡のため worktree へ伝播せず、配布スキルのスクリプトが worktree から解決できない（worktree 構造的制約）
+- **自律対応内容**: repo-local 整合性スクリプト（`.opencode/skills/repo-agentdev-integrity/scripts/`、git 追跡で worktree へ伝播）は worktree から直接実行し、配布スキルのスクリプトは main root の `.opencode/` から `--root <worktree>` 指定で読取専用実行する形で検証を完結した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（REQ-018 worktree 構造的制約の運用知見）
+- **横展開観点**: worktree で配布スキルの検証スクリプトを実行するすべての場面
+- **再発条件**: junction 未伝播の worktree で配布スキルのスクリプトを直接実行しようとした場合
+- **予防策候補**: worktree 検証時は「repo-local スクリプトは直実行、配布スキルは main root から --root 指定」の使い分けを事前確認する
+- **想定反映先**: agentdev-git-worktree の worktree 構造的制約、agentdev-workflow-case-run STEP-S5 の検証実行形態
+- **関連**: PR #2412 本文「Findings/ Capture候補」learning 2件目（回収元: https://github.com/yogata/agent-dev-flow/pull/2412 ）
+- **タグ**: `#worktree` `#junction` `#read-only-verification` `#req018`
+
+## PR 本文の traceability 検証差分の担当行帰属は Epic マッピングと突合する
+
+- **問題事象**: PR #2412 本文の traceability check 行が残存 missing-implementation の対象行を「#2410、#2411 担当行 001〜004、019〜022、030」と記載していたが、Epic #2408 本文の REQ 行 → 子Issue マッピングでは REQ-049-001〜004 は #2409（Wave 1）の完了条件行であり、帰属が不一致していた。case-close の独立再検査で行レベルの check を再実行するまで気づけなかった
+- **発生局面**: 検証（Epic Wave クローズの QG-4 トレーサビリティ独立再検査、Epic #2408 Wave 1 case-close）
+- **検知方法**: agentdev-traceability check を `--req REQ-049-001,...,030` の行 ID 列挙で実行し、PR 本文記載の担当行と Epic 本文マッピングを行単位で突合
+- **根本原因**: case-run が check 結果（REQ 単位の findings）を後続 Wave 担当行の説明と混記し、行レベルの帰属を Issue の対象要件行で確認しなかった
+- **自律対応内容**: 行レベル再実行で実態（001〜004 が #2409 完了条件行の宣言欠落）を確定し、実装の実体は QG-4 で担保済みのため宣言 corpus 欠落として intake item（2026-08-23-req049-declaration-corpus-gap.md）へ回収し、対応記録コメントの検証差分に新規 finding として記録した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（トレーサビリティ能力の fail-open・中間Wave 保留原則の運用実例）
+- **横展開観点**: Epic Wave case-close で traceability 独立再検査を実施するすべての場面
+- **再発条件**: check 結果の残存行を行 ID レベルで確認せず、PR 本文の担当行記載をそのまま信用した場合
+- **予防策候補**: case-close の再検査は行 ID 列挙で実行し、残存行が当該 Issue の対象要件行か後続 Wave 担当行かを Epic マッピングで判定する手順を明確化する
+- **想定反映先**: agentdev-workflow-case-close のトレーサビリティ独立再検査手順（行レベル評価スコープ判定）
+- **関連**: PR #2412 本文、Issue #2409 対応記録コメント、Epic #2408 Wave 1 case-close
+- **タグ**: `#traceability` `#epic-wave` `#evaluation-scope` `#case-close`
+
