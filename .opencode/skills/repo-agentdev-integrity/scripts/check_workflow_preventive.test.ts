@@ -24,8 +24,8 @@ describe("checkWorkflowPreventive (integration against real repo)", () => {
       expect(c.pass).toBe(true);
     }
     expect(report.failures.filter((f) => f.severity === "strict").length).toBe(0);
-    // 17 public commands since backlog-auto was added (16 before).
-    expect(report.stats.public_commands).toBe(17);
+    // 18 public commands since issue was added (17 before).
+    expect(report.stats.public_commands).toBe(18);
     expect(report.stats.legacy_kind_files).toBe(0);
     expect(report.stats.legacy_commands_dir_files).toBe(0);
   });

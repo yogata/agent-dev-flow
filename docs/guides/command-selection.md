@@ -20,6 +20,7 @@
 | inbox.md にエントリがある | `/agentdev/learning-promote` | 採用済み成果物 |
 | 採用済み成果物（intake/learning）がある | `/agentdev/backlog-review` | `RU-*.md` |
 | RU がある | `/agentdev/req-define` | 要件doc（draft） |
+| 未解決事項を課題として追跡したい | `/agentdev/issue` | 課題ファイル（`docs/issue-list/`） |
 | REQ 体系の健全性を検出したい | `/agentdev/inspect-docs` | 検出レポート |
 | 要件docがあり req-saveからcase-closeまで自走させたい / Issue番号、URL があり case-run〜case-close を自走させたい | `/agentdev/case-auto` | マージ済み + クローズ済み |
 | backlog整理サイクル（検出→昇格→統合）を1回で実行したい | `/agentdev/backlog-auto` | 検出事項、採用済み成果物、`RU-*.md` |
@@ -42,6 +43,7 @@
 
 - 工程分岐は `work_type` 固定分岐ではなく req_draft の `artifact_actions` 存在で動的判定する（v2:REQ-0138, v2:ADR-0124）。REQ/Decision 対象 artifact_actions があれば req-save、Design 対象 artifact_actions があれば design-save を実行する
 - Intake / Learning パイプラインの詳細は [Intake / Learning / Backlog フロー](intake-learning-backlog-flow.md) を参照
+- 課題管理（`/agentdev/issue`、`docs/issue-list/`）は開発中の未解決事項を発生から解決、正規成果物への反映確認まで追跡する系統であり、Intake / Learning、GitHub Issue、Decision、RU とは別系統である。サブコマンドや引数を覚える必要はなく、自然言語で指示する
 - 各コマンドの入出力の詳細は [要件定義 → Case実行フロー](req-case-flow.md) を参照
 - `/agentdev/case-auto` は明示指定時のみ使用する追加入口。標準ワークフローを置き換えない
 - `/agentdev/backlog-auto` は backlog 整理サイクル（検出→昇格→統合）を1回で実行する追加入口。標準の backlog 整理フローを置き換えず、既存5コマンド（inspect-docs、learning-promote、intake-promote、inspect-promote、backlog-review）は従来どおり単独実行できる

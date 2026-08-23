@@ -22,6 +22,7 @@ AgentDevFlow の各コマンドの入力、出力、次アクションを一覧�
 | `/agentdev/intake-capture` | ユーザー手動入力 | `inbox/` item | `/agentdev/intake-promote` |
 | `/agentdev/intake-from-github` | クローズ済み Issue/PR | `inbox/` item | `/agentdev/intake-promote` |
 | `/agentdev/intake-promote` | `inbox/` item | `promoted/` 成果物 | `/agentdev/backlog-review` |
+| `/agentdev/issue` | 自然言語による課題管理の指示 | 課題ファイル（`docs/issue-list/`）の作成・更新 / 検索・参照結果 | 継続利用または完了 |
 | `/agentdev/learning-promote` | `inbox.md` + `deferred.md` | `promoted/` 成果物 | `/agentdev/backlog-review` |
 | `/agentdev/backlog-review` | `promoted/` 成果物（intake/learning） | `RU-*.md` | `/agentdev/req-define` |
 | `/agentdev/inspect-docs` | docs全体の意味整合検出 | 検出事項 | `/agentdev/inspect-promote` → `/agentdev/backlog-review` |
@@ -43,6 +44,7 @@ AgentDevFlow の各コマンドの入力、出力、次アクションを一覧�
 - [intake-capture.md](./intake-capture.md)
 - [intake-from-github.md](./intake-from-github.md)
 - [intake-promote.md](./intake-promote.md)
+- [issue.md](./issue.md)
 - [learning-promote.md](./learning-promote.md)
 - [inspect-docs.md](./inspect-docs.md)
 - [inspect-skills.md](./inspect-skills.md)

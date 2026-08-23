@@ -281,7 +281,7 @@ const commands = getCommandFiles();
 const skillDirs = getSkillDirs();
 const templateFiles = getTemplateFiles();
 
-// Current 17 public agentdev commands (aligns with commands/agentdev/README.md listing)
+// Current 18 public agentdev commands (aligns with commands/agentdev/README.md listing)
 const EXPECTED_COMMANDS = [
   "backlog-auto",
   "backlog-review",
@@ -296,6 +296,7 @@ const EXPECTED_COMMANDS = [
   "intake-capture",
   "intake-from-github",
   "intake-promote",
+  "issue",
   "learning-promote",
   "req-define",
   "req-save",
