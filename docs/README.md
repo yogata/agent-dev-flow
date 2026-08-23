@@ -6,10 +6,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 39件、廃止済み: 9件
+現行 REQ: 40件、廃止済み: 9件
 <!-- AUTOGEN:END -->
 
-現行要件は39件である（REQ-013 は後継 REQ-012 への移行として、REQ-022〜REQ-024 は達成済みとして、REQ-025・REQ-026・REQ-028 は移管完了に伴う恒常行移行済みとして、REQ-020・REQ-040 は最小トレーサビリティモデルへの再設計による後継 REQ-012 統合として retired/ へ移行、REQ-036〜REQ-048 を追加。番号には欠番が存在する）。
+現行要件は40件である（REQ-013 は後継 REQ-012 への移行として、REQ-022〜REQ-024 は達成済みとして、REQ-025・REQ-026・REQ-028 は移管完了に伴う恒常行移行済みとして、REQ-020・REQ-040 は最小トレーサビリティモデルへの再設計による後継 REQ-012 統合として retired/ へ移行、REQ-036〜REQ-049 を追加。番号には欠番が存在する）。
 REQ-022・REQ-024 の旧規範内容（augmentation 配置先、check_graph.ts 抽出規則と warning 分類）は旧 Artifact Graph とともに廃止された（DEC-017）。履歴は retired REQ ファイルと版管理で参照できる。
 各 REQ の詳細は各 REQ ファイル本文を参照。
 
@@ -54,12 +54,13 @@ REQ-022・REQ-024 の旧規範内容（augmentation 配置先、check_graph.ts �
 | [REQ-046](requirements/REQ-046.md) | 横断正規化後の不変条件 |
 | [REQ-047](requirements/REQ-047.md) | 規則所有権の一方向化 |
 | [REQ-048](requirements/REQ-048.md) | ADF 実行効率第1次改善（実行観測基盤） |
+| [REQ-049](requirements/REQ-049.md) | 課題管理機構 |
 
 - [要件インデックス](requirements/README.md)
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-019 の19件である（DEC-018、DEC-019 は proposed、DEC-005、DEC-007 は superseded）。
+現行 Decision は DEC-001 から DEC-020 の20件である（DEC-018、DEC-019、DEC-020 は proposed、DEC-005、DEC-007 は superseded）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
@@ -83,6 +84,7 @@ REQ-022・REQ-024 の旧規範内容（augmentation 配置先、check_graph.ts �
 | [DEC-017](decisions/DEC-017.md) | 最小トレーサビリティモデルの採用と Artifact Graph の廃止（proposed） |
 | [DEC-018](decisions/DEC-018.md) | 評価ブランチモデルとCase統合先の一般化（proposed） |
 | [DEC-019](decisions/DEC-019.md) | 一般処理の標準API委譲とADF固有意味論の所有境界（proposed） |
+| [DEC-020](decisions/DEC-020.md) | 課題管理系統の導入（proposed） |
 
 ## 設計（Design）
 
