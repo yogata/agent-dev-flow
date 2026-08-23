@@ -34,6 +34,7 @@ AgentDevFlow プラグインの設定を管理するリポジトリ。AI エー�
 | inbox.md にエントリがある | `/agentdev/learning-promote` | 採用済み成果物 |
 | 採用済み成果物（intake/learning/inspect）がある | `/agentdev/backlog-review` | `RU-*.md` |
 | RU がある | `/agentdev/req-define` | 要件doc（draft） |
+| 未解決事項を課題として追跡したい | `/agentdev/issue` | 課題ファイル（`docs/issue-list/`） |
 | docs 全体の意味整合性を検出したい | `/agentdev/inspect-docs` | 検出事項（finding） |
 | Command/Skill 参照妥当性を検出したい | `/agentdev/inspect-skills` | 検出事項（finding） |
 | 検出事項を分類したい | `/agentdev/inspect-promote` | 採用済み成果物 |
