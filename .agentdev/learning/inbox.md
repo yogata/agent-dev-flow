@@ -245,3 +245,19 @@
 - **関連**: PR #2412 本文、Issue #2409 対応記録コメント、Epic #2408 Wave 1 case-close
 - **タグ**: `#traceability` `#epic-wave` `#evaluation-scope` `#case-close`
 
+
+## Windows worktree で外部依存（zod）を持つ検証スクリプトは bun install 前置で実行する
+
+- **問題事象**: Windows の worktree（`.worktrees/2410-feature`）では node_modules が git 管理外のため main root から伝播せず、zod に依存する integrity checker（check_extensions が参照する agentdev-project-extensions/scripts/lib/extension_state.ts）が unhandled error で失敗した
+- **発生局面**: 検証（case-run・case-close の worktree での整合性検証、Issue #2410 の case work）
+- **検知方法**: worktree 上での check_extensions 実行時に zod のモジュール解決エラーが発生
+- **根本原因**: node_modules は git 非追跡のため worktree へ伝播しない（worktree 構造的制約と同一根拠）。agentdev-project-extensions/scripts が zod に依存するが、worktree 側に当該 node_modules が存在しない
+- **自律対応内容**: src/opencode/skills/agentdev-project-extensions/scripts と .opencode/skills/repo-agentdev-integrity/scripts の両方で bun install を実行して解消した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（REQ-018 worktree 構造的制約の運用知見）
+- **横展開観点**: Windows worktree で zod 等の外部依存を持つ検証スクリプトを実行するすべての場面
+- **再発条件**: 新規 worktree を作成し、node_modules の伝播を前提とした検証スクリプトを実行する場合
+- **予防策候補**: worktree 検証手順に bun install 前置を明文化する
+- **想定反映先**: agentdev-git-worktree の worktree 構造的制約（bun test 実行の環境前提）、agentdev-workflow-case-run の委譲時検証手順
+- **関連**: PR #2413 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2413 ）
+- **タグ**: `#windows` `#worktree` `#node-modules` `#bun-install`
