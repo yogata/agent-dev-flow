@@ -1,21 +1,21 @@
 // ADF-COVERS(implementation): REQ-010-063
-// Skill rename symmetry checker (REQ-026).
+// Skill rename symmetry checker.
 //
-// Deterministic checks for skill rename operations. Verifies symmetries
-// that must hold after a rename:
+// Deterministic checks under the REQ-010-063 inspection contract
+// (docs/designs/integrity/targeted-docs-guard-implementation.md
+// "skill rename 対称性検査観点"):
 //
-//   REQ-026-001 (path-symmetry):
-//     For every distributed skill `src/opencode/skills/{X}/` there must be a
-//     matching Design `docs/designs/skills/{X}.md`, and vice versa. Design with
-//     status `superseded` is exempt (skill dir intentionally removed).
+//   Constant checks (always run):
+//     frontmatter-id: SKILL.md frontmatter `name` == skill directory name,
+//     and Design frontmatter title token == Design filename stem.
 //
-//   REQ-026-002 (frontmatter-id):
-//     SKILL.md frontmatter `name` must equal the parent directory name.
-//     Design frontmatter `title` must contain the skill name token matching
-//     the Design filename stem.
-//
-//   REQ-026-003 (graph-node) was abolished with the Artifact Graph retirement
-//   (DEC-017, Issue #2362).
+//   Rename-time checks (only when renames are declared via `--rename`):
+//     path-symmetry between the old and new names of each declared rename:
+//     `src/opencode/skills/{name}` and `docs/designs/skills/{name}.md` must
+//     move together. Same-name Skill Design existence is NOT a constant
+//     invariant (Workflow Skills may have no dedicated same-name Design).
+//     Maintained exceptions: a `superseded` Design without its skill dir is
+//     tolerated; a `draft` Design symmetry break is reported as warning.
 //
 // Scope: distribution skills `agentdev-*` only. Repo-local skills
 // (`repo-agentdev-*` under `.opencode/skills/`) and third-party skills
@@ -47,9 +47,19 @@ export interface SymmetryReport {
   stats: {
     skills_scanned: number;
     designs_scanned: number;
+    renames_checked: number;
     path_symmetry_violations: number;
     frontmatter_id_violations: number;
   };
+}
+
+export interface RenamePair {
+  from: string;
+  to: string;
+}
+
+export interface SymmetryOptions {
+  renames?: RenamePair[];
 }
 
 const DISTRIBUTION_SKILLS_PARENT = "src/opencode/skills";
@@ -181,53 +191,97 @@ function isSupersededStatus(status: string): boolean {
 }
 
 /**
- * REQ-026-001: physical path symmetry between distribution skills and Designs.
+ * REQ-010-063 rename-time path symmetry. For each declared rename
+ * `from` -> `to`, the skill dir and the same-name Design must move together:
+ *
+ *  R1: both old and new skill dirs exist        -> ng (incomplete rename)
+ *  R2: both old and new Designs exist           -> ng (incomplete rename;
+ *      a `superseded` old Design is exempt)
+ *  R3: skill moved, Design remains at old name  -> ng (warning when the old
+ *      Design is `draft`; `superseded` exempt)
+ *  R3b: Design moved, skill dir remains at old name -> ng (warning when the
+ *      new Design is `draft`; `superseded` exempt)
+ *
+ * Skills without a same-name Design (e.g. Workflow Skills) rename freely:
+ * with no Design at either name, no correspondence exists to break.
  */
-function checkPathSymmetry(
+function checkRenamePathSymmetry(
   skills: SkillEntry[],
   designs: DesignEntry[],
+  renames: RenamePair[],
 ): SymmetryFailure[] {
   const failures: SymmetryFailure[] = [];
-  const skillNames = new Set(skills.map((s) => s.name));
-  const designByName = new Map(designs.map((s) => [s.name, s] as const));
+  const skillByName = new Map(skills.map((s) => [s.name, s] as const));
+  const designByName = new Map(designs.map((d) => [d.name, d] as const));
 
-  // skill dir exists → Design must exist
-  for (const skill of skills) {
-    if (!designByName.has(skill.name)) {
+  for (const { from, to } of renames) {
+    const skillFrom = skillByName.get(from);
+    const skillTo = skillByName.get(to);
+    const designFrom = designByName.get(from);
+    const designTo = designByName.get(to);
+
+    if (skillFrom && skillTo) {
       failures.push({
         category: "path-symmetry",
         level: "ng",
         message:
-          `distribution skill \`${skill.name}\` has no matching Design at ${DESIGNS_SKILLS_DIR}/${skill.name}.md`,
-        file: skill.dir,
-        expected: `${DESIGNS_SKILLS_DIR}/${skill.name}.md`,
+          `rename \`${from}\` -> \`${to}\`: both old and new skill dirs exist (old dir left behind)`,
+        file: skillFrom.dir,
+        expected: `only ${DISTRIBUTION_SKILLS_PARENT}/${to}`,
       });
     }
-  }
 
-  // Design exists → skill dir must exist (unless superseded)
-  for (const design of designs) {
-    if (skillNames.has(design.name)) continue;
-    if (isSupersededStatus(design.status)) {
-      // superseded Design intentionally has no skill dir; not a violation
-      continue;
+    if (designFrom && designTo && !isSupersededStatus(designFrom.status)) {
+      failures.push({
+        category: "path-symmetry",
+        level: "ng",
+        message:
+          `rename \`${from}\` -> \`${to}\`: both old and new Design files exist (old Design left behind)`,
+        file: designFrom.file,
+        expected: `only ${DESIGNS_SKILLS_DIR}/${to}.md`,
+      });
     }
-    const level = design.status === "accepted" ? "ng" : "warning";
-    failures.push({
-      category: "path-symmetry",
-      level,
-      message:
-        `Design \`${design.name}\` (status: ${design.status || "unknown"}) has no matching distribution skill at ${DISTRIBUTION_SKILLS_PARENT}/${design.name}`,
-      file: design.file,
-      expected: `${DISTRIBUTION_SKILLS_PARENT}/${design.name}/SKILL.md`,
-    });
+
+    if (
+      skillTo &&
+      !skillFrom &&
+      designFrom &&
+      !isSupersededStatus(designFrom.status) &&
+      !designTo
+    ) {
+      failures.push({
+        category: "path-symmetry",
+        level: designFrom.status === "draft" ? "warning" : "ng",
+        message:
+          `rename \`${from}\` -> \`${to}\`: skill dir moved but its Design remains at ${DESIGNS_SKILLS_DIR}/${from}.md`,
+        file: designFrom.file,
+        expected: `${DESIGNS_SKILLS_DIR}/${to}.md`,
+      });
+    }
+
+    if (
+      designTo &&
+      !designFrom &&
+      skillFrom &&
+      !skillTo &&
+      !isSupersededStatus(designTo.status)
+    ) {
+      failures.push({
+        category: "path-symmetry",
+        level: designTo.status === "draft" ? "warning" : "ng",
+        message:
+          `rename \`${from}\` -> \`${to}\`: Design moved but skill dir remains at ${DISTRIBUTION_SKILLS_PARENT}/${from}`,
+        file: skillFrom.dir,
+        expected: `${DISTRIBUTION_SKILLS_PARENT}/${to}/SKILL.md`,
+      });
+    }
   }
 
   return failures;
 }
 
 /**
- * REQ-026-002: frontmatter id consistency.
+ * REQ-010-063 constant frontmatter-id check.
  *
  * SKILL.md `name` must equal parent directory name.
  * Design `title` must contain the skill name token matching the filename stem.
@@ -309,21 +363,26 @@ function checkFrontmatterId(
   return failures;
 }
 
-export function checkSkillRenameSymmetry(repoRoot: string): SymmetryReport {
+export function checkSkillRenameSymmetry(
+  repoRoot: string,
+  options?: SymmetryOptions,
+): SymmetryReport {
+  const renames = options?.renames ?? [];
   const skills = listDistributionSkills(repoRoot);
   const designs = listDesigns(repoRoot);
 
-  const pathFailures = checkPathSymmetry(skills, designs);
   const frontmatterFailures = checkFrontmatterId(skills, designs);
+  const pathFailures = checkRenamePathSymmetry(skills, designs, renames);
 
   const failures: SymmetryFailure[] = [
-    ...pathFailures,
     ...frontmatterFailures,
+    ...pathFailures,
   ];
 
   const stats = {
     skills_scanned: skills.length,
     designs_scanned: designs.length,
+    renames_checked: renames.length,
     path_symmetry_violations: pathFailures.length,
     frontmatter_id_violations: frontmatterFailures.length,
   };
@@ -339,25 +398,61 @@ export function checkSkillRenameSymmetry(repoRoot: string): SymmetryReport {
   };
 }
 
+function parseRenameArgs(args: string[]): RenamePair[] {
+  const renames: RenamePair[] = [];
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    let value: string | null = null;
+    if (a === "--rename") {
+      value = args[i + 1] ?? null;
+      if (value !== null) i++;
+    } else if (a.startsWith("--rename=")) {
+      value = a.slice("--rename=".length);
+    } else {
+      continue;
+    }
+    if (value === null || value === "") {
+      throw new Error("--rename requires a value (<old>=<new>)");
+    }
+    const eq = value.indexOf("=");
+    if (eq <= 0 || eq === value.length - 1) {
+      throw new Error(`--rename expects <old>=<new> (got '${value}')`);
+    }
+    const from = value.slice(0, eq);
+    const to = value.slice(eq + 1);
+    if (from === to) {
+      throw new Error(`--rename old and new names must differ (got '${value}')`);
+    }
+    renames.push({ from, to });
+  }
+  return renames;
+}
+
 if (require.main === module) {
   const args = process.argv.slice(2);
   if (args.includes("--help") || args.includes("-h")) {
     process.stdout.write(
-      `check_skill_rename_symmetry.ts - skill rename symmetry checker (REQ-026)
+      `check_skill_rename_symmetry.ts - skill rename symmetry checker (REQ-010-063)
 
 USAGE:
-  bun .opencode/skills/repo-agentdev-integrity/scripts/check_skill_rename_symmetry.ts [repoRoot] [--json]
+  bun .opencode/skills/repo-agentdev-integrity/scripts/check_skill_rename_symmetry.ts [repoRoot] [--json] [--rename <old>=<new>]...
 
 OPTIONS:
-  --help, -h   Show this help message
-  --json       Output results in JSON format
+  --help, -h          Show this help message
+  --json              Output results in JSON format
+  --rename <old>=<new>
+                      Declare a skill rename (repeatable). Enables the
+                      rename-time path-symmetry check for the pair: the skill
+                      dir and the same-name Design must move together.
 
 ARGUMENTS:
-  repoRoot     Repository root (default: current working directory)
+  repoRoot            Repository root (default: current working directory)
 
 CHECKS:
-  path-symmetry    REQ-026-001: src/opencode/skills/{X} <-> docs/designs/skills/{X}.md
-  frontmatter-id   REQ-026-002: SKILL.md name == dir, Design title token == filename stem
+  frontmatter-id   constant: SKILL.md name == dir, Design title token == filename stem
+  path-symmetry    rename-time only (--rename): src/opencode/skills/{name} and
+                   docs/designs/skills/{name}.md move together (same-name Skill
+                   Design existence is not a constant invariant)
 
 EXIT CODES:
   0  No issues found
@@ -368,7 +463,18 @@ EXIT CODES:
   }
 
   const json = args.includes("--json");
-  const positional = args.filter((a) => !a.startsWith("-"));
+
+  let renames: RenamePair[];
+  try {
+    renames = parseRenameArgs(args);
+  } catch (e) {
+    process.stderr.write(`error: ${(e as Error).message}\n`);
+    process.exit(2);
+  }
+
+  const positional = args.filter(
+    (a, idx) => !a.startsWith("-") && args[idx - 1] !== "--rename",
+  );
   const repoRoot = positional[0] ? path.resolve(positional[0]) : process.cwd();
 
   if (!dirExists(repoRoot)) {
@@ -376,13 +482,13 @@ EXIT CODES:
     process.exit(2);
   }
 
-  const report = checkSkillRenameSymmetry(repoRoot);
+  const report = checkSkillRenameSymmetry(repoRoot, { renames });
 
   if (json) {
     process.stdout.write(JSON.stringify(report, null, 2) + "\n");
   } else {
     process.stdout.write(
-      `check_skill_rename_symmetry.ts - skill rename symmetry (REQ-026)\n`,
+      `check_skill_rename_symmetry.ts - skill rename symmetry (REQ-010-063)\n`,
     );
     process.stdout.write(
       `=============================================================\n`,
