@@ -2,7 +2,7 @@
 title: 成果物責任表
 status: accepted
 created: 2026-08-20
-updated: 2026-08-10
+updated: 2026-08-23
 ---
 
 # 成果物責任表
@@ -23,6 +23,7 @@ updated: 2026-08-10
 | Decision | `docs/decisions/DEC-*.md` | - | - | 意思決定記録（基準） |
 | Design | `docs/designs/**/*.md` | - | - | 現在設計（リポジトリ内部）。commands/skills/workflows の3層と基盤6ドメイン（foundations/responsibilities/quality/integrity/local/authoring）で構成 |
 | Guide | `docs/guides/*.md` | - | - | 参照用読み物（ナビゲーション層） |
+| 課題ファイル(`docs/issue-list/`) | 課題管理 Capability Skill(最終命名は skill Design が確定) | - | - | 未解決事項の追跡(検知、起票、検索、更新、保留、再評価、解決、反映確認、クローズ、再オープン)。反映先成果物の更新は当該成果物を所有する ADF 能力へ委譲し、課題管理側は反映要否の追跡に徹する |
 | ドメイン状態 | `.agentdev/` | - | - | Intake / Learning / Backlog / Integrity 永続状態 |
 | リポジトリローカル Command | `.opencode/commands/repo/` | - | - | 本体リポジトリ専用コマンド（REQ-001）。AgentDevFlow 配布対象外。原本、配置先同期対象外 |
 | リポジトリローカル Skill | `.opencode/skills/repo-*/` | - | - | 本体リポジトリ専用スキル（REQ-001）。AgentDevFlow 配布対象外。原本、配置先同期対象外 |
