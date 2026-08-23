@@ -261,3 +261,20 @@
 - **想定反映先**: agentdev-git-worktree の worktree 構造的制約（bun test 実行の環境前提）、agentdev-workflow-case-run の委譲時検証手順
 - **関連**: PR #2413 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2413 ）
 - **タグ**: `#windows` `#worktree` `#node-modules` `#bun-install`
+
+
+## 配布依存境界 guard は src 参照を含む一時検証ドライバの TEMP 書出しも block する
+
+- **問題事象**: 配布依存境界 guard の事前書き込み gate が、TEMP 直下の一時検証ドライバの書き出しに対しても、内容に src/opencode/ 配下パス参照を含むことを理由に block した
+- **発生局面**: 検証（Issue #2411 の case-run、Windows、検証ドライバの一時ファイル化）
+- **検知方法**: 一時ドライバ書き出し時に gate が block を報告
+- **根本原因**: gate は書き込み先パスではなく書き込み内容の配布物パス参照で判定するため、一時領域への検証用ファイル書き出しも配布物変更と同様に扱われる
+- **自律対応内容**: ドライバをファイル化せずコマンド inline 実行に切り替えて回避した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（配布依存境界 Design の gate 仕様に従う挙動）
+- **横展開観点**: 配布依存境界 guard 配下で検証ドライバをファイル化するすべての場面
+- **再発条件**: 一時検証ドライバに src/opencode/ 配下パスを埋め込んだファイルを書き出す場合
+- **予防策候補**: 一時ドライバをファイル化する場合は配布物パスを埋め込まない構成にする（コマンド inline 実行またはパスの間接参照）
+- **想定反映先**: agentdev-workflow-case-run の検証手順、配布依存境界 Design の gate 例外規定の検討
+- **関連**: PR #2414 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2414 ）
+- **タグ**: `#distribution-boundary` `#guard` `#temp-file` `#windows`
