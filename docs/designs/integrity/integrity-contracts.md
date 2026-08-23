@@ -2,7 +2,7 @@
 title: 整合性契約
 status: accepted
 created: 2026-08-20
-updated: 2026-08-22
+updated: 2026-08-23
 ---
 <!-- ADF-COVERS(implementation): REQ-010-006 -->
 <!-- ADF-COVERS(implementation): REQ-036-022 -->
@@ -513,7 +513,7 @@ archive は配布物の自己完結を保証するが、checker（`repo-agentdev
 処理順序:
 
 1. `--archive` で指定された ZIP を一時ディレクトリ `<temp>` へ展開する
-2. `<temp>/<root>/scripts/install-from-archive.ps1 -Source <temp>/<root>/src/opencode -Target <temp>/<root>/.opencode -Mode copy` を実行する
+2. `<temp>/<root>/scripts/install.ps1 -Source <temp>/<root>/src/opencode -Target <temp>/<root>/.opencode -Mode copy` を実行する（archive 版 installer。原本は `scripts/consumer/archive/install.ps1` で、archive 内では投影名 `scripts/install.ps1` として配置される）
 3. host 側 checker を `--profile installed --root <temp>/<root> --json` で起動し、installed profile を実行する
 4. archive は docs/ を含まないため、exit code は `InstalledProfile` カテゴリ（projection_missing/extra/content_mismatch/broken_junction/missing_required_dir）の結果のみで判定する。全文結果は report へ転送する
 5. 成功・失敗の双方で `<temp>` を削除する（cleanup 失敗は warning、exit code は変えない）
@@ -523,9 +523,9 @@ install 後も配置先が欠落する場合は NG とする。
 
 ### archive 生成・導入コマンド（§7.5.1, §7.5.2）
 
-archive 生成: `scripts/package-release-archive.ps1`（原本 `src/opencode/` 配下を junction 解決済み実ファイルとして ZIP へ格納）。
+archive 生成: `scripts/self/release/package-release-archive.ps1`（原本 `src/opencode/` 配下を junction 解決済み実ファイルとして ZIP へ格納）。
 出力は `dist/agentdev-release-<commit-short>.zip`。
-archive 内レイアウトは `agentdev-release-<sha>/` ルートの下に `src/opencode/commands/agentdev/**`、`src/opencode/skills/agentdev-*/**`、`src/opencode/skills/japanese-tech-writing/**`、`scripts/install-from-archive.ps1`、`README-INSTALL.md` を格納する。
+archive 内レイアウトは `agentdev-release-<sha>/` ルートの下に `src/opencode/commands/agentdev/**`、`src/opencode/skills/agentdev-*/**`、`src/opencode/skills/japanese-tech-writing/**`、`scripts/install.ps1`（archive 版。原本 `scripts/consumer/archive/install.ps1` を投影名 `scripts/install.ps1` として格納）、`README-INSTALL.md` を格納する。
 
 | 実行結果 | exit code |
 |---|---|
@@ -533,7 +533,7 @@ archive 内レイアウトは `agentdev-release-<sha>/` ルートの下に `src/
 | 原本欠落・必須ファイル不在 | 2 |
 | 既存 dist 上書き検出（`-Force` 無し） | 3 |
 
-archive 展開・install: `scripts/install-from-archive.ps1 -Source <src/opencode> -Target <.opencode> -Mode copy` が実ファイルを `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`、`.opencode/skills/japanese-tech-writing/` 配下へ配置する。
+archive 展開・install: archive 版 `scripts/install.ps1 -Source <src/opencode> -Target <.opencode> -Mode copy` が実ファイルを `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`、`.opencode/skills/japanese-tech-writing/` 配下へ配置する（原本は `scripts/consumer/archive/install.ps1`）。
 junction は作成しない。
 
 | 実行結果 | exit code |

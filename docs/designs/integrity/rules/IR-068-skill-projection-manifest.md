@@ -2,7 +2,7 @@
 title: "IR-068: skill-projection-manifest"
 status: accepted
 created: 2026-08-22
-updated: 2026-08-22
+updated: 2026-08-23
 ---
 
 # IR-068: skill-projection-manifest
@@ -21,7 +21,7 @@ updated: 2026-08-22
 | false_positive_risk | 低。repo-* プレフィックスの投影専用スキル（repo-local、v2:ADR-0020 / v2:REQ-0159-002）は投影比較から除外する。worktree（junction 不在）では投影比較自体を skip するため誤検出しない。解決不能エントリ（projection-broken）はディレクトリ以外の混入物も含むが、投影スキルはディレクトリであることが契約であるため誤検出とならない。manifest の重複・不正形式エントリは silent skip せず heuristic 警告する（宣言的データの silent skip 禁止、checker-execution-contracts Design） |
 | regression_test | `check_integrity.test.ts` describe "IR-068 skill-projection-manifest (Issue #2383 (d), inspect F-01)"。正常例（manifest ↔ src 一致）・違反例（manifest 陳腐化・投影欠落・stale junction）・境界例（worktree = junction 不在で skip）・許容例（repo-* 投影専用スキル）・再現例（F-01: workflow-design-save 投影欠落 + `agentdev-artifact-graph` stale junction + リンク先欠損 `agentdev-spec-file-manager` の解決不能エントリ）の 5 種 fixture |
 | finding_route | intake |
-| triage_action | manifest 陳腐化はスキル追加・削除・リネームと同一 PR での manifest 更新で解消する。投影乖離（projection-missing / projection-extra / projection-broken）は junction 再構築（`install-consumer-opencode.ps1 -Mode apply` 再実行、局所運用タスク）で解消する。F-01 の既知乖離 7 件（投影欠落 4 + stale junction 3）は NG baseline（provenance `issue-2383-f01-junction-rebuild-pending`）で管理し、PR マージ後の junction 再構築で解消する |
+| triage_action | manifest 陳腐化はスキル追加・削除・リネームと同一 PR での manifest 更新で解消する。投影乖離（projection-missing / projection-extra / projection-broken）は junction 再構築（`scripts/install.ps1 -Mode apply` 再実行、局所運用タスク）で解消する。F-01 の既知乖離 7 件（投影欠落 4 + stale junction 3）は NG baseline（provenance `issue-2383-f01-junction-rebuild-pending`）で管理し、PR マージ後の junction 再構築で解消する |
 | last_verified | 2026-08-22 |
 
 ## 検査項目
