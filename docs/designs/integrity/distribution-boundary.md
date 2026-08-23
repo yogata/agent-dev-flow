@@ -2,7 +2,7 @@
 title: "配布依存境界"
 status: accepted
 created: "2026-08-11"
-updated: "2026-08-20"
+updated: "2026-08-23"
 ---
 <!-- ADF-COVERS(implementation): REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-045 -->
@@ -79,6 +79,9 @@ clean として通過させない（DEC-014 決定5）。
 
 いずれかの projection で違反が残存する場合、全体を通過扱いにしない。
 
+通常 checkout 版の `scripts/install.ps1` と release archive 版の `scripts/install.ps1` は同名で併存する。
+trust root / manifest の検証は projection スコープで実施し、両者を区別して扱う（REQ-050-010、REQ-050-012）。
+
 ## 事前書き込み gate と最終 gate の契約
 
 事前書き込み gate は執筆・編集経路で動作する fail-fast adapter であり、書き込み前に検出結果を反映する。
@@ -100,8 +103,9 @@ Epic 実装はこれに従う。
 - 共有 module: 副作用なし（side-effect-free）の canonical detector module は repo-agentdev-integrity 配下が所有する。想定モジュールパスは `.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts`。既存の checker はこの共有 module への adapter となる。
 - repo-local plugin: plugin パスは `.opencode/plugins/distribution-boundary-guard.ts`。
 - 事前書き込み gate: OpenCode の `tool.execute.before` フック（サポート対象は `edit`、`write`、`apply_patch`）で構成する。adapter は prospective content を評価し、違反または検査エラー時に書き込みを block する。
-- archive 公開前検査の呼び出し点: `scripts/package-release-archive.ps1` が最終公開前に一時 archive を検証する。
-- archive-installed 検証の配置: 一時的な consumer/archive-install パスを用いて archive-installed projection を検証する。`check-consumer-opencode.ps1` へ新たな責務を追加しない。
+- archive 公開前検査の呼び出し点: `scripts/self/release/package-release-archive.ps1` が最終公開前に一時 archive を検証する。
+- archive-installed 検証の配置: 一時的な consumer/archive-install パスを用いて archive-installed projection を検証する。consumer 向け公開入口（scripts/install.ps1）へ新たな責務を追加しない。archive-installed 検証は consumer 向け公開入口を利用しない別経路を維持する（特定入口名への再刻印を避け、将来の入口再編で再度陳腐化しない一般化表現とする）。
+- trust root / protected path と配布 manifest の対象パス: スクリプトパスを契約として保持する検証処理・テストは新構造（scripts/install.ps1、scripts/self-sync.ps1、scripts/consumer/ 配下、scripts/self/ 配下）へ追従させる。trust root / protected path は新しい信頼対象パスを保護し、移動後の旧パスのみを保護する状態にしない。公開入口の実行依存集合（scripts/consumer/common.ps1 等）が配布 manifest 対象に完全に含まれることを検証対象とする。
 - trusted-distribution-gate CLI（`trusted-distribution-gate/cli.ts`）の引数構文解析は `node:util.parseArgs` へ移行する。オプション間依存（`--profile release` 時の `--archive` 必須等）の意味検証は ADF 側に残留し、CLI の終了コード・stdout・stderr 契約は変更しない。移行契約の詳細は checker 共通実行契約 Design「再帰ファイル探索と CLI 引数解析の標準API移行」が定める。
 
 ## 関連 Design と実装詳細の帰属

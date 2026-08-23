@@ -2,13 +2,13 @@
 title: 実行時パッケージ境界
 status: accepted
 created: 2026-08-20
-updated: 2026-08-15
+updated: 2026-08-23
 ---
 <!-- ADF-COVERS(implementation): REQ-002-007, REQ-002-008, REQ-002-011, REQ-002-019, REQ-002-020, REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-002, REQ-009-003, REQ-009-006, REQ-009-007, REQ-009-008, REQ-009-009, REQ-009-010, REQ-009-011, REQ-009-012, REQ-009-013, REQ-009-014, REQ-009-015, REQ-009-016, REQ-009-017, REQ-009-018, REQ-009-019, REQ-009-020, REQ-009-021, REQ-009-022, REQ-009-023, REQ-009-024, REQ-009-025, REQ-009-035, REQ-009-036, REQ-009-037, REQ-009-038, REQ-009-039, REQ-009-046, REQ-009-047, REQ-009-048, REQ-009-049 -->
 <!-- ADF-COVERS(implementation): REQ-044-004 -->
 <!-- ADF-COVERS(implementation): REQ-011-006 -->
-<!-- 注: install/check/sync 各 ps1（scripts/）は走査対象拡張子外のため、導入器実装行の宣言は本 Design（正規仕様所有者）へ配置。実装実体は scripts/install-consumer-opencode.ps1、scripts/check-consumer-opencode.ps1、scripts/sync-self-opencode.ps1 -->
+<!-- 注: install/self-sync 各 ps1（scripts/）は走査対象拡張子外のため、導入器実装行の宣言は本 Design（正規仕様所有者）へ配置。実装実体は scripts/install.ps1、scripts/self-sync.ps1（内部処理は scripts/consumer/、scripts/self/ 配下） -->
 
 # 実行時パッケージ境界
 
@@ -66,7 +66,7 @@ skills/agentdev-*/             → 原本
 
 - 原本編集は `src/opencode/` で実施
 - `.opencode/` は実ディレクトリとして動作（全体ジャンクションではない）
-- `sync-opencode.ps1` が `commands/agentdev/` と `skills/agentdev-*/` を個別ジャンクションとして管理
+- `scripts/self-sync.ps1` が `commands/agentdev/` と `skills/agentdev-*/` を個別ジャンクションとして管理
 - ジャンクション対象は `agentdev-*` グロブで動的列挙（ハードコードなし）
 - `.gitignore` は `src/opencode/.gitignore` から実ファイルとしてコピー
 - `.opencode/` 内の非管理ファイル（セッション、設定等）は opencode ランタイムが自由に配置可能
@@ -189,29 +189,63 @@ docs-check（IR-016）が乖離（divergence）を検出、報告する。
 
 ## リポジトリ種別別同期スクリプト範囲（Sync Script Scope）
 
-`sync-opencode.ps1` の適用範囲（REQ-002-065）。
+同期・導入系公開入口の適用範囲（REQ-009-003、REQ-050-001）。
+self-hosting 向けの `scripts/self-sync.ps1` と consumer 向けの `scripts/install.ps1` が対象を分担する。
 
 | リポジトリ種別 | 同期対象 | 非対象 |
 |-----------|----------|--------|
-| `self-hosting` | `commands/agentdev/` + `skills/agentdev-*/` の選択的ジャンクション + `.gitignore` コピー | opencode 実行時ファイル（sessions, config 等） |
-| `consumer-with-agentdev` | AgentDevFlow 提供ファイルのみ | プロジェクトローカルカスタマイズ |
+| `self-hosting` | `scripts/self-sync.ps1` による `commands/agentdev/` + `skills/agentdev-*/` の選択的ジャンクション + `.gitignore` コピー | opencode 実行時ファイル（sessions, config 等） |
+| `consumer-with-agentdev` | `scripts/install.ps1` による AgentDevFlow 提供ファイルのみ | プロジェクトローカルカスタマイズ |
 | `consumer-local` | なし（適用対象外） | 全体 |
 | `consumer-generated` | なし（適用対象外）。link 設定により接続されるため同期スクリプト対象外 | 全体 |
 
-> plugin/npm/package 配布形態は現在未対応である（REQ-002-064 参照）。
+> plugin/npm/package 配布形態は現在未対応である（REQ-009-009 参照）。
 
 ### 本体リポジトリでの同期モード
+
+`scripts/self-sync.ps1` は apply、check、dry-run の3モードを提供する（REQ-050-003）。
 
 | Mode | 動作 |
 |------|------|
 | `apply` | `src/opencode/` → `.opencode/` の同期実行 |
-| `check` | 乖離検出（終了コードで判定） |
-| `dry-run` | 変更予測（実行なし） |
+| `check` | 乖離検出（終了コードで判定）。同期対象を変更しない |
+| `dry-run` | 変更予測（実行なし）。同期対象を変更しない |
 
 ### Consumer での同期
 
-Consumer では AgentDevFlow 本体から提供されるファイルのみを同期対象とする。
+Consumer では `scripts/install.ps1` が AgentDevFlow 本体から提供されるファイルのみを同期対象とする（apply、check、dry-run。REQ-050-002、REQ-050-005）。
 プロジェクトローカルカスタマイズは同期の影響を受けない。
+旧状態確認専用スクリプト（check-consumer-opencode.ps1）の検査能力は `scripts/install.ps1 -Mode check` が包含する（REQ-050-004。検査項目の一覧は install-script-usability Design「install.ps1 -Mode check の検査カタログ」参照）。
+
+## scripts 公開入口と内部配置
+
+scripts/ 直下の公開入口と内部配置の構成（REQ-050-001、REQ-050-009）。
+
+- 公開入口2本: consumer 向け `scripts/install.ps1`、self-hosting 向け `scripts/self-sync.ps1`。公開入口名は利用者が固定参照する安定契約である（DEC-021）
+- 内部配置: consumer 専用の内部処理は `scripts/consumer/` 配下、self-hosting 固有の配布・検証処理は `scripts/self/release/` 配下、保守処理は `scripts/self/maintenance/` 配下
+- release 生成、信頼境界検証、self-hosting 保守処理、単体実行しない内部共通処理を scripts/ 直下に配置しない
+- 具体的な内部ファイル分割は、公開契約と依存境界を変えない範囲で実装時に調整できる
+
+### archive 専用 installer 原本と release archive 投影
+
+repository 上では archive 専用 installer の原本を通常 consumer installer と分離して保持する（`scripts/consumer/archive/install.ps1`）。
+release archive 内では consumer が実行する公開入口として `scripts/install.ps1` の名で配置する。
+通常 checkout 版の `scripts/install.ps1` と release archive 版の `scripts/install.ps1` は同一ファイルである必要はなく、異なる installation projection として扱い、それぞれの導入方式の契約を維持する。両版を同一実装へ強制統合しない（REQ-050-010）。
+
+## 誤実行防止の環境判定方式
+
+両公開入口は実行対象環境を機械的に判定し、誤った環境では変更前に停止して適切な公開入口を案内する（REQ-050-006）。
+
+判定材料と手順:
+
+| 入口 | 誤実行検出条件 | 判定材料 |
+|------|--------------|---------|
+| `scripts/install.ps1` | 実行対象が AgentDevFlow 本体リポジトリである | 実行ディレクトリ直下に `src/opencode/` が存在すること（consumer ではチェックアウトは `.agentdev-plugin/` 配下にあり、実行ディレクトリ直下に `src/opencode/` は存在しない。リポジトリ種別判定基準の `self-hosting` 構成） |
+| `scripts/self-sync.ps1` | 実行対象が本体リポジトリでない（consumer リポジトリ等） | `$PSScriptRoot` の親に `src/opencode` が存在しないこと（本体リポジトリの原本構成でない） |
+
+- 変更前停止: 誤った環境と判定した場合、check、dry-run、apply の全モードで管理対象ファイルを変更せずに停止する
+- 案内: 停止時に対象環境で実行すべき公開入口（本体リポジトリでは `scripts/self-sync.ps1`、consumer リポジトリでは `scripts/install.ps1`）を案内する。案内メッセージ形式は install-script-usability Design「cwd 安全化」の誤実行防止案内に従う
+- REQ-009-041（cwd 安全化）との責務境界: REQ-009-041 は実行ディレクトリの想定外検知（Git リポジトリでない、原本領域、実行時領域、チェックアウト配置先）を担い、本判定はリポジトリ種別の誤り検知を担う。両者は直列に機能する別判定である
 
 ## link mode 接続手順技術詳細
 
@@ -242,9 +276,9 @@ Case ファイルのスキーマ正本は [ローカル Case ファイル](local
 
 ローカル版のための汎用バックエンド抽象化、`src/opencode-local/skills/`、ローカル版 command、ローカル版 template は作成しない。
 
-### install-consumer-opencode.ps1 -LocalMode の入出力契約
+### scripts/install.ps1 -LocalMode の入出力契約
 
-`install-consumer-opencode.ps1` は既存の `-Mode` パラメータ（dry-run / check / apply）に `-LocalMode` スイッチを追加し、local mode のリンク設定を実行する。
+`scripts/install.ps1` は `-Mode` パラメータ（dry-run / check / apply）に `-LocalMode` スイッチを併用でき、local mode のリンク設定を実行する。
 
 | パラメータ | リンク構成 |
 |-----------|-----------|
@@ -252,23 +286,23 @@ Case ファイルのスキーマ正本は [ローカル Case ファイル](local
 | `-LocalMode` 指定時 | local mode: `agentdev-gh-cli` のみ `src/opencode-local/agentdev-gh-cli/` へ接続、それ以外は `src/opencode/` 配下へ接続 |
 
 `-Mode`（dry-run / check / apply）は `-LocalMode` の有無にかかわらず従来通り動作し、チェックアウト検証と junction 設定の各フェーズで適用される。
-別スクリプト（`install-consumer-opencode-local.ps1` 等）は新設せず、エントリポイントを単一に維持する。
+別スクリプト（`install-local.ps1` 等）は新設せず、エントリポイントを単一に維持する。
 これは既存 `-Mode` パターンと整合し、チェックアウト検証と junction 設定のロジック重複を避けるための採用判断である。
 
-### check-consumer-opencode.ps1 の local mode リンク状態検出条件
+### scripts/install.ps1 -Mode check の local mode リンク状態検出条件
 
-`check-consumer-opencode.ps1` は `.opencode/skills/agentdev-gh-cli/` が `src/opencode-local/agentdev-gh-cli/` への link として解決される場合、リポジトリ種別を `consumer-generated` として検出、報告する（リポジトリ種別判定基準表参照）。
+`scripts/install.ps1 -Mode check` は `.opencode/skills/agentdev-gh-cli/` が `src/opencode-local/agentdev-gh-cli/` への link として解決される場合、リポジトリ種別を `consumer-generated` として検出、報告する（リポジトリ種別判定基準表参照）。
 通常版のリンク構成（`agentdev-gh-cli` も `src/opencode/` 配下へ接続）との違いを当該 link target で識別する。
 
 ### チェックアウト検証（usable checkout 判定）
 
-install-consumer-opencode.ps1 と check-consumer-opencode.ps1 は、agent-dev-flow チェックアウトの検証を git リポジトリ性必須判定ではなく usable checkout 判定で行う。
+`scripts/install.ps1`（-Mode apply / check / dry-run）は、agent-dev-flow チェックアウトの検証を git リポジトリ性必須判定ではなく usable checkout 判定で行う。
 判定基準はチェックアウト配置先（既定 `.agentdev-plugin/`）配下に `src/opencode/` が存在することであり、`.git` の存在を必須としない（REQ-009-047、REQ-009-048）。
 
-チェックアウトが検出できない場合（チェックアウト配置先に `src/opencode/` が存在しない場合を含む）、両スクリプトはエラー停止し、clone コマンド例とソースアーカイブ取得手順を案内表示する。
+チェックアウトが検出できない場合（チェックアウト配置先に `src/opencode/` が存在しない場合を含む）、エラー停止し、clone コマンド例とソースアーカイブ取得手順を案内表示する。
 provisioning を代行実行しない。
 
-check-consumer-opencode.ps1 の版（commit/branch）報告は `.git` が存在する場合のみ行い、ZIP 展開チェックアウト（`.git` なし）の版は unknown とする。
+`scripts/install.ps1 -Mode check` の版（commit/branch）報告は `.git` が存在する場合のみ行い、ZIP 展開チェックアウト（`.git` なし）の版は unknown とする。
 「.agentdev-plugin/ が git リポジトリでない」は乖離（DIVERGENCE）ではなく情報報告として扱う。
 version manifest ファイルは導入しない。
 ZIP 展開環境はサポート対象外とし、不具合報告の受け付け対象から除外する運用とする。
@@ -288,7 +322,7 @@ link target が意図した target 以外へ解決される場合は link 設定
 
 #### ジャンクション状態の判定と自己修復
 
-`install-consumer-opencode.ps1` は各ジャンクション対象について、ジャンクションの有無と解決先の一致を確認する（PR #1120）。
+`scripts/install.ps1` は各ジャンクション対象について、ジャンクションの有無と解決先の一致を確認する（PR #1120）。
 各対象は以下のいずれかに分類される。
 
 | 状態 | 判定基準 | apply モードの挙動 | check / dry-run モードの挙動 |
@@ -343,7 +377,7 @@ wrong target 検出、再作成ロジックは LocalMode と通常版 install �
 1. **参照確認**: 配布物（`src/opencode/commands/**/*.md`, `src/opencode/skills/**/*.md`）から当該スキル名が参照されていることを確認
 2. **昇格**: `git mv .opencode/skills/<name>/ <files> src/opencode/skills/<name>/`
 3. **`.gitignore` 整理**: 当該スキルが `repo-*` ホワイトリスト以外で個別にトラックされていた場合はその行を削除
-4. **同期スクリプト更新**: `agentdev-*` グロブで自動 junction 対象外の場合、`sync-self-opencode.ps1` と `install-consumer-opencode.ps1` の `Get-ConsumerJunctionTargets` / `Get-SelectiveJunctionTargets` に個別追加
+4. **同期スクリプト更新**: `agentdev-*` グロブで自動 junction 対象外の場合、`scripts/self-sync.ps1` と `scripts/install.ps1` の `Get-ConsumerJunctionTargets` / `Get-SelectiveJunctionTargets` に個別追加
 5. **README 推奨 .gitignore 更新**: consumer 向け推奨 `.gitignore` へ当該スキルを追加
 6. **検査**: docs-check で IR-016（source-projection-sync）と IR-058（distribution-untracked-skill-reference）の NG が 0 件であることを確認
 

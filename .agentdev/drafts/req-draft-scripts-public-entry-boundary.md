@@ -16,6 +16,9 @@ work_type: feature
 # scale: feature のみ standard / large
 scale: large
 
+# design_artifact_actions_consumed: design-save による artifact: design entry 消費済みフラグ
+design_artifact_actions_consumed: true
+
 # summary: 当該 draft が何を合意したかの1段落要約
 summary: >
   scripts/ 直下の通常利用者向け公開入口を scripts/install.ps1（consumer 向け）と
@@ -430,7 +433,11 @@ operation_units:
     depends_on: []
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      status: applied
+      saved_docs:
+        - docs/designs/local/runtime-package-boundary.md
+      action_ids: [ACT-DESIGN-001]
   - ou_id: OU-0004
     source_ru: RU-0001
     target_design:
@@ -442,7 +449,11 @@ operation_units:
     depends_on: []
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      status: applied
+      saved_docs:
+        - docs/designs/local/install-script-usability.md
+      action_ids: [ACT-DESIGN-002]
   - ou_id: OU-0005
     source_ru: RU-0001
     target_design:
@@ -454,7 +465,11 @@ operation_units:
     depends_on: []
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      status: applied
+      saved_docs:
+        - docs/designs/integrity/distribution-boundary.md
+      action_ids: [ACT-DESIGN-003]
 
 # test_strategy: 各合意項目の検証方法（3要素必須）
 test_strategy:
