@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-close
-description: "case-close command の workflow 実装本体。PR マージ（squash merge 先の統合先解決、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase）、統合先ブランチ同期時のリスク事前検出、QG-4 最終完了判定ゲート、docs 検証・Design 確定（Design status 昇格）、Capture 回収（PR 本文→intake/learning 分離）、実証最終クローズ（最終評価結果の導出と Issue 最終コメント正規記録、正式化経路案内）、Epic Wave クローズを所有する。USE FOR: case-close 実行時の workflow 制御（単一 Issue クローズ・Epic Wave クローズ・PR マージ・QG-4・Design 確定・Capture 回収・実証最終クローズ）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "case-close command の workflow 実装本体。PR マージ（squash merge 先の統合先解決、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase）、統合先ブランチ同期時のリスク事前検出、QG-4 最終完了判定ゲート（検証対応要否未分類残存・検証対応必須行の恒久検証対応欠落時の完了阻止を含む）、docs 検証・Design 確定（Design status 昇格）、Capture 回収（PR 本文→intake/learning 分離）、実証最終クローズ（最終評価結果の導出と Issue 最終コメント正規記録、正式化経路案内）、Epic Wave クローズを所有する。USE FOR: case-close 実行時の workflow 制御（単一 Issue クローズ・Epic Wave クローズ・PR マージ・QG-4・Design 確定・Capture 回収・実証最終クローズ）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # case-close workflow スキル
@@ -84,7 +84,7 @@ gate 違反時は両ルートとも PR マージを停止する。
 - 正常終了: 単一 Issue ルートはクリーンアップ・Capture 回収・永続化 STEP の完了報告まで。Epic Wave ルートは最終 Wave 判定（Epic クローズ または 残 Wave 通知）まで
 - 一時ファイル残存: 単一 Issue ルートの正常終了の前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（STEP-6-6 で確認。cleanup 規定は `agentdev-gh-cli`）
 - 一時成果物残留（Epic Wave ルート）: Epic Wave クローズの正常終了の前提として、当該 Wave スコープの一時成果物（draft、RU、検出事項等のドメイン状態）残留と当該実行で `.agentdev/tmp/` に作成した一時ファイルの残存がないこと（E6-1 で確認。残留時は当該 Wave を完了扱いにしない）
-- 停止終了: 未達チェックボックス残存（構造化エラー）、QG-4 不合格、配布依存境界 最終 gate 違反、mergeable ポーリング上限超過、Level 1 rebase 失敗（case-auto エスカレーション）
+- 停止終了: 未達チェックボックス残存（構造化エラー）、QG-4 不合格、対象要件行の検証対応要否未分類残存または検証対応必須行の恒久検証対応欠落（段階ゲートの完了阻止条件）、配布依存境界 最終 gate 違反、mergeable ポーリング上限超過、Level 1 rebase 失敗（case-auto エスカレーション）
 
 ## 主要 Capability Skill 連携
 
@@ -111,6 +111,8 @@ gate 違反時は両ルートとも PR マージを停止する。
 case-run 側の事前検査とは独立に実施する。検証手段との対応関係と「今回その検証を実行して合格したか」という実行結果（Issue、PR、QG の記録）を分離して扱う。
 
 - 対象要件に実装対応または検証対応の欠落が残る場合はマージせず停止する。不足する対応関係を自動追加または修正せず、検査失敗を case-run 側の修正対象として差し戻す
+- **検証対応要否の段階ゲート（完了阻止面）**: 対象要件行に未分類の行（検証対応宣言なし かつ 検証対応要否カタログ未登録。導出定義はトレーサビリティモデル「対応関係の完全性規則」が所有）が残る場合、または検証対応必須行に恒久検証対応が存在しない場合、当該 Case を完了として扱わない。導出は `agentdev-traceability` の check（`--req` で対象要件行に限定）で機械的に行い、`missing-verification` の findings を未分類行・恒久検証対応欠落行として扱う。check が実行不能な場合はカタログ登録状態と検証対応宣言の有無を定義どおり手動確認する
+- **検証対応任意行の保護**: 検証対応任意行（検証対応要否カタログに登録された要件行）に恒久的な検証手段が存在しないことだけを理由として完了を阻害しない。任意行は完全性の計上対象外である
 - QG-4 の対応完全性検査は有効である。全現行要件の実装対応と検証対応必須行の検証対応が成立し、check の未解決不合格が0件であることを移行完了条件とする。検証対応の完全性判定は検証対応必須行のみを計上する（検証対応任意行はトレーサビリティモデルの検証対応要否カタログが宣言する）
 - agentdev-traceability の不在、実行失敗、空結果、候補過多のみを理由に本 workflow を失敗させない（fail-open）。代替検証経路（既存の品質ゲート、targeted docs guard、`rg` 等の独立探索）で継続し、正規成果物そのものの異常とトレーサビリティ機能側の異常を区別する
 - 正規成果物側の実不整合が確認された場合は、既存の品質ゲート、受け入れ条件に従って fail とする
