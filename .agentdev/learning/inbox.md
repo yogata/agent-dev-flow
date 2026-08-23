@@ -310,3 +310,19 @@
 - **想定反映先**: src/opencode/skills/agentdev-traceability/scripts/README.md
 - **関連**: PR #2422 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2422 ）
 - **タグ**: `#traceability` `#worktree` `#false-fail`
+
+## 配布 Workflow Skill 本文への具象 REQ ID 記載は IR-055 違反になるため対応宣言は command Design へ置く
+
+- **問題事象**: 段階ゲート実装（Issue 2418）の初回実装で、配布物（req-save・case-open・case-close の 3 Workflow Skill）本文に実装対象の具象 REQ ID（REQ-021-023〜025）を記載した結果、check_integrity の IR-055 回帰テストが26違反で失敗した
+- **発生局面**: 実装（Workflow Skill 本文への要件対応記載、Issue 2418 の case work）
+- **検知方法**: bun test（IR-055 runtime-unresolved-reference 回帰テスト）の26違反
+- **根本原因**: 配布物本文は IR-055（runtime-unresolved-reference）により docs/ 正規成果物へ参照解決できない具象 REQ/DEC ID を持てない。Workflow Skill が実現する要件行の対応宣言の正規配置は command Design であるという配置契約を初回実装時に踏襲していなかった
+- **自律対応内容**: 3 Workflow Skill 本文から具象 ID を除去し、実装対応宣言（ADF-COVERS(implementation): REQ-021-023〜025）を req-save・case-open・case-close の各 command Design へ移設した。再実行で 2400 pass / 0 fail を確認した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（IR-055・配布依存境界の既存規定の運用知見。PR #2424 Design確定候補「実装対応宣言の配置」と同一内容）
+- **横展開観点**: Workflow Skill・配布 skill に要件対応を本文へ記載するすべての場面
+- **再発条件**: 配布物本文に具象 REQ/DEC ID を ADF-COVERS 宣言以外の形で記載した場合
+- **予防策候補**: Workflow Skill 実装時の対応宣言配置チェック（command Design への ADF-COVERS 配置を skill-authoring ガイダンスへ明記候補）
+- **想定反映先**: agentdev-skill-authoring、docs/designs/integrity/rules/IR-055 の運用記録
+- **関連**: PR #2424 本文「検証差分」finding 差分（修正済み1件）、Issue 2418
+- **タグ**: `#ir055` `#distribution-boundary` `#skill-authoring`
