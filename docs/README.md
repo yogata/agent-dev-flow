@@ -6,10 +6,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 40件、廃止済み: 9件
+現行 REQ: 41件、廃止済み: 9件
 <!-- AUTOGEN:END -->
 
-現行要件は40件である（REQ-013 は後継 REQ-012 への移行として、REQ-022〜REQ-024 は達成済みとして、REQ-025・REQ-026・REQ-028 は移管完了に伴う恒常行移行済みとして、REQ-020・REQ-040 は最小トレーサビリティモデルへの再設計による後継 REQ-012 統合として retired/ へ移行、REQ-036〜REQ-049 を追加。番号には欠番が存在する）。
+現行要件は41件である（REQ-013 は後継 REQ-012 への移行として、REQ-022〜REQ-024 は達成済みとして、REQ-025・REQ-026・REQ-028 は移管完了に伴う恒常行移行済みとして、REQ-020・REQ-040 は最小トレーサビリティモデルへの再設計による後継 REQ-012 統合として retired/ へ移行、REQ-036〜REQ-049、REQ-050 を追加。番号には欠番が存在する）。
 REQ-022・REQ-024 の旧規範内容（augmentation 配置先、check_graph.ts 抽出規則と warning 分類）は旧 Artifact Graph とともに廃止された（DEC-017）。履歴は retired REQ ファイルと版管理で参照できる。
 各 REQ の詳細は各 REQ ファイル本文を参照。
 
@@ -55,12 +55,13 @@ REQ-022・REQ-024 の旧規範内容（augmentation 配置先、check_graph.ts �
 | [REQ-047](requirements/REQ-047.md) | 規則所有権の一方向化 |
 | [REQ-048](requirements/REQ-048.md) | ADF 実行効率第1次改善（実行観測基盤） |
 | [REQ-049](requirements/REQ-049.md) | 課題管理機構 |
+| [REQ-050](requirements/REQ-050.md) | scripts 公開入口境界 |
 
 - [要件インデックス](requirements/README.md)
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-020 の20件である（DEC-018、DEC-019、DEC-020 は proposed、DEC-005、DEC-007 は superseded）。
+現行 Decision は DEC-001 から DEC-021 の21件である（DEC-018〜DEC-021 は proposed、DEC-005、DEC-007 は superseded）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
@@ -80,11 +81,12 @@ REQ-022・REQ-024 の旧規範内容（augmentation 配置先、check_graph.ts �
 | [DEC-013](decisions/DEC-013.md) | IR 登録モデルの簡素化 — 現存 IR を実行可能な恒久統制に限定 |
 | [DEC-014](decisions/DEC-014.md) | 配布依存境界の多層 enforcement |
 | [DEC-015](decisions/DEC-015.md) | ADF決定論的実行中核と実行基盤実行機構の責務分界 |
-| [DEC-016](decisions/DEC-016.md) | 導入系スクリプトの副作用ゼロ原則（proposed） |
+| [DEC-016](decisions/DEC-016.md) | 導入系スクリプトの副作用ゼロ原則 |
 | [DEC-017](decisions/DEC-017.md) | 最小トレーサビリティモデルの採用と Artifact Graph の廃止（proposed） |
 | [DEC-018](decisions/DEC-018.md) | 評価ブランチモデルとCase統合先の一般化（proposed） |
 | [DEC-019](decisions/DEC-019.md) | 一般処理の標準API委譲とADF固有意味論の所有境界（proposed） |
 | [DEC-020](decisions/DEC-020.md) | 課題管理系統の導入（proposed） |
+| [DEC-021](decisions/DEC-021.md) | scripts 公開入口の2本固定と安定契約（proposed） |
 
 ## 設計（Design）
 

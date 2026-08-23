@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は15件、提案中の Decision は3件である。
+現行の承認済み Decision は15件、提案中の Decision は4件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -35,6 +35,7 @@
 | DEC-018 | 評価ブランチモデルとCase統合先の一般化 | proposed | 2026-08-19 |
 | DEC-019 | 一般処理の標準API委譲とADF固有意味論の所有境界 | proposed | 2026-08-20 |
 | DEC-020 | 課題管理系統の導入 | proposed | 2026-08-23 |
+| DEC-021 | scripts 公開入口の2本固定と安定契約 | proposed | 2026-08-23 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -70,6 +71,7 @@
 - [DEC-018](DEC-018.md)（評価ブランチモデルとCase統合先の一般化）
 - [DEC-019](DEC-019.md)（一般処理の標準API委譲とADF固有意味論の所有境界）
 - [DEC-020](DEC-020.md)（課題管理系統の導入）
+- [DEC-021](DEC-021.md)（scripts 公開入口の2本固定と安定契約）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -103,6 +105,7 @@
 - [DEC-014](DEC-014.md)（配布依存境界の多層 enforcement、IR-059 範囲と enforcement 経路の変更）
 - [DEC-016](DEC-016.md)（導入系スクリプトの副作用ゼロ原則、provisioning 責務の利用者移転）
 - [DEC-017](DEC-017.md)（最小トレーサビリティモデルの採用と Artifact Graph の廃止、要件中心の最小 TIM と agentdev-traceability への置換）
+- [DEC-021](DEC-021.md)（scripts 公開入口の2本固定と安定契約、公開入口の構造境界と入口名の安定性）
 
 ### ワークフロー・委譲契約
 
@@ -175,6 +178,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-018 | [REQ-042](../requirements/REQ-042.md), [REQ-043](../requirements/REQ-043.md), [REQ-004](../requirements/REQ-004.md), [REQ-005](../requirements/REQ-005.md), [REQ-017](../requirements/REQ-017.md), [REQ-030](../requirements/REQ-030.md), [REQ-031](../requirements/REQ-031.md), [REQ-032](../requirements/REQ-032.md), [REQ-034](../requirements/REQ-034.md), [REQ-035](../requirements/REQ-035.md) | 評価ブランチモデルとCase統合先の一般化（REQ-042/REQ-043 CREATE、REQ-004/005/017/030/031/032/034/035 UPDATE と整合） |
 | DEC-019 | [REQ-044](../requirements/REQ-044.md) | 一般処理の標準API委譲とADF固有意味論の所有境界（REQ-044 CREATE と整合。Design 4 件への実装契約追記・更新を伴う） |
 | DEC-020 | [REQ-049](../requirements/REQ-049.md), [REQ-001](../requirements/REQ-001.md) | 課題管理系統の導入（REQ-049 CREATE、REQ-001-001 UPDATE と整合。Design 4 件への契約更新を伴う） |
+| DEC-021 | [REQ-050](../requirements/REQ-050.md) | scripts 公開入口の2本固定と安定契約（REQ-050 CREATE、REQ-009-002/044 UPDATE、DEC-016 参照修正と整合） |
 
 ## 過去版の履歴基盤
 
