@@ -1,8 +1,10 @@
-// ADF-COVERS(verification): REQ-049-008, REQ-049-009, REQ-049-010, REQ-049-012, REQ-049-013, REQ-049-026, REQ-049-029
+// ADF-COVERS(verification): REQ-049-006, REQ-049-007, REQ-049-008, REQ-049-009, REQ-049-010, REQ-049-011, REQ-049-012, REQ-049-013, REQ-049-026, REQ-049-029
 //
-// agentdev-issue-tracking 配布スキル scripts の検証（Issue #2409）。
+// agentdev-issue-tracking 配布スキル scripts の検証（Issue #2409、#2420）。
 // - 課題 ID 形式が GitHub Issue 番号参照と交差しないこと（機械的識別）
-// - 5状態保存値の表現と未知状態の検出
+// - 1課題1ファイルのフラット列挙と frontmatter による状態保持（ディレクトリ移動なし）
+// - 5状態保存値の表現と未知状態の検出、解決済み・クローズ済みの同一体系内での列挙・検証
+// - frontmatter 保持情報（関連成果物、担当、期限など）の解析と省略可能項目の扱い
 // - frontmatter のみを解析する検索・一覧（全文読込非依存の到達機構）
 // - 状態別必須項目の形式検証（保留、解決済み、クローズ済みの区別とクローズ前提）
 
