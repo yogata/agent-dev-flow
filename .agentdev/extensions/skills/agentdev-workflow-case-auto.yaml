@@ -13,7 +13,7 @@ context:
       - "docs/designs/workflows/workflow-contracts.md"
     purpose: パイプライン概要と共通フェーズ契約の確認
   - id: case-auto-spec
-    when: 本コマンド Design（経路H 停止伝播契約、bounded parent decision resolution、コンフリクト解消モデル3レベル、停止理由分類の分類軸、実証Case自走）参照時
+    when: 本コマンド Design（adversarial-review 由来の停止伝播契約、bounded parent decision resolution、コンフリクト解消モデル3レベル、停止理由分類の分類軸、実証Case自走）参照時
     paths:
       - "docs/designs/commands/case-auto.md"
     purpose: case-auto 固有契約の正規定義の確認。本コマンド定義は実行入口であり、契約の詳細は本 Design を正とする
@@ -24,7 +24,7 @@ context:
       - "docs/decisions/DEC-008.md"
     purpose: decision_context 自律解決境界の正規契約（REQ-006-112〜114、DEC-008 決定1〜6）の確認
   - id: adversarial-review-caller-contract
-    when: 経路H（adversarial-review 由来の停止伝播）、user-decision-required の位置づけ、再 review 条件、default-on + skip policy の参照時
+    when: adversarial-review 由来の停止伝播（case-auto の停止伝播受領）、user-decision-required の位置づけ、再 review 条件、default-on + skip policy の参照時
     paths:
       - "docs/requirements/REQ-014.md"
       - "docs/requirements/REQ-015.md"

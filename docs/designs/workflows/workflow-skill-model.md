@@ -196,7 +196,7 @@ DEC-010 の Workflow Architecture Inventory が Capability Skill 横断抽出候
 | Epic 進捗・Wave 構成 | `agentdev-epic-tracker` | case-open、case-close、case-auto |
 | 品質ゲート | `agentdev-quality-gates` | case-open（QG-2）、case-close（QG-4）、req-define |
 | Capture 境界・学び検知 | `agentdev-intake-pipeline`、`agentdev-learning-capture`、`agentdev-learning-pipeline` | case-close、case-auto、intake-from-github、intake-promote |
-| 対論型レビュー | `agentdev-adversarial-review` | case-open（経路F）、case-auto（経路H伝播）、req-define 等 |
+| 対論型レビュー | `agentdev-adversarial-review` | req-define、inspect-promote、intake-promote、learning-promote、backlog-review、case-open、case-run adapter 委譲内（7呼出元）。case-auto は停止伝播のみ受領 |
 | case-run 外部実行 adapter | `agentdev-case-run-execution-adapter` | case-run、case-auto |
 
 ### workflow-* プレフィックスを持つ Capability Skill 的スキル

@@ -58,7 +58,7 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 | 工程 | 前提条件 | 出力契約 | 検証基準 |
 |---|---|---|---|
 | STEP-1 classification | inbox に item 存在 | item ごとの暫定分類（採用/保留/却下）と自律確定候補/ユーザー判断必要の判定 | 分類根拠と自律確定候補/ユーザー判断必要の判定が各 item に付いていること |
-| STEP-2 review（経路C） | 暫定分類の意味的決定が存在、またはユーザー明示指定（default-on） | review 経由を要する自律確定候補は review 完了後に確定 | accepted finding が分類案へ反映されていること |
+| STEP-2 review（adversarial-review） | 暫定分類の意味的決定が存在、またはユーザー明示指定（default-on） | review 経由を要する自律確定候補は review 完了後に確定 | accepted finding が分類案へ反映されていること |
 | STEP-3 HITL | ユーザー判断必要 item が残存（全 item 自律確定時は HITL 提示を省略） | 分類確定（自律確定 item は根拠に基づく確定、ユーザー判断必要 item はユーザー承認済み） | ユーザー判断必要 item のみが提示され、ユーザーが「確定」を明示していること。自律確定済み item は確定内容の報告にとどまること |
 | STEP-4 persistence | 分類確定済み | `.agentdev/intake/promoted/*.md`（フラット構造） | 整形結果が元 item の意味を保持した整理・構造化にとどまっていること |
 | STEP-5 destructive handling | persistence 済み | 採用 item の inbox 元ファイル削除・reject item の即時削除（却下理由を commit message に含む） | 削除対象が分類確定内容と一致していること |

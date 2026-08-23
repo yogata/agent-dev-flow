@@ -564,10 +564,10 @@ req-define が生成した draft を内容欠落なく評価環境へ引き継�
 - REQ-003（外部エージェント統合契約）
 - DEC-003（構造化 draft-data 形式）
 
-## adversarial-review 挿入境界（経路A）
+## adversarial-review 挿入境界（req-define）
 
-本節は req-define への adversarial-review caller integration（経路A、REQ-015-004）の挿入境界を正典として所有する。
-共通 caller integration 契約（任意性、QG/HITL 非代替、副作用禁止、accepted finding 反映責務、再 review 条件と停止条件、呼出失敗時取扱い）は [adversarial-review Design](../skills/agentdev-adversarial-review.md)「adversarial-review caller integration 共通契約」節が正であり、本節は経路A 固有の発動条件、review 対象確定位置、採用後戻り先、最初の副作用との順序のみを規定する（REQ-014-011）。
+本節は req-define への adversarial-review caller integration（REQ-015-004）の挿入境界を正典として所有する。
+共通 caller integration 契約（任意性、QG/HITL 非代替、副作用禁止、accepted finding 反映責務、再 review 条件と停止条件、呼出失敗時取扱い）は [adversarial-review Design](../skills/agentdev-adversarial-review.md)「adversarial-review caller integration 共通契約」節が正であり、本節は req-define 固有の発動条件、review 対象確定位置、採用後戻り先、最初の副作用との順序のみを規定する（REQ-014-011）。
 
 ### 挿入位置（REQ-015-004）
 

@@ -173,10 +173,10 @@ backlog-review は全 RU frontmatter に `tentative_classification` を付与す
 - REQ-008（RU lifecycle）
 - REQ-039（バックログ統合）
 
-## adversarial-review 挿入境界（経路E）
+## adversarial-review 挿入境界（backlog-review）
 
-本節は backlog-review における adversarial-review caller integration（REQ-015 経路E）の挿入境界を正典として所有する（REQ-014-011）。
-共通 caller integration 契約の正規所有者は adversarial-review Design であり（REQ-014-003）、本節は経路E 固有の挿入位置、発動条件、順序、矛盾取扱いのみを所有する。
+本節は backlog-review における adversarial-review caller integration（REQ-015-008）の挿入境界を正典として所有する（REQ-014-011）。
+共通 caller integration 契約の正規所有者は adversarial-review Design であり（REQ-014-003）、本節は backlog-review 固有の挿入位置、発動条件、順序、矛盾取扱いのみを所有する。
 adversarial-review 自身の振る舞い契約、再 review 条件、停止条件は adversarial-review Design を正とし、本節で再定義しない。
 候補判断基準、内部手続き（候補確定位置、呼出タイミング、矛盾検出への引き渡し）の正規所有者は agentdev-backlog-integration Design とし、本節は参照する。
 
@@ -195,7 +195,7 @@ backlog-review の処理段階へ review 挿入境界を次のとおり一意に
 
 ### 構成、review、承認の順序（REQ-015-008）
 
-経路E は構成、review、承認の順で進む（REQ-015-008）。
+backlog-review の統合は構成、review、承認の順で進む（REQ-015-008）。
 review は構成（分析、統合・分割判定）の完了後、承認（構成承認、矛盾検出時追加判断）の前に挿入する。
 review を構成前に、または承認後に挿入しない。
 

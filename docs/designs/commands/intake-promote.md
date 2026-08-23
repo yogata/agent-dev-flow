@@ -157,10 +157,10 @@ HITL 確定フェーズではユーザー判断が必要な item のみを提示
 - `agentdev-intake-pipeline` skill（inbox スキャン、レビュー評価、分類提示、整形保存）
 - REQ-037（Intake command群）
 
-## adversarial-review 挿入境界（経路C）
+## adversarial-review 挿入境界（intake-promote）
 
-本節は intake-promote における経路C の review 挿入境界を正典として所有する（REQ-015-006）。
-共通契約（任意性、副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱い）は adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014）が正規所有し、本節は経路C 固有の挿入位置、発動条件、戻り先のみを所有する。
+本節は intake-promote における review 挿入境界を正典として所有する（REQ-015-006）。
+共通契約（任意性、副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱い）は adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014）が正規所有し、本節は intake-promote 固有の挿入位置、発動条件、戻り先のみを所有する。
 
 ### 挿入位置（REQ-015-006）
 
@@ -170,7 +170,7 @@ review 挿入位置は「暫定分類の生成完了後・ユーザー確認の�
 
 ### 発動条件判定 Step と review 呼出 Step の分離（REQ-015-001）
 
-経路C の review 挿入境界は次の2 Step を分離して構成する。
+intake-promote の review 挿入境界は次の2 Step を分離して構成する。
 
 | Step | 役割 |
 |---|---|

@@ -34,16 +34,16 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 | ファイル | 内容 |
 |----------|------|
-| `references/integration-judgment.md` | 成果物の読み込み、分析、統合分割判定、depends_on 依存解決、矛盾検出、RU 生成の判定ロジック。adversarial-review 候補判断と内部挿入（経路E）の実行時参照 |
+| `references/integration-judgment.md` | 成果物の読み込み、分析、統合分割判定、depends_on 依存解決、矛盾検出、RU 生成の判定ロジック。adversarial-review 候補判断と内部挿入（backlog-review）の実行時参照 |
 
 backlog-review コマンドの実行時投影先パスは `.opencode/commands/agentdev/backlog-review.md`。
 command 本文内で backlog-review を参照する場合はこちらを使用。
 
-## adversarial-review 候補判断と内部挿入（経路E）
+## adversarial-review 候補判断と内部挿入（backlog-review）
 
-本スキルは backlog-review 経路E（REQ-{NNNN}）における adversarial-review の候補判断基準と内部手続き（候補確定位置、呼出タイミング、矛盾検出への引き渡し）の実行時参照を提供する。
+本スキルは backlog-review（REQ-{NNNN}）における adversarial-review の候補判断基準と内部手続き（候補確定位置、呼出タイミング、矛盾検出への引き渡し）の実行時参照を提供する。
 正規原本は `agentdev-backlog-integration` Design「adversarial-review 候補判断と内部挿入」節である（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。
-本 SKILL.md は重複定義せず、詳細は `references/integration-judgment.md`「adversarial-review 候補判断と内部挿入（経路E）」節を参照。
+本 SKILL.md は重複定義せず、詳細は `references/integration-judgment.md`「adversarial-review 候補判断と内部挿入（backlog-review）」節を参照。
 
 呼出元（backlog-review command）と本スキルの主な契約（詳細は Design と reference を正とする）:
 

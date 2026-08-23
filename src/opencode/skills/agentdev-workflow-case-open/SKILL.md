@@ -53,7 +53,7 @@ case-open workflow は次の6 STEP で構成する。
 | STEP-1 | 引き継ぎ・OU選択 | 要件doc 受領 | 処理対象確定（OU 単位） | [references/handoff-and-ou-gate.md](references/handoff-and-ou-gate.md) |
 | STEP-2 | Issue本文生成・execution contract 確定 | 処理対象確定 | Issue 本文候補（EC-{N}〜EC-{N} 反映済み、QG-2 検証済み） | [references/issue-body-and-execution-contract.md](references/issue-body-and-execution-contract.md) |
 | STEP-3 | 構成判定・preflight | Issue 本文候補確定 | execution structure（Epic vs Standard、Wave 構成、preflight合格。対象要件行の検証対応要否未分類残存チェック込み） | [references/execution-unit-and-preflight.md](references/execution-unit-and-preflight.md) |
-| STEP-4 | adversarial-review（経路F） | execution structure + Issue 本文 + 完了条件の3者確定 | review 結果反映（4パターン再実行ルール） | [references/adversarial-review-integration.md](references/adversarial-review-integration.md) |
+| STEP-4 | adversarial-review | execution structure + Issue 本文 + 完了条件の3者確定 | review 結果反映（4パターン再実行ルール） | [references/adversarial-review-integration.md](references/adversarial-review-integration.md) |
 | STEP-5 | Issue 作成（Epic flow / Standard flow） | adversarial-review skip または review 完了 | GitHub Issue 作成済み（親Epic + 子Issue群、または Standard Issue） | [references/issue-creation-flows.md](references/issue-creation-flows.md) |
 | STEP-6 | 終了処理・クリーンアップ | Issue 作成完了 | コメント追加、draft/RU 削除（Form Zero）、完了報告 | [references/termination-and-cleanup.md](references/termination-and-cleanup.md) |
 
@@ -87,7 +87,7 @@ case-open workflow は次の6 STEP で構成する。
 - `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ（draft/RU 削除、Form Zero）
 - `agentdev-traceability`: 検証対応要否未分類行の導出（check。分類状態の導出定義はトレーサビリティモデル「対応関係の完全性規則」が所有。STEP-3 preflight の停止判定に利用）
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
-- `agentdev-adversarial-review`: 経路F review 呼出
+- `agentdev-adversarial-review`: case-open の review 呼出
 - `agentdev-learning-capture` / `agentdev-intake-pipeline`: deviation capture 委譲（STEP-4/5 で実観測時）
 
 ## トレーサビリティ能力の利用

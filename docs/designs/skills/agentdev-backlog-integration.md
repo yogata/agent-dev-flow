@@ -61,7 +61,7 @@ backlog-review における採用済み成果物の統合、分割判定、矛�
 
 ## adversarial-review 候補判断と内部挿入
 
-本節は backlog-review 経路E（REQ-015）における adversarial-review の候補判断基準と内部手続き（候補確定位置、呼出タイミング、矛盾検出への引き渡し）を正典として所有する（REQ-014-011）。
+本節は backlog-review における adversarial-review の候補判断基準と内部手続き（候補確定位置、呼出タイミング、矛盾検出への引き渡し）を正典として所有する（REQ-014-011、REQ-015）。
 共通 caller integration 契約の正規所有者は adversarial-review Design であり（REQ-014-003）、本節は domain skill 固有の判断基準、内部手続きのみを所有する。
 挿入境界（発動条件、Step 構造、順序）の正規所有者は backlog-review command Design であり、本節は再定義せず参照する。
 
@@ -106,6 +106,6 @@ adversarial-review は delegation-contracts Design の `semantic_review`（書�
 
 ### 正規所有者マトリックス参照
 
-本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts Design「adversarial-review との委譲契約接続」節、backlog-review command Design「adversarial-review 挿入境界（経路E）」節との間で意味の重複、矛盾を生じない。
+本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts Design「adversarial-review との委譲契約接続」節、backlog-review command Design「adversarial-review 挿入境界（backlog-review）」節との間で意味の重複、矛盾を生じない。
 挿入境界、発動条件、順序は backlog-review command Design を正とし、本節は domain skill 固有の候補判断基準、内部手続き（候補確定位置、呼出タイミング、矛盾検出への引き渡し）のみを所有する。
 

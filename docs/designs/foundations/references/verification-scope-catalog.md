@@ -101,9 +101,9 @@ Issue #2362 の移行作業（棚卸し (a')）で全現行要件行を判定し
 
 - REQ-014-001..REQ-014-015: 原則適用・skip 可能、副作用禁止、再 review 条件、停止条件、正規所有者マトリックスの実行時契約
 
-### REQ-015（adversarial-review caller integration 7経路+case-auto）
+### REQ-015（adversarial-review caller integration 7呼出元+case-auto）
 
-- REQ-015-001..REQ-015-012: 7経路の review 挿入境界、採用否決、blocked 遷移、case-auto 停止伝播の実行時振る舞い
+- REQ-015-001..REQ-015-012: 7呼出元の review 挿入境界、採用否決、blocked 遷移、case-auto 停止伝播の実行時振る舞い
 
 ### REQ-017（Issue Execution Contract）
 

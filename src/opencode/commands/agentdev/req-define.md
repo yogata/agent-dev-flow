@@ -49,7 +49,7 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 | STEP-5 Decision判断 | 要件展開済み | Decision 要否判定と decision エントリ | Decision閾値以上の判断を `agentdev-decision-guidelines` で判定済みであること |
 | STEP-6 要件doc生成 | 要件展開・Decision判断済み | 構造化 `draft-data` 形式の要件doc | req-draft.md テンプレートに従っていること |
 | STEP-7 work_type・Scale 判定 | 要件doc生成済み | work_type と Scale の確定 | `agentdev-workflow-lifecycle` 基準に従っていること |
-| STEP-8 adversarial-review（経路A） | ユーザー明示指定時 | review 結果と反映後の要件doc | accepted finding が要件docへ反映されていること |
+| STEP-8 adversarial-review | ユーザー明示指定時 | review 結果と反映後の要件doc | accepted finding が要件docへ反映されていること |
 | STEP-9 ドラフト保存 | 要件doc確定 | `.agentdev/drafts/req-draft-{topic-slug}.md` | ドラフトファイルが存在し `status` frontmatter を持つこと |
 | STEP-10 要件doc確認 | ドラフト保存済み | ユーザー確認結果 | ユーザーが要件docを確認済みであること |
 | STEP-11 完了報告 | 確認済み | 完了報告（次コマンドの提示を含む） | 出力パスと次アクションが報告されていること |

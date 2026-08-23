@@ -46,10 +46,10 @@ learning-promote コマンドの Steps における判定ロジック（旧フ�
 - 確認対象とギャップ分類は `agentdev-learning-pipeline` skill の `references/disposition-and-artifact-schema.md`（既存対策照合）を参照
 - 「新規X化」より「既存Xへ反映」を優先
 
-## Phase 4-R: adversarial-review 候補判断と内部挿入（経路D）
+## Phase 4-R: adversarial-review 候補判断と内部挿入（learning-promote）
 
-本 Phase は learning-promote 経路D における review 候補判断と内部手続きの実装詳細を提供する。
-経路D の発動条件、挿入位置、戻り先、Step 6 戻しループは learning-promote command Design「adversarial-review 挿入境界（経路D）」節と `agentdev-learning-pipeline` Design「adversarial-review 候補判断と内部挿入」節が正規所有し、本 Phase は再定義しない。
+本 Phase は learning-promote における review 候補判断と内部手続きの実装詳細を提供する。
+learning-promote の発動条件、挿入位置、戻り先、Step 6 戻しループは learning-promote command Design「adversarial-review 挿入境界（learning-promote）」節と `agentdev-learning-pipeline` Design「adversarial-review 候補判断と内部挿入」節が正規所有し、本 Phase は再定義しない。
 共通 caller integration 契約は `agentdev-adversarial-review` Design が正規所有する。
 
 ### 候補判断（Step 8-R1）

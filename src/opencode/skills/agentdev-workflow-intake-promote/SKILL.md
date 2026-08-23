@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-intake-promote
-description: "intake-promote command の workflow 実装本体。inbox 内 intake item の classification（確認・読込・評価・暫定分類・自律確定候補判定）、review（adversarial-review 経路C）、HITL（ユーザー判断必要 item の承認・分類確定）、persistence（採用 item 整形・promoted 保存）、destructive handling（振り分け・inbox 削除・破壊的変更の明示承認・git 永続化）の各 STEP を独立 resume point として所有する。USE FOR: intake-promote 実行時の workflow 制御。DO NOT USE FOR: inbox item の新規保存、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "intake-promote command の workflow 実装本体。inbox 内 intake item の classification（確認・読込・評価・暫定分類・自律確定候補判定）、review（adversarial-review）、HITL（ユーザー判断必要 item の承認・分類確定）、persistence（採用 item 整形・promoted 保存）、destructive handling（振り分け・inbox 削除・破壊的変更の明示承認・git 永続化）の各 STEP を独立 resume point として所有する。USE FOR: intake-promote 実行時の workflow 制御。DO NOT USE FOR: inbox item の新規保存、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # intake-promote workflow スキル
@@ -54,7 +54,7 @@ intake-promote workflow は次の6 STEP で構成する。
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
 | STEP-1 | classification（inbox 確認・item 読込・評価・暫定分類提示・自律確定候補判定） | inbox item 存在 | 暫定分類表（採用/保留/却下、根拠、自律確定候補/ユーザー判断必要の判定） | [references/classification-and-review.md](references/classification-and-review.md) |
-| STEP-2 | review（adversarial-review 経路C） | 暫定分類の意味的決定が存在、またはユーザー明示指定 | review 経由を要する自律確定候補は review 完了後に確定。反映済み暫定分類（skip 時は STEP-1 結果をそのまま継承） | [references/classification-and-review.md](references/classification-and-review.md) |
+| STEP-2 | review（adversarial-review） | 暫定分類の意味的決定が存在、またはユーザー明示指定 | review 経由を要する自律確定候補は review 完了後に確定。反映済み暫定分類（skip 時は STEP-1 結果をそのまま継承） | [references/classification-and-review.md](references/classification-and-review.md) |
 | STEP-3 | HITL（ユーザー確認・分類承認） | ユーザー判断必要 item が残存（全 item 自律確定時は HITL 提示を省略し確定内容を報告） | 分類確定（自律確定 item は根拠に基づく確定、ユーザー判断必要 item はユーザー承認済み） | [references/hitl-persistence-and-destructive.md](references/hitl-persistence-and-destructive.md) |
 | STEP-4 | persistence（採用 item 整形・promoted 保存） | 分類確定（採用 item あり） | `.agentdev/intake/promoted/` 配下の採用済み成果物 | [references/hitl-persistence-and-destructive.md](references/hitl-persistence-and-destructive.md) |
 | STEP-5 | destructive handling（振り分け・削除・git 永続化） | 分類確定 + 採用済み成果物保存済み（保留のみ確定時は振り分けから） | inbox 振り分け完了（採用削除・保留残置・reject 即時削除）、commit/push 済み | [references/hitl-persistence-and-destructive.md](references/hitl-persistence-and-destructive.md) |
@@ -112,8 +112,8 @@ HITL（STEP-3）の承認状態は単独では durable state に記録されな�
 
 本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
 
-- `agentdev-intake-pipeline`: inbox 確認、Review 観点、分類提示形式、採用 item 整形、保存と振り分け、Git 永続化の判定基準。経路C の review 候補判断と内部手続き
-- `agentdev-adversarial-review`: 経路C の review 呼出（共通契約の正規所有者は adversarial-review Design、REQ-{NNNN}）
+- `agentdev-intake-pipeline`: inbox 確認、Review 観点、分類提示形式、採用 item 整形、保存と振り分け、Git 永続化の判定基準。intake-promote の review 候補判断と内部手続き
+- `agentdev-adversarial-review`: intake-promote の review 呼出（共通契約の正規所有者は adversarial-review Design、REQ-{NNNN}）
 - `agentdev-git-worktree`: ドメイン状態永続化プロシージャ（並列実行安全ステージング、構造化エラー形式）
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 

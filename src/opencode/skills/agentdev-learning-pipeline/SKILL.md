@@ -69,7 +69,7 @@ pipeline 各層を構成する 4 成果物の役割、性格、command 間の振
 - raw learning item を実行時コマンド/ skill の直接参照対象にしない
 - Decision 候補分類の前に `agentdev-decision-guidelines` の除外基準（禁止条件フィルタリングゲート）を必須適用する
 - `case-run` への直接受け渡しは禁止（`backlog-review` → `req-define` を経由すること）
-- **adversarial-review は任意助言手段（経路D、REQ）**: ユーザー明示要求時のみ Step 8-R1（発動条件判定）→ Step 8-R2（review 呼出）を経て発動する。明示要求がない場合は Phase 5 へ従来フローを維持する（REQ-{NNNN}-{NNN}/{NNN}）。共通 caller integration 契約（任意性、副作用禁止、再 review 条件、停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` Design（REQ-{NNNN}）が正規所有する。本 skill は経路D 固有の候補判断、呼出タイミング、evaluation-report 反映、Step 6 戻しループの実装詳細のみを提供する
+- **adversarial-review は任意助言手段（learning-promote、REQ）**: ユーザー明示要求時のみ Step 8-R1（発動条件判定）→ Step 8-R2（review 呼出）を経て発動する。明示要求がない場合は Phase 5 へ従来フローを維持する（REQ-{NNNN}-{NNN}/{NNN}）。共通 caller integration 契約（任意性、副作用禁止、再 review 条件、停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` Design（REQ-{NNNN}）が正規所有する。本 skill は learning-promote 固有の候補判断、呼出タイミング、evaluation-report 反映、Step 6 戻しループの実装詳細のみを提供する
 
 ## 主要な判断順序
 
@@ -89,7 +89,7 @@ pipeline 各層を構成する 4 成果物の役割、性格、command 間の振
 |---|---|
 | inbox entry の13フィールド schema、旧5フィールドからのマッピング、正規化ルール、問題クラス分類基準、8軸評価ディメンション、禁止条件フィルタリングゲート、evaluation-report schema が必要な場合 | [references/inbox-and-evaluation-schema.md](references/inbox-and-evaluation-schema.md) |
 | 処分区分（11カテゴリ + duplicate）、反映先マッピング、既存対策照合、採用済み成果物スキーマ、カテゴリ別反映先パス例、プロジェクト固有知識の振り分け、prune 方針詳細が必要な場合 | [references/disposition-and-artifact-schema.md](references/disposition-and-artifact-schema.md) |
-| learning-promote の Phase ごとの判定ロジック（正規化、分類、8軸評価、廃棄判定、HITL承認）、経路D の review 候補判断と内部挿入（Step 8-R1/8-R2、Step 6 戻しループ）を実行する場合 | [references/promote-judgment-logic.md](references/promote-judgment-logic.md) |
+| learning-promote の Phase ごとの判定ロジック（正規化、分類、8軸評価、廃棄判定、HITL承認）、learning-promote の review 候補判断と内部挿入（Step 8-R1/8-R2、Step 6 戻しループ）を実行する場合 | [references/promote-judgment-logic.md](references/promote-judgment-logic.md) |
 | inbox → deferred の原子的移動プロシージャ（追記、検証、クリア）を実行する場合 | [references/deferred-atomic-move-procedure.md](references/deferred-atomic-move-procedure.md) |
 
 ## 反映ルート

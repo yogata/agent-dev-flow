@@ -116,7 +116,7 @@ Wave 内子Issue を実行担当サブエージェントへ最大5件並列委�
 
 ### Procedure
 
-各子Issue を [references/delegation-and-result.md](delegation-and-result.md) STEP-S4 と同一契約で実行担当サブエージェントへ委譲する（adapter skill 読込、委譲 prompt 内で実行 command 指定、worktree root 相対パス引き渡し、経路G 含む）。
+各子Issue を [references/delegation-and-result.md](delegation-and-result.md) STEP-S4 と同一契約で実行担当サブエージェントへ委譲する（adapter skill 読込、委譲 prompt 内で実行 command 指定、worktree root 相対パス引き渡し、adapter 委譲内 adversarial-review 含む）。
 並列数は最大5件とし、超過分は完了順に起動する。
 子Issue ごとに委譲起動直前・直後の L2 タイムスタンプを記録する。
 

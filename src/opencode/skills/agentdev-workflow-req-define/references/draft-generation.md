@@ -2,7 +2,7 @@
 
 > 本 reference は `agentdev-workflow-req-define` SKILL.md の STEP-6、STEP-7、STEP-9、STEP-10、STEP-11 詳細である。
 > 要件doc（draft-data）生成、work_type・Scale 判定、ドラフト保存、要件doc確認、完了報告を提供する。
-> STEP-8（経路A）は [references/adversarial-review-path-a.md](adversarial-review-path-a.md) 参照。
+> STEP-8（adversarial-review）は [references/adversarial-review-integration.md](adversarial-review-integration.md) 参照。
 
 ## 目次
 
@@ -225,7 +225,7 @@ work_type・scale に応じた種別の完了報告を出力する。
 
 ## 関連 STEP
 
-- 前: STEP-5（requirement-development.md）、STEP-8（adversarial-review-path-a.md）
+- 前: STEP-5（requirement-development.md）、STEP-8（adversarial-review-integration.md）
 - 次: なし（workflow 終了。後続は req-save / design-save / case-open）
 
 ## 関連 Capability Skill

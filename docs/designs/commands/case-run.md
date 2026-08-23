@@ -445,19 +445,19 @@ case-run 委譲内で作成する commit の構成運用を規定する。
 - REQ-011（case-auto 最大自走モード）
 - v2:ADR-0128（case-run 外部実行委譲）
 
-## adversarial-review 挿入境界（経路G: adapter 委譲内）
+## adversarial-review 挿入境界（case-run: adapter 委譲内）
 
-本節は case-run における adversarial-review caller integration（REQ-015 経路G）の挿入境界を正典として所有する（REQ-014-011）。
-共通 caller integration 契約の正規所有者は adversarial-review Design であり（REQ-014-003）、本節は経路G 固有の挿入位置、発動条件、実装方針限定、blocked 遷移のみを所有する。
+本節は case-run における adversarial-review caller integration（REQ-015-010、adapter 委譲内）の挿入境界を正典として所有する（REQ-014-011）。
+共通 caller integration 契約の正規所有者は adversarial-review Design であり（REQ-014-003）、本節は case-run の adapter 委譲内固有の挿入位置、発動条件、実装方針限定、blocked 遷移のみを所有する。
 adversarial-review 自身の振る舞い契約、再 review 条件、停止条件は adversarial-review Design を正とし、本節で再定義しない。
 実装方針形成、review 呼出、結果反映の内部手続きの正規所有者は `agentdev-case-run-execution-adapter` Design「adversarial-review 統合（実装方針→review→結果反映）」節とし、本節は参照する。
 
 ### 挿入境界と構造（REQ-015-001）
 
-経路G は他経路（A〜F）と異なり、review 挿入境界を case-run 本体の処理段階へ直接挿入しない。
+case-run の adapter 委譲内統合は他の6呼出元（req-define、inspect-promote、intake-promote、learning-promote、backlog-review、case-open）と異なり、review 挿入境界を case-run 本体の処理段階へ直接挿入しない。
 代わりに、実行担当サブエージェント起動における adapter 委譲の内部に review 挿入境界を設ける。
 発動条件判定と review 呼出の分離（REQ-015-001）は adapter 委譲内で達成され、case-run 本体は review 発動の有無を判定しない。
-本節は委譲境界を経路G の正典として一意に特定し、Workflow Skill（`agentdev-workflow-case-run`）の委譲起動手順が実行時実装先となる。
+本節は委譲境界を case-run 呼出の正典として一意に特定し、Workflow Skill（`agentdev-workflow-case-run`）の委譲起動手順が実行時実装先となる。
 
 | 段階 | 対応処理 | 役割 |
 |---|---|---|

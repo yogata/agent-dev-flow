@@ -52,7 +52,7 @@ RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, 
 | STEP-1 実行前同期・成果物検出 | promoted/ に採用済み成果物（または引数指定） | 対象成果物リスト | promoted ディレクトリと durable state が同期されていること |
 | STEP-2 分析・暫定分類付与 | 対象リスト確定 | 分析結果・`tentative_classification` 付与済みリスト | 文書7分類モデル（REQ、挙動Design、カタログDesign、guide、learning維持、作業記録、対象外）のいずれかが記録されていること |
 | STEP-3 統合・分割判定・depends_on 依存解決 | 分析済み | 統合・分割判定結果・依存解決済みRU構成 | depends_on が RU-ID のみで構成されていること |
-| STEP-4 review（経路E） | ユーザー明示指定時 | review 結果と反映後の案 | accepted finding が案へ反映されていること |
+| STEP-4 review（adversarial-review） | ユーザー明示指定時 | review 結果と反映後の案 | accepted finding が案へ反映されていること |
 | STEP-5 HITL | 判定案確定 | ユーザー承認結果 | ユーザーが RU 作成を承認済みであること |
 | STEP-6 矛盾検出・追加判断 | 承認済み | 矛盾検出結果・追加判断結果 | 矛盾検出時はユーザーの指示を待機していること |
 | STEP-7 RU 生成・成功成果物削除 | 判断確定 | `RU-*.md` 生成・成功成果物削除 | RU が `agentdev-backlog-integration` のフォーマットに従っていること |

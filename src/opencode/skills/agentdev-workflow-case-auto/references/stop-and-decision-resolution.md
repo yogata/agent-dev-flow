@@ -1,12 +1,12 @@
-# STEP-4/5/6: 停止条件検出・adversarial-review 経路H・bounded parent decision resolution（stop-and-decision-resolution）
+# STEP-4/5/6: 停止条件検出・adversarial-review 由来の停止伝播・bounded parent decision resolution（stop-and-decision-resolution）
 
 > 本 reference は `agentdev-workflow-case-auto` SKILL.md の Control Plane STEP-4, STEP-5, STEP-6 詳細である。
-> 停止条件検出（11項目）・停止理由分類（7軸＋上位合意矛盾/新規ユーザー判断）、adversarial-review 経路H 停止伝播、bounded parent decision resolution（限定的親判断解決）を提供する。
+> 停止条件検出（11項目）・停止理由分類（7軸＋上位合意矛盾/新規ユーザー判断）、adversarial-review 由来の停止伝播、bounded parent decision resolution（限定的親判断解決）を提供する。
 
 ## 目次
 
 - STEP-4: 停止条件検出・停止理由分類
-- STEP-5: adversarial-review 経路H 停止伝播
+- STEP-5: adversarial-review 由来の停止伝播
 - STEP-6: bounded parent decision resolution
 
 ## STEP-4: 停止条件検出・停止理由分類
@@ -89,7 +89,7 @@ execution_unit 分割可能性があるにも関わらず case-open が停止し
 
 - 停止判定は各工程の durable state からの評価であり副作用を持たない。再開時は停止報告の再開ポイントから再構成する
 
-## STEP-5: adversarial-review 経路H 停止伝播
+## STEP-5: adversarial-review 由来の停止伝播
 
 ### Purpose
 
@@ -109,7 +109,7 @@ execution_unit 分割可能性があるにも関わらず case-open が停止し
 ### Procedure
 
 case-auto は当該 execution_unit の自走を停止し、ユーザー判断を待機する。
-停止伝播契約の詳細は case-auto command Design（project extension 経由参照）「adversarial-review 由来の停止伝播（経路H）」節を正とする。
+停止伝播契約の詳細は case-auto command Design（project extension 経由参照）「adversarial-review 由来の停止伝播（case-auto の停止伝播受領）」節を正とする。
 
 - **受領**: case-run 起源は result `blocked` + user-decision-required 分類、工程委譲起源は既存 status + `parent_decision_required`（workflow-contracts Design「adversarial-review 由来の停止信号」節、delegation-contracts Design「review 経路での parent_decision_required / decision_context 適用」節）。user-decision-required は case-run result enum 第5状態ではなく停止理由分類である
 - **自走停止**: 当該 execution_unit のみ停止。他 ready 対象は継続（部分停止、STEP-3 Wave 反復制御）
@@ -117,7 +117,7 @@ case-auto は当該 execution_unit の自走を停止し、ユーザー判断を
 - **resume point**: case-run 起源は当該 Issue の case-run 再開ポイント（準備フェーズ、実装フェーズ、提出フェーズのいずれか）、工程委譲起源は当該工程の委譲起点
 - **再開**: ユーザー判断解決後、resume point から再開。adversarial-review 再発動要否は adversarial-review Design「再 review 条件」「再 review 停止条件」に従い case-auto は独自判断しない
 
-case-auto は経路H において review 直接起動、finding 解釈、採否、再評価を行わない。
+case-auto は停止伝播受領において review 直接起動、finding 解釈、採否、再評価を行わない。
 これらは下位 command の責務であり、case-auto は伝播と再開のみを担う。
 user-decision-required は STEP-4 の HITL 境界停止条件分類とは独立する停止理由分類である。
 停止報告（STEP-8）には user-decision-required を停止理由分類として含める。
@@ -195,7 +195,7 @@ default-on + skip policy と case-auto の自走性を両立し、ユーザー�
 
 - 停止条件検出結果（11項目のいずれか該当・非該当）
 - 停止理由分類（9軸のいずれか）
-- 経路H user-decision-required 受領状態、decision_context、resume point
+- adversarial-review 由来の user-decision-required 受領状態、decision_context、resume point
 - bounded parent decision resolution 判定結果（自律解決/作業仮定/上位合意矛盾/新規ユーザー判断）
 
 ## 関連 STEP
@@ -206,8 +206,8 @@ default-on + skip policy と case-auto の自走性を両立し、ユーザー�
 ## 関連 Capability Skill
 
 - `agentdev-workflow-orchestration`: 停止理由分類詳細、再開コマンド候補、capture 境界、bg task 破棄検知時の回復
-- `agentdev-adversarial-review`: 経路H で停止伝播のみ受領（case-auto は直接起動しない）、再 review 条件・停止条件の正
-- `agentdev-project-extensions`: case-auto command Design extension 経由（経路H 停止伝播契約、bounded parent decision resolution）
+- `agentdev-adversarial-review`: 停止伝播のみ受領（case-auto は直接起動しない）、再 review 条件・停止条件の正
+- `agentdev-project-extensions`: case-auto command Design extension 経由（停止伝播契約、bounded parent decision resolution）
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 

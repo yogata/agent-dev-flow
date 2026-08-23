@@ -200,13 +200,13 @@ STEP reference 8 要素は `<workflows/step-reference-contract>` Design 参照�
 | 委譲起動の具象実装（起動方式、worktree 取り扱い、PR 作成と URL 受領、result 受領、evidence 確認、timeout/ 中断、委譲プロンプト構築例、委譲プロンプト雛形）が必要な場合 | [references/harness-delegation.md](references/harness-delegation.md) |
 | 委譲プロトコルと category 設計（`writing` category と発火スキルの相互作用、`unspecified-high` 推奨根拠、category 選定ガイドライン、MUST NOT DO 必須化）が必要な場合 | [references/harness-delegation.md](references/harness-delegation.md) |
 | 委譲起動失敗、異常終了時の事後処理（worktree git status 確認、変更残留時の分類、残留箇所の grep 検出、手動修正または PR 化）が必要な場合 | [references/harness-delegation.md](references/harness-delegation.md) |
-| 経路G の adapter 委譲内 adversarial-review 統合（実装方針形成、review 呼出、結果反映、blocked 遷移の実行時詳細手順、候補判断基準、呼出失敗時の取扱い）が必要な場合 | [references/adversarial-review-integration.md](references/adversarial-review-integration.md) |
+| adapter 委譲内 adversarial-review 統合（実装方針形成、review 呼出、結果反映、blocked 遷移の実行時詳細手順、候補判断基準、呼出失敗時の取扱い）が必要な場合 | [references/adversarial-review-integration.md](references/adversarial-review-integration.md) |
 
-## adversarial-review 統合（経路G: adapter 委譲内）
+## adversarial-review 統合（case-run: adapter 委譲内）
 
-本スキルは case-run 経路G（REQ-{NNNN}）における adapter 委譲内の adversarial-review 統合（実装方針形成、review 呼出、結果反映、blocked 遷移）の実行時参照を提供する。
+本スキルは case-run の adapter 委譲内（REQ-{NNNN}）における adversarial-review 統合（実装方針形成、review 呼出、結果反映、blocked 遷移）の実行時参照を提供する。
 正規原本は `agentdev-case-run-execution-adapter` Design「adversarial-review 統合（実装方針→review→結果反映）」節である（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。
-本 SKILL.md は重複定義せず、詳細は `references/adversarial-review-integration.md`「adversarial-review 統合（経路G）」節を参照。
+本 SKILL.md は重複定義せず、詳細は `references/adversarial-review-integration.md`「adversarial-review 統合（adapter 委譲内）」節を参照。
 
 呼出元（case-run command）と本スキルの主な契約（詳細は Design と reference を正とする）:
 

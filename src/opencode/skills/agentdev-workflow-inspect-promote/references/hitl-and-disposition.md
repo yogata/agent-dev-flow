@@ -5,7 +5,7 @@
 
 ## STEP-6: 確定（自律確定判定と HITL 確定）
 
-- **Purpose**: 分類・検証と必要な経路B review を経た検出事項について、自律確定判定と HITL 確定により分類を確定する
+- **Purpose**: 分類・検証と必要な adversarial-review を経た検出事項について、自律確定判定と HITL 確定により分類を確定する
 - **Input Resolution**: STEP-5 の反映済み暫定分類結果（skip 時は STEP-3 の暫定分類結果）。検出事項本文は inbox ファイル（durable state）から読み取る。自律確定可否の判定基準は横断契約Design（workflow-contracts Design「promote系判断確定とHITL境界」節、extension 経由で解決）の詳細判定表を正とし、本 reference は判定表を複製しない
 - **Preconditions**: STEP-5 完了または skip 条件該当、確定対象の検出事項が1件以上存在
 - **Procedure**:

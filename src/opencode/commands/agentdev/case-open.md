@@ -38,7 +38,7 @@ extension の5セクション（`context` / `rules` / `checks` / `acceptance_gat
 | STEP-1 引き継ぎ・OU 選択 | 要件doc（構造化 `draft-data`）存在 | 処理対象 OU の確定 | `auto_gate.auto_ready` が true であり、未解決質問・未解決衝突・repo外操作・停止理由が残っていないこと |
 | STEP-2 Issue 本文生成・execution contract 確定 | OU 選択済み | Issue 本文・execution contract | テンプレートの【必須】セクション（`完了条件` を含む）が完備していること |
 | STEP-3 構成判定・preflight | 本文確定 | 構成判定結果（Epic flow / Standard flow）と preflight 結果 | 子Issue が Epic 1件あたり最大10件以内であること（超過時は作成前にエラー停止） |
-| STEP-4 adversarial-review（経路F） | ユーザー明示指定時 | review 結果と反映後の本文 | accepted finding が本文へ反映されていること |
+| STEP-4 adversarial-review | ユーザー明示指定時 | review 結果と反映後の本文 | accepted finding が本文へ反映されていること |
 | STEP-5 Issue 作成（Epic flow / Standard flow） | preflight 通過 | GitHub Issue（ラベル付き、要件doc埋め込み） | gh CLI 書込後の VERIFY で作成内容が確認できること。子Issue 本文先頭行に `Parent: #{epic_number}` があること |
 | STEP-6 終了処理・クリーンアップ | Issue 作成済み | Epic ステータス追跡テーブル更新・draft/RU 削除・完了報告 | 全子Issue 作成完了後にステータス追跡テーブルを一括更新していること（部分更新は行わない）。RU ファイル削除後に統合先ブランチ（既定 main）の作業ディレクトリとリモートの同期を確認し、不一致時は停止していること |
 

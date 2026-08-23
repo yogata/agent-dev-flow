@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-backlog-review
-description: "backlog-review command の workflow 実装本体。採用済み成果物（intake/learning/inspect の promoted）の検出・読込・分析・暫定分類、統合・分割判定・depends_on 依存解決、adversarial-review 経路E、ユーザー承認、矛盾検出、RU 生成・成功成果物削除、git 永続化の各 STEP を独立 resume point として所有する。USE FOR: backlog-review 実行時の workflow 制御。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "backlog-review command の workflow 実装本体。採用済み成果物（intake/learning/inspect の promoted）の検出・読込・分析・暫定分類、統合・分割判定・depends_on 依存解決、adversarial-review、ユーザー承認、矛盾検出、RU 生成・成功成果物削除、git 永続化の各 STEP を独立 resume point として所有する。USE FOR: backlog-review 実行時の workflow 制御。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # backlog-review workflow スキル
@@ -54,7 +54,7 @@ backlog-review workflow は次の8 STEP で構成する。
 | STEP-1 | 実行前同期・成果物検出 | backlog-review 起動 | 対象成果物一覧（0件時は正常終了） | [references/analysis-composition-and-review.md](references/analysis-composition-and-review.md) |
 | STEP-2 | 分析・暫定分類付与 | 対象成果物 1件以上 | 分析結果、RU frontmatter の `tentative_classification` 付与 | [references/analysis-composition-and-review.md](references/analysis-composition-and-review.md) |
 | STEP-3 | 統合・分割判定・depends_on 依存解決 | 分析完了 | RU 構成案（統合・分割判定、depends_on 解決結果） | [references/analysis-composition-and-review.md](references/analysis-composition-and-review.md) |
-| STEP-4 | review（adversarial-review 経路E） | RU 構成案確定 | review 結果反映（矛盾は STEP-6 へ引継ぎ。skip 時は従来フロー継承） | [references/analysis-composition-and-review.md](references/analysis-composition-and-review.md) |
+| STEP-4 | review（adversarial-review） | RU 構成案確定 | review 結果反映（矛盾は STEP-6 へ引継ぎ。skip 時は従来フロー継承） | [references/analysis-composition-and-review.md](references/analysis-composition-and-review.md) |
 | STEP-5 | HITL（ユーザー承認、RU 生成承認を兼ねる） | RU 構成案確定、review skip または完了 | 承認確定（矛盾なし時は単一承認で RU 生成承認と同時に扱う） | [references/analysis-composition-and-review.md](references/analysis-composition-and-review.md) |
 | STEP-6 | 矛盾検出・追加判断 | 承認確定 | 矛盾検出結果（なし / あり+追加判断、partial success 扱い） | [references/contradiction-ru-and-persistence.md](references/contradiction-ru-and-persistence.md) |
 | STEP-7 | RU 生成・成功成果物削除 | 承認確定、矛盾処理完了 | `.agentdev/backlog/req-units/RU-*.md`、RU 化成功成果物の削除 | [references/contradiction-ru-and-persistence.md](references/contradiction-ru-and-persistence.md) |
@@ -63,7 +63,7 @@ backlog-review workflow は次の8 STEP で構成する。
 ### STEP 間の依存と分岐
 
 - **正常経路**: STEP-1 → STEP-2 → STEP-3 → STEP-4（skip 条件該当時は省略）→ STEP-5 → STEP-6 → STEP-7 → STEP-8
-- **構成、review、承認の順序**: STEP-3（統合、分割判定、depends_on 依存解決）で RU 構成案を確定し、続く STEP-4（adversarial-review 呼出、default-on）を経て、STEP-5（ユーザー承認）で承認を確定する。順序の正規所有者は backlog-review command Design「adversarial-review 挿入境界（経路E）」節である
+- **構成、review、承認の順序**: STEP-3（統合、分割判定、depends_on 依存解決）で RU 構成案を確定し、続く STEP-4（adversarial-review 呼出、default-on）を経て、STEP-5（ユーザー承認）で承認を確定する。順序の正規所有者は backlog-review command Design「adversarial-review 挿入境界（backlog-review）」節である
 - **矛盾なしの場合の単一承認**: 後続の STEP-6 で矛盾が検出されない場合、STEP-5 の統合、分割判定承認を RU 生成承認（STEP-7）としても扱う。単一承認で処理し、追加の HITL は不要
 - **対象 0 件**: STEP-1 で正常終了（エラー扱いとしない。「対象なし」を報告）
 - **review unresolved 残存時**: RU 生成（STEP-7）、採用済み成果物削除、Git 永続化（STEP-8）等の後続不可逆処理へ進まない
@@ -95,8 +95,8 @@ RU 実ファイル（STEP-7 の成果物）を承認証跡として扱い、証�
 
 本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
 
-- `agentdev-backlog-integration`: 採用済み成果物の読込、分析、統合・分割判定、depends_on 依存解決、矛盾検出、RU 生成ルール（frontmatter、セクション構成、採番、upstream handoff 転記）。経路E の review 候補判断と内部手続き
-- `agentdev-adversarial-review`: 経路E の review 呼出（共通契約の正規所有者は adversarial-review Design、REQ-{NNNN}）
+- `agentdev-backlog-integration`: 採用済み成果物の読込、分析、統合・分割判定、depends_on 依存解決、矛盾検出、RU 生成ルール（frontmatter、セクション構成、採番、upstream handoff 転記）。backlog-review の review 候補判断と内部手続き
+- `agentdev-adversarial-review`: backlog-review の review 呼出（共通契約の正規所有者は adversarial-review Design、REQ-{NNNN}）
 - `agentdev-git-worktree`: ドメイン状態永続化プロシージャ（並列実行安全ステージング、構造化エラー形式）
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open。document-model Design の文書7分類モデルは extension 経由で参照）
 
