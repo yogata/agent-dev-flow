@@ -99,7 +99,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [commands/inspect-skills.md](commands/inspect-skills.md) | accepted | `/agentdev/inspect-skills` |
 | [commands/inspect-promote.md](commands/inspect-promote.md) | accepted | `/agentdev/inspect-promote` |
 | [commands/backlog-auto.md](commands/backlog-auto.md) | accepted | `/agentdev/backlog-auto` |
-| [commands/issue.md](commands/issue.md) | draft | `/agentdev/issue` |
+| [commands/issue.md](commands/issue.md) | accepted | `/agentdev/issue` |
 
 `/repo/docs-check` は repo-local、配布対象外のため対象外。
 

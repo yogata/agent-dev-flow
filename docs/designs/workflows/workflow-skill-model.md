@@ -2,7 +2,7 @@
 title: Workflow Skill Model
 status: draft
 created: 2026-08-10
-updated: 2026-08-22
+updated: 2026-08-23
 ---
 <!-- ADF-COVERS(implementation): REQ-002-001, REQ-002-002, REQ-002-003, REQ-002-004, REQ-002-017, REQ-002-018, REQ-002-034 -->
 <!-- ADF-COVERS(implementation): REQ-027-001, REQ-027-002, REQ-027-003 -->
@@ -45,13 +45,14 @@ Workflow Skill は workflow STEP を所有し、特定 Command の制御構造�
 
 ### Workflow 型分類と標準構成（STEP model 対象型と対象外型）
 
-Workflow Skill は STEP model の適用有無により次の3型に分類される（REQ-027-003）。
+Workflow Skill は STEP model の適用有無により次の4型に分類される（REQ-027-003）。
 
 | 型 | 対象 | STEP model | resume point / export / import |
 |---|---|---|---|
 | 標準型 | req-define、req-save、design-save、case-open、case-run、case-update、case-close、case-auto、intake-promote、learning-promote、backlog-review、inspect-promote | 対象 | 持つ（DEC-011） |
 | capture-only 型 | intake-capture、intake-from-github | 対象外 | 持たない。工程は逐次実行し、中断時は先頭から再実行する |
 | read-only-diagnostic 型 | inspect-docs、inspect-skills | 対象外 | 持たない。工程一覧のラベルは順序ラベルであり、中断時は先頭から再実行する |
+| 対話操作完結型 | issue | 対象外 | 持たない。各操作が1完結単位であり、課題ファイル自体が durable state であるため、中断時は同一指示から再実行して現在状態を再構成できる |
 
 read-only-diagnostic 型の SKILL.md は次の標準セクション構成を持つ。
 
@@ -61,6 +62,7 @@ read-only-diagnostic 型の SKILL.md は次の標準セクション構成を持�
 4. 終了条件（termination）
 
 capture-only 型も同様に型判定節と工程一覧を持ち、保存専用 workflow であることを宣言する。
+対話操作完結型も同様に型判定節と工程一覧を持ち、対話操作完結型（STEP model 対象外）であることを宣言する。
 
 ### 1:N 分割基準の適用実例（case-run）
 
@@ -241,8 +243,8 @@ Workflow Skill の単独起動防止（soft guard）は OpenCode 1.18.15 が ski
 
 | 層 | 実装 | 全 Workflow Skill での実装有無 |
 |---|---|---|
-| Skill 層 | Workflow Skill description の DO NOT USE FOR に置く簡潔なトリガー項（「単独起動（対応する /agentdev/* コマンド経由で利用すること）」） | 全16 Workflow Skill で実装（実効の主層） |
-| Command 層 | command 定義本文 workflow 節の soft guard 宣言節（grep 可能な `soft guard` マーカー） | core 8 Command（req-define、req-save、design-save、case-open、case-run、case-update、case-close、case-auto）と inspect 3 Command（inspect-docs、inspect-skills、inspect-promote）で実装。intake / learning / backlog 5 Command（intake-capture、intake-from-github、intake-promote、learning-promote、backlog-review）は command 定義本文に宣言節を持たず、Skill 層のみで実効する |
+| Skill 層 | Workflow Skill description の DO NOT USE FOR に置く簡潔なトリガー項（「単独起動（対応する /agentdev/* コマンド経由で利用すること）」） | 全17 Workflow Skill で実装（実効の主層） |
+| Command 層 | command 定義本文 workflow 節の soft guard 宣言節（grep 可能な `soft guard` マーカー） | core 8 Command（req-define、req-save、design-save、case-open、case-run、case-update、case-close、case-auto）と inspect 3 Command（inspect-docs、inspect-skills、inspect-promote）、issue Command で実装。intake / learning / backlog 5 Command（intake-capture、intake-from-github、intake-promote、learning-promote、backlog-review）は command 定義本文に宣言節を持たず、Skill 層のみで実効する |
 
 マーカー語、内部 ID、運用規則の散文は description に置かない。
 
