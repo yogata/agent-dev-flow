@@ -99,6 +99,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [commands/inspect-skills.md](commands/inspect-skills.md) | accepted | `/agentdev/inspect-skills` |
 | [commands/inspect-promote.md](commands/inspect-promote.md) | accepted | `/agentdev/inspect-promote` |
 | [commands/backlog-auto.md](commands/backlog-auto.md) | accepted | `/agentdev/backlog-auto` |
+| [commands/issue.md](commands/issue.md) | draft | `/agentdev/issue` |
 
 `/repo/docs-check` は repo-local、配布対象外のため対象外。
 
@@ -141,6 +142,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [skills/agentdev-adversarial-review.md](skills/agentdev-adversarial-review.md) | accepted | 補助 | 対論型レビュー（adversarial review）の振る舞い契約、レビュー手続き、責務構造。3論理役割、動的レビュー戦略、対称的相互反証、戦略メタ反証、合意候補再検証、read-only 境界を所有 |
 | [skills/agentdev-git-worktree-test-fallback.md](skills/agentdev-git-worktree-test-fallback.md) | draft | 補助 | worktree 構造系テスト fallback 契約（junction 未設定時の src/opencode/ fallback、構造的制約の明示） |
 | [skills/agentdev-workflow-backlog-auto.md](skills/agentdev-workflow-backlog-auto.md) | accepted | 中核 | backlog-auto workflow 実装本体（orchestration stage 構成、直列化契約、fan-in 判定、resume 契約） |
+| [skills/agentdev-issue-tracking.md](skills/agentdev-issue-tracking.md) | draft | 中核 | 課題管理 Capability Skill（docs/issue-list/ 課題ファイル形式、操作能力、効率的到達機構、反映追跡） |
 
 `repo-agentdev-integrity` は repo-local、配布対象外のため対象外。
 

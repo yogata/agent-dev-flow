@@ -98,6 +98,7 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 | REQ-009 | 49 | +0 |  |
 | REQ-034 | 43 | +0 |  |
 | REQ-043 | 30 | +0 |  |
+| REQ-049 | 30 | +0 |  |
 | REQ-005 | 28 | +0 |  |
 | REQ-002 | 27 | +0 |  |
 | REQ-012 | 25 | +0 |  |
@@ -106,6 +107,7 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 | REQ-010 | 23 | +0 |  |
 | REQ-032 | 22 | +0 |  |
 | REQ-030 | 21 | +0 |  |
+| REQ-048 | 21 | +0 |  |
 | REQ-011 | 19 | +0 |  |
 | REQ-017 | 16 | +0 |  |
 | REQ-041 | 16 | +0 |  |
@@ -130,7 +132,7 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 | REQ-018 | 2 | +0 |  |
 | REQ-019 | 2 | +0 |  |
 
-計測日: 2026-08-22。
+計測日: 2026-08-23。
 <!-- AUTOGEN:END -->
 
 要件行数は要件テーブル行のみをカウント（目的、適用範囲セクションの散文は除外）。

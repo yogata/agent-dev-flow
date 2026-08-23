@@ -2,6 +2,7 @@
 draft_type: req_draft
 topic_slug: issue-tracking-system
 status: saved
+design_actions_consumed: true
 created_at: "2026-08-23T10:07:55+09:00"
 source_rus:
   - RU-0002
