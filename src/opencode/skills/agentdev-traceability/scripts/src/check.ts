@@ -1,5 +1,6 @@
 // check CLI。対応宣言コーパスの7種検査（lib/check.ts の公開契約）。
 // 検証対応要否カタログ（既定パス、不在時は全要件行が検証対応必須）も自動的に読み込む。
+// レポートには全現行要件行の分類状態導出（verificationClassification）を含む。
 //
 // 使い方:
 //   bun scripts/src/check.ts --root .

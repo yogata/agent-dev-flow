@@ -12,10 +12,19 @@
 //
 // Design 対応（design 役割）は完全性判定に使わない。Design 対応0件のみを理由に
 // 異常とはしない（対応関係の完全性規則、foundations/traceability-model.md）。
+//
+// 検証対応要否の分類状態の導出（トレーサビリティモデル「対応関係の完全性規則」）は
+// classification.ts が担い、missing-verification の計上とレポートの
+// verificationClassification は同一の導出結果から計算する（単一の正規導出、二重管理しない）。
 
 import type { DeclarationIssue } from "./declarations.ts";
 import type { ScanResult } from "./corpus.ts";
 import type { VerificationScopeResolution } from "./verification_scope.ts";
+import {
+  classifyVerificationScope,
+  declaredVerificationReqIds,
+} from "./classification.ts";
+import type { VerificationClassificationEntry } from "./classification.ts";
 
 export type CheckKind =
   | "malformed-declarations"
@@ -52,6 +61,11 @@ export interface CheckReport {
   readonly summary: CheckSummary;
   /** 完全性検査（missing-*）の対象要件。all は現行要件全体を指す。 */
   readonly completenessScope: "all" | readonly string[];
+  /**
+   * 全現行要件行の検証対応要否分類状態（トレーサビリティモデルの分類状態導出契約）。
+   * 完全性検査の対象限定（completenessReqIds）の影響を受けず全行を報告する。
+   */
+  readonly verificationClassification: readonly VerificationClassificationEntry[];
 }
 
 export interface CheckOptions {
@@ -81,7 +95,17 @@ export function runChecks(
 ): CheckReport {
   const known = new Set(knownReqIds);
   const scope = options.completenessReqIds ?? knownReqIds;
-  const optionalReqIds = options.verificationScope?.optionalReqIds;
+  const optionalReqIds = options.verificationScope?.optionalReqIds ?? new Set<string>();
+  const verificationClassification = classifyVerificationScope(
+    knownReqIds,
+    declaredVerificationReqIds(scan.declarations),
+    optionalReqIds,
+  );
+  const unclassifiedReqIds = new Set(
+    verificationClassification
+      .filter((entry) => entry.classification === "unclassified")
+      .map((entry) => entry.reqId),
+  );
 
   const malformed = scan.issues.filter((i): i is DeclarationIssue & { kind: "malformed-declaration" } => i.kind === "malformed-declaration");
   const unknownRoles = scan.issues.filter((i): i is DeclarationIssue & { kind: "unknown-role" } => i.kind === "unknown-role");
@@ -111,9 +135,8 @@ export function runChecks(
   const missingVerification: CheckFinding[] = [];
   for (const reqId of scope) {
     const impl = scan.declarations.some((d) => d.role === "implementation" && d.reqIds.includes(reqId));
-    const verif = scan.declarations.some((d) => d.role === "verification" && d.reqIds.includes(reqId));
     if (!impl) missingImplementation.push({ reqId });
-    if (!verif && !(optionalReqIds?.has(reqId) ?? false)) missingVerification.push({ reqId });
+    if (unclassifiedReqIds.has(reqId)) missingVerification.push({ reqId });
   }
 
   const evidenceFindings: CheckFinding[] = scan.unreadableFiles.map((file) => ({
@@ -143,5 +166,6 @@ export function runChecks(
     checks,
     summary,
     completenessScope: options.completenessReqIds ?? "all",
+    verificationClassification,
   };
 }

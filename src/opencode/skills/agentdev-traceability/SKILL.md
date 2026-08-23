@@ -46,11 +46,25 @@ Design を正規原本とし、SKILL.md は実行入口および skill 固有の
 |---|---|---|---|
 | `src/coverage.ts` | coverage | `--root` + `--req` または `--artifact` | 要件起点: 役割付き対応関係の全件（`relations`, `counts`, `truncated: false`）/ 成果物起点: 当該成果物の対応要件（`relations`, `emptyResult`） |
 | `src/impact.ts` | impact | `--root` + `--req` または `--artifact` | 要件起点: 再確認候補 / 成果物起点: `viaRequirements` + `recheckCandidates`。空結果は `emptyResult: true` と `note`（影響なしの証明ではない旨）で明示 |
-| `src/check.ts` | check | `--root`（任意: `--req` で完全性検査対象限定、`--artifact` で根拠検査追加） | 7種検査の `checks`（項目ごと pass / fail と findings）と `summary` |
+| `src/check.ts` | check | `--root`（任意: `--req` で完全性検査対象限定、`--artifact` で根拠検査追加） | 7種検査の `checks`（項目ごと pass / fail と findings）、`summary`、全現行要件行の分類状態 `verificationClassification` |
 
 check の7種検査: `malformed-declarations`（形式・構文違反）、`unknown-roles`（未知の成果物役割）、`unknown-req-refs`（存在しない要件への参照）、`invalid-catalog-refs`（検証対応要否カタログの無効なエントリ・参照）、`missing-implementation`（実装対応の欠落）、`missing-verification`（検証対応の欠落。検証対応必須行のみ計上）、`evidence-unavailable`（根拠箇所を取得できない状態）。
 Design 対応（design 役割）0件のみを理由に異常としない。
 検証対応の要否区分は検証対応要否カタログ（自己ホストリポジトリ内の `verification-scope-catalog.md` の `## 任意行エントリ` 節、要件行ID の列挙または同一REQファイル内の範囲表現）が所有する。check はカタログを既定パスから自動的に読み込み、カタログが存在しない場合（consumer 環境を含む）は全要件行を検証対応必須として扱う（安全側既定）。
+
+### 検証対応要否の分類状態導出
+
+トレーサビリティモデル（最小 TIM の「対応関係の完全性規則」）が所有する分類状態の導出契約に基づき、check は全現行要件行の検証対応要否分類状態を、既存の恒久成果物（対応宣言コーパスと検証対応要否カタログ）からその場で導出し、`verificationClassification`（`reqId` と `classification` の組、`--req` の対象限定の影響を受けない）として報告する。`classification` は次の3値である。
+
+| 値 | 意味 | 導出条件 |
+|---|---|---|
+| `unclassified` | 未分類 | 検証対応宣言なし かつ 検証対応要否カタログ未登録 |
+| `verification-present` | 分類済み（恒久検証対応あり） | 検証対応宣言あり（カタログ登録の有無は問わない） |
+| `catalog-registered` | 分類済み（検証対応任意行） | 検証対応宣言なし・カタログ登録済み |
+
+- 分類状態のみを保持する独立した台帳、REQ frontmatter 項目、派生索引を新設しない。導出は毎回宣言とカタログから計算し、呼び出し間で状態を保持しない
+- `unclassified` と `missing-verification` 検査の findings は同一の行集合（検証対応必須行の検証対応0件 = 未分類）であり、単一の導出から計上する。契約上の役割は異なる（`missing-verification` は対応関係の完全性規則に基づく完全性検査、分類状態は工程ゲートの判定入力）
+- 段階ゲート（req-save の未分類検出・記録、case-open の未分類残存の停止、case-close の未分類残存と検証対応必須行の恒久検証対応欠落の完了阻止）は本導出を利用する（ゲート挙動の契約所有は各 Workflow Skill 側）。`catalog-registered` 行に恒久的な検証手段が存在しないことだけを理由として完了阻止しない
 
 ### 実行方法
 

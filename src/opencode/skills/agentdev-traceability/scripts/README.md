@@ -13,6 +13,7 @@ scripts/
 │   ├── corpus.ts             # 正規成果物コーパスの直接走査（派生 Graph 非依存）
 │   ├── requirements.ts       # 現行要件行ID（docs/requirements/REQ-{NNNN}.md）の収集
 │   ├── verification_scope.ts # 検証対応要否カタログの解析・範囲展開（不在時は全行必須）
+│   ├── classification.ts     # 検証対応要否の分類状態導出（宣言とカタログから都度導出、台帳なし）
 │   ├── query.ts              # coverage・impact の公開契約（純粋関数）
 │   ├── check.ts              # check の7種検査（純粋関数）
 │   └── cli_utils.ts          # argv 解析、JSON 出力、エラー終了
