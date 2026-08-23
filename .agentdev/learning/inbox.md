@@ -294,3 +294,19 @@
 - **想定反映先**: docs/designs/integrity/distribution-boundary.md（archive 公開前検査の運用注記）
 - **関連**: PR #2416 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2416 ）
 - **タグ**: `#distribution-boundary` `#archive` `#concrete-id`
+
+## worktree で agentdev-traceability を scripts ディレクトリ cwd 起動する場合は --root に worktree root を明示指定する
+
+- **問題事象**: worktree（junction 未伝播）で agentdev-traceability の check を scripts ディレクトリ（`src/opencode/skills/agentdev-traceability/scripts/`）を cwd に直接起動する際、`--root .` とすると scripts ディレクトリ自体が走査 root と解釈され corpus が縮退、missing-implementation / missing-verification の誤検出（false fail、exit 2）となる
+- **発生局面**: 検証（case-run / case-close のトレーサビリティ独立再検査、worktree 環境）
+- **検知方法**: traceability check の missing-implementation / missing-verification fail（exit 2）
+- **根本原因**: `--root` の `.` が cwd 相対で解決され、scripts ディレクトリを root に指定した場合に ADF-COVERS 宣言 corpus（docs/・src/・.opencode/ 等）が走査対象から外れる
+- **自律対応内容**: `--root` に worktree root のパスを明示指定して再実行し、7/7 種 pass（exit 0）を確認（PR #2422 case-run、2026-08-24 case-close 独立再検査でも同一手順で 7/7 pass を確認）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: worktree 環境で scripts ディレクトリを cwd にした checker・エンジン系 CLI 起動全般で、走査 root を相対指定（`.` や暗黙 cwd）にしない
+- **再発条件**: worktree 環境で corpus 走査系 CLI を `--root .` 等 cwd 相対指定で起動した場合
+- **予防策候補**: agentdev-traceability scripts README の実行例へ worktree 環境での `--root` 明示指定の運用注記を追加
+- **想定反映先**: src/opencode/skills/agentdev-traceability/scripts/README.md
+- **関連**: PR #2422 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2422 ）
+- **タグ**: `#traceability` `#worktree` `#false-fail`
