@@ -1,4 +1,4 @@
-// Direct regression tests for scripts/publish-hard-link.ts.
+// Direct regression tests for scripts/self/release/publish-hard-link.ts.
 //
 // Pins the contract required by Issue #2092 Stage B (digest-binding revision):
 //   - argv protocol: <staged> <final> <expectedSha256> (3 args, no env overrides).
@@ -15,6 +15,8 @@
 //     the host's Get-FileHash computation and the helper's read.
 //   - NO copy/rename fallback in the helper text.
 
+// ADF-COVERS(verification): REQ-050-011
+
 import { describe, expect, test } from "bun:test";
 import * as crypto from "crypto";
 import * as fs from "fs";
@@ -22,8 +24,8 @@ import * as os from "os";
 import * as path from "path";
 import { spawnSync } from "child_process";
 
-const REPO_ROOT = path.resolve(__dirname, "..");
-const HELPER = path.join(REPO_ROOT, "scripts", "publish-hard-link.ts");
+const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
+const HELPER = path.join(__dirname, "publish-hard-link.ts");
 
 interface Run {
   readonly exitCode: number;

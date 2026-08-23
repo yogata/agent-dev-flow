@@ -137,20 +137,20 @@ describe("true two-process publication race", () => {
 // ---------------------------------------------------------------------------
 
 describe("buildSourceManifest / required bootstrap scripts", () => {
-  test("throws when install-consumer-opencode.ps1 is missing", () => {
+  test("throws when scripts/install.ps1 is missing", () => {
     const inputs = [
-      entry("scripts/check-consumer-opencode.ps1", SHA, 10),
+      entry("scripts/consumer/common.ps1", SHA, 10),
       entry("src/opencode/skills/agentdev-foo/SKILL.md", SHA, 10),
     ];
-    expect(() => buildSourceManifest(inputs)).toThrow(/install-consumer-opencode\.ps1/);
+    expect(() => buildSourceManifest(inputs)).toThrow(/scripts\/install\.ps1/);
   });
 
-  test("throws when check-consumer-opencode.ps1 is missing", () => {
+  test("throws when scripts/consumer/common.ps1 is missing", () => {
     const inputs = [
-      entry("scripts/install-consumer-opencode.ps1", SHA, 10),
+      entry("scripts/install.ps1", SHA, 10),
       entry("src/opencode/skills/agentdev-foo/SKILL.md", SHA, 10),
     ];
-    expect(() => buildSourceManifest(inputs)).toThrow(/check-consumer-opencode\.ps1/);
+    expect(() => buildSourceManifest(inputs)).toThrow(/scripts\/consumer\/common\.ps1/);
   });
 
   test("throws when both bootstrap scripts are missing", () => {
@@ -162,8 +162,8 @@ describe("buildSourceManifest / required bootstrap scripts", () => {
 
   test("succeeds when both bootstrap scripts are present", () => {
     const inputs = [
-      entry("scripts/install-consumer-opencode.ps1", SHA, 10),
-      entry("scripts/check-consumer-opencode.ps1", SHA, 10),
+      entry("scripts/install.ps1", SHA, 10),
+      entry("scripts/consumer/common.ps1", SHA, 10),
       entry("src/opencode/skills/agentdev-foo/SKILL.md", SHA, 10),
     ];
     const m = buildSourceManifest(inputs);
@@ -172,11 +172,11 @@ describe("buildSourceManifest / required bootstrap scripts", () => {
 });
 
 describe("launcher / bootstrap script deletion in seed mode", () => {
-  test("deleting install-consumer-opencode.ps1 from candidate produces exit 1, no archive", () => {
+  test("deleting scripts/install.ps1 from candidate produces exit 1, no archive", () => {
     const repo = makeFixtureRepo();
     try {
       const base = headOid(repo);
-      const candidate = deleteAndCommit(repo, "scripts/install-consumer-opencode.ps1");
+      const candidate = deleteAndCommit(repo, "scripts/install.ps1");
       const out = makeTmpDir("trust-boot-del1-");
       const opts: LauncherOptions = {
         repo_root: repo, base_oid: base, candidate_oid: candidate, output_dir: out,
@@ -193,8 +193,8 @@ describe("launcher / bootstrap script deletion in seed mode", () => {
     const repo = makeFixtureRepo();
     try {
       const base = headOid(repo);
-      let candidate = deleteAndCommit(repo, "scripts/install-consumer-opencode.ps1");
-      candidate = deleteAndCommit(repo, "scripts/check-consumer-opencode.ps1");
+      let candidate = deleteAndCommit(repo, "scripts/install.ps1");
+      candidate = deleteAndCommit(repo, "scripts/consumer/common.ps1");
       const out = makeTmpDir("trust-boot-del2-");
       const opts: LauncherOptions = {
         repo_root: repo, base_oid: base, candidate_oid: candidate, output_dir: out,

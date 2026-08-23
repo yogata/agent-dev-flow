@@ -141,10 +141,10 @@ describe("blob-loader / fail-closed on binary (parent defect #4)", () => {
   test("rejects invalid UTF-8 in .ps1 bootstrap entry", () => {
     const bytes = new Uint8Array([0xff, 0xfe, 0xfd]);
     const adapter = makeAdapter({
-      "scripts/install-consumer-opencode.ps1": bytes,
+      "scripts/install.ps1": bytes,
     });
     const r = loadAndClassify(adapter, FAKE_OID, [
-      makeEntry("scripts/install-consumer-opencode.ps1"),
+      makeEntry("scripts/install.ps1"),
     ]);
     expect(r.kind).toBe("error");
     if (r.kind !== "error") return;

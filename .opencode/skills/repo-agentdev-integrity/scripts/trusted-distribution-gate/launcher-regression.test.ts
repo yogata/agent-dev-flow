@@ -1,4 +1,4 @@
-﻿// Regression tests for parent defect blockers #4 (aggregation), #5 (real
+// Regression tests for parent defect blockers #4 (aggregation), #5 (real
 // first-bootstrap base to candidate), #11 (test isolation + concurrent
 // same-final-output), and #12 (bounded git subprocess count via batched
 // reads).
@@ -55,11 +55,11 @@ describe("launcher / real first-bootstrap base to candidate (parent defect #5)",
       writeFix(repo, "src/opencode/commands/agentdev/case-run.md", "# case-run\n");
       writeFix(repo, "src/opencode/skills/agentdev-foo/SKILL.md", "# foo\n");
       writeFix(repo, "src/opencode/skills/japanese-tech-writing/SKILL.md", "# jtw\n");
-      writeFix(repo, "scripts/install-consumer-opencode.ps1", "# install\n");
-      writeFix(repo, "scripts/check-consumer-opencode.ps1", "# check\n");
+      writeFix(repo, "scripts/install.ps1", "# install\n");
+      writeFix(repo, "scripts/consumer/common.ps1", "# check\n");
       writeFix(
         repo,
-        "scripts/install-from-archive.ps1",
+        "scripts/consumer/archive/install.ps1",
         [
           "[CmdletBinding()]",
           "param(",
@@ -80,7 +80,7 @@ describe("launcher / real first-bootstrap base to candidate (parent defect #5)",
         ].join("\n"),
       );
       writeFix(repo, "README-INSTALL.md", "# install readme\n");
-      writeFix(repo, "scripts/package-release-archive.ps1", "# placeholder\n");
+      writeFix(repo, "scripts/self/release/package-release-archive.ps1", "# placeholder\n");
       execFileSync("git", ["add", "-A"], { cwd: repo });
       execFileSync("git", ["commit", "-q", "-m", "pre-bootstrap"], { cwd: repo });
       const base = headOid(repo);
@@ -102,7 +102,7 @@ describe("launcher / real first-bootstrap base to candidate (parent defect #5)",
       for (const f of ["tsconfig.json", "package.json", "bun.lock", ".gitignore"]) {
         writeFix(repo, `${trustDir}/${f}`, `# ${f}\n`);
       }
-      writeFix(repo, "scripts/trusted-distribution-gate.ps1", "# placeholder\n");
+      writeFix(repo, "scripts/self/release/trusted-distribution-gate.ps1", "# placeholder\n");
       execFileSync("git", ["add", "-A"], { cwd: repo });
       execFileSync("git", ["commit", "-q", "-m", "add trust root"], { cwd: repo });
       const candidate = headOid(repo);
@@ -131,16 +131,16 @@ describe("launcher / real first-bootstrap base to candidate (parent defect #5)",
       writeFix(repo, "src/opencode/commands/agentdev/case-run.md", "# case-run\n");
       writeFix(repo, "src/opencode/skills/agentdev-foo/SKILL.md", "# foo\n");
       writeFix(repo, "src/opencode/skills/japanese-tech-writing/SKILL.md", "# jtw\n");
-      writeFix(repo, "scripts/install-consumer-opencode.ps1", "# install\n");
-      writeFix(repo, "scripts/check-consumer-opencode.ps1", "# check\n");
-      writeFix(repo, "scripts/install-from-archive.ps1", "# placeholder installer\n");
+      writeFix(repo, "scripts/install.ps1", "# install\n");
+      writeFix(repo, "scripts/consumer/common.ps1", "# check\n");
+      writeFix(repo, "scripts/consumer/archive/install.ps1", "# placeholder installer\n");
       writeFix(repo, "README-INSTALL.md", "# install\n");
-      writeFix(repo, "scripts/package-release-archive.ps1", "# placeholder\n");
+      writeFix(repo, "scripts/self/release/package-release-archive.ps1", "# placeholder\n");
       execFileSync("git", ["add", "-A"], { cwd: repo });
       execFileSync("git", ["commit", "-q", "-m", "pre-bootstrap"], { cwd: repo });
       const base = headOid(repo);
 
-      writeFix(repo, "scripts/trusted-distribution-gate.ps1", "# ps1\n");
+      writeFix(repo, "scripts/self/release/trusted-distribution-gate.ps1", "# ps1\n");
       writeFix(repo, ".opencode/skills/repo-agentdev-integrity/scripts/trusted-distribution-gate/types.ts", "// types\n");
       execFileSync("git", ["add", "-A"], { cwd: repo });
       execFileSync("git", ["commit", "-q", "-m", "add trust root"], { cwd: repo });

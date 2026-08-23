@@ -1,6 +1,6 @@
 // End-to-end tests for the PowerShell entry script.
 //
-// These tests invoke scripts/trusted-distribution-gate.ps1 via `pwsh` on
+// These tests invoke scripts/self/release/trusted-distribution-gate.ps1 via `pwsh` on
 // Windows (the only platform where the entry script is the documented
 // primary) and assert both the JSON stdout structure AND the exact
 // $LASTEXITCODE for clean and representative failure exit codes
@@ -38,7 +38,7 @@ function ps1Available(): boolean {
 }
 
 function runPs1(args: string[]): { stdout: string; stderr: string; code: number } {
-  const ps1 = path.join(REPO_ROOT, "scripts", "trusted-distribution-gate.ps1");
+  const ps1 = path.join(REPO_ROOT, "scripts", "self", "release", "trusted-distribution-gate.ps1");
   try {
     const stdout = execFileSync("pwsh", ["-NoProfile", "-File", ps1, ...args], {
       cwd: REPO_ROOT,

@@ -37,7 +37,7 @@ function makeRepo(): { repo: string; head: string } {
     fs.mkdirSync(path.dirname(full), { recursive: true });
     fs.writeFileSync(full, `// ${f}\n`);
   }
-  const scriptsDir = path.join(repo, "scripts");
+  const scriptsDir = path.join(repo, "scripts", "self", "release");
   fs.mkdirSync(scriptsDir, { recursive: true });
   fs.writeFileSync(path.join(scriptsDir, "trusted-distribution-gate.ps1"), "# ps1\n");
   execFileSync("git", ["add", "-A"], { cwd: repo });
@@ -53,7 +53,7 @@ describe("bootstrap-report", () => {
     expect(r.ok).toBe(false); // not all protected paths committed in fixture
     expect(r.oid).toBe(head);
     expect(r.entries.length).toBeGreaterThan(0);
-    const ps1 = r.entries.find((e) => e.path === "scripts/trusted-distribution-gate.ps1");
+    const ps1 = r.entries.find((e) => e.path === "scripts/self/release/trusted-distribution-gate.ps1");
     expect(ps1?.status).toBe("present");
     expect(ps1?.sha256).toMatch(/^[0-9a-f]{64}$/);
   });
@@ -80,7 +80,7 @@ describe("bootstrap-report", () => {
     const { repo, head } = makeRepo();
     const r = bootstrapDigestReport(repo, head);
     const paths = r.entries.map((e) => e.path);
-    expect(paths).toContain("scripts/trusted-distribution-gate.ps1");
-    expect(paths).toContain("scripts/install-consumer-opencode.ps1");
+    expect(paths).toContain("scripts/self/release/trusted-distribution-gate.ps1");
+    expect(paths).toContain("scripts/install.ps1");
   });
 });

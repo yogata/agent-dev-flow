@@ -44,6 +44,8 @@
 // This helper is a trusted host primitive. It does NOT read environment
 // variables for path or digest overrides; both arrive only via argv.
 
+// ADF-COVERS(implementation): REQ-050-009
+
 import * as crypto from "crypto";
 import * as fs from "fs";
 

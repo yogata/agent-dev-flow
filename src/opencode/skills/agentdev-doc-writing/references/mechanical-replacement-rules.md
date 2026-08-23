@@ -205,7 +205,7 @@ ordered list（`1. `、`2. ` 等の番号マーカー行）は本アルゴリズ
 1. 最初の文は番号マーカーを保持した行とする
 2. 2文目以降の継続文はマーカーなしの後続行とする
 
-この運用は実装（apply-mechanical-replacement.ps1）と整合する。
+この運用は実装（apply-mechanical-replacement.ps1、`scripts/self/maintenance/` 配下）と整合する。
 実装の X-4 除外判定は unordered list マーカー（`^\s*[-*+]\s`）のみに一致し、ordered list 行を除外しない。
 Apply-X4Split は先頭セグメントを番号マーカーごと保持し、2文目以降のセグメントにはマーカーを付与しない。
 過去是正実績（PR #1091、PR #2154）も同一の運用で分割している。
@@ -308,7 +308,7 @@ PR #2154 は検証エビデンスで「`| — |` プレースホルダ grep（do
 
 ### 機械置換スクリプト
 
-`scripts/apply-mechanical-replacement.ps1` は本ファイルの algorithm を実装するツールである。
+`scripts/self/maintenance/apply-mechanical-replacement.ps1` は本ファイルの algorithm を実装するツールである。
 Wave 横断是正で共用し、algorithm SSoT と同期する。
 
 スクリプトのヒューリスティックは本ファイルの判定手順に従う。

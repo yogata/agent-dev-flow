@@ -83,7 +83,7 @@ fan-in 判定モデルの詳細は `agentdev-epic-tracker` 参照。
 
 ### 準備フェーズの既知の制約（Windows + ジャンクション環境）
 
-- メインリポジトリで `sync-self-opencode.ps1`/ `install-consumer-opencode.ps1` が作成する `.opencode/` 配下のジャンクションリンクは、git worktree（`.worktrees/{N}`）へ伝播しない。worktree 作成後に個別に再作成が必要になる場合がある。
+- メインリポジトリで `self-sync.ps1`/ `install.ps1` が作成する `.opencode/` 配下のジャンクションリンクは、git worktree（`.worktrees/{N}`）へ伝播しない。worktree 作成後に個別に再作成が必要になる場合がある。
 - worktree 内でジャンクション依存の整合性検査（`source-projection-sync` 等）を実行すると、projection 側が存在せず失敗することがある。提出フェーズのローカル検証で整合性検査を含む場合は注意。
 - ジャンクション再作成は既存手順に準拠し、本スキルで新規手順は定義しない。詳細、復旧手順は `references/self-healing-and-errors.md` の該当セクションを参照。
 - この制約は Windows + ジャンクション環境固有。`resolvePathWithFallback`によるランタイムパス→ソースパスの部分フォールバックはあるが、source/projection 双方向比較を要する検査までは補完しない。
@@ -96,7 +96,7 @@ Windows + ジャンクション環境の worktree では `.opencode/skills/agent
 - 構造化文脈（10意味）を構造化して含めること。意味の一覧と直列化形式は `agentdev-case-run-execution-adapter` スキルの委譲プロンプト雛形「構造化文脈の直列化（委譲時）」を参照
 - worktree 内 `.opencode/` は空（ジャンクション未伝播）であること
 - source（`src/opencode/`）と projection（`.opencode/`）の編集は手動両辺編集を行うこと
-- 同期スクリプト（`sync-self-opencode.ps1` 等）には依存しないこと
+- 同期スクリプト（`self-sync.ps1` 等）には依存しないこと
 - 起動プロンプトテンプレートは `references/subagent-protocol.md` の「driver 起動プロンプトテンプレート（Windows + ジャンクション環境）」を参照
 
 ## 参照先

@@ -1,14 +1,15 @@
 // ADF-COVERS(verification): REQ-009-009, REQ-009-045
 // ADF-COVERS(verification): REQ-010-060
-// Regression harness for scripts/package-release-archive.ps1.
+// ADF-COVERS(verification): REQ-050-010, REQ-050-011
+// Regression harness for scripts/self/release/package-release-archive.ps1.
 //
 // Proves the hardening contract (Issue #2092 / DEC-014 decision 7):
 //   - Happy path publishes exactly one final ZIP, no staging residue.
 //   - Archive boundary violation -> no ZIP, no residue.
 //   - Missing trusted host checker -> no ZIP, no residue.
 //   - Archive expansion failure -> no ZIP, no residue.
-//   - Missing trusted installer (scripts/install-from-archive.ps1) -> no ZIP,
-//     no residue.
+//   - Missing trusted installer (scripts/consumer/archive/install.ps1) -> no
+//     ZIP, no residue.
 //   - Installer exits non-zero -> no ZIP, no residue.
 //   - Archive-installed boundary check fails -> no newly published ZIP, no
 //     residue.
@@ -29,9 +30,9 @@ import { execFileSync, spawn, spawnSync, type ChildProcess } from "child_process
 // From <repoRoot>/.opencode/skills/repo-agentdev-integrity/scripts/ to
 // <repoRoot> is four ".." segments.
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..", "..");
-const REAL_SCRIPT = path.join(REPO_ROOT, "scripts", "package-release-archive.ps1");
-const REAL_INSTALLER = path.join(REPO_ROOT, "scripts", "install-from-archive.ps1");
-const REAL_PUBLISHER = path.join(REPO_ROOT, "scripts", "publish-hard-link.ts");
+const REAL_SCRIPT = path.join(REPO_ROOT, "scripts", "self", "release", "package-release-archive.ps1");
+const REAL_INSTALLER = path.join(REPO_ROOT, "scripts", "consumer", "archive", "install.ps1");
+const REAL_PUBLISHER = path.join(REPO_ROOT, "scripts", "self", "release", "publish-hard-link.ts");
 
 // Stub boundary checker used by every scenario. The real
 // check_distribution_boundary.ts is a heavy TS module that pulls in lib/;
@@ -45,7 +46,7 @@ const REAL_PUBLISHER = path.join(REPO_ROOT, "scripts", "publish-hard-link.ts");
 //
 // Mirroring the narrow scan is essential: a broad "scan everything" stub
 // would mask the regression where the script forgets to scan archive extras
-// (README-INSTALL.md, install-from-archive.ps1) that live outside
+// (README-INSTALL.md, scripts/install.ps1 archive edition) that live outside
 // src/opencode/. A failure is recorded when any scanned file contains the
 // literal VIOLATION-MARKER-REQ-9999.
 const STUB_CHECKER_TS = `const fs=require("fs");const p=require("path");
@@ -87,9 +88,9 @@ interface RunResult {
 interface RepoPaths {
   /** Temp repo root (under os.tmpdir). */
   root: string;
-  /** <root>/scripts/package-release-archive.ps1 */
+  /** <root>/scripts/self/release/package-release-archive.ps1 */
   scriptPath: string;
-  /** <root>/scripts/install-from-archive.ps1 (real copy by default). */
+  /** <root>/scripts/consumer/archive/install.ps1 (real copy by default). */
   installerPath: string;
   /** <root>/.opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary.ts */
   checkerPath: string;
@@ -120,7 +121,8 @@ interface ResidueReport {
 
 function makeFakeRepo(): RepoPaths {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "pkg-rel-"));
-  fs.mkdirSync(path.join(root, "scripts"), { recursive: true });
+  fs.mkdirSync(path.join(root, "scripts", "self", "release"), { recursive: true });
+  fs.mkdirSync(path.join(root, "scripts", "consumer", "archive"), { recursive: true });
   fs.mkdirSync(path.join(root, "src", "opencode", "commands", "agentdev"), { recursive: true });
   fs.mkdirSync(path.join(root, "src", "opencode", "skills"), { recursive: true });
   fs.mkdirSync(path.join(root, ".opencode", "skills", "repo-agentdev-integrity", "scripts"), { recursive: true });
@@ -130,9 +132,9 @@ function makeFakeRepo(): RepoPaths {
   fs.writeFileSync(path.join(root, "src", "opencode", "skills", "agentdev-probe", "SKILL.md"), "# probe skill\n");
   fs.writeFileSync(path.join(root, "README-INSTALL.md"), "# Install\nConsumer install instructions.\n");
 
-  fs.copyFileSync(REAL_SCRIPT, path.join(root, "scripts", "package-release-archive.ps1"));
-  fs.copyFileSync(REAL_INSTALLER, path.join(root, "scripts", "install-from-archive.ps1"));
-  fs.copyFileSync(REAL_PUBLISHER, path.join(root, "scripts", "publish-hard-link.ts"));
+  fs.copyFileSync(REAL_SCRIPT, path.join(root, "scripts", "self", "release", "package-release-archive.ps1"));
+  fs.copyFileSync(REAL_INSTALLER, path.join(root, "scripts", "consumer", "archive", "install.ps1"));
+  fs.copyFileSync(REAL_PUBLISHER, path.join(root, "scripts", "self", "release", "publish-hard-link.ts"));
   fs.writeFileSync(
     path.join(root, ".opencode", "skills", "repo-agentdev-integrity", "scripts", "check_distribution_boundary.ts"),
     STUB_CHECKER_TS,
@@ -150,8 +152,8 @@ function makeFakeRepo(): RepoPaths {
 
   return {
     root,
-    scriptPath: path.join(root, "scripts", "package-release-archive.ps1"),
-    installerPath: path.join(root, "scripts", "install-from-archive.ps1"),
+    scriptPath: path.join(root, "scripts", "self", "release", "package-release-archive.ps1"),
+    installerPath: path.join(root, "scripts", "consumer", "archive", "install.ps1"),
     checkerPath: path.join(root, ".opencode", "skills", "repo-agentdev-integrity", "scripts", "check_distribution_boundary.ts"),
     commandsDir: path.join(root, "src", "opencode", "commands", "agentdev"),
     skillsDir: path.join(root, "src", "opencode", "skills"),
@@ -260,7 +262,7 @@ describe("package-release-archive.ps1 / archive boundary violation", () => {
 });
 
 describe("package-release-archive.ps1 / archive extras boundary violation", () => {
-  test("scanner catches violations in README-INSTALL.md and install-from-archive.ps1 (exit 6)", () => {
+  test("scanner catches violations in README-INSTALL.md and the archive installer (exit 6)", () => {
     const repo = makeFakeRepo();
     try {
       // Violation in README-INSTALL.md (an archive extra, not under src/opencode/).
@@ -330,8 +332,8 @@ describe("package-release-archive.ps1 / missing trusted installer", () => {
     try {
       fs.rmSync(repo.installerPath, { force: true });
       const res = runScript(repo);
-      // The trusted installer (scripts/install-from-archive.ps1) is a host
-      // source-required file; missing it must exit non-zero before any
+      // The trusted installer (scripts/consumer/archive/install.ps1) is a
+      // host source-required file; missing it must exit non-zero before any
       // staging is built.
       expect(res.exitCode).not.toBe(0);
       const report = inspect(repo);
@@ -448,7 +450,7 @@ describe("package-release-archive.ps1 / publish primitive contract", () => {
   test("missing trusted host publish helper fails closed (exit 8), no ZIP, no residue", () => {
     const repo = makeFakeRepo();
     try {
-      fs.rmSync(path.join(repo.root, "scripts", "publish-hard-link.ts"), { force: true });
+      fs.rmSync(path.join(repo.root, "scripts", "self", "release", "publish-hard-link.ts"), { force: true });
       const res = runScript(repo);
       expect(res.exitCode).toBe(8);
       const report = inspect(repo);
@@ -464,12 +466,12 @@ describe("package-release-archive.ps1 / publish primitive contract", () => {
 // ---------------------------------------------------------------------------
 // Stage B (Issue #2092) / untrusted-execution defense
 //
-// Proves the candidate archive's install-from-archive.ps1 is NEVER executed
-// by the release pipeline. Only the trusted host installer
-// (scripts/install-from-archive.ps1 at the release runner's working tree)
-// runs against the extracted source. A mutated archive's installer can no
-// longer run arbitrary code (in particular, can no longer mutate $stagedZip
-// between Compress-Archive and publication).
+// Proves the candidate archive's scripts/install.ps1 (archive edition) is
+// NEVER executed by the release pipeline. Only the trusted host installer
+// (scripts/consumer/archive/install.ps1 at the release runner's working
+// tree) runs against the extracted source. A mutated archive's installer
+// can no longer run arbitrary code (in particular, can no longer mutate
+// $stagedZip between Compress-Archive and publication).
 // ---------------------------------------------------------------------------
 
 describe("package-release-archive.ps1 / Stage B untrusted-execution defense", () => {
@@ -488,10 +490,10 @@ describe("package-release-archive.ps1 / Stage B untrusted-execution defense", ()
 
   test("malicious installer inside the staged archive does NOT run; publish succeeds", () => {
     // Behavioral probe. The staging step normally copies $installScript
-    // (trusted) into <stageArchiveRoot>/scripts/install-from-archive.ps1.
-    // Patch the staging step to write a MALICIOUS stub there instead. The
-    // trusted installer at repo.installerPath is unchanged. After running
-    // the release script:
+    // (trusted) into <stageArchiveRoot>/scripts/install.ps1 (archive
+    // edition projection name, REQ-050-010). Patch the staging step to
+    // write a MALICIOUS stub there instead. The trusted installer at
+    // repo.installerPath is unchanged. After running the release script:
     //   - if the script still invokes the extracted installer, the malicious
     //     stub runs and drops a probe file (BUG: exit 9 / probe present)
     //   - if the script invokes the trusted installer, the stub never runs
@@ -501,10 +503,10 @@ describe("package-release-archive.ps1 / Stage B untrusted-execution defense", ()
       const probePath = path.join(repo.root, "MALICIOUS-INSTALLER-RAN.txt");
       const stubBody = `New-Item -ItemType File -Path '${probePath.replace(/'/g, "''")}' -Force | Out-Null`;
       // Function-replacement form avoids $-interpolation of $stageScripts.
-      const stageCopyRe = /Copy-Item -LiteralPath \$installScript -Destination \(Join-Path \$stageScripts "install-from-archive\.ps1"\) -Force/;
+      const stageCopyRe = /Copy-Item -LiteralPath \$installScript -Destination \(Join-Path \$stageScripts "install\.ps1"\) -Force/;
       const txt = fs.readFileSync(repo.scriptPath, "utf-8");
       const patched = txt.replace(stageCopyRe, () =>
-        `Set-Content -LiteralPath (Join-Path $stageScripts "install-from-archive.ps1") -Value '${stubBody.replace(/'/g, "''")}' -Encoding utf8`,
+        `Set-Content -LiteralPath (Join-Path $stageScripts "install.ps1") -Value '${stubBody.replace(/'/g, "''")}' -Encoding utf8`,
       );
       expect(patched).not.toEqual(txt);
       fs.writeFileSync(repo.scriptPath, patched);

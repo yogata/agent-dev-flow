@@ -9,11 +9,11 @@ agentdev-release-<sha>/
   src/opencode/commands/agentdev/**.md
   src/opencode/skills/agentdev-*/**/**
   src/opencode/skills/japanese-tech-writing/**/**
-  scripts/install-from-archive.ps1
+  scripts/install.ps1
   README-INSTALL.md
 ```
 
-`scripts/install-from-archive.ps1` は配布物を `.opencode/` 配下へ実ファイルとして配置する導入スクリプトである。archive は配布物の自己完結を保証し、展開先リポジトリの `src/opencode/` 状態に依存しない。
+`scripts/install.ps1`（archive 版 installer）は配布物を `.opencode/` 配下へ実ファイルとして配置する導入スクリプトである。archive は配布物の自己完結を保証し、展開先リポジトリの `src/opencode/` 状態に依存しない。archive 版は junction を作成しない archive 固有の導入契約を持つ（通常 checkout 版 `scripts/install.ps1` とは別の installation projection である）。
 
 ## 前提
 
@@ -30,8 +30,8 @@ Expand-Archive -LiteralPath "agentdev-release-<sha>.zip" -DestinationPath $temp 
 # 2. 展開先のルート（archive 内の agentdev-release-<sha>/）を特定
 $unpackedRoot = Join-Path $temp "agentdev-release-<sha>"
 
-# 3. install-from-archive.ps1 を実行
-& (Join-Path $unpackedRoot "scripts\install-from-archive.ps1") `
+# 3. scripts/install.ps1（archive 版 installer）を実行
+& (Join-Path $unpackedRoot "scripts\install.ps1") `
     -Source (Join-Path $unpackedRoot "src\opencode") `
     -Target (Join-Path $unpackedRoot ".opencode") `
     -Mode copy

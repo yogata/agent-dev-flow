@@ -1,3 +1,4 @@
+# ADF-COVERS(implementation): REQ-050-009
 # 機械置換アルゴリズム適用スクリプト (mechanical-replacement-rules.md 準拠)
 # X-1: 中黒並列 → 読点
 # X-4: 一文一行違反 → 句点で行分割 (table/list/heading/frontmatter/code fence/括弧内句点は除外)

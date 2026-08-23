@@ -1,4 +1,4 @@
-﻿// TDD red-phase regression tests for confirmed parent blockers.
+// TDD red-phase regression tests for confirmed parent blockers.
 //
 // These tests fail against the current code on purpose. They encode the
 // contracts the parent review requires:
@@ -65,7 +65,7 @@ function opts(repo: string, base: string, candidate: string, outName: string, ex
 
 describe("launcher / publish-after-verify ordering (parent blocker #1, #8)", () => {
   test("when physical archive-installed verify fails, NO final archive is published", () => {
-    // The launcher reads scripts/install-from-archive.ps1 from the BASE
+    // The launcher reads scripts/consumer/archive/install.ps1 from the BASE
     // OID (trusted). If base has a broken installer (exits non-zero), the
     // physical install verification MUST fail BEFORE any final archive is
     // published. This test commits a base with an installer that always
@@ -82,15 +82,15 @@ describe("launcher / publish-after-verify ordering (parent blocker #1, #8)", () 
       writeFix(repo, "src/opencode/commands/agentdev/case-run.md", "# case-run\n");
       writeFix(repo, "src/opencode/skills/agentdev-foo/SKILL.md", "# foo\n");
       writeFix(repo, "src/opencode/skills/japanese-tech-writing/SKILL.md", "# jtw\n");
-      writeFix(repo, "scripts/install-consumer-opencode.ps1", "# install\n");
-      writeFix(repo, "scripts/check-consumer-opencode.ps1", "# check\n");
+      writeFix(repo, "scripts/install.ps1", "# install\n");
+      writeFix(repo, "scripts/consumer/common.ps1", "# check\n");
       writeFix(repo, "README-INSTALL.md", "# readme\n");
-      writeFix(repo, "scripts/package-release-archive.ps1", "# placeholder\n");
+      writeFix(repo, "scripts/self/release/package-release-archive.ps1", "# placeholder\n");
       // BASE installer: intentionally broken (exit 5). The launcher's
       // verify MUST detect this and refuse to publish.
       writeFix(
         repo,
-        "scripts/install-from-archive.ps1",
+        "scripts/consumer/archive/install.ps1",
         [
           "[CmdletBinding()]",
           "param([string]$Source,[string]$Target,[string]$Mode)",
@@ -103,11 +103,11 @@ describe("launcher / publish-after-verify ordering (parent blocker #1, #8)", () 
       execFileSync("git", ["commit", "-q", "-m", "base-with-broken-installer"], { cwd: repo });
       const base = headOid(repo);
 
-      // Candidate: add only the trust root. install-from-archive.ps1
+      // Candidate: add only the trust root. scripts/consumer/archive/install.ps1
       // remains the broken base version (we want verify to fail). Stage
-      // B owns install-from-archive.ps1 so its non-presence in the
+      // B owns the archive installer original so its non-presence in the
       // candidate commit is fine; protected-path policy does not fire.
-      writeFix(repo, "scripts/trusted-distribution-gate.ps1", "# placeholder\n");
+      writeFix(repo, "scripts/self/release/trusted-distribution-gate.ps1", "# placeholder\n");
       writeFix(repo, ".opencode/skills/repo-agentdev-integrity/scripts/trusted-distribution-gate/types.ts", "// types\n");
       writeFix(repo, ".opencode/skills/repo-agentdev-integrity/scripts/trusted-distribution-gate/protected-paths.ts", "// pp\n");
       execFileSync("git", ["add", "-A"], { cwd: repo });

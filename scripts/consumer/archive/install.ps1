@@ -5,6 +5,8 @@ param(
     [Parameter(Mandatory = $true)][ValidateSet("copy")][string]$Mode
 )
 
+# archive 専用 installer 原本。release archive 内では scripts/install.ps1 の名で
+# 配置される（package-release-archive.ps1 が投影名を付与する）。
 # WP-{N} (Issue #1928) §7.5.2: install the unpacked release archive's src/opencode/
 # tree into the projection directory (.opencode/) as real files.
 # Junctions are NOT created; release archives must be junction-free.

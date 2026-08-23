@@ -1,14 +1,18 @@
 // Regression: protected-path enumeration MUST cover every non-test runtime
 // module under the trust-root directory and MUST NOT cover Stage B canonical
-// scripts (install-from-archive.ps1, package-release-archive.ps1).
+// scripts (scripts/consumer/archive/install.ps1,
+// scripts/self/release/package-release-archive.ps1).
 //
 // This test fails closed when a new runtime module is added without being
 // reflected in the auto-enumeration. It also enforces the Stage A/B boundary:
 // Stage A protects its own runtime closure plus the trusted launcher /
-// consumer install-check scripts; Stage B owns the archive packaging scripts
-// and may modify them without re-triggering Stage A protected-path violation.
+// consumer install entry and its dependency module; Stage B owns the archive
+// packaging scripts and may modify them without re-triggering Stage A
+// protected-path violation.
 //
 // Parent defect blockers #2, #3.
+
+// ADF-COVERS(verification): REQ-050-012
 
 import { describe, expect, test } from "bun:test";
 import * as fs from "fs";
@@ -68,24 +72,24 @@ describe("protected-paths / runtime-module coverage (parent defect #2)", () => {
 });
 
 describe("protected-paths / Stage A/B boundary (parent defect #3)", () => {
-  test("does NOT protect scripts/install-from-archive.ps1 (Stage B owns)", () => {
+  test("does NOT protect scripts/consumer/archive/install.ps1 (Stage B owns)", () => {
     const all = listAllProtectedPaths(DEFAULT_PROTECTED_PATH_SET);
-    expect(all).not.toContain("scripts/install-from-archive.ps1");
+    expect(all).not.toContain("scripts/consumer/archive/install.ps1");
   });
 
-  test("does NOT protect scripts/package-release-archive.ps1 (Stage B owns)", () => {
+  test("does NOT protect scripts/self/release/package-release-archive.ps1 (Stage B owns)", () => {
     const all = listAllProtectedPaths(DEFAULT_PROTECTED_PATH_SET);
-    expect(all).not.toContain("scripts/package-release-archive.ps1");
+    expect(all).not.toContain("scripts/self/release/package-release-archive.ps1");
   });
 
   test("protects trusted launcher entry", () => {
     const all = listAllProtectedPaths(DEFAULT_PROTECTED_PATH_SET);
-    expect(all).toContain("scripts/trusted-distribution-gate.ps1");
+    expect(all).toContain("scripts/self/release/trusted-distribution-gate.ps1");
   });
 
-  test("protects trusted consumer install/check scripts", () => {
+  test("protects the consumer install entry and its dependency module (REQ-050-011, REQ-050-012)", () => {
     const all = listAllProtectedPaths(DEFAULT_PROTECTED_PATH_SET);
-    expect(all).toContain("scripts/install-consumer-opencode.ps1");
-    expect(all).toContain("scripts/check-consumer-opencode.ps1");
+    expect(all).toContain("scripts/install.ps1");
+    expect(all).toContain("scripts/consumer/common.ps1");
   });
 });
