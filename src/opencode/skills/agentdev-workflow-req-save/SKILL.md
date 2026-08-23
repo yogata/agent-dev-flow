@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-req-save
-description: "req-save command の workflow 実装本体。壁打ち成果物（draft-data）をREQ/Decisionファイルとしてdocs/に保存し、コミット・プッシュする制御を所有する。事前チェック（no-op 判定）、REQ ファイル操作と適用結果整合性検証、インデックス・ハブ更新、Decision ファイル作成、docs 変更整合性検証、変更範囲検証、ドラフト status 更新（saved）も含む。USE FOR: req-save 実行時の workflow 制御（normal create/update・no-op・validation failure・partial failure・rerun idempotency・commit 前中断・external Git failure 各シナリオ）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "req-save command の workflow 実装本体。壁打ち成果物（draft-data）をREQ/Decisionファイルとしてdocs/に保存し、コミット・プッシュする制御を所有する。事前チェック（no-op 判定）、REQ ファイル操作と適用結果整合性検証、検証対応要否未分類行の検出・記録（保存は失敗させない）、インデックス・ハブ更新、Decision ファイル作成、docs 変更整合性検証、変更範囲検証、ドラフト status 更新（saved）も含む。USE FOR: req-save 実行時の workflow 制御（normal create/update・no-op・validation failure・partial failure・rerun idempotency・commit 前中断・external Git failure 各シナリオ）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # req-save workflow スキル
@@ -54,7 +54,7 @@ req-save workflow は次の12 STEP で構成する。
 | STEP-1 | 事前チェック | req-save 起動 | 処理要否判定（no-op or 継続） | [references/precheck-and-req-ops.md](references/precheck-and-req-ops.md) |
 | STEP-2 | ドラフト読込 | 処理対象あり | ドラフト読込済み、読込時 commit hash 記録 | [references/precheck-and-req-ops.md](references/precheck-and-req-ops.md) |
 | STEP-3 | ドラフト検証・処理対象確定 | ドラフト読込済み | 必須フィールド検証、処理対象 entry 確定 | [references/precheck-and-req-ops.md](references/precheck-and-req-ops.md) |
-| STEP-4 | REQ ファイル操作 | 処理対象確定 | REQ/Decision ファイル保存（QG-1 相当検証、決定的スクリプト適用） | [references/precheck-and-req-ops.md](references/precheck-and-req-ops.md) |
+| STEP-4 | REQ ファイル操作 | 処理対象確定 | REQ/Decision ファイル保存（QG-1 相当検証、決定的スクリプト適用、検証対応要否未分類行の検出・記録） | [references/precheck-and-req-ops.md](references/precheck-and-req-ops.md) |
 | STEP-5 | インデックス・ハブ更新 | REQ ファイル操作完了 | README エントリ登録（check-entry-existence 検証済み） | [references/indexes-and-persistence.md](references/indexes-and-persistence.md) |
 | STEP-6 | Decision ファイル作成 | `artifact: decision` entry 存在 | Decision ファイル作成、ハブ追記 | [references/indexes-and-persistence.md](references/indexes-and-persistence.md) |
 | STEP-7 | docs 変更整合性検証 | ファイル操作完了 | REQ番号連続性、frontmatter id↔ファイル名整合 | [references/indexes-and-persistence.md](references/indexes-and-persistence.md) |
@@ -94,6 +94,7 @@ req-save workflow は次の12 STEP で構成する。
 - `agentdev-conventional-commits`: commit message 生成
 - `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ（明示パスステージ、`git commit -- <paths>`）
 - `agentdev-workflow-orchestration`: capture 境界（deviation capture の委譲）
+- `agentdev-traceability`: 検証対応要否未分類行の導出（check。分類状態の導出定義はトレーサビリティモデル「対応関係の完全性規則」が所有）
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 - integrity checker skill（AG-{NNN} detector、repo 固有）: check_changed_docs.ts（targeted docs guard）
 
@@ -112,6 +113,7 @@ req-save workflow は次の12 STEP で構成する。
 - **capture 非関与**: intake/learning capture は原則行わない。例外は REQ 再構成 intake（`.agentdev/intake/inbox/req-restructure/**`）のみ生成可。deviation capture は Skill（`agentdev-learning-capture` または `agentdev-intake-pipeline`）への委譲で実施する
 - **内容品質の再検証なし**: req-save の QG-1 は適用結果の整合性のみ検証し、内容の品質は req-define の QG-1 の責務
 - **成果物本文 verbatim**: 成果物本文は verbatim で返す。判定結果、調査過程、中間ログは要約・圧縮して返す
+- **検証対応要否の段階ゲート（検出・記録面）**: 保存対象の新規 REQ または追加要件行のうち検証対応要否が未分類（検証対応宣言が存在せず、検証対応要否カタログにも未登録）の行を検出し、未分類行として保存結果に明示的に記録する。未分類行の存在だけを理由として保存を失敗させない。分類の完了は case-open 側の停止条件が担う（判定方法の詳細は STEP-4 reference）
 
 ## See Also
 

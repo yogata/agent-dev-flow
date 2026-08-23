@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-open
-description: "case-open command の workflow 実装本体。要件定義から GitHub Issue（Epic flow / Standard flow）作成までの制御構造、execution contract 確定、execution_unit 構成、draft/RU 削除クリーンアップを所有する。USE FOR: case-open 実行時の workflow 制御（Issue 本文生成・execution contract 確定・execution_unit 構成・preflight・Epic flow/Standard flow）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "case-open command の workflow 実装本体。要件定義から GitHub Issue（Epic flow / Standard flow）作成までの制御構造、execution contract 確定、execution_unit 構成、検証対応要否未分類行残存時の Issue 作成停止ゲート、draft/RU 削除クリーンアップを所有する。USE FOR: case-open 実行時の workflow 制御（Issue 本文生成・execution contract 確定・execution_unit 構成・preflight・Epic flow/Standard flow）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # case-open workflow スキル
@@ -52,7 +52,7 @@ case-open workflow は次の6 STEP で構成する。
 |---|---|---|---|---|
 | STEP-1 | 引き継ぎ・OU選択 | 要件doc 受領 | 処理対象確定（OU 単位） | [references/handoff-and-ou-gate.md](references/handoff-and-ou-gate.md) |
 | STEP-2 | Issue本文生成・execution contract 確定 | 処理対象確定 | Issue 本文候補（EC-{N}〜EC-{N} 反映済み、QG-2 検証済み） | [references/issue-body-and-execution-contract.md](references/issue-body-and-execution-contract.md) |
-| STEP-3 | 構成判定・preflight | Issue 本文候補確定 | execution structure（Epic vs Standard、Wave 構成、preflight合格） | [references/execution-unit-and-preflight.md](references/execution-unit-and-preflight.md) |
+| STEP-3 | 構成判定・preflight | Issue 本文候補確定 | execution structure（Epic vs Standard、Wave 構成、preflight合格。対象要件行の検証対応要否未分類残存チェック込み） | [references/execution-unit-and-preflight.md](references/execution-unit-and-preflight.md) |
 | STEP-4 | adversarial-review（経路F） | execution structure + Issue 本文 + 完了条件の3者確定 | review 結果反映（4パターン再実行ルール） | [references/adversarial-review-integration.md](references/adversarial-review-integration.md) |
 | STEP-5 | Issue 作成（Epic flow / Standard flow） | adversarial-review skip または review 完了 | GitHub Issue 作成済み（親Epic + 子Issue群、または Standard Issue） | [references/issue-creation-flows.md](references/issue-creation-flows.md) |
 | STEP-6 | 終了処理・クリーンアップ | Issue 作成完了 | コメント追加、draft/RU 削除（Form Zero）、完了報告 | [references/termination-and-cleanup.md](references/termination-and-cleanup.md) |
@@ -71,7 +71,7 @@ case-open workflow は次の6 STEP で構成する。
 ### termination
 
 - 正常終了: 終了処理・クリーンアップ STEP の完了報告出力まで（draft/RU 削除残存検証合格を含む）
-- 停止終了: `auto_gate.auto_ready` が false、未解決質問、未解決衝突、repo 外操作、停止理由が残る場合。preflight 不合格、子Issue 上限超過、QG-2 fail
+- 停止終了: `auto_gate.auto_ready` が false、未解決質問、未解決衝突、repo 外操作、停止理由が残る場合。preflight 不合格（対象要件行の検証対応要否未分類残存を含む）、子Issue 上限超過、QG-2 fail
 
 ## 主要 Capability Skill 連携
 
@@ -85,6 +85,7 @@ case-open workflow は次の6 STEP で構成する。
 - `agentdev-workflow-lifecycle`: 引き継ぎ停止判定（runtime-package-boundary）
 - `agentdev-req-file-manager`: RU ファイル削除
 - `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ（draft/RU 削除、Form Zero）
+- `agentdev-traceability`: 検証対応要否未分類行の導出（check。分類状態の導出定義はトレーサビリティモデル「対応関係の完全性規則」が所有。STEP-3 preflight の停止判定に利用）
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 - `agentdev-adversarial-review`: 経路F review 呼出
 - `agentdev-learning-capture` / `agentdev-intake-pipeline`: deviation capture 委譲（STEP-4/5 で実観測時）
@@ -95,6 +96,7 @@ case-open は、上流工程（req-define）で確定した対象要件と実行
 Issue の対象範囲、完了条件、test strategy の確定（STEP-2、STEP-3）は、上流工程の引き継ぎ情報（draft-data、artifact_actions、operation_units）を基に行う。
 
 - req-define と重複して一般的な変更影響探索や依存関係探索を行い、対象範囲を再決定しない
+- 検証対応要否の分類状態の導出（STEP-3 preflight の未分類残存チェック）は `agentdev-traceability` の check 利用であり、一般的な変更影響探索・依存関係探索には該当しない
 - 引き継ぎ情報に欠落があり変更影響候補の確認が必要な場合は、req-define へ差し戻す
 - 必須品質統制の導出は artifact type から品質能力キーへの変換（品質統制 routing Design が定める）に従う
 
