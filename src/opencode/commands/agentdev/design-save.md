@@ -18,37 +18,10 @@ req-save の G02（Design 編集禁止）を緩和するものではなく、Des
 - `docs/designs/<**/*>.md`（既存 Design への追記 or 新規 Design 作成）
 - `.agentdev/drafts/req-draft-{topic-slug}.md`（Design artifact_actions 消費済みフラグの status 更新）
 
-## project extensions
-
-本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-design-save`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-design-save.yaml`、kind: workflow-extension）を読み込む。
-extension の5セクション（`context` / `rules` / `checks` / `acceptance_gates` / `must_not`）は標準動作に追加・拡張される（上書きではない）。
-存在しない場合は標準動作で続行し、破損時はエラー表示して当該 extension を無視し標準動作で続行する。
-extension に列挙されていない `docs/designs/**` 内部パスを固定知識として読みに行かない。
-詳細な読み込み契約は `agentdev-project-extensions` skill 参照
-
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-design-save` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
-同スキルが11 STEP の control plane として制御構造（配置先解決、Design ファイル操作、整合確認、永続化）を所有する。
-各工程を前出出力検証表で示す（工程ラベルが推奨順）。
-
-| 工程 | 前提条件 | 出力契約 | 検証基準 |
-|---|---|---|---|
-| STEP-1 事前チェック | ドラフト指定あり | 処理対象確定（no-op 判定を含む） | Design 対象 artifact_actions（`artifact: design`）の有無が判定済みであること |
-| STEP-2 Design artifact_actions 読込 | 事前チェック通過 | Design 保存対象 entry リスト | `artifact_actions` 形式が正当であること（不正はエラー中止・req-define 差し戻し推奨） |
-| STEP-3 配置先解決 | 読込済み | 配置先 Design パス（既存追記 or 新規作成） | 配置先判定が req-define（`agentdev-req-analysis`）の分離結果を尊重していること。特定不能候補は skip + follow-up 明示 |
-| STEP-4 Design 分離基準の最終確認 | 配置先解決済み | 分離適合確認結果 | 各 action が Design 分離基準に適合していること（安定契約例外は follow-up 扱い） |
-| STEP-5 Design ファイル操作 | 分離確認済み | `docs/designs/<**/*>.md` の追記 or 新規作成 | 新規作成時は frontmatter `status: draft` 付与、追記時は `status` 維持であること |
-| STEP-6 インデックス整合 | Design 操作済み | Design 一覧（`README.md`）整合状態 | Design 一覧表と実ファイルが一致していること |
-| STEP-7 Design 一覧整合確認 | インデックス更新済み | 整合確認結果 | 一覧表エントリと status が実ファイルと一致していること |
-| STEP-8 ドラフト status 更新 | 整合確認済み | 消費済みフラグの status 更新 | status 更新が commit 対象に含まれていること |
-| STEP-9 変更範囲検証 | status 更新済み | 変更範囲検証結果 | 変更が許可スコープ内であること（違反時は報告して指示待ち） |
-| STEP-10 コミット・プッシュ | 検証通過 | commit・push 済みブランチ | 並列実行安全ステージング（`agentdev-git-worktree`）に従っていること |
-| STEP-11 完了報告 | push 完了 | 完了報告（次コマンドの提示を含む） | 出力パスと次アクションが報告されていること |
-
-**soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-design-save` が所有する。
-同 Workflow Skill は `/agentdev/design-save` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。
-OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
+本コマンドは workflow 実装本体を `agentdev-workflow-design-save` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
+工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの control plane が所有する。
 
 ## 不変条件
 

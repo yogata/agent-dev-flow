@@ -11,13 +11,6 @@ description: "対論型レビューの実行入口。Orchestrator、Reviewer、R
 - **参照元**: 呼出元コマンド（default-on + skip policy、REQ-{NNNN}-{NNN}/{NNN}）、ユーザー明示的選択
 - **特性**: 審議プロトコルの振る舞い契約を実行入口として提供する。実装実行、ファイル編集、外部状態変更は本スキルの対象外
 
-## 原本（SSoT）
-
-本スキルの原本仕様は `docs/designs/<skills/agentdev-adversarial-review>.md` である。
-Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は Design を正とする。
-extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
-
 ## 発動契約
 
 原則適用・skip 可能な助言手段（対論型レビュー）である（REQ-{NNNN}-{NNN}）。

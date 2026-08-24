@@ -7,13 +7,6 @@ description: Manages git worktree creation, switching, and cleanup based on Issu
 
 GitHub Issue 番号に基づいて、安全かつ一貫性のある方法で git worktree を作成、管理、削除する。
 
-## 原本（SSoT）
-
-本スキルの原本仕様は `agentdev-git-worktree` Design である。
-Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は Design を正とする。
-extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
-
 ## 命名規則
 
 | 項目 | 命名パターン | 例 |
@@ -74,4 +67,3 @@ detached worktree による baseline 比較を標準手順とする。
 - `--force` によるダーティworktreeの強制削除禁止
 - メインリポジトリ内でのファイル編集禁止（case-run中）
 - worktree ライフサイクルに伴うブランチクリーンアップは禁止事項の対象外
-

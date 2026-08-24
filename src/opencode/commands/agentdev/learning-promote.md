@@ -10,15 +10,6 @@ description: inbox.mdから正規化、分類、8軸評価、自律確定・HITL
 反映ルート: promoted → `/agentdev/backlog-review`（RU 生成）→ `/agentdev/req-define` → `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run`。
 旧 `learning-refine` の全機能を吸収済み（事前実行不要）。
 
-## project extensions
-
-本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-learning-promote`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-learning-promote.yaml`、kind: workflow-extension）を読み込む。
-
-- extension は `context` / `rules` / `checks` / `acceptance_gates` / `must_not` の5セクションを持ち、本コマンドの標準動作に追加・拡張される（上書きではない）
-- extension が存在しない場合は標準動作で続行する
-- extension が破損している場合はエラーを表示して当該 extension を無視し、標準動作で続行する
-- 詳細な読み込み契約は `agentdev-project-extensions` skill 参照
-
 ## 入力
 
 - `.agentdev/learning/inbox.md`（必須）— 未処理の学びエントリ
@@ -34,19 +25,7 @@ description: inbox.mdから正規化、分類、8軸評価、自律確定・HITL
 ## workflow
 
 本コマンドは workflow 実装本体を `agentdev-workflow-learning-promote` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
-同スキルが7 STEP の control plane として制御構造を所有する。
-各 STEP は resume point を持ち、durable state（inbox.md / deferred.md / evaluation-report.md / promoted/ の実ファイル状態、分類確定状態）から再開点を再構成する（DEC-{N}）。
-各工程を前出出力検証表で示す（工程ラベルが推奨順）。
-
-| 工程 | 前提条件 | 出力契約 | 検証基準 |
-|---|---|---|---|
-| STEP-1 入力読込・正規化 | `.agentdev/learning/inbox.md` 存在 | 正規化済みエントリ群 | inbox.md 不在時はエラー終了（`agentdev-learning-capture` での追加を案内）であること |
-| STEP-2 評価 | 正規化済み | 8軸評価スコア・問題クラス分類 | 評価根拠が各エントリに揃っていること |
-| STEP-3 判定 | 評価済み | 廃棄判定・既存対策確認・昇華可能性判定 | 恒久契約（REQ/Decision/Design）への昇華可能性が判定されていること |
-| STEP-4 review（adversarial-review） | default-on（発動条件判定 → review 呼出） | review 結果と反映後の評価 | accepted finding 反映時は evaluation-report 生成工程から再実行していること |
-| STEP-5 判定確定（自律確定・HITL） | 判定結果あり | 判定確定（自律確定分はユーザー承認なし、ユーザー判断必要分はユーザー承認済み）・prune | 一意に確定できる項目はユーザー承認なしで確定し、ユーザー判断が必要な項目のみ廃棄判定結果・8軸評価スコアの確認・修正・承認を経ていること |
-| STEP-6 永続化 | 判定確定済み（自律確定またはユーザー承認） | `promoted/{category}-{name}.md`・deferred.md 追記・inbox.md クリア・prune | 採用済み成果物・deferred 移動・prune が確定内容と一致していること |
-| STEP-7 完了報告 | 永続化済み | 完了報告（次アクション） | 出力パスと次コマンド（`/agentdev/backlog-review`）が報告されていること |
+工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの control plane が所有する。
 
 ## 不変条件
 
@@ -56,7 +35,7 @@ description: inbox.mdから正規化、分類、8軸評価、自律確定・HITL
 - 採用済み成果物の受け渡しは `/agentdev/backlog-review` 経由とする（case-run への直接受け渡しは行わない。反映ルート: promoted → `/agentdev/backlog-review`（RU 生成）→ `/agentdev/req-define` → `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run`）
 - 主入力は `inbox.md` とし、raw learning item の再分類は行わない
 - 既存対策を優先する（「新規X化」より「既存Xへ反映」を優先）
-- 学びは直接 REQ 化せず、恒久契約（REQ/Decision/Design）への昇華可能性を STEP-3 で評価し、昇華可能なもののみ `promoted/` へ出力する。昇華不能な知見は living pool（`deferred.md`）で維持する
+- 学びは直接 REQ 化せず、恒久契約（REQ/Decision/Design）への昇華可能性を判定工程で評価し、昇華可能なもののみ `promoted/` へ出力する。昇華不能な知見は living pool（`deferred.md`）で維持する
 - 一意に確定できる項目は自律確定し、ユーザー判断が必要な項目のみ HITL 対象とする。自律確定可否の詳細判定表は横断契約Design「promote系判断確定とHITL境界」節が集約所有し、本コマンド定義と Workflow Skill は判定表を複製しない。自律確定はユーザー承認の擬制ではなく、deferred・未処理項目を自動削除しない安全境界は維持する
 - adversarial-review は default-on（REQ-{NNNN}-{NNN}）: workflow の review STEP（発動条件判定 → review 呼出）を経て原則発動する。skip 条件（inbox.md 1件で重複確実、inbox.md 空）該当時は HITL へ従来フローを維持し、ユーザー明示要求時は skip 条件にかかわらず必ず発動する。共通契約（任意性、副作用禁止、再 review 条件、停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` Design（REQ-{NNNN}）が正規所有する
 
@@ -67,14 +46,14 @@ description: inbox.mdから正規化、分類、8軸評価、自律確定・HITL
 - G01: `.opencode/` 直接反映は行わない（採用済み成果物は `.agentdev/learning/promoted/` のみに生成）
 - G06: ユーザー判断が必要な項目の判定、prune ともにユーザー承認なしには実行しない。一意に確定できる項目（横断契約Design の詳細判定表に従う）はユーザー承認なしで自律確定する
 - G07: 管理用ファイル（`elevation-ledger.md` 等）は生成しない
-- G09: 破壊的変更（inbox.md 全体強制クリア、大量エントリ一括削除等）は STEP-5（判定確定）とは別に明示承認を維持する（REQ）。自律確定によっても迂回されない
+- G09: 破壊的変更（inbox.md 全体強制クリア、大量エントリ一括削除等）は判定確定の承認とは別に明示承認を維持する（REQ）。自律確定によっても迂回されない
 
 ## ユーザー確認ポイント、エラー処理
 
 ユーザー確認ポイント、エラー処理表、各成果物のライフサイクルは `agentdev-learning-pipeline` を参照。主要項目のみ本節に抜粋する:
 
-- **HITL（workflow STEP-5）**: ユーザー判断が必要な項目の廃棄判定結果、8軸評価スコアの確認、修正、承認（判断の確定、REQ）。一意に確定できる項目はユーザー承認なしで自律確定し、HITL 対象としない（判断確定の境界は横断契約Design「promote系判断確定とHITL境界」節の詳細判定表に従う）
-- **prune（workflow 永続化 STEP）**: prune は判定確定（自律確定またはユーザー承認）と同時に承認済みとみなし自動実行（REQ）。staged/rejected/duplicate の追加確認は不要
+- **HITL（判定確定）**: ユーザー判断が必要な項目の廃棄判定結果、8軸評価スコアの確認、修正、承認（判断の確定、REQ）。一意に確定できる項目はユーザー承認なしで自律確定し、HITL 対象としない（判断確定の境界は横断契約Design「promote系判断確定とHITL境界」節の詳細判定表に従う）
+- **prune（永続化）**: prune は判定確定（自律確定またはユーザー承認）と同時に承認済みとみなし自動実行（REQ）。staged/rejected/duplicate の追加確認は不要
 - **inbox.md 不在**: エラー終了。「先に `agentdev-learning-capture` skill で学びを追加してください」
 - **git pull/push 失敗**: 構造化エラー表示して停止（push 失敗時は完了扱いにしない）
 - **learning-promote の責務**: normalize → classify → 8-axis eval → evaluation-report → disposal judgment → 自律確定判定（ユーザー判断が必要な項目のみ HITL）→ 採用済み成果物生成 → archive move → prune。採用済み成果物は `/agentdev/backlog-review` 経由で RU 化後に `/agentdev/req-define` に合流する

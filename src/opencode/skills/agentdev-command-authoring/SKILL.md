@@ -8,22 +8,6 @@ description: Provides quality criteria and best practices for authoring OpenCode
 OpenCodeのCommand定義（`.opencode/commands/`）を書く際の実践ガイド。
 Command/ Skill/ Template/ Script の責任分界に基づき、Commandを薄く保つ基準を提供する。
 
-## 原本（SSoT）
-
-本スキルの原本仕様は `agentdev-command-authoring` Design である。
-Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は Design を正とする。
-extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
-
-## skill extension 参照方針
-
-本スキルは以下の方針に従う。
-
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）のみを前提とし、`docs/designs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
-2. **extension の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill extension（`.agentdev/extensions/skills/agentdev-command-authoring.yaml`）を読む。skill extension はスキル単位で1ファイルに集約し、reference ごとの extension は作らない
-3. **`docs/designs/**` 内部パスの固定知識化の禁止**: extension に列挙されていない `docs/designs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/designs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
-4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
-
 ## Frontmatter 規約
 
 command frontmatter の許可フィールドは `description` 単一。
@@ -66,7 +50,6 @@ Commandに書くべきでない内容:
 Command が持つ Step 番号は高レベル（整数 Step 1, 2, 3...）に限定する。
 Step の細分番号（4-1, 4-2 等）、判定表、状態機械詳細は skill 本体または skill の `references/` へ配置すること。
 Command Steps が深く階層化されている場合、それは skill への切り出し不足のシグナルである。
-
 
 REQ 要件行には振る舞い、制約、状態のみを記述し、Step 番号参照やコマンド実装詳細を混入させないこと。
 REQ 要件行が特定 Step 番号（例: 「Step 4-2 で分類する」）に依存している場合、command 実装の変更が REQ 解釈に影響する結合が生じるため、振る舞い単位の記述に書き換えること。
@@ -143,5 +126,3 @@ Command作成、改定時に以下を確認する:
 - **agentdev-skill-authoring**: Skill品質基準
 - **artifact-contracts Design**: Command/Skill/Template/Script 責務境界
 - **references/command-authoring-standards.md**: 行数目安、Steps数目安、共通処理重複、正規パス、完了報告種別、後方互換性の詳細
-
-

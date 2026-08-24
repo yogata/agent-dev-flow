@@ -9,10 +9,12 @@
  *       (references/docs-and-design-promotion.md)
  *   - Epic Wave route: case-close STEP-E4-1
  *       (references/epic-wave-close.md)
- *   - case-run post-implementation final gate: case-run 配布依存境界の最終
- *       変更経路 gate paragraph (commands/agentdev/case-run.md, layer-3
- *       transition: former standalone final-gate heading, 現行は workflow-case-run
- *       STEP-S5-1 が対応)
+ *   - case-run post-implementation final gate: workflow-case-run STEP-S5-1
+ *       (skills/agentdev-workflow-case-run/references/delegation-and-result.md).
+ *       The former command-side gate paragraph was removed with the thin
+ *       Command model (DEC-022, Issue #2428): the command keeps only a
+ *       name-level delegation and the routing tokens live in the Workflow
+ *       Skill reference.
  *
  * All three must reference the same detector entry point and profile token.
  * Assertions verify only routing-bearing machine/LLM-dispatch tokens:
@@ -51,6 +53,9 @@ function readFileIfExists(p: string): string | null {
 }
 
 const CASE_RUN_COMMAND = resolveWorkflowPath("commands/agentdev/case-run.md");
+const CASE_RUN_DELEGATION_AND_RESULT = resolveWorkflowPath(
+  "skills/agentdev-workflow-case-run/references/delegation-and-result.md",
+);
 const DOCS_AND_SPEC_PROMOTION = resolveWorkflowPath(
   "skills/agentdev-workflow-case-close/references/docs-and-design-promotion.md",
 );
@@ -95,20 +100,20 @@ function extractSection(
     sectionId: sectionHeading
   };
 }
-
-// 前出出力検証表転換後の case-run 最終 gate は独立した手順見出しでなく
-// bold 段落（**配布依存境界の最終変更経路 gate（実装後）**）で表現される。
-// 段落の終端は soft guard 宣言または次の見出し。
+// case-run 最終 gate の routing トークンは thin Command モデル移行後、
+// Workflow Skill 側 reference（delegation-and-result.md STEP-S5-1）が所有する。
+// 段落の終端は次の見出しまたは次のリスト項目。
 function extractCaseRunGateParagraph(content: string): SectionExtractionResult {
-  const marker = "**配布依存境界の最終変更経路 gate（実装後）**";
+  const marker = "STEP-S5-1:";
   const startIdx = content.indexOf(marker);
   if (startIdx === -1) {
     return { section: "", sectionId: null };
   }
+
   const afterStart = content.slice(startIdx);
-  const softGuardIdx = afterStart.indexOf("\n**soft guard");
-  const nextHeadingIdx = afterStart.search(/\n#{1,3} /);
-  const candidates = [softGuardIdx, nextHeadingIdx].filter((i) => i > 0);
+  const nextHeadingIdx = afterStart.search(/\n#{1,4} /);
+  const nextListItemIdx = afterStart.indexOf("\n- **");
+  const candidates = [nextHeadingIdx, nextListItemIdx].filter((i) => i > 0);
   const end = candidates.length > 0 ? Math.min(...candidates) : afterStart.length;
   return { section: afterStart.slice(0, end), sectionId: marker };
 }
@@ -120,8 +125,9 @@ function assertSectionExists(result: SectionExtractionResult, fileName: string):
 }
 
 describe("distribution-boundary final gate routing contract", () => {
-  it("case-run command file is reachable from the test harness", () => {
+  it("case-run command and workflow gate reference are reachable from the test harness", () => {
     expect(fs.existsSync(CASE_RUN_COMMAND)).toBe(true);
+    expect(fs.existsSync(CASE_RUN_DELEGATION_AND_RESULT)).toBe(true);
   });
 
   it("case-close references are reachable from the test harness", () => {
@@ -205,11 +211,11 @@ describe("distribution-boundary final gate routing contract", () => {
   });
 
   describe("case-run 配布依存境界の最終変更経路 gate preserves adapter result protocol", () => {
-    const content = readFileIfExists(CASE_RUN_COMMAND) ?? "";
+    const content = readFileIfExists(CASE_RUN_DELEGATION_AND_RESULT) ?? "";
     const step71 = extractCaseRunGateParagraph(content);
 
     it("gate section exists", () => {
-      assertSectionExists(step71, "case-run.md");
+      assertSectionExists(step71, "delegation-and-result.md");
     });
 
     it(`section contains detector entry point: ${DETECTOR_ENTRYPOINT}`, () => {
@@ -236,7 +242,7 @@ describe("distribution-boundary final gate routing contract", () => {
   describe("both case-close trigger paths route through the same detector", () => {
     const docsContent = readFileIfExists(DOCS_AND_SPEC_PROMOTION) ?? "";
     const epicContent = readFileIfExists(EPIC_WAVE_CLOSE) ?? "";
-    const caseRunContent = readFileIfExists(CASE_RUN_COMMAND) ?? "";
+    const caseRunContent = readFileIfExists(CASE_RUN_DELEGATION_AND_RESULT) ?? "";
 
     const step31 = extractSection(docsContent, "### STEP-3-1:");
     const e41 = extractSection(epicContent, "#### E4-1:");

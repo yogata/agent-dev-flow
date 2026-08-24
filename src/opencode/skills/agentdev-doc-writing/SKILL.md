@@ -5,28 +5,16 @@ description: ADR/REQ/Design 横断の文書品質査読ゲート。文書種別�
 
 # 文書品質ゲート（doc-writing）
 
-## skill extension 参照方針
-
-本スキルは以下の方針に従う。
-
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）のみを前提とし、`docs/designs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
-2. **extension の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill extension（`.agentdev/extensions/skills/agentdev-doc-writing.yaml`）を読む。skill extension はスキル単位で1ファイルに集約し、reference ごとの extension は作らない
-3. **`docs/designs/**` 内部パスの固定知識化の禁止**: extension に列挙されていない `docs/designs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/designs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
-4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
-
 ## 目的
 
 書かれた文書の品質を静的査読し、読者が判断、実行できる文書へ修正提案を提示する。
 対象は `docs/` 配下の REQ/ADR/Design/guides/README、および docs を生成、編集する command/skill の自然言語記述である。
 QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要件性、文意品質、粒度の補助査読として位置づける。
 
-
 本スキルは**静的査読**を担う。
 実行時の動的判断（要件分析、Decision要否判定）は `agentdev-req-analysis`、`agentdev-decision-guidelines` が担う。
 
-
 ## 原本
-
 
 執筆規範の原本は `japanese-tech-writing` スキル（AGENTS.md 経由で参照）、配置基準、用語政策の原本は document-type-responsibilities Design である。
 本スキルはその実行入口であり、`references/*` は運用ビュー（圧縮ビュー、チェックリスト、出力形式、機械判定アルゴリズム、置換辞書）である。
@@ -127,5 +115,3 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 - `agentdev-decision-file-manager`（Decisionファイル管理。番号採番、ライフサイクル）
 - `agentdev-skill-authoring`（スキル構造、配置判断）
 - `agentdev-workflow-templates`（ワークフローテンプレート）
-
-

@@ -7,23 +7,6 @@ description: backlog整理サイクル（inspect-docs→昇格3系統→backlog-
 backlog 整理サイクル（inspect-docs による文書診断、learning、intake、inspect の3昇格系統、backlog-review による統合と RU 生成）を1回の起動で一巡させる。
 既存5コマンド（inspect-docs、learning-promote、intake-promote、inspect-promote、backlog-review）を置換せず、標準の backlog 整理フロー（個別コマンドの逐次実行）を置き換えない追加入口である。
 
-## workflow 実装の権威情報源
-
-本コマンドの workflow 実装本体（orchestration stage 構成、昇格3系統の並行実行と競合処理の直列化契約、fan-in 判定、停止伝播、resume 契約）は `agentdev-workflow-backlog-auto` Workflow Skill を権威情報源とする（責務3層分化、workflow-skill-model Design 準拠）。
-本コマンド定義は公開 interface / dispatch のみを所有し、workflow 実装本体を複製しない。
-
-**子ワークフローの権威情報源**: 各工程は対応する Workflow Skill（`agentdev-workflow-inspect-docs`、`agentdev-workflow-learning-promote`、`agentdev-workflow-intake-promote`、`agentdev-workflow-inspect-promote`、`agentdev-workflow-backlog-review`）を権威情報源として実行する。
-backlog-auto は子ワークフロー内部の分類、評価、昇格、RU 生成ロジックを再実装しない。
-
-## project extensions
-
-本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-backlog-auto`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-backlog-auto.yaml`、kind: workflow-extension）を読み込む。
-
-- extension は `context` / `rules` / `checks` / `acceptance_gates` / `must_not` の5セクションを持ち、本コマンドの標準動作に追加・拡張される（上書きではない）
-- extension が存在しない場合は標準動作で続行する
-- extension が破損している場合はエラーを表示して当該 extension を無視し、標準動作で続行する
-- 詳細な読み込み契約は `agentdev-project-extensions` skill 参照
-
 ## 入力
 
 - なし（対象状態は各子コマンドの durable state から解決する）
@@ -36,19 +19,8 @@ backlog-auto は子ワークフロー内部の分類、評価、昇格、RU 生�
 ## workflow
 
 本コマンドは workflow 実装本体を `agentdev-workflow-backlog-auto` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
-同スキルが6 STEP の control plane として制御構造を所有する。
-各工程を前出出力検証表で示す（工程ラベルが推奨順）。
-
-| 工程 | 前提条件 | 出力契約 | 検証基準 |
-|---|---|---|---|
-| STEP-1 開始時刻記録・進行状態初期化 | コマンド起動 | 開始時刻記録、durable state からの進行状態再構成 | 対象状態が各子コマンドの durable state から解決されていること |
-| STEP-2 stage 1: inspect-docs 実行 | 開始時刻記録済み | 検出事項（`.agentdev/inspect/inbox/`）または検出事項なし完了 | inspect-docs の公開契約どおりに実行されていること |
-| STEP-3 stage 2: 昇格3系統実行 | inspect-docs 正常終了 | 系統別実行結果（正常完了、対象なし終了、blocked、failed の別） | 系統相互の先行依存がなく、競合する Git 操作、共有成果物書き込み、ユーザー対話が直列化されていること |
-| STEP-4 fan-in 判定 | 3系統の結果受領 | backlog-review 開始可否の判定 | 全系統が正常完了または対象なし終了の時のみ開始可と判定していること |
-| STEP-5 stage 3: backlog-review 実行 | fan-in 判定が開始可 | `RU-*.md` 生成、成功成果物削除（backlog-review 公開契約どおり） | backlog-review の公開契約どおりに実行されていること |
-| STEP-6 完了報告 | 全工程完了または停止 | 工程別結果、停止理由、再開コマンド提示を含む実行結果報告 | 停止時に再開点と再開可能な次コマンドが明示され、全体完了が報告されていないこと |
-
-同スキルは本コマンドの工程経由でのみ利用し、単独の skill 起動は soft guard（REQ-{NNNN}-{NNN}）で抑制する。
+工程、分岐、状態遷移、再開、停止などの高水準の実行構造、子ワークフロー（inspect-docs、learning-promote、intake-promote、inspect-promote、backlog-review）の権威情報源と読込主体の割当ても同スキルの control plane が所有する。
+backlog-auto は子ワークフロー内部の分類、評価、昇格、RU 生成ロジックを再実装しない。
 
 ## 不変条件
 

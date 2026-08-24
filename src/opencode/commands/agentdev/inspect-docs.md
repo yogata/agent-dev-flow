@@ -44,31 +44,11 @@ docs全体（REQ/Decision/Design/guides）の意味整合性を診断し、検�
 routing は実行コマンド選択の目安であり、各コマンドの検出対象（既定のスキャン範囲）は変更しない。
 配布物のみの変更時は inspect-skills を優先する。
 
-## project extensions
-
-本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-inspect-docs`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-docs.yaml`、kind: workflow-extension）を読み込む。
-
-- extension は `context` / `rules` / `checks` / `acceptance_gates` / `must_not` の5セクションを持ち、本コマンドの標準動作に追加・拡張される（上書きではない）
-- extension が存在しない場合は標準動作で続行する
-- extension が破損している場合はエラーを表示して当該 extension を無視し、標準動作で続行する
-- 詳細な読み込み契約は `agentdev-project-extensions` skill 参照
-
 ## workflow
 
 本コマンドは workflow 実装本体を `agentdev-workflow-inspect-docs` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
-同スキルは read-only-diagnostic型（STEP model 対象外、resume point なし）として4工程の control plane を所有する。
-各工程を前出出力検証表で示す（工程ラベルが推奨順）。
-
-| 工程 | 前提条件 | 出力契約 | 検証基準 |
-|---|---|---|---|
-| STEP-1 スキャン対象の収集 | コマンド起動 | スキャン対象成果物リスト | 対象ディレクトリ不存在時は空扱い警告で継続していること |
-| STEP-2 REQ 体系・文書種別別意味診断 | 対象収集済み | 観点別診断結果 | source-of-truth priority（現行 REQ > 承認済み ADR > Design > guides）に従って矛盾判定していること |
-| STEP-3 配布物整合性検査・route 判定 | 診断済み | 配布物整合性結果・route 判定 | 検出事項ごとに観点・対象・根拠・推奨routeが揃っていること |
-| STEP-4 検出事項出力・永続化・完了報告 | 検出完了 | `.agentdev/inspect/inbox/inspect-docs-finding-*.md`・完了報告 | 検出事項ファイルが finding schema に従っていること |
-
-同スキルは本コマンドの工程経由でのみ利用し、単独の skill 起動は soft guard（REQ-{NNNN}-{NNN}）で抑制する。
-
-**共通ルール**（全工程適用）: エラー処理（スキャン対象ディレクトリ不存在時は該当カテゴリを空扱い警告、ファイル読込失敗時はスキップ警告）
+工程、分岐、再開、停止などの高水準の実行構造は同スキルの control plane が所有する。
+エラー処理（スキャン対象ディレクトリ不存在時は該当カテゴリを空扱い警告、ファイル読込失敗時はスキップ警告）
 
 ## 不変条件
 

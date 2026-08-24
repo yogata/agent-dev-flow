@@ -1,6 +1,6 @@
 ---
 title: Workflow Skill Model
-status: draft
+status: accepted
 created: 2026-08-10
 updated: 2026-08-24
 ---

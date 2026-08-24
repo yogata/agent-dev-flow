@@ -9,12 +9,6 @@ AgentDevFlow 標準配布スキル。
 要件と成果物の明示的な対応関係（covers）について、coverage、impact、check の3能力を提供する。
 正規成果物を直接走査して対応関係をその場で解決し、派生 Graph を前提としない。
 
-## 原本（SSoT）
-
-本スキルの原本仕様は `agentdev-traceability` Design である。
-Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は Design を正とする。
-
 ## 対応宣言の表記
 
 対応宣言は対応する成果物自身が保持し、中央台帳を新設しない。

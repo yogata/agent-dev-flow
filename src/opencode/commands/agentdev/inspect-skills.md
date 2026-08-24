@@ -46,30 +46,11 @@ Command→Skill 参照妥当性と Skill 構造を検査対象を直接修正せ
 routing は実行コマンド選択の目安であり、各コマンドの検出対象（既定のスキャン範囲）は変更しない。
 配布物のみの変更時は inspect-skills を優先する。
 
-## project extensions
-
-本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-inspect-skills`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-skills.yaml`、kind: workflow-extension）を読み込む。
-
-- extension は `context` / `rules` / `checks` / `acceptance_gates` / `must_not` の5セクションを持ち、本コマンドの標準動作に追加・拡張される（上書きではない）
-- extension が存在しない場合は標準動作で続行する
-- extension が破損している場合はエラーを表示して当該 extension を無視し、標準動作で続行する
-- 詳細な読み込み契約は `agentdev-project-extensions` skill 参照
-
 ## workflow
 
 本コマンドは workflow 実装本体を `agentdev-workflow-inspect-skills` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
-同スキルは read-only-diagnostic型（STEP model 対象外、resume point なし）として3工程の control plane を所有する。
-各工程を前出出力検証表で示す（工程ラベルが推奨順）。
-
-| 工程 | 前提条件 | 出力契約 | 検証基準 |
-|---|---|---|---|
-| STEP-1 診断対象の読込 | コマンド起動（Command/Skill 定義ファイル群） | 診断対象リスト | 対象ファイル不存在時は空扱い警告、読込失敗時はスキップ警告で継続していること |
-| STEP-2 診断観点の評価・分類・route 提示 | 読込済み | 観点別評価結果・分類・推奨 route | 参照先 Skill 不存在時は検出事項として報告されていること |
-| STEP-3 検出事項出力・永続化・完了報告 | 評価完了 | `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md`・完了報告 | 検出事項（対象、観点、分類、根拠、推奨 route）が finding schema に従っていること |
-
-同スキルは本コマンドの工程経由でのみ利用し、単独の skill 起動は soft guard（REQ-{NNNN}-{NNN}）で抑制する。
-
-**共通ルール**（全工程適用）: エラー処理（対象ファイル不存在時は空扱い警告、読込失敗時はスキップ警告、参照先 Skill 不存在時は検出事項として報告）
+工程、分岐、再開、停止などの高水準の実行構造は同スキルの control plane が所有する。
+エラー処理（対象ファイル不存在時は空扱い警告、読込失敗時はスキップ警告、参照先 Skill 不存在時は検出事項として報告）
 
 ## 不変条件
 

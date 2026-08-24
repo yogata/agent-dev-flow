@@ -12,21 +12,6 @@ finding disposition を STEP resume point として所有する。
 
 inspect-promote command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 
-## 原本（SSoT）
-
-本スキルの原本仕様は SKILL.md（control plane）と `references/` 配下（各 STEP 詳細）が担う。
-Workflow Skill 固有契約（Command / Workflow Skill / Capability Skill 責務、1:N 分割基準、依存方向、配置契約）は `<workflows/workflow-skill-model>` Design が正規所有する。
-extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-promote.yaml`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
-
-## skill extension 参照方針
-
-本スキルは以下の方針に従う（ADR、`agentdev-skill-authoring` 準拠）。
-
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/decisions/specs）と inspect-promote command の公開契約のみを前提とする。Design ディレクトリの内部構成（`foundations`, `responsibilities` 等）は仮定しない
-2. **extension の読込契約**: 呼び出し元 command から渡された解決済み文脈を優先し、不足分のみ skill extension を読む。reference ごとの extension は作らない
-3. **Design 内部パスの固定知識化の禁止**: extension に列挙されていない Design 内部パスを固定知識として参照しない
-4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
-
 ## 入力
 
 - `.agentdev/inspect/inbox/*.md`（検出事項ファイル群）
@@ -96,15 +81,6 @@ inspect-promote workflow は次の8 STEP で構成する。
 - `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ（明示パス stage、`git commit -- <paths>`）
 - `agentdev-conventional-commits`: commit message 規約（reject 時の却下理由記載含む）
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
-
-## Workflow Extension 読込契約
-
-本スキルは workflow-extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-promote.yaml`、kind: workflow-extension）を読み込む場合がある。
-Workflow Skill のみが読み、inspect-promote command は直接読まない。
-標準動作に追加・拡張される（上書きではない）。
-存在しない場合は標準動作で続行する（fail-open）。
-破損している場合はエラーを表示して当該 extension を無視し、標準動作で続行する。
-自動 promote 対象カテゴリ、投入先、実行ログ、誤検知 revoke 手順は workflow-contracts Design（extension 経由で解決）を正とし、本スキルはカテゴリ定義を重複保持しない。
 
 ## 共通制約
 

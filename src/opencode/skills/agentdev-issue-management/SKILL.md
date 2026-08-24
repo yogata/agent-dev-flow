@@ -8,13 +8,6 @@ description: GitHub Issue の作成・更新・リンク・確認の安全手順
 GitHub Issue の作成、更新、リンク、確認を安全に行うための操作手順を提供するスキル。
 `agentdev-gh-cli` の VERIFY 操作（書き込み内容検証）と連携し、Issue 操作特有の安全性要件を補完する。
 
-## 原本（SSoT）
-
-本スキルの原本仕様は `agentdev-issue-management` Design である。
-Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は Design を正とする。
-extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
-
 ## 対象コマンド
 
 | コマンド | 本スキルの利用目的 |
@@ -46,4 +39,3 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 - 本スキルで Epic/child Issue の作成順序、Wave スケジューリングを定義しないこと（`case-open` command の責務）
 - 本スキルで RU 削除、完了報告を扱わないこと（`agentdev-req-file-manager`/ テンプレートの責務）
 - 本スキルで work_type 判定、ラベル体系を扱わないこと（`agentdev-workflow-lifecycle` の責務）
-
