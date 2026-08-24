@@ -21,6 +21,10 @@
     - .opencode/             = real directory (not a junction)
     - .opencode/commands/agentdev/  = junction -> src/opencode/commands/agentdev/
     - .opencode/skills/agentdev-*/  = individual junctions -> src/opencode/skills/agentdev-*/
+    - .opencode/tools/agentdev-*/   = individual junctions -> src/opencode/tools/agentdev-*/
+      (Custom Tool distribution type)
+    - .opencode/plugins/agentdev-*/ = individual junctions -> src/opencode/plugins/agentdev-*/
+      (Plugin / Hook distribution type)
 
     Repo-local artifacts are excluded from junction management:
     - .opencode/commands/repo/      = real directory (not a junction, repo-local only)
@@ -40,6 +44,7 @@
 #>
 
 # ADF-COVERS(implementation): REQ-050-001, REQ-050-003, REQ-050-005, REQ-050-006, REQ-050-007
+# ADF-COVERS(implementation): REQ-052-007, REQ-052-008
 
 #Requires -Version 7.0
 
@@ -55,6 +60,12 @@ $SourceDir = Join-Path $RepoRoot 'src\opencode'
 $ProjectionDir = Join-Path $RepoRoot '.opencode'
 $CommandsDir = Join-Path $ProjectionDir 'commands'
 $SkillsDir = Join-Path $ProjectionDir 'skills'
+$ToolsDir = Join-Path $ProjectionDir 'tools'
+$PluginsDir = Join-Path $ProjectionDir 'plugins'
+
+# Parent directories that must exist as real directories (junction parents).
+$ProjectionParentDirs = @($CommandsDir, $SkillsDir, $ToolsDir, $PluginsDir)
+$ProjectionParentRels = @('commands', 'skills', 'tools', 'plugins')
 
 # Repo-local patterns excluded from junction management (ADR-0020)
 $RepoLocalCommandNames = @('repo')
@@ -140,6 +151,20 @@ function Get-SelectiveJunctionTargets {
         }
     }
 
+    # tools\agentdev-* (Custom Tool 配布種別、動的列挙)
+    $toolsSource = Join-Path $SourceDir 'tools'
+    if (Test-Path -LiteralPath $toolsSource) {
+        Get-ChildItem -LiteralPath $toolsSource -Directory -Filter 'agentdev-*' |
+            ForEach-Object { $targets.Add("tools\$($_.Name)") }
+    }
+
+    # plugins\agentdev-* (Plugin / Hook 配布種別、動的列挙)
+    $pluginsSource = Join-Path $SourceDir 'plugins'
+    if (Test-Path -LiteralPath $pluginsSource) {
+        Get-ChildItem -LiteralPath $pluginsSource -Directory -Filter 'agentdev-*' |
+            ForEach-Object { $targets.Add("plugins\$($_.Name)") }
+    }
+
     return ($targets | Sort-Object)
 }
 
@@ -211,7 +236,7 @@ if ($Mode -eq 'check') {
     }
 
     # 4. Orphan detection in commands/ and skills/ (skip repo-local artifacts)
-    foreach ($parentRel in @('commands', 'skills')) {
+    foreach ($parentRel in $ProjectionParentRels) {
         $parentPath = Join-Path $ProjectionDir $parentRel
         if (-not (Test-Path -LiteralPath $parentPath)) { continue }
         Get-ChildItem -LiteralPath $parentPath -Directory -Force |
@@ -267,7 +292,7 @@ if ($Mode -eq 'dry-run') {
     }
 
     # Parent directory status
-    foreach ($parentRel in @('commands', 'skills')) {
+    foreach ($parentRel in $ProjectionParentRels) {
         $parentPath = Join-Path $ProjectionDir $parentRel
         if (-not (Test-Path -LiteralPath $parentPath)) {
             Write-Host "[WOULD ADD] .opencode/$parentRel/ (real directory)"
@@ -303,7 +328,7 @@ if ($Mode -eq 'dry-run') {
     Write-Host ''
     Write-Host '--- Orphan junctions ---'
     $orphansFound = $false
-    foreach ($parentRel in @('commands', 'skills')) {
+    foreach ($parentRel in $ProjectionParentRels) {
         $parentPath = Join-Path $ProjectionDir $parentRel
         if (-not (Test-Path -LiteralPath $parentPath)) { continue }
         Get-ChildItem -LiteralPath $parentPath -Directory -Force |
@@ -379,7 +404,7 @@ if ($Mode -eq 'apply') {
         exit 1
     }
 
-    foreach ($parentRel in @('commands', 'skills')) {
+    foreach ($parentRel in $ProjectionParentRels) {
         $parentPath = Join-Path $ProjectionDir $parentRel
         if (Test-Junction -Path $parentPath) {
             Write-Error "[ERROR] .opencode/$parentRel is a junction (must be real directory)"
@@ -434,7 +459,7 @@ if ($Mode -eq 'apply') {
     # Step 4: Orphan Junction Cleanup (skip repo-local artifacts)
     Write-Host ''
     Write-Host '--- Orphan cleanup ---'
-    foreach ($parentRel in @('commands', 'skills')) {
+    foreach ($parentRel in $ProjectionParentRels) {
         $parentPath = Join-Path $ProjectionDir $parentRel
         if (-not (Test-Path -LiteralPath $parentPath)) { continue }
         Get-ChildItem -LiteralPath $parentPath -Directory -Force |

@@ -11,6 +11,8 @@ param(
 # tree into the projection directory (.opencode/) as real files.
 # Junctions are NOT created; release archives must be junction-free.
 #
+# ADF-COVERS(implementation): REQ-052-007
+#
 # Exit codes:
 #   0  success (every file placed, content matches)
 #   4  destination already has a file with different content (do not overwrite)
@@ -97,5 +99,24 @@ foreach ($skillDir in $skillDirs) {
     }
 }
 
-Write-Host "install-from-archive: placed commands and skills into $Target"
+# Custom Tools / Plugins (agentdev-* distribution types, REQ-052). Optional
+# kinds: archives without a kind directory simply skip it.
+foreach ($kind in @("tools", "plugins")) {
+    $kindSrc = Join-Path $Source $kind
+    if (-not (Test-Path -LiteralPath $kindSrc)) { continue }
+    $kindDst = Join-Path $Target $kind
+    $kindDirs = Get-ChildItem -LiteralPath $kindSrc -Directory | Where-Object {
+        $_.Name -like "agentdev-*"
+    }
+    foreach ($kindDir in $kindDirs) {
+        $kindFiles = Get-ChildItem -LiteralPath $kindDir.FullName -Recurse -File
+        foreach ($f in $kindFiles) {
+            $rel = $f.FullName.Substring($kindSrc.Length).TrimStart('\', '/')
+            $dst = Join-Path $kindDst $rel
+            Place-File -SrcFile $f.FullName -DstFile $dst
+        }
+    }
+}
+
+Write-Host "install-from-archive: placed commands, skills, tools, and plugins into $Target"
 exit 0

@@ -3,12 +3,15 @@ param()
 
 # ADF-COVERS(implementation): REQ-050-009, REQ-050-010
 # ADF-COVERS(verification): REQ-050-010, REQ-050-011
+# ADF-COVERS(implementation): REQ-052-007
 #
 # WP-3 (Issue #1928) §7.5.1: build a junction-free release archive from the
 # repo's src/opencode/ source tree. The archive contains:
 #   agentdev-release-<sha>/
 #     src/opencode/commands/agentdev/**.md
 #     src/opencode/skills/agentdev-*/**, japanese-tech-writing/**
+#     src/opencode/tools/agentdev-*/**        (Custom Tool distribution type)
+#     src/opencode/plugins/agentdev-*/**      (Plugin / Hook distribution type)
 #     scripts/install.ps1            (projected from scripts/consumer/archive/install.ps1)
 #     README-INSTALL.md
 # Junctions are resolved to real file content so the archive is self-contained.
@@ -171,8 +174,26 @@ try {
         Copy-Item -Path (Join-Path $d.FullName "*") -Destination $stageSkillDir -Recurse -Force
     }
 
+    # Custom Tools / Plugins (agentdev-* distribution types, REQ-052):
+    # staged under src/opencode/{tools,plugins}/ like skills. Optional at
+    # this stage — repos without these kinds simply skip them.
+    foreach ($kind in @("tools", "plugins")) {
+        $kindSource = Join-Path $repoRoot "src\opencode\$kind"
+        if (-not (Test-Path -LiteralPath $kindSource)) { continue }
+        $stageKindDir = Join-Path $stageSrcOpencode $kind
+        New-Item -ItemType Directory -Path $stageKindDir -Force | Out-Null
+        $kindDirs = Get-ChildItem -LiteralPath $kindSource -Directory | Where-Object {
+            $_.Name -like "agentdev-*"
+        }
+        foreach ($d in $kindDirs) {
+            $stageEntryDir = Join-Path $stageKindDir $d.Name
+            New-Item -ItemType Directory -Path $stageEntryDir -Force | Out-Null
+            Copy-Item -Path (Join-Path $d.FullName "*") -Destination $stageEntryDir -Recurse -Force
+        }
+    }
+
     # node_modules は配布アーカイブに含めない (サイズ増大・consumer側のnpm installで解決)
-    Get-ChildItem -LiteralPath $stageSkills -Recurse -Directory -Filter "node_modules" -ErrorAction SilentlyContinue |
+    Get-ChildItem -LiteralPath $stageSrcOpencode -Recurse -Directory -Filter "node_modules" -ErrorAction SilentlyContinue |
         Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
     # The archive-dedicated installer travels inside the archive under the

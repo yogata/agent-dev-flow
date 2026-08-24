@@ -6,7 +6,9 @@
 //   source           — every tracked regular file under
 //                      src/opencode/commands/agentdev/**,
 //                      src/opencode/skills/agentdev-*/**,
-//                      src/opencode/skills/japanese-tech-writing/**
+//                      src/opencode/skills/japanese-tech-writing/**,
+//                      src/opencode/tools/agentdev-*/**,
+//                      src/opencode/plugins/agentdev-/**
 //                      (including tests, fixtures, README, package.json,
 //                      tsconfig, lockfiles, and metadata — none excluded)
 //                      PLUS the trusted consumer bootstrap entry
@@ -42,6 +44,7 @@
 
 // ADF-COVERS(implementation): REQ-050-011
 // ADF-COVERS(verification): REQ-050-011
+// ADF-COVERS(implementation): REQ-052-006, REQ-052-007
 
 import type { ManifestEntry, ManifestSet, Projection, SourceSubset } from "./types.ts";
 
@@ -59,6 +62,8 @@ const RUNTIME_PREFIXES: readonly string[] = [
   "src/opencode/commands/agentdev/",
   "src/opencode/skills/agentdev-",
   "src/opencode/skills/japanese-tech-writing/",
+  "src/opencode/tools/agentdev-",
+  "src/opencode/plugins/agentdev-",
 ];
 
 const BOOTSTRAP_PATHS: readonly string[] = [

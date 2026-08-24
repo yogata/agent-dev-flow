@@ -8,12 +8,15 @@
 //     untouched on a real consumer layout (REQ-050-005)
 //   - orphan detection: check reports an agentdev junction that is not in
 //     the current source enumeration (REQ-050-004)
+//   - tools/plugins projection: apply junctions the Custom Tool and
+//     Plugin / Hook distribution kinds into .opencode/ (REQ-052-007)
 //
 // The consumer layout is exercised in both checkout forms accepted by
 // REQ-050 / REQ-009: git clone style (.git present) and source ZIP style
 // (.git absent).
 
 // ADF-COVERS(verification): REQ-050-004, REQ-050-005, REQ-050-006
+// ADF-COVERS(verification): REQ-052-007
 
 import { describe, expect, test } from "bun:test";
 import * as crypto from "crypto";
@@ -83,9 +86,13 @@ function makeConsumerRepo(zipCheckout: boolean, localSource = false): string {
   fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode", "commands", "agentdev"), { recursive: true });
   fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode", "skills", "agentdev-gh-cli"), { recursive: true });
   fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode", "skills", "japanese-tech-writing"), { recursive: true });
+  fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode", "tools", "agentdev-gh"), { recursive: true });
+  fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode", "plugins", "agentdev-gh-write-guard"), { recursive: true });
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode", "commands", "agentdev", "case-run.md"), "# case-run\n");
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode", "skills", "agentdev-gh-cli", "SKILL.md"), "# gh-cli\n");
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode", "skills", "japanese-tech-writing", "SKILL.md"), "# jtw\n");
+  fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode", "tools", "agentdev-gh", "index.ts"), "// agentdev-gh tool\n");
+  fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode", "plugins", "agentdev-gh-write-guard", "plugin.ts"), "// agentdev-gh-write-guard plugin\n");
   if (localSource) {
     fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode-local", "agentdev-gh-cli"), { recursive: true });
     fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode-local", "agentdev-gh-cli", "SKILL.md"), "# gh-cli local\n");
@@ -183,6 +190,30 @@ describe("scripts behavior / non-destructive check and dry-run (REQ-050-005)", (
   nonDestructiveScenario("git clone checkout, normal mode", false);
   nonDestructiveScenario("git clone checkout, -LocalMode", false, true, ["-LocalMode"]);
   nonDestructiveScenario("source ZIP checkout (.git absent), normal mode", true);
+});
+
+describe("scripts behavior / tools and plugins projection (REQ-052-007)", () => {
+  test("apply junctions src/opencode/{tools,plugins}/agentdev-* into .opencode/ and check stays clean", () => {
+    const root = makeConsumerRepo(false);
+    try {
+      const apply = runInstall(root, "apply");
+      expect(apply.exitCode).toBe(0);
+
+      const toolLink = path.join(root, ".opencode", "tools", "agentdev-gh");
+      const pluginLink = path.join(root, ".opencode", "plugins", "agentdev-gh-write-guard");
+      expect(fs.existsSync(toolLink)).toBe(true);
+      expect(fs.existsSync(path.join(toolLink, "index.ts"))).toBe(true);
+      expect(fs.existsSync(pluginLink)).toBe(true);
+      expect(fs.existsSync(path.join(pluginLink, "plugin.ts"))).toBe(true);
+
+      const check = runInstall(root, "check");
+      expect(check.exitCode).toBe(0);
+      expect(check.stdout).toMatch(/tools\\agentdev-gh/);
+      expect(check.stdout).toMatch(/plugins\\agentdev-gh-write-guard/);
+    } finally {
+      rmrf(root);
+    }
+  }, 120000);
 });
 
 describe("scripts behavior / check capabilities (REQ-050-004)", () => {

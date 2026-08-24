@@ -10,6 +10,7 @@
 // public projection labels.
 
 // ADF-COVERS(verification): REQ-050-011
+// ADF-COVERS(verification): REQ-052-006, REQ-052-007
 
 import { describe, expect, test } from "bun:test";
 import {
@@ -40,12 +41,22 @@ describe("manifest / isRequiredRuntimePath", () => {
   test("accepts skills/japanese-tech-writing/**", () => {
     expect(isRequiredRuntimePath("src/opencode/skills/japanese-tech-writing/SKILL.md")).toBe(true);
   });
+  test("accepts tools/agentdev-*/** and plugins/agentdev-*/** (REQ-052 distribution kinds)", () => {
+    expect(isRequiredRuntimePath("src/opencode/tools/agentdev-gh/index.ts")).toBe(true);
+    expect(isRequiredRuntimePath("src/opencode/tools/agentdev-gh/tests/engine-fail-closed.test.ts")).toBe(true);
+    expect(isRequiredRuntimePath("src/opencode/plugins/agentdev-gh-write-guard/plugin.ts")).toBe(true);
+    expect(isRequiredRuntimePath("src/opencode/plugins/agentdev-gh-write-guard/lib/guard-config.ts")).toBe(true);
+  });
   test("rejects unrelated commands", () => {
     expect(isRequiredRuntimePath("src/opencode/commands/repo/x.md")).toBe(false);
     expect(isRequiredRuntimePath("src/opencode/commands/agentdev-other/x.md")).toBe(false);
   });
   test("rejects unrelated skills", () => {
     expect(isRequiredRuntimePath("src/opencode/skills/repo-integrity/SKILL.md")).toBe(false);
+  });
+  test("rejects non-agentdev tools/plugins entries (repo-local, REQ-052-006)", () => {
+    expect(isRequiredRuntimePath("src/opencode/tools/local-tool/index.ts")).toBe(false);
+    expect(isRequiredRuntimePath("src/opencode/plugins/local-guard/plugin.ts")).toBe(false);
   });
   test("includes tests, fixtures, README, package.json, tsconfig, lockfiles, and metadata", () => {
     expect(isRequiredRuntimePath("src/opencode/skills/agentdev-foo/scripts/x.test.ts")).toBe(true);
@@ -121,12 +132,16 @@ describe("manifest / buildLinkManifest", () => {
       entry("src/opencode/commands/agentdev/case-run.md", "a".repeat(64), 10),
       entry("src/opencode/skills/agentdev-foo/SKILL.md", "b".repeat(64), 20),
       entry("src/opencode/skills/japanese-tech-writing/SKILL.md", "c".repeat(64), 30),
+      entry("src/opencode/tools/agentdev-gh/index.ts", "0".repeat(64), 15),
+      entry("src/opencode/plugins/agentdev-gh-write-guard/plugin.ts", "1".repeat(64), 25),
     ];
     const m = buildLinkManifest(runtime);
     expect(m.entries.map((e) => e.path).sort()).toEqual([
       ".opencode/commands/agentdev/case-run.md",
+      ".opencode/plugins/agentdev-gh-write-guard/plugin.ts",
       ".opencode/skills/agentdev-foo/SKILL.md",
       ".opencode/skills/japanese-tech-writing/SKILL.md",
+      ".opencode/tools/agentdev-gh/index.ts",
     ]);
     // Identical digests required.
     for (const e of m.entries) {
