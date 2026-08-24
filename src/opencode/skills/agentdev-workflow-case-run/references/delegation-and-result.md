@@ -6,10 +6,10 @@
 
 ## 目次
 
-- STEP-S4: 実行担当サブエージェント委譲（経路G 含む）
+- STEP-S4: 実行担当サブエージェント委譲（adapter 委譲内 adversarial-review 含む）
 - STEP-S5: result 処理・配布依存境界 最終 gate
 
-## STEP-S4: 実行担当サブエージェント委譲（経路G 含む）
+## STEP-S4: 実行担当サブエージェント委譲（adapter 委譲内 adversarial-review 含む）
 
 ### Purpose
 
@@ -46,7 +46,7 @@
 - **実証Caseの PR 本文記録要素**: 実行担当サブエージェントが PR 本文に実際の実行条件、測定結果、観察結果、証拠、評価結果を記録するよう委譲プロンプトで指示する。評価ブランチ削除後も Issue/PR から必要な結果と証拠を追跡できる形式とする
 - **PR URL 受領**: 実行担当サブエージェントが直接 PR 作成を行い、PR URL を委譲 result として返却する（PR URL フォールバック検索は使用しない）
 - **case-run 本体は実装方針を生成・審査しない**: 実装方針の形成、adversarial-review 呼出、結果反映は委譲内で adapter の委譲契約に従い、最初の実装変更前に実施する。case-run 本体が実装方針を生成、保持、審査するステップを新設しない。委譲 result（4状態）のみで委譲内の結果を受領する
-- **経路G（adapter 委譲内 adversarial-review）**: 発動条件判定と review 呼出は adapter 委譲内で実行担当サブエージェントが分離して実施する。default-on、skip 条件（実装方針が自明の場合）該当時は省略して従来フローを継続、ユーザー明示指定時は強制発動。実装方針限定、blocked 遷移（(1) 既確定文書の変更・追加・撤回が必要、(2) 要件・仕様問題の検出、(3) unresolved な本質的争点またはユーザー判断事項が残る）の詳細は `agentdev-case-run-execution-adapter` 参照
+- **adapter 委譲内 adversarial-review**: 発動条件判定と review 呼出は adapter 委譲内で実行担当サブエージェントが分離して実施する。default-on、skip 条件（実装方針が自明の場合）該当時は省略して従来フローを継続、ユーザー明示指定時は強制発動。実装方針限定、blocked 遷移（(1) 既確定文書の変更・追加・撤回が必要、(2) 要件・仕様問題の検出、(3) unresolved な本質的争点またはユーザー判断事項が残る）の詳細は `agentdev-case-run-execution-adapter` 参照
 
 ### Result
 
@@ -121,7 +121,7 @@
 
 ## 関連 Capability Skill
 
-- `agentdev-case-run-execution-adapter`: adapter protocol、result 契約、経路G、異常終了時事後処理
+- `agentdev-case-run-execution-adapter`: adapter protocol、result 契約、adapter 委譲内 adversarial-review、異常終了時事後処理
 - `agentdev-workflow-orchestration`: 障害伝播、capture 境界
 - `agentdev-quality-gates`: QG-4 bun test フル suite 正規形（機械受理基準）
 - integrity checker skill（repo 固有）: check_distribution_boundary.ts（--profile source / --profile link）、generate_indexes.ts（AUTOGEN 索引再生成）

@@ -1,10 +1,10 @@
-# adversarial-review 統合（経路G）
+# adversarial-review 統合（adapter 委譲内）
 
-本ファイルは case-run 経路Gにおける adapter 委譲内の adversarial-review 統合の実行時参照を提供する。
+本ファイルは case-run の adapter 委譲内における adversarial-review 統合の実行時参照を提供する。
 正規原本は `agentdev-case-run-execution-adapter` Design「adversarial-review 統合（実装方針→review→結果反映）」節である。
 本ファイルは Design を補完する実行手続きのみを保持し、Design と矛盾する場合は Design を正とする。
 共通 caller integration 契約は adversarial-review Design が正規所有者であり、本ファイルは再定義しない。
-挿入境界、委譲内実施、実装方針限定、blocked 遷移の契約は case-run command Design「adversarial-review 挿入境界（経路G: adapter 委譲内）」節が正であり、本ファイルは参照レベルに留める。
+挿入境界、委譲内実施、実装方針限定、blocked 遷移の契約は case-run command Design「adversarial-review 挿入境界（case-run: adapter 委譲内）」節が正であり、本ファイルは参照レベルに留める。
 
 ## 実装方針形成
 
@@ -107,6 +107,6 @@ adversarial-review は delegation-contracts Design の `semantic_review`（書�
 
 ## 参照契約
 
-挿入境界（委譲内実施、STEP-S4 投影、実装方針限定、blocked 遷移）は case-run command Design「adversarial-review 挿入境界（経路G: adapter 委譲内）」節が正であり、共通契約（任意性、副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱い）は adversarial-review Design「adversarial-review caller integration 共通契約」節が正とする。
+挿入境界（委譲内実施、STEP-S4 投影、実装方針限定、blocked 遷移）は case-run command Design「adversarial-review 挿入境界（case-run: adapter 委譲内）」節が正であり、共通契約（任意性、副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱い）は adversarial-review Design「adversarial-review caller integration 共通契約」節が正とする。
 本ファイルはこれらを再定義しない。
 adapter 委譲内の内部手続き（実装方針形成、review 呼出、結果反映、blocked 遷移）の詳細は `agentdev-case-run-execution-adapter` Design「adversarial-review 統合（実装方針→review→結果反映）」節が正とする。

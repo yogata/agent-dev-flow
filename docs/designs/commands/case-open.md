@@ -275,7 +275,7 @@ execution contract へ反映する。
 ### EC-7: adversarial-review 発動契約の永続化
 
 ユーザー明示指定による adversarial-review 発動契約が Issue 作成前に判明している場合、
-Issue 本文の契約セクションへ永続化する（経路F 拡張）。
+Issue 本文の契約セクションへ永続化する（adversarial-review 統合の拡張）。
 
 ### EC-8: execution contract 必須セクションの付与
 
@@ -412,10 +412,10 @@ case-open Design 内の REQ-006-089、REQ-006-093 参照行と正規定義（REQ
 - v2:REQ-0137（並列実行安全 git 操作規律）
 - REQ-006（RU群バッチ処理と複数 execution_unit 並列実行）
 
-## adversarial-review 挿入境界（経路F）
+## adversarial-review 挿入境界（case-open）
 
-本節は case-open への adversarial-review caller integration（経路F、REQ-015-009）の挿入境界を正典として所有する。
-共通 caller integration 契約（任意性、QG/HITL 非代替、副作用禁止、accepted finding 反映責務、再 review 条件と停止条件、呼出失敗時取扱い）は [adversarial-review Design](../skills/agentdev-adversarial-review.md)「adversarial-review caller integration 共通契約」節が正であり、本節は経路F 固有の挿入位置、発動条件、変更影響別再実行ルール、最初の副作用との順序のみを規定する（REQ-014-011）。
+本節は case-open への adversarial-review caller integration（REQ-015-009）の挿入境界を正典として所有する。
+共通 caller integration 契約（任意性、QG/HITL 非代替、副作用禁止、accepted finding 反映責務、再 review 条件と停止条件、呼出失敗時取扱い）は [adversarial-review Design](../skills/agentdev-adversarial-review.md)「adversarial-review caller integration 共通契約」節が正であり、本節は case-open 固有の挿入位置、発動条件、変更影響別再実行ルール、最初の副作用との順序のみを規定する（REQ-014-011）。
 
 ### 挿入位置（REQ-015-009）
 

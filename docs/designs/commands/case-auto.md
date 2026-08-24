@@ -378,7 +378,7 @@ Phase 0 の枝PR に含まれるコミット構成運用を規定する。
 
 ## 停止状態
 
-停止状態の詳細（停止理由分類、伝播契約）は「adversarial-review 由来の停止伝播（経路H）」「bounded parent decision resolution」節、および Workflow Skill（`agentdev-workflow-case-auto`）の停止条件分類が正規所有する。
+停止状態の詳細（停止理由分類、伝播契約）は「adversarial-review 由来の停止伝播（case-auto の停止伝播受領）」「bounded parent decision resolution」節、および Workflow Skill（`agentdev-workflow-case-auto`）の停止条件分類が正規所有する。
 主要な停止状態は次のとおり。
 
 - 委譲工程の result が blocked / failed の場合（当該工程で自走停止、ユーザー判断待ち）。
@@ -409,7 +409,7 @@ Phase 0 の枝PR に含まれるコミット構成運用を規定する。
 - v2:ADR-0137（case-auto における case-run インライン実行（多重委譲回避））
 - v2:ADR-0138（case-auto オーケストレーション制御の AgentDevFlow 側集約）
 
-## adversarial-review 由来の停止伝播（経路H）
+## adversarial-review 由来の停止伝播（case-auto の停止伝播受領）
 
 本節は case-auto が下位 command（case-run インライン実行、工程委譲）から adversarial-review 由来の停止信号を受領した際の停止伝播挙動を所有する（REQ-015-012）。
 共通契約（REQ-014）の正規定義は重複せず、各正規所有者を参照する（REQ-014-011）。
@@ -453,7 +453,7 @@ case-auto は停止伝播において以下を行わない。
 - **採否**: finding の採用・不採用を決定しない（accepted finding の反映は review 呼出元の責務、REQ-014-006）
 - **再評価**: review 対象の再評価を行わない（再 review 条件の判定は adversarial-review Design、REQ-014-007）
 
-case-auto は経路H において純粋な伝播経路として機能し、adversarial-review の意味的処理には関与しない。
+case-auto は停止伝播受領において純粋な伝播経路として機能し、adversarial-review の意味的処理には関与しない。
 
 ## bounded parent decision resolution（REQ-006-112〜114、DEC-008）
 

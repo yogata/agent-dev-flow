@@ -70,9 +70,9 @@ RU frontmatter の `tentative_classification` フィールドに記録する。
  - 依存順に並べ替え可能であることを確認
  - 検証失敗時は当該 RU を生成せず理由を提示
 
-## adversarial-review 候補判断と内部挿入（経路E）
+## adversarial-review 候補判断と内部挿入（backlog-review）
 
-backlog-review 経路Eにおける adversarial-review の候補判断基準と内部手続きの実行時参照。
+backlog-review における adversarial-review の候補判断基準と内部手続きの実行時参照。
 正規原本は `agentdev-backlog-integration` Design「adversarial-review 候補判断と内部挿入」節である。
 本節は実行時参照として Design を補完し、Design と矛盾する場合は Design を正とする。
 共通 caller integration 契約は adversarial-review Design が正規所有者であり、本節は再定義しない。

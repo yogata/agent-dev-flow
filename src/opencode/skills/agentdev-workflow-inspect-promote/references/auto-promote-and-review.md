@@ -1,4 +1,4 @@
-# STEP-4 / STEP-5: 自動 promote・adversarial-review 経路B（auto-promote-and-review）
+# STEP-4 / STEP-5: 自動 promote・adversarial-review（auto-promote-and-review）
 
 > 本 reference は `agentdev-workflow-inspect-promote` SKILL.md の Control Plane STEP-4、STEP-5 詳細である。
 > 各 STEP は resume point を持つ（`<workflows/step-reference-contract>` Design）。
@@ -14,7 +14,7 @@
 - **Completion Verification**: 自動投入対象が全て投入済みで、各投入がログに記録済みであること
 - **Resume-Idempotency**: auto-promote-log 記載済みかつ投入先ファイルが存在する検出事項は自動 promote 確定として再投入しない。再開時はログと投入先ファイルの突合により未投入分のみを処理する
 
-## STEP-5: adversarial-review（経路B）
+## STEP-5: adversarial-review
 
 - **Purpose**: 暫定分類結果を adversarial-review による対論的審議へかけ、分類の妥当性を高める
 - **Input Resolution**: 手動分類対象の検出事項とその暫定分類結果（promote/defer/reject 判定と根拠）を入力コンテキストとする
@@ -41,7 +41,7 @@ adversarial-review は任意助言手段であり、必須工程、QG、承認�
 
 ## 関連 Capability Skill
 
-- `agentdev-adversarial-review`: 経路B review 呼出（共通契約の正規所有者）
+- `agentdev-adversarial-review`: inspect-promote の review 呼出（共通契約の正規所有者）
 - `agentdev-project-extensions`: workflow-contracts Design の extension 経由解決
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）

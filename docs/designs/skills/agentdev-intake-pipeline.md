@@ -111,8 +111,8 @@ Command→Skill 依存方向（[artifact-contracts.md](../responsibilities/artif
 
 ## adversarial-review 候補判断と内部挿入
 
-本節は intake-promote 経路C における review 候補判断基準と内部手続き（候補確定位置、呼出タイミング、結果反映先）を正典として所有する（REQ-015-006）。
-挿入境界、発動条件、戻り先は intake-promote command Design「adversarial-review 挿入境界（経路C）」節が正であり、本節は domain skill 側の候補判断と内部手続きのみを所有する。
+本節は intake-promote における review 候補判断基準と内部手続き（候補確定位置、呼出タイミング、結果反映先）を正典として所有する（REQ-015-006）。
+挿入境界、発動条件、戻り先は intake-promote command Design「adversarial-review 挿入境界（intake-promote）」節が正であり、本節は domain skill 側の候補判断と内部手続きのみを所有する。
 
 ### 候補判断基準
 

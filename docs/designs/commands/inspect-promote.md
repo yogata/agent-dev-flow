@@ -75,9 +75,9 @@ updated: 2026-08-19
 
 本節は inspect-promote における自律確定の判定位置とHITLフォールバックの実行詳細を所有する。判断確定の境界は REQ-003-055 の共通原則に従い、詳細判定表は横断契約Design（workflows/workflow-contracts.md「promote系判断確定とHITL境界」節）が集約所有する（本 Design と Workflow Skill は同一内容を重複保持しない）。
 
-### 分類・検証・経路B review 後の自律確定判定の挿入位置
+### 分類・検証・adversarial-review 後の自律確定判定の挿入位置
 
-分類・検証を経て、必要な経路B review を実施した後、取得可能な根拠から promote / defer / reject を一意に確定できる検出事項はユーザー承認なしで確定する（REQ-036-018）。
+分類・検証を経て、必要な adversarial-review を実施した後、取得可能な根拠から promote / defer / reject を一意に確定できる検出事項はユーザー承認なしで確定する（REQ-036-018）。
 
 ### 部分自律確定の実行手順
 
@@ -126,11 +126,11 @@ updated: 2026-08-19
 - REQ-036（inspect-promote / 検出事項分類、昇格）
 - REQ-001（inspect-promote 自動 promote（REQ-001-016））
 
-## adversarial-review 挿入境界（経路B）
+## adversarial-review 挿入境界（inspect-promote）
 
-本節は inspect-promote からの adversarial-review 呼出統合（REQ-015 経路B）を正典として所有する。
+本節は inspect-promote からの adversarial-review 呼出統合（REQ-015-005）を正典として所有する。
 共通契約（任意性、副作用禁止、QG/HITL 非代替、呼出失敗時取扱い、再 review 条件、停止条件4点、accepted finding 反映責務、正規所有者マトリックス）は adversarial-review Design「adversarial-review caller integration 共通契約」節を正とし、本節は再定義しない（REQ-014-011）。
-本節は経路B 固有の挿入位置、発動条件判定 Step、review 呼出 Step、--auto fast path を所有する。
+本節は inspect-promote 固有の挿入位置、発動条件判定 Step、review 呼出 Step、--auto fast path を所有する。
 
 ### review 挿入位置（REQ-015-005）
 
@@ -200,7 +200,7 @@ skip 条件該当時、呼出失敗時（REQ-014-010）のいずれの場合も�
 
 ### 正規所有者宣言
 
-review 挿入境界（経路B の発動条件、挿入位置、戻り先、--auto fast path）は本 Design が正規所有する（REQ-014-011、REQ-015-005）。
+review 挿入境界（inspect-promote の発動条件、挿入位置、戻り先、--auto fast path）は本 Design が正規所有する（REQ-014-011、REQ-015-005）。
 共通 caller integration 契約は adversarial-review Design を正とし、本節は再定義しない。
 user-decision-required の停止理由分類は workflow-contracts Design、review 経路での parent_decision_required / decision_context 適用は delegation-contracts Design をそれぞれ正とする。
 

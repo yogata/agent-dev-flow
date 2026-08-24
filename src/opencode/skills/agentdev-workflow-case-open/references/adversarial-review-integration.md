@@ -1,11 +1,11 @@
-# STEP-4: adversarial-review 統合（経路F、adversarial-review-integration）
+# STEP-4: adversarial-review 統合（case-open、adversarial-review-integration）
 
 > 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-4 詳細である。
-> adversarial-review 挿入境界（経路F）の発動条件判定と review 呼出、結果反映を提供する。
+> case-open の adversarial-review 挿入境界の発動条件判定と review 呼出、結果反映を提供する。
 
 ## Purpose
 
-経路F の adversarial-review を原則実行し（default-on）、execution structure・Issue 本文候補・完了条件の本質的争点を Issue 作成前に解消する。
+case-open の adversarial-review を原則実行し（default-on）、execution structure・Issue 本文候補・完了条件の本質的争点を Issue 作成前に解消する。
 
 ## Input Resolution
 
@@ -103,5 +103,5 @@ review の結果反映で review 対象の意味内容が変更された場合�
 
 ## 関連 Capability Skill
 
-- `agentdev-adversarial-review`: 経路F review 呼出、3論理役割、動的レビュー戦略
+- `agentdev-adversarial-review`: case-open の review 呼出、3論理役割、動的レビュー戦略
 - `agentdev-quality-gates`: QG-2 再実行（review 結果反映時）

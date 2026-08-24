@@ -66,9 +66,9 @@ command の具体名、起動手段は AGENTS.md および references/<harness>.
 
 ## adversarial-review 統合（実装方針→review→結果反映）
 
-本節は case-run 経路G（REQ-015）の adapter 委譲内における adversarial-review 統合の内部手続きを正典として所有する（REQ-014-011）。
+本節は case-run の adapter 委譲内（REQ-015-010）における adversarial-review 統合の内部手続きを正典として所有する（REQ-014-011）。
 共通 caller integration 契約の正規所有者は adversarial-review Design であり（REQ-014-003）、本節は adapter 委譲内固有の実装方針形成、review 呼出、結果反映、blocked 遷移の手続きのみを所有する。
-挿入境界（委譲内実施、STEP-S4 投影、実装方針限定、blocked 遷移）の正規所有者は case-run command Design「adversarial-review 挿入境界（経路G: adapter 委譲内）」節であり、本節は再定義せず参照する。
+挿入境界（委譲内実施、STEP-S4 投影、実装方針限定、blocked 遷移）の正規所有者は case-run command Design「adversarial-review 挿入境界（case-run: adapter 委譲内）」節であり、本節は再定義せず参照する。
 adversarial-review 自身の振る舞い契約、再 review 条件、停止条件は adversarial-review Design を正とし、本節で再定義しない。
 
 ### 実装方針の形成と限定（REQ-015-010）
@@ -144,6 +144,6 @@ adversarial-review は delegation-contracts Design の `semantic_review`（書�
 
 ### 正規所有者マトリックス参照
 
-本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts Design「adversarial-review との委譲契約接続」節、case-run command Design「adversarial-review 挿入境界（経路G: adapter 委譲内）」節との間で意味の重複、矛盾を生じない。
+本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts Design「adversarial-review との委譲契約接続」節、case-run command Design「adversarial-review 挿入境界（case-run: adapter 委譲内）」節との間で意味の重複、矛盾を生じない。
 adapter 委譲内の内部手続き（実装方針形成、review 呼出、結果反映、blocked 遷移）のみを本節が所有し、挿入境界（委譲内実施、STEP-S4 投影）、実装方針限定の契約は case-run command Design を正とする。
 

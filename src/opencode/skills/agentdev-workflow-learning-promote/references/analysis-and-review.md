@@ -8,7 +8,7 @@
 - STEP-1: 入力読込・正規化
 - STEP-2: 評価（分類・8軸・evaluation-report）
 - STEP-3: 判定（廃棄判定・既存対策確認）
-- STEP-4: review（adversarial-review 経路D）
+- STEP-4: review（adversarial-review）
 
 ## STEP-1: 入力読込・正規化
 
@@ -130,7 +130,7 @@ inbox.md の学びエントリと deferred.md を読み込み、旧フォーマ�
 
 - 判定は evaluation-report.md と inbox.md 実ファイルから再構築できる。不可逆処理を含まないため再実行に副作用がない
 
-## STEP-4: review（adversarial-review 経路D）
+## STEP-4: review（adversarial-review）
 
 ### Purpose
 
@@ -140,13 +140,13 @@ evaluation-report.md を adversarial-review で検証し、accepted finding を�
 ### Input Resolution
 
 - STEP-2 / STEP-3 の結果が反映された evaluation-report.md（durable state）
-- 経路D の候補判断、呼出タイミング、evaluation-report 戻しループの実行詳細は `agentdev-learning-pipeline` の公開操作契約に従う
+- learning-promote の候補判断、呼出タイミング、evaluation-report 戻しループの実行詳細は `agentdev-learning-pipeline` の公開操作契約に従う
 - 共通 caller integration 契約の正規所有者は adversarial-review Design である
 
 ### Preconditions
 
 - evaluation-report.md が STEP-2 で生成・更新済みであり、STEP-3（廃棄判定）と既存対策確認の結果が反映されていること
-- 挿入境界、発動条件の正は learning-promote command Design の経路D 節である
+- 挿入境界、発動条件の正は learning-promote command Design の adversarial-review 挿入境界節である
 
 ### Procedure
 

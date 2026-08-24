@@ -1,10 +1,10 @@
-# STEP-8: adversarial-review 挿入境界（経路A）（adversarial-review-path-a）
+# STEP-8: adversarial-review 挿入境界（req-define、adversarial-review-integration）
 
 > 本 reference は `agentdev-workflow-req-define` SKILL.md の STEP-8 詳細である。
-> req-define の adversarial-review 挿入境界（経路A）を提供する。
-> 挿入境界の正規所有者は req-define command Design（extension 経由）「adversarial-review 挿入境界（経路A）」節であり、本 reference は実行時詳細である。
+> req-define の adversarial-review 挿入境界を提供する。
+> 挿入境界の正規所有者は req-define command Design（extension 経由）「adversarial-review 挿入境界（req-define）」節であり、本 reference は実行時詳細である。
 
-## STEP-8: adversarial-review（経路A）
+## STEP-8: adversarial-review
 
 ### Purpose
 
@@ -32,7 +32,7 @@ req-define は adversarial-review を原則実行する（default-on）。
   - 未解決のユーザー判断事項が残る場合、STEP-9（ドラフト保存）へ進まない。工程委譲起源であるため既存 status に unresolved 判断事項を付加する
   - 呼出失敗時は silent skip を禁止し、従来フローを維持する
 
-詳細な挿入境界は req-define command Design（extension 経由）「adversarial-review 挿入境界（経路A）」節を正とする。
+詳細な挿入境界は req-define command Design（extension 経由）「adversarial-review 挿入境界（req-define）」節を正とする。
 
 ### Result
 
@@ -57,7 +57,7 @@ req-define は adversarial-review を原則実行する（default-on）。
 
 ## 関連 Capability Skill
 
-- `agentdev-adversarial-review`: 経路A review の実行（3論理役割、動的レビュー戦略、read-only 境界）
+- `agentdev-adversarial-review`: req-define の review 実行（3論理役割、動的レビュー戦略、read-only 境界）
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 

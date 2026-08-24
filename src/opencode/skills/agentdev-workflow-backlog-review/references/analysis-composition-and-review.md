@@ -8,7 +8,7 @@
 - STEP-1: 実行前同期・成果物検出
 - STEP-2: 分析・暫定分類付与
 - STEP-3: 統合・分割判定・depends_on 依存解決
-- STEP-4: review（adversarial-review 経路E）
+- STEP-4: review（adversarial-review）
 - STEP-5: HITL（ユーザー承認、RU 生成承認を兼ねる）
 
 ## STEP-1: 実行前同期・成果物検出
@@ -129,7 +129,7 @@
 
 - promoted/ 実ファイルから RU 構成案を再構築できる。不可逆処理を含まないため再実行に副作用がない
 
-## STEP-4: review（adversarial-review 経路E）
+## STEP-4: review（adversarial-review）
 
 ### Purpose
 
@@ -145,7 +145,7 @@ RU 構成案の意味的決定を adversarial-review で検証し、accepted fin
 ### Preconditions
 
 - STEP-3 完了（RU 構成案確定済み）
-- 挿入境界、発動条件、順序、矛盾取扱いの正規所有者は backlog-review command Design「adversarial-review 挿入境界（経路E）」節である
+- 挿入境界、発動条件、順序、矛盾取扱いの正規所有者は backlog-review command Design「adversarial-review 挿入境界（backlog-review）」節である
 
 ### Procedure
 

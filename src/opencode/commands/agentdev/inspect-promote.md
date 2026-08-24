@@ -27,7 +27,7 @@ description: 検出事項を分類、採用し、採用済み成果物として 
 
 ## 自律確定と HITL フォールバック
 
-分類・検証と必要な経路B review を経て、取得可能な根拠から promote / defer / reject を一意に確定できる検出事項は、ユーザー承認なしで確定する。ユーザー判断が必要な検出事項のみ HITL 対象とする。
+分類・検証と必要な adversarial-review を経て、取得可能な根拠から promote / defer / reject を一意に確定できる検出事項は、ユーザー承認なしで確定する。ユーザー判断が必要な検出事項のみ HITL 対象とする。
 同一実行内に両者が混在する場合、未決項目に依存しない項目を先行確定し、ユーザー判断が必要な検出事項のみを提示する。
 自律確定可否の詳細判定表は workflow-contracts Design（extension 経由で解決）の「promote系判断確定とHITL境界」セクションに原本を置き、本コマンドは判定表を重複保持しない。
 自律確定した検出事項の判定結果、主要根拠、HITL不要と判断した理由は完了報告で報告する（新規永続成果物を必須としない）。
@@ -56,7 +56,7 @@ durable state（`.agentdev/inspect/inbox/`、`.agentdev/inspect/promoted/`、`.a
 | STEP-2 inbox スキャン | 同期済み | 検出事項リスト | 読込失敗時はスキップ警告で継続していること |
 | STEP-3 検出事項分類（暫定分類） | スキャン済み | 暫定分類（promote/ defer/ reject） | 分類根拠が各検出事項に付いていること |
 | STEP-4 自動 promote（`--auto` opt-in 時のみ、fast path） | `--auto` 明示指定 | `.agentdev/intake/promoted/inspect-auto-*.md`・auto-promote-log 記録 | 自動 promote 対象カテゴリ（workflow-contracts Design 参照）合致のみであること |
-| STEP-5 adversarial-review（経路B） | review 挿入境界到達（default-on、skip 条件該当時は省略） | review 結果と反映後の分類案 | accepted finding が分類案へ反映されていること |
+| STEP-5 adversarial-review | review 挿入境界到達（default-on、skip 条件該当時は省略） | review 結果と反映後の分類案 | accepted finding が分類案へ反映されていること |
 | STEP-6 確定（自律確定判定と HITL 確定） | 分類案確定 | 確定済み分類（自律確定分とユーザー確定分） | 横断契約Design 詳細判定表に従い自律確定可能な検出事項が承認なしで確定され、ユーザー判断が必要な検出事項のみ提示されていること |
 | STEP-7 処理実行（promote / reject / defer） | 確定済み | promoted/ 保存・reject 即時削除・defer 残置 | 処理結果が分類確定内容と一致していること（全件 defer 時は残置報告） |
 | STEP-8 完了報告・永続化 | 処理実行済み | 完了報告・git 永続化 | push 失敗時は停止していること |

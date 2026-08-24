@@ -43,7 +43,7 @@ description: inbox.mdから正規化、分類、8軸評価、自律確定・HITL
 | STEP-1 入力読込・正規化 | `.agentdev/learning/inbox.md` 存在 | 正規化済みエントリ群 | inbox.md 不在時はエラー終了（`agentdev-learning-capture` での追加を案内）であること |
 | STEP-2 評価 | 正規化済み | 8軸評価スコア・問題クラス分類 | 評価根拠が各エントリに揃っていること |
 | STEP-3 判定 | 評価済み | 廃棄判定・既存対策確認・昇華可能性判定 | 恒久契約（REQ/Decision/Design）への昇華可能性が判定されていること |
-| STEP-4 review（経路D） | default-on（発動条件判定 → review 呼出） | review 結果と反映後の評価 | accepted finding 反映時は evaluation-report 生成工程から再実行していること |
+| STEP-4 review（adversarial-review） | default-on（発動条件判定 → review 呼出） | review 結果と反映後の評価 | accepted finding 反映時は evaluation-report 生成工程から再実行していること |
 | STEP-5 判定確定（自律確定・HITL） | 判定結果あり | 判定確定（自律確定分はユーザー承認なし、ユーザー判断必要分はユーザー承認済み）・prune | 一意に確定できる項目はユーザー承認なしで確定し、ユーザー判断が必要な項目のみ廃棄判定結果・8軸評価スコアの確認・修正・承認を経ていること |
 | STEP-6 永続化 | 判定確定済み（自律確定またはユーザー承認） | `promoted/{category}-{name}.md`・deferred.md 追記・inbox.md クリア・prune | 採用済み成果物・deferred 移動・prune が確定内容と一致していること |
 | STEP-7 完了報告 | 永続化済み | 完了報告（次アクション） | 出力パスと次コマンド（`/agentdev/backlog-review`）が報告されていること |
@@ -58,7 +58,7 @@ description: inbox.mdから正規化、分類、8軸評価、自律確定・HITL
 - 既存対策を優先する（「新規X化」より「既存Xへ反映」を優先）
 - 学びは直接 REQ 化せず、恒久契約（REQ/Decision/Design）への昇華可能性を STEP-3 で評価し、昇華可能なもののみ `promoted/` へ出力する。昇華不能な知見は living pool（`deferred.md`）で維持する
 - 一意に確定できる項目は自律確定し、ユーザー判断が必要な項目のみ HITL 対象とする。自律確定可否の詳細判定表は横断契約Design「promote系判断確定とHITL境界」節が集約所有し、本コマンド定義と Workflow Skill は判定表を複製しない。自律確定はユーザー承認の擬制ではなく、deferred・未処理項目を自動削除しない安全境界は維持する
-- adversarial-review は default-on（経路D、REQ-{NNNN}-{NNN}）: workflow の review STEP（発動条件判定 → review 呼出）を経て原則発動する。skip 条件（inbox.md 1件で重複確実、inbox.md 空）該当時は HITL へ従来フローを維持し、ユーザー明示要求時は skip 条件にかかわらず必ず発動する。共通契約（任意性、副作用禁止、再 review 条件、停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` Design（REQ-{NNNN}）が正規所有する
+- adversarial-review は default-on（REQ-{NNNN}-{NNN}）: workflow の review STEP（発動条件判定 → review 呼出）を経て原則発動する。skip 条件（inbox.md 1件で重複確実、inbox.md 空）該当時は HITL へ従来フローを維持し、ユーザー明示要求時は skip 条件にかかわらず必ず発動する。共通契約（任意性、副作用禁止、再 review 条件、停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` Design（REQ-{NNNN}）が正規所有する
 
 ## ガードレール
 

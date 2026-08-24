@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-req-define
-description: "req-define command の workflow 実装本体。セッションコンテキスト検知・入力解決から壁打ち対話、既存REQ照合、要件展開、Decision判断、要件doc（draft-data）生成、work_type・Scale 判定、adversarial-review 経路A、ドラフト保存、要件doc確認、完了報告までの対話型 workflow 制御を所有する。USE FOR: req-define 実行時の workflow 制御（対話開始・HITL・blocked・resume・draft 生成）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "req-define command の workflow 実装本体。セッションコンテキスト検知・入力解決から壁打ち対話、既存REQ照合、要件展開、Decision判断、要件doc（draft-data）生成、work_type・Scale 判定、adversarial-review、ドラフト保存、要件doc確認、完了報告までの対話型 workflow 制御を所有する。USE FOR: req-define 実行時の workflow 制御（対話開始・HITL・blocked・resume・draft 生成）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # req-define workflow スキル
@@ -58,7 +58,7 @@ req-define workflow は次の11 STEP で構成する。
 | STEP-5 | Decision判断 | 要件展開完了 | Decision判断記録（`new:{topic-slug}` 形式） | [references/requirement-development.md](references/requirement-development.md) |
 | STEP-6 | 要件doc生成 | Decision判断完了 | 構造化 `draft-data`（operation_units、artifact_actions、test_strategy、review_dispositions。実証Case時は実証Caseであること、評価契約、評価ブランチ識別情報を含む） | [references/draft-generation.md](references/draft-generation.md) |
 | STEP-7 | work_type・Scale 判定 | 要件doc生成完了 | work_type 4値、scale（feature のみ） | [references/draft-generation.md](references/draft-generation.md) |
-| STEP-8 | adversarial-review（経路A） | STEP-7 完了後、STEP-9 前 | review 結果反映（skip 時は従来フロー継続） | [references/adversarial-review-path-a.md](references/adversarial-review-path-a.md) |
+| STEP-8 | adversarial-review | STEP-7 完了後、STEP-9 前 | review 結果反映（skip 時は従来フロー継続） | [references/adversarial-review-integration.md](references/adversarial-review-integration.md) |
 | STEP-9 | ドラフト保存 | review 完了または skip | `.agentdev/drafts/req-draft-{topic-slug}.md` 保存 | [references/draft-generation.md](references/draft-generation.md) |
 | STEP-10 | 要件doc確認 | ドラフト保存完了 | ユーザー提示済み（承認は求めず提示のみ） | [references/draft-generation.md](references/draft-generation.md) |
 | STEP-11 | 完了報告 | 提示完了 | 種別別完了報告 | [references/draft-generation.md](references/draft-generation.md) |
@@ -91,7 +91,7 @@ req-define workflow は次の11 STEP で構成する。
 - `agentdev-decision-guidelines`: Decision判断基準（manual reference）
 - `agentdev-architecture-advisory`: Decision要否確認ゲートの助言委譲
 - `agentdev-workflow-lifecycle`: work_type・Scale 判定、前工程引き継ぎ判定
-- `agentdev-adversarial-review`: 経路A review 呼出
+- `agentdev-adversarial-review`: req-define の review 呼出
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 - `agentdev-traceability`: トレーサビリティ能力（coverage、impact。既存の明示的な対応関係と変更影響候補の確認。fail-open）
 

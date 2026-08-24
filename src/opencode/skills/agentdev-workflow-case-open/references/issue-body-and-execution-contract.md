@@ -80,7 +80,7 @@ Issue 作成前に変更影響候補を探索し、scope、完了条件、test s
 
 #### adversarial-review 発動契約の永続化
 
-ユーザー明示指定による adversarial-review 発動契約が Issue 作成前に判明している場合、Issue 本文の契約セクションへ永続化する（経路F 拡張）。
+ユーザー明示指定による adversarial-review 発動契約が Issue 作成前に判明している場合、Issue 本文の契約セクションへ永続化する（adversarial-review 統合の拡張）。
 
 #### 統合先と実証Case識別情報の確定
 

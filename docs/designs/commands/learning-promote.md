@@ -158,15 +158,15 @@ deferred・未処理項目を自動削除しない既存の安全境界は維持
 - `agentdev-learning-capture` skill（capture 層（独立スキル））
 - REQ-038（学習パイプライン（learning））
 
-## adversarial-review 挿入境界（経路D）
+## adversarial-review 挿入境界（learning-promote）
 
-本節は learning-promote 経路D の review 挿入境界を正典として所有する（REQ-015-007）。
+本節は learning-promote の review 挿入境界を正典として所有する（REQ-015-007）。
 共通 caller integration 契約（任意性、副作用禁止、accepted finding 反映、再 review 条件と停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` Design「adversarial-review caller integration 共通契約」節（REQ-014）が正規所有し、本節は再定義しない。
-本節は経路D 固有の発動条件、挿入位置、戻り先、evaluation-report 更新戻しループのみを所有する。
+本節は learning-promote 固有の発動条件、挿入位置、戻り先、evaluation-report 更新戻しループのみを所有する。
 
 ### 発動条件判定 Step と review 呼出 Step の分離（REQ-015-001/002/003）
 
-経路D は発動条件判定と review 呼出を分離する。
+learning-promote の統合は発動条件判定と review 呼出を分離する。
 分離することで、skip 条件該当時は review 呼出を迂回して従来フロー（既存対策確認 → 判定結果提示）を維持する（REQ-015-003）。
 
 #### 発動条件判定 Step
@@ -215,7 +215,7 @@ unresolved は既存の HITL（ユーザー承認）または blocker 扱いへ�
 
 ### 挿入位置の一意特定（REQ-015-007）
 
-経路D の review 挿入位置は既存対策確認完了直後、ユーザーへの判定結果提示前である。
+learning-promote の review 挿入位置は既存対策確認完了直後、ユーザーへの判定結果提示前である。
 最初の不可逆副作用は git pull 以降（deferred 移動、prune、commit/push）であり、review 挿入位置は全不可逆処理に先立つ。
 handoff.md、promoted/ 等の成果物は review より後の工程で生成されるため、review 時点では存在せず、review 対象は evaluation-report.md のみとなる。
 
@@ -223,7 +223,7 @@ handoff.md、promoted/ 等の成果物は review より後の工程で生成さ�
 
 | 意味 | 正規所有者 |
 |---|---|
-| 経路D の発動条件、挿入位置、戻り先、evaluation-report 更新戻しループ | 本 Design（learning-promote command Design） |
+| learning-promote の発動条件、挿入位置、戻り先、evaluation-report 更新戻しループ | 本 Design（learning-promote command Design） |
 | 候補判断基準、内部手続き（候補確定位置、呼出タイミング、evaluation-report 反映、evaluation-report 更新戻しループの実装詳細） | `agentdev-learning-pipeline` domain skill Design（ACT-SPEC-013） |
 | 共通 caller integration 契約（任意性、副作用禁止、accepted finding 反映、再 review 条件、停止条件、呼出失敗時取扱い） | `agentdev-adversarial-review` Design（REQ-014） |
 

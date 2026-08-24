@@ -6,7 +6,7 @@
 ## 目次
 
 - STEP-1: classification（inbox 確認・item 読込・評価・暫定分類提示）
-- STEP-2: review（adversarial-review 経路C）
+- STEP-2: review（adversarial-review）
 
 ## STEP-1: classification（inbox 確認・item 読込・評価・暫定分類提示）
 
@@ -52,7 +52,7 @@ inbox 内の intake item を読み込み、評価し、暫定分類（採用/ �
 
 - inbox 実ファイルから暫定分類を再構築できる。読み取りのみのため再実行に副作用がない
 
-## STEP-2: review（adversarial-review 経路C）
+## STEP-2: review（adversarial-review）
 
 ### Purpose
 
@@ -69,7 +69,7 @@ inbox 内の intake item を読み込み、評価し、暫定分類（採用/ �
 ### Preconditions
 
 - STEP-1 で暫定分類表が生成済みであること
-- 挿入境界、発動条件、順序の正は intake-promote command Design「adversarial-review 挿入境界（経路C）」節である
+- 挿入境界、発動条件、順序の正は intake-promote command Design「adversarial-review 挿入境界（intake-promote）」節である
 
 ### Procedure
 

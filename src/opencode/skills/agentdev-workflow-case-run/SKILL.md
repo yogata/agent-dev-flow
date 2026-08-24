@@ -80,7 +80,7 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 | STEP-S1 | フェーズ判定・再開ポイント検出 | case-run 起動（Issue番号受領） | 実行モード確定（single）、再開フェーズ判定、引き継ぎ停止判定 | [references/single.md](references/single.md) |
 | STEP-S2 | Issue 抽出・確認・判定 | 実行モード確定（single） | 要件doc・受け入れ基準抽出、関連Decision 確認、work_type metadata 整合確認、execution contract 消費境界適用 | [references/single.md](references/single.md) |
 | STEP-S3 | Worktree 作成・ブランチ準備・前置 gate 群 | Issue 判定完了 | worktree+ブランチ作成（べき等）、前置 gate 群（precondition / staleness / targeted docs / 配布依存境界 事前 gate / AUTOGEN 索引再生成）合格、L2 計測 | [references/single.md](references/single.md) |
-| STEP-S4 | 実行担当サブエージェント委譲 | STEP-S3 合格（worktree 内検証済み） | 委譲起動、L2 計測、経路G（adapter 委譲内 adversarial-review） | [references/delegation-and-result.md](references/delegation-and-result.md) |
+| STEP-S4 | 実行担当サブエージェント委譲 | STEP-S3 合格（worktree 内検証済み） | 委譲起動、L2 計測、adapter 委譲内 adversarial-review | [references/delegation-and-result.md](references/delegation-and-result.md) |
 | STEP-S5 | result 処理・配布依存境界 最終 gate | 委譲 result 受領 | result 4状態処理、配布依存境界 最終 gate 判定、L2 受け渡し | [references/delegation-and-result.md](references/delegation-and-result.md) |
 | STEP-S6 | worktree クリーンアップ確認・完了報告 | result 処理完了（completed-pr 時は最終 gate 合格後） | 未コミット変更確認、tmp/ 残存確認、完了報告（L2 内訳含む） | [references/single.md](references/single.md) |
 
@@ -118,7 +118,7 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
 
 - `agentdev-workflow-orchestration`: 再開ポイント判定、状態機械、CI 対応ループ、capture 境界、障害伝播
-- `agentdev-case-run-execution-adapter`: 実行担当サブエージェント委譲の adapter protocol、result 4状態契約、経路G
+- `agentdev-case-run-execution-adapter`: 実行担当サブエージェント委譲の adapter protocol、result 4状態契約、adapter 委譲内 adversarial-review
 - `agentdev-git-worktree`: worktree 作成・削除、worktree 内判定ヘルパー、並列実行安全ステージング
 - `agentdev-workflow-lifecycle`: work_type 判定、引き継ぎ停止判定（runtime-package-boundary）
 - `agentdev-epic-tracker`: Epic Issue 本文読込、Wave 子Issue 特定、親Epic ステータス更新

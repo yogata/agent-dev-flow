@@ -77,8 +77,8 @@ learning-promote → backlog-review → RU → req-define の承認・要件化�
 
 ## adversarial-review 候補判断と内部挿入
 
-本節は learning-promote 経路D における review 候補判断基準と内部手続きを正典として所有する（ACT-SPEC-013、REQ-015-007）。
-経路D の発動条件、挿入位置、戻り先、Step 6 戻しループは learning-promote command Design「adversarial-review 挿入境界（経路D）」節が正規所有し、本節は再定義しない。
+本節は learning-promote における review 候補判断基準と内部手続きを正典として所有する（ACT-SPEC-013、REQ-015-007）。
+learning-promote の発動条件、挿入位置、戻り先、Step 6 戻しループは learning-promote command Design「adversarial-review 挿入境界（learning-promote）」節が正規所有し、本節は再定義しない。
 共通 caller integration 契約（任意性、副作用禁止、accepted finding 反映、再 review 条件と停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` Design（REQ-014）が正規所有する。
 本節は learning-promote が参照する本 skill 内部の候補判断、呼出タイミング、evaluation-report 反映、Step 6 戻しループの実装詳細を所有する。
 
@@ -135,7 +135,7 @@ adversarial-review 自体を恒久的な統制ゲートとしない。
 
 | 意味 | 正規所有者 |
 |---|---|
-| 経路D の発動条件、挿入位置、戻り先、Step 6 戻しループ（command 視点） | learning-promote command Design（ACT-SPEC-009） |
+| learning-promote の発動条件、挿入位置、戻り先、Step 6 戻しループ（command 視点） | learning-promote command Design（ACT-SPEC-009） |
 | 候補判断基準、内部手続き（候補確定位置、呼出タイミング、evaluation-report 反映、Step 6 戻しループの実装詳細） | 本 Design（agentdev-learning-pipeline domain skill Design、ACT-SPEC-013） |
 | 共通 caller integration 契約 | `agentdev-adversarial-review` Design（REQ-014） |
 

@@ -9,7 +9,7 @@ description: req-save→design-save→case-open→case-run→case-closeを順次
 
 ## workflow 実装の権威情報源
 
-本コマンドの workflow 実装本体（Step 1〜8 の詳細、Wave 反復制御、bounded parent decision resolution、コンフリクト解消モデル Level 2/3、adversarial-review 停止伝播 経路H、結果状態の4次元集約、L1 タイムスタンプ計測、orchestration stage モデル、子 task bg task 破棄検知時の回復）は `agentdev-workflow-case-auto` Workflow Skill を権威情報源とする（責務3層分化、workflow-skill-model Design 準拠）。
+本コマンドの workflow 実装本体（Step 1〜8 の詳細、Wave 反復制御、bounded parent decision resolution、コンフリクト解消モデル Level 2/3、adversarial-review 由来の停止伝播、結果状態の4次元集約、L1 タイムスタンプ計測、orchestration stage モデル、子 task bg task 破棄検知時の回復）は `agentdev-workflow-case-auto` Workflow Skill を権威情報源とする（責務3層分化、workflow-skill-model Design 準拠）。
 本コマンド定義は公開 interface / dispatch のみを所有し、workflow 実装本体を複製しない。
 case-auto は下位 workflow（req-save / design-save / case-open / case-run / case-close）の契約確定後の上位 orchestrator として振る舞う。
 
@@ -52,7 +52,7 @@ extension の5セクション（`context` / `rules` / `checks` / `acceptance_gat
 | STEP-7 停止条件の検出・停止理由分類 | 各工程の結果受領 | 停止判定（11項目）・停止理由分類（7軸＋上位合意矛盾/新規ユーザー判断） | 停止時報告に再開点と再開可能な次コマンドが明示されていること |
 | STEP-8 完了報告 | 全工程完了 or 停止 | L1 タイムスタンプ・4次元集約・結果状態の分離報告 | 結果状態（完了/進行/未実行）が分離して報告されていること |
 
-**adversarial-review 由来の停止伝播（経路H）**: 下位 command から adversarial-review 由来の user-decision-required + decision_context を受領した場合、当該 execution_unit の自走を停止し、ユーザー判断を待機する。
+**adversarial-review 由来の停止伝播**: 下位 command から adversarial-review 由来の user-decision-required + decision_context を受領した場合、当該 execution_unit の自走を停止し、ユーザー判断を待機する。
 user-decision-required は STEP-7 の HITL 境界停止条件分類とは独立する停止理由分類である。
 
 **bounded parent decision resolution**: case-auto は下位 command から受領した decision_context を限定的に自律解決する。
