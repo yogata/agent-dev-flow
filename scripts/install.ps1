@@ -20,6 +20,10 @@
     - .opencode/skills/agentdev-*/  = individual junctions -> .agentdev-plugin/src/opencode/skills/agentdev-*/
     - .opencode/skills/japanese-tech-writing/ = junction -> .agentdev-plugin/src/opencode/skills/japanese-tech-writing/
       (distribution-dependent skill referenced by agentdev-doc-writing)
+    - .opencode/tools/agentdev-*/   = individual junctions -> .agentdev-plugin/src/opencode/tools/agentdev-*/
+      (Custom Tool distribution type)
+    - .opencode/plugins/agentdev-*/ = individual junctions -> .agentdev-plugin/src/opencode/plugins/agentdev-*/
+      (Plugin / Hook distribution type)
 
     Does NOT touch repo-local commands/skills:
     - .opencode/commands/repo/      = real directory (repo-local only)
@@ -61,6 +65,7 @@
 #>
 
 # ADF-COVERS(implementation): REQ-050-001, REQ-050-002, REQ-050-004, REQ-050-005, REQ-050-006, REQ-050-007, REQ-050-008, REQ-050-013
+# ADF-COVERS(implementation): REQ-052-007, REQ-052-008
 
 #Requires -Version 7.0
 
@@ -86,6 +91,12 @@ $LocalSourceDir = Join-Path $PluginPath 'src\opencode-local'
 $ProjectionDir = Join-Path $RepoRoot '.opencode'
 $CommandsDir = Join-Path $ProjectionDir 'commands'
 $SkillsDir = Join-Path $ProjectionDir 'skills'
+$ToolsDir = Join-Path $ProjectionDir 'tools'
+$PluginsDir = Join-Path $ProjectionDir 'plugins'
+
+# Parent directories that must exist as real directories (junction parents).
+$ProjectionParentDirs = @($CommandsDir, $SkillsDir, $ToolsDir, $PluginsDir)
+$ProjectionParentRels = @('commands', 'skills', 'tools', 'plugins')
 
 # Repo-local patterns excluded from junction management
 $RepoLocalCommandNames = @('repo')
@@ -175,6 +186,20 @@ function Get-ConsumerJunctionTargets {
         if (Test-Path -LiteralPath (Join-Path $skillsSource 'japanese-tech-writing')) {
             $targets.Add('skills\japanese-tech-writing')
         }
+    }
+
+    # tools\agentdev-* (Custom Tool 配布種別、動的列挙)
+    $toolsSource = Join-Path $SourceDir 'tools'
+    if (Test-Path -LiteralPath $toolsSource) {
+        Get-ChildItem -LiteralPath $toolsSource -Directory -Filter 'agentdev-*' |
+            ForEach-Object { $targets.Add("tools\$($_.Name)") }
+    }
+
+    # plugins\agentdev-* (Plugin / Hook 配布種別、動的列挙)
+    $pluginsSource = Join-Path $SourceDir 'plugins'
+    if (Test-Path -LiteralPath $pluginsSource) {
+        Get-ChildItem -LiteralPath $pluginsSource -Directory -Filter 'agentdev-*' |
+            ForEach-Object { $targets.Add("plugins\$($_.Name)") }
     }
 
     return ($targets | Sort-Object)
@@ -334,7 +359,7 @@ if ($Mode -eq 'check') {
     }
 
     # 5. Parent directories
-    foreach ($parentDir in @($CommandsDir, $SkillsDir)) {
+    foreach ($parentDir in $ProjectionParentDirs) {
         $parentRel = $parentDir.Substring($ProjectionDir.Length).TrimStart('\', '/')
         if (Test-Junction -Path $parentDir) {
             Write-Host "[DIVERGENCE] .opencode/$parentRel is a junction (must be real directory)"
@@ -376,7 +401,7 @@ if ($Mode -eq 'check') {
     Write-Host ''
     Write-Host '--- Orphan junctions ---'
     $orphansFound = $false
-    foreach ($parentRel in @('commands', 'skills')) {
+    foreach ($parentRel in $ProjectionParentRels) {
         $parentPath = Join-Path $ProjectionDir $parentRel
         if (-not (Test-Path -LiteralPath $parentPath)) { continue }
         Get-ChildItem -LiteralPath $parentPath -Directory -Force |
@@ -438,7 +463,7 @@ if ($Mode -eq 'dry-run') {
     }
 
     # Parent directory status
-    foreach ($parentRel in @('commands', 'skills')) {
+    foreach ($parentRel in $ProjectionParentRels) {
         $parentPath = Join-Path $ProjectionDir $parentRel
         if (-not (Test-Path -LiteralPath $parentPath)) {
             Write-Host "[WOULD ADD] .opencode/$parentRel/ (real directory)"

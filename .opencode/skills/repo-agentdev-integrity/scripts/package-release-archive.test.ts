@@ -1,6 +1,7 @@
 // ADF-COVERS(verification): REQ-009-009, REQ-009-045
 // ADF-COVERS(verification): REQ-010-060
 // ADF-COVERS(verification): REQ-050-010, REQ-050-011
+// ADF-COVERS(verification): REQ-052-007
 // Regression harness for scripts/self/release/package-release-archive.ps1.
 //
 // Proves the hardening contract (Issue #2092 / DEC-014 decision 7):
@@ -234,6 +235,45 @@ describe("package-release-archive.ps1 / happy path", () => {
       rmrf(repo.root);
     }
   }, 120000);
+});
+
+describe("package-release-archive.ps1 / tools and plugins staging (REQ-052-007)", () => {
+  test("archives src/opencode/{tools,plugins}/agentdev-*/** without node_modules and without repo-local entries", () => {
+    const repo = makeFakeRepo();
+    try {
+      const toolDir = path.join(repo.root, "src", "opencode", "tools", "agentdev-probe");
+      const pluginDir = path.join(repo.root, "src", "opencode", "plugins", "agentdev-probe-guard");
+      fs.mkdirSync(toolDir, { recursive: true });
+      fs.writeFileSync(path.join(toolDir, "index.ts"), "// probe tool\n");
+      fs.mkdirSync(path.join(toolDir, "node_modules", "dep"), { recursive: true });
+      fs.writeFileSync(path.join(toolDir, "node_modules", "dep", "dep.js"), "// dependency\n");
+      fs.mkdirSync(pluginDir, { recursive: true });
+      fs.writeFileSync(path.join(pluginDir, "plugin.ts"), "// probe plugin\n");
+      fs.mkdirSync(path.join(repo.root, "src", "opencode", "tools", "local-only"), { recursive: true });
+      fs.writeFileSync(path.join(repo.root, "src", "opencode", "tools", "local-only", "x.ts"), "// repo-local\n");
+
+      const res = runScript(repo);
+      expect(res.exitCode).toBe(0);
+
+      const extracted = path.join(repo.root, "dist", "check-extract");
+      fs.mkdirSync(extracted, { recursive: true });
+      const expand = spawnSync(
+        "pwsh",
+        ["-NoProfile", "-NonInteractive", "-Command",
+          `Expand-Archive -LiteralPath "${repo.finalZipPath}" -DestinationPath "${extracted}" -Force`],
+        { encoding: "utf-8" },
+      );
+      expect(expand.status).toBe(0);
+      const rel = (p: string): string =>
+        path.join(extracted, `agentdev-release-${repo.commitShort}`, p);
+      expect(fs.existsSync(rel(path.join("src", "opencode", "tools", "agentdev-probe", "index.ts")))).toBe(true);
+      expect(fs.existsSync(rel(path.join("src", "opencode", "plugins", "agentdev-probe-guard", "plugin.ts")))).toBe(true);
+      expect(fs.existsSync(rel(path.join("src", "opencode", "tools", "agentdev-probe", "node_modules")))).toBe(false);
+      expect(fs.existsSync(rel(path.join("src", "opencode", "tools", "local-only")))).toBe(false);
+    } finally {
+      rmrf(repo.root);
+    }
+  }, 180000);
 });
 
 describe("package-release-archive.ps1 / archive boundary violation", () => {

@@ -1,0 +1,15 @@
+{
+  "name": "agentdev-gh-write-guard",
+  "version": "0.1.0",
+  "private": true,
+  "description": "agentdev-gh-write-guard Plugin. Detects and rejects raw gh WRITE commands that bypass the agentdev-gh Custom Tool's canonical path via OpenCode's tool.execute.before hook. Fail-closed: uninterpretable config, crashed detection, or unverifiable command input block the tool call.",
+  "type": "module",
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "@types/bun": "^1.3.0"
+  }
+}

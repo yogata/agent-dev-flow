@@ -31,6 +31,10 @@ import type { BoundaryFailure } from "./distribution-boundary-types.ts";
 
 export const PUBLIC_COMMAND_DIR = "src/opencode/commands/agentdev";
 export const PUBLIC_SKILLS_PARENT = "src/opencode/skills";
+export const PUBLIC_TOOLS_PARENT = "src/opencode/tools";
+export const PUBLIC_PLUGINS_PARENT = "src/opencode/plugins";
+
+// ADF-COVERS(implementation): REQ-052-006, REQ-052-007
 
 export type FailureCategory = BoundaryFailure["category"];
 
@@ -131,23 +135,32 @@ export function collectTargets(repoRoot: string, projection: Projection): Artifa
 
   let merged: ArtifactListing = listArtifactsRec(path.join(repoRoot, commandRel));
 
-  const skillsParent = path.join(repoRoot, skillsRel);
-  if (dirExists(skillsParent)) {
+  // agentdev-* and japanese-tech-writing both ship in archive; others ignored.
+  const shippableSkills = (name: string): boolean =>
+    name.startsWith("agentdev-") || name === "japanese-tech-writing";
+  // Custom Tools and Plugins/Hooks ship under agentdev-* distribution names
+  // (REQ-052); other entries under these parents are repo-local and ignored.
+  const shippableDistribution = (name: string): boolean => name.startsWith("agentdev-");
+
+  for (const [rel, accept] of [
+    [skillsRel, shippableSkills],
+    [isInstalledProjection ? path.join(".opencode", "tools") : PUBLIC_TOOLS_PARENT, shippableDistribution],
+    [isInstalledProjection ? path.join(".opencode", "plugins") : PUBLIC_PLUGINS_PARENT, shippableDistribution],
+  ] as const) {
+    const parent = path.join(repoRoot, rel);
+    if (!dirExists(parent)) continue;
     let entries: Array<fs.Dirent>;
     try {
-      entries = fs.readdirSync(skillsParent, { withFileTypes: true }) as Array<fs.Dirent>;
+      entries = fs.readdirSync(parent, { withFileTypes: true }) as Array<fs.Dirent>;
     } catch {
-      return merged;
+      continue;
     }
     for (const ent of entries) {
       if (!ent.isDirectory()) continue;
-      // agentdev-* and japanese-tech-writing both ship in archive; others ignored.
-      if (!ent.name.startsWith("agentdev-") && ent.name !== "japanese-tech-writing") {
-        continue;
-      }
+      if (!accept(ent.name)) continue;
       merged = appendListing(
         merged,
-        listArtifactsRec(path.join(skillsParent, ent.name)),
+        listArtifactsRec(path.join(parent, ent.name)),
       );
     }
   }
