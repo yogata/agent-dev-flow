@@ -31,8 +31,8 @@ updated: 2026-08-15
 
 - git commit/push: `.agentdev/intake/` 配下のみ（commit message: `chore: capture intake item`）
 - 実行前同期: `git pull --ff-only`
-- GitHub Issue 作成: 行わない（G01）
-- 採用可否判断: 行わない（G02）
+- GitHub Issue 作成: 行わない（case-open 責務）
+- 採用可否判断: 行わない（intake-promote 責務）
 
 ## 現在の動作
 
@@ -40,7 +40,7 @@ updated: 2026-08-15
 各段階の詳細手順は Workflow Skill（`agentdev-workflow-intake-capture`）が正規情報源である（capture-only 型、REQ-027-003 により STEP model 対象外）。
 
 - 入力受領
-- intake item 生成（推奨標準形に整理、ユーザー未指定セクションは省略（G13: 過度補完禁止、G11: 過度解釈禁止））
+- intake item 生成（推奨標準形に整理、ユーザー未指定セクションは省略（過度補完禁止、過度解釈禁止））
 - ファイル名生成（`YYYY-MM-DD-{topic-slug}.md`）
 - 実行前同期（`git pull --ff-only`）
 - 保存（`.agentdev/intake/inbox/`）。同名時は連番付与
@@ -61,17 +61,17 @@ updated: 2026-08-15
 
 ## 対象外
 
-- GitHub Issue 作成（G01）
-- 採用可否判断（G02）
-- intake item 変更、更新（G03）
-- review、整形、分類（G04）
-- 作業知見のみの内容（G05、learning item 扱い）
-- learning item 保存、分類、昇華（G06）
-- frontmatter、状態値、重複排除キーの必須化（G08）
-- workflow 管理成果物の扱い（G07）
-- 特定セクションの必須扱い（G09）
-- ユーザー入力内容の過度解釈、変形（G11）
-- `.agentdev/intake/` 以外への保存（G12）
+- GitHub Issue 作成
+- 採用可否判断
+- intake item 変更、更新
+- review、整形、分類
+- 作業知見のみの内容（learning item 扱い）
+- learning item 保存、分類、昇華
+- frontmatter、状態値、重複排除キーの必須化
+- workflow 管理成果物の扱い
+- 特定セクションの必須扱い
+- ユーザー入力内容の過度解釈、変形
+- `.agentdev/intake/` 以外への保存
 
 ## 検証観点
 

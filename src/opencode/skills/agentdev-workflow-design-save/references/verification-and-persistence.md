@@ -152,9 +152,9 @@ commit/push より前に更新し、commit 対象に含める。
 
 ### Procedure
 
-**決定的処理のスクリプト呼出**: `git diff --name-only` で変更ファイル一覧を取得し、許可パスリスト（G02）との照合を `agentdev-artifact-validation` の公開検証契約（`check-change-impact`）で実行する。
+**決定的処理のスクリプト呼出**: `git diff --name-only` で変更ファイル一覧を取得し、許可パスリスト（design-save command のファイル編集スコープ）との照合を `agentdev-artifact-validation` の公開検証契約（`check-change-impact`）で実行する。
 許可範囲外の変更を検出したらエラーを報告し指示を待つ（自動破棄しない）。
-`violations` が空でない場合は G02 違反として報告し指示を待つ。
+`violations` が空でない場合はファイル編集スコープ違反として報告し指示を待つ。
 CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照。
 
 ### Result
@@ -267,7 +267,7 @@ STEP-8 の status 変更を commit 対象に含める。
 
 - 不変条件（分離根拠・配置先判定の再分類禁止）
 - 不変条件（Design status 昇格は case-close の責務）
-- G12（Issue 作成禁止）
+- ガードレール（Issue 作成禁止）
 
 ## 検証観点（品質ゲート: 適用結果の整合性検証）
 

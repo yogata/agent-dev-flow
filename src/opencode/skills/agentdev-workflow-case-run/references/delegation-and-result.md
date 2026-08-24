@@ -129,7 +129,7 @@
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
 - 不変条件（単一 Issue または単一 Wave のみ処理、実装実行の委譲、result 4状態契約）
-- G24（完了条件チェックボックスの評価・更新は case-close QG-4 の責務）
+- ガードレール（完了条件チェックボックスの評価・更新は case-close QG-4 の責務、`POL-completion-checkbox-single-writer`）
 - 不変条件（blocked/failed の SSoT は Issue コメント、completed の SSoT は PR 本文）
 - 不変条件（外部実行ハーネス中間成果物の非扱い、PR URL 受領）
 - 不変条件（Design確定候補は PR 本文の別セクションに記録）

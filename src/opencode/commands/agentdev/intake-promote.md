@@ -51,7 +51,7 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 - 判定位置（classification → review → HITL → persistence の各工程での扱い）は `agentdev-workflow-intake-promote` スキルが所有する
 - 同一実行内に自律確定可能 item とユーザー判断必要 item が混在する場合、未決項目に依存しない item を先行確定する（部分自律確定）
 - 処理対象が空の場合は HITL を発生させず正常な「対象なし」として完了する
-- 破壊的変更の明示承認（G18）は自律確定によって迂回しない
+- 破壊的変更の明示承認は自律確定によって迂回しない（`POL-destructive-change-explicit-approval`）
 
 ## エラー処理
 
@@ -62,8 +62,8 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 工程上の選好を肯定形の不変条件として示す:
 
-- review・分類・整形を担い、GitHub Issue の作成は acklog-review/case-open が担当する。acklog-review は次ステップの提示までとし自動起動は行わない
-- 採用 item の後続ルートは acklog-review のみとする（learning pipeline の入力は生成しない。learning item の保存・分類・昇華は本コマンドの対象外）
+- review・分類・整形を担い、GitHub Issue の作成は backlog-review/case-open が担当する。backlog-review は次ステップの提示までとし自動起動は行わない
+- 採用 item の後続ルートは backlog-review のみとする（learning pipeline の入力は生成しない。learning item の保存・分類・昇華は本コマンドの対象外）
 - review、整形はユーザーとの対話を通じて行う。整形は元 item の内容の意味を保持した整理・構造化にとどめる
 - 取得可能な根拠から採用・保留・却下を一意に確定できる item はユーザー承認なしで確定する（自律確定）。ユーザー判断が必要な item のみを HITL 対象とし、破壊的変更の明示承認は維持する（詳細判定表は workflow-contracts Design 参照）
 - 整形結果は軽量な成果物として扱う（workflow 管理成果物として扱わない）。frontmatter（route/status 等）、重複排除キー、後続成果物参照は含めない
@@ -74,9 +74,9 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 硬い境界（承認境界・state 破壊等の否定規則）に限定する:
 
-- G01: GitHub Issue の作成は行わない（acklog-review/case-open が担当）
-- G06: ユーザー判断が必要な item について、明示的な承認なしに採用済み成果物を生成しない（根拠から一意に確定できる item の自律確定による生成を除く。詳細判定表は workflow-contracts Design 参照）
-- G08: 分類未確定のままの自動確定、自動進行は行わない（REQ）。ユーザー判断必要 item はユーザーが「確定」を明示的に指示してから次フェーズに進む。根拠から一意に確定できる item の自律確定と、確定後の自動進行は REQ で許容される
-- G12: 元 item の本文に整形結果を書き込まない
-- G16: 保存先は .agentdev/intake/promoted/ 直下のみ（フラット構造）
-- G18: 破壊的変更（inbox 大量削除、重要 item の誤分類是正等）は HITL 承認とは別に明示承認を維持する（REQ）
+- GitHub Issue の作成は行わない（backlog-review/case-open が担当）
+- ユーザー判断が必要な item について、明示的な承認なしに採用済み成果物を生成しない（根拠から一意に確定できる item の自律確定による生成を除く。詳細判定表は workflow-contracts Design 参照）（`POL-promoted-artifact-requires-approval`）
+- 分類未確定のままの自動確定、自動進行は行わない（REQ）。ユーザー判断必要 item はユーザーが「確定」を明示的に指示してから次フェーズに進む。根拠から一意に確定できる item の自律確定と、確定後の自動進行は REQ で許容される
+- 元 item の本文に整形結果を書き込まない
+- 保存先は .agentdev/intake/promoted/ 直下のみ（フラット構造）
+- 破壊的変更（inbox 大量削除、重要 item の誤分類是正等）は HITL 承認とは別に明示承認を維持する（REQ）（`POL-destructive-change-explicit-approval`）

@@ -40,7 +40,7 @@ updated: 2026-08-21
 ## 副作用
 
 - ファイル作成: `.agentdev/drafts/req-draft-{topic-slug}.md` のみ
-- git 操作: 実行しない（G08）
+- git 操作: 実行しない
 - Issue 作成: 行わない（後続 case-open 責務）
 
 ## 現在の動作
@@ -311,7 +311,7 @@ disposition は確定した採否判断のみを保持する。
 disposition の `evidence` に根拠（path、section）を設定できない場合、または根拠が曖昧な場合は `auto_gate.auto_ready: false` とし、`stop_reasons` へ根拠不足の旨を記録する。
 根拠不足のまま draft を完成させてはならない。
 
-`evidence.checked_at_commit` は req-define 生成時 `null` とする（G08 git 操作禁止）。
+`evidence.checked_at_commit` は req-define 生成時 `null` とする（req-define は git 操作を実行しない）。
 default branch 最新化後の evidence 再確認は consumer（case-open）の責務である。
 
 ## draft-data review_dispositions フィールドスキーマ
@@ -332,7 +332,7 @@ schema の正規所有先は [artifact-contracts.md](../responsibilities/artifac
 | disposition | enum | 必須 | `covered` / `partially_covered` / `rejected` / `not_applicable`。必要に応じて `superseded` / `stale_target` を追加 |
 | reason_code | string | 必須 | 判断理由のコード |
 | reason | string | 必須 | 人間可読の判断理由本文 |
-| evidence | object | 必須 | 根拠。`path`、`section`、`checked_at_commit` を持つ。`checked_at_commit` は生成時 `null`（G08 git 操作禁止） |
+| evidence | object | 必須 | 根拠。`path`、`section`、`checked_at_commit` を持つ。`checked_at_commit` は生成時 `null`（req-define は git 操作を実行しない） |
 | related_removed_items | list | optional | 本判断により除外された関連項目の識別子リスト |
 
 1 disposition エントリ = 単一 `source_ru` + 単一 `source_item` の組み合わせとする（重複禁止）。
@@ -369,7 +369,7 @@ review_dispositions:
 
 ### checked_at_commit 運用
 
-`evidence.checked_at_commit` は req-define 生成時 `null` とする（G08 git 操作禁止）。
+`evidence.checked_at_commit` は req-define 生成時 `null` とする（req-define は git 操作を実行しない）。
 case-open が default branch 最新化後に evidence の path/section を再確認し、確認時の commit SHA を当該フィールドへ記録する。
 根拠失効時は `covered` のまま起票せず `stale_target` または再評価対象として停止する。
 
@@ -519,25 +519,25 @@ req-define が生成した draft を内容欠落なく評価環境へ引き継�
 
 ## 対象外
 
-- 実装コードの作成、編集（G01: 壁打ちフェーズのみ）
-- 関連ドキュメントの個別ファイル列挙をユーザーに求める（G02）
-- `.agentdev/drafts/**` 以外のファイル作成、編集（G03）
-- ユーザー明示入力ファイルの変更、削除、RU 削除（G04）
-- `docs/` 配下の広範な探索（G05。例外: 明示入力ファイル、`docs/requirements/**` 参照、変更影響候補抽出の限定探索）
-- `inbox.md` / `deferred.md` 直接ロード（G06）
-- 採用済み成果物の直読み（G07）
-- `git` コマンド実行（G08）
-- Issue 階層決定（G13、case-open 責務）
-- `execution_groups` セクション出力（G14）
-- Design 分離基準（REQ-001-068）該当要件行の REQ 残留（G15、`artifact_actions` へ分離）
-- Decision判断における未確認事項の要件本文混入（G17、REQ-003-002/004）
-- アーキテクチャ助言サブエージェントによるファイル編集（G18、REQ-003-003）
+- 実装コードの作成、編集（壁打ちフェーズのみ）
+- 関連ドキュメントの個別ファイル列挙をユーザーに求める
+- `.agentdev/drafts/**` 以外のファイル作成、編集
+- ユーザー明示入力ファイルの変更、削除、RU 削除
+- `docs/` 配下の広範な探索（例外: 明示入力ファイル、`docs/requirements/**` 参照、変更影響候補抽出の限定探索）
+- `inbox.md` / `deferred.md` 直接ロード
+- 採用済み成果物の直読み
+- `git` コマンド実行
+- Issue 階層決定（case-open 責務）
+- `execution_groups` セクション出力
+- Design 分離基準（REQ-001-068）該当要件行の REQ 残留（`artifact_actions` へ分離）
+- Decision判断における未確認事項の要件本文混入（REQ-003-002/004）
+- アーキテクチャ助言サブエージェントによるファイル編集（REQ-003-003）
 
 ## 検証観点
 
 - QG-1（Definition Integrity Gate）: 定義完全性ゲートで要件doc構造的完全性を検証（REQ/Design 分類、Decision ゲート、チェックボックス測可能性、必須フィールド完全性、artifact_actions 構成妥当性）
  - test_strategy 3要素完全性検査: 各 test strategy 項目が verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素を完全に保持すること。いずれかが欠落する項目を検出した場合、fail とする
-- チェックボックス品質基準: `agentdev-req-analysis` に従い測定可能で一意（G09）
+- チェックボックス品質基準: `agentdev-req-analysis` に従い測定可能で一意
 - artifact_actions 構成: REQ/Decision/Design 別 action が適切に統合されているか
 - OU 構造検証: 要件doc確認工程で ou_id、operation、target_req/target_design、depends_on、result 整合性
 

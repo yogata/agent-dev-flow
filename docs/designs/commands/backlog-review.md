@@ -40,8 +40,8 @@ updated: 2026-08-21
 
 - git commit/push: `.agentdev/` 配下（明示パスステージング、v2:REQ-0137-002/005）
 - 実行前同期: `git pull --ff-only`
-- REQ ファイル保存: 行わない（G01）
-- GitHub Issue 作成: 行わない（G02）
+- REQ ファイル保存: 行わない（req-save 責務）
+- GitHub Issue 作成: 行わない（case-open 責務）
 
 ## 現在の動作
 
@@ -52,9 +52,9 @@ updated: 2026-08-21
 - 成果物検出（引数有無切り替え（引数あり: 指定ファイルのみ / 引数なし: `promoted/` 全件））
 - 成果物読込、分析 + 暫定分類付与（`agentdev-backlog-integration` 参照）。暫定分類は `docs/designs/foundations/document-model.md` の文書7分類モデルを参照して付与し、RU frontmatter `tentative_classification` に記録する（v2:REQ-0155-004）。`tentative_classification` の許容値、7値以外入力時、フィールド欠落時の取り扱いは v2:REQ-0155-008、後述「tentative_classification フィールド仕様」に定める。暫定分類は後続 `/agentdev/req-define` で最終確定される候補であり、本コマンドが確定しない
 - 統合分割判定 + depends_on 依存解決 + ユーザー承認（判断の確定、REQ-003-003）（`agentdev-backlog-integration` 参照）
-- 矛盾検出（矛盾検出時のみ追加判断を求める（REQ-003-009））。矛盾なしの場合、統合、分割判定承認を RU 生成承認として扱い、単一承認で処理する。自動解決しない（G05）
-- RU 生成（採用済み成果物の単純コピー（パススルー）は禁止（G03、REQ-008））
-- 成果物削除（RU 生成失敗成果物は削除しない（G06））
+- 矛盾検出（矛盾検出時のみ追加判断を求める（REQ-003-009））。矛盾なしの場合、統合、分割判定承認を RU 生成承認として扱い、単一承認で処理する。自動解決しない
+- RU 生成（採用済み成果物の単純コピー（パススルー）は禁止（REQ-008））
+- 成果物削除（RU 生成失敗成果物は削除しない）
 - Git 永続化
 - 完了報告
 
@@ -81,17 +81,17 @@ agentdev-traceability の coverage, impact, check を一般文書探索、構造
 
 ## 対象外
 
-- REQ ファイル保存（G01、req-save 責務）
-- GitHub Issue 作成（G02、case-open 責務）
-- 採用済み成果物の単純コピー（パススルー）（G03、REQ-008）
-- `.agentdev/intake/inbox/`, `.agentdev/learning/inbox.md`, `.agentdev/learning/deferred.md` の更新（G04）
-- 矛盾検出時の自動解決（G05）
-- RU 生成失敗成果物の削除（G06）
-- depends_on への採用済み成果物パス指定（G07、RU-ID のみ許容）
+- REQ ファイル保存（req-save 責務）
+- GitHub Issue 作成（case-open 責務）
+- 採用済み成果物の単純コピー（パススルー）（REQ-008）
+- `.agentdev/intake/inbox/`, `.agentdev/learning/inbox.md`, `.agentdev/learning/deferred.md` の更新
+- 矛盾検出時の自動解決
+- RU 生成失敗成果物の削除
+- depends_on への採用済み成果物パス指定（RU-ID のみ許容）
 
 ## 検証観点
 
-- depends_on に RU-ID のみ許容（G07）
+- depends_on に RU-ID のみ許容
 - 統合分割判定ロジック: `agentdev-backlog-integration` 参照
 
 ## tentative_classification と分類根拠伝播

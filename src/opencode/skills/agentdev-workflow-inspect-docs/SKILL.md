@@ -79,7 +79,7 @@ agentdev-traceability の coverage、impact、check を一般文書探索、構�
 
 ## 共通制約
 
-- **診断専用**: 許可される副作用は `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成と `.agentdev/inspect/` 配下の git 永続化のみ（G01〜G04）
+- **診断専用**: 許可される副作用は `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成と `.agentdev/inspect/` 配下の git 永続化のみ（command ガードレールの範囲）
 - **source-of-truth priority**: 現行 REQ > 承認済み Decision > Design > guides の順で矛盾を判定する（command 不変条件）
 - **Design 参照は extension 経由**: document-model Design、docs-spec-rebuild-integrity Design 等の分類ポリシー・検査パターンは extension 経由で解決し、Design 内部パスを固定知識として参照しない
 

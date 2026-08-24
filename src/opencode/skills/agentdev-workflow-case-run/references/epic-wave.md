@@ -233,5 +233,5 @@ Epic Issue 本文ステータス追跡テーブルの更新は行わない（cas
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
 - 不変条件（単一 Wave のみ処理、1 Wave の実行で PR 作成まで return、最大5件並列委譲）
-- G24（完了条件チェックボックスの評価・更新は case-close QG-4 の責務）
+- ガードレール（完了条件チェックボックスの評価・更新は case-close QG-4 の責務、`POL-completion-checkbox-single-writer`）
 - 不変条件（blocked/failed の SSoT は Issue コメント、completed の SSoT は PR 本文）

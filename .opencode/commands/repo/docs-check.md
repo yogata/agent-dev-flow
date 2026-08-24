@@ -49,11 +49,11 @@ agent-dev-flow リポジトリの自己監査コマンド。AgentDevFlow 管理�
 
 ## ガードレール
 
-- G01: 検査対象 artifact を変更しない。レポート・intake item の新規作成のみ許容
-- G02: `git` コマンドは intake item 作成時にのみ `.agentdev/intake/` 配下に限定
-- G03: finding は intake 対象（原則）。learning item の直接作成は行わない（MUST NOT）
-- G04: finding 分類・ルートを付与すること（REQ-0101）
-- G05: intake item は NG/WARNING finding から自動生成する。実行＝保存承認（REQ-0108-225）。採否は intake-promote に委譲（REQ-0108-226）。learning/RU/REQ の直接生成禁止（MUST NOT、REQ-0108-227）
-- G06: `gh` コマンドは使用しない
-- G07: `agentdev-req-analysis`（manual reference）の要件分析手法を参照して REQ フィールド検査
-- G08: `agentdev-decision-guidelines`（manual reference）および Decision lifecycle Design（`docs/designs/foundations/decision-lifecycle.md`）の Decision 構造定義を参照して Decision フィールド検査
+- 検査対象 artifact を変更しない。レポート・intake item の新規作成のみ許容
+- `git` コマンドは intake item 作成時にのみ `.agentdev/intake/` 配下に限定
+- finding は intake 対象（原則）。learning item の直接作成は行わない（MUST NOT）
+- finding 分類・ルートを付与すること（REQ-0101）
+- intake item は NG/WARNING finding から自動生成する。実行＝保存承認（REQ-0108-225）。採否は intake-promote に委譲（REQ-0108-226）。learning/RU/REQ の直接生成禁止（MUST NOT、REQ-0108-227）
+- `gh` コマンドは使用しない
+- `agentdev-req-analysis`（manual reference）の要件分析手法を参照して REQ フィールド検査
+- `agentdev-decision-guidelines`（manual reference）および Decision lifecycle Design（`docs/designs/foundations/decision-lifecycle.md`）の Decision 構造定義を参照して Decision フィールド検査

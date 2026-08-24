@@ -39,7 +39,7 @@ backlog-auto は子ワークフロー内部の分類、評価、昇格、RU 生�
 
 硬い境界（破壊的操作、state 破壊等の否定規則）に限定する:
 
-- G01: 子ワークフロー内部の分類、評価、昇格、RU 生成を代行しない（各子 Workflow Skill の責務）
-- G02: inspect-promote の `--auto` を明示 opt-in なしに有効化しない
-- G03: capture 系コマンド（learning-capture、intake-capture、intake-from-github）、inspect-skills、req-define、req-save、GitHub Issue / PR 作成を自動起動しない
-- G04: 子ワークフローの定義ファイルと公開契約を変更しない（子ワークフロー自身の契約変更は各コマンドの正規変更経路による）
+- 子ワークフロー内部の分類、評価、昇格、RU 生成を代行しない（各子 Workflow Skill の責務）
+- inspect-promote の `--auto` を明示 opt-in なしに有効化しない
+- capture 系コマンド（learning-capture、intake-capture、intake-from-github）、inspect-skills、req-define、req-save、GitHub Issue / PR 作成を自動起動しない
+- 子ワークフローの定義ファイルと公開契約を変更しない（子ワークフロー自身の契約変更は各コマンドの正規変更経路による）

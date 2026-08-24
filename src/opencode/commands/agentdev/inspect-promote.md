@@ -54,8 +54,8 @@ description: 検出事項を分類、採用し、採用済み成果物として 
 
 硬い境界（承認境界・state 破壊等の否定規則）に限定する:
 
-- G01: ユーザーの明示的な承認なしに採用済み成果物を生成しない（`--auto` による自動 promote 対象、および詳細判定表（workflow-contracts Design 参照、extension 経由）に従い自律確定した検出事項を除く）
-- G02: promote された検出事項のみを `.agentdev/inspect/promoted/` へ保存する
-- G06: `--auto` は明示 opt-in の場合のみ有効。省略時は自動 promote を一切行わない
+- ユーザーの明示的な承認なしに採用済み成果物を生成しない（`--auto` による自動 promote 対象、および詳細判定表（workflow-contracts Design 参照、extension 経由）に従い自律確定した検出事項を除く）（`POL-promoted-artifact-requires-approval`）
+- promote された検出事項のみを `.agentdev/inspect/promoted/` へ保存する
+- `--auto` は明示 opt-in の場合のみ有効。省略時は自動 promote を一切行わない
 
 

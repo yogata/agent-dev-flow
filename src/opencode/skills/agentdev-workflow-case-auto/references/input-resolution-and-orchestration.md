@@ -156,7 +156,7 @@ bg task 破棄検知時の3状態回復は `agentdev-workflow-orchestration` 参
 
 #### Wave 反復制御（case-auto 直接制御）
 
-- Epic Issue 本文読み取りのみ（書き込みは case-close 単一書き手、G16）
+- Epic Issue 本文読み取りのみ（書き込みは case-close 単一書き手、`POL-epic-tracking-single-writer`）
 - 子Issue インライン case-run 並列実行 最大5件
 - 委譲 → case-close(#epic)
 - 次 Wave 判定
@@ -238,7 +238,7 @@ case-open の判定結果に従う。
 - 不変条件（case-auto は Issue 階層決定ロジックを持たない、複数 REQ doc または scale:large の場合は case-open のルールに委譲）
 - 不変条件（req-save 委譲から case-open 委譲への状態引き継ぎ時、複数 REQ doc の保存結果をフィルタリングまたは再評価しない）
 - 不変条件（Epic Wave 実行時、Wave 反復制御、現在 Wave の ready 子Issue 選択、子Issue 並列委譲 最大5件 を直接担当、case-run(#epic) への委譲は行わない、各子Issue ごとにインライン case-run、Wave 境界のクローズは case-close(#epic) に委譲）
-- G16（case-auto は独自の操作単位ステータス追跡を持たない、Epic Issue のステータス追跡テーブルを使用、Epic Issue 本文の書き込みは case-close 単一書き手、case-auto は読み取るのみ）
+- ガードレール（case-auto は独自の操作単位ステータス追跡を持たない、Epic Issue のステータス追跡テーブルを使用、Epic Issue 本文の書き込みは case-close 単一書き手、case-auto は読み取るのみ）
 - 不変条件（case-auto は操作単位キューの管理・制御のみを担い、OU 本文の抽出・変換・REQ 操作解釈を行わない）
 - 不変条件（case-auto は orchestration pre-reader として case-open 完了前のみ req_draft を読み込み、case-open 成功後は invalid post-case reader として req_draft を読まない、case-open 成功後の停止・再開・完了処理は Issue と Epic だけで成立、クリーンアップ検証ゲートは case-open 完了後に実行、独自の OU 状態管理を持たない）
 - 不変条件（OU 間依存は queue dependency として扱い、依存関係があるだけでは Epic Issue 化しない）

@@ -34,7 +34,7 @@ req-save の次、case-open の前に実行する。
 
 - ファイル作成/更新: `docs/designs/**`, `.agentdev/drafts/**`（status 更新用）。`docs/designs/README.md` は Design 操作に付随する更新のみ許可
 - git 操作: commit + push（`agentdev-conventional-commits` + `agentdev-git-worktree` 並列実行安全ステージング）
-- Issue 作成: 行わない（G12、case-open 責務）
+- Issue 作成: 行わない（case-open 責務）
 - deviation capture: design-save 実行中に実観測した deviation を agentdev-learning-capture skill または
   agentdev-intake-pipeline（自動capture向け item 生成操作）へ委譲して保存。
   保存先は capture-boundaries.md の Split Rule に従う。
@@ -216,7 +216,7 @@ target_area 見出し検索は `agentdev-design-file-manager/scripts/src/search-
 - `placement` が `tail` の場合は Design ファイル末尾へ、`after_anchor` / `before_anchor` の場合は `anchor` 見出し行の前後へ `content` が挿入されていること
 - 挿入結果の Design ファイルが Markdown 構造として破損しないこと（見出し階層の不整合がないこと）
 - frontmatter `updated` が更新されていること
-- `status` は変更しないこと（G06）
+- `status` は変更しないこと
 
 ### 旧別名の不受理
 
@@ -257,17 +257,17 @@ Design保存工程では、変更されたDesignと連動する`docs/designs/REA
 strict failureが存在する場合は修正して再実行する。
 ## 対象外
 
-- Design 対象 artifact_actions（`artifact: design`）がない場合の Design ファイル作成、編集（G01、G04、no-op）
-- `docs/designs/**`, `.agentdev/drafts/**`, `docs/designs/README.md` 以外のファイル作成、編集（G02、G03）。REQ ファイル（`docs/requirements/**`）、Decision（`docs/decisions/**`）、コマンド、スキル、テンプレート編集禁止
-- Design 対象 artifact_actions がない場合の Design ファイル作成、編集（G04）
-- 新規 Design 作成時の `status: draft` 省略（G05）
-- 既存 Design 追記時の `status` 変更（G06、`status: accepted` 昇格は case-close 責務）
-- Design status が `draft` の Design を IR-044（REQ/Design 境界違反検出）の対象に含めること（G07）
-- REQ-001-055（Design 分離基準）不適合 action の保存（G08、安定契約例外 REQ-001-069 は follow-up 扱い）
-- 実行時コマンドが Design ファイルに依存する記述（G09、REQ-001 実行時非依存維持）
-- Design artifact_actions の分離根拠、配置先判定の再分類（G10、req-define `agentdev-req-analysis` 結果を尊重）
-- Design status 昇格（draft → accepted）の判定（G11、case-close 責務）
-- Issue 作成（G12、case-open 責務）
+- Design 対象 artifact_actions（`artifact: design`）がない場合の Design ファイル作成、編集（no-op 完了）
+- `docs/designs/**`, `.agentdev/drafts/**`, `docs/designs/README.md` 以外のファイル作成、編集。REQ ファイル（`docs/requirements/**`）、Decision（`docs/decisions/**`）、コマンド、スキル、テンプレート編集禁止
+- Design 対象 artifact_actions がない場合の Design ファイル作成、編集
+- 新規 Design 作成時の `status: draft` 省略
+- 既存 Design 追記時の `status` 変更（`status: accepted` 昇格は case-close 責務）
+- Design status が `draft` の Design を IR-044（REQ/Design 境界違反検出）の対象に含めること
+- REQ-001-055（Design 分離基準）不適合 action の保存（安定契約例外 REQ-001-069 は follow-up 扱い）
+- 実行時コマンドが Design ファイルに依存する記述（REQ-001 実行時非依存維持）
+- Design artifact_actions の分離根拠、配置先判定の再分類（req-define `agentdev-req-analysis` 結果を尊重）
+- Design status 昇格（draft → accepted）の判定（case-close 責務）
+- Issue 作成（case-open 責務）
 
 ## 検証観点
 

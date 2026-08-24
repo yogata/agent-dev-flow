@@ -23,7 +23,7 @@ Issue 本文候補を生成し、execution contract を確定する。
 ### Issue 本文生成（委譲接続点）
 
 詳細、委譲接続点（サブエージェントは REQ 読解、テンプレート充足検査、完了条件候補抽出のみを返し、親エージェントが本文確定と Issue 作成）は `agentdev-issue-management` を参照。
-本文候補の受け渡しは `agentdev-issue-management` の「委譲接続点と本文受け渡し」セクションに従いファイルパス経由で行う（G25）。
+本文候補の受け渡しは `agentdev-issue-management` の「委譲接続点と本文受け渡し」セクションに従いファイルパス経由で行う（`POL-gh-io-delegation`）。
 
 ### QG-2 完了条件網羅性検証（2-1 / 2-1a / 2-1b）
 

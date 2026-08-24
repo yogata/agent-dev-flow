@@ -28,6 +28,14 @@ description: コマンドの簡潔な説明
 
 これらの情報は command-map.md 等の参照用文書で管理し、frontmatter には混入させない。
 
+## ガードレール記述と共通ポリシー識別子
+
+ガードレール番号 Gxx の連番制度は廃止済みである（起点番号・欠番なし・重複なし・変換対照表の保持を要求しない）。
+
+- Command 固有の利用者向け境界（横断参照・機械強制を必要としないもの）は ID を付与せず、「ガードレール」セクションの本文として記述する
+- 複数箇所から参照、検査または強制される共通ポリシーのみが意味に基づく安定識別子（`POL-` 接頭辞 + kebab-case）を持つ。識別子の定義一覧は `references/common-policy-identifiers.md` の registry が保持する
+- 配布物から識別子を参照する際は識別子全体をコードスパンで記述する（未定義参照・重複定義・廃止済み Gxx 表記の残存は docs-check が検出する）
+
 ## 責任分界の原則
 
 Commandは **公開APIと高レベル実行骨格** に徹する。
@@ -126,3 +134,4 @@ Command作成、改定時に以下を確認する:
 - **agentdev-skill-authoring**: Skill品質基準
 - **artifact-contracts Design**: Command/Skill/Template/Script 責務境界
 - **references/command-authoring-standards.md**: 行数目安、Steps数目安、共通処理重複、正規パス、完了報告種別、後方互換性の詳細
+- **references/common-policy-identifiers.md**: 共通ポリシー意味識別子（POL-）の定義一覧（registry）

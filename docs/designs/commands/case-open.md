@@ -35,7 +35,7 @@ Epic + 子 Issue 一括作成に対応する。
 ## 出力
 
 - GitHub Issue（ラベル付き、要件doc埋め込み）
-- Epic flow の場合は Epic Issue + 子 Issue 群（最大10件、G05/G15）
+- Epic flow の場合は Epic Issue + 子 Issue 群（最大10件、子Issue 数上限と OU 単位作成の各制約）
 - ドラフト削除: `.agentdev/drafts/req-draft-{topic-slug}.md`
 - RU ファイル削除: `.agentdev/backlog/req-units/RU-*.md`
 - OU `result` 書き戻し: `operation_units` セクションに Issue / Epic 番号
@@ -319,27 +319,27 @@ RU ファイル削除後に統合先ブランチ（REQ-042 の定義による、
 
 ## 対象外
 
-- 機能要件、非機能要件、制約、対象外、受け入れ条件の新規作成（G19、REQ-006-009）
-- 実装順序、Issue分解についてのユーザー確認要求（G20、REQ-006-008）
-- 単一 Issue で完結する場合の Epic 作成（G20、REQ-005-041）
-- Wave単位のみの子Issue構造（G14、子Issue は OU 単位で作成し、対応 OU 経由で REQ/Decision/Design トレーサビリティを保持。子Issue を REQ 文書単位で対応付ける規定は廃止、REQ-005-042 準拠）
-- 子Issue最大10件超過時の作成続行（G05、エラー停止、REQ-006-028）
-- 構成生成事前検証を GitHub Issue 作成後に行う扱い（G05、REQ-006-027）
-- intake / learning capture の実施（G18, G22）
-- Issue作成の gh CLI 安全手続き省略（G12、`agentdev-gh-cli` 参照）
-- case-open は Issue 本文（Standard/Epic/子Issue/完了報告コメント全て）を文字列変数で持ち回らず、`[System.IO.File]::WriteAllText`（UTF8Encoding($false)）による UTF-8 BOM なし LF 一時ファイル経由で `gh --body-file` へ渡すこと（G25、REQ-006-024）。テンプレート読込→変数置換→ファイル保存→gh CLI 渡しまでをファイル経由で固定し、親エージェントの本文再構成を禁止する（REQ-006-025）
-- スイープ操作（`git add -A` / `git add .` / `git commit -a` / `git checkout .` / `git reset --hard` / `git stash` 等）の実行（G23、v2:REQ-0137-001）
-- 明示パス指定以外のステージ、コミット（G24、v2:REQ-0137-002/005）
-- draft / RU 削除の未ステージ残存許可（G24、Form Zero、v2:REQ-0137-003/006）
+- 機能要件、非機能要件、制約、対象外、受け入れ条件の新規作成（REQ-006-009）
+- 実装順序、Issue分解についてのユーザー確認要求（REQ-006-008）
+- 単一 Issue で完結する場合の Epic 作成（REQ-005-041）
+- Wave単位のみの子Issue構造（子Issue は OU 単位で作成し、対応 OU 経由で REQ/Decision/Design トレーサビリティを保持。子Issue を REQ 文書単位で対応付ける規定は廃止、REQ-005-042 準拠）
+- 子Issue最大10件超過時の作成続行（エラー停止、REQ-006-028）
+- 構成生成事前検証を GitHub Issue 作成後に行う扱い（REQ-006-027）
+- intake / learning capture の実施
+- Issue作成の gh CLI 安全手続き省略（`agentdev-gh-cli` 参照）
+- case-open は Issue 本文（Standard/Epic/子Issue/完了報告コメント全て）を文字列変数で持ち回らず、`[System.IO.File]::WriteAllText`（UTF8Encoding($false)）による UTF-8 BOM なし LF 一時ファイル経由で `gh --body-file` へ渡すこと（REQ-006-024、`POL-gh-io-delegation`）。テンプレート読込→変数置換→ファイル保存→gh CLI 渡しまでをファイル経由で固定し、親エージェントの本文再構成を禁止する（REQ-006-025）
+- スイープ操作（`git add -A` / `git add .` / `git commit -a` / `git checkout .` / `git reset --hard` / `git stash` 等）の実行（v2:REQ-0137-001）
+- 明示パス指定以外のステージ、コミット（v2:REQ-0137-002/005）
+- draft / RU 削除の未ステージ残存許可（Form Zero、v2:REQ-0137-003/006）
 
 ## 検証観点
 
 - QG-2（Acceptance Criteria Coverage Gate）: 完了条件網羅性検証で完了条件が対象 REQ/Decision/Design の必達要件を網羅しているか検証。fail 時は Issue 作成前に req-define 差し戻し推奨
-- 子Issue 先頭行 `Parent: #{epic_number}` 含有（G03、親子関係追跡用）
-- 全子Issue作成完了後の Epic 本文ステータス追跡テーブル更新（G04、部分更新禁止）
-- 子Issue数上限（G05、最大10件、Epic 1件あたり）
-- テンプレート必須セクション完備確認（G09、G10、`完了条件` セクション含む）
-- 出力制約: Issue 本文、commit message は verbatim で返す。「verbatim」とは LF・空行・インデントを含む行構造を byte 単位で保持することを指し、文字列の正規化、改行圧縮、空白挿入・削除をすべて禁止する。委譲接続点（Issue 本文生成、Epic Issue 本文生成、子Issue 本文生成、Epic Issue 本文更新）と最終 gh CLI 渡し（Issue 作成、コメント追加）の双方に適用する。判定結果、調査過程、中間ログ、読解メモは要約、成果物パス、根拠、親判断事項、capture候補へ圧縮して返す（G17）
+- 子Issue 先頭行 `Parent: #{epic_number}` 含有（親子関係追跡用）
+- 全子Issue作成完了後の Epic 本文ステータス追跡テーブル更新（部分更新禁止）
+- 子Issue数上限（最大10件、Epic 1件あたり）
+- テンプレート必須セクション完備確認（`完了条件` セクション含む）
+- 出力制約: Issue 本文、commit message は verbatim で返す。「verbatim」とは LF・空行・インデントを含む行構造を byte 単位で保持することを指し、文字列の正規化、改行圧縮、空白挿入・削除をすべて禁止する。委譲接続点（Issue 本文生成、Epic Issue 本文生成、子Issue 本文生成、Epic Issue 本文更新）と最終 gh CLI 渡し（Issue 作成、コメント追加）の双方に適用する。判定結果、調査過程、中間ログ、読解メモは要約、成果物パス、根拠、親判断事項、capture候補へ圧縮して返す
 - draft / RU 削除残存検証（`git status --porcelain` で空であること）
 
 ## case-auto 並列委譲モデル（REQ-006-087〜093）
@@ -370,7 +370,7 @@ case-open は Epic 構成推論の根拠を Epic Issue 本文または `case_ope
 
 - 子Issue 本文案作成、検査、Issue 作成は最大5件まで並列化できる。最大5件は Design 所有の実行安全境界の数値であり（REQ-006 目的「実行安全境界の数値は Design を正規所有者とし、本 REQ は境界宣言へ縮約する」）、case-open 実装が遵守する。旧 v2 参照の REQ-006-089 は case-auto orchestration stage モデルを規定する別要件であり、本並列化上限の根拠ではないため参照を除去した（OU-008 整合）
 - Epic Issue 作成、Wave 1 配置、Epic 本文ステータス追跡テーブル更新は Epic Issue 本文の単一書き手原則（REQ-006-095, REQ-006-101）に基づく親の直列集約である。旧 v2 参照の REQ-006-093 は case-auto background task 回復パターンを規定する別要件であり、本直列集約の根拠ではないため参照を除去した（OU-008 整合）
-- G04「全子Issue 作成完了後にテーブル更新（部分更新禁止）」は集約更新で維持
+- 全子Issue 作成完了後のテーブル更新（部分更新禁止）は集約更新で維持
 
 ## REQ-006-089/093 参照の整合
 

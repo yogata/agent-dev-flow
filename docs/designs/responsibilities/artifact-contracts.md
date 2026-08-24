@@ -427,7 +427,7 @@ draft type registry の allowed consumers 列、REQ-008、REQ-006-083、document
 | `disposition` | enum | `covered` / `partially_covered` / `rejected` / `not_applicable`。必要に応じて `superseded` / `stale_target` を追加 |
 | `reason_code` | string | 判断理由のコード（例: `already_satisfied`、`out_of_scope`、`superseded_by`） |
 | `reason` | string | 人間可読の判断理由本文 |
-| `evidence` | object | 根拠。`path`（ファイルパス）、`section`（セクション見出し等）、`checked_at_commit`（確認 commit SHA）を持つ。`checked_at_commit` は req-define 生成時 `null`（G08 git 禁止）。case-open が default branch 最新化後に再確認し、確認 commit SHA を記録する |
+| `evidence` | object | 根拠。`path`（ファイルパス）、`section`（セクション見出し等）、`checked_at_commit`（確認 commit SHA）を持つ。`checked_at_commit` は req-define 生成時 `null`（req-define は git 操作を実行しない）。case-open が default branch 最新化後に再確認し、確認 commit SHA を記録する |
 | `related_removed_items` | list | 本判断により除外された関連項目の識別子リスト（該当なし時は空リスト） |
 
 1 disposition エントリ = 単一 `source_ru` + 単一 `source_item` の組み合わせとする（重複禁止）。
@@ -513,7 +513,7 @@ Design operation の公式 enum は `create` / `append` / `update` の3値とす
 
 - 追加後の Design ファイルに `target_area` と完全一致する見出しが1つだけ存在すること
 - frontmatter `updated` を更新していること
-- `status` は変更しないこと（G06）
+- `status` は変更しないこと
 
 配置契約の実行詳細（`placement` 別挿入位置の算出、anchor マッチング規則）は `designs/commands/design-save.md`「append 操作時のセクション追加ロジック」が正規所有する。
 

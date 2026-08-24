@@ -78,7 +78,7 @@ push 失敗時は同プロシージャの構造化エラー形式で停止する
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- G01（`.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成のみ例外許可、他のファイル変更禁止）
-- G02（GitHub Issue/PR を作成、更新しない）
-- G03（worktree/ブランチを作成しない）
-- G04（intake/learning/RU の処理を行わない）
+- ガードレール（`.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成のみ例外許可、他のファイル変更禁止）
+- ガードレール（GitHub Issue/PR を作成、更新しない）
+- ガードレール（worktree/ブランチを作成しない）
+- ガードレール（intake/learning/RU の処理を行わない）

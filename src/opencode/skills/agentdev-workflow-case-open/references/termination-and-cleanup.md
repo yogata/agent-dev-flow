@@ -110,4 +110,4 @@ push 失敗時は構造化エラーメッセージを表示して停止する。
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
 - 不変条件（自工程で実観測した deviation を learning-capture または intake-pipeline へ委譲保存、`intake-capture` command 等の別 command を直接呼ばない、capture 本体は完了報告に含めず保存した成果物のパス・分類・保存結果のみを `Capture結果` 小節へ含める）
-- G23・不変条件（並列実行安全 git 操作、明示パス指定 + `git commit -- <paths>` の --only pathspec 形式、`git add -A`/`git add .`/`git add --all`/`git commit -a` 等のスイープ操作禁止、Form Zero、`.agentdev/` 全体一括スコープではなく明示パス限定）
+- ガードレール・不変条件（並列実行安全 git 操作、明示パス指定 + `git commit -- <paths>` の --only pathspec 形式、`git add -A`/`git add .`/`git add --all`/`git commit -a` 等のスイープ操作禁止、Form Zero、`.agentdev/` 全体一括スコープではなく明示パス限定）

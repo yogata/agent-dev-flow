@@ -162,7 +162,7 @@ IR エントリ一覧（IR-046 以降）は `generate_indexes.ts` が自動生�
 - [IR-060: forbidden Japanese word detection](rules/IR-060-forbidden-japanese-word-detection.md)
 - [IR-061: 索引類自動生成整合性](rules/IR-061-index-generation-consistency.md)
 - [IR-062: skill/command パス参照実在](rules/IR-062-reference-path-existence.md)
-- [IR-063: guardrail-number-invariant](rules/IR-063-guardrail-number-invariant.md)
+- [IR-063: common-policy-identifier-invariant](rules/IR-063-common-policy-identifier-invariant.md)
 - [IR-064: unresolved-placeholder](rules/IR-064-unresolved-placeholder.md)
 - [IR-065: obsolete-vocabulary-current-use](rules/IR-065-obsolete-vocabulary-current-use.md)
 - [IR-066: legacy-path-removed-name](rules/IR-066-legacy-path-removed-name.md)

@@ -97,28 +97,28 @@ context 管理:
 
 ## 対象外
 
-- DB migration実行、deploy/apply、クラウドリソース操作、外部SaaS設定変更、課金、権限、認証情報変更、repo 外実データ操作、通知送信（G02）
-- migrationファイル、IaCファイルの作成、修正以外の migration実行、IaC apply（G03）
-- remote branch 削除で当該 case-auto / case-run が作成した branch 以外の対象（G05）
-- 各工程のインライン実行は通常時対象外（G07、委譲起動必須、v2:ADR-0127, REQ-006-006/073/084）。委譲起動不能時の `delegation-unavailable` 報告は例外として許可（REQ-002-003/004）
-- 既存 req-save / design-save / case-open / case-run / case-close の責務変更（G09、委譲は起動方式変更のみ）
-- source path の実行時パス読み替え（G11）
-- Issue 階層決定ロジックの独自保持（G13、case-open に委譲）
-- req-save 委譲から case-open 委譲への状態引き継ぎ時のフィルタリング、再評価（G14、保存結果をそのまま渡す）
-- 子Issue 選択ロジック、子Issue 単位の並列起動（G15、case-run(#epic) / case-close(#epic) に委譲）
-- Epic Issue 本文の書き込み（G16、case-close の単一書き手責務、v2:ADR-0125、case-auto は読み取るのみ）
-- 操作単位本文の抽出、変換、REQ 操作解釈（G18、REQ-006-051）
-- case-open 完了後の draft SSoT 扱い（G19、case-open 完了後は子Issue が SSoT）
-- OU 間依存のみでの Epic Issue 化（G20、REQ-006-055）
-- Epic Issue 化判定への関与（G21、REQ-006-057）
-- case-auto 固有の capture 振る舞い（G17、構成コマンドの capture 責務境界に従う）
+- DB migration実行、deploy/apply、クラウドリソース操作、外部SaaS設定変更、課金、権限、認証情報変更、repo 外実データ操作、通知送信
+- migrationファイル、IaCファイルの作成、修正以外の migration実行、IaC apply
+- remote branch 削除で当該 case-auto / case-run が作成した branch 以外の対象
+- 各工程のインライン実行は通常時対象外（委譲起動必須、v2:ADR-0127, REQ-006-006/073/084）。委譲起動不能時の `delegation-unavailable` 報告は例外として許可（REQ-002-003/004）
+- 既存 req-save / design-save / case-open / case-run / case-close の責務変更（委譲は起動方式変更のみ）
+- source path の実行時パス読み替え
+- Issue 階層決定ロジックの独自保持（case-open に委譲）
+- req-save 委譲から case-open 委譲への状態引き継ぎ時のフィルタリング、再評価（保存結果をそのまま渡す）
+- 子Issue 選択ロジック、子Issue 単位の並列起動（case-run(#epic) / case-close(#epic) に委譲）
+- Epic Issue 本文の書き込み（case-close の単一書き手責務、v2:ADR-0125、case-auto は読み取るのみ、`POL-epic-tracking-single-writer`）
+- 操作単位本文の抽出、変換、REQ 操作解釈（REQ-006-051）
+- case-open 完了後の draft SSoT 扱い（case-open 完了後は子Issue が SSoT）
+- OU 間依存のみでの Epic Issue 化（REQ-006-055）
+- Epic Issue 化判定への関与（REQ-006-057）
+- case-auto 固有の capture 振る舞い（構成コマンドの capture 責務境界に従う）
 
 ## 検証観点
 
-- 工程別委譲契約遵守（G27）: inputs に指定された情報のみを渡し、output_contract に指定された結果のみを受領
-- 親コンテキスト非累積（G28）: 各委譲の完了結果（Issue/PR番号、pass/warn/fail）のみを親コンテキストに保持
+- 工程別委譲契約遵守: inputs に指定された情報のみを渡し、output_contract に指定された結果のみを受領
+- 親コンテキスト非累積: 各委譲の完了結果（Issue/PR番号、pass/warn/fail）のみを親コンテキストに保持
 - クリーンアップ検証ゲート（Standard / Epic Issue flow 双方）: ドラフトファイル、RU ファイルの残存がないこと
-- 出力制約: 成果物本文 verbatim、調査過程等は圧縮（G10）
+- 出力制約: 成果物本文 verbatim、調査過程等は圧縮
 - タイミング情報: 開始時刻、終了時刻、所要時間を人間が読みやすい形式で報告（REQ-006-082/083）
 - 結果状態の4次元集約（REQ-006-110）: 後述「結果状態の4次元集約（REQ-006-110）」セクションの4状態次元と集約規則に従い、warn を pass へ変換しない
 
@@ -148,7 +148,7 @@ case-auto は各工程の結果を次の4状態次元で保持し、集約報告
 
 case-auto は case-open が生成した execution_unit 群（standard | epic の混在）を orchestration 対象とする（REQ-006-012）。
 従来の「単一 Epic の Wave 反復制御」を「複数 execution_unit 群反復制御」へ一般化する。
-case-auto は case-open の判定結果に従い case-run(#epic) / case-run(standard) を起動する（薄いオーケストレーター原則、G13/G15/G21 維持）。
+case-auto は case-open の判定結果に従い case-run(#epic) / case-run(standard) を起動する（薄いオーケストレーター原則、Issue 階層決定・子 Issue 選択・Epic 化判定の委譲を維持）。
 Issue 階層決定、子 Issue 選択、Epic 化判定の判断ロジックは持たない。
 
 ### 処理単位の一級概念化（DEC-015）
@@ -353,7 +353,7 @@ Phase 0 の枝PR に含まれるコミット構成運用を規定する。
 
 - 永続性の違い: 成果物は配布対象の永続状態、ドメイン state はケース固有の一時状態。同一コミットに混在すると revert、cherry-pick の単位が曖昧になる
 - レビュー単位の分離: 成果物変更は Design 品質査読の対象、ドメイン state はキャプチャ境界（intake/learning）の対象。査読観点が異なるため分離する
-- capture 境界の遵守: `.agentdev/intake/`、`.agentdev/learning/` の直接編集は case-run 委譲内では禁止（G15/G16/G17、`agentdev-case-run-execution-adapter` SKILL）。実行担当サブエージェントは PR 本文の `## Findings / Capture候補` へ記録し、case-close が intake/learning pipeline へ引き継ぐ。よって case-run 委譲内でドメイン state をコミットへ含めることは原則として発生しない
+- capture 境界の遵守: `.agentdev/intake/`、`.agentdev/learning/` の直接編集は case-run 委譲内では禁止（委譲内の対象外制約、`agentdev-case-run-execution-adapter` SKILL）。実行担当サブエージェントは PR 本文の `## Findings / Capture候補` へ記録し、case-close が intake/learning pipeline へ引き継ぐ。よって case-run 委譲内でドメイン state をコミットへ含めることは原則として発生しない
 
 **例外**: `.agentdev/drafts/` の削除（req-save / design-save 完了後のクリーンアップ）は、成果物変更とは独立したクリーンアップコミットとして扱う。
 本運用が禁止する同一コミット混在には該当しない。

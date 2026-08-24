@@ -13,7 +13,7 @@
 
 ## CREATE 時の status 適用
 
-新規 Design 作成時（`operation: create`）は frontmatter に `status: draft` を必ず付与する（G05）。
+新規 Design 作成時（`operation: create`）は frontmatter に `status: draft` を必ず付与する。
 
 frontmatter 完全性（4フィールド）:
 - `title`: Design タイトル
@@ -22,11 +22,11 @@ frontmatter 完全性（4フィールド）:
 - `updated`: 作成日（`YYYY-MM-DD`、`created` と同値）
 
 `accepted` を付与しないこと。
-`draft` から `accepted` への昇格は case-close の責務（G11）。
+`draft` から `accepted` への昇格は case-close の責務。
 
 ## APPEND / UPDATE 時の status 扱い
 
-既存 Design へ新規セクション追加（APPEND）またはセクション置換（UPDATE）の場合、当該 Design の `status` を変更しない（G06）。
+既存 Design へ新規セクション追加（APPEND）またはセクション置換（UPDATE）の場合、当該 Design の `status` を変更しない。
 既存 Design の成熟度を尊重する。
 
 - `status: draft` の Design へ追記 → `status: draft` を維持

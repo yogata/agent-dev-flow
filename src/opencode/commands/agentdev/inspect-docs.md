@@ -14,7 +14,7 @@ docs全体（REQ/Decision/Design/guides）の意味整合性を診断し、検�
 
 - 診断結果の提示（検出事項、根拠、source-of-truth判定、推奨route）
 - `.agentdev/inspect/inbox/` への検出事項出力
-- 副作用は検出事項ファイルの生成のみ（Issue/PR作成、worktree作成、intake/learning/RU処理はガードレール G01〜G04 の対象外）
+- 副作用は検出事項ファイルの生成のみ（Issue/PR作成、worktree作成、intake/learning/RU処理は後述のガードレール対象外）
 
 ## 入力
 
@@ -60,9 +60,9 @@ routing は実行コマンド選択の目安であり、各コマンドの検出
 
 硬い境界（破壊的操作・state 破壊等の否定規則）に限定する:
 
-- G01: ファイルを変更、作成、削除しない。ただし `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成は例外として許可する
-- G02: GitHub Issue/PR を作成、更新しない
-- G03: worktree/ブランチを作成しない
-- G04: intake/learning/RU の処理を行わない
+- ファイルを変更、作成、削除しない。ただし `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成は例外として許可する
+- GitHub Issue/PR を作成、更新しない
+- worktree/ブランチを作成しない
+- intake/learning/RU の処理を行わない
 
 

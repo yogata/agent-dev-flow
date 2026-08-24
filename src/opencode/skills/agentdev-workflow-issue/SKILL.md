@@ -80,10 +80,10 @@ resume point / export / import を持たない。
 
 ## 共通制約
 
-- **編集スコープ**: `docs/issue-list/` 配下の課題ファイルのみ（command 側ガードレール G01）。状態によって課題ファイルを移動、複製、分割しない
-- **GitHub Issue 非対象**: GitHub Issue/PR の操作を行わない（G02。`agentdev-issue-management` との対象体系の分離）
-- **正規成果物の直接更新禁止**: 解決結果の反映は当該成果物を所有する ADF 能力へ委譲する（G03）。反映先は解決時点で課題ファイルの「反映先」に記録する（起票時に決め打ちしない）
-- **承認・判断境界の維持**: ユーザー合意が必要な設計判断を代理確定しない（G04）。既存の承認、判断境界を迂回しない
+- **編集スコープ**: `docs/issue-list/` 配下の課題ファイルのみ（command 側ガードレール）。状態によって課題ファイルを移動、複製、分割しない
+- **GitHub Issue 非対象**: GitHub Issue/PR の操作を行わない（`agentdev-issue-management` との対象体系の分離）
+- **正規成果物の直接更新禁止**: 解決結果の反映は当該成果物を所有する ADF 能力へ委譲する。反映先は解決時点で課題ファイルの「反映先」に記録する（起票時に決め打ちしない）
+- **承認・判断境界の維持**: ユーザー合意が必要な設計判断を代理確定しない。既存の承認、判断境界を迂回しない
 - **git 永続化**: 本 workflow 単独実行時は `docs/issue-list/` 配下の変更を scoped commit で永続化する（commit message は Conventional Commits 形式）。変更なし時は commit/push せず完了報告で「変更なし」と報告する。他 workflow の実行中に課題管理能力を利用した場合は、当該 workflow の成果物コミットに含める
 - **完了報告**: 書き込み操作時の完了報告は template（`.opencode/commands/agentdev/templates/issue/standard.md`）に従う
 

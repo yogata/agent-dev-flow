@@ -46,7 +46,7 @@ draft 全体の `agreed_items`、`artifact_actions`、`operation_units` を処�
 
 硬い境界（破壊的操作・state 破壊等の否定規則）に限定する:
 
-- G23: 共有作業ツリーでスイープ操作（`git add -A`/ `git add .`/ `git add --all`/ `git commit -a`/ `git checkout .`/ `git reset --hard`/ `git stash`/ 非所有パスへの `git checkout -- <path>`/ `git restore <path>`）は実行しない。`agentdev-git-worktree` の並列実行安全ステージングプロシージャに従い、明示パス指定（`git add <path>`/ `git rm <path>`）+ `git commit -- <paths>`（--only pathspec 形式）で行う。draft/RU 削除は同一ステップで即時ステージ・コミットし未ステージ残存を許さない（Form Zero）
-- G25: Issue 本文（Standard/Epic/子Issue/完了報告コメント全て）の gh CLI への引き渡しは文字列変数で持ち回らず、`agentdev-gh-cli` の WRITE 標準手順（ファイル経由の引き渡し）に従う
+- 共有作業ツリーでスイープ操作（`git add -A`/ `git add .`/ `git add --all`/ `git commit -a`/ `git checkout .`/ `git reset --hard`/ `git stash`/ 非所有パスへの `git checkout -- <path>`/ `git restore <path>`）は実行しない。`agentdev-git-worktree` の並列実行安全ステージングプロシージャに従い、明示パス指定（`git add <path>`/ `git rm <path>`）+ `git commit -- <paths>`（--only pathspec 形式）で行う。draft/RU 削除は同一ステップで即時ステージ・コミットし未ステージ残存を許さない（Form Zero）
+- Issue 本文（Standard/Epic/子Issue/完了報告コメント全て）の gh CLI への引き渡しは文字列変数で持ち回らず、`agentdev-gh-cli` の WRITE 標準手順（ファイル経由の引き渡し）に従う（`POL-gh-io-delegation`）
 
 

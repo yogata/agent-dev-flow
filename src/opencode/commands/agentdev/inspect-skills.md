@@ -13,7 +13,7 @@ Command→Skill 参照妥当性と Skill 構造を検査対象を直接修正せ
 
 - 診断結果の提示
 - 根拠と推奨 route の提示
-- 副作用は検出事項ファイルの生成のみ（正規文書・REQ/Decision/Design・Command/Skill/Template/Script への変更、Issue/PR作成、RU保存、branch、worktree 操作はガードレール G01〜G04 の対象外）
+- 副作用は検出事項ファイルの生成のみ（正規文書・REQ/Decision/Design・Command/Skill/Template/Script への変更、Issue/PR作成、RU保存、branch、worktree 操作は後述のガードレール対象外）
 
 ## 入力
 
@@ -62,9 +62,9 @@ routing は実行コマンド選択の目安であり、各コマンドの検出
 
 硬い境界（破壊的操作・state 破壊等の否定規則）に限定する:
 
-- G01: ファイルを変更、作成、削除しない。ただし `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成は例外として許可する
-- G02: GitHub Issue/PR を作成、更新しない
-- G03: RU、intake、learning、backlog 成果物を保存しない
-- G04: commit/ push は `.agentdev/inspect/` 配下の永続化のみ許可。branch/ worktree 操作は禁止
+- ファイルを変更、作成、削除しない。ただし `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成は例外として許可する
+- GitHub Issue/PR を作成、更新しない
+- RU、intake、learning、backlog 成果物を保存しない
+- commit/ push は `.agentdev/inspect/` 配下の永続化のみ許可。branch/ worktree 操作は禁止
 
 

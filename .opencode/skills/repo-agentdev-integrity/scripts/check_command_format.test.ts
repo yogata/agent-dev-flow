@@ -6,7 +6,6 @@
  * - Public /agentdev/* commands carry no workflow stage tables, no
  *   `### Step N` procedure headings, and no Workflow Skill internal STEP
  *   identifiers (REQ-002-001, REQ-002-041)
- * - No non-G01 guardrail numbers
  */
 
 import { test, expect } from "bun:test";
@@ -109,7 +108,7 @@ test("checkCommandFile passes thin public command workflow dispatch", () => {
 
 ## ガードレール
 
-- G01: valid
+- 全ファイル操作は worktree 内で実行する（\`POL-worktree-isolation\`）
 `;
   const violations = checkCommandFile(PUBLIC_CMD, content);
   expect(violations).toHaveLength(0);
@@ -135,14 +134,4 @@ test("checkCommandFile allows non-identifier STEP mentions in public commands", 
   expect(
     violations.some((v) => v.rule === "command-format-workflow-step-id"),
   ).toBe(false);
-});
-
-test("checkCommandFile detects non-G01 guardrail numbers", () => {
-  const content = `## ガードレール
-
-- G1: invalid format
-- G001: too many digits
-`;
-  const violations = checkCommandFile(PUBLIC_CMD, content);
-  expect(violations.some((v) => v.rule === "command-format-guardrail-number")).toBe(true);
 });

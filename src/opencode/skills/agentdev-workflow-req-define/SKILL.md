@@ -25,7 +25,7 @@ req-define command は公開 interface（入出力契約・ガードレール）
 
 ## 副作用
 
-- `.agentdev/drafts/**` 配下のファイル作成・更新のみ（G03）。`git` コマンドは実行しない（G08）。実証Caseでも Git 副作用（評価ブランチ作成等）を持たない
+- `.agentdev/drafts/**` 配下のファイル作成・更新のみ（ファイル編集スコープ制約）。`git` コマンドは実行しない（git コマンド実行禁止制約）。実証Caseでも Git 副作用（評価ブランチ作成等）を持たない
 - RU、promoted 成果物、inbox.md/deferred.md は読取のみ（参照専用入力）
 
 ## Control Plane（STEP 一覧）

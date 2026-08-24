@@ -327,26 +327,26 @@ case-run は評価ブランチ上で必要な実証手段の準備、実行、�
 
 ## 対象外
 
-- 壁打ち（G01、構造的実行フェーズ、実装は 実行担当サブエージェント経由）
-- 実装で判明した制約の REQ 黙示変更（G02、実行担当サブエージェントが乖離として報告しユーザー承認後に反映）
-- worktree 外でのファイル操作（G04）
-- Issue番号省略時の `gh issue list` 等の open issue 一覧取得（G05、G06）
-- Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）（G11、case-close 責務）
-- case-run 本体による work plan生成、実装、乖離検出、specs更新、PR作成（G22、実行担当サブエージェント責務）
-- 実行担当サブエージェント result 以外の状態扱い（G23、`agentdev-case-run-execution-adapter` result 契約に従う）
-- 完了条件チェックボックスの評価、更新（G24、case-close QG-4 責務）
-- blocked / failed SSoT の一時会話コンテキスト、中間ファイル使用（G25、Issue コメント、PR 本文が SSoT）
-- 外部実行ハーネス中間成果物の内部構造依存処理、検証（G26、REQ-003-007）
-- 外部実行手段中間成果物の永続成果物扱い（G29、REQ-003-007）
-- worktree 未作成時、メインリポジトリでの 実行担当サブエージェント起動（G30、worktree precondition gate）
-- 実行担当サブエージェントへメインリポジトリパスを渡すこと（G31、worktree root 相対パス指定）
-- Epic Wave 実行モードで1 Wave を超える処理、Wave 境界（PR マージ）の実施（G32、case-close へ委譲）
-- スコープ拡大（G14）、intake 候選の `.agentdev/intake/inbox/` 直接変更（G15）、learning 候選と intake 候選の混在（G16, G17）、`.agentdev/learning/inbox.md` 直接変更（G21）、Design確定候選と Findings の混在（G27）
+- 壁打ち（構造的実行フェーズ、実装は 実行担当サブエージェント経由）
+- 実装で判明した制約の REQ 黙示変更（実行担当サブエージェントが乖離として報告しユーザー承認後に反映）
+- worktree 外でのファイル操作（`POL-worktree-isolation`）
+- Issue番号省略時の `gh issue list` 等の open issue 一覧取得
+- Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）（case-close 責務）
+- case-run 本体による work plan生成、実装、乖離検出、specs更新、PR作成（実行担当サブエージェント責務）
+- 実行担当サブエージェント result 以外の状態扱い（`agentdev-case-run-execution-adapter` result 契約に従う）
+- 完了条件チェックボックスの評価、更新（case-close QG-4 責務、`POL-completion-checkbox-single-writer`）
+- blocked / failed SSoT の一時会話コンテキスト、中間ファイル使用（Issue コメント、PR 本文が SSoT）
+- 外部実行ハーネス中間成果物の内部構造依存処理、検証（REQ-003-007）
+- 外部実行手段中間成果物の永続成果物扱い（REQ-003-007）
+- worktree 未作成時、メインリポジトリでの 実行担当サブエージェント起動（worktree precondition gate）
+- 実行担当サブエージェントへメインリポジトリパスを渡すこと（worktree root 相対パス指定）
+- Epic Wave 実行モードで1 Wave を超える処理、Wave 境界（PR マージ）の実施（case-close へ委譲）
+- スコープ拡大、intake 候選の `.agentdev/intake/inbox/` 直接変更、learning 候選と intake 候選の混在、`.agentdev/learning/inbox.md` 直接変更、Design確定候選と Findings の混在
 
 ## 検証観点
 
 - worktree precondition gate: worktree+ブランチ作成済みを検証（`git worktree list` + `git rev-parse --show-toplevel`）。検証失敗時は 実行担当サブエージェント起動禁止
-- 実行担当サブエージェント result 4状態（completed-pr / blocked / failed / delegation-unavailable）の取り扱い正確性（G23）
+- 実行担当サブエージェント result 4状態（completed-pr / blocked / failed / delegation-unavailable）の取り扱い正確性
 - PR URL 受領の確実性（REQ-006-021 廃止に伴い PR URL フォールバック検索不使用）
 - Epic Wave 実行時の1 Wave のみ処理、べき等性（同コマンド再実行で次 Wave に進む）
 - 出力制約: PR 本文、commit message は verbatim で返す（成果物本文）
@@ -410,7 +410,7 @@ case-run 委譲内で作成する commit の構成運用を規定する。
 
 - 永続性の違い: 成果物は配布対象の永続状態、ドメイン state はケース固有の一時状態。同一コミットに混在すると revert、cherry-pick の単位が曖昧になる
 - レビュー単位の分離: 成果物変更は Design 品質査読の対象、ドメイン state はキャプチャ境界（intake/learning）の対象。査読観点が異なるため分離する
-- capture 境界の遵守: `.agentdev/intake/`、`.agentdev/learning/` の直接編集は case-run 委譲内では禁止（G15/G16/G17、`agentdev-case-run-execution-adapter` SKILL）。実行担当サブエージェントは PR 本文の `## Findings / Capture候補` へ記録し、case-close が intake/learning pipeline へ引き継ぐ。よって case-run 委譲内でドメイン state をコミットへ含めることは原則として発生しない
+- capture 境界の遵守: `.agentdev/intake/`、`.agentdev/learning/` の直接編集は case-run 委譲内では禁止（委譲内の capture 対象外制約、`agentdev-case-run-execution-adapter` SKILL）。実行担当サブエージェントは PR 本文の `## Findings / Capture候補` へ記録し、case-close が intake/learning pipeline へ引き継ぐ。よって case-run 委譲内でドメイン state をコミットへ含めることは原則として発生しない
 
 **例外**: `.agentdev/drafts/` の削除（req-save / design-save 完了後のクリーンアップ）は、成果物変更とは独立したクリーンアップコミットとして扱う。
 本運用が禁止する同一コミット混在には該当しない。
@@ -425,7 +425,7 @@ case-run 委譲内で作成する commit の構成運用を規定する。
 - result が failed の場合（repository context で回答不能な blocker。詳細は Issue コメント SSoT）。
 - result が delegation-unavailable の場合（実行未試行のため Issue を `pending` に戻す、REQ-002-004）。
 - 前工程からの引き継ぎ停止判定（`agentdev_handoff: true`）検出時（実装開始せず停止する）。
-- worktree precondition gate 失敗時（worktree、ブランチ未作成なら実行担当サブエージェントを起動しない、G30）。
+- worktree precondition gate 失敗時（worktree、ブランチ未作成なら実行担当サブエージェントを起動しない）。
 - 完了条件の不足、曖昧さ、矛盾、実現不能の検出時（自律補完せず blocked とする。execution contract 消費境界参照）。
 
 ## See Also
@@ -489,7 +489,7 @@ adapter 委譲内で次のいずれかに該当する場合、実行担当サブ
 - adversarial-review 審議で unresolved な本質的争点またはユーザー判断事項が残り、実装の最初の変更（不可逆処理）へ進めない（REQ-014-009）
 
 blocked 詳細本文は Issue コメントに SSoT として記録され、case-run の result 処理で扱われる。
-実行担当サブエージェントは要件、仕様問題を検出した場合、勝手に仕様変更、REQ 黙示変更、ADR 再解釈を行わず、必ず blocked 経路へ入る（REQ-015-011、G02）。
+実行担当サブエージェントは要件、仕様問題を検出した場合、勝手に仕様変更、REQ 黙示変更、ADR 再解釈を行わず、必ず blocked 経路へ入る（REQ-015-011、REQ 黙示変更禁止制約）。
 
 ### 発動条件（REQ-015-002、REQ-015-003）
 

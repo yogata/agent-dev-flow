@@ -1,4 +1,4 @@
-// ADF-COVERS(implementation): REQ-002-037, REQ-002-038, REQ-002-039, REQ-002-040, REQ-002-041
+// ADF-COVERS(implementation): REQ-002-037, REQ-002-038, REQ-002-039, REQ-002-040, REQ-002-041, REQ-051-005
 // ADF-COVERS(verification): REQ-002-001, REQ-002-041
 /**
  * Command file format violation checker (IR-049 + IR-028/029/030/031).
@@ -50,9 +50,6 @@ const TABLE_ROW = /^\|/;
 // Workflow Skill 内部 STEP 識別子（STEP-1, STEP-S3, STEP-W2, STEP-E4, STEP-3-1 等）。
 // "STEP model" 等、識別子でない言及は含まない。
 const WORKFLOW_STEP_IDENTIFIER = /\bSTEP-[A-Z]?\d/;
-
-const GUARDRAIL_LINE = /^-\s+(G\d+):/;
-const G01_FORMAT = /^G\d{2}$/;
 
 export function checkCommandFile(
   filePath: string,
@@ -114,20 +111,6 @@ export function checkCommandFile(
           severity: "NG",
         });
       }
-    }
-  }
-
-  // Check for non-G01 guardrail numbers (G + exactly 2 digits zero-padded)
-  for (let i = 0; i < lines.length; i++) {
-    const match = lines[i].match(GUARDRAIL_LINE);
-    if (match && !G01_FORMAT.test(match[1])) {
-      violations.push({
-        file: filePath,
-        line: i + 1,
-        rule: "command-format-guardrail-number",
-        description: `ガードレール番号 ${match[1]} は G01 形式（G + ゼロ埋め2桁）に不一致`,
-        severity: "NG",
-      });
     }
   }
 

@@ -227,6 +227,6 @@ CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照。
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
 - 不変条件（`artifact: design` 有無での判定、`work_type` 判定廃止）
-- G02・不変条件（ファイル編集スコープ、Design 対象なし時の編集禁止）
-- G06・不変条件（Design ライフサイクル制約）
+- ガードレール・不変条件（ファイル編集スコープ、Design 対象なし時の編集禁止）
+- ガードレール・不変条件（Design ライフサイクル制約）
 - 不変条件（Design 分離基準適合、実行時非依存）

@@ -8,7 +8,7 @@ description: "design-save command の workflow 実装本体。req-define で分�
 design-save command の workflow 実装本体。
 req-define で分離された Design 保存対象（`draft-data` の `artifact_actions` 内 `artifact: design` entry）を `docs/designs/<**/*>.md` に保存、確定する制御構造を所有する。
 req-save の次、case-open の前に実行する。
-req-save の G02（Design 編集禁止）を緩和するものではなく、Design 保存を独立責務として切り出す。
+req-save のファイル編集スコープ制約（Design 編集禁止）を緩和するものではなく、Design 保存を独立責務として切り出す。
 全 work_type 対象であり、`work_type` による判定は廃止する。
 
 design-save command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
@@ -24,9 +24,9 @@ design-save command は公開 interface（入出力契約・ガードレール�
 
 ## 副作用
 
-- `docs/designs/**` と `.agentdev/drafts/**` のみ作成・編集（G02。`docs/designs/README.md` は Design 操作に付随する更新のみ）
+- `docs/designs/**` と `.agentdev/drafts/**` のみ作成・編集（`docs/designs/README.md` は Design 操作に付随する更新のみ）
 - main ブランチへの commit・push（明示パスステージ、`agentdev-git-worktree` プロシージャ準拠）
-- Issue は作成しない（G12、case-open の責任範囲）
+- Issue は作成しない（case-open の責任範囲）
 
 ## Control Plane（STEP 一覧）
 

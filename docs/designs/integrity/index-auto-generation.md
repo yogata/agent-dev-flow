@@ -179,7 +179,7 @@ docs-check 既存資産（cli_utils.ts, check_integrity.ts の parseFrontmatter,
 3. **各領域の正規情報源**: frontmatter、各文書本文のセクション構造、宣言等。
 4. **人手管理領域に対する整合性確認方法**: docs-check（IR-061、IR-038、IR-039、IR-042）による検出、人手レビュー等。
 
-docs-check は G01 原則（検査対象を直接修正しない）を維持し、生成スクリプトは docs-check から独立して動作する。
+docs-check は検査対象不変原則（検査対象を直接修正しない）を維持し、生成スクリプトは docs-check から独立して動作する。
 
 ### AUTOGEN marker 検出契約
 

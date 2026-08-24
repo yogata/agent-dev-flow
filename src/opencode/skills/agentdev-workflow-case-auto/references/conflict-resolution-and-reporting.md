@@ -71,7 +71,7 @@ Level 2 コンフリクト文脈付きインライン case-run 再実行、Level
 ### Procedure
 
 最終工程（case-close 委譲）の完了報告をそのまま出力する。
-Epic Issue を伴う Wave 反復実行時は、完了・blocked・failed 子Issue 一覧を含める（Epic Issue 本文ステータス追跡テーブルから読み取り、case-auto は書き込まない、G16）。
+Epic Issue を伴う Wave 反復実行時は、完了・blocked・failed 子Issue 一覧を含める（Epic Issue 本文ステータス追跡テーブルから読み取り、case-auto は書き込まない、`POL-epic-tracking-single-writer`）。
 停止時は完了済み OU・進行中 OU・未実行 OU・再開可能な次コマンドを報告する。
 
 **tmp/ 残存確認**: 当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないことを確認する。残存時は `agentdev-gh-cli` の cleanup 規定に従って処理し、残存ファイルと対応結果を完了報告に明示する。
@@ -116,7 +116,7 @@ Standard flow の case-close 完了後に未処理 OU が残存する場合は�
 
 ### Completion Verification
 
-- warn を pass へ変換せず集約していること。Phase 0 成功と OU 完了を別々に報告していること。Epic Issue 本文のステータス追跡テーブルから読み取りのみで書き込んでいないこと（G16）。当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（残存時は対応結果を報告済みであること）
+- warn を pass へ変換せず集約していること。Phase 0 成功と OU 完了を別々に報告していること。Epic Issue 本文のステータス追跡テーブルから読み取りのみで書き込んでいないこと（Epic テーブル単一書き手制約）。当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（残存時は対応結果を報告済みであること）
 
 ### Resume-Idempotency
 
@@ -138,10 +138,10 @@ Standard flow の case-close 完了後に未処理 OU が残存する場合は�
 - `agentdev-workflow-orchestration`: コンフリクト解消 Level 2/3 詳細、オーケストレーション級判断、停止条件の段階化、bg task 破棄検知時の回復
 - `agentdev-case-run-execution-adapter`: Level 2 インライン case-run 再実行時の委譲契約
 - `agentdev-git-worktree`: コンフリクト解消 rebase パス補助、並列実行安全ステージング
-- `agentdev-epic-tracker`: Epic Issue 本文ステータス追跡テーブル（読取のみ、G16）
+- `agentdev-epic-tracker`: Epic Issue 本文ステータス追跡テーブル（読取のみ、Epic テーブル単一書き手制約）
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
 - 不変条件（成果物本文 verbatim、判定結果・調査過程・中間ログ・読解メモは要約）
-- G16（case-auto は独自の操作単位ステータス追跡を持たない、Epic Issue 本文書き込みは case-close 単一書き手、case-auto は読取のみ）
+- ガードレール（case-auto は独自の操作単位ステータス追跡を持たない、Epic Issue 本文書き込みは case-close 単一書き手、case-auto は読取のみ）
 - 不変条件（委譲工程の完了結果のみを親コンテキストに保持）

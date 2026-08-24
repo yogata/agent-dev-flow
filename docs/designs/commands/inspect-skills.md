@@ -34,14 +34,14 @@ Command→Skill 参照妥当性と Skill 構造を、検査対象を直接修正
 
 ## 副作用
 
-- ファイル作成: `.agentdev/inspect/inbox/inspect-skills-finding-*.md` のみ（G01 例外）
+- ファイル作成: `.agentdev/inspect/inbox/inspect-skills-finding-*.md` のみ（診断専用の例外許可）
 - git commit/push: `.agentdev/inspect/` 配下のみ
 - 実行前同期: `git pull --ff-only`
-- 検査対象ファイルの変更: 禁止（G01）
-- GitHub Issue/PR 作成、更新: 禁止（G02）
-- worktree/ブランチ操作: 禁止（G04）
-- RU/intake/learning/backlog 成果物保存: 禁止（G03）
-- 自動修正: 禁止（G05、推奨 route 提示に留める）
+- 検査対象ファイルの変更: 禁止
+- GitHub Issue/PR 作成、更新: 禁止
+- worktree/ブランチ操作: 禁止
+- RU/intake/learning/backlog 成果物保存: 禁止
+- 自動修正: 禁止（推奨 route 提示に留める）
 
 ## 現在の動作
 
@@ -86,17 +86,17 @@ agentdev-traceability の coverage, impact, check を一般文書探索、構造
 
 ## 対象外
 
-- 正規文書変更、REQ/Decision/Design 変更、Command/Skill/Template/Script 変更（G01）
-- Issue 作成、PR 作成、RU 保存（G02, G03）
-- branch、worktree 操作（G04）
-- 自動修正（G05、推奨 route 提示に留める）
+- 正規文書変更、REQ/Decision/Design 変更、Command/Skill/Template/Script 変更
+- Issue 作成、PR 作成、RU 保存
+- branch、worktree 操作
+- 自動修正（推奨 route 提示に留める）
 
 ## 検証観点
 
-- ファイル変更禁止（G01、`.agentdev/inspect/inbox/inspect-skills-finding-*.md` 生成は例外）
-- GitHub Issue/PR 作成、更新禁止（G02）
-- commit/push スコープ: `.agentdev/inspect/` 配下のみ（G04）
-- 自動修正禁止（G05）
+- ファイル変更禁止（`.agentdev/inspect/inbox/inspect-skills-finding-*.md` 生成は例外）
+- GitHub Issue/PR 作成、更新禁止
+- commit/push スコープ: `.agentdev/inspect/` 配下のみ
+- 自動修正禁止
 
 ## 停止状態
 

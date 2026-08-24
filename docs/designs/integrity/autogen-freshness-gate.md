@@ -52,7 +52,7 @@ AUTOGEN ブロックを含む索引ファイル（design-health-metrics.md 等�
 - **検査スクリプト**: `.opencode/skills/repo-agentdev-integrity/scripts/check_autogen_freshness.ts`
 - **実行ランナー**: Bun（`bun run`）。TypeScript 直接実行と `require()` / `import` 混在構文を前提とするため、Bun 以外のランナーでは ESM 解釈エラーが発生する
 - **docs-check からの呼出し**: `/repo/docs-check` Step 1 が `bun run` で実行する。check_autogen_freshness.ts の strict failure（stale blocks 検出）は docs-check 全体を fail とする
-- **生成スクリプトとの論理同一性**: 検査スクリプトは生成スクリプト（`generate_indexes.ts`）の exported 関数を再利用し、検査と生成で同一の再生成ロジックを共有する。これにより検査と生成の間の論理的同一性を保証する（AG-002 docs-check G01 分離原則維持）
+- **生成スクリプトとの論理同一性**: 検査スクリプトは生成スクリプト（`generate_indexes.ts`）の exported 関数を再利用し、検査と生成で同一の再生成ロジックを共有する。これにより検査と生成の間の論理的同一性を保証する（AG-002 docs-check の検査対象不変原則の維持）
 - **IR-061 との関係**: IR-061（`check_integrity.ts` `checkIndexGenerationConsistency`）は同一の不整合を「内容不一致」として検出する。本 gate は鮮度種別（rename / status_change / content_change）を分類して報告する点が異なる。両検査は独立して実施し、いずれか単独の実施要否にも他方の結果は影響しない（独立実施原則）
 
 ### CLI 契約

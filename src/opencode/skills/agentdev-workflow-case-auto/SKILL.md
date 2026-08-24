@@ -25,7 +25,7 @@ case-auto command は公開 interface（入出力契約・ガードレール）�
 - 各工程の委譲起動（req-save、design-save、case-open、case-close）とインライン実行（case-run、AG-{NNN}/{NNN}）
 - bg task API による stage 2 並列起動（最大5件）
 - GitHub Issue/PR/comment/merge/close（自走対象、command 不変条件）
-- remote branch 削除（当該 case-auto/ case-run が作成した branch に限定、G05）
+- remote branch 削除（当該 case-auto/ case-run が作成した branch に限定）
 - docs/ REQ/ ADR/ Design/ command reference/ guide の更新（自走対象、command 不変条件）
 - 当該 Workflow Skill は worktree root 配下以外を編集しない
 
@@ -93,8 +93,8 @@ case-auto workflow は次の8 STEP で構成する。
 
 ## 共通制約
 
-- **自走境界（ガードレール G02・G05、ほか不変条件）**: repo にファイルとして残る変更のみ自走対象。DB migration 実行、deploy/apply、クラウドリソース操作、外部SaaS 設定変更、課金、権限、認証情報、repo外実データ操作、通知送信は対象外
-- **委譲・参照制約（command 不変条件、ガードレール G16）**: 各工程は対応するコマンド定義を authoritative source として実行（case-auto 定義内再実装回避）。case-run はインライン実行（標準動作、AG-{NNN}）。Epic Issue 本文書き込みは case-close 単一書き手（case-auto は読取のみ、G16）。case-auto は Issue 階層決定ロジックを持たない、Epic Issue 化の判定に関与しない（command 不変条件）
+- **自走境界（ガードレール: 自走対象外・remote branch 削除限定、ほか不変条件）**: repo にファイルとして残る変更のみ自走対象。DB migration 実行、deploy/apply、クラウドリソース操作、外部SaaS 設定変更、課金、権限、認証情報、repo外実データ操作、通知送信は対象外
+- **委譲・参照制約（command 不変条件、ガードレール: Epic Issue 本文書き込み禁止）**: 各工程は対応するコマンド定義を authoritative source として実行（case-auto 定義内再実装回避）。case-run はインライン実行（標準動作、AG-{NNN}）。Epic Issue 本文書き込みは case-close 単一書き手（case-auto は読取のみ、`POL-epic-tracking-single-writer`）。case-auto は Issue 階層決定ロジックを持たない、Epic Issue 化の判定に関与しない（command 不変条件）
 - **3つの「5件」文脈の区別**: (1) case-run Wave 内子 Issue 並列、(2) case-auto Phase 2 同時起動数、(3) execution_unit 全体並列（上限なし）。混同しない
 - **OU処理ループ**: Standard flow の case-close 完了後に未処理 OU が残存する場合は次 OU の処理を STEP-3 から開始（全 OU 処理完了時のみ全体完了報告）
 - **実証Case認識と評価ブランチ伝播**: 実証Caseを draft-data の実証情報（実証Caseであること、評価契約、評価ブランチ識別情報）または Issue 等の永続情報の実証Case識別情報から復元し、通常Caseと区別する。実証Caseは復元した評価ブランチを統合先として全工程（req-save、design-save、case-open、case-run、case-close）へ一貫して伝播する。同時に複数実証を処理する場合はそれぞれ異なる評価ブランチを利用する。実証であることだけを理由に req-save / design-save を省略せず、評価ブランチ上で実行する。通常Caseの既存挙動は維持する（実証Case自走の実行詳細は case-auto command Design（project extension 経由参照）「実証Case自走」節参照）

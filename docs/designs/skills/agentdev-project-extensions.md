@@ -48,12 +48,12 @@ updated: 2026-07-27
 
 ## 現在の動作
 
-- extension は標準 command/skill の上書きではなく、追加・拡張のみ（G01）
-- 自分に対応する extension（1件）のみを読み、他 command/skill の extension は読まない（G02）
-- 破損 extension（malformed）で処理全体を停止しない。旧 kind は migration-required、未知 kind は schema violation として停止する（G03）
-- 委譲先 project-local skill の中身には関与しない（G04）
+- extension は標準 command/skill の上書きではなく、追加・拡張のみ
+- 自分に対応する extension（1件）のみを読み、他 command/skill の extension は読まない
+- 破損 extension（malformed）で処理全体を停止しない。旧 kind は migration-required、未知 kind は schema violation として停止する
+- 委譲先 project-local skill の中身には関与しない
 - rules/checks の初期契約では `action`, `required`, `fail_on` を採用しない。呼び出された skill は extension entry の `id`, `when`, `skill` および周辺文脈をもとに判断する
-- 配布 command/skill 本文にプロジェクト固有文書の具体参照を持たせない（G05）。プロジェクト固有参照は extension 経由でのみ与える
+- 配布 command/skill 本文にプロジェクト固有文書の具体参照を持たせない。プロジェクト固有参照は extension 経由でのみ与える
 
 ## 対象外
 
