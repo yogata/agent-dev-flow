@@ -2,7 +2,7 @@
 title: Workflow Skill Model
 status: draft
 created: 2026-08-10
-updated: 2026-08-23
+updated: 2026-08-24
 ---
 <!-- ADF-COVERS(implementation): REQ-002-001, REQ-002-002, REQ-002-003, REQ-002-004, REQ-002-017, REQ-002-018, REQ-002-034 -->
 <!-- ADF-COVERS(implementation): REQ-027-001, REQ-027-002, REQ-027-003 -->
@@ -18,20 +18,15 @@ REQ-027 は境界宣言のみを持ち、本節が詳細実装を正規所有す
 
 ## Command 責務
 
-公開interface（入出力契約・ガードレール）、workflow dispatch。
-workflow 実装本体は所有しない。
+Command は利用者向け入口、入力契約、最終出力、利用者から見える重大な副作用・確認境界、Workflow Skill への
+委譲のみを正規所有する。workflow の工程一覧、STEP、内部順序、公開順序の要約を正規所有しない
+（DEC-022、REQ-002-001）。
 
-### thin Command の workflow 節標準構造
-
-thin Command の workflow 節は次の3要素で構成する。
-
-1. Workflow Skill 名レベルの dispatch 宣言（委譲先 Workflow Skill 名と委譲範囲の宣言。内部構造（STEP ID、reference パス）への直接依存を持たない）
-2. 公開順序の要約（順序ラベル付きの見出し群。Workflow Skill 内部手順の複製ではなく、公開interface としての順序提示）
-3. soft guard 宣言（Workflow Skill の単独起動防止宣言。後述「soft guard の二層様式」）
-
-thin Command の workflow 節の順序ラベルは `authoring/command-file-format.md` が正規所有する様式（前出出力検証表、順序ラベル）に従う（Issue #2373、REQ-047-006。公開 command の `### Step N` 見出しは正規形の範囲外）。
-Workflow Skill 本文（SKILL.md、references/）の工程識別子は実番号形式（`STEP-1` 等）を用い、Command 定義の順序ラベルとは形式を区別して使い分ける。
-公開順序の要約の記述様式（前出出力検証表等）は `authoring/command-file-format.md` が正規所有する。詳細工程は Workflow Skill 側 STEP reference が所有し、本節は workflows 側の構成契約のみを記録する。
+- Command が記述するもの: 入口と引数、入力契約、最終出力、利用者から見える重大な副作用・確認境界、
+  Workflow Skill への委譲宣言、Command 固有の利用者向け境界（ID 付与なし）
+- Command が記述しないもの: 工程表、STEP 一覧、公開順序の要約、Workflow Skill の内部構造
+  （reference パス、STEP 識別子）、型由来の標準契約（継承により省略）、実装手順
+- Command は Workflow Skill 名レベルで委譲し、内部 STEP・reference パスへ依存しない（REQ-002-017 維持）
 
 ## Workflow Skill 責務
 

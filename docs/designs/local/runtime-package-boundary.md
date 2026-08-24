@@ -2,7 +2,7 @@
 title: 実行時パッケージ境界
 status: accepted
 created: 2026-08-20
-updated: 2026-08-23
+updated: 2026-08-24
 ---
 <!-- ADF-COVERS(implementation): REQ-002-007, REQ-002-008, REQ-002-011, REQ-002-019, REQ-002-020, REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-002, REQ-009-003, REQ-009-006, REQ-009-007, REQ-009-008, REQ-009-009, REQ-009-010, REQ-009-011, REQ-009-012, REQ-009-013, REQ-009-014, REQ-009-015, REQ-009-016, REQ-009-017, REQ-009-018, REQ-009-019, REQ-009-020, REQ-009-021, REQ-009-022, REQ-009-023, REQ-009-024, REQ-009-025, REQ-009-035, REQ-009-036, REQ-009-037, REQ-009-038, REQ-009-039, REQ-009-046, REQ-009-047, REQ-009-048, REQ-009-049 -->
@@ -232,6 +232,13 @@ scripts/ 直下の公開入口と内部配置の構成（REQ-050-001、REQ-050-0
 repository 上では archive 専用 installer の原本を通常 consumer installer と分離して保持する（`scripts/consumer/archive/install.ps1`）。
 release archive 内では consumer が実行する公開入口として `scripts/install.ps1` の名で配置する。
 通常 checkout 版の `scripts/install.ps1` と release archive 版の `scripts/install.ps1` は同一ファイルである必要はなく、異なる installation projection として扱い、それぞれの導入方式の契約を維持する。両版を同一実装へ強制統合しない（REQ-050-010）。
+
+## Tools / Plugins の配布・投影
+
+Custom Tool（src/opencode/tools/）と Plugin / Hook（src/opencode/plugins/）を正規配布種別として扱う
+（REQ-052、DEC-022）。原本と実行時投影は Command / Skill と同一の source・projection 原則（DEC-002）に従い、
+link mode の接続対象に含める。scripts/ 直下の公開入口は従来どおり2本に固定し、Tool / Plugin の追加によって
+新たな公開入口を作らない（REQ-050-001、REQ-052-008）。ディレクトリ構造の詳細は本 Design が所有する。
 
 ## 誤実行防止の環境判定方式
 

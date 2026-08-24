@@ -2,7 +2,7 @@
 title: 整合性ルールカタログ
 status: accepted
 created: 2026-08-20
-updated: 2026-08-22
+updated: 2026-08-24
 ---
 <!-- ADF-COVERS(implementation): REQ-010-009 -->
 
@@ -383,6 +383,17 @@ regression test の fixture copy は実ファイル構成の完全ミラーリ�
 
 候補語対照表は `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` と連携して最新状態を保ち、対象外とする語には IR-044 適用除外の根拠を併記する。
 候補語の限定は訳語表全体で検証した結果に基づき、限定の根拠を対照表へ明記する。
+
+## ガードレール識別体系検査（Gxx 検査の置換）
+
+Gxx 連番検査（開始番号・欠番・重複・未定義参照）を廃止し、次の検査へ置換する（REQ-051-005、REQ-010-064）。
+
+- 共通ポリシー意味識別子の未定義参照検出（参照先が定義済みであること）
+- 共通ポリシー意味識別子の重複定義検出
+- 廃止済み Gxx 表記の残存検出（G[0-9]{2} パターンの現行契約残存）
+- Command / Workflow Skill 間の workflow 契約重複の回帰検出（工程表・公開順序の要約の Command 残存）
+
+個別ルールの IR 登録と baseline の置換は、本セクションを正規所有者として整理する。
 
 ## メタ整合性
 

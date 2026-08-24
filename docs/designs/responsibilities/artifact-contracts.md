@@ -2,7 +2,7 @@
 title: アーティファクト契約
 status: accepted
 created: 2026-08-20
-updated: 2026-08-10
+updated: 2026-08-24
 ---
 <!-- ADF-COVERS(implementation): REQ-002-005, REQ-002-006, REQ-002-016, REQ-002-034 -->
 
@@ -18,12 +18,20 @@ Command / Skill / Template / Script の入出力契約と依存方向を定義�
 
 | 種別 | 配置先 | 責務 | 入力 | 出力 |
 |---|---|---|---|---|
-| Command | `src/opencode/commands/agentdev/`（実行時: `.opencode/commands/agentdev/`） | ユーザー向け入口、入出力、ガードレール、高レベル Steps | ユーザー起動、GitHub Issue | PR、Issue 更新、完了報告 |
-| Skill | `src/opencode/skills/`（実行時: `.opencode/skills/`） | 再利用可能な判断基準、ドメイン知識 | Command からの参照 | 判断結果の参照提供 |
-| Template | `src/opencode/skills/*/templates/` または `src/opencode/commands/agentdev/templates/`（実行時: `.opencode/` 経由） | 出力構造とプレースホルダー | 変数バインド | Issue/PR 本文、コメント |
-| Script | `src/opencode/skills/*/scripts/`（実行時: `.opencode/` 経由） | 決定的でテスト可能な実行ロジック | コマンドライン引数 | 標準出力（JSON/Markdown） |
-| リポジトリローカル Command | `.opencode/commands/repo/`（原本なし） | 本体リポジトリ専用入口（REQ-001） | ユーザー起動 | レポート、成果物 |
-| リポジトリローカル Skill | `.opencode/skills/repo-*/`（原本なし） | 本体リポジトリ専用判断基準（REQ-001） | Command からの参照 | 判断結果の参照提供 |
+| Command | src/opencode/commands/agentdev/（実行時: .opencode/commands/agentdev/） | 利用者向け入口、入力契約、最終出力、利用者から見える重大な副作用・確認境界、Workflow Skill への委譲 | ユーザー起動、GitHub Issue | PR、Issue 更新、完了報告 |
+| Skill | src/opencode/skills/（実行時: .opencode/skills/） | 再利用可能な判断基準、ドメイン知識 | Command からの参照 | 判断結果の参照提供 |
+| Template | src/opencode/skills/*/templates/ または src/opencode/commands/agentdev/templates/（実行時: .opencode/ 経由） | 出力構造とプレースホルダー | 変数バインド | Issue/PR 本文、コメント |
+| Script | src/opencode/skills/*/scripts/（実行時: .opencode/ 経由） | 決定的でテスト可能な解析・変換・検証・生成ロジック | コマンドライン引数 | 標準出力（JSON/Markdown） |
+| Custom Tool | src/opencode/tools/（実行時: .opencode/tools/ 経由。詳細構造は Design が所有） | Git / GitHub 等への構造化された副作用操作。操作契約（入力、出力、保証、失敗時）を公開し、文字コード・シェル・一時ファイル等の実装詳細を隠蔽 | 構造化引数 | 構造化結果（検証成功のみ成功） |
+| Plugin / Hook | src/opencode/plugins/（実行時: .opencode/ 経由。詳細構造は Design が所有） | モデル遵守判断に委ねない実行前の拒否・強制、正規経路の迂回防止 | ツール実行イベント | 許可・拒否判定 |
+| リポジトリローカル Command | .opencode/commands/repo/（原本なし） | 本体リポジトリ専用入口（REQ-001） | ユーザー起動 | レポート、成果物 |
+| リポジトリローカル Skill | .opencode/skills/repo-*/（原本なし） | 本体リポジトリ専用判断基準（REQ-001） | Command からの参照 | 判断結果の参照提供 |
+
+種別ごとの正規所有内容と所有しない内容の一意判別、標準継承と差分記述原則、決定的処理の配置基準の詳細は
+DEC-022 および REQ-002-037〜040 が要求水準を所有し、本 Design が配置・構造の詳細を所有する。
+依存方向は Command → Skill → Reference / Script に加え、Command / Skill → Custom Tool（操作契約経由）、
+Plugin / Hook → ツール実行（迂回防止）を含む。REQ / Design は規範・設計契約の正規文書層であり、
+配布種別とは別軸である（DEC-022 決定8）。
 
 ## 依存方向
 

@@ -194,6 +194,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | responsibilities/req-impact-map.md | accepted | REQ 影響マップ | REQ → 影響するルール/アーティファクト の対応表。`integrity/rule-ownership.md`（ルールドメイン → canonical REQ/Design）と逆方向。同期更新が必要なケースあり。配置は responsibilities/ 残置（移動は別途判断） |
 | responsibilities/responsibility-boundary-purification.md | accepted | 責務境界浄化: 所有/非所有リスト詳細 | 配布物と harness 実行制御の責務境界（所有/非所有リスト）。原則は harness-separation-model.md を SSoT とし、各工程（case-auto/case-run/adapter/extensions/タイムスタンプ）の詳細を集約。抽象化手順は `foundations/references/concrete-abstraction.md` を参照 |
 | responsibilities/artifact-quality-control-routing.md | draft | Artifact Quality Control Routing Design | artifact type から必須品質能力を導出する合成規則、能力キー定義、QG-2 投影契約。REQ-017 execution contract の設計記録 |
+| responsibilities/custom-tool-contracts.md | draft | Custom Tool 操作契約 | Custom Tool の操作契約（入力、出力、保証、失敗時）、ローカル版実装差し替え、迂回防止（REQ-052、DEC-022） |
 
 #### quality/（品質、メトリクス）
 

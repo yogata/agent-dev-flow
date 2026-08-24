@@ -662,6 +662,24 @@ req_save_results:
     - REQ-052-001〜REQ-052-010
     - REQ-011-020, REQ-011-021
 
+design_consumed: true
+
+design_save_results:
+  saved_designs:
+    - {path: docs/designs/workflows/workflow-skill-model.md, operation: update}
+    - {path: docs/designs/responsibilities/artifact-contracts.md, operation: update}
+    - {path: docs/designs/authoring/command-file-format.md, operation: update}
+    - {path: docs/designs/responsibilities/custom-tool-contracts.md, operation: create}
+    - {path: docs/designs/local/runtime-package-boundary.md, operation: append}
+    - {path: docs/designs/integrity/integrity-rule-catalog.md, operation: append}
+  action_results:
+    ACT-DESIGN-001: {status: applied, target: docs/designs/workflows/workflow-skill-model.md, operation: update}
+    ACT-DESIGN-002: {status: applied, target: docs/designs/responsibilities/artifact-contracts.md, operation: update}
+    ACT-DESIGN-003: {status: applied, target: docs/designs/authoring/command-file-format.md, operation: update}
+    ACT-DESIGN-004: {status: applied, target: docs/designs/responsibilities/custom-tool-contracts.md, operation: create}
+    ACT-DESIGN-005: {status: applied, target: docs/designs/local/runtime-package-boundary.md, operation: append}
+    ACT-DESIGN-006: {status: applied, target: docs/designs/integrity/integrity-rule-catalog.md, operation: append}
+
 test_strategy:
   - id: TS-001
     target_item: AG-001
