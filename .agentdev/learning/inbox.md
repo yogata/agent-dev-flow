@@ -374,3 +374,19 @@
 - **想定反映先**: 横断検索系 test strategy の verification 記載指針
 - **関連**: PR #2426 本文「Findings / Capture候補」事実報告（回収元: https://github.com/yogata/agent-dev-flow/pull/2426 ）、docs/designs/integrity/rules/IR-057
 - **タグ**: `#false-positive` `#cross-search` `#identifier-retirement`
+
+## worktree 環境の bun test 依存解決不能は bun install --cwd で worktree ローカル解消できる
+
+- **問題事象**: worktree 環境（.worktrees/2428-feature）で bun test 実行時、agentdev-project-extensions/scripts の zod 依存が解決不能となり5件 fail（4+1、すべて unhandled error）が発生した
+- **発生局面**: 実装（case-run の契約テスト実行、worktree 環境）
+- **検知方法**: bun test の unhandled error fail（事前計測で検出）
+- **根本原因**: worktree は junction を持たず（未伝播）、scripts 配下の node_modules も git 管理対象外のため、worktree 側で依存解決ができない
+- **自律対応内容**: src/opencode/skills/agentdev-project-extensions/scripts で bun install --cwd を実行して worktree ローカルに依存を解消し、テスト全件合格を確認した（node_modules は untracked 0 を確認）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（worktree テスト fallback 契約は agentdev-git-worktree-test-fallback Design が所有）
+- **横展開観点**: worktree 環境で node_modules を必要とするサブパッケージのテストが環境起因 fail する場合の依存解消手段。worktree テスト fallback の判別には「stash 前後でチェッカーを再実行して差分比較」が有効
+- **再発条件**: worktree 環境で node_modules を必要とする scripts 配下のテストを実行する場合
+- **予防策候補**: worktree テスト実行前に bun install --cwd を実行する、または環境起因 fail 時の依存解消手順を fallback 手順へ明記する
+- **想定反映先**: agentdev-git-worktree-test-fallback Design、worktree テスト実行手順
+- **関連**: PR 2432 本文、Issue 2428、Epic 2427 Wave 1
+- **タグ**: #worktree #bun-test #dependencies
