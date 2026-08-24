@@ -151,7 +151,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | Design | status | タイトル | 責務 |
 |------|--------|---------|------|
 | [workflows/workflow-contracts.md](workflows/workflow-contracts.md) | accepted | ワークフロー契約（横断） | パイプライン概要、共通フェーズ、SSoT 遷移、実装分類、case-auto と case-run の委譲モデル、result 4状態契約 |
-| [workflows/workflow-skill-model.md](workflows/workflow-skill-model.md) | draft | Workflow Skill Model | Command / Workflow Skill / Capability Skill の責務、依存方向、1:N分割基準、配置契約。DEC-010 実装詳細 |
+| [workflows/workflow-skill-model.md](workflows/workflow-skill-model.md) | accepted | Workflow Skill Model | Command / Workflow Skill / Capability Skill の責務、依存方向、1:N分割基準、配置契約。DEC-010 実装詳細 |
 | [workflows/step-reference-contract.md](workflows/step-reference-contract.md) | draft | STEP Reference Contract | STEP reference 構造、開始条件、結果、証拠、完了確認、べき等性。DEC-011 実装詳細 |
 | [workflows/input-resolution-and-durable-state.md](workflows/input-resolution-and-durable-state.md) | draft | Input Resolution and Durable State | 入力解決優先順位、永続状態、current STEP 再構成、並列child task 復元。DEC-011 入力解決・永続状態側面 |
 | [workflows/delegation-contracts.md](workflows/delegation-contracts.md) | accepted | サブエージェント委譲契約 | 委譲時最小契約、委譲種別、制約、manager-orchestrator 分離 |
