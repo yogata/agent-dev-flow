@@ -1,6 +1,6 @@
 ---
 title: Custom Tool 操作契約
-status: draft
+status: accepted
 created: 2026-08-24
 updated: 2026-08-24
 ---
