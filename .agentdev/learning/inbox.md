@@ -342,3 +342,35 @@
 - **想定反映先**: agentdev-workflow-req-save 手順、docs/designs/integrity/checker-execution-contracts.md（AG-009(a) で扱う領域）
 - **関連**: PR #2423 本文「Findings / Capture候補」2件目（回収元: https://github.com/yogata/agent-dev-flow/pull/2423 ）、Issue #2419、commit 301cdc90、本 inbox 既存エントリ「REQ 行 append を伴う req-save では AUTOGEN 索引の同 commit 再生成が必要」（PR #2390、commit 340e7304）
 - **タグ**: `#req-save` `#autogen` `#freshness-gate` `#recurrence`
+
+## 委譲メタデータの baseline 数値は参考値であり完了判定は再検索の実測で行う
+
+- **問題事象**: 委譲コンテキストの baseline 記載（経路[A-H] 54 files / 184 matches）と実行時の実測（53 files）に乖離があった。検索パス集合・除外指定の違いによる参考値のずれと推定される
+- **発生局面**: 実装（case-run 委譲、横断検索系 test strategy の実行）
+- **検知方法**: 完了条件の再検索実測と委譲メタデータ baseline 記載の突合
+- **根本原因**: baseline 数値の生成時点と実行時で検索条件（パス集合・除外指定）が一致しておらず、数値だけが引き継がれた
+- **自律対応内容**: 完了判定は再検索の実測（対象 0 件確認）で行い、baseline 数値は参考値として扱った。乖離は事実として PR 本文へ記録した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: baseline 数値を含む委譲メタデータを受け取るすべての場面
+- **再発条件**: 検索条件が異なる前提で baseline 数値だけを引き継ぎ、実測なしに完了判定した場合
+- **予防策候補**: baseline 数値には検索条件（パス集合・除外指定）を併記し、完了判定は必ず再検索の実測で行う
+- **想定反映先**: agentdev-workflow-case-run の委譲メタデータ作成手順、agentdev-backlog-integration の RU 生成
+- **関連**: PR #2426 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2426 ）
+- **タグ**: `#delegation-metadata` `#baseline` `#re-grep`
+
+## 短い識別子の横断検索パターンは既存識別子の部分一致で偽陽性になる（path-a と path-after-domain-split）
+
+- **問題事象**: 実行コードの横断検索（TS-007）で `path-a` パターンが IR-057（obsolete-spec-path-after-domain-split）の `path-after-domain-split` 由来で誤検出された。A〜H 相当の機械的識別子の実行コード使用は検出されなかった
+- **発生局面**: 検証（識別子廃止系 test strategy の横断検索パターン設計と実行）
+- **検知方法**: 検出箇所の実体確認（IR-057 のルール名 `path-after-domain-split` の部分一致と判明）
+- **根本原因**: `path-a` が `path-after-domain-split` の部分文字列として含まれるため、語境界を考慮しない substring 検索では無関係な既存識別子に一致する
+- **自律対応内容**: Issue 完了条件の規定（検出時は事実報告のみ、対象外）に従い修正対象外として報告した。完了条件の検出には旧パス参照（adversarial-review-path-a）に限定した再検索で 0 件を確認した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: 識別子廃止・改名系の横断検索で短い識別子を検索パターンに使うすべての場面
+- **再発条件**: より長い既存識別子（ルール名・パス名等）の部分文字列となる短い識別子を検索パターンに含めた場合
+- **予防策候補**: 横断検索のパターン設計時に部分一致の偽陽性ソース（既存ルール名・パス名）を確認し、必要に応じて語境界を明示したパターンにする
+- **想定反映先**: 横断検索系 test strategy の verification 記載指針
+- **関連**: PR #2426 本文「Findings / Capture候補」事実報告（回収元: https://github.com/yogata/agent-dev-flow/pull/2426 ）、docs/designs/integrity/rules/IR-057
+- **タグ**: `#false-positive` `#cross-search` `#identifier-retirement`
