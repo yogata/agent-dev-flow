@@ -39,9 +39,9 @@ description: クローズ済み GitHub Issue/PR から未回収の変更候補�
 
 硬い境界（破壊的操作・state 破壊等の否定規則）に限定する:
 
-- G01: GitHub Issue の作成は行わない（`case-open` が担当）
-- G04: Issue/PR へのコメント投稿、マーカー付与は行わない（`backlog-review` が担当）
-- G09: GitHub Issue/PR のデータ取得は `gh` CLI のみ使用する（GitHub API 直接呼び出しは不可）
-- G12: 保存先は `.agentdev/intake/inbox/` のみ（他ディレクトリへの保存は禁止）
+- GitHub Issue の作成は行わない（`case-open` が担当）
+- Issue/PR へのコメント投稿、マーカー付与は行わない（`backlog-review` が担当）
+- GitHub Issue/PR のデータ取得は `gh` CLI のみ使用する（GitHub API 直接呼び出しは不可）（`POL-gh-io-delegation`）
+- 保存先は `.agentdev/intake/inbox/` のみ（他ディレクトリへの保存は禁止）
 
 

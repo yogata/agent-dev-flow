@@ -32,13 +32,13 @@ REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて De
 
 ## 副作用
 
-- ファイル作成: `.agentdev/inspect/inbox/inspect-docs-finding-*.md` のみ（G01 例外）
+- ファイル作成: `.agentdev/inspect/inbox/inspect-docs-finding-*.md` のみ（診断専用の例外許可）
 - git commit/push: `.agentdev/inspect/` 配下のみ（commit message: `chore(agentdev): capture inspect-docs finding`）
 - 実行前同期: `git pull --ff-only`
-- 検査対象（docs/, .opencode/）のファイル変更: 禁止（G01）
-- GitHub Issue/PR 作成、更新: 禁止（G02）
-- worktree/ブランチ作成: 禁止（G03）
-- intake/learning/RU 処理: 禁止（G04）
+- 検査対象（docs/, .opencode/）のファイル変更: 禁止
+- GitHub Issue/PR 作成、更新: 禁止
+- worktree/ブランチ作成: 禁止
+- intake/learning/RU 処理: 禁止
 
 ## 現在の動作
 
@@ -86,15 +86,15 @@ agentdev-traceability の coverage, impact, check を一般文書探索、構造
 
 ## 対象外
 
-- ファイル変更、作成、削除（G01、`.agentdev/inspect/inbox/inspect-docs-finding-*.md` 生成は例外）
-- GitHub Issue/PR 作成、更新（G02）
-- worktree/ブランチ作成（G03）
-- intake/learning/RU 処理（G04）
-- source-of-truth priority 違反（G05、現行 REQ > 承認済み Decision > Design > guides）
+- ファイル変更、作成、削除（`.agentdev/inspect/inbox/inspect-docs-finding-*.md` 生成は例外）
+- GitHub Issue/PR 作成、更新
+- worktree/ブランチ作成
+- intake/learning/RU 処理
+- source-of-truth priority 違反（現行 REQ > 承認済み Decision > Design > guides）
 
 ## 検証観点
 
-- source-of-trought priority 遵守（G05）
+- source-of-trought priority 遵守
 - 6観点診断の網羅性: SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT
 - 文書分類一貫性: classification policy 適合確認
 - 検出事項の source-of-truth 判定、推奨 route 明示

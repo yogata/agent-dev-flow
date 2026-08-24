@@ -40,13 +40,13 @@ updated: 2026-08-15
 処理段階（外部から意味のある順序）。
 各段階の詳細手順は Workflow Skill（`agentdev-workflow-case-update`）が正規情報源である。
 
-- Issue番号解決: ユーザー入力またはセッション内会話から取得。`gh issue list` / `gh issue status` 等は禁止（G03）
+- Issue番号解決: ユーザー入力またはセッション内会話から取得。`gh issue list` / `gh issue status` 等は禁止
 - 現在状態取得: Issue 状態を取得し、フェーズ判定（`agentdev-workflow-routing`、`agentdev-workflow-lifecycle`）
 - 更新種別ごとの分岐:
-  - `--body`（Issue 本文更新）。Issue 作成時と同じテンプレート構造を維持（G06）。`--body-file` 使用（G08）、`agentdev-gh-cli` VERIFY（G09）
-  - `--comment`（コメント追加）。テンプレート【必須】セクション確認（G07）、`--body-file` 使用、VERIFY
+  - `--body`（Issue 本文更新）。Issue 作成時と同じテンプレート構造を維持。`--body-file` 使用、`agentdev-gh-cli` VERIFY（`POL-gh-io-delegation`）
+  - `--comment`（コメント追加）。テンプレート【必須】セクション確認、`--body-file` 使用、VERIFY
   - `--req`（REQ ファイル更新（APPEND/UPDATE 対応）、git commit/push）
-  - `--review-ng`（レビュー NG コメント）。**必ず QG-3 の乖離検出結果を引用**（G05）
+  - `--review-ng`（レビュー NG コメント）。**必ず QG-3 の乖離検出結果を引用**
 - 完了報告
 
 ## 所有関係と委譲
@@ -64,25 +64,25 @@ updated: 2026-08-15
 
 ## 対象外
 
-- CI/CD 修正、自律修正ループ（G02、case-run の責務）
-- `gh issue list` / `gh issue status` 等による Issue番号取得（G03）
-- SSoT 整合性の破壊（G04）
-- `--review-ng` 時の QG-3 乖離検出結果引用省略（G05）
-- `--body` 更新時の Issue 作成時テンプレート構造維持省略（G06）
-- コメント / レビュー NG コメント テンプレート【必須】セクション確認省略（G07）
-- `--body` 直接指定（G08、`--body-file` 使用必須）
-- `agentdev-gh-cli` 安全読み取り手順省略（G09）
-- work_type 分岐判定基準、固有ルールの独自保持（G10、`agentdev-workflow-lifecycle` 参照）
+- CI/CD 修正、自律修正ループ（case-run の責務）
+- `gh issue list` / `gh issue status` 等による Issue番号取得
+- SSoT 整合性の破壊
+- `--review-ng` 時の QG-3 乖離検出結果引用省略
+- `--body` 更新時の Issue 作成時テンプレート構造維持省略
+- コメント / レビュー NG コメント テンプレート【必須】セクション確認省略
+- `--body` 直接指定（`--body-file` 使用必須）
+- `agentdev-gh-cli` 安全読み取り手順省略
+- work_type 分岐判定基準、固有ルールの独自保持（`agentdev-workflow-lifecycle` 参照）
 
 ## 検証観点
 
-- フェーズ維持（G01）: 現在のフェーズを変更しない
-- 出力制約（G11）: 成果物本文（Issue 本文、コメント、commit message）は verbatim で返す
+- フェーズ維持: 現在のフェーズを変更しない
+- 出力制約: 成果物本文（Issue 本文、コメント、commit message）は verbatim で返す
 
 ## 停止状態
 
-- Issue番号が解決できない場合（G03 の範囲外の手段は使用せず、エラーとして報告して停止する）。
-- テンプレート必須セクションの欠落を検出した場合（G06、G07。投稿前に停止し補完を求める）。
+- Issue番号が解決できない場合（一覧取得等の範囲外の手段は使用せず、エラーとして報告して停止する）。
+- テンプレート必須セクションの欠落を検出した場合（テンプレート構造維持・【必須】セクション確認の各制約により投稿前に停止し補完を求める）。
 - gh CLI / git 操作の失敗時（`agentdev-gh-cli` のエラー取扱いに従い、自動リトライ範囲を超えたら停止して報告する）。
 
 ## See Also

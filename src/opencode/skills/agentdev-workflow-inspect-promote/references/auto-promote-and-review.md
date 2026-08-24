@@ -46,6 +46,6 @@ adversarial-review は任意助言手段であり、必須工程、QG、承認�
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- G01（ユーザーの明示的な承認なしに採用済み成果物を生成しない。`--auto` による自動 promote 対象を除く）
-- G06（`--auto` は明示 opt-in の場合のみ有効。省略時は自動 promote を一切行わない）
+- ガードレール（ユーザーの明示的な承認なしに採用済み成果物を生成しない。`--auto` による自動 promote 対象を除く、`POL-promoted-artifact-requires-approval`）
+- ガードレール（`--auto` は明示 opt-in の場合のみ有効。省略時は自動 promote を一切行わない）
 - 不変条件（`--auto` 実行の都度、投入対象、根拠を `.agentdev/inspect/promoted/auto-promote-log.md` に記録する。誤検知 revoke 手順は同 Design 参照）

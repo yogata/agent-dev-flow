@@ -138,7 +138,7 @@ Issue 完了条件チェックボックスの全達成、CI 通過、ドキュ�
 
 QG-4 は Issue 本文の完了条件セクションのチェックボックスを品質ゲートとして評価する。
 識別子中心評価（REQ-003-011）を主評価値とし、件数や行数などの実測値は補助値として扱う。
-未達項目は case-run への差し戻し（G08）、または intake への逃がし禁止（G16）として扱う。
+未達項目は case-run への差し戻し、または intake への逃がし禁止として扱う。
 
 verify-only PR（実装差分0件、検証のみ）の場合、QG-4 の完了条件評価は PR 本文の verify-only 根拠欄（実装差分を含まない理由、根拠成果物または commit、検証対象、検証結果）を証拠ソースとして認める。
 verify-only PR は実装差分を含まないため、根拠欄の記載で完了条件を評価する。
@@ -199,7 +199,7 @@ verify-only 根拠欄の記入規則は [case-run.md](../commands/case-run.md)�
 
 ### case-auto の継承
 
-case-auto は構成コマンド（req-save / case-open / case-run / case-close）から QG を継承し、工程間制御のみを担う（case-auto G07, G09）。
+case-auto は構成コマンド（req-save / case-open / case-run / case-close）から QG を継承し、工程間制御のみを担う（委譲起動・構成コマンド責務変更の各禁止制約）。
 
 ## 関連項目（See Also）
 

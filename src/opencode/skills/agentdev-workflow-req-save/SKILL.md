@@ -24,9 +24,9 @@ req-save command は公開 interface（入出力契約・ガードレール）�
 
 ## 副作用
 
-- docs/ 配下のファイル作成・更新（G02 許可パスのみ）、ドラフト status 更新
+- docs/ 配下のファイル作成・更新（req-save command の許可パスのみ）、ドラフト status 更新
 - main ブランチへの commit・push（明示パスステージ、`agentdev-git-worktree` プロシージャ準拠）
-- Issue は作成しない（G11、case-open の責任範囲）
+- Issue は作成しない（case-open の責任範囲）
 
 ## Control Plane（STEP 一覧）
 

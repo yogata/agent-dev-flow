@@ -31,9 +31,9 @@ updated: 2026-08-15
 
 - git commit/push: `.agentdev/intake/` 配下のみ（commit message: `chore: capture intake items from github`）
 - 実行前同期: `git pull --ff-only`
-- GitHub API 読み取り: gh CLI のみ使用（G09、GitHub API 直接呼出禁止）
-- GitHub Issue 作成: 行わない（G01）
-- Issue/PR コメント投稿、マーカー付与: 行わない（G04）
+- GitHub API 読み取り: gh CLI のみ使用（GitHub API 直接呼出禁止）
+- GitHub Issue 作成: 行わない（case-open 責務）
+- Issue/PR コメント投稿、マーカー付与: 行わない（case-update 責務）
 
 ## 現在の動作
 
@@ -41,7 +41,7 @@ updated: 2026-08-15
 各段階の詳細手順は Workflow Skill（`agentdev-workflow-intake-from-github`）が正規情報源である（capture-only 型、REQ-027-003 により STEP model 対象外）。
 
 - 期間解釈（`agentdev-intake-pipeline`）
-- データ取得（`agentdev-intake-pipeline`）（クローズ済み Issue/PR のみ対象（G10））
+- データ取得（`agentdev-intake-pipeline`）（クローズ済み Issue/PR のみ対象）
 - 構造的検出（`agentdev-intake-pipeline`）
 - LLM 全文解析（`agentdev-intake-pipeline`）
 - intake item 生成（`agentdev-intake-pipeline`）
@@ -65,20 +65,20 @@ updated: 2026-08-15
 
 ## 対象外
 
-- GitHub Issue 作成（G01）
-- 採用可否判断（G02）
-- review、整形、分類判断（G03）
-- Issue/PR コメント投稿、マーカー付与（G04）
-- frontmatter、状態値、重複排除キーの必須化（G06）
-- workflow 管理成果物の扱い（G05）
-- 特定セクションの必須扱い（G07）
-- GitHub API 直接呼出（G09、gh CLI のみ使用）
-- オープン状態の Issue/PR の対象化（G10、クローズ済みのみ）
-- `.agentdev/intake/inbox/` 以外への保存（G12）
+- GitHub Issue 作成
+- 採用可否判断
+- review、整形、分類判断
+- Issue/PR コメント投稿、マーカー付与
+- frontmatter、状態値、重複排除キーの必須化
+- workflow 管理成果物の扱い
+- 特定セクションの必須扱い
+- GitHub API 直接呼出（gh CLI のみ使用）
+- オープン状態の Issue/PR の対象化（クローズ済みのみ）
+- `.agentdev/intake/inbox/` 以外への保存
 
 ## 検証観点
 
-- 出力制約（G13）: 成果物本文 verbatim、判定結果、調査過程は圧縮
+- 出力制約: 成果物本文 verbatim、判定結果、調査過程は圧縮
 - 抽出ロジック精度: `agentdev-intake-pipeline` 参照
 
 ## 停止状態

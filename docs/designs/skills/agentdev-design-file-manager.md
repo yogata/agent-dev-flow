@@ -79,8 +79,8 @@ Design operation の公式 enum は `create` / `append` / `update` の3値であ
 
 - `design-save` は `target_area` 指定時、当該 skill の配置先解決、target_area マッチング規則を適用してセクション置換を行う
 - `design-save` は `operation: append` 指定時、当該 skill の配置先解決、anchor と placement に基づく新規セクション追加を行う（REQ-008-058）
-- 新規 Design 作成時は frontmatter `status: draft` を必ず付与する（G05）
-- 既存 Design 変更時（`append` / `update`）は当該 Design の `status` を変更しない（G06、v2:ADR-0123 Decision #1）
+- 新規 Design 作成時は frontmatter `status: draft` を必ず付与する
+- 既存 Design 変更時（`append` / `update`）は当該 Design の `status` を変更しない（v2:ADR-0123 Decision #1）
 - Design 固有 script は `search-target-area.ts`（target_area 見出し検索、見出し行全体完全一致）を正規所有対象とする。`update` の target_area マッチングと `append` の anchor マッチングの双方で使用する
 - 共通検証 script（`check-frontmatter-consistency.ts`、`check-entry-existence.ts`、`check-change-impact.ts`）は `agentdev-artifact-validation` が所有し、本 skill は公開検証契約経由で委譲する
 
@@ -106,7 +106,7 @@ docs 横断診断、証拠構造、finding 出力契約は `agentdev-doc-diagnos
 ## 検証観点
 
 - 新規 Design 作成時の frontmatter 完全性（`title`、`status: draft`、`created`、`updated`）
-- 既存 Design 変更時（`append` / `update`）の `status` 変更がないこと（G06）
+- 既存 Design 変更時（`append` / `update`）の `status` 変更がないこと
 - target_area マッチング規則の適用結果（単一マッチ、複数マッチ時の warn、未検出時のスキップ + follow-up）
 - `append` 操作時の anchor マッチング、placement 別挙動の適用結果、挿入後の Markdown 構造破損がないこと
 - 共通検証委譲の結果（`agentdev-artifact-validation` 公開検証契約経由）

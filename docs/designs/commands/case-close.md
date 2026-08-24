@@ -94,7 +94,7 @@ worktree を削除する前に、未追跡ファイルだけを対象とする c
 ### Epic Issue 完了条件チェックボックス最終評価・更新
 
 Epic status table 更新の後、最終 Wave 判定の前に実施する。
-Epic Issue 本文の `## 完了条件` セクションを読み込み、全完了条件を QG-4 に従い評価・更新する（REQ-011 完了条件チェックボックス評価の case-close 専任責務、G08 Epic Wave 経路への明示適用）。
+Epic Issue 本文の `## 完了条件` セクションを読み込み、全完了条件を QG-4 に従い評価・更新する（REQ-011 完了条件チェックボックス評価の case-close 専任責務、Epic Wave 経路への明示適用、`POL-completion-checkbox-single-writer`）。
 
 #### 評価対象スコープ（QG-4 観点8）
 
@@ -111,7 +111,7 @@ Epic Issue 本文の `## 完了条件` セクションを読み込み、全完�
 
 #### 未達項目残存時の停止
 
-最終 Wave で実装完了していない完了条件（`- [ ]`）が残る場合、case-close は構造化エラーで停止する（G08 Epic Wave 経路への明示適用）。
+最終 Wave で実装完了していない完了条件（`- [ ]`）が残る場合、case-close は構造化エラーで停止する（未達項目残存時停止の Epic Wave 経路への明示適用）。
 中間 Wave で他 Wave の完了条件が `[ ]` のまま残ることは停止条件ではない（対象外 Wave の完了条件は評価対象外のため）。
 
 停止時の出力には以下を含める:
@@ -139,7 +139,7 @@ Epic Issue 本文の `## 完了条件` セクションを読み込み、全完�
 - 親Epic Issue更新（`agentdev-epic-tracker`、Epic 自動クローズ判定）
 - 実行前同期（`git pull --ff-only`、hash 検証）
   - git main 同期リスク事前検出、代替同期手順選択（REQ-006-029）（`git pull --ff-only` 直前に worktree 状態（dirty tree）・並列実行による ref lock 競合・非 main ブランチ占有の3リスクを事前検出。検出時に安全な代替同期手順（直列化待機、`git fetch origin main:main` による非チェックアウト同期）を選択。`agentdev-git-worktree` の git main 同期リスク事前検出プロシージャ参照）
-- 学びの検知、抽出（`agentdev-learning-capture`、ユーザーに学び有無を問わない（G13）、Capture 回収（PR 本文から intake/learning を分離））
+- 学びの検知、抽出（`agentdev-learning-capture`、ユーザーに学び有無を問わない（エージェント自律）、Capture 回収（PR 本文から intake/learning を分離））
 - ドメイン状態永続化（`.agentdev/` 配下を commit/push（learning と intake を同一 commit））
 - 完了報告（結果状態の分離報告（GitHub側、`.agentdev`、ブランチ削除））
 
@@ -287,21 +287,21 @@ Issue 最終コメントを最終評価結果の正規記録とする（REQ-043-
 
 ## 対象外
 
-- 未マージPRのクローズ（G01）
-- `gh issue list` / `gh issue status` 等による Issue番号解決（G03、ユーザー入力またはセッション内会話からのみ）
-- Epic 自動クローズ判定での全子Issue CLOSED 以外のクローズ（G04）
-- ブランチ、worktree 削除失敗時の継続（G05、警告表示して停止）
-- `git pull --ff-only` 省略、pull 前 hash 検証省略（G06）
-- CI 失敗時のマージ続行（G07、case-run へ差し戻し）
-- 未達チェックボックス残存時の完了扱い（G08、構造化エラー停止）
-- 機能追加で docs/ 更新がない場合の完了続行（G09、警告表示して停止確認）
-- 学び有無のユーザー確認（G13、エージェント自律）
-- intake と learning の混合単一成果物（G15）
-- 今回の完了条件未対応事項の intake への逃がし（G16）
-- 共有作業ツリーでの `git checkout .`（G17、v2:REQ-0137-001、他セッション変更の無差別破壊）
-- 完了条件チェックボックス評価の他コマンド委譲（G20、case-close 専任責務）
-- Design status 昇格の他コマンド委譲（G22、case-close 責務、design-save は accepted を付与しない）
-- Epic Issue 本文ステータス追跡テーブルの他コマンド書き込み（G24、case-close 単一書き手）
+- 未マージPRのクローズ
+- `gh issue list` / `gh issue status` 等による Issue番号解決（ユーザー入力またはセッション内会話からのみ）
+- Epic 自動クローズ判定での全子Issue CLOSED 以外のクローズ
+- ブランチ、worktree 削除失敗時の継続（警告表示して停止）
+- `git pull --ff-only` 省略、pull 前 hash 検証省略
+- CI 失敗時のマージ続行（case-run へ差し戻し）
+- 未達チェックボックス残存時の完了扱い（構造化エラー停止）
+- 機能追加で docs/ 更新がない場合の完了続行（警告表示して停止確認）
+- 学び有無のユーザー確認（エージェント自律）
+- intake と learning の混合単一成果物
+- 今回の完了条件未対応事項の intake への逃がし
+- 共有作業ツリーでの `git checkout .`（v2:REQ-0137-001、他セッション変更の無差別破壊）
+- 完了条件チェックボックス評価の他コマンド委譲（case-close 専任責務、`POL-completion-checkbox-single-writer`）
+- Design status 昇格の他コマンド委譲（case-close 責務、design-save は accepted を付与しない）
+- Epic Issue 本文ステータス追跡テーブルの他コマンド書き込み（case-close 単一書き手、`POL-epic-tracking-single-writer`）
 
 ## 検証観点
 
@@ -310,8 +310,8 @@ Issue 最終コメントを最終評価結果の正規記録とする（REQ-043-
 - Squash merge リトライ: 最大5回（5秒待機付き）
 - mergeable UNKNOWN ポーリング（REQ-006-028）: squash merge 前に `gh pr view --json mergeable,mergeStateStatus` で事前確認、UNKNOWN 時は最大60秒（10秒間隔）でポーリング、上限超過時はマージ中止・構造化エラー停止
 - git main 同期リスク事前検出（REQ-006-029）: `git pull --ff-only` 直前に worktree 状態・並列実行 ref lock 競合・非 main ブランチ占有の3リスクを事前検出、検出時に安全な代替同期手順（直列化待機、`git fetch origin main:main`）を選択
-- 出力制約: 成果物本文（PR本文、commit message）は verbatim で返す（G10/G18、別途成果物パス、根拠、親判断事項は圧縮）
-- 結果状態分離報告: GitHub側、`.agentdev` 永続化、ブランチ削除状態を独立して報告（G19）
+- 出力制約: 成果物本文（PR本文、commit message）は verbatim で返す（別途成果物パス、根拠、親判断事項は圧縮）
+- 結果状態分離報告: GitHub側、`.agentdev` 永続化、ブランチ削除状態を独立して報告
 
 ## 停止状態
 

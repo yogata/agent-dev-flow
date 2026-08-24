@@ -74,7 +74,7 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
 - git commit/push: `.agentdev/learning/` 配下のみ（明示パスステージング、v2:REQ-0137-002/005）
 - 実行前同期: `git pull --ff-only`
 - 昇華時 prune: 自動実行（REQ-003-006、staged/rejected/duplicate のみ。deferred/未処理は非対象 REQ-003-007）
-- `.opencode/` 直接反映: 禁止（G01）
+- `.opencode/` 直接反映: 禁止
 
 ## 現在の動作
 
@@ -88,9 +88,9 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
   - 8軸評価
   - evaluation-report 生成
   - 廃棄判定（11カテゴリ + duplicate）+ 昇華可能性評価（v2:REQ-0155-005）。無条件の自動REQ化を禁止し、昇華不能な知見は `deferred.md` の living pool で維持する
-  - 既存対策確認（G05: 既存対策優先、新規 X 化より既存 X へ反映）
+  - 既存対策確認（既存対策優先、新規 X 化より既存 X へ反映）
   - 結果提示
-  - ユーザー承認（G06: 判定、prune にユーザー承認必須）
+  - ユーザー承認（判定、prune にユーザー承認必須）
 - フェーズ6 実行 git 操作:
   - git pull
   - 採用済み成果物生成
@@ -133,20 +133,20 @@ deferred・未処理項目を自動削除しない既存の安全境界は維持
 
 ## 対象外
 
-- `.opencode/` 直接反映（G01）
-- case-run への直接受け渡し（G03、backlog-review 経由のみ）
-- raw learning item の再分類（G04）
-- 管理用ファイル（elevation-ledger.md 等）の生成（G07）
+- `.opencode/` 直接反映
+- case-run への直接受け渡し（backlog-review 経由のみ）
+- raw learning item の再分類
+- 管理用ファイル（elevation-ledger.md 等）の生成
 
 ## 検証観点
 
-- evaluation-report.md は本コマンドが生成、管理（G02）
-- 既存対策優先（G05）: 新規 X 化より既存 X へ反映
-- ユーザー承認必須（G06）: 判定、prune
+- evaluation-report.md は本コマンドが生成、管理
+- 既存対策優先: 新規 X 化より既存 X へ反映
+- ユーザー承認必須: 判定、prune
 
 ## 停止状態
 
-- ユーザー承認（判定、prune）を得るまで実行フェーズへ進まない（G06）。
+- ユーザー承認（判定、prune）を得るまで実行フェーズへ進まない。
 - adversarial-review 審議で unresolved な本質的争点が残る場合（ユーザー承認、deferred 移動、prune 等の不可逆処理へ進まず停止する、REQ-014-009）。
 - 実行前同期（`git pull --ff-only`）失敗時、push 失敗時（エラーを報告して停止する）。
 

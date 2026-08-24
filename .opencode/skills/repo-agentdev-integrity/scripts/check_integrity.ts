@@ -4,7 +4,7 @@
 // ADF-COVERS(verification): REQ-006-105, REQ-006-106, REQ-006-107, REQ-006-109, REQ-006-111
 // ADF-COVERS(verification): REQ-008-050
 // ADF-COVERS(verification): REQ-009-018, REQ-009-019, REQ-009-020
-// ADF-COVERS(implementation): REQ-010-002, REQ-010-003, REQ-010-005, REQ-010-006, REQ-010-007, REQ-010-063
+// ADF-COVERS(implementation): REQ-010-002, REQ-010-003, REQ-010-005, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-064, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008
 // ADF-COVERS(verification): REQ-010-009
 // ADF-COVERS(verification): REQ-011-002, REQ-011-008, REQ-011-014
 // ADF-COVERS(verification): REQ-031-011, REQ-031-012, REQ-031-014
@@ -4908,7 +4908,7 @@ function checkSkillCategoryGap(
     ["Runtime reference", ["RuntimeUnresolvedReference"]],
     ["Distribution untracked skill", ["DistributionUntrackedSkillReference"]],
     ["Skill rename 対称性", ["SkillRenameSymmetry"]],
-    ["Guardrail number invariant", ["GuardrailNumberInvariant"]],
+    ["Common policy identifier invariant", ["CommonPolicyIdentifierInvariant"]],
     ["Unresolved placeholder", ["UnresolvedPlaceholder"]],
     ["Obsolete vocabulary & legacy path", ["ObsoleteVocabulary"]],
     ["引用 REQ 行実在性", ["ReferencedReqRowExistence"]],
@@ -8190,7 +8190,7 @@ function checkObsoleteSpecPath(root: string): CheckResult[] {
 // 囲まれた領域が、IR-* ファイルから再生成した期待値と一致することを検証する。
 // severity: strict（再現可能な機械的パターンマッチング）。
 // 生成スクリプト（generate_indexes.ts）と共通の抽出・生成ロジックを再利用し、
-// 検査と生成の論理的同一性を保証する（AG-002 docs-check G01 分離原則維持）。
+// 検査と生成の論理的同一性を保証する（AG-002 docs-check の検査対象不変原則の維持）。
 
 function checkIndexGenerationConsistency(root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -8872,28 +8872,34 @@ function checkSkillSeeAlsoReference(skillsDir: string, root: string): CheckResul
 // （NORMALIZATION-REQ-046）後の状態を機械検査で固定する新規検査クラス群。
 // 検出シグナル・許容条件の詳細は docs/designs/integrity/rules/IR-063..066 が所有する。
 
-// IR-063 (REQ-010-064): 公開 command のガードレール番号 (Gxx) 不変条件。
-// 定義行様式は `- Gxx: ...`（Wave 1 監査観点V6 と同一抽出パターン）。
-const GUARDRAIL_DEF_LINE_RE = /^[-*]\s+(?:\*\*)?`?G(\d{2})`?(?:\*\*)?\s*[:：]/;
-const GUARDRAIL_REF_RE = /\bG(\d{2})\b/g;
+// IR-063 (REQ-051-005, REQ-010-064): ガードレール識別体系検査。
+// Gxx 連番検査（開始番号・欠番・重複・未定義参照）は廃止済み（REQ-051、DEC-022 決定7）。
+// 共通ポリシー意味識別子（POL-）の未定義参照・重複定義と、廃止済み Gxx 表記の
+// 配布物残存を検出する。検出シグナルの詳細は docs/designs/integrity/rules/IR-063 が所有する。
 
-function collectPublicCommandMarkdown(root: string): string[] {
-  const cmdDir = path.join(root, "src", "opencode", "commands", "agentdev");
-  if (!fs.existsSync(cmdDir)) return [];
-  // 直下の .md のみ（templates/ サブディレクトリと README.md は対象外）
-  return listFiles(cmdDir)
-    .filter((f) => f !== "README.md")
-    .map((f) => path.join(cmdDir, f));
-}
+// 共通ポリシー意味識別子 registry（定義の実体）。
+const POLICY_REGISTRY_REL_PATH =
+  "src/opencode/skills/agentdev-command-authoring/references/common-policy-identifiers.md";
+// registry 定義行様式: `- **POL-xxx**: 説明`
+const POLICY_DEF_LINE_RE = /^[-*]\s+\*\*(POL-[a-z0-9]+(?:-[a-z0-9]+)*)\*\*/;
+// 本文参照（コードスパン表記を含む POL- トークン全体）
+const POLICY_REF_RE = /\bPOL-[a-z0-9]+(?:-[a-z0-9]+)*\b/g;
+// 廃止済み Gxx 表記（G + ゼロ埋め2桁。AG-005 等の別名前空間には一致しない）
+const RESIDUAL_GXX_RE = /\bG\d{2}\b/g;
+// 検査対象の配布物ルート（command（templates/ 含む）、skill、template を含む .md 全体）
+const IR063_DISTRIBUTION_DIRS = [
+  "src/opencode/commands/agentdev",
+  "src/opencode/skills",
+] as const;
 
-function guardrailNg(
+function policyNg(
   relPath: string,
-  line: number,
+  line: number | undefined,
   message: string,
   evidence: string,
   expected: string,
 ): CheckResult {
-  return ng("GuardrailNumber", "guardrail-number-invariant", message, relPath, line, {
+  return ng("CommonPolicyIdentifier", "common-policy-identifier-invariant", message, relPath, line, {
     evidence,
     expected,
     route: "intake",
@@ -8902,111 +8908,133 @@ function guardrailNg(
   });
 }
 
-function checkGuardrailNumberInvariant(root: string): CheckResult[] {
+function checkCommonPolicyIdentifierInvariant(root: string): CheckResult[] {
   const results: CheckResult[] = [];
-  const files = collectPublicCommandMarkdown(root);
-  let violationCount = 0;
-  for (const fullPath of files) {
-    const relPath = resolveRelative(fullPath, root);
-    const content = readText(fullPath);
-    if (!content) continue;
-    const lines = content.split("\n");
+  const registryPath = path.join(root, ...POLICY_REGISTRY_REL_PATH.split("/"));
+  const registryContent = readText(registryPath);
 
-    // 定義抽出（出現順。重複検出のため同一番号の行リストを保持）
-    const defLineIdx = new Map<string, number[]>();
-    const defOrder: string[] = [];
-    lines.forEach((line, idx) => {
-      const m = line.match(GUARDRAIL_DEF_LINE_RE);
-      if (!m) return;
-      const num = m[1];
-      if (!defLineIdx.has(num)) defOrder.push(num);
-      const arr = defLineIdx.get(num) ?? [];
-      arr.push(idx);
-      defLineIdx.set(num, arr);
-    });
-    // Gxx 定義を持たない command は検査対象外（ガードレール定義は必須でない）
-    if (defOrder.length === 0) continue;
-
-    // 1. 開始番号（G01 起点）
-    const first = defOrder[0];
-    if (first !== "01") {
-      violationCount++;
+  // 0. registry 実在（定義の実体が失われた場合は検査不能として検出する）。
+  // registry 所有 skill（agentdev-command-authoring）を含まない配布ツリー
+  // （最小 fixture 等）は本検査の適用対象外とする。
+  if (registryContent === null) {
+    const registryOwnerSkillDir = path.join(
+      root,
+      "src",
+      "opencode",
+      "skills",
+      "agentdev-command-authoring",
+    );
+    if (fs.existsSync(registryOwnerSkillDir)) {
       results.push(
-        guardrailNg(
-          relPath,
-          (defLineIdx.get(first)?.[0] ?? 0) + 1,
-          `Guardrail numbers must start at G01: first defined guardrail is G${first} (REQ-010-064, IR-063)`,
-          `start-number:G${first}`,
-          "first guardrail definition is G01",
+        policyNg(
+          POLICY_REGISTRY_REL_PATH,
+          undefined,
+          `Common policy identifier registry missing: ${POLICY_REGISTRY_REL_PATH} not found (REQ-051-005, IR-063)`,
+          "registry-missing",
+          "registry file exists at src/opencode/skills/agentdev-command-authoring/references/",
         ),
       );
     }
+    return results;
+  }
 
-    // 2. 欠番（定義番号は連番であること）
-    const nums = defOrder.map((n) => parseInt(n, 10));
-    for (let i = 1; i < nums.length; i++) {
-      if (nums[i] === nums[i - 1] + 1) continue;
-      const prev = String(nums[i - 1]).padStart(2, "0");
-      const next = String(nums[i]).padStart(2, "0");
-      for (let g = nums[i - 1] + 1; g < nums[i]; g++) {
-        const gStr = String(g).padStart(2, "0");
+  // 1. 重複定義（registry 内の同一識別子定義は 1 回のみ）
+  const defined = new Set<string>();
+  registryContent.split("\n").forEach((line, idx) => {
+    const m = line.match(POLICY_DEF_LINE_RE);
+    if (!m) return;
+    const id = m[1];
+    if (defined.has(id)) {
+      results.push(
+        policyNg(
+          POLICY_REGISTRY_REL_PATH,
+          idx + 1,
+          `Duplicate common policy identifier definition: ${id} is defined more than once (REQ-051-005, IR-063)`,
+          `duplicate-definition:${id}`,
+          `${id} is defined exactly once in the registry`,
+        ),
+      );
+      return;
+    }
+    defined.add(id);
+  });
+
+  // 2. 配布物走査: registry 外定義・未定義参照・廃止済み Gxx 表記残存
+  const targets: string[] = [];
+  const cmdDir = path.join(root, ...IR063_DISTRIBUTION_DIRS[0].split("/"));
+  if (fs.existsSync(cmdDir)) walkMarkdown(cmdDir, targets);
+  const skillRoot = path.join(root, ...IR063_DISTRIBUTION_DIRS[1].split("/"));
+  if (fs.existsSync(skillRoot)) targets.push(...collectAgentdevSkillMarkdown(skillRoot));
+
+  let violationCount = results.length; // registry 重複定義を違反数に含める
+  for (const fullPath of targets) {
+    const relPath = resolveRelative(fullPath, root);
+    // registry 自身は定義の実体であるため参照検査の対象外（様式例示 `POL-xxx` を含む）
+    if (relPath === POLICY_REGISTRY_REL_PATH) continue;
+    const content = readText(fullPath);
+    if (!content) continue;
+    content.split("\n").forEach((line, idx) => {
+      // 2a. registry 外での定義形式の出現
+      const defMatch = line.match(POLICY_DEF_LINE_RE);
+      if (defMatch) {
         violationCount++;
         results.push(
-          guardrailNg(
+          policyNg(
             relPath,
-            (defLineIdx.get(next)?.[0] ?? 0) + 1,
-            `Guardrail number gap detected: G${gStr} is missing between G${prev} and G${next} (REQ-010-064, IR-063)`,
-            `gap:G${gStr}`,
-            `guardrail numbers are sequential (G${prev} directly followed by G${next} leaves G${gStr} unused)`,
+            idx + 1,
+            `Common policy identifier defined outside the registry: ${defMatch[1]} must be defined only in the registry (REQ-051-005, IR-063)`,
+            `definition-outside-registry:${defMatch[1]}`,
+            `${defMatch[1]} is defined in common-policy-identifiers.md only`,
           ),
         );
       }
-    }
-
-    // 3. 重複（同一番号の定義は 1 回のみ）
-    for (const [num, idxs] of defLineIdx) {
-      if (idxs.length <= 1) continue;
-      violationCount++;
-      results.push(
-        guardrailNg(
-          relPath,
-          idxs[1] + 1,
-          `Duplicate guardrail number definition: G${num} is defined ${idxs.length} times (REQ-010-064, IR-063)`,
-          `duplicate:G${num}`,
-          `G${num} is defined exactly once`,
-        ),
-      );
-    }
-
-    // 4. 未定義参照（本文中の Gxx は同一ファイルの定義へ解決されること）
-    lines.forEach((line, idx) => {
-      if (GUARDRAIL_DEF_LINE_RE.test(line)) return;
-      GUARDRAIL_REF_RE.lastIndex = 0;
-      let m2: RegExpExecArray | null;
-      const reported = new Set<string>();
-      while ((m2 = GUARDRAIL_REF_RE.exec(line)) !== null) {
-        if (defLineIdx.has(m2[1])) continue;
-        if (reported.has(m2[1])) continue;
-        reported.add(m2[1]);
+      // 2b. 未定義参照（registry に定義のない識別子の参照）
+      POLICY_REF_RE.lastIndex = 0;
+      const reportedIds = new Set<string>();
+      let refMatch: RegExpExecArray | null;
+      while ((refMatch = POLICY_REF_RE.exec(line)) !== null) {
+        const id = refMatch[0];
+        if (defined.has(id) || reportedIds.has(id)) continue;
+        reportedIds.add(id);
         violationCount++;
         results.push(
-          guardrailNg(
+          policyNg(
             relPath,
             idx + 1,
-            `Body references undefined guardrail number G${m2[1]}: no matching definition in this command (REQ-010-064, IR-063)`,
-            `undefined-reference:G${m2[1]}`,
-            `G${m2[1]} is defined in the same command file`,
+            `Undefined common policy identifier reference: ${id} is not defined in the registry (REQ-051-005, IR-063)`,
+            `undefined-reference:${id}`,
+            `${id} is defined in common-policy-identifiers.md`,
+          ),
+        );
+      }
+      // 2c. 廃止済み Gxx 表記の残存
+      RESIDUAL_GXX_RE.lastIndex = 0;
+      const reportedGxx = new Set<string>();
+      let gxxMatch: RegExpExecArray | null;
+      while ((gxxMatch = RESIDUAL_GXX_RE.exec(line)) !== null) {
+        const id = gxxMatch[0];
+        if (reportedGxx.has(id)) continue;
+        reportedGxx.add(id);
+        violationCount++;
+        results.push(
+          policyNg(
+            relPath,
+            idx + 1,
+            `Residual abolished guardrail number: ${id} remains in distribution (Gxx numbering was abolished, REQ-051-005, IR-063)`,
+            `residual-gxx:${id}`,
+            "guardrail descriptions use plain text or common policy identifiers (POL-)",
           ),
         );
       }
     });
   }
+
   if (violationCount === 0) {
     results.push(
       ok(
-        "GuardrailNumber",
-        "guardrail-number-invariant",
-        `IR-063 guardrail-number-invariant: ${files.length} public commands scanned, 0 violations (REQ-010-064)`,
+        "CommonPolicyIdentifier",
+        "common-policy-identifier-invariant",
+        `IR-063 common-policy-identifier-invariant: ${targets.length} distribution files scanned, ${defined.size} policy identifiers registered, 0 violations (REQ-051-005)`,
       ),
     );
   }
@@ -10087,7 +10115,7 @@ async function main(): Promise<void> {
     ...checkRuntimeUnresolvedReference(root), // IR-055 (v2:REQ-0108-263/264)
     ...checkObsoleteSpecPath(root), // IR-057 (v2:REQ-0158-002)
     ...checkIndexGenerationConsistency(root), // IR-061 (SC-002 Phase C, 索引類自動生成整合性)
-    ...checkGuardrailNumberInvariant(root), // IR-063 (REQ-010-064, Issue #2372)
+    ...checkCommonPolicyIdentifierInvariant(root), // IR-063 (REQ-051-005, REQ-010-064, Issue #2429)
     ...checkUnresolvedPlaceholder(root), // IR-064 (REQ-010-065, Issue #2372)
     ...checkObsoleteVocabulary(root), // IR-065/IR-066 (REQ-010-066/067, Issue #2372)
     ...checkReferencedReqRowExistence(root), // IR-067 (REQ-010-069, Issue #2383 (a))

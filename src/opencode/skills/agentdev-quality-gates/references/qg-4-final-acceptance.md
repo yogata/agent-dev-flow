@@ -16,7 +16,7 @@ case-close で PR マージ前に、最終受け入れ状態を確認する Gate
 
 Issue 本文の `完了条件` セクションの全チェックボックスが `[x]`（達成）になっているか。
 
-- **fail**: 未達チェックボックス（`- [ ]`）が残る。構造化エラーで停止（case-close G08）。
+- **fail**: 未達チェックボックス（`- [ ]`）が残る。構造化エラーで停止（case-close の完了条件評価専任責務、`POL-completion-checkbox-single-writer`）。
 - **pass**: 全チェックボックスが `[x]`。
 
 #### 達成判定
@@ -26,7 +26,7 @@ unchecked 項目を達成判定する。
 
 #### 未達項目の取り扱い
 
-- 達成不可項目 → case-run への差し戻し（case-close G08）。
+- 達成不可項目 → case-run への差し戻し（case-close の完了条件評価専任責務）。
 - 今回の完了条件に含まれる未対応事項を intake に逃がして完了扱いにしない（case-close 不変条件）。
 - スコープ外項目は `> ℹ️ 別途確認: {項目名}` 形式に変換（case-run STEP-S5 の責務）。
 
@@ -76,7 +76,7 @@ PR の CI が全て通過しているか。
 Issue 本文のテスト戦略セクションに含まれる全 test strategy 項目（verification / pass_criteria / on_failure の3要素構造）が処理済みであることを確認する。
 各項目は「合格」（pass_criteria を満たす）または PR 本文の `## Findings / Capture候補` セクションへの Findings 記録（record-in-findings）のいずれかに分類されていること。
 
-- **fail**: 未処理の test strategy 項目が残る。構造化エラーで停止（case-close G08）。未処理項目が残る場合は完了扱いとしない。
+- **fail**: 未処理の test strategy 項目が残る。構造化エラーで停止（case-close の完了条件評価専任責務）。未処理項目が残る場合は完了扱いとしない。
 - **pass**: 全項目が合格または Findings 記録済み。
 - **N/A**: Issue 本文にテスト戦略セクションが存在しない場合（旧形式 Issue 等）。本観点は skip する。
 
@@ -257,7 +257,7 @@ case-close STEP-2 での完了条件チェックボックス評価:
 3. 各 unchecked 項目を達成判定（証拠ソース: コミット、PR、CI 結果）
 4. 達成判定した項目を `[x]` に更新（Issue 本文更新手続き、`agentdev-gh-cli`）
 5. **事後確認**: 更新後に Issue 本文を再読込し、全 `- [ ]` が `[x]` に反映されたことを確認。未反映の場合は再更新（最大 2 回）
-6. 未達項目が残る場合 → 構造化エラーで停止（G08）
+6. 未達項目が残る場合 → 構造化エラーで停止（完了条件評価専任責務）
 
 ### 責務帰属
 

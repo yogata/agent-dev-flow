@@ -231,8 +231,8 @@ GitHub 完了後に `.agentdev` push 失敗の場合は standard 種別を使用
 - 不変条件（学びの検知はエージェント自律、ユーザーに問わない）
 - 不変条件（intake と learning を混合した単一成果物にしない、learning と intake を同一 commit に含める、今回の完了条件に含まれる未対応事項を intake に逃がして完了扱いにしない）
 - 不変条件（実証全体の最終 case-close は新しい評価を始めず評価契約と蓄積済み証拠から最終評価結果を導出し Issue 最終コメントへ正規記録する、実証Caseの最終 case-close の完了報告は正式化経路 req-define <実証Issue> を案内し後続 req-define を自動実行しない）
-- G17（STEP-6-5 の commit は並列実行安全ステージングプロシージャに従い、明示パスでステージ、`git add` は `.agentdev/` 全体の一括スコープにしない）
+- ガードレール（STEP-6-5 の commit は並列実行安全ステージングプロシージャに従い、明示パスでステージ、`git add` は `.agentdev/` 全体の一括スコープにしない）
 - 不変条件（STEP-6-6 は当該実行で `.agentdev/tmp/` に作成した一時ファイルの残存なしを確認、残存時は cleanup 規定に従い処理して報告）
 - 不変条件（STEP-6-7 は結果状態を分離して報告、`.agentdev` push 失敗時は完了扱いにしない）
-- G21・不変条件（case-close の capture 責務は「回収・保存」、Design status 昇格は case-close の責務、Design 確定候補の処理は `## Design確定候補` を入力とし `## Findings / Capture候補` とは区別）
-- G27・不変条件（`git pull --ff-only` 実行前に worktree 状態・ref lock 競合・統合先以外のブランチ占有の3リスクを事前検出し代替同期手順を選択、同期対象は当該 Case の統合先ブランチ）
+- ガードレール・不変条件（case-close の capture 責務は「回収・保存」、Design status 昇格は case-close の責務、Design 確定候補の処理は `## Design確定候補` を入力とし `## Findings / Capture候補` とは区別）
+- ガードレール（`git pull --ff-only` 実行前に worktree 状態・ref lock 競合・統合先以外のブランチ占有の3リスクを事前検出し代替同期手順を選択、同期対象は当該 Case の統合先ブランチ）

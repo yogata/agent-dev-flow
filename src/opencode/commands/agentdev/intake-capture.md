@@ -37,7 +37,7 @@ description: 未分類の変更候補を手動入力から intake item として
 
 硬い境界（破壊的操作・state 破壊等の否定規則）に限定する:
 
-- G01: GitHub Issue の作成は行わない（`case-open` が担当）
-- G03: 保存済み intake item の変更・更新は行わない（保存のみ。review 結果の書き込みも行わない）
-- G12: 保存先は `.agentdev/intake/inbox/` のみ（他ディレクトリへの保存は禁止）
+- GitHub Issue の作成は行わない（`case-open` が担当）
+- 保存済み intake item の変更・更新は行わない（保存のみ。review 結果の書き込みも行わない）
+- 保存先は `.agentdev/intake/inbox/` のみ（他ディレクトリへの保存は禁止）
 

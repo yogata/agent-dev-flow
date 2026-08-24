@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-010-002, REQ-010-003, REQ-010-006, REQ-010-007, REQ-010-063
+// ADF-COVERS(verification): REQ-010-002, REQ-010-003, REQ-010-006, REQ-010-007, REQ-010-063, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
 import { mkdirSync, writeFileSync, copyFileSync, rmSync, existsSync, readFileSync } from "fs";
 import { join } from "path";
@@ -3171,10 +3171,11 @@ describe("WP-3 execution profiles (Issue #1928)", () => {
   });
 });
 
-// ─── IR-063 guardrail-number-invariant (REQ-010-064, Issue #2372) ────────────
-// Fixture kinds per REQ-010-068: 正常例 (ok-cmd), 違反例 (violation-cmd),
-// 境界例 (boundary-cmd: single G01, defined reference), 許容例 (no-guardrail-cmd:
-// Gxx 未使用 command は対象外), 再現例 (f009-cmd: Wave 1 F-009 の req-define 形式).
+// ─── IR-063 common-policy-identifier-invariant (REQ-051-005, Issue #2429) ────
+// Fixture kinds per REQ-010-068: 正常例 (ok-cmd: 登録済み POL 参照), 違反例
+// (violation-cmd: 未定義参照 + registry 外定義、registry: 重複定義), 境界例
+// (agentdev-demo-skill: 識別子を持たない配布 skill), 許容例 (registry 自身の
+// 様式例示は対象外), 再現例 (residual-cmd: Issue #2429 移行前の旧 Gxx 定義行様式).
 
 const IR063_ROOT = join(TEMP_ROOT, "ir063");
 
@@ -3203,7 +3204,34 @@ function buildIr063Fixture(root: string): void {
     "utf-8",
   );
 
-  // 正常例: G01 連番 + 定義済み参照
+  // registry fixture（定義の実体。様式例示 `POL-xxx` を含む）
+  const registryDir = join(
+    root,
+    "src",
+    "opencode",
+    "skills",
+    "agentdev-command-authoring",
+    "references",
+  );
+  mkdirp(registryDir);
+  writeFileSync(
+    join(registryDir, "common-policy-identifiers.md"),
+    [
+      "# registry fixture",
+      "",
+      "定義は本 registry に `- **POL-xxx**: 説明` 形式で1回のみ記述する。",
+      "配布物から参照する際は `POL-xxx` のコードスパンで記述する。",
+      "",
+      "- **POL-worktree-isolation**: worktree 隔離",
+      "- **POL-gh-io-delegation**: gh I/O 委譲",
+      "- **POL-dup**: 重複定義検出用",
+      "- **POL-dup**: 重複定義検出用（2回目）",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 正常例: 登録済み識別子の参照 + ID なしのガードレール本文
   writeFileSync(
     join(cmdDir, "ok-cmd.md"),
     [
@@ -3214,17 +3242,15 @@ function buildIr063Fixture(root: string): void {
       "",
       "## ガードレール",
       "",
-      "- G01: 編集スコープは限定する",
-      "- G02: 破壊的操作は行わない",
-      "- G03: レポートのみ出力する",
-      "",
-      "手順は G02 に従う。",
+      "- 全ファイル操作は worktree 内で実行する（`POL-worktree-isolation`）",
+      "- GitHub Issue/PR の読み書きは正規の I/O 境界手続きへ委譲する（`POL-gh-io-delegation`）",
+      "- 破壊的操作は行わない",
       "",
     ].join("\n"),
     "utf-8",
   );
 
-  // 違反例: 非 G01 開始 + 重複 + 未定義参照
+  // 違反例: 未定義参照 + registry 外定義
   writeFileSync(
     join(cmdDir, "violation-cmd.md"),
     [
@@ -3235,56 +3261,36 @@ function buildIr063Fixture(root: string): void {
       "",
       "## ガードレール",
       "",
-      "- G01: first guardrail",
-      "- G01: duplicate definition of G01",
-      "- G03: skips G02",
-      "",
-      "本文は G09 を参照する（未定義）。",
+      "- 未知のポリシーを参照する（`POL-unknown-policy`）",
+      "- **POL-worktree-isolation**: registry 外での定義",
       "",
     ].join("\n"),
     "utf-8",
   );
 
-  // 境界例: 最小構成（G01 単体）+ 定義行の直前参照
+  // 境界例: POL 参照も Gxx 表記も持たない配布 skill 本文
+  const skillDir = join(root, "src", "opencode", "skills", "agentdev-demo-skill");
+  mkdirp(skillDir);
   writeFileSync(
-    join(cmdDir, "boundary-cmd.md"),
+    join(skillDir, "SKILL.md"),
     [
       "---",
-      "description: boundary command",
-      "agent: test-agent",
+      'name: "agentdev-demo-skill"',
+      "description: demo skill",
       "---",
       "",
-      "## ガードレール",
-      "",
-      "- G01: only guardrail",
-      "",
-      "G01 を適用する。",
+      "ガードレール識別子を持たない配布 skill 本文である。",
       "",
     ].join("\n"),
     "utf-8",
   );
 
-  // 許容例: Gxx を使用しない command（検査対象外）
+  // 再現例: Issue #2429 移行前に配布 command に残存していた旧 Gxx 定義行様式
   writeFileSync(
-    join(cmdDir, "no-guardrail-cmd.md"),
+    join(cmdDir, "residual-cmd.md"),
     [
       "---",
-      "description: no guardrail command",
-      "agent: test-agent",
-      "---",
-      "",
-      "本文にガードレール番号を持たない。",
-      "",
-    ].join("\n"),
-    "utf-8",
-  );
-
-  // 再現例: Wave 1 監査 F-009 の req-define.md 形式（G03/G04/G08 = 非 G01 開始 + 欠番）
-  writeFileSync(
-    join(cmdDir, "f009-cmd.md"),
-    [
-      "---",
-      "description: F-009 reproduction",
+      "description: residual Gxx command",
       "agent: test-agent",
       "---",
       "",
@@ -3292,7 +3298,8 @@ function buildIr063Fixture(root: string): void {
       "",
       "- G03: 編集スコープは限定する",
       "- G04: 入力ファイルは参照専用とする",
-      "- G08: git コマンドは実行しない",
+      "",
+      "本文は G09 を参照する。",
       "",
     ].join("\n"),
     "utf-8",
@@ -3301,67 +3308,69 @@ function buildIr063Fixture(root: string): void {
   copyScripts(root);
 }
 
-describe("IR-063 guardrail-number-invariant (REQ-010-064, Issue #2372)", () => {
+describe("IR-063 common-policy-identifier-invariant (REQ-051-005, REQ-010-064, Issue #2429)", () => {
   beforeAll(() => {
     mkdirp(IR063_ROOT);
     buildIr063Fixture(IR063_ROOT);
   });
 
-  it("passes a sequential G01-start command with resolved references (正常例)", () => {
+  it("passes registered policy references and identifier-free files (正常例・境界例)", () => {
     const r = runScript(IR063_ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { category: string; level: string; file?: string }) =>
-        res.category === "GuardrailNumber" &&
+        res.category === "CommonPolicyIdentifier" &&
         res.level !== "ok" &&
-        (res.file ?? "").includes("ok-cmd.md"),
+        ((res.file ?? "").includes("ok-cmd.md") ||
+          (res.file ?? "").includes("agentdev-demo-skill")),
     );
     expect(violations.length).toBe(0);
   });
 
-  it("detects start-number, duplicate, and undefined-reference violations (違反例)", () => {
+  it("detects undefined references, out-of-registry definitions, and duplicate definitions (違反例)", () => {
     const r = runScript(IR063_ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
     const byEvidence = parsed.results
       .filter(
         (res: { category: string; level: string; file?: string }) =>
-          res.category === "GuardrailNumber" &&
+          res.category === "CommonPolicyIdentifier" &&
           res.level === "ng" &&
-          (res.file ?? "").includes("violation-cmd.md"),
+          ((res.file ?? "").includes("violation-cmd.md") ||
+            (res.file ?? "").includes("common-policy-identifiers.md")),
       )
       .map((res: { evidence?: string }) => res.evidence ?? "");
-    expect(byEvidence).toContain("duplicate:G01");
-    expect(byEvidence).toContain("gap:G02");
-    expect(byEvidence).toContain("undefined-reference:G09");
+    expect(byEvidence).toContain("undefined-reference:POL-unknown-policy");
+    expect(byEvidence).toContain("definition-outside-registry:POL-worktree-isolation");
+    expect(byEvidence).toContain("duplicate-definition:POL-dup");
   });
 
-  it("accepts a single-G01 minimal command and does not flag Gxx-free commands (境界例・許容例)", () => {
+  it("accepts registry style examples without undefined-reference detection (許容例)", () => {
     const r = runScript(IR063_ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
-      (res: { category: string; level: string; file?: string }) =>
-        res.category === "GuardrailNumber" &&
+      (res: { category: string; level: string; evidence?: string; file?: string }) =>
+        res.category === "CommonPolicyIdentifier" &&
         res.level === "ng" &&
-        ((res.file ?? "").includes("boundary-cmd.md") ||
-          (res.file ?? "").includes("no-guardrail-cmd.md")),
+        (res.file ?? "").endsWith("common-policy-identifiers.md") &&
+        (res.evidence ?? "").startsWith("undefined-reference:"),
     );
     expect(violations.length).toBe(0);
   });
 
-  it("reproduces Wave 1 F-009 (non-G01 start and gaps, 再現例)", () => {
+  it("reproduces residual abolished Gxx notation in distribution (再現例)", () => {
     const r = runScript(IR063_ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
     const byEvidence = parsed.results
       .filter(
         (res: { category: string; level: string; file?: string }) =>
-          res.category === "GuardrailNumber" &&
+          res.category === "CommonPolicyIdentifier" &&
           res.level === "ng" &&
-          (res.file ?? "").includes("f009-cmd.md"),
+          (res.file ?? "").includes("residual-cmd.md"),
       )
       .map((res: { evidence?: string }) => res.evidence ?? "");
-    expect(byEvidence).toContain("start-number:G03");
-    expect(byEvidence).toContain("gap:G05");
-    expect(byEvidence).toContain("gap:G07");
+    expect(byEvidence).toContain("residual-gxx:G03");
+    expect(byEvidence).toContain("residual-gxx:G04");
+    expect(byEvidence).toContain("residual-gxx:G09");
   });
 });
 

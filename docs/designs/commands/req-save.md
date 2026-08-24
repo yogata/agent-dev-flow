@@ -38,8 +38,8 @@ req-define で壁打ちした成果物を REQ/Decision ファイルとして doc
 
 - ファイル作成/更新: `docs/requirements/**`, `docs/decisions/**`, `docs/README.md`, `.agentdev/drafts/**`
 - git 操作: commit + push（`agentdev-conventional-commits` + `agentdev-git-worktree` 並列実行安全ステージング）
-- 読込時 hash 記録 → リモート同期（`git pull --ff-only`）後の hash 一致検証（G08）
-- Issue 作成: 行わない（G11、case-open 責務）
+- 読込時 hash 記録 → リモート同期（`git pull --ff-only`）後の hash 一致検証
+- Issue 作成: 行わない（case-open 責務）
 - deviation capture: req-save 実行中に実観測した deviation を agentdev-learning-capture skill または
   agentdev-intake-pipeline（自動capture向け item 生成操作）へ委譲して保存。
   保存先は capture-boundaries.md の Split Rule に従う。
@@ -103,25 +103,25 @@ req-save は check_integrity.ts（全体監査）を使用しない（保存工�
 
 ## 対象外
 
-- REQ/Decision 対象 artifact_actions がない場合の Design ファイル作成、編集（G01、no-op 完了）
+- REQ/Decision 対象 artifact_actions がない場合の Design ファイル作成、編集（no-op 完了）
 - トレーサビリティ対応（実装対応、検証対応）の作成（REQ-021-012。req-save は正式な要件IDの保存を担当し、対応宣言を作成する責務を持たない。新規要件の保存時点で対応が存在しないことを理由に req-save を失敗させない）
-- `docs/requirements/**`、`docs/decisions/**`、`docs/README.md`、`.agentdev/drafts/**` 以外のファイル作成、編集（G02、G03）
-- ドラフトファイル不存在時の実行（G04、エラー中止）
-- REQ番号の空き番号再利用（G05、`agentdev-req-file-manager` 採番ルール遵守）
-- `doc_requirement.md` テンプレート必須セクションの欠落（G06）
-- push 後の status 更新（G07、commit 対象に status 変更を含めること）
-- リモート同期時の hash 一致検証省略（G08）
-- Issue 作成（G11、case-open 責務）
-- intake / learning capture の直接実施（G12）。deviation capture は Skill 委譲で実施（「副作用」セクション参照）
+- `docs/requirements/**`、`docs/decisions/**`、`docs/README.md`、`.agentdev/drafts/**` 以外のファイル作成、編集
+- ドラフトファイル不存在時の実行（エラー中止）
+- REQ番号の空き番号再利用（`agentdev-req-file-manager` 採番ルール遵守）
+- `doc_requirement.md` テンプレート必須セクションの欠落
+- push 後の status 更新（commit 対象に status 変更を含めること）
+- リモート同期時の hash 一致検証省略
+- Issue 作成（case-open 責務）
+- intake / learning capture の直接実施。deviation capture は Skill 委譲で実施（「副作用」セクション参照）
 - Design artifact_actions の処理（design-save 責務）
-- `work_type` 固定分岐による工程判定（G09、`artifact_actions` 有無で判定）
+- `work_type` 固定分岐による工程判定（`artifact_actions` 有無で判定）
 
 ## 検証観点
 
 - QG-1（Definition Integrity Gate）: REQ/Decision ファイル保存の前置条件として「適用結果の整合性検証」を実行（採番結果の整合性、マージ結果の整合性、インデックスの整合性、変更範囲の妥当性）。内容の品質は req-define の QG-1 の責務（REQ-004-081/082）
 - Decision 妥当性再検証ゲート: Decision 保存直前に技術判断含有確認、REQ/Design 相当の内容のみなら停止
 - Decision 採番: `agentdev-decision-file-manager` の採番ルール（max+1, 欠番埋め禁止）で確定番号を付与
-- 出力制約: 成果物本文（REQ/Decision ファイル本文、commit message）は verbatim で返す（G10）
+- 出力制約: 成果物本文（REQ/Decision ファイル本文、commit message）は verbatim で返す
 
 ## case-auto 並列委譲モデル（REQ-006-087〜093）
 
@@ -129,16 +129,16 @@ req-save は複数 REQ/Decision ファイルの変更案作成、検査を並列
 
 | フェーズ | 操作 | 実行方法 |
 |---|---|---|
-| 1. 採番バッチ | 最大番号+N を一括確保（G05 一意性維持） | 直列 |
+| 1. 採番バッチ | 最大番号+N を一括確保（一意性維持） | 直列 |
 | 2. ファイル作成 | 各 REQ/Decision ファイル作成、変更（独立パス） | 並列（最大5件） |
 | 3. インデックス更新 | README.md への順序挿入、draft status 更新、commit/push | 直列 |
 
-G07（commit 前 status 更新）は フェーズ3 で維持。
+commit 前 status 更新は フェーズ3 で維持。
 
 ## 停止状態
 
-- ドラフトファイル不存在時（G04。エラー中止する）。
-- 読込時 hash とリモート同期後 hash の不一致検出時（G08。保存処理を中止し、差異を報告する）。
+- ドラフトファイル不存在時（エラー中止する）。
+- 読込時 hash とリモート同期後 hash の不一致検出時（保存処理を中止し、差異を報告する）。
 - Decision 妥当性再検証で REQ/Design 相当と判定した場合（保存せず停止し、ユーザー判断を求める）。
 - targeted docs guard の検査失敗時（検査対象文書を修正して再実行するまで永続化しない）。
 

@@ -194,7 +194,7 @@ README 索引更新は導線の更新であり、要件、判断、仕様の更�
 
 ### Procedure
 
-- **決定的処理のスクリプト呼出**: `git diff --name-only` で変更ファイル一覧を取得し、許可パスリスト（G02）との照合を `agentdev-artifact-validation` の公開検証契約（`check-change-impact`）で実行する。許可範囲外の変更を検出したらエラー内容をユーザーに報告して指示を待つ（自動破棄しない）。`violations` が空でない場合は G02 違反として報告し指示を待つ
+- **決定的処理のスクリプト呼出**: `git diff --name-only` で変更ファイル一覧を取得し、許可パスリスト（req-save command のファイル編集スコープ）との照合を `agentdev-artifact-validation` の公開検証契約（`check-change-impact`）で実行する。許可範囲外の変更を検出したらエラー内容をユーザーに報告して指示を待つ（自動破棄しない）。`violations` が空でない場合はファイル編集スコープ違反として報告し指示を待つ
 - **リモート同期と hash 検証**: `git pull --ff-only` 後、読込時 hash と pull 後 hash の一致検証を必須とする。一致しない場合は評価、承認をやり直す。**RU パス保存禁止**の詳細、委譲接続点は `agentdev-req-file-manager` を参照
 
 ### Result
@@ -355,5 +355,5 @@ STEP-4 で検出した検証対応要否未分類行がある場合は、完了�
 - 不変条件（status 更新は commit/push 前に実施し commit 対象に含める）
 - 不変条件（pull 後の読込時 hash と pull 後 hash の一致検証必須）
 - 不変条件（成果物本文 verbatim、過程は圧縮）
-- G11（Issue 作成禁止）
+- ガードレール（Issue 作成禁止）
 - 不変条件（capture 原則非関与、例外は REQ 再構成 intake のみ）

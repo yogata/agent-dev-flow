@@ -38,4 +38,4 @@ description: 既存Caseの本文更新、コメント追加、またはREQファ
 
 硬い境界（破壊的操作・state 破壊等の否定規則）に限定する:
 
-- G08: GitHub Issue/PR 操作は `agentdev-gh-cli` の手続きへ委譲する（gh コマンド直接記述は禁止）
+- GitHub Issue/PR 操作は `agentdev-gh-cli` の手続きへ委譲する（gh コマンド直接記述は禁止）（`POL-gh-io-delegation`）

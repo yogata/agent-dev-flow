@@ -48,9 +48,9 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 
 硬い境界（破壊的操作・state 破壊等の否定規則）に限定する:
 
-- G02: 実装で判明した制約により REQ を黙って変更しない。乖離として報告し、ユーザー承認後に反映する
-- G04: 全ファイル操作は worktree 内で実行する（メインリポジトリでのファイル操作は禁止）
-- G15: `.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md` への直接変更は行わない（capture 情報は PR 本文経由のみ case-close に引き継ぐ）
-- G24: 完了条件チェックボックスの評価・更新は case-close QG-4 の責務であり、case-run と実行担当サブエージェントは完了条件チェックボックスを更新しない
-- G30: 実行担当サブエージェント委譲の前に worktree+ブランチが作成済みであることを前置の precondition gate で検証する。未作成時・メインリポジトリにいる場合は実行担当サブエージェントを起動しない。委譲では worktree root（相対パス、`.worktrees/{N}-{type}/`）を引き渡し、メインリポジトリパスは引き渡さない
-- G33: Issue 本文の書き換えは case-update が所有する（case-run が単独で Issue 本文を書き換えない。staleness 差異は case-update へ連携する）
+- 実装で判明した制約により REQ を黙って変更しない。乖離として報告し、ユーザー承認後に反映する
+- 全ファイル操作は worktree 内で実行する（メインリポジトリでのファイル操作は禁止）（`POL-worktree-isolation`）
+- `.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md` への直接変更は行わない（capture 情報は PR 本文経由のみ case-close に引き継ぐ）
+- 完了条件チェックボックスの評価・更新は case-close QG-4 の責務であり、case-run と実行担当サブエージェントは完了条件チェックボックスを更新しない（`POL-completion-checkbox-single-writer`）
+- 実行担当サブエージェント委譲の前に worktree+ブランチが作成済みであることを前置の precondition gate で検証する。未作成時・メインリポジトリにいる場合は実行担当サブエージェントを起動しない。委譲では worktree root（相対パス、`.worktrees/{N}-{type}/`）を引き渡し、メインリポジトリパスは引き渡さない
+- Issue 本文の書き換えは case-update が所有する（case-run が単独で Issue 本文を書き換えない。staleness 差異は case-update へ連携する）

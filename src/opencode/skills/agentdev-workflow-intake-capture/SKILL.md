@@ -83,9 +83,9 @@ workflow 管理用の frontmatter、状態フィールド、重複排除キー�
 
 ## 共通制約
 
-- **保存専用**: GitHub Issue の作成、採用可否の判断、review、整形、分類、item の変更・更新を行わない（command 側ガードレール G01・G03・G12 と不変条件の詳細実装）
+- **保存専用**: GitHub Issue の作成、採用可否の判断、review、整形、分類、item の変更・更新を行わない（command 側ガードレールと不変条件の詳細実装）
 - **補完禁止**: ユーザーの入力に含まれない情報を自動生成・推論して記載しない。元の意図を保ったまま整理する（command 不変条件）
-- **保存先**: `.agentdev/intake/inbox/` のみ（G12）。ディレクトリが存在しない場合は作成する。同名ファイルが存在する場合は `{topic-slug}-2`、`{topic-slug}-3` のように連番を付与する
+- **保存先**: `.agentdev/intake/inbox/` のみ。ディレクトリが存在しない場合は作成する。同名ファイルが存在する場合は `{topic-slug}-2`、`{topic-slug}-3` のように連番を付与する
 - **topic-slug 生成**: タイトルから生成する（小文字英数字、ハイフン区切り、30文字以内）。日付は実行時のシステム日付（`YYYY-MM-DD`）
 - **git 永続化**: commit message は `chore(agentdev): capture intake item`（Conventional Commits 形式）。変更なし時は commit/push せず完了報告で「変更なし」と報告する。push 失敗時は構造化エラー形式で停止する（完了扱いにしない）
 - **実行前同期**: `git pull --ff-only` 失敗時は共通 template（`.opencode/commands/agentdev/templates/common/git-error-messages.md`）の「Git 同期エラー」形式で表示して停止する（自動解消しない）

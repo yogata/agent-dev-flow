@@ -43,5 +43,5 @@ req-defineで生成された壁打ち成果物をREQ/Decisionファイルとし�
 
 硬い境界（破壊的操作・state 破壊等の否定規則）に限定する:
 
-- G02: ファイル編集スコープは `docs/requirements/**`（REQファイル）、`docs/decisions/**`（Decision）、`docs/README.md`（ドキュメントハブ）、`.agentdev/drafts/**`（ドラフトstatus更新用）のみ（上記以外のパスへの作成・編集・削除は禁止）
-- G11: Issue は作成しない（Issue 作成は case-open の責任範囲）
+- ファイル編集スコープは `docs/requirements/**`（REQファイル）、`docs/decisions/**`（Decision）、`docs/README.md`（ドキュメントハブ）、`.agentdev/drafts/**`（ドラフトstatus更新用）のみ（上記以外のパスへの作成・編集・削除は禁止）
+- Issue は作成しない（Issue 作成は case-open の責任範囲）

@@ -16,7 +16,7 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 - GitHub Issue URL（既存Issueの場合）
 - 実証Issue（`req-define <実証Issue>` 形式の明示指定時。当該実証の正式化を主たる入力とし、評価契約、最終評価結果、参照証拠を取り込む）
 - エラーログ（バグ修正の場合）
-- **ユーザーが明示した入力ファイル**: 設計メモ、調査メモ、RU（`.agentdev/backlog/req-units/RU-*.md`）等。全て参照専用入力（G04）
+- **ユーザーが明示した入力ファイル**: 設計メモ、調査メモ、RU（`.agentdev/backlog/req-units/RU-*.md`）等。全て参照専用入力
 - req-save SPLIT 検出時の検出事項（`.agentdev/drafts/requirements-review-finding-{topic-slug}.md`）
 - inspect-skills 診断結果の検出事項（`.agentdev/inspect/inbox/inspect-skills-finding-{topic-slug}.md`）。参照専用入力として扱い、未確認事項・採否未確定事項は要件本文と分離する（inspect lifecycle、-151 相当）
 - **promoted の参照経路**: `.agentdev/intake/promoted/` 及び `.agentdev/learning/promoted/` は backlog-review による RU 化を経由して参照する
@@ -52,6 +52,6 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 
 硬い境界（破壊的操作・state 破壊等の否定規則）に限定する:
 
-- G03: ファイル編集スコープは `.agentdev/drafts/**` のみ（他パスへの作成・編集は禁止）
-- G04: ユーザーが明示した入力ファイルは参照専用とし、変更・削除を行わない。`.agentdev/backlog/req-units/RU-*.md` の削除は case-open 成功後に実施する
-- G08: `git` コマンドは実行しない
+- ファイル編集スコープは `.agentdev/drafts/**` のみ（他パスへの作成・編集は禁止）
+- ユーザーが明示した入力ファイルは参照専用とし、変更・削除を行わない。`.agentdev/backlog/req-units/RU-*.md` の削除は case-open 成功後に実施する
+- `git` コマンドは実行しない

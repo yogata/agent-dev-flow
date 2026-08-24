@@ -142,4 +142,4 @@ case-open の STEP-5-4「子 Issue 作成の並列化」は **(1) に該当**。
 - 不変条件（子Issue 本文の先頭行に `Parent: #{epic_number}` を必ず含める）
 - 不変条件（全子Issue の作成完了後に Epic 本文のステータス追跡テーブルを更新、部分更新禁止）
 - 不変条件（成果物本文 verbatim、LF・空行・インデント保持）
-- G25（Issue 本文ファイル経由制約。実装詳細は `agentdev-gh-cli` の WRITE 標準手続きが所有）
+- ガードレール（Issue 本文ファイル経由制約。実装詳細は `agentdev-gh-cli` の WRITE 標準手続きが所有、`POL-gh-io-delegation`）

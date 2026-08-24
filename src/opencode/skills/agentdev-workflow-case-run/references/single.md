@@ -213,9 +213,9 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- G04（全ファイル操作は worktree 内で実行）
-- G30・不変条件（STEP-S3 precondition gate、worktree root 相対パス引き渡し）
-- G33・不変条件（QG-3 前置 staleness check、差異検出時の引き渡しと case-update 連携）
+- ガードレール（全ファイル操作は worktree 内で実行、`POL-worktree-isolation`）
+- ガードレール・不変条件（STEP-S3 precondition gate、worktree root 相対パス引き渡し）
+- ガードレール・不変条件（QG-3 前置 staleness check、差異検出時の引き渡しと case-update 連携）
 
 ## 関連ガイドライン
 

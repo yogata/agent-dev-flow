@@ -41,7 +41,7 @@ REQ/Decision 対象 artifact_actions（`artifact: req` / `artifact: decision`）
 
 req-define で分離された Design 保存対象（`draft-data` の `artifact_actions` 内 `artifact: design` entry）を Design ファイルとして `docs/designs/` に保存、確定するコマンド。
 Design 対象 artifact_actions がある場合に実行する（全 work_type 対象、`work_type` による判定は廃止、v2:REQ-0138-009）。
-req-save の G02（Design 編集禁止）を緩和するものではなく、Design 保存を独立責務として切り出す（v2:ADR-0123）。
+req-save のファイル編集スコープ制約（Design 編集禁止）を緩和するものではなく、Design 保存を独立責務として切り出す（v2:ADR-0123）。
 
 **入力**: 要件doc（Design 対象 artifact_actions がある場合）
 

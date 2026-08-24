@@ -43,7 +43,7 @@ case-auto は下位 workflow の契約確定後の上位 orchestrator として�
 
 硬い境界（課金・認証・破壊的操作・state 破壊等の否定規則）に限定する:
 
-- G02: 自走対象外は DB migration 実行、deploy/apply、クラウドリソース操作、外部SaaS設定変更、課金、権限、認証情報に関わる変更、repo外の実データ操作、通知送信とする（migrationファイル、IaCファイルの作成・修正は対象、実行・apply は対象外）
-- G05: remote branch 削除は当該 case-auto/ case-run が作成した branch に限定する
-- G16: Epic Issue 本文の書き込みは case-close の単一書き手責務であり、case-auto は読み取りのみを行う
-- G33: 子 task bg task 破棄検知時の回復で、未コミット変更の帰属が確認できない場合に強制 commit は行わない。整合確認できない場合は当該子 task を `blocked` とし、「未コミット変更の帰属不明」（停止条件の1つ）として報告する（AG-{NNN}）
+- 自走対象外は DB migration 実行、deploy/apply、クラウドリソース操作、外部SaaS設定変更、課金、権限、認証情報に関わる変更、repo外の実データ操作、通知送信とする（migrationファイル、IaCファイルの作成・修正は対象、実行・apply は対象外）
+- remote branch 削除は当該 case-auto/ case-run が作成した branch に限定する
+- Epic Issue 本文の書き込みは case-close の単一書き手責務であり、case-auto は読み取りのみを行う（`POL-epic-tracking-single-writer`）
+- 子 task bg task 破棄検知時の回復で、未コミット変更の帰属が確認できない場合に強制 commit は行わない。整合確認できない場合は当該子 task を `blocked` とし、「未コミット変更の帰属不明」（停止条件の1つ）として報告する（AG-{NNN}）

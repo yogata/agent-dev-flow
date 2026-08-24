@@ -163,9 +163,9 @@ QG-4 観点8 に基づく評価スコープ切替（中間 Wave vs 最終 Wave�
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- G04（Epic 自動クローズは全子Issue が CLOSED の場合のみ）
-- G08・不変条件（未達チェックボックスが残る場合の構造化エラー停止、チェックボックス更新後の再読込 VERIFY 必須、完了条件チェックボックス評価・更新は case-close 専任責務）
-- G24・不変条件（Epic Issue 本文ステータス追跡テーブルの更新は case-close 単一書き手、case-run は読み取りのみ、case-auto は直接書き込まない、Epic Wave クローズは現在 Wave の `running` 子Issue のみ対象、`blocked`/ `failed` を `completed` に上書きしない、べき等性）
-- E4-1 gate 違反子Issue は `blocked` へ遷移し E4-2 マージ並列シーケンスの対象外、`completed` へ上書きしない（べき等性、case-close G24 準拠）
+- ガードレール（Epic 自動クローズは全子Issue が CLOSED の場合のみ）
+- ガードレール・不変条件（未達チェックボックスが残る場合の構造化エラー停止、チェックボックス更新後の再読込 VERIFY 必須、完了条件チェックボックス評価・更新は case-close 専任責務）
+- ガードレール・不変条件（Epic Issue 本文ステータス追跡テーブルの更新は case-close 単一書き手、case-run は読み取りのみ、case-auto は直接書き込まない、Epic Wave クローズは現在 Wave の `running` 子Issue のみ対象、`blocked`/ `failed` を `completed` に上書きしない、べき等性、`POL-epic-tracking-single-writer`）
+- E4-1 gate 違反子Issue は `blocked` へ遷移し E4-2 マージ並列シーケンスの対象外、`completed` へ上書きしない（べき等性、Epic テーブル単一書き手制約に準拠）
 - 不変条件（Epic 実証の最終 Wave は新しい評価を始めず最終評価結果を Epic Issue 最終コメントへ正規記録し正式化経路 req-define <実証Issue> を案内する、Epic 中間Waveでは正式化案内を出さない、後続 req-define を自動実行しない）
 - 不変条件（E6-1 は当該 Wave スコープの一時成果物（draft、RU、検出事項等）残留と当該実行で `.agentdev/tmp/` に作成した一時ファイルの残存を確認し、残留時は当該 Wave を完了扱いにしない）

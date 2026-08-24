@@ -48,11 +48,11 @@ RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, 
 
 硬い境界（破壊的操作・state 破壊等の否定規則）に限定する:
 
-- G01: REQ ファイルの保存は行わない（`req-save` が担当）
-- G02: GitHub Issue の作成は行わない（`case-open` が担当）
-- G04: `.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md`、`.agentdev/learning/deferred.md` は更新しない
-- G06: RU 生成に失敗した成果物は削除しない
-- G08: 破壊的変更（矛盾解消、要件仕様スコープ変更、大量成果物削除等）は明示承認を維持する（REQ）
+- REQ ファイルの保存は行わない（`req-save` が担当）
+- GitHub Issue の作成は行わない（`case-open` が担当）
+- `.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md`、`.agentdev/learning/deferred.md` は更新しない
+- RU 生成に失敗した成果物は削除しない
+- 破壊的変更（矛盾解消、要件仕様スコープ変更、大量成果物削除等）は明示承認を維持する（REQ）（`POL-destructive-change-explicit-approval`）
 
 
 

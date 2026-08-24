@@ -232,7 +232,7 @@ describe("REQ-0030-011: Error case detection via distributed checker rules", () 
       "",
       "## ガードレール",
       "",
-      "- G01: valid",
+      "- 全ファイル操作は worktree 内で実行する",
       "",
     ].join("\n");
 

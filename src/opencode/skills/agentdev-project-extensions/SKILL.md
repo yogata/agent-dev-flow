@@ -233,8 +233,8 @@ inspect-skills が複数 command 間で同一文言の重複を検出した場�
 
 硬い境界（配布物参照境界・廃止 state 保護の否定規則）に限定する:
 
-- G05: 配布 command/skill 本文にプロジェクト固有文書の具体参照（具体ID、具体パス、固定URL）を持たせない。プロジェクト固有参照は extension 経由でのみ与える
-- G07: 旧配置（`.agentdev/extensions/commands/**`）の extension を後方互換で読まない。旧 kind を検出した場合は migration-required として停止する
+- 配布 command/skill 本文にプロジェクト固有文書の具体参照（具体ID、具体パス、固定URL）を持たせない。プロジェクト固有参照は extension 経由でのみ与える
+- 旧配置（`.agentdev/extensions/commands/**`）の extension を後方互換で読まない。旧 kind を検出した場合は migration-required として停止する
 
 ## See Also
 

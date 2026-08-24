@@ -6,7 +6,7 @@ description: req-define で分離された Design 保存対象を Design ファ�
 
 req-define で分離された Design 保存対象（`draft-data` の `artifact_actions` 内 `artifact: design` entry）を `docs/designs/<**/*>.md` に保存、確定する。
 req-save の次、case-open の前に実行する。
-req-save の G02（Design 編集禁止）を緩和するものではなく、Design 保存を独立責務として切り出す。
+req-save のファイル編集スコープ制約（Design 編集禁止）を緩和するものではなく、Design 保存を独立責務として切り出す。
 全 work_type 対象であり、`work_type` による判定は廃止する。
 
 ## 入力
@@ -38,6 +38,6 @@ req-save の G02（Design 編集禁止）を緩和するものではなく、Des
 
 硬い境界（破壊的操作・state 破壊等の否定規則）に限定する:
 
-- G02: ファイル編集スコープは `docs/designs/**`（Design ファイル）、`.agentdev/drafts/**`（ドラフト status 更新用）のみ。`docs/designs/README.md` は Design 操作に付随する更新のみ許可（REQ ファイル（`docs/requirements/**`）、Decision（`docs/decisions/**`）、コマンド、スキル、テンプレート等、上記以外の作成・編集は禁止）
-- G06: Design status の昇格（draft → accepted）は case-close の責務であり、design-save は `status: accepted` を付与しない（新規作成時は `status: draft`、既存 Design 追記時は `status` を維持）
-- G12: Issue は作成しない（Issue 作成は case-open の責任）
+- ファイル編集スコープは `docs/designs/**`（Design ファイル）、`.agentdev/drafts/**`（ドラフト status 更新用）のみ。`docs/designs/README.md` は Design 操作に付随する更新のみ許可（REQ ファイル（`docs/requirements/**`）、Decision（`docs/decisions/**`）、コマンド、スキル、テンプレート等、上記以外の作成・編集は禁止）
+- Design status の昇格（draft → accepted）は case-close の責務であり、design-save は `status: accepted` を付与しない（新規作成時は `status: draft`、既存 Design 追記時は `status` を維持）
+- Issue は作成しない（Issue 作成は case-open の責任）

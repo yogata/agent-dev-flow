@@ -51,7 +51,7 @@ Design ファイルは CREATE（新規）、APPEND（既存追記）、UPDATE（
 Design frontmatter の `status`（`draft` / `accepted` の2値）を本スキルの操作で次のように適用する。
 
 - **CREATE**: frontmatter に `title`、`status: draft`、`created`、`updated` を必ず付与する（design-save 不変条件・前出出力検証表 STEP-5）
-- **APPEND / UPDATE**: 既存 Design の `status` を変更しない（G06）。`accepted` 昇格は case-close の責務
+- **APPEND / UPDATE**: 既存 Design の `status` を変更しない。`accepted` 昇格は case-close の責務
 - 置換済み Design は現行 Design ツリーへ保持しない。置換時は旧 Design を現行ツリーから除外し、履歴は Git、Issue、Decision 等の既存履歴手段から確認する
 
 詳細は [references/design-lifecycle-application.md](references/design-lifecycle-application.md) 参照。
@@ -119,7 +119,7 @@ design-save は本スクリプト群を bash 経由で呼び出し、JSON 結果
 ## 主要な不変条件
 
 - 新規 Design 作成時の frontmatter 完全性（`title`, `status: draft`, `created`, `updated`）
-- 既存 Design 追記時の `status` 変更がないこと（G06）
+- 既存 Design 追記時の `status` 変更がないこと
 - target_area マッチング規則の適用結果（単一マッチ採用、複数マッチ時の warn、未検出時のスキップ + follow-up）
 - Design 固有 script が単一の正規所有者（本スキル）に集約されていること
 - 共通検証を重複実装せず `agentdev-artifact-validation` の公開検証契約へ委譲すること

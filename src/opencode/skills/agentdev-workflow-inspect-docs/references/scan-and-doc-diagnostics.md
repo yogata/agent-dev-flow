@@ -78,5 +78,5 @@ REQ 要件行に schema field、enum 値一覧、route/category/status 判定表
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- G01（ファイルを変更、作成、削除しない。ただし `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成は例外として許可）
+- ガードレール（ファイルを変更、作成、削除しない。ただし `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成は例外として許可）
 - 不変条件（source-of-truth priority（現行 REQ > 承認済み ADR > Design > guides）に従って矛盾を判定）

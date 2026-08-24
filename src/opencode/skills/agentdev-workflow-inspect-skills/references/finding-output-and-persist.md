@@ -53,6 +53,6 @@ push 失敗時は同プロシージャの構造化エラー形式で停止する
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- G02（GitHub Issue/PR を作成、更新しない）
-- G03（RU、intake、learning、backlog 成果物を保存しない）
-- G04（commit/ push は `.agentdev/inspect/` 配下の永続化のみ許可。branch/ worktree 操作は禁止）
+- ガードレール（GitHub Issue/PR を作成、更新しない）
+- ガードレール（RU、intake、learning、backlog 成果物を保存しない）
+- ガードレール（commit/ push は `.agentdev/inspect/` 配下の永続化のみ許可。branch/ worktree 操作は禁止）

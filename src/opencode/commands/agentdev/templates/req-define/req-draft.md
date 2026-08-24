@@ -114,7 +114,7 @@ test_strategy:
 # review_dispositions: 採否判断（covered / rejected 等）の記録。optional soft-contract
 # 欠落時に後続工程は draft を拒否しない（後方互換）。covered 項目だけで Issue/PR を作成しない方針を維持する
 # 1 エントリ = 単一 source_ru + 単一 source_item（重複禁止）
-# evidence.checked_at_commit は req-define 生成時 null（G08 git 禁止）。case-open が default branch 最新化後に再確認し確認 commit SHA を記録する
+# evidence.checked_at_commit は req-define 生成時 null（req-define は git コマンドを実行しない）。case-open が default branch 最新化後に再確認し確認 commit SHA を記録する
 review_dispositions:
   - id: RD-{NNN}                 # RD-NNN 形式の識別子
     source_ru: {RU-ID}         # optional: 単一の元 RU-ID（RU 入力でない場合は省略可）

@@ -70,7 +70,7 @@ push 失敗時は共通 template（`.opencode/commands/agentdev/templates/common
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- G01（ユーザーの明示的な承認なしに採用済み成果物を生成しない。`--auto` による自動 promote 対象、および詳細判定表に従い自律確定した検出事項を除く）
+- ガードレール（ユーザーの明示的な承認なしに採用済み成果物を生成しない。`--auto` による自動 promote 対象、および詳細判定表に従い自律確定した検出事項を除く、`POL-promoted-artifact-requires-approval`）
 - 不変条件（reject された検出事項は即時削除される。即時削除以外の取扱を禁止する）
 - 不変条件（defer された検出事項は `.agentdev/inspect/inbox/` に残す）
 - 不変条件（docs-check ルール／検査データ追加候補は独立 route とせず、採用済み成果物の要件化方向または受け入れ条件に含める）
