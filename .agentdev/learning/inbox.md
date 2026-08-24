@@ -390,3 +390,52 @@
 - **想定反映先**: agentdev-git-worktree-test-fallback Design、worktree テスト実行手順
 - **関連**: PR 2432 本文、Issue 2428、Epic 2427 Wave 1
 - **タグ**: #worktree #bun-test #dependencies
+
+
+## 残存掃除の初期 grep サーベイは件数上限なしで全体を出す
+
+- **問題事象**: Gxx 記述の残存掃除（PR 2433、Issue 2429、OU-002）で、委譲再開時の初期 grep を件数上限（First 40 等）付きで行ったため、docs/designs 配下の Gxx 残存を過少評価し、後工程で約 120 件の追加残存を検出した
+- **発生局面**: 実装（case-run 委譲の残存掃除・全体サーベイ）
+- **検知方法**: 後工程の全文 grep と初期サーベイ結果の件数差
+- **根本原因**: grep 出力の件数上限付きオプションで「全数を出した」と誤認し、対象確定を部分集合に対して行った
+- **自律対応内容**: 件数上限なし・ファイル別カウントで全体を出し直して対象を再確定し、掃除を完了した（PR 2433 の検証差分に記録）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（REQ-051-006 の実装手段の話であり、要件行の変更なし）
+- **横展開観点**: 廃止語句・旧識別子の残存掃除、リネーム追従確認等、全数把握を前提とする初期サーベイ全般
+- **再発条件**: 件数上限付き grep で初期サーベイを行い、その結果で対象確定する場合
+- **予防策候補**: 残存サーベイの初期 grep は件数上限を付けずファイル別カウントで全体を出してから対象を確定する（手順文書への明記）
+- **想定反映先**: agentdev-skill-authoring・agentdev-command-authoring の残存掃除系手順、委譲プロンプトの初期サーベイ指示
+- **関連**: PR 2433 本文、Issue 2429、Epic 2427 Wave 2
+- **タグ**: `#grep` `#residual-sweep` `#survey`
+
+## pwsh の Set-Content は CRLF を書き出すため LF 保持の全面置換は node の readFileSync/writeFileSync 併用が安全
+
+- **問題事象**: Windows PowerShell の Set-Content は既定で CRLF を書き出す。LF の既存 UTF-8 ファイルを Get-Content / Set-Content 経由で書き換えると行末が全面変化した（PR 2434、Issue 2430、OU-003 の実装で発生）
+- **発生局面**: 実装（case-run 委譲、複数ファイルへの一括文字列置換）
+- **検知方法**: 置換後の git diff で意図しない行末変化の全面発生
+- **根本原因**: Set-Content の既定改行コードがプラットフォーム既定（CRLF）であるのに対し、リポジトリの既存 UTF-8 ファイルは LF
+- **自律対応内容**: node による readFileSync（utf-8）→ 文字列置換 → writeFileSync（utf8）の併用で LF を保持して書き戻し、diff を意図差分のみに正規化した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（実装手段の話。gh-cli スキルのファイル書き出し規定と同一方向の知見）
+- **横展開観点**: pwsh で LF の UTF-8 ファイルを一括置換するすべての作業
+- **再発条件**: pwsh の Get-Content / Set-Content 経由で LF ファイルを書き換える場合
+- **予防策候補**: LF 保持・BOM なし UTF-8 が必要な一括置換は node の readFileSync / writeFileSync 併用を標準手段とする（Set-Content を使わない）
+- **想定反映先**: agentdev-gh-cli references の Windows 固有制約、編集系スキルの手順注意
+- **関連**: PR 2434 本文、Issue 2430、Epic 2427 Wave 2
+- **タグ**: `#powershell` `#crlf` `#encoding`
+
+## AUTOGEN 鮮度 gate の計測日ブロックは日付境界で誰の変更でもなく発火する
+
+- **問題事象**: Wave 2 境界クローズ（Epic 2427、PR 2434 マージ後）の check_autogen_freshness 実行で req-health-metrics.md の req-metrics-measurement-example ブロックに CONTENT_CHANGE 1 件が検出されたが、差分は「計測日: 2026-08-24（記録）」vs「計測日: 2026-08-25（期待）」の1行のみだった
+- **発生局面**: 運用（case-close の Design status 変更後の鮮度確認）
+- **検知方法**: check_autogen_freshness の詳細出力（現在値と期待値の比較行）
+- **根本原因**: AUTOGEN ブロックが前日（2026-08-24）に再生成済みで、ローカル日付が 2026-08-25 に変わった後の実行では「当日の日付を期待する」検査が日付境界だけで必ず不合格になる
+- **自律対応内容**: 差分が計測日1行のみであることから date rollover 起因かつ当該 Case の変更対象外と判定し、docs を編集せずに再生成コマンド（generate_indexes.ts）の実施を次の docs 変更コミット所有者へ記録する対応とした
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（gate 判定の運用知見。REQ-010-059 の検査仕様自体は不変）
+- **横展開観点**: 日付を含む AUTOGEN ブロックの鮮度確認を日付をまたいで実行するすべての工程（case-close、docs-check）
+- **再発条件**: 計測日等の当日日付を埋め込む AUTOGEN ブロックを持つ成果物を、生成日の翌日以降に鮮度検査する場合
+- **予防策候補**: 鮮度違反の詳細で差分が日付行のみのときは date rollover と判定し、内容変更と区別して報告する（gate 側の緩和は別途検討）
+- **想定反映先**: agentdev-workflow-case-close references（docs-and-design-promotion の check_autogen_freshnes 実行箇所）、autogen-freshness-gate Design
+- **関連**: Issue 2430 対応記録コメント（case-close、検証差分表）、Epic 2427 Wave 2
+- **タグ**: `#autogen` `#freshness-gate` `#date-rollover`
