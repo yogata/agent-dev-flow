@@ -439,3 +439,66 @@
 - **想定反映先**: agentdev-workflow-case-close references（docs-and-design-promotion の check_autogen_freshnes 実行箇所）、autogen-freshness-gate Design
 - **関連**: Issue 2430 対応記録コメント（case-close、検証差分表）、Epic 2427 Wave 2
 - **タグ**: `#autogen` `#freshness-gate` `#date-rollover`
+## OpenCode のプラグイン自動読み込みは depth-1 ファイルのみでディレクトリ型配布 Plugin は読み込まれない
+
+- **問題事象**: Wave 2 で配布した agentdev-gh-write-guard Plugin が実行時に読み込まれていなかった（PR 2435、Issue 2431、OU-004 の実装で判明）。ディレクトリ型パッケージ `.opencode/plugins/<package>/` は OpenCode の自動読み込み対象外だった
+- **発生局面**: 設計（Wave 2 の Plugin 配布構成）と実装（Wave 3 のローダーシム追加）
+- **検知方法**: sst/opencode v1.16〜v1.18 の `config/plugin.ts` の `{plugin,plugins}/*.{ts,js}` glob 実装確認と、ローダーシム生成後の読み込み検証
+- **根本原因**: 配布構造の設計時にランタイムの実際の loader 実装（読み込み経路）を確認せず、ディレクトリ配置で自動読み込みされると想定していた
+- **自律対応内容**: install.ps1 / self-sync.ps1 / consumer archive install が junction に加えてローダーシム（`<package>.ts` 1行再エクスポート）を生成・検証・自己修復する構成を追加し、Wave 2 Plugin の読み込み不能状態を解消した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（REQ-052-006/007 の配布境界要件自体は不変。登録配線の実装手段の知見）
+- **横展開観点**: OpenCode（や類似 harness）へ配布物を置くすべての設計。glob の実装確認なしに「ディレクトリを置けば読まれる」と想定しない
+- **再発条件**: ランタイムの読み込み経路を確認せずに配布構造を設計する場合
+- **予防策候補**: 配布構造の設計時にはランタイムの実際の loader 実装（glob、解決順序）を確認する。配布後には読み込み成否を実行環境で検証する
+- **想定反映先**: custom-tool-contracts / runtime-package-boundary Design（登録配線・ローダーシム節。intake item 2026-08-25-design-confirm-custom-tool-contracts.md ほか経由）
+- **関連**: PR 2435 本文、Issue 2431、Epic 2427 Wave 3
+- **タグ**: `#opencode` `#plugin` `#distribution` `#loader`
+
+## issue_comment の VERIFY は「Issue が open であること」の代理検証であり閉じた Issue へのコメント追加は検証不完になりうる
+
+- **問題事象**: Wave 2 実装の issue_comment 操作は、コメント本文の読み戻しが操作契約に存在しないため「Issue が open であること」を代理検証として使用している。閉じた Issue へのコメント追加（case-close の close 後コメント等）は verification-incomplete になる可能性がある（PR 2435 で指摘、Wave 2 契約維持のため未変更）
+- **発生局面**: 設計（Wave 2 の操作契約定義）と運用（case-close の close 後コメント追加）
+- **検知方法**: 操作契約（contracts）と VERIFY 仕様の突き合わせによる静的確認
+- **根本原因**: 操作の出力契約にコメント本文の読み戻し項目を定義していなかったため、VERIFY が本文照合ではなく状態照合に退化した
+- **自律対応内容**: 本事象を PR 2435 本文に記録し、契約変更（本文読み戻しの追加）は後続 Case の判断へ委譲した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（REQ-011-003 の VERIFY 内部完結要件は充足したまま。操作契約の粒度の知見）
+- **横展開観点**: 出力契約を定義するすべての操作。「操作の成功」と「検証可能な出力」が一致するよう、VERIFY が照合する項目を出力契約へ含める
+- **再発条件**: 出力契約に読み戻し可能な項目を定義せずに VERIFY を状態照合で代替する場合
+- **予防策候補**: 副作用操作の出力契約には、VERIFY が照合できる読み戻し項目（本文、識別子等）を含める。代理検証を使う場合はその限界を契約書に明記する
+- **想定反映先**: custom-tool-contracts Design の操作契約節（intake item 2026-08-25-design-confirm-custom-tool-contracts.md 経由）
+- **関連**: PR 2435 本文、PR 2433/2434（Wave 2 実装）、Epic 2427
+- **タグ**: `#verify` `#contracts` `#issue-comment`
+
+## pwsh のパイプラインでは $LASTEXITCODE が最終コマンドの終了コードになり tsc の結果を読み誤る
+
+- **問題事象**: Wave 3 最終 case-close（DEL-CLOSE-W3）で `bun x tsc --noEmit ... | tail -2; echo EXIT=$LASTEXITCODE` の形式で型検査を実行したところ、tsc が TS2688（bun 型定義なし）で失敗しているのに EXIT=0 と表示された。パイプラインの終了コードが tail の成功を反映したため
+- **発生局面**: 検証（case-close の QG-4 型検査実行）
+- **検知方法**: 出力に TS2688 のエラー文が残っていたため全文再実行で確認。`> $null 2>&1; $LASTEXITCODE` 形式で再計測すると EXIT=2
+- **根本原因**: pwsh では `$LASTEXITCODE` がパイプラインの最後の native コマンド（tail）の終了コードを保持する。tsc の終了コードは上書きされていた
+- **自律対応内容**: 出力リダイレクト + 直接 `$LASTEXITCODE` 参照の形式に切り替え、bun install --cwd 前置のうえ 3/3 clean を確認して記録した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（検証実行手段の知見）
+- **横展開観点**: pwsh で検証コマンドの終了コードを判定するすべての工程（case-close、case-run、CI スクリプト）
+- **再発条件**: pwsh で `コマンド | tail/Select-Object` 形式のパイプライン後に `$LASTEXITCODE` を判定する場合
+- **予防策候補**: 終了コード判定はパイプラインを挟まずリダイレクト (`> file` または `> $null 2>&1`) で実行する。または `$PIPELINESTATUS` 相当（pwsh では存在しない）に依存しない構成にする
+- **想定反映先**: 検証実行手順の記述箇所（quality-gates Design の実行形式、agentdev-git-worktree references の bun test 実行形態）
+- **関連**: Issue 2431 対応記録コメント（case-close、検証差分の tsc 行）、Epic 2427 Wave 3
+- **タグ**: `#powershell` `#exit-code` `#verification`
+
+## integrity suite のテスト数は .opencode/skills/* junction の実在有無で変動する
+
+- **問題事象**: PR 2435 の verification-diff 記録（2436 tests）と merge 後 main での再実行（2447 tests）で integrity suite のテスト数が +11乖離した。同一 commit 内容（squash 前後）での差だった
+- **発生局面**: 検証（case-close の QG-4 suite 実行、case-run 記録との突合）
+- **検知方法**: PR head worktree（.opencode/skills/ に junction なし）で再実行して 2436 を再現し、main 作業環境の junction 実在有無との対応を確認
+- **根本原因**: projection 列挙系テスト（IR-016、IR-068 系）が .opencode/skills/* の実在 junction を parametrize の入力にするため、link mode 導入環境（main）ではテスト数が増える
+- **自律対応内容**: 両環境で fail 0 であることを確認し、差分を実行環境差として検証差分に記録した（Issue 2431 対応記録コメント）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（テスト実行形態の知見。検査仕様自体は不変）
+- **横展開観点**: ワークツリーと main 作業環境で検証記録を突合するすべての工程（case-close の検証差分、PR の verification-diff 記録）
+- **再発条件**: junction 有無が異なる環境間で suite の N 数を比較する場合
+- **予防策候補**: 検証差分の N 数比較は実行環境（link mode junction の有無）を併記する。worktree は junction 未構成で suite を実行する既定動作を踏まえて解釈する
+- **想定反映先**: quality-gates Design の QG-4 実行形式（intake 経由で検討）
+- **関連**: Issue 2431 対応記録コメント（case-close、検証差分の integrity 行）、PR 2435 本文 verification-diff
+- **タグ**: `#bun-test` `#junction` `#verification-diff`
