@@ -15,13 +15,6 @@ Decisionの**作成ガイドライン**（評価基準、Decision必要かどう
 
 ---
 
-## 原本（SSoT）
-
-本スキルの原本仕様は `agentdev-decision-file-manager` Design である。
-Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は Design を正とする。
-extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
-
 ## Decision要否判定の責務境界
 
 本スキルはDecisionファイルの操作（作成、追記、更新）を責務とし、Decisionを作成すべきか否かの**意味的判定**は主責務としない。

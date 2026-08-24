@@ -10,21 +10,6 @@ case-open command の workflow 実装本体。
 
 case-open command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 
-## 原本（SSoT）
-
-本スキルの原本仕様は SKILL.md（control plane）と `references/` 配下（各 STEP 詳細）が担う。
-Workflow Skill 固有契約（Command / Workflow Skill / Capability Skill 責務、1:N 分割基準、依存方向、配置契約）は `<workflows/workflow-skill-model>` Design が正規所有する。
-extension（`.agentdev/extensions/skills/agentdev-workflow-case-open.yaml`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
-
-## skill extension 参照方針
-
-本スキルは以下の方針に従う（ADR、`agentdev-skill-authoring` 準拠）。
-
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/decisions/specs）と case-open command の公開契約のみを前提とする。Design ディレクトリの内部構成（`foundations`, `responsibilities` 等）は仮定しない
-2. **extension の読込契約**: 呼び出し元 command から渡された解決済み文脈を優先し、不足分のみ skill extension を読む。reference ごとの extension は作らない
-3. **Design 内部パスの固定知識化の禁止**: extension に列挙されていない Design 内部パスを固定知識として参照しない
-4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
-
 ## 入力
 
 - case-open command から渡される要件doc（構造化 `draft-data` 形式、`agreed_items` / `artifact_actions` / `operation_units` / `test_strategy` / `review_dispositions` / `case_open_hints` / `auto_gate` / `conflict_resolutions`）
@@ -100,14 +85,6 @@ Issue の対象範囲、完了条件、test strategy の確定（STEP-2、STEP-3
 - 引き継ぎ情報に欠落があり変更影響候補の確認が必要な場合は、req-define へ差し戻す
 - 必須品質統制の導出は artifact type から品質能力キーへの変換（品質統制 routing Design が定める）に従う
 
-## Workflow Extension 読込
-
-本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-open.yaml`、`kind: workflow-extension`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。
-必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-open/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。
-いずれも Workflow Skill のみが読み、case-open command は直接読まない。
-標準動作に追加・拡張される（上書きではない）。
-存在しない場合は標準動作で続行する。
-
 ## 共通制約
 
 - **draft-data 入力**: 本スキルは構造化 `draft-data` を入力として読み取る。`auto_gate.auto_ready` が false、未解決質問、未解決衝突、repo 外操作、停止理由が残る場合は停止する。`conflict_resolutions` に記録済みの衝突は再確認しない
@@ -116,7 +93,7 @@ Issue の対象範囲、完了条件、test strategy の確定（STEP-2、STEP-3
 - **Form Zero**: draft/RU 削除は `git rm <path>` で明示パスをステージし、同一ステップで `git commit -- <path>` により即時コミットし、未ステージ残存を許さない
 - **統合先・実証Case識別情報**: Case に割り当てられた統合先（既定値 main）を Issue 本文の execution contract へ記録する。実証Caseの場合は実証Case識別情報（実証フラグ、対象評価ブランチ、所属実証単位）と評価契約を Issue 本文へ永続記録し、評価結果の採否を Issue 完了条件へ含めない。実証Case専用要素を presence-based 判定の新契約必須セクション一覧から除外する（詳細は STEP-2/3/6 各 reference）
 - **実行識別情報の記録**: 新規作成 Issue 本文に実行識別情報セクション（対象 Case、ADF 工程、実行単位、前工程で確定した事項）を構造化形式で記録する。形式は `agentdev-workflow-templates` の実行識別情報セクション規約に従う。機械的解析は同セクションの key-value 行を正とし、自由文中の ID に依存しない。識別情報の一部が取得不能でも停止せず「N/A」を記録する。作成時点で番号が確定しない自己参照値は Issue 作成後に埋め戻す。既存 Issue への遡及適用は行わない（詳細は STEP-2/ STEP-5 各 reference）
-- **本文 verbatim・ファイル経由**: Issue 本文は `[System.IO.File]::WriteAllText`（UTF8Encoding($false)）による UTF‑8 BOM なし LF 一時ファイル経由で `gh --body-file` へ渡す（G25）
+- **本文 verbatim・ファイル経由**: Issue 本文の gh CLI への引き渡しは `agentdev-gh-cli` の WRITE 標準手続き（ファイル経由）に従う（G25）
 
 ## See Also
 

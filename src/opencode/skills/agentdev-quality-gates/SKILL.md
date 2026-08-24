@@ -8,22 +8,6 @@ description: "Defines lightweight quality gates for the AgentDevFlow main workfl
 AgentDevFlow 主ワークフローの品質ゲート QG-1〜QG-4 の判定基準、検査観点を提供する knowledge base。
 本スキルは参照専用であり、ファイル編集、Issue 作成、PR 作成、マージ、テスト実行は行わない。
 
-## 原本（SSoT）
-
-本スキルの原本仕様は `agentdev-quality-gates` Design である。
-Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は Design を正とする。
-extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
-
-## skill extension 参照方針
-
-本スキルは以下の方針に従う。
-
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）のみを前提とし、`docs/designs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
-2. **extension の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill extension（`.agentdev/extensions/skills/agentdev-quality-gates.yaml`）を読む。skill extension はスキル単位で1ファイルに集約し、reference ごとの extension は作らない
-3. **`docs/designs/**` 内部パスの固定知識化の禁止**: extension に列挙されていない `docs/designs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/designs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
-4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
-
 ## 概要
 
 - **役割**: QG-1〜QG-4 の判定基準、検査観点、乖離分類基準を提供する
@@ -90,4 +74,3 @@ QG-4（full integrity suite 合格基準）における bun test フル suite �
 - **agentdev-req-analysis**: 要件分析手法、チェックボックス品質基準（QG-1 の基準）
 - **agentdev-workflow-lifecycle**: work_type 判定、フェーズ定義
 - **agentdev-workflow-routing**: case-update --review-ng 手順（QG-3 結果の消費先）
-

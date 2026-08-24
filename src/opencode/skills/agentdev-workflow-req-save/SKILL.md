@@ -11,21 +11,6 @@ req-define で生成された壁打ち成果物をREQ/Decisionファイルとし
 
 req-save command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 
-## 原本（SSoT）
-
-本スキルの原本仕様は SKILL.md（control plane）と `references/` 配下（各 STEP 詳細）が担う。
-Workflow Skill 固有契約は `<workflows/workflow-skill-model>` Design が正規所有する。
-extension（`.agentdev/extensions/skills/agentdev-workflow-req-save.yaml`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
-
-## skill extension 参照方針
-
-本スキルは以下の方針に従う（ADR、`agentdev-skill-authoring` 準拠）。
-
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/decisions/specs）と req-save command の公開契約のみを前提とする。Design ディレクトリの内部構成は仮定しない
-2. **extension の読込契約**: 呼び出し元 command から渡された解決済み文脈を優先し、不足分のみ skill extension を読む。reference ごとの extension は作らない
-3. **Design 内部パスの固定知識化の禁止**: extension に列挙されていない Design 内部パスを固定知識として参照しない
-4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
-
 ## 入力
 
 - `.agentdev/drafts/req-draft-{topic-slug}.md`（req-define で生成されたドラフト）
@@ -97,14 +82,6 @@ req-save workflow は次の12 STEP で構成する。
 - `agentdev-traceability`: 検証対応要否未分類行の導出（check。分類状態の導出定義はトレーサビリティモデル「対応関係の完全性規則」が所有）
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 - integrity checker skill（AG-{NNN} detector、repo 固有）: check_changed_docs.ts（targeted docs guard）
-
-## Workflow Extension 読込
-
-本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-req-save.yaml`、`kind: workflow-extension`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。
-必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-req-save/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。
-いずれも Workflow Skill のみが読み、req-save command は直接読まない。
-標準動作に追加・拡張される（上書きではない）。
-存在しない場合は標準動作で続行する。
 
 ## 共通制約
 

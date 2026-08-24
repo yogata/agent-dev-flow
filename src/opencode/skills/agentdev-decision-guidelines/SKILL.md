@@ -5,13 +5,6 @@ description: Evaluates whether architectural decisions require a Decision record
 
 # Decision評価ガイドライン
 
-## 原本（SSoT）
-
-本スキルの原本仕様は `agentdev-decision-guidelines` Design である。
-Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は Design を正とする。
-extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
-
 ## 評価基準（いずれかに該当すればDecision作成推奨）
 
 1. **アーキテクチャ上の重要性**: システム全体の構造、主要コンポーネント間の関係に影響
@@ -149,5 +142,3 @@ accepted Decision は意味的に不変とする。
 - **agentdev-decision-file-manager**: Decisionファイルの作成、追記、更新操作とバリデーション
 - **agentdev-req-analysis**: 要件分析におけるDecision閾値判定ブリッジ
 - **agentdev-workflow-lifecycle**: agentdev-*ワークフロー統括ハブ（フェーズ定義、SSoT遷移、パターン判定）
-
-

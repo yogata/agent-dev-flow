@@ -1,11 +1,11 @@
 /**
  * Regression test for command file format violations (IR-049).
  *
- * Validates that all command files in scope comply with
- * docs/specs/authoring/command-file-format.md (layer-3 style transition,
- * Issue #2183):
- * - Public /agentdev/* commands use the 前出出力検証表 (workflow table)
- *   and carry no `### Step N` procedure headings
+ * Validates that all command files in scope comply with the thin Command
+ * model (DEC-022, Issue #2428):
+ * - Public /agentdev/* commands carry no workflow stage tables, no
+ *   `### Step N` procedure headings, and no Workflow Skill internal STEP
+ *   identifiers (REQ-002-001, REQ-002-041)
  * - No non-G01 guardrail numbers
  */
 
@@ -61,9 +61,7 @@ const REPO_CMD = ".opencode/commands/repo/test.md";
 test("checkCommandFile detects ### Step headings in public commands", () => {
   const content = `## workflow
 
-| 工程 | 前提条件 | 出力契約 | 検証基準 |
-|---|---|---|---|
-| STEP-1 | 入力 | 結果 | 検証 |
+本コマンドは workflow 実装本体を \`agentdev-workflow-demo\` スキルへ委譲する。
 
 ### Step 1: 従来形式の残存
 
@@ -88,20 +86,7 @@ text
   ).toBe(false);
 });
 
-test("checkCommandFile detects workflow section without table", () => {
-  const content = `## workflow
-
-本コマンドは workflow 実装本体を \`agentdev-workflow-demo\` スキルへ委譲する。
-
-- **STEP-1** 工程名のみの列挙
-`;
-  const violations = checkCommandFile(PUBLIC_CMD, content);
-  expect(
-    violations.some((v) => v.rule === "command-format-workflow-table"),
-  ).toBe(true);
-});
-
-test("checkCommandFile passes public command with workflow table", () => {
+test("checkCommandFile detects workflow stage tables in public commands", () => {
   const content = `## workflow
 
 本コマンドは workflow 実装本体を \`agentdev-workflow-demo\` スキルへ委譲する。
@@ -109,6 +94,18 @@ test("checkCommandFile passes public command with workflow table", () => {
 | 工程 | 前提条件 | 出力契約 | 検証基準 |
 |---|---|---|---|
 | STEP-1 入力解決 | 起動時 | 入力確定 | 入力が解決済みであること |
+`;
+  const violations = checkCommandFile(PUBLIC_CMD, content);
+  expect(
+    violations.some((v) => v.rule === "command-format-workflow-table"),
+  ).toBe(true);
+});
+
+test("checkCommandFile passes thin public command workflow dispatch", () => {
+  const content = `## workflow
+
+本コマンドは workflow 実装本体を \`agentdev-workflow-demo\` スキルへ委譲する。
+工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの control plane が所有する。
 
 ## ガードレール
 
@@ -116,6 +113,28 @@ test("checkCommandFile passes public command with workflow table", () => {
 `;
   const violations = checkCommandFile(PUBLIC_CMD, content);
   expect(violations).toHaveLength(0);
+});
+
+test("checkCommandFile detects Workflow Skill internal STEP identifiers in public commands", () => {
+  const content = `## 不変条件
+
+- 委譲の前に worktree が作成済みであることを STEP-S3 の gate で検証する
+`;
+  const violations = checkCommandFile(PUBLIC_CMD, content);
+  expect(
+    violations.some((v) => v.rule === "command-format-workflow-step-id"),
+  ).toBe(true);
+});
+
+test("checkCommandFile allows non-identifier STEP mentions in public commands", () => {
+  const content = `## workflow
+
+本コマンドは workflow 実装本体を \`agentdev-workflow-demo\` スキルへ委譲する。同スキルは STEP model 対象の control plane を所有する。
+`;
+  const violations = checkCommandFile(PUBLIC_CMD, content);
+  expect(
+    violations.some((v) => v.rule === "command-format-workflow-step-id"),
+  ).toBe(false);
 });
 
 test("checkCommandFile detects non-G01 guardrail numbers", () => {

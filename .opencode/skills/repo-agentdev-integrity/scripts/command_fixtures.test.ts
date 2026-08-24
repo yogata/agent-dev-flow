@@ -420,14 +420,21 @@ describe("REQ-0030-010: Test fixture existence and content validity", () => {
           expect(headings!.length).toBeGreaterThan(0);
         });
 
-        it("body contains at least one numbered step reference", () => {
+        it("body contains a workflow dispatch to the dedicated Workflow Skill", () => {
           const body = content.split("---").slice(2).join("---");
-          // 前出出力検証表（層3転換、Issue #2183）の順序ラベル参照。
-          // ## workflow セクションの表行（STEP-N / STEP-S1 / STEP-W1 / STEP-E1 /
-          // 工程-N）または本文中の Step 番号参照のいずれかを要求する。
-          const hasNumberedStep =
-            /(^|\n)\s*\d+\.\s/.test(body) || /Step\s+\d/.test(body) || /(STEP|工程)-[A-Z]?\d/.test(body);
-          expect(hasNumberedStep).toBe(true);
+          // thin Command モデル（DEC-022、Issue #2428）: 公開 Command は工程表・
+          // STEP 識別子を持たず、専用 Workflow Skill への名レベル委譲を持つ。
+          const base = file.replace(/\.md$/, "");
+          const dispatch = new RegExp(
+            "agentdev-workflow-" + base.replace(/[^a-z0-9-]/g, "") + "\\b",
+          );
+          expect(dispatch.test(body)).toBe(true);
+        });
+
+        it("body contains no workflow step identifiers", () => {
+          const body = content.split("---").slice(2).join("---");
+          const stepId = /\b(STEP|工程)-[A-Z]?\d/.test(body);
+          expect(stepId).toBe(false);
         });
       });
     }

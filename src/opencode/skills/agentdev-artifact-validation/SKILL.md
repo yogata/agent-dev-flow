@@ -12,22 +12,6 @@ description: Owns document-type-crosscutting deterministic verification scripts,
 
 ---
 
-## 原本（SSoT）
-
-本スキルの原本仕様は `agentdev-artifact-validation` Design である。
-Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は Design を正とする。
-extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
-
-## skill extension 参照方針
-
-本スキルは以下の方針に従う。
-
-1. **前提とする固定知識の範囲**: `docs/` ディレクトリ構成（requirements/adr/specs）と公開検証契約（argv/stdin → stdout JSON）のみを前提とする
-2. **extension の読込契約**: 呼び出し元 command から渡された解決済み文脈を優先する
-3. **`Design 配下` 内部パスの固定知識化の禁止**: extension に列挙されていない `Design 配下` 内部パスを固定知識として参照しない
-4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行する
-
 ## 責務
 
 本スキルは**決定的検証のみ**を所有する。

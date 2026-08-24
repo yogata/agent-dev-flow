@@ -13,21 +13,6 @@ req-save の G02（Design 編集禁止）を緩和するものではなく、Des
 
 design-save command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 
-## 原本（SSoT）
-
-本スキルの原本仕様は SKILL.md（control plane）と `references/` 配下（各 STEP 詳細）が担う。
-Workflow Skill 固有契約は `<workflows/workflow-skill-model>` Design が正規所有する。
-extension（`.agentdev/extensions/skills/agentdev-workflow-design-save.yaml`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
-
-## skill extension 参照方針
-
-本スキルは以下の方針に従う（ADR、`agentdev-skill-authoring` 準拠）。
-
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/decisions/designs）と design-save command の公開契約のみを前提とする。Design ディレクトリの内部構成は仮定しない
-2. **extension の読込契約**: 呼び出し元 command から渡された解決済み文脈を優先し、不足分のみ skill extension を読む。reference ごとの extension は作らない
-3. **Design 内部パスの固定知識化の禁止**: extension に列挙されていない `docs/designs/**` 内部パスを固定知識として読みに行かない
-4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
-
 ## 入力
 
 - `.agentdev/drafts/req-draft-{topic-slug}.md`（req-define が生成し req-save が REQ 保存済みのドラフト。`draft-data` の `artifact_actions` に `artifact: design` entry を含む）
@@ -102,14 +87,6 @@ design-save は、req-define で Design action と対象要件の対応が明示
 - Design 文書の対応付けは任意とし、Design action が存在しない要件の処理を妨げない
 - 対応 REQ、同一 canonical owner の Design、関連 command、skill、integrity rule の探索（STEP-3 配置先解決、STEP-4 Design 分離基準の最終確認）は、README 索引、正規成果物の直接読取、`rg` 等の独立探索手段で行う（agentdev-traceability を一般文書探索、依存関係探索へ利用しない）
 - 中断後の再実行では、正規成果物に保存済みの対応宣言を再利用し、同じ対応宣言を重複生成しない
-
-## Workflow Extension 読込
-
-本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-design-save.yaml`、`kind: workflow-extension`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。
-必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-design-save/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。
-いずれも Workflow Skill のみが読み、design-save command は直接読まない。
-標準動作に追加・拡張される（上書きではない）。
-存在しない場合は標準動作で続行する。
 
 ## 共通制約
 

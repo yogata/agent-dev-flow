@@ -10,15 +10,6 @@ description: inbox 内の intake item をレビュー、分類し、採用 item 
 ** GitHub Issue の作成は行わない。
 `intake-review` は廃止済みであり、本コマンドが review 機能を吸収している。
 
-## project extensions
-
-本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-intake-promote`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-intake-promote.yaml`、kind: workflow-extension）を読み込む。
-
-- extension は `context` / `rules` / `checks` / `acceptance_gates` / `must_not` の5セクションを持ち、本コマンドの標準動作に追加・拡張される（上書きではない）
-- extension が存在しない場合は標準動作で続行する
-- extension が破損している場合はエラーを表示して当該 extension を無視し、標準動作で続行する
-- 詳細な読み込み契約は `agentdev-project-extensions` skill 参照
-
 ## 入力
 
 - intake item 群（`.agentdev/intake/inbox/` 内の Markdown ファイル）
@@ -51,18 +42,7 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 ## workflow
 
 本コマンドは workflow 実装本体を `agentdev-workflow-intake-promote` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
-同スキルが6 STEP の control plane として制御構造を所有する。
-各 STEP は resume point を持ち、durable state（`.agentdev/intake/inbox/` と `.agentdev/intake/promoted/` の実ファイル状態、分類確定状態）から再開点を再構成する（DEC-{N}）。
-各工程を前出出力検証表で示す（工程ラベルが推奨順）。
-
-| 工程 | 前提条件 | 出力契約 | 検証基準 |
-|---|---|---|---|
-| STEP-1 classification | inbox に item 存在 | item ごとの暫定分類（採用/保留/却下）と自律確定候補/ユーザー判断必要の判定 | 分類根拠と自律確定候補/ユーザー判断必要の判定が各 item に付いていること |
-| STEP-2 review（adversarial-review） | 暫定分類の意味的決定が存在、またはユーザー明示指定（default-on） | review 経由を要する自律確定候補は review 完了後に確定 | accepted finding が分類案へ反映されていること |
-| STEP-3 HITL | ユーザー判断必要 item が残存（全 item 自律確定時は HITL 提示を省略） | 分類確定（自律確定 item は根拠に基づく確定、ユーザー判断必要 item はユーザー承認済み） | ユーザー判断必要 item のみが提示され、ユーザーが「確定」を明示していること。自律確定済み item は確定内容の報告にとどまること |
-| STEP-4 persistence | 分類確定済み | `.agentdev/intake/promoted/*.md`（フラット構造） | 整形結果が元 item の意味を保持した整理・構造化にとどまっていること |
-| STEP-5 destructive handling | persistence 済み | 採用 item の inbox 元ファイル削除・reject item の即時削除（却下理由を commit message に含む） | 削除対象が分類確定内容と一致していること |
-| STEP-6 完了報告 | 処理実行済み | 分類結果レポート・完了報告（次ステップの提示） | 採用/保留/却下の集計と次コマンド提示が報告されていること |
+工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの control plane が所有する。
 
 ## 自律確定とHITL境界
 
@@ -99,4 +79,4 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 - G08: 分類未確定のままの自動確定、自動進行は行わない（REQ）。ユーザー判断必要 item はユーザーが「確定」を明示的に指示してから次フェーズに進む。根拠から一意に確定できる item の自律確定と、確定後の自動進行は REQ で許容される
 - G12: 元 item の本文に整形結果を書き込まない
 - G16: 保存先は .agentdev/intake/promoted/ 直下のみ（フラット構造）
-- G18: 破壊的変更（inbox 大量削除、重要 item の誤分類是正等）は STEP-3（HITL）承認とは別に明示承認を維持する（REQ）
+- G18: 破壊的変更（inbox 大量削除、重要 item の誤分類是正等）は HITL 承認とは別に明示承認を維持する（REQ）

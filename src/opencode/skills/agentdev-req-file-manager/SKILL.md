@@ -12,22 +12,6 @@ description: Manages REQ numbering and requirement file operations (CREATE/APPEN
 
 ---
 
-## 原本（SSoT）
-
-本スキルの原本仕様は `agentdev-req-file-manager` Design である。
-Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は Design を正とする。
-extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
-
-## skill extension 参照方針
-
-本スキルは以下の方針に従う。
-
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）のみを前提とし、`docs/designs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
-2. **extension の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill extension（`.agentdev/extensions/skills/agentdev-req-file-manager.yaml`）を読む。skill extension はスキル単位で1ファイルに集約し、reference ごとの extension は作らない
-3. **`docs/designs/**` 内部パスの固定知識化の禁止**: extension に列挙されていない `docs/designs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/designs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
-4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
-
 ## REQ番号採番と要件行記述
 
 REQ番号は `REQ-{NNNN}`（4桁ゼロ埋め、欠番埋め禁止、max+1）。
@@ -205,4 +189,3 @@ SKILL.md 本文から遅延読み込みされる詳細資料。
 | [references/create-append-update-flow.md](references/create-append-update-flow.md) | CREATE/APPEND/UPDATE 操作モード、状況判定、APPEND/UPDATE判定フロー、廃止宣言 APPEND の precedent 利用、機械置換手順の3段階適用と参照検査観点（参照実在確認、変動値分離） |
 | [references/matching-and-merge.md](references/matching-and-merge.md) | 既存REQ照合方法論、整合性チェック、関連情報管理、マージ競合対応パターン |
 | [references/req-save-procedure.md](references/req-save-procedure.md) | req-save の詳細手順（分類ゲート検査、文書分類適合確認、REQファイル操作、インデックス/ハブ更新、リモート同期と hash 検証、RU パス保存禁止） |
-

@@ -8,13 +8,6 @@ description: docs/issue-list/ 配下の課題ファイルによる未解決事�
 課題管理 Capability Skill。
 開発過程で生じた未解決事項を `docs/issue-list/` の課題ファイルとして、発生から検討、保留、解決、正規成果物への反映確認まで継続して追跡するための共通能力を提供する。
 
-## 原本（SSoT）
-
-本スキルの原本仕様は `agentdev-issue-tracking` Design である。
-Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は Design を正とする。
-extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
-
 ## 責務と境界
 
 - 本スキルは `docs/issue-list/` 配下の課題ファイルの管理を担う。課題ファイルは永続的な git 管理対象の正規成果物であり、`.agentdev/` 配下の一時成果物とは扱いを区別する。

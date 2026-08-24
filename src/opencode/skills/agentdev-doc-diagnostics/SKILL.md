@@ -10,22 +10,6 @@ inspect-docs command から呼ばれる docs 横断診断の判断基盤。
 REQ 固有の SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断、文意品質、探索順は再定義せず、各専門 skill へルーティングする。
 検査対象を直接修正しない診断専用であり、本スキルは判定ロジックとルーティング表の提供のみを行う。
 
-## 原本（SSoT）
-
-本スキルの原本仕様は `agentdev-doc-diagnostics` Design である。
-Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は Design を正とする。
-extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
-
-## skill extension 参照方針
-
-本スキルは以下の方針に従う。
-
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）のみを前提とし、`Design 配下` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
-2. **extension の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill extension（`.agentdev/extensions/skills/agentdev-doc-diagnostics.yaml`）を読む。skill extension はスキル単位で1ファイルに集約し、reference ごとの extension は作らない
-3. **`docs/designs/**` 内部パスの固定知識化の禁止**: extension に列挙されていない `docs/designs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/designs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
-4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
-
 ## 検査対象を直接修正しない制約
 
 - ファイル変更（docs 配下、REQ/ADR/Design、Command/Skill/Template/Script）、Issue 作成、PR 作成、RU 保存、branch/worktree 操作を行わない。許可される副作用は `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit/push）のみ（inspect lifecycle 準拠）

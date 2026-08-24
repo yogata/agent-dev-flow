@@ -9,13 +9,6 @@ description: Resolves project-specific extensions (.agentdev/extensions/skills/*
 配布 command/skill 本文はプロジェクト非依存であり、プロジェクト固有情報は `.agentdev/extensions/**` 経由で実行時に与えられる。
 extension の読み取り主体は Workflow Skill と Capability Skill である（各読み取り主体の対応 extension 種別は「責務ごとの手順」参照）。
 
-## 原本（SSoT）
-
-本スキルの原本仕様は `agentdev-project-extensions` Design である。
-Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は Design を正とする。
-extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
-
 ## 担当
 
 | 責務 | 内容 |

@@ -12,13 +12,6 @@ adapter skill 経由での委譲起動、委譲 prompt 内で実行 command を�
 - **参照元**: `case-run`（実行担当サブエージェント起動時）
 - **特性**: アダプタープロトコルの宣言的定義のみ提供する。Epic/Wave orchestration、worktree 管理、完了条件チェックボックス評価は本スキルの対象外。
 
-## 原本（SSoT）
-
-本スキルの原本仕様は `agentdev-case-run-execution-adapter` Design である。
-Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は Design を正とする。
-extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
-
 ## 入力
 
 - case-run から引き渡される worktree root（相対パス）、ブランチ名、対象 Issue 番号、委譲 prompt 内の実行 command 指定

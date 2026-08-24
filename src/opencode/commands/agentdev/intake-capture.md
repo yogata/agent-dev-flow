@@ -10,15 +10,6 @@ description: 未分類の変更候補を手動入力から intake item として
 ** GitHub Issue の作成、採用可否の判断は行わない。
 作業知見だけの内容は対象外である（`agentdev-workflow-orchestration` の capture 振り分け基準を参照）。
 
-## project extensions
-
-本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-intake-capture`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-intake-capture.yaml`、kind: workflow-extension）を読み込む。
-
-- extension は `context` / `rules` / `checks` / `acceptance_gates` / `must_not` の5セクションを持ち、本コマンドの標準動作に追加・拡張される（上書きではない）
-- extension が存在しない場合は標準動作で続行する
-- extension が破損している場合はエラーを表示して当該 extension を無視し、標準動作で続行する
-- 詳細な読み込み契約は `agentdev-project-extensions` skill 参照
-
 ## 入力
 
 - ユーザーの自然言語による変更候補の記述
@@ -31,20 +22,7 @@ description: 未分類の変更候補を手動入力から intake item として
 ## workflow
 
 本コマンドは workflow 実装本体を `agentdev-workflow-intake-capture` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
-同スキルが保存専用 workflow の実装（入力の受領から intake item 生成、保存、git 永続化、完了報告まで）を所有する。
-
-本 workflow は capture-only型であり、STEP model の対象外である（REQ-{NNNN}-{NNN}）。
-resume point / export / import を持たない。
-工程は逐次実行し、中断時は最初から再実行する。
-各工程を前出出力検証表で示す（工程ラベルが推奨順）。
-
-| 工程 | 前提条件 | 出力契約 | 検証基準 |
-|---|---|---|---|
-| STEP-1 入力の受領 | ユーザーの手動入力あり | 受領済み変更候補の記述 | 入力が「未分類の作業候補、不整合、規約違反、未回収課題」のいずれかに該当すること（作業知見のみは対象外） |
-| STEP-2 intake item の生成 | 入力受領済み | item 本文 | 元の意図を保った整理にとどまっていること（推測不能なセクションは省略） |
-| STEP-3 ファイル名の生成・実行前同期 | item 生成済み | `YYYY-MM-DD-{topic-slug}.md` ファイル名 | 同名ファイル存在時は連番付与（`{topic-slug}-2` 等）であること |
-| STEP-4 保存・永続化 | ファイル名確定 | `.agentdev/intake/inbox/` への保存・git 永続化 | 保存先が `.agentdev/intake/inbox/` のみであること |
-| STEP-5 完了報告 | 保存済み | 完了報告（パス・次アクション） | 保存パスと次コマンド（`/agentdev/intake-promote`）が報告されていること |
+工程、分岐、再開、停止などの高水準の実行構造は同スキルの control plane が所有する。
 
 ## 不変条件
 

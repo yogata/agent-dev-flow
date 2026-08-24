@@ -20,33 +20,10 @@ description: 自然言語で課題管理（docs/issue-list/ の課題ファイ�
 - 課題ファイル（`docs/issue-list/` 配下の作成・更新。書き込み操作時）
 - 検索・参照結果、操作結果の報告（セッション内テキスト出力）
 
-## project extensions
-
-本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-issue`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-issue.yaml`、kind: workflow-extension）を読み込む。
-
-- extension は `context` / `rules` / `checks` / `acceptance_gates` / `must_not` の5セクションを持ち、本コマンドの標準動作に追加・拡張される（上書きではない）
-- extension が存在しない場合は標準動作で続行する
-- extension が破損している場合はエラーを表示して当該 extension を無視し、標準動作で続行する
-- 詳細な読み込み契約は `agentdev-project-extensions` skill 参照
-
 ## workflow
 
 本コマンドは workflow 実装本体を `agentdev-workflow-issue` スキルへ委譲する（DEC-{N}、REQ-{NNN}-{NNN}）。
-同スキルが自然言語入口の制御構造（操作種別判定、課題化判定、課題管理 Capability Skill への委譲、永続化）を所有する。
-本 workflow は対話操作完結型であり、STEP model の対象外である。各工程ラベルは順序ラベルであり resume point ではない。
-各工程を前出出力検証表で示す（工程ラベルが推奨順）。
-
-| 工程 | 前提条件 | 出力契約 | 検証基準 |
-|---|---|---|---|
-| STEP-1 入力の受領・操作種別判定 | コマンド起動 | 操作種別の判定結果 | 自然言語の指示と会話文脈から操作種別（新規起票、検索・参照、更新、検討経過追加、保留、再評価、解決、反映確認、クローズ、再オープン）が判定されていること |
-| STEP-2 対象課題の特定・前提確認 | 操作種別判定済み | 対象課題と現在状態の確認結果 | 状態遷移操作は対象課題の現在状態と操作前提（クローズは反映確認の完了等）を確認していること |
-| STEP-3 課題化判定 | 新規起票系の指示 | 課題化候補判定と重複確認の結果 | 現在の作業で解決できず将来に影響する未解決事項の判定、正規成果物確認による事前解決の試行、既存課題検索による重複起票防止が実施されていること |
-| STEP-4 操作の実行 | 前提確認済み | 操作結果（課題ファイルの作成・更新、または検索・参照結果） | 課題管理 Capability Skill（`agentdev-issue-tracking`）の操作手順と課題ファイル形式に従っていること |
-| STEP-5 永続化・完了報告 | 操作実行済み | `docs/issue-list/` 配下の変更の scoped commit と完了報告 | 書き込み操作の変更が git 管理対象として永続化され、操作結果と課題 ID が報告されていること |
-
-**soft guard（REQ-{NNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-issue` が所有する。
-同 Workflow Skill は `/agentdev/issue` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。
-OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
+工程、分岐、再開、停止などの高水準の実行構造（操作種別判定、課題化判定、課題管理 Capability Skill への委譲、永続化）は同スキルの control plane が所有する。
 
 ## 不変条件
 
