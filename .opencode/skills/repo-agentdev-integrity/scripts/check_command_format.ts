@@ -1,4 +1,4 @@
-// ADF-COVERS(implementation): REQ-002-037, REQ-002-038, REQ-002-039, REQ-002-040, REQ-002-041, REQ-051-005
+// ADF-COVERS(implementation): REQ-002-037, REQ-002-038, REQ-002-039, REQ-002-040, REQ-002-041, REQ-051-005, REQ-051-006
 // ADF-COVERS(verification): REQ-002-001, REQ-002-041
 /**
  * Command file format violation checker (IR-049 + IR-028/029/030/031).
