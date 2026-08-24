@@ -32,19 +32,19 @@
 #### STEP-5-1: Post-merge テスト戦略検証
 
 マージ後のみ確認可能な項目（CI通過等）を反映。
-Issue 本文更新手続き（`agentdev-gh-cli`）で更新 → VERIFY。
+`agentdev_gh` の issue_update 操作で更新 → VERIFY。
 
 #### STEP-5-2: 実証最終クローズ（実証Caseの最終 case-close 時のみ）
 
 Issue 本文の実証Case状態情報（対象評価ブランチ等の永続記録）から実証Caseと判定され、かつ当該 Issue が実証全体の最終 case-close に該当する場合に実行する。該当しない場合はスキップする（通常Caseの挙動を変更しない）。
 
 - **新しい評価を開始しない**: 最終 case-close で新しい評価を始めない。事前の評価契約（Issue 本文の正規記録）と蓄積済み証拠（各 PR 本文の実行条件・測定結果・観察結果・証拠・評価結果）から最終結果を導出する
-- **最終評価結果の正規記録**: 導出した最終評価結果（採用、不採用、判定不能、未確定の区別を含む）を Issue 最終コメントとして正規記録する（`agentdev-gh-cli` のコメント追加手続き → VERIFY）。評価ブランチ削除後も Issue/PR から結果と証拠を追跡できる構成とする
+- **最終評価結果の正規記録**: 導出した最終評価結果（採用、不採用、判定不能、未確定の区別を含む）を Issue 最終コメントとして正規記録する（`agentdev_gh` の issue_comment 操作。成功応答は読み戻し検証済み）。評価ブランチ削除後も Issue/PR から結果と証拠を追跡できる構成とする
 - **評価契約の書き換え禁止**: 実証全体の最終完了後は当該実証の評価契約および最終結果を書き換えない
 
 #### STEP-5-3: Issue クローズ
 
-Issue close 手続き（理由: completed、`agentdev-gh-cli`）。
+`agentdev_gh` の issue_close 操作（理由: completed）。
 
 ### Result
 
@@ -104,8 +104,8 @@ worktree/branch 削除、親Epic 自動クローズ判定、実行前同期、Ca
 
 - **Issue 本文から Parent Issue 番号を特定**: `Parent: #{N}` パターン
 - **Parent なし** → スキップ
-- **ステータストラッキング表を更新** → `agentdev-gh-cli` VERIFY
-- **子Issue 状態事前取得**: Issue 補助データ読込手続き（`agentdev-gh-cli`）で全子Issue の OPEN/CLOSED 状態を一覧取得しログ出力
+- **ステータストラッキング表を更新** → `agentdev_gh` issue_update（読み戻し検証済み）
+- **子Issue 状態事前取得**: `agentdev_gh` の issue_read 操作で全子Issue の OPEN/CLOSED 状態を一覧取得しログ出力
 - **Epic 自動クローズ判定**: 全子Issue CLOSED → 自動クローズ。1件以上 OPEN → スキップ
 
 #### STEP-6-3: 実行前同期
@@ -153,7 +153,7 @@ learning と intake を同一 commit に含める。
 #### STEP-6-6: tmp/ 残存確認
 
 当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないことを確認する。
-残存時は `agentdev-gh-cli` の cleanup 規定に従って処理し、残存ファイルと対応結果を STEP-6-7 の完了報告に明示する。
+残存時は workflow 側 cleanup 規定（当該実行内での削除）に従って処理し、残存ファイルと対応結果を STEP-6-7 の完了報告に明示する。
 
 #### STEP-6-7: 完了報告
 
@@ -211,7 +211,7 @@ GitHub 完了後に `.agentdev` push 失敗の場合は standard 種別を使用
 
 ## 関連 Capability Skill
 
-- `agentdev-gh-cli`: Issue 本文更新、Issue close、対応記録コメント VERIFY、子Issue 状態取得
+- Custom Tool `agentdev_gh`: Issue 本文更新、Issue close、対応記録コメント、子Issue 状態取得
 - `agentdev-git-worktree`: worktree/branch 削除、重複ファイルチェック、git 統合先同期リスク検出、`git pull --ff-only`、並列実行安全ステージング
 - `agentdev-epic-tracker`: 親Epic Issue 本文ステータステーブル更新、Epic 自動クローズ判定
 - `agentdev-learning-capture`: 学び検知・抽出（エージェント自律）

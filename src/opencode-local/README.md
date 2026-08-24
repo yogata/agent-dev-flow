@@ -24,9 +24,10 @@ link mode では `src/opencode/` の原本をそのまま接続するため、�
 ```text
 src/opencode-local/
 ├── README.md              ← 本ファイル（ローカル版 link 設定手順）
-├── agentdev-gh-cli/       ← ローカル版 agentdev-gh-cli の原本（case-schema を吸収）
-│   ├── SKILL.md           ← ローカル版 agentdev-gh-cli のルーティング入口
-│   ├── references/        ← 操作契約・Case ファイル対応手続き・VERIFY 観点
+├── agentdev-gh-cli/       ← Custom Tool agentdev_gh の Local 実装 Tool（case-schema を吸収）
+│   ├── README.md          ← Local 実装 Tool の説明（読み替え規則・接続方式）
+│   ├── runner-local.ts    ← 同一操作契約の GhRunner 実装（Case ファイル読み書き）
+│   ├── tests/             ← Local 実装のテスト
 │   └── case-schema/       ← Case ファイルの操作用定義（正本は docs/designs/local/local-case-file.md）
 │       ├── case-file.md   ← スキーマ定義（YAML 前書き・status enum・labels・headings・採番）
 │       └── rules/
@@ -68,9 +69,9 @@ link mode では原本がそのまま接続されるため、旧変換資産に�
 
 2. **link target の確認**: 後述の「link target 確認」を実施し、意図した link target がすべて揃っていることを確認する
 
-3. **通常版 link の設定**: `.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/`（agentdev-gh-cli を除く）を `src/opencode/` 配下へ接続する（ADR-0131 decision #2）
+3. **通常版 link の設定**: `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`、`.opencode/tools/agentdev-*/`、`.opencode/plugins/agentdev-*/` を `src/opencode/` 配下へ接続する（ADR-0131 decision #2）
 
-4. **agentdev-gh-cli の差し替え**: `.opencode/skills/agentdev-gh-cli/` だけを `src/opencode-local/agentdev-gh-cli/` へ接続する（ADR-0131 decision #3）
+4. **Custom Tool 実装の差し替え**: `.opencode/tools/agentdev-gh/` だけを `src/opencode-local/agentdev-gh-cli/`（Local 実装 Tool）へ接続する（ADR-0131 decision #3、REQ-011-006。実行は install.ps1 -LocalMode が設定する）
 
 5. **link 設定の検証**: 各 link が意図した target へ解決されることを確認する
 
@@ -84,8 +85,8 @@ link 設定前に `.opencode/` 配下の各 path が意図した link target へ
 | 対象 | 期待される link target |
 |---|---|
 | `.opencode/commands/agentdev/` | `src/opencode/commands/agentdev/` |
-| `.opencode/skills/agentdev-*`（agentdev-gh-cli 以外） | `src/opencode/skills/agentdev-*/` |
-| `.opencode/skills/agentdev-gh-cli/` | `src/opencode-local/agentdev-gh-cli/` |
+| `.opencode/skills/agentdev-*` | `src/opencode/skills/agentdev-*/` |
+| `.opencode/tools/agentdev-gh/` | `src/opencode-local/agentdev-gh-cli/`（Local 実装 Tool） |
 
 link target 確認は決定的な検査として実施する（ADR-0107, ADR-0131 decision #6）。
 AI エージェントの解釈に依存せず、ファイルシステムの実パス解決により機械的に判定する。
@@ -119,8 +120,8 @@ link による接続であるため、上書き問題が発生しない。
 - link 設定の結果を `src/opencode-local/` 配下へ出力しないこと
 - AgentDevFlow 本体リポジトリでローカル版 link 設定を実行しないこと（REQ-0141-006）
 - link target が意図した target 以外へ解決される場合は link 設定を停止すること（REQ-0141-010, AG-012）
-- `.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/`（agentdev-gh-cli 以外）を `src/opencode/` 配下へ接続すること（ADR-0131 decision #2）
-- `.opencode/skills/agentdev-gh-cli/` だけを `src/opencode-local/agentdev-gh-cli/` へ接続すること（ADR-0131 decision #3）
+- `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`、`.opencode/tools/agentdev-*/`（agentdev-gh 以外）、`.opencode/plugins/agentdev-*/` を `src/opencode/` 配下へ接続すること（ADR-0131 decision #2）
+- `.opencode/tools/agentdev-gh/` だけを `src/opencode-local/agentdev-gh-cli/` へ接続すること（ADR-0131 decision #3、REQ-011-006）
 - `runtime-overrides/` を設けないこと
 - バックエンド抽象化を導入しないこと（REQ-0141-027）
 - GitHub 互換ローカルサーバを前提にしないこと（REQ-0141-027）
@@ -128,13 +129,13 @@ link による接続であるため、上書き問題が発生しない。
 
 ## リポジトリ管理対象
 
-- **管理対象外**: link により接続された `.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/`（agentdev-gh-cli を含む）。導入先リポジトリの `.gitignore` で除外することを推奨する（REQ-0141-008, ADR-0131 decision #1）
+- **管理対象外**: link により接続された `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`、`.opencode/tools/agentdev-*/`（Local 実装差し替えを含む）、`.opencode/plugins/agentdev-*/`。導入先リポジトリの `.gitignore` で除外することを推奨する（REQ-0141-008, ADR-0131 decision #1）
 - **管理対象**: `.agentdev/cases/` 配下の Case ファイル（REQ-0141-016）
 
 ## 関連項目
 
 - [Case ファイルスキーマ定義](agentdev-gh-cli/case-schema/case-file.md)：ローカル Case ファイルの構造
-- [ローカル版 agentdev-gh-cli ルーティング入口](agentdev-gh-cli/SKILL.md)：ローカル版 agentdev-gh-cli の手続き一覧
+- [Local 実装 Tool](agentdev-gh-cli/README.md)：Custom Tool `agentdev_gh` の Local 実装（同一操作契約の読み替え規則）
 - `docs/requirements/REQ-0141.md`：ローカル版 OpenCode 導入方式とローカル Case ファイル運用の要件定義（正本）
 - `docs/designs/local/local-generation.md`：link mode 接続フロー、link target 確認、更新運用の正本 Design
 - `docs/designs/local/local-case-file.md`：Case ファイルスキーマの正本 Design

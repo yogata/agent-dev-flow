@@ -94,7 +94,7 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 ### termination
 
 - 正常終了: single は PR 作成確認とクリーンアップ完了報告まで。epic-wave は1 Wave 分の result 集約と Wave 完了報告まで
-- 一時ファイル残存: 正常終了の前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（STEP-S6/W5 で確認。cleanup 規定は `agentdev-gh-cli`）
+- 一時ファイル残存: 正常終了の前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（STEP-S6/W5 で確認。一時ファイル cleanup 規定（workflow 側で生成した `.agentdev/tmp/` 一時ファイルは当該実行内で削除する。Custom Tool 内部の一時ファイルは Tool が操作ごとに自動削除する））
 - 停止終了: blocked / failed（Issue コメント SSoT）、delegation-unavailable（Issue を pending へ戻す）、配布依存境界 最終 gate 違反（PR 本文 SSoT）、worktree precondition gate 失敗（実行担当サブエージェント起動前に停止）
 - 引き継ぎ停止: Issue 本文に `agentdev_handoff: true` を含む場合、リポジトリ種別に応じた停止判定（`agentdev-workflow-lifecycle` runtime-package-boundary）
 
@@ -109,7 +109,7 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 - `agentdev-epic-tracker`: Epic Issue 本文読込、Wave 子Issue 特定、親Epic ステータス更新
 - `agentdev-req-analysis`: チェックボックス品質基準
 - `agentdev-quality-gates`: QG-3 前置 staleness check、QG-4 bun test フル suite 正規形（機械受理基準）
-- `agentdev-gh-cli`: Issue 本文読取等の I/O 手続き
+- Custom Tool `agentdev_gh`: Issue 本文読取等の I/O 操作
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 - `agentdev-traceability`: トレーサビリティ能力（coverage、check。委譲内の対応関係確認と PR 作成前検査。fail-open）
 - integrity checker skill（リポジトリ固有・配布対象外）: check_changed_docs.ts（targeted docs guard）、check_extensions.ts（IR-{NNN}）、check_distribution_boundary.ts（配布依存境界、source / link 両 profile）、generate_indexes.ts（AUTOGEN 索引再生成）

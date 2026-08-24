@@ -6,7 +6,7 @@ description: GitHub Issue の作成・更新・リンク・確認の安全手順
 # `agentdev-issue-management`
 
 GitHub Issue の作成、更新、リンク、確認を安全に行うための操作手順を提供するスキル。
-`agentdev-gh-cli` の VERIFY 操作（書き込み内容検証）と連携し、Issue 操作特有の安全性要件を補完する。
+Custom Tool `agentdev_gh`（書き込みは Tool 内部の読み戻し検証で完了）と連携し、Issue 操作特有の安全性要件を補完する。
 
 ## 対象コマンド
 
@@ -24,13 +24,13 @@ GitHub Issue の作成、更新、リンク、確認を安全に行うための�
 
 ## 動作指針
 
-- 本スキルの各手順は `agentdev-gh-cli` の読み取り手続きおよび VERIFY 操作と連携する。読み取り、書き込みの基本安全性は `agentdev-gh-cli` を参照すること。
+- 本スキルの各手順は Custom Tool `agentdev_gh` の操作と連携する。読み取り、書き込みの基本安全性（文字コード、一時ファイル、読み戻し検証）は Tool が内部で担保する。
 - Issue 操作特有の安全性要件（リンク確認、テーブル整合性、前後比較、プレースホルダー残存検証）を本スキルが補完する。
 - 各書き込み操作（作成、更新、コメント追加）ごとに個別に VERIFY を実行すること（一括検証は不可）。
 
 ## See Also
 
-- `agentdev-gh-cli`（gh CLI のエンコーディング、ファイル書き込み安全性、VERIFY 操作（書き込み内容検証）の基本手順。本スキルの各手順は `agentdev-gh-cli` の VERIFY 操作およびリトライロジックと連携する。）
+- Custom Tool `agentdev_gh`（GitHub I/O 操作。エンコーディング、一時ファイル運用、読み戻し検証は Tool 内部。検証失敗時のリトライ判断は呼び出し側。）
 - `agentdev-workflow-templates`（Issue 本文の構造、テンプレート（`issue_desc_feature.md`, `issue_desc_bug.md`, `issue_desc_epic.md`, `issue_desc_child.md`）、コメントテンプレート、完了報告テンプレート、リポジトリ参照リンク規約。）
 
 ## 禁止事項

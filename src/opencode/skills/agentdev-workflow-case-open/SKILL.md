@@ -23,7 +23,7 @@ case-open command は公開 interface（入出力契約・ガードレール）�
 
 ## 副作用
 
-- GitHub Issue 作成、コメント追加（`agentdev-gh-cli` 経由）
+- GitHub Issue 作成、コメント追加（Custom Tool `agentdev_gh` 経由）
 - `.agentdev/drafts/req-draft-*.md` 削除、`.agentdev/backlog/req-units/RU-*.md` 削除（Form Zero、`git rm` + 即時 commit + push）
 - 当該 Workflow Skill は worktree root 配下以外を編集しない（case-open command の worktree 隔離に従う）
 
@@ -65,7 +65,7 @@ case-open workflow は次の6 STEP で構成する。
 - `agentdev-issue-management`: Issue 操作の安全手続き、テンプレート選定、委譲接続点
 - `agentdev-epic-tracker`: Epic 進捗追跡、Wave 構成、自律構成生成、子Issue 数上限
 - `agentdev-quality-gates`: QG-2 完了条件網羅性検証
-- `agentdev-gh-cli`: gh CLI I/O 境界（Issue 作成・コメント追加・VERIFY）
+- Custom Tool `agentdev_gh`: GitHub I/O 境界（Issue 作成・コメント追加。VERIFY は Tool 内部）
 - `agentdev-workflow-templates`: Issue/PR/コメントテンプレート選定、実行識別情報セクション形式
 - `agentdev-workflow-lifecycle`: 引き継ぎ停止判定（runtime-package-boundary）
 - `agentdev-req-file-manager`: RU ファイル削除
@@ -93,7 +93,7 @@ Issue の対象範囲、完了条件、test strategy の確定（STEP-2、STEP-3
 - **Form Zero**: draft/RU 削除は `git rm <path>` で明示パスをステージし、同一ステップで `git commit -- <path>` により即時コミットし、未ステージ残存を許さない
 - **統合先・実証Case識別情報**: Case に割り当てられた統合先（既定値 main）を Issue 本文の execution contract へ記録する。実証Caseの場合は実証Case識別情報（実証フラグ、対象評価ブランチ、所属実証単位）と評価契約を Issue 本文へ永続記録し、評価結果の採否を Issue 完了条件へ含めない。実証Case専用要素を presence-based 判定の新契約必須セクション一覧から除外する（詳細は STEP-2/3/6 各 reference）
 - **実行識別情報の記録**: 新規作成 Issue 本文に実行識別情報セクション（対象 Case、ADF 工程、実行単位、前工程で確定した事項）を構造化形式で記録する。形式は `agentdev-workflow-templates` の実行識別情報セクション規約に従う。機械的解析は同セクションの key-value 行を正とし、自由文中の ID に依存しない。識別情報の一部が取得不能でも停止せず「N/A」を記録する。作成時点で番号が確定しない自己参照値は Issue 作成後に埋め戻す。既存 Issue への遡及適用は行わない（詳細は STEP-2/ STEP-5 各 reference）
-- **本文 verbatim・ファイル経由**: Issue 本文の gh CLI への引き渡しは `agentdev-gh-cli` の WRITE 標準手続き（ファイル経由）に従う（`POL-gh-io-delegation`）
+- **本文 verbatim**: Issue 本文は Custom Tool `agentdev_gh` の操作引数としてそのまま渡す（文字コード・一時ファイルの実装詳細は Tool 内部）（`POL-gh-io-delegation`）
 
 ## See Also
 

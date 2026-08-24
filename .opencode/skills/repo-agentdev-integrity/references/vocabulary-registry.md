@@ -104,7 +104,6 @@ IR-050・IR-051 の対象 skill 名（`agentdev-*` プレフィックス形式�
 | `agentdev-conventional-commits` | conventional commits 規約 |
 | `agentdev-doc-writing` | 文書執筆品質 |
 | `agentdev-epic-tracker` | Epic 状態追跡 |
-| `agentdev-gh-cli` | gh CLI 操作 |
 | `agentdev-git-worktree` | git worktree 管理 |
 | `agentdev-inspect-skills` | command/skill 参照妥当性検出 |
 | `agentdev-intake-pipeline` | intake パイプライン |

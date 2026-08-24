@@ -174,7 +174,7 @@ Commandから切り出すべき内容:
 | スキーマ定義（JSON/YAML） | Skillの`references/` | 構造定義 |
 | 決定的な変換、検証、生成 | Script | テスト可能な処理 |
 | フォーマッティング処理 | Script | 純粋関数 |
-| 共通安全手順の詳細 | Skill（`agentdev-gh-cli`等） | 再利用 |
+| 共通安全手順の詳細 | Capability Skill / Custom Tool（`agentdev_gh` 等） | 再利用 |
 
 ## Content vs Reference 分割ガイド
 
@@ -294,12 +294,12 @@ Source path は agent-dev-flow 開発リポジトリ内でのみ有効であり�
 
 **✅ OK（Skill 参照時は実行時パス）**:
 ```markdown
-Skill `agentdev-gh-cli`（`.opencode/skills/agentdev-gh-cli/SKILL.md`）の VERIFY操作を実行する
+Custom Tool `agentdev_gh` の操作を実行する（成功応答は読み戻し検証済み）
 ```
 
 **❌ NG（source path で Skill を参照）**:
 ```markdown
-Skill `agentdev-gh-cli`（`src/opencode/skills/agentdev-gh-cli/SKILL.md`）の VERIFY操作を実行する
+Custom Tool `agentdev_gh` の操作を実行する（成功応答は読み戻し検証済み）
 ```
 
 ### 適用範囲

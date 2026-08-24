@@ -1532,28 +1532,8 @@ function buildIr053Fixture(root: string): void {
     "utf-8",
   );
 
-  // Exclusion path: standard-procedures.md may use gh directly (REQ-0149-003).
-  const ghCliRefDir = join(
-    root,
-    "src",
-    "opencode",
-    "skills",
-    "agentdev-gh-cli",
-    "references",
-  );
-  mkdirp(ghCliRefDir);
-  writeFileSync(
-    join(ghCliRefDir, "standard-procedures.md"),
-    [
-      "# Standard Procedures",
-      "",
-      "gh pr create --title \"{title}\" --body-file {body}",
-      "gh issue edit {N} --body-file {body}",
-      "gh pr merge {N} --squash",
-      "",
-    ].join("\n"),
-    "utf-8",
-  );
+  // The former agentdev-gh-cli skill (retired by the GitHub I/O migration,
+  // REQ-011-001) owned the permitted-file exemption; no exemption fixture remains.
 }
 
 describe("IR-053 gh-direct-invocation (REQ-0152-001/002)", () => {
@@ -1585,18 +1565,6 @@ describe("IR-053 gh-direct-invocation (REQ-0152-001/002)", () => {
         (res.file ?? "").includes("agentdev-sample-skill"),
     );
     expect(inCodeBlock.length).toBe(0);
-  });
-
-  it("excludes standard-procedures.md (REQ-0149-003 permitted file)", () => {
-    const r = runScript(IR053_ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const inExcluded = parsed.results.filter(
-      (res: { check: string; level: string; file?: string }) =>
-        res.check === "gh-direct-invocation" &&
-        res.level === "warning" &&
-        (res.file ?? "").includes("standard-procedures.md"),
-    );
-    expect(inExcluded.length).toBe(0);
   });
 });
 

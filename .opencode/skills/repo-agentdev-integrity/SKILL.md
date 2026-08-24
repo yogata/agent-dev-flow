@@ -26,7 +26,7 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 - 要件分析・壁打ち（→ `agentdev-req-analysis`）
 - Decision 要否判断（→ `agentdev-decision-guidelines`）
 - `spec-bug` / `impl-bug` / `scope-creep` の最終分類（→ `agentdev-quality-gates` QG-3、最終判断は case-update）
-- `gh` 書き込み検証の orchestration（→ `agentdev-gh-cli`）
+- `gh` 書き込み検証の orchestration（→ Custom Tool `agentdev_gh` は Tool 内部で読み戻し検証を完結）
 - 実装の自動修正（検査対象を直接修正しない原則。許可出力はレポート・intake item のみ）
 - Consumer project での整合性検査（本 skill は self-hosting repo のみ対象）
 
@@ -206,7 +206,6 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 
 - **agentdev-req-file-manager**: REQ 番号採番ルール、frontmatter 規約
 - **agentdev-decision-file-manager**: Decision 構造定義
-- **agentdev-gh-cli**: gh 書き込み後の body verifier (`verify_body.ts`)
 - **agentdev-workflow-templates**: ワークフローテンプレート定義
 
 ## Junction 管理手順（Windows 環境）

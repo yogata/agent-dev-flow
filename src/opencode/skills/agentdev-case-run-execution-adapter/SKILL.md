@@ -23,7 +23,7 @@ adapter skill 経由での委譲起動、委譲 prompt 内で実行 command を�
 ## 副作用
 
 - worktree root 配下でのみファイル編集を行う（メインリポジトリには触れない）
-- PR 作成、Issue コメント追加は実行担当サブエージェントが実施（`agentdev-gh-cli` 経由）
+- PR 作成、Issue コメント追加は実行担当サブエージェントが実施（Custom Tool `agentdev_gh` 経由）
 
 ## 実行モデル
 
@@ -35,7 +35,7 @@ case-run (orchestration)
         ├── 実行 command による evidence-backed 実装・品質ゲート（code review + QA review + gate review）
         ├── test strategy 項目の test-fix ループ（項目ごと検証、不合格時 fix-and-reverify / record-in-findings、全項目処理まで反復）
         ├── blocker 処理
-        ├── PR 作成手続き（agentdev-gh-cli）による PR 作成（PR URL を result に格納）
+        ├── PR 作成操作（gentdev_gh pr_create）による PR 作成（PR URL を result に格納）
         └── result を case-run へ返却
 ```
 
@@ -64,7 +64,7 @@ harness execution mechanism は本 SKILL の規範対象外とし、`references/
 2. **context 再確認**: ADR/ REQ/ Design/ docs/ repository context を再確認し、実装が既存の決定事項に矛盾しないことを担保する。
 トレーサビリティ能力（`agentdev-traceability` の coverage）を、対象要件と正規成果物の既存の対応関係確認に利用できる。
 問い合わせ結果は候補提供であり最終判断としない、新規の依存関係、実行構成、Wave 構成、実行順序の設計には使用しない、機能の不在、実行失敗、空結果、候補過多の場合は README 索引、正規成果物の直接読取、`rg` 等の代替探索で継続する（fail-open）
-3. **実装、検証、PR 作成**: 実行 command に従い evidence-backed に実装を実行し、品質ゲートを通して PR 作成手続き（`agentdev-gh-cli`）で PR を作成する。
+3. **実装、検証、PR 作成**: 実行 command に従い evidence-backed に実装を実行し、品質ゲートを通して `agentdev_gh` の pr_create 操作で PR を作成する。
 実際に要件を実現する成果物へ実装対応を、実際に要件を検証する恒常的な検証手段へ検証対応を、対応宣言として正規成果物へ明示する（単に変更されたファイルであることを理由に、そのファイルを要件へ自動的に対応付けない）。
 PR 本文には実行識別情報セクション（対象 Case、PR、実行単位、委譲単位識別子と委譲目的、実行結果）を記録する。形式は `agentdev-workflow-templates` の実行識別情報セクション規約に従い、委譲 prompt の委譲識別情報ブロックから `adf_delegation` へ転記する。
 PR 本文には検証差分セクション（実行工程、検証種別、検証結果、finding 差分の5分類: 新規、修正済み、既出、撤回、無効）を記録する。形式は `agentdev-workflow-templates` の検証差分セクション規約に従い、実施した各検証（test strategy 項目検証、品質ゲート等）ごとに実行工程 case-run の行として記録する。

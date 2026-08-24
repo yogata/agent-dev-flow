@@ -62,7 +62,7 @@ case-auto workflow は次の8 STEP で構成する。
 ### termination
 
 - 正常終了: 全工程完了（OU処理ループを含む全 OU 処理完了）時の完了報告まで
-- 一時ファイル残存: 正常終了の前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（STEP-8 で確認。cleanup 規定は `agentdev-gh-cli`）
+- 一時ファイル残存: 正常終了の前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（STEP-8 で確認。一時ファイル cleanup 規定（workflow 側で生成した `.agentdev/tmp/` 一時ファイルは当該実行内で削除する。Custom Tool 内部の一時ファイルは Tool が操作ごとに自動削除する））
 - 停止終了: 11項目の停止条件いずれかの検出時（停止理由分類済み報告）。bounded parent decision resolution での上位合意矛盾・新規ユーザー判断。adversarial-review 由来の user-decision-required。コンフリクト Level 3 失敗
 - 委譲起動不能時: `delegation-unavailable` として報告（委譲工程のインライン実行への切替えは行わない）
 
@@ -86,7 +86,7 @@ case-auto workflow は次の8 STEP で構成する。
 - `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ、コンフリクト解消 rebase パス（Level 1 は case-close、Level 2/3 は本 workflow）
 - `agentdev-epic-tracker`: Epic Issue 本文ステータス追跡テーブル（case-auto は読取のみ、書き込みは case-close 単一書き手）
 - `agentdev-workflow-lifecycle`: 引き継ぎ停止判定
-- `agentdev-gh-cli`: GitHub Issue/PR/comment/merge/close I/O
+- Custom Tool `agentdev_gh`: GitHub Issue/PR/comment/merge/close I/O
 - `agentdev-project-extensions`: project extension 読込
 - `agentdev-adversarial-review`: 停止伝播のみ受領（case-auto は直接起動しない）
 - 各工程の Capability Skill を継承（req-save/design-save/case-open/case-run/case-close の依存スキル群）

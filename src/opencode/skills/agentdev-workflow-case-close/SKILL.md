@@ -24,7 +24,7 @@ case-close command は公開 interface（入出力契約・ガードレール）
 
 ## 副作用
 
-- PR squash merge、Issue close、Issue コメント追加、Epic Issue 本文ステータステーブル更新（`agentdev-gh-cli` 経由、case-close 単一書き手）
+- PR squash merge、Issue close、Issue コメント追加、Epic Issue 本文ステータステーブル更新（Custom Tool `agentdev_gh` 経由、case-close 単一書き手）
 - worktree/ ブランチ削除（local + remote）
 - Design `status` frontmatter 昇格（draft → accepted、対象 Design が draft かつ今回の実装が Design 内容を検証済みの場合）
 - `.agentdev/learning/inbox.md`、`.agentdev/intake/inbox/` への Capture 回収、`.agentdev/` 配下 commit/push
@@ -67,7 +67,7 @@ gate 違反時は両ルートとも PR マージを停止する。
 ### termination
 
 - 正常終了: 単一 Issue ルートはクリーンアップ・Capture 回収・永続化 STEP の完了報告まで。Epic Wave ルートは最終 Wave 判定（Epic クローズ または 残 Wave 通知）まで
-- 一時ファイル残存: 単一 Issue ルートの正常終了の前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（STEP-6-6 で確認。cleanup 規定は `agentdev-gh-cli`）
+- 一時ファイル残存: 単一 Issue ルートの正常終了の前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（STEP-6-6 で確認。一時ファイル cleanup 規定（workflow 側で生成した `.agentdev/tmp/` 一時ファイルは当該実行内で削除する。Custom Tool 内部の一時ファイルは Tool が操作ごとに自動削除する））
 - 一時成果物残留（Epic Wave ルート）: Epic Wave クローズの正常終了の前提として、当該 Wave スコープの一時成果物（draft、RU、検出事項等のドメイン状態）残留と当該実行で `.agentdev/tmp/` に作成した一時ファイルの残存がないこと（E6-1 で確認。残留時は当該 Wave を完了扱いにしない）
 - 停止終了: 未達チェックボックス残存（構造化エラー）、QG-4 不合格、対象要件行の検証対応要否未分類残存または検証対応必須行の恒久検証対応欠落（段階ゲートの完了阻止条件）、配布依存境界 最終 gate 違反、mergeable ポーリング上限超過、Level 1 rebase 失敗（case-auto エスカレーション）
 
@@ -76,7 +76,7 @@ gate 違反時は両ルートとも PR マージを停止する。
 本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
 
 - `agentdev-quality-gates`: QG-4 Final Acceptance Gate、観点8 PR対象範囲 vs 全体 判定マトリクス
-- `agentdev-gh-cli`: PR merge / mergeable UNKNOWN ポーリング / Issue close / VERIFY
+- Custom Tool `agentdev_gh`: PR merge / pr_mergeable（UNKNOWN ポーリングは workflow 側）/ Issue close
 - `agentdev-git-worktree`: 重複ファイルチェック、squash merge 後分岐ハンドリング、コンフリクト解消 rebase パス、worktree 削除、実行前同期リスク検出
 - `agentdev-epic-tracker`: Epic Issue 本文ステータス追跡テーブル、E1〜E6 詳細、子Issue 状態 enum、Epic 自動クローズ判定
 - `agentdev-design-file-manager`: Design status 昇格（draft → accepted）、design-lifecycle-application

@@ -65,7 +65,7 @@ trigger 条件は detector の `--profile source` が分類する配布ソース
 手続きの正規所有者は STEP-3-1（[docs-and-design-promotion.md](docs-and-design-promotion.md)）であり、本 STEP は同一手続きを Epic Wave の各子Issue に適用する。
 
 - **実行コマンド**: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_distribution_boundary.ts --profile source --json`。検査対象は当該子Issue PR の HEAD（マージ前の実際の PR ブランチ内容）。現在の main 状態ではなく、PR で提案されている実際の変更内容を検査する
-- **checker コマンドの stdout 退避形式**: 本 gate の checker コマンドは exit code が意味を持つコマンド（非ゼロ exit = 違反検出）であるため、実行と stdout 取得は `agentdev-gh-cli` READ 手続きの「exit code が意味を持つコマンドの stdout 退避形式」に従う（`spawnSync` による status/ stdout 分離取得 + `fs.writeFileSync` の UTF‑8 明示書き出し）。非ゼロ exit 時も JSON レポートを証跡として保持する（手続きの正規所有者は STEP-3-1 と同一）
+- **checker コマンドの stdout 退避形式**: 本 gate の checker コマンドは exit code が意味を持つコマンド（非ゼロ exit = 違反検出）であるため、実行と stdout 取得は 検証コマンドの stdout 証跡退避形式（`spawnSync` による status/ stdout 分離取得 + `fs.writeFileSync` の UTF‑8 明示書き出し）。非ゼロ exit 時も JSON レポートを証跡として保持する（手続きの正規所有者は STEP-3-1 と同一）
 - **`--profile source`**: case-close は PR マージ前に実行され、配布ソース面を検査するため `source` を使用する（junction は原本への鏡像）
 - **検査エラーの扱い**: 読込不能、未分類エントリ、adapter 起動失敗は全て gate-not-passed として扱う。clean として通過させない
 - **gate 違反時**: 当該子Issue の PR マージを中止し、PR 本文の `## Findings / Capture候補` セクションに `### distribution-boundary` 小見出しで記録する（既に case-run command STEP-S5 で記録済みの場合は上書きせず、case-close で新たに検出された事項のみ追記）。当該子Issue は後続 E4-2 シーケンスへ進めず、E5 Epic status table で `blocked` 状態として記録する（`agentdev-epic-tracker` 準拠、`completed` へ上書きしない、べき等性）
@@ -108,7 +108,7 @@ QG-4 観点8 に基づく評価スコープ切替（中間 Wave vs 最終 Wave�
 **Epic 実証の最終 case-close（全子Issue completed で Epic クローズする場合のみ）**:
 
 - **最終評価結果の導出**: 新しい評価を始めず、事前の評価契約（Epic Issue 本文の正規記録）と蓄積済み証拠（各子Issue の PR 本文の実行条件・測定結果・観察結果・証拠・評価結果）から最終評価結果を導出する
-- **最終評価結果の正規記録**: 導出した最終評価結果を Epic Issue の最終コメントとして正規記録する（`agentdev-gh-cli` のコメント追加手続き → VERIFY）
+- **最終評価結果の正規記録**: 導出した最終評価結果を Epic Issue の最終コメントとして正規記録する（`agentdev_gh` の issue_comment 操作。成功応答は読み戻し検証済み）
 - **正式化経路案内**: 正式化経路として `req-define <実証Issue>`（Epic 実証では Epic Issue を指定）を利用者へ明示する
 - **Epic 中間Waveでの案内抑制**: 残 Wave が存在する中間Wave（残 Wave 通知側）では正式化案内を出さない
 - **req-define 自動実行禁止**: case-close は後続 req-define を自動実行しない
@@ -154,7 +154,7 @@ QG-4 観点8 に基づく評価スコープ切替（中間 Wave vs 最終 Wave�
 ## 関連 Capability Skill
 
 - `agentdev-epic-tracker`: E1〜E6 詳細手順、判定基準、子Issue 状態 enum、再読込 VERIFY、未達項目残存時の停止条件
-- `agentdev-gh-cli`: Epic Issue 本文読込・更新、子Issue PR マージ・クローズ、mergeable UNKNOWN ポーリング、対応記録コメント、VERIFY
+- Custom Tool `agentdev_gh`: Epic Issue 本文読込・更新、子Issue PR マージ・クローズ、pr_mergeable（UNKNOWN ポーリングは workflow 側）、対応記録コメント
 - `agentdev-git-worktree`: squash merge 後分岐ハンドリング、コンフリクト解消 rebase パス（Level 1）
 - `agentdev-quality-gates`: QG-4 完了条件チェックボックス評価・更新、観点8 評価スコープ切替
 - `agentdev-workflow-orchestration`: capture 境界（intake/learning 分離、Epic 横断回収）

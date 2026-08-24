@@ -9,6 +9,7 @@
 !.opencode/skills/repo-*/
 .opencode/tools/agentdev-*/
 .opencode/plugins/agentdev-*/
+.opencode/plugins/agentdev-*.ts
 .sisyphus/
 .worktrees/
 .omo/

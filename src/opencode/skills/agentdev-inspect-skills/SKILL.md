@@ -56,8 +56,8 @@ cleanup モデルと処置契約の SSoT は document-model Design であり、�
 | 配布物壊れた括弧、参照残骸 | 配布物に ID 除去で残った壊れた括弧（例: `（OU-XXX/）`、`（）`、`（/）`）、壊れた参照表現、主語/目的語欠落文がないか（同上文意保持検査パターン準拠） |
 | command-skill 責務説明矛盾 | 同一 Command の責務説明が Command 本体と関連 Skill 間で矛盾していないか（同上責務整合検査パターン準拠） |
 | 実行主体分類の誤認 | 文書内で言及される実行主体（command / skill / subagent / harness）の分類が正確か。誤認（command を skill と呼ぶ、harness を skill と呼ぶ、subagent を skill と呼ぶ、`load_skills` に command 名を指定）を検出する（REQ）。判定基準の詳細は [execution-subject-misclassification.md](references/execution-subject-misclassification.md) |
-| gh 直接記述の委譲漏れ | 配布物（`.opencode/commands/agentdev/*.md`、`.opencode/skills/agentdev-*/**/*.md`）で `gh (issue|pr) (create|edit|view|comment|merge|close|list|status)` の直接記述を検出する（REQ）。command/skill は GitHub I/O を `agentdev-gh-cli` 手続きへ委譲し、gh コマンド直接実行を保持しない。ただし `agentdev-gh-cli/references/standard-procedures.md`（REQ 許容ファイル）は除外する。スキャン対象、除外対象の詳細は agentdev-gh-cli Design「gh 直接記述の検出スコープ」参照 |
-| Design 操作契約テーブル ↔ agentdev-gh-cli/references/contracts.md フィールド一致性 | Design 側に記載された操作契約テーブル（`## 操作契約` セクション）のフィールド集合と、対応する `agentdev-gh-cli/references/contracts.md` のフィールド集合が過不足なく一致することを検出する（REQ / AG-{NNN}）。手続き集合、手続き名、入力、出力の一致を確認し、不一致を検出事項として報告する。判定基準の詳細、対象 Design 範囲、フィールド対応規則は [spec-operation-contract-consistency.md](references/spec-operation-contract-consistency.md) 参照（REQ 準拠）。単一情報源化（生成スクリプト、ビルドステップ）は導入せず、検出のみとする（CR-{NNN}） |
+| gh 直接記述の委譲漏れ | 配布物（`.opencode/commands/agentdev/*.md`、`.opencode/skills/agentdev-*/**/*.md`）で `gh (issue|pr) (create|edit|view|comment|merge|close|list|status)` の直接記述を検出する（REQ）。command/skill は GitHub I/O を Custom Tool `agentdev_gh` の操作へ委譲する（gh WRITE 直接実行の保持は禁止。読み取り系は Design custom-tool-contracts「迂回防止」の許容範囲に従う）。スキャン対象、除外対象の詳細は IR-053 の定義参照 |
+| Custom Tool 操作契約整合 | Design `custom-tool-contracts.md` の対象操作（初期セット10操作）と `src/opencode/tools/agentdev-gh/contracts.ts` の操作カタログが過不足なく一致することを検出する（REQ / AG-{NNN}）。操作集合、操作名、入力、出力の一致を確認し、不一致を検出事項として報告する。判定基準の詳細、対象 Design 範囲、フィールド対応規則は [spec-operation-contract-consistency.md](references/spec-operation-contract-consistency.md) 参照（REQ 準拠）。単一情報源化（生成スクリプト、ビルドステップ）は導入せず、検出のみとする（CR-{NNN}） |
 | SKILL.md frontmatter `name:` バッククォート検出 | 配布物（`.opencode/skills/agentdev-*/SKILL.md`）の frontmatter `name:` 行がバッククォートで囲まれている場合、YAML スカラー値として不正のため strict 違反候補として検出する（REQ 準拠、PR #1334 事例）。frontmatter は構造データであり Markdown インラインコード表記の対象外（backticks-identifier-threshold Design「適用対象外」準拠）。検出基準の詳細、IR-{NNN}（skill-name-dir-match）との協調は [skill-frontmatter-name-backtick.md](references/skill-frontmatter-name-backtick.md) 参照 |
 | 廃止 REQ/Design 由来の記述残置 | 配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/**`）に retired REQ/Design ID（`docs/requirements/retired/`、`docs/designs/retired/` 等）をソースとした記述が残置していないか。retired REQ/Design ID をキーとした横断検索で検出する。活性 REQ/Design（現行セット）への言及は対象外とする |
 | 意味的重複 | 同一の契約、手順、判定基準が複数の配布物で再定義されているかを検出する。同一契約再定義抑止の原則に照らして検出する。artifact-responsibilities Design が定める重複許容基準に合致し正の情報源が明示された場合は対象外。判定基準の詳細、検出手順、報告例は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
@@ -91,8 +91,8 @@ cleanup モデルと処置契約の SSoT は document-model Design であり、�
 | canonical-name-violation | canonical Skill name ではない参照がある |
 | skill-internal-reference-leak | Command が Skill 内部構造に依存している |
 | execution-subject-misclassification | 実行主体（command / skill / subagent / harness）の分類が誤っている（command を skill と呼ぶ、`load_skills` に command 名を指定、harness を skill と呼ぶ、subagent を skill と呼ぶ等） |
-| gh-direct-invocation-leak | command/skill が `agentdev-gh-cli` へ委譲すべき gh 直接記述（`gh (issue|pr) (create|edit|view|comment|merge|close|list|status)`）を保持している（REQ）。許容ファイル `agentdev-gh-cli/references/standard-procedures.md` は除外 |
-| spec-operation-contract-consistency | Design 操作契約テーブルと agentdev-gh-cli/references/contracts.md の手続き集合、手続き名、入力、出力が過不足なく一致していない（REQ / AG-{NNN}）。判定基準の詳細は [spec-operation-contract-consistency.md](references/spec-operation-contract-consistency.md) 参照 |
+| gh-direct-invocation-leak | command/skill が Custom Tool `agentdev_gh` 経由であるべき箇所に gh 直接記述（`gh (issue|pr) (create|edit|view|comment|merge|close|list|status)`）を保持している（REQ） |
+| spec-operation-contract-consistency | Design custom-tool-contracts.md と Tool の contracts.ts の操作集合、操作名、入力、出力が過不足なく一致していない（REQ / AG-{NNN}）。判定基準の詳細は [spec-operation-contract-consistency.md](references/spec-operation-contract-consistency.md) 参照 |
 | skill-frontmatter-name-backtick | SKILL.md frontmatter `name:` 行がバッククォートで囲まれており、YAML スカラー値として不正（REQ 準拠、PR #1334 事例）。バッククォート付き name はディレクトリ名と不一致となるため IR-{NNN}（skill-name-dir-match）違反と併発する可能性が高い。判定基準の詳細は [skill-frontmatter-name-backtick.md](references/skill-frontmatter-name-backtick.md) 参照 |
 | semantic-duplication | 同一の契約、手順、判定基準が複数の配布物で再定義されている（同一契約再定義抑止の原則違反）。artifact-responsibilities Design の重複許容基準に合致し正の情報源が明示された場合は対象外。判定基準の詳細は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
 | semantic-contradiction | Command と Skill 間で工程、状態、責務、停止条件の意味が矛盾している（正規な定義元の原則、同一契約再定義抑止の原則の違反）。判定基準の詳細は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
@@ -120,7 +120,6 @@ cleanup モデルと処置契約の SSoT は document-model Design であり、�
 | intake-from-github | `agentdev-intake-pipeline` | full-skill-needed |
 | intake-promote | `agentdev-intake-pipeline` | full-skill-needed |
 | req-define | `agentdev-req-file-manager` | reference-disclosure-needed |
-| `agentdev-gh-cli` | `agentdev-gh-cli` | reference-disclosure-needed |
 | case-run | `agentdev-workflow-orchestration` | full-skill-needed |
 | learning-promote | `agentdev-learning-pipeline` | full-skill-needed |
 

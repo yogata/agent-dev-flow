@@ -294,4 +294,4 @@ Skill 分割を検討する条件:
 - **別 SSoT 管理対象を含めない**: 全コマンド一覧等は skill 内に保持せず、該当する README 等を参照する
 
 **OK**: `- **agentdev-req-analysis**: 要件分析手法`（発見導線）
-**NG**: `- **agentdev-gh-cli**: --body-file 使用、安全な読み取り手順`（実行判断材料）
+**NG**: `- **agentdev-gh**: gh オプションの運用詳細`（実行判断材料）

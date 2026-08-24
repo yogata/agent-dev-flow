@@ -21,7 +21,7 @@ description: Updates parent Epic Issue status tracking tables in case-close work
 
 ## 副作用
 
-- 親Epic Issue 本文を更新する（`agentdev-gh-cli` の Issue 本文更新手続き経由）。子Issue 本文、PR は更新しない
+- 親Epic Issue 本文を更新する（`agentdev_gh` の issue_update 操作経由）。子Issue 本文、PR は更新しない
 
 ## 常に守る不変条件
 
@@ -57,11 +57,11 @@ Epic自動クローズ判定では `completed` を終了状態として扱う（
 ## 主要な判断順序（case-close: completed/ blocked/ failed 更新）
 
 1. 子Issue本文から `Parent: #{N}` を検出。親Epicが存在しない → スキップ
-2. Issue 本文読込手続き（`agentdev-gh-cli`）でEpic本文を取得
+2. `agentdev_gh` の issue_read 操作でEpic本文を取得
 3. 正規表現で該当子Issue行を特定（新4列/旧4列形式に対応）
 4. べき等性確認（既に終了状態ならスキップ）
 5. `pending` を置換（completed なら PR番号/ URL 付き、blocked/ failed なら当該ステータス値）
-6. Issue 本文更新手続き（`agentdev-gh-cli`）でEpic本文を更新
+6. `agentdev_gh` の issue_update 操作でEpic本文を更新
 
 `blocked`/ `failed` は case-close が case-run(#epic) の実行結果（`completed-pr`/ `blocked`/ `failed`）から確定して Epic Issue 本文へ反映する終了状態。
 
@@ -77,5 +77,5 @@ Epic自動クローズ判定では `completed` を終了状態として扱う（
 
 ## See Also
 
-- **agentdev-gh-cli**
+- Custom Tool `agentdev_gh`（Epic Issue 本文の読み取り・更新）
 - **agentdev-workflow-lifecycle**: Epic振る舞いルール、進捗追跡テーブル定義

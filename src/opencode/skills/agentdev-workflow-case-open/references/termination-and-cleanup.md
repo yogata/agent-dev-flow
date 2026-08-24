@@ -104,7 +104,7 @@ push 失敗時は構造化エラーメッセージを表示して停止する。
 - `agentdev-workflow-templates`: コメント用テンプレート、完了報告テンプレート
 - `agentdev-req-file-manager`: RU ファイル削除
 - `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ（Form Zero）
-- `agentdev-gh-cli`: コメント追加・VERIFY
+- Custom Tool `agentdev_gh`: コメント追加
 - `agentdev-learning-capture` / `agentdev-intake-pipeline`: deviation capture 委譲
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）

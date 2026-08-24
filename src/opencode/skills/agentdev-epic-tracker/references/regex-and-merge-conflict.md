@@ -201,8 +201,8 @@ Epic Issue 本文の書き込みは case-close(#epic) が単一書き手であ�
    ```
 
 **conflict解決手順**:
-1. Issue 本文読込手続き（`agentdev-gh-cli`）で最新のEpic本文を取得
+1. `agentdev_gh` の issue_read 操作で最新のEpic本文を取得
 2. 正規表現で該当子Issue行を特定
 3. ステータス値を更新（べき等性を確認）
-4. Issue 本文更新手続き（`agentdev-gh-cli`）で更新
+4. `agentdev_gh` の issue_update 操作で更新
 5. 更新失敗時は警告表示して継続

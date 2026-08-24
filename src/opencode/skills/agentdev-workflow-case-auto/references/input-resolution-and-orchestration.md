@@ -227,7 +227,7 @@ case-open の判定結果に従う。
 - `agentdev-case-run-execution-adapter`: case-run 委譲契約（インライン実行時）
 - `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ
 - `agentdev-epic-tracker`: Epic Issue 本文ステータス追跡テーブル（読取のみ）
-- `agentdev-gh-cli`: GitHub Issue/PR/comment/merge/close I/O
+- Custom Tool `agentdev_gh`: GitHub Issue/PR/comment/merge/close I/O
 - `agentdev-project-extensions`: project extension 読込
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）

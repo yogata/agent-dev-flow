@@ -1,0 +1,15 @@
+{
+  "name": "agentdev-gh-tool-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "agentdev-gh-tool Plugin. Registers the agentdev_gh Custom Tool (structured GitHub issue/PR operations, fail-closed with read-back verification) with the OpenCode runtime, and swaps in the Local implementation (Case file I/O) when the local-mode projection provides runner-local.ts.",
+  "type": "module",
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "@types/bun": "^1.3.0"
+  }
+}

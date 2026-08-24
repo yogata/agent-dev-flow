@@ -14,13 +14,13 @@ case-update が既存 Case の本文更新、コメント追加、REQ ファイ�
 ## 本文更新
 
 Issue 作成時に使用された `issue_desc_bug.md`、`issue_desc_feature.md`、`issue_desc_epic.md`、`issue_desc_child.md` のいずれかに従って更新する。
-該当テンプレートの必須セクションが全て本文に含まれることを確認し、Issue 本文更新手続き（`agentdev-gh-cli`）で更新する。
+該当テンプレートの必須セクションが全て本文に含まれることを確認し、`agentdev_gh` の issue_update 操作で更新する。
 
 ## コメント追加
 
 `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_update.md` を Read tool で読み込む。
 テンプレートの必須セクションが全てコメント本文に含まれることを確認し、欠落時は生成をやり直す。
-投稿は Issue コメント追加手続き（`agentdev-gh-cli`）で行う。
+投稿は `agentdev_gh` の issue_comment 操作で行う。
 
 ## REQ ファイル更新
 
@@ -32,7 +32,7 @@ case-update `--req` は req-save へ委譲せず、直接 commit と push を行
 4. UPDATE は既存セクションの内容修正として扱う。
 5. frontmatter `updated` フィールドを現在日時に更新する。
 6. ファイルを書き出す。
-7. Issue 本文更新手続き（`agentdev-gh-cli`）で Issue 本文の該当箇所も同期する。
+7. `agentdev_gh` の issue_update 操作で Issue 本文の該当箇所も同期する。
 8. REQ ファイルおよび影響を受ける docs ファイルを commit + push する。
 
 ## レビュー NG コメント
@@ -48,7 +48,7 @@ case-update `--req` は req-save へ委譲せず、直接 commit と push を行
 7. `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_review_ng.md` を Read tool で読み込み、必須セクション欠落時は生成をやり直す。
 8. QG-3 乖離検出結果をテンプレートの「仕様適合性 結果」セクションに展開する。
 9. NG 理由分類のチェックボックスを自動選択する。
-10. Issue コメント追加手続き（`agentdev-gh-cli`）でコメントを投稿する。
+10. `agentdev_gh` の issue_comment 操作でコメントを投稿する。
 
 ## 更新漏れ局所確認
 

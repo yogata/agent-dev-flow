@@ -101,7 +101,7 @@ git clone https://github.com/yogata/agent-dev-flow.git .agentdev-plugin
 ./.agentdev-plugin/scripts/install.ps1 -Mode apply
 ```
 
-ローカル版（ローカル版 OpenCode を利用する環境）のインストール。`-LocalMode` を付けると `agentdev-gh-cli` だけが `src/opencode-local/agentdev-gh-cli/` へ接続され、それ以外の command/skill は通常版と同じ `src/opencode/` 配下へ接続される（REQ-009、DEC-004）。
+ローカル版（ローカル版 OpenCode を利用する環境）のインストール。`-LocalMode` を付けると Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけが `src/opencode-local/agentdev-gh-cli/`（Local 実装）へ差し替えられ、それ以外の command/skill/tool/plugin は通常版と同じ `src/opencode/` 配下へ接続される（REQ-009、DEC-004、REQ-011-006）。
 
 ```powershell
 ./.agentdev-plugin/scripts/install.ps1 -Mode apply -LocalMode
@@ -139,7 +139,7 @@ cd .agentdev-plugin && git pull && cd ..
 
 ### 推奨 .gitignore 設定
 
-通常版・ローカル版ともに同一。`agentdev-gh-cli` はリンク先が異なるだけなので `.opencode/skills/agentdev-*/` パターンで網羅される。`japanese-tech-writing` は配布物依存スキル（`agentdev-doc-writing` が参照、REQ-002）のため別途 gitignore に含める。Custom Tool（`.opencode/tools/agentdev-*/`）と Plugin / Hook（`.opencode/plugins/agentdev-*/`）も配布種別として同様に gitignore に含める（REQ-052）。runtime workspace ディレクトリの管理は harness 側の責務であり（charter 原則、DEC-001）、本 gitignore 推奨には含めない。
+通常版・ローカル版ともに同一。ローカル版では `.opencode/tools/agentdev-gh/` のリンク先が Local 実装へ差し替わるだけなので、`.opencode/tools/agentdev-*/` パターンで網羅される。`japanese-tech-writing` は配布物依存スキル（`agentdev-doc-writing` が参照、REQ-002）のため別途 gitignore に含める。Custom Tool（`.opencode/tools/agentdev-*/`）と Plugin / Hook（`.opencode/plugins/agentdev-*/`）も配布種別として同様に gitignore に含める（REQ-052）。インストーラが生成する Plugin のローダーシム（`.opencode/plugins/agentdev-*.ts`）も投影成果物のため含める。runtime workspace ディレクトリの管理は harness 側の責務であり（charter 原則、DEC-001）、本 gitignore 推奨には含めない。
 
 ```gitignore
 .agentdev-plugin/
@@ -148,6 +148,7 @@ cd .agentdev-plugin && git pull && cd ..
 .opencode/skills/japanese-tech-writing/
 .opencode/tools/agentdev-*/
 .opencode/plugins/agentdev-*/
+.opencode/plugins/agentdev-*.ts
 ```
 
 > `.agentdev/` は gitignore に**含めない**こと（ドメイン状態として git 管理対象）。

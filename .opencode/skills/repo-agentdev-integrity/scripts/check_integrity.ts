@@ -325,14 +325,12 @@ const PATTERN_PROHIBITED_SKILLS: Record<string, string[]> = {
     "agentdev-epic-tracker",
     "agentdev-learning-pipeline",
     "agentdev-git-worktree",
-    "agentdev-gh-cli",
     "agentdev-conventional-commits",
     "agentdev-learning-capture",
   ],
   "wall-session": [
     "agentdev-workflow-orchestration",
     "agentdev-workflow-routing",
-    "agentdev-gh-cli",
     "agentdev-git-worktree",
     "agentdev-conventional-commits",
   ],
@@ -6844,22 +6842,20 @@ function checkReqDesignBoundaryViolation(root: string): CheckResult[] {
 // ─── IR-053: gh direct invocation detection (v2:REQ-0152-001, v2:REQ-0152-002) ──────
 // Detects direct `gh (issue|pr) (create|edit|view|comment|merge|close|list|status)`
 // invocations embedded in command/skill definitions. Direct gh CLI usage bypasses
-// the agentdev-gh-cli delegation base (v2:REQ-0149) and must route through it.
+// the agentdev_gh Custom Tool (REQ-011-001) and must route through it.
 // Scan targets (v2:REQ-0152-001):
 //   src/opencode/commands/agentdev/*.md
 //   src/opencode/skills/agentdev-*/**/*.md
-// Exclusion (v2:REQ-0152-002, v2:REQ-0149-003 permitted file):
-//   src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md
 // Code-block contents are exempt (example/pattern description, v2:REQ-0108-254).
+// The former agentdev-gh-cli skill owned the permitted-file exemption; the skill was
+// retired by the GitHub I/O migration (REQ-011-001) and no exemption path remains.
 // Severity: heuristic (warn / exit 1).
 
 const IR053_GH_DIRECT_PATTERN =
   /\bgh\s+(issue|pr)\s+(create|edit|view|comment|merge|close|list|status)\b/i;
 
-// Exemption paths (repo-root-relative, forward-slash normalized).
-const IR053_EXEMPT_PATHS: RegExp[] = [
-  /src\/opencode\/skills\/agentdev-gh-cli\/references\/standard-procedures\.md$/,
-];
+// Exemption paths (repo-root-relative, forward-slash normalized). None currently.
+const IR053_EXEMPT_PATHS: RegExp[] = [];
 
 export function walkMarkdown(dirPath: string, acc: string[]): void {
   if (!fs.existsSync(dirPath)) return;
@@ -6908,13 +6904,13 @@ function checkGhDirectInvocation(root: string): CheckResult[] {
           warn(
             "CanonicalConflict",
             "gh-direct-invocation",
-            `Direct gh CLI invocation 'gh ${match[1]} ${match[2]}' detected — route via agentdev-gh-cli delegation (IR-053, v2:REQ-0152-001)`,
-            relPath,
-            i + 1,
-            {
-              evidence: match[0],
-              expected:
-                "delegate gh CLI access through agentdev-gh-cli procedures (v2:REQ-0149)",
+              `Direct gh CLI invocation 'gh ${match[1]} ${match[2]}' detected — route via the agentdev_gh Custom Tool (IR-053, v2:REQ-0152-001)`,
+              relPath,
+              i + 1,
+              {
+                evidence: match[0],
+                expected:
+                  "delegate GitHub I/O through the agentdev_gh Custom Tool operations (REQ-011-001)",
               route: "intake",
             },
           ),
