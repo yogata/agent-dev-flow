@@ -9,11 +9,11 @@ GitHub から残課題を抽出する際のロジック（期間解釈、デー�
 
 ## データ取得
 
-`agentdev-gh-cli` の読込手続きに従い、指定期間内にクローズされた Issue と PR を取得する:
+gh 読み取り系（Design custom-tool-contracts「迂回防止」の許容範囲）で指定期間内にクローズされた Issue と PR を取得する:
 - Issues: 一覧取得（状態: closed、検索条件: `closed:>=YYYY-MM-DD`、上限: 100、取得フィールド: number, title, body, state, closedAt, labels, comments）
 - PRs: 一覧取得（条件同上）
-- 読み取りは `agentdev-gh-cli` の READ 手続きに従う
-- コメントも取得: Issue/PR 補助データ読込手続き（`agentdev-gh-cli`）でコメント一覧を取得
+- 読み取りは gh 読み取り系（許容範囲）で行う
+- コメントも取得: Issue/`agentdev_gh` の pr_changed_files / pr_mergeable 操作でコメント一覧を取得
 
 ## 構造的検出
 

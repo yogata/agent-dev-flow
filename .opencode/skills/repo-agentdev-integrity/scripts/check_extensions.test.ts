@@ -47,7 +47,8 @@ describe("checkExtensions (integration against real repo)", () => {
     expect(classification.workflowSkills.has("agentdev-workflow-case-run")).toBe(true);
     expect(classification.workflowSkills.has("agentdev-workflow-orchestration")).toBe(false);
     expect(classification.capabilitySkills.has("agentdev-workflow-orchestration")).toBe(true);
-    expect(classification.capabilitySkills.has("agentdev-gh-cli")).toBe(true);
+    expect(classification.capabilitySkills.has("agentdev-issue-management")).toBe(true);
+    expect(classification.capabilitySkills.has("agentdev-gh-cli")).toBe(false);
   });
 });
 

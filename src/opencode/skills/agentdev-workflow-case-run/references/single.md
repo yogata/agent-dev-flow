@@ -19,7 +19,7 @@
 
 ### Input Resolution
 
-1. SSoT 再構成: Issue 本文（`agentdev-gh-cli` 読取）、Epic Issue 本文（ステータス追跡テーブル有無）
+1. SSoT 再構成: Issue 本文（`agentdev_gh` issue_read）、Epic Issue 本文（ステータス追跡テーブル有無）
 2. identifier 保持: Issue番号（ユーザー入力またはセッション内会話）
 3. 最小 scalar: なし
 4. runtime artifact: なし（会話コンテキストのみに依存しない）
@@ -137,7 +137,7 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 
 **case-run が使用する検査ツール**（integrity 契約 Design「Workflow × 使用ツールマトリックス」参照）: check_changed_docs.ts（--workflow case-run、docs/** 変更を含む場合に委譲前に実行）、check_extensions.ts（`.opencode/commands/agentdev/**/*.md`、`.opencode/skills/agentdev-*/SKILL.md`、`.opencode/skills/agentdev-*/references/**/*.md`、`.agentdev/extensions/**` のいずれかを変更した場合に実行）、check_distribution_boundary.ts（--profile source / --profile link、STEP-S3-5 で base ベースライン取得、STEP-S5 で実装後の src 側原本面と .opencode 投影面を検査）、generate_indexes.ts（AUTOGEN 索引再生成、STEP-S3-6 の必須指示に基づき委譲内で実行）、test_strategy（Issue 完了条件検証）
 
-**checker コマンドの stdout 退避形式**: 上記 checker コマンドは exit code が意味を持つコマンド（非ゼロ exit = 違反検出等の観測対象）であるため、実行と stdout 取得は `agentdev-gh-cli` READ 手続きの「exit code が意味を持つコマンドの stdout 退避形式」に従う（`spawnSync` による status/ stdout 分離取得 + `fs.writeFileSync` の UTF‑8 明示書き出し）。
+**checker コマンドの stdout 退避形式**: 上記 checker コマンドは exit code が意味を持つコマンド（非ゼロ exit = 違反検出等の観測対象）であるため、実行と stdout 取得は 検証コマンドの stdout 証跡退避形式（`spawnSync` による status/ stdout 分離取得 + `fs.writeFileSync` の UTF‑8 明示書き出し）。
 非ゼロ exit 時も JSON レポート（stdout）を Evidence として保持し、`>` リダイレクトや PowerShell 変数格納で退避しない。
 
 ### Result
@@ -177,7 +177,7 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 
 - 未コミット変更あり: 報告してユーザーの指示に従う。自動的な破棄、コミットは行わない
 - 未コミット変更なし: 完了報告へ。runtime workspace のクリーンアップは harness 側の責務であり（charter 原則、harness 分離モデル Design 参照）、case-run は関与しない
-- **tmp/ 残存確認**: 当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないことを確認する。残存時は `agentdev-gh-cli` の cleanup 規定に従って処理し、残存ファイルと対応結果を完了報告に明示する
+- **tmp/ 残存確認**: 当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないことを確認する。残存時は workflow 側 cleanup 規定（当該実行内での削除）に従って処理し、残存ファイルと対応結果を完了報告に明示する
 - 完了報告 template に従って出力する（実行担当サブエージェント result 状態、PR番号を含める）
 - 本 Step（worktree クリーンアップ）の開始時刻・終了時刻（JST）を記録し、worktree クリーンアップ時間を計測する。完了報告に L2 タイムスタンプ内訳（worktree 設定時間、実行担当サブエージェント実行時間、worktree クリーンアップ時間）を含める
 

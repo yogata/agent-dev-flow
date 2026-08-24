@@ -94,7 +94,7 @@
   - 実行コマンド（双方反映検証）:
     - src 側（原本）: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_distribution_boundary.ts --profile source --json`。現在の worktree（実装後 HEAD）の配布物原本ツリーを検査する
     - .opencode 側（投影）: 同スクリプトに `--profile link` を指定して `.opencode/` 投影を検査する。worktree は junction 未伝播（`agentdev-git-worktree` の worktree 構造的制約参照）のため投影が実体化していない場合は、位置引数（repoRoot）で junction 構成が維持された root を指定して読取専用実行し、実行環境と junction 伝播状態を環境ラベルとして gate 判定記録に含める。投影が実体化していないまま worktree で実行して検査対象がゼロとなった場合は gate-not-passed として扱う。link 検査は投影経路の健全性（投影が原本を正しく反映する状態）の検証であり、PR 変更分の内容検証は src 側検査が担う
-  - **checker コマンドの stdout 退避形式**: 本 gate の checker コマンドは exit code が意味を持つコマンド（非ゼロ exit = 違反検出）であるため、実行と stdout 取得は `agentdev-gh-cli` READ 手続きの「exit code が意味を持つコマンドの stdout 退避形式」に従う（`spawnSync` による status/ stdout 分離取得 + `fs.writeFileSync` の UTF‑8 明示書き出し）。非ゼロ exit 時も JSON 実行結果（Evidence）を保持する
+  - **checker コマンドの stdout 退避形式**: 本 gate の checker コマンドは exit code が意味を持つコマンド（非ゼロ exit = 違反検出）であるため、実行と stdout 取得は 検証コマンドの stdout 証跡退避形式（`spawnSync` による status/ stdout 分離取得 + `fs.writeFileSync` の UTF‑8 明示書き出し）。非ゼロ exit 時も JSON 実行結果（Evidence）を保持する
   - 検出結果の分類: 検査エラー（読込不能、未分類エントリ、adapter 起動失敗）は全て gate-not-passed として扱う。clean として通過させない。source / link いずれかの profile で違反または検査エラーが残存する場合、最終 gate 全体を通過扱いにしない（投影分離原則）
   - 違反検出時の停止契約（adapter result `blocked` とは区別）: 違反検出時は PR 本文の `## Findings / Capture候補` セクションに `### distribution-boundary` 小見出しで記録し、STEP-S6 へ進まず case-run を停止する。adapter result は `completed-pr` のまま変更せず、adapter result 契約の `blocked` へ上書きしない。停止理由は「配布依存境界 最終 gate 違反（PR 本文記録済み）」と報告し、SSoT は PR 本文とする。next action は同一 Issue で case-run を再実行し違反を修正する（worktree+ブランチ存活時は STEP-S3 をスキップし STEP-S4 から再開、べき等）。case-close へは進めない
 

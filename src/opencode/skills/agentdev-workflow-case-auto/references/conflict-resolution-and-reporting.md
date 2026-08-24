@@ -74,7 +74,7 @@ Level 2 コンフリクト文脈付きインライン case-run 再実行、Level
 Epic Issue を伴う Wave 反復実行時は、完了・blocked・failed 子Issue 一覧を含める（Epic Issue 本文ステータス追跡テーブルから読み取り、case-auto は書き込まない、`POL-epic-tracking-single-writer`）。
 停止時は完了済み OU・進行中 OU・未実行 OU・再開可能な次コマンドを報告する。
 
-**tmp/ 残存確認**: 当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないことを確認する。残存時は `agentdev-gh-cli` の cleanup 規定に従って処理し、残存ファイルと対応結果を完了報告に明示する。
+**tmp/ 残存確認**: 当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないことを確認する。残存時は workflow 側 cleanup 規定（当該実行内での削除）に従って処理し、残存ファイルと対応結果を完了報告に明示する。
 
 完了報告には以下を含める（停止時フォーマットを含む）。
 

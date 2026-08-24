@@ -18,7 +18,7 @@
 
 | 対象 Design | 対応 references/contracts.md |
 |-----------|------------------------------|
-| agentdev-gh-cli Design「## 操作契約」 | `src/opencode/skills/agentdev-gh-cli/references/contracts.md`（標準版）、`src/opencode-local/agentdev-gh-cli/references/contracts.md`（ローカル版） |
+| Design `custom-tool-contracts.md`「対象操作の境界（初期セット）」 | `src/opencode/tools/agentdev-gh/contracts.ts`（GitHub 実装と Local 実装で同一の操作契約） |
 
 新規に `## 操作契約` セクションを持つ Design が追加された場合、本診断の対象に自動的に含まれる。
 Design 内の「操作契約」見出しを走査し、対応する skill の `references/contracts.md` が存在するかを確認する。
@@ -30,7 +30,7 @@ Design 内の「操作契約」見出しを走査し、対応する skill の `r
 
 Design 操作契約テーブルの列と `references/contracts.md` の手続きごとの表の行は、以下のように対応する。
 
-### Design 操作契約テーブルの標準構造（`agentdev-gh-cli` 事例）
+### Design 操作契約の標準構造（`custom-tool-contracts` 事例）
 
 | 列 | 内容 |
 |----|------|
@@ -39,7 +39,7 @@ Design 操作契約テーブルの列と `references/contracts.md` の手続き�
 | 出力 | 当該手続きの出力概要 |
 
 Design 側は薄いルーティング入口として要約版を保持する。
-詳細化は `references/contracts.md` に分離する（薄いルーティング入口と references 分離の原則、`agentdev-gh-cli` Design 参照）。
+操作契約の型は `contracts.ts` が単一所有する（Skill 解消により references 分離構造は解消。`custom-tool-contracts` Design 参照）。
 
 ### references/contracts.md の手続きごとの表の標準構造
 
@@ -67,7 +67,7 @@ contracts.md では I/O 手続きが `### {手続き名}` 見出しで並び、V
 ### 1. 対象 Design の特定
 
 `docs/designs/` 配下を走査し、`## 操作契約` 見出しを含む Design ファイルを特定する。
-現在は agentdev-gh-cli Design のみが該当する。
+現在は custom-tool-contracts Design のみが該当する。
 新規追加 Design が同見出しを持つ場合、自動的に対象に含める。
 
 ### 2. 対応 contracts.md の特定
@@ -126,7 +126,7 @@ Recommended route には `references`（contracts.md 側の修正）、`spec`（
 
 ```markdown
 - Finding: Design 操作契約テーブルと references/contracts.md の手続き集合が不一致
-- Target: agentdev-gh-cli Design、src/opencode/skills/agentdev-gh-cli/references/contracts.md
+- Target: Design docs/designs/responsibilities/custom-tool-contracts.md、src/opencode/tools/agentdev-gh/contracts.ts
 - Classification: spec-operation-contract-consistency
 - Evidence: Design 操作契約テーブルに「Issue close」手続きがあるが、contracts.md に該当手続きのセクションが存在しない
 - Recommended route: references

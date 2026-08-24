@@ -38,7 +38,7 @@ squash merge 先は当該 Case の統合先とする。
 
 ### STEP-4-2: squash merge 前の mergeable UNKNOWN ポーリング
 
-`agentdev-gh-cli` の「squash merge 前の mergeable UNKNOWN ポーリング」手続きに従い、次を実行する。
+本書が所有する「squash merge 前の mergeable UNKNOWN ポーリング」手順（状態取得は `agentdev_gh` の pr_mergeable 操作。最大60秒、10秒間隔で再取得、待機中の CONFLICTING 遷移時は即時打ち切りコンフリクト解消パスへ、上限超過時は構造化エラーとして停止）に従い、次を実行する。
 
 - 対象 PR の `mergeable` 状態事前確認
 - `UNKNOWN` ポーリング待機
@@ -49,11 +49,11 @@ squash merge 先は当該 Case の統合先とする。
 
 ### STEP-4-3: PR merge 実行
 
-STEP-4-1 で解決した当該 Case の統合先（PR の base）へ PR merge 手続き（squash 方式、`agentdev-gh-cli`）を実行 → HEAD commit hash 記録（`agentdev-git-worktree` skill に従い）。
+STEP-4-1 で解決した当該 Case の統合先（PR の base）へ `agentdev_gh` の pr_merge 操作（squash 方式）を実行 → HEAD commit hash 記録（`agentdev-git-worktree` skill に従い）。
 
-**Squash merge 失敗時のリトライ**: `agentdev-gh-cli` の「squash merge リトライ手続き」に従う（待機間隔・最大試行回数は gh-cli 手続き側が所有、各試行のログ記録、全試行失敗時のフォールバックは template `.opencode/commands/agentdev/templates/case-close/standard.md` 参照）。
+**Squash merge 失敗時のリトライ**: 本書が所有する「squash merge リトライ手順」に従う（待機間隔5秒、最大試行回数は初期試行 + 5回リトライ、各試行のログ記録、全試行失敗時のフォールバックは template `.opencode/commands/agentdev/templates/case-close/standard.md` 参照）。
 
-**対応記録コメント**: Issue に対応記録コメントを追加（テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_*.md` から Read して `agentdev-gh-cli` の VERIFY 操作に従って内容検証）。
+**対応記録コメント**: Issue に対応記録コメントを追加（テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_*.md` から Read して `agentdev_gh` の issue_comment 操作で追加（成功応答は読み戻し検証済み））。
 
 **対応記録コメントへの検証差分記録**: case-close が実施した各検証（QG-4 完了条件評価、docs 検証・配布依存境界 最終 gate、トレーサビリティ独立再検査等）について、対応記録コメントへ検証差分を記録する。形式は `agentdev-workflow-templates` の検証差分セクション規約（PR テンプレート形式と同一のテーブル）に従い、実行工程 case-close の行として検証種別、検証結果、finding 差分（新規、修正済み、既出、撤回、無効の5分類）を記録する。finding 差分は前段階（case-run）の PR 本文検証差分セクションの記録との差分で分類し、同種検証の工程間比較を可能にする。品質ゲート完了報告の既存の修正証跡記録を本記録で置換しない。
 
@@ -102,12 +102,12 @@ squash merge がコンフリクトで失敗した場合（STEP-4-3 のリトラ�
 
 ## 関連 Capability Skill
 
-- `agentdev-gh-cli`: PR merge 手続き、mergeable UNKNOWN ポーリング、squash merge リトライ、VERIFY、対応記録コメントテンプレート
+- Custom Tool `agentdev_gh`（pr_merge、pr_mergeable）+ workflow 側手順（mergeable UNKNOWN ポーリング、squash merge リトライ、対応記録コメントテンプレート）
 - `agentdev-git-worktree`: HEAD commit hash 記録、squash merge 後分岐ハンドリング、コンフリクト解消 rebase パス
 - `agentdev-workflow-templates`: 対応記録コメントテンプレート
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
 - 不変条件（PR の CI 通過確認、CI 失敗時は case-run に差し戻す）
-- ガードレール・不変条件（GitHub Issue/PR 操作は `agentdev-gh-cli` の手続きへ委譲、gh コマンド直接記述禁止、`POL-gh-io-delegation`）
+- ガードレール・不変条件（GitHub Issue/PR 操作は Custom Tool `agentdev_gh` へ委譲、gh コマンド直接記述禁止、`POL-gh-io-delegation`）
 - ガードレール（squash merge 実行前に mergeable 状態を事前確認し UNKNOWN の場合はポーリング待機、ポーリング省略して UNKNOWN 状態のままマージ試行禁止）

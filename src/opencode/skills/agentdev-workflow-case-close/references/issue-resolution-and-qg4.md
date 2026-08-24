@@ -11,7 +11,7 @@ Issue 番号を解決し、単一 Issue クローズと Epic Wave クローズ�
 
 ### Input Resolution
 
-1. SSoT 再構成: Issue 本文（ステータス追跡テーブル有無、`agentdev-gh-cli` の安全な読み取り手順）
+1. SSoT 再構成: Issue 本文（ステータス追跡テーブル有無、`agentdev_gh` の issue_read 操作）
 2. identifier 保持: Issue番号（ユーザー入力またはセッション内会話）
 3. 最小 scalar: なし
 4. runtime artifact: なし
@@ -26,7 +26,7 @@ Issue 番号を解決し、単一 Issue クローズと Epic Wave クローズ�
 複数候補時は直近を優先して確認。
 検出不可時はユーザーに指定を求めて停止。
 
-**Epic Issue 判定**: 解決した Issue 番号の本文を `agentdev-gh-cli` の安全な読み取り手順で取得し、ステータス追跡テーブル（`agentdev-epic-tracker` の新4列/旧4列形式）が存在するか確認。
+**Epic Issue 判定**: 解決した Issue 番号の本文を `agentdev_gh` の issue_read 操作で取得し、ステータス追跡テーブル（`agentdev-epic-tracker` の新4列/旧4列形式）が存在するか確認。
 
 - **テーブル存在時**: **Epic Wave クローズ**（STEP-E1〜E6、[references/epic-wave-close.md](epic-wave-close.md)）へ分岐
 - **テーブル不存在時**: **単一 Issue クローズ**（STEP-1-1〜）へ進む（後方互換）
@@ -34,7 +34,7 @@ Issue 番号を解決し、単一 Issue クローズと Epic Wave クローズ�
 ### STEP-1-1: 重複ファイルチェック（merge/pull 実行前、単一 Issue クローズ時）
 
 `agentdev-git-worktree` の「PR merge 前重複ファイルチェック」プロシージャに従い、ローカル未コミット変更ファイルと対象 PR 変更ファイルの重複を検出、停止条件の判定を行う。
-PR 補助データ読込手続き（`agentdev-gh-cli`）実行不可時は後方互換性として STEP-6（実行前同期）でフォールバック検出を維持する。
+`agentdev_gh` の pr_changed_files / pr_mergeable 操作実行不可時は後方互換性として STEP-6（実行前同期）でフォールバック検出を維持する。
 
 ### Result
 
@@ -114,7 +114,7 @@ Issue 本文の完了条件チェックボックスを最終評価・更新し�
 
 ## 関連 Capability Skill
 
-- `agentdev-gh-cli`: Issue 本文読取、安全な読み取り手順
+- Custom Tool `agentdev_gh`: Issue 本文読取
 - `agentdev-epic-tracker`: Epic Issue 判定、ステータス追跡テーブル形式
 - `agentdev-git-worktree`: 重複ファイルチェックプロシージャ
 - `agentdev-quality-gates`: QG-4 Final Acceptance Gate、観点8 判定マトリクス

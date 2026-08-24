@@ -44,12 +44,12 @@ case-run は実行担当サブエージェントを委譲起動する。
 
 ### PR 作成
 
-実行担当サブエージェントは実装完了後、PR 作成手続き（`agentdev-gh-cli`）で PR を作成する。
+実行担当サブエージェントは実装完了後、`agentdev_gh` の pr_create 操作で PR を作成する。
 PR 本文には Issue 番号（`Refs: #N`）と実行識別情報セクション（対象 Case、PR、実行単位、委譲単位識別子と委譲目的、実行結果。`agentdev-workflow-templates` の実行識別情報セクション規約参照）を含める。
 併せて検証差分セクション（実行工程、検証種別、検証結果、finding 差分の5分類: 新規、修正済み、既出、撤回、無効。`agentdev-workflow-templates` の検証差分セクション規約参照）を含める。
 実行担当サブエージェントは実施した各検証（test strategy 項目検証、bun test フル suite、配布依存境界 gate、targeted docs guard、トレーサビリティ check、品質ゲート等）ごとに検証差分セクションへ実行工程 case-run の行として記録する。
 委譲 prompt の委譲識別情報ブロック（`<delegation-ident>`）の値を `adf_delegation` へ転記する。
-PR 作成時点で番号が確定しない自己参照値 `adf_pr` は、PR 作成の応答で確定した PR 番号を PR 本文更新（`agentdev-gh-cli` の手続きに準じる）で埋め戻す。
+PR 作成時点で番号が確定しない自己参照値 `adf_pr` は、PR 作成の応答で確定した PR 番号を PR 本文更新（`agentdev_gh` の操作に準じる）で埋め戻す。
 委譲 prompt 内 実行 command の品質ゲート（code review + QA review + gate review）を通過した PR のみが作成される。
 
 ### URL 受領
@@ -131,7 +131,7 @@ plan_change: なし（委譲中に計画変更が生じた場合は result に�
 </worktree>
 
 <Issue body>
-（Issue 本文読込手続き（agentdev-gh-cli）で取得した Issue 本文を埋め込み）
+（`agentdev_gh` の issue_read 操作で取得した Issue 本文を埋め込み）
 </Issue body>
 ```
 

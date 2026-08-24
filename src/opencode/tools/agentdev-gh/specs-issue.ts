@@ -26,6 +26,11 @@ function positiveInt(v: unknown): number | null {
   return typeof v === "number" && Number.isInteger(v) && v > 0 ? v : null;
 }
 
+// 出力 URL: GitHub 実装は https URL、Local 実装（Case ファイル）は絶対パスを識別子として返す（REQ-011-006）。
+function isAcceptedUrl(v: string): boolean {
+  return /^https:\/\//.test(v) || v.startsWith("/") || /^[A-Za-z]:[\\/]/.test(v);
+}
+
 function issueReadRequest(number: number): GhRunnerRequest {
   return { operation: "issue_read", args: { number } };
 }
@@ -81,7 +86,7 @@ const issueCreateSpec: OperationSpec = {
     if (!isRecord(payload)) return null;
     const number = positiveInt(payload.number);
     const url = str(payload.url);
-    if (number === null || url === null || !/^https:\/\//.test(url)) return null;
+    if (number === null || url === null || !isAcceptedUrl(url)) return null;
     return { operation: "issue_create", number: issueNumber(number), url };
   },
   async verify(runner, request, success) {
@@ -162,7 +167,7 @@ const issueUpdateSpec: OperationSpec = {
     if (!isRecord(payload)) return null;
     const number = positiveInt(payload.number);
     const url = str(payload.url);
-    if (number === null || url === null || !/^https:\/\//.test(url)) return null;
+    if (number === null || url === null || !isAcceptedUrl(url)) return null;
     return { operation: "issue_update", number: issueNumber(number), url };
   },
   async verify(runner, request, _success) {
@@ -197,7 +202,7 @@ const issueCommentSpec: OperationSpec = {
     if (!isRecord(payload)) return null;
     const number = positiveInt(payload.number);
     const url = str(payload.url);
-    if (number === null || url === null || !/^https:\/\//.test(url)) return null;
+    if (number === null || url === null || !isAcceptedUrl(url)) return null;
     return { operation: "issue_comment", number: issueNumber(number), url };
   },
   async verify(runner, _request, success) {

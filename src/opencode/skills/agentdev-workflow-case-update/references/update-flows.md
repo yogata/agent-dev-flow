@@ -31,7 +31,7 @@
 
 詳細は `agentdev-workflow-routing` を参照。
 委譲接続点: サブエージェントは候補番号抽出のみを返し、親エージェントが確認、停止を判断する。
-Issue/PR 一覧取得手続き（`agentdev-gh-cli`）等で open issue 一覧を取得することは禁止（command 不変条件）。
+Issue/PR 一覧取得により open issue を探すことは禁止（command 不変条件）。
 
 ### Result
 
@@ -57,7 +57,7 @@ Issue/PR 一覧取得手続き（`agentdev-gh-cli`）等で open issue 一覧を
 
 ### Input Resolution
 
-1. SSoT 再構成: Issue 本文（`agentdev-gh-cli` の安全な読み取り手順）
+1. SSoT 再構成: Issue 本文（Custom Tool `agentdev_gh` の issue_read 操作）
 2. identifier 保持: Issue番号
 3. 最小 scalar: なし
 4. runtime artifact: なし
@@ -105,7 +105,7 @@ Issue/PR 一覧取得手続き（`agentdev-gh-cli`）等で open issue 一覧を
 
 ### Procedure
 
-- **`--body`**: Issue作成時に使用されたテンプレートに従って更新する。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは本文案と必須セクション検査のみを返し、親エージェントが Issue 本文更新手続き（`agentdev-gh-cli`）を行う
+- **`--body`**: Issue作成時に使用されたテンプレートに従って更新する。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは本文案と必須セクション検査のみを返し、親エージェントが `agentdev_gh` の issue_update 操作を行う
 - **`--comment`**: 更新コメントを追加する。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントはコメント案と必須セクション検査のみを返し、親エージェントが投稿する
 - **`--req`**: REQファイル更新を行う。case-update --req は直接 commit+push を行う（req-save への委譲は行わない）。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは関連REQ候補、APPEND/UPDATE候補、根拠のみを返し、親エージェントがファイル更新と commit/push を行う。APPEND vs UPDATE 判定基準: APPEND は要件テーブルへの行追加、適用範囲の拡張（例: 受け入れ基準の追加、新規要件の追加）。UPDATE は既存セクションの内容修正（例: テキスト置換、要件の文言修正、適用範囲の変更）
 - **`--review-ng`**: レビューNG時の専用フローを実行する。必ず QG-3（`agentdev-quality-gates`）の乖離検出結果を引用する（command 不変条件）。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは乖離タイプ候補、推奨アクション、更新漏れ候補のみを返し、親エージェントがコメント投稿とREQ更新判断を行う
@@ -116,7 +116,7 @@ Issue/PR 一覧取得手続き（`agentdev-gh-cli`）等で open issue 一覧を
 
 ### Evidence
 
-- 更新後の Issue 本文/コメント（`agentdev-gh-cli` VERIFY 結果）、REQ ファイルの commit hash
+- 更新後の Issue 本文/コメント（`agentdev_gh` 操作結果。成功応答は読み戻し検証済み）、REQ ファイルの commit hash
 
 ### Completion Verification
 
@@ -180,7 +180,7 @@ Issue/PR 一覧取得手続き（`agentdev-gh-cli`）等で open issue 一覧を
 
 - `agentdev-workflow-routing`: 各更新種別フローの詳細、委譲接続点
 - `agentdev-workflow-lifecycle`: フェーズ判定
-- `agentdev-gh-cli`: Issue 更新・コメント追加の I/O 手続きと VERIFY
+- Custom Tool `agentdev_gh`: Issue 更新・コメント追加の操作
 - `agentdev-quality-gates`: QG-3 乖離検出結果の引用
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）

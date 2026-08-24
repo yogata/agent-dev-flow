@@ -23,7 +23,7 @@ RU の frontmatter、本文から対象領域キーワードを抽出し、glob/
 | 抽出元 | キーワード種別 | 例 |
 |--------|---------------|-----|
 | frontmatter | `source_artifact`, `target_artifact`, `area` 等の対象示唆フィールド | `REQ`, `req-define`, `agentdev-req-analysis` |
-| 本文見出し | 対象 command/skill/文書名 | `case-run`, `agentdev-gh-cli` |
+| 本文見出し | 対象 command/skill/文書名 | `case-run`, `agentdev-issue-management` |
 | 本文 | 既存 REQ/ADR/Design の参照 ID（`REQ-NNNN`, `ADR-NNNN`, Design パス） | `REQ`, `ADR`, `<command Design>` |
 | 本文 | ドメイン用語、対象機能名 | `委譲`, `I/O 境界`, `soft-contract` |
 

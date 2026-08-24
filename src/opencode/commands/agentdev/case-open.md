@@ -38,7 +38,7 @@ draft 全体の `agreed_items`、`artifact_actions`、`operation_units` を処�
 - Case に割り当てられた統合先（既定値 main）を Issue 本文の execution contract へ記録する。実証Caseの場合は実証Case識別情報（実証フラグ、対象評価ブランチ、所属実証単位）と評価契約を Issue 本文へ永続記録する。評価結果の採否（採用、不採用、判定不能）自体を Issue 完了条件へ含めない
 - Epic ステータス追跡テーブルは全子Issue の作成完了後に一括更新する
 - preflight で req-define 未実行・要件docのチェックボックス空を検出した場合は警告する。feature の場合は対応する REQ ファイルの存在を確認する
-- gh CLI 出力の読み取りは `agentdev-gh-cli` の安全な読み取り手順に従う。work_type 判定基準と固有ルールは `agentdev-workflow-lifecycle` を参照する
+- GitHub の読み取りは Custom Tool `agentdev_gh` の読み取り操作（issue_read、pr_read 等）経由で行う。work_type 判定基準と固有ルールは `agentdev-workflow-lifecycle` を参照する
 - Issue 本文（Standard/Epic/子Issue/完了報告コメント全て）の成果物本文は verbatim で返す（LF・空行・インデントを含む行構造を保持）。判定結果、調査過程、中間ログ、読解メモは要約、成果物パス、根拠、親判断事項、capture候補へ圧縮して返す
 - 自工程で実観測した deviation は `agentdev-learning-capture` skill または `agentdev-intake-pipeline`（自動capture向け item 生成操作）へ委譲して保存する（保存先は Split Rule（`agentdev-workflow-orchestration` 参照）に従う）。capture 本文は完了報告に含めず、保存した成果物のパス・分類・保存結果のみを `Capture結果` 小節へ含める
 
@@ -47,6 +47,6 @@ draft 全体の `agreed_items`、`artifact_actions`、`operation_units` を処�
 硬い境界（破壊的操作・state 破壊等の否定規則）に限定する:
 
 - 共有作業ツリーでスイープ操作（`git add -A`/ `git add .`/ `git add --all`/ `git commit -a`/ `git checkout .`/ `git reset --hard`/ `git stash`/ 非所有パスへの `git checkout -- <path>`/ `git restore <path>`）は実行しない。`agentdev-git-worktree` の並列実行安全ステージングプロシージャに従い、明示パス指定（`git add <path>`/ `git rm <path>`）+ `git commit -- <paths>`（--only pathspec 形式）で行う。draft/RU 削除は同一ステップで即時ステージ・コミットし未ステージ残存を許さない（Form Zero）
-- Issue 本文（Standard/Epic/子Issue/完了報告コメント全て）の gh CLI への引き渡しは文字列変数で持ち回らず、`agentdev-gh-cli` の WRITE 標準手順（ファイル経由の引き渡し）に従う（`POL-gh-io-delegation`）
+- Issue 本文（Standard/Epic/子Issue/完了報告コメント全て）は Custom Tool `agentdev_gh` の操作（issue_create、issue_update、issue_comment）で投入する。文字コード・一時ファイル等の実装詳細は Tool 内部に隠蔽される（`POL-gh-io-delegation`）
 
 

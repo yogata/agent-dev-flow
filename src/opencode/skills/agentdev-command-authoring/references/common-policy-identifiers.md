@@ -13,7 +13,7 @@
 
 ## 定義一覧
 
-- **POL-gh-io-delegation**: GitHub Issue/PR の読み書きは正規の I/O 境界手続き（`agentdev-gh-cli`）へ委譲する。command/ skill 本文に gh コマンドの直接実行手順を記述せず、gh CLI 出力の読み取りも同手続きの安全な読取手順に従う
+- **POL-gh-io-delegation**: GitHub Issue/PR の読み書きは Custom Tool `agentdev_gh` の操作契約へ委譲する。command/ skill 本文に gh コマンドの直接実行手順を記述せず、gh WRITE 直接実行は agentdev-gh-write-guard（Plugin/Hook）が拒否する。gh CLI 出力の読み取りも Tool の読み取り操作経由を正とする
 - **POL-destructive-change-explicit-approval**: 破壊的変更（inbox 全体強制クリア、大量エントリ一括削除、矛盾解消、要件仕様スコープ変更等）は、通常の判定・分類の承認とは別系統の明示承認を要求する。自律確定や自動進行によってこの承認を迂回しない
 - **POL-promoted-artifact-requires-approval**: ユーザーの明示的な承認なしに採用済み成果物（promoted artifact）を生成しない。詳細判定表（横断契約Design 参照）に従い自律確定条件が満たされたと根拠から一意に確定できる対象のみ、承認なしの生成を許容する
 - **POL-completion-checkbox-single-writer**: Issue 完了条件チェックボックスの評価・更新は case-close QG-4 の専任責務である。case-run、実行担当サブエージェント、その他のコマンドは完了条件チェックボックスを更新しない

@@ -179,7 +179,7 @@ Recommended route には対象配布物の種別と修正方向を提示する�
 報告例:
 
 ```markdown
-- Finding: Issue 作成手続きの契約が agentdev-gh-cli/references/contracts.md と別 Skill で重複定義されている
+- Finding: Issue 作成操作の契約が Tool の contracts.ts と別 Skill で重複定義されている
 - Target: src/opencode/skills/agentdev-XXX/references/foo.md
 - Perspective: 意味的重複
 - Classification: semantic-duplication

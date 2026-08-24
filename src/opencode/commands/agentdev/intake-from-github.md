@@ -31,7 +31,7 @@ description: クローズ済み GitHub Issue/PR から未回収の変更候補�
 工程上の選好を肯定形の不変条件として示す:
 
 - 保存専用のコマンドであり、採用可否の判断は `intake-promote` が、review・整形・分類は後続コマンドが、Issue/PR へのコメント投稿・マーカー付与は `backlog-review` が担う
-- 対象はクローズ済み Issue/PR のみとする。読み取り操作は `agentdev-gh-cli` に従って実行する
+- 対象はクローズ済み Issue/PR のみとする。読み取り操作は Custom Tool `agentdev_gh` 経由で実行する
 - intake item は軽量な手書きメモとして扱う（workflow 管理成果物として扱わない）。frontmatter、状態値、重複排除キー、後続成果物参照、特定セクションを必須とせず、review 結果は item に書き込まない
 - 成果物本文（Issue本文、PR本文、commit message、保存対象ファイル本文、テンプレート成果物）は verbatim で返す。判定結果、調査過程、中間ログ、読解メモは要約、成果物パス、根拠、親判断事項、capture候補へ圧縮して返す
 
