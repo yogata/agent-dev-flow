@@ -13,7 +13,7 @@ AgentDevFlow プラグインの設定を管理するリポジトリ。AI エー�
 | 公開コマンドのプレフィックス | `/agentdev/*` |
 | ドメイン状態ディレクトリ | `.agentdev/` |
 | スキルのプレフィックス | `agentdev-*` |
-| 対象ドメイン | req, case, learning, intake, integrity |
+| 対象ドメイン | req, case, learning, intake, integrity, issue |
 
 ## 入口表
 
@@ -22,8 +22,8 @@ AgentDevFlow プラグインの設定を管理するリポジトリ。AI エー�
 | 現在の状態 | 次のコマンド | 出力 |
 |-----------|-------------|------|
 | 要件を整理したい | `/agentdev/req-define` | 要件doc（draft） |
-| 要件docがあり、機能追加の場合 | `/agentdev/req-save` | REQ/Decision ファイル |
-| REQ/Decision ファイルがあり、Design候補がある場合 | `/agentdev/design-save` | Design ファイル（`docs/designs/`） |
+| 要件docに REQ/Decision 対象 artifact_actions がある場合 | `/agentdev/req-save` | REQ/Decision ファイル |
+| 要件docに Design 対象 artifact_actions がある場合 | `/agentdev/design-save` | Design ファイル（`docs/designs/`） |
 | REQ ファイルまたは要件docがある | `/agentdev/case-open` | GitHub Issue |
 | Issue がある | `/agentdev/case-run` | 実装済みブランチ + PR |
 | PR がある | `/agentdev/case-close` | マージ済み + クローズ済み |
@@ -55,12 +55,14 @@ AgentDevFlow プラグインの設定を管理するリポジトリ。AI エー�
 
 ## クイックスタート
 
-機能追加の最小フロー。バグ修正は `/agentdev/req-define` 後に `/agentdev/case-open` に進む。
+標準フロー。
+`req-save` / `design-save` は要件docの `artifact_actions` に該当対象がある場合のみ実行する。
+該当対象がない場合は `/agentdev/req-define` の直後に `/agentdev/case-open` に進む。
 
 ```
 /agentdev/req-define    # 要件を壁打ちする
-/agentdev/req-save      # REQ/Decision ファイルとして保存（機能追加のみ）
-/agentdev/design-save     # Design候補を docs/designs/ に保存（Design候補がある場合・機能追加のみ）
+/agentdev/req-save      # REQ/Decision ファイルとして保存（REQ/Decision 対象 artifact_actions がある場合）
+/agentdev/design-save   # Design を docs/designs/ に保存（Design 対象 artifact_actions がある場合）
 /agentdev/case-open     # Issue を作成
 /agentdev/case-run      # 実装して PR を作成
 /agentdev/case-close    # PR をマージして Issue をクローズ

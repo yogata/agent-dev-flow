@@ -12,11 +12,11 @@
 | ガイド | 内容 |
 |--------|------|
 | [憲章](charter.md) | 目的、責務境界、hard governance の限定、新規統制追加原則 |
-| [クイックスタート](quickstart.md) | 5コマンドで機能追加を完了する最小フロー |
+| [クイックスタート](quickstart.md) | 要件定義からマージまでの標準フロー |
 | [コマンド選択](command-selection.md) | 現在の状態から次のコマンドを選ぶ入口表 |
 | [要件定義 → Case実行フロー](req-case-flow.md) | req-define から case-close までの流れ |
 | [Intake / Learning / Backlog フロー](intake-learning-backlog-flow.md) | 作業候補、学びの収集から RU 生成まで |
-| [診断、メンテナンス](diagnostics-and-maintenance.md) | docs-check / inspect-docs |
+| [診断、メンテナンス](diagnostics-and-maintenance.md) | docs-check / inspect 系コマンド |
 | [成果物、状態モデル](artifacts-and-state.md) | 成果物の種別、配置、ライフサイクル |
 | [プロジェクトドキュメントと Design](project-docs-and-specs.md) | REQ / Decision / Design の関係 |
 | [Consumer Project 導入](consumer-project-setup.md) | AgentDevFlow の適用プロジェクト導入手順 |
