@@ -1,7 +1,7 @@
 # ドキュメント入口
 
 AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) と [憲章](guides/charter.md) を参照。
-現行の REQ/Decision は `REQ-001〜`、`DEC-NNN`（3桁ゼロ埋め）のIDを使用し、過去版は tag `v2.11.0` と `v2:` プレフィックスで区別する。
+現行の REQ/Decision は `REQ-NNN`、`DEC-NNN`（3桁ゼロ埋め）のIDを使用する。
 
 ## 要件
 
@@ -9,8 +9,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 現行 REQ: 43件、廃止済み: 9件
 <!-- AUTOGEN:END -->
 
-現行要件は43件である（REQ-013 は後継 REQ-012 への移行として、REQ-022〜REQ-024 は達成済みとして、REQ-025・REQ-026・REQ-028 は移管完了に伴う恒常行移行済みとして、REQ-020・REQ-040 は最小トレーサビリティモデルへの再設計による後継 REQ-012 統合として retired/ へ移行、REQ-036〜REQ-050、REQ-051〜REQ-052 を追加。番号には欠番が存在する）。
-REQ-022・REQ-024 の旧規範内容（augmentation 配置先、check_graph.ts 抽出規則と warning 分類）は旧 Artifact Graph とともに廃止された（DEC-017）。履歴は retired REQ ファイルと版管理で参照できる。
+現行要件は43件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
 各 REQ の詳細は各 REQ ファイル本文を参照。
 
 | REQ | タイトル |
@@ -84,10 +83,10 @@ REQ-022・REQ-024 の旧規範内容（augmentation 配置先、check_graph.ts �
 | [DEC-014](decisions/DEC-014.md) | 配布依存境界の多層 enforcement |
 | [DEC-015](decisions/DEC-015.md) | ADF決定論的実行中核と実行基盤実行機構の責務分界 |
 | [DEC-016](decisions/DEC-016.md) | 導入系スクリプトの副作用ゼロ原則 |
-| [DEC-017](decisions/DEC-017.md) | 最小トレーサビリティモデルの採用と Artifact Graph の廃止（proposed） |
+| [DEC-017](decisions/DEC-017.md) | 最小トレーサビリティモデルの採用と Artifact Graph の廃止 |
 | [DEC-018](decisions/DEC-018.md) | 評価ブランチモデルとCase統合先の一般化（proposed） |
 | [DEC-019](decisions/DEC-019.md) | 一般処理の標準API委譲とADF固有意味論の所有境界（proposed） |
-| [DEC-020](decisions/DEC-020.md) | 課題管理系統の導入（proposed） |
+| [DEC-020](decisions/DEC-020.md) | GitHub Issue 共通管理単位の採用（proposed） |
 | [DEC-021](decisions/DEC-021.md) | scripts 公開入口の2本固定と安定契約（proposed） |
 | [DEC-022](decisions/DEC-022.md) | 実行定義層の正規所有モデルと機械強制への移行（proposed） |
 
@@ -99,10 +98,14 @@ Design は 3 層構造（commands / skills / workflows）と基盤 6 ドメイ�
 ### 横断 Design（`designs/workflows/`）
 
 - [ワークフロー契約（横断）](designs/workflows/workflow-contracts.md)
+- [Workflow Skill Model](designs/workflows/workflow-skill-model.md)
+- [STEP Reference Contract](designs/workflows/step-reference-contract.md)
+- [Input Resolution and Durable State](designs/workflows/input-resolution-and-durable-state.md)
 - [サブエージェント委譲契約](designs/workflows/delegation-contracts.md)
 - [キャプチャ境界](designs/workflows/capture-boundaries.md)
 - [Epic / Wave / Issue 実行モデル](designs/workflows/epic-wave-model.md)
 - [RU / 採用済み成果物 / draft lifecycle](designs/workflows/backlog-artifact-lifecycle.md)
+- [execution_unit 構成アルゴリズム参照](designs/workflows/references/execution-unit-construction.md)
 
 ### command Design / skill Design
 
@@ -111,27 +114,66 @@ Design は 3 層構造（commands / skills / workflows）と基盤 6 ドメイ�
 
 ### 基盤 Design（`designs/{foundations,responsibilities,quality,integrity,local,authoring}/`）
 
-基盤 Design は 6 ドメインへ整理済み。
-各ドメイン直下に主要 Design を置き、詳細・実装固有事項は `references/` サブディレクトリへ分離する（Wave 3 再構築）。
+基盤 Design は 6 ドメインで構成する。
+各ドメイン直下に主要 Design を置き、詳細・実装固有事項は `references/` サブディレクトリへ分離する。
+status（draft / accepted）を含む完全一覧は [Design インデックス](designs/README.md) を正とする。
 
+#### foundations/（基盤モデル）
+
+- [採番管理](designs/foundations/numbering-policy.md)
 - [システム仕様](designs/foundations/system.md)
+- [文書モデル](designs/foundations/document-model.md)
+- [Decision Lifecycle](designs/foundations/decision-lifecycle.md)
 - [文書フォーマット規約](designs/foundations/patterns.md)
 - [設計原則](designs/foundations/design-principles.md)
-- [文書モデル](designs/foundations/document-model.md)
-- [harness 分離モデル](designs/foundations/harness-separation-model.md)
 - [Project Extensions](designs/foundations/project-extensions.md)
+- [harness 分離モデル](designs/foundations/harness-separation-model.md)
+- [最小トレーサビリティモデル（TIM）](designs/foundations/traceability-model.md)
+
+#### responsibilities/（文書種別、成果物責務）
+
 - [文書種別責務・配置基準](designs/responsibilities/document-type-responsibilities.md)
-- [アーティファクト契約](designs/responsibilities/artifact-contracts.md)
 - [成果物責任表](designs/responsibilities/artifact-responsibilities.md)
+- [アーティファクト契約](designs/responsibilities/artifact-contracts.md)
+- [REQ 影響マップ](designs/responsibilities/req-impact-map.md)
+- [責務境界浄化](designs/responsibilities/responsibility-boundary-purification.md)
+- [Artifact Quality Control Routing](designs/responsibilities/artifact-quality-control-routing.md)
+- [Custom Tool 操作契約](designs/responsibilities/custom-tool-contracts.md)
+
+#### quality/（品質、メトリクス）
+
 - [品質仕様](designs/quality/quality-specs.md)
 - [品質ゲート](designs/quality/quality-gates.md)
 - [REQ 健全性メトリクス](designs/quality/req-health-metrics.md)
+- [Design 健全性メトリクス](designs/quality/design-health-metrics.md)
+
+#### integrity/（整合性契約、ルール）
+
+- [索引類自動生成](designs/integrity/index-auto-generation.md)
 - [整合性契約](designs/integrity/integrity-contracts.md)
 - [整合性ルールカタログ](designs/integrity/integrity-rule-catalog.md)
+- [整合性ルール詳細（IR-NNN）](designs/integrity/rules/)
 - [ルール所有権マトリックス](designs/integrity/rule-ownership.md)
+- [配布物整合性検査ルール](designs/integrity/docs-spec-rebuild-integrity.md)
+- [配布依存境界](designs/integrity/distribution-boundary.md)
+- [backticks 識別子/一般名詞 判定閾値](designs/integrity/backticks-identifier-threshold.md)
+- [validator 分割基準](designs/integrity/validator-split-criteria.md)
+- [Targeted Docs Guard 実装詳細](designs/integrity/targeted-docs-guard-implementation.md)
+- [AUTOGEN ブロック鮮度検出 gate](designs/integrity/autogen-freshness-gate.md)
+- [テスト影響範囲検出 gate](designs/integrity/test-impact-detection-gate.md)
+- [checker 実行契約と検出基盤規則](designs/integrity/checker-execution-contracts.md)
+
+#### local/（ローカル版 Design）
+
 - [実行時パッケージ境界](designs/local/runtime-package-boundary.md)
-- [ローカル Case ファイル](designs/local/local-case-file.md)
+- [ローカルIssue共通スキーマ](designs/local/local-case-file.md)
+- [導入スクリプトの使いやすさ詳細](designs/local/install-script-usability.md)
+
+#### authoring/（執筆規約）
+
 - [コマンドファイルフォーマット規約](designs/authoring/command-file-format.md)
+- [外部依存メジャーバージョン互換性管理ガイド](designs/authoring/dependency-version-compatibility.md)
+- [語彙レジストリ](designs/authoring/vocabulary-registry.md)
 
 ## Report
 
