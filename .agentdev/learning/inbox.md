@@ -502,3 +502,83 @@
 - **想定反映先**: quality-gates Design の QG-4 実行形式（intake 経由で検討）
 - **関連**: Issue 2431 対応記録コメント（case-close、検証差分の integrity 行）、PR 2435 本文 verification-diff
 - **タグ**: `#bun-test` `#junction` `#verification-diff`
+
+## worktree では junction が伝播しないため junction 依存検査は代替実行で実質検証する
+
+- **問題事象**: git worktree（.worktrees/ 配下）には .opencode/ の agentdev-* junction が伝播せず、check_changed_docs.ts の検出対象が 0 になった（false-clean）
+- **発生局面**: 実装（case-run の worktree 上での targeted docs guard 実行、Epic 2436 Wave 1）
+- **検知方法**: check_changed_docs.ts の JSON 出力で files_checked が空・検出対象 0
+- **根本原因**: junction は git 非追跡のファイルシステム成果物で、worktree 作成時に複製されない
+- **自律対応内容**: src fallback を持つ repo-integrity suite（bun test 正規形）と環境ラベル付き代替実行（main repo root 読取専用）で実質検証した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（worktree 構造的制約の運用知見。REQ-018 関連）
+- **横展開観点**: worktree 上で junction 依存検査（.opencode/ 配下を走査する checker）を実行するすべての場面
+- **再発条件**: worktree 上で junction 依存の checker を junction 無しで実行した場合
+- **予防策候補**: worktree での検査実行時は検出対象 0 の場合に junction 有無を確認し、src fallback・環境ラベル付き代替実行を組む手順の明文化
+- **想定反映先**: agentdev-git-worktree-test-fallback、targeted-docs-guard-implementation Design
+- **関連**: PR 2440 本文「Findings / Capture候補」learning 1件目
+- **タグ**: `#worktree` `#junction` `#check-changed-docs`
+
+## worktree では node_modules も伝播しないため依存パッケージのテストは事前に bun install する
+
+- **問題事象**: worktree 上で zod に依存する配布スキルのテストを実行したところ unhandled error 4件が発生した（node_modules が worktree に存在しない）
+- **発生局面**: 実装（case-run の worktree 上での bun test 実行、Epic 2436 Wave 1）
+- **検知方法**: bun test の unhandled error（zod モジュール解決失敗）
+- **根本原因**: node_modules は git 非追跡であり worktree 作成時に複製されない。依存を持つパッケージのテストは worktree 側で install が必要
+- **自律対応内容**: 該当パッケージで bun install を実行後に再検証し PASS した（検証差分に「修正済み」として記録）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: worktree 上で node_modules 依存のテストを実行するすべての場面
+- **再発条件**: worktree 上で未 install の依存パッケージを含むテストを実行した場合
+- **予防策候補**: worktree でのテスト実行手順へ依存パッケージの事前 install 確認を組み込む
+- **想定反映先**: agentdev-git-worktree、case-run workflow のテスト実行手順
+- **関連**: PR 2440 本文「Findings / Capture候補」learning 2件目、検証差分の bun test 行（修正済み）
+- **タグ**: `#worktree` `#bun-install` `#node-modules`
+
+## PowerShell のリダイレクトは UTF-8 JSON を破壊するため cmd /c リダイレクトか直接パースを使う
+
+- **問題事象**: PowerShell の `>` リダイレクトで受け取った検査結果 JSON の日本語 snippet が文字化けし、証跡の可読性が失われた（case-run の dist 最終 gate 証跡に実際に発生）
+- **発生局面**: 実装・検証（PowerShell 上での checker 実行と stdout のファイル退避）
+- **検知方法**: 退避 JSON の該当フィールドが置換文字を含むことの目視・再取得との突合
+- **根本原因**: PowerShell のネイティブコマンド出力デコードとリダイレクト書き込みの既定符号化が UTF-8 を安定して保持しない
+- **自律対応内容**: 以降の実行は bun スクリプト内の spawnSync + fs.writeFileSync（UTF-8 明示）で stdout を退避する形式に切り替え、文字化けを解消した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（checker 実行契約の「stdout 証跡退避形式」と整合する運用知見）
+- **横展開観点**: PowerShell 上で JSON を出力する checker の stdout を受け取るすべての場面
+- **再発条件**: PowerShell の `>` でネイティブコマンドの UTF-8 出力を退避した場合
+- **予防策候補**: checker stdout の退避は spawnSync + UTF-8 明示書き出し（node/bun スクリプト）を標準とし、PowerShell リダイレクトを使わない
+- **想定反映先**: checker-execution-contracts Design の stdout 証跡退避形式
+- **関連**: PR 2440 本文「Findings / Capture候補」learning 3件目、case-close 実行の cl-run-*.ts 系証跡
+- **タグ**: `#powershell` `#utf8` `#stdout-evidence`
+
+## agentdev_gh issue_update は契約外フィールドを無視して部分更新として成功する
+
+- **問題事象**: issue_update リクエストに契約外の bodyPath フィールドで本文ファイルパスを渡したところ、仕様の validate は body を null と解し title のみの部分更新を実行、Tool 内 VERIFY も title 一致で合格した。完了条件チェックボックスが未更新のまま工程が進行しかけた
+- **発生局面**: 実行（case-close の QG-4 完了条件チェックボックス更新、Epic 2436 Wave 1）
+- **検知方法**: case-close 側の再読込 VERIFY（完了条件 checked=0 を検出）
+- **根本原因**: 操作仕様の validate が未知フィールドを拒否せず、指定された既知フィールドのみで部分更新リクエストを組み立てる。VERIFY は要求されたフィールドのみ照合するため部分更新を検出できない
+- **自律対応内容**: body をインライン JSON 文字列で組んだ正規形式のリクエストで再実行し、再読込 VERIFY で checked=14 を確認した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（Tool は契約どおり動作。リクエスト組立て側の様式知見）
+- **横展開観点**: agentdev_gh へのリクエストを組むすべての呼び出し側（bun driver 経由の委譲実行を含む）
+- **再発条件**: body のような必須更新字段を契約外形式（bodyPath 等）で渡した場合
+- **予防策候補**: リクエスト組立ては契約のフィールド名（body はインライン文字列）に厳密に従う。中間 spec から最終リクエストを組むスクリプトでは契約フィールドの存在検証を入れる
+- **想定反映先**: agentdev_gh 呼出 driver の作成手順（委譲時 Tool 利用経路の明文化候補に付随）
+- **関連**: Issue 2437 実装記録コメント（case-close）、委譲単位 case-auto-20260825-stage-close-w1
+- **タグ**: `#agentdev-gh` `#issue-update` `#request-schema`
+
+## agentdev_gh pr_mergeable は gh の mergeable 再計算競合で verification-incomplete になり得る
+
+- **問題事象**: PR head 更新直後の pr_mergeable 操作が「verification read-back did not confirm the operation result」（verification-incomplete）で連続失敗した（60秒・10秒間隔のポーリング全失敗を含む）。実状態は gh pr view で MERGEABLE・mergeStateStatus CLEAN と確認できた
+- **発生局面**: 実行（case-close STEP-E4 の squash merge 前 mergeable 確認、Epic 2436 Wave 1）
+- **検知方法**: Tool の failure.kind = verification-incomplete と、gh pr view --json mergeable,mergeStateStatus による実状態確認との乖離
+- **根本原因**: gh pr view の mergeable フィールドは呼び出しごとに再計算され得る。操作の読み取りと VERIFY の再読み取りの間で MERGEABLE → UNKNOWN が揺れると照合不一致になる
+- **自律対応内容**: 読み取り操作の代替経路（Tool の contingency が明示する gh CLI 手動実行、canContinue: true）で MERGEABLE・CLEAN を確認した後に pr_merge（squash）を実行し、Tool 内 VERIFY 付きでマージに成功した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（読み取り系の代替継続契約どおりの運用）
+- **横展開観点**: PR head 更新直後の pr_mergeable 実行すべて
+- **再発条件**: GitHub 側 mergeable 再計算が走っているタイミングで pr_mergeable を実行した場合
+- **予防策候補**: verification-incomplete 時は failure で完了扱いにせず代替読み取りで実状態を確認してから副作用操作へ進む手順化。恒久対策は Tool 側 verify の再試行
+- **想定反映先**: agentdev-workflow-case-close STEP-4-2（mergeable ポーリング手順）、Custom Tool 操作契約 Design
+- **関連**: PR 2440 マージ（case-close、委譲単位 case-auto-20260825-stage-close-w1）
+- **タグ**: `#agentdev-gh` `#pr-mergeable` `#verify-race`
