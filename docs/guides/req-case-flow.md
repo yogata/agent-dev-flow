@@ -9,7 +9,7 @@
 /agentdev/req-define → /agentdev/req-save（REQ/Decision 対象 artifact_actions がある場合）→ /agentdev/design-save（Design 対象 artifact_actions がある場合）→ /agentdev/case-open → /agentdev/case-run → /agentdev/case-close
 ```
 
-> 工程分岐は `work_type` 固定分岐ではなく req_draft の `artifact_actions` 存在で動的判定する（v2:REQ-0138, v2:ADR-0124）。
+> 工程分岐は req_draft の `artifact_actions` 存在で動的判定する。
 > draft は構造化 `draft-data` 形式（緩やかな契約：soft contract）で req-define が生成し、後続コマンドが LLM 推論で消費する。
 
 ## req-define
@@ -31,7 +31,6 @@ AI と対話して要件を整理するコマンド。
 
 要件docを REQ/Decision ファイルとして `docs/` に保存するコマンド。
 REQ/Decision 対象 artifact_actions（`artifact: req` / `artifact: decision`）がある場合に実行する。
-`work_type` による判定は廃止した（v2:REQ-0138-009）。
 
 **入力**: 要件doc（REQ/Decision 対象 artifact_actions がある場合）
 
@@ -40,8 +39,8 @@ REQ/Decision 対象 artifact_actions（`artifact: req` / `artifact: decision`）
 ## design-save
 
 req-define で分離された Design 保存対象（`draft-data` の `artifact_actions` 内 `artifact: design` entry）を Design ファイルとして `docs/designs/` に保存、確定するコマンド。
-Design 対象 artifact_actions がある場合に実行する（全 work_type 対象、`work_type` による判定は廃止、v2:REQ-0138-009）。
-req-save のファイル編集スコープ制約（Design 編集禁止）を緩和するものではなく、Design 保存を独立責務として切り出す（v2:ADR-0123）。
+Design 対象 artifact_actions がある場合に実行する（全 work_type 対象）。
+req-save のファイル編集スコープ制約（Design 編集禁止）を緩和するものではなく、Design 保存を独立責務として切り出す。
 
 **入力**: 要件doc（Design 対象 artifact_actions がある場合）
 
@@ -50,7 +49,7 @@ req-save のファイル編集スコープ制約（Design 編集禁止）を緩�
 **Design ライフサイクル**: Design は frontmatter `status`（`draft` / `accepted`）で成熟度を管理する。
 `draft`（design-save で保存直後）→ `accepted`（case-close で実装が Design 内容を検証した旨を確認）の順で昇格する。
 
-**スキップ条件**: `artifact: design` entry がない、または旧形式 draft（`artifact_actions` フィールドなし）の場合はスキップし従来ワークフローで実行（後方互換）。
+**スキップ条件**: `artifact: design` entry がない場合はスキップする。
 
 ## case-open
 
@@ -79,7 +78,7 @@ Issue に基づいて実装し、PR を作成するコマンド。
 | 実装 | 実装、テスト、docs/designs 整合性確認 |
 | 提出 | コミット、PR 作成 |
 
-> **完了条件チェックボックスは case-close の責務**: case-run は完了条件チェックボックスの更新を case-close に委ねる（v2:ADR-0114）。
+> **完了条件チェックボックスは case-close の責務**: case-run は完了条件チェックボックスの更新を case-close に委ねる。
 > チェックボックスの評価、更新は case-close QG-4 で行う。
 
 ### 自律修正ループ
@@ -119,8 +118,8 @@ PR をマージし、Issue をクローズするコマンド。
 
 ## work_type 分類
 
-Issue の work_type は参考情報であり、パイプライン分岐（`/agentdev/req-save` の要否）は `work_type` 固定分岐ではなく req_draft の `artifact_actions` 存在で動的判定する（v2:REQ-0138-009, v2:ADR-0124）。
-docs 更新責務は全 work_type 共通である（bugfix も含む。v2:REQ-0104-034）。
+Issue の work_type は参考情報であり、パイプライン分岐（`/agentdev/req-save` の要否）は req_draft の `artifact_actions` 存在で動的判定する。
+docs 更新責務は全 work_type 共通である（bugfix も含む）。
 
 | work_type | 名称 | ラベル | ブランチ種別 |
 |-----------|------|--------|-------------|
@@ -139,7 +138,7 @@ docs 更新責務は全 work_type 共通である（bugfix も含む。v2:REQ-01
 
 ### 実行内容
 
-入力要件docの `draft-data` の `artifact_actions` を読み取り、工程を動的判定する（`work_type` 固定分岐ではなく `artifact_actions` 存在による判定、v2:REQ-0138-009）:
+入力要件docの `draft-data` の `artifact_actions` を読み取り、工程を動的判定する（`artifact_actions` 存在による判定）:
 
 - **REQ/Decision artifact_actions あり**: `/agentdev/req-save` → `/agentdev/design-save`（Design artifact_actions がある場合）→ `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`
 - **REQ/Decision artifact_actions なし**: `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`（`/agentdev/req-save` 、 `/agentdev/design-save` をスキップ）
