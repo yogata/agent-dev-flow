@@ -34,7 +34,7 @@
 | DEC-017 | 最小トレーサビリティモデルの採用と Artifact Graph の廃止 | accepted | 2026-08-17 |
 | DEC-018 | 評価ブランチモデルとCase統合先の一般化 | proposed | 2026-08-19 |
 | DEC-019 | 一般処理の標準API委譲とADF固有意味論の所有境界 | proposed | 2026-08-20 |
-| DEC-020 | 課題管理系統の導入 | proposed | 2026-08-23 |
+| DEC-020 | GitHub Issue 共通管理単位の採用 | proposed | 2026-08-23 |
 | DEC-021 | scripts 公開入口の2本固定と安定契約 | proposed | 2026-08-23 |
 | DEC-022 | 実行定義層の正規所有モデルと機械強制への移行 | proposed | 2026-08-24 |
 <!-- AUTOGEN:END -->
@@ -71,7 +71,7 @@
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
 - [DEC-018](DEC-018.md)（評価ブランチモデルとCase統合先の一般化）
 - [DEC-019](DEC-019.md)（一般処理の標準API委譲とADF固有意味論の所有境界）
-- [DEC-020](DEC-020.md)（課題管理系統の導入）
+- [DEC-020](DEC-020.md)（GitHub Issue 共通管理単位の採用）
 - [DEC-021](DEC-021.md)（scripts 公開入口の2本固定と安定契約）
 - [DEC-022](DEC-022.md)（実行定義層の正規所有モデルと機械強制への移行）
 <!-- AUTOGEN:END -->
@@ -117,7 +117,7 @@
 - [DEC-015](DEC-015.md)（ADF決定論的実行中核と実行基盤実行機構の責務分界、処理単位と状態機械の選択的適用）
 - [DEC-018](DEC-018.md)（評価ブランチモデルとCase統合先の一般化、実証・評価ワークフローと統合先基準の統一）
 - [DEC-019](DEC-019.md)（一般処理の標準API委譲とADF固有意味論の所有境界、YAML 構文解析・再帰ファイル探索・CLI 引数解析の標準 API 委譲）
-- [DEC-020](DEC-020.md)（課題管理系統の導入、docs/issue-list/ による未解決事項の永続追跡体系と Capability Skill 提供）
+- [DEC-020](DEC-020.md)（GitHub Issue 共通管理単位の採用、追跡Issueと Case Issue の役割分離と論理スキーマ一元管理）
 
 ### 整合性・IR 体系
 
@@ -179,7 +179,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-017 | [REQ-012](../requirements/REQ-012.md), [REQ-021](../requirements/REQ-021.md), [REQ-020](../requirements/retired/REQ-020.md)（retired、後継: REQ-012）, [REQ-040](../requirements/retired/REQ-040.md)（retired、後継: REQ-012） | 最小トレーサビリティモデルの採用と Artifact Graph の廃止（REQ-012 UPDATE、REQ-021 UPDATE、REQ-020 RETIRE、REQ-040 RETIRE と整合） |
 | DEC-018 | [REQ-042](../requirements/REQ-042.md), [REQ-043](../requirements/REQ-043.md), [REQ-004](../requirements/REQ-004.md), [REQ-005](../requirements/REQ-005.md), [REQ-017](../requirements/REQ-017.md), [REQ-030](../requirements/REQ-030.md), [REQ-031](../requirements/REQ-031.md), [REQ-032](../requirements/REQ-032.md), [REQ-034](../requirements/REQ-034.md), [REQ-035](../requirements/REQ-035.md) | 評価ブランチモデルとCase統合先の一般化（REQ-042/REQ-043 CREATE、REQ-004/005/017/030/031/032/034/035 UPDATE と整合） |
 | DEC-019 | [REQ-044](../requirements/REQ-044.md) | 一般処理の標準API委譲とADF固有意味論の所有境界（REQ-044 CREATE と整合。Design 4 件への実装契約追記・更新を伴う） |
-| DEC-020 | [REQ-049](../requirements/REQ-049.md), [REQ-001](../requirements/REQ-001.md) | 課題管理系統の導入（REQ-049 CREATE、REQ-001-001 UPDATE と整合。Design 4 件への契約更新を伴う） |
+| DEC-020 | [REQ-049](../requirements/REQ-049.md), [REQ-001](../requirements/REQ-001.md), [REQ-009](../requirements/REQ-009.md), [REQ-011](../requirements/REQ-011.md) | GitHub Issue 共通管理単位の採用（REQ-049 全面再構成、REQ-001/REQ-009/REQ-011 UPDATE と整合。Design への契約更新を伴う） |
 | DEC-021 | [REQ-050](../requirements/REQ-050.md) | scripts 公開入口の2本固定と安定契約（REQ-050 CREATE、REQ-009-002/044 UPDATE、DEC-016 参照修正と整合） |
 
 ## 過去版の履歴基盤

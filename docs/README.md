@@ -54,7 +54,7 @@ REQ-022・REQ-024 の旧規範内容（augmentation 配置先、check_graph.ts �
 | [REQ-046](requirements/REQ-046.md) | 横断正規化後の不変条件 |
 | [REQ-047](requirements/REQ-047.md) | 規則所有権の一方向化 |
 | [REQ-048](requirements/REQ-048.md) | ADF 実行効率第1次改善（実行観測基盤） |
-| [REQ-049](requirements/REQ-049.md) | 課題管理機構 |
+| [REQ-049](requirements/REQ-049.md) | 追跡Issue管理機構 |
 | [REQ-050](requirements/REQ-050.md) | scripts 公開入口境界 |
 | [REQ-051](requirements/REQ-051.md) | ガードレール識別体系と機械検査の再編 |
 | [REQ-052](requirements/REQ-052.md) | Custom Tool・Plugin/Hook の種別契約と配布境界 |
