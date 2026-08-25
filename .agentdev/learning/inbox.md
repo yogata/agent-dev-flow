@@ -582,3 +582,19 @@
 - **想定反映先**: agentdev-workflow-case-close STEP-4-2（mergeable ポーリング手順）、Custom Tool 操作契約 Design
 - **関連**: PR 2440 マージ（case-close、委譲単位 case-auto-20260825-stage-close-w1）
 - **タグ**: `#agentdev-gh` `#pr-mergeable` `#verify-race`
+
+## worktree の依存復元は bun install（worktree root）単独では不完で分散 node_modules の個別 install が必要
+
+- **問題事象**: worktree 環境でのテスト実行に必要な依存復元は `bun install`（worktree root）単独では不完である。本リポジトリは root package.json を持たず、依存は gitignore 済みの各所 node_modules（`.opencode/package.json`、`.opencode/plugins/`、`src/opencode/skills/agentdev-*/scripts/`、`src/opencode/tools/agentdev-gh/`、`src/opencode/plugins/agentdev-gh-tool/` 等）に分散している。worktree ではこれらが未伝播のため、個別に `bun install` する必要がある（例: zod は `.opencode` 系依存と `agentdev-project-extensions/scripts` の両経路で解決に寄与）
+- **発生局面**: 実装（case-run 委譲、worktree 環境の検証実行、Issue 2438 の case work）
+- **検知方法**: worktree での依存解決失敗（テスト実行時のモジュール解決エラー）
+- **根本原因**: 依存配置が repo root 一元型でなく多層分散型（各サブディレクトリの package.json + gitignore 済み node_modules）である構成を、委譲時の環境復元が root 一元型の前提で見立てていた
+- **自律対応内容**: 依存を持つ各ディレクトリで個別に `bun install` を実行して検証を完結した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: worktree でテスト・検証スクリプトを実行する委譲すべて、委譲時の環境復元手順書
+- **再発条件**: worktree root の `bun install` のみで依存が復元されたと見なしてテストを実行する場合
+- **予防策候補**: 委譲時の環境復元手順書へ分散依存の個別 install 差分を反映する
+- **想定反映先**: agentdev-git-worktree の worktree 構造的制約（bun test 実行の環境前提）、agentdev-workflow-case-run の委譲時環境復元手順
+- **関連**: PR 2443 本文「Findings/ Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2443 ）、本 inbox 既存エントリ「worktree では node_modules も伝播しないため依存パッケージのテストは事前に bun install する」「worktree 環境の bun test 依存解決不能は bun install --cwd で worktree ローカル解消できる」
+- **タグ**: `#worktree` `#bun-install` `#dependencies` `#delegation`
