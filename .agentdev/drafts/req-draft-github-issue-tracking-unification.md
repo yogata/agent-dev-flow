@@ -528,6 +528,8 @@ test_strategy:
 
 review_dispositions: []
 
+design_actions_consumed: true
+
 case_open_hints:
   epic_needed: true
   decomposition: |

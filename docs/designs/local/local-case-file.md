@@ -1,69 +1,68 @@
 ---
-title: ローカル Case ファイル
+title: ローカルIssue共通スキーマ
 status: accepted
 created: 2026-06-20
-updated: 2026-07-26
+updated: 2026-08-25
 ---
 <!-- ADF-COVERS(implementation): REQ-009-014, REQ-009-026, REQ-009-027, REQ-009-028, REQ-009-029, REQ-009-030, REQ-009-031, REQ-009-032, REQ-009-033, REQ-009-034, REQ-009-037, REQ-009-039 -->
 <!-- ADF-COVERS(implementation): REQ-011-007 -->
 
-# ローカル Case ファイル
+# ローカルIssue共通スキーマ
 
 > **Scope**: 本 Design は agent-dev-flow リポジトリのリポジトリ内部設計文書である（REQ-001）。
-> ローカル版 OpenCode 導入先リポジトリで運用される Case ファイルのスキーマ、状態遷移、採番、見出しを定義する。
+> ローカル版 OpenCode 導入先リポジトリで運用されるローカルIssueの共通スキーマ、role 条件付きスキーマ、採番、見出しを定義する。
 > 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（REQ-001）。
-> REQ-009 の詳細仕様を正とする。
-> Case ファイル仕様の正本は本 Design であり、`src/opencode-local/agentdev-gh-cli/case-schema/` 配下の定義は操作用定義（正本ではない）とする。
+> REQ-009 の詳細仕様を正とする。role、kind、状態の意味論は agentdev-issue-tracking Design を正とし、本 Design は物理表現の写像に徹する。
+> ローカルIssue仕様の正本は本 Design であり、`src/opencode-local/agentdev-gh-cli/case-schema/` 配下の定義は操作用定義（正本ではない）とする。
 
 ## 目的
 
-GitHub Issue / PR を使わない個人利用環境（ローカル版 OpenCode）で、Issue / PR 相当の永続情報を保持する Case ファイルの構造を定義する（REQ-009-016〜020, 024）。
-ローカル版コマンド（`case-open` / `case-run` / `case-close`）は本 Design に従って `.agentdev/cases/case-{NNNN}.md` を生成、更新する。
+GitHub Issue / PR を使わない個人利用環境（ローカル版 OpenCode）で、Issue / PR 相当の永続情報を保持するローカルIssueの構造を定義する（REQ-009-026〜033）。
+ローカル版の Custom Tool（agentdev_gh の Local 実装）は本 Design に従って `.agentdev/issues/issue-{NNNN}.md` を読み書きする。上位の Command / Workflow / Capability は .agentdev/issues/ を直接読み書きせず、通常版と同一の Tool 操作契約経由でのみローカルIssueを操作する。
 
-## 配置先
+## 配置先と採番
 
-- パス: `.agentdev/cases/case-{NNNN}.md`
-- `{NNNN}`: 4 桁ゼロ埋め番号（例: `0001`, `0042`）
-- リポジトリ管理対象: `.agentdev/cases/` 配下の Case ファイルは Issue / PR 相当の永続情報としてリポジトリ管理対象とする（REQ-009-016）
+- パス: `.agentdev/issues/issue-{NNNN}.md`
+- `{NNNN}`: 4 桁ゼロ埋め番号（例: `0001`, `0042`）。GitHub Issue 番号に対応する一つの共通採番空間とし、role（tracking/case）ごとに採番を分けない
+- 新規作成時は `.agentdev/issues/issue-*.md` の既存最大番号 + 1 を使用する。欠番は再利用しない（過去に削除、リネームされた番号を再採番しない）
+- 同一番号のファイルが既に存在する場合、作成側は停止する（上書きしない）
+- 複数プロセスによる同時作成の排他制御は対象外とする（暫定ローカル版の前提）
+- リポジトリ管理対象: `.agentdev/issues/` 配下のローカルIssueは Issue / PR 相当の永続情報としてリポジトリ管理対象とする
 
-## YAML 前書きスキーマ
+## 共通メタデータ（YAML 前書き）
 
-Case ファイルの YAML 前書きは以下のフィールドを持つ。
-各フィールドの型、必須/任意、値域を定義する。
+全ローカルIssueが持つ共通メタデータ。各フィールドの型、必須/任意、値域を定義する。
 
 | フィールド | 型 | 必須/任意 | 値域、制約 |
 |---|---|---|---|
-| `id` | 文字列 | 必須 | `case-{NNNN}` 形式。ファイル名 `case-{NNNN}.md` と一致すること |
-| `title` | 文字列 | 必須 | 自由記述。Case の概要を簡潔に表す日本語または英語 |
-| `status` | 文字列（enum） | 必須 | `open`, `running`, `blocked`, `review`, `closed`, `cancelled` のいずれか |
+| `id` | 文字列 | 必須 | `issue-{NNNN}` 形式。ファイル名 `issue-{NNNN}.md` と一致すること |
+| `title` | 文字列 | 必須 | 自由記述。Issue の概要を簡潔に表す日本語または英語 |
+| `role` | 文字列（enum） | 必須 | `tracking` / `case`。role の意味論は agentdev-issue-tracking Design が所有する |
+| `status` | 文字列（enum） | 必須 | role ごとの値域（後述）から選択される |
 | `created_at` | 文字列（日時） | 必須 | ISO 8601 形式（例: `2026-06-20T21:39:00+09:00`） |
 | `updated_at` | 文字列（日時） | 必須 | ISO 8601 形式。最終更新日時 |
-| `closed_at` | 文字列（日時）または空 | 条件付き必須 | `status: closed` または `status: cancelled` の場合のみ値を持つ。それ以外では空文字列またはフィールド値なし |
-| `labels` | 配列（文字列） | 必須 | `rules/labels.yaml` の `label_enum` から選定。補助分類であり状態遷移やワークフロー状態の代替として扱わない |
+| `closed_at` | 文字列（日時）または空 | 条件付き必須 | role ごとの終端状態の場合のみ値を持つ。それ以外では空文字列またはフィールド値なし |
+| `labels` | 配列（文字列） | 必須 | role ごとの値域（後述）から選定。補助分類であり状態遷移やワークフロー状態の代替として扱わない |
 
 ### YAML 前書きに含めないフィールド
 
-以下のフィールドは YAML 前書きに持たせない（REQ-009-017, 024）。
+`work_type`、`source`、`branch`、`base_branch` を YAML 前書きに持たせない。
+ブランチ情報はブランチを使った場合のみ role: case の `## マージ結果` セクションに記録する。
 
-- `work_type`
-- `source`
-- `branch`
-- `base_branch`
+## role: tracking の条件付きスキーマ
 
-ブランチ情報はブランチを使った場合のみ `## マージ結果` セクションに記録する。
-YAML 前書きには持たせない。
+追跡Issueの物理表現。保持する情報の意味論（role、kind、状態と状態遷移、再評価・解決・反映追跡の意味）は agentdev-issue-tracking Design を正とする。
 
-### 前書きスキーマ定義ファイル
+- `status` 値域: 追跡Issue 6状態（起票、検討中、保留、実行準備完了、解決済み、クローズ済み）に対応する物理値。agentdev-issue-tracking Design の状態の三段写像に従う
+- `labels` 値域: kind（problem、idea、task、risk）等の追跡Issueラベル。物理写像表の正は agentdev-issue-tracking Design
+- 本文: 追跡Issue本文の標準構造（件名、背景、影響、関連成果物、選択肢、判断材料、不足情報、保留理由と再評価条件、解決結論、反映先と反映状態、関連 Case Issue 参照）に従う。Case 固有セクション（PR 相当セクション、マージ結果）を必須項目としない
+- コメント相当履歴: GitHub Issue コメント相当の検討経過を、本文内の追記型コメント相当セクション（日時エントリの時系列）として保持する
 
-前書きスキーマの形式定義は `src/opencode-local/agentdev-gh-cli/case-schema/rules/frontmatter.yaml` に機械可読形式で保持する。
-本 Design は意味仕様の原本であり、`frontmatter.yaml` は本 Design と矛盾してはならない。
-`frontmatter.yaml` は操作用定義（正本ではない）とする。
+## role: case の条件付きスキーマ
 
-## status enum と状態遷移
+Case 実行の物理表現。旧ローカル Case ファイルの構造を引き継ぐ。
 
-### status 値域
-
-`status` は以下のいずれかの値を取る（REQ-009-018）。
+### status 値域（role: case）
 
 | status | 意味 | 終端状態 |
 |---|---|---|
@@ -74,12 +73,9 @@ YAML 前書きには持たせない。
 | `closed` | 完了 | はい |
 | `cancelled` | 中止 | はい |
 
-`closed` と `cancelled` は終端状態とする。
-終端状態からの遷移は定義しない。
+`closed` と `cancelled` は終端状態とし、終端状態からの遷移は定義しない。
 
-### 状態遷移表
-
-ローカル版各コマンドの操作に対応する状態遷移を定義する（REQ-009-018）。
+### 状態遷移表（role: case）
 
 | 操作 | 変更前 status | 変更後 status |
 |---|---|---|
@@ -92,55 +88,19 @@ YAML 前書きには持たせない。
 | ローカル版 `case-close` 完了 | `review` | `closed` |
 | 明示中止 | `open` / `running` / `blocked` / `review` | `cancelled` |
 
-### 再開経路
+再開経路と禁止遷移:
 
 - ローカル版 `case-run` 停止後の再開経路: `blocked` → `running` → `review`
 - ローカル版 `case-close` 停止後の再開経路: `blocked` → `review` → `closed`
+- `blocked` から `closed` への直接遷移は禁止する。`blocked` から `closed` に至る場合は `review` を経由する
 
-### 禁止遷移
+### labels 値域（role: case）
 
-- `blocked` から `closed` への直接遷移は禁止する。`blocked` から `closed` に至る場合は `review` を経由すること。
-- 終端状態（`closed`, `cancelled`）からの遷移は定義しない。
+`feature`、`bugfix`、`maintenance`、`docs`、`refactor`、`chore`、`epic` から選定する。
 
-### status 定義ファイル
+### 本文構成（role: case）
 
-状態遷移表の形式定義は `src/opencode-local/agentdev-gh-cli/case-schema/rules/status.yaml` に機械可読形式で保持する。
-本 Design と `status.yaml` は矛盾してはならない。
-
-## 採番規則
-
-`{NNNN}` の採番規則を定義する（REQ-009-016）。
-
-- 4 桁ゼロ埋め番号とする（例: `0001`, `0042`, `9999`）
-- 新規作成時は `.agentdev/cases/case-*.md` の既存最大番号 + 1 を使用する
-- 欠番は再利用しない（過去に削除、リネームされた番号を再採番しない）
-- 同一番号のファイルが既に存在する場合、ローカル版 `case-open` は停止する（上書きしない）
-- 複数プロセスによる同時作成の排他制御は対象外とする（暫定ローカル版の前提）
-
-## labels 値域
-
-`labels` は配列とし、`rules/labels.yaml` の `label_enum` から選定する（REQ-009-019）。
-`labels` は補助分類であり、状態遷移やワークフロー状態の代替として扱わない。
-
-`label_enum` の値域:
-
-- `feature`
-- `bugfix`
-- `maintenance`
-- `docs`
-- `refactor`
-- `chore`
-- `epic`
-
-### labels 定義ファイル
-
-ラベル値域の形式定義は `src/opencode-local/agentdev-gh-cli/case-schema/rules/labels.yaml` に機械可読形式で保持する。
-本 Design と `labels.yaml` は矛盾してはならない。
-
-## 見出し一覧
-
-Case ファイル本文は以下の 15 セクション見出しを持つ（REQ-009-020）。
-各見出しの必須/任意を定義する。
+Case ファイル本文は以下のセクション見出しを保持できる。`Design確定候補` と `Findings / Capture候補` は必須とする（GitHub 版で PR 本文が担っていた引き継ぎ情報の代替であり、case-close への引き継ぎ経路を失わせないため）。
 
 | # | 見出し | 必須/任意 | 役割 |
 |---|---|---|---|
@@ -153,95 +113,66 @@ Case ファイル本文は以下の 15 セクション見出しを持つ（REQ-0
 | 7 | `## 受け入れ条件` | 任意 | Case の受け入れ条件 |
 | 8 | `## 作業ログ` | 任意 | 作業の進行ログ。GitHub Issue コメント相当の内容を記録 |
 | 9 | `## マージ前確認` | 任意 | マージ前確認事項。GitHub PR 本文の引き継ぎ情報の一部 |
-| 10 | `## Design確定候補` | **必須** | Design 確定候補。GitHub PR 本文が担っていた引き継ぎ情報の代替（REQ-009-020） |
-| 11 | `## Findings / Capture候補` | **必須** | Findings / Capture候補。GitHub PR 本文が担っていた引き継ぎ情報の代替。下位に `### intake` と `### learning` サブ見出しを持つ |
-| 12 | `## マージ結果` | 任意 | ローカル Git 上の取り込み結果。ブランチ情報は本セクションに記録する（YAML 前書きには持たせない） |
+| 10 | `## Design確定候補` | **必須** | Design 確定候補。GitHub PR 本文が担っていた引き継ぎ情報の代替 |
+| 11 | `## Findings / Capture候補` | **必須** | Findings / Capture候補。下位に `### intake` と `### learning` サブ見出しを持つ |
+| 12 | `## マージ結果` | 任意 | ローカル Git 上の取り込み結果。ブランチ情報は本セクションに記録する |
 | 13 | `## 残課題` | 任意 | 残課題、フォローアップ項目 |
 | 14 | `## 完了判定` | 任意 | 完了判定結果 |
 | 15 | （自由拡張） | 任意 | 上記以外のセクションは必要に応じて追加可能 |
 
-`Design確定候補` と `Findings / Capture候補` を必須とする理由: これらは GitHub 版で PR 本文が担っていた引き継ぎ情報の代替であり、case-close への引き継ぎ経路を失わせないため（REQ-009-020）。
+### closed_at の値条件（role: case）
 
-### Findings / Capture候補 サブ見出し
+`closed_at` は `status: closed`（クローズ日時）または `status: cancelled`（キャンセル日時）の場合のみ ISO 8601 形式で値を持ち、それ以外の `status` では空文字列またはフィールド値なしとする。
 
-`## Findings / Capture候補` は以下のサブ見出しを持つ。
+### マージ結果の記録方針（role: case）
 
-```markdown
-## Findings / Capture候補
+`## マージ結果` セクションには、ローカル版 `case-close` がローカル Git 上で実施済みの取り込み、反映結果を記録する。GitHub PR 取り込みは実行しない。
 
-### intake
+必須記録項目: 実行した操作、関連するコミットハッシュ、実行日時、結果（`PASS` / `FAIL`）。
+ブランチを使用した場合は取り込み先ブランチ、取り込み元ブランチも記録する（ブランチ未使用時はブランチ名の記録を必須としない）。
+取り込み、反映結果が失敗または未完了の場合、ローカル版 `case-close` は `status` を `blocked` に更新し、理由を `## 残課題` に記録する。
 
-（intake 候補のリスト）
+## PR 系操作の対象解決
 
-### learning
+PR 系操作（pr_create、pr_read、pr_merge、pr_changed_files、pr_mergeable）の対象は role: case のローカルIssueに限る。ローカル版 Tool 実装は操作の対象解決時に role を検証し、role: tracking のローカルIssueへの PR 系操作を拒否する。
 
-（learning 候補のリスト）
-```
+## コメント読み替えの role 分岐
 
-### headings 定義ファイル
+issue_comment の読み書きは、対象ローカルIssueの role により読み替え先を分岐する。
 
-見出し一覧の形式定義は `src/opencode-local/agentdev-gh-cli/case-schema/rules/headings.yaml` に機械可読形式で保持する。
-本 Design と `headings.yaml` は矛盾してはならない。
+- role: tracking → 追記型コメント相当セクション（検討経過）
+- role: case → `## 作業ログ` 等、Case 実行のコメント相当情報セクション
 
-## closed_at の値条件
+## role ごとの必須項目・状態値・許可操作の検証
 
-`closed_at` は以下の条件でのみ値を持つ（REQ-009-017）。
+ローカル版 Tool 実装は、role ごとの必須メタデータ、status 値域、許可操作を機械検証する。Case 固有セクション（PR 相当セクション、マージ結果）を role: tracking の必須項目としない。
 
-- `status: closed` の場合: 値を持つ（クローズ日時を ISO 8601 形式で記録）
-- `status: cancelled` の場合: 値を持つ（キャンセル日時を ISO 8601 形式で記録）
-- それ以外の `status`: 空文字列またはフィールド値なし
-
-## マージ結果の記録方針
-
-`## マージ結果` セクションには、ローカル版 `case-close` がローカル Git 上で実施済みの取り込み、反映結果を記録する（REQ-009-025）。
-GitHub PR 取り込みは実行しない。
-
-### 記録項目
-
-以下を必須項目とする。
-
-- 実行した操作
-- 関連するコミットハッシュ
-- 実行日時
-- 結果: `PASS` / `FAIL`
-
-### ブランチ使用時の追記項目
-
-ブランチを使った場合は以下も記録する。
-ブランチを使わない場合はブランチ名の記録を必須としない。
-
-- 取り込み先ブランチ
-- 取り込み元ブランチ
-
-### 失敗、未完了時の扱い
-
-ローカル Git 上で実施済みの取り込み、反映結果が失敗または未完了の場合、ローカル版 `case-close` は `status` を `blocked` に更新し、理由を `## 残課題` に記録する（REQ-009-025）。
+case-schema 機械可読定義の更新方針: `src/opencode-local/agentdev-gh-cli/case-schema/rules/` の機械可読定義（frontmatter.yaml、status.yaml、labels.yaml、headings.yaml）を共通メタデータと role 条件付きスキーマへ拡張する。role ごとの値域・必須項目を定義へ反映し、本 Design と矛盾しないことを検証する。
 
 ## GitHub Issue / PR 置換対応表
 
-ローカル版では GitHub Issue / PR が担う情報を Case ファイルに集約する（REQ-009-021〜023, 026）。
+ローカル版では GitHub Issue / PR が担う情報をローカルIssueに集約する。
 
 | GitHub 版 | ローカル版 |
 |---|---|
-| GitHub Issue 本文 | Case ファイル本文 |
-| GitHub Issue コメント | `## 作業ログ` |
-| GitHub Issue の状態 | Case ファイルの `status` |
-| GitHub Issue のラベル | Case ファイルの `labels` |
-| GitHub PR 本文 | `## マージ前確認` / `## Design確定候補` / `## Findings / Capture候補` |
-| GitHub PR 取り込み結果 | `## マージ結果` |
-| GitHub Issue のクローズ | `status: closed` + `closed_at` |
+| GitHub Issue 本文 | ローカルIssue本文 |
+| GitHub Issue コメント | role に応じたコメント相当セクション |
+| GitHub Issue の状態 | ローカルIssueの `status`（role ごとの値域） |
+| GitHub Issue のラベル | ローカルIssueの `labels`（role ごとの値域） |
+| GitHub PR 本文 | role: case の `## マージ前確認` / `## Design確定候補` / `## Findings / Capture候補` |
+| GitHub PR 取り込み結果 | role: case の `## マージ結果` |
+| GitHub Issue のクローズ | 終端 `status` + `closed_at` |
 
 ローカル版各コマンドの責務:
 
-- ローカル版 `case-open`: GitHub Issue 作成ではなく Case ファイル作成を行う（REQ-009-021）
-- ローカル版 `case-run`: GitHub PR 作成ではなく Case ファイルの PR 相当セクション追記を行う（REQ-009-022）
-- ローカル版 `case-close`: GitHub PR 取り込み / Issue クローズではなく Case ファイルの完了更新を行う（REQ-009-023）
-- GitHub Issue 作成、PR 作成、PR 取り込み、Issue クローズおよび `gh issue` / `gh pr` をローカル版の必須操作にしない（REQ-009-026）
+- ローカル版 `case-open`: Case Issue 作成ではなく role: case のローカルIssue作成を行う
+- ローカル版 `case-run`: GitHub PR 作成ではなく role: case のローカルIssueへの PR 相当セクション追記を行う
+- ローカル版 `case-close`: GitHub PR 取り込み / Issue クローズではなくローカルIssueの完了更新を行う
+- `/agentdev/issue`: 追跡Issue操作を role: tracking のローカルIssueへ Tool 操作契約経由で実行する
+- GitHub Issue 作成、PR 作成、PR 取り込み、Issue クローズおよび `gh issue` / `gh pr` をローカル版の必須操作にしない
 
 ## 関連項目
 
-- **関連 Decision**: REQ-009（ローカル版導入方式を link mode へ統一し生成方式を廃止。v2:ADR-0126 を supersede）
-- **関連 REQ**: REQ-009（ローカル版 OpenCode 導入方式とローカルCaseファイル運用）、v2:REQ-0150（ローカル版 `agentdev-gh-cli` 実装）
-- **関連 Design**: runtime-package-boundary.md
-
-v2:ADR-0126（superseded）は履歴参照のみとし、現行根拠として扱わない（REQ-001-053 準拠）。
+- **関連 Decision**: DEC-020（GitHub Issue 共通管理単位の採用）
+- **関連 REQ**: REQ-009（ローカル版導入方式とローカルIssue運用）、REQ-049（追跡Issue管理機構）
+- **関連 Design**: agentdev-issue-tracking.md（role、kind、状態の意味論の正）、custom-tool-contracts.md（Tool 操作契約）、runtime-package-boundary.md

@@ -142,7 +142,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [skills/agentdev-adversarial-review.md](skills/agentdev-adversarial-review.md) | accepted | 補助 | 対論型レビュー（adversarial review）の振る舞い契約、レビュー手続き、責務構造。3論理役割、動的レビュー戦略、対称的相互反証、戦略メタ反証、合意候補再検証、read-only 境界を所有 |
 | [skills/agentdev-git-worktree-test-fallback.md](skills/agentdev-git-worktree-test-fallback.md) | draft | 補助 | worktree 構造系テスト fallback 契約（junction 未設定時の src/opencode/ fallback、構造的制約の明示） |
 | [skills/agentdev-workflow-backlog-auto.md](skills/agentdev-workflow-backlog-auto.md) | accepted | 中核 | backlog-auto workflow 実装本体（orchestration stage 構成、直列化契約、fan-in 判定、resume 契約） |
-| [skills/agentdev-issue-tracking.md](skills/agentdev-issue-tracking.md) | accepted | 中核 | 課題管理 Capability Skill（docs/issue-list/ 課題ファイル形式、操作能力、効率的到達機構、反映追跡） |
+| [skills/agentdev-issue-tracking.md](skills/agentdev-issue-tracking.md) | accepted | 中核 | 追跡Issue論理スキーマの一元管理（role/kind/状態遷移、物理マッピング表、本文標準構造、反映追跡） |
 
 `repo-agentdev-integrity` は repo-local、配布対象外のため対象外。
 
@@ -230,7 +230,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | Design | status | タイトル | 責務 |
 |------|--------|---------|------|
 | local/runtime-package-boundary.md | accepted | 実行時パッケージ境界 | リポジトリ種別別 .opencode/ 定義、命名規約、link mode 導入フロー、更新運用 |
-| local/local-case-file.md | accepted | ローカル Case ファイル | ローカル版 Case ファイルスキーマ、状態遷移 |
+| local/local-case-file.md | accepted | ローカルIssue共通スキーマ | ローカルIssueの共通メタデータ、role 条件付きスキーマ、状態遷移 |
 | local/install-script-usability.md | draft | 導入スクリプトの使いやすさ詳細 | install/check/sync-self の使いやすさ詳細（対話ウィザード、cwd 安全化、ヘルプ、上級者向けオプション） |
 
 #### authoring/（執筆規約）

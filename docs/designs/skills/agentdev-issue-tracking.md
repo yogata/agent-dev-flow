@@ -2,45 +2,39 @@
 title: `agentdev-issue-tracking` Design
 status: accepted
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-08-25
 ---
-<!-- ADF-COVERS(implementation): REQ-049-005, REQ-049-006, REQ-049-007, REQ-049-008, REQ-049-009, REQ-049-010, REQ-049-011, REQ-049-012, REQ-049-013, REQ-049-014, REQ-049-015, REQ-049-016, REQ-049-017, REQ-049-018, REQ-049-023, REQ-049-024, REQ-049-025, REQ-049-026, REQ-049-027, REQ-049-028, REQ-049-029 -->
+<!-- ADF-COVERS(implementation): REQ-049-001, REQ-049-002, REQ-049-003, REQ-049-005, REQ-049-006, REQ-049-007, REQ-049-008, REQ-049-012, REQ-049-013, REQ-049-014, REQ-049-017, REQ-049-018 -->
 
 # `agentdev-issue-tracking` Design
 
-課題管理 Capability Skill `agentdev-issue-tracking` の Design。
+追跡Issue管理 Capability Skill `agentdev-issue-tracking` の Design。
 
-- 課題ファイル形式の詳細: 課題 ID の接頭辞、採番規則、ファイル名規則(GitHub Issue 番号と
-  明確に識別できること)、frontmatter スキーマ、状態の具体的保存値(未着手、検討中、保留、
-  解決済み、クローズ済みの5意味の表現)、保持情報(課題 ID、件名、状態、課題内容、背景、影響、
-  関連成果物、選択肢、判断材料・証拠、不足情報、担当、期限、再評価条件、検討経過、結論、反映先、
-  クローズ確認)の格納形式、保留状態における再評価条件の記述形式。
-- 操作能力(検知、新規起票、検索・参照、更新、検討経過追加、保留、再評価、解決、反映確認、
-  クローズ、再オープン)の実行手順と Skill 内構成(操作単位の references/ 分割または単一 Skill 構成。
-  単なる操作差だけを理由とした不必要な細分化禁止)。
-- 既存 GitHub Issue 管理 skill(agentdev-issue-management)との命名・責務境界の明示
-  (新スキルは docs/issue-list/ 課題管理を、既存スキルは GitHub Issue 操作手続きを担う)。
-- 複数 workflow からの利用契約(/agentdev/issue 明示実行を必須としない共有能力としての公開方法)。
-- 効率的到達機構: 全 ADF コマンド実行時の docs/issue-list/ 全文読込を要求しない設計
-  (課題 ID、状態、関連成果物、再評価条件を利用した索引・検索手段)。
-- 反映追跡と委譲: 反映先成果物の所有する ADF 能力への更新委譲、クローズ前の反映確認手順、
-  解決済み未反映課題のクローズ抑止。
-- 検査対象区分: 課題ファイルを検討経過を保持する履歴系文書として定義し、
-  文意品質検査の現行文書基準との適用区分を明示。
+本 Design は追跡Issueの論理スキーマの一元管理先であり、GitHub Issue を追跡Issue（tracking）と Case Issue（case）の共通管理単位として運用するための意味論を所有する（REQ-049、DEC-020）。物理的な GitHub / ローカル I/O 手続きは所有しない（Tool 操作契約、REQ-011）。
+
+- 論理スキーマ: role、kind、状態と状態遷移、件名、内容、背景、影響、関連成果物、選択肢、判断材料、不足情報、owner・期限・優先度等の任意メタデータ、保留理由、再評価条件、解決結論、反映先と反映状態、追跡Issueと Case Issue の関連。
+- 物理マッピング表: role、kind、状態とラベル、Issue Type、Issue Field 等の物理値の対応表。正は本 Design が所有し、機械適用は Tool 内実装が行う。
+- 本文標準構造: 追跡Issue本文の標準セクション構成（現在状態の理解のための要約・構造化情報を中心とする）。
+- 再評価・解決・反映追跡の意味論: 保留理由と再評価条件の識別、解決済み（結論確定）とクローズ済み（反映完了または反映不要確認完了）の区別、反映先と反映状態の追跡。
+- GitHub メタデータへのマッピング: title、labels、state、本文、コメントが論理スキーマのどの要素を保持するか。
 
 ## 確定事項
 
-Issue #2409（PR #2412）の実装により確定した設計事項。実装レベルの正は配布物
-`src/opencode/skills/agentdev-issue-tracking/`（SKILL.md、references、scripts）と
-`docs/issue-list/README.md` が保持する。
+1. **role 体系**: Issue の role は `tracking`（追跡Issue）と `case`（Case Issue）の2値。role は物理的にはラベル等へ写像され、Tool が機械判定可能な形で読取結果へ提供される
+2. **kind 値域**: 追跡Issueの kind は `problem`、`idea`、`task`、`risk` の4値を基本値域とする
+3. **状態の6値と意味**: 追跡Issueの状態は起票、検討中、保留、実行準備完了、解決済み、クローズ済みの6状態。解決済みは結論の確定を、クローズ済みは必要な反映の完了または反映不要の確認完了を意味する
+4. **状態の三段写像**: 追跡Issue 6状態、GitHub open/closed、Tool close reason の対応表を本 Design が確定する:
 
-1. **課題 ID 体系**: `ISL-{NNN}`。接頭辞 `ISL` は正規配置先 `docs/issue-list/` に由来する。3桁ゼロ埋め、単調増加、欠番維持。`^ISL-\d{3}$` と GitHub Issue 番号参照 `^#?\d+$` は交差しないため機械的にも人間にも混同不能。既存 REQ/DEC/RU/IR/OU の識別子と衝突しない
-2. **ファイル名規則**: 課題 ID + `.md`（`ISL-{NNN}.md`）。1課題1ファイル、状態によるディレクトリ移動なし
-3. **状態保存値**: frontmatter `status` に `open`（未着手）/ `in-progress`（検討中）/ `on-hold`（保留）/ `resolved`（解決済み）/ `closed`（クローズ済み）の5値。`resolved`（結論出た）と `closed`（反映確認完了）を区別する
-4. **frontmatter スキーマ**: 必須 = `id`, `title`, `status`, `created`, `updated`。任意 = `related_artifacts`（インラインリスト、`--related` 到達の対象）, `owner`, `due`。条件付き必須 = `reevaluation`（`on-hold` 時、再評価条件の要約）
-5. **保持情報の格納形式**: 機械到達用を frontmatter、詳細を本文 H2 セクション（課題内容、背景、影響、関連成果物、選択肢、判断材料・証拠、不足情報、再評価条件、検討経過（追記専用・日付エントリ）、結論、反映先、クローズ確認）。起票テンプレートに反映先・クローズ確認を含めない（REQ-049-003 決め打ち回避）
-6. **保留の再評価条件の記述形式**: 本文 `## 再評価条件` 配下に `### 判断保留の理由`（なぜ判断できないか）と `### 再評価条件`（何が成立すれば再評価するか）の2サブセクション。frontmatter `reevaluation` は索引用の要約
-7. **効率的到達機構の形式**: 永続索引ファイルは持たず、決定的スクリプト `scripts/src/list.ts` が要求時に frontmatter のみを解析する（ID・状態・関連成果物・再評価条件による到達）。全文読込を要求しない。`--validate` で状態別必須項目を機械検査する（fail 時 exit 2）。索引ファイル方式は鮮度管理と二重管理のコストが上回るため不採用
-8. **Skill 内構成**: 単一 Skill（`agentdev-issue-tracking`）。references は issue-file-format（形式）と operations（11操作と反映委譲）の2分割、scripts は lib（解析コア）+ src（CLI）。操作差のみを理由とした skill 分割は行わない
-9. **反映追跡と委譲**: 反映先は所有する ADF 能力へ委譲する（Decision → `agentdev-decision-file-manager`、REQ → `agentdev-req-file-manager`、Design → `agentdev-design-file-manager`、RU 化 → intake パイプライン + `/agentdev/backlog-review`、実装・検証 → Case パイプライン）。課題側は `## 反映先` の状況（未反映/反映済み/反映不要）と `## クローズ確認` で追跡する。クローズ抑止は手順の前提確認と `--validate`（`closed-requires-reflection`、`closed-requires-close-confirmation`）の二層
-10. **検査区分**: 課題ファイル = 履歴系文書（文意品質検査の現行文書基準の適用対象外）。`docs/issue-list/README.md` 自体は現行文書として適用対象。docs/issue-list/README.md（配置基準・運用規則）と skill references/issue-file-format.md（実行時形式の正）の SSoT 分担を README が宣言する
+   | 追跡Issue状態 | GitHub state | Tool issue_close reason |
+   |---|---|---|
+   | 起票、検討中、保留、実行準備完了、解決済み | open | クローズしない |
+   | クローズ済み（反映完了） | closed | completed |
+   | クローズ済み（反映不要の確認完了。対応不要の解決を経由したものを含む） | closed | not_planned |
+
+   issue_close の reason は追跡Issueの解決済み（open のまま結論確定を保持する中間状態）、クローズ済み（completed）、対応不要（解決の一形態。not_planned でクローズ）のいずれかに対応する
+5. **物理写像表の所有と機械適用の分担**: role、kind、状態とラベル、Issue Type、Issue Field 等の対応表の正は本 Design が所有する。論理値と物理値の変換（写像表の機械適用）は Tool 内実装が行い、Tool は写像の意味判断を新規に所有しない。上位層は論理値のまま Tool 操作契約を利用し、写像を再実装しない
+6. **本文標準構造**: 追跡Issue本文は、件名、背景、影響、関連成果物、選択肢、判断材料、不足情報、保留理由と再評価条件、解決結論、反映先と反映状態、関連 Case Issue への参照を標準セクションとして保持する。起票時に反映先・クローズ確認を含めない（反映先の決め打ち回避）。検討経過は Issue コメントを正規の時系列履歴とし、本文内へ独自の追記専用ログを二重保持しない
+7. **再評価・解決・反映追跡の意味論**: 保留状態は「なぜ現在判断できないか」と「何が成立すれば再評価するか」を識別して保持する。再評価後は、結論の確定、理由と不足情報を更新した保留継続、対応不要という結論での解決、解決結果の正規成果物への反映のいずれかとして処理する。反映先の成果物更新はその成果物を所有する能力へ委譲し、追跡Issue側は反映先と反映状態で追跡する。クローズは必要な反映の完了または反映不要の確認を条件とする
+8. **GitHub Organization 固有機能の位置づけ**: GitHub Issue Type / Issue Fields は利用可能な環境での物理写像として使用し、必須前提としない。論理スキーマは最低限、リポジトリ単位の Issue、ラベル、本文、状態で成立する
+9. **コメント読み替えの role 分岐（ローカル版）**: ローカル版では Issue コメント相当の履歴をローカルIssue内のコメント相当セクションへ読み替える。読み替え先は role により分岐する（role: tracking は検討経過、role: case は Case 実行のコメント相当情報。物理表現の詳細はローカルIssue共通スキーマ Design が所有する）
+10. **実行確定時の経路**: 追跡Issueで実行が確定した場合、req-define 等の正規要件化・設計経路を経由し、case-open が別の Case Issue を作成する。追跡Issueと生成された Case Issue の関連は双方の参照として保持し、追跡Issueを実行票へ直接変質させない
