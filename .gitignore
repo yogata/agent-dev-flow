@@ -13,9 +13,7 @@
 .sisyphus/
 .worktrees/
 .omo/
-.agentdev/integrity/reports/
-.agentdev/graph/
-.agentdev/tmp/
+.agentdev/
 docs/reports/local/
 AGENTS.md
 outputs/

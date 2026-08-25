@@ -143,6 +143,7 @@ cd .agentdev-plugin && git pull && cd ..
 
 ```gitignore
 .agentdev-plugin/
+.agentdev/
 .opencode/commands/agentdev/
 .opencode/skills/agentdev-*/
 .opencode/skills/japanese-tech-writing/
@@ -151,4 +152,4 @@ cd .agentdev-plugin && git pull && cd ..
 .opencode/plugins/agentdev-*.ts
 ```
 
-> `.agentdev/` は gitignore に**含めない**こと（ドメイン状態として git 管理対象）。
+> `.agentdev/` は gitignore に**含める**こと（ドメイン状態はリポジトリローカルで保持し、git 管理対象外とする）。
