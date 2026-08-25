@@ -48,7 +48,7 @@
     src/opencode/tools/agentdev-gh/. All other agentdev-* command/skill/tool/plugin
     junctions target src/opencode/ as normal.
 
-    判断基準: GitHub Issue/PR を使わずローカルファイル（.agentdev/cases/）で運用する環境
+    判断基準: GitHub Issue/PR を使わずローカルIssue（.agentdev/issues/）で運用する環境
     （ローカル版 OpenCode）では -LocalMode を指定する。
 
     -Mode check で -LocalMode を省略した場合、tools/agentdev-gh のリンク先から
