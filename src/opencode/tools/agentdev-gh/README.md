@@ -15,9 +15,11 @@ Git / GitHub 等への構造化された副作用操作を担う ADF 汎用 Cust
 
 実装詳細（gh オプション、`--body-file`、UTF-8 BOM なし、chcp 初期化、REST API PATCH、一時ファイル運用、シェル呼出）は `runner.ts` の実行境界の内側に隠蔽する。
 
-## 対象操作（初期セット）
+## 対象操作
 
-`issue_create`、`issue_read`、`issue_update`、`issue_comment`、`issue_close`、`pr_create`、`pr_read`、`pr_merge`、`pr_changed_files`、`pr_mergeable`。
+`issue_create`、`issue_read`、`issue_update`、`issue_comment`、`issue_close`、`issue_list`、`issue_reopen`、`pr_create`、`pr_read`、`pr_merge`、`pr_changed_files`、`pr_mergeable`。
+
+追跡Issue操作（`issue_list`、`issue_reopen`、`issue_read` のメタデータ拡張、`issue_update` の labels/kind/trackingState、`issue_comment` の読取）は論理値（role、kind、追跡Issue状態）を上位契約へ公開し、物理ラベルへの写像は Tool 内の `tracking-schema.ts` が機械適用する。写像表の意味論の正は agentdev-issue-tracking Design が所有する。
 
 ## fail-closed（決定6）
 
@@ -38,7 +40,7 @@ Git / GitHub 等への構造化された副作用操作を担う ADF 汎用 Cust
 - `index.ts` が Tool 名・公開契約・操作スペックを単一の登録単位へ接続する
 - `runner-cli.ts` が gh CLI への具体的な写像（GitHub 実装 `GhRunner`）を実装する。`--input` による UTF-8 JSON ファイル渡し、シェル不使用の引数配列呼び出し、一時ファイルの作成と削除等の実装詳細はこの境界の内側に隠蔽される
 - 登録 Plugin（`src/opencode/plugins/agentdev-gh-tool/`）が custom tool `agentdev_gh` を OpenCode の実行時へ登録する
-- ローカル版（consumer-generated）は同一操作契約で Case ファイル読み書きへ読み替えた `GhRunner` 実装（`src/opencode-local/agentdev-gh-cli/runner-local.ts`）を差し替える
+- ローカル版（consumer-generated）は同一操作契約でローカルIssue（`.agentdev/issues/`、role 条件付きスキーマ）の読み書きへ読み替えた `GhRunner` 実装（`src/opencode-local/agentdev-gh-cli/runner-local.ts`）を差し替える
 
 ツール名、ファイル構成、公開単位の詳細は Design `custom-tool-contracts.md` が所有する。
 

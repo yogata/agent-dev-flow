@@ -18,14 +18,16 @@ import {
   AGENTDEV_GH_TOOL_NAME,
 } from "../index.ts";
 
-describe("操作カタログ（Design 初期セットとの一致）", () => {
-  test("初期セットの10操作を公開する", () => {
+describe("操作カタログ（Design 対象操作との一致）", () => {
+  test("初期セットと追跡Issue操作の12操作を公開する", () => {
     expect([...GH_TOOL_OPERATIONS]).toEqual([
       "issue_create",
       "issue_read",
       "issue_update",
       "issue_comment",
       "issue_close",
+      "issue_list",
+      "issue_reopen",
       "pr_create",
       "pr_read",
       "pr_merge",

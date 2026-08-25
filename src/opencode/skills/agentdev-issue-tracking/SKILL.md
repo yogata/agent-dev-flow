@@ -1,105 +1,107 @@
 ---
 name: agentdev-issue-tracking
-description: docs/issue-list/ 配下の課題ファイルによる未解決事項の追跡能力を提供する課題管理 Capability Skill。要件定義、設計、レビュー、実装、検証等で生じた未解決事項を発生から解決、正規成果物への反映確認まで追跡する。USE FOR: 課題の新規起票と状態更新、保留課題の再評価条件の確認と再評価、解決結論と反映先の記録、クローズ前の反映確認、frontmatter スキャンによる課題の検索・一覧、他 workflow からの課題管理利用。DO NOT USE FOR: GitHub Issue の作成・更新・確認（agentdev-issue-management）、Decision/REQ/Design 等の正規成果物の更新実行（各成果物を所有するスキルの責務）、Intake / Learning の検出事項や学びの管理、RU の生成と統合。
+description: 追跡Issue（課題、ToDo、アイデア、リスク等の未解決事項の育成管理単位）の論理スキーマ運用知識と操作能力を提供する課題管理 Capability Skill。起票、検索・参照、更新、検討経過の追加、保留、再評価、実行準備完了、解決、反映確認、クローズ、再オープンの操作知識を所有し、GitHub I/O は Custom Tool（agentdev_gh）の操作契約経由で行う。USE FOR: 追跡Issueの起票と状態遷移、重複回避のための既存追跡Issue検索、保留理由と再評価条件の整理、解決結論と反映先・反映状態の追跡、クローズ前提の反映確認、複数 workflow からの追跡Issue操作利用。DO NOT USE FOR: GitHub I/O の実行手続きそのもの（agentdev_gh 操作契約の責務）、物理ラベル等への写像の再実装（Tool 内実装の責務）、Case Issue（req/case パイプラインの実行票）の管理（case-open/case-run/case-close の責務）、Decision/REQ/Design 等の正規成果物の更新実行（各成果物を所有する能力の責務）、Intake / Learning の検出事項や学びの管理、RU の生成と統合。
 ---
 
 # `agentdev-issue-tracking`
 
-課題管理 Capability Skill。
-開発過程で生じた未解決事項を `docs/issue-list/` の課題ファイルとして、発生から検討、保留、解決、正規成果物への反映確認まで継続して追跡するための共通能力を提供する。
+追跡Issue管理 Capability Skill。
+要件定義、方式設計、実装、レビュー、検証、外部確認等で生じた未解決事項を、発生から検討、保留、解決、正規成果物への反映確認まで継続して追跡するための共通知識と操作能力を提供する。
 
 ## 責務と境界
 
-- 本スキルは `docs/issue-list/` 配下の課題ファイルの管理を担う。課題ファイルは永続的な git 管理対象の正規成果物であり、`.agentdev/` 配下の一時成果物とは扱いを区別する。
-- GitHub Issue の作成、更新、確認の操作手続きは `agentdev-issue-management` が担う。両者の対象体系は異なる（課題ファイル = リポジトリ内の永続的な未解決事項の追跡、GitHub Issue = req/case パイプラインの作業単位）。
-- 課題の解決結果を正規成果物へ反映する更新は、当該成果物を所有する ADF 能力へ委譲する（references/operations.md「反映追跡と委譲」）。本スキルは何が結論となったか、どこへ反映すべきか、実際に反映されたかの追跡に徹する。
-- Intake / Learning（AI 駆動開発の改善循環）、RU（変更要求）、Decision（判断理由を保持すべき解決結果）は別系統であり、本スキルはそれらの管理を行わない。
+- 追跡Issueは GitHub Issue を Case Issue（req/case パイプラインの実行票）と共有する管理単位であり、論理 role（tracking / case）により区別される。role、kind、状態と状態遷移、物理マッピング、本文標準構造の正は追跡Issue論理スキーマ一元管理 Design が所有し、本スキルはその運用記述を提供する
+- 追跡Issueへの I/O は Custom Tool `agentdev_gh` の操作契約（issue_create、issue_read、issue_update、issue_comment、issue_close、issue_list、issue_reopen）経由でのみ行う。ラベル名等の物理値への写像は Tool 内実装が機械適用するため、本スキルおよび上位層は論理値（role、kind、状態）のみを扱う
+- GitHub 版ではリポジトリ内に課題ファイルを作成し、commit しない。ローカル版は同一の操作契約でローカルIssueが読み書きされる（Tool が差し替わるため、本スキルは環境差を意識しない）
+- Issue の存在自体を Agent の実行許可としない。追跡Issueを実行票へ直接変質させない。実行が確定した場合は req-define 等の正規要件化・設計経路へ引き継ぎ、Case Issue の生成は case-open が行う
+- 解決結果の正規成果物への反映は、当該成果物を所有する能力へ委譲する。本スキルは結論、反映先、反映状態の追跡に徹する
+- Intake / Learning（AI 駆動開発の改善循環）、RU（変更要求）、Decision（判断理由を保持すべき解決結果）は別系統であり、本スキルはそれらの管理を行わない
 
-## 課題ファイル（要約）
+## 論理スキーマ（要約）
 
-| 項目 | 規約 |
+| 項目 | 値域、規約 |
 |---|---|
-| 正規配置先 | `docs/issue-list/` |
-| ファイル構成 | 1課題1ファイル。ファイル名は課題 ID + `.md`。状態によるディレクトリ移動は行わない |
-| 課題 ID | `ISL-{NNN}`（3桁ゼロ埋め、単調増加、欠番維持）。接頭辞とハイフンにより GitHub Issue 番号 `#NNNN` と機械的にも人間にも混同できない |
-| 状態 | 各ファイルの frontmatter `status` が保持する。値は `open`（未着手）、`in-progress`（検討中）、`on-hold`（保留）、`resolved`（解決済み）、`closed`（クローズ済み）の5値 |
-| 保持情報 | 課題 ID、件名、状態、課題内容、背景、影響、関連成果物、選択肢、判断材料・証拠、不足情報、担当、期限、再評価条件、検討経過、結論、反映先、クローズ確認。不要な項目は省略できる |
-| 検査区分 | 課題ファイルは検討経過を保持する履歴系文書であり、文意品質検査の現行文書基準の適用対象外 |
+| role | `tracking`（追跡Issue）/ `case`（Case Issue）。機械判定可能 |
+| kind | `problem`（問題）、`idea`（アイデア）、`task`（作業）、`risk`（リスク） |
+| 状態 | 起票、検討中、保留、実行準備完了、解決済み、クローズ済みの 6 状態 |
+| 解決済み | 結論の確定を意味する。クローズ済みは必要な反映の完了または反映不要の確認完了を意味する |
+| 検討経過 | Issue コメントを正規の時系列履歴とする。本文内へ独自の追記専用ログを二重保持しない |
+| 本文 | 現在状態の理解のための要約・構造化情報を中心とする（標準構造は後述） |
 
-形式の詳細（frontmatter スキーマ、本文セクション、状態別必須項目、再評価条件の記述形式、テンプレート）は [references/issue-file-format.md](references/issue-file-format.md) を正とする。
+## 本文標準構造
 
-## Scripts（決定的処理）
+追跡Issue本文は次のセクションを標準構造として保持する。起票時に反映先・クローズ確認を含めない（反映先の決め打ち回避）。不要なセクションは省略できる。
 
-`scripts/` 配下の決定的スクリプトが課題の検索、一覧、形式検証を機械的に実行する。実装は TypeScript + bun。
-全 ADF コマンド実行時に `docs/issue-list/` 全文を読み込むことを要求しない。list は各課題ファイルの frontmatter（最初の `---` ブロック）のみを解析し、validate は本文の見出しのみを検査する。
+- 件名（title）
+- 背景
+- 影響
+- 関連成果物
+- 選択肢
+- 判断材料
+- 不足情報
+- 保留理由と再評価条件（保留状態のみ必須）
+- 解決結論（解決済みのみ必須）
+- 反映先と反映状態（解決後に記録）
+- 関連 Case Issue への参照（実行確定時に記録）
 
-### I/O 契約（共通）
+## 状態遷移と Tool 操作の対応
 
-| 項目 | 規約 |
-|---|---|
-| 入力 | argv（`--root` 必須、任意: `--status`, `--related`, `--id`, `--format`, `--validate`） |
-| 出力 | stdout に JSON（`--format md` 指定時は Markdown 表） |
-| エラー | 実行エラーで終了コード 1。`--validate` 指定時に形式検証の fail ありで終了コード 2 |
-| 走査 | `--root` 配下の `docs/issue-list/ISL-*.md`。`docs/issue-list/` が存在しない場合は空の一覧を返す |
+| 操作 | Tool 操作契約 | 状態遷移 |
+|---|---|---|
+| 起票 | `issue_create`（role: tracking、kind 指定） | （新規）→ 起票 |
+| 更新 | `issue_update`（title、body、labels） | 状態不変 |
+| 検討経過の追加 | `issue_comment`（body 付き） | 状態不変 |
+| 検討中への遷移 | `issue_update`（trackingState 指定） | 起票/保留/実行準備完了 → 検討中 |
+| 保留 | `issue_update`（trackingState 指定） | → 保留（保留理由と再評価条件を本文へ整備） |
+| 実行準備完了 | `issue_update`（trackingState 指定） | → 実行準備完了 |
+| 解決 | `issue_update`（trackingState 指定） | → 解決済み（解決結論を本文へ記録） |
+| クローズ | `issue_close`（reason: completed / not_planned） | 解決済み等 → クローズ済み |
+| 再オープン | `issue_reopen` | クローズ済み → 検討中 |
+| 検索・参照 | `issue_list`（role、kind、状態等の絞り込み）、`issue_read`、`issue_comment`（body 省略で読取） | — |
 
-### 公開操作契約（スクリプト一覧）
+クローズの reason は、反映完了によるクローズで `completed`、対応不要の確認完了を経由したクローズで `not_planned` を使う。
 
-| スクリプト | 能力 | 引数 | 出力の要点 |
-|---|---|---|---|
-| `src/list.ts` | list / search / validate | `--root` + 任意フィルタ（`--status` は状態、`--related` は関連成果物、`--id` は課題 ID） | JSON: `issues`（課題レコード一覧）、`counts`（状態別件数）、`validation`（形式検証 findings）。`--format md` は Markdown 表 |
+## 保留・再評価・反映の意味論
 
-### 実行方法
+- 保留状態は「なぜ現在判断できないか」（保留理由）と「何が成立すれば再評価するか」（再評価条件）を本文で識別して保持する
+- 再評価後は、結論の確定（解決）、理由と不足情報を更新した保留継続、対応不要という結論での解決、のいずれかとして処理する
+- 解決結果を正規成果物へ反映する必要がある場合は、反映先と反映状態を本文へ記録し、反映先の成果物更新を当該成果物を所有する能力へ委譲する
+- クローズは必要な反映の完了または反映不要の確認を条件とする。反映未完了のままクローズしない
 
-```bash
-# 全課題の一覧（状態別件数つき）
-bun .opencode/skills/agentdev-issue-tracking/scripts/src/list.ts --root .
+## 起票時の判定（重複回避と事前解決）
 
-# フィルタ: 保留課題（再評価条件の要約を含む）
-bun .opencode/skills/agentdev-issue-tracking/scripts/src/list.ts --root . --status on-hold
+新規起票系の操作では、起票の前に次を順に実行する。
 
-# フィルタ: 関連成果物に関連する課題
-bun .opencode/skills/agentdev-issue-tracking/scripts/src/list.ts --root . --related docs/requirements/REQ-{NNN}.md
+1. **候補判定**: 現在の作業で解決できず、かつ将来の設計、実装、検証、合意等に影響する未解決事項かを判定する。すべての疑問、TODO、一時エラーを課題化しない
+2. **事前解決の試行**: 正規成果物の確認等によってその場で解決可能な疑問は、課題化前に解決を試みる
+3. **既存追跡Issue検索**: `issue_list`（role: tracking、kind、状態による絞り込み）で既存追跡Issueを検索し、重複起票を避ける。同一論点の既存追跡Issueがある場合は重複起票せず、既存追跡Issueへの統合・参照を提案する
 
-# 形式検証（状態別必須項目。fail ありで終了コード 2）
-bun .opencode/skills/agentdev-issue-tracking/scripts/src/list.ts --root . --validate
-```
-
-スクリプト構成の詳細は [scripts/README.md](scripts/README.md) 参照。
-
-## 操作能力
-
-検知、新規起票、検索・参照、更新、検討経過の追加、保留、再評価、解決、反映確認、クローズ、再オープンの11操作の実行手順は [references/operations.md](references/operations.md) が提供する。
-いずれの操作も本スキルを読み込んだ ADF エージェントが自然言語の指示と現在の会話文脈から判断して実行する。ユーザーに操作文法の暗記を要求しない。
-
-## reference選択表
-
-通常経路で全 reference を無条件読込しない。必要な条件に応じて読む reference を選択する。
-
-| 条件 | 読む reference |
-|---|---|
-| 課題ファイルの作成、編集、frontmatter、状態遷移、テンプレートが必要な場合 | [references/issue-file-format.md](references/issue-file-format.md) |
-| 11操作の実行手順、反映追跡と委譲、クローズ抑止が必要な場合 | [references/operations.md](references/operations.md) |
+正規成果物または現在の会話で結論が確定している事項は、その結果を追跡Issueへ反映できる。ユーザー合意が必要な設計判断を課題管理側だけで確定しない。
 
 ## 他 workflow からの利用
 
 本スキルは共有能力であり、人間向け公開入口（`/agentdev/issue` command）の明示実行を利用の必須条件としない。
 
-- 要件定義、設計、レビュー、実装、検証等の各 workflow、各 skill は、未解決事項を認識した場合に本スキルを直接読み込み、課題化、検索、更新を行える。
-- 保留課題の再評価条件への到達は `--status on-hold`、作業対象に関連する保留課題の確認は `--related` で行う。関連する作業、設計、レビュー、分析を行う際に保留課題の条件成立を確認する。
-- 本スキルの利用にあたって新規の承認点を追加しない。既存の承認、判断境界（ユーザー合意が必要な設計判断を本スキルが勝手に確定しない等）は維持する。
+- 要件定義、設計、レビュー、実装、検証等の各 workflow、各 skill は、未解決事項を認識した場合に本スキルの知識を直接利用し、Tool 操作契約経由で追跡Issueの操作を行える
+- 保留中の追跡Issueは `issue_list`（状態絞り込み）で到達できる。関連する作業、設計、レビュー、分析を行う際に再評価条件の成立を確認する
+- 本スキルの利用にあたり新規の承認点を追加しない。既存の承認、判断境界（ユーザー合意が必要な設計判断を本スキルが勝手に確定しない等）は維持する
 
 ## 禁止事項
 
-- 本スキルで GitHub Issue の作成、更新、確認を行わないこと（`agentdev-issue-management` の責務）
-- 本スキルで Decision、REQ、Design 等の正規成果物を直接更新しないこと（当該成果物を所有する ADF 能力への委譲が前提）
-- 課題起票時に反映先を決め打ちしないこと
-- 解決済みの課題を反映完了または反映不要の確認なしにクローズしないこと
-- 状態によって課題ファイルを移動、複製、分割しないこと
-- すべての疑問、TODO、一時エラーを無条件に課題化しないこと（現在の作業で解決できず、将来の設計、実装、検証、合意に影響する未解決事項を課題化候補とする）
+- 追跡Issueの操作に、サブコマンド、ラベル名、Issue Type、Field 名等の GitHub 実装詳細の把握をユーザーに要求しないこと
+- 物理ラベルへの写像（role、kind、状態とラベルの対応）を本スキルや上位層で再実装しないこと（Tool 操作契約の論理値を使うこと）
+- GitHub 版でリポジトリ内に課題ファイルを作成し、commit しないこと
+- ローカル版のローカルIssueの保存先を直接読み書きしないこと（Tool 操作契約経由のみ）
+- 追跡Issueを Case Issue（実行票）へ直接変質させないこと。実行は req-define 等の正規経路へ引き継ぐこと
+- Decision、REQ、Design 等の正規成果物を直接更新しないこと（当該成果物を所有する能力への委譲が前提）
+- 追跡Issue起票時に反映先を決め打ちしないこと
+- 解決済みの追跡Issueを反映完了または反映不要の確認なしにクローズしないこと
+- Issue 本文内へ検討経過の追記専用ログを二重保持しないこと（コメントを正規の時系列履歴とすること）
 
 ## See Also
 
-- **agentdev-issue-management**: GitHub Issue 操作手続き。本スキルと対象体系が異なる
+- **agentdev-workflow-issue**: `/agentdev/issue` の workflow 実装本体（本スキルの知識を利用する対話操作完結型 workflow）
+- **agentdev-issue-management**: GitHub Issue 操作の安全性手続き（VERIFY、リンク確認）
 - **agentdev-decision-file-manager**: 解決結果を Decision へ反映する際の委譲先
 - **agentdev-req-file-manager**: 解決結果を REQ へ反映する際の委譲先
 - **agentdev-design-file-manager**: 解決結果を Design へ反映する際の委譲先

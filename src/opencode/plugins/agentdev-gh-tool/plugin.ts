@@ -59,9 +59,10 @@ const REQUEST_PROPERTY_SCHEMA = {
   type: "object",
   description:
     "Structured GitHub issue/PR operation request. See the agentdev_gh operation contract " +
-    "(issue_create, issue_read, issue_update, issue_comment, issue_close, pr_create, pr_read, " +
-    "pr_merge, pr_changed_files, pr_mergeable). Side-effect operations are verified by read-back " +
-    "before success is returned (fail-closed).",
+    "(issue_create, issue_read, issue_update, issue_comment, issue_close, issue_list, issue_reopen, " +
+    "pr_create, pr_read, pr_merge, pr_changed_files, pr_mergeable). Tracking-issue operations expose " +
+    "logical values (role, kind, trackingState); physical label mapping is applied inside the tool. " +
+    "Side-effect operations are verified by read-back before success is returned (fail-closed).",
   properties: {
     operation: {
       type: "string",
@@ -71,6 +72,8 @@ const REQUEST_PROPERTY_SCHEMA = {
         "issue_update",
         "issue_comment",
         "issue_close",
+        "issue_list",
+        "issue_reopen",
         "pr_create",
         "pr_read",
         "pr_merge",
@@ -79,10 +82,40 @@ const REQUEST_PROPERTY_SCHEMA = {
       ],
       description: "Operation name from the agentdev_gh operation catalog.",
     },
-    number: { type: "integer", minimum: 1, description: "Issue/PR (or Case) number." },
+    number: { type: "integer", minimum: 1, description: "Issue/PR (or local issue) number." },
     title: { type: "string", description: "Title for issue_create / issue_update / pr_create." },
-    body: { type: "string", description: "Markdown body for write operations." },
-    labels: { type: "array", items: { type: "string" }, description: "Labels for issue_create." },
+    body: {
+      type: "string",
+      description:
+        "Markdown body for write operations. Omit on issue_comment to read the comment timeline instead.",
+    },
+    labels: {
+      type: "array",
+      items: { type: "string" },
+      description: "Free-form labels for issue_create / issue_update (tracking-axis labels are managed by the tool).",
+    },
+    role: {
+      type: "string",
+      enum: ["tracking", "case"],
+      description: "Logical issue role for issue_create / issue_list.",
+    },
+    kind: {
+      type: "string",
+      enum: ["problem", "idea", "task", "risk"],
+      description: "Logical tracking-issue kind for issue_create / issue_update / issue_list.",
+    },
+    trackingState: {
+      type: "string",
+      enum: ["created", "in-discussion", "on-hold", "ready", "resolved", "closed"],
+      description:
+        "Logical tracking-issue state. issue_update accepts non-terminal states only; issue_list accepts all.",
+    },
+    state: {
+      type: "string",
+      enum: ["open", "closed"],
+      description: "Open/closed filter for issue_list.",
+    },
+    search: { type: "string", description: "Title substring filter for issue_list." },
     reason: { type: "string", enum: ["completed", "not_planned"], description: "Close reason for issue_close." },
     base: { type: "string", description: "Base branch for pr_create." },
     head: { type: "string", description: "Head branch for pr_create." },
@@ -128,10 +161,10 @@ async function defaultCreateRunner(worktree: string, repo: string): Promise<GhRu
   const localPath = path.join(worktree, LOCAL_RUNNER_PROJECTION);
   if (fs.existsSync(localPath)) {
     const mod = (await import(pathToFileURL(localPath).href)) as {
-      createLocalRunner?: (options: { casesDir: string }) => GhRunner;
+      createLocalRunner?: (options: { issuesDir: string }) => GhRunner;
     };
     if (typeof mod.createLocalRunner === "function") {
-      return mod.createLocalRunner({ casesDir: path.join(worktree, ".agentdev", "cases") });
+      return mod.createLocalRunner({ issuesDir: path.join(worktree, ".agentdev", "issues") });
     }
   }
   return createCliRunner({ repo, tempDir: os.tmpdir() });

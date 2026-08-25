@@ -1,28 +1,91 @@
-# ローカル Case ファイル status enum と状態遷移表
+# ローカルIssue status スキーマ（role 条件付き）
 #
-# 正本: docs/designs/local/local-case-file.md「status enum と状態遷移」
-# 要件: REQ-0141-018
+# 正本: docs/designs/local/local-case-file.md「role: tracking の条件付きスキーマ」「role: case の条件付きスキーマ」
+# 要件: REQ-009-028
 #
-# status 値域・意味・終端状態・状態遷移表・再開経路・禁止遷移を定義する。
+# role ごとの status 値域・終端状態・状態遷移を定義する。
+# role: tracking の 6 状態と三段写像（GitHub open/closed、Tool issue_close reason
+# の対応）の意味論の正は agentdev-issue-tracking Design が所有する。
 # 本ファイルは docs/designs/local/local-case-file.md と矛盾してはならない。
 
-schema_version: "1.0"
-target: ".agentdev/cases/case-{NNNN}.md の status フィールド"
+schema_version: "2.0"
+target: ".agentdev/issues/issue-{NNNN}.md の status フィールド"
 canonical_spec: "docs/designs/local/local-case-file.md"
 
-# status enum（REQ-0141-018）
-status_enum:
+# role 条件付き status 値域
+role_conditional_status:
+  tracking:
+    enum_ref: "#tracking_status_enum"
+    description: "追跡Issue 6 状態（起票、検討中、保留、実行準備完了、解決済み、クローズ済み）"
+  case:
+    enum_ref: "#case_status_enum"
+    description: "Case 実行 6 状態（旧ローカル Case ファイルから継承）"
+
+# role: tracking の status 値域
+tracking_status_enum:
+  created:
+    description: "起票。追跡Issue作成直後の初期状態"
+    terminal: false
+    github_state: open
+  in-discussion:
+    description: "検討中。検討経過（コメント相当履歴）が蓄積する状態"
+    terminal: false
+    github_state: open
+  on-hold:
+    description: "保留。現在判断できない理由と再評価条件を本文が保持する状態"
+    terminal: false
+    github_state: open
+  ready:
+    description: "実行準備完了。正規要件化・設計経路への引き継ぎ可能な状態"
+    terminal: false
+    github_state: open
+  resolved:
+    description: "解決済み。結論が確定し本文の解決結論が保持する中間状態（open を維持）"
+    terminal: false
+    github_state: open
+  closed:
+    description: "クローズ済み。必要な反映の完了または反映不要の確認完了"
+    terminal: true
+    github_state: closed
+    close_reason:
+      - completed
+      - not_planned
+
+# role: tracking の状態遷移
+# 非終端状態間の遷移は追跡Issue操作（/agentdev/issue 相当）が指示に従って
+# 実行する。終端状態への遷移は issue_close、終端からの復帰は issue_reopen のみ。
+tracking_transitions:
+  - operation: "追跡Issue起票"
+    from: "(新規作成)"
+    to: "created"
+  - operation: "issue_update（trackingState 指定）"
+    from: "created"
+    to: "in-discussion | on-hold | ready | resolved"
+  - operation: "issue_update（再評価・結論確定）"
+    from: "on-hold"
+    to: "in-discussion | on-hold | resolved"
+  - operation: "issue_close"
+    from: "created | in-discussion | on-hold | ready | resolved"
+    to: "closed"
+    note: "close reason は completed / not_planned のいずれも クローズ済み へ遷移する。理由の詳細はコメント相当履歴で保持する"
+  - operation: "issue_reopen"
+    from: "closed"
+    to: "in-discussion"
+    note: "クローズ済みからの再検討"
+
+# role: case の status 値域
+case_status_enum:
   open:
-    description: "Case オープン済み・作業前"
+    description: "Case オープン済み、作業前"
     terminal: false
   running:
     description: "作業中"
     terminal: false
   blocked:
-    description: "停止中（障害・未解決事項あり）"
+    description: "停止中（障害、未解決事項あり）"
     terminal: false
   review:
-    description: "作業完了・レビュー対象"
+    description: "作業完了、レビュー対象"
     terminal: false
   closed:
     description: "完了"
@@ -31,76 +94,49 @@ status_enum:
     description: "中止"
     terminal: true
 
-# 終端状態（REQ-0141-018）
-# closed と cancelled は終端状態とする。終端状態からの遷移は定義しない。
+# 終端状態（role ごと）
 terminal_states:
-  - closed
-  - cancelled
+  tracking:
+    - closed
+  case:
+    - closed
+    - cancelled
 
-# 状態遷移表（REQ-0141-018, Design local-case-file.md「状態遷移表」）
-# 操作・変更前 status・変更後 status の対応を定義する。
-transitions:
+# role: case の状態遷移表
+case_transitions:
   - operation: "ローカル版 case-open"
     from: "(新規作成)"
     to: "open"
-    note: "Case ファイル新規作成時"
-
   - operation: "ローカル版 case-run 開始"
     from: "open"
     to: "running"
-    note: "open からの開始"
-
-  - operation: "ローカル版 case-run 開始"
+  - operation: "ローカル版 case-run 開始（再開）"
     from: "blocked"
     to: "running"
-    note: "blocked からの再開"
-
   - operation: "ローカル版 case-run 完了"
     from: "running"
     to: "review"
-    note: "実装完了・レビュー対象へ"
-
   - operation: "ローカル版 case-run 停止"
     from: "running"
     to: "blocked"
-    note: "障害・未解決事項による停止"
-
   - operation: "ローカル版 case-close 停止"
     from: "review"
     to: "blocked"
-    note: "完了処理中の停止"
-
   - operation: "ローカル版 case-close 再開"
     from: "blocked"
     to: "review"
-    note: "blocked から完了処理への再開"
-
   - operation: "ローカル版 case-close 完了"
     from: "review"
     to: "closed"
-    note: "完了確定。終端状態"
-
-  - operation: "明示中止"
-    from: "open"
-    to: "cancelled"
-    note: "利用者による明示的キャンセル"
-
-  - operation: "明示中止"
-    from: "running"
-    to: "cancelled"
-    note: "利用者による明示的キャンセル"
-
-  - operation: "明示中止"
-    from: "blocked"
-    to: "cancelled"
-    note: "利用者による明示的キャンセル"
-
-  - operation: "明示中止"
+  - operation: "ローカル版 case-close 取り込み失敗・未完了"
     from: "review"
+    to: "blocked"
+    note: "マージ結果セクションに失敗・未完了を記録し status を blocked へ更新する"
+  - operation: "明示中止"
+    from: "open | running | blocked | review"
     to: "cancelled"
-    note: "利用者による明示的キャンセル"
 
-# 再開経路（Design local-case-file.md「再開経路」）
+# 再開経路（role: case）
 recovery_paths:
   case_run:
     description: "ローカル版 case-run 停止後の再開経路"
@@ -115,14 +151,14 @@ recovery_paths:
       - "review"
       - "closed"
 
-# 禁止遷移（Design local-case-file.md「禁止遷移」）
+# 禁止遷移（role: case）
 forbidden_transitions:
   - from: "blocked"
     to: "closed"
-    reason: "blocked から closed への直接遷移は禁止。review を経由すること"
+    reason: "blocked から closed への直接遷移は禁止。review を経由する"
   - from: "closed"
     to: "*"
-    reason: "終端状態からの遷移は定義しない"
+    reason: "終端状態からの遷移は定義しない（issue_reopen の対象外）"
   - from: "cancelled"
     to: "*"
-    reason: "終端状態からの遷移は定義しない"
+    reason: "終端状態からの遷移は定義しない（issue_reopen の対象外）"
