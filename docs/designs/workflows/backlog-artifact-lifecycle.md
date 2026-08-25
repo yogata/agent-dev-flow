@@ -31,7 +31,8 @@ updated: 2026-08-15
 | 採用済み成果物（inspect） | `inspect-promote` | `backlog-review` | RU 化成功時 |
 | RU（Requirement Unit） | `backlog-review` | `req-define`, `req-save`, `case-open` | case-open の Issue作成 + VERIFY 成功時（REQ-008-012, REQ-008-015） |
 | REQ ファイル | `req-save` | `case-open`, `case-run`, `case-close` | なし（永続） |
-| Issue | `case-open` | `case-run`, `case-close` | なし（永続） |
+| 追跡Issue | `issue`（起票）、各 workflow | `issue`、`req-define`（実行確定時の要件化経路） | なし（永続） |
+| Case Issue | `case-open` | `case-run`, `case-close` | なし（永続） |
 
 ## RU（Requirement Unit）
 
@@ -54,6 +55,20 @@ updated: 2026-08-15
 - learning-promote は inbox.md + deferred.md から読み取り、内部で normalize/classify/eval、HITL確認後に採用済み成果物を生成
 - inspect-promote は inbox（検出事項）から読み取り、分類（promote/defer/reject）、HITL承認後に採用済み成果物を生成。`--auto` は高確信度の検出事項を HITL 承認なしで自動投入する
 - RU 生成に成功した採用済み成果物は `backlog-review` が削除（REQ-008）
+
+## 追跡Issueからの要件化経路
+
+追跡Issueで実行が確定した場合、正規の要件化・設計経路（req-define 経由）を通って Case Issue 化する（REQ-049-005）。
+RU が採用済み成果物（intake / learning / inspect）からの要件化経路であるのに対し、追跡Issueは未解決事項の育成管理からの要件化経路であり、両者は別系統である。
+
+```
+追跡Issue（実行準備完了） → req-define（要件doc） → req-save / design-save → case-open（Case Issue 作成）
+```
+
+- 追跡Issueを実行票（Case Issue）へ直接変質させない。case-open は追跡Issueとは別の Case Issue を作成する
+- 生成された Case Issue の本文には元追跡Issueへの参照形式（`Tracking: #N`）を記録する（形式の定義は case-open Design「Case Issue 本文の元追跡Issue参照形式」節が所有する）
+- 追跡Issue側は本文標準構造の関連 Case Issue への参照セクションで生成された Case Issue を追跡する（論理スキーマの正は agentdev-issue-tracking Design）
+- 追跡Issueは要件化経由後もクローズせず、解決結論と反映状態で追跡を継続する（クローズは必要な反映の完了または反映不要の確認を条件とする）
 
 ## バックログドラフトプロトコル（Backlog Draft Protocol）
 

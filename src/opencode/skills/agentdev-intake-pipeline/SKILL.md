@@ -11,7 +11,7 @@ intake-from-github と intake-promote コマンドの知識ベース。
 
 | コマンド | 目的 |
 |----------|------|
-| `/agentdev/intake-from-github` | クローズ済み Issue/PR から残課題を抽出し inbox item を生成する |
+| `/agentdev/intake-from-github` | クローズ済み Case Issue/PR から残課題を抽出し inbox item を生成する（role: tracking の追跡Issueは抽出対象外） |
 | `/agentdev/intake-promote` | inbox item を review、分類、整形、振り分けし promoted/ に保存する |
 
 ## 参考文献

@@ -124,7 +124,7 @@ Issue/PR/コメント本文にリポジトリ内ファイル、ディレクト�
 
 - `docs/requirements/v2:REQ-0107.md` → `https://github.com/yogata/agent-dev-flow/blob/main/docs/requirements/v2:REQ-0107.md`
 - `docs/decisions/DEC-001.md` → `https://github.com/yogata/agent-dev-flow/blob/main/docs/decisions/DEC-001.md`
-- `src/opencode/skills/agentdev-gh-cli/SKILL.md` → `https://github.com/yogata/agent-dev-flow/blob/main/src/opencode/skills/agentdev-gh-cli/SKILL.md`
+- `src/opencode/skills/agentdev-traceability/SKILL.md` → `https://github.com/yogata/agent-dev-flow/blob/main/src/opencode/skills/agentdev-traceability/SKILL.md`
 - `src/opencode/skills/` → `https://github.com/yogata/agent-dev-flow/tree/main/src/opencode/skills/`
 
 ### 対象外

@@ -41,7 +41,7 @@ updated: 2026-08-15
 各段階の詳細手順は Workflow Skill（`agentdev-workflow-intake-from-github`）が正規情報源である（capture-only 型、REQ-027-003 により STEP model 対象外）。
 
 - 期間解釈（`agentdev-intake-pipeline`）
-- データ取得（`agentdev-intake-pipeline`）（クローズ済み Issue/PR のみ対象）
+- データ取得（`agentdev-intake-pipeline`）（クローズ済み Case Issue/PR のみ対象。role: tracking の追跡Issueは抽出対象から除外する。クローズ済み追跡Issueは反映確認完了を意味し、未回収変更候補の回収機会と意味が衝突するためである）
 - 構造的検出（`agentdev-intake-pipeline`）
 - LLM 全文解析（`agentdev-intake-pipeline`）
 - intake item 生成（`agentdev-intake-pipeline`）
@@ -74,6 +74,7 @@ updated: 2026-08-15
 - 特定セクションの必須扱い
 - GitHub API 直接呼出（gh CLI のみ使用）
 - オープン状態の Issue/PR の対象化（クローズ済みのみ）
+- role: tracking の追跡Issueの抽出対象化（未回収変更候補の抽出対象はクローズ済み Case Issue/PR に限定する）
 - `.agentdev/intake/inbox/` 以外への保存
 
 ## 検証観点

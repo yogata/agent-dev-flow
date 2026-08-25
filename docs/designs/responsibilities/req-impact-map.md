@@ -59,7 +59,7 @@ updated: 2026-06-28
 | REQ-008 | 構造化 req_draft 契約 | IR-016 | ドメイン状態 |
 | REQ-003 | 外部エージェント統合契約 | IR-006, IR-024 | commands, skills |
 | v2:REQ-0140 | 文書品質ゲート | IR-013, IR-045 | docs, Design, document-type-responsibilities.md |
-| REQ-009 | ローカル版 OpenCode 導入方式とローカル Case ファイル運用 | IR-016, IR-046, IR-047, IR-048 | src/opencode-local/, .opencode/commands/agentdev/, .opencode/skills/agentdev-*/, .agentdev/cases/, Design, guides |
+| REQ-009 | ローカル版 OpenCode 導入方式とローカルIssue運用 | IR-016, IR-046, IR-047, IR-048 | src/opencode-local/, .opencode/commands/agentdev/, .opencode/skills/agentdev-*/, .agentdev/issues/, Design, guides |
 | REQ-002 | 配布物ID除去後の文意保持、構文健全性、責務整合 | IR-016 | docs, Design, docs-spec-rebuild-integrity.md |
 | v2:REQ-0143 | Command 定義ファイルフォーマット標準化 | IR-049 | commands, command-file-format.md |
 | REQ-010 | docs-check/integrity 運用是正 | IR-016, IR-052 | integrity scripts, docs-check, Design |
@@ -68,6 +68,7 @@ updated: 2026-06-28
 | REQ-003 | 実行契約、委譲、プロセス設計 | IR-006, IR-032, IR-033 | commands, Design |
 | REQ-003 | 文書化規律、HITL境界 | IR-013, IR-019, IR-035 | docs, commands, skills, guides |
 | REQ-006 | RU群バッチ処理と複数 execution_unit 並列実行 | IR-006, IR-016 | commands |
+| REQ-049 | 追跡Issue管理機構 | - | commands, skills, templates, Design（論理スキーマの一元管理は `agentdev-issue-tracking` skill Design） |
 
 ## 要件行影響（Requirement-Line Impact）
 
@@ -99,7 +100,7 @@ REQ-002-028、029、035 は RETIRE 扱いとし、それぞれの検査（構文
 - **REQ-005**: Command protocol (2 ルール)
 - **REQ-006**: Case 実行オーケストレーション (3 ルール)
 - **v2:REQ-0107**: Reporting (2 ルール)
-- **REQ-009**: ローカル版 OpenCode 導入方式とローカル Case ファイル運用 (4 ルール: IR-016, IR-046, IR-047, IR-048)
+- **REQ-009**: ローカル版 OpenCode 導入方式とローカルIssue運用 (4 ルール: IR-016, IR-046, IR-047, IR-048)
 - **REQ-010**: docs-check/integrity 検出設計改善 (4 ルール: IR-044, IR-050, IR-051, IR-052)
 - **REQ-003**: 実行契約、委譲、プロセス設計 (3 ルール: IR-006, IR-032, IR-033)
 - **REQ-003**: 文書化規律、HITL境界 (3 ルール: IR-013, IR-019, IR-035)

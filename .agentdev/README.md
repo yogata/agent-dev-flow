@@ -21,6 +21,7 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-001�
 | `inspect/inbox/*.md` | 未分類 inspect finding | `inspect-docs`, `inspect-skills` | `inspect-promote` | `inspect-promote` の分類後に削除（promote 時は promoted/ へ保存、reject 時は即時削除、defer 時は inbox 残置） |
 | `inspect/promoted/*.md` | promoted artifact（採用済み・RU化対象） | `inspect-promote` | `backlog-review` | `backlog-review` による RU 化成功後に削除 |
 | `inspect/promoted/auto-promote-log.md` | `--auto` 実行ログ（append-only） | `inspect-promote`(--auto) | ユーザー参照・revoke 手順 | 永続（トレーサビリティ） |
+| `issues/issue-*.md` | ローカルIssue（追跡Issue / Case Issue。ローカル版のみ） | `/agentdev/issue`、case-open/run/close（Tool 操作契約経由） | `/agentdev/issue`、`/agentdev/req-define`（実行確定時の要件化経路） | なし（永続。Issue/PR 相当の永続情報として git 管理対象、REQ-009-026） |
 
 ## .agentdev/ の性質
 
@@ -49,6 +50,8 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-001�
 ├── inspect/
 │   ├── inbox/           ← inspect-docs / inspect-skills が未分類 finding を保存
 │   └── promoted/        ← inspect-promote が採用済み artifact を出力（フラット）
+├── issues/              ← ローカルIssue（ローカル版のみ。Tool 操作契約経由で読み書き）
+│   └── issue-{NNNN}.md
 └── integrity/
     └── reports/         ← docs-check が検証結果を保存（非永続・git管理対象外）
 ```

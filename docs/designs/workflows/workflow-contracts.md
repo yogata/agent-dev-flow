@@ -102,15 +102,15 @@ draft（`.agentdev/drafts/req-draft-*.md`）は壁打ちフェーズ内の一時
 
 ### Local backend の SSoT 位置づけ
 
-Local backend（ローカル版 OpenCode）では、構造的実行以降の SSoT は GitHub Issue / PR ではなくローカル Case ファイル（`.agentdev/cases/case-{NNNN}.md`）である（REQ-009-021〜023）。
+Local backend（ローカル版 OpenCode）では、構造的実行以降の SSoT は GitHub Issue / PR ではなくローカルIssue（`.agentdev/issues/issue-{NNNN}.md`）である（REQ-009-021〜023）。
 
 | マクロフェーズ | Local backend の SSoT |
 |---|---|
 | 壁打ち | セッション会話 + draft（GitHub backend と共通） |
-| 構造的実行 | Case ファイル本文 |
-| レビュー完了 | Case ファイル `## マージ結果` |
+| 構造的実行 | ローカルIssue本文（role: case） |
+| レビュー完了 | ローカルIssue（role: case）`## マージ結果` |
 
-詳細は `docs/designs/local/local-case-file.md` を参照。
+詳細は `docs/designs/local/local-case-file.md`（ローカルIssue共通スキーマ）を参照。
 
 ## STEP model
 

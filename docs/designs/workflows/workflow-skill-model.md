@@ -47,7 +47,7 @@ Workflow Skill は STEP model の適用有無により次の4型に分類され�
 | 標準型 | req-define、req-save、design-save、case-open、case-run、case-update、case-close、case-auto、intake-promote、learning-promote、backlog-review、inspect-promote | 対象 | 持つ（DEC-011） |
 | capture-only 型 | intake-capture、intake-from-github | 対象外 | 持たない。工程は逐次実行し、中断時は先頭から再実行する |
 | read-only-diagnostic 型 | inspect-docs、inspect-skills | 対象外 | 持たない。工程一覧のラベルは順序ラベルであり、中断時は先頭から再実行する |
-| 対話操作完結型 | issue | 対象外 | 持たない。各操作が1完結単位であり、課題ファイル自体が durable state であるため、中断時は同一指示から再実行して現在状態を再構成できる |
+| 対話操作完結型 | issue | 対象外 | 持たない。各操作が1完結単位であり、追跡Issue自体が durable state（管理単位・永続状態）であるため、中断時は同一指示から再実行して現在状態を再構成できる |
 
 read-only-diagnostic 型の SKILL.md は次の標準セクション構成を持つ。
 
