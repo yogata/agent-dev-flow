@@ -38,14 +38,16 @@ AgentDevFlow の利用でよくある問題と対処法をまとめる。
 
 **原因**: BOM 付き UTF-8 でファイルが書き込まれた、または Shift-JIS に変換された。
 
-**対処**: `agentdev-gh-cli` スキルの手順に従い、`[System.IO.File]::WriteAllText` で BOM なし UTF-8 を指定してファイル作成し、`--body-file` で指定する。
+**対処**: GitHub I/O は Custom Tool `agentdev_gh` の操作契約経由で行う。
+ファイルを直接作成する場合は `[System.IO.File]::WriteAllText` で BOM なし UTF-8 を指定してファイル作成し、`--body-file` で指定する。
 PowerShell の `Out-File` や `Set-Content` は使用しない。
 
 ### gh CLI の出力を PowerShell で受けると文字化けする
 
 **原因**: PowerShell がネイティブコマンドの UTF-8 出力をパイプライン経由でエンコーディング変換する。
 
-**対処**: Node.js の `execSync` を使って gh CLI の出力を直接取得する。
+**対処**: GitHub I/O は Custom Tool `agentdev_gh` の操作契約経由で行う。
+直接 gh CLI を実行する場合は Node.js の `execSync` を使って出力を直接取得する。
 `node -e "const r=execSync('gh ...',{encoding:'utf-8'});..."` の形式。
 
 ## ワークフロー関連

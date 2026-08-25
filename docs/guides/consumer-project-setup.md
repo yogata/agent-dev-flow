@@ -2,7 +2,7 @@
 
 <!-- ADF-COVERS(implementation): REQ-050-014 -->
 
-AgentDevFlow を適用プロジェクトに導入する際のモデルを定義する（v2:ADR-011-061~065, v2:ADR-011-072~077）。
+AgentDevFlow を適用プロジェクトに導入する際のモデルを定義する（REQ-009）。
 
 ## リポジトリ種別（Repo Type）
 
@@ -24,8 +24,8 @@ AgentDevFlow は5種のリポジトリ種別を定義する（詳細は Design [
 ```
 .opencode/           → ジャンクション → src/opencode/ (実行時の配置先)
 src/opencode/
-  commands/agentdev/  → 原本（公開コマンド定義13件、README除外）
-  skills/agentdev-*/  → 原本（agentdev スキル20件）
+  commands/agentdev/  → 原本（`/agentdev/*` 公開コマンド定義）
+  skills/agentdev-*/  → 原本（`agentdev-*` スキル）
 scripts/
   self-sync.ps1       → AgentDevFlow 本体リポジトリ用同期スクリプト（self-hosting 向け公開入口）
 ```
@@ -68,7 +68,7 @@ scripts/
 ### ローカル版 OpenCode 導入（consumer-generated）
 
 GitHub Issue/PR を使わない個人利用環境向けのリポジトリ種別。
-通常版と同じ link mode（`.opencode/` 配下を src 配下へ接続）で導入し、Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけを `src/opencode-local/agentdev-gh-cli/`（Local 実装）から差し替える（v2:ADR-011, v2:ADR-009）。
+通常版と同じ link mode（`.opencode/` 配下を src 配下へ接続）で導入し、Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけを `src/opencode-local/agentdev-gh-cli/`（Local 実装）から差し替える（REQ-009、REQ-011-006）。
 詳細な接続フロー、link target 確認は Design [実行時パッケージ境界](../designs/local/runtime-package-boundary.md) を参照。
 
 ```
@@ -85,12 +85,12 @@ GitHub Issue/PR を使わない個人利用環境向けのリポジトリ種別�
   issues/                        → ローカルIssue（Issue / PR 相当の永続情報）
 ```
 
-- **link による接続**: command/skill を生成せず、`.opencode/` 配下を src 配下へ link で接続する（v2:ADR-009 decision #1, #2, #3）
-- **agentdev_gh 実装の差し替え**: agentdev-gh 以外は通常版と同じ `src/opencode/` 配下へ接続し、Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけを `src/opencode-local/agentdev-gh-cli/` へ接続する（v2:ADR-009 decision #3、REQ-011-006）
-- **link target 確認**: link 設定前に `.opencode/` 配下の各 path が意図した link target へ解決されることを確認し、意図しない target の場合は link 設定を停止する（v2:ADR-011-010, v2:ADR-009 decision #6）
-- **リポジトリ管理対象外**: link により接続された `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/` はリポジトリ管理対象外（v2:ADR-011-008）
-- **リポジトリ管理対象**: `.agentdev/issues/` 配下のローカルIssueは Issue/PR 相当の永続情報としてリポジトリ管理対象（v2:ADR-011-016、REQ-009-026）
-- **更新方式**: unlink / relink により行う。`.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を全削除して作り直す方式は採らない（v2:ADR-011-033, v2:ADR-009 decision #4）
+- **link による接続**: command/skill を生成せず、`.opencode/` 配下を src 配下へ link で接続する
+- **agentdev_gh 実装の差し替え**: agentdev-gh 以外は通常版と同じ `src/opencode/` 配下へ接続し、Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけを `src/opencode-local/agentdev-gh-cli/` へ接続する（REQ-011-006）
+- **link target 確認**: link 設定前に `.opencode/` 配下の各 path が意図した link target へ解決されることを確認し、意図しない target の場合は link 設定を停止する
+- **リポジトリ管理対象外**: link により接続された `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/` はリポジトリ管理対象外
+- **リポジトリ管理対象**: `.agentdev/issues/` 配下のローカルIssueは Issue/PR 相当の永続情報としてリポジトリ管理対象（REQ-009-026）
+- **更新方式**: unlink / relink により行う。`.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を全削除して作り直す方式は採らない
 - **判定基準**: `.opencode/tools/agentdev-gh/` が `src/opencode-local/agentdev-gh-cli/` への link として解決される場合に consumer-generated と判定される（Design runtime-package-boundary.md）
 
 #### ローカル版セットアップ手順
@@ -125,12 +125,11 @@ cd .agentdev-plugin && git pull && cd ..
 | `.agentdev-plugin/` | 適用プロジェクトのチェックアウト配置先 | `consumer-with-agentdev`, `consumer-generated` |
 
 **禁止事項**:
-- consumer-local での `agentdev` 名前空間の使用（v2:ADR-011-056）
+- consumer-local での `agentdev` 名前空間の使用
 - consumer-with-agentdev での AgentDevFlow 提供ファイルの直接編集（上書きされる可能性）
 - `.agentdev-plugin/` を `.agentdev/` として使用すること（ドメイン状態と競合）
-- consumer-generated で link target が意図した src 配下以外へ解決される環境での link 設定実行（v2:ADR-011-010, v2:ADR-009 decision #6）
+- consumer-generated で link target が意図した src 配下以外へ解決される環境での link 設定実行
 
-`agentdev-integrity`（旧 integrity skill）は AgentDevFlow 配布対象外となった（DEC-001）。
 docs-check は `repo-agentdev-integrity`（配布対象外スキル）として AgentDevFlow 本体リポジトリでのみ実行される。
 適用プロジェクトには配布されない。
 
@@ -157,7 +156,7 @@ install スクリプトは provisioning（clone、fetch、reset）も network ac
 | ジャンクション + チェックアウト（`.agentdev-plugin/`） | ✅ | **推奨** | 更新が自動反映、原本が単一 |
 | 直接コピー | ⚠️ | 非推奨 | 手動更新が必要、乖離のリスク |
 | Git サブモジュール | ⚠️ | 検討可能 | 複雑性が増す |
-| プラグイン/npm/package | ❌ | 将来対応 | v2:ADR-011-064 で将来の選択肢扱い |
+| プラグイン/npm/package | ❌ | 将来対応 | 将来の選択肢 |
 
 > 「source ZIP によるチェックアウト供給」と「release archive projection」（REQ-029 が別途定義する配布と検証の投影）は別の概念である（DEC-014）。
 > ZIP 展開による provisioning は手動 copy インストールに該当せず、install 手段は link mode に限定される。
@@ -219,7 +218,7 @@ scripts/ 直下の公開入口は consumer 向け `scripts/install.ps1` と self
 |--------|---------------|------|
 | `scripts/self-sync.ps1` | `self-hosting` | `src/opencode/` ↔ `.opencode/` の同期（apply / check / dry-run） |
 | `scripts/install.ps1` | `consumer-with-agentdev`, `consumer-generated` | チェックアウト済み `.agentdev-plugin/` を前提としたジャンクション作成（apply / check / dry-run）。check は状態確認（link mode 自動検出、版報告は `.git` 存在時のみ、orphan 検出を含む）を兼ねる |
-| （link 設定: `-LocalMode`） | `consumer-generated` | `install.ps1 -Mode apply -LocalMode` が Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）のみ `src/opencode-local/agentdev-gh-cli/` へ接続し、それ以外を `src/opencode/` 配下へ接続する（v2:ADR-011-032, v2:ADR-009、REQ-011-006）。決定的な変換ロジックを実装したスクリプトは使用しない |
+| （link 設定: `-LocalMode`） | `consumer-generated` | `install.ps1 -Mode apply -LocalMode` が Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）のみ `src/opencode-local/agentdev-gh-cli/` へ接続し、それ以外を `src/opencode/` 配下へ接続する（REQ-011-006）。決定的な変換ロジックを実装したスクリプトは使用しない |
 
 ### 本体リポジトリ（self-hosting）での同期
 
@@ -244,7 +243,7 @@ scripts/ 直下の公開入口は consumer 向け `scripts/install.ps1` と self
 | ルール | 説明 |
 |------|------|
 | 名前空間の衝突回避 | `agentdev` および `agentdev-*` は使用不可 |
-| kebab-case | skill 名は小文字、数字、ハイフンのみ（v2:ADR-011-011） |
+| kebab-case | skill 名は小文字、数字、ハイフンのみ |
 | 意味に基づく命名 | プロジェクト名やドメイン名をプレフィックスに含めることを推奨 |
 | 独自ディレクトリ | 独自 skill は `.opencode/skills/{project}-*/` に配置 |
 
@@ -263,10 +262,17 @@ scripts/ 直下の公開入口は consumer 向け `scripts/install.ps1` と self
 # AgentDevFlow がジャンクション管理するディレクトリ（インストールスクリプトが自動作成）
 .opencode/commands/agentdev/
 .opencode/skills/agentdev-*/
+.opencode/skills/japanese-tech-writing/
+.opencode/tools/agentdev-*/
+.opencode/plugins/agentdev-*/
+.opencode/plugins/agentdev-*.ts
 ```
 
-**注意**: `.agentdev/` は gitignore に**含めない**こと。
-`.agentdev/` は AgentDevFlow のドメイン状態（Intake, Learning, Backlog 等）を保持し、git 管理対象である。
+`.agentdev/` は AgentDevFlow のドメイン状態（Intake, Learning, Backlog 等）を保持し、git 管理対象であるため gitignore に**含めない**こと。
+各コマンドは `.agentdev/` 配下の変更を scoped commit で git に永続化する。
+`japanese-tech-writing` は配布物依存スキル（`agentdev-doc-writing` が参照、REQ-002）のため gitignore に含める。
+Custom Tool（`.opencode/tools/agentdev-*/`）と Plugin / Hook（`.opencode/plugins/agentdev-*/`）も配布種別として gitignore に含める（REQ-052）。
+インストーラが生成する Plugin のローダーシム（`.opencode/plugins/agentdev-*.ts`）も投影成果物のため含める。
 
 ## 移行ガイド
 

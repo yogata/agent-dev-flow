@@ -7,7 +7,8 @@ AgentDevFlow で使う用語の定義。
 | 用語 | 読み方 | 定義 |
 |------|--------|------|
 | req-define | レキ、ディファイン | AI と対話して要件を整理するコマンド |
-| req-save | レキ、セーブ | 要件doc を REQ/Decision ファイルとして保存するコマンド（機能追加のみ） |
+| req-save | レキ、セーブ | 要件doc を REQ/Decision ファイルとして保存するコマンド（REQ/Decision 対象 artifact_actions がある場合） |
+| design-save | デザイン、セーブ | 要件doc の Design 保存対象を Design ファイルとして docs/designs/ に保存、確定するコマンド（Design 対象 artifact_actions がある場合） |
 | case-open | ケース、オープン | 要件から GitHub Issue を作成するコマンド |
 | case-run | ケース、ラン | Issue に基づいて実装し、PR を作成するコマンド |
 | case-close | ケース、クローズ | PR をマージし、Issue をクローズするコマンド |
@@ -17,9 +18,12 @@ AgentDevFlow で使う用語の定義。
 | intake-promote | インテイク、プロモート | inbox の項目をレビュー、採用、却下、保留判定し、採用済み成果物に整形するコマンド |
 | learning-promote | ラーニング、プロモート | Learning エントリを分析、分類、昇華判定し、採用済み成果物を生成するコマンド |
 | backlog-review | バックログ、レビュー | 採用済み成果物を分析、統合し、ユーザー承認後に RU を生成するコマンド |
-| docs-check | ドックス、チェック | ドキュメント、スキル、コマンドの整合性を検証するコマンド（旧称: integrity-check）。配布対象外コマンド `/repo/docs-check` に配置し、`/agentdev/*` コマンド体系とは区別する（DEC-001, v2:ADR-011-156） |
+| backlog-auto | バックログ、オート | backlog 整理サイクル（検出→昇格→統合）を1回で実行するコマンド |
+| docs-check | ドックス、チェック | ドキュメント、スキル、コマンドの整合性を検証するコマンド。配布対象外コマンド `/repo/docs-check` に配置し、`/agentdev/*` コマンド体系とは区別する（DEC-001、REQ-010） |
 | issue | イシュー | 自然言語の指示から追跡Issueの起票、検索・参照、更新、コメント追加、保留、再評価、実行準備完了、解決、反映確認、クローズ、再オープンを行うコマンド（`/agentdev/issue`）。読み書きは Tool 操作契約経由 |
-| inspect-docs | インスペクト、ドックス | docs 全体の意味整合性を検出し、検出事項（finding）を出力するコマンド（旧称: req-restructure-review, docs-review, diagnostics-docs） |
+| inspect-docs | インスペクト、ドックス | docs 全体の意味整合性を検出し、検出事項（finding）を出力するコマンド |
+| inspect-skills | インスペクト、スキルズ | Command/Skill 参照妥当性を検出し、検出事項（finding）を出力するコマンド |
+| inspect-promote | インスペクト、プロモート | 検出事項（finding）を分類（promote/defer/reject）し、採用済み成果物を生成するコマンド |
 | case-auto | ケース、オート | 最大自走モード。req-save → design-save（Design候補がある場合）→ case-open → case-run → case-close を順次実行するコマンド |
 
 ## 成果物
@@ -27,7 +31,7 @@ AgentDevFlow で使う用語の定義。
 | 用語 | 定義 |
 |------|------|
 | REQ | 要件定義の永続基準。`docs/requirements/REQ-{NNN}.md` に配置 |
-| ADR | 取り返しのつかない技術判断の記録。現行基準は `docs/decisions/DEC-{NNN}.md`。再編前の ADR-00XX 番号帯は物理削除済み（v2:ADR-011-047, 048）。後継関係は `docs/decisions/README.md` の Decision Map を参照 |
+| ADR | 取り返しのつかない技術判断の記録。現行基準は `docs/decisions/DEC-{NNN}.md` として管理する。後継関係は `docs/decisions/README.md` の Decision Map を参照 |
 | Design | 実装者が参照する現在設計。`docs/designs/**/*.md` に配置（commands/skills/workflows の3層と基盤6ドメイン） |
 | Report | 監査・評価・観測の事実記録。`docs/reports/**/*.md` に配置 |
 | README | ドキュメント入口、各ディレクトリの索引。`docs/README.md` 等 |
@@ -53,12 +57,12 @@ AgentDevFlow で使う用語の定義。
 
 | 用語 | 定義 |
 |------|------|
-| work_type | Issue の作業分類（bugfix / feature / maintenance / docs_chore）。経路と docs 更新範囲を決定する。旧称 Pattern（A/B/C/D）は非推奨、廃止済み |
-| 実装分類（Implementation Pattern） | コマンド内部構造の分類軸（wall-session=対話セッション型 / file-pipeline=ファイル変換パイプライン型 / manager-orchestrator=状態機械統制型 / capture-only=データ収集型 / read-only-diagnostic=検査対象を直接修正しない診断型）。旧称 Pattern（A/B/C/D）= work_type とは別概念（v2:ADR-011-016, workflow-contracts.md） |
+| work_type | Issue の作業分類（bugfix / feature / maintenance / docs_chore）。参考情報であり、工程分岐（req-save / design-save の要否）は req_draft の `artifact_actions` 存在で判定する |
+| 実装分類（Implementation Pattern） | コマンド内部構造の分類軸（wall-session=対話セッション型 / file-pipeline=ファイル変換パイプライン型 / manager-orchestrator=状態機械統制型 / capture-only=データ収集型 / read-only-diagnostic=検査対象を直接修正しない診断型）。work_type とは別概念（workflow-contracts.md） |
 | SSoT（Single Source of Truth / 唯一の情報源） | 各フェーズでの信頼できる唯一の情報源 |
 | HITL（Human-in-the-loop / 人の判断を挟む） | ユーザーの確認を挟む判断ポイント |
 | マクロフェーズ | 壁打ち、構造的実行、レビュー完了の3段階 |
-| マイクロフェーズ | requirement / analyzed / created / in_progress / review / done の6状態（説明用ラベルであり、状態管理モデルではない。v2:ADR-011-023） |
+| マイクロフェーズ | requirement / analyzed / created / in_progress / review / done の6状態（説明用ラベルであり、状態管理モデルではない） |
 | 検出事項（Finding） | docs-check や case-run で検出された乖離、発見事項 |
 
 ## Epic 関連
@@ -68,7 +72,7 @@ AgentDevFlow で使う用語の定義。
 | Epic | 大規模 Issue を複数の子 Issue に分割した親 Issue |
 | Wave | Epic 統率者（Orchestrator）が子 Issue を並列実行する単位 |
 | Epic 自動クローズ | 全子 Issue 完了時に親 Epic を自動的にクローズする仕組み |
-| ステータス追跡テーブル | Epic 本文内の子 Issue 進捗管理表（未着手/進行中/完了/対処不要/スキップ）。⏭スキップは前提条件未達等で Epic 統率者が設定する終了状態（v2:ADR-011-030） |
+| ステータス追跡テーブル | Epic 本文内の子 Issue 進捗管理表（未着手/進行中/完了/対処不要/スキップ）。⏭スキップは前提条件未達等で Epic 統率者が設定する終了状態 |
 
 ## ツール、スキル
 
@@ -83,16 +87,15 @@ AgentDevFlow で使う用語の定義。
 
 ## ローカル版 OpenCode
 
-GitHub Issue/PR を使わない個人利用環境向けの AgentDevFlow 利用形態（v2:ADR-011, v2:ADR-009）に関連する用語。
+GitHub Issue/PR を使わない個人利用環境向けの AgentDevFlow 利用形態（REQ-009）に関連する用語。
 
 | 用語 | 定義 |
 |------|------|
-| ローカル版 OpenCode | GitHub Issue/PR を使わない個人利用環境向けの AgentDevFlow 利用形態（v2:ADR-011-001）。link mode により GitHub 版 AgentDevFlow の原本を `.opencode/` 配下へ接続して利用する（v2:ADR-009） |
-| 仕様管理リポジトリ | AgentDevFlow 本体リポジトリ（agent-dev-flow）。ローカル版 link 先の原本を保持する（v2:ADR-011-002） |
-| 導入先リポジトリ | ローカル版 OpenCode を導入する利用側リポジトリ。`consumer-generated` リポジトリ種別に対応（v2:ADR-011-002） |
-| consumer-generated | ローカル版 OpenCode を導入するリポジトリ種別。`.opencode/tools/agentdev-gh/`（Custom Tool `agentdev_gh` の実行ディレクトリ）が `src/opencode-local/agentdev-gh-cli/`（Local 実装）への link として解決されることで判定される（Design `runtime-package-boundary.md`, v2:ADR-009） |
-| `generated_by` 識別子 | v2:ADR-0126 時代のローカル版生成物に付与された識別情報。値は `local-opencode-transform`。link mode への移行後は付与されず、上書き保護も廃止された（v2:ADR-009 decision #5）。IR-046/048 は link mode 移行前の生成物が混在する環境向けの整合性検証語彙として残る |
-| `src/opencode-local/` | ローカル版 link 先原本領域。AgentDevFlow 本体リポジトリに配置され、`README.md` と `agentdev-gh-cli/` のみを保持する（v2:ADR-011-004, 005）。IR-047 でディレクトリ構成を検証 |
-| link mode | ローカル版導入方式。`.opencode/` 配下を src 配下へ接続し、原本をそのまま利用する。`agentdev-gh-cli` だけを `src/opencode-local/agentdev-gh-cli/` から差し替える（v2:ADR-009, v2:ADR-011-007） |
-| link target 確認 | ローカル版 link 設定前に `.opencode/` 配下の各 path が意図した link target へ解決されることを確認する安全機構（v2:ADR-011-010, v2:ADR-009 decision #6）。意図した target 以外へ解決される場合は link 設定を停止する |
+| ローカル版 OpenCode | GitHub Issue/PR を使わない個人利用環境向けの AgentDevFlow 利用形態。link mode により GitHub 版 AgentDevFlow の原本を `.opencode/` 配下へ接続して利用する |
+| 仕様管理リポジトリ | AgentDevFlow 本体リポジトリ（agent-dev-flow）。ローカル版 link 先の原本を保持する |
+| 導入先リポジトリ | ローカル版 OpenCode を導入する利用側リポジトリ。`consumer-generated` リポジトリ種別に対応 |
+| consumer-generated | ローカル版 OpenCode を導入するリポジトリ種別。`.opencode/tools/agentdev-gh/`（Custom Tool `agentdev_gh` の実行ディレクトリ）が `src/opencode-local/agentdev-gh-cli/`（Local 実装）への link として解決されることで判定される（Design `runtime-package-boundary.md`） |
+| `src/opencode-local/` | ローカル版 link 先原本領域。AgentDevFlow 本体リポジトリに配置され、`README.md` と `agentdev-gh-cli/` のみを保持する。IR-047 でディレクトリ構成を検証 |
+| link mode | ローカル版導入方式。`.opencode/` 配下を src 配下へ接続し、原本をそのまま利用する。`agentdev-gh-cli` だけを `src/opencode-local/agentdev-gh-cli/` から差し替える |
+| link target 確認 | ローカル版 link 設定前に `.opencode/` 配下の各 path が意図した link target へ解決されることを確認する安全機構。意図した target 以外へ解決される場合は link 設定を停止する |
 | Local backend | ローカル版 OpenCode のバックエンド区分。GitHub backend（GitHub Issue/PR を使う通常運用）との差分として Design `workflow-contracts.md` で定義される。SSoT は GitHub Issue/PR ではなくローカルIssue（`.agentdev/issues/issue-{NNNN}.md`）となる |
