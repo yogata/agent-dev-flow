@@ -34,13 +34,15 @@ export function prNumber(n: number): PrNumber {
   return n as PrNumber;
 }
 
-/** 操作名（初期セット。Design「対象操作の境界（初期セット）」が所有）。 */
+/** 操作名（初期セット + 追跡Issue操作。Design「対象操作の境界」が所有）。 */
 export const GH_TOOL_OPERATIONS = [
   "issue_create",
   "issue_read",
   "issue_update",
   "issue_comment",
   "issue_close",
+  "issue_list",
+  "issue_reopen",
   "pr_create",
   "pr_read",
   "pr_merge",
@@ -92,13 +94,15 @@ function readOnly(operation: GhToolOperation): OperationCatalogEntry {
   return { operation, kind: "read-only", contingency: READ_CONTINGENCY };
 }
 
-/** 操作カタログ（Design の初期セットに対応）。 */
+/** 操作カタログ（Design の対象操作の境界に対応）。 */
 export const GH_TOOL_OPERATION_CATALOG: readonly OperationCatalogEntry[] = [
   sideEffect("issue_create"),
   readOnly("issue_read"),
   sideEffect("issue_update"),
   sideEffect("issue_comment"),
   sideEffect("issue_close"),
+  readOnly("issue_list"),
+  sideEffect("issue_reopen"),
   sideEffect("pr_create"),
   readOnly("pr_read"),
   sideEffect("pr_merge"),
@@ -131,6 +135,8 @@ export type GhToolRequest =
       readonly title: string;
       readonly body: string;
       readonly labels: readonly string[];
+      readonly role?: "tracking" | "case";
+      readonly kind?: "problem" | "idea" | "task" | "risk";
     }
   | { readonly operation: "issue_read"; readonly number: IssueNumber }
   | {
@@ -138,17 +144,41 @@ export type GhToolRequest =
       readonly number: IssueNumber;
       readonly title?: string;
       readonly body?: string;
+      readonly labels?: readonly string[];
+      readonly kind?: "problem" | "idea" | "task" | "risk";
+      readonly trackingState?:
+        | "created"
+        | "in-discussion"
+        | "on-hold"
+        | "ready"
+        | "resolved";
     }
   | {
       readonly operation: "issue_comment";
       readonly number: IssueNumber;
-      readonly body: string;
+      readonly body?: string;
     }
   | {
       readonly operation: "issue_close";
       readonly number: IssueNumber;
       readonly reason?: "completed" | "not_planned";
     }
+  | {
+      readonly operation: "issue_list";
+      readonly role?: "tracking" | "case";
+      readonly kind?: "problem" | "idea" | "task" | "risk";
+      readonly state?: "open" | "closed";
+      readonly trackingState?:
+        | "created"
+        | "in-discussion"
+        | "on-hold"
+        | "ready"
+        | "resolved"
+        | "closed";
+      readonly labels?: readonly string[];
+      readonly search?: string;
+    }
+  | { readonly operation: "issue_reopen"; readonly number: IssueNumber }
   | {
       readonly operation: "pr_create";
       readonly title: string;
@@ -179,6 +209,18 @@ export type GhToolSuccess =
       readonly title: string;
       readonly body: string;
       readonly state: "open" | "closed";
+      readonly labels: readonly string[];
+      readonly role: "tracking" | "case";
+      readonly kind: "problem" | "idea" | "task" | "risk" | null;
+      readonly trackingState:
+        | "created"
+        | "in-discussion"
+        | "on-hold"
+        | "ready"
+        | "resolved"
+        | "closed"
+        | null;
+      readonly closeReason: "completed" | "not_planned" | null;
     }
   | {
       readonly operation: "issue_update";
@@ -189,11 +231,21 @@ export type GhToolSuccess =
       readonly operation: "issue_comment";
       readonly number: IssueNumber;
       readonly url: string;
+      readonly comments: readonly IssueCommentSummary[];
     }
   | {
       readonly operation: "issue_close";
       readonly number: IssueNumber;
       readonly state: "closed";
+    }
+  | {
+      readonly operation: "issue_list";
+      readonly issues: readonly IssueListItem[];
+    }
+  | {
+      readonly operation: "issue_reopen";
+      readonly number: IssueNumber;
+      readonly state: "open";
     }
   | {
       readonly operation: "pr_create";
@@ -222,6 +274,33 @@ export type GhToolSuccess =
       readonly number: PrNumber;
       readonly mergeable: "MERGEABLE" | "CONFLICTING" | "UNKNOWN";
     };
+
+/** issue_comment 読取モードの応答（コメントの時系列）。 */
+export interface IssueCommentSummary {
+  readonly body: string;
+  readonly createdAt: string | null;
+  readonly url: string | null;
+}
+
+/** issue_list の一覧エントリ（絞り込み可能な構造化結果）。 */
+export interface IssueListItem {
+  readonly number: IssueNumber;
+  readonly title: string;
+  readonly url: string;
+  readonly state: "open" | "closed";
+  readonly labels: readonly string[];
+  readonly role: "tracking" | "case";
+  readonly kind: "problem" | "idea" | "task" | "risk" | null;
+  readonly trackingState:
+    | "created"
+    | "in-discussion"
+    | "on-hold"
+    | "ready"
+    | "resolved"
+    | "closed"
+    | null;
+  readonly closeReason: "completed" | "not_planned" | null;
+}
 
 /** 操作結果（保証と失敗を型で強制する）。 */
 export type GhToolResult =

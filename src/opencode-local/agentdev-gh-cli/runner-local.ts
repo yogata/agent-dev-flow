@@ -1,48 +1,140 @@
-// agentdev-gh Custom Tool の Local 実装（GhRunner、REQ-011-006 / DEC-004）。
+// agentdev-gh Custom Tool の Local 実現（GhRunner、REQ-011-006 / DEC-004）。
 //
-// 同一の操作契約（contracts.ts の10操作）を、GitHub Issue/PR の代わりに
-// Case ファイル（`.agentdev/cases/case-{NNNN}.md`）の読み書きへ読み替える。
-// Workflow は GitHub 実装（runner-cli.ts）と本実装の差を認識しない。
+// 同一の操作契約（contracts.ts の12操作）を、GitHub Issue/PR の代わりに
+// ローカルIssue（`.agentdev/issues/issue-{NNNN}.md`、単一採番空間）の
+// 読み書きへ読み替える。Workflow は GitHub 実装（runner-cli.ts）と本実装の
+// 差を認識しない。
 //
 // 読み替え規則（正本: docs/designs/local/local-case-file.md、操作用定義: case-schema/）:
-//   - Issue 番号 = Case 番号（4 桁ゼロ埋め、欠番再利用なし）
-//   - Issue state  = Case status の非終端（open/running/blocked/review）→ open、終端 → closed
-//   - PR state    = `## マージ結果` 記録済み → merged、それ以外は Case status から写像
-//   - 出力 URL    = Case ファイルの絶対パス（GitHub 実装の Issue/PR URL に代わる一意識別子）
+//   - Issue 番号 = ローカルIssue番号（4 桁ゼロ埋め、欠番再利用なし、role ごとに採番を分けない）
+//   - frontmatter = 共通メタデータ（id/title/role/status/created_at/updated_at/closed_at/labels）
+//   - role: tracking は追跡Issue 6状態、role: case は Case 実行 6状態（role 条件付きスキーマ）
+//   - Issue state = status の非終端 → open、終端 → closed（role ごとの終端判定）
+//   - PR 系操作（pr_*）の対象は role: case のローカルIssueに限る
+//   - issue_comment は role により読み替え先セクションを分岐する
+//     （tracking: `## 検討経過`、case: `## 作業ログ`）
+//   - 出力 URL = ローカルIssueファイルの絶対パス（GitHub 実装の URL に代わる一意識別子）
 //   - 本文の内容Routing（テンプレート展開等）は本 Tool の責務外（REQ-011-020）
+//
+// 物理写像（role/kind/状態と frontmatter/ラベルの対応）の機械適用は
+// Tool 本体の tracking-schema.ts が所有する写像表に従う。
 
 
 import * as fs from "node:fs";
 import * as path from "node:path";
 import type { GhRunner, GhRunnerReply, GhRunnerRequest } from "../../opencode/tools/agentdev-gh/runner.ts";
+import {
+  LOCAL_TRACKING_LABEL_VALUES,
+  LOCAL_TRACKING_STATUS_VALUES,
+  parseTrackingKind,
+  parseTrackingState,
+  REOPEN_TRACKING_STATE,
+  TRACKING_KINDS,
+  type CloseReason,
+  type IssueRole,
+  type TrackingKind,
+  type TrackingState,
+} from "../../opencode/tools/agentdev-gh/tracking-schema.ts";
 
-const CASE_FILE_PREFIX = "case-";
-const CASE_FILE_SUFFIX = ".md";
+const ISSUE_FILE_PREFIX = "issue-";
+const ISSUE_FILE_SUFFIX = ".md";
 const FRONTMATTER_DELIMITER = "---";
 
 const HEADING_WORKLOG = "## 作業ログ";
+const HEADING_DISCUSSION = "## 検討経過";
 const HEADING_MERGE_CHECK = "## マージ前確認";
 const HEADING_MERGE_RESULT = "## マージ結果";
 const HEADINGS_BEFORE_WORKLOG = [HEADING_MERGE_CHECK, "## Design確定候補", "## Findings / Capture候補"];
 const PR_TITLE_PREFIX = "### PR title: ";
 
-const NON_TERMINAL_STATUSES = ["open", "running", "blocked", "review"] as const;
+const CASE_NON_TERMINAL_STATUSES = ["open", "running", "blocked", "review"] as const;
+const CASE_TERMINAL_STATUSES = ["closed", "cancelled"] as const;
+const CASE_STATUS_VALUES = [...CASE_NON_TERMINAL_STATUSES, ...CASE_TERMINAL_STATUSES] as const;
+const CASE_LABEL_VALUES = ["feature", "bugfix", "maintenance", "docs", "refactor", "chore", "epic"] as const;
 
 export interface LocalRunnerOptions {
-  /** Case ファイルの配置ディレクトリ（`.agentdev/cases`）。 */
-  readonly casesDir: string;
+  /** ローカルIssueの配置ディレクトリ（`.agentdev/issues`）。 */
+  readonly issuesDir: string;
   /** 日時の注入点（テスト用）。省略時は実行時刻。 */
   readonly now?: () => Date;
 }
 
-interface CaseFrontmatter {
+/** ローカルIssueの共通メタデータ（frontmatter）。 */
+export interface LocalIssueFrontmatter {
   readonly id: string;
   readonly title: string;
+  readonly role: IssueRole;
   readonly status: string;
   readonly created_at: string;
   readonly updated_at: string;
   readonly closed_at: string;
   readonly labels: readonly string[];
+}
+
+/** role 条件付きスキーマの検証結果。 */
+export interface LocalIssueValidation {
+  readonly valid: boolean;
+  readonly errors: readonly string[];
+}
+
+/** role ごとの status 値域（role 条件付きスキーマの機械検証用）。 */
+export function localStatusValues(role: IssueRole): readonly string[] {
+  return role === "tracking" ? LOCAL_TRACKING_STATUS_VALUES : CASE_STATUS_VALUES;
+}
+
+/** role ごとの labels 値域（同上）。 */
+export function localLabelValues(role: IssueRole): readonly string[] {
+  return role === "tracking" ? LOCAL_TRACKING_LABEL_VALUES : CASE_LABEL_VALUES;
+}
+
+/** role ごとの終端 status。 */
+export function localTerminalStatuses(role: IssueRole): readonly string[] {
+  return role === "tracking" ? ["closed"] : CASE_TERMINAL_STATUSES;
+}
+
+/** role 条件付きスキーマの検証（共通メタデータ、status 値域、labels 値域、closed_at 条件）。 */
+export function validateLocalIssue(
+  fm: LocalIssueFrontmatter,
+  fileName: string,
+): LocalIssueValidation {
+  const errors: string[] = [];
+  const expectedId = `${ISSUE_FILE_PREFIX}${fileName.replace(ISSUE_FILE_PREFIX, "").replace(ISSUE_FILE_SUFFIX, "")}`;
+  if (fm.id !== fileName.replace(ISSUE_FILE_SUFFIX, "") && fm.id !== expectedId) {
+    errors.push(`id must match the file name (${fileName})`);
+  }
+  if (!new RegExp(`^${ISSUE_FILE_PREFIX}[0-9]{4}$`).test(fm.id)) {
+    errors.push(`id must be ${ISSUE_FILE_PREFIX}{NNNN}: ${fm.id}`);
+  }
+  if (fm.title.length === 0) errors.push("title must not be empty");
+  if (fm.role !== "tracking" && fm.role !== "case") {
+    errors.push(`role must be tracking or case: ${fm.role}`);
+    return { valid: false, errors };
+  }
+  if (!localStatusValues(fm.role).includes(fm.status)) {
+    errors.push(`status '${fm.status}' is not in the ${fm.role} status values`);
+  }
+  const labelValues = localLabelValues(fm.role);
+  for (const label of fm.labels) {
+    if (!labelValues.includes(label)) {
+      errors.push(`label '${label}' is not in the ${fm.role} label values`);
+    }
+  }
+  if (fm.role === "tracking") {
+    const kindLabels = fm.labels.filter((l) =>
+      (TRACKING_KINDS as readonly string[]).includes(l),
+    );
+    if (kindLabels.length !== 1) {
+      errors.push("tracking issues require exactly one kind label");
+    }
+  }
+  const terminal = localTerminalStatuses(fm.role).includes(fm.status);
+  if (terminal && fm.closed_at.length === 0) {
+    errors.push("terminal status requires closed_at");
+  }
+  if (!terminal && fm.closed_at.length > 0) {
+    errors.push("non-terminal status must not have closed_at");
+  }
+  return { valid: errors.length === 0, errors };
 }
 
 function isRecord(v: unknown): v is Record<string, unknown> {
@@ -53,13 +145,13 @@ function toLf(text: string): string {
   return text.replace(/\r\n/g, "\n");
 }
 
-function caseFileName(number: number): string {
-  return `${CASE_FILE_PREFIX}${String(number).padStart(4, "0")}${CASE_FILE_SUFFIX}`;
+function issueFileName(number: number): string {
+  return `${ISSUE_FILE_PREFIX}${String(number).padStart(4, "0")}${ISSUE_FILE_SUFFIX}`;
 }
 
-function parseCaseNumber(fileName: string): number | null {
-  if (!fileName.startsWith(CASE_FILE_PREFIX) || !fileName.endsWith(CASE_FILE_SUFFIX)) return null;
-  const digits = fileName.slice(CASE_FILE_PREFIX.length, -CASE_FILE_SUFFIX.length);
+function parseIssueNumber(fileName: string): number | null {
+  if (!fileName.startsWith(ISSUE_FILE_PREFIX) || !fileName.endsWith(ISSUE_FILE_SUFFIX)) return null;
+  const digits = fileName.slice(ISSUE_FILE_PREFIX.length, -ISSUE_FILE_SUFFIX.length);
   if (!/^\d{4}$/.test(digits)) return null;
   const n = Number.parseInt(digits, 10);
   return Number.isInteger(n) && n > 0 ? n : null;
@@ -69,12 +161,13 @@ function quoteYamlString(value: string): string {
   return `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
 }
 
-function serializeFrontmatter(fm: CaseFrontmatter): string {
+function serializeFrontmatter(fm: LocalIssueFrontmatter): string {
   const labels = fm.labels.length > 0 ? `[${fm.labels.join(", ")}]` : "[]";
   return [
     FRONTMATTER_DELIMITER,
     `id: ${fm.id}`,
     `title: ${quoteYamlString(fm.title)}`,
+    `role: ${fm.role}`,
     `status: ${fm.status}`,
     `created_at: ${quoteYamlString(fm.created_at)}`,
     `updated_at: ${quoteYamlString(fm.updated_at)}`,
@@ -84,8 +177,8 @@ function serializeFrontmatter(fm: CaseFrontmatter): string {
   ].join("\n");
 }
 
-interface ParsedCase {
-  readonly fm: CaseFrontmatter;
+interface ParsedIssue {
+  readonly fm: LocalIssueFrontmatter;
   readonly bodyAfterFrontmatter: string;
   readonly raw: string;
 }
@@ -97,7 +190,7 @@ function unquoteYamlString(v: string): string {
   return v;
 }
 
-function parseCase(raw: string): ParsedCase | null {
+function parseIssue(raw: string): ParsedIssue | null {
   const text = toLf(raw);
   const lines = text.split("\n");
   if (lines[0] !== FRONTMATTER_DELIMITER) return null;
@@ -113,12 +206,17 @@ function parseCase(raw: string): ParsedCase | null {
   }
   const id = fields.get("id");
   const title = fields.get("title");
+  const role = fields.get("role");
   const status = fields.get("status");
   const created = fields.get("created_at");
   const updated = fields.get("updated_at");
-  if (id === undefined || title === undefined || status === undefined || created === undefined || updated === undefined) {
+  if (
+    id === undefined || title === undefined || role === undefined ||
+    status === undefined || created === undefined || updated === undefined
+  ) {
     return null;
   }
+  if (role !== "tracking" && role !== "case") return null;
   const labelsRaw = fields.get("labels") ?? "[]";
   const labelsInner = labelsRaw.replace(/^\[/, "").replace(/\]$/, "").trim();
   const labels = labelsInner.length > 0 ? labelsInner.split(",").map((s) => s.trim()) : [];
@@ -126,6 +224,7 @@ function parseCase(raw: string): ParsedCase | null {
     fm: {
       id,
       title: unquoteYamlString(title),
+      role,
       status,
       created_at: unquoteYamlString(created),
       updated_at: unquoteYamlString(updated),
@@ -137,8 +236,8 @@ function parseCase(raw: string): ParsedCase | null {
   };
 }
 
-function isNonTerminal(status: string): boolean {
-  return (NON_TERMINAL_STATUSES as readonly string[]).includes(status);
+function isTerminal(role: IssueRole, status: string): boolean {
+  return localTerminalStatuses(role).includes(status);
 }
 
 function isoNow(now: () => Date): string {
@@ -147,11 +246,11 @@ function isoNow(now: () => Date): string {
 
 /** Local 実装の GhRunner。 */
 export class LocalRunner implements GhRunner {
-  private readonly casesDir: string;
+  private readonly issuesDir: string;
   private readonly now: () => Date;
 
   constructor(options: LocalRunnerOptions) {
-    this.casesDir = options.casesDir;
+    this.issuesDir = options.issuesDir;
     this.now = options.now ?? (() => new Date());
   }
 
@@ -171,21 +270,27 @@ export class LocalRunner implements GhRunner {
     return { ok: false, error, exitCode: null };
   }
 
-  private casePath(number: number): string {
-    return path.join(this.casesDir, caseFileName(number));
+  private issuePath(number: number): string {
+    return path.join(this.issuesDir, issueFileName(number));
   }
 
-  private readCase(number: number): { parsed: ParsedCase; file: string } | null {
-    const file = this.casePath(number);
+  private readIssue(number: number): { parsed: ParsedIssue; file: string } | null {
+    const file = this.issuePath(number);
     if (!fs.existsSync(file)) return null;
-    const parsed = parseCase(fs.readFileSync(file, "utf8"));
+    const parsed = parseIssue(fs.readFileSync(file, "utf8"));
     if (parsed === null) return null;
+    const validation = validateLocalIssue(parsed.fm, path.basename(file));
+    if (!validation.valid) {
+      throw new Error(
+        `local issue ${issueFileName(number)} violates the role-conditional schema: ${validation.errors.join("; ")}`,
+      );
+    }
     return { parsed, file };
   }
 
-  private writeCase(number: number, raw: string): void {
-    fs.mkdirSync(this.casesDir, { recursive: true });
-    fs.writeFileSync(this.casePath(number), toLf(raw), "utf8");
+  private writeIssue(number: number, raw: string): void {
+    fs.mkdirSync(this.issuesDir, { recursive: true });
+    fs.writeFileSync(this.issuePath(number), toLf(raw), "utf8");
   }
 
   private requireNumber(args: Record<string, unknown>): number | null {
@@ -193,41 +298,56 @@ export class LocalRunner implements GhRunner {
     return typeof n === "number" && Number.isInteger(n) && n > 0 ? n : null;
   }
 
-  private nextCaseNumber(): number {
-    return this.latestCaseNumber() + 1;
+  private nextIssueNumber(): number {
+    return this.latestIssueNumber() + 1;
   }
 
-  private latestCaseNumber(): number {
-    fs.mkdirSync(this.casesDir, { recursive: true });
+  private latestIssueNumber(role?: IssueRole): number {
+    fs.mkdirSync(this.issuesDir, { recursive: true });
     let max = 0;
-    for (const entry of fs.readdirSync(this.casesDir)) {
-      const n = parseCaseNumber(entry);
-      if (n !== null && n > max) max = n;
+    for (const entry of fs.readdirSync(this.issuesDir)) {
+      const n = parseIssueNumber(entry);
+      if (n === null || n <= max) continue;
+      if (role !== undefined) {
+        const parsed = parseIssue(
+          fs.readFileSync(path.join(this.issuesDir, entry), "utf8"),
+        );
+        if (parsed === null || parsed.fm.role !== role) continue;
+      }
+      max = n;
     }
     return max;
   }
 
-  /** Issue 系の state 出力（非終端 → open、終端 → closed）。 */
-  private issueState(status: string): "open" | "closed" | null {
-    return isNonTerminal(status) ? "open" : "closed";
+  /** Issue 系の state 出力（role ごとの終端判定: 非終端 → open、終端 → closed）。 */
+  private issueState(role: IssueRole, status: string): "open" | "closed" | null {
+    if (!localStatusValues(role).includes(status)) return null;
+    return isTerminal(role, status) ? "closed" : "open";
   }
 
-  /** PR 系の state 出力（マージ結果記録済み → merged）。 */
-  private prState(parsed: ParsedCase): "open" | "closed" | "merged" | null {
-    if (this.hasMergeResult(parsed)) return "merged";
-    return this.issueState(parsed.fm.status);
+  private trackingMetaOf(parsed: ParsedIssue): {
+    kind: TrackingKind | null;
+    trackingState: TrackingState | null;
+    closeReason: CloseReason | null;
+  } {
+    if (parsed.fm.role !== "tracking") {
+      return { kind: null, trackingState: null, closeReason: null };
+    }
+    const kind = parseTrackingKind(parsed.fm.labels.find((l) =>
+      (TRACKING_KINDS as readonly string[]).includes(l),
+    ));
+    return { kind, trackingState: parsed.fm.status as TrackingState, closeReason: null };
   }
 
-  private hasMergeResult(parsed: ParsedCase): boolean {
+  private hasMergeResult(parsed: ParsedIssue): boolean {
     return parsed.raw.split("\n").some((l) => l.trim() === HEADING_MERGE_RESULT);
   }
 
-  private mergeableOf(parsed: ParsedCase): "MERGEABLE" | "CONFLICTING" | "UNKNOWN" {
+  private mergeableOf(parsed: ParsedIssue): "MERGEABLE" | "CONFLICTING" | "UNKNOWN" {
     return parsed.fm.status === "review" ? "MERGEABLE" : "UNKNOWN";
   }
 
-  /** 最後の `## マージ前確認` セクションから PR title を取り出す。 */
-  private prTitle(parsed: ParsedCase): string | null {
+  private prTitle(parsed: ParsedIssue): string | null {
     const lines = parsed.raw.split("\n");
     let title: string | null = null;
     for (const line of lines) {
@@ -251,6 +371,10 @@ export class LocalRunner implements GhRunner {
         return this.issueComment(args);
       case "issue_close":
         return this.issueClose(args);
+      case "issue_list":
+        return this.issueList(args);
+      case "issue_reopen":
+        return this.issueReopen(args);
       case "pr_create":
         return this.prCreate(args);
       case "pr_read":
@@ -272,63 +396,182 @@ export class LocalRunner implements GhRunner {
     const title = typeof args.title === "string" ? args.title : null;
     const body = typeof args.body === "string" ? args.body : null;
     if (title === null || body === null) return this.fail("issue_create requires title and body");
+    const role: IssueRole = args.role === "tracking" ? "tracking" : "case";
+    const kind = args.kind === undefined ? null : parseTrackingKind(args.kind);
+    if (args.kind !== undefined && kind === null) {
+      return this.fail("issue_create received an invalid kind");
+    }
     const labels = Array.isArray(args.labels)
       ? args.labels.filter((l): l is string => typeof l === "string")
       : [];
-    const number = this.nextCaseNumber();
+    if (role === "tracking" && kind === null) {
+      return this.fail("tracking issue_create requires a kind");
+    }
+    const labelValues = localLabelValues(role);
+    for (const label of labels) {
+      if (!labelValues.includes(label)) {
+        return this.fail(`label '${label}' is not in the ${role} label values`);
+      }
+    }
+    const finalLabels = role === "tracking" && kind !== null ? [kind] : labels;
+    const number = this.nextIssueNumber();
     const timestamp = isoNow(this.now);
-    const fm: CaseFrontmatter = {
-      id: `case-${String(number).padStart(4, "0")}`,
+    const initialStatus = role === "tracking" ? "created" : "open";
+    const fm: LocalIssueFrontmatter = {
+      id: `${ISSUE_FILE_PREFIX}${String(number).padStart(4, "0")}`,
       title,
-      status: "open",
+      role,
+      status: initialStatus,
       created_at: timestamp,
       updated_at: timestamp,
       closed_at: "",
-      labels,
+      labels: finalLabels,
     };
-    this.writeCase(number, `${serializeFrontmatter(fm)}\n${toLf(body)}`);
-    return { ok: true, payload: { number, url: this.casePath(number) } };
+    this.writeIssue(number, `${serializeFrontmatter(fm)}\n${toLf(body)}`);
+    return { ok: true, payload: { number, url: this.issuePath(number) } };
   }
 
   private issueRead(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
     if (number === null) return this.fail("issue_read requires number");
-    const c = this.readCase(number);
-    if (c === null) return this.fail(`case file not found: ${caseFileName(number)}`);
-    const state = this.issueState(c.parsed.fm.status);
-    if (state === null) return this.fail(`unknown case status: ${c.parsed.fm.status}`);
+    const c = this.readIssue(number);
+    if (c === null) return this.fail(`local issue not found: ${issueFileName(number)}`);
+    const state = this.issueState(c.parsed.fm.role, c.parsed.fm.status);
+    if (state === null) return this.fail(`unknown issue status: ${c.parsed.fm.status}`);
+    const meta = this.trackingMetaOf(c.parsed);
     return {
       ok: true,
-      payload: { number, title: c.parsed.fm.title, body: c.parsed.raw, state },
+      payload: {
+        number,
+        title: c.parsed.fm.title,
+        body: c.parsed.raw,
+        state,
+        labels: c.parsed.fm.labels,
+        role: c.parsed.fm.role,
+        kind: meta.kind,
+        trackingState: meta.trackingState,
+        closeReason: meta.closeReason,
+      },
     };
   }
 
   private issueUpdate(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
     if (number === null) return this.fail("issue_update requires number");
-    const c = this.readCase(number);
-    if (c === null) return this.fail(`case file not found: ${caseFileName(number)}`);
-    if (typeof args.body === "string") {
-      // body は Case ファイル全体の内容（issue_read が返す形式）をそのまま反映する。
-      // updated_at の更新は呼び出し側の責務（読み戻し検証は全文一致を要求する）。
-      this.writeCase(number, toLf(args.body));
-    } else if (typeof args.title === "string") {
-      const fm: CaseFrontmatter = { ...c.parsed.fm, title: args.title };
-      this.writeCase(number, `${serializeFrontmatter(fm)}\n${c.parsed.bodyAfterFrontmatter.replace(/^\n+/, "")}`);
-    } else {
-      return this.fail("issue_update requires title or body");
+    const kind = args.kind === undefined ? null : parseTrackingKind(args.kind);
+    if (args.kind !== undefined && kind === null) {
+      return this.fail("issue_update received an invalid kind");
     }
-    return { ok: true, payload: { number, url: this.casePath(number) } };
+    const trackingState =
+      args.trackingState === undefined ? null : parseTrackingState(args.trackingState);
+    if (
+      args.trackingState !== undefined &&
+      (trackingState === null || trackingState === "closed")
+    ) {
+      return this.fail("issue_update trackingState must be a non-terminal state");
+    }
+    const c = this.readIssue(number);
+    if (c === null) return this.fail(`local issue not found: ${issueFileName(number)}`);
+    const fm = c.parsed.fm;
+
+    if (typeof args.body === "string") {
+      const replaced = parseIssue(toLf(args.body));
+      if (replaced === null) {
+        return this.fail("issue_update body must be the full local issue content");
+      }
+      const validation = validateLocalIssue(replaced.fm, issueFileName(number));
+      if (!validation.valid) {
+        return this.fail(`issue_update body violates the schema: ${validation.errors.join("; ")}`);
+      }
+      this.writeIssue(number, toLf(args.body));
+      return { ok: true, payload: { number, url: this.issuePath(number) } };
+    }
+
+    if ((kind !== null || trackingState !== null) && fm.role !== "tracking") {
+      return this.fail("issue_update kind/trackingState apply only to tracking issues");
+    }
+
+    const nextFm = {
+      id: fm.id,
+      title: fm.title,
+      role: fm.role,
+      status: fm.status,
+      created_at: fm.created_at,
+      updated_at: fm.updated_at,
+      closed_at: fm.closed_at,
+      labels: [...fm.labels],
+    };
+    let changed = false;
+    if (typeof args.title === "string" && args.title.length > 0) {
+      nextFm.title = args.title;
+      changed = true;
+    }
+    if (kind !== null) {
+      nextFm.labels = [kind];
+      changed = true;
+    }
+    if (trackingState !== null) {
+      nextFm.status = trackingState;
+      changed = true;
+    }
+    if (Array.isArray(args.labels)) {
+      const labels = args.labels.filter((l): l is string => typeof l === "string");
+      const labelValues = localLabelValues(fm.role);
+      for (const label of labels) {
+        if (!labelValues.includes(label)) {
+          return this.fail(`label '${label}' is not in the ${fm.role} label values`);
+        }
+      }
+      if (fm.role === "tracking") {
+        const currentKind = nextFm.labels.find((l) =>
+          (TRACKING_KINDS as readonly string[]).includes(l),
+        );
+        nextFm.labels = currentKind !== undefined ? [currentKind, ...labels] : labels;
+      } else {
+        nextFm.labels = labels;
+      }
+      changed = true;
+    }
+    if (!changed) {
+      return this.fail("issue_update requires title, body, labels, kind, or trackingState");
+    }
+    const validation = validateLocalIssue(nextFm, issueFileName(number));
+    if (!validation.valid) {
+      return this.fail(`issue_update violates the schema: ${validation.errors.join("; ")}`);
+    }
+    nextFm.updated_at = isoNow(this.now);
+    this.writeIssue(
+      number,
+      `${serializeFrontmatter(nextFm)}\n${c.parsed.bodyAfterFrontmatter.replace(/^\n+/, "")}`,
+    );
+    return { ok: true, payload: { number, url: this.issuePath(number) } };
   }
 
   private issueComment(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
     if (number === null) return this.fail("issue_comment requires number");
+    const c = this.readIssue(number);
+    if (c === null) return this.fail(`local issue not found: ${issueFileName(number)}`);
+    if (args.body === undefined) {
+      return { ok: true, payload: { number, comments: this.readComments(c.parsed) } };
+    }
     const body = typeof args.body === "string" ? args.body : null;
-    if (body === null) return this.fail("issue_comment requires body");
-    const c = this.readCase(number);
-    if (c === null) return this.fail(`case file not found: ${caseFileName(number)}`);
+    if (body === null) return this.fail("issue_comment requires a string body");
     const lines = c.parsed.raw.split("\n");
+    if (c.parsed.fm.role === "tracking") {
+      const entry = [
+        "",
+        `### ${isoNow(this.now)}`,
+        "",
+        toLf(body).replace(/^\n+/, "").replace(/\n+$/, ""),
+        "",
+      ].join("\n");
+      if (!lines.some((l) => l.trim() === HEADING_DISCUSSION)) {
+        lines.push("", HEADING_DISCUSSION, "");
+      }
+      this.writeIssue(number, `${lines.join("\n").replace(/\n+$/, "")}\n${entry}`);
+      return { ok: true, payload: { number, url: this.issuePath(number) } };
+    }
     let insertAt = lines.length;
     if (!lines.some((l) => l.trim() === HEADING_WORKLOG)) {
       for (let i = 0; i < lines.length; i++) {
@@ -342,39 +585,198 @@ export class LocalRunner implements GhRunner {
       lines.splice(insertAt, 0, HEADING_WORKLOG, "");
     }
     const updated = `${lines.join("\n").replace(/\n+$/, "")}\n${toLf(body).replace(/^\n+/, "").replace(/\n+$/, "")}\n`;
-    this.writeCase(number, updated);
-    return { ok: true, payload: { number, url: this.casePath(number) } };
+    this.writeIssue(number, updated);
+    return { ok: true, payload: { number, url: this.issuePath(number) } };
+  }
+
+  /** コメント読取（role 分岐: tracking は検討経過の日時エントリ、case は作業ログ全文）。 */
+  private readComments(parsed: ParsedIssue): { body: string; createdAt: string | null; url: null }[] {
+    const lines = parsed.raw.split("\n");
+    if (parsed.fm.role === "tracking") {
+      const comments: { body: string; createdAt: string | null; url: null }[] = [];
+      let inSection = false;
+      let current: { createdAt: string | null; bodyLines: string[] } | null = null;
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed === HEADING_DISCUSSION) {
+          inSection = true;
+          continue;
+        }
+        if (trimmed.startsWith("## ")) {
+          if (trimmed !== HEADING_DISCUSSION) inSection = false;
+          continue;
+        }
+        if (!inSection) continue;
+        if (trimmed.startsWith("### ")) {
+          if (current !== null && (current.createdAt !== null || current.bodyLines.length > 0)) {
+            comments.push({
+              body: current.bodyLines.join("\n").replace(/\n+$/, ""),
+              createdAt: current.createdAt,
+              url: null,
+            });
+          }
+          current = { createdAt: trimmed.slice(4).trim() || null, bodyLines: [] };
+          continue;
+        }
+        if (current !== null) current.bodyLines.push(line);
+      }
+      if (current !== null && (current.createdAt !== null || current.bodyLines.length > 0)) {
+        comments.push({
+          body: current.bodyLines.join("\n").replace(/\n+$/, ""),
+          createdAt: current.createdAt,
+          url: null,
+        });
+      }
+      return comments;
+    }
+    const start = lines.findIndex((l) => l.trim() === HEADING_WORKLOG);
+    if (start < 0) return [];
+    const body: string[] = [];
+    for (let i = start + 1; i < lines.length; i++) {
+      const line = lines[i];
+      if (line === undefined) continue;
+      if (line.trim().startsWith("## ")) break;
+      body.push(line);
+    }
+    const text = body.join("\n").replace(/^\n+/, "").replace(/\n+$/, "");
+    if (text.length === 0) return [];
+    return [{ body: text, createdAt: null, url: null }];
   }
 
   private issueClose(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
     if (number === null) return this.fail("issue_close requires number");
-    const c = this.readCase(number);
-    if (c === null) return this.fail(`case file not found: ${caseFileName(number)}`);
+    const c = this.readIssue(number);
+    if (c === null) return this.fail(`local issue not found: ${issueFileName(number)}`);
     const reason = typeof args.reason === "string" ? args.reason : "completed";
-    const fm: CaseFrontmatter = {
+    const terminal =
+      c.parsed.fm.role === "tracking"
+        ? "closed"
+        : reason === "not_planned"
+          ? "cancelled"
+          : "closed";
+    const fm: LocalIssueFrontmatter = {
       ...c.parsed.fm,
-      status: reason === "not_planned" ? "cancelled" : "closed",
+      status: terminal,
       closed_at: isoNow(this.now),
       updated_at: isoNow(this.now),
     };
-    this.writeCase(number, `${serializeFrontmatter(fm)}\n${c.parsed.bodyAfterFrontmatter.replace(/^\n+/, "")}`);
+    const validation = validateLocalIssue(fm, issueFileName(number));
+    if (!validation.valid) {
+      return this.fail(`issue_close violates the schema: ${validation.errors.join("; ")}`);
+    }
+    this.writeIssue(
+      number,
+      `${serializeFrontmatter(fm)}\n${c.parsed.bodyAfterFrontmatter.replace(/^\n+/, "")}`,
+    );
     return { ok: true, payload: { number, state: "closed" } };
   }
 
+  private issueList(args: Record<string, unknown>): GhRunnerReply {
+    const role = args.role === "tracking" || args.role === "case" ? args.role : null;
+    const kind = args.kind === undefined ? null : parseTrackingKind(args.kind);
+    if (args.kind !== undefined && kind === null) {
+      return this.fail("issue_list received an invalid kind");
+    }
+    const state = args.state === "open" || args.state === "closed" ? args.state : null;
+    const trackingState =
+      args.trackingState === undefined ? null : parseTrackingState(args.trackingState);
+    if (args.trackingState !== undefined && trackingState === null) {
+      return this.fail("issue_list received an invalid trackingState");
+    }
+    const labels = Array.isArray(args.labels)
+      ? args.labels.filter((l): l is string => typeof l === "string")
+      : [];
+    const search = typeof args.search === "string" && args.search.length > 0 ? args.search : null;
+
+    fs.mkdirSync(this.issuesDir, { recursive: true });
+    const issues: Record<string, unknown>[] = [];
+    const entries = fs.readdirSync(this.issuesDir).sort();
+    for (const entry of entries) {
+      const n = parseIssueNumber(entry);
+      if (n === null) continue;
+      const parsed = parseIssue(fs.readFileSync(path.join(this.issuesDir, entry), "utf8"));
+      if (parsed === null) continue;
+      const validation = validateLocalIssue(parsed.fm, entry);
+      if (!validation.valid) continue;
+      const issueState = this.issueState(parsed.fm.role, parsed.fm.status);
+      if (issueState === null) continue;
+      const meta = this.trackingMetaOf(parsed);
+      if (role !== null && parsed.fm.role !== role) continue;
+      if (kind !== null && meta.kind !== kind) continue;
+      if (state !== null && issueState !== state) continue;
+      if (trackingState !== null && meta.trackingState !== trackingState) continue;
+      if (labels.length > 0 && !labels.every((l) => parsed.fm.labels.includes(l))) continue;
+      if (search !== null && !parsed.fm.title.includes(search)) continue;
+      issues.push({
+        number: n,
+        title: parsed.fm.title,
+        url: this.issuePath(n),
+        state: issueState,
+        labels: parsed.fm.labels,
+        role: parsed.fm.role,
+        kind: meta.kind,
+        trackingState: meta.trackingState,
+        closeReason: meta.closeReason,
+      });
+    }
+    return { ok: true, payload: { issues } };
+  }
+
+  private issueReopen(args: Record<string, unknown>): GhRunnerReply {
+    const number = this.requireNumber(args);
+    if (number === null) return this.fail("issue_reopen requires number");
+    const c = this.readIssue(number);
+    if (c === null) return this.fail(`local issue not found: ${issueFileName(number)}`);
+    if (c.parsed.fm.role !== "tracking") {
+      return this.fail("issue_reopen applies only to tracking issues in the local implementation");
+    }
+    if (c.parsed.fm.status !== "closed") {
+      return this.fail(`issue_reopen requires a closed tracking issue: ${c.parsed.fm.status}`);
+    }
+    const fm: LocalIssueFrontmatter = {
+      ...c.parsed.fm,
+      status: REOPEN_TRACKING_STATE,
+      closed_at: "",
+      updated_at: isoNow(this.now),
+    };
+    const validation = validateLocalIssue(fm, issueFileName(number));
+    if (!validation.valid) {
+      return this.fail(`issue_reopen violates the schema: ${validation.errors.join("; ")}`);
+    }
+    this.writeIssue(
+      number,
+      `${serializeFrontmatter(fm)}\n${c.parsed.bodyAfterFrontmatter.replace(/^\n+/, "")}`,
+    );
+    return { ok: true, payload: { number, state: "open" } };
+  }
+
   // ---------------------------------------------------------------------
-  // PR 系
+  // PR 系（対象は role: case のローカルIssueに限る）
   // ---------------------------------------------------------------------
+
+  private requireCaseIssue(number: number): { parsed: ParsedIssue } | GhRunnerReply {
+    const c = this.readIssue(number);
+    if (c === null) {
+      return this.fail(`local issue not found: ${issueFileName(number)}`);
+    }
+    if (c.parsed.fm.role !== "case") {
+      return this.fail(
+        `PR operations apply only to role: case local issues: ${issueFileName(number)}`,
+      );
+    }
+    return { parsed: c.parsed };
+  }
 
   private prCreate(args: Record<string, unknown>): GhRunnerReply {
     const title = typeof args.title === "string" ? args.title : null;
     const body = typeof args.body === "string" ? args.body : null;
     if (title === null || body === null) return this.fail("pr_create requires title and body");
-    // 操作契約上 pr_create は番号を持たないため、ローカル版は最新 Case を対象とする。
-    const number = this.requireNumber(args) ?? this.latestCaseNumber();
-    if (number <= 0) return this.fail("pr_create requires an existing case");
-    const c = this.readCase(number);
-    if (c === null) return this.fail(`case file not found: ${caseFileName(number)}`);
+    // 操作契約上 pr_create は番号を持たないため、ローカル版は最新の role: case ローカルIssueを対象とする。
+    const number = this.requireNumber(args) ?? this.latestIssueNumber("case");
+    if (number <= 0) return this.fail("pr_create requires an existing case issue");
+    const target = this.requireCaseIssue(number);
+    if (!("parsed" in target)) return target;
     const section = [
       "",
       HEADING_MERGE_CHECK,
@@ -384,23 +786,25 @@ export class LocalRunner implements GhRunner {
       toLf(body).replace(/\n+$/, ""),
       "",
     ].join("\n");
-    this.writeCase(number, `${c.parsed.raw.replace(/\n+$/, "")}\n${section}`);
-    return { ok: true, payload: { number, url: this.casePath(number) } };
+    this.writeIssue(number, `${target.parsed.raw.replace(/\n+$/, "")}\n${section}`);
+    return { ok: true, payload: { number, url: this.issuePath(number) } };
   }
 
   private prRead(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
     if (number === null) return this.fail("pr_read requires number");
-    const c = this.readCase(number);
-    if (c === null) return this.fail(`case file not found: ${caseFileName(number)}`);
-    const title = this.prTitle(c.parsed);
-    const state = this.prState(c.parsed);
+    const target = this.requireCaseIssue(number);
+    if (!("parsed" in target)) return target;
+    const title = this.prTitle(target.parsed);
+    const state = this.hasMergeResult(target.parsed)
+      ? "merged"
+      : this.issueState("case", target.parsed.fm.status);
     if (title === null || state === null) {
-      return this.fail(`case file has no PR section: ${caseFileName(number)}`);
+      return this.fail(`local issue has no PR section: ${issueFileName(number)}`);
     }
     return {
       ok: true,
-      payload: { number, title, state, mergeable: this.mergeableOf(c.parsed) },
+      payload: { number, title, state, mergeable: this.mergeableOf(target.parsed) },
     };
   }
 
@@ -408,8 +812,8 @@ export class LocalRunner implements GhRunner {
     const number = this.requireNumber(args);
     if (number === null) return this.fail("pr_merge requires number");
     const method = typeof args.method === "string" ? args.method : "merge";
-    const c = this.readCase(number);
-    if (c === null) return this.fail(`case file not found: ${caseFileName(number)}`);
+    const target = this.requireCaseIssue(number);
+    if (!("parsed" in target)) return target;
     const timestamp = isoNow(this.now);
     const record = [
       "",
@@ -420,18 +824,18 @@ export class LocalRunner implements GhRunner {
       `- 結果: PASS`,
       "",
     ].join("\n");
-    if (this.hasMergeResult(c.parsed)) {
-      return this.fail(`case file already has a merge result: ${caseFileName(number)}`);
+    if (this.hasMergeResult(target.parsed)) {
+      return this.fail(`local issue already has a merge result: ${issueFileName(number)}`);
     }
-    this.writeCase(number, `${c.parsed.raw.replace(/\n+$/, "")}\n${record}`);
+    this.writeIssue(number, `${target.parsed.raw.replace(/\n+$/, "")}\n${record}`);
     return { ok: true, payload: { number, merged: true } };
   }
 
   private prChangedFiles(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
     if (number === null) return this.fail("pr_changed_files requires number");
-    const c = this.readCase(number);
-    if (c === null) return this.fail(`case file not found: ${caseFileName(number)}`);
+    const target = this.requireCaseIssue(number);
+    if (!("parsed" in target)) return target;
     // ローカル版に変更ファイル一覧は存在しない（Git worktree の実状態が正）。
     return { ok: true, payload: { number, files: [] } };
   }
@@ -439,9 +843,9 @@ export class LocalRunner implements GhRunner {
   private prMergeable(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
     if (number === null) return this.fail("pr_mergeable requires number");
-    const c = this.readCase(number);
-    if (c === null) return this.fail(`case file not found: ${caseFileName(number)}`);
-    return { ok: true, payload: { number, mergeable: this.mergeableOf(c.parsed) } };
+    const target = this.requireCaseIssue(number);
+    if (!("parsed" in target)) return target;
+    return { ok: true, payload: { number, mergeable: this.mergeableOf(target.parsed) } };
   }
 }
 

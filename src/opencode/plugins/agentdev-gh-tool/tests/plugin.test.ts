@@ -41,7 +41,7 @@ describe("登録形状（OpenCode registry が要求する構造）", () => {
     expect(typeof def.execute).toBe("function");
   });
 
-  test("args.request の JSON Schema は10操作を enum で公開する", async () => {
+  test("args.request の JSON Schema は12操作を enum で公開する", async () => {
     const server = createAgentdevGhToolPlugin({
       resolveRepo: () => "owner/repo",
       createRunner: () => fakeRunner(async () => ({ ok: false, error: "unused", exitCode: 1 })),
@@ -50,7 +50,7 @@ describe("登録形状（OpenCode registry が要求する構造）", () => {
     const def = ((hooks as { tool: Record<string, unknown> }).tool["agentdev_gh"] ?? {}) as {
       args: { request: { properties: { operation: { enum: string[] } }; required: string[] } };
     };
-    expect(def.args.request.properties.operation.enum).toHaveLength(10);
+    expect(def.args.request.properties.operation.enum).toHaveLength(12);
     expect(def.args.request.required).toEqual(["operation"]);
   });
 });
@@ -63,7 +63,7 @@ describe("実行（注入 runner による成功・失敗）", () => {
         if (request.operation === "issue_read") {
           return {
             ok: true,
-            payload: { number: 7, title: "T", body: "B", state: "open" },
+            payload: { number: 7, title: "T", body: "B", state: "open", labels: [], role: "case", kind: null, trackingState: null, closeReason: null },
           };
         }
         return { ok: false, error: "unexpected op", exitCode: 1 };
@@ -86,7 +86,7 @@ describe("実行（注入 runner による成功・失敗）", () => {
           if (request.operation === "issue_create") {
             return { ok: true, payload: { number: 8, url: "https://example/i/8" } };
           }
-          return { ok: true, payload: { number: 8, title: "different", body: "B", state: "open" } };
+          return { ok: true, payload: { number: 8, title: "different", body: "B", state: "open", labels: [], role: "case", kind: null, trackingState: null, closeReason: null } };
         }),
     };
     const def = createAgentdevGhToolDefinition(failing);
@@ -120,11 +120,11 @@ describe("ローカル版差し替え（投影パスの Local 実装検出）", 
       path.join(projectionDir, "runner-local.ts"),
       [
         'import type { GhRunner } from "../../../../../../../src/opencode/tools/agentdev-gh/runner.ts";',
-        "export function createLocalRunner(options: { casesDir: string }): GhRunner {",
+        "export function createLocalRunner(options: { issuesDir: string }): GhRunner {",
         "  return {",
         "    async run(request) {",
         "      if (request.operation === \"issue_read\") {",
-        "        return { ok: true, payload: { number: 1, title: \"LOCAL\", body: \"B\", state: \"open\" } };",
+        "        return { ok: true, payload: { number: 1, title: \"LOCAL\", body: \"B\", state: \"open\", labels: [], role: \"case\", kind: null, trackingState: null, closeReason: null } };",
         "      }",
         "      return { ok: false, error: \"local stub: unsupported op\", exitCode: null };",
         "    },",
@@ -151,7 +151,7 @@ describe("ローカル版差し替え（投影パスの Local 実装検出）", 
       createRunner: () =>
         fakeRunner(async (request) => {
           if (request.operation === "issue_read") {
-            return { ok: true, payload: { number: 2, title: "GITHUB", body: "B", state: "open" } };
+            return { ok: true, payload: { number: 2, title: "GITHUB", body: "B", state: "open", labels: [], role: "case", kind: null, trackingState: null, closeReason: null } };
           }
           return { ok: false, error: "unexpected", exitCode: 1 };
         }),

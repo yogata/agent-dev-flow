@@ -15,7 +15,7 @@ link mode では `src/opencode/` の原本をそのまま接続するため、�
 | リポジトリ | 役割 | 主な対象パス |
 |---|---|---|
 | 仕様管理リポジトリ（AgentDevFlow 本体） | link 元の原本を保持 | `src/opencode/`, `src/opencode-local/agentdev-gh-cli/` |
-| 導入先リポジトリ | ローカル版を導入する利用側リポジトリ。`.opencode/` に link を張る | `.opencode/commands/`, `.opencode/skills/`, `.agentdev/cases/` |
+| 導入先リポジトリ | ローカル版を導入する利用側リポジトリ。`.opencode/` に link を張る | `.opencode/commands/`, `.opencode/skills/`, `.agentdev/issues/` |
 
 ローカル版導入の実体は AgentDevFlow 本体リポジトリでは行わない（REQ-0141-006）。
 
@@ -26,15 +26,15 @@ src/opencode-local/
 ├── README.md              ← 本ファイル（ローカル版 link 設定手順）
 ├── agentdev-gh-cli/       ← Custom Tool agentdev_gh の Local 実装 Tool（case-schema を吸収）
 │   ├── README.md          ← Local 実装 Tool の説明（読み替え規則・接続方式）
-│   ├── runner-local.ts    ← 同一操作契約の GhRunner 実装（Case ファイル読み書き）
+│   ├── runner-local.ts    ← 同一操作契約の GhRunner 実装（ローカルIssue読み書き）
 │   ├── tests/             ← Local 実装のテスト
-│   └── case-schema/       ← Case ファイルの操作用定義（正本は docs/designs/local/local-case-file.md）
-│       ├── case-file.md   ← スキーマ定義（YAML 前書き・status enum・labels・headings・採番）
+│   └── case-schema/       ← ローカルIssueの操作用定義（正本は docs/designs/local/local-case-file.md）
+│       ├── case-file.md   ← スキーマ定義（YAML 前書き・role 条件付き status/labels・headings・採番）
 │       └── rules/
 │           ├── frontmatter.yaml   ← YAML 前書きスキーマの機械可読定義
-│           ├── status.yaml        ← status enum と状態遷移表の機械可読定義
-│           ├── labels.yaml        ← labels 値域の機械可読定義
-│           └── headings.yaml      ← 見出し一覧の機械可読定義
+│           ├── status.yaml        ← role 条件付き status 値域と状態遷移表の機械可読定義
+│           ├── labels.yaml        ← role 条件付き labels 値域の機械可読定義
+│           └── headings.yaml      ← role 条件付き見出し一覧の機械可読定義
 ```
 
 link mode への移行に伴い、`transform/` と `generation-flow.md` は現行構成から除去済みである（AG-002, ADR-0131 decision #4, REQ-0141-028）。
@@ -130,15 +130,15 @@ link による接続であるため、上書き問題が発生しない。
 ## リポジトリ管理対象
 
 - **管理対象外**: link により接続された `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`、`.opencode/tools/agentdev-*/`（Local 実装差し替えを含む）、`.opencode/plugins/agentdev-*/`。導入先リポジトリの `.gitignore` で除外することを推奨する（REQ-0141-008, ADR-0131 decision #1）
-- **管理対象**: `.agentdev/cases/` 配下の Case ファイル（REQ-0141-016）
+- **管理対象**: `.agentdev/issues/` 配下のローカルIssue（単一採番空間、role 条件付きスキーマ）
 
 ## 関連項目
 
-- [Case ファイルスキーマ定義](agentdev-gh-cli/case-schema/case-file.md)：ローカル Case ファイルの構造
-- [Local 実装 Tool](agentdev-gh-cli/README.md)：Custom Tool `agentdev_gh` の Local 実装（同一操作契約の読み替え規則）
-- `docs/requirements/REQ-0141.md`：ローカル版 OpenCode 導入方式とローカル Case ファイル運用の要件定義（正本）
-- `docs/designs/local/local-generation.md`：link mode 接続フロー、link target 確認、更新運用の正本 Design
-- `docs/designs/local/local-case-file.md`：Case ファイルスキーマの正本 Design
+- [ローカルIssueスキーマ定義](agentdev-gh-cli/case-schema/case-file.md)：ローカルIssue（`.agentdev/issues/`）の構造
+- [Local 実装 Tool](agentdev-gh-cli/README.md)：Custom Tool `agentdev_gh` の Local 実現（同一操作契約の読み替え規則）
+- `docs/requirements/REQ-009.md`：配布基盤とローカル版導入モデルの要件定義（正本）
+- `docs/designs/local/runtime-package-boundary.md`：link mode 接続フロー、link target 確認、更新運用の正本 Design
+- `docs/designs/local/local-case-file.md`：ローカルIssue共通スキーマの正本 Design
 - `docs/designs/local/runtime-package-boundary.md`：`consumer_generated` リポジトリ種別、`.opencode/` 構成
 - v2:ADR-0131（tag v2.11.0）:ローカル版導入方式を link mode へ統一し生成方式を廃止（v2:ADR-0126 を supersede）
 - v2:ADR-0126（tag v2.11.0）:ローカル版 OpenCode 生成基盤（superseded by v2:ADR-0131、歴史参照）

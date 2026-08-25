@@ -1,36 +1,56 @@
-# ローカル Case ファイル labels 値域
+# ローカルIssue labels スキーマ（role 条件付き）
 #
-# 正本: docs/designs/local/local-case-file.md「labels 値域」
-# 要件: REQ-0141-019
+# 正本: docs/designs/local/local-case-file.md「role: tracking の条件付きスキーマ」「labels 値域（role: case）」
+# 要件: REQ-009-029
 #
-# labels フィールドに設定可能な値を定義する。
+# role ごとの labels 値域を定義する。role: tracking の kind 値の意味論の正は
+# agentdev-issue-tracking Design が所有する。
 # 本ファイルは docs/designs/local/local-case-file.md と矛盾してはならない。
 
-schema_version: "1.0"
-target: ".agentdev/cases/case-{NNNN}.md の labels フィールド"
+schema_version: "2.0"
+target: ".agentdev/issues/issue-{NNNN}.md の labels フィールド"
 canonical_spec: "docs/designs/local/local-case-file.md"
 
-# label_enum（REQ-0141-019）
-# labels は配列とし、以下の値域から選定する。
-# labels は補助分類であり、状態遷移やワークフロー状態の代替として扱わない。
-label_enum:
+# role 条件付き labels 値域
+role_conditional_labels:
+  tracking:
+    enum_ref: "#tracking_label_enum"
+    constraint: "kind 4 値からちょうど 1 つを含める"
+  case:
+    enum_ref: "#case_label_enum"
+    constraint: "0 個以上を選定"
+
+# role: tracking の labels 値域（kind と同値）
+tracking_label_enum:
+  problem:
+    description: "問題。解決が必要と認識された未解決事項"
+  idea:
+    description: "アイデア。将来の改善・拡張の候補"
+  task:
+    description: "作業。実施が見込まれる作業項目"
+  risk:
+    description: "リスク。将来の不確実な懸念"
+
+# role: case の labels 値域
+case_label_enum:
   feature:
-    description: "機能追加・新規実装"
+    description: "機能追加・新規開発"
   bugfix:
     description: "バグ修正"
   maintenance:
-    description: "保守作業・運用改善"
+    description: "保守・運用改善"
   docs:
     description: "ドキュメント作成・更新"
   refactor:
-    description: "リファクタリング・構造改善（振る舞い保持）"
+    description: "リファクタリング・構造改善（振る舞い維持）"
   chore:
     description: "雑務・設定変更・依存更新"
   epic:
-    description: "Epic（複数子 Case を束ねる大型課題）"
+    description: "Epic（複数子 Case を束ねる親票）"
 
 # ガードレール
 constraints:
-  - "labels.yaml の label_enum に存在しないラベルを追加してはならない"
+  - "role に対応する enum に存在しないラベルを追加してはならない"
   - "labels は配列として扱い、単一文字列としては扱わない"
   - "labels を状態遷移やワークフロー状態の代替として扱わない"
+  - "role: tracking は kind 4 値からちょうど 1 つを含める（機械検証）"
