@@ -6,7 +6,7 @@ AgentDevFlow を構成する成果物の種別、配置、ライフサイクル�
 
 | 種別 | 格納先 | 役割 |
 |------|--------|------|
-| REQ | `docs/requirements/REQ-{NNNN}.md` | 要件定義の永続基準 |
+| REQ | `docs/requirements/REQ-{NNN}.md` | 要件定義の永続基準 |
 | Decision（現行） | `docs/decisions/DEC-{NNN}.md` | 現行基準の技術判断記録 |
 | Design | `docs/designs/**/*.md` | 実装者が参照する現在設計（commands/skills/workflows の3層と基盤6ドメイン） |
 | Report | `docs/reports/**/*.md` | 監査・評価・観測の事実記録 |
@@ -70,7 +70,6 @@ requirements/REQ-{NNN}.md     # 要件定義（基準）
 .opencode/                        # 実行時の配置先（ジャンクション → src/opencode/）
   commands/agentdev/             # Command 定義（AgentDevFlow 配布対象）
   commands/repo/                 # AgentDevFlow 本体リポジトリ専用コマンド（DEC-001、配布対象外）
-  commands/agentdev/             # Command 定義（AgentDevFlow 配布対象）
   skills/agentdev-*/             # Skill 定義（AgentDevFlow 配布対象）
   skills/repo-*/                 # AgentDevFlow 本体リポジトリ専用スキル（DEC-001、配布対象外）
 src/opencode/                     # 原本（正規の定義ファイル）
@@ -109,7 +108,7 @@ scripts/
 ### ディレクトリ責務の補足
 
 - `.agentdev/`: AgentDevFlow のドメイン状態。Intake / Learning / Backlog / 整合性の永続データを管理する。配布物ではなく、リポジトリの動作状態を保持する（DEC-001）。AgentDevFlow 本体リポジトリ / 適用プロジェクトの双方で使用される。
-- `.agentdev-plugin/`: 適用プロジェクトにおける agent-dev-flow の git clone 先（v2:REQ-0103-072~077）。AgentDevFlow 本体リポジトリでは直接 `.agentdev/` を使用する。`.gitignore` で管理対象外とする。
+- `.agentdev-plugin/`: 適用プロジェクトにおける agent-dev-flow のチェックアウト先。AgentDevFlow 本体リポジトリでは直接 `.agentdev/` を使用する。`.gitignore` で管理対象外とする。
 - `.agentdev/drafts/`: コマンドワークフローでのみ明示的に定義された作業中ドラフトの引き継ぎに使用する一時領域。
 
 ## 成果物ライフサイクル
@@ -146,21 +145,21 @@ RU 削除は `/agentdev/case-open` の永続化成功に限定する。
 | `review` | PR 作成済み、レビュー中 | レビュー完了 |
 | `done` | 完了（post-run capture 含む） | レビュー完了 |
 
-6 マイクロフェーズは説明用ラベルであり、AgentDevFlow は全体横断の状態遷移モデルではなく、各コマンドの入出力契約とディレクトリ配置が実際の状態表現である（v2:REQ-0112-023）。
+6 マイクロフェーズは説明用ラベルであり、AgentDevFlow は全体横断の状態遷移モデルではなく、各コマンドの入出力契約とディレクトリ配置が実際の状態表現である。
 
-## 状態モデル制約（v2:REQ-0112）
+## 状態モデル制約
 
 以下の制約を AgentDevFlow の状態モデルに適用する。
 
-- REQ / Design の状態管理は Issue ラベル、GitHub Project で行う（v2:REQ-0112-027）
-- intake promoted の route / status はディレクトリ配置で表現する（v2:REQ-0112-028）
-- Issue / PR の状態を docs に複製しない（v2:REQ-0112-029）
-- command-map を状態遷移エンジン化しない（v2:REQ-0112-030）
+- REQ / Design の状態管理は Issue ラベル、GitHub Project で行う
+- intake promoted の route / status はディレクトリ配置で表現する
+- Issue / PR の状態を docs に複製しない
+- command-map を状態遷移エンジン化しない
 
 ## .agentdev/ の位置づけ
 
-`.agentdev/` は AgentDevFlow の正規のドメイン状態（永続的な管理情報）である（v2:REQ-0112-024）。
+`.agentdev/` は AgentDevFlow の正規のドメイン状態（永続的な管理情報）である。
 
 - **ドメイン状態**: Intake / Learning / Backlog / 整合性のパイプライン状態を保持する
-- **配布物ではない**: 実行時配布物の一部ではなく、agent-dev-flow リポジトリ内の作業領域である
-- **git 管理対象**: コマンド実行時に scoped commit で永続化される
+- **配布物ではない**: 実行時配布物の一部ではなく、リポジトリローカルの作業領域である
+- **git 管理対象**: ドメイン状態として git 管理対象とし、コマンド実行時に scoped commit で永続化される

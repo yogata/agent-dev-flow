@@ -6,7 +6,7 @@ AgentDevFlow の整合性検査と REQ 体系の健全性診断を説明する�
 
 agent-dev-flow リポジトリの自己監査コマンド。
 ドキュメント、スキル、コマンドの横断的整合性を検証する。
-AgentDevFlow の配布対象外であり、AgentDevFlow 本体リポジトリでのみ利用する（v2:ADR-0106、v2:REQ-0108-156）。
+AgentDevFlow の配布対象外であり、AgentDevFlow 本体リポジトリでのみ利用する（REQ-010）。
 
 ### 基本フロー
 
@@ -26,7 +26,7 @@ REQ/Decision/Skill/Command/Template/Workflow/Link/Canonical/Lifecycle/Namespace/
 - ライフサイクル境界
 - 旧 namespace 残存
 - 実装分類（Implementation Pattern）の診断
-- Decision の現行/廃止済み番号帯の区別（v2:REQ-0112-050）
+- Decision の現行/廃止済み番号帯の区別
 
 ### 検出事項の分類
 
@@ -43,7 +43,7 @@ REQ/Decision/Skill/Command/Template/Workflow/Link/Canonical/Lifecycle/Namespace/
 
 ### Decision 関連検査
 
-docs-check は Decision を現行の番号帯と廃止済みの番号帯に区別して検査する（v2:REQ-0112-050）:
+docs-check は Decision を現行の番号帯と廃止済みの番号帯に区別して検査する:
 
 - **現行 Decision**（`docs/decisions/DEC-001.md`〜`DEC-{NNN}.md`）: 3桁ID形式。status 遷移の妥当性、参照先 REQ の存在確認、誤分類の兆候検出を検査する
 - v2 歴史的 ADR（`v2:ADR-0001`〜`v2:ADR-0099`）: 4桁ID形式。履歴参照用。`v2:` プレフィックスで明示的に区別し、tag v2.11.0 で参照。Decision Map（`docs/decisions/README.md`）で後継関係のみ参照する
@@ -68,8 +68,7 @@ docs-check は Decision を現行の番号帯と廃止済みの番号帯に区�
 
 ## inspect-docs
 
-docs 全体の意味整合性と REQ 体系の健全性を検出するコマンド（v2:REQ-0109）。
-旧 `req-restructure-review` を統合し、REQ 再構成観点を含む全体意味検出を担う。
+docs 全体の意味整合性と REQ 体系の健全性を検出するコマンド（REQ-036）。
 
 ### 基本フロー
 
@@ -85,7 +84,7 @@ docs 全体の整合性を確認したい → /agentdev/inspect-docs → 検出�
 
 ## 3層ゲートと達成記録先
 
-整合性検査は3層ゲート構造で運用し、検査結果と達成状況は各層、各ルールの正規記録先に配置する（v2:REQ-0101-075、v2:REQ-0108-153）。
+整合性検査は3層ゲート構造で運用し、検査結果と達成状況は各層、各ルールの正規記録先に配置する。
 
 ### 3層ゲート概念
 
@@ -100,7 +99,7 @@ integrity 検査は検査範囲に応じて3層に分かれる。
 
 ### 達成状況の正規記録先
 
-各達成項目の正規記録先は以下の標準に従う（v2:REQ-0101-075、v2:REQ-0136-026）。
+各達成項目の正規記録先は以下の標準に従う。
 
 | 達成項目 | 正規記録先 |
 |---------|----------|
@@ -110,8 +109,8 @@ integrity 検査は検査範囲に応じて3層に分かれる。
 
 ### 記録時の遵守事項
 
-- Update Notes セクションは使用しない（v2:REQ-0101-071 遵守）。
-- 変更履歴は frontmatter `updated` フィールドのみで追跡する（v2:REQ-0101-073 遵守）。
+- Update Notes セクションは使用しない。
+- 変更履歴は frontmatter `updated` フィールドのみで追跡する。
 
 ## 整合性の考え方
 
