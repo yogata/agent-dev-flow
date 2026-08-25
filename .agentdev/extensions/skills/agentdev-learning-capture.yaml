@@ -1,0 +1,18 @@
+version: 1
+kind: capability-skill-extension
+id: agentdev-learning-capture
+
+context:
+  - id: design-principles
+    when: 設計原則参照時
+    paths:
+      - "docs/designs/foundations/design-principles.md"
+    purpose: learning capture の設計原則と境界の確認
+
+rules: []
+
+checks: []
+
+acceptance_gates: []
+
+must_not: []

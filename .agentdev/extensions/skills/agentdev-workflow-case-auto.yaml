@@ -1,0 +1,39 @@
+version: 1
+kind: workflow-extension
+id: agentdev-workflow-case-auto
+
+context:
+  - id: must-1
+    paths:
+      - "docs/designs/workflows/epic-wave-model.md"
+    purpose: Epic/Wave/Issue 実行モデルと execution_unit 構成の確認
+  - id: workflow-contracts
+    when: ワークフロー契約（フェーズ、SSoT 遷移、実装分類）参照時
+    paths:
+      - "docs/designs/workflows/workflow-contracts.md"
+    purpose: パイプライン概要と共通フェーズ契約の確認
+  - id: case-auto-spec
+    when: 本コマンド Design（adversarial-review 由来の停止伝播契約、bounded parent decision resolution、コンフリクト解消モデル3レベル、停止理由分類の分類軸、実証Case自走）参照時
+    paths:
+      - "docs/designs/commands/case-auto.md"
+    purpose: case-auto 固有契約の正規定義の確認。本コマンド定義は実行入口であり、契約の詳細は本 Design を正とする
+  - id: bounded-parent-decision-resolution-contract
+    when: bounded parent decision resolution の解決範囲、作業仮定の明示要件、上位合意矛盾・新規ユーザー判断事項の停止理由分類、resume 機構の参照時
+    paths:
+      - "docs/requirements/REQ-006.md"
+      - "docs/decisions/DEC-008.md"
+    purpose: decision_context 自律解決境界の正規契約（REQ-006-112〜114、DEC-008 決定1〜6）の確認
+  - id: adversarial-review-caller-contract
+    when: adversarial-review 由来の停止伝播（case-auto の停止伝播受領）、user-decision-required の位置づけ、再 review 条件、default-on + skip policy の参照時
+    paths:
+      - "docs/requirements/REQ-014.md"
+      - "docs/requirements/REQ-015.md"
+    purpose: adversarial-review caller integration 契約（REQ-014-007/008/009/010/011/012、REQ-015-002/006/012）の確認
+
+rules: []
+
+checks: []
+
+acceptance_gates: []
+
+must_not: []

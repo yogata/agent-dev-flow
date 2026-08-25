@@ -1,0 +1,18 @@
+version: 1
+kind: workflow-extension
+id: agentdev-workflow-inspect-skills
+
+context:
+  - id: docs-spec-rebuild-integrity
+    when: 配布物整合性ルール参照時
+    paths:
+      - "docs/designs/integrity/docs-spec-rebuild-integrity.md"
+    purpose: Command/Skill 参照妥当性検出の整合性ルール確認
+
+rules: []
+
+checks: []
+
+acceptance_gates: []
+
+must_not: []

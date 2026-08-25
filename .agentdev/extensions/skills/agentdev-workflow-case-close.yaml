@@ -1,0 +1,44 @@
+version: 1
+kind: workflow-extension
+id: agentdev-workflow-case-close
+
+context:
+  - id: must-1
+    paths:
+      - "docs/designs/foundations/document-model.md"
+    purpose: "REQ/Decision/Design/guides の責務マトリックスと文書間関係の確認（document-model Design）"
+  - id: case-auto-conflict-model
+    when: "case-auto 並行実行時のコンフリクト解消モデル参照時"
+    paths:
+      - "docs/designs/commands/case-auto.md"
+    purpose: "case-auto 連携時のコンフリクト解消手順の確認"
+  - id: case-close-spec
+    when: "case-close 工程 Design 参照時"
+    paths:
+      - "docs/designs/commands/case-close.md"
+    purpose: "case-close の完了ゲート、QG-4 達成判定、統合先へのマージと実証最終クローズの実行詳細の確認"
+  - id: index-auto-generation-spec
+    when: "Step 3-3 AUTOGEN block 索引再生成差分検出（単一 Issue / Epic Wave E5b 前段）参照時"
+    paths:
+      - "docs/designs/integrity/index-auto-generation.md"
+    purpose: "AUTOGEN block 自動生成機構と generate_indexes.ts の契約確認"
+  - id: discovery-2
+    purpose: docs/designs/README.md 経由で Design status と整合性ルールカタログを参照してよい
+  - id: discovery-3
+    purpose: "docs/designs/integrity/integrity-rule-catalog.md 経由で関連 IR を確認してよい"
+
+rules:
+  - id: traceability-qg4-independent-recheck
+    when: QG-4 で対象要件の実装対応・検証対応の完全性を独立して再検査するとき。利用不能時は既存の品質ゲート、targeted docs guard、rg 等の従来の検査手段で続行する
+    skill: agentdev-traceability
+
+checks:
+  - id: autogen-index-regeneration-diff
+    when: "Step 3-3（単一 Issue クローズ）および Step E5b 前段（Epic Wave クローズ）。generate_indexes.ts --dry-run で AUTOGEN block 再生成差分を検出する。差分あり（WOULD UPDATE 行を含む）場合は case-close を停止し case-run へ差戻す（再生成の実 commit は case-run が行う）。差分なしの場合のみ case-close を完了する。case-close 自身は索引ファイルを直接編集・commit しない。契約の詳細は case-close Design Step 3-3 参照"
+    skill: repo-agentdev-integrity
+
+acceptance_gates:
+  - 完了した Issue/PR の成果物が docs/requirements/, docs/decisions/, docs/designs/ のいずれかに存在すること
+  - PR 対象ファイルに src/opencode/commands/** または src/opencode/skills/** の変更を含む場合、当該変更ファイルが配布物参照境界（IR-059）に違反しないこと
+
+must_not: []

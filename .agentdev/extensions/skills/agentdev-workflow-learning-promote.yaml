@@ -1,0 +1,13 @@
+version: 1
+kind: workflow-extension
+id: agentdev-workflow-learning-promote
+
+context: []
+
+rules: []
+
+checks: []
+
+acceptance_gates: []
+
+must_not: []

@@ -1,0 +1,18 @@
+version: 1
+kind: capability-skill-extension
+id: agentdev-adversarial-review
+
+context:
+  - id: design-index
+    when: レビュー対象候補と evidence を README 索引、正規成果物の直接読取、rg 等の独立探索手段で探索するとき
+    paths:
+      - "docs/designs/README.md"
+    purpose: Design 一覧と入口表を起点としたレビュー対象候補の探索
+
+rules: []
+
+checks: []
+
+acceptance_gates: []
+
+must_not: []
