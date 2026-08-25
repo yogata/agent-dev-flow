@@ -29,13 +29,13 @@ AgentDevFlow プラグインの設定を管理するリポジトリ。AI エー�
 | PR がある | `/agentdev/case-close` | マージ済み + クローズ済み |
 | Issue の更新・コメント追加が必要 | `/agentdev/case-update` | 更新済み Issue |
 | 具体的な作業候補を収集したい | `/agentdev/intake-capture` | inbox 項目 |
-| クローズ済み Issue/PR から残課題を抽出したい | `/agentdev/intake-from-github` | inbox 項目 |
+| クローズ済み Case Issue/PR から残課題を抽出したい | `/agentdev/intake-from-github` | inbox 項目 |
 | inbox に項目がある | `/agentdev/intake-promote` | 採用済み / archive |
 | 再発防止知見を蓄積したい | `learning-capture`（スキル） | inbox.md エントリ |
 | inbox.md にエントリがある | `/agentdev/learning-promote` | 採用済み成果物 |
 | 採用済み成果物（intake/learning/inspect）がある | `/agentdev/backlog-review` | `RU-*.md` |
 | RU がある | `/agentdev/req-define` | 要件doc（draft） |
-| 未解決事項を課題として追跡したい | `/agentdev/issue` | 課題ファイル（`docs/issue-list/`） |
+| 未解決事項を課題として追跡したい | `/agentdev/issue` | 追跡Issue（GitHub Issue、Tool 操作契約経由） |
 | docs 全体の意味整合性を検出したい | `/agentdev/inspect-docs` | 検出事項（finding） |
 | Command/Skill 参照妥当性を検出したい | `/agentdev/inspect-skills` | 検出事項（finding） |
 | 検出事項を分類したい | `/agentdev/inspect-promote` | 採用済み成果物 |

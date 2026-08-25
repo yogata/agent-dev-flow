@@ -20,7 +20,7 @@ AgentDevFlow の各コマンドの入力、出力、次アクションを一覧�
 | `/agentdev/case-auto` | 要件doc/ Issue番号、URL | マージ済み + クローズ済み（req-save〜design-save〜case-close自走） | 完了 |
 | `/agentdev/backlog-auto` | なし（durable state から解決） | 検出事項、採用済み成果物、`RU-*.md`（backlog整理サイクル一巡） | RU がある場合: `/agentdev/req-define` |
 | `/agentdev/intake-capture` | ユーザー手動入力 | `inbox/` item | `/agentdev/intake-promote` |
-| `/agentdev/intake-from-github` | クローズ済み Issue/PR | `inbox/` item | `/agentdev/intake-promote` |
+| `/agentdev/intake-from-github` | クローズ済み Case Issue/PR | `inbox/` item | `/agentdev/intake-promote` |
 | `/agentdev/intake-promote` | `inbox/` item | `promoted/` 成果物 | `/agentdev/backlog-review` |
 | `/agentdev/issue` | 自然言語による課題管理の指示 | 追跡Issue の作成・更新・検索・参照（Tool 操作契約経由） | 継続利用または完了 |
 | `/agentdev/learning-promote` | `inbox.md` + `deferred.md` | `promoted/` 成果物 | `/agentdev/backlog-review` |

@@ -147,7 +147,7 @@ scripts/self-sync.ps1 を consumer リポジトリで実行した場合の停止
 
 ## -LocalMode の判断基準
 
-GitHub Issue/PR を使わずローカルファイル（.agentdev/cases/）で運用する環境
+GitHub Issue/PR を使わずローカルIssue（.agentdev/issues/）で運用する環境
 （ローカル版 OpenCode）では -LocalMode を指定する。
 
 ## 上級者向けオプション

@@ -57,7 +57,7 @@ req-impact-map.md の配置移動は未確定事項とし、参照方向、利�
 | 29 | REQ 検証基準（必達要件） | REQ-010 | integrity-contracts.md | 規範語ではなく必達要件判定に基づく検証（v2:REQ-0115-044 から REQ-010 に移管） |
 | 30 | Quality Gates | REQ-010 | quality-gates.md | QG-1〜QG-4 定義、機械化境界、実装マッピング（v2:REQ-0115 から REQ-010 に移管） |
 | 31 | docs 日本語表現、文意整合 | v2:REQ-0140, REQ-010 (003), REQ-036 (023) | integrity-rule-catalog.md (IR-045) | 英字混じり抽象用語、読取専用セマンティクスの検出。文書表記、文意品質ゲート（付帯品質ゲート）の機械検査担当 |
-| 32 | local-case-file（ローカル Case ファイルスキーマ） | REQ-009 (016-020, 024, 025) | local-case-file.md | ローカル版 OpenCode の Case ファイル YAML 前書き、status enum、labels 値域、見出し一覧、マージ結果記録 |
+| 32 | local-case-file（ローカルIssue共通スキーマ） | REQ-009 (016-020, 024, 025) | local-case-file.md | ローカル版 OpenCode のローカルIssue YAML 前書き、role 条件付き status enum、labels 値域、見出し一覧、マージ結果記録 |
 | 33 | ローカル版 link mode 導入フロー、安全ゲート | REQ-009 (001-015) | runtime-package-boundary.md | link mode 接続手順、link target 確認、ジャンクション検出安全ゲート |
 | 34 | local-transform（ローカル版変換資産） | REQ-009 (028, 029, 032) | runtime-package-boundary.md | **確定廃止**（PR#1195 で transform/ 完全削除、REQ-009-004/009/028 確定廃止昇格）。変換用プロンプト、レビュー用プロンプト、変換仕様の要件は全て廃止済み。link mode の現行契約は `runtime-package-boundary.md` が所有する |
 | 35 | obsolete-spec-path（旧Design直下パス参照検出） | REQ-001 (006), REQ-009 (004), REQ-036 (012) | integrity-rule-catalog.md (IR-057) | docs/designs/ 基盤Design ドメイン別体系化（REQ-001）以前の直下パス参照を検出。`obsolete-path-map.yaml` を対照表として IR-057 が検証。link mode 統一（REQ-009）に伴う廃止語彙を「単独検出語」（即 ng）と「近接条件つき検出語」（conditional）に分離し検出。例外条件: obsolete-path-map.yaml 自体、IR-057 ルール説明、retired 配下、テスト fixture、コードブロック内検査 fixture。v2:REQ-0158 は Issue #1713 で retire 完了（検出契約は IR-057 が現行所有） |

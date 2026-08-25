@@ -317,6 +317,15 @@ RU ファイル削除後に統合先ブランチ（REQ-042 の定義による、
 
 実証Case の RU/draft 削除は通常Caseと同一の手順で実行する。実証Issue 作成と VERIFY が成功した RU は評価ブランチ削除後に main 側で未処理 RU として再出現しない（REQ-042-012、REQ-043-012 の実行詳細）。ADF 制御状態の正規位置は main であり、RU 消費等のドメイン状態の変更は main 側で維持する。
 
+## Case Issue 本文の元追跡Issue参照形式
+
+Case Issue の本文冒頭には、req-define 経由で要件化された元追跡Issueへの参照を `Tracking: #N` 形式で記録する（REQ-049-005「追跡Issueと生成された Case Issue の関係は後から追跡できること」の実現手段）。
+
+- **記載形式**: 本文冒頭ブロックに `Tracking: #N` を1行で記載する。複数の元追跡Issueがある場合は `Tracking: #N, #M` のようにカンマ区切りで列挙する
+- **Parent: #N との区別**: `Parent: #N` は Epic Issue と子 Issue の階層関係（Epic/child 専用）を表す形式であり、元追跡Issueへの参照には使用しない。両形式は別用途であり、同一 Issue 本文に併存できる（Epic の子 Issue で元追跡Issue参照が必要な場合など）
+- **記載対象**: 追跡Issueから要件化された Standard Issue、Epic Issue、子 Issue の各テンプレートで元追跡Issueが判明している場合に記載する。追跡Issueを起源としない通常の Case Issue には記載しない
+- **追跡Issue側との対応**: 追跡Issue側の本文標準構造（関連 Case Issue への参照セクション）との双方向参照として保持する。論理スキーマ（role、kind、状態、本文標準構造を含む）の正は agentdev-issue-tracking Design が一元管理し、本節は Case Issue 本文側の記載形式のみを所有する
+
 ## 対象外
 
 - 機能要件、非機能要件、制約、対象外、受け入れ条件の新規作成（REQ-006-009）

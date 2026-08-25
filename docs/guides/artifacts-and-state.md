@@ -10,12 +10,13 @@ AgentDevFlow を構成する成果物の種別、配置、ライフサイクル�
 | Decision（現行） | `docs/decisions/DEC-{NNN}.md` | 現行基準の技術判断記録 |
 | Design | `docs/designs/**/*.md` | 実装者が参照する現在設計（commands/skills/workflows の3層と基盤6ドメイン） |
 | Report | `docs/reports/**/*.md` | 監査・評価・観測の事実記録 |
-| 課題ファイル | `docs/issue-list/ISL-{NNN}.md` | 未解決事項の発生から解決、反映確認までの追跡（検討経過を保持する履歴系文書） |
 | guides | `docs/guides/*.md` | 利用者向けの参照用読み物 |
 
 **優先順位**: REQ > Decision > Design。
 guides は基準への導線を提供する。
 基準文書と矛盾する記述がある場合は基準を優先する。
+
+> 未解決事項の追跡は追跡Issue（GitHub Issue の管理単位・永続状態）で行い、docs/ 配下に課題ファイルの文書種別は設けない（REQ-049、DEC-020）。
 
 ### 参照ルール
 
@@ -58,7 +59,6 @@ requirements/REQ-{NNN}.md     # 要件定義（基準）
     README.md               # Decision 索引
   designs/**/*.md                   # 現在設計（commands/skills/workflows の3層 + 基盤6ドメイン、リポジトリ内部の設計文書、基準）
   reports/**/*.md                   # 監査・評価・観測記録（Report、Design とは分離）
-  issue-list/ISL-{NNN}.md          # 課題ファイル（未解決事項の追跡、履歴系文書）
   guides/*.md                    # 参照用読み物（案内層、非基準）
 .agentdev/
   intake/                        # Intake パイプラインのドメイン状態
@@ -120,8 +120,8 @@ scripts/
 | 採用済み成果物（Learning） | `/agentdev/learning-promote` | `/agentdev/backlog-review` | RU 化成功時 |
 | RU | `/agentdev/backlog-review`, セッション由来 | `/agentdev/req-define`, `/agentdev/req-save`, `/agentdev/case-open` | `/agentdev/case-open` の Issue 作成 + VERIFY 成功時 |
 | REQ ファイル | `/agentdev/req-save` | `/agentdev/case-open`, `/agentdev/case-run`, `/agentdev/case-close` | なし（永続） |
-| 課題ファイル | `/agentdev/issue`、各 workflow（課題管理 Capability Skill 経由） | `/agentdev/issue`、各 workflow | なし（永続。解決済み、クローズ済みも同一体系内に残置） |
-| Issue | `/agentdev/case-open` | `/agentdev/case-run`, `/agentdev/case-close` | なし（永続） |
+| 追跡Issue | `/agentdev/issue`、各 workflow | `/agentdev/issue`、`/agentdev/req-define`（実行確定時の要件化経路） | なし（永続。解決済み、クローズ済みも同一体系内に残置） |
+| Case Issue | `/agentdev/case-open` | `/agentdev/case-run`, `/agentdev/case-close` | なし（永続） |
 
 流れは以下の通り。
 採用済み成果物 / セッション由来 → RU → REQ ファイル / Issue → マージ → クローズ。

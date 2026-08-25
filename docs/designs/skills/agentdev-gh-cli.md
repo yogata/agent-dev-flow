@@ -12,8 +12,8 @@ updated: "2026-08-18"
 ## 目的
 
 `agentdev-gh-cli` は AgentDevFlow の GitHub I/O を一箇所に集約する中央集権的な I/O 境界である（REQ-011, DEC-004）。
-command と skill は GitHub CLI（gh）コマンドを直接記述せず、`agentdev-gh-cli` の手続きへ委譲する。
-ローカル版は `agentdev-gh-cli` を差し替えることで GitHub 非依存の運用を実現する（v2:REQ-0150, DEC-004）。
+command と skill は GitHub CLI（gh）コマンドを直接記述せず、Custom Tool `agentdev_gh` の操作契約（gh CLI 手続きの委譲先、REQ-011-022〜024）へ委譲する。
+ローカル版は Custom Tool `agentdev_gh` の実行ディレクトリを差し替えることで GitHub 非依存の運用を実現する（v2:REQ-0150, DEC-004）。
 
 ## 責務定義
 
@@ -191,14 +191,13 @@ command/skill 配下で gh コマンド直接記述を検出する `/agentdev/in
 コードブロック内、インラインコード内の記述も検出対象とする。
 許容ファイル（除外対象）に該当しない限り、委譲漏れとして報告する。
 
-### 除外対象（許容ファイル）
+### 除外対象（許容範囲）
 
-| 除外ファイル | 理由 | 根拠 |
+| 除外対象 | 理由 | 根拠 |
 |-------------|------|------|
-| `src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md` | 標準版（GitHub 版）の既定実装として gh コマンド直接実行を保持する唯一のファイル | REQ-011-003 |
+| `src/opencode/tools/agentdev-gh/`（Custom Tool `agentdev_gh` 実装。runner-cli.ts 等） | スキャン対象は command/skill 配下のみであり、Custom Tool 実装はスキャン対象外。GitHub I/O を集約する Tool 実装が gh コマンドを直接保持することは委譲の目的と矛盾しない（Tool 内実装として呼び出し側へ隠蔽する） | REQ-011-003, REQ-011-013 |
 
-`agentdev-gh-cli` は GitHub I/O を集約する I/O 境界であり、その標準版実装が gh コマンドを直接保持することは委譲の目的と矛盾しない。
-standard-procedures.md 以外のファイルが gh 直接記述を保持する場合は委譲漏れとして検出する。
+command/skill 配下のファイルが gh 直接記述（gh WRITE 直接実行）を保持する場合は委譲漏れとして検出する。読み取り系は Design custom-tool-contracts「迂回防止」の許容範囲に従う。
 
 ### 検出時の推奨 route
 
@@ -206,31 +205,32 @@ gh 直接記述を検出した場合、`gh-direct-invocation-leak` 分類で報�
 
 ## 差し替え可能性（ローカル版）
 
-ローカル版は `agentdev-gh-cli` を差し替え、同一手続き名で Case ファイル（`.agentdev/cases/case-{NNNN}.md`）の読み書きへ読み替える（v2:REQ-0150, DEC-004 decision #4, #5）。
-PR 関連手続きはスキップせず、Case ファイルの対応セクションで代替する（DEC-004 decision #5）。
-GitHub 非依存の抽象 backend は新設せず、GitHub 前提の gh-cli 手続き名を保ったまま実装を差し替える方式とする（DEC-004 decision #6）。
+ローカル版は Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）を `src/opencode-local/agentdev-gh-cli/`（Local 実装）へ差し替え、同一操作契約でローカルIssue（`.agentdev/issues/issue-{NNNN}.md`）の読み書きへ読み替える（v2:REQ-0150, DEC-004 decision #4, #5、REQ-011-006）。
+PR 関連操作はスキップせず、role: case のローカルIssueが持つ PR 相当セクションで代替する（DEC-004 decision #5）。
+GitHub 非依存の抽象 backend は新設せず、GitHub 前提の操作契約を保ったまま実装を差し替える方式とする（DEC-004 decision #6）。
 
-### 手続きと Case ファイルセクションの対応
+### 操作とローカルIssueの対応
 
-| 標準版手続き | ローカル版での読み替え先 |
+| 通常版操作 | ローカル版での読み替え先 |
 |---|---|
-| Issue 作成 | Case ファイル新規作成（`## 入力`、`## 背景` 等） |
-| Issue 本文読込 | Case ファイル読込 |
-| Issue 本文更新 | Case ファイル本文更新 |
-| Issue コメント追加 | `## 作業ログ` へ追記 |
-| PR 作成 | Case ファイル新規作成（PR 相当セクション: `## マージ前確認`、`## Design確定候補`、`## Findings / Capture候補`） |
-| PR 本文読込 | Case ファイル読込（`## マージ前確認`、`## Design確定候補`、`## Findings / Capture候補`） |
+| Issue 作成 | ローカルIssue新規作成（role に応じた本文標準構造） |
+| Issue 本文読込 | ローカルIssue読込 |
+| Issue 本文更新 | ローカルIssue本文更新 |
+| Issue コメント追加 | role: tracking は `## 検討経過`（日時エントリ）へ、role: case は `## 作業ログ` へ追記（コメント読み替えの role 分岐） |
+| 追跡Issue操作（role: tracking） | ローカルIssue（role: tracking）の状態遷移、kind、本文標準構造への読み替え（論理スキーマの正は agentdev-issue-tracking Design） |
+| PR 作成 | role: case のローカルIssue更新（PR 相当セクション: `## マージ前確認`、`## Design確定候補`、`## Findings / Capture候補`） |
+| PR 本文読込 | role: case のローカルIssue読込（PR 相当セクション） |
 | PR merge | `## マージ結果` へ記録 |
-| Issue close | `status: closed` + `closed_at` 更新 |
-| VERIFY | Case ファイル読み戻し検証（Markdown 構造、必須セクション） |
+| Issue close | `status` 終端値 + `closed_at` 更新 |
+| VERIFY | ローカルIssue読み戻し検証（frontmatter、必須セクション、role 条件付きスキーマ） |
 
-詳細は [ローカル Case ファイル](../local/local-case-file.md) 参照。
+詳細は [ローカルIssue共通スキーマ](../local/local-case-file.md) 参照。
 
 ## 適用対象
 
 - GitHub Issue / PR を操作するすべての command と skill（REQ-011）
 - Windows PowerShell 環境での gh CLI 実行（標準版）
-- ローカル版での Case ファイル読み書き（ローカル版）
+- ローカル版でのローカルIssue読み書き（ローカル版）
 
 ## 対象外
 
@@ -252,7 +252,7 @@ WRITE 標準手順（Windows encoding 指定必須、REQ-011-009）を commit �
 
 - [agentdev-issue-management.md](agentdev-issue-management.md)
 - [agentdev-inspect-skills.md](agentdev-inspect-skills.md)（gh 直接記述の検出辞書を参照）
-- [ローカル Case ファイル](../local/local-case-file.md)
+- [ローカルIssue共通スキーマ](../local/local-case-file.md)
 - [REQ-011](../../requirements/REQ-011.md)（`agentdev-gh-cli` 手続き委譲基盤）
 - v2:REQ-0150（tag `v2.11.0`、ローカル版 `agentdev-gh-cli` 実装）
 - [DEC-004](../../decisions/DEC-004.md)（`agentdev-gh-cli` を差し替え可能な I/O 境界として確立）

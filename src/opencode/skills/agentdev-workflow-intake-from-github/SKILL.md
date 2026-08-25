@@ -39,7 +39,7 @@ resume point / export / import を持たない。
 | STEP | 名称 | 内容 |
 |---|---|---|
 | STEP-1 | 期間解釈 | 期間指定または Issue/PR 番号指定を解釈する（抽出アルゴリズムは `agentdev-intake-pipeline`） |
-| STEP-2 | データ取得 | クローズ済み Issue/PR のデータを取得する（Custom Tool `agentdev_gh` の読み取り操作） |
+| STEP-2 | データ取得 | クローズ済み Case Issue/PR のデータを取得する（Custom Tool `agentdev_gh` の読み取り操作）。role: tracking の追跡Issue（`agentdev-tracking` ラベル保持）は抽出対象から除外する |
 | STEP-3 | 構造的検出 | 抽出ルールに基づき構造的に残課題候補を検出する（`agentdev-intake-pipeline`） |
 | STEP-4 | LLM 全文解析 | キーワードリスト、コンテキスト付与ルールに基づき全文解析する（`agentdev-intake-pipeline`） |
 | STEP-5 | intake item 生成・実行前同期 | item 生成ルール、ファイル名規則に従い item を生成する（`agentdev-intake-pipeline`）。`git pull --ff-only` を実行する |
@@ -66,7 +66,7 @@ frontmatter、状態フィールド、重複排除キーは持たない。
 ## 共通制約
 
 - **保存専用**: GitHub Issue の作成、採用可否の判断、review、整形、分類を行わない。Issue/PR へのコメント投稿、マーカー付与も行わない（command 側ガードレールほか、不変条件の詳細実装）
-- **データ取得**: GitHub Issue/PR のデータ取得は `gh` CLI のみ使用する（GitHub API 直接呼び出し不可）。対象はクローズ済み Issue/PR のみ（オープン中は対象外、command 不変条件）。読み取り操作は Custom Tool `agentdev_gh` 経由で行う（command 不変条件）
+- **データ取得**: GitHub Issue/PR のデータ取得は `gh` CLI のみ使用する（GitHub API 直接呼び出し不可）。対象はクローズ済み Case Issue/PR のみ（オープン中は対象外、command 不変条件）。role: tracking の追跡Issueは抽出対象外とする（クローズ済み追跡Issueは反映確認完了を意味し、未回収変更候補の回収機会と意味が衝突するため、command 不変条件）。読み取り操作は Custom Tool `agentdev_gh` 経由で行う（command 不変条件）
 - **保存先**: `.agentdev/intake/inbox/` のみ。ディレクトリが存在しない場合は作成する。同名ファイルが存在する場合は連番を付与する
 - **成果物本文 verbatim**: 保存対象ファイル本文は verbatim で扱う。判定結果、調査過程、中間ログ、読解メモは要約し、成果物パス、根拠、capture候補へ圧縮して返す（command 不変条件）
 - **git 永続化**: commit message は `chore(agentdev): capture intake items from github`（Conventional Commits 形式）。変更なし時は commit/push せず完了報告で「変更なし」と報告する。push 失敗時は構造化エラー形式で停止する（完了扱いにしない）
