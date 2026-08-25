@@ -53,10 +53,11 @@ GitHub Issue / PR を使わない個人利用環境（ローカル版 OpenCode�
 
 追跡Issueの物理表現。保持する情報の意味論（role、kind、状態と状態遷移、再評価・解決・反映追跡の意味）は agentdev-issue-tracking Design を正とする。
 
-- `status` 値域: 追跡Issue 6状態（起票、検討中、保留、実行準備完了、解決済み、クローズ済み）に対応する物理値。agentdev-issue-tracking Design の状態の三段写像に従う
-- `labels` 値域: kind（problem、idea、task、risk）等の追跡Issueラベル。物理写像表の正は agentdev-issue-tracking Design
+- `status` 値域: 追跡Issue 6状態の論理トークンと同一値（`created`、`in-discussion`、`on-hold`、`ready`、`resolved`、`closed`）。agentdev-issue-tracking Design の状態の三段写像に従う
+- `labels` 値域: kind 4値（`problem`、`idea`、`task`、`risk`）からちょうど 1 つ。追加ラベルは許容しない（機械検証）。物理写像表の正は agentdev-issue-tracking Design
 - 本文: 追跡Issue本文の標準構造（件名、背景、影響、関連成果物、選択肢、判断材料、不足情報、保留理由と再評価条件、解決結論、反映先と反映状態、関連 Case Issue 参照）に従う。Case 固有セクション（PR 相当セクション、マージ結果）を必須項目としない
-- コメント相当履歴: GitHub Issue コメント相当の検討経過を、本文内の追記型コメント相当セクション（日時エントリの時系列）として保持する
+- コメント相当履歴: GitHub Issue コメント相当の検討経過を、本文内の追記型コメント相当セクション（日時エントリの時系列）として保持する。物理表現は `## 検討経過` セクションに `### {ISO 8601 日時}` 見出しと本文からなる日時エントリの時系列とする
+- クローズ: issue_close の reason（completed / not_planned）のいずれも `closed` へ遷移する。reason の詳細は `## 検討経過` の履歴で保持し、ローカル版 issue_read は closeReason を null として返す。再オープンは `closed` → `in-discussion` とする（agentdev-issue-tracking Design の再オープン遷移に従う）
 
 ## role: case の条件付きスキーマ
 
@@ -134,7 +135,7 @@ Case ファイル本文は以下のセクション見出しを保持できる。
 
 ## PR 系操作の対象解決
 
-PR 系操作（pr_create、pr_read、pr_merge、pr_changed_files、pr_mergeable）の対象は role: case のローカルIssueに限る。ローカル版 Tool 実装は操作の対象解決時に role を検証し、role: tracking のローカルIssueへの PR 系操作を拒否する。
+PR 系操作（pr_create、pr_read、pr_merge、pr_changed_files、pr_mergeable）の対象は role: case のローカルIssueに限る。ローカル版 Tool 実装は操作の対象解決時に role を検証し、role: tracking のローカルIssueへの PR 系操作を拒否する。pr_create は操作契約上対象番号を持たないため、最新の role: case ローカルIssueを対象として解決する。
 
 ## コメント読み替えの role 分岐
 

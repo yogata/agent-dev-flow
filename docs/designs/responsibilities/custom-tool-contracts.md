@@ -30,7 +30,8 @@ GitHub I/O の対象操作は次のとおり。
 - 基本操作: issue_create、issue_read、issue_update、issue_comment、issue_close、pr_create、pr_read、pr_merge、pr_changed_files、pr_mergeable
 - 追跡Issue操作（追加）: issue_list（role、kind、state 等による絞り込みを含む構造化結果を返す Issue 一覧・検索）、issue_reopen（Issue 再オープン）
 - 既存契約の変更: issue_read のメタデータ拡張。title、state、labels に加え、role/kind/状態写像に必要なメタデータを返す。新規操作追加と区別して契約・テストを更新する
-- 既存契約の拡張: issue_update は Issue 本文・メタデータ更新に labels 更新を含む。issue_comment はコメント追加・読取の双方を扱う
+- 既存契約の変更: issue_create は任意の `role`（既定 `case`）と `kind` を受け付ける。ローカル版は role 条件付きスキーマ充足のため作成時の role が必須になる
+- 既存契約の拡張: issue_update は Issue 本文・メタデータ更新に labels 更新を含む。labels 指定は追跡Issue軸ラベル（role/kind/status）を除いた残りのラベルの置換を意味し、追跡Issue軸は kind/trackingState 指定で置換される。issue_comment はコメント追加・読取の双方を扱う（body あり＝コメント追加、body なし＝コメント読取）
 
 issue_list と issue_read は read-only 操作として応答自己整合の検証を、issue_update、issue_comment、issue_close、issue_reopen は副作用操作として読み戻し検証（VERIFY）を適用する。各 WRITE は Tool 内で VERIFY まで完了してから成功を返す（REQ-011-023）。
 

@@ -38,3 +38,6 @@ updated: 2026-08-25
 8. **GitHub Organization 固有機能の位置づけ**: GitHub Issue Type / Issue Fields は利用可能な環境での物理写像として使用し、必須前提としない。論理スキーマは最低限、リポジトリ単位の Issue、ラベル、本文、状態で成立する
 9. **コメント読み替えの role 分岐（ローカル版）**: ローカル版では Issue コメント相当の履歴をローカルIssue内のコメント相当セクションへ読み替える。読み替え先は role により分岐する（role: tracking は検討経過、role: case は Case 実行のコメント相当情報。物理表現の詳細はローカルIssue共通スキーマ Design が所有する）
 10. **実行確定時の経路**: 追跡Issueで実行が確定した場合、req-define 等の正規要件化・設計経路を経由し、case-open が別の Case Issue を作成する。追跡Issueと生成された Case Issue の関連は双方の参照として保持し、追跡Issueを実行票へ直接変質させない
+11. **状態トークンと GitHub ラベル語彙（物理写像表の具体値）**: 追跡Issue 6状態の論理トークンは `created`（起票）、`in-discussion`（検討中）、`on-hold`（保留）、`ready`（実行準備完了）、`resolved`（解決済み）、`closed`（クローズ済み）とする。GitHub 物理ラベルは、role = `agentdev-tracking`（追跡Issueのみ付与。ラベルなしは role: case と機械判定し、既存 Case Issue との互換を維持する）、kind = `agentdev-kind/{problem|idea|task|risk}`、非終端追跡Issue状態 = `agentdev-tracking-status/{created|in-discussion|on-hold|ready|resolved}`。終端（`closed`）は GitHub state と state_reason（completed / not_planned）から導出し、状態ラベルを付与しない。ローカルIssueの frontmatter `status` は論理トークンと同一の値を用いる
+12. **再オープン遷移**: 追跡Issueの再オープンは `closed` → `in-discussion`（再検討）へ遷移させる。ローカル版の role: case は終端状態からの遷移を定義しないため、reopen を拒否する（ローカルIssue共通スキーマ Design の role: case 状態遷移と整合）
+13. **ローカル版追跡Issueの labels 値域**: ローカル版 role: tracking の `labels` は kind 4値（`problem`、`idea`、`task`、`risk`）からちょうど 1 つを持つ（機械検証）。追加ラベルは許容しない（role ごとの値域検証の実効性のため）
