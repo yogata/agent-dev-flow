@@ -8,6 +8,7 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-001�
 
 | Path | 状態 | Producer | Consumer / Next command | Retention / Removal |
 |------|------|----------|------------------------|---------------------|
+| `agentdev.jsonc` | ADF 実行時共通構成 | ユーザー（手動配置・編集。配布テンプレートは `src/opencode/plugins/agentdev-model-escalation/`） | ADF Plugin（`agentdev-model-escalation` が読取） | なし（永続・Git 管理対象） |
 | `intake/inbox/*.md` | raw item | `intake-capture`, `intake-from-github` | `intake-promote` | `intake-promote` の分類確定後に削除（採用 item は promoted/ へ保存、却下 item は即時削除） |
 | `intake/promoted/*.md` | promoted artifact | `intake-promote`, `inspect-promote`(--auto) | `backlog-review` | `backlog-review` による RU 化成功後に削除 |
 | `learning/inbox.md` | 未整理エントリ | `learning-capture`（skill） | `learning-promote` | `learning-promote` 成功後にクリア |
@@ -35,6 +36,7 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-001�
 
 ```
 .agentdev/
+├── agentdev.jsonc     ← ADF 実行時共通構成（REQ-053、DEC-023。Git 管理対象）
 ├── intake/
 │   ├── inbox/           ← intake-capture / intake-from-github が raw item を保存
 │   └── promoted/        ← intake-promote が派生 artifact を出力（フラット）
