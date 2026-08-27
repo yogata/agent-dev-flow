@@ -1,0 +1,19 @@
+// ADF-COVERS(implementation): REQ-053-001, REQ-053-002, REQ-053-003, REQ-053-014
+// ADF 共通設定ファイル（REQ-053、DEC-023）。
+//
+// - 第一階層キーは機能名とし、キー不在の機能は発動しない（REQ-053-002）。
+// - 特定の Plugin、Tool、command、skill 専用の設定ファイルは本ファイルへ集約する
+//   （REQ-053-001。専用設定ファイルを新設しない）。
+// - Provider 認証情報・API キーを保存する構造を持たない（REQ-053-014）。
+// - 通常利用モデルの設定項目を持たない（REQ-053-003。昇格先のみを設定する）。
+// - 編集は Git 管理下で行い、機能キーをコメント解除して有効化する。
+//
+// modelEscalation: 同一セッション内のターン境界モデル昇格（REQ-053）。
+// 有効化すると、昇格要求 tool（escalate_model / revert_model）が提供される。
+// model は provider/model 形式、variant は省略可能。下記の記述例をコメント解除して有効化する。
+{
+  // "modelEscalation": {
+  //   "model": "zai-coding-plan/glm-5.3",
+  //   "variant": "max"
+  // }
+}

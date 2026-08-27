@@ -1,0 +1,19 @@
+// ADF-COVERS(implementation): REQ-053-001, REQ-053-002, REQ-053-003, REQ-053-014, REQ-053-015
+// agentdev.jsonc 配布テンプレート（REQ-053、DEC-023）。
+// Consumer への導入は手動コピー（DEC-016 副作用ゼロ原則。導入スクリプトは提供しない）:
+//   - 本ファイルを導入先リポジトリの .agentdev/agentdev.jsonc へコピーする
+//   - plugin.ts を導入先リポジトリの .opencode/plugin/ へコピーする（agentdev-model-escalation ディレクトリごと、または plugin.ts 単体）
+// 本リポジトリ側の運用配置は .agentdev/agentdev.jsonc が正である。
+//
+// 第一階層キーは機能名とし、キー不在の機能は発動しない（REQ-053-002）。
+// Provider 認証情報・API キーを保存する構造を持たない（REQ-053-014）。
+// 通常利用モデルの設定項目を持たない（REQ-053-003）。
+{
+  // modelEscalation: 同一セッション内のターン境界モデル昇格（REQ-053）。
+  // 有効化すると、昇格要求 tool（escalate_model / revert_model）が提供される。
+  // model は provider/model 形式、variant は省略可能。下記の記述例をコメント解除して有効化する。
+  // "modelEscalation": {
+  //   "model": "zai-coding-plan/glm-5.3",
+  //   "variant": "max"
+  // }
+}
