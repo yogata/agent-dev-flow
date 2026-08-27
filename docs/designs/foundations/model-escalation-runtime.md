@@ -1,6 +1,6 @@
 ---
 title: OpenCode 同一セッションモデル昇格ランタイム
-status: draft
+status: accepted
 created: "2026-08-28"
 updated: "2026-08-28"
 ---
