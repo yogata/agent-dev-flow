@@ -598,3 +598,67 @@
 - **想定反映先**: agentdev-git-worktree の worktree 構造的制約（bun test 実行の環境前提）、agentdev-workflow-case-run の委譲時環境復元手順
 - **関連**: PR 2443 本文「Findings/ Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2443 ）、本 inbox 既存エントリ「worktree では node_modules も伝播しないため依存パッケージのテストは事前に bun install する」「worktree 環境の bun test 依存解決不能は bun install --cwd で worktree ローカル解消できる」
 - **タグ**: `#worktree` `#bun-install` `#dependencies` `#delegation`
+
+## git commit の -- pathspec はオプションより後に置き -m は -- より前に置く
+
+- **問題事象**: `git commit -- <paths> -m "msg"` の形式でコミットしたところ pathspec エラーで失敗した（case-open の Form Zero 削除コミット、DEL-OU-001-2）
+- **発生局面**: 実装（case-open 工程、明示パス限定のドメイン状態永続化コミット）
+- **検知方法**: git コマンドの pathspec エラー（即時に検出）
+- **根本原因**: `--` 以降はすべて pathspec として扱われるため、`--` の後ろに置いた `-m` がオプションとして解釈されない
+- **自律対応内容**: `git commit -m "msg" -- <paths>` の順序へ修正して即時再実行し、コミット成功を確認した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（case-close 契約の `git commit -- <paths>` 記述は --only pathspec 形式の意味であり、実行時は -m を先に置く様式の知見）
+- **横展開観点**: 明示パス限定でコミットするすべての工程（case-open、case-close、req-save、design-save）
+- **再発条件**: `--` より後ろに `-m` 等のオプションを置いて git commit を実行した場合
+- **予防策候補**: git commit はオプション（-m 等）を先に並べ、`--` と pathspec を最後に置く様式を徹底する
+- **想定反映先**: agentdev-git-worktree の並列実行安全ステージングプロシージャ、case-open / case-close の永続化手順
+- **関連**: Issue 2444 case-open（DEL-OU-001-2）からの capture 引継ぎ、PR 2445 本文「Findings / Capture候補」
+- **タグ**: `#git-commit` `#pathspec` `#option-order`
+
+## traceability scripts の scan 対象は .md と .ts のみで .agentdev/ は除外ディレクトリ
+
+- **問題事象**: 配布物（plugin.ts、配布 README.md）と .agentdev/ 側の実体（.jsonc）に分割して ADF-COVERS 宣言を書いたところ、.jsonc 拡張子と .agentdev/ パスは traceability scan 対象外のため REQ-053-016 の implementation 宣言が機械解析に現れず、missing-implementation finding が発生した（REQ-053 の case-run、PR 2445）
+- **発生局面**: 実装（case-run 委譲、REQ-053 の対応宣言配置）
+- **検知方法**: agentdev-traceability check の missing-implementation finding（2 件、修正済み）
+- **根本原因**: corpus.ts の DEFAULT_SCAN_EXTENSIONS（.md / .ts のみ）と DEFAULT_EXCLUDE_DIRS（.agentdev/ 含む）の適用範囲を宣言配置前に確認していなかった
+- **自律対応内容**: plugin.ts と配布 README.md（scan 対象ファイル）側で宣言を網羅し、README 側移管で REQ-053-016 の宣言欠落を解消して traceability check 7 pass / 0 fail を確認した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（最小トレーサビリティモデル・agentdev-traceability の既存仕様の運用知見）
+- **横展開観点**: ADF-COVERS 宣言を配置するすべての場面（実装・検証の対応宣言）
+- **再発条件**: .md / .ts 以外の拡張子のファイルや .agentdev/ 配下へ ADF-COVERS 宣言を書いて coverage/check の計上を期待した場合
+- **予防策候補**: 対応宣言は scan 対象拡張子（.md / .ts）かつ除外外パスのファイルに配置する。例外拡張子（.jsonc 等）は同一契約を .md / .ts 側でも宣言する
+- **想定反映先**: agentdev-traceability の対応宣言ガイダンス、agentdev-skill-authoring の記載様式
+- **関連**: PR 2445 本文「Findings / Capture候補」learning 1件目（回収元: https://github.com/yogata/agent-dev-flow/pull/2445 ）
+- **タグ**: `#traceability` `#adf-covers` `#scan-scope`
+
+## OpenCode plugin の引数なし tool は args 省略で定義可能
+
+- **問題事象**: なし（初回実装で引数なし tool の定義様式を確認した際に得た知見。問題発生ではない）
+- **発生局面**: 実装（agentdev-model-escalation Plugin の tool 定義、REQ-053 の case work）
+- **検知方法**: OpenCode v1.18.x 世代の registry 実装確認（def.args ?? {} への正規化）
+- **根本原因**: 該当なし（外部 zod 依存なしで tool 定義できる契約の確認結果）
+- **自律対応内容**: escalate_model / revert_model を引数なし tool として args 省略で定義し、外部 zod 依存なしで unit テスト 33 pass を達成した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（OpenCode plugin 実装の様式知見）
+- **横展開観点**: OpenCode plugin へ引数なし tool を定義するすべての場面
+- **再発条件**: 引数なし tool に必須の args 型を求めて不必要な zod 依存を追加する場合
+- **予防策候補**: 引数なし tool は args 省略で定義する（registry 側の def.args ?? {} 正規化に依存できる）
+- **想定反映先**: REQ-052 対応 Design（Plugin/Hook の実装様式節の更新候補）、agentdev-skill-authoring の plugin 実装参考
+- **関連**: PR 2445 本文「Findings / Capture候補」learning 2件目（回収元: https://github.com/yogata/agent-dev-flow/pull/2445 ）
+- **タグ**: `#opencode` `#plugin` `#tool-definition`
+
+## bun install を実行する配下ディレクトリには配下 .gitignore（node_modules/）が必要
+
+- **問題事象**: worktree 内で新規 plugin ディレクトリを作り bun install を実行した結果、node_modules が git 管理外にならず最初の commit に混入した（リポジトリ ルートの .gitignore は node_modules を除外しない構成のため）
+- **発生局面**: 実装（case-run 委譲、agentdev-model-escalation Plugin の新設、PR 2445）
+- **検知方法**: 品質ゲート自查（PR 構成の副作用境界確認）で node_modules 混入を検出
+- **根本原因**: node_modules 除外は repo ルートの .gitignore に存在せず、bun install を実行するサブディレクトリ側の .gitignore に依存する構成を事前把握していなかった（gh-write-guard 先例と同じ構成）
+- **自律対応内容**: 直ちに commit をやり直し、plugin 配下へ .gitignore（node_modules/）を追加して修正済み finding として記録した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（リポジトリ構成の運用知見）
+- **横展開観点**: worktree 内で bun install を伴う新規ディレクトリを作るすべての場面
+- **再発条件**: 配下 .gitignore を置かずに bun install を実行して commit する場合
+- **予防策候補**: 新規ディレクトリで bun install を実行する場合は配下 .gitignore（node_modules/）の同時作成を手順に含める
+- **想定反映先**: agentdev-git-worktree の worktree 構造的制約（新規ディレクトリ作成手順）、agentdev-workflow-case-run の委譲手順
+- **関連**: PR 2445 本文「Findings / Capture候補」learning 3件目（回収元: https://github.com/yogata/agent-dev-flow/pull/2445 ）
+- **タグ**: `#gitignore` `#node-modules` `#bun-install` `#worktree`
