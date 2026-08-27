@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は15件、提案中の Decision は5件である。
+現行の承認済み Decision は15件、提案中の Decision は6件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -37,6 +37,7 @@
 | DEC-020 | GitHub Issue 共通管理単位の採用 | proposed | 2026-08-23 |
 | DEC-021 | scripts 公開入口の2本固定と安定契約 | proposed | 2026-08-23 |
 | DEC-022 | 実行定義層の正規所有モデルと機械強制への移行 | proposed | 2026-08-24 |
+| DEC-023 | ADF 共通設定ファイルの新設（.agentdev/agentdev.jsonc） | proposed | 2026-08-28 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -74,6 +75,7 @@
 - [DEC-020](DEC-020.md)（GitHub Issue 共通管理単位の採用）
 - [DEC-021](DEC-021.md)（scripts 公開入口の2本固定と安定契約）
 - [DEC-022](DEC-022.md)（実行定義層の正規所有モデルと機械強制への移行）
+- [DEC-023](DEC-023.md)（ADF 共通設定ファイルの新設（.agentdev/agentdev.jsonc））
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
