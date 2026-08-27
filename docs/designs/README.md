@@ -183,6 +183,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | foundations/harness-separation-model.md | accepted | harness 分離モデル | 配布物と harness 実行制御の責務分離モデル。配布物の大多数を harness 非依存とし、依存具体を references/ へ集約 |
 | foundations/traceability-model.md | accepted | 最小トレーサビリティモデル（TIM） | 要件を中心とした最小 TIM のモデル要素（要件行、対応関係（covers）、design/implementation/verification の3役割）、対応関係の完全性規則、用語政策を正規所有（REQ-012、DEC-017） |
 | foundations/references/concrete-abstraction.md | accepted | 配布物具体参照の抽象化参照 | 配布物から harness 固有・実装固有の具体を抽象化する手順の参照。harness-separation-model.md、responsibility-boundary-purification.md から参照される |
+| foundations/model-escalation-runtime.md | draft | OpenCode 同一セッションモデル昇格ランタイム | REQ-053 の実装詳細（ADF 共通設定ファイル schema、昇格要求受付、ターン境界切替メカニズム、状態保持、通知、失敗報告と無限反復防止、配布経路） |
 
 #### responsibilities/（文書種別、成果物責務）
 

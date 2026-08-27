@@ -2,6 +2,7 @@
 draft_type: req_draft
 topic_slug: model-escalation-shared-config
 status: saved
+design_saved: true
 created_at: 2026-08-27T23:53:18+09:00
 source_rus:
   - RU-0001
