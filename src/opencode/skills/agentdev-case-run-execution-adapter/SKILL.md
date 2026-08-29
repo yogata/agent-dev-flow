@@ -35,7 +35,7 @@ case-run (orchestration)
         ├── 実行 command による evidence-backed 実装・品質ゲート（code review + QA review + gate review）
         ├── test strategy 項目の test-fix ループ（項目ごと検証、不合格時 fix-and-reverify / record-in-findings、全項目処理まで反復）
         ├── blocker 処理
-        ├── PR 作成操作（gentdev_gh pr_create）による PR 作成（PR URL を result に格納）
+        ├── PR 作成操作（agentdev_gh pr_create）による PR 作成（PR URL を result に格納）
         └── result を case-run へ返却
 ```
 

@@ -131,7 +131,7 @@ ID 汚染（前節）が 0 件でも本検査は実施する。
 |----------|----------|----|
 | frontmatter 重複 | 同一ファイル内に frontmatter 開始/終了 delimiter（`---`）が複数対出現し、`description:`/`agent:`/`name:` 等が重複している | `---\n...frontmatter...\n---\n...本文...\n---\n...同一frontmatter...\n---` |
 | 主要見出し重複 | 同一ファイル内で同一 H1（`#`）または H2（`##`）テキストが意図せず重複している | `# 最大自走モード` が2回出現 |
-| Markdown 構文破損 | frontmatter delimiter、コードフェンス、インラインコードの対応破綻、正規表現の truncate | `引数が数値のみ（`^\d+---` 等の regex truncate |
+| Markdown 構文破損 | frontmatter delimiter、コードフェンス、インラインコードの対応破綻、正規表現の truncate | 引数が数値のみ（`^\d+---` 等の regex truncate |
 
 ### 文意保持検査
 
