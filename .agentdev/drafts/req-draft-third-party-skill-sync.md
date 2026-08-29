@@ -2,6 +2,7 @@
 draft_type: req_draft
 topic_slug: third-party-skill-sync
 status: saved
+design_consumed: true
 created_at: 2026-08-30T00:45:00+09:00
 source_rus:
   - RU-0001

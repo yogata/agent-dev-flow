@@ -2,7 +2,7 @@
 title: 実行時パッケージ境界
 status: accepted
 created: 2026-08-20
-updated: 2026-08-24
+updated: 2026-08-30
 ---
 <!-- ADF-COVERS(implementation): REQ-002-007, REQ-002-008, REQ-002-011, REQ-002-019, REQ-002-020, REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-002, REQ-009-003, REQ-009-006, REQ-009-007, REQ-009-008, REQ-009-009, REQ-009-010, REQ-009-011, REQ-009-012, REQ-009-013, REQ-009-014, REQ-009-015, REQ-009-016, REQ-009-017, REQ-009-018, REQ-009-019, REQ-009-020, REQ-009-021, REQ-009-022, REQ-009-023, REQ-009-024, REQ-009-025, REQ-009-035, REQ-009-036, REQ-009-037, REQ-009-038, REQ-009-039, REQ-009-046, REQ-009-047, REQ-009-048, REQ-009-049 -->
@@ -379,6 +379,10 @@ wrong target 検出、再作成ロジックは LocalMode と通常版 install �
 
 昇格判定は「配布物（`src/opencode/commands/`, `src/opencode/skills/`）が当該スキルを参照するか否か」で機械的に行う。
 参照の有無は IR-058（後述）が `git ls-files` 突合とテキスト参照走査で検出する。
+
+昇格基準表に第三区分の行を追加する:
+
+- third-party Skill: 昇格対象外。.opencode/skills/<name>/ への取得機構経由配置が正規であり、src/opencode/skills/ へ昇格しない。配布成果物から参照する場合は宣言と参照点集約（REQ-002-044）に従う。
 
 ### 昇格手順
 

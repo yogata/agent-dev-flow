@@ -2,7 +2,7 @@
 title: "IR-058: distribution-untracked-skill-reference"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-08-30
 ---
 
 # IR-058: distribution-untracked-skill-reference
@@ -26,13 +26,15 @@ updated: 2026-08-20
 
 ## 検査項目
 
-`check_integrity.ts` が以下を検査する。
+検査判定を 3 分岐へ更新する:
 
-| # | 検査項目 | 失敗時 |
-|---|----------|--------|
-| 1 | projection-only スキル（`.opencode/skills/` 配下、`src/opencode/skills/` 配下に不在、`repo-*` 以外）が配布物から参照されていないこと | strict fail |
-| 2 | 検出時はスキル名、参照元ファイルパス、行番号、`src/opencode/skills/<name>/` への昇格を促すメッセージを出力すること | - |
-| 3 | projection-only スキルが存在しない場合は OK を出力すること | - |
+1. 参照される skill 名が repo-* の場合: 従来どおり除外（本体専用の repo-local skill）
+2. 参照される skill 名が third-party 宣言ファイル（src/third-party/skills.yaml）に宣言されている場合: 適合（宣言済み third-party 参照）。参照点集約規律（REQ-002-044）の運用確認は本検査の対象外とする
+3. いずれでもない場合: strict fail。triage として src/opencode/skills/ への昇格（配布物依存スキル）または skills.yaml への宣言登録を案内する
+
+逆検査を追加する: 配布成果物が third-party Skill 名を参照するが skills.yaml 未宣言の場合も fail とする（検出対象名集合の決定方法は本 Design が所有する）。
+
+per-skill exemption は本規定では新設しない（個別特例の正規経路化を禁止する）。既存の未宣言参照の是正完了まで、本検査の未宣言検出は triage 案内の提示に限定する。是正の期限・対象と管理は本 Design を所有せず、実装 execution contract が所有する。
 
 ## 検査対象範囲（scope）
 

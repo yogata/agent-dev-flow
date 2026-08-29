@@ -2,13 +2,13 @@
 title: Custom Tool 操作契約
 status: accepted
 created: 2026-08-24
-updated: 2026-08-25
+updated: 2026-08-30
 ---
 <!-- ADF-COVERS(implementation): REQ-011-022, REQ-011-023, REQ-011-024 -->
 
 # Custom Tool 操作契約
 
-Git / GitHub 等への構造化された副作用操作を担う Custom Tool の操作契約と失敗時動作を所有する
+Git、GitHub、外部ソース（URL、Git リポジトリ等）からの取得等の構造化された副作用操作を担う Custom Tool の操作契約と失敗時動作を所有する
 （REQ-052、DEC-022）。
 
 ## 操作契約の構成要素
@@ -36,6 +36,15 @@ GitHub I/O の対象操作は次のとおり。
 issue_list と issue_read は read-only 操作として応答自己整合の検証を、issue_update、issue_comment、issue_close、issue_reopen は副作用操作として読み戻し検証（VERIFY）を適用する。各 WRITE は Tool 内で VERIFY まで完了してから成功を返す（REQ-011-023）。
 
 ローカル版実装差し替えの読み替え先は .agentdev/issues/ のローカルIssue（role 条件付きスキーマ、単一採番空間）とする。PR 系操作（pr_create、pr_read、pr_merge、pr_changed_files、pr_mergeable）の対象は role: case のローカルIssueに限る。物理写像（role、kind、状態とラベル等の対応）の機械適用は Tool 内実装が行うが、写像表の所有は agentdev-issue-tracking Design である。ラベル・kind 値域の正は本 Design で定義せず、agentdev-issue-tracking Design を参照する。
+
+「third-party Skill 取得」操作契約:
+
+- 入力: third-party 宣言（skills.yaml）の対象 Skill 名（省略時は全件）、dry-run 指定
+- 出力: 取得結果報告（対象一覧、取得成否、配置パス、管理外衝突の検出状況）
+- 保証: 取得結果の検証後に成功を返す。取得開始前に存在した正常な配置を取得失敗時に破壊しない。機構管理外の既存配置を無断で上書きしない
+- 失敗: 失敗を成功扱いとしない。部分取得状態を開始前状態へ解消し、失敗要因を報告する
+
+取得プロファイル（単一 SKILL.md URL 型・GitHub Skill ディレクトリ型の判定、正規化、再帰取得、相対構造保持、Skill ディレクトリ外非取得）の詳細は Design third-party-skill-management が所有する。
 
 ## ローカル版実装差し替え
 

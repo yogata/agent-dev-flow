@@ -2,7 +2,7 @@
 title: `agentdev-doc-writing` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-08-30
 ---
 <!-- ADF-COVERS(verification): REQ-001-004, REQ-001-005, REQ-001-016, REQ-001-018, REQ-001-019, REQ-001-046, REQ-001-048, REQ-001-049, REQ-001-061, REQ-001-063, REQ-001-064, REQ-004-007, REQ-004-008, REQ-004-009, REQ-004-023, REQ-004-024, REQ-004-025, REQ-004-026, REQ-004-027, REQ-004-028, REQ-004-029, REQ-004-030 -->
 
@@ -39,6 +39,7 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 - `references/execution-subject-classification.md`（実行主体分類（command / skill / subagent / harness）の査読）
 
 配置基準、用語政策の原本は `docs/designs/responsibilities/document-type-responsibilities.md`、執筆規範の SSoT は `japanese-tech-writing` スキル（AGENTS.md 経由）。
+`agentdev-doc-writing` は third-party Skill（文章規範）への正規参照点であり、依存 Skill は skills.yaml 宣言+取得機構経由で利用者環境に配置される（REQ-002-044）。
 内容が重複する場合は原本を優先（v2:REQ-0140-023）。
 
 ## 現在の動作
