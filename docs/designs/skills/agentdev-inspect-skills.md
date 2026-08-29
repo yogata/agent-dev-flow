@@ -2,7 +2,7 @@
 title: `agentdev-inspect-skills` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-08-30
 ---
 <!-- ADF-COVERS(verification): REQ-005-014, REQ-016-001, REQ-016-002, REQ-016-003, REQ-016-004, REQ-016-005, REQ-016-006, REQ-016-007, REQ-016-008, REQ-016-009, REQ-016-010 -->
 <!-- ADF-COVERS(implementation): REQ-036-013, REQ-036-014, REQ-036-015, REQ-036-023 -->
@@ -49,6 +49,13 @@ Command→Skill 参照妥当性と Skill 構造を、ファイル修正なしで
 - 粒度の適切性（Skill 分割候補検出）
 - 診断分類の正確性
 - gh 直接記述の委譲漏れ（REQ-011）。command/skill 配下で `agentdev-gh-cli` へ委譲すべき gh 直接記述が残留していないか。許容ファイル（standard-procedures.md）の除外が正しく機能しているか
+
+### 文章品質観点（診断時）
+
+Command/Skill 診断時に次の観点を検出対象へ追加する。決定的破損は機械検査可能な項目、文章品質は doc-writing 査読観点と同一基準（配布物の文章品質契約 REQ、REQ-053）を用いる。
+
+- 決定的破損: Markdown 構造破損（見出し階層不整合、未閉鎖コードブロック、壊れたリンク、壊れたコードスパン、強調記法の破損）、制御文字混入、不正な Unicode 文字、意図しない異言語文字、既知形式の参照残骸
+- 文章品質: メタ指示残留、未完結文、不自然な英語混在、規範宣言の濫用、名詞連結、一文への条件過剰連結
 
 ## See Also
 

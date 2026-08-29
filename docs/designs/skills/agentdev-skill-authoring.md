@@ -2,7 +2,7 @@
 title: `agentdev-skill-authoring` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-18
+updated: 2026-08-30
 ---
 <!-- ADF-COVERS(implementation): REQ-002-013, REQ-002-014, REQ-002-015 -->
 <!-- ADF-COVERS(verification): REQ-002-004 -->
@@ -129,4 +129,15 @@ Skill 層（description の DO NOT USE FOR トリガー）と Command 層（本�
 ### 機械検査（本 Design 検証観点への追加）
 
 検証不通過: 1024 超過、単体 600 超過、USE FOR 二重保持、description 内マーカー語・内部 ID、簡潔トリガー項欠落（AG-004)、300 行超 references の目次欠落。warn: 集約予算（平均 350×N）超過。実装は既存検査枠組み（repo-agentdev-integrity / docs-check）へ規則追加する
+
+### 文章品質観点（作成時）
+
+skill 作成時に次の文章品質観点を検査し、違反を残さない。規範原本は japanese-tech-writing スキル、契約は配布物の文章品質契約 REQ（REQ-053）である。
+
+- メタ指示残留: 実行時に意味を持たない LLM 宛指示文を残さない
+- 文の完結性: 主述が完結しない文を残さない
+- 自然な日本語: 無根拠な英単語混在を行わない。英字は用語政策の許容リストに基づく用語に限る
+- 規範関係明示: 「〜を正とする」「〜が正」は規範原本への参照を伴い、定義元・参照元・所有関係のいずれかを一義的に判断できる場合に限り使用する
+- 名詞連結: 過長な名詞連結列を残さず、読み手の切れ目を示す
+- 条件連結: 1 文に 3 以上の条件節を連結しない
 
