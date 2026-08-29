@@ -742,3 +742,35 @@
 - **想定反映先**: agentdev-workflow-case-run / case-close の検証手順、third-party-sync 関連 Issue のテスト戦略
 - **関連**: PR #2462 本文「Findings / Capture候補」learning 2件目（回収元: https://github.com/yogata/agent-dev-flow/pull/2462 ）
 - **タグ**: `#third-party-sync` `#verification` `#bun-e` `#distribution-boundary-guard`
+
+## traceability の ADF-COVERS(implementation) 宣言は docs 配下 Design へ置く（配布物直書きは concrete-id gate と衝突）
+
+- **発見事項**: REQ-053-011 の実装対応を、配布物（src/opencode/skills/** の SKILL.md）本文へ `ADF-COVERS(implementation): REQ-053-011` 宣言として直接付与したところ、traceability check の missing-implementation は解消する一方、配布依存境界 最終 gate（concrete-id 検出）が baseline +1〜+4 の違反を検出した。traceability check（宣言の不在検出）と配布依存境界 gate（配布物内の concrete ID 非増加）を同時に満たす対応宣言の正規配置は、docs 配下の正規成果物（skill Design、リポジトリ内部文書・配布対象外）である。既存の前例（agentdev-traceability Design、traceability-model Design）と同一の配置規律
+- **特性区分**: 実装（配布物への対応宣言配置、Epic #2465 Wave2-a の OU-003〜005）
+- **確知手段**: PR #2473 / #2474 / #2475 それぞれの中間状態での gate 違反検出と、docs 配下 Design への宣言移設後の再検証（traceability 7/7 pass、concrete_id_hits 10 = baseline 60715d99 と同値）
+- **根本原因**: 宣言の不在検出（traceability）と ID 汚染の非増加（配布依存境界）という2つの gate の適用面の違い（docs/ と配布物）を、初回実装時に同時に考慮していなかった
+- **恒久対応内容**: 3 PR とも宣言を docs/designs/skills/agentdev-*.md へ移設して解消済み（当該変更起因の gate 増分 0、traceability 7/7 pass を両立）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（IR-055・配布依存境界・traceability の既存規定の運用知見。既存学び「配布 Workflow Skill 本文への具象 REQ ID 記載は IR-055 違反になるため対応宣言は command Design へ置く」と同系の配置規律の第2事例）
+- **横展開観点**: 配布物へ REQ 対応宣言を記載するすべての場面（skill Design・command Design 更新を含む）
+- **再発条件**: traceability の missing-implementation 解消を目的に、配布物本文へ ADF-COVERS(implementation) 宣言を直書きした場合
+- **予防策候補**: 対応宣言の配置先判断では docs 配下正規成果物を既定とする規律の明文化（skill-authoring ガイダンスへの追記候補）
+- **想定反映先**: agentdev-skill-authoring の対応宣言配置ガイダンス、agentdev-traceability の宣言配置運用記録
+- **関連**: PR #2473 / #2474 / #2475 本文「Findings / Capture候補」learning（統合記録。回収元: https://github.com/yogata/agent-dev-flow/pull/2473 https://github.com/yogata/agent-dev-flow/pull/2474 https://github.com/yogata/agent-dev-flow/pull/2475 ）
+- **タグ**: `#distribution-boundary` `#concrete-id` `#adf-covers` `#traceability` `#skill-authoring`
+
+## コマンド定義ファイル追加時は COMMAND_COUNT と public_commands のテスト期待値を同時更新する
+
+- **発見事象**: third-party-sync コマンド定義の追加時に、commands_e2e.test.ts の COMMAND_COUNT（期待 18）と check_workflow_preventive.test.ts の public_commands（期待 18）が未更新のまま残り、integrity suite に恒常 fail（実 19）が 2 件残存した。baseline 60715d99 展開環境でも同一 fail が再現する既知欠陥であり、QG-4 フル suite の fail 由来分類で判明した
+- **特性区分**: 検証（integrity suite の fail 由来分類、Epic #2465 Wave2-a の OU-006）
+- **確知手段**: PR #2476 本文の QG-4 bun test フル suite 由来分類表（baseline 展開での対照実行により既知欠陥と判定、当該変更起因 0）
+- **根本原因**: コマンド定義数を固定値で期待するテスト定数が複数存在し、コマンド追加 PR の必須更新リストに組み込まれていなかった
+- **恒久対応内容**: なし（本 PR は当該欠陥の是正対象外。由来分類と intake item としての記録のみ）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（テスト定数の陳腐化防止の運用知見）
+- **横展開観点**: コマンド定義ファイルを追加・削除するすべての PR
+- **再発条件**: commands_e2e.test.ts と check_workflow_preventive.test.ts の期待値を更新せずにコマンド定義を追加した場合
+- **予防策候補**: コマンド追加を含む PR の必須更新リストへの組入れ、または期待値の動的化（intake item 2026-08-30-integrity-suite-command-count-stale-expectations.md で別途判断）
+- **想定反映先**: repo-agentdev-integrity のテスト定数、agentdev-command-authoring の command 追加手順
+- **関連**: PR #2476 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2476 ）
+- **タグ**: `#integrity-suite` `#test-constant` `#command-count` `#stale-expectation`

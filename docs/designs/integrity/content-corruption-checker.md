@@ -1,6 +1,6 @@
 ---
 title: "決定的破損検査クラス"
-status: draft
+status: accepted
 created: "2026-08-30"
 updated: "2026-08-30"
 ---
