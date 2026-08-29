@@ -31,6 +31,8 @@ export type ListDirectoryResult =
 export interface GitHubFetcherEndpoints {
   /** raw contents のベース URL。既定: https://raw.githubusercontent.com */
   readonly rawBaseUrl: string;
+  /** gist raw のベース URL。既定: https://gist.githubusercontent.com */
+  readonly gistRawBaseUrl: string;
   /** contents API のベース URL。既定: https://api.github.com */
   readonly apiBaseUrl: string;
 }
@@ -47,6 +49,7 @@ export interface SourceFetcher {
 
 const DEFAULT_ENDPOINTS: GitHubFetcherEndpoints = {
   rawBaseUrl: "https://raw.githubusercontent.com",
+  gistRawBaseUrl: "https://gist.githubusercontent.com",
   apiBaseUrl: "https://api.github.com",
 };
 
@@ -57,6 +60,7 @@ const DEFAULT_ENDPOINTS: GitHubFetcherEndpoints = {
 export function createGitHubSourceFetcher(endpoints?: Partial<GitHubFetcherEndpoints>): SourceFetcher {
   const resolved: GitHubFetcherEndpoints = {
     rawBaseUrl: trimTrailingSlash(endpoints?.rawBaseUrl ?? DEFAULT_ENDPOINTS.rawBaseUrl),
+    gistRawBaseUrl: trimTrailingSlash(endpoints?.gistRawBaseUrl ?? DEFAULT_ENDPOINTS.gistRawBaseUrl),
     apiBaseUrl: trimTrailingSlash(endpoints?.apiBaseUrl ?? DEFAULT_ENDPOINTS.apiBaseUrl),
   };
 

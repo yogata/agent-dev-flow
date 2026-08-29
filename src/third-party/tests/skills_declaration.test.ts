@@ -176,12 +176,12 @@ describe("validateSkillsDeclaration (schema: name + source only)", () => {
 });
 
 describe("shipped skills.yaml self-consistency", () => {
-  test("the declaration file itself passes validation with an empty skills list", () => {
+  test("the declaration file itself passes validation and declares the shipped entries", () => {
     const text = readFileSync(join(import.meta.dir, "..", "skills.yaml"), "utf8");
     const result = loadSkillsDeclaration(text);
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.entries).toEqual([]);
+      expect(result.entries.map((e) => e.name)).toEqual(["japanese-tech-writing"]);
     }
   });
 });

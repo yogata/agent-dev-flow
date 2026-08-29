@@ -72,6 +72,12 @@ export function parseDeclaration(text: string): DeclarationResult {
         inSkills = true;
         continue;
       }
+      if (line.startsWith("schema_version:")) {
+        // 出荷宣言ファイル（src/third-party/skills.yaml）の schema_version 行。
+        // スキーマ正（検証側 lib/skills_declaration.ts）では必須項目のため、
+        // 本パーサーも name/source 取得の妨げにせず無視する。
+        continue;
+      }
       return { ok: false, detail: `declaration must start with "skills:", got: ${line}` };
     }
 

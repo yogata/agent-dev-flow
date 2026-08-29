@@ -262,7 +262,6 @@ scripts/ 直下の公開入口は consumer 向け `scripts/install.ps1` と self
 # AgentDevFlow がジャンクション管理するディレクトリ（インストールスクリプトが自動作成）
 .opencode/commands/agentdev/
 .opencode/skills/agentdev-*/
-.opencode/skills/japanese-tech-writing/
 .opencode/tools/agentdev-*/
 .opencode/plugins/agentdev-*/
 .opencode/plugins/agentdev-*.ts
@@ -270,7 +269,7 @@ scripts/ 直下の公開入口は consumer 向け `scripts/install.ps1` と self
 
 `.agentdev/` は AgentDevFlow のドメイン状態（Intake, Learning, Backlog 等）を保持し、git 管理対象であるため gitignore に**含めない**こと。
 各コマンドは `.agentdev/` 配下の変更を scoped commit で git に永続化する。
-`japanese-tech-writing` は配布物依存スキル（`agentdev-doc-writing` が参照、REQ-002）のため gitignore に含める。
+third-party Skill は宣言（`skills.yaml`）に基づく取得機構経由で利用者環境へ配置され、ADF リポジトリ上では Git 管理対象外である（REQ-002）。
 Custom Tool（`.opencode/tools/agentdev-*/`）と Plugin / Hook（`.opencode/plugins/agentdev-*/`）も配布種別として gitignore に含める（REQ-052）。
 インストーラが生成する Plugin のローダーシム（`.opencode/plugins/agentdev-*.ts`）も投影成果物のため含める。
 
