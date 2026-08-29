@@ -2,7 +2,7 @@
 description: docs整合性検査（旧称: integrity-check）。agent-dev-flow repo self-audit（repo-local, not distributed to consumers）
 agent: sisyphus
 ---
-<!-- ADF-COVERS(implementation): REQ-010-001, REQ-010-002, REQ-010-003, REQ-010-004 -->
+<!-- ADF-COVERS(implementation): REQ-010-001, REQ-010-002, REQ-010-003, REQ-010-004, REQ-010-071 -->
 
 # Repo Self-Audit: Docs Check
 
@@ -45,6 +45,7 @@ agent-dev-flow リポジトリの自己監査コマンド。AgentDevFlow 管理�
 - **IR-056（project extensions 整合性）**: `check_extensions.ts`（`.opencode/skills/repo-agentdev-integrity/scripts/check_extensions.ts`）を `bun run` で併せて実行し、IR-056 として strict に取り扱う（project extensions Design、project extensions 読み込み標準 skill）。check_extensions.ts の strict failure は docs-check 全体を fail とする
 - **配布物参照境界（配布 command/skill 本文の具体参照禁止）**: `check_distribution_boundary.ts`（`.opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary.ts`）を `bun run` で併せて実行する。配布 command/skill 本文（`src/opencode/commands/agentdev/**/*.md`、`src/opencode/skills/agentdev-*/**/*.md`）に含まれる具体ID（`ADR-NNNN`、`REQ-NNNN`）、具体パス（`docs/(decisions|requirements|designs)/<file>.md`、但し README.md とテンプレート表記は除外）、固定URL（blob/raw）を検出し、厳格に取り扱う。check_distribution_boundary.ts の failure は docs-check 全体を fail とする
 - **AUTOGEN ブロック鮮度検出 gate（REQ-010-059、autogen-freshness-gate Design）**: `check_autogen_freshness.ts`（`.opencode/skills/repo-agentdev-integrity/scripts/check_autogen_freshness.ts`）を `bun run` で併せて実行する。AUTOGEN ブロック（`<!-- AUTOGEN:BEGIN:id=xxx -->`〜`<!-- AUTOGEN:END -->`）を含む索引ファイル群について、ソース（frontmatter / ファイル名 / status）の rename や status 変更後に AUTOGEN ブロックが陳腐化しているかを検出し、鮮度種別（rename / status_change / content_change）を分類して報告する。check_autogen_freshness.ts の strict failure（stale blocks 検出）は docs-check 全体を fail とする。不合格時は `bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts` で AUTOGEN ブロックを再生成すること（自動修復は行わない、Design「不合格時の処置」）。IR-061（check_integrity.ts）と同一不整合を検出し得るが、両検査は独立して実施し、いずれか単独の実施要否にも他方の結果は影響しない
+- **決定的破損検査（REQ-010-071、content-corruption-checker Design）**: `check_content_corruption.ts`（`.opencode/skills/repo-agentdev-integrity/scripts/check_content_corruption.ts`）を `bun run` で併せて実行する。配布 command・skill 全体（`src/opencode/commands/agentdev/**/*.md`、`src/opencode/skills/**/*.md`）の本文記述を走査し、Markdown 構造破損（見出し階層不整合、未閉鎖コードブロック、壊れたリンク、壊れたコードスパン、強調記法の破損）、制御文字混入、不正な Unicode 文字、意図しない異言語文字、既知形式の参照残骸を検出する。検出シグナル・検出平面・許容例列挙は `docs/designs/integrity/content-corruption-checker.md` を authoritative source とする。check_content_corruption.ts の failure は docs-check 全体を fail とする
 - **full integrity suite（bun test 全件、QG-4 bun test 実行形態契約）**: `bun test ./.opencode/skills/repo-agentdev-integrity/scripts/` を実行する。`./` prefix 付きで対象ディレクトリを明示指定する（必須ステップ）。実行結果の「Ran N tests across M files」の N/M 件数突合を実施し（必須ステップ）、直前実績と比較して件数が急減していないかの妥当性を検証する（固定値の期待値化は行わない）。実行 cwd と起動コマンド形式（prefix・パス指定を含む）をレポートの証拠記録に明記する。対象スイートには cwd 依存テストが混在するため、カレントディレクトトリビアな実行（`bun test` 単体等）で代替しない
 
 ## ガードレール

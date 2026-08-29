@@ -67,7 +67,7 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 - review、整形はユーザーとの対話を通じて行う。整形は元 item の内容の意味を保持した整理・構造化にとどめる
 - 取得可能な根拠から採用・保留・却下を一意に確定できる item はユーザー承認なしで確定する（自律確定）。ユーザー判断が必要な item のみを HITL 対象とし、破壊的変更の明示承認は維持する（詳細判定表は workflow-contracts Design 参照）
 - 整形結果は軽量な成果物として扱う（workflow 管理成果物として扱わない）。frontmatter（route/status 等）、重複排除キー、後続成果物参照は含めない
-- intake 成果物の参照先は inbox/ と promoted/ に限る（ccepted/ は廃止済み）
+- intake 成果物の参照先は inbox/ と promoted/ に限る（accepted/ は廃止済み）
 - 採用 item の inbox 元ファイルは成果物保存後に削除する（.agentdev/intake/archive/promoted/ への移動は廃止）。reject item の inbox 元ファイルは即時削除し、reject 時の commit message に却下理由を含める（AG-{NNN}、監査証跡の補強）
 
 ## ガードレール
