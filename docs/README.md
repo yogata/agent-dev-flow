@@ -62,7 +62,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-022 の22件である（DEC-018〜DEC-022 は proposed、DEC-005、DEC-007 は superseded）。
+現行 Decision は DEC-001 から DEC-023 の23件である（DEC-018〜DEC-023 は proposed、DEC-005、DEC-007 は superseded）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
@@ -89,6 +89,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [DEC-020](decisions/DEC-020.md) | GitHub Issue 共通管理単位の採用（proposed） |
 | [DEC-021](decisions/DEC-021.md) | scripts 公開入口の2本固定と安定契約（proposed） |
 | [DEC-022](decisions/DEC-022.md) | 実行定義層の正規所有モデルと機械強制への移行（proposed） |
+| [DEC-023](decisions/DEC-023.md) | third-party Skill の分離管理と取得機構の導入（proposed） |
 
 ## 設計（Design）
 

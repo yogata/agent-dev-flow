@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は15件、提案中の Decision は5件である。
+現行の承認済み Decision は15件、提案中の Decision は6件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -37,6 +37,7 @@
 | DEC-020 | GitHub Issue 共通管理単位の採用 | proposed | 2026-08-23 |
 | DEC-021 | scripts 公開入口の2本固定と安定契約 | proposed | 2026-08-23 |
 | DEC-022 | 実行定義層の正規所有モデルと機械強制への移行 | proposed | 2026-08-24 |
+| DEC-023 | third-party Skill の分離管理と取得機構の導入 | proposed | 2026-08-30 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -74,6 +75,7 @@
 - [DEC-020](DEC-020.md)（GitHub Issue 共通管理単位の採用）
 - [DEC-021](DEC-021.md)（scripts 公開入口の2本固定と安定契約）
 - [DEC-022](DEC-022.md)（実行定義層の正規所有モデルと機械強制への移行）
+- [DEC-023](DEC-023.md)（third-party Skill の分離管理と取得機構の導入）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -108,6 +110,7 @@
 - [DEC-016](DEC-016.md)（導入系スクリプトの副作用ゼロ原則、provisioning 責務の利用者移転）
 - [DEC-017](DEC-017.md)（最小トレーサビリティモデルの採用と Artifact Graph の廃止、要件中心の最小 TIM と agentdev-traceability への置換）
 - [DEC-021](DEC-021.md)（scripts 公開入口の2本固定と安定契約、公開入口の構造境界と入口名の安定性）
+- [DEC-023](DEC-023.md)（third-party Skill の分離管理と取得機構の導入、第三区分所有境界と参照点集約）
 
 ### ワークフロー・委譲契約
 
@@ -181,6 +184,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-019 | [REQ-044](../requirements/REQ-044.md) | 一般処理の標準API委譲とADF固有意味論の所有境界（REQ-044 CREATE と整合。Design 4 件への実装契約追記・更新を伴う） |
 | DEC-020 | [REQ-049](../requirements/REQ-049.md), [REQ-001](../requirements/REQ-001.md), [REQ-009](../requirements/REQ-009.md), [REQ-011](../requirements/REQ-011.md) | GitHub Issue 共通管理単位の採用（REQ-049 全面再構成、REQ-001/REQ-009/REQ-011 UPDATE と整合。Design への契約更新を伴う） |
 | DEC-021 | [REQ-050](../requirements/REQ-050.md) | scripts 公開入口の2本固定と安定契約（REQ-050 CREATE、REQ-009-002/044 UPDATE、DEC-016 参照修正と整合） |
+| DEC-023 | [REQ-002](../requirements/REQ-002.md), [REQ-009](../requirements/REQ-009.md), [REQ-029](../requirements/REQ-029.md), [REQ-052](../requirements/REQ-052.md) | third-party Skill の分離管理と取得機構の導入（REQ-002-019 UPDATE、REQ-002-042〜044 APPEND、REQ-009-050 APPEND、REQ-029-009 APPEND、REQ-052-011 APPEND と整合） |
 
 ## 過去版の履歴基盤
 
