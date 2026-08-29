@@ -80,7 +80,7 @@ RU 実ファイル（STEP-7 の成果物）を承認証跡として扱い、証�
 
 本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
 
-- `agentdev-backlog-integration`: 採用済み成果物の読込、分析、統合・分割判定、depends_on 依存解決、矛盾検出、RU 生成ルール（frontmatter、セクション構成、採番、upstream handoff 転記）。backlog-review の review 候補判断と内部手続き
+- `agentdev-backlog-integration`: 採用済み成果物の読込、分析、統合・分割判定、depends_on 依存解決、矛盾検出、RU 生成ルール（frontmatter、セクション構成、採番、前工程からの引き継ぎ（upstream handoff）転記）。backlog-review の review 候補判断と内部手続き
 - `agentdev-adversarial-review`: backlog-review の review 呼出（共通契約の正規所有者は adversarial-review Design、REQ-{NNNN}）
 - `agentdev-git-worktree`: ドメイン状態永続化プロシージャ（並列実行安全ステージング、構造化エラー形式）
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open。document-model Design の文書7分類モデルは extension 経由で参照）
