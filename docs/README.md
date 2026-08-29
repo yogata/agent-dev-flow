@@ -6,10 +6,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 44件、廃止済み: 9件
+現行 REQ: 43件、廃止済み: 9件
 <!-- AUTOGEN:END -->
 
-現行要件は44件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
+現行要件は43件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
 各 REQ の詳細は各 REQ ファイル本文を参照。
 
 | REQ | タイトル |
@@ -57,13 +57,12 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [REQ-050](requirements/REQ-050.md) | scripts 公開入口境界 |
 | [REQ-051](requirements/REQ-051.md) | ガードレール識別体系と機械検査の再編 |
 | [REQ-052](requirements/REQ-052.md) | Custom Tool・Plugin/Hook の種別契約と配布境界 |
-| [REQ-053](requirements/REQ-053.md) | OpenCode 同一セッションモデル昇格と ADF 共通設定 |
 
 - [要件インデックス](requirements/README.md)
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-023 の23件である（DEC-018〜DEC-023 は proposed、DEC-005、DEC-007 は superseded）。
+現行 Decision は DEC-001 から DEC-022 の22件である（DEC-018〜DEC-022 は proposed、DEC-005、DEC-007 は superseded）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
@@ -90,7 +89,6 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [DEC-020](decisions/DEC-020.md) | GitHub Issue 共通管理単位の採用（proposed） |
 | [DEC-021](decisions/DEC-021.md) | scripts 公開入口の2本固定と安定契約（proposed） |
 | [DEC-022](decisions/DEC-022.md) | 実行定義層の正規所有モデルと機械強制への移行（proposed） |
-| [DEC-023](decisions/DEC-023.md) | ADF 共通設定ファイルの新設（.agentdev/agentdev.jsonc）（proposed） |
 
 ## 設計（Design）
 
