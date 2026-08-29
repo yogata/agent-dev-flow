@@ -64,6 +64,8 @@ cleanup モデルと処置契約の SSoT は document-model Design であり、�
 | 意味的矛盾 | Command と Skill 間で工程、状態、責務、停止条件の意味が矛盾していないかを検出する。正規な定義元の原則および同一契約再定義抑止の原則に照らして検出する。判定基準の詳細、検出手順、報告例は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
 | 正規な定義元からの逸脱 | 各責務が artifact-responsibilities Design のマッピングに照らして正規な定義元（配布 Command / Skill / references / script / harness 側文書 / REQ-ADR-SPEC のいずれか）に置かれているかを検出する。正規な定義元の原則に照らして検出する。責務越境（Command に Skill 要素、Skill に Command 固有手順、Template/Script の責務越境等）を含む。判定基準の詳細、検出手順、報告例は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
 | セマンティクス欠落 | 疎結合化、抽象化、縮約により、意味、条件、成果物契約（入力、前提、停止条件、適用境界、出力等）が欠落していないかを検出する。同一契約再定義抑止の原則に照らして検出する。判定基準の詳細、検出手順、報告例は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
+| 文章品質（診断時） | 配布物（`.opencode/commands/agentdev/*.md`、`.opencode/skills/agentdev-*/**/*.md`）に文章品質違反（メタ指示残留、未完結文、不自然な英語混在、規範宣言の濫用、名詞連結、一文への条件過剰連結）がないかを検出する（配布物の文章品質契約 REQ）。判定基準は doc-writing 査読観点と同一基準。検出対象の定義は Design agentdev-inspect-skills「文章品質観点（診断時）」参照 |
+| 決定的破損（診断時） | 配布物に決定的破損（Markdown 構造破損、制御文字混入、不正な Unicode 文字、意図しない異言語文字、既知形式の参照残骸）がないかを検出する（配布物の文章品質契約 REQ）。Markdown 構造破損の内訳（見出し階層不整合、未閉鎖コードブロック、壊れたリンク、壊れたコードスパン、強調記法の破損）を検出対象とする。検出対象の定義は Design agentdev-inspect-skills「文章品質観点（診断時）」参照。配布物構文健全性系の既存観点と重複する項目は文章品質契約由来の検出対象として併せて適用する（既存観点の変更ではない） |
 
 ## NG 分類
 
