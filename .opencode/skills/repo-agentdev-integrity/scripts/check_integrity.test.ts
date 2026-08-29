@@ -2109,7 +2109,8 @@ function buildIr058Fixture(root: string): void {
   writeFileSync(join(root, "docs", "designs", "README.md"), "# Design\n", "utf-8");
   writeFileSync(join(root, "docs", "DOC-MAP.md"), "# DOC-MAP\n\n| 分類 | パス |\n|------|------|\n| REQ | docs/requirements/REQ-9301.md |\n", "utf-8");
 
-  // Distribution skill that references both a projection-only skill and a repo-* skill.
+  // Distribution skill that references a projection-only skill, a repo-* skill,
+  // and a skills.yaml-declared third-party skill (IR-058 3-branch fixture).
   const distSkillDir = join(root, "src", "opencode", "skills", "agentdev-sample");
   mkdirp(distSkillDir);
   writeFileSync(
@@ -2127,6 +2128,7 @@ function buildIr058Fixture(root: string): void {
       "",
       "Reference to projection-only: `test-projection-only` スキル.",
       "Reference to repo-local: `repo-test-local` スキル.",
+      "Reference to declared third-party: `japanese-tech-writing` スキル.",
       "Path-style: .opencode/skills/test-projection-only/SKILL.md",
       "",
     ].join("\n"),
@@ -2135,11 +2137,37 @@ function buildIr058Fixture(root: string): void {
   // Also create a sibling agentdev-* dir so source-side enumeration works.
   mkdirp(join(root, "src", "opencode", "skills", "agentdev-other"));
 
+  // skills.yaml declaration (IR-058 branch 2 fixture): japanese-tech-writing is declared.
+  const thirdPartyDir = join(root, "src", "third-party");
+  mkdirp(thirdPartyDir);
+  writeFileSync(
+    join(thirdPartyDir, "skills.yaml"),
+    [
+      "# third-party Skill 宣言ファイル（fixture）",
+      "",
+      'schema_version: "1.0"',
+      "",
+      "skills:",
+      "  - name: japanese-tech-writing",
+      "    source: https://example.com/japanese-tech-writing/SKILL.md",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
   // Projection-only skill (no src/ counterpart) — should be flagged.
   mkdirp(join(root, ".opencode", "skills", "test-projection-only"));
   writeFileSync(
     join(root, ".opencode", "skills", "test-projection-only", "SKILL.md"),
     "---\nname: test-projection-only\n---\n# test-projection-only\n",
+    "utf-8",
+  );
+  // Declared third-party skill (IR-058 branch 2) — projection-only but declared
+  // in skills.yaml, so its distribution reference must NOT be flagged.
+  mkdirp(join(root, ".opencode", "skills", "japanese-tech-writing"));
+  writeFileSync(
+    join(root, ".opencode", "skills", "japanese-tech-writing", "SKILL.md"),
+    "---\nname: japanese-tech-writing\n---\n# japanese-tech-writing\n",
     "utf-8",
   );
   // repo-* skill (carve-out per ADR-0106) — must NOT be flagged even if referenced.
@@ -2328,6 +2356,65 @@ describe("IR-058 distribution-untracked-skill-reference (REQ-0159-003)", () => {
         (res.message ?? "").includes("ADR-0134"),
     );
     expect(promotionMessage).toBeDefined();
+  });
+
+  it("does not flag skills.yaml-declared projection-only skill (IR-058 branch 2)", () => {
+    const r = runScript(IR058_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const declaredNg = parsed.results.filter(
+      (res: { check: string; level: string; message?: string }) =>
+        res.check === "distribution-untracked-skill-reference" &&
+        res.level === "ng" &&
+        (res.message ?? "").includes("japanese-tech-writing"),
+    );
+    expect(declaredNg.length).toBe(0);
+  });
+
+  it("reverse check: NG message includes skills.yaml declaration guidance (IR-058 branch 3)", () => {
+    const r = runScript(IR058_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const ngResults = parsed.results.filter(
+      (res: { check: string; level: string; message?: string }) =>
+        res.check === "distribution-untracked-skill-reference" &&
+        res.level === "ng",
+    );
+    expect(ngResults.length).toBeGreaterThan(0);
+    const guidance = ngResults.find(
+      (res: { message?: string }) =>
+        (res.message ?? "").includes("not declared in src/third-party/skills.yaml") &&
+        (res.message ?? "").includes("register it in src/third-party/skills.yaml"),
+    );
+    expect(guidance).toBeDefined();
+  });
+});
+
+// ─── IR-058 strict-fail return (fail-closed without skills.yaml) ──────────
+
+const IR058_NODECL_ROOT = join(TEMP_ROOT, "ir058-nodecl");
+
+describe("IR-058 strict fail without skills.yaml (fail-closed)", () => {
+  beforeAll(() => {
+    rmSync(IR058_NODECL_ROOT, { recursive: true, force: true });
+    mkdirp(IR058_NODECL_ROOT);
+    buildIr058Fixture(IR058_NODECL_ROOT);
+    rmSync(join(IR058_NODECL_ROOT, "src", "third-party", "skills.yaml"));
+    copyScripts(IR058_NODECL_ROOT);
+  });
+
+  afterAll(() => {
+    rmSync(IR058_NODECL_ROOT, { recursive: true, force: true });
+  });
+
+  it("treats referenced projection-only skill as undeclared without declaration", () => {
+    const r = runScript(IR058_NODECL_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const ngResults = parsed.results.filter(
+      (res: { check: string; level: string; message?: string }) =>
+        res.check === "distribution-untracked-skill-reference" &&
+        res.level === "ng" &&
+        (res.message ?? "").includes("test-projection-only"),
+    );
+    expect(ngResults.length).toBe(1);
   });
 });
 

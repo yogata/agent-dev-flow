@@ -5256,6 +5256,38 @@ function isIr058ExemptPath(relPath: string): boolean {
   return IR058_EXEMPT_PATH_PATTERNS.some((re) => re.test(relPath));
 }
 
+// Declared third-party skill names from src/third-party/skills.yaml. Only
+// skills[].name is read; schema_version is ignored on purpose (matches the
+// shipped declaration loader). Fail-closed: unreadable/invalid declaration
+// yields an empty set, so referenced projection-only skills are undeclared.
+function loadIr058DeclaredSkillNames(root: string): Set<string> {
+  const names = new Set<string>();
+  const declPath = path.join(root, "src", "third-party", "skills.yaml");
+  let text: string;
+  try {
+    text = fs.readFileSync(declPath, "utf-8");
+  } catch {
+    return names;
+  }
+  let parsed: unknown;
+  try {
+    parsed = Bun.YAML.parse(text);
+  } catch {
+    return names;
+  }
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    return names;
+  }
+  const skills = (parsed as { skills?: unknown }).skills;
+  if (!Array.isArray(skills)) return names;
+  for (const entry of skills) {
+    if (typeof entry !== "object" || entry === null || Array.isArray(entry)) continue;
+    const name = (entry as { name?: unknown }).name;
+    if (typeof name === "string" && name.length > 0) names.add(name);
+  }
+  return names;
+}
+
 function checkDistributionUntrackedSkillReference(root: string): CheckResult[] {
   const results: CheckResult[] = [];
 
@@ -5270,7 +5302,8 @@ function checkDistributionUntrackedSkillReference(root: string): CheckResult[] {
   const projectionSkillDirs = listDirs(projectionSkillsDir);
 
   // Projection-only skill names: exist in .opencode/skills/ but not in src/opencode/skills/.
-  // repo-* prefix is repo-local by design (v2:ADR-0106 / v2:REQ-0159-002).
+  // Branch 1 (IR-058 3-branch judgment): repo-* prefix is repo-local by design
+  // (v2:ADR-0106 / v2:REQ-0159-002) and excluded as before.
   const projectionOnlySkills = projectionSkillDirs.filter(
     (d) => !sourceSkillDirs.has(d) && !d.startsWith("repo-"),
   );
@@ -5281,6 +5314,26 @@ function checkDistributionUntrackedSkillReference(root: string): CheckResult[] {
         "Inventory",
         "distribution-untracked-skill-reference",
         "No projection-only skills referenced by distribution (v2:REQ-0159-003)",
+      ),
+    );
+    return results;
+  }
+
+  // Branch 2 (IR-058 3-branch judgment): a projection-only skill name declared
+  // in src/third-party/skills.yaml is a compliant declared third-party reference
+  // and is excluded from the scan targets. Branch 3 + reverse check: an
+  // undeclared projection-only name referenced by distribution is a strict fail.
+  const declaredSkillNames = loadIr058DeclaredSkillNames(root);
+  const undeclaredProjectionOnly = projectionOnlySkills.filter(
+    (d) => !declaredSkillNames.has(d),
+  );
+
+  if (undeclaredProjectionOnly.length === 0) {
+    results.push(
+      ok(
+        "Inventory",
+        "distribution-untracked-skill-reference",
+        "All projection-only skill references are declared in src/third-party/skills.yaml (IR-058 3-branch, v2:REQ-0159-003)",
       ),
     );
     return results;
@@ -5303,7 +5356,7 @@ function checkDistributionUntrackedSkillReference(root: string): CheckResult[] {
   }
 
   let foundViolation = false;
-  for (const skillName of projectionOnlySkills) {
+  for (const skillName of undeclaredProjectionOnly) {
     const refPattern = buildIr058ReferencePattern(skillName);
     let referenced = false;
     let evidence: { file: string; line: number; text: string } | null = null;
@@ -5329,12 +5382,12 @@ function checkDistributionUntrackedSkillReference(root: string): CheckResult[] {
         ng(
           "Inventory",
           "distribution-untracked-skill-reference",
-          `Skill '${skillName}' is referenced by distribution (${evidence!.file}:${evidence!.line}) but exists only in .opencode/skills/. Promote to src/opencode/skills/ (v2:ADR-0134/v2:REQ-0159-001).`,
+          `Skill '${skillName}' is referenced by distribution (${evidence!.file}:${evidence!.line}) but exists only in .opencode/skills/ and is not declared in src/third-party/skills.yaml. Promote to src/opencode/skills/ or register it in src/third-party/skills.yaml (v2:ADR-0134/v2:REQ-0159-001).`,
           undefined,
           undefined,
           {
             evidence: `${evidence!.file}:${evidence!.line}: ${evidence!.text}`,
-            expected: `src/opencode/skills/${skillName}/`,
+            expected: `src/opencode/skills/${skillName}/ or src/third-party/skills.yaml declaration of '${skillName}'`,
             route: determineRoute("integrity-rule-gap", 1),
           },
         ),
@@ -5347,7 +5400,7 @@ function checkDistributionUntrackedSkillReference(root: string): CheckResult[] {
       ok(
         "Inventory",
         "distribution-untracked-skill-reference",
-        "No projection-only skills referenced by distribution (v2:REQ-0159-003)",
+        "No undeclared projection-only skills referenced by distribution (IR-058 3-branch + reverse check, v2:REQ-0159-003)",
       ),
     );
   }
