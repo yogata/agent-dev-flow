@@ -9,7 +9,7 @@ param()
 # repo's src/opencode/ source tree. The archive contains:
 #   agentdev-release-<sha>/
 #     src/opencode/commands/agentdev/**.md
-#     src/opencode/skills/agentdev-*/**, japanese-tech-writing/**
+#     src/opencode/skills/agentdev-*/**
 #     src/opencode/tools/agentdev-*/**        (Custom Tool distribution type)
 #     src/opencode/plugins/agentdev-*/**      (Plugin / Hook distribution type)
 #     scripts/install.ps1            (projected from scripts/consumer/archive/install.ps1)
@@ -164,9 +164,9 @@ try {
     # Commands: real-file recursive copy (junctions resolved by Copy-Item).
     Copy-Item -Path (Join-Path $srcCommands "*") -Destination $stageCommands -Recurse -Force
 
-    # Skills: agentdev-* and japanese-tech-writing only.
+    # Skills: agentdev-* only.
     $skillDirs = Get-ChildItem -LiteralPath $srcSkills -Directory | Where-Object {
-        $_.Name -like "agentdev-*" -or $_.Name -eq "japanese-tech-writing"
+        $_.Name -like "agentdev-*"
     }
     foreach ($d in $skillDirs) {
         $stageSkillDir = Join-Path $stageSkills $d.Name
@@ -220,7 +220,7 @@ try {
 
     # Pre-publication boundary inspection #2: archive EXTRAS. The host
     # checker's archive profile walks src/opencode/{commands/agentdev,
-    # skills/<agentdev-*|japanese-tech-writing>}/** only, so it would
+    # skills/agentdev-*}/** only, so it would
     # silently skip README-INSTALL.md and the archive edition of
     # scripts/install.ps1. Build an auxiliary scan root with those files
     # placed under src/opencode/commands/agentdev/ and re-invoke the same

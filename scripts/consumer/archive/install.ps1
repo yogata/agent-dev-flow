@@ -86,9 +86,9 @@ foreach ($f in $commandFiles) {
     Place-File -SrcFile $f.FullName -DstFile $dst
 }
 
-# Skills: agentdev-* and the japanese-tech-writing dependency (REQ-{NNNN}).
+# Skills: agentdev-* only.
 $skillDirs = Get-ChildItem -LiteralPath $skillsSrc -Directory | Where-Object {
-    $_.Name -like "agentdev-*" -or $_.Name -eq "japanese-tech-writing"
+    $_.Name -like "agentdev-*"
 }
 foreach ($skillDir in $skillDirs) {
     $skillFiles = Get-ChildItem -LiteralPath $skillDir.FullName -Recurse -File

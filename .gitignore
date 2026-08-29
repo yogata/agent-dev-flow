@@ -7,8 +7,6 @@
 !.opencode/commands/repo/
 .opencode/skills/*
 !.opencode/skills/repo-*/
-# japanese-tech-writing は追跡対象外（ローカルのみで管理）
-src/opencode/skills/japanese-tech-writing/
 .opencode/tools/agentdev-*/
 .opencode/plugins/agentdev-*/
 .opencode/plugins/agentdev-*.ts

@@ -4,7 +4,7 @@ AgentDevFlow を編集するエージェント向けのリポジトリガイド�
 
 ## 行動規範
 
-- 基本言語は日本語。例外無く、中国語での出力を禁止する。執筆規範は `japanese-tech-writing` スキルに従うこと。
+- 基本言語は日本語。例外無く、中国語での出力を禁止する。執筆規範は `agentdev-doc-writing` スキルが正規参照点とする文章規範（third-party Skill）に従うこと。
 - 思考・thinking・出力における基本言語は日本語。
 - 文書種別の配置基準、用語政策（英字許容リスト、訳語表）は `docs/designs/responsibilities/document-type-responsibilities.md` を参照すること。
 - req-define に構造化された要件が渡された場合は別エージェントでの使用を想定し、AskUserQuestion を使用せずに質問すること。

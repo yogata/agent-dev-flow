@@ -8,7 +8,6 @@
 agentdev-release-<sha>/
   src/opencode/commands/agentdev/**.md
   src/opencode/skills/agentdev-*/**/**
-  src/opencode/skills/japanese-tech-writing/**/**
   scripts/install.ps1
   README-INSTALL.md
 ```

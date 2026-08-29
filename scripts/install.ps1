@@ -18,8 +18,6 @@
     Creates junctions for public runtime artifacts ONLY:
     - .opencode/commands/agentdev/  = junction -> .agentdev-plugin/src/opencode/commands/agentdev/
     - .opencode/skills/agentdev-*/  = individual junctions -> .agentdev-plugin/src/opencode/skills/agentdev-*/
-    - .opencode/skills/japanese-tech-writing/ = junction -> .agentdev-plugin/src/opencode/skills/japanese-tech-writing/
-      (distribution-dependent skill referenced by agentdev-doc-writing)
     - .opencode/tools/agentdev-*/   = individual junctions -> .agentdev-plugin/src/opencode/tools/agentdev-*/
       (Custom Tool distribution type)
     - .opencode/plugins/agentdev-*/ = individual junctions -> .agentdev-plugin/src/opencode/plugins/agentdev-*/
@@ -184,16 +182,11 @@ function Get-ConsumerJunctionTargets {
         $targets.Add('commands\agentdev')
     }
 
-    # skills\agentdev-* (dynamic enumeration) plus japanese-tech-writing
-    # (distribution-dependent skill referenced by agentdev-doc-writing, ADR-{NNNN}/REQ-{NNNN}-{NNN}).
+    # skills\agentdev-* (dynamic enumeration)
     $skillsSource = Join-Path $SourceDir 'skills'
     if (Test-Path -LiteralPath $skillsSource) {
         Get-ChildItem -LiteralPath $skillsSource -Directory -Filter 'agentdev-*' |
             ForEach-Object { $targets.Add("skills\$($_.Name)") }
-        # japanese-tech-writing is promoted to src/ but lacks agentdev-* prefix (ADR-{NNNN}).
-        if (Test-Path -LiteralPath (Join-Path $skillsSource 'japanese-tech-writing')) {
-            $targets.Add('skills\japanese-tech-writing')
-        }
     }
 
     # tools\agentdev-* (Custom Tool 配布種別、動的列挙)
@@ -691,7 +684,6 @@ if ($Mode -eq 'apply') {
     Write-Host '  .sisyphus/'
     Write-Host '  .opencode/commands/agentdev/'
     Write-Host '  .opencode/skills/agentdev-*/'
-    Write-Host '  .opencode/skills/japanese-tech-writing/'
     Write-Host '  .opencode/tools/agentdev-*/'
     Write-Host '  .opencode/plugins/agentdev-*/'
     Write-Host '  .opencode/plugins/agentdev-*.ts'

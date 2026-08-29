@@ -85,13 +85,11 @@ function makeConsumerRepo(zipCheckout: boolean, localSource = false): string {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), zipCheckout ? "adf-zip-" : "adf-git-"));
   fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode", "commands", "agentdev"), { recursive: true });
   fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode", "skills", "agentdev-workflow-case-run"), { recursive: true });
-  fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode", "skills", "japanese-tech-writing"), { recursive: true });
   fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode", "tools", "agentdev-gh"), { recursive: true });
   fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode", "plugins", "agentdev-gh-write-guard"), { recursive: true });
   fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode", "plugins", "agentdev-gh-tool"), { recursive: true });
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode", "commands", "agentdev", "case-run.md"), "# case-run\n");
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode", "skills", "agentdev-workflow-case-run", "SKILL.md"), "# case-run skill\n");
-  fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode", "skills", "japanese-tech-writing", "SKILL.md"), "# jtw\n");
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode", "tools", "agentdev-gh", "index.ts"), "// agentdev-gh tool\n");
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode", "plugins", "agentdev-gh-write-guard", "plugin.ts"), "// agentdev-gh-write-guard plugin\n");
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode", "plugins", "agentdev-gh-tool", "plugin.ts"), "// agentdev-gh-tool plugin\n");
