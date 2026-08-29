@@ -36,6 +36,7 @@ AgentDevFlow プラグインの設定を管理するリポジトリ。AI エー�
 | 採用済み成果物（intake/learning/inspect）がある | `/agentdev/backlog-review` | `RU-*.md` |
 | RU がある | `/agentdev/req-define` | 要件doc（draft） |
 | 未解決事項を課題として追跡したい | `/agentdev/issue` | 追跡Issue（GitHub Issue、Tool 操作契約経由） |
+| third-party Skill を宣言（skills.yaml）に基づき取得・同期したい | `/agentdev/third-party-sync` | 取得結果報告（対象一覧、成否、配置パス、管理外衝突検出状況。Tool 操作契約経由） |
 | docs 全体の意味整合性を検出したい | `/agentdev/inspect-docs` | 検出事項（finding） |
 | Command/Skill 参照妥当性を検出したい | `/agentdev/inspect-skills` | 検出事項（finding） |
 | 検出事項を分類したい | `/agentdev/inspect-promote` | 採用済み成果物 |
