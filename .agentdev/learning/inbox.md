@@ -710,3 +710,35 @@
 - **想定反映先**: agentdev-workflow-case-close / case-run の検証手順（同一性確認の記述がある箇所）
 - **関連**: PR 2459 本文「Findings / Capture候補」learning 1件目（回収元: https://github.com/yogata/agent-dev-flow/pull/2459 ）
 - **タグ**: `#powershell` `#git-show` `#encoding`
+
+## 宣言データの確定値を case-open の実行契約へ明記しないと実装委譲内で blocked になる
+
+- **発見事項**: source URL のような運用者登録データを前提とする Issue（Epic #2446 の 2-1、skills.yaml への宣言追加）で、確定値が Issue 作成時の実行契約に明記されておらず、実装委譲内で blocked（source URL 未確定）になった。運用者が gist URL（https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d）を確定したことで解消（SSoT: Issue #2451 コメント）
+- **特性区分**: 運用（case-open の実行契約項目と宣言データ登録の接続）
+- **確知手段**: PR #2462 本文の blocked 解消経過の記録と Issue #2451 コメントの対照確認
+- **根本原因**: 宣言データを要求する REQ の場合、そのデータの確定責務とタイミングが case-open の実行契約項目になっていなかった
+- **恒久対応内容**: なし（本 Case では blocked → 運用者判断 → unblock の往復 1 回で解消）
+- **ユーザー確認有無**: あり（source URL の運用者確定）
+- **ADR/REQ/spec影響**: なし（REQ-002-042〜044 の「source URL は宣言データとして運用者が登録する」の運用知見）
+- **横展開観点**: 運用者登録データ（URL、識別子、外部リソース指定等）を前提とする REQ を追加するすべての場面
+- **再発条件**: 宣言データの確定を前提とする子 Issue が、確定値なしで case-open される場合
+- **予防策候補**: 宣言データを要求する REQ の case-open 実行契約に「確定値の明記または blocked 判定の事前確認」を項目化
+- **想定反映先**: agentdev-workflow-case-open の実行契約確定手順
+- **関連**: PR #2462 本文「Findings / Capture候補」learning 1件目（回収元: https://github.com/yogata/agent-dev-flow/pull/2462 ）
+- **タグ**: `#case-open` `#declaration-data` `#blocked-resolve`
+
+## worktree での実フェッチ検証は endpoint 注入と同一コード経路のファイルレス実行で可能
+
+- **発見事項**: 取得機構の実フェッチ検証（TS-008/TS-007）で、mock（endpoints 差し替え）テストに加え、本番 fetcher（createGitHubSourceFetcher 無引数）での実フェッチを bun -e の1文で実行できた。スクリプトファイルの配置は distribution-boundary-guard の write hook に阻害されるため、ファイルレス実行が有効だった
+- **特性区分**: 運用（検証手法）
+- **確知手段**: PR #2462 / #2463 の TS-008 / TS-007 検証実行の成功
+- **根本原因**: なし（改善知見。スクリプトファイル配置経路の write hook は正常な防衛動作）
+- **恒久対応内容**: なし
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（検証手順の運用知見）
+- **横展開観点**: distribution-boundary-guard 適用下の worktree で一時スクリプトを実行するすべての検証
+- **再発条件**: worktree 内で検証用スクリプトをファイル配置して実行しようとする場合
+- **予防策候補**: 実フェッチ系検証は bun -e ファイルレス実行 + endpoint 注入（mock-source）の2系統を使い分ける手順の明記
+- **想定反映先**: agentdev-workflow-case-run / case-close の検証手順、third-party-sync 関連 Issue のテスト戦略
+- **関連**: PR #2462 本文「Findings / Capture候補」learning 2件目（回収元: https://github.com/yogata/agent-dev-flow/pull/2462 ）
+- **タグ**: `#third-party-sync` `#verification` `#bun-e` `#distribution-boundary-guard`
