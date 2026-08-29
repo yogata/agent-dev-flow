@@ -2,7 +2,7 @@
 title: ルール所有権マトリックス
 status: accepted
 created: 2026-08-20
-updated: 2026-08-22
+updated: 2026-08-30
 ---
 
 # ルール所有権マトリックス
@@ -79,7 +79,7 @@ REQ-047 が定める対象規則（command format、ガードレール番号、�
 | command format | [command-file-format.md](../authoring/command-file-format.md)（工程表形式が公開 command の正規形。ガードレール番号の様式も同 Design が所有） | `data/command-format-rules.yaml`（検出用ビュー） | `check_command_format.ts`（IR-049/028/029/030/031 検出定数、工程表検査）、`check_workflow_preventive.ts`（check 7: yaml の regex コンパイル性と thin 標本非拒否を検証） | `check_command_format.test.ts`、`check_workflow_preventive.test.ts`、`commands_error_cases.test.ts` |
 | ガードレール識別体系 | REQ-051-005/006、REQ-010-064/068（検出要件行）+ [IR-063](rules/IR-063-common-policy-identifier-invariant.md)（検出契約）+ command-file-format.md ガードレール識別体系節（ID 不要の Command 固有境界、共通ポリシーの意味識別子） | なし（検出は checker 内の抽出パターン。data yaml を持たない） | `check_integrity.ts`（checkCommonPolicyIdentifierInvariant） | `check_integrity.test.ts` IR-063 describe（baseline エントリなし） |
 | 廃止語彙と旧パス | REQ-010-066/067（検出要件行）+ [IR-065](rules/IR-065-obsolete-vocabulary-current-use.md) / [IR-066](rules/IR-066-legacy-path-removed-name.md)（検出契約） | `data/obsolete-vocabulary-map.yaml`（語彙 ID、existence_probe、exemption_files、否定文脈語の運用データ） | `check_integrity.ts`（checkObsoleteVocabulary。検出シグナル正規表現は IR065_/IR066_ 定数） | `check_integrity.test.ts` IR-065/066 describe（drift 検出含む）、NG baseline |
-| 配布境界 | REQ-029 + DEC-014 + [distribution-boundary.md](distribution-boundary.md)（検証モデル）+ [runtime-package-boundary.md](../local/runtime-package-boundary.md)（リポジトリ種別・命名規約） | `data/distribution-targets.yaml`（検出用ビュー。ただし現行 checker は本 yaml を読まない。同期条件は下表） | `check_distribution_boundary.ts` + `lib/distribution-boundary-*.ts`、`.opencode/plugins/distribution-boundary-guard` | `check_distribution_boundary.test.ts`、`distribution_boundary_routing_contract.test.ts`、boundary 系 test 群 |
+| 配布境界 | REQ-029 + DEC-014 + [distribution-boundary.md](distribution-boundary.md)（検証モデル）+ [runtime-package-boundary.md](../local/runtime-package-boundary.md)（リポジトリ種別・命名規約） | `data/distribution-targets.yaml`（検出用ビュー。ただし現行 checker は本 yaml を読まない。同期条件は下表） | `check_distribution_boundary.ts` + `lib/distribution-boundary-*.ts`、`src/opencode/plugins/agentdev-distribution-boundary-guard/` | `check_distribution_boundary.test.ts`、`distribution_boundary_routing_contract.test.ts`、boundary 系 test 群 |
 | 同種の integrity 検査定義（IR 体系一般） | [integrity-contracts.md](integrity-contracts.md)（strict/heuristic/observation 分類と検査カテゴリ）+ [integrity-rule-catalog.md](integrity-rule-catalog.md)（schema）+ `rules/IR-NNN-*.md`（個別検出契約） | 各 data yaml（検出用ビュー）と baselines（既知違反の運用データ） | `check_integrity.ts` ほか checker 群 | 各 checker 対応の `*.test.ts` と回帰テスト群 |
 
 ### 同期条件と独立所有の明示（REQ-047-003）

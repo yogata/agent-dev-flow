@@ -2,6 +2,7 @@
 draft_type: req_draft
 topic_slug: distribution-boundary-guard-packaging
 status: saved
+design_applied: true
 created_at: 2026-08-30T08:16:18+09:00
 source_rus:
   - RU-0001

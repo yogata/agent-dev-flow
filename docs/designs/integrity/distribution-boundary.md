@@ -2,7 +2,7 @@
 title: "配布依存境界"
 status: accepted
 created: "2026-08-11"
-updated: "2026-08-23"
+updated: "2026-08-30"
 ---
 <!-- ADF-COVERS(implementation): REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-045 -->
@@ -101,7 +101,9 @@ Epic 実装はこれに従う。
 関数署名、実装コード、内部データ表現は実装詳細として本節に含めない。
 
 - 共有 module: 副作用なし（side-effect-free）の canonical detector module は repo-agentdev-integrity 配下が所有する。想定モジュールパスは `.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts`。既存の checker はこの共有 module への adapter となる。
-- repo-local plugin: plugin パスは `.opencode/plugins/distribution-boundary-guard.ts`。
+- repo-local plugin: 正本は `src/opencode/plugins/agentdev-distribution-boundary-guard/` 配下（package.json に repo-local 配布除外の判定根拠を含む）。利用側は self-sync 投影（`.opencode/plugins/agentdev-distribution-boundary-guard/` junction + depth-1 loader shim `agentdev-distribution-boundary-guard.ts`）。
+- plugin からの相対 import は、移動後に想定モジュールパス（canonical detector `.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts`）へ src 配下から .opencode 配下への逆向き参照になる（REQ-018 テスト fallback 観点）。
+- 旧名称・旧パス（distribution-boundary-guard、`.opencode/plugins/distribution-boundary-guard.ts`）を obsolete-vocabulary-map.yaml（IR-066）へ登録し、並存禁止を機械検出可能にする方針とする。
 - 事前書き込み gate: OpenCode の `tool.execute.before` フック（サポート対象は `edit`、`write`、`apply_patch`）で構成する。adapter は prospective content を評価し、違反または検査エラー時に書き込みを block する。
 - archive 公開前検査の呼び出し点: `scripts/self/release/package-release-archive.ps1` が最終公開前に一時 archive を検証する。
 - archive-installed 検証の配置: 一時的な consumer/archive-install パスを用いて archive-installed projection を検証する。consumer 向け公開入口（scripts/install.ps1）へ新たな責務を追加しない。archive-installed 検証は consumer 向け公開入口を利用しない別経路を維持する（特定入口名への再刻印を避け、将来の入口再編で再度陳腐化しない一般化表現とする）。

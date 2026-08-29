@@ -240,6 +240,15 @@ Custom Tool（src/opencode/tools/）と Plugin / Hook（src/opencode/plugins/）
 link mode の接続対象に含める。scripts/ 直下の公開入口は従来どおり2本に固定し、Tool / Plugin の追加によって
 新たな公開入口を作らない（REQ-050-001、REQ-052-008）。ディレクトリ構造の詳細は本 Design が所有する。
 
+### repo-local Plugin の配布・投影契約
+
+repo-local Plugin（REQ-002-045）の配布・投影については次のとおりである。
+
+- repo-local Plugin の正本配置原則は `src/opencode/plugins/<agentdev-name>/` 配下である。consumer 配布系全経路（`scripts/install.ps1`、`scripts/consumer/` 配下の archive installer、`scripts/self/release/package-release-archive.ps1`）は repo-local 配布除外を実装し、3ファイルの列挙条件を同期する義務を持つ。
+- `scripts/self-sync.ps1` は repo-local Plugin を除外しない（自己ホスト投影を維持する）。理由は、consumer 配布と自己ホスト投影が非対称であるためである。repo-local Plugin は REQ-052-006 により consumer への配布対象外である一方、自己ホスト環境では Plugin を利用可能にする必要がある。自己ホスト投影は canonical チェックアウト内部の source → projection 構成（`.opencode/plugins/` への junction と depth-1 loader shim 生成）であり、consumer への配布ではないため、配布除外機構の適用対象外である。
+- 除外機構の実現方式は明示的除外リスト等とする。REQ-002-011 の repo-* prefix 方式を plugin に採用しない（shim 名が repo-*.ts になり、stale shim 検出フィルタ等の波及修正が増えるため）。
+- 将来 repo-local Plugin が複数化した時点で、マーカー方式（package.json マーカーフィールド等）への拡張条件を判断する。
+
 ## 誤実行防止の環境判定方式
 
 両公開入口は実行対象環境を機械的に判定し、誤った環境では変更前に停止して適切な公開入口を案内する（REQ-050-006）。
