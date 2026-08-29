@@ -225,7 +225,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | integrity/autogen-freshness-gate.md | draft | AUTOGEN ブロック鮮度検出 gate | AUTOGEN ブロック（design-health-metrics.md 等）の鮮度検出、rename/status 変更時の再生成必要性判定、不合格時の処置 |
 | integrity/test-impact-detection-gate.md | draft | テスト影響範囲検出 gate | リファクタリング PR で Design 変更に連動する周辺テストの陳腐化検出。変更 Design を参照し同一 PR で未更新のテストを陳腐化候補として報告、不合格時の処置契約（REQ-019） |
 | integrity/checker-execution-contracts.md | accepted | checker 実行契約と検出基盤規則 | checker 共通実行契約、検出対象除外規定、宣言的データ YAML の schema 原則、detector 命名規約 |
-| integrity/content-corruption-checker.md | draft | 決定的破損検査クラス | 配布 command・skill 全体の決定的破損検査（Markdown 構造破損、制御文字混入、不正な Unicode 文字、意図しない異言語文字、既知形式の参照残骸）の検査クラス契約、検出シグナル、検出平面、許容例列挙（REQ-010-071、REQ-053-012） |
+| integrity/content-corruption-checker.md | accepted | 決定的破損検査クラス | 配布 command・skill 全体の決定的破損検査（Markdown 構造破損、制御文字混入、不正な Unicode 文字、意図しない異言語文字、既知形式の参照残骸）の検査クラス契約、検出シグナル、検出平面、許容例列挙（REQ-010-071、REQ-053-012） |
 
 #### local/（ローカル版 Design）
 
