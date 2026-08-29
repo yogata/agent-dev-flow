@@ -1,0 +1,32 @@
+# third-party Skill 宣言ファイル
+#
+# 位置づけ: 配布成果物種別ではない宣言ファイル（DEC-023 決定2、case-schema/ 先行例と同様）。
+# third-party Skill の本体は ADF リポジトリおよび配布成果物へ含めず、本宣言に基づく
+# 取得機構経由で利用者環境の .opencode/skills/<name>/ へ配置する
+# （REQ-002-042、REQ-002-043）。
+#
+# 正本: docs/designs/local/third-party-skill-management.md「宣言ファイル（skills.yaml）」
+# 要求: REQ-002-042、REQ-002-043、REQ-002-044（AG-002、AG-010、AG-011）
+# 検証: src/third-party/lib/skills_declaration.ts
+
+schema_version: "1.0"
+
+# 宣言エントリのスキーマ（name + source のみ）。
+#
+#   name:
+#     kebab-case（^[a-z0-9]+(-[a-z0-9]+)*$）。
+#     agentdev-・repo- 接頭辞は拒否する（名前空間予約との衝突回避）。
+#   source:
+#     取得元 URL。版固定は source URL で表現する。
+#     取得形式（単一ファイル型 / ディレクトリ型）は source から判定するため、
+#     type 項目を持たない。
+#
+# revision 項目なし、type 項目なし。スキーマ外の項目を宣言した場合は検証違反
+# （取得停止）となる。
+#
+# 宣言例（schema 例示であり実在しない宣言。実際の source URL は運用者が登録する）:
+# skills:
+#   - name: example-skill
+#     source: https://example.com/example-skill/SKILL.md
+
+skills: []
