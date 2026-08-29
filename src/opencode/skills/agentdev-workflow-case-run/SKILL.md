@@ -108,7 +108,7 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 - `agentdev-workflow-lifecycle`: work_type 判定、引き継ぎ停止判定（runtime-package-boundary）
 - `agentdev-epic-tracker`: Epic Issue 本文読込、Wave 子Issue 特定、親Epic ステータス更新
 - `agentdev-req-analysis`: チェックボックス品質基準
-- `agentdev-quality-gates`: QG-3 前置 staleness check、QG-4 bun test フル suite 正規形（機械受理基準）
+- `agentdev-quality-gates`: QG-3 前置の鮮度検出、QG-4 bun test フル suite 正規形（機械受理基準）
 - Custom Tool `agentdev_gh`: Issue 本文読取等の I/O 操作
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 - `agentdev-traceability`: トレーサビリティ能力（coverage、check。委譲内の対応関係確認と PR 作成前検査。fail-open）
