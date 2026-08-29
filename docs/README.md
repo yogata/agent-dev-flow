@@ -6,10 +6,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 43件、廃止済み: 9件
+現行 REQ: 44件、廃止済み: 9件
 <!-- AUTOGEN:END -->
 
-現行要件は43件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
+現行要件は44件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
 各 REQ の詳細は各 REQ ファイル本文を参照。
 
 | REQ | タイトル |
@@ -57,6 +57,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [REQ-050](requirements/REQ-050.md) | scripts 公開入口境界 |
 | [REQ-051](requirements/REQ-051.md) | ガードレール識別体系と機械検査の再編 |
 | [REQ-052](requirements/REQ-052.md) | Custom Tool・Plugin/Hook の種別契約と配布境界 |
+| [REQ-053](requirements/REQ-053.md) | 配布物の文章品質契約 |
 
 - [要件インデックス](requirements/README.md)
 

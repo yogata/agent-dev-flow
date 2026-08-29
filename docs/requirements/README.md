@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下43件を第一参照先とする。
+現在の要件判断では、以下44件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -55,6 +55,7 @@
 | [REQ-050](REQ-050.md) | scripts 公開入口境界 |
 | [REQ-051](REQ-051.md) | ガードレール識別体系と機械検査の再編 |
 | [REQ-052](REQ-052.md) | Custom Tool・Plugin/Hook の種別契約と配布境界 |
+| [REQ-053](REQ-053.md) | 配布物の文章品質契約 |
 <!-- AUTOGEN:END -->
 
 ## 廃止済み要件
