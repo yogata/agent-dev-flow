@@ -1,6 +1,6 @@
 ---
 title: third-party-sync Design
-status: draft
+status: accepted
 created: 2026-08-30
 updated: 2026-08-30
 ---

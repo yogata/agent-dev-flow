@@ -662,3 +662,51 @@
 - **想定反映先**: agentdev-git-worktree の worktree 構造的制約（新規ディレクトリ作成手順）、agentdev-workflow-case-run の委譲手順
 - **関連**: PR 2445 本文「Findings / Capture候補」learning 3件目（回収元: https://github.com/yogata/agent-dev-flow/pull/2445 ）
 - **タグ**: `#gitignore` `#node-modules` `#bun-install` `#worktree`
+
+## Windows PowerShell の Get-Content | Set-Content による UTF-8 ファイルの cp932 文字化け（再確認）
+
+- **問題事象**: 既存 UTF-8（BOM なし）ファイルを PowerShell の Get-Content | Set-Content（utf8NoBOM 指定付き）で書き換えると、Get-Content 側が cp932 で解釈し日本語コメントが文字化けした（AGENTS.md の既知事象と同一）。write ツールによる全面再書き込みで復旧
+- **発生局面**: 実装（case-run 委譲、Epic 2446 Wave 1、PR 2458）
+- **検知方法**: 編集後のファイル内容確認で日本語コメントの文字化けを検出
+- **根本原因**: PowerShell 5.x 系の Get-Content が BOM なし UTF-8 をシステム既定エンコーディング（cp932）で解釈する挙動を、utf8NoBOM 指定の Set-Content と組み合わせて看的下した
+- **自律対応内容**: write ツールによる全面再書き込みで復旧した。edit ツール優先のガイドレールは繰り返し有効
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（リポジトリ ガイドレールの運用知見）
+- **横展開観点**: Windows 環境で既存 UTF-8 ファイルを PowerShell で書き換えるすべての場面
+- **再発条件**: Get-Content（既定エンコーディング）で読み込んだ内容を Set-Content で書き戻す場合
+- **予防策候補**: 既存 UTF-8 ファイルの編集は edit ツールを優先する。PowerShell で扱う場合は [System.IO.File]::ReadAllText / WriteAllText に明示エンコーディングを渡す
+- **想定反映先**: AGENTS.md の文字化けガイドレール（既存）、agentdev-workflow-case-run の委譲手順
+- **関連**: PR 2458 本文「Findings / Capture候補」learning 1件目（回収元: https://github.com/yogata/agent-dev-flow/pull/2458 ）
+- **タグ**: `#windows` `#powershell` `#encoding` `#mojibake`
+
+## distribution boundary check の concrete-id は新規配布物原本・テスト内の ID 表記からも検出される
+
+- **問題事象**: なし（検証設計の知見。問題発生ではない）
+- **発生局面**: 実装（case-run 委譲、distribution boundary check の新規違反解消、PR 2458）
+- **検知方法**: check_distribution_boundary.ts（source profile）の concrete-id findings（実装中に一時的に新規 17件）
+- **根本原因**: 新規配布物原本内の concrete ID（REQ-NNN、DEC-NNN、AG-NNN、TS-NNN を含む）と tests 内のテスト戦略識別子（TS-002 等）が検出対象になる構造を事前に織り込んでいなかった
+- **自律対応内容**: tests・README・コメント内の ID 表記を Design パス参照・ID なし表現へ修正して解消済み。既存 baseline（agentdev-gh 系11件）は既出として維持
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（配布依存境界検査の運用知見）
+- **横展開観点**: 新規配布物（command / SKILL.md / Tool / Plugin）と付随テストを作成するすべての場面
+- **再発条件**: 新規配布物原本・テストに REQ/DEC/AG/TS 等の ID を含めて commit する場合
+- **予防策候補**: 新規配布物・テストには ID を含まない表現（Design パス参照等）を使う
+- **想定反映先**: agentdev-git-worktree / case-run の配布物新設手順、agentdev-skill-authoring の記載様式
+- **関連**: PR 2458 本文「Findings / Capture候補」learning 2件目（回収元: https://github.com/yogata/agent-dev-flow/pull/2458 ）
+- **タグ**: `#distribution-boundary` `#concrete-id` `#naming`
+
+## PowerShell で git show の出力をパイプ受信すると cp932 デコードで ASCII パターンも取りこぼす
+
+- **問題事象**: PowerShell で git show <ref>:<path> の出力をパイプ受信すると cp932 デコードで mojibake が発生し、ASCII パターン（REQ-011 等）もマルチバイト文字に取り込まれて Select-String が取りこぼすことがあった
+- **発生局面**: 検証（case-run 委譲、main との同一性確認、PR 2459）
+- **検知方法**: Select-String の検出件数が期待より少ないことの確認
+- **根本原因**: パイプ受信時の PowerShell 側デコード（cp932）が 8bit 多バイト文字境界を跨いで ASCII 列を破壊する
+- **自律対応内容**: main との同一性確認を git diff <ref> HEAD --stat -- <path> を正とする方式へ変更した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（検証手順の運用知見）
+- **横展開観点**: PowerShell 上で git のバイナリ安全性が必要な出力をテキスト加工するすべての場面
+- **再発条件**: git show / git log 等の出力を PowerShell パイプで受信して文字列検索する場合
+- **予防策候補**: 同一性・差分確認は git diff / --stat を正とする。パイプ受信で文字列検索しない
+- **想定反映先**: agentdev-workflow-case-close / case-run の検証手順（同一性確認の記述がある箇所）
+- **関連**: PR 2459 本文「Findings / Capture候補」learning 1件目（回収元: https://github.com/yogata/agent-dev-flow/pull/2459 ）
+- **タグ**: `#powershell` `#git-show` `#encoding`

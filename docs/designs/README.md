@@ -100,7 +100,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [commands/inspect-promote.md](commands/inspect-promote.md) | accepted | `/agentdev/inspect-promote` |
 | [commands/backlog-auto.md](commands/backlog-auto.md) | accepted | `/agentdev/backlog-auto` |
 | [commands/issue.md](commands/issue.md) | accepted | `/agentdev/issue` |
-| [commands/third-party-sync.md](commands/third-party-sync.md) | draft | `/agentdev/third-party-sync`（third-party Skill 取得入口、Custom Tool 委譲） |
+| [commands/third-party-sync.md](commands/third-party-sync.md) | accepted | `/agentdev/third-party-sync`（third-party Skill 取得入口、Custom Tool 委譲） |
 
 `/repo/docs-check` は repo-local、配布対象外のため対象外。
 
@@ -233,7 +233,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | local/runtime-package-boundary.md | accepted | 実行時パッケージ境界 | リポジトリ種別別 .opencode/ 定義、命名規約、link mode 導入フロー、更新運用 |
 | local/local-case-file.md | accepted | ローカルIssue共通スキーマ | ローカルIssueの共通メタデータ、role 条件付きスキーマ、状態遷移 |
 | local/install-script-usability.md | draft | 導入スクリプトの使いやすさ詳細 | install/check/sync-self の使いやすさ詳細（対話ウィザード、cwd 安全化、ヘルプ、上級者向けオプション） |
-| local/third-party-skill-management.md | draft | third-party Skill 管理 | third-party Skill の宣言（skills.yaml）と取得機構の正規仕様（source 形式判定、取得プロファイル、非破壊性、個別特例統合、参照点集約） |
+| local/third-party-skill-management.md | accepted | third-party Skill 管理 | third-party Skill の宣言（skills.yaml）と取得機構の正規仕様（source 形式判定、取得プロファイル、非破壊性、個別特例統合、参照点集約） |
 
 #### authoring/（執筆規約）
 
