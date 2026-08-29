@@ -8,7 +8,11 @@
 //   3. github.com/{owner}/{repo}/tree/{ref}/{path} → ディレクトリ型
 //   4. raw.githubusercontent.com/{owner}/{repo}/{ref}/{path} → 末尾 SKILL.md
 //      のみ単一ファイル型。raw はディレクトリ一覧が不能なため、その他は拒否
-//   5. 上記以外 → 判定不能（取得しない）
+//   5. gist.github.com/{user}/{gist_id} → 単一ファイル型。gist は SKILL.md を
+//      1つ含むことを期待し、raw 取得は gist raw エンドポイントの
+//      gist.githubusercontent.com/{user}/{gist_id}/raw/SKILL.md へ正規化する
+//      （決定論的な最新 revision 参照。パスの追加指定は拒否）
+//   6. 上記以外 → 判定不能（取得しない）
 //
 // ref は最初のパスセグメントとして解釈する（スラッシュを含むブランチ名は
 // 宣言側で URL エンコードすることを前提とする運用規約）。
@@ -23,6 +27,8 @@ import type { AcquisitionProfile } from "./contracts.ts";
 /** 判定済み source。取得トランスポートが消費する構造化形式。 */
 export interface ResolvedSource {
   readonly profile: AcquisitionProfile;
+  /** source の提供形態。repo: リポジトリ blob/raw/tree、gist: gist raw。 */
+  readonly sourceKind: "repo" | "gist";
   readonly owner: string;
   readonly repo: string;
   readonly ref: string;
@@ -42,6 +48,8 @@ export type SourceResolution =
 
 const GITHUB_HOST = "github.com";
 const RAW_HOST = "raw.githubusercontent.com";
+const GIST_HOST = "gist.github.com";
+const GIST_RAW_HOST = "gist.githubusercontent.com";
 
 interface ParsedGitHubPath {
   readonly owner: string;
@@ -83,6 +91,31 @@ export function resolveSourceUrl(rawUrl: string): SourceResolution {
   const lastSegment = rest[rest.length - 1] ?? "";
   const endsWithSkillMd = decodeURIComponent(lastSegment).endsWith("SKILL.md");
 
+  if (host === GIST_HOST) {
+    // gist.github.com/{user}/{gist_id} のみ対応（user・gist_id は owner・repo
+    // セグメントへ解決済み）。パスの追加指定は拒否する。
+    if (rest.length !== 0) {
+      return {
+        ok: false,
+        detail: `gist source URL must be https://gist.github.com/{user}/{gist_id} (additional path segments are not supported): ${rawUrl}`,
+      };
+    }
+    return {
+      ok: true,
+      source: {
+        profile: "single-file",
+        sourceKind: "gist",
+        owner,
+        repo,
+        ref: "raw",
+        dir: "",
+        path: "SKILL.md",
+        rawUrl: buildGistRawUrl(owner, repo),
+        sourceUrl: rawUrl,
+      },
+    };
+  }
+
   if (host === RAW_HOST) {
     // raw.githubusercontent.com/{owner}/{repo}/{ref}/{path}
     const [ref, ...pathSegments] = rest;
@@ -100,6 +133,7 @@ export function resolveSourceUrl(rawUrl: string): SourceResolution {
       ok: true,
       source: {
         profile: "single-file",
+        sourceKind: "repo",
         owner,
         repo,
         ref,
@@ -128,6 +162,7 @@ export function resolveSourceUrl(rawUrl: string): SourceResolution {
         ok: true,
         source: {
           profile: "single-file",
+          sourceKind: "repo",
           owner,
           repo,
           ref,
@@ -153,6 +188,7 @@ export function resolveSourceUrl(rawUrl: string): SourceResolution {
         ok: true,
         source: {
           profile: "directory",
+          sourceKind: "repo",
           owner,
           repo,
           ref,
@@ -171,10 +207,14 @@ export function resolveSourceUrl(rawUrl: string): SourceResolution {
 
   return {
     ok: false,
-    detail: `unsupported source host "${host}" (expected github.com or raw.githubusercontent.com): ${rawUrl}`,
+    detail: `unsupported source host "${host}" (expected github.com, raw.githubusercontent.com, or gist.github.com): ${rawUrl}`,
   };
 }
 
 function buildRawUrl(owner: string, repo: string, ref: string, path: string): string {
   return `https://raw.githubusercontent.com/${owner}/${repo}/${ref}/${path}`;
+}
+
+function buildGistRawUrl(user: string, gistId: string): string {
+  return `https://${GIST_RAW_HOST}/${user}/${gistId}/raw/SKILL.md`;
 }

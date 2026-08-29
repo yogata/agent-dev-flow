@@ -31,6 +31,50 @@ describe("単一ファイル型の判定", () => {
     expect(result.source.ref).toBe("v1.2.0");
     expect(result.source.rawUrl).toContain("/path/SKILL.md");
   });
+
+  test("gist URL は SKILL.md 単一ファイル型へ正規化される", () => {
+    const result = resolveSourceUrl(
+      "https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d",
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.source.profile).toBe("single-file");
+    expect(result.source.sourceKind).toBe("gist");
+    expect(result.source.owner).toBe("k16shikano");
+    expect(result.source.repo).toBe("fd287c3133457c4fd8f5601d34aa817d");
+    expect(result.source.path).toBe("SKILL.md");
+    expect(result.source.rawUrl).toBe(
+      "https://gist.githubusercontent.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d/raw/SKILL.md",
+    );
+  });
+
+  test("gist URL のクエリ・フラグメントは無視される", () => {
+    const result = resolveSourceUrl(
+      "https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d?fileCount=1#file-skill-md",
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.source.profile).toBe("single-file");
+    expect(result.source.rawUrl).toBe(
+      "https://gist.githubusercontent.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d/raw/SKILL.md",
+    );
+  });
+
+  test("gist URL にパスの追加指定があれば拒否", () => {
+    const result = resolveSourceUrl(
+      "https://gist.github.com/user/gist123/raw/SKILL.md",
+    );
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.detail).toContain("gist source URL must be");
+  });
+
+  test("gist URL に id が欠けていれば拒否", () => {
+    const result = resolveSourceUrl("https://gist.github.com/only-user");
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.detail).toContain("no owner/repo path");
+  });
 });
 
 describe("ディレクトリ型の判定", () => {

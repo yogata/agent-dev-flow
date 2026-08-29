@@ -214,7 +214,9 @@ async function stageAcquisition(
 
   if (resolved.profile === "single-file") {
     // 取得は fetcher.endpoints 経由で行う（rawUrl は宣言 URL の正規化表示）。
-    const rawUrl = buildRawFileUrl(endpoints.rawBaseUrl, owner, repo, ref, resolved.path);
+    // gist はリポジトリ raw と別ホストのため、endpoints のgist raw ベース URL を使う。
+    const rawBase = resolved.sourceKind === "gist" ? endpoints.gistRawBaseUrl : endpoints.rawBaseUrl;
+    const rawUrl = buildRawFileUrl(rawBase, owner, repo, ref, resolved.path);
     const fetched = await env.fetcher.fetchFile(rawUrl);
     if (!fetched.ok) {
       await fs.rm(stagingDir, { recursive: true, force: true });

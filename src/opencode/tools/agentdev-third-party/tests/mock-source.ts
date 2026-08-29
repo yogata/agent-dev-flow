@@ -14,10 +14,15 @@ export interface MockSourceSpec {
   readonly owner?: string;
   readonly repo?: string;
   readonly ref?: string;
+  /** gist raw エンドポイントで提供するファイル（gist 相対パス → 内容）。 */
+  readonly gistFiles?: ReadonlyMap<string, string>;
+  readonly gistUser?: string;
+  readonly gistId?: string;
 }
 
 export interface MockSourceServer {
   readonly rawBaseUrl: string;
+  readonly gistRawBaseUrl: string;
   readonly apiBaseUrl: string;
   readonly owner: string;
   readonly repo: string;
@@ -82,6 +87,18 @@ export async function startMockGitHubSource(spec: MockSourceSpec): Promise<MockS
         return new Response("not found", { status: 404 });
       }
 
+      const gistUser = spec.gistUser ?? "gist-user";
+      const gistId = spec.gistId ?? "gist123";
+      const gistRawPrefix = `/${gistUser}/${gistId}/raw/`;
+      if (spec.gistFiles !== undefined && url.pathname.startsWith(gistRawPrefix)) {
+        const gistPath = url.pathname.slice(gistRawPrefix.length).replace(/\/+$/g, "");
+        const gistContent = spec.gistFiles.get(gistPath);
+        if (gistContent !== undefined) {
+          return new Response(gistContent, { status: 200, headers: { "Content-Type": "text/plain" } });
+        }
+        return new Response("not found", { status: 404 });
+      }
+
       return new Response("not found", { status: 404 });
     },
   });
@@ -89,6 +106,7 @@ export async function startMockGitHubSource(spec: MockSourceSpec): Promise<MockS
   const address = `http://127.0.0.1:${server.port}`;
   return {
     rawBaseUrl: address,
+    gistRawBaseUrl: address,
     apiBaseUrl: address,
     owner,
     repo,

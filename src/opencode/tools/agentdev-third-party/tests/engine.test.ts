@@ -164,6 +164,18 @@ describe("操作契約（読み戻し検証、dry-run 計画照合、不正 sour
     }
   });
 
+  test("出荷宣言と同一の schema_version 行を含む宣言を読み込める", async () => {
+    await writeDeclaration(
+      'schema_version: "1.0"\n' +
+        "skills:\n" +
+        `  - name: alpha\n    source: https://github.com/${mock.owner}/${mock.repo}/tree/${mock.ref}/skills/alpha\n`,
+    );
+    const result = await executeAcquire(env, { operation: "acquire", dryRun: true });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.success.report.targets.map((t) => t.name)).toEqual(["alpha"]);
+  });
+
   test("未宣言の対象 Skill 名は失敗として報告する", async () => {
     await writeDeclaration("skills:\n");
     const result = await executeAcquire(env, { operation: "acquire", skill: "nope" });
@@ -190,5 +202,97 @@ describe("操作契約（読み戻し検証、dry-run 計画照合、不正 sour
     expect(built.ok).toBe(false);
     if (built.ok) return;
     expect(built.failure.kind).toBe("path-unresolvable");
+  });
+});
+
+describe("gist source の取得（単一 SKILL.md 型）", () => {
+  test("gist raw エンドポイントから SKILL.md を取得し provenance に gist URL を記録する", async () => {
+    const gistMock = await startMockGitHubSource({
+      files: new Map<string, string>(),
+      directories: new Set<string>(),
+      gistFiles: new Map<string, string>([["SKILL.md", "# gist skill\n"]]),
+      gistUser: "k16shikano",
+      gistId: "fd287c3133457c4fd8f5601d34aa817d",
+    });
+    try {
+      const gistFetcher = createGitHubSourceFetcher({
+        rawBaseUrl: gistMock.rawBaseUrl,
+        gistRawBaseUrl: gistMock.gistRawBaseUrl,
+        apiBaseUrl: gistMock.apiBaseUrl,
+      });
+      const gistDecl = path.join(testRoot, "skills-gist.yaml");
+      await fs.writeFile(
+        gistDecl,
+        "skills:\n  - name: gist-skill\n    source: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d\n",
+        "utf8",
+      );
+      const built = buildTpToolEnv(
+        { declarationPath: gistDecl, skillsRoot },
+        {
+          skillsRoot: (candidates) => candidates[0] ?? null,
+          stagingRoot: () => stagingRoot,
+        },
+        gistFetcher,
+      );
+      if (!built.ok) throw new Error("env build failed");
+
+      const result = await executeAcquire(built.env, { operation: "acquire" });
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      expect(result.success.report.summary.succeeded).toBe(1);
+      expect(result.success.report.results[0]?.placementPath).toBe(path.join(skillsRoot, "gist-skill"));
+
+      const placed = await fs.readFile(path.join(skillsRoot, "gist-skill", "SKILL.md"), "utf8");
+      expect(placed).toBe("# gist skill\n");
+      const provenance = JSON.parse(
+        await fs.readFile(path.join(skillsRoot, "gist-skill", PROVENANCE_FILENAME), "utf8"),
+      );
+      expect(provenance.source).toBe("https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d");
+      expect(provenance.profile).toBe("single-file");
+    } finally {
+      await gistMock.stop();
+    }
+  });
+
+  test("gist に SKILL.md が存在しない場合は取得せず失敗する（fail-closed）", async () => {
+    const gistMock = await startMockGitHubSource({
+      files: new Map<string, string>(),
+      directories: new Set<string>(),
+      gistFiles: new Map<string, string>([["README.md", "# no skill here\n"]]),
+      gistUser: "k16shikano",
+      gistId: "fd287c3133457c4fd8f5601d34aa817d",
+    });
+    try {
+      const gistFetcher = createGitHubSourceFetcher({
+        rawBaseUrl: gistMock.rawBaseUrl,
+        gistRawBaseUrl: gistMock.gistRawBaseUrl,
+        apiBaseUrl: gistMock.apiBaseUrl,
+      });
+      const gistDecl = path.join(testRoot, "skills-gist-missing.yaml");
+      await fs.writeFile(
+        gistDecl,
+        "skills:\n  - name: gist-missing\n    source: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d\n",
+        "utf8",
+      );
+      const built = buildTpToolEnv(
+        { declarationPath: gistDecl, skillsRoot },
+        {
+          skillsRoot: (candidates) => candidates[0] ?? null,
+          stagingRoot: () => stagingRoot,
+        },
+        gistFetcher,
+      );
+      if (!built.ok) throw new Error("env build failed");
+
+      const result = await executeAcquire(built.env, { operation: "acquire" });
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.failure.kind).toBe("operation-failed");
+      expect(result.failure.detail).toContain("gist-missing");
+      const entries = await fs.readdir(skillsRoot);
+      expect(entries).toEqual([]);
+    } finally {
+      await gistMock.stop();
+    }
   });
 });

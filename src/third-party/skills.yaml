@@ -29,4 +29,6 @@ schema_version: "1.0"
 #   - name: example-skill
 #     source: https://example.com/example-skill/SKILL.md
 
-skills: []
+skills:
+  - name: japanese-tech-writing
+    source: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d
