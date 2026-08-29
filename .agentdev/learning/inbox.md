@@ -774,3 +774,19 @@
 - **想定反映先**: repo-agentdev-integrity のテスト定数、agentdev-command-authoring の command 追加手順
 - **関連**: PR #2476 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2476 ）
 - **タグ**: `#integrity-suite` `#test-constant` `#command-count` `#stale-expectation`
+
+## 訳語表未登録の技術用語の可否判断は走査ごとの文脈判断になり REQ-053-004 走査の再現性を下げる
+
+- **発見事象**: 68 配布ファイルの英単語頻度集計走査（OU-002）で、REQ-053-004「無根拠な英単語混在」の判断において、配布物の英字は Design/REQ 定義済み概念名・日本語併記済み専門用語・YAML フィールド名由来が大半で許容範囲に収まった一方、訳語表に未登録の技術用語（commit message、prompt、review 等）の可否判断は走査ごとに個別の文脈判断が必要になった
+- **特性区分**: 運用（REQ-053-004 走査の再現性、Epic #2465 Wave2-b の OU-002）
+- **確知手段**: PR #2478 本文「実装内容」の非是正判断（許容英字の分類と判断根拠の記録）と REQ-053-004
+- **根本原因**: 訳語表に技術用語の登録範囲と推奨訳が未整備で、判断基準が走査時の個別文脈判断に依存する
+- **恒久対応内容**: なし（本 PR は当該走査の是正対象のみ。訳語表追補は別途提案）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（訳語表追補の要否判断は learning-promote / backlog-review 経由の別提案）
+- **横展開観点**: REQ-053-004 観点の配布物走査を新規に実施するすべての作業
+- **再発条件**: 訳語表未登録の技術用語が配布物に存在する状態で REQ-053-004 走査を実施した場合
+- **予防策候補**: 訳語表への追補（根拠と推奨訳を明記した登録）により走査の再現性を向上
+- **想定反映先**: docs/designs/responsibilities/document-type-responsibilities.md（訳語表）、agentdev-doc-writing の査読観点
+- **関連**: PR #2478 本文「Findings / Capture候補」learning 1 件（回収元: https://github.com/yogata/agent-dev-flow/pull/2478 ）
+- **タグ**: `#req053` `#訳語表` `#英字混在` `#走査再現性`
