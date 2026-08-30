@@ -30,11 +30,11 @@ intake-promote command は公開 interface（入出力契約・ガードレー�
 - `.agentdev/intake/` 配下の変更の commit / push
 - 当該 Workflow Skill は worktree root 配下以外を編集しない（intake-promote command の worktree 隔離に従う）
 
-## Control Plane（STEP 一覧）
+## 制御平面（STEP 一覧）
 
 intake-promote workflow は次の6 STEP で構成する。
-各 STEP は resume point を持ち（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）、classification / review / HITL / persistence / destructive handling の5段階がそれぞれ独立した resume point である。
-会話コンテキストに依存せず、durable state（inbox / promoted の実ファイル状態、分類確定状態）から再開点を再構成する。
+各 STEP は再開ポイント（resume point）を持ち（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）、classification / review / HITL / persistence / destructive handling の5段階がそれぞれ独立した再開ポイントである。
+会話コンテキストに依存せず、永続状態（inbox / promoted の実ファイル状態、分類確定状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -68,9 +68,9 @@ intake-promote workflow は次の6 STEP で構成する。
 - **空入力**: 処理対象が空の場合は HITL を発生させず正常な「対象なし」として完了する（STEP-1 の inbox 空分岐）
 - **安全境界**: 破壊的変更の明示承認（`POL-destructive-change-explicit-approval`）等、明示承認そのものを安全境界と要求する契約は自律確定によって迂回しない
 
-## Resume Protocol（durable state による再開）
+## 再開プロトコル（永続状態による再開）
 
-会話コンテキストを権威情報源とせず、durable state から current STEP を再構成する（DEC-{N}）。
+会話コンテキストを権威情報源とせず、永続状態から current STEP を再構成する（DEC-{N}）。
 優先順位は `<workflows/input-resolution-and-durable-state>` Design に従う。
 
 1. SSoT 再構成: `.agentdev/intake/inbox/` と `.agentdev/intake/promoted/` の実ファイル状態
@@ -80,7 +80,7 @@ intake-promote workflow は次の6 STEP で構成する。
 
 ### current STEP 再構成規則
 
-| durable state の観察結果 | 再開 STEP | 承認状態の解釈 |
+| 永続状態の観察結果 | 再開 STEP | 承認状態の解釈 |
 |---|---|---|
 | inbox に item 残存、promoted に対応成果物なし | STEP-1 | 未確定（暫定分類と自律確定候補判定をやり直し、ユーザー判断必要 item があれば HITL をやり直す） |
 | promoted に採用済み成果物保存済み、inbox 元ファイル残存 | STEP-5 | 承認済み（persistence 完了の実ファイルが承認証跡。再承認を求めない） |
@@ -89,7 +89,7 @@ intake-promote workflow は次の6 STEP で構成する。
 | 保留 item のみ残存、他の振り分け完了 | STEP-5 の残処理または STEP-6 | 承認済み |
 | 全 item の振り分けと commit/push 完了 | STEP-6（完了報告のみ） | 承認済み |
 
-HITL（STEP-3）の承認状態は単独では durable state に記録されない。
+HITL（STEP-3）の承認状態は単独では永続状態に記録されない。
 そのため、persistence の成果物（promoted 実ファイル）を承認証跡として扱い、証跡がない場合は未確定と解釈して STEP-1（自律確定候補判定を含む）からやり直す。自律確定済み item も同様に persistence の実ファイルをもって確定証跡とする。
 不可逆処理（inbox 削除、reject 即時削除）は確定後にのみ実行する。
 
@@ -118,7 +118,7 @@ HITL（STEP-3）の承認状態は単独では durable state に記録されな�
 - **`<workflows/workflow-contracts>` Design**: promote系判断確定とHITL境界の詳細判定表の集約所有者
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
 - **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
-- **`<workflows/input-resolution-and-durable-state>` Design**: durable state 優先順位、current STEP 再構成
+- **`<workflows/input-resolution-and-durable-state>` Design**: 永続状態の優先順位、current STEP 再構成
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
 - **intake-promote command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

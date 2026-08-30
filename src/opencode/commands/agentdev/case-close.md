@@ -4,9 +4,9 @@ description: PRをマージし、対応記録を追記し、Caseをクローズ�
 
 # 完了処理
 
-PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブランチを削除する。
+PR をマージし、Case に記録を追記し、クローズ後に worktree とブランチを削除する。
 レビュー完了フェーズ。
-Epic Issue番号入力時は現在 Wave の PR作成済み子Issue を一括マージ、クローズし、Epic status table を更新する（Epic Wave クローズ）。
+Epic Issue番号入力時は現在 Wave の PR作成済み子Issue を一括マージ、クローズし、Epic ステータス追跡テーブルを更新する（Epic Wave クローズ）。
 
 **完了条件チェックボックスの評価、更新は case-close の専任責務**。
 case-run/ driver/ 外部実行バックエンドが完了条件チェックボックスを更新しない。
@@ -25,12 +25,12 @@ last-write-wins 競合防止は case-close の単一書き手で維持される�
 ## 出力
 
 - **単一 Issue クローズ時**: マージ済みPR、クローズ済みCase、削除済みブランチ、worktree
-- **Epic Wave クローズ時**: 現在 Wave の全子Issue マージ、クローズ、Epic status table 更新、最終 Wave 判定結果（Epic クローズ または 残 Wave 通知）
+- **Epic Wave クローズ時**: 現在 Wave の全子Issue マージ、クローズ、Epic ステータス追跡テーブル更新、最終 Wave 判定結果（Epic クローズ または 残 Wave 通知）
 
 ## workflow
 
 本コマンドは workflow 実装本体を `agentdev-workflow-case-close` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
-工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの control plane が所有する。
+工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの制御平面（control plane）が所有する。
 
 ## 不変条件
 

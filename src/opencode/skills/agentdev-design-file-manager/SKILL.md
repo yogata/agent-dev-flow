@@ -133,7 +133,7 @@ design-save は本スクリプト群を bash 経由で呼び出し、JSON 結果
 
 ### 永続成果物と Input Resolution
 
-本スキルが操作する Design ファイル群は durable state の最上位（SSoT 再構成）に位置する。
+本スキルが操作する Design ファイル群は永続状態の最上位（SSoT 再構成）に位置する。
 Design `status`（`draft` / `accepted`）は最小 scalar 相当の状態値として扱う。
 優先順位の詳細は `<workflows/input-resolution-and-durable-state>` Design 参照。
 
@@ -147,7 +147,7 @@ STEP reference 8 要素は `<workflows/step-reference-contract>` Design 参照�
 - **agentdev-artifact-validation**: 共通検証 script の公開検証契約（委譲先）
 - **agentdev-doc-diagnostics**: docs 横断診断
 - **agentdev-doc-writing**: Design 横断の文書品質査読ゲート
-- Design lifecycle と design-save の導入（本体 ADR 参照）
+- Design ライフサイクルと design-save の導入（本体 ADR 参照）
 - REQ/Design 責務分離、script 所有権（本体 REQ 参照）
 
 ## 参考文献

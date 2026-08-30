@@ -30,7 +30,7 @@ issue command は公開 interface（入出力契約・ガードレール）と�
 
 本スキルは対話操作完結型の workflow であり、STEP model の対象外である。
 resume point / export / import を持たない。
-各操作が1完結単位であり、追跡Issue自体が durable state であるため、中断時は同一指示から再実行して追跡Issueの現在状態を再構成できる。
+各操作が1完結単位であり、追跡Issue自体が永続状態であるため、中断時は同一指示から再実行して追跡Issueの現在状態を再構成できる。
 工程ラベルは順序ラベルであり resume point ではない。
 
 | STEP | 名称 | 内容 |

@@ -9,7 +9,7 @@ backlog 整理サイクル（inspect-docs による文書診断、learning、int
 
 ## 入力
 
-- なし（対象状態は各子コマンドの durable state から解決する）
+- なし（対象状態は各子コマンドの永続状態から解決する）
 
 ## 出力
 
@@ -19,7 +19,7 @@ backlog 整理サイクル（inspect-docs による文書診断、learning、int
 ## workflow
 
 本コマンドは workflow 実装本体を `agentdev-workflow-backlog-auto` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
-工程、分岐、状態遷移、再開、停止などの高水準の実行構造、子ワークフロー（inspect-docs、learning-promote、intake-promote、inspect-promote、backlog-review）の権威情報源と読込主体の割当ても同スキルの control plane が所有する。
+工程、分岐、状態遷移、再開、停止などの高水準の実行構造、子ワークフロー（inspect-docs、learning-promote、intake-promote、inspect-promote、backlog-review）の権威情報源と読込主体の割当ても同スキルの制御平面（control plane）が所有する。
 backlog-auto は子ワークフロー内部の分類、評価、昇格、RU 生成ロジックを再実装しない。
 
 ## 不変条件

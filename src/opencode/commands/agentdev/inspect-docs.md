@@ -5,14 +5,14 @@ description: docs全体の意味整合性を検出し、検出事項を .agentde
 # inspect-docs
 
 docs全体（REQ/Decision/Design/guides）の意味整合性を診断し、検出事項を `.agentdev/inspect/inbox/` へ出力するコマンド。
-検査対象を直接修正しない診断を行い、REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて Design、ADR、guides、README の意味診断を含む。
+検査対象を直接修正しない診断を行い、REQ 構造診断（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて Design、ADR、guides、README の意味診断を含む。
 
 ## 基本原則: 診断専用（検査対象を直接修正しない）
 
 診断のみを実行する。
 許可される副作用は `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit/ push）のみ。
 
-- 診断結果の提示（検出事項、根拠、source-of-truth判定、推奨route）
+- 診断結果の提示（検出事項、根拠、source-of-truth 判定、推奨経路）
 - `.agentdev/inspect/inbox/` への検出事項出力
 - 副作用は検出事項ファイルの生成のみ（Issue/PR作成、worktree作成、intake/learning/RU処理は後述のガードレール対象外）
 
@@ -23,13 +23,13 @@ docs全体（REQ/Decision/Design/guides）の意味整合性を診断し、検�
 ## 出力
 
 - 診断結果（セッション内テキスト出力 + `.agentdev/inspect/inbox/` への検出事項ファイル）
-  - 検出事項リスト（観点、対象、根拠、source-of-truth判定、推奨route）
+  - 検出事項リスト（観点、対象、根拠、source-of-truth 判定、推奨経路）
 
 ## inspect-* コマンド選択 routing
 
 変更ファイル種別に基づき、実行する inspect-* コマンドを選ぶ。
 本コマンド（inspect-docs）と inspect-skills は配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）の検出対象が一部重複する（inspect-docs の配布物整合性検査、inspect-skills の配布物構文健全性・責務整合診断）。
-変更範囲に応じて routing することで重複検出を防ぐ。
+変更範囲に応じて振り分けることで重複検出を防ぐ。
 
 | 変更ファイル種別 | 実行コマンド |
 |------|------|
@@ -41,14 +41,14 @@ docs全体（REQ/Decision/Design/guides）の意味整合性を診断し、検�
 | `docs/designs/<commands/**/*>.md`、`docs/designs/<skills/**/*>.md` | inspect-skills |
 | 上記両方（docs と command/skill にまたがる変更） | inspect-docs を先に実行し、続けて inspect-skills を実行 |
 
-routing は実行コマンド選択の目安であり、各コマンドの検出対象（既定のスキャン範囲）は変更しない。
+振り分けは実行コマンド選択の目安であり、各コマンドの検出対象（既定のスキャン範囲）は変更しない。
 配布物のみの変更時は inspect-skills を優先する。
 
 ## workflow
 
 本コマンドは workflow 実装本体を `agentdev-workflow-inspect-docs` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
-工程、分岐、再開、停止などの高水準の実行構造は同スキルの control plane が所有する。
-エラー処理（スキャン対象ディレクトリ不存在時は該当カテゴリを空扱い警告、ファイル読込失敗時はスキップ警告）
+工程、分岐、再開、停止などの高水準の実行構造は同スキルの制御平面（control plane）が所有する。
+エラー処理（スキャン対象ディレクトリ不存在時は該当カテゴリを空扱い警告、ファイル読込失敗時はスキップ警告）も同スキルが所有する。
 
 ## 不変条件
 

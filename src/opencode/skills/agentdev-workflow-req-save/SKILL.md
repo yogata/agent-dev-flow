@@ -28,11 +28,11 @@ req-save command は公開 interface（入出力契約・ガードレール）�
 - main ブランチへの commit・push（明示パスステージ、`agentdev-git-worktree` プロシージャ準拠）
 - Issue は作成しない（case-open の責任範囲）
 
-## Control Plane（STEP 一覧）
+## 制御平面（STEP 一覧）
 
 req-save workflow は次の12 STEP で構成する。
-各 STEP は resume point を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
-会話コンテキストに依存せず、durable state（draft の `status` frontmatter、REQ/Decision ファイル、README エントリ、commit hash、git 状態）から再開点を再構成する。
+各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
+会話コンテキストに依存せず、永続状態（draft の `status` frontmatter、REQ/Decision ファイル、README エントリ、commit hash、git 状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -56,13 +56,13 @@ req-save workflow は次の12 STEP で構成する。
 - **エラー停止**: STEP-3 の必須フィールド欠損、STEP-4 の QG-1 fail（req-define へ差し戻し）、STEP-9 の変更範囲違反（ユーザーへ報告し指示待ち）
 - **並列委譲**: 複数 REQ/Decision ファイル操作は3フェーズ分離（採番バッチ[直列] / ファイル作成[並列・最大5件] / インデックス更新[直列]）で並列化できる
 
-### resume protocol
+### 再開プロトコル（resume protocol）
 
-- 再開点は durable state から再構成する: draft の `status` frontmatter（`saved` であれば commit/push 済み）、REQ/Decision ファイルの存在、README エントリの存在、`git log` の commit、読込時 hash と pull 後 hash の一致
+- 再開点は永続状態から再構成する: draft の `status` frontmatter（`saved` であれば commit/push 済み）、REQ/Decision ファイルの存在、README エントリの存在、`git log` の commit、読込時 hash と pull 後 hash の一致
 - commit 前中断時は `git status` と `git diff --name-only` で変更ファイルを再検出し、未実行 STEP から再開する。`status: saved` への更新は commit/push より前に実施し commit 対象に含める（push 後の status 更新は永続化されないため禁止、command 不変条件）
-- external Git failure（pull 失敗、push 拒絶）時はエラーを報告し、同一 durable state からリトライ可能な STEP を明示する
+- external Git failure（pull 失敗、push 拒絶）時はエラーを報告し、同一永続状態からリトライ可能な STEP を明示する
 
-### termination
+### 終了条件（termination）
 
 - 正常終了: STEP-12 の完了報告出力まで（no-op 時は STEP-1 の no-op 完了報告）
 - 停止終了: ドラフト不存在（エラーで中止、req-define を案内）、必須フィールド欠損、QG-1 fail（req-define 差し戻し）、変更範囲違反（ユーザー指示待ち）、hash 不一致（評価・承認のやり直し）

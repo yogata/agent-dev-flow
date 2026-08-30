@@ -28,11 +28,11 @@ case-update command は公開 interface（入出力契約・ガードレール�
 - REQ ファイル更新と commit+push（`--req` 時、`agentdev-git-worktree` の並列実行安全ステージング準拠）
 - フェーズは変更しない（現在のフェーズを維持、command 不変条件）
 
-## Control Plane（STEP 一覧）
+## 制御平面（STEP 一覧）
 
 case-update workflow は次の4 STEP で構成する。
-各 STEP は resume point を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
-会話コンテキストに依存せず、durable state（Issue 本文・コメントの現状、REQ ファイル、git 状態）から再開点を再構成する。
+各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
+会話コンテキストに依存せず、永続状態（Issue 本文・コメントの現状、REQ ファイル、git 状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -46,12 +46,12 @@ case-update workflow は次の4 STEP で構成する。
 - **標準経路**: STEP-1 → STEP-2 → STEP-3（4分岐）→ STEP-4
 - **更新種別推論**: 種別指定がない場合、ユーザー入力、直前のレビュー結果、対象Issue/REQ、会話文脈から推論する。推論不能時のみユーザーに指定を求めて停止する
 
-### resume protocol
+### 再開プロトコル（resume protocol）
 
-- 再開点は durable state から再構成する: Issue 本文・コメントの現状（更新済み否かの判定）、REQ ファイルの git 状態（commit 済み否か）
+- 再開点は永続状態から再構成する: Issue 本文・コメントの現状（更新済み否かの判定）、REQ ファイルの git 状態（commit 済み否か）
 - 更新の重複適用は、更新後の Issue 本文/コメント読戻しと REQ ファイルの git log で検出して回避する
 
-### termination
+### 終了条件（termination）
 
 - 正常終了: STEP-4 の完了報告出力まで
 - 停止終了: Issue番号解決不能（ユーザー指定待ち）、更新種別推論不能（ユーザー指定待ち）

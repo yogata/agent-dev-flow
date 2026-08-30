@@ -72,7 +72,7 @@ cd .opencode/skills/agentdev-artifact-validation/scripts && bun test
 
 ### req-save / design-save からの呼び出し
 
-`req-save` と `design-save` は本スキルの公開検証契約を bash 経由で呼び出し、JSON 結果を parse して意味判断（NG 時の対応等）を行う。
+`req-save` と `design-save` は本スキルの公開検証契約を bash 経由で呼び出し、JSON 結果を解析して意味判断（NG 時の対応等）を行う。
 これにより frontmatter id↔ファイル名整合性確認、エントリ存在確認、変更範囲検証を LLM 推論ではなく機械的に実行する（design-principles.md 第5節「決定的処理の Script 委譲原則」）。
 
 REQ/Decision 番号採番、要件行 ID 採番、target_area 検索は本スキルの対象外（それぞれ `agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-design-file-manager` の責務）。
@@ -89,8 +89,8 @@ REQ/Decision 番号採番、要件行 ID 採番、target_area 検索は本スキ
 ## 必要な reference の選択条件
 
 現状、SKILL.md 本文と Design で完結するため `references/` 配下に追加資料を置かない。
-Design への参照のみを正とする。
-將来的に検証契約の詳細（拡張入力形式、追加 kind、エラー分類）が必要になった場合は `references/` 配下へ分離する。
+正規原本は Design である。
+将来的に検証契約の詳細（拡張入力形式、追加 kind、エラー分類）が必要になった場合は `references/` 配下へ分離する。
 
 ---
 

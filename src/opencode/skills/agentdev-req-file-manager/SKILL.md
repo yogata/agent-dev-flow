@@ -164,7 +164,7 @@ REQ間の関連（置き換え、関連、分割元/分割先）もREQ本文内�
 
 ### 永続成果物と Input Resolution
 
-本スキルが操作する REQ ファイル（`docs/requirements/REQ-{NNNN}.md`）は durable state の最上位（SSoT 再構成）に位置する。
+本スキルが操作する REQ ファイル（`docs/requirements/REQ-{NNNN}.md`）は永続状態の最上位（SSoT 再構成）に位置する。
 REQ-ID（`REQ-{NNNN}`）は identifier 保持として安定 ID として扱う。
 優先順位の詳細は `<workflows/input-resolution-and-durable-state>` Design 参照。
 

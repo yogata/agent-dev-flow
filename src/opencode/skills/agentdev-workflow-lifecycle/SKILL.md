@@ -19,7 +19,7 @@ agentdev系コマンドのフェーズ定義、SSoT遷移、work_type 判定基�
 
 ### 宣言的定義と Input Resolution
 
-本スキルが提供する宣言的定義は、各 STEP の Input Resolution において durable state 優先順位の最上位（SSoT 再構成）に位置する。
+本スキルが提供する宣言的定義は、各 STEP の Input Resolution において永続状態の優先順位の最上位（SSoT 再構成）に位置する。
 優先順位の詳細は `<workflows/input-resolution-and-durable-state>` Design 参照。
 
 | 宣言的定義 | SSoT 配置 | 利用 STEP |
@@ -31,7 +31,7 @@ agentdev系コマンドのフェーズ定義、SSoT遷移、work_type 判定基�
 | 工程間構造化文脈引き継ぎ | 本スキル（`references/structured-stage-handoff.md`） | 全 workflow の STEP transition、完了報告 |
 | 参照先解決ポリシー（source / projection 目的判別） | 本スキル（`references/reference-resolution.md`） | 全 workflow の canonical_references 生成・消費、配布物参照の読み取り先解決 |
 
-STEP reference 8 要素、STEP 識別子、durable state 復元契約は `<workflows/step-reference-contract>` Design に従う。
+STEP reference 8 要素、STEP 識別子、永続状態復元契約は `<workflows/step-reference-contract>` Design に従う。
 compaction 後の current STEP 復元、ToDo 使用、compaction 検出の実処理は harness 固有（AGENTS.md、harness reference）。
 
 ## work_type とコマンド経路

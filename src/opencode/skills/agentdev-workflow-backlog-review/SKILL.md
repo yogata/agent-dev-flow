@@ -29,10 +29,10 @@ backlog-review command は公開 interface（入出力契約・ガードレー�
 - `.agentdev/` 配下の変更の commit / push
 - 当該 Workflow Skill は worktree root 配下以外を編集しない（backlog-review command の worktree 隔離に従う）
 
-## Control Plane（STEP 一覧）
+## 制御平面（STEP 一覧）
 
 backlog-review workflow は次の8 STEP で構成する。
-各 STEP は resume point を持ち（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）、会話コンテキストに依存せず、durable state（promoted/ 残存成果物、RU-*.md 実ファイルと frontmatter、req-units/ 配下状態）から再開点を再構成する。
+各 STEP は再開ポイント（resume point）を持ち（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）、会話コンテキストに依存せず、永続状態（promoted/ 残存成果物、RU-*.md 実ファイルと frontmatter、req-units/ 配下状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -53,9 +53,9 @@ backlog-review workflow は次の8 STEP で構成する。
 - **対象 0 件**: STEP-1 で正常終了（エラー扱いとしない。「対象なし」を報告）
 - **review unresolved 残存時**: RU 生成（STEP-7）、採用済み成果物削除、Git 永続化（STEP-8）等の後続不可逆処理へ進まない
 
-## Resume Protocol（durable state による再開）
+## 再開プロトコル（永続状態による再開）
 
-会話コンテキストを権威情報源とせず、durable state から current STEP を再構成する（DEC-{N}）。
+会話コンテキストを権威情報源とせず、永続状態から current STEP を再構成する（DEC-{N}）。
 優先順位は `<workflows/input-resolution-and-durable-state>` Design に従う。
 
 1. SSoT 再構成: `.agentdev/{intake,learning,inspect}/promoted/` と `.agentdev/backlog/req-units/` の実ファイル状態
@@ -65,14 +65,14 @@ backlog-review workflow は次の8 STEP で構成する。
 
 ### current STEP 再構成規則
 
-| durable state の観察結果 | 再開 STEP | 承認状態の解釈 |
+| 永続状態の観察結果 | 再開 STEP | 承認状態の解釈 |
 |---|---|---|
 | promoted に成果物残存、req-units に該当 RU なし | STEP-2（分析から。RU 構成案は promoted 実ファイルから再構築） | 未承認（HITL をやり直す） |
 | RU 生成済み（req-units に RU 存在）、対応 promoted が削除済み | STEP-8（git 永続化から） | 承認済み（RU 実ファイルが承認・生成証跡。再承認を求めない） |
 | RU 生成済み、対応 promoted が残存 | STEP-7（成果物削除から） | 承認済み |
 | 対象成果物 0 件 | 正常終了（「対象なし」報告のみ） | - |
 
-HITL（STEP-5）の承認状態は単独では durable state に記録されない。
+HITL（STEP-5）の承認状態は単独では永続状態に記録されない。
 RU 実ファイル（STEP-7 の成果物）を承認証跡として扱い、証跡がない場合は未承認と解釈して STEP-5 をやり直す。
 不可逆処理（RU 生成、採用済み成果物削除）は承認確定後にのみ実行する。
 
@@ -110,7 +110,7 @@ agentdev-traceability の coverage、impact、check を一般文書探索、構�
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
 - **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
-- **`<workflows/input-resolution-and-durable-state>` Design**: durable state 優先順位、current STEP 再構成
+- **`<workflows/input-resolution-and-durable-state>` Design**: 永続状態の優先順位、current STEP 再構成
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
 - **backlog-review command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

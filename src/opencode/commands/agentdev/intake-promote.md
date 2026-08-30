@@ -6,8 +6,7 @@ description: inbox 内の intake item をレビュー、分類し、採用 item 
 
 `.agentdev/intake/inbox/` 内の intake item を直接読み込み、内部 review フェーズで分類したのち、採用 item を `backlog-review` に渡せる採用済み成果物に整形する。
 
-**このコマンドは review、分類、整形を行う。
-** GitHub Issue の作成は行わない。
+**このコマンドは review、分類、整形を行う。** GitHub Issue の作成は行わない。
 `intake-review` は廃止済みであり、本コマンドが review 機能を吸収している。
 
 ## 入力
@@ -42,9 +41,9 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 ## workflow
 
 本コマンドは workflow 実装本体を `agentdev-workflow-intake-promote` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
-工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの control plane が所有する。
+工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの制御平面（control plane）が所有する。
 
-## 自律確定とHITL境界
+## 自律確定と HITL 境界
 
 - 取得可能な根拠から採用・保留・却下を一意に確定できる item はユーザー承認なしで確定する（自律確定）。ユーザー判断が必要な item のみを HITL 対象とする
 - 自律確定可否の詳細判定表（自律確定可能要件、HITL移送条件、判定と運用の共通規則）は workflow-contracts Design（extension 経由で解決）「promote系判断確定とHITL境界」節が集約所有し、本コマンド定義と Workflow Skill は同一内容を重複保持しない

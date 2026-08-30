@@ -6,8 +6,7 @@ description: 未分類の変更候補を手動入力から intake item として
 
 ユーザーの手動入力から、未分類の作業候補、不整合、規約違反、未回収課題を intake item として作成し、`.agentdev/intake/inbox/` に保存する。
 
-**このコマンドは保存専用である。
-** GitHub Issue の作成、採用可否の判断は行わない。
+**このコマンドは保存専用である。** GitHub Issue の作成、採用可否の判断は行わない。
 作業知見だけの内容は対象外である（`agentdev-workflow-orchestration` の capture 振り分け基準を参照）。
 
 ## 入力
@@ -22,7 +21,7 @@ description: 未分類の変更候補を手動入力から intake item として
 ## workflow
 
 本コマンドは workflow 実装本体を `agentdev-workflow-intake-capture` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
-工程、分岐、再開、停止などの高水準の実行構造は同スキルの control plane が所有する。
+工程、分岐、再開、停止などの高水準の実行構造は同スキルの制御平面（control plane）が所有する。
 
 ## 不変条件
 

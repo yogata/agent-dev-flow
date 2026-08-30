@@ -27,11 +27,11 @@ case-open command は公開 interface（入出力契約・ガードレール）�
 - `.agentdev/drafts/req-draft-*.md` 削除、`.agentdev/backlog/req-units/RU-*.md` 削除（Form Zero、`git rm` + 即時 commit + push）
 - 当該 Workflow Skill は worktree root 配下以外を編集しない（case-open command の worktree 隔離に従う）
 
-## Control Plane（STEP 一覧）
+## 制御平面（STEP 一覧）
 
 case-open workflow は次の6 STEP で構成する。
-各 STEP は resume point を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
-会話コンテキストに依存せず、durable state（draft-data、GitHub Issue、commit hash）から再開点を再構成する。
+各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
+会話コンテキストに依存せず、永続状態（draft-data、GitHub Issue、commit hash）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -48,12 +48,12 @@ case-open workflow は次の6 STEP で構成する。
 - **Epic flow（単一REQ `scale: large`、マルチREQ、複数 OU）**: STEP-1 → STEP-2 → STEP-3（Epic ルート、execution_unit 構成）→ STEP-4 → STEP-5（Epic flow、子Issue 並列作成）→ STEP-6
 - **adversarial-review skip 条件**: Standard flow で単一 OU の機械的確定、Wave 分割なし（REQ-{NNNN}-{NNN}）。ユーザー明示指定時は強制発動（REQ-{NNNN}-{NNN}）
 
-### resume protocol
+### 再開プロトコル（resume protocol）
 
-- 再開点は durable state から再構成する: draft-data（`status`、`auto_gate`、`artifact_actions`）、GitHub Issue の存在と本文、RU ファイルの存在、削除 commit（Form Zero の残存検証）
-- 処理済み draft/RU は削除済み（durable state）で判定し、会話コンテキストの記憶に依存しない。Epic/子Issue 作成の進捗は Issue 本文のステータス追跡テーブルが正である
+- 再開点は永続状態から再構成する: draft-data（`status`、`auto_gate`、`artifact_actions`）、GitHub Issue の存在と本文、RU ファイルの存在、削除 commit（Form Zero の残存検証）
+- 処理済み draft/RU は削除済み（永続状態）で判定し、会話コンテキストの記憶に依存しない。Epic/子Issue 作成の進捗は Issue 本文のステータス追跡テーブルが正である
 
-### termination
+### 終了条件（termination）
 
 - 正常終了: 終了処理・クリーンアップ STEP の完了報告出力まで（draft/RU 削除残存検証合格を含む）
 - 停止終了: `auto_gate.auto_ready` が false、未解決質問、未解決衝突、repo 外操作、停止理由が残る場合。preflight 不合格（対象要件行の検証対応要否未分類残存を含む）、子Issue 上限超過、QG-2 fail
