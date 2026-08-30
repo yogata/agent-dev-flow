@@ -76,6 +76,21 @@ beforeAll(() => {
     "src/opencode/commands/agentdev/README.md",
     "# commands index\nNo concrete refs here.\n",
   );
+
+  // tests/ directory: detection-stimulus strings for the package's own
+  // detection tests; excluded from violation scanning (Issue #2480).
+  writeFile(
+    "src/opencode/plugins/agentdev-foo/tests/plugin.test.ts",
+    [
+      "const samples = [",
+      "  \"ADR-0123\",",
+      "  \"docs/requirements/REQ-0123.md\",",
+      "  \"https://github.com/yogata/agent-dev-flow/blob/main/docs/foo.md\",",
+      "];",
+      "export default samples;",
+      "",
+    ].join("\n"),
+  );
 });
 
 afterAll(() => {
@@ -143,6 +158,14 @@ describe("checkDistributionBoundary", () => {
     expect(report.stats.concrete_id_hits).toBeGreaterThan(0);
     expect(report.stats.concrete_path_hits).toBeGreaterThan(0);
     expect(report.stats.fixed_url_hits).toBeGreaterThan(0);
+  });
+
+  test("excludes files under tests/ directories from violation scanning", () => {
+    const report = checkDistributionBoundary(TMP_ROOT);
+    const testsHits = report.failures.filter((f) =>
+      f.file.replace(/\\/g, "/").includes("/tests/"),
+    );
+    expect(testsHits.length).toBe(0);
   });
 });
 
