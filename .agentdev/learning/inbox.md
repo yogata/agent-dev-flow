@@ -870,3 +870,19 @@
 - **想定反映先**: docs/designs/responsibilities/document-type-responsibilities.md（訳語表）、agentdev-doc-writing の査読観点
 - **関連**: PR #2484 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2484 ）
 - **タグ**: `#訳語表` `#用語政策` `#docs配布物用語差`
+
+## 配布依存境界 checker の unclassified-entry 分類は本文中の実在 IR 参照を新規違反と区別しない
+
+- **発見事象**: 配布 command・skill の文章品質是正 Case（REQ-053、Issue #2485 / PR #2486）の配布依存境界 最終 gate で、agentdev-inspect-skills/SKILL.md L59 の「IR-053」参照が unclassified-entry 1件として baseline に登録されたまま残存した。当該参照は実在 IR（IR-053-gh-direct-invocation-detection）への正当参照であり、checker の分類起因の既出項目である
+- **特性区分**: 検査（checker 分類と実在参照の整合、配布依存境界 checker の検知器性質）
+- **確知手段**: PR #2486 本文「Findings / Capture候補」2件目、Issue #2485 対応記録コメント（case-close 配布依存境界 checker 全体再実行で failures 11件 = baseline 完全一致を再確認）
+- **根本原因**: checker の unclassified-entry 分類が、本文中の ID 記述が「実在 IR への正当参照」か「分類不能な新規 ID」かを区別せず検知している
+- **恒久対応内容**: なし（baseline 登録運用での許容が現状。分類改善は別途提案）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（checker 拡張の要否判断は learning-promote / backlog-review 経由の別提案）
+- **横展開観点**: 配布物本文中に IR 等の ID を正当参照するすべての配布物
+- **再発条件**: 配布物本文中の実在 IR 参照が unclassified-entry として baseline 登録され、新規違反との区別が判定側で難になる場合
+- **予防策候補**: checker 側で本文中の実在 IR への参照を正当参照として分類する拡張、または baseline エントリへの分類理由注記
+- **想定反映先**: check_distribution_boundary.ts の分類ロジック、配布依存境界 Design
+- **関連**: PR #2486 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2486 ）
+- **タグ**: `#配布依存境界` `#checker分類` `#unclassified-entry`
