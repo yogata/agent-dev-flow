@@ -80,7 +80,7 @@ docs 更新責務は全 work_type 共通である。
 
 ## スケール判定基準
 
-通常Case（実証を利用しない Case）の feature スケール（standard/ large）判定基準。
+通常Case（実証を利用しない Case）の feature スケール（standard/ large）判定基準である。
 req-define Step 8 が参照する。
 
 ### standard

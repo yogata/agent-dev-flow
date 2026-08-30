@@ -5,7 +5,7 @@ description: "case-run external execution adapter. USE FOR: connecting case-run 
 
 # case-run 外部実行アダプター（External Execution Adapter）
 
-case-run が1 Issue 単位（または1 Wave 単位）の実装作業を実行担当サブエージェントへ接続する際のアダプタープロトコル（adapter protocol）を定義する知識ベース。
+case-run が1 Issue 単位（または1 Wave 単位）の実装作業を実行担当サブエージェントへ接続する際のアダプタープロトコル（adapter protocol）を定義する知識ベースである。
 adapter skill 経由での委譲起動、委譲 prompt 内で実行 command を指定する委譲に基づく。
 対象を case-run に限定する。
 

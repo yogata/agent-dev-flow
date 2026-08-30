@@ -5,7 +5,7 @@ description: intake-from-github（GitHub残課題抽出）と intake-promote（r
 
 # Intake パイプライン知識ベース
 
-intake-from-github と intake-promote コマンドの知識ベース。
+intake-from-github と intake-promote コマンドの知識ベースである。
 
 ## 対象コマンド
 

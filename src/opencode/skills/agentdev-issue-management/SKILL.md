@@ -5,7 +5,7 @@ description: GitHub Issue の作成・更新・リンク・確認の安全手順
 
 # `agentdev-issue-management`
 
-GitHub Issue の作成、更新、リンク、確認を安全に行うための操作手順を提供するスキル。
+GitHub Issue の作成、更新、リンク、確認を安全に行うための操作手順を提供するスキルである。
 Custom Tool `agentdev_gh`（書き込みは Tool 内部の読み戻し検証で完了）と連携し、Issue 操作特有の安全性要件を補完する。
 
 ## 対象コマンド

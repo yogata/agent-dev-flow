@@ -5,7 +5,7 @@ description: "Requirement definition architecture review support. USE FOR: req-d
 
 # アーキテクチャ助言（req-define 事前確認）
 
-req-define が要件を確定する前にアーキテクチャ上の影響を確認するためのスキル。
+req-define が要件を確定する前にアーキテクチャ上の影響を確認するためのスキルである。
 アーキテクチャ助言サブエージェントは助言役であり、最終判断は親エージェントが行う。
 アーキテクチャ助言サブエージェントの助言のみを根拠にドラフト本文へ確定事項を混入させない。
 

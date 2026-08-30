@@ -5,7 +5,7 @@ description: Updates parent Epic Issue status tracking tables in case-close work
 
 # Epic 状態追跡（Epic Status Tracker）
 
-親Epic Issueのステータス追跡テーブル（`pending`/ `completed`/ `blocked`/ `failed`）を更新する知識ベース。
+親Epic Issueのステータス追跡テーブル（`pending`/ `completed`/ `blocked`/ `failed`）を更新する知識ベースである。
 `ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文（永続状態）には書き込まれない（ADR 単一書き手制約、epic-wave-model Design 参照）。
 
 - **参照元**: `case-close`（completed/ blocked/ failed 更新、単一書き手）。`case-auto`、`case-run` は Epic Issue 本文を読み取るのみで書き込まない

@@ -5,7 +5,7 @@ description: backlog-review の採用済み成果物（promoted artifact）統�
 
 # バックログレビュー統合知識ベース（backlog-review）
 
-backlog-review コマンドの統合判定知識ベース。
+backlog-review コマンドの統合判定知識ベースである。
 採用済み成果物（promoted artifact）の読み込み、分析、RU への統合、分割判定、矛盾検出、RU 生成、depends_on 依存解決の判定基準と詳細構造を提供する。
 
 ## 対象コマンド
