@@ -5,7 +5,7 @@ description: "inspect-skills command の workflow 実装本体。Command→Skill
 
 # inspect-skills workflow スキル
 
-inspect-skills command の workflow 実装本体。
+inspect-skills command の workflow 実装本体である。
 Command/Skill 参照妥当性と Skill 構造の診断から、検出事項の分類、推奨経路の提示、`.agentdev/inspect/inbox/` 出力、`.agentdev/inspect/` 配下の git 永続化、完了報告までの制御構造を所有する。
 
 inspect-skills command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。

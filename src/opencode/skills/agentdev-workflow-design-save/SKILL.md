@@ -5,7 +5,7 @@ description: "design-save command の workflow 実装本体。req-define で分�
 
 # design-save workflow スキル
 
-design-save command の workflow 実装本体。
+design-save command の workflow 実装本体である。
 req-define で分離された Design 保存対象（`draft-data` の `artifact_actions` 内 `artifact: design` entry）を `docs/designs/<**/*>.md` に保存、確定する制御構造を所有する。
 req-save の次、case-open の前に実行する。
 req-save のファイル編集スコープ制約（Design 編集禁止）を緩和するものではなく、Design 保存を独立責務として切り出す。

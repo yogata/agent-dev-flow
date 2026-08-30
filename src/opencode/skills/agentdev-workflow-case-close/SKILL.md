@@ -5,7 +5,7 @@ description: "case-close command の workflow 実装本体。PR マージ（squa
 
 # case-close workflow スキル
 
-case-close command の workflow 実装本体。
+case-close command の workflow 実装本体である。
 PR マージから Issue クローズ、Capture 回収、ドメイン状態永続化、完了報告までの制御構造、QG-4 最終完了判定ゲート（完了条件チェックボックス評価・更新）、Design 確定（draft → accepted 昇格）、Epic Wave クローズ（E1〜E6、単一書き手）を所有する。
 squash merge 先は当該 Case の統合先（通常Caseは既定 main、実証Caseは対象評価ブランチ）に解決し、統合先ブランチ同期時のリスク事前検出を行う。
 実証全体の最終 case-close では新しい評価を始めず最終評価結果を導出して Issue 最終コメントへ正規記録し、正式化経路（req-define <実証Issue>）を案内する（実行詳細は case-close command Design（extension 経由）が所有する）。

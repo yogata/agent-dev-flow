@@ -5,7 +5,7 @@ description: "req-define command の workflow 実装本体。セッションコ�
 
 # req-define workflow スキル
 
-req-define command の workflow 実装本体。
+req-define command の workflow 実装本体である。
 機能追加またはバグ修正の要件を整理・定義する壁打ち workflow の制御構造を所有する。
 対話（HITL）と永続状態（要件doc draft、RU）の分離を維持し、中断・再開を可能にする。
 

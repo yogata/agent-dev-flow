@@ -5,7 +5,7 @@ description: "case-auto command の workflow 実装本体。req-save → design-
 
 # case-auto workflow スキル
 
-case-auto command の workflow 実装本体。
+case-auto command の workflow 実装本体である。
 要件doc または Issue番号から req-save → design-save → case-open → case-run → case-close を順次自走し、repo 内変更に限りマージまで完了する制御構造を所有する。
 orchestration stage モデル、Wave 反復制御、bounded parent decision resolution、コンフリクト解消 Level 2/3、停止理由分類、adversarial-review 由来の停止伝播を統合する。
 

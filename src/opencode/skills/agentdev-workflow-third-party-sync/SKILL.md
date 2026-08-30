@@ -5,7 +5,7 @@ description: "third-party-sync command の workflow 実装本体。third-party �
 
 # third-party-sync workflow スキル
 
-third-party-sync command の workflow 実現本体。
+third-party-sync command の workflow 実現本体である。
 third-party 宣言（skills.yaml）に基づき、対象 Skill の選択から third-party Skill 取得専用 Custom Tool への委譲、結果報告までの workflow を所有する。
 取得手順本体と副作用実行は所有せず、Custom Tool の操作契約へ委譲する。
 

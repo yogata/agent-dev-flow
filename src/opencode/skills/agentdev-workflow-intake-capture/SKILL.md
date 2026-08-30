@@ -5,7 +5,7 @@ description: "intake-capture command の workflow 実装本体。ユーザーの
 
 # intake-capture workflow スキル
 
-intake-capture command の workflow 実装本体。
+intake-capture command の workflow 実装本体である。
 ユーザーの手動入力から未分類の作業候補、不整合、規約違反、未回収課題を intake item として `.agentdev/intake/inbox/` に保存する保存専用 workflow を所有する。
 GitHub Issue の作成、採用可否の判断、review、整形、分類は行わない。
 

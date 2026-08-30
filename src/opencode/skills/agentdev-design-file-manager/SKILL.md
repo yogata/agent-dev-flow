@@ -21,7 +21,7 @@ REQ 操作、ADR 操作、Design 内容推論、accepted 昇格判断、ユー�
 |------|----------|----------|
 | Design 作成、追記、target_area 置換 | ✓ | |
 | Design 配置先解決（既存 vs 新規） | ✓ | |
-| Design ライフサイクル適用（draft 付与、status 维持） | ✓ | |
+| Design ライフサイクル適用（draft 付与、status 維持） | ✓ | |
 | `search-target-area.ts` 呼出契約 | ✓ | |
 | REQ 番号採番、REQ ファイル操作 | | `agentdev-req-file-manager` |
 | Decision 番号採番、Decision ファイル操作 | | `agentdev-decision-file-manager` |

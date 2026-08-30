@@ -5,7 +5,7 @@ description: Manages Decision numbering and decision record file operations (CRE
 
 # Decisionファイル管理
 
-**意思決定記録（Decision）** ファイルの管理に関する**知識ベース**。
+**意思決定記録（Decision）** ファイルの管理に関する**知識ベース**である。
 
 - **このスキル（知識）**: Decision番号採番ルール、ファイル操作モード、判定基準、ステータス遷移、整合性チェック
 - **適用先**: `req-save`（Decisionファイル保存時）、`case-open`（Issue作成時のDecision参照）、`case-run`（実行時のDecision参照）

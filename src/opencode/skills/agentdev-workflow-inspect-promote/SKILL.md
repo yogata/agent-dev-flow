@@ -5,7 +5,7 @@ description: "inspect-promote command の workflow 実装本体。検出事項�
 
 # inspect-promote workflow スキル
 
-inspect-promote command の workflow 実装本体。
+inspect-promote command の workflow 実装本体である。
 `.agentdev/inspect/inbox/` の検出事項を分類（promote/defer/reject）し、採用した検出事項を `.agentdev/inspect/promoted/` へ保存、却下した検出事項を即時削除、見送りを inbox に残置する。
 `--auto` 明示 opt-in 時は高確信度検出事項を `.agentdev/intake/promoted/` へ自動投入する。
 finding disposition を STEP resume point として所有する。

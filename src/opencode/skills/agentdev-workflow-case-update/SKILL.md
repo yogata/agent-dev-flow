@@ -5,7 +5,7 @@ description: "case-update command の workflow 実装本体。既存 Case の本
 
 # case-update workflow スキル
 
-case-update command の workflow 実装本体。
+case-update command の workflow 実装本体である。
 既存Caseの本文更新、コメント追加、REQファイル更新、レビューNG時対応の制御構造を所有する。
 主にレビューNG時の対応で使用される。
 CI/CD修正、自律修正ループは管轄外（case-run の責務）である。

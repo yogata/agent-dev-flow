@@ -5,7 +5,7 @@ description: "backlog-review command の workflow 実装本体。採用済み成
 
 # backlog-review workflow スキル
 
-backlog-review command の workflow 実装本体。
+backlog-review command の workflow 実装本体である。
 `.agentdev/intake/promoted/*.md`、`.agentdev/learning/promoted/*.md`、`.agentdev/inspect/promoted/*.md` の採用済み成果物を読み込み、分析、統合してユーザーに判定を提示し、承認後に直接 RU（Requirement Unit）を生成する制御構造を所有する。
 ユーザー承認は RU 作成承認を兼ねる。
 
