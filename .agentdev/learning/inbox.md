@@ -806,3 +806,67 @@
 - **想定反映先**: agentdev-workflow-case-run / case-close の配布境界 gate 検証手順、runtime-package-boundary Design の repo-local Plugin マーカー方式拡張条件判断
 - **関連**: PR #2481 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2481 ）
 - **タグ**: `#distribution-boundary` `#repo-local-plugin` `#baseline-comparison` `#test-fixture`
+
+## ID 除去ポリシー適用時の配布物表記残骸が形態ごとに不統一なまま決定的検査の対象外になっている
+
+- **発見事象**: 配布 command・skill 70 ファイルの文章品質是正（REQ-053-013 履行、PR #2484）で、「（REQ）」「REQ-{NNNN}-{NNN}」「（REQ / AG-{NNN}）」「SC-{NNN}」等の ID 除去ポリシー適用時の表記が形態ごとに不統一なまま残存し、決定的検査（check_content_corruption.ts の 9 カテゴリ）の対象外で正規化されていないことが分かった
+- **特性区分**: 運用（配布物整合性検査の表記基線、REQ-053 走査）
+- **確知手段**: PR #2484 本文「Findings / Capture候補」learning 1 件目と inspect-skills SKILL.md line 59〜60 の表記残骸確認
+- **根本原因**: ID 除去ポリシーの許容表記が未確定で、走査時の個別文脈判断に依存している
+- **恒久対応内容**: なし（本 PR は当該走査の是正対象のみ。許容表記の確定は別途提案）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（表記パターン統一の要否判断は learning-promote / backlog-review 経由の別提案）
+- **横展開観点**: ID 除去ポリシーを適用する配布物整合性検査のすべて
+- **再発条件**: 許容表記未確定のまま ID 除去ポリシー適用下の配布物を新規作成・改修した場合
+- **予防策候補**: 許容表記の確定（形態ごとの正規表記の登録）と決定的検査への正規化ルール追加
+- **想定反映先**: REQ-053 の表記品質基準、check_content_corruption.ts の検査カテゴリ、agentdev-inspect-skills の診断観点
+- **関連**: PR #2484 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2484 ）
+- **タグ**: `#id-removal-policy` `#表記統一` `#配布物整合性`
+
+## 段落をまたぐ「**…。\n…\n**」型の強調記法破損は既存 checker の偶数判定では検出されない
+
+- **発見事象**: 配布 command・skill 70 ファイルの文章品質是正（REQ-053-013 履行、PR #2484）で、強調記法「**…。\n…\n**」型の破損が 4 ファイルで発見・修復された。checker の段落内 `**` 偶数判定では `**` が偶数個で段落をまたぐため検出されない形である
+- **特性区分**: 検証（決定的破損 checker の検出限界、REQ-053-008 / REQ-053-012）
+- **確知手段**: PR #2484 本文「実装内容」強調記法破損の修復 4 箇所と checker 実行結果（broken-emphasis 0 件のままであった実績）
+- **根本原因**: checker の broken-emphasis 判定が段落内の `**` 偶奇に依存し、行頭 `**` で始まり行末 `**` 単独で終わる空強調行をまたぐパターンを考慮していない
+- **恒久対応内容**: なし（機械検出ルールの追加は別途提案）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（checker 拡張の要否判断は learning-promote / backlog-review 経由の別提案）
+- **横展開観点**: Markdown 強調記法を含む配布物・docs の決定的破損検査全般
+- **再発条件**: 「**…。\n…\n**」型の強調記法破損を含むファイルが決定的検査のみで検査される場合
+- **予防策候補**: 「行頭が `**` で始まり行末が `**` 単独の空強調行」パターンの機械検出ルール追加
+- **想定反映先**: check_content_corruption.ts の broken-emphasis 検査、REQ-053-012 の決定的検査カテゴリ
+- **関連**: PR #2484 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2484 ）
+- **タグ**: `#markdown-emphasis` `#決定的検査` `#checker拡張`
+
+## SKILL.md 見出し語の日本語化は参照先用語の横断確認を前置条件にすべき
+
+- **発見事象**: 配布 command・skill 70 ファイルの文章品質是正（REQ-053-013 履行、PR #2484）で、見出し語（Control Plane、resume protocol、termination 等）を日本語化した結果、references/ 配下が旧見出し名で親 SKILL.md を参照している参照整合の切れが確認された。references を対象外とする制約のため Findings 記録で整合課題を明示して解決した
+- **特性区分**: 運用（配布物の見出し語変更と参照整合、REQ-053-004）
+- **確知手段**: PR #2484 本文「Findings / Capture候補」intake 1 件目（references/ の旧見出し名参照残留）と learning 3 件目
+- **根本原因**: 見出し語の日本語化手順に、親 SKILL.md を参照する下位ファイル（references 等）の語彙追随確認が前置条件として組み込まれていなかった
+- **恒久対応内容**: なし（本 PR は references を対象外とする合意範囲。参照語彙追随は intake で管理）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（検証手順への組み込み要否は learning-promote / backlog-review 経由の別提案）
+- **横展開観点**: 見出し語・用語の変更を含むすべての配布物改修
+- **再発条件**: 参照される見出し語を変更した際に参照元ファイルの語彙追随確認を行わなかった場合
+- **予防策候補**: 用語変更 Case の検証手順に「参照先用語の横断確認」を前置条件として組み込む（変更対象外ファイルを含む）
+- **想定反映先**: REQ-053 の走査手順、agentdev-workflow-case-run の配布物改修系 Case の検証手順、agentdev-doc-writing の査読観点
+- **関連**: PR #2484 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2484 ）
+- **タグ**: `#見出し語` `#参照整合` `#用語変更`
+
+## 配布物側だけの訳語化は docs 側との用語差を生むため訳語登録と追随が後続課題になる
+
+- **発見事象**: 配布 command・skill 70 ファイルの文章品質是正（REQ-053-013 履行、PR #2484）で、`durable state`、`control plane`、`living pool`、`fan-in` / `fan-out`、`resume source` が Design でも英語のまま使用されている一方、配布物側は日本語併記・訳語化したため、docs 側との用語差が生じた
+- **特性区分**: 運用（用語政策の訳語登録範囲、REQ-053-004）
+- **確知手段**: PR #2484 本文「Design確定候補」訳語追加候補一覧と「実装内容」の意図的に保持した表記（複合技術語の併記形）
+- **根本原因**: 訳語登録（document-type-responsibilities.md の訳語表）が docs と配布物の両方を統制する正規参照点として整備されておらず、配布物側の個別判断が先行した
+- **恒久対応内容**: なし（訳語表への追補と docs 側の追随は別途提案）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（訳語表追補の要否判断は learning-promote / backlog-review 経由の別提案）
+- **横展開観点**: 訳語化を含むすべての配布物・docs 横断の用語統一作業
+- **再発条件**: 訳語表未登録の複合技術語を配布物側で先に訳語化した場合
+- **予防策候補**: 訳語候補の訳語表への先行登録（根拠と推奨訳を明記）を配布物の訳語化の前置条件とする
+- **想定反映先**: docs/designs/responsibilities/document-type-responsibilities.md（訳語表）、agentdev-doc-writing の査読観点
+- **関連**: PR #2484 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2484 ）
+- **タグ**: `#訳語表` `#用語政策` `#docs配布物用語差`
