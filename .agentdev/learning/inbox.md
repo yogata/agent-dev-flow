@@ -790,3 +790,19 @@
 - **想定反映先**: docs/designs/responsibilities/document-type-responsibilities.md（訳語表）、agentdev-doc-writing の査読観点
 - **関連**: PR #2478 本文「Findings / Capture候補」learning 1 件（回収元: https://github.com/yogata/agent-dev-flow/pull/2478 ）
 - **タグ**: `#req053` `#訳語表` `#英字混在` `#走査再現性`
+
+## repo-local 正本の src 配下移動は agentdev-* 命名である限り配布境界 detector の列挙に捕まる（移動系 Case の baseline 比較）
+
+- **問題事象**: REQ-002-045 による distribution-boundary-guard の src 配下移動後、配布境界 gate（--profile source）が移動先パッケージを走査し、テストフィクスチャ（検出刺激として意図的に埋め込まれた producer 内部 ID・producer URL・docs パス）85 行を新規検出した。plugin/lib 本体からの新規検出はゼロ
+- **発生局面**: 実装（case-run 委譲、Issue #2480、PR #2481）
+- **検知方法**: 配布境界 gate baseline 比較（baseline 11 → 移動後 96 件、新規増分 85 件が全てテストフィクスチャ起因であることを原因特定で裏取り）
+- **根本原因**: 移動先が `agentdev-*` 命名である限り detector の列挙（shippableDistribution）に捕まる構造と、fixture が detector 刺激そのものを持つテストが gate 検出対象になる点を事前に織り込んでいなかった
+- **自律対応内容**: checker に tests/ ディレクトリ除外を追加（809292c5、ユーザー判断 A 案）し baseline 11 = final 11 で解消済み。根因の模型ずれは intake item（2026-08-30-distribution-boundary-checker-repo-local-model-mismatch.md）として別途管理
+- **ユーザー確認有無**: あり（Issue #2480 コメントで gate 違反記録と checker 修正方針の判断を確認）
+- **ADR/REQ/spec影響**: なし（配布依存境界検査の運用知見）
+- **横展開観点**: repo-local 正本の src 配下移動・新設を含むすべての移動系 Case
+- **再発条件**: agentdev-* 命名の repo-local 正本パッケージを src 配下へ移動・新設し、テストフィクスチャに detector 刺激が含まれる場合
+- **予防策候補**: 移動系 Case では (1) 移動先パッケージ内のコメント・文字列・テストフィクスチャの ID トークンを事前に洗い出す、(2) fixture が detector 刺激そのものを持つテストは gate 偽陽性となることを baseline 比較で明示する
+- **想定反映先**: agentdev-workflow-case-run / case-close の配布境界 gate 検証手順、runtime-package-boundary Design の repo-local Plugin マーカー方式拡張条件判断
+- **関連**: PR #2481 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2481 ）
+- **タグ**: `#distribution-boundary` `#repo-local-plugin` `#baseline-comparison` `#test-fixture`
