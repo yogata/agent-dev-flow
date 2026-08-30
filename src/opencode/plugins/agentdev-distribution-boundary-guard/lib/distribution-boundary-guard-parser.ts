@@ -6,7 +6,8 @@
 // broad catch swallow, and without unsafe casts. apply_patch text parsing
 // must produce a structured result that the reconstruction module can apply
 // against the current file content. Malformed patches return a structured
-// `malformed` result so the gate layer fail-closes (DEC-014 decision 5).
+// `malformed` result so the gate layer fail-closes (the distribution
+// boundary DEC, decision 5).
 //
 // Pure: no fs/path/I/O imports; same input => same output.
 
@@ -51,7 +52,8 @@ function isBoolean(v: unknown): v is boolean {
 /**
  * Parse the `write` tool args. Returns null when `path` or `content` is
  * absent, non-string, or `path` is empty. Null is interpreted by the plugin
- * shell as inspection-error (fail closed per DEC-014 decision 5): a write
+ * shell as inspection-error (fail closed per the distribution boundary
+ * DEC, decision 5): a write
  * call we cannot classify must NOT pass silently.
  *
  * `filePath` is also accepted as a legacy alias so existing programmatic

@@ -8,7 +8,8 @@
 // outside the worktree, or contain traversal segments) and the regex-based
 // distributed-path predicate.
 //
-// Three-valued classification keeps the gate fail-closed (DEC-014 decision 5):
+// Three-valued classification keeps the gate fail-closed (the distribution
+// boundary DEC, decision 5):
 //   - "distributed"     -> apply the detector
 //   - "non-distributed" -> gate passes (no inspection needed)
 //   - "outside-root"    -> gate fails closed (inspection error)

@@ -1,7 +1,7 @@
 // Distribution boundary guard plugin — Stage B orchestrator.
 //
 // Wires the canonical side-effect-free detector
-// (../skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts)
+// (../../../../.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts)
 // into OpenCode's tool.execute.before hook for the write, edit, and
 // apply_patch tools. When a write would introduce a producer-internal
 // reference (concrete ADR/REQ/DEC ID, concrete docs path, producer-repo
@@ -10,10 +10,10 @@
 // to block the write before it lands on disk.
 //
 // Stage B regression (PR #2092):
-//   * Pre-write gate is fail-fast (DEC-014 decision 3).
+//   * Pre-write gate is fail-fast (the distribution boundary DEC, decision 3).
 //   * Inspection errors (read failure, malformed patch input, malformed
 //     supported-tool args, outside-root target, unclassified entry) are
-//     gate-not-passed, NOT clean (DEC-014 decision 5).
+//     gate-not-passed, NOT clean (the distribution boundary DEC, decision 5).
 //   * Repository identity is explicit at the boundary
 //     (DEFAULT_PLUGIN_REPOSITORY_IDENTITY for the self-hosting repo;
 //     override via makeGuardEnv).
@@ -47,7 +47,7 @@ import {
   type DetectorConfig,
   type Projection,
   type RepositoryIdentity,
-} from "../skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts";
+} from "../../../../.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts";
 import * as fs from "fs";
 import {
   parseApplyPatchArgs as parserParseApplyPatchArgs,
@@ -280,12 +280,12 @@ export function formatBlockMessage(
   tool: string,
   result: GuardDetectionsResult,
 ): string {
-  const header = `distribution-boundary-guard: blocked ${tool} (producer-internal reference in distributed text artifact)`;
+  const header = `agentdev-distribution-boundary-guard: blocked ${tool} (producer-internal reference in distributed text artifact)`;
   if (result.ok) {
     return `${header}\nno violation detected (internal call site should not have thrown)`;
   }
   if (result.errorKind === "inspection-error") {
-    return `${header}\ninspection error: malformed input, read failure, outside-root target, or unclassified entry; gate-not-passed per DEC-014 decision 5`;
+    return `${header}\ninspection error: malformed input, read failure, outside-root target, or unclassified entry; gate-not-passed per the distribution boundary DEC (fail-closed)`;
   }
   const lines = [header];
   for (const d of result.detections) {
@@ -343,6 +343,6 @@ const server: PluginServer = async (input) => {
 };
 
 export default {
-  id: "distribution-boundary-guard",
+  id: "agentdev-distribution-boundary-guard",
   server,
 } as const;

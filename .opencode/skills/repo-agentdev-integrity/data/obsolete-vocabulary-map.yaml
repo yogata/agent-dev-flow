@@ -141,3 +141,10 @@ vocabulary:
   - id: agentdev-workflow-spec-save-skill
     rule: IR-066
     existence_probe: src/opencode/skills/agentdev-workflow-spec-save
+  # --- Issue #2480: distribution-boundary-guard Plugin のパッケージ正規化と
+  # agentdev 命名統一（REQ-002-045）。旧名称・旧配置の並存禁止（AG-009）。
+  # 旧名称と旧パス（.opencode/plugins/ 直下配置）の両方を 1 語彙で検出する
+  # （agentdev- 接頭辞付き新名称は checker 側の lookbehind で除外）。
+  - id: distribution-boundary-guard-plugin
+    rule: IR-066
+    existence_probe: .opencode/plugins/distribution-boundary-guard.ts

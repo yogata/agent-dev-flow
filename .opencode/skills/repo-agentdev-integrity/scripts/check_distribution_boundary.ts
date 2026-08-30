@@ -51,6 +51,7 @@ import type {
 } from "./lib/distribution-boundary-types.ts";
 import {
   collectTargets,
+  normalizeFileForBaseline,
   readArtifactBytes,
 } from "./lib/distribution-boundary-fs.ts";
 import { runCli } from "./check_distribution_boundary_cli.ts";
@@ -105,6 +106,18 @@ function emptyStats() {
   };
 }
 
+// Test directory exclusion (file-discovery level): files under any `tests/`
+// directory inside the scanned trees are not violation scan targets. Tests
+// legitimately contain detection-stimulus sample strings (ADR IDs, REQ
+// paths, GitHub URLs) used by the package's own detection tests; they are
+// not distribution contract violations (Issue #2480, REQ-002-045).
+// Detection patterns themselves are unchanged (owned by the lib module).
+function isUnderTestsDir(file: string, repoRoot: string): boolean {
+  const rel = normalizeFileForBaseline(file, repoRoot);
+  const segments = rel.split("/");
+  return segments.slice(0, -1).includes("tests");
+}
+
 export function checkDistributionBoundary(
   repoRoot: string,
   projection: Projection = "source",
@@ -131,9 +144,18 @@ export function checkDistributionBoundary(
 
   const listing = collectTargets(repoRoot, projection);
 
+  // Apply the tests/ directory exclusion before any scanning or
+  // fail-closed reporting so tests/ content never reaches the detector.
+  const scanTextFiles = listing.textFiles.filter(
+    (file) => !isUnderTestsDir(file, repoRoot),
+  );
+  const scanUnknownFiles = listing.unknownFiles.filter(
+    (file) => !isUnderTestsDir(file, repoRoot),
+  );
+
   // Unknown extension fail-closed: each unknown-ext file is reported as an
   // adapter-failure Detection rather than silently skipped or scanned.
-  for (const file of listing.unknownFiles) {
+  for (const file of scanUnknownFiles) {
     failures.push({
       category: "adapter-failure",
       file,
@@ -143,9 +165,10 @@ export function checkDistributionBoundary(
     });
   }
 
-  stats.scanned_files = listing.textFiles.length;
+  stats.scanned_files = scanTextFiles.length;
 
   // Zero targets is a gate error (missing/unreachable projection), not clean.
+  // Evaluated on the unfiltered listing so a missing projection still fails.
   if (listing.textFiles.length === 0 && listing.unknownFiles.length === 0) {
     failures.push({
       category: "adapter-failure",
@@ -156,7 +179,7 @@ export function checkDistributionBoundary(
     });
   }
 
-  for (const file of listing.textFiles) {
+  for (const file of scanTextFiles) {
     const read = readArtifactBytes(file);
     if (!read.ok) {
       // Strict byte read: invalid UTF-8 / NUL is an adapter-failure, not a

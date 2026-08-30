@@ -9406,6 +9406,11 @@ const IR066_VOCAB_PATTERNS: ReadonlyArray<{ id: string; pattern: RegExp }> = [
   { id: "inspect-extensions-command", pattern: /\binspect-extensions\b/g },
   { id: "agentdev-spec-file-manager-skill", pattern: /agentdev-spec-file-manager/g },
   { id: "agentdev-workflow-spec-save-skill", pattern: /agentdev-workflow-spec-save/g },
+  // Issue #2480: distribution-boundary-guard Plugin のパッケージ正規化と
+  // agentdev 命名統一（REQ-002-045、AG-009）。旧名称・旧パス（旧名称を含む
+  // lib/tests ファイル名・パス表現も含む）の並存禁止。新名称
+  // agentdev-distribution-boundary-guard は lookbehind で検出対象外。
+  { id: "distribution-boundary-guard-plugin", pattern: /(?<!agentdev-)\bdistribution-boundary-guard\b/g },
 ];
 
 function isSupersededDecision(relPath: string, content: string): boolean {

@@ -177,13 +177,21 @@ try {
     # Custom Tools / Plugins (agentdev-* distribution types, REQ-052):
     # staged under src/opencode/{tools,plugins}/ like skills. Optional at
     # this stage — repos without these kinds simply skip them.
+    # Repo-local Plugin (agentdev-distribution-boundary-guard, REQ-052-006 /
+    # REQ-002-045) is excluded from consumer distribution. SYNC OBLIGATION
+    # (runtime-package-boundary Design「repo-local Plugin の配布・投影契約」):
+    # keep this exclusion in sync across the 3 consumer distribution paths:
+    # scripts/install.ps1, scripts/consumer/archive/install.ps1, this file.
+    # self-sync.ps1 must NOT exclude it (self-host projection is kept).
+    $repoLocalPluginNames = @("agentdev-distribution-boundary-guard")
     foreach ($kind in @("tools", "plugins")) {
         $kindSource = Join-Path $repoRoot "src\opencode\$kind"
         if (-not (Test-Path -LiteralPath $kindSource)) { continue }
         $stageKindDir = Join-Path $stageSrcOpencode $kind
         New-Item -ItemType Directory -Path $stageKindDir -Force | Out-Null
         $kindDirs = Get-ChildItem -LiteralPath $kindSource -Directory | Where-Object {
-            $_.Name -like "agentdev-*"
+            $_.Name -like "agentdev-*" -and
+            ($kind -ne "plugins" -or $_.Name -notin $repoLocalPluginNames)
         }
         foreach ($d in $kindDirs) {
             $stageEntryDir = Join-Path $stageKindDir $d.Name

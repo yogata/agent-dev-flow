@@ -12,13 +12,13 @@
 // Pure except for the injected GuardEnv.readFile: same input + same readFile
 // output => same evaluation result. Inspection failures (read failure,
 // malformed patch input, unclassified entry, outside-root target) fail
-// closed per DEC-014 decision 5.
+// closed per the distribution boundary DEC (fail-closed).
 
 import {
   classifyContentConfig,
   decideGate,
   type Detection,
-} from "../../skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts";
+} from "../../../../../.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts";
 import {
   parseApplyPatchText,
   type ParsedApplyPatch,
@@ -32,7 +32,7 @@ import {
   reconstructUpdateFile,
   safeRead,
 } from "./distribution-boundary-guard-reconstruction.ts";
-import type { GuardEnv } from "../distribution-boundary-guard.ts";
+import type { GuardEnv } from "../plugin.ts";
 
 export type PathClassifier = (rawPath: string) => PathClass;
 
