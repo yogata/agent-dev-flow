@@ -8,8 +8,7 @@ description: クローズ済み Case Issue/PR から未回収の変更候補を 
 
 旧 `issue-backlog` の抽出機能を intake ワークフローに再定義したコマンド。
 
-**このコマンドは保存専用である。
-** GitHub Issue の作成、採用可否の判断は行わない。
+**このコマンドは保存専用である。** GitHub Issue の作成、採用可否の判断は行わない。
 
 ## 入力
 
@@ -24,7 +23,7 @@ description: クローズ済み Case Issue/PR から未回収の変更候補を 
 ## workflow
 
 本コマンドは workflow 実装本体を `agentdev-workflow-intake-from-github` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
-工程、分岐、再開、停止などの高水準の実行構造は同スキルの control plane が所有する。
+工程、分岐、再開、停止などの高水準の実行構造は同スキルの制御平面（control plane）が所有する。
 
 ## 不変条件
 

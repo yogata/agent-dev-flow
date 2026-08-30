@@ -5,7 +5,7 @@ description: Provides quality criteria and best practices for authoring OpenCode
 
 # スキル作成ベストプラクティス
 
-OpenCodeのSKILL.mdを書く際の実践ガイド。
+OpenCode のSKILL.mdを書く際の実践ガイド。
 スキルの品質を設計原則、構造、品質評価、開発ワークフロー、配置判断の観点から担保する。
 
 ## 入力
@@ -54,7 +54,7 @@ skill 作成時に次の観点で文章品質を検査し、違反を残さな�
 既存の配布物本文（SKILL.md、references、command、template 等）の記述削減・抽象化の前に、対象ファイルを参照する `*.test.ts`・checker の固定トークンを事前 grep して影響を確認する（必須ステップ）。
 自動化は必須とせず、影響判断を含むため手順の明文化を主体とする。
 
-grep 対象の代表例は routing token（検査器エントリポイント、CLI 引数、result 状態語）、期待値固定セクション（テスト・checker が期待値として保持する見出し・セクション文言）、概念名文字列（`content.includes` 由来の責務・契約の概念名）。
+grep 対象の代表例は routing token（references の定義語、内容は検査器エントリポイント、CLI 引数、result 状態語）、期待値固定セクション（テスト・checker が期待値として保持する見出し・セクション文言）、概念名文字列（`content.includes` 由来の責務・契約の概念名）。
 手順と両立運用の回避パターンは [references/development-workflow.md](references/development-workflow.md) を参照。
 
 ## reference選択表
@@ -87,4 +87,4 @@ SKILL.md 本文から遅延読み込みされる詳細資料。
 
 ## See Also
 
-- **agentdev-doc-writing**: ADR/REQ/Design横断の文書品質査読ゲート（文書種別責務、要件性、文意品質、粒度）
+- **agentdev-doc-writing**: ADR/REQ/Design 横断の文書品質査読ゲート（文書種別責務、要件性、文意品質、粒度）

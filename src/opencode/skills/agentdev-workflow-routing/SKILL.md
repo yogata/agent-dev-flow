@@ -22,9 +22,9 @@ agentdev系コマンドのレビューNG時の対応フロー、次コマンド�
 ### ルーティング結果と Input Resolution
 
 レビュー NG 時の次コマンド推論結果は、呼出元 STEP から次 STEP への遷移入力として扱われる。
-Input Resolution は durable state 優先順位（`<workflows/input-resolution-and-durable-state>` Design）に従い、ルーティング結果は自然言語の引き継ぎのみに依存せず、Issue ラベル、PR 番号等の identifier と組み合わせて復元される。
+Input Resolution は永続状態の優先順位（`<workflows/input-resolution-and-durable-state>` Design）に従い、ルーティング結果は自然言語の引き継ぎのみに依存せず、Issue ラベル、PR 番号等の identifier と組み合わせて復元される。
 
-STEP reference 8 要素、STEP 識別子、durable state 復元契約は `<workflows/step-reference-contract>` Design に従う。
+STEP reference 8 要素、STEP 識別子、永続状態復元契約は `<workflows/step-reference-contract>` Design に従う。
 compaction 後の current STEP 復元、ToDo 使用、compaction 検出の実処理は harness 固有（AGENTS.md、harness reference）。
 
 ## 参考文献

@@ -7,7 +7,7 @@ description: ADR/REQ/Design 横断の文書品質査読ゲート。文書種別�
 
 ## 目的
 
-書かれた文書の品質を静的査読し、読者が判断、実行できる文書へ修正提案を提示する。
+書かれた文書の品質を静的査読し、読者が判断し実行できる文書へ修正提案を提示する。
 対象は `docs/` 配下の REQ/ADR/Design/guides/README、および docs を生成、編集する command/skill の自然言語記述である。
 QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要件性、文意品質、粒度の補助査読として位置づける。
 
@@ -28,22 +28,22 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 | `japanese-replacement-dictionary.md` | document-type-responsibilities Design「不自然表現検出分類」 | forbidden / review / allowed_identifier / reconstruct 区分の置換辞書 |
 | `rewrite-patterns.md` | `japanese-tech-writing` | 英語抽象語と LLM 表現の検出、書き換え辞書 |
 
-## 対象/ 対象外
+## 対象/対象外
 
 **対象:**
 
 - `docs/**`（REQ, ADR, Design, guides, README）
 - docs を生成、編集する command/ skill の自然言語記述（req-define, req-save, design-save, case-run, case-close, case-auto, inspect-docs, docs-check が扱う docs 成果物とその記述）
-- Issue 本文, PR 本文, 完了報告, 設計説明, intake/learning 中間成果物
+- Issue 本文、PR 本文、完了報告、設計説明、intake/learning 中間成果物
 
 **対象外:**
 
-- コード実装, テスト実行
+- コード実装、テスト実行
 - REQ/ADR 番号付与, APPEND/UPDATE/CREATE 判定（req-file-manager/ adr-file-manager 担当）
 - ADR 必要性判定（adr-guidelines 担当）
 - command 手順設計, Issue/PR CRUD
 - 要件分析（req-analysis 担当）
-- カジュアルな文章/ 広告/ 詩
+- カジュアルな文章/広告/詩
 
 ## 査読観点
 

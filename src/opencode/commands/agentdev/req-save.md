@@ -5,7 +5,7 @@ description: 壁打ち成果物をREQ/Decisionファイルとしてdocs/に保�
 # 要件保存（壁打ち→docs永続化）
 
 req-defineで生成された壁打ち成果物をREQ/Decisionファイルとしてdocs/に保存し、コミット、プッシュする。
-壁打ちフェーズで使用（REQ/Decision 対象 artifact_actions がある場合）。
+壁打ちフェーズで使用する（REQ/Decision 対象 artifact_actions がある場合）。
 `work_type` による消費判定は廃止し、`artifact_actions` の有無で判定する。
 
 ## 入力
@@ -24,7 +24,7 @@ req-defineで生成された壁打ち成果物をREQ/Decisionファイルとし�
 ## workflow
 
 本コマンドは workflow 実装本体を `agentdev-workflow-req-save` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
-工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの control plane が所有する。
+工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの制御平面（control plane）が所有する。
 
 ## 不変条件
 

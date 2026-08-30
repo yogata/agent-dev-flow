@@ -29,7 +29,7 @@ inspect-promote command は公開 interface（入出力契約・ガードレー�
 
 - `.agentdev/inspect/`（inbox 削除・残置、promoted/ 保存、auto-promote-log 更新）と `.agentdev/intake/`（promoted/ 投入）配下のファイル作成・削除
 - 上記配下に限る git commit/push（commit message: `chore(agentdev): promote inspect findings`）
-- 検出事項の分類確定状態とユーザー承認状態は durable state（ファイル配置）として保持する
+- 検出事項の分類確定状態とユーザー承認状態は永続状態（ファイル配置）として保持する
 
 ## 3層責務（deterministic check / semantic diagnosis / finding disposition）
 
@@ -39,11 +39,11 @@ inspect-promote command は公開 interface（入出力契約・ガードレー�
 | semantic diagnosis（意味診断） | inspect-docs workflow、inspect-skills workflow | 対象外。本スキルは診断を生成しない（前段が生成した検出事項を消費するのみ） |
 | finding disposition（検出事項の分類・採用） | inspect-promote workflow（本スキル） | **本スキルの担当**。検出事項の分類・採用・保留・却下とユーザー承認を処理する |
 
-## Control Plane（STEP 一覧）
+## 制御平面（STEP 一覧）
 
 inspect-promote workflow は次の8 STEP で構成する。
-各 STEP は resume point を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
-会話コンテキストに依存せず、durable state（`.agentdev/inspect/inbox/`、`.agentdev/inspect/promoted/`、`.agentdev/intake/promoted/`、auto-promote-log）から再開点を再構成する。
+各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
+会話コンテキストに依存せず、永続状態（`.agentdev/inspect/inbox/`、`.agentdev/inspect/promoted/`、`.agentdev/intake/promoted/`、auto-promote-log）から再開点を再構成する。
 **finding disposition（STEP-3〜STEP-7 の分類・採用・保留・却下）は独立した resume point 群を構成する。
 **
 
@@ -68,7 +68,7 @@ inspect-promote workflow は次の8 STEP で構成する。
 
 ## resume protocol（DEC-{N}、会話記憶非依存）
 
-- 各 STEP の再開点は durable state から再構成する（`<workflows/input-resolution-and-durable-state>` Design の優先順位に従う）
+- 各 STEP の再開点は永続状態から再構成する（`<workflows/input-resolution-and-durable-state>` Design の優先順位に従う）
 - **検出事項ごとの分類確定状態の再構成**: inbox に残存する検出事項は未確定（STEP-3 分類から再開）、`.agentdev/inspect/promoted/` に保存済みの検出事項は promote 確定（再保存しない）、auto-promote-log 記載済みかつ `.agentdev/intake/promoted/inspect-auto-*.md` 投入済みは自動 promote 確定（再投入しない）、inbox から削除済みは reject 確定（復元しない）、inbox 残置かつ処理実行済み報告があるものは defer 確定
 - **HITL 承認状態**: 承認は処理実行（STEP-7）の完了状態から逆算して再構成する。処理実行が済んでいない検出事項は未確定と扱い、確定（STEP-6 の自律確定判定と HITL 確定）から再開する。自律確定項目にユーザー承認は存在しないため、再開時は詳細判定表に従い再判定する
 - 自然言語の前 STEP result のみに依存した再開を行わない
@@ -111,6 +111,6 @@ inspect-promote workflow は次の8 STEP で構成する。
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
 - **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
-- **`<workflows/input-resolution-and-durable-state>` Design**: 入力解決優先順位、durable state
+- **`<workflows/input-resolution-and-durable-state>` Design**: 入力解決優先順位、永続状態
 - **inspect-promote command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）
 - **`agentdev-workflow-inspect-docs` / `agentdev-workflow-inspect-skills`**: 検出事項の生成を担当する前段 workflow skill

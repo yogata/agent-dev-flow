@@ -25,9 +25,9 @@ case-run は orchestration stage（case-auto が管理する command 間進行�
 
 ## STEP model（REQ-{NNNN}-{NNN}、DEC-{N}）
 
-本スキルは Workflow Skill として case-run workflow の STEP transition を所有する（control plane）。
+本スキルは Workflow Skill として case-run workflow の STEP transition を所有する（制御平面）。
 STEP 識別子は workflow 内安定識別子であり、STEP reference 8 要素（Purpose / Input Resolution / Preconditions / Procedure / Result / Evidence / Completion Verification / Resume-Idempotency）は `<workflows/step-reference-contract>` Design に従う。
-STEP 識別子と durable state から current STEP を復元する契約は `<workflows/input-resolution-and-durable-state>` Design に従う。
+STEP 識別子と永続状態から current STEP を復元する契約は `<workflows/input-resolution-and-durable-state>` Design に従う。
 
 ### STEP 識別子（case-run workflow）
 
@@ -40,9 +40,9 @@ STEP 識別子は command 固定番号（STEP-1, STEP-2 等）とは区別する
 | `execute` | 実装フェーズ（Steps 5-6） | work plan未完了 または チェックボックス未完了 |
 | `submit` | 提出フェーズ（Steps 7-11） | PR未作成 |
 
-### durable state（case-run workflow）
+### 永続状態（case-run workflow）
 
-compaction や中断再開後に current STEP と必要入力を復元するための durable state。
+compaction や中断再開後に current STEP と必要入力を復元するための永続状態。
 優先順位は `<workflows/input-resolution-and-durable-state>` Design に従う。
 
 1. **SSoT 再構成**: Issue 本文、要件doc、REQ/Decision/Design から再取得・再検証
@@ -53,10 +53,10 @@ compaction や中断再開後に current STEP と必要入力を復元するた�
 ### Input Resolution（case-run workflow）
 
 各 STEP の開始時に入力を解決する。
-自然言語の前STEP result のみに依存せず、durable state 優先順位に従って入力を再構成する。
-compaction 後も STEP 識別子と durable state から current STEP を決定し、必要入力を復元できる。
+自然言語の前STEP result のみに依存せず、永続状態の優先順位に従って入力を再構成する。
+compaction 後も STEP 識別子と永続状態から current STEP を決定し、必要入力を復元できる。
 
-AgentDevFlow 配布契約は「STEP 識別子と durable state から current STEP を復元できる契約」のみを所有する。
+AgentDevFlow 配布契約は「STEP 識別子と永続状態から current STEP を復元できる契約」のみを所有する。
 ToDo 使用、compaction 検出、current STEP 選択の実処理は harness 固有（AGENTS.md、harness reference）であり、本スキルでは規定しない。
 
 ### 並列child task 復元（Epic Wave 実行時）

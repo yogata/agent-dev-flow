@@ -29,11 +29,11 @@ case-auto command は公開 interface（入出力契約・ガードレール）�
 - docs/ REQ/ ADR/ Design/ command reference/ guide の更新（自走対象、command 不変条件）
 - 当該 Workflow Skill は worktree root 配下以外を編集しない
 
-## Control Plane（STEP 一覧）
+## 制御平面（STEP 一覧）
 
 case-auto workflow は次の8 STEP で構成する。
-各 STEP は resume point を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
-会話コンテキストに依存せず、durable state（`case_auto_started_at`、L1 タイムスタンプ、orchestration stage 別結果、bg task 状態、結果状態4次元）から再開点を再構成する。
+各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
+会話コンテキストに依存せず、永続状態（`case_auto_started_at`、L1 タイムスタンプ、orchestration stage 別結果、bg task 状態、結果状態4次元）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -54,12 +54,12 @@ case-auto workflow は次の8 STEP で構成する。
 - **bounded parent decision**: STEP-3 → STEP-6（decision_context 受領時）→ 自律解決時は STEP-3 へ戻る、上位合意矛盾/新規ユーザー判断時は STEP-4 停止経路へ
 - **コンフリクトエスカレーション**: STEP-3（case-close 委譲時）→ STEP-7（Level 1 失敗時）→ 解消時は STEP-3 へ戻る、Level 3 失敗時は STEP-4 停止経路へ
 
-### resume protocol
+### 再開プロトコル（resume protocol）
 
-- 再開点は durable state から再構成する: `case_auto_started_at` と L1 工程別タイムスタンプ、Issue/PR の存在と番号、Epic Issue 本文のステータス追跡テーブル（Wave 進行）、draft の有無（case-open 完了前のみ pre-reader）、各工程の完了結果
+- 再開点は永続状態から再構成する: `case_auto_started_at` と L1 工程別タイムスタンプ、Issue/PR の存在と番号、Epic Issue 本文のステータス追跡テーブル（Wave 進行）、draft の有無（case-open 完了前のみ pre-reader）、各工程の完了結果
 - 停止時報告に再開点と再開可能な次コマンドを明示し、会話コンテキストの記憶に依存しない。case-open 成功後の再開は Issue と Epic だけで成立させる（orchestration pre-reader 契約）
 
-### termination
+### 終了条件（termination）
 
 - 正常終了: 全工程完了（OU処理ループを含む全 OU 処理完了）時の完了報告まで
 - 一時ファイル残存: 正常終了の前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（STEP-8 で確認。一時ファイル cleanup 規定（workflow 側で生成した `.agentdev/tmp/` 一時ファイルは当該実行内で削除する。Custom Tool 内部の一時ファイルは Tool が操作ごとに自動削除する））

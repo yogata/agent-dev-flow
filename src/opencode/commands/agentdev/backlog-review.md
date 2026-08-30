@@ -6,9 +6,7 @@ description: 採用済み成果物を分析、統合し、ユーザー承認後�
 
 `.agentdev/intake/promoted/*.md`、`.agentdev/learning/promoted/*.md`、`.agentdev/inspect/promoted/*.md` の採用済み成果物を読み込み、分析、統合してユーザーに判定を提示し、承認後に直接 RU を生成する。
 
-**このコマンドはユーザー承認後に RU を生成する。
-ユーザー承認は RU 作成承認を兼ねる。
-**
+**このコマンドはユーザー承認後に RU を生成する。ユーザー承認は RU 作成承認を兼ねる。**
 
 ## 入力
 
@@ -34,7 +32,7 @@ RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, 
 ## workflow
 
 本コマンドは workflow 実装本体を `agentdev-workflow-backlog-review` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
-工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの control plane が所有する。
+工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの制御平面（control plane）が所有する。
 
 ## 不変条件
 

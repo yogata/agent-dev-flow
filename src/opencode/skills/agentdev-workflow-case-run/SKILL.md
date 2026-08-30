@@ -10,7 +10,7 @@ case-run command の workflow 実装本体。
 case-run 本体は orchestration に専念し、実装実行そのものは行わない。
 
 単一 Issue 実行と Epic Wave 実行は制御構造に実質差異があるため、DEC-{N} の 1:N 分割基準により single workflow と epic-wave workflow の2 workflow として分離する。
-本 SKILL.md は両 workflow の control plane（選択 dispatch、STEP 一覧、遷移）を所有し、実行契約差異を明示する。
+本 SKILL.md は両 workflow の制御平面（control plane。選択 dispatch、STEP 一覧、遷移）を所有し、実行契約差異を明示する。
 
 case-run command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 
@@ -37,26 +37,26 @@ case-run command は公開 interface（入出力契約・ガードレール）�
 単一 Issue 実行と Epic Wave 実行は operation 差ではなく制御構造の実質差異であるため、1 workflow への統合ではなく2 workflow への分離を採る。
 
 - **single workflow**: 対象1 Issue。準備・委譲・クリーンアップの3フェーズを順次実行する
-- **epic-wave workflow**: 対象は現在 ready な Wave の子Issue 群（最大5件並列）。fan-out（子Issue ごとの worktree と委譲）と fan-in（全委譲完了待機・結果集約）を制御する
+- **epic-wave workflow**: 対象は現在 ready な Wave の子Issue 群（最大5件並列）。分散（fan-out、子Issue ごとの worktree と委譲）と合流（fan-in、全委譲完了待機・結果集約）を制御する
 
 workflow 選択は STEP-S1 の実行モード分岐で確定する（引数が Epic Issue 番号か否か）。
-Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-close の責務であり、本 workflow は1 Wave の実行（PR作成まで）で return する。
+Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-close の責務であり、本 workflow は1 Wave の実行（PR 作成まで）で return する。
 
 ### 実行契約差異（single vs Epic Wave）
 
 | 契約軸 | single workflow | epic-wave workflow |
 |---|---|---|
-| target cardinality | 1 Issue | 現在 ready な Wave の子Issue 群（1 Wave 分、上限は並列数と同じ5件） |
-| parallelism | 委譲1件（直列） | 子Issue 並列委譲 最大5件（3つの「5件」文脈の (1)） |
-| fan-out / fan-in | fan-out なし。委譲1件の result を直接処理 | fan-out（子Issueごとの worktree+委譲起動）→ fan-in（全委譲完了待機・結果収集） |
-| child task recovery | 対象外（委譲1件） | 子 task 異常終了・破棄検知時は worktree git status と残留変更で帰属を確認し、個別に blocked/failed 分離。帰属不明は強制 commit しない |
-| partial result | 委譲 result が4状態のいずれか1つ | 子Issue ごとの result を独立して保持。一部 blocked/failed でも完了済み子Issue の PR は有効（partial result 許容） |
-| Wave-level completion | Issue 単位の完了（PR 作成）で終了 | 1 Wave の全委譲 result 収集と Wave 完了報告で return。Wave 境界（マージ）と次 Wave 進行は扱わない（case-close + 再実行） |
+| 対象数（target cardinality） | 1 Issue | 現在 ready な Wave の子Issue 群（1 Wave 分、上限は並列数と同じ5件） |
+| 並列度（parallelism） | 委譲1件（直列） | 子Issue 並列委譲 最大5件（3つの「5件」文脈の (1)） |
+| 分散/合流（fan-out / fan-in） | fan-out なし。委譲1件の result を直接処理 | fan-out（子Issueごとの worktree+委譲起動）→ fan-in（全委譲完了待機・結果収集） |
+| 子 task 復旧（child task recovery） | 対象外（委譲1件） | 子 task 異常終了・破棄検知時は worktree git status と残留変更で帰属を確認し、個別に blocked/failed 分離。帰属不明は強制 commit しない |
+| 部分結果（partial result） | 委譲 result が4状態のいずれか1つ | 子Issue ごとの result を独立して保持。一部 blocked/failed でも完了済み子Issue の PR は有効（partial result 許容） |
+| Wave 完了条件 | Issue 単位の完了（PR 作成）で終了 | 1 Wave の全委譲 result 収集と Wave 完了報告で return。Wave 境界（マージ）と次 Wave 進行は扱わない（case-close + 再実行） |
 
-## Control Plane（STEP 一覧）
+## 制御平面（STEP 一覧）
 
-各 STEP は resume point を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
-会話コンテキストに依存せず、durable state（GitHub Issue/PR、Issue コメント、worktree・ブランチの存在、PR URL）から再開点を再構成する。
+各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
+会話コンテキストに依存せず、永続状態（GitHub Issue/PR、Issue コメント、worktree・ブランチの存在、PR URL）から再開点を再構成する。
 
 ### single workflow（単一 Issue 実行モード）
 
@@ -74,9 +74,9 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
 | STEP-W1 | Epic Issue 解析・Wave 選択 | case-run 起動（Epic Issue番号受領） | 現在 ready な Wave の子Issue 群確定（入力ソース無区別、REQ） | [references/epic-wave.md](references/epic-wave.md) |
-| STEP-W2 | fan-out 準備 | Wave 子Issue 群確定 | `git fetch origin`、子Issue ごとの worktree+ブランチ、前置 gate 群適用（STEP-S3 と同一契約） | [references/epic-wave.md](references/epic-wave.md) |
-| STEP-W3 | fan-out 並列委譲 | fan-out 準備完了 | 子Issue 並列委譲（最大5件、STEP-S4 と同一委譲契約）、L2 計測 | [references/epic-wave.md](references/epic-wave.md) |
-| STEP-W4 | fan-in・結果集約 | 全委譲完了（または異常検知） | 子Issue ごとの result 収集、partial result 保持、child task recovery | [references/epic-wave.md](references/epic-wave.md) |
+| STEP-W2 | 分散準備（fan-out） | Wave 子Issue 群確定 | `git fetch origin`、子Issue ごとの worktree+ブランチ、前置 gate 群適用（STEP-S3 と同一契約） | [references/epic-wave.md](references/epic-wave.md) |
+| STEP-W3 | 分散並列委譲（fan-out） | STEP-W2 完了（分散準備完了） | 子Issue 並列委譲（最大5件、STEP-S4 と同一委譲契約）、L2 計測 | [references/epic-wave.md](references/epic-wave.md) |
+| STEP-W4 | 合流・結果集約（fan-in） | 全委譲完了（または異常検知） | 子Issue ごとの result 収集、partial result 保持、child task recovery | [references/epic-wave.md](references/epic-wave.md) |
 | STEP-W5 | Wave 完了報告・return | 結果集約完了 | 1 Wave 分の完了報告（result 状態別一覧、tmp/ 残存確認）、return（Wave 境界は扱わない） | [references/epic-wave.md](references/epic-wave.md) |
 
 ### STEP 間の依存と分岐
@@ -85,13 +85,13 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 - **epic-wave**: STEP-S1（epic 判定）→ STEP-W1 → STEP-W2 → STEP-W3 → STEP-W4 → STEP-W5。子Issue ごとの委譲は STEP-S4/S5 と同一契約で並列適用する
 - **最終 gate 違反**: STEP-S5 で配布依存境界 最終 gate 違反時、PR 本文に `### distribution-boundary` を記録して停止（adapter result は上書きしない）
 
-### resume protocol
+### 再開プロトコル（resume protocol）
 
-- 再開点は durable state から再構成する: worktree・ブランチの存在（準備フェーズ完了）、PR の存在と PR URL（委譲完了）、Issue コメント（blocked/failed の SSoT）、Epic Issue 本文のステータス追跡テーブル（Wave 進行）
+- 再開点は永続状態から再構成する: worktree・ブランチの存在（準備フェーズ完了）、PR の存在と PR URL（委譲完了）、Issue コメント（blocked/failed の SSoT）、Epic Issue 本文のステータス追跡テーブル（Wave 進行）
 - フェーズ再開条件: 準備フェーズ（worktree+ブランチが存在しない）、委譲フェーズ（PR 未作成かつ result 未確定）、クリーンアップフェーズ（result が completed-pr）
-- 会話コンテキスト・自然言語の前 STEP result のみを resume source としない。親子 task 状態は Harness から復元し、完了済み子Issue 状態を durable domain state（PR・Issue コメント）と再構成して fan-in 判定を行う
+- 会話コンテキスト・自然言語の前 STEP result のみを再開の根拠（resume source）としない。親子 task 状態は Harness から復元し、完了済み子Issue 状態を永続ドメイン状態（PR・Issue コメント）と再構成して合流判定（fan-in）を行う
 
-### termination
+### 終了条件（termination）
 
 - 正常終了: single は PR 作成確認とクリーンアップ完了報告まで。epic-wave は1 Wave 分の result 集約と Wave 完了報告まで
 - 一時ファイル残存: 正常終了の前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（STEP-S6/W5 で確認。一時ファイル cleanup 規定（workflow 側で生成した `.agentdev/tmp/` 一時ファイルは当該実行内で削除する。Custom Tool 内部の一時ファイルは Tool が操作ごとに自動削除する））

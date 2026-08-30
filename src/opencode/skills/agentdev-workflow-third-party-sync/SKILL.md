@@ -30,7 +30,7 @@ third-party-sync command は公開 interface（入出力契約・ガードレー
 
 本スキルは対話操作完結型の workflow であり、STEP model の対象外である。
 resume point / export / import を持たない。
-durable state は skills.yaml の宣言と配置済み Skill であり、中断時は同一指示から再実行して現在状態を再構成できる。
+永続状態は skills.yaml の宣言と配置済み Skill であり、中断時は同一指示から再実行して現在状態を再構成できる。
 工程ラベルは順序ラベルであり resume point ではない。
 
 | STEP | 名称 | 内容 |

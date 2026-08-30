@@ -4,8 +4,7 @@ description: 要件定義をもとにGitHub Issueを作成する
 
 # Case登録
 
-要件定義（req-define）の結果をもとにGitHub Issueを作成する。
-①壁打ち→②構造的実行フェーズの境界。
+要件定義（req-define）の結果をもとにGitHub Issueを作成する。本コマンドは壁打ちフェーズ（req-define）と構造的実行フェーズ（case-open 以降）の境界に位置する。
 
 **draft-data 入力**: case-open は構造化 `draft-data`（`# draft-data` fenced YAML block）を入力として読み取る。
 draft 全体の `agreed_items`、`artifact_actions`、`operation_units` を処理対象とし、OU ごとにスライスせず draft 全体の合意結果を取り扱う。
@@ -23,7 +22,7 @@ draft 全体の `agreed_items`、`artifact_actions`、`operation_units` を処�
 ## workflow
 
 本コマンドは workflow 実装本体を `agentdev-workflow-case-open` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
-工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの control plane が所有する。
+工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの制御平面（control plane）が所有する。
 
 ## 不変条件
 

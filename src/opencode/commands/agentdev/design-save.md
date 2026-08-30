@@ -21,7 +21,7 @@ req-save のファイル編集スコープ制約（Design 編集禁止）を緩�
 ## workflow
 
 本コマンドは workflow 実装本体を `agentdev-workflow-design-save` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
-工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの control plane が所有する。
+工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの制御平面（control plane）が所有する。
 
 ## 不変条件
 

@@ -6,16 +6,16 @@ description: 単一 Issue または単一 Wave（Epic Issue 指定時: 現在 re
 
 Case に対して実装実行を実行担当サブエージェント経由で委譲し、その result を処理する。
 case-run 本体は orchestration に専念し、実装実行そのものは行わない。
-常に git worktree を使用
+常に git worktree を使用する。
 
 **スコープ**: case-run は単一 Issue または単一 Wave を処理する。
 Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-close の責務であり、case-run は扱わない。
-1 Wave の実行（PR作成まで）で return する。
-複数 Issue の一括実行、Wave 順序制御にまたがるオーケストレーションは case-auto の責務（workflow-contracts Design SC-{NNN}、extension 経由で解決）
+1 Wave の実行（PR 作成まで）で return する。
+複数 Issue の一括実行、Wave 順序制御にまたがるオーケストレーションは case-auto の責務である（workflow-contracts Design SC-{NNN}、extension 経由で解決）。
 
 ## 入力
 
-- Issue番号またはURL（要件doc埋め込み済み）— 単一 Issue 実行モード
+- Issue番号またはURL（要件doc埋め込み済み。単一 Issue 実行モード）
 - Epic Issue番号またはURL（Epic Wave 実行モード、`case-run #epic`）
 - ブランチ名（自動生成または指定）
 
@@ -27,7 +27,7 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 ## workflow
 
 本コマンドは workflow 実装本体を `agentdev-workflow-case-run` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
-工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの control plane が所有する。
+工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの制御平面（control plane）が所有する。
 配布物変更を含む PR 作成時の配布依存境界 最終 gate の適用条件と停止契約も同スキルが所有する。
 
 ## 不変条件

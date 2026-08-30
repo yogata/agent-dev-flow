@@ -28,11 +28,11 @@ design-save command は公開 interface（入出力契約・ガードレール�
 - main ブランチへの commit・push（明示パスステージ、`agentdev-git-worktree` プロシージャ準拠）
 - Issue は作成しない（case-open の責任範囲）
 
-## Control Plane（STEP 一覧）
+## 制御平面（STEP 一覧）
 
 design-save workflow は次の11 STEP で構成する。
-各 STEP は resume point を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
-会話コンテキストに依存せず、durable state（draft の Design 消費済みフラグ、Design ファイルの存在と frontmatter `status`、`docs/designs/README.md` エントリ、git 状態）から再開点を再構成する。
+各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
+会話コンテキストに依存せず、永続状態（draft の Design 消費済みフラグ、Design ファイルの存在と frontmatter `status`、`docs/designs/README.md` エントリ、git 状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -55,13 +55,13 @@ design-save workflow は次の11 STEP で構成する。
 - **部分スキップ**: STEP-3 で配置先 Design 特定不能な候補は当該候補をスキップし follow-up 明示（全体中止しない）。STEP-4 で安定契約例外相当は除外し follow-up に明示
 - **並列化**: 異なる `target` パスの Design create/update は並列化可能（最大5件）。同一 Design ファイルへの複数 action は順序依存のため直列サブセットとして分離する
 
-### resume protocol
+### 再開プロトコル（resume protocol）
 
-- 再開点は durable state から再構成する: draft の Design 消費済みフラグ、Design ファイルの存在と frontmatter（`status`、`updated`）、`docs/designs/README.md` のエントリ、`git status`
+- 再開点は永続状態から再構成する: draft の Design 消費済みフラグ、Design ファイルの存在と frontmatter（`status`、`updated`）、`docs/designs/README.md` のエントリ、`git status`
 - commit 前中断時は `git diff --name-only` で変更ファイルを再検出し、未実行 STEP から再開する。Design 消費済みフラグの更新は commit/push より前に実施し commit 対象に含める
-- partial failure 時は保存済み Design（durable state）を残したまま未完了 action のみ再処理する（rerun idempotency）。external Git failure 時はエラー報告し、同一状態からリトライ可能な STEP を明示する
+- partial failure 時は保存済み Design（永続状態）を残したまま未完了 action のみ再処理する（rerun idempotency）。external Git failure 時はエラー報告し、同一状態からリトライ可能な STEP を明示する
 
-### termination
+### 終了条件（termination）
 
 - 正常終了: STEP-11 の完了報告出力まで（no-op 時は STEP-1 の no-op 完了）
 - 停止終了: ドラフト不存在（エラーで中止、req-define を案内）、`artifact_actions` 形式不正（エラーで中止し req-define 差し戻し推奨）、変更範囲検証違反（ユーザーへ報告し指示待ち、自動破棄禁止）

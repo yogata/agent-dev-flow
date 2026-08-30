@@ -37,7 +37,7 @@ REQ 固有の SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断、文意品質、�
 
 document-model Design（extension 経由）「恒久基準と非規範情報の整理」は、非規範情報（移行情報、内部実装方式、fixture、regex、内部関数、テスト構成、未宣言 reference、draft Design、移行証跡、リリース証跡）を整理する cleanup モデル（6処置: KEEP、MERGE、REFERENCE、MOVE、RETIRE、INFERENCE）を所有し、処置の実行を inspect-docs / inspect-skills / 専用の cleanup 作業へ割り当てる。
 本スキルは inspect-docs の横断診断カテゴリの一次所有者として、この適用経路に組み込まれる。
-横断診断で cleanup モデルの対象カテゴリに該当する記述を検出した場合は、6処置の候補を検出事項の推奨 route に併記して提示する。
+横断診断で cleanup モデルの対象カテゴリに該当する記述を検出した場合は、6処置の候補を検出事項の推奨経路に併記して提示する。
 処置に伴う文書変更は行わない（診断専用）。
 cleanup モデルと処置契約の SSoT は document-model Design であり、本スキルは再定義しない。
 

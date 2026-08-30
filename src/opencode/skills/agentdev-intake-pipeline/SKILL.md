@@ -42,7 +42,7 @@ intake-from-github と intake-promote コマンドの知識ベース。
 
 ### 永続成果物と Input Resolution
 
-本スキルが扱う intake item（`.agentdev/intake/inbox/*.md`）、採用済み成果物（`.agentdev/intake/promoted/*.md`）は durable state 優先順位に従う。
+本スキルが扱う intake item（`.agentdev/intake/inbox/*.md`）、採用済み成果物（`.agentdev/intake/promoted/*.md`）は永続状態の優先順位に従う。
 (1) SSoT 再構成（inbox/ promoted/ 配下の永続ファイル、REQ/Decision/Design は docs/ 配下）、(2) identifier 保持（item path、promoted item path）、(3) 最小 scalar、(4) runtime artifact（暫定分類、評価結果、adversarial-review findings、REQ-{NNNN} lifecycle）。
 優先順位の詳細は `<workflows/input-resolution-and-durable-state>` Design 参照。
 
@@ -51,5 +51,5 @@ STEP reference 8 要素は `<workflows/step-reference-contract>` Design 参照�
 
 ## See Also
 
-- **agentdev-workflow-lifecycle**: work_type判定基準、フェーズ定義
+- **agentdev-workflow-lifecycle**: work_type 判定基準、フェーズ定義
 - **agentdev-backlog-integration**: 採用済み成果物から RU への変換

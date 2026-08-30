@@ -8,7 +8,7 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 壁打ちフェーズで使用。
 
 **draft-data 入力・出力**: 本コマンドは構造化 `draft-data`（`# draft-data` fenced YAML block）を扱う。
-対話の進行は durable state（入力ファイル、draft 下書き、`status` frontmatter）から再構成され、会話コンテキストのみを resume source としない。
+対話の進行は永続状態（durable state。入力ファイル、draft 下書き、`status` frontmatter）から再構成され、会話コンテキストのみを再開の根拠（resume source）としない。
 
 ## 入力
 
@@ -18,7 +18,7 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 - エラーログ（バグ修正の場合）
 - **ユーザーが明示した入力ファイル**: 設計メモ、調査メモ、RU（`.agentdev/backlog/req-units/RU-*.md`）等。全て参照専用入力
 - req-save SPLIT 検出時の検出事項（`.agentdev/drafts/requirements-review-finding-{topic-slug}.md`）
-- inspect-skills 診断結果の検出事項（`.agentdev/inspect/inbox/inspect-skills-finding-{topic-slug}.md`）。参照専用入力として扱い、未確認事項・採否未確定事項は要件本文と分離する（inspect lifecycle、-151 相当）
+- inspect-skills 診断結果の検出事項（`.agentdev/inspect/inbox/inspect-skills-finding-{topic-slug}.md`）。参照専用入力として扱い、未確認事項・採否未確定事項は要件本文と分離する（inspect ライフサイクル、-151 相当）
 - **promoted の参照経路**: `.agentdev/intake/promoted/` 及び `.agentdev/learning/promoted/` は backlog-review による RU 化を経由して参照する
 
 ## 出力
@@ -28,7 +28,7 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 ## workflow
 
 本コマンドは workflow 実装本体を `agentdev-workflow-req-define` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
-工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの control plane が所有する。
+工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの制御平面（control plane）が所有する。
 
 ## 不変条件
 
@@ -40,7 +40,7 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 - 関連ドキュメントはコマンドが特定し、ユーザーへの個別ファイル列挙の依頼は省く
 - チェックボックスは測定可能で一意にする（`agentdev-req-analysis` 品質基準）
 - 要件doc 構造は req-draft.md テンプレート（構造化 `draft-data` 形式）に従う
-- Decision閾値以上の判断は `agentdev-decision-guidelines` で判定する。Decision 要否確認ゲートでは `agentdev-architecture-advisory` の助言を親エージェントが分類して採用し、未確認事項は要件本文と分離して扱う
+- Decision 閾値以上の判断は `agentdev-decision-guidelines` で判定する。Decision 要否確認ゲートでは `agentdev-architecture-advisory` の助言を親エージェントが分類して採用し、未確認事項は要件本文と分離して扱う
 - work_type・Scale 判定は `agentdev-workflow-lifecycle` の基準に従う
 - draft は `operation_units` セクションを出力する（単一REQ操作も1件の OU として出力）。`depends_on` は必須依存のみ記録し、Issue 階層・Epic/Wave 構成の決定は case-open が担う
 - 実証Caseとして確定した後は評価ブランチ利用を別途確認せず、実証Caseなら評価ブランチ、通常Caseなら main と決定的に導出する

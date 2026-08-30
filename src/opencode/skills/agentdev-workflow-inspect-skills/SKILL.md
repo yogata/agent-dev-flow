@@ -6,7 +6,7 @@ description: "inspect-skills command の workflow 実装本体。Command→Skill
 # inspect-skills workflow スキル
 
 inspect-skills command の workflow 実装本体。
-Command/Skill 参照妥当性と Skill 構造の診断から、検出事項の分類、推奨 route の提示、`.agentdev/inspect/inbox/` 出力、`.agentdev/inspect/` 配下の git 永続化、完了報告までの制御構造を所有する。
+Command/Skill 参照妥当性と Skill 構造の診断から、検出事項の分類、推奨経路の提示、`.agentdev/inspect/inbox/` 出力、`.agentdev/inspect/` 配下の git 永続化、完了報告までの制御構造を所有する。
 
 inspect-skills command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 
@@ -27,7 +27,7 @@ inspect-skills command は公開 interface（入出力契約・ガードレー�
 ## 出力
 
 - 診断レポート（セッション内テキスト出力）
-- 検出事項リスト（対象、観点、分類、根拠、推奨 route）
+- 検出事項リスト（対象、観点、分類、根拠、推奨経路）
 - `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md`
 
 ## 副作用
@@ -44,7 +44,7 @@ inspect-skills command は公開 interface（入出力契約・ガードレー�
 | semantic diagnosis（意味診断） | inspect-skills workflow（本スキル）、inspect-docs workflow | **本スキルの担当**。Command/Skill 参照妥当性と Skill 構造を診断し検出事項として出力する |
 | finding disposition（検出事項の分類・採用） | inspect-promote workflow | 対象外。本スキルは検出事項の分類・採用を行わない |
 
-## Control Plane（工程一覧）
+## 制御平面（工程一覧）
 
 本スキルの工程一覧を次に示す。
 STEP ラベルは工程順序の整理ラベルであり、**resume point ではない**（read-only-diagnostic型、REQ-{NNNN}-{NNN}）。
@@ -52,7 +52,7 @@ STEP ラベルは工程順序の整理ラベルであり、**resume point では
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
 | STEP-1 | 診断対象の読込 | command 実行開始 | Command/ Skill 定義の把握（参照、frontmatter、本文構造、references、template/ script 参照） | [references/skill-structure-diagnostics.md](references/skill-structure-diagnostics.md) |
-| STEP-2 | 診断観点の評価・分類・route 提示 | 診断対象把握完了 | 検出事項（分類、根拠、推奨 route 付き） | [references/skill-structure-diagnostics.md](references/skill-structure-diagnostics.md) |
+| STEP-2 | 診断観点の評価・分類・経路提示 | 診断対象把握完了 | 検出事項（分類、根拠、推奨経路付き） | [references/skill-structure-diagnostics.md](references/skill-structure-diagnostics.md) |
 | STEP-3 | 検出事項出力・永続化・完了報告 | STEP-2 の検出事項確定 | 検出事項ファイル、`.agentdev/inspect/` commit/push、完了報告 | [references/finding-output-and-persist.md](references/finding-output-and-persist.md) |
 
 ### 工程間の依存と分岐
@@ -80,7 +80,7 @@ agentdev-traceability の coverage、impact、check を一般文書探索、構�
 ## 共通制約
 
 - **診断専用**: 許可される副作用は `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成と `.agentdev/inspect/` 配下の git 永続化のみ（command ガードレールの範囲）
-- **修正せず route 提示のみ**: 自動修正せず、推奨 route の提示に留める（command 不変条件）
+- **修正せず経路提示のみ**: 自動修正せず、推奨経路の提示に留める（command 不変条件）
 - **Design 参照は extension 経由**: docs-spec-rebuild-integrity Design 等の検査パターンは extension 経由で解決し、Design 内部パスを固定知識として参照しない
 
 ## 終了条件（termination）

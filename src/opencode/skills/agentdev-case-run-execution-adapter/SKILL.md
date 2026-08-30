@@ -158,7 +158,7 @@ AgentDevFlow の永続状態は既存の draft/ Issue/ PR/ REQ/ ADR/ Design に�
 
 ### 委譲コンテキストと Input Resolution
 
-委譲起動時に case-run から引き渡される worktree root、ブランチ名、Issue 番号、実行 command 指定は、 durable state 優先順位（`<workflows/input-resolution-and-durable-state>` Design）に従って case-run `execute` STEP の Input Resolution で解決された入力である。
+委譲起動時に case-run から引き渡される worktree root、ブランチ名、Issue 番号、実行 command 指定は、永続状態の優先順位（`<workflows/input-resolution-and-durable-state>` Design）に従い、case-run `execute` STEP の入力解決（Input Resolution）で解決された入力である。
 実行担当サブエージェントは委譲内で Issue 本文、REQ/Decision/Design を SSoT 再構成（最上位優先）で再取得・再検証し、自然言語の前STEP result のみに依存しない。
 
 ### 委譲内シーケンスと result 接合

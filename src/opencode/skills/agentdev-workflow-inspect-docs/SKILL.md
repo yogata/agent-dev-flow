@@ -25,7 +25,7 @@ inspect-docs command は公開 interface（入出力契約・ガードレール�
 ## 出力
 
 - 診断結果（セッション内テキスト出力 + `.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md`）
-- 検出事項リスト（観点、対象、根拠、source-of-truth 判定、推奨 route）
+- 検出事項リスト（観点、対象、根拠、source-of-truth 判定、推奨経路）
 
 ## 副作用
 
@@ -41,7 +41,7 @@ inspect-docs command は公開 interface（入出力契約・ガードレール�
 | semantic diagnosis（意味診断） | inspect-docs workflow（本スキル）、inspect-skills workflow | **本スキルの担当**。docs 体系の意味整合性を診断し検出事項として出力する |
 | finding disposition（検出事項の分類・採用） | inspect-promote workflow | 対象外。本スキルは検出事項の分類・採用を行わない |
 
-## Control Plane（工程一覧）
+## 制御平面（工程一覧）
 
 本スキルの工程一覧を次に示す。
 STEP ラベルは工程順序の整理ラベルであり、**resume point ではない**（read-only-diagnostic型、REQ-{NNNN}-{NNN}）。

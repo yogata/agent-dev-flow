@@ -6,14 +6,14 @@ description: "backlog-auto command の workflow 実装本体。orchestration sta
 # backlog-auto workflow スキル
 
 backlog-auto command の workflow 実装本体。
-backlog 整理サイクル（inspect-docs → 昇格3系統 → backlog-review）の工程間制御（順序、並列と直列化、fan-in、停止伝播、再開）を所有する。
+backlog 整理サイクル（inspect-docs → 昇格3系統 → backlog-review）の工程間制御（順序、並列と直列化、合流（fan-in）、停止伝播、再開）を所有する。
 子ワークフロー内部の分類、評価、昇格、RU 生成ロジックは各子 Workflow Skill が正規の処理主体として所有し、本スキルはこれらを複製しない。
 
 backlog-auto command は公開 interface（入出力契約、ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。
 
 ## 入力
 
-- backlog-auto command から渡される入力（引数なし。対象状態は各子コマンドの durable state から解決する）
+- backlog-auto command から渡される入力（引数なし。対象状態は各子コマンドの永続状態から解決する）
 
 ## 出力
 
@@ -25,38 +25,38 @@ backlog-auto command は公開 interface（入出力契約、ガードレール�
 - 各子ワークフローの既存副作用（`.agentdev/` 配下の成果物作成、削除、git commit / push、ユーザー対話）を子コマンド公開契約どおりに発生させる。本スキルは新規の副作用を追加しない
 - 当該 Workflow Skill は worktree root 配下以外を編集しない
 
-## Control Plane（STEP 一覧）
+## 制御平面（STEP 一覧）
 
 backlog-auto workflow は次の6 STEP で構成する。
-各 STEP は resume point を持ち（DEC-{N}、`<workflows/step-reference-contract>` Design）、会話コンテキストに依存せず、durable state（`backlog_auto_started_at`、各子コマンドの durable state）から再開点を再構成する。
+各 STEP は再開ポイント（resume point）を持ち（DEC-{N}、`<workflows/step-reference-contract>` Design）、会話コンテキストに依存せず、永続状態（`backlog_auto_started_at`、各子コマンドの永続状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
-| STEP-1 | 開始時刻記録・進行状態初期化 | backlog-auto 起動 | 開始時刻記録、durable state からの進行状態再構成 | [references/stage-execution.md](references/stage-execution.md) |
+| STEP-1 | 開始時刻記録・進行状態初期化 | backlog-auto 起動 | 開始時刻記録、永続状態からの進行状態再構成 | [references/stage-execution.md](references/stage-execution.md) |
 | STEP-2 | stage 1: inspect-docs 実行 | 開始時刻記録済み | 検出事項生成または検出事項なし完了 | [references/stage-execution.md](references/stage-execution.md) |
 | STEP-3 | stage 2: 昇格3系統実行 | stage 1 正常終了 | 系統別実行結果（正常完了 / 対象なし終了 / blocked / failed / 未完了） | [references/stage-execution.md](references/stage-execution.md) |
-| STEP-4 | fan-in 判定 | 3系統の結果受領 | backlog-review 開始可否の判定 | [references/fan-in-and-reporting.md](references/fan-in-and-reporting.md) |
-| STEP-5 | stage 3: backlog-review 実行 | fan-in 判定が開始可 | RU 生成、成功成果物削除（backlog-review 公開契約どおり） | [references/fan-in-and-reporting.md](references/fan-in-and-reporting.md) |
+| STEP-4 | 合流判定（fan-in） | 3系統の結果受領 | backlog-review 開始可否の判定 | [references/fan-in-and-reporting.md](references/fan-in-and-reporting.md) |
+| STEP-5 | stage 3: backlog-review 実行 | 合流判定が開始可 | RU 生成、成功成果物削除（backlog-review 公開契約どおり） | [references/fan-in-and-reporting.md](references/fan-in-and-reporting.md) |
 | STEP-6 | 完了報告 | 全工程完了 or 停止 | 工程別結果、停止理由、再開コマンド提示を含む実行結果報告 | [references/fan-in-and-reporting.md](references/fan-in-and-reporting.md) |
 
 ### STEP 間の依存と分岐
 
 - **正常経路**: STEP-1 → STEP-2 → STEP-3 → STEP-4 → STEP-5 → STEP-6
 - **stage 1 停止経路**: STEP-2 で inspect-docs が blocked / failed → 下流工程（stage 2、stage 3）を開始せず STEP-6（停止報告）
-- **fan-in 不合格経路**: STEP-4 で1系統でも blocked、failed、未完了 → backlog-review を開始せず STEP-6（停止報告、全体完了報告の抑制）
-- **系統内再開**: STEP-3 の各系統は子ワークフローの既存再開契約（STEP model、durable state）で系統内の再開点から再開する
+- **合流判定不合格経路**: STEP-4 で1系統でも blocked、failed、未完了 → backlog-review を開始せず STEP-6（停止報告、全体完了報告の抑制）
+- **系統内再開**: STEP-3 の各系統は子ワークフローの既存再開契約（STEP model、永続状態）で系統内の再開点から再開する
 
-### resume protocol
+### 再開プロトコル（resume protocol）
 
-- 再開点は durable state から再構成する: `backlog_auto_started_at`、stage 1 の完了証跡（直近 inspect-docs 実行の検出事項ファイル群または検出事項なし完了）、stage 2 系統別の durable state（learning は `inbox.md` / `deferred.md` / `evaluation-report.md` / `promoted/`、intake は `inbox/` と `promoted/` の実ファイル状態、inspect は `inbox/` と `promoted/` と auto-promote-log）、stage 3 の durable state（各 `promoted/` 残存成果物、`.agentdev/backlog/req-units/` の `RU-*.md` 実ファイル）
+- 再開点は永続状態から再構成する: `backlog_auto_started_at`、stage 1 の完了証跡（直近 inspect-docs 実行の検出事項ファイル群または検出事項なし完了）、stage 2 系統別の永続状態（learning は `inbox.md` / `deferred.md` / `evaluation-report.md` / `promoted/`、intake は `inbox/` と `promoted/` の実ファイル状態、inspect は `inbox/` と `promoted/` と auto-promote-log）、stage 3 の永続状態（各 `promoted/` 残存成果物、`.agentdev/backlog/req-units/` の `RU-*.md` 実ファイル）
 - 完了済み工程を重複実行せず、未完了工程を完了済みと誤認しない。確定不能な工程は未完了として扱う
 - inspect-docs は STEP model 対象外であり、実行途中の中断時は先頭から再実行する
 - 停止時報告に再開点と再開可能な次コマンド（`/agentdev/backlog-auto` 再実行または対象子コマンドの単独実行）を明示し、会話コンテキストの記憶に依存しない
 
-### termination
+### 終了条件（termination）
 
 - 正常終了: stage 3（backlog-review）完了時の完了報告まで（全系統対象なし終了であっても backlog-review 実行後の完了報告を含む）
-- 停止終了: inspect-docs の blocked / failed（下流非開始）、fan-in 判定不合格（blocked / failed / 未完了残存時の backlog-review 非開始）のいずれかの検出時（停止理由分類済み報告）
+- 停止終了: inspect-docs の blocked / failed（下流非開始）、合流判定不合格（blocked / failed / 未完了残存時の backlog-review 非開始）のいずれかの検出時（停止理由分類済み報告）
 
 ## 下位 Workflow Skill 連携（上位 orchestrator）
 

@@ -20,7 +20,7 @@ REQ参照ID整合性、第一参照導線、現行/廃止/世代境界、6観点
 本スキルの6観点診断（SPLIT、MERGE、MOVE、DUPLICATE、RETIRE、DRIFT）と、document-model Design（extension 経由）「恒久基準と非規範情報の整理」の cleanup 6処置（KEEP、MERGE、REFERENCE、MOVE、RETIRE、INFERENCE）は別軸である。
 診断観点は REQ 体系の構造的問題を検出する軸であり、cleanup 6処置は非規範情報の整理処置を表す軸である。
 両者の対応関係は document-model Design が正規所有し、本スキルは再定義しない。
-REQ 内の内部実装方式（cleanup モデルの対象カテゴリ）の残留は Design 分離基準違反の検出シグナルとして扱い、検出事項には cleanup 6処置の候補を推奨 route に併記できる。
+REQ 内の内部実装方式（cleanup モデルの対象カテゴリ）の残留は Design 分離基準違反の検出シグナルとして扱い、検出事項には cleanup 6処置の候補を推奨経路に併記できる。
 処置に伴う文書変更は行わない（診断専用）。
 
 ## 参考文献

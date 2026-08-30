@@ -14,7 +14,7 @@ learning-promote command は公開 interface（入出力契約・ガードレー
 ## 入力
 
 - learning-promote command から渡される `.agentdev/learning/inbox.md`（必須。未処理の学びエントリ）
-- `.agentdev/learning/deferred.md`（任意。過去エントリ参照用の living pool）
+- `.agentdev/learning/deferred.md`（任意。過去エントリ参照用の保留プール）
 
 ## 出力
 
@@ -30,10 +30,10 @@ learning-promote command は公開 interface（入出力契約・ガードレー
 - `.agentdev/learning/` 配下の変更の commit / push
 - 当該 Workflow Skill は worktree root 配下以外を編集しない（learning-promote command の worktree 隔離に従う）
 
-## Control Plane（STEP 一覧）
+## 制御平面（STEP 一覧）
 
 learning-promote workflow は次の7 STEP で構成する。
-各 STEP は resume point を持ち（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）、会話コンテキストに依存せず、durable state（inbox.md / deferred.md / evaluation-report.md / promoted/ の実ファイル状態、分類確定状態）から再開点を再構成する。
+各 STEP は再開ポイント（resume point）を持ち（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）、会話コンテキストに依存せず、永続状態（inbox.md / deferred.md / evaluation-report.md / promoted/ の実ファイル状態、分類確定状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -54,9 +54,9 @@ learning-promote workflow は次の7 STEP で構成する。
 - **inbox.md 空または不在**: STEP-1 で終了（不在時はエラー終了）。HITL を発生させない
 - **unresolved 残存時**: STEP-5（判定確定）、STEP-6（deferred 移動、prune、commit/push）等の不可逆処理へ進まない
 
-## Resume Protocol（durable state による再開）
+## 再開プロトコル（永続状態による再開）
 
-会話コンテキストを権威情報源とせず、durable state から current STEP を再構成する（DEC-{N}）。
+会話コンテキストを権威情報源とせず、永続状態から current STEP を再構成する（DEC-{N}）。
 優先順位は `<workflows/input-resolution-and-durable-state>` Design に従う。
 
 1. SSoT 再構成: `.agentdev/learning/` 配下の inbox.md、deferred.md、evaluation-report.md、promoted/ の実ファイル状態
@@ -66,7 +66,7 @@ learning-promote workflow は次の7 STEP で構成する。
 
 ### current STEP 再構成規則
 
-| durable state の観察結果 | 再開 STEP | 承認状態の解釈 |
+| 永続状態の観察結果 | 再開 STEP | 承認状態の解釈 |
 |---|---|---|
 | inbox.md にエントリ残存、evaluation-report.md なしまたは未反映 | STEP-1 / STEP-2 | 未承認（分析を再構築し HITL をやり直す） |
 | evaluation-report.md 生成済み、inbox.md エントリ残存（deferred 未移動）、promoted なし | STEP-3 / STEP-4 / STEP-5 | 未承認（evaluation-report は判定資料であり承認証跡ではない） |
@@ -74,7 +74,7 @@ learning-promote workflow は次の7 STEP で構成する。
 | inbox.md クリア、promoted なし（全 defer/reject/duplicate） | STEP-6（prune / commit から） | 承認済み |
 | 全永続化と commit/push 完了 | STEP-7（完了報告のみ） | 承認済み |
 
-HITL（STEP-5）の承認状態は単独では durable state に記録されない。
+HITL（STEP-5）の承認状態は単独では永続状態に記録されない。
 採用済み成果物（promoted/）、inbox.md クリア、deferred.md 追記のいずれかを承認証跡として扱い、証跡がない場合は未承認と解釈して STEP-5 をやり直す。
 ただし自律確定分の証跡はユーザー承認ではなく evaluation-report.md の自律確定記録（判定結果、主要根拠、HITL 不要理由）であり、当該記録と永続化成果物の双方から再構成できる。
 不可逆処理（deferred 移動、prune、採用済み成果物生成）は判定確定（自律確定またはユーザー承認）後にのみ実行する。
@@ -91,7 +91,7 @@ HITL（STEP-5）の承認状態は単独では durable state に記録されな�
 ## 共通制約
 
 - **無条件の自動REQ化禁止**: 学びを直接 REQ 化しない。恒久契約（REQ/Decision/Design）への昇華可能性を STEP-3 で評価し、昇華可能なもののみ `promoted/` へ出力する。学びは昇華（`promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/req-save`）を経て初めて REQ 化される
-- **living pool 維持**: 昇華不能な知見（deferred 判定、情報が断片的、出現回数が少ない等）は `deferred.md` の living pool で維持し、REQ 化しない。`deferred.md` は deferred カテゴリのエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である（AG-{NNN}）。終端保管ではなく、次回実行時に再評価の対象となる
+- **保留プール維持**: 昇華不能な知見（deferred 判定、情報が断片的、出現回数が少ない等）は `deferred.md` の保留プールで維持し、REQ 化しない。`deferred.md` は deferred カテゴリのエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の保留プール（living pool）である（AG-{NNN}）。終端保管ではなく、次回実行時に再評価の対象となる
 - **自律確定と HITL フォールバック**: 問題クラス分類、8軸評価、廃棄判定、昇華可能性、既存対策との関係の評価（STEP-2〜STEP-4）を経て、取得可能な根拠で処置を一意に確定できる項目はユーザー承認なしで確定し、ユーザー判断が必要な項目のみ HITL 対象とする。自律確定はユーザー承認の擬制ではなく、モデルの自己申告による確信度や固定パーセンテージのみで可否を判定しない。自律確定可否の詳細判定表（自律確定可能要件、HITL移送条件、判定と運用の共通規則）は横断契約Design `<workflows/workflow-contracts>`「promote系判断確定とHITL境界」節が集約所有し、本スキルは判定表を複製しない（extension 経由で解決）。deferred・未処理項目を自動削除しない既存の安全境界は自律確定によって迂回しない。自律確定項目の証跡（判定結果、主要根拠、HITL 不要理由）は evaluation-report.md 等の既存成果物を優先利用し、新規永続成果物を必須としない
 - **prune 対象**: staged（採用済み成果物生成済み）/ rejected / duplicate のエントリのみ。deferred / 未処理のエントリは残す。staged エントリ除去時に採用済み成果物の「元learning item/ 根拠」セクションに証拠を保存する。STEP-5 の判定確定（自律確定またはユーザー承認）と同時に prune も承認済みとみなし、追加確認なしで削除する
 - **直接反映禁止**: 採用済み成果物は `.agentdev/learning/promoted/` のみに生成する。`.opencode/` 直接書込、`case-run` への直接受け渡しは禁止（`/agentdev/backlog-review` 経由のみ）
@@ -105,7 +105,7 @@ HITL（STEP-5）の承認状態は単独では durable state に記録されな�
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
 - **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
-- **`<workflows/input-resolution-and-durable-state>` Design**: durable state 優先順位、current STEP 再構成
+- **`<workflows/input-resolution-and-durable-state>` Design**: 永続状態の優先順位、current STEP 再構成
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
 - **learning-promote command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

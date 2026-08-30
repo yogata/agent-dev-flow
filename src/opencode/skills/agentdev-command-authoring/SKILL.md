@@ -6,7 +6,7 @@ description: Provides quality criteria and best practices for authoring OpenCode
 # コマンド作成ベストプラクティス（Command Authoring）
 
 OpenCodeのCommand定義（`.opencode/commands/`）を書く際の実践ガイド。
-Command/ Skill/ Template/ Script の責任分界に基づき、Commandを薄く保つ基準を提供する。
+Command/ Skill/ Template/ Script の責任分界に基づき、Command を薄く保つ基準を提供する。
 
 ## Frontmatter 規約
 
@@ -33,7 +33,7 @@ description: コマンドの簡潔な説明
 ガードレール番号 Gxx の連番制度は廃止済みである（起点番号・欠番なし・重複なし・変換対照表の保持を要求しない）。
 
 - Command 固有の利用者向け境界（横断参照・機械強制を必要としないもの）は ID を付与せず、「ガードレール」セクションの本文として記述する
-- 複数箇所から参照、検査または強制される共通ポリシーのみが意味に基づく安定識別子（`POL-` 接頭辞 + kebab-case）を持つ。識別子の定義一覧は `references/common-policy-identifiers.md` の registry が保持する
+- 複数箇所から参照、検査または強制される共通ポリシーのみが意味に基づく安定識別子（`POL-` 接頭辞 + kebab-case）を持つ。識別子の定義一覧は `references/common-policy-identifiers.md` が保持する
 - 配布物から識別子を参照する際は識別子全体をコードスパンで記述する（未定義参照・重複定義・廃止済み Gxx 表記の残存は docs-check が検出する）
 
 ## 責任分界の原則
@@ -64,14 +64,14 @@ REQ 要件行が特定 Step 番号（例: 「Step 4-2 で分類する」）に�
 
 詳細ガイドは `agentdev-req-file-manager` の「REQ 要件行の記述基準」セクションを参照のこと。
 
-### サブセクション化 vs リスト1行追記の判断基準（REQ）
+### サブセクション化かリスト1行追記かの判断基準（REQ）
 
 command 定義の内容を追加、更新する際、サブセクション化（独立した `###` セクションとして記述）するかリスト1行追記（既存の箇条書きに1行追加）するかを判断する基準。
 
 | 判断軸 | サブセクション化 | リスト1行追記 |
 |---|---|---|
 | **情報量** | 説明文が複数段落にわたる、詳細な手順、複雑な条件分岐を含む | 1文で完結する説明、シンプルな事実 |
-| **独立性** | 他の項目から独立して読み取れる、単独で参照可能 | 既存項目との依存関係が強、文脈が必要 |
+| **独立性** | 他の項目から独立して読み取れる、単独で参照可能 | 既存項目との依存関係が強く、文脈が必要 |
 | **将来拡張見込み** | 項目自体が将来的に詳細化、分割される可能性が高い | 将来的な拡張が想定されない、安定した内容 |
 
 3軸のうち2つ以上が「サブセクション化」基準を満たす場合はサブセクション化を選択する。
@@ -106,7 +106,7 @@ Commandの Steps/ Guardrails 内で template や reference のパスを記述す
 
 ## サブエージェント編集安全性（Subagent Edit Safety）
 
-Subagent に編集を委譲する場合、/ および Issue #653/#655/#656 の再発防止として、以下を満たすこと:
+Subagent に編集を委譲する場合、および Issue #653/#655/#656 の再発防止として、以下を満たすこと:
 
 - **Worktree 内制約**: Subagent は worktree root 外のファイルを編集してはならない。編集対象は worktree root からの相対パスで指定し、worktree 外へのパス遷移を防止しなければならない
 - **パスプレフィクス確認**: 編集操作の前に、対象パスが worktree root からの相対パスであることを検証しなければならない。絶対パスや worktree 外パスを使用してはならない
@@ -139,11 +139,11 @@ Command作成、改定時に以下を確認する:
 - [ ] パス参照が実行時パス（`.opencode/...`）を使用しているか（`src/opencode/...` は禁止）
 - [ ] 文章品質観点（上記 6 観点）に違反がないか
 
-→ 詳細な DoD 項目と checklist は `references/command-authoring-standards.md` を参照
+→ 詳細な DoD 項目とチェックリストは `references/command-authoring-standards.md` を参照
 
 ## See Also
 
-- **agentdev-skill-authoring**: Skill品質基準
+- **agentdev-skill-authoring**: Skill 品質基準
 - **artifact-contracts Design**: Command/Skill/Template/Script 責務境界
 - **references/command-authoring-standards.md**: 行数目安、Steps数目安、共通処理重複、正規パス、完了報告種別、後方互換性の詳細
 - **references/common-policy-identifiers.md**: 共通ポリシー意味識別子（POL-）の定義一覧（registry）

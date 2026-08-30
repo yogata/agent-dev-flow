@@ -5,19 +5,19 @@ description: Diagnoses Command to Skill reference validity, Skill structure, exe
 
 # Inspect Skills
 
-Command→Skill 参照妥当性、Skill 粒度、Skill 構造、実行主体分類を検査対象（Command/Skill 定義ファイル）を直接修正せずに診断する。
-修正は実行せず、検出事項、分類、根拠、推奨 route を提示する。
+Command→Skill 参照妥当性、Skill 粒度、Skill 構造、実行主体分類を検査対象とし、Command/Skill 定義ファイルを直接修正せずに診断する。
+修正は実行せず、検出事項、分類、根拠、推奨経路を提示する。
 
 ## 検査対象を直接修正しない制約
 
 - ファイル変更（canonical docs、REQ/ADR/Design、Command/Skill/Template/Script）、Issue 作成、PR 作成、RU 保存、branch/ worktree 操作を行わない。許可される副作用は `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit/ push）のみ
 - 診断結果はセッション内テキストで提示する
-- 修正案は route として提示し、実装、保存、自動整形は行わない
+- 修正案は経路として提示し、実装、保存、自動整形は行わない
 
 ## 検出事項のエクスポート
 
 診断結果を `inspect-promote` に引き継ぐ必要がある場合、`.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md` に検出事項を書き出すことができる。
-この検出事項は inspect lifecycle（`.agentdev/inspect/` inbox/promoted）の対象であり、`inspect-promote` への参照専用中間成果物である。
+この検出事項は inspect ライフサイクル（`.agentdev/inspect/` inbox/promoted）の対象であり、`inspect-promote` への参照専用中間成果物である。
 
 検出事項には以下を含める:
 - 概要（Summary）
@@ -103,7 +103,7 @@ cleanup モデルと処置契約の SSoT は document-model Design であり、�
 
 ## 判定ルール
 
-1. Command は公開 API、入力、出力、guardrail、高レベル導線を保持する
+1. Command は公開 API、入力、出力、ガードレール、高レベル導線を保持する
 2. Skill は複数 Command で再利用できる判断基準、分類、プロトコルを保持する
 3. Template は固定文言、出力構造、プレースホルダーを保持する
 4. Script は決定的でテスト可能な検査や変換を保持する

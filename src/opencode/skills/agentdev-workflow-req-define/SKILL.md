@@ -7,7 +7,7 @@ description: "req-define command の workflow 実装本体。セッションコ�
 
 req-define command の workflow 実装本体。
 機能追加またはバグ修正の要件を整理・定義する壁打ち workflow の制御構造を所有する。
-対話（HITL）と durable state（要件doc draft、RU）の分離を維持し、中断・再開を可能にする。
+対話（HITL）と永続状態（要件doc draft、RU）の分離を維持し、中断・再開を可能にする。
 
 req-define command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 
@@ -28,11 +28,11 @@ req-define command は公開 interface（入出力契約・ガードレール）
 - `.agentdev/drafts/**` 配下のファイル作成・更新のみ（ファイル編集スコープ制約）。`git` コマンドは実行しない（git コマンド実行禁止制約）。実証Caseでも Git 副作用（評価ブランチ作成等）を持たない
 - RU、promoted 成果物、inbox.md/deferred.md は読取のみ（参照専用入力）
 
-## Control Plane（STEP 一覧）
+## 制御平面（STEP 一覧）
 
 req-define workflow は次の11 STEP で構成する。
-各 STEP は resume point を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
-対話の進行は durable state（入力ファイル、壁打ちで確定した合議内容を含む draft-data 下書き）から再構成でき、会話コンテキストのみに依存しない。
+各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
+対話の進行は永続状態（入力ファイル、壁打ちで確定した合議内容を含む draft-data 下書き）から再構成でき、会話コンテキストのみに依存しない。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -57,11 +57,11 @@ req-define workflow は次の11 STEP で構成する。
 
 ### resume protocol
 
-- 再開点は durable state から再構成する: 入力ファイル（RU、検出事項）、`.agentdev/drafts/` 配下の draft 下書き（STEP-6 生成後）、`draft-data` の `status` と `auto_gate`
+- 再開点は永続状態から再構成する: 入力ファイル（RU、検出事項）、`.agentdev/drafts/` 配下の draft 下書き（STEP-6 生成後）、`draft-data` の `status` と `auto_gate`
 - 対話ターン間の合意内容は draft-data 下書き（runtime artifact、REQ-{NNNN}）へ逐次反映し、会話コンテキスト喪失後も下書きから再開できる
 - 未解決質問・未解決衝突・停止理由は draft の該当フィールドが正であり、会話履歴を権威情報源としない
 
-### termination
+### 終了条件（termination）
 
 - 正常終了: STEP-11 の完了報告出力まで（次コマンド実行を確定の意思表示として扱う）
 - 停止終了: 有効な Requirement Source 構成不能、`agentdev_handoff: true` による前工程引き継ぎ整理、STEP-8 で未解決のユーザー判断事項が残る場合（STEP-9 へ進まない）
