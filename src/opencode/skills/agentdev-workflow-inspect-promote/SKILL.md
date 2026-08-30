@@ -44,8 +44,7 @@ inspect-promote command は公開 interface（入出力契約・ガードレー�
 inspect-promote workflow は次の8 STEP で構成する。
 各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
 会話コンテキストに依存せず、永続状態（`.agentdev/inspect/inbox/`、`.agentdev/inspect/promoted/`、`.agentdev/intake/promoted/`、auto-promote-log）から再開点を再構成する。
-**finding disposition（STEP-3〜STEP-7 の分類・採用・保留・却下）は独立した resume point 群を構成する。
-**
+**finding disposition（STEP-3〜STEP-7 の分類・採用・保留・却下）は独立した resume point 群を構成する。**
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
