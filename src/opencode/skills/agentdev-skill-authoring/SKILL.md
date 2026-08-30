@@ -5,7 +5,7 @@ description: Provides quality criteria and best practices for authoring OpenCode
 
 # スキル作成ベストプラクティス
 
-OpenCode のSKILL.mdを書く際の実践ガイド。
+OpenCode のSKILL.mdを書く際の実践ガイドである。
 スキルの品質を設計原則、構造、品質評価、開発ワークフロー、配置判断の観点から担保する。
 
 ## 入力

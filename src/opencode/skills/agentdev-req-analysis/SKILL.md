@@ -5,7 +5,7 @@ description: Provides requirement analysis methods with quality criteria and ADR
 
 # 要件分析スキル
 
-要件分析のための**知識ベース**。
+要件分析のための**知識ベース**である。
 分析観点、品質基準、定義を提供し、壁打ちフェーズでの壁打ち品質を担保する。
 
 - **このスキル（知識）**: 分析観点、品質基準、定義

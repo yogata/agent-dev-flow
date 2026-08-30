@@ -5,7 +5,7 @@ description: Provides quality criteria and best practices for authoring OpenCode
 
 # コマンド作成ベストプラクティス（Command Authoring）
 
-OpenCodeのCommand定義（`.opencode/commands/`）を書く際の実践ガイド。
+OpenCodeのCommand定義（`.opencode/commands/`）を書く際の実践ガイドである。
 Command/ Skill/ Template/ Script の責任分界に基づき、Command を薄く保つ基準を提供する。
 
 ## Frontmatter 規約
