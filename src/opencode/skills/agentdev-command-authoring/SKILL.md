@@ -5,7 +5,7 @@ description: Provides quality criteria and best practices for authoring OpenCode
 
 # コマンド作成ベストプラクティス（Command Authoring）
 
-OpenCodeのCommand定義（`.opencode/commands/`）を書く際の実践ガイド。
+OpenCodeのCommand定義（`.opencode/commands/`）を書く際の実践ガイドである。
 Command/ Skill/ Template/ Script の責任分界に基づき、Command を薄く保つ基準を提供する。
 
 ## Frontmatter 規約
@@ -66,7 +66,7 @@ REQ 要件行が特定 Step 番号（例: 「Step 4-2 で分類する」）に�
 
 ### サブセクション化かリスト1行追記かの判断基準（REQ）
 
-command 定義の内容を追加、更新する際、サブセクション化（独立した `###` セクションとして記述）するかリスト1行追記（既存の箇条書きに1行追加）するかを判断する基準。
+command 定義の内容を追加、更新する際、サブセクション化（独立した `###` セクションとして記述）するかリスト1行追記（既存の箇条書きに1行追加）するかを判断する基準である。
 
 | 判断軸 | サブセクション化 | リスト1行追記 |
 |---|---|---|

@@ -5,7 +5,7 @@ description: "intake-from-github command の workflow 実装本体。クロー�
 
 # intake-from-github workflow スキル
 
-intake-from-github command の workflow 実装本体。
+intake-from-github command の workflow 実装本体である。
 クローズ済みの GitHub Issue/PR の本文、コメントから未回収の変更候補を抽出し、intake item として `.agentdev/intake/inbox/` に保存する保存専用 workflow を所有する。
 GitHub Issue の作成、採用可否の判断、review、整形、分類は行わない。
 

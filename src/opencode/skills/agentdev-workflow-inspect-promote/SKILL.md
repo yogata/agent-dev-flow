@@ -5,7 +5,7 @@ description: "inspect-promote command の workflow 実装本体。検出事項�
 
 # inspect-promote workflow スキル
 
-inspect-promote command の workflow 実装本体。
+inspect-promote command の workflow 実装本体である。
 `.agentdev/inspect/inbox/` の検出事項を分類（promote/defer/reject）し、採用した検出事項を `.agentdev/inspect/promoted/` へ保存、却下した検出事項を即時削除、見送りを inbox に残置する。
 `--auto` 明示 opt-in 時は高確信度検出事項を `.agentdev/intake/promoted/` へ自動投入する。
 finding disposition を STEP resume point として所有する。
@@ -44,8 +44,7 @@ inspect-promote command は公開 interface（入出力契約・ガードレー�
 inspect-promote workflow は次の8 STEP で構成する。
 各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
 会話コンテキストに依存せず、永続状態（`.agentdev/inspect/inbox/`、`.agentdev/inspect/promoted/`、`.agentdev/intake/promoted/`、auto-promote-log）から再開点を再構成する。
-**finding disposition（STEP-3〜STEP-7 の分類・採用・保留・却下）は独立した resume point 群を構成する。
-**
+**finding disposition（STEP-3〜STEP-7 の分類・採用・保留・却下）は独立した resume point 群を構成する。**
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|

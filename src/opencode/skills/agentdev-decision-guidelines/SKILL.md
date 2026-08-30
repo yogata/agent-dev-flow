@@ -63,7 +63,7 @@ false positive（不要なDecisionの作成）は後に整理できるため、�
 
 ## Decision作成可否条件
 
-Decisionの主題として適格かを判定する境界ルール。
+Decisionの主題として適格かを判定する境界ルールである。
 本条件は「Decisionを作成してはならない条件」「False Negative 防止基準」より優先して適用される主題妥当性の最終境界である。
 
 ### 作成可条件

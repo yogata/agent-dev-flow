@@ -38,7 +38,7 @@ worktree の作成元、PR の base、rebase・同期基準、鮮度確認、squ
 ## 統合先の鮮度確認
 
 並列 Wave 実行時、PR merge 後再開時は、worktree 作成前に `git fetch origin` を実行し統合先の鮮度を確認する。
-古い commit 基準の worktree による DIRTY/CONFLICTING を防止するため。
+これは古い commit 基準の worktree による DIRTY/CONFLICTING を防止するためである。
 確認対象は当該 Case の統合先（通常Caseは `origin/main`、実証Caseは対象評価ブランチの remote ref）であり、worktree 作成元と同一の統合先を参照する。
 
 - **Wave 2 以降**: Wave 1 の PR merge 後に `git fetch origin` → 統合先の最新 commit を確認してから worktree 作成

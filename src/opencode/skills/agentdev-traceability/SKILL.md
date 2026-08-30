@@ -5,7 +5,7 @@ description: Provides requirement-artifact traceability (coverage, impact, check
 
 # agentdev-traceability
 
-AgentDevFlow 標準配布スキル。
+本スキルは AgentDevFlow の標準配布スキルである。
 要件と成果物の明示的な対応関係（covers）について、coverage、impact、check の3能力を提供する。
 正規成果物を直接走査して対応関係をその場で解決し、派生 Graph を前提としない。
 

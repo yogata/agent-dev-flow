@@ -5,7 +5,7 @@ description: "design-save command の workflow 実装本体。req-define で分�
 
 # design-save workflow スキル
 
-design-save command の workflow 実装本体。
+design-save command の workflow 実装本体である。
 req-define で分離された Design 保存対象（`draft-data` の `artifact_actions` 内 `artifact: design` entry）を `docs/designs/<**/*>.md` に保存、確定する制御構造を所有する。
 req-save の次、case-open の前に実行する。
 req-save のファイル編集スコープ制約（Design 編集禁止）を緩和するものではなく、Design 保存を独立責務として切り出す。
@@ -91,7 +91,7 @@ design-save は、req-define で Design action と対象要件の対応が明示
 ## 共通制約
 
 - **工程分岐**: `artifact: design` entry の有無で判定する（全 work_type 対象、`work_type` による判定は廃止）
-- **Design ライフサイクル**: 新規作成時 `status: draft`、既存追記時 `status` 変更なし。遷移契機の詳細は `agentdev-design-file-manager` の design-lifecycle-application が正とする
+- **Design ライフサイクル**: 新規作成時 `status: draft`、既存追記時 `status` 変更なし。遷移契機の詳細は `agentdev-design-file-manager` の design-lifecycle-application を正とする
 - **再分類禁止**: Design artifact_actions の分離根拠、配置先判定は req-define（`agentdev-req-analysis`）の結果を尊重し、design-save で再分類しない
 - **実行時非依存**: Design ファイルは実行時コマンドが依存する記述にしない（command 不変条件）
 - **Issue 作成禁止**: design-save は Issue を作成しない（case-open の責任範囲）

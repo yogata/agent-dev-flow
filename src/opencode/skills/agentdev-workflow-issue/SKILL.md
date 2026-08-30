@@ -5,7 +5,7 @@ description: "issue command の workflow 実装本体。自然言語の指示と
 
 # issue workflow スキル
 
-issue command の workflow 実現本体。
+issue command の workflow 実現本体である。
 ユーザーの自然言語の指示と現在の会話文脈から必要な追跡Issue操作を判断し、Capability Skill の操作知識に従って Custom Tool `agentdev_gh` の操作契約経由で実行する対話型 workflow を所有する。
 
 issue command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実現本体を提供する。

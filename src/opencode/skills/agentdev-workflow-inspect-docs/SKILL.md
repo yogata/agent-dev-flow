@@ -5,7 +5,7 @@ description: "inspect-docs command の workflow 実装本体。docs 全体（REQ
 
 # inspect-docs workflow スキル
 
-inspect-docs command の workflow 実装本体。
+inspect-docs command の workflow 実装本体である。
 docs 全体（REQ/Decision/Design/guides/README）と配布物の意味整合性診断から、検出事項の `.agentdev/inspect/inbox/` 出力、`.agentdev/inspect/` 配下の git 永続化、完了報告までの制御構造を所有する。
 
 inspect-docs command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。

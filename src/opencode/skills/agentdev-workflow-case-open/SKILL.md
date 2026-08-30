@@ -5,7 +5,7 @@ description: "case-open command の workflow 実装本体。要件定義から G
 
 # case-open workflow スキル
 
-case-open command の workflow 実装本体。
+case-open command の workflow 実装本体である。
 要件doc（構造化 `draft-data`）から GitHub Issue（Epic flow または Standard flow）を作成する制御構造、execution contract 確定（EC-{N}〜EC-{N}）、execution_unit 構成（連結成分アルゴリズム + 3軸判断 + preflight）、draft/RU 削除クリーンアップ（Form Zero）を所有する。
 
 case-open command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。

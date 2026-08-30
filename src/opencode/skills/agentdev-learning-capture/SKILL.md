@@ -5,7 +5,7 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 # `agentdev-learning-capture`
 
-会話中にエージェントが自律的に検知、回避、修正した問題から学びを抽出し、ユーザー承認なしで自律的に `.agentdev/learning/inbox.md` に蓄積するスキル。
+会話中にエージェントが自律的に検知、回避、修正した問題から学びを抽出し、ユーザー承認なしで自律的に `.agentdev/learning/inbox.md` に蓄積するスキルである。
 
 ## 入力
 

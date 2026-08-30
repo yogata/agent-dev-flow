@@ -6,7 +6,7 @@ description: クローズ済み Case Issue/PR から未回収の変更候補を 
 
 クローズ済みの Case Issue / PR の本文、コメントから未回収の変更候補を抽出し、intake item として `.agentdev/intake/inbox/` に保存する。
 
-旧 `issue-backlog` の抽出機能を intake ワークフローに再定義したコマンド。
+旧 `issue-backlog` の抽出機能を intake ワークフローに再定義したコマンドである。
 
 **このコマンドは保存専用である。** GitHub Issue の作成、採用可否の判断は行わない。
 

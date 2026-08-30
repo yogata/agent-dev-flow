@@ -5,7 +5,7 @@ description: "req-save command の workflow 実装本体。壁打ち成果物（
 
 # req-save workflow スキル
 
-req-save command の workflow 実装本体。
+req-save command の workflow 実装本体である。
 req-define で生成された壁打ち成果物をREQ/Decisionファイルとしてdocs/に保存し、コミット・プッシュする制御構造を所有する。
 `work_type` による消費判定は廃止し、`artifact_actions` の有無で判定する。
 

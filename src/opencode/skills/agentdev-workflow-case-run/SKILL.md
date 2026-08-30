@@ -5,7 +5,7 @@ description: "case-run command の workflow 実装本体。単一 Issue 実行�
 
 # case-run workflow スキル
 
-case-run command の workflow 実装本体。
+case-run command の workflow 実装本体である。
 単一 Issue または単一 Wave の実行を実行担当サブエージェントへ委譲し、その result を処理する制御構造を所有する。
 case-run 本体は orchestration に専念し、実装実行そのものは行わない。
 

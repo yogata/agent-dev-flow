@@ -5,7 +5,7 @@ description: Learning pipeline（capture → promote）の共通知識。inbox e
 
 # `agentdev-learning-pipeline`
 
-learning pipeline（capture → promote）の共通知識ベース。
+learning pipeline（capture → promote）の共通知識ベースである。
 schema、分類基準、評価ディメンション、prune 方針、責任分界を定義し、learning-promote が参照する。
 
 ## パイプライン概要

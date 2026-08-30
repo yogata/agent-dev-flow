@@ -5,7 +5,7 @@ description: "learning-promote command の workflow 実装本体。inbox.md エ�
 
 # learning-promote workflow スキル
 
-learning-promote command の workflow 実装本体。
+learning-promote command の workflow 実装本体である。
 `.agentdev/learning/inbox.md` の学びエントリを読み込み、正規化、問題クラス分類、8軸評価、廃棄判定、既存対策確認、自律確定判定（一意に確定できる項目の自律確定）とユーザー判断が必要な項目のみの HITL 承認を経て採用済み成果物を生成する制御構造を所有する。
 `.opencode/` への直接配置、直接反映は行わない（反映ルート: promoted → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run`）。
 

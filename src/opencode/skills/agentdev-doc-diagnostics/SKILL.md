@@ -5,7 +5,7 @@ description: docs 横断診断カテゴリ、共通証拠構造、共通 finding
 
 # docs 横断診断知識ベース（doc-diagnostics）
 
-inspect-docs command から呼ばれる docs 横断診断の判断基盤。
+inspect-docs command から呼ばれる docs 横断診断の判断基盤である。
 横断診断カテゴリ、共通証拠構造、共通 finding 出力契約、文書種別別診断へのルーティングを一次所有する（AG-{NNN}、RU-{NNNN}-01 合意）。
 REQ 固有の SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断、文意品質、探索順は再定義せず、各専門 skill へルーティングする。
 検査対象を直接修正しない診断専用であり、本スキルは判定ロジックとルーティング表の提供のみを行う。

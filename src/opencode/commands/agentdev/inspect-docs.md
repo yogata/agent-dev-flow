@@ -4,7 +4,7 @@ description: docs全体の意味整合性を検出し、検出事項を .agentde
 
 # inspect-docs
 
-docs全体（REQ/Decision/Design/guides）の意味整合性を診断し、検出事項を `.agentdev/inspect/inbox/` へ出力するコマンド。
+docs全体（REQ/Decision/Design/guides）の意味整合性を診断し、検出事項を `.agentdev/inspect/inbox/` へ出力するコマンドである。
 検査対象を直接修正しない診断を行い、REQ 構造診断（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて Design、ADR、guides、README の意味診断を含む。
 
 ## 基本原則: 診断専用（検査対象を直接修正しない）

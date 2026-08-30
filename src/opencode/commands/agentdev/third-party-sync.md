@@ -4,7 +4,7 @@ description: third-party Skill を宣言（skills.yaml）に基づき利用者�
 
 # third-party Skill 同期
 
-third-party Skill（ADF が製作していない外部由来の skill）を宣言ファイル（skills.yaml）に基づいて利用者環境へ取得・同期する人間向け公開入口。
+third-party Skill（ADF が製作していない外部由来の skill）を宣言ファイル（skills.yaml）に基づいて利用者環境へ取得・同期する人間向け公開入口である。
 取得手順本体を所有せず、third-party Skill 取得専用 Custom Tool へ委譲する。
 skills.yaml への宣言追加だけで取得対象へ追加でき、機構コードの変更を要求しない。
 
