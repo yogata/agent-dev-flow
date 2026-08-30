@@ -1,0 +1,16 @@
+{
+  "name": "agentdev-distribution-boundary-guard",
+  "version": "0.1.0",
+  "private": true,
+  "description": "agentdev-distribution-boundary-guard Plugin. Repo-local pre-write guard that wires the canonical side-effect-free detector into OpenCode's tool.execute.before hook for write/edit/apply_patch. Fail-fast adapter; inspection errors are gate-not-passed, NOT clean. This package is the canonical source of a repo-local Plugin: it is excluded from consumer distribution and projected only by the self-host sync.",
+  "type": "module",
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "@types/bun": "^1.3.0",
+    "@types/node": "^22.0.0"
+  }
+}

@@ -101,12 +101,20 @@ foreach ($skillDir in $skillDirs) {
 
 # Custom Tools / Plugins (agentdev-* distribution types, REQ-052). Optional
 # kinds: archives without a kind directory simply skip it.
+# Repo-local Plugin (agentdev-distribution-boundary-guard, REQ-052-006 /
+# REQ-002-045) is excluded from consumer projection. SYNC OBLIGATION
+# (runtime-package-boundary Design「repo-local Plugin の配布・投影契約」):
+# keep this exclusion in sync across the 3 consumer distribution paths:
+# scripts/install.ps1, scripts/self/release/package-release-archive.ps1,
+# this file. self-sync.ps1 must NOT exclude it (self-host projection is kept).
+$repoLocalPluginNames = @("agentdev-distribution-boundary-guard")
 foreach ($kind in @("tools", "plugins")) {
     $kindSrc = Join-Path $Source $kind
     if (-not (Test-Path -LiteralPath $kindSrc)) { continue }
     $kindDst = Join-Path $Target $kind
     $kindDirs = Get-ChildItem -LiteralPath $kindSrc -Directory | Where-Object {
-        $_.Name -like "agentdev-*"
+        $_.Name -like "agentdev-*" -and
+        ($kind -ne "plugins" -or $_.Name -notin $repoLocalPluginNames)
     }
     foreach ($kindDir in $kindDirs) {
         $kindFiles = Get-ChildItem -LiteralPath $kindDir.FullName -Recurse -File
@@ -125,7 +133,7 @@ foreach ($kind in @("tools", "plugins")) {
 $pluginsSrcDir = Join-Path $Source "plugins"
 if (Test-Path -LiteralPath $pluginsSrcDir) {
     $pluginPackages = Get-ChildItem -LiteralPath $pluginsSrcDir -Directory | Where-Object {
-        $_.Name -like "agentdev-*"
+        $_.Name -like "agentdev-*" -and $_.Name -notin $repoLocalPluginNames
     }
     foreach ($pkg in $pluginPackages) {
         $shimDst = Join-Path (Join-Path $Target "plugins") "$($pkg.Name).ts"

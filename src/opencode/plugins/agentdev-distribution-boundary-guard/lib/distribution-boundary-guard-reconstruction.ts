@@ -6,7 +6,7 @@
 // For Update File, the patch is applied against the current file content;
 // for Move File, the source content is inspected at the destination path.
 // Any failure to read or apply results in a fail-closed outcome
-// (DEC-014 decision 5).
+// (the distribution boundary DEC, decision 5).
 //
 // Pure except for the injected readFile callback: same input + same readFile
 // output => same reconstruction.

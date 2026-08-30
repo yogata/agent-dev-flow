@@ -1,5 +1,5 @@
 /**
- * Tests for distribution-boundary-guard plugin helpers (TS-005).
+ * Tests for the agentdev-distribution-boundary-guard plugin helpers.
  *
  * Validates fail-fast behavior: write/edit/apply_patch operations that would
  * introduce producer-internal references into distributed text artifacts are
@@ -37,7 +37,7 @@ import {
   classifyPath,
   classifyPathNoRoot,
   default as pluginDefault,
-} from "../distribution-boundary-guard.ts";
+} from "../plugin.ts";
 
 describe("shouldInspectTool - tool allowlist", () => {
   test("inspects write, edit, apply_patch", () => {
@@ -315,7 +315,7 @@ describe("formatBlockMessage - error message", () => {
       ],
     };
     const msg = formatBlockMessage("write", fake);
-    expect(msg).toContain("distribution-boundary-guard");
+    expect(msg).toContain("agentdev-distribution-boundary-guard");
     expect(msg).toContain("ADR-0135");
     expect(msg).toContain("producer-internal");
   });
@@ -1084,7 +1084,7 @@ describe("Stage B round 2: V2 default export shape", () => {
   test("default export is V2 shape { id, server }", () => {
     expect(pluginDefault).toBeDefined();
     expect(typeof pluginDefault).toBe("object");
-    expect(pluginDefault.id).toBe("distribution-boundary-guard");
+    expect(pluginDefault.id).toBe("agentdev-distribution-boundary-guard");
     expect(typeof pluginDefault.server).toBe("function");
   });
 

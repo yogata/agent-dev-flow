@@ -106,6 +106,14 @@ $ProjectionParentRels = @('commands', 'skills', 'tools', 'plugins')
 $RepoLocalCommandNames = @('repo')
 $RepoLocalSkillPrefix = 'repo-'
 
+# Repo-local Plugin excluded from consumer distribution (REQ-052-006, REQ-002-045).
+# SYNC OBLIGATION (runtime-package-boundary Design「repo-local Plugin の配布・投影契約」):
+# keep this exclusion in sync across the 3 consumer distribution paths:
+# scripts/install.ps1 (this file), scripts/consumer/archive/install.ps1,
+# scripts/self/release/package-release-archive.ps1. self-sync.ps1 must NOT
+# exclude it (self-host projection is kept).
+$RepoLocalPluginNames = @('agentdev-distribution-boundary-guard')
+
 # In LocalMode the agentdev-gh Custom Tool implementation is redirected from
 # src/opencode-local/ (REQ-011-006, DEC-004).
 $LocalModeRedirectToolRel = 'tools\agentdev-gh'
@@ -197,9 +205,12 @@ function Get-ConsumerJunctionTargets {
     }
 
     # plugins\agentdev-* (Plugin / Hook 配布種別、動的列挙)
+    # Repo-local Plugin（$RepoLocalPluginNames）は consumer 配布対象外のため除外する
+    # （REQ-052-006、REQ-002-045）。除外漏れは check モードの orphan 検出で報告される。
     $pluginsSource = Join-Path $SourceDir 'plugins'
     if (Test-Path -LiteralPath $pluginsSource) {
         Get-ChildItem -LiteralPath $pluginsSource -Directory -Filter 'agentdev-*' |
+            Where-Object { $_.Name -notin $RepoLocalPluginNames } |
             ForEach-Object { $targets.Add("plugins\$($_.Name)") }
     }
 
