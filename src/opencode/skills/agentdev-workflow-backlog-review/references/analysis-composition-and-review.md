@@ -63,6 +63,7 @@
 
 - STEP-1 の対象成果物一覧（durable state: promoted/ 実ファイル）
 - 分析基準、前工程からの引き継ぎメタデータ付与ルールは `agentdev-backlog-integration` の公開操作契約に従う
+- learning 由来の採用済み成果物の反映先分類結果の消費と昇華先ルーティング判定は `agentdev-backlog-integration` の昇華先ルーティング契約に従う
 - document-model Design（extension 経由）の文書7分類モデルを参照する
 
 ### Preconditions
@@ -73,19 +74,21 @@
 
 1. 各採用済み成果物を読み込み、分析する
 2. 各 RU 候補について、document-model Design（extension 経由）の文書7分類モデル（REQ、挙動Design、カタログDesign、guide、learning維持、作業記録、対象外）を参照して暫定分類を付与する
-3. 分析結果と併せて RU frontmatter に `tentative_classification` として記録する（記録は STEP-7 の RU 生成時。本 STEP は付与内容を確定する）
+3. learning 由来の採用済み成果物については、学習パイプラインが前工程で付与した反映先分類結果を読み込み、`agentdev-backlog-integration` の昇華先ルーティング契約に従い昇華先ルート（昇華、Issue 修正、削除、保留）の処置候補を判定する。intake / inspect 由来は本判定の対象としない。反映先分類が記録されていない場合は現行の RU 化経路に従う
+4. 分析結果と併せて RU frontmatter に `tentative_classification` として記録する（記録は STEP-7 の RU 生成時。本 STEP は付与内容を確定する）
 
 ### Result
 
-- 分析結果、暫定分類付与結果
+- 分析結果、暫定分類付与結果、learning 由来の昇華先ルーティング処置候補
 
 ### Evidence
 
-- 各成果物の分析結果、暫定分類（文書7分類モデルのいずれか）
+- 各成果物の分析結果、暫定分類（文書7分類モデルのいずれか）、learning 由来の反映先分類結果と対応付けた処置候補
 
 ### Completion Verification
 
 - 全 RU 候補に暫定分類が付与されていること
+- learning 由来の全成果物について昇華先ルートの処置候補が判定されていること（反映先分類未記録時は RU 化経路へのフォールバックを記録）
 
 ### Resume-Idempotency
 
@@ -111,18 +114,19 @@
 1. 統合、分割判定を行う（N:1 統合 / 1:N 分割 / 1:1）
 2. depends_on 依存解決を行う（未解決、循環、並べ替え可能性の検証）
 3. RU 構成案（統合・分割判定結果、depends_on 解決結果、暫定分類付与結果）を確定する
+4. learning 由来のうち昇華先ルーティングで RU 以外の処置と判定された成果物を RU 構成案から除外し、ルーティング処置案として承認提示対象へ含める（昇華、Issue 修正、削除、保留の処置内容は `agentdev-backlog-integration` の昇華先ルーティング契約に従う）
 
 ### Result
 
-- RU 構成案
+- RU 構成案、ルーティング処置案（learning 由来）
 
 ### Evidence
 
-- RU 構成案（統合・分割の判断根拠、depends_on 検証結果）
+- RU 構成案（統合・分割の判断根拠、depends_on 検証結果）、ルーティング処置案（learning 由来の処置別内訳）
 
 ### Completion Verification
 
-- 全成果物が RU 構成案のいずれかに割り当てられていること
+- 全成果物が RU 構成案またはルーティング処置案のいずれかに割り当てられていること
 - depends_on に unresolved、循環が残っていないこと
 
 ### Resume-Idempotency
@@ -199,11 +203,12 @@ RU 構成案をユーザーに提示し、明示的な承認を得る。
 
 ### Procedure
 
-1. RU 構成案（統合・分割判定、depends_on 解決結果、暫定分類）をユーザーに提示する
+1. RU 構成案（統合・分割判定、depends_on 解決結果、暫定分類）と learning 由来のルーティング処置案をユーザーに提示する
 2. ユーザーの修正指示を受け付け、必要に応じて STEP-3 をやり直す
 3. 明示的な承認を得て承認を確定する
 4. 後続の STEP-6 で矛盾が検出されない場合、本 STEP の統合、分割判定承認を RU 生成承認（STEP-7）としても扱う。単一承認で処理し、追加の HITL は不要
 5. 破壊的変更（矛盾解消、要件仕様スコープ変更、大量成果物削除等）は明示承認を維持する
+6. ルーティング処置（RU 以外への昇華、Issue 修正、削除、保留を含む）もユーザーの明示承認を経る。未承認の処置は実行せず、当該成果物は promoted に残置する
 
 ### Result
 
