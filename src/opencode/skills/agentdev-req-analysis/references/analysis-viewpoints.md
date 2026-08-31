@@ -1,5 +1,7 @@
 # 要件分析観点と品質基準
 
+<!-- ADF-COVERS(implementation): REQ-055-001, REQ-055-002 -->
+
 本ファイルは `agentdev-req-analysis` SKILL.md の補助資料であり、要件展開の観点（ユーザーストーリー、完了条件、境界条件、必達要件記述、状態要件/反映作業分離、REQ/Design境界判定、用語定義、分析フレーム選択、両面分析）と、Issue チェックボックス品質基準、ADR閾値判定ブリッジの詳細を扱う。
 SKILL.md 本文では観点の一覧と不変条件のみを提示し、具体的手順、判定表、具体例は本ファイルを参照する。
 
@@ -15,6 +17,7 @@ SKILL.md 本文では観点の一覧と不変条件のみを提示し、具体�
 - [分析フレーム選択基準](#分析フレーム選択基準)
 - [実装/Design両面分析規定](#実装spec両面分析規定)
 - [変更誘発境界リスク分析](#変更誘発境界リスク分析)
+- [検証手段の質基準](#検証手段の質基準)
 - [チェックボックス品質基準](#チェックボックス品質基準)
 - [ADR閾値判定ブリッジ](#adr閾値判定ブリッジ)
 
@@ -196,6 +199,42 @@ project 固有の判断知識（リスク導出規則）を参照する場合、
 - 各 case-specific risk から検証義務（verification obligation）を導く
 - 検証義務を test strategy 項目（verification / pass_criteria / on_failure の3要素）へ投影する
 - 投影先は test strategy であり、投影完全性の検査は QG-1（リスク→test strategy 投影完全性検査）が担う
+
+## 検証手段の質基準
+
+test strategy 設計時点（req-define）で選択する検証手段の質を判定する基準である。
+REQ-055 が正規所有する production-equivalent verification の一般原則を、test strategy 定義工程へ適用する。
+
+### production-equivalent verification の定義
+
+production-equivalent verification とは「本番を完全複製することではなく、対象リスクに関係する実行・依存・環境境界を十分再現した検証である」。
+検証手段の質は「常に特定環境でテストする」等のプロジェクト固有ルールで判定せず、境界の再現性で判定する。
+
+### 判定基準
+
+test strategy 設計時点で検証手段を選択する際、次の3観点で質を判定する。
+
+| 観点 | 判定内容 |
+|---|---|
+| 対象リスクとの対応 | 検証手段が導出済み case-specific risk（対象リスク）に関係すること |
+| 境界の再現性 | 検証手段が対象リスクに関係する実行・依存・環境境界を再現すること |
+| 完全複製の不要性 | 対象リスクに関係しない境界まで本番と同一にすることを検証手段へ要求しないこと |
+
+判定の適用例:
+
+- 対象リスクに関係する境界を再現した検証は、特定環境を使用しなくても production-equivalent と判定する
+- 特定環境でのテスト実施等のプロジェクト固有ルールは本基準の対象外である（本基準で要求しない）
+- 変更誘発境界リスク分析で case-specific risk が導出されない場合、対象リスクが存在しないため本基準の判定対象も生じない
+
+### 完了時点の証跡契約との時点分担
+
+production-equivalent verification の完了時点（case-run/case-close）の証跡契約は、検証スイート合格判定、fail 由来分類、検証環境記録、baseline 再生成の4項目であり、REQ-007-006〜009 が正規所有する。
+本セクションはこれらを複製せず参照に留める。設計時点（req-define）では検証手段の質を判定するのみであり、完了時点の証跡記録は扱わない。
+
+### test strategy 定義への適用
+
+test strategy 定義工程は、本基準による質判定の結果を test strategy 項目（verification / pass_criteria / on_failure の3要素）へ反映する。
+適用点は `agentdev-workflow-req-define` STEP-4「test strategy 定義」であり、定義自体の正本は本セクションである。
 
 ## チェックボックス品質基準
 
