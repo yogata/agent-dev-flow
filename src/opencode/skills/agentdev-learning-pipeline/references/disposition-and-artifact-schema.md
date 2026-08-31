@@ -154,16 +154,20 @@ learning-promote が出力する採用済み成果物の形式。
 
 ## プロジェクト固有知識の反映先振り分け
 
-project-local knowledge を一律 `.agentdev/learning/project-knowledge.md` に保存せず、内容に応じて振り分ける:
+project-local knowledge を一律 `.agentdev/learning/project-knowledge.md` に保存せず、内容に応じて振り分ける。
+技術固有知識（リスク判断知識）の恒久所有先は、Project Knowledge の所有と workflow 利用の要件が正規所有する所有面の契約に従い、Design（現在のシステム事実）と project-local 側の判断知識（project-local Capability Skill として所有）に分担する。
 
 | 内容の性質 | 反映先 |
 |---|---|
 | 常時必要な短いルール | `AGENTS.md` |
-| 作業種別に応じて必要な知識 | `.opencode/skills/<domain>/SKILL.md` |
-| 長い詳細 | `.opencode/skills/<domain>/references/*.md` |
-| 仕様として固定すべき内容 | `docs/designs/<**/*>.md` |
+| 現在のシステム事実として固定すべき技術事実 | `docs/designs/<**/*>.md` |
+| 再利用可能な判断知識（リスク導出規則） | project-local Capability Skill（対象 Capability Skill に対応する project-local 側の判断知識定義へ追加する） |
 | 設計判断 | `docs/decisions/<*>.md` |
 | 要件変更 | `docs/requirements/<*>.md` |
+
+project-local 側の判断知識は、対象 Capability Skill に対応する extension を経由して workflow 責務へ接続される。extension の配置と読込の契約は、配布成果物の責務境界の要件と extension の発見・読込を提供するスキルが正規所有し、本ファイルは機構の契約を再定義せず名レベルで参照する。
+配布成果物（ADF core）は一般規則のみを保持し、技術固有知識を保持しない（配布成果物の責務境界の要件が正規所有する技術固有知識非保持の原則）。一般規則へ昇華できる内容のみ、恒久契約（REQ/Decision/Design）の経路を経て配布成果物へ反映する。
+project-local 側の判断知識は、learning 昇華先ルーティング（バックログ統合の要件が正規所有する learning 昇華先のルーティング契約）を経由して流入し、リスク導出規則として次の分析で使われる成長する資産として扱う。昇華先が現行体系に存在しない知識は deferred として保留し、Knowledge 独立文書種別の導入判断と独立に扱う。
 
 ## Prune 方針
 
