@@ -1,7 +1,5 @@
 # 要件分析観点と品質基準
 
-<!-- ADF-COVERS(implementation): REQ-055-001, REQ-055-002 -->
-
 本ファイルは `agentdev-req-analysis` SKILL.md の補助資料であり、要件展開の観点（ユーザーストーリー、完了条件、境界条件、必達要件記述、状態要件/反映作業分離、REQ/Design境界判定、用語定義、分析フレーム選択、両面分析）と、Issue チェックボックス品質基準、ADR閾値判定ブリッジの詳細を扱う。
 SKILL.md 本文では観点の一覧と不変条件のみを提示し、具体的手順、判定表、具体例は本ファイルを参照する。
 
@@ -203,7 +201,7 @@ project 固有の判断知識（リスク導出規則）を参照する場合、
 ## 検証手段の質基準
 
 test strategy 設計時点（req-define）で選択する検証手段の質を判定する基準である。
-REQ-055 が正規所有する production-equivalent verification の一般原則を、test strategy 定義工程へ適用する。
+production-equivalent verification の要件が正規所有する一般原則を、test strategy 定義工程へ適用する。
 
 ### production-equivalent verification の定義
 
@@ -228,7 +226,7 @@ test strategy 設計時点で検証手段を選択する際、次の3観点で�
 
 ### 完了時点の証跡契約との時点分担
 
-production-equivalent verification の完了時点（case-run/case-close）の証跡契約は、検証スイート合格判定、fail 由来分類、検証環境記録、baseline 再生成の4項目であり、REQ-007-006〜009 が正規所有する。
+production-equivalent verification の完了時点（case-run/case-close）の証跡契約は、検証スイート合格判定、fail 由来分類、検証環境記録、baseline 再生成の4項目であり、完了時点の証跡契約を正規所有する要件群が正規所有する。
 本セクションはこれらを複製せず参照に留める。設計時点（req-define）では検証手段の質を判定するのみであり、完了時点の証跡記録は扱わない。
 
 ### test strategy 定義への適用
