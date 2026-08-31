@@ -2,7 +2,7 @@
 title: 品質ゲート
 status: accepted
 created: 2026-08-20
-updated: 2026-08-15
+updated: 2026-08-31
 ---
 <!-- ADF-COVERS(implementation): REQ-003-013 -->
 <!-- ADF-COVERS(implementation): REQ-007-006, REQ-007-007, REQ-007-008, REQ-007-009 -->
@@ -58,6 +58,13 @@ AgentDevFlow 主ワークフロー（req-define → req-save → design-save（D
 
 各 test strategy 項目が verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素を完全に保持することを検証する。
 いずれかが欠落する項目を検出した場合、fail とする。
+この検査は req-define / req-save が適用する。
+
+#### リスク→test strategy 投影完全性検査
+
+REQ-054 の変更誘発境界リスク分析が導出した case-specific risk（変更誘発境界リスク）が test strategy へ投影されていること（change → risk → verification obligation → test strategy の変換経路の完全性）を検証する。
+投影入力源の拡張は [artifact-quality-control-routing Design](../responsibilities/artifact-quality-control-routing.md)「入力源」が定義する。
+新規ゲートは作らず、既存 QG-1 の検査観点の拡張として実施する。
 この検査は req-define / req-save が適用する。
 
 ## QG-2: Acceptance Criteria Coverage Gate

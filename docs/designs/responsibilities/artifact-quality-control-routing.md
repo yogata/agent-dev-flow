@@ -2,7 +2,7 @@
 title: Artifact Quality Control Routing Design
 status: draft
 created: 2026-08-09
-updated: 2026-08-09
+updated: 2026-08-31
 ---
 <!-- ADF-COVERS(implementation): REQ-017-004, REQ-017-005, REQ-017-006 -->
 
@@ -41,6 +41,15 @@ artifact type から必須品質能力への対応表。ルーティング先は
 同一成果物が複数能力を必要とする場合（例: Skill の自然言語部分は文書品質査読能力も
 対象）、全ての適用能力を test strategy へ展開する。
 多対多関係を許容する。
+
+## 入力源
+
+品質能力の投影入力源は、artifact type に加えて case-specific risk（変更誘発境界リスク）を含む。
+
+- **artifact type**: 変更予定成果物の種別から必須品質能力を導出する（本 Design の合成規則、変更なし）
+- **case-specific risk（変更誘発境界リスク）**: REQ-054 の変更誘発境界リスク分析が導出した case-specific risk を投影入力源に追加する。投影先は test strategy、投影完全性の検査は QG-1（リスク→test strategy 投影完全性）が担う
+
+既存の合成規則（artifact type → 必須品質能力）を変更せず、入力源の追加として拡張する。
 
 ## 合成規則
 

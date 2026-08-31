@@ -2,6 +2,7 @@
 draft_type: req_draft
 topic_slug: change-induced-risk-feedback
 status: saved
+design_saved: true
 created_at: 2026-08-31T00:00:00+09:00
 source_rus: []
 ---
