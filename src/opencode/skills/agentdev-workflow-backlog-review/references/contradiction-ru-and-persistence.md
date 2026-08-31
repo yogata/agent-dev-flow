@@ -61,6 +61,7 @@ RU を生成し、RU 生成が成功した採用済み成果物のみを削除�
 
 - STEP-5 で承認確定した RU 構成案、STEP-6 の矛盾検出結果（durable state: promoted/ 実ファイル、RU-ID）
 - RU 生成ルール、frontmatter スキーマ、depends_on 検証は `agentdev-backlog-integration` の公開操作契約に従う
+- learning 由来のルーティング処置の実行境界は `agentdev-backlog-integration` の昇華先ルーティング契約に従う
 - session由来RU の生成形式は一時成果物ライフサイクル要件と artifact-contracts Design「RU アーティファクト契約（session由来RU）」セクションを正規原本とする
 
 ### Preconditions
@@ -76,21 +77,23 @@ RU を生成し、RU 生成が成功した採用済み成果物のみを削除�
 4. RU 生成が成功した採用済み成果物のみを削除する。
 削除条件は当該成果物が RU に取り込まれ、RU ファイルの生成が確認できた場合のみ。
 RU 化に失敗した成果物、矛盾により除外された成果物は残置する
-5. 削除結果を記録する
+5. ルーティング処置のうち削除処置は、STEP-5 で明示承認済みの場合に限り該当採用済み成果物を promoted から削除する。保留、指示出力型の処置（昇華指示、Issue 修正指示）の成果物は promoted に残置する
+6. 削除結果とルーティング処置の実行結果を記録する
 
 ### Result
 
 - `.agentdev/backlog/req-units/RU-*.md`
-- RU 化成功成果物の削除、残置成果物の記録
+- RU 化成功成果物の削除、ルーティング削除処置の実行、残置成果物の記録
 
 ### Evidence
 
-- 生成済み RU のファイルパス一覧、削除/ 残置の成果物一覧
+- 生成済み RU のファイルパス一覧、削除/ 残置の成果物一覧、ルーティング処置別の実行結果
 
 ### Completion Verification
 
 - RU 構成案の全 RU について RU ファイルが生成されていること（矛盾除外分を除く）
 - RU 生成成功分の成果物のみが削除されていること
+- ルーティングの削除処置が明示承認済みのものに限られていること
 
 ### Resume-Idempotency
 
@@ -123,7 +126,8 @@ RU 化に失敗した成果物、矛盾により除外された成果物は残�
 5. `git commit -- <paths>`（--only pathspec 形式）を実行し、`git push` を行う。失敗時は構造化エラーメッセージを表示して停止する
 6. 完了報告をテンプレート別に出力する。
 全て成功時は `.opencode/commands/agentdev/templates/backlog-review/standard.md`、partial success（矛盾あり）時は `partial.md`、採用済み成果物なし時は `zero-promoted.md` に従う。
-RU 生成結果、git 永続化結果を含め、次のコマンド（`/agentdev/req-define`）を提示する
+RU 生成結果、ルーティング処置結果、git 永続化結果を含め、次のコマンド（`/agentdev/req-define`）を提示する。
+昇華先が project-local 資産である処置は、書き込み先の実行前提（git 管理境界）を明示した指示を完了報告に含める
 
 ### Result
 
@@ -137,6 +141,7 @@ RU 生成結果、git 永続化結果を含め、次のコマンド（`/agentdev
 ### Completion Verification
 
 - RU 生成結果と git 永続化結果が完了報告に含まれていること
+- learning 由来のルーティング処置結果が完了報告に含まれていること
 - partial success 時に該当テンプレートを使用していること
 
 ### Resume-Idempotency

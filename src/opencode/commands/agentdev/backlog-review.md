@@ -19,6 +19,7 @@ description: 採用済み成果物を分析、統合し、ユーザー承認後�
 
 - `.agentdev/backlog/req-units/RU-*.md`（Requirement Unit）
 - 成功した採用済み成果物の削除
+- learning 由来分類結果の昇華先ルーティング結果（昇華、Issue 修正、削除、保留を完了報告に処置別に記録）
 
 ## RU フォーマット
 
@@ -49,6 +50,7 @@ RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, 
 - REQ ファイルの保存は行わない（`req-save` が担当）
 - GitHub Issue の作成は行わない（`case-open` が担当）
 - `.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md`、`.agentdev/learning/deferred.md` は更新しない
+- ADF リポジトリ外の project-local 資産（project-local Capability Skill の判断知識、Project Extension の接続定義）を直接書き換えない（書き込み先の実行前提を明示した指示の出力で代替する）
 - RU 生成に失敗した成果物は削除しない
 - 破壊的変更（矛盾解消、要件仕様スコープ変更、大量成果物削除等）は明示承認を維持する（REQ）（`POL-destructive-change-explicit-approval`）
 
