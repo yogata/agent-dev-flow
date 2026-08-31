@@ -39,7 +39,7 @@ req-define workflow は次の11 STEP で構成する。
 | STEP-1 | セッションコンテキスト検知・入力解決 | req-define 起動 | 6項目推論（信頼度付き）、入力ソース確定（実証Issue 明示指定時は正式化入力として確定、RU 自動検出と混在時はユーザー確認） | [references/input-and-dialogue.md](references/input-and-dialogue.md) |
 | STEP-2 | 壁打ち対話（引き継ぎ判定含む） | 入力ソース確定 | 深掘り済み要件内容、`agentdev_handoff` 判定、実証Case判定結果（実証/通常の別） | [references/input-and-dialogue.md](references/input-and-dialogue.md) |
 | STEP-3 | 既存REQ照合 | 壁打ち合意内容確定 | 操作分類結果（`artifact_actions` 記録用） | [references/requirement-development.md](references/requirement-development.md) |
-| STEP-4 | 要件展開 | 操作分類確定 | 変更影響候補、分類ゲート、Decision要否確認、test strategy 定義、評価契約確定（実証Case時） | [references/requirement-development.md](references/requirement-development.md) |
+| STEP-4 | 要件展開 | 操作分類確定 | 変更影響候補、分類ゲート、Decision要否確認、変更誘発境界リスク導出（5観点境界）、test strategy 定義、評価契約確定（実証Case時） | [references/requirement-development.md](references/requirement-development.md) |
 | STEP-5 | Decision判断 | 要件展開完了 | Decision判断記録（`new:{topic-slug}` 形式） | [references/requirement-development.md](references/requirement-development.md) |
 | STEP-6 | 要件doc生成 | Decision判断完了 | 構造化 `draft-data`（operation_units、artifact_actions、test_strategy、review_dispositions。実証Case時は実証Caseであること、評価契約、評価ブランチ識別情報を含む） | [references/draft-generation.md](references/draft-generation.md) |
 | STEP-7 | work_type・Scale 判定 | 要件doc生成完了 | work_type 4値、scale（feature のみ） | [references/draft-generation.md](references/draft-generation.md) |

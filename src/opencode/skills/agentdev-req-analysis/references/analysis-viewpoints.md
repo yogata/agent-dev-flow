@@ -14,6 +14,7 @@ SKILL.md 本文では観点の一覧と不変条件のみを提示し、具体�
 - [用語定義](#用語定義)
 - [分析フレーム選択基準](#分析フレーム選択基準)
 - [実装/Design両面分析規定](#実装spec両面分析規定)
+- [変更誘発境界リスク分析](#変更誘発境界リスク分析)
 - [チェックボックス品質基準](#チェックボックス品質基準)
 - [ADR閾値判定ブリッジ](#adr閾値判定ブリッジ)
 
@@ -152,6 +153,49 @@ req-save は REQ ファイル保存時に Design候補セクションを除去�
 - 各面の修正対象（対象ファイル、対象セクション）を明示する
 - 各面の修正内容（変更の要点）を明示する
 - 一方の面で修正が不要な場合も、分析を実施した上で「修正不要」であることを明示する
+
+## 変更誘発境界リスク分析
+
+変更対象の artifact 種別だけでなく、変更によって変化する依存・実行・環境境界（5観点境界）を分析し、change-induced risk（case-specific risk）を導出する分析観点である。
+要件展開工程（後続の execution contract 工程に先立つ）で実行し、導出した case-specific risk は test strategy の入力として投影する。
+
+### 5観点境界の定義
+
+| 観点 | 境界 | 変更差分の確認事項 | リスク例 |
+|---|---|---|---|
+| dependency boundary | 依存境界 | 依存モジュール、参照方向、依存先の公開 API 変化 | 依存先の破壊的変更が依存元へ波及する |
+| client/server boundary | client/server 境界 | API 契約、入出力形式、I/O 境界接続 | server 側の変更が client 側の実行失敗に至る |
+| execution boundary | 実行境界 | 実行主体、実行経路、委譲接続点 | 委譲先で解決できない入力が発生する |
+| build/runtime boundary | build/runtime 境界 | 検証構成、実行時パッケージ構成 | runtime 構成差異により起動失敗や検査漏れが生じる |
+| environment propagation boundary | 環境伝播境界 | link/junction 投影、環境変数、OS 依存 | 投影先の環境でのみ動作不整合が顕在化する |
+
+### 導出手順
+
+1. 変更差分（変更予定成果物とその変更内容）を確定する
+2. 各観点について、変更差分が境界をまたぐ変化を含むか確認する
+3. 境界をまたぐ変化が確認された観点について、case-specific risk を記述する（観点名、変化の内容、予測される影響）
+4. case-specific risk が存在しない場合も、5観点すべての確認を実施したことを記録する（分析の省略はしない）
+
+### リスク導出規則の参照
+
+project 固有の判断知識（リスク導出規則）を参照する場合、extension 読込経路（配布成果物の責務境界の要件が正規所有する読込契約）に従う。
+
+- 実行時参照先は `agentdev-project-extensions`（extension の発見、読み込み状態分類、読込ルールを提供する）
+- 自身に対応する extension のみを読む
+- extension が不在または破損の場合も標準動作を維持する（fail-open）
+
+### 知識不在時の挙動
+
+リスク導出規則が project 側に不在の場合は、本節の 5観点境界（ADF core の一般規則）のみで 5観点境界分析を実行する。分析自体を省略しない。
+
+### test strategy への投影
+
+導出した case-specific risk は検証契約へ投影する。変換経路は change → risk → verification obligation → test strategy とする。
+
+- change（変更差分）から case-specific risk を導出する（本節）
+- 各 case-specific risk から検証義務（verification obligation）を導く
+- 検証義務を test strategy 項目（verification / pass_criteria / on_failure の3要素）へ投影する
+- 投影先は test strategy であり、投影完全性の検査は QG-1（リスク→test strategy 投影完全性検査）が担う
 
 ## チェックボックス品質基準
 
