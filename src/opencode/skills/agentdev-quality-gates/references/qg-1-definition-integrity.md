@@ -109,11 +109,20 @@ Design 等に配置すべきと判定された要件行候補が、ドラフト�
 - **fail**: 受け入れ条件が0件（要件doc に受け入れ条件が一切記載されていない）。
 - **pass**: 受け入れ条件が1件以上存在する。
 
+### 12. リスク→test strategy 投影完全性
+
+変更誘発境界リスク分析（dependency boundary、client/server boundary、execution boundary、build/runtime boundary、environment propagation boundary の 5観点境界）が導出した case-specific risk が test strategy へ投影されていること（change → risk → verification obligation → test strategy の変換経路の完全性）を検証する。
+新規ゲートは作らず、本 Gate の検査観点の拡張として実施する。
+
+- **fail**: 5観点境界の確認記録が不在。または導出済み case-specific risk に対応する test strategy 項目が存在しない（変換経路の連鎖が途切れている）。
+- **warn**: case-specific risk は test strategy へ投影されているが、観点名と検証手順の対応づけが曖昧な項目がある。
+- **pass**: 5観点境界の確認が記録されており、case-specific risk が不在の場合は5観点確認の記録のみで充足、存在する場合は各 case-specific risk に対応する test strategy 項目が存在する。
+
 ## pass/ warn/ fail 基準
 
-- **pass**: 上記 1〜11 の全てを満たす。
-- **warn**: 構造は保たれているが改善推奨事項がある（主に観点 3 の粒度、観点 6 の境界曖昧候補、観点 7 の安定契約例外適用境界、観点 8 の推奨アクション未確認、観点 9 のユーザー承認未確認）。進行可能。
-- **fail**: 構造的欠陥がある（観点 1, 2, 5, 6, 7, 8, 9, 10, 11 の fail）。req-define へ差し戻し。
+- **pass**: 上記 1〜12 の全てを満たす。
+- **warn**: 構造は保たれているが改善推奨事項がある（主に観点 3 の粒度、観点 6 の境界曖昧候補、観点 7 の安定契約例外適用境界、観点 8 の推奨アクション未確認、観点 9 のユーザー承認未確認、観点 12 の対応づけ曖昧）。進行可能。
+- **fail**: 構造的欠陥がある（観点 1, 2, 5, 6, 7, 8, 9, 10, 11, 12 の fail）。req-define へ差し戻し。
 
 ## 委譲接続点
 
