@@ -1,6 +1,6 @@
 # STEP-1/2: Issue 番号解決・QG-4 達成判定（issue-resolution-and-qg4）
 
-> 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-1, STEP-2 詳細である。
+> 本 reference は `agentdev-workflow-case-close` SKILL.md の制御平面（STEP 一覧）STEP-1, STEP-2 詳細である。
 > Issue 番号解決・ルーティング（単一 vs Epic Wave）と QG-4 最終完了判定ゲートを提供する。
 
 ## STEP-1: Issue 番号解決・ルーティング

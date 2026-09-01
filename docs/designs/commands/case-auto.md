@@ -55,7 +55,7 @@ updated: 2026-08-19
 - 各工程の実行
   - 委譲工程（req-save / design-save / case-open / case-close）: 実行担当サブエージェントとして起動（v2:ADR-0127, REQ-006-006/084/085）。req-save / design-save 統合委譲で順次実行、case-open / case-close は各コマンド委譲契約に従い起動。委譲起動不能時に delegation-unavailable 報告（REQ-002-003/004）
   - case-run（インライン実行）: case-auto が case-run の Workflow Skill（`agentdev-workflow-case-run`）を正規情報源として読み込み、準備/クリーンアップフェーズを自ら実行。実行担当サブエージェント委譲フェーズでは case-auto から直接実行担当サブエージェントへ委譲（委譲起点の折りたたみ/002）。adapter skill（agentdev-case-run-execution-adapter）を case-auto が読み込む
-  - 結果状態の4次元集約（REQ-006-110）: 各工程の output_contract から (1) 工程結果 pass/warn/fail、(2) artifact_action 適用結果 applied/skipped/failed/no-op、(3) 定義適用工程完了状態、(4) OU ライフサイクル完了状態を収集し混同なく保持する。集約規則の詳細は後述「結果状態の4次元集約（REQ-006-110）」セクション
+  - 結果状態の4次元集約（REQ-034-031）: 各工程の output_contract から (1) 工程結果 pass/warn/fail、(2) artifact_action 適用結果 applied/skipped/failed/no-op、(3) 定義適用工程完了状態、(4) OU ライフサイクル完了状態を収集し混同なく保持する。集約規則の詳細は後述「結果状態の4次元集約（REQ-034-031）」セクション
 - Wave 反復制御（Epic Issue 指定時）
   - case-auto が Epic Issue 番号を記録。Epic Issue 本文から Wave 構成、各子Issue ステータスを読み取る（読み取りのみ、Epic Issue 本文の書き込みは case-close の責務）
   - case-auto が現在 Wave の ready 子Issue を選択し、各子Issue ごとにインライン case-run を実行（最大5件並列、REQ-006-026 踏襲）。各子Issue の実行担当サブエージェントへ case-auto から直接委譲
@@ -65,7 +65,7 @@ updated: 2026-08-19
 - 工程間の状態引き継ぎ（Issue番号、PR番号、RU ファイルパス、capture 対象情報を最終工程まで保持）
 - 複数REQ対応（req-save 委譲の出力から複数 REQ doc または scale:large 検出時、case-open の Issue 構造ルールを使用）
 - 停止条件の検出（停止時タイミング情報の追記。10項目の停止条件いずれかを検出時、実行停止）
-- 完了報告（タイミング情報追記。インライン実行の適用を記録。結果状態の4次元報告（REQ-006-110）を含める）
+- 完了報告（タイミング情報追記。インライン実行の適用を記録。結果状態の4次元報告（REQ-034-031）を含める）
 
 ### 委譲起動不能時の扱い（REQ-002-003/004）
 
@@ -120,9 +120,9 @@ context 管理:
 - クリーンアップ検証ゲート（Standard / Epic Issue flow 双方）: ドラフトファイル、RU ファイルの残存がないこと
 - 出力制約: 成果物本文 verbatim、調査過程等は圧縮
 - タイミング情報: 開始時刻、終了時刻、所要時間を人間が読みやすい形式で報告（REQ-006-082/083）
-- 結果状態の4次元集約（REQ-006-110）: 後述「結果状態の4次元集約（REQ-006-110）」セクションの4状態次元と集約規則に従い、warn を pass へ変換しない
+- 結果状態の4次元集約（REQ-034-031）: 後述「結果状態の4次元集約（REQ-034-031）」セクションの4状態次元と集約規則に従い、warn を pass へ変換しない
 
-## 結果状態の4次元集約（REQ-006-110）
+## 結果状態の4次元集約（REQ-034-031）
 
 case-auto は各工程の結果を次の4状態次元で保持し、集約報告で次元を混同しない。
 各工程の output_contract（Workflow Skill（`agentdev-workflow-case-auto`）の工程別契約表）が情報源となる。
@@ -142,7 +142,7 @@ case-auto は各工程の結果を次の4状態次元で保持し、集約報告
 - warn 変換禁止: (1) が warn の工程を pass として集約しない。完了報告には warn を warn のまま残す
 
 完了報告（停止時フォーマットを含む）には上記4状態次元を工程別・action id 別・ライフサイクル事象別に列挙する。
-実行定義は Workflow Skill（`agentdev-workflow-case-auto`）の「結果状態の4次元集約（REQ-006-110）」および「結果状態の4次元報告（REQ-006-110）」を正とする。
+実行定義は Workflow Skill（`agentdev-workflow-case-auto`）の「結果状態の4次元集約（REQ-034-031）」および「結果状態の4次元報告（REQ-034-031）」を正とする。
 
 ## 複数 execution_unit 並列 orchestration（REQ-006, v2:ADR-0129）
 
@@ -228,15 +228,15 @@ case-auto は停止時に停止理由を以下の分類で報告する。
 | repo 外実体変更 | DB マイグレーション実行、デプロイ/apply、クラウドリソース操作、外部SaaS設定変更、課金、権限、認証情報変更が必要な場合 |
 | CI/test/lint 失敗 | コンフリクト解消モデル（v2:ADR-0132）の Level 2 まで試行しても自己修復不能な場合 |
 | 未コミット変更の帰属不明 | 変更の由来が不明で安全に続行できない場合 |
-| 上位合意矛盾 | case-auto が受領した decision_context が現行正規成果物（REQ/Decision/Design/Issue）間の矛盾に起因する場合。当該矛盾そのものが finding の対象であり、case-auto が一方を勝手に採用できない（REQ-006-114、DEC-008 決定3） |
-| 新規ユーザー判断事項 | case-auto が受領した decision_context が新しいユーザー価値判断、対象範囲変更、外部契約変更を必要とし、現行正規成果物から一意に回答できない場合（REQ-006-114、DEC-008 決定4） |
+| 上位合意矛盾 | case-auto が受領した decision_context が現行正規成果物（REQ/Decision/Design/Issue）間の矛盾に起因する場合。当該矛盾そのものが finding の対象であり、case-auto が一方を勝手に採用できない（REQ-034-034、DEC-008 決定3） |
+| 新規ユーザー判断事項 | case-auto が受領した decision_context が新しいユーザー価値判断、対象範囲変更、外部契約変更を必要とし、現行正規成果物から一意に回答できない場合（REQ-034-034、DEC-008 決定4） |
 
 execution_unit 分割可能性があるにもかかわらず case-open が停止した場合、「req-define 合意要件からの逸脱」ではなく「command 契約・実装不整合」として報告する。
 これは case-open の契約・実装不整合であり、要件doc側の問題ではない。
 
-「上位合意矛盾」「新規ユーザー判断事項」は bounded parent decision resolution（REQ-006-112〜114、DEC-008）で case-auto が decision_context を自律解決できない場合の停止理由分類である。
+「上位合意矛盾」「新規ユーザー判断事項」は bounded parent decision resolution（REQ-034-032〜034、DEC-008）で case-auto が decision_context を自律解決できない場合の停止理由分類である。
 case-auto は現行正規成果物から一意に回答可能な decision_context を自律解決するが、解決できないものは本2分類のいずれかへ分類してユーザーへ返す。
-詳細は後述「bounded parent decision resolution（REQ-006-112〜114、DEC-008）」節を参照。
+詳細は後述「bounded parent decision resolution（REQ-034-032〜034、DEC-008）」節を参照。
 
 詳細な停止条件の全量は REQ-006-016（本拡張で11項目）を参照。
 
@@ -455,23 +455,23 @@ case-auto は停止伝播において以下を行わない。
 
 case-auto は停止伝播受領において純粋な伝播経路として機能し、adversarial-review の意味的処理には関与しない。
 
-## bounded parent decision resolution（REQ-006-112〜114、DEC-008）
+## bounded parent decision resolution（REQ-034-032〜034、DEC-008）
 
 本節は case-auto が下位 command から受領した decision_context をどの範囲まで自律解決し、どこでユーザーへ返すかの境界を規定する。
 default-on + skip policy（REQ-014-013、REQ-015-002）により各 caller command で adversarial-review が原則実行される前提と、case-auto が中央集約 review engine とはならない前提（REQ-015-012）を両立するための限定的親判断解決である。
 
 ### 解決範囲
 
-case-auto は下位 command から受領した decision_context について、現行正規成果物（REQ、Decision、Design、Issue その他合意済み情報）から一意に回答可能な場合はユーザー停止せず回答して下位 command を resume させる（REQ-006-112、DEC-008 決定1）。
+case-auto は下位 command から受領した decision_context について、現行正規成果物（REQ、Decision、Design、Issue その他合意済み情報）から一意に回答可能な場合はユーザー停止せず回答して下位 command を resume させる（REQ-034-032、DEC-008 決定1）。
 
 | 解決可否 | 条件 | case-auto の挙動 |
 |---|---|---|
-| 自律解決可能 | 現行正規成果物から一意に回答可能 | 回答を下位 command へ返し resume させる（REQ-006-112） |
-| 作業仮定で継続可能 | 外部仕様・互換性・データ保持・セキュリティ・対象範囲・受け入れ条件を変更しない可逆的内部詳細であり、既存契約で許容された範囲 | 作業仮定と根拠を明示した上で自走継続し、下位 command を resume させる（REQ-006-113、DEC-008 決定2） |
-| ユーザー停止（上位合意矛盾） | decision_context が現行正規成果物間の矛盾に起因し、当該矛盾そのものが finding の対象 | 一方を勝手に採用せず停止し、停止理由分類「上位合意矛盾」でユーザーへ返す（REQ-006-114、DEC-008 決定3） |
-| ユーザー停止（新規ユーザー判断事項） | 新しいユーザー価値判断、対象範囲変更、外部契約変更が必要 | 既存停止経路で停止し、停止理由分類「新規ユーザー判断事項」でユーザーへ返す（REQ-006-114、DEC-008 決定4） |
+| 自律解決可能 | 現行正規成果物から一意に回答可能 | 回答を下位 command へ返し resume させる（REQ-034-032） |
+| 作業仮定で継続可能 | 外部仕様・互換性・データ保持・セキュリティ・対象範囲・受け入れ条件を変更しない可逆的内部詳細であり、既存契約で許容された範囲 | 作業仮定と根拠を明示した上で自走継続し、下位 command を resume させる（REQ-034-033、DEC-008 決定2） |
+| ユーザー停止（上位合意矛盾） | decision_context が現行正規成果物間の矛盾に起因し、当該矛盾そのものが finding の対象 | 一方を勝手に採用せず停止し、停止理由分類「上位合意矛盾」でユーザーへ返す（REQ-034-034、DEC-008 決定3） |
+| ユーザー停止（新規ユーザー判断事項） | 新しいユーザー価値判断、対象範囲変更、外部契約変更が必要 | 既存停止経路で停止し、停止理由分類「新規ユーザー判断事項」でユーザーへ返す（REQ-034-034、DEC-008 決定4） |
 
-### 作業仮定の明示要件（REQ-006-113）
+### 作業仮定の明示要件（REQ-034-033）
 
 可逆的内部詳細を作業仮定で継続する場合、case-auto は作業仮定と根拠を明示する。
 明示内容は下位 command への回答に含め、ユーザーが事後確認できる形とする。
@@ -487,7 +487,7 @@ adversarial-review の再実行要否は adversarial-review 側の再 review 契
 ### case-auto が行わないこと（REQ-015-012 維持、DEC-008 決定6）
 
 bounded parent decision resolution においても、case-auto は中央集約 review engine とはならず、raw finding を解釈、採否、候補反映しない（REQ-015-012 維持、DEC-008 決定6）。
-case-auto が解決対象とするのは下位 command が構造化した decision_context のみであり、下位 command が raw finding を case-auto へそのまま渡すことはない（REQ-006-112、AG-006）。
+case-auto が解決対象とするのは下位 command が構造化した decision_context のみであり、下位 command が raw finding を case-auto へそのまま渡すことはない（REQ-034-032、AG-006）。
 各 caller command は自身が所有する候補について finding の意味解釈、採否、候補への反映を維持する（REQ-014-006、REQ-015 caller integration）。
 
 ### 停止理由分類との関係

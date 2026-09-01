@@ -1,6 +1,6 @@
 # STEP-4/5/6: fan-in 判定、stage 3 実行、完了報告（fan-in-and-reporting）
 
-> 本 reference は `agentdev-workflow-backlog-auto` SKILL.md の Control Plane STEP-4, STEP-5, STEP-6 詳細である。
+> 本 reference は `agentdev-workflow-backlog-auto` SKILL.md の制御平面（STEP 一覧）STEP-4, STEP-5, STEP-6 詳細である。
 > fan-in 判定（backlog-review 開始条件）、stage 3（backlog-review 実行）、完了報告（工程別結果、停止理由、再開コマンド提示）を提供する。
 
 ## 目次

@@ -42,7 +42,7 @@ learning-promote は採用済み成果物を生成する際、各問題クラス
 
 REQ 拡張を候補とするのは `new_user_requirement` または `external_contract_change` のみ。
 それ以外は既存 REQ が要求を既に保持している限り REQ を拡張しない（REQ-001-033）。
-判定の最終確定は req-define が行う（REQ-004-087）。
+判定の最終確定は req-define が行う（REQ-004-010）。
 
 ### 分類根拠の引き継ぎ
 
@@ -136,7 +136,7 @@ deferred・未処理項目を自動削除しない既存の安全境界は維持
 - `.opencode/` 直接反映
 - case-run への直接受け渡し（backlog-review 経由のみ）
 - raw learning item の再分類
-- 管理用ファイル（elevation-ledger.md 等）の生成
+- 旧昇格台帳等の管理用ファイルの生成
 
 ## 検証観点
 

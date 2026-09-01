@@ -1,6 +1,6 @@
 # STEP-E1〜E6: Epic Wave クローズ（epic-wave-close）
 
-> 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-E1〜E6 詳細である。
+> 本 reference は `agentdev-workflow-case-close` SKILL.md の制御平面（STEP 一覧）STEP-E1〜E6 詳細である。
 > Epic Issue 番号入力時（ステータス追跡テーブル存在時）の現在 Wave の一括クローズ、Epic status table 更新、最終 Wave 判定、Epic 実証判定（共有評価ブランチ特定）と Epic 実証の最終 case-close（最終評価結果導出・正規記録、正式化案内）を提供する。
 
 ## Purpose

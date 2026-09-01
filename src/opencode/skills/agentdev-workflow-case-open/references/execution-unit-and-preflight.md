@@ -1,6 +1,6 @@
 # STEP-3: 構成判定・preflight（execution-unit-and-preflight）
 
-> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-3 詳細である。
+> 本 reference は `agentdev-workflow-case-open` SKILL.md の制御平面（STEP 一覧）STEP-3 詳細である。
 > execution_unit 構成（連結成分アルゴリズム、3軸判断）と規模判定、構成生成事前検証（preflight）を提供する。
 
 ## 目次

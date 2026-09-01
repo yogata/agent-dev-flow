@@ -1,6 +1,6 @@
 # STEP-3 / STEP-4: 配布物整合性検査・検出事項出力・永続化（distribution-check-and-output）
 
-> 本 reference は `agentdev-workflow-inspect-docs` SKILL.md の Control Plane STEP-3、STEP-4 詳細である。
+> 本 reference は `agentdev-workflow-inspect-docs` SKILL.md の制御平面（STEP 一覧）STEP-3、STEP-4 詳細である。
 > read-only-diagnostic型のため resume point を持たない。
 
 ## 開始条件

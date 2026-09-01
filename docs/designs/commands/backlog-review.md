@@ -137,7 +137,7 @@ tentative_classification（v2:REQ-0155-003 の7値）は文書種別の暫定分
 
 ### 暫定扱いの明記
 
-backlog-review が付与する tentative_classification および分類根拠は暫定（tentative）扱いであり、req-define が最終確定する（REQ-004-087）。
+backlog-review が付与する tentative_classification および分類根拠は暫定（tentative）扱いであり、req-define が最終確定する（REQ-004-010）。
 backlog-review 自体は最終分類を確定しない。
 
 ## tentative_classification フィールド仕様

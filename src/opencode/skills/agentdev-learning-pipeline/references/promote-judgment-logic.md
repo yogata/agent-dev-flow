@@ -78,7 +78,7 @@ accepted finding を反映し review 対象の意味内容が変更された場�
 再 review の発動は新たな本質的争点が生じ得る場合に限り許容し、停止条件（4点）を満たした時点でループを離脱し Phase 5 へ進む。
 
 unresolved な本質的争点またはユーザー判断事項が残る場合、Phase 5（判定結果提示）、Phase 5 のユーザー承認、Phase 6（採用済み成果物生成、deferred 移動、prune、commit/push）等の不可逆処理へ進まない。
-unresolved は既存の HITL（Step 10 ユーザー承認）または blocker 扱いへ振り向ける。
+unresolved は既存の HITL（Phase 5 ユーザー承認）または blocker 扱いへ振り向ける。
 
 ## Phase 5: HITL承認
 

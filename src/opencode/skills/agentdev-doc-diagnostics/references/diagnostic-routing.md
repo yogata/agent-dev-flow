@@ -54,7 +54,7 @@ severity、confidence、NG 分類は本スキルの共通契約へ正規化す�
 ## ルーティング表と inspect-docs workflow 工程の対応
 
 inspect-docs Workflow Skill（`agentdev-workflow-inspect-docs`）の各工程は、次のように本スキルと専門 skill を組み合わせる。
-工程名は同 Skill の SKILL.md Control Plane（工程一覧）に、診断観点は各工程 reference の手順節名に対応する。
+工程名は同 Skill の SKILL.md 制御平面（STEP 一覧）に、診断観点は各工程 reference の手順節名に対応する。
 
 ### 「REQ 体系・文書種別別意味診断」工程（`agentdev-workflow-inspect-docs/references/scan-and-doc-diagnostics.md`）
 

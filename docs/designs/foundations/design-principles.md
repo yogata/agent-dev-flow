@@ -28,7 +28,7 @@ work_type と scale の組み合わせで workflow_route を導出する（REQ-0
 
 **bugfix** は既存機能の不具合修正であり、要件定義書（REQ）の作成を不要とする。
 バグ修正は観察可能な事実（再現手順、期待動作、実際動作）に基づいて完結するため、壁打ちによる要件形成が不要である。
-ただし影響を受ける docs（REQ/Decision/Design/guide）の更新は完了条件に含まれる（REQ-005-034）。
+ただし影響を受ける docs（REQ/Decision/Design/guide）の更新は完了条件に含まれる（REQ-005-008）。
 最小限の経路（req-define → case-open → case-run → case-close）で処理する。
 
 **feature** は新しい振る舞いをシステムに導入するため、WHAT（要件）と HOW（実装）の分離が必要である。

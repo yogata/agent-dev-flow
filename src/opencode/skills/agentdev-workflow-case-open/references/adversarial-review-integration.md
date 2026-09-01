@@ -1,6 +1,6 @@
 # STEP-4: adversarial-review 統合（case-open、adversarial-review-integration）
 
-> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-4 詳細である。
+> 本 reference は `agentdev-workflow-case-open` SKILL.md の制御平面（STEP 一覧）STEP-4 詳細である。
 > case-open の adversarial-review 挿入境界の発動条件判定と review 呼出、結果反映を提供する。
 
 ## Purpose

@@ -160,7 +160,7 @@ Step 1 で 2 件以上の RU が検出または指定された場合、全ての
 - **Design 操作**（`target_design` フィールド指定）: `create` / `append` / `update`。design-save が消費
 
 両系統は後方互換性のため既存の `create`/ `append`/ `update` を維持する。
-Design 候補（Step 5-2/5-3 で分離した `draft-meta.spec-candidates`）が存在する場合、対応する Design 操作 OU を生成し `target_design` に想定配置先 Design パスを設定する。
+Design 候補（STEP-4 で分離した `draft-meta.spec-candidates`）が存在する場合、対応する Design 操作 OU を生成し `target_design` に想定配置先 Design パスを設定する。
 
 ## Epic 規模記録
 

@@ -1,6 +1,6 @@
 # STEP-5/6: Post-merge・Issue クローズ・クリーンアップ・Capture 回収・永続化（cleanup-and-capture）
 
-> 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-5, STEP-6 詳細である。
+> 本 reference は `agentdev-workflow-case-close` SKILL.md の制御平面（STEP 一覧）STEP-5, STEP-6 詳細である。
 > Post-merge テスト戦略検証、実証最終クローズ（最終評価結果の導出と Issue 最終コメント正規記録）、Issue クローズ、worktree/branch 削除、親Epic 自動クローズ判定、実行前同期（統合先ブランチ）、Capture 回収、学び検知、ドメイン状態永続化、正式化経路案内、完了報告を提供する。
 
 ## 目次
@@ -36,7 +36,8 @@
 
 #### STEP-5-2: 実証最終クローズ（実証Caseの最終 case-close 時のみ）
 
-Issue 本文の実証Case状態情報（対象評価ブランチ等の永続記録）から実証Caseと判定され、かつ当該 Issue が実証全体の最終 case-close に該当する場合に実行する。該当しない場合はスキップする（通常Caseの挙動を変更しない）。
+Issue 本文の実証Case状態情報（対象評価ブランチ等の永続記録）から実証Caseと判定され、かつ当該 Issue が実証全体の最終 case-close に該当する場合に実行する。
+該当しない場合はスキップする（通常Caseの挙動を変更しない）。
 
 - **新しい評価を開始しない**: 最終 case-close で新しい評価を始めない。事前の評価契約（Issue 本文の正規記録）と蓄積済み証拠（各 PR 本文の実行条件・測定結果・観察結果・証拠・評価結果）から最終結果を導出する
 - **最終評価結果の正規記録**: 導出した最終評価結果（採用、不採用、判定不能、未確定の区別を含む）を Issue 最終コメントとして正規記録する（`agentdev_gh` の issue_comment 操作。成功応答は読み戻し検証済み）。評価ブランチ削除後も Issue/PR から結果と証拠を追跡できる構成とする
@@ -118,7 +119,8 @@ worktree/branch 削除、親Epic 自動クローズ判定、実行前同期、Ca
 ##### STEP-6-3-2: 統合先ブランチ同期リスク事前検出・代替同期手順選択
 
 `git pull --ff-only` 直前に、`agentdev-git-worktree` の「git 統合先同期リスク事前検出プロシージャ」に従い、worktree 状態（dirty tree）・並列実行による ref lock 競合・統合先以外のブランチ占有の3リスク事前検出と代替同期手順選択を実行する。
-同期対象のブランチは当該 Case の統合先（通常Caseは既定 main、実証Caseは対象評価ブランチ）である。通常Caseの `main` 同期手続きは従来どおりである。
+同期対象のブランチは当該 Case の統合先（通常Caseは既定 main、実証Caseは対象評価ブランチ）である。
+通常Caseの `main` 同期手続きは従来どおりである。
 `agentdev-git-worktree` に従い `git pull --ff-only` を実行（ローカル変更事前チェック、hash 検証、不一致時は評価・承認のやり直し）。
 
 #### STEP-6-4: 学びの検知・抽出・Capture 回収
@@ -169,7 +171,9 @@ learning と intake を同一 commit に含める。
 GitHub 完了後に `.agentdev` push 失敗の場合は standard 種別を使用してはならない。
 **結果状態の分離報告**: GitHub 側完了状態、`.agentdev` 永続化状態、ブランチ削除状態を独立して報告。
 
-**実証Caseの正式化経路案内（実証全体の最終 case-close 時）**: 実証Caseで実証全体の最終 case-close に該当する場合（Standard 実証では当該 Standard Issue の case-close）、正式化経路として `req-define <実証Issue>`（Standard では当該 Standard Issue を指定）を利用者へ明示する。Epic 実証の正式化案内は Epic Wave クローズの最終 Wave 判定（E6）で行い、Epic 中間Waveでは正式化案内を出さない。case-close は後続 req-define を自動実行しない。
+**実証Caseの正式化経路案内（実証全体の最終 case-close 時）**: 実証Caseで実証全体の最終 case-close に該当する場合（Standard 実証では当該 Standard Issue の case-close）、正式化経路として `req-define <実証Issue>`（Standard では当該 Standard Issue を指定）を利用者へ明示する。
+Epic 実証の正式化案内は Epic Wave クローズの最終 Wave 判定（E6）で行い、Epic 中間Waveでは正式化案内を出さない。
+case-close は後続 req-define を自動実行しない。
 
 ### Result
 

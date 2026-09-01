@@ -118,7 +118,7 @@ req-save は check_integrity.ts（全体監査）を使用しない（保存工�
 
 ## 検証観点
 
-- QG-1（Definition Integrity Gate）: REQ/Decision ファイル保存の前置条件として「適用結果の整合性検証」を実行（採番結果の整合性、マージ結果の整合性、インデックスの整合性、変更範囲の妥当性）。内容の品質は req-define の QG-1 の責務（REQ-004-081/082）
+- QG-1（Definition Integrity Gate）: REQ/Decision ファイル保存の前置条件として「適用結果の整合性検証」を実行（採番結果の整合性、マージ結果の整合性、インデックスの整合性、変更範囲の妥当性）。内容の品質は req-define の QG-1 の責務（REQ-004-033）
 - Decision 妥当性再検証ゲート: Decision 保存直前に技術判断含有確認、REQ/Design 相当の内容のみなら停止
 - Decision 採番: `agentdev-decision-file-manager` の採番ルール（max+1, 欠番埋め禁止）で確定番号を付与
 - 出力制約: 成果物本文（REQ/Decision ファイル本文、commit message）は verbatim で返す

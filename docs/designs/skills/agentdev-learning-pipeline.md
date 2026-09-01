@@ -102,18 +102,18 @@ review 候補は learning-promote command Design「発動条件判定 Step」が
 
 #### 呼出タイミング
 
-呼出タイミングは候補確定直後であり、Step 9 へ進む前である。
+呼出タイミングは候補確定直後であり、Phase 5 へ進む前である。
 review 対象は evaluation-report.md のみとし、handoff.md、promoted/、deferred.md への反映前とする。
-この順序により、accepted finding の反映結果が evaluation-report.md へ集約され、後続の不可逆処理（Step 13 deferred 移動、Step 14 prune、Step 15 commit/push）へ混入しない。
+この順序により、accepted finding の反映結果が evaluation-report.md へ集約され、後続の不可逆処理（Phase 6 deferred 移動、prune、commit/push）へ混入しない。
 
 呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止する（REQ-014-010）。
-learning-promote は利用不能を報告し、従来フロー（Step 9 ユーザーへの判定結果提示以降）と既存 HITL（Step 10 ユーザー承認）を維持する。
+learning-promote は利用不能を報告し、従来フロー（Phase 5 ユーザーへの判定結果提示以降）と既存 HITL（Phase 5 ユーザー承認）を維持する。
 
 #### evaluation-report 反映
 
 accepted finding は learning-promote が責任を持って判定対象（正規化結果、問題クラス分類、8軸評価スコア、廃棄判定、既存対策照合結果）へ反映する（REQ-014-006）。
 adversarial-review 自身は反映を行わない。
-反映結果は evaluation-report.md へ集約し、Step 9 の提示内容、Step 13 の deferred 移動、Step 14 の prune、promoted 成果物が反映後の evaluation-report.md と整合するよう維持する。
+反映結果は evaluation-report.md へ集約し、Phase 5 の提示内容、Phase 6 の deferred 移動、Phase 6 の prune、promoted 成果物が反映後の evaluation-report.md と整合するよう維持する。
 
 #### Step 6 戻しループ
 
@@ -125,10 +125,10 @@ accepted finding を反映し、review 対象の意味内容が変更された�
 3. Step 7（廃棄判定、11カテゴリ + duplicate）を再実行する
 4. Step 8（既存対策確認）を再実行する
 5. 発動条件判定 Step を再実行し、review 呼出 Step を再実行する（REQ-014-007）。再 review の発動は反映により review 対象の意味内容が変更され、新たな本質的争点が生じ得る場合にのみ許容する
-6. 再 review 停止条件（REQ-014-008）を満たした時点でループを離脱し、Step 9 へ進む
+6. 再 review 停止条件（REQ-014-008）を満たした時点でループを離脱し、Phase 5 へ進む
 
-ループ中に unresolved な本質的争点またはユーザー判断事項が残る場合、Step 9（判定結果提示）、Step 10（ユーザー承認）、Step 13（deferred 移動）、Step 14（prune）、Step 15（commit/push）等の不可逆処理へ進まない（REQ-014-009）。
-unresolved は既存の HITL（Step 10 ユーザー承認）または blocker 扱いへ振り向ける。
+ループ中に unresolved な本質的争点またはユーザー判断事項が残る場合、Phase 5（判定結果提示・ユーザー承認）、Phase 6（deferred 移動、prune、commit/push）等の不可逆処理へ進まない（REQ-014-009）。
+unresolved は既存の HITL（Phase 5 ユーザー承認）または blocker 扱いへ振り向ける。
 adversarial-review 自体を恒久的な統制ゲートとしない。
 
 ### 正規所有者と参照関係

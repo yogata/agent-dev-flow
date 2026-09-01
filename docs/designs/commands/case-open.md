@@ -67,7 +67,7 @@ Epic + 子 Issue 一括作成に対応する。
   - テンプレート読込（`agentdev-workflow-templates`）
   - Epic Issue本文生成（自律構成分析結果に基づき Epic 本文を構築）
   - Epic Issue作成（ラベル: `enhancement`, `feature`, `epic`）（VERIFY）
-  - 子Issue作成（OU 単位、順次処理）（Issue化単位は REQ doc 単位ではなく OU 単位（REQ-005-042））。各子 Issue 本文の「## 補足情報」セクションに「前工程完了度」属性を埋め込む（REQ-003-011、`docs/designs/workflows/epic-wave-model.md` の前工程完了度3段階分類に従う）
+  - 子Issue作成（OU 単位、順次処理）（Issue化単位は REQ doc 単位ではなく OU 単位（REQ-030-008））。各子 Issue 本文の「## 補足情報」セクションに「前工程完了度」属性を埋め込む（REQ-003-011、`docs/designs/workflows/epic-wave-model.md` の前工程完了度3段階分類に従う）
   - Epic Issue本文更新（ステータス追跡テーブル更新）
   - OU `result` 書き戻し（Issue / Epic 番号）
 - Standard flow:
@@ -99,7 +99,7 @@ case-open は Standard flow、Epic flow、混在構成の全ルートで、GitHu
 
 - 各 Epic の子 Issue 数が10件以下であること（REQ-006-009 ハード制約）
 - 各 Wave の同時実行対象が5件以下であること（REQ-006-026）
-- 各 Standard Issue および各子 Issue が1つの OU と対応していること（REQ-005-042）
+- 各 Standard Issue および各子 Issue が1つの OU と対応していること（REQ-030-008）
 - 必須依存関係（連結成分のエッジ）が維持されていること（REQ-006-006）
 - 全 OU がいずれか1つの execution_unit へ割り当てられ、欠落・重複がないこと
 
@@ -330,8 +330,8 @@ Case Issue の本文冒頭には、req-define 経由で要件化された元追�
 
 - 機能要件、非機能要件、制約、対象外、受け入れ条件の新規作成（REQ-006-009）
 - 実装順序、Issue分解についてのユーザー確認要求（REQ-006-008）
-- 単一 Issue で完結する場合の Epic 作成（REQ-005-041）
-- Wave単位のみの子Issue構造（子Issue は OU 単位で作成し、対応 OU 経由で REQ/Decision/Design トレーサビリティを保持。子Issue を REQ 文書単位で対応付ける規定は廃止、REQ-005-042 準拠）
+- 単一 Issue で完結する場合の Epic 作成（REQ-030-009）
+- Wave単位のみの子Issue構造（子Issue は OU 単位で作成し、対応 OU 経由で REQ/Decision/Design トレーサビリティを保持。子Issue を REQ 文書単位で対応付ける規定は廃止、REQ-030-008 準拠）
 - 子Issue最大10件超過時の作成続行（エラー停止、REQ-006-028）
 - 構成生成事前検証を GitHub Issue 作成後に行う扱い（REQ-006-027）
 - intake / learning capture の実施

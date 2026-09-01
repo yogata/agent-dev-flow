@@ -1,6 +1,6 @@
 # STEP-2: Issue 本文生成・execution contract 確定（issue-body-and-execution-contract）
 
-> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-2 詳細である。
+> 本 reference は `agentdev-workflow-case-open` SKILL.md の制御平面（STEP 一覧）STEP-2 詳細である。
 > Issue 本文生成と execution contract 確定の手順を提供する。
 
 ## Purpose

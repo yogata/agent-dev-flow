@@ -23,8 +23,8 @@ pipeline 各層を構成する 4 成果物の役割、性格、command 間の振
 
 | 成果物 | 役割 | 性格 | Command 間の振る舞い |
 |---|---|---|---|
-| inbox.md | 未整理 learning entry の現行キュー。capture で蓄積し、promote 成功後にクリアされる。永続ストレージではない | 一時キュー。promote の入力として取り込みされ、処理完了後に空になる | capture が書き込む（append）。promote が読み取り、移動後にクリアする |
-| deferred.md | 保留プール（living pool。終端保管ではない）。promote 内部分析フェーズで inbox から移動した entry を保持。昇華判定フェーズの入力として参照され、promote 時の prune により動的に変化する多状態プール（deferred / 未処理 / 再評価対象を保持） | 動的プール。promote のたびに内容が変化し、未処理 entry は次回 promote の対象として残る | promote が inbox から移動して書き込み、読み取り、prune する。capture は参照しない |
+| inbox.md | 未整理 learning エントリの現行キュー。capture で蓄積し、promote 成功後にクリアされる。永続ストレージではない | 一時キュー。promote の入力として取り込みされ、処理完了後に空になる | capture が書き込む（append）。promote が読み取り、移動後にクリアする |
+| deferred.md | 保留プール（living pool。終端保管ではない）。promote 内部分析フェーズで inbox から移動したエントリを保持。昇華判定フェーズの入力として参照され、promote 時の prune により動的に変化する多状態プール（deferred / 未処理 / 再評価対象を保持） | 動的プール。promote のたびに内容が変化し、未処理エントリは次回 promote の対象として残る | promote が inbox から移動して書き込み、読み取り、prune する。capture は参照しない |
 | evaluation-report.md | promote 内部で生成される境界成果物。毎回上書きされ長期履歴ではない。promote の分析フェーズで生成され、昇華判定フェーズの主入力として取り込みされる | 境界成果物。promote 内部の分析→昇華判定間の受け渡し専用。履歴蓄積は行わない | promote が生成（上書き）し、読み取り、取り込みする。capture は参照しない |
 | promoted/ | 採用済み成果物の staging 領域。生成された成果物は `/agentdev/backlog-review` が読み込み、RU 化後に `/agentdev/req-define` に合流する。learning 由来で docs/knowledge/ への知識文書保存に分類された成果物は、backlog-review の利用者承認後に docs/knowledge/ へ直接保存され、RU → req-define を経ない。`.opencode/` や実装コードへの直接反映は禁止。`case-run` への直接受け渡しも禁止 | staging 専用。promote が生成し、backlog-review が取り込みする。pipeline 外への直接反映は不可 | promote が採用済み成果物を生成する。backlog-review が明示的に読み取る |
 
@@ -36,7 +36,7 @@ pipeline 各層を構成する 4 成果物の役割、性格、command 間の振
 | 層 | command | 責務 |
 |---|---|---|
 | capture | `agentdev-learning-capture`（skill） | 検知、抽出、自律蓄積。昇格判断、品質評価は行わない |
-| promote | learning-promote（command） | 正規化、問題クラス分類、8軸評価、evaluation-report 生成、inbox の entry を deferred.md に移動、inbox クリア、廃棄判定、採用済み成果物の生成。deferred.md から staged/ rejected/ duplicate を prune し、deferred/ 未処理/ 再評価対象を保持 |
+| promote | learning-promote（command） | 正規化、問題クラス分類、8軸評価、evaluation-report 生成、inbox のエントリを deferred.md に移動、inbox クリア、廃棄判定、採用済み成果物の生成。deferred.md から staged/ rejected/ duplicate を prune し、deferred/ 未処理/ 再評価対象を保持 |
 
 - learning-promote は本 skill を参照して schema、基準を取得する
 - `agentdev-learning-capture` は独立 skill であり本 skill を参照しない
@@ -44,7 +44,7 @@ pipeline 各層を構成する 4 成果物の役割、性格、command 間の振
 
 ## 入力
 
-- `inbox.md`（capture が蓄積した未整理 entry）、`deferred.md`（保留プールの既存 entry）
+- `inbox.md`（capture が蓄積した未整理エントリ）、`deferred.md`（保留プールの既存エントリ）
 
 ## 出力
 

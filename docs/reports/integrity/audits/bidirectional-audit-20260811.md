@@ -816,7 +816,7 @@ IR-026/027/036/037/038 と退休止 ADR 関連で統合可能性あり
 
 | # | 項目 | 値 | 証拠 |
 |---|------|----|----|
-| 1 | canonical basis | REQ: REQ-010-249, REQ-001-043, REQ-001-044, REQ-001-045; SPEC: integrity-contracts.md, document-model.md | rule-ownership.md AUTOGEN; IR-036 ファイル |
+| 1 | canonical basis | REQ: REQ-010-249, REQ-001-004, REQ-001-022; SPEC: integrity-contracts.md, document-model.md | rule-ownership.md AUTOGEN; IR-036 ファイル |
 | 2 | invariant | Decision で作業手段（work-means）を検出した場合の適切な分類 | IR-036 description / Field 表 |
 | 3 | detector 実装 | （未実装） | detector 未実装 |
 | 4 | detection coverage | detector 未実装 | baseline §3; explore agent 結果 |
@@ -968,7 +968,7 @@ IR-026/027/036/037/038 と退休止 ADR 関連で統合可能性あり
 
 | # | 項目 | 値 | 証拠 |
 |---|------|----|----|
-| 1 | canonical basis | REQ: REQ-010-259, REQ-010-260, REQ-010-262, REQ-001-067, REQ-001-068, REQ-001-069, REQ-010-002, REQ-010-012, REQ-001-031; SPEC: integrity-contracts.md, document-model.md | rule-ownership.md AUTOGEN; IR-044 ファイル |
+| 1 | canonical basis | REQ: REQ-010-259, REQ-010-260, REQ-010-262, REQ-001-067, REQ-001-068, REQ-010-002, REQ-010-012, REQ-001-031; SPEC: integrity-contracts.md, document-model.md | rule-ownership.md AUTOGEN; IR-044 ファイル |
 | 2 | invariant | 現行 REQ 要件行の主たる文意が SPEC 詳細（schema, enum, fixture, Step 番号直接参照等）に該当しないこと | IR-044 description / Field 表 |
 | 3 | detector 実装 | checkReqSpecBoundaryViolation (check_integrity.ts) | リテラル参照あり（IR044_SIGNAL_PATTERNS） |
 | 4 | detection coverage | リテラル参照あり（IR044_SIGNAL_PATTERNS） | baseline §3; explore agent 結果 |

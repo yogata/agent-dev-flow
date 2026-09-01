@@ -1,6 +1,6 @@
 # STEP-1/2/3: 開始時刻記録、stage 1、stage 2 実行（stage-execution）
 
-> 本 reference は `agentdev-workflow-backlog-auto` SKILL.md の Control Plane STEP-1, STEP-2, STEP-3 詳細である。
+> 本 reference は `agentdev-workflow-backlog-auto` SKILL.md の制御平面（STEP 一覧）STEP-1, STEP-2, STEP-3 詳細である。
 > 開始時刻記録と進行状態初期化、stage 1（inspect-docs 単独直列実行）、stage 2（昇格3系統の並行実行と直列化契約）を提供する。
 
 ## 目次

@@ -45,7 +45,7 @@ description: inbox.mdから正規化、分類、8軸評価、自律確定・HITL
 
 - `.opencode/` 直接反映は行わない（採用済み成果物は `.agentdev/learning/promoted/` のみに生成）
 - ユーザー判断が必要な項目の判定、prune ともにユーザー承認なしには実行しない。一意に確定できる項目（横断契約 Design の詳細判定表に従う）はユーザー承認なしで自律確定する（`POL-promoted-artifact-requires-approval`）
-- 管理用ファイル（`elevation-ledger.md` 等）は生成しない
+- 旧昇格台帳等の管理用ファイルは生成しない
 - 破壊的変更（inbox.md 全体強制クリア、大量エントリ一括削除等）は判定確定の承認とは別に明示承認を維持する（REQ）。自律確定によっても迂回されない（`POL-destructive-change-explicit-approval`）
 
 ## ユーザー確認ポイント、エラー処理

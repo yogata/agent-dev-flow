@@ -1,6 +1,6 @@
 # STEP 詳細: 矛盾検出 / RU 生成・成果物削除 / Git 永続化・完了報告（backlog-review）
 
-> 本 reference は `agentdev-workflow-backlog-review` SKILL.md の Control Plane STEP-6〜STEP-8 詳細である。
+> 本 reference は `agentdev-workflow-backlog-review` SKILL.md の制御平面（STEP 一覧）STEP-6〜STEP-8 詳細である。
 > SKILL.md は control plane として STEP 遷移を管理し、本 reference は各 STEP の実行詳細を提供する。
 
 ## 目次

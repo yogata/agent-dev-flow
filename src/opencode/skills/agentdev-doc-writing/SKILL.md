@@ -1,6 +1,6 @@
 ---
 name: agentdev-doc-writing
-description: ADR/REQ/Design 横断の文書品質査読ゲート。文書種別責務、要件性、文意品質、粒度、japanese-tech-writing 規範適合、配布物 ID 汚染検出、実行主体分類を査読する。USE FOR: docs 配下の REQ/ADR/Design/guides/README の査読、command/skill の自然言語記述の査読、LLM っぽい表現・英文混じり表現の検出。DO NOT USE FOR: コード実装やテスト実行、REQ/ADR 番号付与、ADR 必要性判定、ファイル保存・commit・push。
+description: REQ/Decision/Design 横断の文書品質査読ゲート。文書種別責務、要件性、文意品質、粒度、japanese-tech-writing 規範適合、配布物 ID 汚染検出、実行主体分類を査読する。USE FOR: docs 配下の REQ/Decision/Design/guides/README の査読、command/skill の自然言語記述の査読、LLM っぽい表現・英文混じり表現の検出。DO NOT USE FOR: コード実装やテスト実行、REQ/Decision 番号付与、Decision 必要性判定、ファイル保存・commit・push。
 ---
 
 # 文書品質ゲート（doc-writing）
@@ -8,7 +8,7 @@ description: ADR/REQ/Design 横断の文書品質査読ゲート。文書種別�
 ## 目的
 
 書かれた文書の品質を静的査読し、読者が判断し実行できる文書へ修正提案を提示する。
-対象は `docs/` 配下の REQ/ADR/Design/guides/README、および docs を生成、編集する command/skill の自然言語記述である。
+対象は `docs/` 配下の REQ/Decision/Design/guides/README、および docs を生成、編集する command/skill の自然言語記述である。
 QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要件性、文意品質、粒度の補助査読として位置づける。
 
 本スキルは**静的査読**を担う。
@@ -32,15 +32,15 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 
 **対象:**
 
-- `docs/**`（REQ, ADR, Design, guides, README）
+- `docs/**`（REQ, Decision, Design, guides, README）
 - docs を生成、編集する command/ skill の自然言語記述（req-define, req-save, design-save, case-run, case-close, case-auto, inspect-docs, docs-check が扱う docs 成果物とその記述）
 - Issue 本文、PR 本文、完了報告、設計説明、intake/learning 中間成果物
 
 **対象外:**
 
 - コード実装、テスト実行
-- REQ/ADR 番号付与, APPEND/UPDATE/CREATE 判定（req-file-manager/ adr-file-manager 担当）
-- ADR 必要性判定（adr-guidelines 担当）
+- REQ/Decision 番号付与, APPEND/UPDATE/CREATE 判定（req-file-manager/ decision-file-manager 担当）
+- Decision 必要性判定（decision-guidelines 担当）
 - command 手順設計, Issue/PR CRUD
 - 要件分析（req-analysis 担当）
 - カジュアルな文章/広告/詩
@@ -68,7 +68,7 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 
 ### 適用対象の横断性
 
-- **文書種別**: REQ/ADR/Design/guide/README すべての文書種別に対して、文書種別責務観点を適用
+- **文書種別**: REQ/Decision/Design/guide/README すべての文書種別に対して、文書種別責務観点を適用
 - **文書生成元**: docs を生成、編集する command/skill の自然言語記述（req-define, req-save, design-save, case-run, case-close, case-auto, inspect-docs, docs-check 等）に対しても同等の品質基準を適用
 - **成果物種別**: Issue 本文, PR 本文, 完了報告, 設計説明, intake/learning 中間成果物に対して文意品質、粒度観点を適用
 
@@ -89,7 +89,7 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 
 ## Trigger conditions
 
-- docs/** の REQ、ADR、Design、guides、README を作成、編集、レビューする場合
+- docs/** の REQ、Decision、Design、guides、README を作成、編集、レビューする場合
 - docs を生成、編集する command/ skill の本文、description、参照記述を執筆、編集する場合
 - ユーザーが「AIっぽい」「薄い」「抽象的」「意味不明」「ビジネス文書として直せ」と指示した場合
 - Issue/PR 本文、完了報告、設計説明を執筆またはレビューする場合

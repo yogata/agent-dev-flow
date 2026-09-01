@@ -1,6 +1,6 @@
 # STEP-4/5/6: 停止条件検出・adversarial-review 由来の停止伝播・bounded parent decision resolution（stop-and-decision-resolution）
 
-> 本 reference は `agentdev-workflow-case-auto` SKILL.md の Control Plane STEP-4, STEP-5, STEP-6 詳細である。
+> 本 reference は `agentdev-workflow-case-auto` SKILL.md の制御平面（STEP 一覧）STEP-4, STEP-5, STEP-6 詳細である。
 > 停止条件検出（11項目）・停止理由分類（7軸＋上位合意矛盾/新規ユーザー判断）、adversarial-review 由来の停止伝播、bounded parent decision resolution（限定的親判断解決）を提供する。
 
 ## 目次

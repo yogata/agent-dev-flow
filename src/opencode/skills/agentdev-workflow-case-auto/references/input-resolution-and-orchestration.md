@@ -1,6 +1,6 @@
 # STEP-1/2/3: 入力解決・工程分岐・orchestration 実行（input-resolution-and-orchestration）
 
-> 本 reference は `agentdev-workflow-case-auto` SKILL.md の Control Plane STEP-1, STEP-2, STEP-3 詳細である。
+> 本 reference は `agentdev-workflow-case-auto` SKILL.md の制御平面（STEP 一覧）STEP-1, STEP-2, STEP-3 詳細である。
 > 入力解決、work_type 読取・工程分岐、orchestration 実行（stage モデル、Wave 反復、bg task 管理）を提供する。
 
 ## 目次

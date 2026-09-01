@@ -1,6 +1,6 @@
 # STEP-7/8: コンフリクト解消 Level 2/3・完了報告（conflict-resolution-and-reporting）
 
-> 本 reference は `agentdev-workflow-case-auto` SKILL.md の Control Plane STEP-7, STEP-8 詳細である。
+> 本 reference は `agentdev-workflow-case-auto` SKILL.md の制御平面（STEP 一覧）STEP-7, STEP-8 詳細である。
 > コンフリクト解消 Level 2/3（インライン case-run 再実行、オーケストレーション級判断）と完了報告（L1 タイムスタンプ、4次元集約、OU処理ループ）を提供する。
 
 ## STEP-7: コンフリクト解消 Level 2/3

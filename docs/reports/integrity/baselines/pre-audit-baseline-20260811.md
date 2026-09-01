@@ -87,7 +87,7 @@ lifecycle_state/enforcement_mode は IR-011 以外は未設定（= active 扱い
 | IR-033 | lightweight-delegation primary pattern 禁止 | strict | new | full-audit, delta-guard | - | - | canonical-conflict | (未実装) | [REQ-003-015, REQ-003-016] |
 | IR-034 | Skill 内部 section / protocol / Step 参照検出 | heuristic | new | full-audit | - | - | canonical-conflict | (未実装) | [REQ-010-244] |
 | IR-035 | Skill See Also 検出観点 | heuristic | new | full-audit | - | - | canonical-conflict | (未実装) | [REQ-010-245] |
-| IR-036 | Decision-work-means-detection | heuristic | resolved | full-audit | - | - | canonical-conflict | (未実装)。`status: deprecated` Decision が... | [REQ-010-249, REQ-001-043, REQ-001-044, REQ-001-045] |
+| IR-036 | Decision-work-means-detection | heuristic | resolved | full-audit | - | - | canonical-conflict | (未実装)。`status: deprecated` Decision が... | [REQ-010-249, REQ-001-004, REQ-001-022] |
 | IR-037 | retired-ADR-current-baseline-ref | strict | new | full-audit | - | - | canonical-conflict | (未実装) | [REQ-010-250, REQ-001-048] |
 | IR-038 | Decision-index-consistency | strict | new | full-audit, delta-guard | - | - | document-drift | (未実装) | [REQ-010-251, REQ-001-047, REQ-001-048] |
 | IR-039 | index-req-title-consistency | strict | new | full-audit | - | - | document-drift | (未実装) | [REQ-010-003, REQ-001-063, REQ-001] |
@@ -95,7 +95,7 @@ lifecycle_state/enforcement_mode は IR-011 以外は未設定（= active 扱い
 | IR-041 | retired-req-broken-link | strict | new | full-audit | - | - | broken-reference | (未実装) | [REQ-010-070, REQ-001-063] |
 | IR-042 | hardcoded-req-count | heuristic | new | full-audit | - | - | document-drift | (手動確認) | [REQ-010-140, REQ-001] |
 | IR-043 | retired-readme-coverage | strict | new | full-audit | - | - | document-drift | (未実装) | [REQ-010-083, REQ-001] |
-| IR-044 | REQ/SPEC 境界違反検出 | heuristic | new | full-audit | - | - | canonical-conflict | `scripts/check_integrity.test.ts` の I... | [REQ-010-259, REQ-010-260, REQ-010-262, REQ-001-067, REQ-001-068, REQ-001-069, REQ-010-002, REQ-010-012, REQ-001-031] |
+| IR-044 | REQ/SPEC 境界違反検出 | heuristic | new | full-audit | - | - | canonical-conflict | `scripts/check_integrity.test.ts` の I... | [REQ-010-259, REQ-010-260, REQ-010-262, REQ-001-067, REQ-001-068, REQ-010-002, REQ-010-012, REQ-001-031] |
 | IR-046 | consumer-generated リポジトリ種別誤検知防止 | heuristic | new | full-audit | - | - | canonical-conflict | (未実装) | [REQ-009-007, REQ-009-011, REQ-009-014] |
 | IR-047 | src/opencode-local/ link 先原本領域ディレクトリ構成 | strict | new | full-audit, delta-guard | - | - | obsolete-structure | (未実装) | [REQ-009-003, REQ-009-004, REQ-009-005, REQ-009] |
 | IR-048 | generated_by 識別子整合性 | strict | new | full-audit, delta-guard | - | - | canonical-conflict | (未実装) | [REQ-009-011, REQ-009-012, REQ-009-013] |

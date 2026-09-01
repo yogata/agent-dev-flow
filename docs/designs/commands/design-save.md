@@ -48,8 +48,8 @@ req-save の次、case-open の前に実行する。
 
 - 事前チェック: `draft-data` の `artifact_actions` から `artifact: design` entry の有無を確認。なければ no-op 完了。ドラフト不存在時はエラー中止
 - Design artifact_actions 読込（`artifact: design` entry を読込）。`artifact_actions` フィールド不存在（旧形式 draft）の場合は Design 保存対象なしと判定し no-op 完了（後方互換）。各 action の `target`（file path または `new:{slug}`）、`operation`（公式 enum: create/append/update の3値。別名は不受理、REQ-008-058）、`content` を処理対象とする
-- 配置先解決（既存 Design パス（例: `docs/designs/foundations/patterns.md`）→ update 操作）。`target_design: {operation, domain, slug}` 構造化 → 新規 Design 作成（`docs/designs/{domain}/{topic-slug}.md`）。同一 `target` の action は1つの Design へ集約。配置先解決の決定的処理は `agentdev-req-file-manager/scripts/` の決定的スクリプトで実行（REQ-001-029、design-principles.md 第5節「決定的処理の Script 委譲原則」）
-- Design 分離基準の最終確認（各 action が REQ-001-055（Design に置くべき内容の基準）に適合するか再確認）。安定契約例外（REQ-001-069）相当は除外し follow-up に明示
+- 配置先解決（既存 Design パス（例: `docs/designs/foundations/patterns.md`）→ update 操作）。`target_design: {operation, domain, slug}` 構造化 → 新規 Design 作成（`docs/designs/{domain}/{topic-slug}.md`）。同一 `target` の action は1つの Design へ集約。配置先解決の決定的処理は `agentdev-req-file-manager/scripts/` の決定的スクリプトで実行（REQ-002-035、design-principles.md 第5節「決定的処理の Script 委譲原則」）
+- Design 分離基準の最終確認（各 action が REQ-001-067（Design 分離基準）に適合するか再確認）。安定契約例外（REQ-001-068）相当は除外し follow-up に明示
 - Design ファイル操作。`target_area` 見出し検索は `agentdev-design-file-manager/scripts/` の決定的スクリプトで実行
   - create: 新規 Design ファイルを frontmatter（`title`, `status: draft`, `created`, `updated`）付きで作成し、action の `content` をセクションとして記載
   - update: `target_area` 指定時は対象セクションを `content` で置換、未指定時は該当セクションへ `content` を追記。frontmatter `updated` を更新。`status` は変更しない。詳細は「target_area ベースのセクション置換ロジック」セクション参照
@@ -90,7 +90,7 @@ design-save は Design ファイル保存に先立ち、保存内容と配置先
 ### 強制ゲート（保存拒否）の有効化条件
 
 強制ゲート（保存拒否条件: 重複所有、配置不一致）は配置一貫性検証の入力（`../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールド）で機械判定可能な項目について有効化する（REQ-001-035）。
-Design ファイルの基本frontmatterは title、status、created、updated の4キーとし、伝播フィールドを Design ファイルへ宣言として書き込まない。
+Design ファイルの基本frontmatterは `title`、`status`、`created`、`updated` の4キーとし、伝播フィールドを Design ファイルへ宣言として書き込まない。
 
 ### 配置一貫性検証の入力読取（CREATE/UPDATE 共通）
 
@@ -263,7 +263,7 @@ strict failureが存在する場合は修正して再実行する。
 - 新規 Design 作成時の `status: draft` 省略
 - 既存 Design 追記時の `status` 変更（`status: accepted` 昇格は case-close 責務）
 - Design status が `draft` の Design を IR-044（REQ/Design 境界違反検出）の対象に含めること
-- REQ-001-055（Design 分離基準）不適合 action の保存（安定契約例外 REQ-001-069 は follow-up 扱い）
+- REQ-001-067（Design 分離基準）不適合 action の保存（安定契約例外 REQ-001-068 は follow-up 扱い）
 - 実行時コマンドが Design ファイルに依存する記述（REQ-001 実行時非依存維持）
 - Design artifact_actions の分離根拠、配置先判定の再分類（req-define `agentdev-req-analysis` 結果を尊重）
 - Design status 昇格（draft → accepted）の判定（case-close 責務）
@@ -271,7 +271,7 @@ strict failureが存在する場合は修正して再実行する。
 
 ## 検証観点
 
-- 品質ゲート（適用結果の整合性検証）: target_area 置換結果の整合性、Design status の整合性（新規作成時 `status: draft` 付与）、インデックスの整合性（`docs/designs/README.md` エントリと新規 Design の一致）、変更範囲の妥当性を検証。内容の品質は req-define の QG-1 の責務（REQ-001-030）
+- 品質ゲート（適用結果の整合性検証）: target_area 置換結果の整合性、Design status の整合性（新規作成時 `status: draft` 付与）、インデックスの整合性（`docs/designs/README.md` エントリと新規 Design の一致）、変更範囲の妥当性を検証。内容の品質は req-define の QG-1 の責務（REQ-004-033）
 - Design 分離基準適合性（REQ-001-055）: 各 action の content が Design に置くべき内容か
 - frontmatter 完全性: 新規作成時の `title`, `status: draft`, `created`, `updated`
 - 配置先解決の正確性: 既存パス vs `new:{slug}` の判定、重複候補統合

@@ -1,6 +1,6 @@
 # STEP 詳細: 実行前同期・成果物検出 / 分析・暫定分類 / 統合分割判定 / review / HITL（backlog-review）
 
-> 本 reference は `agentdev-workflow-backlog-review` SKILL.md の Control Plane STEP-1〜STEP-5 詳細である。
+> 本 reference は `agentdev-workflow-backlog-review` SKILL.md の制御平面（STEP 一覧）STEP-1〜STEP-5 詳細である。
 > SKILL.md は control plane として STEP 遷移を管理し、本 reference は各 STEP の実行詳細を提供する。
 
 ## 目次

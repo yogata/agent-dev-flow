@@ -129,7 +129,7 @@ Command 固有の実行順序、Issue 作成、保存、更新、削除、完了
 
 learning/intake → RU → req-define → design-save の各工程間で引き継ぐ分類根拠フィールドを定義する（REQ-001-033、REQ-001）。
 本節は工程間伝播フィールドの schema と req-define から design-save へのシリアライズ位置を正規所有する。
-Design ファイルの基本frontmatterは title、status、created、updated の4キーであり、伝播フィールドを Design ファイルへ宣言として書き込まない（AG-005、AG-008）。
+Design ファイルの基本frontmatterは `title`、`status`、`created`、`updated` の4キーであり、伝播フィールドを Design ファイルへ宣言として書き込まない（AG-005、AG-008）。
 req-define は Design action の `artifact_actions` と `operation_units` へ分類根拠を出力し、design-save はこれを読み取って配置一貫性検証の入力とする。
 
 ### 伝播フィールド一覧

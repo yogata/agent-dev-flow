@@ -8,7 +8,7 @@ updated: 2026-09-02
 
 # REQ 健全性メトリクス
 
-REQ の肥大化、関心ズレを定量的に検出するための閾値を定義する（REQ-001-040）。
+REQ の肥大化、関心ズレを定量的に検出するための閾値を定義する（REQ-001-044）。
 `req-define` の既存 REQ 照合、統合/分離判定、`inspect-docs`、`agentdev-req-structure-diagnostics` スキルが本 Design を参照して SPLIT 予兆を判定する。
 
 ## 適用範囲
@@ -157,7 +157,7 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 
 本 Design は閾値の定義のみを提供し、計測、判定の実装は以下が担う:
 
-- **req-define の既存 REQ 照合・統合/分離判定**: ドラフト段階で SPLIT シグナルを計算し `draft-meta.split-forecast` に記録（REQ-001-011）
+- **req-define の既存 REQ 照合・統合/分離判定**: ドラフト段階で SPLIT シグナルを計算し `draft-meta.split-forecast` に記録（REQ-001-044）
 - **agentdev-req-structure-diagnostics スキル**: 既存 REQ の健全性診断で本 Design の閾値を適用
 - **生成スクリプト**（`.opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts`）: 本 Design の「現行 REQ の計測例（参照値）」テーブルを実ファイルから再生成する（SC-002）。定期実行を前提とし、計測結果を実ファイルの最新状態に追従させる
 

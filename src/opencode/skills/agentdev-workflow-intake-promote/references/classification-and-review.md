@@ -1,6 +1,6 @@
 # STEP 詳細: classification / review（intake-promote）
 
-> 本 reference は `agentdev-workflow-intake-promote` SKILL.md の Control Plane STEP-1 / STEP-2 詳細である。
+> 本 reference は `agentdev-workflow-intake-promote` SKILL.md の制御平面（STEP 一覧）STEP-1 / STEP-2 詳細である。
 > SKILL.md は control plane として STEP 遷移を管理し、本 reference は各 STEP の実行詳細を提供する。
 
 ## 目次

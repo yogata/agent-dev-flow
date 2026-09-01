@@ -36,7 +36,7 @@ command 本文内で backlog-review を参照する場合はこちらを使用�
 |---|---|---|
 | 候補判断基準 | REQ-{NNNN}-{NNN} | review 対象は構成完了時点の RU 構成案。候補判断は補助情報であり自動発動根拠ではない |
 | 候補確定位置 | REQ-{NNNN}-{NNN}/{NNN} | Step 4（統合・分割判定 + depends_on 解決）完了時点で RU 構成案を確定する |
-| 呼出タイミング | REQ-{NNNN}-{NNN} | 構成（Step 3、Step 4）完了後、承認前に挿入（順序の正は backlog-review command Design） |
+| 呼出タイミング | REQ-{NNNN}-{NNN} | 構成（STEP-3）完了後、承認（STEP-5）前に挿入（順序の正は backlog-review command Design） |
 | 矛盾検出への引き渡し | REQ-{NNNN}-{NNN} | review で指摘された矛盾は既存矛盾検出ロジックへ渡し、review 内で自動解決しない |
 | 発動条件 | REQ-{NNNN}-{NNN} | ユーザー明示指定時のみ発動（順序、発動条件の正は backlog-review command Design） |
 | 従来フロー維持 | REQ-{NNNN}-{NNN} | 条件非該当時、呼出失敗時は従来フローを維持（順序の正は backlog-review command Design） |

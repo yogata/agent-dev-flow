@@ -1,6 +1,6 @@
 # STEP-5: Issue 作成（Epic flow / Standard flow、issue-creation-flows）
 
-> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-5 詳細である。
+> 本 reference は `agentdev-workflow-case-open` SKILL.md の制御平面（STEP 一覧）STEP-5 詳細である。
 > Epic flow（STEP-5-1〜5-5）と Standard flow（STEP-5-6〜5-8）の制御、GitHub Issue 作成手続きを提供する。
 
 ## Purpose

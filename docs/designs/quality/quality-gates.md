@@ -6,6 +6,7 @@ updated: 2026-08-31
 ---
 <!-- ADF-COVERS(implementation): REQ-003-013 -->
 <!-- ADF-COVERS(implementation): REQ-007-006, REQ-007-007, REQ-007-008, REQ-007-009 -->
+<!-- ADF-COVERS(implementation): REQ-057-003 -->
 
 # 品質ゲート
 
@@ -41,8 +42,8 @@ AgentDevFlow 主ワークフロー（req-define → req-save → design-save（D
 
 ### 配置
 
-- **req-define**: 要件 doc draft 生成時（Step 6〜9）。REQ/Design 分類、Decision ゲート、チェックボックス測可能性を検証。
-- **req-save**: REQ/Decision ファイル保存時（Step 3〜4）。保存前の最終構造検証。
+- **req-define**: 要件 doc draft 生成時（STEP-4〜5、STEP-10）。REQ/Design 分類、Decision ゲート、チェックボックス測可能性を検証。
+- **req-save**: REQ/Decision ファイル保存時（STEP-4）。保存前の最終構造検証。
 
 ### pass / warn / fail 基準
 
@@ -76,7 +77,7 @@ case-open で Issue を作成する前に、Issue の完了条件が対象 REQ/D
 
 ### 配置
 
-- **case-open**: Issue 本文生成時（Step 1, Step 5/15）。REQ 必達要件 → 完了条件チェックボックスへの mapping を検証。
+- **case-open**: Issue 本文生成時（STEP-2）。REQ 必達要件 → 完了条件チェックボックスへの mapping を検証。
 
 ### pass / warn / fail 基準
 
@@ -97,7 +98,7 @@ case-run で PR 作成前に、実装が Issue / REQ / ADR / Design / work plan 
 
 ### 配置
 
-- **case-run**: 提出フェーズ（Step 8）。git diff を対象に乖離検出を実行。
+- **case-run**: PR 作成前の検証（STEP-S3 前置 staleness check、実行担当サブエージェント委譲内の実装検証）。git diff を対象に乖離検出を実行。
 
 ### 乖離分類
 
@@ -134,7 +135,7 @@ Issue 完了条件チェックボックスの全達成、CI 通過、ドキュ�
 
 ### 配置
 
-- **case-close**: 前提確認（Step 2）、docs 検証（Step 3, 3-1）。PR / CI / Issue チェックボックスを対象に完了証拠を確認。
+- **case-close**: QG-4 達成判定（STEP-2）、docs 検証・Design 確定（STEP-3）。PR / CI / Issue チェックボックスを対象に完了証拠を確認。
 
 ### pass / fail 基準
 
@@ -149,7 +150,7 @@ QG-4 は Issue 本文の完了条件セクションのチェックボックス�
 
 verify-only PR（実装差分0件、検証のみ）の場合、QG-4 の完了条件評価は PR 本文の verify-only 根拠欄（実装差分を含まない理由、根拠成果物または commit、検証対象、検証結果）を証拠ソースとして認める。
 verify-only PR は実装差分を含まないため、根拠欄の記載で完了条件を評価する。
-verify-only PR では case-close Step 3-1 targeted docs guard の `files_checked` が空配列となるが、根拠欄の記載により空の `files_checked` が無根拠にならない。
+verify-only PR では case-close STEP-3 targeted docs guard の `files_checked` が空配列となるが、根拠欄の記載により空の `files_checked` が無根拠にならない。
 verify-only PR の判定基準（PR 変更ファイル一覧が空配列、根拠欄の記載十分性、受け入れ基準の検証充足）は [case-close.md](../commands/case-close.md)「verification-only PR の files_checked 空確認（v2:REQ-0158-002）」が定め、QG-4 は当該判定を経た PR のみを PASS とする。
 
 PR テンプレート（pr_desc.md）と Issue 本文構造は workflow-templates（[agentdev-workflow-templates.md](../skills/agentdev-workflow-templates.md)）の責務である。

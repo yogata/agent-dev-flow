@@ -38,7 +38,7 @@ AgentDevFlow の公開コマンドは以下の5分類のいずれかに属する
 | 分類 | コマンド | 目的 |
 |---|---|---|
 | 主フロー | req-define → req-save → design-save（Design候補がある場合）→ case-open → case-run → case-close → case-update | 要件定義から実装完了までの標準ワークフロー |
-| 最大自走入口 | case-auto, backlog-auto | 追加入口。case-auto は req-define 完了後の後続工程を一括自走、backlog-auto は backlog 整理サイクル（inspect-docs → 昇格3系統 → backlog-review）を1回起動で実行。標準フローを置換しない（REQ-005-049、REQ-005-011） |
+| 最大自走入口 | case-auto, backlog-auto | 追加入口。case-auto は req-define 完了後の後続工程を一括自走、backlog-auto は backlog 整理サイクル（inspect-docs → 昇格3系統 → backlog-review）を1回起動で実行。標準フローを置換しない（REQ-005-010、REQ-005-011） |
 | 補助フロー | intake-capture, intake-from-github, intake-promote, learning-promote, backlog-review | 改善候補収集、学び蓄積、RU化。主フローを補完 |
 | 検出フロー | inspect-docs, inspect-skills, inspect-promote | 文書、スキルの意味検出、分類、昇格 |
 | リポジトリローカル検査 | /repo/docs-check | AgentDevFlow 本体リポジトリ内の機械的整合性検査 |
@@ -322,10 +322,10 @@ resume point は次のいずれかとする。
 ユーザー判断の解決後、case-auto は resume point から処理を再開し、adversarial-review の再発動要否は adversarial-review Design「再 review 条件」「再 review 停止条件」の各節に従う。
 adversarial-review 自体を恒久的な統制ゲートとしない（REQ-014-009、adversarial-review Design「unresolved 時の不可逆処理回避」節参照）。
 
-### bounded parent decision resolution と停止・resume 伝播（REQ-006-112〜114、DEC-008）
+### bounded parent decision resolution と停止・resume 伝播（REQ-034-032〜034、DEC-008）
 
 case-auto は user-decision-required + decision_context を受領した際、bounded parent decision resolution により decision_context を自律解決できる場合はユーザー停止せずに下位 command を resume させる。
-本節は case-auto と下位 command 間の停止・resume 伝播契約の整合のみを規定し、解決範囲、作業仮定の明示要件、停止理由分類の詳細は case-auto Design「bounded parent decision resolution（REQ-006-112〜114、DEC-008）」節、delegation-contracts Design「case-auto による decision_context の限定的親判断解決」節が正である。
+本節は case-auto と下位 command 間の停止・resume 伝播契約の整合のみを規定し、解決範囲、作業仮定の明示要件、停止理由分類の詳細は case-auto Design「bounded parent decision resolution（REQ-034-032〜034、DEC-008）」節、delegation-contracts Design「case-auto による decision_context の限定的親判断解決」節が正である。
 
 **自律解決時の resume 伝播**:
 

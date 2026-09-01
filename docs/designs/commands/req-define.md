@@ -57,7 +57,7 @@ updated: 2026-08-21
   - SPLIT 予兆計測（既存REQの健全性メトリクス計測）
 - 要件展開（`agentdev-req-analysis` 分析観点）
   - 変更影響候補抽出
-    - RU 由来キーワード抽出 + glob/grep 前処理によるサブエージェント調査委譲スコープの絞り込み（REQ-004-072）。絞り込みはサブエージェント調査委譲の調査優先対象リストのみに適用（ヒントでありハードフィルタではない）し、実ファイル列挙（REQ-004-002）の完全性は維持する
+    - RU 由来キーワード抽出 + glob/grep 前処理によるサブエージェント調査委譲スコープの絞り込み。絞り込みはサブエージェント調査委譲の調査優先対象リストのみに適用（ヒントでありハードフィルタではない）し、実ファイル列挙（REQ-004-002）の完全性は維持する
   - 非機能受け入れ条件の条件付き確認（work_type に関わらず常に実行。REQ-004-050〜053）
     - 適用対象判定: 対象が、信頼できない入力の構文解析、検証、解釈（パーサ、レクサ、デシリアライザ等）、権限、配布、trust 境界の enforcement、外部ネットワーク経路、アーカイブ展開等の外部攻撃面を持つ処理のいずれかに該当するか否かを判定する（判定基準は `agentdev-req-analysis` Design の分析観点を正とする）
     - 適用対象の場合、処理量の上限（時間計算量、処理ステップ数、または走査量の上限）、出力の上限（出力件数、証跡量の上限）、不正または曖昧な入力時の失敗挙動（fail-open か fail-closed か）の3確認事項への回答が確定するまで壁打ちを継続する
@@ -67,7 +67,7 @@ updated: 2026-08-21
   - 分類ゲート（v2:REQ-0155-004 最終分類確定ステップ）（変更後仕様 or 反映作業、REQ/Design 境界判定）。RU 入力の暫定分類（backlog-review が `tentative_classification` に付与）が存在する場合、`docs/designs/foundations/document-model.md` の文書7分類モデルに照らして最終分類を確定し暫定分類を上書きする。確定時のバリデーション（暫定分類の7値チェック、フィールド欠落時の停止、最終分類上書き値の7値チェック）は後述「tentative_classification 最終確定のバリデーション（v2:REQ-0155-008）」に定める
   - 文書分類妥当性検証（Design 分離基準違反残留検出）
     - Decision要否確認ゲート（`agentdev-architecture-advisory` 経由でアーキテクチャ助言サブエージェントへ委譲）
-    - アーキテクチャ助言サブエージェントへの入力標準テンプレート使用 + 出力 4 ラベル構造要求（REQ-004-073）。ラベル構造は soft-contract（DEC-003）とし、分類権限は親が保持する
+    - アーキテクチャ助言サブエージェントへの入力標準テンプレート使用 + 出力 4 ラベル構造要求（REQ-004-042）。ラベル構造は soft-contract（DEC-003）とし、分類権限は親が保持する
   - 実行主体分類表（REQ-003-007）（委譲契約を定義する場合、実行主体分類表（adapter skill / command / subagent / harness）を必須とする（`docs/designs/workflows/delegation-contracts.md` 参照））。委譲を含まない要件では省略可
   - Test strategy 定義（要件展開内）
     - 各 test strategy 項目を verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素構造として定義
@@ -111,7 +111,7 @@ req-define は Workflow Skill と手順番号を複製せず、公開目的、�
 
 ## REQ影響判定とDesign正規所有者確定
 
-req-define は backlog-review の暫定分類（`tentative_classification`）を暫定入力とし、最終分類を自身で確定する（REQ-004-087、REQ-001）。
+req-define は backlog-review の暫定分類（`tentative_classification`）を暫定入力とし、最終分類を自身で確定する（REQ-004-010、REQ-001）。
 
 ### 最終分類確定ステップで判定する項目
 
@@ -135,7 +135,7 @@ req-define は次の7項目を判定し、`artifact_actions`、`operation_units`
 
 ### REQ 影響なし時の取扱い
 
-REQ 影響なしと確定した変更からは `artifact_actions` の `artifact: req` エントリを生成しない（REQ-004-088）。
+REQ 影響なしと確定した変更からは `artifact_actions` の `artifact: req` エントリを生成しない（REQ-004-033）。
 代わりに `artifact: design` エントリのみを生成し、Design への配置のみを行う。
 Design action には前項「Design action への分類根拠出力」を適用する。
 
@@ -149,7 +149,7 @@ req-define は RU から引き継いだ分類根拠（`artifact-contracts.md`「
 backlog-review が付与する `tentative_classification`（v2:REQ-0155-003 の7値）は暫定値であり、req-define が最終分類を上書きする。
 最終分類確定時のバリデーション（7値チェック、フィールド欠落時の停止、上書き値の7値チェック）は前述「tentative_classification 最終確定のバリデーション」に従う。
 
-### 壁打ち対話 構造的分析フレーム先行手順（REQ-004-083, REQ-004-084, REQ-004-085）
+### 壁打ち対話 構造的分析フレーム先行手順（REQ-004-034, REQ-004-035, REQ-004-036）
 
 壁打ち対話の開始時に、入力（RU、セッションコンテキスト、明示入力ファイル）の構造を入力データの性質に応じた分析フレームで先行して整理し、個別論点の深掘り前に全体構造をユーザーに提示する。
 
@@ -270,7 +270,7 @@ Design operation の旧別名（`spec-create` / `spec-update` / `spec-append`）
 
 ## draft-data artifact_actions フィールド形式
 
-artifact_actions の各 entry が出力する `target_area` と `content` の扱いは operation 別に以下を規定する（REQ-004-078, REQ-004-079、REQ-008-058）。
+artifact_actions の各 entry が出力する `target_area` と `content` の扱いは operation 別に以下を規定する（REQ-004-033、REQ-008-058）。
 
 Design operation の公式 enum は `create` / `append` / `update` の3値である（別名は持たない）。
 
@@ -529,7 +529,7 @@ req-define が生成した draft を内容欠落なく評価環境へ引き継�
 - `git` コマンド実行
 - Issue 階層決定（case-open 責務）
 - `execution_groups` セクション出力
-- Design 分離基準（REQ-001-068）該当要件行の REQ 残留（`artifact_actions` へ分離）
+- Design 分離基準（REQ-001-067）該当要件行の REQ 残留（`artifact_actions` へ分離）
 - Decision判断における未確認事項の要件本文混入（REQ-003-002/004）
 - アーキテクチャ助言サブエージェントによるファイル編集（REQ-003-003）
 

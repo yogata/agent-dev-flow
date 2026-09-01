@@ -1,6 +1,6 @@
 # STEP-3: docs 検証・Design 確定（docs-and-spec-promotion）
 
-> 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-3 詳細である。
+> 本 reference は `agentdev-workflow-case-close` SKILL.md の制御平面（STEP 一覧）STEP-3 詳細である。
 > docs/ 検証、targeted docs guard、check_extensions.ts、Design 確定フロー（draft → accepted 昇格）を提供する。
 
 ## Purpose
