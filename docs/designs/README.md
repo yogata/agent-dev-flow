@@ -1,4 +1,4 @@
-<!-- ADF-COVERS(implementation): REQ-001-025, REQ-001-026, REQ-001-028, REQ-001-065, REQ-057-022 -->
+<!-- ADF-COVERS(implementation): REQ-001-025, REQ-001-026, REQ-001-028, REQ-001-065, REQ-057-015, REQ-057-022 -->
 # Design インデックス
 
 Design ファイルは、REQ を満たすために現在採用している内部構造、内部動作、責務分担、データ構造、処理方式、規則、パラメータを記述する正規文書である（REQ-001）。
@@ -178,7 +178,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | foundations/system.md | accepted | システム仕様 | コマンドシステムの構成定義、運用モデル |
 | foundations/document-model.md | accepted | 文書モデル | REQ/Decision/Design/guides の責務マトリックス、ドメイン別体系化規範 |
 | foundations/decision-lifecycle.md | draft | Decision Lifecycle | Decision 関係モデル（relates-to / supersedes / reaffirms）、粒度管理規則、健全性評価モデル。document-model.md「Decision ライフサイクル詳細」から参照される詳細を正規所有 |
-| foundations/patterns.md | accepted | 文書フォーマット規約 | frontmatter、ID 体系、命名規則、URL 参照形式、共通フォーマット規約（本文構造・執筆規約寄り内容は authoring/ への移管候補、実移管は case-run で判断） |
+| foundations/patterns.md | accepted | 文書フォーマット規約 | frontmatter、ID 体系、命名規則、URL 参照形式、共通フォーマット規約 |
 | foundations/design-principles.md | accepted | 設計原則 | アーキテクチャ設計原則 |
 | foundations/project-extensions.md | accepted | Project Extensions | 実行時プロジェクト固有追加・拡張機構（`.agentdev/extensions/**`）、extension schema、実行時読み込み契約、project-local skill 委譲、配布物具体参照禁止（REQ-002） |
 | foundations/harness-separation-model.md | accepted | harness 分離モデル | 配布物と harness 実行制御の責務分離モデル。配布物の大多数を harness 非依存とし、依存具体を references/ へ集約 |
@@ -195,7 +195,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | responsibilities/req-impact-map.md | accepted | REQ 影響マップ | REQ → 影響するルール/アーティファクト の対応表。`integrity/rule-ownership.md`（ルールドメイン → canonical REQ/Design）と逆方向。同期更新が必要なケースあり。配置の正本は req-impact-map.md 冒頭の配置記述であり、`responsibilities/` 残置を現行配置として確定済み（本行は参照導線） |
 | responsibilities/responsibility-boundary-purification.md | accepted | 責務境界浄化: 所有/非所有リスト詳細 | 配布物と harness 実行制御の責務境界（所有/非所有リスト）。原則は harness-separation-model.md を SSoT とし、各工程（case-auto/case-run/adapter/extensions/タイムスタンプ）の詳細を集約。抽象化手順は `foundations/references/concrete-abstraction.md` を参照 |
 | responsibilities/artifact-quality-control-routing.md | draft | Artifact Quality Control Routing Design | artifact type から必須品質能力を導出する合成規則、能力キー定義、QG-2 投影契約。REQ-017 execution contract の設計記録 |
-| responsibilities/custom-tool-contracts.md | accepted | Custom Tool 操作契約 | Custom Tool の操作契約（入力、出力、保証、失敗時）、ローカル版実装差し替え、迂回防止（REQ-052、DEC-022） |
+| responsibilities/custom-tool-contracts.md | accepted | Custom Tool 操作契約 | Custom Tool の操作契約（入力、出力、保証、失敗時）、ローカル版実装差し替え、迂回防止（REQ-052） |
 
 #### quality/（品質、メトリクス）
 
