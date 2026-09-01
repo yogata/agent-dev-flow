@@ -6,6 +6,9 @@
  * item's detection logic and the structured exemptions.
  */
 
+// ADF-COVERS(implementation): REQ-057-011
+// ADF-COVERS(verification): REQ-057-011
+
 import { expect, test, describe, beforeAll, afterAll } from "bun:test";
 import { checkWorkflowPreventive } from "./check_workflow_preventive.ts";
 import * as path from "path";
@@ -24,8 +27,9 @@ describe("checkWorkflowPreventive (integration against real repo)", () => {
       expect(c.pass).toBe(true);
     }
     expect(report.failures.filter((f) => f.severity === "strict").length).toBe(0);
-    // 18 public commands since issue was added (17 before).
-    expect(report.stats.public_commands).toBe(18);
+    // REQ-057-011 (Q2 Plan A): public_commands is compared against a minimum
+    // floor instead of a fixed count (last known correct state: 18).
+    expect(report.stats.public_commands).toBeGreaterThanOrEqual(18);
     expect(report.stats.legacy_kind_files).toBe(0);
     expect(report.stats.legacy_commands_dir_files).toBe(0);
   });

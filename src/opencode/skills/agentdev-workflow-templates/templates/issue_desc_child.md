@@ -8,6 +8,8 @@ Parent: #{epic_number}
 
 <!-- Parent 配置正規形: 子Issue 本文の先頭行に Parent: #N を配置する（agentdev-epic-tracker 親Epic検出、case-open 不変条件と整合）。旧「## 親Issue」セクション内配置（先行実績 #2092 形式等）は移行措置として後方互換で検出する -->
 
+<!-- Tracking 行配置正規形: 追跡Issueから要件化された Case Issue は、本文冒頭ブロックに `Tracking: #N` を1行で記載する（複数の元追跡Issueがある場合は `Tracking: #N, #M` 形式。Parent: #N は Epic 階層関係専用であり Tracking 行と別形式・併存可。case-open Design「Case Issue 本文の元追跡Issue参照形式」節参照）。追跡Issueを起源としない通常の Case Issue には Tracking 行を記載しない（元追跡Issueが判明している場合のみ case-open が記載する） -->
+
 ## 概要
 <!-- 【必須】 -->
 

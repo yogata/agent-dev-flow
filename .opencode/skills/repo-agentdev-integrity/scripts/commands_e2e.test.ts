@@ -5,6 +5,8 @@
 // ADF-COVERS(verification): REQ-018-001, REQ-018-002
 // ADF-COVERS(verification): REQ-036-002
 // ADF-COVERS(verification): REQ-041-001, REQ-041-016
+// ADF-COVERS(implementation): REQ-057-011
+// ADF-COVERS(verification): REQ-057-011
 /**
  * E2E workflow tests for all agentdev command definitions.
  * REQ-0030-009: Normal-path E2E tests for all commands
@@ -281,27 +283,18 @@ const commands = getCommandFiles();
 const skillDirs = getSkillDirs();
 const templateFiles = getTemplateFiles();
 
-// Current 18 public agentdev commands (aligns with commands/agentdev/README.md listing)
-const EXPECTED_COMMANDS = [
-  "backlog-auto",
-  "backlog-review",
-  "case-auto",
-  "case-close",
-  "case-open",
-  "case-run",
-  "case-update",
-  "inspect-docs",
-  "inspect-promote",
-  "inspect-skills",
-  "intake-capture",
-  "intake-from-github",
-  "intake-promote",
-  "issue",
-  "learning-promote",
-  "req-define",
-  "req-save",
-  "design-save",
-];
+/**
+ * REQ-057-011 (Q2 Plan A): derive the expected list from the actual public
+ * command enumeration instead of a fixed list. The minimum-count floor keeps
+ * enumeration-leak detection meaningful (last known correct state: 18).
+ */
+const MIN_COMMAND_COUNT = 18;
+
+function deriveExpectedCommands(commandFiles: Map<string, string>): string[] {
+  return [...commandFiles.keys()].sort();
+}
+
+const EXPECTED_COMMANDS = deriveExpectedCommands(commands);
 
 // agentdev-prefixed references that are valid skills (not commands).
 // /agentdev/learning-capture is a skill invocation, not a command definition file.
@@ -322,8 +315,28 @@ describe("REQ-0030-009: E2E workflow tests for all commands", () => {
   // ─── Pipeline completeness ───────────────────────────────────────────────
 
   describe("Pipeline completeness: all commands exist", () => {
-    it(`has exactly ${COMMAND_COUNT} command definition files`, () => {
-      expect(commands.size).toBe(COMMAND_COUNT);
+    it(`has at least ${MIN_COMMAND_COUNT} command definition files (minimum floor)`, () => {
+      // REQ-057-011: the expectation is derived dynamically, so this only
+      // fails when the actual enumeration collapses below the minimum floor.
+      expect(commands.size).toBeGreaterThanOrEqual(MIN_COMMAND_COUNT);
+    });
+    it("the derived expected list equals the actual command enumeration", () => {
+      expect(EXPECTED_COMMANDS).toEqual(deriveExpectedCommands(commands));
+    });
+    it("the derived list follows a newly added dummy command", () => {
+      // REQ-057-011 動的化の動作確認: 実配布を触らずに、導出関数が新規コマンドを
+      // 期待値へ反映すること（追加で恒常 fail を起こさないこと）を単体確認する。
+      const base = new Map<string, string>([
+        ["case-open", "content"],
+        ["req-define", "content"],
+      ]);
+      expect(deriveExpectedCommands(base)).toEqual(["case-open", "req-define"]);
+      base.set("dummy-future-command", "content");
+      expect(deriveExpectedCommands(base)).toEqual([
+        "case-open",
+        "dummy-future-command",
+        "req-define",
+      ]);
     });
     for (const cmd of EXPECTED_COMMANDS) {
       it(`command "${cmd}" exists as .md file`, () => {

@@ -21,7 +21,7 @@ skills.yaml への宣言追加だけで取得対象へ追加でき、機構コ�
 ## workflow
 
 本コマンドは workflow 実装本体を `agentdev-workflow-third-party-sync` スキルへ委譲する。
-入力解決、skills.yaml の読込と検証、対象選択、取得実行の Custom Tool 委譲、結果検証・報告は同スキルの STEP-1〜4 が所有する。
+入力解決、skills.yaml の読込と検証、対象選択、取得実行の Custom Tool 委譲、結果検証・報告は同スキルが所有する。
 取得の副作用実行は third-party Skill 取得専用 Custom Tool の操作契約が担う。
 
 ## 不変条件
