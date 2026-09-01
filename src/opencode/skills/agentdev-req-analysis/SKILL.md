@@ -28,7 +28,7 @@ description: Provides requirement analysis methods with quality criteria and ADR
 
 ## 責任境界
 
-- **扱う**: 分析観点、品質基準、壁打ちメソドロジー、REQ/Design 境界判定基準、Decision 閾値判定ブリッジ、変更誘発境界リスク分析（5観点境界からの case-specific risk 導出、リスク導出規則の参照契約と不在時挙動、test strategy への投影）、検証手段の質基準（production-equivalent verification の一般原則と test strategy 設計時点への適用、完了時点の証跡契約を正規所有する要件群との時点分担）
+- **扱う**: 分析観点、品質基準、壁打ちメソドロジー、REQ/Design 境界判定基準、Decision 閾値判定ブリッジ、変更誘発境界リスク分析（5観点境界からの case-specific risk 導出、リスク導出規則の参照契約と不在時挙動、test strategy への投影）、検証手段の質基準（production-equivalent verification の一般原則と test strategy 設計時点への適用、完了時点の証跡契約を正規所有する要件群との時点分担）、プロジェクト知識の参照観点（docs/knowledge/ 配下の知識を判断材料へ加える適用条件判定と知識不在時の分析続行）
 - **扱わない**:
   - REQファイルの採番、CREATE/APPEND/UPDATE、frontmatter更新、README更新（→ `agentdev-req-file-manager`）
   - 実装計画、タスク分割、コード変更方針の確定（→ `/agentdev/case-run` の work plan）
@@ -52,6 +52,14 @@ description: Provides requirement analysis methods with quality criteria and ADR
 6. REQ 健全性メトリクスで SPLIT 予兆を計測し `draft-meta.split-forecast` に記録
 7. 変更誘発境界リスク分析により5観点境界から case-specific risk を導出し、test strategy 定義の入力として提示する
 8. test strategy 定義時に検証手段の質基準（production-equivalent verification）を適用し、検証手段が対象リスクに関係する実行・依存・環境境界を十分再現することを確認する
+
+## プロジェクト知識の参照観点
+
+要件分析・壁打ちでは、docs/knowledge/ 配下のプロジェクト知識（プロジェクト固有の再利用可能な判断材料）を判断材料として参照できる。
+参照は docs/knowledge/ を正規知識領域とし、利用可能なハーネスの探索能力を通じて関連知識を検索する。Project Knowledge の所有と workflow 利用の要件が正規所有する利用契約に従い、知識の探索のために ADF 独自の検索機構を追加しない。
+知識の適用条件が分析対象に一致する場合のみ、判断材料へ加える。
+知識が不在の場合、または適用条件が一致しない場合は ADF core の一般規則のみで分析を実行する。分析を省略しない（変更誘発境界リスク分析の要件が正規所有する知識不在時の分析省略禁止に従う）。
+知識の存在を理由に REQ/Decision/Design への確認を省略しない。
 
 ## reference選択表
 
