@@ -6,6 +6,7 @@ updated: 2026-09-02
 ---
 <!-- ADF-COVERS(implementation): REQ-010-006 -->
 <!-- ADF-COVERS(implementation): REQ-036-022 -->
+<!-- ADF-COVERS(implementation): REQ-057-008 -->
 
 # 整合性契約
 
