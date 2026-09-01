@@ -1,4 +1,4 @@
-<!-- ADF-COVERS(implementation): REQ-001-025, REQ-001-026, REQ-001-028, REQ-001-065 -->
+<!-- ADF-COVERS(implementation): REQ-001-025, REQ-001-026, REQ-001-028, REQ-001-065, REQ-057-022 -->
 # Design インデックス
 
 Design ファイルは、REQ を満たすために現在採用している内部構造、内部動作、責務分担、データ構造、処理方式、規則、パラメータを記述する正規文書である（REQ-001）。
@@ -127,7 +127,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [skills/agentdev-case-run-execution-adapter.md](skills/agentdev-case-run-execution-adapter.md) | accepted | 補助 | case-run 外部実行 adapter |
 | [skills/agentdev-issue-management.md](skills/agentdev-issue-management.md) | accepted | 補助 | Issue 管理 |
 | [skills/agentdev-epic-tracker.md](skills/agentdev-epic-tracker.md) | accepted | 補助 | Epic 進捗追跡 |
-| [skills/agentdev-gh-cli.md](skills/agentdev-gh-cli.md) | accepted | 補助 | gh CLI 手続き委譲 |
+| [skills/agentdev-gh-cli.md](skills/agentdev-gh-cli.md) | accepted | 補助 | gh CLI 手続きの参照点（実行主体は Custom Tool `agentdev_gh`） |
 | [skills/agentdev-git-worktree.md](skills/agentdev-git-worktree.md) | accepted | 補助 | git worktree 操作 |
 | [skills/agentdev-intake-pipeline.md](skills/agentdev-intake-pipeline.md) | accepted | 補助 | intake pipeline |
 | [skills/agentdev-learning-capture.md](skills/agentdev-learning-capture.md) | accepted | 補助 | learning capture |
