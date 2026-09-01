@@ -16,7 +16,7 @@
 # のみ実施し、worktree（junction 未伝播、REQ-018）では info で skip する。
 
 schema_version: 1
-generated_at: 2026-08-22
+generated_at: 2026-09-02
 
 skills:
   - agentdev-adversarial-review
@@ -37,6 +37,7 @@ skills:
   - agentdev-inspect-skills
   - agentdev-intake-pipeline
   - agentdev-issue-management
+  - agentdev-issue-tracking
   - agentdev-learning-capture
   - agentdev-learning-pipeline
   - agentdev-project-extensions
@@ -60,6 +61,7 @@ skills:
   - agentdev-workflow-intake-capture
   - agentdev-workflow-intake-from-github
   - agentdev-workflow-intake-promote
+  - agentdev-workflow-issue
   - agentdev-workflow-learning-promote
   - agentdev-workflow-lifecycle
   - agentdev-workflow-orchestration
@@ -67,4 +69,4 @@ skills:
   - agentdev-workflow-req-save
   - agentdev-workflow-routing
   - agentdev-workflow-templates
-  - japanese-tech-writing
+  - agentdev-workflow-third-party-sync
