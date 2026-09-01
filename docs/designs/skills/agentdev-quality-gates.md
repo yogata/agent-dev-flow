@@ -5,6 +5,7 @@ created: 2026-06-21
 updated: 2026-09-02
 ---
 <!-- ADF-COVERS(implementation): REQ-007-001, REQ-007-003, REQ-007-004, REQ-007-005 -->
+<!-- ADF-COVERS(implementation): REQ-057-004 -->
 
 # `agentdev-quality-gates` Design
 

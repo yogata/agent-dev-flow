@@ -10,6 +10,7 @@ updated: 2026-09-02
 <!-- ADF-COVERS(implementation): REQ-017-007, REQ-017-008, REQ-017-010, REQ-017-011, REQ-017-013, REQ-017-016 -->
 <!-- ADF-COVERS(implementation): REQ-031-001, REQ-031-002, REQ-031-003, REQ-031-004, REQ-031-005, REQ-031-006, REQ-031-007, REQ-031-008, REQ-031-009, REQ-031-010, REQ-031-011, REQ-031-012, REQ-031-013, REQ-031-014, REQ-031-015, REQ-031-016, REQ-031-017, REQ-031-018, REQ-031-019, REQ-031-020, REQ-031-021, REQ-031-022, REQ-031-023, REQ-031-024 -->
 <!-- ADF-COVERS(implementation): REQ-043-015, REQ-043-021, REQ-043-011 -->
+<!-- ADF-COVERS(implementation): REQ-057-004 -->
 <!-- ADF-COVERS(implementation): REQ-007-001, REQ-007-002, REQ-007-003, REQ-007-004, REQ-007-005, REQ-031-001, REQ-031-002, REQ-031-003, REQ-031-004, REQ-031-005, REQ-031-006, REQ-031-009, REQ-031-010, REQ-031-011, REQ-031-012, REQ-031-015, REQ-031-016, REQ-031-017, REQ-031-018, REQ-031-019, REQ-031-020, REQ-031-021, REQ-031-022, REQ-031-023, REQ-031-024, REQ-035-011, REQ-042-001, REQ-042-002, REQ-042-003, REQ-042-005, REQ-042-006, REQ-042-007, REQ-042-011, REQ-043-007, REQ-043-011, REQ-043-015, REQ-043-021 -->
 
 # case-run Design
@@ -98,7 +99,7 @@ Workflow Skill は単一 Issue 実行（single workflow）と Epic Wave 実行�
 
 ### case-run gate 意味論（前置 gate と最終 gate）
 
-- 前置 gate 群（委譲の STEP-S3 相当、子Issue ごとの Epic Wave 委譲にも同一契約で適用）: worktree precondition gate、QG-3 前置 staleness check、docs/** 変更時の targeted docs guard、配布依存境界 事前 gate、AUTOGEN 索引再生成 前置 gate（S3-6）を適用する。AUTOGEN 索引再生成 前置 gate は、PR 対象ファイルに AUTOGEN 生成対象文書（REQ、Decision、Design 実ファイル群）の変更を含む場合、AUTOGEN 索引の再生成を委譲に先行して強制する
+- 前置 gate 群（委譲の STEP-S3 相当、子Issue ごとの Epic Wave 委譲にも同一契約で適用）: worktree precondition gate、QG-3 前置 staleness check、docs/** 変更時の targeted docs guard、配布依存境界 事前 gate、AUTOGEN 索引再生成 前置 gate（S3-6）を適用する。AUTOGEN 索引再生成 前置 gate は、PR 対象ファイルに AUTOGEN 生成元文書（REQ、Decision、Design 実ファイル群）の変更を含む場合、AUTOGEN 索引の再生成を委譲に先行して強制する
 - 配布依存境界の最終変更経路 gate（S5-1）: result が `completed-pr` の場合、クリーンアップに進む前に、実装後の実際の worktree HEAD に対して最終 gate を行う（実行担当サブエージェントが追加した変更も含めて検査する）。本 gate は src 側（原本）と `.opencode` 側（投影）の双方反映検証を要求する
 - tmp 残存確認: 正常終了を前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないことをクリーンアップ工程で確認する。workflow 側で生成した `.agentdev/tmp/` 一時ファイルは当該実行内で削除し、Custom Tool 由来の一時ファイルは Tool が操作ごとに自動削除する
 
