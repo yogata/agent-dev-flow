@@ -2,7 +2,7 @@
 title: 実行時パッケージ境界
 status: accepted
 created: 2026-08-20
-updated: 2026-08-30
+updated: 2026-09-02
 ---
 <!-- ADF-COVERS(implementation): REQ-002-007, REQ-002-008, REQ-002-011, REQ-002-019, REQ-002-020, REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-002, REQ-009-003, REQ-009-006, REQ-009-007, REQ-009-008, REQ-009-009, REQ-009-010, REQ-009-011, REQ-009-012, REQ-009-013, REQ-009-014, REQ-009-015, REQ-009-016, REQ-009-017, REQ-009-018, REQ-009-019, REQ-009-020, REQ-009-021, REQ-009-022, REQ-009-023, REQ-009-024, REQ-009-025, REQ-009-035, REQ-009-036, REQ-009-037, REQ-009-038, REQ-009-039, REQ-009-046, REQ-009-047, REQ-009-048, REQ-009-049 -->
@@ -125,6 +125,11 @@ scripts/ は skill junction の配下に位置し、skill の一部として配�
 - Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけを `src/opencode-local/agentdev-gh-cli/` へ接続する（REQ-009 decision #3、REQ-011-006）
 - link target が意図した target 以外へ解決される場合は link 設定を停止する（REQ-009-010, REQ-009 decision #6）
 - `.opencode/commands/`, `.opencode/skills/`, `.opencode/` 配下ひな形は link により git 管理対象外（REQ-009-008, REQ-009 decision #1）
+
+link mode 接続の技術詳細:
+
+- Plugin のローダーシム（`.opencode/plugins/agentdev-*.ts`、`<package>.ts` の1行再エクスポート）は投影成果物として生成する。install の apply は shim の存在と実体パス解決を検査し、shim が欠落または意図しない解決となっている場合は再生成して自己修復する
+- link 接続した Custom Tool 実行ディレクトリで `bun install` を実行する環境では、当該実行ディレクトリの `.gitignore` に `node_modules/` を指定することを推奨する（投影領域への依存生成物混入の防止）
 - `.agentdev/issues/` 配下のローカルIssueは Issue/PR 相当の永続情報としてリポジトリ管理対象（REQ-009-016、REQ-009-026）
 
 ## プロジェクトローカル命名規則（Project-Local Naming Rules）
@@ -222,7 +227,7 @@ Consumer では `scripts/install.ps1` が AgentDevFlow 本体から提供され�
 
 scripts/ 直下の公開入口と内部配置の構成（REQ-050-001、REQ-050-009）。
 
-- 公開入口2本: consumer 向け `scripts/install.ps1`、self-hosting 向け `scripts/self-sync.ps1`。公開入口名は利用者が固定参照する安定契約である（DEC-021）
+- 公開入口2本: consumer 向け `scripts/install.ps1`、self-hosting 向け `scripts/self-sync.ps1`。公開入口名は利用者が固定参照する安定契約である（REQ-050-001）
 - 内部配置: consumer 専用の内部処理は `scripts/consumer/` 配下、self-hosting 固有の配布・検証処理は `scripts/self/release/` 配下、保守処理は `scripts/self/maintenance/` 配下
 - release 生成、信頼境界検証、self-hosting 保守処理、単体実行しない内部共通処理を scripts/ 直下に配置しない
 - 具体的な内部ファイル分割は、公開契約と依存境界を変えない範囲で実装時に調整できる
@@ -236,7 +241,7 @@ release archive 内では consumer が実行する公開入口として `scripts
 ## Tools / Plugins の配布・投影
 
 Custom Tool（src/opencode/tools/）と Plugin / Hook（src/opencode/plugins/）を正規配布種別として扱う
-（REQ-052、DEC-022）。原本と実行時投影は Command / Skill と同一の source・projection 原則（DEC-002）に従い、
+（REQ-052）。原本と実行時投影は Command / Skill と同一の source・projection 原則（DEC-002）に従い、
 link mode の接続対象に含める。scripts/ 直下の公開入口は従来どおり2本に固定し、Tool / Plugin の追加によって
 新たな公開入口を作らない（REQ-050-001、REQ-052-008）。ディレクトリ構造の詳細は本 Design が所有する。
 
@@ -247,6 +252,8 @@ repo-local Plugin（REQ-002-045）の配布・投影については次のとお�
 - repo-local Plugin の正本配置原則は `src/opencode/plugins/<agentdev-name>/` 配下である。consumer 配布系全経路（`scripts/install.ps1`、`scripts/consumer/` 配下の archive installer、`scripts/self/release/package-release-archive.ps1`）は repo-local 配布除外を実装し、3ファイルの列挙条件を同期する義務を持つ。
 - `scripts/self-sync.ps1` は repo-local Plugin を除外しない（自己ホスト投影を維持する）。理由は、consumer 配布と自己ホスト投影が非対称であるためである。repo-local Plugin は REQ-052-006 により consumer への配布対象外である一方、自己ホスト環境では Plugin を利用可能にする必要がある。自己ホスト投影は canonical チェックアウト内部の source → projection 構成（`.opencode/plugins/` への junction と depth-1 loader shim 生成）であり、consumer への配布ではないため、配布除外機構の適用対象外である。
 - 除外機構の実現方式は明示的除外リスト等とする。REQ-002-011 の repo-* prefix 方式を plugin に採用しない（shim 名が repo-*.ts になり、stale shim 検出フィルタ等の波及修正が増えるため）。
+
+配布境界 checker の repo-local モデル: 配布境界 checker は consumer 配布系と自己ホスト投影の非対称（上記のとおり）を repo-local モデルとして前提とする。detector の列挙条件（除外対象の検出箇所一覧）は repo-local Plugin の正本配置原則（`src/opencode/plugins/<agentdev-name>/`）と同期を維持し、列挙の乖離が観測された場合は個別特例の追加ではなく検査側の一般化で解消する方針とする。
 - 将来 repo-local Plugin が複数化した時点で、マーカー方式（package.json マーカーフィールド等）への拡張条件を判断する。
 
 ## 誤実行防止の環境判定方式

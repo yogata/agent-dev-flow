@@ -2,14 +2,14 @@
 title: Custom Tool 操作契約
 status: accepted
 created: 2026-08-24
-updated: 2026-08-30
+updated: 2026-09-02
 ---
-<!-- ADF-COVERS(implementation): REQ-011-022, REQ-011-023, REQ-011-024 -->
+<!-- ADF-COVERS(implementation): REQ-011-020, REQ-011-021, REQ-011-022, REQ-011-023, REQ-011-024, REQ-052-001, REQ-052-002, REQ-052-003, REQ-052-004, REQ-052-005, REQ-052-008, REQ-052-009, REQ-052-010, REQ-052-011 -->
 
 # Custom Tool 操作契約
 
 Git、GitHub、外部ソース（URL、Git リポジトリ等）からの取得等の構造化された副作用操作を担う Custom Tool の操作契約と失敗時動作を所有する
-（REQ-052、DEC-022）。
+（REQ-052）。
 
 ## 操作契約の構成要素
 
@@ -55,3 +55,8 @@ Workflow は GitHub 版と Local 版の差を認識しない。
 
 Plugin / Hook（tool.execute.before 等）により、生 gh WRITE 等の正規経路迂回を検出・拒否できる。
 禁止範囲（読み取り系の許容等を含む）は本 Design が所有する。
+
+Plugin / Hook の設定契約:
+
+- 強制境界 Plugin の設定は環境変数経由で行う。gh-write-guard Plugin は `AGENTDEV_GH_WRITE_GUARD_CONFIG`（JSON、`enforcedTools` 一覧）を受け付け、未設定時は既定の強制対象で動作し、設定を解釈できない場合は対象副作用を実行せず fail-closed で拒否する（REQ-052-004）。gh-tool Plugin は `AGENTDEV_GH_REPO` で対象リポジトリを指定できる
+- 正規経路の Custom Tool 名は `agentdev_gh`（GitHub Issue / PR 操作）と `agentdev_third_party`（third-party Skill 取得）である。配布物の実行手順はこれらのツール名を経由し、生 gh WRITE の直接実行を正規経路としない（REQ-011-021、REQ-052-010）

@@ -2,7 +2,7 @@
 title: サブエージェント委譲契約
 status: accepted
 created: 2026-06-21
-updated: 2026-08-23
+updated: 2026-09-02
 ---
 <!-- ADF-COVERS(implementation): REQ-002-033, REQ-002-034 -->
 <!-- ADF-COVERS(implementation): REQ-003-001, REQ-003-002, REQ-003-003, REQ-003-004, REQ-003-006, REQ-003-011, REQ-003-012, REQ-003-014, REQ-003-020 -->
@@ -80,6 +80,8 @@ delegation_type は参考分類であり、Command 本文での使用は任意�
 
 ※ step_execution の委譲起動手段（起動方法、実行制御パラメータ）は harness の責務として AGENTS.md および references/<harness>.md に配置する（REQ-002-002）。
 委譲起動不能時は `delegation-unavailable` 状態として報告し、インラインフォールバックは harness 固有の実行制御として配布 Design から除外する（REQ-002-004）。
+
+GitHub I/O を伴う委譲の Custom Tool 経路: 委譲先サブエージェントは GitHub Issue / PR 操作を Custom Tool（`agentdev_gh`）の操作契約経由で実行する。driver 経由で委譲された場合も同じ経路であり、起動手段（driver、実行制御パラメータ）の差異を Tool 操作契約の利用方式に反映しない。生 gh コマンドの直接実行（WRITE）は正規経路としない（custom-tool-contracts Design「迂回防止」）。
 
 ## 委譲制約
 

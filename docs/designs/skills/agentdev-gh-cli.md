@@ -2,7 +2,7 @@
 title: `agentdev-gh-cli` Design
 status: accepted
 created: "2026-08-15"
-updated: "2026-08-18"
+updated: "2026-09-02"
 ---
 <!-- ADF-COVERS(implementation): REQ-011-001, REQ-011-003, REQ-011-004, REQ-011-005, REQ-011-009, REQ-011-013, REQ-011-015 -->
 <!-- ADF-COVERS(implementation): REQ-011-001, REQ-011-002, REQ-011-003, REQ-011-004, REQ-011-005, REQ-011-008, REQ-011-009, REQ-011-013, REQ-011-014, REQ-011-015 -->
@@ -17,7 +17,8 @@ command と skill は GitHub CLI（gh）コマンドを直接記述せず、Cust
 
 ## 責務定義
 
-`agentdev-gh-cli` は GitHub Issue / PR に対する I/O 手続きと VERIFY を担当する（REQ-011, DEC-004 decision #2）。
+gh CLI 手続きの実行主体は Custom Tool `agentdev_gh` であり、実装詳細（gh CLI フラグ、エンコーディング制御、一時ファイル扱い）は Tool 内部に隠蔽される（REQ-011、custom-tool-contracts Design）。
+`agentdev-gh-cli`（本 skill の Design）は GitHub Issue / PR に対する I/O 手続きと VERIFY の安全手順を Design として所有する参照点であり、手続きのみを提供し判断基準は持たない（REQ-011, DEC-004 decision #2）。
 本文生成、完了判定、Epic 依存判定、capture 分類は担当しない。
 これらは domain skill の責務である。
 

@@ -2,7 +2,7 @@
 title: 整合性契約
 status: accepted
 created: 2026-08-20
-updated: 2026-08-23
+updated: 2026-09-02
 ---
 <!-- ADF-COVERS(implementation): REQ-010-006 -->
 <!-- ADF-COVERS(implementation): REQ-036-022 -->
@@ -37,7 +37,7 @@ updated: 2026-08-23
 | integrity-rule-gap | 検査ルール自体の欠落 | observation |
 
 > **REQ/Design 境界違反**: 現行 REQ 要件行の主たる文意が Design 詳細（スキーマフィールド、enum 値一覧、テストデータ詳細、チェッカー個別ルール、誤検知抑制方式、Step 番号、Phase 番号、内部アルゴリズム、作業履歴）である場合は canonical-conflict のサブカテゴリとして扱い、IR-044 で heuristic 検出する。
-> REQ-001-069 の安定契約例外（公開コマンド名、公開入口、ドメイン状態位置づけ、他コマンド接続契約、利用者可視分類体系、安全境界、停止条件の大枠、後続工程が依存する安定した外部契約）に該当する要約残留は検出対象外とする。
+> REQ-001-068 の安定契約例外（公開コマンド名、公開入口、ドメイン状態位置づけ、他コマンド接続契約、利用者可視分類体系、安全境界、停止条件の大枠、後続工程が依存する安定した外部契約）に該当する要約残留は検出対象外とする。
 
 ## 検出事項経路マップ（Finding Route Map）
 
@@ -75,7 +75,7 @@ updated: 2026-08-23
 | CommandLocalTemplate | command-local template 存在、整合性検査 |
 | SkillSpecDependency | 実行時スキルから docs/designs/ への直接依存検出 |
 | RetiredAdrCitation | 廃止 ADR への現行根拠引用検出（REQ-001-048, heuristic/observation） |
-| ReqSpecBoundary | 現行 REQ 要件行への Design 詳細混入検出（REQ-001-067〜069。IR-044 としてカタログ定義。REQ-001-069 安定契約例外は対象外） |
+| ReqSpecBoundary | 現行 REQ 要件行への Design 詳細混入検出（REQ-001-067、REQ-001-068。IR-044 としてカタログ定義。REQ-001-068 安定契約例外は対象外） |
 
 ## レポート形式（Report Format）
 
@@ -525,7 +525,7 @@ install 後も配置先が欠落する場合は NG とする。
 
 archive 生成: `scripts/self/release/package-release-archive.ps1`（原本 `src/opencode/` 配下を junction 解決済み実ファイルとして ZIP へ格納）。
 出力は `dist/agentdev-release-<commit-short>.zip`。
-archive 内レイアウトは `agentdev-release-<sha>/` ルートの下に `src/opencode/commands/agentdev/**`、`src/opencode/skills/agentdev-*/**`、`src/opencode/skills/japanese-tech-writing/**`、`scripts/install.ps1`（archive 版。原本 `scripts/consumer/archive/install.ps1` を投影名 `scripts/install.ps1` として格納）、`README-INSTALL.md` を格納する。
+archive 内レイアウトは `agentdev-release-<sha>/` ルートの下に `src/opencode/commands/agentdev/**`、`src/opencode/skills/agentdev-*/**`、`scripts/install.ps1`（archive 版。原本 `scripts/consumer/archive/install.ps1` を投影名 `scripts/install.ps1` として格納）、`README-INSTALL.md` を格納する。third-party Skill（japanese-tech-writing 等）の本体は release archive へ含めず、利用者環境では宣言（skills.yaml）と取得機構経由で配置する（REQ-002-043、third-party-skill-management Design）。
 
 | 実行結果 | exit code |
 |---|---|
@@ -533,7 +533,7 @@ archive 内レイアウトは `agentdev-release-<sha>/` ルートの下に `src/
 | 原本欠落・必須ファイル不在 | 2 |
 | 既存 dist 上書き検出（`-Force` 無し） | 3 |
 
-archive 展開・install: archive 版 `scripts/install.ps1 -Source <src/opencode> -Target <.opencode> -Mode copy` が実ファイルを `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`、`.opencode/skills/japanese-tech-writing/` 配下へ配置する（原本は `scripts/consumer/archive/install.ps1`）。
+archive 展開・install: archive 版 `scripts/install.ps1 -Source <src/opencode> -Target <.opencode> -Mode copy` が実ファイルを `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/` 配下へ配置する（原本は `scripts/consumer/archive/install.ps1`）。third-party Skill の配置は本 install の対象外であり、third-party 取得機構（skills.yaml 宣言に基づく取得）が `.opencode/skills/<name>/` へ配置する（REQ-002-043）。
 junction は作成しない。
 
 | 実行結果 | exit code |

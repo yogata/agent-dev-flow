@@ -2,14 +2,14 @@
 title: REQ 影響マップ
 status: accepted
 created: 2026-08-20
-updated: 2026-06-28
+updated: 2026-09-02
 ---
 
 # REQ 影響マップ
 
 > **位置づけと rule-ownership.md との関係**: 本ファイルは **REQ → 影響するルール/アーティファクト** の対応表である。
 > `../integrity/rule-ownership.md`（**ルールドメイン → canonical REQ/Design**）と逆方向の対応マップであり、両者は補完関係にある。
-> 配置は `responsibilities/` 残置とする（移動は参照方向、利用頻度、更新責務を確認した後に別途判断）。
+> 配置の正本は本ファイル（`docs/designs/responsibilities/req-impact-map.md`）であり、`responsibilities/` 残置を現行配置として確定する。他文書（rule-ownership.md 等）は本行への参照導線として整合する。
 
 ### 同期更新が必要なケース
 
@@ -19,6 +19,8 @@ updated: 2026-06-28
 - IR の物理削除時（AG-008、REQ-028-008）: 両ファイルで対応行を削除し、本ファイルの `## Retired cross-references` 節へ交叉参照を再配置する
 - canonical owner 変更時: 両ファイルで参照先を更新する
 - 新規 REQ 追加、廃止時: 本ファイルの対応行を追加、削除し、影響先ルールドメインと rule-ownership.md の整合を確認する
+
+両ファイルの同期は手動の双方向管理であり、自動同期機構を持たない。両ファイルの更新は同一 PR で行うことを基準とし、片側のみの更新を残さない。
 
 各現行 REQ が影響する整合性ルールとアーティファクトを記載するマップ（REQ-010-011）。
 10 以上の現行 REQ をカバーする。

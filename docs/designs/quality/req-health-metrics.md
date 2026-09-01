@@ -2,14 +2,14 @@
 title: REQ 健全性メトリクス
 status: accepted
 created: 2026-08-20
-updated: 2026-07-24
+updated: 2026-09-02
 ---
 <!-- ADF-COVERS(implementation): REQ-001-044 -->
 
 # REQ 健全性メトリクス
 
 REQ の肥大化、関心ズレを定量的に検出するための閾値を定義する（REQ-001-040）。
-`req-define` の Step 3（既存 REQ 照合）、Step 10-2（統合/分離判定）、`inspect-docs`、`agentdev-req-structure-diagnostics` スキルが本 Design を参照して SPLIT 予兆を判定する。
+`req-define` の既存 REQ 照合、統合/分離判定、`inspect-docs`、`agentdev-req-structure-diagnostics` スキルが本 Design を参照して SPLIT 予兆を判定する。
 
 ## 適用範囲
 
@@ -68,11 +68,11 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 `agentdev-req-structure-diagnostics` スキルの Design 分離基準違反シグナル（`req-structure-review.md`「Design 分離基準違反検出」）は、1 シグナルでも検出された場合 SPLIT シグナル +1 として扱う。
 これは要件行数、関心分類数とは独立に加算する。
 
-安定契約例外（REQ-001-069、`document-model.md`「安定契約の例外」）に該当する要件行は、Design 分離基準違反の検出対象外とする。
+安定契約例外（REQ-001-068、`document-model.md`「安定契約の例外」）に該当する要件行は、Design 分離基準違反の検出対象外とする。
 
 ## 推奨アクションへの対応付け
 
-合算した SPLIT シグナル数に基づき、`req-define` Step 10-2 と `agentdev-req-structure-diagnostics` が推奨アクションを提示する:
+合算した SPLIT シグナル数に基づき、`req-define` の統合/分離判定と `agentdev-req-structure-diagnostics` が推奨アクションを提示する:
 
 | SPLIT シグナル合計 | 推奨アクション | req-define での扱い |
 |---|---|---|
@@ -91,13 +91,13 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 <!-- AUTOGEN:BEGIN:id=req-metrics-measurement-example -->
 | REQ | 要件行数 | 行数シグナル | 備考 |
 |---|---|---|---|
-| REQ-001 | 61 | +1 |  |
+| REQ-001 | 64 | +1 |  |
 | REQ-008 | 58 | +1 |  |
 | REQ-003 | 56 | +1 |  |
 | REQ-004 | 54 | +1 |  |
 | REQ-009 | 50 | +0 |  |
 | REQ-034 | 43 | +0 |  |
-| REQ-002 | 35 | +0 |  |
+| REQ-002 | 37 | +0 |  |
 | REQ-043 | 30 | +0 |  |
 | REQ-005 | 28 | +0 |  |
 | REQ-012 | 26 | +0 |  |
@@ -106,6 +106,7 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 | REQ-031 | 24 | +0 |  |
 | REQ-036 | 24 | +0 |  |
 | REQ-032 | 22 | +0 |  |
+| REQ-057 | 22 | +0 |  |
 | REQ-030 | 21 | +0 |  |
 | REQ-048 | 21 | +0 |  |
 | REQ-049 | 19 | +0 |  |
@@ -119,6 +120,7 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 | REQ-035 | 12 | +0 |  |
 | REQ-042 | 12 | +0 |  |
 | REQ-052 | 11 | +0 |  |
+| REQ-056 | 11 | +0 |  |
 | REQ-016 | 10 | +0 |  |
 | REQ-037 | 10 | +0 |  |
 | REQ-007 | 9 | +0 |  |
@@ -128,23 +130,25 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 | REQ-047 | 8 | +0 |  |
 | REQ-051 | 8 | +0 |  |
 | REQ-006 | 6 | +0 |  |
+| REQ-039 | 6 | +0 |  |
 | REQ-033 | 5 | +0 |  |
 | REQ-038 | 5 | +0 |  |
-| REQ-039 | 5 | +0 |  |
 | REQ-044 | 5 | +0 |  |
 | REQ-027 | 3 | +0 |  |
+| REQ-054 | 3 | +0 |  |
 | REQ-018 | 2 | +0 |  |
 | REQ-019 | 2 | +0 |  |
+| REQ-055 | 2 | +0 |  |
 
-計測日: 2026-08-30。
+計測日: 2026-09-02。
 <!-- AUTOGEN:END -->
 
 要件行数は要件テーブル行のみをカウント（目的、適用範囲セクションの散文は除外）。
 
 ## 他 Design、スキルとの関係
 
-- **`document-model.md` Design 分離基準（REQ-001-068）**: Design 分離基準違反シグナルの判定基準。本 Design は閾値とシグナル加算のみを定義し、Design 分離の判定本体は `document-model.md` に従う
-- **`document-model.md` 安定契約の例外（REQ-001-069）**: 安定契約例外の定義。本 Design の Design 分離基準違反検出はこの例外を尊重する
+- **`document-model.md` Design 分離基準（REQ-001-067）**: Design 分離基準違反シグナルの判定基準。本 Design は閾値とシグナル加算のみを定義し、Design 分離の判定本体は `document-model.md` に従う
+- **`document-model.md` 安定契約の例外（REQ-001-068）**: 安定契約例外の定義。本 Design の Design 分離基準違反検出はこの例外を尊重する
 - **`agentdev-req-structure-diagnostics` スキル `req-structure-review.md`**: 6 観点診断（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）と Design 分離基準違反の 9 シグナル定義。本 Design の閾値はこのスキルの SPLIT 観点の入力
 - **`req-impact-map.md`**: アーティファクト種別数の計測に使用する「影響するアーティファクト」列
 - **`integrity-rule-catalog.md` IR-044**: REQ/Design 境界違反検出。本 Design の Design 分離基準違反シグナルと連動する
@@ -153,7 +157,7 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 
 本 Design は閾値の定義のみを提供し、計測、判定の実装は以下が担う:
 
-- **req-define Step 3/10-2**: ドラフト段階で SPLIT シグナルを計算し `draft-meta.split-forecast` に記録（REQ-001-011）
+- **req-define の既存 REQ 照合・統合/分離判定**: ドラフト段階で SPLIT シグナルを計算し `draft-meta.split-forecast` に記録（REQ-001-011）
 - **agentdev-req-structure-diagnostics スキル**: 既存 REQ の健全性診断で本 Design の閾値を適用
 - **生成スクリプト**（`.opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts`）: 本 Design の「現行 REQ の計測例（参照値）」テーブルを実ファイルから再生成する（SC-002）。定期実行を前提とし、計測結果を実ファイルの最新状態に追従させる
 
@@ -162,22 +166,22 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 
 ## REQ 横断診断
 
-REQ 健全性診断は行数・関心数に加え、ステークホルダー視点（REQ-001-079）と Design 分離基準（REQ-001-068）に基づく次の検出パターンを追加する（REQ-036-009、REQ-001）。
+REQ 健全性診断は行数・関心数に加え、ステークホルダー視点（REQ-001-048）と Design 分離基準（REQ-001-067）に基づく次の検出パターンを追加する（REQ-036-009、REQ-001）。
 
 ### 検出パターン
 
 | パターン | 内容 | SPLIT シグナル計算への反映 |
 |---|---|---|
-| ステークホルダー不在要件 | 主語がステークホルダーでなく内部成果物、または要求元ステークホルダーが不明（REQ-001-079 違反） | Design 分離基準違反シグナルと同様に +1 |
+| ステークホルダー不在要件 | 主語がステークホルダーでなく内部成果物、または要求元ステークホルダーが不明（REQ-001-048 違反） | Design 分離基準違反シグナルと同様に +1 |
 | 内部成果物主語要件 | 内部成果物（command、skill、script、ファイル）だけを主語とする要件 | +1 |
-| パラメータ主題要件 | パス、フィールド、enum、閾値、内部アルゴリズムを主題とする要件（REQ-001-068 Design 分離基準違反） | Design 分離基準違反シグナルとして既存 +1 |
+| パラメータ主題要件 | パス、フィールド、enum、閾値、内部アルゴリズムを主題とする要件（REQ-001-067 Design 分離基準違反） | Design 分離基準違反シグナルとして既存 +1 |
 | 作業履歴主題要件 | 作業履歴または是正結果を主題とする要件 | +1 |
 | 要件行なしREQ | 要件テーブルが空、または目的・適用範囲のみで要件行を持たない現行 REQ | 計測不能として警告（シグナル加算対象外） |
 
 ### 安定契約例外の扱い
 
-安定契約例外（REQ-001-069）に該当する要件行は、上記検出パターンの対象外とする。
-例外該当判定は REQ-001-069 の安定契約一覧（公開 command 名、公開入口、ドメイン状態の位置づけ、他 command との接続契約、利用者に見える分類体系、安全境界、停止条件の大枠、後続工程が依存する安定した外部契約）に従う。
+安定契約例外（REQ-001-068）に該当する要件行は、上記検出パターンの対象外とする。
+例外該当判定は REQ-001-068 の安定契約一覧（公開 command 名、公開入口、ドメイン状態の位置づけ、他 command との接続契約、利用者に見える分類体系、安全境界、停止条件の大枠、後続工程が依存する安定した外部契約）に従う。
 
 ### 機械化境界
 

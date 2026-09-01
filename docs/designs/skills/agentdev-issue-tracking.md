@@ -2,7 +2,7 @@
 title: `agentdev-issue-tracking` Design
 status: accepted
 created: 2026-08-23
-updated: 2026-08-25
+updated: 2026-09-02
 ---
 <!-- ADF-COVERS(implementation): REQ-049-001, REQ-049-002, REQ-049-003, REQ-049-005, REQ-049-006, REQ-049-007, REQ-049-008, REQ-049-012, REQ-049-013, REQ-049-014, REQ-049-017, REQ-049-018 -->
 
@@ -10,7 +10,7 @@ updated: 2026-08-25
 
 追跡Issue管理 Capability Skill `agentdev-issue-tracking` の Design。
 
-本 Design は追跡Issueの論理スキーマの一元管理先であり、GitHub Issue を追跡Issue（tracking）と Case Issue（case）の共通管理単位として運用するための意味論を所有する（REQ-049、DEC-020）。物理的な GitHub / ローカル I/O 手続きは所有しない（Tool 操作契約、REQ-011）。
+本 Design は追跡Issueの論理スキーマの一元管理先であり、GitHub Issue を追跡Issue（tracking）と Case Issue（case）の共通管理単位として運用するための意味論を所有する（REQ-049）。物理的な GitHub / ローカル I/O 手続きは所有しない（Tool 操作契約、REQ-011）。
 
 - 論理スキーマ: role、kind、状態と状態遷移、件名、内容、背景、影響、関連成果物、選択肢、判断材料、不足情報、owner・期限・優先度等の任意メタデータ、保留理由、再評価条件、解決結論、反映先と反映状態、追跡Issueと Case Issue の関連。
 - 物理マッピング表: role、kind、状態とラベル、Issue Type、Issue Field 等の物理値の対応表。正は本 Design が所有し、機械適用は Tool 内実装が行う。

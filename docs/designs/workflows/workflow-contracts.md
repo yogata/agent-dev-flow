@@ -2,13 +2,14 @@
 title: ワークフロー契約（横断）
 status: accepted
 created: 2026-06-21
-updated: 2026-08-23
+updated: 2026-09-02
 ---
 <!-- ADF-COVERS(implementation): REQ-003-021, REQ-003-022, REQ-003-023, REQ-003-055, REQ-003-056 -->
 <!-- ADF-COVERS(implementation): REQ-005-001, REQ-005-002, REQ-005-003, REQ-005-004, REQ-005-025, REQ-005-026, REQ-005-027, REQ-005-028 -->
 <!-- ADF-COVERS(implementation): REQ-014-012 -->
 <!-- ADF-COVERS(implementation): REQ-048-007, REQ-048-008, REQ-048-009, REQ-048-010, REQ-048-011 -->
 <!-- ADF-COVERS(implementation): REQ-048-001, REQ-048-002, REQ-048-003, REQ-048-004, REQ-048-005, REQ-048-006, REQ-048-021 -->
+<!-- ADF-COVERS(implementation): REQ-048-012, REQ-048-013, REQ-048-014 -->
 
 # ワークフロー契約（横断）
 
@@ -32,7 +33,7 @@ AgentDevFlow は 3 つのパイプラインで構成される:
 
 ## コマンド分類
 
-AgentDevFlow の公開コマンドは以下の5分類のいずれかに属する（REQ-005-048）。
+AgentDevFlow の公開コマンドは以下の5分類のいずれかに属する（REQ-005）。
 
 | 分類 | コマンド | 目的 |
 |---|---|---|
@@ -75,8 +76,14 @@ AgentDevFlow の公開コマンドは以下の5分類のいずれかに属する
 
 ### ワークフロー状態管理
 
-ワークフロー状態（例: "要件定義", "実装", "テスト" 等）は Issue ラベル、GitHub Project で管理する（REQ-001-037）。
+ワークフロー状態（例: "要件定義", "実装", "テスト" 等）は Issue ラベル、GitHub Project で管理する（REQ-002-035）。
 REQ/Design 文書内には状態として埋め込まず、上記マイクロフェーズは説明目的でのみ使用する。
+
+### source / projection 参照確認の工程契約
+
+各工程における成果物参照は、実行目的に応じて正規原本（source）を確認すべき場合、実行時投影（projection）を確認すべき場合、双方の整合確認が必要な場合を判別して行う。「常に source のみ」「常に projection のみ」のような固定ルールとしない（REQ-048-012）。
+工程間の文脈引き継ぎ等を利用して、当該作業で使用すべき解決済み参照先を後工程へ渡せる（REQ-048-013）。
+source / projection 双方の確認が品質保証上必要な場合は、その確認を維持する。source / projection 責務境界自体の変更が必要となった場合は、当該要件の暗黙事項として扱わず、正規の設計判断を行う（REQ-048-014）。
 
 ## SSoT 遷移規則
 

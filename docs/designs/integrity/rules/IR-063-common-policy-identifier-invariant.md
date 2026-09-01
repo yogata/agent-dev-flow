@@ -2,7 +2,7 @@
 title: "IR-063: common-policy-identifier-invariant"
 status: accepted
 created: 2026-08-22
-updated: 2026-08-24
+updated: 2026-09-02
 ---
 
 # IR-063: common-policy-identifier-invariant
@@ -41,7 +41,7 @@ updated: 2026-08-24
 
 ## 前身検査（Gxx 連番検査）の廃止
 
-本ルールは、公開 command のガードレール番号（Gxx）不変量検査（開始番号の起点固定・欠番なし・重複なし・未定義参照、Issue #2372、REQ-010-064 旧文）を置換したものである。旧検査の既知違反 14 command 分（140 検出、NG baseline provenance `issue-2372-ir063-initial-baseline`）は、連番制度の廃止（REQ-051、DEC-022 決定7）に伴う配布物の記述移管の完了をもって baseline から削除した。旧検査の識別子引用（REQ-046-006、REQ-010-064）は置換済みの現行要件行を指す。
+本ルールは、公開 command のガードレール番号（Gxx）不変量検査（開始番号の起点固定・欠番なし・重複なし・未定義参照、Issue #2372、REQ-010-064 旧文）を置換したものである。旧検査の既知違反 14 command 分（140 検出、NG baseline provenance `issue-2372-ir063-initial-baseline`）は、連番制度の廃止（REQ-051）に伴う配布物の記述移管の完了をもって baseline から削除した。旧検査の識別子引用（REQ-046-006、REQ-010-064）は置換済みの現行要件行を指す。
 
 ## exemption（検出対象外）
 

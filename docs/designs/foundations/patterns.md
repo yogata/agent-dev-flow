@@ -2,15 +2,13 @@
 title: 文書フォーマット規約
 status: accepted
 created: 2026-08-20
-updated: 2026-09-01
+updated: 2026-09-02
 ---
 <!-- ADF-COVERS(implementation): REQ-001-008, REQ-001-010, REQ-001-011, REQ-001-012, REQ-001-013, REQ-001-014, REQ-001-015, REQ-001-016, REQ-001-030, REQ-001-046, REQ-001-047 -->
 
 # 文書フォーマット規約
 
 > **正本としての位置づけ**: 本 Design が共通文書モデル規約（frontmatter、ID 体系、命名規則、URL 参照形式、共通フォーマット規約）の正本である。
-> 本文構造、見出し構成、Step 表現、記述形式等の執筆規約寄り内容は `../authoring/` ドメイン（現在は `command-file-format.md` のみ）への移管候補とする。
-> 実移管の判断は case-run で行い、本 Design からの一括移送は行わない。
 
 ## コマンド frontmatter 規約
 
@@ -78,6 +76,8 @@ Knowledge 文書（docs/knowledge/ 配下、REQ-056）の frontmatter は以下�
 Knowledge 文書は固定 ID 採番を持たず、ファイル名 slug（kebab-case）が識別子となる。
 本体の必須セクションは知識内容、適用条件、適用対象、根拠、関連知識の5項目とする（REQ-056）。
 Knowledge 文書は独立文書種別であり、REQ・Decision・Design への ADF-COVERS 宣言を持たない。
+
+knowledge 見出し一致の機械判定形式: 必須セクションの存在は、Markdown 見出し行（`#`〜`######`）の見出しテキストと必須セクション名（知識内容、適用条件、適用対象、根拠、関連知識）との trim 後の完全一致で判定する。見出しとセクション名の意味一致は判定対象に含まらず、検査は構造面（配置、ファイル名命名、必須見出しの存在）に限定される。
 
 ## REQ 分類規約
 

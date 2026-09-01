@@ -2,7 +2,7 @@
 title: "IR-044: REQ/Design 境界違反検出"
 status: accepted
 created: 2026-08-20
-updated: 2026-06-28
+updated: 2026-09-02
 ---
 
 # IR-044: REQ/Design 境界違反検出
@@ -10,12 +10,12 @@ updated: 2026-06-28
 | Field | Value |
 |-------|-------|
 | rule_id | IR-044 |
-| description | 現行 REQ 要件行の主たる文意がスキーマフィールド、enum 値一覧、テストデータ詳細（fixture detail）、チェッカー個別ルール、誤検知（false positive）抑制方式、Step 番号直接参照、Phase 番号、内部アルゴリズム、具体的な作業履歴のいずれかである場合、当該 Design 詳細の混入を検出すること（REQ-001-067〜069, REQ-001-031）。Step 番号直接参照は現行 REQ の記述制約（REQ-001-031）に違反する Design 詳細混入の代表例であり、検出シグナル、exemption 条件の詳細は下位セクション「IR-044 Step 番号直接参照検出」に配置する。exemption は META 規則行（機械的行構造マッチ）のみとし、文脈解釈を要する免除は inspect-docs へ委譲する（REQ-010-002, REQ-010-012）。詳細は下位セクション「IR-044 exemption 条件」 |
+| description | 現行 REQ 要件行の主たる文意がスキーマフィールド、enum 値一覧、テストデータ詳細（fixture detail）、チェッカー個別ルール、誤検知（false positive）抑制方式、Step 番号直接参照、Phase 番号、内部アルゴリズム、具体的な作業履歴のいずれかである場合、当該 Design 詳細の混入を検出すること（REQ-001-002、REQ-001-003、REQ-001-067、REQ-001-068, REQ-001-031）。Step 番号直接参照は現行 REQ の記述制約（REQ-001-031）に違反する Design 詳細混入の代表例であり、検出シグナル、exemption 条件の詳細は下位セクション「IR-044 Step 番号直接参照検出」に配置する。exemption は META 規則行（機械的行構造マッチ）のみとし、文脈解釈を要する免除は inspect-docs へ委譲する（REQ-010-002, REQ-010-012）。詳細は下位セクション「IR-044 exemption 条件」 |
 | severity | heuristic |
 | category | canonical-conflict |
 | detection_method | 現行 REQ 要件行から Design 詳細キーワード（スキーマ、enum、テストデータ、チェッカー個別ルール、FP 抑制、Step 番号直接参照、Phase 番号、内部アルゴリズム、作業履歴）をパターンマッチで検出。Step 番号直接参照は `Step N`、`ステップ N`、`手順 N`（N は数字、範囲表現 `N-M` 含む）の正規表現パターンで検出する（実装: `check_integrity.ts` の `IR044_SIGNAL_PATTERNS` Step number エントリ）。検出後、META 規則行 exemption（REQ-NNNN-MMM 形式 + enum/format 等の列挙パターンを行構造で機械判定、REQ-010-012）のみを適用する。文脈解釈を要する免除（否定文脈、委譲文脈、メタスコープルール文脈、振る舞い述語文脈、安定契約パターン）は実施せず inspect-docs へ委譲する（REQ-010-002） |
 | affected_artifacts | [現行 REQ] |
-| related_req | [REQ-001-067, REQ-001-068, REQ-001-069, REQ-010-002, REQ-010-012, REQ-001-031] |
+| related_req | [REQ-001-002, REQ-001-003, REQ-001-067, REQ-001-068, REQ-010-002, REQ-010-012, REQ-001-031] |
 | related_design | [integrity-contracts.md, document-model.md] |
 | gate_level | full-audit |
 | false_positive_risk | 高。文脈解釈を要する免除（否定文脈、委譲文脈、メタスコープルール文脈、振る舞い述語文脈、安定契約パターン）は docs-check では実施せず inspect-docs へ委譲したため（REQ-010-002）、純粋なパターンマッチの false positive は inspect-docs での意味的再評価で事後処理する。META 規則行 exemption は行構造の機械判定に限定し、件数・内容を規定する Design 詳細列挙行は免除しない（REQ-010-012）。Step 番号直接参照パターンは数字を伴わない「Step 番号」「ステップ番号」語句を検出対象とせず、REQ-001-031 自身（原則宣言の META 規則行）を誤検知しない。これは語句「番号」と数字リテラルの機械的区別により保証し、文脈免除には依存しない。既知の true positive が META exemption により誤って免除されないことを回帰テストで検証する |
@@ -40,8 +40,8 @@ REQ/Design 責務範囲を規定する META 規則行（enum/format/schema 等 D
 
 | パターン | 判定根拠 | 適用例（#1335 で META 規則行と確定した REQ） |
 |---------|---------|----------------------------------------------|
-| Design への切り出し・配置・混入排除宣言 | `切り出し`/`配置する対象`/`混入させない` 等、Design 詳細の配置先を規定する行 | REQ-001-055（切り出す基準）、REQ-001-068（配置する対象）、REQ-010-001（混入させない） |
-| REQ/Design 定義構造 | `REQ は X、Design は Y` の文書種別定義行 | REQ-001-067（REQ/Design 文書種別定義の正規形） |
+| Design への切り出し・配置・混入排除宣言 | `切り出し`/`配置する対象`/`混入させない` 等、Design 詳細の配置先を規定する行 | REQ-001-055（切り出す基準）、REQ-001-067（配置する対象）、REQ-010-001（混入させない） |
+| REQ/Design 定義構造 | `REQ は X、Design は Y` の文書種別定義行 | REQ-001-002、REQ-001-003（REQ/Design 文書種別定義の正規形） |
 | 文書種別・境界・exemption のメタ言語 | `文書種別`/`境界を定義`/`exemption 対象` 等のメタ規定行 | REQ-010-012（META 規則行 exemption の定義行自身） |
 | Design / catalog / reference への委譲 | `委譲` + 委譲先 Design 系キーワード（Design/catalog/reference）を含む行 | REQ-010-001（checker 個別ルールを Design/catalog/reference へ委譲） |
 
@@ -61,7 +61,7 @@ docs-check 側での機械免除は行わない（REQ-010-002 準拠）。
 | isDelegationContext（委譲文脈: 「委譲先」「切り出し先」等） | inspect-docs | 文脈解釈を要する |
 | isMetaScopeRuleContext（メタスコープルール文脈の意味判断範囲） | inspect-docs | 意味判断を要する範囲は META 規則行の機械判定を超える |
 | isBehaviorPredicateContext（振る舞い述語文脈） | inspect-docs | 存在・状態述語の意味判断を要する |
-| IR044_STABLE_CONTRACT_PATTERN（安定契約例外 REQ-001-069） | inspect-docs | 安定契約判定は意味判断を要する |
+| IR044_STABLE_CONTRACT_PATTERN（安定契約例外 REQ-001-068） | inspect-docs | 安定契約判定は意味判断を要する |
 | v2:REQ-0140-028（要件行の操作主体明示ルール中の enum 定義例示） | inspect-docs | 文書品質ゲートの執筆規約行であり、enum は不要Caseの例示。主たる文意は Design 詳細ではなく執筆規約。意味判断で false positive 確定（#1335） |
 | REQ-010-009（システム挙動要件中の copyScripts / fixture drift） | inspect-docs | 主たる文意は自動検出仕組みの提供（外部契約）。copyScripts は実装参照、fixture はドメイン概念。意味判断で false positive 確定（#1335） |
 
@@ -74,7 +74,7 @@ docs-check 側での機械免除は行わない（REQ-010-002 準拠）。
 当該 REQ は Design 詳細を残留させないため META 規則行 exemption の誤免除検証の根拠とならない。
 保護対象の真陽性は、件数・内容を規定する Design 詳細の残留実例に限定する。
 この明記により RU-0011（検出ロジック改良）実施前に同箇所を根拠としたテスト設計の前提崩壊を防ぐ。
-REQ-004-070、REQ-003-007 は Step 番号直接参照から機能名・フェーズ名参照へ是正済みであり、真陽性保護対象から除外する。
+REQ-001-049（旧番号 REQ-004-070）、REQ-003-007 は Step 番号直接参照から機能名・フェーズ名参照へ是正済みであり、真陽性保護対象から除外する。
 当該 REQ は Step 番号直接参照を残留させないため、Step 番号検出の回帰テスト根拠とならない（REQ-001-031 の case-open 由来）。
 true positive として新たに分類し Design 詳細を切り出した件は、対象 REQ-ID、切り出し先 Design、command reference または skill reference の区別、是正根拠 PR 番号を本欄へ追記し、保護対象から除外する（REQ-036-005 準拠）。
 #1335（RU-0011）で true positive に分類し是正した件: fixture copy のミラーリング実装詳細（Design `integrity-rule-catalog.md`「regression test fixture mirroring 方式」へ切り出し、REQ 側は外部契約の要約へ置換）、REQ-006-099（Step 番号直接参照 `Step 1-5, 7-8`/`Step 6` をフェーズ名参照へ置換、REQ-001-031 準拠）、REQ-036-004（テストファイルパス `scripts/tests/check_integrity.test.ts`/`scripts/check_integrity.test.ts` を Design `integrity-rule-catalog.md`「check_integrity test suite 責務分担」へ切り出し済み、REQ 側は外部契約の要約へ置換）。

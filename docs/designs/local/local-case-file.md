@@ -2,7 +2,7 @@
 title: ローカルIssue共通スキーマ
 status: accepted
 created: 2026-06-20
-updated: 2026-08-25
+updated: 2026-09-02
 ---
 <!-- ADF-COVERS(implementation): REQ-009-014, REQ-009-026, REQ-009-027, REQ-009-028, REQ-009-029, REQ-009-030, REQ-009-031, REQ-009-032, REQ-009-033, REQ-009-034, REQ-009-037, REQ-009-039 -->
 <!-- ADF-COVERS(implementation): REQ-011-007 -->
@@ -172,8 +172,9 @@ case-schema 機械可読定義の更新方針: `src/opencode-local/agentdev-gh-c
 - `/agentdev/issue`: 追跡Issue操作を role: tracking のローカルIssueへ Tool 操作契約経由で実行する
 - GitHub Issue 作成、PR 作成、PR 取り込み、Issue クローズおよび `gh issue` / `gh pr` をローカル版の必須操作にしない
 
+runner-local 固有の前提と差分（REQ-011-006）: ローカル版の Tool 操作は、同一の操作契約で Case ファイル読み書きを実装した Local 実装 Tool 経由で実行する。GitHub 環境の存在を前提とせず、GitHub 版との差分は上記の物理写像への集約に限られる。操作順序、読み戻し検証（VERIFY）契約、失敗時動作は GitHub 版と同一である。
+
 ## 関連項目
 
-- **関連 Decision**: DEC-020（GitHub Issue 共通管理単位の採用）
-- **関連 REQ**: REQ-009（ローカル版導入方式とローカルIssue運用）、REQ-049（追跡Issue管理機構）
+- **関連 REQ**: REQ-009（ローカル版導入方式とローカルIssue運用）、REQ-049（追跡Issue管理機構）、REQ-011-006（Custom Tool の Local 実装差し替え）
 - **関連 Design**: agentdev-issue-tracking.md（role、kind、状態の意味論の正）、custom-tool-contracts.md（Tool 操作契約）、runtime-package-boundary.md

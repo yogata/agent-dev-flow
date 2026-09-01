@@ -2,7 +2,7 @@
 title: `agentdev-quality-gates` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-18
+updated: 2026-09-02
 ---
 <!-- ADF-COVERS(implementation): REQ-007-001, REQ-007-003, REQ-007-004, REQ-007-005 -->
 
@@ -71,12 +71,25 @@ artifact-specific quality control の投影検証を追加する。
 
 ## full integrity suite 合格基準（QG-4）における bun test 実行形態契約
 
-QG-4 の full integrity suite 実行における bun test の実行形態を次のとおり契約する。
+QG-4 の full integrity suite 実行における bun test の実行形態は、3 cwd 分割正規形とする。
+正規形の詳細定義は `agentdev-quality-gates` スキルの references/qg-4-final-acceptance.md「bun test フル suite 正規形（実行形態契約）」が所有し、本 Design は品質統制側の契約を所有する:
 
-- 実行手順には `./` prefix 付きの対象ディレクトリ明示指定を必須ステップとする（例: `bun test ./.opencode/skills/repo-agentdev-integrity/scripts/`）
+- ① integrity suite、② src 側 skill script テスト、③ repo ルート系 guard テスト（plugins・発行系等）の3分割実行とし、各実行の cwd はリポジトリルート（worktree root または main root）に統一する
+- 実行手順には `./` prefix 付きの対象ディレクトリ明示指定を必須ステップとする
+- 分割② の実行前に、`bun install --cwd src/opencode/skills/agentdev-project-extensions/scripts` による依存パッケージ前置を行う（node_modules は gitignore 対象のため worktree へ未伝播）
 - 実行結果の「Ran N tests across M files」の N/M 件数突合を必須ステップとする。直前実績と比較して件数が急減していないかの妥当性を検証する（固定値の期待値化は行わない）
-- PR 本文・検証手順の証拠記録へ実行 cwd と起動コマンド形式（prefix・パス指定を含む）を明記することを要求する
-- cwd 依存テストが混在するスイートは、カレントディレクトトリビアな実行（`bun test` 単体等）で代替しない運用注記を付す
+- cwd 依存テストが混在するスイートは、カレントディレクトリトリビアな実行（`bun test` 単体等）で代替しない運用注記を付す
+- QG-4 の適用正規形は tools/plugins テストを含む完全形である（B拡張）。plugins・発行系等の repo ルート直下テスト（分割③）を full suite の受理対象から除外しない
+
+QG-4 機械受理基準: フル suite の受理判断は、次の受理由件の記録が PR 本文に機械的に検証可能な形で存在することを満たす場合のみ pass とする。受理由件は記録の存在と形式で判定し、判定者による内容の裁量判断を含まない:
+
+1. 正規形実行の記録: 3 cwd 分割それぞれの起動コマンド（`./` prefix 付き、cwd はリポジトリルート）の実行記録
+2. 環境ラベルの記録: 実行環境、junction 伝播状態、依存パッケージ状態の3要素
+3. 件数突合の記録: 各分割実行の「Ran N tests across M files」件数
+4. fail 全件の由来分類: fail が 0 件、または全 fail に由来分類（既知欠陥、環境依存、当該変更起因）が付与され、由来不明が 0 件
+5. baseline 基準の明示: 由来判定が remediation 開始前の baseline commit 基準で行われたこと
+
+integrity suite のコマンド数期待値は、公開コマンド列挙からの導出（動的化）により実コマンド数と整合させ、固定期待値による恒常 fail を発生させない。期待値の導出には最小件数下限の検証を併設し、漏れ検出の意味を損なわない（REQ-057-011）。期待値の導出手段の実装は integrity suite 側の責務である。
 
 QG-4 の識別子中心評価の構造は維持する（固定値期待値化による脆化を行わない）。
 case-close / docs-check の full suite 実行手順と PR 本文テンプレート（Test Strategy 結果欄）への記録欄追加は case 実施側の適用とする。

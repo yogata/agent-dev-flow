@@ -2,7 +2,7 @@
 title: case-run Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-21
+updated: 2026-09-02
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-015, REQ-021-016, REQ-021-017, REQ-021-019, REQ-021-020, REQ-021-022 -->
@@ -94,7 +94,13 @@ Workflow Skill は単一 Issue 実行（single workflow）と Epic Wave 実行�
  - completed-pr: 実装完了、PR作成済み。PR番号を受け取りクリーンアップフェーズへ
  - blocked: 回答可能な blocker。詳細本文は Issue コメントに SSoT として記録済み
  - failed: repository context で回答不能な blocker。詳細本文は Issue コメントに構造化して記録済み
- - delegation-unavailable: 実行インフラが委譲を起動できなかった状態。実行未試行のため `pending` に戻す（REQ-002-004）
+  - delegation-unavailable: 実行インフラが委譲を起動できなかった状態。実行未試行のため `pending` に戻す（REQ-002-004）
+
+### case-run gate 意味論（前置 gate と最終 gate）
+
+- 前置 gate 群（委譲の STEP-S3 相当、子Issue ごとの Epic Wave 委譲にも同一契約で適用）: worktree precondition gate、QG-3 前置 staleness check、docs/** 変更時の targeted docs guard、配布依存境界 事前 gate、AUTOGEN 索引再生成 前置 gate（S3-6）を適用する。AUTOGEN 索引再生成 前置 gate は、PR 対象ファイルに AUTOGEN 生成対象文書（REQ、Decision、Design 実ファイル群）の変更を含む場合、AUTOGEN 索引の再生成を委譲に先行して強制する
+- 配布依存境界の最終変更経路 gate（S5-1）: result が `completed-pr` の場合、クリーンアップに進む前に、実装後の実際の worktree HEAD に対して最終 gate を行う（実行担当サブエージェントが追加した変更も含めて検査する）。本 gate は src 側（原本）と `.opencode` 側（投影）の双方反映検証を要求する
+- tmp 残存確認: 正常終了を前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないことをクリーンアップ工程で確認する。workflow 側で生成した `.agentdev/tmp/` 一時ファイルは当該実行内で削除し、Custom Tool 由来の一時ファイルは Tool が操作ごとに自動削除する
 
 ### Epic Wave 実行モード
 

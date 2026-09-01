@@ -2,7 +2,7 @@
 title: Workflow Skill Model
 status: accepted
 created: 2026-08-10
-updated: 2026-08-24
+updated: 2026-09-02
 ---
 <!-- ADF-COVERS(implementation): REQ-002-001, REQ-002-002, REQ-002-003, REQ-002-004, REQ-002-017, REQ-002-018, REQ-002-034 -->
 <!-- ADF-COVERS(implementation): REQ-027-001, REQ-027-002, REQ-027-003 -->
@@ -20,7 +20,7 @@ REQ-027 は境界宣言のみを持ち、本節が詳細実装を正規所有す
 
 Command は利用者向け入口、入力契約、最終出力、利用者から見える重大な副作用・確認境界、Workflow Skill への
 委譲のみを正規所有する。workflow の工程一覧、STEP、内部順序、公開順序の要約を正規所有しない
-（DEC-022、REQ-002-001）。
+（REQ-002-001）。
 
 - Command が記述するもの: 入口と引数、入力契約、最終出力、利用者から見える重大な副作用・確認境界、
   Workflow Skill への委譲宣言、Command 固有の利用者向け境界（ID 付与なし）
@@ -207,22 +207,6 @@ DEC-010 の Workflow Architecture Inventory が Capability Skill 横断抽出候
 | `agentdev-workflow-routing` | review NG 時の次コマンド推論、拒否タイプ分類 | case-run、case-update |
 | `agentdev-workflow-orchestration` | case-run 状態機械、自律修正ループ、Capture 境界、Subagent 委譲プロトコル | case-run、case-close、case-auto |
 | `agentdev-workflow-templates` | Issue/PR/comment template 選定とセクション規約 | case-open、case-close、case-update |
-
-### 新規 Capability Skill 抽出候補（将来対応）
-
-DEC-010 Inventory が挙げる新規 Capability Skill 候補。
-本 Design は候補の記録のみを所有し、個別抽出実装は別 Issue が担う。
-新規 Capability Skill は「Capability Skill の判定基準」を満たす場合にのみ作成し、既存 Capability Skill の再利用を優先する。
-
-- test strategy 定義（`req-define` STEP-4 相当）
-- EC-2 必須品質統制導出（`case-open` execution contract）
-- EC-6 scope-affecting impact 探索（`case-open` execution contract）
-- コンフリクト Level 1 解消判断（`case-close`）
-- Design status 昇格判断（`case-close`、`design-save`）
-- bounded parent decision resolution 詳細（`case-auto`、DEC-008）
-- Wave 反復制御詳細（`case-auto`）
-
-抽出優先度低の workflow（`intake-capture`、`intake-from-github`、`case-update`、`inspect-skills`、`inspect-promote`）は workflow 実装が単純、または既存 Capability Skill（`agentdev-intake-pipeline`、`agentdev-workflow-routing`、`agentdev-inspect-skills`）でカバーされており、1:N 分割・新規 Capability 抽出ともに優先度が低い（DEC-010 Inventory）。
 
 ## 依存方向
 

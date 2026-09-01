@@ -2,7 +2,7 @@
 title: 設計原則
 status: accepted
 created: 2026-08-20
-updated: 2026-07-24
+updated: 2026-09-02
 ---
 
 # 設計原則
@@ -118,7 +118,7 @@ Command / Skill の責任分界の判断理由、詳細契約は v2:ADR-0107（�
 - **Template**: 出力構造とプレースホルダー。変数置換で使用し、ロジックは含まない。
 - **Script**: 決定的でテスト可能な処理。validation、transformation、generation、formatting 等の決定的処理に限定する。
 
-**決定的処理の Script 委譲原則**: Command は決定的処理（採番、整合性確認、エントリ存在確認、変更範囲検証、target_area 見出し検索等）を LLM 推論で実行せず、Script へ委譲する（REQ-001-029）。
+**決定的処理の Script 委譲原則**: Command は決定的処理（採番、整合性確認、エントリ存在確認、変更範囲検証、target_area 見出し検索等）を LLM 推論で実行せず、Script へ委譲する（REQ-002-035）。
 
 各アーティファクトの詳細契約（入出力、依存方向、サイズ制約、スキル粒度、スキル参照妥当性、サブエージェント委譲、テンプレート配置）、統率スキル（Orchestration skill）作成判断基準は `../responsibilities/artifact-contracts.md` を参照。
 責任分界、統率スキル作成基準の判断理由はそれぞれ v2:ADR-0107（コマンド・スキル・テンプレート・スクリプト責任分界の正式定義）、v2:ADR-0108（オーケストレーションスキル作成基準の導入）を参照。
@@ -161,6 +161,6 @@ skill、reference、script、REQ、Design の配置原則を、正規所有者�
 
 ### ハーネス純化の回帰基準
 
-REQ-002、v2:ADR-0136、REQ-002-163 が定めるハーネス責務と配布物責務の分離を回帰基準として維持する。
+REQ-002、v2:ADR-0136、REQ-029-001..008 が定めるハーネス責務と配布物責務の分離を回帰基準として維持する。
 配布 command、skill、reference、docs にハーネス固有の待機時間、並列度、再試行、起動引数を残さない。
 実行エージェントの選定、起動方法、実行制御パラメータはハーネス側文書（`AGENTS.md`、`references/<harness>.md`）が所有する。

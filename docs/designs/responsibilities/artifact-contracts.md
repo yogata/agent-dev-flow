@@ -2,7 +2,7 @@
 title: アーティファクト契約
 status: accepted
 created: 2026-08-20
-updated: 2026-08-24
+updated: 2026-09-02
 ---
 <!-- ADF-COVERS(implementation): REQ-002-005, REQ-002-006, REQ-002-016, REQ-002-034 -->
 
@@ -28,10 +28,10 @@ Command / Skill / Template / Script の入出力契約と依存方向を定義�
 | リポジトリローカル Skill | .opencode/skills/repo-*/（原本なし） | 本体リポジトリ専用判断基準（REQ-001） | Command からの参照 | 判断結果の参照提供 |
 
 種別ごとの正規所有内容と所有しない内容の一意判別、標準継承と差分記述原則、決定的処理の配置基準の詳細は
-DEC-022 および REQ-002-037〜040 が要求水準を所有し、本 Design が配置・構造の詳細を所有する。
+REQ-002-037〜040 が要求水準を所有し、本 Design が配置・構造の詳細を所有する。
 依存方向は Command → Skill → Reference / Script に加え、Command / Skill → Custom Tool（操作契約経由）、
 Plugin / Hook → ツール実行（迂回防止）を含む。REQ / Design は規範・設計契約の正規文書層であり、
-配布種別とは別軸である（DEC-022 決定8）。
+配布種別とは別軸である（REQ-002）。
 
 ## 依存方向
 
@@ -105,7 +105,7 @@ Command 固有の実行順序、Issue 作成、保存、更新、削除、完了
 
 ## Script 所有権と委譲契約
 
-各 script の正規所有者を文書種別ごとに定義する（REQ-002-159、REQ-001-029）。
+各 script の正規所有者を文書種別ごとに定義する（REQ-002-040、REQ-002-035）。
 同一 script または共有 lib を複数 skill へ複製せず、正規所有者を一つに定める。
 
 | script 種別 | 正規所有者 skill | 対象 |
@@ -213,7 +213,7 @@ Command 本文では分類ラベルより、実際の `inputs`、`side_effect_bo
 
 ## テンプレート配置契約
 
-Template の配置先は以下の 2 種類を定義する（REQ-002-046）。
+Template の配置先は以下の 2 種類を定義する（REQ-002-040）。
 
 ### Skill-local templates
 

@@ -2,7 +2,7 @@
 title: ルール所有権マトリックス
 status: accepted
 created: 2026-08-20
-updated: 2026-08-30
+updated: 2026-09-02
 ---
 
 # ルール所有権マトリックス
@@ -19,8 +19,12 @@ updated: 2026-08-30
 - canonical owner 変更時: 両ファイルで参照先を更新する
 - 新規 REQ 追加、廃止時: 本ファイルの対応行を追加、削除し、`req-impact-map.md` で影響先ルールドメインの整合を確認する
 
-req-impact-map.md の配置移動は未確定事項とし、参照方向、利用頻度、更新責務を確認した後に別途判断する。
-本節では関係整理のみを扱い、`responsibilities/` 残置を維持する。
+req-impact-map.md の配置の正本は `../responsibilities/req-impact-map.md` 冒頭の配置記述であり、本ファイルはそこへの参照導線を保持する。`responsibilities/` 残置を現行配置として維持する。
+本節では関係整理のみを扱い、配置判断の正本を当該ファイルへ集約する。
+
+## 配布物対応宣言（ADF-COVERS）の配置規則
+
+配布物（`src/opencode/commands/agentdev/**`、`src/opencode/skills/agentdev-*/**` 等の実行時配布 .md）には対応宣言（ADF-COVERS implementation / verification）を記述せず、当該配布物の宣言は docs 配下の正規成果物（command Design、skill Design）へ配置する。repo-local 実装（`.opencode/skills/repo-*` の scripts 等の配布対象外ファイル）は宣言を保持できる。本配置規則により、配布物の concrete ID 排除（配布境界 baseline）と宣言の検出可能性を両立する。
 
 ## ルールドメイン一覧
 
