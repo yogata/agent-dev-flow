@@ -212,7 +212,7 @@ cd .agentdev-plugin && git pull && cd ..
 
 ## スクリプトの適用範囲
 
-scripts/ 直下の公開入口は consumer 向け `scripts/install.ps1` と self-hosting 向け `scripts/self-sync.ps1` の2本である（REQ-050、DEC-021）。それ以外の内部処理（`scripts/consumer/`、`scripts/self/` 配下）は単体実行しない。
+scripts/ 直下の公開入口は consumer 向け `scripts/install.ps1` と self-hosting 向け `scripts/self-sync.ps1` の2本である（REQ-050）。それ以外の内部処理（`scripts/consumer/`、`scripts/self/` 配下）は単体実行しない。
 
 | スクリプト | 対象リポジトリ種別 | 役割 |
 |--------|---------------|------|

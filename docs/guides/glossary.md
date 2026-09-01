@@ -38,7 +38,7 @@ AgentDevFlow で使う用語の定義。
 | guides | 利用者向けの参照用読み物。`docs/guides/*.md` に配置 |
 | RU（Requirement Unit） | Intake/Learning の採用済み成果物を統合した構造化成果物。`.agentdev/backlog/req-units/RU-*.md` に配置 |
 | 採用済み成果物（promoted artifact） | backlog-review の入力となる整形済み成果物。Intake/Learning それぞれの `promoted/` に配置 |
-| 追跡Issue（tracking Issue） | 課題、ToDo、アイデア、リスク等の未解決事項の育成管理単位。GitHub Issue を共通管理単位とし、role: tracking として機械判定される。docs/ 配下の文書種別ではなく管理単位・永続状態として扱う（REQ-049、DEC-020）。操作は Tool 操作契約経由 |
+| 追跡Issue（tracking Issue） | 課題、ToDo、アイデア、リスク等の未解決事項の育成管理単位。GitHub Issue を共通管理単位とし、role: tracking として機械判定される。docs/ 配下の文書種別ではなく管理単位・永続状態として扱う（REQ-049）。操作は Tool 操作契約経由 |
 | Case Issue（case Issue） | req/case パイプラインの実行票。role: case として機械判定される |
 | セッション由来 RU | チャット内で合意形成済みの内容を直接保存した RU |
 | evaluation-report | learning-promote 内部で生成される分析レポート。同コマンドの昇華判定フェーズの入力として使用される |
