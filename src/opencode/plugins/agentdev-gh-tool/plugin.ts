@@ -4,7 +4,7 @@
 // 経由で、agentdev-gh Custom Tool をモデルに公開する。Plugin は登録の配線のみを担い、
 // 操作契約・fail-closed ゲート・VERIFY は Tool 本体（src/opencode/tools/agentdev-gh/）が所有する。
 //
-// 実行の差し替え（REQ-011-006 / DEC-004）:
+// 実行の差し替え（REQ-{NNNN}-{NNN} / DEC-{NNN}）:
 //   - 既定: GitHub 実装（runner-cli.ts）で gh CLI を実行する
 //   - ローカル版: 投影パス（.opencode/tools/agentdev-gh/runner-local.ts）に Local 実装が
 //     存在する場合（install -LocalMode により junction 先が src/opencode-local/agentdev-gh-cli/

@@ -7,7 +7,7 @@ description: "backlog-review command の workflow 実装本体。採用済み成
 
 backlog-review command の workflow 実装本体である。
 `.agentdev/intake/promoted/*.md`、`.agentdev/learning/promoted/*.md`、`.agentdev/inspect/promoted/*.md` の採用済み成果物を読み込み、分析、統合してユーザーに判定を提示し、承認後に直接 RU（Requirement Unit）を生成する制御構造を所有する。
-learning 由来の採用済み成果物は、学習パイプラインが前工程で付与した反映先分類結果を消費し、昇華先ルーティングの処置へ分岐する。docs/knowledge/ への知識文書保存に振り分けられた成果物は、利用者承認後に docs/knowledge/ へ直接保存され、RU 化を経ない（REQ-039-006、REQ-056-004）。
+learning 由来の採用済み成果物は、学習パイプラインが前工程で付与した反映先分類結果を消費し、昇華先ルーティングの処置へ分岐する。docs/knowledge/ への知識文書保存に振り分けられた成果物は、利用者承認後に docs/knowledge/ へ直接保存され、RU 化を経ない（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。
 ユーザー承認は RU 作成承認を兼ねる。
 
 backlog-review command は公開 interface（入出力契約・ガードレール・RU フォーマット委譲契約）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
@@ -107,7 +107,7 @@ agentdev-traceability の coverage、impact、check を一般文書探索、構�
 - **learning 由来の昇華先ルーティング**: learning 由来の採用済み成果物は、学習パイプラインが前工程で付与した反映先分類結果を消費し、`agentdev-backlog-integration` の昇華先ルーティング契約に従い、docs/knowledge/ への知識文書保存を含む恒久所有先への昇華、通常の Issue による修正、重複・陳腐化した知識の削除、現時点で反映不能なものの保留へルーティングする。intake / inspect 由来は現行の RU 化経路を維持する。docs/knowledge/ 直接保存の手順は次のとおりである（正規原本は backlog-review Design「learning 由来プロジェクト知識の docs/knowledge/ 直接保存」節。実行詳細は [references/contradiction-ru-and-persistence.md](references/contradiction-ru-and-persistence.md) の STEP-7、操作種別判定は `agentdev-backlog-integration` の昇華先ルーティング契約参照）:
   1. 知識候補の内容を知識文書契約（1知識1ファイル、kebab-case slug、必須内容5項目）へ整形する
   2. 既存 docs/knowledge/ 配下ファイルとの重複・陳腐化を確認し、新規、更新、置換、削除の操作種別を判定する
-  3. 操作種別ごとの変更内容を利用者へ提示し、承認を得る。承認なしの書き込みは行わない（REQ-056-006）
+  3. 操作種別ごとの変更内容を利用者へ提示し、承認を得る。承認なしの書き込みは行わない（REQ-{NNNN}-{NNN}）
   4. 承認後、docs/knowledge/ へファイルを書き込み、保存に成功した採用済み成果物を promoted から削除する
   RU 以外への昇華を含む全処置はユーザー承認を経る。ADF リポジトリ外の project-local 資産（Project Extension の接続定義）は直接書き換えず、書き込み先の実行前提（git 管理境界）を明示した指示を完了報告に含める
 - **削除条件**: RU 生成が成功した採用済み成果物、docs/knowledge/ への知識文書保存に成功した採用済み成果物を削除する（当該成果物が RU に取り込まれ、RU ファイルの生成が確認できた場合、または知識文書の保存が確認できた場合）。RU 化・保存に失敗した成果物、矛盾により除外された成果物は残置する。ルーティングの削除処置のみ、ユーザーの明示承認を経た上で例外として削除する

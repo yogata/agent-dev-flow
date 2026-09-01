@@ -9,6 +9,8 @@ updated: 2026-09-02
 <!-- ADF-COVERS(implementation): REQ-044-004 -->
 <!-- ADF-COVERS(implementation): REQ-011-006 -->
 <!-- ADF-COVERS(implementation): REQ-050-001, REQ-050-002, REQ-050-003, REQ-050-004, REQ-050-005, REQ-050-006, REQ-050-007, REQ-050-008, REQ-050-010, REQ-050-013 -->
+<!-- ADF-COVERS(implementation): REQ-052-007（scripts/consumer/archive/install.ps1、scripts/install.ps1 の宣言を docs 正規配置先へ移管） -->
+<!-- ADF-COVERS(implementation): REQ-057-009, REQ-057-010（配布物 concrete ID cleanup、ir-055/ir-059 baseline 整備、DEC-023 (proposed) 注記、tmp 残渣抑止） -->
 <!-- 注: install/self-sync 各 ps1（scripts/）は走査対象拡張子外のため、導入器実装行の宣言は本 Design（正規仕様所有者）へ配置。実装実体は scripts/install.ps1、scripts/self-sync.ps1（内部処理は scripts/consumer/、scripts/self/ 配下） -->
 
 # 実行時パッケージ境界
@@ -81,6 +83,7 @@ skills/agentdev-*/             → 原本
 **scripts/ 配下の配布境界（skills/agentdev-*/scripts/ 配下）**:
 配布対象: `*.ts`（TSソース）、`lib/*.ts`（共有ライブラリ）、`tests/*.test.ts`（テスト）、`package.json`、`tsconfig.json`、`bun.lock`、`.gitignore`、`README.md`
 除外対象: `node_modules/`（.gitignore で除外済み、consumer 側で `bun install` により再生成）
+tmp 残渣抑止: テスト一時フィクスチャ（`tmp-*` 等）の生成先は OS 一時ディレクトリ（`os.tmpdir()`）とし、配布パッケージの tests/ 配下へ生成残渣を残さない。テストのクリーンアップ（削除）は補助手段であり、リポジトリ内への一時生成をしない構造を正とする
 
 scripts/ は skill junction の配下に位置し、skill の一部として配布される。
 ジャンクション対象は `agentdev-*` グロブで動的列挙（ハードコードなし）。

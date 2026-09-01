@@ -1,6 +1,6 @@
 # agentdev-gh-tool（Plugin / Custom Tool 登録）
 
-Custom Tool `agentdev_gh` を OpenCode の実行時へ登録する ADF 汎用 Plugin（REQ-011、REQ-052、DEC-022 決定4）。
+Custom Tool `agentdev_gh` を OpenCode の実行時へ登録する ADF 汎用 Plugin（REQ-{NNNN}、REQ-{NNNN}、DEC-{NNN} 決定4）。
 
 Plugin は登録の配線のみを担う。操作契約（入力、出力、保証、失敗時の意味）、fail-closed 実行ゲート、VERIFY（読み戻し照合）は Tool 本体（`src/opencode/tools/agentdev-gh/`）が所有する。
 
@@ -10,7 +10,7 @@ OpenCode は `.opencode/plugins/` 直下のファイル（depth-1）のみを自
 
 ## 実行の差し替え（ローカル版）
 
-既定は GitHub 実装（Tool の `runner-cli.ts` が gh CLI を実行）。投影パス `.opencode/tools/agentdev-gh/runner-local.ts` に Local 実装が存在する場合（`install.ps1 -LocalMode` により junction 先が `src/opencode-local/agentdev-gh-cli/` に差し替わっている場合）は、それを動的に読み込んで差し替える。Workflow は差を認識しない（REQ-011-006、DEC-004）。
+既定は GitHub 実装（Tool の `runner-cli.ts` が gh CLI を実行）。投影パス `.opencode/tools/agentdev-gh/runner-local.ts` に Local 実装が存在する場合（`install.ps1 -LocalMode` により junction 先が `src/opencode-local/agentdev-gh-cli/` に差し替わっている場合）は、それを動的に読み込んで差し替える。Workflow は差を認識しない（REQ-{NNNN}-{NNN}、DEC-{NNN}）。
 
 ## 設定
 

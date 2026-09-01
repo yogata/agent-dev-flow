@@ -7,6 +7,7 @@
 
 import { describe, expect, test } from "bun:test";
 import * as fs from "node:fs";
+import * as os from "node:os";
 import * as path from "node:path";
 import {
   createAgentdevGhToolDefinition,
@@ -113,7 +114,7 @@ describe("実行（注入 runner による成功・失敗）", () => {
 
 describe("ローカル版差し替え（投影パスの Local 実装検出）", () => {
   test("投影パスに runner-local.ts がある場合は Local 実装を使用する", async () => {
-    const worktree = fs.mkdtempSync(path.join(import.meta.dir, "tmp-plugin-local-"));
+    const worktree = fs.mkdtempSync(path.join(os.tmpdir(), "tmp-plugin-local-"));
     const projectionDir = path.join(worktree, ".opencode", "tools", "agentdev-gh");
     fs.mkdirSync(projectionDir, { recursive: true });
     fs.writeFileSync(
@@ -145,7 +146,7 @@ describe("ローカル版差し替え（投影パスの Local 実装検出）", 
   });
 
   test("投影パスに runner-local.ts がない場合は GitHub 実装を使用する", async () => {
-    const worktree = fs.mkdtempSync(path.join(import.meta.dir, "tmp-plugin-gh-"));
+    const worktree = fs.mkdtempSync(path.join(os.tmpdir(), "tmp-plugin-gh-"));
     const def = createAgentdevGhToolDefinition({
       resolveRepo: () => "owner/repo",
       createRunner: () =>

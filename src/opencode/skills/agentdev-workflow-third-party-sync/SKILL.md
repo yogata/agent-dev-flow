@@ -86,4 +86,4 @@ third-party Skill 取得専用 Custom Tool の操作契約（Custom Tool 操作�
 - **third-party-sync command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）
 - **Custom Tool 操作契約 Design**: 「third-party Skill 取得」操作契約の正
 - **third-party Skill 管理 Design**（local ドメイン）: 宣言スキーマ、取得プロファイル、非破壊性の正
-- **DEC-023**: third-party Skill の分離管理と取得機構の導入
+- **DEC-023**（proposed）: third-party Skill の分離管理と取得機構の導入
