@@ -38,7 +38,7 @@ learning-promote.md「変更種別分類」と整合する。
 
 REQ 拡張を候補とするのは `new_user_requirement` または `external_contract_change` のみ。
 それ以外は既存 REQ が要求を既に保持している限り REQ を拡張しない（REQ-001-033）。
-判定の最終確定は req-define が行う（REQ-004-087）。
+判定の最終確定は req-define が行う（REQ-004-010）。
 
 ### 分類根拠の引き継ぎ
 

@@ -1,6 +1,6 @@
 # STEP-4: PR マージ・コンフリクト解消（pr-merge-and-conflict）
 
-> 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-4 詳細である。
+> 本 reference は `agentdev-workflow-case-close` SKILL.md の制御平面（STEP 一覧）STEP-4 詳細である。
 > squash merge 先の統合先解決、PR squash マージ、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase パスを提供する。
 
 ## Purpose

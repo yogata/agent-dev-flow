@@ -87,4 +87,4 @@ REQ 固有 script は `agentdev-req-file-manager`、Decision 固有 script は `
 - [agentdev-decision-file-manager.md](agentdev-decision-file-manager.md)（Decision 操作 skill、Decision 固有 script 所有）
 - [agentdev-design-file-manager.md](agentdev-design-file-manager.md)（Design 操作 skill、Design 固有 script 所有）
 - REQ-002-159（script 所有権の責務別配置）
-- REQ-001-029（決定的処理の script 委譲）
+- REQ-002-035（決定的処理の script 委譲）

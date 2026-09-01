@@ -1,6 +1,6 @@
 # STEP-4 / STEP-5: 自動 promote・adversarial-review（auto-promote-and-review）
 
-> 本 reference は `agentdev-workflow-inspect-promote` SKILL.md の Control Plane STEP-4、STEP-5 詳細である。
+> 本 reference は `agentdev-workflow-inspect-promote` SKILL.md の制御平面（STEP 一覧）STEP-4、STEP-5 詳細である。
 > 各 STEP は resume point を持つ（`<workflows/step-reference-contract>` Design）。
 
 ## STEP-4: 自動 promote（`--auto` opt-in 時のみ）

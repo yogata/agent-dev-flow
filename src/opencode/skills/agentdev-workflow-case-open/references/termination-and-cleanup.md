@@ -1,6 +1,6 @@
 # STEP-6: 終了処理・クリーンアップ（termination-and-cleanup）
 
-> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-6 詳細である。
+> 本 reference は `agentdev-workflow-case-open` SKILL.md の制御平面（STEP 一覧）STEP-6 詳細である。
 > コメント追加、draft/RU 削除（Form Zero）、完了報告を提供する。
 
 ## Purpose

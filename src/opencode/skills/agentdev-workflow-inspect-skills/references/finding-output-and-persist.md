@@ -1,6 +1,6 @@
 # STEP-3: 検出事項出力・永続化・完了報告（finding-output-and-persist）
 
-> 本 reference は `agentdev-workflow-inspect-skills` SKILL.md の Control Plane STEP-3 詳細である。
+> 本 reference は `agentdev-workflow-inspect-skills` SKILL.md の制御平面（STEP 一覧）STEP-3 詳細である。
 > read-only-diagnostic型のため resume point を持たない。
 
 ## 開始条件

@@ -32,7 +32,7 @@ Decision 作成の必要性判定基準、作成ガイドライン、ライフ�
 
 - Architecturally Significant な決定に対してのみ Decision を作成
 - accepted 後は不変、変更時は新規 Decision 作成
-- 単なる廃止、削除、移行は新規 Decision ではなく `retire` / `supersede` で処理（REQ-001-044/045）
+- 単なる廃止、削除、移行は新規 Decision ではなく `retire` / `supersede` で処理（REQ-001-022/023）
 - 既存 Decision との意味的重複確認（REQ-001-051、重複時は UPDATE 推奨）
 
 ## 対象外

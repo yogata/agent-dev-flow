@@ -100,7 +100,7 @@ RU 構成案は backlog-review command Step 4（統合・分割判定 + depends_
 #### 呼出タイミング
 
 adversarial-review の呼出は、Step 4 完了後、Step 5（矛盾検出）開始前に挿入する（RU構成→review→承認の順）。
-ユーザー承認（Step 4 承認 / Step 5 矛盾検出時追加判断）の前に review を実行し、review 結果を踏まえて承認段階へ進む。
+ユーザー承認（STEP-5 承認 / STEP-6 矛盾検出時追加判断）の前に review を実行し、review 結果を踏まえて承認段階へ進む。
 呼出タイミングの正規所有者は backlog-review command Design であり、本節は参照レベルに留める。
 
 #### 矛盾検出への引き渡し

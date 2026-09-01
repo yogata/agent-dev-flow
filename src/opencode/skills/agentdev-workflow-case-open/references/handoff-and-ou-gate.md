@@ -1,6 +1,6 @@
 # STEP-1: 引き継ぎ・OU 選択（handoff-and-ou-gate）
 
-> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-1 詳細である。
+> 本 reference は `agentdev-workflow-case-open` SKILL.md の制御平面（STEP 一覧）STEP-1 詳細である。
 > SKILL.md は control plane として STEP 遷移を管理し、本 reference は STEP-1 の実行詳細を提供する。
 
 ## Purpose
