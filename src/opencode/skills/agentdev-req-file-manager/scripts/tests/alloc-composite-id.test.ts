@@ -51,7 +51,8 @@ describe("extractAllCompositeIds", () => {
   });
 
   test("round-trips formatCompositeId output for various inputs", () => {
-    for (const [req, row] of [[1, 1], [8, 3], [10, 2], [11, 5], [9999, 999]]) {
+    const inputs: Array<[number, number]> = [[1, 1], [8, 3], [10, 2], [11, 5], [9999, 999]];
+    for (const [req, row] of inputs) {
       const id = formatCompositeId(req, row);
       const extracted = extractAllCompositeIds(id);
       expect(extracted).toEqual([id]);

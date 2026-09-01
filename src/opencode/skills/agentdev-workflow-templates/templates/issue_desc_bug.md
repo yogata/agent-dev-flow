@@ -4,6 +4,8 @@ about: バグの報告
 labels: bug
 ---
 
+<!-- Tracking 行配置正規形: 追跡Issueから要件化された Case Issue は、本文冒頭ブロックに `Tracking: #N` を1行で記載する（複数の元追跡Issueがある場合は `Tracking: #N, #M` 形式。case-open Design「Case Issue 本文の元追跡Issue参照形式」節参照）。追跡Issueを起源としない通常の Case Issue には Tracking 行を記載しない（元追跡Issueが判明している場合のみ case-open が記載する） -->
+
 ## 説明
 <!-- 【必須】 -->
 

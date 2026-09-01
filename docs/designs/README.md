@@ -192,7 +192,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | responsibilities/document-type-responsibilities.md | accepted | 文書種別責務、配置基準 | 文書品質ゲート原本仕様、文書種別責務 |
 | responsibilities/artifact-responsibilities.md | accepted | 成果物責任表 | 各成果物種別の正規所有者と責務 |
 | responsibilities/artifact-contracts.md | accepted | アーティファクト契約 | Command/Skill/Template/Script の入出力、依存方向 |
-| responsibilities/req-impact-map.md | accepted | REQ 影響マップ | REQ → 影響するルール/アーティファクト の対応表。`integrity/rule-ownership.md`（ルールドメイン → canonical REQ/Design）と逆方向。同期更新が必要なケースあり。配置は responsibilities/ 残置（移動は別途判断） |
+| responsibilities/req-impact-map.md | accepted | REQ 影響マップ | REQ → 影響するルール/アーティファクト の対応表。`integrity/rule-ownership.md`（ルールドメイン → canonical REQ/Design）と逆方向。同期更新が必要なケースあり。配置の正本は req-impact-map.md 冒頭の配置記述であり、`responsibilities/` 残置を現行配置として確定済み（本行は参照導線） |
 | responsibilities/responsibility-boundary-purification.md | accepted | 責務境界浄化: 所有/非所有リスト詳細 | 配布物と harness 実行制御の責務境界（所有/非所有リスト）。原則は harness-separation-model.md を SSoT とし、各工程（case-auto/case-run/adapter/extensions/タイムスタンプ）の詳細を集約。抽象化手順は `foundations/references/concrete-abstraction.md` を参照 |
 | responsibilities/artifact-quality-control-routing.md | draft | Artifact Quality Control Routing Design | artifact type から必須品質能力を導出する合成規則、能力キー定義、QG-2 投影契約。REQ-017 execution contract の設計記録 |
 | responsibilities/custom-tool-contracts.md | accepted | Custom Tool 操作契約 | Custom Tool の操作契約（入力、出力、保証、失敗時）、ローカル版実装差し替え、迂回防止（REQ-052、DEC-022） |

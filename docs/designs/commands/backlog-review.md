@@ -7,7 +7,7 @@ updated: 2026-09-01
 
 <!-- ADF-COVERS(implementation): REQ-021-021 -->
 <!-- ADF-COVERS(implementation): REQ-015-008 -->
-<!-- ADF-COVERS(implementation): REQ-039-001, REQ-039-002, REQ-039-003, REQ-039-004, REQ-039-005 -->
+<!-- ADF-COVERS(implementation): REQ-039-001, REQ-039-002, REQ-039-003, REQ-039-004, REQ-039-005, REQ-039-006 -->
 
 # backlog-review Design
 
@@ -40,6 +40,7 @@ updated: 2026-09-01
 
 - git commit/push: `.agentdev/` 配下（明示パスステージング、v2:REQ-0137-002/005）
 - 実行前同期: `git pull --ff-only`
+- docs/knowledge/ 知識文書保存: learning 由来の分類結果が docs/knowledge/ への知識文書保存（REQ-056、REQ-039-006）に振り分けられた場合、利用者承認を経て docs/knowledge/ へ直接書き込む。docs/knowledge/ は git 管理対象（ドメイン状態の永続化対象）であり、当該書き込みは git 永続化対象の副作用である
 - REQ ファイル保存: 行わない（req-save 責務）
 - GitHub Issue 作成: 行わない（case-open 責務）
 
