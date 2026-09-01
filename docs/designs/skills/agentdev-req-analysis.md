@@ -2,7 +2,7 @@
 title: `agentdev-req-analysis` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-15
+updated: 2026-09-01
 ---
 <!-- ADF-COVERS(implementation): REQ-001-048, REQ-001-049, REQ-001-050, REQ-004-007, REQ-004-008, REQ-004-009, REQ-004-024, REQ-004-025, REQ-004-026, REQ-004-027, REQ-004-028, REQ-004-029, REQ-004-030, REQ-004-031, REQ-004-032, REQ-004-033, REQ-004-050, REQ-004-051, REQ-004-052 -->
 
@@ -41,6 +41,13 @@ updated: 2026-08-15
 - 3確認事項の導出観点: 適用対象と判定した場合、処理量の上限（時間計算量、処理ステップ数、または走査量の上限）、出力の上限（出力件数、証跡量の上限）、不正または曖昧な入力時の失敗挙動（fail-open か fail-closed か）を受け入れ条件として確定するまで壁打ちで深掘りする。
 - 回答形式の検証可能性要求: 上限は数値または計算量の形、失敗挙動は fail-open / fail-closed のいずれかを要求し、形式不定の回答や形式的な記述を許容しない。数値上限の記述は既存の test strategy 数値閾値ガイド（`agentdev-workflow-templates` Design「test strategy 記述ガイドライン」）および本 Design「pass_criteria 記述基準」の規範に従う。
 - 適用対象とした場合はその前提を要件docに記録する（適用外の場合の記録は強制しない）。主発動点は要件展開工程であり、adversarial-review の動的レビュー戦略の検出観点は第二の網として助言に留める（adversarial-review Design「動的レビュー戦略」節参照）。
+
+## プロジェクト知識の参照観点
+
+要件分析・壁打ちでは、docs/knowledge/ 配下のプロジェクト知識（REQ-056）を判断材料として参照できる。
+利用可能なハーネスの探索能力を通じて関連知識を検索し、知識の適用条件が分析対象に一致する場合のみ判断材料へ加える。
+知識が不在の場合、または適用条件が一致しない場合は ADF core の一般規則のみで分析を実行する（分析を省略しない、REQ-054-002）。
+知識の存在を理由に REQ/Decision/Design への確認を省略しない。
 
 ## 参照する references
 

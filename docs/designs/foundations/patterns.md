@@ -2,7 +2,7 @@
 title: 文書フォーマット規約
 status: accepted
 created: 2026-08-20
-updated: 2026-08-10
+updated: 2026-09-01
 ---
 <!-- ADF-COVERS(implementation): REQ-001-008, REQ-001-010, REQ-001-011, REQ-001-012, REQ-001-013, REQ-001-014, REQ-001-015, REQ-001-016, REQ-001-030, REQ-001-046, REQ-001-047 -->
 
@@ -64,6 +64,20 @@ REQファイルは`## 目的`、`## 要件`、`## 適用範囲`の3セクショ�
 Design frontmatterは`title`、`status`、`created`、`updated`を基本とする。
 `status`は`draft`、`accepted`のいずれかとする。
 status欠落は後方互換のため`accepted`相当として扱う。
+
+### Knowledge frontmatter 規約
+
+Knowledge 文書（docs/knowledge/ 配下、REQ-056）の frontmatter は以下の基本構造とする。
+
+| フィールド | 必須 | 内容 |
+|---|---|---|
+| title | 必須 | 知識の主題を表す名称 |
+| created | 必須 | 作成日（ISO 8601 の日付） |
+| updated | 必須 | 最終更新日。created 以降 |
+
+Knowledge 文書は固定 ID 採番を持たず、ファイル名 slug（kebab-case）が識別子となる。
+本体の必須セクションは知識内容、適用条件、適用対象、根拠、関連知識の5項目とする（REQ-056）。
+Knowledge 文書は独立文書種別であり、REQ・Decision・Design への ADF-COVERS 宣言を持たない。
 
 ## REQ 分類規約
 

@@ -2,7 +2,7 @@
 title: backlog-review Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-21
+updated: 2026-09-01
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-021 -->
@@ -57,6 +57,17 @@ updated: 2026-08-21
 - 成果物削除（RU 生成失敗成果物は削除しない）
 - Git 永続化
 - 完了報告
+
+## learning 由来プロジェクト知識の docs/knowledge/ 直接保存
+
+learning-promote の反映先分類で docs/knowledge/ への知識文書保存（REQ-056、REQ-039-006）に振り分けられた採用済み成果物は、RU 化を経ずに以下の手順で処理する。
+
+1. 知識候補の内容を知識文書契約（1知識1ファイル、kebab-case slug、必須内容5項目）へ整形する
+2. 既存 docs/knowledge/ 配下ファイルとの重複・陳腐化を確認し、新規、更新、置換、削除の操作種別を判定する
+3. 操作種別ごとの変更内容を利用者へ提示し、承認を得る。承認なしの書き込みは行わない
+4. 承認後、docs/knowledge/ へファイルを書き込み、保存に成功した採用済み成果物を promoted から削除する
+
+構造整合性（正規配置、命名、必須内容）は docs-check 系の機械検査が担保し、意味的妥当性は機械で確定しない（REQ-056）。
 
 ## 所有関係と委譲
 

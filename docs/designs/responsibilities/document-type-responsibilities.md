@@ -2,7 +2,7 @@
 title: 文書種別責務・配置基準
 status: accepted
 created: 2026-06-23
-updated: 2026-08-22
+updated: 2026-09-01
 ---
 <!-- ADF-COVERS(implementation): REQ-001-001, REQ-001-002, REQ-001-003, REQ-001-004, REQ-001-005, REQ-001-006 -->
 <!-- ADF-COVERS(implementation): REQ-001-017, REQ-001-018, REQ-001-019 -->
@@ -58,6 +58,19 @@ REQ 要件行が Design 相当内容（スキーマフィールド、enum 値一
 移管候補一覧と安定契約の完全な定義は `../foundations/document-model.md`「Design 分離基準」「安定契約の例外」を参照。
 
 ただし公開 command 名、公開入口、ドメイン状態の位置づけ、他 command との接続契約、安全境界、停止条件の大枠、後続工程が依存する安定した外部契約に該当する場合は、REQ に要約として記述できる（安定契約例外、REQ-001-069）。
+
+### Knowledge 文書の配置基準（執筆時判断）
+
+| 判断 | 配置先 |
+|---|---|
+| プロジェクト固有の再利用可能な判断材料（リスク導出規則、設計ノウハウ、運用手順の背後にある判断根拠等）で、REQ/Decision/Design へ昇華する前に蓄積・共有する段階のもの | Knowledge 文書（docs/knowledge/、REQ-056） |
+| 現行要件として確定した成果 | REQ |
+| 採否判断とその理由 | Decision |
+| 現在の内部構造・動作 | Design |
+
+Knowledge 文書は1知識1ファイル（kebab-case slug）、必須内容5項目（知識内容、適用条件、適用対象、根拠、関連知識）とする。
+新規、更新、置換、削除は利用者承認を経る（REQ-056）。
+要求として確定すべき内容、現行設計として確定すべき内容は Knowledge に留めず、REQ/Decision/Design へ昇華する。
 
 ## REQ/Design 記述基準
 
