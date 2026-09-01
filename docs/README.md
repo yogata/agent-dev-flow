@@ -182,6 +182,11 @@ status（draft / accepted）を含む完全一覧は [Design インデックス]
 - [外部依存メジャーバージョン互換性管理ガイド](designs/authoring/dependency-version-compatibility.md)
 - [語彙レジストリ](designs/authoring/vocabulary-registry.md)
 
+## 知識（Knowledge）
+
+プロジェクト知識（プロジェクト固有の再利用可能な判断材料）は [knowledge/](knowledge/) 配下へ 1知識1 Markdown ファイル（kebab-case slug、固定 ID 採番なし）で配置する。
+所有と workflow 利用の契約は [REQ-056](requirements/REQ-056.md) を参照する。
+
 ## Report
 
 監査・評価・観測記録は Report として `docs/reports/` へ分離している。
