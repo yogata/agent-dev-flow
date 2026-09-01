@@ -2,7 +2,7 @@
 title: third-party Skill 管理 Design
 status: accepted
 created: 2026-08-30
-updated: 2026-08-30
+updated: 2026-09-02
 ---
 
 # third-party Skill 管理 Design
@@ -26,6 +26,9 @@ REQ-002-042 から REQ-002-044、REQ-029-009、REQ-052-011 の Design が所有�
 - 単一ファイル型: .opencode/skills/<name>/SKILL.md へ正規化
 - ディレクトリ型: Skill ディレクトリ配下を再帰取得し相対構造を保持。
   Skill ディレクトリ外のファイルは取得しない
+- third-party Skill は src/opencode/skills/ 配下へ昇格配置せず、IR-068 の
+  skill-projection-manifest の登録対象外とする（manifest は src/opencode/skills
+  列挙の検出ビューであり、REQ-002-042 の取得機構経由配置に従う）
 
 ## 非破壊性と上書き保護
 
