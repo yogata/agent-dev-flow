@@ -886,3 +886,19 @@
 - **想定反映先**: check_distribution_boundary.ts の分類ロジック、配布依存境界 Design
 - **関連**: PR #2486 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2486 ）
 - **タグ**: `#配布依存境界` `#checker分類` `#unclassified-entry`
+
+## worktree 指定の check_integrity 実行は worktree 内 reports/ へレポートを出力するため検証後の後始末が前提になる
+
+- **発見事象**: 検証実行（check_integrity.ts --root worktree）で生成される整合レポートが worktree 内 .agentdev/integrity/reports/ へ書き出される。reports/ は非永続・git管理対象外のため、検証後の削除と commit 対象外扱いの徹底が必要
+- **特性区分**: 運用（検証実行時のレポート出力先の扱い）
+- **確知手段**: PR #2501 本文「Findings / Capture候補」learning（Epic #2497 Wave 1 / Issue #2498 の検証実行で確認）
+- **根本原因**: --root で worktree を指定した場合、レポート出力先も当該 root 配下へ解決される
+- **恒久対応内容**: なし（PR 本文記録の運用上の留意点どおり、検証後削除と commit 対象外の徹底）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（checker 拡張の要否判断は learning-promote / backlog-review 経由の別提案）
+- **横展開観点**: worktree root 指定で整合系 checker を実行するすべての Case 工程
+- **再発条件**: worktree 内で check_integrity 系検証を実行し、レポート残留のまま次工程へ進んだ場合
+- **予防策候補**: 検証実行手順へのレポート後始末の明記、reports/ 出力先の検証後 cleanup チェック
+- **想定反映先**: checker 実行契約と検出基盤規則（docs/designs/integrity/checker-execution-contracts.md）、検証実行手順の各 workflow
+- **関連**: PR #2501 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2501 ）
+- **タグ**: `#check_integrity` `#worktree` `#レポート後始末`
