@@ -38,3 +38,20 @@
 - **タグ**: #case-run #再委譲 #gh-write-guard #pr-comment-ssot #fail-closed
 
 ---
+## 2026-09-02: REQ-057-005 確定後は ADF-COVERS 宣言を PR 本文へ記載せず docs 配下正規成果物へ配置する
+
+- **問題事象**: 従来、PR 本文冒頭へ ADF-COVERS 宣言を記載する運用が混在していた。REQ-057-005（ADF-COVERS 宣言の正規配置は docs 配下の正規成果物）の確定後は、docs 配下外の PR 本文への宣言記載は正規配置と矛盾し、traceability の宣言完全性の二重情報源になる
+- **発生局面**: case-run の REQ-057 OU-003（Issue #2510）実装時の配置判断
+- **検知方法**: REQ-057-005 の実装対応宣言を traceability-model.md へ配置した時点で、PR 本文記載運用との矛盾に PR #2528 が言及
+- **根本原因**: 宣言の正規配置先が REQ 側で未確定の間に、PR 本文への便宜的记忆が慣行として残存していた
+- **自律対応内容**: PR #2528 から ADF-COVERS 宣言を PR 本文へ記載しない判断を実例化し、実装対応宣言を docs 配下正規成果物（traceability-model.md、verification-scope-catalog.md、integrity-contracts.md、docs/designs/README.md）へ配置した
+- **ユーザー確認の有無**: なし（エージェント自律）
+- **ADR/REQ/spec影響**: なし（REQ-057-005 の既定どおりの運用確定。新規 Decision は不要）
+- **横展開観点**: PR 本文への宣言記載を行う既有 PR（Wave 1 以前）は過去記録として維持し、遡及削除はしない。以降の新規 PR は docs 配下正規配置のみ
+- **再発条件**: 宣言の正規配置方針を知らない委譲先が PR 本文へ宣言を記載する場合
+- **予防策候補**: case-run 委譲 handoff のテンプレートに「宣言は docs 配下正規成果物へ配置（PR 本文記載禁止）」の明示追加
+- **想定反映先**: agentdev-traceability（宣言配置ガイダンス）、case-run command Design（委譲 handoff 項目）
+- **関連**: PR #2528、Issue #2510、Epic #2504
+- **タグ**: #adf-covers #traceability #宣言配置 #pr-本文 #req-057
+
+---
