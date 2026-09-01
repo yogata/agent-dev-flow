@@ -1,13 +1,13 @@
 ---
 name: agentdev-workflow-backlog-review
-description: "backlog-review command の workflow 実装本体。採用済み成果物（intake/learning/inspect の promoted）の検出・読込・分析・暫定分類、統合・分割判定・depends_on 依存解決、learning 由来分類結果の昇華先ルーティング、adversarial-review、ユーザー承認、矛盾検出、RU 生成・成功成果物削除、git 永続化の各 STEP を独立 resume point として所有する。USE FOR: backlog-review 実行時の workflow 制御。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "backlog-review command の workflow 実装本体。採用済み成果物（intake/learning/inspect の promoted）の検出・読込・分析・暫定分類、統合・分割判定・depends_on 依存解決、learning 由来分類結果の昇華先ルーティング（docs/knowledge/ 知識文書直接保存を含む）、adversarial-review、ユーザー承認、矛盾検出、RU 生成・成功成果物削除、git 永続化の各 STEP を独立 resume point として所有する。USE FOR: backlog-review 実行時の workflow 制御。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # backlog-review workflow スキル
 
 backlog-review command の workflow 実装本体である。
 `.agentdev/intake/promoted/*.md`、`.agentdev/learning/promoted/*.md`、`.agentdev/inspect/promoted/*.md` の採用済み成果物を読み込み、分析、統合してユーザーに判定を提示し、承認後に直接 RU（Requirement Unit）を生成する制御構造を所有する。
-learning 由来の採用済み成果物は、学習パイプラインが前工程で付与した反映先分類結果を消費し、昇華先ルーティングの処置へ分岐する。
+learning 由来の採用済み成果物は、学習パイプラインが前工程で付与した反映先分類結果を消費し、昇華先ルーティングの処置へ分岐する。docs/knowledge/ への知識文書保存に振り分けられた成果物は、利用者承認後に docs/knowledge/ へ直接保存され、RU 化を経ない（REQ-039-006、REQ-056-004）。
 ユーザー承認は RU 作成承認を兼ねる。
 
 backlog-review command は公開 interface（入出力契約・ガードレール・RU フォーマット委譲契約）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
@@ -20,13 +20,15 @@ backlog-review command は公開 interface（入出力契約・ガードレー�
 ## 出力
 
 - `.agentdev/backlog/req-units/RU-*.md`（Requirement Unit）
+- `docs/knowledge/` 配下の知識文書（learning 由来、利用者承認後に保存）
 - 成功した採用済み成果物の削除
-- RU 生成結果、ルーティング処置結果、git 永続化結果を含む完了報告（全成功 / partial success / 対象なしのテンプレート別）
+- RU 生成結果、知識文書保存結果、ルーティング処置結果、git 永続化結果を含む完了報告（全成功 / partial success / 対象なしのテンプレート別）
 
 ## 副作用
 
 - `.agentdev/backlog/req-units/` 配下への RU ファイル作成
-- RU 生成が成功した採用済み成果物の削除（`.agentdev/{intake,learning,inspect}/promoted/` 配下）
+- 承認済みの docs/knowledge/ 知識文書の新規、更新、置換、削除（利用者承認後のみ。承認なしの書き込みは行わない）
+- RU 生成が成功した採用済み成果物、docs/knowledge/ への知識文書保存に成功した採用済み成果物の削除（`.agentdev/{intake,learning,inspect}/promoted/` 配下）
 - `.agentdev/` 配下の変更の commit / push
 - 当該 Workflow Skill は worktree root 配下以外を編集しない（backlog-review command の worktree 隔離に従う）
 
@@ -43,7 +45,7 @@ backlog-review workflow は次の8 STEP で構成する。
 | STEP-4 | review（adversarial-review） | RU 構成案確定 | review 結果反映（矛盾は STEP-6 へ引継ぎ。skip 時は従来フロー継承） | [references/analysis-composition-and-review.md](references/analysis-composition-and-review.md) |
 | STEP-5 | HITL（ユーザー承認、RU 生成承認を兼ねる） | RU 構成案確定、review skip または完了 | 承認確定（矛盾なし時は単一承認で RU 生成承認と同時に扱う） | [references/analysis-composition-and-review.md](references/analysis-composition-and-review.md) |
 | STEP-6 | 矛盾検出・追加判断 | 承認確定 | 矛盾検出結果（なし / あり+追加判断、partial success 扱い） | [references/contradiction-ru-and-persistence.md](references/contradiction-ru-and-persistence.md) |
-| STEP-7 | RU 生成・成功成果物削除 | 承認確定、矛盾処理完了 | `.agentdev/backlog/req-units/RU-*.md`、RU 化成功成果物の削除 | [references/contradiction-ru-and-persistence.md](references/contradiction-ru-and-persistence.md) |
+| STEP-7 | RU 生成・知識文書保存・成功成果物削除 | 承認確定、矛盾処理完了 | `.agentdev/backlog/req-units/RU-*.md`、承認済み docs/knowledge/ 知識文書の保存、RU 化・保存成功成果物の削除 | [references/contradiction-ru-and-persistence.md](references/contradiction-ru-and-persistence.md) |
 | STEP-8 | Git 永続化・完了報告 | RU 生成・削除完了 | commit/push、完了報告（テンプレート別） | [references/contradiction-ru-and-persistence.md](references/contradiction-ru-and-persistence.md) |
 
 ### STEP 間の依存と分岐
@@ -68,14 +70,16 @@ backlog-review workflow は次の8 STEP で構成する。
 
 | 永続状態の観察結果 | 再開 STEP | 承認状態の解釈 |
 |---|---|---|
-| promoted に成果物残存、req-units に該当 RU なし | STEP-2（分析から。RU 構成案は promoted 実ファイルから再構築） | 未承認（HITL をやり直す） |
+| promoted に成果物残存、req-units に該当 RU なし、docs/knowledge/ に対応知識文書なし | STEP-2（分析から。RU 構成案は promoted 実ファイルから再構築） | 未承認（HITL をやり直す） |
 | RU 生成済み（req-units に RU 存在）、対応 promoted が削除済み | STEP-8（git 永続化から） | 承認済み（RU 実ファイルが承認・生成証跡。再承認を求めない） |
+| 知識文書保存済み（docs/knowledge/ に知識文書存在）、対応 promoted が削除済み | STEP-8（git 永続化から） | 承認済み（知識文書実ファイルが承認・保存証跡。再承認を求めない） |
 | RU 生成済み、対応 promoted が残存 | STEP-7（成果物削除から） | 承認済み |
+| 知識文書保存済み、対応 promoted が残存 | STEP-7（成果物削除から） | 承認済み |
 | 対象成果物 0 件 | 正常終了（「対象なし」報告のみ） | - |
 
 HITL（STEP-5）の承認状態は単独では永続状態に記録されない。
-RU 実ファイル（STEP-7 の成果物）を承認証跡として扱い、証跡がない場合は未承認と解釈して STEP-5 をやり直す。
-不可逆処理（RU 生成、採用済み成果物削除）は承認確定後にのみ実行する。
+RU 実ファイルと docs/knowledge/ の知識文書実ファイル（STEP-7 の成果物）を承認証跡として扱い、証跡がない場合は未承認と解釈して STEP-5 をやり直す。
+不可逆処理（RU 生成、docs/knowledge/ 知識文書保存、採用済み成果物削除）は承認確定後にのみ実行する。
 
 ## 主要 Capability Skill 連携
 
@@ -100,13 +104,18 @@ agentdev-traceability の coverage、impact、check を一般文書探索、構�
 - **RU フォーマット**: RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, `status`, `depends_on`, `tentative_classification`, `sources` / 本文: Sources, Source Summary, 統合理由, 要件化の方向）は `agentdev-backlog-integration` を正とする。`tentative_classification` は document-model Design（extension 経由）の文書7分類モデル（REQ、挙動Design、カタログDesign、guide、learning維持、作業記録、対象外）のいずれかを記録する。暫定分類は後続 `/agentdev/req-define` で最終確定される候補であり、本 workflow は確定しない
 - **session由来RU**: `source_type: chat` かつ `generated_by: session` の RU は、一時成果物ライフサイクル要件と artifact-contracts Design「RU アーティファクト契約（session由来RU）」セクションを正規原本とする（frontmatter 必須フィールド、二段階承認、`agreement_confirmed_at`、session 論理URI、RU 本文必須8セクション、永続ID 採番）。本 workflow は再定義しない
 - **単純コピー禁止**: 採用済み成果物のパススルー（単純コピー）を生成しない。`depends_on` に採用済み成果物パスを指定しない（RU-ID のみ許容）
-- **learning 由来の昇華先ルーティング**: learning 由来の採用済み成果物は、学習パイプラインが前工程で付与した反映先分類結果を消費し、`agentdev-backlog-integration` の昇華先ルーティング契約に従い、恒久所有先への昇華、通常の Issue による修正、重複・陳腐化した知識の削除、現時点で反映不能なものの保留へルーティングする。intake / inspect 由来は現行の RU 化経路を維持する。RU 以外への昇華を含む全処置はユーザー承認を経る。ADF リポジトリ外の project-local 資産は直接書き換えず、書き込み先の実行前提（git 管理境界）を明示した指示を完了報告に含める
-- **削除条件**: RU 生成が成功した採用済み成果物のみを削除する（当該成果物が RU に取り込まれ、RU ファイルの生成が確認できた場合のみ）。RU 化に失敗した成果物、矛盾により除外された成果物は残置する。ルーティングの削除処置のみ、ユーザーの明示承認を経た上で例外として削除する
+- **learning 由来の昇華先ルーティング**: learning 由来の採用済み成果物は、学習パイプラインが前工程で付与した反映先分類結果を消費し、`agentdev-backlog-integration` の昇華先ルーティング契約に従い、docs/knowledge/ への知識文書保存を含む恒久所有先への昇華、通常の Issue による修正、重複・陳腐化した知識の削除、現時点で反映不能なものの保留へルーティングする。intake / inspect 由来は現行の RU 化経路を維持する。docs/knowledge/ 直接保存の手順は次のとおりである（正規原本は backlog-review Design「learning 由来プロジェクト知識の docs/knowledge/ 直接保存」節。実行詳細は [references/contradiction-ru-and-persistence.md](references/contradiction-ru-and-persistence.md) の STEP-7、操作種別判定は `agentdev-backlog-integration` の昇華先ルーティング契約参照）:
+  1. 知識候補の内容を知識文書契約（1知識1ファイル、kebab-case slug、必須内容5項目）へ整形する
+  2. 既存 docs/knowledge/ 配下ファイルとの重複・陳腐化を確認し、新規、更新、置換、削除の操作種別を判定する
+  3. 操作種別ごとの変更内容を利用者へ提示し、承認を得る。承認なしの書き込みは行わない（REQ-056-006）
+  4. 承認後、docs/knowledge/ へファイルを書き込み、保存に成功した採用済み成果物を promoted から削除する
+  RU 以外への昇華を含む全処置はユーザー承認を経る。ADF リポジトリ外の project-local 資産（Project Extension の接続定義）は直接書き換えず、書き込み先の実行前提（git 管理境界）を明示した指示を完了報告に含める
+- **削除条件**: RU 生成が成功した採用済み成果物、docs/knowledge/ への知識文書保存に成功した採用済み成果物を削除する（当該成果物が RU に取り込まれ、RU ファイルの生成が確認できた場合、または知識文書の保存が確認できた場合）。RU 化・保存に失敗した成果物、矛盾により除外された成果物は残置する。ルーティングの削除処置のみ、ユーザーの明示承認を経た上で例外として削除する
 - **非更新対象**: `.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md`、`.agentdev/learning/deferred.md` を更新しない
 - **矛盾検出時**: ユーザーの指示を待ち、自動的に解決しない。矛盾する artifact を RU 化せずユーザーに確認する。矛盾しない artifact は通常通り RU 化する（partial success）
 - **破壊的変更の明示承認**: 矛盾解消、要件仕様スコープ変更、大量成果物削除等は明示承認を維持する
-- **git 永続化**: 並列実行安全ステージングプロシージャに従い明示パスでステージする。生成した RU は `.agentdev/backlog/req-units/` 配下、削除した採用済み成果物は `.agentdev/{intake,learning,inspect}/promoted/` 配下の各パスを `git add <path>`/ `git rm <path>` で明示的にステージする。`.agentdev/` 全体の一括 `git add` は禁止。commit message は `chore(agentdev): generate requirement units via backlog-review`。`git commit -- <paths>`（--only pathspec 形式）を実行し `git push` を行う。失敗時は構造化エラーメッセージを表示して停止する
-- **完了報告**: 全て成功時は `.opencode/commands/agentdev/templates/backlog-review/standard.md`、partial success（矛盾あり）時は `partial.md`、採用済み成果物なし時は `zero-promoted.md` に従う。RU 生成結果、git 永続化結果を含め、次のコマンド（`/agentdev/req-define`）を提示する
+- **git 永続化**: 並列実行安全ステージングプロシージャに従い明示パスでステージする。生成した RU は `.agentdev/backlog/req-units/` 配下、保存・更新・置換・削除した知識文書は `docs/knowledge/` 配下、削除した採用済み成果物は `.agentdev/{intake,learning,inspect}/promoted/` 配下の各パスを `git add <path>`/ `git rm <path>` で明示的にステージする。`.agentdev/` 全体の一括 `git add` は禁止。commit message は `chore(agentdev): generate requirement units via backlog-review`。`git commit -- <paths>`（--only pathspec 形式）を実行し `git push` を行う。失敗時は構造化エラーメッセージを表示して停止する
+- **完了報告**: 全て成功時は `.opencode/commands/agentdev/templates/backlog-review/standard.md`、partial success（矛盾あり）時は `partial.md`、採用済み成果物なし時は `zero-promoted.md` に従う。RU 生成結果、知識文書保存結果、git 永続化結果を含め、次のコマンド（`/agentdev/req-define`）を提示する
 
 ## See Also
 

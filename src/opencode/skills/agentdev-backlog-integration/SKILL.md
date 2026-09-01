@@ -1,6 +1,6 @@
 ---
 name: agentdev-backlog-integration
-description: backlog-review の採用済み成果物（promoted artifact）統合、分割判定、矛盾検出、RU 生成、depends_on 依存解決、learning 由来分類結果の昇華先ルーティングの知識ベース。USE FOR: 採用済み成果物の統合・分割判定・矛盾検出、RU 生成ルール、depends_on 依存解決基準、分析メタデータ項目、learning 由来反映先分類結果の昇華先ルーティング判定。DO NOT USE FOR: intake 抽出・promote、learning 昇華先の分類評価、REQ 構造診断、work_type 判定。
+description: backlog-review の採用済み成果物（promoted artifact）統合、分割判定、矛盾検出、RU 生成、depends_on 依存解決、learning 由来分類結果の昇華先ルーティング（docs/knowledge/ 知識文書保存を含む）の知識ベース。USE FOR: 採用済み成果物の統合・分割判定・矛盾検出、RU 生成ルール、depends_on 依存解決基準、分析メタデータ項目、learning 由来反映先分類結果の昇華先ルーティング判定、docs/knowledge/ 知識文書保存の操作種別判定基準。DO NOT USE FOR: intake 抽出・promote、learning 昇華先の分類評価、REQ 構造診断、work_type 判定。
 ---
 
 # バックログレビュー統合知識ベース（backlog-review）
@@ -49,7 +49,8 @@ command 本文内で backlog-review を参照する場合はこちらを使用�
 ## learning 由来分類結果の昇華先ルーティング（backlog-review）
 
 本スキルは backlog-review における learning 由来分類結果の昇華先ルーティング契約の実行時参照を提供する。
-学習パイプラインが前工程で付与した反映先分類結果を消費し、恒久所有先への昇華、通常の Issue による修正、重複・陳腐化した知識の削除、現時点で反映不能なものの保留へルーティングする。
+学習パイプラインが前工程で付与した反映先分類結果を消費し、docs/knowledge/ への知識文書保存（REQ-056、REQ-039-006）を含む恒久所有先への昇華、通常の Issue による修正、重複・陳腐化した知識の削除、現時点で反映不能なものの保留へルーティングする。
+docs/knowledge/ への知識文書保存は利用者承認後に backlog-review が直接実行する正規昇華経路であり、RU 化を経ない。
 適用対象は learning 由来に限定し、intake / inspect 由来は現行の RU 化経路を維持する。
 正規原本はバックログ統合の要件が正規所有する learning 昇華先ルーティングの要件行であり、本節は配布物側の実行時参照である。詳細は `references/learning-outcome-routing.md` を参照。
 

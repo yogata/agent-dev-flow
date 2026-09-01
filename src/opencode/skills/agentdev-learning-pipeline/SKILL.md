@@ -26,10 +26,10 @@ pipeline 各層を構成する 4 成果物の役割、性格、command 間の振
 | inbox.md | 未整理 learning entry の現行キュー。capture で蓄積し、promote 成功後にクリアされる。永続ストレージではない | 一時キュー。promote の入力として取り込みされ、処理完了後に空になる | capture が書き込む（append）。promote が読み取り、移動後にクリアする |
 | deferred.md | 保留プール（living pool。終端保管ではない）。promote 内部分析フェーズで inbox から移動した entry を保持。昇華判定フェーズの入力として参照され、promote 時の prune により動的に変化する多状態プール（deferred / 未処理 / 再評価対象を保持） | 動的プール。promote のたびに内容が変化し、未処理 entry は次回 promote の対象として残る | promote が inbox から移動して書き込み、読み取り、prune する。capture は参照しない |
 | evaluation-report.md | promote 内部で生成される境界成果物。毎回上書きされ長期履歴ではない。promote の分析フェーズで生成され、昇華判定フェーズの主入力として取り込みされる | 境界成果物。promote 内部の分析→昇華判定間の受け渡し専用。履歴蓄積は行わない | promote が生成（上書き）し、読み取り、取り込みする。capture は参照しない |
-| promoted/ | 採用済み成果物の staging 領域。生成された成果物は `/agentdev/backlog-review` が読み込み、RU 化後に `/agentdev/req-define` に合流する。`.opencode/` や実装コードへの直接反映は禁止。`case-run` への直接受け渡しも禁止 | staging 専用。promote が生成し、backlog-review が取り込みする。pipeline 外への直接反映は不可 | promote が採用済み成果物を生成する。backlog-review が明示的に読み取る |
+| promoted/ | 採用済み成果物の staging 領域。生成された成果物は `/agentdev/backlog-review` が読み込み、RU 化後に `/agentdev/req-define` に合流する。learning 由来で docs/knowledge/ への知識文書保存に分類された成果物は、backlog-review の利用者承認後に docs/knowledge/ へ直接保存され、RU → req-define を経ない。`.opencode/` や実装コードへの直接反映は禁止。`case-run` への直接受け渡しも禁止 | staging 専用。promote が生成し、backlog-review が取り込みする。pipeline 外への直接反映は不可 | promote が採用済み成果物を生成する。backlog-review が明示的に読み取る |
 
 **制約**: raw learning item を実行時コマンド/ skill の直接参照対象にしない。
-学びは昇華（promote → 採用済み成果物 → backlog-review → RU → req-define）を経て初めて command/ skill/ template/ AGENTS.md/ docs へ組み込まれる。
+学びは昇華（promote → 採用済み成果物 → backlog-review → RU → req-define。docs/knowledge/ への知識文書保存に分類された learning 由来分は、backlog-review の利用者承認後に docs/knowledge/ へ直接保存され、RU → req-define を経ない）を経て初めて command/ skill/ template/ AGENTS.md/ docs へ組み込まれる。
 
 ## 責任分界
 
@@ -92,5 +92,6 @@ promoted/ → /agentdev/backlog-review → /agentdev/req-define → /agentdev/re
 ```
 
 - 採用済み成果物は `/agentdev/backlog-review` が読み込み、RU 化後に `/agentdev/req-define` の明示入力として扱われる
+- learning 由来で docs/knowledge/ への知識文書保存に分類された成果物は、`/agentdev/backlog-review` の利用者承認後に docs/knowledge/ へ直接保存される。この経路では RU を生成せず、`/agentdev/req-define` の要件化経路を通らない（Project Knowledge の所有と workflow 利用の要件、backlog-review Design の知識文書保存手順を正とする）
 - 採用済み成果物の形式要件は `references/disposition-and-artifact-schema.md` の「採用済み成果物スキーマ」参照
 - `case-run` への直接受け渡しは禁止（`backlog-review` → `req-define` を経由すること）
