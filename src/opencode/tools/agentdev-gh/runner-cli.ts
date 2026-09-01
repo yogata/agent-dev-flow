@@ -3,7 +3,7 @@
 // 環境依存の実装詳細（gh オプション運用、--input によるファイル渡し、
 // UTF-8 BOM なし一時ファイル、シェルを経由しない引数配列での gh 呼び出し、
 // REST API による title/body 投入、応答の正規化）はすべて本ファイルの内側に
-// 隠蔽する（REQ-011-013）。呼び出し側（engine / plugin）には現れない。
+// 隠蔽する（REQ-{NNNN}-{NNN}）。呼び出し側（engine / plugin）には現れない。
 //
 // 実行方式:
 //   - gh は node:child_process の spawnSync（シェル不使用、引数配列）で呼ぶ。

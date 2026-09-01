@@ -76,7 +76,7 @@ RU を生成し、承認済みの docs/knowledge/ 知識文書保存を実行し
 1. RU 構成案に基づき `.agentdev/backlog/req-units/RU-*.md` を生成する（frontmatter: `source_type`, `generated_by`, `generated_at`, `status`, `depends_on`, `tentative_classification`, `sources` / 本文: Sources, Source Summary, 統合理由, 要件化の方向）
 2. session由来RU（`source_type: chat`、`generated_by: session`）の場合は、正規原本（一時成果物ライフサイクル要件、artifact-contracts Design「RU アーティファクト契約（session由来RU）」）へ委譲した要件（二段階承認、frontmatter 必須フィールド、`agreement_confirmed_at`、session 論理URI、RU 本文必須8セクション、永続ID 採番）に従う
 3. depends_on 検証を実行する（RU-ID のみ許容、unresolved、循環の検証）
-4. docs/knowledge/ 知識文書保存処置を実行する。STEP-5 で承認済みの操作種別（新規、更新、置換、削除）に従い、整形済み知識文書（1知識1ファイル、kebab-case slug、必須内容5項目）を docs/knowledge/ へ書き込む。承認なしの docs/knowledge/ 書き込みは行わない（REQ-056-006）。知識文書の保存が確認できた採用済み成果物を promoted から削除する（REQ-039-004）
+ 4. docs/knowledge/ 知識文書保存処置を実行する。STEP-5 で承認済みの操作種別（新規、更新、置換、削除）に従い、整形済み知識文書（1知識1ファイル、kebab-case slug、必須内容5項目）を docs/knowledge/ へ書き込む。承認なしの docs/knowledge/ 書き込みは行わない（REQ-{NNNN}-{NNN}）。知識文書の保存が確認できた採用済み成果物を promoted から削除する（REQ-{NNNN}-{NNN}）
 5. RU 生成が成功した採用済み成果物のみを削除する。
 削除条件は当該成果物が RU に取り込まれ、RU ファイルの生成が確認できた場合のみ。
 RU 化に失敗した成果物、矛盾により除外された成果物は残置する

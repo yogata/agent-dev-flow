@@ -10,8 +10,7 @@ param(
 # WP-{N} (Issue #1928) §7.5.2: install the unpacked release archive's src/opencode/
 # tree into the projection directory (.opencode/) as real files.
 # Junctions are NOT created; release archives must be junction-free.
-#
-# ADF-COVERS(implementation): REQ-052-007
+# 対応宣言（ADF-COVERS）の正規配置先は docs 配下の正規成果物である。
 #
 # Exit codes:
 #   0  success (every file placed, content matches)
@@ -99,10 +98,10 @@ foreach ($skillDir in $skillDirs) {
     }
 }
 
-# Custom Tools / Plugins (agentdev-* distribution types, REQ-052). Optional
+# Custom Tools / Plugins (agentdev-* distribution types, REQ-{NNNN}). Optional
 # kinds: archives without a kind directory simply skip it.
-# Repo-local Plugin (agentdev-distribution-boundary-guard, REQ-052-006 /
-# REQ-002-045) is excluded from consumer projection. SYNC OBLIGATION
+# Repo-local Plugin (agentdev-distribution-boundary-guard, REQ-{NNNN}-{NNN} /
+# REQ-{NNNN}-{NNN}) is excluded from consumer projection. SYNC OBLIGATION
 # (runtime-package-boundary Design「repo-local Plugin の配布・投影契約」):
 # keep this exclusion in sync across the 3 consumer distribution paths:
 # scripts/install.ps1, scripts/self/release/package-release-archive.ps1,
@@ -126,7 +125,7 @@ foreach ($kind in @("tools", "plugins")) {
     }
 }
 
-# Plugin loader shims (REQ-011-001 registration wiring): OpenCode auto-loads
+# Plugin loader shims (REQ-{NNNN}-{NNN} registration wiring): OpenCode auto-loads
 # plugin files only at .opencode/plugins/ depth 1, so each directory-style
 # plugin package also needs a depth-1 re-export shim. Release archives must
 # stay junction-free; the shim is a generated real file.

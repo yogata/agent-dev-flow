@@ -18,7 +18,7 @@ description: 採用済み成果物を分析、統合し、ユーザー承認後�
 ## 出力
 
 - `.agentdev/backlog/req-units/RU-*.md`（Requirement Unit）
-- `docs/knowledge/` 配下の知識文書（learning 由来、利用者承認後に直接保存。REQ-056、REQ-039-006）
+- `docs/knowledge/` 配下の知識文書（learning 由来、利用者承認後に直接保存。REQ-{NNNN}、REQ-{NNNN}-{NNN}）
 - 成功した採用済み成果物の削除（RU 生成成功分、docs/knowledge/ 知識文書保存成功分を含む）
 - learning 由来分類結果の昇華先ルーティング結果（docs/knowledge/ 知識文書保存を含む昇華、Issue 修正、削除、保留を完了報告に処置別に記録）
 
@@ -50,7 +50,7 @@ RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, 
 
 - REQ ファイルの保存は行わない（`req-save` が担当）
 - GitHub Issue の作成は行わない（`case-open` が担当）
-- docs/knowledge/ への知識文書の新規、更新、置換、削除は利用者承認なしに行わない（REQ-056-006）
+- docs/knowledge/ への知識文書の新規、更新、置換、削除は利用者承認なしに行わない（REQ-{NNNN}-{NNN}）
 - `.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md`、`.agentdev/learning/deferred.md` は更新しない
 - ADF リポジトリ外の project-local 資産（Project Extension の接続定義）を直接書き換えない（書き込み先の実行前提を明示した指示の出力で代替する）
 - RU 生成に失敗した成果物は削除しない

@@ -49,7 +49,7 @@ command 本文内で backlog-review を参照する場合はこちらを使用�
 ## learning 由来分類結果の昇華先ルーティング（backlog-review）
 
 本スキルは backlog-review における learning 由来分類結果の昇華先ルーティング契約の実行時参照を提供する。
-学習パイプラインが前工程で付与した反映先分類結果を消費し、docs/knowledge/ への知識文書保存（REQ-056、REQ-039-006）を含む恒久所有先への昇華、通常の Issue による修正、重複・陳腐化した知識の削除、現時点で反映不能なものの保留へルーティングする。
+学習パイプラインが前工程で付与した反映先分類結果を消費し、docs/knowledge/ への知識文書保存（REQ-{NNNN}、REQ-{NNNN}-{NNN}）を含む恒久所有先への昇華、通常の Issue による修正、重複・陳腐化した知識の削除、現時点で反映不能なものの保留へルーティングする。
 docs/knowledge/ への知識文書保存は利用者承認後に backlog-review が直接実行する正規昇華経路であり、RU 化を経ない。
 適用対象は learning 由来に限定し、intake / inspect 由来は現行の RU 化経路を維持する。
 正規原本はバックログ統合の要件が正規所有する learning 昇華先ルーティングの要件行であり、本節は配布物側の実行時参照である。詳細は `references/learning-outcome-routing.md` を参照。

@@ -1,6 +1,6 @@
 # third-party Skill 宣言ファイル
 #
-# 位置づけ: 配布成果物種別ではない宣言ファイル（DEC-023 決定2、case-schema/ 先行例と同様）。
+# 位置づけ: 配布成果物種別ではない宣言ファイル（DEC-023（proposed）決定2、case-schema/ 先行例と同様）。
 # third-party Skill の本体は ADF リポジトリおよび配布成果物へ含めず、本宣言に基づく
 # 取得機構経由で利用者環境の .opencode/skills/<name>/ へ配置する
 # （REQ-002-042、REQ-002-043）。

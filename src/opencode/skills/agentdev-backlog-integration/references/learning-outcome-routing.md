@@ -28,11 +28,11 @@ backlog-review は当該分類結果を読み込んで消費する。本工程�
 
 ### ルート (a) の実行境界
 
-- docs/knowledge/ への知識文書保存は、利用者承認後に backlog-review が直接実行する正規昇華経路である（REQ-039-006、REQ-056-004）。指示出力型の処置ではなく、保存までを本工程内で完結させる
+- docs/knowledge/ への知識文書保存は、利用者承認後に backlog-review が直接実行する正規昇華経路である（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。指示出力型の処置ではなく、保存までを本工程内で完結させる
 - docs/knowledge/ 直接保存の手順は次のとおりである（正規原本は backlog-review Design「learning 由来プロジェクト知識の docs/knowledge/ 直接保存」節）:
-  1. 知識候補の内容を知識文書契約（1知識1ファイル、kebab-case slug、必須内容5項目、REQ-056-001/003）へ整形する
+  1. 知識候補の内容を知識文書契約（1知識1ファイル、kebab-case slug、必須内容5項目、REQ-{NNNN}-{NNN}）へ整形する
   2. 既存 docs/knowledge/ 配下ファイルとの重複・陳腐化を確認し、新規、更新、置換、削除の操作種別を判定する
-  3. 操作種別ごとの変更内容を利用者へ提示し、承認を得る。承認なしの書き込みは行わない（REQ-056-006）
+  3. 操作種別ごとの変更内容を利用者へ提示し、承認を得る。承認なしの書き込みは行わない（REQ-{NNNN}-{NNN}）
   4. 承認後、docs/knowledge/ へファイルを書き込み、保存に成功した採用済み成果物を promoted から削除する
 - docs/knowledge/ は ADF リポジトリ内の git 管理対象であり、project-local 資産への指示出力を伴う処置（ガードレール移管、Project Extension 接続更新）と異なり、backlog-review が直接書き込む。保存の実行詳細は `agentdev-workflow-backlog-review`（backlog-review workflow 実装本体）が所有する
 - 既存 REQ / Decision / Design への反映は、要件化の方向に反映先文書と反映の方向を明記した RU 生成により、承認を経た要件化・設計化経路へ乗せる
@@ -43,13 +43,13 @@ backlog-review は当該分類結果を読み込んで消費する。本工程�
 ## ユーザー承認境界
 
 - ルーティング処置は RU 生成承認と同じ承認工程で提示し、ユーザーの明示的な承認を経る
-- 知識文書の新規、更新、置換、削除はいずれも利用者承認を経る（REQ-056-006）。承認なしの docs/knowledge/ 書き込みは行わない
+- 知識文書の新規、更新、置換、削除はいずれも利用者承認を経る（REQ-{NNNN}-{NNN}）。承認なしの docs/knowledge/ 書き込みは行わない
 - RU 以外への昇華（docs/knowledge/ 知識文書保存、ガードレール移管、Project Extension 接続更新、Issue 修正指示、削除、保留）も、バックログ統合の要件が正規所有する承認原則に準拠してユーザー承認を経る
 - 未承認の処置は実行せず、当該成果物は promoted に残置する
 
 ## 成果物ライフサイクル
 
-- docs/knowledge/ への知識文書保存に成功した採用済み成果物は、RU 生成成功時と同様に promoted から削除する（REQ-039-004）
+- docs/knowledge/ への知識文書保存に成功した採用済み成果物は、RU 生成成功時と同様に promoted から削除する（REQ-{NNNN}-{NNN}）
 - RU 化に至らなかった成果物、承認を得られなかった処置の成果物は promoted に残置する
 - 削除ルートの処置は、明示承認を経て該当採用済み成果物を promoted から削除する（破壊的変更の明示承認に従う）
 - 保留ルートと指示出力型の処置（Issue 修正指示、ガードレール移管指示、Project Extension 接続更新指示）の成果物は promoted に残置し、次回 backlog-review 実行の再評価対象とする。learning 側の deferred 管理ファイルは更新しない既存制約を維持する

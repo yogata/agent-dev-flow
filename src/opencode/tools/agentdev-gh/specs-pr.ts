@@ -24,7 +24,7 @@ function positiveInt(v: unknown): number | null {
   return typeof v === "number" && Number.isInteger(v) && v > 0 ? v : null;
 }
 
-// 出力 URL: GitHub 実装は https URL、Local 実装（Case ファイル）は絶対パスを識別子として返す（REQ-011-006）。
+// 出力 URL: GitHub 実装は https URL、Local 実装（Case ファイル）は絶対パスを識別子として返す（REQ-{NNNN}-{NNN}）。
 function isAcceptedUrl(v: string): boolean {
   return /^https:\/\//.test(v) || v.startsWith("/") || /^[A-Za-z]:[\\/]/.test(v);
 }
