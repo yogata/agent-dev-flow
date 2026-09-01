@@ -902,3 +902,19 @@
 - **想定反映先**: checker 実行契約と検出基盤規則（docs/designs/integrity/checker-execution-contracts.md）、検証実行手順の各 workflow
 - **関連**: PR #2501 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2501 ）
 - **タグ**: `#check_integrity` `#worktree` `#レポート後始末`
+
+## トレーサビリティ対応宣言の網羅性は欠落の規模を Case 実行時に定量化して記録すると後続整備の判断材料になる
+
+- **発見事象**: トレーサビリティ check の missing-implementation（70件）と missing-verification（42件）が main から既に存在する広範な既存状態である。REQ 行に対する ADF-COVERS(implementation / verification) 宣言の整備が未了の範囲が大きく、Case 単位の実装・検証だけでは解消しない。PR #2502 の変更では新規違反を生じていない（Compare-Object で main と差分 0件を確認）
+- **特性区分**: 検証（トレーサビリティ対応宣言の網羅性、Epic #2497 Issue #2499 実行時）
+- **確知手段**: PR #2502 本文「検証差分」トレーサビリティ check（missing-implementation 70件 / missing-verification 42件が main と完全一致、新規 0件）
+- **根本原因**: REQ 行への対応宣言整備が一部の REQ で未了のまま残存している（宣言付与の網羅性を担保する工程が現行 pipeline に存在しない）
+- **恒久対応内容**: なし（本変更はスコープ外。宣言網羅性の改善要否は intake / backlog-review 経由で別途判断）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（宣言網羅性の改善要否判断は learning-promote / backlog-review 経由の別提案）
+- **横展開観点**: トレーサビリティ check を実行するすべての Case 工程（fail を新規か既存か分類するとき）
+- **再発条件**: 対応宣言未整備の REQ 行が残存したまま traceability check を実行し、missing を「既存」と分類して記録する場合
+- **予防策候補**: 新規 REQ 保存時に ADF-COVERS 宣言の付与を req-save / design-save の検証対象へ含める、または missing 定期走査の運用化
+- **想定反映先**: agentdev-traceability の宣言完全性運用、REQ-056 系の対応宣言整備計画
+- **関連**: PR #2502 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2502 ）
+- **タグ**: `#traceability` `#adf-covers` `#missing-verification` `#宣言網羅性`
