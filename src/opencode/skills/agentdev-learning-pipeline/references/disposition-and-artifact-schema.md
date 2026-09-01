@@ -36,7 +36,7 @@ living pool は終端保管ではなく、次回 `/agentdev/learning-promote` �
 | 6 | ADR 候補 | アーキテクチャに関する設計判断、技術選定の理由を記録すべき内容 |
 | 7 | spec 候補 | システム仕様、実装パターン、設計原則として docs/designs/ に反映すべき内容 |
 | 8 | REQ 候補 | 要件変更、機能追加の要因となる知見、既存REQの更新が必要な内容。**自動REQ化ではなく候補扱い**。確定は `/agentdev/req-define` → `/agentdev/req-save` 経路で行う |
-| 9 | project-local knowledge | プロジェクト固有の落とし穴、環境依存の知見、汎用化が難しい内容 |
+| 9 | project knowledge | プロジェクト固有の落とし穴、環境依存の知見、汎用化が難しい内容。保存先の候補判定は「プロジェクト固有知識の反映先振り分け」参照 |
 | 10 | deferred | まだ昇華の余地がない、情報が断片的、出現回数が少ない。**living pool（`deferred.md`）で維持し REQ 化しない** |
 | 11 | rejected | ユーザーが明示的に却下、すでに別の対策で十分対応済み |
 | + | duplicate | 既存の command/skill/template/docs で既に同等の内容が十分にカバーされている |
@@ -51,7 +51,7 @@ living pool は終端保管ではなく、次回 `/agentdev/learning-promote` �
 - **architecture**（アーキテクチャ決定）→ ADR 候補
 - **system spec**（システム仕様）→ docs/designs/
 - **requirement change**（要件変更）→ REQ/Issue 更新
-- **project-specific pitfalls**（プロジェクト固有の落とし穴）→ project-local knowledge
+- **project-specific pitfalls**（プロジェクト固有の落とし穴）→ project knowledge（docs/knowledge/ 知識文書保存等、プロジェクト固有知識の反映先振り分けへ）
 
 ## 既存対策照合
 
@@ -73,7 +73,7 @@ living pool は終端保管ではなく、次回 `/agentdev/learning-promote` �
 ## 採用済み成果物スキーマ
 
 learning-promote が出力する採用済み成果物の形式。
-`/agentdev/backlog-review` が読み込み、RU 化後に `/agentdev/req-define` に合流する。
+`/agentdev/backlog-review` が読み込み、RU 化後に `/agentdev/req-define` に合流する。learning 由来で docs/knowledge/ への知識文書保存に分類された成果物は、backlog-review の利用者承認後に docs/knowledge/ へ直接保存され、RU 化を経ない。
 採用済み成果物は backlog-review 以前の段階（pre-backlog-review）であり、RU への変換は backlog-review が行う。
 
 ```markdown
@@ -150,24 +150,24 @@ learning-promote が出力する採用済み成果物の形式。
 | Decision 候補 | `docs/decisions/DEC-{NNN}-{name}.md` |
 | spec 候補 | `docs/designs/{domain}/{spec-name}.md` |
 | REQ 候補 | `docs/requirements/REQ-{NNNN}.md` |
-| project-local knowledge | 内容に応じた振り分け（後述参照） |
+| project knowledge | 内容に応じた振り分け（後述参照） |
 
 ## プロジェクト固有知識の反映先振り分け
 
-project-local knowledge を一律 `.agentdev/learning/project-knowledge.md` に保存せず、内容に応じて振り分ける。
-技術固有知識（リスク判断知識）の恒久所有先は、Project Knowledge の所有と workflow 利用の要件が正規所有する所有面の契約に従い、Design（現在のシステム事実）と project-local 側の判断知識（project-local Capability Skill として所有）に分担する。
+project knowledge を一律 `.agentdev/learning/project-knowledge.md` に保存せず、内容に応じて振り分ける。
+技術固有知識（リスク判断知識）の恒久所有先は、Project Knowledge の所有と workflow 利用の要件が正規所有する所有面の契約に従い、Design（現在のシステム事実）と docs/knowledge/ 配下の知識文書（プロジェクト知識の正規知識層）に分担する。
 
 | 内容の性質 | 反映先 |
 |---|---|
 | 常時必要な短いルール | `AGENTS.md` |
 | 現在のシステム事実として固定すべき技術事実 | `docs/designs/<**/*>.md` |
-| 再利用可能な判断知識（リスク導出規則） | project-local Capability Skill（対象 Capability Skill に対応する project-local 側の判断知識定義へ追加する） |
+| 再利用可能な判断知識（リスク導出規則） | `docs/knowledge/`（知識文書契約（1知識1ファイル、kebab-case slug、必須内容5項目）に従う知識文書として保存する。backlog-review の利用者承認後に docs/knowledge/ へ直接保存され、RU → req-define の要件化経路を通らない） |
 | 設計判断 | `docs/decisions/<*>.md` |
 | 要件変更 | `docs/requirements/<*>.md` |
 
-project-local 側の判断知識は、対象 Capability Skill に対応する extension を経由して workflow 責務へ接続される。extension の配置と読込の契約は、配布成果物の責務境界の要件と extension の発見・読込を提供するスキルが正規所有し、本ファイルは機構の契約を再定義せず名レベルで参照する。
+docs/knowledge/ の知識文書は、利用可能なハーネスの探索能力を通じて関連知識が判断材料として利用される（Project Knowledge の所有と workflow 利用の要件が正規所有する利用面の契約）。本ファイルはその機構の契約を再定義せず名レベルで参照する。
 配布成果物（ADF core）は一般規則のみを保持し、技術固有知識を保持しない（配布成果物の責務境界の要件が正規所有する技術固有知識非保持の原則）。一般規則へ昇華できる内容のみ、恒久契約（REQ/Decision/Design）の経路を経て配布成果物へ反映する。
-project-local 側の判断知識は、learning 昇華先ルーティング（バックログ統合の要件が正規所有する learning 昇華先のルーティング契約）を経由して流入し、リスク導出規則として次の分析で使われる成長する資産として扱う。昇華先が現行体系に存在しない知識は deferred として保留し、Knowledge 独立文書種別の導入判断と独立に扱う。
+docs/knowledge/ 向けの知識文書は、learning 昇華先ルーティング（バックログ統合の要件が正規所有する learning 昇華先のルーティング契約）を経由して流入し、判断の材料として使われる成長する資産として扱う。docs/knowledge/ への知識文書保存にも既存恒久所有先への昇華にも該当しない知識は deferred として保留する。
 
 ## Prune 方針
 
