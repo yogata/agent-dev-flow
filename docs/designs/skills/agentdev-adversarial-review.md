@@ -2,10 +2,11 @@
 title: agentdev-adversarial-review Design
 status: accepted
 created: 2026-08-09
-updated: 2026-08-21
+updated: 2026-09-02
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-021 -->
+<!-- ADF-COVERS(implementation): REQ-057-014 -->
 <!-- ADF-COVERS(implementation): REQ-003-030, REQ-003-031, REQ-003-032, REQ-003-033, REQ-003-034, REQ-003-035, REQ-003-036, REQ-003-037, REQ-003-038, REQ-003-039, REQ-003-040, REQ-003-041, REQ-003-042, REQ-003-043, REQ-003-044, REQ-003-045, REQ-003-046, REQ-003-047, REQ-003-048, REQ-003-049, REQ-003-050, REQ-003-051, REQ-003-052, REQ-003-053, REQ-003-054 -->
 <!-- ADF-COVERS(implementation): REQ-014-001, REQ-014-002, REQ-014-003, REQ-014-004, REQ-014-005, REQ-014-006, REQ-014-007, REQ-014-008, REQ-014-009, REQ-014-010, REQ-014-011, REQ-014-012, REQ-014-013, REQ-014-014, REQ-014-015 -->
 <!-- ADF-COVERS(implementation): REQ-015-001, REQ-015-002, REQ-015-003 -->
@@ -346,3 +347,19 @@ adversarial-review の呼出失敗時（スキル不在、起動異常、timeout
 本マトリックスの遵守状態は REQ-016（横断整合）により検証済みである（#1972）。
 7呼出元（req-define、inspect-promote、intake-promote、learning-promote、backlog-review、case-open、case-run）+ case-auto 統合後について、QG 重複（REQ-016-001）、HITL 重複（REQ-016-002）、新規永続成果物混入（REQ-016-003）、case-auto 伝播 regression（REQ-016-004）、責務重複（REQ-016-005）、command 定義本体と Design の Step 表現整合（REQ-016-006）のいずれも不整合なし。
 共通契約節（REQ-014-006〜011）の具体性も精査済みで補完不要。
+
+## caller 挿入境界の節見出し表記規約
+
+各 command Design が所有する adversarial-review 挿入境界の節見出しは、本節の表記規約に従う（REQ-057-014）。
+個別呼出統合（発動条件、挿入境界、戻り先）の正規所有は各 command Design であり、本節は節見出しの表記のみを正規所有する。
+
+節見出しは次の形式を使い分ける。見出しレベルは command Design 内の第2レベル（`##`）とする。
+
+| 形式 | 適用条件 | 現行適用 |
+|---|---|---|
+| `## adversarial-review 挿入境界（<呼出元コマンド名>）` | 挿入位置を command 単位で一意に定める caller の標準形式 | req-define、case-open、backlog-review、inspect-promote、intake-promote、learning-promote |
+| `## adversarial-review 挿入境界（<呼出元コマンド名>: <位置修飾>）` | 同一 command 内で複数の実行形態があり、位置を実行形態で区別する場合 | case-run（`case-run: adapter 委譲内`） |
+| `## adversarial-review 由来の停止伝播（<呼出元コマンド名> の停止伝播受領）` | 呼出側ではなく adversarial-review の停止伝播を受領する側 | case-auto（`case-auto の停止伝播受領`） |
+
+形式の機械判定は、`docs/designs/commands/` 配下を `adversarial-review 挿入境界（` および `adversarial-review 由来の停止伝播（` で grep し、抽出された見出しが上表の形式のいずれかに一致することで行える。
+形式に一致しない見出しは、本節に例外を追加するか、見出しを規約どおりへ修正する。

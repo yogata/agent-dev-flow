@@ -218,8 +218,6 @@ epic テンプレートでは「完了条件」セクションの直後、「補
 | Epic flow（単一REQ） | `templates/case-open/epic.md` |
 | Epic flow（マルチREQ） | `templates/case-open/multi-req-epic.md` |
 
-### Issue作成時のテンプレート選定（case-close）
-
 ### 共通ルール
 
 - テンプレートは Read tool で読み込み、変数部分を置換して使用する
