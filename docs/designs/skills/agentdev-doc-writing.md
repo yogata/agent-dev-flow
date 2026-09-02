@@ -2,9 +2,9 @@
 title: `agentdev-doc-writing` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-30
+updated: 2026-09-02
 ---
-<!-- ADF-COVERS(verification): REQ-001-004, REQ-001-005, REQ-001-016, REQ-001-018, REQ-001-019, REQ-001-046, REQ-001-048, REQ-001-049, REQ-001-061, REQ-001-063, REQ-001-064, REQ-004-007, REQ-004-008, REQ-004-009, REQ-004-023, REQ-004-024, REQ-004-025, REQ-004-026, REQ-004-027, REQ-004-028, REQ-004-029, REQ-004-030 -->
+<!-- ADF-COVERS(verification): REQ-001-004, REQ-001-005, REQ-001-016, REQ-001-018, REQ-001-019, REQ-001-046, REQ-001-048, REQ-001-049, REQ-001-061, REQ-001-063, REQ-001-064, REQ-004-007, REQ-004-008, REQ-004-009, REQ-004-023, REQ-004-024, REQ-004-025, REQ-004-026, REQ-004-027, REQ-004-028, REQ-004-029, REQ-004-030, REQ-057-019 -->
 <!-- ADF-COVERS(implementation): REQ-053-011 -->
 <!-- ADF-COVERS(implementation): REQ-053-001, REQ-053-002, REQ-053-003, REQ-053-004, REQ-053-005, REQ-053-006, REQ-053-007, REQ-053-008, REQ-053-009, REQ-053-010, REQ-053-013 -->
 
@@ -65,6 +65,7 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 - 要件行が主語、対象、状態、検証可能性、独立性、肯定文主文を満たすか
 - Decision 本文が意思決定文書として成立しているか
 - Design 本文が詳細仕様の置き場として成立しているか
+- 配布物（command/skill）の記載様式が ID 衛生に適合するか。実行手順・例示が fenced code block とプレースホルダ表記で書かれ、具象参照 ID の inline 記載が排除されているか（REQ-057-019）。対応宣言（ADF-COVERS）が docs 配下の正規成果物へ配置されているか
 - `japanese-tech-writing` 規範（LLM っぽい表現の禁止、空虚な形容、空虚な動詞等）への適合
 
 ### 文章品質観点（査読時）

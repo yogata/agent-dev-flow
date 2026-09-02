@@ -28,6 +28,8 @@ OpenCode のSKILL.mdを書く際の実践ガイドである。
 - 参照深度は SKILL.md から **1階層** まで（深いネスト回避）
 - 100行を超える参照ファイルには目次を付ける
 - Windows 形式パス（`\`）を使わず、フォワードスラッシュ（`/`）を使う
+- 配布物への実行手順・例示は fenced code block とプレースホルダ表記で書き、要件・決定・設計等の具象参照（concrete ID）を本文 inline に記載しない
+- 対応宣言（ADF-COVERS implementation / verification）は docs 配下の正規成果物（skill Design・command Design）へ配置する。配布物本体には対応宣言を書かない
 
 ## 文章品質観点（作成時）
 
