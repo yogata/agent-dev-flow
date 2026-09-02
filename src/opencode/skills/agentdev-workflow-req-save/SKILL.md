@@ -40,7 +40,7 @@ req-save workflow は次の12 STEP で構成する。
 | STEP-2 | ドラフト読込 | 処理対象あり | ドラフト読込済み、読込時 commit hash 記録 | [references/precheck-and-req-ops.md](references/precheck-and-req-ops.md) |
 | STEP-3 | ドラフト検証・処理対象確定 | ドラフト読込済み | 必須フィールド検証、処理対象 entry 確定 | [references/precheck-and-req-ops.md](references/precheck-and-req-ops.md) |
 | STEP-4 | REQ ファイル操作 | 処理対象確定 | REQ/Decision ファイル保存（QG-1 相当検証、決定的スクリプト適用、検証対応要否未分類行の検出・記録） | [references/precheck-and-req-ops.md](references/precheck-and-req-ops.md) |
-| STEP-5 | インデックス・ハブ更新 | REQ ファイル操作完了 | README エントリ登録（check-entry-existence 検証済み） | [references/indexes-and-persistence.md](references/indexes-and-persistence.md) |
+| STEP-5 | インデックス・ハブ更新 | REQ ファイル操作完了 | README エントリ登録（check-entry-existence 検証済み）。REQ 行 append を伴う場合は AUTOGEN 対象索引の同 commit 再生成を前置として実行 | [references/indexes-and-persistence.md](references/indexes-and-persistence.md) |
 | STEP-6 | Decision ファイル作成 | `artifact: decision` entry 存在 | Decision ファイル作成、ハブ追記 | [references/indexes-and-persistence.md](references/indexes-and-persistence.md) |
 | STEP-7 | docs 変更整合性検証 | ファイル操作完了 | REQ番号連続性、frontmatter id↔ファイル名整合 | [references/indexes-and-persistence.md](references/indexes-and-persistence.md) |
 | STEP-8 | README 索引影響確認 | 整合性検証完了 | 索引更新、targeted docs guard、extension 更新要否確認 | [references/indexes-and-persistence.md](references/indexes-and-persistence.md) |

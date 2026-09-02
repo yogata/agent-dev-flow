@@ -8,6 +8,7 @@ updated: 2026-09-02
 <!-- ADF-COVERS(implementation): REQ-010-062 -->
 <!-- ADF-COVERS(implementation): REQ-010-010 -->
 <!-- ADF-COVERS(implementation): REQ-057-004 -->
+<!-- ADF-COVERS(implementation): REQ-057-018 -->
 
 # checker 実行契約と検出基盤規則
 
