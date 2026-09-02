@@ -39,7 +39,7 @@ resume point / export / import を持たない。
 | STEP | 名称 | 内容 |
 |---|---|---|
 | STEP-1 | 期間解釈 | 期間指定または Issue/PR 番号指定を解釈する（抽出アルゴリズムは `agentdev-intake-pipeline`） |
-| STEP-2 | データ取得 | クローズ済み Case Issue/PR のデータを取得する（Custom Tool `agentdev_gh` の読み取り操作）。role: tracking の追跡Issue（`agentdev-tracking` ラベル保持）は抽出対象から除外する |
+| STEP-2 | データ取得 | クローズ済み Case Issue/PR のデータを取得する（Custom Tool `agentdev_gh` の読み取り操作）。role: tracking の追跡Issue（`agentdev-issue-tracking` Design の物理写像により role ラベルが付与）は抽出対象から除外する |
 | STEP-3 | 構造的検出 | 抽出ルールに基づき構造的に残課題候補を検出する（`agentdev-intake-pipeline`） |
 | STEP-4 | LLM 全文解析 | キーワードリスト、コンテキスト付与ルールに基づき全文解析する（`agentdev-intake-pipeline`） |
 | STEP-5 | intake item 生成・実行前同期 | item 生成ルール、ファイル名規則に従い item を生成する（`agentdev-intake-pipeline`）。`git pull --ff-only` を実行する |

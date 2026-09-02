@@ -26,7 +26,7 @@ description: コマンドの簡潔な説明
 - `branch_type`（追加禁止フィールド）
 - `labels`（追加禁止フィールド）
 
-これらの情報は command-map.md 等の参照用文書で管理し、frontmatter には混入させない。
+これらの情報は参照用文書で管理し、frontmatter には混入させない。
 
 ## ガードレール記述と共通ポリシー識別子
 

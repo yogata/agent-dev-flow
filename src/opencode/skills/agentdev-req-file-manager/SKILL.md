@@ -153,7 +153,6 @@ REQ間の関連（置き換え、関連、分割元/分割先）もREQ本文内�
 - **保存先**: `.agentdev/drafts/requirements-review-finding-{topic-slug}.md`（REQファイルと同じ `docs/requirements/` には保存しない）
 - **次工程**: 検出事項は req-define の明示入力ファイルとして渡され、正式な要件変更（CREATE/APPEND/UPDATE）に変換される
 - **SPLIT 検出時**: req-save が SPLIT を検出した場合、保存可能範囲を実行した後に検出事項を作成する
-- **詳細**: `agentdev-workflow-lifecycle` reference の `requirements-review-finding-protocol.md` を参照
 
 ---
 

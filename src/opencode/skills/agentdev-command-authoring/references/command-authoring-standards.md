@@ -284,12 +284,12 @@ Source path は agent-dev-flow 開発リポジトリ内でのみ有効であり�
 
 **✅ OK（テンプレート参照時は実行時パスを使用する）**:
 ```markdown
-テンプレート `.opencode/skills/agentdev-workflow-templates/templates/close-report.md` を読み込む
+テンプレート `.opencode/skills/agentdev-workflow-templates/templates/pr_desc.md` を読み込む
 ```
 
 **❌ NG（source path は実行時環境でアクセス不可）**:
 ```markdown
-テンプレート `src/opencode/skills/agentdev-workflow-templates/templates/close-report.md` を読み込む
+テンプレート `src/opencode/skills/agentdev-workflow-templates/templates/pr_desc.md` を読み込む
 ```
 
 **✅ OK（Skill 参照時は実行時パス）**:
@@ -337,9 +337,9 @@ Command作成、改定時に確認する項目:
 - [ ] 決定的処理がScriptに移されているか
 - [ ] テンプレート選定ルールの詳細がSkillに移されているか
 
-### Command-map 整合確認
+### Skill 参照整合確認
 
-- [ ] command 本文で参照している Skill が command-map.md の pattern 定義と整合しているか
+- [ ] command 本文で参照している Skill が `<workflows/workflow-skill-model>` Design の責務分担と整合しているか
 
 ### Frontmatter 禁止フィールド確認
 
@@ -362,9 +362,9 @@ Command本文でテンプレート、スキル参照のパスを記述する際�
 
 | 判定 | 記述例 | 理由 |
 |------|--------|------|
-| ✅ OK | `.opencode/skills/{name}/templates/close-report.md` | 実行時パス（投影先でアクセス可能） |
+| ✅ OK | `.opencode/skills/{name}/templates/pr_desc.md` | 実行時パス（投影先でアクセス可能） |
 | ✅ OK | `.opencode/commands/agentdev/case-close.md` | 実行時パス（commandの実際の配置場所） |
-| ❌ NG | `src/opencode/skills/{name}/templates/close-report.md` | source path（実行時環境に存在しない） |
+| ❌ NG | `src/opencode/skills/{name}/templates/pr_desc.md` | source path（実行時環境に存在しない） |
 | ❌ NG | `src/opencode/commands/agentdev/case-close.md` | source path（開発リポジトリ内のみ有効） |
 
 - [ ] Command本文内のパス参照が実行時パス（`.opencode/...`）を使用しているか
@@ -594,7 +594,7 @@ skill 自身が自分の references/ を案内する progressive disclosure は�
 
 ## 参照
 
-- **artifact-boundaries.md**: Command/ Skill/ Template/ Script の責務境界定義
+- **artifact-contracts.md**: Command/ Skill/ Template/ Script の責務境界定義
 - **Command/Skill/Template/Script責任分界の正式定義**: Command/ Skill/ Template/ Script の責務境界定義
 - **agentdev-skill-authoring**: Skill品質基準
 

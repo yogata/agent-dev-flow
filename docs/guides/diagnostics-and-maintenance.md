@@ -97,20 +97,10 @@ integrity 検査は検査範囲に応じて3層に分かれる。
 | delta guard | 変更関連ルールのみ実行 | PR 作成時、通常開発時 |
 | impact guard | 影響範囲ルールのみ実行 | 特定アーティファクト変更時 |
 
-### 達成状況の正規記録先
+### 達成記録先と記録規約
 
-各達成項目の正規記録先は以下の標準に従う。
-
-| 達成項目 | 正規記録先 |
-|---------|----------|
-| 3層ゲート達成状況（実装、稼働、再発 finding 対応） | 当ガイド `diagnostics-and-maintenance.md` の3層ゲートセクション（本セクション） |
-| false positive 対応、既知パターン | `docs/designs/integrity/integrity-rule-catalog.md` の各 IR エントリ `false_positive_risk` フィールド、および `.opencode/skills/repo-agentdev-integrity/references/gate-levels.md` の「False Positive 扱い」セクション |
-| 要件行（達成要件、検証要件） | 当該 REQ ファイルの要件行テーブル |
-
-### 記録時の遵守事項
-
-- Update Notes セクションは使用しない。
-- 変更履歴は frontmatter `updated` フィールドのみで追跡する。
+達成状況の記録先、false positive の扱い、文書変更時の記録規約（Update Notes セクション不使用、変更履歴の frontmatter `updated` による追跡）は基準文書が所有する。
+文書フォーマット規約は [patterns.md](../designs/foundations/patterns.md)、IR エントリの false positive の扱いは [整合性ルールカタログ](../designs/integrity/integrity-rule-catalog.md) を参照する。
 
 ## 整合性の考え方
 

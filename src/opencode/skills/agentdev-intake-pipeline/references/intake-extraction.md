@@ -14,7 +14,7 @@ gh 読み取り系（Design custom-tool-contracts「迂回防止」の許容範�
 - PRs: 一覧取得（条件同上）
 - 読み取りは gh 読み取り系（許容範囲）で行う
 - コメントも取得: Issue/`agentdev_gh` の pr_changed_files / pr_mergeable 操作でコメント一覧を取得
-- role: tracking の追跡Issue（`agentdev-tracking` ラベルを保持する Issue）は除外する。クローズ済み追跡Issueは反映確認完了を意味し、未回収変更候補の回収機会と意味が衝突するためである
+- role: tracking の追跡Issue（`agentdev-issue-tracking` Design の物理写像により role ラベルが付与された Issue）は除外する。クローズ済み追跡Issueは反映確認完了を意味し、未回収変更候補の回収機会と意味が衝突するためである
 
 ## 構造的検出
 

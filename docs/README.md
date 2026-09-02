@@ -170,12 +170,14 @@ status（draft / accepted）を含む完全一覧は [Design インデックス]
 - [AUTOGEN ブロック鮮度検出 gate](designs/integrity/autogen-freshness-gate.md)
 - [テスト影響範囲検出 gate](designs/integrity/test-impact-detection-gate.md)
 - [checker 実行契約と検出基盤規則](designs/integrity/checker-execution-contracts.md)
+- [決定的破損検査クラス](designs/integrity/content-corruption-checker.md)
 
 #### local/（ローカル版 Design）
 
 - [実行時パッケージ境界](designs/local/runtime-package-boundary.md)
 - [ローカルIssue共通スキーマ](designs/local/local-case-file.md)
 - [導入スクリプトの使いやすさ詳細](designs/local/install-script-usability.md)
+- [third-party Skill 管理](designs/local/third-party-skill-management.md)
 
 #### authoring/（執筆規約）
 
