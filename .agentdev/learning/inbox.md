@@ -55,3 +55,20 @@
 - **タグ**: #adf-covers #traceability #宣言配置 #pr-本文 #req-057
 
 ---
+## 2026-09-02: 委譲コンテキストの概要記述が Issue 本体と乖離する場合は SSoT 再構成契約（Issue 本文・Epic 分解表・REQ 行の永続状態3点一致）で特定する
+
+- **問題事象**: 委譲コンテキスト（structured_context・ENVIRONMENT NOTES）の概要記述が Issue #2517 本体と乖離していた事象: 委譲 prompt 側の概要に本 Issue の内容ではなく別 Issue（#2521・OU-014 ID 衛生ガイダンス・REQ-057-019 系・skill-authoring SKILL.md 追記）の内容が記載されていた
+- **発生局面**: case-run 委譲 → case-close（Epic #2505 Wave 1）
+- **検知方法**: SSoT 再構成契約（Issue 本体・Epic 分解表・REQ 行の永続状態3点一致）により #2517 は REQ-057-020（OU-015・pr_desc.md 変更）と特定して実施できた
+- **根本原因**: case-run orchestration の委譲 prompt 概要生成が Issue 本体から乖離する（概要生成の出典が Issue 本体でない・手動記述混入の可能性）
+- **自律対応内容**: 永続状態3点一致で対象 Issue の正しい内容を特定し、乖離した概要記述に従わず実施した。乖離事象を PR 本文の learning 候補として記録
+- **ユーザー確認の有無**: なし（エージェント自律）
+- **ADR/REQ/spec影響**: なし（既存 SSoT 再構成契約の適用実例。新規規約は不要）
+- **横展開観点**: 概要記述と永続状態が乖離する全委譲（Wave 並列で複数 Issue が同時進行する場合特にリスク大）に適用可能
+- **再発条件**: 委譲 prompt の概要が手動または別 Issue 由来で生成される場合
+- **予防策候補**: case-run orchestration の委譲 prompt 概要生成を Issue 本文からの機械抽出に限定する
+- **想定反映先**: case-run command Design（委譲 prompt 生成規約）、agentdev-workflow-orchestration
+- **関連**: PR #2531、Issue #2517、Epic #2505
+- **タグ**: #case-run #委譲コンテキスト #ssot #issue-乖離 #epic-2505
+
+---
