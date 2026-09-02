@@ -72,3 +72,18 @@
 - **タグ**: #case-run #委譲コンテキスト #ssot #issue-乖離 #epic-2505
 
 ---
+## 2026-09-02: req-save で REQ 行の是正（文書品質是正等）を実施した場合は ADF-COVERS(implementation) 宣言の付与を確認する
+
+- **問題事象**: REQ-057-013（REQ 文書の表記・文意）の implementation 宣言が corpus に存在せず、traceability check の missing-implementation が継続検出される。実装自体（REQ-004:67・REQ-006:27-32・REQ-036:10,41 の文書品質是正）は req-save a2adf328 で完了済みだが、是正時に対応宣言が付与されていなかった
+- **発生局面**: req-save（文書品質是正の artifact_actions 実行）→ 後続 case-run の traceability check
+- **検知方法**: PR #2536 の case-run で traceability check --req REQ-057-012,REQ-057-013 が missing-implementation（REQ-057-013）を検出
+- **根本原因**: req-save の是正実行時に、修正した REQ ファイルへの ADF-COVERS(implementation) 宣言付与が artifact_actions の確認対象に入っていない
+- **自律対応内容**: 宣言の即時付与は case の対象外のため実施せず、learning として回収。なお REQ-057-013 は状態要件であり、宣言先は REQ-057.md 自体ではなく是正対象ファイル（REQ-004.md・REQ-006.md・REQ-036.md）である点に注意
+- **ユーザー確認の有無**: なし（エージェント自律）
+- **ADR/REQ/spec影響**: なし（宣言付与運用の漏れ是正。REQ-057-005 の正規配置方針と矛盾しない）
+- **横展開観点**: req-save 経由の REQ ファイル修正を伴う全 artifact_actions に適用可能。REQ-057-012/014 のように case-run で付与する形態（PR #2536/#2535 で解消）と req-save で付与する形態の分担整理の材料
+- **再発条件**: req-save の artifact_actions で REQ ファイル本文を修正し、対応宣言の付与確認が行われない場合
+- **予防策候補**: req-save の検証工程に「修正 REQ ファイルへの implementation 宣言付与確認」ステップの追加候補
+- **想定反映先**: agentdev-req-file-manager（宣言付与確認）、agentdev-traceability（check の代替経路案内）
+- **関連**: PR #2536、Issue #2519、Epic #2505、req-save a2adf328
+- **タグ**: #traceability #adf-covers #req-save #宣言付与漏れ #req-057-013
