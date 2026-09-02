@@ -29,7 +29,7 @@ description: inbox.mdから正規化、分類、8軸評価、自律確定・HITL
 
 ## 不変条件
 
-工程上の選好を肯定形の不変条件として示す:
+工程上の選好を反映した肯定形の不変条件:
 
 - `evaluation-report.md` は本コマンドが生成・管理する（外部コマンドの事前生成に依存しない）
 - 採用済み成果物の受け渡しは `/agentdev/backlog-review` 経由とする（case-run への直接受け渡しは行わない。反映ルート: promoted → `/agentdev/backlog-review`（RU 生成）→ `/agentdev/req-define` → `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run`）
@@ -41,7 +41,7 @@ description: inbox.mdから正規化、分類、8軸評価、自律確定・HITL
 
 ## ガードレール
 
-硬い境界（承認境界・state 破壊・書き込みスコープ等の否定規則）に限定する:
+否定規則は承認境界・state 破壊・書き込みスコープ等の硬い境界に限定する:
 
 - `.opencode/` 直接反映は行わない（採用済み成果物は `.agentdev/learning/promoted/` のみに生成）
 - ユーザー判断が必要な項目の判定、prune ともにユーザー承認なしには実行しない。一意に確定できる項目（横断契約 Design の詳細判定表に従う）はユーザー承認なしで自律確定する（`POL-promoted-artifact-requires-approval`）

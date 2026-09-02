@@ -25,7 +25,7 @@ req-save のファイル編集スコープ制約（Design 編集禁止）を緩�
 
 ## 不変条件
 
-工程上の選好を肯定形の不変条件として示す:
+工程上の選好を反映した肯定形の不変条件:
 
 - Design 対象 artifact_actions（`artifact: design`）の有無で判定する（全 work_type 対象。`work_type` による判定は廃止）。対象がない場合は Design ファイル操作を行わない no-op とする
 - Design artifact_actions の分離根拠・配置先判定は req-define（`agentdev-req-analysis`）の結果を尊重し、design-save で再分類するのは Design 分離基準への適合確認に限定する
@@ -36,7 +36,7 @@ req-save のファイル編集スコープ制約（Design 編集禁止）を緩�
 
 ## ガードレール
 
-硬い境界（破壊的操作・state 破壊等の否定規則）に限定する:
+否定規則は破壊的操作・state 破壊等の硬い境界に限定する:
 
 - ファイル編集スコープは `docs/designs/**`（Design ファイル）、`.agentdev/drafts/**`（ドラフト status 更新用）のみ。`docs/designs/README.md` は Design 操作に付随する更新のみ許可（REQ ファイル（`docs/requirements/**`）、Decision（`docs/decisions/**`）、コマンド、スキル、テンプレート等、上記以外の作成・編集は禁止）
 - Design status の昇格（draft → accepted）は case-close の責務であり、design-save は `status: accepted` を付与しない（新規作成時は `status: draft`、既存 Design 追記時は `status` を維持）

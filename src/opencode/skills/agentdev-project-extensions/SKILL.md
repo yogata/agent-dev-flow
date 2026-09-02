@@ -221,7 +221,7 @@ inspect-skills が複数 command 間で同一文言の重複を検出した場�
 
 ## 不変条件
 
-工程上の選好を肯定形の不変条件として示す:
+工程上の選好を反映した肯定形の不変条件:
 
 - extension は標準 command/skill 動作への追加・拡張として適用する（動作の置き換えは行わない）
 - 読込対象は自分に対応する extension（1件）に限定する
@@ -231,7 +231,7 @@ inspect-skills が複数 command 間で同一文言の重複を検出した場�
 
 ## ガードレール
 
-硬い境界（配布物参照境界・廃止 state 保護の否定規則）に限定する:
+否定規則は配布物参照境界・廃止 state 保護の硬い境界に限定する:
 
 - 配布 command/skill 本文にプロジェクト固有文書の具体参照（具体ID、具体パス、固定URL）を持たせない。プロジェクト固有参照は extension 経由でのみ与える
 - 旧配置（`.agentdev/extensions/commands/**`）の extension を後方互換で読まない。旧 kind を検出した場合は migration-required として停止する

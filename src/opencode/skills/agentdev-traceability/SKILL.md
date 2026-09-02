@@ -21,7 +21,7 @@ description: Provides requirement-artifact traceability (coverage, impact, check
 ## Scripts（決定的処理）
 
 `scripts/` 配下の決定的スクリプトが3能力を機械的に実行する。
-実装は TypeScript + bun。
+実装は TypeScript + bun である。
 解析コア（`lib/`）と CLI（`src/`）を分離しており、外部契約を変えずにキャッシュまたは索引を追加できる構造とする。
 ユニットテスト（宣言解析に架空の concrete 要件行ID を使うため配布物に含めない）は producer 側リポジトリの検証スイート（`traceability_*.test.ts`）が担う。
 

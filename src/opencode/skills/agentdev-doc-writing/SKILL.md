@@ -53,7 +53,7 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 | 要件行の品質 | 主語、対象、状態、検証可能性、独立性、肯定文主文 | [req-line-quality.md](references/req-line-quality.md) |
 | Decision 本文の品質 | 意思決定文書として成立しているか | [decision-writing-quality.md](references/decision-writing-quality.md) |
 | Design 本文の品質 | 詳細仕様の置き場として成立しているか | [spec-writing-quality.md](references/spec-writing-quality.md) |
-| SKILL.md 構造 | SKILL.md の概要節（description frontmatter）と機能節（`##` セクション群）の重複を検出する。REQ の優先度軸（重複度合い、文書の影響度）に基づき、優先度高位から順に查読する。詳細は Design「SKILL 構造」「SKILL.md概要節と機能節の役割分担」参照 | document-type-responsibilities Design |
+| SKILL.md 構造 | SKILL.md の概要節（description frontmatter）と機能節（`##` セクション群）の重複を検出する。REQ の優先度軸（重複度合い、文書の影響度）に基づき、優先度高位から順に査読する。詳細は Design「SKILL 構造」「SKILL.md概要節と機能節の役割分担」参照 | document-type-responsibilities Design |
 | 実行主体分類 | 文書内で言及される実行主体（command / skill / subagent / harness）の分類が正確か。誤認（command を skill と呼ぶ、harness を skill と呼ぶ、subagent を skill と呼ぶ）を検出する | [execution-subject-classification.md](references/execution-subject-classification.md) |
 | 文章品質観点（査読時） | 配布物の査読時に適用する文章品質観点。メタ指示残留、未完結文、不自然な英語混在、「〜を正とする」濫用、名詞連結、一文への条件過剰連結、Markdown 構造破損、制御文字混入の検出と、文単位の修正候補提示 | doc-writing Design「文章品質観点（査読時）」 |
 | 検出→書き換え | 英語混じり表現、抽象語の具体的書き換え、LLM 表現パターンの検出と書き換え | [rewrite-patterns.md](references/rewrite-patterns.md) |
@@ -75,7 +75,7 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 ### 観点間適用優先順位
 
 1. **japanese-tech-writing 規範適合**: すべての適用対象で最優先。LLM っぽい表現の禁止、空虚な形容、空虚な動詞等の規範への適合を査読する（執筆規範の SSoT は `japanese-tech-writing` スキル）
-2. **文書種別責務**: 対象が文書種別として適切に配置されているかを確認
+2. **文書種別責務**: 対象が文書種別の配置基準に従って配置されているかを確認
 3. **要件行の品質、文意品質、粒度**: 対象に応じた詳細観点を適用（REQ なら要件行、Design なら詳細仕様等）
 4. **実行主体分類**: 実行主体が正確に記述されているかを確認（command/skill/subagent/harness の誤認検出）
 5. **検出→書き換え**: 具体的な書き換え提案が必要な場合に適用

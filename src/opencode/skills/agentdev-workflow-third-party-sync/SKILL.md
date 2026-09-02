@@ -5,11 +5,11 @@ description: "third-party-sync command の workflow 実装本体。third-party �
 
 # third-party-sync workflow スキル
 
-third-party-sync command の workflow 実現本体である。
+third-party-sync command の workflow 実装本体である。
 third-party 宣言（skills.yaml）に基づき、対象 Skill の選択から third-party Skill 取得専用 Custom Tool への委譲、結果報告までの workflow を所有する。
 取得手順本体と副作用実行は所有せず、Custom Tool の操作契約へ委譲する。
 
-third-party-sync command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実現本体を提供する。
+third-party-sync command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する。
 
 ## 入力
 
@@ -24,7 +24,7 @@ third-party-sync command は公開 interface（入出力契約・ガードレー
 ## 副作用
 
 - 取得・配置の副作用は third-party Skill 取得専用 Custom Tool の操作契約経由のみ。本スキル自身は取得・配置・削除の副作用を持たない
-- skills.yaml の読み込みは read-only。本スキルは宣言ファイルを書き換えない
+- skills.yaml の読み込みは参照のみ。本スキルは宣言ファイルを書き換えない
 
 ## workflow model（対話操作完結型、STEP model 対象外）
 

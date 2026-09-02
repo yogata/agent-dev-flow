@@ -32,7 +32,7 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 
 ## 不変条件
 
-工程上の選好を肯定形の不変条件として示す:
+工程上の選好を反映した肯定形の不変条件:
 
 - 本コマンドは orchestration に専念し、実装実行は実行担当サブエージェント経由で委譲する（work plan 生成・実装・乖離検出・specs 更新・PR 作成は委譲先の責務。adapter protocol は `agentdev-case-run-execution-adapter` 参照）
 - worktree の作成元と PR の base は当該 Case の統合先（既定 main。実証Caseは評価ブランチ）を参照する。同期基準・鮮度確認・Epic 後続 Wave の作業起点も同一の統合先を参照し、通常Caseの worktree 起点・PR base は従来どおり main を維持する。実証Caseの場合、実証手段の準備、実行、測定、観察、証拠生成、評価を評価ブランチ上で行い、PR 本文に実際の実行条件、測定結果、観察結果、証拠、評価結果を記録する（統合先とブランチモデルの基盤契約は `agentdev-git-worktree` Design 参照）
@@ -46,7 +46,7 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 
 ## ガードレール
 
-硬い境界（破壊的操作・state 破壊等の否定規則）に限定する:
+否定規則は破壊的操作・state 破壊等の硬い境界に限定する:
 
 - 実装で判明した制約により REQ を黙って変更しない。乖離として報告し、ユーザー承認後に反映する
 - 全ファイル操作は worktree 内で実行する（メインリポジトリでのファイル操作は禁止）（`POL-worktree-isolation`）

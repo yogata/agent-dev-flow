@@ -25,7 +25,7 @@ case-auto は下位 workflow の契約確定後の上位 orchestrator として�
 
 ## 不変条件
 
-工程上の選好を肯定形の不変条件として示す:
+工程上の選好を反映した肯定形の不変条件:
 
 - 自走対象は GitHub Issue/PR/comment/merge/close 操作と repo 内にファイルとして残る変更（docs/、REQ/Decision/Design、command reference、guide を含む）に限定する
 - 委譲工程（req-save/ design-save/ case-open/ case-close）は各コマンドの委譲契約に従って委譲起動し、各工程は対応する Workflow Skill を権威情報源として実行する（手順の case-auto 定義内再実装は回避）。case-run はインライン実行する（標準動作、AG-{NNN}、`agentdev-workflow-case-run` を権威情報源として読み込む）。委譲起動不能時は `delegation-unavailable` として報告し、委譲工程のインライン実行への切替えは行わない。genuine blocker（実装上の問題、スコープ外操作等）は停止条件として扱い `delegation-unavailable` 対象外とする。case-run インライン実行時の実行担当サブエージェントへの委譲失敗は case-run result 契約に従って処理する。工程固有の詳細手順と case-auto 定義が矛盾する場合は工程固有処理（既存コマンド定義）を優先し、自走境界・入力解決・工程間制御は case-auto 定義を優先する（委譲起動・インライン実行は起動方式の変更であり、既存コマンドの責務・ガードレール・成果物を変更しない）
@@ -41,7 +41,7 @@ case-auto は下位 workflow の契約確定後の上位 orchestrator として�
 
 ## ガードレール
 
-硬い境界（課金・認証・破壊的操作・state 破壊等の否定規則）に限定する:
+否定規則は課金・認証・破壊的操作・state 破壊等の硬い境界に限定する:
 
 - 自走対象外は DB migration 実行、deploy/apply、クラウドリソース操作、外部SaaS設定変更、課金、権限、認証情報に関わる変更、repo外の実データ操作、通知送信とする（migrationファイル、IaCファイルの作成・修正は対象、実行・apply は対象外）
 - remote branch 削除は当該 case-auto/ case-run が作成した branch に限定する

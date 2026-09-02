@@ -67,7 +67,7 @@ fan-in 判定モデルの詳細は `agentdev-epic-tracker` 参照。
 ### 準備フェーズの既知の制約（Windows + ジャンクション環境）
 
 - メインリポジトリで `self-sync.ps1`/ `install.ps1` が作成する `.opencode/` 配下のジャンクションリンクは、git worktree（`.worktrees/{N}`）へ伝播しない。worktree 作成後に個別に再作成が必要になる場合がある。
-- worktree 内でジャンクション依存の整合性検査（`source-projection-sync` 等）を実行すると、projection 側が存在せず失敗することがある。提出フェーズのローカル検証で整合性検査を含む場合は注意。
+- worktree 内でジャンクション依存の整合性検査（`source-projection-sync` 等）を実行すると、projection 側が存在せず失敗することがある。提出フェーズのローカル検証に整合性検査を含める場合は、projection 未伝播による検査失敗の可能性を踏まえて実行する。
 - ジャンクション再作成は既存手順に準拠し、本スキルで新規手順は定義しない。詳細、復旧手順は `references/self-healing-and-errors.md` の該当セクションを参照。
 - この制約は Windows + ジャンクション環境固有。`resolvePathWithFallback`によるランタイムパス→ソースパスの部分フォールバックはあるが、source/projection 双方向比較を要する検査までは補完しない。
 

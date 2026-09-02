@@ -7,7 +7,7 @@ description: "req-define command の workflow 実装本体。セッションコ�
 
 req-define command の workflow 実装本体である。
 機能追加またはバグ修正の要件を整理・定義する壁打ち workflow の制御構造を所有する。
-対話（HITL）と永続状態（要件doc draft、RU）の分離を維持し、中断・再開を可能にする。
+対話（HITL）と永続状態（要件doc draft、RU）の分離を維持し、中断・再開できるようにする。
 
 req-define command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 
@@ -37,7 +37,7 @@ req-define workflow は次の11 STEP で構成する。
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
 | STEP-1 | セッションコンテキスト検知・入力解決 | req-define 起動 | 6項目推論（信頼度付き）、入力ソース確定（実証Issue 明示指定時は正式化入力として確定、RU 自動検出と混在時はユーザー確認） | [references/input-and-dialogue.md](references/input-and-dialogue.md) |
-| STEP-2 | 壁打ち対話（引き継ぎ判定含む） | 入力ソース確定 | 深掘り済み要件内容、`agentdev_handoff` 判定、実証Case判定結果（実証/通常の別） | [references/input-and-dialogue.md](references/input-and-dialogue.md) |
+| STEP-2 | 壁打ち対話（引き継ぎ判定含む） | 入力ソース確定 | 壁打ちで確定した要件内容、`agentdev_handoff` 判定、実証Case判定結果（実証/通常の別） | [references/input-and-dialogue.md](references/input-and-dialogue.md) |
 | STEP-3 | 既存REQ照合 | 壁打ち合意内容確定 | 操作分類結果（`artifact_actions` 記録用） | [references/requirement-development.md](references/requirement-development.md) |
 | STEP-4 | 要件展開 | 操作分類確定 | 変更影響候補、分類ゲート、Decision要否確認、変更誘発境界リスク導出（5観点境界）、test strategy 定義、評価契約確定（実証Case時） | [references/requirement-development.md](references/requirement-development.md) |
 | STEP-5 | Decision判断 | 要件展開完了 | Decision判断記録（`new:{topic-slug}` 形式） | [references/requirement-development.md](references/requirement-development.md) |
@@ -71,7 +71,7 @@ req-define workflow は次の11 STEP で構成する。
 
 本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
 
-- `agentdev-req-analysis`: セッションコンテキスト検知、壁打ち深掘り、分析観点、detailed gates、チェックボックス品質基準
+- `agentdev-req-analysis`: セッションコンテキスト検知、壁打ちメソドロジー、分析観点、detailed gates、チェックボックス品質基準
 - `agentdev-req-file-manager`: 既存REQ照合方法論
 - `agentdev-decision-guidelines`: Decision判断基準（manual reference）
 - `agentdev-architecture-advisory`: Decision要否確認ゲートの助言委譲

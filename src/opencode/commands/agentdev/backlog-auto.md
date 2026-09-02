@@ -24,7 +24,7 @@ backlog-auto は子ワークフロー内部の分類、評価、昇格、RU 生�
 
 ## 不変条件
 
-工程上の選好を肯定形の不変条件として示す:
+工程上の選好を反映した肯定形の不変条件:
 
 - 実行順序は inspect-docs、昇格3系統（learning-promote、intake-promote、inspect-promote）、backlog-review の順とし、工程間の開始条件ゲートを制御する。inspect-docs が正常終了する前に昇格3系統を開始せず、昇格3系統すべてが正常完了または対象なしで終了する前に backlog-review を開始しない
 - 昇格3系統相互に先行依存を設けない。1系統の blocked、failed で独立して進行可能な他系統を停止しない
@@ -37,7 +37,7 @@ backlog-auto は子ワークフロー内部の分類、評価、昇格、RU 生�
 
 ## ガードレール
 
-硬い境界（破壊的操作、state 破壊等の否定規則）に限定する:
+否定規則は破壊的操作、state 破壊等の硬い境界に限定する:
 
 - 子ワークフロー内部の分類、評価、昇格、RU 生成を代行しない（各子 Workflow Skill の責務）
 - inspect-promote の `--auto` を明示 opt-in なしに有効化しない

@@ -76,7 +76,7 @@ Design frontmatter の `status`（`draft` / `accepted` の2値）を本スキル
 LLM 推論で実行していた決定的処理をスクリプトへ委譲することで、target_area マッチングのばらつきを確実に防止する。
 
 配置先: 本スキル配下の `scripts/`（Design 固有）。
-実装は TypeScript、決定的（純粋関数）、テスト付き（`tests/*.test.ts`）。
+実装は TypeScript、決定的（純粋関数）、テスト付き（`tests/*.test.ts`）である。
 
 共通検証 script（`check-frontmatter-consistency.ts`、`check-entry-existence.ts`、`check-change-impact.ts`）は `agentdev-artifact-validation` が所有し、本スキルは公開検証契約経由で委譲する。
 本スキル配下には Design 固有 script のみを配置する。
@@ -152,7 +152,7 @@ STEP reference 8 要素は `<workflows/step-reference-contract>` Design 参照�
 
 ## 参考文献
 
-SKILL.md 本文から遅延読み込みされる詳細資料。
+SKILL.md 本文から遅延読み込みされる詳細資料である。
 各ファイルの冒頭に本文への文脈宣言を備える。
 
 | ファイル | 内容 |
