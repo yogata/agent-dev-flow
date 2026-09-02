@@ -1,12 +1,13 @@
 ---
-title: "agentdev-git-worktree 構造系テスト fallback 契約"
+title: "`agentdev-git-worktree-test-fallback` Design"
 status: draft
 created: "2026-08-09"
 updated: "2026-08-18"
 ---
 <!-- ADF-COVERS(implementation): REQ-018-001, REQ-018-002 -->
+<!-- ADF-COVERS(implementation): REQ-057-012 -->
 
-# agentdev-git-worktree 構造系テスト fallback 契約
+# `agentdev-git-worktree-test-fallback` Design
 
 agentdev-git-worktree skill に関連する構造系テスト（commands_e2e、skills_structure、templates_structure 等）の worktree 環境向け fallback 契約。
 worktree junction 未設定環境でのテスト実行保証と、worktree 固有の構造的制約の明示を扱う。

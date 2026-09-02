@@ -7,6 +7,12 @@
 //   - On any failure, only this run's temp artifacts are removed.
 //   - Archive entry set + digests are verified before publish.
 //   - Concurrent same-OID runs do not corrupt each other.
+//
+// REQ-057-012 flaky hardening: external PowerShell spawns get explicit
+// timeouts; staging-residue checks poll for Windows deferred rmSync
+// release; absent-path fixtures derive uniqueness from mkdtempSync.
+
+// ADF-COVERS(verification): REQ-057-012
 
 import { describe, expect, test, beforeEach, afterEach } from "bun:test";
 import * as fs from "fs";
@@ -22,6 +28,19 @@ import {
   prepareStagedArchive,
   publishStagedArchive,
 } from "./archive-publish.ts";
+
+const EXTERNAL_PROCESS_TIMEOUT_MS = 60000;
+
+// Bounded poll for Windows deferred directory-entry release after rmSync;
+// the final state is still asserted strictly afterwards.
+function pollUntil(fn: () => boolean): boolean {
+  const deadline = Date.now() + 10000;
+  while (!fn()) {
+    if (Date.now() >= deadline) return fn();
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 50);
+  }
+  return true;
+}
 
 let TMP_ROOT: string;
 
@@ -103,7 +122,7 @@ describe("archive-builder / verifyArchive", () => {
     }));
     const r = verifyArchive(zipPath, expected);
     expect(r.ok).toBe(true);
-  });
+  }, EXTERNAL_PROCESS_TIMEOUT_MS);
 
   test("detects missing entry", () => {
     const blobs: BlobSource[] = [
@@ -120,7 +139,7 @@ describe("archive-builder / verifyArchive", () => {
     const r = verifyArchive(zipPath, expected);
     expect(r.ok).toBe(false);
     expect(r.missing).toEqual(["missing.md"]);
-  });
+  }, EXTERNAL_PROCESS_TIMEOUT_MS);
 
   test("detects digest mismatch", () => {
     const blobs: BlobSource[] = [
@@ -136,7 +155,7 @@ describe("archive-builder / verifyArchive", () => {
     const r = verifyArchive(zipPath, expected);
     expect(r.ok).toBe(false);
     expect(r.digest_mismatches).toEqual(["a.md"]);
-  });
+  }, EXTERNAL_PROCESS_TIMEOUT_MS);
 
   test("detects extra entry in archive", () => {
     const blobs: BlobSource[] = [
@@ -153,7 +172,7 @@ describe("archive-builder / verifyArchive", () => {
     const r = verifyArchive(zipPath, expected);
     expect(r.ok).toBe(false);
     expect(r.extra).toEqual(["extra.md"]);
-  });
+  }, EXTERNAL_PROCESS_TIMEOUT_MS);
 });
 
 describe("archive-builder / prepareStagedArchive + publishStagedArchive", () => {
@@ -164,7 +183,7 @@ describe("archive-builder / prepareStagedArchive + publishStagedArchive", () => 
     const finalPath = path.join(TMP_ROOT, "final.zip");
     publishStagedArchive(prepareStagedArchive(blobs, TMP_ROOT), finalPath, TMP_ROOT);
     expect(fs.existsSync(finalPath)).toBe(true);
-  });
+  }, EXTERNAL_PROCESS_TIMEOUT_MS);
 
   test("does NOT overwrite pre-existing final archive", () => {
     const finalPath = path.join(TMP_ROOT, "final.zip");
@@ -174,7 +193,7 @@ describe("archive-builder / prepareStagedArchive + publishStagedArchive", () => 
     ];
     expect(() => publishStagedArchive(prepareStagedArchive(blobs, TMP_ROOT), finalPath, TMP_ROOT)).toThrow();
     expect(fs.readFileSync(finalPath, "utf-8")).toBe("PRE-EXISTING");
-  });
+  }, EXTERNAL_PROCESS_TIMEOUT_MS);
 
   test("removes temp artifacts on failure", () => {
     const finalPath = path.join(TMP_ROOT, "final.zip");
@@ -188,27 +207,37 @@ describe("archive-builder / prepareStagedArchive + publishStagedArchive", () => 
     } catch {
       stage.cleanup();
     }
+    pollUntil(() => fs.readdirSync(TMP_ROOT).every((e) => !e.startsWith(".trust-stage-")));
     const entries = fs.readdirSync(TMP_ROOT).sort();
     expect(entries).toEqual(["final.zip"]);
-  });
+  }, EXTERNAL_PROCESS_TIMEOUT_MS);
 });
 
 describe("archive-builder / output containment (parent defect #11)", () => {
+  // mkdtempSync-derived absent path: uniqueness is guaranteed by the OS
+  // (create then remove), so concurrent suites cannot collide the way a
+  // Math.random-suffixed name could.
+  function absentSiblingPath(ext: string): string {
+    const unique = fs.mkdtempSync(path.join(os.tmpdir(), "trust-ab-out-"));
+    fs.rmSync(unique, { recursive: true, force: true });
+    return `${unique}${ext}`;
+  }
+
   test("rejects final path outside output root", () => {
     const blobs: BlobSource[] = [
       { archivePath: "a.md", bytes: new TextEncoder().encode("# a\n") },
     ];
-    const outside = path.join(os.tmpdir(), `outside-${Math.random().toString(36).slice(2, 6)}.zip`);
+    const outside = absentSiblingPath(".zip");
     expect(() => publishStagedArchive(prepareStagedArchive(blobs, TMP_ROOT), outside, TMP_ROOT)).toThrow();
     expect(fs.existsSync(outside)).toBe(false);
-  });
+  }, EXTERNAL_PROCESS_TIMEOUT_MS);
 
   test("rejects final path equal to output root", () => {
     const blobs: BlobSource[] = [
       { archivePath: "a.md", bytes: new TextEncoder().encode("# a\n") },
     ];
     expect(() => publishStagedArchive(prepareStagedArchive(blobs, TMP_ROOT), TMP_ROOT, TMP_ROOT)).toThrow();
-  });
+  }, EXTERNAL_PROCESS_TIMEOUT_MS);
 
   test("rejects traversal in final path that escapes root", () => {
     const blobs: BlobSource[] = [
@@ -216,7 +245,7 @@ describe("archive-builder / output containment (parent defect #11)", () => {
     ];
     const escape = path.join(TMP_ROOT, "..", "escape.zip");
     expect(() => publishStagedArchive(prepareStagedArchive(blobs, TMP_ROOT), escape, TMP_ROOT)).toThrow();
-  });
+  }, EXTERNAL_PROCESS_TIMEOUT_MS);
 });
 
 describe("archive-builder / shell-injection resistance (parent defect #2)", () => {
@@ -229,7 +258,6 @@ describe("archive-builder / shell-injection resistance (parent defect #2)", () =
     ];
     expect(() => buildArchiveFromBlobs(malicious, path.join(TMP_ROOT, "inj-stage"))).toThrow();
   });
-
   test("backtick / $() in archive path rejected", () => {
     const malicious: BlobSource[] = [
       { archivePath: "$(whoami).md", bytes: new TextEncoder().encode("x") },
