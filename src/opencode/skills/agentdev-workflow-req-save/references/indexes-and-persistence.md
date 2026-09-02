@@ -38,6 +38,8 @@ REQ インデックスとドキュメントハブへ新規エントリを登録�
 **エントリ存在確認のスクリプト呼出**: README へのエントリ追加後に `agentdev-artifact-validation` の公開検証契約（`check-entry-existence`）で登録を検証する。
 具体的な CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照。
 
+- **AUTOGEN 対象索引の同 commit 再生成前置（REQ 行 append 時）**: REQ 行 append を伴う保存では、エントリ登録に加えて AUTOGEN 対象索引（README 索引の件数サマリ、計測例等の機械生成領域）を REQ 行追加後の内容で再生成し、同一 commit に含める（工程連動再生成前置）。再生成後の AUTOGEN 鮮度検査が exit 0 となることを期待値とし、不合格時は索引再生成の漏れを解消して再検査する
+
 ### Result
 
 - README エントリ登録済み（check-entry-existence 検証合格）
