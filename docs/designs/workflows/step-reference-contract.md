@@ -1,8 +1,8 @@
 ---
 title: STEP Reference Contract
-status: draft
+status: accepted
 created: 2026-08-10
-updated: 2026-08-15
+updated: 2026-09-02
 ---
 <!-- ADF-COVERS(implementation): REQ-005-024 -->
 

@@ -1,8 +1,8 @@
 ---
 title: Input Resolution and Durable State
-status: draft
+status: accepted
 created: 2026-08-10
-updated: 2026-08-15
+updated: 2026-09-02
 ---
 <!-- ADF-COVERS(implementation): REQ-002-036 -->
 <!-- ADF-COVERS(implementation): REQ-005-024 -->
