@@ -2,6 +2,7 @@
 draft_type: req_draft
 topic_slug: prose-quality-completion-verification
 status: saved
+design_saved: true
 created_at: 2026-09-03T07:50:58+09:00
 source_rus:
   - RU-0001
