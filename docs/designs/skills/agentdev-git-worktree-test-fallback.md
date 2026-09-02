@@ -2,10 +2,11 @@
 title: "`agentdev-git-worktree-test-fallback` Design"
 status: draft
 created: "2026-08-09"
-updated: "2026-08-18"
+updated: "2026-09-02"
 ---
 <!-- ADF-COVERS(implementation): REQ-018-001, REQ-018-002 -->
 <!-- ADF-COVERS(implementation): REQ-057-012 -->
+<!-- ADF-COVERS(implementation): REQ-057-014 -->
 
 # `agentdev-git-worktree-test-fallback` Design
 
@@ -34,6 +35,20 @@ main 等価再現の手順は次のとおりである。
 
 本手順は ir035 worktree 誤検出、check_extensions の cwd 依存・順序依存・worktree junction 失敗等、6件の反復観測クラスに根拠する。
 個別是正（checker 実装修正）は本 Design の手順確定とは分離して実施できる。
+
+## junction 投影残滓（stale junction）の自己修復
+
+`.opencode/skills/` 配下の junction セットは、src 側の skill 追加・削除の後に再構築されるまで次の状態に陥り得る。
+状態の判定は次のとおり行う。
+
+- 未構築: `src/opencode/skills/` 配下に存在する skill 名に対応する junction が `.opencode/skills/` 配下に存在しない
+- stale 残存: `.opencode/skills/` 配下に存在する junction のリンク先が存在しない（src 側で削除済みの skill 名に対応する junction が残存する）
+
+未構築・stale 残存のいずれも、当該環境での skills_structure 系テストを環境依存 fail にし、N/M 件数突合と QG-4 判定にノイズを与える。
+帰属確認手順で環境起因と判定された fail のうち、本節の状態判定に該当するものは、検査側の修正ではなく次の修復を先に実施する。
+
+修復は junction セットの再構築（`install-consumer-opencode.ps1 -Mode apply` の再実行）によって行う。
+`.opencode/skills/*` は gitignore 対象の局所運用タスクであり、修復は PR 成果外として実施する。
 
 ## 関連
 
