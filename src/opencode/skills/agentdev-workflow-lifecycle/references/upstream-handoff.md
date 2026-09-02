@@ -29,10 +29,6 @@ AgentDevFlow 本体改善要求を現在プロジェクトの通常要件docと�
 
 ### backlog-review
 
-AgentDevFlow 本体改善成果物に前工程からの引き継ぎメタデータ（`agentdev_handoff: true`）を付与する。
-
-### backlog-review
-
 前工程からの引き継ぎメタデータ（`agentdev_handoff: true`）を RU frontmatter に転記する。
 RU 本文に現在プロジェクトでは実装しない前工程からの引き継ぎ用 RU であることを記載する。
 

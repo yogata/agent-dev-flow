@@ -183,7 +183,7 @@ Recommended route には対象配布物の種別と修正方向を提示する�
 - Target: src/opencode/skills/agentdev-XXX/references/foo.md
 - Perspective: 意味的重複
 - Classification: semantic-duplication
-- Evidence: 入力（Issue 番号、本文）と出力（Issue URL）が contracts.md と同一だが、正の情報源が明示されていない。同一契約再定義抑止の原則の重複許容例外（artifact-responsibilities Design）に合致しない
+- Evidence: 入力（Issue 番号、本文）と出力（Issue URL）が custom-tool-contracts.md と同一だが、正の情報源が明示されていない。同一契約再定義抑止の原則の重複許容例外（artifact-responsibilities Design）に合致しない
 - Recommended route: references
 ```
 

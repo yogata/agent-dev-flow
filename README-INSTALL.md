@@ -50,7 +50,7 @@ $unpackedRoot = Join-Path $temp "agentdev-release-<sha>"
 
 ## 整合性検査
 
-配布物の整合性は、host 側（agent-dev-flow リポジトリ）の `repo-agentdev-integrity` スキルが提供する `check_integrity.ts --profile installed` で検査する。archive 自体には checker を同梱しない（archive 自己完結と検査実行の分離、移行計画 §7.5）。
+配布物の整合性は、host 側（agent-dev-flow リポジトリ）の `repo-agentdev-integrity` スキルが提供する `check_integrity.ts --profile installed` で検査する。archive 自体には checker を同梱しない（archive 自己完結と検査実行の分離）。正の仕様は `<integrity-contracts>` Design「実行プロファイル分離（source/installed/release）」である。
 
 ```powershell
 bun run <host>/.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts `
@@ -60,5 +60,4 @@ bun run <host>/.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.
 
 ## 関連
 
-- 移行計画: `.omo/plans/agentdev-migration-2026-08-05.md` §7（host 側の normative）
 - 仕様: `<integrity-contracts>` Design「実行プロファイル分離（source/installed/release）」
