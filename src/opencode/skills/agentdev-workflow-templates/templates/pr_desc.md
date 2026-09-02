@@ -117,6 +117,6 @@ Design確定候補がない場合はセクションごと省略する。
 ## 関連Issue
 <!-- 【必須】 -->
 
-Closes #$ISSUE_NUMBER
+Refs: #$ISSUE_NUMBER
 
 
