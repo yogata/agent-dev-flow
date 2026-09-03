@@ -31,7 +31,7 @@ description: Provides requirement analysis methods with quality criteria and ADR
 - **扱う**: 分析観点、品質基準、壁打ちメソドロジー、REQ/Design 境界判定基準、Decision 閾値判定ブリッジ、変更誘発境界リスク分析（5観点境界からの case-specific risk 導出、リスク導出規則の参照契約と不在時挙動、test strategy への投影）、検証手段の質基準（production-equivalent verification の一般原則と test strategy 設計時点への適用、完了時点の証跡契約を正規所有する要件群との時点分担）、プロジェクト知識の参照観点（docs/knowledge/ 配下の知識を判断材料へ加える適用条件判定と知識不在時の分析続行）
 - **扱わない**:
   - REQファイルの採番、CREATE/APPEND/UPDATE、frontmatter更新、README更新（→ `agentdev-req-file-manager`）
-  - 実装計画、タスク分割、コード変更方針の確定（→ `/agentdev/case-run` の work plan）
+  - コードレベルの work plan（実装計画、タスク分割等の確定）（→ `/agentdev/case-run` の work plan）。どの実現面を変更すべきかの確定は req-define 責務であり case-run へ先送りしない（REQ-004-037）
   - Decisionファイルの作成、更新（→ `agentdev-decision-file-manager`）。Decision閾値に達する判断候補の抽出は行うが、ファイル操作は扱わない
 
 ## 常に守る不変条件

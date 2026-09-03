@@ -35,7 +35,7 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 工程上の選好を反映した肯定形の不変条件:
 
 - 本コマンドは要件の整理・定義（壁打ち）を扱い、成果物は要件doc（draft）に限定する。実装コードの作成は case-run の責務である
-- docs/ の参照は、明示入力ファイル・`docs/requirements/**` の参照・Decision 判断に必要な限定探索の3経路に限定する
+- docs/ の参照は、明示入力ファイル・`docs/requirements/**` の参照・変更影響候補抽出と Decision 判断に必要な限定探索の3経路に限定する
 - inbox.md、deferred.md、採用済み成果物（promoted）は backlog-review による RU 化を経由して参照する
 - 関連ドキュメントはコマンドが特定し、ユーザーへの個別ファイル列挙の依頼は省く
 - チェックボックスは測定可能で一意にする（`agentdev-req-analysis` 品質基準）
@@ -47,6 +47,7 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 - 評価契約と test strategy は分離する。test strategy は実証手段・計測手段・実証環境が正常に動作したかを扱い、評価契約は評価対象から得られた結果と採否を扱う
 - 本コマンドは実証Caseでも Git 副作用を持たない（評価ブランチ・worktree 準備の実行主体・手順は command Design が所有する）。評価ブランチ作成だけの新しい公開コマンドを追加しない
 - Design 分離基準に該当する要件行は `artifact_actions`（`artifact: design`）へ分離する（安定契約例外は除く）。test strategy 項目は verification（検証手順）・pass_criteria（合格基準）・on_failure（不合格時の処置）の3要素を欠落なく持ち、欠落項目は保存前に QG fail として扱う
+- 修正の要否を検討する際、実現面（正規所有責務を持つ既存実体・成果物）と Design 面の両面を分析する。コードレベルの work plan は case-run 責務としつつ、どの実現面を変更すべきかの確定を case-run へ先送りしない（REQ-004-037）
 - 実現面の変更方針（正規所有責務、変更すべき実現面、変更意図、検証との対応）は、実現面の変更がある場合に `realization_actions` セクションへ構造化して出力する。`realization_actions` は `artifact_actions` と分離した独立構造であり、成果物種別を固定 enum としないドメイン中立契約とする（REQ-008-060、DEC-026）
 
 ## ガードレール

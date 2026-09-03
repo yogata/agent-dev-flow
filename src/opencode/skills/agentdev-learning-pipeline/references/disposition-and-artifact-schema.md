@@ -159,7 +159,7 @@ project knowledge を一律 `.agentdev/learning/project-knowledge.md` に保存�
 
 docs/knowledge/ の知識文書は、利用可能なハーネスの探索能力を通じて関連知識が判断材料として利用される（Project Knowledge の所有と workflow 利用の要件が正規所有する利用面の契約）。本ファイルはその機構の契約を再定義せず名レベルで参照する。
 配布成果物（ADF core）は一般規則のみを保持し、技術固有知識を保持しない（配布成果物の責務境界の要件が正規所有する技術固有知識非保持の原則）。一般規則へ昇華できる内容のみ、恒久契約（REQ/Decision/Design）の経路を経て配布成果物へ反映する。
-docs/knowledge/ 向けの知識文書は、learning 昇華先ルーティング（バックログ統合の要件が正規所有する learning 昇華先のルーティング契約）を経由して流入し、判断の材料として使われる成長する資産として扱う。docs/knowledge/ への知識文書保存にも既存恒久所有先への昇華にも該当しない知識は deferred として保留する。
+docs/knowledge/ 向けの知識文書は、利用者承認を経て backlog-review が docs/knowledge/ へ直接保存する正規昇華経路（バックログ統合の要件が正規所有する知識文書保存契約）を経由して流入し、判断の材料として使われる成長する資産として扱う。docs/knowledge/ への知識文書保存にも既存恒久所有先への昇華にも該当しない知識は deferred として保留する。
 
 ## Prune 方針
 

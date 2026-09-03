@@ -1,6 +1,6 @@
 ---
 name: agentdev-backlog-integration
-description: backlog-review の採用済み成果物（promoted artifact）統合、分割判定、矛盾検出、RU 生成、depends_on 依存解決、docs/knowledge/ 知識文書保存を含む backlog 自体の処置（重複・陳腐化した知識の削除、保留）の知識ベース。USE FOR: 採用済み成果物の統合・分割判定・矛盾検出、RU 生成ルール、depends_on 依存解決基準、分析メタデータ項目、docs/knowledge/ 知識文書保存の操作種別判定基準。DO NOT USE FOR: intake 抽出・promote、learning 昇華先の分類評価、REQ 構造診断、work_type 判定。
+description: backlog-review の採用済み成果物（promoted artifact）統合、分割判定、矛盾検出、RU 生成、depends_on 依存解決、docs/knowledge/ 知識文書保存を含む backlog 自体の処置（重複・陳腐化した知識の削除、保留）の知識ベース。USE FOR: 採用済み成果物の統合・分割判定・矛盾検出、RU 生成ルール、depends_on 依存解決基準、分析メタデータ項目、docs/knowledge/ 知識文書保存の操作種別判定基準。DO NOT USE FOR: intake 抽出・promote、learning-promote の learning 固有の評価、REQ 構造診断、work_type 判定。
 ---
 
 # バックログレビュー統合知識ベース（backlog-review）
