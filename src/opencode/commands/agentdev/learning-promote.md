@@ -4,7 +4,8 @@ description: inbox.mdから正規化、分類、8軸評価、自律確定・HITL
 
 # 学びの正規化、評価、昇華判定と採用済み成果物生成
 
-`.agentdev/learning/inbox.md` の学びエントリを読み込み、正規化、問題クラス分類、8軸評価、廃棄判定、既存対策確認、自律確定判定（一意に確定できる項目の自律確定）とユーザー判断が必要な項目のみの HITL 承認を経て採用済み成果物を生成する。
+`.agentdev/learning/inbox.md` の学びエントリを読み込み、正規化、問題クラス分類、8軸評価、知識としての保存適否（docs/knowledge/ 候補判定）、重複・陳腐化、保留要否等の learning 固有の評価、廃棄判定、既存対策確認、自律確定判定（一意に確定できる項目の自律確定）とユーザー判断が必要な項目のみの HITL 承認を経て採用済み成果物を生成する。
+実現先（Skill、Command、script 等の種別）を選ぶ分類・マッピングは行わず、req-define の変更影響・実現方法決定を先取りしない。
 
 **重要**: `.opencode/` への直接配置、直接反映は行わない。
 反映ルート: promoted → `/agentdev/backlog-review`（RU 生成）→ `/agentdev/req-define` → `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run`。
@@ -34,7 +35,7 @@ description: inbox.mdから正規化、分類、8軸評価、自律確定・HITL
 - `evaluation-report.md` は本コマンドが生成・管理する（外部コマンドの事前生成に依存しない）
 - 採用済み成果物の受け渡しは `/agentdev/backlog-review` 経由とする（case-run への直接受け渡しは行わない。反映ルート: promoted → `/agentdev/backlog-review`（RU 生成）→ `/agentdev/req-define` → `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run`）
 - 主入力は `inbox.md` とし、raw learning item の再分類は行わない
-- 既存対策を優先する（「新規X化」より「既存Xへ反映」を優先）
+- learning-promote は反映先を直接変更せず、実現先（Skill、Command、script、checker、hook、Custom Tool 等）を選ぶ分類・マッピングを行わない。採用済み成果物は、問題、根拠、望ましい状態、制約、既存事実を req-define が既存 REQ / Decision / Design と実装を再調査して変更方針を確定できる自足的な情報として保持する
 - 学びは直接 REQ 化せず、恒久契約（REQ/Decision/Design）への昇華可能性を判定工程で評価し、昇華可能なもののみ `promoted/` へ出力する。昇華不能な知見は保留プール（`deferred.md`）で維持する
 - 一意に確定できる項目は自律確定し、ユーザー判断が必要な項目のみ HITL 対象とする。自律確定可否の詳細判定表は横断契約 Design「promote系判断確定とHITL境界」節が集約所有し、本コマンド定義と Workflow Skill は判定表を複製しない。自律確定はユーザー承認の擬制ではなく、deferred・未処理項目を自動削除しない安全境界は維持する
 - adversarial-review は default-on（REQ-{NNNN}-{NNN}）: workflow の review STEP（発動条件判定 → review 呼出）を経て原則発動する。skip 条件（inbox.md 1件で重複確実、inbox.md 空）該当時は HITL へ従来フローを維持し、ユーザー明示要求時は skip 条件にかかわらず必ず発動する。共通契約（任意性、副作用禁止、再 review 条件、停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` Design（REQ-{NNNN}）が正規所有する

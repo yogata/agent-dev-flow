@@ -93,12 +93,12 @@ inbox.md の学びエントリと deferred.md を読み込み、旧フォーマ�
 
 ### Purpose
 
-各問題クラスの処分区分（11カテゴリ + duplicate）を判定し、既存対策と照合し、昇華可能性を評価する。
+各問題クラスの処分区分（7カテゴリ + duplicate）を判定し、既存対策と照合し、昇華可能性を評価する。
 
 ### Input Resolution
 
 - STEP-2 の evaluation-report.md（durable state。実ファイルから再取得する）
-- 処分区分、反映先マッピング、既存対策照合、prune 方針の判定基準は `agentdev-learning-pipeline` の公開操作契約に従う
+- 処分区分、既存対策照合、prune 方針の判定基準は `agentdev-learning-pipeline` の公開操作契約に従う
 
 ### Preconditions
 
@@ -106,11 +106,11 @@ inbox.md の学びエントリと deferred.md を読み込み、旧フォーマ�
 
 ### Procedure
 
-1. 廃棄判定（11カテゴリ + duplicate）を行う
+1. 廃棄判定（7カテゴリ + duplicate）を行う
 2. 昇華可能性評価を行う。
 8軸評価スコア、禁止条件フィルタリングゲート、既存対策照合を基に昇華可否を判定する。
 無条件の自動REQ化は禁止する
-3. 既存対策確認を行う（「新規X化」より「既存Xへ反映」を優先）
+3. 既存対策確認を行い、既存事実の整備状況を確定する（実現先の選択は行わない）
 4. 昇華不能な知見（deferred 判定、情報が断片的、出現回数が少ない等）は deferred.md の living pool で維持する対象として確定する
 
 ### Result

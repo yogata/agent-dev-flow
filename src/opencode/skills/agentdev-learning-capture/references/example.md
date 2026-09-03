@@ -196,8 +196,8 @@ SKILL.md 本文では実観測原則、 trigger、禁止事項、 split rule の
 
 → 実行内容（昇華判定フェーズ、引き続き learning-promote 内）:
   - evaluation-report.md の問題クラスを主入力として分析
-  - 各クラスタを11処分区分 + duplicate で判定
-  - 既存 command/skill/template/docs に同種対策が存在するか照合
+  - 各クラスタを7処分区分 + duplicate で判定
+  - 既存の恒久契約、知識、配布物に同種対策が存在するか照合
   - ユーザー承認後、staging領域にスタブファイルを生成（7つの必須フィールド）
   - staged/rejected/duplicate エントリを deferred.md から promote 時 prune
 

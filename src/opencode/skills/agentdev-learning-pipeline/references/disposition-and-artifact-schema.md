@@ -1,66 +1,52 @@
 # 処分区分と採用済み成果物スキーマ
 
-本ファイルは `agentdev-learning-pipeline` SKILL.md の補助資料であり、処分区分（11カテゴリ + duplicate）、反映先マッピング、既存対策照合、採用済み成果物スキーマ、カテゴリ別反映先パス例、プロジェクト固有知識の振り分け、prune 方針の詳細を扱う。
+本ファイルは `agentdev-learning-pipeline` SKILL.md の補助資料であり、処分区分（7カテゴリ + duplicate）、既存対策照合、採用済み成果物スキーマ、req-define 変更影響分析への情報候補、プロジェクト固有知識の振り分け、prune 方針の詳細を扱う。
 SKILL.md 本文では処分区分の存在と living pool 維持の不変条件のみを提示し、判定基準表、schema 雛形、prune 対象特定基準は本ファイルを参照する。
 
 ## 目次
 
 - [処分区分](#処分区分)
-- [反映先マッピング](#反映先マッピング)
 - [既存対策照合](#既存対策照合)
 - [採用済み成果物スキーマ](#採用済み成果物スキーマ)
-- [カテゴリ別の反映先パス例](#カテゴリ別の反映先パス例)
+- [req-define 変更影響分析への情報候補](#req-define-変更影響分析への情報候補)
 - [プロジェクト固有知識の反映先振り分け](#プロジェクト固有知識の反映先振り分け)
 - [Prune 方針](#prune-方針)
 
 ## 処分区分
 
-learning-promote が各クラスタに対して判定する廃棄カテゴリ。
+learning-promote が各クラスタに対して判定する処分カテゴリ。
+処分区分は、学習価値、問題クラス、8軸評価、change_nature、再発条件、知識としての保存適否（docs/knowledge/ 候補判定）、重複・陳腐化、保留要否の learning 固有の評価結果に基づいて判定する。
+Skill、Command、script、checker、hook、Custom Tool 等の具体的な実現先を選ぶ分類・マッピングは処分区分に含めない。実現先の選択は req-define の変更影響分析が確定する責務であり、learning-promote は先取りしない。実現物種別の情報は、採用済み成果物の「反映先候補」として req-define 変更影響分析への情報候補に留める。
 
-**昇華可能性評価、無条件自動REQ化禁止**: 各問題クラスについて恒久契約（REQ/ADR/Design）への昇華可能性を評価する。
+**昇華可能性評価、無条件自動REQ化禁止**: 各問題クラスについて恒久契約（REQ/Decision/Design）への昇華可能性を評価する。
 8軸評価スコア、禁止条件フィルタリングゲート、既存対策照合を基に判定する。
 **無条件の自動REQ化は禁止する**。
 学びは `promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/req-save` の昇華経路を経て初めて REQ 化される。
 
 **living pool 維持**: 昇華不能な知見（`deferred` 判定、情報が断片的、出現回数が少ない等）は `deferred.md` の living pool で維持し、REQ 化しない。
 living pool は終端保管ではなく、次回 `/agentdev/learning-promote` 実行時に再評価の対象となる。
-`deferred.md` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である。
+`deferred.md` は deferred カテゴリ（処分区分の1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である。
 
 | # | カテゴリ | 判定基準 |
 |---|---|---|
-| 1 | 既存 command へ反映 | 既存コマンドのステップ、ガードレール、エラーハンドリングに追加すべき手順、制約 |
-| 2 | 既存 skill へ反映 | 既存スキルのPrerequisites/Steps/Guardrails/禁止事項に追加すべき知見 |
-| 3 | 新規 skill 化 | 汎用的なパターン、複数プロジェクト/コンテキストで再利用可能、独立した判断、手順が確立 |
-| 4 | 新規 command 化 | 特定の操作フローが繰り返し現れている、自動化すべき手順が明確 |
-| 5 | template 反映 | ドキュメント、Issue、PR等のテンプレート形式に反映すべきフォーマット知見 |
-| 6 | ADR 候補 | アーキテクチャに関する設計判断、技術選定の理由を記録すべき内容 |
-| 7 | spec 候補 | システム仕様、実装パターン、設計原則として docs/designs/ に反映すべき内容 |
-| 8 | REQ 候補 | 要件変更、機能追加の要因となる知見、既存REQの更新が必要な内容。**自動REQ化ではなく候補扱い**。確定は `/agentdev/req-define` → `/agentdev/req-save` 経路で行う |
-| 9 | project knowledge | プロジェクト固有の落とし穴、環境依存の知見、汎用化が難しい内容。保存先の候補判定は「プロジェクト固有知識の反映先振り分け」参照 |
-| 10 | deferred | まだ昇華の余地がない、情報が断片的、出現回数が少ない。**living pool（`deferred.md`）で維持し REQ 化しない** |
-| 11 | rejected | ユーザーが明示的に却下、すでに別の対策で十分対応済み |
-| + | duplicate | 既存の command/skill/template/docs で既に同等の内容が十分にカバーされている |
-
-## 反映先マッピング
-
-- **knowledge**（汎用知見）→ skill の Steps/Guardrails
-- **procedures**（手順）→ command の Step
-- **constraints**（制約、注意事項）→ command/skill の Guardrails/禁止事項
-- **format**（フォーマット）→ template + command のフォーマット検証
-- **user-confirmed work**（ユーザー確認済み作業フロー）→ command workflow
-- **architecture**（アーキテクチャ決定）→ ADR 候補
-- **system spec**（システム仕様）→ docs/designs/
-- **requirement change**（要件変更）→ REQ/Issue 更新
-- **project-specific pitfalls**（プロジェクト固有の落とし穴）→ project knowledge（docs/knowledge/ 知識文書保存等、プロジェクト固有知識の反映先振り分けへ）
+| 1 | 恒久契約候補（REQ） | 要件変更、機能追加の要因となる知見、既存 REQ の更新が必要な内容。**自動 REQ 化ではなく候補扱い**。確定は `/agentdev/req-define` → `/agentdev/req-save` 経路で行う |
+| 2 | 恒久契約候補（Decision） | アーキテクチャに関する設計判断、技術選定の理由を記録すべき内容。禁止条件フィルタリングゲート適用後の候補 |
+| 3 | 恒久契約候補（Design） | システム仕様、実装パターン、設計原則として docs/designs/ に反映すべき内容 |
+| 4 | project knowledge | プロジェクト固有の落とし穴、環境依存の知見、汎用化が難しい内容。保存先の候補判定は「プロジェクト固有知識の反映先振り分け」参照 |
+| 5 | 既存対策の更新 | 同種の問題を防止する既存対策が存在するが、陳腐化、不備、適用漏れがある。既存事実の整備状況（ギャップ分類と詳細）として req-define へ引き渡す |
+| 6 | deferred | まだ昇華の余地がない、情報が断片的、出現回数が少ない。**living pool（`deferred.md`）で維持し REQ 化しない** |
+| 7 | rejected | ユーザーが明示的に却下、すでに別の対策で十分対応済み |
+| + | duplicate | 同等の内容が既存の恒久契約、知識、配布物で十分にカバーされている |
 
 ## 既存対策照合
 
+既存対策の確認は、学びが既存事実で十分にカバーされているか、既存対策の整備状況にギャップがあるかを評価する learning 固有の評価である（重複・陳腐化の評価）。
+確認結果は、req-define が変更方針を確定できる既存事実の整備状況として採用済み成果物へ記録する。実現先の選択は行わない。
+
 既存対策の確認対象:
-- `.opencode/commands/` 配下の全コマンド
-- `.opencode/skills/` 配下の全スキル
-- `.opencode/skills/agentdev-workflow-templates/templates/` 配下
-- `.opencode/skills/agentdev-req-file-manager/templates/`, `agentdev-decision-file-manager/templates/` 配下
-- `docs/designs/`, `docs/decisions/`, `docs/requirements/` 配下
+- `docs/requirements/`, `docs/designs/`, `docs/decisions/` 配下（恒久契約）
+- `docs/knowledge/` 配下（プロジェクト知識）
+- `.opencode/commands/`, `.opencode/skills/` 配下（配布 command・skill。templates、scripts、hook、Custom Tool の契約を含む）
 
 ギャップ分類:
 - **fix gap**: 対策内容に不備、欠落がある
@@ -68,11 +54,11 @@ living pool は終端保管ではなく、次回 `/agentdev/learning-promote` �
 - **load miss**: 対策は存在するが該当コマンド/skillがロードされていない
 - **guardrail insufficiency**: ガードレール、禁止事項が不十分
 
-判定ルール: 「新規X化」より「既存Xへ反映」を優先する。
-
 ## 採用済み成果物スキーマ
 
 learning-promote が出力する採用済み成果物の形式。
+採用済み成果物は、問題、根拠、望ましい状態、制約、既存事実を req-define が既存 REQ / Decision / Design と実装を再調査して変更方針を確定できる自足的な情報として保持する。
+learning-promote は実現先を確定せず、「反映先候補」は req-define 変更影響分析への情報候補である。
 `/agentdev/backlog-review` が読み込み、RU 化後に `/agentdev/req-define` に合流する。learning 由来で docs/knowledge/ への知識文書保存に分類された成果物は、backlog-review の利用者承認後に docs/knowledge/ へ直接保存され、RU 化を経ない。
 採用済み成果物は backlog-review 以前の段階（pre-backlog-review）であり、RU への変換は backlog-review が行う。
 
@@ -103,9 +89,11 @@ learning-promote が出力する採用済み成果物の形式。
 
 ## 反映先候補
 
+learning-promote は実現先を確定しない。以下は req-define の変更影響分析・実現方法決定に参照される情報候補であり、req-define が最終的に選択、修正できる。
+
 | 種別 | パス | 変更内容 |
 |------|------|----------|
-| {command/skill/template/spec/adr/req/agents} | {ファイルパス} | {何を変更するか} |
+| {REQ/Decision/Design/配布command/配布skill/template/knowledge/AGENTS.md 等の情報候補} | {ファイルパス} | {何を変更するか} |
 
 ## 既存対策確認
 
@@ -138,19 +126,23 @@ learning-promote が出力する採用済み成果物の形式。
 - **関連Issue**: {関連するIssue番号、なしの場合は「なし」}
 ```
 
-## カテゴリ別の反映先パス例
+## req-define 変更影響分析への情報候補
 
-| カテゴリ | 反映先パス例 |
-|---|---|
-| 既存 command へ反映 | `.opencode/commands/{target-command}.md` |
-| 既存 skill へ反映 | `.opencode/skills/{target-skill}/SKILL.md` |
-| 新規 skill 化 | `.opencode/skills/{new-skill}/SKILL.md` |
-| 新規 command 化 | `.opencode/commands/{new-command}.md` |
-| template 反映 | `.opencode/skills/agentdev-workflow-templates/templates/{template}.md` |
-| Decision 候補 | `docs/decisions/DEC-{NNN}-{name}.md` |
-| spec 候補 | `docs/designs/{domain}/{spec-name}.md` |
-| REQ 候補 | `docs/requirements/REQ-{NNNN}.md` |
-| project knowledge | 内容に応じた振り分け（後述参照） |
+learning-promote は、学びの性質ごとの情報を req-define の変更影響分析への情報候補として採用済み成果物へ保持できる。
+以下は情報候補の観点であり、実現先を最終選択する固定的なマッピングではない。
+
+- **knowledge**（汎用知見）: 手順、ガードレール、判断基準として価値を持つ知見
+- **procedures**（手順）: 繰り返し現れる操作フロー、自動化すべき手順
+- **constraints**（制約、注意事項）: 禁止事項、環境依存の制約
+- **format**（フォーマット）: ドキュメント、Issue、PR 等の形式に関する知見
+- **user-confirmed work**（ユーザー確認済み作業フロー）: 承認境界を含む作業フロー
+- **architecture**（アーキテクチャ決定）: 設計判断、技術選定の理由
+- **system spec**（システム仕様）: 現在のシステム事実として固定すべき内容
+- **requirement change**（要件変更）: 要件、機能の変更要因
+- **project-specific pitfalls**（プロジェクト固有の落とし穴）: 汎用化が難しいプロジェクト固有の知見
+
+これらの観点は、req-define が実現先（既存 REQ / Decision / Design、配布 command・skill、template、docs/knowledge/、AGENTS.md 等のどの実現面を変更するか）を変更影響分析で確定する際の情報として採用済み成果物へ記録できる。
+learning-promote はこの観点で実現先を分類・確定しない。
 
 ## プロジェクト固有知識の反映先振り分け
 
