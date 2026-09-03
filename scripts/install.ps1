@@ -7,7 +7,8 @@
     - check   : 検証のみ（ファイル変更なし）。旧状態確認専用スクリプトの検査能力
                 （orphan 検出、版報告、link mode 検出を含む）を包含する（REQ-050-004）
     - dry-run : 変更予測（ファイル変更なし）
-    - apply   : 実行（ファイル変更あり）
+    - apply   : 実行（ファイル変更あり）。正本から除外・削除された ADF 管理投影物
+                （stale 管理投影物）の配置先からの除去を含む（REQ-058、REQ-050-015）
 
     いずれのモードも provisioning（clone、fetch、reset）と network access を行わず、
     チェックアウト済みの .agentdev-plugin/ を前提に動作する（REQ-009-046、REQ-050-013、DEC-016）。
@@ -70,6 +71,8 @@
 
 # ADF-COVERS(implementation): REQ-050-001, REQ-050-002, REQ-050-004, REQ-050-005, REQ-050-006, REQ-050-007, REQ-050-008, REQ-050-013
 # ADF-COVERS(implementation): REQ-052-007, REQ-052-008, REQ-011-006
+# ADF-COVERS(implementation): REQ-058-001, REQ-058-002, REQ-058-003, REQ-058-004, REQ-058-005, REQ-058-006, REQ-058-007, REQ-058-008, REQ-058-009, REQ-058-010, REQ-058-011, REQ-058-012
+# ADF-COVERS(implementation): REQ-050-015
 
 #Requires -Version 7.0
 
@@ -230,6 +233,99 @@ function Get-TargetSourcePath {
         return Join-Path $LocalSourceDir $LocalModeLocalSourceDirName
     }
     return Join-Path $SourceDir $RelPath
+}
+
+function Test-ManagedProjectionJunction {
+    <#
+    .SYNOPSIS
+        配置先の junction が ADF 管理投影物（本スクリプトが配置した物）であることを確定する
+        （REQ-058-001、REQ-058-008）。
+
+    .DESCRIPTION
+        確定基準: リンク先が、当該 junction の相対パスに対応する正本パス
+        （.agentdev-plugin/src/opencode/<相対パス>）、または LocalMode リダイレクト先
+        （tools\agentdev-gh のみ）に一致する場合のみ管理物とみなす。
+        正本以外を向く junction やリンク先を確定できない junction は管理物判定不能と
+        して扱い、自動削除の対象にしない非破壊境界である（REQ-058-008）。
+    #>
+    param([string]$JunctionRel, [string]$JunctionFullName)
+    $targetObj = Get-JunctionTarget -Path $JunctionFullName
+    $targetList = @($targetObj) | ForEach-Object { [string]$_ } | Where-Object { $_ }
+    if ($targetList.Count -eq 0) { return $false }
+    $expectedSources = @(Join-Path $SourceDir $JunctionRel)
+    if ($JunctionRel -eq $LocalModeRedirectToolRel) {
+        $expectedSources += (Join-Path $LocalSourceDir $LocalModeLocalSourceDirName)
+    }
+    foreach ($target in $targetList) {
+        $resolved = $null
+        try {
+            $resolved = (Resolve-Path -LiteralPath $target -ErrorAction Stop).Path
+        } catch {
+            # 正本から削除された管理対象 junction はリンク先解決に失敗する（broken）。
+            # リンク先の文字列自体は reparse data に残るため判定に使える。
+            $resolved = $target
+        }
+        foreach ($expected in $expectedSources) {
+            $expectedFull = [System.IO.Path]::GetFullPath($expected).TrimEnd('\', '/')
+            if ($resolved.TrimEnd('\', '/') -ieq $expectedFull) { return $true }
+        }
+    }
+    return $false
+}
+
+function Get-StaleManagedJunctions {
+    <#
+    .SYNOPSIS
+        ADF 管理投影物のうち正本の管理対象列挙から外れたもの（stale、削除対象）を返す
+        （REQ-058-001、REQ-058-002）。
+
+    .DESCRIPTION
+        返却要素は RelPath（.opencode/ 相対パス）と FullName（絶対パス）を持つ。
+        正本の管理対象列挙（追加・修復対象を含む現行対象）に含まれない junction のうち、
+        管理物と確定できるものだけを返す。管理物判定不能な junction は返さない
+        （REQ-058-008 の非破壊境界）。
+    #>
+    param([string[]]$CurrentTargets)
+    $stale = [System.Collections.Generic.List[object]]::new()
+    foreach ($parentRel in $ProjectionParentRels) {
+        $parentPath = Join-Path $ProjectionDir $parentRel
+        if (-not (Test-Path -LiteralPath $parentPath)) { continue }
+        Get-ChildItem -LiteralPath $parentPath -Directory -Force |
+            Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
+            ForEach-Object {
+                $junctionRel = "$parentRel\$($_.Name)"
+                if ($junctionRel -notin $CurrentTargets) {
+                    if (Test-ManagedProjectionJunction -JunctionRel $junctionRel -JunctionFullName $_.FullName) {
+                        $stale.Add([PSCustomObject]@{ RelPath = $junctionRel; FullName = $_.FullName })
+                    }
+                }
+            }
+    }
+    return $stale
+}
+
+function Get-UnmanagedProjectionJunctionRels {
+    <#
+    .SYNOPSIS
+        配置先の junction のうち、正本の管理対象列挙にも stale 管理投影物にも該当しない
+        （管理物判定不能な）ものの相対パス一覧を返す（REQ-058-008）。
+    #>
+    param([string[]]$CurrentTargets)
+    $staleRels = @(Get-StaleManagedJunctions -CurrentTargets $CurrentTargets) | ForEach-Object { $_.RelPath }
+    $unmanaged = [System.Collections.Generic.List[string]]::new()
+    foreach ($parentRel in $ProjectionParentRels) {
+        $parentPath = Join-Path $ProjectionDir $parentRel
+        if (-not (Test-Path -LiteralPath $parentPath)) { continue }
+        Get-ChildItem -LiteralPath $parentPath -Directory -Force |
+            Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
+            ForEach-Object {
+                $junctionRel = "$parentRel\$($_.Name)"
+                if ($junctionRel -notin $CurrentTargets -and $junctionRel -notin $staleRels) {
+                    $unmanaged.Add($junctionRel)
+                }
+            }
+    }
+    return $unmanaged
 }
 
 function New-PluginLoaderShimContent {
@@ -423,25 +519,21 @@ if ($Mode -eq 'check') {
         }
     }
 
-    # 7. Orphan detection (agentdev-* junctions that don't match source。REQ-050-004 継承能力)
+    # 7. Orphan detection (REQ-050-004 継承能力)。REQ-058:
+    # 正本の管理対象から外れた ADF 管理投影物（stale）のみ乖離として検出・報告する
+    # （検出のみでファイルシステムを変更しない。REQ-058-003）。
+    # 管理物判定不能な junction（正本以外を向く等）は報告のみで非破壊とする（REQ-058-008）。
     Write-Host ''
     Write-Host '--- Orphan junctions ---'
-    $orphansFound = $false
-    foreach ($parentRel in $ProjectionParentRels) {
-        $parentPath = Join-Path $ProjectionDir $parentRel
-        if (-not (Test-Path -LiteralPath $parentPath)) { continue }
-        Get-ChildItem -LiteralPath $parentPath -Directory -Force |
-            Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
-            ForEach-Object {
-                $junctionRel = "$parentRel\$($_.Name)"
-                if ($junctionRel -notin $targets) {
-                    Write-Host "[ORPHAN] Junction not from current source: $junctionRel"
-                    $orphansFound = $true
-                    $divergences++
-                }
-            }
+    $staleJunctions = @(Get-StaleManagedJunctions -CurrentTargets $targets)
+    foreach ($staleItem in $staleJunctions) {
+        Write-Host "[ORPHAN] Stale managed junction (apply removes it): $($staleItem.RelPath)"
+        $divergences++
     }
-    if (-not $orphansFound) {
+    foreach ($unmanagedRel in (Get-UnmanagedProjectionJunctionRels -CurrentTargets $targets)) {
+        Write-Host "[INFO] Junction not managed by AgentDevFlow (left untouched): $unmanagedRel"
+    }
+    if ($staleJunctions.Count -eq 0) {
         Write-Host '[OK] No orphan junctions detected'
     }
 
@@ -557,6 +649,30 @@ if ($Mode -eq 'dry-run') {
             Write-Host "[WOULD ADD] Plugin loader shim: plugins/$pkg.ts"
         }
     }
+    # REQ-058-004: stale plugin loader shim（正本側の対象消滅により不要となる ADF 生成物）の
+    # 削除予測を報告する（変更はしない）。
+    if (Test-Path -LiteralPath $PluginsDir) {
+        Get-ChildItem -LiteralPath $PluginsDir -File -Filter 'agentdev-*.ts' -ErrorAction SilentlyContinue |
+            Where-Object { $_.BaseName -notin $dryRunPluginPackages } |
+            ForEach-Object {
+                Write-Host "[WOULD REMOVE] Stale plugin loader shim: plugins/$($_.Name)"
+            }
+    }
+
+    # REQ-058-004: stale 管理投影物（正本から除外・削除された管理対象 junction）の
+    # 削除予測を報告する（変更はしない）。
+    Write-Host ''
+    Write-Host '--- Planned stale junction cleanup ---'
+    $dryRunStale = @(Get-StaleManagedJunctions -CurrentTargets $targets)
+    foreach ($staleItem in $dryRunStale) {
+        Write-Host "[WOULD REMOVE] Stale managed junction: $($staleItem.RelPath)"
+    }
+    foreach ($unmanagedRel in (Get-UnmanagedProjectionJunctionRels -CurrentTargets $targets)) {
+        Write-Host "[INFO] Junction not managed by AgentDevFlow (would be left untouched): $unmanagedRel"
+    }
+    if ($dryRunStale.Count -eq 0) {
+        Write-Host '[OK] No stale managed junctions to remove'
+    }
 
     Write-Host ''
     Write-Host 'Dry run complete. No changes made.'
@@ -646,6 +762,9 @@ if ($Mode -eq 'apply') {
     # Step 3b: Plugin loader shims (depth-1 re-export files)
     Write-Host ''
     Write-Host '--- Plugin loader shims ---'
+    # REQ-058-009/011: stale 管理投影物の削除は全件を試み、失敗は記録して処理を続行し、
+    # 最後に判別可能な終了結果を返す（一部残存で正常終了しない）。
+    $applyRemoveFailures = [System.Collections.Generic.List[string]]::new()
     $applyPluginPackages = $targets | Where-Object { $_ -like 'plugins\*' } | ForEach-Object { ($_ -split '\\')[-1] }
     foreach ($pkg in $applyPluginPackages) {
         $shimPath = Join-Path $PluginsDir "$pkg.ts"
@@ -662,13 +781,46 @@ if ($Mode -eq 'apply') {
             [System.IO.File]::WriteAllText($shimPath, $shimContent, (New-Object System.Text.UTF8Encoding($false)))
         }
     }
-    Get-ChildItem -LiteralPath $PluginsDir -File -Filter 'agentdev-*.ts' -ErrorAction SilentlyContinue |
-        ForEach-Object {
-            if ($_.BaseName -notin $applyPluginPackages) {
-                Write-Host "[ACTION] Removing stale plugin loader shim: plugins/$($_.Name)"
-                Remove-Item -LiteralPath $_.FullName -Force
+    if (Test-Path -LiteralPath $PluginsDir) {
+        Get-ChildItem -LiteralPath $PluginsDir -File -Filter 'agentdev-*.ts' -ErrorAction SilentlyContinue |
+            ForEach-Object {
+                if ($_.BaseName -notin $applyPluginPackages) {
+                    Write-Host "[ACTION] Removing stale plugin loader shim: plugins/$($_.Name)"
+                    try {
+                        Remove-Item -LiteralPath $_.FullName -Force -ErrorAction Stop
+                    } catch {
+                        Write-Host "[ERROR] Failed to remove stale plugin loader shim: plugins/$($_.Name) ($($_.Exception.Message))"
+                        $applyRemoveFailures.Add("plugins/$($_.Name)")
+                    }
+                }
             }
+    }
+
+    # Step 3c: Stale managed junction cleanup (REQ-058-002、REQ-050-015)
+    Write-Host ''
+    Write-Host '--- Stale managed junction cleanup ---'
+    $applyStale = @(Get-StaleManagedJunctions -CurrentTargets $targets)
+    foreach ($staleItem in $applyStale) {
+        Write-Host "[ACTION] Removing stale managed junction: $($staleItem.RelPath)"
+        $rmResult = cmd /c "rmdir `"$($staleItem.FullName)`"" 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "[ERROR] Failed to remove stale managed junction: $($staleItem.RelPath) ($rmResult)"
+            $applyRemoveFailures.Add($staleItem.RelPath)
         }
+    }
+    # 管理物判定不能な junction は削除せず報告のみ（REQ-058-008）
+    foreach ($unmanagedRel in (Get-UnmanagedProjectionJunctionRels -CurrentTargets $targets)) {
+        Write-Host "[INFO] Junction not managed by AgentDevFlow (left untouched): $unmanagedRel"
+    }
+    if ($applyStale.Count -eq 0) {
+        Write-Host '[OK] No stale managed junctions to remove'
+    }
+    # REQ-058-011: 削除失敗が残る場合は成功として扱わず、判別可能な終了コードで報告する
+    if ($applyRemoveFailures.Count -gt 0) {
+        Write-Host ''
+        Write-Host "[ERROR] $($applyRemoveFailures.Count) stale artifact(s) could not be removed: $($applyRemoveFailures -join ', ')"
+        exit 1
+    }
 
     # Step 4: Repo-local directories (informational)
     Write-Host ''
