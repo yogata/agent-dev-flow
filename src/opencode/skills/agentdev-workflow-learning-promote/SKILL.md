@@ -39,7 +39,7 @@ learning-promote workflow は次の7 STEP で構成する。
 |---|---|---|---|---|
 | STEP-1 | 入力読込・正規化 | inbox.md にエントリ存在 | 正規化済みエントリ群（deferred.md 読込含む） | [references/analysis-and-review.md](references/analysis-and-review.md) |
 | STEP-2 | 評価（分類・8軸・evaluation-report） | 正規化済みエントリ確定 | 問題クラス分類、8軸評価スコア、evaluation-report.md 生成・更新 | [references/analysis-and-review.md](references/analysis-and-review.md) |
-| STEP-3 | 判定（廃棄判定・既存対策確認） | evaluation-report.md 反映済み | 処分区分判定（11カテゴリ + duplicate）、既存対策照合結果、昇華可能性評価 | [references/analysis-and-review.md](references/analysis-and-review.md) |
+| STEP-3 | 判定（廃棄判定・既存対策確認） | evaluation-report.md 反映済み | 処分区分判定（7カテゴリ + duplicate）、既存対策照合結果、昇華可能性評価 | [references/analysis-and-review.md](references/analysis-and-review.md) |
 | STEP-4 | review（adversarial-review） | evaluation-report.md に STEP-2/STEP-3 結果反映済み | review 結果反映（evaluation-report 戻しループ含む。skip 時は従来フロー継承） | [references/analysis-and-review.md](references/analysis-and-review.md) |
 | STEP-5 | 判定確定（自律確定・HITL） | STEP-3 完了、STEP-4 skip または反映済み | 判定確定（自律確定分はユーザー承認なし、ユーザー判断必要分はユーザー承認済み。promote/defer/reject/duplicate） | [references/hitl-and-persistence.md](references/hitl-and-persistence.md) |
 | STEP-6 | 永続化（成果物生成・deferred 移動・prune・commit/push） | 判定確定（自律確定またはユーザー承認） | 採用済み成果物、deferred 移動済み、prune 済み、クリア済み inbox.md、commit/push | [references/hitl-and-persistence.md](references/hitl-and-persistence.md) |
@@ -83,7 +83,7 @@ HITL（STEP-5）の承認状態は単独では永続状態に記録されない�
 
 本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
 
-- `agentdev-learning-pipeline`: inbox entry schema、正規化ルール、問題クラス分類基準、8軸評価ディメンション、evaluation-report schema、処分区分（11カテゴリ + duplicate）、既存対策照合、採用済み成果物スキーマ、prune 方針、deferred 移動の原子的操作契約。learning-promote の review 候補判断と内部手続き
+- `agentdev-learning-pipeline`: inbox entry schema、正規化ルール、問題クラス分類基準、8軸評価ディメンション、evaluation-report schema、処分区分（7カテゴリ + duplicate）、既存対策照合、採用済み成果物スキーマ、prune 方針、deferred 移動の原子的操作契約。learning-promote の review 候補判断と内部手続き
 - `agentdev-adversarial-review`: learning-promote の review 呼出（共通契約の正規所有者は adversarial-review Design、REQ-{NNNN}）
 - `agentdev-git-worktree`: ドメイン状態永続化プロシージャ（並列実行安全ステージング、構造化エラー形式）
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）

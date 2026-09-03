@@ -62,6 +62,7 @@ pipeline 各層を構成する 4 成果物の役割、性格、command 間の振
 - raw learning item を実行時コマンド/ skill の直接参照対象にしない
 - Decision 候補分類の前に `agentdev-decision-guidelines` の除外基準（禁止条件フィルタリングゲート）を必須適用する
 - `case-run` への直接受け渡しは禁止（`backlog-review` → `req-define` を経由すること）
+- **learning-promote は反映先を直接変更しない**: learning 固有の評価責務（学習価値、問題クラス、8軸評価、change_nature、再発条件、docs/knowledge/ 候補判定、重複・陳腐化、保留要否）を維持し、Skill、Command、script 等の具体的な実現先を選ぶ分類・マッピングは行わない。採用済み成果物は、問題、根拠、望ましい状態、制約、既存事実を req-define が変更方針を確定できる自足的な情報として保持する（REQ）
 - **adversarial-review は任意助言手段（learning-promote、REQ）**: ユーザー明示要求時のみ Step 8-R1（発動条件判定）→ Step 8-R2（review 呼出）を経て発動する。明示要求がない場合は Phase 5 へ従来フローを維持する（REQ-{NNNN}-{NNN}/{NNN}）。共通 caller integration 契約（任意性、副作用禁止、再 review 条件、停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` Design（REQ-{NNNN}）が正規所有する。本 skill は learning-promote 固有の候補判断、呼出タイミング、evaluation-report 反映、Step 6 戻しループの実装詳細のみを提供する
 
 ## 主要な判断順序
@@ -70,7 +71,7 @@ pipeline 各層を構成する 4 成果物の役割、性格、command 間の振
 2. 問題クラス分類（根本原因 + 再発条件 + 予防策が同じ単位、最小2エントリ）
 3. 8軸評価スコアリング（加重合計 /40）と evaluation-report 生成
 4. 禁止条件フィルタリングゲート適用（ADR 候補除外）
-5. 処分区分判定（11カテゴリ + duplicate）と既存対策照合（「新規X化」より「既存Xへ反映」優先）
+5. 処分区分判定（7カテゴリ + duplicate）と既存対策照合（既存事実の整備状況の把握。実現先の選択は行わない）
 6. inbox → deferred 原子的移動、prune（staged/rejected/duplicate のみ）、採用済み成果物生成
 
 ## reference選択表
@@ -81,7 +82,7 @@ pipeline 各層を構成する 4 成果物の役割、性格、command 間の振
 | 条件 | 読む reference |
 |---|---|
 | inbox entry の13フィールド schema、旧5フィールドからのマッピング、正規化ルール、問題クラス分類基準、8軸評価ディメンション、禁止条件フィルタリングゲート、evaluation-report schema が必要な場合 | [references/inbox-and-evaluation-schema.md](references/inbox-and-evaluation-schema.md) |
-| 処分区分（11カテゴリ + duplicate）、反映先マッピング、既存対策照合、採用済み成果物スキーマ、カテゴリ別反映先パス例、プロジェクト固有知識の振り分け、prune 方針詳細が必要な場合 | [references/disposition-and-artifact-schema.md](references/disposition-and-artifact-schema.md) |
+| 処分区分（7カテゴリ + duplicate）、既存対策照合、採用済み成果物スキーマ、req-define 変更影響分析への情報候補、プロジェクト固有知識の振り分け、prune 方針詳細が必要な場合 | [references/disposition-and-artifact-schema.md](references/disposition-and-artifact-schema.md) |
 | learning-promote の Phase ごとの判定ロジック（正規化、分類、8軸評価、廃棄判定、HITL承認）、learning-promote の review 候補判断と内部挿入（Step 8-R1/8-R2、Step 6 戻しループ）を実行する場合 | [references/promote-judgment-logic.md](references/promote-judgment-logic.md) |
 | inbox → deferred の原子的移動プロシージャ（追記、検証、クリア）を実行する場合 | [references/deferred-atomic-move-procedure.md](references/deferred-atomic-move-procedure.md) |
 

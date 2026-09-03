@@ -34,17 +34,17 @@ learning-promote コマンドの Steps における判定ロジック（旧フ�
 
 ## Phase 4: 廃棄判定 + 既存対策確認
 
-### 廃棄判定（11カテゴリ + duplicate）
+### 廃棄判定（7カテゴリ + duplicate）
 
 - **主入力**: Phase 3 で生成した evaluation-report.md の問題クラスラスタ（raw learning item の再分類は禁止）
-- 廃棄カテゴリ一覧、反映先マッピングは `agentdev-learning-pipeline` skill の `references/disposition-and-artifact-schema.md`（処分区分）を参照
-- 各クラスタに対し最適な廃棄先を判定
+- 処分カテゴリ一覧は `agentdev-learning-pipeline` skill の `references/disposition-and-artifact-schema.md`（処分区分）を参照
+- 各クラスタの処分区分を learning 固有の評価結果に基づき判定する
 
 ### 既存対策確認
 
-- 各クラスタの内容に対し、既存の command/skill/template/docs に類似対策が存在するか確認
+- 各クラスタの内容に対し、既存の恒久契約、知識、配布物に類似対策が存在するか確認
 - 確認対象とギャップ分類は `agentdev-learning-pipeline` skill の `references/disposition-and-artifact-schema.md`（既存対策照合）を参照
-- 「新規X化」より「既存Xへ反映」を優先
+- 確認結果は既存事実の整備状況として採用済み成果物へ記録する（実現先の選択は行わない）
 
 ## Phase 4-R: adversarial-review 候補判断と内部挿入（learning-promote）
 
