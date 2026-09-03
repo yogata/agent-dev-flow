@@ -1,6 +1,6 @@
 ---
 title: 導入スクリプトの使いやすさ詳細
-status: draft
+status: accepted
 created: 2026-08-02
 updated: 2026-09-03
 ---

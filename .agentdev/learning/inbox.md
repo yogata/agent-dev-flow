@@ -138,3 +138,37 @@
 - **想定反映先**: agentdev-workflow-case-close（STEP-1 Input Resolution）、custom-tool-contracts.md
 - **関連**: PR #2539、Issue #2538
 - **タグ**: #agentdev-gh #pr-read #fallback #操作契約 #読み戻し
+
+---
+## 2026-09-03: $PSScriptRoot 自己解決型スクリプトの挙動テストは一時リポジトリ内コピーの実行が必須
+
+- **問題事象**: stale クリーンアップ挙動テスト初回実行時、self-sync 系テストが一時リポジトリではなく本体 worktree の `scripts/self-sync.ps1` を実行し、本体 `.opencode/`（worktree 側）へ junction 群を作成した。事故物は削除済みで、メインリポジトリ作業ツリーへの影響なし（`.opencode/*` は gitignore 対象、git status 変化なし）
+- **発生局面**: case-run の TS-001 状態遷移テスト（一時リポジトリ上での検証）初回実行時
+- **検知方法**: テスト対象スクリプトが `$PSScriptRoot` から自己リポジトリを解決する構造であることに起因する junction 作成先の観測
+- **根本原因**: `$PSScriptRoot` で自己位置からリポジトリルートを解決するスクリプトは、本体リポジトリ内のスクリプトをそのまま実行すると本体 `.opencode/` へ副作用を書く。一時環境を構築しても本体側スクリプトを実行すれば自己解決は本体を向く
+- **自律対応内容**: 一時リポジトリ内にコピーしたスクリプトを実行する形へテストを修正済み（PR #2541）
+- **ユーザー確認の有無**: なし（エージェント自律）
+- **ADR/REQ/spec影響**: なし（テスト実行手法の知見）
+- **横展開観点**: `$PSScriptRoot` / `$MyInvocation` 等で自己位置を解決する配布スクリプト（install.ps1、self-sync.ps1 等）全般に適用可能
+- **再発条件**: 自己解決型スクリプトを一時環境でテストする際に本体側実行パスを使った場合
+- **予防策候補**: 挙動テストは常に「一時リポジトリ内にコピーしたスクリプト」を実行する規約化。テストの冒頭でスクリプト解決パスのアサーションを置く
+- **想定反映先**: scripts/self/release/stale-cleanup-behavior.Tests.ps1（実装済み）、install-script-usability Design（テスト実行留意点の追記候補）
+- **関連**: PR #2541、Issue #2540
+- **タグ**: #psscriptroot #テスト #一時リポジトリ #副作用 #install-script
+
+---
+## 2026-09-03: Windows junction の削除失敗は主要な手法では注入困難（失敗経路検証は実ファイルロックで代替）
+
+- **問題事象**: TS-004 (3) の削除失敗注入について、子プロセスの CWD ロック（junction 内 Set-Location）、junction 自体への DELETE deny（icacls）、親への DELETE_CHILD deny、DELETE アクセスの no-share ハンドル保持のいずれも junction の rmdir をブロックできなかった（Windows 11 / pwsh 7.6 環境）
+- **発生局面**: case-run の TS-004 (3) 削除失敗の判別可能な報告（REQ-058-011）検証時
+- **検知方法**: 4 手法の注入を順に試行し、いずれも rmdir 成功で失敗状態を作れないことを観測
+- **根本原因**: junction の削除は reparse point の解除であり、通常のディレクトリ/ファイルのロック機構が効きにくい。ターゲット側のロックは junction 削除に影響しない
+- **自律対応内容**: 削除失敗注入は stale plugin loader shim（実ファイル、`FileShare.None` ロック）で構成した。stale 管理投影物種別横断で「失敗時は記録して続行し、判別可能な終了コードで終える」同一経路のため契約検証としては等価
+- **ユーザー確認の有無**: なし（エージェント自律）
+- **ADR/REQ/spec影響**: なし（検証手法の知見。REQ-058-011 の検証手段構成は PR 本文へ記録済み）
+- **横展開観点**: junction の削除失敗テストを設計する場合は実ファイルロックで代替するか、reparse point 特有の失敗経路（破損した reparse data 等）を別途検討する必要がある
+- **再発条件**: junction の削除失敗をテストで再現しようとした場合
+- **予防策候補**: junction 削除失敗の単独検証手段が必要な場合は失敗注入を契約に含めず、実装レベルのユニットテスト（削除関数のモック）で担保する
+- **想定反映先**: runtime-package-boundary Design（検証手法の留意点候補）、REQ-058 関連の将来テスト
+- **関連**: PR #2541、Issue #2540
+- **タグ**: #junction #削除失敗 #テスト注入 #windows #ts-004
