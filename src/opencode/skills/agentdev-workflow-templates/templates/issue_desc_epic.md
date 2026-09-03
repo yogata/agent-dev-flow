@@ -81,6 +81,24 @@ REQ-{req_number}
 <!-- 完了条件: Epic全体の完了判定条件 -->
 {completion_criteria}
 
+## Execution Contract
+<!-- 【必須】 -->
+
+<!-- Execution Contract: case-open が新規 Epic Issue 作成時に付与するセクション。
+本セクションに実現面の変更方針（realization_actions 由来）の投影先を定義し、req-define が確定した内容を Epic 本文へ永続化する（REQ-017-017）。
+Epic flow の場合は子 Issue 個別の実現面の変更方針が子 Issue 本文へ投影され、Epic 共通の実現面の変更方針のみ本セクションへ記録する -->
+
+### 実現面の変更方針（realization_actions 由来）
+<!-- 【必須】 -->
+
+<!-- 実現面の変更方針: case-open が draft-data の realization_actions を本セクションへ投影する（REQ-017-017）。
+req-define が確定した実現面の変更方針（正規所有責務、変更すべき実現面、変更意図、検証との対応）を失わず本文へ永続化する。
+case-open 成功後は case-run が本文だけで変更責務、変更意図、検証方針を取得できる。
+case-run は本セクションを既確定契約として消費し、実現責務・変更意図・検証方針を再決定せず、範囲内の内部実装方針だけを決定する。
+投影対象がない場合は「該当なし」と記載する -->
+
+- （RA-{NNN} ごとに: concern、responsibility、ownership_hints、intent、verification_refs、source_items を記録）
+
 ## レビュー判断
 <!-- 【必須】 -->
 

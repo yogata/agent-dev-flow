@@ -9,7 +9,7 @@ Issue 本文候補を生成し、execution contract を確定する。
 
 ## Input Resolution
 
-1. SSoT 再構成: 要件doc（draft-data、`agreed_items`、`artifact_actions`、`test_strategy`、`review_dispositions`）、対象 REQ/Decision/Design、関連 ADR（Decision）
+1. SSoT 再構成: 要件doc（draft-data、`agreed_items`、`artifact_actions`、`realization_actions`、`test_strategy`、`review_dispositions`）、対象 REQ/Decision/Design、関連 ADR（Decision）
 2. identifier 保持: REQ-ID、DEC-ID、OU ID、AG-ID
 3. 最小 scalar: なし
 4. runtime artifact: Issue 本文候補ファイル（委譲接続点経由）
@@ -77,6 +77,13 @@ case-open が追加できる test strategy は合意済み変更対象と共通�
 #### scope-affecting impact candidate の探索と反映
 
 Issue 作成前に変更影響候補を探索し、scope、完了条件、test strategy に影響する候補を execution contract へ反映する。
+
+#### realization_actions の execution contract への投影
+
+draft-data の `realization_actions` を読み取り、Issue / Epic 本文の Execution Contract セクション「実現面の変更方針（realization_actions 由来）」へ投影する。
+req-define が確定した実現面の変更方針（正規所有責務、変更すべき実現面、変更意図、検証との対応）を失わず Issue 本文へ永続化する。case-open 成功後は case-run が Issue 本文だけで変更責務、変更意図、検証方針を取得できる（REQ-017-017）。
+Epic flow では Epic 共通の実現面の変更方針を Epic Issue 本文へ、子 Issue 個別の実現面の変更方針を子 Issue 本文へ投影する。
+`realization_actions` は soft contract（DEC-003）であり、欠落時は当該サブセクションへ「該当なし」を記載して継続する。
 
 #### adversarial-review 発動契約の永続化
 
