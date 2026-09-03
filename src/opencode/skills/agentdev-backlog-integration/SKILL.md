@@ -1,12 +1,12 @@
 ---
 name: agentdev-backlog-integration
-description: backlog-review の採用済み成果物（promoted artifact）統合、分割判定、矛盾検出、RU 生成、depends_on 依存解決、learning 由来分類結果の昇華先ルーティング（docs/knowledge/ 知識文書保存を含む）の知識ベース。USE FOR: 採用済み成果物の統合・分割判定・矛盾検出、RU 生成ルール、depends_on 依存解決基準、分析メタデータ項目、learning 由来反映先分類結果の昇華先ルーティング判定、docs/knowledge/ 知識文書保存の操作種別判定基準。DO NOT USE FOR: intake 抽出・promote、learning 昇華先の分類評価、REQ 構造診断、work_type 判定。
+description: backlog-review の採用済み成果物（promoted artifact）統合、分割判定、矛盾検出、RU 生成、depends_on 依存解決、docs/knowledge/ 知識文書保存を含む backlog 自体の処置（重複・陳腐化した知識の削除、保留）の知識ベース。USE FOR: 採用済み成果物の統合・分割判定・矛盾検出、RU 生成ルール、depends_on 依存解決基準、分析メタデータ項目、docs/knowledge/ 知識文書保存の操作種別判定基準。DO NOT USE FOR: intake 抽出・promote、learning 昇華先の分類評価、REQ 構造診断、work_type 判定。
 ---
 
 # バックログレビュー統合知識ベース（backlog-review）
 
 backlog-review コマンドの統合判定知識ベースである。
-採用済み成果物（promoted artifact）の読み込み、分析、RU への統合、分割判定、矛盾検出、RU 生成、depends_on 依存解決、learning 由来分類結果の昇華先ルーティングの判定基準と詳細構造を提供する。
+採用済み成果物（promoted artifact）の読み込み、分析、RU への統合、分割判定、矛盾検出、RU 生成、depends_on 依存解決、docs/knowledge/ 知識文書保存を含む backlog 自体の処置（重複・陳腐化した知識の削除、保留）の判定基準と詳細構造を提供する。
 
 ## 対象コマンド
 
@@ -19,7 +19,7 @@ backlog-review コマンドの統合判定知識ベースである。
 | ファイル | 内容 |
 |----------|------|
 | `references/integration-judgment.md` | 成果物の読み込み、分析、統合分割判定、depends_on 依存解決、矛盾検出、RU 生成の判定ロジック。adversarial-review 候補判断と内部挿入（backlog-review）の実行時参照 |
-| `references/learning-outcome-routing.md` | learning 由来分類結果の昇華先ルーティング契約。適用対象の限定、昇華先ルート（昇華、Issue 修正、削除、保留）、ユーザー承認境界、git 管理境界、成果物ライフサイクルの実行時参照 |
+| `references/learning-outcome-routing.md` | docs/knowledge/ 知識文書保存と backlog 自体の処置の契約（source type 非依存）。docs/knowledge/ 直接保存の手順、操作種別判定、ユーザー承認境界、git 永続化対象の副作用、成果物ライフサイクルの実行時参照 |
 
 backlog-review コマンドの実行時投影先パスは `.opencode/commands/agentdev/backlog-review.md`。
 command 本文内で backlog-review を参照する場合はこちらを使用。
@@ -46,13 +46,12 @@ command 本文内で backlog-review を参照する場合はこちらを使用�
 | unresolved 時の扱い | REQ-{NNNN}-{NNN} | unresolved 残時は不可逆処理へ進まない（正は adversarial-review Design） |
 | 呼出失敗時の扱い | REQ-{NNNN}-{NNN} | silent skip 禁止、従来フロー維持（正は adversarial-review Design） |
 
-## learning 由来分類結果の昇華先ルーティング（backlog-review）
+## docs/knowledge/ 知識文書保存と backlog 自体の処置（backlog-review）
 
-本スキルは backlog-review における learning 由来分類結果の昇華先ルーティング契約の実行時参照を提供する。
-学習パイプラインが前工程で付与した反映先分類結果を消費し、docs/knowledge/ への知識文書保存（REQ-{NNNN}、REQ-{NNNN}-{NNN}）を含む恒久所有先への昇華、通常の Issue による修正、重複・陳腐化した知識の削除、現時点で反映不能なものの保留へルーティングする。
-docs/knowledge/ への知識文書保存は利用者承認後に backlog-review が直接実行する正規昇華経路であり、RU 化を経ない。
-適用対象は learning 由来に限定し、intake / inspect 由来は現行の RU 化経路を維持する。
-正規原本はバックログ統合の要件が正規所有する learning 昇華先ルーティングの要件行であり、本節は配布物側の実行時参照である。詳細は `references/learning-outcome-routing.md` を参照。
+本スキルは backlog-review における docs/knowledge/ 知識文書保存と backlog 自体の処置（docs/knowledge/ 知識文書保存、重複・陳腐化した知識の削除、保留）の実行時参照を提供する。
+backlog-review は promoted artifact を source type に依存しない共通モデルで分析し、docs/knowledge/ への知識文書保存へ処置すると判定した採用済み成果物（learning-promote が知識としての保存適否ありと判定して受け渡したものを含む。source type は問わない）を、利用者承認を経て docs/knowledge/ へ直接保存する正規昇華経路で処理する。当該書き込みは git 永続化対象の副作用である。
+REQ / Decision / Design 反映、ガードレール移管、Project Extension 接続、通常の Issue による修正等の具体的実現先へのルーティングは learning 由来を含めて行わず、システム変更を必要とするものは RU として req-define へ渡す。source type をルーティング条件にしない。
+正規原本はバックログ統合の要件が正規所有する backlog 自体の処置と docs/knowledge/ 直接保存の要件行であり、本節は配布物側の実行時参照である。詳細は `references/learning-outcome-routing.md` を参照。
 
 ## See Also
 
