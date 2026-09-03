@@ -111,6 +111,22 @@ test_strategy:
     on_failure: |              # 不合格時の処置（fix-and-reverify / record-in-findings の選択理由を含む）
       {不合格時の処置の本文}
 
+# realization_actions: 実現面の変更方針（正規所有責務、変更すべき実現面、変更意図、検証との対応）を記録する（REQ-008-060、DEC-026）。optional soft-contract
+# artifact_actions とは分離した独立構造であり、REQ / Decision / Design の保存操作は artifact_actions が担い、実現物種別の enum を追加して責務を混在させない
+# ADF 固有の成果物種別や適用プロジェクト固有の成果物種別を固定 enum として列挙しないドメイン中立契約とする
+# 対象の手掛かり（パス、担当能力、正規所有 Design 等）は ownership_hints に自由形式で記録する
+# 欠落時に後続工程は draft を拒否しない（soft contract、DEC-003）
+# ただし実現面の変更がある場合は本セクションを出力する
+# case-open が本セクションを Issue / Epic の execution contract へ投影する
+realization_actions:
+  - id: RA-{NNN}                # RA-NNN 形式の識別子（NNNは3桁ゼロ埋め連番）
+    concern: {実現面の関心の1行要約}
+    responsibility: {変更すべき正規所有責務の本文}
+    ownership_hints: []         # 正規所有先・変更対象の手掛かりの自由形式 list（ドメイン中立）
+    intent: {変更意図の本文}
+    verification_refs: [TS-{NNN}] # 対応する test_strategy 項目 ID（TS-*）の list
+    source_items: [AG-{NNN}]    # 対応する agreed_item ID（AG-*）の list
+
 # review_dispositions: 採否判断（covered / rejected 等）の記録。optional soft-contract
 # 欠落時に後続工程は draft を拒否しない（後方互換）。covered 項目だけで Issue/PR を作成しない方針を維持する
 # 1 エントリ = 単一 source_ru + 単一 source_item（重複禁止）

@@ -47,6 +47,7 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 - 評価契約と test strategy は分離する。test strategy は実証手段・計測手段・実証環境が正常に動作したかを扱い、評価契約は評価対象から得られた結果と採否を扱う
 - 本コマンドは実証Caseでも Git 副作用を持たない（評価ブランチ・worktree 準備の実行主体・手順は command Design が所有する）。評価ブランチ作成だけの新しい公開コマンドを追加しない
 - Design 分離基準に該当する要件行は `artifact_actions`（`artifact: design`）へ分離する（安定契約例外は除く）。test strategy 項目は verification（検証手順）・pass_criteria（合格基準）・on_failure（不合格時の処置）の3要素を欠落なく持ち、欠落項目は保存前に QG fail として扱う
+- 実現面の変更方針（正規所有責務、変更すべき実現面、変更意図、検証との対応）は、実現面の変更がある場合に `realization_actions` セクションへ構造化して出力する。`realization_actions` は `artifact_actions` と分離した独立構造であり、成果物種別を固定 enum としないドメイン中立契約とする（REQ-008-060、DEC-026）
 
 ## ガードレール
 
