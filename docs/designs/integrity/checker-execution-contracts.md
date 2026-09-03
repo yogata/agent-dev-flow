@@ -2,7 +2,7 @@
 title: checker 実行契約と検出基盤規則
 status: accepted
 created: 2026-08-15
-updated: 2026-09-02
+updated: 2026-09-04
 ---
 <!-- ADF-COVERS(implementation): REQ-002-035 -->
 <!-- ADF-COVERS(implementation): REQ-010-062 -->
@@ -134,6 +134,7 @@ AG-009(a)（Issue #2386 由来の既存対応計画 ID。本前置とは別の�
 - targeted docs guard のモード使い分け・引数形式の詳細（targeted-docs-guard-implementation Design）
 - AUTOGEN block ID の棚卸し規定（autogen-freshness-gate Design）
 - Workflow / Capability 機械分類規則（workflow-skill-model Design）
+- check_workflow_preventive.ts の extractYamlField（単一トップレベルフィールドの正規表現抽出）は宣言的データ読込原則の意図的な適用対象外とする。根拠: Issue #2352 の移行対象からの意図的除外、PR #2355 での ambiguous 判定記録、抽出対象が単一行 `field: value` 意味に限定され構造化 YAML 解析を必要としないこと。Bun.YAML 委譲の共有 lib（resolveExtensionState 系）とは責務が異なるため二重経路には該当しない（RU-0004 対象外明示。ユーザー決定 2026-09-04）
 
 ## 安定実行経路
 

@@ -172,6 +172,14 @@ agreed_items:
       ID プレースホルダーの正規様式は、表の根拠列等の特定領域における裸出力（IR-{NNNN} 等）を
       許容すると IR-064 に明文化されること。配布依存境界 gate の unclassified-entry 検出は
       許容領域を除外規則として扱い、既存 51 箇所の整形を不要とすること。
+  - id: AG-026
+    content: |
+      check_workflow_preventive.ts の extractYamlField（単一トップレベルフィールドの正規表現抽出、
+      L190 定義・kind/id 抽出で使用）は意図的な Bun.YAML 委譲対象外として扱われ、その判断根拠
+      （Issue #2352 の移行対象からの意図的除外、PR #2355 の ambiguous 記録、単一行
+      `field: value` 语义の抽出には正規表現で十分との評価）が checker-execution-contracts の
+      対象外節に明示されること（adversarial-review 後の case-open 証拠検証で RD-002 の観測誤りを
+      修正し、ユーザー決定 2026-09-04「対象外明示で要件化」により追加。実装変更なし）。
 
 artifact_actions:
   - id: ACT-REQ-001
@@ -515,6 +523,20 @@ artifact_actions:
       「監査値（bun test 件数・検出件数等）には計測基準（基準 commit または時点）を併記する」
       （REQ-017-018 に対応する Issue 本文構成要素。adversarial-review F-8 により追加）
 
+  - id: ACT-DESIGN-025
+    artifact: design
+    operation: update
+    target: docs/designs/integrity/checker-execution-contracts.md
+    target_area: 対象外
+    source_items: [AG-026]
+    content: |
+      対象外節に extractYamlField の移行対象外根拠を明示する:
+      「check_workflow_preventive.ts の extractYamlField（単一トップレベルフィールドの正規表現抽出）は
+      宣言的データ読込原則の意図的な適用対象外とする。根拠: Issue #2352 の移行対象からの意図的除外、
+      PR #2355 での ambiguous 判定記録、抽出対象が単一行 `field: value` 语义に限定され
+      構造化 YAML 解析を必要としないこと。Bun.YAML 委譲の共有 lib（resolveExtensionState 系）とは
+      責務が異なるため二重経路には該当しない」（RU-0004 対象外明示。ユーザー決定 2026-09-04）
+
 conflict_resolutions:
   - id: CR-001
     conflict: "check_extensions の NG baseline 運用が SPEC（共用 ng-baseline・additions manifest 必須）と実装（分離 baseline 想定・未作成）で分岐していた（RU-0001）"
@@ -537,6 +559,10 @@ conflict_resolutions:
   - id: CR-007
     conflict: "REQ-057・REQ-017 が SPLIT 予兆シグナル 2（要件行多数・関心分類混在・成果物種別複数）に到達していた"
     resolution: "いずれも APPEND 継続（ユーザー決定 2026-09-03）。本バッチの追記は 1〜2 行と少量で既存系統（現行化・execution contract）の延長であるため"
+
+  - id: CR-008
+    conflict: "case-open 証拠検証で RD-002（RU-0004 already_satisfied）の観測が反証された（extractYamlField 実在 L190・使用 4 箇所。二重経路論点は未解決のまま残存）"
+    resolution: "ユーザー決定（2026-09-04）: RU-0004 を「対象外明示で要件化」として処置する。AG-026/ACT-DESIGN-025/TS-026/OU-026 を追加し、RD-002 を除去する。方向は Design の対象外節への根拠明示（実装変更なし）"
 
 operation_units:
   # OU-001/002 を先行する順序は DEC-023 昇格が検査許容モデルの正規根拠となるため（推奨順序）
@@ -797,6 +823,16 @@ operation_units:
     issue_policy: single
     result: {}
 
+  - ou_id: OU-026
+    source_ru: RU-0004
+    target_design: docs/designs/integrity/checker-execution-contracts.md
+    operation: update
+    scale: standard
+    depends_on: []
+    recommended_order: 5
+    issue_policy: single
+    result: {}
+
 test_strategy:
   - id: TS-001
     target_item: AG-001
@@ -1043,6 +1079,18 @@ test_strategy:
     on_failure: |
       fix-and-reverify。
 
+  - id: TS-026
+    target_item: AG-026
+    verification: |
+      checker-execution-contracts の対象外節に extractYamlField の移行対象外根拠
+      （Issue #2352 意図的除外・PR #2355 ambiguous 記録・単一行 semantic の評価）が記載されている
+      ことを確認する。extractYamlField の実装（check_workflow_preventive.ts L190）が存続している
+      ことを確認する（実装変更なしの確認）。
+    pass_criteria: |
+      根拠明示の記載が存在し、実装が存続している。
+    on_failure: |
+      fix-and-reverify。Design 記載の欠落は追記で解消できるため。
+
 realization_actions:
   - id: RA-001
     concern: japanese-tech-writing 遺構投影ディレクトリの削除と skills_structure 検査の許容モデル準拠
@@ -1244,21 +1292,6 @@ review_dispositions:
       section: AG SPEC 廃止
       checked_at_commit: null
     related_removed_items: []
-  - id: RD-002
-    source_ru: RU-0004
-    source_item: RU-0004
-    disposition: not_applicable
-    reason_code: already_satisfied
-    reason: |
-      extractYamlField の YAML 解析二重経路は現行コードに存在しない。check_workflow_preventive.ts は
-      check_extensions.ts から resolveExtensionState を import して再利用しており（L50, L448）、
-      extractYamlField は repo 全域で不存在。共有 lib 再利用への統合が実装済みと確認できるため
-      要件化作業対象外とする。
-    evidence:
-      path: .opencode/skills/repo-agentdev-integrity/scripts/check_workflow_preventive.ts
-      section: resolveExtensionState import
-      checked_at_commit: null
-    related_removed_items: []
   - id: RD-003
     source_ru: RU-0012
     source_item: RU-0012
@@ -1278,13 +1311,12 @@ review_dispositions:
 case_open_hints:
   epic_needed: true
   decomposition: |
-    25 OU 構成。REQ 操作 6（REQ-057 update・REQ-018 update・REQ-047 append・REQ-017 append・
-    REQ-056 update・REQ-053 append・REQ-057 append のうち設計確定に先行するもの）と Decision 操作 1
+    26 OU 構成（RU-0004 対象外明示の OU-026 追加済み）。REQ 操作 6（REQ-057 update・REQ-018 update・REQ-047 append・REQ-017 append・REQ-056 update・REQ-053 append・REQ-057 append のうち設計確定に先行するもの）と Decision 操作 1
     （DEC-023 昇格）は req-save / design-save フェーズで完結し、実行系 OU（OU-003〜005 一部・
-    OU-010〜018 の実装・是正作業）は case で実行する。design-save 対象は 23 ACT-DESIGN 操作。
+    OU-010〜018 の実装・是正作業）は case で実行する。design-save 対象は 25 ACT-DESIGN 操作。
   wave_hints:
     - "Wave 1（契約基盤）: OU-001（DEC-023 昇格）→ OU-002（検査許容モデル）。昇格が許容モデルの正規根拠"
-    - "Wave 2（契約確定の残り）: OU-003〜009・OU-014・OU-019〜025（Design 確定・REQ 追記。相互依存なし）"
+    - "Wave 2（契約確定の残り）: OU-003〜009・OU-014・OU-019〜026（Design 確定・REQ 追記。相互依存なし。OU-026 は checker-execution-contracts ほかと同一ファイルのため直列化）"
     - "Wave 3（triage 連鎖）: OU-017（draft Design triage）→ OU-016（宣言配置先カタログ適用。depends_on）"
     - "Wave 4（実行・是正）: OU-010〜013・OU-015・OU-018（実装・是正。契約確定後の実行が安全な順序）"
     - "技術的依存: OU-002 の実装（RA-001）は ACT-DESIGN-001/002 の Design 確定後。OU-018（RA-013）は単独で完結可能"
