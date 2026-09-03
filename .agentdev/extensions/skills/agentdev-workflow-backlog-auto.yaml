@@ -1,0 +1,23 @@
+version: 1
+kind: workflow-extension
+id: agentdev-workflow-backlog-auto
+
+context:
+  - id: docs-check-command
+    when: "stage 1 で docs-check を実行するとき"
+    paths:
+      - ".opencode/commands/repo/docs-check.md"
+    purpose: "repo-local docs 整合性検査コマンド（自己ホスト専用）の公開契約の確認。検査スクリプト実行、finding 整理、intake item 生成、条件付き Git 永続化（.agentdev/intake/ 配下のみ）、完了報告の各工程を同コマンド本文どおりに実行する"
+
+rules: []
+
+checks:
+  - id: stage1-docs-check
+    when: "STEP-2（stage 1: inspect-docs 実行）時に /repo/docs-check を inspect-docs と併せて実行する。docs-check はその公開契約どおり（コマンド本文の STEP-1〜5）実行する。inspect-docs と docs-check の双方が完了した後に stage 2 を開始する（docs-check の Git 永続化と stage 2 系統の Git 操作の競合を直列化契約により回避する）。docs-check が生成した intake item は stage 2 の intake 系統（intake-promote）の既存処理対象に含める。検出事項あり（intake item 生成あり）は docs-check の正常終了として扱う。検査スクリプト起動不能等で docs-check が intake item 生成・完了報告に至らない実行不全の場合は stage 1 の blocked / failed と同様に扱い、下流工程（stage 2、stage 3）を開始しない"
+    skill: repo-agentdev-integrity
+
+acceptance_gates: []
+
+must_not:
+  - "docs-check が生成した intake item を backlog-auto 側で直接分類・昇格しない（intake-promote が正規の処理主体）"
+  - "docs-check の検出事項ありを inspect-docs の blocked / failed と混同しない（検出事項ありは正常終了である）"
