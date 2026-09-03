@@ -67,7 +67,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-025 の25件である（DEC-018〜DEC-025 は proposed、DEC-005、DEC-007 は superseded）。
+現行 Decision は DEC-001 から DEC-026 の26件である（DEC-018〜DEC-026 は proposed、DEC-005、DEC-007 は superseded）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
@@ -97,6 +97,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [DEC-023](decisions/DEC-023.md) | third-party Skill の分離管理と取得機構の導入（proposed） |
 | [DEC-024](decisions/DEC-024.md) | 変更誘発境界リスク分析の導入と検証契約への投影（proposed） |
 | [DEC-025](decisions/DEC-025.md) | プロジェクト知識を Capability Skill から分離し、独立した正規知識層として管理する（proposed） |
+| [DEC-026](decisions/DEC-026.md) | 実現面変更方針の構造化ハンドオフ（realization_actions）（proposed） |
 
 ## 設計（Design）
 

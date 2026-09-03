@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は15件、提案中の Decision は8件である。
+現行の承認済み Decision は15件、提案中の Decision は9件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -40,6 +40,7 @@
 | DEC-023 | third-party Skill の分離管理と取得機構の導入 | proposed | 2026-08-30 |
 | DEC-024 | 変更誘発境界リスク分析の導入と検証契約への投影 | proposed | 2026-08-31 |
 | DEC-025 | プロジェクト知識を Capability Skill から分離し、独立した正規知識層として管理する | proposed | 2026-09-01 |
+| DEC-026 | 実現面変更方針の構造化ハンドオフ（realization_actions） | proposed | 2026-09-03 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -80,6 +81,7 @@
 - [DEC-023](DEC-023.md)（third-party Skill の分離管理と取得機構の導入）
 - [DEC-024](DEC-024.md)（変更誘発境界リスク分析の導入と検証契約への投影）
 - [DEC-025](DEC-025.md)（プロジェクト知識を Capability Skill から分離し、独立した正規知識層として管理する）
+- [DEC-026](DEC-026.md)（実現面変更方針の構造化ハンドオフ（realization_actions））
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
