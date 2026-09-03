@@ -547,7 +547,13 @@ operation_units:
     depends_on: []
     recommended_order: 1
     issue_policy: single
-    result: {}
+    result:
+      status: completed
+      saved_req_docs: [REQ-057]
+      artifact_actions: [ACT-REQ-001, ACT-DEC-001]
+      applied_rows: [REQ-057-009(update)]
+      decision_updates: [DEC-023(proposed->accepted)]
+      unclassified_verification_rows: []
   - ou_id: OU-002
     source_ru: [RU-0016, RU-0017]
     target_req: REQ-018
@@ -556,7 +562,12 @@ operation_units:
     depends_on: [OU-001]
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      status: completed
+      saved_req_docs: [REQ-018]
+      artifact_actions: [ACT-REQ-002]
+      applied_rows: [REQ-018-003, REQ-018-004]
+      unclassified_verification_rows: [REQ-018-003, REQ-018-004]
   - ou_id: OU-003
     source_ru: RU-0018
     target_design: docs/designs/integrity/integrity-contracts.md
@@ -592,7 +603,12 @@ operation_units:
     depends_on: []
     recommended_order: 5
     issue_policy: single
-    result: {}
+    result:
+      status: completed
+      saved_req_docs: [REQ-047]
+      artifact_actions: [ACT-REQ-003]
+      applied_rows: [REQ-047-009]
+      unclassified_verification_rows: [REQ-047-009]
   - ou_id: OU-007
     source_ru: RU-0006
     target_design: docs/designs/skills/agentdev-workflow-templates.md
@@ -610,7 +626,12 @@ operation_units:
     depends_on: []
     recommended_order: 7
     issue_policy: single
-    result: {}
+    result:
+      status: completed
+      saved_req_docs: [REQ-017]
+      artifact_actions: [ACT-REQ-004]
+      applied_rows: [REQ-017-018]
+      unclassified_verification_rows: [REQ-017-018]
   - ou_id: OU-009
     source_ru: RU-0008
     target_req: REQ-056
@@ -619,7 +640,12 @@ operation_units:
     depends_on: []
     recommended_order: 8
     issue_policy: single
-    result: {}
+    result:
+      status: completed
+      saved_req_docs: [REQ-056]
+      artifact_actions: [ACT-REQ-005]
+      applied_rows: [REQ-056-010(update)]
+      unclassified_verification_rows: []
   # OU-010〜OU-013 は実行系 OU（REQ/Design ファイル操作なし。case 実行主体の作業単位）
   - ou_id: OU-010
     source_ru: RU-0009
@@ -661,7 +687,12 @@ operation_units:
     depends_on: []
     recommended_order: 13
     issue_policy: single
-    result: {}
+    result:
+      status: completed
+      saved_req_docs: [REQ-053]
+      artifact_actions: [ACT-REQ-006]
+      applied_rows: [REQ-053-023]
+      unclassified_verification_rows: [REQ-053-023]
   - ou_id: OU-015
     source_ru: RU-0015
     operation: create
@@ -678,7 +709,12 @@ operation_units:
     depends_on: [OU-017]
     recommended_order: 16
     issue_policy: single
-    result: {}
+    result:
+      status: completed
+      saved_req_docs: [REQ-057]
+      artifact_actions: [ACT-REQ-007]
+      applied_rows: [REQ-057-023]
+      unclassified_verification_rows: [REQ-057-023]
   # OU-016 の宣言付与実行は OU-017（draft Design triage）完了後（RU frontmatter depends_on 継承）
   - ou_id: OU-017
     source_ru: RU-0021
