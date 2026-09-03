@@ -1,6 +1,6 @@
 ---
 title: "既知不備センチネル検査"
-status: draft
+status: accepted
 created: "2026-09-03"
 updated: "2026-09-03"
 ---
