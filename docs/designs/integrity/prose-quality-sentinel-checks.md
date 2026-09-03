@@ -19,8 +19,11 @@ REQ-053-022 が要求する「既知不備として固定した項目の最終 H
 
 - 配布 command 本文: `src/opencode/commands/agentdev/*.md`（`README.md` はコマンド定義件数に含めない）
 - 配布 skill 本文: `src/opencode/skills/agentdev-*/SKILL.md`
+- 配布 skill references: `src/opencode/skills/agentdev-*/references/**`（S-05（簡体字混入）・S-06（誤記リンク表記）・S-08（参照残骸）の検出対象パスに含める）
 
 実行開始時点と最終検証前に実ファイルから対象を列挙し、追加・削除・改名されたファイルを最終検証対象へ含める。
+
+`japanese-replacement-dictionary.md` は置換辞書の語彙源のため検出対象から除外する（除外規則）。
 
 ## センチネル項目カタログ
 

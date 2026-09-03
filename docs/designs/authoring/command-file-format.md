@@ -139,6 +139,11 @@ repo-local command（`/repo/*`）が従来形式の主手順（`### Step N`）�
 - Capability Skill・Design から Workflow Skill の工程を参照する際は実番号（例: `STEP-S5`）を用いる。相対表現（「第5工程」等）は使用しない
 - 旧 command 番号（`Step N`）形式での参照は新規に書かない。既存参照は AG-023 是正の対象とする
 
+### 適用対象と E系サブステップラベルの正規形
+
+- 順序ラベル様式（`### Step N` 形式）の適用対象は Command 本体・SKILL.md 本文の工程見出しであり、references/ 配下ファイルの見出しは適用対象外とする（対象外の明文化: ru-batch-20260903）
+- E系サブステップラベルの正規形は E{N}-{M}（例: E4-1）および E{N}{小文字}（例: E5b）とし、E 番号は直上位の Step 番号に対応させる。判定根拠は case-run / case-close / epic-wave-close の実例参照による
+
 ## command Design と command 定義の対応付け
 
 command Design は command 定義ファイルの Step 番号を複製しない。

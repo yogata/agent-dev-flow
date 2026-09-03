@@ -10,7 +10,7 @@ updated: 2026-09-03
 <!-- ADF-COVERS(implementation): REQ-011-006 -->
 <!-- ADF-COVERS(implementation): REQ-050-001, REQ-050-002, REQ-050-003, REQ-050-004, REQ-050-005, REQ-050-006, REQ-050-007, REQ-050-008, REQ-050-010, REQ-050-013 -->
 <!-- ADF-COVERS(implementation): REQ-052-007（scripts/consumer/archive/install.ps1、scripts/install.ps1 の宣言を docs 正規配置先へ移管） -->
-<!-- ADF-COVERS(implementation): REQ-057-009, REQ-057-010（配布物 concrete ID cleanup、ir-055/ir-059 baseline 整備、DEC-023 (proposed) 注記、tmp 残渣抑止） -->
+<!-- ADF-COVERS(implementation): REQ-057-009, REQ-057-010（配布物 concrete ID cleanup、ir-055/ir-059 baseline 整備、DEC-023（accepted）注記現行化、tmp 残渣抑止） -->
 <!-- 注: install/self-sync 各 ps1（scripts/）は走査対象拡張子外のため、導入器実装行の宣言は本 Design（正規仕様所有者）へ配置。実装実体は scripts/install.ps1、scripts/self-sync.ps1（内部処理は scripts/consumer/、scripts/self/ 配下） -->
 
 # 実行時パッケージ境界
@@ -236,6 +236,8 @@ Consumer では `scripts/install.ps1` が AgentDevFlow 本体から提供され�
 - Plugin loader shim 等、ADF が生成・管理し正本側の対象消滅によって不要となる生成物の stale 削除は既存契約を維持し、上記の削除境界と矛盾させない。repo-local 配布除外と自己ホスト投影の非対称（「Tools / Plugins の配布・投影」参照）は本削除境界で変えない
 - archive installer（junction 方式ではない）は本削除契約の直接対象外とし、同等の収束契約が必要かどうかの評価を本契約の実装対象に含めない
 
+stale 管理投影物の確定は次の機械的基準で行う: (1) 正本相対でターゲットパスが一致すること、(2) LocalMode リダイレクト先を包含判定に含めること、(3) broken junction は reparse data の参照先で判定すること。管理物と判定できない junction は削除せず非破壊に [INFO] 報告する。
+
 ## scripts 公開入口と内部配置
 
 scripts/ 直下の公開入口と内部配置の構成（REQ-050-001、REQ-050-009）。
@@ -268,6 +270,8 @@ repo-local Plugin（REQ-002-045）の配布・投影については次のとお�
 
 配布境界 checker の repo-local モデル: 配布境界 checker は consumer 配布系と自己ホスト投影の非対称（上記のとおり）を repo-local モデルとして前提とする。detector の列挙条件（除外対象の検出箇所一覧）は repo-local Plugin の正本配置原則（`src/opencode/plugins/<agentdev-name>/`）と同期を維持し、列挙の乖離が観測された場合は個別特例の追加ではなく検査側の一般化で解消する方針とする。
 - 将来 repo-local Plugin が複数化した時点で、マーカー方式（package.json マーカーフィールド等）への拡張条件を判断する。
+
+outside-root 判定は、ワークスペース外の書き込みを原則ブロック（fail-closed）しつつ、事前承認済みディレクトリ（OS 標準 TEMP 等、実行環境が提供する一時領域）への書き込みを例外として許可する。例外はパス個別の特例列挙ではなく、承認済み一時領域カテゴリとして判定基準に組み込む（一般化: ru-batch-20260903、REQ-057-010 方針）。
 
 ## 誤実行防止の環境判定方式
 
@@ -427,7 +431,7 @@ wrong target 検出、再作成ロジックは LocalMode と通常版 install �
 | スキル | 区分 | 備考 |
 |--------|------|------|
 | `agentdev-*` 全 27 件 | 配布物依存 | `src/opencode/skills/` 配下、`agentdev-*` グロブで自動 junction |
-| `japanese-tech-writing` | 配布物依存 | `agentdev-doc-writing` が執筆規範 SSoT として参照（PR #1385 で昇格）。`agentdev-*` 非準拠のため install script で個別 junction 対象 |
+| `japanese-tech-writing` | third-party 起源の遺構投影（削除済み） | third-party 起源の遺構投影であり投影ディレクトリを削除済み。third-party Skill は DEC-023（accepted）の分離管理・検査許容モデルで扱い、本表の管理対象から除外する |
 | `repo-agentdev-integrity` | repo-local 専用 | `/repo/docs-check` 実行スキル。REQ-001 の `repo-*` 卡out 対象。検証スクリプトを呼び出す command は DEC-006 により3 command（`docs-check`, `inspect-skills`, `inspect-promote`）へ正規化済み。これらが `repo-agentdev-integrity/scripts/*.ts` を呼び出すが、当該参照は consumer 環境で実行時欠落する別課題（本 Design の対象外） |
 
 ## 関連項目（See Also）

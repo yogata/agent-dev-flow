@@ -46,6 +46,8 @@ distribution は consumer 環境へ配布されるテキスト成果物の集合
 3. 分類: 解決結果に基づき consumer-resolvable、generic-or-template、producer-internal、unclassified のいずれかへ分類する。
 4. 決定: 分類結果に基づき gate 合格または gate-not-passed を決定する。
 
+配布依存境界 gate は、third-party 取得機構経由の配置（管理登録済み）を許容配置として扱い、unmanaged 検出から除外する。除外は manifest 登録の有無で機械判定する。
+
 ## generic と template 許容
 
 REQ-029-004 が許容する generic および template 参照は、producer 内部へ解決しないことを条件に許容する。
@@ -56,6 +58,8 @@ REQ-029-004 が許容する generic および template 参照は、producer 内�
 ベースライン（baseline）は既知の検出事項集合を管理する運用機構であり、ルールレベルの許容（generic と template）とは別物である。
 個別承認例外は特定の検出事項に対して個別に付与された承認であり、ルール一般を書き換えない。
 誤検出抑制（false-positive suppression）は検出器の挙動であり、承認例外とは区別する。
+
+ID プレースホルダー（IR-{NNNN} 等）の裸出力は、表の根拠列・パターン定義内など正規様式として許容する領域を除外規則で定義する。許容領域の裸出力は unclassified-entry 検出の対象外とする（IR-064 文脈許容様式との連動: ru-batch-20260903）。
 
 ## 共有 detector と adapter の契約
 

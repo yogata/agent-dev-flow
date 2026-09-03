@@ -393,6 +393,10 @@ NG baseline entry の運用は次の契約に従う。
 3. baseline の生成環境を前提として明示する。worktree 環境で生成した baseline は main 環境（junction 実在環境）で新規未管理 NG が 0 件であることを確認してから確定する
 4. 由来ラベル（legacy、superseded、AUTOGEN、実欠陥等）と報告分類（baseline-known 降格、approved additions、新規未管理）の対応を明確に保つ。承認済み entry の解消（実装修復完了）後は当該 entry を除去する（ratchet の純減）
 
+check_extensions の NG baseline 運用は共用 ng-baseline（additions manifest 必須）を正とする。分離 baseline（check-extensions-baseline.json）は作成せず、実装を共用 baseline 運用に整合させる（SPEC を正とする確定: ru-batch-20260903）。
+
+既知残存違反の処置は次の統一選択基準で行う: (a) 意図的残存（検出器語彙・パターン定義内言及）は baseline 登録し根拠を注記する、(b) 実不備は個別修正する、(c) 検出器の誤検出は検出器調整で解消する。処置は baseline 登録・修正・調整のいずれかに分類記録され、未分類残存を許さない。
+
 ### 宣言的データ YAML と detector の契約（REQ-028-015/016 移管受入れ）
 
 REQ-028 の RETIRE に伴い、次の恒常契約の移管を受入れる（詳細な実行規則は checker-execution-contracts Design が所有する）。
@@ -474,7 +478,6 @@ check_integrity.ts 列は req-define と /repo/docs-check のみ ✓ とし、�
 
 check_integrity.ts は3つの実行 profile（source/installed/release）を取り、原本検査、配置後検査、配布アーカイブ検査を区別する。
 各 profile における配布依存境界検査の契約（source/installed/release projection の分離、検査エラーの gate-not-passed 扱い、release profile の公開前検査における違反残存時の成功経路非保持）は `integrity/distribution-boundary.md` が正規所有する（DEC-014 決定5..7）。
-詳細 normative は移行計画 §7（`.omo/plans/agentdev-migration-2026-08-05.md`）を正とする。
 
 ### CLI
 
@@ -509,7 +512,7 @@ bun run check_integrity.ts --profile release --archive <zip-path>
 ### release profile
 
 host 側 checker を起点とし、archive を展開→install→installed profile を `--root` 付きで実行する。
-archive は配布物の自己完結を保証するが、checker（`repo-agentdev-integrity`）は archive に同梱せず host 側のものを使う（archive 自己完結と検査実行の分離、REQ-0145-014）。
+archive は配布物の自己完結を保証するが、checker（`repo-agentdev-integrity`）は archive に同梱せず host 側のものを使う（archive 自己完結と検査実行の分離、v2:REQ-0145-014）。
 
 処理順序:
 

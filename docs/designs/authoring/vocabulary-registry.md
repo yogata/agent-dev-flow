@@ -27,6 +27,8 @@ AgentDevFlow 管理下の文書で使用する正規語彙と旧語彙の対照�
 配布物側の語彙レジストリは `src/opencode/skills/repo-agentdev-integrity/references/` 配下に配置し、`.opencode/skills/repo-agentdev-integrity/references/` へ投射する。
 canonical は source 側とする（DEC-002）。
 
+「実現面」語彙の正典は REQ-004-037 変更後の本文であり、Design（vocabulary-registry を含む）は正典を参照する。Design 側に語彙の定義本文を複製しない。
+
 ## IR-045 文意品質検出対象語の移管状態（ACT-SPEC-007、REQ-028-007）
 
 IR-045（docs 日本語表現、文意整合検査）は REQ-010-003、REQ-036-023 により docs-check 機械検出対象から除外し、`agentdev-doc-writing` スキル配下へ移譲済みである。

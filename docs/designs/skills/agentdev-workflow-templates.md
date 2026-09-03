@@ -152,6 +152,7 @@ Issue 本文に次のセクションを必須とする（新規作成時）。
 
 ### 必須品質統制
 - （artifact-quality-control-routing Design に基づく能力キーと検証項目）
+- 監査値（bun test 件数・検出件数等）には計測基準（基準 commit または時点）を併記する
 
 ### 関連 Decision 拘束条件
 - （該当 ADR と完了条件/test strategy への反映）
@@ -162,6 +163,10 @@ Issue 本文に次のセクションを必須とする（新規作成時）。
 ### adversarial-review 発動契約（任意）
 - （ユーザー明示指定時のみ記録）
 ```
+
+### 対象範囲表記の正規形
+
+Issue 本文の対象範囲にローカル版（src/opencode-local 配下等）の references パスを記載する際は、配置領域の接頭辞（src/opencode-local/）を明示し、配布物（.opencode/）の同名パスと区別できる表記を正規形とする。
 
 ### presence-based 判定
 

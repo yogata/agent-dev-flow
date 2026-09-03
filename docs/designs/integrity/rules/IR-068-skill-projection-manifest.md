@@ -45,6 +45,7 @@ IR-016 系の投影検査（`checkSourceProjectionConsistency`、`checkBrokenJun
 |------|------|
 | `repo-*` プレフィックスの投影専用スキル | repo-local 成果物（v2:ADR-0020 / v2:REQ-0159-002）。src 側への昇格検査は IR-058 が所有する |
 | junction 不在環境（worktree 等）の投影比較 | REQ-018 構造的制約（junction は worktree へ伝播しない）。info で skip |
+| third-party 取得機構経由で配置された投影物（管理登録済み） | third-party 取得機構（agentdev_third_party 操作契約）経由で配置された投影物は管理対象として許容する（INSPECTION-TOLERATED）。許容対象の機械的識別は skill-projection-manifest の管理登録（third-party 由来であることの宣言）で行い、未登録の third-party 起源配置は引き続き検出する。許容は検出ノイズ抑制であり走査除外ではない（ru-batch-20260903） |
 
 ## baseline 運用
 

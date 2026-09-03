@@ -63,6 +63,17 @@ REQ-003-033「責務ごとに最も安定した最小の定義元を正規とす
 - `agentdev-doc-diagnostics` は `agentdev-doc-writing`（文意品質）、`docs/designs/README.md` 索引（探索順）、`agentdev-req-structure-diagnostics`（REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）と責務重複しない（横断編成と結果統合のみを所有）
 - `agentdev-artifact-validation` は内容判断、編集、保存を行わず、利用側（`agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-design-file-manager`、各 command）は公開検証契約のみへ依存する
 
+#### ADF-COVERS 実装対応宣言の正規配置先カタログ
+
+ADF-COVERS(implementation) 宣言の正規配置先は実装成果物の種別ごとに次のとおり定める。
+
+- (a) 配布 skill・command 本体 → 当該 SKILL.md / command .md 冒頭 HTML コメント
+- (b) checker・スクリプト → 対応する Design（integrity/local domain）の該当節
+- (c) 検証コード（test） → テスト対象契約を所有する REQ のカバレージ記録または監査レポート
+- (d) テンプレート・運用資産 → 正規所有 Design の該当節
+
+triage で retire を選択した要求行には宣言を付与しない。残存 68 件の未付与行は本カタログに従い段階的に付与する。
+
 ## 責務境界原則
 
 **Command** は利用者が起動する公開入口であり、入力、出力、ガードレール、高水準の実行順序を定義する。

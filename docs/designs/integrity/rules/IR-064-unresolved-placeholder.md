@@ -40,6 +40,7 @@ updated: 2026-08-22
 | code span（backtick 囲み）内 | 様式例示（`` `REQ-{NNNN}` `` 等） |
 | 括弧（ASCII/全角）内 | 委譲注記様式（`（DEC-{N}、REQ-{NNNN}-{NNN}）`） |
 | 全角引用「」内 | 検出キーワードの列挙例示（「TODO」「FIXME」等） |
+| 表の根拠列・検出器語彙・パターン定義内の裸出力 | 正規様式の文脈許容。IR-{NNNN} 等の ID プレースホルダーは本文中では backtick 包囲を正とするが、表の根拠列・検出器語彙・パターン定義内など様式上 backtick 包囲が成立しない領域は裸出力を許容する。許容領域の定義は distribution-boundary Design の除外規則と一致させる |
 
 ## baseline 運用
 

@@ -2,6 +2,7 @@
 draft_type: req_draft
 topic_slug: ru-batch-20260903
 status: saved
+design_actions_consumed: true
 created_at: 2026-09-03T23:45:00+09:00
 source_rus: [RU-0001, RU-0002, RU-0003, RU-0004, RU-0005, RU-0006, RU-0007, RU-0008, RU-0009, RU-0010, RU-0011, RU-0012, RU-0013, RU-0014, RU-0015, RU-0016, RU-0017, RU-0018, RU-0019, RU-0020, RU-0021, RU-0022, RU-0023, RU-0024, RU-0025, RU-0026, RU-0027, RU-0028]
 ---

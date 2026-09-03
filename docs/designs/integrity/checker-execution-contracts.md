@@ -90,6 +90,10 @@ data yaml の新設は、当該 yaml を読み込む消費者実装（checker �
   検査（src 側スキル集合と投影スキル集合の突合）。manifest と src のスキル集合不一致は strict fail で
   検出する。worktree（junction 未伝播）では投影比較を info で skip する
 
+### 宣言的データ読込原則
+
+検査対象の定義データ（検査ルール・配布対象一覧等）は宣言的データファイル（yaml）を正本とし、checker は定義をコード内に複製せず正本を読み込んで検査を実行する。正本欠損時は検査を実行せず fail-closed で停止する。command-format-rules.yaml・distribution-targets.yaml は本原則の適用対象とする（読込統合: ru-batch-20260903）。
+
 ## detector 命名規約
 
 detector 実装は IR 識別子に基づく命名規約（checkIR_NNN_ 関数接頭辞、@ir タグ等）を持ち、
@@ -130,6 +134,12 @@ AG-009(a)（Issue #2386 由来の既存対応計画 ID。本前置とは別の�
 - targeted docs guard のモード使い分け・引数形式の詳細（targeted-docs-guard-implementation Design）
 - AUTOGEN block ID の棚卸し規定（autogen-freshness-gate Design）
 - Workflow / Capability 機械分類規則（workflow-skill-model Design）
+
+## 安定実行経路
+
+stdout 証跡を要する checker（機械可読レポートを stdout 出力する checker）の実行は、モジュール import 経由（node --experimental-strip-types）を標準経路とする。Windows + bun 環境では bun run 経由の process.exit 実行で stdout レポートが失われることがあるため、CLI 経由で実行する場合は process.exit 前に stdout の flush を保証する終了手順を例外経路として用いる。
+
+安定実行経路の詳細は docs/knowledge/checker-cli-stdout-loss-on-windows-bun.md を参照する。
 
 ## See Also
 
