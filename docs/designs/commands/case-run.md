@@ -2,7 +2,7 @@
 title: case-run Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-02
+updated: "2026-09-03"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-015, REQ-021-016, REQ-021-017, REQ-021-019, REQ-021-020, REQ-021-022 -->
@@ -21,7 +21,7 @@ updated: 2026-09-02
 worktree前提、委譲、結果処理を責務とする。
 3フェーズ構成でべき等性、再開ポイントを提供する。
 case-run 本体は orchestration に専念し、実装実行そのものは行わない（REQ-011、v2:ADR-0128）。
-
+execution contract に投影された実現面の変更方針（realization_actions 由来。REQ-017）は既確定契約として消費し、実現責務・変更意図・検証方針を再決定せず、その範囲内の内部実装方針（関数配置、命名、データ構造、実装順序、具体的 diff）だけを決定する。実現責務の変更が必要と判断した場合は既存の blocked 境界に従う。
 ## 委譲契約
 
 case-run から実行担当サブエージェントへの委譲契約を以下に正規化する。

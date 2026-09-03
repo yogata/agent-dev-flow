@@ -2,7 +2,7 @@
 title: case-open Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-21
+updated: "2026-09-03"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-014, REQ-021-024 -->
@@ -28,10 +28,10 @@ Epic + 子 Issue 一括作成に対応する。
 ## 入力
 
 - req-define で生成された要件doc（構造化 `draft-data` 形式: REQ-008, DEC-003、チェックボックス付き）
-- draft 全体の `agreed_items`、`artifact_actions`、`operation_units` を処理対象。OU ごとにスライスせず draft 全体を取り扱う（REQ-008-009）
+- draft 全体の `agreed_items`、`artifact_actions`、`operation_units`、`realization_actions` を処理対象。OU ごとにスライスせず draft 全体を取り扱う（REQ-008-009）
+- `realization_actions` は Issue / Epic の execution contract へ投影する（REQ-017）。req-define が確定した実現面の変更方針を失わず Issue 本文へ永続化する
 - `auto_gate.auto_ready` が false、または未解決質問、未解決衝突、repo外操作、停止理由が残る場合は停止（REQ-008-013）
 - `conflict_resolutions` に記録済みの衝突は同じ内容をユーザーへ再確認しない（REQ-008-014）
-
 ## 出力
 
 - GitHub Issue（ラベル付き、要件doc埋め込み）

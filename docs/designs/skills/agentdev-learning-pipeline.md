@@ -2,7 +2,7 @@
 title: `agentdev-learning-pipeline` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-15
+updated: "2026-09-03"
 ---
 <!-- ADF-COVERS(implementation): REQ-003-024, REQ-038-001, REQ-038-002, REQ-038-005 -->
 
@@ -31,20 +31,13 @@ schema、分類基準、評価ディメンション、prune 方針を定義す�
 
 ## 構造改善先分類
 
-learning pipeline は学びを保存するだけでなく、再発防止のためにどこへ反映すべきかを評価して分類する（REQ-038-005）。
-構造改善先の評価候補は次の7分類とする。
+learning pipeline は学びを保存するだけでなく、learning 固有の評価責務として、学習価値、問題クラス、8軸評価、change_nature、再発条件、知識としての保存適否（docs/knowledge/ 候補判定）、重複・陳腐化、保留要否を判定する（REQ-038-005）。
+既存 command / 既存 skill / 新規 skill / 新規 command を処分区分の先頭に置く分類、knowledge → skill、procedures → command、constraints → command/skill 等の固定的な反映先マッピングは持たない。処分区分は実現物種別を先頭前提にせず、learning 固有の評価結果（保存適否、重複・陳腐化、保留等）と、req-define へ引き渡す問題・根拠・望ましい状態・制約・既存事実の整備状況を中心に構成する。
 
-1. 既存 REQ / Decision / Design への反映
-2. Skill の改善
-3. 決定論的な検査・ガードレールへの移管
-4. 既存処理手順の改善
-5. 通常の Issue による修正
-6. 重複・陳腐化した知識の削除
-7. 現時点では反映不能なものの保留
-
-learning-promote はこれらの反映先を直接変更しない。
-learning-promote → backlog-review → RU → req-define の承認・要件化経路を維持し、構造改善先の分類結果を後続工程へ渡す。
-
+learning-promote は反映先を直接変更しない。
+learning-promote → backlog-review → RU → req-define の承認・要件化経路を維持し、採用済み成果物は req-define が再調査なしに変更方針を確定できる自足性で保持する。
+具体的な実現先（既存 REQ / Decision / Design、Skill、Command、script、checker、hook、Custom Tool、通常の Issue 等のどの実現面を変更するか）の選択は req-define の変更影響分析が確定する責務であり、learning-promote が先取りしない。
+プロジェクト知識候補は知識としての保存適否の判定結果を保持し、backlog-review の利用者承認後に docs/knowledge/ へ直接保存される（REQ-056）。
 ## 参照する references
 
 - なし（SKILL.md 本文に集約）

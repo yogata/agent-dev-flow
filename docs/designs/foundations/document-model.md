@@ -2,7 +2,7 @@
 title: 文書モデル
 status: accepted
 created: 2026-08-20
-updated: 2026-09-02
+updated: "2026-09-03"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-001, REQ-001-002, REQ-001-003, REQ-001-004, REQ-001-005, REQ-001-006, REQ-001-007, REQ-001-020, REQ-001-035, REQ-001-038, REQ-001-039, REQ-001-040, REQ-001-041, REQ-001-052 -->
 <!-- ADF-COVERS(implementation): REQ-049-019 -->
@@ -274,11 +274,11 @@ Decision は REQ と管理特性を分離し（AG-004）、固定件数ではな
 ### draft の位置づけ（REQ-008, DEC-003）
 
 `.agentdev/drafts/req-draft-*.md`（req_draft）は、req-define が生成する一時的な構造化ハンドオフ成果物である。
-consumer 境界は producer、direct consumer、orchestration pre-reader、invalid post-case reader の 4 集合で確定する（REQ-008-008、REQ-008-036、REQ-006-083）。
+consumer 境界は producer、direct consumer、orchestration pre-reader、invalid post-case reader の 4 集合で確定する（REQ-008-008、REQ-008-036、REQ-034-019）。
 4 集合の正規定義は `docs/designs/responsibilities/artifact-contracts.md`「req_draft consumer 4 集合」節を SSoT とし、本節は同じ 4 集合を抽出元として一致させる。
 永久文書（REQ/Decision/Design/guides）ではなく、以下の性質を持つ:
 
-- **consumer 4 集合**: req_draft の consumer 境界は次の 4 集合で確定する（REQ-008-008、REQ-008-036、REQ-006-083）
+- **consumer 4 集合**: req_draft の consumer 境界は次の 4 集合で確定する（REQ-008-008、REQ-008-036、REQ-034-019）
   - producer: `{req-define}` — req_draft を生成する唯一の command
   - direct consumer: `{req-save, design-save, case-open}` — req_draft を主入力として消費し、REQ/Decision/Design/Issue を生成する command 群。draft type registry の allowed consumers 列と同一
   - orchestration pre-reader: `{case-auto}` — case-open 前だけ req_draft を読み、後続工程の orchestration 入力とする command
@@ -286,9 +286,9 @@ consumer 境界は producer、direct consumer、orchestration pre-reader、inval
 - **緩やかな契約（soft contract）**: API 契約ではなく生成側（producer）の標準。LLM 推論経由で消費され、機械的パースを前提としない（DEC-003）。厳格なスキーマバージョン、JSON Schema、バリデータは導入しない
 - **構造化データが正**: 後続工程の権威ある情報源は `# draft-data` fenced YAML block であり、人間可読 Markdown セクション（`# summary` 等）は補助的である（REQ-008-001, REQ-008-002）
 - **一時成果物**: case-open 成功後（Issue/Epic 作成 + VERIFY）は削除されてよい。case-open 成功後は Issue/Epic を SSoT とし、req_draft は存在しない一時成果物となる（REQ-008-015, REQ-008-016）
-- **標準データモデル**: `auto_gate`, `agreed_items`, `artifact_actions`, `conflict_resolutions`, `operation_units`, `case_open_hints` を中心フィールドとする（REQ-008-011）。詳細構造は `docs/designs/responsibilities/artifact-contracts.md` の「req_draft 出力構造」を参照
+- **標準データモデル**: `auto_gate`, `agreed_items`, `artifact_actions`, `realization_actions`, `conflict_resolutions`, `operation_units`, `case_open_hints` を中心フィールドとする（REQ-008-011）。詳細構造は `docs/designs/responsibilities/artifact-contracts.md` の「req_draft 出力構造」を参照
 - **artifact_actions 統合**: REQ/Decision/Design への保存対象は成果物別配列に分散させず、単一の `artifact_actions` 配列に統合する（REQ-008-009）。後続コマンドの工程分岐は `work_type` 固定分岐ではなく `artifact_actions` の存在で判定する
-
+- **realization_actions 分離**: 実現面の変更方針（正規所有責務、変更すべき実現面、変更意図、検証との対応）は `realization_actions` として `artifact_actions` と分離して保持し、case-open が execution contract へ投影する。`artifact_actions` に実現物種別の enum を追加しない
 ## 信頼できる情報源の優先順位
 
 文書間に矛盾がある場合の優先順位（REQ-001-020）:

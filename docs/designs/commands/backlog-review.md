@@ -2,7 +2,7 @@
 title: backlog-review Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-01
+updated: "2026-09-03"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-021 -->
@@ -13,9 +13,9 @@ updated: 2026-09-01
 
 ## 目的
 
-採用済み成果物を分析、統合し、ユーザー承認後に RU（Requirement Unit）を生成する。
+採用済み成果物（intake、learning、inspect）を source type に依存しない共通モデルで分析、統合し、矛盾を検出して、ユーザー承認後に RU（Requirement Unit）を生成する。
+backlog-review が扱うのは backlog 自体の処置（RU 化、docs/knowledge/ への知識文書保存、重複・陳腐化した知識の削除、保留）であり、REQ / Decision / Design、通常実装、Skill、Command、script、hook、Custom Tool 等のどの実現面を変更して要求を成立させるかの確定は RU を受けた req-define の責務である。
 ユーザー承認は RU 作成承認を兼ねる。
-
 ## HITL 境界、自動実行ルール（REQ-003-003/004/005/009）
 
 - **HITL は「判断の確定」に限定**（REQ-003-003）: 統合、分割判定承認が主要な HITL 対象。
@@ -61,15 +61,14 @@ updated: 2026-09-01
 
 ## learning 由来プロジェクト知識の docs/knowledge/ 直接保存
 
-learning-promote の反映先分類で docs/knowledge/ への知識文書保存（REQ-056、REQ-039-006）に振り分けられた採用済み成果物は、RU 化を経ずに以下の手順で処理する。
+backlog-review が docs/knowledge/ への知識文書保存へ処置すると判定した採用済み成果物（learning-promote が知識としての保存適否ありと判定して受け渡したものを含む。source type は問わない。REQ-056、REQ-039-006）は、RU 化を経ずに以下の手順で処理する。
 
 1. 知識候補の内容を知識文書契約（1知識1ファイル、kebab-case slug、必須内容5項目）へ整形する
 2. 既存 docs/knowledge/ 配下ファイルとの重複・陳腐化を確認し、新規、更新、置換、削除の操作種別を判定する
 3. 操作種別ごとの変更内容を利用者へ提示し、承認を得る。承認なしの書き込みは行わない
-4. 承認後、docs/knowledge/ へファイルを書き込み、保存に成功した採用済み成果物を promoted から削除する
+4. 承認後、docs/knowledge/ へファイルを書き込み、保存に成功した採用済み成果物を promoted から削除する。当該書き込みは git 永続化（副作用）の対象である
 
 構造整合性（正規配置、命名、必須内容）は docs-check 系の機械検査が担保し、意味的妥当性は機械で確定しない（REQ-056）。
-
 ## 所有関係と委譲
 
 - public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、command 定義（`src/opencode/commands/agentdev/backlog-review.md`）はその実行時投影である（DEC-010）。

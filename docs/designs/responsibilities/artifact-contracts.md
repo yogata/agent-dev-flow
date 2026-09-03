@@ -2,7 +2,7 @@
 title: アーティファクト契約
 status: accepted
 created: 2026-08-20
-updated: 2026-09-02
+updated: "2026-09-03"
 ---
 <!-- ADF-COVERS(implementation): REQ-002-005, REQ-002-006, REQ-002-016, REQ-002-034 -->
 
@@ -388,7 +388,7 @@ draft type registry の allowed consumers 列、REQ-008、REQ-006-083、document
 - req_draft は API 契約ではなく、生成元（producer）側の標準（緩やかな契約: soft contract）である。LLM 推論経由で消費され、機械的パースを前提としない（DEC-003）
 - スキーマバージョン、JSON Schema、バリデータは導入しない
 - 後続工程の権威ある情報源は `draft-data` YAML block であり、人間可読 Markdown セクションではない
-- 標準データモデル fields: `auto_gate`, `agreed_items`, `artifact_actions`, `conflict_resolutions`, `operation_units`, `review_dispositions`, `case_open_hints`
+- 標準データモデル fields: `auto_gate`, `agreed_items`, `artifact_actions`, `realization_actions`, `conflict_resolutions`, `operation_units`, `review_dispositions`, `case_open_hints`
 - `summary` 等の人間可読セクションは補助的であり、後続工程の権威ある情報源ではない
 
 ### artifact_actions 詳細構造
@@ -407,6 +407,32 @@ draft type registry の allowed consumers 列、REQ-008、REQ-006-083、document
 | `target_area` | optional: section / area 指定 |
 | `source_items` | 対応する agreed_item ID の list |
 | `content` | 保存対象の full text |
+
+`artifact_actions` は REQ / Decision / Design への保存操作のみを表現する。実現面（通常実装、script、checker、hook、Custom Tool、設定等）の変更方針は `realization_actions` が表現し、成果物種別の enum を `artifact_actions` に追加して責務を混在させない。
+
+### realization_actions 構造
+
+`realization_actions` は req-define が確定した実現面の変更方針（正規所有責務、変更すべき実現面、変更意図、検証との対応）を後続工程へ引き継ぐ構造化情報である。
+
+- **所有先**: 本節（`artifact-contracts.md`「req_draft 出力構造」節）が `realization_actions` の schema を正規所有する
+- **producer**: req-define
+- **consumer**: case-open（execution contract への投影。REQ-017）
+- **ドメイン中立性**: ADF 固有の成果物種別（skill / command / plugin 等）や適用プロジェクト固有の成果物種別（frontend / backend 等）を固定 enum として列挙しない。責務、正規所有先、変更意図、対象の手掛かり、検証との対応を自由形式で表現し、対象リポジトリの既存正規所有関係と実体から具体を判断する
+- **optional soft-contract**: `review_dispositions` と同じく DEC-003 の soft contract であり、欠落時に後続工程は draft を拒否しない。ただし req-define は実現面の変更がある場合に本セクションを出力する
+
+#### 各エントリの field 構成
+
+| field | 型 | 内容 |
+|---|---|---|
+| `id` | string | `RA-NNN` 形式の識別子（NNN は連番） |
+| `concern` | string | 実現面の関心の1行要約 |
+| `responsibility` | string | 変更すべき正規所有責務の本文 |
+| `ownership_hints` | list | 正規所有先・変更対象の手掛かり（パス、担当能力、正規所有 Design 等の自由形式項目。ドメイン中立） |
+| `intent` | string | 変更意図の本文 |
+| `verification_refs` | list | 対応する test_strategy 項目 ID（TS-*） |
+| `source_items` | list | 対応する agreed_item ID（AG-*）の list |
+
+case-open は `realization_actions` を Issue / Epic の execution contract へ投影する。case-open 成功後は case-run が Issue 本文だけで変更責務・変更意図・検証方針を取得でき、再推論しない。case-run は `realization_actions` に記録済みの実現面の変更方針を再決定せず、その範囲内の内部実装方針（関数配置、命名、データ構造、実装順序、具体的 diff）だけを決定する。
 
 ### review_dispositions 構造
 
@@ -457,7 +483,6 @@ req_draft の frontmatter は最小限のメタデータのみとする。
 
 - 最小 frontmatter fields: `draft_type`, `topic_slug`, `status`, `created_at`、optional で `source_rus`
 - frontmatter は lightweight metadata のみ。後続工程の主入力は `# draft-data` fenced YAML であり、frontmatter ではない
-
 ## artifact_actions operation
 
 `artifact_actions` の `operation` フィールドは REQ/Decision/Design とも共通の公式 enum を持つ。
