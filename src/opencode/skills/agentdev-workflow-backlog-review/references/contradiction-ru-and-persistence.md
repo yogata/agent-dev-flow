@@ -61,8 +61,8 @@ RU を生成し、承認済みの docs/knowledge/ 知識文書保存を実行し
 
 - STEP-5 で承認確定した RU 構成案、STEP-6 の矛盾検出結果（durable state: promoted/ 実ファイル、RU-ID）
 - RU 生成ルール、frontmatter スキーマ、depends_on 検証は `agentdev-backlog-integration` の公開操作契約に従う
-- learning 由来のルーティング処置の実行境界は `agentdev-backlog-integration` の昇華先ルーティング契約に従う
-- docs/knowledge/ 直接保存手順の正規原本は backlog-review Design「learning 由来プロジェクト知識の docs/knowledge/ 直接保存」節、操作種別判定基準は `agentdev-backlog-integration` の昇華先ルーティング契約に従う
+- docs/knowledge/ 知識文書保存・知識の削除・保留の実行境界は `agentdev-backlog-integration` の docs/knowledge/ 知識文書保存と backlog 自体の処置の契約に従う
+- docs/knowledge/ 直接保存手順の正規原本は backlog-review Design「learning 由来プロジェクト知識の docs/knowledge/ 直接保存」節、操作種別判定基準は `agentdev-backlog-integration` の docs/knowledge/ 知識文書保存と backlog 自体の処置の契約に従う
 - session由来RU の生成形式は一時成果物ライフサイクル要件と artifact-contracts Design「RU アーティファクト契約（session由来RU）」セクションを正規原本とする
 
 ### Preconditions
@@ -76,29 +76,29 @@ RU を生成し、承認済みの docs/knowledge/ 知識文書保存を実行し
 1. RU 構成案に基づき `.agentdev/backlog/req-units/RU-*.md` を生成する（frontmatter: `source_type`, `generated_by`, `generated_at`, `status`, `depends_on`, `tentative_classification`, `sources` / 本文: Sources, Source Summary, 統合理由, 要件化の方向）
 2. session由来RU（`source_type: chat`、`generated_by: session`）の場合は、正規原本（一時成果物ライフサイクル要件、artifact-contracts Design「RU アーティファクト契約（session由来RU）」）へ委譲した要件（二段階承認、frontmatter 必須フィールド、`agreement_confirmed_at`、session 論理URI、RU 本文必須8セクション、永続ID 採番）に従う
 3. depends_on 検証を実行する（RU-ID のみ許容、unresolved、循環の検証）
- 4. docs/knowledge/ 知識文書保存処置を実行する。STEP-5 で承認済みの操作種別（新規、更新、置換、削除）に従い、整形済み知識文書（1知識1ファイル、kebab-case slug、必須内容5項目）を docs/knowledge/ へ書き込む。承認なしの docs/knowledge/ 書き込みは行わない（REQ-{NNNN}-{NNN}）。知識文書の保存が確認できた採用済み成果物を promoted から削除する（REQ-{NNNN}-{NNN}）
+  4. docs/knowledge/ 知識文書保存処置を実行する。STEP-5 で承認済みの操作種別（新規、更新、置換、削除）に従い、整形済み知識文書（1知識1ファイル、kebab-case slug、必須内容5項目）を docs/knowledge/ へ書き込む。承認なしの docs/knowledge/ 書き込みは行わない（REQ-{NNNN}-{NNN}）。docs/knowledge/ への書き込みは git 永続化対象の副作用である。知識文書の保存が確認できた採用済み成果物を promoted から削除する（REQ-{NNNN}-{NNN}）
 5. RU 生成が成功した採用済み成果物のみを削除する。
 削除条件は当該成果物が RU に取り込まれ、RU ファイルの生成が確認できた場合のみ。
 RU 化に失敗した成果物、矛盾により除外された成果物は残置する
-6. ルーティング処置のうち削除処置は、STEP-5 で明示承認済みの場合に限り該当採用済み成果物を promoted から削除する。保留、指示出力型の処置（Issue 修正指示、ガードレール移管指示、Project Extension 接続更新指示）の成果物は promoted に残置する
-7. 削除結果、知識文書保存結果、ルーティング処置の実行結果を記録する
+6. docs/knowledge/ 知識の削除処置は、STEP-5 で明示承認済みの場合に限り実行し、該当採用済み成果物を promoted から削除する。保留および project-local 資産への昇華指示（指示出力型）の成果物は promoted に残置する
+7. 削除結果、知識文書保存結果、RU 以外の処置の実行結果を記録する
 
 ### Result
 
 - `.agentdev/backlog/req-units/RU-*.md`
 - 承認済み docs/knowledge/ 知識文書の保存
-- RU 化成功成果物、知識文書保存成功成果物の削除、ルーティング削除処置の実行、残置成果物の記録
+- RU 化成功成果物、知識文書保存成功成果物の削除、docs/knowledge/ 知識の削除処置の実行、残置成果物の記録
 
 ### Evidence
 
-- 生成済み RU のファイルパス一覧、docs/knowledge/ 知識文書の保存結果（操作種別と対象ファイル）、削除/ 残置の成果物一覧、ルーティング処置別の実行結果
+- 生成済み RU のファイルパス一覧、docs/knowledge/ 知識文書の保存結果（操作種別と対象ファイル）、削除/ 残置の成果物一覧、RU 以外の処置別の実行結果
 
 ### Completion Verification
 
 - RU 構成案の全 RU について RU ファイルが生成されていること（矛盾除外分を除く）
 - docs/knowledge/ 知識文書の書き込みが承認済み操作種別に一致していること。承認なしの書き込みが 0件であること
 - RU 生成成功分、知識文書保存成功分の成果物のみが削除されていること
-- ルーティングの削除処置が明示承認済みのものに限られていること
+- docs/knowledge/ 知識の削除処置が明示承認済みのものに限られていること
 
 ### Resume-Idempotency
 
@@ -131,7 +131,7 @@ RU 化に失敗した成果物、矛盾により除外された成果物は残�
 5. `git commit -- <paths>`（--only pathspec 形式）を実行し、`git push` を行う。失敗時は構造化エラーメッセージを表示して停止する
 6. 完了報告をテンプレート別に出力する。
 全て成功時は `.opencode/commands/agentdev/templates/backlog-review/standard.md`、partial success（矛盾あり）時は `partial.md`、採用済み成果物なし時は `zero-promoted.md` に従う。
-RU 生成結果、知識文書保存結果、ルーティング処置結果、git 永続化結果を含め、次のコマンド（`/agentdev/req-define`）を提示する。
+RU 生成結果、知識文書保存結果、backlog 自体の処置結果（知識の削除、保留）、git 永続化結果を含め、次のコマンド（`/agentdev/req-define`）を提示する。
 docs/knowledge/ に知識文書を保存した場合は保存結果（操作種別と対象ファイル）を完了報告に含める。
 昇華先が project-local 資産である処置は、書き込み先の実行前提（git 管理境界）を明示した指示を完了報告に含める
 
@@ -147,7 +147,7 @@ docs/knowledge/ に知識文書を保存した場合は保存結果（操作種�
 ### Completion Verification
 
 - RU 生成結果と git 永続化結果が完了報告に含まれていること
-- learning 由来のルーティング処置結果、docs/knowledge/ 知識文書の保存結果が完了報告に含まれていること
+- docs/knowledge/ 知識文書の保存結果、知識の削除・保留の処置結果が完了報告に含まれていること
 - partial success 時に該当テンプレートを使用していること
 
 ### Resume-Idempotency

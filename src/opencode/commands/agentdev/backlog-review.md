@@ -1,10 +1,11 @@
 ---
-description: 採用済み成果物を分析、統合し、ユーザー承認後に RU（Requirement Unit）を生成する
+description: 採用済み成果物を分析、統合し、ユーザー承認後に RU（Requirement Unit）を生成する。docs/knowledge/ 知識文書保存等の backlog 自体の処置を確定する
 ---
 
 # Backlog レビュー
 
-`.agentdev/intake/promoted/*.md`、`.agentdev/learning/promoted/*.md`、`.agentdev/inspect/promoted/*.md` の採用済み成果物を読み込み、分析、統合してユーザーに判定を提示し、承認後に直接 RU を生成する。
+`.agentdev/intake/promoted/*.md`、`.agentdev/learning/promoted/*.md`、`.agentdev/inspect/promoted/*.md` の採用済み成果物を読み込み、source type に依存しない共通モデルで分析、統合してユーザーに判定を提示し、承認後に RU を生成する。
+本コマンドが確定するのは、RU 化、docs/knowledge/ への知識文書保存、重複・陳腐化した知識の削除、保留等の backlog 自体の処置である。REQ / Decision / Design 反映、ガードレール移管、Project Extension 接続、通常の Issue による修正等の具体的実現先へのルーティングは learning 由来を含めて行わず、システム変更を必要とするものは RU として後続の `/agentdev/req-define` へ渡す。
 
 **このコマンドはユーザー承認後に RU を生成する。ユーザー承認は RU 作成承認を兼ねる。**
 
@@ -18,9 +19,9 @@ description: 採用済み成果物を分析、統合し、ユーザー承認後�
 ## 出力
 
 - `.agentdev/backlog/req-units/RU-*.md`（Requirement Unit）
-- `docs/knowledge/` 配下の知識文書（learning 由来、利用者承認後に直接保存。REQ-{NNNN}、REQ-{NNNN}-{NNN}）
+- `docs/knowledge/` 配下の知識文書（利用者承認後に直接保存する正規昇華経路。書き込みは git 永続化対象の副作用。REQ-{NNNN}、REQ-{NNNN}-{NNN}）
 - 成功した採用済み成果物の削除（RU 生成成功分、docs/knowledge/ 知識文書保存成功分を含む）
-- learning 由来分類結果の昇華先ルーティング結果（docs/knowledge/ 知識文書保存を含む昇華、Issue 修正、削除、保留を完了報告に処置別に記録）
+- backlog 自体の処置の報告（docs/knowledge/ 知識文書保存、重複・陳腐化した知識の削除、保留を完了報告に処置別に記録）
 
 ## RU フォーマット
 

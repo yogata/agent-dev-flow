@@ -9,7 +9,7 @@
  - 矛盾詳細: {contradiction_details}
  - RU 生成: {ru_count}件（{ru_list}）
  - 削除済み成果物: {deleted_count}件
- - 昇華先ルーティング: {routing_summary}
+ - backlog 自体の処置: {action_summary}
 検証結果: ⚠️ 注意（矛盾あり）
 git 永続化: {git_result}
 次のコマンド:/agentdev/req-define
