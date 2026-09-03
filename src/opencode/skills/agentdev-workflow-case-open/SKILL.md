@@ -12,7 +12,7 @@ case-open command は公開 interface（入出力契約・ガードレール）�
 
 ## 入力
 
-- case-open command から渡される要件doc（構造化 `draft-data` 形式、`agreed_items` / `artifact_actions` / `operation_units` / `test_strategy` / `review_dispositions` / `case_open_hints` / `auto_gate` / `conflict_resolutions`）
+- case-open command から渡される要件doc（構造化 `draft-data` 形式、`agreed_items` / `artifact_actions` / `operation_units` / `realization_actions` / `test_strategy` / `review_dispositions` / `case_open_hints` / `auto_gate` / `conflict_resolutions`）
 - OU ID 指定（任意、OU モード時）
 
 ## 出力

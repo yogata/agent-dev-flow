@@ -62,6 +62,7 @@ harness execution mechanism は本 SKILL の規範対象外とし、`references/
 
 1. **Issue 読込**: 対象 Issue 本文、受け入れ基準を読み込む。実行 command が Issue を success criteria に分解する
 2. **context 再確認**: ADR/ REQ/ Design/ docs/ repository context を再確認し、実装が既存の決定事項に矛盾しないことを担保する。
+Issue 本文の Execution Contract セクションに投影された実現面の変更方針（realization_actions 由来）は既確定契約として消費し、実現責務・変更意図・検証方針を再決定せず、その範囲内の内部実装方針だけを決定する（REQ-017-017）。
 トレーサビリティ能力（`agentdev-traceability` の coverage）を、対象要件と正規成果物の既存の対応関係確認に利用できる。
 問い合わせ結果は候補提供であり最終判断としない、新規の依存関係、実行構成、Wave 構成、実行順序の設計には使用しない、機能の不在、実行失敗、空結果、候補過多の場合は README 索引、正規成果物の直接読取、`rg` 等の代替探索で継続する（fail-open）
 3. **実装、検証、PR 作成**: 実行 command に従い evidence-backed に実装を実行し、品質ゲートを通して `agentdev_gh` の pr_create 操作で PR を作成する。

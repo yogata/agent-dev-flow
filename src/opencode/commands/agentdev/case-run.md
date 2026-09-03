@@ -40,6 +40,7 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 - Issue番号の省略は同一セッション内で作成済みの場合に限り、番号解決はユーザー入力またはセッション内会話から行う。work_type 判定基準は `agentdev-workflow-lifecycle` を参照する
 - result の4状態（completed-pr/blocked/failed/delegation-unavailable）は `agentdev-case-run-execution-adapter` の result 契約に従う。成功成果は PR 作成である。SSoT は状態別に PR 本文（成功）と Issue コメント（blocked/ failed）とし、一時会話コンテキスト・中間ファイルを SSoT としない
 - 外部実行ハーネスの plan artifact 等の中間成果物は AgentDevFlow の永続成果物から除外し、最終結果は PR URL で受領する（内部構造に依存した処理・検証は行わない。委譲契約は I/O 境界 Design 参照）
+- Issue 本文の Execution Contract セクションに投影された実現面の変更方針（realization_actions 由来）は既確定契約として消費し、実現責務・変更意図・検証方針を再決定せず、その範囲内の内部実装方針（関数配置、命名、データ構造、実装順序、具体的 diff）だけを決定する。実現責務の変更が必要と判断した場合は既存の blocked 境界に従う（req_draft を再読込せず Issue 本文だけで変更責務、変更意図、検証方針を取得する。REQ-017-016、REQ-017-017）
 - 実装作業開始前に QG 前置 staleness check（ファイルパス現行存在確認、検査結果件数再計測）を実行する。差異検出時は検出結果を委譲プロンプトで実行担当サブエージェントに引き渡し、PR 本文の `## Findings / Capture候補` に `### stale-reference` 小見出しで記録する（実行担当サブエージェント責務）
 - 本筋外の発見は PR 本文に記録して修正は後続処理に委ねる（スコープ拡大は行わない）。intake 候補・learning 候補は区別して記録する（capture 境界（capture-boundaries）は `agentdev-workflow-orchestration` 参照、case-run の capture 責務は記録のみ）
 - Design確定候補（実装で発見された Design レベル詳細）は PR 本文の `## Design確定候補` セクションに記録し、`## Findings / Capture候補` とは区別する（確定・反映判断は case-close の責務）
