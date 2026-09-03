@@ -280,11 +280,13 @@ describe("scripts behavior / check capabilities (REQ-050-004)", () => {
       expect(apply.exitCode).toBe(0);
 
       // Plant an orphan agentdev junction not present in the source
-      // enumeration.
-      const orphanTarget = path.join(root, ".agentdev-plugin", "orphan-target");
-      fs.mkdirSync(orphanTarget, { recursive: true });
+      // enumeration. Its link target is the canonical source path of a skill
+      // that no longer exists in the source (stale managed projection,
+      // REQ-058). Junctions pointing outside the canonical source are not
+      // ADF-managed and are never removed (REQ-058-008).
       const orphanLink = path.join(root, ".opencode", "skills", "agentdev-orphan");
-      const mk = spawnSync("cmd", ["/c", "mklink", "/J", orphanLink, orphanTarget], { encoding: "utf-8" });
+      const orphanSource = path.join(root, ".agentdev-plugin", "src", "opencode", "skills", "agentdev-orphan");
+      const mk = spawnSync("cmd", ["/c", "mklink", "/J", orphanLink, orphanSource], { encoding: "utf-8" });
       expect(mk.status).toBe(0);
 
       const check = runInstall(root, "check");
