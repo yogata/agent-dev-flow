@@ -27,3 +27,4 @@ check_integrity の NG 一覧に事前存在負債が残存し、新規違反の
 - PR #2527 本文「Findings/ Capture候補」intake（回収元: https://github.com/yogata/agent-dev-flow/pull/2527 ）
 - 解消分の確認: case-close の check_integrity マージ前後比較（2026-09-02、Epic #2504 Wave 2）
 - 再観測: PR #2535 本文「Findings/ Capture候補」intake（2026-09-02、Epic #2505 Wave 2・Issue #2520 case-close）。同一 3種（REQ-0108 参照、TODO マーカー 2件〔agentdev-issue-tracking/SKILL.md L75・agentdev-workflow-issue/SKILL.md L69〕、third-party-sync の system.md 未記載）を再観測。いずれも diff 外・main と同一であることを `git show main:<file>` 突合で確認済み
+- 再観測: PR #2539 本文「Findings/ Capture候補」intake（2026-09-03、Issue #2538 case-close）。expanded-readme-sync（system.md 未登録の third-party-sync）、broken-req-ref（content-corruption-checker.md 内 REQ-0108 旧参照）、index-generation-consistency（req-metrics-measurement-example AUTOGEN 鮮度）の 3種を再観測。いずれも base 既存・本次 diff 外のため未対応

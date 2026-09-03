@@ -87,3 +87,54 @@
 - **想定反映先**: agentdev-req-file-manager（宣言付与確認）、agentdev-traceability（check の代替経路案内）
 - **関連**: PR #2536、Issue #2519、Epic #2505、req-save a2adf328
 - **タグ**: #traceability #adf-covers #req-save #宣言付与漏れ #req-057-013
+
+---
+## 2026-09-03: 配布物の不在 ID 参照残骸の是正は現行 REQ 番号への置換でなく概念名参照へ（REQ-029 との交点）
+
+- **問題事象**: 不在 ID 参照残骸（センチネル S-08/S-09）を是正する際、現行 REQ 番号（REQ-001-018、REQ-036 等）へ置換すると REQ-029 配布依存境界（配布物への concrete-id 禁止）に抵触する。二重制約の存在を事前に把握しないと自然な修正先で境界違反を生む
+- **発生局面**: Issue #2538（PR #2539）の case-run センチネル S-08/S-09 是正時
+- **検知方法**: 配布依存境界 最終 gate（check_distribution_boundary.ts --profile source）の concrete_id_hits 検出と、実行経過での暫定導入→撤回の過程
+- **根本原因**: 参照残骸の自然な修正先が「現行 ID への置換」と思いがちだが、配布物は REQ/Decision の具体 ID 参照を禁じる境界契約と共存する
+- **自律対応内容**: 不在 ID 参照残骸除去の形へ確定し、概念名（「文書品質契約の肯定文規定」「inspect ライフサイクル」等）での参照へ表現を統一した。具体 ID は docs 側正規文書に集約
+- **ユーザー確認の有無**: なし（エージェント自律）
+- **ADR/REQ/spec影響**: なし（REQ-029 / REQ-053-005 の既定適用。新規 Decision 不要）
+- **横展開観点**: 配布物の規範参照全般に適用可能（具体 ID は docs 側に集約する運用）
+- **再発条件**: 配布物内の ID 参照残骸を修正する場合
+- **予防策候補**: センチネル検査 Design の S-08/S-09 項目に「置換先は概念名参照」の注意追記候補
+- **想定反映先**: docs/designs/integrity/prose-quality-sentinel-checks.md（S-08/S-09 の検出方式補足）、agentdev-doc-writing
+- **関連**: PR #2539、Issue #2538
+- **タグ**: #req-029 #配布依存境界 #センチネル #参照残骸 #概念名参照
+
+---
+## 2026-09-03: checker CLI は bun + Windows で process.exit により stdout が失われることがありモジュール import 経由が安定
+
+- **問題事象**: `check_distribution_boundary_cli.ts` を bun で実行すると process.exit により stdout（JSON レポート）が失われることがある（Windows + bun 1.3.6 で再現）
+- **発生局面**: Issue #2538（PR #2539）の case-run 配布依存境界検証時
+- **検知方法**: CLI 実行の stdout 欠落を観測し、モジュール import 経由（node --experimental-strip-types）で再検証して安定出力を確認
+- **根本原因**: bun の process.exit タイミングと stdout フラッシュの競合（環境差）
+- **自律対応内容**: stdout 証跡退避の代替経路としてモジュール import 経由を使用し、実行経路と結果を PR 本文へ記録
+- **ユーザー確認の有無**: なし（エージェント自律）
+- **ADR/REQ/spec影響**: なし（checker 実行契約への実行経路追記候補の知見）
+- **横展開観点**: process.exit を呼ぶ checker CLI 全般で同様の環境差が発生し得る
+- **再発条件**: Windows + bun で exit code を持つ checker CLI を実行する場合
+- **予防策候補**: checker 実行契約と検出基盤規則（docs/designs/integrity/checker-execution-contracts.md）に安定実行経路（モジュール import 経由）を追記
+- **想定反映先**: agentdev-workflow-case-close（STEP-3 docs 検証）、checker-execution-contracts.md
+- **関連**: PR #2539、Issue #2538
+- **タグ**: #checker #bun #windows #stdout #実行経路
+
+---
+## 2026-09-03: agentdev_gh の pr_read 応答に PR 本文が含まれない場合は読み取り系 gh CLI へフォールバックする
+
+- **問題事象**: Custom Tool agentdev_gh の pr_read 操作が title/state/mergeable のみを返し PR 本文（body）を含まないため、PR 本文を SSoT とする case-close の Capture 回収・検証差分読取が Tool 単独で完結しない。pr_mergeable も verification-incomplete で読み戻しが不完備になる事象を同時観測
+- **発生局面**: Issue #2538（PR #2539）の case-close STEP-1 情報収集時
+- **検知方法**: pr_read 応答の body 欠落を観測。委譲契約の「読み取り系 gh は可」範囲内で gh pr view --json body,files へフォールバックして SSoT 読取を完了
+- **根本原因**: pr_read 操作契約の応答フィールドに body が含まれない（環境依存で欠落する）構造。読み戻し検証が不完備のまま fallback 情報（canContinue: true）を返す設計
+- **自律対応内容**: 読み取り系 gh CLI へフォールバックし、PR 本文・変更ファイル一覧の取得を完了。破壊的操作は Custom Tool 委譲の契約を維持
+- **ユーザー確認の有無**: なし（エージェント自律）
+- **ADR/REQ/spec影響**: なし（Custom Tool 操作契約の知見）
+- **横展開観点**: pr_mergeable / issue_read 等の他操作でも読み戻し不完備は起こり得る。fallback 手順の一般化候補
+- **再発条件**: pr_read の応答で PR 本文を必要とする工程（case-close STEP-1 情報収集、STEP-6 Capture 回収等）
+- **予防策候補**: Custom Tool 操作契約（docs/designs/responsibilities/custom-tool-contracts.md）に pr_read 応答の body 含有保証を明記、または case-close workflow 手順へ読み取り系 gh フォールバックを明記
+- **想定反映先**: agentdev-workflow-case-close（STEP-1 Input Resolution）、custom-tool-contracts.md
+- **関連**: PR #2539、Issue #2538
+- **タグ**: #agentdev-gh #pr-read #fallback #操作契約 #読み戻し
