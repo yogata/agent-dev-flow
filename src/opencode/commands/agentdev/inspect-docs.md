@@ -52,13 +52,13 @@ docs全体（REQ/Decision/Design/guides）の意味整合性を診断し、検�
 
 ## 不変条件
 
-工程上の選好を肯定形の不変条件として示す:
+工程上の選好を反映した肯定形の不変条件:
 
 - 診断結果の提示（検出事項、根拠、source-of-truth判定、推奨route）は source-of-truth priority（現行 REQ > 承認済み ADR > Design > guides）に従って矛盾を判定する
 
 ## ガードレール
 
-硬い境界（破壊的操作・state 破壊等の否定規則）に限定する:
+否定規則は破壊的操作・state 破壊等の硬い境界に限定する:
 
 - ファイルを変更、作成、削除しない。ただし `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成は例外として許可する
 - GitHub Issue/PR を作成、更新しない

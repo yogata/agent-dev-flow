@@ -42,7 +42,7 @@ description: 検出事項を分類、採用し、採用済み成果物として 
 
 ## 不変条件
 
-工程上の選好を肯定形の不変条件として示す:
+工程上の選好を反映した肯定形の不変条件:
 
 - reject された検出事項は即時削除し、reject 時の commit message に却下理由を含める（`archive/rejected/` への移動は廃止）
 - defer された検出事項は `.agentdev/inspect/inbox/` に残置する
@@ -52,7 +52,7 @@ description: 検出事項を分類、採用し、採用済み成果物として 
 
 ## ガードレール
 
-硬い境界（承認境界・state 破壊等の否定規則）に限定する:
+否定規則は承認境界・state 破壊等の硬い境界に限定する:
 
 - ユーザーの明示的な承認なしに採用済み成果物を生成しない（`--auto` による自動 promote 対象、および詳細判定表（workflow-contracts Design 参照、extension 経由）に従い自律確定した検出事項を除く）（`POL-promoted-artifact-requires-approval`）
 - promote された検出事項のみを `.agentdev/inspect/promoted/` へ保存する

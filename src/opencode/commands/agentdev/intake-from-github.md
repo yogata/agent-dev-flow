@@ -27,7 +27,7 @@ description: クローズ済み Case Issue/PR から未回収の変更候補を 
 
 ## 不変条件
 
-工程上の選好を肯定形の不変条件として示す:
+工程上の選好を反映した肯定形の不変条件:
 
 - 保存専用のコマンドであり、採用可否の判断は `intake-promote` が、review・整形・分類は後続コマンドが、Issue/PR へのコメント投稿・マーカー付与は `backlog-review` が担う
 - 対象はクローズ済み Case Issue/PR のみとする（role: tracking の追跡Issueは抽出対象外）。読み取り操作は Custom Tool `agentdev_gh` 経由で実行する
@@ -36,7 +36,7 @@ description: クローズ済み Case Issue/PR から未回収の変更候補を 
 
 ## ガードレール
 
-硬い境界（破壊的操作・state 破壊等の否定規則）に限定する:
+否定規則は破壊的操作・state 破壊等の硬い境界に限定する:
 
 - GitHub Issue の作成は行わない（`case-open` が担当）
 - Issue/PR へのコメント投稿、マーカー付与は行わない（`backlog-review` が担当）

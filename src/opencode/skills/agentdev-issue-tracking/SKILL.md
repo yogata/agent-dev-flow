@@ -57,7 +57,7 @@ description: 追跡Issue（課題、ToDo、アイデア、リスク等の未解�
 | 解決 | `issue_update`（trackingState 指定） | → 解決済み（解決結論を本文へ記録） |
 | クローズ | `issue_close`（reason: completed / not_planned） | 解決済み等 → クローズ済み |
 | 再オープン | `issue_reopen` | クローズ済み → 検討中 |
-| 検索・参照 | `issue_list`（role、kind、状態等の絞り込み）、`issue_read`、`issue_comment`（body 省略で読取） | — |
+| 検索・参照 | `issue_list`（role、kind、状態等の絞り込み）、`issue_read`、`issue_comment`（body 省略で読取） | - |
 
 クローズの reason は、反映完了によるクローズで `completed`、対応不要の確認完了を経由したクローズで `not_planned` を使う。
 
@@ -72,7 +72,7 @@ description: 追跡Issue（課題、ToDo、アイデア、リスク等の未解�
 
 新規起票系の操作では、起票の前に次を順に実行する。
 
-1. **候補判定**: 現在の作業で解決できず、かつ将来の設計、実装、検証、合意等に影響する未解決事項かを判定する。すべての疑問、TODO、一時エラーを課題化しない
+1. **候補判定**: 現在の作業で解決できず、かつ将来の設計、実装、検証、合意等に影響する未解決事項かを判定する。すべての疑問、一時的な覚え書き、一時エラーを課題化しない
 2. **事前解決の試行**: 正規成果物の確認等によってその場で解決可能な疑問は、課題化前に解決を試みる
 3. **既存追跡Issue検索**: `issue_list`（role: tracking、kind、状態による絞り込み）で既存追跡Issueを検索し、重複起票を避ける。同一論点の既存追跡Issueがある場合は重複起票せず、既存追跡Issueへの統合・参照を提案する
 

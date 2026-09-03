@@ -38,7 +38,7 @@ RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, 
 
 ## 不変条件
 
-工程上の選好を肯定形の不変条件として示す:
+工程上の選好を反映した肯定形の不変条件:
 
 - RU は分析・統合の結果として生成し、採用済み成果物の単純コピー（パススルー）とは区別する
 - depends_on には RU-ID のみを指定する（採用済み成果物パスは使用しない）
@@ -46,7 +46,7 @@ RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, 
 
 ## ガードレール
 
-硬い境界（破壊的操作・state 破壊等の否定規則）に限定する:
+否定規則は破壊的操作・state 破壊等の硬い境界に限定する:
 
 - REQ ファイルの保存は行わない（`req-save` が担当）
 - GitHub Issue の作成は行わない（`case-open` が担当）

@@ -27,7 +27,7 @@ Decision要否の判定は `agentdev-decision-guidelines` スキルが行う。
 
 ## 出力
 
-- 作成/更新された `docs/decisions/<DEC-NNN>.md`、更新された `docs/decisions<README>.md`
+- 作成/更新された `docs/decisions/<DEC-NNN>.md`、更新された `docs/decisions/README.md`
 
 ## 副作用
 
@@ -56,7 +56,7 @@ Decision体系の全面改定時は、`DEC-NNN` 以降の番号帯を基準番�
 
 | モード | 条件 | 操作 | frontmatter |
 |---|---|---|---|
-| CREATE | 該当するDecisionファイルが存在しない | テンプレート適用で新規作成、`docs/decisions<README>.md` インデックスへ追加 | 初期 `proposed`、採番は最大番号+1 |
+| CREATE | 該当するDecisionファイルが存在しない | テンプレート適用で新規作成、`docs/decisions/README.md` インデックスへ追加 | 初期 `proposed`、採番は最大番号+1 |
 | APPEND | 既存Decisionに新規セクションを追加（補足説明、参照、学び） | 既存Decisionへセクション追記 | `updated` を現在日時に更新 |
 | UPDATE | 既存Decisionの特定セクションを修正（ステータス変更、内容修正） | 該当セクション更新 | `updated` を現在日時に更新 |
 

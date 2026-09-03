@@ -14,7 +14,7 @@ description: Manages REQ numbering and requirement file operations (CREATE/APPEN
 
 ## REQ番号採番と要件行記述
 
-REQ番号は `REQ-{NNNN}`（4桁ゼロ埋め、欠番埋め禁止、max+1）。
+REQ番号は `REQ-{NNNN}`（4桁ゼロ埋め、欠番埋め禁止、max+1）である。
 要件行は `REQ-{NNNN}-{MMM}` 形式で、要件の振る舞い・制約・状態のみを記述し、実装指示（ファイル編集、コード断片、ステップ手順）は含めない。
 REQ-ID 安定ID 規約、要件行ID定義、REQ本文内メタデータ規約の詳細は [references/numbering-and-validation.md](references/numbering-and-validation.md) 参照。
 
@@ -58,7 +58,7 @@ REQファイル修正が必要なバグ修正は feature に昇格する（work_
 LLM 推論で実行していた決定的処理をスクリプトへ委譲することで、番号の重複、欠番埋めを確実に防止する。
 
 配置先: `.opencode/skills/agentdev-req-file-manager/scripts/`（REQ/ADR 固有採番）。
-実装は TypeScript、決定的（純粋関数）、テスト付き（`tests/*.test.ts`、REQ）。
+実装は TypeScript、決定的（純粋関数）、テスト付き（`tests/*.test.ts`、REQ）である。
 
 > **移管済み script**:
 > - `search-target-area.ts`（Design ファイル内 target_area 見出し検索）は `agentdev-design-file-manager` へ移管済み。
@@ -179,7 +179,7 @@ STEP reference 8 要素は `<workflows/step-reference-contract>` Design 参照�
 
 ## 参考文献
 
-SKILL.md 本文から遅延読み込みされる詳細資料。
+SKILL.md 本文から遅延読み込みされる詳細資料である。
 各ファイルの冒頭に本文への文脈宣言を備える。
 
 | ファイル | 内容 |

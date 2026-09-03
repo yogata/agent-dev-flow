@@ -35,7 +35,7 @@ description: Owns document-type-crosscutting deterministic verification scripts,
 `scripts/` 配下の決定的スクリプトが、文書種別横断の検証処理を機械的に実行する（design-principles.md 第5節「Script は決定的でテスト可能な処理を担う」、AG-{NNN}/{NNN}/{NNN}）。
 
 配置先: `agentdev-artifact-validation skill`。
-実装は TypeScript、決定的（純粋関数）、テスト付き（`tests/*.test.ts`）。
+実装は TypeScript、決定的（純粋関数）、テスト付き（`tests/*.test.ts`）である。
 
 ### I/O 契約（共通）
 

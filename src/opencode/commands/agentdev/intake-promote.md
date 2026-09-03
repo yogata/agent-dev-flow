@@ -59,7 +59,7 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 ## 不変条件
 
-工程上の選好を肯定形の不変条件として示す:
+工程上の選好を反映した肯定形の不変条件:
 
 - review・分類・整形を担い、GitHub Issue の作成は backlog-review/case-open が担当する。backlog-review は次ステップの提示までとし自動起動は行わない
 - 採用 item の後続ルートは backlog-review のみとする（learning pipeline の入力は生成しない。learning item の保存・分類・昇華は本コマンドの対象外）
@@ -71,7 +71,7 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 ## ガードレール
 
-硬い境界（承認境界・state 破壊等の否定規則）に限定する:
+否定規則は承認境界・state 破壊等の硬い境界に限定する:
 
 - GitHub Issue の作成は行わない（backlog-review/case-open が担当）
 - ユーザー判断が必要な item について、明示的な承認なしに採用済み成果物を生成しない（根拠から一意に確定できる item の自律確定による生成を除く。詳細判定表は workflow-contracts Design 参照）（`POL-promoted-artifact-requires-approval`）
