@@ -2,7 +2,7 @@
 title: 実行時パッケージ境界
 status: accepted
 created: 2026-08-20
-updated: 2026-09-02
+updated: 2026-09-03
 ---
 <!-- ADF-COVERS(implementation): REQ-002-007, REQ-002-008, REQ-002-011, REQ-002-019, REQ-002-020, REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-002, REQ-009-003, REQ-009-006, REQ-009-007, REQ-009-008, REQ-009-009, REQ-009-010, REQ-009-011, REQ-009-012, REQ-009-013, REQ-009-014, REQ-009-015, REQ-009-016, REQ-009-017, REQ-009-018, REQ-009-019, REQ-009-020, REQ-009-021, REQ-009-022, REQ-009-023, REQ-009-024, REQ-009-025, REQ-009-035, REQ-009-036, REQ-009-037, REQ-009-038, REQ-009-039, REQ-009-046, REQ-009-047, REQ-009-048, REQ-009-049 -->
@@ -225,6 +225,16 @@ self-hosting 向けの `scripts/self-sync.ps1` と consumer 向けの `scripts/i
 Consumer では `scripts/install.ps1` が AgentDevFlow 本体から提供されるファイルのみを同期対象とする（apply、check、dry-run。REQ-050-002、REQ-050-005）。
 プロジェクトローカルカスタマイズは同期の影響を受けない。
 旧状態確認専用スクリプト（check-consumer-opencode.ps1）の検査能力は `scripts/install.ps1 -Mode check` が包含する（REQ-050-004。検査項目の一覧は install-script-usability Design「install.ps1 -Mode check の検査カタログ」参照）。
+
+### stale 管理投影物の削除境界
+
+正本から除外・削除された ADF 管理対象投影物（stale 管理投影物）の削除は、ADF 管理境界の内部で完結する（REQ-058）。
+
+- 削除対象は、ADF が管理する投影物として配置したもののうち、正本から削除されたもの、および配布・投影対象から明示的に除外されたことにより管理対象から外れたものとする
+- `repo-local` prefix の成果物、利用者が独自に作成した `.opencode/` 配下の成果物、その他 ADF が管理していない成果物は、名前や配置場所が近似しているだけでは削除対象にしない
+- ADF 管理物かどうかを確定できない成果物は自動削除せず、既存契約に従って非破壊的に扱う
+- Plugin loader shim 等、ADF が生成・管理し正本側の対象消滅によって不要となる生成物の stale 削除は既存契約を維持し、上記の削除境界と矛盾させない。repo-local 配布除外と自己ホスト投影の非対称（「Tools / Plugins の配布・投影」参照）は本削除境界で変えない
+- archive installer（junction 方式ではない）は本削除契約の直接対象外とし、同等の収束契約が必要かどうかの評価を本契約の実装対象に含めない
 
 ## scripts 公開入口と内部配置
 
