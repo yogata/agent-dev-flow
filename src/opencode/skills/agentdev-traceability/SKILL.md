@@ -62,24 +62,26 @@ Design 対応（design 役割）0件のみを理由に異常としない。
 
 ### 実行方法
 
+`--root` には検証対象リポジトリのルート（`<repo-root>`）を指定する。絶対パスを推奨する。相対パスは実行時のカレントディレクトリ基準で解決されるため、ルートを明示せず `--root .` とすると、実行位置によっては走査対象が欠落し検査が静かに誤動作する。
+
 ```bash
 # coverage: 要件起点
-bun .opencode/skills/agentdev-traceability/scripts/src/coverage.ts --root . --req REQ-{NNNN}-{MMM}
+bun .opencode/skills/agentdev-traceability/scripts/src/coverage.ts --root <repo-root> --req REQ-{NNNN}-{MMM}
 
 # coverage: 成果物起点（逆引き）
-bun .opencode/skills/agentdev-traceability/scripts/src/coverage.ts --root . --artifact docs/designs/<path/to/artifact>.md
+bun .opencode/skills/agentdev-traceability/scripts/src/coverage.ts --root <repo-root> --artifact docs/designs/<path/to/artifact>.md
 
 # impact: 要件起点
-bun .opencode/skills/agentdev-traceability/scripts/src/impact.ts --root . --req REQ-{NNNN}-{MMM}
+bun .opencode/skills/agentdev-traceability/scripts/src/impact.ts --root <repo-root> --req REQ-{NNNN}-{MMM}
 
 # impact: 成果物起点（成果物 ↔ 要件 ↔ 成果物の再確認候補）
-bun .opencode/skills/agentdev-traceability/scripts/src/impact.ts --root . --artifact src/<path/to/artifact>.ts
+bun .opencode/skills/agentdev-traceability/scripts/src/impact.ts --root <repo-root> --artifact src/<path/to/artifact>.ts
 
 # check: コーパス全体
-bun .opencode/skills/agentdev-traceability/scripts/src/check.ts --root .
+bun .opencode/skills/agentdev-traceability/scripts/src/check.ts --root <repo-root>
 
 # check: 完全性検査の対象要件を限定
-bun .opencode/skills/agentdev-traceability/scripts/src/check.ts --root . --req REQ-{NNNN}-{MMM},REQ-{NNNN}-{MMM}
+bun .opencode/skills/agentdev-traceability/scripts/src/check.ts --root <repo-root> --req REQ-{NNNN}-{MMM},REQ-{NNNN}-{MMM}
 ```
 
 スクリプト構成の詳細は [scripts/README.md](scripts/README.md) 参照。

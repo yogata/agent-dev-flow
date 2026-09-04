@@ -35,22 +35,24 @@ scripts/
 
 ## 実行方法
 
+`--root` には検証対象リポジトリのルート（`<repo-root>`）を指定する。絶対パスを推奨する。相対パスは実行時のカレントディレクトリ基準で解決される。
+
 ```bash
 # 型チェック
 bun run tsc --noEmit
 
 # coverage
-bun src/coverage.ts --root . --req REQ-{NNNN}-{MMM}
-bun src/coverage.ts --root . --artifact docs/designs/<path/to/artifact>.md
+bun src/coverage.ts --root <repo-root> --req REQ-{NNNN}-{MMM}
+bun src/coverage.ts --root <repo-root> --artifact docs/designs/<path/to/artifact>.md
 
 # impact
-bun src/impact.ts --root . --req REQ-{NNNN}-{MMM}
-bun src/impact.ts --root . --artifact src/<path/to/artifact>.ts
+bun src/impact.ts --root <repo-root> --req REQ-{NNNN}-{MMM}
+bun src/impact.ts --root <repo-root> --artifact src/<path/to/artifact>.ts
 
 # check
-bun src/check.ts --root .
-bun src/check.ts --root . --req REQ-{NNNN}-{MMM},REQ-{NNNN}-{MMM}
-bun src/check.ts --root . --artifact docs/designs/<path/to/artifact>.md
+bun src/check.ts --root <repo-root>
+bun src/check.ts --root <repo-root> --req REQ-{NNNN}-{MMM},REQ-{NNNN}-{MMM}
+bun src/check.ts --root <repo-root> --artifact docs/designs/<path/to/artifact>.md
 ```
 
 各 CLI の詳細な出力契約は親 SKILL.md の「公開操作契約（スクリプト一覧）」参照。
