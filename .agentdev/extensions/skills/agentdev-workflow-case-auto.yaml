@@ -20,9 +20,9 @@ context:
   - id: bounded-parent-decision-resolution-contract
     when: bounded parent decision resolution の解決範囲、作業仮定の明示要件、上位合意矛盾・新規ユーザー判断事項の停止理由分類、resume 機構の参照時
     paths:
-      - "docs/requirements/REQ-006.md"
+      - "docs/requirements/REQ-034.md"
       - "docs/decisions/DEC-008.md"
-    purpose: decision_context 自律解決境界の正規契約（REQ-006-112〜114、DEC-008 決定1〜6）の確認
+    purpose: decision_context 自律解決境界の正規契約（REQ-034-032〜034、DEC-008 決定1〜6）の確認
   - id: adversarial-review-caller-contract
     when: adversarial-review 由来の停止伝播（case-auto の停止伝播受領）、user-decision-required の位置づけ、再 review 条件、default-on + skip policy の参照時
     paths:

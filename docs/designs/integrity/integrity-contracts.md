@@ -550,4 +550,3 @@ junction は作成しない。
 
 profile 分離によって検出力が低下していないことを保証するため、意図的 violation を各 profile へ投入し、期待する NG が必ず発生することを baseline 更新前に照合する。
 このマトリクスは baseline 更新前の必須ゲートであり、いずれかのセルで期待 NG が発生しなければ baseline を更新せず WP-3 を完了扱いにしない。
-実行結果は `.omo/plans/agentdev-migration-2026-08-05.regression.md` へ記録する。

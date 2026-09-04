@@ -11,18 +11,18 @@ updated: 2026-09-02
 | Field | Value |
 |-------|-------|
 | rule_id | IR-044 |
-| description | 現行 REQ 要件行の主たる文意がスキーマフィールド、enum 値一覧、テストデータ詳細（fixture detail）、チェッカー個別ルール、誤検知（false positive）抑制方式、Step 番号直接参照、Phase 番号、内部アルゴリズム、具体的な作業履歴のいずれかである場合、当該 Design 詳細の混入を検出すること（REQ-001-002、REQ-001-003、REQ-001-067、REQ-001-068, REQ-001-031）。Step 番号直接参照は現行 REQ の記述制約（REQ-001-031）に違反する Design 詳細混入の代表例であり、検出シグナル、exemption 条件の詳細は下位セクション「IR-044 Step 番号直接参照検出」に配置する。exemption は META 規則行（機械的行構造マッチ）のみとし、文脈解釈を要する免除は inspect-docs へ委譲する（REQ-010-002, REQ-010-012）。詳細は下位セクション「IR-044 exemption 条件」 |
+| description | 現行 REQ 要件行の主たる文意がスキーマフィールド、enum 値一覧、テストデータ詳細（fixture detail）、チェッカー個別ルール、誤検知（false positive）抑制方式、Step 番号直接参照、Phase 番号、内部アルゴリズム、具体的な作業履歴のいずれかである場合、当該 Design 詳細の混入を検出すること（REQ-001-002、REQ-001-003、REQ-001-067、REQ-001-068, REQ-001-049）。Step 番号直接参照は現行 REQ の記述制約（REQ-001-049）に違反する Design 詳細混入の代表例であり、検出シグナル、exemption 条件の詳細は下位セクション「IR-044 Step 番号直接参照検出」に配置する。exemption は META 規則行（機械的行構造マッチ）のみとし、文脈解釈を要する免除は inspect-docs へ委譲する（REQ-010-002, REQ-010-012）。詳細は下位セクション「IR-044 exemption 条件」 |
 | severity | heuristic |
 | category | canonical-conflict |
 | detection_method | 現行 REQ 要件行から Design 詳細キーワード（スキーマ、enum、テストデータ、チェッカー個別ルール、FP 抑制、Step 番号直接参照、Phase 番号、内部アルゴリズム、作業履歴）をパターンマッチで検出。Step 番号直接参照は `Step N`、`ステップ N`、`手順 N`（N は数字、範囲表現 `N-M` 含む）の正規表現パターンで検出する（実装: `check_integrity.ts` の `IR044_SIGNAL_PATTERNS` Step number エントリ）。検出後、META 規則行 exemption（REQ-NNNN-MMM 形式 + enum/format 等の列挙パターンを行構造で機械判定、REQ-010-012）のみを適用する。文脈解釈を要する免除（否定文脈、委譲文脈、メタスコープルール文脈、振る舞い述語文脈、安定契約パターン）は実施せず inspect-docs へ委譲する（REQ-010-002） |
 | affected_artifacts | [現行 REQ] |
-| related_req | [REQ-001-002, REQ-001-003, REQ-001-067, REQ-001-068, REQ-010-002, REQ-010-012, REQ-001-031] |
+| related_req | [REQ-001-002, REQ-001-003, REQ-001-067, REQ-001-068, REQ-010-002, REQ-010-012, REQ-001-049] |
 | related_design | [integrity-contracts.md, document-model.md] |
 | gate_level | full-audit |
-| false_positive_risk | 高。文脈解釈を要する免除（否定文脈、委譲文脈、メタスコープルール文脈、振る舞い述語文脈、安定契約パターン）は docs-check では実施せず inspect-docs へ委譲したため（REQ-010-002）、純粋なパターンマッチの false positive は inspect-docs での意味的再評価で事後処理する。META 規則行 exemption は行構造の機械判定に限定し、件数・内容を規定する Design 詳細列挙行は免除しない（REQ-010-012）。Step 番号直接参照パターンは数字を伴わない「Step 番号」「ステップ番号」語句を検出対象とせず、REQ-001-031 自身（原則宣言の META 規則行）を誤検知しない。これは語句「番号」と数字リテラルの機械的区別により保証し、文脈免除には依存しない。既知の true positive が META exemption により誤って免除されないことを回帰テストで検証する |
-| regression_test | `scripts/check_integrity.test.ts` の IR-044 正規スイート（v2:REQ-9001〜v2:REQ-9013）が真陽性保護と exemption 境界を検証する。Step 番号直接参照の true positive として v2:REQ-9005（`Step 3`）、v2:REQ-9008（`手順 4`）を含み、META 規則行 exemption（v2:REQ-9006/9012/9013）、REQ-001-031 META 規則行の誤検知非検出（v2:REQ-9009）、振る舞い述語 exemption（v2:REQ-9011/v2:REQ-9010 guard）を追加固定する（retired REQ-028-009 準拠） |
+| false_positive_risk | 高。文脈解釈を要する免除（否定文脈、委譲文脈、メタスコープルール文脈、振る舞い述語文脈、安定契約パターン）は docs-check では実施せず inspect-docs へ委譲したため（REQ-010-002）、純粋なパターンマッチの false positive は inspect-docs での意味的再評価で事後処理する。META 規則行 exemption は行構造の機械判定に限定し、件数・内容を規定する Design 詳細列挙行は免除しない（REQ-010-012）。Step 番号直接参照パターンは数字を伴わない「Step 番号」「ステップ番号」語句を検出対象とせず、REQ-001-049 自身（原則宣言の META 規則行）を誤検知しない。これは語句「番号」と数字リテラルの機械的区別により保証し、文脈免除には依存しない。既知の true positive が META exemption により誤って免除されないことを回帰テストで検証する |
+| regression_test | `scripts/check_integrity.test.ts` の IR-044 正規スイート（v2:REQ-9001〜v2:REQ-9013）が真陽性保護と exemption 境界を検証する。Step 番号直接参照の true positive として v2:REQ-9005（`Step 3`）、v2:REQ-9008（`手順 4`）を含み、META 規則行 exemption（v2:REQ-9006/9012/9013）、REQ-001-049 META 規則行の誤検知非検出（v2:REQ-9009）、振る舞い述語 exemption（v2:REQ-9011/v2:REQ-9010 guard）を追加固定する（retired REQ-028-009 準拠） |
 | finding_route | req-define |
-| triage_action | 該当要件行の詳細を Design、ルールカタログ、コマンドリファレンス、スキルリファレンス、テスト文書のいずれかに移管し、REQ 側は外部契約、状態要件の要約に置き換える。Step 番号直接参照の triage は機能名・段階名参照への置換とする（REQ-001-031）。文脈免除の境界判定は inspect-docs が担う |
+| triage_action | 該当要件行の詳細を Design、ルールカタログ、コマンドリファレンス、スキルリファレンス、テスト文書のいずれかに移管し、REQ 側は外部契約、状態要件の要約に置き換える。Step 番号直接参照の triage は機能名・段階名参照への置換とする（REQ-001-049）。文脈免除の境界判定は inspect-docs が担う |
 | last_verified | 2026-06-28 |
 
 ## IR-044 exemption 条件
@@ -76,14 +76,14 @@ docs-check 側での機械免除は行わない（REQ-010-002 準拠）。
 保護対象の真陽性は、件数・内容を規定する Design 詳細の残留実例に限定する。
 この明記により RU-0011（検出ロジック改良）実施前に同箇所を根拠としたテスト設計の前提崩壊を防ぐ。
 REQ-001-049、REQ-003-007 は Step 番号直接参照から機能名・段階名参照へ是正済みであり、真陽性保護対象から除外する。
-当該 REQ は Step 番号直接参照を残留させないため、Step 番号検出の回帰テスト根拠とならない（REQ-001-031 の case-open 由来）。
+当該 REQ は Step 番号直接参照を残留させないため、Step 番号検出の回帰テスト根拠とならない（REQ-001-049 の case-open 由来）。
 true positive として新たに分類し Design 詳細を切り出した件は、対象 REQ-ID、切り出し先 Design、command reference または skill reference の区別、是正根拠 PR 番号を本欄へ追記し、保護対象から除外する（REQ-036-005 準拠）。
-#1335（RU-0011）で true positive に分類し是正した件: fixture copy のミラーリング実装詳細（Design `integrity-rule-catalog.md`「regression test fixture mirroring 方式」へ切り出し、REQ 側は外部契約の要約へ置換）、REQ-006-099（Step 番号直接参照 `Step 1-5, 7-8`/`Step 6` をフェーズ名参照へ置換、REQ-001-031 準拠）、REQ-036-004（テストファイルパス `scripts/tests/check_integrity.test.ts`/`scripts/check_integrity.test.ts` を Design `integrity-rule-catalog.md`「check_integrity test suite 責務分担」へ切り出し済み、REQ 側は外部契約の要約へ置換）。
+#1335（RU-0011）で true positive に分類し是正した件: fixture copy のミラーリング実装詳細（Design `integrity-rule-catalog.md`「regression test fixture mirroring 方式」へ切り出し、REQ 側は外部契約の要約へ置換）、REQ-006-099（Step 番号直接参照 `Step 1-5, 7-8`/`Step 6` をフェーズ名参照へ置換、REQ-001-049 準拠）、REQ-036-004（テストファイルパス `scripts/tests/check_integrity.test.ts`/`scripts/check_integrity.test.ts` を Design `integrity-rule-catalog.md`「check_integrity test suite 責務分担」へ切り出し済み、REQ 側は外部契約の要約へ置換）。
 当該 REQ は Design 詳細を残留させないため、回帰テストの真陽性保護根拠とならない。
 
 ## IR-044 Step 番号直接参照検出
 
-REQ-001-031 が宣言する「現行 REQ の要件行は command 定義または Design の Step 番号を直接参照せず、機能名・フェーズ名で参照する」原則に基づく検出セクション（REQ-001-031 の検出委譲先 Design 配置）。
+REQ-001-049 が宣言する「現行 REQ の要件行は command 定義または Design の Step 番号を直接参照せず、機能名・フェーズ名で参照する」原則に基づく検出セクション（REQ-001-049 の検出委譲先 Design 配置）。
 本セクションは Step 番号直接参照パターンの機械検出仕様を規定し、exemption 境界を明示する。
 
 **検出パターン（機械判定）**:
@@ -103,7 +103,7 @@ N は数字（`\d+`）。
 **非検出語句（false positive 抑制）**:
 
 次の語句は数字リテラルを伴わない「番号」語であり、検出対象外とする。
-これにより原則宣言の META 規則行（REQ-001-031 自身を含む）が語句「Step 番号」を含んでも true positive として誤検知されない。
+これにより原則宣言の META 規則行（REQ-001-049 自身を含む）が語句「Step 番号」を含んでも true positive として誤検知されない。
 本境界は語句と数字リテラルの機械的区別により保証し、文脈免除に依存しない。
 
 | 語句 | 取扱い | 根拠 |
@@ -120,7 +120,7 @@ Design ファイル、コマンドリファレンス、テスト戦略セクシ�
 
 **severity / 分類**:
 
-Step 番号直接参照は REQ レベルの記述制約違反（REQ-001-031）であり、IR-044 全体と同じく severity: `heuristic`、category: `canonical-conflict` に分類する。
+Step 番号直接参照は REQ レベルの記述制約違反（REQ-001-049）であり、IR-044 全体と同じく severity: `heuristic`、category: `canonical-conflict` に分類する。
 REQ 要件行が Design 詳細（Step 番号）へ依存すると Design↔command の Step 構成変更が REQ 側へ波及し、REQ と Design の責務分離（REQ-001 体系）を損なう。
 
 **回帰テスト**:
@@ -129,5 +129,5 @@ REQ 要件行が Design 詳細（Step 番号）へ依存すると Design↔comma
 
 - `Step 3` 形式の true positive 検出（v2:REQ-9005）
 - `手順 N` 形式の true positive 検出（v2:REQ-9008）
-- REQ-001-031 META 規則行（`Step 番号` 語句のみ、数字なし）の false positive 非検出（v2:REQ-9009）
+- REQ-001-049 META 規則行（`Step 番号` 語句のみ、数字なし）の false positive 非検出（v2:REQ-9009）
 - META 規則行 exemption: REQ/Design 定義構造（v2:REQ-9006）、切り出し宣言（v2:REQ-9012）、委譲宣言（v2:REQ-9013）の false positive 非検出
