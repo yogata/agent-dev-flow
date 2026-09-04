@@ -378,3 +378,21 @@
 - **横展開候補**: agentdev-workflow-case-auto（Wave 実行後の再測定トリガ候補）、learning-promote で判定
 - **関連**: PR 2617 本文 Findings / Capture候補 セクション（learning）からの capture 回収（case-close STEP-6）
 - **タグ**: #measurement #baseline-v2 #sample-size #observability #case-run
+
+---
+
+## 2026-09-05: agentdev_gh pr_create が invalid-input で失敗した場合のリトライで PR 作成を完遂。失敗詳細は委譲の一時情報として失われる
+
+- **現象**: case-run 委譲内で agentdev_gh の pr_create 操作が invalid-input 系の失敗応答を返した。リトライにより PR 2620（Issue 2607 対応）の作成を完遂した
+- **状況/文脈**: case-run 委譲（Epic #2597 Wave 4 / Issue 2607 / PR 2620、OU-010 Experiment G2 実験定義）。失敗時の入力詳細は委譲内の一時情報であり、PR 本文の Findings / Capture候補は「該当なし」となった
+- **検知方法**: case-close STEP-6 の学び検知（PR 本文 Findings が該当なしでも、本 Case 実行過程で検知した学びの有無を自律判断。inbox.md 重複確認のうえ新規追記）
+- **根本原因**: invalid-input 応答の具体的な違反箇所（どのパラメータが Tool 操作契約の要求を満たさなかったか）は委譲コンテキスト外に残らず特定不能。capture 境界（PR 本文のみが入力源）では委譲内失敗の詳細は構造的に永続化されない
+- **応急/対応内容**: リトライで PR 作成を完遂。本 entry で現象と capture 構造上の失われ方を記録
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/spec影響**: なし（Tool 操作契約の運用上の知見）
+- **展開視点**: 委譲側での失敗・リトライの詳細を永続化する唯一の経路は、case-run 側が検証差分または Findings へ記録すること。失敗応答の detail 記録をリトライの前提手順に含める候補
+- **再現条件**: pr_create の入力が Tool 操作契約の要求を満たさない場合
+- **予防策**: pr_create 失敗時は失敗応答の detail を記録してからリトライする。リトライ成功時に失敗原因と対処を PR 本文 Findings へ記録する
+- **横展開候補**: agentdev-workflow-orchestration（委譲失敗の記録経路）、agentdev-workflow-case-run（Findings 記録の網羅性）、learning-promote で判定
+- **関連**: Issue 2607 対応記録コメント（case-close STEP-6 学び検知）
+- **タグ**: #github #tool-fallback #pr-create #case-run #case-close
