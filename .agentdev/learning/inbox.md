@@ -74,3 +74,21 @@
 - **想定反映先**: docs/knowledge/checker-cli-stdout-loss-on-windows-bun.md の近縁現象追記候補（intake 経由）、検証手順の実装知識
 - **関連**: PR #2582 本文 Findings / Capture候補 セクションからの capture 回収（case-close STEP-6）
 - **タグ**: #windows #encoding #checker #bun #verification
+
+---
+
+## 2026-09-04: worktree 作成直後は scripts パッケージの node_modules が存在せず tsc/test が環境エラーになる
+
+- **問題事象**: worktree 内で `bun run tsc --noEmit` や一部契約テスト（zod 依存の walk_enumeration_contract 等）が、`@types/bun`・`zod` 等の node_modules 欠落による型・依存未解決エラーで失敗する（実装差分なしの環境要因エラー）
+- **発生局面**: case-run 委譲（Issue #2564 / PR #2585、OU-011 traceability check CLI の root 明示・cwd 依存排除の実装・検証時。検証差分「修正済み」2 件の要因）
+- **検知方式**: tsc --noEmit の node types 未解決エラーと契約テストの zod 依存未解決エラー
+- **根本原因**: git worktree は git 管理対象のみを引き継ぐため、.gitignore 対象の node_modules は worktree ごとに再インストールが必要
+- **自律対応内容**: 該当パッケージで `bun install` を実行して解消し、検証を再実行
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/spec影響**: なし（検証環境の整備手順の教訓）
+- **横展開観点**: worktree で依存解決を伴う検証（tsc・bun test・lint）を実行する全 workflow（case-run / case-close / 実行担当サブエージェント）に共通
+- **再発条件**: worktree 作成直後に依存解決を伴う検証を事前整備なしで実行する
+- **予防策候補**: worktree 作成後の依存整備（`bun install`）を検証手順の事前ステップに組み込む
+- **想定反映先**: agentdev-git-worktree の worktree 作成後手順知識、learning-promote での分類
+- **関連**: PR #2585 本文 Findings セクションからの capture 回収（case-close STEP-6）
+- **タグ**: #worktree #node_modules #bun #environment
