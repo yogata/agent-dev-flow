@@ -2,7 +2,7 @@
 title: サブエージェント委譲契約
 status: accepted
 created: 2026-06-21
-updated: 2026-09-02
+updated: 2026-09-04
 ---
 <!-- ADF-COVERS(implementation): REQ-002-033, REQ-002-034 -->
 <!-- ADF-COVERS(implementation): REQ-003-001, REQ-003-002, REQ-003-003, REQ-003-004, REQ-003-006, REQ-003-011, REQ-003-012, REQ-003-014, REQ-003-020 -->
@@ -281,7 +281,8 @@ adversarial-review の呼出失敗時（スキル不在、起動異常、timeout
 
 ## 構造化文脈引き継ぎ（委譲時）の直列化契約
 
-委譲時最小契約（inputs、side_effect_boundary、output_contract、capture_handoff）の骨格を変更せず、inputs 内に構造化文脈を直列化する。構造化文脈は次の意味を扱う。
+委譲時最小契約（inputs、side_effect_boundary、output_contract、capture_handoff）の骨格を変更せず
+（REQ-003-006 準拠）、inputs 内に構造化文脈を直列化する。構造化文脈は次の意味を扱う。
 
 - 目的（purpose）
 - 現在の ADF 工程（workflow_phase）
@@ -296,6 +297,14 @@ adversarial-review の呼出失敗時（スキル不在、起動異常、timeout
 
 直列化に全文履歴や巨大な計画本文の複製を含めない。
 
-ADF は委譲単位識別子を発行し、親子実行関係の識別の正規手段とする。委譲 prompt には対象 Case、Issue、PR、ADF 工程、実行単位、委譲目的の識別情報を構造化して含める。OpenCode 等の harness 側セッション識別子は、取得可能な場合に付加情報として記録し、必須契約としない（REQ-011-018 準拠）。
+この意味集合および具体化する field 集合は現行ベースラインであり、REQ-048-014 のとおり REQ-048 の成立条件と
+して固定しない。field 集合の変更は REQ-048-012 の実験契約（単一の主要構造変更、Guardrail 付き）に従い、
+工程間の直列化（workflow-contracts Design「工程間構造化文脈引き継ぎ契約」）と意味対応を維持するため
+同時変更を要する。
 
-構造化文脈は新しい正規情報源ではない。引き継ぎ内容は永続的な正規成果物（Issue 本文、PR 本文、RU、OU 等）から再構成可能であること（DEC-011 準拠）。
+ADF は委譲単位識別子を発行し、親子実行関係の識別の正規手段とする。委譲 prompt には対象 Case、Issue、PR、
+ADF 工程、実行単位、委譲目的の識別情報を構造化して含める。OpenCode 等の harness 側セッション識別子は、
+取得可能な場合に付加情報として記録し、必須契約としない（REQ-011-018、REQ-048-003 準拠）。
+
+構造化文脈は新しい正規情報源ではない。引き継ぎ内容は永続的な正規成果物（Issue 本文、PR 本文、RU、OU 等）から
+再構成可能であること（DEC-011 準拠）。

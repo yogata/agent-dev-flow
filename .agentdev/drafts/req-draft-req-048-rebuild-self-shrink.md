@@ -295,6 +295,7 @@ artifact_actions:
     operation: update
     target: docs/designs/workflows/workflow-contracts.md
     target_area: 工程間構造化文脈引き継ぎ契約
+    result: saved
     source_items: [AG-008, AG-001]
     content: |
       ADF の工程間の引き継ぎは、委譲時の構造化文脈と同一の意味集合（目的、現在の ADF 工程、現在の実行単位、
@@ -320,6 +321,7 @@ artifact_actions:
     operation: update
     target: docs/designs/workflows/workflow-contracts.md
     target_area: ADF 実行識別情報の記録契約
+    result: saved
     source_items: [AG-008, AG-001, AG-006]
     content: |
       ADF 実行の識別情報（対象 Case、GitHub Issue、GitHub PR、ADF 工程、実行単位、実行結果、必要な親子実行関係）の
@@ -352,6 +354,7 @@ artifact_actions:
     operation: update
     target: docs/designs/workflows/workflow-contracts.md
     target_area: source / projection 参照確認の工程契約
+    result: saved
     source_items: [AG-008, AG-001]
     content: |
       各工程における成果物参照は、実行目的に応じて正規原本（source）を確認すべき場合、実行時投影（projection）を
@@ -370,6 +373,7 @@ artifact_actions:
     operation: update
     target: docs/designs/workflows/delegation-contracts.md
     target_area: 構造化文脈引き継ぎ（委譲時）の直列化契約
+    result: saved
     source_items: [AG-008, AG-001]
     content: |
       委譲時最小契約（inputs、side_effect_boundary、output_contract、capture_handoff）の骨格を変更せず
@@ -404,6 +408,7 @@ artifact_actions:
     operation: update
     target: docs/designs/skills/agentdev-workflow-templates.md
     target_area: 実行識別情報・検証差分のテンプレートセクション形式
+    result: saved
     source_items: [AG-008, AG-005, AG-001]
     content: |
       Issue テンプレートと PR テンプレートに、実行識別情報と検証差分を構造化して記録するセクションを定義する。

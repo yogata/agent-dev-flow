@@ -2,7 +2,7 @@
 title: `agentdev-workflow-templates` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-23
+updated: 2026-09-04
 ---
 <!-- ADF-COVERS(implementation): REQ-007-002, REQ-007-003, REQ-007-005, REQ-017-003, REQ-043-016, REQ-043-020 -->
 <!-- ADF-COVERS(implementation): REQ-048-001, REQ-048-002, REQ-048-006, REQ-048-015, REQ-048-016, REQ-048-017, REQ-048-018, REQ-057-020 -->
@@ -234,9 +234,14 @@ references セクションに列挙された backlog 系テンプレート2フ�
 Issue テンプレートと PR テンプレートに、実行識別情報と検証差分を構造化して記録するセクションを定義する。
 
 - Issue テンプレート: 対象 Case、ADF 工程、実行単位、前工程で確定した事項を記録する識別情報セクション
-- PR テンプレート: 実行結果、検証種別、検証結果、finding 差分（新規、修正済み、既出、撤回または無効）を記録する検証差分セクション
+- PR テンプレート: 実行結果、検証種別、検証結果、finding 差分を記録する検証差分セクション
 
-検証差分セクションは、case-run の PR 本文 Findings セクション（intake / learning 小見出し）を置換せず、これと共存する（REQ-031-012 準拠）。
+検証差分セクションは、case-run の PR 本文 Findings セクション（intake / learning 小見出し）を置換せず、
+これと共存する（REQ-031-012 準拠）。
 
 本セクション形式は新規作成の Issue / PR に適用し、既存 Issue / PR へ遡及適用しない（REQ-017-013 準拠）。
+
+現在の識別情報 field 集合と検証差分の分類・表形式（8列）は現行ベースラインであり、REQ-048-008、
+REQ-048-014 のとおり REQ-048 の成立条件として固定しない。形式の変更は REQ-048-012 の実験契約に従い、
+後続工程の incremental value 比較可能性（REQ-048-008）を Guardrail として行う。
 
