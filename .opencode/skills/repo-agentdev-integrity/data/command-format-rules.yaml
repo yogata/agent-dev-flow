@@ -7,14 +7,16 @@
 #   - docs/designs/authoring/command-file-format.md
 #
 # Consumed by:
+#   - check_command_format.ts (single-path canonical load, REQ-047-009:
+#     the checker loads these detection signals via lib/command-format-rules.ts
+#     and fails closed when this file is missing or malformed)
 #   - check_workflow_preventive.ts (check 7: validates this YAML itself —
 #     forbidden* regexes must compile and must not reject thin Command
 #     structure samples)
 #
-# Detection signals for IR-028/029/030/031 are implemented as constants in
-# check_command_format.ts (implementation detail). This YAML and the checker
-# constants are kept in sync by same-PR updates (REQ-047-003, Issue #2373;
-# see rule-ownership.md 同期条件).
+# Detection signals for IR-028/029/030/031 are owned by this YAML
+# (REQ-047-009): check_command_format.ts loads them at runtime instead of
+# duplicating rule constants in code.
 #
 # Phase 5 (OU-006 #2082) implementation. The detector loads these patterns to
 # emit findings; severities/gate_levels remain owned by the individual IR files.
