@@ -9,7 +9,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 現行 REQ: 49件、廃止済み: 9件
 <!-- AUTOGEN:END -->
 
-現行要件は48件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
+現行要件は49件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
 各 REQ の詳細は各 REQ ファイル本文を参照。
 
 | REQ | タイトル |
@@ -62,6 +62,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [REQ-055](requirements/REQ-055.md) | production-equivalent verification の定義 |
 | [REQ-056](requirements/REQ-056.md) | Project Knowledge の所有と workflow 利用 |
 | [REQ-057](requirements/REQ-057.md) | docs corpus 整合・現行化バッチ |
+| [REQ-058](requirements/REQ-058.md) | ADF 管理投影物の廃止時クリーンアップ契約 |
 
 - [要件インデックス](requirements/README.md)
 
