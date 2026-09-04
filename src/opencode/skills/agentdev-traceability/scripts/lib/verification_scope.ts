@@ -22,8 +22,8 @@ export const DEFAULT_VERIFICATION_SCOPE_CATALOG =
 const ENTRY_SECTION_HEADING_RE = /^##\s*任意行エントリ\s*$/;
 const NEXT_HEADING_RE = /^##\s/;
 const BULLET_RE = /^-\s+(.*)$/;
-const ENTRY_TOKEN_RE = /^(REQ-\d{3}-\d{3})(?:\.\.(REQ-\d{3}-\d{3}))?/;
-const REQ_LINE_RE = /^REQ-(\d{3})-(\d{3})$/;
+const ENTRY_TOKEN_RE = /^(REQ-\d{3,4}-\d{3})(?:\.\.(REQ-\d{3,4}-\d{3}))?/;
+const REQ_LINE_RE = /^REQ-(\d{3,4})-(\d{3})$/;
 
 export interface VerificationScopeEntry {
   readonly line: number;
