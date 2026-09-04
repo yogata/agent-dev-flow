@@ -2,7 +2,7 @@
 title: 検証対応要否カタログ（トレーサビリティモデル references）
 status: draft
 created: 2026-08-21
-updated: 2026-09-03
+updated: 2026-09-05
 ---
 
 <!-- ADF-COVERS(implementation): REQ-057-006 -->
@@ -222,10 +222,21 @@ Issue #2362 の移行作業（棚卸し (a')）で全現行要件行を判定し
 
 - REQ-047-001..REQ-047-008: 対象規則ごとの正規所有者一意化、派生定義の位置付け、検査定義と checker の独立所有解消、陳腐化検出、外部挙動の維持、相反する正規定義の不在、生成機構の新設制約、追加判断への引き渡し条件の構造規範。docs-check とレビューで検証
 
-### REQ-048（ADF 実行効率第1次改善・実行観測基盤）
+### REQ-048（ADF 実行観測と統制縮小評価）
 
-- REQ-048-007..REQ-048-011: 工程間・委譲時の構造化文脈引き継ぎの識別情報、確定済み事項の初期文脈利用、複製要求の禁止、正規情報源の非代替、委譲時最小契約の維持の実行時振る舞い
-- REQ-048-012..REQ-048-014: source / projection の確認対象判別、解決済み参照先の後工程への引き継ぎ、双方確認の維持と責務境界変更時の正規判断の実行時振る舞い
+- REQ-048-006..REQ-048-015: 実行評価の評価軸（Outcome、Efficiency、Quality、Autonomy、Control / Coordination の区別）、指標算出（wall-clock、token、同一 path 再読込、子セッション間の同一 path 再読込、source / projection 重複参照）、incremental value 比較、自律性評価、処理区分対応付け、機構分類（Safety invariant、Quality control、Efficiency support、Structure / Convenience）、実験契約（Baseline、Hypothesis、単一の主要構造変更、Guardrail、Observation、Decision）、縮小判断（KEEP、NARROW、MERGE、DOWNGRADE、DELETE）、structured handoff 等の観測対象化と非固定宣言、Legacy Baseline 保持の評価・分析時の振る舞い
+
+旧→新行対応表（REQ-048 全面再構築、旧21行→新16行。Epic #2596「scope-affecting impact candidate」セクションで確定した対応の転記。新001〜016 は旧001〜016 と同番号別意味になるため、過去成果物の旧行 ID 引用との衝突を本表で解消する。新001〜005・016 は検証対応必須行（記録・形式契約）のため本カタログへ登録せず、Design implementation 宣言と契約テスト・Report 系 verification 宣言が検証配置先である）:
+
+| 旧行 ID | 新行 ID |
+|---|---|
+| `REQ-048-001..REQ-048-006` | REQ-048-001..REQ-048-005、REQ-048-016（最小相関契約へ縮小維持） |
+| `REQ-048-007..REQ-048-011` | REQ-048-014、REQ-048-007（structured handoff は観測対象化） |
+| `REQ-048-012..REQ-048-014` | REQ-048-007、REQ-048-014（一般責務は workflow-contracts Design が保持し効率評価対象へ） |
+| `REQ-048-015..REQ-048-018` | REQ-048-008（incremental value 比較へ抽象化） |
+| `REQ-048-019` | REQ-048-012、REQ-048-013、DEC-027（縮小評価契約へ置換） |
+| `REQ-048-020` | REQ-048-004、対象外（harness 変更非依存へ吸収） |
+| `REQ-048-021` | REQ-048-015（Legacy Baseline へ分離、Baseline V2 は対象セクションで定義） |
 
 ### REQ-049（追跡Issue管理機構）
 
