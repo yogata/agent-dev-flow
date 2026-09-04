@@ -24,6 +24,7 @@ import {
   GENERIC_ID_PATTERN,
   ID_EVASION_PATTERN,
   URL_CANDIDATE_PATTERN,
+  isAdfCoversDeclarationLine,
   isConcreteDocsPath,
   isProducerOwnedUrl,
   isTemplateWrappedId,
@@ -42,6 +43,7 @@ export {
   normalizePathToken,
   stripQueryAndFragment,
   isConcreteDocsPath,
+  isAdfCoversDeclarationLine,
   extractOwnerRepo,
   isProducerOwnedUrl,
 } from "./distribution-boundary-patterns.ts";
@@ -103,6 +105,18 @@ export function detectCandidates(
   _cfg: DetectorConfig,
 ): Candidate[] {
   const out: Candidate[] = [];
+
+  // IR-059 exemption (inspection-target declaration): a whole-line ADF-COVERS
+  // traceability declaration comment is a machine-readable artifact claim, not
+  // residual prose. Skip id/path/url extraction on it but keep evasion
+  // extraction fail-closed — an escape sequence must not hide inside a
+  // declaration comment.
+  if (isAdfCoversDeclarationLine(line)) {
+    for (const m of line.matchAll(ID_EVASION_PATTERN)) {
+      out.push({ type: "evasion", value: m[0] });
+    }
+    return out;
+  }
 
   for (const m of line.matchAll(GENERIC_ID_PATTERN)) {
     const start = m.index ?? 0;

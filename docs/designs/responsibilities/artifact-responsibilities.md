@@ -65,7 +65,7 @@ REQ-003-033「責務ごとに最も安定した最小の定義元を正規とす
 
 #### ADF-COVERS 実装対応宣言の正規配置先カタログ
 
-ADF-COVERS(implementation) 宣言の正規配置先は実装成果物の種別ごとに次のとおり定める。
+実装対応宣言（ADF-COVERS 形式）の正規配置先は実装成果物の種別ごとに次のとおり定める。
 
 - (a) 配布 skill・command 本体 → 当該 SKILL.md / command .md 冒頭 HTML コメント
 - (b) checker・スクリプト → 対応する Design（integrity/local domain）の該当節
@@ -73,6 +73,8 @@ ADF-COVERS(implementation) 宣言の正規配置先は実装成果物の種別�
 - (d) テンプレート・運用資産 → 正規所有 Design の該当節
 
 triage で retire を選択した要求行には宣言を付与しない。残存 68 件の未付与行は本カタログに従い段階的に付与する。
+
+<!-- ADF-COVERS(implementation): REQ-057-023 -->
 
 ## 責務境界原則
 

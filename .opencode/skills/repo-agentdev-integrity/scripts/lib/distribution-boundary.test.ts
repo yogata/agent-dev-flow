@@ -1255,3 +1255,141 @@ describe("Stage B regression: Unicode / hex evasion detection", () => {
     expect(evasion.length).toBe(0);
   });
 });
+
+// =============================================================================
+// IR-059 exemption: ADF-COVERS traceability declaration comments (OU-016).
+//
+// ADF-COVERS(<role>): REQ-... declarations consumed by agentdev-traceability are
+// inspection-target declarations (IR-059 exemption: "patterns defining the
+// inspection target and inspection-target path declarations"), not residual
+// prose references. Whole-line declaration comments MUST NOT trip the
+// concrete-id gate; ordinary prose with concrete IDs MUST continue to fail.
+// =============================================================================
+
+describe("IR-059 exemption: ADF-COVERS declaration comments", () => {
+  test("whole-line HTML declaration comment is not flagged as concrete-id", () => {
+    const d = classifyLineConfig(
+      {
+        text: "<!-- ADF-COVERS(implementation): REQ-057-013 -->",
+        lineNumber: 6,
+        filePath: "src/opencode/skills/agentdev-doc-writing/SKILL.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    expect(d.filter((x) => x.category === "concrete-id").length).toBe(0);
+    expect(decideGate(d).pass).toBe(true);
+  });
+
+  test("whole-line // and # declaration comment forms are not flagged", () => {
+    for (const line of [
+      "// ADF-COVERS(verification): REQ-029-001, REQ-029-002",
+      "# ADF-COVERS(implementation): REQ-057-021",
+    ]) {
+      const d = classifyLineConfig(
+        {
+          text: line,
+          lineNumber: 1,
+          filePath: "x.md",
+          projection: "source",
+        },
+        DEFAULT_DETECTOR_CONFIG,
+      );
+      expect(d.filter((x) => x.category === "concrete-id").length).toBe(0);
+    }
+  });
+
+  test("declaration sharing a line with prose keeps the prose detectable (fail-closed)", () => {
+    const d = classifyLineConfig(
+      {
+        text: "Read REQ-057-013 first. <!-- ADF-COVERS(implementation): REQ-057-013 -->",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    const ids = d.filter((x) => x.category === "concrete-id");
+    expect(ids.length).toBe(2);
+    expect(decideGate(d).pass).toBe(false);
+  });
+
+  test("truncated HTML declaration comment is still detected (fail-closed)", () => {
+    const d = classifyLineConfig(
+      {
+        text: "<!-- ADF-COVERS(implementation): REQ-057-013",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    expect(d.filter((x) => x.category === "concrete-id").length).toBe(1);
+    expect(decideGate(d).pass).toBe(false);
+  });
+
+  test("ordinary prose concrete IDs continue to be detected", () => {
+    const d = classifyLineConfig(
+      {
+        text: "This implements REQ-057-013 for doc-writing reviews.",
+        lineNumber: 1,
+        filePath: "src/opencode/skills/agentdev-doc-writing/SKILL.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    const ids = d.filter((x) => x.category === "concrete-id");
+    // REQ-NNNN-NNNN matches its leading ID portion (REQ-057), consistent with
+    // the established subitem-form behavior.
+    expect(ids.length).toBe(1);
+    expect(ids[0]!.matched).toBe("REQ-057");
+    expect(ids[0]!.classification).toBe("producer-internal");
+    expect(decideGate(d).pass).toBe(false);
+  });
+
+  test("comment without the ADF-COVERS marker is still detected", () => {
+    const d = classifyLineConfig(
+      {
+        text: "<!-- some other comment REQ-057-013 -->",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    expect(d.filter((x) => x.category === "concrete-id").length).toBe(1);
+    expect(decideGate(d).pass).toBe(false);
+  });
+
+  test("evasion inside a declaration comment line stays blocked (fail-closed)", () => {
+    const d = classifyLineConfig(
+      {
+        text: "<!-- ADF-COVERS(implementation): REQ-\\u0030\\u0031 -->",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    const evasion = d.filter((x) => x.category === "evasion-attempt");
+    expect(evasion.length).toBe(1);
+    expect(evasion[0]!.classification).toBe("unclassified");
+    expect(decideGate(d).pass).toBe(false);
+  });
+
+  test("declaration line still passes through classifyContent with line numbers intact", () => {
+    const content = [
+      "# skill doc",
+      "<!-- ADF-COVERS(implementation): REQ-057-013 -->",
+      "ref ADR-0135 here",
+    ].join("\n");
+    const d = classifyContent(
+      content,
+      "src/opencode/skills/agentdev-doc-writing/SKILL.md",
+      "source",
+    );
+    const matched = d.map((x) => x.matched).sort();
+    expect(matched).toEqual(["ADR-0135"]);
+    expect(d[0]!.line).toBe(3);
+  });
+});

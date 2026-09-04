@@ -154,3 +154,33 @@ export function isTemplateWrappedId(
   if (after === "*") return true;
   return false;
 }
+
+// ---------------------------------------------------------------------------
+// ADF-COVERS declaration comment (IR-059 exemption: inspection-target declaration)
+// ---------------------------------------------------------------------------
+
+/**
+ * Decide whether a line is an ADF-COVERS traceability declaration comment.
+ *
+ * IR-059 explicitly exempts "patterns defining the inspection target and
+ * inspection-target path declarations" from concrete-id detection. The
+ * machine-readable declarations consumed by agentdev-traceability
+ * (`<!-- ADF-COVERS(<role>): REQ-... -->`, `// ADF-COVERS(<role>): REQ-...`,
+ * `# ADF-COVERS(<role>): REQ-...`, where <role> is a placeholder) are such
+ * inspection-target declarations — symmetric with the already-accepted
+ * AGENTS.md header declarations — not residual prose references.
+ *
+ * Only WHOLE-LINE comment forms are exempted: a declaration sharing a line
+ * with prose keeps that prose detectable, and a truncated HTML comment that
+ * never closes is not a well-formed declaration (both fail closed).
+ *
+ * Pure: no fs/path/I/O imports; same input => same output.
+ */
+export function isAdfCoversDeclarationLine(text: string): boolean {
+  const t = text.trim();
+  if (!/ADF-COVERS\s*\(/.test(t)) return false;
+  if (t.startsWith("<!--") && t.endsWith("-->")) return true;
+  if (t.startsWith("//")) return true;
+  if (t.startsWith("#")) return true;
+  return false;
+}
