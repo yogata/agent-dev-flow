@@ -40,7 +40,7 @@ description: クローズ済み Case Issue/PR から未回収の変更候補を 
 
 - GitHub Issue の作成は行わない（`case-open` が担当）
 - Issue/PR へのコメント投稿、マーカー付与は行わない（`backlog-review` が担当）
-- GitHub Issue/PR のデータ取得は `gh` CLI のみ使用する（GitHub API 直接呼び出しは不可）（`POL-gh-io-delegation`）
+- GitHub Issue/PR のデータ取得は Custom Tool `agentdev_gh` の操作契約へ委譲する（gh コマンド直接記述は禁止。GitHub API 直接呼び出しも不可）（`POL-gh-io-delegation`）
 - 保存先は `.agentdev/intake/inbox/` のみ（他ディレクトリへの保存は禁止）
 
 
