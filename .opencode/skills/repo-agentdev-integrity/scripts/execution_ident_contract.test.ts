@@ -1,8 +1,11 @@
-// ADF-COVERS(verification): REQ-048-001, REQ-048-002, REQ-048-003, REQ-048-004, REQ-048-005, REQ-048-006
-// ADF-COVERS(verification): REQ-048-019
-// 実行識別情報セクション契約テスト（Issue #2400 Area1）。
-// テンプレートの実行識別情報セクションが機械的に解析可能な構造化形式を持つこと、
-// harness 側識別子が必須契約になっていないこと、既存の必須セクション構造を削減していないことを検証する。
+// ADF-COVERS(verification): REQ-048-001, REQ-048-002, REQ-048-003, REQ-048-004, REQ-048-005, REQ-048-016
+// 実行識別情報セクション契約テスト（Issue #2400 Area1、Issue #2600 で新 REQ-048 の意図へ再構成）。
+// テンプレートの実行識別情報セクションが機械的に解析可能な構造化形式を持ち、
+// Case・ADF 工程・実行単位・委譲単位・PR・実行結果の相関が機械判別できること（REQ-048-001、REQ-048-002）、
+// harness 側識別子が必須契約になっていないこと（REQ-048-003、REQ-048-004）、
+// 識別情報欠落時は N/A 記録で workflow を停止しないこと（REQ-048-004、REQ-048-005）を検証する。
+// adf_* field 集合の全体固定は REQ-048-014 のとおり REQ-048 の成立条件としない。本テストは
+// REQ-048-001 が要求する相関の成立に必要な key のみを検査し、REQ-048-012 の実験契約に従う変更を妨げない。
 // テンプレートは src/opencode/（原本）を優先読込する（worktree は junction 未伝播、REQ-018-001 と同一 fallback 構成）。
 import { describe, it, expect } from "bun:test";
 import * as fs from "fs";
@@ -50,14 +53,15 @@ const ISSUE_TEMPLATES = [
   "issue_desc_child.md",
 ] as const;
 
-const ISSUE_REQUIRED_KEYS = [
+// REQ-048-001 が対応付けを要求する相関の成立に必要な key（Case・ADF 工程・実行単位・委譲単位・PR・実行結果）。
+// adf_upstream_confirmed 等の他 key は REQ-048-014 のとおり成立条件として固定しない。
+const ISSUE_CORRELATION_KEYS = [
   "adf_case",
   "adf_phase",
   "adf_execution_unit",
-  "adf_upstream_confirmed",
 ] as const;
 
-const PR_REQUIRED_KEYS = [
+const PR_CORRELATION_KEYS = [
   "adf_case",
   "adf_pr",
   "adf_execution_unit",
@@ -84,56 +88,11 @@ const RESULT_STATES = [
   "delegation-unavailable",
 ] as const;
 
-// 実行識別情報セクション導入前（ベースライン）の各テンプレート必須セクション。
-// 本導入が既存の検証構造を削減していないことを固定する（REQ-048-019）。
-const BASELINE_REQUIRED_SECTIONS: Record<string, string[]> = {
-  "issue_desc_feature.md": [
-    "概要",
-    "課題",
-    "提案内容",
-    "完了条件",
-    "テスト戦略",
-    "Execution Contract",
-    "レビュー判断",
-  ],
-  "issue_desc_bug.md": [
-    "説明",
-    "再現手順",
-    "期待される動作",
-    "完了条件",
-    "テスト戦略",
-    "レビュー判断",
-  ],
-  "issue_desc_epic.md": [
-    "概要",
-    "課題",
-    "提案内容",
-    "REQ参照",
-    "分解",
-    "実行順序",
-    "ステータス追跡",
-    "完了条件",
-    "レビュー判断",
-  ],
-  "issue_desc_child.md": [
-    "概要",
-    "対象範囲",
-    "REQ参照",
-    "提案内容",
-    "完了条件",
-    "テスト戦略",
-    "Execution Contract",
-    "レビュー判断",
-  ],
-  "pr_desc.md": [
-    "概要",
-    "実装内容",
-    "完了条件",
-    "テスト結果",
-    "品質メトリクス",
-    "Findings/ Capture候補",
-    "関連Issue",
-  ],
+// Epic と child の実行単位（adf_execution_unit）の規約形式。実行単位の値から
+// 親子実行関係（REQ-048-001）が機械判別できることを検査するために参照する。
+const EXECUTION_UNIT_FORMATS: Record<string, string> = {
+  "issue_desc_epic.md": "epic:",
+  "issue_desc_child.md": "standard:",
 };
 
 function readTemplate(file: string): string {
@@ -165,28 +124,7 @@ export function extractExecutionIdent(content: string): Map<string, string> {
   return keys;
 }
 
-function extractRequiredSectionNames(content: string): Set<string> {
-  const names = new Set<string>();
-  const lines = content.split(/\r?\n/);
-  const headingRe = /^(#{1,6})\s+(.+)$/;
-  const markerRe = /<!--\s*【必須】\s*-->/;
-  for (let i = 0; i < lines.length; i++) {
-    const m = lines[i].match(headingRe);
-    if (!m) continue;
-    const isRequired =
-      markerRe.test(lines[i]) ||
-      (i + 1 < lines.length && markerRe.test(lines[i + 1]));
-    if (isRequired) {
-      let name = m[2];
-      const commentIdx = name.indexOf("<!--");
-      if (commentIdx !== -1) name = name.substring(0, commentIdx);
-      names.add(name.trim());
-    }
-  }
-  return names;
-}
-
-describe("REQ-048-001/002/006: 実行識別情報セクションの構造化形式", () => {
+describe("REQ-048-001/002: 実行識別情報セクションの機械判別可能性", () => {
   const sectionHeading = "## 実行識別情報";
   const markerRe = /<!--\s*【必須】\s*-->/;
 
@@ -204,10 +142,10 @@ describe("REQ-048-001/002/006: 実行識別情報セクションの構造化形�
         expect(markerRe.test(after)).toBe(true);
       });
 
-      it("機械的解析で必須 key を復元できる", () => {
+      it("機械的解析で相関 key（Case・工程・実行単位・委譲単位・PR・実行結果）を復元できる", () => {
         const keys = extractExecutionIdent(content);
         const required =
-          file === "pr_desc.md" ? PR_REQUIRED_KEYS : ISSUE_REQUIRED_KEYS;
+          file === "pr_desc.md" ? PR_CORRELATION_KEYS : ISSUE_CORRELATION_KEYS;
         for (const key of required) {
           expect(keys.has(key)).toBe(true);
           expect(keys.get(key)).not.toBe("");
@@ -240,15 +178,26 @@ describe("REQ-048-001/002/006: 実行識別情報セクションの構造化形�
       it("配布物内部 ID（REQ-XXXX 数字つき）を含まない", () => {
         expect(/REQ-\d/.test(content)).toBe(false);
       });
+
+      const unitFormat = EXECUTION_UNIT_FORMATS[file];
+      if (unitFormat !== undefined) {
+        it("実行単位の値は親子実行関係を機械判別できる形式を規定する", () => {
+          // REQ-048-001 の親子実行関係の相関。Epic は epic:{N}、child は standard:{N} の
+          // 形式を規約として宣言し、実行単位の値の先頭から親子の区別が機械判別できること。
+          const unit = extractExecutionIdent(content).get("adf_execution_unit");
+          expect(unit).toBeDefined();
+          expect(unit!.includes(unitFormat)).toBe(true);
+        });
+      }
     });
   }
 
-  it("実行識別情報の記録先は既存テンプレートのみ（新規テンプレート種別を新設しない）", () => {
+  it("実行識別情報の記録先は既存テンプレートのみ（この目的の新規テンプレート種別を新設しない）", () => {
     const files = fs
       .readdirSync(TEMPLATES_DIR)
       .filter((f) => f.endsWith(".md"))
       .sort();
-    // 実行識別情報セクションを持つのは既存5テンプレートのみであること。
+    // 実行識別情報セクションを持つのは既存5テンプレートのみであること（REQ-048-016）。
     const withSection = files.filter((f) =>
       readTemplate(f).includes(sectionHeading),
     );
@@ -277,7 +226,7 @@ describe("REQ-048-003/004: harness 側識別子と OpenCode 内部履歴の非�
   }
 });
 
-describe("REQ-048-005: 識別情報欠落時の非停止", () => {
+describe("REQ-048-004/005: 識別情報欠落時の N/A 記録と非停止", () => {
   for (const file of [...ISSUE_TEMPLATES, "pr_desc.md"]) {
     it(`${file}: 欠落時 N/A 記録と停止しない旨をセクション規約に含む`, () => {
       const content = readTemplate(file);
@@ -334,16 +283,25 @@ describe("REQ-048-001/002: 委譲識別情報ブロックと PR 転記の対応"
   });
 });
 
-describe("REQ-048-019: 既存必須セクションの削減なし", () => {
-  for (const [file, requiredSections] of Object.entries(
-    BASELINE_REQUIRED_SECTIONS,
-  )) {
-    it(`${file}: ベースライン必須セクションがすべて残存する`, () => {
-      const content = readTemplate(file);
-      const current = extractRequiredSectionNames(content);
-      for (const section of requiredSections) {
-        expect(current.has(section)).toBe(true);
-      }
-    });
-  }
+describe("REQ-048-016: 実行識別情報の記録基盤と Design 現行ベースライン宣言", () => {
+  const templatesDesignPath = path.join(
+    REPO_ROOT,
+    "docs",
+    "designs",
+    "skills",
+    "agentdev-workflow-templates.md",
+  );
+
+  it("agentdev-workflow-templates Design は識別情報 field 集合を現行ベースラインとして宣言する", () => {
+    // 識別情報 field 集合は REQ-048-014 のとおり REQ-048 の成立条件として固定しない。
+    // Design の現行ベースライン宣言セクションがこの運用（REQ-048-012 の実験契約に従う変更）を
+    // 宣言していることを機械検査し、実験による変更を Design 宣言の更新から始められる状態を固定する。
+    const design = fs.readFileSync(templatesDesignPath, "utf-8");
+    expect(
+      design.includes("## 実行識別情報・検証差分のテンプレートセクション形式"),
+    ).toBe(true);
+    expect(design.includes("現行ベースライン")).toBe(true);
+    expect(design.includes("固定しない")).toBe(true);
+    expect(design.includes("REQ-048-012")).toBe(true);
+  });
 });

@@ -1,9 +1,12 @@
-// ADF-COVERS(verification): REQ-048-015, REQ-048-016, REQ-048-017, REQ-048-018
-// ADF-COVERS(verification): REQ-048-019
-// 検証差分セクション契約テスト（Issue #2403 Area4）。
-// PR テンプレートの検証差分セクションが検証種別・検証結果・finding 差分5分類を機械的に判別できる構造を持つこと、
-// Findings セクション（intake / learning 小見出し）と共存していること、
-// 既存の必須セクション構造を削減していないことを検証する。
+// ADF-COVERS(verification): REQ-048-001, REQ-048-002, REQ-048-003, REQ-048-004, REQ-048-008, REQ-048-016
+// 検証差分セクション契約テスト（Issue #2403 Area4、Issue #2600 で新 REQ-048 の意図へ再構成）。
+// PR テンプレートの検証差分セクションが検証種別・検証結果・finding 差分を機械的に判別できる構造を持ち、
+// 工程行の比較（incremental finding value、REQ-048-008）と検証結果の相関判別（REQ-048-001、REQ-048-002）が
+// 成立すること、harness 履歴を必須化しないこと（REQ-048-003、REQ-048-004）、
+// 記録先は既存テンプレートと既存正規情報源に限ること（REQ-048-016）を検証する。
+// finding 差分の分類集合・表形式は REQ-048-014 のとおり REQ-048 の成立条件としない。本テストは
+// Design（agentdev-workflow-templates Design「実行識別情報・検証差分のテンプレートセクション形式」）が
+// 現行ベースラインとして宣言する現行セットとの一致のみを検査し、REQ-048-012 の実験契約に従う変更を妨げない。
 // テンプレートは src/opencode/（原本）を優先読込する（worktree は junction 未伝播、REQ-018-001 と同一 fallback 構成）。
 import { describe, it, expect } from "bun:test";
 import * as fs from "fs";
@@ -44,20 +47,11 @@ const TEMPLATES_DIR = fs.existsSync(PROJECTION_TEMPLATES_DIR)
   : SOURCE_TEMPLATES_DIR;
 const SOURCE_SKILLS_DIR = path.join(REPO_ROOT, "src", "opencode", "skills");
 
-// 検証差分セクション導入前（ベースライン）の PR テンプレート必須セクション。
-// 実行識別情報セクション（Area1導入済み）を含む。本導入が既存の検証構造を削減していないことを固定する（REQ-048-019）。
-const PR_BASELINE_REQUIRED_SECTIONS = [
-  "概要",
-  "実行識別情報",
-  "実装内容",
-  "完了条件",
-  "テスト結果",
-  "品質メトリクス",
-  "Findings/ Capture候補",
-  "関連Issue",
-] as const;
-
-// finding 差分の5分類（REQ-048-015。撤回と無効は「撤回または無効となった finding」の内訳）。
+// finding 差分の分類集合は REQ-048-014 のとおり REQ-048 の成立条件として固定しない。
+// 本定数は Design（agentdev-workflow-templates Design「実行識別情報・検証差分のテンプレートセクション形式」）
+// が現行ベースラインとして宣言する現行セットであり、テンプレートと Design 宣言の一致検査に用いる。
+// REQ-048-012 の実験契約に従う変更は、Design 宣言とテンプレートと本定数の同期更新で完結する。
+// 撤回と無効は「撤回または無効となった finding」の内訳。
 const FINDING_DIFF_CLASSES = [
   "新規",
   "修正済み",
@@ -126,30 +120,16 @@ export function extractDiffTableHeader(content: string): string[] {
   return [];
 }
 
-function extractRequiredSectionNames(content: string): Set<string> {
-  const names = new Set<string>();
-  const lines = content.split(/\r?\n/);
-  const headingRe = /^(#{1,6})\s+(.+)$/;
-  const markerRe = /<!--\s*【必須】\s*-->/;
-  for (let i = 0; i < lines.length; i++) {
-    const m = lines[i].match(headingRe);
-    if (!m) continue;
-    const isRequired =
-      markerRe.test(lines[i]) ||
-      (i + 1 < lines.length && markerRe.test(lines[i + 1]));
-    if (isRequired) {
-      let name = m[2];
-      const commentIdx = name.indexOf("<!--");
-      if (commentIdx !== -1) name = name.substring(0, commentIdx);
-      names.add(name.trim());
-    }
-  }
-  return names;
-}
-
-describe("REQ-048-015: 検証差分セクションの構造化形式", () => {
+describe("REQ-048-001/002: 検証差分セクションの機械判別可能性と finding 比較", () => {
   const sectionHeading = "## 検証差分";
   const markerRe = /<!--\s*【必須】\s*-->/;
+  const templatesDesignPath = path.join(
+    REPO_ROOT,
+    "docs",
+    "designs",
+    "skills",
+    "agentdev-workflow-templates.md",
+  );
 
   it("PR テンプレートは検証差分セクションを含む", () => {
     expect(readTemplate("pr_desc.md").includes(sectionHeading)).toBe(true);
@@ -162,13 +142,27 @@ describe("REQ-048-015: 検証差分セクションの構造化形式", () => {
     expect(markerRe.test(after)).toBe(true);
   });
 
-  it("テーブルヘッダーは 実行工程・検証種別・検証結果・finding 差分5分類の8列を持つ", () => {
+  it("テーブルヘッダーは Design 現行セット（実行工程・検証種別・検証結果・finding 差分分類）と一致する", () => {
+    // 分類集合は REQ-048-014 のとおり成立条件として固定しない。FINDING_DIFF_CLASSES は
+    // Design が現行ベースラインとして宣言する現行セットとの一致検査に用いる。
     const header = extractDiffTableHeader(readTemplate("pr_desc.md"));
     const expected = ["実行工程", "検証種別", "検証結果", ...FINDING_DIFF_CLASSES];
     expect(header).toEqual(expected);
   });
 
-  it("セクション規約コメントは5分類と初回検証の全 finding 新規扱いを規定する", () => {
+  it("agentdev-workflow-templates Design は検証差分の分類・表形式を現行ベースラインとして宣言する", () => {
+    // 検証差分の具体分類・表形式の変更は REQ-048-012 の実験契約に従い、Design 宣言の更新から
+    // 始められることを機械検査する（REQ-048-008、REQ-048-014 の成立条件非固定の運用担保）。
+    const design = fs.readFileSync(templatesDesignPath, "utf-8");
+    expect(
+      design.includes("## 実行識別情報・検証差分のテンプレートセクション形式"),
+    ).toBe(true);
+    expect(design.includes("現行ベースライン")).toBe(true);
+    expect(design.includes("固定しない")).toBe(true);
+    expect(design.includes("REQ-048-012")).toBe(true);
+  });
+
+  it("セクション規約コメントは finding 差分分類と初回検証の全 finding 新規扱いを規定する", () => {
     const section = extractDiffSection(readTemplate("pr_desc.md"));
     for (const cls of FINDING_DIFF_CLASSES) {
       expect(section.includes(cls)).toBe(true);
@@ -178,7 +172,7 @@ describe("REQ-048-015: 検証差分セクションの構造化形式", () => {
   });
 });
 
-describe("REQ-048-017: 工程間比較の可能性", () => {
+describe("REQ-048-008: 工程間比較の可能性", () => {
   it("セクション規約コメントは同種検証の複数工程実施時の行並びと工程間比較を規定する", () => {
     const section = extractDiffSection(readTemplate("pr_desc.md"));
     expect(section.includes("複数工程")).toBe(true);
@@ -226,7 +220,7 @@ describe("REQ-048-016: 記録先は既存テンプレートと既存正規情報
   });
 });
 
-describe("REQ-048-015/016: Findings セクションとの共存（置換しない）", () => {
+describe("REQ-048-016: Findings セクションとの共存（置換しない）", () => {
   it("PR テンプレートの Findings セクションと intake / learning 小見出しが残存する", () => {
     const content = readTemplate("pr_desc.md");
     expect(content.includes("## Findings/ Capture候補")).toBe(true);
@@ -250,7 +244,7 @@ describe("REQ-048-015/016: Findings セクションとの共存（置換しな�
   });
 });
 
-describe("REQ-048-018: 審議中 finding 状態と修正証跡の所有境界を変更しない", () => {
+describe("REQ-048-008: 審議中 finding 状態と修正証跡の所有境界を変更しない", () => {
   it("templates スキルは対論型レビューの審議中 finding 状態と品質ゲート完了報告の修正証跡の所有境界非変更を明記する", () => {
     const skill = readSourceSkill(
       path.join("agentdev-workflow-templates", "SKILL.md"),
@@ -287,7 +281,7 @@ describe("REQ-048-018: 審議中 finding 状態と修正証跡の所有境界を
   });
 });
 
-describe("REQ-048-015/017: 配布物への適用（case-run / case-close の検証記録指示）", () => {
+describe("REQ-048-008/016: 配布物への適用（case-run / case-close の検証記録指示）", () => {
   it("adapter スキルは PR 本文への検証差分セクション記録を指示する", () => {
     const skill = readSourceSkill(
       path.join("agentdev-case-run-execution-adapter", "SKILL.md"),
@@ -332,19 +326,5 @@ describe("REQ-048-015/017: 配布物への適用（case-run / case-close の検�
     expect(ref.includes("**対応記録コメントへの検証差分記録**")).toBe(true);
     expect(ref.includes("実行工程 case-close の行")).toBe(true);
     expect(ref.includes("新規、修正済み、既出、撤回、無効")).toBe(true);
-  });
-});
-
-describe("REQ-048-019: 既存必須セクションの削減なし", () => {
-  it("PR テンプレートのベースライン必須セクションがすべて残存する", () => {
-    const current = extractRequiredSectionNames(readTemplate("pr_desc.md"));
-    for (const section of PR_BASELINE_REQUIRED_SECTIONS) {
-      expect(current.has(section)).toBe(true);
-    }
-  });
-
-  it("検証差分セクション自体は必須セクションとして登録される", () => {
-    const current = extractRequiredSectionNames(readTemplate("pr_desc.md"));
-    expect(current.has("検証差分")).toBe(true);
   });
 });

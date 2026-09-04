@@ -98,3 +98,13 @@ REQ-057-011 / REQ-057-012 に対する ADF-COVERS 実装対応宣言を、実装
 - 本監査は REQ-057-011 / REQ-057-012 分のみを対象とする。他の REQ 行の宣言付与は OU-016 の段階的付与（残存分の後続 Case 継承）に属する
 - 本監査は REQ/Design の内容判断・修正を行わない。integrity suite スクリプトの実装変更も行わない（残存分 0 件のため変更不要）
 - 検証対応要否カタログ上、REQ-057-001..022 は検証対応任意行である。本監査の検証対応宣言の付与は任意行の枠組みを変更しない
+
+## 7. 既知 fail の解消記録（事後追記、Issue #2600）
+
+§3 に由来分類した fail 2件（`issue_desc_epic.md` / `issue_desc_child.md` の配布物内部 ID（REQ-XXXX 数字つき）検出）は、REQ-048 再構築 Epic #2596 Wave 3（Issue #2600、OU-003 / WP-03）の実行により解消された。本節は解消後の追記であり、§3 本体の監査時点記録を変更しない。
+
+- **解消実行日**: 2026-09-05
+- **解消内容**: `issue_desc_epic.md` / `issue_desc_child.md`（src 原本）から配布物内部 ID（REQ-017-017 の3箇所）を除去し、ID 非依存の表現（実現面投影契約への概念参照）へ変更した。あわせて契約テスト2本（execution_ident_contract.test.ts / verification_diff_contract.test.ts）を anti-shrink 契約（旧 REQ-048-019）の分解廃止（AG-005 合意）に伴い、新 REQ-048 の意図（相関・finding 比較能力の検証）へ再構成した
+- **解消 PR**: #2613
+- **検証結果**: `bun test ./.opencode/skills/repo-agentdev-integrity/scripts/execution_ident_contract.test.ts ./.opencode/skills/repo-agentdev-integrity/scripts/verification_diff_contract.test.ts` で 68 pass / 0 fail / 707 expect() calls（実行環境: worktree `.worktrees/2600-feature`、bun 1.3.6、Windows）
+- **残存既知 fail の更新後一覧**: §3 の fail 2件はすべて解消。§4 の malformed-declarations 1件（`distribution-boundary.test.ts` フィクスチャ文字列由来）は本 Issue の対象外として残存（追跡 Issue 化候補のまま）
