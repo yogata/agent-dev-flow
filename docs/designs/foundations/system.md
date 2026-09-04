@@ -370,6 +370,20 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **Capability依存**: workflow-contracts Design（自動 promote 対象カテゴリ、extension 経由）、`agentdev-git-worktree`、`agentdev-adversarial-review`、`agentdev-project-extensions`。
 - **内部workflow候補**: 分類workflow（STEP-3 + promote/defer/reject）、`--auto` fast path workflow（STEP-4 + カテゴリマッチング + 自動投入）、HITL+永続化workflow（STEP-6〜8）。自動 promote 対象カテゴリと誤検知 revoke 手順は Capability Skill 候補（workflow-contracts Design が所有）。
 
+### `/agentdev/third-party-sync`
+
+- **公開契約**: 対象 Skill 名（省略時全件）、dry-run 指定 → 取得結果報告（対象一覧、取得成否、配置パス、管理外衝突の検出状況。セッション内テキスト出力）。dry-run 指定時は実行予定の計画表示のみで取得・配置の変更は行わない。
+- **主要処理段階**: STEP-1 入力解決 → STEP-2 宣言（skills.yaml）読込と検証、対象選択と管理外衝突の事前判定 → STEP-3 取得実行（third-party Skill 取得専用 Custom Tool 委譲）→ STEP-4 結果検証・報告。
+- **分岐**: 対象指定（個別/全件）、dry-run 指定有無、既存管理外衝突の検出（取得を拒否して報告）、取得失敗時の前状態復元。
+- **副作用**: `.opencode/skills/<name>/` 配下への Skill 取得・配置（非破壊制御は Custom Tool 操作契約が所有）。skills.yaml の編集は行わない。
+- **HITL**: あり（取得・配置を人間確認を開いて実行する。dry-run は確認材料の提供）。
+- **並列性**: 持たない（宣言に基づく逐次取得）。
+- **resume**: STEP model 対象外（取得実行は Custom Tool 操作契約で完結し、失敗時は開始前状態を保持して再実行を可能とする）。
+- **durable state**: `.opencode/skills/<name>/` 配置結果、skills.yaml（宣言データ）。
+- **Harness依存**: git（実行前同期）、Custom Tool（third-party Skill 取得）。
+- **Capability依存**: `agentdev-workflow-third-party-sync`（workflow 本体）、`third-party-skill-management` Design（正規仕様）。
+- **内部workflow候補**: なし（取得実行主体は Custom Tool 操作契約、workflow 制御は `agentdev-workflow-third-party-sync` が所有）。
+
 ### 横断観察（Cross-cutting observations）
 
 - **共通 Harness 依存**: 全 Command が `agentdev-git-worktree`（並列実行安全ステージング、ドメイン状態永続化）、`agentdev-project-extensions`（5セクション読込、fail-open）、`agentdev-conventional-commits`（commit message）に依存する。これらは Capability Skill として横断抽出済み。

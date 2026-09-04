@@ -83,7 +83,7 @@ Issue 作成前に変更影響候補を探索し、scope、完了条件、test s
 draft-data の `realization_actions` を読み取り、Issue / Epic 本文の Execution Contract セクション「実現面の変更方針（realization_actions 由来）」へ投影する。
 req-define が確定した実現面の変更方針（正規所有責務、変更すべき実現面、変更意図、検証との対応）を失わず Issue 本文へ永続化する。case-open 成功後は case-run が Issue 本文だけで変更責務、変更意図、検証方針を取得できる（REQ-017-017）。
 Epic flow では Epic 共通の実現面の変更方針を Epic Issue 本文へ、子 Issue 個別の実現面の変更方針を子 Issue 本文へ投影する。
-`realization_actions` は soft contract（DEC-003）であり、欠落時は当該サブセクションへ「該当なし」を記載して継続する。
+`realization_actions` は soft contract であり、欠落時は当該サブセクションへ「該当なし」を記載して継続する。
 
 #### adversarial-review 発動契約の永続化
 

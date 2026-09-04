@@ -7079,7 +7079,10 @@ function checkDraftSpecStaleness(designsDir: string, root: string): CheckResult[
 
 const IR055_STRICT_PATTERNS: ReadonlyArray<{ name: string; pattern: RegExp }> = [
   { name: "REQ-NNNN-NNN", pattern: /\bREQ-\d{4}-\d{3}\b/g },
-  { name: "REQ-NNNN", pattern: /\bREQ-\d{3,4}\b/g },
+  // OU-003 (Issue #2559): `(?!-\d)` prevents the standalone pattern from
+  // consuming the head token of a `-NNN` sub-item line reference, which the
+  // design IR-055 pattern split treats as a separate pattern, not an ID.
+  { name: "REQ-NNNN", pattern: /\bREQ-\d{3,4}(?!-\d)\b/g },
   { name: "DEC-NNN", pattern: /\bDEC-\d{3}\b/g },
   { name: "ADR-NNNN", pattern: /\bADR-\d{3,4}\b/g },
   { name: "src/opencode/", pattern: /\bsrc\/opencode\//g },
@@ -7119,6 +7122,8 @@ interface Ir055BaselineEntry {
   pattern: string;
   severity: "strict" | "heuristic";
   count: number;
+  classification?: "baseline";
+  reason?: string;
 }
 
 interface Ir055Baseline {
@@ -7388,9 +7393,18 @@ function checkRuntimeUnresolvedReference(root: string): CheckResult[] {
   return results;
 }
 
+const IR055_HEURISTIC_BASELINE_REASON =
+  "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）";
+
 function updateIr055Baseline(root: string): void {
   const violations = collectIr055Violations(root);
   const summary = summarizeIr055Violations(violations);
+  for (const entry of summary.values()) {
+    if (entry.severity === "heuristic") {
+      entry.classification = "baseline";
+      entry.reason = IR055_HEURISTIC_BASELINE_REASON;
+    }
+  }
   const baseline: Ir055Baseline = {
     version: 1,
     rule_id: "IR-055",
