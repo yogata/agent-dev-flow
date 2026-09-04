@@ -116,6 +116,7 @@ export {
   normalizePathToken,
   stripQueryAndFragment,
   isConcreteDocsPath,
+  isAdfCoversDeclarationLine,
   extractOwnerRepo,
   isProducerOwnedUrl,
   detectCandidates,
