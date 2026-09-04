@@ -92,3 +92,21 @@
 - **想定反映先**: agentdev-git-worktree の worktree 作成後手順知識、learning-promote での分類
 - **関連**: PR #2585 本文 Findings セクションからの capture 回収（case-close STEP-6）
 - **タグ**: #worktree #node_modules #bun #environment
+
+---
+
+## 2026-09-04: stdout 証跡 checker 群の多くは CommonJS 形式 API を含み、安定実行経路（ESM import 経由）では ReferenceError で実行不能
+
+- **問題事象**: repo-agentdev-integrity の checker 群の多くが CommonJS 形式 API を含み、`node --experimental-strip-types` の ESM 経路（モジュール import 経由・安定実行経路の標準）では ReferenceError で実行不能であることを実証過程で確認した。`check_distribution_boundary.ts` / `check_extensions.ts` は `require.main === module`（ESM で ReferenceError）、`check_changed_docs.ts` / `check_knowledge_docs.ts` は `require("path")` / `require("fs")` 等を使用。`check_content_corruption.ts`（`import.meta.main` 判定・require 不使用）のみ import 経路で実行可能
+- **発生局面**: case-run 委譲（Issue #2573 / PR #2586、OU-023 stdout 証跡 checker の安定実行経路反映・実行境界実証時）
+- **検知方式**: import 経由での checker 実行実証中の ReferenceError
+- **根本原因**: ESM のモジュール解決では `require` / `require.main` が未定義のため、CommonJS 形式 API を含む checker は import 経路で起動できない
+- **自律対応内容**: import 経路で実行可能な `check_content_corruption.ts` を実行境界実証に使用。CommonJS 形式 checker の CLI 実行は stdout flush 保証を伴う例外経路（bun run + node spawnSync による stdout 分離取得・UTF-8 退避）で運用継続
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/spec影響**: なし（実行環境の互換性情報。安定実行経路と例外経路の契約は checker 実行契約 Design「安定実行経路」節で定義済み）
+- **横展開観点**: 安定実行経路（import 標準）で checker を実行する全 workflow（case-run / case-close / docs-check 系検証）と、新規 checker 実装時の実行経路互換性に共通
+- **再発条件**: `require` / `require.main` を含む checker を import 経由（`node --experimental-strip-types`）で実行する
+- **予防策候補**: 新規 checker は `import.meta.main` 判定 + `node:` 組み込みモジュール import で実装する。既存 checker の ESM 互換化の要否は intake item「checker 群の ESM 互換化候補」で追跡
+- **想定反映先**: docs/knowledge/checker-cli-stdout-loss-on-windows-bun.md の近縁現象追記候補（intake 経由）、checker 実装ガイド、learning-promote での分類
+- **関連**: PR #2586 本文 Findings / Capture候補 セクションからの capture 回収（case-close STEP-6）
+- **タグ**: #checker #esm #node #windows #verification
