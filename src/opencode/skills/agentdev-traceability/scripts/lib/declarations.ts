@@ -32,7 +32,7 @@ export interface DeclarationIssue {
 }
 
 const DECLARATION_RE =
-  /ADF-COVERS\((design|implementation|verification)\):\s*(REQ-\d{3}-\d{3}(?:\s*,\s*REQ-\d{3}-\d{3})*)/;
+  /ADF-COVERS\((design|implementation|verification)\):\s*(REQ-\d{3,4}-\d{3}(?:\s*,\s*REQ-\d{3,4}-\d{3})*)/;
 const ROLE_PROBE_RE = /ADF-COVERS\(([A-Za-z][A-Za-z0-9-]*)\)/;
 
 function isCoverRole(value: string): value is CoverRole {

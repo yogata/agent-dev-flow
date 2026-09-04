@@ -99,6 +99,27 @@ describe("派生 Graph が存在しない状態での3能力の動作（AC-001�
   });
 });
 
+describe("4桁第1セグメント REQ の要件行収集（Issue #2594）", () => {
+  it("4桁 REQ ファイル名と4桁要件行テーブル行を収集する（3桁ファイルも併存受理）", () => {
+    writeFixture("docs/requirements/REQ-0037.md", [
+      "| ID | 要件 |",
+      "|---|---|",
+      "| REQ-0037-001 | 4桁要件1 |",
+      "| REQ-0037-002 | 4桁要件2 |",
+    ]);
+    writeFixture("docs/requirements/REQ-911.md", [
+      "| ID | 要件 |",
+      "|---|---|",
+      "| REQ-911-001 | 3桁要件 |",
+    ]);
+    const known = currentRequirementLineIds(ROOT);
+    expect(known).toContain("REQ-0037-001");
+    expect(known).toContain("REQ-0037-002");
+    expect(known).toContain("REQ-911-001");
+    expect(known).toContain("REQ-910-001");
+  });
+});
+
 describe("旧公開API・旧 Graph 生成物への非依存（AC-009、AC-010、REQ-012-049）", () => {
   it("旧 artifact-graph 実装を import していない", () => {
     let files: string[] = [];

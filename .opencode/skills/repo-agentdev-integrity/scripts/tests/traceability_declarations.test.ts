@@ -48,6 +48,23 @@ describe("対応宣言の解析", () => {
     expect(declarations[2]?.reqIds).toEqual(["REQ-900-003", "REQ-900-004"]);
   });
 
+  it("4桁第1セグメントの宣言行を単一ID・カンマ区切りリストともに解析する（第2セグメントは3桁維持）", () => {
+    const content = [
+      decl("implementation", "REQ-0039-002"),
+      decl("verification", "REQ-0039-002, REQ-1234-011"),
+    ].join("\n");
+    const { declarations, issues } = parseDeclarations("wide.md", content);
+    expect(issues).toEqual([]);
+    expect(declarations).toHaveLength(2);
+    expect(declarations[0]).toEqual({
+      role: "implementation",
+      reqIds: ["REQ-0039-002"],
+      file: "wide.md",
+      line: 1,
+    });
+    expect(declarations[1]?.reqIds).toEqual(["REQ-0039-002", "REQ-1234-011"]);
+  });
+
   it("CRLF 行末でも解析できる", () => {
     const content = decl("implementation", "REQ-900-001").replaceAll("\n", "") + "\r\n" + decl("verification", "REQ-900-001") + "\r\n";
     const { declarations } = parseDeclarations("crlf.md", content);

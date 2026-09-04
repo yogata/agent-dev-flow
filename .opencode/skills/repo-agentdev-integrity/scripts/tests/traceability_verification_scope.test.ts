@@ -157,6 +157,41 @@ describe("範囲表現の展開", () => {
   });
 });
 
+describe("4桁第1セグメントエントリの解析と展開（Issue #2594）", () => {
+  // 既知要件行: REQ-0037-001, 002, 004（003 は欠番）。
+  const KNOWN4: readonly string[] = [
+    "REQ-0037-001",
+    "REQ-0037-002",
+    "REQ-0037-004",
+  ];
+
+  it("4桁単一エントリと説明文後置エントリを malformed-entry にせず解析する", () => {
+    const parsed = parseVerificationScopeCatalog(
+      "## 任意行エントリ\n\n- REQ-0037-001\n- REQ-0037-002: 説明文（後置）\n",
+    );
+    expect(parsed.issues).toEqual([]);
+    expect(parsed.entries.map((e) => e.startId)).toEqual(["REQ-0037-001", "REQ-0037-002"]);
+    const resolved = resolveVerificationScope(parsed.entries, KNOWN4);
+    expect(resolved.issues).toEqual([]);
+    expect([...resolved.optionalReqIds].sort()).toEqual(["REQ-0037-001", "REQ-0037-002"]);
+  });
+
+  it("同一REQファイル内の4桁範囲エントリを4桁のまま展開する", () => {
+    const parsed = parseVerificationScopeCatalog(
+      "## 任意行エントリ\n\n- REQ-0037-001..REQ-0037-004\n",
+    );
+    expect(parsed.issues).toEqual([]);
+    const resolved = resolveVerificationScope(parsed.entries, KNOWN4);
+    expect(resolved.issues).toEqual([]);
+    // REQ-0037-003 は欠番のため登録されない
+    expect([...resolved.optionalReqIds].sort()).toEqual([
+      "REQ-0037-001",
+      "REQ-0037-002",
+      "REQ-0037-004",
+    ]);
+  });
+});
+
 describe("存在しない要件行へのカタログ参照の検出", () => {
   it("未知参照・形式違反を invalid-catalog-refs で検出する", () => {
     writeCatalog([
