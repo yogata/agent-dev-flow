@@ -396,3 +396,21 @@
 - **横展開候補**: agentdev-workflow-orchestration（委譲失敗の記録経路）、agentdev-workflow-case-run（Findings 記録の網羅性）、learning-promote で判定
 - **関連**: Issue 2607 対応記録コメント（case-close STEP-6 学び検知）
 - **タグ**: #github #tool-fallback #pr-create #case-run #case-close
+
+---
+
+## 2026-09-05: check_distribution_boundary.ts は --base-ref を持たず、未定義 flag 付き呼び出しは positional repoRoot 誤解釈の fail-closed になる
+
+- **現象**: check_changed_docs.ts と同じ要領で check_distribution_boundary.ts に `--base-ref main` を渡すと、CLI は未知の flag を無視して `main` を positional repoRoot として解釈し、存在しないパスの読み込みで `fail-closed: distribution targets file is missing` を出して exit 2 となった。エラーメッセージが yaml ファイル欠落を示すため、実際の原因（引数契約の取り違え）と切り分けに一手間必要だった
+- **状況/文脈**: case-close STEP-3 配布依存境界 最終 gate 実行時（Issue 2608 / PR 2621、OU-011 Experiment G3 定義）。targeted docs guard（--base-ref 対応）との契約混同が発端
+- **検知方法**: exit 2 と fail-closed メッセージに対し、同ファイルの存在確認（bun fs.existsSync = true）を行ったことで「パス欠落ではなく引数解釈の問題」と切り分け
+- **根本原因**: checker ごとに CLI 契約が異なる（check_changed_docs.ts は --workflow/--files/--base-ref、check_distribution_boundary.ts は --profile と positional repoRoot のみ）。未知の flag と値の組を CLI がエラーにせず沈黙して位置引数へ混ぜる設計が誤用を検知しにくくする
+- **応急/対応内容**: CLI 契約（usage コメント・ヘルプ）を確認のうえ `--profile source .`（positional repoRoot）で再実行し、既知 baseline（concrete-id 13件、PR 変更ファイルへの検出なし）との一致を確認して gate を完遂
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/spec影響**: なし（checker 実行手順の運用知見。gate は fail-closed どおりの動作）
+- **展開視点**: checker 実行前に usage（ヘルプまたはスクリプト先頭の契約コメント）で flag 集合を確認する手順化が候補。未知 flag の fail-fast 化は checker 側の改善候補
+- **再現条件**: check_distribution_boundary.ts へ `--base-ref` 等の未定義 flag と値を渡した場合（STRIP_VALUE_FLAGS 外の値が positional に混入する）
+- **予防策**: 同系 checker 間で引数形式を推測して流用しない。実行前に `--help` またはスクリプト先頭の CLI 契約コメントで flag 集合を確認する
+- **横展開候補**: repo-agentdev-integrity（checker CLI 契約一覧の整備）、agentdev-quality-gates（checker 実行手順の usage 確認注記）、learning-promote で判定
+- **関連**: Issue 2608 対応記録コメント（case-close STEP-6 学び検知）
+- **タグ**: #checker #cli #distribution-boundary #case-close #verification
