@@ -67,18 +67,18 @@ Issue 本文テンプレートと PR 本文テンプレートに、ADF 実行の
 
 | テンプレート | 記録する識別情報 |
 |---|---|
-| `issue_desc_feature.md` | 対象 Case、ADF 工程、実行単位、前工程で確定した事項 |
-| `issue_desc_bug.md` | 対象 Case、ADF 工程、実行単位、前工程で確定した事項 |
-| `issue_desc_epic.md` | 対象 Case、ADF 工程、実行単位、前工程で確定した事項 |
-| `issue_desc_child.md` | 対象 Case、ADF 工程、実行単位、前工程で確定した事項 |
-| `pr_desc.md` | 対象 Case、PR、実行単位、委譲単位識別子と委譲目的、実行結果 |
+| `issue_desc_feature.md` | 対象 Case、実行単位 |
+| `issue_desc_bug.md` | 対象 Case、実行単位 |
+| `issue_desc_epic.md` | 対象 Case、実行単位 |
+| `issue_desc_child.md` | 対象 Case、実行単位 |
+| `pr_desc.md` | 対象 Case、実行単位、委譲単位識別子 |
 
 #### セクション仕様
 
 - セクション見出しは「実行識別情報」とし、`<!-- 【必須】 -->` マーカー付きの必須セクションとする
 - セクション本文は `adf_` 接頭辞付きの key-value 行（`- adf_{key}: {value}`）で構成する
 - 機械的解析は本セクション内の key-value 行を正とし、自由文中に偶然出現する ID に依存しない
-- 実行単位の識別は execution_unit 構成の既存定義（standard / epic と Issue 番号）に接続し、新規の識別体系を並立させない
+- 実行単位の識別は execution_unit 構成の既存定義に接続し、flow 種別（standard / epic）を記録する。対象 Issue 番号は Issue 番号、Parent 行、Refs 行等の canonical 成果物関係から導出し、重複記録しない
 - 委譲単位識別子は `DEL-{N}-{seq}` 形式（N = Issue 番号、seq = 同一 Issue への委譲連番）とし、ADF が発行する識別子を正規手段とする
 - harness 側識別子（OpenCode session ID 等）は任意キー `adf_harness_ref` に限定し、取得可能な場合の付加情報としてのみ記録する。必須契約としない
 - 識別情報の一部が取得不能な場合は「N/A」と記録し、workflow を停止しない
@@ -88,13 +88,9 @@ Issue 本文テンプレートと PR 本文テンプレートに、ADF 実行の
 
 | key | 対象 | 意味 |
 |---|---|---|
-| `adf_case` | Issue / PR | 対象 Case の Issue 番号（#N） |
-| `adf_phase` | Issue | 当該記録を生成した ADF 工程 |
-| `adf_execution_unit` | Issue / PR | 実行単位（standard:#N または epic:#N） |
-| `adf_upstream_confirmed` | Issue | 前工程で確定した事項（識別子中心） |
-| `adf_pr` | PR | 本 PR の番号（#N） |
-| `adf_delegation` | PR | 委譲単位識別子（DEL-{N}-{seq}）と委譲目的。委譲 prompt から転記 |
-| `adf_result` | PR | 実行結果（result 契約の4状態） |
+| `adf_case` | Issue / PR | 対象 Case の Issue 番号（#N）。Standard flow では本 Issue、Epic flow では親 Epic Issue、PR では関連Issue の番号 |
+| `adf_execution_unit` | Issue / PR | 実行単位の flow 種別（standard / epic）。対象 Issue 番号は canonical 成果物関係（Issue 番号、Parent 行、Refs 行）から導出する |
+| `adf_delegation` | PR | 委譲単位識別子（DEL-{N}-{seq}）。委譲 prompt から転記 |
 | `adf_harness_ref` | Issue / PR | 任意。harness 側識別子。取得可能な場合のみ |
 
 #### 配置規則と適用範囲
@@ -120,7 +116,7 @@ PR 本文テンプレートに、検証の構造化記録を行う「検証差�
 - セクション本文はテーブル形式とし、1行に1検証を記録する
 - 列構成は 実行工程 / 検証種別 / 検証結果 / 新規 / 修正済み / 既出 / 撤回 / 無効 の8列とする
 - 実行工程には検証を実施した ADF 工程（case-run、case-close、レビュー等）を記録する
-- PR 単位の実行結果は「実行識別情報」セクションの `adf_result` が正であり、本セクションは検証単位の実行結果（検証結果）を記録する
+- PR 単位の実行結果（result 契約の4状態）は canonical 成果物関係から判別する（PR の存在が completed-pr、blocked / failed / delegation-unavailable は Issue コメント SSoT）。本セクションは検証単位の実行結果（検証結果）を記録する
 - finding の特定は要約と参照（セクション名、Issue コメント、PR 本文内位置等）で行う
 - 各分類に該当する finding がない場合は「該当なし」と記載する
 

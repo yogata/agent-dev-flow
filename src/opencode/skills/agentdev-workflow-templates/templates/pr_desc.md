@@ -22,10 +22,8 @@ harness 側識別子は取得可能な場合の付加情報に限定し、必須
 識別情報の一部が取得不能な場合は「N/A」と記録し、workflow を停止しない。
 本セクションは新規作成 PR のみに適用し、既存 PR への遡及適用は行わない -->
 - adf_case: （対象 Case の Issue 番号。#N 形式）
-- adf_pr: （本 PR の番号。#N 形式）
-- adf_execution_unit: （実行単位。standard:#N または epic:#N。execution_unit 構成の既存定義に従う）
-- adf_delegation: （委譲単位識別子（DEL-{N}-{seq} 形式。N = Issue 番号、seq = 同一 Issue への委譲連番）と委譲目的。委譲 prompt の委譲識別情報ブロックから転記する）
-- adf_result: （実行結果。result 契約の4状態（completed-pr、blocked、failed、delegation-unavailable）。PR 作成時点は completed-pr と記録する）
+- adf_execution_unit: （実行単位の flow 種別。standard または epic。対象 Issue 番号は「関連Issue」セクションの Refs 行を正として導出する）
+- adf_delegation: （委譲単位識別子（DEL-{N}-{seq} 形式。N = Issue 番号、seq = 同一 Issue への委譲連番）。委譲 prompt の委譲識別情報ブロックから転記する）
 - adf_harness_ref: （任意。harness 側識別子（OpenCode session ID 等）。取得可能な場合のみ記載し、省略できる）
 
 ## 実装内容

@@ -7,9 +7,7 @@ updated: 2026-09-05
 <!-- ADF-COVERS(implementation): REQ-003-021, REQ-003-022, REQ-003-023, REQ-003-055, REQ-003-056 -->
 <!-- ADF-COVERS(implementation): REQ-005-001, REQ-005-002, REQ-005-003, REQ-005-004, REQ-005-025, REQ-005-026, REQ-005-027, REQ-005-028 -->
 <!-- ADF-COVERS(implementation): REQ-014-012 -->
-<!-- ADF-COVERS(implementation): REQ-048-007, REQ-048-014 -->
-<!-- ADF-COVERS(implementation): REQ-048-001, REQ-048-002, REQ-048-003, REQ-048-004, REQ-048-005, REQ-048-015, REQ-048-016 -->
-<!-- ADF-COVERS(implementation): REQ-048-007, REQ-048-014 -->
+<!-- ADF-COVERS(implementation): REQ-048-001, REQ-048-002, REQ-048-003, REQ-048-004, REQ-048-005, REQ-048-007, REQ-048-014, REQ-048-015, REQ-048-016 -->
 
 # ワークフロー契約（横断）
 
@@ -375,20 +373,29 @@ REQ-048-007 の評価対象である。
 ADF 実行の識別情報（対象 Case、GitHub Issue、GitHub PR、ADF 工程、実行単位、実行結果、必要な親子実行関係）の
 記録先を次のとおり一意に定め、工程間で一貫させる。
 
-- Issue 本文: 対象 Case、ADF 工程、実行単位、前工程で確定した事項
-- PR 本文: 対象 Case、PR、実行単位、実行結果、検証種別と検証結果
+- Issue 本文: 対象 Case、実行単位
+- PR 本文: 対象 Case、実行単位、委譲単位識別子、検証種別と検証結果
 - RU / OU: 要件単位・操作単位の識別情報
-- 委譲 prompt（委譲時）: 委譲目的、委譲単位識別子、親子実行関係
+- 委譲 prompt（委譲時）: 委譲単位識別子
 
 識別情報は分析に必要な最小限とし、既存識別体系と並行する新しい識別体系を設けない。既存成果物または
 成果物間関係から一意に導出できる値を識別情報として重複記録しない（REQ-048-001）。識別情報は機械的に
 判別できる形式とし、自由文中に偶然出現する識別子のみを対応付けの根拠にしない（REQ-048-002）。
 
-現在の adf_* field 集合（adf_case、adf_phase、adf_execution_unit、adf_upstream_confirmed、adf_pr、
-adf_delegation、adf_result、任意 adf_harness_ref、委譲 <delegation-ident> ブロック）は現行ベースラインであり、
+現在の adf_* field 集合（adf_case、adf_execution_unit、adf_delegation、任意 adf_harness_ref、
+委譲 <delegation-ident> ブロックの adf_delegation_id）は現行ベースラインであり、
 REQ-048 の成立条件として固定しない。field の縮小は、導出可能性監査（canonical 成果物関係から一意に導出
 できる、runtime / downstream が明示値へ依存しないまたは canonical derivation へ置換できる、hard governance
 不変条件を失わない、correlation capability を失わない、の全条件成立）に基づき実施する。
+
+adf_case と adf_execution_unit の対象 Issue 番号は canonical 成果物関係から導出する。Standard Issue では
+本 Issue の番号、Epic flow の子 Issue では本文冒頭の Parent 行と本子 Issue の番号、PR では「関連Issue」の
+Refs 行を正とする。adf_execution_unit は flow 種別（standard / epic）を記録し、Epic / Standard の判別は
+テンプレート種別と Parent 関係から機械判別できる。導出可能な固定値、自己参照値、同値 key（adf_phase、
+adf_upstream_confirmed、adf_pr、adf_result、委譲ブロックの adf_parent、adf_child）は field 集合から
+除去する。委譲目的は処理区分評価へ統合し、親子実行関係は委譲単位識別子と構造化文脈から導出する。
+PR の実行結果（result 契約の4状態）は PR の存在（completed-pr）と Issue コメント（blocked、failed、
+delegation-unavailable）から判別する。
 
 実行単位の識別は epic-wave-model Design の execution_unit 構成の既存定義に接続する。親子実行関係は ADF が
 発行する委譲単位・実行単位識別子を正規手段とし、harness 側識別子（OpenCode session ID 等）は取得可能な

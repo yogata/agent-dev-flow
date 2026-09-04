@@ -45,11 +45,10 @@ case-run は実行担当サブエージェントを委譲起動する。
 ### PR 作成
 
 実行担当サブエージェントは実装完了後、`agentdev_gh` の pr_create 操作で PR を作成する。
-PR 本文には Issue 番号（`Refs: #N`）と実行識別情報セクション（対象 Case、PR、実行単位、委譲単位識別子と委譲目的、実行結果。`agentdev-workflow-templates` の実行識別情報セクション規約参照）を含める。
+PR 本文には Issue 番号（`Refs: #N`）と実行識別情報セクション（対象 Case、実行単位、委譲単位識別子。`agentdev-workflow-templates` の実行識別情報セクション規約参照）を含める。
 併せて検証差分セクション（実行工程、検証種別、検証結果、finding 差分の5分類: 新規、修正済み、既出、撤回、無効。`agentdev-workflow-templates` の検証差分セクション規約参照）を含める。
 実行担当サブエージェントは実施した各検証（test strategy 項目検証、bun test フル suite、配布依存境界 gate、targeted docs guard、トレーサビリティ check、品質ゲート等）ごとに検証差分セクションへ実行工程 case-run の行として記録する。
-委譲 prompt の委譲識別情報ブロック（`<delegation-ident>`）の値を `adf_delegation` へ転記する。
-PR 作成時点で番号が確定しない自己参照値 `adf_pr` は、PR 作成の応答で確定した PR 番号を PR 本文更新（`agentdev_gh` の操作に準じる）で埋め戻す。
+委譲 prompt の委譲識別情報ブロック（`<delegation-ident>`）の委譲単位識別子を `adf_delegation` へ転記する。
 委譲 prompt 内 実行 command の品質ゲート（code review + QA review + gate review）を通過した PR のみが作成される。
 
 ### URL 受領
@@ -99,9 +98,6 @@ case-run が実行担当サブエージェントを起動する際の委譲プ�
 
 <delegation-ident>
 - adf_delegation_id: DEL-{N}-1
-- adf_delegation_purpose: implementation（Issue #N の実装・検証・PR 作成の委譲）
-- adf_parent: case-run @ standard:#N（親実行: ADF 工程 case-run、実行単位 standard:#N）
-- adf_child: DEL-{N}-1（子実行: 本委譲）
 </delegation-ident>
 
 <structured_context>
@@ -136,7 +132,7 @@ plan_change: なし（委譲中に計画変更が生じた場合は result に�
 ```
 
 - `<execution-command> Implement Issue #N:`: 委譲 prompt 内で実行 command を起動し、Issue #N の実装を指示する
-- `<delegation-ident>`: 委譲識別情報ブロック。委譲目的、委譲単位識別子、親子実行関係を記録する（後述「委譲識別情報ブロック」参照）
+- `<delegation-ident>`: 委譲識別情報ブロック。委譲単位識別子を記録する（後述「委譲識別情報ブロック」参照）
 - `<structured_context>`: 構造化文脈（10意味）の直列化ブロック。後述「構造化文脈の直列化（委譲時）」の形式に従う
 - `<worktree>`: case-run が用意した worktree root とブランチ名を明示。メインリポジトリパスは含めない
 - `<Issue body>`: 対象 Issue の本文。実行担当サブエージェントは完了条件、受け入れ基準を success criteria に分解する
@@ -144,17 +140,16 @@ plan_change: なし（委譲中に計画変更が生じた場合は result に�
 ## 委譲識別情報ブロック
 
 委譲 prompt には `<delegation-ident>` ブロックとして委譲識別情報を記録する。
-記録先割当は workflow-contracts Design「ADF 実行識別情報の記録契約」に従い、委譲 prompt が委譲目的、委譲単位識別子、親子実行関係の記録先となる。
+記録先割当は workflow-contracts Design「ADF 実行識別情報の記録契約」に従い、委譲 prompt が委譲単位識別子の記録先となる。
 
 | key | 意味 |
 |---|---|
 | `adf_delegation_id` | 委譲単位識別子。`DEL-{N}-{seq}` 形式（N = Issue 番号、seq = 同一 Issue への委譲連番。初回委譲は 1、再委譲ごとに増分）。case-run が発行する ADF 発行識別子であり、親子実行関係識別の正規手段とする |
-| `adf_delegation_purpose` | 委譲目的（implementation、review 等） |
-| `adf_parent` | 親実行。ADF 工程と実行単位（例: `case-run @ standard:#N`） |
-| `adf_child` | 子実行。本委譲の委譲単位識別子（`DEL-{N}-{seq}`） |
 
+- 親子実行関係は委譲単位識別子と委譲 prompt の構造化文脈から導出する（親実行: ADF 工程 workflow_phase の対象 Issue 実行。子実行: 本委譲単位識別子）。導出可能な親子表示を重複記録しない
+- 委譲目的は委譲 prompt 内の実行 command 指定と category で表現される（処理区分の正規記録先）。委譲目的を独立した識別 key として重複記録しない
 - 親子実行関係の識別は ADF が発行する委譲単位・実行単位識別子を正規手段とし、harness 側識別子（OpenCode session ID 等）は取得可能な場合の付加情報に限定する
-- 実行担当サブエージェントは PR 作成時、PR 本文の実行識別情報セクション（`agentdev-workflow-templates` の実行識別情報セクション規約参照）の `adf_delegation` へ委譲単位識別子と委譲目的を転記する。これにより委譲実行と PR の対応付けが機械的に可能になる
+- 実行担当サブエージェントは PR 作成時、PR 本文の実行識別情報セクション（`agentdev-workflow-templates` の実行識別情報セクション規約参照）の `adf_delegation` へ委譲単位識別子を転記する。これにより委譲実行と PR の対応付けが機械的に可能になる
 - 委譲識別情報の一部が取得不能・発行不能でも委譲を停止しない。欠落値は `N/A` とする
 
 ## 構造化文脈の直列化（委譲時）

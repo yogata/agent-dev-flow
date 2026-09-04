@@ -110,13 +110,11 @@ Issue 本文生成時に、実行識別情報セクションへ次の値を記�
 セクション形式、key 一覧、機械的解析規則は `agentdev-workflow-templates` の実行識別情報セクション規約に従う。
 
 - **adf_case**: 対象 Case の Issue 番号。Standard flow では生成中の本 Issue、Epic flow では親 Epic Issue の番号を記録する
-- **adf_phase**: `case-open` を記録する（当該記録を生成した ADF 工程）
-- **adf_execution_unit**: 処理対象の実行単位。standard flow では `standard:#N`（本 Issue）、Epic flow では Epic Issue に `epic:#N`、子 Issue に `standard:#N`（当該子 Issue）を記録する
-- **adf_upstream_confirmed**: 前工程で確定した事項を識別子中心で記録する（req-save/design-save の commit SHA、確定済み REQ/Decision/Design の識別子）。bugfix 等で前工程がない場合は `N/A` と記録する
+- **adf_execution_unit**: 処理対象の実行単位の flow 種別。standard flow では `standard`、Epic flow では Epic Issue に `epic`、子 Issue に `standard` を記録する。対象 Issue 番号は本 Issue の番号を正として導出する
 - **adf_harness_ref**: 任意。harness 側識別子は取得可能な場合のみ記録し、必須契約としない
 
 識別情報の一部が取得不能でも本 STEP を停止せず、欠落値には `N/A` を記録する。
-本文生成時点で番号が確定しない自己参照値（Standard Issue の `adf_case` と `adf_execution_unit`、子Issue の `adf_execution_unit`）はプレースホルダのまま作成し、STEP-5 の作成後埋め戻し（issue-creation-flows 参照）で確定番号へ置換する。
+本文生成時点で番号が確定しない自己参照値（Standard Issue の `adf_case`）はプレースホルダのまま作成し、STEP-5 の作成後埋め戻し（issue-creation-flows 参照）で確定番号へ置換する。
 本セクションは新規作成 Issue のみに適用し、既存 Issue 本文への遡及適用は行わない。
 実行識別情報の記録先割当は workflow-contracts Design「ADF 実行識別情報の記録契約」に従う。
 
