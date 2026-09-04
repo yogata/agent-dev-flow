@@ -148,7 +148,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-041 | retired-req-broken-link | REQ-001-063 | integrity-contracts.md |
 | IR-042 | hardcoded-req-count | REQ-001 | integrity-contracts.md |
 | IR-043 | retired-readme-coverage | REQ-001 | integrity-contracts.md |
-| IR-044 | REQ/Design 境界違反検出 | REQ-001-002, REQ-001-003, REQ-001-067, REQ-001-068, REQ-010-002, REQ-010-012, REQ-001-031 | integrity-contracts.md, document-model.md |
+| IR-044 | REQ/Design 境界違反検出 | REQ-001-002, REQ-001-003, REQ-001-067, REQ-001-068, REQ-010-002, REQ-010-012, REQ-001-049 | integrity-contracts.md, document-model.md |
 | IR-046 | consumer-generated リポジトリ種別誤検知防止 | REQ-009-007, REQ-009-011, REQ-009-014 | runtime-package-boundary.md |
 | IR-047 | src/opencode-local/ link 先原本領域ディレクトリ構成 | REQ-009-003, REQ-009-004, REQ-009-005, REQ-009 | runtime-package-boundary.md |
 | IR-048 | generated_by 識別子整合性 | REQ-009-011, REQ-009-012, REQ-009-013 | runtime-package-boundary.md |

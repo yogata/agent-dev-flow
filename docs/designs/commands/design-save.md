@@ -162,7 +162,7 @@ Design operation の公式 enum は `create` / `append` / `update` の3値であ
 
 ### search-target-area.ts 契約
 
-target_area 見出し検索は `agentdev-design-file-manager/scripts/src/search-target-area.ts`（Design 固有決定的処理）へ委譲する（REQ-0136-029）。
+target_area 見出し検索は `agentdev-design-file-manager/scripts/src/search-target-area.ts`（Design 固有決定的処理）へ委譲する（v2:REQ-0136-029）。
 本 script は次の契約に従う。
 
 - 見出し行全体との完全一致のみを受け付ける。前方一致、後方一致、部分一致は受け付けない

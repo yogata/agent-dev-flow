@@ -90,7 +90,7 @@ if (-not (Test-Path -LiteralPath $installScript)) {
 }
 
 # Trusted host checker (NOT the candidate copy inside the archive). Per
-# REQ-0145-014 / integrity-contracts.md "release profile", the host checker
+# v2:REQ-0145-014 / integrity-contracts.md "release profile", the host checker
 # is the authority; the archive copy ships for consumer install but is not
 # trusted to validate itself.
 $boundaryChecker = Join-Path $repoRoot ".opencode\skills\repo-agentdev-integrity\scripts\check_distribution_boundary.ts"
