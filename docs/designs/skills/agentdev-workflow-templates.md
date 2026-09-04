@@ -155,7 +155,7 @@ Issue 本文に次のセクションを必須とする（新規作成時）。
 - 監査値（bun test 件数・検出件数等）には計測基準（基準 commit または時点）を併記する
 
 ### 関連 Decision 拘束条件
-- （該当 ADR と完了条件/test strategy への反映）
+- （該当 Decision と完了条件/test strategy への反映）
 
 ### scope-affecting impact candidate
 - （case-open が事前探索した候補）

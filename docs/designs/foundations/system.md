@@ -332,7 +332,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 
 - **公開契約**: なし（全対象成果物を自動スキャン） → 診断結果（セッション内 + `.agentdev/inspect/inbox/inspect-docs-finding-*.md`）。診断専用、検査対象を直接修正しない。
 - **主要処理段階**: STEP-1 スキャン対象収集 → STEP-2 REQ体系・文書種別別意味診断（REQ参照ID整合性、第一参照導線、現行/廃止/世代境界、REQ/Decision/Design/guides/README 意味診断、REQ structure review 6観点、文書分類一貫性検査）→ STEP-3 配布物整合性検査・docs-check route判定（未処理artifact確認）→ STEP-4 検出事項出力・実行前同期・commit/push・完了報告。
-- **分岐**: スキャン対象ディレクトリ存在/不存在、ファイル読込失敗、source-of-truth priority（現行REQ > 承認済みADR > Design > guides）、NG分類（false positive/pre-existing/今回修正対象）、inspect-* routing（docs vs skills vs 両方）。
+- **分岐**: スキャン対象ディレクトリ存在/不存在、ファイル読込失敗、source-of-truth priority（現行REQ > 承認済みDecision > Design > guides）、NG分類（false positive/pre-existing/今回修正対象）、inspect-* routing（docs vs skills vs 両方）。
 - **副作用**: `.agentdev/inspect/inbox/inspect-docs-finding-*.md` 生成、`.agentdev/inspect/` 配下 commit/push（`chore(agentdev): capture inspect-docs finding`）。ファイル変更/作成/削除（finding 生成の例外を除く）、Issue/PR 作成、worktree、intake/learning/RU は禁止。
 - **HITL**: なし（診断専用、検出事項を提示するのみ）。source-of-truth priority は機械的。
 - **並列性**: 明示的並列モデルは持たない（全対象スキャン、検査項目は順次）。

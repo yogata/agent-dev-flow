@@ -31,7 +31,7 @@ adapter skill 経由での委譲起動、委譲 prompt 内で実行 command を�
 case-run (orchestration)
   └── adapter skill を読み込んだ実行担当サブエージェントへ委譲（委譲 prompt 内で実行 command を指定）
         ├── Issue 本文・受け入れ基準読込（実行 command が success criteria に分解）
-        ├── ADR / REQ / Design / docs / repository context 再確認
+        ├── Decision / REQ / Design / docs / repository context 再確認
         ├── 実行 command による evidence-backed 実装・品質ゲート（code review + QA review + gate review）
         ├── test strategy 項目の test-fix ループ（項目ごと検証、不合格時 fix-and-reverify / record-in-findings、全項目処理まで反復）
         ├── blocker 処理
@@ -61,7 +61,7 @@ harness execution mechanism は本 SKILL の規範対象外とし、`references/
 実行担当サブエージェントは以下を順に実行する:
 
 1. **Issue 読込**: 対象 Issue 本文、受け入れ基準を読み込む。実行 command が Issue を success criteria に分解する
-2. **context 再確認**: ADR/ REQ/ Design/ docs/ repository context を再確認し、実装が既存の決定事項に矛盾しないことを担保する。
+2. **context 再確認**: Decision/ REQ/ Design/ docs/ repository context を再確認し、実装が既存の決定事項に矛盾しないことを担保する。
 Issue 本文の Execution Contract セクションに投影された実現面の変更方針（realization_actions 由来）は既確定契約として消費し、実現責務・変更意図・検証方針を再決定せず、その範囲内の内部実装方針だけを決定する（REQ-017-017）。
 トレーサビリティ能力（`agentdev-traceability` の coverage）を、対象要件と正規成果物の既存の対応関係確認に利用できる。
 問い合わせ結果は候補提供であり最終判断としない、新規の依存関係、実行構成、Wave 構成、実行順序の設計には使用しない、機能の不在、実行失敗、空結果、候補過多の場合は README 索引、正規成果物の直接読取、`rg` 等の代替探索で継続する（fail-open）
@@ -72,7 +72,7 @@ PR 本文には検証差分セクション（実行工程、検証種別、検�
 PR 作成前に `agentdev-traceability` の check を実行し、対象要件の実装対応、検証対応、対応宣言の整合性を検査する。check の不合格が承認済み対象範囲内で修正可能な場合は修正して再検証し、要件変更、対象範囲拡大、追加設計判断、外部依存解消が必要な場合は blocked として判断事項を報告する。
 ハーネスの plan artifact 等の中間成果物は解釈せず、PR URL で最終結果を受領する。
 実装完了後、test strategy 項目の test-fix ループ（後述）を実行する
-4. **blocker 処理**: 回答可能な blocker（ADR/REQ/Design/docs/Issue本文で回答できるもの）は自律的に実行 command 内で再評価できる
+4. **blocker 処理**: 回答可能な blocker（Decision/REQ/Design/docs/Issue本文で回答できるもの）は自律的に実行 command 内で再評価できる
 5. **result 返却**: 後述の result 契約に従い case-run へ返却する
 
 ## test strategy 項目の test-fix ループ（REQ）
@@ -150,7 +150,7 @@ capture 境界の詳細は `agentdev-workflow-orchestration` を参照。
 外部実行基盤の結果は **PR URL** で受領する（透明）。
 plan artifact 等の中間成果物の内部構造には依存しない。
 実行担当サブエージェントは中間成果物の内部構造に依存した処理、検証を行わず、result 契約（4状態）のみで接合する。
-AgentDevFlow の永続状態は既存の draft/ Issue/ PR/ REQ/ ADR/ Design に限定し、中間成果物を永続状態として扱わない。
+AgentDevFlow の永続状態は既存の draft/ Issue/ PR/ REQ/ Decision/ Design に限定し、中間成果物を永続状態として扱わない。
 
 ## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
 
@@ -206,7 +206,7 @@ STEP reference 8 要素は `<workflows/step-reference-contract>` Design 参照�
 
 | 契約 | 要件 | 概要 |
 |---|---|---|
-| 実装方針の形成と限定 | REQ-{NNNN}-{NNN} | 委譲内で既確定 Issue/REQ/ADR/Design を実現する内部選択として実装方針を形成する。case-run 本体は形成しない |
+| 実装方針の形成と限定 | REQ-{NNNN}-{NNN} | 委譲内で既確定 Issue/REQ/Decision/Design を実現する内部選択として実装方針を形成する。case-run 本体は形成しない |
 | 実施位置 | REQ-{NNNN}-{NNN} | 最初の実装変更前に実施する（実装、検証、PR 作成より前） |
 | 委譲内 review 呼出 | REQ-{NNNN}-{NNN}/{NNN} | adapter 委譲内で実行担当サブエージェントが発動条件判定（ユーザー明示指定）と review 呼出を分離して実施する |
 | blocked 遷移（実装方針限定違反） | REQ-{NNNN}-{NNN} | 実装方針が既確定文書の変更、追加、撤回を必要とする場合は blocked へ遷移する |

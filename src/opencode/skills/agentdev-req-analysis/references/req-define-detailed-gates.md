@@ -10,8 +10,8 @@ req-define が要件 doc を生成する際の詳細ゲートを定義する。
 - [分類ゲート](#分類ゲート)
 - [文書分類妥当性検証](#文書分類妥当性検証)
 - [SPLIT 予兆計算](#split-予兆計算)
-- [ADR 禁止ゲート](#adr-禁止ゲート)
-- [ADR 判断根拠の記録](#adr-判断根拠の記録)
+- [Decision 禁止ゲート](#decision-禁止ゲート)
+- [Decision 判断根拠の記録](#decision-判断根拠の記録)
 - [複数 RU 処理](#複数-ru-処理)
 - [Epic 規模記録](#epic-規模記録)
 
@@ -22,7 +22,7 @@ req-define が要件 doc を生成する際の詳細ゲートを定義する。
 3. 限定探索を行う。
 対象は `docs/designs/**`、`docs/requirements/**`、`docs/decisions/**`、`docs/README.md`、`.opencode/commands/**`、`.opencode/skills/**` とする。
 4. 探索結果を直接矛盾/ 更新候補/ 影響なしに分類する。
-5. REQ だけでなく ADR/ Design/ guides/ commands/ skills への影響候補を明示する。
+5. REQ だけでなく Decision/ Design/ guides/ commands/ skills への影響候補を明示する。
 6. 結果をドラフトに保持する。
 
 この step は要求定義時の局所的な影響候補抽出であり、`/agentdev/inspect-docs` の全体意味レビューの代替ではない。
@@ -120,10 +120,10 @@ split-forecast:
 APPEND を継続する場合はその理由をドラフトに明記する。
 新規 CREATE のドラフトで要件行数が 51 行を超える場合も肥大化傾向としてユーザーへ提案する。
 
-## ADR 禁止ゲート
+## Decision 禁止ゲート
 
-ADR 候補を提示する前に、REQ/ Design 相当判定を行う。
-以下に該当する場合、ADR 候補から除外し、REQ/ Design 更新候補として整理する。
+Decision 候補を提示する前に、REQ/ Design 相当判定を行う。
+以下に該当する場合、Decision 候補から除外し、REQ/ Design 更新候補として整理する。
 
 1. 仕様変更のみを含み、技術的決定がない。
 2. command 動作仕様の定義である。
@@ -139,9 +139,9 @@ ADR 候補を提示する前に、REQ/ Design 相当判定を行う。
 - schema、path、lifecycle: Design 更新候補
 - 方針、ガイドライン: guide 更新候補
 
-## ADR 判断根拠の記録
+## Decision 判断根拠の記録
 
-ADR 判断後、判断根拠をドラフトに保存する。
+Decision 判断後、判断根拠をドラフトに保存する。
 記録項目は判断結果、適用基準、根拠事実を含める。
 
 ## 複数 RU 処理

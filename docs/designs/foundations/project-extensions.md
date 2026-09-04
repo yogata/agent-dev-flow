@@ -172,7 +172,7 @@ checks:
 
 command/skill 本文には、Decision/REQ/Design の具体ID、具体パス、固定URLを記述しない。
 
-禁止対象は文書種別名としての ADR, REQ, Design ではなく、プロジェクト固有文書を直接指す具体参照である。
+禁止対象は文書種別名としての Decision, REQ, Design ではなく、プロジェクト固有文書を直接指す具体参照である。
 
 .agentdev/extensions/** は、そのプロジェクトの Decision/REQ/Design 参照を許可する。
 REQ/Decision/Design 本文内の参照も許容する。

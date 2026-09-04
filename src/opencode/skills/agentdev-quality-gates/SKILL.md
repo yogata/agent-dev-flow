@@ -45,7 +45,7 @@ AgentDevFlow 主ワークフローの品質ゲート QG-1〜QG-4 の判定基準
 
 ### QG-3 と docs 全体レビューの関係
 
-QG-3 は実装と Issue/ REQ/ ADR/ Design/ work plan の乖離検出ゲートであり、docs 全体の意味レビューの代替ではない。
+QG-3 は実装と Issue/ REQ/ Decision/ Design/ work plan の乖離検出ゲートであり、docs 全体の意味レビューの代替ではない。
 docs 全体の意味レビューは `/agentdev/inspect-docs` が担う。
 
 ### case-update 連携

@@ -14,13 +14,13 @@ req-define が要件を確定する前にアーキテクチャ上の影響を確
 
 ## 適用対象
 
-- req-define Step 4（要件展開）後、Step 5（ADR 判断）前
-- 既存 REQ/Decision/Design との衝突可能性、ADR 作成候補、責務境界変更候補がある場合
+- req-define Step 4（要件展開）後、Step 5（Decision 判断）前
+- 既存 REQ/Decision/Design との衝突可能性、Decision 作成候補、責務境界変更候補がある場合
 - 外部アーキテクチャ助言エージェント（oracle）の接続点
 
 ## 提供する判断、操作
 
-- 推奨方針、設計リスク、ADR 要否判断、Design 分離候補、衝突解消方針、根拠ファイル、確信度の提供
+- 推奨方針、設計リスク、Decision 要否判断、Design 分離候補、衝突解消方針、根拠ファイル、確信度の提供
 - 助言内容を4分類に振り分け: 確定事項（confirmed）/ 推定事項（inferred）/ ユーザー確認事項（user-decision）/ ブロッカー（blocker）
 
 ## 参照する references
@@ -33,13 +33,13 @@ req-define が要件を確定する前にアーキテクチャ上の影響を確
 - 外部助言エージェントが利用できない場合はブロッカーとして報告
 - アーキテクチャ助言サブエージェントはファイル編集主体ではない（REQ-003-003）
 - 相談入力: 要件候補、既存 REQ/Decision/Design の矛盾候補、Decision 候補、Design 候補、責務境界変更、未解決分岐、具体質問
-- 助言出力: 推奨方向、主要な設計リスク、ADR create/update/unnecessary 判断、Design 分離候補、矛盾解消提案、根拠参照、確信度
+- 助言出力: 推奨方向、主要な設計リスク、Decision create/update/unnecessary 判断、Design 分離候補、矛盾解消提案、根拠参照、確信度
 
 ## 対象外
 
 - 実装実行（case-run 責務）
 - 実行計画確認（momus 責務）
-- ADR 判断の確定、記録（req-define 親エージェント責務）
+- Decision 判断の確定、記録（req-define 親エージェント責務）
 - ファイル編集
 
 ## 検証観点

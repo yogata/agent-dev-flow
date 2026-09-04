@@ -1,6 +1,6 @@
 # QG-2: Acceptance Criteria Coverage Gate
 
-case-open で Issue を作成する前に、Issue の完了条件が対象 REQ/ADR/Design の必達要件を網羅しているかを検証する Gate。
+case-open で Issue を作成する前に、Issue の完了条件が対象 REQ/Decision/Design の必達要件を網羅しているかを検証する Gate。
 本ファイルは QG-2 の判定基準、検査観点を定義する。
 共通契約は [common-gate-contract.md](common-gate-contract.md) を参照。
 
@@ -20,13 +20,13 @@ case-open で Issue を作成する前に、Issue の完了条件が対象 REQ/A
 - **warn**: 対応づけはあるが、1 つのチェックボックスが複数要件を混在させている。
 - **pass**: 各必達要件が少なくとも 1 つの完了条件チェックボックスに traceable に対応づけられている。
 
-### 2. ADR 決定事項の反映
+### 2. Decision 決定事項の反映
 
-関連 ADR の決定事項（アーキテクチャ上の制約）が完了条件に反映されているか。
-実装が ADR に矛盾しないことを確認できる完了条件が含まれるか。
+関連 Decision の決定事項（アーキテクチャ上の制約）が完了条件に反映されているか。
+実装が Decision に矛盾しないことを確認できる完了条件が含まれるか。
 
-- **warn**: ADR が関連するが完了条件に反映が見られない。
-- **pass**: 関連 ADR が存在しない、または決定事項が完了条件に反映されている。
+- **warn**: Decision が関連するが完了条件に反映が見られない。
+- **pass**: 関連 Decision が存在しない、または決定事項が完了条件に反映されている。
 
 ### 3. Design 適合性の完了条件化
 

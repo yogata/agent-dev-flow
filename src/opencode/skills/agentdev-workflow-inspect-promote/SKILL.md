@@ -86,7 +86,7 @@ inspect-promote workflow は次の8 STEP で構成する。
 - **HITL 承認必須**: 自動 promote 対象（`--auto`）と自律確定対象（次節の詳細判定表に従う）を除き、ユーザーの明示的な承認なしに採用済み成果物を生成しない（`POL-promoted-artifact-requires-approval`）
 - **reject は即時削除**: `archive/rejected/` への移動は廃止。即時削除以外の取扱を禁止し、reject 時の commit message に却下理由を含める（command 不変条件）
 - **defer は inbox 残置**: defer となった検出事項を `.agentdev/inspect/inbox/` から移動しない（command 不変条件）
-- **`--auto` は明示 opt-in の場合のみ有効**: 省略時は自動 promote を一切行わない。自動 promote 対象は workflow-contracts Design（extension 経由）が定義する高確信度カテゴリのみとし、意味判断、曖昧な分類、ADR 要否判断を含む検出事項は手動分類へ回す（command 不変条件）
+- **`--auto` は明示 opt-in の場合のみ有効**: 省略時は自動 promote を一切行わない。自動 promote 対象は workflow-contracts Design（extension 経由）が定義する高確信度カテゴリのみとし、意味判断、曖昧な分類、Decision 要否判断を含む検出事項は手動分類へ回す（command 不変条件）
 - **実行ログ**: `--auto` 実行の都度、投入対象、根拠を `.agentdev/inspect/promoted/auto-promote-log.md` に記録する（command 不変条件）
 - **adversarial-review は任意助言手段**: 必須工程、QG、承認ゲート、統制ゲートとして導入しない。呼出失敗時は silent skip を禁止し、従来フロー（HITL 確定）を維持する
 

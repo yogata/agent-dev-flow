@@ -23,7 +23,7 @@ inspect-docs command は本スキルが定める schema に従い検出事項を
 |-----------|------|------|
 | id | 検出事項の一意識別子（セッション内連番または `{category}-{n}` 形式） | 必須 |
 | category | 横断診断カテゴリ（`diagnostic-categories.md` 参照）またはルーティング元の専門診断観点 | 必須 |
-| target | 対象ファイルパス、REQ ID、ADR ID、Design パス等の識別子 | 必須 |
+| target | 対象ファイルパス、REQ ID、Decision ID、Design パス等の識別子 | 必須 |
 | evidence | 根拠となる参照、本文要約、検出シグナルの具体的内容 | 必須 |
 | severity | 重要度（後述 severity 分類） | 必須 |
 | confidence | 確信度（後述 信頼度） | 必須 |
@@ -44,7 +44,7 @@ inspect-docs command は本スキルが定める schema に従い検出事項を
 
 - retired REQ/Design 由来記述が「現行判断の根拠」として使われている場合は high
 - REQ/Design 境界違反（Design 分離基準違反シグナル）は high-specificity signal につき、1シグナルでも原則 high（安定契約例外候補の場合は medium に下げる）
-- 横断契約矛盾で上位文書（REQ、承認済み ADR）を正として下位文書が矛盾する場合は high
+- 横断契約矛盾で上位文書（REQ、承認済み Decision）を正として下位文書が矛盾する場合は high
 - 配布物の存在しない command 参照は README listing と command 本文の相互参照で実在確認に基づき機械的に判定可能、配布物汚染に近い影響を持つため high
 - 配布物のエンコーディング不整合（UTF‑8 BOM 付き、CRLF/LF 混在）は機械的に一意に判定可能であり、配布物の文字化けや表示崩れを生じ得るため medium 以上
 - 文意品質、「旧名称残存」等の局所的問題は medium または low
@@ -119,7 +119,7 @@ NG 分類は recommended_route とは別軸で付ける。
 矛盾判定時の優先順位。
 
 1. 現行 REQ（`docs/requirements/<REQ-*>.md`、retired/ 配下を除く）
-2. 承認済み ADR（`status: accepted` の ADR）
+2. 承認済み Decision（`status: accepted` の Decision）
 3. Design（`* Design`）
 4. guides（補助文書）
 

@@ -119,7 +119,7 @@ Epic Issue 本文（永続状態）に書き込まれるステータス値は `p
 
 ## PR merge 前後のEpic状態遷移
 
-Epic Issue 本文（永続状態）の書き込みは case-close(#epic) のみが行う（単一書き手、ADR）。
+Epic Issue 本文（永続状態）の書き込みは case-close(#epic) のみが行う（単一書き手、Decision）。
 `ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文には書き込まれない。
 
 **case-run(#epic) 実行中（merge前、Epic Issue 本文不変）**:

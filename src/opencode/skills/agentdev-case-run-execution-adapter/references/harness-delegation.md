@@ -234,7 +234,7 @@ adapter skill 経由の委譲は、case-run に限らず subagent 委譲する�
 
 ### `writing` category の発火スキルとの相互作用
 
-`writing` category は執筆作業（docs 記述、article 作成、REQ/ ADR/ Design 本文執筆等）を想定した category であり、文章規範等の発火スキルと結合する設計である（文章規範の正規参照点は `agentdev-doc-writing`）。
+`writing` category は執筆作業（docs 記述、article 作成、REQ/ Decision/ Design 本文執筆等）を想定した category であり、文章規範等の発火スキルと結合する設計である（文章規範の正規参照点は `agentdev-doc-writing`）。
 事務的手続きの委譲に `writing` を使用すると、subagent が発火スキルの文書監査・校正的振る舞いに引きずられ、本来責務（Issue 作成、VERIFY、状態遷移等）から逸脱するリスクがある。
 
 Issue #1538 では case-auto から case-open を `category=writing` で委譲した際、subagent が文書監査ファイル生成（`japanese-audit`、`replacement-dictionary` 等、case-open 責務外）と draft 作成（`.agentdev/drafts/` 配下）へ逸脱した。

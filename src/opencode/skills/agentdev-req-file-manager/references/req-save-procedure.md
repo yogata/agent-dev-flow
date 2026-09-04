@@ -1,6 +1,6 @@
 # req-save 詳細手順
 
-req-save が req-define のドラフトを REQ/ ADR ファイルとして保存する際の詳細手順を定義する。
+req-save が req-define のドラフトを REQ/ Decision ファイルとして保存する際の詳細手順を定義する。
 親エージェントは保存、インデックス更新、commit、push、ユーザー指示待ちを担当する。
 サブエージェントへ委譲する場合は検査、分類、候補抽出のみを依頼する。
 
@@ -11,12 +11,12 @@ CREATE 対象 REQ の要件テーブルに、既存成果物への反映作業�
 - 反映作業とは、既存成果物への更新、削除、移動、名称変更、廃止、置換、参照修正、インデックス修正、整合性修正そのものを記述する行を指す。
 - 要件行の述語が「更新する」「削除する」「移動する」「改名する」「廃止する」「置換する」「修正する」だけを表し、変更後に満たすべき振る舞い、制約、状態を含まない場合は反映作業のみと判定する。
 - 検出時は保存を停止し、該当行、判定理由、推奨移送先を報告する。
-- 推奨移送先は対象 REQ/ ADR/ Design 等への UPDATE/ APPEND、または後続 Case の変更対象とする。
+- 推奨移送先は対象 REQ/ Decision/ Design 等への UPDATE/ APPEND、または後続 Case の変更対象とする。
 - 報告後はユーザー指示を待つ。単純な続行指示のみでは保存へ進まない。分類結果に対する明示的な判定変更指示がある場合のみ保存へ進む。
 
 ## 文書分類適合確認
 
-REQ/ ADR 保存前に、対象ドキュメントの種別が document-model Design の Document Classification Policy に適合していることを確認する。
+REQ/ Decision 保存前に、対象ドキュメントの種別が document-model Design の Document Classification Policy に適合していることを確認する。
 適合しない場合は保存を停止し、理由を報告する。
 
 `draft-meta` に `adr-revision-mode: full-reclassification` が指定されている場合は、既存 ADR の full reclassification を許可する。

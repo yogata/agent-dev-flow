@@ -39,7 +39,7 @@ updated: 2026-09-02
 | REQ-008 | RU lifecycle / Requirement Unit 管理 | IR-016 | ドメイン状態 |
 | REQ-006 | Case 実行オーケストレーション / Epic、Wave | IR-006, IR-013, IR-016 | commands, templates |
 | REQ-036 | REQ 再構成運用 | IR-004, IR-011, IR-015 | REQ, 廃止 REQ |
-| REQ-001 | ADR status 正規化 | IR-005, IR-010 | ADR, ADR index |
+| REQ-001 | Decision status 正規化 | IR-005, IR-010 | Decision, Decision index |
 | v2:REQ-0113 | Skill References Design 分離 | IR-008, IR-014 | skills, skill references |
 | REQ-006 | case-auto 最大自走モード | IR-006, IR-016 | commands |
 | REQ-003 | コマンド、スキル、サブエージェント責務分界の再基準化 | IR-006, IR-008, IR-014, IR-024 | commands, skills |

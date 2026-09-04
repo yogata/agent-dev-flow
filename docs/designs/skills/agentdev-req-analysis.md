@@ -24,7 +24,7 @@ updated: 2026-09-01
 - 状態要件と反映作業の分類基準（分類ゲート）
 - REQ/Design 境界判定基準（REQ-001-067〜068）
 - 壁打ちメソドロジー（未決分岐解消、回答分類: Confirmed / Inferred / Unknown / User Decision / Out of Scope）
-- ADR 閾値判定ブリッジ
+- Decision 閾値判定ブリッジ
 - 複数 RU 入力受付、統合/分離判定、操作単位ごとの出力生成
 - Epic 規模検出、Wave 候補、依存関係の記録
 - チェックボックス品質基準（測定可能、一意、実装可能）

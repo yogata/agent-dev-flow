@@ -28,7 +28,7 @@ inspect-docs command が実行する docs 横断診断のうち、専門診断�
 ### 1. 横断編成は本スキルが所有
 
 複数文書種別にまたがる診断カテゴリ（廃止 REQ/Design 由来記述残置、REQ/Design 境界違反、REQ 粒度過小、横断契約矛盾）は本スキルが横断的にスキャンし、シグナルを抽出する（`diagnostic-categories.md` 参照）。
-個別 REQ/ADR/Design の内部診断は専門 skill へルーティングする。
+個別 REQ/Decision/Design の内部診断は専門 skill へルーティングする。
 
 ### 2. 専門診断の再定義禁止
 

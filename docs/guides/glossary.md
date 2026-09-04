@@ -31,7 +31,7 @@ AgentDevFlow で使う用語の定義。
 | 用語 | 定義 |
 |------|------|
 | REQ | 要件定義の永続基準。`docs/requirements/REQ-{NNN}.md` に配置 |
-| ADR | 取り返しのつかない技術判断の記録。現行基準は `docs/decisions/DEC-{NNN}.md` として管理する。後継関係は `docs/decisions/README.md` の Decision Map を参照 |
+| Decision | 取り返しのつかない技術判断の記録。配置は `docs/decisions/DEC-{NNN}.md`。後継関係は `docs/decisions/README.md` の Decision Map を参照（旧称: ADR） |
 | Design | 実装者が参照する現在設計。`docs/designs/**/*.md` に配置（commands/skills/workflows の3層と基盤6ドメイン） |
 | Report | 監査・評価・観測の事実記録。`docs/reports/**/*.md` に配置 |
 | README | ドキュメント入口、各ディレクトリの索引。`docs/README.md` 等 |

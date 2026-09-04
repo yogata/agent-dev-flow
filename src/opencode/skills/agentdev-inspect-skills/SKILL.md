@@ -10,7 +10,7 @@ Command→Skill 参照妥当性、Skill 粒度、Skill 構造、実行主体分�
 
 ## 検査対象を直接修正しない制約
 
-- ファイル変更（canonical docs、REQ/ADR/Design、Command/Skill/Template/Script）、Issue 作成、PR 作成、RU 保存、branch/ worktree 操作を行わない。許可される副作用は `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit/ push）のみ
+- ファイル変更（canonical docs、REQ/Decision/Design、Command/Skill/Template/Script）、Issue 作成、PR 作成、RU 保存、branch/ worktree 操作を行わない。許可される副作用は `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit/ push）のみ
 - 診断結果はセッション内テキストで提示する
 - 修正案は経路として提示し、実装、保存、自動整形は行わない
 
@@ -62,7 +62,7 @@ cleanup モデルと処置契約の SSoT は document-model Design であり、�
 | 廃止 REQ/Design 由来の記述残置 | 配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/**`）に retired REQ/Design ID（`docs/requirements/retired/`、`docs/designs/retired/` 等）をソースとした記述が残置していないか。retired REQ/Design ID をキーとした横断検索で検出する。活性 REQ/Design（現行セット）への言及は対象外とする |
 | 意味的重複 | 同一の契約、手順、判定基準が複数の配布物で再定義されているかを検出する。同一契約再定義抑止の原則に照らして検出する。artifact-responsibilities Design が定める重複許容基準に合致し正の情報源が明示された場合は対象外。判定基準の詳細、検出手順、報告例は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
 | 意味的矛盾 | Command と Skill 間で工程、状態、責務、停止条件の意味が矛盾していないかを検出する。正規な定義元の原則および同一契約再定義抑止の原則に照らして検出する。判定基準の詳細、検出手順、報告例は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
-| 正規な定義元からの逸脱 | 各責務が artifact-responsibilities Design のマッピングに照らして正規な定義元（配布 Command / Skill / references / script / harness 側文書 / REQ-ADR-SPEC のいずれか）に置かれているかを検出する。正規な定義元の原則に照らして検出する。責務越境（Command に Skill 要素、Skill に Command 固有手順、Template/Script の責務越境等）を含む。判定基準の詳細、検出手順、報告例は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
+| 正規な定義元からの逸脱 | 各責務が artifact-responsibilities Design のマッピングに照らして正規な定義元（配布 Command / Skill / references / script / harness 側文書 / REQ-Decision-SPEC のいずれか）に置かれているかを検出する。正規な定義元の原則に照らして検出する。責務越境（Command に Skill 要素、Skill に Command 固有手順、Template/Script の責務越境等）を含む。判定基準の詳細、検出手順、報告例は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
 | セマンティクス欠落 | 疎結合化、抽象化、縮約により、意味、条件、成果物契約（入力、前提、停止条件、適用境界、出力等）が欠落していないかを検出する。同一契約再定義抑止の原則に照らして検出する。判定基準の詳細、検出手順、報告例は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
 | 文章品質（診断時） | 配布物（`.opencode/commands/agentdev/*.md`、`.opencode/skills/agentdev-*/**/*.md`）に文章品質違反（メタ指示残留、未完結文、不自然な英語混在、規範宣言の濫用、名詞連結、一文への条件過剰連結）がないかを検出する（配布物の文章品質契約 REQ）。判定基準は doc-writing 査読観点と同一基準。検出対象の定義は Design agentdev-inspect-skills「文章品質観点（診断時）」参照 |
 | 決定的破損（診断時） | 配布物に決定的破損（Markdown 構造破損、制御文字混入、不正な Unicode 文字、意図しない異言語文字、既知形式の参照残骸）がないかを検出する（配布物の文章品質契約 REQ）。Markdown 構造破損の内訳（見出し階層不整合、未閉鎖コードブロック、壊れたリンク、壊れたコードスパン、強調記法の破損）を検出対象とする。検出対象の定義は Design agentdev-inspect-skills「文章品質観点（診断時）」参照。配布物構文健全性系の既存観点と重複する項目は文章品質契約由来の検出対象として併せて適用する（既存観点の変更ではない） |
@@ -98,7 +98,7 @@ cleanup モデルと処置契約の SSoT は document-model Design であり、�
 | skill-frontmatter-name-backtick | SKILL.md frontmatter `name:` 行がバッククォートで囲まれており、YAML スカラー値として不正（REQ 準拠、PR #1334 事例）。バッククォート付き name はディレクトリ名と不一致となるため `IR-{NNN}`（skill-name-dir-match）違反と併発する可能性が高い。判定基準の詳細は [skill-frontmatter-name-backtick.md](references/skill-frontmatter-name-backtick.md) 参照 |
 | semantic-duplication | 同一の契約、手順、判定基準が複数の配布物で再定義されている（同一契約再定義抑止の原則違反）。artifact-responsibilities Design の重複許容基準に合致し正の情報源が明示された場合は対象外。判定基準の詳細は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
 | semantic-contradiction | Command と Skill 間で工程、状態、責務、停止条件の意味が矛盾している（正規な定義元の原則、同一契約再定義抑止の原則の違反）。判定基準の詳細は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
-| canonical-definition-deviation | 各責務が正規な定義元（配布 Command / Skill / references / script / harness 側文書 / REQ-ADR-SPEC）に置かれておらず、責務越境が発生している（正規な定義元の原則違反）。判定基準の詳細は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
+| canonical-definition-deviation | 各責務が正規な定義元（配布 Command / Skill / references / script / harness 側文書 / REQ-Decision-SPEC）に置かれておらず、責務越境が発生している（正規な定義元の原則違反）。判定基準の詳細は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
 | semantic-contract-missing | 疎結合化、抽象化、縮約により、意味・条件・成果物契約（入力、前提、停止条件、適用境界、出力等）が欠落している（同一契約再定義抑止の原則違反）。判定基準の詳細は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
 
 ## 判定ルール

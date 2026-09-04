@@ -1,6 +1,6 @@
 ---
 name: agentdev-req-analysis
-description: Provides requirement analysis methods with quality criteria and ADR threshold judgment. USE FOR: analyzing requirements, defining acceptance criteria, evaluating requirement completeness. DO NOT USE FOR: creating requirement files, architecture decision evaluation, implementation planning.
+description: Provides requirement analysis methods with quality criteria and Decision threshold judgment. USE FOR: analyzing requirements, defining acceptance criteria, evaluating requirement completeness. DO NOT USE FOR: creating requirement files, architecture decision evaluation, implementation planning.
 ---
 
 # 要件分析スキル
@@ -68,9 +68,9 @@ description: Provides requirement analysis methods with quality criteria and ADR
 
 | 条件 | 読む reference |
 |---|---|
-| 要件展開の観点、完了条件、境界条件、必達要件記述、状態要件/反映作業分離、REQ/Design 境界判定基準、チェックボックス品質基準、ADR 閾値判定ブリッジ、分析フレーム選択、両面分析規定、変更誘発境界リスク分析、検証手段の質基準が必要な場合 | [references/analysis-viewpoints.md](references/analysis-viewpoints.md) |
-| 壁打ちメソドロジー詳細（未決分岐の抽出と整理、質問運用ルール、回答分類と反映、Unknown 取扱い、既存メソドロジー再構造化、既存REQ/ADR の定量的照合、サブエージェント調査委譲スコープ絞り込み、APPEND precedent 利用）が必要な場合 | [references/wall-methodology.md](references/wall-methodology.md) |
-| req-define 詳細ゲート（分類ゲート、Design候補抽出、文書分類妥当性検証、SPLIT 予兆計算、ADR 禁止ゲート、複数RU処理、Epic規模記録）を実行する場合 | [references/req-define-detailed-gates.md](references/req-define-detailed-gates.md) |
+| 要件展開の観点、完了条件、境界条件、必達要件記述、状態要件/反映作業分離、REQ/Design 境界判定基準、チェックボックス品質基準、Decision 閾値判定ブリッジ、分析フレーム選択、両面分析規定、変更誘発境界リスク分析、検証手段の質基準が必要な場合 | [references/analysis-viewpoints.md](references/analysis-viewpoints.md) |
+| 壁打ちメソドロジー詳細（未決分岐の抽出と整理、質問運用ルール、回答分類と反映、Unknown 取扱い、既存メソドロジー再構造化、既存REQ/Decision の定量的照合、サブエージェント調査委譲スコープ絞り込み、APPEND precedent 利用）が必要な場合 | [references/wall-methodology.md](references/wall-methodology.md) |
+| req-define 詳細ゲート（分類ゲート、Design候補抽出、文書分類妥当性検証、SPLIT 予兆計算、Decision 禁止ゲート、複数RU処理、Epic規模記録）を実行する場合 | [references/req-define-detailed-gates.md](references/req-define-detailed-gates.md) |
 | req-define Step1 セッションコンテキスト検知手順が必要な場合 | [references/session-context-detection.md](references/session-context-detection.md) |
 | サブエージェント調査委譲スコープ絞り込みの詳細（キーワード抽出、glob/grep 前処理、priority targets 構築）が必要な場合 | [references/investigation-scope-refinement.md](references/investigation-scope-refinement.md) |
 | test strategy の数値閾値記述ガイドが必要な場合 | [references/test-strategy-numeric-threshold-guide.md](references/test-strategy-numeric-threshold-guide.md) |

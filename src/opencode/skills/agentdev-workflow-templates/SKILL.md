@@ -248,5 +248,5 @@ epic テンプレートでは「完了条件」セクションの直後、「補
 
 - [agentdev-req-file-manager](../agentdev-req-file-manager/SKILL.md)（REQファイル管理。doc_requirement.md テンプレート）
 - [agentdev-decision-file-manager](../agentdev-decision-file-manager/SKILL.md)（Decisionファイル管理。doc_decision.md テンプレート）
-- **agentdev-doc-writing**: ADR/REQ/Design横断の文書品質査読ゲート（文書種別責務、要件性、文意品質、粒度）
+- **agentdev-doc-writing**: Decision/REQ/Design横断の文書品質査読ゲート（文書種別責務、要件性、文意品質、粒度）
 

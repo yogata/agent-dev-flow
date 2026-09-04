@@ -68,6 +68,6 @@ AgentDevFlow のフェーズ定義、SSoT 遷移、work_type 判定基準、ス�
 - [agentdev-workflow-routing.md](agentdev-workflow-routing.md)
 - [agentdev-workflow-orchestration.md](agentdev-workflow-orchestration.md)
 - [../workflows/workflow-contracts.md](../workflows/workflow-contracts.md)
-- REQ-001（ADR ライフサイクル、文書体系基盤）
+- REQ-001（Decision ライフサイクル、文書体系基盤）
 - REQ-005（workflow-lifecycle 宣言的純化）
 

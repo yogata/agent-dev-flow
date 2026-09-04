@@ -63,9 +63,9 @@ work_type と scale の組み合わせで workflow_route を導出する（REQ-0
 
 分離の判断理由、歴史的経緯は REQ-001（文書種別責務境界）を参照。
 
-### ADR 判断漏れ（false negative）基準
+### Decision 判断漏れ（false negative）基準
 
-ADR 対象となる判断を REQ/Design/guide のみとして扱う判断漏れ（false negative）を防ぐため、以下のリスク指標に該当する内容は ADR 必要性を再評価すること（推奨、REQ-001-058）。
+Decision 対象となる判断を REQ/Design/guide のみとして扱う判断漏れ（false negative）を防ぐため、以下のリスク指標に該当する内容は Decision 必要性を再評価すること（推奨、REQ-001-058）。
 
 - REQ/Design 境界の曖昧な内容: WHAT と HOW の分離だけでは判断理由が保存されず、後続変更で根拠が失われる可能性がある
 - 複数モジュールにまたがる判断: command / skill / script / docs など複数の責務境界に影響し、局所仕様だけではトレードオフを説明できない

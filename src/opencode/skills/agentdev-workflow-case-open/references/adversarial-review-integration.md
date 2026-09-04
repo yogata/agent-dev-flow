@@ -26,7 +26,7 @@ case-open の adversarial-review を原則実行し（default-on）、execution 
 execution structure、Issue 本文候補、完了条件を構成した後、**最初の GitHub Issue 作成の前**に挿入する。
 
 - **Epic flow の場合**: STEP-5（テンプレート読込）、Epic Issue 本文生成完了後、Epic Issue 作成の前
-- **Standard flow の場合**: preflight（STEP-3）完了後、関連ADR特定の前
+- **Standard flow の場合**: preflight（STEP-3）完了後、関連Decision特定の前
 
 ### 発動条件判定
 

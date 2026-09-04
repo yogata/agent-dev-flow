@@ -52,4 +52,4 @@
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
 - ガードレール（promote された検出事項のみを `.agentdev/inspect/promoted/` へ保存する）
-- 不変条件（`--auto` は自動 promote 対象カテゴリ（workflow-contracts Design 参照、extension 経由）に合致する高確信度検出事項のみを投入し、意味判断、曖昧な分類、ADR 要否判断を含む検出事項は手動分類へ回す）
+- 不変条件（`--auto` は自動 promote 対象カテゴリ（workflow-contracts Design 参照、extension 経由）に合致する高確信度検出事項のみを投入し、意味判断、曖昧な分類、Decision 要否判断を含む検出事項は手動分類へ回す）

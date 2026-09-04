@@ -1,6 +1,6 @@
 # QG-3: Implementation Deviation Gate
 
-case-run で PR 作成前に、実装が Issue/ REQ/ ADR/ Design/ work plan から乖離していないかを検証する Gate。
+case-run で PR 作成前に、実装が Issue/ REQ/ Decision/ Design/ work plan から乖離していないかを検証する Gate。
 本ファイルは QG-3 の判定基準、検査観点、乖離分類を定義する。
 共通契約は [common-gate-contract.md](common-gate-contract.md) を参照。
 
@@ -16,13 +16,13 @@ case-run で PR 作成前に、実装が Issue/ REQ/ ADR/ Design/ work plan か�
 
 ### 重大乖離
 
-Issue/ REQ/ ADR/ Design/ work plan のいずれかの記載内容を満たさない実装。
+Issue/ REQ/ Decision/ Design/ work plan のいずれかの記載内容を満たさない実装。
 
 - チェックボックスが未実装
 - 受け入れ基準（完了条件）を満たさない
 - 要件に明記された機能が欠落している
 - work plan に記載されたタスクが未実装
-- ADR で決定したアーキテクチャが実装されていない
+- Decision で決定したアーキテクチャが実装されていない
 
 ### 軽微乖離
 
@@ -44,10 +44,10 @@ Issue/ REQ/ ADR/ Design/ work plan のいずれかの記載内容を満たさな
 - 計画外の変更がないか
 - 変更ファイルが work plan の範囲内か
 
-### 3. REQ/ ADR の決定事項 vs 実装
+### 3. REQ/ Decision の決定事項 vs 実装
 
 - REQ の必達要件が実装されているか
-- ADR で決定したアーキテクチャ制約が守られているか
+- Decision で決定したアーキテクチャ制約が守られているか
 
 ### 4. 関連ドキュメントの整合性 vs 変更後仕様
 
@@ -96,7 +96,7 @@ Issue/ REQ/ ADR/ Design/ work plan のいずれかの記載内容を満たさな
 
 ## pass/ warn/ fail 基準
 
-- **pass**: `no-deviation`。実装は Issue/ REQ/ ADR/ Design/ work plan に整合。
+- **pass**: `no-deviation`。実装は Issue/ REQ/ Decision/ Design/ work plan に整合。
 - **warn**: 軽微乖離のみ（`scope-creep` 等）。そのまま進行可能（乖離内容を実装記録に併記）。
 - **fail**: 重大乖離あり（`impl-bug`/ `spec-bug`）。ユーザー指示待機（自動修正禁止）。
 
@@ -111,7 +111,7 @@ Issue/ REQ/ ADR/ Design/ work plan のいずれかの記載内容を満たさな
 ### 乖離1
 - **影響度**: 重大 / 軽微
 - **乖離タイプ**: impl-bug / spec-bug / scope-creep
-- **対象**: 完了条件セクション / work plan タスク / ADR 決定 / 変更ファイル
+- **対象**: 完了条件セクション / work plan タスク / Decision 決定 / 変更ファイル
 - **内容**: 乖離の具体的な説明
 - **影響REQ番号**: [REQ-NNNN-NNN]
 - **修正方針**: code-fix / req-update(UPDATE) / scope-reduction
@@ -126,7 +126,7 @@ Issue/ REQ/ ADR/ Design/ work plan のいずれかの記載内容を満たさな
 壁打ちフェーズへの差し戻し基準。
 
 - **重大乖離 ≥ 2 件** → 壁打ちフェーズ全体を差し戻し推奨
-- **重大乖離 1 件** → 該当する要件セクション/ work plan タスク/ ADR 決定のみ再壁打ち推奨
+- **重大乖離 1 件** → 該当する要件セクション/ work plan タスク/ Decision 決定のみ再壁打ち推奨
 - **軽微乖離のみ** → そのまま進行（乖離内容を実装記録に併記）
 
 ### 重要事項

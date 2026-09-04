@@ -50,7 +50,7 @@ REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて De
 - 第一参照導線確認（`agentdev-req-structure-diagnostics`）
 - 現行/廃止/世代境界確認（`agentdev-req-structure-diagnostics`）
 - Design 意味診断（Design が REQ/Decision/guides の代替、将来計画の混入、実行時依存先としての不適切扱いを確認）
-- ADR 意味診断（承認済み Decision のみを現行判断の根拠として扱っているか確認）
+- Decision 意味診断（承認済み Decision のみを現行判断の根拠として扱っているか確認）
 - guides 意味診断（guides が navigation layer の範囲を超えていないか確認）。履歴混入検出時は route 追加（v2:REQ-0115-041）
 - README 索引診断（README 索引が導線の範囲を超えていないか確認）。内容過多検出時は分割誘導
 - REQ structure review（6観点）（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT（`agentdev-req-structure-diagnostics`））

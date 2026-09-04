@@ -29,7 +29,7 @@ draft 全体の `agreed_items`、`artifact_actions`、`operation_units`、`reali
 
 工程上の選好を反映した肯定形の不変条件:
 
-- ADR・specs の内容は Issue 本文の生成に反映する
+- Decision・specs の内容は Issue 本文の生成に反映する
 - Issue 本文・コメントのテンプレート選定は `agentdev-workflow-templates` の選定ルールに従う（【必須】セクションの完備確認、【任意】は内容がある場合のみ含める）
 - Standard flow の動作・出力形式は Epic flow 追加の影響を受けないものとする（後方互換）
 - Issue 化単位は OU 単位とし、子Issue は OU 単位で作成して対応 OU 経由で REQ/Decision/Design へのトレーサビリティを保持する（Wave 単位のみの子Issue 構造は作らない）。case-open は自律的な要件分析に基づいて Epic Issue または子 Issue 構造を生成し、機能要件・非機能要件・対象外・受け入れ条件は要件doc由来のものを用いる

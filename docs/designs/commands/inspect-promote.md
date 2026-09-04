@@ -49,7 +49,7 @@ updated: 2026-08-19
 - 検出事項分類（promote / defer / reject）
 - 自動 promote（`--auto` opt-in 時のみ）:
  - 自動 promote 対象: Design分離基準違反（high-specificity）、構造的即時是正
- - 自動 promote 対象外: 命名、分類の意味判断、ADR 要否判断（手動分類へ回す）
+ - 自動 promote 対象外: 命名、分類の意味判断、Decision 要否判断（手動分類へ回す）
  - 投入先: `.agentdev/intake/promoted/inspect-auto-{timestamp}-{slug}.md`
  - 実行ログ: `.agentdev/inspect/promoted/auto-promote-log.md` に投入対象記録
 - HITL 確定（手動分類対象）
@@ -99,7 +99,7 @@ updated: 2026-08-19
 - defer 検出事項の `.agentdev/inspect/inbox/` からの移動
 - docs-check ルール、検査データ追加候補の独立 route 化（要件化方向または受け入れ条件に含める）
 - `--auto` の明示 opt-in なしの有効化
-- `--auto` による意味判断、曖昧分類、ADR 要否判断の自動投入（手動分類へ回す）
+- `--auto` による意味判断、曖昧分類、Decision 要否判断の自動投入（手動分類へ回す）
 - `--auto` 実行ログの省略（`auto-promote-log.md` に投入対象、根拠を記録）
 
 ## 検証観点
@@ -108,7 +108,7 @@ updated: 2026-08-19
 - 分類の正確性: promote / defer / reject
 - 投入先、形式の正確性: `.agentdev/intake/promoted/inspect-auto-{timestamp}-{slug}.md`（`--auto` 時）
 - 自動 promote 対象カテゴリの遵守: Design分離基準違反（high-specificity）、構造的即時是正のみ
-- 自動 promote 対象外の手動分類回し: 命名、分類の意味判断、ADR 要否判断
+- 自動 promote 対象外の手動分類回し: 命名、分類の意味判断、Decision 要否判断
 - 実行ログ記録の完備
 
 ## 停止状態

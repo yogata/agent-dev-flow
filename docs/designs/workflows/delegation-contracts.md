@@ -177,11 +177,11 @@ agent 起動、background task、並列実行、context 管理は ADF 配布物�
 
 ## case-auto 委譲契約 MUST NOT DO 精密化（REQ-003-004）
 
-case-auto の MUST NOT DO を「実質的 Design / REQ / ADR 内容編集禁止（lifecycle 状態遷移 `draft`→`accepted` は除く）」へ精密化する。状態遷移操作と内容編集操作の分類判定表:
+case-auto の MUST NOT DO を「実質的 Design / REQ / Decision 内容編集禁止（lifecycle 状態遷移 `draft`→`accepted` は除く）」へ精密化する。状態遷移操作と内容編集操作の分類判定表:
 
 | 操作分類 | case-auto での可否 |
 |---|---|
-| Design / REQ / ADR 本文（要件行、判定基準、アーキテクチャ決定）の編集、追記、削除、リライト | 禁止（内容編集） |
+| Design / REQ / Decision 本文（要件行、判定基準、アーキテクチャ決定）の編集、追記、削除、リライト | 禁止（内容編集） |
 | 新規 Design frontmatter `status: draft` 付与（新規 Design 作成時） | 許可（lifecycle 状態遷移） |
 | 既存 Design frontmatter `status: accepted` 昇格 | 禁止（case-close STEP-3 の責務） |
 | 既存 Design frontmatter `updated` 日付更新 | 許可（lifecycle メタデータ） |

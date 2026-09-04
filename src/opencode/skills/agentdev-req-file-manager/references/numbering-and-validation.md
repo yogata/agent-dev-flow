@@ -82,7 +82,7 @@ REQ単位の関連情報は frontmatter フィールドとして管理せず、�
 | title | 要件タイトル |
 | Status | retained/ partially superseded/ superseded |
 | Related artifacts | 関連ドキュメントへの参照 |
-| Related ADRs | 関連ADRへの参照 |
+| Related ADRs | 関連Decisionへの参照 |
 | Supersedes | この要件が置き換える旧要件 |
 | Superseded by | この要件を置き換える新要件 |
 
@@ -122,7 +122,7 @@ REQ単位の関連情報は frontmatter フィールドとして管理せず、�
 
 | コマンド | タイミング |
 |----------|-----------|
-| `req-define` | 要件展開の直後、ADR判定の前 |
+| `req-define` | 要件展開の直後、Decision判定の前 |
 | `req-save` | CREATE対象REQの保存前 |
 
 #### 判定基準
@@ -136,7 +136,7 @@ REQ単位の関連情報は frontmatter フィールドとして管理せず、�
 #### 処理ルール
 
 1. 反映作業のみの候補は、独立した要件行として扱わない
-2. 後続工程への移送候補として振り分ける: 対象REQ/ADR/Design等への UPDATE/APPEND、後続Caseの変更対象
+2. 後続工程への移送候補として振り分ける: 対象REQ/Decision/Design等への UPDATE/APPEND、後続Caseの変更対象
 3. `req-save` での検査: CREATE対象REQの保存前に反映作業のみの要件行が残っていないか検査し、検出時は保存を停止して該当行、判定理由、移送先を報告する
 
 ### HOW 除去後の acceptance-criteria 順位検証

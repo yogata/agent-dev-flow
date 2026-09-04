@@ -97,7 +97,7 @@ docs 横断診断、証拠構造、finding 出力契約は `agentdev-doc-diagnos
 
 ## 対象外
 
-- REQ 操作、ADR 操作（各操作 skill の責務）
+- REQ 操作、Decision 操作（各操作 skill の責務）
 - Design 内容の新規推論（req-define、`agentdev-req-analysis` の責務）
 - accepted 昇格判断（case-close の責務、v2:ADR-0123 / REQ-001-024 準拠）
 - ユーザー承認、commit、push（command、親エージェントの責務）

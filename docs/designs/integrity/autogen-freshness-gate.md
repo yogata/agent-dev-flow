@@ -25,7 +25,7 @@ AUTOGEN ブロックを含む索引ファイル（design-health-metrics.md 等�
 
 ## 鮮度判定基準
 
-- 対象ファイルのソース（Design / REQ / ADR / IR の frontmatter、ファイル名、status）の rename 発生時に AUTOGEN ブロックの再生成必要性を判定する
+- 対象ファイルのソース（Design / REQ / Decision / IR の frontmatter、ファイル名、status）の rename 発生時に AUTOGEN ブロックの再生成必要性を判定する
 - 対象ファイルのソース status 変更（draft → accepted 等）時に AUTOGEN ブロックの再生成必要性を判定する
 - SC-002（定期再生成）と整合する運用を維持する
 - 計測日導出方式は index-auto-generation Design「計測日導出」節に従い対象ドキュメント群の最終コミット日付基準とする。実行時日付（`new Date()`）の採用によりコミット済み AUTOGEN ブロックが日次で鮮度を失い IR-061 が構造的に再検出する運用は解消する。本解消を本 gate の契約として明記する

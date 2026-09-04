@@ -52,7 +52,7 @@ README 群、索引類、件数表明を実ファイルの frontmatter から再
 
 ### ステータス別ビュー、トピック別ビュー
 
-ステータス別ビューはADR frontmatterから自動生成する。
+ステータス別ビューはDecision frontmatterから自動生成する。
 トピック別ビュー、Decision Map、関連REQ表は現在人手管理とし、実装されていない生成処理を現在契約として扱わない。
 
 ### decision-baseline 索引生成（count キャプション・table 全件出力）
@@ -195,9 +195,9 @@ backtick 文脈判定のような部分一致ロジックは併用しない。
 これは「永久に自動化しない」決定ではなく、「現在実装されていない機能を実装済み契約として扱わない」決定である。
 将来、導出規則と生成機構を別要件で確定すれば本 Design を更新できる自動生成拡張ポイントである。
 
-- **ADR README トピック別ビュー**: 人手管理。導出規則未確定のため。
-- **ADR README Decision Map**: 人手管理。各 ADR 本文の宣言から導出するが、導出規則が未確定のため。
-- **ADR README 関連 REQ 表**: 人手管理。各 Decision の関連宣言から導出するが、導出規則が未確定のため。
+- **Decision README トピック別ビュー**: 人手管理。導出規則未確定のため。
+- **Decision README Decision Map**: 人手管理。各 Decision 本文の宣言から導出するが、導出規則が未確定のため。
+- **Decision README 関連 REQ 表**: 人手管理。各 Decision の関連宣言から導出するが、導出規則が未確定のため。
 - **docs/designs/README.md**: 人手管理または既存生成部分のみ AUTOGEN。status 列は AUTOGEN 可能だが、責務列等の混合領域が大半のため、現状では一部列のみ AUTOGEN または人手管理。
 
 ## 関連情報

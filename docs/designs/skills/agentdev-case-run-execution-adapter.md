@@ -123,7 +123,7 @@ blocked 遷移の契約は case-run command Design「blocked 遷移」節を正�
 | blocked 要因 | 要件 | 詳細 |
 |---|---|---|
 | 実装方針が既確定文書の変更を必要とする | REQ-015-010 | 実装方針が既確定 Issue/REQ/Decision/Design の変更、追加、撤回を要求する場合、実装を開始せず blocked へ遷移する |
-| 要件、仕様問題の検出 | REQ-015-011 | 要件、仕様に欠落、矛盾、曖昧さ、実現不可能な条件等を検出した場合、勝手に仕様変更、REQ 黙示変更、ADR 再解釈を行わず blocked へ遷移する |
+| 要件、仕様問題の検出 | REQ-015-011 | 要件、仕様に欠落、矛盾、曖昧さ、実現不可能な条件等を検出した場合、勝手に仕様変更、REQ 黙示変更、Decision 再解釈を行わず blocked へ遷移する |
 | unresolved 争点の残存 | REQ-014-009 | adversarial-review 審議で unresolved な本質的争点またはユーザー判断事項が残り、実装の最初の変更（不可逆処理）へ進めない場合、blocked へ遷移する |
 
 blocked 詳細本文（検出理由、対象 REQ/Decision/Design、想定される修正方向等）は Issue コメントに SSoT として構造化して記録する（result 契約「SSoT」節、case-run STEP-S5（result 処理）参照）。

@@ -69,7 +69,7 @@ inbox.md の学びエントリと deferred.md を読み込み、旧フォーマ�
 
 1. 問題クラス分類を行う（根本原因 + 再発条件 + 予防策が同じ単位、最小2エントリ）
 2. 8軸評価スコアリングを行う（加重合計 /40）
-3. 禁止条件フィルタリングゲートを適用する（ADR 候補除外。`agentdev-decision-guidelines` の除外基準を必須適用）
+3. 禁止条件フィルタリングゲートを適用する（Decision 候補除外。`agentdev-decision-guidelines` の除外基準を必須適用）
 4. evaluation-report.md を生成・更新する（毎回上書き。履歴蓄積しない）
 
 ### Result

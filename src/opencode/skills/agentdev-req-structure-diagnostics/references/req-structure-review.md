@@ -9,7 +9,7 @@ REQ 構造レビューの判定ロジック（REQ参照ID整合性、第一参�
 
 - **(a) frontmatter `id` 一意性**: 現行/廃止を通じて `id` の重複がないか
 - **(b) frontmatter `id` ↔ ファイル名**: ファイル名 `REQ-{NNNN}.md` の `{NNNN}` と frontmatter の `id` 値が一致するか
-- **(c) 相互参照の存在確認**: REQ本文、ADR、specs で参照されている REQ ID が実在するか
+- **(c) 相互参照の存在確認**: REQ本文、Decision、specs で参照されている REQ ID が実在するか
 
 ## 第一参照導線確認
 
@@ -34,7 +34,7 @@ REQ の現行/廃止/世代境界の整合性を確認する:
 |------|----------|-------------|
 | **SPLIT** | 単一REQが複数の独立した関心事を含んでおり、分割が適切か | (a) 1つのREQに複数の関心対象、(b) 複数成果物種別の混在、(c) 複数 command family の混在、(d) 複数 lifecycle 段階の混在 |
 | **MERGE** | 複数のREQが密接に関連しており、統合が適切か | (a) 複数REQが同じ目的、(b) 同じ対象成果物、(c) 同じ command、(d) 同じ責務を扱っている |
-| **MOVE** | REQの内容が別の文書種（specs/guides/ADR）に移動すべきか | (a) REQ行が変更後仕様ではなく反映作業そのものになっている、(b) Design分離基準違反シグナルが REQ 要件行に残留している |
+| **MOVE** | REQの内容が別の文書種（specs/guides/Decision）に移動すべきか | (a) REQ行が変更後仕様ではなく反映作業そのものになっている、(b) Design分離基準違反シグナルが REQ 要件行に残留している |
 | **DUPLICATE** | REQ間またはREQと他文書で内容が重複しているか | (a) 現行 REQ 間または REQ と spec/guide/command の間で同じ 必達要件 相当の責務が重複 |
 | **RETIRE** | 現行 REQのうち、廃止すべき（現行仕様として不要な）ものがないか | (a) 現行 REQ が現行案内から参照されない、(b) 関心対象が既存 現行 REQ に吸収済み |
 | **DRIFT** | REQ本文と実体（specs/実装/コマンド）の間に乖離がないか | (a) REQ が要求する対象と実体ファイルまたは command 定義が矛盾している |
@@ -151,7 +151,7 @@ ID 汚染（前節）が 0 件でも本検査は実施する。
 | command 本体 ↔ 関連 skill | 当該 command の責務、権限、禁止事項が skill 記述と矛盾していないか |
 | case-open ↔ case-run ↔ case-close ↔ case-auto | 責務境界（PR 作成、Wave 境界、Epic Issue 単一書き手、クリーンアップ、委譲モデル）が全ての記述元で一致しているか |
 
-判定の SSoT 優先順位: 現行 REQ > 承認済み ADR > Design（command Design 群、epic-wave-model Design）> command 本体 > skill。
+判定の SSoT 優先順位: 現行 REQ > 承認済み Decision > Design（command Design 群、epic-wave-model Design）> command 本体 > skill。
 
 ### NG 分類
 

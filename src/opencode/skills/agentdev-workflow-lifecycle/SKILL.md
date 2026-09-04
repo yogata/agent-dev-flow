@@ -75,7 +75,7 @@ docs_chore は bugfix, maintenance と同一経路をとる。
 - 完了証拠: マージ済み PR + クローズ済み Issue
 - 停止条件: `agentdev_handoff: true` 検出時、req-define 合意要件からの逸脱、リポジトリ外操作の必要性
 
-docs_chore は REQ, ADR, Design を生成しないことが多いため req-save と design-save を経由しないが、case-open, case-run, case-close は必ず経由する。
+docs_chore は REQ, Decision, Design を生成しないことが多いため req-save と design-save を経由しないが、case-open, case-run, case-close は必ず経由する。
 docs 更新責務は全 work_type 共通である。
 
 ## スケール判定基準
