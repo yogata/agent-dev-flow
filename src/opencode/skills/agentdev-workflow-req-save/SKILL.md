@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-req-save
-description: "req-save command の workflow 実装本体。壁打ち成果物（draft-data）をREQ/Decisionファイルとしてdocs/に保存し、コミット・プッシュする制御を所有する。事前チェック（no-op 判定）、REQ ファイル操作と適用結果整合性検証、検証対応要否未分類行の検出・記録（保存は失敗させない）、インデックス・ハブ更新、Decision ファイル作成、docs 変更整合性検証、変更範囲検証、ドラフト status 更新（saved）も含む。USE FOR: req-save 実行時の workflow 制御（normal create/update・no-op・validation failure・partial failure・rerun idempotency・commit 前中断・external Git failure 各シナリオ）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "req-save command の workflow 実装本体。壁打ち成果物（draft-data）をREQ/Decisionファイルとしてdocs/に保存し、コミット・プッシュする制御を所有する。事前チェック（no-op 判定）、REQ ファイル操作と適用結果整合性検証、検証対応要否未分類行の検出・記録（保存は失敗させない）、インデックス・ハブ更新、docs 変更整合性検証、変更範囲検証も含む。USE FOR: req-save 実行時の workflow 制御（normal create/update・no-op・validation failure・partial failure・rerun idempotency・commit 前中断・external Git failure 各シナリオ）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # req-save workflow スキル

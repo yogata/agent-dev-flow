@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-third-party-sync
-description: "third-party-sync command の workflow 実装本体。third-party 宣言（skills.yaml）の読込と検証、対象選択と管理外衝突の事前判定、third-party Skill 取得専用 Custom Tool への委譲による取得実行、結果検証・報告の workflow を所有する。USE FOR: third-party-sync 実行時の workflow 実行（入力解決・宣言読込検証・対象選択・衝突事前判定・Tool 委譲・結果報告）。DO NOT USE FOR: 取得プロファイルと非破壊制御の本体実装（third-party Skill 取得専用 Custom Tool の責務）、source URL 形式判定と取得トランスポート（Custom Tool 内部の実装判断）、skills.yaml 自体の管理（宣言データの運用）、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "third-party-sync command の workflow 実装本体。third-party 宣言（skills.yaml）の読込と検証、対象選択と管理外衝突の事前判定、取得専用 Custom Tool への委譲による取得実行、結果検証・報告の workflow を所有する。USE FOR: third-party-sync 実行時の workflow 実行（入力解決・宣言読込検証・対象選択・衝突事前判定・Tool 委譲・結果報告）。DO NOT USE FOR: 取得プロファイルと非破壊制御の本体実装（third-party Skill 取得専用 Custom Tool の責務）、source URL 形式判定と取得トランスポート（Custom Tool 内部の実装判断）、skills.yaml 自体の管理（宣言データの運用）、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # third-party-sync workflow スキル

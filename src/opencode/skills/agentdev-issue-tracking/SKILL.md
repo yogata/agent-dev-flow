@@ -1,6 +1,6 @@
 ---
 name: agentdev-issue-tracking
-description: 追跡Issue（課題、ToDo、アイデア、リスク等の未解決事項の育成管理単位）の論理スキーマ運用知識と操作能力を提供する課題管理 Capability Skill。起票、検索・参照、更新、検討経過の追加、保留、再評価、実行準備完了、解決、反映確認、クローズ、再オープンの操作知識を所有し、GitHub I/O は Custom Tool（agentdev_gh）の操作契約経由で行う。USE FOR: 追跡Issueの起票と状態遷移、重複回避のための既存追跡Issue検索、保留理由と再評価条件の整理、解決結論と反映先・反映状態の追跡、クローズ前提の反映確認、複数 workflow からの追跡Issue操作利用。DO NOT USE FOR: GitHub I/O の実行手続きそのもの（agentdev_gh 操作契約の責務）、物理ラベル等への写像の再実装（Tool 内実装の責務）、Case Issue（req/case パイプラインの実行票）の管理（case-open/case-run/case-close の責務）、Decision/REQ/Design 等の正規成果物の更新実行（各成果物を所有する能力の責務）、Intake / Learning の検出事項や学びの管理、RU の生成と統合。
+description: 追跡Issue（課題、ToDo、アイデア、リスク等の未解決事項の育成管理単位）の論理スキーマと操作能力を提供する課題管理 Capability Skill。起票からクローズ・再オープンまでの操作知識を所有し、GitHub I/O は Custom Tool（agentdev_gh）経由で行う。USE FOR: 追跡Issueの起票と状態遷移、重複回避のための既存追跡Issue検索、保留理由と再評価条件の整理、解決結論と反映状態の追跡、クローズ前提の反映確認、複数 workflow からの利用。DO NOT USE FOR: GitHub I/O の実行手続き（agentdev_gh の責務）、物理ラベル写像の再実装（Tool 内実装の責務）、Case Issue の管理（case-open/case-run/case-close の責務）、Decision/REQ/Design 等の正規成果物の更新実行（各所有能力の責務）、Intake/Learning の検出事項・学びの管理、RU の生成と統合。
 ---
 
 # `agentdev-issue-tracking`

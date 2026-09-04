@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-design-save
-description: "design-save command の workflow 実装本体。req-define で分離された Design 保存対象（artifact: design entry）の保存・確定を行う制御を所有する。事前チェック（no-op 判定）、配置先解決、Design ファイル操作（target_area セクション置換、Design 宣言付与）、インデックス整合、targeted docs guard、ドラフト status 更新、変更範囲検証、コミット・プッシュも含む。USE FOR: design-save 実行時の workflow 制御（normal create/update・no-op・validation failure・partial failure・rerun idempotency・commit 前中断・external Git failure 各シナリオ）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "design-save command の workflow 実装本体。req-define で分離された Design 保存対象（artifact: design entry）の保存・確定制御を所有する。事前チェック（no-op 判定）、配置先解決、Design ファイル操作（target_area セクション置換、Design 宣言付与）、インデックス整合、変更範囲検証、コミット・プッシュも含む。USE FOR: design-save 実行時の workflow 制御（normal create/update・no-op・validation failure・partial failure・rerun idempotency・commit 前中断・external Git failure 各シナリオ）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # design-save workflow スキル
