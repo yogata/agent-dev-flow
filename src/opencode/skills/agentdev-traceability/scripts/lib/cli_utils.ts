@@ -5,6 +5,8 @@
 // - 出力: stdout に JSON
 // - エラー: 非ゼロ終了コード + stderr にエラーメッセージ
 
+import { resolve } from "node:path";
+
 export function parseArgs(argv: readonly string[]): Map<string, string> {
   const args = new Map<string, string>();
   for (let i = 0; i < argv.length; i++) {
@@ -33,4 +35,10 @@ export function fail(message: string, code = 1): never {
 
 export function normalizeArtifactPath(artifact: string): string {
   return artifact.replaceAll("\\", "/").replace(/^\.\//, "");
+}
+
+// --root 値を絶対パスへ解決する。相対パスは実行時のカレントディレクトリ基準で
+// 一度だけ解決し、以降の走査は解決済み絶対パスで行う（cwd 依存の排除）。
+export function resolveRoot(root: string): string {
+  return resolve(root);
 }
