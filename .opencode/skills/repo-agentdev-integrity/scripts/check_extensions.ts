@@ -117,6 +117,7 @@ export interface CheckFailure {
 export interface CheckReport {
   ok: boolean;
   failures: CheckFailure[];
+  ng_baseline?: ExtensionsNgBaselineReport;
   stats: {
     workflow_extensions: number;
     internal_workflow_extensions: number;
@@ -141,31 +142,70 @@ const EXTENSIONS_COMMANDS_DIR = ".agentdev/extensions/commands";
 const EXTENSIONS_SKILLS_DIR = ".agentdev/extensions/skills";
 const LEGACY_DOC_INPUTS_DIR = ".agentdev/doc-inputs";
 
-// REQ-0161-005: baseline-aware strict pass. Mirrors check_integrity.ts NG
-// baseline: baseline-known strict failures are demoted to warning (report-only),
-// only strict failures exceeding the baseline cause ok=false. The baseline is
-// regenerated explicitly via --update-ng-baseline.
+// REQ-0161-005: baseline-aware strict pass over the SHARED NG baseline
+// (.opencode/skills/repo-agentdev-integrity/baselines/ng-baseline.json), the
+// same baseline consumed by check_integrity.ts. integrity-contracts.md
+// 「NG baseline 運用手順」+ SPEC 確定節: a separated baseline
+// (check-extensions-baseline.json) is NOT created — checkers share one
+// ng-baseline, and updates go through --update-ng-baseline with a mandatory
+// --ng-baseline-additions manifest (unmanaged NGs are never absorbed).
+// Baseline-known strict failures are demoted to warning (report-only); only
+// strict failures exceeding the baseline cause ok=false.
 const NG_BASELINE_PATH = path.join(
   ".opencode",
   "skills",
   "repo-agentdev-integrity",
   "baselines",
-  "check-extensions-baseline.json",
+  "ng-baseline.json",
 );
 
+// check_integrity.ts and check_extensions.ts share the ng-baseline bucket key
+// (category/check/file/evidence). Every check_extensions failure maps to the
+// fixed "Extensions" category, its check name, the failure file, and the
+// message as evidence. Entries carry provenance（由来ラベル）and reason（承認理由）.
+const EXTENSIONS_BASELINE_CATEGORY = "Extensions";
+
 interface ExtensionsNgBaselineEntry {
-  check: number;
-  check_name: string;
+  category: string;
+  check: string;
   file: string | null;
-  message: string | null;
+  evidence: string | null;
   count: number;
+  provenance: string;
+  reason: string;
 }
 
 interface ExtensionsNgBaseline {
   version: number;
-  rule_id: "CHECK-EXTENSIONS-NG-BASELINE";
+  rule_id: "NG-BASELINE";
   generated_at: string;
   entries: ExtensionsNgBaselineEntry[];
+}
+
+// Three-way report per the NG baseline design: baseline-known (legacy
+// provenance), approved additions (provenance-tracked), and new unmanaged NG
+// (excess over baseline; exit code driver).
+export interface ExtensionsNgBaselineReport {
+  baselineKnown: number;
+  approvedAdditions: number;
+  newNg: number;
+}
+
+// Entry in the additions manifest passed to --update-ng-baseline. Each addition
+// must declare a provenance label and a reason; entries without them are
+// rejected so the baseline cannot silently absorb unmanaged NGs.
+interface ExtensionsNgBaselineAddition {
+  category: string;
+  check: string;
+  file: string | null;
+  evidence: string | null;
+  count: number;
+  provenance: string;
+  reason: string;
+}
+
+interface ExtensionsNgBaselineAdditionsManifest {
+  additions: ExtensionsNgBaselineAddition[];
 }
 
 // OU-0008 (Issue #2206): パス bucket key の環境依存対策（Design integrity-contracts
@@ -180,12 +220,32 @@ function normalizeExtBaselineFilePath(file: string | null): string {
 }
 
 export function extBaselineKey(
-  check: number,
-  checkName: string,
+  category: string,
+  check: string,
   file: string | null,
-  message: string | null,
+  evidence: string | null,
 ): string {
-  return `${check}\t${checkName}\t${normalizeExtBaselineFilePath(file)}\t${message ?? ""}`;
+  return `${category}\t${check}\t${normalizeExtBaselineFilePath(file)}\t${evidence ?? ""}`;
+}
+
+// Backward-compat entry normalization (mirrors check_integrity.ts): entries
+// written before provenance/reason tracking are treated as "legacy" provenance
+// so they keep demoting without a one-shot JSON migration.
+function normalizeExtensionsNgBaselineEntry(
+  raw: Partial<ExtensionsNgBaselineEntry>,
+): ExtensionsNgBaselineEntry {
+  return {
+    category: String(raw.category ?? ""),
+    check: String(raw.check ?? ""),
+    file: raw.file === null || raw.file === undefined ? null : String(raw.file),
+    evidence:
+      raw.evidence === null || raw.evidence === undefined
+        ? null
+        : String(raw.evidence),
+    count: typeof raw.count === "number" ? raw.count : 0,
+    provenance: raw.provenance ? String(raw.provenance) : "legacy",
+    reason: raw.reason ? String(raw.reason) : "",
+  };
 }
 
 function loadExtensionsNgBaseline(
@@ -195,7 +255,14 @@ function loadExtensionsNgBaseline(
   const content = readText(baselineAbs);
   if (!content) return null;
   try {
-    return JSON.parse(content) as ExtensionsNgBaseline;
+    const parsed = JSON.parse(content) as Partial<ExtensionsNgBaseline>;
+    if (!parsed || !Array.isArray(parsed.entries)) return null;
+    return {
+      version: typeof parsed.version === "number" ? parsed.version : 1,
+      rule_id: "NG-BASELINE",
+      generated_at: parsed.generated_at ?? "",
+      entries: parsed.entries.map(normalizeExtensionsNgBaselineEntry),
+    };
   } catch {
     return null;
   }
@@ -213,6 +280,251 @@ function writeExtensionsNgBaseline(
     JSON.stringify(baseline, null, 2) + "\n",
     "utf-8",
   );
+}
+
+// Bucket-aggregate extension failures into SPEC baseline entries
+// (category/check/file/evidence). Both strict and warning failures are
+// covered, matching the NG baseline scope (ng/warning levels). Provenance and
+// reason live only on persisted baseline entries; raw buckets stay label-free.
+interface ExtensionsFailureBucket {
+  category: string;
+  check: string;
+  file: string | null;
+  evidence: string | null;
+  count: number;
+}
+
+function summarizeExtensionFailures(
+  failures: CheckFailure[],
+): Map<string, ExtensionsFailureBucket> {
+  const summary = new Map<string, ExtensionsFailureBucket>();
+  for (const f of failures) {
+    const key = extBaselineKey(
+      EXTENSIONS_BASELINE_CATEGORY,
+      f.check_name,
+      f.file ?? null,
+      f.message ?? null,
+    );
+    const existing = summary.get(key);
+    if (existing) {
+      existing.count++;
+    } else {
+      summary.set(key, {
+        category: EXTENSIONS_BASELINE_CATEGORY,
+        check: f.check_name,
+        file: f.file ?? null,
+        evidence: f.message ?? null,
+        count: 1,
+      });
+    }
+  }
+  return summary;
+}
+
+// Demote baseline-known failures so the pass criterion reflects only the delta
+// exceeding the baseline. Strict failures in fully baseline-covered buckets are
+// demoted to warning; warning failures stay warning. Returns the three-way
+// report count per the NG baseline design.
+function applyExtensionsNgBaseline(
+  failures: CheckFailure[],
+  baseline: ExtensionsNgBaseline,
+): ExtensionsNgBaselineReport {
+  const baselineIndex = new Map<string, { count: number; provenance: string }>();
+  for (const entry of baseline.entries) {
+    const key = extBaselineKey(entry.category, entry.check, entry.file, entry.evidence);
+    // `.opencode/` 表記 entry と `src/opencode/` 表記 entry が正規化で同一
+    // bucket へ衝突する場合（OU-0008）、同一論理 NG の環境別観測として
+    // count の大きい方を採用する。
+    const prev = baselineIndex.get(key);
+    if (!prev || entry.count > prev.count) {
+      baselineIndex.set(key, { count: entry.count, provenance: entry.provenance });
+    }
+  }
+
+  const currentSummary = summarizeExtensionFailures(failures);
+  const newBuckets = new Set<string>();
+  for (const [key, entry] of currentSummary) {
+    const baselineCount = baselineIndex.get(key)?.count ?? 0;
+    if (entry.count > baselineCount) newBuckets.add(key);
+  }
+
+  const emittedPerBucket = new Map<string, number>();
+  let baselineKnown = 0;
+  let approvedAdditions = 0;
+  let newNg = 0;
+
+  for (const f of failures) {
+    const key = extBaselineKey(
+      EXTENSIONS_BASELINE_CATEGORY,
+      f.check_name,
+      f.file ?? null,
+      f.message ?? null,
+    );
+    const baselineEntry = baselineIndex.get(key);
+    const baselineCount = baselineEntry?.count ?? 0;
+    const provenance = baselineEntry?.provenance ?? "legacy";
+    const emitted = emittedPerBucket.get(key) ?? 0;
+    emittedPerBucket.set(key, emitted + 1);
+    if (emitted < baselineCount && !newBuckets.has(key)) {
+      if (f.severity === "strict") {
+        f.severity = "warning";
+      }
+      const tag =
+        provenance === "legacy"
+          ? "[baseline-known]"
+          : `[baseline-known provenance=${provenance}]`;
+      f.message = `${tag} ${f.message} (ng-baseline, not yet cleaned)`;
+      if (provenance === "legacy") {
+        baselineKnown++;
+      } else {
+        approvedAdditions++;
+      }
+    } else {
+      newNg++;
+    }
+  }
+  return { baselineKnown, approvedAdditions, newNg };
+}
+
+// Load the additions manifest from disk. Validates that every addition carries
+// non-empty provenance and reason; throws on a malformed manifest so the CLI
+// surfaces the error rather than silently absorbing unmanaged NGs.
+function loadExtensionsNgBaselineAdditions(
+  manifestPath: string,
+): ExtensionsNgBaselineAddition[] {
+  const content = readText(manifestPath);
+  if (!content) {
+    throw new Error(
+      `NG baseline additions manifest not found or unreadable: ${manifestPath}`,
+    );
+  }
+  let parsed: Partial<ExtensionsNgBaselineAdditionsManifest>;
+  try {
+    parsed = JSON.parse(content) as Partial<ExtensionsNgBaselineAdditionsManifest>;
+  } catch (e) {
+    throw new Error(
+      `NG baseline additions manifest is not valid JSON: ${manifestPath} (${
+        e instanceof Error ? e.message : String(e)
+      })`,
+    );
+  }
+  if (!parsed || !Array.isArray(parsed.additions)) {
+    throw new Error(
+      `NG baseline additions manifest must have an "additions" array: ${manifestPath}`,
+    );
+  }
+  const additions: ExtensionsNgBaselineAddition[] = [];
+  for (let i = 0; i < parsed.additions.length; i++) {
+    const raw = parsed.additions[i];
+    if (!raw || typeof raw !== "object") {
+      throw new Error(
+        `NG baseline additions[${i}] is not an object in ${manifestPath}`,
+      );
+    }
+    const category = typeof raw.category === "string" ? raw.category : "";
+    const check = typeof raw.check === "string" ? raw.check : "";
+    if (!category || !check) {
+      throw new Error(
+        `NG baseline additions[${i}] missing required category/check in ${manifestPath}`,
+      );
+    }
+    const provenance =
+      typeof raw.provenance === "string" && raw.provenance.length > 0
+        ? raw.provenance
+        : "";
+    const reason =
+      typeof raw.reason === "string" && raw.reason.length > 0 ? raw.reason : "";
+    if (!provenance || !reason) {
+      throw new Error(
+        `NG baseline additions[${i}] (${category}/${check}) missing required provenance or reason in ${manifestPath}`,
+      );
+    }
+    additions.push({
+      category,
+      check,
+      file: raw.file === null || raw.file === undefined ? null : String(raw.file),
+      evidence:
+        raw.evidence === null || raw.evidence === undefined
+          ? null
+          : String(raw.evidence),
+      count: typeof raw.count === "number" && raw.count > 0 ? raw.count : 1,
+      provenance,
+      reason,
+    });
+  }
+  return additions;
+}
+
+// SPEC update contract: merge approved additions (each carrying provenance +
+// reason) into the shared baseline. Does NOT regenerate the baseline from the
+// current NG set — unmanaged NGs stay out so they remain restoration targets.
+// Merged buckets are capped at the currently observable count (anti
+// over-counting / NG隠蔽).
+function updateExtensionsNgBaseline(
+  repoRoot: string,
+  failures: CheckFailure[],
+  additions: ExtensionsNgBaselineAddition[],
+): { addedEntries: number; updatedEntries: number } {
+  const baseline = loadExtensionsNgBaseline(repoRoot) ?? {
+    version: 1,
+    rule_id: "NG-BASELINE" as const,
+    generated_at: new Date().toISOString().slice(0, 10),
+    entries: [],
+  };
+
+  const index = new Map<string, ExtensionsNgBaselineEntry>();
+  for (const entry of baseline.entries) {
+    const key = extBaselineKey(entry.category, entry.check, entry.file, entry.evidence);
+    const prev = index.get(key);
+    if (!prev || entry.count > prev.count) {
+      index.set(key, entry);
+    }
+  }
+
+  const currentCounts = summarizeExtensionFailures(failures);
+
+  let addedEntries = 0;
+  let updatedEntries = 0;
+  for (const add of additions) {
+    const key = extBaselineKey(add.category, add.check, add.file, add.evidence);
+    const current = currentCounts.get(key);
+    const existing = index.get(key);
+    const baseCount = existing ? existing.count : 0;
+    const mergedCount = baseCount + add.count;
+    const finalCount = current ? Math.min(mergedCount, current.count) : mergedCount;
+    if (finalCount <= baseCount) {
+      continue;
+    }
+    index.set(key, {
+      category: add.category,
+      check: add.check,
+      file: add.file,
+      evidence: add.evidence,
+      count: finalCount,
+      provenance: add.provenance,
+      reason: add.reason,
+    });
+    if (existing) updatedEntries++;
+    else addedEntries++;
+  }
+
+  const updated: ExtensionsNgBaseline = {
+    version: baseline.version,
+    rule_id: "NG-BASELINE",
+    generated_at: new Date().toISOString().slice(0, 10),
+    entries: [...index.values()].sort((a, b) => {
+      if (a.category !== b.category) return a.category < b.category ? -1 : 1;
+      if (a.check !== b.check) return a.check < b.check ? -1 : 1;
+      if ((a.file ?? "") !== (b.file ?? ""))
+        return (a.file ?? "") < (b.file ?? "") ? -1 : 1;
+      return 0;
+    }),
+  };
+  writeExtensionsNgBaseline(repoRoot, updated);
+  console.error(
+    `[check_extensions] NG baseline updated: ${addedEntries} added, ${updatedEntries} updated (additions manifest: ${additions.length}).`,
+  );
+  return { addedEntries, updatedEntries };
 }
 
 // Heuristic override-intent phrases (check #8). Extension is additive-only.
@@ -402,7 +714,17 @@ function walkExtension(parsedDoc: unknown, rawText: string, rcFile: string): Ext
   return { pathsReferenced, skillsReferenced, rawText, failures };
 }
 
-export function checkExtensions(repoRoot: string): CheckReport {
+export interface CheckExtensionsOptions {
+  // --update-ng-baseline aggregates raw failure buckets; demotion must not
+  // rewrite messages first (the [baseline-known] prefix would change the
+  // evidence part of the bucket key).
+  skipNgBaseline?: boolean;
+}
+
+export function checkExtensions(
+  repoRoot: string,
+  options?: CheckExtensionsOptions,
+): CheckReport {
   const failures: CheckFailure[] = [];
   // cwd-independent (REQ-018): resolve every scan target against repoRoot.
   // No process.chdir() mutation — immune to (and no source of) order-dependent
@@ -695,84 +1017,24 @@ export function checkExtensions(repoRoot: string): CheckReport {
       stats.public_skills = skillDirs.length;
     }
 
-    const strictFailures = failures.filter((f) => f.severity === "strict");
-    // REQ-0161-005: baseline-aware pass. Demote baseline-known strict failures
-    // to warning so only new (delta) strict failures cause ok=false.
-    const baseline = loadExtensionsNgBaseline(repoRoot);
-    let newStrictCount = strictFailures.length;
-    if (baseline) {
-      const baselineIndex = new Map<string, number>();
-      for (const entry of baseline.entries) {
-        const key = extBaselineKey(
-          entry.check,
-          entry.check_name,
-          entry.file,
-          entry.message,
-        );
-        baselineIndex.set(key, entry.count);
+    // REQ-0161-005: baseline-aware pass over the shared ng-baseline. Demote
+    // baseline-known failures so only new (delta) strict failures cause
+    // ok=false. skipNgBaseline lets --update-ng-baseline aggregate raw buckets
+    // before demotion renames them via the [baseline-known] prefix.
+    let baselineReport: ExtensionsNgBaselineReport | null = null;
+    if (!options?.skipNgBaseline) {
+      const baseline = loadExtensionsNgBaseline(repoRoot);
+      if (baseline) {
+        baselineReport = applyExtensionsNgBaseline(failures, baseline);
       }
-      const emitted = new Map<string, number>();
-      for (const f of failures) {
-        if (f.severity !== "strict") continue;
-        const key = extBaselineKey(
-          f.check,
-          f.check_name,
-          f.file ?? null,
-          f.message ?? null,
-        );
-        const baselineCount = baselineIndex.get(key) ?? 0;
-        const n = emitted.get(key) ?? 0;
-        emitted.set(key, n + 1);
-        if (n < baselineCount) {
-          f.severity = "warning";
-          f.message = `[baseline-known] ${f.message} (check-extensions baseline, not yet cleaned)`;
-        }
-      }
-      newStrictCount = failures.filter((f) => f.severity === "strict").length;
     }
     return {
-      ok: newStrictCount === 0,
+      ok: failures.filter((f) => f.severity === "strict").length === 0,
       failures,
+      ...(baselineReport ? { ng_baseline: baselineReport } : {}),
       stats,
     };
   }
-}
-
-function updateExtensionsNgBaseline(
-  repoRoot: string,
-  failures: CheckFailure[],
-): void {
-  const summary = new Map<string, ExtensionsNgBaselineEntry>();
-  for (const f of failures) {
-    const key = extBaselineKey(
-      f.check,
-      f.check_name,
-      f.file ?? null,
-      f.message ?? null,
-    );
-    const existing = summary.get(key);
-    if (existing) {
-      existing.count++;
-    } else {
-      summary.set(key, {
-        check: f.check,
-        check_name: f.check_name,
-        file: f.file ?? null,
-        message: f.message ?? null,
-        count: 1,
-      });
-    }
-  }
-  const baseline: ExtensionsNgBaseline = {
-    version: 1,
-    rule_id: "CHECK-EXTENSIONS-NG-BASELINE",
-    generated_at: new Date().toISOString().slice(0, 10),
-    entries: [...summary.values()].sort((a, b) => a.check - b.check),
-  };
-  writeExtensionsNgBaseline(repoRoot, baseline);
-  console.error(
-    `[check_extensions] NG baseline regenerated: ${baseline.entries.length} entries (${failures.length} total failures).`,
-  );
 }
 
 export interface ScenarioResult {
@@ -1101,7 +1363,15 @@ if (require.main === module) {
   const json = args.includes("--json");
   const updateBaseline = args.includes("--update-ng-baseline");
   const scenarioMode = args.includes("--scenario");
-  const positional = args.filter((a) => !a.startsWith("--"));
+  // The value of --ng-baseline-additions is a path, not a positional repoRoot.
+  const positional: string[] = [];
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === "--ng-baseline-additions") {
+      i++;
+      continue;
+    }
+    if (!args[i].startsWith("--")) positional.push(args[i]);
+  }
   const repoRoot = positional[0] || process.cwd();
   if (scenarioMode) {
     const results = runExtensionScenarios();
@@ -1122,9 +1392,31 @@ if (require.main === module) {
     }
     process.exit(failed.length === 0 ? 0 : 1);
   }
-  const report = checkExtensions(repoRoot);
+  const report = updateBaseline
+    ? checkExtensions(repoRoot, { skipNgBaseline: true })
+    : checkExtensions(repoRoot);
   if (updateBaseline) {
-    updateExtensionsNgBaseline(repoRoot, report.failures);
+    // v2:REQ-0161-005: the additions manifest is required; running
+    // --update-ng-baseline bare would silently absorb unmanaged NGs.
+    const additionsFlagIdx = args.indexOf("--ng-baseline-additions");
+    const manifestPath =
+      additionsFlagIdx >= 0 ? args[additionsFlagIdx + 1] : undefined;
+    if (!manifestPath) {
+      process.stderr.write(
+        "[check_extensions] --update-ng-baseline requires --ng-baseline-additions <manifest.json> (v2:REQ-0161-005: unmanaged NGs must not be absorbed).\n",
+      );
+      process.exit(2);
+    }
+    let additions: ExtensionsNgBaselineAddition[];
+    try {
+      additions = loadExtensionsNgBaselineAdditions(manifestPath);
+    } catch (e) {
+      process.stderr.write(
+        `[check_extensions] ${e instanceof Error ? e.message : String(e)}\n`,
+      );
+      process.exit(2);
+    }
+    updateExtensionsNgBaseline(repoRoot, report.failures, additions);
     process.exit(0);
   }
   if (json) {
@@ -1134,6 +1426,12 @@ if (require.main === module) {
     process.stdout.write(`=====================================================\n`);
     process.stdout.write(`repoRoot: ${repoRoot}\n`);
     process.stdout.write(`ok: ${report.ok}\n`);
+    if (report.ng_baseline) {
+      const r = report.ng_baseline;
+      process.stdout.write(
+        `ng_baseline: ${r.baselineKnown} baseline-known (demoted to warning), ${r.approvedAdditions} approved additions (provenance-tracked, demoted to warning), ${r.newNg} new unmanaged strict failure (delta, exit code driver)\n`,
+      );
+    }
     process.stdout.write(`stats: ${JSON.stringify(report.stats, null, 2)}\n`);
     process.stdout.write(`failures (${report.failures.length}):\n`);
     for (const f of report.failures) {
