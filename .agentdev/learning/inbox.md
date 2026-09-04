@@ -360,3 +360,21 @@
 - **横展開候補**: agentdev-quality-gates（bun test 実行形態契約の証跡退避手順補完）、repo-agentdev-integrity（checker 実行手順）、learning-promote で判定
 - **関連**: PR #2616 の case-close 対応記録コメント（テスト結果セクション。merge commit 152ba3b5 と同一 tree での最終再実行）
 - **タグ**: #integrity #bun #stderr #verification #case-close
+
+---
+
+## 2026-09-05: Baseline V2 初回測定の委譲単位は6件でサンプル不足。断定を避け運用蓄積後に同一手順で再測定する
+
+- **現象**: Baseline V2 測定（OU-007）の委譲単位は6件で、30〜50 execution units の運用蓄積目安に対してサンプル不足。harness telemetry 指標（wall-clock、token 4性質、tool call、path 再読込、source / projection 重複参照）と telemetry 契約起因の実行失敗は本測定範囲で断定せず、分布・平均・削減効果も断定しない
+- **状況/文脈**: case-run 委譲（Epic #2597 Wave 1 / Issue 2604 / PR 2617、OU-007 Baseline V2 Measurement）
+- **検知方法**: 測定 Report §5 サンプル不足の明記と Report §6 observability gap（harness テレメトリ未永続化、`adf_harness_ref` が対象 PR 6件すべて N/A）の確認
+- **根本原因**: harness telemetry が測定 Report として永続化されておらず、GitHub 読み取りのみの測定は構造観測値（field 数、backfill、コメント/コミット数、Outcome）に限定される
+- **応急/対応内容**: サンプル不足を Report に明記し断定を回避。測定可能な GitHub 構造観測値のみ実測記録し、Wave 5 前後の field 数比較（平均 6.0 → 4 field、約33%減）は構造の観測値として位置づけた
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/spec影響**: なし（AG-002 完了条件限定により、測定手順の存在と再現可能性をもって合格。実測蓄積は運用サイクル依存）
+- **展開視点**: 運用蓄積後に同一手順（Report §2 測定手順・baseline SHA 固定記録）で再測定する。OU-008 以降の Wave 実行で観測サンプルは自然増加する
+- **再現条件**: 30〜50 execution units 未満の委譲単位数で測定分布・平均・削減効果を断定する場合
+- **予防策**: 測定 Report にサンプル数と断定可能範囲を明記し、断定は運用蓄積後へ繰り延べる
+- **横展開候補**: agentdev-workflow-case-auto（Wave 実行後の再測定トリガ候補）、learning-promote で判定
+- **関連**: PR 2617 本文 Findings / Capture候補 セクション（learning）からの capture 回収（case-close STEP-6）
+- **タグ**: #measurement #baseline-v2 #sample-size #observability #case-run
