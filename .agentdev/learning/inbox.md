@@ -270,3 +270,39 @@
 - **横展開候補**: agentdev-quality-gates（bun test 実行形態契約の前提補足）、learning-promote で判定
 - **関連**: PR #2611 本文 Findings セクションからの capture 回収（case-close STEP-6）
 - **タグ**: #integrity #bun #worktree #repo-agentdev-integrity #case-run
+
+---
+
+## 2026-09-05: bun run 経由の process.exit() CLI は stdout flush が破棄され出力が空になる
+
+- **現象**: bun run で実行する process.exit() を呼ぶ CLI（check_distribution_boundary_cli.ts）が、パイプ・リダイレクト・通常出力のいずれでも stdout 内容が空になる
+- **状況/文脈**: case-run 委譲（Epic #2596 Wave 2 / Issue #2599 / PR #2612、OU-002 同期義務の配布依存境界検査実行時）
+- **検知方法**: checker の stdout が空であることの確認
+- **根本原因**: bun 環境で process.exit() の終了タイミングにより stdout flush が完了しない
+- **応急/対応内容**: 結果判定は EXIT コード（0 ok / 1 violation / 2 error）で行い、node 経由の実行を検討
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/spec影響**: なし（checker 実行契約の安定実行経路に既存知見あり。運用注記への追記候補）
+- **展開視点**: checker 実行契約（checker 実行契約と検出基盤規則 Design）の「安定実行経路」節との整合確認が候補
+- **再現条件**: Windows + bun で bun run により process.exit() を呼ぶ CLI を実行して stdout を取得する場合
+- **予防策**: exit code が意味を持つ checker の結果判定は EXIT コード基準とするか、node 経由の実行を標準とする
+- **横展開候補**: agentdev-quality-gates（checker 実行手順）、learning-promote で判定
+- **関連**: PR #2612 本文 Findings セクションからの capture 回収（case-close STEP-6）
+- **タグ**: #bun #checker #stdout #distribution-boundary #case-run
+
+---
+
+## 2026-09-05: IR-067 は plain な REQ-NNN-NNN を REQ 行引用として検出するため対応表の旧行 ID は code span で記録する
+
+- **現象**: IR-067（referenced-req-row-existence）が docs 本文内の plain な REQ-NNN-NNN を REQ 行引用として検出し、旧→新行対応表のような歴史参照テーブルで旧行 ID が Phantom 参照（NG）として誤検出された
+- **状況/文脈**: case-run 委譲（Epic #2596 Wave 2 / Issue #2599 / PR #2612、verification-scope-catalog.md の旧→新行対応表保存時）
+- **検知方法**: docs-check（check_integrity.ts）の IR-067 NG 検出（fix-and-reverify で解消）
+- **根本原因**: IR-067 の検出対象が code span・括弧等を除いた plain テキストであり、歴史参照と現行引用の区別がない
+- **応急/対応内容**: 対応表内の旧行 ID を plain から code span へ変更し、IR-067 新規 NG 4件を解消（検出→修正→再検証合格）
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/spec影響**: なし（IR ルール詳細の正規免除経路（様式例示）の活用）
+- **展開視点**: 歴史参照テーブル（対応表、旧参照の記録）を含む成果物の執筆規約への追記候補
+- **再現条件**: docs 本文に plain な REQ-NNN-NNN（存在しない行 ID）を記録した場合
+- **予防策**: 旧行 ID 等の歴史参照は code span で記録する執筆規約を明文化する
+- **横展開候補**: agentdev-doc-writing（執筆規範）、learning-promote で判定
+- **関連**: PR #2612 本文 Findings セクションからの capture 回収（case-close STEP-6）
+- **タグ**: #integrity #ir067 #docs-check #case-run #verification
