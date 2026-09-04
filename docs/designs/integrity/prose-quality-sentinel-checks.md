@@ -6,6 +6,7 @@ updated: "2026-09-03"
 ---
 
 <!-- ADF-COVERS(design): REQ-053-022 -->
+<!-- ADF-COVERS(verification): REQ-053-023 -->
 
 # 既知不備センチネル検査
 
