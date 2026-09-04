@@ -7,6 +7,7 @@
 // ADF-COVERS(implementation): REQ-010-002, REQ-010-003, REQ-010-005, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-064, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008
 // ADF-COVERS(verification): REQ-010-009
 // ADF-COVERS(verification): REQ-011-002, REQ-011-008, REQ-011-014
+// ADF-COVERS(implementation): REQ-018-003, REQ-018-004
 // ADF-COVERS(verification): REQ-031-011, REQ-031-012, REQ-031-014
 // ADF-COVERS(verification): REQ-032-004, REQ-032-005
 // ADF-COVERS(verification): REQ-037-008, REQ-037-010
@@ -9746,25 +9747,34 @@ const IR068_MANIFEST_REL =
 
 function loadSkillProjectionManifest(
   root: string,
-): { skills: string[] | null; warnings: string[] } {
+): { skills: string[] | null; thirdPartySkills: string[]; warnings: string[] } {
   const yamlPath = path.join(root, ...IR068_MANIFEST_REL.split("/"));
   const content = readText(yamlPath);
-  if (!content) return { skills: null, warnings: [] };
+  if (!content) return { skills: null, thirdPartySkills: [], warnings: [] };
   const skills: string[] = [];
+  const thirdPartySkills: string[] = [];
   const warnings: string[] = [];
   let inSkills = false;
+  let inThirdParty = false;
   for (const raw of content.split("\n")) {
     const line = raw.replace(/\r$/, "");
     if (!line.trim() || line.trim().startsWith("#")) continue;
     if (/^skills:\s*$/.test(line)) {
       inSkills = true;
+      inThirdParty = false;
+      continue;
+    }
+    if (/^third_party_skills:\s*$/.test(line)) {
+      inSkills = false;
+      inThirdParty = true;
       continue;
     }
     if (/^[A-Za-z_][\w]*:/.test(line)) {
       inSkills = false;
+      inThirdParty = false;
       continue;
     }
-    if (!inSkills) continue;
+    if (!inSkills && !inThirdParty) continue;
     const m = line.match(/^\s*-\s+(.+)$/);
     if (!m) continue;
     const name = unquoteYamlScalar(m[1]);
@@ -9772,13 +9782,15 @@ function loadSkillProjectionManifest(
       warnings.push(`invalid skill name '${name}' in ${IR068_MANIFEST_REL}`);
       continue;
     }
-    if (skills.includes(name)) {
-      warnings.push(`duplicate skill name '${name}' in ${IR068_MANIFEST_REL}`);
+    const entries = inSkills ? skills : thirdPartySkills;
+    const kind = inSkills ? "skill name" : "third-party skill name";
+    if (entries.includes(name)) {
+      warnings.push(`duplicate ${kind} '${name}' in ${IR068_MANIFEST_REL}`);
       continue;
     }
-    skills.push(name);
+    entries.push(name);
   }
-  return { skills, warnings };
+  return { skills, thirdPartySkills, warnings };
 }
 
 // 投影エントリ列挙（IR-068）: .opencode/skills の repo-* 以外のエントリを列挙する。
@@ -9824,7 +9836,9 @@ function listProjectionSkillEntries(
 
 function checkSkillProjectionManifest(root: string): CheckResult[] {
   const results: CheckResult[] = [];
-  const { skills: manifestSkills, warnings } = loadSkillProjectionManifest(root);
+  const { skills: manifestSkills, thirdPartySkills, warnings } =
+    loadSkillProjectionManifest(root);
+  const toleratedThirdParty = new Set(thirdPartySkills);
   for (const w of warnings) {
     results.push(
       warn(
@@ -9939,6 +9953,25 @@ function checkSkillProjectionManifest(root: string): CheckResult[] {
     }
     for (const name of [...projSet].sort()) {
       if (!srcSet.has(name)) {
+        // third-party 取得機構経由の管理登録済み配置は検査許容（INSPECTION-TOLERATED、
+        // IR-068 exemption、DEC-023 accepted、REQ-018-003）。許容は検出ノイズ抑制であり
+        // 走査除外ではない。未宣言の third-party 起源配置は引き続き stale junction として検出する。
+        if (toleratedThirdParty.has(name)) {
+          results.push(
+            info(
+              "SkillProjection",
+              "skill-projection-manifest",
+              `Tolerated third-party projection entry '${name}' (INSPECTION-TOLERATED, IR-068 exemption, DEC-023)`,
+              undefined,
+              undefined,
+              {
+                evidence: `tolerated-third-party:${name}`,
+                expected: `declared in ${IR068_MANIFEST_REL} third_party_skills`,
+              },
+            ),
+          );
+          continue;
+        }
         violationCount++;
         results.push(
           ng(

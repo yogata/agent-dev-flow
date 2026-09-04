@@ -4414,5 +4414,81 @@ describe("IR-068 skill-projection-manifest (Issue #2383 (d), inspect F-01)", () 
     );
     expect(warnings.length).toBe(2);
   });
+
+  it("tolerates declared third-party projection entries and keeps undeclared ones inspected (許容例・違反例: INSPECTION-TOLERATED)", () => {
+    const root = join(IR068_ROOT, "third-party-tolerated");
+    mkdirp(root);
+    buildIr068BaseFixture(root);
+    writeIr068Manifest(root, [
+      "schema_version: 1",
+      "generated_at: 2026-09-04",
+      "",
+      "skills:",
+      "  - agentdev-alpha-skill",
+      "  - agentdev-beta-skill",
+      "",
+      "third_party_skills:",
+      "  - japanese-tech-writing",
+    ]);
+    // 投影: ADF スキル 2 件 + 管理登録済み third-party + 未宣言 third-party 起源配置
+    for (const proj of [
+      "agentdev-alpha-skill",
+      "agentdev-beta-skill",
+      "japanese-tech-writing",
+      "undeclared-third-party-skill",
+    ]) {
+      const projDir = join(root, ".opencode", "skills", proj);
+      mkdirp(projDir);
+      writeFileSync(join(projDir, "SKILL.md"), `---\nname: ${proj}\ndescription: p\n---\n# ${proj}\n`, "utf-8");
+    }
+    const r = runScript(root, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const ngEvidence = parsed.results
+      .filter(
+        (res: { category: string; level: string }) =>
+          res.category === "SkillProjection" && res.level === "ng",
+      )
+      .map((res: { evidence?: string }) => res.evidence ?? "");
+    // 管理登録済み third-party は許容（projection-extra に計上されない）
+    expect(ngEvidence).not.toContain("projection-extra:japanese-tech-writing");
+    // 未宣言の third-party 起源配置は引き続き検出（許容は走査除外ではない）
+    expect(ngEvidence).toContain("projection-extra:undeclared-third-party-skill");
+    // 許容は info で可視化され、silent skip しない
+    const tolerated = parsed.results.find(
+      (res: { category: string; level: string; evidence?: string }) =>
+        res.category === "SkillProjection" &&
+        res.level === "info" &&
+        res.evidence === "tolerated-third-party:japanese-tech-writing",
+    );
+    expect(tolerated).toBeDefined();
+  });
+
+  it("reports invalid or duplicate third_party_skills entries instead of silently skipping (silent skip 禁止)", () => {
+    const root = join(IR068_ROOT, "third-party-schema-warning");
+    mkdirp(root);
+    buildIr068BaseFixture(root);
+    writeIr068Manifest(root, [
+      "schema_version: 1",
+      "generated_at: 2026-09-04",
+      "",
+      "skills:",
+      "  - agentdev-alpha-skill",
+      "  - agentdev-beta-skill",
+      "",
+      "third_party_skills:",
+      "  - japanese-tech-writing",
+      "  - japanese-tech-writing",
+      "  - Invalid_Name!",
+    ]);
+    const r = runScript(root, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const warnings = parsed.results.filter(
+      (res: { category: string; level: string; check: string }) =>
+        res.category === "SkillProjection" &&
+        res.level === "warning" &&
+        res.check === "skill-projection-manifest",
+    );
+    expect(warnings.length).toBe(2);
+  });
 });
 
