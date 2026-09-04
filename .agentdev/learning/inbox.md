@@ -324,3 +324,21 @@
 - **横展開候補**: agentdev-workflow-case-open / Epic Wave 設計（RU → Epic 分解時の同期義務割り当て）、learning-promote で判定
 - **関連**: PR #2613 本文 Findings / Capture候補 セクションからの capture 回収（case-close STEP-6）
 - **タグ**: #integrity #traceability #req-restructure #epic-wave #case-run
+
+---
+
+## 2026-09-05: worktree で integrity suite を実行する際は agentdev-project-extensions/scripts 側の bun install（zod）が前提になる
+
+- **現象**: worktree で repo-agentdev-integrity integrity suite を実行する場合、.opencode/skills/repo-agentdev-integrity/scripts に加えて src/opencode/skills/agentdev-project-extensions/scripts の bun install（zod 依存）が前提となる。zod 未解決のままだと、環境依存 fail 4件 / errors 4件（Cannot find package 'zod'）が integrity suite に混入する
+- **状況/文脈**: case-run 委譲（Epic #2596 Wave 5 / Issue #2602 / PR #2615、OU-005 縮小実施時の検証実行）
+- **検知方法**: integrity suite 実行時の環境依存 fail / errors の分離（zod 未解決による Cannot find package エラーの識別）
+- **根本原因**: worktree は node_modules を引き継がないため、スクリプト実行に必要な依存解決がスキルごとのディレクトリ単位で必要になる。依存前提が複数ディレクトリに分散している
+- **応急/対応内容**: .opencode/skills/repo-agentdev-integrity/scripts と src/opencode/skills/agentdev-project-extensions/scripts の両方で bun install を事前実行し、環境依存 fail を消滅させてから既知 fail 判定を実施
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/spec影響**: なし（検証実行環境の運用教訓）
+- **展開視点**: integrity suite の既知 fail 分離判定の前に、実行環境の依存解決状態を先に潰す。環境依存 fail は既知 fail 判定を妨げる
+- **再現条件**: 新規 worktree で bun install を行わず integrity suite を実行した場合
+- **予防策**: worktree で integrity suite を実行する場合の手順に、両スクリプトディレクトリの bun install を前提手順として明記する（PR #2615 テスト結果セクションに記録済み）
+- **横展開候補**: repo-agentdev-integrity（実行手順の依存前提明記）、agentdev-quality-gates（bun test 実行形態契約の依存解決前提）、learning-promote で判定
+- **関連**: PR #2615 本文 Findings / Capture候補 セクションからの capture 回収（case-close STEP-6）
+- **タグ**: #integrity #bun #zod #worktree #environment-dependency
