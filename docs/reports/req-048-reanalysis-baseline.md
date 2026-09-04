@@ -3,18 +3,40 @@ id: BASELINE-REQ048-REANALYSIS
 title: "REQ-048 実行効率改善 再分析比較基線と再分析手順"
 status: accepted
 created: 2026-08-23
-baseline_for: REQ-048-021 / DEC-017
+baseline_for: REQ-048（再構築版、Legacy Baseline） / DEC-017
 source_issue: "#2400 (Area1 実行識別情報)"
 parent_epic: "#2399 (REQ-048 ADF 実行効率第1次改善)"
 ---
 
-<!-- ADF-COVERS(implementation): REQ-048-019, REQ-048-020, REQ-048-021 -->
-<!-- ADF-COVERS(verification): REQ-048-019, REQ-048-020, REQ-048-021 -->
+<!-- ADF-COVERS(implementation): REQ-048-015, REQ-048-016 -->
+<!-- ADF-COVERS(verification): REQ-048-015, REQ-048-016 -->
 # REQ-048 再分析比較基線と再分析手順
 
 REQ-048（ADF 実行効率第1次改善）実施後の再分析に用いる比較基線と再分析手順を記録する観測記録である。
 識別情報の記録契約の正規仕様は workflow-contracts Design「ADF 実行識別情報の記録契約」が、テンプレートセクション形式は agentdev-workflow-templates Design「実行識別情報・検証差分のテンプレートセクション形式」がそれぞれ正である。
 本資料は既存正規成果物（Report）への保存であり、識別情報記録専用の新規成果物種別や実行履歴 DB を新設しない（DEC-017 準拠）。
+
+## 本資料の位置づけ（Legacy Baseline 再枠付け）
+
+REQ-048 全面再構築（Epic #2596、旧21行→新16行）に伴い、本資料は改善前分析を歴史的比較基線（Legacy Baseline、REQ-048-015）として保存する観測記録である。
+基線参照の旧行 ID（REQ-048-019〜REQ-048-021）は新行 ID（REQ-048-015、REQ-048-016）へ付け替えた。
+旧→新行対応表の正は `docs/designs/foundations/references/verification-scope-catalog.md`「REQ-048」セクションである。
+本資料の実測値（30日間、97論理実行単位、総計約 67.9 億トークン等）と定義（用語の定義表、再分析手順）は、再枠付けに際して一切変更していない。歴史証拠としての保存である。
+
+### Legacy Baseline の定義的性質
+
+改善前分析（2026-08-22 時点）の定義には、次の性質がある。本資料の実測値を Baseline V2 以降の指標と直接比較してはならない根拠である。
+
+- 論理実行単位を「read を伴う実行」として計上しており、97単位は read を伴う実行の集計である。委譲単位識別子（`DEL-{N}-{seq}`）による機械区分は当時存在しなかった
+- token 総計の大部分を cache read が占める。総計値を cost 指標として他の期間と単純比較できない
+- source / projection 重複参照、同一 path 再読込、子セッション間の同一 path 再読込の各指標は、当時の正規化 path 定義と実行単位定義に基づく実測である
+- 実行識別情報セクション導入前の実行を含み、ADF 発行の実行識別情報（machine correlation）が不十分な期間を対象とする。機械対応付け率は実質 0%（指標表「対応付け率」行のとおり）
+
+### Baseline V2 との関係
+
+Baseline V2（本要件再構築時点の GitHub 最新 ADF control plane）の定義、baseline commit SHA 固定手順、測定指標、比較可能範囲・非比較範囲の境界は、docs/reports/req-048-baseline-v2-definition.md が正である。
+新しい評価指標を本資料（Legacy Baseline）の値へ retro-fit しない。
+比較は Baseline V2 とそれ以降の測定の間で行い、Legacy Baseline との比較可能範囲・非比較範囲の区別は REQ-048-015 に従う。
 
 ## 目的
 
