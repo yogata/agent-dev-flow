@@ -1,8 +1,8 @@
 ---
 title: agentdev-artifact-validation Design
-status: draft
+status: accepted
 created: 2026-07-22
-updated: 2026-07-24
+updated: 2026-09-04
 ---
 <!-- ADF-COVERS(implementation): REQ-001-042 -->
 
@@ -55,7 +55,7 @@ REQ、Decision、Design 固有の内容判断を行わず、決定的検証の�
 
 - 所有 script（`check-frontmatter-consistency.ts`、`check-entry-existence.ts`、`check-change-impact.ts`）は `src/opencode/skills/agentdev-artifact-validation/scripts/` 配下に配置する
 - script は決定的（純粋関数）、テスト可能（`tests/*.test.ts`）とする
-- I/O は argv/stdin で入力を受け取り、stdout で JSON 結果を返す（REQ-002-160）
+- I/O は argv/stdin で入力を受け取り、stdout で JSON 結果を返す
 - 利用側 command、skill（`agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-design-file-manager`、`req-save`、`design-save` 等）は内部 script パスを直接参照せず、本 skill の公開検証契約へ委譲する
 - 同一 script または共有 lib を複数 skill へ複製しない
 
@@ -86,5 +86,5 @@ REQ 固有 script は `agentdev-req-file-manager`、Decision 固有 script は `
 - [agentdev-req-file-manager.md](agentdev-req-file-manager.md)（REQ 操作 skill、REQ 固有 script 所有）
 - [agentdev-decision-file-manager.md](agentdev-decision-file-manager.md)（Decision 操作 skill、Decision 固有 script 所有）
 - [agentdev-design-file-manager.md](agentdev-design-file-manager.md)（Design 操作 skill、Design 固有 script 所有）
-- REQ-002-159（script 所有権の責務別配置）
+- REQ-002-040（決定的処理の正規配置基準）、REQ-002-016（script は該当 skill の scripts/ 配下へ配置し所有 skill の公開操作契約経由で呼び出す）
 - REQ-002-035（決定的処理の script 委譲）
