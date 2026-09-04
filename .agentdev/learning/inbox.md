@@ -110,3 +110,39 @@
 - **想定反映先**: docs/knowledge/checker-cli-stdout-loss-on-windows-bun.md の近縁現象追記候補（intake 経由）、checker 実装ガイド、learning-promote での分類
 - **関連**: PR #2586 本文 Findings / Capture候補 セクションからの capture 回収（case-close STEP-6）
 - **タグ**: #checker #esm #node #windows #verification
+
+---
+
+## 2026-09-04: worktree の per-skill node_modules は git 管理外のため引き継がれず、bun test 単独実行が zod 未解決で失敗する（bun run では成功する非対称）
+
+- **問題事象**: worktree 環境では `src/opencode/skills/agentdev-project-extensions/scripts/node_modules`（zod / typescript 等、git 管理外の per-skill node_modules）が引き継がれず、`bun test ./.opencode/...` 単独実行が `Cannot find package 'zod'` で失敗する。bun run によるスクリプト直接実行では zod 解決が成功する非対称性も観測
+- **発生局面**: case-run 委譲（Issue #2560 / PR #2587、OU-004 check_extensions baseline SPEC 整合の実装・検証時）
+- **検知方式**: bun test 単独実行の zod 未解決エラー
+- **根本原因**: REQ-018 worktree fallback は src/opencode tree（git 資産）が SoT だが node_modules は非 git 資産のため fallback 対象外。per-skill node_modules は worktree ごとに再整備が必要
+- **自律対応内容**: main 側 node_modules への junction 作成（検証後削除）で暫定対応し、bun test 15 pass / 0 fail を達成
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/spec影響**: なし（検証環境の整備手順の教訓）
+- **横展開観点**: worktree で checker 系テスト検証を行う全 workflow（case-run / case-close / 実行担当サブエージェント）に共通。「worktree 作成直後の node_modules 欠落」（PR #2585 由来エントリ）の近縁現象で、対象が per-skill node_modules である点と junction 対応の有効性が追加知見
+- **再発条件**: worktree で per-skill node_modules 依存の bun test を事前整備なしで単独実行する
+- **予防策候補**: worktree での checker 系テスト検証は junction 作成（検証後削除）または該当 skill ディレクトリでの `bun install` を検証手順の事前ステップに組み込む
+- **想定反映先**: agentdev-git-worktree の worktree 作成後手順知識、learning-promote での分類（PR #2585 由来エントリとの統合候補）
+- **関連**: PR #2587 本文 Findings / Capture候補 セクションからの capture 回収（case-close STEP-6）
+- **タグ**: #worktree #node_modules #zod #bun #environment
+
+---
+
+## 2026-09-04: ng-baseline additions manifest の bucket key は実行結果 message との完全一致が必要で、manifest 化対象は prefix 無しの新規 NG から選ぶのが正手順
+
+- **問題事象**: additions manifest 作成時の bucket key（category/check/file/evidence）が実行結果 message と完全一致しないと baseline 登録が効かない。baseline 登録済み bucket は demote 済み message（`[baseline-known...]` prefix 付き）で出力されるため、demote 済み出力を evidence に転記しても一致しない（本検証で観測・確認済み）
+- **発生局面**: case-run 委譲（Issue #2560 / PR #2587、OU-004 の CLI update フロー検証時）
+- **検知方式**: manifest による update → demote フロー検証中の baseline 登録不発
+- **根本原因**: demotion 後の出力は prefix 付与で message が変化するため、出力結果をそのまま evidence に使うと bucket key がズレる
+- **自律対応内容**: manifest 化の対象を prefix 無しの新規 NG（`--json` 出力の生 failures）から選ぶ手順で再検証し、update → demote → strict pass フローを合格
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/spec影響**: なし（baseline 運用の手順知見。SPEC どおりの動作）
+- **横展開観点**: ng-baseline additions manifest を作成する全運用（check_integrity / check_extensions / learning-promote での baseline 更新提案）に共通
+- **再発条件**: demote 済み出力（prefix 付き message）を evidence に手書き転記して manifest を作成する
+- **予防策候補**: additions manifest は `--json` 出力の生 failures から bucket key を機械的に生成する。手書き転記を避ける
+- **想定反映先**: integrity-contracts baseline 運用契約の手順補足、check_extensions ヘルプ・ドキュメント、learning-promote での分類
+- **関連**: PR #2587 本文 Findings / Capture候補 セクションからの capture 回収（case-close STEP-6）
+- **タグ**: #integrity #ng-baseline #baseline #checker #verification
