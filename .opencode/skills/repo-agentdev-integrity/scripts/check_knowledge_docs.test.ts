@@ -12,9 +12,12 @@ import { join } from "node:path";
 import {
   AREA_README_FILENAME,
   REQUIRED_SECTIONS,
+  extractFrontmatterLines,
   extractHeadings,
+  findFrontmatterViolations,
   findMissingSections,
   isKebabCaseSlug,
+  isValidIsoDate,
   scanKnowledgeDocs,
 } from "./check_knowledge_docs.ts";
 
@@ -135,6 +138,96 @@ describe("isKebabCaseSlug", () => {
   });
 });
 
+// ─── 純関数: frontmatter 検査（REQ-056-010） ─────────────────────────────
+
+describe("isValidIsoDate", () => {
+  test("ISO 8601 日付（YYYY-MM-DD）は合格（正常例）", () => {
+    expect(isValidIsoDate("2026-09-01")).toBe(true);
+  });
+
+  test("形式不備・存在しない日付は不合格（違反例・境界例）", () => {
+    expect(isValidIsoDate("2026/09/01")).toBe(false);
+    expect(isValidIsoDate("2026-9-1")).toBe(false);
+    expect(isValidIsoDate("2026年9月1日")).toBe(false);
+    expect(isValidIsoDate("")).toBe(false);
+    expect(isValidIsoDate("2026-02-30")).toBe(false); // カレンダーに存在しない日付
+  });
+});
+
+describe("extractFrontmatterLines", () => {
+  test("frontmatter ブロックの内部行を返す（正常例・CRLF 許容）", () => {
+    expect(extractFrontmatterLines("---\ntitle: a\n---\n\n本文\n")).toEqual(["title: a"]);
+    expect(extractFrontmatterLines("---\r\ntitle: a\r\n---\r\n")).toEqual(["title: a"]);
+  });
+
+  test("開き --- がない・閉じ --- がない場合は null（違反例）", () => {
+    expect(extractFrontmatterLines("title: a\n---\n")).toBeNull();
+    expect(extractFrontmatterLines("---\ntitle: a\n")).toBeNull();
+  });
+});
+
+describe("findFrontmatterViolations", () => {
+  const complete = "---\ntitle: 正常\ncreated: 2026-09-01\nupdated: 2026-09-02\n---\n\n本文\n";
+
+  test("title / created / updated が揃えば違反なし（正常例）", () => {
+    expect(findFrontmatterViolations(complete)).toEqual([]);
+  });
+
+  test("frontmatter ブロック欠落は missing-frontmatter（違反例）", () => {
+    const violations = findFrontmatterViolations("## 知識内容\n本文のみ\n");
+    expect(violations).toHaveLength(1);
+    expect(violations[0].kind).toBe("missing-frontmatter");
+  });
+
+  test("閉じ --- がない場合は missing-frontmatter（違反例）", () => {
+    const violations = findFrontmatterViolations("---\ntitle: 不完全\n");
+    expect(violations).toHaveLength(1);
+    expect(violations[0].kind).toBe("missing-frontmatter");
+  });
+
+  test("必須フィールド欠落を検出する（違反例）", () => {
+    expect(
+      findFrontmatterViolations("---\ncreated: 2026-09-01\nupdated: 2026-09-01\n---\n").map(
+        (v) => v.problem,
+      ),
+    ).toEqual([expect.stringContaining("title")]);
+    expect(
+      findFrontmatterViolations("---\ntitle: a\nupdated: 2026-09-01\n---\n").map(
+        (v) => v.problem,
+      ),
+    ).toEqual([expect.stringContaining("created")]);
+    expect(
+      findFrontmatterViolations("---\ntitle: a\ncreated: 2026-09-01\n---\n").map(
+        (v) => v.problem,
+      ),
+    ).toEqual([expect.stringContaining("updated")]);
+  });
+
+  test("日付形式不備を検出する（違反例）", () => {
+    const violations = findFrontmatterViolations(
+      "---\ntitle: a\ncreated: 2026/09/01\nupdated: 2026-09-01\n---\n",
+    );
+    expect(violations).toHaveLength(1);
+    expect(violations[0].kind).toBe("invalid-frontmatter");
+    expect(violations[0].problem).toContain("created");
+  });
+
+  test("updated が created より前は検出する（違反例）", () => {
+    const violations = findFrontmatterViolations(
+      "---\ntitle: a\ncreated: 2026-09-02\nupdated: 2026-09-01\n---\n",
+    );
+    expect(violations).toHaveLength(1);
+    expect(violations[0].problem).toContain("updated");
+  });
+
+  test("updated が created と同日は合格（境界例）", () => {
+    const violations = findFrontmatterViolations(
+      "---\ntitle: a\ncreated: 2026-09-01\nupdated: 2026-09-01\n---\n",
+    );
+    expect(violations).toEqual([]);
+  });
+});
+
 // ─── scanKnowledgeDocs（領域構造検査） ───────────────────────────────────
 
 describe("scanKnowledgeDocs", () => {
@@ -176,6 +269,49 @@ describe("scanKnowledgeDocs", () => {
     expect(missing.every((f) => f.file === "docs/knowledge/incomplete-doc.md")).toBe(true);
   });
 
+  test("違反例: frontmatter ブロック欠落を検出する", () => {
+    const root = makeTempRoot();
+    writeKnowledgeDoc(
+      root,
+      "no-frontmatter.md",
+      "## 知識内容\n\n本文のみで frontmatter がない。\n",
+    );
+
+    const result = scanKnowledgeDocs(root);
+    const missing = result.findings.filter((f) => f.kind === "missing-frontmatter");
+    expect(missing).toHaveLength(1);
+    expect(missing[0].file).toBe("docs/knowledge/no-frontmatter.md");
+  });
+
+  test("違反例: frontmatter 必須フィールド欠落を検出する", () => {
+    const root = makeTempRoot();
+    writeKnowledgeDoc(
+      root,
+      "missing-title.md",
+      "---\ncreated: 2026-09-01\nupdated: 2026-09-01\n---\n\n## 知識内容\n\n本文。\n",
+    );
+
+    const result = scanKnowledgeDocs(root);
+    const invalid = result.findings.filter((f) => f.kind === "invalid-frontmatter");
+    expect(invalid).toHaveLength(1);
+    expect(invalid[0].file).toBe("docs/knowledge/missing-title.md");
+    expect(invalid[0].detail).toContain("title");
+  });
+
+  test("違反例: updated が created より前を検出する", () => {
+    const root = makeTempRoot();
+    writeKnowledgeDoc(
+      root,
+      "updated-before-created.md",
+      "---\ntitle: a\ncreated: 2026-09-02\nupdated: 2026-09-01\n---\n\n## 知識内容\n\n本文。\n",
+    );
+
+    const result = scanKnowledgeDocs(root);
+    const invalid = result.findings.filter((f) => f.kind === "invalid-frontmatter");
+    expect(invalid).toHaveLength(1);
+    expect(invalid[0].detail).toContain("updated");
+  });
+
   test("違反例: サブディレクトリと非 Markdown ファイルを正規配置違反として検出する", () => {
     const root = makeTempRoot();
     const area = join(root, "docs", "knowledge");
@@ -204,7 +340,12 @@ describe("scanKnowledgeDocs", () => {
 
   test("境界例: 本文が空でも必須見出しが揃っていれば合格（REQ-056-011 意味検査非対象の固定）", () => {
     const root = makeTempRoot();
-    writeKnowledgeDoc(root, "empty-bodies.md", REQUIRED_SECTIONS.map((s) => `## ${s}`).join("\n"));
+    writeKnowledgeDoc(
+      root,
+      "empty-bodies.md",
+      "---\ntitle: a\ncreated: 2026-09-01\nupdated: 2026-09-01\n---\n\n" +
+        REQUIRED_SECTIONS.map((s) => `## ${s}`).join("\n"),
+    );
 
     const result = scanKnowledgeDocs(root);
     expect(result.findings).toEqual([]);
@@ -225,7 +366,8 @@ describe("scanKnowledgeDocs", () => {
     writeKnowledgeDoc(
       root,
       "loose-heading-format.md",
-      REQUIRED_SECTIONS.map((s) => `###   ${s}  `).join("\n"),
+      "---\ntitle: a\ncreated: 2026-09-01\nupdated: 2026-09-01\n---\n\n" +
+        REQUIRED_SECTIONS.map((s) => `###   ${s}  `).join("\n"),
     );
 
     const result = scanKnowledgeDocs(root);

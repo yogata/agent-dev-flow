@@ -2,15 +2,20 @@
 /**
  * check_knowledge_docs.ts — docs/knowledge/ 構造検査 checker (REQ-056-010/011).
  *
- * docs/knowledge/ 配下のプロジェクト知識文書について、次の3点を機械検査する
- * （REQ-056-010「docs/knowledge/ の正規配置、命名、必須内容を機械検査できること」）:
+ * docs/knowledge/ 配下のプロジェクト知識文書について、次の4点を機械検査する
+ * （REQ-056-010「docs/knowledge/ の正規配置、命名、必須内容を機械検査できること。
+ * 検査範囲は本体 5 項目に加え frontmatter（title / created / updated）を含むこと」）:
  *
  *   1. non-regular-placement: docs/knowledge/ 配下は知識文書（1知識1 Markdown ファイル、
  *      REQ-056-001）と領域案内 README.md のみを配置する。サブディレクトリと
  *      非 Markdown ファイルは違反
  *   2. invalid-slug: ファイル名は kebab-case の slug（REQ-056-001、patterns Design
  *      「Knowledge frontmatter 規約」）。README.md は領域案内のため命名検査の対象外
- *   3. missing-required-section: 本体は知識内容、適用条件、適用対象、根拠、関連知識の
+ *   3. missing-frontmatter / invalid-frontmatter: frontmatter（title / created / updated、
+ *      patterns Design「Knowledge frontmatter 規約」）を検査する。ブロック欠落（missing）、
+ *      必須フィールド欠落、ISO 8601 日付（YYYY-MM-DD）形式不備、updated が created 以降でない
+ *      ことを検出する（invalid）
+ *   4. missing-required-section: 本体は知識内容、適用条件、適用対象、根拠、関連知識の
  *      5項目を見出しとして備える（REQ-056-003、patterns Design「Knowledge frontmatter 規約」）
  *
  * REQ-056-011（知識文書の意味的妥当性を機械検査で確定させない）に従い、本 checker は
@@ -37,7 +42,7 @@ const fs = require("fs") as typeof import("fs");
 
 const SCRIPT_NAME = "check_knowledge_docs.ts";
 const DESCRIPTION =
-  "docs/knowledge/ structure gate — regular placement, kebab-case slug naming, and required 5 sections (REQ-056-010/011)";
+  "docs/knowledge/ structure gate — regular placement, kebab-case slug naming, frontmatter (title / created / updated), and required 5 sections (REQ-056-010/011)";
 const USAGE =
   "bun run check_knowledge_docs.ts [--help] [--json] [--dry-run] [--root <path>]";
 
@@ -61,11 +66,23 @@ export const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 /** 知識文書の配置領域（repo root 相対）。 */
 export const KNOWLEDGE_DIR = "docs/knowledge";
 
+/** ISO 8601 日付（YYYY-MM-DD）形式（patterns Design「Knowledge frontmatter 規約」）。 */
+export const FRONTMATTER_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+/** frontmatter 必須フィールド（REQ-056-010、patterns Design「Knowledge frontmatter 規約」）。 */
+export const REQUIRED_FRONTMATTER_FIELDS: readonly string[] = [
+  "title",
+  "created",
+  "updated",
+];
+
 // ─── 出力契約 ─────────────────────────────────────────────────────────────
 
 export type KnowledgeFindingKind =
   | "non-regular-placement"
   | "invalid-slug"
+  | "missing-frontmatter"
+  | "invalid-frontmatter"
   | "missing-required-section";
 
 export interface KnowledgeFinding {
@@ -113,6 +130,98 @@ export function findMissingSections(content: string): string[] {
 /** slug（拡張子を除いた stem）が kebab-case か判定する（REQ-056-001）。 */
 export function isKebabCaseSlug(stem: string): boolean {
   return SLUG_PATTERN.test(stem);
+}
+
+/**
+ * ISO 8601 日付（YYYY-MM-DD）として妥当か判定する。
+ * Date.parse は存在しない日付（例: 2026-02-30）を繰り越し解釈するため、
+ * 月末日数によるカレンダー妥当性を自前で検証する。
+ */
+export function isValidIsoDate(value: string): boolean {
+  if (!FRONTMATTER_DATE_PATTERN.test(value)) return false;
+  const [year, month, day] = value.split("-").map(Number);
+  if (month < 1 || month > 12 || day < 1) return false;
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  return day <= daysInMonth;
+}
+
+/** frontmatter ブロック（先頭 `---` 行〜次の `---` 行）の内部行配列を返す。ブロック欠落時は null。 */
+export function extractFrontmatterLines(content: string): string[] | null {
+  const lines = content.split(/\r?\n/);
+  if (lines[0]?.trim() !== "---") return null;
+  for (let i = 1; i < lines.length; i++) {
+    if (lines[i]?.trim() === "---") return lines.slice(1, i);
+  }
+  return null;
+}
+
+export interface FrontmatterViolation {
+  kind: "missing-frontmatter" | "invalid-frontmatter";
+  problem: string;
+}
+
+/**
+ * frontmatter 検査（REQ-056-010、patterns Design「Knowledge frontmatter 規約」）。
+ * 構造面のみを検査し、問題ごとに1要素を返す:
+ *   - ブロック欠落（missing-frontmatter）: 先頭 `---` 〜 閉じ `---` が存在しない
+ *   - 必須フィールド（title / created / updated）の欠落・空値（invalid-frontmatter）
+ *   - created / updated の ISO 8601 日付（YYYY-MM-DD）形式不備（invalid-frontmatter）
+ *   - updated が created 以降でない（invalid-frontmatter）
+ */
+export function findFrontmatterViolations(content: string): FrontmatterViolation[] {
+  const lines = extractFrontmatterLines(content);
+  if (lines === null) {
+    return [
+      {
+        kind: "missing-frontmatter",
+        problem:
+          "frontmatter ブロック（先頭 --- 〜 閉じ ---）が存在しない。" +
+          `title / created / updated を --- で挟んで記述する`,
+      },
+    ];
+  }
+  const fields = new Map<string, string>();
+  for (const line of lines) {
+    const m = /^([A-Za-z0-9_-]+)\s*:\s*(.*)$/.exec(line);
+    if (m && !fields.has(m[1])) fields.set(m[1], m[2].trim());
+  }
+  const violations: FrontmatterViolation[] = [];
+  for (const field of REQUIRED_FRONTMATTER_FIELDS) {
+    const value = fields.get(field);
+    if (value === undefined || value === "") {
+      violations.push({
+        kind: "invalid-frontmatter",
+        problem: `必須 frontmatter フィールド「${field}」が存在しないまたは空`,
+      });
+    }
+  }
+  const created = fields.get("created");
+  const updated = fields.get("updated");
+  for (const [name, value] of [
+    ["created", created],
+    ["updated", updated],
+  ] as const) {
+    if (value === undefined || value === "") continue;
+    if (!isValidIsoDate(value)) {
+      violations.push({
+        kind: "invalid-frontmatter",
+        problem: `frontmatter フィールド「${name}」は ISO 8601 日付（YYYY-MM-DD）とする`,
+      });
+    }
+  }
+  if (
+    created !== undefined &&
+    updated !== undefined &&
+    isValidIsoDate(created) &&
+    isValidIsoDate(updated) &&
+    updated < created
+  ) {
+    violations.push({
+      kind: "invalid-frontmatter",
+      problem: "frontmatter フィールド「updated」は「created」以降の日付とする",
+    });
+  }
+  return violations;
 }
 
 interface KnowledgeEntry {
@@ -193,6 +302,13 @@ export function scanKnowledgeDocs(root: string): {
       continue;
     }
     const content = fs.readFileSync(entry.absPath, "utf-8") as string;
+    for (const v of findFrontmatterViolations(content)) {
+      findings.push({
+        file: entry.relPath,
+        kind: v.kind,
+        detail: `${v.problem}（REQ-056-010、patterns Design「Knowledge frontmatter 規約」）`,
+      });
+    }
     const missing = findMissingSections(content);
     for (const section of missing) {
       findings.push({
@@ -233,6 +349,8 @@ function formatText(report: KnowledgeReport): string {
     const kindLabel: Record<KnowledgeFindingKind, string> = {
       "non-regular-placement": "正規配置違反",
       "invalid-slug": "命名違反",
+      "missing-frontmatter": "frontmatter 欠落",
+      "invalid-frontmatter": "frontmatter 不備",
       "missing-required-section": "必須セクション欠落",
     };
     for (const f of report.findings) {
@@ -293,12 +411,15 @@ OPTIONS:
 
 EXIT CODES:
   0  No structure violations found
-  1  Structure violations detected (placement / slug / required sections)
+  1  Structure violations detected (placement / slug / frontmatter / required sections)
   2  Input error or execution failure
 
 CHECKS (REQ-056-010, structure only — REQ-056-011):
   non-regular-placement   Subdirectories and non-Markdown files under docs/knowledge/
   invalid-slug            Filenames that are not kebab-case slugs (README.md exempt)
+  missing-frontmatter     Knowledge docs without a frontmatter block (leading --- ... closing ---)
+  invalid-frontmatter     Missing/empty title, created, updated; non ISO 8601 date
+                          (YYYY-MM-DD); updated earlier than created
   missing-required-section  Knowledge docs missing any of the required 5 section headings:
                           ${REQUIRED_SECTIONS.join(", ")}
 
