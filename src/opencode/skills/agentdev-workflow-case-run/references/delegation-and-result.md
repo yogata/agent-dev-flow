@@ -29,7 +29,7 @@
 ### Procedure
 
 - 実装実行を adapter skill（`agentdev-case-run-execution-adapter`）を読み込んだ実行担当サブエージェントへ委譲する（委譲 prompt 内で実行 command を指定）。起動手段は AGENTS.md および references/<harness>.md 参照。adapter protocol は同 skill 参照
-- **委譲識別情報の発行と記録**: 委譲 prompt に委譲識別情報ブロック（委譲目的、委譲単位識別子 `DEL-{N}-{seq}`、親子実行関係）を含める。case-run が委譲単位識別子を発行し、親子実行関係の正規手段とする（harness 側識別子は付加情報に限定）。記録先割当は workflow-contracts Design「ADF 実行識別情報の記録契約」に従う。実行担当サブエージェントが当該ブロックの値を PR 本文の実行識別情報セクションへ転記する。詳細なブロック形式は `agentdev-case-run-execution-adapter` references 参照
+- **委譲識別情報の発行と記録**: 委譲 prompt に委譲識別情報ブロック（委譲単位識別子 `DEL-{N}-{seq}`）を含める。case-run が委譲単位識別子を発行し、委譲単位識別子の形式（N = 対象 Issue 番号）と委譲 prompt の構造化文脈（workflow_phase、execution_unit）から親子実行関係を導出する（harness 側識別子は付加情報に限定）。記録先割当は workflow-contracts Design「ADF 実行識別情報の記録契約」に従う。実行担当サブエージェントが当該ブロックの委譲単位識別子を PR 本文の実行識別情報セクションへ転記する。詳細なブロック形式は `agentdev-case-run-execution-adapter` references 参照
 - **検証差分の記録指示**: 委譲 prompt で、実施する各検証（test strategy 項目検証、bun test フル suite、配布依存境界 gate、targeted docs guard、トレーサビリティ check、品質ゲート等）について検証種別、検証結果、finding 差分（新規、修正済み、既出、撤回、無効の5分類）を PR 本文の検証差分セクションへ実行工程 case-run の行として記録するよう実行担当サブエージェントへ指示する。形式は `agentdev-workflow-templates` の検証差分セクション規約に従う。前段階の同種検証が存在しない初回検証では全 finding を新規として記録し、後続工程（case-close）が対応記録コメントへ同一形式の case-close 行を記録する前提で工程間比較可能にする
 - **L2 タイムスタンプ計測**: 委譲起動直前・直後に壁時計タイムスタンプ（JST）を記録し、実行担当サブエージェント実行時間を計測する。併せて STEP-S3（worktree 設置）と STEP-S6（クリーンアップ）の開始・終了時刻を記録する
 - 委譲プロンプト、前置 gate 結果の引き渡し（staleness check 差異、配布依存境界の違反ベースライン、AUTOGEN 索引再生成の必須指示）、test strategy 項目の test-fix ループ、実行担当サブエージェントの責務（目標分解、各 criterion に observable evidence を要求、品質ゲートの実行、test-fix ループ）、委譲起動失敗・異常終了時の扱い（即 `failed` とせず実装完了・検証未完了として扱う）の詳細は `agentdev-case-run-execution-adapter` スキルを参照

@@ -20,9 +20,7 @@ harness 側識別子は取得可能な場合の付加情報に限定し、必須
 識別情報の一部が取得不能な場合は「N/A」と記録し、workflow を停止しない。
 本セクションは新規作成 Issue のみに適用し、既存 Issue への遡及適用は行わない -->
 - adf_case: （対象 Case の Issue 番号。#N 形式。本 Epic Issue 自身の番号）
-- adf_phase: case-open
-- adf_execution_unit: （実行単位。epic:#N 形式。execution_unit 構成の既存定義に従い、新規の識別体系を並立させない）
-- adf_upstream_confirmed: （前工程で確定した事項。req-save、design-save の commit SHA と確定済み REQ、Decision、Design の識別子を識別子中心で記録。前工程がない場合は N/A）
+- adf_execution_unit: （実行単位の flow 種別。epic。対象 Issue 番号は本 Epic Issue の番号を正として導出する）
 - adf_harness_ref: （任意。harness 側識別子（OpenCode session ID 等）。取得可能な場合のみ記載し、省略できる）
 
 ## 課題

@@ -1,8 +1,10 @@
 // ADF-COVERS(verification): REQ-048-001, REQ-048-002, REQ-048-003, REQ-048-004, REQ-048-005, REQ-048-016
-// 実行識別情報セクション契約テスト（Issue #2400 Area1、Issue #2600 で新 REQ-048 の意図へ再構成）。
+// 実行識別情報セクション契約テスト（Issue #2400 Area1、Issue #2600 で新 REQ-048 の意図へ再構成、
+// Issue #2602 で縮小後 field 集合の相関成立確認へ更新）。
 // テンプレートの実行識別情報セクションが機械的に解析可能な構造化形式を持ち、
-// Case・ADF 工程・実行単位・委譲単位・PR・実行結果の相関が機械判別できること（REQ-048-001、REQ-048-002）、
-// harness 側識別子が必須契約になっていないこと（REQ-048-003、REQ-048-004）、
+// Case・実行単位・委譲単位の相関が機械判別できること（REQ-048-001、REQ-048-002）、
+// 削除済み field（ADF 工程、前工程確定事項、PR 番号、実行結果）の相関が canonical 成果物関係から
+// 成立すること、harness 側識別子が必須契約になっていないこと（REQ-048-003、REQ-048-004）、
 // 識別情報欠落時は N/A 記録で workflow を停止しないこと（REQ-048-004、REQ-048-005）を検証する。
 // adf_* field 集合の全体固定は REQ-048-014 のとおり REQ-048 の成立条件としない。本テストは
 // REQ-048-001 が要求する相関の成立に必要な key のみを検査し、REQ-048-012 の実験契約に従う変更を妨げない。
@@ -53,20 +55,19 @@ const ISSUE_TEMPLATES = [
   "issue_desc_child.md",
 ] as const;
 
-// REQ-048-001 が対応付けを要求する相関の成立に必要な key（Case・ADF 工程・実行単位・委譲単位・PR・実行結果）。
-// adf_upstream_confirmed 等の他 key は REQ-048-014 のとおり成立条件として固定しない。
+// REQ-048-001 が対応付けを要求する相関の成立に必要な最小 key（Case・実行単位）。
+// 削除済み field（adf_phase、adf_upstream_confirmed）は canonical 成果物関係から導出する。
 const ISSUE_CORRELATION_KEYS = [
   "adf_case",
-  "adf_phase",
   "adf_execution_unit",
 ] as const;
 
+// PR は委譲単位識別子（adf_delegation）を加える。削除済み field（adf_pr、adf_result）は
+// PR 自身の番号と canonical 成果物関係（PR の存在と Issue コメント SSoT）から判別する。
 const PR_CORRELATION_KEYS = [
   "adf_case",
-  "adf_pr",
   "adf_execution_unit",
   "adf_delegation",
-  "adf_result",
 ] as const;
 
 // harness 側の詳細実行履歴・識別子を必須契約としない（REQ-048-003、REQ-048-004）。
@@ -81,18 +82,13 @@ const FORBIDDEN_REQUIRED_KEYS = [
   "adf_compaction",
 ] as const;
 
-const RESULT_STATES = [
-  "completed-pr",
-  "blocked",
-  "failed",
-  "delegation-unavailable",
-] as const;
-
-// Epic と child の実行単位（adf_execution_unit）の規約形式。実行単位の値から
+// Epic と child の実行単位（adf_execution_unit）の flow 種別。実行単位の flow 種別から
 // 親子実行関係（REQ-048-001）が機械判別できることを検査するために参照する。
-const EXECUTION_UNIT_FORMATS: Record<string, string> = {
-  "issue_desc_epic.md": "epic:",
-  "issue_desc_child.md": "standard:",
+// 対象 Issue 番号は canonical 成果物関係（本 Issue 番号、Parent 行）から導出するため、
+// flow 種別の値に番号形式を含まないことを併せて検査する。
+const EXECUTION_UNIT_FLOW_KINDS: Record<string, string> = {
+  "issue_desc_epic.md": "epic",
+  "issue_desc_child.md": "standard",
 };
 
 function readTemplate(file: string): string {
@@ -142,7 +138,7 @@ describe("REQ-048-001/002: 実行識別情報セクションの機械判別可�
         expect(markerRe.test(after)).toBe(true);
       });
 
-      it("機械的解析で相関 key（Case・工程・実行単位・委譲単位・PR・実行結果）を復元できる", () => {
+      it("機械的解析で相関 key（Case・実行単位・委譲単位）を復元できる", () => {
         const keys = extractExecutionIdent(content);
         const required =
           file === "pr_desc.md" ? PR_CORRELATION_KEYS : ISSUE_CORRELATION_KEYS;
@@ -151,6 +147,28 @@ describe("REQ-048-001/002: 実行識別情報セクションの機械判別可�
           expect(keys.get(key)).not.toBe("");
         }
       });
+
+      if (file === "pr_desc.md") {
+        it("PR 番号と実行結果は field 重複記録せず canonical 成果物関係から判別する", () => {
+          // REQ-048-001 の導出可能値の重複所有排除。PR 番号は PR 自身の API 番号、
+          // 実行結果（result 契約の4状態）は PR の存在（completed-pr）と Issue コメント
+          // SSoT（blocked、failed、delegation-unavailable）から判別する。
+          const keys = extractExecutionIdent(content);
+          expect(keys.has("adf_pr")).toBe(false);
+          expect(keys.has("adf_result")).toBe(false);
+          expect(content.includes("Refs: #$ISSUE_NUMBER")).toBe(true);
+        });
+      } else {
+        it("ADF 工程と前工程確定事項は field 重複記録せず canonical 成果物関係から判別する", () => {
+          // REQ-048-001 の導出可能値の重複所有排除。生成工程はテンプレート種別と
+          // 実行識別情報セクションの存在から判別でき、前工程確定事項は REQ/Decision/
+          // Design 参照と structured handoff から再構成できる。
+          const keys = extractExecutionIdent(content);
+          expect(keys.has("adf_phase")).toBe(false);
+          expect(keys.has("adf_upstream_confirmed")).toBe(false);
+          expect(content.includes(sectionHeading)).toBe(true);
+        });
+      }
 
       it("解析はセクション外の adf_ 形式行に依存しない", () => {
         // セクション外に紛れ込んだ key-value 行を解析結果から除外する構造であること。
@@ -179,14 +197,17 @@ describe("REQ-048-001/002: 実行識別情報セクションの機械判別可�
         expect(/REQ-\d/.test(content)).toBe(false);
       });
 
-      const unitFormat = EXECUTION_UNIT_FORMATS[file];
-      if (unitFormat !== undefined) {
-        it("実行単位の値は親子実行関係を機械判別できる形式を規定する", () => {
-          // REQ-048-001 の親子実行関係の相関。Epic は epic:{N}、child は standard:{N} の
-          // 形式を規約として宣言し、実行単位の値の先頭から親子の区別が機械判別できること。
+      const flowKind = EXECUTION_UNIT_FLOW_KINDS[file];
+      if (flowKind !== undefined) {
+        it("実行単位の値は flow 種別を記録し、対象 Issue 番号の重複記録を持たない", () => {
+          // REQ-048-001 の親子実行関係の相関。Epic は epic、child は standard の
+          // flow 種別を記録し、Epic / Standard の判別が機械判別できること。
+          // 対象 Issue 番号は canonical 成果物関係（本 Issue 番号、Parent 行）から
+          // 導出するため、番号形式を値に含まない。
           const unit = extractExecutionIdent(content).get("adf_execution_unit");
           expect(unit).toBeDefined();
-          expect(unit!.includes(unitFormat)).toBe(true);
+          expect(unit!.includes(flowKind)).toBe(true);
+          expect(unit!.includes(":#")).toBe(false);
         });
       }
     });
@@ -253,14 +274,25 @@ describe("REQ-048-001/002: 委譲識別情報ブロックと PR 転記の対応"
     const content = fs.readFileSync(harnessDelegationPath, "utf-8");
     expect(content.includes("<delegation-ident>")).toBe(true);
     expect(content.includes("adf_delegation_id")).toBe(true);
-    expect(content.includes("adf_delegation_purpose")).toBe(true);
-    expect(content.includes("adf_parent")).toBe(true);
-    expect(content.includes("adf_child")).toBe(true);
   });
 
   it("委譲単位識別子は DEL-{N}-{seq} 形式を規定する", () => {
     const content = fs.readFileSync(harnessDelegationPath, "utf-8");
     expect(content.includes("DEL-{N}-{seq}")).toBe(true);
+  });
+
+  it("委譲ブロックは親子実行関係と委譲目的の重複 key を持たず導出規定を持つ", () => {
+    // REQ-048-001 の導出可能値の重複所有排除。親子実行関係は委譲単位識別子と
+    // 構造化文脈から導出し、委譲目的は実行 command 指定と category（処理区分）で
+    // 表現する。同値 key（adf_child）と導出可能 key（adf_parent）は統合・除去済み。
+    const content = fs.readFileSync(harnessDelegationPath, "utf-8");
+    expect(content.includes("- adf_parent:")).toBe(false);
+    expect(content.includes("- adf_child:")).toBe(false);
+    expect(content.includes("- adf_delegation_purpose:")).toBe(false);
+    const derivationLine = content
+      .split(/\r?\n/)
+      .find((l) => l.includes("親子実行関係") && l.includes("導出"));
+    expect(derivationLine).toBeDefined();
   });
 
   it("PR テンプレートの adf_delegation は委譲 prompt からの転記を規定する", () => {
@@ -272,14 +304,11 @@ describe("REQ-048-001/002: 委譲識別情報ブロックと PR 転記の対応"
     expect(line!.includes("転記")).toBe(true);
   });
 
-  it("PR テンプレートの adf_result は result 契約の4状態を列挙する", () => {
-    const line = readTemplate("pr_desc.md")
-      .split(/\r?\n/)
-      .find((l) => l.startsWith("- adf_result:"));
-    expect(line).toBeDefined();
-    for (const state of RESULT_STATES) {
-      expect(line!.includes(state)).toBe(true);
-    }
+  it("子Issue テンプレートは親 Epic 判別の Parent 行を規定する", () => {
+    // REQ-048-001 の Epic 関係の canonical derivation。adf_case（親 Epic 番号）と
+    // adf_execution_unit（standard）の相関は Parent 行との組み合わせで成立する。
+    const content = readTemplate("issue_desc_child.md");
+    expect(content.includes("Parent: #{epic_number}")).toBe(true);
   });
 });
 

@@ -49,14 +49,14 @@ STEP-3 の自律構成分析結果に基づき Epic 本文を構築。
 ラベル `enhancement`, `feature`, `epic`。
 `agentdev_gh` の issue_create 操作で本文を書き込み → VERIFY。
 Issue 番号を `{epic_number}` として記録。
-実行識別情報セクションの自己参照値（`adf_case`、`adf_execution_unit` の `epic:#N`）は、作成済み Epic 本文のステータス追跡テーブル更新（STEP-5-5）と同一の Issue 本文更新手続きで確定番号へ埋め戻す。
+実行識別情報セクションの自己参照値（`adf_case`）は、作成済み Epic 本文のステータス追跡テーブル更新（STEP-5-5）と同一の Issue 本文更新手続きで確定番号へ埋め戻す。
 
 ### STEP-5-4: 子Issue 作成（並列化）
 
 - **Issue 化単位**: OU 単位（command 不変条件）
 - **子Issue 本文**: `Parent: #{epic_number}`（command 不変条件）、対象 OU ID、紐づく REQ/Decision/Design 識別子を記載
 - **並列化**: 子Issue 本文案作成、検査、Issue 作成は最大5件まで並列化（3つの「5件」文脈のうち case-run Wave 内子 Issue 並列上限と同一、後述）
-- **作成後埋め戻し**: 各子Issue の作成後、`agentdev_gh` の issue_update 操作で実行識別情報セクションの自己参照値（`adf_execution_unit` の `standard:#N`）を作成確定番号へ埋め戻し、VERIFY する（`adf_case` は親 Epic Issue 番号で作成時に記録済み）
+- **作成後埋め戻しは不要**: 子Issue の実行識別情報セクションは作成時に確定する（`adf_case` は親 Epic Issue 番号を記録、`adf_execution_unit` は flow 種別のみを記録し、対象 Issue 番号は本子 Issue の番号を正として導出する）
 - **直列集約**: Epic Issue 作成、Wave 1 配置、Epic 本文ステータス追跡テーブル更新は親が直列集約（command 不変条件: 全子Issue 作成完了後の一括更新で維持）
 - **前工程完了度属性の埋め込み**: 各子 Issue 本文の「## 補足情報」セクションに「前工程完了度」属性を埋め込む（3段階: 完全完了/ 検証のみ/ 補完あり、epic-wave-model Design extension 経由）
 
@@ -65,7 +65,7 @@ Issue 番号を `{epic_number}` として記録。
 ### STEP-5-5: Epic Issue 本文更新
 
 詳細、委譲接続点は `agentdev-issue-management` を参照。
-本 STEP の Issue 本文更新で、Epic 本文実行識別情報セクションの自己参照値（`adf_case`、`adf_execution_unit`）を STEP-5-3 で確定した Epic Issue 番号へ埋め戻す。
+本 STEP の Issue 本文更新で、Epic 本文実行識別情報セクションの自己参照値（`adf_case`）を STEP-5-3 で確定した Epic Issue 番号へ埋め戻す。
 
 #### STEP-5-5-1: OU 結果の書き戻し
 
@@ -86,7 +86,7 @@ Issue 番号を `{epic_number}` として記録。
 ### STEP-5-8: GitHub Issue 作成
 
 `agentdev_gh` の issue_create 操作→ VERIFY。
-作成後、`agentdev_gh` の issue_update 操作で実行識別情報セクションの自己参照値（`adf_case`、`adf_execution_unit` の `standard:#N`）を作成確定番号へ埋め戻し、VERIFY する（STEP-2 の 2-7 参照）。
+作成後、`agentdev_gh` の issue_update 操作で実行識別情報セクションの自己参照値（`adf_case`）を作成確定番号へ埋め戻し、VERIFY する（STEP-2 の 2-7 参照）。
 
 #### STEP-5-8-1: OU 結果の書き戻し
 
