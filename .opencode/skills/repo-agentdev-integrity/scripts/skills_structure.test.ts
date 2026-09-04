@@ -1,6 +1,7 @@
 // ADF-COVERS(verification): REQ-002-013, REQ-002-014, REQ-002-015
 // ADF-COVERS(implementation): REQ-018-001
 // ADF-COVERS(verification): REQ-018-001, REQ-018-002
+// ADF-COVERS(verification): REQ-018-003, REQ-018-004
 import { describe, it, expect } from "bun:test";
 import * as fs from "fs";
 import * as path from "path";
@@ -19,10 +20,45 @@ function findRepoRoot(start: string): string {
 const REPO_ROOT = findRepoRoot(SCRIPT_DIR);
 const PROJECTION_SKILLS_DIR = path.join(REPO_ROOT, ".opencode", "skills");
 const SOURCE_SKILLS_DIR = path.join(REPO_ROOT, "src", "opencode", "skills");
+const SKILL_PROJECTION_MANIFEST_PATH = path.join(
+  REPO_ROOT,
+  ".opencode",
+  "skills",
+  "repo-agentdev-integrity",
+  "data",
+  "skill-projection-manifest.yaml",
+);
 // worktree junction 未設定環境では projection に配布スキルが存在しないため src/opencode/ へ fallback する（REQ-018-001）。
 const SKILLS_DIR = fs.existsSync(path.join(PROJECTION_SKILLS_DIR, "agentdev-workflow-templates"))
   ? PROJECTION_SKILLS_DIR
   : SOURCE_SKILLS_DIR;
+// third-party 取得機構経由で配置された投影物のうち、skill-projection-manifest の
+// third_party_skills 宣言（third-party 由来であることの宣言）に登録済みのものは
+// 検査許容（INSPECTION-TOLERATED、IR-068 exemption、DEC-023 accepted、REQ-018-003）とする。
+// 許容は検出ノイズ抑制であり走査除外ではない。未宣言の third-party 起源配置は引き続き検査対象となる。
+function loadToleratedThirdPartySkills(): string[] {
+  if (!fs.existsSync(SKILL_PROJECTION_MANIFEST_PATH)) return [];
+  const content = fs.readFileSync(SKILL_PROJECTION_MANIFEST_PATH, "utf-8");
+  const names: string[] = [];
+  let inSection = false;
+  for (const raw of content.split("\n")) {
+    const line = raw.replace(/\r$/, "");
+    if (!line.trim() || line.trim().startsWith("#")) continue;
+    if (/^third_party_skills:\s*$/.test(line)) {
+      inSection = true;
+      continue;
+    }
+    if (/^[A-Za-z_][\w]*:/.test(line)) {
+      inSection = false;
+      continue;
+    }
+    if (!inSection) continue;
+    const m = line.match(/^\s*-\s+(.+)$/);
+    if (m) names.push(m[1].trim().replace(/^["']|["']$/g, ""));
+  }
+  return names;
+}
+const toleratedThirdPartySkills = new Set(loadToleratedThirdPartySkills());
 function getSkillDirs(): string[] {
   if (!fs.existsSync(SKILLS_DIR)) return [];
   return fs
@@ -87,11 +123,13 @@ function getSectionContent(content: string, heading: string): string {
 }
 const skillDirs = getSkillDirs();
 const skillDirSet = new Set(skillDirs);
+// ADF 配布スキルの構造契約検査対象。third-party 管理登録済み配置は許容として除外される。
+const adfSkillDirs = skillDirs.filter((name) => !toleratedThirdPartySkills.has(name));
 describe("REQ-0030-003: Skill frontmatter required fields", () => {
   it("skill directories exist under .opencode/skills/", () => {
     expect(skillDirs.length).toBeGreaterThan(0);
   });
-  for (const dirName of skillDirs) {
+  for (const dirName of adfSkillDirs) {
     describe(`skill: ${dirName}`, () => {
       const skillMdPath = path.join(SKILLS_DIR, dirName, "SKILL.md");
       it("has SKILL.md", () => {
@@ -118,7 +156,7 @@ describe("REQ-0030-003: Skill frontmatter required fields", () => {
   }
 });
 describe("REQ-0030-004: Skill USE FOR / DO NOT USE FOR sections and See Also references", () => {
-  for (const dirName of skillDirs) {
+  for (const dirName of adfSkillDirs) {
     describe(`skill: ${dirName}`, () => {
       const skillMdPath = path.join(SKILLS_DIR, dirName, "SKILL.md");
       if (!fs.existsSync(skillMdPath)) return;
@@ -168,4 +206,28 @@ describe("REQ-0030-004: Skill USE FOR / DO NOT USE FOR sections and See Also ref
       }
     });
   }
+});
+describe("REQ-018-003 / REQ-018-004: third-party tolerated placements (INSPECTION-TOLERATED)", () => {
+  it("third-party declared placements are tolerated out of ADF skill structure contract checks", () => {
+    for (const name of toleratedThirdPartySkills) {
+      expect(adfSkillDirs.includes(name)).toBe(false);
+    }
+  });
+  it("third-party declared placements are never promoted into src/opencode/skills", () => {
+    // third-party Skill は src/opencode/skills/ 配下へ昇格配置されない
+    // （docs/designs/local/third-party-skill-management.md）。この配置構造により、
+    // worktree fallback 環境（junction 未伝播）でも third-party 起源の検出差分が
+    // fail に計上されない（REQ-018-004 の環境差扱いの基盤）。
+    for (const name of toleratedThirdPartySkills) {
+      expect(fs.existsSync(path.join(SOURCE_SKILLS_DIR, name))).toBe(false);
+    }
+  });
+  it("projection-only placements without third-party declaration remain inspected", () => {
+    // projection 走査環境（junction 実在）でのみ projection-only エントリが現れる。
+    // worktree fallback 環境では走査対象が src 由来のみのため検証対象が空になり pass する（fail-open）。
+    for (const name of skillDirs) {
+      if (fs.existsSync(path.join(SOURCE_SKILLS_DIR, name))) continue;
+      expect(toleratedThirdPartySkills.has(name)).toBe(false);
+    }
+  });
 });

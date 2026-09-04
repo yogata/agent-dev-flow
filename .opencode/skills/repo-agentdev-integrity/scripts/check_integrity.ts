@@ -9746,25 +9746,34 @@ const IR068_MANIFEST_REL =
 
 function loadSkillProjectionManifest(
   root: string,
-): { skills: string[] | null; warnings: string[] } {
+): { skills: string[] | null; thirdPartySkills: string[]; warnings: string[] } {
   const yamlPath = path.join(root, ...IR068_MANIFEST_REL.split("/"));
   const content = readText(yamlPath);
-  if (!content) return { skills: null, warnings: [] };
+  if (!content) return { skills: null, thirdPartySkills: [], warnings: [] };
   const skills: string[] = [];
+  const thirdPartySkills: string[] = [];
   const warnings: string[] = [];
   let inSkills = false;
+  let inThirdParty = false;
   for (const raw of content.split("\n")) {
     const line = raw.replace(/\r$/, "");
     if (!line.trim() || line.trim().startsWith("#")) continue;
     if (/^skills:\s*$/.test(line)) {
       inSkills = true;
+      inThirdParty = false;
+      continue;
+    }
+    if (/^third_party_skills:\s*$/.test(line)) {
+      inSkills = false;
+      inThirdParty = true;
       continue;
     }
     if (/^[A-Za-z_][\w]*:/.test(line)) {
       inSkills = false;
+      inThirdParty = false;
       continue;
     }
-    if (!inSkills) continue;
+    if (!inSkills && !inThirdParty) continue;
     const m = line.match(/^\s*-\s+(.+)$/);
     if (!m) continue;
     const name = unquoteYamlScalar(m[1]);
@@ -9772,13 +9781,15 @@ function loadSkillProjectionManifest(
       warnings.push(`invalid skill name '${name}' in ${IR068_MANIFEST_REL}`);
       continue;
     }
-    if (skills.includes(name)) {
-      warnings.push(`duplicate skill name '${name}' in ${IR068_MANIFEST_REL}`);
+    const entries = inSkills ? skills : thirdPartySkills;
+    const kind = inSkills ? "skill name" : "third-party skill name";
+    if (entries.includes(name)) {
+      warnings.push(`duplicate ${kind} '${name}' in ${IR068_MANIFEST_REL}`);
       continue;
     }
-    skills.push(name);
+    entries.push(name);
   }
-  return { skills, warnings };
+  return { skills, thirdPartySkills, warnings };
 }
 
 // 投影エントリ列挙（IR-068）: .opencode/skills の repo-* 以外のエントリを列挙する。
@@ -9824,7 +9835,9 @@ function listProjectionSkillEntries(
 
 function checkSkillProjectionManifest(root: string): CheckResult[] {
   const results: CheckResult[] = [];
-  const { skills: manifestSkills, warnings } = loadSkillProjectionManifest(root);
+  const { skills: manifestSkills, thirdPartySkills, warnings } =
+    loadSkillProjectionManifest(root);
+  const toleratedThirdParty = new Set(thirdPartySkills);
   for (const w of warnings) {
     results.push(
       warn(
@@ -9939,6 +9952,25 @@ function checkSkillProjectionManifest(root: string): CheckResult[] {
     }
     for (const name of [...projSet].sort()) {
       if (!srcSet.has(name)) {
+        // third-party 取得機構経由の管理登録済み配置は検査許容（INSPECTION-TOLERATED、
+        // IR-068 exemption、DEC-023 accepted、REQ-018-003）。許容は検出ノイズ抑制であり
+        // 走査除外ではない。未宣言の third-party 起源配置は引き続き stale junction として検出する。
+        if (toleratedThirdParty.has(name)) {
+          results.push(
+            info(
+              "SkillProjection",
+              "skill-projection-manifest",
+              `Tolerated third-party projection entry '${name}' (INSPECTION-TOLERATED, IR-068 exemption, DEC-023)`,
+              undefined,
+              undefined,
+              {
+                evidence: `tolerated-third-party:${name}`,
+                expected: `declared in ${IR068_MANIFEST_REL} third_party_skills`,
+              },
+            ),
+          );
+          continue;
+        }
         violationCount++;
         results.push(
           ng(
