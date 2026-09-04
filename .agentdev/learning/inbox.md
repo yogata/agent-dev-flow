@@ -199,3 +199,38 @@
 - **想定反映先**: integrity checker 実行手順の補助ファイル生成知識、docs/knowledge の Windows 系知識文書、learning-promote で分類
 - **関連**: Issue 2570 対応記録コメント（case-close STEP-6 学び検知）
 - **タグ**: #integrity #distribution-boundary #pre-write-gate #case-close #verification
+
+---
+
+## 2026-09-05: integrity suite の cwd 依存と bun test の dot ディレクトリ既定探索による実行手順分断
+
+- **現象**: integrity suite（repo-agentdev-integrity scripts）の一部テストが `path.join("src", ...)` の repo-root カレント前提で、scripts dir カレント実行では ENOENT fail となる。一方 repo-root カレントの `bun test` は既定探索が dot ディレクトリ（.opencode）配下を拾わず、収集 0 件となる
+- **状況/文脈**: case-run TS-005（Issue 2594 / PR 2595、traceability REQ-ID 桁幅緩和 Case）
+- **検知方法**: bun test 実行時の ENOENT fail とテスト収集 0 件の観察
+- **根本原因**: cwd 依存テストと bun の既定テスト探索仕様（dot ディレクトリ無視）の組合せで、実行手順が一意に定まっていない
+- **応急/対応内容**: `./` プレフィックス付きの明示ファイル列挙（102ファイル）で repo-root カレント実行して回避
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/spec影響**: なし（実行手順標準化は後続候補）
+- **展開視点**: 恒久検証手段の実行コマンド明記・cwd 非依存化が候補（bun test 実行形態契約との整合確認を含む）
+- **再現条件**: scripts dir カレントで bun test 実行、または repo-root カレントで引数なし bun test 実行
+- **予防策**: 検証手順ドキュメントへ実行コマンド（cwd と引数形式）を明記し、テストの cwd 前提を排除する
+- **横展開候補**: agentdev-quality-gates（bun test 実行形態契約の運用注記）、learning-promote で標準化 RU 判定
+- **関連**: PR 2595 本文 Findings セクションからの capture 回収（case-close STEP-6）
+- **タグ**: #test #bun #integrity #case-run #verification
+---
+
+## 2026-09-05: PR 本文取得のツールギャップ時の gh 読み取り系フォールバックと Windows 出力退避の文字化け回避
+
+- **現象**: case-close の capture 入力源として必要な PR 本文が agentdev_gh pr_read では title/state/mergeable の compact summary のみで取得できない。また Windows の PowerShell 経由で gh stdout を Out-File 退避すると cp932 解釈で UTF-8 本文が文字化けする
+- **状況/文脈**: case-close STEP-6 capture 回収（Issue 2594 / PR 2595）。pr_mergeable も verification-incomplete で失敗し、Tool 側 contingency の gh 読み取り系フォールバックが提示された
+- **検知方法**: pr_read 応答に body フィールドが無いことの確認、Out-File 退避ファイルの文字化け確認
+- **根本原因**: pr_read の応答契約は compact summary 前提で body 取得を含まない。PowerShell のコンソールエンコーディング（cp932）が gh の UTF-8 出力を破壊する
+- **応急/対応内容**: Tool contingency に従い gh CLI 読み取り系（gh pr view --json body,mergeable）を node の execFileSync（encoding utf8）経由で実行し、writeFileSync utf8 で退避して文字化けを回避
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/spec影響**: なし（POL-gh-io-delegation の読み取り系フォールバックは Tool 側 contingency が明示許可）
+- **展開視点**: Windows + gh の出力退避は PowerShell cmdlet 経由でなく node / [System.IO.File] の明示 UTF-8 経由に統一する規約化が候補
+- **再現条件**: Windows コンソールで gh pr view を実行し Out-File / Set-Content で退避した場合
+- **予防策**: gh 出力の退避は node execFileSync + writeFileSync(utf8) を標準手順とする
+- **横展開候補**: docs/knowledge/windows-powershell-bulk-io-corruption.md の知見拡張（コンソール出力系への適用）、learning-promote で判定
+- **関連**: Issue 2594 対応記録コメント（case-close STEP-6 学び検知）
+- **タグ**: #gh #windows #encoding #case-close #tool-fallback
