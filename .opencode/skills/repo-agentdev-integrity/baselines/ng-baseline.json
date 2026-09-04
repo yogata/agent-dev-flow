@@ -1,7 +1,7 @@
 {
   "version": 1,
   "rule_id": "NG-BASELINE",
-  "generated_at": "2026-08-22",
+  "generated_at": "2026-09-04",
   "entries": [
     {
       "category": "ADR",
@@ -1415,6 +1415,15 @@
       "count": 1,
       "provenance": "legacy",
       "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "docs/designs/integrity/content-corruption-checker.md",
+      "evidence": "REQ-0108",
+      "count": 1,
+      "provenance": "issue-2559-ou003-detector-vocabulary",
+      "reason": "OU-003 unified rule (a): intentional residual (detector vocabulary mention). REQ-0108 appears in content-corruption-checker.md only as the REQ-0108-NNN legacy-numbering pattern vocabulary (detection-exclusion note of check_content_corruption.ts), not as a live REQ reference. Same violation was already approved in the pre-file-tracking bucket (provenance v3-migration)."
     },
     {
       "category": "LinkIntegrity",

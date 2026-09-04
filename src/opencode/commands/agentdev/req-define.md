@@ -48,7 +48,7 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 - 本コマンドは実証Caseでも Git 副作用を持たない（評価ブランチ・worktree 準備の実行主体・手順は command Design が所有する）。評価ブランチ作成だけの新しい公開コマンドを追加しない
 - Design 分離基準に該当する要件行は `artifact_actions`（`artifact: design`）へ分離する（安定契約例外は除く）。test strategy 項目は verification（検証手順）・pass_criteria（合格基準）・on_failure（不合格時の処置）の3要素を欠落なく持ち、欠落項目は保存前に QG fail として扱う
 - 修正の要否を検討する際、実現面（正規所有責務を持つ既存実体・成果物）と Design 面の両面を分析する。コードレベルの work plan は case-run 責務としつつ、どの実現面を変更すべきかの確定を case-run へ先送りしない（REQ-004-037）
-- 実現面の変更方針（正規所有責務、変更すべき実現面、変更意図、検証との対応）は、実現面の変更がある場合に `realization_actions` セクションへ構造化して出力する。`realization_actions` は `artifact_actions` と分離した独立構造であり、成果物種別を固定 enum としないドメイン中立契約とする（REQ-008-060、DEC-026）
+- 実現面の変更方針（正規所有責務、変更すべき実現面、変更意図、検証との対応）は、実現面の変更がある場合に `realization_actions` セクションへ構造化して出力する。`realization_actions` は `artifact_actions` と分離した独立構造であり、成果物種別を固定 enum としないドメイン中立契約とする（REQ-008-060）
 
 ## ガードレール
 

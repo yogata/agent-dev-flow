@@ -1633,6 +1633,7 @@ function buildIr055Fixture(root: string): void {
       "",
       "See REQ-1234 for context.",
       "See REQ-5678-001 for sub-item detail.",
+      "See REQ-217-017 for three-digit sub-item detail.",
       "See DEC-007 for current decision reference (REQ-025-002).",
       "See ADR-0099 for legacy residual reference (REQ-025-004).",
       "See v2:ADR-0099 for historical reference (AG-010 exempt).",
@@ -1786,6 +1787,17 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
         (res.file ?? "").includes("violation-cmd.md"),
     );
     expect(hits.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("does not report the head token of a 3-digit line reference (OU-003, Issue #2559)", () => {
+    const r = runScript(IR055_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hits = parsed.results.filter(
+      (res: { check: string; evidence?: string }) =>
+        res.check === "runtime-unresolved-reference" &&
+        res.evidence === "REQ-217",
+    );
+    expect(hits.length).toBe(0);
   });
 
   it("detects strict pattern ADR-NNNN (residual after Decision migration, REQ-025-004)", () => {
