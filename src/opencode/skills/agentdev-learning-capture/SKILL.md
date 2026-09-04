@@ -1,6 +1,6 @@
 ---
 name: agentdev-learning-capture
-description: Agent-first extraction and capture of learnings from problems autonomously detected/avoided/corrected. Covers CI failures, template deviations, gh/git workarounds, reopen causes, and implementation errors. USE FOR: case-close post-processing, post-incident capture, workflow deviation detection. DO NOT USE FOR: general note-taking, documentation generation, ADR/REQ/spec creation.
+description: Agent-first extraction and capture of learnings from problems autonomously detected/avoided/corrected. Covers CI failures, template deviations, gh/git workarounds, reopen causes, and implementation errors. USE FOR: case-close post-processing, post-incident capture, workflow deviation detection. DO NOT USE FOR: general note-taking, documentation generation, Decision/REQ/spec creation.
 ---
 
 # `agentdev-learning-capture`
@@ -26,7 +26,7 @@ description: Agent-first extraction and capture of learnings from problems auton
 - **エージェント主体**: エージェントが学びを検知、抽出し、ユーザー承認なしで自律的に inbox.md に蓄積する。蓄積後に内容を通知するが、承認や却下は求めない
 - **実観測ベース**: エージェントが実際に観測した事象に基づいて学び候補を抽出する。推測のみのエントリは保存しない。品質評価は保留し下流（promote）に委ねる。重複は気にしない（統合は promote が行う）
 - **13フィールド完備**: 基準テンプレート（`references/capture-entry-template.md`）に従い全13フィールドを必ず含める。推論でフォーマットを組み立てず、テンプレートから取得する
-- **ADR/REQ/spec反映判断を行わない**: 影響の記録まで。実際のADR/REQ/spec更新、昇格判断は別スキルの責務
+- **Decision/REQ/spec反映判断を行わない**: 影響の記録まで。実際のDecision/REQ/spec更新、昇格判断は別スキルの責務
 - **intake item を作成しない**: 学びの抽出過程で具体的な修正対象が残る場合は intake workflow（`/agentdev/intake-capture`）に委ねる
 
 ## いつトリガーするか
@@ -53,7 +53,7 @@ inbox.mdが存在しない場合、エージェントは当該ファイルを作
 
 - **ユーザーに学びの有無を問わない**（「学びはありましたか？」「何か学びはありますか？」等の問いかけは禁止。エージェントが自ら判断する）
 - **ユーザーに学びの内容の入力を促さない**（「学びの内容を入力してください」「学びを教えてください」等の要求は禁止。エージェントが学びを生成して提示する）
-- **ADR/REQ/spec反映判断を行わない**（影響の記録まで。実際のADR/REQ/spec更新は別スキルの責務）
+- **Decision/REQ/spec反映判断を行わない**（影響の記録まで。実際のDecision/REQ/spec更新は別スキルの責務）
 - **昇格判断を行わない**（学びをスキルやコマンドに昇格すべきかの判断は `/agentdev/learning-promote` の責務）
 - **複雑なロジックを使わない**（シンプルなテキスト追記のみ）
 - **intake item を作成しない**（学びの抽出過程で具体的な修正対象が残る場合は、intake workflow（`/agentdev/intake-capture`）に委ねる。learning capture は intake item を作成しない）

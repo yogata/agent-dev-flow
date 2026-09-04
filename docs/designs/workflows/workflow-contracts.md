@@ -141,7 +141,7 @@ no-op / empty state の外部挙動を維持する。
 
 ### 参照フロー（共通）
 
-| コマンド | specs | ADR | REQ | finding | learning | intake | integrity |
+| コマンド | specs | Decision | REQ | finding | learning | intake | integrity |
 |---|---|---|---|---|---|---|---|
 | `/agentdev/req-define` | - || READ | READ（明示入力時） | - || - |
 | `/agentdev/req-save` | - | WRITE | WRITE | WRITE（SPLIT検出時） | - || - |

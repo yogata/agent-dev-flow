@@ -1,6 +1,6 @@
 ---
 name: agentdev-architecture-advisory
-description: "Requirement definition architecture review support. USE FOR: req-define architecture-impact judgment when requirements may affect responsibility boundaries, existing REQ/ADR/Design consistency, or external agent integration. DO NOT USE FOR: implementation execution, implementation plan review, or file editing."
+description: "Requirement definition architecture review support. USE FOR: req-define architecture-impact judgment when requirements may affect responsibility boundaries, existing REQ/Decision/Design consistency, or external agent integration. DO NOT USE FOR: implementation execution, implementation plan review, or file editing."
 ---
 
 # アーキテクチャ助言（req-define 事前確認）
@@ -14,10 +14,10 @@ req-define が要件を確定する前にアーキテクチャ上の影響を確
 
 ## 実行条件
 
-req-define が以下のいずれかに該当する場合、ドラフト完了前かつ ADR 判断確定前にアーキテクチャ助言サブエージェントへ確認する:
+req-define が以下のいずれかに該当する場合、ドラフト完了前かつ Decision 判断確定前にアーキテクチャ助言サブエージェントへ確認する:
 
-- 既存 REQ/ADR/Design との衝突可能性
-- 新規 ADR 作成または既存 ADR 更新候補
+- 既存 REQ/Decision/Design との衝突可能性
+- 新規 Decision 作成または既存 Decision 更新候補
 - command/ skill/ workflow/ docs の責務境界変更
 - 外部実行手段、OpenCode プラグイン、サブエージェントの責務境界影響
 - 複数コマンドにまたがるアーキテクチャ判断
@@ -25,8 +25,8 @@ req-define が以下のいずれかに該当する場合、ドラフト完了前
 
 ## 呼び出し位置
 
-req-define Step 4「要件展開」後、Step 5「ADR判断」前。
-ADR 判断が確定した後の確認は本スキルの対象外。
+req-define Step 4「要件展開」後、Step 5「Decision判断」前。
+Decision 判断が確定した後の確認は本スキルの対象外。
 
 ## アーキテクチャ助言サブエージェント相談の標準入力テンプレート（REQ）
 
@@ -36,9 +36,9 @@ ADR 判断が確定した後の確認は本スキルの対象外。
 | 要素 | 内容 |
 |------|------|
 | 要件候補 | 今回確定しようとする要件行候補、対象範囲 |
-| 衝突候補 | 既存 REQ/ADR/Design との矛盾、責務境界変更候補 |
-| ADR 候補 | 新規 ADR 作成または既存 ADR 更新の候補 |
-| 既存 ADR との関連 | 既存 ADR との意味的重複、適用範囲の重なり、relates-to 関係 |
+| 衝突候補 | 既存 REQ/Decision/Design との矛盾、責務境界変更候補 |
+| Decision 候補 | 新規 Decision 作成または既存 Decision 更新の候補 |
+| 既存 Decision との関連 | 既存 Decision との意味的重複、適用範囲の重なり、relates-to 関係 |
 | 親エージェントの判断質問 | アーキテクチャ助言サブエージェントに答えてほしい具体的質問、未決分岐 |
 
 Design 分離候補は要件候補、衝突候補に付随情報として併記し、独立要素とはしない。
@@ -57,7 +57,7 @@ Design 分離候補は要件候補、衝突候補に付随情報として併記�
 | ユーザー確認事項 | ユーザー合意が必要な内容 | ユーザーへ確認する |
 | ブロッカー | 解決不能な未決事項 | ブロッカーとして報告する |
 
-アーキテクチャ助言サブエージェントは推奨方針、設計リスク、ADR 要否判断、衝突解消方針、根拠ファイル、確信度を助言内容として含め、各助言に上記ラベルを付ける。
+アーキテクチャ助言サブエージェントは推奨方針、設計リスク、Decision 要否判断、衝突解消方針、根拠ファイル、確信度を助言内容として含め、各助言に上記ラベルを付ける。
 ラベルは soft-contract であり、アーキテクチャ助言サブエージェントが付けたラベルを親エージェントがそのまま採用するとは限らない。
 
 ## 親エージェントの分類権限

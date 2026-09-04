@@ -36,7 +36,7 @@
 ### STEP-4-1: 検出事項出力
 
 検出事項を `.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md` へ出力する。
-source-of-truth priority: 現行 REQ > 承認済み ADR > Design > guides。
+source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides。
 NG 分類（false positive/ pre-existing/ 今回修正対象）は docs-spec-rebuild-integrity Design（extension 経由）の NG 分類表に従い、各検出事項に分類、理由、後続対象を付ける。
 
 ### STEP-4-2: 実行前同期（git pull --ff-only）

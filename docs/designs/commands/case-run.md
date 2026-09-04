@@ -75,7 +75,7 @@ Workflow Skill は単一 Issue 実行（single workflow）と Epic Wave 実行�
 べき等性: worktreeとブランチが既に存在する場合、worktree作成をスキップして委譲フェーズへ移行
 
 - Issue本文から要件docと受け入れ基準を抽出 → `agentdev-req-analysis` チェックボックス品質基準で検証
-- 関連Decision特定、実装がADR決定事項に矛盾しないことを確認
+- 関連Decision特定、実装がDecision決定事項に矛盾しないことを確認
 - work_type 判定（`agentdev-workflow-lifecycle`）
 - Worktree作成、ブランチ準備（`agentdev-git-worktree`）（`origin/main` ベース明示指定、べき等チェック）
   - 親Epicステータス更新（`agentdev-epic-tracker`）
@@ -496,7 +496,7 @@ adapter 委譲内で次のいずれかに該当する場合、実行担当サブ
 - adversarial-review 審議で unresolved な本質的争点またはユーザー判断事項が残り、実装の最初の変更（不可逆処理）へ進めない（REQ-014-009）
 
 blocked 詳細本文は Issue コメントに SSoT として記録され、case-run の result 処理で扱われる。
-実行担当サブエージェントは要件、仕様問題を検出した場合、勝手に仕様変更、REQ 黙示変更、ADR 再解釈を行わず、必ず blocked 経路へ入る（REQ-015-011、REQ 黙示変更禁止制約）。
+実行担当サブエージェントは要件、仕様問題を検出した場合、勝手に仕様変更、REQ 黙示変更、Decision 再解釈を行わず、必ず blocked 経路へ入る（REQ-015-011、REQ 黙示変更禁止制約）。
 
 ### 発動条件（REQ-015-002、REQ-015-003）
 

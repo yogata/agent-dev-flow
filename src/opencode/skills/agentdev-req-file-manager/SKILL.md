@@ -37,7 +37,7 @@ REQファイルは CREATE（新規）、APPEND（要件行追加）、UPDATE（�
 
 req-define では壁打ち意向把握後に既存REQとの照合を行い、CREATE/APPEND/UPDATE を分類する。
 照合の判定要素（タイトル、目的、要件内容）、操作分類の5軸評価、REQファイルの照合用情報記述規則は [references/matching-and-merge.md](references/matching-and-merge.md) 参照。
-Issue/ADR/README との整合性チェック、マージ競合対応パターンも同ファイル参照。
+Issue/Decision/README との整合性チェック、マージ競合対応パターンも同ファイル参照。
 
 ---
 
@@ -54,10 +54,10 @@ REQファイル修正が必要なバグ修正は feature に昇格する（work_
 
 ## Scripts（決定的処理）
 
-`scripts/` 配下の決定的スクリプトが、本スキルが規定する REQ/ADR 採番、要件行 ID 採番を機械的に実行する（design-principles.md 第5節「Script は決定的でテスト可能な処理を担う」、REQ、AG-{NNN}/{NNN}）。
+`scripts/` 配下の決定的スクリプトが、本スキルが規定する REQ/Decision 採番、要件行 ID 採番を機械的に実行する（design-principles.md 第5節「Script は決定的でテスト可能な処理を担う」、REQ、AG-{NNN}/{NNN}）。
 LLM 推論で実行していた決定的処理をスクリプトへ委譲することで、番号の重複、欠番埋めを確実に防止する。
 
-配置先: `.opencode/skills/agentdev-req-file-manager/scripts/`（REQ/ADR 固有採番）。
+配置先: `.opencode/skills/agentdev-req-file-manager/scripts/`（REQ/Decision 固有採番）。
 実装は TypeScript、決定的（純粋関数）、テスト付き（`tests/*.test.ts`、REQ）である。
 
 > **移管済み script**:
@@ -101,7 +101,7 @@ cd src/opencode/skills/agentdev-req-file-manager/scripts && npm test
 
 ### req-save / design-save からの呼び出し
 
-req-save と design-save は、REQ番号、ADR番号、要件行IDの採番を `agentdev-req-file-manager` の決定的スクリプトとして bash 経由で呼び出し、JSON 結果を parse して意味判断（NG 時の対応等）を行う（REQ）。
+req-save と design-save は、REQ番号、Decision番号、要件行IDの採番を `agentdev-req-file-manager` の決定的スクリプトとして bash 経由で呼び出し、JSON 結果を parse して意味判断（NG 時の対応等）を行う（REQ）。
 target_area 見出し検索は、Design 固有処理として `agentdev-design-file-manager` 配下のスクリプトで実行する。
 frontmatter 整合性確認、エントリ存在確認、変更範囲検証は、`agentdev-artifact-validation` の公開検証契約経由で呼び出す（AG-{NNN}）。
 詳細は req-save / design-save command の各 Step 参照。

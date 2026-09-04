@@ -48,7 +48,7 @@ skill 作成時に次の観点で文章品質を検査し、違反を残さな�
 2. 設計原則（簡潔さ、自由度、トークン予算、行数ガバナンス）を適用
 3. 段階的開示（SKILL.md を目次化、詳細は references/ へ）を適用
 4. 品質評価5軸（明確性、完全性、トリガー精度、スコープ範囲、アンチパターン検出）で評価
-5. 配置判断フロー（実行時配布物か → Skill/Script/Template、authoring-only か → Design/ADR/Guide）で配置先を確定
+5. 配置判断フロー（実行時配布物か → Skill/Script/Template、authoring-only か → Design/Decision/Guide）で配置先を確定
 6. レビュープロトコル（frontmatter、予算、構造、助言、サブエージェント編集安全性）で検証
 
 ## 記述削減・抽象化の前段チェック（固定トークン事前 grep）
@@ -89,4 +89,4 @@ SKILL.md 本文から遅延読み込みされる詳細資料である。
 
 ## See Also
 
-- **agentdev-doc-writing**: ADR/REQ/Design 横断の文書品質査読ゲート（文書種別責務、要件性、文意品質、粒度）
+- **agentdev-doc-writing**: Decision/REQ/Design 横断の文書品質査読ゲート（文書種別責務、要件性、文意品質、粒度）

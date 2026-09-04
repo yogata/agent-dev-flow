@@ -26,7 +26,7 @@ case-auto command は公開 interface（入出力契約・ガードレール）�
 - bg task API による stage 2 並列起動（最大5件）
 - GitHub Issue/PR/comment/merge/close（自走対象、command 不変条件）
 - remote branch 削除（当該 case-auto/ case-run が作成した branch に限定）
-- docs/ REQ/ ADR/ Design/ command reference/ guide の更新（自走対象、command 不変条件）
+- docs/ REQ/ Decision/ Design/ command reference/ guide の更新（自走対象、command 不変条件）
 - 当該 Workflow Skill は worktree root 配下以外を編集しない
 
 ## 制御平面（STEP 一覧）

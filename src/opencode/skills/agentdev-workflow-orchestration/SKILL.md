@@ -10,7 +10,7 @@ case-run コマンドの状態機械、サブエージェントプロトコル�
 ## 状態機械
 
 case-run は単一 Issue または単一 Wave（`#epic` 指定時: 現在 ready な Wave の子Issue を 実行担当サブエージェント（adapter skill 経由、委譲 prompt 内で実行 command を指定）に並列委譲、最大5件）を処理し、Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）は扱わない（Wave 構成生成は case-open、Wave 境界クローズは case-close の責務）。
-Epic 全体の進行は case-auto が case-run(#epic) → case-close(#epic) の反復制御を担い、Wave 内の子Issue 選択、並列委譲は case-run(#epic) が、Wave 境界クローズ、Epic Issue 本文ステータス追跡テーブル更新は case-close(#epic) が担う（単一書き手: ADR、epic-wave-model Design、ADR）。
+Epic 全体の進行は case-auto が case-run(#epic) → case-close(#epic) の反復制御を担い、Wave 内の子Issue 選択、並列委譲は case-run(#epic) が、Wave 境界クローズ、Epic Issue 本文ステータス追跡テーブル更新は case-close(#epic) が担う（単一書き手: Decision、epic-wave-model Design、Decision）。
 
 ### case-run internal lifecycle フェーズ構成
 

@@ -27,7 +27,7 @@ Command→Skill 参照妥当性診断で、Command/Skill/Template/Script 定義�
 ### 正規な定義元の原則
 
 配布物種別間で責務ごとに正規な定義元を指定する原則。
-正規な定義元の候補は配布 Command / Skill / references / script / harness 側文書 / REQ-ADR-SPEC のいずれかであり、責務ごとに最も安定した最小の定義元を正規とする。
+正規な定義元の候補は配布 Command / Skill / references / script / harness 側文書 / REQ-Decision-SPEC のいずれかであり、責務ごとに最も安定した最小の定義元を正規とする。
 詳細な責務分担マッピングは artifact-responsibilities Design に委譲する。
 本原則は Command/Skill/Template/Script 責任分界の適用条件の精緻化である。
 
@@ -73,7 +73,7 @@ Command と Skill 間で工程、状態、責務、停止条件の意味が矛�
 
 ### 正規な定義元からの逸脱
 
-各責務が artifact-responsibilities Design のマッピングに照らして正規な定義元（配布 Command / Skill / references / script / harness 側文書 / REQ-ADR-SPEC）に置かれているかの検出。
+各責務が artifact-responsibilities Design のマッピングに照らして正規な定義元（配布 Command / Skill / references / script / harness 側文書 / REQ-Decision-SPEC）に置かれているかの検出。
 正規な定義元の原則に照らして検出する。
 
 判定基準:
@@ -82,7 +82,7 @@ Command と Skill 間で工程、状態、責務、停止条件の意味が矛�
 - Skill 本文に特定 Command の手順、Phase 名、Step 番号、局所導線が記述されている（責務越境）
 - Template にロジック、分岐、判定が含まれ、Script または Skill の責務を越境している
 - Script に宣言的ルール、判断基準、再利用可能なプロトコルが含まれ、Skill の責務を越境している
-- REQ / ADR / Design で正規化されるべき内容が配布物に再定義されている
+- REQ / Decision / Design で正規化されるべき内容が配布物に再定義されている
 - harness 側の責務（外部実行基盤の実行制御等）が配布 Command / Skill に越境している
 
 診断分類: `canonical-definition-deviation`
@@ -154,7 +154,7 @@ Recommended route は対象配布物の種別（`command` / `skill` / `reference
 | Skill に Command 固有手順越境 | Skill 本文に特定 Command の Phase 名・Step 番号が記述されている | canonical-definition-deviation |
 | Template にロジック越境 | Template に分岐・判定が含まれ、Script または Skill の責務を越境している | canonical-definition-deviation |
 | Script に宣言ルール越境 | Script に再利用可能な宣言的ルール・判断基準が含まれ、Skill の責務を越境している | canonical-definition-deviation |
-| REQ/ADR/Design 内容の配布物再定義 | REQ で正規化されるべき契約・分類が配布物に再定義されている | canonical-definition-deviation |
+| REQ/Decision/Design 内容の配布物再定義 | REQ で正規化されるべき契約・分類が配布物に再定義されている | canonical-definition-deviation |
 | 参照の前提欠落 | references への参照があるが参照元で前提文脈が記述されない | semantic-contract-missing |
 | 適用境界不明確 | Skill が `USE FOR` / `DO NOT USE FOR` を持たず、適用境界が不明確 | semantic-contract-missing |
 | 結果状態の定義欠落 | 委譲契約で success / blocked / failed 等の結果状態が定義されていない | semantic-contract-missing |

@@ -52,7 +52,7 @@ check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移�
 - WHAT/HOW境界の逸脱検出
 - 新規REQ・タイトル変更時の `docs/requirements/README.md` 同期
 - README 索引更新要否判定
-- ADR参照がある場合の相互参照更新要否判定
+- Decision参照がある場合の相互参照更新要否判定
 - 関連Design候補がある場合の `docs/designs/README.md` 更新要否判定
 - 旧Design直下パス混入検出（IR-057）
 - local版旧生成方式語彙混入検出（IR-057）
@@ -73,7 +73,7 @@ check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移�
 - command Designの場合の対象command原本との最低限の整合
 - skill Designの場合の対象skill原本との最低限の整合
 - integrity Designの場合の catalog/rule file/script 整合
-- REQ相当、ADR相当、guide相当の混入検出
+- REQ相当、Decision相当、guide相当の混入検出
 
 ### case-close 向け検査
 

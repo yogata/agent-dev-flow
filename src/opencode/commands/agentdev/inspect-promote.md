@@ -47,7 +47,7 @@ description: 検出事項を分類、採用し、採用済み成果物として 
 - reject された検出事項は即時削除し、reject 時の commit message に却下理由を含める（`archive/rejected/` への移動は廃止）
 - defer された検出事項は `.agentdev/inspect/inbox/` に残置する
 - docs-check ルール／検査データ追加候補は独立 route とせず、採用済み成果物の要件化方向または受け入れ条件に含める
-- `--auto` は自動 promote 対象カテゴリ（workflow-contracts Design 参照、extension 経由）に合致する高確信度検出事項のみを投入し、意味判断、曖昧な分類、ADR 要否判断を含む検出事項は手動分類へ回す
+- `--auto` は自動 promote 対象カテゴリ（workflow-contracts Design 参照、extension 経由）に合致する高確信度検出事項のみを投入し、意味判断、曖昧な分類、Decision 要否判断を含む検出事項は手動分類へ回す
 - `--auto` 実行の都度、投入対象、根拠を `.agentdev/inspect/promoted/auto-promote-log.md` に記録する（誤検知 revoke 手順は同 Design 参照）
 
 ## ガードレール

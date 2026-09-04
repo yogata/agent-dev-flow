@@ -223,7 +223,7 @@ Q7: 人間向けナビゲーション・案内か？
 | Script | 入力が同じなら出力も同じ。テスト可能 | 採番、validation、INDEX 生成 |
 | Template | 変数置換で使用。ロジックなし | Issue/PR 本文、コメント |
 | Design | 現在の構造、契約、ルールの記述 | system.md、patterns.md |
-| ADR | 「なぜその決定をしたか」の記録 | 技術選定、方針変更 |
+| Decision | 「なぜその決定をしたか」の記録 | 技術選定、方針変更 |
 | Guide | 人間向けの案内、説明 | ワークフロー概要、クイックスタート |
 
 **注意**: skill `references/` は実行時配布物のみを含める（現在は Design system.md で規定）。

@@ -1,6 +1,6 @@
 # 既存REQ照合、整合性チェック、マージ競合対応
 
-本ファイルは `agentdev-req-file-manager` SKILL.md の補助資料であり、req-define での既存REQ照合方法論、Issue/ADR/README との整合性チェック、REQ更新失敗時のマージ競合対応パターンを扱う。
+本ファイルは `agentdev-req-file-manager` SKILL.md の補助資料であり、req-define での既存REQ照合方法論、Issue/Decision/README との整合性チェック、REQ更新失敗時のマージ競合対応パターンを扱う。
 SKILL.md 本文では要点のみを提示し、照合の判定要素、操作分類の5軸評価、マージ競合パターン別解決方法は本ファイルを参照する。
 
 ## 既存REQ照合方法論
@@ -81,10 +81,10 @@ REQ間の関連、依存はREQ本文内に記載する（frontmatterフィール
 
 - REQファイルはIssueから一方向参照（Issue本文にREQ番号を記載）。REQファイルからIssueへの逆参照は行わない
 
-### ADR ↔ REQ
+### Decision ↔ REQ
 
-- ADRが必要な要件は、REQ本文内に `Related ADRs` 形式でADR番号を記載する（専用セクションは仮定しない、記述形式は numbering-and-validation.md「REQ本文内メタデータ規約」参照）
-- ADRが存在しない場合、ADR作成を推奨（要件がアーキテクチャ判断を含む場合）
+- Decisionが必要な要件は、REQ本文内に `Related ADRs` 形式でDecision番号を記載する（専用セクションは仮定しない、記述形式は numbering-and-validation.md「REQ本文内メタデータ規約」参照）
+- Decisionが存在しない場合、Decision作成を推奨（要件がアーキテクチャ判断を含む場合）
 
 ### README.md ↔ REQ
 

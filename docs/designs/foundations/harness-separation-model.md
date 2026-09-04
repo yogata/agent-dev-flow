@@ -49,7 +49,7 @@ AgentDevFlow 配布物と harness 実行制御の責務分離モデルを定義�
 
 ### 配布物側（業務ワークフロー契約）
 
-配布物の大多数（SKILL.md 本体、command .md 本体、docs/REQ、docs/ADR、docs/Design、docs/guides、README）は業務ワークフロー契約のみで完結する。
+配布物の大多数（SKILL.md 本体、command .md 本体、docs/REQ、docs/Decision、docs/Design、docs/guides、README）は業務ワークフロー契約のみで完結する。
 
 - 工程の進行条件、停止条件
 - 永続成果物（REQ/Decision/Design/Issue/PR/`.agentdev/`）

@@ -9,7 +9,7 @@ Issue 本文候補を生成し、execution contract を確定する。
 
 ## Input Resolution
 
-1. SSoT 再構成: 要件doc（draft-data、`agreed_items`、`artifact_actions`、`realization_actions`、`test_strategy`、`review_dispositions`）、対象 REQ/Decision/Design、関連 ADR（Decision）
+1. SSoT 再構成: 要件doc（draft-data、`agreed_items`、`artifact_actions`、`realization_actions`、`test_strategy`、`review_dispositions`）、対象 REQ/Decision/Design、関連 Decision
 2. identifier 保持: REQ-ID、DEC-ID、OU ID、AG-ID
 3. 最小 scalar: なし
 4. runtime artifact: Issue 本文候補ファイル（委譲接続点経由）
@@ -67,7 +67,7 @@ artifact-quality-control-routing Design の合成規則に従い変更予定成�
 
 #### 関連 ADR 拘束条件の特定と反映
 
-Issue の実装を拘束する関連 ADR を特定し、必要な制約を完了条件または test strategy へ反映する。
+Issue の実装を拘束する関連 Decision を特定し、必要な制約を完了条件または test strategy へ反映する。
 
 #### 予定変更内容から事前判定可能な追加検証条件の展開
 

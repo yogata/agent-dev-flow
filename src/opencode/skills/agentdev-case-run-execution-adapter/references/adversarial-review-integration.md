@@ -8,7 +8,7 @@
 
 ## 実装方針形成
 
-実行担当サブエージェントは委譲 prompt で指定された実行 command に従い、Issue 本文、受け入れ基準、ADR、REQ、Design、docs、repository context を再確認した上で実装方針を形成する。
+実行担当サブエージェントは委譲 prompt で指定された実行 command に従い、Issue 本文、受け入れ基準、Decision、REQ、Design、docs、repository context を再確認した上で実装方針を形成する。
 
 実装方針の構成要素:
 
@@ -18,8 +18,8 @@
 - 使用ライブラリ、ユーティリティの選択（既確定 Design 範囲内）
 - テスト方針（test strategy 項目の検証手順の具体化）
 
-実装方針は既確定 Issue 本文、REQ、ADR、Design を実現する内部選択に限定する。
-新規要件の創出、既存 REQ/ADR/Design の変更、撤回、再解釈を含まない。
+実装方針は既確定 Issue 本文、REQ、Decision、Design を実現する内部選択に限定する。
+新規要件の創出、既存 REQ/Decision/Design の変更、撤回、再解釈を含まない。
 実装方針の生成、審査は case-run 本体（委譲元）ではなく adapter 委譲内の実行担当サブエージェント責務である。
 実装方針は最初の実装変更（ファイル編集、コード生成等の不可逆処理）前に形成、確定する。
 
@@ -43,7 +43,7 @@ adversarial-review は実装ファイル、Issue、PR、git 操作を行わず�
 審議対象へ渡す実装方針の内容:
 
 - 対象 Issue 番号、完了条件、受け入れ基準
-- 形成した実装方針（構成要素、根拠、既確定 Issue/REQ/ADR/Design との対応）
+- 形成した実装方針（構成要素、根拠、既確定 Issue/REQ/Decision/Design との対応）
 - 想定失敗条件、技術領域、制約（review 戦略構成の入力）
 
 ## 結果反映
@@ -51,7 +51,7 @@ adversarial-review は実装ファイル、Issue、PR、git 操作を行わず�
 accepted finding の実装方針への反映は実行担当サブエージェント（呼出元）の責務である。
 反映は最初の実装変更前に行う。
 
-反映後に実装方針の意味内容が変更された場合、adapter 委譲内で必要な既存検証（REQ/ADR/Design 整合性再確認、targeted docs guard、QG 等）を再実行する。
+反映後に実装方針の意味内容が変更された場合、adapter 委譲内で必要な既存検証（REQ/Decision/Design 整合性再確認、targeted docs guard、QG 等）を再実行する。
 意味内容変更から新たな本質的争点が生じ得る場合のみ adapter 委譲内で再 review を発動でき、新証拠、新前提、異なる failure condition、未評価範囲のいずれも伴わない同一 finding の再起票を禁止する。
 再 review 停止条件4点は adversarial-review Design を正とする。
 
@@ -65,14 +65,14 @@ accepted finding の実装方針への反映は実行担当サブエージェン
 
 - 既確定 Issue 本文の受け入れ基準、完了条件の変更
 - 既存 REQ の要件行の追加、変更、撤回
-- 既存 ADR の決定事項の変更、撤回
+- 既存 Decision の決定事項の変更、撤回
 - 既存 Design の契約、手続き、責務の変更
 
 これらは adapter 委譲内で解決せず、ユーザー判断、REQ 更新プロセス（req-define / req-save / design-save）、case-update 経由の Issue 本文更新等の正規経路へ引き渡すため blocked とする。
 
 ### 要件、仕様問題の検出
 
-要件、仕様に次のいずれかを検出した場合、勝手に仕様変更、REQ 黙示変更、ADR 再解釈を行わず blocked へ遷移する。
+要件、仕様に次のいずれかを検出した場合、勝手に仕様変更、REQ 黙示変更、Decision 再解釈を行わず blocked へ遷移する。
 
 - 要件の欠落（完了条件、受け入れ基準が不明確、実装不可能）
 - 要件の矛盾（完了条件同士、完了条件と受け入れ基準、REQ 間の矛盾）
@@ -87,7 +87,7 @@ unresolved は既存の HITL、blocker、case-auto 停止理由分類のいず�
 
 ### blocked 詳細本文の記録
 
-blocked 詳細本文（検出理由、対象 REQ/ADR/Design、想定される修正方向等）は Issue コメントに SSoT として構造化して記録する（result 契約「SSoT」節、case-run STEP-S5（result 処理）参照）。
+blocked 詳細本文（検出理由、対象 REQ/Decision/Design、想定される修正方向等）は Issue コメントに SSoT として構造化して記録する（result 契約「SSoT」節、case-run STEP-S5（result 処理）参照）。
 実行担当サブエージェントは blocked 遷移時に実装ファイル、PR、commit を残さず、worktree を実装前の状態に保つ。
 
 ## 従来フロー（review 非発動時）

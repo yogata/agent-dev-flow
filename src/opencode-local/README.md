@@ -1,12 +1,12 @@
 # ローカル版 OpenCode 固有原本領域
 
-> **非正規文書**: 本ディレクトリは AgentDevFlow 本体リポジトリの `docs/`（リポジトリ内部設計文書）ではなく、ローカル版 OpenCode の link 元となるローカル版固有原本を保持する領域である（ADR-0131）。要件は `docs/requirements/REQ-0141.md`、仕様は `docs/designs/local/*.md` を正とする。
+> **非正規文書**: 本ディレクトリは AgentDevFlow 本体リポジトリの `docs/`（リポジトリ内部設計文書）ではなく、ローカル版 OpenCode の link 元となるローカル版固有原本を保持する領域である（v2:ADR-0131）。要件は `docs/requirements/REQ-0141.md`、仕様は `docs/designs/local/*.md` を正とする。
 
 ## 目的
 
-GitHub Issue / PR を使わない個人利用環境（ローカル版 OpenCode）向けに、ローカル版固有原本（agentdev-gh-cli）を保持し、link mode での導入手順を記載する（REQ-0141-003, 004, 031, ADR-0131）。
+GitHub Issue / PR を使わない個人利用環境（ローカル版 OpenCode）向けに、ローカル版固有原本（agentdev-gh-cli）を保持し、link mode での導入手順を記載する（REQ-0141-003, 004, 031, v2:ADR-0131）。
 ローカル版の command / skill / ひな形は配置しない。
-link mode では `src/opencode/` の原本をそのまま接続するため、ローカル版専用の生成物は不要である（ADR-0131 decision #1, #3）。
+link mode では `src/opencode/` の原本をそのまま接続するため、ローカル版専用の生成物は不要である（v2:ADR-0131 decision #1, #3）。
 
 ## リポジトリ構成（前提）
 
@@ -37,7 +37,7 @@ src/opencode-local/
 │           └── headings.yaml      ← role 条件付き見出し一覧の機械可読定義
 ```
 
-link mode への移行に伴い、`transform/` と `generation-flow.md` は現行構成から除去済みである（AG-002, ADR-0131 decision #4, REQ-0141-028）。
+link mode への移行に伴い、`transform/` と `generation-flow.md` は現行構成から除去済みである（AG-002, v2:ADR-0131 decision #4, REQ-0141-028）。
 link mode では原本がそのまま接続されるため、旧変換資産による意味変換は不要である。
 
 ### 作成しないディレクトリ（REQ-0141-005）
@@ -53,7 +53,7 @@ link mode では原本がそのまま接続されるため、旧変換資産に�
 
 ## link 設定手順
 
-ローカル版 link mode 導入の全体フローを定義する（REQ-0141-007, 032, ADR-0131 decision #1, #2, #3）。
+ローカル版 link mode 導入の全体フローを定義する（REQ-0141-007, 032, v2:ADR-0131 decision #1, #2, #3）。
 決定的な変換ロジックを実装した変換スクリプトは使用しない（REQ-0141-032）。
 
 ### 前提
@@ -69,17 +69,17 @@ link mode では原本がそのまま接続されるため、旧変換資産に�
 
 2. **link target の確認**: 後述の「link target 確認」を実施し、意図した link target がすべて揃っていることを確認する
 
-3. **通常版 link の設定**: `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`、`.opencode/tools/agentdev-*/`、`.opencode/plugins/agentdev-*/` を `src/opencode/` 配下へ接続する（ADR-0131 decision #2）
+3. **通常版 link の設定**: `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`、`.opencode/tools/agentdev-*/`、`.opencode/plugins/agentdev-*/` を `src/opencode/` 配下へ接続する（v2:ADR-0131 decision #2）
 
-4. **Custom Tool 実装の差し替え**: `.opencode/tools/agentdev-gh/` だけを `src/opencode-local/agentdev-gh-cli/`（Local 実装 Tool）へ接続する（ADR-0131 decision #3、REQ-011-006。実行は install.ps1 -LocalMode が設定する）
+4. **Custom Tool 実装の差し替え**: `.opencode/tools/agentdev-gh/` だけを `src/opencode-local/agentdev-gh-cli/`（Local 実装 Tool）へ接続する（v2:ADR-0131 decision #3、REQ-011-006。実行は install.ps1 -LocalMode が設定する）
 
 5. **link 設定の検証**: 各 link が意図した target へ解決されることを確認する
 
-link mode では原本がそのまま接続されるため、旧変換資産の実行やひな形の意味変換は不要である（ADR-0131 decision #4）。
+link mode では原本がそのまま接続されるため、旧変換資産の実行やひな形の意味変換は不要である（v2:ADR-0131 decision #4）。
 
 ### link target 確認
 
-link 設定前に `.opencode/` 配下の各 path が意図した link target へ解決されることを確認する（REQ-0141-010, AG-012, ADR-0131 decision #6）。
+link 設定前に `.opencode/` 配下の各 path が意図した link target へ解決されることを確認する（REQ-0141-010, AG-012, v2:ADR-0131 decision #6）。
 ジャンクションやシンボリックリンク環境での誤接続を防止するためである。
 
 | 対象 | 期待される link target |
@@ -88,7 +88,7 @@ link 設定前に `.opencode/` 配下の各 path が意図した link target へ
 | `.opencode/skills/agentdev-*` | `src/opencode/skills/agentdev-*/` |
 | `.opencode/tools/agentdev-gh/` | `src/opencode-local/agentdev-gh-cli/`（Local 実装 Tool） |
 
-link target 確認は決定的な検査として実施する（ADR-0107, ADR-0131 decision #6）。
+link target 確認は決定的な検査として実施する（ADR-0107, v2:ADR-0131 decision #6）。
 AI エージェントの解釈に依存せず、ファイルシステムの実パス解決により機械的に判定する。
 
 意図した link target 以外へ解決される場合、link 設定を開始せずに停止する。
@@ -98,11 +98,11 @@ link mode 全体を一律停止するのではなく、link target が意図し�
 ## 更新運用（unlink / relink）
 
 ローカル版の高頻度更新は想定しない。
-更新時は `.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を unlink してから relink する（REQ-0141-033, ADR-0131 decision #4）。
+更新時は `.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を unlink してから relink する（REQ-0141-033, v2:ADR-0131 decision #4）。
 差分更新は想定しない。
 
 全削除による一括再構築は行わない。
-link の張り直しで済むため、`generated_by` 識別子による保護機構は廃止した（ADR-0131 decision #5）。
+link の張り直しで済むため、`generated_by` 識別子による保護機構は廃止した（v2:ADR-0131 decision #5）。
 link による接続であるため、上書き問題が発生しない。
 
 ### 更新手順
@@ -113,15 +113,15 @@ link による接続であるため、上書き問題が発生しない。
 
 ## ガードレール
 
-ローカル版 link mode 導入が遵守するガードレール（REQ-0141-014, AG-009, AG-010, ADR-0131）。
+ローカル版 link mode 導入が遵守するガードレール（REQ-0141-014, AG-009, AG-010, v2:ADR-0131）。
 
 - `src/opencode/` を変更しないこと（REQ-0141-014）
 - `src/opencode-local/` を変更しないこと
 - link 設定の結果を `src/opencode-local/` 配下へ出力しないこと
 - AgentDevFlow 本体リポジトリでローカル版 link 設定を実行しないこと（REQ-0141-006）
 - link target が意図した target 以外へ解決される場合は link 設定を停止すること（REQ-0141-010, AG-012）
-- `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`、`.opencode/tools/agentdev-*/`（agentdev-gh 以外）、`.opencode/plugins/agentdev-*/` を `src/opencode/` 配下へ接続すること（ADR-0131 decision #2）
-- `.opencode/tools/agentdev-gh/` だけを `src/opencode-local/agentdev-gh-cli/` へ接続すること（ADR-0131 decision #3、REQ-011-006）
+- `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`、`.opencode/tools/agentdev-*/`（agentdev-gh 以外）、`.opencode/plugins/agentdev-*/` を `src/opencode/` 配下へ接続すること（v2:ADR-0131 decision #2）
+- `.opencode/tools/agentdev-gh/` だけを `src/opencode-local/agentdev-gh-cli/` へ接続すること（v2:ADR-0131 decision #3、REQ-011-006）
 - `runtime-overrides/` を設けないこと
 - バックエンド抽象化を導入しないこと（REQ-0141-027）
 - GitHub 互換ローカルサーバを前提にしないこと（REQ-0141-027）
@@ -129,7 +129,7 @@ link による接続であるため、上書き問題が発生しない。
 
 ## リポジトリ管理対象
 
-- **管理対象外**: link により接続された `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`、`.opencode/tools/agentdev-*/`（Local 実装差し替えを含む）、`.opencode/plugins/agentdev-*/`。導入先リポジトリの `.gitignore` で除外することを推奨する（REQ-0141-008, ADR-0131 decision #1）
+- **管理対象外**: link により接続された `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`、`.opencode/tools/agentdev-*/`（Local 実装差し替えを含む）、`.opencode/plugins/agentdev-*/`。導入先リポジトリの `.gitignore` で除外することを推奨する（REQ-0141-008, v2:ADR-0131 decision #1）
 - **管理対象**: `.agentdev/issues/` 配下のローカルIssue（単一採番空間、role 条件付きスキーマ）
 
 ## 関連項目

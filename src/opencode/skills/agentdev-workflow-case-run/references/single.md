@@ -80,7 +80,7 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 - **工程間構造化文脈の初期文脈利用**: 前工程（case-open、case-auto 等）から構造化文脈が引き継がれている場合、前工程で確定した事項を初期文脈として利用し、同じ情報をゼロから探索、再構築することを原則としない。独立検証、鮮度確認、矛盾検出、正規成果物との整合確認を目的とする再確認は維持する。手動起動等で構造化文脈が引き継がれていない場合は、durable state（Issue 本文、要件doc、REQ/Decision/Design）から入力解決を行う（形式と制約は `agentdev-workflow-lifecycle` スキルの工程間構造化文脈引き継ぎ参照）
 - **execution contract 消費境界**: 完了条件、test strategy、必須品質統制を実行契約として扱う。不足・曖昧さ・矛盾・実現不能を検出した場合は自律補完せず blocked とする。test strategy を新規設計せず記録済み項目を実行する。必須品質統制の適用要否を再判断しない。work_type/scale/Issue structure を再分類して実行契約を変更しない
   - runtime-only 判断の維持: worktree 状態確認、QG-3 前置 staleness check、実 diff 検査、実装結果・test 実行結果は case-run の安全検査として維持する
-  - blocked 遷移と case-update 連携: 完了条件の不足・曖昧さ・矛盾・実現不能、scope-affecting impact candidate の発見、関連 ADR への適合確認で新たな拘束の必要性検出、必須品質統制の追加変更必要性、Issue metadata・構造・実態の矛盾検出時は blocked とし、Issue 更新は case-update へ委譲する（case-run 単独では Issue 本文を書き換えない）
+  - blocked 遷移と case-update 連携: 完了条件の不足・曖昧さ・矛盾・実現不能、scope-affecting impact candidate の発見、関連 Decision への適合確認で新たな拘束の必要性検出、必須品質統制の追加変更必要性、Issue metadata・構造・実態の矛盾検出時は blocked とし、Issue 更新は case-update へ委譲する（case-run 単独では Issue 本文を書き換えない）
   - 新旧 Issue 互換運用: execution contract 必須セクション（Execution Contract セクション、必須品質統制セクション）存在有無で新旧 Issue を識別する（presence-based 判定）。必須セクション不存在の legacy Issue は、新契約項目欠落のみを理由に一律 blocked にしない
   - work_type/scale 確認の縮約: work_type 確認は再分類ではなく metadata 整合確認へ縮約して維持する
 

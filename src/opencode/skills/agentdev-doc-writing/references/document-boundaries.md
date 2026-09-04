@@ -8,9 +8,9 @@
 | 文書種別 | 責務 |
 |---|---|
 | REQ | 満たすべき状態、振る舞い、制約、外部契約を記述する |
-| ADR | 将来の設計、運用、文書システムを制約する意思決定の記録 |
+| Decision | 将来の設計、運用、文書システムを制約する意思決定の記録 |
 | Design | 現在の実装構成を成立させるスキーマ、ライフサイクル、コマンド構成、ルールカタログ、判定表、enum、format、内部パラメータを記述する |
-| guide | 人間向けナビゲーション層（REQ/ADR/Design の内容を代替しない） |
+| guide | 人間向けナビゲーション層（REQ/Decision/Design の内容を代替しない） |
 | README | identity、入口表、参照先リンク、最小限のクイックスタート |
 
 ## REQ と Design の配置判定
@@ -61,7 +61,7 @@ Design 相当内容のみを主たる文意とする場合は「移送: Design�
 詳細は [spec-writing-quality.md](spec-writing-quality.md) 参照。
 
 4. **guide/ README か?**（ナビゲーション層として機能しているか。）
-REQ/ADR/Design の内容を代替していないか。
+REQ/Decision/Design の内容を代替していないか。
 
 
 ## 硬直的固定記述の回避
@@ -98,7 +98,7 @@ REQ/ADR/Design の内容を代替していないか。
 内部 ID を機能的記述へ置換する。具体例:
 
 - REQ 番号 → 該当コマンド名、スキル名、機能名
-- ADR 番号 → 意思決定の内容（例: 委譲モデル、ライフサイクル方針）
+- Decision 番号 → 意思決定の内容（例: 委譲モデル、ライフサイクル方針）
 - SPEC-ID → 該当 Design の主題（例: 「case-run Design」）
 
 内部 ID を含む説明が必要な場合は、配布物ではなく `docs/designs/` または `docs/guides/` へ移送する（`移送: Design` または `移送: guide`）。

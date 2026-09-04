@@ -153,7 +153,7 @@ created: "{YYYY-MM-DD}"
 | Design分離基準違反（high-specificity） | 具体的証拠を伴う Step 番号、スキーマフィールド、enum 一覧、テストデータ詳細、作業履歴など、移行先が Design/コマンドリファレンス に一意に定まるもの | 安定契約例外（REQ-001-068）、否定文脈、判定表、内部パラメータなど意味解釈を要するもの |
 | 構造的即時是正 | リンク切れ、旧名前空間（namespace）残存など、正解が一意で破壊的でない修復 | - |
 | 命名、分類の意味判断 | - | SPLIT/MERGE/MOVE/RETIRE/DRIFT 判断、scope 決定、優先度付け（全件手動） |
-| ADR 要否判断 | - | ADR閾値判定を含む finding（全件手動） |
+| Decision 要否判断 | - | Decision閾値判定を含む finding（全件手動） |
 
 自動 promote 対象外の finding は `--auto` 指定時でも手動分類フロー（HITL 承認）に回し、自動投入しない。
 

@@ -17,7 +17,7 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 
 ## 適用対象
 
-- `docs/**`（REQ, ADR, Design, guides, README）の作成、編集、レビュー時
+- `docs/**`（REQ, Decision, Design, guides, README）の作成、編集、レビュー時
 - docs を生成、編集する command / skill の自然言語記述（本文、description、参照記述）の執筆、編集時
 - ユーザーが「AIっぽい」「薄い」「抽象的」「意味不明」「ビジネス文書として直せ」と指示した場合
 - Issue/PR 本文、完了報告、設計説明の執筆またはレビュー時

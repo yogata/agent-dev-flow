@@ -11,7 +11,7 @@ inspect-docs command が実行する docs 横断診断のカテゴリ定義と�
 | 廃止 REQ/Design 由来記述残置 | retired REQ/Design ID をソースとした記述が活性文書に残置していないか | `agentdev-req-structure-diagnostics`（REQ 体系境界、配布物 ID 汚染） |
 | REQ/Design 境界違反 | HOW 詳細が現行 REQ 要件行に残留しているか（document-model Design Separation Criteria 準拠） | `agentdev-req-structure-diagnostics`（MOVE 観点） |
 | REQ 粒度過小 | 1 REQ に複数関心、成果物種別、command family、lifecycle 段階が混在しているか | `agentdev-req-structure-diagnostics`（SPLIT 観点） |
-| 横断契約矛盾 | REQ/ADR/Design/guides 間で source-of-truth priority に基づく矛盾があるか | `agentdev-req-structure-diagnostics`（DRIFT 等）、`agentdev-doc-writing`（文意品質） |
+| 横断契約矛盾 | REQ/Decision/Design/guides 間で source-of-truth priority に基づく矛盾があるか | `agentdev-req-structure-diagnostics`（DRIFT 等）、`agentdev-doc-writing`（文意品質） |
 | 文意品質候補 | LLM っぽい表現、空虚語、英語混じり表現、実行主体分類の誤認が残存しているか | `agentdev-doc-writing` |
 
 各カテゴリの検出シグナル、シグナル閾値、判定ルールの詳細はルーティング先の専門 skill が所有する。
@@ -90,14 +90,14 @@ SPLIT 観点の判定ロジック、シグナル閾値（1シグナルは觀察�
 
 ## 横断契約矛盾
 
-REQ/ADR/Design/guides 間で、source-of-truth priority に基づく矛盾の有無を検出する。
-source-of-truth priority: 現行 REQ > 承認済み ADR > Design > guides。
+REQ/Decision/Design/guides 間で、source-of-truth priority に基づく矛盾の有無を検出する。
+source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides。
 
 ### 横断スキャン観点
 
 | シグナル | 内容 |
 |----------|------|
-| 下位文書の上位文書への矛盾 | guides の記述が現行 REQ/承認済み ADR と矛盾する |
+| 下位文書の上位文書への矛盾 | guides の記述が現行 REQ/承認済み Decision と矛盾する |
 | Design と REQ の責務説明矛盾 | Design の責務記述が現行 REQ の要件と矛盾する |
 | 旧名称、旧概念の残存 | 改名、廃止済みの概念が活性文書に残存している（DRIFT 的観点の横断適用） |
 

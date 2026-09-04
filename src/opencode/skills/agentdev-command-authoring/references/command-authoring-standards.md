@@ -308,7 +308,7 @@ Custom Tool `agentdev_gh` の操作を実行する（成功応答は読み戻し
 - Skill 本文内での他スキル参照
 - テンプレートパス、スクリプトパスの記述
 
-Source path は agent-dev-flow リポジトリ内の開発用文書（ADR, Design, Guide）でのみ使用する。
+Source path は agent-dev-flow リポジトリ内の開発用文書（Decision, Design, Guide）でのみ使用する。
 
 ## Review Checklist
 
@@ -408,7 +408,7 @@ Command本文でテンプレート、スキル参照のパスを記述する際�
 - [ ] 委譲定義を追加する場合、最小契約（inputs, side_effect_boundary, output_contract, capture_handoff）を満たしているか
 - [ ] delegated_check を使用する場合、親コマンドが検証結果の最終判断を保持しているか
 - [ ] サブエージェントの成果物本文は verbatim、判定結果、調査過程、中間ログ、読解メモは圧縮返却として記述しているか
-- [ ] Design/REQ/ADR 文書への置換は verbatim 置換方針に従っているか
+- [ ] Design/REQ/Decision 文書への置換は verbatim 置換方針に従っているか
 
 ## 検査観点展開基準
 
@@ -568,7 +568,7 @@ delegated_check は工程表（前出出力検証表）の行として記述す�
 
 | 対象文書種別 | 置換方式 | 理由 |
 |---|---|---|
-| Design/REQ/ADR 文書 | verbatim 置換 | 文書構造、frontmatter、相互参照の保全 |
+| Design/REQ/Decision 文書 | verbatim 置換 | 文書構造、frontmatter、相互参照の保全 |
 | Issue/PR 本文 | semantic rewrite | テンプレート構造内での意味保持 |
 | レポート、診断結果 | semantic rewrite | フォーマット自由度高 |
 | コード、Script | verbatim 置換 | 構文整合性の保全 |
@@ -578,7 +578,7 @@ delegated_check は工程表（前出出力検証表）の行として記述す�
 1. **置換対象セクションの明示**: 置換対象をセクション単位で指定（ファイル全体の置換は避ける）
 2. **frontmatter の保持**: 置換対象に frontmatter が含まれる場合、置換後も保持
 3. **相互参照の整合確認**: 置換後に参照先の存在確認を行う
-4. **id/ ファイル名の不変**: ADR番号、REQ番号は変更しない
+4. **id/ ファイル名の不変**: Decision番号、REQ番号は変更しない
 
 ### semantic rewrite の適用ルール
 

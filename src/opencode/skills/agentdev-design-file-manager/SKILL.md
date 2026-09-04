@@ -1,6 +1,6 @@
 ---
 name: agentdev-design-file-manager
-description: Manages Design file operations (CREATE/APPEND/UPDATE), placement resolution, target_area section replacement, Design-specific integrity, and Design-specific script invocation contract. USE FOR: creating Design files, appending sections, updating Designs via target_area, Design lifecycle (draft/accepted) application. DO NOT USE FOR: REQ/ADR operations, Design content inference, accepted promotion, user approval, commit, push.
+description: Manages Design file operations (CREATE/APPEND/UPDATE), placement resolution, target_area section replacement, Design-specific integrity, and Design-specific script invocation contract. USE FOR: creating Design files, appending sections, updating Designs via target_area, Design lifecycle (draft/accepted) application. DO NOT USE FOR: REQ/Decision operations, Design content inference, accepted promotion, user approval, commit, push.
 ---
 
 # Designファイル管理
@@ -15,7 +15,7 @@ description: Manages Design file operations (CREATE/APPEND/UPDATE), placement re
 ## 責務境界
 
 本スキルは Design 操作（作成、更新、配置判断、target_area 処理、Design 固有整合性確認、Design 固有 script 呼出契約）のみを担う。
-REQ 操作、ADR 操作、Design 内容推論、accepted 昇格判断、ユーザー承認、commit、push は対象外。
+REQ 操作、Decision 操作、Design 内容推論、accepted 昇格判断、ユーザー承認、commit、push は対象外。
 
 | 操作 | 本スキル | 他スキル |
 |------|----------|----------|
@@ -147,7 +147,7 @@ STEP reference 8 要素は `<workflows/step-reference-contract>` Design 参照�
 - **agentdev-artifact-validation**: 共通検証 script の公開検証契約（委譲先）
 - **agentdev-doc-diagnostics**: docs 横断診断
 - **agentdev-doc-writing**: Design 横断の文書品質査読ゲート
-- Design ライフサイクルと design-save の導入（本体 ADR 参照）
+- Design ライフサイクルと design-save の導入（本体 Decision 参照）
 - REQ/Design 責務分離、script 所有権（本体 REQ 参照）
 
 ## 参考文献

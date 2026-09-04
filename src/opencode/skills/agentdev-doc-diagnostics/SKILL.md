@@ -12,7 +12,7 @@ REQ 固有の SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断、文意品質、�
 
 ## 検査対象を直接修正しない制約
 
-- ファイル変更（docs 配下、REQ/ADR/Design、Command/Skill/Template/Script）、Issue 作成、PR 作成、RU 保存、branch/worktree 操作を行わない。許可される副作用は `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit/push）のみ（inspect lifecycle 準拠）
+- ファイル変更（docs 配下、REQ/Decision/Design、Command/Skill/Template/Script）、Issue 作成、PR 作成、RU 保存、branch/worktree 操作を行わない。許可される副作用は `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit/push）のみ（inspect lifecycle 準拠）
 - 診断結果はセッション内テキストで提示する
 - 修正案は route として提示し、実装、保存、自動整形は行わない
 

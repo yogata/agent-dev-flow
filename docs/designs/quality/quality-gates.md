@@ -47,7 +47,7 @@ AgentDevFlow 主ワークフロー（req-define → req-save → design-save（D
 
 ### pass / warn / fail 基準
 
-- **pass**: 全検査観点を満たす。チェックボックスは測定可能かつ一意、REQ/Design 分類が適切、ADR 判定が記録済み。
+- **pass**: 全検査観点を満たす。チェックボックスは測定可能かつ一意、REQ/Design 分類が適切、Decision 判定が記録済み。
 - **warn**: 構造は保たれているが、改善推奨事項がある（例: チェックボックスの粒度が粗い）。進行可能。
 - **fail**: 構造的欠陥がある（例: 必須セクション欠落、REQ にすべき内容が Design に混入）。req-define へ差し戻し。
 
@@ -93,7 +93,7 @@ case-open で Issue を作成する前に、Issue の完了条件が対象 REQ/D
 
 ### 目的
 
-case-run で PR 作成前に、実装が Issue / REQ / ADR / Design / work plan から乖離していないことを確認する。
+case-run で PR 作成前に、実装が Issue / REQ / Decision / Design / work plan から乖離していないことを確認する。
 乖離を分類し、推奨アクションを提示する。
 
 ### 配置
