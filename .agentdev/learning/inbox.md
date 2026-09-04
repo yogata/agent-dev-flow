@@ -234,3 +234,39 @@
 - **横展開候補**: docs/knowledge/windows-powershell-bulk-io-corruption.md の知見拡張（コンソール出力系への適用）、learning-promote で判定
 - **関連**: Issue 2594 対応記録コメント（case-close STEP-6 学び検知）
 - **タグ**: #gh #windows #encoding #case-close #tool-fallback
+
+---
+
+## 2026-09-05: worktree 内変更の targeted docs guard は main repo から --root + --files 併用で検査できる
+
+- **現象**: worktree 環境では targeted docs guard の `--base-ref origin/main` モードに加え、main repo から `--root <worktreeパス>` + `--files <変更ファイル>` を併用する方式で worktree 内変更を検査できた（check_changed_docs.ts は `--root` と `--files` の併用を受理）
+- **状況/文脈**: case-run 委譲（Epic #2596 Wave 1 / Issue #2598 / PR #2611、OU-001 監査 Report の targeted docs guard 実行時）。worktree への junction 未伝播のため worktree 側からの bun 実行ができない構成
+- **検知方法**: junction 未伝播環境での case-run 実行時、guard を main repo 側から `--root` + `--files` モードで実行して代替（failures 0、warnings 0）
+- **根本原因**: worktree と main repo のスクリプト実体参照が junction 非伝播環境で断絶する（既知構成）。guard 自体のモードは併用を受理する
+- **応急/対応内容**: main repo から `--root` + `--files` 併用で実行し、docs/README.md 連動検査込みで合格
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/spec影響**: なし（実行手順の代替経路。Targeted Docs Guard 実装詳細の運用注記候補）
+- **展開視点**: junction 未伝播環境の case-run / case-close での targeted docs guard 代替手順として再利用可能
+- **再現条件**: worktree 内の変更を targeted docs guard で検査する際、worktree 側から実行できない環境
+- **予防策**: bun test 実行形態契約・Targeted Docs Guard 実装詳細へ `--root` + `--files` 併用モードの運用注記を追加する候補
+- **横展開候補**: agentdev-quality-gates（実行形態契約の運用注記）、learning-promote で標準化判定
+- **関連**: PR #2611 本文 Findings セクションからの capture 回収（case-close STEP-6）
+- **タグ**: #docs-check #worktree #targeted-docs-guard #case-run #verification
+
+---
+
+## 2026-09-05: 契約テスト2本は main repo untracked 実体であり worktree から起動できない
+
+- **現象**: repo-agentdev-integrity の契約テスト2本（execution_ident_contract.test.ts、verification_diff_contract.test.ts）は main repo `.opencode/skills/repo-agentdev-integrity/scripts/` 配下の untracked 実体であり、worktree からは参照・起動できない（既知の junction 未伝播構成）
+- **状況/文脈**: case-run 委譲（Issue #2598 / PR #2611、OU-001 の契約テスト現行監査時）。Report 第2節に「起点比較不能（git 管理外）」として記録済み
+- **検知方法**: worktree からの起動不能と git 管理外による差分判定不能の確認
+- **根本原因**: テスト実体が untracked で git 管理外のため、worktree（別 checkout）に存在しない
+- **応急/対応内容**: 本件は監査（読み取り専用）のため main repo から読取のみで対応。実装変更は無し
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/spec影響**: なし。OU-003（#2600）での契約テスト更新時に実行環境の確認が必要（bun test 実行は main repo カレント前提）
+- **展開視点**: 契約テスト・恒久検証手段を実行する工程（case-run / case-close / docs-check）は実行環境の構成（untracked 実体の所在）を実行前に確認する
+- **再現条件**: worktree 配下から repo-agentdev-integrity scripts 配下のテストを起動する場合
+- **予防策**: テスト更新タスク（OU-003）の実行計画に実行環境（main repo カレント）の明示を含める
+- **横展開候補**: agentdev-quality-gates（bun test 実行形態契約の前提補足）、learning-promote で判定
+- **関連**: PR #2611 本文 Findings セクションからの capture 回収（case-close STEP-6）
+- **タグ**: #integrity #bun #worktree #repo-agentdev-integrity #case-run
