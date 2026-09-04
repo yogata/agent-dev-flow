@@ -306,3 +306,21 @@
 - **横展開候補**: agentdev-doc-writing（執筆規範）、learning-promote で判定
 - **関連**: PR #2612 本文 Findings セクションからの capture 回収（case-close STEP-6）
 - **タグ**: #integrity #ir067 #docs-check #case-run #verification
+
+---
+
+## 2026-09-05: REQ 行全面再構築時の旧行 ID 参照 Report 更新は最終 Wave の完了条件に含めると検証コストが下がる
+
+- **現象**: REQ 行の全面再構築（旧行廃止）時、既存 Report 内の ADF-COVERS 宣言が旧行 ID を参照したままだと、tim_declarations コーパス検査（unknown-req-refs）とトレーサビリティ check が fail する。covers 棚卸し同期義務が管理対象だが、Wave 1 で固定された baseline report 等の Report は後続 Wave が更新する順序依存が生じ、その間 integrity suite に既知 fail が残存する
+- **状況/文脈**: case-run 委譲（Epic #2596 Wave 3 / Issue #2600 / PR #2613、OU-003 契約テスト再構成時の観察）
+- **検知方法**: integrity suite 残存 1 fail（TIM 宣言コーパス unknown-req-refs、req-048-reanalysis-baseline.md L11-12 の旧行 ID 参照）の AG-010 分離（base 11667477 でも再現する pre-existing の確認）
+- **根本原因**: 旧行 ID 参照の Report 更新がどの Wave にも完了条件として割り当てられておらず、Wave 間の順序依存により既知 fail が中間 Wave に残存する設計
+- **応急/対応内容**: 既知 fail として分離記録し、OU-006（#2603）の同期義務で解消予定。本 PR での新規対応は無し（MUST NOT 対象ファイル）
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/spec影響**: なし（REQ 再構築系 Case の Wave 設計の教訓）
+- **展開視点**: REQ 再構築系 Case では「旧行 ID 参照の Report 更新を最終 Wave の完了条件に含める」設計が検証コストを下げる
+- **再現条件**: REQ 行の全面再構築で旧行を廃止しつつ、旧行 ID を covers 宣言で参照する Report が中途 Wave で未更新のまま残る場合
+- **予防策**: REQ 再構築系 Epic の Wave 計画時に、旧行 ID 参照 Report の covers 付替を最終 Wave の完了条件へ明示的に組み込む
+- **横展開候補**: agentdev-workflow-case-open / Epic Wave 設計（RU → Epic 分解時の同期義務割り当て）、learning-promote で判定
+- **関連**: PR #2613 本文 Findings / Capture候補 セクションからの capture 回収（case-close STEP-6）
+- **タグ**: #integrity #traceability #req-restructure #epic-wave #case-run
