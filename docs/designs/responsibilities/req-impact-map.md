@@ -5,6 +5,8 @@ created: 2026-08-20
 updated: 2026-09-02
 ---
 
+<!-- ADF-COVERS(implementation): REQ-057-007 -->
+
 # REQ 影響マップ
 
 > **位置づけと rule-ownership.md との関係**: 本ファイルは **REQ → 影響するルール/アーティファクト** の対応表である。

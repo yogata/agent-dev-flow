@@ -3,6 +3,8 @@ name: agentdev-doc-writing
 description: REQ/Decision/Design 横断の文書品質査読ゲート。文書種別責務、要件性、文意品質、粒度、japanese-tech-writing 規範適合、配布物 ID 汚染検出、実行主体分類を査読する。USE FOR: docs 配下の REQ/Decision/Design/guides/README の査読、command/skill の自然言語記述の査読、LLM っぽい表現・英文混じり表現の検出。DO NOT USE FOR: コード実装やテスト実行、REQ/Decision 番号付与、Decision 必要性判定、ファイル保存・commit・push。
 ---
 
+<!-- ADF-COVERS(implementation): REQ-057-013 -->
+
 # 文書品質ゲート（doc-writing）
 
 ## 目的

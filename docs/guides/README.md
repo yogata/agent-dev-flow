@@ -1,3 +1,5 @@
+<!-- ADF-COVERS(implementation): REQ-057-016 -->
+
 # AgentDevFlow ガイド
 
 利用者向けの参照用読み物（案内層）。
