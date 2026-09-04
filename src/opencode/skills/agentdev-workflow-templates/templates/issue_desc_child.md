@@ -95,7 +95,7 @@ case-run は本セクション存在有無で新旧 Issue を識別する -->
 ### 実現面の変更方針（realization_actions 由来）
 <!-- 【必須】 -->
 
-<!-- 実現面の変更方針: case-open が draft-data の realization_actions を本セクションへ投影する（REQ-017-017）。
+<!-- 実現面の変更方針: case-open が draft-data の realization_actions を本セクションへ投影する（実現面投影契約）。
 req-define が確定した実現面の変更方針（正規所有責務、変更すべき実現面、変更意図、検証との対応）を失わず本文へ永続化する。
 case-open 成功後は case-run が Issue 本文だけで変更責務、変更意図、検証方針を取得できる。
 case-run は本セクションを既確定契約として消費し、実現責務・変更意図・検証方針を再決定せず、範囲内の内部実装方針だけを決定する。
