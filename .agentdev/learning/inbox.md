@@ -181,3 +181,21 @@
 - **想定反映先**: agentdev-quality-gates の QG-4 正規形注記・docs/knowledge の Windows 系知識文書（learning-promote で判定）
 - **関連**: PR 2591 本文 Findings / Capture候補（learning）からの capture 回収（case-close STEP-6）
 - **タグ**: #bun #test #windows #worktree #qg4
+
+---
+
+## 2026-09-04: 配布ソース面パス列挙を含む補助ファイルの Write は配布依存境界 pre-write gate に fail-closed ブロックされる
+
+- **問題事象**: PR 変更ファイル一覧（src/opencode/** 配布ソース面パス 92 件）を一時領域（C:\WINDOWS\TEMP\opencode）へ .txt として書き出そうとしたところ、`agentdev-distribution-boundary-guard: blocked write (producer-internal reference in distributed text artifact)` の fail-closed ブロックが発生した（inspection error: gate-not-passed）
+- **発生局面**: case-close STEP-3 targeted docs guard の --files 引数ファイル事前生成時（Issue #2570 / PR #2593、OU-020 ADR 用語棚卸し case-close）
+- **検知方法**: Write ツールの失敗応答（gate ブロックメッセージ）
+- **根本原因**: 配布ソース面パス列挙を本文に含むテキストは、配布物テキストアーティファクトの producer-internal reference として pre-write gate の内容ベース検査対象になり得る。一時領域・.txt 拡張子でもブロックされる
+- **自律対応内容**: ファイル書き出しを中止し、`gh pr diff --name-only` の出力を PowerShell 配列へ直接読み込んで --files に渡す方式へ変更（一時ファイル不要化）して targeted docs guard を完遂
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（検証補助ファイルの生成手順の教訓。gate は仕様どおり fail-closed 動作）
+- **横展開観点**: targeted docs guard 等の --files に配布ソース面パスを渡す検証（case-run STEP-S5 / case-close STEP-3・E4-1 配布依存境界 gate）に共通
+- **再発条件**: 配布ソース面パス列挙を含む補助ファイルを Write 系ツールで作成する
+- **予防策候補**: --files 等のパス列挙は一時ファイル化せずコマンド出力（gh pr diff --name-only、git diff --name-only）を配列へ直接読み込む。書き出す場合は配布ソース面パス列挙を含まない形式にする
+- **想定反映先**: integrity checker 実行手順の補助ファイル生成知識、docs/knowledge の Windows 系知識文書、learning-promote で分類
+- **関連**: Issue 2570 対応記録コメント（case-close STEP-6 学び検知）
+- **タグ**: #integrity #distribution-boundary #pre-write-gate #case-close #verification
