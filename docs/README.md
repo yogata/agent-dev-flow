@@ -52,7 +52,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [REQ-045](requirements/REQ-045.md) | 現行成果物体系の整合性網羅監査 |
 | [REQ-046](requirements/REQ-046.md) | 横断正規化後の不変条件 |
 | [REQ-047](requirements/REQ-047.md) | 規則所有権の一方向化 |
-| [REQ-048](requirements/REQ-048.md) | ADF 実行効率第1次改善（実行観測基盤） |
+| [REQ-048](requirements/REQ-048.md) | ADF 実行観測と統制縮小評価 |
 | [REQ-049](requirements/REQ-049.md) | 追跡Issue管理機構 |
 | [REQ-050](requirements/REQ-050.md) | scripts 公開入口境界 |
 | [REQ-051](requirements/REQ-051.md) | ガードレール識別体系と機械検査の再編 |
@@ -68,7 +68,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-026 の26件である（DEC-018〜DEC-022、DEC-024〜DEC-026 は proposed、DEC-005、DEC-007 は superseded）。
+現行 Decision は DEC-001 から DEC-027 の27件である（DEC-018〜DEC-022、DEC-024〜DEC-027 は proposed、DEC-005、DEC-007 は superseded）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
@@ -99,6 +99,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [DEC-024](decisions/DEC-024.md) | 変更誘発境界リスク分析の導入と検証契約への投影（proposed） |
 | [DEC-025](decisions/DEC-025.md) | プロジェクト知識を Capability Skill から分離し、独立した正規知識層として管理する（proposed） |
 | [DEC-026](decisions/DEC-026.md) | 実現面変更方針の構造化ハンドオフ（realization_actions）（proposed） |
+| [DEC-027](decisions/DEC-027.md) | 観測ベース統制縮小評価ループ（proposed） |
 
 ## 設計（Design）
 
