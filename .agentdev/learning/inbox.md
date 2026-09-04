@@ -342,3 +342,21 @@
 - **横展開候補**: repo-agentdev-integrity（実行手順の依存前提明記）、agentdev-quality-gates（bun test 実行形態契約の依存解決前提）、learning-promote で判定
 - **関連**: PR #2615 本文 Findings / Capture候補 セクションからの capture 回収（case-close STEP-6）
 - **タグ**: #integrity #bun #zod #worktree #environment-dependency
+
+---
+
+## 2026-09-05: bun test のレポートは stderr に流れるため証跡退避は stdout だけではゼロになる
+
+- **現象**: bun test の実行結果（Ran N tests across M files、pass/fail 行）が stdout にほぼ出ない（27バイトのバージョン行のみ）。stdout のみを fs.writeFileSync で退避する実装だと N/M 件数突合に必要な証跡がゼロになる。spawnSync で stderr も併せて退避したところ、404KB のレポート（2556 pass / 0 fail、Ran 2556 tests across 102 files）を取得できた
+- **状況/文脈**: case-close（Epic #2596 Wave 6 / Issue #2603 / PR #2616、マージ後同一 tree での full integrity suite 最終再実行）
+- **検知方法**: checker コマンドの stdout 証跡退避形式に従い stdout を退避したが、退避ファイルがバージョン行のみであることを長さ検査で検知
+- **根本原因**: bun test はレポータ出力の流れ先が stdout ではなく stderr。checker 実行契約の stdout 証跡退避を stdout 単独で実装すると、bun test の場合だけ証跡が欠落する
+- **応急/対応内容**: spawnSync の stdout と stderr を両方 fs.writeFileSync（UTF-8）で退避し、連結テキストに対して Ran/pass/fail の正規表現突合を実施（exit status 0、2556 pass / 0 fail を確認）
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/spec影響**: なし（checker 実行契約「stdout 証跡退避形式」の運用上の補完情報。checker-execution-contracts Design の「Windows + bun 環境で process.exit の終了タイミングにより stdout レポートが失われることがある」の具体例）
+- **展開視点**: exit code が意味を持つ checker コマンドの証跡退避は、stdout / stderr 両方を対象にする。N/M 件数突合等の後段突合は、退避済み証跡が空でないことを最初に検査する
+- **再現条件**: Windows 環境で spawnSync 経由の bun test を実行し、stdout のみを退避した場合
+- **予防策**: 検証コマンドの stdout 証跡退避形式の実装を stdout/stderr 併存退避に統一し、証跡の空検査を突合の前提手順とする
+- **横展開候補**: agentdev-quality-gates（bun test 実行形態契約の証跡退避手順補完）、repo-agentdev-integrity（checker 実行手順）、learning-promote で判定
+- **関連**: PR #2616 の case-close 対応記録コメント（テスト結果セクション。merge commit 152ba3b5 と同一 tree での最終再実行）
+- **タグ**: #integrity #bun #stderr #verification #case-close
