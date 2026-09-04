@@ -1,6 +1,12 @@
+// ADF-COVERS(implementation): REQ-047-009
 // IR-046/047/048 rules: repo-self-hosting-specific distribution integrity
 // checks that complement the canonical detector. Phase 3 §6.3 / Phase 6
 // delegation. Declarative data is in data/distribution-targets.yaml (Wave 6).
+// Per REQ-047-009 the YAML is the canonical detection-definition source and
+// this module loads it (single path, fail-closed on missing/malformed YAML
+// per the declarative data loading principle, ACT-DESIGN-007). Output-facing
+// finding fields (rule, description wording) stay here so the CLI output
+// contract is unchanged (REQ-047-005).
 // Self-host detectable concerns implemented here; consumer-environment
 // specific detection is delegated to install-consumer-opencode.ps1.
 //
@@ -18,9 +24,107 @@ import {
   readArtifactBytes,
 } from "./distribution-boundary-fs.ts";
 
-const IR046_MARKERS = ["AgentDevFlow プラグインの設定を管理するリポジトリ"];
-const IR047_ALLOWED = ["agentdev-gh-cli"];
-const IR048_PREFIX = "generated_by:";
+const DISTRIBUTION_TARGETS_REL_PATH = path.join(
+  ".opencode",
+  "skills",
+  "repo-agentdev-integrity",
+  "data",
+  "distribution-targets.yaml",
+);
+
+export interface DistributionTargets {
+  /** IR-046: self-hosting-only content markers forbidden in distributed content. */
+  readonly ir046Markers: readonly string[];
+  /** IR-047: subdirectories allowed under src/opencode-local/. */
+  readonly ir047Allowed: readonly string[];
+  /** IR-048: generated_by marker prefix scanned in the local-mode link target. */
+  readonly ir048Prefix: string;
+}
+
+function requireObject(value: unknown, label: string): Record<string, unknown> {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    throw new Error(
+      `fail-closed: ${DISTRIBUTION_TARGETS_REL_PATH}: '${label}' must be a mapping`,
+    );
+  }
+  return value as Record<string, unknown>;
+}
+
+function requireString(value: unknown, label: string): string {
+  if (typeof value !== "string" || value.length === 0) {
+    throw new Error(
+      `fail-closed: ${DISTRIBUTION_TARGETS_REL_PATH}: '${label}' must be a non-empty string`,
+    );
+  }
+  return value;
+}
+
+function requireStringArray(value: unknown, label: string): string[] {
+  if (!Array.isArray(value) || value.length === 0) {
+    throw new Error(
+      `fail-closed: ${DISTRIBUTION_TARGETS_REL_PATH}: '${label}' must be a non-empty array`,
+    );
+  }
+  return value.map((v) => {
+    if (typeof v !== "string" || v.length === 0) {
+      throw new Error(
+        `fail-closed: ${DISTRIBUTION_TARGETS_REL_PATH}: '${label}' must hold non-empty strings`,
+      );
+    }
+    return v;
+  });
+}
+
+export function loadDistributionTargets(repoRoot: string): DistributionTargets {
+  const yamlPath = path.join(repoRoot, DISTRIBUTION_TARGETS_REL_PATH);
+  let text: string;
+  try {
+    text = fs.readFileSync(yamlPath, "utf-8");
+  } catch {
+    throw new Error(
+      `fail-closed: distribution targets file is missing (${DISTRIBUTION_TARGETS_REL_PATH})`,
+    );
+  }
+  let parsed: unknown;
+  try {
+    parsed = Bun.YAML.parse(text);
+  } catch {
+    throw new Error(
+      `fail-closed: distribution targets file is not valid YAML (${DISTRIBUTION_TARGETS_REL_PATH})`,
+    );
+  }
+  if (typeof parsed !== "object" || parsed === null) {
+    throw new Error(
+      `fail-closed: distribution targets file has an unexpected structure (${DISTRIBUTION_TARGETS_REL_PATH})`,
+    );
+  }
+  const root = parsed as Record<string, unknown>;
+
+  const repoKind = requireObject(root.repo_kind_rules, "repo_kind_rules");
+  const linkTarget = requireObject(
+    root.link_target_structure_rules,
+    "link_target_structure_rules",
+  );
+  const generatedBy = requireObject(
+    root.generated_by_identifier_rules,
+    "generated_by_identifier_rules",
+  );
+
+  return {
+    ir046Markers: requireStringArray(
+      repoKind.self_hosting_only_markers,
+      "repo_kind_rules.self_hosting_only_markers",
+    ),
+    ir047Allowed: requireStringArray(
+      linkTarget.allowed_link_subdirs,
+      "link_target_structure_rules.allowed_link_subdirs",
+    ),
+    ir048Prefix: requireString(
+      generatedBy.expected_marker_prefix,
+      "generated_by_identifier_rules.expected_marker_prefix",
+    ),
+  };
+}
 
 export interface DistributionRulesResult {
   ok: boolean;
@@ -109,13 +213,16 @@ function scanTexts(files: readonly string[]): ScannedFile[] {
   return out;
 }
 
-function checkIr046(scanned: readonly ScannedFile[]): DistributionRuleFinding[] {
+function checkIr046(
+  scanned: readonly ScannedFile[],
+  markers: readonly string[],
+): DistributionRuleFinding[] {
   const findings: DistributionRuleFinding[] = [];
   for (const { file, text } of scanned) {
     if (text === null) continue;
     const lines = text.split(/\r?\n/);
     for (let i = 0; i < lines.length; i++) {
-      for (const marker of IR046_MARKERS) {
+      for (const marker of markers) {
         const line = lines[i];
         if (line !== undefined && line.includes(marker)) {
           findings.push({
@@ -132,7 +239,10 @@ function checkIr046(scanned: readonly ScannedFile[]): DistributionRuleFinding[] 
   return findings;
 }
 
-function checkIr047(repoRoot: string): DistributionRuleFinding[] {
+function checkIr047(
+  repoRoot: string,
+  allowed: readonly string[],
+): DistributionRuleFinding[] {
   const findings: DistributionRuleFinding[] = [];
   const localRoot = path.join(repoRoot, "src", "opencode-local");
   if (!dirExists(localRoot)) return findings;
@@ -144,20 +254,23 @@ function checkIr047(repoRoot: string): DistributionRuleFinding[] {
   }
   for (const ent of subs) {
     if (!ent.isDirectory()) continue;
-    if (!IR047_ALLOWED.includes(ent.name)) {
+    if (!allowed.includes(ent.name)) {
       findings.push({
         rule: "ir047",
         file: path.join(localRoot, ent.name).replace(/\\/g, "/"),
         line: 0,
         matched: ent.name,
-        description: `src/opencode-local/ subdir not in allowed set ${JSON.stringify(IR047_ALLOWED)}`,
+        description: `src/opencode-local/ subdir not in allowed set ${JSON.stringify(allowed)}`,
       });
     }
   }
   return findings;
 }
 
-function checkIr048(repoRoot: string): {
+function checkIr048(
+  repoRoot: string,
+  markerPrefix: string,
+): {
   findings: DistributionRuleFinding[];
   scanned: number;
 } {
@@ -171,12 +284,12 @@ function checkIr048(repoRoot: string): {
     const lines = text.split(/\r?\n/);
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      if (line !== undefined && line.includes(IR048_PREFIX)) {
+      if (line !== undefined && line.includes(markerPrefix)) {
         findings.push({
           rule: "ir048",
           file,
           line: i + 1,
-          matched: IR048_PREFIX,
+          matched: markerPrefix,
           description: "local-mode link target must not declare generated_by marker",
         });
       }
@@ -212,12 +325,13 @@ function listAgentGhCliTextFiles(rootDir: string): string[] {
 }
 
 export function checkDistributionRules(repoRoot: string): DistributionRulesResult {
+  const targets = loadDistributionTargets(repoRoot);
   const publicFiles = listPublicMarkdownFiles(repoRoot);
   const publicScanned = scanTexts(publicFiles);
 
-  const ir046 = checkIr046(publicScanned);
-  const ir047 = checkIr047(repoRoot);
-  const ir048 = checkIr048(repoRoot);
+  const ir046 = checkIr046(publicScanned, targets.ir046Markers);
+  const ir047 = checkIr047(repoRoot, targets.ir047Allowed);
+  const ir048 = checkIr048(repoRoot, targets.ir048Prefix);
 
   const findings: DistributionRuleFinding[] = [
     ...ir046,

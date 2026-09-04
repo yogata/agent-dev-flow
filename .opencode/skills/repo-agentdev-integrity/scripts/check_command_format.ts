@@ -1,4 +1,4 @@
-// ADF-COVERS(implementation): REQ-002-037, REQ-002-038, REQ-002-039, REQ-002-040, REQ-002-041, REQ-051-005, REQ-051-006
+// ADF-COVERS(implementation): REQ-002-037, REQ-002-038, REQ-002-039, REQ-002-040, REQ-002-041, REQ-047-009, REQ-051-005, REQ-051-006
 // ADF-COVERS(verification): REQ-002-001, REQ-002-041
 /**
  * Command file format violation checker (IR-049 + IR-028/029/030/031).
@@ -11,10 +11,22 @@
  * execution structure are owned by the Workflow Skill control plane
  * (REQ-002-001, REQ-002-041). `### Step N` procedure headings are likewise
  * the Workflow Skill side / repo-local command expression.
+ *
+ * Detection signals (IR-028/029/030/031) are loaded from the canonical
+ * data/command-format-rules.yaml (REQ-047-009, single-path loading). The
+ * YAML is fail-closed: a missing or malformed rules file stops the checker
+ * before any scan. Output-facing strings (rule names, descriptions,
+ * severities) stay here so the docs-check output contract is unchanged
+ * (REQ-047-005).
  */
 
 const path = require("path") as typeof import("path");
 const fs = require("fs") as typeof import("fs");
+
+import {
+  loadCommandFormatRules,
+  type CommandFormatRules,
+} from "./lib/command-format-rules.ts";
 
 export interface FormatViolation {
   file: string;
@@ -23,21 +35,6 @@ export interface FormatViolation {
   description: string;
   severity: "NG" | "WARNING";
 }
-
-// IR-028: ### Step <letter>: 禁止
-const IR028_FORBIDDEN_HEADING = /^###\s+Step\s+[A-Za-z]/;
-// IR-029: Step 1-a, Step 1-b 禁止
-const IR029_FORBIDDEN_SUBSTEP = /\bStep\s+\d+-[A-Za-z]\b/;
-// IR-030: 無条件 verbatim 禁止（条件付き verbatim は許容）
-const IR030_FORBIDDEN_VERBATIM = /verbatim\s+で返却|verbatim\s+必須/;
-const IR030_EXEMPTION_HINTS = ["成果物本文のみ", "verbatim 区切子", "conditional"];
-// IR-031: 非統一 Findings 見出し禁止（正統は ## Findings / Capture候補）
-const IR031_FORBIDDEN_PRIMARY_HEADING = /^##\s+(Capture|Intake\s+候補|Learning\s+候補)\s*$/;
-
-const COMMAND_DIRS = [
-  "src/opencode/commands/agentdev",
-  ".opencode/commands/repo",
-];
 
 // 公開 /agentdev/* Command ディレクトリ（thin Command モデルの適用対象。
 // /repo/* Command は従来形式を維持する）。
@@ -54,6 +51,7 @@ const WORKFLOW_STEP_IDENTIFIER = /\bSTEP-[A-Z]?\d/;
 export function checkCommandFile(
   filePath: string,
   content: string,
+  rules: CommandFormatRules = loadCommandFormatRules(),
 ): FormatViolation[] {
   const violations: FormatViolation[] = [];
   const lines = content.split("\n");
@@ -116,7 +114,7 @@ export function checkCommandFile(
 
   // IR-028: alphabet 混在 Step 見出し検出
   for (let i = 0; i < lines.length; i++) {
-    if (IR028_FORBIDDEN_HEADING.test(lines[i])) {
+    if (rules.ir028ForbiddenHeading.test(lines[i])) {
       violations.push({
         file: filePath,
         line: i + 1,
@@ -129,7 +127,7 @@ export function checkCommandFile(
 
   // IR-029: 英字サブステップ検出
   for (let i = 0; i < lines.length; i++) {
-    if (IR029_FORBIDDEN_SUBSTEP.test(lines[i])) {
+    if (rules.ir029ForbiddenSubstep.test(lines[i])) {
       violations.push({
         file: filePath,
         line: i + 1,
@@ -143,8 +141,8 @@ export function checkCommandFile(
   // IR-030: 無条件 verbatim 検出（exemption hint がある行は skip）
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    if (!IR030_FORBIDDEN_VERBATIM.test(line)) continue;
-    const hasExemption = IR030_EXEMPTION_HINTS.some((h) => line.includes(h));
+    if (!rules.ir030ForbiddenPatterns.some((re) => re.test(line))) continue;
+    const hasExemption = rules.ir030ExemptionHints.some((h) => line.includes(h));
     if (hasExemption) continue;
     violations.push({
       file: filePath,
@@ -157,7 +155,7 @@ export function checkCommandFile(
 
   // IR-031: 非統一 Findings 見出し検出（command 本文内の指導記述）
   for (let i = 0; i < lines.length; i++) {
-    if (IR031_FORBIDDEN_PRIMARY_HEADING.test(lines[i])) {
+    if (rules.ir031ForbiddenPrimaryHeadings.some((re) => re.test(lines[i]))) {
       violations.push({
         file: filePath,
         line: i + 1,
@@ -180,6 +178,7 @@ function globMarkdown(dir: string): string[] {
 }
 
 export function runCheckCommandFormat(explicitRoot?: string): FormatViolation[] {
+  const rules = loadCommandFormatRules(explicitRoot);
   const allViolations: FormatViolation[] = [];
 
   // Find repo root by looking for .git
@@ -190,7 +189,7 @@ export function runCheckCommandFormat(explicitRoot?: string): FormatViolation[] 
     repoRoot = parent;
   }
 
-  for (const dir of COMMAND_DIRS) {
+  for (const dir of rules.scanDirs) {
     const fullDir = path.join(repoRoot, dir);
     const files = globMarkdown(fullDir);
     for (const file of files) {
@@ -215,7 +214,13 @@ if (import.meta.main) {
     console.error("check_command_format.ts: --root requires a path");
     process.exit(2);
   }
-  const violations = runCheckCommandFormat(explicitRoot);
+  let violations: FormatViolation[];
+  try {
+    violations = runCheckCommandFormat(explicitRoot);
+  } catch (err) {
+    console.error(`check_command_format.ts: ${err instanceof Error ? err.message : err}`);
+    process.exit(2);
+  }
   if (args.includes("--json")) {
     console.log(JSON.stringify({ ok: violations.length === 0, violations }, null, 2));
   } else if (violations.length === 0) {

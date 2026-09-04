@@ -7,13 +7,10 @@
 #   - docs/designs/local/runtime-package-boundary.md
 #
 # Consumed by:
-#   - (none at runtime — current checkers implement IR-046/047/048 detection
-#     rules as constants in lib/distribution-boundary-rules.ts. This YAML is
-#     kept as the detection view; rule changes must update this YAML, the lib
-#     implementation, and the IR-046..048 rule files in the same PR
-#     (REQ-047-003, Issue #2373; see rule-ownership.md 同期条件).
-#     Loading or retiring this YAML is a checker-internal design change and
-#     requires an additional judgment.)
+#   - lib/distribution-boundary-rules.ts (single-path canonical load,
+#     REQ-047-009: the checker loads IR-046/047/048 detection signals from
+#     this YAML via loadDistributionTargets and fails closed when this file
+#     is missing or malformed)
 #
 # Phase 5 (OU-006 #2082) implementation. IR-059 (existing distribution-
 # reference-boundary) continues to own concrete-id/path/url detection; this

@@ -1,3 +1,4 @@
+// ADF-COVERS(implementation): REQ-047-009
 // CLI entry for the distribution boundary adapter.
 //
 // Split out of check_distribution_boundary.ts so the orchestrator stays
@@ -166,8 +167,18 @@ export function runCli(): void {
     process.exit(delta.ok ? 0 : 1);
   }
 
-  // IR-046/047/048 観点を正規実行経路へ統合（AC-04/05: detector 到達可能性）
-  const rulesResult = checkDistributionRules(repoRoot);
+  // IR-046/047/048 観点を正規実行経路へ統合（AC-04/05: detector 到達可能性）。
+  // data/distribution-targets.yaml は正本定義（REQ-047-009）: 欠損・不正時は
+  // fail-closed で検査を実行せず停止する（exit 2）。
+  let rulesResult;
+  try {
+    rulesResult = checkDistributionRules(repoRoot);
+  } catch (err) {
+    process.stderr.write(
+      `check_distribution_boundary.ts: ${err instanceof Error ? err.message : err}\n`,
+    );
+    process.exit(2);
+  }
   const combinedOk = report.ok && rulesResult.ok;
 
   if (json) {

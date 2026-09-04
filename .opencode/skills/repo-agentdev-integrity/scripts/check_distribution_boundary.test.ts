@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-029-001, REQ-029-002, REQ-029-003, REQ-029-005, REQ-029-006, REQ-029-007
+// ADF-COVERS(verification): REQ-029-001, REQ-029-002, REQ-029-003, REQ-029-005, REQ-029-006, REQ-029-007, REQ-047-009
 /**
  * Tests for check_distribution_boundary.ts.
  *
@@ -17,6 +17,7 @@ import {
   applyExemptions,
   computeDelta,
 } from "./check_distribution_boundary.ts";
+import { loadDistributionTargets } from "./lib/distribution-boundary-rules.ts";
 import * as path from "path";
 import * as fs from "fs";
 
@@ -599,3 +600,30 @@ describe("applyExemptions: robust to malformed loaded exemption shape", () => {
     expect(r.remaining.length).toBe(1);
   });
 });
+
+describe("loadDistributionTargets: canonical yaml loading (REQ-047-009)", () => {
+  test("loads IR-046/047/048 signals from the canonical yaml", () => {
+    const targets = loadDistributionTargets(findRepoRoot(process.cwd()));
+    expect(Array.isArray(targets.ir046Markers)).toBe(true);
+    expect(targets.ir046Markers.length).toBeGreaterThan(0);
+    expect(targets.ir047Allowed).toContain("agentdev-gh-cli");
+    expect(typeof targets.ir048Prefix).toBe("string");
+    expect(targets.ir048Prefix.length).toBeGreaterThan(0);
+  });
+
+  test("fails closed when the yaml is missing", () => {
+    expect(() =>
+      loadDistributionTargets("/nonexistent-repo-root-for-ts006"),
+    ).toThrow(/fail-closed.*distribution targets file is missing/i);
+  });
+});
+
+function findRepoRoot(startDir: string): string {
+  let current = path.resolve(startDir);
+  for (;;) {
+    if (fs.existsSync(path.join(current, ".git"))) return current;
+    const parent = path.dirname(current);
+    if (parent === current) return current;
+    current = parent;
+  }
+}
