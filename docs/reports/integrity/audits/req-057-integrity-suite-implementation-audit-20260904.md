@@ -105,6 +105,6 @@ REQ-057-011 / REQ-057-012 に対する ADF-COVERS 実装対応宣言を、実装
 
 - **解消実行日**: 2026-09-05
 - **解消内容**: `issue_desc_epic.md` / `issue_desc_child.md`（src 原本）から配布物内部 ID（REQ-017-017 の3箇所）を除去し、ID 非依存の表現（実現面投影契約への概念参照）へ変更した。あわせて契約テスト2本（execution_ident_contract.test.ts / verification_diff_contract.test.ts）を anti-shrink 契約（旧 REQ-048-019）の分解廃止（AG-005 合意）に伴い、新 REQ-048 の意図（相関・finding 比較能力の検証）へ再構成した
-- **解消 PR**: （PR 番号は作成後に埋め戻し）
+- **解消 PR**: #2613
 - **検証結果**: `bun test ./.opencode/skills/repo-agentdev-integrity/scripts/execution_ident_contract.test.ts ./.opencode/skills/repo-agentdev-integrity/scripts/verification_diff_contract.test.ts` で 68 pass / 0 fail / 707 expect() calls（実行環境: worktree `.worktrees/2600-feature`、bun 1.3.6、Windows）
 - **残存既知 fail の更新後一覧**: §3 の fail 2件はすべて解消。§4 の malformed-declarations 1件（`distribution-boundary.test.ts` フィクスチャ文字列由来）は本 Issue の対象外として残存（追跡 Issue 化候補のまま）
