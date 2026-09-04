@@ -80,6 +80,7 @@ trigger 条件は detector の `--profile source` が分類する配布ソース
 #### full integrity suite 実行（bun test 実行形態契約）
 
 QG-4 の full integrity suite 合格基準により検証スイート全体（bun test 全件）を実行する場合、bun test 実行形態契約に従う。
+3 cwd 分割実行、依存パッケージ前置、環境ラベルを含む正規形契約の本体は `agentdev-quality-gates/references/qg-4-final-acceptance.md` を参照。
 
 - **実行コマンド**: `bun test ./.opencode/skills/<integrity-detector-skill>/scripts/`。`./` prefix 付きで対象ディレクトリを明示指定する（必須ステップ）
 - **N/M 件数突合**: 実行結果の「Ran N tests across M files」の N/M 件数突合を実施する（必須ステップ）。直前実績と比較して件数が急減していないかの妥当性を検証する。固定値の期待値化は行わない
