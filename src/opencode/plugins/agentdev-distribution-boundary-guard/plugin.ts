@@ -174,6 +174,7 @@ function makeClassifier(projectRoot: string | null | undefined): PathClassifier 
 }
 
 export { classifyPath, classifyPathNoRoot, isDistributedPath, normalizePath, type PathClass };
+export { isApprovedTemporaryPath } from "./lib/distribution-boundary-guard-paths.ts";
 
 export const parseWriteArgs = parserParseWriteArgs;
 export const parseEditArgs = parserParseEditArgs;

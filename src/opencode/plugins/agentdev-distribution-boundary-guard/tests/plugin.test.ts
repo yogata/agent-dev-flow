@@ -17,6 +17,7 @@
  */
 
 import { expect, test, describe } from "bun:test";
+import { tmpdir } from "node:os";
 import {
   evaluateWriteContent,
   evaluateEdit,
@@ -972,6 +973,35 @@ describe("Stage B round 2: plugin shell fail-closes on malformed args", () => {
       "/home/me/proj",
     );
     expect(r.threw).toBe(false);
+  });
+
+  test("write to the OS temporary directory passes outside-root classification", async () => {
+    const r = await runHook(
+      "write",
+      { path: `${tmpdir()}/opencode/allowed.md`, content: "ref ADR-0001" },
+      "/home/me/proj",
+    );
+    expect(r.threw).toBe(false);
+  });
+
+  test("write to an unapproved outside-root path remains blocked", async () => {
+    const r = await runHook(
+      "write",
+      { path: "/var/tmp/agentdev-unapproved/blocked.md", content: "ref ADR-0001" },
+      "/home/me/proj",
+    );
+    expect(r.threw).toBe(true);
+    if (r.message) expect(r.message).toContain("inspection error");
+  });
+
+  test("temporary-directory traversal escape remains blocked", async () => {
+    const r = await runHook(
+      "write",
+      { path: `${tmpdir()}/../outside-root/blocked.md`, content: "ref ADR-0001" },
+      "/home/me/proj",
+    );
+    expect(r.threw).toBe(true);
+    if (r.message) expect(r.message).toContain("inspection error");
   });
 });
 

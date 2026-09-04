@@ -14,7 +14,10 @@
 //   - "non-distributed" -> gate passes (no inspection needed)
 //   - "outside-root"    -> gate fails closed (inspection error)
 //
-// Pure: no fs/path/I/O imports; same input => same output.
+// No filesystem reads; the approved temporary category comes from the runtime
+// environment and is checked using pure path-segment operations.
+
+import { tmpdir } from "node:os";
 
 // Distributed text artifact paths. Matches either src/opencode/... source
 // projection (the only path the pre-write gate needs to defend; consumer-side
@@ -105,6 +108,21 @@ function sliceAfterRoot(prefix: string, path: string): string {
 }
 
 /**
+ * True when `rawPath` is inside the OS-provided temporary directory category.
+ * The category is resolved from the runtime rather than from a path-specific
+ * allowlist, and traversal segments must resolve back inside the category.
+ */
+export function isApprovedTemporaryPath(rawPath: string): boolean {
+  const normalized = normalizePath(rawPath);
+  const temporaryRoot = normalizePath(tmpdir()).replace(/\/$/, "");
+  if (!isAbsolute(normalized) || !isUnderRoot(temporaryRoot, normalized)) {
+    return false;
+  }
+  const relative = sliceAfterRoot(temporaryRoot, normalized);
+  return resolveSegments(relative).ok;
+}
+
+/**
  * Resolve `rawPath` (as observed in tool args) against `projectRoot` (the
  * active worktree root) into one of three PathClass values.
  *
@@ -130,6 +148,7 @@ export function classifyPath(rawPath: string, projectRoot: string | null | undef
     : "";
 
   if (isAbsolute(normalized)) {
+    if (isApprovedTemporaryPath(normalized)) return "non-distributed";
     if (root.length === 0) return "outside-root";
     if (!isUnderRoot(root, normalized)) return "outside-root";
     const rel = sliceAfterRoot(root, normalized);
