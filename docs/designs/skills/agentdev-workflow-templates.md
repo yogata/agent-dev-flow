@@ -2,10 +2,10 @@
 title: `agentdev-workflow-templates` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-04
+updated: 2026-09-05
 ---
 <!-- ADF-COVERS(implementation): REQ-007-002, REQ-007-003, REQ-007-005, REQ-017-003, REQ-043-016, REQ-043-020 -->
-<!-- ADF-COVERS(implementation): REQ-048-001, REQ-048-002, REQ-048-006, REQ-048-015, REQ-048-016, REQ-048-017, REQ-048-018, REQ-057-020 -->
+<!-- ADF-COVERS(implementation): REQ-048-001, REQ-048-002, REQ-048-008, REQ-048-016, REQ-057-020 -->
 
 # `agentdev-workflow-templates` Design
 

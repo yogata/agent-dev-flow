@@ -2,14 +2,14 @@
 title: ワークフロー契約（横断）
 status: accepted
 created: 2026-06-21
-updated: 2026-09-04
+updated: 2026-09-05
 ---
 <!-- ADF-COVERS(implementation): REQ-003-021, REQ-003-022, REQ-003-023, REQ-003-055, REQ-003-056 -->
 <!-- ADF-COVERS(implementation): REQ-005-001, REQ-005-002, REQ-005-003, REQ-005-004, REQ-005-025, REQ-005-026, REQ-005-027, REQ-005-028 -->
 <!-- ADF-COVERS(implementation): REQ-014-012 -->
-<!-- ADF-COVERS(implementation): REQ-048-007, REQ-048-008, REQ-048-009, REQ-048-010, REQ-048-011 -->
-<!-- ADF-COVERS(implementation): REQ-048-001, REQ-048-002, REQ-048-003, REQ-048-004, REQ-048-005, REQ-048-006, REQ-048-021 -->
-<!-- ADF-COVERS(implementation): REQ-048-012, REQ-048-013, REQ-048-014 -->
+<!-- ADF-COVERS(implementation): REQ-048-007, REQ-048-014 -->
+<!-- ADF-COVERS(implementation): REQ-048-001, REQ-048-002, REQ-048-003, REQ-048-004, REQ-048-005, REQ-048-015, REQ-048-016 -->
+<!-- ADF-COVERS(implementation): REQ-048-007, REQ-048-014 -->
 
 # ワークフロー契約（横断）
 
