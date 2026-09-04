@@ -146,3 +146,21 @@
 - **想定反映先**: integrity-contracts baseline 運用契約の手順補足、check_extensions ヘルプ・ドキュメント、learning-promote での分類
 - **関連**: PR #2587 本文 Findings / Capture候補 セクションからの capture 回収（case-close STEP-6）
 - **タグ**: #integrity #ng-baseline #baseline #checker #verification
+
+---
+
+## 2026-09-04: traceability check の corpus 走査はテストフィクスチャのダミー宣言を malformed 検出し続ける（複数 Case で再観測される誤検出）
+
+- **問題事象**: traceability check の宣言 corpus 走査が `distribution-boundary.test.ts` L1367 の回帰テストフィクスチャ（エスケープ済みダミー宣言 `REQ-\u0030\u0031`）を malformed-declaration として検出し続ける。base 由来の既存検出であり当該修正と無関係だが、REQ スコープの check を実行するたび fail 1 件として出続ける
+- **発生局面**: case-close 再実行（Issue #2567 / PR #2588、E4-1 gate 停止解消後の QG-4 独立再検査。REQ-053-023 スコープ）
+- **検知方式**: traceability check の fail 1 件（base 由来・既出の再観測。検証差分の 既出 分類として記録）
+- **根本原因**: corpus 走査が scripts 配下 .ts を含み、テストフィクスチャの宣言形式ダミー文字列を実宣言と区別しない（除外設計が未整備）
+- **自律対応内容**: base 由来の既出検出として既存 intake item との重複確認を行い、新規 item は作成せず本 entry で再観測を記録。マージ判定には影響しないことを確認して継続
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/spec影響**: なし（誤検出の追跡は既存 intake item で実施済み）
+- **横展開観点**: REQ スコープの traceability check を実行する全 workflow（case-run / case-close の QG-4 独立再検査）で同検出が繰り返し検証差分に現れる。fail 1 件の常時混入は新規検出との区別を毎回必要とする
+- **再発条件**: distribution-boundary.test.ts を含む corpus で traceability check を実行する
+- **予防策候補**: テストフィクスチャのダミー宣言を検出対象外とする除外設計（既存 intake item の処分候補を参照）
+- **想定反映先**: 既存 intake item 2026-09-04-traceability-malformed-fixture-2558 との duplicate 統合（learning-promote で処分）
+- **関連**: 既存 intake item 2026-09-04-traceability-malformed-fixture-2558（PR 2578 / Issue 2558 由来・同一根拠の初回 capture）。本 entry は PR 2588 本文 Findings セクションからの capture 回収（case-close STEP-6）による第 2 観測記録
+- **タグ**: #integrity #traceability #false-positive #test-fixture #case-close
