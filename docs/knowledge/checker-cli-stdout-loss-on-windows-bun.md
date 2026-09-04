@@ -1,7 +1,7 @@
 ---
 title: checker CLI の stdout 証跡が Windows + bun で失われる問題と安定実行経路
 created: 2026-09-03
-updated: 2026-09-03
+updated: 2026-09-04
 ---
 
 # checker CLI の stdout 証跡が Windows + bun で失われる問題と安定実行経路
@@ -10,7 +10,7 @@ updated: 2026-09-03
 
 Windows + bun 1.3.6 の環境で `bun run` により `process.exit` を呼ぶ checker CLI を実行した場合、終了タイミングにより機械可読な stdout レポートが失われることがある。モジュール import 経由（`node --experimental-strip-types` での import 呼び出し）では安定した stdout 出力を確認した。
 
-stdout 証跡（機械可読出力のファイル退避・突合）を必要とする checker 実行では、モジュール import 経由での起動、または stdout flush を保証する終了手順を用いる。実現手段の正式選択は checker 実行契約（docs/designs/integrity/checker-execution-contracts.md）の更新工程で確定する。
+stdout 証跡（機械可読出力のファイル退避・突合）を必要とする checker 実行では、モジュール import 経由での起動を標準経路とし、CLI 経由で実行する場合は stdout flush を保証する終了手順を例外経路として用いる。安定実行経路の契約は checker 実行契約（docs/designs/integrity/checker-execution-contracts.md）「安定実行経路」節で確定済みである。
 
 ## 適用条件
 
