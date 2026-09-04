@@ -4678,8 +4678,10 @@ function checkReqRangeStaleness(root: string): CheckResult[] {
     /REQ-\d{4}\s*(?:through|〜|~|から|through)\s*REQ-\d{4}/gi;
 
   // v2:REQ-0144-018: scan docs/guides/*.md and vocabulary-registry.md in addition to core files
+  // IR-042 (ACT-DESIGN-017): docs/README.md hardcoded count statements are scanned here.
   const filesToCheck: { absPath: string; label: string }[] = [
     { absPath: path.join(root, "AGENTS.md"), label: "AGENTS.md" },
+    { absPath: path.join(root, "docs", "README.md"), label: "docs/README.md" },
     {
       absPath: path.join(root, "docs", "designs", "foundations", "system.md"),
       label: "system.md",
@@ -4758,9 +4760,9 @@ function checkReqRangeStaleness(root: string): CheckResult[] {
       }
     }
 
-    // Check count expressions: "11件", "14件", "11 件" etc.
+    // Check count expressions: "11件", "14件", "11 件", "現行要件は49件" etc.
     const countPattern =
-      /(?:active\s*REQ|現行.*REQ|REQ.*件)\s*(?:は\s*)?(\d+)\s*件/gi;
+      /(?:active\s*REQ|現行.*REQ|REQ.*件|現行要件)\s*(?:は\s*)?(\d+)\s*件/gi;
     let countMatch;
     while ((countMatch = countPattern.exec(content)) !== null) {
       const statedCount = parseInt(countMatch[1], 10);
