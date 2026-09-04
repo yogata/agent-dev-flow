@@ -164,3 +164,20 @@
 - **想定反映先**: 既存 intake item 2026-09-04-traceability-malformed-fixture-2558 との duplicate 統合（learning-promote で処分）
 - **関連**: 既存 intake item 2026-09-04-traceability-malformed-fixture-2558（PR 2578 / Issue 2558 由来・同一根拠の初回 capture）。本 entry は PR 2588 本文 Findings セクションからの capture 回収（case-close STEP-6）による第 2 観測記録
 - **タグ**: #integrity #traceability #false-positive #test-fixture #case-close
+---
+
+## 2026-09-04: bun test の位置引数フィルタは Windows worktree の dotfile 配下ディレクトリで ./ prefix 付き正規形でのみマッチする
+
+- **問題事象**: Windows worktree 上で bun test の位置引数フィルタ（.opencode/skills/配下ディレクトリ）は、./ なし相対指定・バックスラッシュ区切り・ディレクトリ名部分一致のいずれでも dotfile 配下ディレクトリにマッチせず、QG-4 正規形の ./ prefix 付き形式（bun test ./.opencode/skills/<dir>/・cwd=リポジトリルート）でのみマッチした。手順からの逸脱（cwd 変更やフィルタ短縮）は ENOENT 系の偽 fail を生む
+- **発生局面**: case-run 委譲（Issue #2569 / PR #2591、OU-018 integrity suite 正規形実行時）
+- **検知方法**: bun test 単独実行が対象テストへマッチせず即終了する観測（正規形では 2549 tests / 102 files が計上される対比で確認）
+- **根本原因**: bun test の位置引数フィルタのパスマッチは cwd 相対の指定形式に依存し、Windows のパス区切りと dotfile 開始ディレクトリ（.opencode）の組み合わせでは ./ prefix 付きの正規形のみが一意に解決される
+- **自律対応内容**: QG-4 正規形どおり ./ prefix 付き・cwd=リポジトリルートで実行し直し、正規計上（2549 tests / 102 files）を取得して case-close の QG-4 独立再検証を完遂した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（既存の bun test 実行形態契約どおりの実行で解消する環境知識）
+- **横展開観点**: worktree 上で bun test を位置引数フィルタ付きで実行する全 workflow（case-run / case-close の QG-4 正規形実行・検証サブエージェント）に共通。正規形からの逸脱指定による偽 fail を由来分類で除外する判定材料になる
+- **再発条件**: Windows worktree で ./ なしの bun test .opencode/... 指定、バックスラッシュ区切り指定、ディレクトリ名短縮フィルタを用いた場合
+- **予防策候補**: bun test 実行形態契約（QG-4 正規形）の ./ prefix 必須を Windows 環境向け注記として明文化する
+- **想定反映先**: agentdev-quality-gates の QG-4 正規形注記・docs/knowledge の Windows 系知識文書（learning-promote で判定）
+- **関連**: PR 2591 本文 Findings / Capture候補（learning）からの capture 回収（case-close STEP-6）
+- **タグ**: #bun #test #windows #worktree #qg4
