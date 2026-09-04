@@ -1,8 +1,8 @@
 ---
 title: agentdev-design-file-manager Design
-status: draft
+status: accepted
 created: 2026-07-22
-updated: 2026-07-28
+updated: 2026-09-04
 ---
 
 # agentdev-design-file-manager Design
@@ -120,4 +120,4 @@ docs 横断診断、証拠構造、finding 出力契約は `agentdev-doc-diagnos
 - [agentdev-artifact-validation.md](agentdev-artifact-validation.md)（共通検証 skill）
 - [agentdev-doc-diagnostics.md](agentdev-doc-diagnostics.md)（docs 横断診断 skill）
 - v2:ADR-0123（Design lifecycle と design-save の導入）
-- REQ-001（REQ/Design 責務分離）、REQ-002-159（script 所有権）、REQ-008-058（Design operation enum 公式契約。別名不受理）
+- REQ-001（REQ/Design 責務分離）、REQ-002-016（script は該当 skill の scripts/ 配下へ配置し所有 skill の公開操作契約経由で呼び出す）、REQ-008-058（Design operation enum 公式契約。別名不受理）
