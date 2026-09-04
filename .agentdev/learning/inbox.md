@@ -56,3 +56,21 @@
 - **想定反映先**: integrity checker 系の実装知識、learning-promote での分類
 - **関連**: PR #2581 本文 Findings セクションからの capture 回収（case-close STEP-6）
 - **タグ**: #javascript #date-validation #checker #bun
+
+---
+
+## 2026-09-04: Windows の bun checker stdout を PowerShell パイプへ渡すと cp932 再解釈で JSON パースが壊れる
+
+- **問題事象**: checker（bun 実行）の stdout を PowerShell パイプ（`| node -` 経由の JSON パース等）へ渡すと、cp932 解釈による制御文字混入で JSON パースが失敗する。既存知識 `docs/knowledge/checker-cli-stdout-loss-on-windows-bun.md`（stdout ロス）と近縁だが現象は別（エンコーディング再解釈）。stdout 自体は正常に出力されている
+- **発生局面**: case-close QG-4 独立再検証（Issue #2561 / PR #2582、OU-006 検査定義 yaml 読込統合。旧新 checker の --json 出力比較を PowerShell パイプで行おうとした際）
+- **検知方式**: JSON パース失敗と出力ファイルの破綻からの切り分け
+- **根本原因**: Windows のコンソール コードページ（cp932）を介したパイプ再解釈で、UTF-8 バイト列が文字化け・制御文字混入する
+- **自律対応内容**: spawnSync(encoding: "utf8") 経由で stdout を直接取得し、writeFileSync(utf8) でファイル化してから正規化比較する方式へ変更。QG-4 出力形式比較（REQ-047-005 不変確認）を完遂
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/spec影響**: なし（検証手段の実行上の注意。恒久文書化候補は intake inbox に回収）
+- **横展開観点**: Windows + bun 環境で checker / CLI の JSON 出力をパイプやリダイレクトで処理する全検証（QG、docs-check、case-run の検証手順）に共通
+- **再発条件**: checker stdout を PowerShell パイプ・ファイル リダイレクト経由でテキスト処理に渡す
+- **予防策候補**: 機械的な出力比較は spawnSync(encoding: "utf8") で直接取得する。パイプを使う場合は事前に chcp 65001 を設定する
+- **想定反映先**: docs/knowledge/checker-cli-stdout-loss-on-windows-bun.md の近縁現象追記候補（intake 経由）、検証手順の実装知識
+- **関連**: PR #2582 本文 Findings / Capture候補 セクションからの capture 回収（case-close STEP-6）
+- **タグ**: #windows #encoding #checker #bun #verification
