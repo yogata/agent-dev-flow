@@ -1,3 +1,4 @@
+<!-- ADF-COVERS(implementation): REQ-053-023 -->
 # Decision 本文の合格基準
 
 > **原本**: 配置基準、用語政策は document-type-responsibilities Design「文書種別責務」、執筆規範は `japanese-tech-writing` スキル（AGENTS.md 経由）。
@@ -40,7 +41,7 @@ Decision 本文が合格するためには、以下を満たす必要がある�
 実行時の動的判断は `agentdev-decision-guidelines` が担う。
 本スキルは「書かれた Decision が意思決定文書として成立しているか」のみを査読する。
 
-## 查読出力
+## 査読出力
 
 不合格の Decision 本文は [review-output.md](review-output.md) の形式で、修正文案、移送先候補として提示する。
 

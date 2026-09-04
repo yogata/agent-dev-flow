@@ -1,3 +1,4 @@
+<!-- ADF-COVERS(implementation): REQ-053-023 -->
 # STEP-5: Issue 作成（Epic flow / Standard flow、issue-creation-flows）
 
 > 本 reference は `agentdev-workflow-case-open` SKILL.md の制御平面（STEP 一覧）STEP-5 詳細である。
@@ -9,7 +10,7 @@ Epic flow（STEP-5-1〜5-5）または Standard flow（STEP-5-6〜5-8）の制�
 
 ## Input Resolution
 
-1. SSoT 再構成: execution structure、Issue 本文候補、関連Decision（`docs/decisions<README>.md`）
+1. SSoT 再構成: execution structure、Issue 本文候補、関連Decision（`docs/decisions/README.md`）
 2. identifier 保持: `{epic_number}`、子Issue 番号、OU ID
 3. 最小 scalar: 子Issue 並列数（最大5件）
 4. runtime artifact: Issue 本文候補ファイル
@@ -76,7 +77,7 @@ Issue 番号を `{epic_number}` として記録。
 
 ### STEP-5-6: 関連Decision特定
 
-`docs/decisions<README>.md` から、単一REQ Epic flow の内容反映にも活用。
+`docs/decisions/README.md` から、単一REQ Epic flow の内容反映にも活用。
 
 ### STEP-5-7: ラベル付与
 

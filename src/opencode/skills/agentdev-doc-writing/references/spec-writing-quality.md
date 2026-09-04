@@ -1,3 +1,4 @@
+<!-- ADF-COVERS(implementation): REQ-053-023 -->
 # Design 本文の合格基準
 
 > **原本**: 配置基準、用語政策は document-type-responsibilities Design「文書種別責務」、執筆規範は `japanese-tech-writing` スキル（AGENTS.md 経由）。
@@ -32,7 +33,7 @@ Design 本文が合格するためには、以下を満たす必要がある。
 - **ADR が記録するのは「意思決定」**: Design に決定の経緯を書かず、決定結果（現在の構成）のみを記述する。
 - **guide はナビゲーション層**: Design の内容を代替しない。guide に詳細仕様が混入している場合は Design への移送候補となる。
 
-## 查読出力
+## 査読出力
 
 不合格の Design 本文は [review-output.md](review-output.md) の形式で、修正文案、移送先候補として提示する。
 

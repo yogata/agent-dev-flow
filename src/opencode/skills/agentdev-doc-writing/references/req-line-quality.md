@@ -1,3 +1,4 @@
+<!-- ADF-COVERS(implementation): REQ-053-023 -->
 # REQ 要件行の合格基準
 
 > **原本**: 配置基準、用語政策は document-type-responsibilities Design（「要件行の書き方」「要件性」「粒度」「肯定文主文」節）、執筆規範は `japanese-tech-writing` スキル（AGENTS.md 経由）。
@@ -49,7 +50,7 @@
 安定契約例外（公開 command 名、接続契約、安全境界等）に該当する場合は REQ に要約として記述できる。
 詳細は [document-boundaries.md](document-boundaries.md) 参照。
 
-## 查読出力
+## 査読出力
 
 不合格の要件行は [review-output.md](review-output.md) の形式で、修正文案、分割案、移送先候補として提示する。
 
