@@ -2,16 +2,15 @@
 title: case-run Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-03"
+updated: "2026-09-05"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-015, REQ-021-016, REQ-021-017, REQ-021-019, REQ-021-020, REQ-021-022 -->
 <!-- ADF-COVERS(implementation): REQ-015-010, REQ-015-011 -->
 <!-- ADF-COVERS(implementation): REQ-017-007, REQ-017-008, REQ-017-010, REQ-017-011, REQ-017-013, REQ-017-016 -->
 <!-- ADF-COVERS(implementation): REQ-031-001, REQ-031-002, REQ-031-003, REQ-031-004, REQ-031-005, REQ-031-006, REQ-031-007, REQ-031-008, REQ-031-009, REQ-031-010, REQ-031-011, REQ-031-012, REQ-031-013, REQ-031-014, REQ-031-015, REQ-031-016, REQ-031-017, REQ-031-018, REQ-031-019, REQ-031-020, REQ-031-021, REQ-031-022, REQ-031-023, REQ-031-024 -->
-<!-- ADF-COVERS(implementation): REQ-043-015, REQ-043-021, REQ-043-011 -->
 <!-- ADF-COVERS(implementation): REQ-057-004 -->
-<!-- ADF-COVERS(implementation): REQ-007-001, REQ-007-002, REQ-007-003, REQ-007-004, REQ-007-005, REQ-031-001, REQ-031-002, REQ-031-003, REQ-031-004, REQ-031-005, REQ-031-006, REQ-031-009, REQ-031-010, REQ-031-011, REQ-031-012, REQ-031-015, REQ-031-016, REQ-031-017, REQ-031-018, REQ-031-019, REQ-031-020, REQ-031-021, REQ-031-022, REQ-031-023, REQ-031-024, REQ-035-011, REQ-042-001, REQ-042-002, REQ-042-003, REQ-042-005, REQ-042-006, REQ-042-007, REQ-042-011, REQ-043-007, REQ-043-011, REQ-043-015, REQ-043-021 -->
+<!-- ADF-COVERS(implementation): REQ-007-001, REQ-007-002, REQ-007-003, REQ-007-004, REQ-007-005, REQ-031-001, REQ-031-002, REQ-031-003, REQ-031-004, REQ-031-005, REQ-031-006, REQ-031-009, REQ-031-010, REQ-031-011, REQ-031-012, REQ-031-015, REQ-031-016, REQ-031-017, REQ-031-018, REQ-031-019, REQ-031-020, REQ-031-021, REQ-031-022, REQ-031-023, REQ-031-024, REQ-035-011 -->
 
 # case-run Design
 
@@ -311,26 +310,9 @@ case-run は Issue 本文の execution contract 必須セクション存在有�
 現状の準備フェーズ work_type 確認ステップは、再分類ではなく metadata 整合確認へ
 縮約して維持する（AG-008、REQ-017-011）。
 
-## 統合先基準の作業起点と実証実行（新規セクション）
+## 作業用 worktree 作成元と PR base（REQ-031-024 の実行詳細）
 
-本節は case-run における統合先基準の作業起点と実証実行の実行詳細を所有する（REQ-031-024、REQ-043-015/016 の実行詳細）。統合先とブランチモデルの基盤契約は REQ-042 が、実証Caseの意味論は REQ-043 が所有する。
-
-### worktree 作成元・PR base の統合先参照の実行詳細
-
-- 作業用 worktree の作成元と PR の base は、当該 Case の統合先（REQ-042 の定義による、既定 main）を参照する（REQ-031-024）
-- 実証Caseの場合、評価ブランチを作業起点および PR base とする（REQ-043-015）
-
-### 実証Caseにおける実証手段の準備・実行・測定・観察・証拠生成・評価の実行位置
-
-case-run は評価ブランチ上で必要な実証手段の準備、実行、測定、観察、証拠生成、評価を行う（REQ-043-015）。評価契約と test strategy は分離されており、test strategy は実証手段・計測手段・実証環境が正常に動作したかの検証を担う。
-
-### コード作成が不要な実証の扱い
-
-コード作成が不要な実証を許容する（REQ-043-015）。実証コード・評価基盤・評価用データのみを変更対象とする PR、検証のみの PR を通常の Case と同一の経路で扱う。
-
-### 実証Caseの PR 本文への記録形式
-
-実証Caseの PR には実際の実行条件、測定結果、観察結果、証拠、評価結果を記録する（REQ-043-016）。評価ブランチ削除後も Issue/PR から必要な結果と証拠を追跡できる（REQ-043-020）。
+作業用 worktree の作成元と PR の base は main を参照する（REQ-031-024）。
 
 ## 対象外
 

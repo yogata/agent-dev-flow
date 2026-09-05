@@ -2,15 +2,14 @@
 title: case-open Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-03"
+updated: "2026-09-05"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-014, REQ-021-024 -->
 <!-- ADF-COVERS(implementation): REQ-015-009 -->
 <!-- ADF-COVERS(implementation): REQ-017-001, REQ-017-002, REQ-017-003, REQ-017-008, REQ-017-009, REQ-017-010, REQ-017-012, REQ-017-014, REQ-017-015, REQ-017-016 -->
 <!-- ADF-COVERS(implementation): REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-004, REQ-030-005, REQ-030-006, REQ-030-007, REQ-030-008, REQ-030-009, REQ-030-010, REQ-030-011, REQ-030-012, REQ-030-013, REQ-030-014, REQ-030-015, REQ-030-016, REQ-030-017, REQ-030-018, REQ-030-019, REQ-030-020, REQ-030-021 -->
-<!-- ADF-COVERS(implementation): REQ-043-014, REQ-043-027 -->
-<!-- ADF-COVERS(implementation): REQ-003-025, REQ-003-027, REQ-008-010, REQ-008-011, REQ-008-036, REQ-008-037, REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-005, REQ-030-006, REQ-030-014, REQ-030-015, REQ-030-016, REQ-030-017, REQ-030-018, REQ-030-019, REQ-030-020, REQ-030-021, REQ-043-013, REQ-043-014, REQ-043-027 -->
+<!-- ADF-COVERS(implementation): REQ-003-025, REQ-003-027, REQ-008-010, REQ-008-011, REQ-008-036, REQ-008-037, REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-005, REQ-030-006, REQ-030-014, REQ-030-015, REQ-030-016, REQ-030-017, REQ-030-018, REQ-030-019, REQ-030-020, REQ-030-021 -->
 
 # case-open Design
 
@@ -282,40 +281,6 @@ Issue 本文の契約セクションへ永続化する（adversarial-review 統�
 新規 Issue 作成時、新契約識別用の必須セクション（execution contract セクション、
 必須品質統制セクション）を Issue 本文へ付与する。presence-based 判定により
 新旧 Issue を識別する（AG-012、REQ-017-014）。
-
-## 統合先と実証CaseのIssue構成（新規セクション）
-
-本節は case-open における統合先と実証Caseの Issue 構成の実行詳細を所有する。統合先とブランチモデルの基盤契約は REQ-042 が、実証Caseと評価契約の意味論は REQ-043 が所有する。
-
-### 統合先の Issue 本文への記録形式
-
-- Case に割り当てられた統合先（既定値 main）を Issue 本文の execution contract へ記録する
-- 実証Case識別情報（実証フラグ、対象評価ブランチ、所属実証単位）を Issue 本文へ永続記録し、会話コンテキスト喪失後も Issue 等の永続情報から実証Caseであること、対象評価ブランチ、所属する実証単位を復元できる（REQ-043-013）
-
-### 評価契約の Issue 本文への投影形式
-
-- 実証Caseの場合、評価契約と対象評価ブランチ（REQ-043 所有契約の投影）を execution contract として Issue 本文に確定する（REQ-017-001、REQ-043-014）
-- 評価結果の採否（採用、不採用、判定不能）自体を Issue 完了条件へ含めない投影は REQ-043-028 による（実証Caseの Issue 完了条件には評価の実施とその結果の記録を含める）
-
-### 既存テンプレートへの条件付き評価情報の追加形式
-
-work_type と実証の組み合わせごとに専用Issueテンプレートを増殖させず、既存テンプレート（standard / epic / child）へ条件付き評価情報を追加する（REQ-043-014）。
-
-### presence-based 判定と実証Case専用要素
-
-REQ-017-014 の presence-based 判定に用いる新契約必須セクションの一覧から実証Case専用要素（評価契約・対象評価ブランチ）を除外する。実証Case専用要素の有無は新契約 Issue の判定条件としない。
-
-### 統合評価 Child Issue / Wave の計画反映
-
-複数 Wave の統合状態を実際に動かさなければ評価できない場合、統合状態を実行・測定する Child Issue または Wave を計画へ含める。各 Child で必要十分な評価が完了する場合は不要な統合評価 Wave を強制しない（REQ-043-027）。
-
-### REQ-030-020 の統合先同期確認の実行詳細
-
-RU ファイル削除後に統合先ブランチ（REQ-042 の定義による、既定 main）の作業ディレクトリとリモートの同期を確認し、不一致を検出した場合停止する。
-
-### 実証Case の RU/draft 削除と ADF 制御状態の main 反映手順
-
-実証Case の RU/draft 削除は通常Caseと同一の手順で実行する。実証Issue 作成と VERIFY が成功した RU は評価ブランチ削除後に main 側で未処理 RU として再出現しない（REQ-042-012、REQ-043-012 の実行詳細）。ADF 制御状態の正規位置は main であり、RU 消費等のドメイン状態の変更は main 側で維持する。
 
 ## Case Issue 本文の元追跡Issue参照形式
 

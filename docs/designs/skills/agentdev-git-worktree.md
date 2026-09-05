@@ -2,9 +2,9 @@
 title: `agentdev-git-worktree` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-19
+updated: 2026-09-05
 ---
-<!-- ADF-COVERS(implementation): REQ-018-002, REQ-042-009 -->
+<!-- ADF-COVERS(implementation): REQ-018-002 -->
 
 # `agentdev-git-worktree` Design
 
@@ -41,14 +41,9 @@ Issue 番号に基づいて安全かつ一貫性のある方法で git worktree 
 - draft / RU の削除は同一ステップで即時ステージ、コミットし未ステージ残存を許さない（Form Zero、v2:REQ-0137-003/006）
 - worktree remove で Permission denied 時は停止（リトライは定義に従う）
 
-## 統合先基準のworktree操作（新規セクション）
+## worktree 作成元の main 基準
 
-本節は worktree 操作における統合先基準の適用詳細を所有する。
-統合先とブランチモデルの基盤契約は REQ-042 が所有する。
-
-- **worktree 作成元の統合先解決**: worktree の作成元は当該 Case の統合先（既定 main、実証Caseは評価ブランチ）を参照する。worktree の作成元、PR の base、rebase・同期基準、鮮度確認、squash merge 先、Epic 後続 Wave の作業起点は同一の統合先を参照する（REQ-042-006）
-- **評価ブランチの作成・削除に既存 Git/worktree 能力を再利用する手順**: 評価ブランチの作成・削除には既存の Git/worktree 能力を再利用する。評価ブランチ専用の公開 Git コマンド体系は追加しない（REQ-042-009）。評価ブランチは正規成果物ではなく一時的・非正規の成果物として扱う
-- **評価ブランチの命名規則（実装設計で決定した形式）の適用**: 評価ブランチの命名規則は実装設計で決定した形式に従い、本スキルは特定の命名形式を固定しない
+worktree の作成元は main を参照する。PR の base、rebase・同期基準、squash merge 先も main を基準とし、各工程要件（REQ-031-024、REQ-035-009）が各自明示する。
 
 ## 対象外
 

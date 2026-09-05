@@ -2,9 +2,9 @@
 title: `agentdev-workflow-lifecycle` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-19
+updated: 2026-09-05
 ---
-<!-- ADF-COVERS(implementation): REQ-001-052, REQ-001-053, REQ-001-054, REQ-005-005, REQ-005-006, REQ-005-007, REQ-005-008, REQ-005-009, REQ-005-010, REQ-005-011, REQ-005-012, REQ-005-013, REQ-005-014, REQ-005-015, REQ-005-016, REQ-005-017, REQ-005-018, REQ-005-019, REQ-005-020, REQ-005-021, REQ-005-022, REQ-005-023, REQ-011-016, REQ-043-001 -->
+<!-- ADF-COVERS(implementation): REQ-001-052, REQ-001-053, REQ-001-054, REQ-005-005, REQ-005-006, REQ-005-007, REQ-005-008, REQ-005-009, REQ-005-010, REQ-005-011, REQ-005-012, REQ-005-013, REQ-005-014, REQ-005-015, REQ-005-016, REQ-005-017, REQ-005-018, REQ-005-019, REQ-005-020, REQ-005-021, REQ-005-022, REQ-005-023, REQ-011-016 -->
 
 # `agentdev-workflow-lifecycle` Design
 
@@ -24,7 +24,7 @@ AgentDevFlow のフェーズ定義、SSoT 遷移、work_type 判定基準、ス�
 
 - フェーズ定義（マクロ: 壁打ち、構造的実行、レビュー完了 / マイクロ: requirement、analyzed、created、in_progress、review、done）
 - work_type 分類（4値）
-- スケール判定（feature のみ、3条件: 複数モジュール跨ぎ、PR 肥大化リスク、段階的リリース。実証Caseは work_type にかかわらず scale と Issue 構造を選択可能、実証の判定は REQ-043 の定義による）
+- スケール判定（feature のみ、3条件: 複数モジュール跨ぎ、PR 肥大化リスク、段階的リリース）
 - 実装スコープシグナル確認（ドラフト内実装詳細セクション検出時の scale: large 昇格判定、REQ-004-018）
 - 前工程からの引き継ぎ判定、停止条件（`agentdev_handoff: true` 検出時）
 - SSoT 遷移
@@ -39,14 +39,6 @@ AgentDevFlow のフェーズ定義、SSoT 遷移、work_type 判定基準、ス�
 - 宣言的定義のみを提供
 - 手順、手続きは含まない
 - エージェントが自律的に判断できることをユーザーに確認しない
-
-## スケール判定と工程分類の実証Case例外（新規セクション）
-
-本節はスケール判定と工程分類における実証Case例外を所有する（REQ-005-005 の更新に対応）。
-
-- 通常Caseの scale は feature のみ standard / large とする（REQ-005-005）
-- 実証Case（REQ-043 の定義による）は work_type にかかわらず scale と Issue 構造を選択できる（REQ-005-005）
-- work_type・scale 判定の宣言的定義（REQ-005-012）は通常Caseの判定規則として維持し、実証Case例外は当該宣言的定義に対する例外適用として扱う。実証の判定は REQ-043 の定義による
 
 ## 対象外
 

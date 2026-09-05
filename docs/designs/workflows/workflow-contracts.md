@@ -163,7 +163,6 @@ no-op / empty state の外部挙動を維持する。
 work_type と scale により workflow_route を決定する。
 work_type は bugfix / feature / maintenance / docs_chore の 4 値である（REQ-001-011, REQ-005-014）。
 通常Caseの scale は feature のみ standard / large をとる（REQ-005-005）。
-実証Case（REQ-043 の定義による）は work_type にかかわらず scale と Issue 構造を選択できる（REQ-005-005）。
 
 | work_type | scale | workflow_route |
 |---|---|---|

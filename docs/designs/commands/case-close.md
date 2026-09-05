@@ -2,15 +2,14 @@
 title: case-close Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-02
+updated: 2026-09-05
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-018, REQ-021-019, REQ-021-022, REQ-021-025 -->
 <!-- ADF-COVERS(implementation): REQ-032-001, REQ-032-002, REQ-032-003, REQ-032-004, REQ-032-005, REQ-032-006, REQ-032-007, REQ-032-008, REQ-032-009, REQ-032-010, REQ-032-011, REQ-032-012, REQ-032-013, REQ-032-014, REQ-032-015, REQ-032-016, REQ-032-017, REQ-032-018, REQ-032-019, REQ-032-020, REQ-032-021, REQ-032-022 -->
 <!-- ADF-COVERS(implementation): REQ-035-001, REQ-035-003, REQ-035-009, REQ-035-010 -->
-<!-- ADF-COVERS(implementation): REQ-043-017, REQ-043-018, REQ-043-024, REQ-043-028 -->
 <!-- ADF-COVERS(implementation): REQ-057-004 -->
-<!-- ADF-COVERS(implementation): REQ-003-015, REQ-003-016, REQ-003-019, REQ-003-026, REQ-006-105, REQ-032-001, REQ-032-002, REQ-032-003, REQ-032-004, REQ-032-005, REQ-032-007, REQ-032-008, REQ-032-010, REQ-032-012, REQ-032-013, REQ-032-014, REQ-032-015, REQ-032-016, REQ-032-017, REQ-032-018, REQ-032-019, REQ-032-020, REQ-032-021, REQ-042-006, REQ-042-008, REQ-042-011, REQ-043-008, REQ-043-017, REQ-043-018, REQ-043-020, REQ-043-024, REQ-043-028 -->
+<!-- ADF-COVERS(implementation): REQ-003-015, REQ-003-016, REQ-003-019, REQ-003-026, REQ-006-105, REQ-032-001, REQ-032-002, REQ-032-003, REQ-032-004, REQ-032-005, REQ-032-007, REQ-032-008, REQ-032-010, REQ-032-012, REQ-032-013, REQ-032-014, REQ-032-015, REQ-032-016, REQ-032-017, REQ-032-018, REQ-032-019, REQ-032-020, REQ-032-021 -->
 
 # case-close Design
 
@@ -262,34 +261,6 @@ v2:REQ-0158-002 はこの3層防御を回避するものではなく、verificat
 | 第3層 | files_checked が空でないことの確認ステップを含める | 本ステップが verification-only 判定基準（3項目）の適用場所となる。3項目を満たさない場合は silent pass を許さず FAILURE を維持する |
 
 verification-only 判定基準3項目を満たさない files_checked 空（例: PR 本文の根拠欄に記載がない、検証 evidence がない）は silent pass を許さず、FAILURE を維持して構造化エラー停止とする。
-
-## 統合先へのマージと実証最終クローズ（新規セクション）
-
-本節は case-close における統合先へのマージと実証最終クローズの実行詳細を所有する（REQ-032-013、REQ-043-017/018/024 の実行詳細）。統合先とブランチモデルの基盤契約は REQ-042 が、実証Caseの意味論は REQ-043 が所有する。
-
-### squash merge 先の統合先解決
-
-squash merge 先は当該 Case の統合先（REQ-042 の定義による、既定 main）とする。実証Caseの場合は対象評価ブランチへ squash merge する（REQ-043-017）。
-
-### 統合先ブランチ同期時のリスク事前検出の実行詳細
-
-統合先ブランチ同期時に worktree 状態、ref lock 競合、統合先以外のブランチ占有のリスクを事前検出し、安全な代替同期手順を選択する（REQ-032-013）。
-
-### 実証全体の最終 case-close における評価結果の導出
-
-実証全体の最終 case-close は新しい評価を始めず、事前の評価契約と蓄積済み証拠から最終結果を導出する（REQ-043-018）。
-
-### Issue 最終コメントへの最終評価結果正規記録形式
-
-Issue 最終コメントを最終評価結果の正規記録とする（REQ-043-020）。
-
-### 実証Case の capture 回収の扱い
-
-評価ブランチ上で回収した intake/learning capture を main 側パイプラインへ反映する、または PR 本文記録を正として main 側から追跡可能とする手順を適用する（REQ-042-012 の実行詳細）。
-
-### 正式化経路（req-define <実証Issue>）の案内と Epic 中間Waveでの案内抑制
-
-実証全体の最終 case-close は正式化経路として req-define <実証Issue> を利用者へ明示する。Standard では Standard Issue、Epic では Epic Issue を指定する。Epic 中間Waveでは正式化案内を出さない。case-close は後続 req-define を自動実行しない（REQ-043-024）。
 
 ## 対象外
 

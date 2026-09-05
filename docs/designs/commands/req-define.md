@@ -2,13 +2,12 @@
 title: req-define Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-21
+updated: 2026-09-05
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-011, REQ-021-022 -->
 <!-- ADF-COVERS(implementation): REQ-015-004 -->
-<!-- ADF-COVERS(implementation): REQ-043-002, REQ-043-003, REQ-043-004, REQ-043-005, REQ-043-006, REQ-043-009, REQ-043-010, REQ-043-025, REQ-043-029, REQ-043-030 -->
-<!-- ADF-COVERS(implementation): REQ-004-001, REQ-004-002, REQ-004-004, REQ-004-010, REQ-004-014, REQ-004-015, REQ-004-016, REQ-004-017, REQ-004-018, REQ-004-019, REQ-004-020, REQ-004-022, REQ-004-023, REQ-004-034, REQ-004-035, REQ-004-036, REQ-004-037, REQ-004-038, REQ-004-039, REQ-004-042, REQ-004-043, REQ-004-046, REQ-004-047, REQ-004-048, REQ-004-049, REQ-004-050, REQ-004-051, REQ-004-052, REQ-004-053, REQ-004-054, REQ-008-022, REQ-008-032, REQ-008-033, REQ-008-041, REQ-008-047, REQ-008-048, REQ-008-049, REQ-008-052, REQ-008-053, REQ-043-002, REQ-043-003, REQ-043-004, REQ-043-005, REQ-043-006, REQ-043-009, REQ-043-010, REQ-043-025, REQ-043-029, REQ-043-030 -->
+<!-- ADF-COVERS(implementation): REQ-004-001, REQ-004-002, REQ-004-004, REQ-004-010, REQ-004-014, REQ-004-015, REQ-004-016, REQ-004-017, REQ-004-018, REQ-004-019, REQ-004-020, REQ-004-022, REQ-004-023, REQ-004-034, REQ-004-035, REQ-004-036, REQ-004-037, REQ-004-038, REQ-004-039, REQ-004-042, REQ-004-043, REQ-004-046, REQ-004-047, REQ-004-048, REQ-004-049, REQ-004-050, REQ-004-051, REQ-004-052, REQ-004-053, REQ-008-022, REQ-008-032, REQ-008-033, REQ-008-041, REQ-008-047, REQ-008-048, REQ-008-049, REQ-008-052, REQ-008-053 -->
 
 # req-define Design
 
@@ -473,49 +472,6 @@ req-define は、既存の明示的な対応関係（`agentdev-traceability` の
 - [req-health-metrics.md](../quality/req-health-metrics.md)（SPLIT 予兆計測閾値）
 - [quality-gates.md](../quality/quality-gates.md)（QG-1）
 - [document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md)（draft body 品質検査）
-
-## 実証Case判定と評価契約（新規セクション）
-
-本節は req-define における実証Case判定と評価契約確定の実行詳細を所有する。実証Caseと評価契約の意味論の正規所有は REQ-043 であり、本節はその実行位置と構成要素を規定する。
-
-### 実証必要性推論の観点
-
-- 調査・設計だけでは重要な採否判断を確定できないか
-- 実行・測定・観察が必要か
-- 単なる追加調査でないか
-
-単なる追加調査だけを理由に実証Caseとしない（REQ-043-002）。
-
-### 実証Case推奨時の壁打ち手順
-
-ユーザーが実証を明示している場合は再確認せず実証Caseとして扱う。明示していない場合は req-define が実証を推奨する理由を提示し、壁打ちにより実証Caseへの移行を確定する（REQ-043-003）。実証Caseとして確定した後は評価ブランチ利用を別途確認せず、実証Caseなら評価ブランチ、通常Caseなら main と決定的に導出する（REQ-043-004）。
-
-### 実証Issue 入力（req-define <実証Issue>）
-
-- 実証Issue 明示指定時は、評価契約、最終評価結果、参照証拠を当該実証の正式化の主たる入力として取り込む
-- 実証Issue 明示指定時に RU 自動検出と混在する場合は、どちらを処理するかユーザーへ確認する入力優先規定を適用する
-
-### 評価契約の構成要素一覧
-
-req-define は実証開始前に、必要に応じて次の構成要素を確定する（REQ-043-005）。
-
-評価対象・仮説、比較対象、比較条件、評価方法、評価観点、評価シナリオ、測定・観察項目、判定基準、必要証拠、採用条件、不採用条件、判定不能条件、中止条件、再実行条件、比較条件逸脱時の扱い
-
-### 評価契約と test strategy の分離基準
-
-test strategy は実証手段・計測手段・実証環境が正常に動作したかを扱い、評価契約は評価対象から得られた結果と採否を扱う。評価対象が採用基準を満たさなかったことを実装不具合として自動修正しない（REQ-043-006）。
-
-### 評価ブランチ・worktree 準備タイミングと実行主体
-
-実証Case確定後、最初の保存処理より前に当該実証専用の評価ブランチと必要な worktree を準備する。準備の実行主体・手順は Design が所有し、req-define 単独の Git 副作用としない（REQ-043-009）。req-define 自身は Git 副作用を持たず、評価ブランチ作成だけの新しい公開コマンドを追加しない。
-
-### 実証Case の draft-data 出力形式
-
-req-define は実証Case の draft-data に実証Caseであること、評価契約、評価ブランチ識別情報を出力する（REQ-043-030）。下流コマンドは Issue 等の永続情報または draft-data の当該情報から実証Caseを認識する。
-
-### draft の評価環境への引き継ぎ契約
-
-req-define が生成した draft を内容欠落なく評価環境へ引き継ぎ、req-save / design-save を評価ブランチ上で継続実行できる（REQ-043-010）。
 
 ## 対象外
 
