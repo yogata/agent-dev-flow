@@ -414,3 +414,21 @@
 - **横展開候補**: repo-agentdev-integrity（checker CLI 契約一覧の整備）、agentdev-quality-gates（checker 実行手順の usage 確認注記）、learning-promote で判定
 - **関連**: Issue 2608 対応記録コメント（case-close STEP-6 学び検知）
 - **タグ**: #checker #cli #distribution-boundary #case-close #verification
+
+---
+
+## 2026-09-05: req-define 時点の行番号実測に漏れがある場合、Report 側の実測修正を正として後続 OU は修正済み行番号を使用する
+
+- **問題事象**: Issue #2625 補足情報（req-define 時点実測）の stop-and-decision-resolution.md 行番号は 47、174 だったが、worktree 上の実測 grep（876aab88 ベース）で 47、49、174 を確認（49行は「実証Caseで再開可能な場合は評価ブランチを保持する」の検証語ヒット行）。req-define 時点の手動探索の行番号実測に1件の漏れがあった
+- **発生局面**: case-run 委譲（Issue #2625 / PR #2629、OU-001 撤回インベントリ Report 作成時）
+- **検知方式**: Report 作成時の grep 突合（Issue 補足情報の実測データと worktree 実測の差分検出）
+- **根本原因**: req-define 時点の手動探索は行単位の網羅性を保証せず、行番号リストを後続工程の検証基準（正）にする場合は突合による補正が必須
+- **自律対応内容**: 実測値を正として Report §7 に ★ で修正記録し、PR 本文 Findings にも記録。OU-002 実行時は Report §7 の実測修正済み行番号を正として使用する
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/spec影響**: なし（Issue 補足情報と Report §7 ★ 修正の関係は Report が正と明記済み。OU-002 Issue 本文側の補正は case-update 不要と判断済み）
+- **横展開観点**: req-define 時点の行番号実測を入力として正規化する engineering unit（OU-002〜OU-003）に共通
+- **再発条件**: req-define 時点の行番号リストを再突合なしで検証基準として使用する
+- **予防策候補**: 行番号入力は後続工程で grep 再突合してから正とする。乖離は実測値を正として Report に修正記録し、由来（req-define 時点値との差分）を明記する
+- **想定反映先**: learning-promote での分類、OU-002〜003 の検証手順（Report §7 を正とする運用）
+- **関連**: PR #2629 本文 Findings / Capture候補 セクションからの capture 回収（case-close STEP-6）
+- **タグ**: #inventory #grep #case-run #ou-002 #verification
