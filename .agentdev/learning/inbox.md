@@ -432,3 +432,21 @@
 - **想定反映先**: learning-promote での分類、OU-002〜003 の検証手順（Report §7 を正とする運用）
 - **関連**: PR #2629 本文 Findings / Capture候補 セクションからの capture 回収（case-close STEP-6）
 - **タグ**: #inventory #grep #case-run #ou-002 #verification
+
+---
+
+## 2026-09-05: フル suite 実行時のみ fail する環境依存 staging テストは基底 commit 再現比較で pre-existing 分離する
+
+- **問題事象**: trusted-distribution-gate（archive-builder）の「same-filesystem staging (parent blocker #2) > staging path is created UNDER outputRoot, never under os.tmpdir()」テストが、full suite ① 実行時のみ 1 fail（2555 pass / 1 fail）となり、単体実行では 19 pass / 0 fail で再現しない。当該 changeset 起因の fail との誤判定リスクがあった
+- **発生局面**: case-run 委譲（Issue #2628 / PR #2632、OU-004 最終検証 Report の full suite 正規形 3 cwd 分割実行時）
+- **検知方式**: full suite ① の fail 件数と単体実行結果の差異、および既知 fail ベースライン（§6.1 差分表）への未登録
+- **根本原因**: same-filesystem staging テストは staging path の計測環境（フル suite 実行時の実行環境状態）に依存する環境依存 flaky であり、単体実行では再現しない。単体再現の成否だけでは changeset 起因の判定ができない
+- **自律対応内容**: 基底 commit 98496bc8 を一時 worktree（C:/WINDOWS/TEMP/opencode/base-check-98496bc8）へ取り出し、依存パッケージ前置のうえ同一コマンドで full suite ① を再実行 → 基底でも同一テスト名 1 fail（2556 tests / 1 fail）を確認し、pre-existing（環境依存）と分離。確認後一時 worktree は削除済み（git worktree list で確認）
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/spec影響**: なし（検証手順の運用知見。既知 fail ベースライン管理への trusted-distribution-gate staging 追加候補は intake inbox に回収済み）
+- **横展開観点**: full suite・CI 等の複合実行でしか再現しない flaky テストの分離判定を行う全局面（case-run 検証、case-close QG-4、AG-010 既知 fail 分離運用）に共通
+- **再発条件**: 環境依存テストをフル suite で観測し、単体再現の欠如のみを根拠に changeset 起因と判定する
+- **予防策候補**: flaky 判定は「単体再現確認」→「基底 commit 再現比較（一時 worktree 取り出し + 同一コマンド再実行）」の2段階で分離する。フル suite のみ fail する環境依存テストは既知 fail ベースライン管理（再現比較基準と解消予定の明記）へ登録する
+- **想定反映先**: learning-promote での分類、AG-010 既知 fail 分離運用の運用知識、learning-promote / case-run の検証手順注記
+- **関連**: PR #2632 本文 Findings / Capture候補 セクションからの capture 回収（case-close STEP-6）
+- **タグ**: #test #flaky #staging #distribution-boundary #case-close #verification
