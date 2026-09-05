@@ -6,7 +6,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 49件、廃止済み: 9件
+現行 REQ: 47件、廃止済み: 11件
 <!-- AUTOGEN:END -->
 
 現行要件は47件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。

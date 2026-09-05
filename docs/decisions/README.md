@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は16件、提案中の Decision は9件である。
+現行の承認済み Decision は16件、提案中の Decision は8件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -32,7 +32,6 @@
 | DEC-015 | ADF決定論的実行中核と実行基盤実行機構の責務分界 | accepted | 2026-08-15 |
 | DEC-016 | 導入系スクリプトの副作用ゼロ原則 | accepted | 2026-08-15 |
 | DEC-017 | 最小トレーサビリティモデルの採用と Artifact Graph の廃止 | accepted | 2026-08-17 |
-| DEC-018 | 評価ブランチモデルとCase統合先の一般化 | proposed | 2026-08-19 |
 | DEC-019 | 一般処理の標準API委譲とADF固有意味論の所有境界 | proposed | 2026-08-20 |
 | DEC-020 | GitHub Issue 共通管理単位の採用 | proposed | 2026-08-23 |
 | DEC-021 | scripts 公開入口の2本固定と安定契約 | proposed | 2026-08-23 |
@@ -75,7 +74,6 @@
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
-- [DEC-018](DEC-018.md)（評価ブランチモデルとCase統合先の一般化）
 - [DEC-019](DEC-019.md)（一般処理の標準API委譲とADF固有意味論の所有境界）
 - [DEC-020](DEC-020.md)（GitHub Issue 共通管理単位の採用）
 - [DEC-021](DEC-021.md)（scripts 公開入口の2本固定と安定契約）

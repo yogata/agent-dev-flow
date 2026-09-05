@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下49件を第一参照先とする。
+現在の要件判断では、以下47件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -44,8 +44,6 @@
 | [REQ-038](REQ-038.md) | 学習パイプライン（learning） |
 | [REQ-039](REQ-039.md) | バックログ統合（backlog-review） |
 | [REQ-041](REQ-041.md) | backlog 一括整理コマンド（backlog-auto）実行契約 |
-| [REQ-042](REQ-042.md) | Case統合先とブランチモデル |
-| [REQ-043](REQ-043.md) | 評価ブランチ実証ワークフロー |
 | [REQ-044](REQ-044.md) | 標準API委譲の状態制約 |
 | [REQ-045](REQ-045.md) | 現行成果物体系の整合性網羅監査 |
 | [REQ-046](REQ-046.md) | 横断正規化後の不変条件 |
@@ -77,6 +75,8 @@
 | [REQ-026](retired/REQ-026.md) | skill rename 対称性検査観点の targeted docs guard 追加 |
 | [REQ-028](retired/REQ-028.md) | IR 体系の実効性監査と存在条件厳格化 |
 | [REQ-040](retired/REQ-040.md) | トレーサビリティ高位問い合わせ（Trace Query） |
+| [REQ-042](retired/REQ-042.md) | Case統合先とブランチモデル |
+| [REQ-043](retired/REQ-043.md) | 評価ブランチ実証ワークフロー |
 <!-- AUTOGEN:END -->
 
 ## 基準構造
