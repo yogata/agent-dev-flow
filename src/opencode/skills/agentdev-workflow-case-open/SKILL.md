@@ -91,7 +91,7 @@ Issue の対象範囲、完了条件、test strategy の確定（STEP-2、STEP-3
 - **OU 単位処理**: Issue 化単位は REQ doc 単位ではなく OU 単位（command 不変条件）。子Issue は OU 単位で作成し、Wave 単位のみの子Issue 構造は作成しない（command 不変条件）
 - **子Issue 上限**: Epic 1件あたり最大10件（case-open 前出出力検証表 STEP-3 の検証基準）、case-open STEP-5-4 子Issue 作成並列上限は5件（3つの「5件」文脈の (1) に該当）
 - **Form Zero**: draft/RU 削除は `git rm <path>` で明示パスをステージし、同一ステップで `git commit -- <path>` により即時コミットし、未ステージ残存を許さない
-- **統合先・実証Case識別情報**: Case に割り当てられた統合先（既定値 main）を Issue 本文の execution contract へ記録する。実証Caseの場合は実証Case識別情報（実証フラグ、対象評価ブランチ、所属実証単位）と評価契約を Issue 本文へ永続記録し、評価結果の採否を Issue 完了条件へ含めない。実証Case専用要素を presence-based 判定の新契約必須セクション一覧から除外する（詳細は STEP-2/3/6 各 reference）
+- **統合先**: Case に割り当てられた統合先（main）を Issue 本文の execution contract へ記録する（詳細は STEP-2/ STEP-6 各 reference）
 - **実行識別情報の記録**: 新規作成 Issue 本文に実行識別情報セクション（対象 Case、ADF 工程、実行単位、前工程で確定した事項）を構造化形式で記録する。形式は `agentdev-workflow-templates` の実行識別情報セクション規約に従う。機械的解析は同セクションの key-value 行を正とし、自由文中の ID に依存しない。識別情報の一部が取得不能でも停止せず「N/A」を記録する。作成時点で番号が確定しない自己参照値は Issue 作成後に埋め戻す。既存 Issue への遡及適用は行わない（詳細は STEP-2/ STEP-5 各 reference）
 - **本文 verbatim**: Issue 本文は Custom Tool `agentdev_gh` の操作引数としてそのまま渡す（文字コード・一時ファイルの実装詳細は Tool 内部）（`POL-gh-io-delegation`）
 

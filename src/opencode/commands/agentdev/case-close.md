@@ -42,8 +42,7 @@ last-write-wins 競合防止は case-close の単一書き手で維持される�
 - コメントテンプレートの選定は `agentdev-workflow-templates` の選定ルールに従い、【必須】セクションを確認してから投稿する
 - 学びの検知はエージェント自律で行う（ユーザーに問わない）
 - capture 責務は「回収・保存」である: PR 本文から intake/ learning を分離回収してドメイン状態に保存し、同一 commit に含める（capture 境界（capture-boundaries）は `agentdev-workflow-orchestration` 参照）。Design確定候補の処理は PR 本文の `## Design確定候補` を入力とし、`## Findings / Capture候補` とは区別する
-- squash merge 先と統合先ブランチ同期の対象は当該 Case の統合先を参照する（通常Caseは既定 main、実証Caseは対象評価ブランチ。統合先は Issue 本文の実証Case状態情報から確定）。通常Caseの squash merge 先は従来どおり main を基調とし、利用者向け操作と挙動を変更しない。統合先とブランチモデルの基盤契約は `agentdev-git-worktree` Design（extension 経由）参照
-- 実証全体の最終 case-close は新しい評価を始めず、事前の評価契約と蓄積済み証拠から最終評価結果を導出し、Issue 最終コメントを正規記録とする。実証Caseの最終 case-close は正式化経路として req-define <実証Issue> を利用者へ明示する（Standard では Standard Issue、Epic では Epic Issue を指定）。Epic 中間Waveでは正式化案内を出さない。case-close は後続 req-define を自動実行しない
+- squash merge 先とブランチ同期の対象は main とする。利用者向け操作と挙動を変更しない
 - 完了報告は結果状態を分離して報告する（`.agentdev` push 失敗時は完了扱いにしない）。今回の完了条件に含まれる未対応事項は intake 記録として明示し、完了扱いには含めない
 - ドメイン状態永続化の commit は並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い、明示パス（`git add <path>`/ `git rm <path>`）でステージし、`git commit -- <paths>`（--only pathspec 形式）で実行する
 
@@ -58,7 +57,7 @@ last-write-wins 競合防止は case-close の単一書き手で維持される�
 - ドメイン状態永続化の `git add` は capture 成果物の専用サブディレクトリ（`.agentdev/learning/`、`.agentdev/intake/`）または明示パスに限定し、`.agentdev/` 全体への一括スコープは行わない
 - Design status 昇格（draft → accepted）は、対象 Design が `draft` かつ今回の実装が Design 内容を検証済みの場合のみ実行する（design-save は accepted を付与しない）
 - Epic Issue 本文ステータス追跡テーブルの更新は case-close のみが行う（単一書き手制約。case-run は読み取りのみ、case-auto は Wave 反復制御のみで直接書き込まない。last-write-wins 競合防止は case-close の単一書き手で維持する）。Epic Wave クローズ時の PR マージ・子Issue クローズは現在 Wave の `running` 子Issue のみを対象とし、`blocked`/ `failed` を `completed` に上書きしない（べき等性、`agentdev-epic-tracker` 準拠）（`POL-epic-tracking-single-writer`）
-- squash merge 実行前に PR の mergeable 状態を事前確認し、UNKNOWN の場合は mergeable になるまでポーリング待機する（状態取得は `agentdev_gh` の pr_mergeable 操作、待機間隔・上限は workflow 側手続き `pr-merge-and-conflict.md` が所有。上限超過時はマージ中止して構造化エラーで停止。ポーリング省略して UNKNOWN 状態のままマージ試行は禁止）。`git pull --ff-only` 実行前に worktree 状態（dirty tree）・並列実行による ref lock 競合・統合先以外のブランチ占有の3リスクを事前検出し、検出時は安全な代替同期手順を選択する（同期対象は当該 Case の統合先ブランチ）
+- squash merge 実行前に PR の mergeable 状態を事前確認し、UNKNOWN の場合は mergeable になるまでポーリング待機する（状態取得は `agentdev_gh` の pr_mergeable 操作、待機間隔・上限は workflow 側手続き `pr-merge-and-conflict.md` が所有。上限超過時はマージ中止して構造化エラーで停止。ポーリング省略して UNKNOWN 状態のままマージ試行は禁止）。`git pull --ff-only` 実行前に worktree 状態（dirty tree）・並列実行による ref lock 競合・main 以外のブランチ占有の3リスクを事前検出し、検出時は安全な代替同期手順を選択する（同期対象は main）
 
 
 

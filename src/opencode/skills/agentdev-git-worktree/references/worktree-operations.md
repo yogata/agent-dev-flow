@@ -3,7 +3,6 @@
 ## 目次
 
 - [作成手順](#作成手順)
-- [評価ブランチの作成・削除（既存 Git 能力の再利用）](#評価ブランチの作成削除既存-git-能力の再利用)
 - [worktree 内判定ヘルパー](#worktree-内判定ヘルパー)
 - [worktree 標準運用ガイド](#worktree-標準運用ガイド)
 - [worktree 構造的制約（agentdev-git-worktree-test-fallback Design）](#worktree-構造的制約agentdev-git-worktree-test-fallback-design)
@@ -15,28 +14,25 @@
 
 ## 作成手順
 
-### 1. 統合先の解決（worktree 作成元）
+### 1. worktree 作成元
 
-worktree の作成元は当該 Case の統合先（以下 `origin/{base_branch}`）である。
-通常Caseの統合先は既定 `main`、実証Caseは対象評価ブランチを指定する。
-呼出元（case-run 等）から統合先を明示指定された場合は当該ブランチを使用する。
-worktree の作成元、PR の base、rebase・同期基準、鮮度確認、squash merge 先、Epic 後続 Wave の作業起点は同一の統合先を参照する。
+worktree の作成元は main（以下 `origin/main`）である。
+worktree の作成元、PR の base、rebase・同期基準、鮮度確認、squash merge 先、Epic 後続 Wave の作業起点は main を参照する。
 
-明示指定がない場合（通常Case）はリポジトリのデフォルトブランチを検出して使用する（従来どおり）:
+作成元の検出（従来どおり）:
 
 ```bash
 git remote show origin | grep 'HEAD branch' | sed 's/.*: //'
 ```
 
-検出結果を `origin/{base_branch}` として使用。
+検出結果を `origin/main` として使用。
 デフォルトは `main`。
 ローカルのベースブランチは古くなっている可能性があるため、常にリモートの最新状態を起点とする。
-実証Caseの指定する評価ブランチが remote に存在しない場合は、先に「評価ブランチの作成・削除」の作成手順を実行する。
 
 ### 2. worktree作成コマンド
 
 ```bash
-git worktree add ".worktrees/{N}-{type}" -b "{type}/issue-{N}" origin/{base_branch}
+git worktree add ".worktrees/{N}-{type}" -b "{type}/issue-{N}" origin/main
 ```
 
 ### 3. 重要事項
@@ -55,34 +51,6 @@ git worktree add ".worktrees/{N}-{type}" -b "{type}/issue-{N}" origin/{base_bran
 | 同名worktree既存 | 既存worktreeを再利用（作成コマンド実行しない） |
 | ブランチのみ既存 | `git worktree add ".worktrees/{N}-{type}" "{type}/issue-{N}"` |
 | ダーティなworktree | 削除禁止。未コミット変更時はエラー停止 |
-
-## 評価ブランチの作成・削除（既存 Git 能力の再利用）
-
-実証Caseの評価ブランチは、専用の公開 Git コマンド体系を追加せず、既存の Git 能力で作成・削除する。
-評価ブランチは正規成果物ではなく一時的・非正規の成果物として扱う。
-命名形式は本スキルで固定せず、実装設計で決定した形式に従う。
-作成・削除の要否の判断（実証の開始・終了タイミング、再開可能性の考慮を含む）は呼出元が所有し、本手順は操作のみを提供する。
-
-### 1. 作成
-
-```bash
-git branch "{evaluation_branch}" origin/main
-git push origin "{evaluation_branch}"
-```
-
-- 作成元は main とする。評価ブランチ同士を依存・派生関係として扱わない
-- 作成後、作成手順の統合先として当該評価ブランチを指定する
-
-### 2. 削除
-
-```bash
-git push origin --delete "{evaluation_branch}"
-git branch -D "{evaluation_branch}"
-```
-
-- 評価ブランチは main へ merge しない前提で削除するため、マージ判定のある `-d` ではなく `-D` を使用する
-- リモートにブランチが存在しない場合はエラーを無視して続行（worktree 削除手順のリモートブランチ削除と同一の扱い）
-- 削除失敗時は警告表示して停止
 
 ## worktree 内判定ヘルパー
 

@@ -76,7 +76,7 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 - Issue本文から要件docと受け入れ基準を抽出する（べき等性: worktree とブランチが既に存在する場合、STEP-S3 の作成処理をスキップする）。`agentdev-req-analysis` のチェックボックス品質基準で検証する
 - 関連Decision特定: `docs/decisions/README.md` を読み込み、関連Decisionがあれば個別に読み込み、実装がDecisionの決定事項に矛盾しないことを確認する
 - work_type 判定: `agentdev-workflow-lifecycle` に従い bugfix/feature/maintenance/docs_chore を判定する（scale は feature のみ standard/large、workflow_route は都度導出し保存しない）
-- **統合先判定（実証Case判定）**: Issue 本文の実証Case識別情報（対象評価ブランチ等の実証状態の永続記録）から当該 Case の統合先を確定する。実証Case識別情報がある場合は実証Caseとして評価ブランチを統合先とし、ない場合は通常Caseとして main（既定）を統合先とする。実証は work_type とは別の性質として扱い、work_type へ新値を追加しない
+- **作業起点・PR base**: worktree の作成元と PR の base は main を参照する
 - **工程間構造化文脈の初期文脈利用**: 前工程（case-open、case-auto 等）から構造化文脈が引き継がれている場合、前工程で確定した事項を初期文脈として利用し、同じ情報をゼロから探索、再構築することを原則としない。独立検証、鮮度確認、矛盾検出、正規成果物との整合確認を目的とする再確認は維持する。手動起動等で構造化文脈が引き継がれていない場合は、durable state（Issue 本文、要件doc、REQ/Decision/Design）から入力解決を行う（形式と制約は `agentdev-workflow-lifecycle` スキルの工程間構造化文脈引き継ぎ参照）
 - **execution contract 消費境界**: 完了条件、test strategy、必須品質統制を実行契約として扱う。不足・曖昧さ・矛盾・実現不能を検出した場合は自律補完せず blocked とする。test strategy を新規設計せず記録済み項目を実行する。必須品質統制の適用要否を再判断しない。work_type/scale/Issue structure を再分類して実行契約を変更しない
   - runtime-only 判断の維持: worktree 状態確認、QG-3 前置 staleness check、実 diff 検査、実装結果・test 実行結果は case-run の安全検査として維持する
@@ -86,11 +86,11 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 
 ### Result
 
-- 要件doc・受け入れ基準抽出済み、関連Decision確認済み、work_type metadata 整合確認済み、統合先判定済み（通常Caseは main、実証Caseは評価ブランチ）、execution contract 消費境界適用済み
+- 要件doc・受け入れ基準抽出済み、関連Decision確認済み、work_type metadata 整合確認済み、execution contract 消費境界適用済み
 
 ### Evidence
 
-- Issue 本文読取結果、関連Decision 一覧、統合先判定結果（実証Case識別情報の有無と対象評価ブランチ）、消費境界判定結果（blocked 時はその理由）
+- Issue 本文読取結果、関連Decision 一覧、消費境界判定結果（blocked 時はその理由）
 
 ### Completion Verification
 
@@ -119,7 +119,7 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 
 ### Procedure
 
-- **Worktree 作成・ブランチ準備**: `agentdev-git-worktree` に従って実行する。作成元は当該 Case の統合先（通常Caseは既定 main、実証Caseは評価ブランチ）を明示的に指定する。通常Caseの worktree 起点は従来どおり main を維持する。べき等チェック: worktree 既存時は作成をスキップする。Wave 実行時、PR merge 後再開時は worktree 作成前に `git fetch origin` を実行し統合先の鮮度を確認する（同期基準・鮮度確認も同一の統合先を参照）
+- **Worktree 作成・ブランチ準備**: `agentdev-git-worktree` に従って実行する。作成元は main を明示的に指定する。べき等チェック: worktree 既存時は作成をスキップする。Wave 実行時、PR merge 後再開時は worktree 作成前に `git fetch origin` を実行し main の鮮度を確認する（同期基準・鮮度確認も main を参照）
 - **L2 タイムスタンプ計測**: 本 Step の開始時刻・終了時刻（JST）を記録し、worktree 設定時間を計測する（完了報告の L2 内訳に含める）
 - **STEP-S3-1 親Epic ステータス更新**: `agentdev-epic-tracker` 参照
 - **STEP-S3-2 worktree precondition gate**: `agentdev-git-worktree` の「worktree 内判定ヘルパー」に従い、当該 Issue の worktree+ブランチが作成済みであり、現在 worktree 内にいることを検証する。検証失敗時（worktree 未作成、メインリポジトリにいる）は実行担当サブエージェントを起動せず停止し、STEP-S3 へ戻るようユーザーに報告する
@@ -130,7 +130,7 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
   - ベースライン取得: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_distribution_boundary.ts --profile source --json` を委譲前時点（base 状態）の worktree で実行し、base の違反ベースラインを取得する。ベースラインは委譲プロンプトに引き渡し、委譲先が最終 gate の違反を当該変更起因と既存起因に判別する入力とする
   - 違反を検出した場合は委譲プロンプトで実行担当サブエージェントに引き渡す。src/opencode 変更を含まない PR ではスキップする
 - **STEP-S3-6 AUTOGEN 索引再生成 前置 gate**: PR 対象ファイルに AUTOGEN 生成元文書（REQ 実ファイル、Decision 実ファイル、Design 実ファイル群。件数・一覧・status 別ビュー・行数計測の AUTOGEN ブロック生成元。生成元の具体的なパス構成は対象リポジトリの integrity 検査 skill の定義に従う）の変更を含む場合、AUTOGEN 索引の再生成を委譲に先行して強制する
-  - 検出: worktree の git diff（統合先との比較）で AUTOGEN 生成元文書の変更（本文行数変更、rename、status 変更を含む）の有無を判定する。worktree 作成直後で diff が空の場合は Issue 本文の対象範囲・変更対象成果物の計画対象で判定する
+  - 検出: worktree の git diff（main との比較）で AUTOGEN 生成元文書の変更（本文行数変更、rename、status 変更を含む）の有無を判定する。worktree 作成直後で diff が空の場合は Issue 本文の対象範囲・変更対象成果物の計画対象で判定する
   - 強制内容: 検出時は委譲プロンプトに「実装完了前に AUTOGEN 索引再生成を実行し、再生成結果を PR 対象に含める」ことを必須指示として引き渡す（任意手順として扱わない）。再生成コマンドは `bun run .opencode/skills/<integrity-detector-skill>/scripts/generate_indexes.ts`（worktree 内で実行）
   - 目的: SPEC 行数変更に伴う索引陳腐化を実装後の整合性検査で検出して停止する事態（PR #2253 の E5b 停止）の再発防止であり、索引再生成を前段の必須手順に位置付ける
   - AUTOGEN 生成元文書を含まない PR ではスキップする

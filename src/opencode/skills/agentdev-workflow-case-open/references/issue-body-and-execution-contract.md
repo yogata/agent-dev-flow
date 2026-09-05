@@ -89,19 +89,14 @@ Epic flow では Epic 共通の実現面の変更方針を Epic Issue 本文へ�
 
 ユーザー明示指定による adversarial-review 発動契約が Issue 作成前に判明している場合、Issue 本文の契約セクションへ永続化する（adversarial-review 統合の拡張）。
 
-#### 統合先と実証Case識別情報の確定
+#### 統合先の確定
 
-- Case に割り当てられた統合先（既定値 main）を Issue 本文の Execution Contract セクションへ記録する
-- 実証Case識別情報（実証フラグ、対象評価ブランチ、所属実証単位）を Issue 本文へ永続記録し、会話コンテキスト喪失後も Issue 等の永続情報から実証Caseであること、対象評価ブランチ、所属する実証単位を復元できる。Epic 実証では Epic Issue から共有評価ブランチを特定できる
-- 実証Caseの場合、評価契約と対象評価ブランチ（実証・評価ワークフロー契約の投影）を execution contract として Issue 本文に確定する。実証Caseの判定は draft-data の実証Case識別情報または Issue 等の永続情報から行う
-- 実証Caseの Issue 完了条件には評価の実施とその結果の記録を含め、評価結果の採否（採用、不採用、判定不能）自体を完了条件へ含めない
-- work_type と実証の組み合わせごとに専用 Issue テンプレートを増殖させず、既存テンプレート（standard / epic / child）へ条件付き評価情報を追加する。テンプレートの条件付き評価情報の構造は `agentdev-workflow-templates` を参照
+- Case に割り当てられた統合先（main）を Issue 本文の Execution Contract セクションへ記録する
 
 #### execution contract 必須セクションの付与
 
 新規 Issue 作成時、新契約識別用の必須セクション（Execution Contract セクション、必須品質統制セクション）を Issue 本文へ付与する。
 presence-based 判定により新旧 Issue を識別する。
-presence-based 判定に用いる新契約必須セクションの一覧から実証Case専用要素（評価契約・対象評価ブランチ）を除外する。実証Case専用要素の有無は新契約 Issue の判定条件としない。
 テンプレート（`issue_desc_feature.md`、`issue_desc_child.md`）の Execution Contract セクション構造は `agentdev-workflow-templates` を参照。
 
 ### 実行識別情報セクションの生成（2-7）
@@ -131,11 +126,11 @@ Issue 本文生成時に、実行識別情報セクションへ次の値を記�
 
 ## Evidence
 
-- Issue 本文候補のファイルパス、QG-2 検証結果、execution contract 確定結果、test_strategy 反映状態、統合先記録と実証Case識別情報の反映状態、実行識別情報セクションの記録状態
+- Issue 本文候補のファイルパス、QG-2 検証結果、execution contract 確定結果、test_strategy 反映状態、統合先記録の反映状態、実行識別情報セクションの記録状態
 
 ## Completion Verification
 
-- QG-2 が合格であり（fail 時は req-define 差し戻し推奨）、execution contract 必須セクション（実証Case専用要素を除く）と実行識別情報セクションが本文候補へ付与されていること
+- QG-2 が合格であり（fail 時は req-define 差し戻し推奨）、execution contract 必須セクションと実行識別情報セクションが本文候補へ付与されていること
 
 ## Resume-Idempotency
 

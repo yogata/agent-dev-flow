@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-close
-description: "case-close command の workflow 実装本体。PR マージ（squash merge 先の統合先解決、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase）、統合先ブランチ同期時のリスク事前検出、QG-4 最終完了判定ゲート、docs 検証・Design 確定、Capture 回収（PR 本文→intake/learning 分離）、実証最終クローズ（最終評価結果の導出と Issue 最終コメント正規記録）、Epic Wave クローズを所有する。USE FOR: case-close 実行時の workflow 制御（単一 Issue クローズ・Epic Wave クローズ・PR マージ・QG-4・Design 確定・Capture 回収・実証最終クローズ）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "case-close command の workflow 実装本体。PR マージ（squash merge 先 main、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase）、同期時のリスク事前検出、QG-4 最終完了判定ゲート、docs 検証・Design 確定、Capture 回収（PR 本文→intake/learning 分離）、Epic Wave クローズを所有する。USE FOR: case-close 実行時の workflow 制御（単一 Issue クローズ・Epic Wave クローズ・PR マージ・QG-4・Design 確定・Capture 回収）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-057-017 -->
@@ -9,8 +9,7 @@ description: "case-close command の workflow 実装本体。PR マージ（squa
 
 case-close command の workflow 実装本体である。
 PR マージから Issue クローズ、Capture 回収、ドメイン状態永続化、完了報告までの制御構造、QG-4 最終完了判定ゲート（完了条件チェックボックス評価・更新）、Design 確定（draft → accepted 昇格）、Epic Wave クローズ（E1〜E6、単一書き手）を所有する。
-squash merge 先は当該 Case の統合先（通常Caseは既定 main、実証Caseは対象評価ブランチ）に解決し、統合先ブランチ同期時のリスク事前検出を行う。
-実証全体の最終 case-close では新しい評価を始めず最終評価結果を導出して Issue 最終コメントへ正規記録し、正式化経路（req-define <実証Issue>）を案内する（実行詳細は case-close command Design（extension 経由）が所有する）。
+squash merge 先は main とし、同期時のリスク事前検出を行う。
 
 case-close command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 
@@ -44,9 +43,9 @@ Epic Wave クローズは STEP-1 のルーティングで分岐し、E1〜E6 と
 | STEP-1 | Issue 番号解決・ルーティング | Issue 番号受領 | 単一 Issue クローズ or Epic Wave クローズのルート確定 | [references/issue-resolution-and-qg4.md](references/issue-resolution-and-qg4.md) |
 | STEP-2 | QG-4 達成判定 | ルート確定（単一 Issue） | 完了条件チェックボックス評価・更新、観点8 評価スコープ確定 | [references/issue-resolution-and-qg4.md](references/issue-resolution-and-qg4.md) |
 | STEP-3 | docs 検証・Design 確定（配布依存境界 最終 gate 含む） | QG-4 合格 | targeted docs guard、IR-{NNN} check_extensions.ts、配布依存境界 最終 gate、full integrity suite 実行（bun test 実行形態契約）、Design status 昇格 | [references/docs-and-design-promotion.md](references/docs-and-design-promotion.md) |
-| STEP-4 | PR マージ・コンフリクト解消 | docs 検証合格（配布依存境界 最終 gate 含む） | マージ済みPR（squash merge 先は当該 Case の統合先）、HEAD commit hash 記録、コンフリクト Level 1 解消 or case-auto エスカレーション | [references/pr-merge-and-conflict.md](references/pr-merge-and-conflict.md) |
-| STEP-5 | Post-merge・Issue クローズ | PR マージ完了 | CI 通過確認、Issue 本文更新、実証最終クローズ（最終評価結果導出・Issue 最終コメント正規記録）、Issue close | [references/cleanup-and-capture.md](references/cleanup-and-capture.md) |
-| STEP-6 | クリーンアップ・Capture 回収・永続化 | Issue クローズ完了 | worktree/branch 削除、親Epic 自動クローズ、実行前同期、Capture 回収、学び検知、実証最終クローズの正式化案内、`.agentdev/` 永続化、tmp/ 残存確認、完了報告 | [references/cleanup-and-capture.md](references/cleanup-and-capture.md) |
+| STEP-4 | PR マージ・コンフリクト解消 | docs 検証合格（配布依存境界 最終 gate 含む） | マージ済みPR（squash merge 先は main）、HEAD commit hash 記録、コンフリクト Level 1 解消 or case-auto エスカレーション | [references/pr-merge-and-conflict.md](references/pr-merge-and-conflict.md) |
+| STEP-5 | Post-merge・Issue クローズ | PR マージ完了 | CI 通過確認、Issue 本文更新、Issue close | [references/cleanup-and-capture.md](references/cleanup-and-capture.md) |
+| STEP-6 | クリーンアップ・Capture 回収・永続化 | Issue クローズ完了 | worktree/branch 削除、親Epic 自動クローズ、実行前同期、Capture 回収、学び検知、`.agentdev/` 永続化、tmp/ 残存確認、完了報告 | [references/cleanup-and-capture.md](references/cleanup-and-capture.md) |
 | STEP-E1〜E6 | Epic Wave クローズ（E4-1 配布依存境界 最終 gate 含む） | Epic Issue 番号受領、ステータス追跡テーブル存在 | 現在 Wave の子Issue 一括マージ・クローズ（E4-1 gate 違反子Issue は `blocked` でマージ対象外）、Epic status table 更新、当該 Wave スコープの一時成果物残留確認（E6-1、残留時は完了扱いにしない）、最終 Wave 判定 | [references/epic-wave-close.md](references/epic-wave-close.md) |
 
 ### STEP 間の依存と分岐
@@ -110,8 +109,7 @@ case-run 側の事前検査とは独立に実施する。検証手段との対�
 - **Epic Issue 本文ステータス追跡テーブルの更新は case-close 単一書き手**: case-run は読み取りのみ、case-auto は Wave 反復制御のみで直接書き込まない（last-write-wins 競合防止）
 - **Capture 境界**: intake/ learning を別々の成果物として扱い、PR 本文のみを capture 入力源とする（一時会話コンテキスト不入力）
 - **検証差分の記録**: case-close が実施した各検証（QG-4 完了条件評価、docs 検証・配布依存境界 最終 gate、トレーサビリティ独立再検査等）について、検証種別、検証結果、finding 差分（新規、修正済み、既出、撤回、無効の5分類）を対応記録コメントへ記録する。形式は `agentdev-workflow-templates` の検証差分セクション規約（PR テンプレート形式と同一のテーブル）に従い、前段階（case-run）の PR 本文検証差分セクションの記録との差分で finding を分類し、工程間の比較ができる。対論型レビューの審議中 finding 状態の追跡と品質ゲート完了報告の修正証跡の所有境界を変更しない
-- **統合先基準（squash merge 先・同期基準）**: squash merge 先、統合先ブランチ同期の対象は当該 Case の統合先（通常Caseは既定 main、実証Caseは対象評価ブランチ）を参照する。統合先は Issue 本文の実証Case状態情報（対象評価ブランチ等の永続記録）から確定し、実証Case状態情報がない場合は通常Caseとして main を統合先とする。通常Case（評価を利用しない Standard / Epic Case）の squash merge 先は従来どおり main を基調とし、利用者向け操作と挙動を変更しない。QG-4 は Issue 完了条件の最終判定として意味を変更しない。統合先とブランチモデルの基盤契約は `agentdev-git-worktree` Design（extension 経由）を参照する
-- **実証最終クローズ**: 実証全体の最終 case-close は新しい評価を始めず、事前の評価契約と蓄積済み証拠（Issue 本文の評価契約、各 PR 本文の実行条件・測定結果・証拠・評価結果）から最終結果を導出する。導出した最終評価結果は Issue 最終コメントを正規記録として記録する。実証Caseの最終 case-close の完了報告では正式化経路として req-define <実証Issue> を利用者へ明示する（Standard では Standard Issue、Epic では Epic Issue を指定）。Epic 中間Wave（残 Wave が存在する Wave クローズ）では正式化案内を出さない。case-close は後続 req-define を自動実行しない
+- **統合先基準（squash merge 先・同期基準）**: squash merge 先、ブランチ同期の対象は main とする。QG-4 は Issue 完了条件の最終判定として意味を変更しない
 - **`--delete-branch` 使用禁止**: PR マージ時に `--delete-branch` オプションを使用しない（アクティブ worktree で local 削除が失敗するため）。ブランチ削除は独立 STEP で実施
 - **GitHub auto-close 回避**: commit message でコマンド名と Issue 番号を分離し、`#` 記号による近接参照を避ける
 

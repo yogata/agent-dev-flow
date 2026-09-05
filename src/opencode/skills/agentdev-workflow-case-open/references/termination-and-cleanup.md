@@ -23,7 +23,7 @@ Issue 作成後の共通終了処理（コメント追加、draft/RU 削除、�
 - Issue へのコメント追加完了（テンプレート準拠）
 - draft/RU 削除完了（Form Zero、即時 commit + push）
 - draft/RU 削除残存検証合格
-- 統合先同期確認合格（不一致検出時は停止）
+- main 同期確認合格（不一致検出時は停止）
 - 完了報告出力
 
 ## Procedure
@@ -43,9 +43,6 @@ Issue 作成後の共通終了処理（コメント追加、draft/RU 削除、�
 
 詳細、委譲接続点は `agentdev-req-file-manager` を参照。
 削除は並列実行安全ステージングプロシージャに従い `git rm <RU-path>` で明示パスをステージし、同一ステップ内で `git commit -- <RU-path>` により即時コミットする（Form Zero）。
-
-実証Case の RU/draft 削除は通常Caseと同一の手順で実行する。
-実証Issue 作成と VERIFY が成功した RU は評価ブランチ削除後に main 側で未処理 RU として再出現しない。
 ADF 制御状態の正規位置は main であり、RU 消費等のドメイン状態の変更は main 側で維持する。
 
 ### STEP-6-2-2: draft/RU 削除残存検証（共通終了処理）
@@ -56,9 +53,9 @@ STEP-6-2/6-2-1 の削除後、当該ファイルが作業ツリー、index に�
 - 残存を検出した場合: 即座に停止し残存ファイル一覧を報告
 - Standard flow と Epic flow の双方で実施
 
-### STEP-6-2-3: 統合先同期確認と draft/RU 削除 commit 後の即時 push
+### STEP-6-2-3: main 同期確認と draft/RU 削除 commit 後の即時 push
 
-RU ファイル削除後、統合先ブランチ（既定 main）の作業ディレクトリとリモートの同期を確認する。
+RU ファイル削除後、main の作業ディレクトリとリモートの同期を確認する。
 不一致を検出した場合は即時 push を行わず停止し、不一致の内容を報告する。
 
 同期を確認した後、STEP-6-2/6-2-1 の削除コミットに対し `git push` を即時実行する（case-run 引き継ぎ時の `git pull --ff-only` 失敗を防止するため）。
@@ -76,11 +73,11 @@ push 失敗時は構造化エラーメッセージを表示して停止する。
 
 ## Evidence
 
-- コメント追加の VERIFY 結果、削除 commit hash と push 結果、`git status --porcelain` による残存検証結果、統合先同期確認結果、完了報告出力
+- コメント追加の VERIFY 結果、削除 commit hash と push 結果、`git status --porcelain` による残存検証結果、main 同期確認結果、完了報告出力
 
 ## Completion Verification
 
-- draft/RU 削除残存検証が合格であること（作業ツリー、index に残存なし）。統合先同期確認が不合格であれば停止していること。削除 commit の即時 push が成功していること
+- draft/RU 削除残存検証が合格であること（作業ツリー、index に残存なし）。main 同期確認が不合格であれば停止していること。削除 commit の即時 push が成功していること
 
 ## Resume-Idempotency
 
@@ -91,7 +88,7 @@ push 失敗時は構造化エラーメッセージを表示して停止する。
 - コメント追加状態
 - draft/RU 削除状態（各パス、commit hash、push 成功）
 - 削除残存検証結果
-- 統合先同期確認結果
+- main 同期確認結果
 - 完了報告出力状態
 
 ## 関連 STEP

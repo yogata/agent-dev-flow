@@ -60,7 +60,7 @@ Level 2 コンフリクト文脈付きインライン case-run 再実行、Level
 ### Input Resolution
 
 1. SSoT 再構成: 各工程の完了結果、Epic Issue 本文ステータス追跡テーブル（読取のみ）、L1 工程別タイムスタンプ
-2. identifier 保持: Issue番号、PR番号、OU ID、評価ブランチ識別情報（実証Case時）
+2. identifier 保持: Issue番号、PR番号、OU ID
 3. 最小 scalar: 開始時刻・終了時刻・所要時間
 4. runtime artifact: なし
 
@@ -93,12 +93,6 @@ Epic Issue を伴う Wave 反復実行時は、完了・blocked・failed 子Issu
   - (4) OU ライフサイクル完了状態: Issue 作成・PR 作成・PR マージ・Issue クローズ の各完了/未完了
   - **warn を pass へ変換して集約しない**
   - **Phase 0 成功と OU 完了は別々に報告**
-- **実証Case自走の報告要素**（実証Caseの場合）:
-  - 評価結果（採用、不採用、判定不能、未確定を区別する。blocked / failed 等で実証が未完のまま終了する場合は評価結果を未確定として再開手段を示す）
-  - 実証Issue、主要PRまたは証拠
-  - main 未反映であること（評価ブランチへの squash merge を正常なCase完了として扱い、採用でも評価ブランチを main へ merge しない）
-  - 次の req-define <実証Issue>
-  - 正式化案内は実証全体の完了時のみ示す。Epic 実証の中間Wave完了を実証全体完了と誤認せず正式化案内を出さない。同一実行内で正式化・本実装へ自動継続しない
 
 #### OU処理ループ
 
@@ -108,11 +102,10 @@ Standard flow の case-close 完了後に未処理 OU が残存する場合は�
 
 - 完了報告出力（停止時フォーマットを含む）
 - L1 タイムスタンプ、4次元集約、OU処理ループ状態、tmp/ 残存確認結果
-- 実証Case自走の報告要素（実証Case時: 評価結果、実証Issue、主要PRまたは証拠、main 未反映、次の req-define <実証Issue>）
 
 ### Evidence
 
-- 完了報告出力（停止理由分類、タイムスタンプ内訳、stage 別結果、結果状態4次元、OU処理ループ状態、tmp/ 残存確認結果、実証Case自走の報告要素（実証Case時））
+- 完了報告出力（停止理由分類、タイムスタンプ内訳、stage 別結果、結果状態4次元、OU処理ループ状態、tmp/ 残存確認結果）
 
 ### Completion Verification
 

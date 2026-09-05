@@ -130,8 +130,7 @@ case-run の実行担当（委譲内サブエージェント）は、対象要�
 ## 共通制約
 
 - **スコープ**: 単一 Issue または単一 Wave のみを処理する。Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）は扱わない（workflow-contracts Design SC-{NNN}、extension 経由で解決）
-- **統合先基準（作業起点・PR base）**: worktree の作成元と PR の base は、当該 Case の統合先（通常Caseは既定 main、実証Caseは評価ブランチ）を参照する。rebase・同期基準、鮮度確認、Epic 後続 Wave の作業起点も同一の統合先を参照する。通常Case（評価を利用しない Standard / Epic Case）の利用者向け操作と挙動は従来どおり維持する（統合先とブランチモデルの基盤契約は `agentdev-git-worktree` Design 参照）
-- **実証Caseの実行と PR 記録要素**: 実証Caseの場合、評価ブランチを作業起点および PR base とし、必要な実証手段の準備、実行、測定、観察、証拠生成、評価を評価ブランチ上で行う（詳細は委譲契約の実証Case指示を参照）。コード作成が不要な実証も許容する。実証Caseの PR 本文には実際の実行条件、測定結果、観察結果、証拠、評価結果を記録する
+- **統合先基準（作業起点・PR base）**: worktree の作成元と PR の base は main を参照する。rebase・同期基準、鮮度確認、Epic 後続 Wave の作業起点も main を参照する
 - **実装実行の非所有**: case-run 本体は work plan 生成、実装、TDD、乖離検出、specs 更新、PR 本文作成、PR 作成を行わない（実行担当サブエージェント責務、adapter protocol 参照）
 - **SSoT**: blocked/failed の詳細本文 SSoT は Issue コメント。completed の SSoT は PR 本文。一時会話コンテキスト、中間ファイルは SSoT としない
 - **完了条件チェックボックス**: case-run、実行担当サブエージェントは完了条件チェックボックスを更新しない（case-close QG-4 の責務）

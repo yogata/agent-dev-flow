@@ -1,16 +1,16 @@
 # STEP-4: PR マージ・コンフリクト解消（pr-merge-and-conflict）
 
 > 本 reference は `agentdev-workflow-case-close` SKILL.md の制御平面（STEP 一覧）STEP-4 詳細である。
-> squash merge 先の統合先解決、PR squash マージ、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase パスを提供する。
+> squash merge 先（main）への PR squash マージ、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase パスを提供する。
 
 ## Purpose
 
-squash merge 先の統合先を解決し、PR を squash マージし、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase パスを処理する。
+PR を squash merge 先（main）へ squash マージし、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase パスを処理する。
 
 ## Input Resolution
 
-1. SSoT 再構成: PR の mergeable 状態、ローカル/remote の commit 状態、Issue 本文の実証Case状態情報（対象評価ブランチ等の永続記録）
-2. identifier 保持: PR番号、Issue番号、統合先ブランチ
+1. SSoT 再構成: PR の mergeable 状態、ローカル/remote の commit 状態
+2. identifier 保持: PR番号、Issue番号
 3. 最小 scalar: ポーリング試行回数（上限は gh-cli 手続き側が所有）
 4. runtime artifact: なし
 
@@ -27,14 +27,11 @@ squash merge 先の統合先を解決し、PR を squash マージし、mergeabl
 
 ## Procedure
 
-### STEP-4-1: squash merge 先の統合先解決
+### STEP-4-1: squash merge 先の確認
 
-squash merge 先は当該 Case の統合先とする。
+squash merge 先は main とする。
 
-- **統合先の確定**: Issue 本文の実証Case状態情報（対象評価ブランチ等の永続記録）から当該 Case の統合先を確定する。実証Case状態情報がある場合は実証Caseとして対象評価ブランチを、ない場合は通常Caseとして既定 main を統合先とする
-- **通常Caseの回帰維持**: 通常Case（評価を利用しない Standard / Epic Case）の squash merge 先は従来どおり main であり、利用者向け操作と挙動を変更しない
-- **実証Case**: 対象評価ブランチを squash merge 先とする。PR の base が当該統合先であることを前提とし、PR base と squash merge 先が一致しない場合は処理を進めず構造化エラーとして扱う
-- 統合先とブランチモデルの基盤契約（worktree 作成元、PR の base、rebase・同期基準、鮮度確認、squash merge 先、Epic 後続 Wave の作業起点が同一の統合先を参照すること）は `agentdev-git-worktree` Design（extension 経由）を参照する
+- **確認**: PR の base が main であることを前提とし、PR base と squash merge 先が一致しない場合は処理を進めず構造化エラーとして扱う
 
 ### STEP-4-2: squash merge 前の mergeable UNKNOWN ポーリング
 
@@ -49,7 +46,7 @@ squash merge 先は当該 Case の統合先とする。
 
 ### STEP-4-3: PR merge 実行
 
-STEP-4-1 で解決した当該 Case の統合先（PR の base）へ `agentdev_gh` の pr_merge 操作（squash 方式）を実行 → HEAD commit hash 記録（`agentdev-git-worktree` skill に従い）。
+STEP-4-1 で確認した squash merge 先（main）へ `agentdev_gh` の pr_merge 操作（squash 方式）を実行 → HEAD commit hash 記録（`agentdev-git-worktree` skill に従い）。
 
 **Squash merge 失敗時のリトライ**: 本書が所有する「squash merge リトライ手順」に従う（待機間隔5秒、最大試行回数は初期試行 + 5回リトライ、各試行のログ記録、全試行失敗時のフォールバックは template `.opencode/commands/agentdev/templates/case-close/standard.md` 参照）。
 
@@ -77,11 +74,11 @@ squash merge がコンフリクトで失敗した場合（STEP-4-3 のリトラ�
 
 ## Evidence
 
-- 統合先解決結果（通常Case main / 実証Case 対象評価ブランチの判定根拠）、mergeable 状態とポーリング記録、merge 結果と HEAD commit hash、対応記録コメントの VERIFY 結果、先行 commit 検出・処理結果、rebase 試行結果
+- squash merge 先（main）の確認結果、mergeable 状態とポーリング記録、merge 結果と HEAD commit hash、対応記録コメントの VERIFY 結果、先行 commit 検出・処理結果、rebase 試行結果
 
 ## Completion Verification
 
-- squash merge 先が当該 Case の統合先として解決済みであること。PR がマージ済みであり、HEAD commit hash が記録されていること。Level 1 rebase 失敗時はエスカレーション停止していること
+- squash merge 先（main）が確認済みであること。PR がマージ済みであり、HEAD commit hash が記録されていること。Level 1 rebase 失敗時はエスカレーション停止していること
 
 ## Resume-Idempotency
 
@@ -89,7 +86,7 @@ squash merge がコンフリクトで失敗した場合（STEP-4-3 のリトラ�
 
 ## resume point
 
-- 統合先解決状態（通常Case main / 実証Case 対象評価ブランチ）
+- squash merge 先確認状態（main）
 - mergeable 状態、ポーリング実行状態
 - PR merge 実行結果、HEAD commit hash
 - 先行 commit 検出・処理結果（STEP-4-4）
