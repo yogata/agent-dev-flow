@@ -9,13 +9,16 @@ parent_epic: "#2597 (REQ-048 再構築・測定・実験系)"
 ---
 
 <!-- ADF-COVERS(verification): REQ-048-006, REQ-048-013, REQ-048-016 -->
+
+> **2026-09-05 撤回注記**: 本 Report の作成時点で想定していた「実証Case・評価ブランチ」による実行手続きは、実証Case機構の全面撤回（Issue #2624、Epic）により廃止された。実験の実行・判定は今後「通常の技術検証」として実施する。過去の測定結果・判断・作成経緯は歴史的事実として本 Report に残す。
+
 # REQ-048 再構築 削減候補ランキング（OU-008 / WP-08 Phase B）
 
 ## 本 Report の位置づけ
 
 本 Report は、REQ-048 再構築・測定・実験系 Epic（#2597）の Wave 2（OU-008 / WP-08）で作成した削減候補ランキングの記録である。入力は Baseline V2 測定（`docs/reports/req-048-baseline-v2-measurement.md`）、correlation field derivability 監査（`docs/reports/req-048-correlation-derivability-audit.md`）、Baseline V2 定義基盤（`docs/reports/req-048-baseline-v2-definition.md`）、REQ-048、DEC-027 である。
 
-ランキングの性質を先に限定する。本ランキングは後続実験 G1〜G4（OU-009〜012、Issue #2606〜#2609）の実験対象選定と優先順位の入力である。KEEP、NARROW、MERGE、DOWNGRADE、DELETE の最終判断は、実験実行後の Decision（後続の個別実証Case）が所有する。本 Report に記録するのは候補の評価と判断候補であり、判断の確定ではない。削除そのものを成功条件としない（DEC-027 決定2、REQ-048-013）。
+ランキングの性質を先に限定する。本ランキングは後続実験 G1〜G4（OU-009〜012、Issue #2606〜#2609）の実験対象選定と優先順位の入力である。KEEP、NARROW、MERGE、DOWNGRADE、DELETE の最終判断は、実験実行後の Decision（後続の個別の技術検証）が所有する。本 Report に記録するのは候補の評価と判断候補であり、判断の確定ではない。削除そのものを成功条件としない（DEC-027 決定2、REQ-048-013）。
 
 本 Report は既存成果物種別（Report）への保存であり、新規成果物種別、実行履歴 DB、恒久 checker、公開入口を新設しない（REQ-048-016、DEC-027 決定6）。既存の REQ、Decision、Design、Report の実測値と定義は変更していない。
 

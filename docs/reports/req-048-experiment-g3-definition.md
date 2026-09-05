@@ -8,6 +8,9 @@ parent_epic: "#2597 (REQ-048 再構築・測定・実験系)"
 ---
 
 <!-- ADF-COVERS(verification): REQ-048-007, REQ-048-012, REQ-048-016 -->
+
+> **2026-09-05 撤回注記**: 本 Report の作成時点で想定していた「実証Case・評価ブランチ」による実行手続きは、実証Case機構の全面撤回（Issue #2624、Epic）により廃止された。実験の実行・判定は今後「通常の技術検証」として実施する。過去の測定結果・判断・作成経緯は歴史的事実として本 Report に残す。
+
 # REQ-048 実験G3定義（source / projection 再参照の縮小・OU-011 / WP-09-3 Phase B）
 
 ## 本 Report の位置づけ
@@ -16,7 +19,7 @@ parent_epic: "#2597 (REQ-048 再構築・測定・実験系)"
 
 実験 G3 の定義対象は、解決済み reference choice の再判断削減である。source を常に確認する、projection を常に確認するといった参照先の固定化（固定ルール化）は定義対象に含めない。この区別は workflow-contracts Design「source / projection 参照確認の工程契約」が定める「常に source のみ」「常に projection のみ」のような固定ルールとしない契約に従うものであり、「実験対象と定義対象の契約」節に記す。
 
-本 Report は既存成果物種別（Report）への保存であり、測定専用の新しい成果物種別、実行履歴 DB、恒久 checker、公開入口を追加しない（REQ-048-016、DEC-027 決定6）。本 Report が所有するのは実験の定義であり、実験の実行・判定は後続の個別実証（実証Case候補）へ分離する。分離の契約は「実験の実行・判定の分離（後続実証Case）」節に記す。
+本 Report は既存成果物種別（Report）への保存であり、測定専用の新しい成果物種別、実行履歴 DB、恒久 checker、公開入口を追加しない（REQ-048-016、DEC-027 決定6）。本 Report が所有するのは実験の定義であり、実験の実行・判定は後続の個別の技術検証へ分離する。分離の契約は「実験の実行・判定の分離（後続の技術検証）」節に記す。
 
 入力は、削減候補ランキング（`docs/reports/req-048-candidate-ranking.md`）、Baseline V2 測定（`docs/reports/req-048-baseline-v2-measurement.md`）、Baseline V2 定義基盤（`docs/reports/req-048-baseline-v2-definition.md`）、REQ-048、DEC-027、および workflow-contracts Design「source / projection 参照確認の工程契約」の現行ベースラインである。
 
@@ -63,9 +66,9 @@ parent_epic: "#2597 (REQ-048 再構築・測定・実験系)"
 
 Baseline 要素は Baseline V2 で充足する。Baseline V2 とは「本要件再構築時点の GitHub 最新 ADF control plane」であり、その定義は Baseline V2 定義基盤 Report §1 が正である（`docs/reports/req-048-baseline-v2-definition.md`）。
 
-### Baseline の取得手順（実証Case 実行時）
+### Baseline の取得手順（技術検証 実行時）
 
-Baseline 測定は、後続実証Caseが実験実行時に取得する。取得手順は Baseline V2 定義基盤 Report §2 の baseline commit SHA 固定手順（4ステップ）に従う。
+Baseline 測定は、実験を技術検証として実行する際に取得する。取得手順は Baseline V2 定義基盤 Report §2 の baseline commit SHA 固定手順（4ステップ）に従う。
 
 1. 測定実行時に `git fetch origin main` を実行し、`git rev-parse origin/main` で GitHub 最新 default branch SHA を取得する
 2. 取得した SHA が structurally normalized commit（`a0b5ac82c776a714c133c8245fce90c99dd1a836`）の子孫であることを `git merge-base --is-ancestor <structurally-normalized-SHA> origin/main` で確認する。子孫でない場合、測定を開始せず、その判断を測定 Report に記録する
@@ -76,14 +79,14 @@ Baseline 測定は、後続実証Caseが実験実行時に取得する。取得�
 
 ### 測定整備の前提
 
-ランキング §5 が G3 の実行の前提として記録したとおり、Baseline V2 測定 §6 の harness テレメトリ読取手順の整備が測定の前提であり、整備前に実行数値は得られない。実証Caseは実験実行前に、Baseline V2 測定 §6 の整備項目のうち次の2項を整備する。整備は REQ-048-003 のとおり harness 側の既存生実行履歴を読み取り専用で分析時に読む方向で行い、ADF 側の新規必須 field、永続 state、公開入口を追加しない。
+ランキング §5 が G3 の実行の前提として記録したとおり、Baseline V2 測定 §6 の harness テレメトリ読取手順の整備が測定の前提であり、整備前に実行数値は得られない。技術検証は実験実行前に、Baseline V2 測定 §6 の整備項目のうち次の2項を整備する。整備は REQ-048-003 のとおり harness 側の既存生実行履歴を読み取り専用で分析時に読む方向で行い、ADF 側の新規必須 field、永続 state、公開入口を追加しない。
 
 - harness 側の message、part、tool call、token 生成元情報を、実行単位とともに読み取り専用で取得できる手順（wall-clock、同一 path 再読込、source / projection 重複参照の測定に必要）
 - 委譲実行時の harness session 識別子を取得できる手段（子実行間の同一 path 再読込の対応付けに必要）
 
 ### 比較の起点と参照値
 
-本 Report は測定値を作成しない。実験の比較起点は、実証Case が上記手順で固定記録する baseline SHA と、その時点の測定結果である。参照値として、Baseline V2 測定がすでに記録した構造観測値のうち G3 の比較対象に使える値は存在しない。同一 path 再読込、子実行間の同一 path 再読込、source / projection 重複参照は Baseline V2 測定 §6 が observability gap として記録した未測定指標であり、本実験はこの gap の解消後に初めて比較可能になる。この未測定であること自体を、G3 の baseline 状態として記録する。
+本 Report は測定値を作成しない。実験の比較起点は、技術検証が上記手順で固定記録する baseline SHA と、その時点の測定結果である。参照値として、Baseline V2 測定がすでに記録した構造観測値のうち G3 の比較対象に使える値は存在しない。同一 path 再読込、子実行間の同一 path 再読込、source / projection 重複参照は Baseline V2 測定 §6 が observability gap として記録した未測定指標であり、本実験はこの gap の解消後に初めて比較可能になる。この未測定であること自体を、G3 の baseline 状態として記録する。
 
 比較可能性の条件は Baseline V2 定義基盤 Report §4 に従う。Baseline V2 と同一の指標定義、同一の実行単位定義で算出した結果とのみ比較し、Legacy Baseline（`docs/reports/req-048-reanalysis-baseline.md`）との直接比較は行わない。
 
@@ -144,7 +147,7 @@ GR-1 から GR-4 のいずれかが不成立となった実験結果は、仮説
 
 ## Observation
 
-測定対象は Baseline V2 測定 Report §2 の手順に従い、測定整備の前提節に記した整備完了後に取得する。測定の実施は後続実証Caseが実験実行時に行う。
+測定対象は Baseline V2 測定 Report §2 の手順に従い、測定整備の前提節に記した整備完了後に取得する。測定の実施は、実験を技術検証として実行する際に行う。
 
 | 観測対象 | 指標 | 取得方法 |
 |---|---|---|
@@ -181,15 +184,15 @@ G3 における判断の方向性を次に記す。これは実行前の判断�
 - DOWNGRADE: 解決済み choice の記録が、常時ではなく特定の工程・委譲条件でのみ価値を持つことが実データで示された場合に評価する可能性の判断候補。機構の常時適用を条件付きへ緩める方向であり、DEC-027 決定5 のとおり実装方式の簡素化としてのみ評価する
 - MERGE、DELETE: 原則採用しない。DELETE（source / projection 参照確認自体の廃止）は workflow-contracts Design の工程契約と責務境界の変更に相当し、ランキング §8 が DEC-002 の分離契約そのものを対象外と記録済みである
 
-## 実験の実行・判定の分離（後続実証Case）
+## 実験の実行・判定の分離（後続の技術検証）
 
 本 Report は実験の定義のみを所有する。実験の実行・判定は本実行単位（#2608）の完了条件に含まれない。
 
-- 実験の実行・判定（KEEP / NARROW / MERGE / DOWNGRADE / DELETE の確定）は、Epic #2597 のとおり後続の個別実証（実証Case候補、AG-002・CR-001）として分離する
-- 実行時に、評価ブランチと評価契約を当該実証Caseの Issue で確定する（REQ-043、DEC-018）。本 Report は評価ブランチ・評価契約を先に確定しない
+- 実験の実行・判定（KEEP / NARROW / MERGE / DOWNGRADE / DELETE の確定）は、Epic #2597 のとおり後続の個別の技術検証として分離する（作成時点では実証Case候補と位置づけていた。AG-002・CR-001）
+- 実行時に、測定条件・手順を当該検証の作業記録で確定する。技術検証では必要に応じて一時的な branch・worktree を使用できる（ADF Case 外の通常活動であり、ADF は専用の評価状態・評価契約を所有しない）
 - G1〜G4 は同一 baseline へ複数の主要変更を混在させないため直列実行する（AG-003）。本実行単位は G3 定義のみを担当する
-- 測定整備（harness テレメトリ読取手順、session 識別子取得手段）の整備は、実証Caseが実験実行の前置きとして実施する。この整備自体は本実験の主要構造変更に含めない
-- 実証Case は、本 Report の Baseline 節の手順で baseline を固定記録し、測定整備を完了した上で Observation 節の指標を測定し、Guardrail 節の不変条件を確認した上で、Decision 記録形式で判断を記録する
+- 測定整備（harness テレメトリ読取手順、session 識別子取得手段）の整備は、技術検証が実験実行の前置きとして実施する。この整備自体は本実験の主要構造変更に含めない
+- 技術検証は、本 Report の Baseline 節の手順で baseline を固定記録し、測定整備を完了した上で Observation 節の指標を測定し、Guardrail 節の不変条件を確認した上で、Decision 記録形式で判断を記録する
 
 ## 検証対応
 
@@ -210,7 +213,7 @@ Issue #2608 テスト戦略 TS-012D に従い、本 Report の読み戻しで次
 | REQ-048-012 の6要素（Baseline、Hypothesis、単一の主要構造変更、Guardrail、Observation、Decision）が識別可能である | 合格 | 各要素に対応する見出し節が1つずつ存在する。`## Baseline`、`## Hypothesis`、`## 主要構造変更`、`## Guardrail`、`## Observation`、`## Decision 記録形式` |
 | 定義対象が解決済み reference choice の再判断削減であり、固定化（source / projection の固定ルール化）ではない | 合格 | 本 Report の位置づけと実験対象と定義対象の契約（固定化との区別）節が、定義対象と対象外の区別を表で固定。混在させない変更で固定ルール化を除外 |
 | Guardrail が source / projection 責務境界を変更しない定義である | 合格 | Guardrail 節の GR-1 が責務境界の非変更を不変条件として定め、責務境界自体の変更を正規の設計判断として対象外に位置づけ、不成立時の判断方向（KEEP）を明示 |
-| 実行・判定が後続実証Caseに分離されている | 合格 | 実験の実行・判定の分離節が、本実行単位の完了条件に含まれないことを明示。評価ブランチ・評価契約（REQ-043、DEC-018）の実行時確定と測定整備の前置き実施を記録 |
+| 実行・判定が後続の技術検証に分離されている | 合格 | 実験の実行・判定の分離節が、本実行単位の完了条件に含まれないことを明示。実行時の測定条件・手順確定と測定整備の前置き実施を記録 |
 
 ### docs 変更整合性検証
 

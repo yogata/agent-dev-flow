@@ -8,13 +8,16 @@ parent_epic: "#2597 (REQ-048 再構築・測定・実験系)"
 ---
 
 <!-- ADF-COVERS(verification): REQ-048-008, REQ-048-012, REQ-048-014, REQ-048-016 -->
+
+> **2026-09-05 撤回注記**: 本 Report の作成時点で想定していた「実証Case・評価ブランチ」による実行手続きは、実証Case機構の全面撤回（Issue #2624、Epic）により廃止された。実験の実行・判定は今後「通常の技術検証」として実施する。過去の測定結果・判断・作成経緯は歴史的事実として本 Report に残す。
+
 # REQ-048 実験G4定義（Review / Verification の条件付き化・OU-012 / WP-09-4 Phase B）
 
 ## 本 Report の位置づけ
 
 本 Report は、REQ-048 再構築・測定・実験系 Epic（#2597）の Wave 6（OU-012 / WP-09-4）で作成した実験 G4（Review / Verification の条件付き化）の実行可能な実験定義である。REQ-048-012 の実験契約が要求する6要素（Baseline、Hypothesis、単一の主要構造変更、Guardrail、Observation、Decision）を、各節で識別可能な形に保存する。
 
-本 Report は既存成果物種別（Report）への保存であり、測定専用の新しい成果物種別、実行履歴 DB、恒久 checker、公開入口を追加しない（REQ-048-016、DEC-027 決定6）。本 Report が所有するのは実験の定義であり、実験の実行・判定は後続の個別実証（実証Case候補）へ分離する。分離の契約は「実験の実行・判定の分離（後続実証Case）」節に記す。
+本 Report は既存成果物種別（Report）への保存であり、測定専用の新しい成果物種別、実行履歴 DB、恒久 checker、公開入口を追加しない（REQ-048-016、DEC-027 決定6）。本 Report が所有するのは実験の定義であり、実験の実行・判定は後続の個別の技術検証へ分離する。分離の契約は「実験の実行・判定の分離（後続の技術検証）」節に記す。
 
 実験 G4 の対象は、削減候補ランキング C4 の Review / Verification 実行条件である。review 回数、verification 回数は REQ-048-014 のとおり要件の成立条件として固定せず、hard governance 不変条件と quality gate 必須統制を維持した上で、trigger ベースの条件付き化を実験対象とする。
 
@@ -35,7 +38,7 @@ Baseline V2 測定の現状では、C4 の発動回数は系統記録されて�
 
 ## trigger の定義根拠
 
-G4 の trigger は、単一の固定回数や固定閾値ではなく、次の3ソースを組み合わせて定義する。具体的な閾値と条件式は、本 Report では先に固定せず、後続実証Caseが実測データと既存状態を確認して定める。
+G4 の trigger は、単一の固定回数や固定閾値ではなく、次の3ソースを組み合わせて定義する。具体的な閾値と条件式は、本 Report では先に固定せず、後続の技術検証が実測データと既存状態を確認して定める。
 
 ### 実測データ（Baseline V2）
 
@@ -64,9 +67,9 @@ G4 の単一の主要構造変更として、review / verification 実行の条�
 
 Baseline 要素は Baseline V2 で充足する。Baseline V2 とは「本要件再構築時点の GitHub 最新 ADF control plane」であり、その定義は Baseline V2 定義基盤 Report §1 が正である（`docs/reports/req-048-baseline-v2-definition.md`）。
 
-### Baseline の取得手順（実証Case 実行時）
+### Baseline の取得手順（技術検証 実行時）
 
-Baseline 測定は、後続実証Caseが実験実行時に取得する。取得手順は Baseline V2 定義基盤 Report §2 の baseline commit SHA 固定手順（4ステップ）に従う。
+Baseline 測定は、実験を技術検証として実行する際に取得する。取得手順は Baseline V2 定義基盤 Report §2 の baseline commit SHA 固定手順（4ステップ）に従う。
 
 1. 測定実行時に `git fetch origin main` を実行し、`git rev-parse origin/main` で GitHub 最新 default branch SHA を取得する
 2. 取得した SHA が structurally normalized commit（`a0b5ac82c776a714c133c8245fce90c99dd1a836`）の子孫であることを `git merge-base --is-ancestor <structurally-normalized-SHA> origin/main` で確認する。子孫でない場合、測定を開始せず、その判断を測定 Report に記録する
@@ -77,7 +80,7 @@ Baseline 測定は、後続実証Caseが実験実行時に取得する。取得�
 
 ### 比較の起点と参照値
 
-本 Report は測定値を作成しない。実験の比較起点は、実証Caseが上記手順で固定記録する baseline SHA と、その時点の測定結果である。参照値として、C4 は発動回数の系統記録がなく、PR 本文の検証記録から部分観測可能だが未集計である。Review / Verification の Cost、Benefit、工程別 wall-clock と token は未測定であり、Baseline V2 測定 §6 の observability gap として扱う。6 execution units はサンプル不足であり、未測定軸を推定値で補わない。
+本 Report は測定値を作成しない。実験の比較起点は、技術検証が上記手順で固定記録する baseline SHA と、その時点の測定結果である。参照値として、C4 は発動回数の系統記録がなく、PR 本文の検証記録から部分観測可能だが未集計である。Review / Verification の Cost、Benefit、工程別 wall-clock と token は未測定であり、Baseline V2 測定 §6 の observability gap として扱う。6 execution units はサンプル不足であり、未測定軸を推定値で補わない。
 
 比較可能性の条件は Baseline V2 定義基盤 Report §4 に従う。Baseline V2 と同一の指標定義、同一の実行単位定義で算出した結果とのみ比較し、Legacy Baseline（`docs/reports/req-048-reanalysis-baseline.md`）との直接比較は行わない。
 
@@ -135,7 +138,7 @@ GR-1 から GR-5 のいずれかが不成立となった実験結果は、仮説
 
 ## Observation
 
-測定対象は Baseline V2 測定 Report §2 の手順に従う。測定の実施は後続実証Caseが実験実行時に行う。
+測定対象は Baseline V2 測定 Report §2 の手順に従う。測定の実施は、実験を技術検証として実行する際に行う。
 
 | 観測対象 | 指標 | 取得方法 |
 |---|---|---|
@@ -173,15 +176,15 @@ G4 における判断の方向性を次に記す。これは実行前の判断�
 - KEEP: Guardrail の不成立、incremental value 比較可能性の損失、または Tax 減少の未確認の場合の判断候補。現行の常時実行が要求を満たす形であることを実データが示す
 - MERGE、DELETE: 原則採用しない。DELETE は review / verification 自体の廃止にあたり、hard governance 不変条件または QG 必須統制を失うため、条件付き化の判断候補にはしない
 
-## 実験の実行・判定の分離（後続実証Case）
+## 実験の実行・判定の分離（後続の技術検証）
 
 本 Report は実験の定義のみを所有する。実験の実行・判定は本実行単位（#2609）の完了条件に含まれない。
 
-- 実験の実行・判定（KEEP / NARROW / MERGE / DOWNGRADE / DELETE の確定）は、Epic #2597 のとおり後続の個別実証（実証Case候補、AG-002・CR-001）として分離する
-- 実行時に、評価ブランチと評価契約を当該実証Caseの Issue で確定する（REQ-043、DEC-018）。本 Report は評価ブランチ・評価契約を先に確定しない
+- 実験の実行・判定（KEEP / NARROW / MERGE / DOWNGRADE / DELETE の確定）は、Epic #2597 のとおり後続の個別の技術検証として分離する（作成時点では実証Case候補と位置づけていた。AG-002・CR-001）
+- 実行時に、測定条件・手順を当該検証の作業記録で確定する。技術検証では必要に応じて一時的な branch・worktree を使用できる（ADF Case 外の通常活動であり、ADF は専用の評価状態・評価契約を所有しない）
 - G1〜G4 は同一 baseline へ複数の主要変更を混在させないため直列実行する（AG-003）。本実行単位は G4 定義のみを担当する
-- 実証Case は、本 Report の Baseline 節の手順で baseline を固定記録し、trigger の3ソースを確認して Observation 節の指標を測定し、Guardrail 節の不変条件を確認した上で、Decision 記録形式で判断を記録する
-- 実測データ、risk、finding / modification state に基づく trigger の具体的な閾値と条件式は、REQ-043、DEC-018 に従い実行時に確定する
+- 技術検証は、本 Report の Baseline 節の手順で baseline を固定記録し、trigger の3ソースを確認して Observation 節の指標を測定し、Guardrail 節の不変条件を確認した上で、Decision 記録形式で判断を記録する
+- 実測データ、risk、finding / modification state に基づく trigger の具体的な閾値と条件式は、実行時に当該検証の作業記録で確定する
 
 ## 検証対応
 
@@ -203,7 +206,7 @@ Issue #2609 テスト戦略 TS-012E に従い、本 Report の読み戻しで次
 | REQ-048-012 の6要素（Baseline、Hypothesis、単一の主要構造変更、Guardrail、Observation、Decision）が識別可能である | 合格 | `## Baseline`、`## Hypothesis`、`## 主要構造変更`、`## Guardrail`、`## Observation`、`## Decision 記録形式` が存在する |
 | trigger の定義根拠（実測データ、既存 risk、finding / modification state）が明示されている | 合格 | 「trigger の定義根拠」節に3ソースを独立して記載し、Baseline V2、REQ-054 / DEC-024、REQ-048-008 / REQ-003-042 を参照している |
 | Guardrail が hard governance 不変条件と QG 必須統制の維持を定義している | 合格 | GR-1 が DEC-001 決定3の8点を条件付き化対象外として維持し、GR-2 が QG-1〜QG-4 を対象外として維持する。GR-5 は N/A 非停止を定義する |
-| 実行・判定が後続実証Caseに分離されている | 合格 | 「実験の実行・判定の分離（後続実証Case）」節が本 Issue の完了条件外、REQ-043 / DEC-018 実行時確定、G1〜G4 直列実行を明示している |
+| 実行・判定が後続の技術検証に分離されている | 合格 | 「実験の実行・判定の分離（後続の技術検証）」節が本 Issue の完了条件外、実行時の測定条件・手順確定、G1〜G4 直列実行を明示している |
 
 ### docs 変更整合性検証
 

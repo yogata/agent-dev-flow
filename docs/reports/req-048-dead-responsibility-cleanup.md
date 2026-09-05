@@ -9,6 +9,9 @@ parent_epic: "#2597"
 ---
 
 <!-- ADF-COVERS(verification): REQ-048-013, REQ-048-016 -->
+
+> **2026-09-05 撤回注記**: 本 Report の作成時点で想定していた「実証Case・評価ブランチ」による実行手続きは、実証Case機構の全面撤回（Issue #2624、Epic）により廃止された。実験の実行・判定は今後「通常の技術検証」として実施する。過去の測定結果・判断・作成経緯は歴史的事実として本 Report に残す。
+
 # REQ-048 再構築 Dead Responsibility Cleanup 記録（OU-013 / WP-10）
 
 ## 本 Report の位置づけ
@@ -41,7 +44,7 @@ KEEP 判定3点（`adf_delegation`、`adf_delegation_id`、`adf_harness_ref`）�
 
 | 対象外 | 根拠 |
 |---|---|
-| 実験 G1〜G4 の empirical 判定（C1 検証差分、C2 structured handoff、C3 source / projection 再参照、C4 Review / Verification 実行条件） | 実験の実行・判定は後続実証Case候補へ分離済みで未実行であり、実行時点で empirical 判定は存在しない（Issue #2610 scope-affecting impact candidate、Epic #2597 scope-affecting impact candidate） |
+| 実験 G1〜G4 の empirical 判定（C1 検証差分、C2 structured handoff、C3 source / projection 再参照、C4 Review / Verification 実行条件） | 実験の実行・判定は後続の個別の技術検証へ分離済みで未実行であり、実行時点で empirical 判定は存在しない（Issue #2610 scope-affecting impact candidate、Epic #2597 scope-affecting impact candidate） |
 | R-S1 Epic 状態件数サマリ、R-S2 `adf_execution_unit` の flow 判別部分、R-S3 `adf_case` の Standard flow 自己参照部分 | 削減候補ランキング §4.2 の「残存する導出可能候補」であり「候補」であって確定 DELETE 判定ではない。R-S2、R-S3 は Wave 5 で縮小実施済みの残置部分で、残置理由（直接 join と flow 判別の便益）が同 Report に記録済み |
 | DEC-001 決定3 hard governance 8点 | hard governance（工程停止を要求する機械的強制）は DEC-001 決定3 で8点に限定されており、縮小評価の対象外として維持する |
 | KEEP 判定 field（`adf_delegation`、`adf_delegation_id`、`adf_harness_ref`） | derivability 監査 §6 で KEEP 判定。再委譲 sequence を含む委譲相関と任意付加情報として現行 baseline の構成要素 |
