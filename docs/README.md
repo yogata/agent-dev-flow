@@ -9,7 +9,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 現行 REQ: 49件、廃止済み: 9件
 <!-- AUTOGEN:END -->
 
-現行要件は49件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
+現行要件は47件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
 各 REQ の詳細は各 REQ ファイル本文を参照。
 
 | REQ | タイトル |
@@ -46,8 +46,6 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [REQ-038](requirements/REQ-038.md) | 学習パイプライン（learning） |
 | [REQ-039](requirements/REQ-039.md) | バックログ統合（backlog-review） |
 | [REQ-041](requirements/REQ-041.md) | backlog 一括整理コマンド（backlog-auto）実行契約 |
-| [REQ-042](requirements/REQ-042.md) | Case統合先とブランチモデル |
-| [REQ-043](requirements/REQ-043.md) | 評価ブランチ実証ワークフロー |
 | [REQ-044](requirements/REQ-044.md) | 標準API委譲の状態制約 |
 | [REQ-045](requirements/REQ-045.md) | 現行成果物体系の整合性網羅監査 |
 | [REQ-046](requirements/REQ-046.md) | 横断正規化後の不変条件 |
@@ -68,7 +66,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-027 の27件である（DEC-018〜DEC-022、DEC-024〜DEC-027 は proposed、DEC-005、DEC-007 は superseded）。
+現行 Decision は DEC-001 から DEC-027 の26件である（DEC-019〜DEC-022、DEC-024〜DEC-027 は proposed、DEC-005、DEC-007 は superseded）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
@@ -90,7 +88,6 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [DEC-015](decisions/DEC-015.md) | ADF決定論的実行中核と実行基盤実行機構の責務分界 |
 | [DEC-016](decisions/DEC-016.md) | 導入系スクリプトの副作用ゼロ原則 |
 | [DEC-017](decisions/DEC-017.md) | 最小トレーサビリティモデルの採用と Artifact Graph の廃止 |
-| [DEC-018](decisions/DEC-018.md) | 評価ブランチモデルとCase統合先の一般化（proposed） |
 | [DEC-019](decisions/DEC-019.md) | 一般処理の標準API委譲とADF固有意味論の所有境界（proposed） |
 | [DEC-020](decisions/DEC-020.md) | GitHub Issue 共通管理単位の採用（proposed） |
 | [DEC-021](decisions/DEC-021.md) | scripts 公開入口の2本固定と安定契約（proposed） |
