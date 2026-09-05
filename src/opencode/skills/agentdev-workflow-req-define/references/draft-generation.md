@@ -35,14 +35,13 @@
 原本は構造化された `# draft-data` fenced YAML block である。
 STEP-5 の Decision禁止ゲート・STEP-4 の文書分類妥当性検証で分離した Design 候補は `artifact_actions`（`artifact: design`）として統合し、`## Design候補` 補助セクションは出力しない。
 保存対象は単一の `artifact_actions` 配列に統合する。
-実証Caseの場合、draft-data に実証Caseであること、評価契約、評価ブランチ識別情報を出力する。下流コマンドは Issue 等の永続情報または draft-data の当該情報から実証Caseを認識する。
 
 各副ステップ（定義完全性ゲート QG-1、operation_units 生成、depends_on/recommended_order 定義、artifact_actions 生成、target_area/content 形式、Design action 分類根拠出力、test_strategy 生成、review_dispositions 生成）の詳細、フィールドスキーマ、委譲接続点は `agentdev-req-analysis` の req-define detailed gates、および req-define command Design（extension 経由）の各フィールドスキーマを参照。
 `target_design`、`canonical_owner`、`on_failure`、`review_dispositions` の出力形式も同 Design を正とする。
 
 ### Result
 
-- 構造化 `draft-data`（`work_type`, `scale`, `summary`, `auto_gate`, `agreed_items`, `artifact_actions`, `conflict_resolutions`, `operation_units`, `test_strategy`, `review_dispositions`, `case_open_hints`。実証Case時は実証Caseであること、評価契約、評価ブランチ識別情報を含む）
+- 構造化 `draft-data`（`work_type`, `scale`, `summary`, `auto_gate`, `agreed_items`, `artifact_actions`, `conflict_resolutions`, `operation_units`, `test_strategy`, `review_dispositions`, `case_open_hints`）
 
 ### Evidence
 
@@ -50,7 +49,7 @@ STEP-5 の Decision禁止ゲート・STEP-4 の文書分類妥当性検証で分
 
 ### Completion Verification
 
-- 必須 fields が揃い、`execution_groups` を含まないこと。Design 候補が `artifact_actions` へ統合済みであること。実証Case時は実証Caseであること、評価契約、評価ブランチ識別情報が出力済みであること
+- 必須 fields が揃い、`execution_groups` を含まないこと。Design 候補が `artifact_actions` へ統合済みであること
 
 ### Resume-Idempotency
 
@@ -116,8 +115,6 @@ work_type（4値）と scale（feature のみ）を確定する。
 全 work_type（feature/bugfix/maintenance/docs_chore）で `.agentdev/drafts/req-draft-{topic-slug}.md` に保存する。
 STEP-6 の構造化 `draft-data` 形式（`# draft-data` fenced YAML block）で保存する。
 標準データモデル fields を保持する。
-実証Caseの場合、最初の保存処理より前に当該実証専用の評価ブランチと必要な worktree が準備されていることを前提とする。準備の実行主体・手順は req-define command Design（extension 経由）が所有し、本 workflow は Git 操作を実行しない。
-生成した draft は内容欠落なく評価環境へ引き継ぎ、req-save / design-save を評価ブランチ上で継続実行できる。
 `workflow_route` は派生値として保存しない。
 後続工程の分岐は `artifact_actions` の存在で決定する（`artifact: req`/`adr` → req-save、`artifact: design` → design-save）。
 `summary` 等の人間可読セクションは補助的であり下流処理の正として扱われない。

@@ -56,10 +56,6 @@ Issue/PR をスキップする直接完了経路は存在しない。
 各コマンドの正式名は `/agentdev/<name>` である（例: `/agentdev/req-define`）。
 一覧は command README 参照。
 
-経路一覧の適用前提は通常Case（実証を利用しない Case）である。
-実証Caseは work_type にかかわらず scale と Issue 構造を選択できる。
-実証の判定は評価ブランチ実証ワークフローの定義による（詳細は「スケール判定基準」の実証Case例外参照）。
-
 feature が経由する req-save と design-save は req_draft の `artifact_actions` により動的判定する。
 該当 entry がない場合は case-open から開始する。
 feature large の OU/ 子Issue 構成は `agentdev-workflow-orchestration` 参照。
@@ -80,7 +76,7 @@ docs 更新責務は全 work_type 共通である。
 
 ## スケール判定基準
 
-通常Case（実証を利用しない Case）の feature スケール（standard/ large）判定基準である。
+feature スケール（standard/ large）判定基準である。
 req-define Step 8 が参照する。
 
 ### standard
@@ -97,12 +93,6 @@ req-define Step 8 が参照する。
  - 影響ファイル数が10ファイル超
  - 個別変更件数が30件超
  - シグナル対象: 修正候補リスト、検出事項カタログ、影響ファイル一覧等の実装詳細セクション
-
-### 実証Case例外
-
-- 通常Caseの scale は feature のみ standard / large とする
-- 実証Caseは work_type にかかわらず scale と Issue 構造を選択できる。実証の判定は評価ブランチ実証ワークフローの定義による
-- work_type・scale 判定の宣言的定義は通常Caseの判定規則として維持し、実証Case例外は当該宣言的定義に対する例外適用として扱う。実証を利用しない Case のスケール判定・工程分類の挙動は従来どおり維持する
 
 ## See Also
 

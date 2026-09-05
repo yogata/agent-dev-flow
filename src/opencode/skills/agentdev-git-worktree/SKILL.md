@@ -25,25 +25,20 @@ GitHub Issue 番号に基づいて、安全かつ一貫性のある方法で git
 
 work_type判定は `agentdev-workflow-lifecycle` を参照。
 
-## 統合先基準の worktree 操作
+## main 基準の worktree 操作
 
-worktree の作成元は当該 Case の統合先（通常Caseは既定 main、実証Caseは対象評価ブランチ）を参照する。
-worktree の作成元、PR の base、rebase・同期基準、鮮度確認、squash merge 先、Epic 後続 Wave の作業起点は同一の統合先を参照する。
-通常Case（評価を利用しない Standard / Epic Case）の worktree 作成元は従来どおり main（既定）を維持する。
-統合先の解決と評価ブランチの作成・削除の手順は `references/worktree-operations.md` 参照。
+worktree の作成元は main を参照する。
+worktree の作成元、PR の base、rebase・同期基準、鮮度確認、squash merge 先、Epic 後続 Wave の作業起点は main を参照する。
 
-- **評価ブランチの再利用手順**: 評価ブランチの作成・削除には既存の Git/worktree 能力を再利用し、評価ブランチ専用の公開 Git コマンド体系は追加しない。評価ブランチは正規成果物ではなく一時的・非正規の成果物として扱う
-- **評価ブランチの命名**: 本スキルは評価ブランチの命名形式を固定しない。命名規則は実装設計で決定した形式に従う
+## main の鮮度確認
 
-## 統合先の鮮度確認
-
-並列 Wave 実行時、PR merge 後再開時は、worktree 作成前に `git fetch origin` を実行し統合先の鮮度を確認する。
+並列 Wave 実行時、PR merge 後再開時は、worktree 作成前に `git fetch origin` を実行し main の鮮度を確認する。
 これは古い commit 基準の worktree による DIRTY/CONFLICTING を防止するためである。
-確認対象は当該 Case の統合先（通常Caseは `origin/main`、実証Caseは対象評価ブランチの remote ref）であり、worktree 作成元と同一の統合先を参照する。
+確認対象は `origin/main` である。
 
-- **Wave 2 以降**: Wave 1 の PR merge 後に `git fetch origin` → 統合先の最新 commit を確認してから worktree 作成
+- **Wave 2 以降**: Wave 1 の PR merge 後に `git fetch origin` → main の最新 commit を確認してから worktree 作成
 - **case-run 再開時**: 前回ケースの PR merge 後に再開する場合も同様
-- **確認手順**: `git fetch origin` 後、`git log --oneline origin/{base_branch} -1` で最新 commit hash を確認。`git rev-parse HEAD` と比較し、差分がある場合は worktree を最新の統合先から再作成（既存 worktree がある場合は削除して再作成）
+- **確認手順**: `git fetch origin` 後、`git log --oneline origin/main -1` で最新 commit hash を確認。`git rev-parse HEAD` と比較し、差分がある場合は worktree を最新の main から再作成（既存 worktree がある場合は削除して再作成）
 
 ## stash 運用（worktree 検証時の一時退避）
 
@@ -56,7 +51,6 @@ detached worktree による baseline 比較を標準手順とする。
 | トピック | 参照先 |
 |----------|--------|
 | 作成、削除、ブランチ操作の詳細 | `references/worktree-operations.md` |
-| 統合先の解決、評価ブランチの作成・削除 | `references/worktree-operations.md` |
 | worktree 検証時の一時退避（stash 運用） | `references/worktree-operations.md` |
 | bun test 実行の環境前提（worktree 構造的制約、node_modules 未伝播） | `references/worktree-operations.md` |
 | git pull/push/hash検証の共通手順 | `references/git-common-procedures.md` |

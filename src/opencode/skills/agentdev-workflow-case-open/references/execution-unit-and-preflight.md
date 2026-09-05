@@ -7,7 +7,6 @@
 
 - マルチREQ 入力判定
 - 自律構成生成（OU モード、複数REQ時）
-- 統合評価 Child Issue / Wave の計画反映（実証Case）
 - 規模判定（単一REQの場合）
 - 構成生成事前検証（preflight）
 
@@ -44,11 +43,6 @@ execution_unit 構成（連結成分アルゴリズム、3軸判断）と規模�
 - **Wave テーブル「実行方法」列**: L0/L1 → 並列、L2/L3 → 直列
 
 停止条件、禁止事項、構成生成事前検証（preflight）の詳細は `agentdev-epic-tracker` を参照。
-
-### 統合評価 Child Issue / Wave の計画反映（実証Case）
-
-実証Caseで複数 Wave の統合状態を実際に動かさなければ評価できない場合、統合状態を実行・測定する Child Issue または Wave を計画へ含める。
-各 Child で必要十分な評価が完了する場合は不要な統合評価 Wave を強制しない。
 
 ### 規模判定（単一REQの場合）
 

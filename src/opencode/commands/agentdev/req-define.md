@@ -14,7 +14,6 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 
 - ユーザーの自然言語による機能追加/バグ修正の説明
 - GitHub Issue URL（既存Issueの場合）
-- 実証Issue（`req-define <実証Issue>` 形式の明示指定時。当該実証の正式化を主たる入力とし、評価契約、最終評価結果、参照証拠を取り込む）
 - エラーログ（バグ修正の場合）
 - **ユーザーが明示した入力ファイル**: 設計メモ、調査メモ、RU（`.agentdev/backlog/req-units/RU-*.md`）等。全て参照専用入力
 - req-save SPLIT 検出時の検出事項（`.agentdev/drafts/requirements-review-finding-{topic-slug}.md`）
@@ -43,9 +42,6 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 - Decision 閾値以上の判断は `agentdev-decision-guidelines` で判定する。Decision 要否確認ゲートでは `agentdev-architecture-advisory` の助言を親エージェントが分類して採用し、未確認事項は要件本文と分離して扱う
 - work_type・Scale 判定は `agentdev-workflow-lifecycle` の基準に従う
 - draft は `operation_units` セクションを出力する（単一REQ操作も1件の OU として出力）。`depends_on` は必須依存のみ記録し、Issue 階層・Epic/Wave 構成の決定は case-open が担う
-- 実証Caseとして確定した後は評価ブランチ利用を別途確認せず、実証Caseなら評価ブランチ、通常Caseなら main と決定的に導出する
-- 評価契約と test strategy は分離する。test strategy は実証手段・計測手段・実証環境が正常に動作したかを扱い、評価契約は評価対象から得られた結果と採否を扱う
-- 本コマンドは実証Caseでも Git 副作用を持たない（評価ブランチ・worktree 準備の実行主体・手順は command Design が所有する）。評価ブランチ作成だけの新しい公開コマンドを追加しない
 - Design 分離基準に該当する要件行は `artifact_actions`（`artifact: design`）へ分離する（安定契約例外は除く）。test strategy 項目は verification（検証手順）・pass_criteria（合格基準）・on_failure（不合格時の処置）の3要素を欠落なく持ち、欠落項目は保存前に QG fail として扱う
 - 修正の要否を検討する際、実現面（正規所有責務を持つ既存実体・成果物）と Design 面の両面を分析する。コードレベルの work plan は case-run 責務としつつ、どの実現面を変更すべきかの確定を case-run へ先送りしない（REQ-004-037）
 - 実現面の変更方針（正規所有責務、変更すべき実現面、変更意図、検証との対応）は、実現面の変更がある場合に `realization_actions` セクションへ構造化して出力する。`realization_actions` は `artifact_actions` と分離した独立構造であり、成果物種別を固定 enum としないドメイン中立契約とする（REQ-008-060）

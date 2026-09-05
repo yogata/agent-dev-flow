@@ -74,22 +74,20 @@
 - **文書分類妥当性検証**: REQ 要件行に Design 分離基準違反残留がないか検出する。検出時は Design 保存対象へ移送する（安定契約例外は対象外）
 - **Decision要否確認ゲート**: Decision候補・既存REQ/Decision/Design との衝突候補・責務境界変更を含む場合、`agentdev-architecture-advisory` へ委譲する。出力は4ラベル構造（確定事項/推定事項/ユーザー確認事項/ブロッカー）。soft-contract（Decision）。ブロッカーまたは未決事項残存時は壁打ち（STEP-2）へ差し戻す
 - **実行主体分類表**: 委譲契約を定義する場合、各委譲について実行主体分類表（adapter skill / command / subagent / harness）を必須とする（詳細は delegation-contracts Design（extension 経由）参照。委譲を含まない要件では省略可）
-- **評価契約確定（実証Case時）**: 実証Caseとして確定した場合、実証開始前に評価契約の構成要素を必要に応じて壁打ちで確定する。構成要素は評価対象・仮説、比較対象、比較条件、評価方法、評価観点、評価シナリオ、測定・観察項目、判定基準、必要証拠、採用条件、不採用条件、判定不能条件、中止条件、再実行条件、比較条件逸脱時の扱いとする。詳細は req-define command Design（extension 経由）「実証Case判定と評価契約」参照
-- **評価契約の変更管理**: 実証開始後、実行側の自律判断で評価契約を変更しない。ユーザーが評価契約の変更を明示的に指示した場合のみ変更でき、変更内容、変更理由、既存評価結果への影響を追跡可能にし、影響する既存評価について必要な再評価または再実行を行い、変更前の契約と結果を失わない。実証全体の最終完了後は当該実証の評価契約および最終結果を書き換えない。完了後に異なる条件で評価する場合は新しい実証として扱う
 - **変更誘発境界リスク分析**: `agentdev-req-analysis` の「変更誘発境界リスク分析」観点に従い、変更差分から dependency boundary、client/server boundary、execution boundary、build/runtime boundary、environment propagation boundary の 5観点境界について case-specific risk を導出する。project 固有のリスク導出規則を参照する場合、docs/knowledge/ を正規知識領域とし、利用可能なハーネスの探索能力を通じて関連知識を検索する（Project Knowledge の所有と workflow 利用の要件が正規所有する利用契約に従う）。知識が不在の場合は ADF core の一般規則のみで 5観点境界分析を実行する（分析を省略しない）。導出した case-specific risk は検証契約へ投影する。変換経路は change → risk → verification obligation → test strategy とし、投影先は test strategy、投影完全性の検査は QG-1（リスク→test strategy 投影完全性検査）が担う
-- **test strategy 定義**: 各合意項目（AG-*）の検証方法を test strategy として定義する。3要素構造（`verification` / `pass_criteria` / `on_failure`）を必須とし、`on_failure` を持たない検証項目は含めない。項目識別子は `TS-NNN`、`on_failure` アクション種別は `fix-and-reverify` / `record-in-findings` の2値。シリアライズ形式の詳細は req-define command Design（extension 経由）の draft-data test_strategy フィールドスキーマ参照。test strategy と評価契約は分離する。test strategy は実証手段・計測手段・実証環境が正常に動作したかを扱い、評価契約は評価対象から得られた結果と採否を扱う。評価対象が採用基準を満たさなかったことを実装不具合として自動修正しない。導出済み case-specific risk から検証義務（verification obligation）を導き、test strategy 項目へ投影する（change → risk → verification obligation → test strategy）。選択した検証手段の質は `agentdev-req-analysis` の「検証手段の質基準」観点（production-equivalent verification、正本は analysis-viewpoints reference）に従い判定する。完了時点の証跡契約を正規所有する要件群が正規所有するため、本工程では複製せず参照に留める
+- **test strategy 定義**: 各合意項目（AG-*）の検証方法を test strategy として定義する。3要素構造（`verification` / `pass_criteria` / `on_failure`）を必須とし、`on_failure` を持たない検証項目は含めない。項目識別子は `TS-NNN`、`on_failure` アクション種別は `fix-and-reverify` / `record-in-findings` の2値。シリアライズ形式の詳細は req-define command Design（extension 経由）の draft-data test_strategy フィールドスキーマ参照。導出済み case-specific risk から検証義務（verification obligation）を導き、test strategy 項目へ投影する（change → risk → verification obligation → test strategy）。選択した検証手段の質は `agentdev-req-analysis` の「検証手段の質基準」観点（production-equivalent verification、正本は analysis-viewpoints reference）に従い判定する。完了時点の証跡契約を正規所有する要件群が正規所有するため、本工程では複製せず参照に留める
 
 ### Result
 
-- 変更影響候補、最終分類、Design 分離結果、Decision要否確認結果、case-specific risk 導出結果（5観点境界の確認記録を含む）、test strategy 定義、評価契約（実証Case時）
+- 変更影響候補、最終分類、Design 分離結果、Decision要否確認結果、case-specific risk 導出結果（5観点境界の確認記録を含む）、test strategy 定義
 
 ### Evidence
 
-- 影響候補リスト、分類判定根拠、助言の4ラベル構造結果、case-specific risk 記録（導出有無と5観点確認の記録）、test strategy 項目、評価契約の構成要素確定結果（実証Case時）
+- 影響候補リスト、分類判定根拠、助言の4ラベル構造結果、case-specific risk 記録（導出有無と5観点確認の記録）、test strategy 項目
 
 ### Completion Verification
 
-- 全要件行候補の分類が確定し、Design 分離基準違反残留が0件であること。5観点境界の確認が実施済みであり、導出済み case-specific risk が test strategy へ投影済みであること（投影完全性は QG-1 が検査）。test strategy 項目が全て3要素を持つこと。実証Case時は評価契約が実証開始前に確定していること
+- 全要件行候補の分類が確定し、Design 分離基準違反残留が0件であること。5観点境界の確認が実施済みであり、導出済み case-specific risk が test strategy へ投影済みであること（投影完全性は QG-1 が検査）。test strategy 項目が全て3要素を持つこと
 
 ### Resume-Idempotency
 
@@ -152,7 +150,6 @@
 - 不変条件（Design 分離基準該当行の `artifact_actions` 分離）
 - 不変条件（アーキテクチャ助言サブエージェントの参照と未確認事項非混入）
 - 不変条件（test strategy 3要素完全、欠落時は QG-1 fail 扱い）
-- 不変条件（評価契約と test strategy の分離、評価対象が採用基準を満たさなかったことの実装不具合としての自動修正禁止）
 - 不変条件（変更誘発境界リスク分析の省略禁止。リスク導出規則不在時は ADF core の一般規則のみで 5観点境界分析を実行する）
 - 不変条件（case-specific risk の test strategy 投影。投影完全性の検査は QG-1 が担い、本工程は投影の実施のみを行う）
 - 不変条件（test strategy 定義時の検証手段の質基準適用。質基準の正本は `agentdev-req-analysis` の analysis-viewpoints reference、完了時点の証跡契約を正規所有する要件群が正規所有するため複製しない）
