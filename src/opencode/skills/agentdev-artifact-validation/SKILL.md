@@ -50,7 +50,7 @@ description: Owns document-type-crosscutting deterministic verification scripts,
 
 | スクリプト | 役割 | 入力 | 出力 JSON |
 |-----------|------|------|-----------|
-| `check-frontmatter-consistency.ts` | frontmatter id ↔ ファイル名整合性（REQ/ADR 横断） | argv[2]=dir, argv[3]=kind(req\|adr) | `{ ok, errors[], warnings[] }` |
+| `check-frontmatter-consistency.ts` | frontmatter id ↔ ファイル名整合性（REQ/ADR/Decision 横断） | argv[2]=dir, argv[3]=kind(req\|adr\|decision) | `{ ok, errors[], warnings[] }` |
 | `check-entry-existence.ts` | README エントリ存在 | argv[2]=id, argv[3..]=files、または stdin JSON | `{ ok, errors[], warnings[], found[] }` |
 | `check-change-impact.ts` | 変更範囲検証（許可パスリストとの積集合） | argv[2]=changed-list-file, argv[3]=allowed-list-file、または stdin JSON | `{ ok, errors[], warnings[], violations[] }` |
 

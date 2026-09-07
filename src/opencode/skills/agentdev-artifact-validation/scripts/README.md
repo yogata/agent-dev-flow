@@ -27,6 +27,8 @@ scripts/
 - エラー: 非ゼロ終了コード + stderr にエラーメッセージ
 - 副作用: なし（純粋関数、ファイル I/O は入力読み込みのみ）
 
+`check-frontmatter-consistency.ts` の `kind` は `req`、`adr`、`decision` を受理する。
+
 ## 実行方法
 
 ```bash

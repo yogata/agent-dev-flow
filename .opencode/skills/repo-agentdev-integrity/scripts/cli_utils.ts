@@ -18,9 +18,9 @@ export const EXIT_NG = 1;
 export const EXIT_ERROR = 2;
 
 // WP-3 (Issue #1928): integrity checker execution profiles.
-// Normative: .omo/plans/agentdev-migration-2026-08-05.md §7.
+// WP-3 (Issue #1928): integrity checker execution profiles.
 // `installed` must not use source fallback; `release` keeps the checker on the
-// host (REQ-0145-014 `--root`) and never embeds it in the archive.
+// host (v2:REQ-0145-014 `--root`) and never embeds it in the archive.
 export type IntegrityProfile = "source" | "installed" | "release";
 
 export const DEFAULT_PROFILE: IntegrityProfile = "source";
@@ -91,7 +91,7 @@ export interface CliOptions {
   dryRun: boolean;
   classification: boolean; // REQ-0108-196
   paths: string[];
-  root?: string; // REQ-0145-014: explicit repo root for worktree/CI
+  root?: string; // v2:REQ-0145-014: explicit repo root for worktree/CI
   profile: IntegrityProfile; // WP-3 (Issue #1928): source|installed|release
   archive?: string; // WP-3: required when profile=release
 }
@@ -292,7 +292,7 @@ OPTIONS:
   --json            Output results in JSON format
   --dry-run         Show what would be checked without running checks
   --classification  Enable document classification policy checks (REQ-0108-196)
-  --root <path>     Explicit repository root (REQ-0145-014: worktree/CI support)
+  --root <path>     Explicit repository root (v2:REQ-0145-014: worktree/CI support)
   --profile <p>     Execution profile: source (default), installed, release (Issue #1928 / WP-3)
   --archive <zip>   Path to release archive. Required when --profile=release.
                     Ignored for source/installed.
@@ -713,7 +713,7 @@ export function writeReportFile(root: string, report: IntegrityReport): string {
 }
 
 /**
- * Resolve the repository root for integrity scans (REQ-0145-014).
+ * Resolve the repository root for integrity scans (v2:REQ-0145-014).
  *
  * Resolution priority:
  *   1. options.explicitRoot  — `--root` CLI arg (highest priority)
