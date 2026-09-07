@@ -35,7 +35,7 @@ Issue 本文では、変動しやすい実測値ではなく、作業対象を�
 
 ### 記載例
 
-- 良い例: `REQ-{NNNN}-{NNN}` の契約値を `src/opencode/skills/agentdev-artifact-validation/SKILL.md` の公開検証契約へ反映する。
+- 良い例: `REQ-{NNNN}-{NNN}` の契約値を対象 Skill の公開検証契約へ反映する。
 - 良い例: `TS-{NNN}` を実行し、`agentdev-issue-management` の参照導線が実在する本文へ到達することを確認する。
 - 避ける例: 「42 行目を直す」「現在の 3 箇所を修正する」のように、編集で変動する位置や件数だけを完了条件にする。
 
