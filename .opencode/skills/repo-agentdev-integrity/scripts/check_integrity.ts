@@ -6,6 +6,8 @@
 // ADF-COVERS(verification): REQ-009-018, REQ-009-019, REQ-009-020
 // ADF-COVERS(implementation): REQ-010-002, REQ-010-003, REQ-010-005, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-064, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008
 // ADF-COVERS(verification): REQ-010-009
+// ADF-COVERS(verification): REQ-010-072, REQ-010-073
+// ADF-COVERS(implementation): REQ-010-072, REQ-010-073
 // ADF-COVERS(verification): REQ-011-002, REQ-011-008, REQ-011-014
 // ADF-COVERS(implementation): REQ-018-003, REQ-018-004
 // ADF-COVERS(verification): REQ-031-011, REQ-031-012, REQ-031-014
@@ -1822,6 +1824,89 @@ function checkLinkIntegrity(root: string): CheckResult[] {
       ),
     );
   }
+  return results;
+}
+
+export function checkDecisionReadmeRetiredReqLink(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const relPath = "docs/decisions/README.md";
+  const readmePath = path.join(root, "docs", "decisions", "README.md");
+  const content = readText(readmePath);
+  if (!content) return [info("LinkIntegrity", "retired-req-link-path", "Decision README not found")];
+
+  const lines = content.split("\n");
+  let inRelatedReqSection = false;
+  const linkPattern = /\[REQ-(\d{3})\]\(([^)]+)\)/g;
+  for (let i = 0; i < lines.length; i++) {
+    const heading = lines[i].match(/^#{1,6}\s+(.+)$/);
+    if (heading) {
+      inRelatedReqSection = /^関連\s*REQ$/i.test(heading[1].trim());
+    }
+    if (!inRelatedReqSection || isInsideCodeBlock(lines, i)) continue;
+    let match: RegExpExecArray | null;
+    linkPattern.lastIndex = 0;
+    while ((match = linkPattern.exec(lines[i])) !== null) {
+      if (isInsideCodeSpan(lines[i], match.index)) continue;
+      const reqId = `REQ-${match[1]}`;
+      const href = match[2];
+      const activePath = path.join(root, "docs", "requirements", `${reqId}.md`);
+      const retiredPath = path.join(root, "docs", "requirements", "retired", `${reqId}.md`);
+      if (!fs.existsSync(retiredPath) || fs.existsSync(activePath)) continue;
+      const expectedRetiredHref = `../requirements/retired/${reqId}.md`;
+      if (href !== expectedRetiredHref) {
+        results.push(ng("LinkIntegrity", "retired-req-link-path", `${reqId} is retired but uses a non-canonical requirements path`, relPath, i + 1, {
+          evidence: href,
+          expected: expectedRetiredHref,
+          route: "intake",
+        }));
+      } else if (href === expectedRetiredHref && !/[（(]\s*retired\b/i.test(lines[i].slice(match.index + match[0].length))) {
+        results.push(ng("LinkIntegrity", "retired-req-link-annotation", `${reqId} retired link lacks a retired annotation`, relPath, i + 1, {
+          evidence: lines[i],
+          expected: "retired link is followed by a （retired） annotation",
+          route: "intake",
+        }));
+      }
+    }
+  }
+  if (results.length === 0) results.push(ok("LinkIntegrity", "retired-req-link-path", "Decision README retired REQ links are valid"));
+  return results;
+}
+
+export function checkDesignsRelativeLinkExistence(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const designsDir = path.join(root, "docs", "designs");
+  if (!fs.existsSync(designsDir)) return [info("LinkIntegrity", "designs-relative-link-existence", "Designs directory not found")];
+
+  for (const filePath of collectSpecMarkdownRecursively(designsDir)) {
+    const content = readText(filePath);
+    if (!content) continue;
+    const lines = content.split("\n");
+    for (const link of parseMarkdownLinks(content)) {
+      const linkPath = link.href.split("#")[0];
+      if (!linkPath || /NNN|\{[^}]*\}/.test(linkPath)) continue;
+      const target = resolveLinkTarget(link.href, filePath, root);
+      if (!target) continue;
+      const targetRel = resolveRelative(target.filePath, root);
+      if (targetRel.startsWith("docs/reports/")) continue;
+      const linkText = `[${link.text}](${link.href})`;
+      let lineNumber = 0;
+      let inCode = false;
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i].includes(linkText)) {
+          lineNumber = i + 1;
+          inCode = isInsideCodeBlock(lines, i) || isInsideCodeSpan(lines[i], lines[i].indexOf(linkText));
+          break;
+        }
+      }
+      if (inCode || fs.existsSync(target.filePath)) continue;
+      results.push(ng("LinkIntegrity", "designs-relative-link-existence", `Link target does not exist: ${link.href}`, resolveRelative(filePath, root), lineNumber || undefined, {
+        evidence: link.href,
+        expected: "relative link target must exist",
+        route: "intake",
+      }));
+    }
+  }
+  if (results.length === 0) results.push(ok("LinkIntegrity", "designs-relative-link-existence", "All docs/designs relative links resolve to existing files"));
   return results;
 }
 
@@ -10172,6 +10257,8 @@ async function main(): Promise<void> {
     ...checkPostCompletionOutput(cmdDir, root),
     ...checkTerminology(cmdDir, root),
     ...checkLinkIntegrity(root),
+    ...checkDecisionReadmeRetiredReqLink(root),
+    ...checkDesignsRelativeLinkExistence(root),
     ...checkCanonicalBoundary(root),
     ...checkLifecycleBoundary(root),
     ...checkExpandedLegacyNamespace(skillsDir, cmdDir, root),
