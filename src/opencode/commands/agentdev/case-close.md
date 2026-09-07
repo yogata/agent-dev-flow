@@ -32,6 +32,24 @@ last-write-wins 競合防止は case-close の単一書き手で維持される�
 本コマンドは workflow 実装本体を `agentdev-workflow-case-close` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
 工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの制御平面（control plane）が所有する。
 
+## 特例フロー（docs_chore: PR なし完了）
+
+work_type が docs_chore の Case で適用条件をすべて満たす場合は、PR を作成しない特例フローで完了処理を行う。
+
+適用条件:
+
+- work_type が docs_chore である
+- ユーザー合意済みである
+- main への直接 commit が完了条件を満たす
+
+制約:
+
+- PR 関連 Step は N/A とし、既存 commit を最終成果物とする
+- QG-4 は直接 commit 内容で検証する
+- 実装系 feature/fix には適用しない（既存 PR フロー経路の意味は変更しない）
+
+特例フローのルーティングと PR 関連 Step の N/A 適用は `agentdev-workflow-case-close` スキルの制御平面が所有する。
+
 ## 不変条件
 
 工程上の選好を反映した肯定形の不変条件:
