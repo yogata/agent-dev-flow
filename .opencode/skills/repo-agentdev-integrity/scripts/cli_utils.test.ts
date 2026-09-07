@@ -55,11 +55,11 @@ describe("parseArgs", () => {
     expect(parseArgs(["--dry-run"]).dryRun).toBe(true);
   });
 
-  it("parses --root with a value (REQ-0145-014)", () => {
+  it("parses --root with a value (v2:REQ-0145-014)", () => {
     expect(parseArgs(["--root", "/tmp/repo"]).root).toBe("/tmp/repo");
   });
 
-  it("throws when --root has no value (REQ-0145-014)", () => {
+  it("throws when --root has no value (v2:REQ-0145-014)", () => {
     expect(() => parseArgs(["--root"])).toThrow(/--root requires a value/);
   });
 
@@ -490,7 +490,7 @@ describe("findRepoRoot", () => {
     expect(result).toBe(start);
   });
 
-  it("honors explicit --root option over filesystem walk (REQ-0145-014)", () => {
+  it("honors explicit --root option over filesystem walk (v2:REQ-0145-014)", () => {
     const path = require("path");
     const fs = require("fs");
     const os = require("os");
@@ -503,7 +503,7 @@ describe("findRepoRoot", () => {
     }
   });
 
-  it("honors AGENTDEV_INTEGRITY_ROOT env var when no --root (REQ-0145-014)", () => {
+  it("honors AGENTDEV_INTEGRITY_ROOT env var when no --root (v2:REQ-0145-014)", () => {
     const path = require("path");
     const fs = require("fs");
     const os = require("os");
@@ -520,7 +520,7 @@ describe("findRepoRoot", () => {
     }
   });
 
-  it("prefers explicit --root over env var (REQ-0145-014)", () => {
+  it("prefers explicit --root over env var (v2:REQ-0145-014)", () => {
     const path = require("path");
     const fs = require("fs");
     const os = require("os");
@@ -539,7 +539,7 @@ describe("findRepoRoot", () => {
     }
   });
 
-  it("detects worktree root via .git file (REQ-0145-014)", () => {
+  it("detects worktree root via .git file (v2:REQ-0145-014)", () => {
     const path = require("path");
     const fs = require("fs");
     const os = require("os");
@@ -556,7 +556,7 @@ describe("findRepoRoot", () => {
     }
   });
 
-  it("falls back to .git directory when .opencode is absent (REQ-0145-014)", () => {
+  it("falls back to .git directory when .opencode is absent (v2:REQ-0145-014)", () => {
     const path = require("path");
     const fs = require("fs");
     const os = require("os");

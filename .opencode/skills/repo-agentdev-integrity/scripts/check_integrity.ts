@@ -8718,7 +8718,7 @@ export function walkAllFiles(dirPath: string, acc: string[]): void {
 // Pipeline: expand archive → run install-from-archive.ps1 (-Mode copy) →
 // re-invoke the host checker with `--profile installed --root <temp>/<root>`
 // → forward the integrated report → cleanup `<temp>` on success AND failure.
-// The checker stays on the host (REQ-0145-014 `--root`); the archive must
+// The checker stays on the host (v2:REQ-0145-014 `--root`); the archive must
 // not embed it (§7.5 boundary: archive self-containment vs check execution).
 function findArchiveRoot(tempDir: string): string | null {
   const entries = fs.readdirSync(tempDir, { withFileTypes: true });
