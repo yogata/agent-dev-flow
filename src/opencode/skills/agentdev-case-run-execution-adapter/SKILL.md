@@ -71,6 +71,9 @@ PR 本文には実行識別情報セクション（対象 Case、実行単位、
 PR 本文には検証差分セクション（実行工程、検証種別、検証結果、finding 差分の5分類: 新規、修正済み、既出、撤回、無効）を記録する。形式は `agentdev-workflow-templates` の検証差分セクション規約に従い、実施した各検証（test strategy 項目検証、品質ゲート等）ごとに実行工程 case-run の行として記録する。
 PR 作成前に `agentdev-traceability` の check を実行し、対象要件の実装対応、検証対応、対応宣言の整合性を検査する。check の不合格が承認済み対象範囲内で修正可能な場合は修正して再検証し、要件変更、対象範囲拡大、追加設計判断、外部依存解消が必要な場合は blocked として判断事項を報告する。
 ハーネスの plan artifact 等の中間成果物は解釈せず、PR URL で最終結果を受領する。
+コミット前に `git status --porcelain` で tsconfig 系ファイル（tsconfig*.json）の変更を検出した場合は、意図した変更と TypeScript コンパイラによるメタデータ書き戻し（`--noEmit` 指定でも incremental / project references 構成で発生し得る）の区別を確認する警告として扱う。検出時の処置は確認を促すことに限定し、自動破棄、自動 checkout を行わない。
+本チェックは配布物側 case-run 手順として独立しており、本プロジェクト側の `repo:guard:tsconfig`（bun install 起因の書き換え検出）とは別個に維持する。
+CI typecheck job での `git diff --exit-code` 検証は検討候補として記録する（本手順では実施しない）。
 実装完了後、test strategy 項目の test-fix ループ（後述）を実行する
 4. **blocker 処理**: 回答可能な blocker（Decision/REQ/Design/docs/Issue本文で回答できるもの）は自律的に実行 command 内で再評価できる
 5. **result 返却**: 後述の result 契約に従い case-run へ返却する
