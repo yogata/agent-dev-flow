@@ -1,3 +1,4 @@
+<!-- ADF-COVERS(implementation): REQ-017-019 -->
 # harness 委譲実装ノート
 
 AgentDevFlow 側（case-run）から実行担当サブエージェントを委譲起動するための実装ノート。
@@ -133,7 +134,7 @@ plan_change: なし（委譲中に計画変更が生じた場合は result に�
 
 - `<execution-command> Implement Issue #N:`: 委譲 prompt 内で実行 command を起動し、Issue #N の実装を指示する
 - `<delegation-ident>`: 委譲識別情報ブロック。委譲単位識別子を記録する（後述「委譲識別情報ブロック」参照）
-- `<structured_context>`: 構造化文脈（10意味）の直列化ブロック。後述「構造化文脈の直列化（委譲時）」の形式に従う
+- `<structured_context>`: 構造化文脈（10意味）の直列化ブロック。後述「構造化文脈の直列化（委譲時）」の形式に従う。作業内容・purpose は委譲先 Issue 本文の概要または正規 REQ から抽出する（後述「structured_context の SSoT 抽出と突合検査」参照）
 - `<worktree>`: case-run が用意した worktree root とブランチ名を明示。メインリポジトリパスは含めない
 - `<Issue body>`: 対象 Issue の本文。実行担当サブエージェントは完了条件、受け入れ基準を success criteria に分解する
 
@@ -161,7 +162,7 @@ plan_change: なし（委譲中に計画変更が生じた場合は result に�
 
 | 意味 | キー | 内容 |
 |---|---|---|
-| 目的 | `purpose` | 委譲の目的（実行契約の要約） |
+| 目的 | `purpose` | 委譲の目的（実行契約の要約。委譲先 Issue 本文の概要または正規 REQ から抽出） |
 | 現在の ADF 工程 | `workflow_phase` | 委譲を起動する工程（case-run 等） |
 | 現在の実行単位 | `execution_unit` | 実行単位の識別子（Issue 番号、Wave、OU 等）と委譲単位識別子 |
 | 前工程で確定した事項 | `resolved_context` | 確定済み事項の要約と正規情報源の参照先 |
@@ -204,6 +205,15 @@ inputs:
 - 受領側（実行担当サブエージェント）は前工程で確定した事項（`resolved_context`）を初期文脈として利用し、同じ情報をゼロから探索、再構築することを原則としない。独立検証、鮮度確認、矛盾検出、正規成果物との整合確認を目的とする再確認は維持する。
 - 本テンプレートの適用範囲は case-run からの実行担当サブエージェント委譲に限らず、subagent 委譲する全場面（case-auto、case-open、case-run、case-update、case-close）で共通する（後述「委譲プロトコルと category 設計」と同一の適用範囲）。
 - 工程間（委譲を介さない工程の引き継ぎ）の構造化文脈は、同一の意味集合を `agentdev-workflow-lifecycle` スキルの工程間構造化文脈引き継ぎの形式（`structured_context` をトップレベルに持つ構造化ブロック）で扱う。本節の形式と意味対応を保つ。
+
+### structured_context の SSoT 抽出と突合検査
+
+structured_context の生成（委譲 prompt 構築）は、次の抽出制約と突合検査に従う。
+原本仕様は `<workflows/delegation-contracts>` Design「structured_context の SSoT 抽出制約」である。
+
+- structured_context の作業内容・purpose は、委譲先 Issue 本文の概要または正規 REQ から抽出する。親セッションの会話コンテキスト由来の推定・波及解釈を注入しない。
+- 委譲 prompt 生成時に、委譲先 Issue 番号と structured_context に含める対象成果物パス（Issue 本文の Execution Contract が示す変更対象成果物）の一致を検査する。不一致の場合は委譲を開始しない。
+- 委譲指示と Issue 本文の作業内容が乖離した過去事例（Issue #2566、Issue #2562）と同種の乖離は、上記の抽出制約と突合検査により契約上禁止となる。
 
 ## 委譲プロンプト雛形（委譲契約必須テンプレート）
 

@@ -1,3 +1,4 @@
+<!-- ADF-COVERS(implementation): REQ-017-019 -->
 # 工程間構造化文脈引き継ぎ（structured-stage-handoff）
 
 AgentDevFlow の工程間（req-define → req-save → design-save → case-open → case-run → case-close、および上流工程（backlog-review 等）から req-define への接続）で引き継ぐ構造化文脈の、配布物側の直列化形式と生成・消費契約。
@@ -18,7 +19,7 @@ AgentDevFlow の工程間（req-define → req-save → design-save → case-ope
 
 ```yaml
 structured_context:
-  purpose: {当該工程の目的（実行契約の要約）}
+  purpose: {当該工程の目的（実行契約の要約。後工程対象の Issue 本文の概要または正規 REQ から抽出）}
   workflow_phase: {現在の ADF 工程（req-define / req-save / design-save / case-open / case-run / case-close 等）}
   execution_unit: {現在の実行単位（Issue 番号、Wave、OU 等の識別子）}
   resolved_context:
@@ -44,6 +45,8 @@ structured_context:
 
 - 前工程は完了報告または次工程への委譲起動時に、構造化文脈を次工程へ渡す。
 - case-auto 等の orchestrator による工程委譲では、委譲 prompt の入力内に構造化文脈を直列化する（委譲時の形式に従う）。
+- structured_context の作業内容・purpose は、後工程対象の Issue 本文の概要または正規 REQ から抽出する。親セッションの会話コンテキスト由来の推定・波及解釈を注入しない。
+- 委譲 prompt として直列化する場合は、委譲先 Issue 番号と structured_context に含める対象成果物パスの一致を検査し、不一致の場合は委譲を開始しない（委譲時の抽出制約・突合検査の詳細は `agentdev-case-run-execution-adapter` スキルの委譲実装ノート参照）。
 - 手動で次のコマンドを起動する運用では、構造化文脈は独立した受け渡し媒体を新設せず、既存の durable state（要件doc、Issue 本文、PR 本文等の正規成果物）から次工程が再構成する。
 - 各フィールドの値は要約と正規参照先で構成し、全文履歴や巨大な計画本文の複製を含めない。
 - canonical_references の各項目は、配布物参照において目的判別（正規原本確認、実行時投影確認、双方整合確認）を含める。判別と直列化の表記は本スキルの参照先解決ポリシー（`references/reference-resolution.md`）に従う。
@@ -68,6 +71,7 @@ structured_context:
 
 - `<workflows/workflow-contracts>` Design「工程間構造化文脈引き継ぎ契約」（原本仕様）
 - `<workflows/delegation-contracts>` Design「構造化文脈引き継ぎ（委譲時）の直列化契約」（委譲時の原本仕様）
+- `<workflows/delegation-contracts>` Design「structured_context の SSoT 抽出制約」（structured_context の SSoT 抽出と Issue 番号×対象成果物パス突合の原本仕様）
 - `agentdev-case-run-execution-adapter` スキルの委譲プロンプト雛形（委譲時の直列化形式、意味対応先）
 - 参照先解決ポリシー（`references/reference-resolution.md`。canonical_references の source / projection 目的判別）
 - 前工程からの引き継ぎ 共通方針（agentdev_handoff、consumer リポジトリの引き継ぎ停止）
