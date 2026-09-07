@@ -2,7 +2,7 @@
 title: "配布依存境界"
 status: accepted
 created: "2026-08-11"
-updated: "2026-08-30"
+updated: "2026-09-07"
 ---
 <!-- ADF-COVERS(implementation): REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-045 -->
@@ -60,6 +60,17 @@ REQ-029-004 が許容する generic および template 参照は、producer 内�
 誤検出抑制（false-positive suppression）は検出器の挙動であり、承認例外とは区別する。
 
 ID プレースホルダー（IR-{NNNN} 等）の裸出力は、表の根拠列・パターン定義内など正規様式として許容する領域を除外規則で定義する。許容領域の裸出力は unclassified-entry 検出の対象外とする（IR-064 文脈許容様式との連動: ru-batch-20260903）。
+
+### concrete-id ベースライン再取得手順
+
+配布依存境界の concrete-id ベースラインは、配布物の concrete ID 是正完了後に次の手順で再取得する。
+
+1. 対象 commit を最新 main として特定する
+2. source profile と link profile を main root から読取専用で実行する（checker 実行契約の安定実行経路に従う）
+3. 検出された concrete-id エントリ集合（対象 commit、profile 種別、エントリ一覧、件数）を記録様式に従い baseline へ反映する
+4. 再取得の根拠（対象 commit SHA、実行コマンド、件数の増減）を PR 本文へ記載する
+
+再取得により、解消済み違反の baseline 残存と、現行違反 0件との差異を解消する。
 
 ## 共有 detector と adapter の契約
 

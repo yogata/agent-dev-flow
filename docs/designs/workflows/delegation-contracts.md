@@ -2,7 +2,7 @@
 title: サブエージェント委譲契約
 status: accepted
 created: 2026-06-21
-updated: 2026-09-05
+updated: 2026-09-07
 ---
 <!-- ADF-COVERS(implementation): REQ-002-033, REQ-002-034 -->
 <!-- ADF-COVERS(implementation): REQ-003-001, REQ-003-002, REQ-003-003, REQ-003-004, REQ-003-006, REQ-003-011, REQ-003-012, REQ-003-014, REQ-003-020 -->
@@ -61,6 +61,12 @@ capture_handoff:
 ```
 
 `side_effect_boundary` に `read_only` のような包括値（blanket value）を使用せず、許可する操作を具体名で列挙すること。
+
+### structured_context の SSoT 抽出制約
+
+- 委譲 prompt に含める structured_context の作業内容・purpose は、委譲先 Issue 本文の概要または正規 REQ から抽出する。
+  親セッションの会話コンテキスト由来の推定・波及解釈を注入しない（REQ-017-019）。
+- 委譲 prompt 生成時に、対象 Issue 番号と対象成果物パスの突合を行い、不一致の場合は委譲を開始しない。
 
 ## 委譲種別（delegation_type 参考分類）
 

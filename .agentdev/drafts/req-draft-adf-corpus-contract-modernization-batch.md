@@ -24,6 +24,7 @@ source_rus:
 
 ```yaml
 work_type: feature
+design_actions_consumed: true
 
 scale: large
 
@@ -420,7 +421,8 @@ conflict_resolutions:
     resolution: テンプレート内の concrete ID も IR-059 の検知対象であるため是正対象に含める（10箇所とする）。引用・禁止事例の例示は誤検知対象外のまま維持する。
   - id: CR-002
     conflict: RU-0010 は裸 REQ-0145-014 表記を「8箇所」と記載していたが、実測では13箇所/4ファイル（check_integrity.ts:8636 と cli_utils.ts:94/:295/:716 を含む）である。
-    resolution: 実測の13箇所をすべて v2:REQ-0145-014 へ現行化する対象とする。v2: 接頭辞付きの既存表記（check_changed_docs.ts 4箇所）は対象外のまま維持する。
+    resolution: |
+      実測の13箇所をすべて v2:REQ-0145-014 へ現行化する対象とする。v2: 接頭辞付きの既存表記（check_changed_docs.ts 4箇所）は対象外のまま維持する。
   - id: CR-003
     conflict: REQ-057（docs corpus 整合・現行化バッチ）は SPLIT 予兆計測で合計シグナル +2（要件行数 23行/+0、関心分類 2以上/+1、成果物種別 3以上/+1）の「SPLIT 検討域」であり、A/D 群 RU の APPEND 集約先として候補に挙がる。
     resolution: REQ-057 への APPEND は行わない。本バッチの状態要件は既存行（REQ-057-002/003/009/019/023 等）が既に所有しており、新規行は REQ-010（3行）と REQ-017（1行）へ分割して配置する。これにより REQ-057 の要件行数は不変（23行）とし、SPLIT 検討域の悪化を回避する。RU 別の残作業は Design 操作と反映作業として処理する。

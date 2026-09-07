@@ -2,7 +2,7 @@
 title: 語彙レジストリ
 status: accepted
 created: 2026-08-20
-updated: 2026-08-11
+updated: 2026-09-07
 ---
 
 # 語彙レジストリ
@@ -17,15 +17,15 @@ AgentDevFlow 管理下の文書で使用する正規語彙と旧語彙の対照�
 
 ## 配置と連携
 
-語彙レジストリの実体対照表は配布物側に配置し、本 Design は配置基準と連携契約のみを所有する（重複管理回避、charter 原則）。
+語彙レジストリの実体対照表のうち配布物に含まれるものは配布物側に配置し、本 Design は配置基準と連携契約のみを所有する（重複管理回避、charter 原則）。
 
 | 区分 | 配置先 | 役割 |
 |---|---|---|
-| 実体対照表（canonical source） | `src/opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` | コマンド名、スキル名、サブエージェント名、ハーネス名、語彙ポリシー、廃止済み概念、完了報告フィールド、REQ 範囲表記、旧分類用語、Capture 語彙、文意品質検出対象語（IR-045）、候補語対照表（IR-044 連携）、IR-055 runtime-unresolved-reference 対照の各テーブルを所有する |
+| 実体対照表（canonical source、repo-local） | `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` | コマンド名、スキル名、サブエージェント名、ハーネス名、語彙ポリシー、廃止済み概念、完了報告フィールド、REQ 範囲表記、旧分類用語、Capture 語彙、文意品質検出対象語（IR-045）、候補語対照表（IR-044 連携）、IR-055 runtime-unresolved-reference 対照の各テーブルを所有する |
 | 基盤 Design（本ファイル） | `docs/designs/authoring/vocabulary-registry.md` | 語彙レジストリの配置基準、連携契約、IR-045 移管状態、IR-050/IR-051/IR-044 協調契約を所有する |
 
-配布物側の語彙レジストリは `src/opencode/skills/repo-agentdev-integrity/references/` 配下に配置し、`.opencode/skills/repo-agentdev-integrity/references/` へ投射する。
-canonical は source 側とする（DEC-002）。
+repo-agentdev-integrity は repo-local スキル（配布対象外）であるため src 側配置と投射の対象外であり、実体対照表は `.opencode/skills/repo-agentdev-integrity/references/` 直下を正とする。本 Design 内の他節が引用する実体対照表のパスもすべてこの .opencode 実体を指す。
+配布物に含まれる語彙レジストリ（将来追加される場合）は `src/opencode/` 配下に配置し `.opencode/` へ投射する（DEC-002）。
 
 「実現面」語彙の正典は REQ-004-037 変更後の本文であり、Design（vocabulary-registry を含む）は正典を参照する。Design 側に語彙の定義本文を複製しない。
 
@@ -34,8 +34,10 @@ canonical は source 側とする（DEC-002）。
 IR-045（docs 日本語表現、文意整合検査）は REQ-010-003、REQ-036-023 により docs-check 機械検出対象から除外し、`agentdev-doc-writing` スキル配下へ移譲済みである。
 catalog-only tombstone として管理され、本 Design では文意品質検出対象語の参照として保持する。
 
-移管対象語（`read-only`、`read-only-diagnostic`、`advisor`/`advisory`、`architecture-affecting`、`Architecture advisory gate` 等）の対照表は配布物側 `src/opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md`「文意品質検出対象語（IR-045）」節が正である。
-本 Design は当該節の管理権限を配布物側へ委譲し、重複所有しない。
+移管対象語（`read-only`、`read-only-diagnostic`、`advisor`/`advisory`、`architecture-affecting`、`Architecture advisory gate` 等）の対照表は repo-local 参照ファイル `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md`「文意品質検出対象語（IR-045）」節が正である。
+本 Design は当該節の管理権限を実体対照表側へ委譲し、重複所有しない。
+rewrite-patterns.md の IR-045 系許容表記は語彙レジストリ実体を正とする検出器語彙として恒久除外する
+（同期現行化は行わない。根拠は integrity-contracts.md の統一選択基準「意図的残存は baseline 登録し根拠注記を付す」に従い、除外の根拠を注記する）。
 
 ## IR-050 / IR-051 語彙レジストリ協調
 
@@ -53,7 +55,8 @@ IR-044（REQ/Design 境界違反検出）の候補語対照表は `docs/designs/
 ## 適用範囲
 
 - 対象: 語彙レジストリの配置基準、連携契約、IR-045/050/051/044/055 と配布物側語彙レジストリの責務分担
-- 対象外: 実体対照表の内容管理（配布物側 `src/opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` の責務）、語彙検出ロジックの実装詳細（`check_integrity.ts`、IR-050/051 個別ルールファイルの責務）
+- 対象: 語彙レジストリの配置基準、連携契約、IR-045/050/051/044/055 と実体対照表（repo-local）の責務分担
+- 対象外: 実体対照表の内容管理（`.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` の責務）、語彙検出ロジックの実装詳細（`check_integrity.ts`、IR-050/IR-051 個別ルールファイルの責務）
 
 ## 関連 Design
 

@@ -2,7 +2,7 @@
 title: Custom Tool 操作契約
 status: accepted
 created: 2026-08-24
-updated: 2026-09-02
+updated: 2026-09-07
 ---
 <!-- ADF-COVERS(implementation): REQ-011-020, REQ-011-021, REQ-011-022, REQ-011-023, REQ-011-024, REQ-052-001, REQ-052-002, REQ-052-003, REQ-052-004, REQ-052-005, REQ-052-008, REQ-052-009, REQ-052-010, REQ-052-011 -->
 
@@ -22,6 +22,12 @@ chcp、REST API PATCH、一時ファイル、PowerShell 対策等）は Tool 内
 | 出力 | 構造化結果（issue 番号、URL 等） |
 | 保証 | 操作の結果を検証（読み戻し等）してから成功を返す |
 | 失敗 | 保存または検証に失敗した場合に成功扱いとしない。エラー種別と再試験可否を返す |
+
+### 表示スキーマの契約型追従
+
+Custom Tool の表示スキーマ（description・parameter 定義）は Tool の契約型（contracts.ts）に追従する。
+表示と契約型に差分が生じた場合は表示側を改めて解消する。agentdev_gh Tool においては、issue_create の labels
+必須性と issue_list の labels・search 受理が表示に反映されていることを含む。
 
 ## 対象操作の境界（初期セット）
 

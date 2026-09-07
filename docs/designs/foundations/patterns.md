@@ -2,7 +2,7 @@
 title: 文書フォーマット規約
 status: accepted
 created: 2026-08-20
-updated: 2026-09-02
+updated: 2026-09-07
 ---
 <!-- ADF-COVERS(implementation): REQ-001-008, REQ-001-010, REQ-001-011, REQ-001-012, REQ-001-013, REQ-001-014, REQ-001-015, REQ-001-016, REQ-001-030, REQ-001-046, REQ-001-047 -->
 
@@ -76,6 +76,18 @@ Knowledge 文書（docs/knowledge/ 配下、REQ-056）の frontmatter は以下�
 Knowledge 文書は固定 ID 採番を持たず、ファイル名 slug（kebab-case）が識別子となる。
 本体の必須セクションは知識内容、適用条件、適用対象、根拠、関連知識の5項目とする（REQ-056）。
 Knowledge 文書は独立文書種別であり、REQ・Decision・Design への ADF-COVERS 宣言を持たない。
+
+#### 機械判定形式（check_knowledge_docs.ts 準拠）
+
+Knowledge frontmatter 規約の機械判定は次の5項目で構成する。
+
+1. frontmatter 境界: ファイル先頭の `---` 囲みブロックを frontmatter として判定する
+2. 必須性: `title`、`created`、`updated` の3フィールドの存在を判定する
+3. 日付妥当性: `created`、`updated` を ISO 8601 日付として解釈可能かを判定する
+4. 順序比較: `updated >= created` を判定する
+5. 違反種別: 「必須項目欠落」（2 の違反）と「日付不整合」（3 または 4 の違反）の2種に分類して報告する
+
+本形式の正実装は check_knowledge_docs.ts であり、checker の判定変更時に本規約が追従する。
 
 knowledge 見出し一致の機械判定形式: 必須セクションの存在は、Markdown 見出し行（`#`〜`######`）の見出しテキストと必須セクション名（知識内容、適用条件、適用対象、根拠、関連知識）との trim 後の完全一致で判定する。見出しとセクション名の意味一致は判定対象に含まらず、検査は構造面（配置、ファイル名命名、必須見出しの存在）に限定される。
 

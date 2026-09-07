@@ -2,7 +2,7 @@
 title: checker 実行契約と検出基盤規則
 status: accepted
 created: 2026-08-15
-updated: 2026-09-04
+updated: 2026-09-07
 ---
 <!-- ADF-COVERS(implementation): REQ-002-035 -->
 <!-- ADF-COVERS(implementation): REQ-010-062 -->
@@ -141,6 +141,20 @@ AG-009(a)（Issue #2386 由来の既存対応計画 ID。本前置とは別の�
 stdout 証跡を要する checker（機械可読レポートを stdout 出力する checker）の実行は、モジュール import 経由（node --experimental-strip-types）を標準経路とする。Windows + bun 環境では bun run 経由の process.exit 実行で stdout レポートが失われることがあるため、CLI 経由で実行する場合は process.exit 前に stdout の flush を保証する終了手順を例外経路として用いる。
 
 安定実行経路の詳細は docs/knowledge/checker-cli-stdout-loss-on-windows-bun.md を参照する。
+
+### ESM 互換性要件
+
+checker は module import 経由（node --experimental-strip-types）での実行を前提とする。CommonJS API
+（`require.main`、`require` 等）への依存は、`import.meta.main`、`node:module` の `createRequire` 等による
+互換化を行うか、CLI 例外経路での実行に限定する。新規 checker は import 経由での実行を必須とし、
+既存 checker の互換化は本契約の要件として段階的に適用する。
+
+### link profile 実効実行要件
+
+- link profile は main root から読取専用で実行する（worktree 汎用手順の読取専用実行・環境ラベル規定と整合）。
+- worktree 内実行は junction 未伝播により concrete-id 0件の無効実行になり得る。link profile を worktree で実行した
+  場合は実行環境ラベルを記録し、結果の採用可否を環境ラベルで判定する（REQ-018-004 の環境差区分に従う）。
+- source profile と link profile の対比表を検証結果の解釈に用いる。
 
 ## See Also
 

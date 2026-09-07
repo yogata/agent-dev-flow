@@ -2,7 +2,7 @@
 title: 整合性契約
 status: accepted
 created: 2026-08-20
-updated: 2026-09-02
+ updated: 2026-09-07
 ---
 <!-- ADF-COVERS(implementation): REQ-010-006 -->
 <!-- ADF-COVERS(implementation): REQ-036-022 -->
@@ -344,6 +344,18 @@ baseline は `.opencode/skills/repo-agentdev-integrity/baselines/ir-055-baseline
 | 更新実行手順 | `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts --update-ir055-baseline` を実行し、生成された baseline ファイルを commit する。更新後は `--json` 実行で new violation が 0 件になることを確認する |
 | 更新非対象 | strict 違反（REQ-NNNN、ADR-NNNN、`src/opencode/`、`/repo/*`、`repo-*`）の新規発生は baseline 更新で解消せず、必ず実装修復を行う。baseline 更新が許容されるのは heuristic 違反（`docs/designs/`、`docs/guides/`、本体 GitHub URL、行番号付き参照）の bucket 再計算のみ |
 
+### IR-055 検出責務境界
+
+- IR-055（runtime-unresolved-reference）の検出対象は参照解決不可能な未解決参照である。配布物内の concrete REQ 行 ID
+  （3桁行参照 `REQ-NNN-NNN` を含む）の残存検出は IR-059（distribution-reference-boundary）が所有し、IR-055 は
+  3桁行参照を検出対象外とする。検出器の正規パターン定義と baseline は本境界に従う。
+
+### ir-055-baseline entry schema
+
+- ir-055-baseline.json の entry schema: 各 entry は `classification: baseline`（再生成時に機械的に付与・保持される。
+  strict entry には付与しない）と `reason`（既知残存の根拠）を持つ。baseline 再生成は既存 entry の classification・reason
+  を保持する。
+
 ### baseline 再生成分実行契約
 
 - **移設を伴う変更**: 文書の移設・改名・参照構造変更を伴う PR では、baseline 再生成（再計算）を標準手順として PR 内で実行する。移設完了と baseline 不整合の残存を分離して報告する
@@ -403,6 +415,15 @@ REQ-028 の RETIRE に伴い、次の恒常契約の移管を受入れる（詳�
 
 - 検出用の宣言的データ YAML は Design が正となる schema を持ち、YAML は検出用ビューとして扱うこと
 - detector 実装は IR 識別子に基づく命名規約を持ち、IR から detector 実装への機械的逆引きが可能であること
+
+### NG baseline エントリの現行維持
+
+本節は当該セクションの既存サブセクション（baseline entry 運用契約、宣言的データ YAML と detector の契約）を変更せず、それらと並ぶ運用節として追加する。
+
+- ng-baseline.json のエントリは、src 側で解消済みの表記に由来するエントリを削除して維持する。削除後は
+  `check_integrity` を再実行し、demote（warning 抑制）が解除されて新規違反として検出されないことを検証する。
+- 起源 source path が存在しないエントリ（third-party Skill 配置先への移設等により不在となったパス）は削除する。
+  third-party Skill 配置先（`.opencode/skills/` 配下の管理外 Skill）は baseline 走査対象外とする。
 
 ## docs-check delta 検出における除外設定方針（REQ-010-007, REQ-010-009 準拠）
 

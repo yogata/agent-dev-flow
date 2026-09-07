@@ -2,7 +2,7 @@
 title: 検証対応要否カタログ（トレーサビリティモデル references）
 status: draft
 created: 2026-08-21
-updated: 2026-09-05
+updated: 2026-09-07
 ---
 
 <!-- ADF-COVERS(implementation): REQ-057-006 -->
@@ -273,3 +273,4 @@ Issue #2362 の移行作業（棚卸し (a')）で全現行要件行を判定し
 ### REQ-057（docs corpus 整合・現行化バッチ）
 
 - REQ-057-001..REQ-057-022: docs corpus の参照・表記・カタログ・テスト基盤・ガイダンスの現行化目標と維持基準。恒久的な新機械検証を新設せず、既存検査（docs-check、IR-055 baseline、traceability check、integrity suite、IR-044）が新規違反を生まない制約と、Case Issue のテスト戦略・工程判断・レビューで検証
+- REQ-057-023: ADF-COVERS 実装対応宣言の未付与行は正規配置先カタログ（artifact-responsibilities）に従い段階的に付与され、triage で retire を選択した要求行は宣言対象外であること。traceability check の検証対応計上で検証（検証対応任意行）
