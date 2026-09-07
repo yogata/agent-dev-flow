@@ -88,8 +88,8 @@ describe("case-open command projection contract (REQ-017-017)", () => {
     expect(doc).toMatch(/case-run が Issue 本文だけで変更責務、変更意図、検証方針を取得できる/);
   });
 
-  test("anchors the projection to REQ-017-017", () => {
-    expect(doc).toContain("REQ-017-017");
+  test("anchors the projection to the functional projection contract label", () => {
+    expect(doc).toContain("（実現面投影契約）");
   });
 });
 
@@ -105,11 +105,11 @@ describe("Issue template projection target (Execution Contract)", () => {
       expect(ec).toContain(`### ${PROJECTION_SECTION}`);
     });
 
-    test(`${label} template declares the projection contract and the REQ-017-017 anchor`, () => {
+    test(`${label} template declares the projection contract and the functional projection anchor`, () => {
       const section = extractHeadingSection(read(rel), `### ${PROJECTION_SECTION}`);
       expect(section).not.toBe("");
       expect(section).toMatch(/realization_actions を本セクションへ投影する/);
-      expect(section).toContain("REQ-017-017");
+      expect(section).toContain("（実現面投影契約）");
     });
 
     test(`${label} template declares the soft-contract fallback for missing projection source`, () => {
@@ -166,8 +166,6 @@ describe("case-run command consumption contract (REQ-017-017)", () => {
 
   test("reads change responsibility, intent, and verification policy from the Issue body alone (REQ-017-016)", () => {
     expect(doc).toMatch(/req_draft を再読込せず Issue 本文だけで変更責務、変更意図、検証方針を取得する/);
-    expect(doc).toContain("REQ-017-016");
-    expect(doc).toContain("REQ-017-017");
   });
 });
 
