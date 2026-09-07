@@ -2,7 +2,7 @@
 title: case-update Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-15
+updated: 2026-09-08
 ---
 <!-- ADF-COVERS(implementation): REQ-033-001, REQ-033-002, REQ-033-003, REQ-033-004, REQ-033-005 -->
 <!-- ADF-COVERS(implementation): REQ-033-001, REQ-033-003, REQ-033-004, REQ-033-005 -->
@@ -31,7 +31,7 @@ updated: 2026-08-15
 
 ## 副作用
 
-- GitHub API: Issue 本文更新（`--body-file` 使用、`agentdev-gh-cli` VERIFY）、コメント追加（`--body-file`）
+- GitHub I/O: Issue 本文更新、コメント追加（Custom Tool `agentdev_gh` 操作契約。Tool 内 VERIFY 付き）
 - REQ ファイル更新: `docs/requirements/**` 編集、git commit/push（明示パスステージング）
 - フェーズ変更: なし（現在のフェーズを維持）
 
@@ -43,8 +43,8 @@ updated: 2026-08-15
 - Issue番号解決: ユーザー入力またはセッション内会話から取得。`gh issue list` / `gh issue status` 等は禁止
 - 現在状態取得: Issue 状態を取得し、フェーズ判定（`agentdev-workflow-routing`、`agentdev-workflow-lifecycle`）
 - 更新種別ごとの分岐:
-  - `--body`（Issue 本文更新）。Issue 作成時と同じテンプレート構造を維持。`--body-file` 使用、`agentdev-gh-cli` VERIFY（`POL-gh-io-delegation`）
-  - `--comment`（コメント追加）。テンプレート【必須】セクション確認、`--body-file` 使用、VERIFY
+  - `--body`（Issue 本文更新）。Issue 作成時と同じテンプレート構造を維持。Tool 操作契約（Custom Tool `agentdev_gh`）経由、Tool 内 VERIFY
+  - `--comment`（コメント追加）。テンプレート【必須】セクション確認、Tool 操作契約経由、Tool 内 VERIFY
   - `--req`（REQ ファイル更新（APPEND/UPDATE 対応）、git commit/push）
   - `--review-ng`（レビュー NG コメント）。**必ず QG-3 の乖離検出結果を引用**
 - 完了報告
@@ -70,8 +70,8 @@ updated: 2026-08-15
 - `--review-ng` 時の QG-3 乖離検出結果引用省略
 - `--body` 更新時の Issue 作成時テンプレート構造維持省略
 - コメント / レビュー NG コメント テンプレート【必須】セクション確認省略
-- `--body` 直接指定（`--body-file` 使用必須）
-- `agentdev-gh-cli` 安全読み取り手順省略
+- Issue 本文の文字列直接指定（Tool 操作契約（Custom Tool `agentdev_gh`）の構造化引数経由を必須とする）
+- GitHub I/O の Tool 操作契約（Custom Tool `agentdev_gh`）経由の省略
 - work_type 分岐判定基準、固有ルールの独自保持（`agentdev-workflow-lifecycle` 参照）
 
 ## 検証観点
@@ -83,7 +83,7 @@ updated: 2026-08-15
 
 - Issue番号が解決できない場合（一覧取得等の範囲外の手段は使用せず、エラーとして報告して停止する）。
 - テンプレート必須セクションの欠落を検出した場合（テンプレート構造維持・【必須】セクション確認の各制約により投稿前に停止し補完を求める）。
-- gh CLI / git 操作の失敗時（`agentdev-gh-cli` のエラー取扱いに従い、自動リトライ範囲を超えたら停止して報告する）。
+- GitHub I/O / git 操作の失敗時（Custom Tool `agentdev_gh` 操作契約の失敗時動作に従い、自動リトライ範囲を超えたら停止して報告する）。
 
 ## See Also
 
@@ -91,7 +91,6 @@ updated: 2026-08-15
 - `agentdev-workflow-case-update` skill（workflow 実装本体）
 - `agentdev-workflow-routing` skill（フェーズ判定、次コマンド推論）
 - `agentdev-workflow-lifecycle` skill（work_type 分岐判定）
-- `agentdev-gh-cli` skill（gh CLI 安全使用）
+- Custom Tool `agentdev_gh`（GitHub I/O 操作契約。[custom-tool-contracts.md](../responsibilities/custom-tool-contracts.md)）
 - `agentdev-quality-gates` skill（QG-3（`--review-ng` 時引用））
 - REQ-006（case-update / Issue更新）
-

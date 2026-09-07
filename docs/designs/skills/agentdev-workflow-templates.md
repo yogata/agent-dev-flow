@@ -2,7 +2,7 @@
 title: `agentdev-workflow-templates` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-05
+updated: 2026-09-08
 ---
 <!-- ADF-COVERS(implementation): REQ-007-002, REQ-007-003, REQ-007-005, REQ-017-003 -->
 <!-- ADF-COVERS(implementation): REQ-048-001, REQ-048-002, REQ-048-008, REQ-048-016, REQ-057-020 -->
@@ -44,7 +44,7 @@ agentdev 系コマンドで使用する Issue/PR 本文、コメントテンプ�
 ## 現在の動作
 
 - テンプレートは Read tool で読み込み、変数部分を置換して使用
-- 変数置換後の本文は直ちに `[System.IO.File]::WriteAllText`（UTF8Encoding($false)）により一時ファイル（`$env:TEMP/agentdev/gh-temp-{timestamp}.md` 等）へ保存し、`gh --body-file`/ `-F` で渡すこと。文字列変数での本文持ち回り、PowerShell の `Out-File`/ `Set-Content`/ `>` リダイレクトによる一時ファイル作成を禁止する（agentdev-gh-cli standard-procedures Section 1 準拠）
+- 変数置換後の本文は Custom Tool `agentdev_gh` の操作契約経由で渡すこと。本文の byte 保持（LF、空行、インデントを含む行構造）を維持し、Tool 内 VERIFY に委任する。文字列変数での本文持ち回りを禁止する（Tool への受け渡し手段は Tool 内部に隠蔽する）
 - テンプレートの構造を維持する（セクションの削除、順序変更禁止）。Markdown 行構造（LF、セクション間空行、インデント）の保持を含む
 - `<!-- 【必須】 -->` マーカー付きセクションは省略不可
 - `<!-- 【任意】 -->` マーカー付きセクションは省略可能
@@ -245,4 +245,5 @@ Issue テンプレートと PR テンプレートに、実行識別情報と検�
 現在の識別情報 field 集合と検証差分の分類・表形式（8列）は現行ベースラインであり、REQ-048-008、
 REQ-048-014 のとおり REQ-048 の成立条件として固定しない。形式の変更は REQ-048-012 の実験契約に従い、
 後続工程の incremental value 比較可能性（REQ-048-008）を Guardrail として行う。
+
 

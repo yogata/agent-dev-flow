@@ -2,7 +2,7 @@
 title: Workflow Skill Model
 status: accepted
 created: 2026-08-10
-updated: 2026-09-02
+updated: 2026-09-08
 ---
 <!-- ADF-COVERS(implementation): REQ-002-001, REQ-002-002, REQ-002-003, REQ-002-004, REQ-002-017, REQ-002-018, REQ-002-034 -->
 <!-- ADF-COVERS(implementation): REQ-027-001, REQ-027-002, REQ-027-003 -->
@@ -186,7 +186,7 @@ DEC-010 の Workflow Architecture Inventory が Capability Skill 横断抽出候
 | REQ/Decision ファイル管理 | `agentdev-req-file-manager`、`agentdev-decision-file-manager` | case-open、case-close（RU 削除、Form Zero）、req-define、req-save |
 | Design ファイル管理 | `agentdev-design-file-manager` | case-close（Design status 昇格）、design-save |
 | 決定的検証スクリプト | `agentdev-artifact-validation` | req-save、design-save、inspect-docs を含む品質検証 workflow |
-| Issue/PR I/O 境界 | `agentdev-gh-cli` | 全 GitHub 操作を行う workflow |
+| GitHub I/O（Issue/PR 操作） | Custom Tool `agentdev_gh`（Tool 操作契約。Capability Skill ではなく、正規 Design は responsibilities/custom-tool-contracts.md） | 全 GitHub 操作を行う workflow |
 | Issue 操作の安全手続き | `agentdev-issue-management` | case-open、case-update、case-close |
 | Epic 進捗・Wave 構成 | `agentdev-epic-tracker` | case-open、case-close、case-auto |
 | 品質ゲート | `agentdev-quality-gates` | case-open（QG-2）、case-close（QG-4）、req-define |
@@ -233,3 +233,4 @@ Command Design の delegated responsibility 記述は、当該 command の実効
 ## artifact-contracts.md からの委譲
 
 artifact-contracts.md の肥大化シグナル（500行超）に対応し、Workflow Skill 固有契約は本Design へ委譲する。
+

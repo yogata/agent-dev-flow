@@ -2,7 +2,7 @@
 title: case-open Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-05"
+updated: "2026-09-08"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-014, REQ-021-024 -->
@@ -43,7 +43,7 @@ Epic + 子 Issue 一括作成に対応する。
 
 - ファイル削除: `.agentdev/drafts/req-draft-*.md`, `.agentdev/backlog/req-units/RU-*.md`（Standard / Epic 全フロー共通、v2:REQ-0137-003/006 Form Zero）
 - git 操作: `git rm <path>` + `git commit -- <paths>` の即時ステージ、コミット（並列実行安全ステージング）
-- GitHub API: `gh issue create`, `gh issue edit`, `gh issue comment`（`agentdev-gh-cli` VERIFY 付き）
+- GitHub I/O: Issue 作成、Issue 本文更新、コメント追加（Custom Tool `agentdev_gh` 操作契約。Tool 内 VERIFY 付き）
 - deviation capture: case-open 実行中に実観測した deviation を agentdev-learning-capture skill または
   agentdev-intake-pipeline（自動capture向け item 生成操作）へ委譲して保存。
   保存先は capture-boundaries.md の Split Rule に従う。
@@ -300,8 +300,8 @@ Case Issue の本文冒頭には、req-define 経由で要件化された元追�
 - 子Issue最大10件超過時の作成続行（エラー停止、REQ-006-028）
 - 構成生成事前検証を GitHub Issue 作成後に行う扱い（REQ-006-027）
 - intake / learning capture の実施
-- Issue作成の gh CLI 安全手続き省略（`agentdev-gh-cli` 参照）
-- case-open は Issue 本文（Standard/Epic/子Issue/完了報告コメント全て）を文字列変数で持ち回らず、`[System.IO.File]::WriteAllText`（UTF8Encoding($false)）による UTF-8 BOM なし LF 一時ファイル経由で `gh --body-file` へ渡すこと（REQ-006-024、`POL-gh-io-delegation`）。テンプレート読込→変数置換→ファイル保存→gh CLI 渡しまでをファイル経由で固定し、親エージェントの本文再構成を禁止する（REQ-006-025）
+- GitHub I/O の Tool 操作契約（Custom Tool `agentdev_gh`）経由の省略。Issue作成は Tool 操作契約経由で行い、Tool 内 VERIFY を迂回する直接実行を行わないこと
+- case-open は Issue 本文（Standard/Epic/子Issue/完了報告コメント全て）を Custom Tool `agentdev_gh` の操作契約経由で渡すこと（REQ-006-024）。文字列変数での本文持ち回り、親エージェントによる本文再構成を禁止する（REQ-006-025）
 - スイープ操作（`git add -A` / `git add .` / `git commit -a` / `git checkout .` / `git reset --hard` / `git stash` 等）の実行（v2:REQ-0137-001）
 - 明示パス指定以外のステージ、コミット（v2:REQ-0137-002/005）
 - draft / RU 削除の未ステージ残存許可（Form Zero、v2:REQ-0137-003/006）
@@ -378,7 +378,7 @@ case-open Design 内の REQ-006-089、REQ-006-093 参照行と正規定義（REQ
 - `agentdev-issue-management` skill（Issue 本文生成、テンプレート充足）
 - `agentdev-workflow-templates` skill（テンプレート選定）
 - `agentdev-workflow-lifecycle` skill（work_type、scale 判定、ラベル付与）
-- `agentdev-gh-cli` skill（gh CLI 安全使用）
+- Custom Tool `agentdev_gh`（GitHub I/O 操作契約。[custom-tool-contracts.md](../responsibilities/custom-tool-contracts.md)）
 - `agentdev-git-worktree` skill（並列実行安全ステージング）
 - `agentdev-quality-gates` skill（QG-2）
 - `agentdev-epic-tracker` skill（ステータス追跡テーブル）
@@ -452,4 +452,5 @@ review の結果、execution structure、Issue 本文候補、完了条件のい
 
 本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts Design「adversarial-review との委譲契約接続」節、workflow-contracts Design「adversarial-review 由来の停止信号」節との間で意味の重複、矛盾を生じない。
 case-open command 固有の挿入境界（発動条件、挿入構造、変更影響別再実行ルール、順序）のみを本節が所有し、共通 caller integration 契約、adversarial-review 自身の振る舞い契約、再 review 条件と停止条件の詳細は各正規所有者 Design を正とする。
+
 

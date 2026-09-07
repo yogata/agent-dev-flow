@@ -2,7 +2,7 @@
 title: 実行時パッケージ境界
 status: accepted
 created: 2026-08-20
-updated: 2026-09-03
+updated: 2026-09-08
 ---
 <!-- ADF-COVERS(implementation): REQ-002-007, REQ-002-008, REQ-002-011, REQ-002-019, REQ-002-020, REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-002, REQ-009-003, REQ-009-006, REQ-009-007, REQ-009-008, REQ-009-009, REQ-009-010, REQ-009-011, REQ-009-012, REQ-009-013, REQ-009-014, REQ-009-015, REQ-009-016, REQ-009-017, REQ-009-018, REQ-009-019, REQ-009-020, REQ-009-021, REQ-009-022, REQ-009-023, REQ-009-024, REQ-009-025, REQ-009-035, REQ-009-036, REQ-009-037, REQ-009-038, REQ-009-039, REQ-009-046, REQ-009-047, REQ-009-048, REQ-009-049 -->
@@ -39,7 +39,7 @@ AgentDevFlow の実行時パッケージ境界を定義し、本体リポジト�
 | `consumer-generated` | ローカル版 OpenCode 導入リポジトリ | ローカル版 OpenCode を導入する利用側リポジトリ | link mode による AgentDevFlow 実行時位置（Custom Tool `agentdev_gh` の実行ディレクトリのみ `src/opencode-local/` から接続） | 個人利用環境のローカルリポジトリ |
 
 `consumer-generated` はローカル版 OpenCode を link mode で導入する利用側リポジトリである（REQ-009, REQ-009, REQ-009）。
-`.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を `src/opencode/` 配下へ接続し、Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけを `src/opencode-local/agentdev-gh-cli/`（Local 実装）へ接続する。
+`.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を `src/opencode/` 配下へ接続し、Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけを `src/opencode-local/agentdev-gh/`（Local 実装）へ接続する。
 詳細は本 Design の「link mode 接続手順技術詳細」を参照。
 
 ### リポジトリ種別判定基準
@@ -48,7 +48,7 @@ AgentDevFlow の実行時パッケージ境界を定義し、本体リポジト�
 |------|-----------|
 | `src/opencode/` が存在し `.opencode/` がジャンクション | `self-hosting` |
 | `.opencode/commands/agentdev/` または `.opencode/skills/agentdev-*/` が存在（ジャンクション、シンボリックリンク含む） | `consumer-with-agentdev` |
-| `.opencode/tools/agentdev-gh/` が `src/opencode-local/agentdev-gh-cli/` への link として解決される | `consumer-generated` |
+| `.opencode/tools/agentdev-gh/` が `src/opencode-local/agentdev-gh/` への link として解決される | `consumer-generated` |
 | `.opencode/` が存在し `agentdev` 名前空間を含まない | `consumer-local` |
 | 上記いずれでもない | N/A（OpenCode 非使用リポジトリ） |
 
@@ -119,13 +119,13 @@ scripts/ は skill junction の配下に位置し、skill の一部として配�
 .opencode/
   commands/agentdev/      → link → src/opencode/commands/agentdev/
   skills/agentdev-*/      → link → src/opencode/skills/agentdev-*/
-  tools/agentdev-gh/      → link → src/opencode-local/agentdev-gh-cli/（Local 実装）
+  tools/agentdev-gh/      → link → src/opencode-local/agentdev-gh/（Local 実装）
 .agentdev/
   issues/                 → ローカルIssue（Issue / PR 相当の永続情報）
 ```
 
 - `.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を `src/opencode/` 配下へ接続する（REQ-009 decision #2）
-- Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけを `src/opencode-local/agentdev-gh-cli/` へ接続する（REQ-009 decision #3、REQ-011-006）
+- Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけを `src/opencode-local/agentdev-gh/` へ接続する（REQ-009 decision #3、REQ-011-006）
 - link target が意図した target 以外へ解決される場合は link 設定を停止する（REQ-009-010, REQ-009 decision #6）
 - `.opencode/commands/`, `.opencode/skills/`, `.opencode/` 配下ひな形は link により git 管理対象外（REQ-009-008, REQ-009 decision #1）
 
@@ -298,14 +298,14 @@ outside-root 判定は、ワークスペース外の書き込みを原則ブロ�
 |-------------------------------|----------|------|
 | `commands/agentdev/` | `src/opencode/commands/agentdev/` | 通常版と同一接続先（REQ-009 decision #2） |
 | `skills/agentdev-*/` | `src/opencode/skills/agentdev-*/` | 通常版と同一接続先（REQ-009 decision #2） |
-| `tools/agentdev-gh/` | `src/opencode-local/agentdev-gh-cli/` | local mode のみ差し替え接続先。Custom Tool `agentdev_gh` の実行ディレクトリ（REQ-009 decision #3, REQ-011-006） |
+| `tools/agentdev-gh/` | `src/opencode-local/agentdev-gh/` | local mode のみ差し替え接続先。Custom Tool `agentdev_gh` の実行ディレクトリ（REQ-009 decision #3, REQ-011-006） |
 
-agentdev-gh 以外は通常版と同一の `src/opencode/` 配下へ接続し、Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）のみ `src/opencode-local/agentdev-gh-cli/`（Local 実装）へ接続することでローカル版環境を構成する。
+agentdev-gh 以外は通常版と同一の `src/opencode/` 配下へ接続し、Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）のみ `src/opencode-local/agentdev-gh/`（Local 実装）へ接続することでローカル版環境を構成する。
 `src/opencode/` は GitHub 版専用原本であり、ローカル版はこれを変更しない（REQ-009 decision #7）。
 
 ### ローカル I/O パッケージ契約
 
-`src/opencode-local/agentdev-gh-cli/` は Custom Tool `agentdev_gh` の Local 実装の唯一の原本である。
+`src/opencode-local/agentdev-gh/` は Custom Tool `agentdev_gh` の Local 実装の唯一の原本である。
 
 ローカル版は通常版と同じ操作契約を提供し、Issue と PR の読取り、更新、作成済み状態、取り込み結果をローカルIssue（`.agentdev/issues/issue-{NNNN}.md`）の対応する記録へ読み替える（REQ-009-026〜032）。
 
@@ -324,7 +324,7 @@ agentdev-gh 以外は通常版と同一の `src/opencode/` 配下へ接続し、
 | パラメータ | リンク構成 |
 |-----------|-----------|
 | `-LocalMode` 未指定（既定） | 通常版: 全 agentdev command/skill/tool を `src/opencode/` 配下へ接続 |
-| `-LocalMode` 指定時 | local mode: `tools/agentdev-gh/`（Custom Tool `agentdev_gh` の実行ディレクトリ）のみ `src/opencode-local/agentdev-gh-cli/` へ接続、それ以外は `src/opencode/` 配下へ接続 |
+| `-LocalMode` 指定時 | local mode: `tools/agentdev-gh/`（Custom Tool `agentdev_gh` の実行ディレクトリ）のみ `src/opencode-local/agentdev-gh/` へ接続、それ以外は `src/opencode/` 配下へ接続 |
 
 `-Mode`（dry-run / check / apply）は `-LocalMode` の有無にかかわらず従来通り動作し、チェックアウト検証と junction 設定の各フェーズで適用される。
 別スクリプト（`install-local.ps1` 等）は新設せず、エントリポイントを単一に維持する。
@@ -332,7 +332,7 @@ agentdev-gh 以外は通常版と同一の `src/opencode/` 配下へ接続し、
 
 ### scripts/install.ps1 -Mode check の local mode リンク状態検出条件
 
-`scripts/install.ps1 -Mode check` は `.opencode/tools/agentdev-gh/` が `src/opencode-local/agentdev-gh-cli/` への link として解決される場合、リポジトリ種別を `consumer-generated` として検出、報告する（リポジトリ種別判定基準表参照）。
+`scripts/install.ps1 -Mode check` は `.opencode/tools/agentdev-gh/` が `src/opencode-local/agentdev-gh/` への link として解決される場合、リポジトリ種別を `consumer-generated` として検出、報告する（リポジトリ種別判定基準表参照）。
 通常版のリンク構成（`tools/agentdev-gh/` も `src/opencode/` 配下へ接続）との違いを当該 link target で識別する。
 
 ### チェックアウト検証（usable checkout 判定）
@@ -373,7 +373,7 @@ link target が意図した target 以外へ解決される場合は link 設定
 | ジャンクション以外のパス | パスが存在するがジャンクションでない | エラー停止 | エラーとして報告 |
 
 意図した src 配下は LocalMode の有無により切り替わる。
-通常版は `src/opencode/` 配下、LocalMode 指定時は `agentdev-gh-cli` のみ `src/opencode-local/agentdev-gh-cli/`、それ以外は `src/opencode/` 配下である（REQ-009 decision #2, #3）。
+通常版は `src/opencode/` 配下、LocalMode 指定時は `agentdev-gh` のみ `src/opencode-local/agentdev-gh/`、それ以外は `src/opencode/` 配下である（REQ-009 decision #2, #3）。
 
 wrong target は「ジャンクション自体は存在するが、意図した接続先へ接続されていない、または接続先が解決不能」な状態である。
 PR #1120 により、従来の「ジャンクションが存在すれば正常とみなす」判定から、`Resolve-Path` により実際の解決先と期待される src 配下を比較して意図した target か確認する判定へ拡張された。
@@ -385,7 +385,7 @@ link 設定は導入先リポジトリでだけ実行し、AgentDevFlow 本体�
 
 設定前に各 link の実パスを確認し、意図した target 以外へ解決される場合は設定を停止する。
 
-設定後は command、skill、`agentdev-gh-cli` の各 link が期待する原本へ解決されることを確認する。
+設定後は command、skill、Custom Tool（`agentdev-gh`）の各 link が期待する原本へ解決されることを確認する。
 
 更新時は既存 link を解除してから同じ target へ再接続し、差分生成や変換処理は行わない。
 
@@ -446,3 +446,4 @@ wrong target 検出、再作成ロジックは LocalMode と通常版 install �
 - REQ-002（配布物依存スキルの src 昇格方針と未トラックスキル検出）
 - REQ-009（ローカル版導入方式を link mode へ統一し生成方式を廃止。v2:ADR-0126 を supersede）
 - v2:ADR-0134（配布物依存スキルの src 昇格方針）
+

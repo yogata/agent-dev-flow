@@ -2,7 +2,7 @@
 title: 設計原則
 status: accepted
 created: 2026-08-20
-updated: 2026-09-02
+updated: 2026-09-08
 ---
 
 # 設計原則
@@ -103,7 +103,7 @@ frontmatter でエージェント指定、スキル参照を宣言し、本文�
 
 Command / Skill の責任分界の判断理由、詳細契約は v2:ADR-0107（コマンド・スキル・テンプレート・スクリプト責任分界の正式定義）、`../responsibilities/artifact-contracts.md` を参照。
 
-**gh CLI 安全性**: Windows PowerShell 環境では、WRITE 操作は `--body-file` 経由、READ 操作は一時ファイル経由で Read tool を使用する安全手順を強制する（`agentdev-gh-cli` skill、DEC-004）。
+**GitHub I/O**: GitHub Issue / PR への副作用操作は Custom Tool `agentdev_gh` の操作契約経由に限定する。Windows 環境依存の文字コード・一時ファイル対策は Tool 内部に隠蔽する（[custom-tool-contracts.md](../responsibilities/custom-tool-contracts.md)、DEC-004、DEC-022 決定4）。
 
 **git worktree**: Issue 番号ベースの命名規則（`.worktrees/{N}-{type}`）で複数 Issue の同時進行を管理する（`agentdev-git-worktree` skill）。
 
@@ -164,3 +164,4 @@ skill、reference、script、REQ、Design の配置原則を、正規所有者�
 REQ-002、v2:ADR-0136、REQ-029-001..008 が定めるハーネス責務と配布物責務の分離を回帰基準として維持する。
 配布 command、skill、reference、docs にハーネス固有の待機時間、並列度、再試行、起動引数を残さない。
 実行エージェントの選定、起動方法、実行制御パラメータはハーネス側文書（`AGENTS.md`、`references/<harness>.md`）が所有する。
+

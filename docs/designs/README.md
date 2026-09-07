@@ -127,7 +127,6 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [skills/agentdev-case-run-execution-adapter.md](skills/agentdev-case-run-execution-adapter.md) | accepted | 補助 | case-run 外部実行 adapter |
 | [skills/agentdev-issue-management.md](skills/agentdev-issue-management.md) | accepted | 補助 | Issue 管理 |
 | [skills/agentdev-epic-tracker.md](skills/agentdev-epic-tracker.md) | accepted | 補助 | Epic 進捗追跡 |
-| [skills/agentdev-gh-cli.md](skills/agentdev-gh-cli.md) | accepted | 補助 | gh CLI 手続きの参照点（実行主体は Custom Tool `agentdev_gh`） |
 | [skills/agentdev-git-worktree.md](skills/agentdev-git-worktree.md) | accepted | 補助 | git worktree 操作 |
 | [skills/agentdev-intake-pipeline.md](skills/agentdev-intake-pipeline.md) | accepted | 補助 | intake pipeline |
 | [skills/agentdev-learning-capture.md](skills/agentdev-learning-capture.md) | accepted | 補助 | learning capture |
@@ -268,3 +267,4 @@ Guides (guides/*.md)           -- 人間向けナビゲーション（規範的�
 - **Decision** ファイルは意思決定記録とその判断根拠を記録する。
 - **Design** ファイルは、REQ を満たすために現在採用している内部構造、内部動作、責務分担、データ構造、処理方式、規則、パラメータを記述する。3 層構造（commands / skills / workflows）と基盤 6 ドメイン（foundations / responsibilities / quality / integrity / local / authoring）を持つ。3 層は個別 command/skill と共通契約を扱い、基盤 6 ドメインはシステム全体の構成・フォーマット・整合性検査等を扱う（両系統を混同しない）。横断 Design は個別 Design の代替ではない。
 - **Guides** は人間向けナビゲーション層である。規範的権限を持たない。
+

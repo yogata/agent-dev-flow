@@ -2,7 +2,7 @@
 title: `agentdev-issue-management` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-25
+updated: 2026-09-08
 ---
 
 # `agentdev-issue-management` Design
@@ -66,10 +66,9 @@ Case Issue 本文から元追跡Issueへの参照形式は、Epic/child 専用�
 ## See Also
 
 - [agentdev-issue-tracking.md](agentdev-issue-tracking.md)
-- [agentdev-gh-cli.md](agentdev-gh-cli.md)
+- [custom-tool-contracts.md](../responsibilities/custom-tool-contracts.md)（GitHub I/O の Custom Tool 操作契約）
 - [agentdev-workflow-templates.md](agentdev-workflow-templates.md)
 - [agentdev-epic-tracker.md](agentdev-epic-tracker.md)
 - [commands/case-open.md](../commands/case-open.md)
 - [commands/case-update.md](../commands/case-update.md)
 - [commands/case-close.md](../commands/case-close.md)
-

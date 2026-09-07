@@ -2,7 +2,7 @@
 title: case-close Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-05
+updated: 2026-09-08
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-018, REQ-021-019, REQ-021-022, REQ-021-025 -->
@@ -77,7 +77,7 @@ worktree を削除する前に、未追跡ファイルだけを対象とする c
 
 ### 入力判定
 
-- Issue番号解決: ユーザー入力またはセッション内会話から取得。`agentdev-gh-cli` 安全読み取り手順で本文取得
+- Issue番号解決: ユーザー入力またはセッション内会話から取得。Tool 操作契約（Custom Tool `agentdev_gh`）で本文取得
   - Epic Issue 判定（ステータス追跡テーブル存在確認）。存在時は Epic Wave クローズへ分岐
 
 ### Epic Wave クローズ（REQ-006-021/022/023/027）
@@ -123,18 +123,18 @@ Epic Issue 本文の `## 完了条件` セクションを読み込み、全完�
 
 ### 単一 Issue クローズ（従来フロー、後方互換）
 
-- 重複ファイルチェック（`git status --short` と `gh pr view --json files` で重複検出）
+- 重複ファイルチェック（`git status --short` と PR 変更ファイル一覧取得（Custom Tool `agentdev_gh` の pr_changed_files）で重複検出）
 - 前提確認（達成判定、完了ゲート（QG-4）に従い完了条件チェックボックスを最終評価、更新）。`[x]` 反映事後確認（再読込 VERIFY、最大2回）。未達項目残存時は構造化エラー停止
 - docs/ 検証（機能追加固有検証（REQ作成、インデックス、spec更新、Decision）、関連ドキュメント整合性確認、README 索引整合性）
   - close 時 Design / commands / skills 更新漏れの局所確認
   - Design 確定フロー（v2:ADR-0123 Decision #4, REQ-001-015）（PR 本文の `## Design確定候補` セクション読取、確定判断（(a) 昇格 / (b) design-save 再起動提案 / (c) 見送り））
   - AUTOGEN block 索引再生成差分検出（project extension checks 経由）。docs/ 検証の後、generate_indexes.ts --dry-run を実行し AUTOGEN block の再生成差分を検出する。本検証は case-close の手順を直接編集せず、Workflow Skill extension（.agentdev/extensions/skills/agentdev-workflow-case-close.yaml）の checks セクション経由で導入する（project-extensions Design 準拠）。case-close は dry-run/差分検査で停止し、直接編集・commit しない。差分がある場合は case-run へ差戻し、再生成（実 commit）は case-run が行う。複数 PR 跨ぎでの AUTOGEN block 再生成漏れを防止する。Epic Wave クローズ経路では Epic Issue 完了条件チェックボックス最終評価の前段に同等の dry-run/diff による索引健全性検証を適用する（Epic Issue クローズ時の索引検証は case_open_hints 参照）
-- PRマージ（`gh pr merge --squash`（リトライ最大5回、フォールバック手順）、対応記録コメント追記）
-  - squash merge 前の mergeable UNKNOWN ポーリング（REQ-006-028）（PR 補助データ読込（`agentdev-gh-cli`）で `gh pr view {N} --json mergeable,mergeStateStatus` を取得し、UNKNOWN の場合は最大60秒・10秒間隔でポーリング待機。上限超過時はマージ中止・構造化エラー停止。CONFLICTING 遷移時はコンフリクト解消 rebase パスへ分岐）
+- PRマージ（squash merge（Custom Tool `agentdev_gh` の pr_merge、リトライ最大5回、フォールバック手順）、対応記録コメント追記）
+  - squash merge 前の mergeable UNKNOWN ポーリング（REQ-006-028）（Custom Tool `agentdev_gh` の pr_mergeable で mergeable 状態を取得し、UNKNOWN の場合は最大60秒・10秒間隔でポーリング待機。上限超過時はマージ中止・構造化エラー停止。CONFLICTING 遷移時はコンフリクト解消 rebase パスへ分岐）
   - Squash merge 後のローカル先行 commit 検出、処理（REQ-003-005）（`git log origin/{branch}..HEAD --oneline` で検出、内容重複確認後に `git reset --hard origin/{branch}` で reset（`agentdev-git-worktree` の squash merge 後分岐ハンドリング手順参照））
   - コンフリクト解消 rebase パス（REQ-003-001/002、REQ-006-024/025）（squash merge 失敗時）。squash merge がコンフリクトで失敗した場合、`git rebase` による機械的解消を試みる。rebase が自動解決した場合は再マージ（PR マージへ戻る）。rebase 自体がコンフリクトを発生した場合は実装変更を行わず case-auto へエスカレーションし停止する（コンフリクト解消モデル Level 1、`docs/designs/commands/case-auto.md` コンフリクト解消モデル Level 2/3 参照）
 - Post-merge テスト戦略検証（CI通過等の反映）
-- Issueクローズ（`gh issue close --reason completed`）
+- Issueクローズ（Custom Tool `agentdev_gh` の issue_close、reason: completed）
 - ブランチ、worktree削除（`agentdev-git-worktree` 手順）。未コミット変更検出、共有作業ツリーでの `git checkout .` 禁止（v2:REQ-0137-001）
 - 親Epic Issue更新（`agentdev-epic-tracker`、Epic 自動クローズ判定）
 - 実行前同期（`git pull --ff-only`、hash 検証）
@@ -183,84 +183,13 @@ case-close 工程で targeted docs guard を実行する。
 changed-path routing と配布依存境界の検出経路は共有境界 adapter へ接続する（DEC-014）。
 最終 gate 基底は REQ-010-012 を再利用し、検査エラー（検査対象欠落、読込不能、未分類エントリ、adapter 起動失敗）は gate-not-passed として扱い、clean として通過させない（DEC-014 決定5、`integrity/distribution-boundary.md`「検査エラーの意味」）。
 
-- 実行タイミング: docs/ 検証の一部。変更ファイル対象の targeted docs guard を実行し、draft→accepted 等の Design status 変更時の `docs/designs/README.md` 同期、Issue/PR で宣言した文書更新対象と実変更ファイルの対応、旧Design直下パス混入検出（IR-057）、local版旧生成方式語彙混入検出、full docs-check 実行要否判定を行う
-- 実行コマンド: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts --workflow case-close --files <PR 変更ファイル一覧> --json`。PR 変更ファイル一覧は PR 補助データ読込手続き（`agentdev-gh-cli`）で `gh pr view <PR> --json files` から取得する（case-close はマージ後 main 環境で実行されるため `--files` を使用。`--base-ref` は worktree 環境（マージ前、case-run 等）向け）
+- 実行タイミング: docs/ 検証の一部。変更ファイル対象の targeted docs guard を実行し、draft→accepted 等の Design status 夺更時の `docs/designs/README.md` 同期、Issue/PR で宣言した文書更新対象と実変更ファイルの対応、旧Design直下パス混入検出（IR-057）、local版旧生成方式語彙混入検出、full docs-check 実行要否判定を行う
+- 実行コマンド: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts --workflow case-close --files <PR 変更ファイル一覧> --json`。PR 変更ファイル一覧は Custom Tool `agentdev_gh`（pr_changed_files）で取得する（case-close はマージ後 main 環境で実行されるため `--files` を使用。`--base-ref` は worktree 環境（マージ前、case-run 等）向け）
 - `full_docs_check_recommended` が true の場合: case-close 完了判定の追加確認として扱う。integrity rule 追加・削除・大幅変更、docs/designs の大規模移動・改名、repo-agentdev-integrity の検査スコープ変更、文書分類・責務境界の基準変更を検出した場合は `/repo/docs-check`（全体監査）の実行を推奨する
 - 失敗時: 検査対象文書（PR 変更ファイル、`docs/designs/README.md`、`docs/README.md`）を修正して再実行する
 
 JSON 出力は `workflow`、`files_checked`、`coupled_files_checked`、`failures`、`warnings`、`doc_map_update_required`、`spec_readme_update_required`、`requirements_readme_update_required`、`full_docs_check_recommended` を含む。
 `failure` は `rule_id`、`severity`、`file`、`line`、`message`、`expected` を持つ。
-
-### case-close が使用する検査ツール
-
-case-close が使用する検査ツール（[integrity-contracts.md](../integrity/integrity-contracts.md)「Workflow × 使用ツールマトリックス」参照）:
-
-- check_changed_docs.ts（--workflow case-close、--files <PR 変更ファイル一覧>）: docs 検証の targeted docs guard で実行
-- check_extensions.ts（IR-056）: `src/opencode/commands/agentdev/**/*.md`, `src/opencode/skills/agentdev-*/SKILL.md`, `src/opencode/skills/agentdev-*/references/**/*.md`, `.agentdev/extensions/**` のいずれかを変更した場合に実行（docs 検証）
-- test_strategy: QG-4 完了条件確認（REQ-006-026）
-
-case-close は check_integrity.ts（全体監査）を使用しない（case-close はマージ後 main 環境で PR 単位の targeted 検査が責務。全体監査は /repo/docs-check の責務）。
-
-※上記は全て肯定表現である（REQ-010-002, REQ-010-003 準拠）。
-
-### files_checked 空時の取扱い（REQ-006-030, v2:REQ-0158 Phase 3）
-
-targeted docs guard（check_changed_docs.ts）の実行結果で `files_checked` が空の場合、検査対象ファイルが検出されなかったことを示す。
-case-close は `--files` で PR 変更ファイル一覧を指定するため、Phase 3 契約により FAILURE（exit code 非ゼロ）として報告される。
-
-#### check_changed_docs.ts 側の出力（v2:REQ-0158 Phase 3）
-
-`--files` 指定で `files_checked` が空の場合、`failures` 配列に severity `strict` の FAILURE を追加する（exit code 非ゼロ）。
-メッセージは対象ファイルが検出されなかった旨を示す。
-`--base-ref` 指定で空の場合は WARNING となる（case-close は `--files` を使用するため対象外）。
-check_changed_docs.ts は対象選定の十分性を判定せず、対象ファイル未検出のみを報告する。
-
-#### case-close 側の確認ステップ
-
-case-close は targeted docs guard が FAILURE を返した場合、以下を行う:
-
-1. FAILURE を検査見逃しのリスクとして認識する
-2. `--files` 指定の妥当性を確認する（PR 変更ファイル一覧の再取得、パス指定の確認）
-3. 必要に応じて `--files` での再実行、または対象ファイルの手動確認を行う
-4. 空の理由が正当（対象ファイルが本当に変更されていない等）であることを確認してから続行する
-5. PR が verification-only（変更ファイル0件）の場合、後述「verification-only PR の files_checked 空確認（v2:REQ-0158-002）」に従い判定する
-
-上記確認を経ずに `files_checked` 空のまま完了扱いとしない。
-
-#### verification-only PR の files_checked 空確認（v2:REQ-0158-002）
-
-verification-only PR（実装差分0件、検証のみで作成された PR）の場合、`files_checked` が空になることが正規の状態として発生する。
-case-close は次の手順で verification-only 判定を行い、正当と判断された場合に PASS 処理する。
-要件の SSoT は v2:REQ-0158-002、verification-only PR の定義と case-run 側引継ぎ注意事项は [case-run.md](case-run.md)「verification-only PR（実装差分なし、検証のみ）（v2:REQ-0158-002）」参照。
-
-PR テンプレート（pr_desc.md）と Issue 本文構造は workflow-templates（[agentdev-workflow-templates.md](../skills/agentdev-workflow-templates.md)）の責務である。
-case-close は PR 本文の verify-only 根拠欄を読み、記載が不十分な場合は PASS としない。
-
-**判定基準（全て満たすこと）**:
-
-1. PR 変更ファイル一覧（`gh pr view <PR> --json files`）が空配列であること
-2. PR 本文の verify-only 根拠欄に実装差分を含まない理由、根拠成果物または commit、検証対象、検証結果が記録されていること
-3. PR 本文の検証結果から、Issue の受け入れ基準が検証のみで充足されたことが確認できること
-
-**PASS 処理**:
-
-上記3項目を全て満たす場合、case-close は verification-only PR と判定し、files_checked 空の FAILURE を PASS 処理する。
-判定根拠（PR 本文の verify-only 根拠欄の参照、`gh pr view --json files` の空配列確認）を完了報告に記録する。
-根拠欄の記載が不十分な場合は PASS としない。
-
-**false-clean 3層防御との相互作用**:
-
-v2:REQ-0158「case-close 向け false-clean 予防」節は files_checked 空を silent pass としないための3層防御（対象空時の warning 報告、`--files` 標準化、files_checked 非空の確認ステップ）を定める。
-v2:REQ-0158-002 はこの3層防御を回避するものではなく、verification-only の正当性確認により3層防御の警告を吸収する経路を追加する。
-両者の関係は以下の通り:
-
-| 層 | v2:REQ-0158 false-clean 予防節 | v2:REQ-0158-002 による相互作用 |
-|---|---|---|
-| 第1層 | check_changed_docs.ts が files_checked 空を warning として報告 | warning を検知した case-close が verification-only 判定ステップへ進むトリガーとして扱う（silent pass しない） |
-| 第2層 | case-close は `--files <PR変更ファイル>` 指定を標準とする | verification-only PR では `--files` が空配列となり、それ自体が verification-only のシグナルとなる |
-| 第3層 | files_checked が空でないことの確認ステップを含める | 本ステップが verification-only 判定基準（3項目）の適用場所となる。3項目を満たさない場合は silent pass を許さず FAILURE を維持する |
-
-verification-only 判定基準3項目を満たさない files_checked 空（例: PR 本文の根拠欄に記載がない、検証 evidence がない）は silent pass を許さず、FAILURE を維持して構造化エラー停止とする。
 
 ## 対象外
 
@@ -309,7 +238,7 @@ verification-only 判定基準3項目を満たさない files_checked 空（例:
 - `agentdev-learning-capture` skill（学びの検知）
 - `agentdev-learning-pipeline` skill（deferred.md ルール）
 - `agentdev-workflow-orchestration` skill（Capture 境界、達成判定プロトコル）
-- `agentdev-gh-cli` skill（gh CLI 安全使用）
+- Custom Tool `agentdev_gh`（GitHub I/O 操作契約。[custom-tool-contracts.md](../responsibilities/custom-tool-contracts.md)）
 - `agentdev-issue-management` skill（Issue 操作安全性）
 - REQ-006（case-close / 完了処理）
 - v2:REQ-0137（並列実行安全 git 操作規律）

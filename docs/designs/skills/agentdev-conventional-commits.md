@@ -2,7 +2,7 @@
 title: `agentdev-conventional-commits` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-09-08
 ---
 
 # `agentdev-conventional-commits` Design
@@ -34,7 +34,7 @@ Conventional Commits v1.0.0 仕様に従ってコミットメッセージを生�
 - プロジェクト固有ルールとして日本語記述を採用
 - SemVer 準拠（feat: MINOR、fix/docs/style/refactor/perf/test/build/ci/chore/revert: PATCH）
 - フッター形式: `Refs: #N`（参照）、`Closes: #N`（クローズ）
-- **コミットメッセージ渡し規則**: `git commit -m` は ASCII-only とし、日本語等の非 ASCII 文字を含むコミットメッセージは `git commit -F {utf8-file}` で渡すこと。PowerShell 既定 cp932 環境で `-m` に日本語を渡すとコンソールエンコーディング変換により mojibake が発生する。utf8-file は UTF-8（BOMなし）、改行コード LF で作成すること（`[System.IO.File]::WriteAllText` with `UTF8Encoding($false)` 使用、`agentdev-gh-cli` standard-procedures.md Section 2 参照）
+- **コミットメッセージ渡し規則**: `git commit -m` は ASCII-only とし、日本語等の非 ASCII 文字を含むコミットメッセージは `git commit -F {utf8-file}` で渡すこと。PowerShell 既定 cp932 環境で `-m` に日本語を渡すとコンソールエンコーディング変換により mojibake が発生する。utf8-file は UTF-8（BOMなし）、改行コード LF で作成すること（ファイル作成手段の環境依存詳細は Tool・スクリプト内部に隠蔽し、本 Design では規定しない）
 
 ## 対象外
 
@@ -53,4 +53,5 @@ Conventional Commits v1.0.0 仕様に従ってコミットメッセージを生�
 - [agentdev-git-worktree.md](agentdev-git-worktree.md)
 - [commands/req-save.md](../commands/req-save.md)
 - [commands/design-save.md](../commands/design-save.md)
+
 

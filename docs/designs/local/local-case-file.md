@@ -2,7 +2,7 @@
 title: ローカルIssue共通スキーマ
 status: accepted
 created: 2026-06-20
-updated: 2026-09-02
+updated: 2026-09-08
 ---
 <!-- ADF-COVERS(implementation): REQ-009-014, REQ-009-026, REQ-009-027, REQ-009-028, REQ-009-029, REQ-009-030, REQ-009-031, REQ-009-032, REQ-009-033, REQ-009-034, REQ-009-037, REQ-009-039 -->
 <!-- ADF-COVERS(implementation): REQ-011-007 -->
@@ -13,7 +13,7 @@ updated: 2026-09-02
 > ローカル版 OpenCode 導入先リポジトリで運用されるローカルIssueの共通スキーマ、role 条件付きスキーマ、採番、見出しを定義する。
 > 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（REQ-001）。
 > REQ-009 の詳細仕様を正とする。role、kind、状態の意味論は agentdev-issue-tracking Design を正とし、本 Design は物理表現の写像に徹する。
-> ローカルIssue仕様の正本は本 Design であり、`src/opencode-local/agentdev-gh-cli/case-schema/` 配下の定義は操作用定義（正本ではない）とする。
+> ローカルIssue仕様の正本は本 Design であり、`src/opencode-local/agentdev-gh/case-schema/` 配下の定義は操作用定義（正本ではない）とする。
 
 ## 目的
 
@@ -148,7 +148,7 @@ issue_comment の読み書きは、対象ローカルIssueの role により読�
 
 ローカル版 Tool 実装は、role ごとの必須メタデータ、status 値域、許可操作を機械検証する。Case 固有セクション（PR 相当セクション、マージ結果）を role: tracking の必須項目としない。
 
-case-schema 機械可読定義の更新方針: `src/opencode-local/agentdev-gh-cli/case-schema/rules/` の機械可読定義（frontmatter.yaml、status.yaml、labels.yaml、headings.yaml）を共通メタデータと role 条件付きスキーマへ拡張する。role ごとの値域・必須項目を定義へ反映し、本 Design と矛盾しないことを検証する。
+case-schema 機械可読定義の更新方針: `src/opencode-local/agentdev-gh/case-schema/rules/` の機械可読定義（frontmatter.yaml、status.yaml、labels.yaml、headings.yaml）を共通メタデータと role 条件付きスキーマへ拡張する。role ごとの値域・必須項目を定義へ反映し、本 Design と矛盾しないことを検証する。
 
 ## GitHub Issue / PR 置換対応表
 
@@ -178,3 +178,4 @@ runner-local 固有の前提と差分（REQ-011-006）: ローカル版の Tool 
 
 - **関連 REQ**: REQ-009（ローカル版導入方式とローカルIssue運用）、REQ-049（追跡Issue管理機構）、REQ-011-006（Custom Tool の Local 実装差し替え）
 - **関連 Design**: agentdev-issue-tracking.md（role、kind、状態の意味論の正）、custom-tool-contracts.md（Tool 操作契約）、runtime-package-boundary.md
+
