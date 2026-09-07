@@ -14,7 +14,7 @@ AgentDevFlow は5種のリポジトリ種別を定義する（詳細は Design [
 | **本体リポジトリ**（self-hosting） | AgentDevFlow 本体開発リポジトリ。原本と配置先が同一リポジトリに存在 | `.opencode/` = 実行時の配置先（ジャンクション → `src/opencode/`） | agent-dev-flow |
 | **consumer-with-agentdev** | AgentDevFlow を導入する製品リポジトリ。AgentDevFlow 提供 skill/command を利用 | `.opencode/` = プロジェクト独自設定の入口 + AgentDevFlow 提供 command/skill の実行時の位置 | 各種製品開発リポジトリ |
 | **consumer-local** | AgentDevFlow を利用しない OpenCode プロジェクト。独自 command/skill のみ | `.opencode/` = プロジェクト独自設定専用。`agentdev` 名前空間は使用しない | 実験的リポジトリ |
-| **consumer-generated** | ローカル版 OpenCode を導入する利用側リポジトリ。GitHub Issue/PR を使わない個人利用環境向け | `.opencode/` = link mode により接続された AgentDevFlow 実行時の位置。Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけ `src/opencode-local/agentdev-gh-cli/` から差し替え | 個人利用環境のローカルリポジトリ |
+| **consumer-generated** | ローカル版 OpenCode を導入する利用側リポジトリ。GitHub Issue/PR を使わない個人利用環境向け | `.opencode/` = link mode により接続された AgentDevFlow 実行時の位置。Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけ `src/opencode-local/agentdev-gh/` から差し替え | 個人利用環境のローカルリポジトリ |
 | **plugin-future** | 将来の plugin/npm/package 配布形態（現在は未対応） | `.opencode/` = plugin が管理する実行時の位置 | （将来） |
 
 ## `.opencode/` の意味の違い
@@ -68,35 +68,35 @@ scripts/
 ### ローカル版 OpenCode 導入（consumer-generated）
 
 GitHub Issue/PR を使わない個人利用環境向けのリポジトリ種別。
-通常版と同じ link mode（`.opencode/` 配下を src 配下へ接続）で導入し、Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけを `src/opencode-local/agentdev-gh-cli/`（Local 実装）から差し替える（REQ-009、REQ-011-006）。
+通常版と同じ link mode（`.opencode/` 配下を src 配下へ接続）で導入し、Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけを `src/opencode-local/agentdev-gh/`（Local 実装）から差し替える（REQ-009、REQ-011-006）。
 詳細な接続フロー、link target 確認は Design [実行時パッケージ境界](../designs/local/runtime-package-boundary.md) を参照。
 
 ```
 .agentdev-plugin/                → agent-dev-flow のチェックアウト配置先（git clone またはソース ZIP 展開）
   src/opencode/                  → GitHub 版 AgentDevFlow の原本（agentdev-gh 以外の接続先）
-  src/opencode-local/            → ローカル版 link 先原本領域（agentdev-gh-cli のみ）
+  src/opencode-local/            → ローカル版 link 先原本領域（agentdev-gh のみ）
     README.md                    → ローカル版 link 設定の実行手順
-    agentdev-gh-cli/             → Custom Tool agentdev_gh の Local 実装（ローカルIssueの読み書き）
+    agentdev-gh/                 → Custom Tool agentdev_gh の Local 実装（ローカルIssueの読み書き）
 .opencode/
   commands/agentdev/             → link → src/opencode/commands/agentdev/
   skills/agentdev-*/             → link → src/opencode/skills/agentdev-*/
-  tools/agentdev-gh/             → link → src/opencode-local/agentdev-gh-cli/（Local 実装）
+  tools/agentdev-gh/             → link → src/opencode-local/agentdev-gh/（Local 実装）
 .agentdev/
   issues/                        → ローカルIssue（Issue / PR 相当の永続情報）
 ```
 
 - **link による接続**: command/skill を生成せず、`.opencode/` 配下を src 配下へ link で接続する
-- **agentdev_gh 実装の差し替え**: agentdev-gh 以外は通常版と同じ `src/opencode/` 配下へ接続し、Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけを `src/opencode-local/agentdev-gh-cli/` へ接続する（REQ-011-006）
+- **agentdev_gh 実装の差し替え**: agentdev-gh 以外は通常版と同じ `src/opencode/` 配下へ接続し、Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけを `src/opencode-local/agentdev-gh/` へ接続する（REQ-011-006）
 - **link target 確認**: link 設定前に `.opencode/` 配下の各 path が意図した link target へ解決されることを確認し、意図しない target の場合は link 設定を停止する
 - **リポジトリ管理対象外**: link により接続された `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/` はリポジトリ管理対象外
 - **リポジトリ管理対象**: `.agentdev/issues/` 配下のローカルIssueは Issue/PR 相当の永続情報としてリポジトリ管理対象（REQ-009-026）
 - **更新方式**: unlink / relink により行う。`.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を全削除して作り直す方式は採らない
-- **判定基準**: `.opencode/tools/agentdev-gh/` が `src/opencode-local/agentdev-gh-cli/` への link として解決される場合に consumer-generated と判定される（Design runtime-package-boundary.md）
+- **判定基準**: `.opencode/tools/agentdev-gh/` が `src/opencode-local/agentdev-gh/` への link として解決される場合に consumer-generated と判定される（Design runtime-package-boundary.md）
 
 #### ローカル版セットアップ手順
 
 1. `.agentdev-plugin/` に agent-dev-flow のチェックアウトを用意する（git clone またはソース ZIP 展開）
-2. `./.agentdev-plugin/scripts/install.ps1 -Mode apply -LocalMode` を実行し、link 設定を行う（Custom Tool `agentdev_gh` の実行ディレクトリのみ `src/opencode-local/agentdev-gh-cli/` へ接続、それ以外は `src/opencode/` 配下へ接続）
+2. `./.agentdev-plugin/scripts/install.ps1 -Mode apply -LocalMode` を実行し、link 設定を行う（Custom Tool `agentdev_gh` の実行ディレクトリのみ `src/opencode-local/agentdev-gh/` へ接続、それ以外は `src/opencode/` 配下へ接続）
 3. 各 link が意図した target へ解決されることを `./.agentdev-plugin/scripts/install.ps1 -Mode check` で確認する（link mode を自動検出して報告する）
 4. `.agentdev/issues/` ディレクトリが存在することを確認する（ローカルIssue用）
 5. `.gitignore` に link 先（`.opencode/commands/agentdev/`, `.opencode/skills/agentdev-*/`）を追加する
@@ -218,7 +218,7 @@ scripts/ 直下の公開入口は consumer 向け `scripts/install.ps1` と self
 |--------|---------------|------|
 | `scripts/self-sync.ps1` | `self-hosting` | `src/opencode/` ↔ `.opencode/` の同期（apply / check / dry-run） |
 | `scripts/install.ps1` | `consumer-with-agentdev`, `consumer-generated` | チェックアウト済み `.agentdev-plugin/` を前提としたジャンクション作成（apply / check / dry-run）。check は状態確認（link mode 自動検出、版報告は `.git` 存在時のみ、orphan 検出を含む）を兼ねる |
-| （link 設定: `-LocalMode`） | `consumer-generated` | `install.ps1 -Mode apply -LocalMode` が Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）のみ `src/opencode-local/agentdev-gh-cli/` へ接続し、それ以外を `src/opencode/` 配下へ接続する（REQ-011-006）。決定的な変換ロジックを実装したスクリプトは使用しない |
+| （link 設定: `-LocalMode`） | `consumer-generated` | `install.ps1 -Mode apply -LocalMode` が Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）のみ `src/opencode-local/agentdev-gh/` へ接続し、それ以外を `src/opencode/` 配下へ接続する（REQ-011-006）。決定的な変換ロジックを実装したスクリプトは使用しない |
 
 ### 本体リポジトリ（self-hosting）での同期
 

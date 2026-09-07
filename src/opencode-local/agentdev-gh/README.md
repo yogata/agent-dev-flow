@@ -5,14 +5,14 @@ Custom Tool `agentdev_gh` の Local 実現（REQ-011-006、DEC-004）。同一�
 ローカルIssue（`.agentdev/issues/issue-{NNNN}.md`、単一採番空間、role 条件付きスキーマ）の
 読み書きへ読み替える `GhRunner` 実現（`runner-local.ts`）を提供する。
 
-本ディレクトリは旧 agentdev-gh-cli スキル（ローカル版）の後継であり、I/O 正規経路としての
-スキルは解消済み（REQ-011-001）。上位 command / skill は GitHub 版と同じく Custom Tool
+本ディレクトリはローカル版における Custom Tool `agentdev_gh` の Local 実装であり、ローカル版の
+I/O 正規経路である。上位 command / skill は GitHub 版と同じく Custom Tool
 `agentdev_gh` の操作契約のみを参照し、ローカル版であることを意識しない。
 
 ## 接続方式
 
 `scripts/install.ps1 -Mode apply -LocalMode` は `.opencode/tools/agentdev-gh/` の junction 先を
-`src/opencode/tools/agentdev-gh/` から本ディレクトリ（`src/opencode-local/agentdev-gh-cli/`）へ
+`src/opencode/tools/agentdev-gh/` から本ディレクトリ（`src/opencode-local/agentdev-gh/`）へ
 差し替える。登録 Plugin（`src/opencode/plugins/agentdev-gh-tool/`）は投影パスの
 `runner-local.ts` を検出した場合に本実装を使用する。
 
@@ -52,5 +52,5 @@ Custom Tool `agentdev_gh` の Local 実現（REQ-011-006、DEC-004）。同一�
 ## テスト実行
 
 ```bash
-bun test        # cwd: src/opencode-local/agentdev-gh-cli
+bun test        # cwd: src/opencode-local/agentdev-gh
 ```

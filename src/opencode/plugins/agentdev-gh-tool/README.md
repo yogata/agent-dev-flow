@@ -10,7 +10,7 @@ OpenCode は `.opencode/plugins/` 直下のファイル（depth-1）のみを自
 
 ## 実行の差し替え（ローカル版）
 
-既定は GitHub 実装（Tool の `runner-cli.ts` が gh CLI を実行）。投影パス `.opencode/tools/agentdev-gh/runner-local.ts` に Local 実装が存在する場合（`install.ps1 -LocalMode` により junction 先が `src/opencode-local/agentdev-gh-cli/` に差し替わっている場合）は、それを動的に読み込んで差し替える。Workflow は差を認識しない（REQ-{NNNN}-{NNN}、DEC-{NNN}）。
+既定は GitHub 実装（Tool の `runner-cli.ts` が gh CLI を実行）。投影パス `.opencode/tools/agentdev-gh/runner-local.ts` に Local 実装が存在する場合（`install.ps1 -LocalMode` により junction 先が `src/opencode-local/agentdev-gh/` に差し替わっている場合）は、それを動的に読み込んで差し替える。Workflow は差を認識しない（REQ-{NNNN}-{NNN}、DEC-{NNN}）。
 
 ## 設定
 
