@@ -12,10 +12,11 @@
 - **source_of_truth**: docs/designs/README.md（Design status 追跡情報源。draft であることは追跡と整合し、index 不整合ではない）を正とし、「draft が正規所有者として被参照する」権限づけの揺れを意味候補として検出
 - **recommended_route**: IR-054（draft 放置検出）による継続監視と case-close 工程での昇格判断。既存 defer finding F-15〜17 と統合した再評価（本検出は F-15〜17 のスコープ外の draft Design にも言及）
 - **ng_classification**: pre-existing
-- **defer 根拠**: draft → accepted 昇格は case-close 工程の正規経路であり、draft であること自体は不正状態ではない。Epic #2099 系 case-close 後の draft 継続という再確認条件が未解消のため、次回 inspect サイクルで F-15〜17 と統合して再評価する
+- **defer 根拠**: draft → accepted 昇格は case-close 工程の正規経路であり、draft であること自体は不正状態ではない。2026-09-07 再評価時点の状況: 再確認条件となっていた Epic #2099 の closed は 2026-09-01 実行で確認済み（F-16/F-17 はユーザー承認で promote 採択、F-15 は reject 済み）。designs/README.md 現状では被参照13件中 workflows 3件・install-script-usability・artifact-validation・design-file-manager は accepted 昇格済み、decision-lifecycle・autogen-freshness-gate・test-impact-detection-gate・dependency-version-compatibility・doc-diagnostics・git-worktree-test-fallback・artifact-quality-control-routing（+ references/verification-scope-catalog）は draft 継続で被参照も継続。残 draft 群の昇格要否・時期は優先順位と対象範囲の判断を要するため、IR-054（draft 放置検出）による経過監視と case-close 正規経路への委譲を維持し観察継続する
 - **notes**: draft → accepted 昇格は case-close 工程の正規経路であり、draft であること自体は不正状態ではない。観察継続対象
 
 ## 審議記録（参照）
 
 - 暫定分類 → 経路B adversarial-review skip（ユーザー明示要求なし、発動条件不成立）→ 自律確定（F-01〜F-04）+ HITL 確定（F-06: 管理方針「docs/reports/local/ を gitignore 対象とする」をユーザー承認）: promote 5 / defer 1（本ファイル）/ reject 0
 - 旧 defer F-15〜17（20260815T082159Z）は再確認条件（Epic #2099 系 case-close 後も draft 継続）が未解消のため defer 継続。F-05 は F-15〜17 と統合した再評価対象
+- 2026-09-07 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: F-05 は defer 継続（自律確定）。Epic #2099 closed 確認後も残 draft 群の被参照が継続しているが、昇格は case-close 正規経路・IR-054 が経過監視を担い、残 draft 群の昇格要否・時期は優先順位と対象範囲の判断（ユーザー判断事項）を要するため promote せず観察継続
