@@ -4,7 +4,7 @@
 
 ## 目的
 
-GitHub Issue / PR を使わない個人利用環境（ローカル版 OpenCode）向けに、ローカル版固有原本（agentdev-gh-cli）を保持し、link mode での導入手順を記載する（REQ-0141-003, 004, 031, v2:ADR-0131）。
+GitHub Issue / PR を使わない個人利用環境（ローカル版 OpenCode）向けに、ローカル版固有原本（agentdev-gh）を保持し、link mode での導入手順を記載する（REQ-0141-003, 004, 031, v2:ADR-0131）。
 ローカル版の command / skill / ひな形は配置しない。
 link mode では `src/opencode/` の原本をそのまま接続するため、ローカル版専用の生成物は不要である（v2:ADR-0131 decision #1, #3）。
 
@@ -14,7 +14,7 @@ link mode では `src/opencode/` の原本をそのまま接続するため、�
 
 | リポジトリ | 役割 | 主な対象パス |
 |---|---|---|
-| 仕様管理リポジトリ（AgentDevFlow 本体） | link 元の原本を保持 | `src/opencode/`, `src/opencode-local/agentdev-gh-cli/` |
+| 仕様管理リポジトリ（AgentDevFlow 本体） | link 元の原本を保持 | `src/opencode/`, `src/opencode-local/agentdev-gh/` |
 | 導入先リポジトリ | ローカル版を導入する利用側リポジトリ。`.opencode/` に link を張る | `.opencode/commands/`, `.opencode/skills/`, `.agentdev/issues/` |
 
 ローカル版導入の実体は AgentDevFlow 本体リポジトリでは行わない（REQ-0141-006）。
@@ -24,7 +24,7 @@ link mode では `src/opencode/` の原本をそのまま接続するため、�
 ```text
 src/opencode-local/
 ├── README.md              ← 本ファイル（ローカル版 link 設定手順）
-├── agentdev-gh-cli/       ← Custom Tool agentdev_gh の Local 実装 Tool（case-schema を吸収）
+├── agentdev-gh/           ← Custom Tool agentdev_gh の Local 実装 Tool（case-schema を吸収）
 │   ├── README.md          ← Local 実装 Tool の説明（読み替え規則・接続方式）
 │   ├── runner-local.ts    ← 同一操作契約の GhRunner 実装（ローカルIssue読み書き）
 │   ├── tests/             ← Local 実装のテスト
@@ -59,7 +59,7 @@ link mode では原本がそのまま接続されるため、旧変換資産に�
 ### 前提
 
 - 導入先リポジトリが AgentDevFlow 本体リポジトリでないこと（REQ-0141-006）
-- 仕様管理リポジトリ（AgentDevFlow 本体）の `src/opencode/` と `src/opencode-local/agentdev-gh-cli/` にアクセスできること
+- 仕様管理リポジトリ（AgentDevFlow 本体）の `src/opencode/` と `src/opencode-local/agentdev-gh/` にアクセスできること
 - 導入先リポジトリに `.opencode/` ディレクトリが存在すること（または作成可能であること）
 - GitHub 版とローカル版を同じ `.opencode/` に同居させないこと（REQ-0141-015）
 
@@ -71,7 +71,7 @@ link mode では原本がそのまま接続されるため、旧変換資産に�
 
 3. **通常版 link の設定**: `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`、`.opencode/tools/agentdev-*/`、`.opencode/plugins/agentdev-*/` を `src/opencode/` 配下へ接続する（v2:ADR-0131 decision #2）
 
-4. **Custom Tool 実装の差し替え**: `.opencode/tools/agentdev-gh/` だけを `src/opencode-local/agentdev-gh-cli/`（Local 実装 Tool）へ接続する（v2:ADR-0131 decision #3、REQ-011-006。実行は install.ps1 -LocalMode が設定する）
+4. **Custom Tool 実装の差し替え**: `.opencode/tools/agentdev-gh/` だけを `src/opencode-local/agentdev-gh/`（Local 実装 Tool）へ接続する（v2:ADR-0131 decision #3、REQ-011-006。実行は install.ps1 -LocalMode が設定する）
 
 5. **link 設定の検証**: 各 link が意図した target へ解決されることを確認する
 
@@ -86,7 +86,7 @@ link 設定前に `.opencode/` 配下の各 path が意図した link target へ
 |---|---|
 | `.opencode/commands/agentdev/` | `src/opencode/commands/agentdev/` |
 | `.opencode/skills/agentdev-*` | `src/opencode/skills/agentdev-*/` |
-| `.opencode/tools/agentdev-gh/` | `src/opencode-local/agentdev-gh-cli/`（Local 実装 Tool） |
+| `.opencode/tools/agentdev-gh/` | `src/opencode-local/agentdev-gh/`（Local 実装 Tool） |
 
 link target 確認は決定的な検査として実施する（ADR-0107, v2:ADR-0131 decision #6）。
 AI エージェントの解釈に依存せず、ファイルシステムの実パス解決により機械的に判定する。
@@ -121,7 +121,7 @@ link による接続であるため、上書き問題が発生しない。
 - AgentDevFlow 本体リポジトリでローカル版 link 設定を実行しないこと（REQ-0141-006）
 - link target が意図した target 以外へ解決される場合は link 設定を停止すること（REQ-0141-010, AG-012）
 - `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`、`.opencode/tools/agentdev-*/`（agentdev-gh 以外）、`.opencode/plugins/agentdev-*/` を `src/opencode/` 配下へ接続すること（v2:ADR-0131 decision #2）
-- `.opencode/tools/agentdev-gh/` だけを `src/opencode-local/agentdev-gh-cli/` へ接続すること（v2:ADR-0131 decision #3、REQ-011-006）
+- `.opencode/tools/agentdev-gh/` だけを `src/opencode-local/agentdev-gh/` へ接続すること（v2:ADR-0131 decision #3、REQ-011-006）
 - `runtime-overrides/` を設けないこと
 - バックエンド抽象化を導入しないこと（REQ-0141-027）
 - GitHub 互換ローカルサーバを前提にしないこと（REQ-0141-027）
@@ -134,8 +134,8 @@ link による接続であるため、上書き問題が発生しない。
 
 ## 関連項目
 
-- [ローカルIssueスキーマ定義](agentdev-gh-cli/case-schema/case-file.md)：ローカルIssue（`.agentdev/issues/`）の構造
-- [Local 実装 Tool](agentdev-gh-cli/README.md)：Custom Tool `agentdev_gh` の Local 実現（同一操作契約の読み替え規則）
+- [ローカルIssueスキーマ定義](agentdev-gh/case-schema/case-file.md)：ローカルIssue（`.agentdev/issues/`）の構造
+- [Local 実装 Tool](agentdev-gh/README.md)：Custom Tool `agentdev_gh` の Local 実現（同一操作契約の読み替え規則）
 - `docs/requirements/REQ-009.md`：配布基盤とローカル版導入モデルの要件定義（正本）
 - `docs/designs/local/runtime-package-boundary.md`：link mode 接続フロー、link target 確認、更新運用の正本 Design
 - `docs/designs/local/local-case-file.md`：ローカルIssue共通スキーマの正本 Design

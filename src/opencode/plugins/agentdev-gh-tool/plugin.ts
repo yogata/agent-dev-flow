@@ -7,7 +7,7 @@
 // 実行の差し替え（REQ-{NNNN}-{NNN} / DEC-{NNN}）:
 //   - 既定: GitHub 実装（runner-cli.ts）で gh CLI を実行する
 //   - ローカル版: 投影パス（.opencode/tools/agentdev-gh/runner-local.ts）に Local 実装が
-//     存在する場合（install -LocalMode により junction 先が src/opencode-local/agentdev-gh-cli/
+//     存在する場合（install -LocalMode により junction 先が src/opencode-local/agentdev-gh/
 //     に差し替わっている場合）は、それを動的に読み込んで差し替える。Workflow は差を認識しない
 //
 // args スキーマは zod を用いない（依存ゼロの構造的定義）。OpenCode の registry は

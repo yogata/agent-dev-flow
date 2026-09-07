@@ -29,7 +29,7 @@
     - .opencode/skills/repo-*/      = real directories (repo-local only)
 
     -LocalMode redirects the agentdev-gh Custom Tool implementation to the local source:
-    - tools/agentdev-gh/         = junction -> .agentdev-plugin/src/opencode-local/agentdev-gh-cli/
+    - tools/agentdev-gh/         = junction -> .agentdev-plugin/src/opencode-local/agentdev-gh/
       (Local implementation of the same operation contract, REQ-011-006 / DEC-004)
     All other agentdev-* artifacts still link to src/opencode/ as normal.
 
@@ -43,7 +43,7 @@
 
 .PARAMETER LocalMode
     Switch. When set, the agentdev-gh Custom Tool implementation (.opencode/tools/agentdev-gh/)
-    is junctioned to src/opencode-local/agentdev-gh-cli/ instead of
+    is junctioned to src/opencode-local/agentdev-gh/ instead of
     src/opencode/tools/agentdev-gh/. All other agentdev-* command/skill/tool/plugin
     junctions target src/opencode/ as normal.
 
@@ -120,7 +120,7 @@ $RepoLocalPluginNames = @('agentdev-distribution-boundary-guard')
 # In LocalMode the agentdev-gh Custom Tool implementation is redirected from
 # src/opencode-local/ (REQ-011-006, DEC-004).
 $LocalModeRedirectToolRel = 'tools\agentdev-gh'
-$LocalModeLocalSourceDirName = 'agentdev-gh-cli'
+$LocalModeLocalSourceDirName = 'agentdev-gh'
 
 # --- Helper Functions ---
 
@@ -225,7 +225,7 @@ function Get-TargetSourcePath {
     .SYNOPSIS
         Resolve the absolute source path backing a projection relative path.
         In LocalMode, tools\agentdev-gh is redirected to
-        src/opencode-local/agentdev-gh-cli/ (REQ-011-006, DEC-004).
+        src/opencode-local/agentdev-gh/ (REQ-011-006, DEC-004).
         All other targets back to src/opencode/ as normal.
     #>
     param([string]$RelPath)
@@ -417,7 +417,7 @@ if ($Mode -eq 'check') {
     }
     $ExpectedLocalMode = if ($LocalMode) { $true } else { $DetectedLocalMode }
     if ($ExpectedLocalMode) {
-        Write-Host '[INFO] Link mode: local (consumer-generated) — tools/agentdev-gh -> src/opencode-local/agentdev-gh-cli/'
+        Write-Host '[INFO] Link mode: local (consumer-generated) — tools/agentdev-gh -> src/opencode-local/agentdev-gh/'
     } else {
         Write-Host '[INFO] Link mode: normal (consumer-with-agentdev) — tools/agentdev-gh -> src/opencode/tools/agentdev-gh/'
     }
@@ -593,7 +593,7 @@ if ($Mode -eq 'check') {
 if ($Mode -eq 'dry-run') {
     Write-Host '=== Consumer Install Dry Run ==='
     if ($LocalMode) {
-        Write-Host '[INFO] LocalMode: tools/agentdev-gh redirects to src/opencode-local/agentdev-gh-cli/'
+        Write-Host '[INFO] LocalMode: tools/agentdev-gh redirects to src/opencode-local/agentdev-gh/'
     }
 
     # .opencode/ status
@@ -686,7 +686,7 @@ if ($Mode -eq 'dry-run') {
 if ($Mode -eq 'apply') {
     Write-Host '=== Consumer Install: applying junctions ==='
     if ($LocalMode) {
-        Write-Host '[INFO] LocalMode: tools/agentdev-gh redirects to src/opencode-local/agentdev-gh-cli/'
+        Write-Host '[INFO] LocalMode: tools/agentdev-gh redirects to src/opencode-local/agentdev-gh/'
     }
 
     # Step 1: Ensure .opencode/ is a real directory

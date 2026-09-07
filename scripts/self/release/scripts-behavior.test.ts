@@ -78,7 +78,7 @@ function digestTree(root: string): Map<string, string> {
  * Minimal consumer fixture mirroring the real layout:
  *   <root>/.git                       (present unless zipCheckout)
  *   <root>/.agentdev-plugin/src/opencode/{commands/agentdev,skills/...}
- *   <root>/.agentdev-plugin/src/opencode-local/agentdev-gh-cli  (localSource only)
+ *   <root>/.agentdev-plugin/src/opencode-local/agentdev-gh  (localSource only)
  *   <root>/scripts/{install.ps1,consumer/common.ps1}
  */
 function makeConsumerRepo(zipCheckout: boolean, localSource = false): string {
@@ -94,8 +94,8 @@ function makeConsumerRepo(zipCheckout: boolean, localSource = false): string {
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode", "plugins", "agentdev-gh-write-guard", "plugin.ts"), "// agentdev-gh-write-guard plugin\n");
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode", "plugins", "agentdev-gh-tool", "plugin.ts"), "// agentdev-gh-tool plugin\n");
   if (localSource) {
-    fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode-local", "agentdev-gh-cli"), { recursive: true });
-    fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode-local", "agentdev-gh-cli", "runner-local.ts"), "// local runner\n");
+    fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode-local", "agentdev-gh"), { recursive: true });
+    fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode-local", "agentdev-gh", "runner-local.ts"), "// local runner\n");
   }
 
   fs.mkdirSync(path.join(root, "scripts", "consumer"), { recursive: true });
