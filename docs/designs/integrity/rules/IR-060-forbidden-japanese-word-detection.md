@@ -32,7 +32,7 @@ review 区分語は本ルールの対象外とし、`agentdev-doc-writing` 查�
 
 ### 検知対象
 
-forbidden 区分語（正: [japanese-replacement-dictionary.md](../../../src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md)）。主な対象:
+forbidden 区分語（正: [japanese-replacement-dictionary.md](../../../../src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md)）。主な対象:
 
 - 中国語簡体字・中国語由来: `而非`, `统一`, `陈述形式`, `定位`, `候选`, `路径`, `一致性`, `来源`
 - 文字化け・誤字: `破綾`, `監査証跠`, `成果成果物`, `本来件`, `測可能性`, `進捰`
@@ -64,6 +64,6 @@ review 区分語（`正規のXX`, `局所物理分離`, `責務境界浄化`, `�
 
 ## 関連
 
-- [../../../src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md](../../../src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md): 置換辞書（forbidden 語リスト正）
-- [../responsibilities/document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md): 不自然表現検出分類 P0〜P4
+- [../../../../src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md](../../../../src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md): 置換辞書（forbidden 語リスト正）
+- [../../responsibilities/document-type-responsibilities.md](../../responsibilities/document-type-responsibilities.md): 不自然表現検出分類 P0〜P4
 - [../integrity-rule-catalog.md](../integrity-rule-catalog.md): 整合性ルールカタログ

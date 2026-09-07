@@ -128,6 +128,6 @@ full audit を即 fail gate 化する。
 
 ## See Also
 
-- [obsolete-path-map.yaml](../obsolete-path-map.yaml)
+- [obsolete-path-map.yaml](../../../../.opencode/skills/repo-agentdev-integrity/data/obsolete-path-map.yaml)
 - [integrity-rule-catalog.md](../integrity-rule-catalog.md)
 - [rule-ownership.md](../rule-ownership.md)
