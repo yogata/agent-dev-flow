@@ -1,15 +1,15 @@
 # STEP-4: PR マージ・コンフリクト解消（pr-merge-and-conflict）
 
 > 本 reference は `agentdev-workflow-case-close` SKILL.md の制御平面（STEP 一覧）STEP-4 詳細である。
-> squash merge 先（main）への PR squash マージ、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase パスを提供する。
+> squash merge 先（main）への PR squash マージ、PR base 移動判定、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase パスを提供する。
 
 ## Purpose
 
-PR を squash merge 先（main）へ squash マージし、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase パスを処理する。
+PR を squash merge 先（main）へ squash マージし、PR base 移動判定、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase パスを処理する。
 
 ## Input Resolution
 
-1. SSoT 再構成: PR の mergeable 状態、ローカル/remote の commit 状態
+1. SSoT 再構成: PR の mergeable 状態と mergeStateStatus、ローカル/remote の commit 状態、base 移動判定結果（ローカル git 由来）
 2. identifier 保持: PR番号、Issue番号
 3. 最小 scalar: ポーリング試行回数（上限は gh-cli 手続き側が所有）
 4. runtime artifact: なし
@@ -33,6 +33,21 @@ squash merge 先は main とする。
 
 - **確認**: PR の base が main であることを前提とし、PR base と squash merge 先が一致しない場合は処理を進めず構造化エラーとして扱う
 
+**base 移動判定**: 並行セッションが main へ push すると、PR 作成時点から base（main）が移動する。base 移動判定はローカル git で行う。
+
+```bash
+git fetch origin main
+git rev-parse origin/main
+```
+
+`git fetch origin main` で remote-tracking を更新した後、`git rev-parse origin/main` で base（main）の先端 commit hash を取得する。
+`git merge-base HEAD origin/main` の結果が origin/main の先端と一致しない場合、base は移動している。
+
+> **baseRefOid 誤認注意**: GitHub の PR メタデータには、mergeability 再計算中は `UNKNOWN` を返す特性と、baseRefOid の表示が再計算完了後も遅延する特性がある（並行セッションの main push 直後に baseRefOid が旧 main を表示し続けた実測に基づく）。
+> baseRefOid を base 移動判定の情報源として使わない。base 移動判定は上記のローカル git のみで行う。
+
+base 移動の検出は squash merge を妨げない。squash merge 可否は STEP-4-2 の mergeStateStatus（CLEAN）基準で判断し、base 移動判定結果は Evidence に記録する。
+
 ### STEP-4-2: squash merge 前の mergeable UNKNOWN ポーリング
 
 本書が所有する「squash merge 前の mergeable UNKNOWN ポーリング」手順（状態取得は `agentdev_gh` の pr_mergeable 操作。最大60秒、10秒間隔で再取得、待機中の CONFLICTING 遷移時は即時打ち切りコンフリクト解消パスへ、上限超過時は構造化エラーとして停止）に従い、次を実行する。
@@ -43,6 +58,9 @@ squash merge 先は main とする。
 - 待機中の `CONFLICTING` 遷移検出を自動分岐させ、コンフリクト解消パス（STEP-4-5）へ即時接続する
 
 ポーリング間隔・上限値は gh-cli 手続き側が所有する。
+
+squash merge 可否の判定は、`agentdev_gh` の pr_mergeable 操作が返す mergeStateStatus（CLEAN）を基準とする。
+base 移動判定（STEP-4-1）の導入は、本手順の mergeable UNKNOWN ポーリング契約（10秒間隔、上限60秒）を変更しない。
 
 ### STEP-4-3: PR merge 実行
 
@@ -74,11 +92,11 @@ squash merge がコンフリクトで失敗した場合（STEP-4-3 のリトラ�
 
 ## Evidence
 
-- squash merge 先（main）の確認結果、mergeable 状態とポーリング記録、merge 結果と HEAD commit hash、対応記録コメントの VERIFY 結果、先行 commit 検出・処理結果、rebase 試行結果
+- squash merge 先（main）の確認結果、base 移動判定結果（fetch 後の origin/main 先端 hash と merge-base 比較）、mergeable 状態とポーリング記録、mergeStateStatus（CLEAN）判定結果、merge 結果と HEAD commit hash、対応記録コメントの VERIFY 結果、先行 commit 検出・処理結果、rebase 試行結果
 
 ## Completion Verification
 
-- squash merge 先（main）が確認済みであること。PR がマージ済みであり、HEAD commit hash が記録されていること。Level 1 rebase 失敗時はエスカレーション停止していること
+- squash merge 先（main）が確認済みであること。base 移動判定がローカル git で実施済みであり、結果が Evidence に記録されていること。PR がマージ済みであり、HEAD commit hash が記録されていること。Level 1 rebase 失敗時はエスカレーション停止していること
 
 ## Resume-Idempotency
 
@@ -87,6 +105,7 @@ squash merge がコンフリクトで失敗した場合（STEP-4-3 のリトラ�
 ## resume point
 
 - squash merge 先確認状態（main）
+- base 移動判定結果（STEP-4-1）
 - mergeable 状態、ポーリング実行状態
 - PR merge 実行結果、HEAD commit hash
 - 先行 commit 検出・処理結果（STEP-4-4）
@@ -100,7 +119,7 @@ squash merge がコンフリクトで失敗した場合（STEP-4-3 のリトラ�
 ## 関連 Capability Skill
 
 - Custom Tool `agentdev_gh`（pr_merge、pr_mergeable）+ workflow 側手順（mergeable UNKNOWN ポーリング、squash merge リトライ、対応記録コメントテンプレート）
-- `agentdev-git-worktree`: HEAD commit hash 記録、squash merge 後分岐ハンドリング、コンフリクト解消 rebase パス
+- `agentdev-git-worktree`: HEAD commit hash 記録、squash merge 後分岐ハンドリング、コンフリクト解消 rebase パス、git 同期リスク事前検出（base 移動判定の `git fetch origin main` と実行前同期の接続）
 - `agentdev-workflow-templates`: 対応記録コメントテンプレート
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
