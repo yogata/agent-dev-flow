@@ -53,6 +53,13 @@ describe("登録形状（OpenCode registry が要求する構造）", () => {
     };
     expect(def.args.request.properties.operation.enum).toHaveLength(12);
     expect(def.args.request.required).toEqual(["operation"]);
+    expect(def.args.request.properties.labels).toBeDefined();
+    expect(
+      (def.args.request.properties.labels as { description: string }).description,
+    ).toContain("issue_list");
+    expect(
+      (def.args.request.properties.labels as { description: string }).description,
+    ).toContain("required for issue_create");
   });
 });
 
@@ -164,4 +171,3 @@ describe("ローカル版差し替え（投影パスの Local 実装検出）", 
     fs.rmSync(worktree, { recursive: true, force: true });
   });
 });
-

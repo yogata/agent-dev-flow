@@ -92,7 +92,8 @@ const REQUEST_PROPERTY_SCHEMA = {
     labels: {
       type: "array",
       items: { type: "string" },
-      description: "Free-form labels for issue_create / issue_update (tracking-axis labels are managed by the tool).",
+      description:
+        "Labels accepted by issue_create, issue_update, and issue_list; required for issue_create. Tracking-axis labels are managed by the tool.",
     },
     role: {
       type: "string",
