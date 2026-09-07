@@ -80,6 +80,35 @@ export interface CheckOptions {
   readonly verificationScope?: VerificationScopeResolution;
 }
 
+// 既知の意図的 fixture（malformed 宣言の見た目を持つ検出器回帰テスト行）。
+// fail-closed 検証のために本物の不正宣言として埋め込まれており、実 corpus の
+// 誤宣言ではないため malformed-declarations 検査から除外する。
+// file 一致かつ行テキストが固有断片を含む場合のみ除外し、一般の malformed 検出は
+// 弱めない。fixture の編集・削除で断片一致が失効し、免除は自動で無効化される。
+const MALFORMED_DECLARATION_FIXTURE_EXEMPTIONS: readonly {
+  readonly file: string;
+  readonly lineIncludes: string;
+}[] = [
+  {
+    // distribution-boundary 検出器の escape 隠蔽 fail-closed 回帰テスト行。
+    file: ".opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.test.ts",
+    lineIncludes: ["REQ", "-", "\\\\", "u0030", "\\\\", "u0031"].join(""),
+  },
+];
+
+/**
+ * malformed-declaration 検出が既知の意図的 fixture に対するものかを判定する。
+ * 既知 fixture の file と行テキストの固有断片が両方一致する場合のみ true。
+ */
+export function isMalformedDeclarationFixtureExempt(
+  file: string,
+  text: string,
+): boolean {
+  return MALFORMED_DECLARATION_FIXTURE_EXEMPTIONS.some(
+    (e) => e.file === file && text.includes(e.lineIncludes),
+  );
+}
+
 function item(kind: CheckKind, findings: readonly CheckFinding[]): CheckResultItem {
   return { kind, status: findings.length === 0 ? "pass" : "fail", findings };
 }
@@ -107,7 +136,9 @@ export function runChecks(
       .map((entry) => entry.reqId),
   );
 
-  const malformed = scan.issues.filter((i): i is DeclarationIssue & { kind: "malformed-declaration" } => i.kind === "malformed-declaration");
+  const malformed = scan.issues
+    .filter((i): i is DeclarationIssue & { kind: "malformed-declaration" } => i.kind === "malformed-declaration")
+    .filter((i) => !isMalformedDeclarationFixtureExempt(i.file, i.text));
   const unknownRoles = scan.issues.filter((i): i is DeclarationIssue & { kind: "unknown-role" } => i.kind === "unknown-role");
 
   const unknownReqRefs: CheckFinding[] = [];
