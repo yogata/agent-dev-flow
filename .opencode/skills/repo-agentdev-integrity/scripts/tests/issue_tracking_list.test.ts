@@ -42,7 +42,7 @@ import {
   localStatusValues,
   localTerminalStatuses,
   type LocalIssueFrontmatter,
-} from "../../../../../src/opencode-local/agentdev-gh-cli/runner-local.ts";
+} from "../../../../../src/opencode-local/agentdev-gh/runner-local.ts";
 
 const TEMP_BASE = path.join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `issue-tracking-2437-${crypto.randomUUID().slice(0, 8)}`;

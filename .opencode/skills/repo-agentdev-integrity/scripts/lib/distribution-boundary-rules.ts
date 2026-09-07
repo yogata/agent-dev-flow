@@ -275,9 +275,9 @@ function checkIr048(
   scanned: number;
 } {
   const findings: DistributionRuleFinding[] = [];
-  const localGhCli = path.join(repoRoot, "src", "opencode-local", "agentdev-gh-cli");
-  if (!dirExists(localGhCli)) return { findings, scanned: 0 };
-  const files = listAgentGhCliTextFiles(localGhCli);
+  const localAgentGh = path.join(repoRoot, "src", "opencode-local", "agentdev-gh");
+  if (!dirExists(localAgentGh)) return { findings, scanned: 0 };
+  const files = listAgentGhTextFiles(localAgentGh);
   const scanned = scanTexts(files);
   for (const { file, text } of scanned) {
     if (text === null) continue;
@@ -298,7 +298,7 @@ function checkIr048(
   return { findings, scanned: scanned.length };
 }
 
-function listAgentGhCliTextFiles(rootDir: string): string[] {
+function listAgentGhTextFiles(rootDir: string): string[] {
   const out: string[] = [];
   const stack: string[] = [rootDir];
   while (stack.length > 0) {
