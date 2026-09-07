@@ -111,7 +111,7 @@ test_strategy:
     on_failure: |              # 不合格時の処置（fix-and-reverify / record-in-findings の選択理由を含む）
       {不合格時の処置の本文}
 
-# realization_actions: 実現面の変更方針（正規所有責務、変更すべき実現面、変更意図、検証との対応）を記録する（REQ-008-060、DEC-026）。optional soft-contract
+# realization_actions: 実現面の変更方針（正規所有責務、変更すべき実現面、変更意図、検証との対応）を記録する（実現面変更方針の構造化ハンドオフ契約）。optional soft-contract
 # artifact_actions とは分離した独立構造であり、REQ / Decision / Design の保存操作は artifact_actions が担い、実現物種別の enum を追加して責務を混在させない
 # ADF 固有の成果物種別や適用プロジェクト固有の成果物種別を固定 enum として列挙しないドメイン中立契約とする
 # 対象の手掛かり（パス、担当能力、正規所有 Design 等）は ownership_hints に自由形式で記録する

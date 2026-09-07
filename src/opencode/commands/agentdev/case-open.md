@@ -8,7 +8,7 @@ description: 要件定義をもとにGitHub Issueを作成する
 
 **draft-data 入力**: case-open は構造化 `draft-data`（`# draft-data` fenced YAML block）を入力として読み取る。
 draft 全体の `agreed_items`、`artifact_actions`、`operation_units`、`realization_actions` を処理対象とし、OU ごとにスライスせず draft 全体の合意結果を取り扱う。
-`realization_actions`（実現面の変更方針: 正規所有責務、変更すべき実現面、変更意図、検証との対応）は Issue / Epic 本文の Execution Contract セクション「実現面の変更方針（realization_actions 由来）」へ投影し、req-define が確定した内容を失わず Issue 本文へ永続化する。case-open 成功後は case-run が Issue 本文だけで変更責務、変更意図、検証方針を取得できる（REQ-017-017）
+`realization_actions`（実現面の変更方針: 正規所有責務、変更すべき実現面、変更意図、検証との対応）は Issue / Epic 本文の Execution Contract セクション「実現面の変更方針（realization_actions 由来）」へ投影し、req-define が確定した内容を失わず Issue 本文へ永続化する。case-open 成功後は case-run が Issue 本文だけで変更責務、変更意図、検証方針を取得できる（実現面投影契約）
 `auto_gate.auto_ready` が false、または未解決質問、未解決衝突、repo外操作、停止理由が残る場合は停止する。
 `conflict_resolutions` に記録済みの衝突については同じ内容をユーザーへ再確認しない
 
