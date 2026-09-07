@@ -19,10 +19,6 @@ CREATE 対象 REQ の要件テーブルに、既存成果物への反映作業�
 REQ/ Decision 保存前に、対象ドキュメントの種別が document-model Design の Document Classification Policy に適合していることを確認する。
 適合しない場合は保存を停止し、理由を報告する。
 
-`draft-meta` に `adr-revision-mode: full-reclassification` が指定されている場合は、既存 ADR の full reclassification を許可する。
-このモードでは既存 ADR を現行基準/ 廃止/ REQ、Design、guide 移管候補として再分類できる。
-実行前に、移管先情報と変更内容をドラフトまたは保存結果へ明示的に記録する。
-
 ## REQ ファイル操作
 
 ドラフトに複数の `req-operation` と `target-req` のペアが含まれる場合は、各ペアを順次処理する。
