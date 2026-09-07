@@ -58,3 +58,21 @@
 - **タグ**: #checker #bun #stdout #windows #case-close #verification
 
 ---
+
+## 2026-09-08: bun install は bun.lock の root workspace name を書き換えない。package rename 後は lock の name フィールドを手動更新する
+
+- **問題事象**: package rename（agentdev-gh-cli-local-runner → agentdev-gh-local-runner）後に `bun install` を実行しても、bun.lock 内 `workspaces[""].name` は旧名のまま残存し、依存解決のみが再検証される。
+- **発生局面**: 実装（case-run 委譲・RA-002 package 名統一）。Epic 2681 / Issue 2683 / PR 2684。
+- **検知方法**: rename 後の bun.lock 残存内容確認（git grep agentdev-gh-cli-local-runner）。
+- **根本原因**: bun install v1.3.6 の lock 更新は依存グラフを対象とし、lock の root workspace name フィールドは package.json との自動同期対象外。
+- **自律対応内容**: bun.lock の name フィールドを手動更新して旧 package identifier の現行利用ゼロ（AC-05/26）を達成。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（bun 運用知見。契約文書の変更必要性は learning-promote で判断）
+- **横展開観点**: package rename を伴う全作業（ディレクトリ改名と package 識別子統一の同時実施ケース）に共通。
+- **再発条件**: package.json の name 変更後に bun install のみで bun.lock 同期を完了判定する場合。
+- **予防策候補**: package rename 後は bun.lock 内 root workspace name を grep で確認し、旧名残存時は手動更新する。TS-002 系の package 識別子検証に bun.lock の name フィールド確認を含める。
+- **想定反映先**: learning-promote での分類後、runtime-package-boundary.md の link mode 更新運用または REQ-009 系検証手順への注記候補。
+- **関連**: PR 2684、Issue 2683、Epic 2681、src/opencode-local/agentdev-gh/bun.lock
+- **タグ**: #bun #bun-lock #package-rename #case-run #verification
+
+---
