@@ -45,6 +45,14 @@ draft-data の `test_strategy` を読み取り、Issue 本文の「テスト戦�
 
 各詳細は `agentdev-issue-management`、case-open command Design（extension 経由）を参照。
 
+### 事前状態の記述規律（構成と挙動の観点分離）
+
+Issue 本文の事前状態セクションを記述する際、依存宣言の有無（構成上の状態）と型解決の成否（環境構築後の挙動）は別観点として記述し、混同しない。
+
+- 依存宣言の有無は構成上の状態、型解決の成否は環境構築後の挙動である。両者を同一の記述で混在させない
+- 構成と挙動の対応を主張する項目（依存・型解決系など）は、クリーン worktree での実測確認（`bun install` → `bunx tsc --noEmit` 相当）を行ってから記述する
+- 実測確認を全項目へ要求しない。全項目への実測要求は case-open の実行コストを増大させるため、構成と挙動の対応を主張する項目に焦点を絞る
+
 ### execution contract 確定ステップ（2-6）
 
 Issue 本文生成前に次の確定ステップを実行し、結果を Issue 本文の対応セクション（対象範囲、test strategy、完了条件、Execution Contract セクション）へ反映する。
