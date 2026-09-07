@@ -4997,6 +4997,33 @@
       "count": 1,
       "provenance": "issue-2372-ir064-initial-baseline",
       "reason": "REQ-010-065 (IR-064) detection rollout: pre-existing bare ID placeholders used consistently as delegation-notation style. Style normalization (backticks or concrete IDs) is a Design candidate recorded in PR #2372; approve or remediate via intake."
+    },
+    {
+      "category": "Decision",
+      "check": "accepted-adr-only-citation",
+      "file": "docs/designs/foundations/references/verification-scope-catalog.md",
+      "evidence": "DEC-027",
+      "count": 1,
+      "provenance": "issue-2666-ou0008-warning-baseline",
+      "reason": "Issue #2666 OU-0008: existing proposed Decision citation is retained as a warning-equivalent known delta pending Decision acceptance or reference update."
+    },
+    {
+      "category": "CanonicalConflict",
+      "check": "gh-direct-invocation",
+      "file": "src/opencode/skills/agentdev-workflow-case-run/references/single.md",
+      "evidence": "gh issue edit",
+      "count": 1,
+      "provenance": "issue-2666-ou0008-warning-baseline",
+      "reason": "Issue #2666 OU-0008: existing historical gh CLI procedure reference is retained as a warning-equivalent known delta pending documentation migration."
+    },
+    {
+      "category": "ObsoleteVocabulary",
+      "check": "obsolete-vocabulary-current-use",
+      "file": "src/opencode/skills/agentdev-artifact-validation/SKILL.md",
+      "evidence": "req-adr-kind-enumeration:REQ/ADR/",
+      "count": 1,
+      "provenance": "issue-2666-ou0008-warning-baseline",
+      "reason": "Issue #2666 OU-0008: existing legacy REQ/ADR enumeration is retained as a warning-equivalent known delta pending vocabulary normalization."
     }
   ]
 }
