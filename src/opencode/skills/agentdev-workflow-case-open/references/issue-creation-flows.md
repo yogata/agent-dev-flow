@@ -48,6 +48,7 @@ STEP-3 の自律構成分析結果に基づき Epic 本文を構築。
 
 ラベル `enhancement`, `feature`, `epic`。
 `agentdev_gh` の issue_create 操作で本文を書き込み → VERIFY。
+呼出は `agentdev-issue-management` の標準呼出形式手順（本文・タイトルの二重引用符回避、labels 引数の明示）に従う。
 Issue 番号を `{epic_number}` として記録。
 実行識別情報セクションの自己参照値（`adf_case`）は、作成済み Epic 本文のステータス追跡テーブル更新（STEP-5-5）と同一の Issue 本文更新手続きで確定番号へ埋め戻す。
 
@@ -85,7 +86,7 @@ Issue 番号を `{epic_number}` として記録。
 
 ### STEP-5-8: GitHub Issue 作成
 
-`agentdev_gh` の issue_create 操作→ VERIFY。
+`agentdev_gh` の issue_create 操作→ VERIFY。呼出は `agentdev-issue-management` の標準呼出形式手順（本文・タイトルの二重引用符回避、labels 引数の明示）に従う。
 作成後、`agentdev_gh` の issue_update 操作で実行識別情報セクションの自己参照値（`adf_case`）を作成確定番号へ埋め戻し、VERIFY する（STEP-2 の 2-7 参照）。
 
 #### STEP-5-8-1: OU 結果の書き戻し

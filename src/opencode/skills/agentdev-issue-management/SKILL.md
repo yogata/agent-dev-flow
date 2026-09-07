@@ -20,12 +20,13 @@ Custom Tool `agentdev_gh`（書き込みは Tool 内部の読み戻し検証で�
 
 | トピック | 参照先 |
 |----------|--------|
-| Issue 操作の安全性手順（作成後確認、Parent/Child リンク確認、Epic テーブル更新、前後内容比較、VERIFY 連携、禁止事項） | `references/issue-operation-safety.md` |
+| Issue 操作の安全性手順（標準呼出形式、作成後確認、Parent/Child リンク確認、Epic テーブル更新、前後内容比較、VERIFY 連携、禁止事項） | `references/issue-operation-safety.md` |
 
 ## 動作指針
 
 - 本スキルの各手順は Custom Tool `agentdev_gh` の操作と連携する。読み取り、書き込みの基本安全性（文字コード、一時ファイル、読み戻し検証）は Tool が内部で担保する。
 - Issue 操作特有の安全性要件（リンク確認、テーブル整合性、前後比較、プレースホルダー残存検証）を本スキルが補完する。
+- issue_create、issue_update、issue_comment の呼出は「`agentdev_gh` 標準呼出形式」（本文・タイトルの二重引用符回避、labels 引数の明示）に従う。
 - 各書き込み操作（作成、更新、コメント追加）ごとに個別に VERIFY を実行すること（一括検証は不可）。
 
 ## See Also
