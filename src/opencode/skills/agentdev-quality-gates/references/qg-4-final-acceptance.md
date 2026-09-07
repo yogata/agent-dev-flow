@@ -241,11 +241,17 @@ bun test ./src/opencode/skills/
 bun test ./.opencode/plugins/ ./scripts/
 ```
 
-- **依存パッケージ前置**: 分割② の実行前に、配布 skill `agentdev-project-extensions` の scripts ディレクトリで `bun install` を実行済みであること（zod 等の依存解決）。node_modules は gitignore 対象のため worktree へ未伝播であり、未実施の場合は integrity suite の一部テストも依存解決失敗で fail する
+- **依存パッケージ前置**: フル suite 実行の前に、対象ディレクトリ集合の両方で `bun install` を実行済みであること。node_modules は gitignore 対象のため worktree へ未伝播であり、未実施の場合は integrity suite・分割② の一部テストが依存解決失敗で fail する
 
   ```bash
   bun install --cwd src/opencode/skills/agentdev-project-extensions/scripts
+  bun install --cwd .opencode/skills/repo-agentdev-integrity/scripts
   ```
+
+  - **対象ディレクトリ集合**: `src/opencode/skills/agentdev-project-extensions/scripts`（zod 等の依存解決。分割② のテストと integrity suite からの相対 import 参照の前提）と `.opencode/skills/repo-agentdev-integrity/scripts`（worktree 実体。`typescript`・`@types/bun`・`@types/node` の依存解決）の両方
+  - **tsc 型検証の型解決前提**: tsc 型検証（`tsc --noEmit`）を含む場合は、対象パッケージでの `bun install` による `@types/bun` 等の復元を前提とする。node_modules 未整備の状態では tsc の型解決が失敗する
+  - **bun test 単独実行の依存前提と junction 代替**: bun test 単独実行（フル suite 正規形以外）で依存解決が必要な場合は、main 側 `node_modules` への junction 作成（検証後削除）または当該 skill ディレクトリでの `bun install` のいずれかで整備する（手順詳細は `agentdev-git-worktree` の worktree 構造的制約を参照）
+  - **整備後の再実行手順**: 依存整備実施後は、依存解決失敗で fail したテスト・型検証を同一環境で再実行して当該 fail の解消を確認し、依存整備実施済みの旨を環境ラベル（依存パッケージ状態）へ記録する
 
 - **件数突合**: 各実行結果の「Ran N tests across M files」の N/M 件数突合を行う。直前実績と比較して件数が急減していないかの妥当性を検証する（固定値の期待値化は行わない）
 - **カレントディレクトトリビアな実行の禁止**: 対象スイートには cwd 依存テストが混在するため、`bun test` 単体等での実行で正規形を代替しない
@@ -337,4 +343,3 @@ QG-4 の検査をサブエージェントに委譲する場合:
 - [qg-3-implementation-deviation.md](qg-3-implementation-deviation.md)（前工程の実装乖離検出。QG-4 は QG-3 pass を前提とする）
 - **agentdev-workflow-orchestration**: 達成判定プロトコル、証拠ソース
 - **agentdev-issue-management**: Issue 本文更新、前後内容比較
-
