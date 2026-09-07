@@ -54,6 +54,7 @@ detached worktree による baseline 比較を標準手順とする。
 | worktree 検証時の一時退避（stash 運用） | `references/worktree-operations.md` |
 | bun test 実行の環境前提（worktree 構造的制約、node_modules 未伝播） | `references/worktree-operations.md` |
 | git pull/push/hash検証の共通手順 | `references/git-common-procedures.md` |
+| Windows git 出力のエンコーディング処理 | `references/git-common-procedures.md` |
 
 ## 禁止事項
 
