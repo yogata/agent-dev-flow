@@ -53,6 +53,7 @@ Epic Wave クローズは STEP-1 のルーティングで分岐し、E1〜E6 と
 - **単一 Issue クローズ**: STEP-1（単一 ルート）→ STEP-2 → STEP-3（配布依存境界 最終 gate 含む）→ STEP-4 → STEP-5 → STEP-6
 - **Epic Wave クローズ**: STEP-1（Epic ルート、ステータス追跡テーブル存在時）→ STEP-E1〜E6（E4 内で配布依存境界 最終 gate を各子Issue に適用、single-Issue STEP-3-1 と同一 detector）
 - **コンフリクトエスカレーション**: STEP-4 で Level 1 rebase 失敗時、case-auto Level 2/3 エスカレーションへ（本 workflow の対象外）
+- **PR なし特例フロー（docs_chore、main 直接 push 済み）**: STEP-1（特例ルート）→ STEP-2 → STEP-3 → STEP-5 → STEP-6。PR 関連処理（STEP-4、STEP-5 の CI 通過確認等 PR 依存部分）は N/A とし、既存 commit を最終成果物として QG-4（STEP-2）は直接 commit 内容で検証する。適用条件と実装系 feature/fix への適用除外は case-close command の特例フローセクションを正とする
 
 ### 共通事前マージ gate（両ルート共通、DEC-{N}、配布依存境界 Design）
 

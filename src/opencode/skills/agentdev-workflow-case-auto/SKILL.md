@@ -99,6 +99,7 @@ case-auto workflow は次の8 STEP で構成する。
 - **OU処理ループ**: Standard flow の case-close 完了後に未処理 OU が残存する場合は次 OU の処理を STEP-3 から開始（全 OU 処理完了時のみ全体完了報告）
 - **親コンテキスト非累積（command 不変条件）**: 委譲工程の完了結果（Issue/PR番号、pass/warn/fail）のみを親コンテキストに保持し、委譲工程内部の調査過程、中間ログ、読解メモを親コンテキストに累積しない
 - **L1 タイムスタンプ**: 開始時刻（`case_auto_started_at`）、工程別タイムスタンプ（req-save+design-save 統合委譲 / case-open / case-run / case-close）、終了時刻を記録。case-run の L2 内訳は case-run result から読み取って含める
+- **既存成果物検出ガード（STEP-3 各工程起動時の前置ガード）**: 各工程の起動時に git log で当該工程成果物の既存 commit を確認する。成果物が既に commit 済みの場合は配置検証のみで pass 判定する配置検証モードへ切替え、同一成果物の二重 commit と内容衝突を予防する（未 commit の場合は通常経路で当該工程を実行する）
 
 ## See Also
 

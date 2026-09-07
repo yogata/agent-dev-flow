@@ -37,6 +37,7 @@ case-auto は下位 workflow の契約確定後の上位 orchestrator として�
 - case-auto の所有対象は入力解決、auto_gate確認、artifact_actions基準工程決定、入力引き渡し、永続状態再読込、継続停止再開判定、完了進行未実行報告、壁時計時間計測、case-run インライン実行時の準備/クリーンアップフェーズのオーケストレーション手順、orchestration stage 分離、stage 2 の固定並列数、bg task の状態管理・破棄検知・状態別回復、stage 1/3 の直列集約に限定する（harness 実行機構との責務分界は harness 分離モデル Design 参照）
 - subagent 委譲 prompt は MUST DO / MUST NOT DO の明示構造を持ち、スコープ外作業（当該 command 責務外のファイル作成、REQ/ Design/ src の直接修正、文書監査、capture 境界を超える `.agentdev/` 直接変更等）を列挙する。category 選定は委譲先 command の責務と category 名の意味的距離で評価し、事務的手続き（Issue 作成、VERIFY、状態遷移等）には `unspecified-high` を、`writing` category は執筆作業（docs 記述、REQ/ Decision/ Design 本文執筆等）に限定する。subagent 委譲 prompt と工程間の引き継ぎは、構造化文脈（10意味）を構造化して含む（委譲時の直列化形式は `agentdev-case-run-execution-adapter` スキルの委譲プロンプト雛形、工程間の形式は `agentdev-workflow-lifecycle` スキルの工程間構造化文脈引き継ぎが所有）
 - case-run の並列起動は orchestration stage 2 のみで行い、stage 1 と 3 では並列起動を行わない（並列実行を利用できない場合のみ順次フォールバック）。capture は構成コマンド（case-run/ case-close）の capture 責務境界に従って継承し、case-auto 固有の capture 振る舞いを持たない（capture 境界は `agentdev-workflow-orchestration` 参照）。成果物本文は verbatim で返し、判定結果・調査過程・中間ログ・読解メモは要約・圧縮して返す
+- 各工程の起動時に前置ガードとして git log で当該工程成果物の既存 commit を確認する。成果物が既に commit 済みの場合は配置検証のみで pass 判定する配置検証モードへ切替え、同一成果物の二重 commit と内容衝突を予防する。未 commit の場合は通常経路で当該工程を実行する
 
 ## ガードレール
 
