@@ -40,3 +40,21 @@
 - **タグ**: #baseline #ng-baseline #integrity #demote #case-run #verification
 
 ---
+
+## 2026-09-07: Bun.YAML 依存 checker は node 安定実行経路で実行不能。bun spawnSync の stdout 分離取得で証跡を確保する
+
+- **問題事象**: checker 実行契約の安定実行経路（node --experimental-strip-types）で check_distribution_boundary.ts を実行したところ、`Bun.YAML.parse` 依存により "fail-closed: distribution targets file is not valid YAML"（exit 2）で失敗した。check_extensions.ts 等の同系 checker も同じ Bun 依存を持つ。また traceability check（scripts/src/check.ts）は `bun run <相対パス>` で Module not found（exit 1）になり、スクリプト絶対パス指定で解決した。
+- **発生局面**: 検証（case-close STEP-3 配布依存境界 最終 gate、targeted docs guard、トレーサビリティ独立再検査）。Epic 2653 / Issue 2664 / PR 2677。
+- **検知方法**: node での checker 実行が空 stdout + exit 2 で失敗し、stderr の fail-closed メッセージと checker ソース（distribution-boundary-rules.ts の Bun.YAML.parse）を突合して原因特定。
+- **根本原因**: checker 実行契約の安定実行経路は Windows + bun の process.exit stdout 消失対策として node 経路を標準とするが、Bun.YAML 等 Bun ランタイム API に依存する checker は node では実行そのものが不可能。契約上の標準経路と checker 実装のランタイム依存の間に前提のずれがある。
+- **自律対応内容**: bun を spawnSync で起動し status/stdout を分離取得、stdout を UTF-8 明示 writeFileSync で退避する wrapper を用いて全 checker を実行。JSON レポート取得と非ゼロ exit の証跡保持を両立した。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（checker 実行契約の運用注記レベル。契約文書の変更必要性は learning-promote で判断）
+- **横展開観点**: repo-agentdev-integrity 配下 checker、agentdev-traceability scripts を case-close/case-run で実行する全ケースに共通。
+- **再発条件**: Bun ランタイム API（Bun.YAML 等）に依存する checker を node 経路で実行する場合、または scripts 配下に独自 package.json を持つスクリプトを相対パスの `bun run` で起動する場合。
+- **予防策候補**: checker 実行時、Bun 依存の有無（Bun.YAML 等 import）を確認し、Bun 依存 checker は bun spawnSync wrapper 経由で stdout 証跡を取得する。scripts 配下のスクリプトは絶対パス指定で起動する。
+- **想定反映先**: learning-promote での分類後、checker 実行契約（checker 実行契約と検出基盤規則 Design）の安定実行経路節への Bun 依存 checker 注記。
+- **関連**: PR 2677、Issue 2664、Epic 2653、.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary-rules.ts
+- **タグ**: #checker #bun #stdout #windows #case-close #verification
+
+---
