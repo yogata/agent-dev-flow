@@ -64,6 +64,8 @@ base 移動判定（STEP-4-1）の導入は、本手順の mergeable UNKNOWN ポ
 
 ### STEP-4-3: PR merge 実行
 
+**PR タイトルの事前変更**: pr_merge 操作は squash コミットタイトルを制御できない。マージ実行前に `agentdev_gh` の issue_update 操作で PR タイトルを Conventional Commits 形式 + (Refs #N) 形式へ変更する。squash コミットタイトル経由で auto-close キーワードが解釈されることによる Issue の意図しないクローズを回避するため、タイトル変更は pr_merge 実行の前に行う。
+
 STEP-4-1 で確認した squash merge 先（main）へ `agentdev_gh` の pr_merge 操作（squash 方式）を実行 → HEAD commit hash 記録（`agentdev-git-worktree` skill に従い）。
 
 **Squash merge 失敗時のリトライ**: 本書が所有する「squash merge リトライ手順」に従う（待機間隔5秒、最大試行回数は初期試行 + 5回リトライ、各試行のログ記録、全試行失敗時のフォールバックは template `.opencode/commands/agentdev/templates/case-close/standard.md` 参照）。

@@ -48,7 +48,7 @@ description: 追跡Issue（課題、ToDo、アイデア、リスク等の未解�
 
 | 操作 | Tool 操作契約 | 状態遷移 |
 |---|---|---|
-| 起票 | `issue_create`（role: tracking、kind 指定） | （新規）→ 起票 |
+| 起票 | `issue_create`（role: tracking、kind 指定。labels は必須引数のため空配列も明示する） | （新規）→ 起票 |
 | 更新 | `issue_update`（title、body、labels） | 状態不変 |
 | 検討経過の追加 | `issue_comment`（body 付き） | 状態不変 |
 | 検討中への遷移 | `issue_update`（trackingState 指定） | 起票/保留/実行準備完了 → 検討中 |
@@ -57,9 +57,11 @@ description: 追跡Issue（課題、ToDo、アイデア、リスク等の未解�
 | 解決 | `issue_update`（trackingState 指定） | → 解決済み（解決結論を本文へ記録） |
 | クローズ | `issue_close`（reason: completed / not_planned） | 解決済み等 → クローズ済み |
 | 再オープン | `issue_reopen` | クローズ済み → 検討中 |
-| 検索・参照 | `issue_list`（role、kind、状態等の絞り込み）、`issue_read`、`issue_comment`（body 省略で読取） | - |
+| 検索・参照 | `issue_list`（role 単位で列挙。絞り込みは応答一覧をクライアント側で行う）、`issue_read`、`issue_comment`（body 省略で読取） | - |
 
 クローズの reason は、反映完了によるクローズで `completed`、対応不要の確認完了を経由したクローズで `not_planned` を使う。
+
+`issue_list` は role 単位での列挙が標準呼出形式である。labels・search パラメータは Tool が invalid-input として拒否するため指定せず、結果の絞り込みは応答一覧をクライアント側で行う。
 
 ## 保留・再評価・反映の意味論
 
@@ -74,7 +76,7 @@ description: 追跡Issue（課題、ToDo、アイデア、リスク等の未解�
 
 1. **候補判定**: 現在の作業で解決できず、かつ将来の設計、実装、検証、合意等に影響する未解決事項かを判定する。すべての疑問、一時的な覚え書き、一時エラーを課題化しない
 2. **事前解決の試行**: 正規成果物の確認等によってその場で解決可能な疑問は、課題化前に解決を試みる
-3. **既存追跡Issue検索**: `issue_list`（role: tracking、kind、状態による絞り込み）で既存追跡Issueを検索し、重複起票を避ける。同一論点の既存追跡Issueがある場合は重複起票せず、既存追跡Issueへの統合・参照を提案する
+3. **既存追跡Issue検索**: `issue_list`（role 単位で列挙。kind、状態による絞り込みは応答一覧をクライアント側で行う）で既存追跡Issueを検索し、重複起票を避ける。同一論点の既存追跡Issueがある場合は重複起票せず、既存追跡Issueへの統合・参照を提案する
 
 正規成果物または現在の会話で結論が確定している事項は、その結果を追跡Issueへ反映できる。ユーザー合意が必要な設計判断を課題管理側だけで確定しない。
 
@@ -83,7 +85,7 @@ description: 追跡Issue（課題、ToDo、アイデア、リスク等の未解�
 本スキルは共有能力であり、人間向け公開入口（`/agentdev/issue` command）の明示実行を利用の必須条件としない。
 
 - 要件定義、設計、レビュー、実装、検証等の各 workflow、各 skill は、未解決事項を認識した場合に本スキルの知識を直接利用し、Tool 操作契約経由で追跡Issueの操作を行える
-- 保留中の追跡Issueは `issue_list`（状態絞り込み）で到達できる。関連する作業、設計、レビュー、分析を行う際に再評価条件の成立を確認する
+- 保留中の追跡Issueは `issue_list`（role 単位で列挙。状態絞り込みは応答一覧をクライアント側で行う）で到達できる。関連する作業、設計、レビュー、分析を行う際に再評価条件の成立を確認する
 - 本スキルの利用にあたり新規の承認点を追加しない。既存の承認、判断境界（ユーザー合意が必要な設計判断を本スキルが勝手に確定しない等）は維持する
 
 ## 禁止事項
