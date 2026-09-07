@@ -1166,15 +1166,6 @@
     },
     {
       "category": "LinkIntegrity",
-      "check": "broken-file-link",
-      "file": "docs/designs/quality/quality-gates.md",
-      "evidence": "../../src/opencode/skills/agentdev-quality-gates/SKILL.md",
-      "count": 1,
-      "provenance": "legacy",
-      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
-    },
-    {
-      "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "REQ-0101 referenced but REQ file does not exist",
       "evidence": "REQ-0101 referenced but REQ file does not exist",
