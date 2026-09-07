@@ -259,6 +259,7 @@ Windows + worktree 環境で `git -C <worktree> mv` が `fatal: renaming ... fai
 `git pull --ff-only` 実行前に、worktree 状態（dirty tree）・並列実行による ref lock 競合・main 以外のブランチ占有の3リスクを事前検出し、安全な代替同期手順を選択する。
 暗黙の手順順序依存を明示的な事前チェックに置き換える（3件の pull 失敗事象: worktree 状態、並列実行コンテキスト、main 以外のブランチ占有に基づく）。
 case-close STEP-6-3-2 から参照される。
+case-close STEP-4-1 の PR base 移動判定は、`git fetch origin main` による remote-tracking 更新のみで pull を伴わないため、本プロシージャの適用対象外である。
 
 ### 前提確認
 
