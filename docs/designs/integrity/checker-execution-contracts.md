@@ -7,6 +7,7 @@ updated: 2026-09-07
 <!-- ADF-COVERS(implementation): REQ-002-035 -->
 <!-- ADF-COVERS(implementation): REQ-010-062 -->
 <!-- ADF-COVERS(implementation): REQ-010-010 -->
+<!-- ADF-COVERS(design): REQ-018-004 -->
 <!-- ADF-COVERS(implementation): REQ-057-004 -->
 <!-- ADF-COVERS(implementation): REQ-057-018 -->
 
@@ -151,10 +152,26 @@ checker は module import 経由（node --experimental-strip-types）での実�
 
 ### link profile 実効実行要件
 
-- link profile は main root から読取専用で実行する（worktree 汎用手順の読取専用実行・環境ラベル規定と整合）。
+- link profile は main root を位置引数 `repoRoot` に指定して読取専用で実行する（worktree 汎用手順の読取専用実行・環境ラベル規定と整合）。
 - worktree 内実行は junction 未伝播により concrete-id 0件の無効実行になり得る。link profile を worktree で実行した
   場合は実行環境ラベルを記録し、結果の採用可否を環境ラベルで判定する（REQ-018-004 の環境差区分に従う）。
 - source profile と link profile の対比表を検証結果の解釈に用いる。
+
+実行記録には、次の環境ラベルを必ず付す。
+
+| 項目 | 記録内容 |
+|---|---|
+| 実行環境 | main root または worktree root の別とパス |
+| junction 伝播状態 | worktree の `.opencode/skills/agentdev-*` 未伝播、または main root の junction 構成の状態 |
+| 依存パッケージ状態 | `node_modules` の伝播状態、`bun install` の要否および実施状況 |
+
+checker の stdout 証跡は、実行プロセスの終了状態と stdout を分離して退避する。非ゼロ終了時も
+機械可読な stdout を保持し、source profile と link profile の実行結果・環境ラベル・対比表を同一の
+検証記録から追跡できるようにする。
+
+本節は checker の実行契約だけを所有する。AG-005（`agentdev-skill-authoring`）の規則は
+command/skill の記述品質を所有し、worktree 汎用手順は `agentdev-git-worktree` の references が所有する。
+両者の手順を本 Design に重複記載せず、checker の実行結果解釈に必要な範囲だけを参照する。
 
 ## See Also
 
