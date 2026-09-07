@@ -29,6 +29,18 @@ Custom Tool `agentdev_gh`（書き込みは Tool 内部の読み戻し検証で�
 - issue_create、issue_update、issue_comment の呼出は「`agentdev_gh` 標準呼出形式」（本文・タイトルの二重引用符回避、labels 引数の明示）に従う。
 - 各書き込み操作（作成、更新、コメント追加）ごとに個別に VERIFY を実行すること（一括検証は不可）。
 
+## Issue 本文の記載粒度ガイドライン
+
+Issue 本文では、変動しやすい実測値ではなく、作業対象を安定して再特定できる識別子を中心に記載する。対象 Issue 番号、REQ 行 ID、Design 節、ファイルパス、検証項目 ID などを明示し、行番号や件数は補助情報として扱う。
+
+### 記載例
+
+- 良い例: `REQ-{NNNN}-{NNN}` の契約値を `src/opencode/skills/agentdev-artifact-validation/SKILL.md` の公開検証契約へ反映する。
+- 良い例: `TS-{NNN}` を実行し、`agentdev-issue-management` の参照導線が実在する本文へ到達することを確認する。
+- 避ける例: 「42 行目を直す」「現在の 3 箇所を修正する」のように、編集で変動する位置や件数だけを完了条件にする。
+
+対象範囲が一部である場合は Issue 番号、OU/REQ 識別子、対象パスを列挙し、全体評価が必要な場合は「全体」と明記する。最新状態の確認結果と evidence は識別子を添えて記録し、後続工程が同じ対象を再解決できるようにする。
+
 ## See Also
 
 - Custom Tool `agentdev_gh`（GitHub I/O 操作。エンコーディング、一時ファイル運用、読み戻し検証は Tool 内部。検証失敗時のリトライ判断は呼び出し側。）
