@@ -450,3 +450,21 @@
 - **想定反映先**: learning-promote での分類、AG-010 既知 fail 分離運用の運用知識、learning-promote / case-run の検証手順注記
 - **関連**: PR #2632 本文 Findings / Capture候補 セクションからの capture 回収（case-close STEP-6）
 - **タグ**: #test #flaky #staging #distribution-boundary #case-close #verification
+
+---
+
+## 2026-09-07: lint_skills.ts の references TOC 観点（AG-005）は 300 行閾値で発動するため、既存 references への行数追加で新規 NG が誘発され得る
+
+- **問題事象**: 既存 references ファイルへの手順追記（289 行 → 330 行）により、lint_skills.ts の AG-005 観点（references が 300 行を超えると TOC 必須）の新規違反が誘発され得ることを、追記後の検証で把握した。追記前に閾値距離を確認していなかったため、検証で初めて閾値越えに気づき得る状態だった
+- **発生局面**: case-run 委譲（Epic #2633 Wave 1 / Issue #2636 / PR #2647、OU-003 fail 由来分類と正規ランナー構成確認の配布物反映）
+- **検知方式**: 反映先 references への行数追加後の lint_skills.ts 実行時の AG-005 評価確認
+- **根本原因**: lint_skills.ts の AG-005 観点（references TOC 必須判定）は 300 行閾値で発動するが、追記側の手順に「追記前の行数と閾値の距離確認」が含まれていなかった
+- **自律対応内容**: 追記後に行数と AG-005 評価を確認し、TOC 要否を検証（本 PR では新規 NG なしで合格）
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/spec影響**: なし（検査閾値に対する追記手順の教訓）
+- **横展開観点**: 既存 references への追記を伴う配布物反映（case-run 委譲・docs_chore 系 Issue）全般に共通
+- **再発条件**: 300 行に近い references への複数行追記、かつ追記前の行数・閾値距離の未確認
+- **予防策候補**: references への追記前に当該ファイルの行数と 300 行閾値との距離を事前確認する。追記で閾値を跨ぐ場合は TOC 追加を同時対応に含める
+- **想定反映先**: learning-promote での分類、case-run 委譲手順の検証前確認注記、agentdev-skill-authoring の構造基準注記
+- **関連**: PR #2647 本文 Findings / Capture候補 セクションからの capture 回収（case-close STEP-6）
+- **タグ**: #lint #skill #threshold #toc #case-run #verification
