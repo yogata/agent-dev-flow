@@ -115,7 +115,7 @@ test_strategy:
 # artifact_actions とは分離した独立構造であり、REQ / Decision / Design の保存操作は artifact_actions が担い、実現物種別の enum を追加して責務を混在させない
 # ADF 固有の成果物種別や適用プロジェクト固有の成果物種別を固定 enum として列挙しないドメイン中立契約とする
 # 対象の手掛かり（パス、担当能力、正規所有 Design 等）は ownership_hints に自由形式で記録する
-# 欠落時に後続工程は draft を拒否しない（soft contract、DEC-003）
+# 欠落時に後続工程は draft を拒否しない（soft contract 原則）
 # ただし実現面の変更がある場合は本セクションを出力する
 # case-open が本セクションを Issue / Epic の execution contract へ投影する
 realization_actions:
@@ -160,5 +160,4 @@ case_open_hints:
  検討経緯や採用しない方針は処理対象として残さない。 -->
 
 {合意内容の人間可読補足。検討経緯、不採用方針は含めない}
-
 
