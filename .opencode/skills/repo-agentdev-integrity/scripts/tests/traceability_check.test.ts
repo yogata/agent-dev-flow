@@ -29,6 +29,14 @@ function tsDecl(role: string, ids: string): string {
   return `// ${MARKER}(${role}): ${ids}`;
 }
 
+const DISTRIBUTION_BOUNDARY_FIXTURE =
+  ".opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.test.ts";
+const ESCAPED_FIXTURE_ID = ["REQ-", "\\\\", "u0030", "\\\\", "u0031"].join("");
+
+function distributionBoundaryMalformedFixture(): string {
+  return `text: "<!-- ${MARKER}(implementation): ${ESCAPED_FIXTURE_ID} -->",`;
+}
+
 function writeFixture(rel: string, lines: readonly string[]): void {
   const filePath = join(ROOT, rel);
   mkdirSync(join(filePath, ".."), { recursive: true });
@@ -127,6 +135,43 @@ describe("check の個別検出", () => {
     const report = runChecks(scan, KNOWN);
     const total = Object.keys(report.checks).length;
     expect(report.summary.pass + report.summary.fail).toBe(total);
+  });
+});
+
+describe("既知の意図的 fixture の exemption", () => {
+  it("distribution-boundary の fail-closed fixture を malformed-declarations に計上しない", () => {
+    writeFixture(DISTRIBUTION_BOUNDARY_FIXTURE, [distributionBoundaryMalformedFixture()]);
+    const scan = scanCorpus(ROOT);
+    const report = runChecks(scan, KNOWN);
+    const findings = report.checks["malformed-declarations"].findings.filter(
+      (finding) => finding.file === DISTRIBUTION_BOUNDARY_FIXTURE,
+    );
+    expect(findings).toEqual([]);
+  });
+
+  it("同一ファイルの別 malformed 行は exemption されない", () => {
+    writeFixture(DISTRIBUTION_BOUNDARY_FIXTURE, [
+      distributionBoundaryMalformedFixture(),
+      `<!-- ${MARKER}(design) REQ-900-001 -->`,
+    ]);
+    const scan = scanCorpus(ROOT);
+    const report = runChecks(scan, KNOWN);
+    const findings = report.checks["malformed-declarations"].findings.filter(
+      (finding) => finding.file === DISTRIBUTION_BOUNDARY_FIXTURE,
+    );
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.text).toContain(`${MARKER}(design) REQ-900-001`);
+  });
+
+  it("同じ escape 断片でも別ファイルは exemption されない", () => {
+    const otherFile = "other/distribution-fixture.md";
+    writeFixture(otherFile, [distributionBoundaryMalformedFixture()]);
+    const scan = scanCorpus(ROOT);
+    const report = runChecks(scan, KNOWN);
+    const findings = report.checks["malformed-declarations"].findings.filter(
+      (finding) => finding.file === otherFile,
+    );
+    expect(findings).toHaveLength(1);
   });
 });
 
