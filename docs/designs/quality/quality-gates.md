@@ -211,6 +211,6 @@ case-auto は構成コマンド（req-save / case-open / case-run / case-close�
 
 ## 関連項目（See Also）
 
-- [agentdev-quality-gates](../../src/opencode/skills/agentdev-quality-gates/SKILL.md)（QG-1〜QG-4 の判定基準、検査観点を提供する実行時ナレッジベース）
+- [agentdev-quality-gates](../../../src/opencode/skills/agentdev-quality-gates/SKILL.md)（QG-1〜QG-4 の判定基準、検査観点を提供する実行時ナレッジベース）
 - [quality-specs.md](quality-specs.md)（品質基準（行数上限、執筆完了基準 等））
 - [document-model.md](../foundations/document-model.md)（REQ/Decision/Design/guides の責務マトリックス、文書分類ポリシー）
