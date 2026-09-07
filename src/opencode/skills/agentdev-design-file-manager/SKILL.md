@@ -68,6 +68,10 @@ Design frontmatter の `status`（`draft` / `accepted` の2値）を本スキル
 
 新規 Design 作成時の frontmatter は `title`, `status: draft`, `created`, `updated` の4フィールドを付与する。
 
+移行・統合で Design の配置先体系（番号空間、slug 空間）を専有する場合、対応表確定の前置として衝突チェックを機械的に実行する。
+移行先の実ファイル一覧（inventory）を `Get-ChildItem` 等のディレクトリ走査で取得し、採番ロジックの内部状態のみに依存しない。
+衝突を検出した場合は対応表を確定せず、衝突一覧を報告する。
+
 ---
 
 ## Scripts（決定的処理）
