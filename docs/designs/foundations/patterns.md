@@ -89,6 +89,16 @@ Knowledge frontmatter 規約の機械判定は次の5項目で構成する。
 
 本形式の正実装は check_knowledge_docs.ts であり、checker の判定変更時に本規約が追従する。
 
+規約と実装の対応は次のとおりである。checker の判定を変更した場合は、この表と上記の規約を同じ変更で更新する。
+
+| 規約項目 | checker の判定 |
+|---|---|
+| frontmatter 境界 | `extractFrontmatterLines` による先頭 `---` と閉じ `---` の検出 |
+| 必須性 | `REQUIRED_FRONTMATTER_FIELDS`（`title`、`created`、`updated`）の欠落・空値検出 |
+| 日付妥当性 | `FRONTMATTER_DATE_PATTERN` と `isValidIsoDate` による `YYYY-MM-DD` 検証 |
+| 順序比較 | `updated >= created` の比較 |
+| 違反種別 | `missing-frontmatter` / `invalid-frontmatter` の分類 |
+
 knowledge 見出し一致の機械判定形式: 必須セクションの存在は、Markdown 見出し行（`#`〜`######`）の見出しテキストと必須セクション名（知識内容、適用条件、適用対象、根拠、関連知識）との trim 後の完全一致で判定する。見出しとセクション名の意味一致は判定対象に含まらず、検査は構造面（配置、ファイル名命名、必須見出しの存在）に限定される。
 
 ## REQ 分類規約
