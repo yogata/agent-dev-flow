@@ -8,11 +8,11 @@ context:
     paths:
       - "docs/designs/integrity/docs-spec-rebuild-integrity.md"
     purpose: 配布物 ID 除去後の品質保持ルールの確認
-  - id: agentdev-gh-cli-design
-    when: "agentdev-gh-cli Design 参照時"
+  - id: custom-tool-contracts
+    when: Custom Tool 操作契約参照時
     paths:
-      - "docs/designs/skills/agentdev-gh-cli.md"
-    purpose: gh CLI 手続き委譲基盤の Design 確認
+      - "docs/designs/responsibilities/custom-tool-contracts.md"
+    purpose: GitHub I/O の Custom Tool（agentdev_gh）操作契約の Design 確認
   - id: integrity-rule-catalog
     when: 整合性ルールカタログ参照時
     paths:

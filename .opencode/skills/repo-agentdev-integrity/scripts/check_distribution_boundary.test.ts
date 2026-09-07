@@ -606,7 +606,7 @@ describe("loadDistributionTargets: canonical yaml loading (REQ-047-009)", () => 
     const targets = loadDistributionTargets(findRepoRoot(process.cwd()));
     expect(Array.isArray(targets.ir046Markers)).toBe(true);
     expect(targets.ir046Markers.length).toBeGreaterThan(0);
-    expect(targets.ir047Allowed).toContain("agentdev-gh-cli");
+    expect(targets.ir047Allowed).toContain("agentdev-gh");
     expect(typeof targets.ir048Prefix).toBe("string");
     expect(targets.ir048Prefix.length).toBeGreaterThan(0);
   });
