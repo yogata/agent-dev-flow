@@ -40,7 +40,7 @@ Git / GitHub 等への構造化された副作用操作を担う ADF 汎用 Cust
 - `index.ts` が Tool 名・公開契約・操作スペックを単一の登録単位へ接続する
 - `runner-cli.ts` が gh CLI への具体的な写像（GitHub 実装 `GhRunner`）を実装する。`--input` による UTF-8 JSON ファイル渡し、シェル不使用の引数配列呼び出し、一時ファイルの作成と削除等の実装詳細はこの境界の内側に隠蔽される
 - 登録 Plugin（`src/opencode/plugins/agentdev-gh-tool/`）が custom tool `agentdev_gh` を OpenCode の実行時へ登録する
-- ローカル版（consumer-generated）は同一操作契約でローカルIssue（`.agentdev/issues/`、role 条件付きスキーマ）の読み書きへ読み替えた `GhRunner` 実装（`src/opencode-local/agentdev-gh-cli/runner-local.ts`）を差し替える
+- ローカル版（consumer-generated）は同一操作契約でローカルIssue（`.agentdev/issues/`、role 条件付きスキーマ）の読み書きへ読み替えた `GhRunner` 実装（`src/opencode-local/agentdev-gh/runner-local.ts`）を差し替える
 
 ツール名、ファイル構成、公開単位の詳細は Design `custom-tool-contracts.md` が所有する。
 
