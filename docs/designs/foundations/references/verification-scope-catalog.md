@@ -109,6 +109,7 @@ Issue #2362 の移行作業（棚卸し (a')）で全現行要件行を判定し
 - REQ-010-064..REQ-010-067: docs-check の意味識別子、未解決プレースホルダー、廃止語、旧パス・削除済み実体の各検出要求。docs-check 検査と回帰テスト（Case Issue のテスト戦略）で検証
 - REQ-010-069..REQ-010-070: docs-check の REQ 識別子存在性検査と、再検出対象の再発防止検査クラス追加契約。docs-check 検査と回帰テスト（REQ-010-068、Case Issue のテスト戦略）で検証
 - REQ-010-071: 配布物の決定的破損検査クラスの追加要求。検査クラスの実装と回帰テスト（REQ-010-068、Case Issue のテスト戦略）で検証
+- REQ-010-072..REQ-010-074: 関連REQ表の retired REQ 実パス検査、docs/designs 相対リンク実在検査、既知 delta 区分維持の各追加点。docs-check 検証とテスト（REQ-010-068、Case Issue のテスト戦略）で検証
 
 ### REQ-011（I/O境界と外部連携手段）
 
@@ -130,6 +131,7 @@ Issue #2362 の移行作業（棚卸し (a')）で全現行要件行を判定し
 ### REQ-017（Issue Execution Contract）
 
 - REQ-017-001..REQ-017-016: execution contract の Issue 埋め込み、品質統制の適用、blocked 遷移、runtime-only 判定の保持の実行時振る舞い
+- REQ-017-019: 委譲 prompt 生成側の structured_context の Issue 本文 SSoT 抽出制約と Issue 番号×対象成果物パス突合。委譲契約 Design・配布物 references との整合確認とレビューで検証
 
 ### REQ-027（Capability Skill・Soft guard・代表ケース検証）
 
