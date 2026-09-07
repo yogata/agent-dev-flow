@@ -35,8 +35,8 @@ Issue 本文では、変動しやすい実測値ではなく、作業対象を�
 
 ### 記載例
 
-- 良い例: `REQ-057-003` の契約値を `src/opencode/skills/agentdev-artifact-validation/SKILL.md` の公開検証契約へ反映する。
-- 良い例: `TS-012` を実行し、`agentdev-issue-management` の参照導線が実在する本文へ到達することを確認する。
+- 良い例: `REQ-{NNNN}-{NNN}` の契約値を `src/opencode/skills/agentdev-artifact-validation/SKILL.md` の公開検証契約へ反映する。
+- 良い例: `TS-{NNN}` を実行し、`agentdev-issue-management` の参照導線が実在する本文へ到達することを確認する。
 - 避ける例: 「42 行目を直す」「現在の 3 箇所を修正する」のように、編集で変動する位置や件数だけを完了条件にする。
 
 対象範囲が一部である場合は Issue 番号、OU/REQ 識別子、対象パスを列挙し、全体評価が必要な場合は「全体」と明記する。最新状態の確認結果と evidence は識別子を添えて記録し、後続工程が同じ対象を再解決できるようにする。
