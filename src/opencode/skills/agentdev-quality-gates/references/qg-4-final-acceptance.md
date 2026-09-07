@@ -248,7 +248,7 @@ bun test ./.opencode/plugins/ ./scripts/
   bun install --cwd .opencode/skills/repo-agentdev-integrity/scripts
   ```
 
-  - **対象ディレクトリ集合**: `src/opencode/skills/agentdev-project-extensions/scripts`（zod 等の依存解決。分割② のテストと integrity suite からの相対 import 参照の前提）と `.opencode/skills/repo-agentdev-integrity/scripts`（worktree 実体。`typescript`・`@types/bun`・`@types/node` の依存解決）の両方
+  - **対象ディレクトリ集合**: `agentdev-project-extensions/scripts`（zod 等の依存解決。分割② のテストと integrity suite からの相対 import 参照の前提）と repository-local integrity checker の scripts ディレクトリ（worktree 実体。`typescript`・`@types/bun`・`@types/node` の依存解決）の両方
   - **tsc 型検証の型解決前提**: tsc 型検証（`tsc --noEmit`）を含む場合は、対象パッケージでの `bun install` による `@types/bun` 等の復元を前提とする。node_modules 未整備の状態では tsc の型解決が失敗する
   - **bun test 単独実行の依存前提と junction 代替**: bun test 単独実行（フル suite 正規形以外）で依存解決が必要な場合は、main 側 `node_modules` への junction 作成（検証後削除）または当該 skill ディレクトリでの `bun install` のいずれかで整備する（手順詳細は `agentdev-git-worktree` の worktree 構造的制約を参照）
   - **整備後の再実行手順**: 依存整備実施後は、依存解決失敗で fail したテスト・型検証を同一環境で再実行して当該 fail の解消を確認し、依存整備実施済みの旨を環境ラベル（依存パッケージ状態）へ記録する
