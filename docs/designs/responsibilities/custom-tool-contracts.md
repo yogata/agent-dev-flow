@@ -2,7 +2,7 @@
 title: Custom Tool 操作契約
 status: accepted
 created: 2026-08-24
-updated: 2026-09-08
+updated: 2026-09-09
 ---
 <!-- ADF-COVERS(implementation): REQ-011-001, REQ-011-002, REQ-011-003, REQ-011-005, REQ-011-008, REQ-011-009, REQ-011-013, REQ-011-014, REQ-011-015, REQ-011-020, REQ-011-021, REQ-011-022, REQ-011-023, REQ-011-024, REQ-052-001, REQ-052-002, REQ-052-003, REQ-052-004, REQ-052-005, REQ-052-008, REQ-052-009, REQ-052-010, REQ-052-011 -->
 
@@ -25,14 +25,18 @@ Git、GitHub、外部ソース（URL、Git リポジトリ等）からの取得�
 - runner と engine の間の実行応答は失敗クラス情報を持ち、外部操作の失敗（HTTP エラー、対象不在）と Tool / runner 自体の異常を engine が区別して分類する
 - 入力契約違反は invalid-input とし、外部操作の失敗・検証未了・Tool 異常と同一分類に集約しない
 
+runner 応答 before 契約（追跡軸保持 VERIFY の実行前状態接合）:
+- issue_update、issue_reopen の追跡軸保持 VERIFY は、副作用後の読み戻しのみでは自己保持できない実行前状態を必要とするため、runner の成功応答 payload は実行前状態（before）を正規化済み導出値として含める。含める導出値は state、labels、role、kind、trackingState、closeReason とし、正規化規則は契約型（contracts.ts）と追跡スキーマ（tracking-schema.ts）の実装に従う
+- runner と engine の間の内部契約を拡張する場合は、GitHub 版と Local 版へ同時に反映する。Local 版の実装が未完了の間は、最低限の型整合を維持し、当該操作の VERIFY は fail-closed で verification-incomplete として返ることを許容する
+
 ## 対象操作の境界（初期セット）
 
-操作カタログを以下の16操作へ再定義する。
+操作カタログを以下の16操作として定義する。
 
-- 基本操作: issue_create、issue_read、issue_update、issue_close、pr_create、pr_read、pr_merge、pr_changed_files、pr_mergeable、pr_update（新規）
+- 基本操作: issue_create、issue_read、issue_update、issue_close、pr_create、pr_read、pr_merge、pr_changed_files、pr_mergeable、pr_update
 - 追跡Issue操作: issue_list、issue_reopen
-- Comment 操作（新規）: comment_create、comment_list、comment_update、comment_delete。Comment は Issue と Pull Request の会話コメントを同一の論理リソースとして扱う。comment_list の各要素は commentId、body、createdAt、updatedAt、url を返す。comment_update と comment_delete は commentId を対象識別子として使用する。commentId の公開型は文字列とし、GitHub 実装は数値コメント id を文字列化する
-- 廃止: issue_comment（body あり＝追加、body なし＝読取の二重モード）。正規操作カタログから除去し、ADF 内部の呼出元は Comment 操作へ移行する。移行完了までの間は一時的に温存する
+- Comment 操作: comment_create、comment_list、comment_update、comment_delete。Comment は Issue と Pull Request の会話コメントを同一の論理リソースとして扱う。comment_list の各要素は commentId、body、createdAt、updatedAt、url を返す。comment_update と comment_delete は commentId を対象識別子として使用する。commentId の公開型は文字列とし、GitHub 実装は数値コメント id を文字列化する
+- 廃止済み操作: issue_comment（body あり＝追加、body なし＝読取の二重モード）は正規操作カタログから除去済みであり、ADF 内部の呼出元は Comment 操作への移行が完了している。GitHub 版・Local 版のいずれの実装にも issue_comment は存在せず、廃止は確定している。外部 consumer 環境が更新前の runner を保持する間に旧 runner 側で issue_comment が動作し得るが、それは本 Design の操作契約の対象外である
 - pr_read の拡張: 成功結果に Pull Request 本文（body）を含む。本文の論理的な範囲はローカル版の物理写像（ローカルIssue共通スキーマ Design）に従い、読み取りと更新が round-trip 可能な同一の論理範囲（ローカル版ではマージ前確認・Design確定候補・Findings / Capture候補の3セクション群の直列化）とする
 - pr_update: title と body を対象とする項目単位の部分更新操作。指定されていない項目は保持し、更新後は読み戻しによって要求値の反映を確認する。ローカル版では Pull Request タイトルの正をマージ前確認セクション内の PR タイトル行とし、pr_update の title は同行を置換する
 - issue_update の部分更新不変条件: 変更を要求していない追跡Issue軸（role、kind、trackingState）を保持する。VERIFY の照合対象は追跡軸の完全一致と要求通常ラベルの包含とし、確認時点での第三者による通常ラベル追加を不変条件違反として失敗扱いにしない
@@ -86,8 +90,8 @@ Plugin / Hook の設定契約:
 
 GitHub I/O の操作契約、VERIFY、失敗時動作、環境依存隠蔽、ローカル版実装差し替えの正規所有は本 Design が一元的に担う。旧 Skill Design（`docs/designs/skills/agentdev-gh-cli.md`）はこの移管の完了に伴い現行 Design 体系から除去する。
 
-旧 Design が掲載していた操作契約表と拡張手続き（PR 変更ファイル一覧取得、PR mergeable 状態取得）は本 Design の「対象操作の境界（初期セット）」が所有する。gh 直接記述の検出スコープは IR-053（gh 直接記述検出）が所有する。Windows 環境依存の実装詳細（コンソールエンコーディング初期化、`--body-file`、一時ファイル運用等）は Tool 内部に隠蔽し、Design では正規所有しない。
+旧 Design が掲載していた操作契約表と拡大手続き（PR 変更ファイル一覧取得、PR mergeable 状態取得）は本 Design の「対象操作の境界（初期セット）」が所有する。gh 直接記述の検出スコープは IR-053（gh 直接記述検出）が所有する。Windows 環境依存の実装詳細（コンソールエンコーディング初期化、`--body-file`、一時ファイル運用等）は Tool 内部に隠蔽し、Design では正規所有しない。
 
-旧 Design の ADF-COVERS(implementation) 宣言対象行（REQ-011-001、REQ-011-002、REQ-011-003、REQ-011-005、REQ-011-008、REQ-011-009、REQ-011-013、REQ-011-014、REQ-011-015）の被覆を本 Design が引き継ぎ、本 Design の ADF-COVERS(implementation) 宣言へ上記の各行を追記する。
+旧 Design が実装対応宣言の対象としていた各行（REQ-011-001、REQ-011-002、REQ-011-003、REQ-011-005、REQ-011-008、REQ-011-009、REQ-011-013、REQ-011-014、REQ-011-015）の被覆を本 Design が引き継ぎ、本 Design の実装対応宣言へ上記の各行を追記する。
 
 ローカル版の正規原本は `src/opencode-local/agentdev-gh/` とし、通常版 `src/opencode/tools/agentdev-gh/` と同一の `agentdev-gh` 名で対応させる。

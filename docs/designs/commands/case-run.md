@@ -2,7 +2,7 @@
 title: case-run Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-05"
+updated: "2026-09-09"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-015, REQ-021-016, REQ-021-017, REQ-021-019, REQ-021-020, REQ-021-022 -->
@@ -197,7 +197,7 @@ pr_desc.md への verify-only 根拠欄追加は workflow-templates Design の�
 
 verification-only PR は以下を全て満たす PR とする（v2:REQ-0158-002）。
 
-- PR の変更ファイル数が0件（`gh pr view --json files` で `files: []`）
+- PR の変更ファイル数が0件（pr_changed_files の変更ファイル一覧が空と確認される）
 - Issue の受け入れ基準が検証のみで充足された（既存実装・既存文書が要件を満たしており、追加実装を要しなかった）
 - 検証結果が PR 本文の verify-only 根拠欄に evidence として記録されている
 
@@ -213,7 +213,7 @@ case-run は verify-only PR 作成時に pr_desc.md の verify-only 根拠欄へ
 
 GitHub は空 PR（変更ファイル0件）の squash merge を許可し、空 commit を生成する（commit 2b34f8b0 で実証）。
 case-run は空 PR の作成・マージを GitHub の挙動に依存して実行する。
-squash merge で生成された空 commit は履歴に残り、`gh pr merge --squash` の通常フローに従う。
+squash merge で生成された空 commit は履歴に残り、pr_merge（squash merge）の通常フローに従う。
 
 ### case-close 引継ぎ注意事项
 

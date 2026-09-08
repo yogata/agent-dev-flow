@@ -2,7 +2,7 @@
 title: 実行時パッケージ境界
 status: accepted
 created: 2026-08-20
-updated: 2026-09-08
+updated: 2026-09-09
 ---
 <!-- ADF-COVERS(implementation): REQ-002-007, REQ-002-008, REQ-002-011, REQ-002-019, REQ-002-020, REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-002, REQ-009-003, REQ-009-006, REQ-009-007, REQ-009-008, REQ-009-009, REQ-009-010, REQ-009-011, REQ-009-012, REQ-009-013, REQ-009-014, REQ-009-015, REQ-009-016, REQ-009-017, REQ-009-018, REQ-009-019, REQ-009-020, REQ-009-021, REQ-009-022, REQ-009-023, REQ-009-024, REQ-009-025, REQ-009-035, REQ-009-036, REQ-009-037, REQ-009-038, REQ-009-039, REQ-009-046, REQ-009-047, REQ-009-048, REQ-009-049 -->
@@ -87,6 +87,8 @@ tmp 残渣抑止: テスト一時フィクスチャ（`tmp-*` 等）の生成先
 
 scripts/ は skill junction の配下に位置し、skill の一部として配布される。
 ジャンクション対象は `agentdev-*` グロブで動的列挙（ハードコードなし）。
+
+- package rename（パッケージ名の変更）を行った場合は、bun install が bun.lock の root workspace name を自動同期しないため、bun.lock の name が新パッケージ名へ追従していることを確認する。bun install の実行面（依存前置）は worktree 運用参照（agentdev-git-worktree/references/worktree-operations.md）と相互参照する
 
 ### Consumer（AgentDevFlow 導入済み）
 

@@ -2,7 +2,7 @@
 title: checker 実行契約と検出基盤規則
 status: accepted
 created: 2026-08-15
-updated: 2026-09-07
+updated: 2026-09-09
 ---
 <!-- ADF-COVERS(implementation): REQ-002-035 -->
 <!-- ADF-COVERS(implementation): REQ-010-062 -->
@@ -172,6 +172,8 @@ checker の stdout 証跡は、実行プロセスの終了状態と stdout を�
 本節は checker の実行契約だけを所有する。AG-005（`agentdev-skill-authoring`）の規則は
 command/skill の記述品質を所有し、worktree 汎用手順は `agentdev-git-worktree` の references が所有する。
 両者の手順を本 Design に重複記載せず、checker の実行結果解釈に必要な範囲だけを参照する。
+
+- Bun ランタイム API（Bun.YAML 等）に依存する checker は bun 経由（`bun run`）で実行する。node の安定実行経路は Bun ランタイム API に依存しない checker に適用され、依存する checker には適用されない
 
 ## See Also
 

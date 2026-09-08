@@ -2,6 +2,7 @@
 draft_type: req_draft
 topic_slug: post-2686-contract-alignment-batch
 status: saved
+design_saved: true
 created_at: 2026-09-08T22:59:24+09:00
 source_rus:
   - RU-0001
@@ -343,7 +344,12 @@ operation_units:
     depends_on: []
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      save_stage: design-save
+      status: saved
+      artifact_action: ACT-DESIGN-001
+      saved_file: docs/designs/responsibilities/custom-tool-contracts.md
+      applied: 「対象操作の境界（初期セット）」セクション置換（target_area 単一マッチ）
   - ou_id: OU-003
     source_ru: RU-0004
     target_design: docs/designs/responsibilities/custom-tool-contracts.md
@@ -352,7 +358,12 @@ operation_units:
     depends_on: []
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      save_stage: design-save
+      status: saved
+      artifact_action: ACT-DESIGN-002
+      saved_file: docs/designs/responsibilities/custom-tool-contracts.md
+      applied: 「移管記録（旧 \`agentdev-gh-cli\` Skill Design の廃止）」セクション置換（宣言形式文字列の自然文への言い換え）
   - ou_id: OU-004
     source_ru: RU-0009
     target_design: docs/designs/responsibilities/custom-tool-contracts.md
@@ -361,7 +372,12 @@ operation_units:
     depends_on: []
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      save_stage: design-save
+      status: saved
+      artifact_action: ACT-DESIGN-003
+      saved_file: docs/designs/responsibilities/custom-tool-contracts.md
+      applied: 「操作契約の構成要素」セクション末尾へ before 契約追記
   - ou_id: OU-005
     source_ru: RU-0003
     target_design: docs/designs/commands/case-run.md
@@ -370,7 +386,12 @@ operation_units:
     depends_on: []
     recommended_order: 3
     issue_policy: single
-    result: {}
+    result:
+      save_stage: design-save
+      status: saved
+      artifact_action: ACT-DESIGN-004
+      saved_file: docs/designs/commands/case-run.md
+      applied: 「verification-only PR（実装差分なし、検証のみ）（v2:REQ-0158-002）」セクション置換（raw gh CLI 表記を Tool 操作名表記へ統一）
   - ou_id: OU-006
     source_ru: RU-0006
     target_design: docs/designs/skills/agentdev-traceability.md
@@ -379,7 +400,12 @@ operation_units:
     depends_on: []
     recommended_order: 3
     issue_policy: single
-    result: {}
+    result:
+      save_stage: design-save
+      status: saved
+      artifact_action: ACT-DESIGN-005
+      saved_file: docs/designs/skills/agentdev-traceability.md
+      applied: 「対応宣言の表記（正規情報源）」セクション末尾へ表記・解釈仕様3項目追記（SKILL ミラー同期は RA-007 で実装）
   - ou_id: OU-007
     source_ru: RU-0010
     target_design: docs/designs/integrity/checker-execution-contracts.md
@@ -388,7 +414,12 @@ operation_units:
     depends_on: []
     recommended_order: 3
     issue_policy: single
-    result: {}
+    result:
+      save_stage: design-save
+      status: saved
+      artifact_action: ACT-DESIGN-006
+      saved_file: docs/designs/integrity/checker-execution-contracts.md
+      applied: 「安定実行経路」セクション末尾へ Bun 依存 checker の bun 経路実行規定追記
   - ou_id: OU-008
     source_ru: RU-0011
     target_design: docs/designs/local/runtime-package-boundary.md
@@ -397,7 +428,12 @@ operation_units:
     depends_on: []
     recommended_order: 3
     issue_policy: single
-    result: {}
+    result:
+      save_stage: design-save
+      status: saved
+      artifact_action: ACT-DESIGN-007
+      saved_file: docs/designs/local/runtime-package-boundary.md
+      applied: 「本体リポジトリ sync」セクション末尾へ bun.lock root name 確認手順追記
   - ou_id: OU-009
     source_ru: RU-0012
     target_design: docs/designs/skills/agentdev-skill-authoring.md
@@ -406,7 +442,12 @@ operation_units:
     depends_on: []
     recommended_order: 3
     issue_policy: single
-    result: {}
+    result:
+      save_stage: design-save
+      status: saved
+      artifact_action: ACT-DESIGN-008
+      saved_file: docs/designs/skills/agentdev-skill-authoring.md
+      applied: 「配布物執筆時の ID 衛生（REQ-057-019）」セクション末尾へ配布境界 ID 執筆規律4項目追記
   - ou_id: OU-010
     source_ru: RU-0002
     operation: create

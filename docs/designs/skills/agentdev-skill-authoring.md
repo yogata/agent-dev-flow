@@ -2,7 +2,7 @@
 title: `agentdev-skill-authoring` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-02
+updated: 2026-09-09
 ---
 <!-- ADF-COVERS(implementation): REQ-002-013, REQ-002-014, REQ-002-015, REQ-053-011, REQ-057-019 -->
 <!-- ADF-COVERS(verification): REQ-002-004 -->
@@ -63,6 +63,11 @@ OpenCode SKILL.md の作成における品質基準とベストプラクティ�
 skill 執筆ガイダンスは、配布物への実行手順・例示を fenced code block とプレースホルダ表記で書き、要件・決定・設計等の具象参照（concrete ID）を本文 inline に記載しないことを不変条件として含む。
 対応宣言（ADF-COVERS implementation / verification）の正規配置先は docs 配下の正規成果物（skill Design・command Design）であり、配布物本体には対応宣言を書かない。
 本節は文書種別責務 Design「配布物の REQ 参照表記（定性参照）と対応宣言配置」（document-type-responsibilities.md）と同一方向であり、当該節を参照点として整合を保つ。
+
+- 記載例・サンプルは最初からプレースホルダ形式（`REQ-{NNNN}-{NNN}`、`TS-{NNN}` 等、digits を持たないトークン）で執筆する。検出器の ID 分類規則（プレースホルダ形式は concrete ID として検出されない）は変更しない前提の運用規律である
+- 具体 ID の実例が不可欠な場合は、PR 作成前に配布依存境界 gate（check_distribution_boundary.ts の --profile source）を前置実行して新規違反 0 件を確認する
+- 操作廃止系の Case で test strategy に全文検索対象を定義する際は、repo-local 実体（`.opencode/skills/repo-*` 配下の checker・テスト等）を検査対象に含めるか否かを明示的に判断する
+- release archive に同梱されるファイルにも記載例・本文中の concrete ID 制約が適用される。whole-line 形式の対応宣言コメントは配布依存境界 gate の既存 exemption（IR-059）の対象であり、archive 同梱ファイルでの宣言配置を制限しない
 
 ## 対象外
 
