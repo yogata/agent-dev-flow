@@ -1,7 +1,7 @@
 # agentdev-gh Local 実装 Tool（ローカル版）
 
-Custom Tool `agentdev_gh` の Local 実現（REQ-011-006、DEC-004）。同一の操作契約
-（`src/opencode/tools/agentdev-gh/contracts.ts` の16操作 + 温存中の `issue_comment`）を、GitHub Issue/PR の代わりに
+Custom Tool `agentdev_gh` の Local 実現。同一の操作契約
+（`src/opencode/tools/agentdev-gh/contracts.ts` の16操作）を、GitHub Issue/PR の代わりに
 ローカルIssue（`.agentdev/issues/issue-{NNNN}.md`、単一採番空間、role 条件付きスキーマ）の
 読み書きへ読み替える `GhRunner` 実現（`runner-local.ts`）を提供する。
 
@@ -23,12 +23,11 @@ I/O 正規経路である。上位 command / skill は GitHub 版と同じく Cu
 | `issue_create` | ローカルIssue新規作成（採番: 既存最大 + 1、4 桁ゼロ埋め、role をまたぐ単一空間、欠番再利用なし）。`role: tracking` は kind と初期状態 起票（created）を設定 |
 | `issue_read` | ローカルIssue全文読込（frontmatter + 本文）。state は role ごとの終端判定（非終端 → `open`、終端 → `closed`）。role/kind/trackingState を導出して返す |
 | `issue_update` | 本文指定時はローカルIssue全文をそのまま反映（`updated_at` 更新は呼び出し側の責務。読み戻し検証は全文一致を要求）。title/labels/kind/trackingState 指定時は frontmatter を書き換える |
-| `issue_comment` | role 分岐のコメント相当セクションへ追記（tracking: `## 検討経過` へ `### {日時}` エントリ、case: `## 作業ログ`）。body 省略時はコメント履歴を読み取る |
 | `issue_close` | tracking: `status: closed`（両 reason 共通）。case: `status: closed`（`not_planned` は `cancelled`）+ `closed_at` 更新 |
 | `issue_list` | `.agentdev/issues/` のスキャンと role/kind/trackingState/state/labels/search による絞り込み |
 | `issue_reopen` | tracking の `closed` → `in-discussion` + `closed_at` クリア。case は終端状態からの遷移なしとして拒否 |
 | `pr_create` | 最新の role: case ローカルIssueへ `## マージ前確認` セクション追記（`### PR title: {title}` + 本文）。操作契約上 pr_create は番号を持たないため |
-| `pr_read` | 最後の `## マージ前確認` から title を抽出し、body としてローカルIssue全文を返す（body の論理範囲の直列化は #2688 が確定する）。state は `## マージ結果` 記録済み → `merged`、それ以外は status から写像 |
+| `pr_read` | 最後の `## マージ前確認` から title を抽出し、body として論理 PR 本文（`## マージ前確認` / `## Design確定候補` / `## Findings / Capture候補` の3セクションの定義順直列化）を返す。state は `## マージ結果` 記録済み → `merged`、それ以外は status から写像 |
 | `pr_merge` | `## マージ結果` へ記録（操作、実行日時、結果 `PASS`）。GitHub PR 取り込みは実行しない。失敗・未完了時の `status: blocked` への更新は `issue_update`（本文全文反映）で構成する |
 | `pr_changed_files` | 空配列（ローカルに変更ファイル一覧は不存在。Git worktree の実状態が正） |
 | `pr_mergeable` | `status: review` → `MERGEABLE`、それ以外 → `UNKNOWN` |
@@ -48,7 +47,7 @@ Comment の本文は見出し直後の `### c{NN} {ISO 8601 日時}` から次�
 （PR 系操作の role: case 限定、case 終端状態の reopen 拒否）を機械検証する。
 スキーマ違反のローカルIssueへの読み取りは失敗し、成功扱いとしない。
 
-## 非担当（REQ-011-020）
+## 非担当
 
 本文生成、完了判定、Epic 依存判定、capture 分類を担当しない。セクションへの振り分け等の
 内容Routing は呼び出し側の責務であり、本 Tool は I/O と読み戻し検証のみを担う。

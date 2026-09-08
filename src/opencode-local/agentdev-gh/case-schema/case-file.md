@@ -68,11 +68,11 @@ labels: [feature]
 
 ## PR 系操作の対象解決
 
-PR 系操作（pr_create、pr_read、pr_merge、pr_changed_files、pr_mergeable）の対象は role: case のローカルIssueに限る。Local 実装 Tool は操作の対象解決時に role を検証し、role: tracking への PR 系操作を拒否する。
+PR 系操作（pr_create、pr_read、pr_merge、pr_changed_files、pr_mergeable、pr_update）の対象は role: case のローカルIssueに限る。Local 実装 Tool は操作の対象解決時に role を検証し、role: tracking への PR 系操作を拒否する。
 
 ## コメント読み替えの role 分岐
 
-issue_comment の読み書きは、対象ローカルIssueの role により読み替え先を分岐する。
+Comment 操作4種（comment_create、comment_list、comment_update、comment_delete）の読み書きは、対象ローカルIssueの role により読み替え先を分岐する。
 
 - role: tracking → `## 検討経過`（日時エントリの時系列）
 - role: case → `## 作業ログ`（Case 実行のコメント相当情報）
