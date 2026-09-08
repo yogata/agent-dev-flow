@@ -103,25 +103,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
-## Epic Orchestrator の Wave間変更漏れパターン
-
-- **問題事象**: Epic Orchestrator による Wave 1（3子Issue並列）→ Wave 2（2子Issue並列）の実行後、最終コミット（dc32df0）で廃止コマンド名（intake-review, learning-refine, accepted/）の残存参照が残っていることを検知し、追加コミットで修正した
-- **発生局面**: 実装
-- **検知方法**: エージェントによる自律確認（最終コミット前の横断検索で残存参照を発見）
-- **根本原因**: Wave 1 で各子Issueが独立して変更を行う際、他の子Issueの変更内容を踏まえた横断的な残存参照確認がWave間の境界で実行されなかった。各子Issueは自身のスコープ内の変更に集中し、全体の整合性確認がWave 2終了後まで遅延した
-- **自律対応内容**: 最終コミット（dc32df0）で README.md、SKILL.md、workflow-lifecycle 等 6ファイルの残存参照を一括修正。内容は intake-review → intake-promote、learning-refine → learning-promote、accepted/ → inbox/ の置換
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし（本質的には実行時の品質管理の話であり、ADR/REQ/specの定義には影響しない）
-- **横展開観点**: 複数Wave構成のEpicで、後続Waveが先行Waveの変更を前提とする場合、各Wave終了時にスコープ横断的な残存参照検索を実行することで最終的な修正コミットを減らせる
-- **再発条件**: 複数子Issueが同じファイル群を変更し、各子Issueが独立したスコープで参照更新を行う場合
-- **予防策候補**: Wave完了時に「廃止対象キーワードの全文検索」を定型チェックとして組み込む。コマンド廃止系の変更では、廃止名をチェックリスト化してWave境界で検証する
-- **想定反映先**: case-run の Wave完了時チェック手順、または workflow-orchestration スキルのWave境界検証ステップ
-- **関連**: Issue #618, #619, PR #624, commit dc32df0
-- **タグ**: `#epic-orchestrator` `#wave` `#残存参照` `#横断検証`
-- **移動日**: 2026-06-07
-
----
-
 ## runtime template path の暗黙参照が誤用を招くパターン
 
 - **問題事象**: case-close が Issueコメントテンプレートの参照先を skill 名だけで記述し、runtime path が不明確だったため、command-local templates 側に誤探索するバグが発生。また case-auto が委譲先コマンド定義を読み込む際、`src/opencode/...` を runtime path に読み替えていた
@@ -1169,46 +1150,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
-## PowerShell 一括読み書きによる配布物ファイル破壊の再発防止（OU-0001、PR #2198）
-
-- **問題事象**: PowerShell で await を含む誤ったコマンドが部分失敗した際、後続の Set-Content が空変数のまま実行され8ファイルが空になった（git 復元 + 再構築で回復）。
-- **発生局面**: 実装（配布スキル src/opencode/skills/agentdev-artifact-graph 配下の編集）
-- **検知方法**: 部分失敗したコマンド列の実行後、対象ファイルが空であることを確認
-- **根本原因**: PowerShell のパイプライン・変数展開を含む一括読み書きは部分失敗時に空書き込みへ到達しうる。逐次 edit ツールと異なり中間状態の検証がない
-- **自律対応内容**: git 復元と再構築で回復。以後の配布物編集は per-line edit ツールに限定
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし
-- **横展開観点**: Windows 環境での配布物編集全般。AGENTS.md の「Write ツール全面上書きは新規ファイル限定」警告の PowerShell 版として一般化できる
-- **再発条件**: PowerShell による複数ファイルへの一括読み書き（Get-Content → 加工 → Set-Content）を失敗しうる-chain で実行する場合
-- **予防策候補**: 配布物編集は per-line edit ツールに限定し、PowerShell 一括読み書きを禁止/制限する規約化
-- **想定反映先**: agentdev-skill-authoring または AGENTS.md 編集規約の参考（learning-promote で判定）
-- **関連**: PR #2198, Issue #2190 (CLOSED), Epic #2189
-- **タグ**: #powershell #encoding #editing
-- **移動日**: 2026-08-18
-- **処分判定**: deferred（learning-promote 2026-08-18 評価。出現1件。AGENTS.md 既存警告の PowerShell 版一般化候補）
-
----
-
-## 配布物への具体 ID・docs パス直書きは配布依存境界 gate で違反になる（OU-0004、PR #2199）
-
-- **問題事象**: 配布物（src/opencode/skills 配下）へ具体 ID（REQ-020 等）や docs/ 配下パスを直接記述すると配布依存境界 gate（check_distribution_boundary --profile source）が違反になる。
-- **発生局面**: 実装（effectiveness/candidate_limit サブスイート作成）
-- **検知方法**: 配布依存境界 gate 実行（case-run Step 7-1）
-- **根本原因**: 配布物はプロジェクト非依存が要件であり、具体 ID・docs パスはプロジェクト固有情報
-- **自律対応内容**: effectiveness 既存資産の規約（REQ-{NNNN} プレースホルダ、採番フォーマッタ関数による ID 合成、文字列分割によるパス合成）に従って通過
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし
-- **横展開観点**: 配布物へ言及を書く場面全般
-- **再発条件**: 配布物に具体 ID や docs パスを文字列リテラルで記述する場合
-- **予防策候補**: 配布物編集時のプレースホルダ・合成規約を authoring ガイドへ集約する
-- **想定反映先**: agentdev-skill-authoring または effectiveness 資産規約の参考（learning-promote で判定）
-- **関連**: PR #2199, Issue #2193 (CLOSED), Epic #2189
-- **タグ**: #distribution-boundary #placeholder
-- **移動日**: 2026-08-18
-- **処分判定**: deferred（learning-promote 2026-08-18 評価。出現1件。対策本体は配布依存境界 gate と effectiveness 既存資産の規約が既存。authoring ガイドへの集約は改善候補の域）
-
----
-
 ## 複数 worktree 検査はループ変数で作業ディレクトリを切り替える（case-close 実行、Epic 2189）
 
 - **問題事象**: 複数 worktree で同一 detector を実行する際、bash ツールの workdir を最初の worktree に固定したまま foreach ループを回したため、4回すべて同一 worktree で検査を実施していた（検査対象の取り違え）。
@@ -1453,24 +1394,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 - **移動日**: 2026-09-01
 
-## Windows worktree で外部依存（zod）を持つ検証スクリプトは bun install 前置で実行する
-
-- **問題事象**: Windows の worktree（`.worktrees/2410-feature`）では node_modules が git 管理外のため main root から伝播せず、zod に依存する integrity checker（check_extensions が参照する agentdev-project-extensions/scripts/lib/extension_state.ts）が unhandled error で失敗した
-- **発生局面**: 検証（case-run・case-close の worktree での整合性検証、Issue #2410 の case work）
-- **検知方法**: worktree 上での check_extensions 実行時に zod のモジュール解決エラーが発生
-- **根本原因**: node_modules は git 非追跡のため worktree へ伝播しない（worktree 構造的制約と同一根拠）。agentdev-project-extensions/scripts が zod に依存するが、worktree 側に当該 node_modules が存在しない
-- **自律対応内容**: src/opencode/skills/agentdev-project-extensions/scripts と .opencode/skills/repo-agentdev-integrity/scripts の両方で bun install を実行して解消した
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし（REQ-018 worktree 構造的制約の運用知見）
-- **横展開観点**: Windows worktree で zod 等の外部依存を持つ検証スクリプトを実行するすべての場面
-- **再発条件**: 新規 worktree を作成し、node_modules の伝播を前提とした検証スクリプトを実行する場合
-- **予防策候補**: worktree 検証手順に bun install 前置を明文化する
-- **想定反映先**: agentdev-git-worktree の worktree 構造的制約（bun test 実行の環境前提）、agentdev-workflow-case-run の委譲時検証手順
-- **関連**: PR #2413 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2413 ）
-- **タグ**: `#windows` `#worktree` `#node-modules` `#bun-install`
-
-- **移動日**: 2026-09-01
-
 ## 配布依存境界 guard は src 参照を含む一時検証ドライバの TEMP 書出しも block する
 
 - **問題事象**: 配布依存境界 guard の事前書き込み gate が、TEMP 直下の一時検証ドライバの書き出しに対しても、内容に src/opencode/ 配下パス参照を含むことを理由に block した
@@ -1486,42 +1409,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **想定反映先**: agentdev-workflow-case-run の検証手順、配布依存境界 Design の gate 例外規定の検討
 - **関連**: PR #2414 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2414 ）
 - **タグ**: `#distribution-boundary` `#guard` `#temp-file` `#windows`
-
-- **移動日**: 2026-09-01
-
-## release archive 同梱配布物には実 REQ ID を書かずプレースホルダ表記を使う
-
-- **問題事象**: release archive に同梱される配布物（archive 専用 installer `scripts/consumer/archive/install.ps1`、`README-INSTALL.md`）に ADF-COVERS 宣言や実 REQ ID（REQ-050）を記述した結果、配布依存境界検査（archive profile）の concrete-id 違反 5 件が検出され、archive 生成（package-release-archive.ps1）が停止した（REQ-050 実装、TS-006 検証中）
-- **発生局面**: 実装（case-run、release archive 生成検証 TS-006）
-- **検知方法**: 配布依存境界検査（archive projection）の concrete-id 違反による archive 生成停止（exit 非 0）
-- **根本原因**: 配布物から正規 ID 汚染（concrete-id）を除外する配布依存境界の規約が、archive に同梱されるファイルにも適用される。対応宣言（ADF-COVERS）は host 専用ファイル（archive に入らないファイル）に配置すべきであるが、archive 同梱ファイルへ記述していた
-- **自律対応内容**: 配布物から宣言・実 ID を除去しプレースホルダ表記（`WP-{N}` 形式）へ変更して解消、再検証合格（PR #2416 検証差分 TS-006 行）
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし（REQ-050-010 の archive 投影契約の運用実例）
-- **横展開観点**: 今後 archive に同梱するファイル（README-INSTALL.md 等）を追加・更新する際、実 REQ ID や ADF-COVERS 宣言を持ち込まない。対応宣言は host 専用ファイル側に配置する
-- **再発条件**: archive 同梱配布物に実 ID や対応宣言を記述した場合
-- **予防策候補**: 配布物向け執筆時のプレースホルダ表記ルールの明文化（配布依存境界 Design の archive 公開前検査節への運用注記）
-- **想定反映先**: docs/designs/integrity/distribution-boundary.md（archive 公開前検査の運用注記）
-- **関連**: PR #2416 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2416 ）
-- **タグ**: `#distribution-boundary` `#archive` `#concrete-id`
-
-- **移動日**: 2026-09-01
-
-## worktree で agentdev-traceability を scripts ディレクトリ cwd 起動する場合は --root に worktree root を明示指定する
-
-- **問題事象**: worktree（junction 未伝播）で agentdev-traceability の check を scripts ディレクトリ（`src/opencode/skills/agentdev-traceability/scripts/`）を cwd に直接起動する際、`--root .` とすると scripts ディレクトリ自体が走査 root と解釈され corpus が縮退、missing-implementation / missing-verification の誤検出（false fail、exit 2）となる
-- **発生局面**: 検証（case-run / case-close のトレーサビリティ独立再検査、worktree 環境）
-- **検知方法**: traceability check の missing-implementation / missing-verification fail（exit 2）
-- **根本原因**: `--root` の `.` が cwd 相対で解決され、scripts ディレクトリを root に指定した場合に ADF-COVERS 宣言 corpus（docs/・src/・.opencode/ 等）が走査対象から外れる
-- **自律対応内容**: `--root` に worktree root のパスを明示指定して再実行し、7/7 種 pass（exit 0）を確認（PR #2422 case-run、2026-08-24 case-close 独立再検査でも同一手順で 7/7 pass を確認）
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし
-- **横展開観点**: worktree 環境で scripts ディレクトリを cwd にした checker・エンジン系 CLI 起動全般で、走査 root を相対指定（`.` や暗黙 cwd）にしない
-- **再発条件**: worktree 環境で corpus 走査系 CLI を `--root .` 等 cwd 相対指定で起動した場合
-- **予防策候補**: agentdev-traceability scripts README の実行例へ worktree 環境での `--root` 明示指定の運用注記を追加
-- **想定反映先**: src/opencode/skills/agentdev-traceability/scripts/README.md
-- **関連**: PR #2422 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2422 ）
-- **タグ**: `#traceability` `#worktree` `#false-fail`
 
 - **移動日**: 2026-09-01
 
@@ -1633,42 +1520,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 - **移動日**: 2026-09-01
 
-## issue_comment の VERIFY は「Issue が open であること」の代理検証であり閉じた Issue へのコメント追加は検証不完になりうる
-
-- **問題事象**: Wave 2 実装の issue_comment 操作は、コメント本文の読み戻しが操作契約に存在しないため「Issue が open であること」を代理検証として使用している。閉じた Issue へのコメント追加（case-close の close 後コメント等）は verification-incomplete になる可能性がある（PR 2435 で指摘、Wave 2 契約維持のため未変更）
-- **発生局面**: 設計（Wave 2 の操作契約定義）と運用（case-close の close 後コメント追加）
-- **検知方法**: 操作契約（contracts）と VERIFY 仕様の突き合わせによる静的確認
-- **根本原因**: 操作の出力契約にコメント本文の読み戻し項目を定義していなかったため、VERIFY が本文照合ではなく状態照合に退化した
-- **自律対応内容**: 本事象を PR 2435 本文に記録し、契約変更（本文読み戻しの追加）は後続 Case の判断へ委譲した
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし（REQ-011-003 の VERIFY 内部完結要件は充足したまま。操作契約の粒度の知見）
-- **横展開観点**: 出力契約を定義するすべての操作。「操作の成功」と「検証可能な出力」が一致するよう、VERIFY が照合する項目を出力契約へ含める
-- **再発条件**: 出力契約に読み戻し可能な項目を定義せずに VERIFY を状態照合で代替する場合
-- **予防策候補**: 副作用操作の出力契約には、VERIFY が照合できる読み戻し項目（本文、識別子等）を含める。代理検証を使う場合はその限界を契約書に明記する
-- **想定反映先**: custom-tool-contracts Design の操作契約節（intake item 2026-08-25-design-confirm-custom-tool-contracts.md 経由）
-- **関連**: PR 2435 本文、PR 2433/2434（Wave 2 実装）、Epic 2427
-- **タグ**: `#verify` `#contracts` `#issue-comment`
-
-- **移動日**: 2026-09-01
-
-## pwsh のパイプラインでは $LASTEXITCODE が最終コマンドの終了コードになり tsc の結果を読み誤る
-
-- **問題事象**: Wave 3 最終 case-close（DEL-CLOSE-W3）で `bun x tsc --noEmit ... | tail -2; echo EXIT=$LASTEXITCODE` の形式で型検査を実行したところ、tsc が TS2688（bun 型定義なし）で失敗しているのに EXIT=0 と表示された。パイプラインの終了コードが tail の成功を反映したため
-- **発生局面**: 検証（case-close の QG-4 型検査実行）
-- **検知方法**: 出力に TS2688 のエラー文が残っていたため全文再実行で確認。`> $null 2>&1; $LASTEXITCODE` 形式で再計測すると EXIT=2
-- **根本原因**: pwsh では `$LASTEXITCODE` がパイプラインの最後の native コマンド（tail）の終了コードを保持する。tsc の終了コードは上書きされていた
-- **自律対応内容**: 出力リダイレクト + 直接 `$LASTEXITCODE` 参照の形式に切り替え、bun install --cwd 前置のうえ 3/3 clean を確認して記録した
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし（検証実行手段の知見）
-- **横展開観点**: pwsh で検証コマンドの終了コードを判定するすべての工程（case-close、case-run、CI スクリプト）
-- **再発条件**: pwsh で `コマンド | tail/Select-Object` 形式のパイプライン後に `$LASTEXITCODE` を判定する場合
-- **予防策候補**: 終了コード判定はパイプラインを挟まずリダイレクト (`> file` または `> $null 2>&1`) で実行する。または `$PIPELINESTATUS` 相当（pwsh では存在しない）に依存しない構成にする
-- **想定反映先**: 検証実行手順の記述箇所（quality-gates Design の実行形式、agentdev-git-worktree references の bun test 実行形態）
-- **関連**: Issue 2431 対応記録コメント（case-close、検証差分の tsc 行）、Epic 2427 Wave 3
-- **タグ**: `#powershell` `#exit-code` `#verification`
-
-- **移動日**: 2026-09-01
-
 ## worktree では node_modules も伝播しないため依存パッケージのテストは事前に bun install する
 
 - **問題事象**: worktree 上で zod に依存する配布スキルのテストを実行したところ unhandled error 4件が発生した（node_modules が worktree に存在しない）
@@ -1684,60 +1535,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **想定反映先**: agentdev-git-worktree、case-run workflow のテスト実行手順
 - **関連**: PR 2440 本文「Findings / Capture候補」learning 2件目、検証差分の bun test 行（修正済み）
 - **タグ**: `#worktree` `#bun-install` `#node-modules`
-
-- **移動日**: 2026-09-01
-
-## PowerShell のリダイレクトは UTF-8 JSON を破壊するため cmd /c リダイレクトか直接パースを使う
-
-- **問題事象**: PowerShell の `>` リダイレクトで受け取った検査結果 JSON の日本語 snippet が文字化けし、証跡の可読性が失われた（case-run の dist 最終 gate 証跡に実際に発生）
-- **発生局面**: 実装・検証（PowerShell 上での checker 実行と stdout のファイル退避）
-- **検知方法**: 退避 JSON の該当フィールドが置換文字を含むことの目視・再取得との突合
-- **根本原因**: PowerShell のネイティブコマンド出力デコードとリダイレクト書き込みの既定符号化が UTF-8 を安定して保持しない
-- **自律対応内容**: 以降の実行は bun スクリプト内の spawnSync + fs.writeFileSync（UTF-8 明示）で stdout を退避する形式に切り替え、文字化けを解消した
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし（checker 実行契約の「stdout 証跡退避形式」と整合する運用知見）
-- **横展開観点**: PowerShell 上で JSON を出力する checker の stdout を受け取るすべての場面
-- **再発条件**: PowerShell の `>` でネイティブコマンドの UTF-8 出力を退避した場合
-- **予防策候補**: checker stdout の退避は spawnSync + UTF-8 明示書き出し（node/bun スクリプト）を標準とし、PowerShell リダイレクトを使わない
-- **想定反映先**: checker-execution-contracts Design の stdout 証跡退避形式
-- **関連**: PR 2440 本文「Findings / Capture候補」learning 3件目、case-close 実行の cl-run-*.ts 系証跡
-- **タグ**: `#powershell` `#utf8` `#stdout-evidence`
-
-- **移動日**: 2026-09-01
-
-## agentdev_gh issue_update は契約外フィールドを無視して部分更新として成功する
-
-- **問題事象**: issue_update リクエストに契約外の bodyPath フィールドで本文ファイルパスを渡したところ、仕様の validate は body を null と解し title のみの部分更新を実行、Tool 内 VERIFY も title 一致で合格した。完了条件チェックボックスが未更新のまま工程が進行しかけた
-- **発生局面**: 実行（case-close の QG-4 完了条件チェックボックス更新、Epic 2436 Wave 1）
-- **検知方法**: case-close 側の再読込 VERIFY（完了条件 checked=0 を検出）
-- **根本原因**: 操作仕様の validate が未知フィールドを拒否せず、指定された既知フィールドのみで部分更新リクエストを組み立てる。VERIFY は要求されたフィールドのみ照合するため部分更新を検出できない
-- **自律対応内容**: body をインライン JSON 文字列で組んだ正規形式のリクエストで再実行し、再読込 VERIFY で checked=14 を確認した
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし（Tool は契約どおり動作。リクエスト組立て側の様式知見）
-- **横展開観点**: agentdev_gh へのリクエストを組むすべての呼び出し側（bun driver 経由の委譲実行を含む）
-- **再発条件**: body のような必須更新字段を契約外形式（bodyPath 等）で渡した場合
-- **予防策候補**: リクエスト組立ては契約のフィールド名（body はインライン文字列）に厳密に従う。中間 spec から最終リクエストを組むスクリプトでは契約フィールドの存在検証を入れる
-- **想定反映先**: agentdev_gh 呼出 driver の作成手順（委譲時 Tool 利用経路の明文化候補に付随）
-- **関連**: Issue 2437 実装記録コメント（case-close）、委譲単位 case-auto-20260825-stage-close-w1
-- **タグ**: `#agentdev-gh` `#issue-update` `#request-schema`
-
-- **移動日**: 2026-09-01
-
-## agentdev_gh pr_mergeable は gh の mergeable 再計算競合で verification-incomplete になり得る
-
-- **問題事象**: PR head 更新直後の pr_mergeable 操作が「verification read-back did not confirm the operation result」（verification-incomplete）で連続失敗した（60秒・10秒間隔のポーリング全失敗を含む）。実状態は gh pr view で MERGEABLE・mergeStateStatus CLEAN と確認できた
-- **発生局面**: 実行（case-close STEP-E4 の squash merge 前 mergeable 確認、Epic 2436 Wave 1）
-- **検知方法**: Tool の failure.kind = verification-incomplete と、gh pr view --json mergeable,mergeStateStatus による実状態確認との乖離
-- **根本原因**: gh pr view の mergeable フィールドは呼び出しごとに再計算され得る。操作の読み取りと VERIFY の再読み取りの間で MERGEABLE → UNKNOWN が揺れると照合不一致になる
-- **自律対応内容**: 読み取り操作の代替経路（Tool の contingency が明示する gh CLI 手動実行、canContinue: true）で MERGEABLE・CLEAN を確認した後に pr_merge（squash）を実行し、Tool 内 VERIFY 付きでマージに成功した
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし（読み取り系の代替継続契約どおりの運用）
-- **横展開観点**: PR head 更新直後の pr_mergeable 実行すべて
-- **再発条件**: GitHub 側 mergeable 再計算が走っているタイミングで pr_mergeable を実行した場合
-- **予防策候補**: verification-incomplete 時は failure で完了扱いにせず代替読み取りで実状態を確認してから副作用操作へ進む手順化。恒久対策は Tool 側 verify の再試行
-- **想定反映先**: agentdev-workflow-case-close STEP-4-2（mergeable ポーリング手順）、Custom Tool 操作契約 Design
-- **関連**: PR 2440 マージ（case-close、委譲単位 case-auto-20260825-stage-close-w1）
-- **タグ**: `#agentdev-gh` `#pr-mergeable` `#verify-race`
 
 - **移動日**: 2026-09-01
 
@@ -1777,24 +1574,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 - **移動日**: 2026-09-01
 
-## traceability scripts の scan 対象は .md と .ts のみで .agentdev/ は除外ディレクトリ
-
-- **問題事象**: 配布物（plugin.ts、配布 README.md）と .agentdev/ 側の実体（.jsonc）に分割して ADF-COVERS 宣言を書いたところ、.jsonc 拡張子と .agentdev/ パスは traceability scan 対象外のため REQ-053-016 の implementation 宣言が機械解析に現れず、missing-implementation finding が発生した（REQ-053 の case-run、PR 2445）
-- **発生局面**: 実装（case-run 委譲、REQ-053 の対応宣言配置）
-- **検知方法**: agentdev-traceability check の missing-implementation finding（2 件、修正済み）
-- **根本原因**: corpus.ts の DEFAULT_SCAN_EXTENSIONS（.md / .ts のみ）と DEFAULT_EXCLUDE_DIRS（.agentdev/ 含む）の適用範囲を宣言配置前に確認していなかった
-- **自律対応内容**: plugin.ts と配布 README.md（scan 対象ファイル）側で宣言を網羅し、README 側移管で REQ-053-016 の宣言欠落を解消して traceability check 7 pass / 0 fail を確認した
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし（最小トレーサビリティモデル・agentdev-traceability の既存仕様の運用知見）
-- **横展開観点**: ADF-COVERS 宣言を配置するすべての場面（実装・検証の対応宣言）
-- **再発条件**: .md / .ts 以外の拡張子のファイルや .agentdev/ 配下へ ADF-COVERS 宣言を書いて coverage/check の計上を期待した場合
-- **予防策候補**: 対応宣言は scan 対象拡張子（.md / .ts）かつ除外外パスのファイルに配置する。例外拡張子（.jsonc 等）は同一契約を .md / .ts 側でも宣言する
-- **想定反映先**: agentdev-traceability の対応宣言ガイダンス、agentdev-skill-authoring の記載様式
-- **関連**: PR 2445 本文「Findings / Capture候補」learning 1件目（回収元: https://github.com/yogata/agent-dev-flow/pull/2445 ）
-- **タグ**: `#traceability` `#adf-covers` `#scan-scope`
-
-- **移動日**: 2026-09-01
-
 ## OpenCode plugin の引数なし tool は args 省略で定義可能
 
 - **問題事象**: なし（初回実装で引数なし tool の定義様式を確認した際に得た知見。問題発生ではない）
@@ -1828,42 +1607,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **想定反映先**: agentdev-git-worktree の worktree 構造的制約（新規ディレクトリ作成手順）、agentdev-workflow-case-run の委譲手順
 - **関連**: PR 2445 本文「Findings / Capture候補」learning 3件目（回収元: https://github.com/yogata/agent-dev-flow/pull/2445 ）
 - **タグ**: `#gitignore` `#node-modules` `#bun-install` `#worktree`
-
-- **移動日**: 2026-09-01
-
-## distribution boundary check の concrete-id は新規配布物原本・テスト内の ID 表記からも検出される
-
-- **問題事象**: なし（検証設計の知見。問題発生ではない）
-- **発生局面**: 実装（case-run 委譲、distribution boundary check の新規違反解消、PR 2458）
-- **検知方法**: check_distribution_boundary.ts（source profile）の concrete-id findings（実装中に一時的に新規 17件）
-- **根本原因**: 新規配布物原本内の concrete ID（REQ-NNN、DEC-NNN、AG-NNN、TS-NNN を含む）と tests 内のテスト戦略識別子（TS-002 等）が検出対象になる構造を事前に織り込んでいなかった
-- **自律対応内容**: tests・README・コメント内の ID 表記を Design パス参照・ID なし表現へ修正して解消済み。既存 baseline（agentdev-gh 系11件）は既出として維持
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし（配布依存境界検査の運用知見）
-- **横展開観点**: 新規配布物（command / SKILL.md / Tool / Plugin）と付随テストを作成するすべての場面
-- **再発条件**: 新規配布物原本・テストに REQ/DEC/AG/TS 等の ID を含めて commit する場合
-- **予防策候補**: 新規配布物・テストには ID を含まない表現（Design パス参照等）を使う
-- **想定反映先**: agentdev-git-worktree / case-run の配布物新設手順、agentdev-skill-authoring の記載様式
-- **関連**: PR 2458 本文「Findings / Capture候補」learning 2件目（回収元: https://github.com/yogata/agent-dev-flow/pull/2458 ）
-- **タグ**: `#distribution-boundary` `#concrete-id` `#naming`
-
-- **移動日**: 2026-09-01
-
-## PowerShell で git show の出力をパイプ受信すると cp932 デコードで ASCII パターンも取りこぼす
-
-- **問題事象**: PowerShell で git show <ref>:<path> の出力をパイプ受信すると cp932 デコードで mojibake が発生し、ASCII パターン（REQ-011 等）もマルチバイト文字に取り込まれて Select-String が取りこぼすことがあった
-- **発生局面**: 検証（case-run 委譲、main との同一性確認、PR 2459）
-- **検知方法**: Select-String の検出件数が期待より少ないことの確認
-- **根本原因**: パイプ受信時の PowerShell 側デコード（cp932）が 8bit 多バイト文字境界を跨いで ASCII 列を破壊する
-- **自律対応内容**: main との同一性確認を git diff <ref> HEAD --stat -- <path> を正とする方式へ変更した
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし（検証手順の運用知見）
-- **横展開観点**: PowerShell 上で git のバイナリ安全性が必要な出力をテキスト加工するすべての場面
-- **再発条件**: git show / git log 等の出力を PowerShell パイプで受信して文字列検索する場合
-- **予防策候補**: 同一性・差分確認は git diff / --stat を正とする。パイプ受信で文字列検索しない
-- **想定反映先**: agentdev-workflow-case-close / case-run の検証手順（同一性確認の記述がある箇所）
-- **関連**: PR 2459 本文「Findings / Capture候補」learning 1件目（回収元: https://github.com/yogata/agent-dev-flow/pull/2459 ）
-- **タグ**: `#powershell` `#git-show` `#encoding`
 
 - **移動日**: 2026-09-01
 
@@ -2084,6 +1827,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **移動日**: 2026-09-01
 
 ---
+
 ## harness 異常終了後の PR 再利用時は PR 本文置換ができずコメントを SSoT とする
 - **根本原因**: agentdev_gh操作契約にPR本文更新操作がない。
 - **恒久対応内容**: コメントを正とする運用は適用済み。手順明文化を再評価する。
@@ -2092,6 +1836,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **移動日**: 2026-09-03
 
 ---
+
 ## REQ-057-005 確定後は ADF-COVERS 宣言を docs 配下正規成果物へ配置する
 - **根本原因**: 正規配置方針確定前の運用が残存した。
 - **恒久対応内容**: PR #2528で適用済み。handoff明示を再評価する。
@@ -2100,6 +1845,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **移動日**: 2026-09-03
 
 ---
+
 ## 委譲コンテキストの概要記述と Issue 本体の乖離
 - **根本原因**: 概要生成の出典がIssue本体に限定されていない。
 - **恒久対応内容**: SSoT再構成契約を適用済み。概要生成手順を再評価する。
@@ -2108,6 +1854,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **移動日**: 2026-09-03
 
 ---
+
 ## req-saveでREQ行を是正した場合のADF-COVERS implementation宣言確認
 - **根本原因**: artifact_actionsの確認対象に宣言付与が含まれていない。
 - **恒久対応内容**: 宣言網羅性deferred（2026-09-01）と統合して再評価する。
@@ -2116,6 +1863,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **移動日**: 2026-09-03
 
 ---
+
 ## 配布物の不在ID参照残骸は概念名参照へ置換する
 - **根本原因**: concrete-id禁止境界との交点を事前に考慮していなかった。
 - **恒久対応内容**: S-08/S-09で機械検出済み。注意追記を再評価する。
@@ -2124,14 +1872,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **移動日**: 2026-09-03
 
 ---
-## agentdev_gh pr_read本文欠落時の読み取り系gh CLI fallback
-- **根本原因**: pr_read応答のbody含有保証が契約にない。
-- **恒久対応内容**: fallbackは既存contingency。契約ファミリーと統合して再評価する。
-- **関連**: PR #2539、Issue #2538
-- **タグ**: `#agentdev-gh` `#pr-read` `#fallback`
-- **移動日**: 2026-09-03
 
----
 ## $PSScriptRoot自己解決型スクリプトは一時リポジトリ内コピーを実行する
 - **根本原因**: $PSScriptRootが実行スクリプトの配置先を解決する。
 - **恒久対応内容**: PR #2541で一時コピー実行へ修正済み。Design追記を保留する。
@@ -2140,6 +1881,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **移動日**: 2026-09-03
 
 ---
+
 ## Windows junction削除失敗の検証は実ファイルロックで代替する
 - **根本原因**: reparse point解除には通常のディレクトリロックが効きにくい。
 - **恒久対応内容**: stale plugin loader shimの実ファイルロックで等価経路を検証済み。
@@ -2377,27 +2119,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
-## 2026-09-05: bun test のレポートは stderr に流れるため証跡退避は stdout だけではゼロになる
-
-- **現象**: bun test の実行結果（Ran N tests across M files、pass/fail 行）が stdout にほぼ出ない（27バイトのバージョン行のみ）。stdout のみを fs.writeFileSync で退避する実装だと N/M 件数突合に必要な証跡がゼロになる。spawnSync で stderr も併せて退避したところ、404KB のレポート（2556 pass / 0 fail、Ran 2556 tests across 102 files）を取得できた
-- **状況/文脈**: case-close（Epic #2596 Wave 6 / Issue #2603 / PR #2616、マージ後同一 tree での full integrity suite 最終再実行）
-- **検知方法**: checker コマンドの stdout 証跡退避形式に従い stdout を退避したが、退避ファイルがバージョン行のみであることを長さ検査で検知
-- **根本原因**: bun test はレポータ出力の流れ先が stdout ではなく stderr。checker 実行契約の stdout 証跡退避を stdout 単独で実装すると、bun test の場合だけ証跡が欠落する
-- **応急/対応内容**: spawnSync の stdout と stderr を両方 fs.writeFileSync（UTF-8）で退避し、連結テキストに対して Ran/pass/fail の正規表現突合を実施（exit status 0、2556 pass / 0 fail を確認）
-- **ユーザー確認の有無**: なし
-- **ADR/REQ/spec影響**: なし（checker 実行契約「stdout 証跡退避形式」の運用上の補完情報。checker-execution-contracts Design の「Windows + bun 環境で process.exit の終了タイミングにより stdout レポートが失われることがある」の具体例）
-- **展開視点**: exit code が意味を持つ checker コマンドの証跡退避は、stdout / stderr 両方を対象にする。N/M 件数突合等の後段突合は、退避済み証跡が空でないことを最初に検査する
-- **再現条件**: Windows 環境で spawnSync 経由の bun test を実行し、stdout のみを退避した場合
-- **予防策**: 検証コマンドの stdout 証跡退避形式の実装を stdout/stderr 併存退避に統一し、証跡の空検査を突合の前提手順とする
-- **横展開候補**: agentdev-quality-gates（bun test 実行形態契約の証跡退避手順補完）、repo-agentdev-integrity（checker 実行手順）、learning-promote で判定
-- **関連**: PR #2616 の case-close 対応記録コメント（テスト結果セクション。merge commit 152ba3b5 と同一 tree での最終再実行）
-- **タグ**: #integrity #bun #stderr #verification #case-close
-
-- **移動日**: 2026-09-07
-- **処分判定**: defer（証跡退避 stdout/stderr 併存化候補。2026-09-07 evaluation-report 参照）
-
----
-
 ## 2026-09-05: Baseline V2 初回測定の委譲単位は6件でサンプル不足。断定を避け運用蓄積後に同一手順で再測定する
 
 - **現象**: Baseline V2 測定（OU-007）の委譲単位は6件で、30〜50 execution units の運用蓄積目安に対してサンプル不足。harness telemetry 指標（wall-clock、token 4性質、tool call、path 再読込、source / projection 重複参照）と telemetry 契約起因の実行失敗は本測定範囲で断定せず、分布・平均・削減効果も断定しない
@@ -2520,3 +2241,25 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **タグ**: #lint #skill #threshold #toc #case-run #verification
 - **移動日**: 2026-09-07
 - **処分判定**: defer（C4: AG-005 300行閾値。2026-09-07 evaluation-report 参照）
+
+## 2026-09-07: ng-baseline エントリ削除は live suppression を巻き込まない。削除後に check_integrity で delta 0 を検証する
+
+- **問題事象**: ng-baseline.json の解消済みエントリ削除作業で、provenance が同一（issue-2372-ir065-initial-baseline）の live suppression（.agentdev/extensions 3件、rewrite-patterns.md の obsolete-vocabulary 計4件）まで一括削除され、demote 解除が破綻する状態で PR 化された。case-close 側の検証で delta が 0 にならないため blocked 再作業となり、live 4件の復元（commit c74d9c30）が必要だった。
+- **発生局面**: 実装（case-run 委譲）。Epic 2652 / Issue 2659 / PR 2672。
+- **検知方法**: case-close 側での check_integrity 再実行・main 差分比較（TS-009 の demote 解除検証）。
+- **根本原因**: 「解消済みエントリ」の判定を provenance 系の一括処理で行い、「当該エントリの violation が現在も発生しているか（live か）」の個別確認を経ていなかった。
+- **自律対応内容**: live suppressions 4件を復元し、最終状態でエントリ差分（573 → 555、削除 18 / 追加 0）と check_integrity 新規 NG 0件（delta 0）を確認してマージ。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（integrity-contracts.md L359 の baseline 再計算手順・ratchet 運用の適用欠缺。Design 変更不要）
+- **横展開観点**: ng-baseline / baseline 系ファイルのエントリ削除・再生成を伴う全作業（ACT-DESIGN-003 運用、baseline 再計算 PR）に共通。
+- **再発条件**: baseline エントリ削除時に violation 発生有無を確認せず provenance・check 種別単位で一括削除する運用。
+- **予防策候補**: baseline エントリ削除の前に、当該エントリの violation が現行ツリーで still-live かを確認（live は残す）。削除後は PR 化前に check_integrity を再実行して新規 NG 0件（delta 0）を確認する。
+- **想定反映先**: learning-promote での分類後、repo-agentdev-integrity SKILL.md の baseline 運用手順注記、integrity-contracts.md baseline 再計算手順の運用注記。
+- **関連**: PR 2672 本文、Issue 2659、Epic 2652、docs/designs/integrity/integrity-contracts.md
+- **タグ**: #baseline #ng-baseline #integrity #demote #case-run #verification
+
+---
+
+- **移動日**: 2026-09-08
+
+---
