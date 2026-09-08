@@ -92,6 +92,10 @@ squash merge がコンフリクトで失敗した場合（STEP-4-3 のリトラ�
 - **rebase 自動解決時**: squash merge（STEP-4-3）へ戻り再マージ
 - **rebase コンフリクト発生時**: case-auto へエスカレーションして停止する（コンフリクト解消モデル Level 2/3 は case-auto の責務）
 
+**rebase 解消編集の永続化確認（境界跨ぎ編集の取り込み確認）**:
+- rebase 解消編集は `git rebase --continue` の前に `git add` で stage 確定し、squash merge 再実行の前に worktree が clean であることを確認する（`agentdev-git-worktree`「Merge Conflict 対応パターン」参照。stage 前の `--continue` は解消編集の squash merge 内容からの欠落を招く）
+- merge 後は main 上で再検証する（該当検査を main HEAD で再実行し、rebase 解消編集の取り込みを確認する）
+
 ## Evidence
 
 - squash merge 先（main）の確認結果、base 移動判定結果（fetch 後の origin/main 先端 hash と merge-base 比較）、mergeable 状態とポーリング記録、mergeStateStatus（CLEAN）判定結果、merge 結果と HEAD commit hash、対応記録コメントの VERIFY 結果、先行 commit 検出・処理結果、rebase 試行結果
