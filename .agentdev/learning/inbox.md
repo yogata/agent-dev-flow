@@ -76,3 +76,56 @@
 - **タグ**: #bun #bun-lock #package-rename #case-run #verification
 
 ---
+
+## 2026-09-08: bun の stdout を PowerShell リダイレクト（*>）で受けると日本語混じり JSON が符号化破損する。checker 証跡は spawnSync + fs.writeFileSync(utf8) で取得する
+
+- **問題事象**: bun で checker を実行し、その stdout を PowerShell の `*>` リダイレクトでファイル化すると、日本語混じり JSON が符号化破損し JSON.parse が破綻する。配布依存境界 gate の JSON レポート証跡が取得できなくなる。
+- **発生局面**: 実装（case-run 委譲）。Epic 2686 / Issue 2687 / PR 2691。
+- **検知方法**: リダイレクト生成ファイルの JSON.parse 失敗と、元 stdout の直接取得成功の対比で検知。
+- **根本原因**: PowerShell リダイレクトは既定エンコーディング（cp932 系）で再符号化するため、UTF-8 の stdout バイト列が破損する。AGENTS.md 既知事象（PowerShell 標準 cmdlet 経由の既存 UTF-8 ファイル一括読み書き回避）と同根。
+- **自律対応内容**: checker 出力の証跡取得を spawnSync（encoding buffer）+ stdout.toString("utf8") + fs.writeFileSync("utf8") の運用へ統一し、JSON レポートの取得と非ゼロ exit の証跡保持を両立させた。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（checker 実行契約「checker コマンドの stdout 退避形式」で既に規定済みの運用の再確認）
+- **横展開観点**: Windows 環境で bun/node 系 checker の JSON 出力を証跡化する全ケース（case-close E4-1 gate、STEP-3 検証群、case-run STEP-S5）に共通。
+- **再発条件**: checker stdout を PowerShell リダイレクトや標準 cmdlet でファイル化する場合。
+- **予防策候補**: checker 実行は必ず spawnSync 系 wrapper で stdout を UTF-8 明示 writeFileSync する。`>` / `*>` リダイレクト・PowerShell 変数格納は stdout 証跡に使わない。
+- **想定反映先**: learning-promote での分類後、checker 実行契約の stdout 退避形式節への運用注記強化候補。
+- **関連**: PR 2691、Issue 2687、Epic 2686、.opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary.ts
+- **タグ**: #windows #powershell #encoding #checker #case-run #case-close #verification
+
+---
+
+## 2026-09-08: issue_update/issue_reopen の追跡軸保持 VERIFY は実行前状態を必要とするため runner 応答 payload へ before を運ばせる。runner↔spec 内部契約拡張は GitHub 版と Local 版へ同時反映する
+
+- **問題事象**: spec の verify は実行後にしか動けないが、追跡軸保持 VERIFY（role/kind/trackingState 完全一致・要求通常ラベル包含）の照合基準は「実行前状態」が必要。runner 応答 payload に before を運ばせる接合とした際、契約拡張を両版へ同時反映しないと、未対応側の VERIFY が一律 verification-incomplete になる。
+- **発生局面**: 実装（case-run 委譲・RA-003 設計判断）。Epic 2686 / Issue 2687 / PR 2691。
+- **検知方法**: VERIFY 照合基準と実行タイミングの不整合の設計時発見（fail-closed 動作として実装側で捕捉）。
+- **根本原因**: VERIFY は副作用後の読み戻しで判定する構造上、実行前状態を自己保持できない。runner が応答へ before を含めることが照合の前提になる。
+- **自律対応内容**: GhRunnerReply 成功側へ before（state、labels、role、kind、trackingState、closeReason の正規化済み導出値）を必須化し、issue_update/issue_reopen の VERIFY を before 基準で照合するよう実装。Local 版（runner-local.ts）へは Wave 2（#2688）まで最低限の型整合のみ適用（fail の failureClass、before、pr_read body、新操作5種は operation-failed スタブ）。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: runner↔spec 内部契約の設計判断。Design への記載は未保存（PR 本文 Design 確定候補として design-save 再実行提案済み）
+- **横展開観点**: 実行前状態を照合基準に使う VERIFY を追加する全ケース（追跡軸保持以外の不変条件保護系 VERIFY）に共通。
+- **再発条件**: runner↔spec 内部契約を拡張する際に GitHub 版のみへ反映する場合。
+- **予防策候補**: 内部契約の拡張は GitHub 版と Local 版へ同時に反映する（Local 版が実装完了するまでの間は最低限の型整合を維持し、VERIFY は fail-closed で verification-incomplete になることを許容する）。
+- **想定反映先**: learning-promote での分類後、custom-tool-contracts.md（before 契約の Design 反映。design-save 再実行提案と一体）。
+- **関連**: PR 2691、Issue 2687、Epic 2686、Issue 2688（Wave 2 Local 版等価実装）
+- **タグ**: #agentdev-gh #verify #runner #spec #before #fail-closed #case-run
+
+---
+
+## 2026-09-08: agentdev-traceability check の --req 範囲構文（REQ-011-022..030 形式）は範囲文字列がリテラル reqId として報告される。個別カンマ指定を正として使う
+
+- **問題事象**: `check.ts --req REQ-011-022..030` の範囲構文を渡すと、missing-implementation 検査で範囲文字列全体がリテラル reqId として報告される（存在しない要求行として扱われる）。個別カンマ指定（REQ-011-022,REQ-011-023,...）では正しく解決されて pass する。
+- **発生局面**: 検証（case-close トレーサビリティ独立再検査）。Epic 2686 / Issue 2687 / PR 2691。
+- **検知方法**: 範囲構文での check 実行結果（リテラル reqId 報告）と個別指定での実行結果（pass）の対比。
+- **根本原因**: check の --req 引数解析が `..` 範囲形式を範囲展開せずリテラル ID として扱う。
+- **自律対応内容**: 個別カンマ指定の実行結果を正として採用し、範囲構文の使用を避けた（前回 case-close の対応記録コメント備考へ記録、本 learning へ回収）。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（agentdev-traceability の引数解析改善候補。実装変更は後続判断）
+- **横展開観点**: agentdev-traceability check を case-close STEP-3 / QG-4 独立再検査で実行する全ケースに共通。
+- **再発条件**: --req へ `..` 区切りの範囲形式を渡す場合。
+- **予防策候補**: check の --req は個別カンマ指定で渡す。範囲形式の対応は agentdev-traceability 実装側の改善候補として記録する。
+- **想定反映先**: learning-promote での分類後、agentdev-traceability SKILL.md の check 呼出手順注記、case-close/case-run の check 実行手順への注記候補。
+- **関連**: PR 2691、Issue 2687、Epic 2686、src/opencode/skills/agentdev-traceability/scripts/src/check.ts
+
+---
