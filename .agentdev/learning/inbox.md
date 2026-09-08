@@ -129,3 +129,37 @@
 - **関連**: PR 2691、Issue 2687、Epic 2686、src/opencode/skills/agentdev-traceability/scripts/src/check.ts
 
 ---
+
+## 2026-09-08: 操作廃止時の残存参照検索は repo-local integrity Skill の実体（.opencode/skills/repo-*）もインベントリに含めないと契約テストの残存参照を取りこぼす
+- **問題事象**: issue_comment 廃止（Epic 2686 / Issue 2689 / PR 2693）の移行インベントリが src/ と docs/ のみを対象としており、リポジトリ固有の integrity checker skill（.opencode/skills/repo-agentdev-integrity 配下スクリプト・テスト）が検索対象から漏れていた。契約テストが対象領域を広げた場合、.opencode/ 配下の実体に残存する旧操作参照を検証から取りこぼし得る。
+- **発生局面**: 検証（case-run TS-003 全文検索・インベントリ設計）。Epic 2686 / Issue 2689 / PR 2693。
+- **検知方法**: case-run のインベントリ再構成時に .opencode/ 配下の repo-local スキルが検索対象外であることの自覚（PR 本文 learning セクションで報告、case-close Capture 回収）。
+- **根本原因**: 移行インベントリの検索範囲を配布ソース面（src/、docs/）に限定しており、リポジトリ固有・配布対象外のスキル実体（.opencode/skills/repo-*）が網羅基準から抜けていた。
+- **自律対応内容**: 本 learning として記録し、操作廃止系 Case のインベントリ設計基準への反映候補とする。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（インベントリ網羅基準の運用注記レベル。learning-promote で反映先を判断）
+- **横展開観点**: 操作カタログ変更・API 廃止を伴う全 Case の全文検索インベントリ設計（src/ 以外の実体領域を含めるか）に共通。
+- **再発条件**: 操作廃止時の全文検索インベントリを src/ と docs/ だけで定義する場合。
+- **予防策候補**: 操作廃止系の TS（テスト戦略）で全文検索対象を定義する際、.opencode/skills/repo-* 等のリポジトリ固有実体を検査対象に含めるかを明示的に判断する。
+- **想定反映先**: learning-promote での分類後、custom-tool-contracts.md（TS-003 の検索範囲規定。design-save 再実行提案と一体で判断）。
+- **関連**: PR 2693、Issue 2689、Epic 2686、.opencode/skills/repo-agentdev-integrity/
+- **タグ**: #issue-comment #migration #inventory #full-text-search #case-run
+
+---
+
+## 2026-09-08: rebase コンフリクト解消の編集は rebase --continue 前に git add を完了させる。マージ後の永続化漏れは merge 先 main での影響テスト再実行で検知する
+- **問題事象**: PR 2693 の case-close Level 1 rebase で、コンフリクト解消後に行った定数復元編集（runner-local.ts への HEADING_WORKLOG / HEADING_DISCUSSION 追加）を rebase --continue の git add 対象に含めず、未コミット変更として worktree に残留させたまま squash merge を実行した。main にマージされた状態は Comment 系操作が未定義定数参照（enforcement-crashed）となる壊れた状態で、マージ後に欠落を検出して fix コミット（77e2caa4）で修復した。
+- **発生局面**: 実装（case-close STEP-4 コンフリクト Level 1 rebase）。Epic 2686 / Issue 2689 / PR 2693。
+- **検知方法**: squash merge 後の worktree 削除時に git status が modified を検出。当該変更がマージ済み squash 内容に含まれるかを git diff で照合して欠落を確定。
+- **根本原因**: rebase 中の編集と rebase --continue の git add が別時点の操作になり、rebase 完了後に行った追加編集が永続化フローから漏れた。merge 直前の「squash 内容と worktree 内容の同一性確認」を行っていなかった。
+- **自律対応内容**: 欠落分を main へ fix コミット（77e2caa4）で反映し、merge 先 main 上で bun test 36 pass / 0 fail を再検証。Issue 2689 の対応記録コメントへ修正証跡を追記。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（rebase 運用手順の改善候補レベル）
+- **横展開観点**: case-close STEP-4 で Level 1 rebase を実行する全ケース（コンフリクト解消編集を伴うマージ全般）に共通。
+- **再発条件**: rebase コンフリクト解消の後にファイルを編集し、その編集を git add / commit せずに merge へ進む場合。
+- **予防策候補**: rebase 中の解消編集はすべて rebase --continue の前の git add で確定させる。rebase 中でない時点での追加編集が必要になった場合は、その時点でコミット or 修正適用を明示的に管理し、squash merge 前に worktree が clean であること（または worktree と squash 内容の diff が空であること）を最終確認する。加えて、merge 後に merge 先 main 上で影響テストを再実行する。
+- **想定反映先**: learning-promote での分類後、case-close workflow（pr-merge-and-conflict reference）の rebase 手順注記候補。
+- **関連**: PR 2693、Issue 2689（対応記録追記コメント）、Epic 2686、commit 77e2caa4、src/opencode-local/agentdev-gh/runner-local.ts
+- **タグ**: #rebase #git #persistence #case-close #verification
+
+---
