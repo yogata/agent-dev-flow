@@ -96,7 +96,7 @@ describe("異常系3: Tool / runner 自体の異常（enforcement-crashed）", (
     expect(env.ok).toBe(true);
     if (!env.ok) return;
     const result = await runAgentdevGhOperation(env.env, {
-      operation: "issue_comment",
+      operation: "comment_create",
       number: 5,
       body: "text",
     });

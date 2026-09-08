@@ -13,7 +13,6 @@ import {
   type CommentSummary,
   type GhToolRequest,
   type GhToolSuccess,
-  type IssueCommentSummary,
   type IssueListItem,
 } from "./contracts.ts";
 import type { GhRunner, GhRunnerRequest } from "./runner.ts";
@@ -478,79 +477,6 @@ const issueUpdateSpec: OperationSpec = {
 };
 
 // ---------------------------------------------------------------------------
-// issue_comment（body あり: コメント追加 / body なし: コメント読取）
-// ---------------------------------------------------------------------------
-
-function parseCommentList(raw: unknown): IssueCommentSummary[] | null {
-  if (!Array.isArray(raw)) return null;
-  const comments: IssueCommentSummary[] = [];
-  for (const entry of raw) {
-    if (!isRecord(entry)) return null;
-    const body = str(entry.body);
-    if (body === null) return null;
-    const createdAt = str(entry.createdAt);
-    const url = str(entry.url);
-    comments.push({ body, createdAt, url });
-  }
-  return comments;
-}
-
-const issueCommentSpec: OperationSpec = {
-  operation: "issue_comment",
-  validate(raw): ValidateOutcome {
-    if (!isRecord(raw)) return missingFieldOutcome("issue_comment", "operation");
-    const unknown = checkUnknownFields(raw, ["operation", "number", "body"]);
-    if (unknown !== null) return unknown;
-    if (raw.number === undefined) return missingFieldOutcome("issue_comment", "number");
-    const number = positiveInt(raw.number);
-    if (number === null) {
-      return invalidFieldOutcome("number", "number must be a positive integer");
-    }
-    if (raw.body === undefined) {
-      return { ok: true, request: { operation: "issue_comment", number: issueNumber(number) } };
-    }
-    const body = str(raw.body);
-    if (body === null || body.length === 0) {
-      return invalidFieldOutcome("body", "body must be a non-empty string when present");
-    }
-    return { ok: true, request: { operation: "issue_comment", number: issueNumber(number), body } };
-  },
-  buildRequest(request): GhRunnerRequest {
-    const r = request as Extract<GhToolRequest, { operation: "issue_comment" }>;
-    return { operation: "issue_comment", args: { number: r.number, body: r.body } };
-  },
-  parseSuccess(payload): GhToolSuccess | null {
-    if (!isRecord(payload)) return null;
-    const number = positiveInt(payload.number);
-    if (number === null) return null;
-    if (payload.comments === undefined) {
-      const url = str(payload.url);
-      if (url === null || !isAcceptedUrl(url)) return null;
-      return { operation: "issue_comment", number: issueNumber(number), url, comments: [] };
-    }
-    const comments = parseCommentList(payload.comments);
-    if (comments === null) return null;
-    const url = str(payload.url);
-    return {
-      operation: "issue_comment",
-      number: issueNumber(number),
-      url: url !== null && isAcceptedUrl(url) ? url : "",
-      comments,
-    };
-  },
-  async verify(runner, request, success) {
-    const req = request as Extract<GhToolRequest, { operation: "issue_comment" }>;
-    const done = success as Extract<GhToolSuccess, { operation: "issue_comment" }>;
-    const issue = await readIssue(runner, done.number);
-    if (issue === null) return false;
-    if (req.body === undefined) {
-      return done.comments.every((c) => typeof c.body === "string");
-    }
-    return str(issue.state) === "open";
-  },
-};
-
-// ---------------------------------------------------------------------------
 // issue_close
 // ---------------------------------------------------------------------------
 
@@ -973,7 +899,6 @@ export const ISSUE_OPERATION_SPECS: readonly OperationSpec[] = [
   issueCloseSpec,
   issueListSpec,
   issueReopenSpec,
-  issueCommentSpec,
 ];
 
 /** Comment 系操作のスペック一覧。 */

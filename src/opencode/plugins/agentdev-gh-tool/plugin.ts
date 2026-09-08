@@ -62,7 +62,7 @@ export const REQUEST_PROPERTY_SCHEMA = {
     "Structured GitHub issue/PR operation request. See the agentdev_gh operation contract " +
     "(issue_create, issue_read, issue_update, issue_close, pr_create, pr_read, pr_merge, pr_changed_files, " +
     "pr_mergeable, pr_update, issue_list, issue_reopen, comment_create, comment_list, comment_update, " +
-    "comment_delete; issue_comment is deprecated and kept temporarily during the migration). " +
+    "comment_delete). " +
     "Tracking-issue operations expose logical values (role, kind, trackingState); physical label mapping " +
     "is applied inside the tool. Comments are a shared logical resource of issues and pull requests, " +
     "identified by commentId (public type: string). Side-effect operations are verified by read-back " +
@@ -87,7 +87,6 @@ export const REQUEST_PROPERTY_SCHEMA = {
         "comment_list",
         "comment_update",
         "comment_delete",
-        "issue_comment",
       ],
       description: "Operation name from the agentdev_gh operation catalog.",
     },
@@ -105,7 +104,7 @@ export const REQUEST_PROPERTY_SCHEMA = {
     body: {
       type: "string",
       description:
-        "Markdown body for write operations (issues, PRs, comments). Omit on issue_comment to read the comment timeline instead (deprecated dual mode).",
+        "Markdown body for write operations (issues, PRs, comments).",
     },
     labels: {
       type: "array",
