@@ -313,6 +313,8 @@ exemption: code block 内部、template placeholder（`{xxx}`）、`vocabulary-r
 
 段階導入（REQ-0108-264）: baseline 既知違反は `info`（報告のみ、fail なし）。新規違反は strict→`ng`、heuristic→`warning`（delta guard / impact guard で fail）。baseline ファイル（`.opencode/skills/repo-agentdev-integrity/baselines/ir-055-baseline.json`）は `--update-ir055-baseline` で再生成する。baseline 0 到達後に full audit を fail gate 化する。
 
+前置確認運用（REQ-057-024）: 配布物 Markdown を変更する変更は、マージの前置確認で IR-055 既知 delta の鮮度を確認し、鮮度を欠く場合は baseline の再生成（`--update-ir055-baseline`）または該当表現の解消のいずれかを行うこと。
+
 ## IR-065/IR-066 廃止語彙・旧パス検出対照（REQ-010-066/067）
 
 IR-065（廃止語彙の現行使用検出）と IR-066（旧パス・削除済み名称検出）の検出語彙対照（Issue #2372）。検出シグナル（正規表現）は `check_integrity.ts` が、許容条件の運用データ（existence_probe、exemption_files、否定文脈語）は `data/obsolete-vocabulary-map.yaml` が所有する。詳細は [rules/IR-065-obsolete-vocabulary-current-use.md](../../../docs/designs/integrity/rules/IR-065-obsolete-vocabulary-current-use.md) と [rules/IR-066-legacy-path-removed-name.md](../../../docs/designs/integrity/rules/IR-066-legacy-path-removed-name.md) 参照。
