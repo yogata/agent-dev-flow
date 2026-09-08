@@ -43,6 +43,7 @@ GitHub Issue / PR を使わない個人利用環境（ローカル版 OpenCode�
 | `updated_at` | 文字列（日時） | 必須 | ISO 8601 形式。最終更新日時 |
 | `closed_at` | 文字列（日時）または空 | 条件付き必須 | role ごとの終端状態の場合のみ値を持つ。それ以外では空文字列またはフィールド値なし |
 | `labels` | 配列（文字列） | 必須 | role ごとの値域（後述）から選定。補助分類であり状態遷移やワークフロー状態の代替として扱わない |
+| `comment_seq` | 数値 | 任意 | コメント採番の最高水位標 |
 
 ### YAML 前書きに含めないフィールド
 
@@ -135,14 +136,30 @@ Case ファイル本文は以下のセクション見出しを保持できる。
 
 ## PR 系操作の対象解決
 
-PR 系操作（pr_create、pr_read、pr_merge、pr_changed_files、pr_mergeable）の対象は role: case のローカルIssueに限る。ローカル版 Tool 実装は操作の対象解決時に role を検証し、role: tracking のローカルIssueへの PR 系操作を拒否する。pr_create は操作契約上対象番号を持たないため、最新の role: case ローカルIssueを対象として解決する。
+PR 系操作の対象解決（拡張）:
+
+- PR 系操作（pr_create、pr_read、pr_merge、pr_changed_files、pr_mergeable、pr_update）の対象は role: case のローカルIssueに限る
+- ローカル版における Pull Request 本文の論理範囲は、`## マージ前確認`、`## Design確定候補`、`## Findings / Capture候補` の3セクションの内容を定義順に直列化したものとする。pr_read の body は当該直列化を返し、pr_update の body 指定は当該3セクションの内容を置換する（セクション見出し構造は呼出側の round-trip 責任。GitHub 版の本文全体置換と同一規律）
+- Pull Request タイトルの正は `## マージ前確認` セクション内の PR タイトル行とし、pr_read の title は同行から、pr_update の title 指定は同行を置換する。frontmatter の title はローカルIssue（Issue 側）のタイトルであり Pull Request タイトルの更新対象としない
+- `## マージ前確認` セクションが存在しない場合、pr_read と pr_update は operation-failed とする。セクションが複数存在する場合（pr_create の繰り返し実行時）、最後のセクションを対象とする
 
 ## コメント読み替えの role 分岐
 
-issue_comment の読み書きは、対象ローカルIssueの role により読み替え先を分岐する。
+コメント読み替えと Comment 操作の物理写像（拡張）:
 
-- role: tracking → 追記型コメント相当セクション（検討経過）
-- role: case → `## 作業ログ` 等、Case 実行のコメント相当情報セクション
+- Comment 操作（comment_create、comment_list、comment_update、comment_delete）の読み替え先は role により分岐する: role: tracking は `## 検討経過`、role: case は `## 作業ログ` 等の Case 実行のコメント相当情報セクション。両 role のコメント相当エントリは同一の物理形式を採用する
+- コメント相当エントリは安定したコメント識別子を持つ。見出し形式を `### c{NN} {ISO 8601}` とし、commentId の物理表現は `issue-{NNNN}-c{NN}`（公開型は文字列）とする
+- 採番はローカルIssueの frontmatter 項目 `comment_seq`（任意項目。初回コメント書込時に初期化し単調増加）を最高水位標として管理し、削除による欠番は再利用しない。同一Issueへのコメント操作は逐次実行を前提とする（既存の採番前提と同一）
+- role: case の既存の無区切り作業ログ内容は、初回のコメント操作時に先頭エントリ c01 として束ねる（過去分の分割不能に伴う等価性の明示的制約）。新規コメントは c02 以降に採番する
+- comment_list は全エントリを commentId、body、createdAt、updatedAt（未更新なら createdAt と同一値）、url（当該ローカルIssueファイルの絶対パス）で返す
+- comment_update は対象エントリの本文を置換し updated_at を更新する。comment_delete は対象エントリを除去する（git 履歴から復旧可能）
+- 旧形式（`### {ISO 8601}` 見出しのみ）の既存エントリは、最初のコメント書込操作の一部として冪等に新形式へ移行する
+- コメント書込（新規採番・旧形式移行を含む）はファイル全体の原子的書込み（一時ファイル書込み後にリネーム）で行う
+- case 系 workflow の作業ログ追記は comment_create 経由とし、issue_update による本文全体置換の際はコメントエントリ構造を保持して round-trip する
+
+共通メタデータ表へ `comment_seq`（数値、任意、コメント採番の最高水位標）を追加する。
+`src/opencode-local/agentdev-gh/case-schema/` の機械可読定義（case-file.md、headings.yaml 等）を
+本拡張へ合わせて更新する。
 
 ## role ごとの必須項目・状態値・許可操作の検証
 
@@ -163,6 +180,8 @@ case-schema 機械可読定義の更新方針: `src/opencode-local/agentdev-gh/c
 | GitHub PR 本文 | role: case の `## マージ前確認` / `## Design確定候補` / `## Findings / Capture候補` |
 | GitHub PR 取り込み結果 | role: case の `## マージ結果` |
 | GitHub Issue のクローズ | 終端 `status` + `closed_at` |
+| GitHub Issue コメント（commentId 付き） | コメント相当セクションの `### c{NN}` エントリ（commentId = issue-{NNNN}-c{NN}） |
+| GitHub PR 本文の読取・更新（pr_read.body / pr_update） | マージ前確認・Design確定候補・Findings / Capture候補の3セクション直列化と PR タイトル行 |
 
 ローカル版各コマンドの責務:
 

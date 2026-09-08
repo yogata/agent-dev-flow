@@ -2,7 +2,7 @@
 title: Custom Tool 操作契約
 status: accepted
 created: 2026-08-24
-updated: 2026-09-07
+updated: 2026-09-08
 ---
 <!-- ADF-COVERS(implementation): REQ-011-001, REQ-011-002, REQ-011-003, REQ-011-005, REQ-011-008, REQ-011-009, REQ-011-013, REQ-011-014, REQ-011-015, REQ-011-020, REQ-011-021, REQ-011-022, REQ-011-023, REQ-011-024, REQ-052-001, REQ-052-002, REQ-052-003, REQ-052-004, REQ-052-005, REQ-052-008, REQ-052-009, REQ-052-010, REQ-052-011 -->
 
@@ -13,35 +13,50 @@ Git、GitHub、外部ソース（URL、Git リポジトリ等）からの取得�
 
 ## 操作契約の構成要素
 
-各操作は次の外部契約のみを公開する。実装詳細（gh オプション、--body-file、UTF-8 BOM なし、
-chcp、REST API PATCH、一時ファイル、PowerShell 対策等）は Tool 内部に隠蔽する。
+操作契約の構成要素に入力契約と失敗分類の厳格化を追加する。
 
-| 要素 | 内容 |
-|---|---|
-| 入力 | 操作名、構造化引数（title、body、labels 等）。環境依存の引数運用規則を含まない |
-| 出力 | 構造化結果（issue 番号、URL 等） |
-| 保証 | 操作の結果を検証（読み戻し等）してから成功を返す |
-| 失敗 | 保存または検証に失敗した場合に成功扱いとしない。エラー種別と再試験可否を返す |
+入力契約（操作単位の定義）:
+- 各操作は操作単位の入力フィールド定義（必須、任意、型）を持ち、操作の入力定義に存在しないフィールドを含む要求は副作用発生前に invalid-input で拒否する
+- 必須フィールドの不足も副作用発生前に invalid-input で拒否し、問題となったフィールドまたは不足フィールドを特定できる情報（フィールド名を含む）を返す。検証結果は構造化されたエラー情報として操作スペックから engine へ返す
+- 一つの flat schema に操作ごとの必須条件を文章だけで補う運用を解消する。公開される Tool スキーマは契約型（contracts.ts）に追従し、実行時 validator と矛盾しない。実行時検証が公開スキーマより厳密であることを妨げない。スキーマと validator の一致性（実行時受理集合が公開スキーマ許容集合に含まれること）はテストで検証する
 
-### 表示スキーマの契約型追従
-
-Custom Tool の表示スキーマ（description・parameter 定義）は Tool の契約型（contracts.ts）に追従する。
-表示と契約型に差分が生じた場合は表示側を改めて解消する。agentdev_gh Tool においては、issue_create の labels
-必須性と issue_list の labels・search 受理が表示に反映されていることを含む。
+失敗分類:
+- GhToolFailureKind は invalid-input、operation-failed、verification-incomplete、enforcement-crashed、config-uninterpretable、path-unresolvable の6種を維持し、相互に集約しない
+- runner と engine の間の実行応答は失敗クラス情報を持ち、外部操作の失敗（HTTP エラー、対象不在）と Tool / runner 自体の異常を engine が区別して分類する
+- 入力契約違反は invalid-input とし、外部操作の失敗・検証未了・Tool 異常と同一分類に集約しない
 
 ## 対象操作の境界（初期セット）
 
-GitHub I/O の対象操作は次のとおり。
+操作カタログを以下の16操作へ再定義する。
 
-- 基本操作: issue_create、issue_read、issue_update、issue_comment、issue_close、pr_create、pr_read、pr_merge、pr_changed_files、pr_mergeable
-- 追跡Issue操作（追加）: issue_list（role、kind、state 等による絞り込みを含む構造化結果を返す Issue 一覧・検索）、issue_reopen（Issue 再オープン）
-- 既存契約の変更: issue_read のメタデータ拡張。title、state、labels に加え、role/kind/状態写像に必要なメタデータを返す。新規操作追加と区別して契約・テストを更新する
-- 既存契約の変更: issue_create は任意の `role`（既定 `case`）と `kind` を受け付ける。ローカル版は role 条件付きスキーマ充足のため作成時の role が必須になる
-- 既存契約の拡張: issue_update は Issue 本文・メタデータ更新に labels 更新を含む。labels 指定は追跡Issue軸ラベル（role/kind/status）を除いた残りのラベルの置換を意味し、追跡Issue軸は kind/trackingState 指定で置換される。issue_comment はコメント追加・読取の双方を扱う（body あり＝コメント追加、body なし＝コメント読取）
+- 基本操作: issue_create、issue_read、issue_update、issue_close、pr_create、pr_read、pr_merge、pr_changed_files、pr_mergeable、pr_update（新規）
+- 追跡Issue操作: issue_list、issue_reopen
+- Comment 操作（新規）: comment_create、comment_list、comment_update、comment_delete。Comment は Issue と Pull Request の会話コメントを同一の論理リソースとして扱う。comment_list の各要素は commentId、body、createdAt、updatedAt、url を返す。comment_update と comment_delete は commentId を対象識別子として使用する。commentId の公開型は文字列とし、GitHub 実装は数値コメント id を文字列化する
+- 廃止: issue_comment（body あり＝追加、body なし＝読取の二重モード）。正規操作カタログから除去し、ADF 内部の呼出元は Comment 操作へ移行する。移行完了までの間は一時的に温存する
+- pr_read の拡張: 成功結果に Pull Request 本文（body）を含む。本文の論理的な範囲はローカル版の物理写像（ローカルIssue共通スキーマ Design）に従い、読み取りと更新が round-trip 可能な同一の論理範囲（ローカル版ではマージ前確認・Design確定候補・Findings / Capture候補の3セクション群の直列化）とする
+- pr_update: title と body を対象とする項目単位の部分更新操作。指定されていない項目は保持し、更新後は読み戻しによって要求値の反映を確認する。ローカル版では Pull Request タイトルの正をマージ前確認セクション内の PR タイトル行とし、pr_update の title は同行を置換する
+- issue_update の部分更新不変条件: 変更を要求していない追跡Issue軸（role、kind、trackingState）を保持する。VERIFY の照合対象は追跡軸の完全一致と要求通常ラベルの包含とし、確認時点での第三者による通常ラベル追加を不変条件違反として失敗扱いにしない
+- issue_reopen の追跡Issue状態遷移: agentdev-issue-tracking Design が所有する再オープン遷移（クローズ済み→検討中）を Tool が状態ラベルの機械適用によって実現する。kind と通常ラベルを保持し、Case Issue には追跡状態遷移を適用しない。既に open の追跡Issueへの再オープンは要求的状態の確認をもって冪等に成功とする
 
-issue_list と issue_read は read-only 操作として応答自己整合の検証を、issue_update、issue_comment、issue_close、issue_reopen は副作用操作として読み戻し検証（VERIFY）を適用する。各 WRITE は Tool 内で VERIFY まで完了してから成功を返す（REQ-011-023）。
+VERIFY 適用（READ / WRITE 分離）:
+- WRITE 操作（issue_create、issue_update、issue_close、issue_reopen、comment_create、comment_update、comment_delete、pr_create、pr_update、pr_merge）: 副作用そのものを読み戻し、要求した状態の反映と保持対象不変条件の維持を確認する。Comment WRITE は対象 Comment の存在・本文で判定し、Issue / Pull Request の open / closed 状態を成功証拠として使用しない
+- READ 操作（issue_read、issue_list、comment_list、pr_read、pr_changed_files、pr_mergeable）: 取得結果の構造と契約上必要な意味的整合性を確認する。時間変化し得る値（mergeable 等）について連続読取の一致を要求せず、取得時点の状態を正規化して返す。pr_mergeable は単一読取の正規化結果を返し、直後の再読取との一致確認を行わない
 
-ローカル版実装差し替えの読み替え先は .agentdev/issues/ のローカルIssue（role 条件付きスキーマ、単一採番空間）とする。PR 系操作（pr_create、pr_read、pr_merge、pr_changed_files、pr_mergeable）の対象は role: case のローカルIssueに限る。物理写像（role、kind、状態とラベル等の対応）の機械適用は Tool 内実装が行うが、写像表の所有は agentdev-issue-tracking Design である。ラベル・kind 値域の正は本 Design で定義せず、agentdev-issue-tracking Design を参照する。
+一覧完全性:
+- issue_list と comment_list は Tool 内部で必要なページをすべて取得し、完全一覧として返す。上位層は GitHub API のページングを指定しない
+- フィルタ可能な軸（state、labels 等）はサーバ側絾り込みクエリへ推送し、安全上限への到達可能性を低減する。上限値は本 Design のパラメータとして定義する
+- 安全上の上限によって完全取得できない場合は再試行可能な失敗（operation-failed）として扱い、不完全な一覧を完全な成功結果として返さない。呼出側の回避手順（期間分割等）は各 workflow 文書が定める
+
+失敗分類の判定規則:
+- 存在しない対象（Issue 番号、commentId、PR 番号）への操作は、入力が構造的に有効であれば operation-failed とする（存在性は入力妥当性ではない）
+- runner 実行時の外部操作失敗（gh / GitHub API の HTTP エラーを含む）は operation-failed に分類し、Tool / runner 自体の異常終了のみを enforcement-crashed に分類する
+- WRITE 実行後に読み戻し確認を完了できない場合は verification-incomplete とする
+
+GitHub版 / Local版等価性:
+- 両版は操作名、入力構造、出力構造、Comment 識別概念（commentId の役割と公開型）、Issue の論理状態遷移、READ / WRITE の成功意味、失敗の意味を同値とする
+- 物理写像に起因する値域差異（ローカル版追跡Issueの通常ラベル非許容。agentdev-issue-tracking Design の値域定義に従う）と、role: case の状態モデルに起因する受理条件差（ローカル版 case の再オープン拒否。ローカルIssue共通スキーマ Design の状態遷移に従う）は、本 Design が例外として明示する
+
+操作カタログの完全列挙（16操作）は契約テストで固定し、対象外機能の追加を検出する。
 
 「third-party Skill 取得」操作契約:
 

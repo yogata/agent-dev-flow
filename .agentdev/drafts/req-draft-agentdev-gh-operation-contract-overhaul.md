@@ -313,7 +313,8 @@ operation_units:
     recommended_order: 1
     issue_policy: epic
     result:
-      status: saved
+status: saved
+design_saved: true
       saved_docs:
         - docs/requirements/REQ-011.md
       artifact_action_mapping:
@@ -335,7 +336,13 @@ operation_units:
     depends_on: [OU-001]
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      status: saved
+      saved_designs:
+        - docs/designs/responsibilities/custom-tool-contracts.md
+      artifact_action_mapping:
+        ACT-DESIGN-001: docs/designs/responsibilities/custom-tool-contracts.md#対象操作の境界（初期セット）
+        ACT-DESIGN-002: docs/designs/responsibilities/custom-tool-contracts.md#操作契約の構成要素
   - ou_id: OU-003
     target_design: docs/designs/skills/agentdev-issue-tracking.md
     operation: update
@@ -343,7 +350,12 @@ operation_units:
     depends_on: [OU-001]
     recommended_order: 3
     issue_policy: single
-    result: {}
+    result:
+      status: saved
+      saved_designs:
+        - docs/designs/skills/agentdev-issue-tracking.md
+      artifact_action_mapping:
+        ACT-DESIGN-003: docs/designs/skills/agentdev-issue-tracking.md#確定事項（12 置換・14 追加）
   - ou_id: OU-004
     target_design: docs/designs/local/local-case-file.md
     operation: update
@@ -351,7 +363,13 @@ operation_units:
     depends_on: [OU-001]
     recommended_order: 4
     issue_policy: single
-    result: {}
+    result:
+      status: saved
+      saved_designs:
+        - docs/designs/local/local-case-file.md
+      artifact_action_mapping:
+        ACT-DESIGN-004: docs/designs/local/local-case-file.md#コメント読み替えの role 分岐（共通メタデータ表への comment_seq 追記を含む）
+        ACT-DESIGN-005: docs/designs/local/local-case-file.md#PR 系操作の対象解決（置換対応表への追記を含む）
 
 test_strategy:
   - id: TS-001

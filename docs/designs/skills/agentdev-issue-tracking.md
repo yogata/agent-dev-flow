@@ -2,7 +2,7 @@
 title: `agentdev-issue-tracking` Design
 status: accepted
 created: 2026-08-23
-updated: 2026-09-02
+updated: 2026-09-08
 ---
 <!-- ADF-COVERS(implementation): REQ-049-001, REQ-049-002, REQ-049-003, REQ-049-005, REQ-049-006, REQ-049-007, REQ-049-008, REQ-049-012, REQ-049-013, REQ-049-014, REQ-049-017, REQ-049-018 -->
 
@@ -39,5 +39,6 @@ updated: 2026-09-02
 9. **コメント読み替えの role 分岐（ローカル版）**: ローカル版では Issue コメント相当の履歴をローカルIssue内のコメント相当セクションへ読み替える。読み替え先は role により分岐する（role: tracking は検討経過、role: case は Case 実行のコメント相当情報。物理表現の詳細はローカルIssue共通スキーマ Design が所有する）
 10. **実行確定時の経路**: 追跡Issueで実行が確定した場合、req-define 等の正規要件化・設計経路を経由し、case-open が別の Case Issue を作成する。追跡Issueと生成された Case Issue の関連は双方の参照として保持し、追跡Issueを実行票へ直接変質させない
 11. **状態トークンと GitHub ラベル語彙（物理写像表の具体値）**: 追跡Issue 6状態の論理トークンは `created`（起票）、`in-discussion`（検討中）、`on-hold`（保留）、`ready`（実行準備完了）、`resolved`（解決済み）、`closed`（クローズ済み）とする。GitHub 物理ラベルは、role = `agentdev-tracking`（追跡Issueのみ付与。ラベルなしは role: case と機械判定し、既存 Case Issue との互換を維持する）、kind = `agentdev-kind/{problem|idea|task|risk}`、非終端追跡Issue状態 = `agentdev-tracking-status/{created|in-discussion|on-hold|ready|resolved}`。終端（`closed`）は GitHub state と state_reason（completed / not_planned）から導出し、状態ラベルを付与しない。ローカルIssueの frontmatter `status` は論理トークンと同一の値を用いる
-12. **再オープン遷移**: 追跡Issueの再オープンは `closed` → `in-discussion`（再検討）へ遷移させる。ローカル版の role: case は終端状態からの遷移を定義しないため、reopen を拒否する（ローカルIssue共通スキーマ Design の role: case 状態遷移と整合）
+12. **再オープン遷移（拡張）**: 追跡Issueの再オープンは closed → in-discussion（再検討）へ遷移させる。再オープンによって kind と通常ラベルを失わない。GitHub 版では Tool が状態ラベルの再付与によって遷移を機械適用する。ローカル版の role: case は終端状態からの遷移を定義しないため、reopen を拒否する（ローカルIssue共通スキーマ Design の role: case 状態遷移と整合）
 13. **ローカル版追跡Issueの labels 値域**: ローカル版 role: tracking の `labels` は kind 4値（`problem`、`idea`、`task`、`risk`）からちょうど 1 つを持つ（機械検証）。追加ラベルは許容しない（role ごとの値域検証の実効性のため）
+14. **Comment 更新・削除の利用規律（新規）**: comment_update と comment_delete は Comment を管理する汎用操作として Tool に提供される。追跡Issueの検討経過コメントへの適用は、時系列履歴の整合を損なわない範囲（誤記修正、機密情報の除去、重複の統合、直前誤投稿の訂正等）に限る。適用可否の判断規律の正は agentdev-issue-tracking Capability Skill の操作知識が単一参照点として所有し、操作能力を利用する workflow はこれに従う。本項は検討経過コメントが正規の時系列履歴である要件（REQ-049-012）との整合境界を定める
