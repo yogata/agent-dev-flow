@@ -1,6 +1,6 @@
 ---
 name: agentdev-issue-tracking
-description: 追跡Issue（課題、ToDo、アイデア、リスク等の未解決事項の育成管理単位）の論理スキーマと操作能力を提供する課題管理 Capability Skill。起票からクローズ・再オープンまでの操作知識を所有し、GitHub I/O は Custom Tool（agentdev_gh）経由で行う。USE FOR: 追跡Issueの起票と状態遷移、重複回避のための既存追跡Issue検索、保留理由と再評価条件の整理、解決結論と反映状態の追跡、クローズ前提の反映確認、複数 workflow からの利用。DO NOT USE FOR: GitHub I/O の実行手続き（agentdev_gh の責務）、物理ラベル写像の再実装（Tool 内実装の責務）、Case Issue の管理（case-open/case-run/case-close の責務）、Decision/REQ/Design 等の正規成果物の更新実行（各所有能力の責務）、Intake/Learning の検出事項・学びの管理、RU の生成と統合。
+description: 追跡Issue（課題、ToDo、アイデア、リスク等の未解決事項の育成管理単位）の論理スキーマと操作能力を提供する課題管理 Capability Skill。起票からクローズ・再オープンまでの操作知識を所有し、GitHub I/O は Custom Tool（agentdev_gh）経由で行う。USE FOR: 追跡Issueの起票と状態遷移、Comment 更新・削除の適用可否判断、重複回避のための既存追跡Issue検索、保留理由と再評価条件の整理、解決結論と反映状態の追跡、クローズ前提の反映確認、複数 workflow からの利用。DO NOT USE FOR: GitHub I/O の実行手続き（agentdev_gh の責務）、物理ラベル写像の再実装（Tool 内実装の責務）、Case Issue の管理（case-open/case-run/case-close の責務）、Decision/REQ/Design 等の正規成果物の更新実行（各所有能力の責務）、Intake/Learning の検出事項・学びの管理、RU の生成と統合。
 ---
 
 # `agentdev-issue-tracking`
@@ -11,7 +11,7 @@ description: 追跡Issue（課題、ToDo、アイデア、リスク等の未解�
 ## 責務と境界
 
 - 追跡Issueは GitHub Issue を Case Issue（req/case パイプラインの実行票）と共有する管理単位であり、論理 role（tracking / case）により区別される。role、kind、状態と状態遷移、物理マッピング、本文標準構造の正は追跡Issue論理スキーマ一元管理 Design が所有し、本スキルはその運用記述を提供する
-- 追跡Issueへの I/O は Custom Tool `agentdev_gh` の操作契約（issue_create、issue_read、issue_update、issue_comment、issue_close、issue_list、issue_reopen）経由でのみ行う。ラベル名等の物理値への写像は Tool 内実装が機械適用するため、本スキルおよび上位層は論理値（role、kind、状態）のみを扱う
+- 追跡Issueへの I/O は Custom Tool `agentdev_gh` の操作契約（issue_create、issue_read、issue_update、comment_create、comment_list、issue_close、issue_list、issue_reopen）経由でのみ行う。Comment の更新（comment_update）、削除（comment_delete）は Comment 利用規律（後述）に従う場合に限り利用する。ラベル名等の物理値への写像は Tool 内実装が機械適用するため、本スキルおよび上位層は論理値（role、kind、状態）のみを扱う
 - GitHub 版ではリポジトリ内に課題ファイルを作成し、commit しない。ローカル版は同一の操作契約でローカルIssueが読み書きされる（Tool が差し替わるため、本スキルは環境差を意識しない）
 - Issue の存在自体を Agent の実行許可としない。追跡Issueを実行票へ直接変質させない。実行が確定した場合は req-define 等の正規要件化・設計経路へ引き継ぎ、Case Issue の生成は case-open が行う
 - 解決結果の正規成果物への反映は、当該成果物を所有する能力へ委譲する。本スキルは結論、反映先、反映状態の追跡に徹する
@@ -50,18 +50,30 @@ description: 追跡Issue（課題、ToDo、アイデア、リスク等の未解�
 |---|---|---|
 | 起票 | `issue_create`（role: tracking、kind 指定。labels は必須引数のため空配列も明示する） | （新規）→ 起票 |
 | 更新 | `issue_update`（title、body、labels） | 状態不変 |
-| 検討経過の追加 | `issue_comment`（body 付き） | 状態不変 |
+| 検討経過の追加 | `comment_create`（number、body 付き） | 状態不変 |
 | 検討中への遷移 | `issue_update`（trackingState 指定） | 起票/保留/実行準備完了 → 検討中 |
 | 保留 | `issue_update`（trackingState 指定） | → 保留（保留理由と再評価条件を本文へ整備） |
 | 実行準備完了 | `issue_update`（trackingState 指定） | → 実行準備完了 |
 | 解決 | `issue_update`（trackingState 指定） | → 解決済み（解決結論を本文へ記録） |
 | クローズ | `issue_close`（reason: completed / not_planned） | 解決済み等 → クローズ済み |
 | 再オープン | `issue_reopen` | クローズ済み → 検討中 |
-| 検索・参照 | `issue_list`（role 単位で列挙。絞り込みは応答一覧をクライアント側で行う）、`issue_read`、`issue_comment`（body 省略で読取） | - |
+| 検索・参照 | `issue_list`（role 単位で列挙。絞り込みは応答一覧をクライアント側で行う）、`issue_read`、`comment_list`（Comment の時系列読取） | - |
 
 クローズの reason は、反映完了によるクローズで `completed`、対応不要の確認完了を経由したクローズで `not_planned` を使う。
 
+再オープンはクローズ済みから検討中（in-discussion、再検討）へ遷移させる。再オープンによって kind と通常ラベルを失わない。GitHub 版では Tool が状態ラベルの再付与によって遷移を機械適用する。ローカル版は role: case のローカルIssueに対する reopen を拒否する（role: case の状態遷移は終端状態からの遷移を定義しないため）。
+
 `issue_list` は role 単位での列挙が標準呼出形式である。labels・search パラメータは Tool が invalid-input として拒否するため指定せず、結果の絞り込みは応答一覧をクライアント側で行う。
+
+## Comment 利用規律（検討経過の更新と削除）
+
+検討経過は Issue コメントを正規の時系列履歴とする。Comment 系操作のうち、検討経過の追加は `comment_create`、Comment の時系列読取は `comment_list` を使う。
+
+Comment の更新（`comment_update`）と削除（`comment_delete`）は、時系列履歴の整合を損なわない範囲の訂正に限って適用する。適用できる訂正は、誤記修正、機密情報の除去、重複コメントの統合、直前誤投稿の訂正等である。過去の検討内容の抹消、時系列順の見かけ変更等、履歴の意味を書き換える更新・削除は行わない。
+
+Comment 更新・削除の適用可否判断規律の正は本節の操作知識であり、単一参照点として本スキルが所有する。Comment 系操作を利用する workflow、skill は独自の判断基準を追加定義せず、本節へ従う。
+
+この規律は、検討経過コメントが正規の時系列履歴であることとの整合境界を定めるものである。Comment の可変性は禁止しておらず、禁止しているのは検討経過の本文内二重保持のみである（論理スキーマの検討経過行）。ローカル版では git 管理により、削除済みコメントも履歴から復旧可能である。
 
 ## 保留・再評価・反映の意味論
 
@@ -99,6 +111,7 @@ description: 追跡Issue（課題、ToDo、アイデア、リスク等の未解�
 - 追跡Issue起票時に反映先を決め打ちしないこと
 - 解決済みの追跡Issueを反映完了または反映不要の確認なしにクローズしないこと
 - Issue 本文内へ検討経過の追記専用ログを二重保持しないこと（コメントを正規の時系列履歴とすること）
+- 検討経過の Comment について、時系列履歴の整合を損なう更新・削除を行わないこと（Comment 利用規律に従うこと）
 
 ## See Also
 
