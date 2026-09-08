@@ -22,7 +22,12 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
-import type { GhRunner, GhRunnerReply, GhRunnerRequest } from "../../opencode/tools/agentdev-gh/runner.ts";
+import type {
+  GhRunner,
+  GhRunnerFailureClass,
+  GhRunnerReply,
+  GhRunnerRequest,
+} from "../../opencode/tools/agentdev-gh/runner.ts";
 import {
   LOCAL_TRACKING_LABEL_VALUES,
   LOCAL_TRACKING_STATUS_VALUES,
@@ -262,12 +267,17 @@ export class LocalRunner implements GhRunner {
         ok: false,
         error: e instanceof Error ? e.message : String(e),
         exitCode: null,
+        failureClass: "enforcement-crashed",
       };
     }
   }
 
-  private fail(error: string): GhRunnerReply {
-    return { ok: false, error, exitCode: null };
+  private fail(
+    error: string,
+    exitCode: number | null = null,
+    failureClass: GhRunnerFailureClass = "operation-failed",
+  ): GhRunnerReply {
+    return { ok: false, error, exitCode, failureClass };
   }
 
   private issuePath(number: number): string {
@@ -339,6 +349,20 @@ export class LocalRunner implements GhRunner {
     return { kind, trackingState: parsed.fm.status as TrackingState, closeReason: null };
   }
 
+  /** 実行前状態（before）。issue_update / issue_reopen の応答へ含め、VERIFY の照合基準とする。 */
+  private beforeFrom(parsed: ParsedIssue): Record<string, unknown> {
+    const state = this.issueState(parsed.fm.role, parsed.fm.status);
+    const meta = this.trackingMetaOf(parsed);
+    return {
+      state: state ?? "open",
+      labels: [...parsed.fm.labels],
+      role: parsed.fm.role,
+      kind: meta.kind,
+      trackingState: meta.trackingState,
+      closeReason: meta.closeReason,
+    };
+  }
+
   private hasMergeResult(parsed: ParsedIssue): boolean {
     return parsed.raw.split("\n").some((l) => l.trim() === HEADING_MERGE_RESULT);
   }
@@ -385,7 +409,27 @@ export class LocalRunner implements GhRunner {
         return this.prChangedFiles(args);
       case "pr_mergeable":
         return this.prMergeable(args);
+      case "pr_update":
+        return this.localPending("pr_update");
+      case "comment_create":
+        return this.localPending("comment_create");
+      case "comment_list":
+        return this.localPending("comment_list");
+      case "comment_update":
+        return this.localPending("comment_update");
+      case "comment_delete":
+        return this.localPending("comment_delete");
     }
+  }
+
+  // Local 実装の新操作（Comment 4操作・pr_update）は #2688 が実装する。本 PR は
+  // 契約型変更に伴う型整合のみを目的とし、機能実装を行わない。
+  private localPending(operation: string): GhRunnerReply {
+    return this.fail(
+      `${operation} is not implemented in the local runner yet (pending #2688)`,
+      null,
+      "operation-failed",
+    );
   }
 
   // ---------------------------------------------------------------------
@@ -484,7 +528,7 @@ export class LocalRunner implements GhRunner {
         return this.fail(`issue_update body violates the schema: ${validation.errors.join("; ")}`);
       }
       this.writeIssue(number, toLf(args.body));
-      return { ok: true, payload: { number, url: this.issuePath(number) } };
+      return { ok: true, payload: { number, url: this.issuePath(number), before: this.beforeFrom(c.parsed) } };
     }
 
     if ((kind !== null || trackingState !== null) && fm.role !== "tracking") {
@@ -544,7 +588,10 @@ export class LocalRunner implements GhRunner {
       number,
       `${serializeFrontmatter(nextFm)}\n${c.parsed.bodyAfterFrontmatter.replace(/^\n+/, "")}`,
     );
-    return { ok: true, payload: { number, url: this.issuePath(number) } };
+    return {
+      ok: true,
+      payload: { number, url: this.issuePath(number), before: this.beforeFrom(c.parsed) },
+    };
   }
 
   private issueComment(args: Record<string, unknown>): GhRunnerReply {
@@ -725,7 +772,7 @@ export class LocalRunner implements GhRunner {
 
   private issueReopen(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
-    if (number === null) return this.fail("issue_reopen requires number");
+    if (number === null) return this.fail("issue_reopen requires number", 0, "invalid-input");
     const c = this.readIssue(number);
     if (c === null) return this.fail(`local issue not found: ${issueFileName(number)}`);
     if (c.parsed.fm.role !== "tracking") {
@@ -748,7 +795,10 @@ export class LocalRunner implements GhRunner {
       number,
       `${serializeFrontmatter(fm)}\n${c.parsed.bodyAfterFrontmatter.replace(/^\n+/, "")}`,
     );
-    return { ok: true, payload: { number, state: "open" } };
+    return {
+      ok: true,
+      payload: { number, state: "open", before: this.beforeFrom(c.parsed) },
+    };
   }
 
   // ---------------------------------------------------------------------
@@ -792,7 +842,7 @@ export class LocalRunner implements GhRunner {
 
   private prRead(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
-    if (number === null) return this.fail("pr_read requires number");
+    if (number === null) return this.fail("pr_read requires number", 0, "invalid-input");
     const target = this.requireCaseIssue(number);
     if (!("parsed" in target)) return target;
     const title = this.prTitle(target.parsed);
@@ -802,9 +852,17 @@ export class LocalRunner implements GhRunner {
     if (title === null || state === null) {
       return this.fail(`local issue has no PR section: ${issueFileName(number)}`);
     }
+    // pr_read の body（論理範囲の直列化）は #2688 が確定する。移行期間は
+    // issue_read と同様にローカルIssue全文を返す（round-trip 可能な同一範囲）。
     return {
       ok: true,
-      payload: { number, title, state, mergeable: this.mergeableOf(target.parsed) },
+      payload: {
+        number,
+        title,
+        body: target.parsed.raw,
+        state,
+        mergeable: this.mergeableOf(target.parsed),
+      },
     };
   }
 

@@ -31,6 +31,7 @@ import {
   kindToLabel,
   labelToKind,
   labelToTrackingState,
+  stripTrackingLabels,
   TRACKING_KINDS,
   TRACKING_ROLE_LABEL,
   TRACKING_STATES,
@@ -81,6 +82,24 @@ function fakeGithubRunner(issues: Map<number, Record<string, unknown>>): GhRunne
     async run(request: GhRunnerRequest): Promise<GhRunnerReply> {
       const args = request.args as Record<string, unknown>;
       const number = typeof args.number === "number" ? args.number : null;
+      const labelNamesOf = (issue: Record<string, unknown>): string[] =>
+        (issue.labels as { name: string }[]).map((l) => l.name);
+      const beforeOf = (issue: Record<string, unknown>): Record<string, unknown> => {
+        const labels = labelNamesOf(issue);
+        const derived = deriveTrackingState(
+          labels,
+          issue.state as "open" | "closed",
+          issue.state_reason as string | null,
+        );
+        return {
+          state: issue.state,
+          labels,
+          role: deriveRole(labels),
+          kind: deriveKind(labels),
+          trackingState: derived.trackingState,
+          closeReason: derived.closeReason,
+        };
+      };
       switch (request.operation) {
         case "issue_create": {
           const labels = ((args.labels as string[] | undefined) ?? []).slice();
@@ -98,7 +117,9 @@ function fakeGithubRunner(issues: Map<number, Record<string, unknown>>): GhRunne
         }
         case "issue_read": {
           const issue = number !== null ? issues.get(number) : undefined;
-          if (issue === undefined) return { ok: false, error: "not found", exitCode: 1 };
+          if (issue === undefined) {
+            return { ok: false, error: "not found", exitCode: 1, failureClass: "operation-failed" };
+          }
           return {
             ok: true,
             payload: {
@@ -106,16 +127,16 @@ function fakeGithubRunner(issues: Map<number, Record<string, unknown>>): GhRunne
               title: issue.title,
               body: issue.body,
               state: issue.state,
-              labels: (issue.labels as { name: string }[]).map((l) => l.name),
-              role: deriveRole((issue.labels as { name: string }[]).map((l) => l.name)),
-              kind: deriveKind((issue.labels as { name: string }[]).map((l) => l.name)),
+              labels: labelNamesOf(issue),
+              role: deriveRole(labelNamesOf(issue)),
+              kind: deriveKind(labelNamesOf(issue)),
               trackingState: deriveTrackingState(
-                (issue.labels as { name: string }[]).map((l) => l.name),
+                labelNamesOf(issue),
                 issue.state as "open" | "closed",
                 issue.state_reason as string | null,
               ).trackingState,
               closeReason: deriveTrackingState(
-                (issue.labels as { name: string }[]).map((l) => l.name),
+                labelNamesOf(issue),
                 issue.state as "open" | "closed",
                 issue.state_reason as string | null,
               ).closeReason,
@@ -125,27 +146,44 @@ function fakeGithubRunner(issues: Map<number, Record<string, unknown>>): GhRunne
         }
         case "issue_update": {
           const issue = number !== null ? issues.get(number) : undefined;
-          if (issue === undefined) return { ok: false, error: "not found", exitCode: 1 };
+          if (issue === undefined) {
+            return { ok: false, error: "not found", exitCode: 1, failureClass: "operation-failed" };
+          }
+          const before = beforeOf(issue);
           if (typeof args.title === "string") issue.title = args.title;
           if (typeof args.body === "string") issue.body = args.body;
           if (Array.isArray(args.labels)) {
             issue.labels = ghLabelNames(args.labels as string[]);
           }
-          return { ok: true, payload: { number, url: `https://example.com/i/${number}` } };
+          return { ok: true, payload: { number, url: `https://example.com/i/${number}`, before } };
         }
         case "issue_close": {
           const issue = number !== null ? issues.get(number) : undefined;
-          if (issue === undefined) return { ok: false, error: "not found", exitCode: 1 };
+          if (issue === undefined) {
+            return { ok: false, error: "not found", exitCode: 1, failureClass: "operation-failed" };
+          }
           issue.state = "closed";
           issue.state_reason = args.reason ?? "completed";
           return { ok: true, payload: { number, state: "closed" } };
         }
         case "issue_reopen": {
           const issue = number !== null ? issues.get(number) : undefined;
-          if (issue === undefined) return { ok: false, error: "not found", exitCode: 1 };
+          if (issue === undefined) {
+            return { ok: false, error: "not found", exitCode: 1, failureClass: "operation-failed" };
+          }
+          const before = beforeOf(issue);
           issue.state = "open";
           issue.state_reason = null;
-          return { ok: true, payload: { number, state: "open" } };
+          if (before.role === "tracking" && before.trackingState === "closed") {
+            // CliRunner 相当の再オープン遷移の機械適用（role/kind/通常ラベル保持）
+            const next2 = [TRACKING_ROLE_LABEL];
+            const kind = before.kind as string | null;
+            if (kind !== null) next2.push(kindToLabel(kind as never));
+            next2.push("agentdev-tracking-status/in-discussion");
+            const normal = stripTrackingLabels(before.labels as string[]);
+            issue.labels = ghLabelNames([...new Set([...next2, ...normal])]);
+          }
+          return { ok: true, payload: { number, state: "open", before } };
         }
         case "issue_list": {
           const list = [...issues.values()].map((issue) => ({
@@ -174,7 +212,12 @@ function fakeGithubRunner(issues: Map<number, Record<string, unknown>>): GhRunne
           };
         }
         default:
-          return { ok: false, error: `unsupported in fake: ${request.operation}`, exitCode: 1 };
+          return {
+            ok: false,
+            error: `unsupported in fake: ${request.operation}`,
+            exitCode: 1,
+            failureClass: "operation-failed",
+          };
       }
     },
   };
@@ -545,7 +588,6 @@ describe("ローカルIssueの role 条件付きスキーマ（単一採番空�
       body: "本文",
       base: "main",
       head: "feature/x",
-      number: 1,
     });
     expect(pr.ok).toBe(true);
     const merged = await runAgentdevGhOperation(env, {

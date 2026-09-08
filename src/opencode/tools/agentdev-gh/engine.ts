@@ -1,3 +1,4 @@
+// ADF-COVERS(implementation): REQ-011-028, REQ-011-029
 // agentdev-gh Custom Tool の fail-closed 実行ゲート（決定6）。
 //
 // 全操作に共通する実行制御を所有する:
@@ -20,7 +21,7 @@ import {
   type GhToolSuccess,
   type OperationCatalogEntry,
 } from "./contracts.ts";
-import type { GhRunner, GhRunnerRequest } from "./runner.ts";
+import type { GhRunner, GhRunnerFailureClass, GhRunnerRequest } from "./runner.ts";
 
 // ---------------------------------------------------------------------------
 // 設定解釈（fail-closed 1: 設定を解釈できない場合は実行しない）
@@ -162,11 +163,25 @@ export function buildGhToolEnv(
 // 操作スペック（各操作の入力検証・実行・応答解釈・読み戻し照合）
 // ---------------------------------------------------------------------------
 
-/** 操作ごとの差分実装。specs-issue.ts / specs-pr.ts が10操作分を定義する。 */
+/** 操作単位の入力定義に基づく構造化検証エラー（Design「入力契約」）。 */
+export interface InputContractError {
+  /** unknown-field（契約外フィールド）/ missing-field（必須欠落）/ invalid-field（型・値域違反）/ empty-update（更新項目なし）。 */
+  readonly code: "unknown-field" | "missing-field" | "invalid-field" | "empty-update";
+  /** 問題となったフィールドまたは不足フィールドの名前。 */
+  readonly field: string;
+  readonly detail: string;
+}
+
+/** validate の結果。失敗は構造化エラーとして engine へ返す。 */
+export type ValidateOutcome =
+  | { readonly ok: true; readonly request: GhToolRequest }
+  | { readonly ok: false; readonly error: InputContractError };
+
+/** 操作ごとの差分実装。specs-issue.ts / specs-pr.ts が全操作分を定義する。 */
 export interface OperationSpec {
   readonly operation: GhToolOperation;
-  /** 未検証の要求（unknown）を構造化入力へ解釈する。失敗は invalid-input。 */
-  readonly validate: (raw: unknown) => GhToolRequest | null;
+  /** 未検証の要求（unknown）を構造化入力へ解釈する。失敗は構造化エラー（invalid-input）。 */
+  readonly validate: (raw: unknown) => ValidateOutcome;
   /** runner への構造化要求の組立て。 */
   readonly buildRequest: (request: GhToolRequest) => GhRunnerRequest;
   /** 実行応答の解釈。失敗は operation-failed。 */
@@ -174,24 +189,33 @@ export interface OperationSpec {
   /**
    * 読み戻し照合（VERIFY）。true のみ成功扱い。例外は engine が
    * verification-incomplete へ分類する。要求（request）は照合値の参照用。
+   * payload は実行応答の生ペイロードで、実行前状態（before）等の照合基準を運ぶ。
    */
   readonly verify: (
     runner: GhRunner,
     request: GhToolRequest,
     success: GhToolSuccess,
+    payload: unknown,
   ) => Promise<boolean>;
 }
 
 async function callRunner(
   runner: GhRunner,
   request: GhRunnerRequest,
-): Promise<{ readonly ok: true; readonly payload: unknown } | { readonly ok: false; readonly error: string }> {
+): Promise<
+  | { readonly ok: true; readonly payload: unknown }
+  | { readonly ok: false; readonly error: string; readonly failureClass: GhRunnerFailureClass }
+> {
   try {
     const reply = await runner.run(request);
     if (reply.ok) return { ok: true, payload: reply.payload };
-    return { ok: false, error: reply.error };
+    return { ok: false, error: reply.error, failureClass: reply.failureClass };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : String(e) };
+    return {
+      ok: false,
+      error: e instanceof Error ? e.message : String(e),
+      failureClass: "enforcement-crashed",
+    };
   }
 }
 
@@ -205,13 +229,24 @@ export async function executeOperation(
   spec: OperationSpec,
   rawRequest: unknown,
 ): Promise<GhToolResult> {
-  const request = spec.validate(rawRequest);
-  if (request === null) {
-    return fail(spec.operation, "invalid-input", true, "request does not match the operation contract");
+  const validated = spec.validate(rawRequest);
+  if (!validated.ok) {
+    return fail(
+      spec.operation,
+      "invalid-input",
+      true,
+      `request does not match the ${spec.operation} input contract ` +
+        `(${validated.error.code} [${validated.error.field}]: ${validated.error.detail})`,
+    );
   }
-  const run = await callRunner(env.runner, spec.buildRequest(request));
+  const run = await callRunner(env.runner, spec.buildRequest(validated.request));
   if (!run.ok) {
-    return fail(spec.operation, "enforcement-crashed", true, `operation execution failed: ${run.error}`);
+    return fail(
+      spec.operation,
+      run.failureClass,
+      true,
+      `operation execution failed (${run.failureClass}): ${run.error}`,
+    );
   }
   const success = spec.parseSuccess(run.payload);
   if (success === null) {
@@ -219,7 +254,7 @@ export async function executeOperation(
   }
   let verified: boolean;
   try {
-    verified = await spec.verify(env.runner, request, success);
+    verified = await spec.verify(env.runner, validated.request, success, run.payload);
   } catch (e) {
     return fail(
       spec.operation,

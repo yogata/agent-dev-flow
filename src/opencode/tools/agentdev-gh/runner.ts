@@ -18,10 +18,28 @@ export interface GhRunnerRequest {
   readonly args: Readonly<Record<string, unknown>>;
 }
 
-/** 実行応答。ok=false は操作の実行失敗（exitCode は CLI 互換の終了コード）。 */
+/**
+ * runner から engine への失敗クラス。外部操作の失敗（HTTP エラー、対象不在）、
+ * 入力契約違反（runner 境界内で検出した場合）、Tool / runner 自体の異常を区別し、
+ * engine がこのクラスを失敗分類へ正規化する（Design「失敗分類の判定規則」）。
+ */
+export type GhRunnerFailureClass =
+  | "operation-failed"
+  | "invalid-input"
+  | "enforcement-crashed";
+
+/**
+ * 実行応答。ok=false は操作の実行失敗（exitCode は CLI 互換の終了コード）。
+ * failureClass は engine の失敗分類（GhToolFailureKind）への写像元となる。
+ */
 export type GhRunnerReply =
   | { readonly ok: true; readonly payload: unknown }
-  | { readonly ok: false; readonly error: string; readonly exitCode: number | null };
+  | {
+      readonly ok: false;
+      readonly error: string;
+      readonly exitCode: number | null;
+      readonly failureClass: GhRunnerFailureClass;
+    };
 
 /**
  * gh CLI 実行境界。実装は構造化要求を実際の gh 呼び出しへ写像する。
