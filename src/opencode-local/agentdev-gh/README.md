@@ -32,12 +32,15 @@ I/O 正規経路である。上位 command / skill は GitHub 版と同じく Cu
 | `pr_merge` | `## マージ結果` へ記録（操作、実行日時、結果 `PASS`）。GitHub PR 取り込みは実行しない。失敗・未完了時の `status: blocked` への更新は `issue_update`（本文全文反映）で構成する |
 | `pr_changed_files` | 空配列（ローカルに変更ファイル一覧は不存在。Git worktree の実状態が正） |
 | `pr_mergeable` | `status: review` → `MERGEABLE`、それ以外 → `UNKNOWN` |
-| `pr_update`、`comment_create`、`comment_list`、`comment_update`、`comment_delete` | 未実装（#2688 が同一契約で実装する。現状は operation-failed を返す） |
+| `pr_update` | role: case の最後の `## マージ前確認` を対象に、PR タイトル行と本文の3論理セクションを項目単位で更新し、読み戻しで検証 |
+| `comment_create`、`comment_list`、`comment_update`、`comment_delete` | role に応じたコメント相当セクション（tracking: `## 検討経過`、case: `## 作業ログ`）を `c{NN}` 形式で操作。公開 commentId は `issue-{NNNN}-c{NN}`、採番水位は frontmatter の `comment_seq` で管理 |
 
 出力 URL はローカルIssueファイルの絶対パス（GitHub 実装の Issue/PR URL に代わる一意識別子）。
 
 ローカルIssueのスキーマ（role 条件付きの status・labels・見出し、採番）の操作用定義は
 [case-schema/case-file.md](case-schema/case-file.md)。意味仕様の正本は `docs/designs/local/local-case-file.md`。
+
+Comment の本文は見出し直後の `### c{NN} {ISO 8601 日時}` から次のエントリまでを読み取り、本文と区切り空行を保持する。旧形式の日時見出しと case の見出しなし作業ログは、最初のコメント書込時に新形式へ移行する。
 
 ## role 条件付きスキーマの機械検証
 

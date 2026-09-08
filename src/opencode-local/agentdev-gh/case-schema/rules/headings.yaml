@@ -26,11 +26,23 @@ role_conditional_headings:
 
 # role: tracking のコメント相当セクション
 # GitHub Issue コメント相当の検討経過を日時エントリの時系列で保持する。
-# エントリ形式: `### {ISO 8601 日時}` 見出し + コメント本文。
+# エントリ形式: `### c{NN} {ISO 8601 日時}` 見出し + コメント本文。
 tracking_comment_entries:
   heading_prefix: "### "
   timestamp_format: "ISO 8601"
   ordering: "時系列（追記型）"
+  id_format: "c{NN}"
+  entry_heading: "### c{NN} {ISO 8601 日時}"
+  separator: "本文の後に空行 1 行"
+
+case_comment_entries:
+  heading_prefix: "### "
+  timestamp_format: "ISO 8601"
+  ordering: "時系列（追記型）"
+  id_format: "c{NN}"
+  entry_heading: "### c{NN} {ISO 8601 日時}"
+  separator: "本文の後に空行 1 行"
+  prelude_migration: "見出しのない既存作業ログ本文を最初のコメント c01 として束ねる"
 
 # role: case の本文セクション一覧
 case_headings:
