@@ -17,6 +17,9 @@ description: Requirement-artifact traceability (coverage, impact, check) by scan
 - 宣言は各ファイル種別のコメント記法（Markdown は HTML コメント、TypeScript は `//` 等）の内部に1行で記述する
 - 1ファイルに複数の宣言行を含められる。解析結果は和集合とする
 - 解析は行単位のパターン照合で行い、意味推定を行わない
+- 宣言の REQ-ID は子要件行 ID で指定する。親要件 ID のみの参照（bare ID）は実装宣言・検証宣言の配置対象とならず、check に missing-implementation として計上され得る
+- 実装対応宣言の配置先は成果物責任表（`artifact-responsibilities.md`）の正規配置先カタログに従う
+- 宣言が未付与の既存行は missing-implementation として計上され、fail-open 運用の下で段階的に付与される
 
 ## Scripts（決定的処理）
 
