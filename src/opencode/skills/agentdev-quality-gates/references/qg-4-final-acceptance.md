@@ -253,7 +253,10 @@ bun test ./.opencode/plugins/ ./scripts/
   - **bun test 単独実行の依存前提と junction 代替**: bun test 単独実行（フル suite 正規形以外）で依存解決が必要な場合は、main 側 `node_modules` への junction 作成（検証後削除）または当該 skill ディレクトリでの `bun install` のいずれかで整備する（手順詳細は `agentdev-git-worktree` の worktree 構造的制約を参照）
   - **整備後の再実行手順**: 依存整備実施後は、依存解決失敗で fail したテスト・型検証を同一環境で再実行して当該 fail の解消を確認し、依存整備実施済みの旨を環境ラベル（依存パッケージ状態）へ記録する
 
+- **Bun 依存 checker の実行経路**: integrity 検査の checker スクリプトを bun test の枠組み外で個別実行する場合は、Bun ランタイム API（Bun.YAML 等）に依存する checker を bun 経路で実行する。実行経路の使い分けの正契約は checker 実行契約 Design（checker 実行契約と検出基盤規則）「安定実行経路」節が所有する
+
 - **件数突合**: 各実行結果の「Ran N tests across M files」の N/M 件数突合を行う。直前実績と比較して件数が急減していないかの妥当性を検証する（固定値の期待値化は行わない）
+- **証跡の stdout・stderr 分離併退避**: 各分割実行の証跡は stdout と stderr を分離してファイルへ併退避する。bun test は fail の詳細を stderr へ出力するため、stdout のみの退避では「fail 由来分類」に必要な情報が失われる。PowerShell コンソール上の表示出力はコンソールコードページによる再解釈を含むため証跡として扱わず、退避ファイルをもって証跡とする
 - **カレントディレクトトリビアな実行の禁止**: 対象スイートには cwd 依存テストが混在するため、`bun test` 単体等での実行で正規形を代替しない
 
 ### 環境ラベル

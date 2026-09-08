@@ -12,6 +12,7 @@ AgentDevFlow を編集するエージェント向けのリポジトリガイド�
 - 本リポジトリは AgentDevFlow プラグインを管理する。
 - Windows 環境で既存 UTF-8（BOM なし）ファイルを編集する際は edit ツール（per-line string replace）を優先し、Write ツール（全面上書き）は新規ファイル作成時に限定すること。Write ツールが既存 UTF-8 ファイルを cp932 で書き出し文字化けを生む事象が実証済みのため。
 - Windows 環境で PowerShell 標準 cmdlet（Get-Content / Set-Content）経由の既存 UTF-8（BOM なし）/LF ファイル一括読み書きは避けること。cp932 解釈や CRLF 書き出しによりファイルを破壊し得るため、標準手段は edit ツール、node の readFileSync/writeFileSync、[System.IO.File] の明示エンコーディング指定とする。詳細は `docs/knowledge/windows-powershell-bulk-io-corruption.md` を参照すること。
+- Windows 環境で PowerShell のリダイレクト演算子（`>` / `>>` / `*>`）やパイプによるファイル出力も、cp932 再符号化による UTF-8 破損の対象である。証跡退避を含むファイル出力は上記の標準手段で行うこと。詳細は `docs/knowledge/windows-powershell-bulk-io-corruption.md` を参照すること。
 
 ## ハーネス選定
 
