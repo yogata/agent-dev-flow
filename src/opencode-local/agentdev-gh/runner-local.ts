@@ -56,6 +56,8 @@ const ISSUE_FILE_PREFIX = "issue-";
 const ISSUE_FILE_SUFFIX = ".md";
 const FRONTMATTER_DELIMITER = "---";
 
+const HEADING_WORKLOG = "## 作業ログ";
+const HEADING_DISCUSSION = "## 検討経過";
 const HEADING_MERGE_CHECK = "## マージ前確認";
 const HEADING_MERGE_RESULT = "## マージ結果";
 const HEADING_DESIGN_CANDIDATES = "## Design確定候補";
