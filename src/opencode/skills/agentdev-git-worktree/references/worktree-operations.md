@@ -143,6 +143,7 @@ bun test によるフル suite 実行は、次の環境前提を踏まえて実�
        ```
 
   - **整備後の再実行手順**: 依存整備実施後、依存解決失敗で fail したテスト・型検証を同一 worktree で再実行し、当該 fail が解消したことを確認する。再実行結果には依存整備実施済みの旨を環境ラベル（依存パッケージ状態）へ記録し、整備前の fail と整備後の結果を混在させない
+  - **package rename 時の bun.lock 確認**: package rename を伴う変更で `bun install` を実行した場合は、bun.lock の root workspace name が新パッケージ名へ追従していることを確認する（確認手順は `docs/designs/local/runtime-package-boundary.md`「本体リポジトリ sync」節参照）
 - worktree の `.opencode/` 配下 junction は未伝播である。junction を前提とする構造系テストは source パス（SoT パス）への fallback で実行される
 - worktree の構造上の理由でテストスイートが実行できない場合は、メインリポジトリからの読取専用実行でエビデンスを採取できる。この場合は実行環境（worktree または main、junction 伝播状態、依存パッケージ状態）を環境ラベルとして検証記録に明記し、fail 全件の由来分類（既知欠陥・環境依存・当該変更起因）を行う
 
@@ -374,6 +375,10 @@ rebase中にconflictを解決した場合:
 1. 変更をstage: `git add -u`
 2. rebase継続: `git rebase --continue`
 3. rebase完了後push: `git push --force-with-lease`（必要に応じて）
+
+**rebase 解消編集の永続化確認（境界跨ぎ編集の取り込み確認）**:
+- rebase の解消編集は `git rebase --continue` の前に `git add` で stage 確定する。stage 前に `--continue` を実行すると解消編集が rebase 完了後の状態に取り込まれず、squash merge 内容から欠落する事故（main 破壊と fix コミットの誘発）の原因となる
+- squash merge の実行前に worktree が clean であることを確認する（`git status` で変更・stage 残存なしを確認）
 
 **重要**: force pushは慎重に実行すること。
 リモートの変更を上書きするリスクがあるため、事前に確認が必要。
