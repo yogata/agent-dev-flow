@@ -14,6 +14,7 @@ import { describe, expect, test } from "bun:test";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { createCliRunner, type GhExec } from "../runner-cli.ts";
+import { issueNumber } from "../contracts.ts";
 import { buildGhToolEnv } from "../engine.ts";
 import { runAgentdevGhOperation } from "../index.ts";
 import type { GhRunnerReply, GhRunnerRequest } from "../runner.ts";
@@ -1031,7 +1032,7 @@ describe("CliRunner + engine: 一覧完全性（TS-008 / TS-009）", () => {
     });
     expect(result.ok).toBe(true);
     if (result.ok && result.success.operation === "issue_list") {
-      expect(result.success.issues.map((i) => i.number)).toEqual([1]);
+      expect(result.success.issues.map((i) => i.number)).toEqual([issueNumber(1)]);
     }
     expect(
       stub.requests.some((r) => r.includes("labels=agentdev-kind%2Fproblem")),
