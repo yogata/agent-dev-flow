@@ -37,6 +37,12 @@ scripts/
 
 `--root` には検証対象リポジトリのルート（`<repo-root>`）を指定する。絶対パスを推奨する。相対パスは実行時のカレントディレクトリ基準で解決される。
 
+実行前提（共通）:
+
+- `--req` は要件行ID（`REQ-{NNNN}-{MMM}`）の個別カンマ指定のみを受理する。`..` 形式の範囲構文は範囲展開されずリテラルの reqId として扱われるため、check の完全性検査（`missing-implementation` / `missing-verification`）の対象限定が空振りし、未検査の行が存在しないかのような結果を返す。対象行は1つずつ列挙すること
+- 本 README のコマンド例は scripts ディレクトリを cwd に起動することを前提とする。worktree を検証対象とする場合は `--root` にその worktree のルートを明示する（相対パス指定の注意は前段のとおり）
+- 宣言の走査対象は拡張子 `.md` / `.ts` のファイルのみで、除外ディレクトリは `.git`、`.agentdev`、`.agentdev-plugin`、`.worktrees`、`node_modules`。除外ディレクトリ配下や対象拡張子以外のファイルに配置した宣言は計上されない
+
 ```bash
 # 型チェック
 bun run tsc --noEmit
