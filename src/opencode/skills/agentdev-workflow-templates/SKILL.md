@@ -30,6 +30,8 @@ agentdev系コマンドで使用するIssue/PR本文、コメントテンプレ�
 | `issue_comment_feature_implementation.md` | 実装記録 | case-close | PRマージ後コメント (機能追加) |
 | `issue_comment_bug_record.md` | 対応記録 | case-close | PRマージ後コメント (バグ修正、軽微変更/リファクタリング、保守作業/ドキュメント、雑務) |
 
+コメントテンプレートの本文は Read tool で読み込んで変数置換し、Custom Tool `agentdev_gh` の comment_create 操作で投稿する。テンプレートファイル名 `issue_comment_*.md` は用途識別子であり、Tool 操作名を指さない。
+
 ### case-open 完了報告テンプレート
 
 | テンプレート | 用途 | 対象コマンド | flow |

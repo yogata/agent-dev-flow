@@ -197,7 +197,7 @@ GitHub 完了後に `.agentdev` push 失敗の場合は standard 種別を使用
 
 ## 関連 Capability Skill
 
-- Custom Tool `agentdev_gh`: Issue 本文更新、Issue close、対応記録コメント、子Issue 状態取得
+- Custom Tool `agentdev_gh`: Issue 本文更新、Issue close、comment_create による対応記録コメント、子Issue 状態取得
 - `agentdev-git-worktree`: worktree/branch 削除、重複ファイルチェック、git 同期リスク検出、`git pull --ff-only`、並列実行安全ステージング
 - `agentdev-epic-tracker`: 親Epic Issue 本文ステータステーブル更新、Epic 自動クローズ判定
 - `agentdev-learning-capture`: 学び検知・抽出（エージェント自律）

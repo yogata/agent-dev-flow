@@ -180,7 +180,7 @@ Issue/PR 一覧取得により open issue を探すことは禁止（command 不
 
 - `agentdev-workflow-routing`: 各更新種別フローの詳細、委譲接続点
 - `agentdev-workflow-lifecycle`: フェーズ判定
-- Custom Tool `agentdev_gh`: Issue 更新・コメント追加の操作
+- Custom Tool `agentdev_gh`: Issue 更新・comment_create によるコメント追加の操作
 - `agentdev-quality-gates`: QG-3 乖離検出結果の引用
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）

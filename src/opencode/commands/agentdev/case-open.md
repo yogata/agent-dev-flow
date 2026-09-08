@@ -47,6 +47,6 @@ draft 全体の `agreed_items`、`artifact_actions`、`operation_units`、`reali
 否定規則は破壊的操作・state 破壊等の硬い境界に限定する:
 
 - 共有作業ツリーでスイープ操作（`git add -A`/ `git add .`/ `git add --all`/ `git commit -a`/ `git checkout .`/ `git reset --hard`/ `git stash`/ 非所有パスへの `git checkout -- <path>`/ `git restore <path>`）は実行しない。`agentdev-git-worktree` の並列実行安全ステージングプロシージャに従い、明示パス指定（`git add <path>`/ `git rm <path>`）+ `git commit -- <paths>`（--only pathspec 形式）で行う。draft/RU 削除は同一ステップで即時ステージ・コミットし未ステージ残存を許さない（Form Zero）
-- Issue 本文（Standard/Epic/子Issue/完了報告コメント全て）は Custom Tool `agentdev_gh` の操作（issue_create、issue_update、issue_comment）で投入する。文字コード・一時ファイル等の実装詳細は Tool 内部に隠蔽される（`POL-gh-io-delegation`）
+- Issue 本文（Standard/Epic/子Issue/完了報告コメント全て）は Custom Tool `agentdev_gh` の操作（issue_create、issue_update、comment_create）で投入する。文字コード・一時ファイル等の実装詳細は Tool 内部に隠蔽される（`POL-gh-io-delegation`）
 
 

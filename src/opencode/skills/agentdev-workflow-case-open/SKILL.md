@@ -65,7 +65,7 @@ case-open workflow は次の6 STEP で構成する。
 - `agentdev-issue-management`: Issue 操作の安全手続き、テンプレート選定、委譲接続点
 - `agentdev-epic-tracker`: Epic 進捗追跡、Wave 構成、自律構成生成、子Issue 数上限
 - `agentdev-quality-gates`: QG-2 完了条件網羅性検証
-- Custom Tool `agentdev_gh`: GitHub I/O 境界（Issue 作成・コメント追加。VERIFY は Tool 内部）
+- Custom Tool `agentdev_gh`: GitHub I/O 境界（Issue 作成、comment_create によるコメント追加。VERIFY は Tool 内部）
 - `agentdev-workflow-templates`: Issue/PR/コメントテンプレート選定、実行識別情報セクション形式
 - `agentdev-workflow-lifecycle`: 引き継ぎ停止判定（runtime-package-boundary）
 - `agentdev-req-file-manager`: RU ファイル削除
