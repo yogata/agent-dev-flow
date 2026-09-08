@@ -30,6 +30,7 @@ GitHub Issue / PR を使わない個人利用環境（ローカル版 OpenCode�
 | `updated_at` | 文字列（日時） | 必須 | ISO 8601 形式。最終更新日時 |
 | `closed_at` | 文字列（日時）または空 | 条件付き必須 | role ごとの終端状態の場合のみ値を持つ |
 | `labels` | 配列（文字列） | 必須 | role ごとの値域（`rules/labels.yaml`）から選定 |
+| `comment_seq` | 数値 | 任意 | コメント採番の最高水位標。コメント書込時に初期化し、削除後も減少・再利用しない |
 
 ### YAML 前書きに含めないフィールド
 
@@ -56,7 +57,7 @@ labels: [feature]
 - `status` 値域: 追跡Issue 6 状態（起票 `created`、検討中 `in-discussion`、保留 `on-hold`、実行準備完了 `ready`、解決済み `resolved`、クローズ済み `closed`）。三段写像は agentdev-issue-tracking Design が所有
 - `labels` 値域: kind（`problem`、`idea`、`task`、`risk`）からちょうど 1 つ
 - 本文: 追跡Issue本文の標準構造（件名、背景、影響、関連成果物、選択肢、判断材料、不足情報、保留理由と再評価条件、解決結論、反映先と反映状態、関連 Case Issue 参照）に従う。Case 固有セクションを必須項目としない
-- コメント相当履歴: `## 検討経過` セクションへ `### {ISO 8601 日時}` 見出し + 本文の日時エントリとして時系列で保持する
+- コメント相当履歴: `## 検討経過` セクションへ `### c{NN} {ISO 8601 日時}` 見出し + 本文のエントリとして時系列で保持する。旧形式の `### {ISO 8601 日時}` は最初のコメント書込時に移行する
 
 ## role: case の条件付きスキーマ（Case Issue）
 
@@ -75,18 +76,21 @@ issue_comment の読み書きは、対象ローカルIssueの role により読�
 
 - role: tracking → `## 検討経過`（日時エントリの時系列）
 - role: case → `## 作業ログ`（Case 実行のコメント相当情報）
+- 共通形式: `### c{NN} {ISO 8601 日時}` 見出し、本文、区切り空行 1 行。公開 commentId は `issue-{NNNN}-c{NN}` とする
+- role: case では、見出しのない既存の作業ログ本文を最初のコメント `c01` として束ねる
 
 ## GitHub Issue / PR 置換対応表
 
 | GitHub 版 | ローカル版 |
 |---|---|
 | GitHub Issue 本文 | ローカルIssue本文 |
-| GitHub Issue コメント | role に応じたコメント相当セクション（`## 検討経過` / `## 作業ログ`） |
+| GitHub Issue コメント | role に応じたコメント相当セクション（`## 検討経過` / `## 作業ログ`）。commentId は `issue-{NNNN}-c{NN}` |
 | GitHub Issue の状態 | ローカルIssueの `status`（role ごとの値域） |
 | GitHub Issue のラベル | ローカルIssueの `labels`（role ごとの値域） |
 | GitHub PR 本文 | role: case の `## マージ前確認` / `## Design確定候補` / `## Findings / Capture候補` |
 | GitHub PR 取り込み結果 | role: case の `## マージ結果` |
 | GitHub Issue のクローズ | 終端 `status` + `closed_at` |
+| GitHub PR タイトル・本文更新 | `## マージ前確認` 内の PR タイトル行と、3つの PR 論理セクションの直列化 |
 
 ## 関連項目
 

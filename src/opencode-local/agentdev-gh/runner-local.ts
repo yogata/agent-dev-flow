@@ -1,18 +1,29 @@
 // agentdev-gh Custom Tool の Local 実現（GhRunner、REQ-011-006 / DEC-004）。
+// ADF-COVERS(implementation): REQ-011-024, REQ-011-025, REQ-011-026, REQ-011-027, REQ-011-030
 //
-// 同一の操作契約（contracts.ts の12操作）を、GitHub Issue/PR の代わりに
-// ローカルIssue（`.agentdev/issues/issue-{NNNN}.md`、単一採番空間）の
+// 同一の操作契約（contracts.ts の16操作 + 温存中の issue_comment）を、GitHub Issue/PR
+// の代わりにローカルIssue（`.agentdev/issues/issue-{NNNN}.md`、単一採番空間）の
 // 読み書きへ読み替える。Workflow は GitHub 実装（runner-cli.ts）と本実装の
 // 差を認識しない。
 //
 // 読み替え規則（正本: docs/designs/local/local-case-file.md、操作用定義: case-schema/）:
 //   - Issue 番号 = ローカルIssue番号（4 桁ゼロ埋め、欠番再利用なし、role ごとに採番を分けない）
-//   - frontmatter = 共通メタデータ（id/title/role/status/created_at/updated_at/closed_at/labels）
+//   - frontmatter = 共通メタデータ（id/title/role/status/created_at/updated_at/closed_at/labels/comment_seq）
 //   - role: tracking は追跡Issue 6状態、role: case は Case 実行 6状態（role 条件付きスキーマ）
 //   - Issue state = status の非終端 → open、終端 → closed（role ごとの終端判定）
 //   - PR 系操作（pr_*）の対象は role: case のローカルIssueに限る
-//   - issue_comment は role により読み替え先セクションを分岐する
+//   - 論理 PR 本文 = `## マージ前確認` / `## Design確定候補` / `## Findings / Capture候補`
+//     の3セクションの定義順直列化。PR タイトルの正は マージ前確認 内の PR タイトル行
+//   - Comment 操作（comment_*）と issue_comment は role により読み替え先セクションを分岐する
 //     （tracking: `## 検討経過`、case: `## 作業ログ`）
+//   - コメント相当エントリは `### c{NN} {ISO 8601}` 見出し（更新時 `(updated {ISO 8601})`
+//     接尾辞）を持ち、commentId の物理表現は `issue-{NNNN}-c{NN}`（公開型は文字列）。
+//     採番の最高水位標は frontmatter `comment_seq`（初回コメント書込時に初期化、単調増加、
+//     削除による欠番は再利用しない）。旧形式（`### {ISO 8601}` のみ）の既存エントリと
+//     role: case の無区切り作業ログ内容（初回コメント操作時に c01 へ束ね）は、最初の
+//     コメント書込操作の一部として冪等に新形式へ移行する
+//   - コメント書込（新規採番・旧形式移行を含む）はファイル全体の原子的書込み
+//     （一時ファイル書込み後にリネーム）で行う
 //   - 出力 URL = ローカルIssueファイルの絶対パス（GitHub 実装の URL に代わる一意識別子）
 //   - 本文の内容Routing（テンプレート展開等）は本 Tool の責務外（REQ-011-020）
 //
@@ -49,13 +60,20 @@ const HEADING_WORKLOG = "## 作業ログ";
 const HEADING_DISCUSSION = "## 検討経過";
 const HEADING_MERGE_CHECK = "## マージ前確認";
 const HEADING_MERGE_RESULT = "## マージ結果";
-const HEADINGS_BEFORE_WORKLOG = [HEADING_MERGE_CHECK, "## Design確定候補", "## Findings / Capture候補"];
+const HEADING_DESIGN_CANDIDATES = "## Design確定候補";
+const HEADING_FINDINGS = "## Findings / Capture候補";
+const HEADINGS_BEFORE_WORKLOG = [HEADING_MERGE_CHECK, HEADING_DESIGN_CANDIDATES, HEADING_FINDINGS];
+const PR_BODY_SECTIONS = [HEADING_MERGE_CHECK, HEADING_DESIGN_CANDIDATES, HEADING_FINDINGS];
 const PR_TITLE_PREFIX = "### PR title: ";
 
 const CASE_NON_TERMINAL_STATUSES = ["open", "running", "blocked", "review"] as const;
 const CASE_TERMINAL_STATUSES = ["closed", "cancelled"] as const;
 const CASE_STATUS_VALUES = [...CASE_NON_TERMINAL_STATUSES, ...CASE_TERMINAL_STATUSES] as const;
 const CASE_LABEL_VALUES = ["feature", "bugfix", "maintenance", "docs", "refactor", "chore", "epic"] as const;
+
+const COMMENT_ENTRY_HEADING_RE = /^### c(\d{2,}) (\S+)(?: \(updated (\S+)\))?$/;
+const LEGACY_COMMENT_ENTRY_RE = /^### (\S+)$/;
+const COMMENT_ID_RE = /^issue-(\d{4})-c(\d{2,})$/;
 
 export interface LocalRunnerOptions {
   /** ローカルIssueの配置ディレクトリ（`.agentdev/issues`）。 */
@@ -74,6 +92,8 @@ export interface LocalIssueFrontmatter {
   readonly updated_at: string;
   readonly closed_at: string;
   readonly labels: readonly string[];
+  /** コメント採番の最高水位標（任意。初回コメント書込時に初期化し単調増加）。 */
+  readonly comment_seq?: number;
 }
 
 /** role 条件付きスキーマの検証結果。 */
@@ -139,6 +159,9 @@ export function validateLocalIssue(
   if (!terminal && fm.closed_at.length > 0) {
     errors.push("non-terminal status must not have closed_at");
   }
+  if (fm.comment_seq !== undefined && (!Number.isInteger(fm.comment_seq) || fm.comment_seq < 0)) {
+    errors.push(`comment_seq must be a non-negative integer: ${String(fm.comment_seq)}`);
+  }
   return { valid: errors.length === 0, errors };
 }
 
@@ -168,7 +191,7 @@ function quoteYamlString(value: string): string {
 
 function serializeFrontmatter(fm: LocalIssueFrontmatter): string {
   const labels = fm.labels.length > 0 ? `[${fm.labels.join(", ")}]` : "[]";
-  return [
+  const lines = [
     FRONTMATTER_DELIMITER,
     `id: ${fm.id}`,
     `title: ${quoteYamlString(fm.title)}`,
@@ -178,14 +201,18 @@ function serializeFrontmatter(fm: LocalIssueFrontmatter): string {
     `updated_at: ${quoteYamlString(fm.updated_at)}`,
     `closed_at: ${fm.closed_at.length > 0 ? quoteYamlString(fm.closed_at) : '""'}`,
     `labels: ${labels}`,
-    FRONTMATTER_DELIMITER,
-  ].join("\n");
+  ];
+  if (fm.comment_seq !== undefined) lines.push(`comment_seq: ${fm.comment_seq}`);
+  lines.push(FRONTMATTER_DELIMITER);
+  return lines.join("\n");
 }
 
 interface ParsedIssue {
   readonly fm: LocalIssueFrontmatter;
   readonly bodyAfterFrontmatter: string;
   readonly raw: string;
+  /** frontmatter の閉じデリミタ（`---`）の行番号（0 基）。 */
+  readonly fmEndLine: number;
 }
 
 function unquoteYamlString(v: string): string {
@@ -225,6 +252,11 @@ function parseIssue(raw: string): ParsedIssue | null {
   const labelsRaw = fields.get("labels") ?? "[]";
   const labelsInner = labelsRaw.replace(/^\[/, "").replace(/\]$/, "").trim();
   const labels = labelsInner.length > 0 ? labelsInner.split(",").map((s) => s.trim()) : [];
+  const commentSeqRaw = fields.get("comment_seq");
+  const commentSeq =
+    commentSeqRaw !== undefined && /^\d+$/.test(commentSeqRaw)
+      ? Number.parseInt(commentSeqRaw, 10)
+      : undefined;
   return {
     fm: {
       id,
@@ -235,14 +267,156 @@ function parseIssue(raw: string): ParsedIssue | null {
       updated_at: unquoteYamlString(updated),
       closed_at: unquoteYamlString(fields.get("closed_at") ?? '""'),
       labels,
+      ...(commentSeq !== undefined ? { comment_seq: commentSeq } : {}),
     },
     bodyAfterFrontmatter: lines.slice(end + 1).join("\n"),
     raw: text,
+    fmEndLine: end,
   };
 }
 
 function isTerminal(role: IssueRole, status: string): boolean {
   return localTerminalStatuses(role).includes(status);
+}
+
+/** 本文の `## ` レベル2見出し行の判定（`### ` レベル3は含まない）。 */
+function isLevel2Heading(line: string): boolean {
+  const t = line.trim();
+  return t.startsWith("## ") && t !== "## ";
+}
+
+interface SectionSpan {
+  readonly start: number;
+  readonly end: number;
+}
+
+function sectionSpans(lines: readonly string[], heading: string): SectionSpan[] {
+  const spans: SectionSpan[] = [];
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i]?.trim() !== heading) continue;
+    let end = lines.length;
+    for (let j = i + 1; j < lines.length; j++) {
+      if (isLevel2Heading(lines[j] ?? "")) {
+        end = j;
+        break;
+      }
+    }
+    spans.push({ start: i, end });
+  }
+  return spans;
+}
+
+function lastSectionSpan(lines: readonly string[], heading: string): SectionSpan | null {
+  const spans = sectionSpans(lines, heading);
+  return spans.length > 0 ? spans[spans.length - 1]! : null;
+}
+
+/** セクション本文行（先頭・末尾の空行を除去したもの）。 */
+function sectionContentLines(lines: readonly string[], span: SectionSpan): string[] {
+  const content = lines.slice(span.start + 1, span.end);
+  while (content.length > 0 && content[0] === "") content.shift();
+  while (content.length > 0 && content[content.length - 1] === "") content.pop();
+  return content;
+}
+
+/** コメント相当エントリの解析結果（行範囲で保持し、本文は byte 保存で復元する）。 */
+interface CommentEntrySpan {
+  /** c{NN} の採番。旧形式（未採番）は null。 */
+  readonly seq: number | null;
+  readonly createdAt: string;
+  /** 更新日時（`(updated ...)` 接尾辞から。未更新は null）。 */
+  readonly updatedAt: string | null;
+  readonly legacy: boolean;
+  readonly headingIdx: number;
+  readonly bodyStart: number;
+  readonly bodyEnd: number;
+}
+
+interface CommentSectionAnalysis {
+  readonly entries: readonly CommentEntrySpan[];
+  /** 最初のエントリより前の無区切り領域 [preludeStart, preludeEnd)。 */
+  readonly preludeStart: number;
+  readonly preludeEnd: number;
+  readonly preludeNonEmpty: boolean;
+}
+
+function parseCommentEntries(lines: readonly string[], span: SectionSpan): CommentSectionAnalysis {
+  const entries: CommentEntrySpan[] = [];
+  let preludeStart = span.start + 1;
+  let preludeEnd = span.end;
+  let current: CommentEntrySpan | null = null;
+  for (let i = span.start + 1; i < span.end; i++) {
+    const line = lines[i] ?? "";
+    const m = COMMENT_ENTRY_HEADING_RE.exec(line);
+    const legacyMatch = m === null ? LEGACY_COMMENT_ENTRY_RE.exec(line) : null;
+    if (m !== null || legacyMatch !== null) {
+      if (current !== null) {
+        entries.push({ ...current, bodyEnd: i });
+      } else {
+        preludeEnd = i;
+      }
+      const seq = m !== null ? Number.parseInt(m[1] ?? "", 10) : null;
+      current = {
+        seq,
+        createdAt: m !== null ? (m[2] ?? "") : (legacyMatch?.[1] ?? ""),
+        updatedAt: m?.[3] ?? null,
+        legacy: m === null,
+        headingIdx: i,
+        bodyStart: i + 1,
+        bodyEnd: span.end,
+      };
+    }
+  }
+  if (current !== null) entries.push(current);
+  const preludeNonEmpty = lines
+    .slice(preludeStart, preludeEnd)
+    .some((l) => l.trim().length > 0);
+  return { entries, preludeStart, preludeEnd, preludeNonEmpty };
+}
+
+/**
+ * エントリ本文。書込規約（本文行 + 区切り空行 1 行）に従い末尾の空行 1 行を除いて
+ * 復元する。旧形式エントリは旧書式の区切り空行（見出し直後・本文末尾）を全て
+ * 除いて正規化する（移行後の本文と一致させるため）。
+ */
+function commentBodyOf(lines: readonly string[], entry: CommentEntrySpan): string {
+  const body = lines.slice(entry.bodyStart, entry.bodyEnd);
+  if (body.length > 0 && body[body.length - 1] === "") body.pop();
+  if (entry.legacy) {
+    while (body.length > 0 && body[0] === "") body.shift();
+    while (body.length > 0 && body[body.length - 1] === "") body.pop();
+  }
+  return body.join("\n");
+}
+
+/** 束ね対象の無区切り領域の本文行（セクション見出し直後と末尾の書式空行を除く）。 */
+function bundledPreludeLines(lines: readonly string[], analysis: CommentSectionAnalysis): string[] {
+  const body = lines.slice(analysis.preludeStart, analysis.preludeEnd);
+  while (body.length > 0 && body[0] === "") body.shift();
+  while (body.length > 0 && body[body.length - 1] === "") body.pop();
+  return body;
+}
+
+function commentSeqLabel(seq: number): string {
+  return String(seq).padStart(2, "0");
+}
+
+function commentIdOf(number: number, seq: number): string {
+  return `issue-${String(number).padStart(4, "0")}-c${commentSeqLabel(seq)}`;
+}
+
+function commentEntryHeading(seq: number, createdAt: string, updatedAt: string | null): string {
+  const base = `### c${commentSeqLabel(seq)} ${createdAt}`;
+  return updatedAt === null ? base : `${base} (updated ${updatedAt})`;
+}
+
+function parseCommentId(commentId: string): { number: number; seq: number } | null {
+  const m = COMMENT_ID_RE.exec(commentId);
+  if (m === null) return null;
+  const n = Number.parseInt(m[1] ?? "", 10);
+  const seq = Number.parseInt(m[2] ?? "", 10);
+  if (!(n > 0) || !(seq > 0)) return null;
+  return { number: n, seq };
 }
 
 function isoNow(now: () => Date): string {
@@ -299,8 +473,18 @@ export class LocalRunner implements GhRunner {
   }
 
   private writeIssue(number: number, raw: string): void {
+    // 原子的書込み: 同じディレクトリへの一時ファイル書込み後にリネームで置換する。
+    // リネーム失敗時は一時ファイルを残さず、失敗を上位へ伝播する。
     fs.mkdirSync(this.issuesDir, { recursive: true });
-    fs.writeFileSync(this.issuePath(number), toLf(raw), "utf8");
+    const target = this.issuePath(number);
+    const tmp = path.join(this.issuesDir, `${issueFileName(number)}.tmp`);
+    fs.writeFileSync(tmp, toLf(raw), "utf8");
+    try {
+      fs.renameSync(tmp, target);
+    } catch (e) {
+      fs.rmSync(tmp, { force: true });
+      throw e;
+    }
   }
 
   private requireNumber(args: Record<string, unknown>): number | null {
@@ -371,15 +555,18 @@ export class LocalRunner implements GhRunner {
     return parsed.fm.status === "review" ? "MERGEABLE" : "UNKNOWN";
   }
 
-  private prTitle(parsed: ParsedIssue): string | null {
-    const lines = parsed.raw.split("\n");
-    let title: string | null = null;
-    for (const line of lines) {
+  /** PR タイトル行の正統一: 最後の マージ前確認 セクション内の PR タイトル行のみを正とする。 */
+  private prTitleOfLines(lines: readonly string[]): { lineIdx: number; title: string } | null {
+    const span = lastSectionSpan(lines, HEADING_MERGE_CHECK);
+    if (span === null) return null;
+    let found: { lineIdx: number; title: string } | null = null;
+    for (let i = span.start + 1; i < span.end; i++) {
+      const line = lines[i] ?? "";
       if (line.startsWith(PR_TITLE_PREFIX)) {
-        title = line.slice(PR_TITLE_PREFIX.length).trim();
+        found = { lineIdx: i, title: line.slice(PR_TITLE_PREFIX.length).trim() };
       }
     }
-    return title;
+    return found;
   }
 
   private runSync(request: GhRunnerRequest): GhRunnerReply {
@@ -410,26 +597,16 @@ export class LocalRunner implements GhRunner {
       case "pr_mergeable":
         return this.prMergeable(args);
       case "pr_update":
-        return this.localPending("pr_update");
+        return this.prUpdate(args);
       case "comment_create":
-        return this.localPending("comment_create");
+        return this.commentCreate(args);
       case "comment_list":
-        return this.localPending("comment_list");
+        return this.commentList(args);
       case "comment_update":
-        return this.localPending("comment_update");
+        return this.commentUpdate(args);
       case "comment_delete":
-        return this.localPending("comment_delete");
+        return this.commentDelete(args);
     }
-  }
-
-  // Local 実装の新操作（Comment 4操作・pr_update）は #2688 が実装する。本 PR は
-  // 契約型変更に伴う型整合のみを目的とし、機能実装を行わない。
-  private localPending(operation: string): GhRunnerReply {
-    return this.fail(
-      `${operation} is not implemented in the local runner yet (pending #2688)`,
-      null,
-      "operation-failed",
-    );
   }
 
   // ---------------------------------------------------------------------
@@ -776,10 +953,16 @@ export class LocalRunner implements GhRunner {
     const c = this.readIssue(number);
     if (c === null) return this.fail(`local issue not found: ${issueFileName(number)}`);
     if (c.parsed.fm.role !== "tracking") {
+      // 受理条件差（ローカルIssue共通スキーマ Design）: role: case は終端状態からの
+      // 遷移を定義しないため、reopen を拒否する。
       return this.fail("issue_reopen applies only to tracking issues in the local implementation");
     }
     if (c.parsed.fm.status !== "closed") {
-      return this.fail(`issue_reopen requires a closed tracking issue: ${c.parsed.fm.status}`);
+      // open 済み追跡Issueへの再オープンは要求的状態の確認をもって冪等に成功させる。
+      return {
+        ok: true,
+        payload: { number, state: "open", before: this.beforeFrom(c.parsed) },
+      };
     }
     const fm: LocalIssueFrontmatter = {
       ...c.parsed.fm,
@@ -799,6 +982,308 @@ export class LocalRunner implements GhRunner {
       ok: true,
       payload: { number, state: "open", before: this.beforeFrom(c.parsed) },
     };
+  }
+
+  // ---------------------------------------------------------------------
+  // Comment 系（role 分岐のコメント相当セクション上の c{NN} エントリ CRUD。
+  // commentId の物理表現は issue-{NNNN}-c{NN}）
+  // ---------------------------------------------------------------------
+
+  private commentSectionHeading(role: IssueRole): string {
+    return role === "tracking" ? HEADING_DISCUSSION : HEADING_WORKLOG;
+  }
+
+  /** コメント相当セクションを確保する（未作成なら作成する）。返り値は当該セクションの span。 */
+  private ensureCommentSection(lines: string[], role: IssueRole): SectionSpan {
+    const heading = this.commentSectionHeading(role);
+    const existing = lastSectionSpan(lines, heading);
+    if (existing !== null) return existing;
+    if (role === "tracking") {
+      lines.push("", heading);
+    } else {
+      let insertAt = lines.length;
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (line === undefined) continue;
+        if (HEADINGS_BEFORE_WORKLOG.some((h) => line.trim() === h)) {
+          insertAt = i;
+          break;
+        }
+      }
+      lines.splice(insertAt, 0, heading, "");
+    }
+    return lastSectionSpan(lines, heading)!;
+  }
+
+  /**
+   * コメント相当セクションの解析と採番導出。旧形式エントリと role: case の無区切り
+   * 作業ログ（束ね対象）には、移行時に付与される採番を導出して返す（書込は行わない）。
+   * 導出順は migrateComments と同一（旧形式の文書順 → 束ね）でなければならない。
+   */
+  private analyzeComments(
+    lines: readonly string[],
+    span: SectionSpan,
+    fm: LocalIssueFrontmatter,
+    role: IssueRole,
+  ): CommentSectionAnalysis & {
+    nextSeq: number;
+    bundleSeq: number | null;
+    readonly derivedSeqs: readonly number[];
+  } {
+    const analysis = parseCommentEntries(lines, span);
+    let max = fm.comment_seq ?? 0;
+    for (const entry of analysis.entries) {
+      if (entry.seq !== null && entry.seq > max) max = entry.seq;
+    }
+    const derivedSeqs: number[] = [];
+    for (const entry of analysis.entries) {
+      if (entry.seq !== null) {
+        derivedSeqs.push(entry.seq);
+      } else {
+        max += 1;
+        derivedSeqs.push(max);
+      }
+    }
+    let bundleSeq: number | null = null;
+    if (role === "case" && analysis.preludeNonEmpty) {
+      max += 1;
+      bundleSeq = max;
+    }
+    return { ...analysis, nextSeq: max, bundleSeq, derivedSeqs };
+  }
+
+  /**
+   * 旧形式エントリと role: case の無区切り作業ログ内容の新形式への移行（in-place）。
+   * セクション内容を再構築して置き換える。移行対象がない場合は行を変更しない
+   * （冪等）。再構築は各エントリを 見出し行 + 本文行 + 区切り空行 1 行 の規約へ
+   * 正規化する。移行後の最高水位標を返す。
+   */
+  private migrateComments(
+    lines: string[],
+    fm: LocalIssueFrontmatter,
+    role: IssueRole,
+  ): number {
+    const heading = this.commentSectionHeading(role);
+    const span = lastSectionSpan(lines, heading);
+    if (span === null) return fm.comment_seq ?? 0;
+    const analysis = parseCommentEntries(lines, span);
+    let max = fm.comment_seq ?? 0;
+    for (const entry of analysis.entries) {
+      if (entry.seq !== null && entry.seq > max) max = entry.seq;
+    }
+    const legacySeq = new Map<number, number>();
+    for (let i = 0; i < analysis.entries.length; i++) {
+      const entry = analysis.entries[i];
+      if (entry?.legacy) {
+        max += 1;
+        legacySeq.set(i, max);
+      }
+    }
+    let bundleSeq: number | null = null;
+    if (role === "case" && analysis.preludeNonEmpty) {
+      max += 1;
+      bundleSeq = max;
+    }
+    if (legacySeq.size === 0 && bundleSeq === null) return max;
+    const content: string[] = [];
+    if (bundleSeq !== null) {
+      content.push(
+        commentEntryHeading(bundleSeq, fm.updated_at, null),
+        ...bundledPreludeLines(lines, analysis),
+        "",
+      );
+    } else {
+      for (const line of lines.slice(analysis.preludeStart, analysis.preludeEnd)) {
+        content.push(line);
+      }
+    }
+    for (let i = 0; i < analysis.entries.length; i++) {
+      const entry = analysis.entries[i];
+      if (entry === undefined) continue;
+      if (entry.legacy) {
+        const seq = legacySeq.get(i);
+        if (seq !== undefined) {
+          content.push(commentEntryHeading(seq, entry.createdAt, null), ...commentBodyOf(lines, entry).split("\n"), "");
+        }
+      } else {
+        const body = lines.slice(entry.bodyStart, entry.bodyEnd);
+        if (body.length > 0 && body[body.length - 1] === "") body.pop();
+        content.push(lines[entry.headingIdx] ?? "", ...body, "");
+      }
+    }
+    lines.splice(span.start + 1, span.end - (span.start + 1), ...content);
+    return max;
+  }
+
+  private commentCreate(args: Record<string, unknown>): GhRunnerReply {
+    const number = this.requireNumber(args);
+    if (number === null) {
+      return this.fail("comment_create requires number", 0, "invalid-input");
+    }
+    const body = typeof args.body === "string" && args.body.length > 0 ? args.body : null;
+    if (body === null) {
+      return this.fail("comment_create requires a non-empty body", 0, "invalid-input");
+    }
+    const c = this.readIssue(number);
+    if (c === null) return this.fail(`local issue not found: ${issueFileName(number)}`);
+    const lines = c.parsed.raw.split("\n");
+    this.ensureCommentSection(lines, c.parsed.fm.role);
+    const maxSeq = this.migrateComments(lines, c.parsed.fm, c.parsed.fm.role);
+    const seq = maxSeq + 1;
+    const timestamp = isoNow(this.now);
+    const span = lastSectionSpan(lines, this.commentSectionHeading(c.parsed.fm.role))!;
+    lines.splice(
+      span.end,
+      0,
+      commentEntryHeading(seq, timestamp, null),
+      ...toLf(body).split("\n"),
+      "",
+    );
+    const fm: LocalIssueFrontmatter = {
+      ...c.parsed.fm,
+      updated_at: timestamp,
+      ...(seq > (c.parsed.fm.comment_seq ?? 0) ? { comment_seq: seq } : {}),
+    };
+    this.writeIssue(number, this.reassemble(c.parsed, fm, lines));
+    return {
+      ok: true,
+      payload: { commentId: commentIdOf(number, seq), url: this.issuePath(number) },
+    };
+  }
+
+  private commentList(args: Record<string, unknown>): GhRunnerReply {
+    const number = this.requireNumber(args);
+    if (number === null) {
+      return this.fail("comment_list requires number", 0, "invalid-input");
+    }
+    const c = this.readIssue(number);
+    if (c === null) return this.fail(`local issue not found: ${issueFileName(number)}`);
+    const lines = c.parsed.raw.split("\n");
+    const span = lastSectionSpan(lines, this.commentSectionHeading(c.parsed.fm.role));
+    if (span === null) return { ok: true, payload: { number, comments: [] } };
+    const analysis = this.analyzeComments(lines, span, c.parsed.fm, c.parsed.fm.role);
+    const comments: Record<string, unknown>[] = [];
+    if (analysis.bundleSeq !== null) {
+      comments.push({
+        commentId: commentIdOf(number, analysis.bundleSeq),
+        body: bundledPreludeLines(lines, analysis).join("\n"),
+        createdAt: c.parsed.fm.updated_at,
+        updatedAt: c.parsed.fm.updated_at,
+        url: this.issuePath(number),
+      });
+    }
+    for (const [i, entry] of analysis.entries.entries()) {
+      comments.push({
+        commentId: commentIdOf(number, analysis.derivedSeqs[i] ?? 0),
+        body: commentBodyOf(lines, entry),
+        createdAt: entry.createdAt,
+        updatedAt: entry.updatedAt ?? entry.createdAt,
+        url: this.issuePath(number),
+      });
+    }
+    return { ok: true, payload: { number, comments } };
+  }
+
+  private commentUpdate(args: Record<string, unknown>): GhRunnerReply {
+    const cid = typeof args.commentId === "string" ? args.commentId : null;
+    if (cid === null) {
+      return this.fail("comment_update requires commentId", 0, "invalid-input");
+    }
+    const target = parseCommentId(cid);
+    if (target === null) {
+      return this.fail(
+        "comment_update requires a commentId of the form issue-{NNNN}-c{NN}",
+        0,
+        "invalid-input",
+      );
+    }
+    const body = typeof args.body === "string" && args.body.length > 0 ? args.body : null;
+    if (body === null) {
+      return this.fail("comment_update requires a non-empty body", 0, "invalid-input");
+    }
+    const c = this.readIssue(target.number);
+    if (c === null) return this.fail(`local issue not found: ${issueFileName(target.number)}`);
+    const lines = c.parsed.raw.split("\n");
+    const maxSeq = this.migrateComments(lines, c.parsed.fm, c.parsed.fm.role);
+    const found = this.findCommentEntry(lines, c.parsed.fm.role, target.seq);
+    if (found === null) {
+      return this.fail(`comment not found: ${cid}`);
+    }
+    const timestamp = isoNow(this.now);
+    lines.splice(
+      found.entry.bodyStart,
+      found.entry.bodyEnd - found.entry.bodyStart,
+      ...toLf(body).split("\n"),
+      "",
+    );
+    lines[found.entry.headingIdx] = commentEntryHeading(
+      found.entry.seq ?? target.seq,
+      found.entry.createdAt,
+      timestamp,
+    );
+    const fm: LocalIssueFrontmatter = {
+      ...c.parsed.fm,
+      updated_at: timestamp,
+      ...(maxSeq > (c.parsed.fm.comment_seq ?? 0) ? { comment_seq: maxSeq } : {}),
+    };
+    this.writeIssue(target.number, this.reassemble(c.parsed, fm, lines));
+    return {
+      ok: true,
+      payload: { commentId: cid, url: this.issuePath(target.number), number: target.number },
+    };
+  }
+
+  private commentDelete(args: Record<string, unknown>): GhRunnerReply {
+    const cid = typeof args.commentId === "string" ? args.commentId : null;
+    if (cid === null) {
+      return this.fail("comment_delete requires commentId", 0, "invalid-input");
+    }
+    const target = parseCommentId(cid);
+    if (target === null) {
+      return this.fail(
+        "comment_delete requires a commentId of the form issue-{NNNN}-c{NN}",
+        0,
+        "invalid-input",
+      );
+    }
+    const c = this.readIssue(target.number);
+    if (c === null) return this.fail(`local issue not found: ${issueFileName(target.number)}`);
+    const lines = c.parsed.raw.split("\n");
+    const maxSeq = this.migrateComments(lines, c.parsed.fm, c.parsed.fm.role);
+    const found = this.findCommentEntry(lines, c.parsed.fm.role, target.seq);
+    if (found === null) {
+      return this.fail(`comment not found: ${cid}`);
+    }
+    const timestamp = isoNow(this.now);
+    lines.splice(found.entry.headingIdx, found.entry.bodyEnd - found.entry.headingIdx);
+    const fm: LocalIssueFrontmatter = {
+      ...c.parsed.fm,
+      updated_at: timestamp,
+      ...(maxSeq > (c.parsed.fm.comment_seq ?? 0) ? { comment_seq: maxSeq } : {}),
+    };
+    this.writeIssue(target.number, this.reassemble(c.parsed, fm, lines));
+    return { ok: true, payload: { commentId: cid, number: target.number } };
+  }
+
+  /** 移行済みセクションから指定採番のエントリを探す。 */
+  private findCommentEntry(
+    lines: readonly string[],
+    role: IssueRole,
+    seq: number,
+  ): { entry: CommentEntrySpan } | null {
+    const span = lastSectionSpan(lines, this.commentSectionHeading(role));
+    if (span === null) return null;
+    const analysis = parseCommentEntries(lines, span);
+    const entry = analysis.entries.find((e) => e.seq === seq);
+    return entry === undefined ? null : { entry };
+  }
+
+  /** frontmatter を置き換え、本文行配列と再結合してローカルIssue全文を組み立てる。 */
+  private reassemble(parsed: ParsedIssue, fm: LocalIssueFrontmatter, lines: readonly string[]): string {
+    const bodyLines = lines.slice(parsed.fmEndLine + 1);
+    let raw = `${serializeFrontmatter(fm)}\n${bodyLines.join("\n")}`;
+    if (!raw.endsWith("\n")) raw += "\n";
+    return raw;
   }
 
   // ---------------------------------------------------------------------
@@ -840,30 +1325,116 @@ export class LocalRunner implements GhRunner {
     return { ok: true, payload: { number, url: this.issuePath(number) } };
   }
 
+  /** 論理 PR 本文: 3セクション（マージ前確認 / Design確定候補 / Findings / Capture候補）の定義順直列化。 */
+  private serializePrBody(lines: readonly string[]): string {
+    const blocks: string[] = [];
+    for (const heading of PR_BODY_SECTIONS) {
+      const span = lastSectionSpan(lines, heading);
+      const content = span === null ? [] : sectionContentLines(lines, span);
+      blocks.push(content.length === 0 ? heading : `${heading}\n\n${content.join("\n")}`);
+    }
+    return blocks.join("\n\n");
+  }
+
+  /** 論理 PR 本文の入力をセクション単位へ分解する（各見出しは最後の出現を正とする）。 */
+  private parsePrBodySections(body: string): Map<string, string[]> {
+    const lines = body.split("\n");
+    const headingIdx = new Map<string, number>();
+    for (let i = 0; i < lines.length; i++) {
+      const t = lines[i]?.trim();
+      if (t !== undefined && (PR_BODY_SECTIONS as readonly string[]).includes(t)) {
+        headingIdx.set(t, i);
+      }
+    }
+    const sections = new Map<string, string[]>();
+    for (const [heading, idx] of headingIdx) {
+      let end = lines.length;
+      for (const other of headingIdx.values()) {
+        if (other > idx && other < end) end = other;
+      }
+      sections.set(heading, sectionContentLines(lines, { start: idx, end }));
+    }
+    return sections;
+  }
+
   private prRead(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
     if (number === null) return this.fail("pr_read requires number", 0, "invalid-input");
     const target = this.requireCaseIssue(number);
     if (!("parsed" in target)) return target;
-    const title = this.prTitle(target.parsed);
+    const lines = target.parsed.raw.split("\n");
+    const title = this.prTitleOfLines(lines);
+    if (title === null) {
+      return this.fail(
+        `local issue has no '${HEADING_MERGE_CHECK}' section with a PR title line: ${issueFileName(number)}`,
+      );
+    }
     const state = this.hasMergeResult(target.parsed)
       ? "merged"
       : this.issueState("case", target.parsed.fm.status);
-    if (title === null || state === null) {
-      return this.fail(`local issue has no PR section: ${issueFileName(number)}`);
+    if (state === null) {
+      return this.fail(`unknown issue status: ${target.parsed.fm.status}`);
     }
-    // pr_read の body（論理範囲の直列化）は #2688 が確定する。移行期間は
-    // issue_read と同様にローカルIssue全文を返す（round-trip 可能な同一範囲）。
     return {
       ok: true,
       payload: {
         number,
-        title,
-        body: target.parsed.raw,
+        title: title.title,
+        body: this.serializePrBody(lines),
         state,
         mergeable: this.mergeableOf(target.parsed),
       },
     };
+  }
+
+  private prUpdate(args: Record<string, unknown>): GhRunnerReply {
+    const number = this.requireNumber(args);
+    if (number === null) return this.fail("pr_update requires number", 0, "invalid-input");
+    const title = typeof args.title === "string" && args.title.length > 0 ? args.title : null;
+    const body = typeof args.body === "string" ? args.body : null;
+    if (title === null && body === null) {
+      return this.fail("pr_update requires title or body", 0, "invalid-input");
+    }
+    const target = this.requireCaseIssue(number);
+    if (!("parsed" in target)) return target;
+    const lines = target.parsed.raw.split("\n");
+    if (lastSectionSpan(lines, HEADING_MERGE_CHECK) === null) {
+      return this.fail(
+        `local issue has no '${HEADING_MERGE_CHECK}' section: ${issueFileName(number)}`,
+      );
+    }
+    if (body !== null) {
+      const sections = this.parsePrBodySections(body);
+      if (sections.size === 0) {
+        return this.fail(
+          `pr_update body contains none of the PR sections (${PR_BODY_SECTIONS.join(" / ")})`,
+        );
+      }
+      for (const heading of PR_BODY_SECTIONS) {
+        const content = sections.get(heading);
+        if (content === undefined) continue;
+        const span = lastSectionSpan(lines, heading);
+        if (span === null) {
+          if (lines.length > 0 && lines[lines.length - 1] !== "") lines.push("");
+          lines.push(heading, ...content);
+        } else {
+          const replacement =
+            content.length === 0 ? [heading] : [heading, "", ...content, ""];
+          lines.splice(span.start, span.end - span.start, ...replacement);
+        }
+      }
+    }
+    if (title !== null) {
+      const t = this.prTitleOfLines(lines);
+      if (t === null) {
+        return this.fail(
+          `local issue has no PR title line in '${HEADING_MERGE_CHECK}': ${issueFileName(number)}`,
+        );
+      }
+      lines[t.lineIdx] = `${PR_TITLE_PREFIX}${title}`;
+    }
+    this.writeIssue(number, this.reassemble(target.parsed, target.parsed.fm, lines));
+    return { ok: true, payload: { number, url: this.issuePath(number) } };
   }
 
   private prMerge(args: Record<string, unknown>): GhRunnerReply {

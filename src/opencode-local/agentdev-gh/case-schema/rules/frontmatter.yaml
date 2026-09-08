@@ -83,6 +83,13 @@ fields:
     constraint: "role に対応する labels.yaml の値域から選定。補助分類であり状態遷移やワークフロー状態の代替として扱わない"
     description: "Issue のラベル一覧（role 条件付き）"
 
+  comment_seq:
+    type: integer
+    required: false
+    minimum: 0
+    constraint: "コメント採番の最高水位標。欠番を再利用せず、コメント書込時に必要に応じて増加する"
+    description: "ローカル Comment の採番水位"
+
 # 禁止フィールド
 # 以下のフィールドは YAML 前書きに含めてはならない。
 forbidden_fields:
