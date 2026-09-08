@@ -1,7 +1,13 @@
+// ADF-COVERS(verification): REQ-011-022, REQ-011-023
+//
 // 操作契約の契約テスト。
 //
-// Design custom-tool-contracts.md が所有する対象操作の初期セットと、
-// 操作カタログの契約整合（副作用分類、継続契約）を固定する。
+// Design custom-tool-contracts.md が所有する対象操作の境界（16操作カタログ）と、
+// 操作カタログの契約整合（副作用分類、継続契約）を完全列挙で固定する。
+// 対象外 GitHub 機能（Issue 削除、PR close/reopen、review、inline review comment、
+// assignee、milestone、Projects、lock/unlock、pin/unpin 等）の追加は列挙固定に
+// よって検出される。温存中の deprecated 操作 issue_comment は移行完了（#2689）
+// まで期待値として許容する。
 
 
 import { describe, expect, test } from "bun:test";
@@ -19,27 +25,86 @@ import {
 } from "../index.ts";
 
 describe("操作カタログ（Design 対象操作との一致）", () => {
-  test("初期セットと追跡Issue操作の12操作を公開する", () => {
+  test("16操作カタログ + 温存中の issue_comment を完全列挙で固定する", () => {
     expect([...GH_TOOL_OPERATIONS]).toEqual([
       "issue_create",
       "issue_read",
       "issue_update",
-      "issue_comment",
       "issue_close",
-      "issue_list",
-      "issue_reopen",
       "pr_create",
       "pr_read",
       "pr_merge",
       "pr_changed_files",
       "pr_mergeable",
+      "pr_update",
+      "issue_list",
+      "issue_reopen",
+      "comment_create",
+      "comment_list",
+      "comment_update",
+      "comment_delete",
+      "issue_comment",
     ]);
+  });
+
+  test("16操作カタログは Comment 4操作と pr_update を含む", () => {
+    const catalog = new Set(GH_TOOL_OPERATIONS);
+    for (const op of [
+      "comment_create",
+      "comment_list",
+      "comment_update",
+      "comment_delete",
+      "pr_update",
+    ]) {
+      expect(catalog.has(op as (typeof GH_TOOL_OPERATIONS)[number])).toBe(true);
+    }
+  });
+
+  test("対象外操作（削除・review・管理系 GitHub 機能）はカタログへ追加されていない", () => {
+    const catalog = new Set<string>(GH_TOOL_OPERATIONS);
+    const forbidden = [
+      "issue_delete",
+      "pr_close",
+      "pr_reopen",
+      "pr_review",
+      "pr_review_comment",
+      "issue_assign",
+      "issue_milestone",
+      "issue_lock",
+      "issue_unlock",
+      "issue_pin",
+      "issue_unpin",
+      "issue_projects",
+      "issue_transfer",
+      "pr_draft_update",
+      "pr_base_update",
+    ];
+    for (const op of forbidden) {
+      expect(catalog.has(op)).toBe(false);
+    }
+  });
+
+  test("issue_comment は温存されている（廃止は #2689 の完了条件）", () => {
+    expect(GH_TOOL_OPERATIONS).toContain("issue_comment");
+    expect(GH_TOOL_OPERATION_CATALOG.find((e) => e.operation === "issue_comment")?.kind).toBe(
+      "side-effect",
+    );
   });
 
   test("カタログは全操作を重複なく網羅する", () => {
     const catalogOps = GH_TOOL_OPERATION_CATALOG.map((e) => e.operation);
     expect(new Set(catalogOps).size).toBe(GH_TOOL_OPERATIONS.length);
     expect(catalogOps.sort()).toEqual([...GH_TOOL_OPERATIONS].sort());
+  });
+
+  test("Comment WRITE は side-effect、comment_list は read-only", () => {
+    const kindOf = (op: string) =>
+      GH_TOOL_OPERATION_CATALOG.find((e) => e.operation === op)?.kind;
+    expect(kindOf("comment_create")).toBe("side-effect");
+    expect(kindOf("comment_update")).toBe("side-effect");
+    expect(kindOf("comment_delete")).toBe("side-effect");
+    expect(kindOf("comment_list")).toBe("read-only");
+    expect(kindOf("pr_update")).toBe("side-effect");
   });
 });
 

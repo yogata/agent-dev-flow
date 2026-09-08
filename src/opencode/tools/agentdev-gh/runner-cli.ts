@@ -1,3 +1,4 @@
+// ADF-COVERS(implementation): REQ-011-025, REQ-011-026, REQ-011-027, REQ-011-029, REQ-011-030
 // agentdev-gh Custom Tool の GitHub 実装（GhRunner）。
 //
 // 環境依存の実装詳細（gh オプション運用、--input によるファイル渡し、
@@ -17,15 +18,23 @@
 import { spawnSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import type { GhRunner, GhRunnerReply, GhRunnerRequest } from "./runner.ts";
+import type {
+  GhRunner,
+  GhRunnerFailureClass,
+  GhRunnerReply,
+  GhRunnerRequest,
+} from "./runner.ts";
 import {
   buildTrackingLabels,
   deriveKind,
   deriveRole,
   deriveTrackingState,
+  kindToLabel,
   parseTrackingKind,
   parseTrackingState,
   stripTrackingLabels,
+  trackingStateToLabel,
+  REOPEN_TRACKING_STATE,
   TRACKING_ROLE_LABEL,
   type CloseReason,
   type IssueRole,
@@ -61,6 +70,10 @@ interface RawReply {
   readonly stdout: string;
   readonly stderr: string;
 }
+
+/** 一覧完全取得のページング・パラメータ（Design「一覧完全性」の安全上限）。 */
+const LIST_PER_PAGE = 100;
+const LIST_MAX_PAGES = 10;
 
 function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === "object" && v !== null;
@@ -131,6 +144,16 @@ export class CliRunner implements GhRunner {
         return this.prChangedFiles(request.args);
       case "pr_merge":
         return this.prMerge(request.args);
+      case "pr_update":
+        return this.prUpdate(request.args);
+      case "comment_create":
+        return this.commentCreate(request.args);
+      case "comment_list":
+        return this.commentList(request.args);
+      case "comment_update":
+        return this.commentUpdate(request.args);
+      case "comment_delete":
+        return this.commentDelete(request.args);
     }
   }
 
@@ -138,22 +161,34 @@ export class CliRunner implements GhRunner {
   // 内部: gh 実行の共通処理
   // ---------------------------------------------------------------------
 
-  private fail(error: string, exitCode: number | null): GhRunnerReply {
-    return { ok: false, error, exitCode };
+  private fail(
+    error: string,
+    exitCode: number | null,
+    failureClass: GhRunnerFailureClass = "operation-failed",
+  ): GhRunnerReply {
+    return { ok: false, error, exitCode, failureClass };
   }
 
   private runGh(args: readonly string[]): { ok: true; payload: unknown } | GhRunnerReply {
     const r: RawReply = this.exec("gh", args);
     if (r.status === null) {
-      return this.fail("failed to start gh (is gh installed and on PATH?)", null);
+      return this.fail(
+        "failed to start gh (is gh installed and on PATH?)",
+        null,
+        "enforcement-crashed",
+      );
     }
     if (r.status !== 0) {
       const message = r.stderr.trim().length > 0 ? r.stderr.trim() : r.stdout.trim();
-      return this.fail(message.length > 0 ? message : `gh exited with ${r.status}`, r.status);
+      return this.fail(
+        message.length > 0 ? message : `gh exited with ${r.status}`,
+        r.status,
+        "operation-failed",
+      );
     }
     const trimmed = r.stdout.trim();
     if (trimmed.length === 0) {
-      return this.fail("gh replied with empty output", r.status);
+      return this.fail("gh replied with empty output", r.status, "operation-failed");
     }
     try {
       return { ok: true, payload: JSON.parse(trimmed) as unknown };
@@ -161,6 +196,7 @@ export class CliRunner implements GhRunner {
       return this.fail(
         `gh reply is not valid JSON: ${e instanceof Error ? e.message : String(e)}`,
         r.status,
+        "operation-failed",
       );
     }
   }
@@ -223,6 +259,39 @@ export class CliRunner implements GhRunner {
   private requireNumber(args: Record<string, unknown>): number | null {
     const n = args.number;
     return typeof n === "number" && Number.isInteger(n) && n > 0 ? n : null;
+  }
+
+  /** 実行前状態（before）。issue_update / issue_reopen の応答へ含め、VERIFY の照合基準とする。 */
+  private beforeFrom(rec: Record<string, unknown>): Record<string, unknown> | null {
+    const meta = this.trackingMetaFrom(rec);
+    const state = normalizeIssueState(rec.state);
+    if (meta === null || state === null) return null;
+    return {
+      state,
+      labels: meta.labels,
+      role: meta.role,
+      kind: meta.kind,
+      trackingState: meta.trackingState,
+      closeReason: meta.closeReason,
+    };
+  }
+
+  /**
+   * 追跡Issueのラベル構成。kind ラベルを持たない追跡Issue（過渡的状態）は
+   * kind ラベルを新設せず、role と状態ラベルのみを保持して再構成する。
+   */
+  private trackingLabelsFor(
+    currentLabels: readonly string[],
+    kind: TrackingKind | null,
+    state: TrackingState,
+  ): string[] {
+    if (kind === null) {
+      const stateLabel = trackingStateToLabel(state);
+      const next = [TRACKING_ROLE_LABEL];
+      if (stateLabel !== null) next.push(stateLabel);
+      return [...new Set([...next, ...stripTrackingLabels(currentLabels)])];
+    }
+    return buildTrackingLabels(currentLabels, kind, state);
   }
 
   // ---------------------------------------------------------------------
@@ -295,7 +364,7 @@ export class CliRunner implements GhRunner {
 
   private issueRead(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
-    if (number === null) return this.fail("issue_read requires number", 0);
+    if (number === null) return this.fail("issue_read requires number", 0, "invalid-input");
     return this.apiGet(`repos/${this.repo}/issues/${number}`, (rec) => {
       const state = normalizeIssueState(rec.state);
       const title = str(rec.title);
@@ -326,62 +395,65 @@ export class CliRunner implements GhRunner {
 
   private issueUpdate(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
-    if (number === null) return this.fail("issue_update requires number", 0);
+    if (number === null) {
+      return this.fail("issue_update requires number", 0, "invalid-input");
+    }
     const kind = args.kind === undefined ? null : parseTrackingKind(args.kind);
     if (args.kind !== undefined && kind === null) {
-      return this.fail("issue_update received an invalid kind", 0);
+      return this.fail("issue_update received an invalid kind", 0, "invalid-input");
     }
     const trackingState =
       args.trackingState === undefined ? null : parseTrackingState(args.trackingState);
     if (args.trackingState !== undefined && (trackingState === null || trackingState === "closed")) {
-      return this.fail("issue_update trackingState must be a non-terminal state", 0);
+      return this.fail("issue_update trackingState must be a non-terminal state", 0, "invalid-input");
     }
     const labelsRequested = Array.isArray(args.labels)
       ? args.labels.filter((l): l is string => typeof l === "string")
       : null;
 
+    // 常に現状を取得する。応答の before は VERIFY の追跡軸保持照合の基準であり、
+    // ラベル再構成は要求対象外の追跡軸を現状から復元する（部分更新不変条件）。
+    const current = this.apiGet(`repos/${this.repo}/issues/${number}`, (rec) => ({
+      ok: true as const,
+      payload: rec,
+    }));
+    if (!current.ok) return current;
+    const rec = current.payload as Record<string, unknown>;
+    const meta = this.trackingMetaFrom(rec);
+    if (meta === null) return this.fail("issue update cannot read current labels", 0);
+    const before = this.beforeFrom(rec);
+    if (before === null) return this.fail("issue update cannot read current labels", 0);
+
+    if ((kind !== null || trackingState !== null) && meta.role !== "tracking") {
+      return this.fail("issue_update kind/trackingState apply only to tracking issues", 0);
+    }
     let nextLabels: string[] | null = null;
     if (kind !== null || trackingState !== null || labelsRequested !== null) {
-      const current = this.apiGet(`repos/${this.repo}/issues/${number}`, (rec) => ({
-        ok: true as const,
-        payload: rec,
-      }));
-      if (!current.ok) return current;
-      const rec = current.payload as Record<string, unknown>;
-      const meta = this.trackingMetaFrom(rec);
-      if (meta === null) return this.fail("issue update cannot read current labels", 0);
-      if ((kind !== null || trackingState !== null) && meta.role !== "tracking") {
-        return this.fail("issue_update kind/trackingState apply only to tracking issues", 0);
-      }
       const base = labelsRequested ?? stripTrackingLabels(meta.labels);
-      const currentKind = meta.kind ?? kind;
+      const currentKind = kind ?? meta.kind;
       const currentState = trackingState ?? (meta.trackingState ?? "created");
-      if (kind !== null || trackingState !== null) {
-        if (currentKind === null) {
-          return this.fail("issue_update requires a kind for tracking issues", 0);
-        }
-        nextLabels = buildTrackingLabels(base, currentKind, currentState);
-      } else {
-        nextLabels = base;
-      }
+      nextLabels =
+        meta.role === "tracking"
+          ? this.trackingLabelsFor(base, currentKind, currentState)
+          : base;
     }
 
     const body: Record<string, unknown> = {};
     if (args.title !== undefined && args.title !== null) body.title = args.title;
     if (args.body !== undefined && args.body !== null) body.body = args.body;
     if (nextLabels !== null) body.labels = nextLabels;
-    return this.apiWithInput("PATCH", `repos/${this.repo}/issues/${number}`, body, (rec) => {
-      const url = str(rec.html_url);
+    return this.apiWithInput("PATCH", `repos/${this.repo}/issues/${number}`, body, (rec2) => {
+      const url = str(rec2.html_url);
       if (url === null) {
         return this.fail("issue update reply missing html_url", 0);
       }
-      return { ok: true, payload: { number, url } };
+      return { ok: true, payload: { number, url, before } };
     });
   }
 
   private issueComment(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
-    if (number === null) return this.fail("issue_comment requires number", 0);
+    if (number === null) return this.fail("issue_comment requires number", 0, "invalid-input");
     if (args.body === undefined) {
       return this.issueCommentRead(number);
     }
@@ -419,7 +491,7 @@ export class CliRunner implements GhRunner {
 
   private issueClose(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
-    if (number === null) return this.fail("issue_close requires number", 0);
+    if (number === null) return this.fail("issue_close requires number", 0, "invalid-input");
     const reason = str(args.reason) ?? "completed";
     return this.apiWithInput("PATCH", `repos/${this.repo}/issues/${number}`, {
       state: "closed",
@@ -437,13 +509,13 @@ export class CliRunner implements GhRunner {
     const role = args.role === "tracking" || args.role === "case" ? args.role : null;
     const kind = args.kind === undefined ? null : parseTrackingKind(args.kind);
     if (args.kind !== undefined && kind === null) {
-      return this.fail("issue_list received an invalid kind", 0);
+      return this.fail("issue_list received an invalid kind", 0, "invalid-input");
     }
-    const state = args.state === "open" || args.state === "closed" ? args.state : "all";
+    const state = args.state === "open" || args.state === "closed" ? args.state : null;
     const trackingState =
       args.trackingState === undefined ? null : parseTrackingState(args.trackingState);
     if (args.trackingState !== undefined && trackingState === null) {
-      return this.fail("issue_list received an invalid trackingState", 0);
+      return this.fail("issue_list received an invalid trackingState", 0, "invalid-input");
     }
     const labels =
       Array.isArray(args.labels)
@@ -451,23 +523,41 @@ export class CliRunner implements GhRunner {
         : [];
     const search = typeof args.search === "string" && args.search.length > 0 ? args.search : null;
 
-    const MAX_PAGES = 10;
-    const PER_PAGE = 100;
+    // フィルタ可能な軸はサーバ側絞り込みクエリへ推送し、安全上限への到達可能性を
+    // 低減する。追跡軸（kind、非終端状態、role=tracking）は物理ラベルへ写像して推送する。
+    const serverState = state ?? (trackingState === "closed" ? "closed" : "all");
+    const serverLabels = [...labels];
+    if (kind !== null) serverLabels.push(kindToLabel(kind));
+    if (trackingState !== null && trackingState !== "closed") {
+      const stateLabel = trackingStateToLabel(trackingState);
+      if (stateLabel !== null) serverLabels.push(stateLabel);
+    }
+    if (role === "tracking") serverLabels.push(TRACKING_ROLE_LABEL);
+    let query = `repos/${this.repo}/issues?state=${serverState}&per_page=${LIST_PER_PAGE}`;
+    if (serverLabels.length > 0) {
+      query += `&labels=${serverLabels.map((l) => encodeURIComponent(l)).join(",")}`;
+    }
+
     const collected: Record<string, unknown>[] = [];
-    for (let page = 1; page <= MAX_PAGES; page++) {
-      const r = this.apiGetAny(
-        `repos/${this.repo}/issues?state=${state}&per_page=${PER_PAGE}&page=${page}`,
-        (payload) => {
-          if (!Array.isArray(payload)) {
-            return this.fail("issues list reply is not an array", 0);
-          }
-          return { ok: true, payload };
-        },
-      );
+    for (let page = 1; page <= LIST_MAX_PAGES; page++) {
+      const r = this.apiGetAny(`${query}&page=${page}`, (payload) => {
+        if (!Array.isArray(payload)) {
+          return this.fail("issues list reply is not an array", 0);
+        }
+        return { ok: true, payload };
+      });
       if (!r.ok) return r;
       const list = r.payload as unknown[];
       collected.push(...(list.filter((e) => isRecord(e)) as Record<string, unknown>[]));
-      if (list.length < PER_PAGE) break;
+      if (list.length < LIST_PER_PAGE) break;
+      if (page === LIST_MAX_PAGES) {
+        return this.fail(
+          `issue_list reached the safety page limit (${LIST_MAX_PAGES} pages of ${LIST_PER_PAGE}); ` +
+            "narrow the filters (state, labels, kind, trackingState, search) and retry",
+          0,
+          "operation-failed",
+        );
+      }
     }
 
     const issues: Record<string, unknown>[] = [];
@@ -507,16 +597,37 @@ export class CliRunner implements GhRunner {
 
   private issueReopen(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
-    if (number === null) return this.fail("issue_reopen requires number", 0);
-    return this.apiWithInput("PATCH", `repos/${this.repo}/issues/${number}`, {
-      state: "open",
-      state_reason: null,
-    }, (rec) => {
-      const state = normalizeIssueState(rec.state);
+    if (number === null) {
+      return this.fail("issue_reopen requires number", 0, "invalid-input");
+    }
+    // クローズ済み追跡Issueは状態ラベルの再付与（closed → in-discussion）によって
+    // 再オープン遷移を機械適用する。open 済みの場合は要求的状態の確認のみで
+    // 冪等に成功させ、Case Issue には追跡状態遷移を適用しない。
+    const current = this.apiGet(`repos/${this.repo}/issues/${number}`, (rec) => ({
+      ok: true as const,
+      payload: rec,
+    }));
+    if (!current.ok) return current;
+    const rec = current.payload as Record<string, unknown>;
+    const meta = this.trackingMetaFrom(rec);
+    if (meta === null) return this.fail("issue reopen cannot read current labels", 0);
+    const before = this.beforeFrom(rec);
+    if (before === null) return this.fail("issue reopen cannot read current labels", 0);
+
+    const body: Record<string, unknown> = { state: "open", state_reason: null };
+    if (meta.role === "tracking" && meta.trackingState === "closed") {
+      body.labels = this.trackingLabelsFor(
+        meta.labels,
+        meta.kind,
+        REOPEN_TRACKING_STATE,
+      );
+    }
+    return this.apiWithInput("PATCH", `repos/${this.repo}/issues/${number}`, body, (rec2) => {
+      const state = normalizeIssueState(rec2.state);
       if (state !== "open") {
         return this.fail("issue reopen reply is not open", 0);
       }
-      return { ok: true, payload: { number, state: "open" } };
+      return { ok: true, payload: { number, state: "open", before } };
     });
   }
 
@@ -542,10 +653,10 @@ export class CliRunner implements GhRunner {
     });
   }
 
-  /** `gh pr view --json` を使う読み取り（pr_read / pr_mergeable）。 */
+  /** `gh pr view --json` を使う読み取り（pr_read / pr_mergeable）。mergeable は時間変動値のため単一読取の正規化結果を返す。 */
   private prView(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
-    if (number === null) return this.fail("pr view requires number", 0);
+    if (number === null) return this.fail("pr view requires number", 0, "invalid-input");
     const r = this.runGh([
       "pr",
       "view",
@@ -553,7 +664,7 @@ export class CliRunner implements GhRunner {
       "--repo",
       this.repo,
       "--json",
-      "number,title,state,mergeable",
+      "number,title,body,state,mergeable",
     ]);
     if (!r.ok) return r;
     if (!isRecord(r.payload)) {
@@ -561,17 +672,34 @@ export class CliRunner implements GhRunner {
     }
     const rec = r.payload;
     const title = str(rec.title);
+    const body = str(rec.body) ?? "";
     const state = normalizePrState(rec.state);
     const mergeable = str(rec.mergeable);
     if (title === null || state === null || mergeable === null) {
       return this.fail("pr view reply missing title/state/mergeable", 0);
     }
-    return { ok: true, payload: { number, title, state, mergeable } };
+    return { ok: true, payload: { number, title, body, state, mergeable } };
+  }
+
+  private prUpdate(args: Record<string, unknown>): GhRunnerReply {
+    const number = this.requireNumber(args);
+    if (number === null) return this.fail("pr_update requires number", 0, "invalid-input");
+    // 指定された項目のみを PATCH へ投入し、未指定項目は GitHub 側で保持させる。
+    const body: Record<string, unknown> = {};
+    if (args.title !== undefined && args.title !== null) body.title = args.title;
+    if (args.body !== undefined && args.body !== null) body.body = args.body;
+    return this.apiWithInput("PATCH", `repos/${this.repo}/pulls/${number}`, body, (rec) => {
+      const url = str(rec.html_url);
+      if (url === null) {
+        return this.fail("pr update reply missing html_url", 0);
+      }
+      return { ok: true, payload: { number, url } };
+    });
   }
 
   private prChangedFiles(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
-    if (number === null) return this.fail("pr_changed_files requires number", 0);
+    if (number === null) return this.fail("pr_changed_files requires number", 0, "invalid-input");
     const r = this.runGh([
       "pr",
       "view",
@@ -601,7 +729,7 @@ export class CliRunner implements GhRunner {
 
   private prMerge(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
-    if (number === null) return this.fail("pr_merge requires number", 0);
+    if (number === null) return this.fail("pr_merge requires number", 0, "invalid-input");
     const method = str(args.method) ?? "merge";
     return this.apiWithInput(
       "PUT",
@@ -614,6 +742,159 @@ export class CliRunner implements GhRunner {
         return { ok: true, payload: { number, merged: true } };
       },
     );
+  }
+
+  // ---------------------------------------------------------------------
+  // Comment 系（Issue と Pull Request の会話コメントの共通論理リソース。
+  // commentId は GitHub の数値コメント id を文字列化した公開識別子）
+  // ---------------------------------------------------------------------
+
+  private commentIdArg(args: Record<string, unknown>): number | null {
+    const s = str(args.commentId);
+    if (s === null || !/^\d+$/.test(s)) return null;
+    const n = Number.parseInt(s, 10);
+    return Number.isSafeInteger(n) && n > 0 ? n : null;
+  }
+
+  /** コメント応答の issue_url（…/issues/{N}）から親 Issue/PR 番号を導出する。 */
+  private parentNumberFromUrl(v: unknown): number | null {
+    const s = str(v);
+    if (s === null) return null;
+    const m = /\/issues\/(\d+)$/.exec(s);
+    if (m === null) return null;
+    const n = Number.parseInt(m[1] ?? "", 10);
+    return Number.isSafeInteger(n) && n > 0 ? n : null;
+  }
+
+  private commentCreate(args: Record<string, unknown>): GhRunnerReply {
+    const number = this.requireNumber(args);
+    if (number === null) {
+      return this.fail("comment_create requires number", 0, "invalid-input");
+    }
+    const body = str(args.body);
+    if (body === null || body.length === 0) {
+      return this.fail("comment_create requires a non-empty body", 0, "invalid-input");
+    }
+    return this.apiWithInput(
+      "POST",
+      `repos/${this.repo}/issues/${number}/comments`,
+      { body },
+      (rec) => {
+        const id = rec.id;
+        const url = str(rec.html_url);
+        if (typeof id !== "number" || url === null) {
+          return this.fail("comment create reply missing id/html_url", 0);
+        }
+        return { ok: true, payload: { commentId: String(id), url } };
+      },
+    );
+  }
+
+  private commentList(args: Record<string, unknown>): GhRunnerReply {
+    const number = this.requireNumber(args);
+    if (number === null) {
+      return this.fail("comment_list requires number", 0, "invalid-input");
+    }
+    // 完全一覧: 必要なページをすべて取得する。安全上限到達時は不完全な一覧を
+    // 成功結果として返さず、再試行可能な失敗とする。
+    const collected: Record<string, unknown>[] = [];
+    for (let page = 1; page <= LIST_MAX_PAGES; page++) {
+      const r = this.apiGetAny(
+        `repos/${this.repo}/issues/${number}/comments?per_page=${LIST_PER_PAGE}&page=${page}`,
+        (payload) => {
+          if (!Array.isArray(payload)) {
+            return this.fail("comments reply is not an array", 0);
+          }
+          return { ok: true, payload };
+        },
+      );
+      if (!r.ok) return r;
+      const list = r.payload as unknown[];
+      for (const entry of list) {
+        if (!isRecord(entry)) return this.fail("comment entry is not an object", 0);
+        collected.push(entry);
+      }
+      if (list.length < LIST_PER_PAGE) break;
+      if (page === LIST_MAX_PAGES) {
+        return this.fail(
+          `comment_list reached the safety page limit (${LIST_MAX_PAGES} pages of ${LIST_PER_PAGE}); retry with a narrower target`,
+          0,
+          "operation-failed",
+        );
+      }
+    }
+    const comments: Record<string, unknown>[] = [];
+    for (const entry of collected) {
+      const id = entry.id;
+      const body = str(entry.body);
+      if (typeof id !== "number" || body === null) {
+        return this.fail("comment reply missing id/body", 0);
+      }
+      comments.push({
+        commentId: String(id),
+        body,
+        createdAt: str(entry.created_at),
+        updatedAt: str(entry.updated_at),
+        url: str(entry.html_url),
+      });
+    }
+    return { ok: true, payload: { number, comments } };
+  }
+
+  private commentUpdate(args: Record<string, unknown>): GhRunnerReply {
+    const id = this.commentIdArg(args);
+    if (id === null) {
+      return this.fail("comment_update requires a numeric commentId", 0, "invalid-input");
+    }
+    const body = str(args.body);
+    if (body === null || body.length === 0) {
+      return this.fail("comment_update requires a non-empty body", 0, "invalid-input");
+    }
+    return this.apiWithInput(
+      "PATCH",
+      `repos/${this.repo}/issues/comments/${id}`,
+      { body },
+      (rec) => {
+        const url = str(rec.html_url);
+        const number = this.parentNumberFromUrl(rec.issue_url);
+        if (url === null || number === null) {
+          return this.fail("comment update reply missing html_url/issue_url", 0);
+        }
+        return { ok: true, payload: { commentId: String(id), url, number } };
+      },
+    );
+  }
+
+  private commentDelete(args: Record<string, unknown>): GhRunnerReply {
+    const id = this.commentIdArg(args);
+    if (id === null) {
+      return this.fail("comment_delete requires a numeric commentId", 0, "invalid-input");
+    }
+    // 削除応答は 204（本文なし）のため、VERIFY の対象特定（親 Issue 番号）を
+    // 先行 GET で確保してから削除する。対象不在はこの時点で operation-failed。
+    const current = this.apiGet(`repos/${this.repo}/issues/comments/${id}`, (rec) => ({
+      ok: true as const,
+      payload: rec,
+    }));
+    if (!current.ok) return current;
+    const rec = current.payload as Record<string, unknown>;
+    const number = this.parentNumberFromUrl(rec.issue_url);
+    if (number === null) {
+      return this.fail("comment reply missing issue_url", 0);
+    }
+    const r = this.exec("gh", ["api", "-X", "DELETE", `repos/${this.repo}/issues/comments/${id}`]);
+    if (r.status === null) {
+      return this.fail("failed to start gh (is gh installed and on PATH?)", null, "enforcement-crashed");
+    }
+    if (r.status !== 0) {
+      const message = r.stderr.trim().length > 0 ? r.stderr.trim() : r.stdout.trim();
+      return this.fail(
+        message.length > 0 ? message : `gh exited with ${r.status}`,
+        r.status,
+        "operation-failed",
+      );
+    }
+    return { ok: true, payload: { commentId: String(id), number } };
   }
 }
 

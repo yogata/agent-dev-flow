@@ -1,3 +1,4 @@
+// ADF-COVERS(implementation): REQ-011-022, REQ-011-030
 // agentdev-gh Custom Tool の操作契約（種別契約 REQ、決定4・6）。
 //
 // 本ファイルは Design `docs/designs/responsibilities/custom-tool-contracts.md`
@@ -34,20 +35,36 @@ export function prNumber(n: number): PrNumber {
   return n as PrNumber;
 }
 
-/** 操作名（初期セット + 追跡Issue操作。Design「対象操作の境界」が所有）。 */
+/**
+ * 操作名。Design「対象操作の境界（初期セット）」が所有する16操作
+ * （基本操作10: issue_create、issue_read、issue_update、issue_close、pr_create、
+ * pr_read、pr_merge、pr_changed_files、pr_mergeable、pr_update、
+ * 追跡Issue操作2: issue_list、issue_reopen、
+ * Comment 操作4: comment_create、comment_list、comment_update、comment_delete）
+ * に移行完了まで温存する deprecated な issue_comment を加えた並び。
+ * Comment は Issue と Pull Request の会話コメントを同一の論理リソースとして扱い、
+ * commentId（公開型は文字列）で対象識別する。
+ */
 export const GH_TOOL_OPERATIONS = [
   "issue_create",
   "issue_read",
   "issue_update",
-  "issue_comment",
   "issue_close",
-  "issue_list",
-  "issue_reopen",
   "pr_create",
   "pr_read",
   "pr_merge",
   "pr_changed_files",
   "pr_mergeable",
+  "pr_update",
+  "issue_list",
+  "issue_reopen",
+  "comment_create",
+  "comment_list",
+  "comment_update",
+  "comment_delete",
+  // 廃止予定（deprecated）: body あり＝追加 / body なし＝読取の二重モード操作。
+  // 呼出元の Comment 操作への移行（#2689）完了まで温存する。
+  "issue_comment",
 ] as const;
 
 export type GhToolOperation = (typeof GH_TOOL_OPERATIONS)[number];
@@ -99,15 +116,20 @@ export const GH_TOOL_OPERATION_CATALOG: readonly OperationCatalogEntry[] = [
   sideEffect("issue_create"),
   readOnly("issue_read"),
   sideEffect("issue_update"),
-  sideEffect("issue_comment"),
   sideEffect("issue_close"),
-  readOnly("issue_list"),
-  sideEffect("issue_reopen"),
   sideEffect("pr_create"),
   readOnly("pr_read"),
   sideEffect("pr_merge"),
   readOnly("pr_changed_files"),
   readOnly("pr_mergeable"),
+  sideEffect("pr_update"),
+  readOnly("issue_list"),
+  sideEffect("issue_reopen"),
+  sideEffect("comment_create"),
+  readOnly("comment_list"),
+  sideEffect("comment_update"),
+  sideEffect("comment_delete"),
+  sideEffect("issue_comment"),
 ];
 
 /** fail-closed 4異常系と運用上の失敗種別。 */
@@ -194,7 +216,26 @@ export type GhToolRequest =
       readonly method: "merge" | "squash" | "rebase";
     }
   | { readonly operation: "pr_changed_files"; readonly number: PrNumber }
-  | { readonly operation: "pr_mergeable"; readonly number: PrNumber };
+  | { readonly operation: "pr_mergeable"; readonly number: PrNumber }
+  | {
+      /** title と body の項目単位部分更新。指定していない項目は保持する。 */
+      readonly operation: "pr_update";
+      readonly number: PrNumber;
+      readonly title?: string;
+      readonly body?: string;
+    }
+  | {
+      readonly operation: "comment_create";
+      readonly number: IssueNumber;
+      readonly body: string;
+    }
+  | { readonly operation: "comment_list"; readonly number: IssueNumber }
+  | {
+      readonly operation: "comment_update";
+      readonly commentId: string;
+      readonly body: string;
+    }
+  | { readonly operation: "comment_delete"; readonly commentId: string };
 
 /** 操作成功（出力）。構造化結果（番号、URL 等）のみを公開する。 */
 export type GhToolSuccess =
@@ -256,6 +297,7 @@ export type GhToolSuccess =
       readonly operation: "pr_read";
       readonly number: PrNumber;
       readonly title: string;
+      readonly body: string;
       readonly state: "open" | "closed" | "merged";
       readonly mergeable: "MERGEABLE" | "CONFLICTING" | "UNKNOWN";
     }
@@ -273,12 +315,48 @@ export type GhToolSuccess =
       readonly operation: "pr_mergeable";
       readonly number: PrNumber;
       readonly mergeable: "MERGEABLE" | "CONFLICTING" | "UNKNOWN";
+    }
+  | {
+      readonly operation: "pr_update";
+      readonly number: PrNumber;
+      readonly url: string;
+    }
+  | {
+      readonly operation: "comment_create";
+      readonly commentId: string;
+      readonly url: string;
+    }
+  | {
+      readonly operation: "comment_list";
+      readonly number: IssueNumber;
+      readonly comments: readonly CommentSummary[];
+    }
+  | {
+      readonly operation: "comment_update";
+      readonly commentId: string;
+      readonly url: string;
+    }
+  | {
+      readonly operation: "comment_delete";
+      readonly commentId: string;
     };
 
-/** issue_comment 読取モードの応答（コメントの時系列）。 */
+/** issue_comment 読取モードの応答（コメントの時系列）。deprecated 操作の温存型。 */
 export interface IssueCommentSummary {
   readonly body: string;
   readonly createdAt: string | null;
+  readonly url: string | null;
+}
+
+/**
+ * comment_list の要素。commentId は Comment 論理リソースの識別子で、公開型は
+ * 文字列とする（GitHub 実装は数値コメント id を文字列化する）。
+ */
+export interface CommentSummary {
+  readonly commentId: string;
+  readonly body: string;
+  readonly createdAt: string | null;
+  readonly updatedAt: string | null;
   readonly url: string | null;
 }
 

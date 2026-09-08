@@ -15,7 +15,7 @@ import {
 } from "./contracts.ts";
 import type { GhToolEnv, OperationSpec } from "./engine.ts";
 import { executeOperation } from "./engine.ts";
-import { ISSUE_OPERATION_SPECS } from "./specs-issue.ts";
+import { ISSUE_OPERATION_SPECS, COMMENT_OPERATION_SPECS } from "./specs-issue.ts";
 import { PR_OPERATION_SPECS } from "./specs-pr.ts";
 
 /** Tool の公開名。命名は Design の所有事項（仮確定、Design確定候補参照）。 */
@@ -47,6 +47,7 @@ export const AGENTDEV_GH_PUBLIC_CONTRACTS: readonly OperationPublicContract[] =
 export const AGENTDEV_GH_OPERATION_SPECS: readonly OperationSpec[] = [
   ...ISSUE_OPERATION_SPECS,
   ...PR_OPERATION_SPECS,
+  ...COMMENT_OPERATION_SPECS,
 ];
 
 const SPECS_BY_OPERATION: ReadonlyMap<string, OperationSpec> = new Map(

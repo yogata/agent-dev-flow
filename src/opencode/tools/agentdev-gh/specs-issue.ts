@@ -1,20 +1,23 @@
-// Issue 系操作（5 操作）のスペック実装。
+// ADF-COVERS(implementation): REQ-011-022, REQ-011-025, REQ-011-026
+// Issue 系・Comment 系操作のスペック実装。
 //
 // 各スペックは操作ごとの差分（入力検証、runner 要求の組立て、応答解釈、
 // 読み戻し照合）のみを所有する。fail-closed の制御順序は engine.ts が所有する。
 // runner への要求・応答の接合形状（payload フィールド）は本ファイルと
-// runner 実装（GitHub I/O 移管の後続 Issue）間の契約である。
+// runner 実装間の契約である。issue_update / issue_reopen の応答 payload は
+// 実行前状態（before）を運び、VERIFY の追跡軸保持照合の基準とする。
 
 
 import {
   issueNumber,
+  type CommentSummary,
   type GhToolRequest,
   type GhToolSuccess,
   type IssueCommentSummary,
   type IssueListItem,
 } from "./contracts.ts";
 import type { GhRunner, GhRunnerRequest } from "./runner.ts";
-import type { OperationSpec } from "./engine.ts";
+import type { InputContractError, OperationSpec, ValidateOutcome } from "./engine.ts";
 import {
   deriveKind,
   deriveRole,
@@ -28,6 +31,7 @@ import {
   type TrackingKind,
   type TrackingState,
 } from "./tracking-schema.ts";
+import { REOPEN_TRACKING_STATE } from "./tracking-schema.ts";
 
 function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === "object" && v !== null;
@@ -60,6 +64,55 @@ function parseState(v: unknown): TrackingState | null {
 
 function parseCloseReason(v: unknown): CloseReason | null {
   return v === "completed" || v === "not_planned" ? v : null;
+}
+
+// ---------------------------------------------------------------------------
+// 操作単位の入力定義（Design「入力契約」）。契約外フィールドと必須欠落を
+// 構造化エラーとして特定可能にする。
+// ---------------------------------------------------------------------------
+
+function invalidOutcome(error: InputContractError): ValidateOutcome {
+  return { ok: false, error };
+}
+
+function unknownFieldOutcome(
+  operation: string,
+  field: string,
+): ValidateOutcome {
+  return invalidOutcome({
+    code: "unknown-field",
+    field,
+    detail: `field '${field}' is not part of the ${operation} input contract`,
+  });
+}
+
+function missingFieldOutcome(
+  operation: string,
+  field: string,
+): ValidateOutcome {
+  return invalidOutcome({
+    code: "missing-field",
+    field,
+    detail: `required field '${field}' is missing for ${operation}`,
+  });
+}
+
+function invalidFieldOutcome(
+  field: string,
+  detail: string,
+): ValidateOutcome {
+  return invalidOutcome({ code: "invalid-field", field, detail });
+}
+
+/** 要求が操作の入力定義（許容フィールド一覧）に反していないか検査する。 */
+function checkUnknownFields(
+  raw: Record<string, unknown>,
+  allowed: readonly string[],
+): ValidateOutcome | null {
+  for (const key of Object.keys(raw)) {
+    if (!allowed.includes(key)) return unknownFieldOutcome(String(raw.operation), key);
+  }
+  return null;
 }
 
 /** issue_read / issue_list 共通の追跡Issueメタデータ導出（応答の自己整合の部品）。 */
@@ -98,6 +151,21 @@ function parseTrackingMeta(rec: Record<string, unknown>): {
   };
 }
 
+/** 実行応答 payload 内の実行前状態（before）。issue_update / issue_reopen の照合基準。 */
+function beforeMeta(payload: unknown): {
+  role: IssueRole;
+  kind: TrackingKind | null;
+  trackingState: TrackingState | null;
+  labels: string[];
+} | null {
+  if (!isRecord(payload) || !isRecord(payload.before)) return null;
+  const meta = parseTrackingMeta(payload.before);
+  if (meta === null) return null;
+  const labels = stringArray(payload.before.labels);
+  if (labels === null) return null;
+  return { ...meta, labels };
+}
+
 // 出力 URL: GitHub 実装は https URL、Local 実装（Case ファイル）は絶対パスを識別子として返す（REQ-{NNNN}-{NNN}）。
 function isAcceptedUrl(v: string): boolean {
   return /^https:\/\//.test(v) || v.startsWith("/") || /^[A-Za-z]:[\\/]/.test(v);
@@ -117,50 +185,66 @@ async function readIssue(
   return reply.payload;
 }
 
-function validateIssueBase(
-  raw: unknown,
-  requiredKeys: readonly string[],
-): Record<string, unknown> | null {
-  if (!isRecord(raw) || raw.operation === undefined) return null;
-  for (const key of requiredKeys) {
-    const value = raw[key];
-    if (typeof value !== "string" || value.length === 0) return null;
-  }
-  return raw;
-}
-
 // ---------------------------------------------------------------------------
 // issue_create
 // ---------------------------------------------------------------------------
 
 const issueCreateSpec: OperationSpec = {
   operation: "issue_create",
-  validate(raw): GhToolRequest | null {
-    const rec = validateIssueBase(raw, ["title", "body"]);
-    if (rec === null) return null;
-    const title = str(rec.title);
-    const body = str(rec.body);
-    if (title === null || body === null) return null;
-    if (!Array.isArray(rec.labels)) return null;
-    if (!rec.labels.every((l) => typeof l === "string")) return null;
-    const request: GhToolRequest = {
-      operation: "issue_create",
-      title,
-      body,
-      labels: rec.labels,
-    };
-    if (rec.role !== undefined) {
-      const role = parseRole(rec.role);
-      if (role === null) return null;
-      if (role !== "tracking" && rec.kind !== undefined) return null;
-      (request as { role?: "tracking" | "case" }).role = role;
+  validate(raw): ValidateOutcome {
+    if (!isRecord(raw)) return missingFieldOutcome("issue_create", "operation");
+    const unknown = checkUnknownFields(raw, [
+      "operation",
+      "title",
+      "body",
+      "labels",
+      "role",
+      "kind",
+    ]);
+    if (unknown !== null) return unknown;
+    const title = str(raw.title);
+    if (raw.title === undefined) return missingFieldOutcome("issue_create", "title");
+    if (title === null || title.length === 0) {
+      return invalidFieldOutcome("title", "title must be a non-empty string");
     }
-    if (rec.kind !== undefined) {
-      const kind = parseKind(rec.kind);
-      if (kind === null) return null;
-      (request as { kind?: TrackingKind }).kind = kind;
+    if (raw.body === undefined) return missingFieldOutcome("issue_create", "body");
+    const body = str(raw.body);
+    if (body === null || body.length === 0) {
+      return invalidFieldOutcome("body", "body must be a non-empty string");
     }
-    return request;
+    if (raw.labels === undefined) return missingFieldOutcome("issue_create", "labels");
+    if (!Array.isArray(raw.labels)) {
+      return invalidFieldOutcome("labels", "labels must be an array of strings");
+    }
+    if (!raw.labels.every((l) => typeof l === "string")) {
+      return invalidFieldOutcome("labels", "labels must be an array of strings");
+    }
+    const request: {
+      operation: "issue_create";
+      title: string;
+      body: string;
+      labels: string[];
+      role?: "tracking" | "case";
+      kind?: TrackingKind;
+    } = { operation: "issue_create", title, body, labels: raw.labels };
+    if (raw.role !== undefined) {
+      const role = parseRole(raw.role);
+      if (role === null) {
+        return invalidFieldOutcome("role", "role must be 'tracking' or 'case'");
+      }
+      request.role = role;
+    }
+    if (raw.kind !== undefined) {
+      if (request.role !== "tracking") {
+        return invalidFieldOutcome("kind", "kind requires role 'tracking'");
+      }
+      const kind = parseKind(raw.kind);
+      if (kind === null) {
+        return invalidFieldOutcome("kind", "kind must be problem, idea, task, or risk");
+      }
+      request.kind = kind;
+    }
+    return { ok: true, request };
   },
   buildRequest(request): GhRunnerRequest {
     const r = request as Extract<GhToolRequest, { operation: "issue_create" }>;
@@ -228,11 +312,16 @@ function parseIssueRead(payload: unknown, number: number): GhToolSuccess | null 
 
 const issueReadSpec: OperationSpec = {
   operation: "issue_read",
-  validate(raw): GhToolRequest | null {
-    if (!isRecord(raw)) return null;
+  validate(raw): ValidateOutcome {
+    if (!isRecord(raw)) return missingFieldOutcome("issue_read", "operation");
+    const unknown = checkUnknownFields(raw, ["operation", "number"]);
+    if (unknown !== null) return unknown;
+    if (raw.number === undefined) return missingFieldOutcome("issue_read", "number");
     const number = positiveInt(raw.number);
-    if (number === null) return null;
-    return { operation: "issue_read", number: issueNumber(number) };
+    if (number === null) {
+      return invalidFieldOutcome("number", "number must be a positive integer");
+    }
+    return { ok: true, request: { operation: "issue_read", number: issueNumber(number) } };
   },
   buildRequest(request): GhRunnerRequest {
     const r = request as Extract<GhToolRequest, { operation: "issue_read" }>;
@@ -262,21 +351,63 @@ const issueReadSpec: OperationSpec = {
 
 const issueUpdateSpec: OperationSpec = {
   operation: "issue_update",
-  validate(raw): GhToolRequest | null {
-    if (!isRecord(raw)) return null;
+  validate(raw): ValidateOutcome {
+    if (!isRecord(raw)) return missingFieldOutcome("issue_update", "operation");
+    const unknown = checkUnknownFields(raw, [
+      "operation",
+      "number",
+      "title",
+      "body",
+      "labels",
+      "kind",
+      "trackingState",
+    ]);
+    if (unknown !== null) return unknown;
+    if (raw.number === undefined) return missingFieldOutcome("issue_update", "number");
     const number = positiveInt(raw.number);
-    if (number === null) return null;
-    const title = str(raw.title);
-    const body = str(raw.body);
-    if (title === "" || body === "") return null;
+    if (number === null) {
+      return invalidFieldOutcome("number", "number must be a positive integer");
+    }
+    const title = raw.title === undefined ? null : str(raw.title);
+    if (raw.title !== undefined && (title === null || title.length === 0)) {
+      return invalidFieldOutcome("title", "title must be a non-empty string when present");
+    }
+    const body = raw.body === undefined ? null : str(raw.body);
+    if (raw.body !== undefined && (body === null || body.length === 0)) {
+      return invalidFieldOutcome("body", "body must be a non-empty string when present");
+    }
     const labels = raw.labels === undefined ? null : stringArray(raw.labels);
-    if (raw.labels !== undefined && labels === null) return null;
+    if (raw.labels !== undefined && labels === null) {
+      return invalidFieldOutcome("labels", "labels must be an array of strings");
+    }
     const kind = raw.kind === undefined ? null : parseKind(raw.kind);
-    if (raw.kind !== undefined && kind === null) return null;
+    if (raw.kind !== undefined && kind === null) {
+      return invalidFieldOutcome("kind", "kind must be problem, idea, task, or risk");
+    }
     const trackingState =
       raw.trackingState === undefined ? null : parseState(raw.trackingState);
-    if (raw.trackingState !== undefined && trackingState === null) return null;
-    if (trackingState === "closed") return null;
+    if (raw.trackingState !== undefined && trackingState === null) {
+      return invalidFieldOutcome(
+        "trackingState",
+        "trackingState must be a tracking state value",
+      );
+    }
+    if (trackingState === "closed") {
+      return invalidFieldOutcome(
+        "trackingState",
+        "issue_update accepts non-terminal tracking states only (use issue_close)",
+      );
+    }
+    if (
+      title === null && body === null && labels === null &&
+      kind === null && trackingState === null
+    ) {
+      return invalidOutcome({
+        code: "empty-update",
+        field: "title",
+        detail: "specify at least one of title, body, labels, kind, trackingState",
+      });
+    }
     const request = {
       operation: "issue_update",
       number: issueNumber(number),
@@ -294,13 +425,7 @@ const issueUpdateSpec: OperationSpec = {
     if (labels !== null) request.labels = labels;
     if (kind !== null) request.kind = kind;
     if (trackingState !== null) request.trackingState = trackingState;
-    if (
-      title === null && body === null && labels === null &&
-      kind === null && trackingState === null
-    ) {
-      return null;
-    }
-    return request;
+    return { ok: true, request };
   },
   buildRequest(request): GhRunnerRequest {
     const r = request as Extract<GhToolRequest, { operation: "issue_update" }>;
@@ -323,28 +448,30 @@ const issueUpdateSpec: OperationSpec = {
     if (number === null || url === null || !isAcceptedUrl(url)) return null;
     return { operation: "issue_update", number: issueNumber(number), url };
   },
-  async verify(runner, request, _success) {
+  async verify(runner, request, _success, payload) {
     const req = request as Extract<GhToolRequest, { operation: "issue_update" }>;
     const issue = await readIssue(runner, req.number);
     if (issue === null) return false;
     if (req.title !== undefined && str(issue.title) !== req.title) return false;
     if (req.body !== undefined && str(issue.body) !== req.body) return false;
-    if (req.kind !== undefined || req.trackingState !== undefined) {
-      if (parseRole(issue.role) !== "tracking") return false;
-      if (req.kind !== undefined && parseKind(issue.kind) !== req.kind) return false;
-      if (
-        req.trackingState !== undefined &&
-        parseState(issue.trackingState) !== req.trackingState
-      ) {
-        return false;
-      }
-    }
+    // 部分更新不変条件: 要求対象外の追跡軸（role、kind、trackingState）の維持を
+    // 実行前状態（before）と完全一致で照合する。通常ラベルは要求包含のみ確認し、
+    // 確認時点での第三者による追加を不変条件違反として失敗扱いにしない。
+    const before = beforeMeta(payload);
+    if (before === null) return false;
+    const after = parseTrackingMeta(issue);
+    if (after === null) return false;
+    if (after.role !== before.role) return false;
+    const expectedKind = req.kind !== undefined ? req.kind : before.kind;
+    if (after.kind !== expectedKind) return false;
+    const expectedState =
+      req.trackingState !== undefined ? req.trackingState : before.trackingState;
+    if (after.trackingState !== expectedState) return false;
     if (req.labels !== undefined) {
       const current = stringArray(issue.labels);
       if (current === null) return false;
-      const kept = stripTrackingLabels(current).sort().join("\n");
-      const wanted = [...req.labels].sort().join("\n");
-      if (kept !== wanted) return false;
+      const kept = stripTrackingLabels(current);
+      if (!req.labels.every((l) => kept.includes(l))) return false;
     }
     return true;
   },
@@ -370,17 +497,23 @@ function parseCommentList(raw: unknown): IssueCommentSummary[] | null {
 
 const issueCommentSpec: OperationSpec = {
   operation: "issue_comment",
-  validate(raw): GhToolRequest | null {
-    const rec = validateIssueBase(raw, []);
-    if (rec === null) return null;
-    const number = positiveInt(rec.number);
-    if (number === null) return null;
-    if (rec.body === undefined) {
-      return { operation: "issue_comment", number: issueNumber(number) };
+  validate(raw): ValidateOutcome {
+    if (!isRecord(raw)) return missingFieldOutcome("issue_comment", "operation");
+    const unknown = checkUnknownFields(raw, ["operation", "number", "body"]);
+    if (unknown !== null) return unknown;
+    if (raw.number === undefined) return missingFieldOutcome("issue_comment", "number");
+    const number = positiveInt(raw.number);
+    if (number === null) {
+      return invalidFieldOutcome("number", "number must be a positive integer");
     }
-    const body = str(rec.body);
-    if (body === null || body.length === 0) return null;
-    return { operation: "issue_comment", number: issueNumber(number), body };
+    if (raw.body === undefined) {
+      return { ok: true, request: { operation: "issue_comment", number: issueNumber(number) } };
+    }
+    const body = str(raw.body);
+    if (body === null || body.length === 0) {
+      return invalidFieldOutcome("body", "body must be a non-empty string when present");
+    }
+    return { ok: true, request: { operation: "issue_comment", number: issueNumber(number), body } };
   },
   buildRequest(request): GhRunnerRequest {
     const r = request as Extract<GhToolRequest, { operation: "issue_comment" }>;
@@ -423,14 +556,23 @@ const issueCommentSpec: OperationSpec = {
 
 const issueCloseSpec: OperationSpec = {
   operation: "issue_close",
-  validate(raw): GhToolRequest | null {
-    if (!isRecord(raw)) return null;
+  validate(raw): ValidateOutcome {
+    if (!isRecord(raw)) return missingFieldOutcome("issue_close", "operation");
+    const unknown = checkUnknownFields(raw, ["operation", "number", "reason"]);
+    if (unknown !== null) return unknown;
+    if (raw.number === undefined) return missingFieldOutcome("issue_close", "number");
     const number = positiveInt(raw.number);
-    if (number === null) return null;
-    const reason = str(raw.reason);
-    if (reason === null) return { operation: "issue_close", number: issueNumber(number) };
-    if (reason !== "completed" && reason !== "not_planned") return null;
-    return { operation: "issue_close", number: issueNumber(number), reason };
+    if (number === null) {
+      return invalidFieldOutcome("number", "number must be a positive integer");
+    }
+    if (raw.reason === undefined) {
+      return { ok: true, request: { operation: "issue_close", number: issueNumber(number) } };
+    }
+    const reason = parseCloseReason(raw.reason);
+    if (reason === null) {
+      return invalidFieldOutcome("reason", "reason must be 'completed' or 'not_planned'");
+    }
+    return { ok: true, request: { operation: "issue_close", number: issueNumber(number), reason } };
   },
   buildRequest(request): GhRunnerRequest {
     const r = request as Extract<GhToolRequest, { operation: "issue_close" }>;
@@ -456,8 +598,18 @@ const issueCloseSpec: OperationSpec = {
 
 const issueListSpec: OperationSpec = {
   operation: "issue_list",
-  validate(raw): GhToolRequest | null {
-    if (!isRecord(raw)) return null;
+  validate(raw): ValidateOutcome {
+    if (!isRecord(raw)) return missingFieldOutcome("issue_list", "operation");
+    const unknown = checkUnknownFields(raw, [
+      "operation",
+      "role",
+      "kind",
+      "state",
+      "trackingState",
+      "labels",
+      "search",
+    ]);
+    if (unknown !== null) return unknown;
     const request = { operation: "issue_list" } as {
       operation: "issue_list";
       role?: IssueRole;
@@ -469,34 +621,49 @@ const issueListSpec: OperationSpec = {
     };
     if (raw.role !== undefined) {
       const role = parseRole(raw.role);
-      if (role === null) return null;
+      if (role === null) {
+        return invalidFieldOutcome("role", "role must be 'tracking' or 'case'");
+      }
       request.role = role;
     }
     if (raw.kind !== undefined) {
       const kind = parseKind(raw.kind);
-      if (kind === null) return null;
+      if (kind === null) {
+        return invalidFieldOutcome("kind", "kind must be problem, idea, task, or risk");
+      }
       request.kind = kind;
     }
     if (raw.state !== undefined) {
-      if (raw.state !== "open" && raw.state !== "closed") return null;
+      if (raw.state !== "open" && raw.state !== "closed") {
+        return invalidFieldOutcome("state", "state must be 'open' or 'closed'");
+      }
       request.state = raw.state;
     }
     if (raw.trackingState !== undefined) {
       const trackingState = parseState(raw.trackingState);
-      if (trackingState === null) return null;
+      if (trackingState === null) {
+        return invalidFieldOutcome(
+          "trackingState",
+          "trackingState must be a tracking state value",
+        );
+      }
       request.trackingState = trackingState;
     }
     if (raw.labels !== undefined) {
       const labels = stringArray(raw.labels);
-      if (labels === null) return null;
+      if (labels === null) {
+        return invalidFieldOutcome("labels", "labels must be an array of strings");
+      }
       request.labels = labels;
     }
     if (raw.search !== undefined) {
       const search = str(raw.search);
-      if (search === null || search.length === 0) return null;
+      if (search === null || search.length === 0) {
+        return invalidFieldOutcome("search", "search must be a non-empty string");
+      }
       request.search = search;
     }
-    return request;
+    return { ok: true, request };
   },
   buildRequest(request): GhRunnerRequest {
     const r = request as Extract<GhToolRequest, { operation: "issue_list" }>;
@@ -554,11 +721,16 @@ const issueListSpec: OperationSpec = {
 
 const issueReopenSpec: OperationSpec = {
   operation: "issue_reopen",
-  validate(raw): GhToolRequest | null {
-    if (!isRecord(raw)) return null;
+  validate(raw): ValidateOutcome {
+    if (!isRecord(raw)) return missingFieldOutcome("issue_reopen", "operation");
+    const unknown = checkUnknownFields(raw, ["operation", "number"]);
+    if (unknown !== null) return unknown;
+    if (raw.number === undefined) return missingFieldOutcome("issue_reopen", "number");
     const number = positiveInt(raw.number);
-    if (number === null) return null;
-    return { operation: "issue_reopen", number: issueNumber(number) };
+    if (number === null) {
+      return invalidFieldOutcome("number", "number must be a positive integer");
+    }
+    return { ok: true, request: { operation: "issue_reopen", number: issueNumber(number) } };
   },
   buildRequest(request): GhRunnerRequest {
     const r = request as Extract<GhToolRequest, { operation: "issue_reopen" }>;
@@ -571,10 +743,225 @@ const issueReopenSpec: OperationSpec = {
     if (str(payload.state) !== "open") return null;
     return { operation: "issue_reopen", number: issueNumber(number), state: "open" };
   },
-  async verify(runner, _request, success) {
+  async verify(runner, _request, success, payload) {
     const reopened = success as Extract<GhToolSuccess, { operation: "issue_reopen" }>;
     const issue = await readIssue(runner, reopened.number);
-    return issue !== null && str(issue.state) === "open";
+    if (issue === null) return false;
+    if (str(issue.state) !== "open") return false;
+    // 再オープン遷移: クローズ済み追跡Issueは in-discussion へ遷移し、kind と
+    // 通常ラベルを保持する。Case Issue には追跡状態遷移を適用しない。
+    // open 済み追跡Issueへの再実行は現状維持のまま冪等に成功する。
+    const before = beforeMeta(payload);
+    if (before === null) return false;
+    const after = parseTrackingMeta(issue);
+    if (after === null) return false;
+    if (after.role !== before.role) return false;
+    if (before.role !== "tracking") return true;
+    const expected =
+      before.trackingState === "closed" ? REOPEN_TRACKING_STATE : before.trackingState;
+    if (after.trackingState !== expected) return false;
+    if (after.kind !== before.kind) return false;
+    const afterLabels = stringArray(issue.labels);
+    if (afterLabels === null) return false;
+    const beforeNormal = stripTrackingLabels(before.labels);
+    const afterNormal = stripTrackingLabels(afterLabels);
+    if (!beforeNormal.every((l) => afterNormal.includes(l))) return false;
+    return true;
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Comment 系（Comment は Issue と Pull Request の会話コメントの共通論理リソース）
+// ---------------------------------------------------------------------------
+
+function parseCommentSummaries(raw: unknown): CommentSummary[] | null {
+  if (!Array.isArray(raw)) return null;
+  const comments: CommentSummary[] = [];
+  for (const entry of raw) {
+    if (!isRecord(entry)) return null;
+    const commentId = str(entry.commentId);
+    if (commentId === null || commentId.length === 0) return null;
+    const body = str(entry.body);
+    if (body === null) return null;
+    comments.push({
+      commentId,
+      body,
+      createdAt: str(entry.createdAt),
+      updatedAt: str(entry.updatedAt),
+      url: str(entry.url),
+    });
+  }
+  return comments;
+}
+
+async function listComments(
+  runner: GhRunner,
+  number: number,
+): Promise<CommentSummary[] | null> {
+  const reply = await runner.run({
+    operation: "comment_list",
+    args: { number },
+  });
+  if (!reply.ok || !isRecord(reply.payload)) return null;
+  if (positiveInt(reply.payload.number) !== number) return null;
+  return parseCommentSummaries(reply.payload.comments);
+}
+
+const commentCreateSpec: OperationSpec = {
+  operation: "comment_create",
+  validate(raw): ValidateOutcome {
+    if (!isRecord(raw)) return missingFieldOutcome("comment_create", "operation");
+    const unknown = checkUnknownFields(raw, ["operation", "number", "body"]);
+    if (unknown !== null) return unknown;
+    if (raw.number === undefined) return missingFieldOutcome("comment_create", "number");
+    const number = positiveInt(raw.number);
+    if (number === null) {
+      return invalidFieldOutcome("number", "number must be a positive integer");
+    }
+    if (raw.body === undefined) return missingFieldOutcome("comment_create", "body");
+    const body = str(raw.body);
+    if (body === null || body.length === 0) {
+      return invalidFieldOutcome("body", "body must be a non-empty string");
+    }
+    return {
+      ok: true,
+      request: { operation: "comment_create", number: issueNumber(number), body },
+    };
+  },
+  buildRequest(request): GhRunnerRequest {
+    const r = request as Extract<GhToolRequest, { operation: "comment_create" }>;
+    return { operation: "comment_create", args: { number: r.number, body: r.body } };
+  },
+  parseSuccess(payload): GhToolSuccess | null {
+    if (!isRecord(payload)) return null;
+    const commentId = str(payload.commentId);
+    const url = str(payload.url);
+    if (commentId === null || commentId.length === 0) return null;
+    if (url === null || !isAcceptedUrl(url)) return null;
+    return { operation: "comment_create", commentId, url };
+  },
+  async verify(runner, request, success) {
+    const req = request as Extract<GhToolRequest, { operation: "comment_create" }>;
+    const done = success as Extract<GhToolSuccess, { operation: "comment_create" }>;
+    // Comment WRITE は対象コメントの存在・本文で判定する（Issue/PR の open/closed
+    // を成功証拠にしない）。
+    const comments = await listComments(runner, req.number);
+    if (comments === null) return false;
+    const found = comments.find((c) => c.commentId === done.commentId);
+    return found !== undefined && found.body === req.body;
+  },
+};
+
+const commentListSpec: OperationSpec = {
+  operation: "comment_list",
+  validate(raw): ValidateOutcome {
+    if (!isRecord(raw)) return missingFieldOutcome("comment_list", "operation");
+    const unknown = checkUnknownFields(raw, ["operation", "number"]);
+    if (unknown !== null) return unknown;
+    if (raw.number === undefined) return missingFieldOutcome("comment_list", "number");
+    const number = positiveInt(raw.number);
+    if (number === null) {
+      return invalidFieldOutcome("number", "number must be a positive integer");
+    }
+    return { ok: true, request: { operation: "comment_list", number: issueNumber(number) } };
+  },
+  buildRequest(request): GhRunnerRequest {
+    const r = request as Extract<GhToolRequest, { operation: "comment_list" }>;
+    return { operation: "comment_list", args: { number: r.number } };
+  },
+  parseSuccess(payload): GhToolSuccess | null {
+    if (!isRecord(payload)) return null;
+    const number = positiveInt(payload.number);
+    if (number === null) return null;
+    const comments = parseCommentSummaries(payload.comments);
+    if (comments === null) return null;
+    return { operation: "comment_list", number: issueNumber(number), comments };
+  },
+  async verify(_runner, _request, success) {
+    const listed = success as Extract<GhToolSuccess, { operation: "comment_list" }>;
+    const ids = new Set(listed.comments.map((c) => c.commentId));
+    return ids.size === listed.comments.length;
+  },
+};
+
+const commentUpdateSpec: OperationSpec = {
+  operation: "comment_update",
+  validate(raw): ValidateOutcome {
+    if (!isRecord(raw)) return missingFieldOutcome("comment_update", "operation");
+    const unknown = checkUnknownFields(raw, ["operation", "commentId", "body"]);
+    if (unknown !== null) return unknown;
+    if (raw.commentId === undefined) {
+      return missingFieldOutcome("comment_update", "commentId");
+    }
+    const commentId = str(raw.commentId);
+    if (commentId === null || commentId.length === 0) {
+      return invalidFieldOutcome("commentId", "commentId must be a non-empty string");
+    }
+    if (raw.body === undefined) return missingFieldOutcome("comment_update", "body");
+    const body = str(raw.body);
+    if (body === null || body.length === 0) {
+      return invalidFieldOutcome("body", "body must be a non-empty string");
+    }
+    return { ok: true, request: { operation: "comment_update", commentId, body } };
+  },
+  buildRequest(request): GhRunnerRequest {
+    const r = request as Extract<GhToolRequest, { operation: "comment_update" }>;
+    return { operation: "comment_update", args: { commentId: r.commentId, body: r.body } };
+  },
+  parseSuccess(payload): GhToolSuccess | null {
+    if (!isRecord(payload)) return null;
+    const commentId = str(payload.commentId);
+    const url = str(payload.url);
+    if (commentId === null || commentId.length === 0) return null;
+    if (url === null || !isAcceptedUrl(url)) return null;
+    return { operation: "comment_update", commentId, url };
+  },
+  async verify(runner, request, success, payload) {
+    const req = request as Extract<GhToolRequest, { operation: "comment_update" }>;
+    const done = success as Extract<GhToolSuccess, { operation: "comment_update" }>;
+    if (!isRecord(payload)) return false;
+    const number = positiveInt(payload.number);
+    if (number === null) return false;
+    const comments = await listComments(runner, number);
+    if (comments === null) return false;
+    const found = comments.find((c) => c.commentId === done.commentId);
+    return found !== undefined && found.body === req.body;
+  },
+};
+
+const commentDeleteSpec: OperationSpec = {
+  operation: "comment_delete",
+  validate(raw): ValidateOutcome {
+    if (!isRecord(raw)) return missingFieldOutcome("comment_delete", "operation");
+    const unknown = checkUnknownFields(raw, ["operation", "commentId"]);
+    if (unknown !== null) return unknown;
+    if (raw.commentId === undefined) {
+      return missingFieldOutcome("comment_delete", "commentId");
+    }
+    const commentId = str(raw.commentId);
+    if (commentId === null || commentId.length === 0) {
+      return invalidFieldOutcome("commentId", "commentId must be a non-empty string");
+    }
+    return { ok: true, request: { operation: "comment_delete", commentId } };
+  },
+  buildRequest(request): GhRunnerRequest {
+    const r = request as Extract<GhToolRequest, { operation: "comment_delete" }>;
+    return { operation: "comment_delete", args: { commentId: r.commentId } };
+  },
+  parseSuccess(payload): GhToolSuccess | null {
+    if (!isRecord(payload)) return null;
+    const commentId = str(payload.commentId);
+    if (commentId === null || commentId.length === 0) return null;
+    return { operation: "comment_delete", commentId };
+  },
+  async verify(runner, _request, success, payload) {
+    const done = success as Extract<GhToolSuccess, { operation: "comment_delete" }>;
+    if (!isRecord(payload)) return false;
+    const number = positiveInt(payload.number);
+    if (number === null) return false;
+    const comments = await listComments(runner, number);
+    if (comments === null) return false;
+    return comments.every((c) => c.commentId !== done.commentId);
   },
 };
 
@@ -583,8 +970,16 @@ export const ISSUE_OPERATION_SPECS: readonly OperationSpec[] = [
   issueCreateSpec,
   issueReadSpec,
   issueUpdateSpec,
-  issueCommentSpec,
   issueCloseSpec,
   issueListSpec,
   issueReopenSpec,
+  issueCommentSpec,
+];
+
+/** Comment 系操作のスペック一覧。 */
+export const COMMENT_OPERATION_SPECS: readonly OperationSpec[] = [
+  commentCreateSpec,
+  commentListSpec,
+  commentUpdateSpec,
+  commentDeleteSpec,
 ];

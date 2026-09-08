@@ -1,7 +1,7 @@
 # agentdev-gh Local 実装 Tool（ローカル版）
 
 Custom Tool `agentdev_gh` の Local 実現（REQ-011-006、DEC-004）。同一の操作契約
-（`src/opencode/tools/agentdev-gh/contracts.ts` の12操作）を、GitHub Issue/PR の代わりに
+（`src/opencode/tools/agentdev-gh/contracts.ts` の16操作 + 温存中の `issue_comment`）を、GitHub Issue/PR の代わりに
 ローカルIssue（`.agentdev/issues/issue-{NNNN}.md`、単一採番空間、role 条件付きスキーマ）の
 読み書きへ読み替える `GhRunner` 実現（`runner-local.ts`）を提供する。
 
@@ -28,10 +28,11 @@ I/O 正規経路である。上位 command / skill は GitHub 版と同じく Cu
 | `issue_list` | `.agentdev/issues/` のスキャンと role/kind/trackingState/state/labels/search による絞り込み |
 | `issue_reopen` | tracking の `closed` → `in-discussion` + `closed_at` クリア。case は終端状態からの遷移なしとして拒否 |
 | `pr_create` | 最新の role: case ローカルIssueへ `## マージ前確認` セクション追記（`### PR title: {title}` + 本文）。操作契約上 pr_create は番号を持たないため |
-| `pr_read` | 最後の `## マージ前確認` から title を抽出。state は `## マージ結果` 記録済み → `merged`、それ以外は status から写像 |
+| `pr_read` | 最後の `## マージ前確認` から title を抽出し、body としてローカルIssue全文を返す（body の論理範囲の直列化は #2688 が確定する）。state は `## マージ結果` 記録済み → `merged`、それ以外は status から写像 |
 | `pr_merge` | `## マージ結果` へ記録（操作、実行日時、結果 `PASS`）。GitHub PR 取り込みは実行しない。失敗・未完了時の `status: blocked` への更新は `issue_update`（本文全文反映）で構成する |
 | `pr_changed_files` | 空配列（ローカルに変更ファイル一覧は不存在。Git worktree の実状態が正） |
 | `pr_mergeable` | `status: review` → `MERGEABLE`、それ以外 → `UNKNOWN` |
+| `pr_update`、`comment_create`、`comment_list`、`comment_update`、`comment_delete` | 未実装（#2688 が同一契約で実装する。現状は operation-failed を返す） |
 
 出力 URL はローカルIssueファイルの絶対パス（GitHub 実装の Issue/PR URL に代わる一意識別子）。
 

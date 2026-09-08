@@ -1,3 +1,4 @@
+// ADF-COVERS(implementation): REQ-011-028
 // agentdev-gh-tool Plugin（Custom Tool `agentdev_gh` の harness 登録配線）。
 //
 // OpenCode のプラグイン機構（.opencode/plugins/ 直下の depth-1 ファイルから読み込まれる）
@@ -55,14 +56,17 @@ export type ToolResultObject = {
 };
 
 /** 操作要求の公開スキーマ（JSON Schema）。正の契約は Tool の contracts.ts が所有する。 */
-const REQUEST_PROPERTY_SCHEMA = {
+export const REQUEST_PROPERTY_SCHEMA = {
   type: "object",
   description:
     "Structured GitHub issue/PR operation request. See the agentdev_gh operation contract " +
-    "(issue_create, issue_read, issue_update, issue_comment, issue_close, issue_list, issue_reopen, " +
-    "pr_create, pr_read, pr_merge, pr_changed_files, pr_mergeable). Tracking-issue operations expose " +
-    "logical values (role, kind, trackingState); physical label mapping is applied inside the tool. " +
-    "Side-effect operations are verified by read-back before success is returned (fail-closed).",
+    "(issue_create, issue_read, issue_update, issue_close, pr_create, pr_read, pr_merge, pr_changed_files, " +
+    "pr_mergeable, pr_update, issue_list, issue_reopen, comment_create, comment_list, comment_update, " +
+    "comment_delete; issue_comment is deprecated and kept temporarily during the migration). " +
+    "Tracking-issue operations expose logical values (role, kind, trackingState); physical label mapping " +
+    "is applied inside the tool. Comments are a shared logical resource of issues and pull requests, " +
+    "identified by commentId (public type: string). Side-effect operations are verified by read-back " +
+    "before success is returned (fail-closed).",
   properties: {
     operation: {
       type: "string",
@@ -70,24 +74,38 @@ const REQUEST_PROPERTY_SCHEMA = {
         "issue_create",
         "issue_read",
         "issue_update",
-        "issue_comment",
         "issue_close",
-        "issue_list",
-        "issue_reopen",
         "pr_create",
         "pr_read",
         "pr_merge",
         "pr_changed_files",
         "pr_mergeable",
+        "pr_update",
+        "issue_list",
+        "issue_reopen",
+        "comment_create",
+        "comment_list",
+        "comment_update",
+        "comment_delete",
+        "issue_comment",
       ],
       description: "Operation name from the agentdev_gh operation catalog.",
     },
-    number: { type: "integer", minimum: 1, description: "Issue/PR (or local issue) number." },
-    title: { type: "string", description: "Title for issue_create / issue_update / pr_create." },
+    number: {
+      type: "integer",
+      minimum: 1,
+      description:
+        "Issue/PR (or local issue) number. comment_create/comment_list use the parent issue or PR number.",
+    },
+    commentId: {
+      type: "string",
+      description: "Comment identifier for comment_update / comment_delete (public type: string).",
+    },
+    title: { type: "string", description: "Title for issue_create / issue_update / pr_create / pr_update." },
     body: {
       type: "string",
       description:
-        "Markdown body for write operations. Omit on issue_comment to read the comment timeline instead.",
+        "Markdown body for write operations (issues, PRs, comments). Omit on issue_comment to read the comment timeline instead (deprecated dual mode).",
     },
     labels: {
       type: "array",
