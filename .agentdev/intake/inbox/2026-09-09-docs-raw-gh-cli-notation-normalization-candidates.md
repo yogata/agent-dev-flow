@@ -16,3 +16,7 @@ verification-only PR 節の表記統一（ACT-DESIGN-004、commit ff591ef4）と
 
 - `src/opencode/skills/agentdev-workflow-case-run/references/single.md` L226 の `gh issue edit --body-file` 言及は「Issue/PR 操作は Custom Tool agentdev_gh を標準とする」理由説明の文脈であり、IR-053 除外候補（custom-tool-contracts.md「迂回防止」基準）。本 item では**回収対象外**とした
 - 正規化要否は intake-promote の review で判定すること。case-run.md L322 は対象外リスト内の言及であり、正規化不要の可能性がある
+
+## 補足（Epic #2704 Wave 1 close 時、2026-09-09）
+
+PR #2718（Issue #2706 / OU-007）の Findings で qg-4-final-acceptance.md の同一箇所を再観察。PR #2718 マージ（7964375f）により該当行は L121 近傍から L124 近傍へ移動しているが、`gh pr view --json files` の生 gh 表記自体は未修正のまま残存（同 PR のスコープ外）。新規 item としては起票せず、本 item への補足として記録する。
