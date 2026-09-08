@@ -796,7 +796,7 @@ export class CliRunner implements GhRunner {
       return this.fail("comment_list requires number", 0, "invalid-input");
     }
     // 完全一覧: 必要なページをすべて取得する。安全上限到達時は不完全な一覧を
-    // 成功結果として返さず、再試行可能な失敗とする（REQ-011-027）。
+    // 成功結果として返さず、再試行可能な失敗とする。
     const collected: Record<string, unknown>[] = [];
     for (let page = 1; page <= LIST_MAX_PAGES; page++) {
       const r = this.apiGetAny(

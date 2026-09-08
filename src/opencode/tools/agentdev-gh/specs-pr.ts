@@ -329,7 +329,7 @@ const prMergeableSpec: OperationSpec = {
     return { operation: "pr_mergeable", number: prNumber(number), mergeable };
   },
   async verify(_runner, request, success) {
-    // 時間変動 READ 値のため、直後の再読取との一致確認は行わない（CR-002）。
+    // 時間変動 READ 値のため、直後の再読取との一致確認は行わない。
     // 単一読取の正規化結果（UNKNOWN を含む）と要求番号の一致のみを確認する。
     const req = request as Extract<GhToolRequest, { operation: "pr_mergeable" }>;
     const result = success as Extract<GhToolSuccess, { operation: "pr_mergeable" }>;
