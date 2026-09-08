@@ -1,7 +1,7 @@
 {
   "version": 1,
   "rule_id": "IR-055",
-  "generated_at": "2026-09-04",
+  "generated_at": "2026-09-08",
   "entries": [
     {
       "file": "src/opencode/commands/agentdev/README.md",
@@ -115,9 +115,15 @@
     },
     {
       "file": "src/opencode/skills/agentdev-git-worktree/references/worktree-operations.md",
+      "pattern": "repo-*",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-git-worktree/references/worktree-operations.md",
       "pattern": "src/opencode/",
       "severity": "strict",
-      "count": 3
+      "count": 4
     },
     {
       "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
@@ -160,6 +166,12 @@
       "count": 1
     },
     {
+      "file": "src/opencode/skills/agentdev-issue-management/SKILL.md",
+      "pattern": "src/opencode/",
+      "severity": "strict",
+      "count": 1
+    },
+    {
       "file": "src/opencode/skills/agentdev-learning-pipeline/references/disposition-and-artifact-schema.md",
       "pattern": "docs/designs/",
       "severity": "heuristic",
@@ -169,9 +181,15 @@
     },
     {
       "file": "src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md",
-      "pattern": "src/opencode/",
+      "pattern": "repo-*",
       "severity": "strict",
       "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md",
+      "pattern": "src/opencode/",
+      "severity": "strict",
+      "count": 2
     },
     {
       "file": "src/opencode/skills/agentdev-req-analysis/references/analysis-viewpoints.md",
