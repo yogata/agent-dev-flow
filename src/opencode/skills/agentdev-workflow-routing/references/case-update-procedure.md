@@ -20,7 +20,7 @@ Issue 作成時に使用された `issue_desc_bug.md`、`issue_desc_feature.md`�
 
 `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_update.md` を Read tool で読み込む。
 テンプレートの必須セクションが全てコメント本文に含まれることを確認し、欠落時は生成をやり直す。
-投稿は `agentdev_gh` の issue_comment 操作で行う。
+投稿は `agentdev_gh` の comment_create 操作で行う。
 
 ## REQ ファイル更新
 
@@ -48,7 +48,7 @@ case-update `--req` は req-save へ委譲せず、直接 commit と push を行
 7. `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_review_ng.md` を Read tool で読み込み、必須セクション欠落時は生成をやり直す。
 8. QG-3 乖離検出結果をテンプレートの「仕様適合性 結果」セクションに展開する。
 9. NG 理由分類のチェックボックスを自動選択する。
-10. `agentdev_gh` の issue_comment 操作でコメントを投稿する。
+10. `agentdev_gh` の comment_create 操作でコメントを投稿する。
 
 ## 更新漏れ局所確認
 

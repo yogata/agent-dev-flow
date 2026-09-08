@@ -50,7 +50,7 @@ describe("登録形状（OpenCode registry が要求する構造）", () => {
     expect(typeof def.execute).toBe("function");
   });
 
-  test("args.request の JSON Schema は16操作 + 温存中の issue_comment を enum で公開する", async () => {
+  test("args.request の JSON Schema は16操作を enum で公開する", async () => {
     const server = createAgentdevGhToolPlugin({
       resolveRepo: () => "owner/repo",
       createRunner: () =>
@@ -61,13 +61,13 @@ describe("登録形状（OpenCode registry が要求する構造）", () => {
       args: { request: { properties: Record<string, { type?: string; enum?: string[] }>; required: string[] } };
     };
     const request = def.args.request;
-    expect(request.properties.operation?.enum).toHaveLength(17);
+    expect(request.properties.operation?.enum).toHaveLength(16);
     expect(request.properties.operation?.enum).toContain("pr_update");
     expect(request.properties.operation?.enum).toContain("comment_create");
     expect(request.properties.operation?.enum).toContain("comment_list");
     expect(request.properties.operation?.enum).toContain("comment_update");
     expect(request.properties.operation?.enum).toContain("comment_delete");
-    expect(request.properties.operation?.enum).toContain("issue_comment");
+    expect(request.properties.operation?.enum).not.toContain("issue_comment");
     expect(request.required).toEqual(["operation"]);
     expect(request.properties.commentId).toBeDefined();
     expect(request.properties.commentId?.type).toBe("string");
@@ -115,8 +115,6 @@ describe("公開スキーマと実行時 validator の一致性（実行時受�
     { operation: "comment_list", number: 7 },
     { operation: "comment_update", commentId: "101", body: "本文" },
     { operation: "comment_delete", commentId: "101" },
-    { operation: "issue_comment", number: 7 },
-    { operation: "issue_comment", number: 7, body: "本文" },
   ];
 
   test("実行時 validator が受理する全操作の要求は公開スキーマの許容集合に含まれる", () => {

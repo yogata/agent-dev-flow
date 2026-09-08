@@ -127,8 +127,6 @@ export class CliRunner implements GhRunner {
         return this.issueRead(request.args);
       case "issue_update":
         return this.issueUpdate(request.args);
-      case "issue_comment":
-        return this.issueComment(request.args);
       case "issue_close":
         return this.issueClose(request.args);
       case "issue_list":
@@ -448,44 +446,6 @@ export class CliRunner implements GhRunner {
         return this.fail("issue update reply missing html_url", 0);
       }
       return { ok: true, payload: { number, url, before } };
-    });
-  }
-
-  private issueComment(args: Record<string, unknown>): GhRunnerReply {
-    const number = this.requireNumber(args);
-    if (number === null) return this.fail("issue_comment requires number", 0, "invalid-input");
-    if (args.body === undefined) {
-      return this.issueCommentRead(number);
-    }
-    return this.apiWithInput(
-      "POST",
-      `repos/${this.repo}/issues/${number}/comments`,
-      { body: args.body },
-      (rec) => {
-        const url = str(rec.html_url);
-        if (url === null) {
-          return this.fail("comment reply missing html_url", 0);
-        }
-        return { ok: true, payload: { number, url } };
-      },
-    );
-  }
-
-  private issueCommentRead(number: number): GhRunnerReply {
-    return this.apiGetAny(`repos/${this.repo}/issues/${number}/comments`, (payload) => {
-      if (!Array.isArray(payload)) {
-        return this.fail("issue comments reply is not an array", 0);
-      }
-      const comments: unknown[] = [];
-      for (const entry of payload) {
-        if (!isRecord(entry)) return this.fail("comment entry is not an object", 0);
-        const body = str(entry.body);
-        const createdAt = str(entry.created_at);
-        const url = str(entry.html_url);
-        if (body === null) return this.fail("comment entry missing body", 0);
-        comments.push({ body, createdAt, url });
-      }
-      return { ok: true, payload: { number, comments } };
     });
   }
 

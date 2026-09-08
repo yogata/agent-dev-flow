@@ -1,8 +1,8 @@
 // agentdev-gh Custom Tool の Local 実現（GhRunner、REQ-011-006 / DEC-004）。
 // ADF-COVERS(implementation): REQ-011-024, REQ-011-025, REQ-011-026, REQ-011-027, REQ-011-030
 //
-// 同一の操作契約（contracts.ts の16操作 + 温存中の issue_comment）を、GitHub Issue/PR
-// の代わりにローカルIssue（`.agentdev/issues/issue-{NNNN}.md`、単一採番空間）の
+// 同一の操作契約（contracts.ts の16操作）を、GitHub Issue/PR の代わりに
+// ローカルIssue（`.agentdev/issues/issue-{NNNN}.md`、単一採番空間）の
 // 読み書きへ読み替える。Workflow は GitHub 実装（runner-cli.ts）と本実装の
 // 差を認識しない。
 //
@@ -14,7 +14,7 @@
 //   - PR 系操作（pr_*）の対象は role: case のローカルIssueに限る
 //   - 論理 PR 本文 = `## マージ前確認` / `## Design確定候補` / `## Findings / Capture候補`
 //     の3セクションの定義順直列化。PR タイトルの正は マージ前確認 内の PR タイトル行
-//   - Comment 操作（comment_*）と issue_comment は role により読み替え先セクションを分岐する
+//   - Comment 操作（comment_*）は role により読み替え先セクションを分岐する
 //     （tracking: `## 検討経過`、case: `## 作業ログ`）
 //   - コメント相当エントリは `### c{NN} {ISO 8601}` 見出し（更新時 `(updated {ISO 8601})`
 //     接尾辞）を持ち、commentId の物理表現は `issue-{NNNN}-c{NN}`（公開型は文字列）。
@@ -56,8 +56,6 @@ const ISSUE_FILE_PREFIX = "issue-";
 const ISSUE_FILE_SUFFIX = ".md";
 const FRONTMATTER_DELIMITER = "---";
 
-const HEADING_WORKLOG = "## 作業ログ";
-const HEADING_DISCUSSION = "## 検討経過";
 const HEADING_MERGE_CHECK = "## マージ前確認";
 const HEADING_MERGE_RESULT = "## マージ結果";
 const HEADING_DESIGN_CANDIDATES = "## Design確定候補";
@@ -578,8 +576,6 @@ export class LocalRunner implements GhRunner {
         return this.issueRead(args);
       case "issue_update":
         return this.issueUpdate(args);
-      case "issue_comment":
-        return this.issueComment(args);
       case "issue_close":
         return this.issueClose(args);
       case "issue_list":
@@ -769,102 +765,6 @@ export class LocalRunner implements GhRunner {
       ok: true,
       payload: { number, url: this.issuePath(number), before: this.beforeFrom(c.parsed) },
     };
-  }
-
-  private issueComment(args: Record<string, unknown>): GhRunnerReply {
-    const number = this.requireNumber(args);
-    if (number === null) return this.fail("issue_comment requires number");
-    const c = this.readIssue(number);
-    if (c === null) return this.fail(`local issue not found: ${issueFileName(number)}`);
-    if (args.body === undefined) {
-      return { ok: true, payload: { number, comments: this.readComments(c.parsed) } };
-    }
-    const body = typeof args.body === "string" ? args.body : null;
-    if (body === null) return this.fail("issue_comment requires a string body");
-    const lines = c.parsed.raw.split("\n");
-    if (c.parsed.fm.role === "tracking") {
-      const entry = [
-        "",
-        `### ${isoNow(this.now)}`,
-        "",
-        toLf(body).replace(/^\n+/, "").replace(/\n+$/, ""),
-        "",
-      ].join("\n");
-      if (!lines.some((l) => l.trim() === HEADING_DISCUSSION)) {
-        lines.push("", HEADING_DISCUSSION, "");
-      }
-      this.writeIssue(number, `${lines.join("\n").replace(/\n+$/, "")}\n${entry}`);
-      return { ok: true, payload: { number, url: this.issuePath(number) } };
-    }
-    let insertAt = lines.length;
-    if (!lines.some((l) => l.trim() === HEADING_WORKLOG)) {
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        if (line === undefined) continue;
-        if (HEADINGS_BEFORE_WORKLOG.some((h) => line.trim() === h)) {
-          insertAt = i;
-          break;
-        }
-      }
-      lines.splice(insertAt, 0, HEADING_WORKLOG, "");
-    }
-    const updated = `${lines.join("\n").replace(/\n+$/, "")}\n${toLf(body).replace(/^\n+/, "").replace(/\n+$/, "")}\n`;
-    this.writeIssue(number, updated);
-    return { ok: true, payload: { number, url: this.issuePath(number) } };
-  }
-
-  /** コメント読取（role 分岐: tracking は検討経過の日時エントリ、case は作業ログ全文）。 */
-  private readComments(parsed: ParsedIssue): { body: string; createdAt: string | null; url: null }[] {
-    const lines = parsed.raw.split("\n");
-    if (parsed.fm.role === "tracking") {
-      const comments: { body: string; createdAt: string | null; url: null }[] = [];
-      let inSection = false;
-      let current: { createdAt: string | null; bodyLines: string[] } | null = null;
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (trimmed === HEADING_DISCUSSION) {
-          inSection = true;
-          continue;
-        }
-        if (trimmed.startsWith("## ")) {
-          if (trimmed !== HEADING_DISCUSSION) inSection = false;
-          continue;
-        }
-        if (!inSection) continue;
-        if (trimmed.startsWith("### ")) {
-          if (current !== null && (current.createdAt !== null || current.bodyLines.length > 0)) {
-            comments.push({
-              body: current.bodyLines.join("\n").replace(/\n+$/, ""),
-              createdAt: current.createdAt,
-              url: null,
-            });
-          }
-          current = { createdAt: trimmed.slice(4).trim() || null, bodyLines: [] };
-          continue;
-        }
-        if (current !== null) current.bodyLines.push(line);
-      }
-      if (current !== null && (current.createdAt !== null || current.bodyLines.length > 0)) {
-        comments.push({
-          body: current.bodyLines.join("\n").replace(/\n+$/, ""),
-          createdAt: current.createdAt,
-          url: null,
-        });
-      }
-      return comments;
-    }
-    const start = lines.findIndex((l) => l.trim() === HEADING_WORKLOG);
-    if (start < 0) return [];
-    const body: string[] = [];
-    for (let i = start + 1; i < lines.length; i++) {
-      const line = lines[i];
-      if (line === undefined) continue;
-      if (line.trim().startsWith("## ")) break;
-      body.push(line);
-    }
-    const text = body.join("\n").replace(/^\n+/, "").replace(/\n+$/, "");
-    if (text.length === 0) return [];
-    return [{ body: text, createdAt: null, url: null }];
   }
 
   private issueClose(args: Record<string, unknown>): GhRunnerReply {

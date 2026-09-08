@@ -6,8 +6,8 @@
 // 操作カタログの契約整合（副作用分類、継続契約）を完全列挙で固定する。
 // 対象外 GitHub 機能（Issue 削除、PR close/reopen、review、inline review comment、
 // assignee、milestone、Projects、lock/unlock、pin/unpin 等）の追加は列挙固定に
-// よって検出される。温存中の deprecated 操作 issue_comment は移行完了（#2689）
-// まで期待値として許容する。
+// よって検出される。廃止済みの issue_comment（二重モード操作）も禁止対象として
+// 固定する。
 
 
 import { describe, expect, test } from "bun:test";
@@ -25,7 +25,7 @@ import {
 } from "../index.ts";
 
 describe("操作カタログ（Design 対象操作との一致）", () => {
-  test("16操作カタログ + 温存中の issue_comment を完全列挙で固定する", () => {
+  test("16操作カタログを完全列挙で固定する", () => {
     expect([...GH_TOOL_OPERATIONS]).toEqual([
       "issue_create",
       "issue_read",
@@ -43,7 +43,6 @@ describe("操作カタログ（Design 対象操作との一致）", () => {
       "comment_list",
       "comment_update",
       "comment_delete",
-      "issue_comment",
     ]);
   });
 
@@ -60,7 +59,7 @@ describe("操作カタログ（Design 対象操作との一致）", () => {
     }
   });
 
-  test("対象外操作（削除・review・管理系 GitHub 機能）はカタログへ追加されていない", () => {
+  test("対象外操作（削除・review・管理系 GitHub 機能・廃止済み issue_comment）はカタログへ追加されていない", () => {
     const catalog = new Set<string>(GH_TOOL_OPERATIONS);
     const forbidden = [
       "issue_delete",
@@ -78,17 +77,11 @@ describe("操作カタログ（Design 対象操作との一致）", () => {
       "issue_transfer",
       "pr_draft_update",
       "pr_base_update",
+      "issue_comment",
     ];
     for (const op of forbidden) {
       expect(catalog.has(op)).toBe(false);
     }
-  });
-
-  test("issue_comment は温存されている（廃止は #2689 の完了条件）", () => {
-    expect(GH_TOOL_OPERATIONS).toContain("issue_comment");
-    expect(GH_TOOL_OPERATION_CATALOG.find((e) => e.operation === "issue_comment")?.kind).toBe(
-      "side-effect",
-    );
   });
 
   test("カタログは全操作を重複なく網羅する", () => {

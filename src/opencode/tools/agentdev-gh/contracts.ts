@@ -40,8 +40,7 @@ export function prNumber(n: number): PrNumber {
  * （基本操作10: issue_create、issue_read、issue_update、issue_close、pr_create、
  * pr_read、pr_merge、pr_changed_files、pr_mergeable、pr_update、
  * 追跡Issue操作2: issue_list、issue_reopen、
- * Comment 操作4: comment_create、comment_list、comment_update、comment_delete）
- * に移行完了まで温存する deprecated な issue_comment を加えた並び。
+ * Comment 操作4: comment_create、comment_list、comment_update、comment_delete）。
  * Comment は Issue と Pull Request の会話コメントを同一の論理リソースとして扱い、
  * commentId（公開型は文字列）で対象識別する。
  */
@@ -62,9 +61,6 @@ export const GH_TOOL_OPERATIONS = [
   "comment_list",
   "comment_update",
   "comment_delete",
-  // 廃止予定（deprecated）: body あり＝追加 / body なし＝読取の二重モード操作。
-  // 呼出元の Comment 操作への移行（#2689）完了まで温存する。
-  "issue_comment",
 ] as const;
 
 export type GhToolOperation = (typeof GH_TOOL_OPERATIONS)[number];
@@ -129,7 +125,6 @@ export const GH_TOOL_OPERATION_CATALOG: readonly OperationCatalogEntry[] = [
   readOnly("comment_list"),
   sideEffect("comment_update"),
   sideEffect("comment_delete"),
-  sideEffect("issue_comment"),
 ];
 
 /** fail-closed 4異常系と運用上の失敗種別。 */
@@ -174,11 +169,6 @@ export type GhToolRequest =
         | "on-hold"
         | "ready"
         | "resolved";
-    }
-  | {
-      readonly operation: "issue_comment";
-      readonly number: IssueNumber;
-      readonly body?: string;
     }
   | {
       readonly operation: "issue_close";
@@ -269,12 +259,6 @@ export type GhToolSuccess =
       readonly url: string;
     }
   | {
-      readonly operation: "issue_comment";
-      readonly number: IssueNumber;
-      readonly url: string;
-      readonly comments: readonly IssueCommentSummary[];
-    }
-  | {
       readonly operation: "issue_close";
       readonly number: IssueNumber;
       readonly state: "closed";
@@ -340,13 +324,6 @@ export type GhToolSuccess =
       readonly operation: "comment_delete";
       readonly commentId: string;
     };
-
-/** issue_comment 読取モードの応答（コメントの時系列）。deprecated 操作の温存型。 */
-export interface IssueCommentSummary {
-  readonly body: string;
-  readonly createdAt: string | null;
-  readonly url: string | null;
-}
 
 /**
  * comment_list の要素。commentId は Comment 論理リソースの識別子で、公開型は

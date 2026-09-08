@@ -50,9 +50,9 @@ resume point / export / import を持たない。
 | 新規起票 | 課題として残す、登録する等の指示。対話中の未解決事項を残置する指示 | `issue_create` |
 | 検索・参照 | 未解決の追跡Issueの確認、一覧、特定テーマの問い合わせ | `issue_list`、`issue_read` |
 | 更新 | 追跡Issue内容、選択肢、判断材料等の追記・修正の指示 | `issue_update` |
-| 検討経過の追加 | 検討が進んだ、判断材料が揃った等の経過報告 | `issue_comment`（body 付き） |
+| 検討経過の追加 | 検討が進んだ、判断材料が揃った等の経過報告 | `comment_create` |
 | 保留 | 判断を先送りする、様子を見る等の指示 | `issue_update`（trackingState） |
-| 再評価 | 保留中の追跡Issueの再検討、再評価条件の成立の報告 | `issue_read`、`issue_update`、`issue_comment` |
+| 再評価 | 保留中の追跡Issueの再検討、再評価条件の成立の報告 | `issue_read`、`issue_update`、`comment_create` |
 | 実行準備完了 | 実行へ進めてよいという判断の報告 | `issue_update`（trackingState） |
 | 解決 | 結論が出た、対応不要とする等の指示 | `issue_update`（trackingState、解決結論を本文へ） |
 | 反映確認 | 解決済み追跡Issueの反映状況の確認、反映の実施の指示 | `issue_read`、成果物所有能力への委譲 |

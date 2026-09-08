@@ -70,7 +70,7 @@ STEP-4-1 で確認した squash merge 先（main）へ `agentdev_gh` の pr_merg
 
 **Squash merge 失敗時のリトライ**: 本書が所有する「squash merge リトライ手順」に従う（待機間隔5秒、最大試行回数は初期試行 + 5回リトライ、各試行のログ記録、全試行失敗時のフォールバックは template `.opencode/commands/agentdev/templates/case-close/standard.md` 参照）。
 
-**対応記録コメント**: Issue に対応記録コメントを追加（テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_*.md` から Read して `agentdev_gh` の issue_comment 操作で追加（成功応答は読み戻し検証済み））。
+**対応記録コメント**: Issue に対応記録コメントを追加（テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_*.md` から Read して `agentdev_gh` の comment_create 操作で追加（成功応答は読み戻し検証済み））。
 
 **対応記録コメントへの検証差分記録**: case-close が実施した各検証（QG-4 完了条件評価、docs 検証・配布依存境界 最終 gate、トレーサビリティ独立再検査等）について、対応記録コメントへ検証差分を記録する。形式は `agentdev-workflow-templates` の検証差分セクション規約（PR テンプレート形式と同一のテーブル）に従い、実行工程 case-close の行として検証種別、検証結果、finding 差分（新規、修正済み、既出、撤回、無効の5分類）を記録する。finding 差分は前段階（case-run）の PR 本文検証差分セクションの記録との差分で分類し、同種検証の工程間比較を可能にする。品質ゲート完了報告の既存の修正証跡記録を本記録で置換しない。
 

@@ -3,7 +3,7 @@
 //
 // 追跡Issue管理機構の配布物実装検証（Issue #2437、OU-06）。
 // - Tool 操作契約の追跡Issue操作（issue_list、issue_read 拡張、issue_update labels、
-//   issue_comment 読取、issue_reopen）とカタログ登録
+//   comment_list 読取、issue_reopen）とカタログ登録
 // - 副作用操作の VERIFY 完了後成功返却（読み戻し不一致は失敗）、読み取り操作の応答自己整合
 // - 物理写像（role/kind/状態とラベルの対応）の機械適用と三段写像の導出
 // - ローカル版のローカルIssue（単一採番空間、role 条件付きスキーマ、PR 系操作の role: case 限定）
@@ -196,17 +196,14 @@ function fakeGithubRunner(issues: Map<number, Record<string, unknown>>): GhRunne
           }));
           return { ok: true, payload: { issues: list } };
         }
-        case "issue_comment": {
-          if (args.body !== undefined) {
-            return { ok: true, payload: { number, url: `https://example.com/c/${number}` } };
-          }
+        case "comment_list": {
           return {
             ok: true,
             payload: {
               number,
               comments: [
-                { body: "1件目", createdAt: "2026-08-25T01:00:00Z", url: "https://example.com/c/1" },
-                { body: "2件目", createdAt: "2026-08-25T02:00:00Z", url: "https://example.com/c/2" },
+                { commentId: "1", body: "1件目", createdAt: "2026-08-25T01:00:00Z", updatedAt: null, url: "https://example.com/c/1" },
+                { commentId: "2", body: "2件目", createdAt: "2026-08-25T02:00:00Z", updatedAt: null, url: "https://example.com/c/2" },
               ],
             },
           };
@@ -287,17 +284,18 @@ describe("Tool 操作契約の追跡Issue操作（カタログと契約）", () 
     expect(labels).toEqual(["enhancement"]);
   });
 
-  it("issue_comment は body 省略でコメント履歴を読み取る", async () => {
+  it("comment_list はコメント履歴を完全一覧で読み取る", async () => {
     const issues = new Map<number, Record<string, unknown>>([
       [3, { number: 3, title: "T", body: "B", state: "open", state_reason: null, labels: ghLabelNames([]) }],
     ]);
     const result = await runAgentdevGhOperation(ghEnv(fakeGithubRunner(issues)), {
-      operation: "issue_comment",
+      operation: "comment_list",
       number: 3,
     });
     expect(result.ok).toBe(true);
-    if (result.ok && result.success.operation === "issue_comment") {
+    if (result.ok && result.success.operation === "comment_list") {
       expect(result.success.comments.length).toBe(2);
+      expect(result.success.comments[0]?.commentId).toBe("1");
       expect(result.success.comments[0]?.body).toBe("1件目");
       expect(result.success.comments[1]?.createdAt).toBe("2026-08-25T02:00:00Z");
     }
@@ -490,22 +488,6 @@ describe("ローカルIssueの role 条件付きスキーマ（単一採番空�
     if (listed.ok && listed.success.operation === "issue_list") {
       expect(listed.success.issues.length).toBe(1);
       expect(listed.success.issues[0]?.role).toBe("tracking");
-    }
-
-    const commented = await runAgentdevGhOperation(env, {
-      operation: "issue_comment",
-      number: 1,
-      body: "検討を開始した",
-    });
-    expect(commented.ok).toBe(true);
-    const history = await runAgentdevGhOperation(env, {
-      operation: "issue_comment",
-      number: 1,
-    });
-    expect(history.ok).toBe(true);
-    if (history.ok && history.success.operation === "issue_comment") {
-      expect(history.success.comments.length).toBe(1);
-      expect(history.success.comments[0]?.body).toContain("検討を開始した");
     }
 
     const resolved = await runAgentdevGhOperation(env, {

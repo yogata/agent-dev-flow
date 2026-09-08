@@ -15,7 +15,7 @@ case-open がサブエージェントへ本文生成を委譲する接続点（S
 
 ## `agentdev_gh` 標準呼出形式
 
-Issue 本文、タイトルを書き込む操作（issue_create、issue_update、issue_comment）は、次の標準呼出形式に従う。
+Issue 本文、タイトルを書き込む操作（issue_create、issue_update、comment_create）は、次の標準呼出形式に従う。
 本節は実測された呼出制約の手順化であり、Tool 操作契約の引数定義と併せて読む。
 
 ### 本文・タイトルの二重引用符回避

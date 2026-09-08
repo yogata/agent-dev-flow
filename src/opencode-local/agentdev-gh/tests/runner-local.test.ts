@@ -318,60 +318,6 @@ describe("LocalRunner: issue_read / issue_update / issue_list", () => {
   });
 });
 
-describe("LocalRunner: コメントの role 分岐", () => {
-  test("tracking は検討経過へ日時エントリで追記し、読取は時系列を返す", async () => {
-    const issuesDir = makeIssuesDir();
-    await run(issuesDir, {
-      operation: "issue_create",
-      args: { title: "T", body: "本文", labels: [], role: "tracking", kind: "problem" },
-    });
-    const first = await run(issuesDir, {
-      operation: "issue_comment",
-      args: { number: 1, body: "1件目の検討" },
-    });
-    expect(first.ok).toBe(true);
-    const second = await run(issuesDir, {
-      operation: "issue_comment",
-      args: { number: 1, body: "2件目の検討" },
-    });
-    expect(second.ok).toBe(true);
-    const raw = readIssueFile(issuesDir, 1);
-    expect(raw).toContain("## 検討経過");
-    expect((raw.match(/### 20/g) ?? []).length).toBe(2);
-    expect(raw.indexOf("1件目の検討")).toBeLessThan(raw.indexOf("2件目の検討"));
-
-    const read = await run(issuesDir, { operation: "issue_comment", args: { number: 1 } });
-    expect(read.ok).toBe(true);
-    if (read.ok) {
-      const comments = (read.payload as Record<string, unknown>).comments as Record<string, unknown>[];
-      expect(comments.length).toBe(2);
-      expect(comments[0]?.body).toContain("1件目の検討");
-      expect(comments[1]?.body).toContain("2件目の検討");
-      expect(typeof comments[0]?.createdAt).toBe("string");
-    }
-    fs.rmSync(issuesDir, { recursive: true, force: true });
-  });
-
-  test("case は作業ログへ追記し、読取はセクション本文を1件で返す", async () => {
-    const issuesDir = makeIssuesDir();
-    await run(issuesDir, { operation: "issue_create", args: { title: "C", body: "b", labels: [], role: "case" } });
-    const added = await run(issuesDir, {
-      operation: "issue_comment",
-      args: { number: 1, body: "作業を開始した" },
-    });
-    expect(added.ok).toBe(true);
-    expect(readIssueFile(issuesDir, 1)).toContain("## 作業ログ");
-    const read = await run(issuesDir, { operation: "issue_comment", args: { number: 1 } });
-    expect(read.ok).toBe(true);
-    if (read.ok) {
-      const comments = (read.payload as Record<string, unknown>).comments as Record<string, unknown>[];
-      expect(comments.length).toBe(1);
-      expect(String(comments[0]?.body)).toContain("作業を開始した");
-    }
-    fs.rmSync(issuesDir, { recursive: true, force: true });
-  });
-});
-
 describe("LocalRunner: Comment CRUD（c{NN} 物理写像）", () => {
   test("comment_create は commentId（文字列）を返し、comment_list で本文が読み戻し一致する（TS-004）", async () => {
     const issuesDir = makeIssuesDir();
@@ -965,7 +911,7 @@ describe("LocalRunner: PR 系操作の role: case 限定", () => {
 });
 
 describe("LocalRunner: engine 経由の VERIFY（追跡Issueライフサイクル）", () => {
-  test("起票→保留→解決→コメント→クローズ→再オープンが読み戻し検証を通る", async () => {
+  test("起票→保留→解決→クローズ→再オープンが読み戻し検証を通る", async () => {
     const issuesDir = makeIssuesDir();
     const env = makeEnv(issuesDir);
 
@@ -985,13 +931,6 @@ describe("LocalRunner: engine 経由の VERIFY（追跡Issueライフサイク�
       trackingState: "on-hold",
     });
     expect(held.ok).toBe(true);
-
-    const commented = await runAgentdevGhOperation(env, {
-      operation: "issue_comment",
-      number: 1,
-      body: "再評価条件が成立した",
-    });
-    expect(commented.ok).toBe(true);
 
     const resolved = await runAgentdevGhOperation(env, {
       operation: "issue_update",

@@ -317,30 +317,6 @@ describe("CliRunner: 各操作の API 写像", () => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
-  test("issue_comment は body 省略時にコメント一覧を返す", async () => {
-    const { exec, calls } = fakeExec(() => ({
-      status: 0,
-      stdout: JSON.stringify([
-        { body: "1件目", created_at: "2026-08-25T01:00:00Z", html_url: "https://example/c/1" },
-        { body: "2件目", created_at: "2026-08-25T02:00:00Z", html_url: "https://example/c/2" },
-      ]),
-      stderr: "",
-    }));
-    const reply = await run(exec, makeTempDir(), {
-      operation: "issue_comment",
-      args: { number: 7 },
-    });
-    expect(reply.ok).toBe(true);
-    if (reply.ok) {
-      const payload = reply.payload as Record<string, unknown>;
-      const comments = payload.comments as Record<string, unknown>[];
-      expect(comments.length).toBe(2);
-      expect(comments[0]?.body).toBe("1件目");
-      expect(comments[0]?.createdAt).toBe("2026-08-25T01:00:00Z");
-    }
-    expect(calls[0]?.args).toContain("repos/owner/repo/issues/7/comments");
-  });
-
   test("issue_list は PR を除外し role/kind/trackingState で絞り込む", async () => {
     const issue = (
       n: number,

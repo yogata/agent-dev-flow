@@ -137,7 +137,7 @@ QG-4 観点8 に基づく評価スコープ切替（中間 Wave vs 最終 Wave�
 ## 関連 Capability Skill
 
 - `agentdev-epic-tracker`: E1〜E6 詳細手順、判定基準、子Issue 状態 enum、再読込 VERIFY、未達項目残存時の停止条件
-- Custom Tool `agentdev_gh`: Epic Issue 本文読込・更新、子Issue PR マージ・クローズ、pr_mergeable（UNKNOWN ポーリングは workflow 側）、対応記録コメント
+- Custom Tool `agentdev_gh`: Epic Issue 本文読込・更新、子Issue PR マージ・クローズ、pr_mergeable（UNKNOWN ポーリングは workflow 側）、comment_create による対応記録コメント
 - `agentdev-git-worktree`: squash merge 後分岐ハンドリング、コンフリクト解消 rebase パス（Level 1）
 - `agentdev-quality-gates`: QG-4 完了条件チェックボックス評価・更新、観点8 評価スコープ切替
 - `agentdev-workflow-orchestration`: capture 境界（intake/learning 分離、Epic 横断回収）

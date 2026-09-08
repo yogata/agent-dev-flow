@@ -64,7 +64,7 @@ case-update workflow は次の4 STEP で構成する。
 - `agentdev-workflow-routing`: Issue番号解決、--body/--comment/--req/--review-ng 各フロー詳細、レビュー拒否タイプ分類
 - `agentdev-workflow-lifecycle`: 現在フェーズ判定、work_type 分岐の参照
 - `agentdev-workflow-templates`: テンプレート選定、コメント/レビューNGコメントの【必須】セクション検査
-- Custom Tool `agentdev_gh`: Issue 本文更新、Issue コメント追加の操作（VERIFY は Tool 内部の読み戻し検証）
+- Custom Tool `agentdev_gh`: Issue 本文更新、comment_create によるコメント追加の操作（VERIFY は Tool 内部の読み戻し検証）
 - `agentdev-quality-gates`: QG-3 乖離検出結果の引用（--review-ng 時）
 - `agentdev-git-worktree`: `--req` 時の並列実行安全ステージング
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）

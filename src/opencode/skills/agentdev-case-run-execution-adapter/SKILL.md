@@ -23,7 +23,7 @@ adapter skill 経由での委譲起動、委譲 prompt 内で実行 command を�
 ## 副作用
 
 - worktree root 配下でのみファイル編集を行う（メインリポジトリには触れない）
-- PR 作成、Issue コメント追加は実行担当サブエージェントが実施（Custom Tool `agentdev_gh` 経由）
+- PR 作成、Issue コメント追加（comment_create）は実行担当サブエージェントが実施（Custom Tool `agentdev_gh` 経由）
 
 ## 実行モデル
 
