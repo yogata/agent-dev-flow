@@ -60,7 +60,7 @@ Issue/ REQ/ Decision/ Design/ work plan のいずれかの記載内容を満た�
 機械的テキスト置換、複数ディレクトリ横断是正を含む PR 向けの検査項目（L-012、PR #1090 / #1122 由来）。
 
 - **検査項目**: 機械的テキスト置換、複数ディレクトリ横断是正を含む場合、置換対象パターンの再 grep 結果が 0 件であることを確認する
-- **適用範囲**: 機械的テキスト置換、複数ディレクトリ横断、[mechanical-replacement-rules.md](../../agentdev-doc-writing/references/mechanical-replacement-rules.md) 対象表の文字種等の横断是正
+- **適用範囲**: 機械的テキスト置換、複数ディレクトリ横断、機械置換手順（3段階: old 側 grep 実在確認、置換実行、置換後 MISS 確認）に従う文字種等の横断是正
 - **スコープ定位**: QG-3 の既存スコープ（PR 作成直前の実装充足・乖離ゲート）を維持し、機械横断是正の再 grep 0 件確認は乖離検出の一部として位置付ける
 - **対象外維持**: 品質メトリクス収集、広範な docs 全体 grep、Document Classification Policy 全体確認、case-update 連携は引き続き QG-3 対象外とする
 

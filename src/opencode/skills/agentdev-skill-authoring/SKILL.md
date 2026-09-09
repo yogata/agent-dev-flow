@@ -33,7 +33,7 @@ OpenCode のSKILL.mdを書く際の実践ガイドである。
 
 ## 文章品質観点（作成時）
 
-skill 作成時に次の観点で文章品質を検査し、違反を残さない。規範原本は japanese-tech-writing スキル、契約は配布物の文章品質契約である。
+skill 作成時に次の観点で文章品質を検査し、違反を残さない。文章表層品質の判定基準は textlint 共通基盤の規則構成（標準規則とプロジェクト用語 prh 辞書）、契約は配布物の文章品質契約である。
 
 - メタ指示残留: 実行時に意味を持たない LLM 宛指示文を残さない
 - 文の完結性: 主述が完結しない文を残さない
@@ -86,7 +86,3 @@ SKILL.md 本文から遅延読み込みされる詳細資料である。
 | [references/design-principles.md](references/design-principles.md) | 設計原則、命名規則、description/ トリガー設計、複雑度分類、段階的開示、配置判断フロー、スキル粒度、参照記述ルール |
 | [references/review-protocol.md](references/review-protocol.md) | レビュープロトコル（frontmatter、予算、構造、助言、サブエージェント編集安全性のチェックリスト）、品質評価5軸 |
 | [references/development-workflow.md](references/development-workflow.md) | 開発ワークフロー（反復開発、フィードバックループ、評価先行構築、テンプレートパターン）、記述削減・抽象化の前段チェック（固定トークン事前 grep）、アンチパターン一覧 |
-
-## See Also
-
-- **agentdev-doc-writing**: Decision/REQ/Design 横断の文書品質査読ゲート（文書種別責務、要件性、文意品質、粒度）

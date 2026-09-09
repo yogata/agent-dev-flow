@@ -11,8 +11,8 @@ inspect-docs command が実行する docs 横断診断のカテゴリ定義と�
 | 廃止 REQ/Design 由来記述残置 | retired REQ/Design ID をソースとした記述が活性文書に残置していないか | `agentdev-req-structure-diagnostics`（REQ 体系境界、配布物 ID 汚染） |
 | REQ/Design 境界違反 | HOW 詳細が現行 REQ 要件行に残留しているか（document-model Design Separation Criteria 準拠） | `agentdev-req-structure-diagnostics`（MOVE 観点） |
 | REQ 粒度過小 | 1 REQ に複数関心、成果物種別、command family、lifecycle 段階が混在しているか | `agentdev-req-structure-diagnostics`（SPLIT 観点） |
-| 横断契約矛盾 | REQ/Decision/Design/guides 間で source-of-truth priority に基づく矛盾があるか | `agentdev-req-structure-diagnostics`（DRIFT 等）、`agentdev-doc-writing`（文意品質） |
-| 文意品質候補 | LLM っぽい表現、空虚語、英語混じり表現、実行主体分類の誤認が残存しているか | `agentdev-doc-writing` |
+| 横断契約矛盾 | REQ/Decision/Design/guides 間で source-of-truth priority に基づく矛盾があるか | `agentdev-req-structure-diagnostics`（DRIFT 等）。表現揺れに起因する意味矛盾は本スキルの直接判定対象 |
+| 文意品質候補 | LLM っぽい表現、空虚語、英語混じり表現、実行主体分類の誤認が残存しているか | 文章表層は共通 textlint 基盤。実行主体分類の誤認は docs 配下が本スキルの意味診断、配布物は `agentdev-inspect-skills` |
 
 各カテゴリの検出シグナル、シグナル閾値、判定ルールの詳細はルーティング先の専門 skill が所有する。
 本スキルは「どのカテゴリを横断的にスキャンするか」「どの専門 skill へルーティングするか」のみを定義する。
@@ -105,7 +105,7 @@ source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides�
 
 - 矛盾判定は source-of-truth priority に従う。上位文書を正とし、下位文書の矛盾を検出事項とする
 - 旧名称、旧概念の残存は DRIFT 観点として `agentdev-req-structure-diagnostics` へルーティングする
-- 文意品質に起因する矛盾（表現揺れ、曖昧語）は `agentdev-doc-writing` へルーティングする
+- 文意品質に起因する矛盾（表現揺れ、曖昧語）は本スキルの docs 横断意味診断で直接判定する（文章表層の検出は共通 textlint 基盤が担う）
 - 履歴説明目的の言及は対象外とする（文脈で判定）
 
 ## 文意品質候補
@@ -119,8 +119,9 @@ LLM っぽい表現、空虚な形容/動詞、英語混じり表現、実行主
 
 ### ルーティング先
 
-判定辞書（置換辞書、LLM 表現辞書、英語抽象語書き換え辞書）、機械的置換ルール、査読出力形式は `agentdev-doc-writing` が所有する。
-本スキルは横断スキャンで候補を抽出し、ルーティングする。
+文章表層品質（LLM 表現、空虚語、英語混じり表現）の検出と判定規則は共通 textlint 基盤（標準規則とプロジェクト用語 prh 辞書）が所有し、本スキルは判定辞書を保持しない（REQ-036-008）。
+実行主体分類の誤認は、docs 配下の記述を本スキルの docs 横断意味診断（基準の原本は document-type-responsibilities Design「実行主体分類の査読基準」）で、配布物（Command/Skill 記述）を `agentdev-inspect-skills` の診断観点で扱う。
+本スキルは横断スキャンで候補を抽出し、振り分ける。
 
 ## 配布物統合性
 

@@ -1,7 +1,7 @@
 # 共通 finding 出力契約
 
 inspect-docs command が出力する docs 横断診断の検出事項（finding）に共通する証拠構造、severity、信頼度、出力ファイル契約を定義する。
-REQ 固有診断、文意品質診断等の専門診断からルーティングされてきた検出事項も本契約へ適合させる（共通証拠構造の統一）。
+REQ 固有診断等の専門診断からルーティングされてきた検出事項も本契約へ適合させる（共通証拠構造の統一）。
 
 本契約は inspect-docs command が出力する最終的な共通証拠構造である。
 専門 skill が内部で保持する診断観点別の出力形式（例: `agentdev-req-structure-diagnostics` の問題候補出力スキーマ7フィールド）は各専門 skill の内部スキーマであり、本契約へ正規化して統合する。
@@ -12,7 +12,6 @@ REQ 固有診断、文意品質診断等の専門診断からルーティング�
 | 専門 skill | 内部スキーマ | 本契約への正規化 |
 |------------|--------------|------------------|
 | `agentdev-req-structure-diagnostics` | 問題候補出力スキーマ7フィールド（観点、対象、根拠、シグナル数、確信度、推奨アクション、req-define入力案） | 観点→category、対象→target、根拠→evidence、シグナル数→notes、確信度→confidence、推奨アクション→recommended_route、req-define入力案→notes へマッピング。severity、source_of_truth、ng_classification は本スキルが横断的に付与 |
-| `agentdev-doc-writing` | 査読出力形式（`references/review-output.md`） | 本契約の target、evidence、recommended_route へ正規化 |
 
 ## finding schema（共通証拠構造）
 

@@ -172,10 +172,9 @@ STEP reference 8 要素は `<workflows/step-reference-contract>` Design 参照�
 
 ## See Also
 
-- **agentdev-req-analysis**: 要件分析手法（要件の展開観点、必達要件記述ガイダンス、壁打ちメソドロジー）
+- **agentdev-req-analysis**: 要件分析手法（要件の展開観点、必達要件記述ガイダンス、要件行の品質観点、壁打ちメソドロジー）
 - **agentdev-decision-file-manager**: Decisionファイル管理（REQ ↔ Decision整合性チェック）
 - **agentdev-decision-guidelines**: Decision作成の必要性判定基準
-- **agentdev-doc-writing**: Decision/REQ/Design横断の文書品質査読ゲート（文書種別責務、要件性、文意品質、粒度）
 
 ## 参考文献
 

@@ -29,7 +29,7 @@ Command→Skill 参照妥当性診断で、文書内で言及される実行主�
 | command を skill と呼ぶ | 実行 command を skill と記述、`load_skills` に command 名を指定 | execution-subject-misclassification |
 | harness を skill と呼ぶ | 外部実行基盤を skill と記述 | execution-subject-misclassification |
 | subagent を skill と呼ぶ | 実行担当サブエージェントを skill と記述 | execution-subject-misclassification |
-| skill を command と呼ぶ | `agentdev-doc-writing` を `/agentdev-doc-writing` と記述 | execution-subject-misclassification |
+| skill を command と呼ぶ | `agentdev-req-analysis` を `/agentdev-req-analysis` と記述 | execution-subject-misclassification |
 | skill を subagent と呼ぶ | `agentdev-case-run-execution-adapter` を subagent_type に指定 | execution-subject-misclassification |
 
 ## 診断手順
@@ -89,4 +89,4 @@ Recommended route には `command` / `skill` / `references` のいずれかを�
 
 - 実行時の動的判定（委譲の実際の起動、`load_skills` の実解決）は本診断の対象外。静的記述の分類正確性のみを検証する。
 - 機械的パターンマッチングによる検出は integrity-rule-catalog Design が担う。本診断は意味的、文脈的な誤認検出を担う。
-- 文書品質査読時の実行主体分類は `agentdev-doc-writing` が担う。本診断は Command→Skill 参照妥当性診断の文脈での誤認検出を担う。
+- 実行主体分類の基準の原本は document-type-responsibilities Design「実行主体分類の査読基準」である。作成時の確認は authoring 系 skill（command-authoring、skill-authoring）の文章品質観点が担い、診断時の誤認検出は本診断が担う。
