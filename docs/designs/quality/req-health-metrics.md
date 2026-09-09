@@ -185,5 +185,5 @@ REQ 健全性診断は行数・関心数に加え、ステークホルダー視�
 ### 機械化境界
 
 上記検出パターンの機械判定可能範囲（固有名詞主語検出、 Design 分離基準キーワード検出等）は docs-check が担う。
-文脈解釈を要する判定は inspect-docs / `agentdev-doc-writing` が担う（3層検出構造、REQ-036-008）。
+文脈解釈を要する判定は inspect-docs / `agentdev-doc-diagnostics` が担う（3層検出構造、REQ-036-008）。
 本 Design は検出パターンの定義のみを提供し、各実装を規定しない。

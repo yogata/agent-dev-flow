@@ -18,14 +18,14 @@ updated: 2026-09-09
 > 両 Design の境界変更時は相互参照を更新し、同一関心の説明が重複・矛盾しない状態を維持する。
 
 docs/ 配下の文書（REQ/Decision/Design/guides/README）および AGENTS.md の日本語執筆における文書種別責務、配置基準、用語政策を示す。
-v2:REQ-0140（文書品質ゲート）の原本仕様（文書種別配置、用語政策系）であり、`agentdev-doc-writing` スキルの参照先である。
+v2:REQ-0140（文書品質ゲート）の原本仕様（文書種別配置、用語政策系）である。
 配布 command/skill 本文のプロジェクト固有 Decision、REQ、Design 具体 ID、具体パス、固定 URL への非依存は REQ-029-003、REQ-029-004 が正規所有し、traceability 補完は extension 機構（`../foundations/project-extensions.md`）と協調する。
 意味境界の検出契約は `../integrity/distribution-boundary.md` を参照する。
 
-> **執筆規範の SSoT は japanese-tech-writing スキル**: 基本原則、術語の平易化、文体基準、不自然な日本語の典型は AGENTS.md 経由で japanese-tech-writing スキルを参照する。
-> 本 Design は文書種別の配置基準とリポジトリ固有の用語政策に特化し、japanese-tech-writing の内容を複製しない。
+> **文章表層品質の SSoT は textlint 共通基盤**: 基本的な表層規則、用語辞書、文体規則は `agentdev-textlint-guard` Plugin とプロジェクト用語 prh 辞書を参照する。
+> 本 Design は文書種別の配置基準とリポジトリ固有の用語政策に特化し、文章表層規則を複製しない。
 >
-> **AI-slop 検出基準は含めない**: AI-slop 概念は完全廃止し、文章品質の判定は japanese-tech-writing（LLM っぽい表現の禁止、空虚な形容、空虚な動詞）に完全委譲する。
+> **AI-slop 検出基準は含めない**: AI-slop 概念は完全廃止し、文章表層品質の判定は textlint 共通基盤に委譲する。
 > 対応表は作成しない。
 
 ## 文書種別の基準境界（参照）
@@ -130,7 +130,7 @@ learning/intake 成果物から後続工程（RU、req-define、design-save）�
 ## 実行主体分類の査読基準
 
 文書内で言及される実行主体は、以下の分類に従って正確に記述すること。
-この基準は `agentdev-doc-writing`（v2:REQ-0140-027）および `agentdev-inspect-skills`（REQ-010-010）の査読対象である。
+この基準は `agentdev-inspect-skills`（REQ-010-010）の診断対象である。
 
 | 分類 | 説明 | 判定方法 |
 |---|---|---|
@@ -212,7 +212,7 @@ SKILL.md の節構成は以下の役割分担に従う。
 | 機能節（`## 責務`, `## USE FOR`, `## 担当` 等） | 新情報追加 | 概要節で触れない具体的な対象、対象外、查読観点、判定基準を詳細に記述 |
 
 **禁止パターン**: 概要節に機能節と同じ内容の詳細説明を含め、機能節で再説明する重複構造。
-SKILL.md 査読時（`agentdev-doc-writing`）に概要節と機能節の重複を検出し、概要節を簡潔な導入へ縮退するよう指示する。
+SKILL.md 査読時（`agentdev-inspect-skills`）に概要節と機能節の重複を検出し、概要節を簡潔な導入へ縮退するよう指示する。
 
 **適用対象**: `src/opencode/skills/agentdev-*/SKILL.md`（配布 agentdev-* skill 全件）。
 件数は固定値を埋め込まず、実ディレクトリ構成により動的に追従する（旧「全27ファイル」等の固定件数は構成変更時に陳腐化するため廃止）。
@@ -238,7 +238,7 @@ SKILL.mdはDesignを参照し、extensionは標準SKILL.mdの固定知識外に�
 ## SKILL.md概要節と機能節の役割分担
 
 SKILL.mdの概要節は入口として役割と利用条件を簡潔に示し、機能節は具体的な対象、対象外、判断基準、参照先を追加する。
-概要節と機能節の重複は`agentdev-doc-writing`の恒常的な査読対象とする。
+概要節と機能節の重複は`agentdev-inspect-skills`の恒常的な診断対象とする。
 
 査読対象の分類は重複度合いと文書影響度に基づく。
 固定件数、実施順序、段階的スケジュール、個別ファイル一覧は本Designに保持しない（固定件数埋め込みを全件禁止）。

@@ -44,9 +44,8 @@ REQ ファイルの作成、追記、更新を管理する知識ベースとし�
 
 ## 対象外
 
-- 要件分析手法（`agentdev-req-analysis` 担当）
+- 要件分析手法、要件行の品質観点（`agentdev-req-analysis` 担当）
 - Decision ファイル作成、更新（`agentdev-decision-file-manager` 担当）
-- 文書品質査読（`agentdev-doc-writing` 担当）
 - 要件収集
 
 ## 検証観点

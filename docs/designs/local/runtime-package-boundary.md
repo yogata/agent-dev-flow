@@ -433,7 +433,6 @@ wrong target 検出、再作成ロジックは LocalMode と通常版 install �
 | スキル | 区分 | 備考 |
 |--------|------|------|
 | `agentdev-*` 全 27 件 | 配布物依存 | `src/opencode/skills/` 配下、`agentdev-*` グロブで自動 junction |
-| `japanese-tech-writing` | third-party 起源の遺構投影（削除済み） | third-party 起源の遺構投影であり投影ディレクトリを削除済み。third-party Skill は DEC-023（accepted）の分離管理・検査許容モデルで扱い、本表の管理対象から除外する |
 | `repo-agentdev-integrity` | repo-local 専用 | `/repo/docs-check` 実行スキル。REQ-001 の `repo-*` 卡out 対象。検証スクリプトを呼び出す command は DEC-006 により3 command（`docs-check`, `inspect-skills`, `inspect-promote`）へ正規化済み。これらが `repo-agentdev-integrity/scripts/*.ts` を呼び出すが、当該参照は consumer 環境で実行時欠落する別課題（本 Design の対象外） |
 
 ## 関連項目（See Also）
@@ -448,4 +447,3 @@ wrong target 検出、再作成ロジックは LocalMode と通常版 install �
 - REQ-002（配布物依存スキルの src 昇格方針と未トラックスキル検出）
 - REQ-009（ローカル版導入方式を link mode へ統一し生成方式を廃止。v2:ADR-0126 を supersede）
 - v2:ADR-0134（配布物依存スキルの src 昇格方針）
-

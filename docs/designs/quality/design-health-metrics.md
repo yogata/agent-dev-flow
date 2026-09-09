@@ -88,5 +88,5 @@ Design 健全性診断は行数・status・配置に基づく次の検出パタ�
 ### 機械化境界
 
 上記検出パターンの機械判定可能範囲（Report 配下への監査記録分離確認、行数計測等）は docs-check が担う。
-文脈解釈を要する判定（REQ 規範重複等）は inspect-docs / `agentdev-doc-writing` が担う（3層検出構造、REQ-036-008）。
+文脈解釈を要する判定（REQ 規範重複等）は inspect-docs / `agentdev-doc-diagnostics` が担う（3層検出構造、REQ-036-008）。
 本 Design は検出パターンの定義のみを提供し、各実装を規定しない。

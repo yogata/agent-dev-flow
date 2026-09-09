@@ -339,7 +339,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **resume**: スキャン対象一覧、検出事項リスト、source-of-truth 判定結果、NG分類。
 - **durable state**: `.agentdev/inspect/inbox/inspect-docs-finding-*.md`、commit hash。
 - **Harness依存**: LLM 推論（意味診断）、subagent 起動（`agentdev-req-structure-diagnostics` 等）、git、拡張読込。
-- **Capability依存**: `agentdev-req-structure-diagnostics`、`agentdev-doc-diagnostics`、`agentdev-doc-writing`（参照）、`agentdev-git-worktree`、`agentdev-project-extensions`。
+- **Capability依存**: `agentdev-req-structure-diagnostics`、`agentdev-doc-diagnostics`、`agentdev-git-worktree`、`agentdev-project-extensions`。
 - **内部workflow候補**: docs 横断診断workflow（STEP-1〜3 + 6観点 review + 文書分類検査 + 配布物整合性）。診断カテゴリの routing と検査ロジックは Capability Skill 候補（`agentdev-doc-diagnostics`/`agentdev-req-structure-diagnostics` が所有）。
 
 ### `/agentdev/inspect-skills`
@@ -441,4 +441,3 @@ Workflow Skill 抽出済みの case-open/case-close/case-auto/case-run は完全
 - [workflows/](../workflows/)（横断ワークフロー契約）
 - [commands/](../commands/)（command Design）
 - [skills/](../skills/)（skill Design）
-

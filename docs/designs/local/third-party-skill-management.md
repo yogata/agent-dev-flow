@@ -37,8 +37,8 @@ REQ-002-042 から REQ-002-044、REQ-029-009、REQ-052-011 の Design が所有�
 
 ## 個別特例統合
 
-- agentdev-doc-writing が参照点である該当 Skill の skills.yaml 宣言と機構経由再取得
-- gitignore 特例・doc-writing 以外の特例参照の除去（scripts、README、guide、docs 設計系）
+- 個別 Skill の利用前提は宣言データと各利用側の責務文書で管理する
+- third-party Skill 固有の参照を ADF 本体へ埋め込まない
 - source URL は宣言データとして運用者が登録する
 
 ## release archive 検証

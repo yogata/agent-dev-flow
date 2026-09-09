@@ -45,7 +45,6 @@ authoring Skill/Design がそれぞれ担当する。
 対象判定は共通 textlint 基盤が所有し、doc-diagnostics は src/opencode の対象化を所有しない。
 標準対象外の template 等に文章表層検査を適用する場合はプロジェクトの追加対象設定を利用する。
 同じ成果物に複数の能力が必要なら全てを test strategy に投影する。
-退役する agentdev-doc-writing への呼出しは品質能力の充足根拠としない。
 既存の QG と変更誘発境界リスクに基づく品質要求を維持する。
 
 ## 入力源

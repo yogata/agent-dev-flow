@@ -42,7 +42,6 @@ Decision ファイルの作成、追記、更新を管理する知識ベース�
 
 - Decision 作成ガイドライン、Decision 必要かどうかの判定（`agentdev-decision-guidelines` 担当）
 - 要件分析手法（`agentdev-req-analysis` 担当）
-- 文書品質査読（`agentdev-doc-writing` 担当）
 
 ## 検証観点
 
@@ -50,6 +49,7 @@ Decision ファイルの作成、追記、更新を管理する知識ベース�
 - ID とファイル名の一致
 - 日付フォーマットの正当性
 - ステータス遷移が許容遷移に従っているか
+- Decision 本文が意思決定文書として成立しているか（決定内容の明示、文脈、根拠、代替案と却下理由、影響、判断主体の明確さ）。要件（満たすべき成果）と現在の実装構成の詳細は REQ/Design への移送候補として提示する（文書種別責務の原本は document-type-responsibilities Design）
 
 ## accepted Decision 直接編集チェックリスト
 
