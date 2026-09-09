@@ -243,6 +243,55 @@ describe("設定の fail-closed と再読込み", () => {
   });
 });
 
+describe("ADF 本体の追加対象と特例分岐禁止（TS-007）", () => {
+  const ADF_BODY_CONFIG = "version: 1\nadditional_targets:\n  - src/opencode/commands/**/*.md\n  - src/opencode/skills/**/*.md\n";
+
+  test("ADF 本体と同じ追加対象設定で commands / skills の Markdown が検査対象になる", async () => {
+    const root = makeProject({ "src/opencode/skills/agentdev-x/SKILL.md": "# s\n\n正常。\n" });
+    const configAbs = configPathFor(root);
+    fs.mkdirSync(path.dirname(configAbs), { recursive: true });
+    fs.writeFileSync(configAbs, ADF_BODY_CONFIG, "utf8");
+    await expectBlocked(
+      "write",
+      { filePath: path.join(root, "src", "opencode", "commands", "agentdev", "c.md"), content: VIOLATING },
+      root,
+    );
+    await expectBlocked(
+      "edit",
+      {
+        filePath: path.join(root, "src", "opencode", "skills", "agentdev-x", "SKILL.md"),
+        oldString: "正常。",
+        newString: "半角カナ\uFF71混入。",
+      },
+      root,
+    );
+  });
+
+  test("設定のない別プロジェクトでは commands / skills は対象外のまま", async () => {
+    const root = makeProject({ "docs/keep.md": CLEAN });
+    expect(
+      await guardOperation(
+        "write",
+        { filePath: path.join(root, "src", "opencode", "skills", "s", "SKILL.md"), content: VIOLATING },
+        root,
+      ),
+    ).toBeNull();
+    // 標準対象は設定なしでも常時有効
+    await expectBlocked("write", { filePath: path.join(root, "docs", "a.md"), content: VIOLATING }, root);
+  });
+
+  test("Plugin source にリポジトリ判定分岐を持たない（機械検索）", () => {
+    const pluginDir = path.resolve(import.meta.dir, "..");
+    const sourceFiles = ["plugin.ts", "gate.ts", ...fs.readdirSync(path.join(pluginDir, "lib")).map((f) => `lib/${f}`)];
+    for (const rel of sourceFiles) {
+      if (!rel.endsWith(".ts")) continue;
+      const text = fs.readFileSync(path.join(pluginDir, ...rel.split("/")), "utf8");
+      expect(text.includes("agent-dev-flow")).toBe(false);
+      expect(/isAdfRepository|adfRepo|repositoryName/.test(text)).toBe(false);
+    }
+  });
+});
+
 describe("hooks 配線（OpenCode 契約形状）", () => {
   test("tool.execute.before フックは write/edit/apply_patch だけを検査する", async () => {
     const root = makeProject({ "docs/a.md": CLEAN });

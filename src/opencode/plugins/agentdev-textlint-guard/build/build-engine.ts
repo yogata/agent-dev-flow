@@ -95,3 +95,24 @@ fs.writeFileSync(outJsonPath, jsonText, "utf8");
 const sizeKb = Math.round(jsonText.length / 1024);
 console.log(`engine bundle written: ${path.relative(pluginDir, outJsonPath)} (${sizeKb} KB)`);
 console.log("versions:", JSON.stringify(versions));
+
+// 5) kuromoji 辞書の同梱（vendor/kuromoji-dict/）。
+//    採用プリセットの形態素規則は kuromojin 経由で kuromoji 辞書を必要とする。
+//    kuromojin の既定 dicPath は node_modules 内を指すため、導入先の
+//    node_modules 有無に依存しないよう、配布物として辞書を実ファイルで同梱する
+//    （実行時は lib/engine-bundle.ts が KUROMOJIN_DIC_PATH を本配置へ固定する）。
+const dictSrcDir = path.join(pluginDir, "node_modules", "kuromoji", "dict");
+const dictOutDir = path.join(outDir, "kuromoji-dict");
+if (!fs.existsSync(dictSrcDir)) {
+  throw new Error(`kuromoji dict not found at ${dictSrcDir}; run bun install before build:engine`);
+}
+fs.rmSync(dictOutDir, { recursive: true, force: true });
+fs.mkdirSync(dictOutDir, { recursive: true });
+for (const name of fs.readdirSync(dictSrcDir)) {
+  fs.copyFileSync(path.join(dictSrcDir, name), path.join(dictOutDir, name));
+}
+const dictFiles = fs.readdirSync(dictOutDir);
+if (dictFiles.length === 0) {
+  throw new Error(`kuromoji dict copy produced no files at ${dictOutDir}`);
+}
+console.log(`kuromoji dict copied: ${dictOutDir} (${dictFiles.length} files)`);

@@ -1,10 +1,11 @@
-// ADF-COVERS(implementation): REQ-053-025, REQ-053-026, REQ-053-027, REQ-053-028, REQ-053-031, REQ-053-032, REQ-053-034
+// ADF-COVERS(implementation): REQ-053-004, REQ-053-024, REQ-053-025, REQ-053-026, REQ-053-027, REQ-053-028, REQ-053-031, REQ-053-032, REQ-053-034
 // agentdev-textlint-guard 共通実行基盤: 文章検査（両入口の共通判定点）。
 //
 // pre-write 検査も最終検査も、このモジュールの inspectText / inspectFile を経由する。
 // 同一の全文、パス、規則、設定に対して同一の判定（正規化済み結果）を返すことが
 // 両入口の同一性契約の実装本体である。検査異常終了は検査不能として失敗を返す
 // （fail-closed、呼出側は副作用を拒否する）。
+// プロジェクト固有用語辞書の発見もここで行い、規則合成へ追加合成する。
 
 import * as fs from "node:fs";
 import * as path from "node:path";
@@ -12,6 +13,7 @@ import type { GuardConfig, GuardConfigResult } from "./config.ts";
 import { formatConfigError, loadGuardConfig } from "./config.ts";
 import { loadEngine, type EngineLoadResult, type TextlintKernelLike } from "./engine-bundle.ts";
 import { composeRuleDescriptors, type RuleComposition } from "./rules.ts";
+import { discoverProjectPrh, formatProjectPrhError } from "./terminology.ts";
 import {
   classifySeverity,
   extractExcerpt,
@@ -47,6 +49,10 @@ export async function prepareInspection(root: string, env: InspectEnvironment = 
   if (!configResult.ok) {
     return { ok: false, detail: formatConfigError(configResult) };
   }
+  const projectPrh = discoverProjectPrh(root);
+  if (!projectPrh.ok) {
+    return { ok: false, detail: formatProjectPrhError(projectPrh) };
+  }
   const engineResult = await (env.loadEngineFn ?? (() => loadEngine(env.pluginDir)))();
   if (!engineResult.ok) {
     return { ok: false, detail: `agentdev-textlint-guard: ${engineResult.detail}; blocked per fail-closed` };
@@ -55,7 +61,10 @@ export async function prepareInspection(root: string, env: InspectEnvironment = 
     const composition =
       env.composeRules !== undefined
         ? env.composeRules(engineResult)
-        : composeRuleDescriptors(engineResult.engine);
+        : composeRuleDescriptors(
+            engineResult.engine,
+            projectPrh.path === null ? {} : { prhRulePaths: [projectPrh.path] },
+          );
     return {
       ok: true,
       config: configResult.config,
@@ -97,8 +106,15 @@ export async function inspectText(
       plugins: [{ pluginId: "markdown", plugin: prepared.markdownPlugin }],
       rules: prepared.composition.rules,
     });
+    // 拒否対象の判定は規則構成の hardRuleIds（意思決定記録の限定列挙）を正とする。
+    // kernel の severity は、RuleError を介さない plain object report で規則が
+    // severity を返さない場合 options.severity を無視して error 固定となるため
+    // （例: preset-ai-writing/ai-tech-writing-guideline）、数値だけでは
+    // 助言対象の規則が拒否対象へ昇格してしまう。
+    const hardRuleIds = new Set(prepared.composition.hardRuleIds);
     const findings = lintResult.messages.map((m): InspectionFinding => {
       const range = normalizeRange(m.range, m.fix?.range ?? null);
+      const numeric = classifySeverity(m.severity);
       return {
         path: rootRelativePath,
         line: m.line,
@@ -107,7 +123,7 @@ export async function inspectText(
         message: m.message,
         excerpt: extractExcerpt(text, range),
         replacement: m.fix?.text ?? null,
-        severity: classifySeverity(m.severity),
+        severity: hardRuleIds.has(m.ruleId) ? "hard" : numeric === "hard" ? "advice" : numeric,
       };
     });
     findings.sort((a, b) => a.line - b.line || a.column - b.column || a.ruleId.localeCompare(b.ruleId));

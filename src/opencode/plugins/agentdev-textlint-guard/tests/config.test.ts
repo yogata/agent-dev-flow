@@ -74,6 +74,24 @@ describe("parseConfigYaml（スキーマ検証）", () => {
     const parsed = parseConfigYaml("\n# comment only\n");
     expect(parsed.ok).toBe(false);
   });
+
+  test("解釈不能な構文は設定エラー", () => {
+    const parsed = parseConfigYaml("version: 1\nadditional_targets:\n  - a.md\n!!! garbage\n");
+    expect(parsed.ok).toBe(false);
+  });
+
+  test("additional_targets へのスカラー指定は設定エラー（型違い）", () => {
+    const parsed = parseConfigYaml("version: 1\nadditional_targets: docs/**/*.md\n");
+    expect(parsed.ok).toBe(false);
+  });
+
+  test("標準対象の無効化・削除を意図する項目は未知キーとして拒否される", () => {
+    for (const key of ["targets", "standard_targets", "disable_targets", "exclude_targets"]) {
+      const parsed = parseConfigYaml(`version: 1\n${key}:\n  - docs/**/*.md\n`);
+      expect(parsed.ok).toBe(false);
+      if (!parsed.ok) expect(parsed.detail).toContain("unknown config key");
+    }
+  });
 });
 
 describe("validateTargetGlob（ルート内パスの妥当性）", () => {

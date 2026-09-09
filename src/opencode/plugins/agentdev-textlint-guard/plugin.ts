@@ -29,6 +29,7 @@ import {
   type ReconstructionResult,
 } from "./lib/reconstruct.ts";
 import { formatOutcome } from "./lib/results.ts";
+import { discoverProjectPrh, formatProjectPrhError } from "./lib/terminology.ts";
 import { isTargetPath } from "./lib/targets.ts";
 
 // OpenCode plugin plumbing 型（@opencode-ai/plugin 1.18.x と同じ形状。
@@ -86,10 +87,15 @@ export async function guardOperation(
   args: Record<string, unknown>,
   projectRoot: string,
 ): Promise<string | null> {
-  // 1) 設定の読込み（hook ごと）。不正な設定は対象外ファイルへの操作も含めて拒否する。
+  // 1) 設定とプロジェクト用語辞書の読込み（hook ごと）。解釈不能・読込み不能は
+  //    対象外ファイルへの操作も含めて拒否する（fail-closed）。
   const configResult: GuardConfigResult = loadGuardConfig(projectRoot);
   if (!configResult.ok) {
     return formatConfigError(configResult);
+  }
+  const projectPrh = discoverProjectPrh(projectRoot);
+  if (!projectPrh.ok) {
+    return formatProjectPrhError(projectPrh);
   }
 
   // 2) 完成予定全文の再構成

@@ -18,6 +18,15 @@ import { pathToFileURL } from "node:url";
 export const BUNDLE_RELATIVE_PATH = "vendor/textlint-engine.bundle.json";
 export const ENGINE_BUNDLE_SCHEMA = 1;
 
+/**
+ * kuromojin 辞書の同梱配置（bundle と同じ vendor/ 配下）。
+ * kuromojin の既定 dicPath 解決は require.resolve("kuromoji") を含み、
+ * bundler がこれをビルド時の絶対パスへ固定するため、配置場所に依存する。
+ * そこで kuromojin の公開上書き経路（環境変数 KUROMOJIN_DIC_PATH）を
+ * 本配布物の同梱辞書へ固定し、検査実行を導入先の配置場所から独立させる。
+ */
+export const KUROMOJI_DICT_RELATIVE_PATH = "vendor/kuromoji-dict";
+
 /** textlint kernel（本 Plugin が消費する操作のみを宣言）。 */
 export interface TextlintKernelLike {
   lintText(
@@ -88,9 +97,20 @@ export function bundlePathFor(pluginDir?: string): string {
   return path.resolve(here, "..", ...BUNDLE_RELATIVE_PATH.split("/"));
 }
 
+export function kuromojiDictPathFor(pluginDir?: string): string {
+  return path.join(path.dirname(bundlePathFor(pluginDir)), "kuromoji-dict");
+}
+
+/** kuromojin 辞書パスを同梱辞書へ固定（利用者明示指定は優先する）。 */
+function ensureKuromojinDicPath(pluginDir?: string): void {
+  if (process.env.KUROMOJIN_DIC_PATH !== undefined) return;
+  process.env.KUROMOJIN_DIC_PATH = kuromojiDictPathFor(pluginDir);
+}
+
 /** エンジンの読込み（module-level キャッシュ）。失敗は検査不能として呼出側で拒否する。 */
 export async function loadEngine(pluginDir?: string): Promise<EngineLoadResult> {
   if (loaded !== null) return { ok: true, engine: loaded };
+  ensureKuromojinDicPath(pluginDir);
   const bundlePath = bundlePathFor(pluginDir);
   let raw: string;
   try {
@@ -155,6 +175,7 @@ export function invalidateEngineCache(): void {
 
 /** 代替経路（一時ファイル import）。blob: URL import を利用できない実行基盤向け。テスト専用。 */
 export async function loadEngineViaTempFile(pluginDir: string): Promise<EngineLoadResult> {
+  ensureKuromojinDicPath(pluginDir);
   const bundlePath = bundlePathFor(pluginDir);
   let code: string;
   try {
