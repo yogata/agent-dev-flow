@@ -73,7 +73,7 @@ describe("vendored engine bundle（配布前解決済み依存）", () => {
 });
 
 describe("規則合成（既定構成）", () => {
-  test("既定の prh 辞書（空）が接続され、拒否対象は決定的規則に限定される", async () => {
+  test("標準 prh 辞書が接続され、拒否対象は決定的規則に限定される", async () => {
     const engine = await loadEngine(pluginDir);
     expect(engine.ok).toBe(true);
     if (!engine.ok) return;
@@ -102,8 +102,12 @@ describe("規則合成（既定構成）", () => {
       expect(advice).toContain(heuristic);
       expect(composition.hardRuleIds).not.toContain(heuristic);
     }
-    // 既定 prh 辞書は空（未立証の語を強制していない）
+    // 標準 prh 辞書は旧 IR-060 forbidden 区分から移管した完全一致検出語を持ち、
+    // YAML として解析できる（検出挙動は standard-dictionary.test.ts が検証する）
     const dict = fs.readFileSync(path.join(pluginDir, "rules", "default-prh.yml"), "utf8");
-    expect(dict).toContain("rules: []");
+    expect(dict).toContain("pattern: 而非");
+    expect(dict).toContain("pattern: 監査証跠");
+    expect(dict).toContain("pattern: /source-of-trought/");
+    expect(dict.startsWith("# ADF 標準 prh 辞書")).toBe(true);
   });
 });

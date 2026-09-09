@@ -99,13 +99,17 @@ describe("共通基盤の検査（TS-001）", () => {
   test("prh の修正候補（replacement）を保持する", async () => {
     const prepared = await prepareInspection(process.cwd());
     if (!prepared.ok) return;
-    // prh 既定辞書は空のため、replacement 保持は意味論検証に留める:
-    // prh 規則が fix を提供する場合に replacement へ流れることを
-    // 規則合成を通じた検出で確認する（空辞書では検出なし＝通過）。
-    const r = await inspectText(prepared, process.cwd(), "docs/sample.md", "辞書対象外の文章。");
+    // 標準辞書の登録語（監査証跠の誤変換）を検出し、replacement（修正指針）を保持する。
+    const r = await inspectText(prepared, process.cwd(), "docs/sample.md", "監査証跠を残す。");
     expect(r.ok).toBe(true);
     if (r.ok) {
-      expect(r.result.findings.filter((f) => f.ruleId === "prh")).toHaveLength(0);
+      const hits = r.result.findings.filter((f) => f.ruleId === "prh" && f.severity === "hard");
+      expect(hits.length).toBeGreaterThan(0);
+      const firstHit = hits[0];
+      expect(firstHit).toBeDefined();
+      if (firstHit !== undefined) {
+        expect(firstHit.replacement).toBe("監査証跡");
+      }
     }
   });
 
