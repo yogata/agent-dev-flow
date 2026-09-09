@@ -53,7 +53,7 @@
 | [REQ-050](REQ-050.md) | scripts 公開入口境界 |
 | [REQ-051](REQ-051.md) | ガードレール識別体系と機械検査の再編 |
 | [REQ-052](REQ-052.md) | Custom Tool・Plugin/Hook の種別契約と配布境界 |
-| [REQ-053](REQ-053.md) | 配布物の文章品質契約 |
+| [REQ-053](REQ-053.md) | 文書と配布物の文章品質契約 |
 | [REQ-054](REQ-054.md) | 変更誘発境界リスク分析 |
 | [REQ-055](REQ-055.md) | production-equivalent verification の定義 |
 | [REQ-056](REQ-056.md) | Project Knowledge の所有と workflow 利用 |

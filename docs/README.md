@@ -55,7 +55,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [REQ-050](requirements/REQ-050.md) | scripts 公開入口境界 |
 | [REQ-051](requirements/REQ-051.md) | ガードレール識別体系と機械検査の再編 |
 | [REQ-052](requirements/REQ-052.md) | Custom Tool・Plugin/Hook の種別契約と配布境界 |
-| [REQ-053](requirements/REQ-053.md) | 配布物の文章品質契約 |
+| [REQ-053](requirements/REQ-053.md) | 文書と配布物の文章品質契約 |
 | [REQ-054](requirements/REQ-054.md) | 変更誘発境界リスク分析 |
 | [REQ-055](requirements/REQ-055.md) | production-equivalent verification の定義 |
 | [REQ-056](requirements/REQ-056.md) | Project Knowledge の所有と workflow 利用 |
@@ -66,7 +66,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-027 の26件である（DEC-019〜DEC-022、DEC-024〜DEC-027 は proposed、DEC-005、DEC-007 は superseded）。
+現行 Decision は DEC-001 から DEC-028 の27件である（DEC-019〜DEC-022、DEC-024〜DEC-028 は proposed、DEC-005、DEC-007 は superseded）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
@@ -97,6 +97,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [DEC-025](decisions/DEC-025.md) | プロジェクト知識を Capability Skill から分離し、独立した正規知識層として管理する（proposed） |
 | [DEC-026](decisions/DEC-026.md) | 実現面変更方針の構造化ハンドオフ（realization_actions）（proposed） |
 | [DEC-027](decisions/DEC-027.md) | 観測ベース統制縮小評価ループ（proposed） |
+| [DEC-028](decisions/DEC-028.md) | 文章表層品質の共通実行基盤（proposed） |
 
 ## 設計（Design）
 

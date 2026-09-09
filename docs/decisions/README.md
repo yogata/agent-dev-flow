@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は16件、提案中の Decision は8件である。
+現行の承認済み Decision は16件、提案中の Decision は9件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -41,6 +41,7 @@
 | DEC-025 | プロジェクト知識を Capability Skill から分離し、独立した正規知識層として管理する | proposed | 2026-09-01 |
 | DEC-026 | 実現面変更方針の構造化ハンドオフ（realization_actions） | proposed | 2026-09-03 |
 | DEC-027 | 観測ベース統制縮小評価ループ | proposed | 2026-09-04 |
+| DEC-028 | 文章表層品質の共通実行基盤 | proposed | 2026-09-09 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -82,6 +83,7 @@
 - [DEC-025](DEC-025.md)（プロジェクト知識を Capability Skill から分離し、独立した正規知識層として管理する）
 - [DEC-026](DEC-026.md)（実現面変更方針の構造化ハンドオフ（realization_actions））
 - [DEC-027](DEC-027.md)（観測ベース統制縮小評価ループ）
+- [DEC-028](DEC-028.md)（文章表層品質の共通実行基盤）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -117,6 +119,7 @@
 - [DEC-017](DEC-017.md)（最小トレーサビリティモデルの採用と Artifact Graph の廃止、要件中心の最小 TIM と agentdev-traceability への置換）
 - [DEC-021](DEC-021.md)（scripts 公開入口の2本固定と安定契約、公開入口の構造境界と入口名の安定性）
 - [DEC-023](DEC-023.md)（third-party Skill の分離管理と取得機構の導入、第三区分所有境界と参照点集約）
+- [DEC-028](DEC-028.md)（文章表層品質の共通実行基盤、textlint 採用と書込み前・最終検査の共通化、DEC-001 決定3の限定後継）
 
 ### ワークフロー・委譲契約
 
@@ -188,6 +191,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-021 | [REQ-050](../requirements/REQ-050.md) | scripts 公開入口の2本固定と安定契約（REQ-050 CREATE、REQ-009-002/044 UPDATE、DEC-016 参照修正と整合） |
 | DEC-023 | [REQ-002](../requirements/REQ-002.md), [REQ-009](../requirements/REQ-009.md), [REQ-029](../requirements/REQ-029.md), [REQ-052](../requirements/REQ-052.md) | third-party Skill の分離管理と取得機構の導入（REQ-002-019 UPDATE、REQ-002-042〜044 APPEND、REQ-009-050 APPEND、REQ-029-009 APPEND、REQ-052-011 APPEND と整合） |
 | DEC-024 | [REQ-054](../requirements/REQ-054.md), [REQ-055](../requirements/REQ-055.md), [REQ-056](../requirements/REQ-056.md) | 変更誘発境界リスク分析の導入と検証契約への投影（REQ-054/055/056 CREATE、REQ-002-046 APPEND、REQ-039-006 APPEND と整合） |
+| DEC-028 | [REQ-053](../requirements/REQ-053.md), [REQ-010](../requirements/REQ-010.md), [REQ-036](../requirements/REQ-036.md) | 文章表層品質の共通実行基盤（REQ-053 全面更新、REQ-010-071/074 UPDATE と REQ-010-075 APPEND、REQ-036-008/023 UPDATE と整合） |
 
 ## 過去版の履歴基盤
 
