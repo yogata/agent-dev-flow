@@ -42,10 +42,10 @@ textlint kernel では、規則が `report(node, plainObject)`（RuleError 非�
 
 ## 2026-09-09 worktree の独立 bun プロジェクトは各 package で個別 bun install が必要
 
-- **発生源**: PR #2745（Issue #2735 / Epic #2734 W1）テスト結果
+- **発生源**: PR #2745（Issue #2735 / Epic #2734 W1）、PR #2749 / PR #2750（Issue #2737 / #2738 / Epic #2734 W3/W4）テスト結果
 - **クラス**: 環境前提（worktree 構造的制約）
 
-worktree で integrity suite を実行する場合、textlint plugin 配下に加えて `src/opencode/skills/agentdev-project-extensions/scripts/` など独立 bun プロジェクト（package.json + bun.lock 構成）でも個別に bun install が必要（node_modules 未伝播の構造的制約）。未実施のまま suite を実行すると zod 解決失敗が現れる。REQ-018（worktree 構造的制約とテスト fallback）関連の補足知見。
+worktree で integrity suite を実行する場合、textlint plugin 配下に加えて `src/opencode/skills/agentdev-project-extensions/scripts/` など独立 bun プロジェクト（package.json + bun.lock 構成）でも個別に bun install が必要（node_modules 未伝播の構造的制約）。未実施のまま suite を実行すると zod 解決失敗（`Cannot find package 'zod'`）が現れる。W3/W4 でも同様に `.opencode/skills/repo-agentdev-integrity/scripts` と `agentdev-project-extensions/scripts` の両方で bun install が必要であることを再確認済み。bun install 実行後の `git status` はクリーンを維持する（bun.lock 変更なし）。REQ-018（worktree 構造的制約とテスト fallback）関連の補足知見。
 
 ## 2026-09-09 対象解決の既定除外は node_modules と歴史記録で加算優先の意味論が異なる
 
@@ -97,3 +97,51 @@ worktree で integrity suite を実行する場合、textlint plugin 配下に�
 - **想定反映先**: textlint 品質基盤の運用知見（learning-promote で反映先を判断）
 - **関連**: src/opencode/plugins/agentdev-textlint-guard/lib/rules.ts、PR 2747、docs/reports/req-053-textlint-wave2-calibration.md
 - **タグ**: `#textlint` `#preset-ai-writing` `#corpus校正`
+
+## 2026-09-10 Windows の integrity suite フル実行では 5 秒 spawn timeout 由来の環境 fail が出現し、単独再実行と timeout 延長で由来分類する
+
+- **問題事象**: textlint 是正キャンペーン Wave 3/4 の integrity suite フル実行で、IR-055 baseline-known 閾値テストと NG21 N17 テストが `timed out after 5000ms` で fail した（check_integrity.ts のサブプロセス実行が Windows 環境で 5 秒を超える）。フル実行の回数によって出現が変動する
+- **発生局面**: 検証（Epic 2734 Wave 3/4 境界 case-close の QG-4 bun test フル suite）
+- **検知方法**: bun test の fail 出力への `this test timed out after 5000ms` 明示と実行時間（5 秒前後）・JSON Parse error: Unexpected EOF（kill されたサブプロセスの stdout 途切れ）の確認
+- **根本原因**: テストが check_integrity スクリプト全体をサブプロセスで実行する設計に対し、bun test 既定の 5 秒 timeout が Windows の spawn コストで不足する
+- **自律対応内容**: 修正せず、`--timeout 120000` を付けた単独再実行で 2 件とも pass を確認し環境由来と分類した。fail 由来分類は QG-4 記録へ記載
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: サブプロセス spawn を伴うテストのフル suite fail は、タイムアウト延長の単独再実行で由来分類してから修正判断する（Wave2 から継続の既知パターン）
+- **再発条件**: Windows 環境でフル suite を並行実行・高負荷時に実行した場合
+- **予防策候補**: サブプロセス実行テストへの timeout 延長設定、またはフル suite 実行手順への単独再実行由来分類の明記
+- **想定反映先**: integrity suite 実行手順の運用知見（learning-promote で反映先を判断）
+- **関連**: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts、PR 2749、PR 2750
+- **タグ**: `#integrity-suite` `#spawn-timeout` `#Windows`
+
+## 2026-09-10 実行記録本文に ADF-COVERS マーカー形状の言及を書くと traceability check が malformed-declaration を検出する
+
+- **問題事象**: docs/reports/ の実行記録本文へ ADF-COVERS(implementation) マーカー形状を「言及」として書くと、traceability check が宣言形式として解釈し malformed-declaration を検出した
+- **発生局面**: 実装（Epic 2734 Wave 4 実行記録作成時の traceability 検証）
+- **検知方法**: traceability check の初回実行での malformed-declaration 検出
+- **根本原因**: マーカー形状は文字列一致で検出されるため、本文中の言及と実際の宣言が区別されない
+- **自律対応内容**: レポート本文では「実装対応宣言（implementation ロール）」等の形状を含まない表現へ置換し、宣言は frontmatter の covers に集約した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 機械検出されるマーカー・ID 形状を本文で説明する際は、形状を含まない言い換えを使う
+- **再発条件**: 検証記録・ガイド文書で ADF-COVERS 形状を例示した場合
+- **予防策候補**: ADF-COVERS 形状の言及は frontmatter 宣言または docs 配下の説明文書に限定する
+- **想定反映先**: トレーサビリティ運用知見（learning-promote で反映先を判断）
+- **関連**: PR 2750、docs/reports/req-053-textlint-wave4-src-correction.md
+- **タグ**: `#traceability` `#ADF-COVERS` `#実行記録`
+
+## 2026-09-10 規則構成ハッシュの再計算手順は prh options.rulePaths の絶対パスで環境依存になる
+
+- **問題事象**: Wave 2 規則構成ハッシュの再計算手順テキスト（req-053-textlint-wave2-calibration.md 第 4.1 節）のまま実行したところ、再現結果が Wave 2 記録値と一致しなかった
+- **発生局面**: 実装（Epic 2734 Wave 4 検証）
+- **検知方法**: 手順どおりの再計算結果と Wave 2 記録値の突合
+- **根本原因**: prh 規則 options.rulePaths が engine 起動環境の plugin dir 絶対パスを含み、canonical JSON(options) に環境依存値が混在する（原因候補として記録）
+- **自律対応内容**: 修正せず Wave 5（TS-001 突合）への引き継ぎ事項として実行記録へ記録。Wave 5 は突合前に Wave 2 の計算実装で手順の実装詳細（環境依存値の正規化要否）を確認する
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: 関連 Design確定候補（計算手順の環境非依存化）は Wave3/4 境界 case-close で「Wave5 close まで見送り」判断済み。Wave5 で Design 更新検討
+- **横展開観点**: ハッシュ計算に環境パスが混入する構成要素は、正規化規則を明記しないと再現性が失われる
+- **再発条件**: 異なる clone 先パスでハッシュ再計算を実行した場合
+- **予防策候補**: canonical JSON 対象から環境依存パスを除外または相対化する正規化規則の Design 明記
+- **想定反映先**: textlint 品質基盤 Design（docs/designs/quality/textlint-quality-runtime.md）の規則校正と移行検証節（Wave5 で検討）
+- **関連**: docs/reports/req-053-textlint-wave2-calibration.md、docs/reports/req-053-textlint-wave4-src-correction.md、PR 2750
+- **タグ**: `#textlint` `#規則構成ハッシュ` `#再現性`
