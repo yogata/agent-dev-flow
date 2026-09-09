@@ -19,7 +19,7 @@ inspect-docs command が実行する docs 横断診断のうち、専門診断�
 判定基準の詳細、検出手順、報告例は docs-spec-rebuild-integrity Design（extension 経由）と `agentdev-req-structure-diagnostics` が所有する。
 本スキルは横断スキャンで対象範囲を特定し、ルーティングする。
 | Design 三層構造違反（commands/skills/workflows 層分離） | `agentdev-req-structure-diagnostics` | 横断的に Design を比較、シグナル抽出、ルーティング | 該当なし（常に委譲） |
-| 文章表層品質（LLM っぽい表現、空虚な形容/動詞、英語混じり表現） | 共通 textlint 基盤（`agentdev-textlint-guard`） | 本スキルは検査しない（共通基盤が検査、REQ-036-008） | 該当なし（本スキルの対象外） |
+| 文章表層品質（LLM っぽい表現、空虚な形容/動詞、英語混じり表現） | 共通 textlint 基盤（`agentdev-textlint-guard`） | 本スキルは検査しない（共通基盤が検査） | 該当なし（本スキルの対象外） |
 | 実行主体分類の誤認（command を skill と呼ぶ等） | docs 配下は本スキルの意味診断、配布物（Command/Skill 記述）は `agentdev-inspect-skills` | docs 配下の横断意味診断で検出。配布物は独立実行を促す | inspect-docs から配布物側はルーティングせず、独立実行を促す |
 | Command/Skill 参照妥当性、Skill 構造 | `agentdev-inspect-skills`（独立 inspect-* 対象） | ルーティングしない（独立コマンド `inspect-skills` の対象） | inspect-docs からはルーティングせず、独立実行を促す |
 
@@ -84,6 +84,6 @@ inspect-docs Workflow Skill（`agentdev-workflow-inspect-docs`）の各工程は
 | 検査能力 | 専門領域 | 本スキルとの境界 |
 |-------|----------|------------------|
 | `agentdev-req-structure-diagnostics` | REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断、REQ 参照 ID 整合性、配布物統合性、Design 三層構造 | 本スキルは横断スキャン、シグナル抽出、ルーティングのみ。判定ロジック、シグナル閾値、出力 schema（7フィールド）は再定義しない |
-| 共通 textlint 基盤（`agentdev-textlint-guard`） | 文章表層品質の検査（標準規則とプロジェクト用語 prh 辞書） | 本スキルは文章表層検査を保持しない（REQ-036-008）。docs 横断の意味診断に限定する（REQ-036-023） |
+| 共通 textlint 基盤（`agentdev-textlint-guard`） | 文章表層品質の検査（標準規則とプロジェクト用語 prh 辞書） | 本スキルは文章表層検査を保持しない。docs 横断の意味診断に限定する |
 
 境界違反を検出した場合（本スキルが専門診断を再定義している、専門 skill が横断編成を所有している等）は stop-and-fix で即時修正する。

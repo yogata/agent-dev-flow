@@ -8,8 +8,8 @@ description: docs 横断診断カテゴリ、共通証拠構造、共通 finding
 inspect-docs command から呼ばれる docs 横断診断の判断基盤である。
 横断診断カテゴリ、共通証拠構造、共通 finding 出力契約、文書種別別診断へのルーティングを一次所有する（AG-{NNN}、RU-{NNNN}-01 合意）。
 REQ 固有の SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断は再定義せず `agentdev-req-structure-diagnostics` へルーティングする。
-文章表層検査は共通 textlint 基盤が担い、本スキルはこれを保持しない（REQ-036-008）。
-本スキルの診断は docs 横断の意味診断に限定する（REQ-036-023）。
+文章表層検査は共通 textlint 基盤が担い、本スキルはこれを保持しない。
+本スキルの診断は docs 横断の意味診断に限定する。
 検査対象を直接修正しない診断専用であり、本スキルは判定ロジックとルーティング表の提供のみを行う。
 
 ## 検査対象を直接修正しない制約
@@ -32,7 +32,7 @@ REQ 固有の SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断は再定義せず `
 | 専門診断 | 正規所有者 | 本スキルの役割 |
 |----------|------------------|----------------|
 | REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT | `agentdev-req-structure-diagnostics` | ルーティングのみ（判定ロジックを再定義しない） |
-| 文章表層品質（LLM 表現、空虚語、英語混じり） | 共通 textlint 基盤（`agentdev-textlint-guard`） | 本スキルは検査しない（REQ-036-008） |
+| 文章表層品質（LLM 表現、空虚語、英語混じり） | 共通 textlint 基盤（`agentdev-textlint-guard`） | 本スキルは検査しない |
 | docs 横断診断カテゴリ、共通証拠構造、共通 finding 出力契約、docs 横断の意味診断 | `agentdev-doc-diagnostics`（本スキル） | 一次所有 |
 
 ## cleanup モデルへの適用経路
