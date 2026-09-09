@@ -157,7 +157,7 @@ REQ/Decision/Design操作が `docs/README.md`、各 README（`docs/requirements/
 影響がある場合は更新、ない場合は「README 索引更新なし」とする。
 README 索引更新は導線の更新であり、要件、判断、仕様の更新ではない。
 
-- **targeted docs guard**: 変更 REQ ファイルと連動ファイル（`docs/requirements/README.md`、`docs/README.md`、`AGENTS.md`）に対し `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_changed_docs.ts --workflow req-save --files <changed REQ files> --json` を実行する（bun run 起動。モード使い分けの標準は コミット前の worktree 上での検証 = `--base-ref`、コミット後・PR 作成後の main 環境 = `--files` であり、保存直後ファイルの直接指定には `--files` を使用する。PowerShell で複数パスを渡す場合は配列変数経由（`$files = @('a.md','b.md')` を `--files $files` で渡す）または個別渡しとし、引用符まとめ渡し（`--files "a.md b.md"`）は使用しない）。`failures` に strict severity を含む場合は修正して再実行する。`full_docs_check_recommended` true 時は全体監査（self-hosting リポジトリ限定の自己監査コマンド）の実行をユーザーに提案する
+- **targeted docs guard**: 変更 REQ ファイルと連動ファイル（`docs/requirements/README.md`、`docs/README.md`、`AGENTS.md`）に対し `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_changed_docs.ts --workflow req-save --files <changed REQ files> --json` を実行する（bun run 起動。モード使い分けの標準は `--base-ref` によるコミット済み差分ベースの検出はコミット後・push 前の実行に限定、コミット前の worktree 上での検証は untracked ファイルを含む `--files` による明示指定であり、保存直後ファイルの直接指定には `--files` を使用する。PowerShell で複数パスを渡す場合は配列変数経由（`$files = @('a.md','b.md')` を `--files $files` で渡す）または個別渡しとし、引用符まとめ渡し（`--files "a.md b.md"`）は使用しない）。`failures` に strict severity を含む場合は修正して再実行する。`full_docs_check_recommended` true 時は全体監査（self-hosting リポジトリ限定の自己監査コマンド）の実行をユーザーに提案する
 - **extension 更新要否**: REQ/Decision 追加/移動/削除が `.agentdev/extensions/**` へ影響するか確認する。該当 REQ/Decision を context に列挙している extension がある場合、paths も更新対象。必要時はユーザーへ指示を仰ぐ（直接編集しない）
 - **エントリ存在確認**: `agentdev-artifact-validation` の公開検証契約（`check-entry-existence`）で REQ/Decision エントリの README 索引への存在を確認する
 

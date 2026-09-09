@@ -181,6 +181,15 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 - 非対話実行
 - 破壊的変更を行わない
 
+## worktree 検査実行手順（targeted docs guard、check_changed_docs.ts）
+
+worktree を検査対象とする場合は、host 側配置の本 skill（メインリポジトリの `.opencode/skills/repo-agentdev-integrity/`）を起点として起動し、検査対象 worktree の絶対パスを `--root` で明示指定する。worktree への検査 skill 複製と配置先起点の起動は標準としない。
+
+- **検査対象 root の明示**: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts --workflow <workflow> --root <worktree 絶対パス> <変更ファイル指定> --json`。配置先起点の誤リポジトリ検査は検査見逃しとして扱う
+- **root 解決の一致確認**: `files_checked` の内容と検査対象 worktree の変更ファイル（コミット済み差分または列挙ファイル）の一致を検査結果の採用前に確認する。`files_checked` が空の場合は検査見逃しとして扱い、FAILURE とする（検証モード問わず）
+- **モード使い分け**: `--base-ref` によるコミット済み差分ベースの変更ファイル検出はコミット後・push 前の実行に限定する。コミット前の worktree 上での検証は untracked ファイルを含む `--files` による明示指定を標準とする（列挙手段: `git status --porcelain` と `git diff` の和集合、または `git ls-files -m -o --exclude-standard` 相当）
+- **worktree 分離原則との関係**: 本検査は読み取り専用であり、worktree への書込みを行わない（POL-worktree-isolation と整合）。検査対象 root の明示指定と結果採用前の一致確認のみを worktree 外（host 側）で行う
+
 ## 共通 CLI 契約ユーティリティ
 
 `scripts/cli_utils.ts` に共通パーサー・フォーマッタを提供する。各 validator script はこれを import して使用する。
