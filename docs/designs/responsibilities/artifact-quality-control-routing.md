@@ -2,7 +2,7 @@
 title: Artifact Quality Control Routing Design
 status: draft
 created: 2026-08-09
-updated: 2026-08-31
+updated: 2026-09-09
 ---
 <!-- ADF-COVERS(implementation): REQ-017-004, REQ-017-005, REQ-017-006 -->
 
@@ -26,21 +26,27 @@ authoring Skill/Design がそれぞれ担当する。
 
 ## 能力キー定義
 
-artifact type から必須品質能力への対応表。ルーティング先は能力キーで表現し、
-現在の提供 skill を参照情報として扱う（DEC-001 憲章：ADF core は具体的 skill 名や
-呼出順を固定しない）。
+品質能力は決定的な文章表層検査と成果物固有の意味および構造の品質を区別する。
 
-| artifact type | 必須品質能力キー | 現在の提供 skill（参照） |
+| 対象 | 品質能力 | 提供責務 |
 |---|---|---|
-| document（docs/**/*.md） | 文書品質査読能力 | agentdev-doc-writing |
-| Skill（src/opencode/skills/agentdev-*/SKILL.md） | Skill 品質査読能力 | agentdev-skill-authoring |
-| Command（src/opencode/commands/**/*.md） | Command 品質査読能力 | agentdev-command-authoring |
-| template（templates/**/*.md） | 文書品質査読能力（自然言語部分） | agentdev-doc-writing |
-| references、scripts | 該当する能力キーが定義されている場合はそれに従う | 個別定義による |
+| 共通基盤の対象 Markdown | 文章表層検査能力 | 共通 textlint 基盤 |
+| REQ の作成と要件行 | 要件意味品質能力 | agentdev-req-analysis |
+| REQ の事後構造診断 | REQ 構造診断能力 | agentdev-req-structure-diagnostics |
+| docs 横断の意味と文書境界 | 文書意味診断能力 | agentdev-doc-diagnostics |
+| Decision の成立と根拠 | Decision 品質判断能力 | agentdev-decision-guidelines と既存 Decision 関連責務 |
+| Command の作成 | Command 品質能力 | agentdev-command-authoring |
+| Skill の作成 | Skill 品質能力 | agentdev-skill-authoring |
+| Command と Skill の事後診断 | 配布物意味構造診断能力 | agentdev-inspect-skills |
+| template と references | 内容の成果物種別に応じた意味構造品質能力 | 当該成果物の既存所有能力 |
+| 構造と参照および履歴の機械検査 | 整合性検査能力 | 既存の決定的検査器 |
 
-同一成果物が複数能力を必要とする場合（例: Skill の自然言語部分は文書品質査読能力も
-対象）、全ての適用能力を test strategy へ展開する。
-多対多関係を許容する。
+能力キーは具体的な Skill の呼出順を固定しない。
+対象判定は共通 textlint 基盤が所有し、doc-diagnostics は src/opencode の対象化を所有しない。
+標準対象外の template 等に文章表層検査を適用する場合はプロジェクトの追加対象設定を利用する。
+同じ成果物に複数の能力が必要なら全てを test strategy に投影する。
+退役する agentdev-doc-writing への呼出しは品質能力の充足根拠としない。
+既存の QG と変更誘発境界リスクに基づく品質要求を維持する。
 
 ## 入力源
 
@@ -72,12 +78,13 @@ QG-2（agentdev-quality-gates）は次を検証する。
 
 ## 他 Design との関係
 
-- **artifact-responsibilities.md**: 成果物責任表を維持。本 Design への一方向参照のみ追加
-- **document-type-responsibilities.md**: 文書種別責務を維持。本 Design は document 以外も対象
-- **agentdev-doc-writing**: 文書品質基準を所有。本 Design は適用対象の指定のみ
-- **agentdev-skill-authoring**: Skill 品質基準を所有。本 Design は適用対象の指定のみ
-- **agentdev-command-authoring**: Command 品質基準を所有。本 Design は適用対象の指定のみ
-- **agentdev-quality-gates（QG-2）**: 実行時投影先。本 Design の規則に従い検証
+- artifact-responsibilities.md は成果物責任表を所有する。
+- document-type-responsibilities.md は文書種別責務を所有し、本 Design は文書以外の成果物も対象にする。
+- textlint-quality-runtime は文章表層検査の共通基盤を所有し、本 Design は必要な品質能力の投影を所有する。
+- 成果物固有の意味と構造の品質は能力キー定義に示した既存責務が所有する。
+- agentdev-skill-authoring は Skill の品質基準を所有する。
+- agentdev-command-authoring は Command の品質基準を所有する。
+- agentdev-quality-gates の QG-2 は実行時の投影先として本 Design の規則に従って検証する。
 
 ## 拡張契約
 

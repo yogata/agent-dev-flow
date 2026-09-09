@@ -2,7 +2,7 @@
 title: 文書種別責務・配置基準
 status: accepted
 created: 2026-06-23
-updated: 2026-09-02
+updated: 2026-09-09
 ---
 <!-- ADF-COVERS(implementation): REQ-001-001, REQ-001-002, REQ-001-003, REQ-001-004, REQ-001-005, REQ-001-006 -->
 <!-- ADF-COVERS(implementation): REQ-001-017, REQ-001-018, REQ-001-019 -->
@@ -245,107 +245,12 @@ SKILL.mdの概要節は入口として役割と利用条件を簡潔に示し、
 
 ## 用語政策
 
-
-japanese-tech-writing は「術語の扱い方の一般論」を管理する。
-本節は AgentDevFlow リポジトリ固有の許容リスト、訳語表を管理する。
-両者の責務は重複しない。
-
-### 英語のまま残す語（固有名詞、識別子）
-
-製品名（AgentDevFlow, OpenCode）、ID（REQ-008 等）、略語（REQ/Decision/Design/RU/OU/PR/SSoT/HITL）、コマンド名、ファイルパス、YAMLフィールド名（説明文では日本語訳を併記）、パイプライン名（Intake/Learning/Backlog）。
-
-### 修飾語の日本語化の方向性
-
-active→現行、retired→廃止、accepted→承認済み、upstream/downstream→文脈で「前工程/次工程」「上位/下位」等（固定しない）、current→現行/現在の、top-level→最上位（既存「トップレベル」も統一）。
-
-### 複合技術語の訳し方指針（文意に基づく）
-
-domain state→「ドメイン状態」「保持する管理情報」等、runtime command→「実行時コマンド」、command topology→「コマンド構成」、provenance marker→「出典標識」、upstream handoff→「前工程からの引き継ぎ」「上位工程からの受渡し」等、fixture detail→「テストデータ詳細」「検査データ詳細」等、runtime workspace→「実行時作業領域」、canonical path→「正規パス」、self-hosting（普通名詞）→「本体リポジトリ」、junction→「ジャンクション」、session-sourced→「セッション由来」。
-いずれも文脈で最も自然な表現を選ぶ。
-
-### 専門カタカナ語の日本語訳（文意に基づく）
-
-fixture→「テストデータ」「検査データ」、variant→「種別」「バリエーション」「形式」、provider→「提供元」、baseline→「基準」、finding→「検出事項」、promoted artifact→「採用済み成果物」。
-
-### 識別子と散文普通名詞の区別
-
-識別子（Type ID、enum 値、frontmatter field、ファイル名、ディレクトリ名、バッククォート内コード値）は英語のまま許容する。
-日本語散文中で普通名詞として使用する場合は推奨訳に置換する。
-runtime-package-boundary.md が実装している良いパターン（本文は日本語、表の Type ID 列は `` `self-hosting` `` のまま）を参照。
-識別子（backticks 必須）と一般名詞（backticks 任意）の機械判定閾値は [backticks-identifier-threshold.md](../integrity/backticks-identifier-threshold.md) を参照。
-
-### カタカナ語（一般的定着語は許容）
-
-許容: スキーマ、ライフサイクル、カタログ、パイプライン 程度。
-非許容（文意に基づく日本語訳）: フィクスチャ、バリアント、プロバイダ、ベースライン 等。
-
-### 略語の扱い
-
-SSoT, HITL は略語のまま使用。
-初出時のみ日本語訳（「唯一の情報源（SSoT）」「人の判断を挟む（HITL）」）を併記。
-
-### 中黒使用の許容範囲
-
-中黒（`・`）は原則として日本語並列に使わない（japanese-tech-writing L18）。ただし以下は許容する:
-
-- 固定複合名詞の内部（「実行時・編集時」「コマンド・スキル・テンプレート・スクリプト」等の確定 tech term）
-- 単一固有名詞の内部
-
-流動的並列、識別子の並列、コード値の並列は読点（、）、スラッシュ、箇条書きに置換する。
-
-中黒許容範囲の機械判定アルゴリズム（許容条件4種、判定手順、テーブルセル扱い）は algorithm SSoT（[mechanical-replacement-rules.md](../../../src/opencode/skills/agentdev-doc-writing/references/mechanical-replacement-rules.md)）Section 1 を参照。
-本節は固定複合名詞・単一固有名詞の許容例の原本として機能し、algorithm 的記述は SSoT へ委任する。
-
-### em-dash 置換形式
-
-em-dash（`—`、`―`）は japanese-tech-writing L17 に従い、同格、補足は括弧（``）で、言い換え、敷衍は句点で2文分割または読点でつなぐ。
-コロン（`:`）による置換は行わない。
-
-テーブルセル内の em-dash（`| — |`）は、N/A プレースホルダと判別されたセルを `| - |`（ハイフン1文字）へ機械置換する（判別基準は PR 2271。肯定記号と対で用いる意図的マトリックス表記は置換しない）。
-プレースホルダセルに em-dash を使用しない置換表記は正規表記として確定済みであり、[integrity-rule-catalog.md](../integrity/integrity-rule-catalog.md)「IR-055 プレースホルダ表記の確定」の確定表記と表現を整合させる。
-実装運用への影響はなく、判定は機械的である。
-本文中の em-dash とは意味が異なり、文脈判断を要しない安全な機械置換である。
-検出後の文脈判定パターン（A: label—explanation、B: 句点直後、C: 括弧内既存、D: テーブルセル、ママ）の詳細は algorithm SSoT（mechanical-replacement-rules.md）Section 2 を参照。
-
-### frontmatter 訳語
-
-YAML frontmatter は「YAML フロントマター」を推奨訳とする。
-原語併記（「frontmatter（YAML 前書き）」）または初出のみ訳出の運用も許容する。
-ファイル名 `rules/frontmatter.yaml` は原語を保持する。
-
-### 推奨訳語（追補）
-
-既存の用語政策に以下を追加する:
-
-- fixture → テストデータ/検査データ
-- variant → 種別/バリエーション/形式
-- provider → 提供元
-- baseline → 基準
-- current → 現行/現在の
-
-識別子（Type ID、enum 値、frontmatter field、ファイル名、バッククォート内コード値）は英語のままとする。
-
-### LLM 表現の検出→書き換え方針
-
-LLM 表現（接続の型、空虚な動詞、空虚な形容、ラベル前置き）の検出→書き換えパターンの具体例は
-`agentdev-doc-writing` スキルの運用参照資料 `references/llm-expression-patterns.md`（OU-003 の case-run で新規作成）で管理する。本 Design には方針のみを記載し、具体例の正誤表は skill references に集約する
-（v2:REQ-0140-026「個別用語の正誤表は `agentdev-doc-writing` スキルの参照資料で管理」準拠）。
-
-### 不自然表現検出分類（v2:REQ-0140-033）
-
-`agentdev-doc-writing` は文書品質ゲートの查読観点として、現行自然言語文書および直近1週間以内に作成・更新された GitHub Issue 本文における不自然な日本語表現を検出する。
-検出分類（P0〜P4）と代表例を以下に示す。
-
-| 分類 | 内容 | 例 |
-|---|---|---|
-| P0 | 文字化け、誤字、中国語簡体字混入、意味欠落 | `而非`, `来源`, `破綾`, `監査証跠` |
-| P1 | 常用しない直訳語、独自語 | `単独根`, `局所物理分離`, `具象参照抽象化` |
-| P2 | 名詞の過剰連結、助詞欠落 | `前工程完了度`, `責務割当`, `配布物ハーネス境界浄化` |
-| P3 | 識別子ではない英語の文章混在 | `authoritative source`, `living pool`, `return` |
-| P4 | 表記揺れ、用語統一 | `正規の情報源`, `正の情報源`, `権威ある情報源` |
-
-修正方式（A: 安全な横断置換、B: 文脈別置換、C: 文全体の再記述、D: 原文復元）の対応表と禁語・許容の機械判定は、`agentdev-doc-writing` スキル参照資料（[japanese-replacement-dictionary.md](../../../src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md)）で管理する。
-本節は検出分類の原本として機能し、各語の割当ては参照資料へ委任する。
+プロジェクト固有の散文用語は当該プロジェクトの native textlint/prh 設定が所有する。
+ADF 本体も同じ仕組みを利用する。
+固定置換できる表記と、文脈に応じた修正指針を要する表現を区別する。
+識別子とコードの扱いは Markdown 構造および各規則の標準機構に従う。
+文書種別、ライフサイクル、参照整合性に関わる語彙は一般文章規則と区別する。
+一般文章辞書、書換えパターン、体裁上の好みだけの独自規則を本 Design に重複保持しない。
 
 ### 横断検索における経路識別子の検出基準
 
@@ -375,20 +280,24 @@ LLM 表現（接続の型、空虚な動詞、空虚な形容、ラベル前置�
 したがって、配布物執筆時の ID 衛生ガイダンス（concrete ID inline 排除・実行手順のプレースホルダ表記を配布物執筆ガイダンスへ明記する後続対応）と矛盾せず、同一方向である。
 後続の ID 衛生ガイダンス対応は本節を参照点として整合を保つ。
 
-## 文書種別ごとの japanese-tech-writing 適用サブセット
+## 文書種別ごとの意味品質
 
-japanese-tech-writing が定める全規範のうち、文書種別ごとに適用するサブセットを示す。
-各文書種別は該当サブセットのみを適用対象とし、記載のない規範（演出、パラグラフライティング等）は適用外とする。
-guides/README のみ全規範を適用する。
+文章表層品質は共通 textlint 基盤の対象判定と規則構成に従う。
+文書種別に固有の意味と構造は各責務の品質能力が確認する。
 
-| 文書種別 | 適用サブセット | 非適用 |
-|---|---|---|
-| REQ | 整形、LLM表現禁止、冗長排除、演出抑制、用語政策 | パラグラフライティング、山場の演出 |
-| Decision | 整形、LLM表現禁止、冗長排除、論証の厳密さ（因果の機構、譲歩の処理）、用語政策 | 演出 |
-| Design | 整形、LLM表現禁止、冗長排除、識別子と散文の区別、用語政策 | 演出、パラグラフライティング |
-| command | 整形、LLM表現禁止、冗長排除、見出しの付け方、用語政策 | 演出、パラグラフライティング |
-| skill | 整形、LLM表現禁止、冗長排除、論証の厳密さ、用語政策 | 演出 |
-| guides/README | japanese-tech-writing 全規範 | なし |
+| 文書種別 | 意味と構造の確認対象 |
+|---|---|
+| REQ | 主語、対象、状態、検証可能性、要件と設計の境界 |
+| Decision | 判断の成立、背景、根拠、代替案、結果の整合 |
+| Design | 内部構成と現在の動作、所有責務、参照の整合 |
+| Command | 入出力、責務と委譲、実行主体の整合 |
+| Skill | 提供能力、粒度、段階的開示、参照と実行主体の整合 |
+| guide と README | 案内先、説明対象と現行成果物の整合 |
+
+REQ 作成時の分析は agentdev-req-analysis、事後構造診断は agentdev-req-structure-diagnostics が所有する。
+docs 横断診断と専門能力への振分けは agentdev-doc-diagnostics が所有する。
+Command と Skill は既存の作成支援と事後診断の責務を維持する。
+Decision の要否は既存の判断能力が、文書保存は既存のファイル管理能力が担い、意味品質の観点をこれらの既存責務へ接続する。
 
 ## 規範情報と非規範情報の配置基準
 

@@ -204,6 +204,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | quality/quality-gates.md | accepted | 品質ゲート | QG-1〜QG-4 定義、機械化境界 |
 | quality/req-health-metrics.md | accepted | REQ 健全性メトリクス | REQ 肥大化、関心ズレ検出の定量閾値 |
 | quality/design-health-metrics.md | accepted | Design 健全性メトリクス | Design 肥大化、放置、ドメイン分類適合の定量閾値 |
+| quality/textlint-quality-runtime.md | draft | textlint 品質基盤 | 文章表層品質の共通実行基盤（プロジェクト解決、設定読込み、対象解決、規則構成、文章検査、結果整形）。書込み前検査と最終検査の共通化、Plugin と単独実行入口の2入口 |
 
 #### integrity/（整合性契約、ルール）
 

@@ -1312,7 +1312,15 @@ operation_units:
       - "OU-001"
     recommended_order: 3
     issue_policy: "epic"
-    result: {}
+    result:
+      saved_files:
+        - "docs/designs/quality/textlint-quality-runtime.md"
+      artifact_actions:
+        - action: "ACT-DESIGN-001"
+          artifact: "design"
+          operation: "create"
+          target_file: "docs/designs/quality/textlint-quality-runtime.md"
+          status: "draft"
   -
     ou_id: "OU-005"
     target_design: "docs/designs/responsibilities/artifact-quality-control-routing.md"
@@ -1324,7 +1332,20 @@ operation_units:
       - "OU-004"
     recommended_order: 4
     issue_policy: "single"
-    result: {}
+    result:
+      saved_files:
+        - "docs/designs/responsibilities/artifact-quality-control-routing.md"
+      artifact_actions:
+        - action: "ACT-DESIGN-002"
+          artifact: "design"
+          operation: "update"
+          target_file: "docs/designs/responsibilities/artifact-quality-control-routing.md"
+          target_area: "能力キー定義"
+        - action: "ACT-DESIGN-005"
+          artifact: "design"
+          operation: "update"
+          target_file: "docs/designs/responsibilities/artifact-quality-control-routing.md"
+          target_area: "他 Design との関係"
   -
     ou_id: "OU-006"
     target_design: "docs/designs/responsibilities/document-type-responsibilities.md"
@@ -1336,7 +1357,20 @@ operation_units:
       - "OU-004"
     recommended_order: 4
     issue_policy: "single"
-    result: {}
+    result:
+      saved_files:
+        - "docs/designs/responsibilities/document-type-responsibilities.md"
+      artifact_actions:
+        - action: "ACT-DESIGN-003"
+          artifact: "design"
+          operation: "update"
+          target_file: "docs/designs/responsibilities/document-type-responsibilities.md"
+          target_area: "用語政策"
+        - action: "ACT-DESIGN-004"
+          artifact: "design"
+          operation: "update"
+          target_file: "docs/designs/responsibilities/document-type-responsibilities.md"
+          target_area: "文書種別ごとの japanese-tech-writing 適用サブセット"
 test_strategy:
   -
     id: "TS-001"
@@ -1655,6 +1689,7 @@ classification:
   reason: "新しい消費者向け拒否動作と共通検査機能を提供するため feature。複数REQと10ファイル超の実現面を変更するため large。方式の採否を比較する実証ではなく、合意済み採用方式の適合試験である。"
   design_separation: "規則名、設定スキーマ、パス、tool入力形式、検査構成、配布実装は Design に分離する。REQ には観測可能な状態と保証を記す。"
 operation_unit_notes: "Decision 保存は ACT-DEC-001 により req-save が実行する。各 OU は同一変更の保存操作の区分であり、独立リリースや Issue 階層の決定を意味しない。"
+design_saved: true
 health_assessment:
   target: "REQ-053"
   existing_rows: 23
