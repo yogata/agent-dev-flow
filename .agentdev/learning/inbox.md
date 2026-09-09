@@ -25,3 +25,17 @@ git worktree には root の node_modules が伝播しないため、worktree �
 - **クラス**: 環境前提（配布 bundle 生成条件）
 
 Windows/Bun 環境で配布用の単一 ESM bundle を作る場合、`target: node` で生成し、`// @bun` バナーを除去しないと consumer 側で UTF-8 parse error になる。今後のオフライン bundle 作成時は生成条件（target 指定とバナー除去）を固定し、配布同梱前に consumer 実行系での起動を検証する。
+
+## 2026-09-09 Bun.build は require.resolve をビルド時絶対パスへ展開する
+
+- **発生源**: PR #2730（Issue #2725 / Epic #2723 W2）テスト結果
+- **クラス**: 環境前提（配布 bundle 生成条件）
+
+Bun.build は `require.resolve("...")` をビルド時の絶対パス文字列へ展開する。runtime で node_modules を前提としない offline bundle では、(1) 実行時に必要なデータ資産（辞書等）は実ファイルで同梱し、(2) 既定解決がビルド場所を参照するライブラリは公式の上書き経路（環境変数等）で配布物相対へ固定する、という構成が配置場所独立の要件を満たす。ビルド場所の worktree が削除された後は焼き付きパスが解決不能になるため、test や standalone 実行で現れる環境依存 failure は bundle 生成時点のビルド場所依存として解釈する。
+
+## 2026-09-09 textlint kernel は plain object report の severity を構成側で正規化する
+
+- **発生源**: PR #2730（Issue #2725 / Epic #2723 W2）テスト結果
+- **クラス**: ライブラリ仕様（検査結果の分類）
+
+textlint kernel では、規則が `report(node, plainObject)`（RuleError 非介在）で severity を省略すると規則構成の `options.severity` に関係なく error 固定になる。拒否対象と助言対象の区別を設定側で所有する場合は、kernel 報告 severity ではなく構成側の拒否対象集合（hardRuleIds 等の限定列挙）で分類する。
