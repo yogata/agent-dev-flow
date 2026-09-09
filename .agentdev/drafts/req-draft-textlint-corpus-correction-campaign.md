@@ -9,6 +9,7 @@ created_at: 2026-09-09T20:24:13+09:00
 
 ```yaml
 work_type: maintenance
+design_saved: true
 
 summary: >-
   docs/ と src/ 配下の全配布 Markdown（node_modules と歴史記録を除く504ファイル）を対象に、textlint 品質契約（REQ-053、
