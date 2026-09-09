@@ -1,6 +1,6 @@
 ---
 title: textlint 品質基盤
-status: draft
+status: accepted
 created: 2026-09-09
 updated: 2026-09-09
 ---
