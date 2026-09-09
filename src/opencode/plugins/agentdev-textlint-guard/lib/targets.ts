@@ -5,7 +5,7 @@
 // 加算する（加算設定によって標準対象を無効化できない）。対象は常に「標準 + 追加」
 // の和集合である。対象外ファイルだけの正常な操作には一般文章検査を適用しない。
 //
-// 解決順（Design「プロジェクトと対象の解決」、REQ-053-039）:
+// 解決順（Design「プロジェクトと対象の解決」が所有する契約）:
 // 1. 標準対象の解決結果から機構固定の既定除外パターンを除外する
 //    （node_modules は依存成果物、歴史記録サブツリー retired/reports は ADF の
 //    文書配置規約に基づく歴史記録として除外する）
@@ -52,7 +52,7 @@ export function isExcludedByDefault(rootRelativePosix: string): boolean {
 /**
  * ルート相対パス（/ 区切り）が検査対象かどうか。
  * 解決順: 追加対象（加算設定）は歴史記録サブツリーの既定除外に優先し、node_modules
- * は依存成果物として加算設定でも対象外とする（REQ-053-039）。
+ * は依存成果物として加算設定でも対象外とする（設計契約による）。
  */
 export function isTargetPath(rootRelativePosix: string, config: GuardConfig): boolean {
   if (!rootRelativePosix.endsWith(".md")) return false;
