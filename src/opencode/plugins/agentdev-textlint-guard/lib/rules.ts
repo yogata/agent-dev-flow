@@ -30,6 +30,35 @@ const HARD_RULE_IDS: ReadonlySet<string> = new Set([
   "prh",
 ]);
 
+/**
+ * corpus 校正（2026-09-09 実測、正式初期判定前の corpus 校正段階）で確定した
+ * 規則別 option。プリセット既定 rulesConfig を上書きする。
+ * 実測根拠と誤検出確認は docs/reports/ 配下の校正実行記録を参照する。
+ * ここでの option 調整は規則の無効化ではなく、採用規則機構が提供する option に
+ * よる対象調整である（severity は校正で変更しない）。
+ */
+const CALIBRATED_RULE_OPTIONS: Readonly<Record<string, Record<string, unknown>>> = {
+  // 漢字連続: 既定 max 6 は本 corpus の正規複合名詞（「現行成果物体系」「限定的親判断解決」等、
+  // 7〜10字連続の実測約1,900件は題名・ルール名・手順名等の正規名詞）を大量に指摘する。
+  // max 10 へ緩和し、11字以上の実在する読みにくい長連続（実測37件相当）のみ助言対象とする。
+  "preset-ja-technical-writing/max-kanji-continuous-len": { max: 10 },
+  // 「- **用語**: 説明」形式の定義リストは本 corpus の慣行表記として確立しているため
+  // 太字リスト項目の検出を抑止する（実測1,825件は全件この形式）。
+  // 絵文字リスト項目の検出は維持する。
+  "preset-ai-writing/no-ai-list-formatting": { disableBoldListItems: true },
+  // 「**重要**」「**注意**」等の info プレフィックス太字は配布物の注意喚起慣行として
+  // 確立しているため検出を抑止する（実測22件は全件この形式）。
+  // 絵文字+太字の組み合わせ検出は維持する。
+  "preset-ai-writing/no-ai-emphasis-patterns": { disableInfoPatterns: true },
+};
+
+/** corpus 校正で確定した規則別 option を規則記述子の既定 options へ上書き合成する。 */
+function applyCalibration(descriptor: KernelRuleDescriptor): KernelRuleDescriptor {
+  const calibrated = CALIBRATED_RULE_OPTIONS[descriptor.ruleId];
+  if (calibrated === undefined) return descriptor;
+  return { ...descriptor, options: { ...(descriptor.options ?? {}), ...calibrated } };
+}
+
 export interface RuleCompositionOptions {
   /**
    * プロジェクトが所有する prh 形式の用語辞書（絶対パス）。標準辞書へ追加合成され、
@@ -101,13 +130,13 @@ export function composeRuleDescriptors(
   const jaPreset = engine.ruleModules["preset-ja-technical-writing"];
   if (jaPreset === undefined) throw new Error("engine bundle is missing preset-ja-technical-writing");
   for (const d of flattenPreset("preset-ja-technical-writing", jaPreset)) {
-    descriptors.push(withSeverity(d, HARD_RULE_IDS.has(d.ruleId)));
+    descriptors.push(withSeverity(applyCalibration(d), HARD_RULE_IDS.has(d.ruleId)));
   }
 
   const aiPreset = engine.ruleModules["preset-ai-writing"];
   if (aiPreset === undefined) throw new Error("engine bundle is missing preset-ai-writing");
   for (const d of flattenPreset("preset-ai-writing", aiPreset)) {
-    descriptors.push(withSeverity(d, HARD_RULE_IDS.has(d.ruleId)));
+    descriptors.push(withSeverity(applyCalibration(d), HARD_RULE_IDS.has(d.ruleId)));
   }
 
   const prh = engine.ruleModules["prh"];
