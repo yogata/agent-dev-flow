@@ -1,4 +1,4 @@
-// ADF-COVERS(implementation): REQ-053-025, REQ-053-034, REQ-053-037
+// ADF-COVERS(implementation): REQ-053-004, REQ-053-024, REQ-053-025, REQ-053-034, REQ-053-037
 // agentdev-textlint-guard 共通実行基盤: 規則構成と用語。
 //
 // 標準構成は textlint-rule-preset-ja-technical-writing、
@@ -8,8 +8,8 @@
 // しない（拒否対象は誤検出確認済みの決定的規則に限定。助言対象の規則は
 // severity を warning に下げ、検査不合格の根拠にしない）。
 //
-// prh は既定辞書（rules/default-prh.yml、空）を接続する。プロジェクトが所有する
-// native な prh 形式の用語規則の追加合成は設定段階（追加対象・用語設定）で接続する。
+// prh は標準辞書（rules/default-prh.yml）に、プロジェクトが所有する native な
+// prh 形式の用語辞書を追加合成する（prh 規則は複数 rulePaths を merge する）。
 // 用語の接続によって標準規則または標準対象を無効化しない。一般の textlint 設定に
 // 含まれる ignore や規則の無効化設定を標準構成の上書きとして取り込まない。
 
@@ -31,8 +31,8 @@ const HARD_RULE_IDS: ReadonlySet<string> = new Set([
 
 export interface RuleCompositionOptions {
   /**
-   * prh 辞書パス（絶対）。既定は本パッケージの rules/default-prh.yml。
-   * プロジェクトが所有する prh 形式の用語規則はここへ渡して追加合成する。
+   * プロジェクトが所有する prh 形式の用語辞書（絶対パス）。標準辞書へ追加合成され、
+   * 標準辞書を置き換えない（プロジェクト辞書には標準規則・標準対象の無効化手段がない）。
    */
   readonly prhRulePaths?: readonly string[];
 }
@@ -95,10 +95,7 @@ export function composeRuleDescriptors(
   options: RuleCompositionOptions = {},
 ): RuleComposition {
   const descriptors: KernelRuleDescriptor[] = [];
-  const prhRulePaths =
-    options.prhRulePaths !== undefined && options.prhRulePaths.length > 0
-      ? [...options.prhRulePaths]
-      : [defaultPrhDictionaryPath()];
+  const prhRulePaths = [defaultPrhDictionaryPath(), ...(options.prhRulePaths ?? [])];
 
   const jaPreset = engine.ruleModules["preset-ja-technical-writing"];
   if (jaPreset === undefined) throw new Error("engine bundle is missing preset-ja-technical-writing");

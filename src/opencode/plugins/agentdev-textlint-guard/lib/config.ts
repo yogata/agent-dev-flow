@@ -1,4 +1,4 @@
-// ADF-COVERS(implementation): REQ-053-025, REQ-053-027, REQ-053-029
+// ADF-COVERS(implementation): REQ-053-025, REQ-053-027, REQ-053-029, REQ-053-030
 // agentdev-textlint-guard 共通実行基盤: Plugin 設定の読込みと検証。
 //
 // 固定パス .agentdev/config/plugins/agentdev-textlint-guard.yaml を読む。

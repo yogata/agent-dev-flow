@@ -1,0 +1,7 @@
+# agentdev-textlint-guard project-local 設定（ADR 本体 = agent-dev-flow リポジトリ）。
+# 追加対象はルート相対 glob として標準対象（docs/**/*.md）へ加算される。
+# プロジェクト用語辞書は隣接慣行パス agentdev-textlint-guard-prh.yml。
+version: 1
+additional_targets:
+  - src/opencode/commands/**/*.md
+  - src/opencode/skills/**/*.md

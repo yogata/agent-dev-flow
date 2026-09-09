@@ -14,11 +14,12 @@ Plugin と最終検査は同一の共通基盤（`lib/`）を呼び出す。プ�
 | `lib/project.ts` | プロジェクト解決（`input.worktree` 第一候補、`input.directory`、`input.project.worktree` の代替候補。Plugin の配置場所をプロジェクトルートに使わない） |
 | `lib/config.ts` | 設定読込みと検証（固定パス `.agentdev/config/plugins/agentdev-textlint-guard.yaml`、`version: 1` + `additional_targets` 文字列配列のみ。設定なしは標準対象だけの正常状態。hook ごとに mtime で変更検知し再起動なしに反映） |
 | `lib/targets.ts` | 対象解決（標準対象 `docs/**` 配下の `.md` + 追加対象の加算。ルート外参照は拒否） |
-| `lib/rules.ts` | 規則構成（プリセットのフラット化、規則ごとの severity、prh 既定辞書の接続） |
-| `lib/engine-bundle.ts` | 配布前解決済み依存（vendored engine bundle）の読込み |
+| `lib/rules.ts` | 規則構成（プリセットのフラット化、規則ごとの severity、prh 標準辞書とプロジェクト辞書の追加合成） |
+| `lib/engine-bundle.ts` | 配布前解決済み依存（vendored engine bundle と同條 kuromoji 辞書）の読込み |
 | `lib/inspect.ts` | 文章検査（両入口の共通判定点） |
 | `lib/results.ts` | 結果整形（対象パス、行・列、rule ID、該当箇所、replacement / guidance、拒否と助言の区別） |
 | `lib/reconstruct.ts` | 完成予定全文の再構成（write / edit / apply_patch の現行 OpenCode 入力形式に固定） |
+| `lib/terminology.ts` | プロジェクト固有用語の接続点（慣行パスの prh 辞書発見、標準構成への追加合成） |
 
 ## fail-closed（検査不能は拒否）
 
@@ -43,6 +44,8 @@ additional_targets:
 ```
 
 追加対象はルート相対 glob として標準対象へ加算する（標準対象を無効化できない）。設定なしは標準対象だけの正常状態。
+
+プロジェクト固有用語は prh 形式の辞書として隣接慣行パス `.agentdev/config/plugins/agentdev-textlint-guard-prh.yml` から接続する。辞書は標準規則構成へ追加合成され、標準規則や標準対象を無効化しない。辞書の妥当性は prh 規則自身が検証し、読込み不能・型不正は検査不能として全書込み操作を拒否する（fail-closed）。
 
 ## 依存と配布（オフライン導入）
 

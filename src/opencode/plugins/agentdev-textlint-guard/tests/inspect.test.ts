@@ -120,6 +120,24 @@ describe("共通基盤の検査（TS-001）", () => {
     }
   });
 
+  test("規則構成が warning に下げた規則の報告は助言として分類する（plain object report 回帰）", async () => {
+    const prepared = await prepareInspection(process.cwd());
+    expect(prepared.ok).toBe(true);
+    if (!prepared.ok) return;
+    expect(prepared.composition.hardRuleIds).not.toContain("preset-ai-writing/ai-tech-writing-guideline");
+    // ai-tech-writing-guideline は RuleError を介さず report するため kernel の
+    // severity は error 固定になる。構成の hardRuleIds が正となり助言に分類されること。
+    const r = await inspectText(prepared, process.cwd(), "docs/sample.md", "# 見出し\n\n必要に応じて設定を変更する。\n");
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    const hits = r.result.findings.filter((f) => f.ruleId === "preset-ai-writing/ai-tech-writing-guideline");
+    expect(hits.length).toBeGreaterThan(0);
+    for (const f of hits) {
+      expect(f.severity).not.toBe("hard");
+    }
+    expect(r.result.hardCount).toBe(0);
+  });
+
   test("規則構成は採用プリセット + prh のみ（独自 detector を持たない）", async () => {
     invalidateConfigCache();
     const prepared = await prepareInspection(process.cwd());
