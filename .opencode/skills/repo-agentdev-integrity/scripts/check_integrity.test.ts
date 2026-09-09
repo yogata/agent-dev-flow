@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-010-002, REQ-010-003, REQ-010-006, REQ-010-007, REQ-010-063, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008
+// ADF-COVERS(verification): REQ-010-002, REQ-010-003, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-066, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
 import { mkdirSync, writeFileSync, copyFileSync, rmSync, existsSync, readFileSync } from "fs";
 import { join } from "path";
@@ -3816,6 +3816,180 @@ describe("IR-065/IR-066 obsolete-vocabulary & legacy-path (REQ-010-066/067, Issu
         res.category === "ObsoleteVocabulary" && res.check === "obsolete-vocabulary-map-drift",
     );
     expect(drift.length).toBe(0);
+  });
+});
+
+// ─── IR-065 space-normalized matching (REQ-010-066, Issue #2742) ─────────────
+// Fixture kinds: 正常例 (現行語彙のみ), 違反例 (半角・全角スペース挿入バリアント),
+// 境界例 (v2: プレフィックスのスペース挿入・code span・語彙基本形), 許容例
+// (行履歴マーカー・否定文脈・retired 見出し配下・構造的除外領域), 再現例
+// (REQ-010-066 文言のバリアント「本 ADR」「本　ADR」)。
+
+const IR065_SPACE_ROOT = join(TEMP_ROOT, "ir065-space");
+
+function buildIr065SpaceFixture(root: string): void {
+  buildIr065Fixture(root);
+
+  // buildIr065Fixture は existence_probe 境界例のため agentdev-artifact-graph を
+  // 実在させる。スペースバリアント検出テストでは当該語彙を active 化するため
+  // probe 先を除去する（probe-design.md は本 describe の filter 対象外）
+  rmSync(join(root, "src", "opencode", "skills", "agentdev-artifact-graph"), {
+    recursive: true,
+    force: true,
+  });
+
+  // 違反例・再現例: 半角・全角スペース挿入バリアント（negation terms・行履歴
+  // マーカーを含まない文面。正規化語彙の両バリアントと基本形を含める）
+  const cmdDir = join(root, "src", "opencode", "commands", "agentdev");
+  writeFileSync(
+    join(cmdDir, "space-variant-cmd.md"),
+    [
+      "---",
+      "description: space variant command",
+      "agent: test-agent",
+      "---",
+      "",
+      "判断根拠は本 ADR で記録する。",
+      "",
+      "判断根拠は本　ADR で記録する。",
+      "",
+      "判断根拠は本ADR で記録する。",
+      "",
+      "注記様式は（ ADR ）である。",
+      "",
+      "種別列挙は REQ / ADR/ である。",
+      "",
+      "探索モデルは Artifact　Graph である。",
+      "",
+      "文書経路は docs /adr/ 配下である。",
+      "",
+      "判断 ID は ADR -0099 である。",
+      "",
+      "索引様式は DOC -MAP である。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  const designDir = join(root, "docs", "designs", "skills");
+
+  // 境界例: v2: プレフィックスのスペース挿入は正規化照合でも lookbehind で許容、
+  // code span 内のスペース挿入バリアントは許容（文面は行履歴マーカー・
+  // 否定文脈語を含まない）
+  writeFileSync(
+    join(designDir, "space-boundary-design.md"),
+    [
+      "# Space boundary design",
+      "",
+      "v2: ADR-0123 はスペース挿入付きでも許容済みの識別子表記である。",
+      "",
+      "`本 ADR` と `Artifact　Graph` は code span 内の様式例示である。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 許容例: 行履歴マーカー・否定文脈・retired 見出し配下のスペース挿入バリアント
+  writeFileSync(
+    join(designDir, "space-exempt-design.md"),
+    [
+      "# Space exempt design",
+      "",
+      "旧方式の判断根拠は本 ADR で記録していた。",
+      "",
+      "従来の判断根拠は本 ADR で記録しないこと。",
+      "",
+      "## 廃止済み要件",
+      "",
+      "本 ADR 参照は retired 見出し配下のため許容される。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 許容例: 構造的除外領域（IR ルール定義領域）内のスペース挿入バリアントは
+  // 領域ベース除外により検出しない（REQ-010-066）
+  const ruleDir = join(root, "docs", "designs", "integrity", "rules");
+  mkdirp(ruleDir);
+  writeFileSync(
+    join(ruleDir, "IR-065-obsolete-vocabulary-current-use.md"),
+    [
+      "---",
+      "title: \"IR-065: obsolete-vocabulary-current-use\"",
+      "status: accepted",
+      "---",
+      "",
+      "# IR-065: obsolete-vocabulary-current-use",
+      "",
+      "本 ADR の様式説明。判断 ID は ADR -0099。種別列挙は REQ / ADR/。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+}
+
+describe("IR-065 space-normalized matching (REQ-010-066, Issue #2742)", () => {
+  beforeAll(() => {
+    mkdirp(IR065_SPACE_ROOT);
+    buildIr065SpaceFixture(IR065_SPACE_ROOT);
+  });
+
+  it("detects half-width and full-width space insertion variants of each normalized vocabulary (違反例・再現例)", () => {
+    const r = runScript(IR065_SPACE_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const evidence = parsed.results
+      .filter(
+        (res: { category: string; file?: string }) =>
+          (res.category === "ObsoleteVocabulary" || res.category === "LegacyPathName") &&
+          (res.file ?? "").includes("space-variant-cmd.md"),
+      )
+      .map((res: { level: string; evidence?: string }) => `${res.level}:${res.evidence}`);
+    expect(evidence).toContain("warning:self-adr-reference:本 ADR");
+    expect(evidence).toContain("warning:self-adr-reference:本　ADR");
+    expect(evidence).toContain("warning:self-adr-reference:本ADR");
+    expect(evidence).toContain("ng:adr-kind-annotation:（ ADR ）");
+    expect(evidence).toContain("warning:req-adr-kind-enumeration:REQ / ADR/");
+    expect(evidence).toContain("warning:artifact-graph-name:Artifact　Graph");
+    expect(evidence).toContain("warning:docs-adr-path:docs /adr/");
+    expect(evidence).toContain("warning:bare-adr-identifier:ADR -0099");
+    expect(evidence).toContain("warning:doc-map-name:DOC -MAP");
+  });
+
+  it("reports original line text evidence with original line numbers (報告は原文行)", () => {
+    const r = runScript(IR065_SPACE_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const selfRef = parsed.results.filter(
+      (res: { category: string; file?: string; evidence?: string }) =>
+        res.category === "ObsoleteVocabulary" &&
+        res.evidence === "self-adr-reference:本　ADR",
+    );
+    expect(selfRef.length).toBe(1);
+    expect(selfRef[0].file).toContain("space-variant-cmd.md");
+    expect(selfRef[0].line).toBe(8);
+  });
+
+  it("does not flag space-inserted v2: prefix, code spans, history markers, negation contexts, or retired headings (境界例・許容例)", () => {
+    const r = runScript(IR065_SPACE_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { category: string; file?: string }) =>
+        (res.category === "ObsoleteVocabulary" || res.category === "LegacyPathName") &&
+        ((res.file ?? "").includes("space-boundary-design.md") ||
+          (res.file ?? "").includes("space-exempt-design.md")),
+    );
+    expect(violations.length).toBe(0);
+  });
+
+  it("excludes vocabulary-quoting rule definition areas declared with reasons (許容例: 構造的除外領域)", () => {
+    const r = runScript(IR065_SPACE_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { category: string; file?: string }) =>
+        (res.category === "ObsoleteVocabulary" || res.category === "LegacyPathName") &&
+        (res.file ?? "").includes("integrity") &&
+        (res.file ?? "").includes("rules"),
+    );
+    expect(violations.length).toBe(0);
   });
 });
 

@@ -82,6 +82,22 @@ negation_context_terms:
   - 撤去
   - residual
 
+# 構造的除外領域（REQ-010-066）: 語彙を引用・記録する領域を経路・領域ベースで除外する。
+# 個別出現箇所の allow 条件列挙で代替しない。anchor は領域を識別する構造マーカーの
+# 宣言であり、行番号・行内容の列挙を錨としない。既存の行レベル免除（行レベル履歴
+# マーカー、否定文脈語、retired 見出し配下）は行の意味的分類による構造的免除であり、
+# 本宣言の対象に含まれない。
+structural_exclusions:
+  - area: docs/designs/integrity/rules/
+    anchor: "IR-NNN 個別ルール定義ファイル（frontmatter、15 フィールド定義表、検出パターン仕様から構成される領域全体）"
+    reason: "IR-065/IR-066 系の廃止語彙を仕様として定義・引用する検出器語彙領域。語彙の様式説明・パターン列挙（スペース挿入バリアントの例示を含む）が現行概念としての使用と混同される誤検知を構造的に抑制する"
+  - area: docs/designs/integrity/integrity-rule-catalog.md
+    anchor: "整合性ルールカタログ（IR-NNN ルールインデックス行の領域）"
+    reason: "検出語彙とルール割当の対照記述（検出器語彙領域）。カタログ行の語彙引用は現行概念としての使用ではない"
+  - area: docs/designs/integrity/rule-ownership.md
+    anchor: "ルール所有権マトリクス（ルールドメインと canonical REQ/Design の対応表の領域）"
+    reason: "検出語彙を扱うルールの所有関係記述（検出器語彙領域）。対応表内の語彙言及は現行概念としての使用ではない"
+
 # 検出語彙エントリ（正規表現は check_integrity.ts の IR065_/IR066_ 定数が所有）
 vocabulary:
   # --- IR-065（REQ-010-066）: 廃止語彙（種別・呼称・概念語） ---
@@ -103,6 +119,9 @@ vocabulary:
   - id: doc-map-name
     rule: IR-065
     existence_probe: docs/DOC-MAP.md
+  - id: self-adr-reference
+    rule: IR-065
+    existence_probe: docs/adr
   # --- IR-066（REQ-010-067）: 旧パス・削除済み名称 ---
   - id: docs-specs-path
     rule: IR-066
