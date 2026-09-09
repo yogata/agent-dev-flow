@@ -550,7 +550,7 @@ install 後も配置先が欠落する場合は NG とする。
 
 archive 生成: `scripts/self/release/package-release-archive.ps1`（原本 `src/opencode/` 配下を junction 解決済み実ファイルとして ZIP へ格納）。
 出力は `dist/agentdev-release-<commit-short>.zip`。
-archive 内レイアウトは `agentdev-release-<sha>/` ルートの下に `src/opencode/commands/agentdev/**`、`src/opencode/skills/agentdev-*/**`、`scripts/install.ps1`（archive 版。原本 `scripts/consumer/archive/install.ps1` を投影名 `scripts/install.ps1` として格納）、`README-INSTALL.md` を格納する。third-party Skill（japanese-tech-writing 等）の本体は release archive へ含めず、利用者環境では宣言（skills.yaml）と取得機構経由で配置する（REQ-002-043、third-party-skill-management Design）。
+archive 内レイアウトは `agentdev-release-<sha>/` ルートの下に `src/opencode/commands/agentdev/**`、`src/opencode/skills/agentdev-*/**`、`scripts/install.ps1`（archive 版。原本 `scripts/consumer/archive/install.ps1` を投影名 `scripts/install.ps1` として格納）、`README-INSTALL.md` を格納する。third-party Skill の本体は release archive へ含めず、利用者環境では宣言（skills.yaml）と取得機構経由で配置する（REQ-002-043、third-party-skill-management Design）。
 
 | 実行結果 | exit code |
 |---|---|

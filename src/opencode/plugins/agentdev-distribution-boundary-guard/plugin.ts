@@ -17,7 +17,6 @@
 //   * Repository identity is explicit at the boundary
 //     (DEFAULT_PLUGIN_REPOSITORY_IDENTITY for the self-hosting repo;
 //     override via makeGuardEnv).
-//   * Distributed paths include japanese-tech-writing.
 //   * Path classification is project-root-aware: absolute paths under the
 //     worktree are resolved to repo-relative; absolute paths outside the
 //     worktree and traversal escapes fail closed. The worktree root comes

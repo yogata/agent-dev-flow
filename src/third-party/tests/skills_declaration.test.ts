@@ -181,7 +181,7 @@ describe("shipped skills.yaml self-consistency", () => {
     const result = loadSkillsDeclaration(text);
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.entries.map((e) => e.name)).toEqual(["japanese-tech-writing"]);
+      expect(result.entries.map((e) => e.name)).toEqual([]);
     }
   });
 });

@@ -150,7 +150,6 @@ STEP reference 8 要素は `<workflows/step-reference-contract>` Design 参照�
 - **agentdev-decision-file-manager**: Decision ファイル管理
 - **agentdev-artifact-validation**: 共通検証 script の公開検証契約（委譲先）
 - **agentdev-doc-diagnostics**: docs 横断診断
-- **agentdev-doc-writing**: Design 横断の文書品質査読ゲート
 - Design ライフサイクルと design-save の導入（本体 Decision 参照）
 - REQ/Design 責務分離、script 所有権（本体 REQ 参照）
 

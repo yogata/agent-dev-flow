@@ -35,7 +35,7 @@ describe("checkExtensions (integration against real repo)", () => {
     // captured via Issue #2559); stats follow the live .agentdev/extensions tree.
     expect(report.stats.workflow_extensions).toBe(17);
     expect(report.stats.internal_workflow_extensions).toBe(0);
-    expect(report.stats.capability_extensions).toBe(13);
+    expect(report.stats.capability_extensions).toBe(12);
     expect(report.stats.legacy_kind_files).toBe(0);
     expect(report.stats.commands_dir_files).toBe(0);
     expect(report.stats.doc_inputs_residual_files).toBe(0);

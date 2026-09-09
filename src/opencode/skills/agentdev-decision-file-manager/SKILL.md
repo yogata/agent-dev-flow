@@ -150,4 +150,3 @@ bun .opencode/skills/agentdev-decision-file-manager/scripts/src/alloc-decision-n
 - **agentdev-decision-guidelines**: Decision作成の必要性判定基準、ライフサイクル定義
 - **agentdev-req-analysis**: 要件分析におけるDecision閾値判定ブリッジ
 - **agentdev-req-file-manager**: REQファイル管理（Decision ↔ REQ整合性チェック）
-- **agentdev-doc-writing**: Decision/REQ/Design横断の文書品質査読ゲート（文書種別責務、要件性、文意品質、粒度）

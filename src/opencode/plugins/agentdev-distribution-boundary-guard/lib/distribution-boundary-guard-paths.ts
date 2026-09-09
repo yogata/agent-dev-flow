@@ -2,7 +2,7 @@
 //
 // Stage B regression (PR #2092): the pre-write gate must inspect write/edit/
 // apply_patch operations whose target lands under src/opencode/{commands/agentdev,
-// skills/agentdev-*|japanese-tech-writing}/**. The detector core is a pure
+// skills/agentdev-*/**. The detector core is a pure
 // string classifier; this module owns the boundary between raw tool args
 // (which may be repo-relative, absolute under the project worktree, absolute
 // outside the worktree, or contain traversal segments) and the regex-based
@@ -24,7 +24,7 @@ import { tmpdir } from "node:os";
 // link/archive projections are checked by the final gate / release pipeline).
 // Case-insensitive: Windows filesystem is case-insensitive at runtime.
 export const DISTRIBUTED_PATH_RE =
-  /^src\/opencode\/commands\/agentdev\/|^src\/opencode\/skills\/(?:agentdev-[^\/]+|japanese-tech-writing)\//i;
+  /^src\/opencode\/commands\/agentdev\/|^src\/opencode\/skills\/agentdev-[^\/]+\//i;
 
 export function normalizePath(p: string): string {
   return p.replace(/\\/g, "/");

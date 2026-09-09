@@ -109,7 +109,6 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | Design | status | 分類 | 責務 |
 |------|--------|------|------|
 | [skills/_template.md](skills/_template.md) | accepted | template | skill Design テンプレート |
-| [skills/agentdev-doc-writing.md](skills/agentdev-doc-writing.md) | accepted | 中核 | 文書品質ゲート |
 | [skills/agentdev-req-analysis.md](skills/agentdev-req-analysis.md) | accepted | 中核 | 要件分析 |
 | [skills/agentdev-req-file-manager.md](skills/agentdev-req-file-manager.md) | accepted | 中核 | REQ ファイル管理 |
 | [skills/agentdev-req-structure-diagnostics.md](skills/agentdev-req-structure-diagnostics.md) | accepted | 中核 | REQ 構造診断 |

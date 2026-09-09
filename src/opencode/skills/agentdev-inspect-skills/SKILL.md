@@ -145,5 +145,5 @@ cleanup モデルと処置契約の SSoT は document-model Design であり、�
 
 - **agentdev-skill-authoring**: スキルオーサリングの品質基準
 - **agentdev-command-authoring**: コマンド定義の規約
-- **agentdev-doc-writing**: 実行主体分類の査読観点（doc-writing は意味的査読、inspect-skills は診断観点。原本は document-type-responsibilities Design「実行主体分類の査読基準」）
+- **document-type-responsibilities Design**: 実行主体分類の査読基準（原本。本スキルの診断観点「実行主体分類の誤認」が参照）
 - **integrity-rule-catalog Design**: 機械判定可能な境界違反ルール（IR-{NNN}、IR-{NNN}、REQ 準拠）
