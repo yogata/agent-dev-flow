@@ -94,7 +94,7 @@ agentdev-traceability の coverage, impact, check を一般文書探索、構造
 
 ## 検証観点
 
-- source-of-trought priority 遵守
+- source-of-truth priority 遵守
 - 6観点診断の網羅性: SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT
 - 文書分類一貫性: classification policy 適合確認
 - 検出事項の source-of-truth 判定、推奨 route 明示

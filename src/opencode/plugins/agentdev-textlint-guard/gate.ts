@@ -1,4 +1,4 @@
-// ADF-COVERS(implementation): REQ-053-031, REQ-053-032, REQ-053-033, REQ-010-075
+// ADF-COVERS(implementation): REQ-053-014, REQ-053-015, REQ-053-016, REQ-053-022, REQ-053-031, REQ-053-032, REQ-053-033, REQ-010-074, REQ-010-075
 // agentdev-textlint-guard 最終検査（単独実行入口）。
 //
 // 標準対象と追加対象の全件を列挙し、実ファイル全文を共通基盤（lib/）で検査する。

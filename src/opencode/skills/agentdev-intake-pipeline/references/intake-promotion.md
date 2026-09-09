@@ -64,7 +64,7 @@ learning 分岐は `agentdev-workflow-orchestration` の intake/learning 境界�
 3. 採用 item の元 inbox item は削除する（`.agentdev/intake/archive/promoted/` への移動を廃止）。
 4. 保留 item は `.agentdev/intake/inbox/` に残す。
 5. 却下 item は即時削除する（`.agentdev/intake/archive/rejected/` への移動を廃止）。
-reject 時の commit message に却下理由を含める（監査証跠の補強）。
+reject 時の commit message に却下理由を含める（監査証跡の補強）。
 
 ## Git 永続化
 
