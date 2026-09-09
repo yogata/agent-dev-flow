@@ -11,7 +11,7 @@
  * parses external args into typed values (no `as string`, no broad catch),
  * classifies URLs by explicit repository identity, treats unknown bytes as
  * fail-closed, matches distributed paths case-insensitively on Windows, and
- * covers all distributed source paths including japanese-tech-writing. The
+ * covers all distributed agentdev source paths. The
  * parser and reconstruction are split into focused modules so the plugin
  * orchestrator stays under the 250 pure-LOC ceiling.
  */
@@ -333,11 +333,6 @@ describe("Stage B regression: distributed path coverage", () => {
   test("src/opencode/skills/agentdev-* is distributed", () => {
     expect(isDistributedPath("src/opencode/skills/agentdev-foo/SKILL.md")).toBe(true);
   });
-  test("src/opencode/skills/japanese-tech-writing/ is distributed", () => {
-    expect(
-      isDistributedPath("src/opencode/skills/japanese-tech-writing/SKILL.md"),
-    ).toBe(true);
-  });
   test("non-distributed paths are skipped", () => {
     expect(isDistributedPath("docs/designs/foo.md")).toBe(false);
     expect(isDistributedPath("scripts/install.ps1")).toBe(false);
@@ -346,9 +341,6 @@ describe("Stage B regression: distributed path coverage", () => {
   test("Windows backslash distributed path matches case-insensitively", () => {
     expect(
       isDistributedPath("SRC\\OpenCode\\Commands\\AgentDev\\sample.md"),
-    ).toBe(true);
-    expect(
-      isDistributedPath("src\\opencode\\skills\\Japanese-Tech-Writing\\SKILL.md"),
     ).toBe(true);
   });
 });
