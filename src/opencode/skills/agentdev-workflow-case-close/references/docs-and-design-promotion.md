@@ -58,11 +58,11 @@ PR 本文の `## Design確定候補` セクションから Design 確定フロ�
 - **実行コマンド**: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_changed_docs.ts --workflow case-close --files <PR 変更ファイル一覧> --json`
 - **`<PR 変更ファイル一覧>`**: space 区切り推奨、comma 区切り、混在も可
 - **PowerShell での複数パス指定**: 配列変数経由（`$files = @('a.md','b.md')` を `--files $files` で渡す）または個別渡しとし、引用符まとめ渡し（`--files "a.md b.md"`）は使用しない
-- **モード使い分けの標準**: コミット前の worktree 上での検証は `--base-ref`、コミット後・PR 作成後の main 環境は `--files`（case-close はマージ後 main 環境で実行されるため `--files` を使用）
+- **モード使い分けの標準**: `--base-ref` によるコミット済み差分ベースの検出はコミット後・push 前の実行に限定し、コミット前の worktree 上での検証は untracked ファイルを含む `--files` による明示指定を標準とする（case-close はマージ後 main 環境で実行されるため `--files` を使用）
 - **JSON 出力の `failures`**: strict severity が含まれる場合はマージを停止し対象ファイルを修正して再実行
 - **`full_docs_check_recommended`**: true の場合は全体監査（self-hosting リポジトリ限定の自己監査コマンド）の実行をユーザーに提案
 - **draft → accepted 等の Design status 変更時**: `spec_readme_update_required` を STEP-3-2 Design 確定フローに反映
-- **`files_checked` 空時の確認**: targeted docs guard の JSON 出力で `files_checked` が空の場合、検査見逃しリスクとして扱い、`warnings` 配列の警告を確認、`--files` 指定の妥当性を確認、必要に応じて再実行または手動確認、空の理由が正当であることを確認してから続行する
+- **`files_checked` 空時の確認**: targeted docs guard の JSON 出力で `files_checked` が空の場合、検査見逃しリスクとして扱い、`warnings` 配列の警告を確認、`--files` 指定の妥当性と検査対象 root の解決（配置先起点の誤リポジトリ検査でないこと）を確認、`files_checked` の内容と検査対象変更ファイルの一致を確認、必要に応じて再実行または手動確認、空の理由が正当であることを確認してから続行する
 
 #### 配布依存境界の最終変更経路 gate
 
