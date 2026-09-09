@@ -153,4 +153,47 @@ describe("共通基盤の検査（TS-001）", () => {
       "prh",
     ]);
   });
+
+  test("漢字 10 字以内の正規複合名詞は max-kanji-continuous-len で指摘しない（corpus 校正 max 10）", async () => {
+    const prepared = await prepareInspection(process.cwd());
+    if (!prepared.ok) return;
+    const r = await inspectText(prepared, process.cwd(), "docs/sample.md", "# 見出し\n\n現行成果物体系の整合性網羅監査を実行する。\n");
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    const hits = r.result.findings.filter((f) => f.ruleId === "preset-ja-technical-writing/max-kanji-continuous-len");
+    expect(hits).toHaveLength(0);
+  });
+
+  test("漢字 11 字以上の連続は助言として検出する（corpus 校正 max 10）", async () => {
+    const prepared = await prepareInspection(process.cwd());
+    if (!prepared.ok) return;
+    const r = await inspectText(prepared, process.cwd(), "docs/sample.md", "# 見出し\n\n外部実行手段中間成果物を検査する。\n");
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    const hits = r.result.findings.filter((f) => f.ruleId === "preset-ja-technical-writing/max-kanji-continuous-len");
+    expect(hits.length).toBeGreaterThan(0);
+    for (const f of hits) expect(f.severity).not.toBe("hard");
+  });
+
+  test("「- **用語**: 説明」の定義リストは no-ai-list-formatting で指摘しない（corpus 校正 disableBoldListItems）", async () => {
+    const prepared = await prepareInspection(process.cwd());
+    if (!prepared.ok) return;
+    const text = "# 見出し\n\n- **Harness依存**: 説明文である。\n- **正規パス**: 別の説明である。\n";
+    const r = await inspectText(prepared, process.cwd(), "docs/sample.md", text);
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    const hits = r.result.findings.filter((f) => f.ruleId === "preset-ai-writing/no-ai-list-formatting");
+    expect(hits).toHaveLength(0);
+  });
+
+  test("「**重要**」の注意喚起ブロックは no-ai-emphasis-patterns で指摘しない（corpus 校正 disableInfoPatterns）", async () => {
+    const prepared = await prepareInspection(process.cwd());
+    if (!prepared.ok) return;
+    const text = "# 見出し\n\n**重要**\n\nこれは注意喚起の本文である。\n\n**注意**\n\n別の注意喚起である。\n";
+    const r = await inspectText(prepared, process.cwd(), "docs/sample.md", text);
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    const hits = r.result.findings.filter((f) => f.ruleId === "preset-ai-writing/no-ai-emphasis-patterns");
+    expect(hits).toHaveLength(0);
+  });
 });
