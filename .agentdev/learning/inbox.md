@@ -39,3 +39,24 @@ Bun.build は `require.resolve("...")` をビルド時の絶対パス文字列�
 - **クラス**: ライブラリ仕様（検査結果の分類）
 
 textlint kernel では、規則が `report(node, plainObject)`（RuleError 非介在）で severity を省略すると規則構成の `options.severity` に関係なく error 固定になる。拒否対象と助言対象の区別を設定側で所有する場合は、kernel 報告 severity ではなく構成側の拒否対象集合（hardRuleIds 等の限定列挙）で分類する。
+
+## 2026-09-09 worktree の独立 bun プロジェクトは各 package で個別 bun install が必要
+
+- **発生源**: PR #2745（Issue #2735 / Epic #2734 W1）テスト結果
+- **クラス**: 環境前提（worktree 構造的制約）
+
+worktree で integrity suite を実行する場合、textlint plugin 配下に加えて `src/opencode/skills/agentdev-project-extensions/scripts/` など独立 bun プロジェクト（package.json + bun.lock 構成）でも個別に bun install が必要（node_modules 未伝播の構造的制約）。未実施のまま suite を実行すると zod 解決失敗が現れる。REQ-018（worktree 構造的制約とテスト fallback）関連の補足知見。
+
+## 2026-09-09 対象解決の既定除外は node_modules と歴史記録で加算優先の意味論が異なる
+
+- **発生源**: PR #2745（Issue #2735 / Epic #2734 W1）テスト結果
+- **クラス**: ライブラリ仕様（対象解決の意味論）
+
+`**/node_modules/**` を加算設定（additional_targets）で上書き可能にすると glob の `**` 展開が依存配置へ入り込み、TS-004 の node_modules 非含有と矛盾する。TS-004（node_modules 非含有）と TS-005（docs/reports 再包含）の同時成立から「node_modules は加算でも対象外、歴史記録サブツリーは加算優先の再包含対象」の2クラス意味論が一意に確定した。
+
+## 2026-09-09 配布ソースのコメントへの REQ/Design ID 参照は ADF-COVERS 宣言へ集約する
+
+- **発生源**: PR #2745（Issue #2735 / Epic #2734 W1）case-close E4-1 gate 違反
+- **クラス**: 規約運用（配布物への concrete-id 混入防止）
+
+実装コメントへの REQ/Design ID 参照は配布物では ADF-COVERS 宣言行以外に書けない（distribution-boundary の concrete-id 検出対象）。契約参照は ADF-COVERS 宣言へ集約し、本文コメントは Design セクション名や「設計契約」等の一般化表現を使うのが配布安全な書き方。
