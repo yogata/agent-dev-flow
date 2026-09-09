@@ -159,3 +159,79 @@ describe("final gate CLI 契約", () => {
     // gate は独立して動作する（上記 runFinalGate の各テストが実行証拠）
   });
 });
+
+describe("corpus 適用（是正パターンでの二入口同一性と bypass 検出）", () => {
+  const ADF_BODY_CONFIG =
+    "version: 1\nadditional_targets:\n  - src/opencode/commands/**/*.md\n  - src/opencode/skills/**/*.md\n";
+  // corpus 校正で是正した実在パターンの是正前後の全文（docs 標準対象と skills 追加対象の両方）。
+  const CORPUS_CASES = [
+    {
+      rel: "docs/designs/commands/inspect-docs.md",
+      before: "# 見出し\n\n- source-of-trought priority 遵守\n",
+      after: "# 見出し\n\n- source-of-truth priority 遵守\n",
+    },
+    {
+      rel: "src/opencode/skills/agentdev-intake-pipeline/references/intake-promotion.md",
+      before: "# 見出し\n\nreject 時の commit message に却下理由を含める（監査証跠の補強）。\n",
+      after: "# 見出し\n\nreject 時の commit message に却下理由を含める（監査証跡の補強）。\n",
+    },
+    {
+      rel: "src/opencode/skills/agentdev-req-analysis/references/session-context-detection.md",
+      before: "# 見出し\n\n推論結果を表示（**陈述形式、質問ではない**）。\n",
+      after: "# 見出し\n\n推論結果を表示（**記述形式、質問ではない**）。\n",
+    },
+  ];
+
+  function makeAdfProject(): string {
+    const root = makeProject();
+    const configAbs = configPathFor(root);
+    fs.mkdirSync(path.dirname(configAbs), { recursive: true });
+    fs.writeFileSync(configAbs, ADF_BODY_CONFIG, "utf8");
+    return root;
+  }
+
+  test("是正前の全文は両入口で同一に拒否し、是正後の全文は両入口で同一に通過する", async () => {
+    const root = makeAdfProject();
+    const prepared = await prepareInspection(root);
+    expect(prepared.ok).toBe(true);
+    if (!prepared.ok) return;
+    for (const c of CORPUS_CASES) {
+      const abs = path.join(root, ...c.rel.split("/"));
+      fs.mkdirSync(path.dirname(abs), { recursive: true });
+      // 是正前: pre-write 経路（plugin が使うのと同一の共通基盤入口）は拒否対象
+      const beforePre = await inspectText(prepared, root, c.rel, c.before);
+      expect(beforePre.ok).toBe(true);
+      if (beforePre.ok) expect(beforePre.result.hardCount).toBeGreaterThan(0);
+      // 是正前: 最終検査経路（実ファイル全文）も同一件数で拒否する
+      fs.writeFileSync(abs, c.before, "utf8");
+      const beforeGate = await inspectAllTargetFiles(root);
+      expect(beforeGate.ok).toBe(true);
+      if (!beforeGate.ok) return;
+      const beforeFile = beforeGate.outcome.files.find((f) => f.path === c.rel);
+      expect(beforeFile?.hardCount).toBeGreaterThan(0);
+      if (beforePre.ok && beforeFile) expect(beforeFile.hardCount).toBe(beforePre.result.hardCount);
+      // 是正後: 両入口とも拒否対象ゼロで同一に通過する
+      const afterPre = await inspectText(prepared, root, c.rel, c.after);
+      expect(afterPre.ok).toBe(true);
+      if (afterPre.ok) expect(afterPre.result.hardCount).toBe(0);
+      fs.writeFileSync(abs, c.after, "utf8");
+      const afterGate = await inspectAllTargetFiles(root);
+      expect(afterGate.ok).toBe(true);
+      if (!afterGate.ok) return;
+      const afterFile = afterGate.outcome.files.find((f) => f.path === c.rel);
+      expect(afterFile?.hardCount).toBe(0);
+    }
+  });
+
+  test("是正前パターンの外部書込み（bypass）を最終検査が検出する", async () => {
+    const root = makeAdfProject();
+    const abs = path.join(root, "src", "opencode", "skills", "agentdev-x", "references", "leaked.md");
+    fs.mkdirSync(path.dirname(abs), { recursive: true });
+    fs.writeFileSync(abs, CORPUS_CASES[0]?.before ?? VIOLATING, "utf8");
+    const gate = await runFinalGate(["--root", root]);
+    expect(gate.exitCode).toBe(1);
+    expect(gate.output).toContain("leaked.md");
+    expect(gate.output).toContain("prh");
+    expect(gate.output).toContain("FAIL");
+  });
+});
