@@ -25,7 +25,7 @@ const HARD_RULE_IDS: ReadonlySet<string> = new Set([
   "preset-ja-technical-writing/no-invalid-control-character",
   "preset-ja-technical-writing/no-nfd",
   "preset-ja-technical-writing/no-zero-width-spaces",
-  // 固定置換による禁止表現（標準辞書は旧 IR-060 forbidden 区分から移管した完全一致検出語。
+  // 固定置換による禁止表現（標準辞書は既存の禁止表現区分から移管した完全一致検出語。
   // 辞書登録された語は決定的に検出する）
   "prh",
 ]);

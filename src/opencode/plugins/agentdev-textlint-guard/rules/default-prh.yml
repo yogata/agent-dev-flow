@@ -1,5 +1,5 @@
 # ADF 標準 prh 辞書（一般文章の禁止表現）。
-# 旧 IR-060（forbidden Japanese word detection）の一般文章用置換辞書（forbidden 区分）から
+# 既存の禁止表現検出で用いていた一般文章用置換辞書（禁止表現区分）から
 # 完全一致検出として移管した語を登録する。文脈で推奨訳が複数ある語は候補を「/」区切りで示す。
 # 検出は散文（Str 節点）のみに適用され、inline code と fenced code は対象外。
 version: 1
