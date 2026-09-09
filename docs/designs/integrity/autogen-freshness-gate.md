@@ -1,8 +1,8 @@
 ---
 title: "AUTOGEN ブロック鮮度検出 gate"
-status: draft
+status: accepted
 created: "2026-08-09"
-updated: "2026-08-18"
+updated: "2026-09-10"
 ---
 
 # AUTOGEN ブロック鮮度検出 gate

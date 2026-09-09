@@ -1,8 +1,8 @@
 ---
 title: Artifact Quality Control Routing Design
-status: draft
+status: accepted
 created: 2026-08-09
-updated: 2026-09-09
+updated: 2026-09-10
 ---
 <!-- ADF-COVERS(implementation): REQ-017-004, REQ-017-005, REQ-017-006 -->
 

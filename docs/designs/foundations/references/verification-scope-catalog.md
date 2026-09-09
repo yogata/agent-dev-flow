@@ -1,8 +1,8 @@
 ---
 title: 検証対応要否カタログ（トレーサビリティモデル references）
-status: draft
+status: accepted
 created: 2026-08-21
-updated: 2026-09-09
+updated: 2026-09-10
 ---
 
 <!-- ADF-COVERS(implementation): REQ-057-006 -->

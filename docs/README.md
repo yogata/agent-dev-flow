@@ -66,7 +66,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-028 の27件である（DEC-019〜DEC-022、DEC-024〜DEC-027 は proposed、DEC-005、DEC-007 は superseded）。
+現行 Decision は DEC-001 から DEC-028 の27件である（DEC-005、DEC-007 は superseded）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
@@ -88,15 +88,15 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [DEC-015](decisions/DEC-015.md) | ADF決定論的実行中核と実行基盤実行機構の責務分界 |
 | [DEC-016](decisions/DEC-016.md) | 導入系スクリプトの副作用ゼロ原則 |
 | [DEC-017](decisions/DEC-017.md) | 最小トレーサビリティモデルの採用と Artifact Graph の廃止 |
-| [DEC-019](decisions/DEC-019.md) | 一般処理の標準API委譲とADF固有意味論の所有境界（proposed） |
-| [DEC-020](decisions/DEC-020.md) | GitHub Issue 共通管理単位の採用（proposed） |
-| [DEC-021](decisions/DEC-021.md) | scripts 公開入口の2本固定と安定契約（proposed） |
-| [DEC-022](decisions/DEC-022.md) | 実行定義層の正規所有モデルと機械強制への移行（proposed） |
+| [DEC-019](decisions/DEC-019.md) | 一般処理の標準API委譲とADF固有意味論の所有境界 |
+| [DEC-020](decisions/DEC-020.md) | GitHub Issue 共通管理単位の採用 |
+| [DEC-021](decisions/DEC-021.md) | scripts 公開入口の2本固定と安定契約 |
+| [DEC-022](decisions/DEC-022.md) | 実行定義層の正規所有モデルと機械強制への移行 |
 | [DEC-023](decisions/DEC-023.md) | third-party Skill の分離管理と取得機構の導入 |
-| [DEC-024](decisions/DEC-024.md) | 変更誘発境界リスク分析の導入と検証契約への投影（proposed） |
-| [DEC-025](decisions/DEC-025.md) | プロジェクト知識を Capability Skill から分離し、独立した正規知識層として管理する（proposed） |
-| [DEC-026](decisions/DEC-026.md) | 実現面変更方針の構造化ハンドオフ（realization_actions）（proposed） |
-| [DEC-027](decisions/DEC-027.md) | 観測ベース統制縮小評価ループ（proposed） |
+| [DEC-024](decisions/DEC-024.md) | 変更誘発境界リスク分析の導入と検証契約への投影 |
+| [DEC-025](decisions/DEC-025.md) | プロジェクト知識を Capability Skill から分離し、独立した正規知識層として管理する |
+| [DEC-026](decisions/DEC-026.md) | 実現面変更方針の構造化ハンドオフ（realization_actions） |
+| [DEC-027](decisions/DEC-027.md) | 観測ベース統制縮小評価ループ |
 | [DEC-028](decisions/DEC-028.md) | 文章表層品質の共通実行基盤 |
 
 ## 設計（Design）
@@ -183,7 +183,6 @@ status（draft / accepted）を含む完全一覧は [Design インデックス]
 #### authoring/（執筆規約）
 
 - [コマンドファイルフォーマット規約](designs/authoring/command-file-format.md)
-- [外部依存メジャーバージョン互換性管理ガイド](designs/authoring/dependency-version-compatibility.md)
 - [語彙レジストリ](designs/authoring/vocabulary-registry.md)
 
 ## 知識（Knowledge）

@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は17件、提案中の Decision は8件である。
+現行の承認済み Decision は25件、提案中の Decision は0件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -32,15 +32,15 @@
 | DEC-015 | ADF決定論的実行中核と実行基盤実行機構の責務分界 | accepted | 2026-08-15 |
 | DEC-016 | 導入系スクリプトの副作用ゼロ原則 | accepted | 2026-08-15 |
 | DEC-017 | 最小トレーサビリティモデルの採用と Artifact Graph の廃止 | accepted | 2026-08-17 |
-| DEC-019 | 一般処理の標準API委譲とADF固有意味論の所有境界 | proposed | 2026-08-20 |
-| DEC-020 | GitHub Issue 共通管理単位の採用 | proposed | 2026-08-23 |
-| DEC-021 | scripts 公開入口の2本固定と安定契約 | proposed | 2026-08-23 |
-| DEC-022 | 実行定義層の正規所有モデルと機械強制への移行 | proposed | 2026-08-24 |
+| DEC-019 | 一般処理の標準API委譲とADF固有意味論の所有境界 | accepted | 2026-08-20 |
+| DEC-020 | GitHub Issue 共通管理単位の採用 | accepted | 2026-08-23 |
+| DEC-021 | scripts 公開入口の2本固定と安定契約 | accepted | 2026-08-23 |
+| DEC-022 | 実行定義層の正規所有モデルと機械強制への移行 | accepted | 2026-08-24 |
 | DEC-023 | third-party Skill の分離管理と取得機構の導入 | accepted | 2026-08-30 |
-| DEC-024 | 変更誘発境界リスク分析の導入と検証契約への投影 | proposed | 2026-08-31 |
-| DEC-025 | プロジェクト知識を Capability Skill から分離し、独立した正規知識層として管理する | proposed | 2026-09-01 |
-| DEC-026 | 実現面変更方針の構造化ハンドオフ（realization_actions） | proposed | 2026-09-03 |
-| DEC-027 | 観測ベース統制縮小評価ループ | proposed | 2026-09-04 |
+| DEC-024 | 変更誘発境界リスク分析の導入と検証契約への投影 | accepted | 2026-08-31 |
+| DEC-025 | プロジェクト知識を Capability Skill から分離し、独立した正規知識層として管理する | accepted | 2026-09-01 |
+| DEC-026 | 実現面変更方針の構造化ハンドオフ（realization_actions） | accepted | 2026-09-03 |
+| DEC-027 | 観測ベース統制縮小評価ループ | accepted | 2026-09-04 |
 | DEC-028 | 文章表層品質の共通実行基盤 | accepted | 2026-09-09 |
 <!-- AUTOGEN:END -->
 
@@ -69,21 +69,21 @@
 - [DEC-015](DEC-015.md)（ADF決定論的実行中核と実行基盤実行機構の責務分界）
 - [DEC-016](DEC-016.md)（導入系スクリプトの副作用ゼロ原則）
 - [DEC-017](DEC-017.md)（最小トレーサビリティモデルの採用と Artifact Graph の廃止）
+- [DEC-019](DEC-019.md)（一般処理の標準API委譲とADF固有意味論の所有境界）
+- [DEC-020](DEC-020.md)（GitHub Issue 共通管理単位の採用）
+- [DEC-021](DEC-021.md)（scripts 公開入口の2本固定と安定契約）
+- [DEC-022](DEC-022.md)（実行定義層の正規所有モデルと機械強制への移行）
 - [DEC-023](DEC-023.md)（third-party Skill の分離管理と取得機構の導入）
+- [DEC-024](DEC-024.md)（変更誘発境界リスク分析の導入と検証契約への投影）
+- [DEC-025](DEC-025.md)（プロジェクト知識を Capability Skill から分離し、独立した正規知識層として管理する）
+- [DEC-026](DEC-026.md)（実現面変更方針の構造化ハンドオフ（realization_actions））
+- [DEC-027](DEC-027.md)（観測ベース統制縮小評価ループ）
 - [DEC-028](DEC-028.md)（文章表層品質の共通実行基盤）
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
-- [DEC-019](DEC-019.md)（一般処理の標準API委譲とADF固有意味論の所有境界）
-- [DEC-020](DEC-020.md)（GitHub Issue 共通管理単位の採用）
-- [DEC-021](DEC-021.md)（scripts 公開入口の2本固定と安定契約）
-- [DEC-022](DEC-022.md)（実行定義層の正規所有モデルと機械強制への移行）
-- [DEC-024](DEC-024.md)（変更誘発境界リスク分析の導入と検証契約への投影）
-- [DEC-025](DEC-025.md)（プロジェクト知識を Capability Skill から分離し、独立した正規知識層として管理する）
-- [DEC-026](DEC-026.md)（実現面変更方針の構造化ハンドオフ（realization_actions））
-- [DEC-027](DEC-027.md)（観測ベース統制縮小評価ループ）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）

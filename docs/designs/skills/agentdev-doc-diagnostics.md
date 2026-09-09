@@ -1,8 +1,8 @@
 ---
 title: agentdev-doc-diagnostics Design
-status: draft
+status: accepted
 created: 2026-07-22
-updated: 2026-08-21
+updated: 2026-09-10
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-021 -->

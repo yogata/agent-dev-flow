@@ -121,7 +121,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [skills/agentdev-workflow-lifecycle.md](skills/agentdev-workflow-lifecycle.md) | accepted | 中核 | ワークフロー lifecycle |
 | [skills/agentdev-workflow-templates.md](skills/agentdev-workflow-templates.md) | accepted | 中核 | ワークフロー templates |
 | [skills/agentdev-design-file-manager.md](skills/agentdev-design-file-manager.md) | accepted | 中核 | Design ファイル管理（作成、更新、配置判断、target_area、Design 固有整合性、Design 固有 script 呼出契約） |
-| [skills/agentdev-doc-diagnostics.md](skills/agentdev-doc-diagnostics.md) | draft | 中核 | docs 横断診断カテゴリ、共通証拠構造、finding 出力契約、文書種別別診断へのルーティング |
+| [skills/agentdev-doc-diagnostics.md](skills/agentdev-doc-diagnostics.md) | accepted | 中核 | docs 横断診断カテゴリ、共通証拠構造、finding 出力契約、文書種別別診断へのルーティング |
 | [skills/agentdev-artifact-validation.md](skills/agentdev-artifact-validation.md) | accepted | 中核 | 文書種別横断の決定的検証 script と共有 lib の所有、公開検証契約、JSON 結果契約 |
 | [skills/agentdev-case-run-execution-adapter.md](skills/agentdev-case-run-execution-adapter.md) | accepted | 補助 | case-run 外部実行 adapter |
 | [skills/agentdev-issue-management.md](skills/agentdev-issue-management.md) | accepted | 補助 | Issue 管理 |
@@ -139,7 +139,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [skills/agentdev-backlog-integration.md](skills/agentdev-backlog-integration.md) | accepted | 補助 | backlog integration |
 | [skills/agentdev-project-extensions.md](skills/agentdev-project-extensions.md) | accepted | 補助 | project extensions 読み込み |
 | [skills/agentdev-adversarial-review.md](skills/agentdev-adversarial-review.md) | accepted | 補助 | 対論型レビュー（adversarial review）の振る舞い契約、レビュー手続き、責務構造。3論理役割、動的レビュー戦略、対称的相互反証、戦略メタ反証、合意候補再検証、read-only 境界を所有 |
-| [skills/agentdev-git-worktree-test-fallback.md](skills/agentdev-git-worktree-test-fallback.md) | draft | 補助 | worktree 構造系テスト fallback 契約（junction 未設定時の src/opencode/ fallback、構造的制約の明示） |
+| [skills/agentdev-git-worktree-test-fallback.md](skills/agentdev-git-worktree-test-fallback.md) | accepted | 補助 | worktree 構造系テスト fallback 契約（junction 未設定時の src/opencode/ fallback、構造的制約の明示） |
 | [skills/agentdev-workflow-backlog-auto.md](skills/agentdev-workflow-backlog-auto.md) | accepted | 中核 | backlog-auto workflow 実装本体（orchestration stage 構成、直列化契約、fan-in 判定、resume 契約） |
 | [skills/agentdev-issue-tracking.md](skills/agentdev-issue-tracking.md) | accepted | 中核 | 追跡Issue論理スキーマの一元管理（role/kind/状態遷移、物理マッピング表、本文標準構造、反映追跡） |
 
@@ -175,7 +175,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | foundations/numbering-policy.md | accepted | 採番管理 Design | REQ/Decision/IR の識別子採番規則、欠番維持、決定的採番スクリプトとの協調 |
 | foundations/system.md | accepted | システム仕様 | コマンドシステムの構成定義、運用モデル |
 | foundations/document-model.md | accepted | 文書モデル | REQ/Decision/Design/guides の責務マトリックス、ドメイン別体系化規範 |
-| foundations/decision-lifecycle.md | draft | Decision Lifecycle | Decision 関係モデル（relates-to / supersedes / reaffirms）、粒度管理規則、健全性評価モデル。document-model.md「Decision ライフサイクル詳細」から参照される詳細を正規所有 |
+| foundations/decision-lifecycle.md | accepted | Decision Lifecycle | Decision 関係モデル（relates-to / supersedes / reaffirms）、粒度管理規則、健全性評価モデル。document-model.md「Decision ライフサイクル詳細」から参照される詳細を正規所有 |
 | foundations/patterns.md | accepted | 文書フォーマット規約 | frontmatter、ID 体系、命名規則、URL 参照形式、共通フォーマット規約 |
 | foundations/design-principles.md | accepted | 設計原則 | アーキテクチャ設計原則 |
 | foundations/project-extensions.md | accepted | Project Extensions | 実行時プロジェクト固有追加・拡張機構（`.agentdev/extensions/**`）、extension schema、実行時読み込み契約、project-local skill 委譲、配布物具体参照禁止（REQ-002） |
@@ -192,7 +192,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | responsibilities/artifact-contracts.md | accepted | アーティファクト契約 | Command/Skill/Template/Script の入出力、依存方向 |
 | responsibilities/req-impact-map.md | accepted | REQ 影響マップ | REQ → 影響するルール/アーティファクト の対応表。`integrity/rule-ownership.md`（ルールドメイン → canonical REQ/Design）と逆方向。同期更新が必要なケースあり。配置の正本は req-impact-map.md 冒頭の配置記述であり、`responsibilities/` 残置を現行配置として確定済み（本行は参照導線） |
 | responsibilities/responsibility-boundary-purification.md | accepted | 責務境界浄化: 所有/非所有リスト詳細 | 配布物と harness 実行制御の責務境界（所有/非所有リスト）。原則は harness-separation-model.md を SSoT とし、各工程（case-auto/case-run/adapter/extensions/タイムスタンプ）の詳細を集約。抽象化手順は `foundations/references/concrete-abstraction.md` を参照 |
-| responsibilities/artifact-quality-control-routing.md | draft | Artifact Quality Control Routing Design | artifact type から必須品質能力を導出する合成規則、能力キー定義、QG-2 投影契約。REQ-017 execution contract の設計記録 |
+| responsibilities/artifact-quality-control-routing.md | accepted | Artifact Quality Control Routing Design | artifact type から必須品質能力を導出する合成規則、能力キー定義、QG-2 投影契約。REQ-017 execution contract の設計記録 |
 | responsibilities/custom-tool-contracts.md | accepted | Custom Tool 操作契約 | Custom Tool の操作契約（入力、出力、保証、失敗時）、ローカル版実装差し替え、迂回防止（REQ-052） |
 
 #### quality/（品質、メトリクス）
@@ -221,8 +221,8 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | integrity/backticks-identifier-threshold.md | accepted | backticks 識別子/一般名詞 判定閾値 | backticks 必須と任意の機械判定閾値 |
 | integrity/validator-split-criteria.md | accepted | validator 分割基準 | check_changed_docs.ts の validator 分割基準（責務境界、ファイルサイズ上限、関心分離ルール）。内部 validator 構成は `references/validator-internal-config.md` へ分離 |
 | integrity/targeted-docs-guard-implementation.md | accepted | Targeted Docs Guard 実装詳細 | check_changed_docs.ts 変更文書限定検査契約（CLI 引数、workflow 別検査項目、判定条件、false-clean 予防）。Phase 1-6 実装計画、report フィールド一覧、完了済み移行作業は `references/targeted-docs-guard-implementation-details.md` へ分離 |
-| integrity/autogen-freshness-gate.md | draft | AUTOGEN ブロック鮮度検出 gate | AUTOGEN ブロック（design-health-metrics.md 等）の鮮度検出、rename/status 変更時の再生成必要性判定、不合格時の処置 |
-| integrity/test-impact-detection-gate.md | draft | テスト影響範囲検出 gate | リファクタリング PR で Design 変更に連動する周辺テストの陳腐化検出。変更 Design を参照し同一 PR で未更新のテストを陳腐化候補として報告、不合格時の処置契約（REQ-019） |
+| integrity/autogen-freshness-gate.md | accepted | AUTOGEN ブロック鮮度検出 gate | AUTOGEN ブロック（design-health-metrics.md 等）の鮮度検出、rename/status 変更時の再生成必要性判定、不合格時の処置 |
+| integrity/test-impact-detection-gate.md | accepted | テスト影響範囲検出 gate | リファクタリング PR で Design 変更に連動する周辺テストの陳腐化検出。変更 Design を参照し同一 PR で未更新のテストを陳腐化候補として報告、不合格時の処置契約（REQ-019） |
 | integrity/checker-execution-contracts.md | accepted | checker 実行契約と検出基盤規則 | checker 共通実行契約、検出対象除外規定、宣言的データ YAML の schema 原則、detector 命名規約 |
 | integrity/content-corruption-checker.md | accepted | 決定的破損検査クラス | 配布 command・skill 全体の決定的破損検査（Markdown 構造破損、制御文字混入、不正な Unicode 文字、意図しない異言語文字、既知形式の参照残骸）の検査クラス契約、検出シグナル、検出平面、許容例列挙（REQ-010-071、REQ-053-012） |
 | integrity/prose-quality-sentinel-checks.md | accepted | 既知不備センチネル検査 | 配布 command・skill の既知不備 14 項目のセンチネル検査カタログ、確定一致/列挙後確認の 2 段検出方式、対象集合、合格条件、REQ-053-012 と決定的破損検査クラスとの関係（REQ-053-022） |
@@ -241,7 +241,6 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | Design | status | タイトル | 責務 |
 |------|--------|---------|------|
 | authoring/command-file-format.md | accepted | コマンドファイルフォーマット規約 | command 定義ファイルの Markdown 構成標準。本文構造・見出し構成・Step 表現・記述形式を扱い、`foundations/patterns.md`（共通文書モデル規約）と責務分離。authoring/ は REQ/Design/SKILL/guide 執筆規約の集約先として将来拡張余地あり（即時統合・authoring/ 削除は行わない） |
-| authoring/dependency-version-compatibility.md | draft | 外部依存メジャーバージョン互換性管理ガイド | 外部依存のメジャーバージョン互換性事前確認手順、影響範囲スキャン方法、検査器と対象コードの TypeScript バージョン整合要件 |
 | authoring/vocabulary-registry.md | accepted | 語彙レジストリ | 語彙対照表の配置基準、連携契約、IR-045 文意品質検出対象語の移管状態、IR-050/IR-051/IR-044 協調契約（ACT-DESIGN-007、REQ-028-007、DEC-013 適用） |
 
 > 上記分類は段階的に適用する。
