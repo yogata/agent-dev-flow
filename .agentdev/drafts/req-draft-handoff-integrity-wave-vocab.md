@@ -2,6 +2,7 @@
 draft_type: req_draft
 topic_slug: handoff-integrity-wave-vocab
 status: saved
+design_actions_consumed: true
 created_at: 2026-09-09T00:00:00+09:00
 source_rus:
   - RU-20260908-12

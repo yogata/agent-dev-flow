@@ -2,7 +2,7 @@
 title: Targeted Docs Guard 実装詳細
 status: accepted
 created: 2026-07-15
-updated: 2026-08-24
+updated: 2026-09-09
 ---
 
 # Targeted Docs Guard 実装詳細
@@ -22,8 +22,9 @@ check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移�
 | 引数 | 必須 | 値 | 説明 |
 |------|------|-----|------|
 | `--workflow` | ✓ | `req-save` / `design-save` / `case-run` / `case-close` / `docs-check` | 検査プロファイル切替え。各 workflow で対象ファイル種別と検査ルールセットを切替える（REQ-010-012） |
-| `--files <path...>` | -- | ファイルパス（space 区切り推奨、comma 区切りも受入） | main 環境（マージ後、case-close 等）で PR 変更ファイルを直接指定して使用。files_checked 空の場合は FAILURE（REQ-010-012、Phase 3） |
-| `--base-ref <git-ref>` | -- | git ref（既定: `origin/main`） | worktree 環境（マージ前、case-run 等）で変更ファイル検出に使用。files_checked 空の場合は WARNING（REQ-010-012、Phase 3） |
+| `--files <path...>` | -- | ファイルパス（space 区切り推奨、comma 区切りも受入） | コミット前の worktree 検証（req-save、design-save、case-run 等）で変更ファイルを明示指定して使用する標準モード。コミット前の列挙には untracked ファイルを含める（`--base-ref` のセマンティクスと混在させない）。main 環境（マージ後、case-close 等）でも PR 変更ファイルの直接指定に使用。files_checked 空の場合は FAILURE（REQ-010-012、REQ-010-076） |
+| `--base-ref <git-ref>` | -- | git ref（既定: `origin/main`） | コミット済み差分に基づく変更ファイル検出。実行はコミット後・push 前に限定する（コミット前の worktree では未コミット差分が検出されず、files_checked 空の検査見逃しを生む）。files_checked 空の場合は FAILURE（REQ-010-012、REQ-010-076） |
+| `--root <path>` | -- | ディレクトリパス | 検査対象リポジトリのルートを明示指定する。worktree 検査・CI 実行時に、検査 skill 配置先を起点とする root 誤解決（誤リポジトリ検査）を防ぐ |
 | `--json` | -- | flag | JSON 出力を有効化 |
 | `--fail-level <level>` | -- | `strict` / `warning` | failure とする severity の閾値。既定は `strict` |
 | `--declared-files <path...>` | -- | ファイルパス（space 区切り推奨、comma 区切りも受入） | Issue/PR で宣言した文書更新対象と実変更ファイルの対応を検査する任意引数 |
@@ -33,7 +34,8 @@ check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移�
 
 ### 標準実行契約（モード使い分け、起動手段、引数形式）
 
-- モード使い分け: コミット前（worktree 上での検証）は `--base-ref` を標準とし、コミット後・PR 作成後（main 環境）は `--files` を標準とする。`--files` と `--base-ref` の誤用による誤 pass・誤 FAILURE を防ぐため、起動時に対象ファイルが検出できる見込みを確認してから実行する
+- モード使い分け: `--base-ref` によるコミット済み差分ベースの変更ファイル検出はコミット後・push 前の実行に限定し、コミット前（worktree 上での検証）は untracked ファイルを含む `--files` による明示指定を標準とする。`--files` と `--base-ref` の誤用による誤 pass・誤 FAILURE を防ぐため、起動時に対象ファイルが検出できる見込みを確認してから実行する
+- 検査対象 root の解決: worktree を検査対象とする場合は、検査 skill を host 側配置を起点として起動し、検査対象 worktree の絶対パスを `--root` で明示指定する。配置先起点の誤リポジトリ検査は検査見逃しとして扱う
 - 起動手段: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts` により起動する（スクリプト契約の共通 CLI 契約に従う）
 - PowerShell での引数形式: 複数パスの引数は引用符でまとめて1文字列として渡さず、配列変数経由（`$files = @("a.md","b.md"); --files $files`）または個別渡しとする。`--files "a.md b.md"` 形式の引用符まとめ渡しは split 失敗の恐れがあるため使用しない
 - USAGE 文言: check_changed_docs.ts の `--help` 出力および guard 実行手続 references は上記使い分け・起動手段・引数形式を明記する
@@ -119,7 +121,8 @@ case-close profile の `full_docs_check_recommended` の判定条件（v2:REQ-01
 
 case-close 向け changed docs guard の false-clean 予防契約（v2:REQ-0158 より移管、REQ-010-012 で要件化）。
 
-- docs guard 検査の対象ファイルが空（`files_checked: 0`）の場合、検査結果を warning として報告し、silent pass としないこと
+- `files_checked` が空の場合の扱いは検証モード（`--files` / `--base-ref`）問わず検査見逃しに集約する（REQ-010-076）。確認なく合格扱いとしない
+- severity は FAILURE に統一する。旧仕様の「`--files` 空 FAILURE / `--base-ref` 空 WARNING+確認」の非対称は、WARNING+確認の運用が「確認なく合格扱いとしない」（REQ-010-076）を動作面で担保できず、モード間の severity 不一致が誤 pass の温床になるため、本 Design で FAILURE 化を確定する。verification-only PR 判定の例外経路のみ本節の例外を維持する
 - case-close は `--files <PR変更ファイル>` 指定を標準とし、`--base-ref` のみの指定を補助的使用に限定すること。main worktree 実行時に HEAD==merge-base となる環境では `--base-ref` が空 diff を生じため、`--files` を優先すること
 - case-close 手順に `files_checked` が空でないことの確認ステップを含めること
 - verification-only PR（実装差分0件、検証のみで作成された PR）で `files_checked` が空になる場合は本 Design の verification-only 判定を経て PASS 処理すること
@@ -140,8 +143,8 @@ TargetedDocsReport 型契約の正本は [integrity-contracts.md](integrity-cont
 
 ## files_checked 空時の警告
 
-`files_checked` が空の場合、検査対象ファイルが検出されなかった旨の警告（warnings 配列）を出力する。
-空の理由（`--files` 指定の不備、PR 変更ファイル取得の失敗、検査対象パスの誤り等）の確認を促す内容とする（Phase 3、REQ-010-012 連動）。
+`files_checked` が空の場合、検査対象ファイルが検出されなかった旨の警告（warnings 配列）を出力するとともに、検査見逃しとして FAILURE に扱う（REQ-010-076、検証モード問わず）。
+空の理由（`--files` 指定の不備、`--base-ref` の実行タイミング違反（コミット前実行）、検査対象 root の誤解決、PR 変更ファイル取得の失敗、検査対象パスの誤り等）の確認を促す内容とする（Phase 3、REQ-010-012 連動）。
 
 ## 検査失敗時の取り扱い
 

@@ -2,7 +2,7 @@
 title: "IR-065: obsolete-vocabulary-current-use"
 status: accepted
 created: 2026-08-22
-updated: 2026-08-22
+updated: 2026-09-09
 ---
 
 # IR-065: obsolete-vocabulary-current-use
@@ -34,6 +34,18 @@ updated: 2026-08-22
 | 4 | `REQ/ADR/` 種別列挙が現行種別列挙として使用されないこと（現行は `REQ/Decision/`） | heuristic fail |
 | 5 | `Artifact Graph`、`DOC-MAP` 呼称が現行概念として使用されないこと | heuristic fail |
 
+### 検出パターンのスペース正規化仕様
+
+検出照合は、語彙内への半角・全角スペース（U+0020/U+3000）挿入の有無に依存しない照合とする
+（REQ-010-066）。実現方式は共通ヘルパー方式とし、照合時にのみ語彙・対象行を正規化し、
+検出報告は原文行を対象とする（正規化後の行を報告・証跡化しない）。
+
+- 正規化対象語彙は正規化の適用対象として一覧管理し、新規語彙を必要に応じて追加する
+- 語彙の追加・変更は `check_integrity.ts` パターン定数（IR065_VOCAB_PATTERNS / IR066_VOCAB_PATTERNS）と
+  `data/obsolete-vocabulary-map.yaml` vocabulary[] の同一 PR 同期を必須とする（REQ-047-004、drift 検査 strict fail 連動）
+- 正規化照合は既存の行全体マッチ統一規約（checker-execution-contracts「パターンマッチ・網羅検査設計の標準規約」）と協調し、
+  行単位走査モデルを維持する。行の照合時正規化を導入するものであり、行全体マッチ規約を置き換えない
+
 ## exemption（許容条件）
 
 許容条件の運用データは `data/obsolete-vocabulary-map.yaml` が宣言する（検出シグナルの正規表現は本ルールの checker 実装が所有）。
@@ -49,6 +61,20 @@ updated: 2026-08-22
 | existence_probe 先が実在する語彙 | 現行機能として存在するため検出対象外 |
 | code block / code span 内 | 例示・様式説明 |
 | `docs/requirements/retired/`、`docs/decisions/retired/`、`docs/reports/`、検出基盤配下（scripts/references/data/baselines、repo-agentdev-integrity/SKILL.md） | 履歴領域・検出基盤許容（IR-057 と同一） |
+
+### 構造的除外の宣言仕様
+
+スペース正規化の導入に伴う誤検知（語彙引用・記録領域の検出）の除外は、語彙を引用・記録する領域を
+経路・領域ベースで構造的に除外する方式とする（REQ-010-066）。個別出現箇所の allow 条件列挙で
+代替しない。
+
+- 除外対象と理由は既存の宣言構造（`data/obsolete-vocabulary-map.yaml`）に理由付きで記録する
+- 除外領域の宣言は構造マーカー（見出し、frontmatter、コードブロック等の領域境界）を錨とし、行番号や
+  行内容の列挙を錨としない。行内容列挙は個別出現箇所の allow 列挙に該当するため採用しない
+- 広域 glob による検出回避と検出無効化は許容しない（NG 隠蔽禁止原則、checker-execution-contracts「検出対象除外規定」と同一規定）
+- 既存の行レベル免除（行レベル履歴マーカー、否定文脈語、retired 見出し配下）は存続する。これらは
+  「個別出現箇所の allow 列挙」ではなく、行の意味的分類（履歴文脈・否定文脈・履歴領域）による構造的
+  免除であり、構造的除外宣言の対象に含まれない旨を整理する
 
 ## baseline 運用
 

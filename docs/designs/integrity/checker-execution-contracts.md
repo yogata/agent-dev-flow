@@ -156,6 +156,14 @@ checker は module import 経由（node --experimental-strip-types）での実�
 - worktree 内実行は junction 未伝播により concrete-id 0件の無効実行になり得る。link profile を worktree で実行した
   場合は実行環境ラベルを記録し、結果の採用可否を環境ラベルで判定する（REQ-018-004 の環境差区分に従う）。
 - source profile と link profile の対比表を検証結果の解釈に用いる。
+- worktree を検査対象とする checker の起動契約: 検査 skill は host 側配置を起点として起動し、検査対象 worktree の
+  絶対パスを `--root`（相当の repoRoot 明示指定）で指定して起動する。worktree への検査 skill 複製と配置先起点の
+  起動は標準としない。
+- 検査対象 root の誤解決（配置先起点の誤リポジトリ検査）と `files_checked` 空は検査見逃しとして扱う。
+  `files_checked` の内容と検査対象 worktree の変更ファイルの一致確認を検査結果の採用前の手順とする（REQ-010-076）。
+- 読み取り専用検査であり worktree への書込みを行わない。worktree 分離原則（POL-worktree-isolation）との関係:
+  検査は worktree の分離を壊さない読み取り専用操作として実行され、検査対象 root の明示指定と結果採用前の一致確認の
+  みを worktree 外（host 側）で行う。
 
 実行記録には、次の環境ラベルを必ず付す。
 
