@@ -36,7 +36,6 @@ const RETIRED_ENTRIES = [
   "package-release-archive.ps1",
   "trusted-distribution-gate.ps1",
   "publish-hard-link.ts",
-  "apply-mechanical-replacement.ps1",
 ] as const;
 
 function read(rel: string): string {
@@ -96,7 +95,6 @@ describe("scripts layout / public entry boundary (REQ-050-001, REQ-050-007, REQ-
     expect(fs.existsSync(path.join(SCRIPTS_DIR, "self", "release", "package-release-archive.ps1"))).toBe(true);
     expect(fs.existsSync(path.join(SCRIPTS_DIR, "self", "release", "trusted-distribution-gate.ps1"))).toBe(true);
     expect(fs.existsSync(path.join(SCRIPTS_DIR, "self", "release", "publish-hard-link.ts"))).toBe(true);
-    expect(fs.existsSync(path.join(SCRIPTS_DIR, "self", "maintenance", "apply-mechanical-replacement.ps1"))).toBe(true);
   });
 });
 

@@ -1,2 +1,37 @@
+# ADF 標準 prh 辞書（一般文章の禁止表現）。
+# 既存の禁止表現検出で用いていた一般文章用置換辞書（禁止表現区分）から
+# 完全一致検出として移管した語を登録する。文脈で推奨訳が複数ある語は候補を「/」区切りで示す。
+# 検出は散文（Str 節点）のみに適用され、inline code と fenced code は対象外。
 version: 1
-rules: []
+rules:
+  # 中国語簡体字・中国語由来
+  - expected: 〜ではなく
+    pattern: 而非
+  - expected: 統一
+    pattern: 统一
+  - expected: 記述形式/表明形式
+    pattern: 陈述形式
+  - expected: 候補
+    pattern: 候选
+  - expected: パス/経路
+    pattern: 路径
+  - expected: 出典/由来/発生元
+    pattern: 来源
+  # 文字化け・誤字・変換失敗
+  - expected: 破綻
+    pattern: 破綾
+  - expected: 監査証跡
+    pattern: 監査証跠
+  - expected: 成果物
+    pattern: 成果成果物
+  - expected: 本来/件
+    pattern: 本来件
+  - expected: 進捗
+    pattern: 進捰
+  # 直訳独自語・英語混在
+  - expected: 自己完結
+    pattern: 自己完束
+  - expected: 唯一の情報源（SSoT）
+    # ハイフンを含む語は plain pattern の自動エスケープ（\-）が Unicode 正規表現で
+    # 不正になるため、regex 形式で指定する
+    pattern: /source-of-trought/

@@ -1,4 +1,4 @@
-// ADF-COVERS(implementation): REQ-053-004, REQ-053-024, REQ-053-025, REQ-053-034, REQ-053-037
+// ADF-COVERS(implementation): REQ-010-068, REQ-053-004, REQ-053-024, REQ-053-025, REQ-053-034, REQ-053-037
 // agentdev-textlint-guard 共通実行基盤: 規則構成と用語。
 //
 // 標準構成は textlint-rule-preset-ja-technical-writing、
@@ -25,7 +25,8 @@ const HARD_RULE_IDS: ReadonlySet<string> = new Set([
   "preset-ja-technical-writing/no-invalid-control-character",
   "preset-ja-technical-writing/no-nfd",
   "preset-ja-technical-writing/no-zero-width-spaces",
-  // 固定置換による禁止表現（既定辞書は空。辞書登録された語は決定的に検出する）
+  // 固定置換による禁止表現（標準辞書は既存の禁止表現区分から移管した完全一致検出語。
+  // 辞書登録された語は決定的に検出する）
   "prh",
 ]);
 
