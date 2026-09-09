@@ -31,7 +31,7 @@ Plugin と最終検査は同一の共通基盤（`lib/`）を呼び出す。プ�
 
 標準構成は `textlint-rule-preset-ja-technical-writing`、`@textlint-ja/textlint-rule-preset-ai-writing`、`textlint-rule-prh`（規則の版は `package.json` + `bun.lock` で固定）。
 
-拒否対象（hard）は誤検出確認済みの決定的規則に限定する（意思決定記録の限定例外）。初期構成の hard は文字品質違反クラス（半角カナ、制御文字、NFD、ゼロ幅スペース）と prh（既定辞書は空のため初期強制語なし）のみ。文長・文体・弱い表現等のヒューリスティックな規則は助言対象（severity warning）とし、検査不合格の根拠にしない。規則ごとの導入証拠（7条件）は該当 Case の PR 本文が追跡先である。規則の option と severity の実測校正は別工程（corpus 校正段階）が所有する。
+拒否対象（hard）は誤検出確認済みの決定的規則に限定する（意思決定記録の限定例外）。初期構成の hard は文字品質違反クラス（半角カナ、制御文字、NFD、ゼロ幅スペース）と prh（標準辞書 `rules/default-prh.yml` は旧 IR-060 forbidden 区分から移管した完全一致検出語を登録）のみ。文長・文体・弱い表現等のヒューリスティックな規則は助言対象（severity warning）とし、検査不合格の根拠にしない。規則ごとの導入証拠（7条件）は該当 Case の PR 本文が追跡先である。規則の option と severity の実測校正は別工程（corpus 校正段階）が所有する。
 
 ## 設定
 
