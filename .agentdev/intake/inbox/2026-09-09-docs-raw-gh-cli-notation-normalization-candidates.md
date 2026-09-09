@@ -20,3 +20,7 @@ verification-only PR 節の表記統一（ACT-DESIGN-004、commit ff591ef4）と
 ## 補足（Epic #2704 Wave 1 close 時、2026-09-09）
 
 PR #2718（Issue #2706 / OU-007）の Findings で qg-4-final-acceptance.md の同一箇所を再観察。PR #2718 マージ（7964375f）により該当行は L121 近傍から L124 近傍へ移動しているが、`gh pr view --json files` の生 gh 表記自体は未修正のまま残存（同 PR のスコープ外）。新規 item としては起票せず、本 item への補足として記録する。
+
+## 補足（Epic #2734 W5 close 時、2026-09-10）
+
+PR #2751（Issue #2739）の Findings で integrity suite の gh-direct-invocation check が single.md の gh CLI 直接呼出記述を warning として再観察（main 627def84 既出、2026-09-10 集約時点も継続）。同一対象のため新規 item は起票せず本 item へ記録。集約観察は 2026-09-10-textlint-suite-existing-warnings-backlog-candidates.md の #3 を参照。

@@ -12,3 +12,8 @@ IR-055 既出違反: `src/opencode/skills/agentdev-git-worktree/references/workt
 
 - 是正の要否・優先度は intake-promote の review で判定すること
 - W4 実行記録（req-053-textlint-wave4-src-correction.md）の取り扱い: 修復（参照形式の是正または baseline 登録）は W4 の src 変更禁止により未実施。Wave 5（REQ-057-024、IR-055 baseline 再生成の主責任 Wave）での baseline 登録判断の対象として引き継ぎ済み
+
+## 状況更新（Epic #2734 W5 close 時、2026-09-10）
+
+- Wave 5（PR #2751 マージ 1b1678b1）で IR-055 baseline が最終状態へ再生成され、本参照（worktree-operations.md L146、docs/designs/）は既知 delta（heuristic）として baseline 登録済みとなった（実行記録 req-053-textlint-wave5-final-verification.md 第 5.2 節の判断根拠: CR-001 表層是正禁止と対象範囲制約下での baseline 登録選択）。integrity suite の IR-055 new violations は 0
+- 参照形式の是正（表現解消）を選ぶ場合は baseline エントリの併せた除去が必要。baseline 登録のまま維持する場合は本 item の残処置なし。いずれかを intake-promote の review で判定すること

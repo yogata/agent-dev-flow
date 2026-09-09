@@ -145,3 +145,19 @@ worktree で integrity suite を実行する場合、textlint plugin 配下に�
 - **想定反映先**: textlint 品質基盤 Design（docs/designs/quality/textlint-quality-runtime.md）の規則校正と移行検証節（Wave5 で検討）
 - **関連**: docs/reports/req-053-textlint-wave2-calibration.md、docs/reports/req-053-textlint-wave4-src-correction.md、PR 2750
 - **タグ**: `#textlint` `#規則構成ハッシュ` `#再現性`
+
+## 2026-09-10 prh rulePaths 正規化手順が確定し環境非依存ハッシュで突合可能になった（上記エントリの解決）
+
+- **問題事象**: 上記「規則構成ハッシュの再計算手順は prh options.rulePaths の絶対パスで環境依存になる」の根本原因が Wave 5 で確定し、正規化手順が確立した
+- **発生局面**: 検証（Epic 2734 Wave 5 最終検証、TS-001 突合）
+- **検知方法**: worktree 実位置と Wave2 計算時相当仮想位置の両方で生 hash を再計算し、同一規則構成から配置位置だけで hash が変動することを実証（実行記録 req-053-textlint-wave5-final-verification.md 第 2.1 節）
+- **根本原因**: composeRuleDescriptors が実行環境の plugin dir 絶対パスを prh options.rulePaths に混在させるため、canonical JSON(options) を生のまま hash 化すると clone 配置位置依存の値になる（Wave4 の「原因候補」から確定）
+- **自律対応内容**: rulePaths を plugin dir 相対（標準辞書）/ プロジェクトルート相対（用語辞書）へ正規化し / 区切り・辞書順ソートを施す手順を確定（同記録第 2.2 節）。正規化後 hash は両構成で同一値となり環境非依存を確認。textlint 品質基盤 Design「規則校正と移行検証」節へ正規手順として追記（Wave5 close、PR 2751 後の capture commit）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: Design 追記適用（REQ-053-037 の規則固定突合手順の規範化）。Wave2 記録第 4.1 節は歴史記録のため未修正
+- **横展開観点**: ハッシュ計算に環境パスが混入する構成要素は、正規化規則を明記しないと再現性が失われる
+- **再発条件**: 異なる clone 先パスでハッシュ再計算を実行した場合
+- **予防策候補**: canonical JSON 対象から環境依存パスを除外または相対化する正規化規則の Design 明記（実施済み）
+- **想定反映先**: textlint 品質基盤 Design（反映済み）
+- **関連**: docs/reports/req-053-textlint-wave5-final-verification.md、docs/designs/quality/textlint-quality-runtime.md、PR 2751
+- **タグ**: `#textlint` `#規則構成ハッシュ` `#再現性` `#解決`

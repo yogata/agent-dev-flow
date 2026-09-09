@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は16件、提案中の Decision は9件である。
+現行の承認済み Decision は17件、提案中の Decision は8件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -41,7 +41,7 @@
 | DEC-025 | プロジェクト知識を Capability Skill から分離し、独立した正規知識層として管理する | proposed | 2026-09-01 |
 | DEC-026 | 実現面変更方針の構造化ハンドオフ（realization_actions） | proposed | 2026-09-03 |
 | DEC-027 | 観測ベース統制縮小評価ループ | proposed | 2026-09-04 |
-| DEC-028 | 文章表層品質の共通実行基盤 | proposed | 2026-09-09 |
+| DEC-028 | 文章表層品質の共通実行基盤 | accepted | 2026-09-09 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -70,6 +70,7 @@
 - [DEC-016](DEC-016.md)（導入系スクリプトの副作用ゼロ原則）
 - [DEC-017](DEC-017.md)（最小トレーサビリティモデルの採用と Artifact Graph の廃止）
 - [DEC-023](DEC-023.md)（third-party Skill の分離管理と取得機構の導入）
+- [DEC-028](DEC-028.md)（文章表層品質の共通実行基盤）
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
@@ -83,7 +84,6 @@
 - [DEC-025](DEC-025.md)（プロジェクト知識を Capability Skill から分離し、独立した正規知識層として管理する）
 - [DEC-026](DEC-026.md)（実現面変更方針の構造化ハンドオフ（realization_actions））
 - [DEC-027](DEC-027.md)（観測ベース統制縮小評価ループ）
-- [DEC-028](DEC-028.md)（文章表層品質の共通実行基盤）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
