@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-053-031, REQ-053-032, REQ-053-033, REQ-010-075
+// ADF-COVERS(verification): REQ-053-031, REQ-053-032, REQ-053-033, REQ-053-039, REQ-010-075
 // ADF-COVERS(verification): REQ-052-002
 //
 // TS-008: 二入口の同一性と bypass 検出。
@@ -6,6 +6,7 @@
 // - 外部書込みで違反を導入して最終検査を実行する（bypass 検出）
 // - 全対象の検査不能と拒否対象違反は完了失敗になる
 // - 導入先で docs-check なしに実行できる（本テストは docs-check 非依存）
+// - 機構固定の既定除外と加算優先を最終検査入口で確認する（REQ-053-039）
 
 import { describe, expect, test, beforeEach } from "bun:test";
 import * as fs from "node:fs";
@@ -130,6 +131,32 @@ describe("bypass 検出（外部書込み）", () => {
     fs.writeFileSync(path.join(root, "docs", "direct.md"), "# 直接書込み\n\n正常な文章である。\n", "utf8");
     const gate = await runFinalGate(["--root", root]);
     expect(gate.exitCode).toBe(0);
+  });
+});
+
+describe("機構固定の既定除外と加算優先（最終検査入口、REQ-053-039）", () => {
+  test("node_modules は加算でも対象外、歴史記録サブツリーは加算で再包含される", async () => {
+    const root = makeProject({
+      "docs/ok.md": CLEAN,
+      "docs/reports/bypass.md": VIOLATING,
+      "src/opencode/plugins/x/node_modules/dep/README.md": VIOLATING,
+    });
+    const configAbs = configPathFor(root);
+    fs.mkdirSync(path.dirname(configAbs), { recursive: true });
+    fs.writeFileSync(
+      configAbs,
+      "version: 1\nadditional_targets:\n  - docs/reports/**/*.md\n  - src/opencode/plugins/**/README.md\n",
+      "utf8",
+    );
+    const gate = await runFinalGate(["--root", root, "--json"]);
+    // 加算設定（docs/reports/**/*.md）は既定除外に優先して再包含するため違反で不合格
+    expect(gate.exitCode).toBe(1);
+    const payload = JSON.parse(gate.output) as { outcome: { files: { path: string }[] } };
+    const paths = payload.outcome.files.map((f) => f.path);
+    expect(paths).toContain("docs/ok.md");
+    expect(paths).toContain("docs/reports/bypass.md");
+    // node_modules 配下は依存成果物として加算設定でも列挙されない
+    expect(paths.every((p) => !p.includes("node_modules"))).toBe(true);
   });
 });
 

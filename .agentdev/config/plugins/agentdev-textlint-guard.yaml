@@ -5,3 +5,6 @@ version: 1
 additional_targets:
   - src/opencode/commands/**/*.md
   - src/opencode/skills/**/*.md
+  - src/opencode/plugins/**/README.md
+  - src/opencode/tools/**/README.md
+  - src/opencode-local/**/*.md
