@@ -2,7 +2,7 @@
 title: execution_unit 構成アルゴリズム参照
 status: accepted
 created: 2026-07-25
-updated: 2026-08-18
+updated: 2026-09-09
 ---
 <!-- ADF-COVERS(implementation): REQ-030-007, REQ-030-008, REQ-030-009 -->
 
@@ -38,7 +38,7 @@ case-open は OU 群の依存グラフから連結成分を計算し、各連結
 2. AUTOGEN 対象ファイル重複: 変更に付随して再生成される AUTOGEN 対象ファイル（README 索引、メトリクス表等）の重複
 3. 同一ファイル行近接: 同一ファイル内での変更行近接（一括機械置換等の隣接行変更）
 
-依存ヒントを検知した場合の Wave 構成判断（直列化・依存付与・単一 PR 集約）は親 Design「execution_unit 構成の依存ヒントと Wave 構成判断基準」節が定める。
+依存ヒントを検知した場合の Wave 構成判断（重複前置検出、Wave 分離・変更対象分割・重複許容）は親 Design「execution_unit 構成の依存ヒントと Wave 構成の重複前置検出契約（REQ-030-022、REQ-031-027、REQ-035-012）」節が定める。
 
 ## 3軸判断モデル
 
