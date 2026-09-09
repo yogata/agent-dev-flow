@@ -67,3 +67,33 @@ worktree で integrity suite を実行する場合、textlint plugin 配下に�
 - **クラス**: 規約運用（配布物への concrete-id 混入防止）
 
 配布物本文へ REQ/DEC の concrete ID（REQ-{NNNN}-{NNN} 形式等）を記載すると配布依存境界 gate が検出する。配布手順へ REQ 行を手順化する際は、本文では concrete ID を書かず Design 節名参照と内容記述へ集約し、正規の ID 参照はファイル先頭の ADF-COVERS 宣言行（IR-059 免除）へ置くのが正規パターン（PR #2748 で 11件を置換して実証済み）。TS-004/TS-005 のような REQ 行 ID を引く検証記述は docs 配下または一時証跡に限定する。
+## 2026-09-09 max-kanji-continuous-len 既定 max 6 は技術 corpus で実質誤検出機構になり corpus 実測による option 校正が必要
+
+- **問題事象**: textlint 是正キャンペーン Wave 2 の規則校正実測で、textlint-rule-max-kanji-continuous-len のプリセット既定 max 6 では指摘 1,856 件の大半（約 98%）が「現行成果物体系」「限定的親判断解決」等の正規複合名詞への構造的誤検出であり、実在する読みにくい長連続（11 字以上 37 件相当）を捉えていなかった
+- **発生局面**: 実装（Epic 2734 Wave 2 規則校正）
+- **検知方法**: gate.ts --json による corpus 全文実測と漢字連続長分布の測定（7〜10 字 1,919 件 / 11 字以上 37 件相当）
+- **根本原因**: プリセット既定値（max 6）は汎用 corpus を想定した閾値であり、専門用語・複合名詞の多い技術文書 corpus の実態と合っていない
+- **自律対応内容**: 実測分布に基づき option を max 10 へ校正（lib/rules.ts の CALIBRATED_RULE_OPTIONS）。指摘 1,856 件を 33 件へ削減し、残存 33 件（11 字以上の実在する長連続）は助言対象として維持。誤検出を拒否対象へ昇格させず DEC-001 決定4 の 7 条件契約を維持した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（DEC-028 の「実測と誤検出確認で option と severity を設定」の運用に従う実装）
+- **横展開観点**: lint 系プリセット規則の既定値は、採用 corpus の実測で妥当性を確認してから使う運用へ横展開できる
+- **再発条件**: 新規プリセット規則を corpus 実測なしで既定値のまま採用した場合
+- **予防策候補**: 導入工程に corpus 実測による option 校正ステップを組み込む
+- **想定反映先**: textlint 品質基盤の運用知見（learning-promote で反映先を判断）
+- **関連**: src/opencode/plugins/agentdev-textlint-guard/lib/rules.ts、PR 2747、docs/reports/req-053-textlint-wave2-calibration.md
+- **タグ**: `#textlint` `#corpus校正` `#誤検出`
+## 2026-09-09 preset-ai-writing の corpus 慣行表記との衝突は規則無効化ではなく disableXxx 系 option の対象調整で解消する
+
+- **問題事象**: preset-ai-writing の no-ai-list-formatting（1,825 件）と no-ai-emphasis-patterns（22 件）の指摘が、本 corpus で確立済みの慣行表記（「- **用語**: 説明」の定義リスト、「**重要**」等の注意喚起太字）への検出であり、規則の無効化も大量是正も過剰対応だった
+- **発生局面**: 実装（Epic 2734 Wave 2 規則校正）
+- **検知方法**: gate.ts --json の規則別実測と excerpt 内容の誤検出確認
+- **根本原因**: プリセット規則は corpus 固有の慣行表記を知らず、機構が提供する disableXxx 系 option（無効化ではなく検出対象の調整）を使わず既定適用すると慣行表記と衝突する
+- **自律対応内容**: disableBoldListItems: true（絵文字リスト検出は維持）と disableInfoPatterns: true（絵文字+太字検出は維持）を option 校正として確定。対象調整により指摘 1,825 件を 28 件、22 件を 0 件へ削減し、AI 由来の機械的体裁の検出機能は維持した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: preset-ai-writing を採用する他のプロジェクトでも、corpus 慣行表記との衝突は同系 option の対象調整で解消できる
+- **再発条件**: corpus の慣行表記（定義リスト・注意喚起太字等）を調査せずに preset-ai-writing を既定 option のまま適用した場合
+- **予防策候補**: プリセット採用時に corpus の慣行表記を確認し、disableXxx 系 option で対象調整する（無効化しない）
+- **想定反映先**: textlint 品質基盤の運用知見（learning-promote で反映先を判断）
+- **関連**: src/opencode/plugins/agentdev-textlint-guard/lib/rules.ts、PR 2747、docs/reports/req-053-textlint-wave2-calibration.md
+- **タグ**: `#textlint` `#preset-ai-writing` `#corpus校正`
