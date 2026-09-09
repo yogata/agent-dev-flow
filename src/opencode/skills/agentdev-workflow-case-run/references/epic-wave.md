@@ -1,5 +1,7 @@
 # epic-wave workflow: Epic Wave 実行（epic-wave）
 
+<!-- ADF-COVERS(implementation): REQ-031-027, REQ-035-012 -->
+
 > 本 reference は `agentdev-workflow-case-run` SKILL.md の epic-wave workflow 詳細である。
 > `case-run #epic` 受領時に現在 ready な Wave の子Issue を並列実行する制御（STEP-W1〜W5）を所有する。
 > 子Issue ごとの委譲・result 処理は [references/delegation-and-result.md](delegation-and-result.md) の STEP-S4/S5 と同一契約で並列適用する。
@@ -59,7 +61,7 @@ Epic Issue 本文を読み込み（`agentdev-epic-tracker` 参照）、現在 re
 
 ### Purpose
 
-子Issue 並列委譲の前提（fetch、worktree 群、前置 gate 群）を整える。
+子Issue 並列委譲の前提（変更ファイル重複前置検出、fetch、worktree 群、前置 gate 群）を整える。
 
 ### Input Resolution
 
@@ -74,6 +76,23 @@ Epic Issue 本文を読み込み（`agentdev-epic-tracker` 参照）、現在 re
 
 ### Procedure
 
+**変更ファイル重複前置検出（fan-out 前）**:
+
+Wave 構成時（case-open STEP-3）の前置検出に対する最終検出であり、fan-out 前の重複検出と停止条件を所有する。
+前置検出契約の正は epic-wave-model Design「execution_unit 構成の依存ヒントと Wave 構成の重複前置検出契約」節である。
+
+1. Wave 内 ready 子Issue ごとに変更対象ファイル集合を取得する（子Issue 本文の実現面の変更方針・変更対象成果物）
+2. 子Issue 間でファイル単位の重複を比較する
+3. 重複なしの場合は既存の fan-out 経路を維持し、以降の準備作業へ進む
+4. 重複検出時は事前記録された解消方針（Epic Issue 本文の Wave 構成判断記録。case-open が確定した Wave 分離・変更対象分割・重複許容の判断）を参照し、その判断に従う。重複許容の場合は衝突解消の担当とマージ順序の事前記録に従う
+5. 解消方針が記録されていない（方針なし）場合は fan-out を停止して判断を求める。case-auto 配下では decision_context による親判断解決へ委譲する
+6. 変更対象集合が取得不能またはファイル粒度に展開不能な子Issue がある場合は、比較を省略せず検出不能として報告し判断を求める
+
+前置検出は回復の発生確率を下げる予防であり、Level 1〜3 コンフリクト解消（回復）契約を弱めない。
+mergeable 作成時状態のみで Wave の安全性を判断しない。
+
+**通常の fan-out 準備**:
+
 - `git fetch origin` を実行し main の鮮度を確認する（Wave 実行時、PR merge 後再開時は必須）
 - 子Issue ごとに worktree とブランチを作成する（`agentdev-git-worktree` 参照。作成元は main を明示的に指定する。Epic 後続 Wave の作業起点も main を参照。べき等チェック: 既存時はスキップ）
 - 子Issue ごとに前置 gate 群（single.md STEP-S3 の STEP-S3-2〜S3-6 と同一契約: worktree precondition gate、QG-3 前置 staleness check、docs/** 変更時 targeted docs guard、配布依存境界 事前 gate、AUTOGEN 索引再生成 前置 gate）を適用する
@@ -81,18 +100,21 @@ Epic Issue 本文を読み込み（`agentdev-epic-tracker` 参照）、現在 re
 
 ### Result
 
+- 変更ファイル重複前置検出の結果（重複なし、事前記録された解消方針に従う、検出不能報告、方針なし停止のいずれか）
 - 全子Issue の worktree+ブランチ準備完了（べき等）、前置 gate 群の判定結果、L2 タイムスタンプ
 
 ### Evidence
 
-- worktree・ブランチの存在確認結果、各 gate 実行結果、L2 タイムスタンプ
+- 重複前置検出の比較結果、解消方針の確認結果（または検出不能報告・方針なし停止の記録）、worktree・ブランチの存在確認結果、各 gate 実行結果、L2 タイムスタンプ
 
 ### Completion Verification
 
+- 変更ファイル重複前置検出が完了していること。方針なし重複または検出不能の判断が確定しない場合は fan-out を開始していないこと（前置 gate の不合格が当該子Issue のみの起動停止であるのに対し、重複前置検出の停止は Wave 単位である）
 - 全子Issue について precondition gate が合格していること（不合格の子Issue は当該子Issue のみ起動停止とし、他子Issue へ伝播させない）
 
 ### Resume-Idempotency
 
+- 重複前置検出は子Issue 本文と Epic Issue 本文（durable state）からの読取で冪等であり、再開時は同一定義で再比較する
 - worktree・ブランチ既存時は作成をスキップする。一部子Issue のみ準備済みの再開では未準備分のみ作成する
 
 ## STEP-W3: fan-out 並列委譲
@@ -110,6 +132,8 @@ Wave 内子Issue を実行担当サブエージェントへ最大5件並列委�
 
 ### Preconditions
 
+- STEP-W1 で Wave 子Issue 群が確定している
+- STEP-W2 の変更ファイル重複前置検出が確定している（重複なし、事前記録された解消方針に従う、のいずれか。方針なし停止・検出不能判断中は fan-out へ進まない）
 - STEP-W2 の前置 gate 群が合格している（対象子Issue 分）
 
 ### Procedure
