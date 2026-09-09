@@ -36,8 +36,8 @@ catalog-only tombstone として管理され、本 Design では文意品質検�
 
 移管対象語（`read-only`、`read-only-diagnostic`、`advisor`/`advisory`、`architecture-affecting`、`Architecture advisory gate` 等）の対照表は repo-local 参照ファイル `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md`「文意品質検出対象語（IR-045）」節が正である。
 本 Design は当該節の管理権限を実体対照表側へ委譲し、重複所有しない。
-rewrite-patterns.md の IR-045 系許容表記は語彙レジストリ実体を正とする検出器語彙として恒久除外する
-（同期現行化は行わない。根拠は integrity-contracts.md の統一選択基準「意図的残存は baseline 登録し根拠注記を付す」に従い、除外の根拠を注記する）。
+IR-045 系の文意品質語彙は一般文章の textlint 規則へ移管せず、語彙レジストリ実体を参照する成果物固有の意味品質能力で扱う。
+一般文章の置換辞書や rewrite pattern は本 Design に重複保持しない。
 
 ## IR-050 / IR-051 語彙レジストリ協調
 

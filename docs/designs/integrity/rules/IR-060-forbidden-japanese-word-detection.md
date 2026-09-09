@@ -2,68 +2,60 @@
 title: "IR-060: forbidden Japanese word detection"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-09-09
 ---
 
 # IR-060: forbidden Japanese word detection
 
-現行自然言語文書（Markdown 本文）における禁止語（forbidden）の機械検出。
-v2:REQ-0140-035 が定める置換辞書運用区分のうち、forbidden 区分語を docs-check / inspect-docs の検査対象とする。
-review 区分語は本ルールの対象外とし、`agentdev-doc-writing` 查読観点（v2:REQ-0140-033）で人手確認する。
+現行 Markdown 本文における、固定置換できる禁止表現の機械検出。
+一般文章の表層検査は textlint 共通基盤が所有し、本ルールは移管対象と移管対象外の責務境界を記録する。
+履歴文脈、廃止語彙、旧パス、識別子に関わる検査は IR-065 / IR-066 等の既存 integrity checker が所有する。
 
 | Field | Value |
 |-------|-------|
 | rule_id | IR-060 |
-| description | 現行自然言語文書（Markdown 本文）における禁止語（forbidden）の機械検出。forbidden 区分語は日本語本文中に出現した場合、即時 finding とする |
+| description | 固定置換できる forbidden 表現を textlint の prh 標準辞書で完全一致検出する |
 | severity | heuristic |
 | category | document-drift |
-| detection_method | 完全一致検出（forbidden 語リスト正: `src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md` の forbidden 区分）。backticks 内、fenced code block 内、YAML frontmatter、ファイルパス、識別子（enum 値、コマンド名、スキル名、YAMLキー）は文脈除外対象 |
-| affected_artifacts | [docs/**/*.md（docs/requirements/retired/, docs/decisions/retired/ を除く）, src/opencode/{commands,skills}/**/*.md, AGENTS.md] |
-| related_req | [v2:REQ-0140（v2:REQ-0140-033, v2:REQ-0140-035, v2:REQ-0140-036）, REQ-010（文意判断は docs-check 対象外、本ルールは完全一致検出に限定）] |
-| related_design | [../responsibilities/document-type-responsibilities.md（不自然表現検出分類 P0〜P4）, ../../../src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md（forbidden 語リスト正）, integrity-rule-catalog.md] |
+| detection_method | `src/opencode/plugins/agentdev-textlint-guard/rules/default-prh.yml` の prh 規則による完全一致検出。textlint の Markdown parser が backticks 内、fenced code block 内、frontmatter を散文から除外する |
+| affected_artifacts | [docs/**/*.md（docs/requirements/retired/, docs/decisions/retired/ を除く）, src/opencode/{commands,skills}/**/*.md] |
+| related_req | [REQ-053-007, REQ-053-035, REQ-036-023, REQ-010-071] |
+| related_design | [../../quality/textlint-quality-runtime.md, ../../responsibilities/document-type-responsibilities.md, ../integrity-rule-catalog.md] |
 | gate_level | delta-guard |
-| false_positive_risk | backticks 内、コードブロック内、frontmatter、YAMLキー、ファイルパス、識別子（enum 値、コマンド名、スキル名）での forbidden 語出現は正当使用。文脈除外ロジックで対応。例: `` `source-of-trought` `` が backticks 内で例示される場合は検出対象外 |
-| regression_test | (未実装) |
+| false_positive_risk | prh の Markdown 構造除外によりコード値と frontmatter を検出しない。文脈で推奨訳が変わる語と lifecycle / artifact-integrity 語彙は本規則へ追加しない |
+| regression_test | `src/opencode/plugins/agentdev-textlint-guard/tests/standard-dictionary.test.ts`（正常、違反、境界、許容、過去再現） |
 | finding_route | req-define |
-| triage_action | forbidden 語を推奨訳へ置換。文脈で推奨訳が変わる場合は `agentdev-doc-writing` 查読（v2:REQ-0140-033）で確定。review 区分語は本ルールの対象外とし、查読観点へ振り向ける |
-| last_verified | (未検証) |
+| triage_action | prh の replacement を修正指針として提示し、固定置換可能な表現だけを是正する。文脈判断を要する表現は専用規則へ戻さず、成果物固有の意味品質能力へ委譲する |
+| last_verified | 2026-09-09 |
 
-## 検知対象詳細
+## 検知対象
 
-### 検知対象
+標準辞書 [default-prh.yml](../../../../src/opencode/plugins/agentdev-textlint-guard/rules/default-prh.yml) が所有する固定置換可能な語:
 
-forbidden 区分語（正: [japanese-replacement-dictionary.md](../../../../src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md)）。主な対象:
+- 中国語簡体字・中国語由来: `而非`, `统一`, `陈述形式`, `候选`, `路径`, `来源`
+- 文字化け・誤字: `破綾`, `監査証跠`, `成果成果物`, `本来件`, `進捰`
+- 直訳独自語・誤記: `自己完束`
+- 英語混在（識別子以外）: `source-of-trought`
 
-- 中国語簡体字・中国語由来: `而非`, `统一`, `陈述形式`, `定位`, `候选`, `路径`, `一致性`, `来源`
-- 文字化け・誤字: `破綾`, `監査証跠`, `成果成果物`, `本来件`, `測可能性`, `進捰`
-- 直訳独自語: `単独根`, `自己完束`
-- 英語混在（識別子以外）: `source-of-trought`, `要件doc`
+`定位`、`一致性`、`測可能性`、`単独根`、`要件doc` は文脈依存または意味の復元が必要なため、標準辞書へ移管しない。
 
-カタログへは具体語をコピーせず、参照資料を正とする（語彙レジストリと同様の方針）。
+## exemption 条件
 
-### exemption 条件
+以下の文脈での辞書語出現は正当使用として検出対象外とする。
 
-以下の文脈での forbidden 語出現は正当使用として検出対象外とする。
-
-- backticks（`` ` ``）で囲まれた部分（例示、コード値の提示）
+- backticks（`` ` ``）で囲まれた部分
 - fenced code block（` ``` ` または `~~~`）の内部
-- YAML frontmatter（`---` で囲まれた部分）
-- ファイルパス・ディレクトリパスの一部
-- 識別子（enum 値、コマンド名、スキル名、YAMLキー）
+- YAML frontmatter
+- ファイルパス、enum 値、コマンド名、スキル名、YAML キー
 
-## IR-045 との関係
+## 既存 integrity checker との境界
 
-IR-045（削除済み）は「docs 日本語表現、文意整合検査」を担っていたが、REQ-010-003 により docs-check は意味判断を要する文意整合検査を保持しない方針となり削除された。
-IR-060 はこの方針を継承し、意味判断を要する検出（review 区分語、文意品質判断）は扱わず、完全一致検出（forbidden 区分語）のみを担う。
-IR-045 で扱っていた文意品質検出対象語は `vocabulary-registry.md`「文意品質検出対象語（IR-045）」で参照として残る。
-
-## review 区分語の扱い
-
-review 区分語（`正規のXX`, `局所物理分離`, `責務境界浄化`, `純化`, `浄化`, `具象参照抽象化`, `repo-local` 等）は本ルールの機械検出対象外とし、`agentdev-doc-writing` 查読観点（v2:REQ-0140-033）で人手確認する。
-文脈によって推奨訳が変わるため、機械的な完全一致検出では誤検知リスクが高く、查読へ委任する。
+IR-065 は廃止語彙の現行使用を、IR-066 は旧パス・削除済み名称・歴史的識別子を検査する。
+これらは存在確認、履歴文脈、否定文脈を扱うため、textlint の一般文章辞書へ移管しない。
+IR-060 は一般文章の固定置換だけを扱い、構造、参照、ライフサイクルの検査を重複実装しない。
 
 ## 関連
 
-- [../../../../src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md](../../../../src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md): 置換辞書（forbidden 語リスト正）
-- [../../responsibilities/document-type-responsibilities.md](../../responsibilities/document-type-responsibilities.md): 不自然表現検出分類 P0〜P4
+- [../../../../src/opencode/plugins/agentdev-textlint-guard/rules/default-prh.yml](../../../../src/opencode/plugins/agentdev-textlint-guard/rules/default-prh.yml): 移管済み標準辞書
+- [../../responsibilities/document-type-responsibilities.md](../../responsibilities/document-type-responsibilities.md): 用語政策と責務境界
 - [../integrity-rule-catalog.md](../integrity-rule-catalog.md): 整合性ルールカタログ

@@ -163,7 +163,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-057 | obsolete-spec-path-after-domain-split | REQ-001-006, REQ-009-004, REQ-036-012 | ../integrity/integrity-rule-catalog.md, obsolete-path-map.yaml, ../local/runtime-package-boundary.md |
 | IR-058 | distribution-untracked-skill-reference | REQ-002-001, REQ-002-002, REQ-002-003 | ../integrity/integrity-rule-catalog.md, ../local/runtime-package-boundary.md |
 | IR-059 | distribution-reference-boundary | REQ-029 | `distribution-boundary.md`, `foundations/project-extensions.md`, `integrity-rule-catalog.md` |
-| IR-060 | forbidden Japanese word detection | v2:REQ-0140（v2:REQ-0140-033, v2:REQ-0140-035, v2:REQ-0140-036）, REQ-010（文意判断は docs-check 対象外、本ルールは完全一致検出に限定） | ../responsibilities/document-type-responsibilities.md（不自然表現検出分類 P0〜P4）, ../../../src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md（forbidden 語リスト正）, integrity-rule-catalog.md |
+| IR-060 | forbidden Japanese word detection | REQ-053-007, REQ-053-035, REQ-036-023, REQ-010-071 | ../../quality/textlint-quality-runtime.md, ../../responsibilities/document-type-responsibilities.md, ../integrity-rule-catalog.md |
 | IR-061 | 索引類自動生成整合性 | - | - |
 | IR-062 | skill/command パス参照実在 | REQ-010 | integrity-contracts.md, agentdev-skill-authoring.md, agentdev-command-authoring.md |
 | IR-063 | common-policy-identifier-invariant | REQ-051-005, REQ-051-006, REQ-010-064, REQ-010-068 | ../integrity-rule-catalog.md, ../../authoring/command-file-format.md |
