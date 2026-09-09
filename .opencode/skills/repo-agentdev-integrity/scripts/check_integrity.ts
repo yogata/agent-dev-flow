@@ -4,7 +4,7 @@
 // ADF-COVERS(verification): REQ-006-105, REQ-006-106, REQ-006-107, REQ-006-109, REQ-006-111
 // ADF-COVERS(verification): REQ-008-050
 // ADF-COVERS(verification): REQ-009-018, REQ-009-019, REQ-009-020
-// ADF-COVERS(implementation): REQ-010-002, REQ-010-003, REQ-010-005, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-064, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008
+// ADF-COVERS(implementation): REQ-010-002, REQ-010-003, REQ-010-005, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-064, REQ-010-066, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008
 // ADF-COVERS(verification): REQ-010-009
 // ADF-COVERS(verification): REQ-010-072, REQ-010-073
 // ADF-COVERS(implementation): REQ-010-072, REQ-010-073
@@ -9348,11 +9348,20 @@ interface ObsoleteVocabEntry {
   probe: string;
 }
 
+// 構造的除外領域（REQ-010-066）: 語彙を引用・記録する領域を経路・領域ベースで
+// 除外する宣言。行番号・行内容の列挙を錨とせず、構造マーカー（領域境界）を錨とする。
+interface ObsoleteStructuralExclusion {
+  area: string;
+  anchor: string;
+  reason: string;
+}
+
 interface ObsoleteVocabMap {
   scopeInclude: string[];
   scopeExclude: string[];
   exemptionFiles: Map<string, string>;
   negationTerms: string[];
+  structuralExclusions: ObsoleteStructuralExclusion[];
   vocab: ObsoleteVocabEntry[];
 }
 
@@ -9383,11 +9392,13 @@ function loadObsoleteVocabularyMap(root: string): ObsoleteVocabMap | null {
     scopeExclude: [],
     exemptionFiles: new Map<string, string>(),
     negationTerms: [],
+    structuralExclusions: [],
     vocab: [],
   };
-  let section: "scope" | "exemption" | "negation" | "vocab" | null = null;
+  let section: "scope" | "exemption" | "negation" | "structural" | "vocab" | null = null;
   let subsection: "include" | "exclude" | null = null;
   let currentExemption: { path?: string; reason?: string } | null = null;
+  let currentExclusion: ObsoleteStructuralExclusion | null = null;
   let currentVocab: Partial<ObsoleteVocabEntry> | null = null;
   for (const raw of content.split("\n")) {
     const line = raw.replace(/\r$/, "");
@@ -9404,6 +9415,11 @@ function loadObsoleteVocabularyMap(root: string): ObsoleteVocabMap | null {
     }
     if (/^negation_context_terms:/.test(line)) {
       section = "negation";
+      continue;
+    }
+    if (/^structural_exclusions:/.test(line)) {
+      section = "structural";
+      currentExclusion = null;
       continue;
     }
     if (/^vocabulary:/.test(line)) {
@@ -9446,6 +9462,29 @@ function loadObsoleteVocabularyMap(root: string): ObsoleteVocabMap | null {
       if (item) map.negationTerms.push(unquoteYamlScalar(item[1]));
       continue;
     }
+    if (section === "structural") {
+      const areaMatch = line.match(/^\s{2}-\s+area:\s*(.+)$/);
+      if (areaMatch) {
+        currentExclusion = {
+          area: unquoteYamlScalar(areaMatch[1]),
+          anchor: "",
+          reason: "",
+        };
+        map.structuralExclusions.push(currentExclusion);
+        continue;
+      }
+      const anchorMatch = line.match(/^\s{4}anchor:\s*(.+)$/);
+      if (anchorMatch && currentExclusion) {
+        currentExclusion.anchor = unquoteYamlScalar(anchorMatch[1]);
+        continue;
+      }
+      const reasonMatch = line.match(/^\s{4}reason:\s*(.+)$/);
+      if (reasonMatch && currentExclusion) {
+        currentExclusion.reason = unquoteYamlScalar(reasonMatch[1]);
+        continue;
+      }
+      continue;
+    }
     if (section === "vocab") {
       const idMatch = line.match(/^\s{2}-\s+id:\s*(.+)$/);
       if (idMatch) {
@@ -9481,18 +9520,67 @@ function loadObsoleteVocabularyMap(root: string): ObsoleteVocabMap | null {
   return map;
 }
 
-const IR065_VOCAB_PATTERNS: ReadonlyArray<{ id: string; pattern: RegExp }> = [
-  // bare ADR-NNN（v2: プレフィックス付きは許容済み識別子のため除外）
-  { id: "bare-adr-identifier", pattern: /(?<!v2:)(?<![\w-])ADR-\d{3,4}(?!\d)/g },
-  { id: "docs-adr-path", pattern: /docs\/adr\//g },
+// スペース正規化照合の共通ヘルパー（REQ-010-066、IR-065 rule Design
+// 「検出パターンのスペース正規化仕様」）。照合時にのみ対象行から半角・全角
+// スペース（U+0020/U+3000）を除去し、検出報告と位置依存の許容判定は原文行の
+// 位置で行う（正規化後の行を報告・証跡化しない）。行単位走査モデルは維持する。
+interface NormalizedVocabLine {
+  text: string;
+  originIndex: number[];
+}
+
+function normalizeLineForVocabMatch(line: string): NormalizedVocabLine {
+  const chars: string[] = [];
+  const originIndex: number[] = [];
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === "\u0020" || ch === "\u3000") continue;
+    chars.push(ch);
+    originIndex.push(i);
+  }
+  return { text: chars.join(""), originIndex };
+}
+
+function mapNormalizedRangeToOrigin(
+  normalized: NormalizedVocabLine,
+  start: number,
+  end: number,
+): { start: number; end: number } {
+  if (normalized.originIndex.length === 0) return { start, end };
+  const from = normalized.originIndex[Math.min(start, normalized.originIndex.length - 1)];
+  const to =
+    normalized.originIndex[Math.min(end - 1, normalized.originIndex.length - 1)] + 1;
+  return { start: from, end: to };
+}
+
+// 正規化対象語彙は spaceNormalized: true で一覧管理する。spaceNormalized 語彙の
+// pattern は正規化後の語彙形（スペース除去後の文字列に一致する形）で記述する。
+const IR065_VOCAB_PATTERNS: ReadonlyArray<{
+  id: string;
+  pattern: RegExp;
+  spaceNormalized?: boolean;
+}> = [
+  // bare ADR-NNN（v2: プレフィックス付きは許容済み識別子のため除外）。
+  // 正規化照合により「v2: ADR-0123」等のスペース挿入バリアントも lookbehind で除外
+  { id: "bare-adr-identifier", pattern: /(?<!v2:)(?<![\w-])ADR-\d{3,4}(?!\d)/g, spaceNormalized: true },
+  { id: "docs-adr-path", pattern: /docs\/adr\//g, spaceNormalized: true },
   // Wave 2 (#2371) で解消済みの孤立注記。再発は即 fail（strict）
-  { id: "adr-kind-annotation", pattern: /（ADR）/g },
-  { id: "req-adr-kind-enumeration", pattern: /REQ\/ADR\//g },
-  { id: "artifact-graph-name", pattern: /\bArtifact Graph\b/g },
-  { id: "doc-map-name", pattern: /\bDOC-MAP\b/g },
+  { id: "adr-kind-annotation", pattern: /（ADR）/g, spaceNormalized: true },
+  { id: "req-adr-kind-enumeration", pattern: /REQ\/ADR\//g, spaceNormalized: true },
+  // 正規化語彙形での照合（原文「Artifact Graph」「Artifact　Graph」等が
+  // 正規化行では「ArtifactGraph」となり本パターンへ一致する）
+  { id: "artifact-graph-name", pattern: /\bArtifactGraph\b/g, spaceNormalized: true },
+  { id: "doc-map-name", pattern: /\bDOC-MAP\b/g, spaceNormalized: true },
+  // Issue #2742: 本ADR 自己言及（番号なし ADR 種別の現行言及）。
+  // 「本ADR」「本 ADR」「本　ADR」を正規化照合で検出する
+  { id: "self-adr-reference", pattern: /本ADR/g, spaceNormalized: true },
 ];
 
-const IR066_VOCAB_PATTERNS: ReadonlyArray<{ id: string; pattern: RegExp }> = [
+const IR066_VOCAB_PATTERNS: ReadonlyArray<{
+  id: string;
+  pattern: RegExp;
+  spaceNormalized?: boolean;
+}> = [
   { id: "docs-specs-path", pattern: /docs\/specs\//g },
   { id: "agentdev-graph-path", pattern: /\.agentdev\/graph/g },
   { id: "agentdev-artifact-graph-skill", pattern: /agentdev-artifact-graph/g },
@@ -9574,10 +9662,23 @@ function checkObsoleteVocabulary(root: string): CheckResult[] {
   const scoped = targetFiles.filter((f) => {
     const rel = resolveRelative(f, root);
     if (map.scopeExclude.some((p) => rel.startsWith(p))) return false;
+    // 構造的除外領域（REQ-010-066）: 語彙引用・記録領域の領域ベース除外
+    if (
+      map.structuralExclusions.some(
+        (e) => rel === e.area || rel.startsWith(e.area),
+      )
+    ) {
+      return false;
+    }
     return /\.(md|yaml|yml)$/.test(f);
   });
 
-  const allPatterns: ReadonlyArray<{ id: string; pattern: RegExp; rule: string }> = [
+  const allPatterns: ReadonlyArray<{
+    id: string;
+    pattern: RegExp;
+    rule: string;
+    spaceNormalized?: boolean;
+  }> = [
     ...IR065_VOCAB_PATTERNS.map((p) => ({ ...p, rule: "IR-065" })),
     ...IR066_VOCAB_PATTERNS.map((p) => ({ ...p, rule: "IR-066" })),
   ];
@@ -9637,26 +9738,41 @@ function checkObsoleteVocabulary(root: string): CheckResult[] {
     if (isSupersededDecision(relPath, content)) continue;
     const lines = content.split("\n");
 
-    for (const { id, pattern, rule } of allPatterns) {
+    for (const { id, pattern, rule, spaceNormalized } of allPatterns) {
       if (!activeVocab.has(id)) continue;
       const category = rule === "IR-065" ? "ObsoleteVocabulary" : "LegacyPathName";
       const check = rule === "IR-065" ? "obsolete-vocabulary-current-use" : "legacy-path-removed-name";
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
+        // スペース正規化照合（REQ-010-066）: 照合時にのみ正規化し、報告と
+        // 位置依存の許容判定（code span 等）は原文位置で行う
+        const normalized = spaceNormalized ? normalizeLineForVocabMatch(line) : null;
+        const matchSource = normalized ? normalized.text : line;
         pattern.lastIndex = 0;
         let m: RegExpExecArray | null;
         const reported = new Set<string>();
-        while ((m = pattern.exec(line)) !== null) {
+        while ((m = pattern.exec(matchSource)) !== null) {
           if (isIr057InCodeBlock(lines, i)) break;
-          if (isInsideCodeSpan(line, m.index)) continue;
+          let originStart = m.index;
+          let evidenceText = m[0];
+          if (normalized) {
+            const origin = mapNormalizedRangeToOrigin(
+              normalized,
+              m.index,
+              m.index + m[0].length,
+            );
+            originStart = origin.start;
+            evidenceText = line.slice(origin.start, origin.end);
+          }
+          if (isInsideCodeSpan(line, originStart)) continue;
           // retired 系見出し配下（廃止済み要件表等）は履歴領域として許容
           if (isIr065UnderRetiredHeading(lines, i)) continue;
           // 行レベル履歴マーカー（旧/移行/廃止/履歴/経緯 等）は許容
           if (hasLineLevelHistoryMarker(line)) continue;
           // 否定文脈（廃止機能を「使わないこと」を定める現行契約の記述）は許容
           if (map.negationTerms.some((t) => line.includes(t))) continue;
-          if (reported.has(m[0])) continue;
-          reported.add(m[0]);
+          if (reported.has(evidenceText)) continue;
+          reported.add(evidenceText);
           violationCount++;
           const strict = id === "adr-kind-annotation";
           const ctor = strict ? ng : warn;
@@ -9664,11 +9780,11 @@ function checkObsoleteVocabulary(root: string): CheckResult[] {
             ctor(
               category,
               check,
-              `Obsolete ${rule === "IR-065" ? "vocabulary" : "path/removed name"} '${m[0]}' (${id}) used as current concept (REQ-010-${rule === "IR-065" ? "066" : "067"}, ${rule})`,
+              `Obsolete ${rule === "IR-065" ? "vocabulary" : "path/removed name"} '${evidenceText}' (${id}) used as current concept (REQ-010-${rule === "IR-065" ? "066" : "067"}, ${rule})`,
               relPath,
               i + 1,
               {
-                evidence: `${id}:${m[0]}`,
+                evidence: `${id}:${evidenceText}`,
                 expected: "replace with the current vocabulary or mark the mention as historical",
                 route: "intake",
                 finding_category: "obsolete-structure",
