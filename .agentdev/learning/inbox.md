@@ -161,3 +161,67 @@ worktree で integrity suite を実行する場合、textlint plugin 配下に�
 - **想定反映先**: textlint 品質基盤 Design（反映済み）
 - **関連**: docs/reports/req-053-textlint-wave5-final-verification.md、docs/designs/quality/textlint-quality-runtime.md、PR 2751
 - **タグ**: `#textlint` `#規則構成ハッシュ` `#再現性` `#解決`
+
+## 2026-09-10 配布テンプレート本文には ADF-COVERS 宣言を付与できず対応宣言は親 SKILL.md 側へ集約する
+
+- **問題事象**: pr_desc.md へ ADF-COVERS 宣言を付与したところ、配布物内部 ID 契約テスト（execution_ident_contract / verification_diff_contract）が「配布物内部 ID（REQ-XXXX 数字つき）を含まない」契約違反 2 件を検出した
+- **発生局面**: 実装（Epic 2752 Wave 1、PR 2760 のテンプレート変更時 integrity suite）
+- **検知方法**: integrity suite 分割① の fail 検出
+- **根本原因**: 配布テンプレートの構造様式契約テストが配布物内部 ID の混入を禁止しており、テンプレート本文への対応宣言（数字つき REQ ID）付与と衝突する
+- **自律対応内容**: pr_desc.md 側の宣言を削除し、対応宣言を親 SKILL.md 側へ集約して再検証合格
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: テンプレート変更を伴う実装 PR では対応宣言の配置先を事前に SKILL.md 側へ寄せる
+- **再発条件**: templates/*.md 本体に ADF-COVERS 宣言（数字つき REQ ID）を付与した場合
+- **予防策候補**: 配布テンプレート本文への対応宣言付与は禁止し、親 SKILL.md へ集約する運用を明文化
+- **想定反映先**: workflow-templates の運用知見（learning-promote で反映先を判断）
+- **関連**: PR 2760、src/opencode/skills/agentdev-workflow-templates/templates/pr_desc.md
+- **タグ**: `#配布物` `#ADF-COVERS` `#テンプレート`
+
+## 2026-09-10 配布物側 reference への新規行には本体内部 ID 参照・docs/designs/ パス参照・括弧付き宣言表記を書けない
+
+- **問題事象**: docs-and-design-promotion.md の新規行に docs/designs/ パス参照と棚卸し列挙手順の括弧付き宣言表記を書いたところ、IR-055 delta guard（docs/designs/ 参照 4 行）と配布依存境界 concrete-id で fail した
+- **発生局面**: 実装（Epic 2752 Wave 1、PR 2760）
+- **検知方法**: IR-055 delta guard と配布依存境界 gate の初回実行
+- **根本原因**: 配布物側 reference の本体内部 ID 参照・docs/designs/ パス参照・括弧付き宣言表記は、配布境界契約（concrete-id / runtime-unresolved-reference）と宣言パーサの文字列一致に抵触する
+- **自律対応内容**: 「Design 一覧表」「正規 Design 文書」等の一般名詞化と「ADF-COVERS 宣言（implementation 役割）」表記へ変更して再検証合格
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 保存済み Design を配布物へ実装反映する際は、Design 原本のパス・ID 参照を配布物側では一般名詞化する変換が必要
+- **再発条件**: 配布物側 reference に docs/designs/ パス、REQ-NNNN-NNN、DEC-NNN、IR-NNN、括弧付き宣言表記を書いた場合
+- **予防策候補**: 配布物への実装反映直後にチェック系（配布依存境界・IR-055・traceability check）を実行する
+- **想定反映先**: 配布物実装反映の運用知見（learning-promote で反映先を判断）
+- **関連**: PR 2760、src/opencode/skills/agentdev-workflow-case-close/references/docs-and-design-promotion.md
+- **タグ**: `#配布物` `#IR-055` `#配布依存境界`
+
+## 2026-09-10 worktree checkout 直後の integrity suite 実行は zod 依存未導入で error になり bun install 前置が必須工程
+
+- **問題事象**: worktree checkout 直後の integrity suite 実行で、agentdev-project-extensions/scripts の zod 依存が未導入により check_extensions.test.ts 等が error になった
+- **発生局面**: 検証（Epic 2752 Wave 1、PR 2760 の worktree での bun test 実行）
+- **検知方法**: bun test の error 出力
+- **根本原因**: worktree はメインリポジトリの node_modules を共有せず、依存パッケージの前置（bun install）が未実施のまま suite を実行した
+- **自律対応内容**: bun install を前置して再実行し解消
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: bun test 実行形態契約の「依存パッケージ前置」は worktree 環境でも必須工程である
+- **再発条件**: worktree checkout 直後に bun install せず bun test を実行した場合
+- **予防策候補**: worktree 検証手順の前置ステップとして bun install を明記
+- **想定反映先**: worktree 検証手順・QG-4 bun test 実行形態契約の運用知見（learning-promote で反映先を判断）
+- **関連**: PR 2760、.worktrees/2753-feature
+- **タグ**: `#worktree` `#bun-test` `#依存前置`
+
+## 2026-09-10 配布物への実装反映ではチェック系 3 点を変更直後に実行すると新規違反をコミット前に確実に検出できる
+
+- **問題事象**: 配布物への実装反映直後の初回機械検査で、本変更行に IR-055 heuristic 2 件、配布依存境界 concrete-id/unclassified-entry 8 件、トレーサビリティ宣言パーサ malformed 3 件の計 13 件の新規違反が検出された
+- **発生局面**: 実装（Epic 2752 Wave 1、PR 2759）
+- **検知方法**: 変更直後の機械検査（check_distribution_boundary / check_integrity / traceability check）の実行
+- **根本原因**: 配布物への実装反映では ID 参照・パス参照・宣言表記が機械契約と衝突しやすい構造になっている
+- **自律対応内容**: 初回検出 13 件をすべて fix-and-reverify で解消（ID 参照の概念語化、括弧付き宣言表記の括弧なし化）し、base 水準の既出 6 件のみを残して完了
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: チェック系 3 点を変更直後に実行すると新規違反をコミット前に確実に検出できる
+- **再発条件**: 配布物変更をコミット・マージ後に検査した場合（発見が遅延する）
+- **予防策候補**: 配布物変更の手順に「変更直後のチェック系 3 点実行」を組み込む
+- **想定反映先**: 配布物実装反映の運用知見（learning-promote で反映先を判断）
+- **関連**: PR 2759、src/opencode/skills/agentdev-doc-diagnostics/references/diagnostic-categories.md
+- **タグ**: `#配布物` `#機械検査` `#fix-and-reverify`
