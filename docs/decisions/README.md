@@ -167,6 +167,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 
 ## 関連 REQ
 
+<!-- AUTOGEN:BEGIN:id=decision-related-req-table -->
 | Decision | 関連REQ | 説明 |
 |-----|---------|------|
 | DEC-001 | [REQ-001](../requirements/REQ-001.md), [REQ-002](../requirements/REQ-002.md), [REQ-003](../requirements/REQ-003.md), [REQ-004](../requirements/REQ-004.md), [REQ-005](../requirements/REQ-005.md), [REQ-006](../requirements/REQ-006.md), [REQ-007](../requirements/REQ-007.md), [REQ-008](../requirements/REQ-008.md), [REQ-009](../requirements/REQ-009.md), [REQ-010](../requirements/REQ-010.md), [REQ-011](../requirements/REQ-011.md) | AgentDevFlow 憲章の全体原則（hard governance 8点、新規統制追加7条件、リリース条件） |
@@ -175,23 +176,28 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-004 | [REQ-011](../requirements/REQ-011.md), [REQ-009](../requirements/REQ-009.md) | 差し替え可能な I/O 境界（境界成果物は DEC-022 決定4により Custom Tool、Local backend） |
 | DEC-005 | [REQ-002](../requirements/REQ-002.md), [REQ-009](../requirements/REQ-009.md) | Project Extensions Architecture（.agentdev/extensions/** によるプロジェクト固有追加）。DEC-006 により superseded |
 | DEC-006 | [REQ-010](../requirements/REQ-010.md), [REQ-002](../requirements/REQ-002.md) | inspect 3-command 構成への正規化（inspect-extensions 廃止、extension 検査の3層責務分離） |
-| DEC-007 | [REQ-012](../requirements/REQ-012.md), [REQ-013](../requirements/retired/REQ-013.md)（retired、後継: REQ-012）, [REQ-002](../requirements/REQ-002.md), [REQ-009](../requirements/REQ-009.md) | Artifact Graph 標準化と配布スキル昇格（open extensibility、project/self-hosting augmentation、fail-open、決定論性） |
+| DEC-007 | [REQ-012](../requirements/REQ-012.md), [REQ-013](../requirements/retired/REQ-013.md)（retired）, [REQ-002](../requirements/REQ-002.md), [REQ-009](../requirements/REQ-009.md) | Artifact Graph 標準化と配布スキル昇格（open extensibility、project/self-hosting augmentation、fail-open、決定論性）。関連 REQ-013 の後継は REQ-012 |
 | DEC-008 | [REQ-006](../requirements/REQ-006.md), [REQ-014](../requirements/REQ-014.md), [REQ-003](../requirements/REQ-003.md) | case-auto の限定的親判断解決（bounded parent decision resolution、REQ-034-032〜034、REQ-014-009/010、REQ-003-008/009/010 と整合） |
 | DEC-009 | [REQ-001](../requirements/REQ-001.md) | ADR から Decision への正規成果物モデル移行（AG-001〜017、REQ-001-056〜064） |
 | DEC-010 | [REQ-002](../requirements/REQ-002.md), [REQ-027](../requirements/REQ-027.md) | Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則（AG-003、AG-007、REQ-002-001〜004 意味変更） |
 | DEC-011 | [REQ-005](../requirements/REQ-005.md) | STEP resume point と会話記憶非依存（AG-004、AG-005、REQ-005-024 追記） |
 | DEC-012 | [REQ-002](../requirements/REQ-002.md) | Extension を file-kind から workflow/capability responsibility へ再編（AG-008、REQ-002-030/031 意味変更） |
-| DEC-013 | [REQ-028](../requirements/retired/REQ-028.md)（retired、後継: DEC-013）, [REQ-010](../requirements/REQ-010.md) | IR 登録モデルの簡素化（AG-008 tombstone 廃止、AG-009 lifecycle/enforcement/baseline_status 簡素化、REQ-010-053..057 RETIRE、REQ-036-022 UPDATE） |
+| DEC-013 | [REQ-028](../requirements/retired/REQ-028.md)（retired）, [REQ-010](../requirements/REQ-010.md) | IR 登録モデルの簡素化（AG-008 tombstone 廃止、AG-009 lifecycle/enforcement/baseline_status 簡素化、REQ-010-053..057 RETIRE、REQ-036-022 UPDATE）。関連 REQ-028 の後継は本 DEC-013 |
 | DEC-014 | [REQ-029](../requirements/REQ-029.md), [REQ-002](../requirements/REQ-002.md), [REQ-010](../requirements/REQ-010.md), [REQ-009](../requirements/REQ-009.md) | 配布依存境界の多層 enforcement（REQ-029 新設、REQ-002 縮約、REQ-010-060 最終保証 gate、REQ-009-045 release artifact 境界、IR-059 範囲と source/save/complete/release 経路変更） |
 | DEC-015 | [REQ-002](../requirements/REQ-002.md), [REQ-005](../requirements/REQ-005.md), [REQ-011](../requirements/REQ-011.md), [REQ-034](../requirements/REQ-034.md), [REQ-035](../requirements/REQ-035.md), [REQ-038](../requirements/REQ-038.md) | ADF決定論的実行中核と実行基盤実行機構の責務分界（REQ-002-035/036、REQ-005-025〜028、REQ-011-019、REQ-034-035/036、REQ-035-011、REQ-038-005 と整合） |
 | DEC-016 | [REQ-009](../requirements/REQ-009.md) | 導入系スクリプトの副作用ゼロ原則（provisioning 責務の利用者移転、REQ-009-010 UPDATE、REQ-009-046〜049 APPEND と整合） |
-| DEC-017 | [REQ-012](../requirements/REQ-012.md), [REQ-021](../requirements/REQ-021.md), [REQ-020](../requirements/retired/REQ-020.md)（retired、後継: REQ-012）, [REQ-040](../requirements/retired/REQ-040.md)（retired、後継: REQ-012） | 最小トレーサビリティモデルの採用と Artifact Graph の廃止（REQ-012 UPDATE、REQ-021 UPDATE、REQ-020 RETIRE、REQ-040 RETIRE と整合） |
+| DEC-017 | [REQ-012](../requirements/REQ-012.md), [REQ-021](../requirements/REQ-021.md), [REQ-020](../requirements/retired/REQ-020.md)（retired）, [REQ-040](../requirements/retired/REQ-040.md)（retired） | 最小トレーサビリティモデルの採用と Artifact Graph の廃止（REQ-012 UPDATE、REQ-021 UPDATE、REQ-020 RETIRE、REQ-040 RETIRE と整合）。関連 REQ-020/REQ-040 の後継は REQ-012 |
 | DEC-019 | [REQ-044](../requirements/REQ-044.md) | 一般処理の標準API委譲とADF固有意味論の所有境界（REQ-044 CREATE と整合。Design 4 件への実装契約追記・更新を伴う） |
 | DEC-020 | [REQ-049](../requirements/REQ-049.md), [REQ-001](../requirements/REQ-001.md), [REQ-009](../requirements/REQ-009.md), [REQ-011](../requirements/REQ-011.md) | GitHub Issue 共通管理単位の採用（REQ-049 全面再構成、REQ-001/REQ-009/REQ-011 UPDATE と整合。Design への契約更新を伴う） |
 | DEC-021 | [REQ-050](../requirements/REQ-050.md) | scripts 公開入口の2本固定と安定契約（REQ-050 CREATE、REQ-009-002/044 UPDATE、DEC-016 参照修正と整合） |
+| DEC-022 | [REQ-002](../requirements/REQ-002.md), [REQ-051](../requirements/REQ-051.md), [REQ-052](../requirements/REQ-052.md), [REQ-011](../requirements/REQ-011.md), [REQ-046](../requirements/REQ-046.md), [REQ-010](../requirements/REQ-010.md), [REQ-045](../requirements/REQ-045.md), [REQ-047](../requirements/REQ-047.md), [REQ-029](../requirements/REQ-029.md) | - |
 | DEC-023 | [REQ-002](../requirements/REQ-002.md), [REQ-009](../requirements/REQ-009.md), [REQ-029](../requirements/REQ-029.md), [REQ-052](../requirements/REQ-052.md) | third-party Skill の分離管理と取得機構の導入（REQ-002-019 UPDATE、REQ-002-042〜044 APPEND、REQ-009-050 APPEND、REQ-029-009 APPEND、REQ-052-011 APPEND と整合） |
 | DEC-024 | [REQ-054](../requirements/REQ-054.md), [REQ-055](../requirements/REQ-055.md), [REQ-056](../requirements/REQ-056.md) | 変更誘発境界リスク分析の導入と検証契約への投影（REQ-054/055/056 CREATE、REQ-002-046 APPEND、REQ-039-006 APPEND と整合） |
+| DEC-025 | [REQ-056](../requirements/REQ-056.md) | - |
+| DEC-026 | [REQ-008](../requirements/REQ-008.md), [REQ-004](../requirements/REQ-004.md), [REQ-017](../requirements/REQ-017.md), [REQ-038](../requirements/REQ-038.md), [REQ-039](../requirements/REQ-039.md) | - |
+| DEC-027 | [REQ-048](../requirements/REQ-048.md) | - |
 | DEC-028 | [REQ-053](../requirements/REQ-053.md), [REQ-010](../requirements/REQ-010.md), [REQ-036](../requirements/REQ-036.md) | 文章表層品質の共通実行基盤（REQ-053 全面更新、REQ-010-071/074 UPDATE と REQ-010-075 APPEND、REQ-036-008/023 UPDATE と整合） |
+<!-- AUTOGEN:END -->
 
 ## 過去版の履歴基盤
 

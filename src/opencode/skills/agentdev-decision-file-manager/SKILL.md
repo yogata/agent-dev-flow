@@ -61,6 +61,23 @@ Decision体系の全面改定時は、`DEC-NNN` 以降の番号帯を基準番�
 | UPDATE | 既存Decisionの特定セクションを修正（ステータス変更、内容修正） | 該当セクション更新 | `updated` を現在日時に更新 |
 
 - accepted後のUPDATEは非セマンティックな軽微な誤字修正のみ。意味的変更は新規Decision作成による置き換えが必須
+- accepted 遷移時は「## 承認記録」セクションを本文末尾へ追記する。形式（日付・遷移・承認根拠）の
+  正規所有は patterns.md Design「承認記録セクション形式」。本追記は UPDATE 操作の標準手順に含める
+
+## related_reqs フィールド管理
+
+- **CREATE 時**: req-save が要件doc（draft-data）の該当 Decision 対象操作で確定した関連 REQ を
+  frontmatter `related_reqs` へ決定的に保存する（初期保存手順は `agentdev-req-file-manager` の
+  req-save-procedure reference、フィールド規約の正本は patterns.md Design）
+- **UPDATE 時**: 関連 REQ の変更（要件再構成、Decision の置換・再確認）を `related_reqs` フィールド更新
+  として扱う。status 遷移とは独立に更新できる
+- **検証**: REQ 識別子形式（`REQ-{NNNN}`）、実在 REQ の指先確認（`docs/requirements/` または
+  `docs/requirements/retired/` に実在すること）、空宣言（`related_reqs: []`、関連なしの正規状態）と
+  未宣言（フィールド欠落、正規状態ではなく機械検出対象）の区別
+- 本フィールドは Decision 成果物のローカルメタデータであり、TIM の ADF-COVERS 宣言・covers 関係とは
+  独立に管理される。agentdev-traceability は本フィールドを消費しない
+- `docs/decisions/README.md` 関連REQ表は本フィールドから自動生成される（混合領域構成。
+  「説明」列のみ人手管理）。整合検査は docs-check の索引整合 checker が担う
 
 ## ファイル配置規約
 
@@ -78,6 +95,7 @@ id: DEC-NNN
 title: 意思決定タイトル
 status: proposed | accepted | deprecated | superseded
 superseded_by: DEC-MMM  # status: superseded の場合のみ
+related_reqs: [REQ-NNNN, ...]  # 関連 REQ が存在しない場合は []（空宣言）。未宣言（フィールド欠落）は正規状態ではない
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 ---
