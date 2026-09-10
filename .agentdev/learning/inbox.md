@@ -63,7 +63,7 @@ worktree で integrity suite を実行する場合、textlint plugin 配下に�
 
 ## 2026-09-09 配布手順本文への REQ 行手順化は concrete ID を書かず Design 節名参照へ集約する
 
-- **発生源**: PR #2748（Issue #2743 / Epic #2740 W2）case-run 配布依存境界 gate（初回 concrete_id_hits=12）
+- **発生源**: PR #2748（Issue #2743 / Epic #2740 W2）case-run 配布依存境界 gate（初回 concrete_id_hits=12）。PR #2761（Issue #2756 / Epic #2755 W1）でも IR-055 と配布依存境界の両方から検出・修正を再経験（同種知見のため本 entry に発生源追記で集約、新規 entry 不登録）
 - **クラス**: 規約運用（配布物への concrete-id 混入防止）
 
 配布物本文へ REQ/DEC の concrete ID（REQ-{NNNN}-{NNN} 形式等）を記載すると配布依存境界 gate が検出する。配布手順へ REQ 行を手順化する際は、本文では concrete ID を書かず Design 節名参照と内容記述へ集約し、正規の ID 参照はファイル先頭の ADF-COVERS 宣言行（IR-059 免除）へ置くのが正規パターン（PR #2748 で 11件を置換して実証済み）。TS-004/TS-005 のような REQ 行 ID を引く検証記述は docs 配下または一時証跡に限定する。
