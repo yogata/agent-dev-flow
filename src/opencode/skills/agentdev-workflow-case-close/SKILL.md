@@ -4,11 +4,12 @@ description: "case-close command の workflow 実装本体。PR マージ（squa
 ---
 
 <!-- ADF-COVERS(implementation): REQ-057-017 -->
+<!-- ADF-COVERS(implementation): REQ-032-024, REQ-032-025, REQ-032-026 -->
 
 # case-close workflow スキル
 
 case-close command の workflow 実装本体である。
-PR マージから Issue クローズ、Capture 回収、ドメイン状態永続化、完了報告までの制御構造、QG-4 最終完了判定ゲート（完了条件チェックボックス評価・更新）、Design 確定（draft → accepted 昇格）、Epic Wave クローズ（E1〜E6、単一書き手）を所有する。
+PR マージから Issue クローズ、Capture 回収、ドメイン状態永続化、完了報告までの制御構造、QG-4 最終完了判定ゲート（完了条件チェックボックス評価・更新）、Design 状態評価（棚卸し制、draft → accepted 昇格）、Epic Wave クローズ（E1〜E6、単一書き手）を所有する。
 squash merge 先は main とし、同期時のリスク事前検出を行う。
 
 case-close command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
@@ -27,7 +28,7 @@ case-close command は公開 interface（入出力契約・ガードレール）
 
 - PR squash merge、Issue close、Issue コメント追加、Epic Issue 本文ステータステーブル更新（Custom Tool `agentdev_gh` 経由、case-close 単一書き手）
 - worktree/ ブランチ削除（local + remote）
-- Design `status` frontmatter 昇格（draft → accepted、対象 Design が draft かつ今回の実装が Design 内容を検証済みの場合）
+- Design `status` frontmatter 昇格（draft → accepted、棚卸し制の Design 状態評価（STEP-3-2）で実装・検証との整合確認を通過した対象 Design）
 - `.agentdev/learning/inbox.md`、`.agentdev/intake/inbox/` への Capture 回収、`.agentdev/` 配下 commit/push
 - 当該 Workflow Skill は worktree root 配下以外を編集しない（case-close command の worktree 隔離に従う）
 
@@ -42,11 +43,11 @@ Epic Wave クローズは STEP-1 のルーティングで分岐し、E1〜E6 と
 |---|---|---|---|---|
 | STEP-1 | Issue 番号解決・ルーティング | Issue 番号受領 | 単一 Issue クローズ or Epic Wave クローズのルート確定 | [references/issue-resolution-and-qg4.md](references/issue-resolution-and-qg4.md) |
 | STEP-2 | QG-4 達成判定 | ルート確定（単一 Issue） | 完了条件チェックボックス評価・更新、観点8 評価スコープ確定 | [references/issue-resolution-and-qg4.md](references/issue-resolution-and-qg4.md) |
-| STEP-3 | docs 検証・Design 確定（配布依存境界 最終 gate 含む） | QG-4 合格 | targeted docs guard、IR-{NNN} check_extensions.ts、配布依存境界 最終 gate、full integrity suite 実行（bun test 実行形態契約）、Design status 昇格 | [references/docs-and-design-promotion.md](references/docs-and-design-promotion.md) |
+| STEP-3 | docs 検証・Design 確定（配布依存境界 最終 gate 含む） | QG-4 合格 | targeted docs guard、IR-{NNN} check_extensions.ts、配布依存境界 最終 gate、full integrity suite 実行（bun test 実行形態契約）、Design 状態評価（棚卸し制：PR 本文申告候補の統合を含む全件評価）・Design status 昇格 | [references/docs-and-design-promotion.md](references/docs-and-design-promotion.md) |
 | STEP-4 | PR マージ・コンフリクト解消 | docs 検証合格（配布依存境界 最終 gate 含む） | マージ済みPR（squash merge 先は main）、HEAD commit hash 記録、コンフリクト Level 1 解消 or case-auto エスカレーション | [references/pr-merge-and-conflict.md](references/pr-merge-and-conflict.md) |
 | STEP-5 | Post-merge・Issue クローズ | PR マージ完了 | CI 通過確認、Issue 本文更新、Issue close | [references/cleanup-and-capture.md](references/cleanup-and-capture.md) |
 | STEP-6 | クリーンアップ・Capture 回収・永続化 | Issue クローズ完了 | worktree/branch 削除、親Epic 自動クローズ、実行前同期、Capture 回収、学び検知、`.agentdev/` 永続化、tmp/ 残存確認、完了報告 | [references/cleanup-and-capture.md](references/cleanup-and-capture.md) |
-| STEP-E1〜E6 | Epic Wave クローズ（E4-1 配布依存境界 最終 gate 含む） | Epic Issue 番号受領、ステータス追跡テーブル存在 | 現在 Wave の子Issue 一括マージ・クローズ（E4-1 gate 違反子Issue は `blocked` でマージ対象外）、Epic status table 更新、当該 Wave スコープの一時成果物残留確認（E6-1、残留時は完了扱いにしない）、最終 Wave 判定 | [references/epic-wave-close.md](references/epic-wave-close.md) |
+| STEP-E1〜E6 | Epic Wave クローズ（E4-1 配布依存境界 最終 gate 含む） | Epic Issue 番号受領、ステータス追跡テーブル存在 | 現在 Wave の子Issue 一括マージ・クローズ（E4-1 gate 違反子Issue は `blocked` でマージ対象外）、Design 状態評価の Wave 内集約（E4-3、直列集約段で一元評価）、Epic status table 更新、当該 Wave スコープの一時成果物残留確認（E6-1、残留時は完了扱いにしない）、最終 Wave 判定 | [references/epic-wave-close.md](references/epic-wave-close.md) |
 
 ### STEP 間の依存と分岐
 

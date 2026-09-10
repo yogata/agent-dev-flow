@@ -1,9 +1,11 @@
 ---
+
 description: 単一 Issue または単一 Wave（Epic Issue 指定時: 現在 ready な Wave の子Issue を並列実行）を実行担当サブエージェントへ委譲し、result を処理する。worktree前提、委譲、結果処理を責務とする。3フェーズ構成でべき等性、再開ポイントを提供
 ---
 
-# 実装パイプライン
+<!-- ADF-COVERS(implementation): REQ-032-024 -->
 
+# 実装パイプライン
 Case に対して実装実行を実行担当サブエージェント経由で委譲し、その result を処理する。
 case-run 本体は orchestration に専念し、実装実行そのものは行わない。
 常に git worktree を使用する。
@@ -43,7 +45,7 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 - Issue 本文の Execution Contract セクションに投影された実現面の変更方針（realization_actions 由来）は既確定契約として消費し、実現責務・変更意図・検証方針を再決定せず、その範囲内の内部実装方針（関数配置、命名、データ構造、実装順序、具体的 diff）だけを決定する。実現責務の変更が必要と判断した場合は既存の blocked 境界に従う（req_draft を再読込せず Issue 本文だけで変更責務、変更意図、検証方針を取得する）
 - 実装作業開始前に QG 前置 staleness check（ファイルパス現行存在確認、検査結果件数再計測）を実行する。差異検出時は検出結果を委譲プロンプトで実行担当サブエージェントに引き渡し、PR 本文の `## Findings / Capture候補` に `### stale-reference` 小見出しで記録する（実行担当サブエージェント責務）
 - 本筋外の発見は PR 本文に記録して修正は後続処理に委ねる（スコープ拡大は行わない）。intake 候補・learning 候補は区別して記録する（capture 境界（capture-boundaries）は `agentdev-workflow-orchestration` 参照、case-run の capture 責務は記録のみ）
-- Design確定候補（実装で発見された Design レベル詳細）は PR 本文の `## Design確定候補` セクションに記録し、`## Findings / Capture候補` とは区別する（確定・反映判断は case-close の責務）
+- Design確定候補（実装で発見された Design レベル詳細）は PR 本文の `## Design確定候補` セクションに記録し、`## Findings / Capture候補` とは区別する（本セクションは case-close の Design 状態評価（棚卸し制）への補助入力であり、case-close は申告の有無に関わらず棚卸し列挙を実行する。確定・反映判断は case-close の責務）
 
 ## ガードレール
 

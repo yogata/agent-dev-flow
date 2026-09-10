@@ -1,3 +1,5 @@
+<!-- ADF-COVERS(implementation): REQ-032-024, REQ-032-025, REQ-032-026 -->
+
 # STEP-3: docs 検証・Design 確定（docs-and-spec-promotion）
 
 > 本 reference は `agentdev-workflow-case-close` SKILL.md の制御平面（STEP 一覧）STEP-3 詳細である。
@@ -9,7 +11,7 @@ PR マージ前の docs 検証、拡張検査、配布依存境界 最終 gate �
 
 ## Input Resolution
 
-1. SSoT 再構成: PR 変更ファイル一覧、PR 本文（`## Design確定候補`）、対象 Design frontmatter `status`
+1. SSoT 再構成: PR 変更ファイル一覧、PR 本文（`## Design確定候補`、補助入力）、対象 REQ（Issue 本文の REQ 参照から導出）、正規 Design 文書の ADF-COVERS 宣言（implementation 役割）と frontmatter `status`
 2. identifier 保持: PR番号、Issue番号、Design パス
 3. 最小 scalar: なし
 4. runtime artifact: なし
@@ -22,7 +24,7 @@ PR マージ前の docs 検証、拡張検査、配布依存境界 最終 gate �
 ## Result
 
 - docs/ 検証合格（targeted docs guard、配布依存境界 最終 gate）
-- Design 確定フロー処理完了（昇格 / design-save 提案 / 見送り）
+- Design 状態評価（棚卸し制）の全件評価完了（統合後の全候補が 昇格 / design-save 提案 / 見送り のいずれかの評価結果を持つ。0 件の場合は 0 件確認を記録）
 
 ## Procedure
 
@@ -30,7 +32,7 @@ PR マージ前の docs 検証、拡張検査、配布依存境界 最終 gate �
 
 機能追加固有の検証（REQ作成、インデックス記載、spec更新、Decision作成）および全 work_type 共通の関連ドキュメント整合性確認、README 索引整合性確認。
 不足時は警告表示してユーザー判断を仰ぐ。
-PR 本文の `## Design確定候補` セクションから Design 確定フロー（STEP-3-2）を実行する。
+Design 状態評価（棚卸し制、STEP-3-2）を実行する。PR 本文の `## Design確定候補` セクションは補助入力である。
 
 **文書分類ポリシー適合確認**: document-model Design（extension 経由）の Document Classification Policy に基づき、最終ドキュメント状態が分類ポリシーに適合していることを確認する。
 
@@ -87,16 +89,40 @@ QG-4 の full integrity suite 合格基準により検証スイート全体（bu
 - **証拠記録**: 実行 cwd と起動コマンド形式（prefix・パス指定を含む）を PR 本文のテスト結果の証拠へ明記する
 - **cwd 依存テスト混在スイートの運用注記**: 対象スイートには cwd 依存テストが混在するため、カレントディレクトトリビアな実行（`bun test` 単体等）で代替しない
 
-### STEP-3-2: Design 確定フロー
+### STEP-3-2: Design 状態評価フロー（棚卸し制）
 
-PR 本文の `## Design確定候補` セクション（case-run/ driver が記録）を読み取り、Design の確定、昇格を処理する。
-セクション不存在・空の場合はスキップ。
+対象 REQ に基づく draft Design 棚卸し列挙と、PR 本文の `## Design確定候補` セクション（case-run/ driver が記録）の申告候補を統合し、Design の確定、昇格を処理する。
+申告セクションは補助入力であり、セクション不存在・空の場合も棚卸し列挙を実行する（申告の不在を理由に棚卸しを省略しない）。
+契約の正は case-close Design「Design 状態評価の棚卸し制（STEP-3 拡張）」であり、本 STEP はその workflow 側実装である。
+
+#### 棚卸し列挙
+
+1. 当該 Case の対象 REQ を特定する（Issue 本文の REQ 参照から導出。REQ ファイル単位の近似列挙を許容）
+2. 正規 Design 文書（Design 一覧表が status を追跡する docs 配下の正規成果物。`<designs/README.md>` が追跡情報源）から、
+   当該 REQ を ADF-COVERS 宣言（implementation 役割）でカバーし frontmatter status が draft の Design を
+   逆算列挙する。projection 配下は対象外とし、列挙対象は正規成果物のみとする。
+   ADF-COVERS 宣言の解析は `agentdev-traceability` の能力（coverage）を参照できる（fail-open。
+   不在・実行失敗・空結果時は正規成果物の直接走査（`rg` 等）で継続する）
+3. PR 本文「Design 確定候補」セクションの申告候補を列挙結果へ統合する（同一 Design は 1 候補にまとめ、
+   二重処理しない。申告のみ存在する Design も評価対象に含める）
+4. 統合後の候補が 0 件の場合は 0 件確認を記録して Design 状態評価を正常完了する（エラー停止しない）
+
+#### 全件評価
 
 | 処理パターン | 条件 | アクション |
 |---|---|---|
-| (a) case-close 内で Design 昇格 | 対象 Design の `status` が `draft`、実装が Design 内容を検証済み | 対象 Design の `status` を `draft` → `accepted` に昇格（編集スコープ: プロジェクトの Design ファイル群） |
+| (a) case-close 内で Design 昇格 | 統合後の候補 Design の `status` が `draft`、STEP-3-1「Design 本文と実装の最終矛盾確認」により実装・検証との整合を確認済み | 対象 Design の `status` を `draft` → `accepted` に昇格し、Design 一覧表（Design README）の status 列を同時更新する（編集スコープ: プロジェクトの Design ファイル群） |
 | (b) design-save 再起動の提案 | Design 確定候補が Design ファイル未保存 | `/agentdev/design-save` の再実行を提案し case-close は完了させる |
-| (c) 見送り | 確定不要と判断 | 候補を Findings/ Capture候補 に準じて記録し後続へ委ねる |
+| (c) 見送り | 整合確認の結果、当該 Case で確定できないと判断 | 見送り理由と再評価契機を対応記録コメントの検証差分へ記録し、Design ファイル本体へ最小限の経緯記録を追記する。Design 本体への追記はライフサイクル経緯の最小記録に限り、設計内容としての未確定事項・将来計画・判断宣告の追記を含まない |
+
+- 見送り（評価実施・確定不可）と未評価（評価未実施）を区別して記録する
+- 新規の一時成果物種別・新規ドメイン状態は作らない（見送り記録は既存チャネル〔対応記録コメント、Design ファイル本体〕に保存する）
+- **完了ゲート**: 統合後の全候補が (a) 昇格または (c) 見送りのいずれかの評価結果を持つことを case-close 完了条件に含める。評価結果のない候補（未評価）が残る場合は完了扱いにしない（停止または継続扱い）
+
+#### 冪等（再実行）
+
+- accepted 済み Design は棚卸し列挙の評価対象から除外する（重複する状態遷移・承認記録を生成しない）
+- 同一 Case 再実行では既存の見送り記録を評価結果として認定し、重複する見送り記録を生成しない
 
 Design status 昇格タイミング（draft → accepted）の詳細、frontmatter `status` と `updated` の更新、Design 確定候補処理の詳細は `agentdev-design-file-manager/references/design-lifecycle-application.md` を参照。
 
@@ -115,7 +141,7 @@ Design status 昇格タイミング（draft → accepted）の詳細、frontmatt
 
 ## Evidence
 
-- targeted docs guard、check_extensions.ts、check_distribution_boundary.ts の各 JSON 結果、Design 確定フローの処理パターン（a/b/c）
+- targeted docs guard、check_extensions.ts、check_distribution_boundary.ts の各 JSON 結果、Design 状態評価（棚卸し制）の列挙結果・統合結果・全件評価結果（処理パターン a/b/c、0 件確認の有無）
 - full integrity suite 実行時: 「Ran N tests across M files」の N/M 件数突合結果、実行 cwd と起動コマンド形式
 
 ## Completion Verification
@@ -125,12 +151,12 @@ Design status 昇格タイミング（draft → accepted）の詳細、frontmatt
 
 ## Resume-Idempotency
 
-- 各検査は読取であり再実行可能。Design 昇格は frontmatter `status`（durable state）で判定し、`accepted` 済みの場合は再昇格しない
+- 各検査は読取であり再実行可能。Design 昇格は frontmatter `status`（durable state）で判定し、`accepted` 済みの場合は再昇格しない。同一 Case 再実行では既存の見送り記録を評価結果として認定し、重複する見送り記録を生成しない
 
 ## resume point
 
 - docs/ 検証結果（targeted docs guard、check_extensions.ts）
-- Design 確定フロー処理結果（昇格 a / 提案 b / 見送り c）
+- Design 状態評価（棚卸し制）処理結果（列挙候補一覧、統合結果、全候補の評価結果（昇格 a / 提案 b / 見送り c）、0 件確認の有無）
 - `spec_readme_update_required` 状態
 
 ## 関連 STEP
@@ -147,4 +173,4 @@ Design status 昇格タイミング（draft → accepted）の詳細、frontmatt
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
 - 不変条件（機能追加で docs/ 更新がない場合の警告表示と停止確認）
-- ガードレール・不変条件（Design status 昇格は case-close の責務、Design 確定候補の処理は PR 本文の `## Design確定候補` を入力とし `## Findings / Capture候補` とは区別）
+- ガードレール・不変条件（Design status 昇格は case-close の責務、Design 状態評価は棚卸し列挙を正とし PR 本文の `## Design確定候補` 申告を補助入力として統合し、`## Findings / Capture候補` とは区別）
