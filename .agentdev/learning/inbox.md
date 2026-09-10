@@ -225,3 +225,19 @@ worktree で integrity suite を実行する場合、textlint plugin 配下に�
 - **想定反映先**: 配布物実装反映の運用知見（learning-promote で反映先を判断）
 - **関連**: PR 2759、src/opencode/skills/agentdev-doc-diagnostics/references/diagnostic-categories.md
 - **タグ**: `#配布物` `#機械検査` `#fix-and-reverify`
+
+## 2026-09-10 worktree の .opencode/plugins は gitignore 未伝播で欠落するため plugins 分割は source fallback を使う
+
+- **問題事象**: worktree 上での bun test フル suite 実行時、.opencode/plugins/ が gitignore 未伝播で存在せず plugins 分割の実行対象が 0 件になった
+- **発生局面**: 検証（Epic 2755 Wave 2、PR 2763 の worktree での bun test 3 cwd 分割実行）
+- **検知方法**: bun test の実行対象ディレクトリ確認（plugins 分割の対象不在）
+- **根本原因**: .opencode/plugins は gitignore 対象のため worktree には伝播せず、junction 環境はメインリポジトリにしか存在しない
+- **自律対応内容**: worktree 構造的制約の source fallback として bun test ./src/opencode/plugins/ を実行し網羅性を確保（311 tests / 0 fail）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree での plugins テストは src/opencode/plugins/ を source fallback として実行すればテスト網羅性を保てる
+- **再発条件**: worktree 上で bun test フル suite の plugins 分割を実行した場合
+- **予防策候補**: worktree での plugins 分割は source fallback パスを標準手順として明記
+- **想定反映先**: QG-4 bun test 実行形態契約・worktree 構造的制約の運用知見（learning-promote で反映先を判断）
+- **関連**: PR 2763、.worktrees/2758-feature
+- **タグ**: `#worktree` `#bun-test` `#plugins`
