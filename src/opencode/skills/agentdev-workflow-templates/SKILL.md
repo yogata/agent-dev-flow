@@ -3,6 +3,8 @@ name: agentdev-workflow-templates
 description: Manages Issue/PR description and comment templates, selection rules, and section conventions for the agentdev command pipeline. USE FOR: determining which template to use for a given situation, reading template files, understanding template section structure. DO NOT USE FOR: workflow phase definitions, requirement analysis, architecture decisions.
 ---
 
+<!-- ADF-COVERS(implementation): REQ-032-024 -->
+
 # Issue テンプレート管理スキル
 
 agentdev系コマンドで使用するIssue/PR本文、コメントテンプレートの管理、選定ルール、セクション規約を提供する。
@@ -58,7 +60,7 @@ agentdev系コマンドで使用するIssue/PR本文、コメントテンプレ�
 | 品質メトリクス | 【必須】 | テーブル形式（メトリクス/結果/基準/判定） | - |
 | 検証差分 | 【必須】 | 検証差分セクション形式（後述「検証差分セクション」参照）。実行工程、検証種別、検証結果、finding 差分の5分類を1行1検証のテーブルで記録する | 「該当なし」 |
 | Findings/ Intake候補 | 【必須】 | case-run で発見した本筋外 Finding（intake候補、learning候補）を記録。各項目に発見元、内容、分類（intake/learning）を含める | 「該当なし」 |
-| Design確定候補 | 【任意】 | case-run/ driver が実装時に発見した Design レベルの詳細（schema、enum、判定表、内部アルゴリズム等）。`Findings / Capture候補` とは別セクション。case-close STEP-3 の Design 確定チェック入力となる | セクションごと省略 |
+| Design確定候補 | 【任意】 | case-run/ driver が実装時に発見した Design レベルの詳細（schema、enum、判定表、内部アルゴリズム等）。`Findings / Capture候補` とは別セクション。case-close STEP-3 の Design 状態評価（棚卸し制）への補助入力となる（棚卸し列挙が正、申告の不在で棚卸しは省略されない） | セクションごと省略 |
 
 ### 実行識別情報セクション（Issue/PR テンプレート共通形式）
 

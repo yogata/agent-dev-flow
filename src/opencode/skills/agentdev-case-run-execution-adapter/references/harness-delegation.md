@@ -1,4 +1,5 @@
 <!-- ADF-COVERS(implementation): REQ-017-019 -->
+<!-- ADF-COVERS(implementation): REQ-032-024 -->
 # harness 委譲実装ノート
 
 AgentDevFlow 側（case-run）から実行担当サブエージェントを委譲起動するための実装ノート。
@@ -118,7 +119,7 @@ stop_conditions:
   - 既確定文書（REQ、Decision、Design）の変更、追加、撤回が必要と判明した場合
 expected_output: 実装済みブランチ + PR（PR 本文に検証証跡、Findings / Capture候補を含む）
 handoff_artifacts:
-  - PR 本文（検証結果、Findings / Capture候補、Design確定候補）
+  - PR 本文（検証結果、Findings / Capture候補、Design確定候補（case-close の Design 状態評価（棚卸し制）への補助入力））
 plan_change: なし（委譲中に計画変更が生じた場合は result に理由を付して報告）
 </structured_context>
 

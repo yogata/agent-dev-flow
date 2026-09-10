@@ -101,7 +101,8 @@ finding の特定は要約と参照（セクション名、コメント番号等
 ## Design確定候補
 <!-- 【任意】 case-run/ driver が実装時に発見した Design レベルの詳細（Design に記載すべき schema、enum、判定表、内部アルゴリズム等）を記録する。
 `## Findings / Capture候補` とは別セクション。
-case-close STEP-3 で Design 確定チェックの入力となり、draft → 承認済み 昇格または design-save 再起動の判断材料となる。
+case-close STEP-3 の Design 状態評価（棚卸し制）では棚卸し列挙が正であり、本セクションは補助入力である（申告の不在で棚卸しが省略されることはなく、申告候補は棚卸し列挙結果へ統合される）。
+draft → 承認済み 昇格、design-save 再起動、見送りの判断材料となる。
 Design確定候補がない場合はセクションごと省略する。
  -->
 

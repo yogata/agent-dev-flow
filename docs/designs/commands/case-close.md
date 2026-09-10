@@ -128,7 +128,7 @@ Epic Issue 本文の `## 完了条件` セクションを読み込み、全完�
 - 前提確認（達成判定、完了ゲート（QG-4）に従い完了条件チェックボックスを最終評価、更新）。`[x]` 反映事後確認（再読込 VERIFY、最大2回）。未達項目残存時は構造化エラー停止
 - docs/ 検証（機能追加固有検証（REQ作成、インデックス、spec更新、Decision）、関連ドキュメント整合性確認、README 索引整合性）
   - close 時 Design / commands / skills 更新漏れの局所確認
-  - Design 確定フロー（v2:ADR-0123 Decision #4, REQ-001-015）（PR 本文の `## Design確定候補` セクション読取、確定判断（(a) 昇格 / (b) design-save 再起動提案 / (c) 見送り））
+  - Design 確定フロー（v2:ADR-0123 Decision #4, REQ-001-015）（対象 REQ に基づく draft Design 棚卸し列挙と、PR 本文 `## Design確定候補` セクションの申告候補（補助入力）の統合による全件評価、確定判断（(a) 昇格 / (b) design-save 再起動提案 / (c) 見送り）。申告の有無に関わらず棚卸し列挙を実行する）
   - AUTOGEN block 索引再生成差分検出（project extension checks 経由）。docs/ 検証の後、generate_indexes.ts --dry-run を実行し AUTOGEN block の再生成差分を検出する。本検証は case-close の手順を直接編集せず、Workflow Skill extension（.agentdev/extensions/skills/agentdev-workflow-case-close.yaml）の checks セクション経由で導入する（project-extensions Design 準拠）。case-close は dry-run/差分検査で停止し、直接編集・commit しない。差分がある場合は case-run へ差戻し、再生成（実 commit）は case-run が行う。複数 PR 跨ぎでの AUTOGEN block 再生成漏れを防止する。Epic Wave クローズ経路では Epic Issue 完了条件チェックボックス最終評価の前段に同等の dry-run/diff による索引健全性検証を適用する（Epic Issue クローズ時の索引検証は case_open_hints 参照）
 - PRマージ（squash merge（Custom Tool `agentdev_gh` の pr_merge、リトライ最大5回、フォールバック手順）、対応記録コメント追記）
   - squash merge 前の mergeable UNKNOWN ポーリング（REQ-006-028）（Custom Tool `agentdev_gh` の pr_mergeable で mergeable 状態を取得し、UNKNOWN の場合は最大60秒・10秒間隔でポーリング待機。上限超過時はマージ中止・構造化エラー停止。CONFLICTING 遷移時はコンフリクト解消 rebase パスへ分岐）
@@ -240,8 +240,8 @@ PR 本文読取記述、design-lifecycle-application.md の旧昇格条件文言
 1. 当該 Case の対象 REQ を特定する（Issue 本文の REQ 参照から導出。行レベルの導出は
    現行の正規記録先に存在しないため、REQ ファイル単位の近似列挙を許容する。
    行レベルの正規記録先が確定した場合は行レベル判定へ昇格する）（adversarial-review F2）
-2. docs/designs/** の正規成果物から、当該 REQ を ADF-COVERS(implementation) 宣言でカバーし
-   frontmatter status が draft の Design を逆算列挙する（projection 配下は対象外）
+2. docs/designs/** の正規成果物から、当該 REQ を ADF-COVERS 宣言（implementation 役割）で
+   カバーし frontmatter status が draft の Design を逆算列挙する（projection 配下は対象外）
 3. PR 本文「Design 確定候補」セクションの申告候補を列挙結果へ統合する（重複は 1 件にまとめ、
    二重処理しない）。申告は補助入力であり、申告の不在を理由に棚卸しを省略しない
 4. 列挙結果が 0 件の場合は 0 件確認を記録して Design 状態評価を正常完了する
