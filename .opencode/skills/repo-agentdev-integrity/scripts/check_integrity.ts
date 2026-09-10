@@ -13,6 +13,8 @@
 // ADF-COVERS(verification): REQ-031-011, REQ-031-012, REQ-031-014
 // ADF-COVERS(verification): REQ-032-004, REQ-032-005
 // ADF-COVERS(verification): REQ-037-008, REQ-037-010
+// ADF-COVERS(implementation): REQ-059-003
+// ADF-COVERS(verification): REQ-059-002, REQ-059-003
 import {
   EXIT_OK,
   EXIT_NG,
@@ -65,6 +67,11 @@ import {
   DECISION_STATUS_SUPERSEDED_BLOCK_ID,
   DECISION_STATUS_DEPRECATED_BLOCK_ID,
   DECISION_RETIRED_TABLE_BLOCK_ID,
+  DECISION_RELATED_REQ_TABLE_BLOCK_ID,
+  collectReqIdContext,
+  extractRelatedReqNotes,
+  findUndeclaredRelatedReqDecisions,
+  generateDecisionRelatedReqTable,
   REQ_ACTIVE_COUNT_BLOCK_ID,
   REQ_ACTIVE_TABLE_BLOCK_ID,
   REQ_RETIRED_TABLE_BLOCK_ID,
@@ -8496,14 +8503,36 @@ function checkIndexGenerationConsistency(root: string): CheckResult[] {
     }
   }
 
-  // AG-008 (DEC-009): Decision README (docs/decisions/README.md) — 7 AUTOGEN blocks
+  // AG-008 (DEC-009): Decision README (docs/decisions/README.md) — 8 AUTOGEN blocks
   const decisionsDir = path.join(root, "docs", "decisions");
   const decisionRetiredDir = path.join(decisionsDir, "retired");
   const decisionReadmePath = path.join(decisionsDir, "README.md");
+  const reqDir = path.join(root, "docs", "requirements");
+  const reqRetiredDir = path.join(reqDir, "retired");
   const decisionReadmeContent = readText(decisionReadmePath);
   if (decisionReadmeContent !== null && fs.existsSync(decisionsDir)) {
     const decisionInfos = collectDecisionFiles(decisionsDir);
     const decisionRetiredInfos = collectRetiredDecisionFiles(decisionRetiredDir);
+
+    // REQ-059-003: 未宣言（related_reqs フィールド欠落）Decision の検出。
+    // finding（observation）として検出し、工程停止条件としない（DEC-001 決定4）。
+    const undeclaredDecisions =
+      findUndeclaredRelatedReqDecisions(decisionInfos);
+    for (const d of undeclaredDecisions) {
+      results.push(
+        info(
+          "IndexGenerationConsistency",
+          "decision-related-reqs-undeclared",
+          `Decision ${d.id} は frontmatter related_reqs が未宣言です（フィールド欠落）。` +
+            `関連 REQ の有無に応じて related_reqs を宣言してください（関連なしは related_reqs: [] 空宣言）。` +
+            `本検出は finding であり工程停止条件ではありません（REQ-059-003、DEC-001 決定4）`,
+          resolveRelative(path.join(decisionsDir, d.filename), root),
+          1,
+          { finding_level: "observation", route: "intake" },
+        ),
+      );
+    }
+
     const decisionSpecs: AutogenBlockSpec[] = [
       { blockId: DECISION_BASELINE_COUNT_BLOCK_ID, expected: generateDecisionBaselineCaption(decisionInfos), label: "decision-baseline-count" },
       { blockId: DECISION_BASELINE_TABLE_BLOCK_ID, expected: generateDecisionBaselineTable(decisionInfos), label: "decision-baseline-table" },
@@ -8512,6 +8541,15 @@ function checkIndexGenerationConsistency(root: string): CheckResult[] {
       { blockId: DECISION_STATUS_SUPERSEDED_BLOCK_ID, expected: generateDecisionStatusList(decisionInfos, "superseded"), label: "decision-status-superseded" },
       { blockId: DECISION_STATUS_DEPRECATED_BLOCK_ID, expected: generateDecisionStatusList(decisionInfos, "deprecated"), label: "decision-status-deprecated" },
       { blockId: DECISION_RETIRED_TABLE_BLOCK_ID, expected: generateDecisionRetiredTable(decisionRetiredInfos), label: "decision-retired-table" },
+      {
+        blockId: DECISION_RELATED_REQ_TABLE_BLOCK_ID,
+        expected: generateDecisionRelatedReqTable(
+          decisionInfos,
+          collectReqIdContext(reqDir, reqRetiredDir),
+          extractRelatedReqNotes(decisionReadmeContent),
+        ),
+        label: "decision-related-req-table",
+      },
     ];
     const decisionOutcome = verifyAutogenBlocksInFile(
       decisionReadmeContent,
@@ -8525,8 +8563,6 @@ function checkIndexGenerationConsistency(root: string): CheckResult[] {
   }
 
   // AG-009: REQ README (docs/requirements/README.md) — 3 AUTOGEN blocks
-  const reqDir = path.join(root, "docs", "requirements");
-  const reqRetiredDir = path.join(reqDir, "retired");
   const reqReadmePath = path.join(reqDir, "README.md");
   const reqReadmeContent = readText(reqReadmePath);
   if (reqReadmeContent !== null && fs.existsSync(reqDir)) {

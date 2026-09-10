@@ -34,6 +34,17 @@ Design 操作（`artifact: design`、operation `create`/`append`/`update`）は 
 - 検出事項の作成: requirements review の検出事項を `.agentdev/drafts/requirements-review-finding-{topic-slug}.md` に作成する。
 - REQ 再構成候補: REQ 体系上の歪みを検知した場合、REQ 再構成 intake を `.agentdev/intake/inbox/req-restructure/` に保存する。
 
+## Decision ファイル操作と related_reqs 初期保存
+
+req-save が Decision を CREATE する場合、frontmatter の標準フィールド `related_reqs` に、要件doc（draft-data）の該当 Decision 対象操作で確定した関連 REQ を決定的に保存する。
+
+- 関連 REQ が確定している Decision: `related_reqs: [REQ-NNNN, ...]` 形式で保存する。
+- 関連 REQ が存在しない Decision: `related_reqs: []`（空宣言）として作成する。フィールド自体を省略しない（未宣言は正規状態ではなく機械検出の対象）。
+- フィールド規約の正本は patterns.md Design「Decision frontmatter 関連REQ宣言（related_reqs）規約」、操作・採番手順は `agentdev-decision-file-manager` を参照する。
+- UPDATE 時: 関連 REQ の変更（要件再構成、Decision の置換・再確認）は `related_reqs` フィールド更新として扱う（status 遷移とは独立に更新できる）。
+- 検証: REQ 識別子形式（`REQ-{NNNN}`）、実在 REQ の指先確認（`docs/requirements/` または `docs/requirements/retired/`）、空宣言と未宣言の区別。
+- accepted 遷移時は「## 承認記録」セクションを本文末尾へ追記する（形式の正規所有は patterns.md Design「承認記録セクション形式」）。
+
 ## 局所矛盾防止
 
 保存完了後、draft-meta を使って、保存後に残る既知の矛盾を検出可能な範囲で防止する。

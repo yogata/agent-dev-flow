@@ -1,4 +1,4 @@
-// ADF-COVERS(implementation): REQ-010-011
+// ADF-COVERS(implementation): REQ-010-011, REQ-059-002, REQ-059-003
 /**
  * Index auto-generation script (SC-002 Phase C, IR-061).
  *
@@ -469,6 +469,12 @@ export interface DecisionInfo {
    * 現行 Decision: "DEC-001.md"、retired Decision: "retired/DEC-001.md"
    */
   relPath: string;
+  /**
+   * frontmatter related_reqs（REQ-059-001）。
+   * 未宣言（フィールド欠落）は REQ-059-003 の機械検出対象であり正規状態ではないため、
+   * 空宣言（[]）と区別して null で表現する。
+   */
+  relatedReqs: string[] | null;
 }
 
 /**
@@ -492,10 +498,14 @@ function extractDecisionInfo(
   let title = "";
   let status = "";
   let created = "";
+  let relatedReqs: string[] | null = null;
   if (fm) {
     if (typeof fm["title"] === "string") title = fm["title"];
     if (typeof fm["status"] === "string") status = fm["status"];
     if (typeof fm["created"] === "string") created = fm["created"];
+    const rr = fm["related_reqs"];
+    if (Array.isArray(rr)) relatedReqs = rr;
+    else if (typeof rr === "string") relatedReqs = [rr];
   }
   // title が frontmatter に無い場合は H1 から抽出（フォールバック）。
   if (!title) {
@@ -507,7 +517,7 @@ function extractDecisionInfo(
     }
   }
 
-  return { id, num, title, status, created, filename, relPath };
+  return { id, num, title, status, created, filename, relPath, relatedReqs };
 }
 
 /**
@@ -621,6 +631,12 @@ export const DECISION_STATUS_DEPRECATED_BLOCK_ID =
   "decision-status-deprecated";
 export const DECISION_RETIRED_TABLE_BLOCK_ID = "decision-retired-table";
 
+// Decision README 関連REQ表（REQ-059-002、REQ-059-003）。
+// 混合領域構成: 生成処理は Decision 列と関連REQ列のみ上書きし、
+// 「説明」列（人手判断列）は現在の README 内容から抽出して保持する
+// （index-auto-generation.md「Decision 関連REQ表の自動生成」）。
+export const DECISION_RELATED_REQ_TABLE_BLOCK_ID = "decision-related-req-table";
+
 /**
  * 現行 Decision の件数表明キャプション（1行）。
  * 形式: "現行の承認済み Decision はN件、提案中の Decision はM件である。"
@@ -680,6 +696,107 @@ export function generateDecisionRetiredTable(
     lines.push(
       `| [${info.id}](${info.relPath}) | ${sanitizeTableCell(info.title)} | ${info.status} |`,
     );
+  }
+  return lines;
+}
+
+// ─── Decision 関連REQ表生成 (REQ-059-002) ──────────────────────────────────
+
+/** REQ 識別子の実在コンテキスト（active と retired の区別）。 */
+export interface ReqLinkContext {
+  active: Set<string>;
+  retired: Set<string>;
+}
+
+export function collectReqIdContext(
+  reqDir: string,
+  reqRetiredDir: string,
+): ReqLinkContext {
+  const ctx: ReqLinkContext = { active: new Set(), retired: new Set() };
+  for (const f of listFiles(reqDir).filter((f) => /^REQ-\d+\.md$/.test(f))) {
+    ctx.active.add(`REQ-${f.slice(4, -3)}`);
+  }
+  for (const f of listFiles(reqRetiredDir).filter((f) => /^REQ-\d+\.md$/.test(f))) {
+    ctx.retired.add(`REQ-${f.slice(4, -3)}`);
+  }
+  return ctx;
+}
+
+/**
+ * 関連REQ列のセル（frontmatter related_reqs 由来）。
+ * retired REQ（現行配置に存在しない retired/ のみ）は retired/ へリンクし
+ * retired-req-link-annotation 契約（check_integrity.ts LinkIntegrity）に従い
+ * 同一セル内へ retired 注記を付与する。空宣言は "-"。
+ */
+export function formatRelatedReqCell(
+  relatedReqs: string[],
+  ctx: ReqLinkContext,
+): string {
+  if (relatedReqs.length === 0) return "-";
+  return relatedReqs
+    .map((reqId) => {
+      if (ctx.retired.has(reqId) && !ctx.active.has(reqId)) {
+        return `[${reqId}](../requirements/retired/${reqId}.md)（retired）`;
+      }
+      return `[${reqId}](../requirements/${reqId}.md)`;
+    })
+    .join(", ");
+}
+
+/**
+ * 現在の README 内容の「## 関連 REQ」セクション表から DEC ID → 説明列 を抽出する。
+ * 説明列は frontmatter から導出できない人手判断列のため、AUTOGEN ブロック囲みの
+ * 有無に依存せず見出しスコープで抽出する（初回 AUTOGEN 化時の手動表取り込み対応）。
+ */
+export function extractRelatedReqNotes(
+  readmeContent: string,
+): Record<string, string> {
+  const notes: Record<string, string> = {};
+  const lines = readmeContent.split("\n");
+  let inSection = false;
+  for (const line of lines) {
+    if (/^##\s+/.test(line)) {
+      inSection = /^##\s+関連 REQ\s*$/.test(line.trim());
+      continue;
+    }
+    if (!inSection) continue;
+    const rowMatch = line.match(/^\|\s*(DEC-\d+)\s*\|/);
+    if (!rowMatch) continue;
+    const cells = line.split("|").map((c) => c.trim());
+    if (cells.length >= 4) {
+      notes[rowMatch[1]] = cells[3];
+    }
+  }
+  return notes;
+}
+
+/**
+ * 未宣言（related_reqs フィールド欠落）Decision の検出（REQ-059-003）。
+ * 検出は finding であり工程停止条件としない（DEC-001 決定4）。
+ */
+export function findUndeclaredRelatedReqDecisions(
+  decisions: DecisionInfo[],
+): DecisionInfo[] {
+  return decisions.filter((d) => d.relatedReqs === null);
+}
+
+/**
+ * Decision 関連REQ表（混合領域構成）。
+ * Decision 列と関連REQ列を frontmatter から生成し、「説明」列は notes（現在 README
+ * の人手判断列）を優先して保持する。notes に存在しない行（新規 Decision 等）は "-"。
+ */
+export function generateDecisionRelatedReqTable(
+  decisions: DecisionInfo[],
+  ctx: ReqLinkContext,
+  notes: Record<string, string>,
+): string[] {
+  const lines: string[] = [];
+  lines.push("| Decision | 関連REQ | 説明 |");
+  lines.push("|-----|---------|------|");
+  for (const info of decisions) {
+    const cell = formatRelatedReqCell(info.relatedReqs ?? [], ctx);
+    const note = sanitizeTableCell(notes[info.id] ?? "-");
+    lines.push(`| ${info.id} | ${cell} | ${note} |`);
   }
   return lines;
 }
@@ -1016,7 +1133,7 @@ TARGET FILES (SC-002 Phase C):
     - docs/designs/integrity/integrity-rule-catalog.md (catalog IR entries, 2 blocks around IR-045 gap)
     - docs/designs/integrity/rule-ownership.md (IR cross-reference appendix)
   Wave 2 (AG-008/009, DEC-009):
-    - docs/decisions/README.md (decision-* baseline/status/retired blocks; skipped when absent)
+    - docs/decisions/README.md (decision-* baseline/status/retired/related-req blocks; skipped when absent)
     - docs/requirements/README.md (active/retired REQ tables)
   Wave 3 (AG-006 候補5):
     - docs/designs/quality/req-health-metrics.md (REQ line count + signal table)
@@ -1219,6 +1336,7 @@ RELATED:
       DECISION_STATUS_SUPERSEDED_BLOCK_ID,
       DECISION_STATUS_DEPRECATED_BLOCK_ID,
       DECISION_RETIRED_TABLE_BLOCK_ID,
+      DECISION_RELATED_REQ_TABLE_BLOCK_ID,
     ];
     const decisionReadmeFoundIds = new Set(
       decisionReadmeBlocks.map((b) => b.id),
@@ -1232,6 +1350,13 @@ RELATED:
       );
       process.exit(EXIT_ERROR);
     }
+    const relatedReqNotes = extractRelatedReqNotes(decisionReadmeOriginal);
+    const reqCtx = collectReqIdContext(reqDir, reqRetiredDir);
+    const decisionRelatedReqTable = generateDecisionRelatedReqTable(
+      decisionInfos,
+      reqCtx,
+      relatedReqNotes,
+    );
     let decisionReadmeUpdated = decisionReadmeOriginal;
     const decisionReadmeReplacements: Record<string, string[]> = {
       [DECISION_BASELINE_COUNT_BLOCK_ID]: decisionBaselineCaption,
@@ -1241,6 +1366,7 @@ RELATED:
       [DECISION_STATUS_SUPERSEDED_BLOCK_ID]: decisionStatusSuperseded,
       [DECISION_STATUS_DEPRECATED_BLOCK_ID]: decisionStatusDeprecated,
       [DECISION_RETIRED_TABLE_BLOCK_ID]: decisionRetiredTable,
+      [DECISION_RELATED_REQ_TABLE_BLOCK_ID]: decisionRelatedReqTable,
     };
     for (const blockId of decisionReadmeExpectedIds) {
       decisionReadmeUpdated = replaceAutogenBlock(

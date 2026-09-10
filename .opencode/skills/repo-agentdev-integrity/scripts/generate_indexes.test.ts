@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-010-011
+// ADF-COVERS(verification): REQ-010-011, REQ-059-001, REQ-059-002, REQ-059-003, REQ-059-004
 /**
  * Regression tests for AUTOGEN marker detection (Issue #1771, RU-0002).
  *
@@ -27,6 +27,12 @@ import {
   countDesignBodyLines,
   deriveMeasureDateFromLastCommit,
   deriveReqMetricsMeasureDate,
+  collectDecisionFiles,
+  collectReqIdContext,
+  extractRelatedReqNotes,
+  findUndeclaredRelatedReqDecisions,
+  formatRelatedReqCell,
+  generateDecisionRelatedReqTable,
 } from "./generate_indexes.ts";
 import { findRepoRoot } from "./cli_utils.ts";
 
@@ -358,6 +364,144 @@ describe("deriveReqMetricsMeasureDate", () => {
   });
 });
 
+// ─── Decision 関連REQ表（REQ-059-001..003）──────────────────────────────────
+// related_reqs 抽出（空宣言と未宣言の区別）、混合領域生成（説明列保持）、
+// retired REQ 注記、未宣言検出を固定する回帰テスト（Issue #2756）。
+
+const RR_TMP_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), "genidx-related-req-"));
+
+function writeDecision(dir: string, id: string, fmBody: string): void {
+  fs.writeFileSync(
+    path.join(dir, `${id}.md`),
+    ["---", `id: ${id}`, fmBody, "---", "", `# ${id}`, ""].join("\n"),
+    "utf-8",
+  );
+}
+
+describe("Decision related_reqs collection (REQ-059-001)", () => {
+  const decDir = path.join(RR_TMP_ROOT, "decisions");
+  const reqDir = path.join(RR_TMP_ROOT, "requirements");
+  const reqRetiredDir = path.join(reqDir, "retired");
+  if (!fs.existsSync(decDir)) {
+    fs.mkdirSync(decDir, { recursive: true });
+    fs.mkdirSync(reqRetiredDir, { recursive: true });
+    writeDecision(
+      decDir,
+      "DEC-001",
+      'title: "T1"\nstatus: accepted\nrelated_reqs: [REQ-002, REQ-009]\ncreated: "2026-01-01"\nupdated: "2026-01-01"',
+    );
+    writeDecision(
+      decDir,
+      "DEC-002",
+      'title: "T2"\nstatus: accepted\nrelated_reqs: []\ncreated: "2026-01-01"\nupdated: "2026-01-01"',
+    );
+    writeDecision(
+      decDir,
+      "DEC-003",
+      'title: "T3"\nstatus: proposed\ncreated: "2026-01-01"\nupdated: "2026-01-01"',
+    );
+    writeDecision(
+      decDir,
+      "DEC-004",
+      'title: "T4"\nstatus: accepted\nrelated_reqs: [REQ-013]\ncreated: "2026-01-01"\nupdated: "2026-01-01"',
+    );
+    fs.writeFileSync(path.join(reqDir, "REQ-002.md"), "# req\n", "utf-8");
+    fs.writeFileSync(path.join(reqDir, "REQ-009.md"), "# req\n", "utf-8");
+    fs.writeFileSync(path.join(reqRetiredDir, "REQ-013.md"), "# req\n", "utf-8");
+  }
+
+  it("parses a declared list, an empty declaration, and an undeclared field distinctly", () => {
+    const infos = collectDecisionFiles(decDir);
+    const byId = new Map(infos.map((d) => [d.id, d]));
+    expect(byId.get("DEC-001")?.relatedReqs).toEqual(["REQ-002", "REQ-009"]);
+    expect(byId.get("DEC-002")?.relatedReqs).toEqual([]);
+    expect(byId.get("DEC-003")?.relatedReqs).toBe(null);
+  });
+
+  it("detects undeclared decisions as finding candidates (REQ-059-003)", () => {
+    const infos = collectDecisionFiles(decDir);
+    const undeclared = findUndeclaredRelatedReqDecisions(infos);
+    expect(undeclared.map((d) => d.id)).toEqual(["DEC-003"]);
+  });
+
+  it("formats active, retired-annotated, and empty cells", () => {
+    const ctx = collectReqIdContext(reqDir, reqRetiredDir);
+    expect(formatRelatedReqCell(["REQ-002", "REQ-009"], ctx)).toBe(
+      "[REQ-002](../requirements/REQ-002.md), [REQ-009](../requirements/REQ-009.md)",
+    );
+    expect(formatRelatedReqCell(["REQ-013"], ctx)).toBe(
+      "[REQ-013](../requirements/retired/REQ-013.md)（retired）",
+    );
+    expect(formatRelatedReqCell([], ctx)).toBe("-");
+  });
+
+  it("generates a mixed-area table preserving hand-curated note cells", () => {
+    const infos = collectDecisionFiles(decDir);
+    const ctx = collectReqIdContext(reqDir, reqRetiredDir);
+    const notes = { "DEC-001": "人手判断列" };
+    const table = generateDecisionRelatedReqTable(infos, ctx, notes);
+    expect(table[0]).toBe("| Decision | 関連REQ | 説明 |");
+    expect(table[2]).toContain("| DEC-001 | [REQ-002](../requirements/REQ-002.md), [REQ-009](../requirements/REQ-009.md) | 人手判断列 |");
+    expect(table[3]).toContain("| DEC-002 | - | - |");
+    expect(table[5]).toContain("[REQ-013](../requirements/retired/REQ-013.md)（retired）");
+  });
+
+  it("keeps generation idempotent for note cells (no data loss on re-run)", () => {
+    const infos = collectDecisionFiles(decDir);
+    const ctx = collectReqIdContext(reqDir, reqRetiredDir);
+    const notes = { "DEC-001": "人手判断列" };
+    const first = generateDecisionRelatedReqTable(infos, ctx, notes);
+    const secondNotes = extractRelatedReqNotes(
+      ["## 関連 REQ", "", ...first, "", "## 次の節", ""].join("\n"),
+    );
+    const second = generateDecisionRelatedReqTable(infos, ctx, secondNotes);
+    expect(second).toEqual(first);
+  });
+});
+
+describe("extractRelatedReqNotes", () => {
+  it("extracts note cells only within the related REQ section", () => {
+    const content = [
+      "## Decision Map",
+      "",
+      "| Decision | 関係 | 対象 | 説明 |",
+      "| DEC-001 | relates-to | v2:ADR-0105 | map row must not be picked |",
+      "",
+      "## 関連 REQ",
+      "",
+      "| Decision | 関連REQ | 説明 |",
+      "| DEC-002 | [REQ-009](../requirements/REQ-009.md) | note-two |",
+      "",
+      "## 過去版の履歴基盤",
+      "",
+      "| DEC-003 | after section must not be picked |",
+    ].join("\n");
+    const notes = extractRelatedReqNotes(content);
+    expect(notes).toEqual({ "DEC-002": "note-two" });
+  });
+});
+
+describe("doc_decision template related_reqs initial value (REQ-059-004)", () => {
+  const repoRoot = findRepoRoot(import.meta.dir);
+  const templateCandidates = [
+    path.join(repoRoot, "src", "opencode", "skills", "agentdev-decision-file-manager", "templates", "doc_decision.md"),
+    path.join(repoRoot, ".opencode", "skills", "agentdev-decision-file-manager", "templates", "doc_decision.md"),
+  ];
+  const templatePath = templateCandidates.find((p) => fs.existsSync(p));
+
+  it("declares related_reqs: [] as the initial frontmatter value", () => {
+    expect(templatePath).toBeDefined();
+    const content = fs.readFileSync(templatePath!, "utf-8");
+    const fmMatch = content.match(/^---\s*\n([\s\S]*?)\n---\s*\n/);
+    expect(fmMatch).not.toBeNull();
+    const relatedReqLine = fmMatch![1]
+      .split("\n")
+      .find((l) => /^related_reqs:/.test(l));
+    expect(relatedReqLine).toBe("related_reqs: []");
+  });
+});
+
 afterAll(() => {
   fs.rmSync(TMP_ROOT, { recursive: true, force: true });
+  fs.rmSync(RR_TMP_ROOT, { recursive: true, force: true });
 });

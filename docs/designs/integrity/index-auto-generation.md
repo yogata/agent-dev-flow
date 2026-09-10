@@ -6,6 +6,7 @@ updated: 2026-09-10
 ---
 <!-- ADF-COVERS(implementation): REQ-001-026, REQ-001-028 -->
 <!-- ADF-COVERS(implementation): REQ-010-011 -->
+<!-- ADF-COVERS(implementation): REQ-059-002, REQ-059-003 -->
 
 # 索引類自動生成 Design
 
@@ -16,9 +17,9 @@ README 群、索引類、件数表明を実ファイルの frontmatter から再
 
 ## 適用範囲
 
-- **現在自動生成される領域**: 実装済みAUTOGENブロックで生成される件数、一覧、status別ビュー、IR索引、関連マッピング、メトリクス例
-- **現在人手管理される領域**: ADRトピック別ビュー、Decision Map、ADR関連REQ表、REQ移行判定
-- **現在混合管理される領域**: 自動生成列と人手管理列が同一表に共存し、生成実装が対象列だけを更新する領域
+- **現在自動生成される領域**: 実装済みAUTOGENブロックで生成される件数、一覧、status別ビュー、IR索引、関連マッピング、メトリクス例、Decision 関連REQ表（Decision 列・関連REQ列）
+- **現在人手管理される領域**: ADRトピック別ビュー、Decision Map、REQ移行判定
+- **現在混合管理される領域**: 自動生成列と人手管理列が同一表に共存し、生成実装が対象列だけを更新する領域。Decision 関連REQ表（Decision 列・関連REQ列は自動生成、「説明」列は人手管理）が該当する
 - **対象外**: REQ、Decision、Design本文そのもの、および未実装の将来自動生成計画
 ## 自動生成の対象領域と生成元
 
@@ -26,7 +27,8 @@ README 群、索引類、件数表明を実ファイルの frontmatter から再
 |---|---|---|
 | `docs/requirements/README.md`のREQ一覧・件数 | 自動生成 | REQ frontmatter |
 | `docs/decisions/README.md`の基盤一覧・status別一覧・件数 | 自動生成 | Decision frontmatter |
-| `docs/decisions/README.md`のトピック別ビュー・Decision Map・関連REQ表 | 人手管理 | Decision本文と人手判断 |
+| `docs/decisions/README.md`のトピック別ビュー・Decision Map | 人手管理 | Decision本文と人手判断 |
+| `docs/decisions/README.md`の関連REQ表 | 混合管理（Decision 列・関連REQ列は自動生成、「説明」列は人手管理） | Decision frontmatter（related_reqs）と人手判断列 |
 | `docs/designs/README.md`のDesign一覧・status列 | 現行実装に従う混合管理 | Design frontmatterと人手管理列 |
 | integrity rule catalogとrule ownershipのAUTOGENブロック | 自動生成 | 個別IR文書 |
 | REQ/Designメトリクス計測例 | 自動生成 | 対象文書の計測結果 |
@@ -53,7 +55,8 @@ README 群、索引類、件数表明を実ファイルの frontmatter から再
 ### ステータス別ビュー、トピック別ビュー
 
 ステータス別ビューはDecision frontmatterから自動生成する。
-トピック別ビュー、Decision Map、関連REQ表は現在人手管理とし、実装されていない生成処理を現在契約として扱わない。
+トピック別ビュー、Decision Map は現在人手管理とし、実装されていない生成処理を現在契約として扱わない。
+関連REQ表は「Decision 関連REQ表の自動生成」節のとおり自動生成（混合領域）とする。
 
 ### decision-baseline 索引生成（count キャプション・table 全件出力）
 
@@ -94,6 +97,7 @@ AUTOGEN block ID は `{target}-{section}-{subsection}` 形式に従う。
 | `decision-baseline-count`, `decision-baseline-table` | decisions/README.md |
 | `decision-status-accepted` 等（proposed/superseded/deprecated） | decisions/README.md |
 | `decision-retired-table` | decisions/README.md |
+| `decision-related-req-table` | decisions/README.md |
 | `req-active-count`, `req-active-table`, `req-retired-table` | requirements/README.md |
 | `req-metrics-measurement-example` | quality/req-health-metrics.md |
 | `spec-metrics-measurement-example` | quality/design-health-metrics.md |
@@ -175,7 +179,7 @@ catalog は欠番 IR-045（削除済み、ファイル不在）を挟む2ブロ�
 生成スクリプト `.opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts` が存在し、AUTOGEN ブロック（HTML コメント形式 `<!-- AUTOGEN:BEGIN:id=xxx --> ... <!-- AUTOGEN:END -->`）で囲まれた領域を上書きする。
 docs-check 既存資産（cli_utils.ts, check_integrity.ts の parseFrontmatter, readText, listFiles 等）を再利用する。
 2. **現在人手管理されている領域**: 導出規則が未確定、混合領域、人手判断を含む領域。
-後述「現在人手管理領域の5領域」参照。
+後述「現在人手管理領域の3領域」参照。
 3. **各領域の正規情報源**: frontmatter、各文書本文のセクション構造、宣言等。
 4. **人手管理領域に対する整合性確認方法**: docs-check（IR-061、IR-038、IR-039、IR-042）による検出、人手レビュー等。
 
@@ -189,16 +193,17 @@ backtick 文脈判定のような部分一致ロジックは併用しない。
 これにより正常な AUTOGEN block 認識の失敗と索引再生成の途中停止を防止する（PR #1718 の HTML コメント構文抽象化による暫定対応と置換）。
 正例（正規マーカー行）、負例（backtick 囲み marker 文字列を含む説明文）、境界例（マーカー行に backtick が隣接する場合）を含む回帰テストが生成スクリプトに付属する。
 
-### 現在人手管理領域の4領域
+### 現在人手管理領域の3領域
 
-以下4領域は現在契約上の自動生成対象外（人手管理領域）として確定する。
+以下3領域は現在契約上の自動生成対象外（人手管理領域）として確定する。
 これは「永久に自動化しない」決定ではなく、「現在実装されていない機能を実装済み契約として扱わない」決定である。
 将来、導出規則と生成機構を別要件で確定すれば本 Design を更新できる自動生成拡張ポイントである。
 
 - **Decision README トピック別ビュー**: 人手管理。導出規則未確定のため。
 - **Decision README Decision Map**: 人手管理。各 Decision 本文の宣言から導出するが、導出規則が未確定のため。
-- **Decision README 関連 REQ 表**: 人手管理。各 Decision の関連宣言から導出するが、導出規則が未確定のため。
 - **docs/designs/README.md**: 人手管理または既存生成部分のみ AUTOGEN。status 列は AUTOGEN 可能だが、責務列等の混合領域が大半のため、現状では一部列のみ AUTOGEN または人手管理。
+
+Decision README 関連REQ表は自動生成（混合領域）へ移行済みである（前述「Decision 関連REQ表の自動生成」節）。旧 4領域構成からの移行に伴い、本節は3領域構成へ更新した。
 
 ## Decision 関連REQ表の自動生成
 

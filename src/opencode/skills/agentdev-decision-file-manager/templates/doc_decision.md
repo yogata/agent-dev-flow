@@ -2,6 +2,7 @@
 id: DEC-NNN
 title: ""
 status: proposed
+related_reqs: []
 created: "YYYY-MM-DD"
 updated: "YYYY-MM-DD"
 ---
