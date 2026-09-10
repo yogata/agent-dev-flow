@@ -1,6 +1,6 @@
 ---
 title: inspect-docs 診断観点レジストリ
-status: draft
+status: accepted
 created: 2026-09-10
 updated: 2026-09-10
 ---
