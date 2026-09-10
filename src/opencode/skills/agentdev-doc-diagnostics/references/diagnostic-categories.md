@@ -1,3 +1,4 @@
+<!-- ADF-COVERS(implementation): REQ-036-026 -->
 # docs 横断診断カテゴリ
 
 inspect-docs command が実行する docs 横断診断のカテゴリ定義と、各専門 skill へのルーティング対象を定義する。
@@ -14,6 +15,7 @@ inspect-docs command が実行する docs 横断診断のカテゴリ定義と�
 | 横断契約矛盾 | REQ/Decision/Design/guides 間で source-of-truth priority に基づく矛盾があるか | `agentdev-req-structure-diagnostics`（DRIFT 等）。表現揺れに起因する意味矛盾は本スキルの直接判定対象 |
 | 文意品質候補 | LLM っぽい表現、空虚語、英語混じり表現、実行主体分類の誤認が残存しているか | 文章表層は共通 textlint 基盤。実行主体分類の誤認は docs 配下が本スキルの意味診断、配布物は `agentdev-inspect-skills` |
 | Design 状態乖離 DRIFT | draft Design のうち、その `ADF-COVERS` の implementation 宣言がカバーする REQ の実装・検証 Case が完了済みであるにもかかわらず状態評価されないままのものがないか | 本スキル直接判定（判定基準の原本は `agentdev-doc-diagnostics` Design「Design 状態乖離 DRIFT 診断観点」節。時間ベースの draft 放置検出と判定基準を分離） |
+| Decision 状態乖離 DRIFT | frontmatter status が proposed の Decision のうち、`related_reqs` 宣言が示す関連 REQ の実装 Case が進行しているにもかかわらず受理評価されないままのものがないか | 本スキル直接判定（判定基準の原本は `agentdev-doc-diagnostics` Design「Decision 状態乖離 DRIFT 診断観点」節。Design 状態乖離 DRIFT とは観点として分離） |
 
 各カテゴリの検出シグナル、シグナル閾値、判定ルールの詳細はルーティング先の専門 skill が所有する。
 本スキルは「どのカテゴリを横断的にスキャンするか」「どの専門 skill へルーティングするか」のみを定義する。
@@ -128,7 +130,7 @@ LLM っぽい表現、空虚な形容/動詞、英語混じり表現、実行主
 
 draft Design のうち、実装・検証との整合を評価できる段階に達したにもかかわらず状態評価されないままのものを検出する。
 単なる draft Design の存在は異常とみなさない。
-本観点は正規の観点レジストリの登録対象であり、正規レジストリ実体が確定するまでの現行配置は本カテゴリ定義とする（観点レジストリの schema と配置先の正は `agentdev-doc-diagnostics` Design「観点レジストリ」節、extension 経由で参照）。
+本観点は正規の観点レジストリへ登録済みであり、レジストリの schema と配置先の正は `agentdev-doc-diagnostics` Design「観点レジストリ」節、extension 経由で参照。
 
 ### 判定基準
 
@@ -156,6 +158,38 @@ draft Design のうち、実装・検証との整合を評価できる段階に�
 検出は DRIFT カテゴリの finding として報告し、推奨アクションは case-close の Design 状態評価（棚卸し制）への差し戻しを提示する。
 finding には REQ ファイル単位近似である旨を明示し、見送り記録存在時は該当記録の文脈を添付する。
 診断は読み取りと報告のみとし、Design の status・frontmatter を直接変更しない。
+
+## Decision 状態乖離 DRIFT
+
+frontmatter `status: proposed` の Decision のうち、関連 REQ の実装 Case が進行しているにもかかわらず受理評価されないままのものを検出する。
+単なる proposed Decision の存在は異常とみなさない。
+本観点は正規の観点レジストリへ登録済みであり、レジストリの schema と配置先の正は `agentdev-doc-diagnostics` Design「観点レジストリ」節、extension 経由で参照。
+
+### 判定基準
+
+| 項目 | 内容 |
+|------|------|
+| 対象 | Decision ファイル群のうち frontmatter `status: proposed` の Decision |
+| 関連 REQ | 当該 Decision の frontmatter `related_reqs` 宣言（Decision 成果物のローカルメタデータ）が示す REQ。Case 特定の粒度は REQ ファイル単位の近似であり、finding に近似判定である旨を明示する。TIM の covers 関係、`agentdev-traceability` の API は使用しない |
+| Case 進行の取得源 | 関連 REQ の実装 Case が進行していること（完了 Case が存在する、またはオープンな実装 Case が存在する）の判定は、ローカル版ではローカルIssue共通スキーマに基づく永続ファイル（role: case、完了 Case は終端 `status: closed`。物理パスの正規記述は `agentdev-doc-diagnostics` Design「Decision 状態乖離 DRIFT 診断観点」節に正がある）、GitHub 版では Custom Tool 操作契約経由の読み取りとする。診断は読み取りと報告のみ |
+| 乖離条件 | 関連 REQ の実装 Case が進行しているにもかかわらず、受理評価されないまま frontmatter `status` が proposed ままであること |
+| 判定分離 | 単なる proposed の存在は指摘しない（新規作成直後で Case 未着手の Decision は指摘対象外）。経過時間を判定根拠に使わない。Design 状態乖離 DRIFT 診断とは観点として分離し、判定基準（対象成果物種別、対象 status、Case 状態条件）を混用しない |
+| baseline | 適用起点は本診断の実装以降に進行した Case とし、実装前の Case（移行期間中に開かれた Case を含む）に遡って適用しない |
+| 対象外 | frontmatter `status: accepted` の Decision、related_reqs に実装 Case 進行と紐づく REQ がない proposed Decision |
+
+### 横断スキャン観点
+
+- Decision ファイル群から frontmatter `status: proposed` の Decision を収集する（`accepted` 等、proposed 以外は対象外）
+- 各 proposed Decision の frontmatter `related_reqs` 宣言から関連 REQ を抽出する（TIM の covers 関係は使用しない）
+- 関連 REQ の実装 Case の進行状態を Case 進行の取得源から確認する（時間は参照しない）
+- 完了 Case またはオープンな実装 Case が存在する proposed Decision を DRIFT 候補として検出する
+
+### ルーティング先
+
+判定基準の原本は `agentdev-doc-diagnostics` Design「Decision 状態乖離 DRIFT 診断観点」節であり、本カテゴリは本スキルの docs 横断意味診断として直接判定する。
+検出は DRIFT カテゴリの finding として報告し、推奨アクションは case-open の Decision 状態評価への差し戻しを提示する。
+finding には REQ ファイル単位近似である旨を明示する。
+診断は読み取りと報告のみとし、Decision の status・frontmatter を直接変更しない。
 
 ## 配布物統合性
 
