@@ -13,6 +13,7 @@ inspect-docs command が実行する docs 横断診断のカテゴリ定義と�
 | REQ 粒度過小 | 1 REQ に複数関心、成果物種別、command family、lifecycle 段階が混在しているか | `agentdev-req-structure-diagnostics`（SPLIT 観点） |
 | 横断契約矛盾 | REQ/Decision/Design/guides 間で source-of-truth priority に基づく矛盾があるか | `agentdev-req-structure-diagnostics`（DRIFT 等）。表現揺れに起因する意味矛盾は本スキルの直接判定対象 |
 | 文意品質候補 | LLM っぽい表現、空虚語、英語混じり表現、実行主体分類の誤認が残存しているか | 文章表層は共通 textlint 基盤。実行主体分類の誤認は docs 配下が本スキルの意味診断、配布物は `agentdev-inspect-skills` |
+| Design 状態乖離 DRIFT | draft Design のうち、その `ADF-COVERS` の implementation 宣言がカバーする REQ の実装・検証 Case が完了済みであるにもかかわらず状態評価されないままのものがないか | 本スキル直接判定（判定基準の原本は `agentdev-doc-diagnostics` Design「Design 状態乖離 DRIFT 診断観点」節。時間ベースの draft 放置検出と判定基準を分離） |
 
 各カテゴリの検出シグナル、シグナル閾値、判定ルールの詳細はルーティング先の専門 skill が所有する。
 本スキルは「どのカテゴリを横断的にスキャンするか」「どの専門 skill へルーティングするか」のみを定義する。
@@ -122,6 +123,39 @@ LLM っぽい表現、空虚な形容/動詞、英語混じり表現、実行主
 文章表層品質（LLM 表現、空虚語、英語混じり表現）の検出と判定規則は共通 textlint 基盤（標準規則とプロジェクト用語 prh 辞書）が所有し、本スキルは判定辞書を保持しない。
 実行主体分類の誤認は、docs 配下の記述を本スキルの docs 横断意味診断（基準の原本は document-type-responsibilities Design「実行主体分類の査読基準」）で、配布物（Command/Skill 記述）を `agentdev-inspect-skills` の診断観点で扱う。
 本スキルは横断スキャンで候補を抽出し、振り分ける。
+
+## Design 状態乖離 DRIFT
+
+draft Design のうち、実装・検証との整合を評価できる段階に達したにもかかわらず状態評価されないままのものを検出する。
+単なる draft Design の存在は異常とみなさない。
+本観点は正規の観点レジストリの登録対象であり、正規レジストリ実体が確定するまでの現行配置は本カテゴリ定義とする（観点レジストリの schema と配置先の正は `agentdev-doc-diagnostics` Design「観点レジストリ」節、extension 経由で参照）。
+
+### 判定基準
+
+| 項目 | 内容 |
+|------|------|
+| 対象 | Design ファイル群のうち frontmatter `status: draft` の Design |
+| 対象要件 | 当該 Design の `ADF-COVERS` の implementation 宣言がカバーする REQ。Case 特定の粒度は REQ ファイル単位の近似を含み、行レベルの正規記録先が確定した場合は行レベル判定へ昇格する。REQ ファイル単位近似は同一 REQ ファイルの別行実装完了による誤報告性格を含むため、finding に近似判定である旨を明示する |
+| 評価可能段階の到達 | 対象 REQ を実装・検証した Case が完了済み（Issue クローズ済みまたは PR マージ済み）であること。Case 完了状態の取得源は、ローカル版では `.agentdev/issues/` の永続ファイル（role: case、終端 `status: closed`、ローカルIssue共通スキーマ Design 参照）、GitHub 版では Custom Tool 操作契約経由の読み取りとする。診断は読み取りと報告のみ |
+| 乖離条件 | 評価可能段階に達しているにもかかわらず frontmatter `status` が draft ままであること。対応記録コメント等に見送り記録（見送り理由・再評価契機）が存在する場合は乖離と判定せず、該当記録の文脈（再評価契機を含む）を finding へ添付する。この文脈提示が再評価契機の消費者契約となる |
+| 判定分離 | 単なる draft の存在は指摘しない。経過時間（frontmatter `updated` からの日数）を判定根拠に使わない。時間ベースの draft 放置検出と判定基準を分離し、同一判定を重複保持しない |
+| baseline | 適用起点は本診断の実装以降に完了した Case とし、実装前の歴史的完了 Case に遡って適用しない |
+| 対象外 | Decision の状態乖離（proposed Decision の受理評価漏れ）。frontmatter `status: accepted`、status なしの Design |
+
+### 横断スキャン観点
+
+- Design ファイル群から frontmatter `status: draft` の Design を収集する（`accepted`、status なしは対象外）
+- 各 draft Design の `ADF-COVERS` の implementation 宣言から対象 REQ を抽出する
+- 対象 REQ を実装・検証した Case の完了状態を Case 完了状態の取得源から確認する（時間は参照しない）
+- 対応記録コメント等の見送り記録（見送り理由・再評価契機）の有無を確認する
+- frontmatter `updated` からの経過日数は判定に使用しない（時間ベース放置検出との判定分離を保持する）
+
+### ルーティング先
+
+判定基準の原本は `agentdev-doc-diagnostics` Design「Design 状態乖離 DRIFT 診断観点」節であり、本カテゴリは本スキルの docs 横断意味診断として直接判定する。
+検出は DRIFT カテゴリの finding として報告し、推奨アクションは case-close の Design 状態評価（棚卸し制）への差し戻しを提示する。
+finding には REQ ファイル単位近似である旨を明示し、見送り記録存在時は該当記録の文脈を添付する。
+診断は読み取りと報告のみとし、Design の status・frontmatter を直接変更しない。
 
 ## 配布物統合性
 
