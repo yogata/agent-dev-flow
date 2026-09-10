@@ -2,7 +2,7 @@
 title: 文書フォーマット規約
 status: accepted
 created: 2026-08-20
-updated: 2026-09-07
+updated: 2026-09-10
 ---
 <!-- ADF-COVERS(implementation): REQ-001-008, REQ-001-010, REQ-001-011, REQ-001-012, REQ-001-013, REQ-001-014, REQ-001-015, REQ-001-016, REQ-001-030, REQ-001-046, REQ-001-047 -->
 
@@ -169,3 +169,31 @@ Issue/PR/コメント本文にリポジトリ内ファイル、ディレクト�
 - コードブロック内のパス参照
 - `http://` `https://` で始まる既存 URL
 - リポジトリ内 Markdown ファイル間の相対リンク
+
+## Decision frontmatter 関連REQ宣言（related_reqs）規約と承認記録形式
+
+### related_reqs フィールド
+
+- Decision frontmatter の標準フィールド related_reqs は REQ 識別子（REQ-{NNNN}）のリストとする
+- 関連 REQ が存在しない Decision は `related_reqs: []`（空宣言）として明示する。
+  未宣言（フィールド自体の欠落）は機械検出の対象であり、正規状態とは扱わない
+- 宣言は Decision 成果物のローカルメタデータであり、TIM の ADF-COVERS 宣言・covers 関係とは
+  独立に管理される。agentdev-traceability は本フィールドを消費しない
+- req-save が Decision 作成時に要件doc（draft-data）の関連情報から保存し、
+  既存 Decision への付与はバックフィル（一括付与）による
+- 本規約は patterns.md が Decision frontmatter 規約を持たない現状の解消を兼ねる
+  （共通文書モデル規約の正本としての配置。decision-lifecycle Design は意味境界・関係・粒度・
+  健全性に特化し、形式規約の正本とはしない）
+
+### 承認記録セクション形式（正規所有）
+
+- Decision の accepted 遷移には、本文末尾に「## 承認記録」セクションを追記する
+- 形式: 「YYYY-MM-DD に Decision ライフサイクルの確認手続きに従い承認した
+  （status: proposed → accepted）。{承認根拠}（REQ-001-021 との矛盾解消）。」
+- 承認根拠には、評価時点で照合した根拠（合意内容と現行 REQ・Design・実装の一致、
+  またはユーザー承認の旨）を記載する
+- 本形式は DEC-008 / DEC-015 / DEC-019〜027 / DEC-028 の昇格実績で採用された慣行の
+  正規化である。遷移の実行主体（case-open、確認手続きによる一括昇格）を問わず同一形式を用いる
+- 形式の正本は本 Design（patterns.md）、テンプレート実体は doc_decision.md、
+  存在確認・検証は agentdev-decision-file-manager、「明示承認記録が存在する」存在要件は
+  document-model.md（現状維持）が所有する

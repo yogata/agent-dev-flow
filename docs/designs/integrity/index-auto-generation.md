@@ -2,7 +2,7 @@
 title: 索引類自動生成 Design
 status: accepted
 created: 2026-07-19
-updated: 2026-08-22
+updated: 2026-09-10
 ---
 <!-- ADF-COVERS(implementation): REQ-001-026, REQ-001-028 -->
 <!-- ADF-COVERS(implementation): REQ-010-011 -->
@@ -199,6 +199,21 @@ backtick 文脈判定のような部分一致ロジックは併用しない。
 - **Decision README Decision Map**: 人手管理。各 Decision 本文の宣言から導出するが、導出規則が未確定のため。
 - **Decision README 関連 REQ 表**: 人手管理。各 Decision の関連宣言から導出するが、導出規則が未確定のため。
 - **docs/designs/README.md**: 人手管理または既存生成部分のみ AUTOGEN。status 列は AUTOGEN 可能だが、責務列等の混合領域が大半のため、現状では一部列のみ AUTOGEN または人手管理。
+
+## Decision 関連REQ表の自動生成
+
+- decisions/README.md の関連REQ表を AUTOGEN ブロック化し、Decision frontmatter の
+  related_reqs から生成する
+- 生成対象: 各 Decision の関連 REQ 列（既存の手動表の列構造を引き継ぐ）。
+  「説明」列は frontmatter から導出できない人手判断列として保持する混合領域構成とする
+  （生成処理は Decision/関連REQ 列のみ上書きし説明列を保存）
+- 整合検査: frontmatter と AUTOGEN ブロックの不一致、および未宣言 Decision
+  （related_reqs フィールド欠落）の検出を index 生成整合の機械検査へ組み込む
+- 管理区分の変更（人手管理領域からの移動）に伴い、本 Design の適用範囲の管理区分記述
+  （「現在人手管理される領域」等）、「自動生成の対象領域と生成元」表の関連REQ表行
+  （人手管理 → 自動生成/混合への区分変更）、「現在人手管理領域の4領域」節
+  （3領域への更新）を更新し、generate_indexes.ts への生成処理追加、IR-061 系整合検査の
+  拡張を同一 Case で実施する
 
 ## 関連情報
 

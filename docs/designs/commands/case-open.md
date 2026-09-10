@@ -2,7 +2,7 @@
 title: case-open Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-08"
+updated: "2026-09-10"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-014, REQ-021-024 -->
@@ -81,6 +81,49 @@ Epic + 子 Issue 一括作成に対応する。
   - draft / RU 削除残存検証（`git status --porcelain` で残存検出）
   - draft/RU 削除 commit 後の即時 push（REQ-003-003）（削除コミット後に `git push` を即時実行する）。case-run 引き継ぎ時の `git pull --ff-only` 失敗防止のため
   - 完了報告（Standard / 単一REQ Epic / マルチREQ Epic テンプレート）
+
+## Decision 状態評価（Issue 作成前工程）
+
+本工程は Standard flow、Epic flow、混在構成の全ルートで最初の GitHub Issue 作成前に実行する。
+Epic flow では Epic Issue 作成前に、構成確定後の全対象 REQ 群を評価対象とする。
+
+### 評価対象の特定
+
+1. 当該 Case の対象 REQ を特定する（Issue 構成の入力である要件doc / REQ ファイルから導出）
+2. 全 Decision の frontmatter related_reqs から、対象 REQ を含む宣言を持つ Decision を列挙する
+3. 列挙のうち frontmatter status が proposed のものを評価対象とする（accepted / superseded /
+   deprecated は対象外）。評価対象 0 件の場合は記録の上、既存フローを継続する
+4. 関連の特定は本手順（正規情報源）のみを用いる。宣言欠落・解釈不能な宣言に遭遇した場合は
+   意味推測で補完せず、フィールド整備（宣言付与）を促す停止理由として報告する
+
+本節の特定手順（手順1〜4）の結果は、EC-4（関連 Decision 拘束条件の特定と反映）および
+Standard flow の「関連Decision特定」で再利用し、重複特定を行わない。既存の特定記述が
+related_reqs 以外の方法（本文読解等の推測的導出）に依存する場合、本節の追加時に
+正規情報源へ寄せて書き換えることを確定事項とする。
+
+### 受理評価と遷移
+
+- 各評価対象について、req-define での合意内容（要件doc の Decision 判断記録）と現行の
+  REQ・Design・実装の状態を照合し、受理可否が一意に確定できるかを判定する
+- 一意確定できる場合: 既存ライフサイクル規則（proposed → accepted）に従って状態遷移し、
+  承認記録（patterns.md Design の正規形式）を追記する。遷移確認後に Case 作成を継続する
+- 一意に確定できない場合: ユーザー判断を求める（HITL）。受理不能または判断情報不足の場合は
+  proposed のまま Case を開始せず、停止理由を報告する
+- 再実行時: 既に accepted の Decision を評価対象から除外し、重複する遷移・承認記録を
+  生成しない
+
+本工程の HITL 分岐（一意確定不能時のユーザー判断、受理不能・情報不足時の開始阻止）は
+REQ-003-055 共通原則および workflow-contracts Design の HITL 移送条件一覧に従う。
+case-open Design の「承認・HITL 境界」セクションへ本判断点を追記する
+（入力要件doc への新たな承認点を追加するものではない旨を明示する）。
+
+### Design 正規列挙セクションへの反映
+
+本節の追加に伴い、case-open Design の「副作用」セクションへ Decision ファイル更新
+（frontmatter status 変更、承認記録セクション追記。git commit/push は既存の並列実行安全
+ステージング規律・明示パス指定に従う）を、「停止状態」セクションへ本工程由来の停止条件
+（受理不能・判断情報不足・関連取得不能・宣言欠落・解釈不能宣言）の列挙追加を、
+それぞれ明記する。
 
 ## 所有関係と委譲
 

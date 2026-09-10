@@ -9,6 +9,8 @@ source_rus: [RU-0001]
 # draft-data
 
 ```yaml
+design_actions_consumed: true
+
 work_type: feature
 
 scale: standard

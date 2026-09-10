@@ -2,7 +2,7 @@
 title: `agentdev-decision-file-manager` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-07-27
+updated: 2026-09-10
 ---
 <!-- ADF-COVERS(implementation): REQ-001-056, REQ-001-057, REQ-001-058, REQ-001-059, REQ-001-060, REQ-004-044, REQ-004-045 -->
 
@@ -79,6 +79,18 @@ accepted Decision へ直接編集を実施する場合、次のチェックリ�
 4. 意味を変えない表記統一
 5. 決定内容でも制約でもない移行時ラベルの除去
 6. 履歴注記、関連リンク、日付などの補助情報修正
+
+## related_reqs フィールド管理
+
+- CREATE 時: req-save が要件doc（draft-data）の Decision 対象操作から関連 REQ の初期値を
+  決定的に取得する規約に基づき保存する（取得元の draft-data 内構造は patterns.md
+  （ACT-DESIGN-001）で確定する。draft-data schema の拡張要否は REQ-008・DEC-003 の管轄との
+  整合で design-save 時に確定する）
+- UPDATE 時: 関連 REQ の変更（要件再構成、Decision の置換・再確認）をフィールド更新として
+  扱う。status 遷移とは独立に更新できる
+- 検証: REQ 識別子形式（REQ-{NNNN}）、空宣言と未宣言の区別、実在 REQ の指先確認
+- 承認記録: accepted 遷移時の「## 承認記録」セクション形式（日付・遷移・理由）の追記を
+  UPDATE 操作の標準手順に含める（形式の正規所有は patterns.md Design）
 
 ## See Also
 

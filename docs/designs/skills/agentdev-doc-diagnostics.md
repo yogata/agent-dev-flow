@@ -127,6 +127,29 @@ docs 横断診断は本 skill が正規の所有者となる（REQ-036-013 の d
 - Decision の状態乖離（proposed Decision の受理評価漏れ）は本観点の対象外とし、
   Decision と REQ の関係を正規情報から一意に取得できる情報源の確定後に別要件として追加する
 
+## Decision 状態乖離 DRIFT 診断観点
+
+### 判定基準
+
+- 対象: frontmatter status が proposed の Decision
+- 乖離条件: 関連REQ宣言（related_reqs）に含まれる REQ の実装 Case が進行している
+  （完了 Case が存在する、またはオープンな実装 Case が存在する）にもかかわらず、
+  受理評価されないまま proposed であること
+- Case 進行の判定は、ローカル版では .agentdev/issues/ の永続ファイル、GitHub 版では
+  Tool 操作契約経由の読み取りによる（診断は読み取りと報告のみ）
+- 単なる proposed の存在は指摘しない（新規作成直後で Case 未着手の Decision は指摘対象外）
+- 適用起点は本診断の実装以降に進行した Case を対象とし、実装前の Case（移行期間中に
+  開かれた Case を含む）へ遡って適用しない（baseline 注記）
+- Design 状態乖離 DRIFT（前 draft で追加）とは観点として分離し、判定基準を混用しない
+
+### 出力と副作用
+
+- 検出は DRIFT カテゴリの finding として報告し、推奨アクションは case-open の
+  Decision 状態評価への差し戻しを提示する。finding には REQ ファイル単位の近似判定で
+  ある旨を明示する
+- 診断は Design の status と同様に Decision の status・frontmatter を直接変更しない
+- 本観点は観点レジストリ（REQ-036-024 の正規実体）へ登録する
+
 ## See Also
 
 - [agentdev-req-structure-diagnostics.md](agentdev-req-structure-diagnostics.md)（REQ 固有診断 skill）
