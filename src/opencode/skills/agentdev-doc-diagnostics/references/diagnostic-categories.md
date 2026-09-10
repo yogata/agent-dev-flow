@@ -136,7 +136,7 @@ draft Design のうち、実装・検証との整合を評価できる段階に�
 |------|------|
 | 対象 | Design ファイル群のうち frontmatter `status: draft` の Design |
 | 対象要件 | 当該 Design の `ADF-COVERS` の implementation 宣言がカバーする REQ。Case 特定の粒度は REQ ファイル単位の近似を含み、行レベルの正規記録先が確定した場合は行レベル判定へ昇格する。REQ ファイル単位近似は同一 REQ ファイルの別行実装完了による誤報告性格を含むため、finding に近似判定である旨を明示する |
-| 評価可能段階の到達 | 対象 REQ を実装・検証した Case が完了済み（Issue クローズ済みまたは PR マージ済み）であること。Case 完了状態の取得源は、ローカル版では `.agentdev/issues/` の永続ファイル（role: case、終端 `status: closed`、ローカルIssue共通スキーマ Design 参照）、GitHub 版では Custom Tool 操作契約経由の読み取りとする。診断は読み取りと報告のみ |
+| 評価可能段階の到達 | 対象 REQ を実装・検証した Case が完了済み（Issue クローズ済みまたは PR マージ済み）であること。Case 完了状態の取得源は、ローカル版ではローカルIssue共通スキーマに基づく永続ファイル（role: case、終端 `status: closed`。物理パスの正規記述は `agentdev-doc-diagnostics` Design「Design 状態乖離 DRIFT 診断観点」節に正がある）、GitHub 版では Custom Tool 操作契約経由の読み取りとする。診断は読み取りと報告のみ |
 | 乖離条件 | 評価可能段階に達しているにもかかわらず frontmatter `status` が draft ままであること。対応記録コメント等に見送り記録（見送り理由・再評価契機）が存在する場合は乖離と判定せず、該当記録の文脈（再評価契機を含む）を finding へ添付する。この文脈提示が再評価契機の消費者契約となる |
 | 判定分離 | 単なる draft の存在は指摘しない。経過時間（frontmatter `updated` からの日数）を判定根拠に使わない。時間ベースの draft 放置検出と判定基準を分離し、同一判定を重複保持しない |
 | baseline | 適用起点は本診断の実装以降に完了した Case とし、実装前の歴史的完了 Case に遡って適用しない |
