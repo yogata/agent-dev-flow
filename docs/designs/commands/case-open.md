@@ -23,6 +23,7 @@ Epic + 子 Issue 一括作成に対応する。
 
 - case-open 自身の承認点を持たない（req-define で壁打ち合意済みの要件 doc を入力とし、Issue 作成を自動実行する）。
 - OU 選択ゲートで処理対象 OU を決定できない場合（OU ID 指定 / 自動選択 / 一覧表示停止のいずれにも該当しないとき）は、一覧を表示してユーザー判断を求める。
+- Decision 状態評価（Issue 作成前工程）で受理可否が一意に確定できない Decision は、ユーザー判断を求める（HITL）。本判断点は入力要件doc への新たな承認点を追加するものではなく、Decision ライフサイクル（proposed → accepted）の受理評価に限定される。受理不能または判断情報不足の場合は proposed のまま Case を開始せず、停止理由を報告する（REQ-003-055 共通原則）。
 
 ## 入力
 
@@ -42,6 +43,7 @@ Epic + 子 Issue 一括作成に対応する。
 ## 副作用
 
 - ファイル削除: `.agentdev/drafts/req-draft-*.md`, `.agentdev/backlog/req-units/RU-*.md`（Standard / Epic 全フロー共通、v2:REQ-0137-003/006 Form Zero）
+- Decision ファイル更新: 関連 proposed Decision の受理評価結果に基づく frontmatter `status` 変更（proposed → accepted）と本文末尾「## 承認記録」セクション追記（patterns.md Design 正規形式）。git commit/push は既存の並列実行安全ステージング規律・明示パス指定に従う
 - git 操作: `git rm <path>` + `git commit -- <paths>` の即時ステージ、コミット（並列実行安全ステージング）
 - GitHub I/O: Issue 作成、Issue 本文更新、コメント追加（Custom Tool `agentdev_gh` 操作契約。Tool 内 VERIFY 付き）
 - deviation capture: case-open 実行中に実観測した deviation を agentdev-learning-capture skill または
@@ -62,6 +64,7 @@ Epic + 子 Issue 一括作成に対応する。
 - マルチREQ入力判定（単一REQ / 複数REQ or `scale: large` で Epic flow へ分岐）
   - 自律構成生成（OU モード、複数REQ時）（`operation_units` から Epic / Wave / Issue 構造を自律生成）
 - 規模判定（単一REQの場合）（`scale: large` → Epic flow / `scale: standard` → Standard flow）
+- Decision 状態評価（Standard flow、Epic flow、混在構成の全ルートで最初の GitHub Issue 作成前に実行。「Decision 状態評価（Issue 作成前工程）」セクション参照）
 - Epic flow:
   - テンプレート読込（`agentdev-workflow-templates`）
   - Epic Issue本文生成（自律構成分析結果に基づき Epic 本文を構築）
@@ -70,7 +73,7 @@ Epic + 子 Issue 一括作成に対応する。
   - Epic Issue本文更新（ステータス追跡テーブル更新）
   - OU `result` 書き戻し（Issue / Epic 番号）
 - Standard flow:
-  - 関連Decision特定
+  - 関連Decision特定（Decision 状態評価の特定結果を再利用、重複特定しない）
   - ラベル付与（`agentdev-workflow-lifecycle`）
   - GitHub Issue作成（VERIFY）
   - OU `result` 書き戻し（Issue 番号）
@@ -410,6 +413,7 @@ case-open Design 内の REQ-006-089、REQ-006-093 参照行と正規定義（REQ
 - preflight 検証失敗時（Issue 作成呼び出しを実行せず停止する、REQ-006-028）。
 - review_dispositions の evidence 失効検出時（Issue 作成を中止する。`covered` のまま失効した disposition は再利用しない）。
 - adversarial-review 審議で unresolved なユーザー判断事項が残る場合（最初の GitHub Issue 作成へ進まない）。
+- Decision 状態評価由来の停止条件: 受理不能、判断情報不足、関連取得不能、Decision の related_reqs 宣言欠落、解釈不能な related_reqs 宣言（いずれも proposed のまま Case を開始せず停止理由を報告する。宣言欠落・解釈不能宣言の場合はフィールド整備（宣言付与）を促す報告とする）。
 
 ## See Also
 
