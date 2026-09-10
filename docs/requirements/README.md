@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下47件を第一参照先とする。
+現在の要件判断では、以下48件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -59,6 +59,7 @@
 | [REQ-056](REQ-056.md) | Project Knowledge の所有と workflow 利用 |
 | [REQ-057](REQ-057.md) | docs corpus 整合・現行化バッチ |
 | [REQ-058](REQ-058.md) | ADF 管理投影物の廃止時クリーンアップ契約 |
+| [REQ-059](REQ-059.md) | Decision と REQ の関連宣言管理 |
 <!-- AUTOGEN:END -->
 
 ## 廃止済み要件
