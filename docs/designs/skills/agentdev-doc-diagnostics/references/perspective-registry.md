@@ -17,8 +17,8 @@ updated: 2026-09-10
 
 | 観点ID | 診断カテゴリ | 適用文書種別 | 正規所有者 skill | 詳細参照 |
 |---|---|---|---|---|
-| design-status-drift | DRIFT | Design | `agentdev-doc-diagnostics` | `agentdev-doc-diagnostics` Design「Design 状態乖離 DRIFT 診断観点」節（判定基準の原本）、[diagnostic-categories.md](../../../../src/opencode/skills/agentdev-doc-diagnostics/references/diagnostic-categories.md)「Design 状態乖離 DRIFT」節 |
-| decision-status-drift | DRIFT | Decision | `agentdev-doc-diagnostics` | `agentdev-doc-diagnostics` Design「Decision 状態乖離 DRIFT 診断観点」節（判定基準の原本）、[diagnostic-categories.md](../../../../src/opencode/skills/agentdev-doc-diagnostics/references/diagnostic-categories.md)「Decision 状態乖離 DRIFT」節 |
+| design-status-drift | DRIFT | Design | `agentdev-doc-diagnostics` | `agentdev-doc-diagnostics` Design「Design 状態乖離 DRIFT 診断観点」節（判定基準の原本）、[diagnostic-categories.md](../../../../../src/opencode/skills/agentdev-doc-diagnostics/references/diagnostic-categories.md)「Design 状態乖離 DRIFT」節 |
+| decision-status-drift | DRIFT | Decision | `agentdev-doc-diagnostics` | `agentdev-doc-diagnostics` Design「Decision 状態乖離 DRIFT 診断観点」節（判定基準の原本）、[diagnostic-categories.md](../../../../../src/opencode/skills/agentdev-doc-diagnostics/references/diagnostic-categories.md)「Decision 状態乖離 DRIFT」節 |
 
 ## 運用
 
