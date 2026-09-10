@@ -47,7 +47,7 @@ cleanup モデルと処置契約の SSoT は document-model Design であり、�
 
 | ファイル | 内容 |
 |----------|------|
-| `references/diagnostic-categories.md` | docs 横断診断カテゴリ（廃止 REQ/Design 由来記述残置、REQ/Design 境界違反、REQ 粒度過小、横断契約矛盾、文意品質候補、Design 状態乖離 DRIFT、探索順と索引の不整合、配布物統合性）の定義、横断スキャン観点、ルーティング先、安定契約例外候補の抽出方針。Design 状態乖離 DRIFT は、ADF-COVERS 対象 REQ と完了 Case の組合せによる判定基準、時間ベースの draft 放置検出との判定分離、read-only 契約を含む。配布物統合性には docs-spec-rebuild-integrity Design が定義する構文健全性5パターン（frontmatter 重複、見出し重複、Markdown 構文破損、存在しない command 参照、エンコーディング不整合）、文意保持、責務整合を含む |
+| `references/diagnostic-categories.md` | docs 横断診断カテゴリ（廃止 REQ/Design 由来記述残置、REQ/Design 境界違反、REQ 粒度過小、横断契約矛盾、文意品質候補、Design 状態乖離 DRIFT、Decision 状態乖離 DRIFT、探索順と索引の不整合、配布物統合性）の定義、横断スキャン観点、ルーティング先、安定契約例外候補の抽出方針。Design 状態乖離 DRIFT は、ADF-COVERS 対象 REQ と完了 Case の組合せによる判定基準、時間ベースの draft 放置検出との判定分離、read-only 契約を含む。Decision 状態乖離 DRIFT は、related_reqs 宣言と Case 進行状態の組合せによる判定基準、単なる proposed の非指摘、REQ ファイル単位近似の明示、Design 状態乖離 DRIFT との観点分離、read-only 契約を含む。配布物統合性には docs-spec-rebuild-integrity Design が定義する構文健全性5パターン（frontmatter 重複、見出し重複、Markdown 構文破損、存在しない command 参照、エンコーディング不整合）、文意保持、責務整合を含む |
 | `references/finding-output-contract.md` | 共通証拠構造（finding schema フィールド）、severity 分類、信頼度、出力ファイル契約（`.agentdev/inspect/inbox/`）、NG 分類、source-of-truth priority、許可される副作用 |
 | `references/diagnostic-routing.md` | 文書種別別診断へのルーティング表（REQ 固有、文章表層の共通基盤委譲、配布物整合性、Design 三層構造）、専門 skill 委譲規則、委譲時の入力引き渡し契約、責務重複なしの保証（AC-{NNN}） |
 

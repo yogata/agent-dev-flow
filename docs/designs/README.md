@@ -121,7 +121,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [skills/agentdev-workflow-lifecycle.md](skills/agentdev-workflow-lifecycle.md) | accepted | 中核 | ワークフロー lifecycle |
 | [skills/agentdev-workflow-templates.md](skills/agentdev-workflow-templates.md) | accepted | 中核 | ワークフロー templates |
 | [skills/agentdev-design-file-manager.md](skills/agentdev-design-file-manager.md) | accepted | 中核 | Design ファイル管理（作成、更新、配置判断、target_area、Design 固有整合性、Design 固有 script 呼出契約） |
-| [skills/agentdev-doc-diagnostics.md](skills/agentdev-doc-diagnostics.md) | accepted | 中核 | docs 横断診断カテゴリ、共通証拠構造、finding 出力契約、文書種別別診断へのルーティング |
+| [skills/agentdev-doc-diagnostics.md](skills/agentdev-doc-diagnostics.md) | accepted | 中核 | docs 横断診断カテゴリ、共通証拠構造、finding 出力契約、文書種別別診断へのルーティング。観点レジストリの正規実体は references/perspective-registry.md |
 | [skills/agentdev-artifact-validation.md](skills/agentdev-artifact-validation.md) | accepted | 中核 | 文書種別横断の決定的検証 script と共有 lib の所有、公開検証契約、JSON 結果契約 |
 | [skills/agentdev-case-run-execution-adapter.md](skills/agentdev-case-run-execution-adapter.md) | accepted | 補助 | case-run 外部実行 adapter |
 | [skills/agentdev-issue-management.md](skills/agentdev-issue-management.md) | accepted | 補助 | Issue 管理 |
