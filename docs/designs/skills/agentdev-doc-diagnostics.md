@@ -8,6 +8,7 @@ updated: 2026-09-10
 <!-- ADF-COVERS(implementation): REQ-021-021 -->
 <!-- ADF-COVERS(verification): REQ-001-020 -->
 <!-- ADF-COVERS(implementation): REQ-036-003, REQ-036-005, REQ-036-011, REQ-036-023, REQ-036-024 -->
+<!-- ADF-COVERS(implementation): REQ-036-025 -->
 
 # agentdev-doc-diagnostics Design
 
@@ -95,6 +96,36 @@ docs 横断診断は本 skill が正規の所有者となる（REQ-036-013 の d
 - 文書種別別診断へのルーティング精度
 - 読み取り専用制約の遵守（許可副作用は `.agentdev/inspect/inbox/*.md` 生成と git 永続化のみ）
 - 既存専門診断 skill との責務重複なし
+
+## Design 状態乖離 DRIFT 診断観点
+
+### 判定基準
+
+- 対象要件: draft Design の ADF-COVERS(implementation) 宣言がカバーする REQ
+  （Case 特定の粒度は REQ ファイル単位の近似を含む。行レベルの正規記録先が確定した場合は
+  行レベル判定へ昇格する。REQ ファイル単位近似は、同一 REQ ファイルの別行実装完了による
+  誤報告性格を含むため、finding に近似判定である旨を明示する）（adversarial-review F7）
+- 評価可能段階の到達: 当該 REQ を実装・検証した Case が完了済み（Issue クローズ済みまたは
+  PR マージ済み）であること。Case 完了状態の取得源は、ローカル版では .agentdev/issues/ の
+  永続ファイル、GitHub 版では Custom Tool 操作契約経由の読み取りとする（診断は読み取りと
+  報告のみ）（adversarial-review F7）
+- 乖離条件: 評価可能段階に達しているにもかかわらず当該 Design の frontmatter status が
+  draft ままであること。ただし対応記録コメント等に見送り記録（見送り理由・再評価契機）が
+  存在する場合は乖離と判定せず、該当記録の文脈（再評価契機を含む）を finding へ添付する
+  （adversarial-review F7。この文脈提示が再評価契機の消費者契約となる）
+- 単なる draft の存在は指摘しない。経過時間（frontmatter updated からの日数）を判定根拠に使わない
+  （IR-054 の時間ベース放置検出と判定基準を分離する）
+- 適用起点は本診断の実装以降に完了した Case を対象とし、実装前の歴史的完了 Case に遡って
+  適用しない（baseline 注記、adversarial-review F7(d) 推奨）
+
+### 出力と副作用
+
+- 検出は DRIFT カテゴリの finding として報告し、推奨アクションは case-close の Design 状態評価
+  （棚卸し制）への差し戻しを提示する
+- 診断は読み取りと報告のみとし、Design の status・frontmatter を直接変更しない
+- 本観点は観点レジストリ（REQ-036-024 の正規実体）へ登録する
+- Decision の状態乖離（proposed Decision の受理評価漏れ）は本観点の対象外とし、
+  Decision と REQ の関係を正規情報から一意に取得できる情報源の確定後に別要件として追加する
 
 ## See Also
 

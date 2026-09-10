@@ -2,7 +2,7 @@
 title: case-close Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-08
+updated: 2026-09-10
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-018, REQ-021-019, REQ-021-022, REQ-021-025 -->
@@ -10,6 +10,7 @@ updated: 2026-09-08
 <!-- ADF-COVERS(implementation): REQ-035-001, REQ-035-003, REQ-035-009, REQ-035-010 -->
 <!-- ADF-COVERS(implementation): REQ-057-004 -->
 <!-- ADF-COVERS(implementation): REQ-003-015, REQ-003-016, REQ-003-019, REQ-003-026, REQ-006-105, REQ-032-001, REQ-032-002, REQ-032-003, REQ-032-004, REQ-032-005, REQ-032-007, REQ-032-008, REQ-032-010, REQ-032-012, REQ-032-013, REQ-032-014, REQ-032-015, REQ-032-016, REQ-032-017, REQ-032-018, REQ-032-019, REQ-032-020, REQ-032-021 -->
+<!-- ADF-COVERS(implementation): REQ-032-024, REQ-032-025, REQ-032-026 -->
 
 # case-close Design
 
@@ -226,6 +227,53 @@ JSON 出力は `workflow`、`files_checked`、`coupled_files_checked`、`failure
 - squash merge のコンフリクトが rebase で解消不能な場合（実装変更を伴う解消は行わず、case-auto レベル判断へエスカレーションして停止）。
 - 最終 Wave で完了条件が残る場合（Epic クローズせずエラー停止、残 Wave 通知へ整理）。
 - worktree、ブランチ削除のリトライ上限超過時（`prune` と復元を実施し、削除失敗を報告して停止）。
+
+## Design 状態評価の棚卸し制（STEP-3 拡張）
+
+本節の追加に伴い、既存の申告制記述（docs-and-design-promotion.md STEP-3-2 の
+「セクション不存在・空の場合はスキップ」、case-close Design の Design 確定フロー欄の
+PR 本文読取記述、design-lifecycle-application.md の旧昇格条件文言「実装が Design 内容を
+検証済み」）は本契約へ書き換える（adversarial-review F3）。
+
+### 棚卸し列挙手順
+
+1. 当該 Case の対象 REQ を特定する（Issue 本文の REQ 参照から導出。行レベルの導出は
+   現行の正規記録先に存在しないため、REQ ファイル単位の近似列挙を許容する。
+   行レベルの正規記録先が確定した場合は行レベル判定へ昇格する）（adversarial-review F2）
+2. docs/designs/** の正規成果物から、当該 REQ を ADF-COVERS(implementation) 宣言でカバーし
+   frontmatter status が draft の Design を逆算列挙する（projection 配下は対象外）
+3. PR 本文「Design 確定候補」セクションの申告候補を列挙結果へ統合する（重複は 1 件にまとめ、
+   二重処理しない）。申告は補助入力であり、申告の不在を理由に棚卸しを省略しない
+4. 列挙結果が 0 件の場合は 0 件確認を記録して Design 状態評価を正常完了する
+
+列挙の限界: 列挙は ADF-COVERS 宣言に基づく近似であり、宣言を持たない draft Design は
+漏れ得る（宣言付与は REQ-057-023 の段階的付与契約に従い、棚卸しが宣言を要求しない）。
+漏れの補完経路は PR 申告の補助入力、inspect-docs の Design DRIFT 診断、宣言付与慣行の
+継続である。本棚卸しに完全性保証を持たせない（adversarial-review F1）。
+
+### 評価と記録
+
+- 各候補について、当該 Case の実装・検証結果と Design の現在構造との整合を確認し、
+  昇格（draft → accepted、designs/README.md status 列の同時更新）または見送りを確定する。
+  整合確認の証拠は STEP-3-1（docs 検証・局所確認）の「Design 本文と実装の最終矛盾確認」
+  結果に基づき、根拠を対応記録コメントへ残す（adversarial-review F3）
+- 見送り時は見送り理由と再評価契機を対応記録コメントの検証差分へ記録し、Design ファイル本体へ
+  最小限の経緯記録を追記する。新規の一時成果物種別・新規ドメイン状態は作らない。
+  Design 本体への追記はライフサイクル経緯の最小記録であり、REQ-057-015 が禁止する
+  設計内容としての未確定事項・将来計画・判断宣告ではない（整合条項、adversarial-review F6）
+- 見送り（評価実施・確定不可）と未評価（評価未実施）を区別して記録する
+
+### 完了ゲートと適用範囲
+
+- 全候補が昇格または見送りのいずれかの評価結果を持つことを case-close 完了条件へ含める。
+  評価結果のない候補が残る場合、単一 Issue ルート（STEP-3）と Epic Wave ルート（E4）の
+  両方で完了扱いにしない
+- Epic Wave ルートでは、各子 Issue の棚卸し列挙を Wave 内で集約し、同一 draft Design の
+  評価は直列集約段で一元実行する（子 Issue 並列評価による二重評価・競合評価
+  〔片昇格と片見送りの混在〕・見送り記録の二重生成を防止する）
+  （adversarial-review F4）
+- 再実行時は accepted 済み Design を評価対象から除外し、同一 Case 再実行では既存の
+  見送り記録を評価結果として認定して重複する記録を生成しない（adversarial-review F5）
 
 ## See Also
 
