@@ -76,6 +76,7 @@ artifact-quality-control-routing Design の合成規則に従い変更予定成�
 #### 関連 ADR 拘束条件の特定と反映
 
 Issue の実装を拘束する関連 Decision を特定し、必要な制約を完了条件または test strategy へ反映する。
+特定は STEP-5 の Decision 状態評価（issue-creation-flows.md STEP-5-0「評価対象の特定」）で実施する特定手順（Decision frontmatter `related_reqs` による正規情報源特定）の結果を再利用し、重複特定を行わない。
 
 #### 予定変更内容から事前判定可能な追加検証条件の展開
 
