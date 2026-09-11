@@ -2,7 +2,7 @@
 title: case-close Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-10
+updated: 2026-09-11
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-018, REQ-021-019, REQ-021-022, REQ-021-025 -->
@@ -147,6 +147,7 @@ Epic Issue 本文の `## 完了条件` セクションを読み込み、全完�
 ### full integrity suite 実行と tmp 残存確認
 
 - full integrity suite 実行（QG-4 合格基準）: bun test 実行形態は 3 cwd 分割正規形に従う（① integrity suite、② src 側 skill script テスト、③ repo ルート系 guard テストの3分割。各実行の cwd はリポジトリルートに統一、`./` prefix 付きの対象ディレクトリ明示指定、分割② 前の依存パッケージ前置、N/M 件数突合、固定値の期待値化なし、カレントディレクトリトリビアな実行の禁止）。実行形態契約の正は agentdev-quality-gates Design「full integrity suite 合格基準（QG-4）における bun test 実行形態契約」と同スキル references/qg-4-final-acceptance.md が所有する
+- 配布物変更を含む case の3検査結果確認: case-close の最終 gate で配布物変更を含む case を検証する場合、配布依存境界・IR-055・traceability の3検査の実行結果（case-run での commit 前実行記録）を確認する。case-run で3検査が実行されていない配布物変更を検出した場合は、検査を実行して新規違反 0 件を確認してからマージに進む。base 既知違反と新規違反の分離突合を省略せず、baseline 既知違反の無断削除・隠蔽を受け入れない
 - tmp 残存確認: 単一 Issue ルートの正常終了を前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないことをクリーンアップ工程で確認する。Epic Wave ルートでは、当該 Wave スコープの一時成果物（draft、RU、検出事項等の未消化ドメイン状態）の残留と `.agentdev/tmp/` 一時ファイルの残存がないことを確認し、残留時は当該 Wave を完了扱いにしない
 
 ## 所有関係と委譲
