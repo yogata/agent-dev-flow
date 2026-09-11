@@ -6,12 +6,19 @@
 // 4. 配布境界検査の検出パターン（大文字前置詞 + 数字の ID、docs パス、
 //    GitHub URL）が成果物に出現しないことを自己検証する
 //
+// バンドル後コードには焼き付き絶対パスの検出・無害化自己検査
+// （build/absolute-path-guard.ts、runtime-package-boundary.md 契約）を適用する。
+//
 // 依存は配布前に解決した成果物として供給する（導入系スクリプトはネットワーク取得を
 // 行わない）。node_modules を除外するアーカイブ経路でも本 bundle が同梱されるため、
 // 空キャッシュ・ネットワーク遮断下で追加操作なしに起動できる。
 
 import * as fs from "node:fs";
 import * as path from "node:path";
+import {
+  guardEmbeddedAbsolutePaths,
+  searchEmbeddedAbsolutePaths,
+} from "./absolute-path-guard.ts";
 
 const pluginDir = path.resolve(import.meta.dir, "..");
 const packageJsonPath = path.join(pluginDir, "package.json");
@@ -58,7 +65,33 @@ if (!build.success) {
 }
 const artifact = build.outputs.find((o) => o.kind === "entry-point");
 if (artifact === undefined) throw new Error("Bun.build produced no entry-point output");
-const code = (await artifact.text()).replace(/^\/\/ @bun\r?\n/, "");
+let code = (await artifact.text()).replace(/^\/\/ @bun\r?\n/, "");
+
+// kuromojin 既定 dicPath 用 require.resolve 等がビルド時の絶対パス（worktree パスを
+// 含む）として焼き付く既知現象への自己検査。buildRoot 配下のパスは相対パスへ無害化
+// してから出力し、無害化不能なパスが残る場合は build を fail させる（fail-closed）。
+const guard = guardEmbeddedAbsolutePaths(code, pluginDir);
+for (const s of guard.sanitized) {
+  console.log(`sanitized embedded absolute path -> ${s.to}`);
+}
+if (guard.unresolved.length > 0) {
+  for (const u of guard.unresolved) {
+    console.error(
+      `embedded absolute path cannot be sanitized (not under ${pluginDir}): ${u.decoded}`,
+    );
+  }
+  throw new Error(
+    `generated bundle embeds ${guard.unresolved.length} absolute path(s) that cannot be sanitized`,
+  );
+}
+code = guard.code;
+const residual = searchEmbeddedAbsolutePaths(code);
+if (residual.length > 0) {
+  for (const r of residual) {
+    console.error(`embedded absolute path remains after sanitization: ${r.decoded}`);
+  }
+  throw new Error("generated bundle still embeds absolute path(s) after sanitization");
+}
 
 // 3) base64 エンベロープの書き出し（UTF-8 no BOM / LF）
 fs.mkdirSync(outDir, { recursive: true });
