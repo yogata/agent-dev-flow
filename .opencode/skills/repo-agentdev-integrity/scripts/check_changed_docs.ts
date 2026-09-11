@@ -733,8 +733,11 @@ function isIndexChange(s: ChangeDescriptor): boolean {
 }
 
 // 監査・評価・観測記録は docs/reports/ へ分離済みのため Design 判定に例外は不要（Issue #2349）。
+// references 配下（docs/designs/**/references/**）は references 登録規約（独立行登録しない）の
+// 対象のため Design 判定対象外とする。正規 Design ファイル判定は不変（Issue #2783）。
 function isDesignFile(relPath: string, absPath: string): boolean {
   if (!/^docs\/designs\/.*\.md$/.test(relPath)) return false;
+  if (/^docs\/designs\/.+\/references\//.test(relPath)) return false;
   return true;
 }
 
