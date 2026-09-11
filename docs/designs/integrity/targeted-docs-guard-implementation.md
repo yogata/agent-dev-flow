@@ -2,7 +2,7 @@
 title: Targeted Docs Guard 実装詳細
 status: accepted
 created: 2026-07-15
-updated: 2026-09-09
+updated: 2026-09-11
 ---
 
 # Targeted Docs Guard 実装詳細
@@ -145,6 +145,12 @@ TargetedDocsReport 型契約の正本は [integrity-contracts.md](integrity-cont
 
 `files_checked` が空の場合、検査対象ファイルが検出されなかった旨の警告（warnings 配列）を出力するとともに、検査見逃しとして FAILURE に扱う（REQ-010-076、検証モード問わず）。
 空の理由（`--files` 指定の不備、`--base-ref` の実行タイミング違反（コミット前実行）、検査対象 root の誤解決、PR 変更ファイル取得の失敗、検査対象パスの誤り等）の確認を促す内容とする（Phase 3、REQ-010-012 連動）。
+
+<!-- ADF-COVERS(implementation): REQ-010-076 -->
+本 Design の check_changed_docs 実装詳細（files_checked が空の場合を検査見逃しとして扱い、
+確認なく合格扱いとしない。検証モード問わず）が REQ-010-076 を実装する。
+配布物のみの変更で実現された実装の ADF-COVERS 宣言は、docs 配下の正規成果物
+（該当実装を規定する Design）へ付与する。配布物本体への宣言付与は行わない。
 
 ## 検査失敗時の取り扱い
 

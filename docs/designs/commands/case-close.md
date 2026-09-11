@@ -193,6 +193,10 @@ changed-path routing と配布依存境界の検出経路は共有境界 adapter
 JSON 出力は `workflow`、`files_checked`、`coupled_files_checked`、`failures`、`warnings`、`doc_map_update_required`、`spec_readme_update_required`、`requirements_readme_update_required`、`full_docs_check_recommended` を含む。
 `failure` は `rule_id`、`severity`、`file`、`line`、`message`、`expected` を持つ。
 
+<!-- ADF-COVERS(implementation): REQ-032-023 -->
+本 Design の検査実行結果突合（files_checked が空または検査対象変更ファイルと不一致の場合を
+検査見逃しとして扱い、確認なく合格扱いとしない）が REQ-032-023 を実装する。
+
 ## 対象外
 
 - 未マージPRのクローズ

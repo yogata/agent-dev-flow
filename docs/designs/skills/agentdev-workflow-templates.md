@@ -2,7 +2,7 @@
 title: `agentdev-workflow-templates` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-08
+updated: 2026-09-11
 ---
 <!-- ADF-COVERS(implementation): REQ-007-002, REQ-007-003, REQ-007-005, REQ-017-003 -->
 <!-- ADF-COVERS(implementation): REQ-048-001, REQ-048-002, REQ-048-008, REQ-048-016, REQ-057-020 -->
@@ -222,6 +222,13 @@ references セクションに列挙された backlog 系テンプレート2フ�
 - 当該2ファイルの列挙を references セクションから削除する
 - カタログ Design としての整合性を列挙削除により確保する
 - 原本ドラフトが挙げていた L34-35 は references セクション内の列挙行の近似であり、実施時に正確な行を再特定する
+
+## 配布 template の運用手順（テンプレート作成・更新時の注意事項）
+
+配布 template（テンプレートファイル）本文に ADF-COVERS 宣言を付与しない。
+テンプレートを消費する実装の対応宣言は、親 SKILL.md（または該当実装を規定する docs 配下の
+正規成果物）へ集約する。テンプレート本文の宣言は配布物内部 ID 契約テスト違反
+（配布物本文の concrete ID 記載）を生むため禁止する。
 
 ## See Also
 

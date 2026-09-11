@@ -194,6 +194,11 @@ case-run プロファイル固有の追加ルールとして full_docs_check_rec
 - 検出結果（failures の strict severity）は PR 本文の `## Findings / Capture候補` セクションに `### docs-integrity` 小見出しで記録する
 - case-update へ連携し、Issue 本文の更新を委譲する（case-run 単独では Issue 本文を書き換えない、REQ-006-034 準拠）
 
+<!-- ADF-COVERS(implementation): REQ-031-025 -->
+<!-- ADF-COVERS(implementation): REQ-031-026 -->
+本 Design の docs 整合性検査手順（worktree に対する検査 skill 起点指定、コミット後 push 前限定の
+差分検出、コミット前の明示ファイル列挙）が REQ-031-025、REQ-031-026 を実装する。
+
 ## verification-only PR（実装差分なし、検証のみ）（v2:REQ-0158-002）
 
 case-run は実行担当サブエージェント委譲の結果、実装差分0件・検証のみで完了する PR（**verification-only PR**）を生成する場合がある。
