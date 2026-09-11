@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-002-013, REQ-002-014, REQ-002-015, REQ-002-018
+// ADF-COVERS(verification): REQ-002-013, REQ-002-014, REQ-002-015, REQ-002-018, REQ-050-016
 /**
  * Skill structure linter for AgentDevFlow.
  * Validates all skill directories under .opencode/skills/ for structural
