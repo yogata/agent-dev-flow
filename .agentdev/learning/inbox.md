@@ -40,3 +40,21 @@
 - **タグ**: #worktree #junction #検証実行
 
 ---
+
+## 2026-09-11: integrity scripts の CWD 起点実行で環境依存 fail が発生し正規実行点は repo root
+
+- **問題事象**: repo-agentdev-integrity の scripts dir を cwd とした `bun test` 実行で 8 fail / 4 errors が発生した。全件が環境依存（CWD 相対パス起因 4 fail、worktree の node_modules 欠落起因 4 errors）であり当該変更起因の違反は 0 件
+- **発生局面**: case 2768（textlint Design 2点補強検証）の case-run 委譲 DEL-2768-1 における full integrity suite 実行時
+- **検知方法**: integrity suite 初回実行の fail / error 検出と由来分類（CWD 相対パスは repo root を cwd とした単独再実行で 22 pass / 0 fail を確認して切り分け）
+- **根本原因**: integrity 系テストが repo root 相対パス（`path.join("src", ...)` 等）を読む前提に対し、実行 cwd の規定が実行者側で守られていなかった（scripts dir を cwd にした）
+- **自律対応内容**: repo root を cwd としたフル再実行で 2565 pass / 0 fail を確認。node_modules 欠落は当該 package dir（agentdev-project-extensions/scripts）で `bun install` を実行して解消（install 後の `git status --porcelain` は空を確認）
+- **ユーザー確認の有無**: なし（自律修正）
+- **Decision/REQ/spec影響**: なし（検証実行手順の注意）
+- **横展開観点**: repo root 相対パスを前提とする他の検査系スクリプト・テスト全般で同様に発生し得る。worktree で検証する場合の node_modules 有無も同時リスク
+- **再発条件**: repo root 以外（scripts dir 等）を cwd として integrity suite を実行した場合、または worktree で node_modules 未解決のまま suite を実行した場合
+- **予防策候補**: integrity suite の正規実行点（cwd = repo root）を実行形態契約として明文化し、worktree 実行時は事前に `bun install` を行う手順を添える
+- **想定反映先**: repo-agentdev-integrity skill の bun test 実行形態契約（references）または case-close workflow の full integrity suite 実行 reference（docs-and-design-promotion.md）
+- **関連**: case 2768（Issue 2768、verify-only closure のため PR なし）
+- **タグ**: #integrity #cwd依存 #bun-test #worktree
+
+---
