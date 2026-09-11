@@ -2,7 +2,7 @@
 title: 実行時パッケージ境界
 status: accepted
 created: 2026-08-20
-updated: 2026-09-09
+updated: 2026-09-11
 ---
 <!-- ADF-COVERS(implementation): REQ-002-007, REQ-002-008, REQ-002-011, REQ-002-019, REQ-002-020, REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-002, REQ-009-003, REQ-009-006, REQ-009-007, REQ-009-008, REQ-009-009, REQ-009-010, REQ-009-011, REQ-009-012, REQ-009-013, REQ-009-014, REQ-009-015, REQ-009-016, REQ-009-017, REQ-009-018, REQ-009-019, REQ-009-020, REQ-009-021, REQ-009-022, REQ-009-023, REQ-009-024, REQ-009-025, REQ-009-035, REQ-009-036, REQ-009-037, REQ-009-038, REQ-009-039, REQ-009-046, REQ-009-047, REQ-009-048, REQ-009-049 -->
@@ -89,6 +89,14 @@ scripts/ は skill junction の配下に位置し、skill の一部として配�
 ジャンクション対象は `agentdev-*` グロブで動的列挙（ハードコードなし）。
 
 - package rename（パッケージ名の変更）を行った場合は、bun install が bun.lock の root workspace name を自動同期しないため、bun.lock の name が新パッケージ名へ追従していることを確認する。bun install の実行面（依存前置）は worktree 運用参照（agentdev-git-worktree/references/worktree-operations.md）と相互参照する
+
+**vendored bundle 再生成時の焼き付き絶対パス自己検査**:
+
+vendored engine bundle（`src/opencode/plugins/agentdev-textlint-guard/vendor/textlint-engine.bundle.json`）の再生成手順では、build スクリプトに含まれる焼き付き絶対パスの検出・無害化自己検査を実行する。
+
+- 検出対象: kuromojin 既定 dicPath 用 `require.resolve` 由来の絶対パス等、ビルド環境由来の絶対パス（worktree パスを含む）
+- 挙動: 機械的に無害化可能な場合は無害化してから出力し、無害化できない場合は build を fail させる（焼き付きパスの混入を検知できることが目的。runtime は `KUROMOJIN_DIC_PATH` 固定経路で使用されるため実害はないが、検出手段がないとビルド時 worktree 削除後の `bun test` が環境依存 fail し、原因特定コストが残る）
+- 自己検査の運用知識は [Bun offline bundle の配置場所独立性（資産同梱・相対解決・生成条件）](../../knowledge/bun-offline-bundle-placement-independent-build.md) と相互参照する
 
 ### Consumer（AgentDevFlow 導入済み）
 
