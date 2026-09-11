@@ -112,6 +112,15 @@ Workflow Skill は単一 Issue 実行（single workflow）と Epic Wave 実行�
 新規違反は全件分類して修正し、再検証で新規違反 0 件を確認してから commit する（fix-and-reverify）。
 baseline 既知違反の無断削除・隠蔽を行わない。baseline エントリの除去は対応する残存箇所の実際の解消とセットでのみ行う。
 
+#### docs 変更を含む case での commit 前 full check_integrity 工程
+
+PR 対象ファイルに docs/** 変更を含む case では、commit 前に check_integrity を full 実行し、
+base 既知違反（baseline 既知 delta）と変更起因の新規違反を分離して新規違反 0 件を確認する（fix-and-reverify）。
+これにより integrity 由来の違反（reference-path-existence 等）の検出を case-run に前段化し、
+case-close 最終 gate（QG-4）での初検出・blocked を防ぐ。
+baseline 既知違反の無断削除・隠蔽を行わない（「配布物変更時の commit 前3検査工程」と同一の扱い）。
+targeted docs guard（PR 単位の targeted 検査）は維持する。
+
 ### Epic Wave 実行モード
 
 v2:ADR-0128 Decision #3 に基づく。
@@ -264,10 +273,11 @@ case-run の実行担当（委譲内サブエージェント）は、対象要�
 case-run が使用する検査ツール（[integrity-contracts.md](../integrity/integrity-contracts.md)「Workflow × 使用ツールマトリックス」参照）:
 
 - check_changed_docs.ts（--workflow case-run）: PR 対象ファイルに docs/** 変更を含む場合、委譲前に実行（[docs/** 変更時の targeted docs guard（REQ-006-035）](#docs-変更時の-targeted-docs-guardREQ-006-035) 参照）
+- check_integrity.ts（全体監査）: PR 対象ファイルに docs/** 変更を含む case では commit 前に full 実行し、base 既知違反と新規違反を分離して新規違反 0 件を確認する（「docs 変更を含む case での commit 前 full check_integrity 工程」参照）
 - check_extensions.ts（IR-056）: `src/opencode/commands/agentdev/**/*.md`, `src/opencode/skills/agentdev-*/SKILL.md`, `src/opencode/skills/agentdev-*/references/**/*.md`, `.agentdev/extensions/**` のいずれかを変更した場合に実行
 - test_strategy: Issue 完了条件検証（REQ-006-029/030）
 
-case-run は check_integrity.ts（全体監査）を使用しない（case-run は worktree で実行、PR 単位の targeted 検査が責務。全体監査は /repo/docs-check の責務）。
+case-run は check_integrity.ts（全体監査）を、docs 変更を含む case での commit 前検査として条件付きで使用する（base 既知違反と新規違反の分離、新規違反 0 件確認）。targeted docs guard（PR 単位の targeted 検査）は維持する。docs 変更を含まない case での全体監査は /repo/docs-check の責務である。
 
 ※上記は全て肯定表現である（REQ-010-002, REQ-010-003 準拠）。
 

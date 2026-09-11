@@ -2,7 +2,7 @@
 title: checker 実行契約と検出基盤規則
 status: accepted
 created: 2026-08-15
-updated: 2026-09-09
+updated: 2026-09-11
 ---
 <!-- ADF-COVERS(implementation): REQ-002-035 -->
 <!-- ADF-COVERS(implementation): REQ-010-062 -->
@@ -182,6 +182,19 @@ command/skill の記述品質を所有し、worktree 汎用手順は `agentdev-g
 両者の手順を本 Design に重複記載せず、checker の実行結果解釈に必要な範囲だけを参照する。
 
 - Bun ランタイム API（Bun.YAML 等）に依存する checker は bun 経由（`bun run`）で実行する。node の安定実行経路は Bun ランタイム API に依存しない checker に適用され、依存する checker には適用されない
+
+### worktree 環境での checker 実行 fallback（junction 未伝播時の SoT 直参照）
+
+worktree 環境で .opencode/skills/* junction を前提とする検査（docs/designs 側リンク検査、
+IR-062 reference-path-existence を含む）を実行する場合、junction 未伝播時には検査対象パスを
+source パス（SoT パス = 検査 root（--root 指定の対象 worktree）直下の src/opencode/ 配下。
+同一チェックアウト内）へ直参照 fallback して検査を実行する。
+メインリポジトリ作業コピー側の src/opencode へ解決することは誤解決（誤リポジトリ検査）として禁止する。
+
+- fallback 判定は junction（または投影ディレクトリ）の不在を検出した時点で行う
+- fallback で実行可能な検査は実行し、実行不能な既知 skip は環境差（REQ-018-004 の環境差扱い）として区別記録する
+- fallback を使用した検査では、実行環境（worktree / main、junction 伝播状態）を環境ラベルとして検証記録に明記する（REQ-018 の環境ラベル契約に従う）
+- 本 fallback は REQ-018「junction を前提とする構造系テストは source パス（SoT パス）への fallback で実行される」規約の checker への適用であり、worktree 作成工程（junction 自動化）を変更しない
 
 ## See Also
 
