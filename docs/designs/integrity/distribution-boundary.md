@@ -2,7 +2,7 @@
 title: "配布依存境界"
 status: accepted
 created: "2026-08-11"
-updated: "2026-09-07"
+updated: "2026-09-11"
 ---
 <!-- ADF-COVERS(implementation): REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-045 -->
@@ -35,6 +35,17 @@ distribution は consumer 環境へ配布されるテキスト成果物の集合
 境界は Markdown 本文に限定しない（REQ-029-002）。
 配布対象のテキスト成果物（command 定義、skill 定義、template、script ソース、附属するテキスト形式の設定や README）すべてへ適用する。
 テキストと判定可能な成果物とバイナリと判定される成果物を決定的に区別し、判定不能なエントリは unclassified として gate-not-passed 扱いとする。
+
+## 配布物本文の記述規則
+
+配布物（配布 command / skill / template / script）の本文・コメント・reference における
+内部参照の記述規則を以下のとおり明文化する。
+- 対応関係（REQ/Decision ID との対応）は ADF-COVERS 宣言行へ集約する。配布物本文に concrete ID を直接記載しない
+- 配布物本文は設計契約名、Design 節名、内容説明などの一般化表現で記述する
+- docs/ 内部パス参照（docs/designs/、docs/requirements/ 等のパス表記）を配布物へ残さない。
+  導入先で解決できない参照は「Design一覧」等の一般名詞表現へ置換する
+- 本規則は REQ-029（配布依存境界）および IR-055 の enforcement に接続し、
+  違反は配布依存境界検査・IR-055 検査で検出する
 
 ## 候補抽出から決定までのパイプライン
 
