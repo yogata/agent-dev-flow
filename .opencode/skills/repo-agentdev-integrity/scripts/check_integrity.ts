@@ -36,6 +36,7 @@ import {
   processResults,
   type CheckResult,
   type CheckResultOptions,
+  type IntegrityEnvironment,
   type IntegrityReport,
   type ScanSummary,
   type FindingCategory,
@@ -3701,8 +3702,16 @@ function resolveReferencePath(
   }
   const relSource = resolveRelative(sourceFilePath, root);
   const skillsPrefix = ".opencode/skills/";
-  if (relSource.startsWith(skillsPrefix)) {
-    const afterSkills = relSource.slice(skillsPrefix.length);
+  // REQ-018-001 worktree fallback: source files under src/opencode/skills/ (SoT)
+  // resolve skill-relative refs against the same skillsDir as projection files.
+  const srcSkillsPrefix = "src/opencode/skills/";
+  const sourcePrefix = relSource.startsWith(skillsPrefix)
+    ? skillsPrefix
+    : relSource.startsWith(srcSkillsPrefix)
+      ? srcSkillsPrefix
+      : null;
+  if (sourcePrefix) {
+    const afterSkills = relSource.slice(sourcePrefix.length);
     const slashIdx = afterSkills.indexOf("/");
     if (slashIdx >= 0) {
       const skillDir = afterSkills.slice(0, slashIdx);
@@ -5183,6 +5192,54 @@ function isInsideWorktree(root: string): boolean {
   } catch {
     return false;
   }
+}
+
+// REQ-018-001 / checker-execution-contracts.md「worktree 環境での checker 実行 fallback」:
+// worktree では .opencode/skills/* junction が未伝播のため投影側に配布スキルが不在
+// （repo-local skill のみ残存）。代表 skill（agentdev-workflow-templates、
+// skills_structure.test.ts と同一判定）の不在を junction（投影ディレクトリ）不在と
+// みなし、検査 root 直下の src/opencode/skills（同一チェックアウト内 SoT）へ解決する。
+// path.join(root, ...) 由来の置換のみのため、メインリポジトリ作業コピー側への解決
+// （誤リポジトリ検査・REQ-031-025）は構造的に発生しない。
+interface SkillsDirResolution {
+  /** 走査に使用する skills ディレクトリ（fallback 後） */
+  dir: string;
+  /** junction（投影ディレクトリ）が不在で src/opencode/skills へ fallback したか */
+  usedFallback: boolean;
+}
+
+function resolveSkillsDirWithFallback(root: string): SkillsDirResolution {
+  const projectionDir = path.join(root, ".opencode", "skills");
+  const representativeSkill = path.join(
+    projectionDir,
+    "agentdev-workflow-templates",
+  );
+  if (fs.existsSync(representativeSkill)) {
+    return { dir: projectionDir, usedFallback: false };
+  }
+  const sourceDir = path.join(root, "src", "opencode", "skills");
+  if (fs.existsSync(sourceDir)) {
+    return { dir: sourceDir, usedFallback: true };
+  }
+  return { dir: projectionDir, usedFallback: false };
+}
+
+function buildIntegrityEnvironment(
+  root: string,
+  skillsDirResolution: SkillsDirResolution,
+): IntegrityEnvironment {
+  const executionRoot: IntegrityEnvironment["executionRoot"] =
+    isInsideWorktree(root) ? "worktree" : "main";
+  let junctionPropagation: IntegrityEnvironment["junctionPropagation"] =
+    "unknown";
+  if (skillsDirResolution.usedFallback) {
+    junctionPropagation = "absent-skills-dir-fallback";
+  } else if (executionRoot === "worktree") {
+    junctionPropagation = "worktree-partial";
+  } else {
+    junctionPropagation = "present";
+  }
+  return { executionRoot, rootPath: root, junctionPropagation };
 }
 
 function checkSourceProjectionConsistency(root: string): CheckResult[] {
@@ -10319,7 +10376,11 @@ async function main(): Promise<void> {
   const reqDir = path.join(root, "docs", "requirements");
   const adrDir = path.join(root, "docs", "adr");
   const designsDir = path.join(root, "docs", "designs");
-  const skillsDir = path.join(root, ".opencode", "skills");
+  // worktree fallback (REQ-018-001): scanning uses the resolved dir; junction
+  // projection checks below keep using the raw projection path.
+  const projectionSkillsDir = path.join(root, ".opencode", "skills");
+  const skillsDirResolution = resolveSkillsDirWithFallback(root);
+  const skillsDir = skillsDirResolution.dir;
   // §7.3 (source): fallback `.opencode/` → `src/opencode/` preserves the
   // legacy behavior so worktrees and existing callers see no regression.
   // §7.4 (installed): inspect the projection directly. Source fallback would
@@ -10331,9 +10392,7 @@ async function main(): Promise<void> {
           path.join(root, ".opencode", "commands", "agentdev"),
         );
   const commandMapPath = path.join(
-    root,
-    ".opencode",
-    "skills",
+    skillsDir,
     "agentdev-workflow-lifecycle",
     "references",
     "command-map.md",
@@ -10433,7 +10492,7 @@ async function main(): Promise<void> {
     ...checkReqBacklogResidualDetection(root),
     ...checkAbolishedSkillReferences(root),
     ...checkReqRangeStaleness(root),
-    ...checkSkillCategoryGap(root, skillsDir, cmdDir),
+    ...checkSkillCategoryGap(root, projectionSkillsDir, cmdDir),
     ...checkTemplatePathIntegrity(cmdDir, root),
     ...checkDistributionUntrackedSkillReference(root), // IR-058 (v2:REQ-0159-003) — source/installed both run; no-op when projection absent
     ...checkUpdateNotesInDocs(root),
@@ -10464,6 +10523,18 @@ async function main(): Promise<void> {
     ...checkSkillProjectionManifest(root), // IR-068 (Issue #2383 (d), inspect F-01)
   ];
 
+  // REQ-018-001 / checker-execution-contracts.md: fallback 使用時は環境ラベルを
+  // 検証記録へ明記する（report.environment と本 info エントリの二重記録）。
+  if (skillsDirResolution.usedFallback) {
+    results.push(
+      info(
+        "Inventory",
+        "skills-dir-fallback",
+        `Junction projection absent: scanning ${resolveRelative(skillsDir, root)} (SoT src/opencode/skills) instead of .opencode/skills (REQ-018-001, environment=${isInsideWorktree(root) ? "worktree" : "main"}/junction=absent-skills-dir-fallback)`,
+      ),
+    );
+  }
+
   // WP-3 (Issue #1928): profile-gated projection checks. §7.3 source skips
   // projection sync / broken-junction / junction-coverage. IR-058 above stays
   // enabled for both profiles — it no-ops when the projection dir is absent,
@@ -10480,7 +10551,7 @@ async function main(): Promise<void> {
     );
   } else {
     results.push(...checkSourceProjectionConsistency(root));
-    results.push(...checkBrokenJunctions(skillsDir, root, cmdDir));
+    results.push(...checkBrokenJunctions(projectionSkillsDir, root, cmdDir));
     results.push(...checkJunctionScanCoverage(root));
     results.push(...checkInstalledProjection(root));
   }
@@ -10533,6 +10604,7 @@ async function main(): Promise<void> {
     timestamp: new Date().toISOString(),
     script: SCRIPT_NAME,
     profile: options.profile,
+    environment: buildIntegrityEnvironment(root, skillsDirResolution),
     scanned,
     summary,
     results: processed,

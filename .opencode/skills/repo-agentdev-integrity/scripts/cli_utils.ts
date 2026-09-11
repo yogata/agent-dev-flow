@@ -73,11 +73,27 @@ export interface ScanSummary {
   info: number;
 }
 
+// checker-execution-contracts.md「worktree 環境での checker 実行 fallback」の
+// 環境ラベル契約（REQ-018 の環境ラベル契約に従う）。検証記録へ必ず付す。
+export interface IntegrityEnvironment {
+  /** 実行環境種別: main root または worktree root */
+  executionRoot: "main" | "worktree";
+  /** 検査対象 root のパス（--root 指定の対象 root） */
+  rootPath: string;
+  /** junction（投影ディレクトリ）伝播状態 */
+  junctionPropagation:
+    | "present"
+    | "absent-skills-dir-fallback"
+    | "worktree-partial"
+    | "unknown";
+}
+
 export interface IntegrityReport {
   timestamp: string;
   script: string;
   profile: IntegrityProfile;
   archive?: string;
+  environment?: IntegrityEnvironment;
   scanned: Record<string, number>;
   summary: ScanSummary;
   results: CheckResult[];
@@ -449,6 +465,11 @@ export function formatMarkdownReport(report: IntegrityReport): string {
   lines.push(`- **プロファイル**: ${report.profile}`);
   if (report.archive) {
     lines.push(`- **アーカイブ**: ${report.archive}`);
+  }
+  if (report.environment) {
+    lines.push(
+      `- **環境ラベル**: ${report.environment.executionRoot} / junction=${report.environment.junctionPropagation} / root=${report.environment.rootPath}`,
+    );
   }
   lines.push(
     `- **スキャン対象**: ${Object.entries(report.scanned)

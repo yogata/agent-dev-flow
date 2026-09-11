@@ -1103,8 +1103,105 @@ describe("checkScriptTemplateReferencePaths", () => {
     const okResults = refResults.filter(
       (r) =>
         r.level === "ok" &&
-        r.evidence === "agentdev-test-skill/templates/case-open/epic.md",
+        r.evidence ===
+          "agentdev-test-skill/templates/case-open/epic.md",
     );
     expect(okResults.length).toBeGreaterThanOrEqual(1);
+  });
+  it("worktree fallback scans src/opencode/skills and fires IR-062 when junction projection is absent (REQ-018-001, TS-002)", () => {
+    const root = join(TEMP_ROOT, "worktree-fallback-ir062");
+    buildMinimalFixture(root);
+    copyScripts(root);
+    const srcSkillsDir = join(root, "src", "opencode", "skills");
+    mkdirp(
+      join(srcSkillsDir, "agentdev-doc-diagnostics", "references"),
+    );
+    writeFileSync(
+      join(
+        srcSkillsDir,
+        "agentdev-doc-diagnostics",
+        "references",
+        "perspective-registry.md",
+      ),
+      [
+        "# 診断観点レジストリ",
+        "",
+        "各観点エントリの詳細は references/diagnostic-categories.md を参照する。",
+        "",
+      ].join("\n"),
+      "utf-8",
+    );
+    const result = runScriptJson(root);
+    expect(result.report).not.toBeNull();
+    const refResults = (result.report!.results || []).filter(
+      (r) =>
+        r.category === "ReferencePath" &&
+        r.check === "reference-path-existence",
+    );
+    const missingNg = refResults.filter(
+      (r) =>
+        r.level === "ng" &&
+        r.evidence?.includes("diagnostic-categories.md"),
+    );
+    expect(missingNg.length).toBeGreaterThanOrEqual(1);
+    expect(result.report!.environment).toBeDefined();
+    expect(result.report!.environment!.junctionPropagation).toBe(
+      "absent-skills-dir-fallback",
+    );
+    expect(result.report!.environment!.rootPath.toLowerCase()).toBe(
+      root.toLowerCase(),
+    );
+    const fallbackInfo = (result.report!.results || []).filter(
+      (r) => r.check === "skills-dir-fallback",
+    );
+    expect(fallbackInfo.length).toBe(1);
+    expect(fallbackInfo[0].message).toContain("src/opencode/skills");
+  });
+  it("junction projection present keeps scanning .opencode/skills without fallback (REQ-018-001)", () => {
+    const root = join(TEMP_ROOT, "junction-present-no-fallback");
+    buildMinimalFixture(root);
+    copyScripts(root);
+    const skillsDir = join(root, ".opencode", "skills");
+    mkdirp(join(skillsDir, "agentdev-workflow-templates"));
+    writeFileSync(
+      join(skillsDir, "agentdev-workflow-templates", "SKILL.md"),
+      "# agentdev-workflow-templates\n",
+      "utf-8",
+    );
+    const srcSkillsDir = join(root, "src", "opencode", "skills");
+    mkdirp(join(srcSkillsDir, "agentdev-doc-diagnostics", "references"));
+    writeFileSync(
+      join(
+        srcSkillsDir,
+        "agentdev-doc-diagnostics",
+        "references",
+        "perspective-registry.md",
+      ),
+      [
+        "# 診断観点レジストリ",
+        "",
+        "各観点エントリの詳細は references/diagnostic-categories.md を参照する。",
+        "",
+      ].join("\n"),
+      "utf-8",
+    );
+    const result = runScriptJson(root);
+    expect(result.report).not.toBeNull();
+    const fallbackInfo = (result.report!.results || []).filter(
+      (r) => r.check === "skills-dir-fallback",
+    );
+    expect(fallbackInfo.length).toBe(0);
+    expect(result.report!.environment!.junctionPropagation).toBe("present");
+    const refResults = (result.report!.results || []).filter(
+      (r) =>
+        r.category === "ReferencePath" &&
+        r.check === "reference-path-existence",
+    );
+    const missingNg = refResults.filter(
+      (r) =>
+        r.level === "ng" &&
+        r.evidence?.includes("diagnostic-categories.md"),
+    );
+    expect(missingNg.length).toBe(0);
   });
 });
