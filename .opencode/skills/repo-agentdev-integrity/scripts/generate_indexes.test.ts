@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-010-011, REQ-059-001, REQ-059-002, REQ-059-003, REQ-059-004
+// ADF-COVERS(verification): REQ-010-011, REQ-059-001, REQ-059-002, REQ-059-003, REQ-059-004, REQ-059-005
 /**
  * Regression tests for AUTOGEN marker detection (Issue #1771, RU-0002).
  *
@@ -478,6 +478,43 @@ describe("extractRelatedReqNotes", () => {
     ].join("\n");
     const notes = extractRelatedReqNotes(content);
     expect(notes).toEqual({ "DEC-002": "note-two" });
+  });
+});
+
+describe("retired Decision restore handling (REQ-059-005)", () => {
+  const restoreDecDir = path.join(RR_TMP_ROOT, "restore", "decisions");
+  const restoreRetiredDir = path.join(restoreDecDir, "retired");
+
+  it("excludes retired decisions from collection and undeclared detection, then includes them after restore", () => {
+    fs.mkdirSync(restoreRetiredDir, { recursive: true });
+    writeDecision(
+      restoreRetiredDir,
+      "DEC-009",
+      'title: "T9"\nstatus: accepted\ncreated: "2026-01-01"\nupdated: "2026-01-01"',
+    );
+    const collectIds = () =>
+      collectDecisionFiles(restoreDecDir).map((d) => d.id);
+    const undeclaredIds = () =>
+      findUndeclaredRelatedReqDecisions(collectDecisionFiles(restoreDecDir))
+        .map((d) => d.id);
+
+    expect(collectIds()).not.toContain("DEC-009");
+    expect(undeclaredIds()).toEqual([]);
+
+    fs.renameSync(
+      path.join(restoreRetiredDir, "DEC-009.md"),
+      path.join(restoreDecDir, "DEC-009.md"),
+    );
+
+    expect(collectIds()).toContain("DEC-009");
+    expect(undeclaredIds()).toEqual(["DEC-009"]);
+
+    writeDecision(
+      restoreDecDir,
+      "DEC-010",
+      'title: "T10"\nstatus: accepted\nrelated_reqs: []\ncreated: "2026-01-01"\nupdated: "2026-01-01"',
+    );
+    expect(undeclaredIds()).toEqual(["DEC-009"]);
   });
 });
 
