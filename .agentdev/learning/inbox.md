@@ -130,3 +130,57 @@
 - **タグ**: #bun-build #require-resolve #正規表現エスケープ #ネガティブテスト
 
 ---
+
+## 2026-09-12: bun test の fail 行が CR/ANSI 上書きで log ファイルに残らない環境があり junit reporter での構造取得が fail 差分分離に有効
+
+- **問題事象**: `bun test` の出力をリダイレクトで log ファイルへ保存した際、fail 行が CR（キャリッジリターン）/ ANSI エスケープの上書き描画により log ファイル上に実質残らず、base と現行の fail 差分を目視で分離できなかった
+- **発生局面**: case 2777（checker の worktree SoT fallback 実装）の case-run 検証時。base（2486 pass / 4 fail / 4 errors）と変更後（2488 pass / 4 fail / 4 errors）の fail 差分分離が必要だった
+- **検知方法**: log ファイル内に fail 行が存在しない（tail で最終集計行のみ確認できる）ことを異常として検知
+- **根本原因**: bun test の進捗表示が CR 上書き + ANSI カラーコード前提の形式で出力され、非 TTY（リダイレクト）環境でも上書き前の fail 行が保存されない場合がある
+- **自律対応内容**: `--reporter=junit --reporter-outfile` で構造化出力を取得し、python ElementTree で XML 解析して fail ケース名を機械的に抽出。base と現行の fail 差分を確実に分離できた（結果: 差分 0 を確認）
+- **ユーザー確認の有無**: なし（機械的検証で確定）
+- **Decision/REQ/spec影響**: なし（検証手段の工夫で対応）
+- **横展開観点**: bun test の結果を証跡として保存する全検証工程（case-run / case-close の QG 検証、CI 代替のローカル検証）
+- **再発条件**: 非 TTY 環境で bun test の標準出力を証跡保存に使う場合
+- **予防策候補**: fail 差分が必要な検証では最初から junit reporter を使用する。標準出力の tail 集計行だけを証跡としない
+- **想定反映先**: checker-execution-contracts.md の bun test 実行形態契約への補足（learning-promote 経由で評価）
+- **関連**: case 2777（Issue 2777 / PR 2778）
+- **タグ**: #bun-test #junit-reporter #ログ取得 #証跡
+
+---
+
+## 2026-09-12: worktree 内での bun test は repo root 起 cwd で実行する（scripts 配下 cwd では REPO_ROOT 解決系テストが誤動作する）
+
+- **問題事象**: worktree 内で `bun test` を integrity scripts 配下（`.opencode/skills/repo-agentdev-integrity/scripts`）を cwd として実行すると、REPO_ROOT を上方向解決するテスト（issue_tracking_list 等）が誤動作する
+- **発生局面**: case 2777 の case-close 独立再検証時。前例 OU-1〜7 で同一の確認歴がある再現性ある事象
+- **検知方法**: scripts 配下 cwd 実行で REPO_ROOT 解決系テストが期待と異なる結果を返すことを確認
+- **根本原因**: テストが repo root を cwd からの相対解決で求める実装になっており、scripts 配下 cwd では repo root が正しく解決されない
+- **自律対応内容**: repo root 起 cwd で `bun test ./.opencode/skills/repo-agentdev-integrity/scripts` を実行する形に統一（case-run / case-close 両工程で同一形）。本 case でも 2488 pass / 4 fail / 4 errors をこの形で取得
+- **ユーザー確認の有無**: なし（前例追認）
+- **Decision/REQ/spec影響**: なし（既知の実行形態契約の再確認）
+- **横展開観点**: repo 内テストスクリプト全般。cwd 起点で repo root を解決するテストは repo root 起 cwd で実行する
+- **再発条件**: scripts 配下やサブディレクトリを cwd として bun test を起動した場合
+- **予防策候補**: 実行形態契約（repo root 起 cwd + 対象パス明示）を検証手順のテンプレートへ明記し、逸脱時に REPO_ROOT 解決系テストの失敗から気付けるようにする
+- **想定反映先**: checker-execution-contracts.md の bun test 実行形態契約（既存規約の運用徹底。learning-promote 経由で評価）
+- **関連**: case 2777（Issue 2777 / PR 2778）、前例 case 2766 / 2771 / 2775（同一確認）
+- **タグ**: #bun-test #cwd #REPO_ROOT #worktree
+
+---
+
+## 2026-09-12: IR-062 系 fixture テストは checker を fixture root 配下へ複製して spawn する方式が既存規約で fallback 判定は fixture 内 src/opencode/skills の有無で制御できる
+
+- **問題事象**: junction 前提検査（IR-062 reference-path-existence 等）の fixture テストで、fallback 挙動（junction 不在時の SoT 直参照）をどう再現・制御するかが課題になった
+- **発生局面**: case 2777 の TS-002 fixture テスト実装時（case-run）
+- **検知方法**: 既存 fixture 規約（copyScripts）の調査と fallback 判定条件の実装照合
+- **根本原因**: 該当なし（設計知見の蓄積。問題ではなく方式の確立）
+- **自律対応内容**: checker を fixture root 配下へ複製して spawn する既存規約（copyScripts）を踏襲し、fixture 内 `src/opencode/skills` の有無で fallback 判定を制御する方式で 2 件のテスト（fallback 発動 + junction 存在時非 fallback 負例）を実装。30/30 pass を確認
+- **ユーザー確認の有無**: なし（実装で確定）
+- **Decision/REQ/spec影響**: なし（テスト実装方式の知見）
+- **横展開観点**: junction / 投影ディレクトリを前提とする検査器のテスト全般。環境差（junction 伝播の有無）を fixture で再現する際の制御点は投影元ディレクトリの存在有無に置く
+- **再発条件**: fallback の有無を含む検査器挙動を fixture で検証する場合
+- **予防策候補**: fixture の directory 構成で環境差を表現する規約（copyScripts + src 配置制御）を検査器テストの標準パターンとして維持する
+- **想定反映先**: checker-execution-contracts.md または agentdev-git-worktree-test-fallback Design の fixture 規約（learning-promote 経由で評価）
+- **関連**: case 2777（Issue 2777 / PR 2778）
+- **タグ**: #fixture #copyScripts #IR-062 #fallback
+
+---
