@@ -58,3 +58,21 @@
 - **タグ**: #integrity #cwd依存 #bun-test #worktree
 
 ---
+
+## 2026-09-11: verify-only case では3検査を実行証跡として実 case と同水準で実行・記録すると検証完了の根拠が再現可能になる
+
+- **問題事象**: 変更ゼロの verify-only case では PR・carrier commit が存在しないため、検証完了の証跡が会話上のみで消えると PR-less closure の処分判断（QG-4 判定）の根拠が恒久記録から追跡できなくなる
+- **発生局面**: case 2769（配布物変更直後の commit 前3検査工程の Design 明文化検証）の case-run / case-close 実行時
+- **検知方法**: case-run result blocked（verify-only 契約適用）での PR-less closure 処分依頼を case-close 側が受けた際の証跡確認
+- **根本原因**: verify-only case の検証証跡の恒久記録方法が手順として明文化されておらず、#2768 で確立した前例（SSoT コメントへの実行コマンド列付き記録）の運用依存だった
+- **自律対応内容**: case-run 側が3検査（配布依存境界・IR-055・traceability）と integrity suite を実 case と同水準で実行し、実行コマンド・結果（new_delta 0、新規違反 0 件、2565 pass / 0 fail 等）を SSoT コメントへ記録。case-close 側はその SSoT を QG-4 判定根拠として参照し、Design 実記述の独立再確認と併せて完了判定した
+- **ユーザー確認の有無**: なし（#2768 確立済み working assumption の同一適用を case-auto bounded parent decision で記録）
+- **Decision/REQ/spec影響**: なし（運用上の注意。PR-less closure は carrier commit 捏造を却下した作業仮定として記録）
+- **横展開観点**: 変更ゼロの docs_chore case 全般、および検証のみで完了する maintenance case で共通
+- **再発条件**: verify-only case で検証コマンドと結果を SSoT コメントへ記録せずに処分判断だけを行った場合
+- **予防策候補**: verify-only case では検証実行コマンド列と結果を SSoT コメントに残す（実行コマンド列はそのまま再実行手順になる）運用を標準化する
+- **想定反映先**: case-run / case-close の verify-only 契約関係の Design 手順（将来的な明文化候補。intake/learning promote 経由で評価）
+- **関連**: case 2769（Issue 2769、verify-only closure のため PR なし）/ 前例 case 2768
+- **タグ**: #verify-only #実行証跡 #SSoT #PR-less-closure
+
+---
