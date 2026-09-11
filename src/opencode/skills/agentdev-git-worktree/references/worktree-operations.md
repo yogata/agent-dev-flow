@@ -38,7 +38,7 @@ git worktree add ".worktrees/{N}-{type}" -b "{type}/issue-{N}" origin/main
 ### 3. 重要事項
 
 - **worktreeプレフィクス必須**: ファイルパスには `.worktrees/{N}-{type}/` を含めること
- - 正: `C:/path/to/repo/.worktrees/516-fix/src/components/App.tsx`
+ - 正: `<repo-root>/.worktrees/516-fix/src/components/App.tsx`
  - 正: `.worktrees/516-fix/src/components/App.tsx`
  - 誤: `src/components/App.tsx`（メインリポジトリのファイルを誤編集リスク）
 - Windows環境: パスにスペースが含まれる可能性があるためダブルクォート必須
@@ -95,10 +95,10 @@ git rev-parse --show-toplevel
 
 worktree 環境の運用落とし穴に対する標準運用ガイド（L-003, L-008, L-009, L-013、PR #1036/#1099/#1128 由来）。
 
-### src/opencode/ 直接参照（SoT パス）
+### source 側ツリー直接参照（SoT パス）
 
 worktree 内では `.opencode/skills/` の junction が再作成されないため、junction 切断時に `.opencode/` 経由参照が失敗する。
-整合性検査、スキル参照は `src/opencode/` を SoT パスとして直接参照すること。
+整合性検査、スキル参照は、配置先（`.opencode/`）ではなく source 側ツリー（SoT パス）を直接参照すること。
 
 ### isInsideWorktree 適用
 
@@ -120,7 +120,7 @@ worktree は独立した working tree を持つため、本体リポジトリ直
 worktree は独立した working tree であるため、メインリポジトリで `.gitignore` 対象となっているファイル（`.opencode/skills/agentdev-*/` ジャンクション配下、`.agentdev-plugin/` 等）は worktree 側へ受け渡しできない。
 worktree 内で当該ファイルを参照する検査は失敗する。
 
-worktree 内で gitignore 対象ファイルを参照・編集する必要がある場合は、`git add -f` で強制追加して worktree の working tree に存在させるか、source パス（`src/opencode/`）へ fallback して参照する。
+worktree 内で gitignore 対象ファイルを参照・編集する必要がある場合は、`git add -f` で強制追加して worktree の working tree に存在させるか、source 側ツリー（SoT パス）へ fallback して参照する。
 
 ### bun test 実行の環境前提
 
@@ -128,7 +128,7 @@ bun test によるフル suite 実行は、次の環境前提を踏まえて実�
 フル suite の実行形態（3 cwd 分割実行・./ prefix・環境ラベル）の正規形は `agentdev-quality-gates`（QG-4 bun test フル suite 正規形）が品質統制側として所有する。
 
 - worktree は独立した working tree のため、gitignore 対象の `node_modules` は worktree へ未伝播である。bun test（フル suite 正規形、bun test 単独実行の別を問わない）および tsc 型検証の実行前に依存整備を前置する。未実施の場合、integrity suite の一部テスト・tsc 型検証が依存解決失敗で fail する。依存整備の対象ディレクトリ集合と前置の実行形態は正規形（`agentdev-quality-gates` QG-4 の依存パッケージ前置）を参照する。worktree における依存整備前提は次のとおり:
-  - **対象ディレクトリ集合**: `src/opencode/skills/agentdev-project-extensions/scripts`（zod 等の依存解決。integrity suite からの相対 import 参照の前提を含む）と `.opencode/skills/repo-agentdev-integrity/scripts`（worktree 実体。`typescript`・`@types/bun`・`@types/node` の依存解決）の両方。片方のみ整備した場合、未整備側を参照するテスト・型検証が依存解決失敗で fail する
+  - **対象ディレクトリ集合**: Project Extensions の scripts ディレクトリ（source 側ツリー配下。zod 等の依存解決。integrity suite からの相対 import 参照の前提を含む）と、本体リポジトリ専用の整合性検査 skill の scripts ディレクトリ（配置先配下の worktree 実体。`typescript`・`@types/bun`・`@types/node` の依存解決）の両方。片方のみ整備した場合、未整備側を参照するテスト・型検証が依存解決失敗で fail する
   - **tsc 型検証の型解決前提**: tsc 型検証（`tsc --noEmit`）を含む場合は、対象パッケージでの `bun install` により `@types/bun` 等の型定義と `typescript` を復元済みであること。node_modules 未整備の状態では tsc の型解決が失敗する
   - **bun test 単独実行の依存前提と junction 代替**: bun test 単独実行（フル suite 正規形以外の実行）で依存解決が必要な場合は、次のいずれかの手段で整備する
     1. main 側の当該 scripts ディレクトリ配下の `node_modules` への junction を worktree 側に作成する。検証後に junction を削除する（junction エントリのみの削除とし、参照先の main 側 `node_modules` は破壊しない）
@@ -143,7 +143,7 @@ bun test によるフル suite 実行は、次の環境前提を踏まえて実�
        ```
 
   - **整備後の再実行手順**: 依存整備実施後、依存解決失敗で fail したテスト・型検証を同一 worktree で再実行し、当該 fail が解消したことを確認する。再実行結果には依存整備実施済みの旨を環境ラベル（依存パッケージ状態）へ記録し、整備前の fail と整備後の結果を混在させない
-  - **package rename 時の bun.lock 確認**: package rename を伴う変更で `bun install` を実行した場合は、bun.lock の root workspace name が新パッケージ名へ追従していることを確認する（確認手順は `docs/designs/local/runtime-package-boundary.md`「本体リポジトリ sync」節参照）
+  - **package rename 時の bun.lock 確認**: package rename を伴う変更で `bun install` を実行した場合は、bun.lock の root workspace name が新パッケージ名へ追従していることを確認する（確認手順は runtime-package-boundary Design「本体リポジトリ sync」節参照）
 - worktree の `.opencode/` 配下 junction は未伝播である。junction を前提とする構造系テストは source パス（SoT パス）への fallback で実行される
 - worktree の構造上の理由でテストスイートが実行できない場合は、メインリポジトリからの読取専用実行でエビデンスを採取できる。この場合は実行環境（worktree または main、junction 伝播状態、依存パッケージ状態）を環境ラベルとして検証記録に明記し、fail 全件の由来分類（既知欠陥・環境依存・当該変更起因）を行う
 
