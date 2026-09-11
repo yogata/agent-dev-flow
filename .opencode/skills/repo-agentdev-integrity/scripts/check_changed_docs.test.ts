@@ -1183,3 +1183,143 @@ describe("Issue #2349 TS-005: Report 分離後の Design 判定（docs/reports �
     expect(parsed.extensions_check_required).toBe(false);
   });
 });
+
+// ─── Issue #2783 TS-001/TS-002: isDesignFile references 配下除外 ─────────────
+// references 配下（docs/designs/**/references/**）は references 登録規約
+// （docs/designs/README.md: 独立行登録しない）に従うため Design 判定対象外。
+// 正規 Design ファイル（docs/designs/{domain}/{slug}.md 直下）の判定は不変。
+
+describe("Issue #2783 TS-001: references 配下のみの変更 → design_readme_update_required=false", () => {
+  it("added file under docs/designs/{domain}/{slug}/references/ → 過剰検出 0 件", () => {
+    const root = join(TEMP_ROOT, "issue2783-refs-only");
+    mkdirp(root);
+    setupGitFixture(root);
+    mkdirp(join(root, "docs", "designs", "integrity", "ref-guard", "references"));
+    writeDesignFile(
+      root,
+      "integrity/ref-guard/references/note.md",
+      "reference note",
+      "accepted",
+      "Reference material under references/.",
+    );
+    copyScripts(root);
+
+    const r = runScript(root, [
+      "--workflow",
+      "design-save",
+      "--files",
+      "docs/designs/integrity/ref-guard/references/note.md",
+      "--json",
+    ]);
+    expect(r.exitCode).toBe(0);
+    const parsed = JSON.parse(r.stdout);
+    expect(parsed.design_readme_update_required).toBe(false);
+    expect(parsed.extensions_check_required).toBe(false);
+  });
+
+  it("added file under docs/designs/{domain}/references/ → 過剰検出 0 件", () => {
+    const root = join(TEMP_ROOT, "issue2783-domain-refs");
+    mkdirp(root);
+    setupGitFixture(root);
+    mkdirp(join(root, "docs", "designs", "integrity", "references"));
+    writeDesignFile(
+      root,
+      "integrity/references/domain-note.md",
+      "domain reference note",
+      "accepted",
+      "Reference material under domain references/.",
+    );
+    copyScripts(root);
+
+    const r = runScript(root, [
+      "--workflow",
+      "design-save",
+      "--files",
+      "docs/designs/integrity/references/domain-note.md",
+      "--json",
+    ]);
+    expect(r.exitCode).toBe(0);
+    const parsed = JSON.parse(r.stdout);
+    expect(parsed.design_readme_update_required).toBe(false);
+    expect(parsed.extensions_check_required).toBe(false);
+  });
+
+  it("正規 Design ファイル（docs/designs/{domain}/{slug}.md）は引き続き検出（比較確認・誤 pass 0 件）", () => {
+    const root = join(TEMP_ROOT, "issue2783-canonical-pos");
+    mkdirp(root);
+    setupGitFixture(root);
+    mkdirp(join(root, "docs", "designs", "integrity"));
+    writeDesignFile(
+      root,
+      "integrity/ref-guard.md",
+      "reference guard design",
+      "accepted",
+      "Canonical Design fixture body.",
+    );
+    copyScripts(root);
+
+    const r = runScript(root, [
+      "--workflow",
+      "design-save",
+      "--files",
+      "docs/designs/integrity/ref-guard.md",
+      "--json",
+    ]);
+    expect(r.exitCode).toBe(0);
+    const parsed = JSON.parse(r.stdout);
+    expect(parsed.design_readme_update_required).toBe(true);
+    expect(parsed.extensions_check_required).toBe(true);
+  });
+});
+
+describe("Issue #2783 TS-002: 親 Design + references 配下の同時変更 → 親 Design 変更は Design 判定", () => {
+  it("親 Design title 変更 + references 配下新規 → design_readme_update_required=true", () => {
+    const root = join(TEMP_ROOT, "issue2783-parent-and-refs");
+    mkdirp(root);
+    mkdirp(join(root, "docs", "designs", "integrity", "ref-guard", "references"));
+    writeDesignFile(
+      root,
+      "integrity/ref-guard.md",
+      "original title",
+      "accepted",
+      "Original body.",
+    );
+    writeDesignFile(
+      root,
+      "integrity/ref-guard/references/note.md",
+      "reference note",
+      "accepted",
+      "Reference note body.",
+    );
+    setupGitFixture(root);
+    writeDesignFile(
+      root,
+      "integrity/ref-guard.md",
+      "changed title",
+      "accepted",
+      "Original body.",
+    );
+    writeDesignFile(
+      root,
+      "integrity/ref-guard/references/extra.md",
+      "extra reference note",
+      "accepted",
+      "Extra reference note body.",
+    );
+    copyScripts(root);
+
+    const r = runScript(root, [
+      "--workflow",
+      "design-save",
+      "--files",
+      "docs/designs/integrity/ref-guard.md",
+      "docs/designs/integrity/ref-guard/references/extra.md",
+      "--json",
+    ]);
+    expect(r.exitCode).toBe(0);
+    const parsed = JSON.parse(r.stdout);
+    expect(parsed.files_checked).toContain("docs/designs/integrity/ref-guard.md");
+    expect(parsed.files_checked).toContain("docs/designs/integrity/ref-guard/references/extra.md");
+    expect(parsed.design_readme_update_required).toBe(true);
+  });
+});
