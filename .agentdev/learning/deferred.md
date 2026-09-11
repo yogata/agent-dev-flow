@@ -2263,3 +2263,30 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **移動日**: 2026-09-08
 
 ---
+
+## 2026-09-09 worktree への node_modules 非伝播で integrity suite が環境起因 fail する
+
+- **発生源**: PR #2718（Issue #2706 / OU-007）、PR #2717（Issue #2708 / OU-009）テスト結果
+- **クラス**: 環境前提（worktree 構造的制約）
+
+git worktree には root の node_modules が伝播しないため、worktree で integrity suite を実行すると `Cannot find package 'zod'`（extension_state.ts import）等の import 失敗が発生する。加えて junction 未伝播の worktree では IR-055 delta-from-baseline テストが baseline パス変換のずれで未編集ファイルを「新規違反」として検出し fail する（変更ゼロの baseline commit で再現確認済み、main root では不発生）。bun install の安易な実行は tsconfig 系ファイル書き戻しリスク（AGENTS.md 警告規定）を伴うため、worktree でフル suite を実行する際はこの既知の環境依存を前提に結果を解釈する。
+
+- **移動日**: 2026-09-11
+
+## 2026-09-10 worktree の .opencode/plugins は gitignore 未伝播で欠落するため plugins 分割は source fallback を使う
+
+- **問題事象**: worktree 上での bun test フル suite 実行時、.opencode/plugins/ が gitignore 未伝播で存在せず plugins 分割の実行対象が 0 件になった
+- **発生局面**: 検証（Epic 2755 Wave 2、PR 2763 の worktree での bun test 3 cwd 分割実行）
+- **検知方法**: bun test の実行対象ディレクトリ確認（plugins 分割の対象不在）
+- **根本原因**: .opencode/plugins は gitignore 対象のため worktree には伝播せず、junction 環境はメインリポジトリにしか存在しない
+- **自律対応内容**: worktree 構造的制約の source fallback として bun test ./src/opencode/plugins/ を実行し網羅性を確保（311 tests / 0 fail）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree での plugins テストは src/opencode/plugins/ を source fallback として実行すればテスト網羅性を保てる
+- **再発条件**: worktree 上で bun test フル suite の plugins 分割を実行した場合
+- **予防策候補**: worktree での plugins 分割は source fallback パスを標準手順として明記
+- **想定反映先**: QG-4 bun test 実行形態契約・worktree 構造的制約の運用知見（learning-promote で反映先を判断）
+- **関連**: PR 2763、.worktrees/2758-feature
+- **タグ**: `#worktree` `#bun-test` `#plugins`
+
+- **移動日**: 2026-09-11
