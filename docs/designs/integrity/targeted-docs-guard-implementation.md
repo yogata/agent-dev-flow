@@ -2,7 +2,7 @@
 title: Targeted Docs Guard 実装詳細
 status: accepted
 created: 2026-07-15
-updated: 2026-09-11
+updated: 2026-09-12
 ---
 
 # Targeted Docs Guard 実装詳細
@@ -76,6 +76,14 @@ check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移�
 - skill Designの場合の対象skill原本との最低限の整合
 - integrity Designの場合の catalog/rule file/script 整合
 - REQ相当、Decision相当、guide相当の混入検出
+
+**Design 判定（isDesignFile）の契約**:
+
+isDesignFile は `docs/designs` 配下の変更ファイルを Design 文書と判定する判定関数であり、design-save 向け検査の対象特定と `design_readme_update_required` 判定の入口である。判定契約は次のとおりとする。
+
+- `docs/designs/{domain}/{slug}.md` 直下の正規 Design ファイルは Design 判定対象とする
+- `docs/designs/**/references/**` 配下のファイルは references 登録規約（独立行登録しない・親 Design 行の備考欄で言及）に従うため Design 判定対象外とする（`design_readme_update_required` の発火対象外）
+- 除外の影響は references 配下のみに限定し、正規 Design ファイルの見逃し（誤 pass）を生まない。親 Design ファイル自体の変更は引き続き Design 判定対象とする
 
 ### case-close 向け検査
 
