@@ -15,6 +15,7 @@ description: Requirement-artifact traceability (coverage, impact, check) by scan
 
 - 宣言形式: `ADF-COVERS(<role>): <REQ-ID>{, <REQ-ID>}*`（role は design / implementation / verification、REQ-ID は `REQ-{NNNN}-{MMM}` 形式の要件行ID）
 - 宣言は各ファイル種別のコメント記法（Markdown は HTML コメント、TypeScript は `//` 等）の内部に1行で記述する
+- 解析対象は正規宣言位置（各ファイル種別のコメント記法内部の宣言行）に限定する。本文 prose（見出し・段落・箇条書き等）内の宣言マーカー形状の言及は解析対象外とする（説明文コンテキスト対象外判定）。正規位置の形式不備宣言は引き続き検出する
 - 1ファイルに複数の宣言行を含められる。解析結果は和集合とする
 - 解析は行単位のパターン照合で行い、意味推定を行わない
 - 宣言の REQ-ID は子要件行 ID で指定する。親要件 ID のみの参照（bare ID）は実装宣言・検証宣言の配置対象とならず、check に missing-implementation として計上され得る

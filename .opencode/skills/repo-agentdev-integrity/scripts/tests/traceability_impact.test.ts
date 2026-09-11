@@ -22,6 +22,12 @@ function decl(role: string, ids: string): string {
   return `<!-- ${MARKER}(${role}): ${ids} -->`;
 }
 
+// TypeScript 正規宣言位置（行頭 // コメント）用の宣言行生成。
+// 対象外判定により .ts 内の HTML コメント行は prose として無視されるため使い分ける。
+function tsDecl(role: string, ids: string): string {
+  return `// ${MARKER}(${role}): ${ids}`;
+}
+
 function writeFixture(rel: string, lines: readonly string[]): void {
   const filePath = join(ROOT, rel);
   mkdirSync(join(filePath, ".."), { recursive: true });
@@ -38,8 +44,8 @@ afterAll(() => {
 describe("impact（要件起点）", () => {
   it("当該要件へ明示的に対応する成果物を再確認候補として返す", () => {
     writeFixture("docs/d1.md", [decl("design", "REQ-900-001")]);
-    writeFixture("src/i1.ts", [decl("implementation", "REQ-900-001")]);
-    writeFixture("tests/v1.test.ts", [decl("verification", "REQ-900-001")]);
+    writeFixture("src/i1.ts", [tsDecl("implementation", "REQ-900-001")]);
+    writeFixture("tests/v1.test.ts", [tsDecl("verification", "REQ-900-001")]);
     const { declarations } = scanCorpus(ROOT);
     const result = impactByRequirement(declarations, "REQ-900-001");
     expect(result.mode).toBe("requirement");
@@ -62,10 +68,10 @@ describe("impact（要件起点）", () => {
 
 describe("impact（成果物起点）", () => {
   it("対応要件を経由して同じ要件へ対応する他成果物を再確認候補として返す（起点自身を除く）", () => {
-    writeFixture("src/start.ts", [decl("implementation", "REQ-900-201, REQ-900-202")]);
+    writeFixture("src/start.ts", [tsDecl("implementation", "REQ-900-201, REQ-900-202")]);
     writeFixture("docs/other-design.md", [decl("design", "REQ-900-201")]);
-    writeFixture("src/other-impl.ts", [decl("implementation", "REQ-900-202")]);
-    writeFixture("tests/other-test.test.ts", [decl("verification", "REQ-900-201, REQ-900-202")]);
+    writeFixture("src/other-impl.ts", [tsDecl("implementation", "REQ-900-202")]);
+    writeFixture("tests/other-test.test.ts", [tsDecl("verification", "REQ-900-201, REQ-900-202")]);
     const { declarations } = scanCorpus(ROOT);
     const result = impactByArtifact(declarations, "src/start.ts");
     expect(result.viaRequirements).toHaveLength(2);

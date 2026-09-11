@@ -48,6 +48,12 @@ function decl(role: string, ids: string): string {
   return `<!-- ${MARKER}(${role}): ${ids} -->`;
 }
 
+// TypeScript 正規宣言位置（行頭 // コメント）用の宣言行生成。
+// 対象外判定により .ts 内の HTML コメント行は prose として無視されるため使い分ける。
+function tsDecl(role: string, ids: string): string {
+  return `// ${MARKER}(${role}): ${ids}`;
+}
+
 function writeFixture(rel: string, lines: readonly string[]): void {
   const filePath = join(ROOT, rel);
   mkdirSync(join(filePath, ".."), { recursive: true });
@@ -69,8 +75,8 @@ describe("派生 Graph が存在しない状態での3能力の動作（AC-001�
       "| REQ-910-001 | 統合用 |",
     ]);
     writeFixture("docs/designs/int.md", [decl("design", "REQ-910-001")]);
-    writeFixture("src/int.ts", [decl("implementation", "REQ-910-001")]);
-    writeFixture("tests/int.test.ts", [decl("verification", "REQ-910-001")]);
+    writeFixture("src/int.ts", [tsDecl("implementation", "REQ-910-001")]);
+    writeFixture("tests/int.test.ts", [tsDecl("verification", "REQ-910-001")]);
     // フィクスチャルートに派生 Graph は存在しない
     expect(readdirSync(ROOT).includes(".agentdev")).toBe(false);
 

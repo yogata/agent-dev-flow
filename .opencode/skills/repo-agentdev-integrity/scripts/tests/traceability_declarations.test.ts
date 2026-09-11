@@ -99,12 +99,12 @@ describe("対応宣言の解析", () => {
     expect(issues).toEqual([]);
   });
 
-  it("既知ロールで宣言形式を満たさない行を malformed-declaration として検出する", () => {
+  it("正規位置の既知ロールで宣言形式を満たさない行を malformed-declaration として検出する", () => {
     const cases = [
-      `${MARKER}(design) REQ-900-001`,          // コロンなし
-      `${MARKER}(design): REQ900-001`,          // ID 形式違反
-      `${MARKER}(design):`,                     // ID 空
-      `${MARKER}(implementation): REQ-900-1`,   // 桁数不足
+      `<!-- ${MARKER}(design) REQ-900-001 -->`,          // コロンなし
+      `<!-- ${MARKER}(design): REQ900-001 -->`,          // ID 形式違反
+      `<!-- ${MARKER}(design): -->`,                     // ID 空
+      `<!-- ${MARKER}(implementation): REQ-900-1 -->`,   // 桁数不足
     ];
     for (let i = 0; i < cases.length; i++) {
       const { declarations, issues } = parseDeclarations(`m${i}.md`, cases[i]!);
@@ -113,6 +113,55 @@ describe("対応宣言の解析", () => {
       expect(issues[0]?.kind).toBe("malformed-declaration");
       expect(issues[0]?.line).toBe(1);
     }
+  });
+
+  it("本文 prose 内の宣言形状言及（完全形式・形式不備とも）は対象外とする", () => {
+    const content = [
+      "## 宣言の書き方",
+      "",
+      `宣言は ${MARKER}(implementation): REQ-900-001 の形式で書く。`,
+      `形式不備の例: ${MARKER}(design) REQ-900-001`,
+      `- 箇条書きでも ${MARKER}(verification): REQ-900-001, REQ-900-002 と書ける。`,
+    ].join("\n");
+    const { declarations, issues } = parseDeclarations("prose.md", content);
+    expect(declarations).toEqual([]);
+    expect(issues).toEqual([]);
+  });
+
+  it("prose 言及と正規位置の形式不備宣言が混在しても prose は無視し、malformed-declaration は検出し続ける", () => {
+    const content = [
+      `説明文で ${MARKER}(implementation): REQ-900-001 と形状を言及する。`,
+      `<!-- ${MARKER}(design): REQ900-001 -->`,
+    ].join("\n");
+    const { declarations, issues } = parseDeclarations("mixed.md", content);
+    expect(declarations).toEqual([]);
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.kind).toBe("malformed-declaration");
+    expect(issues[0]?.line).toBe(2);
+  });
+
+  it("prose 言及と正規位置の完全形式宣言が混在する場合、正規位置のみ宣言として計上する", () => {
+    const content = [
+      `${MARKER}(implementation): REQ-900-999 という形状の説明。`,
+      `<!-- ${MARKER}(implementation): REQ-900-001 -->`,
+    ].join("\n");
+    const { declarations, issues } = parseDeclarations("mixed2.md", content);
+    expect(issues).toEqual([]);
+    expect(declarations).toHaveLength(1);
+    expect(declarations[0]?.reqIds).toEqual(["REQ-900-001"]);
+    expect(declarations[0]?.line).toBe(2);
+  });
+
+  it("TypeScript のコード行内の形状言及は対象外とし、行頭コメント内の形式不備は検出する", () => {
+    const content = [
+      `const shape = "${MARKER}(design): REQ-900-001";`,
+      `// ${MARKER}(design): REQ900-001`,
+    ].join("\n");
+    const { declarations, issues } = parseDeclarations("code.ts", content);
+    expect(declarations).toEqual([]);
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.kind).toBe("malformed-declaration");
+    expect(issues[0]?.line).toBe(2);
   });
 
   it("未知の成果物役割を unknown-role として検出する", () => {
