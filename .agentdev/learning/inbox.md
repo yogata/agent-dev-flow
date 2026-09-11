@@ -76,3 +76,39 @@
 - **タグ**: #verify-only #実行証跡 #SSoT #PR-less-closure
 
 ---
+
+## 2026-09-11: 自己ホスト投影は junction であるため配布ソース src/ のみ編集で配布整合が成立し、worktree 検証では投影不在を前提に依存を整備する
+
+- **問題事象**: 自己ホスト投影 `.opencode/skills/agentdev-*`（IO_REPARSE_TAG_MOUNT_POINT、`src/opencode/skills` 配下への投影）は git 非追跡のため、worktree では junction が作られず投影自体が不在になる。投影の存在を前提に「src と .opencode の両方を編集する」運用をとると、worktree では投影がなく編集対象が半分存在しない状態になり、逆に main では junction が src への同一実体のため二重編集になる
+- **発生局面**: case 2771（traceability 解析コアへの対象外判定実装）の case-run / case-close 実行時
+- **検知方法**: PR 本文 Findings での自己ホスト投影の実体機構報告。case-close 側の worktree 検証（traceability 単体テスト・full integrity suite）で junction 不在の worktree 上でも追跡ファイルのみの検査が完結することを確認
+- **根本原因**: 投影機構の実態（junction・git 非追跡）と「両方編集」の慣行的運用の乖離。配布整合は src（配布ソース）と .opencode（junction 投影）の同一性で担保されるため、src 編集のみで成立する
+- **自律対応内容**: PR は配布ソース src/ のみ編集で配布整合を成立させた。worktree 検証では scripts/node_modules をメイン側実体へ junction 張りして typecheck を実行（.gitignore 済み）。case-close は worktree 側で bun install（integrity scripts 側 node_modules 復元）を実施して full suite 正規形 3 分割実行を完遂
+- **ユーザー確認の有無**: なし（PR 本文 Findings 記録済み知見の case-close での確認）
+- **Decision/REQ/spec影響**: なし（運用上の注意）
+- **横展開観点**: src/opencode/skills/** を変更する case 全般、および worktree 上で integrity suite / traceability 検査を実行する case-close / case-run 全般
+- **再発条件**: worktree で .opencode/skills/agentdev-* 投影の存在を前提に検査・編集を行った場合、または main 側 junction を二重編集対象とみなした場合
+- **予防策候補**: 実装 case の変更対象が配布ソース面の場合は src/ のみを編集対象とし、.opencode 側は junction による同一実体であることを確認する。worktree 検証時は追跡ファイルのみの検査対象であること、依存は bun install またはメイン側 node_modules への junction（検証後削除）で整備する
+- **想定反映先**: case-run / case-close の worktree 検証手順、agentdev-git-worktree の worktree 構造的制約（junction 伝播状態の環境ラベル記録）
+- **関連**: case 2771（Issue 2771 / PR 2772）、case 2766（同様の worktree 検証経路）
+- **タグ**: #junction #自己ホスト投影 #worktree #配布整合
+
+---
+
+## 2026-09-11: テスト fixture 内の宣言マーカー形状は正規宣言位置のコメント形式で書かないと旧パーサが偽宣言として計上し REQ カバレッジを汚染する
+
+- **問題事象**: escape 隠蔽回帰テスト用の fixture 文字列リテラル内の宣言マーカー形状が、旧宣言パーサ（行単位文字列一致）で正規宣言として誤計上され、REQ カバレッジに偽の対応関係が混入していた（実 corpus で偽宣言 15 件。fixture 由来の偽の実装宣言が REQ-057-013 のカバレッジを誤魔化していた）
+- **発生局面**: case 2771（対象外判定実装）の case-run 検証時。実 corpus 全走査の新旧パーサ差分確認で発覚
+- **検知方法**: TS-001 検出縮退確認（旧 422 件 → 新 407 件の差分 15 件の由来分類。全件がテスト内文字列リテラル由来の偽宣言であることを確認）
+- **根本原因**: 宣言パーサが正規宣言位置を識別せず行単位の文字列一致で判定していた構造的欠陥。fixture は「検査器が検出してはならないもの」を表現するため本質的に非正規位置の形状を含むが、旧パーサはそれを区別できなかった
+- **自律対応内容**: 対象外判定（正規宣言位置: .md は HTML コメント完結行、.ts は行頭 `//` コメント行のみ解析対象）の実装で偽宣言 15 件が計上対象から除外され、REQ-057-013 の本来の missing-implementation が正当計上（81 → 82 件）になった。fixture 自体は正規位置（コメント）形式へ移設して回帰検証能力を維持
+- **ユーザー確認の有無**: なし（機械的検証と突合で確定）
+- **Decision/REQ/spec影響**: REQ-057-013 の missing-implementation 計上変化は coverage の正当化であり REQ/Design 変更は不要
+- **横展開観点**: 検査器のテスト fixture を含む全テストコード。検査器が文字列パターン照合である場合、fixture 内のパターン文字列は検出対象から除外される形式（正規位置コメント等）で書くのが安全
+- **再発条件**: 文字列照合系検査器の fixture に検出対象パターンを非正規位置（文字列リテラル等）のまま配置した場合
+- **予防策候補**: fixture 内のパターン文字列は正規宣言位置のコメント形式で書く、または escape・分割で形状一致を避ける運用を検査器契約に明記する
+- **想定反映先**: traceability-model / agentdev-traceability Design の fixture 記述規約（将来的な明文化候補。intake/learning promote 経由で評価）
+- **関連**: case 2771（Issue 2771 / PR 2772、REQ-057-013 計上の元事象）
+- **タグ**: #fixture #偽カバレッジ #宣言パーサ #traceability
+
+---
