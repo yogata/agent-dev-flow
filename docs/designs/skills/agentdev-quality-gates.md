@@ -2,7 +2,7 @@
 title: `agentdev-quality-gates` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-02
+updated: 2026-09-11
 ---
 <!-- ADF-COVERS(implementation): REQ-007-001, REQ-007-003, REQ-007-004, REQ-007-005 -->
 <!-- ADF-COVERS(implementation): REQ-057-004 -->
@@ -94,6 +94,8 @@ integrity suite のコマンド数期待値は、公開コマンド列挙から�
 
 QG-4 の識別子中心評価の構造は維持する（固定値期待値化による脆化を行わない）。
 case-close / docs-check の full suite 実行手順と PR 本文テンプレート（Test Strategy 結果欄）への記録欄追加は case 実施側の適用とする。
+
+QG-4 final acceptance の変更ファイル突合検証における I/O 操作の表記契約は、Custom Tool `agentdev_gh` 操作契約（pr_changed_files 経由の取得）に準拠する。生 gh CLI コマンド表記は配布 reference（references/qg-4-final-acceptance.md）にのみ現存し得るため、当該表記の置換は配布側 realization で実施し、本 Design は表記契約の確認として対応する。検証内容（PR 変更ファイルの取得と files_checked / Issue 本文との突合）は現行どおり維持する。
 
 ## 対象外
 

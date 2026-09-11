@@ -220,7 +220,7 @@ JSON 出力は `workflow`、`files_checked`、`coupled_files_checked`、`failure
 - QG-4（Final Acceptance Gate）: 前提確認で Issue 本文の完了条件チェックボックスを最終評価、更新
 - チェックボックス事後確認: 更新後に Issue 本文を再読込し全 `- [ ]` が `[x]` に反映されたことを確認（最大2回）
 - Squash merge リトライ: 最大5回（5秒待機付き）
-- mergeable UNKNOWN ポーリング（REQ-006-028）: squash merge 前に `gh pr view --json mergeable,mergeStateStatus` で事前確認、UNKNOWN 時は最大60秒（10秒間隔）でポーリング、上限超過時はマージ中止・構造化エラー停止
+- mergeable UNKNOWN ポーリング（REQ-006-028）: squash merge 前に Custom Tool `agentdev_gh` の pr_mergeable で mergeable・mergeStateStatus 状態を事前確認、UNKNOWN 時は最大60秒（10秒間隔）でポーリング、上限超過時はマージ中止・構造化エラー停止
 - git main 同期リスク事前検出（REQ-006-029）: `git pull --ff-only` 直前に worktree 状態・並列実行 ref lock 競合・非 main ブランチ占有の3リスクを事前検出、検出時に安全な代替同期手順（直列化待機、`git fetch origin main:main`）を選択
 - 出力制約: 成果物本文（PR本文、commit message）は verbatim で返す（別途成果物パス、根拠、親判断事項は圧縮）
 - 結果状態分離報告: GitHub側、`.agentdev` 永続化、ブランチ削除状態を独立して報告
