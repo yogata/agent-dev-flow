@@ -2,7 +2,7 @@
 title: 索引類自動生成 Design
 status: accepted
 created: 2026-07-19
-updated: 2026-09-10
+updated: 2026-09-12
 ---
 <!-- ADF-COVERS(implementation): REQ-001-026, REQ-001-028 -->
 <!-- ADF-COVERS(implementation): REQ-010-011 -->
@@ -219,6 +219,15 @@ Decision README 関連REQ表は自動生成（混合領域）へ移行済みで�
   （人手管理 → 自動生成/混合への区分変更）、「現在人手管理領域の4領域」節
   （3領域への更新）を更新し、generate_indexes.ts への生成処理追加、IR-061 系整合検査の
   拡張を同一 Case で実施する
+
+decisions/README.md の関連REQ列は Decision frontmatter の related_reqs から再生成される
+ため後継情報を載せられず（retired REQ リンクは（retired）付きで関連REQ列に残存する）、
+後継・retired の事実は README 説明列（人手判断列）で補記する。
+- retired REQ に関連 Decision が存在する場合、該当 Decision 行の説明列へ後継・retired の
+  事実を補記する（例: DEC-007/013/017 の既存補記）
+- 補記の網羅性は retired 発生時・復帰時に確認する。機械検出対象外の運用情報であるため、
+  網羅性確認は retired 登録操作とセットで行う
+- 説明列（人手判断列）の編集は AUTOGEN ブロック外で行い、自動生成結果と矛盾させない
 
 ## 関連情報
 

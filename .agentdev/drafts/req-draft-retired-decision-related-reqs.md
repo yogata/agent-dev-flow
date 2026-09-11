@@ -2,6 +2,7 @@
 draft_type: req_draft
 topic_slug: retired-decision-related-reqs
 status: saved
+design_actions_consumed: true
 created_at: 2026-09-11
 source_rus: [RU-0009]
 ---
