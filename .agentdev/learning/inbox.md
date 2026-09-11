@@ -184,3 +184,21 @@
 - **タグ**: #fixture #copyScripts #IR-062 #fallback
 
 ---
+
+## 2026-09-12: bun test のファイル単体指定は .opencode/... 形式だと no test files matched になるため ./.opencode/... 付き相対パスで指定する
+
+- **問題事象**: `bun test <path>` に `.opencode/...` 形式（`./` なし）のパスフィルタを渡すと tests の探索対象と一致せず「no test files matched」となり、テストが 1 件も実行されない
+- **発生局面**: case 2779 の恒久検証手段（generate_indexes.test.ts 単体実行）実行時（case-run / case-close）
+- **検知方法**: bun test 出力の「no test files matched」と ran 0 tests 系メッセージ
+- **根本原因**: bun test のパスフィルタは相対パス（`./` 付き）として解決されるのに対し、`./` なしの `.opencode/...` 表記は探索対象のパス解決と一致しない
+- **自律対応内容**: ファイル単体実行時は `./.opencode/...` 形式で指定する運用に統一。case 2779 では `bun test ./.opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.test.ts` → 40 pass / 0 fail を取得（case-run / case-close 両工程で同結果）
+- **ユーザー確認の有無**: なし（前例追認）
+- **Decision/REQ/spec影響**: なし（既知の bun test 実行形態契約の細分化）
+- **横展開観点**: repo 内テストスクリプトのファイル単体実行全般。ディレクトリ一括実行は repo root 起 cwd + `./.opencode/...` 形式（case 2777 の前例と同一方向）
+- **再発条件**: `.opencode/...` 形式（`./` なし）で bun test にファイルパスを渡した場合
+- **予防策候補**: bun test 実行形態契約に「ファイル単体指定は `./` 付き相対パス」を明記し、no test files matched 出力を検知条件にする
+- **想定反映先**: checker-execution-contracts.md の bun test 実行形態契約（learning-promote 経由で評価）
+- **関連**: case 2779（Issue 2779 / PR 2780）、case 2777（repo root 起 cwd 契約の前例）
+- **タグ**: #bun-test #パスフィルタ #cwd
+
+---
