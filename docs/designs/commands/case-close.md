@@ -245,7 +245,7 @@ PR 本文読取記述、design-lifecycle-application.md の旧昇格条件文言
 1. 当該 Case の対象 REQ を特定する（Issue 本文の REQ 参照から導出。行レベルの導出は
    現行の正規記録先に存在しないため、REQ ファイル単位の近似列挙を許容する。
    行レベルの正規記録先が確定した場合は行レベル判定へ昇格する）（adversarial-review F2）
-2. docs/designs/** の正規成果物から、当該 REQ を ADF-COVERS 宣言（implementation 役割）で
+2. docs/designs/** の正規成果物から、当該 REQ を implementation 役割の対応宣言で
    カバーし frontmatter status が draft の Design を逆算列挙する（projection 配下は対象外）
 3. PR 本文「Design 確定候補」セクションの申告候補を列挙結果へ統合する（重複は 1 件にまとめ、
    二重処理しない）。申告は補助入力であり、申告の不在を理由に棚卸しを省略しない

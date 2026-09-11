@@ -22,6 +22,12 @@ function decl(role: string, ids: string): string {
   return `<!-- ${MARKER}(${role}): ${ids} -->`;
 }
 
+// TypeScript 正規宣言位置（行頭 // コメント）用の宣言行生成。
+// 対象外判定により .ts 内の HTML コメント行は prose として無視されるため使い分ける。
+function tsDecl(role: string, ids: string): string {
+  return `// ${MARKER}(${role}): ${ids}`;
+}
+
 function writeFixture(rel: string, lines: readonly string[]): void {
   const filePath = join(ROOT, rel);
   mkdirSync(join(filePath, ".."), { recursive: true });
@@ -38,9 +44,9 @@ afterAll(() => {
 describe("coverage（要件起点）", () => {
   it("1要件に複数役割の対応成果物があるとき全件を役割付きで返す（RU-0002 検証: 正常系）", () => {
     writeFixture("docs/designs/x.md", [decl("design", "REQ-900-001")]);
-    writeFixture("src/a.ts", [decl("implementation", "REQ-900-001")]);
-    writeFixture("src/b.ts", [decl("implementation", "REQ-900-001, REQ-900-002")]);
-    writeFixture("tests/v.test.ts", [decl("verification", "REQ-900-001")]);
+    writeFixture("src/a.ts", [tsDecl("implementation", "REQ-900-001")]);
+    writeFixture("src/b.ts", [tsDecl("implementation", "REQ-900-001, REQ-900-002")]);
+    writeFixture("tests/v.test.ts", [tsDecl("verification", "REQ-900-001")]);
     const { declarations } = scanCorpus(ROOT);
     const result = coverageByRequirement(declarations, "REQ-900-001");
     expect(result.mode).toBe("requirement");
@@ -85,8 +91,8 @@ describe("coverage（要件起点）", () => {
 describe("coverage（成果物起点）", () => {
   it("1成果物から複数要件への対応を全件返す（RU-0002 検証: 逆引き）", () => {
     writeFixture("src/multi.ts", [
-      decl("implementation", "REQ-900-101, REQ-900-102"),
-      decl("verification", "REQ-900-101"),
+      tsDecl("implementation", "REQ-900-101, REQ-900-102"),
+      tsDecl("verification", "REQ-900-101"),
     ]);
     const { declarations } = scanCorpus(ROOT);
     const result = coverageByArtifact(declarations, "src/multi.ts");

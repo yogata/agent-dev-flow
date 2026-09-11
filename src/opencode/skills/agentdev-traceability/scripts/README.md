@@ -9,7 +9,7 @@ scripts/
 ├── package.json
 ├── tsconfig.json
 ├── lib/
-│   ├── declarations.ts       # ADF-COVERS 対応宣言の解析（行単位パターン照合、意味推定なし）
+│   ├── declarations.ts       # ADF-COVERS 対応宣言の解析（正規宣言位置の行単位パターン照合、prose 対象外、意味推定なし）
 │   ├── corpus.ts             # 正規成果物コーパスの直接走査（派生 Graph 非依存）
 │   ├── requirements.ts       # 現行要件行ID（docs/requirements/REQ-{NNNN}.md）の収集
 │   ├── verification_scope.ts # 検証対応要否カタログの解析・範囲展開（不在時は全行必須）

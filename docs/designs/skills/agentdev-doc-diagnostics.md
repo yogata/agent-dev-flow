@@ -101,7 +101,7 @@ docs 横断診断は本 skill が正規の所有者となる（REQ-036-013 の d
 
 ### 判定基準
 
-- 対象要件: draft Design の ADF-COVERS(implementation) 宣言がカバーする REQ
+- 対象要件: draft Design の implementation 役割の対応宣言がカバーする REQ
   （Case 特定の粒度は REQ ファイル単位の近似を含む。行レベルの正規記録先が確定した場合は
   行レベル判定へ昇格する。REQ ファイル単位近似は、同一 REQ ファイルの別行実装完了による
   誤報告性格を含むため、finding に近似判定である旨を明示する）（adversarial-review F7）

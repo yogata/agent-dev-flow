@@ -34,7 +34,9 @@ const DISTRIBUTION_BOUNDARY_FIXTURE =
 const ESCAPED_FIXTURE_ID = ["REQ-", "\\\\", "u0030", "\\\\", "u0031"].join("");
 
 function distributionBoundaryMalformedFixture(): string {
-  return `text: "<!-- ${MARKER}(implementation): ${ESCAPED_FIXTURE_ID} -->",`;
+  // 正規宣言位置（行頭 // コメント）内に配置する。対象外判定導入後も
+  // exemption 機能（file + 行テキスト断片の限定免除）を検証し続けるため。
+  return `// text: "<!-- ${MARKER}(implementation): ${ESCAPED_FIXTURE_ID} -->",`;
 }
 
 function writeFixture(rel: string, lines: readonly string[]): void {
@@ -152,7 +154,7 @@ describe("既知の意図的 fixture の exemption", () => {
   it("同一ファイルの別 malformed 行は exemption されない", () => {
     writeFixture(DISTRIBUTION_BOUNDARY_FIXTURE, [
       distributionBoundaryMalformedFixture(),
-      `<!-- ${MARKER}(design) REQ-900-001 -->`,
+      `// ${MARKER}(design) REQ-900-001`,
     ]);
     const scan = scanCorpus(ROOT);
     const report = runChecks(scan, KNOWN);
@@ -164,7 +166,9 @@ describe("既知の意図的 fixture の exemption", () => {
   });
 
   it("同じ escape 断片でも別ファイルは exemption されない", () => {
-    const otherFile = "other/distribution-fixture.md";
+    // 対象外判定後も exemption 限定性を検証するため、正規宣言位置（行頭 // コメント）
+    // を持つ TypeScript ファイルに配置する
+    const otherFile = "other/distribution-fixture.ts";
     writeFixture(otherFile, [distributionBoundaryMalformedFixture()]);
     const scan = scanCorpus(ROOT);
     const report = runChecks(scan, KNOWN);
