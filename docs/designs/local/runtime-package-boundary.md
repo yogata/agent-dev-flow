@@ -2,7 +2,7 @@
 title: 実行時パッケージ境界
 status: accepted
 created: 2026-08-20
-updated: 2026-09-11
+updated: 2026-09-12
 ---
 <!-- ADF-COVERS(implementation): REQ-002-007, REQ-002-008, REQ-002-011, REQ-002-019, REQ-002-020, REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-002, REQ-009-003, REQ-009-006, REQ-009-007, REQ-009-008, REQ-009-009, REQ-009-010, REQ-009-011, REQ-009-012, REQ-009-013, REQ-009-014, REQ-009-015, REQ-009-016, REQ-009-017, REQ-009-018, REQ-009-019, REQ-009-020, REQ-009-021, REQ-009-022, REQ-009-023, REQ-009-024, REQ-009-025, REQ-009-035, REQ-009-036, REQ-009-037, REQ-009-038, REQ-009-039, REQ-009-046, REQ-009-047, REQ-009-048, REQ-009-049 -->
@@ -282,6 +282,14 @@ repo-local Plugin（REQ-002-045）の配布・投影については次のとお�
 - 将来 repo-local Plugin が複数化した時点で、マーカー方式（package.json マーカーフィールド等）への拡張条件を判断する。
 
 outside-root 判定は、ワークスペース外の書き込みを原則ブロック（fail-closed）しつつ、事前承認済みディレクトリ（OS 標準 TEMP 等、実行環境が提供する一時領域）への書き込みを例外として許可する。例外はパス個別の特例列挙ではなく、承認済み一時領域カテゴリとして判定基準に組み込む（一般化: ru-batch-20260903、REQ-057-010 方針）。
+
+### 自己ホスト投影対称性検査の機械検査契約
+
+repo-local Plugin の自己ホスト投影対称性検査を機械検査契約として追加する。
+- 検査対象: 正本（src/opencode/plugins/agentdev-textlint-guard/ 配下の投影対象構造）と自己ホスト投影（.opencode/plugins/ 配下）の対称性（投影欠落・余剰・shim 内容不一致）
+- 検出扱い: 対称性破れは [DIVERGENCE] 相当の検出として docs-check 系検査結果に報告する
+- 対称性の契約参照: 本 Design の投影契約、plugin README の配布宣言、self-sync.ps1 の動的列挙の 3 点
+- 投影の再同期（self-sync.ps1 再実行）は環境操作であり、検出時の対応は環境操作として完了報告等に実行指示を含める運用とする（検査自体は repo 内で完結する）
 
 ## 誤実行防止の環境判定方式
 
