@@ -202,3 +202,57 @@
 - **タグ**: #bun-test #パスフィルタ #cwd
 
 ---
+
+## 2026-09-12: worktree で self-sync.ps1 apply を実行すると既存 docs-check 検査の走査対象が投影側へ切り替わり NG baseline 未整備環境では既知 NG が新規 unmanaged NG として顕在化する
+
+- **問題事象**: worktree 環境で `self-sync.ps1 -Mode apply` を実行した場合、既存 docs-check 検査（例: `reference-path-existence`）の走査対象がフォールバック（`src/opencode/skills`）から投影側（`.opencode/skills` junction）へ切り替わり、NG baseline 未整備の環境では既知 NG が新規 unmanaged NG として顕在化する
+- **発生局面**: case 2787 の TS-001 対称状態構築時（case-run、DEL-2787-1）
+- **検知方法**: `check_integrity.ts` 全体実行で既知 NG 15 件が新規 unmanaged NG として報告された
+- **根本原因**: 投影出現による走査対象切替と NG baseline 未整備の組合せ（当該変更起因ではない）
+- **自律対応内容**: 由来分類（当該変更起因か否か）は「stash で実装を一時退避し HEAD 版で同一環境を再実行して同件数を確認する」手順で実証（DEL-2787-1）
+- **ユーザー確認の有無**: なし（実行で確定）
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree + apply を伴う検証全般。由来分類の対照実行手順は distribution-boundary gate 等の他検査にも適用可能
+- **再発条件**: worktree 上で `self-sync.ps1 -Mode apply` 後に docs-check 系検査を実行する場合
+- **予防策候補**: NG baseline の整備、または worktree 検証時の走査対象明示
+- **想定反映先**: checker-execution-contracts.md（learning-promote 経由で評価）
+- **関連**: case 2787（Issue 2787 / PR 2788）
+- **タグ**: #self-sync #worktree #NG-baseline #対照実行
+
+---
+
+## 2026-09-12: 配布依存境界 gate は baseline 未整備環境では既存 violation が failure 化するため対照実行で delta 0 を実証して合格扱いを判定する
+
+- **問題事象**: `check_distribution_boundary.ts --profile source` が baseline 未整備環境（リポジトリに baseline ファイル不在）では既存 violation（concrete-id `DEC-003`、templates/req-define/req-draft.md L118）を `ok: false` の failure として報告し、PR 変更と無関係でも gate 合格判定が機械的に得られない
+- **発生局面**: case 2787 の case-close STEP-3 配布依存境界 最終 gate 実行時
+- **検知方法**: gate 実行結果 `ok: false`、かつ failure の file が PR 変更ファイル一覧（pr_changed_files）に含まれないこと
+- **根本原因**: baseline ファイル不在につき `--delta` 経由の delta 計算が動かず raw failures が ok 判定に使われる
+- **自律対応内容**: 同一 detector・同一引数を main HEAD（PR 変更未適用）と PR HEAD worktree で対照実行し、同一 signature（同一 file/category/matched）を確認 → 新規違反 delta 0 をもって distribution-boundary Design §6.4 baseline policy（baseline 超過分のみ gate 失敗）基準で合格扱いと判定
+- **ユーザー確認の有無**: なし（対照実行で機械実証）
+- **Decision/REQ/spec影響**: なし（判定手順の運用知見。IR-059 baseline 整備自体は後続課題）
+- **横展開観点**: distribution-boundary gate ほか baseline 保持型 checker の gate 合格判定全般。case-run の stash 対照実証と同一手法
+- **再発条件**: baseline 未整備環境で baseline 保持型 checker を gate として実行した場合
+- **予防策候補**: IR-059 baseline ファイルの整備と `--delta` の常時指定
+- **想定反映先**: distribution-boundary Design または checker 実行契約の baseline 運用（learning-promote 経由で評価）
+- **関連**: case 2787（Issue 2787 / PR 2788）、case 2777（stash 対照実証の前例）
+- **タグ**: #distribution-boundary #baseline #対照実行 #case-close
+
+---
+
+## 2026-09-12: bun test の spawnSync 系回帰テストは高負荷環境で 5 秒タイムアウトにより fail するため PR 変更未適用状態での再実行で環境起因と切り分ける
+
+- **問題事象**: `bun test ./.opencode/skills/repo-agentdev-integrity/scripts/` で Issue #1782 / #2245 由来の spawnSync 回帰テスト 4 件が `timed out after 5000ms` で fail する（子プロセスの bun 起動が閾値超過）。機能的アサーション失敗ではない
+- **発生局面**: case 2787 の case-close STEP-3 full integrity suite（main HEAD 実行）で 2 回連続発生
+- **検知方法**: fail 出力の `timed out after 5000ms` と `SyntaxError: JSON Parse error: Unexpected EOF`（タイムアウトで stdout 空のため）
+- **根本原因**: spawnSync で外部 checker を子プロセス起動するテストの 5 秒閾値に対し、高負荷環境（suite 実行 224 秒規模）では子プロセス起動が間に合わない環境性能要因
+- **自律対応内容**: 実行対象が PR 変更未適用の main HEAD（working tree clean 確認済み）であることを確認し、PR 非起因の環境依存と判定して対応記録コメントへ既出相当として記録。case-run の worktree 実行（0 fail）と main HEAD 実行（4 fail）の差は環境負荷差として説明
+- **ユーザー確認の有無**: なし（実行ログで機械確認）
+- **Decision/REQ/spec影響**: なし（テスト実行環境の知見）
+- **横展開観点**: spawnSync 外部実行テスト全般（IR-055、NG21 N16/N17 系）。タイムアウト fail を機能的 fail と区別する切り分け手順
+- **再発条件**: 高負荷状態で spawnSync 系テストを含む suite を実行した場合
+- **予防策候補**: spawnSync 系テストのタイムアウト閾値引き上げ、または suite 実行時の負荷分離
+- **想定反映先**: checker-execution-contracts.md の bun test 実行形態契約（learning-promote 経由で評価）
+- **関連**: case 2787（Issue 2787 / PR 2788）、Issue #1782、Issue #2245
+- **タグ**: #bun-test #spawnSync #タイムアウト #環境起因
+
+---
