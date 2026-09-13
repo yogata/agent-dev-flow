@@ -2,7 +2,7 @@
 title: checker 実行契約と検出基盤規則
 status: accepted
 created: 2026-08-15
-updated: 2026-09-11
+updated: 2026-09-14
 ---
 <!-- ADF-COVERS(implementation): REQ-002-035 -->
 <!-- ADF-COVERS(implementation): REQ-010-062 -->
@@ -10,6 +10,7 @@ updated: 2026-09-11
 <!-- ADF-COVERS(design): REQ-018-004 -->
 <!-- ADF-COVERS(implementation): REQ-057-004 -->
 <!-- ADF-COVERS(implementation): REQ-057-018 -->
+<!-- ADF-COVERS(design): REQ-060-001, REQ-060-002, REQ-060-003 -->
 
 # checker 実行契約と検出基盤規則
 
@@ -195,6 +196,31 @@ source パス（SoT パス = 検査 root（--root 指定の対象 worktree）直
 - fallback で実行可能な検査は実行し、実行不能な既知 skip は環境差（REQ-018-004 の環境差扱い）として区別記録する
 - fallback を使用した検査では、実行環境（worktree / main、junction 伝播状態）を環境ラベルとして検証記録に明記する（REQ-018 の環境ラベル契約に従う）
 - 本 fallback は REQ-018「junction を前提とする構造系テストは source パス（SoT パス）への fallback で実行される」規約の checker への適用であり、worktree 作成工程（junction 自動化）を変更しない
+
+## bun test 実行形態契約（単独実行・ファイル単体指定を含む）
+
+bun test の全ての実行は、フル suite の 3 cwd 分割正規形（agentdev-quality-gates が正規所有）に
+加えて、次の実行形態に統一する。本節は bun test 単独実行・ファイル単体指定時の一般規約を所有し、
+フル suite 合格判定の実行形態契約（QG-4）を侵食しない。
+
+- 起動 cwd はリポジトリルート（main root または worktree root）に統一する。scripts 配下等、
+  repo root 以外を cwd にした実行を標準としない
+- 対象パスは `./` 付き相対パスとして指定する。`.opencode/...` のような `./` なし表記は bun test の
+  パスフィルタで no test files matched となり 0 件実行になるため標準としない。
+  ファイル単体指定も `./` 付きとする
+- worktree 実行時は依存パッケージ前置（bun install）の要否を事前確認する
+  （node_modules 未伝播の依存解決 fail 予防。詳細は agentdev-git-worktree の worktree 構造的制約を参照）
+
+逸脱時の検知条件（次のシグナルが観測された場合は実行形態逸脱を疑う）:
+
+- REPO_ROOT を cwd からの相対解決で求めるテストの fail（repo root 以外の cwd 起動時に発生。
+  全件が環境依存 fail として観測され得る）
+- bun test 出力に no test files matched が含まれ、実行件数 0 件となる（`./` なしパス指定時）
+- 依存解決失敗（Cannot find package 等）が worktree node_modules 未伝播由来で発生
+
+QG-4 フル suite 正規形（3 cwd 分割実行、正規ランナー構成確認、環境ラベル、fail 由来分類）は
+agentdev-quality-gates が正規所有する。本節はその所有権を変更せず、単独実行・ファイル単体指定時の
+一般規約と正規形への参照を提供する。
 
 ## See Also
 

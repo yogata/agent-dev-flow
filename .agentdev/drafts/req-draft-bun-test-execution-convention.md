@@ -1,7 +1,7 @@
 ---
 draft_type: req_draft
 topic_slug: bun-test-execution-convention
-status: saved
+status: design_saved
 created_at: 2026-09-14T05:33:01+09:00
 source_rus:
   - RU-0003
@@ -151,12 +151,15 @@ operation_units:
       target_req_resolved: REQ-060
       artifact_action_mapping:
         ACT-REQ-001: REQ-060
+        ACT-DESIGN-001: docs/designs/integrity/checker-execution-contracts.md
       ru_mapping:
         RU-0003: REQ-060
       uncategorized_verification_rows: [REQ-060-001, REQ-060-002, REQ-060-003, REQ-060-004, REQ-060-005]
       notes: |
         ACT-DESIGN-001（artifact: design、checker-execution-contracts.md append）は design-save の
         対象として本 workflow では未処理。次経路: design-save → case-open。
+        design-save により ACT-DESIGN-001 を docs/designs/integrity/checker-execution-contracts.md へ
+        append 済み（frontmatter status: design_saved、See Also 直前配置）。次経路: case-open。
         uncategorized_verification_rows は検証対応要否が未分類の要件行（検証対応宣言なし かつ
         カタログ未登録）。分類完了は case-open または実装着手前までの必須条件
         （検証対応任意行としてのカタログ登録、または検証対応宣言を持つ恒久検証手段の整備）。
