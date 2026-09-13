@@ -124,7 +124,16 @@ operation_units:
     depends_on: []
     recommended_order: 1
     issue_policy: single
-    result: {}
+    result:
+      saved_docs:
+        - "REQ-007 (docs/requirements/REQ-007.md)"
+      action_to_doc:
+        ACT-REQ-001: "REQ-007 (append: REQ-007-010)"
+      ru_to_operation:
+        RU-0004: "OU-001 -> ACT-REQ-001 -> REQ-007"
+      unclassified_lines:
+        - REQ-007-010
+      saved_at_commit: "00309532"
 
 test_strategy:
   - id: TS-001
