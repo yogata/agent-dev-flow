@@ -1,7 +1,7 @@
 ---
 draft_type: req_draft
 topic_slug: verify-only-execution-evidence-ssot
-status: saved
+status: design_saved
 created_at: 2026-09-14T00:00:00+09:00
 source_rus:
   - RU-0002
@@ -107,6 +107,7 @@ artifact_actions:
     operation: append
     target: docs/designs/commands/case-run.md
     target_area: "#### 配布物変更時の commit 前3検査工程"
+    status: consumed
     source_items: [AG-001, AG-003, AG-004]
     content: |
       「配布物変更時の commit 前3検査工程」節の直後に新節として追加:
@@ -143,6 +144,7 @@ artifact_actions:
     operation: append
     target: docs/designs/commands/case-close.md
     target_area: "配布物変更を含む case の3検査結果確認"
+    status: skipped
     source_items: [AG-002, AG-003, AG-004]
     content: |
       「配布物変更を含む case の3検査結果確認」項の直後に新節として追加:

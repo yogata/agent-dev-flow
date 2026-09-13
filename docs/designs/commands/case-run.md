@@ -2,7 +2,7 @@
 title: case-run Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-11"
+updated: "2026-09-14"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-015, REQ-021-016, REQ-021-017, REQ-021-019, REQ-021-020, REQ-021-022 -->
@@ -111,6 +111,34 @@ Workflow Skill は単一 Issue 実行（single workflow）と Epic Wave 実行�
 突合は base 既知違反（baseline 既知 delta）と変更起因の新規違反を分離して行う。
 新規違反は全件分類して修正し、再検証で新規違反 0 件を確認してから commit する（fix-and-reverify）。
 baseline 既知違反の無断削除・隠蔽を行わない。baseline エントリの除去は対応する残存箇所の実際の解消とセットでのみ行う。
+
+#### verify-only closure の検証実行と SSoT コメント記録工程
+
+verify-only closure（PR も carrier commit も存在しない Issue 完了。検証のみで完了する
+maintenance case を含む）では、変更が存在しないため commit 前3検査の発火条件
+（配布物変更を含む case）が成立しない。この場合でも検証完了の恒久証跡を残すため、
+次のとおり実行する。本工程は case 2769 で確立した運用の明文化であり、
+「検証完了のために carrier commit を作成する」代替案は case 2769 で却下済みの作業仮定に基づき採用しない。
+
+1. verify-only closure の判定: execution contract で検証のみと事前確定された case、
+   または実行の結果変更不要が確定した case のいずれかを正規の判定点とする。
+   判定根拠を Issue コメント（SSoT コメント）に残す
+2. 3検査の実行: 配布依存境界検査（check_distribution_boundary.ts）、IR-055 検査
+   （runtime-unresolved-reference）、traceability 検査（宣言整合）を通常 case と同一の手順・
+   同一の水準（base 既知違反と新規違反の分離突合、新規違反 0 件確認）で実行する。
+   checker コマンドの実行経路と stdout 退避形式は checker 実行契約
+   （安定実行経路: モジュール import 経由、spawnSync による status/stdout 分離取得、
+   fs.writeFileSync の UTF-8 明示書き出し）に従う
+3. integrity suite の実行: full integrity suite（bun test 全件）を実行し、
+   「Ran N tests across M files」の N/M 件数突合と直前実績との件数急減なし確認を行う
+   （case-close STEP-3 の合格基準と同水準）
+4. SSoT コメントへの記録: 実行コマンド列（実行 cwd、実行形態を含み、そのまま再実行手順として
+   機能する形式）と結果（3検査の new_delta 0・新規違反 0 件、integrity suite の pass/fail 件数）
+   を Issue コメントに記録する。verify-only closure では PR が存在しないため
+   PR 本文を記録先に使わない
+5. チャネル分離: SSoT コメントは検証証跡チャネルであり、capture（intake/learning 候補）
+   チャネルではない。REQ-031-014 の capture 引き継ぎ経路（PR 本文限定）は変更しない。
+   検証中に発見した本筋外の検出事項は既存の intake 起票経路で扱う
 
 #### docs 変更を含む case での commit 前 full check_integrity 工程
 
