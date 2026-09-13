@@ -40,9 +40,9 @@ learning-capture によって inbox.md に追記されたエントリが、learn
 
 deferred.md は append-only ではなく、以下のタイミングでエントリが削除される:
 - **promote 内部分析フェーズ時 prune**（MAY）: 長期間再発していない単発レアケース。ただし判断基準・技術知識・プロジェクト固有知識を含む learning item は削除不可
-- **promote 時 prune**（SHALL）: staged / rejected / duplicate の learning item。deferred/未処理/再評価対象の learning item は削除不可（REQ-0147-007）
+- **promote 時 prune**（SHALL）: staged / rejected / duplicate の learning item。deferred/未処理/再評価対象の learning item は削除不可（REQ-003-006/REQ-003-007）
 
-**注意**: learning-refine は廃止済み（REQ-0105-051）。refine 機能は learning-promote に統合されている。
+**注意**: learning-refine は廃止済み（v2:REQ-0105-051、v3.0.0 移行で v2 REQ は物理削除済み。AG-010 の v2: 表記で参照維持）。refine 機能は learning-promote に統合されている。
 
 ---
 
