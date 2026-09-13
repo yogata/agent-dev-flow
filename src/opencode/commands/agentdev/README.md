@@ -6,13 +6,16 @@ description: agentdev コマンドリファレンス
 
 AgentDevFlow の各コマンドの入力、出力、次アクションを一覧化する。
 
+req-save / design-save の要否は req_draft の `artifact_actions` 存在で動的判定する（work_type による固定判定は行わない）。
+該当対象がない場合は req-define の直後に case-open へ進む。
+
 ## コマンド一覧
 
 | Command | Primary Input | Primary Output | Next |
 |---------|--------------|----------------|------|
-| `/agentdev/req-define` | セッション会話/ RU | 要件doc（draft） | feature: `/agentdev/req-save`、bugfix/maintenance/docs_chore: `/agentdev/case-open` |
-| `/agentdev/req-save` | 要件doc（feature のみ） | REQ/Decision ファイル | `/agentdev/design-save`（Design候補がある場合）/ `/agentdev/case-open` |
-| `/agentdev/design-save` | 要件doc（feature のみ、Design候補あり） | Design ファイル（`docs/designs/`） | `/agentdev/case-open` |
+| `/agentdev/req-define` | セッション会話/ RU | 要件doc（draft） | `/agentdev/req-save`（REQ/Decision 対象 artifact_actions がある場合）/ `/agentdev/case-open` |
+| `/agentdev/req-save` | 要件doc（REQ/Decision 対象 artifact_actions がある場合） | REQ/Decision ファイル | `/agentdev/design-save`（Design 対象 artifact_actions がある場合）/ `/agentdev/case-open` |
+| `/agentdev/design-save` | 要件doc（Design 対象 artifact_actions がある場合） | Design ファイル | `/agentdev/case-open` |
 | `/agentdev/case-open` | REQ ファイル/ 要件doc | GitHub Issue | `/agentdev/case-run` |
 | `/agentdev/case-run` | Issue | 実装済みブランチ + PR | レビュー後: `/agentdev/case-close` |
 | `/agentdev/case-update` | Issue | 更新済み Issue | 継続または `/agentdev/case-close` |

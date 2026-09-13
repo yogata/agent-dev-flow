@@ -2,27 +2,19 @@
 
 AgentDevFlow を構成する成果物の種別、配置、ライフサイクルを説明する。
 
-## 文書種別
+## 文書種別の配置
 
-| 種別 | 格納先 | 役割 |
-|------|--------|------|
-| REQ | `docs/requirements/REQ-{NNN}.md` | 要件定義の永続基準 |
-| Decision（現行） | `docs/decisions/DEC-{NNN}.md` | 現行基準の技術判断記録 |
-| Design | `docs/designs/**/*.md` | 実装者が参照する現在設計（commands/skills/workflows の3層と基盤6ドメイン） |
-| Report | `docs/reports/**/*.md` | 監査・評価・観測の事実記録 |
-| guides | `docs/guides/*.md` | 利用者向けの参照用読み物 |
+| 種別 | 格納先 |
+|------|--------|
+| REQ | `docs/requirements/REQ-{NNN}.md` |
+| Decision（現行） | `docs/decisions/DEC-{NNN}.md` |
+| Design | `docs/designs/**/*.md` |
+| Report | `docs/reports/**/*.md` |
+| Knowledge | `docs/knowledge/*.md` |
+| guides | `docs/guides/*.md` |
 
-**優先順位**: REQ > Decision > Design。
-guides は基準への導線を提供する。
-基準文書と矛盾する記述がある場合は基準を優先する。
-
-> 未解決事項の追跡は追跡Issue（GitHub Issue の管理単位・永続状態）で行い、docs/ 配下に課題ファイルの文書種別は設けない（REQ-049）。
-
-### 参照ルール
-
-- REQ → Decision、Decision → Decision、Issue → Decision の参照を許可
-- Decision → Issue の逆参照は不可
-- 文書間矛盾時は REQ を優先
+各文書種別の役割、文書体系の読み方、優先順位、参照ルールの正は [プロジェクトドキュメントと Design](project-docs-and-specs.md) を参照する。
+未解決事項の追跡は追跡Issue（GitHub Issue の管理単位・永続状態）で行い、docs/ 配下に課題ファイルの文書種別は設けない（REQ-049）。
 
 ## コマンド、スキル体系
 
@@ -36,7 +28,7 @@ guides は基準への導線を提供する。
 | リポジトリ専用 Skill | `.opencode/skills/repo-*/`（原本なし、配置先のみ） | AgentDevFlow 本体リポジトリ専用スキル（DEC-001）。配布対象外 |
 
 Command は判定ロジックを Skill の参照先に委ねる。
-Skill は Command の Step 番号やファイルパスは Command 側で管理する。
+Command の Step 番号やファイルパスは Command 側で管理する。
 Script は決定的で単体テスト可能な処理に限定する。
 
 ### テンプレート配置
@@ -145,7 +137,9 @@ RU 削除は `/agentdev/case-open` の永続化成功に限定する。
 | `review` | PR 作成済み、レビュー中 | レビュー完了 |
 | `done` | 完了（post-run capture 含む） | レビュー完了 |
 
-6 マイクロフェーズは説明用ラベルであり、AgentDevFlow は全体横断の状態遷移モデルではなく、各コマンドの入出力契約とディレクトリ配置が実際の状態表現である。
+6 マイクロフェーズは説明用ラベルであり、状態管理モデルではない。
+AgentDevFlow は全体横断の状態遷移モデルを持たない。
+各コマンドの入出力契約とディレクトリ配置が実際の状態表現である。
 
 ## 状態モデル制約
 
@@ -153,8 +147,9 @@ RU 削除は `/agentdev/case-open` の永続化成功に限定する。
 
 - REQ / Design の状態管理は Issue ラベル、GitHub Project で行う
 - intake promoted の route / status はディレクトリ配置で表現する
+- frontmatter や status フィールドによる状態管理は行わず、各段階の進行はディレクトリ構造で追跡する
 - Issue / PR の状態を docs に複製しない
-- command-map を状態遷移エンジン化しない
+- 入口表は次に実行すべきコマンドの案内であり、状態遷移エンジンではない
 
 ## .agentdev/ の位置づけ
 

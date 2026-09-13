@@ -16,11 +16,13 @@ AgentDevFlow で使う用語の定義。
 | intake-capture | インテイク、キャプチャ | 手動で気づき、課題を inbox に記録するコマンド |
 | intake-from-github | インテイク、フロム、ギットハブ | クローズ済み Case Issue/PR から改善候補を抽出するコマンド（role: tracking の追跡Issueは抽出対象外） |
 | intake-promote | インテイク、プロモート | inbox の項目をレビュー、採用、却下、保留判定し、採用済み成果物に整形するコマンド |
+| learning-capture（スキル） | ラーニング、キャプチャ | 観測から再発防止知見を inbox.md に蓄積するスキル（コマンドではなくスキルとして提供される） |
 | learning-promote | ラーニング、プロモート | Learning エントリを分析、分類、昇華判定し、採用済み成果物を生成するコマンド |
 | backlog-review | バックログ、レビュー | 採用済み成果物を分析、統合し、ユーザー承認後に RU を生成するコマンド |
 | backlog-auto | バックログ、オート | backlog 整理サイクル（検出→昇格→統合）を1回で実行するコマンド |
 | docs-check | ドックス、チェック | ドキュメント、スキル、コマンドの整合性を検証するコマンド。配布対象外コマンド `/repo/docs-check` に配置し、`/agentdev/*` コマンド体系とは区別する（DEC-001、REQ-010） |
 | issue | イシュー | 自然言語の指示から追跡Issueの起票、検索・参照、更新、コメント追加、保留、再評価、実行準備完了、解決、反映確認、クローズ、再オープンを行うコマンド（`/agentdev/issue`）。読み書きは Tool 操作契約経由 |
+| third-party-sync | サードパーティー、シンク | third-party Skill を宣言（skills.yaml）に基づき取得、同期するコマンド。対象一覧、取得成否、配置パス、管理外衝突の検出状況を報告する |
 | inspect-docs | インスペクト、ドックス | docs 全体の意味整合性を検出し、検出事項（finding）を出力するコマンド |
 | inspect-skills | インスペクト、スキルズ | Command/Skill 参照妥当性を検出し、検出事項（finding）を出力するコマンド |
 | inspect-promote | インスペクト、プロモート | 検出事項（finding）を分類（promote/defer/reject）し、採用済み成果物を生成するコマンド |

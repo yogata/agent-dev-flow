@@ -15,7 +15,9 @@
 
 ## REQ/Decision・Design の保存対象がない場合
 
-バグ修正、保守作業、ドキュメント作業のように要件docに `artifact_actions` がない場合は `req-save` / `design-save` をスキップし、`/agentdev/req-define` の直後に `/agentdev/case-open` に進む。
+バグ修正、保守作業、ドキュメント作業のように要件docに `artifact_actions` がない場合がある。
+この場合は `req-save` / `design-save` をスキップする。
+`/agentdev/req-define` の直後に `/agentdev/case-open` へ進む。
 
 ```
 /agentdev/req-define    # 再現手順・修正方針を整理する
@@ -26,13 +28,7 @@
 
 ## 各コマンドの概要
 
-| コマンド | やること | 入力 | 出力 |
-|----------|---------|------|------|
-| `/agentdev/req-define` | AI と対話して要件を整理 | セッション会話 / RU | 要件doc（draft） |
-| `/agentdev/req-save` | REQ/Decision ファイルを docs/ に保存 | 要件doc（REQ/Decision 対象 artifact_actions がある場合） | REQ/Decision ファイル |
-| `/agentdev/design-save` | Design ファイルを docs/designs/ に保存 | 要件doc（Design 対象 artifact_actions がある場合） | Design ファイル |
-| `/agentdev/case-open` | GitHub Issue を作成 | REQ ファイル / 要件doc | Issue |
-| `/agentdev/case-run` | 実装して PR を作成 | Issue | 実装済みブランチ + PR |
-| `/agentdev/case-close` | PR をマージして Issue をクローズ | PR | マージ済み + クローズ済み |
+各コマンドの入出力の詳細は [コマンドリファレンス](../../src/opencode/commands/agentdev/README.md) を参照する。
+工程分岐（req-save / design-save の要否）の詳細は [コマンド選択](command-selection.md) の補足を参照する。
 
 最大自走モード。`/agentdev/req-define` 完了後の後続工程を一括実行する場合は `/agentdev/case-auto` を使う（明示指定時のみ）。

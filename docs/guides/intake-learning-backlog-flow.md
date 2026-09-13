@@ -49,7 +49,8 @@ inbox/ → promoted/（採用 item の inbox 元ファイルは削除）
 | `inbox/` | 収集された気づき、課題の一次受け |
 | `promoted/` | backlog-review 入力用の採用済み成果物 |
 
-採用・却下いずれの判断も inbox 元ファイルは即時削除とし、監査証跡は commit message（reject の場合は却下理由を含める）で確保する。
+採用、却下いずれの判断も inbox 元ファイルは即時削除とする。
+監査証跡は commit message（reject の場合は却下理由を含める）で確保する。
 
 `promoted/` はフラット構成で、ディレクトリ配置で route / status を表現する。
 
@@ -94,7 +95,8 @@ Intake/Learning 両方の採用済み成果物を RU に統合する。
 |----------|------|------|
 | `promoted/`（intake/learning） | `/agentdev/backlog-review` | `RU-*.md` |
 
-`/agentdev/backlog-review` は分析、統合結果をユーザーに確認（HITL：人の判断を挟む）し、承認後に直接 RU を生成する。
+`/agentdev/backlog-review` は分析と統合結果をユーザーに確認する（HITL）。
+承認後に直接 RU を生成する。
 
 ### RU の粒度
 
@@ -122,18 +124,15 @@ RU は一時成果物であり、永続化未完了の場合は残置する。
 採用済み成果物間に矛盾が検出された場合、矛盾する成果物を RU 化せずユーザーに確認する。
 矛盾しない成果物は通常通り RU 化を継続する（一部成功）。
 
-## 状態モデル制約
+## 追跡Issue（別系統）
 
-AgentDevFlow のパイプライン状態はディレクトリ配置とファイルの存在で表現する。
-frontmatter や status フィールドによる状態管理は行わず、各段階の進行はディレクトリ構造で追跡する。
+追跡Issue（`/agentdev/issue`）は、開発中の未解決事項を管理する Intake / Learning とは別系統の課題管理である。
 
-- **採用済み成果物の状態表現**: ディレクトリ配置（`inbox/` → `promoted/`）が状態の表現である。frontmatter の route / status はディレクトリ配置で代替する
-- **GitHub 状態の管理場所**: Issue / PR の open / closed / merged 状態は Issue / PR で管理する。REQ / Design / guides への複製は行わない
-- **入口表は状態遷移エンジンではない**: 入口表は次に実行すべきコマンドの案内であり、状態機械の遷移表ではない
-- **6 マイクロフェーズは説明用ラベル**: ワークフローの進行状況を人間が理解するための呼称であり、システムが管理する状態値ではない
+- **管理単位**: GitHub Issue（role: tracking）。docs/ 配下に課題ファイルの文書種別は設けない（REQ-049）
+- **操作**: 起票、検索・参照、更新、コメント追加、保留、再評価、実行準備完了、解決、反映確認、クローズ、再オープン。読み書きは Custom Tool `agentdev_gh` の操作契約経由で行う
+- **要件化への接続**: 実行が確定した未解決事項は req-define 経由で要件化し、case-open が別の Case Issue を作成する
+- **指示方法**: サブコマンドや引数を覚える必要はなく、自然言語で指示する
 
-## .agentdev/ の位置づけ
+## 状態モデルと `.agentdev/` の位置づけ
 
-`.agentdev/` は AgentDevFlow の正規のドメイン状態である。
-パイプラインの状態（Intake / Learning / Backlog / 整合性）を保持する永続領域であり、実行時配布物の一部ではない。
-各コマンドは `.agentdev/` 配下の変更を scoped commit で git に永続化する。
+パイプライン状態の表現方法や `.agentdev/` の位置づけなど、状態モデルの共通制約の正は [成果物、状態モデル](artifacts-and-state.md) を参照する。

@@ -13,6 +13,7 @@ Design（現在設計：現在の姿）
 ```
 
 各文書は独立した基準性を持ち、下位の文書が上位を代替することはない。
+Knowledge、Report、guides は基準の階層の外側にある補助文書種別である。
 
 ## REQ（要件定義）
 
@@ -35,8 +36,7 @@ Design（現在設計：現在の姿）
 - 現行 Decision は DEC-001〜 の番号範囲を使用する
 - 後継関係は Decision Map（`docs/decisions/README.md`）を参照のこと
 - 承認済み Decision の決定内容は安定して維持する。変更が必要な場合は新規 Decision を作成する
-- REQ → Decision、Decision → Decision、Issue → Decision の参照を許可
-- REQ → Issue の一方向参照である（Issue から REQ への逆参照は行わない）
+- 参照の方向は「参照関係のルール」節を参照する
 - 一覧は `docs/decisions/README.md` に索引がある（現行基準ビュー）
 
 ## Design（現在設計）
@@ -51,6 +51,23 @@ Design（現在設計：現在の姿）
 > 現行 Design の一覧は `docs/designs/README.md`（Design インデックス）を正とする。
 > 本ガイドでは Design 一覧を複製しない。
 
+## Report（監査、観測記録）
+
+**格納先**: `docs/reports/**/*.md`
+
+監査、評価、観測の事実記録。
+Design の管理対象から分離されており、分離の規約は `docs/designs/README.md`「Report の分離」を参照する。
+
+## Knowledge（Project Knowledge）
+
+**格納先**: `docs/knowledge/*.md`
+
+プロジェクト固有の再利用可能な判断材料を保持する独立文書種別である。
+1知識1 Markdown ファイル（kebab-case slug、固定 ID 採番なし）で配置する。
+REQ/Decision/Design への ADF-COVERS 宣言は持たない。
+所有と workflow 利用の契約は REQ-056、知識層の分離判断は DEC-025 を参照する。
+一覧は `docs/knowledge/README.md` を参照する。
+
 ## このガイドの位置づけ
 
 本ファイルを含む `docs/guides/` は人間向けの案内層である。
@@ -64,5 +81,11 @@ REQ/Decision/Design と矛盾する記述がある場合は基準文書を優先
 2. Decision
 3. Design
 4. guides（基準への導線を提供する）
+
+参照の方向は次のとおりである。
+
+- REQ → Decision、Decision → Decision、Issue → Decision の参照を許可する
+- REQ → Issue の一方向参照である。Issue から REQ への逆参照は行わない
+- Decision → Issue の逆参照は不可
 
 guides（本ファイルを含む）は参照用読み物であり、基準文書への導線を提供する。
