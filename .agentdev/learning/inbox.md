@@ -256,3 +256,21 @@
 - **タグ**: #bun-test #spawnSync #タイムアウト #環境起因
 
 ---
+
+## 2026-09-13: 配布 skill reference への REQ/DEC 具体 ID は prose ではなく ADF-COVERS 宣言コメント位置に限る
+
+- **問題事象**: 配布 skill reference（src/opencode/skills 配下の Markdown）の本文 prose に REQ/DEC の具体 ID（例: REQ-038-006）を記載すると、配布依存境界 gate の concrete-id 違反として検出される
+- **発生局面**: case 2789 の case-run で analysis-and-review.md STEP-1 Purpose に要件 ID を prose 記載し、配布依存境界 最終 gate が [concrete-id] failure を検出
+- **検知方法**: 配布依存境界 最終 gate（check_distribution_boundary.ts --profile source）の [concrete-id] failure（matched=REQ-038-006）
+- **根本原因**: 配布 skill は具体 ID 参照を対応宣言コメント（`<!-- ADF-COVERS(implementation): REQ-NNN-NNN -->`）の正規位置でのみ持つ設計になっており、prose への具体 ID 記載は配布依存境界（consumer 環境での ID 解決不能）違反として検出される
+- **自律対応内容**: prose から具体 ID を除去し、ADF-COVERS(implementation) 宣言コメントを正規位置へ付与（既存前例 harness-delegation.md と同一様式）。traceability 実装対応宣言（missing-implementation 解消）と concrete-id 違反回避を両立
+- **ユーザー確認の有無**: なし（gate 出力と修正後再実行で機械確認）
+- **Decision/REQ/spec影響**: なし（記載様式の運用知見）
+- **横展開観点**: 配布 skill reference の作成・更新全般。traceability 対応宣言と配布依存境界の両立様式
+- **再発条件**: 配布 skill 本文に REQ/DEC 具体 ID を prose として記載した場合
+- **予防策候補**: 「配布 skill への REQ/DEC 参照は ADF-COVERS 対応宣言コメント位置に限る」様式ルールの周知・検査への組み込み
+- **想定反映先**: distribution-boundary Design の運用節または skill authoring ガイド（learning-promote 経由で評価）
+- **関連**: case 2789（Issue 2789 / PR 2790）
+- **タグ**: #distribution-boundary #concrete-id #ADF-COVERS #配布skill
+
+---
