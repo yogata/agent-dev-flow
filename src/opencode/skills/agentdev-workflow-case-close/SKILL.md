@@ -5,6 +5,7 @@ description: "case-close command の workflow 実装本体。PR マージ（squa
 
 <!-- ADF-COVERS(implementation): REQ-057-017 -->
 <!-- ADF-COVERS(implementation): REQ-032-024, REQ-032-025, REQ-032-026 -->
+<!-- ADF-COVERS(implementation): REQ-032-027 -->
 
 # case-close workflow スキル
 
@@ -55,6 +56,7 @@ Epic Wave クローズは STEP-1 のルーティングで分岐し、E1〜E6 と
 - **Epic Wave クローズ**: STEP-1（Epic ルート、ステータス追跡テーブル存在時）→ STEP-E1〜E6（E4 内で配布依存境界 最終 gate を各子Issue に適用、single-Issue STEP-3-1 と同一 detector）
 - **コンフリクトエスカレーション**: STEP-4 で Level 1 rebase 失敗時、case-auto Level 2/3 エスカレーションへ（本 workflow の対象外）
 - **PR なし特例フロー（docs_chore、main 直接 push 済み）**: STEP-1（特例ルート）→ STEP-2 → STEP-3 → STEP-5 → STEP-6。PR 関連処理（STEP-4、STEP-5 の CI 通過確認等 PR 依存部分）は N/A とし、既存 commit を最終成果物として QG-4（STEP-2）は直接 commit 内容で検証する。適用条件と実装系 feature/fix への適用除外は case-close command の特例フローセクションを正とする
+- **verify-only closure（PR も carrier commit も存在しない Issue 完了）**: 単一 Issue クローズのルート分岐に従い、STEP-2 QG-4 達成判定の判定根拠を case-run が記録した SSoT コメント（Issue コメント）から参照する。docs_chore 特例フロー（main 直接 commit が存在する PR なし完了）は直接 commit 内容で QG-4 を検証するため、verify-only closure とは判定根拠が異なる。SSoT コメント参照手順と不在時の完了抑止は [references/issue-resolution-and-qg4.md](references/issue-resolution-and-qg4.md) の STEP-2 を参照する
 
 ### 共通事前マージ gate（両ルート共通、DEC-{N}、配布依存境界 Design）
 
@@ -72,7 +74,7 @@ gate 違反時は両ルートとも PR マージを停止する。
 - 正常終了: 単一 Issue ルートはクリーンアップ・Capture 回収・永続化 STEP の完了報告まで。Epic Wave ルートは最終 Wave 判定（Epic クローズ または 残 Wave 通知）まで
 - 一時ファイル残存: 単一 Issue ルートの正常終了の前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（STEP-6-6 で確認。一時ファイル cleanup 規定（workflow 側で生成した `.agentdev/tmp/` 一時ファイルは当該実行内で削除する。Custom Tool 内部の一時ファイルは Tool が操作ごとに自動削除する））
 - 一時成果物残留（Epic Wave ルート）: Epic Wave クローズの正常終了の前提として、当該 Wave スコープの一時成果物（draft、RU、検出事項等のドメイン状態）残留と当該実行で `.agentdev/tmp/` に作成した一時ファイルの残存がないこと（E6-1 で確認。残留時は当該 Wave を完了扱いにしない）
-- 停止終了: 未達チェックボックス残存（構造化エラー）、QG-4 不合格、対象要件行の検証対応要否未分類残存または検証対応必須行の恒久検証対応欠落（段階ゲートの完了阻止条件）、配布依存境界 最終 gate 違反、mergeable ポーリング上限超過、Level 1 rebase 失敗（case-auto エスカレーション）
+- 停止終了: 未達チェックボックス残存（構造化エラー）、QG-4 不合格、SSoT コメント不在の verify-only closure または SSoT コメントに検証結果の記載が欠落している verify-only closure（verify-only closure の QG-4 完了抑止）、対象要件行の検証対応要否未分類残存または検証対応必須行の恒久検証対応欠落（段階ゲートの完了阻止条件）、配布依存境界 最終 gate 違反、mergeable ポーリング上限超過、Level 1 rebase 失敗（case-auto エスカレーション）
 
 ## 主要 Capability Skill 連携
 

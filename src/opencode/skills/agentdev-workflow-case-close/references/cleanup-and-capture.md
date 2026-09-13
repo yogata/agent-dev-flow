@@ -1,3 +1,4 @@
+<!-- ADF-COVERS(implementation): REQ-032-027 -->
 # STEP-5/6: Post-merge・Issue クローズ・クリーンアップ・Capture 回収・永続化（cleanup-and-capture）
 
 > 本 reference は `agentdev-workflow-case-close` SKILL.md の制御平面（STEP 一覧）STEP-5, STEP-6 詳細である。
@@ -129,6 +130,7 @@ PR 本文の `## Findings / Capture候補` セクションから intake/ learnin
 - **Epic 横断回収**: Epic 単位で一括回収
 - **Capture 境界**: intake/ learning 境界は `agentdev-workflow-orchestration`（capture-boundaries）を参照。intake と learning を別々の成果物として扱う
 - **一時会話コンテキスト不入力**: case-run の一時会話コンテキスト（ローカル変数、中間ファイル等）を capture の入力として使用しない。capture 情報の入力源は PR 本文のみ
+- **verify-only closure の N/A 適用**: verify-only closure（PR も carrier commit も存在しない Issue 完了）では PR 本文が存在しないため capture 回収は N/A とする。SSoT コメントを capture 入力源として扱わない（SSoT コメントは検証証跡チャネルであり capture チャネルではない）
 
 #### STEP-6-5: ドメイン状態永続化
 
