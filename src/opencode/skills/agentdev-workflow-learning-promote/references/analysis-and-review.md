@@ -1,3 +1,4 @@
+<!-- ADF-COVERS(implementation): REQ-038-006 -->
 # STEP 詳細: 入力読込・正規化 / 評価 / 判定 / review（learning-promote）
 
 > 本 reference は `agentdev-workflow-learning-promote` SKILL.md の制御平面（STEP 一覧）STEP-1〜STEP-4 詳細である。
