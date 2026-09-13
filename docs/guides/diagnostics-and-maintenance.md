@@ -82,6 +82,22 @@ docs 全体の整合性を確認したい → /agentdev/inspect-docs → 検出�
 - 廃止済み REQ と現行 REQ の整合性
 - 移行表の正確性
 
+## inspect-skills
+
+Command/Skill の参照妥当性を検出するコマンド（REQ-036）。
+
+### 基本フロー
+
+```
+Command/Skill の参照妥当性を確認したい → /agentdev/inspect-skills → 検出レポート生成
+```
+
+### 診断対象
+
+- Command から Skill への参照の有効性
+- Skill の構造、実行主体分類の妥当性
+- 配布物の参照整合
+
 ## 3層ゲートと達成記録先
 
 整合性検査は3層ゲート構造で運用し、検査結果と達成状況は各層、各ルールの正規記録先に配置する。
@@ -99,7 +115,8 @@ integrity 検査は検査範囲に応じて3層に分かれる。
 
 ### 達成記録先と記録規約
 
-達成状況の記録先、false positive の扱い、文書変更時の記録規約（Update Notes セクション不使用、変更履歴の frontmatter `updated` による追跡）は基準文書が所有する。
+達成状況の記録先、false positive の扱い、文書変更時の記録規約は基準文書が所有する。
+規約の内容は Update Notes セクション不使用と、変更履歴の frontmatter `updated` による追跡である。
 文書フォーマット規約は [patterns.md](../designs/foundations/patterns.md)、IR エントリの false positive の扱いは [整合性ルールカタログ](../designs/integrity/integrity-rule-catalog.md) を参照する。
 
 ## 整合性の考え方

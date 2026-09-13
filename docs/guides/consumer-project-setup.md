@@ -68,7 +68,8 @@ scripts/
 ### ローカル版 OpenCode 導入（consumer-generated）
 
 GitHub Issue/PR を使わない個人利用環境向けのリポジトリ種別。
-通常版と同じ link mode（`.opencode/` 配下を src 配下へ接続）で導入し、Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけを `src/opencode-local/agentdev-gh/`（Local 実装）から差し替える（REQ-009、REQ-011-006）。
+通常版と同じ link mode（`.opencode/` 配下を src 配下へ接続）で導入する。
+Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけを `src/opencode-local/agentdev-gh/`（Local 実装）から差し替える（REQ-009、REQ-011-006）。
 詳細な接続フロー、link target 確認は Design [実行時パッケージ境界](../designs/local/runtime-package-boundary.md) を参照。
 
 ```
@@ -86,7 +87,7 @@ GitHub Issue/PR を使わない個人利用環境向けのリポジトリ種別�
 ```
 
 - **link による接続**: command/skill を生成せず、`.opencode/` 配下を src 配下へ link で接続する
-- **agentdev_gh 実装の差し替え**: agentdev-gh 以外は通常版と同じ `src/opencode/` 配下へ接続し、Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけを `src/opencode-local/agentdev-gh/` へ接続する（REQ-011-006）
+- **agentdev_gh 実装の差し替え**: agentdev-gh 以外は通常版と同じ `src/opencode/` 配下へ接続する。Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけを `src/opencode-local/agentdev-gh/` へ接続する（REQ-011-006）
 - **link target 確認**: link 設定前に `.opencode/` 配下の各 path が意図した link target へ解決されることを確認し、意図しない target の場合は link 設定を停止する
 - **リポジトリ管理対象外**: link により接続された `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/` はリポジトリ管理対象外
 - **リポジトリ管理対象**: `.agentdev/issues/` 配下のローカルIssueは Issue/PR 相当の永続情報としてリポジトリ管理対象（REQ-009-026）
