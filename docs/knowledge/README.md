@@ -17,11 +17,16 @@ docs/knowledge/ はプロジェクト知識（プロジェクト固有の再利�
 
 ## 現在の知識文書
 
-3件。
+8件。
 
 - [windows-powershell-bulk-io-corruption.md](windows-powershell-bulk-io-corruption.md)
 - [checker-cli-stdout-loss-on-windows-bun.md](checker-cli-stdout-loss-on-windows-bun.md)
 - [external-dependency-major-version-compatibility.md](external-dependency-major-version-compatibility.md)
+- [baseline-substitution-vocabulary-crosscheck.md](baseline-substitution-vocabulary-crosscheck.md)
+- [bun-offline-bundle-placement-independent-build.md](bun-offline-bundle-placement-independent-build.md)
+- [bun-test-junit-reporter-evidence.md](bun-test-junit-reporter-evidence.md)
+- [distribution-concrete-id-placement.md](distribution-concrete-id-placement.md)
+- [windows-bun-test-spawn-timeout-classification.md](windows-bun-test-spawn-timeout-classification.md)
 
 知識文書は learning から昇華されて成長する（REQ-056）。
 登録経路と承認条件は REQ-056 を参照する。
