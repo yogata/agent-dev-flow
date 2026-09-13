@@ -2,7 +2,7 @@
 title: learning-promote Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-19
+updated: 2026-09-13
 ---
 <!-- ADF-COVERS(implementation): REQ-015-007 -->
 <!-- ADF-COVERS(implementation): REQ-038-001, REQ-038-002, REQ-038-003, REQ-038-004, REQ-038-005 -->
@@ -81,9 +81,9 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
 6 フェーズ構成。
 各フェーズの詳細手順は Workflow Skill（`agentdev-workflow-learning-promote`）が正規情報源である。
 
-- フェーズ1 inbox スキャン: inbox.md 読込、deferred.md 読込
+- フェーズ1 inbox スキャン: inbox.md 読込。deferred.md はインデックススキャン → 候補エントリ本文読込の2フェーズで読み込む。候補0件・候補に上がらないエントリ・判定曖昧時は deferred.md 全面読みへフォールバックする。突合スコープは deferred プールサイズに依存しない
 - フェーズ2-5 Normalize→Classify→Evaluate→Dispose→HITL:
-  - 正規化
+  - 正規化（inbox は全面、deferred は候補本文のみ）
   - 問題クラス分類
   - 8軸評価
   - evaluation-report 生成

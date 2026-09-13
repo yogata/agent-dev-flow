@@ -2,7 +2,7 @@
 title: `agentdev-learning-pipeline` Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-03"
+updated: "2026-09-13"
 ---
 <!-- ADF-COVERS(implementation): REQ-003-024, REQ-038-001, REQ-038-002, REQ-038-005 -->
 
@@ -20,7 +20,7 @@ schema、分類基準、評価ディメンション、prune 方針を定義す�
 
 ## 提供する判断、操作
 
-- inbox entry schema（13フィールド）
+- inbox entry schema（13フィールド。見出しは `## YYYY-MM-DD: タイトル` 形式）。schema の詳細実体は `references/inbox-and-evaluation-schema.md` の Inbox Entry Schema が所有する
 - 問題クラス分類基準
 - 8軸評価ディメンション
 - evaluation-report schema

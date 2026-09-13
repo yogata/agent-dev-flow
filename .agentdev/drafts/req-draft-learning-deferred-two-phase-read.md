@@ -98,9 +98,10 @@ operation_units:
         ACT-REQ-001: REQ-038
       source_ru_to_ops: {}
       unclassified_rows: [REQ-038-006]
-      design_pending:
-        - ACT-DESIGN-001 (docs/designs/commands/learning-promote.md, design-save 対象・未消費)
-        - ACT-DESIGN-002 (docs/designs/skills/agentdev-learning-pipeline.md, design-save 対象・未消費)
+      design_pending: []
+      design_consumed:
+        - ACT-DESIGN-001 (docs/designs/commands/learning-promote.md, design-save で消費済み)
+        - ACT-DESIGN-002 (docs/designs/skills/agentdev-learning-pipeline.md, design-save で消費済み)
 
 test_strategy:
   - id: TS-001
