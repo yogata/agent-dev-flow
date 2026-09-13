@@ -1,3 +1,4 @@
+<!-- ADF-COVERS(implementation): REQ-038-006 -->
 # STEP 詳細: 入力読込・正規化 / 評価 / 判定 / review（learning-promote）
 
 > 本 reference は `agentdev-workflow-learning-promote` SKILL.md の制御平面（STEP 一覧）STEP-1〜STEP-4 詳細である。
@@ -14,7 +15,8 @@
 
 ### Purpose
 
-inbox.md の学びエントリと deferred.md を読み込み、旧フォーマットを正規化する。
+inbox.md の学びエントリを読み込み、旧フォーマットを正規化する。
+deferred.md はインデックススキャン → 候補エントリ本文読込の2フェーズで読み込む。
 
 ### Input Resolution
 
@@ -31,24 +33,31 @@ inbox.md の学びエントリと deferred.md を読み込み、旧フォーマ�
 
 1. inbox.md を読み込む。ファイルなしの場合はエラー終了する
 2. `---` 区切りエントリをカウントする。0件の場合は「分析対象の学びがありません」と終了する
-3. deferred.md を読み込む（存在すれば。不存在は空として扱う）
-4. 全エントリを読み込み、旧フォーマット正規化を行う（解析時のみ。元ファイルは不変）
+3. deferred.md をインデックススキャンする（存在すれば。不存在は空として扱う）。
+grep により `^## ` 見出し行とタグ行を抽出し、{見出し, タグ, 位置} の候補一覧を構成する。
+分離インデックスファイルは作らず、毎回現ファイルから計算する（grep on read）
+4. 各 inbox エントリについて候補一覧から候補を選択し、候補エントリ本文を読み込む。
+候補選択は過剰包含（recall 向上フィルタ）とし、次のいずれかで候補に加える: a) タグ1つでも一致、b) 見出しトークンが問題事象の固有名詞と一致、c) 常に直近20エントリ。
+候補選択は duplicate 判定そのものを行わず、判定は候補エントリ本文読込後の突合で行う。
+全面読みは既定経路から除外し、次の3類型の inbox エントリは deferred.md 全面読みへフォールバックする: 候補0件の inbox エントリ、タグ・見出しトークンのいずれでもマッチせず候補に上がらない inbox エントリ、候補本文読込後も判定が曖昧な inbox エントリ。
+旧フォーマット正規化の対象区分は inbox.md が全面読込・正規化、deferred.md が候補本文のみ解析対象である（解析時のみ。元ファイルは不変）
 
 ### Result
 
-- 正規化済みエントリ群、deferred.md の既存エントリ
+- 正規化済みエントリ群、deferred.md の候補一覧と候補エントリ本文
 
 ### Evidence
 
-- inbox.md のエントリ数、正規化の適用結果
+- inbox.md のエントリ数、インデックススキャンによる候補数と候補本文読込分量、正規化の適用結果
 
 ### Completion Verification
 
-- 全エントリが読み込まれ、正規化済みであること
+- inbox.md の全エントリが読み込まれ、正規化済みであること
+- deferred.md は候補選択と候補エントリ本文読込が完了していること（3類型フォールバック対象を除く）
 
 ### Resume-Idempotency
 
-- inbox.md / deferred.md 実ファイルから読込・正規化を再構築できる。元ファイルを変更しないため再実行に副作用がない
+- inbox.md / deferred.md 実ファイルからインデックススキャン・候補選択・読込・正規化を再構築できる。元ファイルを変更しないため再実行に副作用がない
 
 ## STEP-2: 評価（分類・8軸・evaluation-report）
 
@@ -98,6 +107,7 @@ inbox.md の学びエントリと deferred.md を読み込み、旧フォーマ�
 ### Input Resolution
 
 - STEP-2 の evaluation-report.md（durable state。実ファイルから再取得する）
+- STEP-1 で構成した deferred.md の候補一覧と候補エントリ本文（中断時は deferred.md 実ファイルから STEP-1 を再構築して導出する）
 - 処分区分、既存対策照合、prune 方針の判定基準は `agentdev-learning-pipeline` の公開操作契約に従う
 
 ### Preconditions
@@ -106,10 +116,13 @@ inbox.md の学びエントリと deferred.md を読み込み、旧フォーマ�
 
 ### Procedure
 
-1. 廃棄判定（7カテゴリ + duplicate）を行う
+1. 廃棄判定（7カテゴリ + duplicate）を行う。
+deferred.md 既存エントリとの突合は、STEP-1 で選択した候補エントリ本文に対して行う。
+全面読みは既定経路から除外されており、STEP-1 の3類型フォールバック（候補0件・候補に上がらないエントリ・判定曖昧）の inbox エントリのみ deferred.md 全面読みの対象となる
 2. 昇華可能性評価を行う。
 8軸評価スコア、禁止条件フィルタリングゲート、既存対策照合を基に昇華可否を判定する。
-無条件の自動REQ化は禁止する
+無条件の自動REQ化は禁止する。
+既存対策照合は、STEP-1 と同じ deferred.md 候補集合（候補エントリ本文）に対して行う
 3. 既存対策確認を行い、既存事実の整備状況を確定する（実現先の選択は行わない）
 4. 昇華不能な知見（deferred 判定、情報が断片的、出現回数が少ない等）は deferred.md の living pool で維持する対象として確定する
 
@@ -128,7 +141,7 @@ inbox.md の学びエントリと deferred.md を読み込み、旧フォーマ�
 
 ### Resume-Idempotency
 
-- 判定は evaluation-report.md と inbox.md 実ファイルから再構築できる。不可逆処理を含まないため再実行に副作用がない
+- 判定は evaluation-report.md と inbox.md / deferred.md 実ファイルから再構築できる。不可逆処理を含まないため再実行に副作用がない
 
 ## STEP-4: review（adversarial-review）
 
