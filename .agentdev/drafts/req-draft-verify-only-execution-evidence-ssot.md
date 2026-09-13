@@ -144,7 +144,7 @@ artifact_actions:
     operation: append
     target: docs/designs/commands/case-close.md
     target_area: "配布物変更を含む case の3検査結果確認"
-    status: skipped
+    status: consumed
     source_items: [AG-002, AG-003, AG-004]
     content: |
       「配布物変更を含む case の3検査結果確認」項の直後に新節として追加:
