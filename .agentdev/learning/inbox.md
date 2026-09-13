@@ -274,3 +274,39 @@
 - **タグ**: #distribution-boundary #concrete-id #ADF-COVERS #配布skill
 
 ---
+
+## 2026-09-13: README・guides の構成を大きく変える変更では README 機械検査を構成変更の初期段階で実行すると構造的削除に起因する新規違反を早期検出できる
+
+- **問題事象**: 入口表削除のような構造的削除を含む README 変更で、全編編集完了後に /repo/docs-check（expanded-readme-sync）を実行したため、root README への全配布コマンド名の言及要求に起因する新規違反 13件が編集完了後にまとめて検出された（手戻りは索引リスト追加で最小だったが、検出順序の改善余地があった）
+- **発生局面**: case 2791（Issue 2792 / PR 2792）の case-run
+- **検知方法**: /repo/docs-check（check_integrity.ts）の expanded-readme-sync 13件
+- **根本原因**: README 構造に機械契約（expanded-readme-sync は root README への全配布コマンド名の言及を substring 一致で要求）が存在することを構成変更前に把握していなかった
+- **自律対応内容**: README 主要導線内に「配布コマンドの索引」リストを追加して解消。最終実行は新規違反ゼロで合格
+- **ユーザー確認の有無**: なし（checker 実行で機械確認）
+- **Decision/REQ/spec影響**: なし（検証実行順序の運用知見）
+- **横展開観点**: README・ガイド類の大規模構成変更全般。機械検査対象の README を変更する Case では構成案の初期段階で checker を実行する
+- **再発条件**: README 構造に機械契約が存在する状態で構造的削除を含む変更を行い、検査を最後に実行した場合
+- **予防策候補**: README 機械検査の構成変更初期段階実行を docs 変更 Case の実施手順として明文化
+- **想定反映先**: /repo/docs-check の guide または case-run の docs 変更時実施手順（learning-promote 経由で評価）
+- **関連**: case 2791（Issue 2792 / PR 2792）
+- **タグ**: #docs-check #expanded-readme-sync #README #検証順序
+
+---
+
+## 2026-09-13: case-close の worktree 削除で bash ツール永続シェルの cwd 保持により空ディレクトリが残留する
+
+- **問題事象**: case-close の worktree 削除（git worktree remove）が Permission denied で部分失敗した後、git worktree prune で管理情報は削除できたが、空になった .worktrees/{N}-{type} ディレクトリが Device or resource busy で削除できず残留した（git worktree list からは消滅済み、ブランチ local/remote 削除は完了）
+- **発生局面**: case 2791（Issue 2792 / PR 2792）の case-close STEP-6-1
+- **検知方法**: git worktree remove の Permission denied → リトライ 3回 → prune → rm -rf / rmdir のいずれも Device or resource busy（find でディレクトリが空であることは確認）
+- **根本原因**: bash ツールが workdir パラメータで worktree 内を指定して実行した永続シェルセッションが、当該ディレクトリをカレントディレクトリ（またはハンドル）として保持し続ける。worktree の git 管理情報削除後も OS レベルでディレクトリエントリが掴まれたままになる
+- **自律対応内容**: git 側の削除（worktree remove/prune、ローカル・リモートブランチ削除）を完了させ、空ディレクトリ残留のみ警告記録。git には影響しない（worktree list からは消滅）
+- **ユーザー確認の有無**: なし（削除コマンド結果で機械確認）
+- **Decision/REQ/spec影響**: なし（環境起因の作業ツリー残留の切り分け知見）
+- **横展開観点**: case-close だけでなく worktree を削除する全手順。worktree 内を workdir に指定したシェル実行があった Case の worktree 削除では、削除前にシェル cwd をリポジトリルートへ明示移動するか、空ディレクトリ残留を許容して報告する
+- **再発条件**: worktree を workdir に指定してシェルコマンドを実行した後、同一セッションで worktree ディレクトリを削除した場合
+- **予防策候補**: worktree 削除手順に「削除対象 worktree を cwd とするシェルセッションの明示的な cwd 解放」または「空ディレクトリ残留時は git 管理状態のみで完了判定」の追記
+- **想定反映先**: agentdev-git-worktree の削除手順（learning-promote 経由で評価）
+- **関連**: case 2791（Issue 2792 / PR 2792）、case 2777（stash 対照実証の前例）
+- **タグ**: #worktree #Permission-denied #空ディレクトリ残留 #シェルハンドル
+
+---
