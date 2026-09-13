@@ -758,26 +758,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
-## 配布物 SKILL.md の DERIVE 宣言に内部 ID を含めると IR-055 strict violation となる設計制約（Wave 4 実証）
-
-- **問題事象**: Wave 4（PR #1631）で src/opencode/skills/agentdev-*/SKILL.md 25ファイルへ原本（SSoT）節を新設し、SPEC 参照と DERIVE 宣言を記述した際、初期実装で原本節に `REQ-0140-041/042` を含めたところ IR-055 strict violation（84件）が検出された。配布物（src/opencode/skills/）は consumer 環境（AgentDevFlow プラグイン利用先）へ配布されるため、consumer 側に存在しない内部 REQ-ID への未解決参照となり strict violation となる。
-- **発生局面**: 実装（case-run Wave 4 #1627 PR #1631、SKILL.md 原本節新設時）
-- **検知方法**: check_integrity.ts 実行で IR-055 strict violation 84件を検出。追加行に `REQ-[0-9]` パターンが含まれることを `git diff main` で確認。
-- **根本原因**: IR-055 は配布物（src/opencode/{commands,skills}/）に AgentDevFlow 内部 ID（REQ-XXXX/ADR-XXXX/SPEC-{KIND}-{NNN}/IR-XX 等）が残留することを検出するルール。consumer 環境ではこれらの内部 ID は解決できないため、配布物仕様として禁止されている。SKILL.md の DERIVE 宣言は配布物の一部であり、内部 ID の直接言及は IR-055 違反となる。
-- **自律対応内容**: PR #1631 で原本節から内部 REQ-ID を除去し、SPEC 参照リンク（`docs/specs/skills/agentdev-{name}.md`）と機能的記述（「本 SKILL.md は実行入口であり、SPEC を SSoT として DERIVE する」「extension は標準 SKILL.md を前提とし、重複しない補完情報のみを提供する」）のみで DERIVE 宣言を完結。再検証で IR-055 violation 0件を確認。
-- **ユーザー確認有無**: なし（エージェント自律で設計判断、PR 本文 Findings に明記）
-- **ADR/REQ/spec影響**: あり（要評価）。REQ-0108（配布物境界）の具体的事例。SC-002 SPEC または document-type-responsibilities SPEC に「SKILL.md DERIVE 宣言は SPEC 参照リンクと機能的記述のみで完結し、内部 ID の直接言及は避ける」設計指針の明文化候補。
-- **横展開観点**: 配布物（src/opencode/{commands,skills}/）の自然言語記述で内部 ID を参照する全ケースに適用可能。DERIVE 機構、REFERENCE、See Also 等の参照リンクは SPEC または外部ドキュメントへの相対パスで表現し、内部 ID（REQ-/ADR-/SPEC-/IR-）の直接言及は避ける設計が適切。
-- **再発条件**: (1) 配布物（src/opencode/skills/）の SKILL.md を編集、(2) DERIVE 宣言または参照記述に内部 ID（REQ-XXXX 等）を含める、(3) check_integrity.ts または CI で IR-055 を検査、の全てが揃った場合。
-- **予防策候補**: (a) SC-002 SPEC または document-type-responsibilities SPEC に「SKILL.md DERIVE 宣言は SPEC 参照リンクと機能的記述のみで完結し、内部 ID の直接言及は避ける」設計指針を明文化する。(b) case-run skill の検証テンプレートに「配布物変更時は IR-055 strict violation 0件を必須確認」項を追加する。(c) SKILL.md テンプレート（agentdev-skill-authoring）に原本節の標準フォーマット（内部 ID を含めない）を定義する。
-- **想定反映先**: `docs/specs/responsibilities/document-type-responsibilities.md`（SKILL.md DERIVE 機構の設計指針）、`docs/specs/integrity/index-auto-generation.md`（SC-002 SPEC、配布物と内部 ID の境界）、`src/opencode/skills/agentdev-skill-authoring/`（SKILL.md テンプレート）、case-run skill 検証テンプレート
-- **関連**: PR #1631, Issue #1627, Epic #1622 Wave 4, REQ-0140-041/042, IR-055, SC-002 Phase D, AG-012, U-012
-- **タグ**: #wave4 #skill-md #derive #ir-055 #strict-violation #internal-id #distribution-boundary #consumer-environment #sc-002 #phase-d
-- **移動日**: 2026-07-22
-- **処分判定**: deferred（learning-promote 2026-07-22 評価。詳細は evaluation-report.md 参照）
-
----
-
 ## worktree 委譲先での cd 操作誤りによるメインリポジトリ一時汚染と検出・是正パターン（Wave 5 実証）
 
 - **問題事象**: Wave 5（PR #1632）で case-run 実行担当サブエージェント（deep category）へ worktree root（`.worktrees/1626-maintenance`）配下での作業を委譲した際、委譲先が検証ステップで cd 操作を誤り、一時的にメインリポジトリ（`C:/Users/ogatay/work/agent-dev-flow`）の作業ツリーへ変更を迷い込ませた。委譲先は即座に異常を検知し、(a) パッチ抽出、(b) worktree 再適用、(c) メインリポジトリ `git checkout --` で原状復帰する手順で是正。最終状態でメインリポジトリに本 PR 由来の変更は一切残らなかったが、worktree 隔離原則の一時的破綻事例として記録する。
@@ -1012,25 +992,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **タグ**: #grep-zero-criteria #remediation-note #machine-check #writing-convention
 - **移動日**: 2026-08-15
 - **処分判定**: deferred（出現1件。執筆規範レベル知見。agentdev-doc-writing / japanese-tech-writing 検証観点の再評価対象）
-
----
-
-## 配布物へ Workflow Skill の STEP 表を書く際、具体番号を書ける ID ファミリーは STEP / QG に限定される
-- **問題事象**: 配布物（src/opencode/）に Workflow Skill の STEP 表を記述する際、STEP / QG 接頭辞は具体番号付きで配布可能（distributed-control として境界検査を通過）だが、他の全 ID ファミリー（REQ / DEC / ADR / AG / IR / TS / OU / RU / EC 等）は具体番号を書くと配布依存境界検査で違反または未分類エラーになる
-- **発生局面**: 実装（Wave 2 Workflow Skill 作成、OU-002 / OU-003 / OU-004 並列 Wave）
-- **検知方法**: `check_distribution_boundary.ts --profile source --json` の実行（具体番号記述が concrete_id_hits として検出される）
-- **根本原因**: 配布依存境界 SPEC の ID 衛生規則。具体番号は消費者環境で解決不能なプロジェクト内部 ID である一方、STEP / QG は workflow 定義内で閉じた distributed-control の識別子として扱われる
-- **自律対応内容**: 具体番号が必要な場面を STEP / QG に限定し、それ以外はマスク形式（REQ-{NNNN}-{NNN} 等）で統一して Wave 2 の3 Workflow Skill を作成した
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし（配布依存境界 SPEC の既定運用の明確化事象）
-- **横展開観点**: 並列 Wave での Workflow Skill / Command 作成時、作成段階からマスク形式で書くことで境界検査の手戻りを防げる
-- **再発条件**: 配布物にプロジェクト内部 ID の具体番号を記述した場合
-- **予防策候補**: Workflow Skill / Command の新規作成手順（agentdev-skill-authoring / agentdev-command-authoring）への「具体番号は STEP / QG のみ、他はマスク形式」注意喚起の反映候補
-- **想定反映先**: `src/opencode/skills/agentdev-skill-authoring/**` または agentdev-command-authoring（執筆規範側。要否は learning-promote で判断）
-- **関連**: PR 2112 Findings learning セクション, Issue 2104（OU-004）, Epic 2099, 同時並行 Wave（PR 2113 / PR 2114）
-- **タグ**: `#distribution-boundary` `#id-hygiene` `#mask-form` `#workflow-skill-authoring`
-- **移動日**: 2026-08-15
-- **処分判定**: deferred（出現1件。authoring 注意喚起候補（agentdev-skill-authoring / agentdev-command-authoring））
 
 ---
 
@@ -1520,42 +1481,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 - **移動日**: 2026-09-01
 
-## worktree では node_modules も伝播しないため依存パッケージのテストは事前に bun install する
-
-- **問題事象**: worktree 上で zod に依存する配布スキルのテストを実行したところ unhandled error 4件が発生した（node_modules が worktree に存在しない）
-- **発生局面**: 実装（case-run の worktree 上での bun test 実行、Epic 2436 Wave 1）
-- **検知方法**: bun test の unhandled error（zod モジュール解決失敗）
-- **根本原因**: node_modules は git 非追跡であり worktree 作成時に複製されない。依存を持つパッケージのテストは worktree 側で install が必要
-- **自律対応内容**: 該当パッケージで bun install を実行後に再検証し PASS した（検証差分に「修正済み」として記録）
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし
-- **横展開観点**: worktree 上で node_modules 依存のテストを実行するすべての場面
-- **再発条件**: worktree 上で未 install の依存パッケージを含むテストを実行した場合
-- **予防策候補**: worktree でのテスト実行手順へ依存パッケージの事前 install 確認を組み込む
-- **想定反映先**: agentdev-git-worktree、case-run workflow のテスト実行手順
-- **関連**: PR 2440 本文「Findings / Capture候補」learning 2件目、検証差分の bun test 行（修正済み）
-- **タグ**: `#worktree` `#bun-install` `#node-modules`
-
-- **移動日**: 2026-09-01
-
-## worktree の依存復元は bun install（worktree root）単独では不完で分散 node_modules の個別 install が必要
-
-- **問題事象**: worktree 環境でのテスト実行に必要な依存復元は `bun install`（worktree root）単独では不完である。本リポジトリは root package.json を持たず、依存は gitignore 済みの各所 node_modules（`.opencode/package.json`、`.opencode/plugins/`、`src/opencode/skills/agentdev-*/scripts/`、`src/opencode/tools/agentdev-gh/`、`src/opencode/plugins/agentdev-gh-tool/` 等）に分散している。worktree ではこれらが未伝播のため、個別に `bun install` する必要がある（例: zod は `.opencode` 系依存と `agentdev-project-extensions/scripts` の両経路で解決に寄与）
-- **発生局面**: 実装（case-run 委譲、worktree 環境の検証実行、Issue 2438 の case work）
-- **検知方法**: worktree での依存解決失敗（テスト実行時のモジュール解決エラー）
-- **根本原因**: 依存配置が repo root 一元型でなく多層分散型（各サブディレクトリの package.json + gitignore 済み node_modules）である構成を、委譲時の環境復元が root 一元型の前提で見立てていた
-- **自律対応内容**: 依存を持つ各ディレクトリで個別に `bun install` を実行して検証を完結した
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし
-- **横展開観点**: worktree でテスト・検証スクリプトを実行する委譲すべて、委譲時の環境復元手順書
-- **再発条件**: worktree root の `bun install` のみで依存が復元されたと見なしてテストを実行する場合
-- **予防策候補**: 委譲時の環境復元手順書へ分散依存の個別 install 差分を反映する
-- **想定反映先**: agentdev-git-worktree の worktree 構造的制約（bun test 実行の環境前提）、agentdev-workflow-case-run の委譲時環境復元手順
-- **関連**: PR 2443 本文「Findings/ Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2443 ）、本 inbox 既存エントリ「worktree では node_modules も伝播しないため依存パッケージのテストは事前に bun install する」「worktree 環境の bun test 依存解決不能は bun install --cwd で worktree ローカル解消できる」
-- **タグ**: `#worktree` `#bun-install` `#dependencies` `#delegation`
-
-- **移動日**: 2026-09-01
-
 ## git commit の -- pathspec はオプションより後に置き -m は -- より前に置く
 
 - **問題事象**: `git commit -- <paths> -m "msg"` の形式でコミットしたところ pathspec エラーで失敗した（case-open の Form Zero 削除コミット、DEL-OU-001-2）
@@ -1973,27 +1898,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
-## 2026-09-04: bun test の位置引数フィルタは Windows worktree の dotfile 配下ディレクトリで ./ prefix 付き正規形でのみマッチする
-
-- **問題事象**: Windows worktree 上で bun test の位置引数フィルタ（.opencode/skills/配下ディレクトリ）は、./ なし相対指定・バックスラッシュ区切り・ディレクトリ名部分一致のいずれでも dotfile 配下ディレクトリにマッチせず、QG-4 正規形の ./ prefix 付き形式（bun test ./.opencode/skills/<dir>/・cwd=リポジトリルート）でのみマッチした。手順からの逸脱（cwd 変更やフィルタ短縮）は ENOENT 系の偽 fail を生む
-- **発生局面**: case-run 委譲（Issue #2569 / PR #2591、OU-018 integrity suite 正規形実行時）
-- **検知方法**: bun test 単独実行が対象テストへマッチせず即終了する観測（正規形では 2549 tests / 102 files が計上される対比で確認）
-- **根本原因**: bun test の位置引数フィルタのパスマッチは cwd 相対の指定形式に依存し、Windows のパス区切りと dotfile 開始ディレクトリ（.opencode）の組み合わせでは ./ prefix 付きの正規形のみが一意に解決される
-- **自律対応内容**: QG-4 正規形どおり ./ prefix 付き・cwd=リポジトリルートで実行し直し、正規計上（2549 tests / 102 files）を取得して case-close の QG-4 独立再検証を完遂した
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし（既存の bun test 実行形態契約どおりの実行で解消する環境知識）
-- **横展開観点**: worktree 上で bun test を位置引数フィルタ付きで実行する全 workflow（case-run / case-close の QG-4 正規形実行・検証サブエージェント）に共通。正規形からの逸脱指定による偽 fail を由来分類で除外する判定材料になる
-- **再発条件**: Windows worktree で ./ なしの bun test .opencode/... 指定、バックスラッシュ区切り指定、ディレクトリ名短縮フィルタを用いた場合
-- **予防策候補**: bun test 実行形態契約（QG-4 正規形）の ./ prefix 必須を Windows 環境向け注記として明文化する
-- **想定反映先**: agentdev-quality-gates の QG-4 正規形注記・docs/knowledge の Windows 系知識文書（learning-promote で判定）
-- **関連**: PR 2591 本文 Findings / Capture候補（learning）からの capture 回収（case-close STEP-6）
-- **タグ**: #bun #test #windows #worktree #qg4
-
-- **移動日**: 2026-09-07
-- **処分判定**: defer（C3: bun test 正規形逸脱偽 fail。2026-09-07 evaluation-report 参照）
-
----
-
 ## 2026-09-04: 配布ソース面パス列挙を含む補助ファイルの Write は配布依存境界 pre-write gate に fail-closed ブロックされる
 
 - **問題事象**: PR 変更ファイル一覧（src/opencode/** 配布ソース面パス 92 件）を一時領域（C:\WINDOWS\TEMP\opencode）へ .txt として書き出そうとしたところ、`agentdev-distribution-boundary-guard: blocked write (producer-internal reference in distributed text artifact)` の fail-closed ブロックが発生した（inspection error: gate-not-passed）
@@ -2012,26 +1916,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 - **移動日**: 2026-09-07
 - **処分判定**: defer（guard 設計どおり。pool 統合。2026-09-07 evaluation-report 参照）
-
----
-
-## 2026-09-05: integrity suite の cwd 依存と bun test の dot ディレクトリ既定探索による実行手順分断
-
-- **現象**: integrity suite（repo-agentdev-integrity scripts）の一部テストが `path.join("src", ...)` の repo-root カレント前提で、scripts dir カレント実行では ENOENT fail となる。一方 repo-root カレントの `bun test` は既定探索が dot ディレクトリ（.opencode）配下を拾わず、収集 0 件となる
-- **状況/文脈**: case-run TS-005（Issue 2594 / PR 2595、traceability REQ-ID 桁幅緩和 Case）
-- **検知方法**: bun test 実行時の ENOENT fail とテスト収集 0 件の観察
-- **根本原因**: cwd 依存テストと bun の既定テスト探索仕様（dot ディレクトリ無視）の組合せで、実行手順が一意に定まっていない
-- **応急/対応内容**: `./` プレフィックス付きの明示ファイル列挙（102ファイル）で repo-root カレント実行して回避
-- **ユーザー確認の有無**: なし
-- **ADR/REQ/spec影響**: なし（実行手順標準化は後続候補）
-- **展開視点**: 恒久検証手段の実行コマンド明記・cwd 非依存化が候補（bun test 実行形態契約との整合確認を含む）
-- **再現条件**: scripts dir カレントで bun test 実行、または repo-root カレントで引数なし bun test 実行
-- **予防策**: 検証手順ドキュメントへ実行コマンド（cwd と引数形式）を明記し、テストの cwd 前提を排除する
-- **横展開候補**: agentdev-quality-gates（bun test 実行形態契約の運用注記）、learning-promote で標準化 RU 判定
-- **関連**: PR 2595 本文 Findings セクションからの capture 回収（case-close STEP-6）
-- **タグ**: #test #bun #integrity #case-run #verification
-- **移動日**: 2026-09-07
-- **処分判定**: defer（C3: bun test 正規形逸脱偽 fail。2026-09-07 evaluation-report 参照）
 
 ---
 
@@ -2203,27 +2087,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
-## 2026-09-05: フル suite 実行時のみ fail する環境依存 staging テストは基底 commit 再現比較で pre-existing 分離する
-
-- **問題事象**: trusted-distribution-gate（archive-builder）の「same-filesystem staging (parent blocker #2) > staging path is created UNDER outputRoot, never under os.tmpdir()」テストが、full suite ① 実行時のみ 1 fail（2555 pass / 1 fail）となり、単体実行では 19 pass / 0 fail で再現しない。当該 changeset 起因の fail との誤判定リスクがあった
-- **発生局面**: case-run 委譲（Issue #2628 / PR #2632、OU-004 最終検証 Report の full suite 正規形 3 cwd 分割実行時）
-- **検知方式**: full suite ① の fail 件数と単体実行結果の差異、および既知 fail ベースライン（§6.1 差分表）への未登録
-- **根本原因**: same-filesystem staging テストは staging path の計測環境（フル suite 実行時の実行環境状態）に依存する環境依存 flaky であり、単体実行では再現しない。単体再現の成否だけでは changeset 起因の判定ができない
-- **自律対応内容**: 基底 commit 98496bc8 を一時 worktree（C:/WINDOWS/TEMP/opencode/base-check-98496bc8）へ取り出し、依存パッケージ前置のうえ同一コマンドで full suite ① を再実行 → 基底でも同一テスト名 1 fail（2556 tests / 1 fail）を確認し、pre-existing（環境依存）と分離。確認後一時 worktree は削除済み（git worktree list で確認）
-- **ユーザー確認の有無**: なし
-- **ADR/REQ/spec影響**: なし（検証手順の運用知見。既知 fail ベースライン管理への trusted-distribution-gate staging 追加候補は intake inbox に回収済み）
-- **横展開観点**: full suite・CI 等の複合実行でしか再現しない flaky テストの分離判定を行う全局面（case-run 検証、case-close QG-4、AG-010 既知 fail 分離運用）に共通
-- **再発条件**: 環境依存テストをフル suite で観測し、単体再現の欠如のみを根拠に changeset 起因と判定する
-- **予防策候補**: flaky 判定は「単体再現確認」→「基底 commit 再現比較（一時 worktree 取り出し + 同一コマンド再実行）」の2段階で分離する。フル suite のみ fail する環境依存テストは既知 fail ベースライン管理（再現比較基準と解消予定の明記）へ登録する
-- **想定反映先**: learning-promote での分類、AG-010 既知 fail 分離運用の運用知識、learning-promote / case-run の検証手順注記
-- **関連**: PR #2632 本文 Findings / Capture候補 セクションからの capture 回収（case-close STEP-6）
-- **タグ**: #test #flaky #staging #distribution-boundary #case-close #verification
-
-- **移動日**: 2026-09-07
-- **処分判定**: defer（AG-010 分離強化知見。2026-09-07 evaluation-report 参照）
-
----
-
 ## 2026-09-07: lint_skills.ts の references TOC 観点（AG-005）は 300 行閾値で発動するため、既存 references への行数追加で新規 NG が誘発され得る
 
 - **問題事象**: 既存 references ファイルへの手順追記（289 行 → 330 行）により、lint_skills.ts の AG-005 観点（references が 300 行を超えると TOC 必須）の新規違反が誘発され得ることを、追記後の検証で把握した。追記前に閾値距離を確認していなかったため、検証で初めて閾値越えに気づき得る状態だった
@@ -2264,29 +2127,78 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
-## 2026-09-09 worktree への node_modules 非伝播で integrity suite が環境起因 fail する
+## 2026-09-11: テスト fixture 内の宣言マーカー形状は正規宣言位置のコメント形式で書かないと旧パーサが偽宣言として計上し REQ カバレッジを汚染する
 
-- **発生源**: PR #2718（Issue #2706 / OU-007）、PR #2717（Issue #2708 / OU-009）テスト結果
-- **クラス**: 環境前提（worktree 構造的制約）
+- **問題事象**: escape 隠蔽回帰テスト用の fixture 文字列リテラル内の宣言マーカー形状が、旧宣言パーサ（行単位文字列一致）で正規宣言として誤計上され、REQ カバレッジに偽の対応関係が混入していた（実 corpus で偽宣言 15 件。fixture 由来の偽の実装宣言が REQ-057-013 のカバレッジを誤魔化していた）
+- **発生局面**: case 2771（対象外判定実装）の case-run 検証時。実 corpus 全走査の新旧パーサ差分確認で発覚
+- **検知方法**: TS-001 検出縮退確認（旧 422 件 → 新 407 件の差分 15 件の由来分類。全件がテスト内文字列リテラル由来の偽宣言であることを確認）
+- **根本原因**: 宣言パーサが正規宣言位置を識別せず行単位の文字列一致で判定していた構造的欠陥。fixture は「検査器が検出してはならないもの」を表現するため本質的に非正規位置の形状を含むが、旧パーサはそれを区別できなかった
+- **自律対応内容**: 対象外判定（正規宣言位置: .md は HTML コメント完結行、.ts は行頭 `//` コメント行のみ解析対象）の実装で偽宣言 15 件が計上対象から除外され、REQ-057-013 の本来の missing-implementation が正当計上（81 → 82 件）になった。fixture 自体は正規位置（コメント）形式へ移設して回帰検証能力を維持
+- **ユーザー確認の有無**: なし（機械的検証と突合で確定）
+- **Decision/REQ/spec影響**: REQ-057-013 の missing-implementation 計上変化は coverage の正当化であり REQ/Design 変更は不要
+- **横展開観点**: 検査器のテスト fixture を含む全テストコード。検査器が文字列パターン照合である場合、fixture 内のパターン文字列は検出対象から除外される形式（正規位置コメント等）で書くのが安全
+- **再発条件**: 文字列照合系検査器の fixture に検出対象パターンを非正規位置（文字列リテラル等）のまま配置した場合
+- **予防策候補**: fixture 内のパターン文字列は正規宣言位置のコメント形式で書く、または escape・分割で形状一致を避ける運用を検査器契約に明記する
+- **想定反映先**: traceability-model / agentdev-traceability Design の fixture 記述規約（将来的な明文化候補。intake/learning promote 経由で評価）
+- **関連**: case 2771（Issue 2771 / PR 2772、REQ-057-013 計上の元事象）
+- **タグ**: #fixture #偽カバレッジ #宣言パーサ #traceability
+- **移動日**: 2026-09-13
 
-git worktree には root の node_modules が伝播しないため、worktree で integrity suite を実行すると `Cannot find package 'zod'`（extension_state.ts import）等の import 失敗が発生する。加えて junction 未伝播の worktree では IR-055 delta-from-baseline テストが baseline パス変換のずれで未編集ファイルを「新規違反」として検出し fail する（変更ゼロの baseline commit で再現確認済み、main root では不発生）。bun install の安易な実行は tsconfig 系ファイル書き戻しリスク（AGENTS.md 警告規定）を伴うため、worktree でフル suite を実行する際はこの既知の環境依存を前提に結果を解釈する。
+---
 
-- **移動日**: 2026-09-11
+## 2026-09-11: Bun.build 焼き付きパスは文字列リテラル内でバックスラッシュ2連エスケープ形で現れるため検出 regex には4連が必要
 
-## 2026-09-10 worktree の .opencode/plugins は gitignore 未伝播で欠落するため plugins 分割は source fallback を使う
+- **問題事象**: Bun.build が焼き付ける `require.resolve` 展開パス（Windows 絶対パス）が JS 文字列リテラル内にバックスラッシュ 2 連（`C:\\Users\\...`）のエスケープ形で現れるため、検出用正規表現を regex レベルのバックスラッシュ 2 連（`\\`）で書くと生パス（1 連区切り）にしか一致せず、焼き付きパスを見逃してサイレント pass した（実装初版で実際に見逃しを確認）
+- **発生局面**: case 2775（vendored engine bundle 再生成 build スクリプトへの焼き付き絶対パス検出・無害化自己検査追加）の case-run 実装初版の bundle 再生成検証時
+- **検知方法**: fixture ネガティブテスト（tests/absolute-path-guard.test.ts）が焼き付きパス fixture の非検出を検知（検出されない自己検査は合格としない契約に基づく fail）
+- **根本原因**: 文字列リテラル内のエスケープ 2 連がさらに bundle 出力面（JSON 等）では 4 連に段階化される多段エスケープ構造に対し、regex を 1 段の想定で設計した
+- **自律対応内容**: 検出正規表現を regex レベルのバックスラッシュ 4 連（`\\\\`）へ修正し、fixture ネガティブテスト（3 形態検出・誤検出 0・無害化・unresolved・実 bundle 残存 0）で恒久防止（fix-and-reverify 1 回で解消）
+- **ユーザー確認の有無**: なし（自律修正）
+- **Decision/REQ/spec影響**: なし（実装初期バグ修正と恒久テスト追加）
+- **横展開観点**: bundle / JSON / ソースコード内の文字列リテラルに焼き付く Windows 絶対パスを検出する処理全般（エスケープ段数は対象面ごとに異なる）
+- **再発条件**: Windows 絶対パスを文字列リテラル経由で検出する正規表現を、検出対象面のエスケープ段数の考慮なしに書いた場合
+- **予防策候補**: 検出対象の形状（エスケープ段数）を fixture で固定し、ネガティブテストで実検出（サイレント pass 不許可）を保証する
+- **想定反映先**: build/absolute-path-guard.ts の検出 regex 契約（コメント化）、または offline bundle 運用知識への注意書き（learning-promote 経由で評価）
+- **関連**: case 2775（Issue 2775 / PR 2776）
+- **タグ**: #bun-build #require-resolve #正規表現エスケープ #ネガティブテスト
+- **移動日**: 2026-09-13
 
-- **問題事象**: worktree 上での bun test フル suite 実行時、.opencode/plugins/ が gitignore 未伝播で存在せず plugins 分割の実行対象が 0 件になった
-- **発生局面**: 検証（Epic 2755 Wave 2、PR 2763 の worktree での bun test 3 cwd 分割実行）
-- **検知方法**: bun test の実行対象ディレクトリ確認（plugins 分割の対象不在）
-- **根本原因**: .opencode/plugins は gitignore 対象のため worktree には伝播せず、junction 環境はメインリポジトリにしか存在しない
-- **自律対応内容**: worktree 構造的制約の source fallback として bun test ./src/opencode/plugins/ を実行し網羅性を確保（311 tests / 0 fail）
-- **ユーザー確認有無**: なし
-- **Decision/REQ/spec影響**: なし
-- **横展開観点**: worktree での plugins テストは src/opencode/plugins/ を source fallback として実行すればテスト網羅性を保てる
-- **再発条件**: worktree 上で bun test フル suite の plugins 分割を実行した場合
-- **予防策候補**: worktree での plugins 分割は source fallback パスを標準手順として明記
-- **想定反映先**: QG-4 bun test 実行形態契約・worktree 構造的制約の運用知見（learning-promote で反映先を判断）
-- **関連**: PR 2763、.worktrees/2758-feature
-- **タグ**: `#worktree` `#bun-test` `#plugins`
+---
 
-- **移動日**: 2026-09-11
+## 2026-09-12: IR-062 系 fixture テストは checker を fixture root 配下へ複製して spawn する方式が既存規約で fallback 判定は fixture 内 src/opencode/skills の有無で制御できる
+
+- **問題事象**: junction 前提検査（IR-062 reference-path-existence 等）の fixture テストで、fallback 挙動（junction 不在時の SoT 直参照）をどう再現・制御するかが課題になった
+- **発生局面**: case 2777 の TS-002 fixture テスト実装時（case-run）
+- **検知方法**: 既存 fixture 規約（copyScripts）の調査と fallback 判定条件の実装照合
+- **根本原因**: 該当なし（設計知見の蓄積。問題ではなく方式の確立）
+- **自律対応内容**: checker を fixture root 配下へ複製して spawn する既存規約（copyScripts）を踏襲し、fixture 内 `src/opencode/skills` の有無で fallback 判定を制御する方式で 2 件のテスト（fallback 発動 + junction 存在時非 fallback 負例）を実装。30/30 pass を確認
+- **ユーザー確認の有無**: なし（実装で確定）
+- **Decision/REQ/spec影響**: なし（テスト実装方式の知見）
+- **横展開観点**: junction / 投影ディレクトリを前提とする検査器のテスト全般。環境差（junction 伝播の有無）を fixture で再現する際の制御点は投影元ディレクトリの存在有無に置く
+- **再発条件**: fallback の有無を含む検査器挙動を fixture で検証する場合
+- **予防策候補**: fixture の directory 構成で環境差を表現する規約（copyScripts + src 配置制御）を検査器テストの標準パターンとして維持する
+- **想定反映先**: checker-execution-contracts.md または agentdev-git-worktree-test-fallback Design の fixture 規約（learning-promote 経由で評価）
+- **関連**: case 2777（Issue 2777 / PR 2778）
+- **タグ**: #fixture #copyScripts #IR-062 #fallback
+- **移動日**: 2026-09-13
+
+---
+
+## 2026-09-13: README・guides の構成を大きく変える変更では README 機械検査を構成変更の初期段階で実行すると構造的削除に起因する新規違反を早期検出できる
+
+- **問題事象**: 入口表削除のような構造的削除を含む README 変更で、全編編集完了後に /repo/docs-check（expanded-readme-sync）を実行したため、root README への全配布コマンド名の言及要求に起因する新規違反 13件が編集完了後にまとめて検出された（手戻りは索引リスト追加で最小だったが、検出順序の改善余地があった）
+- **発生局面**: case 2791（Issue 2792 / PR 2792）の case-run
+- **検知方法**: /repo/docs-check（check_integrity.ts）の expanded-readme-sync 13件
+- **根本原因**: README 構造に機械契約（expanded-readme-sync は root README への全配布コマンド名の言及を substring 一致で要求）が存在することを構成変更前に把握していなかった
+- **自律対応内容**: README 主要導線内に「配布コマンドの索引」リストを追加して解消。最終実行は新規違反ゼロで合格
+- **ユーザー確認の有無**: なし（checker 実行で機械確認）
+- **Decision/REQ/spec影響**: なし（検証実行順序の運用知見）
+- **横展開観点**: README・ガイド類の大規模構成変更全般。機械検査対象の README を変更する Case では構成案の初期段階で checker を実行する
+- **再発条件**: README 構造に機械契約が存在する状態で構造的削除を含む変更を行い、検査を最後に実行した場合
+- **予防策候補**: README 機械検査の構成変更初期段階実行を docs 変更 Case の実施手順として明文化
+- **想定反映先**: /repo/docs-check の guide または case-run の docs 変更時実施手順（learning-promote 経由で評価）
+- **関連**: case 2791（Issue 2792 / PR 2792）
+- **タグ**: #docs-check #expanded-readme-sync #README #検証順序
+- **移動日**: 2026-09-13
+
+---
