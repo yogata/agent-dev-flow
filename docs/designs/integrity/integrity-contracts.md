@@ -2,7 +2,7 @@
 title: 整合性契約
 status: accepted
 created: 2026-08-20
- updated: 2026-09-07
+ updated: 2026-09-14
 ---
 <!-- ADF-COVERS(implementation): REQ-010-006 -->
 <!-- ADF-COVERS(implementation): REQ-036-022 -->
@@ -424,6 +424,29 @@ REQ-028 の RETIRE に伴い、次の恒常契約の移管を受入れる（詳�
   `check_integrity` を再実行し、demote（warning 抑制）が解除されて新規違反として検出されないことを検証する。
 - 起源 source path が存在しないエントリ（third-party Skill 配置先への移設等により不在となったパス）は削除する。
   third-party Skill 配置先（`.opencode/skills/` 配下の管理外 Skill）は baseline 走査対象外とする。
+
+### baseline 未整備環境での対照実行による合格判定
+
+NG baseline 保持型 checker を baseline 未整備環境で実行した場合は、次の対照実行手順により合格判定できる。baseline 未整備環境の判定基準は、検出事項が NG baseline に未登録であること、または NG baseline ファイル自体が不在であることとする。
+
+1. 対照実行: 同一 detector・同一引数を、remediation 開始前の baseline commit（main HEAD、PR 変更未適用）と変更 HEAD（worktree）で同一環境にて再実行する
+2. 同一 signature 確認: 両実行の検出事項について signature（同一 detector が同一検出対象へ産出する検出識別子。具体定義は各 detector の検出契約が所有する）単位の一致を確認する
+3. delta 0 実証: 変更 HEAD の検出事項が baseline commit 側検出事項の部分集合であること（新規違反 delta 0）を実証する
+4. 判定: baseline policy（baseline 超過分のみ gate 失敗）に準拠し、新規違反 delta 0 を実証した場合は合格扱いとする
+
+判定根拠の記録形式:
+
+- 対照実行の実施記録（detector、引数、両 HEAD の識別子）
+- 同一 signature 確認結果と delta 0 実証の証跡
+- 実行環境ラベル（checker 実行契約の環境ラベル契約に従う。両実行が同一環境であることの根拠）
+- baseline policy 準拠の判定根拠
+
+制約:
+
+- delta 0 実証は同一環境での再実行に基づく。異なる環境間の結果比較で代替しない。環境ラベル（worktree/main、junction 伝播状態、依存パッケージ状態）が一致しない実行間の比較は delta 0 の証拠として採用しない
+- 対照実行の main HEAD 側実行は detached worktree を使う（stash 往復リスク回避の既存規約。worktree 汎用手順の baseline 比較手順に従う）
+- 本判定は baseline 未整備環境に限定する。baseline 整備済み環境では通常の baseline 比較を用い、本手順を適用しない
+- baseline ファイルの整備自体（IR-059 baseline 整備）は別課題であり、本手順はその代替を恒久化するものではない
 
 ## docs-check delta 検出における除外設定方針（REQ-010-007, REQ-010-009 準拠）
 

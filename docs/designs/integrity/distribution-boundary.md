@@ -2,7 +2,7 @@
 title: "配布依存境界"
 status: accepted
 created: "2026-08-11"
-updated: "2026-09-11"
+updated: "2026-09-14"
 ---
 <!-- ADF-COVERS(implementation): REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-045 -->
@@ -82,6 +82,8 @@ ID プレースホルダー（IR-{NNNN} 等）の裸出力は、表の根拠列�
 4. 再取得の根拠（対象 commit SHA、実行コマンド、件数の増減）を PR 本文へ記載する
 
 再取得により、解消済み違反の baseline 残存と、現行違反 0件との差異を解消する。
+
+baseline 未整備環境で concrete-id 検出を伴う gate を実行する場合の対照実行による合格判定（新規違反 delta 0 実証）の判定手順は、NG baseline 運用手順（integrity-contracts.md）が正規所有する。本 Design は判定手順を複製せず、参照に留める。
 
 ## 共有 detector と adapter の契約
 

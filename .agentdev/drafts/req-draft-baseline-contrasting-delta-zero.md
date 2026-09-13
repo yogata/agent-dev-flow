@@ -1,7 +1,7 @@
 ---
 draft_type: req_draft
 topic_slug: baseline-contrasting-delta-zero
-status: saved
+status: design_saved
 created_at: 2026-09-14T05:32:09+09:00
 source_rus:
   - RU-0004

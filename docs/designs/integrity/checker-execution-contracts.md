@@ -197,6 +197,14 @@ source パス（SoT パス = 検査 root（--root 指定の対象 worktree）直
 - fallback を使用した検査では、実行環境（worktree / main、junction 伝播状態）を環境ラベルとして検証記録に明記する（REQ-018 の環境ラベル契約に従う）
 - 本 fallback は REQ-018「junction を前提とする構造系テストは source パス（SoT パス）への fallback で実行される」規約の checker への適用であり、worktree 作成工程（junction 自動化）を変更しない
 
+### baseline 未整備環境での対照実行の実行契約
+
+baseline 未整備環境での gate 実行に伴う対照実行（同一 detector・同一引数を baseline commit と変更 HEAD で同一環境再実行）の判定手順と記録形式は、NG baseline 運用手順（integrity-contracts.md「baseline 未整備環境での対照実行による合格判定」）が正規所有する。本 Design は実行面の次の事項のみを所有する。
+
+- 対照実行の両系統（baseline commit 側・変更 HEAD 側）の実行は、本 Design の checker 共通実行契約と worktree 検査対象 checker の起動契約（host 側起点、repoRoot 明示指定、読取専用）に従う
+- 両系統の実行には環境ラベルを必ず付す。環境ラベルが一致しない実行間の結果比較は delta 0 の証拠として採用しない（同一環境再実行の要求）
+- baseline commit 側の実行は detached worktree（worktree 汎用手順の baseline 比較手順）で行い、作業中 worktree の stash 往復を行わない
+
 ## bun test 実行形態契約（単独実行・ファイル単体指定を含む）
 
 bun test の全ての実行は、フル suite の 3 cwd 分割正規形（agentdev-quality-gates が正規所有）に
