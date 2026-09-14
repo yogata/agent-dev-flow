@@ -137,3 +137,19 @@
 - 内容: squash merge 済み分支（前回 PR #2819 の feature/issue-2811）を再利用する委譲では、remote 分支に squash 前コミット 11 件が残留し、main 由来の新 commit を fast-forward push できない。force-push 回避のため新分支（feature/issue-2811-2、base main 46d723a1）から PR を作成した。case-run の worktree/分支準備時に remote 分支の fast-forward 可否確認、または squash merge 後の分支削除運用により防止できる
 - 関連: Issue #2811（OU-006）、PR #2820 対応記録
 - タグ: `#squash-merge` `#branch` `#case-run` `#worktree`
+
+## 2026-09-15 case 2805 Epic（case-close 再検証）: body 更新のみの issue_update 後に Issue state が closed へ変化した
+
+- **問題事象**: Epic Issue 2805 の本文更新（完了条件⑤残課題記述の現状化 + 再検証記録追記）を Custom Tool agentdev_gh の issue_update で実行したところ、リクエストには state 変更を含めないにもかかわらず、直後の再読込 VERIFY で Issue state が closed へ変化していた。完了条件⑤未達の Epic が closed になるのは構造化停止契約（未達チェックボックス残存時の停止）に反するため、issue_reopen で open へ復帰した
+- **発生局面**: case-close Epic Wave クローズ E5-1（完了条件最終評価に伴う Epic Issue 本文更新）
+- **検知方法**: Issue body 更新後の再読込 VERIFY（issue_read）で state フィールドを期待値（open 維持）と突合
+- **根本原因**: 未特定。issue_update 操作自体の副作用（Tool 内部実装が body 内容に連動して state を操作する等）または並行アクター（別セッション・ユーザー手動操作・GitHub 自動化）による state 変更の可能性が残る。issue_update の fail-closed 検証は本文反映を読み戻すため、state の意図しない変化は検知できない
+- **自律対応内容**: issue_reopen で open へ復帰（読み戻し VERIFY 済み）。本文更新内容は維持。本 learning エントリとして capture
+- **ユーザー確認有無**: なし（完了報告で明示）
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: agentdev_gh 経由の Issue/PR 更新操作全般。body 更新後の VERIFY は本文だけでなく state も含めて期待値突合すべき
+- **再発条件**: issue_update 実行後、state を期待値と突合せずに後続 STEP へ進む場合
+- **予防策候補**: issue_update 後の再読込 VERIFY に state の期待値突合（更新指示に含まれない限り open/closed は不変であること）を追加。意図しない state 変化検知時は元状態への復帰を即時実施し、原因を learning へ記録
+- **想定反映先**: agentdev-issue-management（Issue 更新時の前後内容比較・VERIFY 手順）、agentdev-workflow-case-close（E5-1 再読込 VERIFY）
+- **関連**: Issue 2805（Epic、case-close 再検証 2026-09-15）、agentdev_gh issue_update / issue_reopen
+- **タグ**: `#agentdev-gh` `#issue-update` `#state-change` `#verify` `#reopen`
