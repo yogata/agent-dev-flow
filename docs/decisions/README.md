@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は25件、提案中の Decision は1件である。
+現行の承認済み Decision は26件、提案中の Decision は0件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -42,7 +42,7 @@
 | DEC-026 | 実現面変更方針の構造化ハンドオフ（realization_actions） | accepted | 2026-09-03 |
 | DEC-027 | 観測ベース統制縮小評価ループ | accepted | 2026-09-04 |
 | DEC-028 | 文章表層品質の共通実行基盤 | accepted | 2026-09-09 |
-| DEC-029 | 公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入 | proposed | 2026-09-14 |
+| DEC-029 | 公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入 | accepted | 2026-09-14 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -80,12 +80,12 @@
 - [DEC-026](DEC-026.md)（実現面変更方針の構造化ハンドオフ（realization_actions））
 - [DEC-027](DEC-027.md)（観測ベース統制縮小評価ループ）
 - [DEC-028](DEC-028.md)（文章表層品質の共通実行基盤）
+- [DEC-029](DEC-029.md)（公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入）
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
-- [DEC-029](DEC-029.md)（公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
