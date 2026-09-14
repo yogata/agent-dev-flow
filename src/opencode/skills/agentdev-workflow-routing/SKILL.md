@@ -12,12 +12,12 @@ agentdev系コマンドのレビューNG時の対応フロー、次コマンド�
 | コマンド | 使用目的 |
 |----------|----------|
 | case-run | レビューNG対応フロー参照 |
-| case-update | レビューNGコメント投稿フロー参照 |
+| case-revise | レビューNG後の再合意済み Definition 変更反映フロー参照 |
 
 ## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
 
 本スキルは Workflow Skill としてレビュー後ルーティングルールを提供する。
-本スキル自身は workflow STEP を所有せず、case-run / case-update の各 Workflow Skill が所有する STEP から参照される（`<workflows/workflow-skill-model>` Design）。
+本スキル自身は workflow STEP を所有せず、case-run / case-revise の各 Workflow Skill が所有する STEP から参照される（`<workflows/workflow-skill-model>` Design）。
 
 ### ルーティング結果と Input Resolution
 
