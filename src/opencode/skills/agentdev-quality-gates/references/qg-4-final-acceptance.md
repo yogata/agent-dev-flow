@@ -1,3 +1,4 @@
+<!-- ADF-COVERS(implementation): REQ-060-005 -->
 # QG-4: Final Acceptance Gate
 
 case-close で PR マージ前に、最終受け入れ状態を確認する Gate。
@@ -252,6 +253,8 @@ bun test ./.opencode/plugins/ ./scripts/
   - **tsc 型検証の型解決前提**: tsc 型検証（`tsc --noEmit`）を含む場合は、対象パッケージでの `bun install` による `@types/bun` 等の復元を前提とする。node_modules 未整備の状態では tsc の型解決が失敗する
   - **bun test 単独実行の依存前提と junction 代替**: bun test 単独実行（フル suite 正規形以外）で依存解決が必要な場合は、main 側 `node_modules` への junction 作成（検証後削除）または当該 skill ディレクトリでの `bun install` のいずれかで整備する（手順詳細は `agentdev-git-worktree` の worktree 構造的制約を参照）
   - **整備後の再実行手順**: 依存整備実施後は、依存解決失敗で fail したテスト・型検証を同一環境で再実行して当該 fail の解消を確認し、依存整備実施済みの旨を環境ラベル（依存パッケージ状態）へ記録する
+
+- **bun test 単独実行・ファイル単体指定の実行形態契約**: フル suite 正規形以外の bun test 実行（単独実行・ファイル単体指定を含む）の実行形態一般規約（repo root 起 cwd 統一、`./` 付きパス指定、逸脱時の検知条件）は、checker 実行契約 Design（checker 実行契約と検出基盤規則）「bun test 実行形態契約（単独実行・ファイル単体指定を含む）」節が所有する
 
 - **Bun 依存 checker の実行経路**: integrity 検査の checker スクリプトを bun test の枠組み外で個別実行する場合は、Bun ランタイム API（Bun.YAML 等）に依存する checker を bun 経路で実行する。実行経路の使い分けの正契約は checker 実行契約 Design（checker 実行契約と検出基盤規則）「安定実行経路」節が所有する
 

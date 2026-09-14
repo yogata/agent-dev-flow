@@ -1,4 +1,5 @@
 <!-- ADF-COVERS(implementation): REQ-056-001 -->
+<!-- ADF-COVERS(implementation): REQ-060-004 -->
 # 知識（Knowledge）
 
 docs/knowledge/ はプロジェクト知識（プロジェクト固有の再利用可能な判断材料）の正規配置領域である。
@@ -17,7 +18,7 @@ docs/knowledge/ はプロジェクト知識（プロジェクト固有の再利�
 
 ## 現在の知識文書
 
-8件。
+9件。
 
 - [windows-powershell-bulk-io-corruption.md](windows-powershell-bulk-io-corruption.md)
 - [checker-cli-stdout-loss-on-windows-bun.md](checker-cli-stdout-loss-on-windows-bun.md)
@@ -27,6 +28,7 @@ docs/knowledge/ はプロジェクト知識（プロジェクト固有の再利�
 - [bun-test-junit-reporter-evidence.md](bun-test-junit-reporter-evidence.md)
 - [distribution-concrete-id-placement.md](distribution-concrete-id-placement.md)
 - [windows-bun-test-spawn-timeout-classification.md](windows-bun-test-spawn-timeout-classification.md)
+- [bun-test-execution-form-drift-signals.md](bun-test-execution-form-drift-signals.md)
 
 知識文書は learning から昇華されて成長する（REQ-056）。
 登録経路と承認条件は REQ-056 を参照する。
