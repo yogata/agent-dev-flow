@@ -1,7 +1,7 @@
 ---
 draft_type: req_draft
 topic_slug: case-workflow-state-redesign
-status: saved
+status: design_saved
 created_at: "2026-09-14T11:30:00+09:00"
 source_rus:
   - C:/Users/ogatay/desk/projects/req-input-case-workflow-redesign.md

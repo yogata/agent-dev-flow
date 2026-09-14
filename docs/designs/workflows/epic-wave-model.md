@@ -23,14 +23,14 @@ OU (Operation Unit):
   実装順序やIssue分解そのものではない。
 
 Epic:
-  case-open が OU を実行可能にするために作る上位 Issue。
+  case-ready が canonical Definition 確定後に OU を実行可能にするために作る上位 Issue。
   大きな OU を複数 Issue で処理する必要がある場合に作成。
   子 Issue 全体の進捗 SSoT を持つ。
 
 Wave:
-  Epic 内の実行段階。case-open が技術的依存関係から作成。
-  Wave 内 Issue は同じ前提条件のもとで実行可能。
-  Wave 間には順序がある。
+    Epic 内の実行段階。case-ready が技術的依存関係から作成。
+    Wave 内 Issue は同じ前提条件のもとで実行可能。
+    Wave 間には順序がある。
 
 Issue:
   case-run が1回で扱う最小実装単位。
@@ -41,7 +41,7 @@ Issue:
 
 | 規模 | 構成 |
 |------|------|
-| 単一 Issue | OU → Issue |
+| 単一 Issue | OU → Issue（Root Case が単一 execution unit） |
 | 複数 Issue | OU → Epic → Wave → Issue |
 
 Epic は常に Wave 構造を持つ。
@@ -49,7 +49,7 @@ Epic は常に Wave 構造を持つ。
 
 ## execution_unit 定義（REQ-035-006）
 
-**execution_unit** は case-open が OU 群から生成する実行単位であり、`standard issue` または `epic issue` のいずれかである。
+**execution_unit** は case-ready が canonical Definition 確定後に OU 群から生成する実行単位であり、`standard issue` または `epic issue` のいずれかである。
 Wave は execution_unit に含まず、Epic Issue 本文から読み取る内部構造として扱う。
 
 | execution_unit | 内部構造 | 実行契約 |
@@ -78,11 +78,13 @@ execution_unit 間の並列可否は連結成分（必須依存のみをエッ�
 - OU / Epic の状態は進捗集約として扱い、主たる実行状態は Issue 状態とする。
 - `ready` / `running` は case-run(#epic) の内部状態であり、Epic Issue 本文（永続状態）には書き込まれない。永続状態に書き込まれるのは `pending` → `completed` / `blocked` / `failed` / `delegation-unavailable` の遷移のみ（case-close が単一書き手）。
 
-## case-open 構成生成基準
+子Issue 実行状態の `ready` / `running` は case-run(#epic) の内部状態であり永続状態に書き込まれない。Root Case（role: case）の status 値域における `ready`（canonical Definition と execution contract が確定し実行可能な永続状態、REQ-006 参照）とは別概念である。両者を混同しない。
 
-case-open は要件doc の operation_units を読み取り、以下を自律生成する:
+## case-ready 構成生成基準
 
-- Epic 要否判定（単一 Issue で完結する場合は Epic を作成しない）
+case-ready は canonical Definition 確定後に要件doc の operation_units を読み取り、以下を自律生成する:
+
+- Epic 要否判定（単一 Issue で完結する場合は Epic を作成しない。Standard では Root Case 自身を単一 execution unit とする）
 - Issue 分解（OU を実装可能なサイズに分割）
 - 依存関係設定（技術的依存に基づく Wave 構成）
 - 初期 status 付与（原則 `pending`）
@@ -93,7 +95,7 @@ case-open は要件doc の operation_units を読み取り、以下を自律生�
 - 機能要件、非機能要件、制約、対象外、受け入れ条件の新規作成
 - 実装順序、Issue分解についてのユーザー確認要求
 
-詳細は `docs/designs/commands/case-open.md` 参照。
+詳細は `docs/designs/commands/case-ready.md` 参照。
 
 ## Epic 検出ルール
 

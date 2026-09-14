@@ -45,6 +45,14 @@ GitHub Issue / PR を使わない個人利用環境（ローカル版 OpenCode�
 | `labels` | 配列（文字列） | 必須 | role ごとの値域（後述）から選定。補助分類であり状態遷移やワークフロー状態の代替として扱わない |
 | `comment_seq` | 数値 | 任意 | コメント採番の最高水位標 |
 
+### role: case の条件付きフィールド
+
+role: case のローカルIssueは次の条件付きフィールドを持つ:
+
+| フィールド | 型 | 必須/任意 | 値域、制約 |
+|---|---|---|---|
+| `resume_command` | 文字列または空 | 条件付き必須 | status が `blocked` の場合のみ値を持つ。`req-define` / `case-revise` / `case-ready` / `case-run` / `case-close` のいずれか。通常状態への遷移時にクリアする（REQ-006 参照） |
+
 ### YAML 前書きに含めないフィールド
 
 `work_type`、`source`、`branch`、`base_branch` を YAML 前書きに持たせない。
@@ -68,10 +76,11 @@ Case 実行の物理表現。旧ローカル Case ファイルの構造を引き
 
 | status | 意味 | 終端状態 |
 |---|---|---|
-| `open` | Case オープン済み、作業前 | いいえ |
-| `running` | 作業中 | いいえ |
-| `blocked` | 停止中（障害、未解決事項あり） | いいえ |
-| `review` | 作業完了、レビュー対象 | いいえ |
+| `open` | Root Case 確立済み、Definition / execution contract 未確定、実行不可 | いいえ |
+| `ready` | canonical Definition と execution contract が確定し実行可能 | いいえ |
+| `running` | 実行中 | いいえ |
+| `blocked` | 継続条件不足（resume_command を保持） | いいえ |
+| `review` | 実装完了、最終受入対象 | いいえ |
 | `closed` | 完了 | はい |
 | `cancelled` | 中止 | はい |
 
@@ -82,19 +91,21 @@ Case 実行の物理表現。旧ローカル Case ファイルの構造を引き
 | 操作 | 変更前 status | 変更後 status |
 |---|---|---|
 | ローカル版 `case-open` | （新規作成） | `open` |
-| ローカル版 `case-run` 開始 | `open` / `blocked` | `running` |
+| ローカル版 `case-ready` 成功 | `open` / `blocked` | `ready` |
+| ローカル版 `case-run` 開始 | `ready` / `blocked` | `running` |
 | ローカル版 `case-run` 完了 | `running` | `review` |
-| ローカル版 `case-run` 停止 | `running` | `blocked` |
-| ローカル版 `case-close` 停止 | `review` | `blocked` |
+| ローカル版 `case-run` 停止 | `running` | `blocked`（resume_command 記録） |
+| ローカル版 `case-close` 停止 | `review` | `blocked`（resume_command 記録） |
 | ローカル版 `case-close` 再開 | `blocked` | `review` |
 | ローカル版 `case-close` 完了 | `review` | `closed` |
-| 明示中止 | `open` / `running` / `blocked` / `review` | `cancelled` |
+| 明示中止 | `open` / `ready` / `running` / `blocked` / `review` | `cancelled` |
 
 再開経路と禁止遷移:
 
-- ローカル版 `case-run` 停止後の再開経路: `blocked` → `running` → `review`
-- ローカル版 `case-close` 停止後の再開経路: `blocked` → `review` → `closed`
+- `case-run` 開始は `ready` からのみ許可する（`blocked` からの直接 `running` 遷移は、resume_command が指す正規再開経路（req-define / case-revise / case-ready）を経由して `ready` に復帰した後に行う）
+- `blocked` からの再開は resume_command の指す先（`req-define` / `case-revise` / `case-ready` / `case-run` / `case-close`）を正規入口とし、推測による再開を行わない
 - `blocked` から `closed` への直接遷移は禁止する。`blocked` から `closed` に至る場合は `review` を経由する
+- 通常状態への遷移時に `resume_command` をクリアする
 
 ### labels 値域（role: case）
 

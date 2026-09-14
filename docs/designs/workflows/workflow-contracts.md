@@ -25,7 +25,7 @@ AgentDevFlow は 3 つのパイプラインで構成される:
 
 | パイプライン | コマンド | 目的 |
 |---|---|---|
-| req/case | req-define → req-save → design-save（Design候補がある場合）→ case-open → case-run → case-close → case-update | 要件定義から実装完了まで |
+| req/case | req-define → case-open → case-ready → case-run → case-close（Definition 変更時は req-define → case-revise → case-ready 例外経路） | 要件定義から実装完了まで |
 | learning | learning-capture → learning-promote | 学びの蓄積、昇華 |
 | intake | intake-capture / intake-from-github → intake-promote | 改善候補の収集、昇華 |
 
@@ -35,13 +35,13 @@ AgentDevFlow の公開コマンドは以下の5分類のいずれかに属する
 
 | 分類 | コマンド | 目的 |
 |---|---|---|
-| 主フロー | req-define → req-save → design-save（Design候補がある場合）→ case-open → case-run → case-close → case-update | 要件定義から実装完了までの標準ワークフロー |
+| 主フロー | req-define → case-open → case-ready → case-run → case-close（例外経路: req-define → case-revise → case-ready） | 要件定義から実装完了までの標準ワークフロー |
 | 最大自走入口 | case-auto, backlog-auto | 追加入口。case-auto は req-define 完了後の後続工程を一括自走、backlog-auto は backlog 整理サイクル（inspect-docs → 昇格3系統 → backlog-review）を1回起動で実行。標準フローを置換しない（REQ-005-010、REQ-005-011） |
 | 補助フロー | intake-capture, intake-from-github, intake-promote, learning-promote, backlog-review | 改善候補収集、学び蓄積、RU化。主フローを補完 |
 | 検出フロー | inspect-docs, inspect-skills, inspect-promote | 文書、スキルの意味検出、分類、昇格 |
 | リポジトリローカル検査 | /repo/docs-check | AgentDevFlow 本体リポジトリ内の機械的整合性検査 |
 
-- case-auto は標準フロー（req-save → design-save → case-open → case-run → case-close）を内部的に呼び出す追加入口であり、標準フローを置換、廃止しない（REQ-006-017）。design-save は `artifact_actions` に `artifact: design` entry が含まれる場合に実行し、旧形式 draft（同フィールドなし）は後方互換で従来順序で実行する（v2:ADR-0123, REQ-001-014）。
+- case-auto は標準フロー（case-open → case-ready → case-run → case-close）を内部的に呼び出す追加入口であり、標準フローを置換、廃止しない。REQ / Decision / Design の保存は case-ready 内部の保存内部責務（Capability Skill 委譲）が実行する。
 - backlog-auto は標準の backlog 整理フロー（inspect-docs、昇格3系統、backlog-review の個別コマンド逐次実行）を置換しない追加入口であり、backlog 整理サイクル（inspect-docs → 昇格3系統（learning-promote、intake-promote、inspect-promote）→ backlog-review）を1回起動で実行する（REQ-005-011、REQ-041）。
 - 補助フロー、検出フロー、リポジトリローカル検査は、主フロー、最大自走入口とは独立して実行可能である。
 - 検出フローの出力（検出事項: inspect finding）は、inspect-promote → backlog-review を経て RU 化され、req-define の入力となる。
@@ -50,13 +50,13 @@ AgentDevFlow の公開コマンドは以下の5分類のいずれかに属する
 
 ### マクロフェーズ
 
-開発ワークフローを3つのマクロフェーズで定義する。
+開発ワークフローを3つのマクロフェーズで定義する。新しいマクロフェーズは追加しない。
 
-| マクロフェーズ | 定義 | 対応マイクロフェーズ |
+| マクロフェーズ | 定義 | 対応 Case 状態 |
 |---|---|---|
-| 壁打ち | 要件定義、分析、Issue作成前の合意形成 | requirement + analyzed |
-| 構造的実行 | Issue作成後の実装、PR作成、進捗管理 | created + in_progress |
-| レビュー完了 | PR作成後のレビュー、マージ、完了処理 | review + done |
+| 壁打ち | 要件定義、分析、合意形成 | （Case 確立前） |
+| 構造的実行 | Root Case 確立後の Definition 確定、実行準備、実装、進捗管理 | open → ready → running |
+| レビュー完了 | 実装完了後のレビュー、マージ、完了処理 | review → closed |
 
 ### マイクロフェーズ
 
@@ -103,10 +103,11 @@ source / projection 双方の確認が品質保証上必要な場合は、その
 
 ### draft の位置づけ
 
-draft（`.agentdev/drafts/req-draft-*.md`）は壁打ちフェーズ内の一時ハンドオフであり、構造的実行以降のSSoTはIssue本文とWork Planである。
+draft（`.agentdev/drafts/req-draft-*.md`）は壁打ちフェーズ内の一時ハンドオフであり、構造的実行以降のSSoTはIssue本文である。
 
-- ライフサイクル: `draft` → `saved`（req-save完了）→ `issued` + 削除（case-open完了）
-- 構造的実行フェーズ以降: draft は存在しない（case-open完了時に削除）
+- ライフサイクル: `draft`（req-define完了）→ Definition Package 生成（case-open完了、保持）→ 削除（case-ready成功）
+- case-ready 成功後: draft は存在しない（case-ready 成功時に削除）。RU も case-ready 成功後に削除される
+- case-ready が blocked / failed / 中断した場合: draft / RU は保持される
 
 ### フェーズ境界ルール
 
@@ -150,13 +151,12 @@ no-op / empty state の外部挙動を維持する。
 | コマンド | specs | Decision | REQ | finding | learning | intake | integrity |
 |---|---|---|---|---|---|---|---|
 | `/agentdev/req-define` | - || READ | READ（明示入力時） | - || - |
-| `/agentdev/req-save` | - | WRITE | WRITE | WRITE（SPLIT検出時） | - || - |
-| `/agentdev/design-save` | WRITE | - || - || - ||
-| `/agentdev/case-open` | READ | READ | READ | - || - ||
-| `/agentdev/case-run` | READ+WRITE | READ | READ | - || - ||
+| `/agentdev/case-open` | READ | READ | READ | - || - |
+| `/agentdev/case-ready` | WRITE | WRITE | WRITE | WRITE（SPLIT検出時） | - || - |
+| `/agentdev/case-revise` | WRITE | WRITE | WRITE | - || - |
+| `/agentdev/case-run` | READ+WRITE | READ | READ | - || - |
 | `/agentdev/case-close` | - || READ | - | WRITE（capture） | WRITE（capture） | - |
 | `/agentdev/case-auto` | READ+WRITE | READ+WRITE | READ+WRITE | - | WRITE（capture） | WRITE（capture） | - |
-| `/agentdev/case-update` | - || READ+WRITE | - || - ||
 
 ## ワークフロー経路制御
 
@@ -196,7 +196,7 @@ AgentDevFlow は case-auto と case-run の2階層委譲構造で大規模自走
 
 ### case-auto 構成工程委譲
 
-case-auto は構成工程（req-save、design-save、case-open、case-close）を各工程の Workflow Skill を権威情報源とする委譲起動で実行する。
+case-auto は構成工程（case-open、case-ready、case-revise（req-define で再合意済みの Definition 変更がある場合）、case-close）を各工程の Workflow Skill を権威情報源とする委譲起動で実行する。
 case-auto 本体は薄いオーケストレータに専念し、入力解決、工程分岐、工程間状態引き継ぎ、停止条件検出、完了報告、OU と子Issue ループ制御、クリーンアップ検証ゲートのみを保持し、工程内部ロジックを実行しない。
 
 case-run は case-auto 内でインライン実行する（構成工程委譲の対象外）。
