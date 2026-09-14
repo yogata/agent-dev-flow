@@ -25,8 +25,8 @@ Issue 本文の事前状態セクションが列挙する検査結果件数（NG
 差異を検出した場合、case-run は以下を実施する:
 
 1. 検出結果（対象パス、Issue 本文記載値、現行値）を STEP-S4 委譲プロンプトに含めて実行担当サブエージェントへ引き渡す。実行担当サブエージェントは PR 本文の `## Findings / Capture候補` セクションに `### stale-reference` 小見出しで差異内容を記録する（Findings 記録は実行担当サブエージェント責務）
-2. case-update へ連携し、Issue 本文の参照パス・件数の更新を委譲する
-3. case-run 単独では Issue 本文を書き換えない（Issue 本文更新は case-update の責務）
+2. case-revise へ連携し、Definition 変更と Issue 本文の参照パス・件数の更新を委譲する
+3. case-run 単独では Definition/Issue 本文を書き換えない（再合意済み変更は case-revise の責務）
 
 差異非検出時はそのまま STEP-S4 へ進む。
 staleness check の差異有無によらず QG-3 本体（STEP-S4 委譲先）の実施要否は変更しない。

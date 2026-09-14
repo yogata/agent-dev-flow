@@ -1,6 +1,6 @@
 # QG-1: Definition Integrity Gate
 
-要件定義フェーズ（req-define/ req-save）で生成される成果物の構造的完全性を検証する Gate。
+要件定義フェーズ（req-define/ case-ready/ case-revise）で生成される成果物の構造的完全性を検証する Gate。
 本ファイルは QG-1 の判定基準、検査観点を定義する。
 共通契約は [common-gate-contract.md](common-gate-contract.md) を参照。
 
@@ -9,7 +9,7 @@
 | コマンド | 配置ステップ | 対象成果物 |
 |---------|-------------|-----------|
 | req-define | STEP-3（既存REQ照合、SPLIT予兆計測）〜STEP-10（要件doc確認、ドラフトSPLIT予兆計測） | 要件doc draft（`.agentdev/drafts/req-draft-*.md`） |
-| req-save | STEP-3（ドラフト検証）〜STEP-4（REQ 操作） | REQ ファイル（`docs/requirements/<REQ-*>.md`）、Decision ファイル（`docs/decisions/<DEC-*>.md`） |
+| case-ready / case-revise | Definition 保存・確定 | REQ ファイル（`docs/requirements/<REQ-*>.md`）、Decision ファイル（`docs/decisions/<DEC-*>.md`） |
 
 ## 検査観点
 
@@ -130,11 +130,11 @@ QG-1 の検査をサブエージェントに委譲する場合:
 
 - サブエージェントは分類候補、測可能性判定候補、根拠のみを返す。
 - 親エージェントが pass/warn/fail を確定し、ドラフト反映判断を行う。
-- 具体的な委譲接続点は req-define/ req-save の各 Step（4-2 分類ゲート, 5-1 Decision禁止ゲート 等）を参照。
+- 具体的な委譲接続点は req-define/ case-ready / case-revise の各 Step（分類ゲート、Definition 保存ゲート等）を参照。
 
 ## 責務境界
 
-- QG-1 は**判定のみ**行う。ドラフト編集、REQ 保存は req-define/ req-save コマンドの責務。
+- QG-1 は**判定のみ**行う。ドラフト編集、Definition 保存は req-define/ case-ready / case-revise コマンドの責務。
 - QG-1 fail 時の差し戻し判断はユーザーが行う（自動差し戻し禁止）。
 
 ## See Also
@@ -142,5 +142,4 @@ QG-1 の検査をサブエージェントに委譲する場合:
 - [common-gate-contract.md](common-gate-contract.md)
 - **agentdev-req-analysis**: チェックボックス品質基準、REQ/Design 分類基準
 - **agentdev-decision-guidelines**: Decision 判定基準
-
 

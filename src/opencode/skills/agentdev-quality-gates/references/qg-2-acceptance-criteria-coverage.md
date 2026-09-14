@@ -102,7 +102,7 @@ execution contract 確定を支援するため、artifact-specific quality contr
 適用範囲:
 
 - 新規 Issue 作成時（case-open STEP-2、STEP-5 で実行）
-- case-update による新契約更新時
+- case-revise による新契約更新時
 - legacy Issue（Execution Contract 必須セクション不存在）には適用しない（presence-based 判定）
 
 判定:
@@ -145,4 +145,3 @@ QG-2 の検査をサブエージェントに委譲する場合:
 - [qg-1-definition-integrity.md](qg-1-definition-integrity.md)（前工程の要件定義の完全性。QG-2 はその成果物を入力とする）
 - **agentdev-issue-management**: Issue 本文生成、テンプレート選定
 - **agentdev-workflow-templates**: Issue 本文テンプレート（`issue_desc_*.md`）
-
