@@ -1,5 +1,7 @@
 # single workflow: 単一 Issue 実行（single）
 
+<!-- ADF-COVERS(implementation): REQ-031-028 -->
+
 > 本 reference は `agentdev-workflow-case-run` SKILL.md の single workflow 詳細である。
 > STEP-S1〜S3（フェーズ判定から前置 gate 群まで）と STEP-S6（クリーンアップ・完了報告）を所有する。
 > STEP-S4/S5 は [references/delegation-and-result.md](delegation-and-result.md) を参照。
@@ -9,6 +11,7 @@
 - STEP-S1: フェーズ判定・再開ポイント検出
 - STEP-S2: Issue 抽出・確認・判定
 - STEP-S3: Worktree 作成・ブランチ準備・前置 gate 群
+- verify-only closure の検証実行と SSoT コメント記録
 - STEP-S6: worktree クリーンアップ確認・完了報告
 
 ## STEP-S1: フェーズ判定・再開ポイント検出
@@ -158,6 +161,41 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 
 - worktree・ブランチ既存時は作成をスキップする。gate 群は再実行可能であり、同一 worktree 状態に対して同一判定を返す
 
+## verify-only closure の検証実行と SSoT コメント記録
+
+### Purpose
+
+verify-only closure（PR も carrier commit も存在しない Issue 完了。検証のみで完了する maintenance case を含む）では、変更が存在しないため commit 前3検査の発火条件（配布物変更を含む case）が成立しない。この場合でも検証完了の恒久証跡を残すため、3検査と integrity suite を通常 case と同水準で実行し、その実行証跡を SSoT コメント（Issue コメント）へ記録する。正規原本は case-run command Design「verify-only closure の検証実行と SSoT コメント記録工程」節であり、本工程はその実行時手順である。
+
+### Preconditions
+
+- STEP-S5 で result 処理が完了している（verify-only closure では PR を作成しない）
+
+### Procedure
+
+1. **verify-only closure の判定**: execution contract で検証のみと事前確定された case、または実行の結果変更不要が確定した case のいずれかを正規の判定点とする。判定根拠を Issue コメント（SSoT コメント）に残す
+2. **3検査の実行**: 配布依存境界検査（check_distribution_boundary.ts）、runtime-unresolved-reference 検査（check_extensions.ts 経由の integrity 検査）、traceability 検査（宣言整合）を通常 case と同一の手順・同一の水準（base 既知違反と新規違反の分離突合、新規違反 0 件確認、件数突合）で実行する。checker コマンドの実行経路と stdout 退避形式は STEP-S5「checker コマンドの実行経路（安定実行経路）」「checker コマンドの stdout 退避形式」（delegation-and-result.md）と同一契約に従う
+3. **integrity suite の実行**: full integrity suite（bun test 全件）を実行し、「Ran N tests across M files」の N/M 件数突合と直前実績との件数急減なし確認を行う（case-close STEP-3 の合格基準と同水準）
+4. **SSoT コメントへの記録**: 実行コマンド列（実行 cwd、実行形態を含み、そのまま再実行手順として機能する形式）と結果（3検査の new_delta 0・新規違反 0 件、integrity suite の pass/fail 件数）を Issue コメント（Custom Tool `agentdev_gh` の comment_create）へ記録する。verify-only closure では PR が存在しないため PR 本文を記録先に使わない
+5. **carrier commit 不作成**: 検証完了のために carrier commit を作成しない（case 2769 で確立した作業仮定の継承。「検証完了のために carrier commit を作成する」代替案は Design 節で却下済み）
+6. **チャネル分離**: SSoT コメントは検証証跡チャネルであり、capture（intake/learning 候補）チャネルではない。capture 引き継ぎの PR 本文限定原則（既存契約）は変更しない。検証中に発見した本筋外の検出事項は既存の intake 起票経路で扱う
+
+### Result
+
+- 検証完了（3検査と integrity suite の実行結果確認済み）、SSoT コメント記録済み
+
+### Evidence
+
+- SSoT コメント（Issue コメント）: 判定根拠、実行コマンド列と検証結果
+
+### Completion Verification
+
+- SSoT コメントに判定根拠、再実行可能な実行コマンド列（実行 cwd・実行形態を含む）、検証結果が記録されていること
+
+### Resume-Idempotency
+
+- 3検査と integrity suite は読取検査であり再実行可能。SSoT コメントの記録有無で本工程の完了を判定し、記録済みの場合は重複記録しない
+
 ## STEP-S6: worktree クリーンアップ確認・完了報告
 
 ### Purpose
@@ -180,7 +218,7 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 - 未コミット変更あり: 報告してユーザーの指示に従う。自動的な破棄、コミットは行わない
 - 未コミット変更なし: 完了報告へ。runtime workspace のクリーンアップは harness 側の責務であり（charter 原則、harness 分離モデル Design 参照）、case-run は関与しない
 - **tmp/ 残存確認**: 当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないことを確認する。残存時は workflow 側 cleanup 規定（当該実行内での削除）に従って処理し、残存ファイルと対応結果を完了報告に明示する
-- 完了報告 template に従って出力する（実行担当サブエージェント result 状態、PR番号を含める）
+- 完了報告 template に従って出力する（実行担当サブエージェント result 状態、PR番号を含める）。verify-only closure 時は PR番号の代わりに SSoT コメント（検証証跡）の記録済み確認を含める
 - 本 Step（worktree クリーンアップ）の開始時刻・終了時刻（JST）を記録し、worktree クリーンアップ時間を計測する。完了報告に L2 タイムスタンプ内訳（worktree 設定時間、実行担当サブエージェント実行時間、worktree クリーンアップ時間）を含める
 
 ### Result

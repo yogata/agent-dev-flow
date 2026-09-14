@@ -3,6 +3,8 @@ name: agentdev-workflow-case-run
 description: "case-run command の workflow 実装本体。単一 Issue 実行（single workflow）と Epic Wave 実行（epic-wave workflow）の 1:N 分離構成、実行担当サブエージェント委譲（最大5件並列）、fan-out・fan-in、partial result、child task recovery、result 4状態処理を所有する。USE FOR: case-run 実行時の workflow 制御（single Issue 実行・Epic Wave 実行・再開フェーズ判定・委譲・前置/最終 gate）。DO NOT USE FOR: 実装実行そのもの（委譲内の実行担当サブエージェントが担う）、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
+<!-- ADF-COVERS(implementation): REQ-031-028 -->
+
 # case-run workflow スキル
 
 case-run command の workflow 実装本体である。
@@ -87,13 +89,13 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 
 ### 再開プロトコル（resume protocol）
 
-- 再開点は永続状態から再構成する: worktree・ブランチの存在（準備フェーズ完了）、PR の存在と PR URL（委譲完了）、Issue コメント（blocked/failed の SSoT）、Epic Issue 本文のステータス追跡テーブル（Wave 進行）
-- フェーズ再開条件: 準備フェーズ（worktree+ブランチが存在しない）、委譲フェーズ（PR 未作成かつ result 未確定）、クリーンアップフェーズ（result が completed-pr）
+- 再開点は永続状態から再構成する: worktree・ブランチの存在（準備フェーズ完了）、PR の存在と PR URL（委譲完了）、Issue コメント（blocked/failed の SSoT、verify-only closure の検証証跡 SSoT コメント）、Epic Issue 本文のステータス追跡テーブル（Wave 進行）
+- フェーズ再開条件: 準備フェーズ（worktree+ブランチが存在しない）、委譲フェーズ（PR 未作成かつ result 未確定）、クリーンアップフェーズ（result が completed-pr。verify-only closure では SSoT コメントの記録有無で検証・記録工程の再開点を判定する）
 - 会話コンテキスト・自然言語の前 STEP result のみを再開の根拠（resume source）としない。親子 task 状態は Harness から復元し、完了済み子Issue 状態を永続ドメイン状態（PR・Issue コメント）と再構成して合流判定（fan-in）を行う
 
 ### 終了条件（termination）
 
-- 正常終了: single は PR 作成確認とクリーンアップ完了報告まで。epic-wave は1 Wave 分の result 集約と Wave 完了報告まで
+- 正常終了: single は PR 作成確認とクリーンアップ完了報告まで。epic-wave は1 Wave 分の result 集約と Wave 完了報告まで。verify-only closure（PR を作成しない完了）は検証完了と SSoT コメント記録まで（references/single.md「verify-only closure の検証実行と SSoT コメント記録」参照）
 - 一時ファイル残存: 正常終了の前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（STEP-S6/W5 で確認。一時ファイル cleanup 規定（workflow 側で生成した `.agentdev/tmp/` 一時ファイルは当該実行内で削除する。Custom Tool 内部の一時ファイルは Tool が操作ごとに自動削除する））
 - 停止終了: blocked / failed（Issue コメント SSoT）、delegation-unavailable（Issue を pending へ戻す）、配布依存境界 最終 gate 違反（PR 本文 SSoT）、worktree precondition gate 失敗（実行担当サブエージェント起動前に停止）
 - 引き継ぎ停止: Issue 本文に `agentdev_handoff: true` を含む場合、リポジトリ種別に応じた停止判定（`agentdev-workflow-lifecycle` runtime-package-boundary）
@@ -132,7 +134,7 @@ case-run の実行担当（委譲内サブエージェント）は、対象要�
 - **スコープ**: 単一 Issue または単一 Wave のみを処理する。Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）は扱わない（workflow-contracts Design SC-{NNN}、extension 経由で解決）
 - **統合先基準（作業起点・PR base）**: worktree の作成元と PR の base は main を参照する。rebase・同期基準、鮮度確認、Epic 後続 Wave の作業起点も main を参照する
 - **実装実行の非所有**: case-run 本体は work plan 生成、実装、TDD、乖離検出、specs 更新、PR 本文作成、PR 作成を行わない（実行担当サブエージェント責務、adapter protocol 参照）
-- **SSoT**: blocked/failed の詳細本文 SSoT は Issue コメント。completed の SSoT は PR 本文。一時会話コンテキスト、中間ファイルは SSoT としない
+- **SSoT**: blocked/failed の詳細本文 SSoT は Issue コメント。completed の SSoT は PR 本文。verify-only closure（PR も carrier commit も存在しない Issue 完了）ではこの例外として、検証証跡（3検査+integrity suite の結果と再実行可能な実行コマンド列）を SSoT コメント（Issue コメント）へ記録する。一時会話コンテキスト、中間ファイルは SSoT としない
 - **完了条件チェックボックス**: case-run、実行担当サブエージェントは完了条件チェックボックスを更新しない（case-close QG-4 の責務）
 - **Findings / Design確定候補**: 実行担当サブエージェントが PR 本文の `## Findings / Capture候補` と `## Design確定候補` に記録する（別セクション、混在させない）。case-run の capture 責務は記録のみ
 - **外部実行ハーネスの中間成果物**: plan artifact 等を AgentDevFlow の永続成果物として扱わず、最終結果は PR URL で受領する

@@ -1,5 +1,7 @@
 # 共通委譲・result 処理（delegation-and-result）
 
+<!-- ADF-COVERS(implementation): REQ-031-028 -->
+
 > 本 reference は `agentdev-workflow-case-run` SKILL.md の共通 STEP 詳細である。
 > STEP-S4（実行担当サブエージェント委譲）と STEP-S5（result 処理・配布依存境界 最終 gate）を所有する。
 > single workflow から直接参照され、epic-wave workflow からは子Issue ごとの委譲契約として並列適用される。
@@ -83,7 +85,7 @@
 ### Procedure
 
 - **result 4状態処理**（`agentdev-case-run-execution-adapter` の result 契約）:
-  - **completed-pr**: 実装完了、PR作成済み。PR番号を受け取り最終 gate（後述）へ。成功成果は PR 作成である
+  - **completed-pr**: 実装完了、PR作成済み。PR番号を受け取り最終 gate（後述）へ。成功成果は PR 作成である。verify-only closure（PR も carrier commit も存在しない Issue 完了）ではこの限りではなく、検証証跡は SSoT コメント（Issue コメント）へ記録する（references/single.md「verify-only closure の検証実行と SSoT コメント記録」参照）
   - **blocked**: 回答可能な blocker。詳細本文は Issue コメントに SSoT として記録済み（実行担当サブエージェント責務）。エラー処理に従い停止、ユーザー報告
   - **failed**: repository context で回答不能な blocker。詳細本文は Issue コメントに構造化して記録済み。エラー処理に従い停止、ユーザー報告
   - **delegation-unavailable**: 実行インフラが委譲を起動できなかった状態。実行未試行のため `pending` に戻す
@@ -130,6 +132,6 @@
 
 - 不変条件（単一 Issue または単一 Wave のみ処理、実装実行の委譲、result 4状態契約）
 - ガードレール（完了条件チェックボックスの評価・更新は case-close QG-4 の責務、`POL-completion-checkbox-single-writer`）
-- 不変条件（blocked/failed の SSoT は Issue コメント、completed の SSoT は PR 本文）
+- 不変条件（blocked/failed の SSoT は Issue コメント、completed の SSoT は PR 本文。verify-only closure では検証証跡は SSoT コメントへ記録し carrier commit を作成しない）
 - 不変条件（外部実行ハーネス中間成果物の非扱い、PR URL 受領）
 - 不変条件（Design確定候補は PR 本文の別セクションに記録）
