@@ -1409,24 +1409,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 - **移動日**: 2026-09-01
 
-## worktree 環境の bun test 依存解決不能は bun install --cwd で worktree ローカル解消できる
-
-- **問題事象**: worktree 環境（.worktrees/2428-feature）で bun test 実行時、agentdev-project-extensions/scripts の zod 依存が解決不能となり5件 fail（4+1、すべて unhandled error）が発生した
-- **発生局面**: 実装（case-run の契約テスト実行、worktree 環境）
-- **検知方法**: bun test の unhandled error fail（事前計測で検出）
-- **根本原因**: worktree は junction を持たず（未伝播）、scripts 配下の node_modules も git 管理対象外のため、worktree 側で依存解決ができない
-- **自律対応内容**: src/opencode/skills/agentdev-project-extensions/scripts で bun install --cwd を実行して worktree ローカルに依存を解消し、テスト全件合格を確認した（node_modules は untracked 0 を確認）
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし（worktree テスト fallback 契約は agentdev-git-worktree-test-fallback Design が所有）
-- **横展開観点**: worktree 環境で node_modules を必要とするサブパッケージのテストが環境起因 fail する場合の依存解消手段。worktree テスト fallback の判別には「stash 前後でチェッカーを再実行して差分比較」が有効
-- **再発条件**: worktree 環境で node_modules を必要とする scripts 配下のテストを実行する場合
-- **予防策候補**: worktree テスト実行前に bun install --cwd を実行する、または環境起因 fail 時の依存解消手順を fallback 手順へ明記する
-- **想定反映先**: agentdev-git-worktree-test-fallback Design、worktree テスト実行手順
-- **関連**: PR 2432 本文、Issue 2428、Epic 2427 Wave 1
-- **タグ**: #worktree #bun-test #dependencies
-
-- **移動日**: 2026-09-01
-
 ## 残存掃除の初期 grep サーベイは件数上限なしで全体を出す
 
 - **問題事象**: Gxx 記述の残存掃除（PR 2433、Issue 2429、OU-002）で、委譲再開時の初期 grep を件数上限（First 40 等）付きで行ったため、docs/designs 配下の Gxx 残存を過少評価し、後工程で約 120 件の追加残存を検出した
@@ -2200,5 +2182,101 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **関連**: case 2791（Issue 2792 / PR 2792）
 - **タグ**: #docs-check #expanded-readme-sync #README #検証順序
 - **移動日**: 2026-09-13
+
+---
+
+## 2026-09-14 case 2796 Wave 1 / case 2797（PR #2801）: worktree で full check_integrity を実行する際の repo-local Plugin 投影前提
+
+- 観測元: case 2797（DEL-2797-3、PR #2801）本文 learning 候補、case-close 2026-09-14 回収
+- 内容: worktree は `.opencode/plugins/<plugin>` junction・loader shim・plugins 配下 node_modules が未整備だと PluginProjection 検査で環境由来 NG（only-worktree 10 件）が発生する。検証時は一時構成（junction + shim 配置 → 検証 → 削除）で解消でき、base との分離突合で変更起因と環境起因を分離できる
+
+- **移動日**: 2026-09-15
+- **処分判定**: deferred（出現1件。`.opencode/plugins` 投影の一時構成手順は未整備。再発時に具体化して再評価）
+
+---
+
+## 2026-09-14 case 2796 Wave 1 / case 2797（PR #2801）: bun test フル suite の直前実績比較の制約
+
+- 観測元: case 2797（DEL-2797-3、PR #2801）本文 learning 候補、case-close 2026-09-14 回収
+- 内容: bun test 直前実績比較（base での N/M 実行）は main 側書込み回避のため worktree 完了検証では未実施となり得る。fail 0 件と規模妥当性（3086 tests / 134 files）で受領したが、main 側書込みを伴わない base 件数比較手段（読取専用 detached worktree 実行等）があれば候補
+
+- **移動日**: 2026-09-15
+- **処分判定**: deferred（出現1件。base 件数比較の代替手段は候補止まり）
+
+---
+
+## 2026-09-14 case 2799（PR #2803）: repo-agentdev-integrity 検査スクリプトの実行ランナーは bun
+
+- 観測元: case 2799（DEL-2799-3、PR #2803）本文 learning 候補、case 2800（PR #2804）でも同様、case-close 2026-09-14 回収
+- 内容: check_changed_docs.ts・generate_indexes.ts 等 repo-agentdev-integrity の scripts は CommonJS の require() を使用するため node --experimental-strip-types では ReferenceError で実行不可。bun 経由（`bun .opencode/skills/repo-agentdev-integrity/scripts/<script>.ts`）が現行の実行手段。checker 実行契約の安定実行経路（node モジュール import）は check_distribution_boundary_cli.ts のような runCli export 型に適用され、require() 混在スクリプトには適用できない
+
+- **移動日**: 2026-09-15
+- **処分判定**: deferred（出現1件。checker 実行契約の適用範囲の事実記録）
+
+---
+
+## 2026-09-14 case 2805（case-open STEP-4）: サブエージェント bash の Windows パス結合不具合による repo root 迷子ファイル作成
+
+- **問題事象**: adversarial-review を ultrabrain カテゴリのサブエージェントへ委譲した際、サブエージェントが bash でトレーサビリティ check の JSON 出力先パスを結合する際に OS 区切り文字を喪失し、repo root 直下に `CWINDOWSTEMPopencodetrace-check.json`（約94KB）という迷子 untracked ファイルが作成された（意図先は OS テンポラリ配下）
+- **発生局面**: 実装（case-open STEP-4 の review 委譲内の読取検査実行）
+- **検知方法**: 親エージェントが STEP-5-0 の commit 前に `git status --porcelain=v1` を実行した際に untracked 迷子ファイルを検知（review サブエージェントの I-04 finding でも指摘）
+- **根本原因**: サブエージェントが bash コマンドで絶対パス文字列とファイル名を文字列連結した際、Windows 環境の区切り文字（`\` または `/`）が失われたまま出力先パスを構築した。サブエージェント側には出力先がプロジェクト外であることの検証がなく、エラーにならず repo root への書込みが成立した
+- **自律対応内容**: 親エージェント（case-open 実行主体）が明示パス指定の git 操作で迷子ファイルをコミット対象から除外し（Form Zero・スイープ禁止の遵守）、本 learning エントリとして capture。迷子ファイル自体は untracked の一時残骸として削除
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: サブエージェントへ bash でのファイル出力を委譲する場合全般（review・実装・検査委譲）。Windows 環境での作業ツリー外出力は区切り文字喪失による repo root 汚染リスクがある
+- **再発条件**: bash（POSIX シェル）で Windows 絶対パス（`C:\...`）を含む文字列連結により出力先を構築し、かつ書込み先がプロジェクト内外かの検証を行わない場合
+- **予防策候補**: bash での一時ファイル出力は `/` 区切りの正パス（`C:/WINDOWS/TEMP/opencode/...`）または `$TEMP` を使う。委譲プロンプトに出力先パスの完全な正区切り表記を明示する。commit 前の `git status --porcelain` 確認（untracked 迷子検知）を commit 前置手順として維持する
+- **想定反映先**: agentdev-workflow-orchestration（Split Rule・委譲時の作業衛生）、learning pipeline 経由でサブエージェント委譲プロンプトの規約へ
+- **関連**: Issue #2805（case-open 実行）、adversarial-review 委譲（ultrabrain、2026-09-14）
+- **タグ**: `#windows` `#bash` `#subagent-delegation` `#git-hygiene`
+
+- **移動日**: 2026-09-15
+- **処分判定**: deferred（出現1件。委譲プロンプト規約への反映は再発時に再評価）
+
+---
+
+## 2026-09-15 case 2805 OU-006（PR #2820）: worktree 内並行書き込みの検知と明示パス・ステージ確認の対処
+
+- 観測元: case 2805 OU-006（DEL-2811-2、PR #2820）本文 learning 候補、case-close 2026-09-15 回収
+- 内容: 作業中に git status の差分監視で別主体とみられる書き込み（routing references・learning 関連・docs/designs 多数ファイル）を検知した。対処として (1) in-scope ファイルのみ明示パス指定でステージ、(2) ステージ後の `git diff --stat <scope>` が空であることの確認、(3) コミットはステージスナップショットに対して実行、により PR への混入を防止できた。worktree は 1 writer 前提であり、並行書き込み検知時の早期断念基準（in-scope ファイルへの書き込み検知時は直ちに停止等）を adapter protocol 側で明文化すると再発防止になる
+- 関連: Issue #2811（OU-006）、PR #2820 対応記録
+- タグ: `#worktree` `#parallel-write` `#staging` `#adapter-protocol`
+
+- **移動日**: 2026-09-15
+- **処分判定**: deferred（出現1件。adapter protocol の早期断念基準明文化は候補止まり）
+
+---
+
+## 2026-09-15 case 2805 OU-006（PR #2820）: squash merge 済み分支の再利用は fast-forward 不能になる
+
+- 観測元: case 2805 OU-006（DEL-2811-2、PR #2820）本文 learning 候補、case-close 2026-09-15 回収
+- 内容: squash merge 済み分支（前回 PR #2819 の feature/issue-2811）を再利用する委譲では、remote 分支に squash 前コミット 11 件が残留し、main 由来の新 commit を fast-forward push できない。force-push 回避のため新分支（feature/issue-2811-2、base main 46d723a1）から PR を作成した。case-run の worktree/分支準備時に remote 分支の fast-forward 可否確認、または squash merge 後の分支削除運用により防止できる
+- 関連: Issue #2811（OU-006）、PR #2820 対応記録
+- タグ: `#squash-merge` `#branch` `#case-run` `#worktree`
+
+- **移動日**: 2026-09-15
+- **処分判定**: deferred（出現1件。分支削除運用・fast-forward 可否確認は候補止まり）
+
+---
+
+## 2026-09-15 case 2805 Epic（case-close 再検証）: body 更新のみの issue_update 後に Issue state が closed へ変化した
+
+- **問題事象**: Epic Issue 2805 の本文更新（完了条件⑤残課題記述の現状化 + 再検証記録追記）を Custom Tool agentdev_gh の issue_update で実行したところ、リクエストには state 変更を含めないにもかかわらず、直後の再読込 VERIFY で Issue state が closed へ変化していた。完了条件⑤未達の Epic が closed になるのは構造化停止契約（未達チェックボックス残存時の停止）に反するため、issue_reopen で open へ復帰した
+- **発生局面**: case-close Epic Wave クローズ E5-1（完了条件最終評価に伴う Epic Issue 本文更新）
+- **検知方法**: Issue body 更新後の再読込 VERIFY（issue_read）で state フィールドを期待値（open 維持）と突合
+- **根本原因**: 未特定。issue_update 操作自体の副作用（Tool 内部実装が body 内容に連動して state を操作する等）または並行アクター（別セッション・ユーザー手動操作・GitHub 自動化）による state 変更の可能性が残る。issue_update の fail-closed 検証は本文反映を読み戻すため、state の意図しない変化は検知できない
+- **自律対応内容**: issue_reopen で open へ復帰（読み戻し VERIFY 済み）。本文更新内容は維持。本 learning エントリとして capture
+- **ユーザー確認有無**: なし（完了報告で明示）
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: agentdev_gh 経由の Issue/PR 更新操作全般。body 更新後の VERIFY は本文だけでなく state も含めて期待値突合すべき
+- **再発条件**: issue_update 実行後、state を期待値と突合せずに後続 STEP へ進む場合
+- **予防策候補**: issue_update 後の再読込 VERIFY に state の期待値突合（更新指示に含まれない限り open/closed は不変であること）を追加。意図しない state 変化検知時は元状態への復帰を即時実施し、原因を learning へ記録
+- **想定反映先**: agentdev-issue-management（Issue 更新時の前後内容比較・VERIFY 手順）、agentdev-workflow-case-close（E5-1 再読込 VERIFY）
+- **関連**: Issue 2805（Epic、case-close 再検証 2026-09-15）、agentdev_gh issue_update / issue_reopen
+- **タグ**: `#agentdev-gh` `#issue-update` `#state-change` `#verify` `#reopen`
+
+- **移動日**: 2026-09-15
+- **処分判定**: deferred（出現1件・原因未特定。VERIFY への state 突合追加は再発時に再評価）
 
 ---

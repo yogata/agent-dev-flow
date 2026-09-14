@@ -1,206 +1,210 @@
 # 評価レポート
 
 ## メタデータ
-- **実行日時**: 2026-09-13
-- **対象エントリ数**: 26件（inbox: 17件、deferred: 約120件をインデックススキャンし、近接9件を詳細照合・統合評価）
-- **問題クラス数**: 3クラスタ + 未分類10件
-- **実行範囲**: STEP-1〜STEP-3 完了（本レポートに評価・判定結果を反映）。STEP-4 以降は本レポートを対象に判定する。
-- **特記事項**: ユーザー指定により deferred プールの再評価を実施（近接統合9件、前回最優先再評価候補1件、3ヶ月超過 prune スクリーニング）。
 
-## STEP-1 正規化・既存対策照合
+- **実行日時**: 2026-09-15 06:56
+- **対象エントリ数**: 21件（inbox: 21件、deferred: 候補読込 直近20件 + タグ一致群）
+- **問題クラス数**: 4（未分類 7件含む）
+- **実行前同期**: git pull --ff-only 実施済み（orchestrator による STEP-0、Already up to date）
 
-inbox 17件は全件13フィールド新フォーマットで読み込み（正規化は解析時のみ、元ファイル不変）。deferred.md は約120件をインデックススキャンし、突合キー（bun test / worktree・junction / baseline・IR-055 / distribution-boundary / traceability・宣言 / lint・docs-check）で近接9件を特定して詳細照合した。
+## STEP-1 記録（入力読込・正規化）
 
-既存対策照合の主要結果:
-
-- `docs/knowledge/windows-bun-test-spawn-timeout-classification.md`（2026-09-11）: inbox #14 と同問題クラス（timeout 系由来分類）。既存は timeout 延長単独再実行、inbox #14 は main HEAD 対照実行と手法が補完的 → 統合候補
-- `docs/knowledge/checker-cli-stdout-loss-on-windows-bun.md`: inbox #8 と現象は近い（stdout 消失）が対象が違う（checker CLI プロセス vs bun test runner 出力）→ 隣接知見、新規文書で関連付け
-- `src/opencode/skills/agentdev-git-worktree/references/worktree-operations.md`「bun test 実行の環境前提」: node_modules 未伝播・依存整備手順（junction 代替含む）を既に規定 → クラスタC2 は partial カバー。SoT パス起点の skill 実行規約と「src/ のみ編集で配布整合成立」の明文化は未整備（fix gap）
-- `docs/knowledge/README.md`: 知識文書一覧が陳腐化（3件表記 vs 実在6件。bun-offline-bundle と windows-bun-test-spawn-timeout が未収録）→ 既存対策の更新候補として記録（本 workflow 処分対象外、別工程で是正）
-
-promoted/ は空（前回実行分は backlog-review で処理済み）。
+- inbox.md: 21エントリを読込。大部分は軽量形式（観測元/内容 [+関連/タグ]）、E-07・E-21 は13項目完全形式。正規化は解析時のみ適用（内容→問題事象、観測元→発生局面/関連に読替、欠落フィールドは空扱い・推測補完なし）。元ファイル不変。
+- deferred.md: `^## ` 見出し全件とタグ行のインデックススキャン（grep on read、分離インデックス不作成）。候補選択（過剰包含フィルタ）: タグ1件一致 / 見出しトークン一致 / 直近20エントリ。候補本文読込: worktree・bun-test 依存系（pool 1412 他）、traceability・ADF-COVERS 系（pool 1750/1762/1771/1783）、concrete-id 系（pool 1700/1792）。
+- 全面読みフォールバック: 判定曖昧エントリ（E-02/E-05/E-09/E-11/E-12/E-13/E-17）は見出し全件レビュー + 該当群本文読込で突合。duplicate 判定は deferred pool ではなく正規成果物（docs/knowledge/、配布 skill references）との照合で確定したため、deferred.md 全面本文読みは不要と判断した。
 
 ## 問題クラス一覧
 
-スコア順は「発生件数/影響度/横展開性/反映先明確度/自動化適性/プロジェクト固有知識再利用性/再発可能性/費用対効果」。各1〜5、合計40点。
+### 問題クラス1: Windows + bun での checker CLI stdout 損失・破損に対する安定実行経路の例外補完
 
-| クラス | 対象 | 根本原因・再発条件・予防策 | スコア | 暫定処分 |
-|---|---|---|---:|---|
-| C3 | #12,#13 | baseline 不在環境で gate/checker が既存違反を新規違反と区別できず failure 化。対照実行（main HEAD vs 変更 HEAD の同一環境再実行）で delta 0 を実証して合格判定 | 33 | promote（knowledge） |
-| #15 | #15+deferred2 | 配布物本文 prose への REQ/DEC 具体 ID 記載は検出器違反となる。ADF-COVERS 宣言コメントの正規位置でのみ可 | 32 | promote（knowledge、deferred 同種2件統合） |
-| C2 | #2,#5+deferred4 | worktree には git 管理外実体（junction 投影・node_modules）が不在。SoT パス起点実行・投影不在前提の依存整備・src/ のみ編集で配布整合 | 31 | promote（knowledge。worktree-operations.md partial カバー） |
-| C1 | #3,#9,#11+deferred2 | bun test は cwd 依存で REPO_ROOT 解決系が誤動作し、dot 配下は ./ prefix 付きでのみマッチ。repo root 起 cwd + ./.opencode/... 形式に統一 | 29 | promote（knowledge） |
-| #14 | #14+deferred1 | タイムアウト系 fail が環境負荷に依存して非確定的に fail。main HEAD（変更未適用）再実行の対照実行で環境起因と切り分け | 28 | promote（knowledge・既存 timeout 文書統合候補） |
-| #17 | #17 | bash ツール永続シェルが worktree 内 workdir を保持し、remove 後も空ディレクトリが残留。git 管理状態のみで完了判定 | 28 | promote（knowledge・git-worktree skill 更新候補） |
-| #4 | #4 | verify-only case の検証完了根拠が会話上で消失。3検査+integrity suite を SSoT コメントへ実行コマンド列付き記録する運用標準化 | 25 | promote（REQ 候補） |
-| #1 | #1 | baseline-known 違反の置換語が検出器パターンに該当し新規違反。置換語彙と検出器パターン突合・置換後再検査 | 25 | HITL（promote vs deferred 境界） |
-| #8 | #8 | bun test の fail 行が CR/ANSI 上書きで log に残らない。junit reporter で構造取得 | 25 | HITL（promote vs deferred 境界・既存 stdout 文書と関連） |
-| #6 | #6 | fixture リテラル内の宣言マーカーが旧パーサで偽宣言として計上されカバレッジ汚染。正規位置コメント形式で書く | 24 | HITL（promote vs deferred 境界） |
-| #10 | #10 | IR-062 fixture テストの checker 複製 spawn 方式（方式確立知見） | 24 | HITL（promote vs deferred 境界） |
-| #16 | #16 | README・guides 構成変更では README 機械検査を初期段階で実行 | 22 | deferred 維持（単発、影響小） |
-| #7 | #7 | Bun.build 焼き付きパスは多段エスケープ形で regex に4連必要 | 19 | deferred 維持（単発、影響小） |
+- **根本原因**: Windows + bun 環境で checker CLI を bun 直実行した際、process.exit による stdout flush 前終了、または CLI 経由 `--json` 出力の末尾破損が発生し、機械可読証跡が失われる・破損する。既存知識は「モジュール import 経路を標準、CLI 経由は flush 保証終了を例外」と定めるが、Bun.YAML 依存 checker は node import 経路を使えず、例外経路の具体手が未整備。
+- **再発条件**: Bun.YAML 依存 checker、または CLI 経由で `--json` 出力を取得する checker を Windows + bun で実行する場合。
+- **予防策**: Bun.write(Bun.stdout) による flush 保証ラッパー（一時ファイル → flush → 実行後削除）を例外経路手順として知識文書へ明記する。JSON 途中破損時は human readable 出力 + node 単独実行への切替を記録する。
 
-### 軸別スコア根拠
+#### 8軸評価スコア
 
-| クラス | 発生 | 影響 | 横展開 | 明確度 | 自動化 | 固有知識 | 再発 | 費用対効果 |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| C3 | 4 | 3 | 4 | 4 | 3 | 5 | 5 | 5 |
-| #15 | 4 | 2 | 5 | 5 | 4 | 5 | 3 | 4 |
-| C2 | 6 | 3 | 3 | 4 | 2 | 4 | 5 | 4 |
-| C1 | 5 | 2 | 3 | 4 | 2 | 4 | 5 | 4 |
-| #14 | 3 | 2 | 4 | 4 | 2 | 5 | 4 | 4 |
-| #17 | 1 | 2 | 5 | 4 | 3 | 5 | 4 | 4 |
-| #4 | 2 | 3 | 3 | 4 | 2 | 3 | 4 | 4 |
-| #1 | 2 | 2 | 4 | 3 | 3 | 4 | 3 | 4 |
-| #8 | 1 | 2 | 4 | 3 | 4 | 4 | 3 | 4 |
-| #6 | 1 | 3 | 4 | 3 | 3 | 4 | 2 | 3 |
-| #10 | 1 | 2 | 4 | 3 | 3 | 5 | 2 | 4 |
-| #16 | 1 | 2 | 4 | 3 | 2 | 4 | 3 | 3 |
-| #7 | 1 | 2 | 3 | 3 | 2 | 3 | 2 | 3 |
-
-### クラスタ詳細
-
-**C3: baseline 未整備環境での gate 誤 failure と対照実行による合格判定**
-- 根本原因: baseline ファイル不在環境では gate/checker が既存違反を新規違反と区別できず failure 化する
-- 再発条件: baseline 未整備環境（worktree、新環境）での gate/checker 実行
-- 予防策: 対照実行（main HEAD vs 変更 HEAD の同一環境再実行）で delta 0 を実証する合格判定の標準化
-- エントリ: 2026-09-12 self-sync.ps1 apply 走査対象切替×NG baseline 未整備（対照実行で由来分類）[inbox] ／ 2026-09-12 配布依存境界 gate を対照実行で delta 0 実証し合格判定 [inbox]
-- 既存対策: detached worktree による baseline 比較は worktree-operations.md に規定済みだが、gate 合格判定への適用（delta 0 判定）は未文書化（fix gap）
-
-**C2: worktree/junction 投影・依存不在前提の操作**
-- 根本原因: worktree には git 管理外の実体（.opencode/skills junction 投影、node_modules）が存在せず、実体前提の操作が fail する
-- 再発条件: worktree 内での skill スクリプト実行、配布整合検証、依存解決
-- 予防策: SoT パス（src/opencode/skills）起点実行、投影不在前提の依存整備（bun install／メイン側 node_modules junction）、src/ のみ編集で配布整合成立の明文化
-- エントリ: 2026-09-11 worktree 内 .opencode/skills/ junction 未伝播で SoT 起点実行 [inbox] ／ 2026-09-11 自己ホスト投影は junction で src/ のみ編集 [inbox] ／ 2026-09-01 worktree では node_modules も伝播しない [deferred、統合] ／ 2026-09-01 依存復元は bun install 単独では不完 [deferred、統合] ／ 2026-09-09 node_modules 非伝播で integrity suite が環境起因 fail [deferred、統合] ／ 2026-09-10 .opencode/plugins は gitignore 未伝播で source fallback [deferred、統合]
-- 既存対策: worktree-operations.md「bun test 実行の環境前提」が node_modules 未伝播・依存整備手順を規定済み（partial カバー）。SoT 起点実行規約・配布整合の明文化が未整備（fix gap）
-
-**C1: bun test 実行形態の非統一（cwd 起点・パス指定形式）**
-- 根本原因: bun test は REPO_ROOT 解決系テストが cwd 依存で誤動作し、dot 配下のテストは ./ prefix 付き相対パスでのみマッチする仕様があり、実行起点・指定形式の規約が未文書化
-- 再発条件: scripts 配下 cwd での実行、./ なしパス指定、worktree での integrity suite 実行
-- 予防策: repo root 起 cwd + ./.opencode/... 形式への統一規約の文書化
-- エントリ: 2026-09-11 integrity scripts の CWD 起点実行で環境依存 fail [inbox] ／ 2026-09-12 worktree 内 bun test は repo root 起 cwd [inbox] ／ 2026-09-12 ファイル単体指定は ./.opencode/... 形式 [inbox] ／ 2026-09-05 integrity suite の cwd 依存と dot ディレクトリ既定探索 [deferred、統合] ／ 2026-09-04 位置引数フィルタは ./ prefix 付きでのみマッチ [deferred、統合]
-- 既存対策: QG-4 フル suite 正規形が agentdev-quality-gates に存在。単独実行の cwd・パス指定規約の知識文書化が未整備（load miss）
-
-**#15: 配布物への concrete ID 記載位置制約**
-- 根本原因: 配布物本文は検出器の concrete-id 検査対象であり、本文 prose への REQ/DEC 具体 ID 記載が違反となる設計制約がある
-- 再発条件: 配布 skill reference・SKILL.md 本文への ID 記載
-- 予防策: ADF-COVERS 宣言コメントの正規位置でのみ具体 ID を記載。本文は概念名参照へ置換
-- エントリ: 2026-09-13 配布 skill reference への REQ/DEC 具体 ID は ADF-COVERS 宣言コメント位置に限る [inbox] ／ 2026-07-22 DERIVE 宣言に内部 ID を含めると IR-055 strict violation [deferred、統合] ／ 2026-08-15 STEP 表の具体番号は STEP/QG ID ファミリーに限定 [deferred、統合]
-- 既存対策: 検出器（concrete-id 検査）実装済み。規約知識の統合文書化が未整備（load miss）
-
-**#14: 対照実行による環境起因切り分け**
-- 根本原因: タイムアウト系 fail が環境負荷に依存して非確定的に発生する
-- 再発条件: 高負荷環境での spawnSync 系テスト実行
-- 予防策: main HEAD（変更未適用・working tree clean）での再実行（対照実行）で環境起因と切り分け
-- エントリ: 2026-09-12 spawnSync 系回帰テスト 5 秒タイムアウトを main HEAD 再実行で環境起因と判定 [inbox] ／ 2026-09-05 フル suite 環境依存 staging テストは基底 commit 再現比較で pre-existing 分離 [deferred、統合]
-- 既存対策: windows-bun-test-spawn-timeout-classification.md（timeout 延長単独再実行）が隣接。対照実行手法は未文書化（application miss）
-
-## deferred プール再評価（ユーザー指定）
-
-### 近接統合（promote 判定済み成果物への統合 → prune 対象、9件）
-
-| deferred エントリ | 日付 | 統合先 |
+| 軸 | スコア | 判定理由 |
 |---|---|---|
-| integrity suite の cwd 依存と bun test の dot ディレクトリ既定探索による実行手順分断 | 2026-09-05 | C1 |
-| bun test の位置引数フィルタは Windows worktree の dotfile 配下ディレクトリで ./ prefix 付き正規形でのみマッチ | 2026-09-04 | C1 |
-| worktree では node_modules も伝播しないため依存パッケージのテストは事前に bun install する | 2026-09-01 | C2 |
-| worktree の依存復元は bun install（worktree root）単独では不完で分散 node_modules の個別 install が必要 | 2026-09-01 | C2 |
-| worktree への node_modules 非伝播で integrity suite が環境起因 fail する | 2026-09-09 | C2 |
-| worktree の .opencode/plugins は gitignore 未伝播で欠落するため plugins 分割は source fallback を使う | 2026-09-10 | C2 |
-| 配布物 SKILL.md の DERIVE 宣言に内部 ID を含めると IR-055 strict violation となる設計制約 | 2026-07-22 | #15 |
-| 配布物へ STEP 表を書く際、具体番号を書ける ID ファミリーは STEP / QG に限定される | 2026-08-15 | #15 |
-| フル suite 実行時のみ fail する環境依存 staging テストは基底 commit 再現比較で pre-existing 分離 | 2026-09-05 | #14 |
+| 発生件数 | 2/5 | E-08、E-14 の2件 |
+| 影響度 | 3/5 | 検証証跡の消失・検証再実行コスト。対処すれば case-close 停止には至らない |
+| 横展開性 | 4/5 | Windows + bun（当リポジトリ標準環境）の checker CLI 実行全般 |
+| 反映先明確度 | 5/5 | 対象知識文書・追記内容がエントリ本文で自足的に特定済み（E-08 が「既存知識文書に明記されていない」と未記載箇所を明示） |
+| 自動化適性 | 3/5 | ラッパー手順は半機械化。実行経路の選択判断は残る |
+| プロジェクト固有知識再利用性 | 5/5 | 環境固有の実行経路知識。checker 実行契約と直結 |
+| 再発可能性 | 5/5 | Bun.YAML 依存 checker・CLI 実行は今後の検証で標準的に発生する経路 |
+| 費用対効果 | 4/5 | 既存知識文書への追記は低コスト。証跡喪失の再実行コスト削減効果は大 |
+| **加重合計** | **31/40** | |
 
-前回実行（2026-09-11）で worktree 未伝播系は defer/duplicate 判定だったが、その後の観測（case 2787 等）で発生件数が増加し、統合 promote の根拠が成立した。
+- **推奨処分案**: 処分区分5「既存対策の更新」。docs/knowledge/checker-cli-stdout-loss-on-windows-bun.md の例外経路追記（fix gap）、checker 実行契約 Design「安定実行経路」の補完候補。採用済み成果物 `promoted/update-checker-stdout-flush-workarounds.md` として staged。
 
-### 再評価結果（維持）
+#### エントリ一覧
 
-| deferred エントリ | 日付 | 判定 | 理由 |
+- 2026-09-14 case 2805 Wave 1 / case 2812（PR #2812）: Bun.YAML 依存 checker の stdout flush 保証ラッパー [inbox]
+- 2026-09-14 case 2805 OU-004（PR #2817）: check_integrity の --json 出力は bun CLI 経由・Windows で末尾破損することがある [inbox]
+
+### 問題クラス2: traceability 完了判定の横断 durable state 前提（宣言ブロック確認・main 側カタログ新鮮性）
+
+- **根本原因**: case-close QG-4 の traceability 完了判定は、Design ヘッダの ADF-COVERS(implementation) 宣言と検証対応要否カタログという横断 durable state に依存する。design-save で Design 本体へ要件反映した際の既存宣言ブロック確認を欠くと missing-implementation fail になり、また `--root` を PR HEAD worktree に向けた check は分岐後に main へ commit されたカタログ登録を参照できず unclassified 誤判定となる。
+- **再発条件**: design-save で Design 本体へ要件反映するケース、および ブランチ分岐後に main 側でカタログ登録・宣言更新が commit された後に QG-4 traceability check を実行するケース。
+- **予防策**: design-save 工程で当該 Design ヘッダの既存宣言ブロック更新を確認対象に含める。worktree root 起点で unclassified 判定が出た場合は main 側 root で再実行し、カタログ登録 commit の時系列（ブランチ分岐の前後）を確認してから完了阻止を判断する。
+
+#### 8軸評価スコア
+
+| 軸 | スコア | 判定理由 |
+|---|---|---|
+| 発生件数 | 2/5 | E-05、E-09 の2件 |
+| 影響度 | 4/5 | case-close QG-4 でのマージ停止（完了阻止）に直結 |
+| 横展開性 | 3/5 | QG-4 traceability 実行・design-save で Design 反映するケース全般 |
+| 反映先明確度 | 4/5 | 対処手順が具体的（宣言ブロック確認、main 側再実行 + 時系列確認）。反映先候補は複数（quality-gates / case-close / design-file-manager） |
+| 自動化適性 | 3/5 | main 側再実行・時系列確認は手順化可能。判定自体は半自動 |
+| プロジェクト固有知識再利用性 | 4/5 | 検証対応要否カタログ・worktree 構造に依存する固有知見 |
+| 再発可能性 | 4/5 | mid-Epic 運用では分岐後 main 更新が日常的に発生 |
+| 費用対効果 | 4/5 | 手順注記レベルの更新でマージ停止の手戻りを防止 |
+| **加重合計** | **28/40** | |
+
+- **推奨処分案**: 処分区分5「既存対策の更新」。worktree-operations.md は checker skip・読取専用実行を扱うがカタログ新鮮性・宣言確認は未カバー（fix gap / application miss）。採用済み成果物 `promoted/update-traceability-cross-state-qg4.md` として staged。
+
+#### エントリ一覧
+
+- 2026-09-14 case 2800（PR #2804）: 検証対応任意行の要件でも implementation 宣言欠落は QG-4 で差し戻しになる [inbox]
+- 2026-09-14 case 2805 Wave 1 / case 2812（PR #2812）: PR HEAD worktree root でのトレーサビリティ check は main 側カタログ更新を反映しない [inbox]
+
+### 問題クラス3: 検証 fail 由来分類の前提確認（対照 baseline の健全性・横断検査の専属性）
+
+- **根本原因**: 検証 fail の由来分類において、対照実行の前提（main root baseline が mid-Epic の stale 状態でないか）と検査対象の専属性（integrity suite が別 OU 専属成果物を横断検査する構成）を確認せず fail を本変更起因と扱うと、誤った差し戻し・完了阻止が発生する。
+- **再発条件**: Epic 進行中に main root 対照実行を行う場合、および配布物削除 Case で別 OU 専属の `.agentdev/extensions/**` 等を横断検査する integrity suite を実行する場合。
+- **予防策**: 由来分類時に検証前提を確認する。(a) 対照実行の baseline（main root）は mid-Epic で stale（manifest 未反映・stale junction）になり得るため絶対視せず、環境起因疑いの fail には PR HEAD での pass 結果を根拠として併記する。(b) 横断検査 fail は本変更起因ではなく後続 OU 専属の計画的依存として分類する（Epic Wave の専属割当を確認）。
+
+#### 8軸評価スコア
+
+| 軸 | スコア | 判定理由 |
+|---|---|---|
+| 発生件数 | 2/5 | E-15、E-16 の2件 |
+| 影響度 | 3/5 | 誤差し戻し・完了阻止の誤判断リスク。実害は判定のやり直し |
+| 横展開性 | 4/5 | 検証 fail 由来分類を行う場面全般（QG-4、対照実行） |
+| 反映先明確度 | 4/5 | 既存知識文書（対照実行節）への追記内容が具体化済み |
+| 自動化適性 | 2/5 | 判断知識（前提確認・根拠併記）。機械化は困難 |
+| プロジェクト固有知識再利用性 | 4/5 | mid-Epic 運用・OU 専属割当という固有構造に依存する知見 |
+| 再発可能性 | 4/5 | Epic 並行運用・削除系 Case は反復的に発生 |
+| 費用対効果 | 4/5 | 既存知識への前提確認追記は低コスト |
+| **加重合計** | **27/40** | |
+
+- **推奨処分案**: 処分区分5「既存対策の更新」。docs/knowledge/windows-bun-test-spawn-timeout-classification.md（対照実行節）の前提確認拡張（fix gap）。採用済み成果物 `promoted/update-fail-origin-classification-preconditions.md` として staged。
+
+#### エントリ一覧
+
+- 2026-09-14 case 2805 OU-004（PR #2817）: main root 対照実行は mid-Epic の stale 状態で環境特有 fail を出す。由来分類には PR HEAD での pass 確認を併記する [inbox]
+- 2026-09-14 case 2805 OU-005（PR #2818）: 配布物削除 Case では integrity suite の fail 由来分類に extensions 横断検査を織り込む [inbox]
+
+### 問題クラス4: 委譲結果受領の契約完了検査缺失（4-state result・commit・PR の最終ゲート）
+
+- **根本原因**: 実行担当サブエージェントへの委譲において、(a) background task 起動が起動直後に消失しても通知されず、(b) 委譲先が実装・検証の要約のみを返し契約上必要な commit・PR 作成と4状態結果を返さないことがあり、受領側が契約完了検査（4-state result・commit hash・PR URL の3点）を行わないと未達のまま後続工程へ進めない・誤って進むリスクが生じる。
+- **再発条件**: run_in_background=true の委譲起動、および委譲先の応答が要約で終わり result 契約を返さない場合。受領側で3点検査を行わない場合。
+- **予防策**: 委譲結果の最終ゲートとして commit hash・PR URL・4-state result の3点を必須検査し、不足時は要約で終了せず再開する guard を設ける。background 委譲の消失を検知したら durable state（worktree git status・PR・Issue コメント）で帰属確認し、未試行なら同期実行で再委譲する回復手順を明文化する。
+
+#### 8軸評価スコア
+
+| 軸 | スコア | 判定理由 |
+|---|---|---|
+| 発生件数 | 2/5 | E-06、E-18 の2件 |
+| 影響度 | 4/5 | Case の実行・完了が停滞（再開セッションでの手動回復が必要になった実績） |
+| 横展開性 | 3/5 | サブエージェント委譲を実行する case-run / case-auto 全般 |
+| 反映先明確度 | 4/5 | 3点検査 guard・回復手順が具体的。反映先候補は adapter skill / case-run / 委譲契約 Design |
+| 自動化適性 | 3/5 | 3点検査は機械的チェックとして組み込み可能 |
+| プロジェクト固有知識再利用性 | 3/5 | result 4状態契約・adapter protocol という固有構造に依存 |
+| 再発可能性 | 4/5 | harness background 機構の異常・委譲先の契約不履行は制御外で再発し得る |
+| 費用対効果 | 4/5 | 受領側検査の追加で停滞・手動回復コストを削減 |
+| **加重合計** | **27/40** | |
+
+- **推奨処分案**: 処分区分5「既存対策の更新」。adapter skill・result 4状態契約は存在するが受領側完了検査 guard・消失時回復手順は未整備（guardrail insufficiency）。採用済み成果物 `promoted/update-delegation-result-contract-guard.md` として staged。
+
+#### エントリ一覧
+
+- 2026-09-14 case 2796/2799/2800: background task 起動の連続消失と同期実行への切替 [inbox]
+- 2026-09-15 case 2805 OU-006（PR #2819）: 初回委譲応答が4状態契約を完了せずに要約で終了した [inbox]
+
+### 未分類（単独エントリ → deferred living pool）
+
+| entry | 主題 | 暫定処置と根拠 |
+|---|---|---|
+| E-01 | worktree で full check_integrity を実行する際の repo-local Plugin 投影前提（junction + loader shim 一時構成） | deferred（出現1件。worktree-operations.md は scripts node_modules junction を扱うが `.opencode/plugins` 投影の一時構成手順は未整備。再発時に具体化して再評価） |
+| E-03 | bun test フル suite の直前実績比較の制約（main 側書込み回避で base 比較未実施になり得る） | deferred（出現1件。読取専用 detached worktree 実行等の代替手段は候補止まり） |
+| E-04 | repo-agentdev-integrity 検査スクリプトの実行ランナーは bun（CommonJS require() のため node import 経路不可） | deferred（出現1件。checker 実行契約の適用範囲の事実記録。REQ 化に至る具体性不足） |
+| E-07 | サブエージェント bash の Windows パス結合不具合による repo root 迷子ファイル作成 | deferred（出現1件。予防策候補（正区切りパス明示・commit 前 git status 確認）は有効だが単発では昇華の具体性不足。委譲プロンプト規約への反映は再発時に再評価） |
+| E-19 | worktree 内並行書き込みの検知と明示パス・ステージ確認の対処 | deferred（出現1件。adapter protocol 側の早期断念基準明文化は候補止まり） |
+| E-20 | squash merge 済み分支の再利用は fast-forward 不能になる | deferred（出現1件。分支削除運用・fast-forward 可否確認は候補止まり） |
+| E-21 | body 更新のみの issue_update 後に Issue state が closed へ変化した（根本原因未特定） | deferred（出現1件・原因未特定。issue-management の VERIFY へ state 突合追加は再発時に再評価する再評価対象） |
+
+## duplicate 判定（既存対策でカバー済み）
+
+| entry | 主題 | カバーする既存成果物（確認済み） |
+|---|---|---|
+| E-02 | Design 節文言の配布物転記時の concrete-id 違反（一般形翻訳） | docs/knowledge/distribution-concrete-id-placement.md（2026-09-13 作成。本文は概念名参照・具体 ID は ADF-COVERS 宣言位置へ集約、ID ファミリー制限を規定。E-02 の「一般形（IR-{NNN}）へ翻訳」は同知識の適用） |
+| E-10 | Integrity suite・textlint final gate の Windows 環境依存失敗と timeout | docs/knowledge/windows-bun-test-spawn-timeout-classification.md（spawn timeout 由来分類・timeout 拡張単独再実行・main HEAD 対照実行・環境由来記録要件を規定。IR-055/NG21 の 5 秒 timeout JSON EOF を明示カバー。zod 依存解決は QG-4 依存パッケージ前置がカバー） |
+| E-11 | 配布物 prose 内 REQ 行引用は ADF-COVERS 宣言行へ集約する | docs/knowledge/distribution-concrete-id-placement.md（規定1・2が同一内容。prose の braced 形式（REQ-{NNN}）表現も概念名参照の機械的表現として同知識の範囲） |
+| E-12 | worktree での bun test 実行に必要な node_modules 事前整備 | .opencode/skills/agentdev-git-worktree/references/worktree-operations.md「bun test 実行の環境前提」（node_modules 未伝播・依存整備前置・junction 代替（作成→検証→削除）・worktree 内 bun install を規定）+ QG-4 依存パッケージ前置 |
+| E-13 | worktree の bun test 依存整備は .opencode/skills 側 bun install で完結する | .opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md L245-252（`bun install --cwd src/opencode/skills/agentdev-project-extensions/scripts` + `bun install --cwd .opencode/skills/repo-agentdev-integrity/scripts` の2ディレクトリ前置を正規形として明記。E-13 の内容と完全一致） |
+| E-17 | junction 未伝播環境の link profile は main root 読取専用 runner で代替測定する | worktree-operations.md「bun test 実行の環境前提」（メインリポジトリからの読取専用実行によるエビデンス採取・環境ラベル・fail 全件の由来分類を規定。traceability CLI の repoRoot 位置引数は agentdev-traceability SKILL の argv 契約に記載） |
+| pool 1412 | worktree 環境の bun test 依存解決不能は bun install --cwd で worktree ローカル解消できる（2026-09-01 移動） | qg-4-final-acceptance.md L245-252 の依存パッケージ前置 + worktree-operations.md の bun install/junction 代替が同内容を配布物として正規文書化済み |
+
+## 禁止条件フィルタリングゲート（Decision 候補除外記録）
+
+| 対象 | 除外理由 | 根拠事実 | 代替反映先候補 |
 |---|---|---|---|
-| Phase 0（req-save/spec-save）起因の AUTOGEN 陳腐化は case-close の dry-run ゲートで差戻しになる | 2026-08-18 | deferred 維持 | 前回「次回最優先再評価候補」の正式再評価。既存 dry-run ゲートが安全網として機能中。検出タイミング後段の改善余地はあるが REQ 化の緊急性なし（影響小・単発） |
-| check_distribution_boundary.ts は --base-ref を持たず、未定義 flag 付き呼び出しは positional repoRoot 誤解釈の fail-closed になる | 2026-09-05 | deferred 維持 | gate API 仕様知見。C3（対照実行）とは別問題クラス |
-| 配布依存境界 checker の unclassified-entry 分類は本文中の実在 IR 参照を新規違反と区別しない | 2026-09-01 | deferred 維持 | checker 分類挙動の知見。C3 と隣接だが別問題クラス |
-
-### 全体スクリーニング
-
-prune MAY 条件（3ヶ月超過+再発なし+影響度低+再発条件曖昧+横展開性低+費用対効果低）で 2026-06〜07 のエントリ約40件をスクリーニング。技術知識・判断基準・プロジェクト固有知識を含むものが大半で、prune 条件を全て満たすエントリは確認されなかった → 本実行での prune 実施なし（削除禁止原則を優先）。
-
-## promote 時prune結果
-
-- **対象エントリ数**: 26件（inbox 17 + deferred 統合9）
-- **prune実施**: promote 判定済み成果物への統合 deferred 9件（C1: 2件、C2: 4件、#15: 2件、#14: 1件）。staged として成果物「元learning item/根拠」セクションへ証拠保存のうえ除去
-- **prune候補**: なし（prune MAY 条件完備エントリなし）
-- **prune却下**: なし
+| 全問題クラス（PC-1〜PC-4） | 運用ルール / 技術判断不在 | いずれも検証実行経路・手順・受領検査の運用改善であり、アーキテクチャ上の決定・技術選定・設計判断を含まない | docs/knowledge/ 知識文書、agentdev-quality-gates、agentdev-case-run-execution-adapter、checker 実行契約 Design |
 
 ## 全体傾向
 
-- bun test / worktree 系の検証環境ノウハウに集中（inbox 17件中9件）。実行形態（cwd・パス指定）、投影・依存不在、証跡取得の3系統に分かれる
-- case 2766〜2791（2026-09-11〜09-13）の集中観測。worktree 検証・case-close 検証が発生源の中心
-- 検証実行の正規形と証跡の SSoT 記録への標準化ニーズが高い
-- docs/knowledge/README.md の知識文書一覧が陳腐化（3件表記 vs 実在6件）→ 既存対策の更新候補（本 workflow 処分対象外、別工程で是正）
+- 高頻出・高影響: Windows + bun 検証環境に起因する問題クラスが今回の 21 エントリ中 12 エントリ（PC-1、E-10、E-12〜E-17、E-04）を占める。Epic #2805（Windows 環境の検証基盤是正）の実行に伴う観測の集中による。
+- 横展開性が高い: PC-1（checker 実行全般）、PC-3（fail 由来分類全般）。
+- 自動化適性が高い: PC-4（3点検査 guard は機械的チェック）、PC-2（main 側再実行手順）。
+- 観察所見: Epic #2805 の各 OU で得た検証環境知見の大半（E-10、E-12、E-13、E-17）は当該 Case 自体が QG-4 正規形・worktree-operations.md・知識文書へ反映済みであり、learning としては duplicate として処理される。反映済み知識の二重蓄積は capture 境界上やむを得ないが、promoted 成果物と配布物の乖離は生んでいない。
 
-## Decision候補除外記録
+## STEP-4 adversarial-review 記録
 
-- **対象 item**: 全判定単位（3クラスタ+10単独、計13単位）
-- **除外理由**: 技術判断（代替案選択・トレードオフ決定・アーキテクチャ選択）を含まない運用手順・検証ノウハウ・環境依存知見である（agentdev-decision-guidelines 除外基準「技術判断不在」を適用）
-- **根拠事実**: 各クラスタの予防策は既存規約・手順の標準化（bun test 正規形、SoT 起点実行、対照実行判定）であり、新規の設計判断を伴わない
-- **代替反映先候補**: docs/knowledge 知識文書（カテゴリ4）、workflow skill・references 更新（カテゴリ5）、case-close 運用標準化（カテゴリ1 REQ 候補）
+- **発動条件判定**: 発動。inbox エントリ 21件（skip 条件「1件のみかつ重複確実」非該当、inbox 空でない）、evaluation-report.md に STEP-2/3 結果反映済み。不可逆処理（deferred 移動・prune・commit/push）は未実行であることを確認。
+- **実行形態**: agentdev-adversarial-review の審議プロトコル（Orchestrator / Reviewer / Reviewee の3論理役割、初期 challenge 2系統の独立 stream、対称的相互反証、合意候補再検証）を本 workflow 実行体内の論理役割による inline 審議として実行（書き込み禁止型 semantic_review。審議自体はファイル・Issue・PR への副作用なし。論理役割は物理エージェント構成を固定しない）。
+- **レビュー戦略**: 対象=問題クラス分類・8軸評価・処分判定・既存対策照合。疑う点=(i) 既存配布物・知識との重複見逃し（冗長昇華）、(ii) 未カバー知見の誤った duplicate 判定（知見喪失）、(iii) 問題クラスのテーマクラスタリング化（異種根本原因の混入）、(iv) 単発エントリの過大評価、(v) prune 対象の誤拡大。
+- **Stream-α（分類・評価の内在妥当性）findings**:
+  - F-α1【受理・反映】: 当初案の「fail 由来分類」クラス（E-10/E-15/E-16）は3系統の根本原因（Windows 環境依存 / baseline stale / 横断検査依存）をテーマクラスタリングする恐れ。STEP-3 照合で E-10 は既存知識（windows-bun-test-spawn-timeout-classification.md）がカバー（duplicate）、E-15/E-16 は「検証前提の確認不足による誤分類」で同一予防策ファミリ（前提確認 + 根拠併記）と確定し、クラスを PC-3（E-15/E-16）に再構成した。反証（Reviewee）: E-15 と E-16 は前提の種類が異なる→再反証: いずれも「由来分類時に検証前提（baseline 健全性・検査対象の専属性）を確認し根拠を併記する」同一手順の適用局面差であり、予防策は同一。維持。
+  - F-α2【棄却】: E-19/E-20 を worktree 運用クラスとして統合すべきとの疑い→根本原因（1-writer 前提違反の検知 vs 分支履歴の物理制約）が異なり、分類基準（根本原因 + 再発条件 + 予防策が同じ単位）違反。未分類維持。
+  - F-α3【棄却】: 8軸スコアの水増し疑い（PC-1 の再発可能性 5・固有知識 5）→ Windows + bun は当リポジトリ標準検証環境であり checker 実行のたびに適用される知識。スコア妥当。
+  - F-α4【棄却】: promote 4件は過剰との疑い→各クラス2件以上・ギャップを実ファイル確認で実証・backlog-review に利用者承認がある。過剰でない。
+- **Stream-β（既存対策照合の完全性）findings**:
+  - F-β1【受理・確認】: E-12/E-13/E-17 の duplicate 判定根拠（worktree-operations.md「bun test 実行の環境前提」節、qg-4-final-acceptance.md の依存パッケージ前置節、traceability SKILL の argv 契約表）を再確認。カバー十分。
+  - F-β2【受理・保守的運用】: deferred pool の concrete-id 系既存エントリ（pool 1700: unclassified-entry 分類仕様の観察、pool 1792: 不在 ID 参照残骸の置換実例）を今回 duplicate prune すべきか→現行知識文書で「十分に」カバーとは言い切れない（1700 は checker 分類仕様の観察記録）。prune せず保留維持。
+  - F-β3【受理】: pool 1412 の duplicate 判定は qg-4-final-acceptance.md の2ディレクトリ前置明記により完全カバー。prune 合理。
+  - F-β4【受理・確認】: PC-4 のギャップ主張（受領側3点検査 guard・background 消失回復手順の未整備）を adapter SKILL 本文確認で再検証（result 4状態・PR URL 受領は既存、commit hash 検査・消失時回復手順の記載なし）。ギャップ実在。
+- **Convergence**: 受理 findings は全て判定表へ反映済みまたは確認済み。未解決の本質的争点なし。
+- **Convergence audit**: 受理 findings の根拠を正規成果物（knowledge 2件、qg-4-final-acceptance.md、worktree-operations.md、adapter SKILL、traceability SKILL）の該当箇所と再突合し、分類・処分・prune 対象（新規 staged 8 / duplicate 6 / pool duplicate 1 / deferred 維持 7 + pool 既存分）が確定したことを再検証。新規争点なし。
+- **ループ離脱**: 停止条件4点（新 finding なし、全 finding 処理済み、HITL/blocker なし、対象の意味内容変化なし）を満たし離脱。STEP-5 へ。
 
-## adversarial-review 記録
+## STEP-5 自律確定記録
 
-STEP-4 で adversarial-review を発動した（default-on、skip 条件非該当: inbox 17件）。Reviewer 2 stream（独立論理 stream: stream A=昇格・統合判断の反証、stream B=処分基準・schema 整合の反証）を並行起動したが、実行セッションの終了に伴い両 stream が消失した（確認時 Task not found）。対論型レビューは実施不能となったため、adversarial-review caller integration 共通契約の呼出失敗時取扱い（silent skip 禁止・利用不能の報告・従来フローと既存 QG/HITL の維持）に従い、adversarial-review なしの従来フロー（HITL 中心の判定確定）で STEP-5 以降を継続する。
+自律確定可否は workflow-contracts Design「promote系判断確定とHITL境界」の判定表に従って判定した。
 
-従来フローでは HITL を品質保証の主たる安全境界とし、自律確定範囲を縮小する（対論型レビューによる裏付けが得られない境界判断は HITL へ移送: #4 の処分カテゴリ選択、#17 の発生1回での promote 判断を自律確定から HITL へ変更）。
-
-## 自律確定証跡
-
-STEP-5 判定確定（2026-09-13）。adversarial-review 呼出失敗後の従来フロー（HITL 中心）で確定した。ユーザー指示により HITL 対象は「#4 の処分カテゴリ選択」「#17 の promote 判断」「prune 承認」の3点に特定された。#1/#6/#8/#10 は当該指示により HITL 対象から除外し、評価時の推奨判定（#1: promote、#6: deferred、#8: promote、#10: deferred）で確定した（解釈違いの場合は判定結果提示にて訂正可能）。
-
-### promote（自律確定、7件）
-
-| 単位 | 処分カテゴリ | 主要根拠 | HITL 不要理由 |
+| 対象 | 判定結果 | 主要根拠 | HITL 不要理由 |
 |---|---|---|---|
-| C1 bun test 実行形態の統一（cwd・パス指定） | 4（knowledge） | 発生5件相当（inbox 3+deferred 2）。REPO_ROOT 誤動作と ./ prefix 非マッチが case 2766/2768/2777/2779 で反復。QG-4 正規形と整合する実行規約として自足的 | 繰り返し発生・既存対策照合済み（QG-4 正規形との差分確認）・処分先が一意。選択肢間に本質的競合なし |
-| C2 worktree/junction 投影・依存不在 | 4（knowledge） | 発生6件相当（inbox 2+deferred 4）。worktree-operations.md「bun test 実行の環境前提」と突合済みで fix gap（SoT 起点実行規約・配布整合の明文化）を特定 | 同上（既存記載との重複は partial カバーと判別済み、新規性明確） |
-| C3 baseline 未整備環境での対照実行 delta 0 判定 | 4（knowledge） | 発生4件相当。gate 誤 failure が case 2787 で2系統同時観測（self-sync 走査対象切替・配布依存境界 gate）。対照実行手順が自足的 | 同上（detached worktree baseline 比較の既存規定と未文書化部分を判別済み） |
-| #14 対照実行による環境起因切り分け | 4（knowledge） | 発生3件相当（inbox 1+deferred 1+近接）。既存 windows-bun-test-spawn-timeout 文書（timeout 延長単独再実行）と手法が補完的で未カバー | 同上（既存文書との判別済み） |
-| #15 配布物 concrete ID 記載位置制約 | 4（knowledge） | 発生4件相当（inbox 1+deferred 2+関連）。concrete-id 検出器実装済みで規約知識が自足的。deferred 同種2件との統合で網羅性向上 | 同上 |
-| #1 置換語彙×検出器パターン突合 | 4（knowledge） | 一般化置換は頻出操作（再発可能性3）。突合・置換後再検査の手順が自足的。影響度2で軽微だが予防コスト低 | ユーザー指示により HITL 対象外。推奨判定（promote）で確定 |
-| #8 junit reporter による fail 構造取得 | 4（knowledge） | CI/非TTY環境で再発可能性3。即適用可能なコマンド知見。既存 checker stdout 消失知識とは対象が違うことを突合済み | 同上 |
+| PC-1（E-08, E-14） | promote（staged。update-checker-stdout-flush-workarounds.md） | 31/40。fix gap 実証（E-08 が未記載箇所を明示、知識文書の例外経路節に具体手なし） | 適用契約（知識文書・checker 実行契約）と判断根拠を特定済み。実現先選定は req-define / backlog-review（利用者承認あり）に委ねられており新規対象範囲の決定を含まない。競合する選択肢なし・情報欠落なし |
+| PC-2（E-05, E-09） | promote（staged。update-traceability-cross-state-qg4.md） | 28/40。worktree-operations.md はカタログ新鮮性・宣言確認を未カバー（fix gap / application miss） | 同上。対処手順が一意に文書化可能 |
+| PC-3（E-15, E-16） | promote（staged。update-fail-origin-classification-preconditions.md） | 27/40。既存知識の対照実行節に前提確認（baseline 健全性・専属性）の記載なし（fix gap） | 同上 |
+| PC-4（E-06, E-18） | promote（staged。update-delegation-result-contract-guard.md） | 27/40。adapter SKILL に受領側3点検査 guard・消失回復手順の記載なし（guardrail insufficiency） | 同上 |
+| E-02, E-10, E-11, E-12, E-13, E-17 | duplicate（prune） | カバーする既存成果物を本実行で直接読込確認（duplicate 判定表参照） | 既存対策との重複がファイル確認で一意に確定。ユーザーの価値判断・新規範囲決定を含まない |
+| pool 1412 | duplicate（prune） | qg-4-final-acceptance.md が同一手順を正規形として明記 | 同上 |
+| E-01, E-03, E-04, E-07, E-19, E-20, E-21 | deferred（living pool 維持） | 全て出現1件・昇華の具体性不足。既存安全境界（deferred/未処理の自動削除禁止）に従い維持 | 保留維持は可逆処理であり安全境界の迂回なし |
 
-### deferred 維持（自律確定、7件）
+- **HITL移送条件該当検討**: 複数の本質的に競合する選択肢なし / ユーザー固有の価値判断不要 / 対象範囲の新規決定なし（promote は候補 staging のみ、実現先は req-define が確定）/ 正規情報源間の矛盾なし / 証拠・情報不足なし / レビュー未解決争点なし / 必須検証の利用不能なし / 明示承認を要求する契約なし（破壊的変更に該当せず: inbox クリアは deferred 原子的移動後の正規操作、prune は判定確定と同時承認の設計）。
+- **結論**: 全項目自律確定。ユーザー判断必要項目なし → HITL を発生させず STEP-6 へ進む。
 
-| 単位 | 主要根拠 | HITL 不要理由 |
-|---|---|---|
-| #7 Bun.build 多段エスケープ regex | スコア19、単発、影響小 | 判定基準（出現回数少・影響小）の典型例で一意 |
-| #16 README 機械検査の初期段階実行 | スコア22、単発、影響小 | 同上 |
-| #6 fixture 宣言マーカー偽計上 | スコア24。パーサ修正済みで再発可能性2。作成規約価値はあるが発生1回 | ユーザー指示により HITL 対象外。推奨判定（deferred 維持）で確定 |
-| #10 IR-062 checker 複製 spawn 方式 | スコア24。方式確立済み（問題でなく知見）で再利用場面の頻度が不確定 | 同上 |
-| Phase 0 AUTOGEN 陳腐化（deferred 再評価） | 前回最優先再評価候補の正式再評価。既存 dry-run ゲートが安全網として機能中、影響小・単発 | 安全網の実在確認済みで一意 |
-| --base-ref 不在（deferred 再評価） | gate API 仕様知見。C3（対照実行）とは別問題クラス | 判定基準適用（問題クラス非同一）で一意 |
-| unclassified-entry 分類（deferred 再評価） | checker 分類挙動の知見。C3 と隣接だが別問題クラス | 同上 |
+## promote 時 prune 結果
 
-### HITL として残る項目（ユーザー承認待ち、3点）
+- **対象エントリ数**: deferred.md 既存エントリ + inbox 移動 21エントリ
+- **prune 実施**: あり
+- **prune 候補**: 15件（新規移動分 staged 8件 + 新規移動分 duplicate 6件 + pool 既存 duplicate 1件（pool 1412））。staged 分の証拠は各採用済み成果物「元learning item / 根拠」セクションへ保存
+- **prune 却下**: 0件（deferred / 未処理 / 再評価対象は全件保持。pool 1700/1792 は F-β2 により保留維持）
 
-1. **#4 verify-only 実行証跡 SSoT 記録の処分カテゴリ**: (a) promote REQ 候補（case-close 運用の恒久契約化）／(b) promote knowledge（参照知識文書化）／(c) deferred 維持 — 推奨 (a)。選択肢間に本質的差（恒久契約 vs 知識参照）が残るため HITL 移送（判定表: 複数の妥当な選択肢が残る）
-2. **#17 bash 永続シェル cwd 保持の promote 判断**: (a) promote knowledge（反映先候補: 知識文書＋git-worktree skill 削除手順更新）／(b) deferred 維持 — 推奨 (a)。発生1回だが横展開性5・再発可能性4。「出現回数少→deferred」原則の例外判断のため HITL 移送
-3. **prune 承認（破壊的変更の明示承認）**: deferred 統合9件の除去（C1: 2件、C2: 4件、#15: 2件、#14: 1件。証拠は各成果物「元learning item/根拠」セクションへ保存）＋ promote 確定分 inbox エントリの staged prune（対象は #4/#17 の判定結果に連動）
+## git 永続化
 
-### STEP-6 永続化実行記録（2026-09-13）
-
-ユーザー承認: HITL 6件すべて推奨どおり（#4=(a) promote REQ候補、#17=(a) promote knowledge、#1=(a) promote knowledge、#6=(b) deferred維持、#8=(a) promote knowledge、#10=(b) deferred維持）。prune（deferred 統合9件 + promote 判定分 inbox 13件）も承認。
-
-- **promoted 成果物生成: 9件**
-  - 1-verify-only-execution-evidence-ssot.md（#4、カテゴリ1 REQ候補）
-  - project-knowledge-bun-test-execution-conventions.md（C1）
-  - project-knowledge-worktree-junction-projection.md（C2）
-  - project-knowledge-baseline-comparison-delta-zero.md（C3）
-  - project-knowledge-environment-fail-main-head-rerun.md（#14）
-  - project-knowledge-distribution-concrete-id-placement.md（#15）
-  - project-knowledge-vocabulary-detector-crosscheck.md（#1）
-  - project-knowledge-bun-test-junit-reporter.md（#8）
-  - project-knowledge-persistent-shell-cwd-worktree-residue.md（#17）
-- **deferred 移動**: inbox 17件に移動日 2026-09-13 を付与して追記（H2 118→135、+17 検証）
-- **inbox クリア**: ヘッダーのみ（H2 = 0 検証）
-- **prune**: 22件除去（inbox 由来 staged 13件 + 既存 deferred 統合9件。H2 135→113 検証、維持4件（#6/#7/#10/#16）の残存確認済み）
-- **最終 deferred 構成**: 既存維持分（Phase 0 AUTOGEN、--base-ref 不在、unclassified-entry 分類等）+ 今回移動の4件（#6/#7/#10/#16）
+- **対象**: `.agentdev/learning/` 配下のみ（inbox.md、deferred.md、evaluation-report.md、promoted/ 4件）。明示パス指定・`git commit -- <paths>` 形式
+- **commit message**: `chore(agentdev): promote learning findings`（commit hash・push 成否は完了報告に記載）
+- **prune 実績**: 追記 21件 → 検証済み → inbox クリア → prune 15件（staged 8 + duplicate 6 + pool 1412）→ 新規 deferred 残存 7件（deferred.md 見出し 113 → 119）
