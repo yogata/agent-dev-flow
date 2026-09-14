@@ -34,3 +34,19 @@
 
 - 観測元: case-run 実行（DEL-{N}-1/-2）、case-close 2026-09-14 回収
 - 内容: run_in_background=true の委譲起動が2回連続で起動直後に消失（worktree クリーン・PR なし・SSoT コメントなしで実行未試行と判定）。harness 側 background task 機構の異常。同期実行（run_in_background=false）に切り替えることで確実に result を受領できた。background 委譲の消失を検知したら durable state（worktree git status・PR・Issue コメント）で帰属確認し、未試行なら同期実行で再委譲する回復手順が有効
+
+## 2026-09-14 case 2805（case-open STEP-4）: サブエージェント bash の Windows パス結合不具合による repo root 迷子ファイル作成
+
+- **問題事象**: adversarial-review を ultrabrain カテゴリのサブエージェントへ委譲した際、サブエージェントが bash でトレーサビリティ check の JSON 出力先パスを結合する際に OS 区切り文字を喪失し、repo root 直下に `CWINDOWSTEMPopencodetrace-check.json`（約94KB）という迷子 untracked ファイルが作成された（意図先は OS テンポラリ配下）
+- **発生局面**: 実装（case-open STEP-4 の review 委譲内の読取検査実行）
+- **検知方法**: 親エージェントが STEP-5-0 の commit 前に `git status --porcelain=v1` を実行した際に untracked 迷子ファイルを検知（review サブエージェントの I-04 finding でも指摘）
+- **根本原因**: サブエージェントが bash コマンドで絶対パス文字列とファイル名を文字列連結した際、Windows 環境の区切り文字（`\` または `/`）が失われたまま出力先パスを構築した。サブエージェント側には出力先がプロジェクト外であることの検証がなく、エラーにならず repo root への書込みが成立した
+- **自律対応内容**: 親エージェント（case-open 実行主体）が明示パス指定の git 操作で迷子ファイルをコミット対象から除外し（Form Zero・スイープ禁止の遵守）、本 learning エントリとして capture。迷子ファイル自体は untracked の一時残骸として削除
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: サブエージェントへ bash でのファイル出力を委譲する場合全般（review・実装・検査委譲）。Windows 環境での作業ツリー外出力は区切り文字喪失による repo root 汚染リスクがある
+- **再発条件**: bash（POSIX シェル）で Windows 絶対パス（`C:\...`）を含む文字列連結により出力先を構築し、かつ書込み先がプロジェクト内外かの検証を行わない場合
+- **予防策候補**: bash での一時ファイル出力は `/` 区切りの正パス（`C:/WINDOWS/TEMP/opencode/...`）または `$TEMP` を使う。委譲プロンプトに出力先パスの完全な正区切り表記を明示する。commit 前の `git status --porcelain` 確認（untracked 迷子検知）を commit 前置手順として維持する
+- **想定反映先**: agentdev-workflow-orchestration（Split Rule・委譲時の作業衛生）、learning pipeline 経由でサブエージェント委譲プロンプトの規約へ
+- **関連**: Issue #2805（case-open 実行）、adversarial-review 委譲（ultrabrain、2026-09-14）
+- **タグ**: `#windows` `#bash` `#subagent-delegation` `#git-hygiene`
