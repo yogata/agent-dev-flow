@@ -60,3 +60,10 @@
 
 - 観測元: case-close QG-4 独立再検査（case 2812、PR #2812）、case-close 2026-09-14 検知
 - 内容: トレーサビリティ check の --root を PR HEAD worktree に向けると、ブランチ分岐後に main へ commit された検証対応要否カタログ登録（本件は前回 case-close ゲート停止の解消 RU-0002、commit 4987ea1e）が存在せず、durable state では解消済みの対象 6 行が unclassified と判定される。検証対応要否段階ゲートの判定対象は REQ ファイル・検証対応要否カタログ・対応宣言という横断 durable state であり、未分類判定が出た場合は main 側 root で再実行し、カタログ登録 commit の時系列（ブランチ分岐の前後）を確認してから完了阻止を判断する
+
+## 2026-09-14 case 2805 OU-002（PR #2815）: Integrity suite・textlint final gate の Windows 環境依存失敗と timeout
+
+- 観測元: case 2805 OU-002（DEL-2807-1、PR #2815）本文 learning 候補、case-close 2026-09-14 回収
+- 内容: bun test フル suite（repo-agentdev-integrity/scripts）は Windows 環境で環境依存 fail を含む。IR-055 / NG21 の checker subprocess は約 5 秒 timeout で JSON Parse EOF（Unexpected EOF）fail が発生し flaky。zod は node_modules 未整備の worktree では依存解決失敗となり、main root では解決する。textlint final gate は case-run で 120 秒 timeout したが、時間制約を 300 秒へ拡張した単独実行（`bun run src/opencode/plugins/agentdev-textlint-guard/gate.ts --root .`）では 507 ファイル・hard violation 0 件で合格。検証失敗時は timeout 拡張・main root 実行での再現確認により環境依存か変更起因かを由来分類してから扱う。trusted-distribution BaseOid の失敗も PR 本文で環境依存として記録済み
+- 関連: Issue #2807（OU-002）、PR #2815 対応記録コメント、既存知識 docs/knowledge/checker-cli-stdout-loss-on-windows-bun.md
+- タグ: `#windows` `#bun` `#integrity-suite` `#textlint` `#timeout` `#flaky`
