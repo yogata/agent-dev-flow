@@ -4,8 +4,11 @@ description: PRをマージし、対応記録を追記し、Caseをクローズ�
 
 # 完了処理
 
+主フロー req-define → case-open → case-ready → case-run → case-close の完了工程である。
+Definition 変更の例外経路（req-define での再合意、case-revise → case-ready）を経た Case も本工程で完了処理する。
 PR をマージし、Case に記録を追記し、クローズ後に worktree とブランチを削除する。
 レビュー完了フェーズ。
+Case 状態モデルでは、本コマンドは review から closed への遷移を担う。停止時は blocked へ遷移して resume_command（case-close）を記録し、再開時は resume_command に従い review へ復帰してから完了処理を続行する。
 Epic Issue番号入力時は現在 Wave の PR作成済み子Issue を一括マージ、クローズし、Epic ステータス追跡テーブルを更新する（Epic Wave クローズ）。
 
 **完了条件チェックボックスの評価、更新は case-close の専任責務**。
