@@ -27,8 +27,8 @@ updated: 2026-09-05
 | 採用済み成果物（intake） | `intake-promote` | `backlog-review` | RU 化成功時 |
 | 採用済み成果物（learning） | `learning-promote` | `backlog-review` | RU 化成功時 |
 | 採用済み成果物（inspect） | `inspect-promote` | `backlog-review` | RU 化成功時 |
-| RU（Requirement Unit） | `backlog-review` | `req-define`, `req-save`, `case-open` | case-open の Issue作成 + VERIFY 成功時（REQ-008-012, REQ-008-015） |
-| REQ ファイル | `req-save` | `case-open`, `case-run`, `case-close` | なし（永続） |
+| RU（Requirement Unit） | `backlog-review` | `req-define`, `case-open` | case-ready 成功時。blocked / failed / 中断時は保持（REQ-008-010, REQ-008-011） |
+| REQ ファイル | Definition 保存内部責務 | `case-open`, `case-run`, `case-close` | なし（永続） |
 | 追跡Issue | `issue`（起票）、各 workflow | `issue`、`req-define`（実行確定時の要件化経路） | なし（永続） |
 | Case Issue | `case-open` | `case-run`, `case-close` | なし（永続） |
 
@@ -38,7 +38,7 @@ updated: 2026-09-05
 - 粒度: N:1（複数 artifact → 1 RU 統合）および 1:N（1 artifact → 複数 RU 分割）を許可（REQ-008）
 - 採用済み成果物 の単純コピー（パススルー）は禁止（REQ-008）
 - 矛盾検出時: 矛盾する artifact を RU 化せずユーザーに確認。矛盾しない artifact は通常通り RU 化（partial success）
-- `case-open` での Issue作成 + VERIFY 成功後に該当 RU を削除（REQ-008-012, REQ-008-015）。`req-save` は RU を削除せず、RU 削除を行う唯一のコマンドは `case-open` である
+- `case-ready` 成功後に該当 RU を削除（REQ-008-010）。blocked / failed / 中断時は RU を保持する（REQ-008-011）。`case-open` は RU を削除せず（REQ-030-007）、RU 削除を行う唯一の工程は `case-ready` である
 
 ## 採用済み成果物（Promoted Artifact）
 
@@ -60,7 +60,7 @@ updated: 2026-09-05
 RU が採用済み成果物（intake / learning / inspect）からの要件化経路であるのに対し、追跡Issueは未解決事項の育成管理からの要件化経路であり、両者は別系統である。
 
 ```
-追跡Issue（実行準備完了） → req-define（要件doc） → req-save / design-save → case-open（Case Issue 作成）
+追跡Issue（実行準備完了） → req-define（要件doc） → case-open（Case Issue 作成） → case-ready（保存内部責務による Definition 確定）
 ```
 
 - 追跡Issueを実行票（Case Issue）へ直接変質させない。case-open は追跡Issueとは別の Case Issue を作成する
@@ -208,7 +208,7 @@ HITL 承認状態は処理実行（promote / reject / defer の実行 STEP）の
 
 ## REQ ファイル整合性検査（横断）
 
-req-save と case-close で共通利用される REQ ファイル整合性検査の契約。
+Definition 保存内部責務と case-close で共通利用される REQ ファイル整合性検査の契約。
 
 ### 検証項目
 
@@ -221,7 +221,7 @@ req-save と case-close で共通利用される REQ ファイル整合性検査
 
 ### 実行タイミング
 
-- `req-save` Step 7: 自動修正あり
+- Definition 保存内部責務の保存工程: 自動修正あり
 - `case-close` Step 3: 検証のみ（自動修正は行わない）
 
 ## README 索引影響規則
@@ -269,11 +269,11 @@ REQ保存処理中にREQ体系上の歪みを検知した場合、REQ再構成in
 
 ## artifact_actions ベース工程分岐
 
-case-auto / case-open / req-save / design-save の工程分岐は `work_type` の固定分岐ではなく、req_draft の `artifact_actions` 存在に基づく動的判定とする（v2:ADR-0123, REQ-001-014）。
+case-auto / case-open / case-ready の工程分岐は `work_type` の固定分岐ではなく、req_draft の `artifact_actions` 存在に基づく動的判定とする（v2:ADR-0123, REQ-001-014）。
 
-- `req-save` は `artifact_actions` に `artifact: req` または `artifact: decision` の entry が含まれる場合に実行する（`work_type` に依存しない）
-- `design-save` は `artifact_actions` に `artifact: design` の entry が含まれる場合に実行する（`work_type` に依存しない）
-- `case-open` は `req-save` / `design-save` の後に常に実行する
+- Definition 保存内部責務は `artifact_actions` に `artifact: req` または `artifact: decision` の entry が含まれる場合に実行する（`work_type` に依存しない、REQ-008-046）
+- Design 保存内部責務は `artifact_actions` に `artifact: design` の entry が含まれる場合に実行する（`work_type` に依存しない、REQ-008-046）
+- `case-open` は REQ / Decision / Design の保存を実行せず、保存内部責務は `case-ready` の Definition 確定工程として実行される（REQ-030-007、REQ-008-010）
 - `case-auto` はパイプラインの各工程を `work_type` の固定分岐ではなく `artifact_actions` の存在から決定する
 - `auto_gate` preflight: `case-auto` は `auto_gate.auto_ready` を確認し、false の場合または未解決 item が残る場合は停止する
 
