@@ -102,3 +102,17 @@
 - 内容: main root での分割①対照実行が worktree（PR HEAD）より 4 件多い fail を出した（IR-055 runtime-unresolved-reference delta 系 2件・NG21 N16/N17 2件）。原因は mid-Epic の main root 環境が次子 Issue の manifest 未反映 / stale junction 状態にあることで、同一テストは PR HEAD worktree では pass する。対照実行による fail 由来分類では「baseline（main）で再現する pre-existing」と「main 環境固有で PR HEAD では pass の環境起因（無効分類）」を区別し、後者には PR HEAD での pass 結果を根拠として併記する。 Epic 進行中の main root は対照実行の baseline として絶対視しない
 - 関連: PR #2817 対応記録コメント検証差分、同 inbox の「Integrity suite・textlint final gate の Windows 環境依存失敗と timeout」（OU-002）、QG-4 環境ラベル（junction 伝播状態）
 - タグ: `#integrity-suite` `#ir055` `#ng21` `#main-root` `#fail-origin` `#epic`
+
+## 2026-09-14 case 2805 OU-005（PR #2818）: 配布物削除 Case では integrity suite の fail 由来分類に extensions 横断検査を織り込む
+
+- 観測元: case 2805 OU-005（DEL-2810-1、PR #2818）本文 learning 候補、case-close 2026-09-14 回収
+- 内容: 既存の integrity suite は `.agentdev/extensions/**` の別OU専属成果物を横断検査するため、配布物削除時に旧参照が残ると本変更側の suite が失敗する。今回の専属領域は修正せず、Finding として記録した。削除系 Case では Epic Wave の専属割当を確認し、横断検査の fail は本変更起因ではなく後続 OU 専属の計画的依存として由来分類する
+- 関連: Issue #2810（OU-005）、PR #2818 対応記録コメント、Epic #2805 OU-006（.agentdev/extensions/** 更新専属）
+- タグ: `#integrity-suite` `#extensions` `#deletion` `#fail-origin` `#epic`
+
+## 2026-09-14 case 2805 OU-005（PR #2818）: junction 未伝播環境の link profile は main root 読取専用 runner で代替測定する
+
+- 観測元: case 2805 OU-005（DEL-2810-1、PR #2818）本文 learning 候補、case-close 2026-09-14 回収
+- 内容: Windows の junction 未伝播環境では worktree link profile を直接測定できないため、main root の読取専用 runner と Bun 実行で検査した。case-close 配布依存境界 最終 gate（source profile）でも同様に main root から bun run し、CLI の repoRoot 位置引数に PR HEAD worktree を指定する読取専用実行で case-run STEP-S5 と同一 detector を再現した（CLI 契約 `[--profile P] [--json] [repoRoot]`）
+- 関連: Issue #2810（OU-005）、PR #2818 対応記録コメント、同 inbox の「worktree での bun test 実行に必要な node_modules 事前整備」（OU-003）
+- タグ: `#windows` `#junction` `#distribution-boundary` `#worktree` `#fail-origin`
