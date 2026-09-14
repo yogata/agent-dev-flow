@@ -8,7 +8,7 @@ description: Manages Design file operations (CREATE/APPEND/UPDATE), placement re
 このスキルは Design ファイル（`* Design`）の管理に関する**知識ベース**として機能する。
 
 - **このスキル（知識）**: Design ファイル操作モード、配置先解決、`target_area` マッチング規則、Design ライフサイクル適用、Design 固有整合性確認、Design 固有 script 呼出契約
-- **適用先**: `design-save`（Design 保存時）
+- **適用先**: Design 保存内部責務（Design 保存時）
 
 ---
 
@@ -50,7 +50,7 @@ Design ファイルは CREATE（新規）、APPEND（既存追記）、UPDATE（
 
 Design frontmatter の `status`（`draft` / `accepted` の2値）を本スキルの操作で次のように適用する。
 
-- **CREATE**: frontmatter に `title`、`status: draft`、`created`、`updated` を必ず付与する（design-save 不変条件・前出出力検証表 STEP-5）
+- **CREATE**: frontmatter に `title`、`status: draft`、`created`、`updated` を必ず付与する（保存内部責務の不変条件）
 - **APPEND / UPDATE**: 既存 Design の `status` を変更しない。`accepted` 昇格は case-close の責務
 - 置換済み Design は現行 Design ツリーへ保持しない。置換時は旧 Design を現行ツリーから除外し、履歴は Git、Issue、Decision 等の既存履歴手段から確認する
 
@@ -113,9 +113,9 @@ echo '{"target_area":"パターン","files":["docs/designs/{domain}/<existing-de
 cd src/opencode/skills/agentdev-design-file-manager/scripts && bun test
 ```
 
-### design-save からの呼び出し
+### Design 保存内部責務からの呼び出し
 
-design-save は本スクリプト群を bash 経由で呼び出し、JSON 結果を parse して意味判断（複数マッチ時の warning、未検出時のスキップ判定等）を行う。
+Design 保存内部責務は本スクリプト群を bash 経由で呼び出し、JSON 結果を parse して意味判断（複数マッチ時の warning、未検出時のスキップ判定等）を行う。
 これにより target_area 見出し検索を LLM 推論ではなく機械的に実行する（design-principles.md 第5節「決定的処理の Script 委譲原則」）。
 
 ---
@@ -132,7 +132,7 @@ design-save は本スクリプト群を bash 経由で呼び出し、JSON 結果
 
 ## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
 
-本スキルは Capability Skill として、design-save Workflow Skill が所有する STEP から呼び出される（`<workflows/workflow-skill-model>` Design）。
+本スキルは Capability Skill として、case-ready Workflow Skill が所有する STEP の Design 保存内部責務から呼び出される（`<workflows/workflow-skill-model>` Design）。
 本スキル自身は STEP を所有しない。
 
 ### 永続成果物と Input Resolution
@@ -141,7 +141,7 @@ design-save は本スクリプト群を bash 経由で呼び出し、JSON 結果
 Design `status`（`draft` / `accepted`）は最小 scalar 相当の状態値として扱う。
 優先順位の詳細は `<workflows/input-resolution-and-durable-state>` Design 参照。
 
-呼出元 STEP（design-save）は本スキルの操作結果（Design ファイル作成、target_area 置換結果）を STEP の result evidence として扱い、次 STEP の Input Resolution で SSoT 再構成から再取得できる。
+呼出元 STEP（Design 保存内部責務）は本スキルの操作結果（Design ファイル作成、target_area 置換結果）を STEP の result evidence として扱い、次 STEP の Input Resolution で SSoT 再構成から再取得できる。
 STEP reference 8 要素は `<workflows/step-reference-contract>` Design 参照。
 
 ## See Also
@@ -150,7 +150,7 @@ STEP reference 8 要素は `<workflows/step-reference-contract>` Design 参照�
 - **agentdev-decision-file-manager**: Decision ファイル管理
 - **agentdev-artifact-validation**: 共通検証 script の公開検証契約（委譲先）
 - **agentdev-doc-diagnostics**: docs 横断診断
-- Design ライフサイクルと design-save の導入（本体 Decision 参照）
+- Design ライフサイクルと保存内部責務の導入（本体 Decision 参照）
 - REQ/Design 責務分離、script 所有権（本体 REQ 参照）
 
 ## 参考文献

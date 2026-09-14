@@ -8,7 +8,7 @@ description: Manages REQ numbering and requirement file operations (CREATE/APPEN
 このスキルは要件ファイル（REQ）の管理に関する**知識ベース**として機能する。
 
 - **このスキル（知識）**: REQ番号採番ルール、ファイル操作モード、判定基準
-- **適用先**: `req-define`（要件定義時）、`req-save`（REQ保存時）、`case-open`（Issue作成時のREQ参照）、`case-run`（実行時のREQ参照）、`case-update`（要件更新時）、`case-close`（完了時のREQ参照）
+- **適用先**: `req-define`（要件定義時）、Definition 保存内部責務（REQ保存時）、`case-open`（Issue作成時のREQ参照）、`case-run`（実行時のREQ参照）、`case-update`（要件更新時）、`case-close`（完了時のREQ参照）
 
 ---
 
@@ -99,12 +99,12 @@ bun src/opencode/skills/agentdev-req-file-manager/scripts/src/alloc-req-number.t
 cd src/opencode/skills/agentdev-req-file-manager/scripts && npm test
 ```
 
-### req-save / design-save からの呼び出し
+### 保存内部責務からの呼び出し
 
-req-save と design-save は、REQ番号、Decision番号、要件行IDの採番を `agentdev-req-file-manager` の決定的スクリプトとして bash 経由で呼び出し、JSON 結果を parse して意味判断（NG 時の対応等）を行う（REQ）。
+Definition 保存内部責務と Design 保存内部責務は、REQ番号、Decision番号、要件行IDの採番を `agentdev-req-file-manager` の決定的スクリプトとして bash 経由で呼び出し、JSON 結果を parse して意味判断（NG 時の対応等）を行う（REQ）。
 target_area 見出し検索は、Design 固有処理として `agentdev-design-file-manager` 配下のスクリプトで実行する。
 frontmatter 整合性確認、エントリ存在確認、変更範囲検証は、`agentdev-artifact-validation` の公開検証契約経由で呼び出す（AG-{NNN}）。
-詳細は req-save / design-save command の各 Step 参照。
+詳細は保存内部責務の実行手順を参照。
 
 ---
 
@@ -142,7 +142,7 @@ REQ間の関連（置き換え、関連、分割元/分割先）もREQ本文内�
 テンプレート構成:
 - **frontmatter**: `id`, `title`, `created`, `updated`
 - **必須セクション**: `目的`, `要件`（テーブル形式）, `適用範囲`（対象/対象外）
-- **補助セクション（任意）**: `Design候補`（req-define が REQ 要件行候補から分離した Design 相当行と想定配置先 Design を記載。req-save が REQ ファイル保存時に本セクションを除去し、内容は `draft-meta.spec-candidates` 経由で design-save が消費する。最終 REQ ファイルに本セクションは残さない）
+- **補助セクション（任意）**: `Design候補`（req-define が REQ 要件行候補から分離した Design 相当行と想定配置先 Design を記載。Definition 保存内部責務が REQ ファイル保存時に本セクションを除去し、内容は `draft-meta.spec-candidates` 経由で Design 保存内部責務が消費する。最終 REQ ファイルに本セクションは残さない）
 
 ---
 
@@ -152,13 +152,13 @@ REQ間の関連（置き換え、関連、分割元/分割先）もREQ本文内�
 
 - **保存先**: `.agentdev/drafts/requirements-review-finding-{topic-slug}.md`（REQファイルと同じ `docs/requirements/` には保存しない）
 - **次工程**: 検出事項は req-define の明示入力ファイルとして渡され、正式な要件変更（CREATE/APPEND/UPDATE）に変換される
-- **SPLIT 検出時**: req-save が SPLIT を検出した場合、保存可能範囲を実行した後に検出事項を作成する
+- **SPLIT 検出時**: Definition 保存内部責務が SPLIT を検出した場合、保存可能範囲を実行した後に検出事項を作成する
 
 ---
 
 ## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
 
-本スキルは Capability Skill として、req-save / case-open / case-update / case-close 等の Workflow Skill が所有する STEP から呼び出される（`<workflows/workflow-skill-model>` Design）。
+本スキルは Capability Skill として、case-open / case-update / case-close / case-ready 等の Workflow Skill が所有する STEP から呼び出される（`<workflows/workflow-skill-model>` Design）。
 本スキル自身は STEP を所有しない。
 
 ### 永続成果物と Input Resolution
@@ -186,4 +186,4 @@ SKILL.md 本文から遅延読み込みされる詳細資料である。
 | [references/numbering-and-validation.md](references/numbering-and-validation.md) | REQ番号採番、要件行ID、REQ-ID 安定ID、ファイル配置、frontmatterバリデーション、分類ゲート、HOW 除去後の acceptance criteria 順位検証、移行・統合時の番号空間衝突チェック（前置） |
 | [references/create-append-update-flow.md](references/create-append-update-flow.md) | CREATE/APPEND/UPDATE 操作モード、状況判定、APPEND/UPDATE判定フロー、廃止宣言 APPEND の precedent 利用、機械置換手順の3段階適用と参照検査観点（参照実在確認、変動値分離） |
 | [references/matching-and-merge.md](references/matching-and-merge.md) | 既存REQ照合方法論、整合性チェック、関連情報管理、マージ競合対応パターン |
-| [references/req-save-procedure.md](references/req-save-procedure.md) | req-save の詳細手順（分類ゲート検査、文書分類適合確認、REQファイル操作、Decision ファイル操作と related_reqs 初期保存、インデックス/ハブ更新、リモート同期と hash 検証、RU パス保存禁止） |
+| [references/save-procedure.md](references/save-procedure.md) | 保存内部責務の詳細手順（分類ゲート検査、文書分類適合確認、REQファイル操作、Decision ファイル操作と related_reqs 初期保存、インデックス/ハブ更新、リモート同期と hash 検証、RU パス保存禁止） |

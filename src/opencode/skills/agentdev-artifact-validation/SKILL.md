@@ -8,14 +8,14 @@ description: Owns document-type-crosscutting deterministic verification scripts,
 このスキルは複数文書種別で共有する決定的検証 script と共有 lib の**正規所有者**として機能する（AG-{NNN}、AG-{NNN}、AG-{NNN}、CR-{NNN}、RU-{NNNN}-01 合意）。
 
 - **このスキル（検証基盤）**: 3つの共通検証 script とそれらが利用する共有 lib、対応 test、公開検証契約、JSON 結果契約
-- **適用先**: `req-save`、`design-save`（共通検証 script 呼出 Step）、各 file-manager skill（委譲経由）、`agentdev-req-file-manager`（公開検証契約経由）
+- **適用先**: Definition 保存内部責務、Design 保存内部責務（共通検証 script 呼出 Step）、各 file-manager skill（委譲経由）
 
 ---
 
 ## 責務
 
 本スキルは**決定的検証のみ**を所有する。
-検証対象の内容判断、文書の編集、保存、採番、ユーザー承認、commit、push は対象外（各 file-manager skill、各 command の責務）。
+検証対象の内容判断、文書の編集、採番は対象外（各 file-manager skill の責務）。ユーザー承認、commit、push は対象外（上流工程の責務）。
 
 | 責務 | 本スキル | 対象外（他 skill/command の責務） |
 |------|----------|----------------------------------|
@@ -70,9 +70,9 @@ echo '{"id":"REQ-{NNNN}","files":["docs/requirements<README>.md"]}' | bun .openc
 cd .opencode/skills/agentdev-artifact-validation/scripts && bun test
 ```
 
-### req-save / design-save からの呼び出し
+### 保存内部責務からの呼び出し
 
-`req-save` と `design-save` は本スキルの公開検証契約を bash 経由で呼び出し、JSON 結果を解析して意味判断（NG 時の対応等）を行う。
+Definition 保存内部責務と Design 保存内部責務は本スキルの公開検証契約を bash 経由で呼び出し、JSON 結果を解析して意味判断（NG 時の対応等）を行う。
 これにより frontmatter id↔ファイル名整合性確認、エントリ存在確認、変更範囲検証を LLM 推論ではなく機械的に実行する（design-principles.md 第5節「決定的処理の Script 委譲原則」）。
 
 REQ/Decision 番号採番、要件行 ID 採番、target_area 検索は本スキルの対象外（それぞれ `agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-design-file-manager` の責務）。
@@ -99,4 +99,3 @@ REQ/Decision 番号採番、要件行 ID 採番、target_area 検索は本スキ
 - **agentdev-req-file-manager**: REQ ファイル管理、REQ 番号/要件行 ID 採番（REQ 固有 script 所有）
 - **agentdev-decision-file-manager**: Decision ファイル管理、Decision 番号採番（Decision 固有 script 所有）
 - **agentdev-design-file-manager**: Design ファイル管理、target_area 検索（Design 固有 script 所有）
-- **req-save** / **design-save**: 共通検証 script 呼出 Step を持つ command
