@@ -15,7 +15,7 @@ Decision ファイルの作成、追記、更新を管理する知識ベース�
 
 ## 適用対象
 
-- req-save（Decision ファイル保存時、採番、CREATE 操作、`new:{topic-slug}` 形式から確定番号への置換）
+- Definition 保存内部責務（Decision ファイル保存時、採番、CREATE 操作、`new:{topic-slug}` 形式から確定番号への置換）
 - case-open（Issue 作成時の Decision 参照）
 - case-run（実行時の Decision 参照）
 
@@ -34,10 +34,10 @@ Decision ファイルの作成、追記、更新を管理する知識ベース�
 ## 現在の動作
 
 - DEC-{NNN} 形式で3桁ゼロ埋め採番
-- 初期ステータスは `proposed`（req-save で作成時）
+- 初期ステータスは `proposed`（Definition 保存内部責務で作成時）
 - 単なる廃止、削除、移行は新規 Decision ではなく `retire` / `supersede` で処理
 - accepted 後は非セマンティックな軽微修正のみ許可
-- 確定番号は req-save が本スキルの採番ルールで確定し、draft 内の全 Decision 参照（`new:{topic-slug}` 形式）を置換
+- 確定番号は Definition 保存内部責務が本スキルの採番ルールで確定し、draft 内の全 Decision 参照（`new:{topic-slug}` 形式）を置換
 
 ## 対象外
 
@@ -83,10 +83,10 @@ accepted Decision へ直接編集を実施する場合、次のチェックリ�
 
 ## related_reqs フィールド管理
 
-- CREATE 時: req-save が要件doc（draft-data）の Decision 対象操作から関連 REQ の初期値を
+- CREATE 時: Definition 保存内部責務が要件doc（draft-data）の Decision 対象操作から関連 REQ の初期値を
   決定的に取得する規約に基づき保存する（取得元の draft-data 内構造は patterns.md
   （ACT-DESIGN-001）で確定する。draft-data schema の拡張要否は REQ-008・DEC-003 の管轄との
-  整合で design-save 時に確定する）
+  整合で Design 保存内部責務の実行時に確定する）
 - UPDATE 時: 関連 REQ の変更（要件再構成、Decision の置換・再確認）をフィールド更新として
   扱う。status 遷移とは独立に更新できる
 - 検証: REQ 識別子形式（REQ-{NNNN}）、空宣言と未宣言の区別、実在 REQ の指先確認
@@ -97,5 +97,4 @@ accepted Decision へ直接編集を実施する場合、次のチェックリ�
 
 - [agentdev-decision-guidelines.md](agentdev-decision-guidelines.md)
 - [agentdev-req-file-manager.md](agentdev-req-file-manager.md)
-- [commands/req-save.md](../commands/req-save.md)
 - REQ-001（Decision ライフサイクル標準化）

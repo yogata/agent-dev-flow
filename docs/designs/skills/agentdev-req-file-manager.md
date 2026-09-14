@@ -16,7 +16,7 @@ REQ ファイルの作成、追記、更新を管理する知識ベースとし�
 ## 適用対象
 
 - req-define（要件定義時、照合方法論、分類ゲートルール）
-- req-save（REQ 保存時、採番、CREATE/APPEND/UPDATE 操作、インデックス、ハブ更新、語彙、責務、runtime 境界矛盾防止、Catalog entry 確認）
+- Definition 保存内部責務（REQ 保存時、採番、CREATE/APPEND/UPDATE 操作、インデックス、ハブ更新、語彙、責務、runtime 境界矛盾防止、Catalog entry 確認）
 - case-open（Issue 作成時の REQ 参照）
 - case-run（実行時の REQ 参照）
 - case-update（要件更新時、`--req` フラグ）
@@ -78,6 +78,5 @@ REQ ファイルの作成、追記、更新を管理する知識ベースとし�
 
 - [agentdev-req-analysis.md](agentdev-req-analysis.md)
 - [agentdev-decision-file-manager.md](agentdev-decision-file-manager.md)
-- [commands/req-save.md](../commands/req-save.md)
 - REQ-001（文書、REQ 管理基準）
 - REQ-004（要件定義、保存）
