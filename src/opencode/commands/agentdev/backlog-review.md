@@ -49,13 +49,12 @@ RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, 
 
 否定規則は破壊的操作・state 破壊等の硬い境界に限定する:
 
-- REQ ファイルの保存は行わない（`req-save` が担当）
+- REQ ファイルの保存は行わない（Definition の保存・確定は `case-ready` が担当）
 - GitHub Issue の作成は行わない（`case-open` が担当）
 - docs/knowledge/ への知識文書の新規、更新、置換、削除は利用者承認なしに行わない（REQ-{NNNN}-{NNN}）
 - `.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md`、`.agentdev/learning/deferred.md` は更新しない
 - ADF リポジトリ外の project-local 資産（Project Extension の接続定義）を直接書き換えない（書き込み先の実行前提を明示した指示の出力で代替する）
 - RU 生成に失敗した成果物は削除しない
 - 破壊的変更（矛盾解消、要件仕様スコープ変更、大量成果物削除等）は明示承認を維持する（REQ）（`POL-destructive-change-explicit-approval`）
-
 
 
