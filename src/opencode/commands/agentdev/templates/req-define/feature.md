@@ -7,12 +7,11 @@
  - 壁打ちドラフトを .agentdev/drafts/ に保存
 検証結果: ✅ OK
 git 永続化: 該当なし
-次のコマンド:/agentdev/req-save
+次のコマンド:/agentdev/case-open または /agentdev/case-ready
 
 📋 壁打ち結論ハイライト
  背景: {課題の1行サマリ}
  目標: {達成すべきゴール}
  要件数: {機能要件の数}
  主要な判断: {壁打ちで合意した技術判断}
-
 

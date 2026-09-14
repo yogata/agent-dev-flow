@@ -8,7 +8,7 @@ source_rus: # optional: RU-* IDs that seeded this draft
 
 <!-- req_draft テンプレート
  このテンプレートは req-define が生成する構造化引き継ぎ成果物の原本である。
- 後続工程（req-save/ design-save/ case-open/ case-auto/ case-run/ case-close）が参照する
+後続工程（case-open/ case-ready/ case-revise/ case-auto/ case-run/ case-close）が参照する
  原本の情報源は # draft-data 内の YAML コードブロックであり、人間可読 Markdown セクションではない。
  soft contract（生成元側標準）であり、LLM 推論経由で消費される。
  厳格なスキーマバージョン、JSON Schema、バリデータは導入しない。 -->
@@ -65,7 +65,7 @@ artifact_actions:
     source_items: [AG-{NNN}]
     content: |
       {保存対象の本文}
-  - id: ACT-DESIGN-{NNN}            # Design 保存対象（artifact: design）が含まれる場合 design-save が実行される
+- id: ACT-DESIGN-{NNN}            # Design 保存対象（artifact: design）は case-ready が適用する
     artifact: design
     operation: create           # create / append / update の3値（spec-create 等の旧別名、design-create 等の新別名は出力しない・受理しない）
     target_design:                # Design 操作は target_design 構造化推奨（operation, domain, slug）。target: file path との併用も可
@@ -95,7 +95,7 @@ operation_units:
     depends_on: []              # 実在する ou_id を参照
     recommended_order: 1
     issue_policy: single        # single / epic
-    result: {}                  # req-save / design-save / case-open が書き戻す。req-define は空を出力
+result: {}                  # case-open / case-ready / case-revise が書き戻す。req-define は空を出力
 
 # test_strategy: 各合意項目（AG-*）の検証方法。各項目は3要素（verification / pass_criteria / on_failure）を必須とする
 # on_failure（不合格時の処置）を持たない検証項目は test_strategy に含めないこと（REQ）
@@ -115,7 +115,7 @@ test_strategy:
 # artifact_actions とは分離した独立構造であり、REQ / Decision / Design の保存操作は artifact_actions が担い、実現物種別の enum を追加して責務を混在させない
 # ADF 固有の成果物種別や適用プロジェクト固有の成果物種別を固定 enum として列挙しないドメイン中立契約とする
 # 対象の手掛かり（パス、担当能力、正規所有 Design 等）は ownership_hints に自由形式で記録する
-# 欠落時に後続工程は draft を拒否しない（soft contract、DEC-003）
+# 欠落時に後続工程は draft を拒否しない（soft contract）
 # ただし実現面の変更がある場合は本セクションを出力する
 # case-open が本セクションを Issue / Epic の execution contract へ投影する
 realization_actions:
@@ -160,5 +160,3 @@ case_open_hints:
  検討経緯や採用しない方針は処理対象として残さない。 -->
 
 {合意内容の人間可読補足。検討経緯、不採用方針は含めない}
-
-
