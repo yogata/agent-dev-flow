@@ -1,3 +1,4 @@
+<!-- ADF-COVERS(implementation): REQ-032-027 -->
 # STEP-1/2: Issue 番号解決・QG-4 達成判定（issue-resolution-and-qg4）
 
 > 本 reference は `agentdev-workflow-case-close` SKILL.md の制御平面（STEP 一覧）STEP-1, STEP-2 詳細である。
@@ -61,7 +62,7 @@ Issue 本文の完了条件チェックボックスを最終評価・更新し�
 
 ### Input Resolution
 
-1. SSoT 再構成: Issue 本文（完了条件チェックボックス）、PR 本文（capture 入力源）、test strategy セクション
+1. SSoT 再構成: Issue 本文（完了条件チェックボックス）、PR 本文（capture 入力源）、test strategy セクション、SSoT コメント（verify-only closure 時の判定根拠）
 2. identifier 保持: Issue番号、PR番号
 3. 最小 scalar: なし
 4. runtime artifact: なし
@@ -81,6 +82,11 @@ Issue 本文の完了条件チェックボックスを最終評価・更新し�
 - **PR 対象範囲 vs 全体 評価スコープ判定（QG-4 観点8）**: unchecked 完了条件を達成判定する前に、各完了条件の評価スコープ（PR 対象範囲 or 全体）を QG-4 観点8「PR 対象範囲 vs 全体 判定マトリクス」に従い決定する（境界ケース #1532 由来）
 - 手順、再 grep/再検査/再計測、事後確認（再読込 VERIFY）、未達項目残存時の停止（完了条件評価専任責務）、test strategy 処理完了確認（未処理項目が残る場合は構造化エラーで停止）の詳細は `agentdev-quality-gates` の QG-4 を参照
 - PR 存在確認
+- **verify-only closure の QG-4 達成判定（SSoT コメント参照）**: verify-only closure（PR も carrier commit も存在しない Issue 完了）では、case-run が記録した SSoT コメント（Issue コメント）の実行コマンド列と検証結果を判定根拠として参照する。PR が存在しないため PR 本文の検証差分セクションは存在せず、SSoT コメントが検証証跡の恒久記録の正となる。SSoT コメントから次の3点を確認する:
+  - 3検査（配布依存境界・IR-{NNN}・トレーサビリティ）の実行記録と新規違反 0 件確認
+  - integrity suite の N/M 件数突合と直前実績比較
+  - 実行コマンド列の再実行可能性（実行 cwd・実行形態の記載）
+  SSoT コメントが存在しない verify-only closure、または SSoT コメントに検証結果の記載が欠落している場合は QG-4 不合格として完了扱いにしない。docs_chore 特例フロー（main 直接 commit が存在する PR なし完了）は本手順の対象外であり、直接 commit 内容で QG-4 を検証する
 
 ### Result
 
@@ -88,24 +94,27 @@ Issue 本文の完了条件チェックボックスを最終評価・更新し�
 - 観点8 評価スコープ確定
 - test strategy 処理完了確認
 - 検証対応要否の分類状態判定結果（未分類行・検証対応必須行の恒久検証対応欠落の有無）
+- verify-only closure 時: SSoT コメント参照手順の確認結果（3検査記録、件数突合、再実行可能性）
 
 ### Evidence
 
 - 完了条件チェックボックスの評価結果と更新後の再読込 VERIFY 結果、観点8 評価スコープ判定、test strategy 処理完了状態、段階ゲートの判定根拠（check の JSON 結果または定義どおりの手動確認結果）
+- verify-only closure 時: SSoT コメントの参照結果（3検査の実行記録と新規違反 0 件確認、integrity suite の N/M 件数突合と直前実績比較、実行コマンド列の再実行可能性確認）
 
 ### Completion Verification
 
-- 未達チェックボックスが残っていないこと（残る場合は構造化エラーで停止）。更新後の再読込 VERIFY が合格であること。対象要件行に未分類の行が残らず、検証対応必須行の恒久検証対応が存在すること（未分類残存または恒久検証対応欠落時は完了として扱わない。検証対応任意行に恒久的な検証手段が存在しないことだけを理由とした阻止は行わない）
+- 未達チェックボックスが残っていないこと（残る場合は構造化エラーで停止）。更新後の再読込 VERIFY が合格であること。対象要件行に未分類の行が残らず、検証対応必須行の恒久検証対応が存在すること（未分類残存または恒久検証対応欠落時は完了として扱わない。検証対応任意行に恒久的な検証手段が存在しないことだけを理由とした阻止は行わない）。verify-only closure 時は SSoT コメントが存在し検証結果の記載が欠落していないこと（SSoT コメント不在または検証結果記載欠落時は完了として扱わない）
 
 ### Resume-Idempotency
 
 - Issue 本文のチェックボックス状態（durable state、更新後に再読込）で評価済み否かを再構成する。更新済みチェックボックスを再評価しない
+- verify-only closure 時は対象 Issue のコメント一覧（durable state、`agentdev_gh` の comment_list）から SSoT コメントの有無を再構成する。SSoT コメント不在時の完了抑止は再実行時も維持する
 
 ## resume point
 
 - Issue 番号解決状態、Epic Wave vs 単一 Issue ルート判定
 - 重複ファイルチェック結果（単一 Issue ルート）
-- QG-4 完了条件チェックボックス評価・更新状態、観点8 評価スコープ
+- QG-4 完了条件チェックボックス評価・更新状態、観点8 評価スコープ、verify-only closure 時の SSoT コメント参照状態
 
 ## 関連 STEP
 
