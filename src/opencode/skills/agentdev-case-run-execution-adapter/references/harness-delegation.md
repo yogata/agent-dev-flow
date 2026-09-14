@@ -204,7 +204,7 @@ inputs:
 - 構造化文脈は新しい正規情報源ではない。引き継ぎ内容は永続的な正規成果物（Issue 本文、PR 本文、RU、OU 等）から再構成可能であること。会話記憶に依存する再開を許可しない。
 - 委譲 prompt には対象 Case、Issue、PR（既知の場合）、ADF 工程、実行単位、委譲目的の識別情報を構造化して含める。委譲単位識別子は ADF が発行する識別情報の記録契約に従う。OpenCode 等の harness 側セッション識別子は、取得可能な場合の付加情報とし、必須契約としない。
 - 受領側（実行担当サブエージェント）は前工程で確定した事項（`resolved_context`）を初期文脈として利用し、同じ情報をゼロから探索、再構築することを原則としない。独立検証、鮮度確認、矛盾検出、正規成果物との整合確認を目的とする再確認は維持する。
-- 本テンプレートの適用範囲は case-run からの実行担当サブエージェント委譲に限らず、subagent 委譲する全場面（case-auto、case-open、case-run、case-update、case-close）で共通する（後述「委譲プロトコルと category 設計」と同一の適用範囲）。
+- 本テンプレートの適用範囲は case-run からの実行担当サブエージェント委譲に限らず、subagent 委譲する全場面（case-auto、case-open、case-run、case-revise、case-close）で共通する（後述「委譲プロトコルと category 設計」と同一の適用範囲）。
 - 工程間（委譲を介さない工程の引き継ぎ）の構造化文脈は、同一の意味集合を `agentdev-workflow-lifecycle` スキルの工程間構造化文脈引き継ぎの形式（`structured_context` をトップレベルに持つ構造化ブロック）で扱う。本節の形式と意味対応を保つ。
 
 ### structured_context の SSoT 抽出と突合検査
@@ -235,7 +235,7 @@ case-run は委譲プロンプト構築時に本テンプレート構造を維�
 
 ## 委譲プロトコルと category 設計
 
-adapter skill 経由の委譲は、case-run に限らず subagent 委譲する全場面（case-auto/ case-open/ case-run/ case-update/ case-close）で共通する category 設計と MUST NOT DO 記載の要件に従う（Issue #1538 由来）。
+adapter skill 経由の委譲は、case-run に限らず subagent 委譲する全場面（case-auto/ case-open/ case-run/ case-revise/ case-close）で共通する category 設計と MUST NOT DO 記載の要件に従う（Issue #1538 由来）。
 本節は委譲プロトコルと category 設計の関係を整理し、事務的手続きで `unspecified-high` を推奨する根拠を明示する。
 
 ### `writing` category の発火スキルとの相互作用

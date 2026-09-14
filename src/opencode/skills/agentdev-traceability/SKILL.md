@@ -62,7 +62,7 @@ Design 対応（design 役割）0件のみを理由に異常としない。
 
 - 分類状態のみを保持する独立した台帳、REQ frontmatter 項目、派生索引を新設しない。導出は毎回宣言とカタログから計算し、呼び出し間で状態を保持しない
 - `unclassified` と `missing-verification` 検査の findings は同一の行集合（検証対応必須行の検証対応0件 = 未分類）であり、単一の導出から計上する。契約上の役割は異なる（`missing-verification` は対応関係の完全性規則に基づく完全性検査、分類状態は工程ゲートの判定入力）
-- 段階ゲート（req-save の未分類検出・記録、case-open の未分類残存の停止、case-close の未分類残存と検証対応必須行の恒久検証対応欠落の完了阻止）は本導出を利用する（ゲート挙動の契約所有は各 Workflow Skill 側）。`catalog-registered` 行に恒久的な検証手段が存在しないことだけを理由として完了阻止しない
+- 段階ゲート（Definition 保存内部責務（case-ready / case-revise）の未分類検出・記録、case-open の未分類残存の停止、case-close の未分類残存と検証対応必須行の恒久検証対応欠落の完了阻止）は本導出を利用する（ゲート挙動の契約所有は各 Workflow Skill 側）。`catalog-registered` 行に恒久的な検証手段が存在しないことだけを理由として完了阻止しない
 
 ### 実行方法
 

@@ -104,7 +104,7 @@ REQ間の関連、依存はREQ本文内に記載する（frontmatterフィール
 | 状況 | リスクレベル |
 |------|-------------|
 | 複数ユーザーが同時に同じREQを編集 | 高 |
-| req-saveと手動編集が競合 | 中 |
+| REQ保存（Definition 保存内部責務）と手動編集が競合 | 中 |
 | APPENDとUPDATEが同時に実行 | 中 |
 
 **競合予防**: 更新前に `git pull --ff-only` で最新を取得し、`git status --porcelain` でローカル変更を確認。

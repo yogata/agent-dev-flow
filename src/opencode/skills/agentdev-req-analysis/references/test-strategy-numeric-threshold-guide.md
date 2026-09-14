@@ -86,8 +86,8 @@ QG-2（case-open 完了条件網羅性検証）の観点6「数値閾値到達�
 
 ```
 req-define (本ガイドで数値閾値を策定)
-  → req-save (test_strategy に数値閾値を保存)
-    → case-open Step 2-1 (QG-2 観点6 で到達可能性検証)
+  → case-open Step 2-1 (QG-2 観点6 で到達可能性検証)
+    → case-ready (Definition 保存内部責務が test_strategy に数値閾値を保存)
       → case-run (test strategy 項目として検証)
         → case-close (QG-4 で最終確認)
 ```

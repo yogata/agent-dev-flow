@@ -68,7 +68,7 @@ accepted finding の実装方針への反映は実行担当サブエージェン
 - 既存 Decision の決定事項の変更、撤回
 - 既存 Design の契約、手続き、責務の変更
 
-これらは adapter 委譲内で解決せず、ユーザー判断、REQ 更新プロセス（req-define / req-save / design-save）、case-update 経由の Issue 本文更新等の正規経路へ引き渡すため blocked とする。
+これらは adapter 委譲内で解決せず、ユーザー判断、REQ 更新プロセス（req-define、再合意済み Definition 変更は case-revise → case-ready）、`/agentdev/issue` コマンド（`agentdev_gh` issue_update）経由の Issue 本文更新等の正規経路へ引き渡すため blocked とする。
 
 ### 要件、仕様問題の検出
 

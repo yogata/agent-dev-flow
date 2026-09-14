@@ -97,7 +97,7 @@
 
 ### Purpose
 
-`agentdev-decision-guidelines`（manual reference）に従ってDecision判断を記録する（Decisionファイル作成は req-save で実行）。
+`agentdev-decision-guidelines`（manual reference）に従ってDecision判断を記録する（Decisionファイル作成は Definition 保存内部責務、case-ready / case-revise の Capability Skill 委譲で実行）。
 
 ### Input Resolution
 

@@ -82,13 +82,13 @@ AgentDevFlow コマンド群における Intake/ Learning キャプチャの責�
 |----------|-------------|------|
 | case-run | **記録のみ** | 本筋外の検出事項を PR 本文に記録。`.agentdev/intake/inbox/` と `.agentdev/learning/inbox.md` の直接変更は禁止 |
 | case-close | **回収、保存** | PR 本文から Intake/ Learning を分離回収。自身の実観測も分割ルールに基づいて保存。ユーザーに「学びがあるか」質問禁止 |
-| req-save | **原則非関与** | 通常はキャプチャを行わない。例外: REQ 再構成 Intake（`.agentdev/intake/inbox/req-restructure/**`）のみ生成可能 |
+| Definition 保存内部責務（case-ready / case-revise） | **原則非関与** | 通常はキャプチャを行わない。例外: REQ 再構成 Intake（`.agentdev/intake/inbox/req-restructure/**`）のみ生成可能 |
 | case-open | **非関与** | Intake/ Learning キャプチャを行わない |
 | case-auto | **委譲** | 構成コマンド（case-run/ case-close）の責務境界に従う。case-auto 固有のキャプチャ振る舞いは持たない |
 
 ## Subagent 委譲プロトコルの MUST NOT DO 記載要件
 
-subagent 委譲を実施する agentdev command（case-auto、case-open、case-run、case-update、case-close）は、委譲 prompt に MUST NOT DO セクションを必須で記載する。
+subagent 委譲を実施する agentdev command（case-auto、case-open、case-run、case-revise、case-close）は、委譲 prompt に MUST NOT DO セクションを必須で記載する。
 キャプチャ境界（`.agentdev/` 直接変更禁止、PR 本文経由の capture 引き継ぎ）も MUST NOT DO に含まれる。
 
 - **対象**: subagent 委譲する全場面。特定 command に限定しない

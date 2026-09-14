@@ -8,7 +8,7 @@ description: Manages REQ numbering and requirement file operations (CREATE/APPEN
 このスキルは要件ファイル（REQ）の管理に関する**知識ベース**として機能する。
 
 - **このスキル（知識）**: REQ番号採番ルール、ファイル操作モード、判定基準
-- **適用先**: `req-define`（要件定義時）、Definition 保存内部責務（REQ保存時）、`case-open`（Issue作成時のREQ参照）、`case-run`（実行時のREQ参照）、`case-update`（要件更新時）、`case-close`（完了時のREQ参照）
+- **適用先**: `req-define`（要件定義時）、Definition 保存内部責務（REQ保存時、`case-ready` / `case-revise` から Capability Skill 委譲）、`case-open`（Issue作成時のREQ参照）、`case-run`（実行時のREQ参照）、`case-close`（完了時のREQ参照）
 
 ---
 
@@ -158,7 +158,7 @@ REQ間の関連（置き換え、関連、分割元/分割先）もREQ本文内�
 
 ## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
 
-本スキルは Capability Skill として、case-open / case-update / case-close / case-ready 等の Workflow Skill が所有する STEP から呼び出される（`<workflows/workflow-skill-model>` Design）。
+本スキルは Capability Skill として、case-open / case-close / case-ready / case-revise 等の Workflow Skill が所有する STEP から呼び出される（`<workflows/workflow-skill-model>` Design）。
 本スキル自身は STEP を所有しない。
 
 ### 永続成果物と Input Resolution

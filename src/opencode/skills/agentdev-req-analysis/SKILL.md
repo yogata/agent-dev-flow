@@ -84,7 +84,7 @@ description: Provides requirement analysis methods with quality criteria and Dec
 テンプレート構成:
 - **frontmatter**: `id`, `title`, `created`, `updated`
 - **必須セクション**: `目的`, `要件`（テーブル形式）, `適用範囲`（対象/対象外）
-- **補助セクション（任意）**: `Design候補`（req-define が分離した Design 相当行と想定配置先 Design を記載。req-save が REQ ファイル保存時に除去し、design-save が消費する）
+- **補助セクション（任意）**: `Design候補`（req-define が分離した Design 相当行と想定配置先 Design を記載。Definition 保存内部責務が REQ ファイル保存時に除去し、Design 保存で消費する）
 
 ## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
 

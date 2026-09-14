@@ -27,7 +27,7 @@ updated: ""
 <!-- 【任意】 req-define が Step 5-2/5-3 で REQ 要件行候補から分離した Design 相当行を配置する補助セクション。
 REQ 必須セクション（目的/要件/適用範囲）は本セクションの有無にかかわらず維持する。
 構造化データは draft-meta.spec-candidates に保持し、本セクションは人間可読な一覧を提供する。
-req-save は REQ ファイル保存時に本セクションを除去し、内容は draft-meta.spec-candidates 経由で design-save が docs/designs/<**/*>.md へ保存する。
+Definition 保存内部責務（case-ready / case-revise から Capability Skill 委譲）は REQ ファイル保存時に本セクションを除去し、内容は draft-meta.spec-candidates 経由で Design 保存内部責務が docs/designs/<**/*>.md へ保存する。
 最終 REQ ファイルに本セクションは残さない。
 Design候補がない場合はセクションごと省略する。
 -->

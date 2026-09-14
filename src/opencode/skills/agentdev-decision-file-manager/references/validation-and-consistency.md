@@ -151,7 +151,7 @@ Decision の `status` を変更した場合、`docs/decisions/README.md` の全�
 1. Decision frontmatter の `status` を読み取る
 2. `docs/decisions/README.md` の各ビューを照合し、実ファイルと一致しているか確認する
 3. 不整合を検出した場合、ステータス変更と README 更新を同一変更（同一 PR、同一コミット群）で実施する
-4. 整合性確認を保存前の検証ステップに組み込む（`req-save`、`case-update` での Decision status 変更時）
+4. 整合性確認を保存前の検証ステップに組み込む（Definition 保存内部責務（case-ready / case-revise）での Decision status 変更時）
 
 ### 共起必須項目
 

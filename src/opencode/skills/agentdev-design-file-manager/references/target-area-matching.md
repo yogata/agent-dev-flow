@@ -33,8 +33,8 @@
 
 ## 複数マッチ時の挙動
 
-`target_area` に一致する見出しが複数存在する場合、design-save command の置換拒否規則に従い置換を拒否し warning を出力する。
-`search-target-area.ts` は全マッチを返し、呼び出し元（design-save）が `matches.length > 1` で warning 判断を行う。
+`target_area` に一致する見出しが複数存在する場合、Design 保存（case-ready / case-revise の Capability Skill 委譲）の置換拒否規則に従い置換を拒否し warning を出力する。
+`search-target-area.ts` は全マッチを返し、呼び出し元（Design 保存内部責務）が `matches.length > 1` で warning 判断を行う。
 
 ## 未検出時の挙動
 
@@ -60,7 +60,7 @@ target_area セクション置換は機械置換であり、次の機械置換�
 | 2. 置換実行 | 特定したセクション範囲を action の `content` で置換する |
 | 3. 置換後 MISS 確認 | 旧見出しテキスト、旧内容の固有パターンを再検索し、0 件であることを確認する。見出しを変更しない置換では旧内容のパターンで確認する |
 
-複数マッチ（design-save command の置換拒否規則）、未検出（スキップ + follow-up）は、段階1の実在確認で検出する。
+複数マッチ（Design 保存の置換拒否規則）、未検出（スキップ + follow-up）は、段階1の実在確認で検出する。
 
 ### 参照検査観点
 

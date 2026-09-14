@@ -4,9 +4,9 @@
 
 | 条件 | 推論結果 |
 | ---- | -------- |
-| レビュー結果に「仕様バグ」が含まれる | `/agentdev/case-update {N} --req --review-ng` → `/agentdev/case-run {N}` |
-| レビュー結果に「実装バグ」が含まれる | `/agentdev/case-update {N} --comment --review-ng` → `/agentdev/case-run {N}` |
-| レビュー結果に「スコープ外逸脱」が含まれる | `/agentdev/case-update {N} --req --review-ng` → 不要実装削除 → `/agentdev/case-run {N}` |
+| レビュー結果に「仕様バグ」が含まれる | `/agentdev/case-revise {N}` → `/agentdev/case-ready {N}` → `/agentdev/case-run {N}`（再開） |
+| レビュー結果に「実装バグ」が含まれる | `/agentdev/case-run {N}` 再開（Root Case の resume_command。レビューNGコメントは Issue コメントへ記録） |
+| レビュー結果に「スコープ外逸脱」が含まれる | `/agentdev/case-revise {N}` → `/agentdev/case-ready {N}` → 不要実装削除 → `/agentdev/case-run {N}` |
 | レビュー結果がOK | `/agentdev/case-close {N}` |
 
 ## Epic関連の推論ルール

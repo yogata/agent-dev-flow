@@ -2,17 +2,17 @@
  * target_area 見出し検索スクリプト（AG-{NNN}、AG-{NNN}、REQ-{NNNN}-{NNN}/160、REQ-{NNNN}-{NNN}/032）。
  *
  * 指定 Design ファイル群から、target_area（Markdown 見出し行）を検索する。
- * design-save の update 操作で、target_area に一致するセクションを特定するために使用する。
+ * Design 保存（case-ready / case-revise の Capability Skill 委譲）の update 操作で、target_area に一致するセクションを特定するために使用する。
  *
  * 本スクリプトは agentdev-design-file-manager の Design 固有決定的処理として配置される
  * （REQ-{NNNN}-{NNN}: Design 固有 script は agentdev-design-file-manager 配下）。
  *
- * マッチ規約（design-save command Design の target_area ベースのセクション置換ロジックに準拠）:
+ * マッチ規約（agentdev-design-file-manager Design の target_area ベースのセクション置換ロジックに準拠）:
  *   - 入力正規化: target_area に Markdown 見出しプレフィックス（#{1,6}\s+）が含まれる場合、
  *     比較前にプレフィックスを除去して見出しテキスト部分へ正規化する
  *   - 完全一致: 正規化後の target_area と見出しテキストが完全一致（見出し行全体完全一致、前方一致は廃止）
- *   - 複数マッチ時は warning（design-save command の置換拒否規則の根拠）
- *   - 未検出時は空配列（design-save でスキップ判定）
+ *   - 複数マッチ時は warning（Design 保存の置換拒否規則の根拠）
+ *   - 未検出時は空配列（Design 保存側でスキップ判定）
  *
  * I/O:
  *   入力: argv[2] = target_area 文字列（見出しテキスト）
@@ -66,14 +66,14 @@ export function findTargetAreaHeadings(
   return matches;
 }
 
-/** 見出し行全体との完全一致のみ（design-save Design「見出し行全体完全一致」準拠）。前方一致は廃止。 */
+/** 見出し行全体との完全一致のみ（agentdev-design-file-manager Design「見出し行全体完全一致」準拠）。前方一致は廃止。 */
 export function headingMatchesTarget(headingText: string, targetArea: string): boolean {
   return headingText === targetArea;
 }
 
 /**
  * 複数ファイルに対して target_area を検索し、結果を集約する（純粋関数）。
- * matches が空でもエラーとはしない（design-save 側でスキップ判定）。
+ * matches が空でもエラーとはしない（Design 保存側でスキップ判定）。
  * 複数マッチは呼び出し元で warning 判断の材料とするため、全て返す。
  */
 export function searchTargetArea(
