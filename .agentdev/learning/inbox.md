@@ -67,3 +67,17 @@
 - 内容: bun test フル suite（repo-agentdev-integrity/scripts）は Windows 環境で環境依存 fail を含む。IR-055 / NG21 の checker subprocess は約 5 秒 timeout で JSON Parse EOF（Unexpected EOF）fail が発生し flaky。zod は node_modules 未整備の worktree では依存解決失敗となり、main root では解決する。textlint final gate は case-run で 120 秒 timeout したが、時間制約を 300 秒へ拡張した単独実行（`bun run src/opencode/plugins/agentdev-textlint-guard/gate.ts --root .`）では 507 ファイル・hard violation 0 件で合格。検証失敗時は timeout 拡張・main root 実行での再現確認により環境依存か変更起因かを由来分類してから扱う。trusted-distribution BaseOid の失敗も PR 本文で環境依存として記録済み
 - 関連: Issue #2807（OU-002）、PR #2815 対応記録コメント、既存知識 docs/knowledge/checker-cli-stdout-loss-on-windows-bun.md
 - タグ: `#windows` `#bun` `#integrity-suite` `#textlint` `#timeout` `#flaky`
+
+## 2026-09-14 case 2805 OU-003（PR #2816）: 配布物 prose 内 REQ 行引用は ADF-COVERS 宣言行へ集約する
+
+- 観測元: case 2805 OU-003（DEL-2808-1、PR #2816）本文 learning 候補、case-close 2026-09-14 回収
+- 内容: 配布物の REQ 行引用は prose に書くと IR-055 / 配布依存境界の両 checker で検出される。正規パターンは「行の正確な対応は ADF-COVERS 宣言行（両 checker で免除）に集約し、prose は `REQ-{NNN}` / `DEC-{N}` braced 形式か語で表現する」。新規配布物作成時に最初からこの形式で書くことで検出 → 修正 → 再検証の往復を避けられる
+- 関連: Issue #2808（OU-003）、PR #2816 対応記録コメント
+- タグ: `#distribution` `#ir055` `#concrete-id` `#adf-covers`
+
+## 2026-09-14 case 2805 OU-003（PR #2816）: worktree での bun test 実行に必要な node_modules 事前整備
+
+- 観測元: case 2805 OU-003（DEL-2808-1、PR #2816）本文 learning 候補、case-close 2026-09-14 回収
+- 内容: worktree での bun test は node_modules 未伝播により、`.opencode/` 配下の依存（zod 等）と src 側 import 解決の双方で事前整備が必要。`.opencode/package.json` 取得 + bun install に加え、src/opencode からの解決のため worktree root への node_modules junction 作成が必要だった（整備資産は gitignore 対象、commit 対象外）
+- 関連: Issue #2808（OU-003）、PR #2816 対応記録コメント、既存知識 docs/knowledge/checker-cli-stdout-loss-on-windows-bun.md
+- タグ: `#worktree` `#bun-test` `#node-modules` `#junction`
