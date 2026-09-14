@@ -31,7 +31,7 @@ compaction 後の current STEP 復元、ToDo 使用、compaction 検出の実処
 
 | ファイル | 内容 |
 |---------|------|
-| review-ng.md | レビューNG理由の定義、対応フロー、--review-ngフラグ |
+| review-ng.md | レビューNG理由の定義、対応フロー、レビューNGコメント投稿 |
 | next-command-rules.md | 次コマンド推論ルール、Epic関連推論ルール |
 
 ## See Also

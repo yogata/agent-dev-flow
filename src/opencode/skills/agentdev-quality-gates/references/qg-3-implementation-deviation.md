@@ -140,7 +140,7 @@ QG-3 は乖離の分類と推奨アクションの提示までを責務とし、
 
 ### 乖離タイプ → case-revise フラグ mapping
 
-| 乖離タイプ | case-update コマンド | 説明 |
+| 乖離タイプ | case-revise コマンド | 説明 |
 |---|---|---|
 | `spec-bug` | `/agentdev/case-revise {N} --review-ng` | Definition の修正が必要 |
 | `impl-bug` | `/agentdev/case-revise {N} --comment --review-ng` | 実装の修正が必要（Definition は不変） |

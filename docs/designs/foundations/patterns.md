@@ -180,7 +180,7 @@ Issue/PR/コメント本文にリポジトリ内ファイル、ディレクト�
   未宣言（フィールド自体の欠落）は機械検出の対象であり、正規状態とは扱わない
 - 宣言は Decision 成果物のローカルメタデータであり、TIM の ADF-COVERS 宣言・covers 関係とは
   独立に管理される。agentdev-traceability は本フィールドを消費しない
-- req-save が Decision 作成時に要件doc（draft-data）の関連情報から保存し、
+- Definition 保存内部責務（case-ready / case-revise）が Decision 作成時に要件doc（draft-data）の関連情報から保存し、
   既存 Decision への付与はバックフィル（一括付与）による
 - 本規約は patterns.md が Decision frontmatter 規約を持たない現状の解消を兼ねる
   （共通文書モデル規約の正本としての配置。decision-lifecycle Design は意味境界・関係・粒度・

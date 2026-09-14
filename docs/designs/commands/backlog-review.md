@@ -41,7 +41,7 @@ backlog-review が扱うのは backlog 自体の処置（RU 化、docs/knowledge
 - git commit/push: `.agentdev/` 配下（明示パスステージング、v2:REQ-0137-002/005）
 - 実行前同期: `git pull --ff-only`
 - docs/knowledge/ 知識文書保存: learning 由来の分類結果が docs/knowledge/ への知識文書保存（REQ-056、REQ-039-006）に振り分けられた場合、利用者承認を経て docs/knowledge/ へ直接書き込む。docs/knowledge/ は git 管理対象（ドメイン状態の永続化対象）であり、当該書き込みは git 永続化対象の副作用である
-- REQ ファイル保存: 行わない（req-save 責務）
+- REQ ファイル保存: 行わない（Definition 保存内部責務（case-ready / case-revise）の責務）
 - GitHub Issue 作成: 行わない（case-open 責務）
 
 ## 現在の動作
@@ -92,7 +92,7 @@ agentdev-traceability の coverage, impact, check を一般文書探索、構造
 
 ## 対象外
 
-- REQ ファイル保存（req-save 責務）
+- REQ ファイル保存（Definition 保存内部責務）
 - GitHub Issue 作成（case-open 責務）
 - 採用済み成果物の単純コピー（パススルー）（REQ-008）
 - `.agentdev/intake/inbox/`, `.agentdev/learning/inbox.md`, `.agentdev/learning/deferred.md` の更新
@@ -108,7 +108,7 @@ agentdev-traceability の coverage, impact, check を一般文書探索、構造
 ## tentative_classification と分類根拠伝播
 
 backlog-review は採用済み成果物の分析時に tentative_classification（暫定分類）と分類根拠を RU へ付与して伝播させる（REQ-001-033、REQ-001）。
-分類根拠は learning/intake 成果物から後続工程（req-define、design-save）へ引き継がれる情報であり、本 Design は backlog-review での扱いを規定する。
+分類根拠は learning/intake 成果物から後続工程（req-define、case-ready / case-revise の Design 保存内部責務）へ引き継がれる情報であり、本 Design は backlog-review での扱いを規定する。
 
 ### 伝播させる分類根拠フィールド
 

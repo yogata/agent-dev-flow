@@ -57,7 +57,7 @@ pipeline 各層を構成する 4 成果物の役割、性格、command 間の振
 
 ## 常に守る不変条件
 
-- **無条件の自動REQ化は禁止する**（REQ）。学びは `promoted/` → backlog-review → req-define → req-save の昇華経路を経て初めて REQ 化される
+- **無条件の自動REQ化は禁止する**（REQ）。学びは `promoted/` → backlog-review → req-define → case-open → case-ready の昇華経路を経て初めて REQ 化される
 - **保留プール維持**: 昇華不能な知見（deferred 判定、情報断片、出現回数少）は `deferred.md` で維持し REQ 化しない（REQ）
 - raw learning item を実行時コマンド/ skill の直接参照対象にしない
 - Decision 候補分類の前に `agentdev-decision-guidelines` の除外基準（禁止条件フィルタリングゲート）を必須適用する
@@ -89,7 +89,7 @@ pipeline 各層を構成する 4 成果物の役割、性格、command 間の振
 ## 反映ルート
 
 ```
-promoted/ → /agentdev/backlog-review → /agentdev/req-define → /agentdev/req-save → /agentdev/design-save（Design候補がある場合）→ /agentdev/case-open → /agentdev/case-run
+promoted/ → /agentdev/backlog-review → /agentdev/req-define → /agentdev/case-open → /agentdev/case-ready → /agentdev/case-run
 ```
 
 - 採用済み成果物は `/agentdev/backlog-review` が読み込み、RU 化後に `/agentdev/req-define` の明示入力として扱われる

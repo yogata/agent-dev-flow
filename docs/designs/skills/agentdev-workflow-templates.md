@@ -171,7 +171,7 @@ Issue 本文の対象範囲にローカル版（src/opencode-local 配下等）�
 
 ### presence-based 判定
 
-case-open は新規 Issue 作成時および case-update による新契約更新時に「Execution Contract」
+case-open は新規 Issue 作成時および case-ready / case-revise による新契約更新時に「Execution Contract」
 セクションを必ず付与する。
 case-run は当該セクションの存在有無により新旧 Issue を識別する。
 

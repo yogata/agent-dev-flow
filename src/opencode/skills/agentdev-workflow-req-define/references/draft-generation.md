@@ -116,7 +116,7 @@ work_type（4値）と scale（feature のみ）を確定する。
 STEP-6 の構造化 `draft-data` 形式（`# draft-data` fenced YAML block）で保存する。
 標準データモデル fields を保持する。
 `workflow_route` は派生値として保存しない。
-後続工程の分岐は `artifact_actions` の存在で決定する（`artifact: req`/`adr` → req-save、`artifact: design` → design-save）。
+後続工程の分岐は `artifact_actions` の存在で決定する（`artifact: req`/`adr` → REQ 保存、`artifact: design` → Design 保存。いずれも case-ready / case-revise の Definition 保存内部責務で実行）。
 `summary` 等の人間可読セクションは補助的であり下流処理の正として扱われない。
 
 各副ステップ（実装詳細の分離、auto_gate 完了ゲート、未確定内容の auto_ready 抑止）の詳細、stop_reasons 記録形式、代表 fixture、引用誤検知除外パターンは req-define command Design（extension 経由）「未確定内容の auto_ready 抑止」節、および `agentdev-req-analysis` の req-define detailed gates を参照。
@@ -135,7 +135,7 @@ STEP-6 の構造化 `draft-data` 形式（`# draft-data` fenced YAML block）で
 
 ### Resume-Idempotency
 
-- 同一 topic-slug への再保存は上書きであり冪等。保存済み draft の status は durable state として後続工程（req-save/design-save）が参照する
+- 同一 topic-slug への再保存は上書きであり冪等。保存済み draft の status は durable state として後続工程（Definition 保存内部責務）が参照する
 
 ## STEP-10: 要件doc確認
 
@@ -223,7 +223,7 @@ work_type・scale に応じた種別の完了報告を出力する。
 ## 関連 STEP
 
 - 前: STEP-5（requirement-development.md）、STEP-8（adversarial-review-integration.md）
-- 次: なし（workflow 終了。後続は req-save / design-save / case-open）
+- 次: なし（workflow 終了。後続は case-open。Definition の保存は case-ready / case-revise の内部責務）
 
 ## 関連 Capability Skill
 

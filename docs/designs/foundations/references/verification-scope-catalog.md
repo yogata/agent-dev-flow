@@ -294,7 +294,7 @@ Issue #2362 の移行作業（棚卸し (a')）で全現行要件行を判定し
 
 ### REQ-059（Decision と REQ の関連宣言管理）
 
-- REQ-059-001..REQ-059-004: Decision frontmatter 関連REQ宣言（related_reqs）、Decision 索引関連REQ表の自動生成と整合検査、未宣言検出（IR-061 系 finding 拡張）、req-save での初期保存の実行時振る舞い。Case Issue のテスト戦略とレビューで検証
+- REQ-059-001..REQ-059-004: Decision frontmatter 関連REQ宣言（related_reqs）、Decision 索引関連REQ表の自動生成と整合検査、未宣言検出（IR-061 系 finding 拡張）、Definition 保存（case-ready / case-revise）での初期保存の実行時振る舞い。Case Issue のテスト戦略とレビューで検証
 
 ### REQ-060（bun test 実行形態の統一）
 

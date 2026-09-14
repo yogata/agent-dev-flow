@@ -10,7 +10,7 @@ updated: 2026-08-31
 
 # 品質ゲート
 
-AgentDevFlow 主ワークフロー（req-define → req-save → design-save（Design 候補がある場合）→ case-open → case-run → case-close）に配置される品質ゲート QG-1〜QG-4 を定義する（REQ-010）。
+AgentDevFlow 主ワークフロー（req-define → case-open → case-ready → case-run → case-close）に配置される品質ゲート QG-1〜QG-4 を定義する（REQ-010）。
 各ゲートの判定基準、機械化境界、実装マッピングを示す。
 
 > **リポジトリ内部設計文書**: 本 Design は agent-dev-flow リポジトリの設計文書であり、実行時配布対象ではない（REQ-001）。
@@ -18,15 +18,15 @@ AgentDevFlow 主ワークフロー（req-define → req-save → design-save（D
 
 ## 適用範囲
 
-- **対象**: AgentDevFlow **主ワークフローのみ**。req-define / req-save / case-open / case-run / case-close（および case-auto）を横断する 4 ゲート。
-- **対象外**: inspect-* / intake-* / learning-* / backlog-* / case-update は実行時参照対象ではない。これらの補助ワークフローには QG-1〜QG-4 を適用しない。
+- **対象**: AgentDevFlow **主ワークフローのみ**。req-define / case-open / case-ready / case-run / case-close（および case-auto）を横断する 4 ゲート。
+- **対象外**: inspect-* / intake-* / learning-* / backlog-* は実行時参照対象ではない。これらの補助ワークフローには QG-1〜QG-4 を適用しない。
 - **置換関係**: 本 Design は旧 `agentdev-spec-compliance` スキルの乖離検出機能を QG-3 として再編成したものである。品質メトリクス収集（型チェック/Lint/ビルド/テスト）は各コマンドのローカル検証ステップ（case-run 実行担当サブエージェント委譲内の test-fix ループ等）に委譲する。
 
 ## ゲート一覧
 
 | Gate | 名称 | 配置コマンド | 対象成果物 | 判定結果 |
 |------|------|-------------|-----------|---------|
-| QG-1 | Definition Integrity Gate | req-define / req-save | 要件 doc draft / REQ、Decision ファイル | pass / warn / fail |
+| QG-1 | Definition Integrity Gate | req-define / Definition 保存（case-ready / case-revise） | 要件 doc draft / REQ、Decision ファイル | pass / warn / fail |
 | QG-2 | Acceptance Criteria Coverage Gate | case-open | Issue 本文（完了条件） | pass / warn / fail |
 | QG-3 | Implementation Deviation Gate | case-run | git diff（実装差分） | pass / warn / fail（乖離分類付き） |
 | QG-4 | Final Acceptance Gate | case-close | PR / CI / Issue チェックボックス | pass / fail |
@@ -37,13 +37,13 @@ AgentDevFlow 主ワークフロー（req-define → req-save → design-save（D
 
 ### 目的
 
-要件定義フェーズ（req-define / req-save）で生成される成果物の構造的完全性を担保する。
+要件定義フェーズ（req-define / Definition 保存（case-ready / case-revise））で生成される成果物の構造的完全性を担保する。
 曖昧な要件、測定不能なチェックボックス、分類不適合をフェーズ内で検出する。
 
 ### 配置
 
 - **req-define**: 要件 doc draft 生成時（STEP-4〜5、STEP-10）。REQ/Design 分類、Decision ゲート、チェックボックス測可能性を検証。
-- **req-save**: REQ/Decision ファイル保存時（STEP-4）。保存前の最終構造検証。
+- **Definition 保存内部責務（case-ready / case-revise）**: REQ/Decision ファイル保存時。保存前の最終構造検証。
 
 ### pass / warn / fail 基準
 
@@ -59,14 +59,14 @@ AgentDevFlow 主ワークフロー（req-define → req-save → design-save（D
 
 各 test strategy 項目が verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素を完全に保持することを検証する。
 いずれかが欠落する項目を検出した場合、fail とする。
-この検査は req-define / req-save が適用する。
+この検査は req-define / Definition 保存内部責務（case-ready / case-revise）が適用する。
 
 #### リスク→test strategy 投影完全性検査
 
 REQ-054 の変更誘発境界リスク分析が導出した case-specific risk（変更誘発境界リスク）が test strategy へ投影されていること（change → risk → verification obligation → test strategy の変換経路の完全性）を検証する。
 投影入力源の拡張は [artifact-quality-control-routing Design](../responsibilities/artifact-quality-control-routing.md)「入力源」が定義する。
 新規ゲートは作らず、既存 QG-1 の検査観点の拡張として実施する。
-この検査は req-define / req-save が適用する。
+この検査は req-define / Definition 保存内部責務（case-ready / case-revise）が適用する。
 
 ## QG-2: Acceptance Criteria Coverage Gate
 
@@ -119,7 +119,7 @@ case-run で PR 作成前に、実装が Issue / REQ / Decision / Design / work 
 
 QG-3 は**乖離の分類と推奨アクションの提示**に限定する。
 REQ ファイルの更新判断、更新実行は行わない。
-REQ 更新の最終判断は `case-update` がユーザー承認済み入力をもって行う。
+REQ 更新の最終判断は `case-revise`（ユーザー承認済み入力をもって req-define が再合意）→ `case-ready`（Definition 確定）が行う。
 docs 全体の意味レビューは `/agentdev/inspect-docs` の責務であり、QG-3 の代替ではない。
 
 ### 詳細
@@ -198,16 +198,15 @@ verify-only 根拠欄の記入規則は [case-run.md](../commands/case-run.md)�
 
 | Gate | 配置コマンド | 参照スキル（実行時） | Design |
 |------|-------------|---------------------|------|
-| QG-1 | req-define.md, req-save.md | `agentdev-quality-gates` (qg-1-definition-integrity) | quality-gates.md |
+| QG-1 | req-define.md, case-ready.md, case-revise.md | `agentdev-quality-gates` (qg-1-definition-integrity) | quality-gates.md |
 | QG-2 | case-open.md | `agentdev-quality-gates` (qg-2-acceptance-criteria-coverage) | quality-gates.md |
 | QG-3 | case-run.md | `agentdev-quality-gates` (qg-3-implementation-deviation) | quality-gates.md |
 | QG-4 | case-close.md | `agentdev-quality-gates` (qg-4-final-acceptance) | quality-gates.md |
 | - | case-auto.md | 構成コマンドから QG を継承（再実装しない） | quality-gates.md |
-| - | case-update.md | QG 直接参照なし（review-ng 時は QG-3 結果を引用） | - |
 
 ### case-auto の継承
 
-case-auto は構成コマンド（req-save / case-open / case-run / case-close）から QG を継承し、工程間制御のみを担う（委譲起動・構成コマンド責務変更の各禁止制約）。
+case-auto は構成コマンド（case-open / case-ready / case-run / case-close）から QG を継承し、工程間制御のみを担う（委譲起動・構成コマンド責務変更の各禁止制約）。
 
 ## 関連項目（See Also）
 

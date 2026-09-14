@@ -93,7 +93,7 @@ REQ 記述はステークホルダー視点に従うこと（REQ-001-048）。RE
 
 ### learning/intake 由来変更の変更種別分類
 
-learning/intake 成果物から後続工程（RU、req-define、design-save）へ引き継ぐ変更種別を次の8種別で分類する（REQ-001-033）:
+learning/intake 成果物から後続工程（RU、req-define、case-ready / case-revise の保存内部責務）へ引き継ぐ変更種別を次の8種別で分類する（REQ-001-033）:
 
 | 変更種別 | 内容 | REQ 拡張候補 |
 |---|---|---|
@@ -111,7 +111,7 @@ REQ 拡張を候補とするのは「新しい利用者要求」または「外�
 
 ### 分類根拠の引き継ぎ要件
 
-learning/intake 成果物から後続工程（RU、req-define、design-save）へ引き継ぐ分類根拠を次の8項目とする（REQ-001-033）:
+learning/intake 成果物から後続工程（RU、req-define、case-ready / case-revise の保存内部責務）へ引き継ぐ分類根拠を次の8項目とする（REQ-001-033）:
 
 | 分類根拠 | 内容 |
 |---|---|

@@ -22,7 +22,7 @@ SKILL.md 本文では実観測原則、 trigger、禁止事項、 split rule の
 | **テンプレート逸脱の修正** | テンプレート、仕様からの逸脱を検知、修正した事例 | Issue本文フォーマットのずれ、コミットメッセージ規約違反 |
 | **gh/gitワークアラウンド** | gh CLIやgit操作で標準手順外の対処が必要だった事例 | worktree削除時のforce指定、PR作成時のドラフトフラグ |
 | **リオープン原因** | Issue/PRの再オープンを招いた原因 | レビューNG時の対応漏れ、マージ後のデグレ |
-| **実装エラーによるcase-update** | 実装中のエラーが原因でIssue更新が必要になった事例 | 仕様変更の発生、スコープ変更の必要 |
+| **実装エラーによるIssue更新** | 実装中のエラーが原因でIssue更新が必要になった事例 | 仕様変更の発生、スコープ変更の必要 |
 | **自律回避、自律修正** | エージェントが自ら問題を回避、修正した事例 | 依存関係の事前検知、設定ミスの自動修正 |
 
 ユーザー確認を伴う問題が発生した場合、エージェントは Decision/REQ/spec への影響可能性を記録する（フィールド7参照）。
@@ -139,8 +139,8 @@ SKILL.md 本文では実観測原則、 trigger、禁止事項、 split rule の
 - **ADR/REQ/spec影響**: {REQ-ID} 該当セクションの更新が必要。retired {ADR-ID}（現在は Design で規定済みの内容）の内容についても検討すべき
 - **横展開観点**: REQ作成時は常に既存specs/Decisionとの整合性確認を必須とすべき
 - **再発条件**: 新規REQ作成時に既存ドキュメントとの整合性チェックをスキップする場合
-- **予防策候補**: req-save の実行ステップに specs/Decision 整合性チェックを追加する
-- **想定反映先**: `req-save` コマンド、`agentdev-req-analysis` スキル
+- **予防策候補**: Definition 保存（case-ready / case-revise の Capability Skill 委譲）の実行ステップに specs/Decision 整合性チェックを追加する
+- **想定反映先**: `agentdev-req-file-manager` スキル（Definition 保存内部責務）、`agentdev-req-analysis` スキル
 - **関連**: `docs/requirements/{REQ-ID}.md`, design-principles Design, Issue #{issue_number}
 - **タグ**: `#仕様矛盾` `#REQ更新` `#Decision影響`
 ```

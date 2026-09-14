@@ -201,12 +201,12 @@ candidate 状態の IR は catalog への本エントリ追加を含まず、別
 
 ### check_changed_docs.ts 関連ルールの整理（targeted-docs-guard-implementation.md Phase 1）
 
-check_changed_docs.ts は IR-001〜IR-059 のうち各 workflow profile（req-save/design-save/case-run/case-close）に必要なルールサブセットを適用する。
+check_changed_docs.ts は IR-001〜IR-059 のうち各 workflow profile（case-ready / case-revise（Definition 保存）/ case-run / case-close）に必要なルールサブセットを適用する。
 catalog は IR ルールの正典であり、check_changed_docs.ts の profileFor() が返す rules は catalog IR のサブセット参照である。
 check_integrity.ts は全 IR ルール（full-audit gate_level）を実装する。
 check_changed_docs.ts と check_integrity.ts の二系統で IR ルールを共有し、検出ロジックを重複実装しない。
 
-詳細な IR-*.md の追加・更新内容は後続の design-save / case-run 工程で確定する。
+詳細な IR-*.md の追加・更新内容は後続の Definition 保存 / case-run 工程で確定する。
 check_changed_docs.ts の profile rules と Design 記載項目の対応関係は REQ-010-009（1:1 対応不要、包括カバー許容）に従う。
 
 ### AG-005 規則群（lint_skills.ts、層1〜2記述基準機械検査）
@@ -344,7 +344,7 @@ checkWorkflowStatusProhibition
 
 ### check_changed_docs.ts profile rules と Design 記載項目の対応関係（REQ-010-009）
 
-req-save / design-save / case-close 各 Design が記載する検査項目と、`check_changed_docs.ts` の `profileFor()` が返す `rules`（profile rules）の対応関係は 1:1 を要求しない。
+case-ready / case-revise（Definition 保存）/ case-close 各 Design が記載する検査項目と、`check_changed_docs.ts` の `profileFor()` が返す `rules`（profile rules）の対応関係は 1:1 を要求しない。
 1 つの Design 記載項目に対して専用 profile rule を実装しなくても、既存 rule 群による包括カバーを許容する。
 本方針は今後の Design / rule 追加時の判断基準となる。
 

@@ -133,10 +133,10 @@ REQ単位の関連情報は frontmatter フィールドとして管理せず、�
 
 #### 適用タイミング
 
-| コマンド | タイミング |
+| 主体 | タイミング |
 |----------|-----------|
 | `req-define` | 要件展開の直後、Decision判定の前 |
-| `req-save` | CREATE対象REQの保存前 |
+| Definition 保存内部責務（case-ready / case-revise） | CREATE対象REQの保存前 |
 
 #### 判定基準
 
@@ -150,7 +150,7 @@ REQ単位の関連情報は frontmatter フィールドとして管理せず、�
 
 1. 反映作業のみの候補は、独立した要件行として扱わない
 2. 後続工程への移送候補として振り分ける: 対象REQ/Decision/Design等への UPDATE/APPEND、後続Caseの変更対象
-3. `req-save` での検査: CREATE対象REQの保存前に反映作業のみの要件行が残っていないか検査し、検出時は保存を停止して該当行、判定理由、移送先を報告する
+3. REQ 保存時の検査（Definition 保存内部責務）: CREATE対象REQの保存前に反映作業のみの要件行が残っていないか検査し、検出時は保存を停止して該当行、判定理由、移送先を報告する
 
 ### HOW 除去後の acceptance-criteria 順位検証
 
@@ -159,9 +159,9 @@ REQ単位の関連情報は frontmatter フィールドとして管理せず、�
 
 #### 適用タイミング
 
-| コマンド | タイミング |
+| 主体 | タイミング |
 |----------|-----------|
-| `req-save` | HOW 除去（Design 相当行の Design 候補セクションへの分離）の完了後、保存前 |
+| Definition 保存内部責務（case-ready / case-revise） | HOW 除去（Design 相当行の Design 候補セクションへの分離）の完了後、保存前 |
 
 #### 検証手順
 

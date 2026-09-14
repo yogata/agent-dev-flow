@@ -135,7 +135,7 @@ repo-local command（`/repo/*`）が従来形式の主手順（`### Step N`）�
 
 ### 成果物間の工程ラベル参照形式
 
-- Workflow Skill から command の公開ラベルを参照する際は command 名で修飾する（例: 「req-save command STEP-4」）。command 名なしの裸参照はしない
+- Workflow Skill から command の公開ラベルを参照する際は command 名で修飾する（例: 「case-ready command STEP-4」）。command 名なしの裸参照はしない
 - Capability Skill・Design から Workflow Skill の工程を参照する際は実番号（例: `STEP-S5`）を用いる。相対表現（「第5工程」等）は使用しない
 - 旧 command 番号（`Step N`）形式での参照は新規に書かない。既存参照は AG-023 是正の対象とする
 

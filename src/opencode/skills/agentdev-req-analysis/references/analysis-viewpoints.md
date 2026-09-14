@@ -126,13 +126,13 @@ Given-When-Then形式で記述し、測定可能であること。
 **記述形式**: 主たる文意は肯定文で記述する（肯定文主文の規約に準拠）。
 否定文は境界条件、例外、補足として併記する場合に限る。
 
-**判定タイミング**: req-define/ req-save は保存前に REQ/Design 配置判定を行う。
+**判定タイミング**: req-define は保存前に REQ/Design 配置判定を行う。
 QG-1 の観点 6（REQ/Design 配置判定）がこれを担保する。
 
 **Design 候補の分離経路**: req-define は Design 等に配置すべきと判定した要件行候補を REQ 要件行に残留させず、ドラフト内の `## Design候補` 補助セクションと `draft-meta.spec-candidates`（SC-ID、content、intended_spec、classification、source）に分離する。
 各 Design 候補には想定配置先 Design（既存 Design ファイル名または新規 Design 候補）と分離根拠（Design分離基準の該当種別）を記録する。
 この分離経路により、Design 相当行が REQ ファイルへ混入することを構造的に防止する。
-req-save は REQ ファイル保存時に Design候補セクションを除去し、内容は design-save が `docs/designs/<**/*>.md` へ保存する。
+Definition 保存内部責務は REQ ファイル保存時に Design候補セクションを除去し、内容は Design 保存（case-ready / case-revise の Capability Skill 委譲）が `docs/designs/<**/*>.md` へ保存する。
 
 ## 用語定義
 
@@ -343,4 +343,4 @@ Issue本文のチェックボックスが満たすべき品質条件。
 ### Decision参照
 
 Decisionが必要と判定された場合 → `agentdev-decision-guidelines` スキルを参照する。
-Decision候補記録までを責務とし、Decisionファイル作成は req-save + `agentdev-decision-file-manager` に委譲する。
+Decision候補記録までを責務とし、Decisionファイル作成は Definition 保存内部責務（case-ready / case-revise）+ `agentdev-decision-file-manager` に委譲する。

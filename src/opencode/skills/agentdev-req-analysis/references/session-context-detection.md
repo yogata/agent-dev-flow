@@ -30,8 +30,8 @@
 - 存在する場合: ファイル名の topic-slug とセッションの要件内容の一致を確認
 - トピック不一致 → draft を無視（セッションコンテキスト優先）
 - トピック一致 → draft の `status` 値でルーティング:
- - `saved` → req-save 完了状態。case-open 待ち
- - `draft` → req-save 未実行。req-save 待ち
+ - `saved` → draft 保存済み状態。case-open 待ち
+ - `draft` → draft 未確定。req-define の要件展開継続待ち
 
 ## 推論サマリー表示形式
 

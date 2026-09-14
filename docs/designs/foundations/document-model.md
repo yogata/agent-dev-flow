@@ -245,7 +245,7 @@ frontmatter形式は`patterns.md`が所有する。
 
 | status | 意味 | 通常内容検査 | 遷移契機 |
 |---|---|---|---|
-| `draft` | design-saveで保存された未確定状態 | 境界違反等の確定Design向け検査対象外 | 新規Design保存時 |
+| `draft` | Design 保存（case-ready / case-revise の Capability Skill 委譲）で保存された未確定状態 | 境界違反等の確定Design向け検査対象外 | 新規Design保存時 |
 | `accepted` | 実装との整合確認を通過した現在設計 | 通常の整合性検査対象 | case-closeで確定時 |
 
 - 新規Designは `draft` として作成され、確定時に `accepted` へ遷移する。`accepted` の付与は case-close の責務である
@@ -280,7 +280,7 @@ consumer 境界は producer、direct consumer、orchestration pre-reader、inval
 
 - **consumer 4 集合**: req_draft の consumer 境界は次の 4 集合で確定する（REQ-008-008、REQ-008-036、REQ-034-019）
   - producer: `{req-define}` — req_draft を生成する唯一の command
-  - direct consumer: `{req-save, design-save, case-open}` — req_draft を主入力として消費し、REQ/Decision/Design/Issue を生成する command 群。draft type registry の allowed consumers 列と同一
+  - direct consumer: `{case-open, case-ready, case-revise}` — req_draft を主入力として消費し、REQ/Decision/Design/Issue を生成・確定する command 群。draft type registry の allowed consumers 列と同一
   - orchestration pre-reader: `{case-auto}` — case-open 前だけ req_draft を読み、後続工程の orchestration 入力とする command
   - invalid post-case reader: `{case-auto, case-run, case-close}` — case-open 成功後に req_draft を参照してはならない command 群。case-open 成功後は Issue と Epic を SSoT として単独成立する
 - **緩やかな契約（soft contract）**: API 契約ではなく生成側（producer）の標準。LLM 推論経由で消費され、機械的パースを前提としない（DEC-003）。厳格なスキーマバージョン、JSON Schema、バリデータは導入しない
@@ -347,8 +347,8 @@ accepted Decision は意味的に不変とする（REQ-001-056〜060）。
 
 | 文書種別 | 編集権限 | 承認フロー | 変更主体 |
 |---|---|---|---|
-| REQ | req-define / req-save コマンド経由 | ユーザー承認（req-save） | エージェント（draft 作成）、ユーザー（最終承認） |
-| Decision | req-save / 手動作成 | ユーザー承認 | エージェント（draft 作成）、ユーザー（最終承認） |
+| REQ | req-define 経由 + Definition 保存内部責務（case-ready / case-revise） | ユーザー承認（case-ready） | エージェント（draft 作成）、ユーザー（最終承認） |
+| Decision | Definition 保存内部責務（case-ready / case-revise）/ 手動作成 | ユーザー承認 | エージェント（draft 作成）、ユーザー（最終承認） |
 | Design | 実装に伴う更新 | Design は現在設計の記録のため、実装完了に伴い更新 | エージェント（実装後の Design 更新） |
 | Guide | inspect-docs / 手動更新 | 規範的権限なし。情報正確性の確認のみ | エージェント / ユーザー |
 | Report | 整合性コマンド等の自動生成、または手動作成 | 公開時の事実確認 | エージェント（自動生成）、ユーザー（手動作成） |

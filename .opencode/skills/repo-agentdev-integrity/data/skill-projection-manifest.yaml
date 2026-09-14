@@ -25,7 +25,7 @@
 # （docs/designs/local/third-party-skill-management.md）。
 
 schema_version: 1
-generated_at: 2026-09-04
+generated_at: 2026-09-15
 
 skills:
   - agentdev-adversarial-review
@@ -61,9 +61,8 @@ skills:
   - agentdev-workflow-case-close
   - agentdev-workflow-case-open
   - agentdev-workflow-case-ready
+  - agentdev-workflow-case-revise
   - agentdev-workflow-case-run
-  - agentdev-workflow-case-update
-  - agentdev-workflow-design-save
   - agentdev-workflow-inspect-docs
   - agentdev-workflow-inspect-promote
   - agentdev-workflow-inspect-skills
@@ -75,10 +74,8 @@ skills:
   - agentdev-workflow-lifecycle
   - agentdev-workflow-orchestration
   - agentdev-workflow-req-define
-  - agentdev-workflow-req-save
   - agentdev-workflow-routing
   - agentdev-workflow-templates
   - agentdev-workflow-third-party-sync
 
-third_party_skills:
-  - japanese-tech-writing
+third_party_skills: []

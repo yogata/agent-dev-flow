@@ -24,7 +24,7 @@ PR マージ前の docs 検証、拡張検査、配布依存境界 最終 gate �
 ## Result
 
 - docs/ 検証合格（targeted docs guard、配布依存境界 最終 gate）
-- Design 状態評価（棚卸し制）の全件評価完了（統合後の全候補が 昇格 / design-save 提案 / 見送り のいずれかの評価結果を持つ。0 件の場合は 0 件確認を記録）
+- Design 状態評価（棚卸し制）の全件評価完了（統合後の全候補が 昇格 / Design 保存提案 / 見送り のいずれかの評価結果を持つ。0 件の場合は 0 件確認を記録）
 
 ## Procedure
 
@@ -112,7 +112,7 @@ QG-4 の full integrity suite 合格基準により検証スイート全体（bu
 | 処理パターン | 条件 | アクション |
 |---|---|---|
 | (a) case-close 内で Design 昇格 | 統合後の候補 Design の `status` が `draft`、STEP-3-1「Design 本文と実装の最終矛盾確認」により実装・検証との整合を確認済み | 対象 Design の `status` を `draft` → `accepted` に昇格し、Design 一覧表（Design README）の status 列を同時更新する（編集スコープ: プロジェクトの Design ファイル群） |
-| (b) design-save 再起動の提案 | Design 確定候補が Design ファイル未保存 | `/agentdev/design-save` の再実行を提案し case-close は完了させる |
+| (b) Design 保存提案（case-revise 経由） | Design 確定候補が Design ファイル未保存 | `/agentdev/case-revise` の再実行を提案し（case-ready の Design 保存内部責務で Design ファイルを保存）、case-close は完了させる |
 | (c) 見送り | 整合確認の結果、当該 Case で確定できないと判断 | 見送り理由と再評価契機を対応記録コメントの検証差分へ記録し、Design ファイル本体へ最小限の経緯記録を追記する。Design 本体への追記はライフサイクル経緯の最小記録に限り、設計内容としての未確定事項・将来計画・判断宣告の追記を含まない |
 
 - 見送り（評価実施・確定不可）と未評価（評価未実施）を区別して記録する

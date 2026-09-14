@@ -13,7 +13,7 @@ GitHub Issue の作成、更新、リンク、確認を安全に行うための�
 
 ## 適用対象
 
-- case-open、case-update、case-close、/agentdev/issue での Issue 操作後の VERIFY 手順
+- case-open、case-ready、case-revise、case-close、/agentdev/issue での Issue 操作後の VERIFY 手順
 - Parent/Child リンク確認（`Parent: #{N}` パターン検証）
 - Epic ステータス追跡テーブル更新の安全手順
 - 追跡Issueと Case Issue の関連参照の整合確認
@@ -70,5 +70,6 @@ Case Issue 本文から元追跡Issueへの参照形式は、Epic/child 専用�
 - [agentdev-workflow-templates.md](agentdev-workflow-templates.md)
 - [agentdev-epic-tracker.md](agentdev-epic-tracker.md)
 - [commands/case-open.md](../commands/case-open.md)
-- [commands/case-update.md](../commands/case-update.md)
+- [commands/case-ready.md](../commands/case-ready.md)
+- [commands/case-revise.md](../commands/case-revise.md)
 - [commands/case-close.md](../commands/case-close.md)

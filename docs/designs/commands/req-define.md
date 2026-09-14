@@ -20,7 +20,7 @@ updated: 2026-09-05
 
 - 壁打ち対話そのものが主要 HITL である（要件の深掘り、合意形成をユーザーとの対話で行う、REQ-004）。
 - auto_gate の未解決 item 解消方策は壁打ちで合意する（解消時は `auto_ready: true` へ更新。ユーザーが明示的に false を選択した場合は `conflict_resolutions` に記録して継続する）。
-- 生成した要件doc は提示のみとし、承認は求めない（後続の req-save / case-open へそのまま渡す）。
+- 生成した要件doc は提示のみとし、承認は求めない（後続の case-open へそのまま渡す）。Definition の保存は case-ready / case-revise の内部責務で実行する
 
 ## 入力
 
@@ -28,7 +28,7 @@ updated: 2026-09-05
 - GitHub Issue URL（既存Issueの場合）
 - エラーログ（バグ修正の場合）
 - ユーザーが明示した入力ファイル: 設計メモ、調査メモ、RU（`.agentdev/backlog/req-units/RU-*.md`）。全て参照専用入力
-- req-save SPLIT 検出時の検出事項（`.agentdev/drafts/requirements-review-finding-{topic-slug}.md`）
+- Definition 保存（case-ready / case-revise の内部責務）の SPLIT 検出時の検出事項（`.agentdev/drafts/requirements-review-finding-{topic-slug}.md`）
 - inspect-skills 診断結果の検出事項（`.agentdev/inspect/inbox/inspect-skills-finding-{topic-slug}.md`）。参照専用入力
 - promoted 直読み禁止: `.agentdev/intake/promoted/`、`.agentdev/learning/promoted/` は直接読み込まない
 
@@ -129,8 +129,8 @@ req-define は次の7項目を判定し、`artifact_actions`、`operation_units`
 ### Design action への分類根拠出力
 
 最終分類確定ステップで `artifact: design` の Design action 各 entry へ `canonical_owner` を最終分類確定値として出力する。
-出力値は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールド一覧（`canonical_owner`）と一致し、後続の design-save が配置一貫性検証を実行するための入力となる。
-分類値が確定できない場合は `unknown` とし、soft-contract（DEC-003）に従い design-save へ警告付きで引き継ぐ。
+出力値は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールド一覧（`canonical_owner`）と一致し、後続の Design 保存内部責務（case-ready / case-revise）が配置一貫性検証を実行するための入力となる。
+分類値が確定できない場合は `unknown` とし、soft-contract（DEC-003）に従い Design 保存内部責務へ警告付きで引き継ぐ。
 
 ### REQ 影響なし時の取扱い
 
@@ -249,14 +249,14 @@ req-define は既存 Design ファイルへ新規セクションを追加する�
 | `placement` | 任意（省略時 `tail`） | `tail` / `after_anchor` / `before_anchor` のいずれか |
 | `anchor` | `placement` が `tail` 以外は必須 | 挿入位置の基準となる見出し行（`target_area` と同一形式） |
 
-`placement` 別の追加位置、`anchor` マッチング規則、anchor 未検出時の挙動、同名見出し時の挙動、合格基準は [artifact-contracts.md](../responsibilities/artifact-contracts.md)「append operation」および [design-save.md](design-save.md)「append 操作時のセクション追加ロジック」が正規所有する。
+`placement` 別の追加位置、`anchor` マッチング規則、anchor 未検出時の挙動、同名見出し時の挙動、合格基準は [artifact-contracts.md](../responsibilities/artifact-contracts.md)「append operation」および [agentdev-design-file-manager.md](../skills/agentdev-design-file-manager.md)「APPEND 操作」節が正規所有する。
 req-define 側は入力フィールドの選択と値の生成のみを規定し、配置実行の詳細は規定しない。
 
 ### 新規セクション追加と target_area 誤記の機械的区別
 
 `append` を用いることで、意図的な新規セクション追加と `target_area` の誤字・古い見出し名・参照先間違いを機械的に区別できる。
 
-- `update`: 既存セクションを置換する意図。`target_area` に一致する見出しが存在しない場合、consumer（design-save）は未検出として follow-up 報告を行う。`target_area` の誤字、古い見出し名、参照先間違いはこの経路で検出される
+- `update`: 既存セクションを置換する意図。`target_area` に一致する見出しが存在しない場合、consumer（Design 保存内部責務）は未検出として follow-up 報告を行う。`target_area` の誤字、古い見出し名、参照先間違いはこの経路で検出される
 - `append`: 新規セクションを追加する意図。`target_area` は追加する新規セクションの見出しを示し、既存見出しとの一致を前提としない。配置位置は `placement` と `anchor` で指示する
 
 両者を operation で明示することで、consumer 側は `target_area` が既存見出しと一致しない事象を「置換対象の誤記」と「新規セクション追加の意図」で区別して処理できる。
@@ -275,12 +275,12 @@ Design operation の公式 enum は `create` / `append` / `update` の3値であ
 
 | operation | target_area | content |
 |-----------|-------------|---------|
-| create | 任意（省略時は design-save が既存セクション構造から追加位置を判断） | 新規セクション本文 |
+| create | 任意（省略時は Design 保存内部責務が既存セクション構造から追加位置を判断） | 新規セクション本文 |
 | append | 必須（anchor 見出し、Markdown 見出し行形式。例: `### IR-044`）。anchor 末尾への追加を示す `placement: tail`（既定）、anchor 直後を示す `placement: after_anchor`、anchor 直前を示す `placement: before_anchor` を action へ併せて出力できる（省略時は `tail`） | 追記する新規セクション本文（見出し行を含む） |
 | update | 必須（対象セクション見出し、Markdown 見出し行形式。例: `### IR-044`） | 変更後セクション全文（対象セクションの見出し行から次の同レベル見出しの直前までの全内容） |
 
 req-define 側は出力形式のみを規定する。
-`target_area` の形式（Markdown 見出し行）、見出し階層の解釈規則、複数マッチ、未検出時の挙動、`append` の placement 別挙動は [design-save.md](design-save.md) 側に配置する。
+`target_area` の形式（Markdown 見出し行）、見出し階層の解釈規則、複数マッチ、未検出時の挙動、`append` の placement 別挙動は [artifact-contracts.md](../responsibilities/artifact-contracts.md)「append operation」と [agentdev-design-file-manager.md](../skills/agentdev-design-file-manager.md)「APPEND 操作」節側に配置する。
 
 ## review_dispositions の producer 契約
 
@@ -375,7 +375,7 @@ case-open が default branch 最新化後に evidence の path/section を再確
 ### 後方互換性
 
 `review_dispositions` は optional な soft-contract である。
-本フィールドを持たない旧ドラフトを req-save、case-open は入力として拒否しない（DEC-003 準拠）。
+本フィールドを持たない旧ドラフトを Definition 保存内部責務（case-ready / case-revise）、case-open は入力として拒否しない（DEC-003 準拠）。
 
 ## 未確定内容の auto_ready 抑止（REQ-008-059）
 
@@ -506,9 +506,9 @@ req-define は、既存の明示的な対応関係（`agentdev-traceability` の
 
 ## See Also
 
-- [req-save.md](req-save.md)（後続コマンド（REQ/Decision 保存））
-- [design-save.md](design-save.md)（後続コマンド（Design 保存））
 - [case-open.md](case-open.md)（後続コマンド（Issue 作成））
+- [case-ready.md](case-ready.md)（後続コマンド（Definition 確定、REQ/Decision/Design 保存の内部責務実行））
+- [case-revise.md](case-revise.md)（例外経路コマンド（再合意済み Definition 変更の反映））
 - `agentdev-workflow-req-define` skill（workflow 実装本体（STEP 構成、resume protocol））
 - `agentdev-req-analysis` skill（要件分析手法）
 - `agentdev-req-file-manager` skill（REQ ファイル管理、照合）

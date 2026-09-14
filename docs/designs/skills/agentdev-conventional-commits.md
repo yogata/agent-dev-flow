@@ -14,7 +14,7 @@ Conventional Commits v1.0.0 仕様に従ってコミットメッセージを生�
 ## 適用対象
 
 - コミット作成、メッセージ記述、履歴整形
-- req-save、design-save、case-open、case-close、case-auto、intake-*、learning-promote、backlog-review、inspect-* の各コマンドでの commit 時
+- case-open、case-ready、case-revise、case-close、case-auto、intake-*、learning-promote、backlog-review、inspect-* の各コマンドでの commit 時
 
 ## 提供する判断、操作
 
@@ -51,7 +51,7 @@ Conventional Commits v1.0.0 仕様に従ってコミットメッセージを生�
 ## See Also
 
 - [agentdev-git-worktree.md](agentdev-git-worktree.md)
-- [commands/req-save.md](../commands/req-save.md)
-- [commands/design-save.md](../commands/design-save.md)
+- [commands/case-ready.md](../commands/case-ready.md)
+- [commands/case-revise.md](../commands/case-revise.md)
 
 

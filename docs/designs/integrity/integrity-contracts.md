@@ -137,11 +137,10 @@ check_changed_docs.ts は以下の挙動Design 契約に従う: entry（引数�
 | Command | 許可変更 | 禁止 |
 |---|---|---|
 | `req-define` | `.agentdev/drafts/req-draft-*.md` の生成（対話セッションで合意形成し、原本文書は変更しない） | 原本文書（`docs/`、`.opencode/`）の変更、Issue/PR 作成、更新、commit/push |
-| `req-save` | `docs/requirements/`, `docs/decisions/`, `.agentdev/intake/inbox/req-restructure/`（REQ 再構成 intake のみ） | `.agentdev/`（req-restructure 除く）, `.opencode/` |
+| `case-ready` / `case-revise`（Definition 保存の内部責務、Capability Skill 委譲） | `docs/requirements/`, `docs/decisions/`, `docs/designs/`, `.agentdev/intake/inbox/req-restructure/`（REQ 再構成 intake のみ） | `.agentdev/`（req-restructure 除く）, `.opencode/` |
 | `case-open` | GitHub Issue/PR のみ | ローカルファイル |
 | `case-run` | worktree 内の全ファイル | worktree 外、`.agentdev/` |
 | `case-close` | GitHub Issue/PR, worktree 削除 | `.agentdev/intake/inbox/` 直接書込 |
-| `case-update` | GitHub Issue のみ | ローカルファイル |
 | `docs-check` | `.agentdev/integrity/reports/`, `.agentdev/intake/inbox/`（実行時。実行自体を承認として扱い、追加のユーザー承認は不要。REQ-001-059） | 検査対象アーティファクト |
 
 > **注記**: `docs-check` は `/repo/docs-check` として実行される配布対象外コマンドである（REQ-001）。
@@ -268,7 +267,7 @@ DEC-001 決定4 の7条件:
 
 新規 IR 登録時に `integrity-rule-catalog.md`「新規カテゴリ追加判定フロー（REQ-010-005）」へ従い gate を実施する。
 catalog エントリ追加前に (a) を、blocking IR の場合は (b) も確認する。
-gate 不合格の場合は新規 IR 登録を取り下げ、retired REQ-028-013「IR 件数削減数で評価しない」に従い別途 backlog → RU → req-define → req-save 経路で提起する。
+gate 不合格の場合は新規 IR 登録を取り下げ、retired REQ-028-013「IR 件数削減数で評価しない」に従い別途 backlog → RU → req-define → case-open → case-ready 経路で提起する。
 
 ## 一時移行検査 registry（retired REQ-028-006 から移管）
 
@@ -286,7 +285,7 @@ gate 不合格の場合は新規 IR 登録を取り下げ、retired REQ-028-013�
 
 継続的再発防止価値がある場合のみ恒久 IR へ昇格する。
 昇格時は新規 IR 登録 gate（前述）を適用する。
-retired REQ-028-006 の詳細運用は別途 design-save 工程で確定する。
+retired REQ-028-006 の詳細運用は別途 Definition 保存（case-ready / case-revise の Design 保存内部責務）工程で確定する。
 
 ### IR-057 適用（REQ-028-006 移行判断、Phase 3 §7.2 判定）
 
@@ -496,12 +495,11 @@ docs-check 項目役割範囲（バックエンド対象 vs skill 定義対象�
 ## Workflow × 使用ツールマトリックス
 
 本セクションは全 workflow の使用検査ツールを肯定表現で一元管理する SSoT であり、各 workflow Design から参照される。
-req-save/design-save/case-run/case-close の各コマンドは対象ファイル種別に応じた最小監査範囲を定義し、case-run/case-close は永続文書更新を契機に検査する。
+case-ready/case-revise（Definition 保存の内部責務）/case-run/case-close の各コマンドは対象ファイル種別に応じた最小監査範囲を定義し、case-run/case-close は永続文書更新を契機に検査する。
 
 | workflow | check_changed_docs.ts | check_extensions.ts | check_integrity.ts | test_strategy |
 |---|---|---|---|---|
-| req-save | ✓（REQ files） | — | — | — |
-| design-save | ✓（Design files） | — | — | — |
+| case-ready / case-revise | ✓（REQ/Decision/Design files） | — | — | — |
 | case-open | — | — | — | — |
 | case-run | ✓（docs/** 変更時、--workflow case-run） | ✓（src/opencode/{commands,skills}/** 変更時、IR-056） | — | ✓（Issue 完了条件検証） |
 | case-close | ✓（PR files、--workflow case-close） | ✓（src/opencode/{commands,skills}/** 変更時、IR-056） | — | ✓（QG-4 完了条件確認） |
@@ -513,9 +511,9 @@ check_integrity.ts 列は req-define と /repo/docs-check のみ ✓ とし、�
 
 参照元 workflow Design 一覧（各 Design から本マトリックス表を参照）:
 
-- [commands/req-save.md](../commands/req-save.md)
-- [commands/design-save.md](../commands/design-save.md)
 - [commands/case-open.md](../commands/case-open.md)
+- [commands/case-ready.md](../commands/case-ready.md)
+- [commands/case-revise.md](../commands/case-revise.md)
 - [commands/case-run.md](../commands/case-run.md)
 - [commands/case-close.md](../commands/case-close.md)
 

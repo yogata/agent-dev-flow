@@ -78,7 +78,7 @@ manager-orchestrator（既存の実装分類を利用する）
 
 - 子ワークフロー内部の分類基準、評価基準、昇格基準、RU 生成ロジック（各子 Workflow Skill の責務）
 - 既存5コマンドの廃止、置換、単独実行契約の変更
-- capture 系コマンド（learning-capture、intake-capture、intake-from-github）、inspect-skills、req-define、req-save、GitHub Issue / PR 作成の自動起動
+- capture 系コマンド（learning-capture、intake-capture、intake-from-github）、inspect-skills、req-define、GitHub Issue / PR 作成の自動起動
 
 ## 検証観点
 

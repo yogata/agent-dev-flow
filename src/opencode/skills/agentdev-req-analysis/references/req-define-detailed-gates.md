@@ -150,14 +150,14 @@ Step 1 で 2 件以上の RU が検出または指定された場合、全ての
 単一の壁打ちセッションで複数 RU を一括処理対象とする。
 
 入力 RU 群は統合または分離を判定する。
-同一トピック、同一対象 REQ、同一理由の場合は 1 つの req-save 操作に統合する。
-いずれかが異なる場合は個別の req-save 操作に分離する。
+同一トピック、同一対象 REQ、同一理由の場合は 1 つの Definition 保存操作に統合する。
+いずれかが異なる場合は個別の Definition 保存操作に分離する。
 判定結果は draft-meta に記録する。
 
-統合または分離後の各操作単位について、対象 artifact（REQ/ Design）、操作種別、要件候補一覧、依存関係を req-save/ design-save が消費可能な形式で出力し、ドラフト内に保持する。操作種別は対象 artifact により2系統とする:
+統合または分離後の各操作単位について、対象 artifact（REQ/ Design）、操作種別、要件候補一覧、依存関係を Definition 保存内部責務（case-ready / case-revise の Capability Skill 委譲）が消費可能な形式で出力し、ドラフト内に保持する。操作種別は対象 artifact により2系統とする:
 
-- **REQ 操作**（`target_req` フィールド指定）: `create`/ `append`/ `update`。req-save が消費
-- **Design 操作**（`target_design` フィールド指定）: `create` / `append` / `update`。design-save が消費
+- **REQ 操作**（`target_req` フィールド指定）: `create`/ `append`/ `update`。REQ 保存が消費
+- **Design 操作**（`target_design` フィールド指定）: `create` / `append` / `update`。Design 保存が消費
 
 両系統は後方互換性のため既存の `create`/ `append`/ `update` を維持する。
 Design 候補（STEP-4 で分離した `draft-meta.spec-candidates`）が存在する場合、対応する Design 操作 OU を生成し `target_design` に想定配置先 Design パスを設定する。

@@ -6,7 +6,7 @@
 
 | status | 意味 | 遷移契機 |
 |--------|------|----------|
-| `draft` | design-save で保存された直後の状態。境界違反検査の対象外 | design-save が新規 Design 作成時に付与（既定値） |
+| `draft` | Design 保存で保存された直後の状態。境界違反検査の対象外 | Design 保存（case-ready / case-revise の Capability Skill 委譲）が新規 Design 作成時に付与（既定値） |
 | `accepted` | case-close で Design 状態評価（棚卸し制）を通過した状態。すべての integrity rule の検査対象 | case-close STEP-3 の Design 状態評価（棚卸し制）で実装・検証との整合確認を通過時 |
 
 `status` 欠落は後方互換のため `accepted` 相当として扱う。
@@ -45,7 +45,7 @@ frontmatter 完全性（4フィールド）:
 
 登録内容:
 - Design パス（相対リンク）
-- `status`: `draft`（design-save 新規作成時）
+- `status`: `draft`（Design 保存の新規作成時）
 - タイトル
 - 責務の概要
 
