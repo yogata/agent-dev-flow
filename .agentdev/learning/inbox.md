@@ -123,3 +123,17 @@
 - 内容: 初回 delegation turn は実装・検証の要約を返したが、契約上必要な commit と PR を作成せず、completed-pr / blocked / failed の4状態結果も返さなかった。adapter contract の完了判定が未達のまま後続工程へ進めない状態になり、再開セッションで残りの検証・10コミット・PR作成まで完了した。delegated task の最終ゲートとして、commit hash・PR URL・4-state result の3点を必須検査し、不足時は要約で終了せず再開する guard が有効
 - 関連: Issue #2811（OU-006）、PR #2819 対応記録、同 inbox の「background task 起動の連続消失と同期実行への切替」。統合判断は learning-promote が行う
 - タグ: `#delegation` `#adapter-contract` `#four-state` `#guard`
+
+## 2026-09-15 case 2805 OU-006（PR #2820）: worktree 内並行書き込みの検知と明示パス・ステージ確認の対処
+
+- 観測元: case 2805 OU-006（DEL-2811-2、PR #2820）本文 learning 候補、case-close 2026-09-15 回収
+- 内容: 作業中に git status の差分監視で別主体とみられる書き込み（routing references・learning 関連・docs/designs 多数ファイル）を検知した。対処として (1) in-scope ファイルのみ明示パス指定でステージ、(2) ステージ後の `git diff --stat <scope>` が空であることの確認、(3) コミットはステージスナップショットに対して実行、により PR への混入を防止できた。worktree は 1 writer 前提であり、並行書き込み検知時の早期断念基準（in-scope ファイルへの書き込み検知時は直ちに停止等）を adapter protocol 側で明文化すると再発防止になる
+- 関連: Issue #2811（OU-006）、PR #2820 対応記録
+- タグ: `#worktree` `#parallel-write` `#staging` `#adapter-protocol`
+
+## 2026-09-15 case 2805 OU-006（PR #2820）: squash merge 済み分支の再利用は fast-forward 不能になる
+
+- 観測元: case 2805 OU-006（DEL-2811-2、PR #2820）本文 learning 候補、case-close 2026-09-15 回収
+- 内容: squash merge 済み分支（前回 PR #2819 の feature/issue-2811）を再利用する委譲では、remote 分支に squash 前コミット 11 件が残留し、main 由来の新 commit を fast-forward push できない。force-push 回避のため新分支（feature/issue-2811-2、base main 46d723a1）から PR を作成した。case-run の worktree/分支準備時に remote 分支の fast-forward 可否確認、または squash merge 後の分支削除運用により防止できる
+- 関連: Issue #2811（OU-006）、PR #2820 対応記録
+- タグ: `#squash-merge` `#branch` `#case-run` `#worktree`
