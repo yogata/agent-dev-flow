@@ -60,6 +60,7 @@ skills:
   - agentdev-workflow-case-auto
   - agentdev-workflow-case-close
   - agentdev-workflow-case-open
+  - agentdev-workflow-case-ready
   - agentdev-workflow-case-run
   - agentdev-workflow-case-update
   - agentdev-workflow-design-save

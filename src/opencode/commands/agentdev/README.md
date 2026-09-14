@@ -16,7 +16,8 @@ req-save / design-save の要否は req_draft の `artifact_actions` 存在で�
 | `/agentdev/req-define` | セッション会話/ RU | 要件doc（draft） | `/agentdev/req-save`（REQ/Decision 対象 artifact_actions がある場合）/ `/agentdev/case-open` |
 | `/agentdev/req-save` | 要件doc（REQ/Decision 対象 artifact_actions がある場合） | REQ/Decision ファイル | `/agentdev/design-save`（Design 対象 artifact_actions がある場合）/ `/agentdev/case-open` |
 | `/agentdev/design-save` | 要件doc（Design 対象 artifact_actions がある場合） | Design ファイル | `/agentdev/case-open` |
-| `/agentdev/case-open` | REQ ファイル/ 要件doc | GitHub Issue | `/agentdev/case-run` |
+| `/agentdev/case-open` | REQ ファイル/ 要件doc | GitHub Issue | `/agentdev/case-ready` |
+| `/agentdev/case-ready` | Root Case Issue | ready 状態の Root Case + 実行構造 | `/agentdev/case-run` |
 | `/agentdev/case-run` | Issue | 実装済みブランチ + PR | レビュー後: `/agentdev/case-close` |
 | `/agentdev/case-update` | Issue | 更新済み Issue | 継続または `/agentdev/case-close` |
 | `/agentdev/case-close` | PR + Issue | マージ済み + クローズ済み | 完了 |
@@ -39,6 +40,7 @@ req-save / design-save の要否は req_draft の `artifact_actions` 存在で�
 - [req-save.md](./req-save.md)
 - [design-save.md](./design-save.md)
 - [case-open.md](./case-open.md)
+- [case-ready.md](./case-ready.md)
 - [case-run.md](./case-run.md)
 - [case-update.md](./case-update.md)
 - [case-close.md](./case-close.md)
