@@ -3,10 +3,13 @@ name: agentdev-workflow-req-define
 description: "req-define command の workflow 実装本体。セッションコンテキスト検知・入力解決から壁打ち対話、既存REQ照合、要件展開、Decision判断、要件doc（draft-data）生成、work_type・Scale 判定、adversarial-review、ドラフト保存、要件doc確認、完了報告までの対話型 workflow 制御を所有する。USE FOR: req-define 実行時の workflow 制御（対話開始・HITL・blocked・resume・draft 生成）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
+<!-- ADF-COVERS(implementation): REQ-005-029 -->
+
 # req-define workflow スキル
 
 req-define command の workflow 実装本体である。
 機能追加またはバグ修正の要件を整理・定義する壁打ち workflow の制御構造を所有する。
+主フロー req-define → case-open → case-ready → case-run → case-close の起点であり、Case 確立後の Definition 変更は本 workflow での再合意を例外経路（case-revise → case-ready）の起点とする。
 対話（HITL）と永続状態（要件doc draft、RU）の分離を維持し、中断・再開できるようにする。
 
 req-define command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
@@ -16,11 +19,12 @@ req-define command は公開 interface（入出力契約・ガードレール）
 - ユーザーの自然言語による機能追加/バグ修正の説明
 - GitHub Issue URL（既存Issueの場合）、エラーログ（バグ修正の場合）
 - ユーザーが明示した入力ファイル（設計メモ、調査メモ、RU `.agentdev/backlog/req-units/RU-*.md` 等、参照専用）
-- req-save SPLIT 検出時の検出事項、inspect-skills 診断結果の検出事項
+- Definition 保存内部責務の SPLIT 検出時の検出事項、inspect-skills 診断結果の検出事項
 
 ## 出力
 
 - `.agentdev/drafts/req-draft-{topic-slug}.md`（全 work_type 共通、構造化 `draft-data` 形式）
+- draft の direct consumer 集合は {case-open, case-ready, case-revise} である。主フローでは case-open が消費し、Definition 実変更を伴う例外経路では case-revise が消費して case-ready へ進む
 
 ## 副作用
 

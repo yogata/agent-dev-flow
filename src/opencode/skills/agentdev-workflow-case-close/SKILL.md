@@ -6,12 +6,14 @@ description: "case-close command の workflow 実装本体。PR マージ（squa
 <!-- ADF-COVERS(implementation): REQ-057-017 -->
 <!-- ADF-COVERS(implementation): REQ-032-024, REQ-032-025, REQ-032-026 -->
 <!-- ADF-COVERS(implementation): REQ-032-027 -->
+<!-- ADF-COVERS(implementation): REQ-006-112, REQ-006-114 -->
 
 # case-close workflow スキル
 
 case-close command の workflow 実装本体である。
 PR マージから Issue クローズ、Capture 回収、ドメイン状態永続化、完了報告までの制御構造、QG-4 最終完了判定ゲート（完了条件チェックボックス評価・更新）、Design 状態評価（棚卸し制、draft → accepted 昇格）、Epic Wave クローズ（E1〜E6、単一書き手）を所有する。
 squash merge 先は main とし、同期時のリスク事前検出を行う。
+Case 状態モデルでは review から closed への遷移を担い、停止時は blocked へ遷移して resume_command（case-close）を記録する。再開時は resume_command に従い review へ復帰してから未完了 STEP を続行する。
 
 case-close command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 
@@ -68,6 +70,7 @@ gate 違反時は両ルートとも PR マージを停止する。
 
 - 再開点は永続状態から再構成する: Issue 本文の完了条件チェックボックス状態、PR の mergeable/マージ済み状態、HEAD commit hash、Design `status` frontmatter、worktree・ブランチの存在、Capture 回収済みファイルの存在
 - 各 STEP の再実行はべき等であり、マージ済み PR への再マージ、更新済みチェックボックスの再評価を発生させない
+- 停止終了時は Case を blocked へ遷移させ、resume_command（case-close）を記録する。再開時は resume_command に従い review へ復帰してから未完了 STEP を続行する。review または closed へ遷移した時点で resume_command をクリアする。closed は終端状態であり、blocked から closed への直接遷移は行わない（review を経由する）
 
 ### 終了条件（termination）
 

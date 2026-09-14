@@ -5,7 +5,8 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 # 要件定義
 
 機能追加またはバグ修正の要件を整理、定義する。
-壁打ちフェーズで使用。
+壁打ちフェーズ（Case 確立前）で使用し、主フロー req-define → case-open → case-ready → case-run → case-close の起点となる。
+Case 確立後の Definition 変更も本コマンドで再合意し、実変更がある場合は例外経路 case-revise → case-ready へ進む。
 
 **draft-data 入力・出力**: 本コマンドは構造化 `draft-data`（`# draft-data` fenced YAML block）を扱う。
 対話の進行は永続状態（durable state。入力ファイル、draft 下書き、`status` frontmatter）から再構成され、会話コンテキストのみを再開の根拠（resume source）としない。
@@ -16,13 +17,14 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 - GitHub Issue URL（既存Issueの場合）
 - エラーログ（バグ修正の場合）
 - **ユーザーが明示した入力ファイル**: 設計メモ、調査メモ、RU（`.agentdev/backlog/req-units/RU-*.md`）等。全て参照専用入力
-- req-save SPLIT 検出時の検出事項（`.agentdev/drafts/requirements-review-finding-{topic-slug}.md`）
+- Definition 保存内部責務の SPLIT 検出時の検出事項（`.agentdev/drafts/requirements-review-finding-{topic-slug}.md`）
 - inspect-skills 診断結果の検出事項（`.agentdev/inspect/inbox/inspect-skills-finding-{topic-slug}.md`）。参照専用入力として扱い、未確認事項・採否未確定事項は要件本文と分離する（inspect ライフサイクルに従う）
 - **promoted の参照経路**: `.agentdev/intake/promoted/` 及び `.agentdev/learning/promoted/` は backlog-review による RU 化を経由して参照する
 
 ## 出力
 
 - `.agentdev/drafts/req-draft-{topic-slug}.md`（全 work_type 共通、構造化 `draft-data` 形式）
+- draft の direct consumer 集合は {case-open, case-ready, case-revise} である
 
 ## workflow
 
