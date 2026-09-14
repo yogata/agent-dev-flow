@@ -304,24 +304,8 @@ describe("段階ゲートの工程契約文言（3 Workflow Skill）", () => {
   }
 
   it.each([
-    {
-      file: "src/opencode/skills/agentdev-workflow-req-save/SKILL.md",
-      phrases: [
-        "未分類（検証対応宣言が存在せず、検証対応要否カタログにも未登録）",
-        "未分類行の存在だけを理由として保存を失敗させない",
-      ],
-    },
-    {
-      file: "src/opencode/skills/agentdev-workflow-req-save/references/precheck-and-req-ops.md",
-      phrases: [
-        "検証対応要否の未分類検出・記録（段階ゲート）",
-        "の findings を未分類行として採用",
-      ],
-    },
-    {
-      file: "src/opencode/skills/agentdev-workflow-req-save/references/indexes-and-persistence.md",
-      phrases: ["未分類行の記録（段階ゲート）"],
-    },
+    // req-save 系（SKILL、references、Design）は Issue #2810（DEC-029）で廃止済みのため検査対象から除去した。
+    // 未分類検出・記録（段階ゲート）の割り当て先再設定は REQ-021 側の更新（後続工程）で対応する。
     {
       file: "src/opencode/skills/agentdev-workflow-case-open/SKILL.md",
       // REQ-030 縮小後: case-open は未分類行が残っても Root Case 確立を妨げない（REQ-021-024）。
@@ -341,10 +325,6 @@ describe("段階ゲートの工程契約文言（3 Workflow Skill）", () => {
         "完了として扱わない",
         "検証対応必須行に恒久検証対応が存在しない場合",
       ],
-    },
-    {
-      file: "docs/designs/commands/req-save.md",
-      phrases: [implDeclComment("REQ-021-012, REQ-021-023")],
     },
     {
       file: "docs/designs/commands/case-open.md",

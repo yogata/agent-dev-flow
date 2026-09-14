@@ -27,8 +27,7 @@ agentdev系コマンドで使用するIssue/PR本文、コメントテンプレ�
 |---|---|---|---|
 | `issue_comment_bug_analysis.md` | バグ分析結果 | case-open | Issue作成後コメント (バグ修正、軽微変更/リファクタリング、保守作業/ドキュメント、雑務) |
 | `issue_comment_feature_technical.md` | 技術検討結果 | case-open | Issue作成後コメント (機能追加) |
-| `issue_comment_update.md` | 進捗更新 | case-update | Issue更新時コメント |
-| `issue_comment_review_ng.md` | レビューNG記録 | case-update | レビューNG時コメント |
+| `issue_comment_review_ng.md` | レビューNG記録 | - | レビューNG時コメント |
 | `issue_comment_feature_implementation.md` | 実装記録 | case-close | PRマージ後コメント (機能追加) |
 | `issue_comment_bug_record.md` | 対応記録 | case-close | PRマージ後コメント (バグ修正、軽微変更/リファクタリング、保守作業/ドキュメント、雑務) |
 
@@ -47,6 +46,13 @@ agentdev系コマンドで使用するIssue/PR本文、コメントテンプレ�
 |---|---|---|---|
 | `templates/case-ready/root-case.md` | Root Case Issue 本文（execution contract 確定と ready 遷移で更新する構造） | case-ready | 全 Case |
 | `templates/case-ready/root-case-report.md` | Root Case 完了報告 | case-ready | 全 Case |
+
+### case-revise テンプレート
+
+| テンプレート | 用途 | 対象コマンド | 適用対象 |
+|---|---|---|---|
+| `templates/case-revise/amendment-pr.md` | Definition Amendment PR 本文（実変更がある場合のみ作成） | case-revise | 実変更がある Case |
+| `templates/case-revise/root-case-report.md` | Root Case 完了報告 | case-revise | 全 Case |
 
 ### PR本文テンプレート
 
@@ -79,6 +85,7 @@ Issue 本文テンプレートと PR 本文テンプレートに、ADF 実行の
 |---|---|
 | `templates/case-open/root-case.md` | 対象 Case（Root Case 自身）、実行単位（case-ready で確定。取得不能時は N/A） |
 | `templates/case-ready/root-case.md` | 対象 Case、実行単位（case-ready が確定した値） |
+| `templates/case-revise/amendment-pr.md` | 対象 Case、実行単位 |
 | `issue_desc_feature.md` | 対象 Case、実行単位 |
 | `issue_desc_bug.md` | 対象 Case、実行単位 |
 | `issue_desc_epic.md` | 対象 Case、実行単位 |

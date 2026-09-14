@@ -15,21 +15,20 @@ function read(rel: string): string {
   return readFileSync(join(REPO_ROOT, rel), "utf-8");
 }
 
-/** Issue #2361 の対象範囲（Design 10件 + req-save Design + Workflow Skill 10件 + extension 6件） */
+/** Issue #2361 の対象範囲（Design + Workflow Skill + extension）。
+ * req-save / design-save 系（Design、Workflow Skill、extension）は Issue #2810（DEC-029）で廃止済みのため検査対象から除去した。
+ * REQ-021-012/013/020 の割り当て先再設定は REQ-021 側の更新（後続工程）で対応する。 */
 const SWITCH_TARGET_FILES: readonly string[] = [
   "docs/designs/commands/req-define.md",
-  "docs/designs/commands/design-save.md",
   "docs/designs/commands/case-open.md",
   "docs/designs/commands/case-run.md",
   "docs/designs/commands/case-close.md",
   "docs/designs/commands/inspect-docs.md",
   "docs/designs/commands/inspect-skills.md",
   "docs/designs/commands/backlog-review.md",
-  "docs/designs/commands/req-save.md",
   "docs/designs/skills/agentdev-doc-diagnostics.md",
   "docs/designs/skills/agentdev-adversarial-review.md",
   "src/opencode/skills/agentdev-workflow-req-define/SKILL.md",
-  "src/opencode/skills/agentdev-workflow-design-save/SKILL.md",
   "src/opencode/skills/agentdev-workflow-case-open/SKILL.md",
   "src/opencode/skills/agentdev-workflow-case-run/SKILL.md",
   "src/opencode/skills/agentdev-workflow-case-close/SKILL.md",
@@ -39,7 +38,6 @@ const SWITCH_TARGET_FILES: readonly string[] = [
   "src/opencode/skills/agentdev-adversarial-review/SKILL.md",
   "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
   ".agentdev/extensions/skills/agentdev-workflow-req-define.yaml",
-  ".agentdev/extensions/skills/agentdev-workflow-design-save.yaml",
   ".agentdev/extensions/skills/agentdev-workflow-case-open.yaml",
   ".agentdev/extensions/skills/agentdev-workflow-case-run.yaml",
   ".agentdev/extensions/skills/agentdev-workflow-case-close.yaml",
@@ -102,23 +100,6 @@ describe("REQ-021-011〜022 の割り当て文言の存在", () => {
       ],
     },
     {
-      req: "REQ-021-012",
-      file: "docs/designs/commands/req-save.md",
-      phrases: [
-        "対応宣言を作成する責務を持たない",
-        "失敗させない",
-      ],
-    },
-    {
-      req: "REQ-021-013",
-      file: "docs/designs/commands/design-save.md",
-      phrases: [
-        "明示的に確定している場合",
-        "再推論して正規の対応関係を生成しない",
-        "Design action が存在しない要件の処理を妨げない",
-      ],
-    },
-    {
       req: "REQ-021-014",
       file: "docs/designs/commands/case-open.md",
       phrases: [
@@ -175,13 +156,6 @@ describe("REQ-021-011〜022 の割り当て文言の存在", () => {
     },
     {
       req: "REQ-021-020",
-      file: "docs/designs/commands/design-save.md",
-      phrases: [
-        "同じ対応宣言を重複生成しない",
-      ],
-    },
-    {
-      req: "REQ-021-020",
       file: "docs/designs/commands/case-run.md",
       phrases: [
         "同じ対応宣言を重複生成しない",
@@ -215,11 +189,10 @@ describe("REQ-021-011〜022 の割り当て文言の存在", () => {
 describe("Workflow Skill 本文・extension の切替", () => {
   it.each([
     "src/opencode/skills/agentdev-workflow-req-define/SKILL.md",
-    "src/opencode/skills/agentdev-workflow-design-save/SKILL.md",
     "src/opencode/skills/agentdev-workflow-case-open/SKILL.md",
     "src/opencode/skills/agentdev-workflow-case-run/SKILL.md",
     "src/opencode/skills/agentdev-workflow-case-close/SKILL.md",
-  ])("5工程 Workflow Skill がトレーサビリティ能力の利用節を持つ: %s", (rel) => {
+  ])("Workflow Skill がトレーサビリティ能力の利用節を持つ: %s", (rel) => {
     expect(read(rel).includes("## トレーサビリティ能力の利用")).toBe(true);
   });
 
