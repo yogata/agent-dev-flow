@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は25件、提案中の Decision は0件である。
+現行の承認済み Decision は25件、提案中の Decision は1件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -42,6 +42,7 @@
 | DEC-026 | 実現面変更方針の構造化ハンドオフ（realization_actions） | accepted | 2026-09-03 |
 | DEC-027 | 観測ベース統制縮小評価ループ | accepted | 2026-09-04 |
 | DEC-028 | 文章表層品質の共通実行基盤 | accepted | 2026-09-09 |
+| DEC-029 | 公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入 | proposed | 2026-09-14 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -84,6 +85,7 @@
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
+- [DEC-029](DEC-029.md)（公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -197,6 +199,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-026 | [REQ-008](../requirements/REQ-008.md), [REQ-004](../requirements/REQ-004.md), [REQ-017](../requirements/REQ-017.md), [REQ-038](../requirements/REQ-038.md), [REQ-039](../requirements/REQ-039.md) | - |
 | DEC-027 | [REQ-048](../requirements/REQ-048.md) | - |
 | DEC-028 | [REQ-053](../requirements/REQ-053.md), [REQ-010](../requirements/REQ-010.md), [REQ-036](../requirements/REQ-036.md) | 文章表層品質の共通実行基盤（REQ-053 全面更新、REQ-010-071/074 UPDATE と REQ-010-075 APPEND、REQ-036-008/023 UPDATE と整合） |
+| DEC-029 | [REQ-005](../requirements/REQ-005.md), [REQ-006](../requirements/REQ-006.md) | - |
 <!-- AUTOGEN:END -->
 
 ## 過去版の履歴基盤

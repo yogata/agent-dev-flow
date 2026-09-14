@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下49件を第一参照先とする。
+現在の要件判断では、以下50件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -33,10 +33,9 @@
 | [REQ-021](REQ-021.md) | トレーサビリティのワークフロー統合 |
 | [REQ-027](REQ-027.md) | Capability Skill・Soft guard・代表ケース検証 |
 | [REQ-029](REQ-029.md) | 配布依存境界 |
-| [REQ-030](REQ-030.md) | case-open 実行契約（Issue構成生成） |
+| [REQ-030](REQ-030.md) | case-open 実行契約（Root Case 確立と Definition Package） |
 | [REQ-031](REQ-031.md) | case-run 実行契約（実装実行と委譲） |
 | [REQ-032](REQ-032.md) | case-close 実行契約（完了判定とマージ） |
-| [REQ-033](REQ-033.md) | case-update 実行契約（Issue・要件更新） |
 | [REQ-034](REQ-034.md) | case-auto 実行契約（自走オーケストレーション） |
 | [REQ-035](REQ-035.md) | Epic と Wave 実行モデル |
 | [REQ-036](REQ-036.md) | 検出と診断コマンド群（inspect 系） |
@@ -61,6 +60,8 @@
 | [REQ-058](REQ-058.md) | ADF 管理投影物の廃止時クリーンアップ契約 |
 | [REQ-059](REQ-059.md) | Decision と REQ の関連宣言管理 |
 | [REQ-060](REQ-060.md) | bun test 実行形態の統一（repo root 起 cwd・`./` 付きパス指定） |
+| [REQ-061](REQ-061.md) | case-ready 実行契約 |
+| [REQ-062](REQ-062.md) | case-revise 実行契約 |
 <!-- AUTOGEN:END -->
 
 ## 廃止済み要件
@@ -76,6 +77,7 @@
 | [REQ-025](retired/REQ-025.md) | IR 検証ルールの Decision 移行残存修復 |
 | [REQ-026](retired/REQ-026.md) | skill rename 対称性検査観点の targeted docs guard 追加 |
 | [REQ-028](retired/REQ-028.md) | IR 体系の実効性監査と存在条件厳格化 |
+| [REQ-033](retired/REQ-033.md) | case-update 実行契約（Issue・要件更新） |
 | [REQ-040](retired/REQ-040.md) | トレーサビリティ高位問い合わせ（Trace Query） |
 | [REQ-042](retired/REQ-042.md) | Case統合先とブランチモデル |
 | [REQ-043](retired/REQ-043.md) | 評価ブランチ実証ワークフロー |

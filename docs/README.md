@@ -6,10 +6,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 49件、廃止済み: 11件
+現行 REQ: 50件、廃止済み: 12件
 <!-- AUTOGEN:END -->
 
-現行要件は49件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
+現行要件は50件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
 各 REQ の詳細は各 REQ ファイル本文を参照。
 
 | REQ | タイトル |
@@ -38,7 +38,6 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [REQ-030](requirements/REQ-030.md) | case-open 実行契約（Issue構成生成） |
 | [REQ-031](requirements/REQ-031.md) | case-run 実行契約（実装実行と委譲） |
 | [REQ-032](requirements/REQ-032.md) | case-close 実行契約（完了判定とマージ） |
-| [REQ-033](requirements/REQ-033.md) | case-update 実行契約（Issue・要件更新） |
 | [REQ-034](requirements/REQ-034.md) | case-auto 実行契約（自走オーケストレーション） |
 | [REQ-035](requirements/REQ-035.md) | Epic と Wave 実行モデル |
 | [REQ-036](requirements/REQ-036.md) | 検出と診断コマンド群（inspect 系） |
@@ -63,12 +62,14 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [REQ-058](requirements/REQ-058.md) | ADF 管理投影物の廃止時クリーンアップ契約 |
 | [REQ-059](requirements/REQ-059.md) | Decision と REQ の関連宣言管理 |
 | [REQ-060](requirements/REQ-060.md) | bun test 実行形態の統一（repo root 起 cwd・`./` 付きパス指定） |
+| [REQ-061](requirements/REQ-061.md) | case-ready 実行契約 |
+| [REQ-062](requirements/REQ-062.md) | case-revise 実行契約 |
 
 - [要件インデックス](requirements/README.md)
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-028 の27件である（DEC-005、DEC-007 は superseded）。
+現行 Decision は DEC-001 から DEC-029 の28件である（DEC-005、DEC-007 は superseded）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
@@ -100,6 +101,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [DEC-026](decisions/DEC-026.md) | 実現面変更方針の構造化ハンドオフ（realization_actions） |
 | [DEC-027](decisions/DEC-027.md) | 観測ベース統制縮小評価ループ |
 | [DEC-028](decisions/DEC-028.md) | 文章表層品質の共通実行基盤 |
+| [DEC-029](decisions/DEC-029.md) | 公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入 |
 
 ## 設計（Design）
 
