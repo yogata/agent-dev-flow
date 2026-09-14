@@ -14,7 +14,7 @@ Custom Tool `agentdev_gh`（書き込みは Tool 内部の読み戻し検証で�
 |----------|-------------------|
 | `case-open` | Issue 作成後の VERIFY、Parent/Child リンク確認、Epic ステータス追跡テーブル更新の安全手順 |
 | `case-close` | Issue 本文更新時の前後内容比較、コメント追記後の VERIFY、Parent Issue 本文更新の安全手順 |
-| `case-update` | Issue 本文更新、コメント追加後の通常検証、前後内容比較 |
+| `case-revise` | 再合意済み Definition 変更の Issue 関連付け、コメント追加後の通常検証、前後内容比較 |
 
 ## 参考文献
 

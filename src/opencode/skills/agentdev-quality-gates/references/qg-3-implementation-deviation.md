@@ -62,7 +62,7 @@ Issue/ REQ/ Decision/ Design/ work plan のいずれかの記載内容を満た�
 - **検査項目**: 機械的テキスト置換、複数ディレクトリ横断是正を含む場合、置換対象パターンの再 grep 結果が 0 件であることを確認する
 - **適用範囲**: 機械的テキスト置換、複数ディレクトリ横断、機械置換手順（3段階: old 側 grep 実在確認、置換実行、置換後 MISS 確認）に従う文字種等の横断是正
 - **スコープ定位**: QG-3 の既存スコープ（PR 作成直前の実装充足・乖離ゲート）を維持し、機械横断是正の再 grep 0 件確認は乖離検出の一部として位置付ける
-- **対象外維持**: 品質メトリクス収集、広範な docs 全体 grep、Document Classification Policy 全体確認、case-update 連携は引き続き QG-3 対象外とする
+- **対象外維持**: 品質メトリクス収集、広範な docs 全体 grep、Document Classification Policy 全体確認、case-revise 連携は引き続き QG-3 対象外とする
 
 ## 乖離分類
 
@@ -134,17 +134,17 @@ Issue/ REQ/ Decision/ Design/ work plan のいずれかの記載内容を満た�
 自動ループバックはしない。
 エージェントが推奨アクションを提示し、ユーザーが決定する。
 
-## case-update 連携
+## case-revise 連携
 
-QG-3 は乖離の分類と推奨アクションの提示までを責務とし、REQ 更新の最終判断は case-update（ユーザー承認入力）に委譲する。
+QG-3 は乖離の分類と推奨アクションの提示までを責務とし、Definition 変更の最終判断は case-revise（ユーザー承認入力）に委譲する。
 
-### 乖離タイプ → case-update フラグ mapping
+### 乖離タイプ → case-revise フラグ mapping
 
 | 乖離タイプ | case-update コマンド | 説明 |
 |---|---|---|
-| `spec-bug` | `/agentdev/case-update {N} --req --review-ng` | 要件定義の修正が必要 |
-| `impl-bug` | `/agentdev/case-update {N} --comment --review-ng` | 実装の修正が必要（要件は不変） |
-| `scope-creep` | `/agentdev/case-update {N} --req --review-ng` | 要件スコープの再定義が必要 |
+| `spec-bug` | `/agentdev/case-revise {N} --review-ng` | Definition の修正が必要 |
+| `impl-bug` | `/agentdev/case-revise {N} --comment --review-ng` | 実装の修正が必要（Definition は不変） |
+| `scope-creep` | `/agentdev/case-revise {N} --review-ng` | Definition スコープの再定義が必要 |
 
 報告フォーマットの出力は `issue_comment_review_ng.md` テンプレートに埋め込める形式とする。
 
@@ -158,7 +158,7 @@ QG-3 の検査をサブエージェントに委譲する場合:
 ## 責務境界
 
 - QG-3 は**乖離の分類と推奨アクションの提示**に限定する。
-- REQ ファイルの更新判断、更新実行は行わない（case-update の責務）。
+- REQ/Definition ファイルの更新判断、更新実行は行わない（case-revise の責務）。
 - 品質メトリクス収集（型チェック/ Lint/ ビルド/ テスト）は行わない（実行担当サブエージェント委譲内のローカル検証（test-fix ループ）の責務）。
 - docs 全体の意味レビューは行わない（`/agentdev/inspect-docs` の責務）。
 
@@ -166,6 +166,5 @@ QG-3 の検査をサブエージェントに委譲する場合:
 
 - [common-gate-contract.md](common-gate-contract.md)
 - [qg-4-final-acceptance.md](qg-4-final-acceptance.md)（次工程の最終受け入れ。QG-4 は QG-3 の結果を前提とする）
-- **agentdev-workflow-routing**: case-update --review-ng 手順（QG-3 結果の消費先）
+- **agentdev-workflow-routing**: case-revise --review-ng 手順（QG-3 結果の消費先）
 - **agentdev-workflow-templates**: `issue_comment_review_ng.md` テンプレート
-
