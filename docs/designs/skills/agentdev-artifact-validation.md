@@ -31,7 +31,7 @@ REQ、Decision、Design 固有の内容判断を行わず、決定的検証の�
 
 - REQ、Decision、Design 固有の内容判断（各操作 skill の責務）
 - 文書の作成、更新、削除（各操作 skill の責務）
-- 保存、ユーザー承認、commit、push（各 command の責務）
+- ユーザー承認、commit、push（上流工程の責務）
 - REQ 番号、Decision 番号、要件行 ID の採番（`agentdev-req-file-manager`、`agentdev-decision-file-manager` の責務）
 - target_area の検索（`agentdev-design-file-manager` の責務）
 
@@ -49,14 +49,14 @@ REQ、Decision、Design 固有の内容判断を行わず、決定的検証の�
 
 - artifact-contracts.md「Script 所有権と委譲契約」
 - artifact-responsibilities.md「操作 skill 正規所有者台帳」
-- req-save.md、design-save.md（共通検証 script 呼出 Step）
+- workflow-contracts.md（保存内部責務からの共通検証 script 呼出契約）
 
 ## 現在の動作
 
 - 所有 script（`check-frontmatter-consistency.ts`、`check-entry-existence.ts`、`check-change-impact.ts`）は `src/opencode/skills/agentdev-artifact-validation/scripts/` 配下に配置する
 - script は決定的（純粋関数）、テスト可能（`tests/*.test.ts`）とする
 - I/O は argv/stdin で入力を受け取り、stdout で JSON 結果を返す
-- 利用側 command、skill（`agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-design-file-manager`、`req-save`、`design-save` 等）は内部 script パスを直接参照せず、本 skill の公開検証契約へ委譲する
+- 利用側の保存内部責務および skill（`agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-design-file-manager` 等）は内部 script パスを直接参照せず、本 skill の公開検証契約へ委譲する
 - 同一 script または共有 lib を複数 skill へ複製しない
 
 ## 境界

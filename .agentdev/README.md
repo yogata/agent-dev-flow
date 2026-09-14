@@ -14,8 +14,8 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-001�
 | `learning/deferred.md` | 分類済み living pool | `learning-promote` | `learning-promote` | 多状態 living pool。staged/rejected/duplicate は promote 時 prune、deferred/未処理/再評価対象は保持 |
 | `learning/evaluation-report.md` | 境界 artifact | `learning-promote` | `learning-promote` | 毎回上書き |
 | `learning/promoted/*.md` | promoted artifact | `learning-promote` | `backlog-review` | `backlog-review` による RU 化成功後に削除 |
-| `backlog/req-units/RU-*.md` | RU（Requirement Unit） | `backlog-review`, session-sourced | `req-define`, `case-open` | `case-open` の Issue 作成 + VERIFY 成功後に削除 |
-| `drafts/req-draft-*.md` | working draft | `req-define` | `req-save`（feature） / `case-open`（bugfix/maintenance/docs_chore） | `case-open` の Issue 作成 + VERIFY 成功後に削除 |
+| `backlog/req-units/RU-*.md` | RU（Requirement Unit） | `backlog-review`, session-sourced | `req-define`, `case-open` | `case-ready` 成功後に削除（blocked / failed / 中断時は保持。REQ-008-010, REQ-008-011） |
+| `drafts/req-draft-*.md` | working draft | `req-define` | `case-open`, `case-ready`, `case-revise` | `case-ready` 成功後に削除（blocked / failed / 中断時は保持。REQ-008-010, REQ-008-011） |
 | `drafts/requirements-review-finding-*.md` | review finding | `req-save`（SPLIT 検出時） | `req-define` | `req-define` の消化後に削除 |
 | `integrity/reports/*.md` | 検証レポート（非永続） | `docs-check` | `docs-check`（intake化）・ユーザー参照 | 非永続・git管理対象外（`.gitignore` で除外） |
 | `inspect/inbox/*.md` | 未分類 inspect finding | `inspect-docs`, `inspect-skills` | `inspect-promote` | `inspect-promote` の分類後に削除（promote 時は promoted/ へ保存、reject 時は即時削除、defer 時は inbox 残置） |
@@ -46,7 +46,7 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-001�
 ├── backlog/
 │   └── req-units/       ← backlog-review が RU を生成
 │       └── RU-*.md
-├── drafts/              ← req-define が要件ドラフトを保存（req-save/case-open で消費・削除）
+├── drafts/              ← req-define が要件ドラフトを保存（case-open / case-ready / case-revise で消費、case-ready 成功後に削除）
 ├── inspect/
 │   ├── inbox/           ← inspect-docs / inspect-skills が未分類 finding を保存
 │   └── promoted/        ← inspect-promote が採用済み artifact を出力（フラット）

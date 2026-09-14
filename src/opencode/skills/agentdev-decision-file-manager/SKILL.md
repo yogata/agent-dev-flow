@@ -8,7 +8,7 @@ description: Manages Decision numbering and decision record file operations (CRE
 **意思決定記録（Decision）** ファイルの管理に関する**知識ベース**である。
 
 - **このスキル（知識）**: Decision番号採番ルール、ファイル操作モード、判定基準、ステータス遷移、整合性チェック
-- **適用先**: `req-save`（Decisionファイル保存時）、`case-open`（Issue作成時のDecision参照）、`case-run`（実行時のDecision参照）
+- **適用先**: Definition 保存内部責務（Decisionファイル保存時）、`case-open`（Issue作成時のDecision参照）、`case-run`（実行時のDecision参照）
 
 **注意**: このスキルはDecisionの**管理、運用**（採番、ステータス遷移、整合性チェック）を担当する。
 Decisionの**作成ガイドライン**（評価基準、Decision必要かどうかの判定）については、`agentdev-decision-guidelines` を参照。
@@ -43,7 +43,7 @@ Decision要否の判定は `agentdev-decision-guidelines` スキルが行う。
 | 空き番号 | 再利用禁止（欠番があっても欠番を埋めない） |
 
 - **欠番が存在しても、新規Decisionで欠番を埋めない。常に最大番号+1で採番する**
-- req-save が Decision ファイルを保存する際、本採番ルールに従うことを必須とする。req-define 側で番号推測を行わず、req-save と本スキルの連携で確定する
+- Definition 保存内部責務が Decision ファイルを保存する際、本採番ルールに従うことを必須とする。req-define 側で番号推測を行わず、Definition 保存内部責務と本スキルの連携で確定する
 - 新規作成時の初期ステータスは `proposed`（`未指定 → accepted` は禁止）
 
 ### 基準番号帯例外
@@ -66,9 +66,9 @@ Decision体系の全面改定時は、`DEC-NNN` 以降の番号帯を基準番�
 
 ## related_reqs フィールド管理
 
-- **CREATE 時**: req-save が要件doc（draft-data）の該当 Decision 対象操作で確定した関連 REQ を
+- **CREATE 時**: Definition 保存内部責務が要件doc（draft-data）の該当 Decision 対象操作で確定した関連 REQ を
   frontmatter `related_reqs` へ決定的に保存する（初期保存手順は `agentdev-req-file-manager` の
-  req-save-procedure reference、フィールド規約の正本は patterns.md Design）
+  save-procedure reference、フィールド規約の正本は patterns.md Design）
 - **UPDATE 時**: 関連 REQ の変更（要件再構成、Decision の置換・再確認）を `related_reqs` フィールド更新
   として扱う。status 遷移とは独立に更新できる
 - **検証**: REQ 識別子形式（`REQ-{NNNN}`）、実在 REQ の指先確認（`docs/requirements/` または

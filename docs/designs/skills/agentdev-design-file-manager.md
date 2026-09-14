@@ -14,7 +14,7 @@ Design ファイルの作成、更新、配置先判断、target_area 処理、D
 
 ## 目的
 
-`design-save` command の実行時に Design 操作（Design 作成、更新、配置判断、target_area による更新判断、Design 固有整合性確認、Design 固有 script 呼出契約）を担う操作用 skill の責務、対象外、境界を定義する。
+Design 保存内部責務の実行時に Design 操作（Design 作成、更新、配置判断、target_area による更新判断、Design 固有整合性確認、Design 固有 script 呼出契約）を担う操作用 skill の責務、対象外、境界を定義する。
 REQ/Decision 操作 skill（`agentdev-req-file-manager`、`agentdev-decision-file-manager`）との責務重複を防ぎ、Design 操作の正規所有者を一つに定める。
 
 ## 適用対象
@@ -44,7 +44,7 @@ Design operation の公式 enum は `create` / `append` / `update` の3値であ
 - 新規 Design 作成時（`create`）の frontmatter（`title`、`status: draft`、`created`、`updated`）付与
 - 既存 Design 変更時（`append` / `update`）の `status` 維持（変更しない）
 - target_area が指定された `update` 操作におけるセクション置換ロジック（REQ-001-027/028）
-- `append` 操作における新規セクション追加ロジック（anchor と placement に基づく追加、REQ-008-058）。詳細な契約（placement 別挙動、anchor マッチング規則、anchor 未検出時挙動、同名見出し時挙動、合格基準）は `../commands/design-save.md`「append 操作時のセクション追加ロジック」が正規所有する
+- `append` 操作における新規セクション追加ロジック（anchor と placement に基づく追加、REQ-008-058）。詳細な契約（placement 別挙動、anchor マッチング規則、anchor 未検出時挙動、同名見出し時挙動、合格基準）は `artifact-contracts.md`「append operation」と本 Design の「APPEND 操作」節が正規所有する
 - Design 固有整合性確認（frontmatter 完全性、target_area マッチング規則、Design status ライフサイクル）
 - `search-target-area.ts`（Design 固有 script）の呼出契約。同 script は見出し行全体との完全一致のみを受け付け、前方一致、後方一致、部分一致を受け付けない（正規入力 `### IR-044` は見出し行 `### IR-044 - 題` とはマッチしない）。この契約は `target_area` マッチング規則と `append` の anchor マッチング規則の双方に適用される
 - 共通検証（frontmatter 整合性、エントリ存在、変更範囲）は `agentdev-artifact-validation` の公開検証契約へ委譲
@@ -52,7 +52,7 @@ Design operation の公式 enum は `create` / `append` / `update` の3値であ
 ### APPEND 操作
 
 `append` は既存 Design ファイルへ新規セクションを追加する操作である（REQ-008-058）。
-配置契約の実行詳細（`placement` 別挿入位置の算出、anchor マッチング規則）は `../commands/design-save.md`「append 操作時のセクション追加ロジック」が正規所有する。
+配置契約の実行詳細（`placement` 別挿入位置の算出、anchor マッチング規則）は `artifact-contracts.md`「append operation」と本 Design の「APPEND 操作」節が正規所有する。
 
 - `content` は新規見出し行から始まる
 - `placement`: `tail`（既定）/ `after_anchor` / `before_anchor` のいずれか
@@ -71,14 +71,14 @@ Design operation の公式 enum は `create` / `append` / `update` の3値であ
 
 ## 参照する references
 
-- design-save.md（command 手順）の Design 操作 Step
+- artifact-contracts.md「append operation」（Design 操作の append 契約）
 - artifact-contracts.md「Script 所有権と委譲契約」
 - artifact-responsibilities.md「操作 skill 正規所有者台帳」
 
 ## 現在の動作
 
-- `design-save` は `target_area` 指定時、当該 skill の配置先解決、target_area マッチング規則を適用してセクション置換を行う
-- `design-save` は `operation: append` 指定時、当該 skill の配置先解決、anchor と placement に基づく新規セクション追加を行う（REQ-008-058）
+- Design 保存内部責務は `target_area` 指定時、当該 skill の配置先解決、target_area マッチング規則を適用してセクション置換を行う
+- Design 保存内部責務は `operation: append` 指定時、当該 skill の配置先解決、anchor と placement に基づく新規セクション追加を行う（REQ-008-058）
 - 新規 Design 作成時は frontmatter `status: draft` を必ず付与する
 - 既存 Design 変更時（`append` / `update`）は当該 Design の `status` を変更しない（v2:ADR-0123 Decision #1）
 - Design 固有 script は `search-target-area.ts`（target_area 見出し検索、見出し行全体完全一致）を正規所有対象とする。`update` の target_area マッチングと `append` の anchor マッチングの双方で使用する
@@ -115,10 +115,9 @@ docs 横断診断、証拠構造、finding 出力契約は `agentdev-doc-diagnos
 
 ## See Also
 
-- [design-save.md](../commands/design-save.md)（Design 操作 command。`append` 操作時のセクション追加ロジック詳細を正規所有）
 - [agentdev-req-file-manager.md](agentdev-req-file-manager.md)（REQ 操作 skill）
 - [agentdev-decision-file-manager.md](agentdev-decision-file-manager.md)（Decision 操作 skill）
 - [agentdev-artifact-validation.md](agentdev-artifact-validation.md)（共通検証 skill）
 - [agentdev-doc-diagnostics.md](agentdev-doc-diagnostics.md)（docs 横断診断 skill）
-- v2:ADR-0123（Design lifecycle と design-save の導入）
+- v2:ADR-0123（Design lifecycle と保存内部責務の導入）
 - REQ-001（REQ/Design 責務分離）、REQ-002-016（script は該当 skill の scripts/ 配下へ配置し所有 skill の公開操作契約経由で呼び出す）、REQ-008-058（Design operation enum 公式契約。別名不受理）
