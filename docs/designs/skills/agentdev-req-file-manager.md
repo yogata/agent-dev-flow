@@ -19,7 +19,7 @@ REQ ファイルの作成、追記、更新を管理する知識ベースとし�
 - Definition 保存内部責務（REQ 保存時、採番、CREATE/APPEND/UPDATE 操作、インデックス、ハブ更新、語彙、責務、runtime 境界矛盾防止、Catalog entry 確認）
 - case-open（Issue 作成時の REQ 参照）
 - case-run（実行時の REQ 参照）
-- case-update（要件更新時、`--req` フラグ）
+- Definition 保存内部責務（case-ready / case-revise、要件更新時）
 
 ## 提供する判断、操作
 

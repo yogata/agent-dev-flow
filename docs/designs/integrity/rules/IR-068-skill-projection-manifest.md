@@ -19,7 +19,7 @@ updated: 2026-08-23
 | related_design | [../../local/runtime-package-boundary.md, ../checker-execution-contracts.md, ../integrity-rule-catalog.md] |
 | gate_level | full-audit（source profile でも投影比較は junction 実在時のみ実施。installed profile では常時） |
 | false_positive_risk | 低。repo-* プレフィックスの投影専用スキル（repo-local、v2:ADR-0020 / v2:REQ-0159-002）は投影比較から除外する。worktree（junction 不在）では投影比較自体を skip するため誤検出しない。解決不能エントリ（projection-broken）はディレクトリ以外の混入物も含むが、投影スキルはディレクトリであることが契約であるため誤検出とならない。manifest の重複・不正形式エントリは silent skip せず heuristic 警告する（宣言的データの silent skip 禁止、checker-execution-contracts Design） |
-| regression_test | `check_integrity.test.ts` describe "IR-068 skill-projection-manifest (Issue #2383 (d), inspect F-01)"。正常例（manifest ↔ src 一致）・違反例（manifest 陳腐化・投影欠落・stale junction）・境界例（worktree = junction 不在で skip）・許容例（repo-* 投影専用スキル）・再現例（F-01: workflow-design-save 投影欠落 + `agentdev-artifact-graph` stale junction + リンク先欠損 `agentdev-spec-file-manager` の解決不能エントリ）の 5 種 fixture |
+| regression_test | `check_integrity.test.ts` describe "IR-068 skill-projection-manifest (Issue #2383 (d), inspect F-01)"。正常例（manifest ↔ src 一致）・違反例（manifest 陳腐化・投影欠落・stale junction）・境界例（worktree = junction 不在で skip）・許容例（repo-* 投影専用スキル）・再現例（F-01: 導入時点の実在スキル名を用いた投影欠落 + stale junction + リンク先欠損エントリの旧環境再現 fixture）の 5 種 fixture |
 | finding_route | intake |
 | triage_action | manifest 陳腐化はスキル追加・削除・リネームと同一 PR での manifest 更新で解消する。投影乖離（projection-missing / projection-extra / projection-broken）は junction 再構築（`scripts/install.ps1 -Mode apply` 再実行、局所運用タスク）で解消する。F-01 の既知乖離 7 件（投影欠落 4 + stale junction 3）は NG baseline（provenance `issue-2383-f01-junction-rebuild-pending`）で管理し、PR マージ後の junction 再構築で解消する |
 | last_verified | 2026-08-22 |
@@ -49,7 +49,7 @@ IR-016 系の投影検査（`checkSourceProjectionConsistency`、`checkBrokenJun
 
 ## baseline 運用
 
-導入時点（Issue #2383、2026-08-22）の既知違反は F-01 の投影乖離 7 件（投影欠落 projection-missing: `agentdev-workflow-backlog-auto`、`agentdev-workflow-design-save`、`agentdev-design-file-manager`、`agentdev-traceability` の 4 件。リンク先欠損 stale junction projection-broken: `agentdev-artifact-graph`、`agentdev-spec-file-manager`、`agentdev-workflow-spec-save` の 3 件）。junction 再構築は `.opencode/skills/*` が .gitignore 対象の局所運用タスクであり PR 成果外（RD-002）のため、NG baseline additions（provenance `issue-2383-f01-junction-rebuild-pending`）で管理し、PR マージ後の手動再構築で解消する。baseline 適用後、新規の投影乖離（スキル追加時の junction 追加漏れ等）は即時に strict fail として検出する。
+導入時点（Issue #2383、2026-08-22）に検出された投影乖離（projection-missing）とリンク先欠損 stale junction（projection-broken）の既知違反は、NG baseline additions（provenance `issue-2383-f01-junction-rebuild-pending`）で管理する。junction 再構築は `.opencode/skills/*` が .gitignore 対象の局所運用タスクであり PR 成果外（RD-002）のため、PR マージ後の手動再構築（install script -Mode apply）で解消する。baseline 適用後、新規の投影乖離（スキル追加時の junction 追加漏れ等）は即時に strict fail として検出する。
 
 ## See Also
 

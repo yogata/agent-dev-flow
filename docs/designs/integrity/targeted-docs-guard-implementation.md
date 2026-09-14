@@ -21,8 +21,8 @@ check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移�
 
 | 引数 | 必須 | 値 | 説明 |
 |------|------|-----|------|
-| `--workflow` | ✓ | `req-save` / `design-save` / `case-run` / `case-close` / `docs-check` | 検査プロファイル切替え。各 workflow で対象ファイル種別と検査ルールセットを切替える（REQ-010-012） |
-| `--files <path...>` | -- | ファイルパス（space 区切り推奨、comma 区切りも受入） | コミット前の worktree 検証（req-save、design-save、case-run 等）で変更ファイルを明示指定して使用する標準モード。コミット前の列挙には untracked ファイルを含める（`--base-ref` のセマンティクスと混在させない）。main 環境（マージ後、case-close 等）でも PR 変更ファイルの直接指定に使用。files_checked 空の場合は FAILURE（REQ-010-012、REQ-010-076） |
+| `--workflow` | ✓ | `case-run` / `case-close` / `docs-check`、および Definition 保存 / Design 保存内部責務向け profile | 検査プロファイル切替え。各 workflow で対象ファイル種別と検査ルールセットを切替える（REQ-010-012） |
+| `--files <path...>` | -- | ファイルパス（space 区切り推奨、comma 区切りも受入） | コミット前の worktree 検証（Definition 保存 / Design 保存内部責務、case-run 等）で変更ファイルを明示指定して使用する標準モード。コミット前の列挙には untracked ファイルを含める（`--base-ref` のセマンティクスと混在させない）。main 環境（マージ後、case-close 等）でも PR 変更ファイルの直接指定に使用。files_checked 空の場合は FAILURE（REQ-010-012、REQ-010-076） |
 | `--base-ref <git-ref>` | -- | git ref（既定: `origin/main`） | コミット済み差分に基づく変更ファイル検出。実行はコミット後・push 前に限定する（コミット前の worktree では未コミット差分が検出されず、files_checked 空の検査見逃しを生む）。files_checked 空の場合は FAILURE（REQ-010-012、REQ-010-076） |
 | `--root <path>` | -- | ディレクトリパス | 検査対象リポジトリのルートを明示指定する。worktree 検査・CI 実行時に、検査 skill 配置先を起点とする root 誤解決（誤リポジトリ検査）を防ぐ |
 | `--json` | -- | flag | JSON 出力を有効化 |
@@ -45,7 +45,7 @@ check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移�
 各 workflow profile が実行する検査項目（v2:REQ-0158 より移管）。
 検出ルールの詳細は IR-*.md ならびに `integrity-rule-catalog.md` 参照。
 
-### req-save 向け検査
+### Definition 保存（case-ready / case-revise、REQ/Decision files）向け検査
 
 変更ファイルが `docs/requirements/REQ-*.md` の場合、以下を確認する。
 
@@ -60,7 +60,7 @@ check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移�
 - local版旧生成方式語彙混入検出（IR-057）
 - 文書種別責務と日本語執筆規範の機械化可能範囲の検査
 
-### design-save 向け検査
+### Design 保存（case-ready / case-revise、Design files）向け検査
 
 変更ファイルが `docs/designs/**/*.md` の場合、以下を確認する。
 
@@ -79,7 +79,7 @@ check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移�
 
 **Design 判定（isDesignFile）の契約**:
 
-isDesignFile は `docs/designs` 配下の変更ファイルを Design 文書と判定する判定関数であり、design-save 向け検査の対象特定と `design_readme_update_required` 判定の入口である。判定契約は次のとおりとする。
+isDesignFile は `docs/designs` 配下の変更ファイルを Design 文書と判定する判定関数であり、Design 保存向け検査の対象特定と `design_readme_update_required` 判定の入口である。判定契約は次のとおりとする。
 
 - `docs/designs/{domain}/{slug}.md` 直下の正規 Design ファイルは Design 判定対象とする
 - `docs/designs/**/references/**` 配下のファイルは references 登録規約（独立行登録しない・親 Design 行の備考欄で言及）に従うため Design 判定対象外とする（`design_readme_update_required` の発火対象外）
@@ -98,7 +98,7 @@ case-close では保存工程より広めに以下を確認する。
 
 ### case-run 向け検査
 
-case-run プロファイルは docs/** 変更ファイルを対象とし、req-save/design-save プロファイルと同等の docs 整合性検査ルールセット（obsolete-spec-path, legacy-local-generation-vocab, doc-type-responsibility 等）を適用する。
+case-run プロファイルは docs/** 変更ファイルを対象とし、Definition 保存 / Design 保存向けプロファイルと同等の docs 整合性検査ルールセット（obsolete-spec-path, legacy-local-generation-vocab, doc-type-responsibility 等）を適用する。
 case-run プロファイル固有の追加ルールとして `full_docs_check_recommended` 判定は持たない（case-close の責務）。
 appliesTo は `docs/designs/**`, `docs/requirements/**`, `docs/decisions/**`, `docs/guides/**`, `AGENTS.md`, `README.md` 等、docs 配下および文書整合性に関連するファイルに限定する。
 
@@ -162,7 +162,7 @@ TargetedDocsReport 型契約の正本は [integrity-contracts.md](integrity-cont
 
 ## 検査失敗時の取り扱い
 
-- req-save、design-save の検査失敗時は保存対象文書と連動文書を修正して再実行する（REQ-010-012）
+- Definition 保存 / Design 保存内部責務（case-ready / case-revise）の検査失敗時は保存対象文書と連動文書を修正して再実行する（REQ-010-012）
 - case-close で `full_docs_check_recommended` が true の場合は case-close 完了判定の追加確認として扱う
 
 ## 完了済み移行作業

@@ -34,7 +34,7 @@ case-run から実行担当サブエージェントへの委譲契約を以下�
 ## 承認・HITL 境界
 
 - case-run 本体の承認点を持たない（Issue に確定済みの execution contract を再判断せず消費する）。
-- result が blocked / failed の場合はユーザー判断待ちとして扱い、Issue 更新は case-update へ委譲する（自律補完、スコープ拡大をしない）。
+- result が blocked / failed の場合はユーザー判断待ちとして扱い、blocker 詳細は Issue コメントへ SSoT として記録する（Issue 本文更新は case-ready / case-revise の責務、REQ-031-010 準拠。case-run 単独では Issue 本文を書き換えない）。
 - クリーンアップフェーズで未コミット変更を検出した場合は報告してユーザーの指示に従う（自動的な破棄、コミットを行わない）。
 
 ## 入力
@@ -195,8 +195,8 @@ case-run は実装作業開始前に QG-3 本体とは独立した前置検査�
 差異を検出した場合、case-run は以下を実施する:
 
 1. PR 本文の `## Findings / Capture候補` セクションに `### stale-reference` 小見出しで差異内容（対象パス、Issue 本文記載値、現行値）を記録する
-2. case-update へ連携し、Issue 本文の参照パス・件数の更新を委譲する
-3. case-run 単独では Issue 本文を書き換えない（Issue 本文更新は case-update の責務）
+2. blocked として報告し、Root Case の resume_command による正規再開経路に従う（REQ-031-010）。Issue 本文の参照パス・件数の更新が必要な場合は case-ready / case-revise 経由で実施する
+3. case-run 単独では Issue 本文を書き換えない（Issue 本文更新は case-ready / case-revise の責務）
 
 ### QG-3 本体との関係
 
@@ -229,7 +229,7 @@ case-run プロファイル固有の追加ルールとして full_docs_check_rec
 ### 検出結果の記録と連携
 
 - 検出結果（failures の strict severity）は PR 本文の `## Findings / Capture候補` セクションに `### docs-integrity` 小見出しで記録する
-- case-update へ連携し、Issue 本文の更新を委譲する（case-run 単独では Issue 本文を書き換えない、REQ-006-034 準拠）
+- blocked として報告し、Root Case の resume_command による正規再開経路に従う（case-run 単独では Issue 本文を書き換えない、REQ-031-010 準拠）
 
 <!-- ADF-COVERS(implementation): REQ-031-025 -->
 <!-- ADF-COVERS(implementation): REQ-031-026 -->
@@ -329,9 +329,9 @@ case-run は REQ-017 に定義される execution contract を消費境界とし
 - 実 diff 検査
 - 実装結果、test 実行結果
 
-### blocked 遷移と case-update 連携
+### blocked 遷移と Issue 更新の取扱い
 
-次の場合、case-run は blocked とし、Issue 更新は case-update へ委譲する。
+次の場合、case-run は blocked とし、blocker 詳細を Issue コメントへ SSoT として記録する（Issue 本文更新は case-ready / case-revise の責務、Root Case の resume_command による正規再開経路に従う）。
 - 完了条件の不足、曖昧さ、矛盾、実現不能の検出
 - scope-affecting impact candidate の発見（既存 scope 内を超える変更が必要）
 - 関連 Decision への適合確認で新たな拘束 Decision の必要性が判明した場合
@@ -428,7 +428,7 @@ case-auto Design と整合する内容を維持する（OU-013b / OU-013a）。
 Phase 0 で複数孫 Issue（Epic Wave 内の子Issue、または並列 execution_unit 内の個別 Issue）の実装が同一 Design ファイルに触れる場合の扱いを以下で規定する。
 
 **Design 本文修正の非許容**: 実行担当サブエージェントは test strategy が `on_failure: fix-and-reverify` を指示する場合でも、case-run 委譲内で Design 本文（`docs/designs/**`）を修正しない。
-Phase 0 の Design 成果物は design-save 工程で確定済みであり、case-run 委譲内で再修正すると定義層の一貫性が損なわれる。
+Phase 0 の Design 成果物は Definition 保存（case-ready / case-revise の Capability Skill 委譲）工程で確定済みであり、case-run 委譲内で再修正すると定義層の一貫性が損なわれる。
 Design 修正が必要と判明した場合は `record-in-findings` で PR 本文の `## Design確定候補` セクションへ記録し、case-close の docs 検証における Design 確定チェックへ引き継ぐ（`agentdev-case-run-execution-adapter` SKILL の Design確定候補配置契約に従う）。
 
 **target_area の重複判定と並列制御**:
@@ -454,16 +454,16 @@ case-run 委譲内で作成する commit の構成運用を規定する。
 - レビュー単位の分離: 成果物変更は Design 品質査読の対象、ドメイン state はキャプチャ境界（intake/learning）の対象。査読観点が異なるため分離する
 - capture 境界の遵守: `.agentdev/intake/`、`.agentdev/learning/` の直接編集は case-run 委譲内では禁止（委譲内の capture 対象外制約、`agentdev-case-run-execution-adapter` SKILL）。実行担当サブエージェントは PR 本文の `## Findings / Capture候補` へ記録し、case-close が intake/learning pipeline へ引き継ぐ。よって case-run 委譲内でドメイン state をコミットへ含めることは原則として発生しない
 
-**例外**: `.agentdev/drafts/` の削除（req-save / design-save 完了後のクリーンアップ）は、成果物変更とは独立したクリーンアップコミットとして扱う。
+**例外**: `.agentdev/drafts/` の削除（Definition 保存（case-ready / case-revise の内部責務）完了後のクリーンアップ）は、成果物変更とは独立したクリーンアップコミットとして扱う。
 本運用が禁止する同一コミット混在には該当しない。
-当該クリーンアップは req-save / design-save 工程の責務であり、Phase 0 の case-run 委譲内では発生しない。
+当該クリーンアップは Definition 保存（case-ready / case-revise の内部責務）工程の責務であり、Phase 0 の case-run 委譲内では発生しない。
 
 **commit 分割手順**: 実行担当サブエージェントは成果物変更を先にコミットする。
 ドメイン state に触れる必要がある場合は別コミットへ分離するが、前述の通り case-run 委譲内では原則として `.agentdev/` 配下を編集せず、PR 本文経由で case-close へ引き継ぐ。
 
 ## 停止状態
 
-- result が blocked の場合（回答可能な blocker。詳細は Issue コメント SSoT。ユーザー判断待ちとして case-update 連携）。
+- result が blocked の場合（回答可能な blocker。詳細は Issue コメント SSoT。ユーザー判断待ちとして停止、Root Case の resume_command 再開経路）。
 - result が failed の場合（repository context で回答不能な blocker。詳細は Issue コメント SSoT）。
 - result が delegation-unavailable の場合（実行未試行のため Issue を `pending` に戻す、REQ-002-004）。
 - 前工程からの引き継ぎ停止判定（`agentdev_handoff: true`）検出時（実装開始せず停止する）。

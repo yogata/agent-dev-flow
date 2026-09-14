@@ -127,10 +127,10 @@ Command 固有の実行順序、Issue 作成、保存、更新、削除、完了
 
 ## 分類根拠伝播契約
 
-learning/intake → RU → req-define → design-save の各工程間で引き継ぐ分類根拠フィールドを定義する（REQ-001-033、REQ-001）。
-本節は工程間伝播フィールドの schema と req-define から design-save へのシリアライズ位置を正規所有する。
+learning/intake → RU → req-define → case-ready / case-revise（Design 保存内部責務）の各工程間で引き継ぐ分類根拠フィールドを定義する（REQ-001-033、REQ-001）。
+本節は工程間伝播フィールドの schema と req-define から Design 保存内部責務へのシリアライズ位置を正規所有する。
 Design ファイルの基本frontmatterは `title`、`status`、`created`、`updated` の4キーであり、伝播フィールドを Design ファイルへ宣言として書き込まない（AG-005、AG-008）。
-req-define は Design action の `artifact_actions` と `operation_units` へ分類根拠を出力し、design-save はこれを読み取って配置一貫性検証の入力とする。
+req-define は Design action の `artifact_actions` と `operation_units` へ分類根拠を出力し、Design 保存内部責務（case-ready / case-revise）はこれを読み取って配置一貫性検証の入力とする。
 
 ### 伝播フィールド一覧
 
@@ -160,7 +160,7 @@ req-define は Design action の `artifact_actions` と `operation_units` へ分
 | intake-promote | inbox item から change_nature、observed_evidence を推定 | 採用済み成果物に分類根拠を添付 |
 | backlog-review | 採用済み成果物から読取、`tentative_classification` と併せて RU frontmatter へ記録 | RU frontmatter に `tentative_classification` と分類根拠を記録 |
 | req-define | RU の分類根拠を暫定入力とし、最終分類を自身で確定。Design action（`artifact: design`）の各 entry へ `canonical_owner` を最終分類確定値として出力する | draft-data の `artifact_actions`（各 Design action）と `operation_units` へ最終分類根拠を反映 |
-| design-save | draft-data の `artifact_actions`（各 Design action）から分類根拠を読取、配置一貫性検証の入力とする。分類値が `unknown` または欠落の場合は警告して処理を継続する（soft-contract、欠落を理由に保存拒否しない、DEC-003）。伝播フィールドを Design ファイルへ書き込まない | 配置一貫性検証結果を commit message、完了報告に反映 |
+| Design 保存内部責務（case-ready / case-revise） | draft-data の `artifact_actions`（各 Design action）から分類根拠を読取、配置一貫性検証の入力とする。分類値が `unknown` または欠落の場合は警告して処理を継続する（soft-contract、欠落を理由に保存拒否しない、DEC-003）。伝播フィールドを Design ファイルへ書き込まない | 配置一貫性検証結果を commit message、完了報告に反映 |
 
 ### REQ 拡張可否判定ルール
 
@@ -233,7 +233,7 @@ Template の配置先は以下の 2 種類を定義する（REQ-002-040）。
 | テンプレート種別 | 参照先（実行時パス） | 参照元 |
 |---|---|---|
 | Issue 説明文 | `.opencode/skills/agentdev-workflow-templates/templates/issue_desc_*.md` | case-open |
-| Issue コメント | `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_*.md` | case-close, case-update |
+| Issue コメント | `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_*.md` | case-close, case-run, case-ready, case-revise |
 | PR 説明文 | `.opencode/skills/agentdev-workflow-templates/templates/pr_desc.md` | case-run |
 | 完了報告 | `.opencode/commands/agentdev/templates/{command}/{variant}.md` | 各コマンド |
 
@@ -324,7 +324,7 @@ draft file は原本アーティファクト（REQ/Decision/Design/RU）では�
 
 | draft_type | file pattern | producer | allowed consumers | 位置づけ | lifecycle |
 |---|---|---|---|---|---|
-| `req_draft` | `.agentdev/drafts/req-draft-{topic}.md` | `req-define` | `req-save`, `design-save`, `case-open` | 保存前の要件ドラフト | case-open の Issue 作成 + VERIFY 成功後に削除 |
+| `req_draft` | `.agentdev/drafts/req-draft-{topic}.md` | `req-define` | `case-ready`, `case-revise`, `case-open` | 保存前の要件ドラフト | case-open の Issue 作成 + VERIFY 成功後に削除 |
 
 標準 draft type は `req_draft` の 1 種のみとする（REQ-002-132）。
 `requirements-review-finding` および旧 `skill_review_finding` は標準 draft type に含めない。
@@ -351,8 +351,8 @@ frontmatter の基本フィールドは `draft_type`、`topic`、`status`、`cre
 
 | command | 受け付ける draft_type |
 |---|---|
-| `req-save` | `req_draft` |
-| `design-save` | `req_draft` |
+| `case-ready` | `req_draft` |
+| `case-revise` | `req_draft` |
 | `case-open` | `req_draft` |
 
 ### inspect-skills 副作用境界
@@ -370,7 +370,7 @@ draft type registry の allowed consumers 列、REQ-008、REQ-006-083、document
 | 集合 | 要素 | 役割 |
 |---|---|---|
 | producer | `{req-define}` | req_draft を生成する唯一の command |
-| direct consumer | `{req-save, design-save, case-open}` | req_draft を主入力として消費し、REQ/Decision/Design/Issue を生成する command 群 |
+| direct consumer | `{case-open, case-ready, case-revise}` | req_draft を主入力として消費し、REQ/Decision/Design/Issue を生成・確定する command 群 |
 | orchestration pre-reader | `{case-auto}` | case-open 前だけ req_draft を読み、後続工程の orchestration 入力とする command |
 | invalid post-case reader | `{case-auto, case-run, case-close}` | case-open 成功後に req_draft を参照してはならない command 群 |
 
@@ -379,11 +379,11 @@ draft type registry の allowed consumers 列、REQ-008、REQ-006-083、document
 - case-open 成功後は Issue と Epic を SSoT とし、req_draft は削除されてよい一時成果物となる
 - case-auto は case-open 成功後の停止、再開、完了処理を Issue と Epic だけで成立させる
 - case-run、case-close は case-open 成功後に req_draft を参照しない
-- draft type registry の allowed consumers 列は `{req-save, design-save, case-open}` とする（従来の `{req-save, case-open}` から design-save を追加）
+- draft type registry の allowed consumers 列は `{case-open, case-ready, case-revise}` とする（REQ/Decision 保存と Design 保存を case-ready / case-revise の Definition 保存内部責務として統合した構成に対応）
 
 ## req_draft 出力構造
 
-`req_draft`（`.agentdev/drafts/req-draft-{topic}.md`）は req-define が生成する一時的な構造化ハンドオフ成果物であり、req-save / design-save / case-open / case-auto / case-run / case-close が消費する。
+`req_draft`（`.agentdev/drafts/req-draft-{topic}.md`）は req-define が生成する一時的な構造化ハンドオフ成果物であり、case-open / case-ready / case-revise / case-auto / case-run / case-close が消費する。
 
 - req_draft は API 契約ではなく、生成元（producer）側の標準（緩やかな契約: soft contract）である。LLM 推論経由で消費され、機械的パースを前提としない（DEC-003）
 - スキーマバージョン、JSON Schema、バリデータは導入しない
@@ -496,9 +496,9 @@ Design operation の公式 enum は `create` / `append` / `update` の3値とす
 
 | operation | 意図 | target_area 扱い |
 |---|---|---|
-| `create` | 新規 Design ファイルを作成する | 任意（省略時は design-save が既存セクション構造から追加位置を判断） |
+| `create` | 新規 Design ファイルを作成する | 任意（省略時は Design 保存内部責務が既存セクション構造から追加位置を判断） |
 | `append` | 既存 Design ファイルへ新規セクションを追加する | 必須（anchor 見出し、Markdown 見出し行形式）。anchor 末尾への追加を示す `placement: tail`（既定）、anchor 直後を示す `placement: after_anchor`、anchor 直前を示す `placement: before_anchor` を action へ併せて出力できる（省略時は `tail`） |
-| `update` | 既存 Design ファイルの既存セクションを置換する | 必須（対象セクション見出し、Markdown 見出し行形式。例: `### IR-044`）。`target_area` に一致する見出しが存在しない場合、design-save は未検出として follow-up 報告を行う |
+| `update` | 既存 Design ファイルの既存セクションを置換する | 必須（対象セクション見出し、Markdown 見出し行形式。例: `### IR-044`）。`target_area` に一致する見出しが存在しない場合、Design 保存内部責務は未検出として follow-up 報告を行う |
 
 `append` と `update` の使い分けにより、意図的な新規セクション追加と `target_area` の誤字・古い見出し名・参照先間違いを機械的に区別できる。
 
@@ -540,7 +540,7 @@ Design operation の公式 enum は `create` / `append` / `update` の3値とす
 - frontmatter `updated` を更新していること
 - `status` は変更しないこと
 
-配置契約の実行詳細（`placement` 別挿入位置の算出、anchor マッチング規則）は `designs/commands/design-save.md`「append 操作時のセクション追加ロジック」が正規所有する。
+配置契約の実行詳細（`placement` 別挿入位置の算出、anchor マッチング規則）は `artifact-contracts.md`「append operation」と [agentdev-design-file-manager.md](../skills/agentdev-design-file-manager.md)「APPEND 操作」節が正規所有する。
 
 ## RU アーティファクト契約（session由来RU）
 

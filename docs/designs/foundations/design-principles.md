@@ -32,7 +32,7 @@ work_type と scale の組み合わせで workflow_route を導出する（REQ-0
 最小限の経路（req-define → case-open → case-run → case-close）で処理する。
 
 **feature** は新しい振る舞いをシステムに導入するため、WHAT（要件）と HOW（実装）の分離が必要である。
-壁打ちフェーズでの要件形成、REQ/Decision ファイルの保存、specs 更新など、複数の確認ポイントを経由する経路（req-define → req-save → design-save（Design 候補がある場合）→ case-open → case-run → case-close）を辿る。
+壁打ちフェーズでの要件形成、REQ/Decision ファイルの保存、specs 更新など、複数の確認ポイントを経由する経路（req-define → case-open → case-ready → case-run → case-close）を辿る。
 
 **maintenance** はリファクタリング、保守作業向けの軽量経路である。
 **docs_chore** はドキュメント、雑務向けの軽量経路である。
@@ -42,8 +42,8 @@ work_type と scale の組み合わせで workflow_route を導出する（REQ-0
 | work_type | scale | workflow_route | 経路 |
 |---|---|---|---|
 | bugfix | - | direct_case | req-define → case-open → case-run → case-close |
-| feature | standard | req_backed_case | req-define → req-save → design-save（Design 候補がある場合）→ case-open → case-run → case-close |
-| feature | large | epic_case | req-define → req-save → design-save（Design 候補がある場合）→ case-open（Epic）→ case-run（Wave）→ case-close |
+| feature | standard | req_backed_case | req-define → case-open → case-ready → case-run → case-close |
+| feature | large | epic_case | req-define → case-open（Epic）→ case-ready → case-run（Wave）→ case-close |
 | maintenance | - | direct_case | req-define → case-open → case-run → case-close |
 | docs_chore | - | direct_case | req-define → case-open → case-run → case-close |
 
@@ -71,7 +71,7 @@ Decision 対象となる判断を REQ/Design/guide のみとして扱う判断�
 - 複数モジュールにまたがる判断: command / skill / script / docs など複数の責務境界に影響し、局所仕様だけではトレードオフを説明できない
 - 長期間有効な技術選定: 一時的な仕様ではなく、将来の実装、運用判断を拘束する選定である
 
-予防策として、req-define / req-save は Decision 不要と判断した場合でも除外基準と根拠事実を記録すること。
+予防策として、req-define は Decision 不要と判断した場合でも除外基準と根拠事実を記録すること。
 上記リスク指標のいずれかに該当する場合、`agentdev-decision-guidelines` の閾値と除外基準を再適用し、Decision 不要の理由が技術判断不在、仕様変更のみ等に明確に該当することを確認すること。
 
 ---

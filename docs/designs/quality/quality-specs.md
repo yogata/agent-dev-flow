@@ -15,7 +15,7 @@ AgentDevFlow の品質基準、検証ルールを定義する。
 主ワークフローの品質ゲート定義は [quality-gates.md](quality-gates.md) を原本とする。
 各 Gate の判定基準、検査観点は `agentdev-quality-gates` スキルの参照ファイルを参照。
 
-- QG-1 Definition Integrity Gate（req-define / req-save）
+- QG-1 Definition Integrity Gate（req-define / Definition 保存（case-ready / case-revise））
 - QG-2 Acceptance Criteria Coverage Gate（case-open）
 - QG-3 Implementation Deviation Gate（case-run）
 - QG-4 Final Acceptance Gate（case-close）

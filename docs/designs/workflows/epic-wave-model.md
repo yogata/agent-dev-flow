@@ -173,7 +173,7 @@ scale: large（Epic）の場合、case-auto は Epic Issue に対し case-run(#e
 複数 execution_unit 並列実行時は、各 execution_unit に相当する Issue または Epic Issue に対し個別に処理する（REQ-034-018）。
 詳細は `docs/designs/commands/case-auto.md` 参照。
 
-- case-auto: pipeline 制御（req-save→design-save→case-open→case-run→case-close）、execution_unit 群反復制御、OU 逐次処理。case-run は case-auto 内でインライン実行し、実行担当サブエージェントへの委譲を case-auto から直接行う（委譲起点の折りたたみ、多重委譲回避）
+- case-auto: pipeline 制御（case-open→case-ready→case-run→case-close）、execution_unit 群反復制御、OU 逐次処理。case-run は case-auto 内でインライン実行し、実行担当サブエージェントへの委譲を case-auto から直接行う（委譲起点の折りたたみ、多重委譲回避）
 - case-run: Epic Wave 実行時の子Issue 並列委譲、全委譲完了待機、結果収集、Findings / Capture候補件数の集約
 - case-close: Epic Wave クローズ時の PR マージ、子Issue クローズ、Epic Issue 本文ステータス追跡テーブルの単一書き手
 
@@ -298,11 +298,11 @@ stage 2 の bg task がシステムにより破棄されたことを検知した
 ## 前工程完了度3段階分類（REQ-003-027）
 
 OU 属性「前工程完了度」を追加する。
-本属性は子 Issue 実行状態 enum（pending / ready / running / completed / blocked / failed / delegation-unavailable）とは直交する分類であり、前工程（req-save / design-save）の完了状況を表す。
+本属性は子 Issue 実行状態 enum（pending / ready / running / completed / blocked / failed / delegation-unavailable）とは直交する分類であり、前工程（Definition 保存（case-ready / case-revise））の完了状況を表す。
 
 | 前工程完了度 | 意味 | subagent の振る舞い（REQ-003-012） |
 |---|---|---|
-| 完全完了 | req-save / design-save 等の前工程で実施済み、追加作業不要 | 通常実行（acceptance criteria 順位検証を実施） |
+| 完全完了 | Definition 保存（case-ready / case-revise の内部責務）等の前工程で実施済み、追加作業不要 | 通常実行（acceptance criteria 順位検証を実施） |
 | 検証のみ | 前工程完了を前提、acceptance criteria 順位検証のみ実施 | acceptance criteria 順位検証は必須、前工程相当作業は実施しない |
 | 補完あり | 前工程に残余あり、補完実装の可能性 | 前工程相当作業の補完可能性を考慮しつつ acceptance criteria 順位検証を実施 |
 

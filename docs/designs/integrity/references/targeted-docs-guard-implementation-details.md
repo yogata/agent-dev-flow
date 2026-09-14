@@ -39,7 +39,7 @@ usage メッセージ、--help 出力で区切り形式を明示すること。
 
 ### Phase 4: コマンド別最小監査範囲
 
-- req-save/design-save/case-run/case-close の各コマンドが、対象ファイル種別に応じた最小監査範囲を定義すること。
+- case-ready/case-revise（Definition 保存の内部責務）/case-run/case-close の各コマンドが、対象ファイル種別に応じた最小監査範囲を定義すること。
 - 各コマンド Design と integrity-contracts.md の Workflow×ツールマトリックス表が SSoT であること。
 - case-run/case-close は永続文書更新を契機に検査すること。
 
@@ -81,7 +81,7 @@ TargetedDocsReport 型契約の正本は `docs/designs/integrity/integrity-contr
 
 旧Design直下配置前提の除去対応（v2:REQ-0158 より移管、完了済み）。
 
-- design-save.md（原本）と `docs/designs/commands/design-save.md`（Design）に残存する旧Design直下配置前提（`docs/designs/*.md`、`docs/designs/{topic-slug}.md`、`docs/designs/<existing-spec>.md`、Design 用 `new:{topic-slug}`）を廃止した。
+- Design 保存の旧Design直下配置前提（`docs/designs/*.md`、`docs/designs/{topic-slug}.md`、`docs/designs/<existing-spec>.md`、Design 用 `new:{topic-slug}`）を廃止した。
 - 新表現として `docs/designs/{domain}/{topic-slug}.md`、`docs/designs/**/*.md`、`target_design: {operation, domain, slug}` 構造化へ寄せた。
 - `docs/designs/README.md` の Design 配置表現（`designs/*.md`）を `designs/**/*.md` またはドメイン分割説明へ更新した。
 - Design 配下の二系統（実行単位: commands/skills/workflows、基盤: foundations/responsibilities/quality/integrity/local/authoring）を説明に含めた。

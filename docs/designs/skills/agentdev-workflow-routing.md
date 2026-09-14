@@ -13,7 +13,7 @@ updated: 2026-07-18
 
 ## 適用対象
 
-- レビュー NG 結果の処理（case-update `--review-ng` 時）
+- レビュー NG 結果の処理（レビュー NG 後の case-run 再開、Definition 変更時は case-revise → case-ready 経路）
 - レビュー拒否後の次のコマンド決定
 - 拒否タイプの分類（spec-bug / impl-bug / scope-creep / no-deviation）
 - Epic 関連コマンド推論の解決
@@ -52,6 +52,7 @@ updated: 2026-07-18
 
 - [agentdev-workflow-lifecycle.md](agentdev-workflow-lifecycle.md)
 - [agentdev-quality-gates.md](agentdev-quality-gates.md)
-- [commands/case-update.md](../commands/case-update.md)
-- REQ-006（case-update / Issue更新）
+- [commands/case-run.md](../commands/case-run.md)
+- [commands/case-revise.md](../commands/case-revise.md)
+- REQ-031（case-run 実行契約）
 

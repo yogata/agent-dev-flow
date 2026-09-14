@@ -33,7 +33,7 @@ updated: 2026-08-15
 - 実行前同期: `git pull --ff-only`
 - GitHub API 読み取り: gh CLI のみ使用（GitHub API 直接呼出禁止）
 - GitHub Issue 作成: 行わない（case-open 責務）
-- Issue/PR コメント投稿、マーカー付与: 行わない（case-update 責務）
+- Issue/PR コメント投稿、マーカー付与: 行わない（case-run / case-close 責務）
 
 ## 現在の動作
 

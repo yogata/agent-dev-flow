@@ -36,7 +36,7 @@ AgentDevFlow 配布物が前提する採番の不変条件を宣言し、各所�
 欠番が存在する場合でも欠番を埋めず、最大番号をもって決定する。
 
 採番の判断は人間または LLM が行わず、`agentdev-req-file-manager/scripts/`（REQ、複合 ID）と `agentdev-decision-file-manager/scripts/`（Decision）が提供する決定的スクリプト（`alloc-req-number.ts`、`alloc-decision-number.ts`、`alloc-composite-id.ts`）が機械的に確定する（design-principles.md 第5節）。
-req-save、design-save は当該スクリプトを bash 経由で呼び出す。
+Definition 保存 / Design 保存内部責務（case-ready / case-revise）は当該スクリプトを bash 経由で呼び出す。
 
 ### 廃止時の扱い
 

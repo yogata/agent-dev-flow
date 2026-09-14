@@ -58,13 +58,11 @@ PR 本文の capture 関連セクションは以下を分離する:
 | コマンド | intake | learning | 備考 |
 |---|---|---|---|
 | req-define | 非関与 | 非関与 | - |
-| req-save | REQ 再構成 intake に加え自工程 deviation capture | 自工程 deviation capture | Split Rule で分類、Skill 委譲で保存（REQ-006-106） |
-| design-save | 自工程 deviation capture | 自工程 deviation capture | 従来非関与から変更（REQ-006-107） |
+| case-ready / case-revise | REQ 再構成 intake に加え自工程 deviation capture（Definition 保存 / Design 保存の内部責務実行時） | 自工程 deviation capture | Split Rule で分類、Skill 委譲で保存（REQ-006-106 / REQ-006-107 由来） |
 | case-open | 自工程 deviation capture | 自工程 deviation capture | case-close への委譲を廃止（REQ-006-021） |
 | case-run | PR 本文記録のみ（直接 inbox 変更禁止） | PR 本文記録のみ（直接 inbox.md 変更禁止） | 実行担当サブエージェント経由 |
 | case-close | PR 本文から回収 + 自工程 deviation capture | PR 本文から回収 + 自工程 deviation capture | Epic 横断回収含む（REQ-006-105） |
 | case-auto | 各工程の保存結果参照と件数集計のみ | 各工程の保存結果参照と件数集計のみ | capture 本文の再分類・再保存は行わない（REQ-006-108） |
-| case-update | 非関与 | 非関与 | REQ 更新、レビュー NG コメント、Issue 本文更新のみ |
 | intake-* | 各コマンド責務（各 command Design 参照） | - | - |
 | learning-promote | - | 各コマンド責務（command Design 参照） | - |
 | inspect-* | 各コマンド責務（各 command Design 参照） | - | - |
@@ -88,15 +86,14 @@ v2:ADR-0127（case-auto 構成工程の委譲）と v2:ADR-0137（case-run イ�
 
 ## 工程別 capture 責務
 
-主ワークフロー構成 6 工程（req-save / design-save / case-open / case-run / case-close / case-auto）の capture 責務、保存先、git 永続化担当を工程別に定義する。
+主ワークフロー構成（case-open / case-ready / case-revise / case-run / case-close / case-auto）の capture 責務、保存先、git 永続化担当を工程別に定義する。
 各工程分散型（選択肢A、REQ-006-021 / REQ-006-105〜108）に従う。
 
 ### 工程別 capture 責務表
 
 | 工程 | capture 責務 | 保存先 | git 永続化担当 |
 |---|---|---|---|
-| req-save | REQ 再構成 intake + 自工程 deviation capture（REQ-006-106） | `.agentdev/intake/inbox/`、`.agentdev/learning/` | req-save command |
-| design-save | 自工程 deviation capture（REQ-006-107） | `.agentdev/intake/inbox/`、`.agentdev/learning/` | design-save command |
+| case-ready / case-revise | REQ 再構成 intake + 自工程 deviation capture（REQ-006-106 / REQ-006-107 由来） | `.agentdev/intake/inbox/`、`.agentdev/learning/` | case-ready / case-revise command |
 | case-open | 自工程 deviation capture（case-close への委譲を廃止、REQ-006-021） | `.agentdev/intake/inbox/`、`.agentdev/learning/` | case-open command |
 | case-run | PR 本文記録のみ（`.agentdev/` 直接変更禁止） | PR 本文 `## Findings / Capture候補` | 実行担当サブエージェント（PR 作成時） |
 | case-close | PR 本文から回収 + 自工程 deviation capture（REQ-006-105、Epic 横断回収含む） | `.agentdev/intake/inbox/`、`.agentdev/learning/` | case-close command |

@@ -118,7 +118,7 @@ sources:
 ---
 finding_type: SPLIT | MOVE | RETIRE | DUPLICATE | OBSOLETE | DRIFT
 source_req: REQ-{NNN} | null
-source_command: req-save
+source_command: Definition 保存内部責務（case-ready / case-revise）
 topic_slug: {topic-slug}
 created: "{YYYY-MM-DD}"
 ---
@@ -128,7 +128,7 @@ created: "{YYYY-MM-DD}"
 
 | 種別 | 説明 | 検出タイミング |
 |---|---|---|
-| `SPLIT` | 要件が膨張、関心分離の基準に該当し分割が必要 | req-save SPLIT検出時 |
+| `SPLIT` | 要件が膨張、関心分離の基準に該当し分割が必要 | Definition 保存（SPLIT検出）時 |
 | `MOVE` | 要件が別REQに移動すべき | requirements review時 |
 | `RETIRE` | 要件が不要になり廃止すべき | requirements review時 |
 | `DUPLICATE` | 複数REQ間で要件が重複 | requirements review時 |

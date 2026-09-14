@@ -41,23 +41,15 @@ baseline 件数は次の2軸で明記する。
 機械化判定はマッチ単位を採用し、grep 結果との1:1照合を可能にする。
 ファイル単位は進捗報告用の補助値とし、判定の主評価値とはしない。
 
-### baseline リスト（11件）
+### baseline リスト（3件）
 
-下記11件を baseline 既知違反として登録する。
+下記3件を baseline 既知違反として登録する。
 各行は「ファイルパス:行番号:違反内容:検出ルール」形式である。
-抽出元は integrity 検査の warning level（11件）、ファイル単位の件数は6件である。
+抽出元は integrity 検査の warning level（3件）、ファイル単位の件数は3件である。
 
 1. `src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md`:110:gh CLI 直接呼出し（`gh pr view`）:IR-053 (gh-direct-invocation)
-2. `src/opencode/commands/agentdev/req-save.md`:262:`docs/guides/` 参照:IR-055 (runtime-unresolved-reference, heuristic)
-3. `src/opencode/commands/agentdev/req-save.md`:272:`docs/designs/` 参照:IR-055 (runtime-unresolved-reference, heuristic)
-4. `src/opencode/commands/agentdev/req-save.md`:272:`docs/guides/` 参照:IR-055 (runtime-unresolved-reference, heuristic)
-5. `src/opencode/commands/agentdev/design-save.md`:226:`docs/guides/` 参照:IR-055 (runtime-unresolved-reference, heuristic)
-6. `src/opencode/commands/agentdev/design-save.md`:236:`docs/guides/` 参照:IR-055 (runtime-unresolved-reference, heuristic)
-7. `src/opencode/commands/agentdev/design-save.md`:240:`docs/designs/` 参照:IR-055 (runtime-unresolved-reference, heuristic)
-8. `src/opencode/commands/agentdev/design-save.md`:253:`docs/designs/` 参照:IR-055 (runtime-unresolved-reference, heuristic)
-9. `src/opencode/commands/agentdev/design-save.md`:253:`docs/designs/` 参照:IR-055 (runtime-unresolved-reference, heuristic)
-10. `src/opencode/skills/agentdev-inspect-skills/SKILL.md`:63:`docs/designs/` 参照:IR-055 (runtime-unresolved-reference, heuristic)
-11. `src/opencode/skills/agentdev-req-analysis/references/investigation-scope-refinement.md`:55:`docs/designs/` 参照:IR-055 (runtime-unresolved-reference, heuristic)
+2. `src/opencode/skills/agentdev-inspect-skills/SKILL.md`:63:`docs/designs/` 参照:IR-055 (runtime-unresolved-reference, heuristic)
+3. `src/opencode/skills/agentdev-req-analysis/references/investigation-scope-refinement.md`:55:`docs/designs/` 参照:IR-055 (runtime-unresolved-reference, heuristic)
 
 ## 関連
 

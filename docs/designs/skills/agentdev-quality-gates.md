@@ -15,13 +15,13 @@ AgentDevFlow 主ワークフローの品質ゲート QG-1〜QG-4 の判定基準
 
 ## 適用対象
 
-- QG-1（Definition Integrity Gate）: req-define / req-save での要件定義の構造的完全性検証
+- QG-1（Definition Integrity Gate）: req-define / Definition 保存（case-ready / case-revise）での要件定義の構造的完全性検証
 - QG-2（Acceptance Criteria Coverage Gate）: case-open での完了条件の必達要件網羅性検証
 - QG-3（Implementation Deviation Gate）: case-run での実装乖離検出、分類
 - QG-4（Final Acceptance Gate）: case-close での最終受け入れ確認
 
-主ワークフロー（req-define / req-save / design-save / case-open / case-run / case-close）のみ適用。
-design-save は独自 QG を持たず QG-1、QG-4 で担保される。
+主ワークフロー（req-define / case-open / case-ready / case-revise / case-run / case-close）のみ適用。
+Design 保存は独自 QG を持たず QG-1、QG-4 で担保される。
 
 ## 提供する判断、操作
 
@@ -61,7 +61,7 @@ QG-2 は REQ-017 execution contract 確定を支援するため、次の検証�
 ### 適用範囲
 
 - 新規 Issue 作成時（case-open Step 1、Step 5、Step 15 で実行）
-- case-update による新契約更新時
+- case-revise → case-ready による新契約更新時
 - legacy Issue（必須セクション不存在）には適用しない
 
 ### 既存 QG-2 との関係
@@ -104,7 +104,7 @@ QG-4 final acceptance の変更ファイル突合検証における I/O 操作�
 - Issue / PR / コメントの作成（各コマンド責務）
 - コマンド固有の手順（Steps / Guardrails）の置き換え
 - docs 全体の意味レビュー（inspect-docs 責務）
-- 適用範囲外ワークフロー（inspect-* / intake-* / learning-* / backlog-* / case-update）
+- 適用範囲外ワークフロー（inspect-* / intake-* / learning-* / backlog-*）
 
 ## 検証観点
 
@@ -116,6 +116,6 @@ QG-4 final acceptance の変更ファイル突合検証における I/O 操作�
 ## See Also
 
 - [quality-gates.md](../quality/quality-gates.md)（Design 定義）
-- [commands/req-define.md](../commands/req-define.md), [commands/req-save.md](../commands/req-save.md), [commands/case-open.md](../commands/case-open.md), [commands/case-run.md](../commands/case-run.md), [commands/case-close.md](../commands/case-close.md)（適用先）
+- [commands/req-define.md](../commands/req-define.md), [commands/case-ready.md](../commands/case-ready.md), [commands/case-revise.md](../commands/case-revise.md), [commands/case-open.md](../commands/case-open.md), [commands/case-run.md](../commands/case-run.md), [commands/case-close.md](../commands/case-close.md)（適用先）
 - REQ-001（REQ/Design 責務分離の徹底）
 
