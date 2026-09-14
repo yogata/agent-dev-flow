@@ -1,0 +1,24 @@
+version: 1
+kind: workflow-extension
+id: agentdev-workflow-case-revise
+
+context:
+  - id: definition-readiness
+    paths:
+      - "docs/designs/workflows/definition-readiness.md"
+    purpose: Definition Amendment の保存・確定境界の確認
+  - id: workflow-contracts
+    paths:
+      - "docs/designs/workflows/workflow-contracts.md"
+    purpose: 再合意済み変更後の case-ready 接続の確認
+  - id: case-revise-spec
+    paths:
+      - "docs/designs/commands/case-revise.md"
+    purpose: case-revise 固有の実行契約と停止境界の確認
+
+rules: []
+checks: []
+acceptance_gates:
+  - 再合意済み Definition 変更が Amendment として既存 Root Case に関連付けられていること
+  - case-revise 完了後に case-ready が再確定工程として実行可能であること
+must_not: []

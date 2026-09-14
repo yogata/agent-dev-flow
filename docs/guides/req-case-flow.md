@@ -6,10 +6,10 @@
 ## 全体の流れ
 
 ```
-/agentdev/req-define → /agentdev/req-save（REQ/Decision 対象 artifact_actions がある場合）→ /agentdev/design-save（Design 対象 artifact_actions がある場合）→ /agentdev/case-open → /agentdev/case-run → /agentdev/case-close
+/agentdev/req-define → /agentdev/case-open → /agentdev/case-ready → /agentdev/case-run → /agentdev/case-close
 ```
 
-> 工程分岐は req_draft の `artifact_actions` 存在で動的判定する。
+> `artifact_actions` は case-ready の Definition action として適用する。case-ready は保存対象の有無にかかわらず実行する。
 > draft は構造化 `draft-data` 形式（緩やかな契約：soft contract）で req-define が生成し、後続コマンドが LLM 推論で消費する。
 
 ## req-define
@@ -27,31 +27,6 @@ AI と対話して要件を整理するコマンド。
 
 **分類ゲート**: 既存成果物への反映作業のみを表す候補は、新規要件の独立要件行から除外する。
 
-## req-save
-
-要件docを REQ/Decision ファイルとして `docs/` に保存するコマンド。
-REQ/Decision 対象 artifact_actions（`artifact: req` / `artifact: decision`）がある場合に実行する。
-
-**入力**: 要件doc（REQ/Decision 対象 artifact_actions がある場合）
-
-**出力**: REQ/Decision ファイル（commit/push まで実行）
-
-## design-save
-
-req-define で分離された Design 保存対象を Design ファイルとして `docs/designs/` に保存、確定するコマンド。
-保存対象は `draft-data` の `artifact_actions` 内 `artifact: design` entry である。
-Design 対象 artifact_actions がある場合に実行する（全 work_type 対象）。
-req-save のファイル編集スコープ制約（Design 編集禁止）を緩和するものではなく、Design 保存を独立責務として切り出す。
-
-**入力**: 要件doc（Design 対象 artifact_actions がある場合）
-
-**出力**: Design ファイル（`docs/designs/**/*.md`）。新規作成時は `status: draft` を付与
-
-**Design ライフサイクル**: Design は frontmatter `status`（`draft` / `accepted`）で成熟度を管理する。
-`draft`（design-save で保存直後）→ `accepted`（case-close で実装が Design 内容を検証した旨を確認）の順で昇格する。
-
-**スキップ条件**: `artifact: design` entry がない場合はスキップする。
-
 ## case-open
 
 要件docまたは REQ ファイルから GitHub Issue を作成するコマンド。
@@ -61,6 +36,26 @@ req-save のファイル編集スコープ制約（Design 編集禁止）を緩�
 **出力**: GitHub Issue
 
 **Epic 規模判定**: 複数モジュール跨ぎ、PR 肥大化リスク、段階的リリースのいずれかを満たす場合、Epic + 子Issue 構成で実行する。
+
+## case-ready
+
+Definition Package を保存・確定し、Case の実行構造を確定するコマンド。
+
+**入力**: Root Case、要件doc、`artifact_actions`
+
+**出力**: 確定済み Definition Package、Epic / Wave / Issue の実行構造
+
+REQ、Decision、Design の保存と Design の成熟度管理は case-ready の Definition action として扱う。保存対象がない場合も case-ready は実行し、execution contract の確定と QG 前提を整える。
+
+## case-revise
+
+再合意済み Definition の変更を既存 Root Case に反映するコマンド。
+
+**入力**: 既存 Root Case、再合意済み要件doc、Amendment
+
+**出力**: Root Case に関連付けられた Definition 変更
+
+case-revise の後は case-ready を再実行し、変更後の Definition と実行構造を確定する。
 
 ## case-run
 
@@ -102,7 +97,7 @@ PR をマージし、Issue をクローズするコマンド。
 2. 要件、Design、README 索引の整合性確認
 3. Decision 作成済みかの確認
 4. マージ済み PR 本文から検出事項/Intake 候補を回収し、Intake / Learning に分離して保存
-5. PR 本文の `## Design確定候補` から Design 確定フローを実行（Design status の draft → accepted 昇格、または design-save 再起動の提案）
+5. PR 本文の `## Design確定候補` から Design 確定フローを実行（Design status の draft → accepted 昇格、または case-revise → case-ready の提案）
 
 ### Epic 自動クローズ
 
@@ -111,7 +106,7 @@ PR をマージし、Issue をクローズするコマンド。
 
 ## work_type 分類
 
-Issue の work_type は参考情報であり、パイプライン分岐（`/agentdev/req-save` の要否）は req_draft の `artifact_actions` 存在で動的判定する。
+Issue の work_type は参考情報であり、Definition action の適用とパイプライン分岐は case-ready が入力状態をもとに判定する。
 docs 更新責務は全 work_type 共通である（bugfix も含む）。
 
 | work_type | 名称 | ラベル | ブランチ種別 |
@@ -121,8 +116,7 @@ docs 更新責務は全 work_type 共通である（bugfix も含む）。
 | maintenance | リファクタリング、保守作業 | `refactor`, `maintenance` | `refactor` |
 | docs_chore | ドキュメント、雑務 | `docs`, `chore` | `chore` |
 
-**工程分岐**: req_draft の `artifact_actions` に `artifact: req` / `artifact: decision` entry が含まれれば req-save が実行され、`artifact: design` entry が含まれれば design-save が実行される。
-いずれの artifact_actions もない場合は case-open から開始する。
+**Definition action**: req_draft の `artifact_actions`（`artifact: req` / `artifact: decision` / `artifact: design`）は case-ready が適用する。いずれの action もない場合も case-ready をスキップしない。
 
 ## 最大自走モード
 
@@ -131,10 +125,10 @@ docs 更新責務は全 work_type 共通である（bugfix も含む）。
 
 ### 実行内容
 
-入力要件docの `draft-data` の `artifact_actions` を読み取り、工程を動的判定する（`artifact_actions` 存在による判定）:
+入力要件docの `draft-data` を読み取り、工程を実行する。`artifact_actions` は case-ready の入力として渡す:
 
-- **REQ/Decision artifact_actions あり**: `/agentdev/req-save` → `/agentdev/design-save`（Design artifact_actions がある場合）→ `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`
-- **REQ/Decision artifact_actions なし**: `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`（`/agentdev/req-save` 、 `/agentdev/design-save` をスキップ）
+- `/agentdev/case-open` → `/agentdev/case-ready` → `/agentdev/case-run` → `/agentdev/case-close`
+- 再合意済み Definition 変更時は `/agentdev/case-revise` → `/agentdev/case-ready` → `/agentdev/case-run` → `/agentdev/case-close`
 
 ### 自走対象
 

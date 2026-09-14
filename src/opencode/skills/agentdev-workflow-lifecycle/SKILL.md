@@ -41,7 +41,7 @@ work_type は工程分岐の参照軸である。
 Issue/PR をスキップする直接完了経路は存在しない。
 
 `workflow-contracts` Design は bugfix, maintenance, docs_chore を `direct_case` に分類する。
-`direct_case` は req-save と design-save を経由しないことを指し、Issue/PR を経由しないことを指さない。
+`direct_case` は Definition 保存工程を別入口で実行しないことを指し、Issue/PR を経由しないことを指さない。
 
 ### 経路一覧
 
@@ -50,14 +50,14 @@ Issue/PR をスキップする直接完了経路は存在しない。
 | bugfix | - | req-define → case-open → case-run → case-close |
 | maintenance | - | req-define → case-open → case-run → case-close |
 | docs_chore | - | req-define → case-open → case-run → case-close |
-| feature | standard | req-define →（req-save → design-save）→ case-open → case-run → case-close |
-| feature | large | req-define → req-save →（design-save）→ case-open → case-run → case-close（OU/ 子Issue 構成） |
+| feature | standard | req-define → case-open → case-ready → case-run → case-close |
+| feature | large | req-define → case-open → case-ready → case-run → case-close（OU/ 子Issue 構成） |
 
 各コマンドの正式名は `/agentdev/<name>` である（例: `/agentdev/req-define`）。
 一覧は command README 参照。
 
-feature が経由する req-save と design-save は req_draft の `artifact_actions` により動的判定する。
-該当 entry がない場合は case-open から開始する。
+feature の Definition action は req_draft の `artifact_actions` を case-ready に渡して動的適用する。
+該当 entry がない場合も case-ready で Definition readiness を確定する。
 feature large の OU/ 子Issue 構成は `agentdev-workflow-orchestration` 参照。
 
 ### docs_chore 経路の要素
@@ -71,7 +71,7 @@ docs_chore は bugfix, maintenance と同一経路をとる。
 - 完了証拠: マージ済み PR + クローズ済み Issue
 - 停止条件: `agentdev_handoff: true` 検出時、req-define 合意要件からの逸脱、リポジトリ外操作の必要性
 
-docs_chore は REQ, Decision, Design を生成しないことが多いため req-save と design-save を経由しないが、case-open, case-run, case-close は必ず経由する。
+docs_chore は REQ, Decision, Design を生成しないことが多いが、Case 実行では case-open, case-ready, case-run, case-close を経由する。
 docs 更新責務は全 work_type 共通である。
 
 ## スケール判定基準

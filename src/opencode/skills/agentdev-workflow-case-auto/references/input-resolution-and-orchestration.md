@@ -1,7 +1,7 @@
 # STEP-1/2/3: 入力解決・工程分岐・orchestration 実行（input-resolution-and-orchestration）
 
 > 本 reference は `agentdev-workflow-case-auto` SKILL.md の制御平面（STEP 一覧）STEP-1, STEP-2, STEP-3 詳細である。
-> 入力解決、work_type 読取・工程分岐、orchestration 実行（stage モデル、Wave 反復、bg task 管理）を提供する。
+> 入力解決、工程分岐、orchestration 実行（stage モデル、クリーンアップ検証ゲート、Wave 反復、bg task 管理）を提供する。
 
 ## 目次
 
@@ -31,7 +31,7 @@
 実行開始時刻を JST（Etc/GMT-{N}）で記録し `case_auto_started_at` に保持。
 STEP-8（停止時報告）・STEP-8（完了報告）での所要時間算出の基準として使用。
 
-- **Issue番号/URL入力モード**: 引数が数値のみまたは GitHub Issue URL の場合、Issue番号として解決し case-run 移行モードへ分岐（STEP-1 の Issue番号/URL入力分岐へ）。要件doc入力より優先。要件doc の入力解決・work_type 読取はスキップ
+- **Issue番号/URL入力モード**: 引数が数値のみまたは GitHub Issue URL の場合、Root Case として解決し、Issue の durable state に基づく継続工程（case-ready / case-run / case-close）へ分岐。要件doc入力より優先。要件doc の入力解決はスキップ
 - **要件doc入力モード**:
   - (1) 引数なし: `.agentdev/drafts/req-draft-*.md` 全件処理（デフォルト）。1件以上なら全件（1件含む）処理、0件なら停止し req-define 実行またはパス指定を求める。複数draftは無確認で全件処理
   - (2) 明示パス指定: 当該draftのみ。不在時は停止しエラー報告
@@ -56,11 +56,11 @@ STEP-8（停止時報告）・STEP-8（完了報告）での所要時間算出�
 
 - 読取と記録のみで副作用を持たない。`case_auto_started_at` は durable state として停止時報告・完了報告で再利用する
 
-## STEP-2: work_type 読取・工程分岐
+## STEP-2: 工程分岐（継続工程確定）
 
 ### Purpose
 
-`artifact_actions` 存在による動的判定で工程順序を確定し、auto_gate preflight を実施する。
+入力種別、`artifact_actions`、Root Case の durable state に基づく動的判定で工程順序を確定し、auto_gate preflight を実施する。`work_type` は参考情報であり固定分岐に使用しない。
 
 ### Input Resolution
 
@@ -75,15 +75,15 @@ STEP-8（停止時報告）・STEP-8（完了報告）での所要時間算出�
 
 ### Procedure
 
-入力要件doc の `draft-data` から work_type を取得（参考情報、パイプライン分岐の判定には使用しない）。
+入力要件doc の `draft-data` から `work_type`、`artifact_actions`、`auto_gate` を取得する（`work_type` は参考情報、パイプライン分岐の固定条件には使用しない）。Issue 入力時は Root Case の durable state を再構成する。
 
-#### 工程分岐（`work_type` 固定分岐ではなく `artifact_actions` 存在による動的判定）
+#### 工程分岐（`work_type` 固定分岐ではなく入力状態による動的判定）
 
-- **Issue番号/URL入力**: case-run → case-close（req-save、design-save、case-open、work_type読取をスキップ）。STEP-1 で解決した Issue番号/URL を case-run にそのまま渡す。draft-data の読取は行わない
-- **artifact_actions ベース分岐**:
-  - `artifact: req` または `artifact: decision` entry → req-save を実行
-  - `artifact: design` entry → design-save を実行（req-save の後、entry が空ならスキップ、`artifact_actions` フィールド不存在は後方互換で design-save スキップ）
-  - 常に → case-open → case-run → case-close
+- **要件doc入力（通常経路）**: case-open → case-ready → クリーンアップ検証ゲート → case-run → case-close。`artifact_actions` の有無は case-ready が適用する Definition action と auto_gate の判定に渡し、work_type 固定分岐は行わない
+- **再合意済み Definition 変更**: 既存 Root Case に対する req-define 再合意済み変更がある場合は case-revise → case-ready → クリーンアップ検証ゲート → case-run → case-close
+- **Issue番号/URL入力**: Root Case の状態が open なら case-ready から、ready/running/review なら case-run から継続し、再合意済み Definition 変更がある場合は case-revise から開始する。closed は再実行せず完了状態を報告
+- **artifact_actions の引き渡し**: `artifact: req`、`artifact: decision`、`artifact: design` entry は case-ready の Definition action 入力として渡す。entry の有無による下位保存 command の固定分岐は行わない
+- **通常経路**: case-open → case-ready → クリーンアップ検証ゲート → case-run → case-close
 
 #### auto_gate preflight
 
@@ -91,7 +91,7 @@ STEP-8（停止時報告）・STEP-8（完了報告）での所要時間算出�
 
 ### Result
 
-- 工程順序確定（req-save, design-save, case-open, case-run, case-close の部分集合）
+- 工程順序確定（通常経路、例外経路、Issue 再開経路のいずれか）
 
 ### Evidence
 
@@ -124,18 +124,18 @@ STEP-8（停止時報告）・STEP-8（完了報告）での所要時間算出�
 
 ### Procedure
 
-実行モデル原則、工程別契約（req-save+design-save 統合委譲、case-open、case-run インライン実行、case-close）、QG-1〜QG-4 の継承、タイムスタンプ計測（L1）、インライン実行時のコンテキスト管理、結果状態の4次元集約、case-open 完了後の分岐（Standard flow / Epic Issue flow、クリーンアップ検証ゲート）、Wave 反復制御、OU 処理順序、クリーンアップ検証ゲート、委譲起動判定（delegation-unavailable 停止条件）、Subagent 委譲プロトコル（category 選定ガイドライン、MUST NOT DO 必須化）、orchestration stage モデル、子 task bg task 破棄検知時の回復（3状態分類、ライフサイクル分離）の各詳細は `agentdev-workflow-orchestration`、`agentdev-case-run-execution-adapter`、`agentdev-git-worktree`、各対応 skill を参照。
+実行モデル原則、工程別契約（case-open / case-ready / case-revise の委譲、case-run インライン実行、case-close の委譲）、QG-1〜QG-4 の継承、タイムスタンプ計測（L1）、インライン実行時のコンテキスト管理、結果状態の4次元集約、case-ready 完了後のクリーンアップ検証ゲート、Wave 反復制御、OU 処理順序、委譲起動判定（delegation-unavailable 停止条件）、Subagent 委譲プロトコル（category 選定ガイドライン、MUST NOT DO 必須化）、orchestration stage モデル、子 task bg task 破棄検知時の回復（3状態分類、ライフサイクル分離）の各詳細は `agentdev-workflow-orchestration`、`agentdev-case-run-execution-adapter`、`agentdev-git-worktree`、各対応 skill を参照。
 case-run インライン実行時も case-run.md を authoritative source として読み込む。
 
 case-auto は各工程の結果に基づいて次工程へ進むか停止条件（STEP-4）を判定する。
-req-save/case-open の委譲に draft path と OU ID のみを渡す（OU 本文の切り出しは行わない）。
+case-open / case-ready / case-revise の委譲には contract が許す identifier と durable state のみを渡す（OU 本文の切り出しは行わない）。
 OU の統合・分割・REQ 操作分類・Issue 階層判定を再評価しない（各工程の判定結果に従う）。
 
 #### orchestration stage モデル
 
 | stage | 工程 | 実行方式 | 並列性 |
 |---|---|---|---|
-| stage 1 | case-open | 直列集約 | 単一 |
+| stage 1 | case-open → case-ready（例外経路時は case-revise → case-ready） | 直列集約 | 単一 |
 | stage 2 | case-run | bg task（最大5件） | 並列（3つの「5件」文脈の (2) に該当） |
 | stage 3 | case-close | 直列集約 | 単一 |
 
@@ -154,7 +154,7 @@ bg task 破棄検知時の3状態回復は `agentdev-workflow-orchestration` 参
 
 各工程の起動結果（Issue番号、PR番号）を次工程の入力として渡す。加えて以下を最終工程まで保持すること:
 
-1. RU ファイルパス（case-open 委譲の RU 削除で使用）
+1. RU ファイルパス（case-ready の cleanup gate で検証する対象）
 2. capture 対象情報（case-close 委譲の learning/intake capture で使用）
 
 工程間の引き継ぎでは、構造化文脈（10意味）を次工程へ構造化して渡す。
@@ -163,8 +163,8 @@ bg task 破棄検知時の3状態回復は `agentdev-workflow-orchestration` 参
 
 #### 複数REQ対応
 
-req-save 委譲の出力から複数 REQ doc または scale:large を検出した場合、case-auto は case-open の Issue 構造ルールを使用（command 不変条件）。
-req-save から case-open への状態引き継ぎ時、複数 REQ doc の保存結果をフィルタリング・再評価なしでそのまま渡す（command 不変条件）。
+case-ready の確定結果から複数 REQ doc または scale:large を検出した場合、case-auto は確定済みの Issue 構造に従う（command 不変条件）。
+case-open / case-ready から後工程への状態引き継ぎ時、複数 REQ doc の保存結果をフィルタリング・再評価なしでそのまま渡す（command 不変条件）。
 Epic Issue 化の判定には関与しない（command 不変条件）。
 case-open の判定結果に従う。
 
@@ -220,11 +220,11 @@ case-open の判定結果に従う。
 - 不変条件（委譲工程は各コマンド委譲契約に従い起動、case-run はインライン実行、委譲起動不能時は `delegation-unavailable` として報告）
 - 不変条件（工程固有の詳細手順と case-auto 定義が矛盾する場合、工程固有処理は既存コマンド定義を優先）
 - 不変条件（case-auto は Issue 階層決定ロジックを持たない、複数 REQ doc または scale:large の場合は case-open のルールに委譲）
-- 不変条件（req-save 委譲から case-open 委譲への状態引き継ぎ時、複数 REQ doc の保存結果をフィルタリングまたは再評価しない）
+- 不変条件（case-open / case-ready から後工程への状態引き継ぎ時、複数 REQ doc の保存結果をフィルタリングまたは再評価しない）
 - 不変条件（Epic Wave 実行時、Wave 反復制御、現在 Wave の ready 子Issue 選択、子Issue 並列委譲 最大5件 を直接担当、case-run(#epic) への委譲は行わない、各子Issue ごとにインライン case-run、Wave 境界のクローズは case-close(#epic) に委譲）
 - ガードレール（case-auto は独自の操作単位ステータス追跡を持たない、Epic Issue のステータス追跡テーブルを使用、Epic Issue 本文の書き込みは case-close 単一書き手、case-auto は読み取るのみ）
 - 不変条件（case-auto は操作単位キューの管理・制御のみを担い、OU 本文の抽出・変換・REQ 操作解釈を行わない）
-- 不変条件（case-auto は orchestration pre-reader として case-open 完了前のみ req_draft を読み込み、case-open 成功後は invalid post-case reader として req_draft を読まない、case-open 成功後の停止・再開・完了処理は Issue と Epic だけで成立、クリーンアップ検証ゲートは case-open 完了後に実行、独自の OU 状態管理を持たない）
+- 不変条件（case-auto は orchestration pre-reader として case-open 前のみ req_draft を読み込み、case-ready 成功後は invalid post-case reader として req_draft を読まない、case-ready 成功後の停止・再開・完了処理は Issue と Epic だけで成立、クリーンアップ検証ゲートは case-ready 完了後に実行、独自の OU 状態管理を持たない）
 - 不変条件（OU 間依存は queue dependency として扱い、依存関係があるだけでは Epic Issue 化しない）
 - 不変条件（case-auto は Epic Issue 化の判定に関与しない、case-open の判定結果に従う）
 - 不変条件（各工程の起動は工程別契約に従い、inputs に指定された情報のみを渡し、output_contract に指定された結果のみを受領）

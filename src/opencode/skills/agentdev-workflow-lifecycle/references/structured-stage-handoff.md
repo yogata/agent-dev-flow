@@ -1,7 +1,7 @@
 <!-- ADF-COVERS(implementation): REQ-017-019 -->
 # 工程間構造化文脈引き継ぎ（structured-stage-handoff）
 
-AgentDevFlow の工程間（req-define → req-save → design-save → case-open → case-run → case-close、および上流工程（backlog-review 等）から req-define への接続）で引き継ぐ構造化文脈の、配布物側の直列化形式と生成・消費契約。
+AgentDevFlow の工程間（req-define → case-open → case-ready → case-run → case-close、および再合意経路 case-revise → case-ready、上流工程（backlog-review 等）から req-define への接続）で引き継ぐ構造化文脈の、配布物側の直列化形式と生成・消費契約。
 原本仕様は `<workflows/workflow-contracts>` Design「工程間構造化文脈引き継ぎ契約」である（Design を正とし、本参照は配布物への適用形を定める）。
 
 ## 目的
@@ -20,7 +20,7 @@ AgentDevFlow の工程間（req-define → req-save → design-save → case-ope
 ```yaml
 structured_context:
   purpose: {当該工程の目的（実行契約の要約。後工程対象の Issue 本文の概要または正規 REQ から抽出）}
-  workflow_phase: {現在の ADF 工程（req-define / req-save / design-save / case-open / case-run / case-close 等）}
+workflow_phase: {現在の ADF 工程（req-define / case-open / case-ready / case-revise / case-run / case-close 等）}
   execution_unit: {現在の実行単位（Issue 番号、Wave、OU 等の識別子）}
   resolved_context:
     - {前工程で確定した事項の要約。正規情報源の参照先を付ける}

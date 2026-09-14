@@ -11,7 +11,7 @@ AgentDevFlow 主ワークフローの品質ゲート QG-1〜QG-4 の判定基準
 ## 概要
 
 - **役割**: QG-1〜QG-4 の判定基準、検査観点、乖離分類基準を提供する
-- **対象**: AgentDevFlow **主ワークフローのみ**（req-define/ req-save/ design-save/ case-open/ case-run/ case-close）。design-save は主ワークフローの一工程だが、独自の QG を持たず QG-1（req-save）と QG-4（case-close）の Design lifecycle 確定で担保される
+- **対象**: AgentDevFlow **主ワークフローのみ**（req-define/ case-open/ case-ready/ case-revise/ case-run/ case-close）。Definition の保存・確定は case-ready / case-revise の責務として QG-1 と QG-4 の検証へ接続する
 - **特性**: 知識ベースである。コマンドから参照され、判定結果を返すが成果物を直接編集しない
 - **依存**: agentdev コマンドから参照される専門スキル
 
@@ -19,7 +19,7 @@ AgentDevFlow 主ワークフローの品質ゲート QG-1〜QG-4 の判定基準
 
 | Gate | 名称 | 配置コマンド | 参照ファイル |
 |------|------|-------------|-------------|
-| QG-1 | Definition Integrity Gate | req-define/ req-save | [qg-1-definition-integrity.md](references/qg-1-definition-integrity.md) |
+| QG-1 | Definition Integrity Gate | req-define/ case-ready/ case-revise | [qg-1-definition-integrity.md](references/qg-1-definition-integrity.md) |
 | QG-2 | Acceptance Criteria Coverage Gate | case-open | [qg-2-acceptance-criteria-coverage.md](references/qg-2-acceptance-criteria-coverage.md) |
 | QG-3 | Implementation Deviation Gate | case-run | [qg-3-implementation-deviation.md](references/qg-3-implementation-deviation.md) |
 | QG-4 | Final Acceptance Gate | case-close | [qg-4-final-acceptance.md](references/qg-4-final-acceptance.md) |
@@ -34,7 +34,7 @@ AgentDevFlow 主ワークフローの品質ゲート QG-1〜QG-4 の判定基準
 - `intake-*`（intake-capture/ intake-from-github/ intake-promote）
 - `learning-*`（learning-capture/ learning-promote）
 - `backlog-*`（backlog-review）
-- `case-update`（QG 直接参照なし。`--review-ng` 時は QG-3 の結果を引用する）
+- `case-revise`（QG 直接参照なし。`--review-ng` 時は QG-3 の結果を引用する）
 
 ## 責務境界
 
@@ -48,10 +48,10 @@ AgentDevFlow 主ワークフローの品質ゲート QG-1〜QG-4 の判定基準
 QG-3 は実装と Issue/ REQ/ Decision/ Design/ work plan の乖離検出ゲートであり、docs 全体の意味レビューの代替ではない。
 docs 全体の意味レビューは `/agentdev/inspect-docs` が担う。
 
-### case-update 連携
+### case-revise 連携
 
-QG-3 は乖離の分類と推奨アクションの提示までを責務とし、REQ 更新の最終判断は case-update（ユーザー承認入力）に委譲する。
-乖離分類 → case-update フラグの mapping は `references/qg-3-implementation-deviation.md` を参照。
+QG-3 は乖離の分類と推奨アクションの提示までを責務とし、再合意済み Definition 変更の最終反映は case-revise（ユーザー承認入力）に委譲する。
+乖離分類 → case-revise フラグの mapping は `references/qg-3-implementation-deviation.md` を参照。
 
 ## 自動ループバック禁止
 
@@ -73,4 +73,4 @@ QG-4（full integrity suite 合格基準）における bun test フル suite �
 - quality-gates Design（QG-1〜QG-4 の Design 定義、機械化境界、実装マッピング、skill extension 経由）
 - **agentdev-req-analysis**: 要件分析手法、チェックボックス品質基準（QG-1 の基準）
 - **agentdev-workflow-lifecycle**: work_type 判定、フェーズ定義
-- **agentdev-workflow-routing**: case-update --review-ng 手順（QG-3 結果の消費先）
+- **agentdev-workflow-routing**: case-revise --review-ng 手順（QG-3 結果の消費先）

@@ -62,7 +62,7 @@
 | branch 削除検出 | (9) |
 | 未コミット変更の帰属不明 | (10) |
 | 上位合意矛盾 | bounded parent decision resolution で decision_context が現行正規成果物間の矛盾に起因する場合 |
-| 新規ユーザー判断事項 | 同 decision_context が新しいユーザー価値判断・対象範囲変更・外部契約変更を必要とする場合 |
+| 新規ユーザー判断事項 | 同 decision_context が新しいユーザー価値判断・対象範囲変更・外部契約変更を必要とする場合。Root Case の `resume_command: req-define` を記録する |
 
 execution_unit 分割可能性があるにも関わらず case-open が停止した場合、「req-define 合意要件からの逸脱」ではなく「command 契約・実装不整合」として報告する（case-open の契約・実装不整合であり要件doc 側の問題ではない）。
 各分類の定義、対応停止条件、再開コマンド候補の詳細は `agentdev-workflow-orchestration` を参照。

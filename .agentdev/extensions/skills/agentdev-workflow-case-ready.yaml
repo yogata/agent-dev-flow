@@ -1,0 +1,24 @@
+version: 1
+kind: workflow-extension
+id: agentdev-workflow-case-ready
+
+context:
+  - id: definition-readiness
+    paths:
+      - "docs/designs/workflows/definition-readiness.md"
+    purpose: Definition Package の保存・確定と readiness 状態遷移の確認
+  - id: workflow-contracts
+    paths:
+      - "docs/designs/workflows/workflow-contracts.md"
+    purpose: case-ready を含む工程接続と SSoT 遷移の確認
+  - id: case-ready-spec
+    paths:
+      - "docs/designs/commands/case-ready.md"
+    purpose: case-ready 固有の実行契約と受入境界の確認
+
+rules: []
+checks: []
+acceptance_gates:
+  - Definition の保存・確定結果と execution structure が Issue に反映されていること
+  - drafts と RU の残存を case-auto の cleanup gate が検証できること
+must_not: []
