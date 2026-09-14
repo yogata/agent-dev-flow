@@ -446,7 +446,7 @@ NG baseline 保持型 checker を baseline 未整備環境で実行した場合�
 - delta 0 実証は同一環境での再実行に基づく。異なる環境間の結果比較で代替しない。環境ラベル（worktree/main、junction 伝播状態、依存パッケージ状態）が一致しない実行間の比較は delta 0 の証拠として採用しない
 - 対照実行の main HEAD 側実行は detached worktree を使う（stash 往復リスク回避の既存規約。worktree 汎用手順の baseline 比較手順に従う）
 - 本判定は baseline 未整備環境に限定する。baseline 整備済み環境では通常の baseline 比較を用い、本手順を適用しない
-- baseline ファイルの整備自体（IR-059 baseline 整備）は別課題であり、本手順はその代替を恒久化するものではない
+- baseline ファイルの整備自体（IR-059 baseline 整備）は別課題であり、checker 実装の変更も対象外である。本手順はその代替を恒久化するものではない
 
 ## docs-check delta 検出における除外設定方針（REQ-010-007, REQ-010-009 準拠）
 
