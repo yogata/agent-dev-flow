@@ -33,4 +33,4 @@ AgentDevFlow は AI エージェントによる開発ワークフローを支え
 配布コマンドの索引。
 詳細な選び方は上表の[コマンド選択](docs/guides/command-selection.md)、各コマンドの入出力は[コマンドリファレンス](src/opencode/commands/agentdev/README.md)を参照する。
 
-`/agentdev/req-define`、`/agentdev/req-save`、`/agentdev/design-save`、`/agentdev/case-open`、`/agentdev/case-run`、`/agentdev/case-update`、`/agentdev/case-close`、`/agentdev/case-auto`、`/agentdev/intake-capture`、`/agentdev/intake-from-github`、`/agentdev/intake-promote`、`/agentdev/learning-promote`、`/agentdev/backlog-review`、`/agentdev/backlog-auto`、`/agentdev/inspect-docs`、`/agentdev/inspect-skills`、`/agentdev/inspect-promote`、`/agentdev/issue`、`/agentdev/third-party-sync`
+`/agentdev/req-define`、`/agentdev/req-save`、`/agentdev/design-save`、`/agentdev/case-open`、`/agentdev/case-ready`、`/agentdev/case-run`、`/agentdev/case-update`、`/agentdev/case-close`、`/agentdev/case-auto`、`/agentdev/intake-capture`、`/agentdev/intake-from-github`、`/agentdev/intake-promote`、`/agentdev/learning-promote`、`/agentdev/backlog-review`、`/agentdev/backlog-auto`、`/agentdev/inspect-docs`、`/agentdev/inspect-skills`、`/agentdev/inspect-promote`、`/agentdev/issue`、`/agentdev/third-party-sync`

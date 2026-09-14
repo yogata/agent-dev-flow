@@ -29,6 +29,7 @@ AgentDevFlow（`/agentdev/*` コマンド体系）は 3 つのパイプライン
 | `/agentdev/req-save` | 要件定義の保存 | [commands/req-save.md](../commands/req-save.md) |
 | `/agentdev/design-save` | Design 候補の保存、確定 | [commands/design-save.md](../commands/design-save.md) |
 | `/agentdev/case-open` | Issue 登録（連結成分ベース複数 Standard/Epic 構成生成、3軸判断） | [commands/case-open.md](../commands/case-open.md) |
+| `/agentdev/case-ready` | Definition 受入と実行準備完了への状態遷移 | [commands/case-ready.md](../commands/case-ready.md) |
 | `/agentdev/case-run` | 実装パイプライン（3 フェーズ構成） | [commands/case-run.md](../commands/case-run.md) |
 | `/agentdev/case-update` | Issue 更新 | [commands/case-update.md](../commands/case-update.md) |
 | `/agentdev/case-close` | 完了処理（達成判定プロトコル付き完了ゲート） | [commands/case-close.md](../commands/case-close.md) |
@@ -118,6 +119,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 | `/agentdev/req-save` | 要件doc | REQ/Decision ファイル | req/case |
 | `/agentdev/design-save` | 要件doc | Design ファイル | req/case |
 | `/agentdev/case-open` | 要件doc | GitHub Issue | req/case |
+| `/agentdev/case-ready` | Root Case Issue | ready 状態の Root Case + 実行構造 | req/case |
 | `/agentdev/case-run` | Issue | 実装済みブランチ + PR | req/case |
 | `/agentdev/case-update` | Issue | 更新済み Issue / REQ | req/case |
 | `/agentdev/case-close` | Issue + PR | マージ済み + クローズ済み | req/case |

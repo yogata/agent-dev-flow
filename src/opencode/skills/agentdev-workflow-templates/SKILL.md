@@ -41,6 +41,13 @@ agentdev系コマンドで使用するIssue/PR本文、コメントテンプレ�
 | `templates/case-open/root-case.md` | Root Case Issue 本文 | case-open | 全 Case |
 | `templates/case-open/root-case-report.md` | Root Case 完了報告 | case-open | 全 Case |
 
+### case-ready テンプレート（Root Case 用）
+
+| テンプレート | 用途 | 対象コマンド | 適用対象 |
+|---|---|---|---|
+| `templates/case-ready/root-case.md` | Root Case Issue 本文（execution contract 確定と ready 遷移で更新する構造） | case-ready | 全 Case |
+| `templates/case-ready/root-case-report.md` | Root Case 完了報告 | case-ready | 全 Case |
+
 ### PR本文テンプレート
 
 | テンプレート | 用途 | 対象コマンド |
@@ -71,6 +78,7 @@ Issue 本文テンプレートと PR 本文テンプレートに、ADF 実行の
 | テンプレート | 記録する識別情報 |
 |---|---|
 | `templates/case-open/root-case.md` | 対象 Case（Root Case 自身）、実行単位（case-ready で確定。取得不能時は N/A） |
+| `templates/case-ready/root-case.md` | 対象 Case、実行単位（case-ready が確定した値） |
 | `issue_desc_feature.md` | 対象 Case、実行単位 |
 | `issue_desc_bug.md` | 対象 Case、実行単位 |
 | `issue_desc_epic.md` | 対象 Case、実行単位 |
@@ -211,6 +219,12 @@ work_type 判定基準と固有ルールは `agentdev-workflow-lifecycle` を参
 | 条件 | 完了報告テンプレート |
 |------|---------------------|
 | Root Case（全 Case） | `templates/case-open/root-case-report.md` |
+
+### 完了報告時のテンプレート選定（case-ready）
+
+| 条件 | 完了報告テンプレート |
+|------|---------------------|
+| Root Case（全 Case） | `templates/case-ready/root-case-report.md` |
 
 ### 共通ルール
 
