@@ -150,11 +150,11 @@ Issue 本文のテスト戦略セクションに含まれる全 test strategy �
 
 #### 運用実例
 
-**実例1: case-open STEP-2-3 記載粒度ガイドライン**
+**実例1: 完了条件の識別子中心記載（case-ready 責務）**
 
-case-open は Issue 本文の完了条件・事前状態を識別子中心で記載する。
+完了条件・事前状態の識別子中心記載は case-ready の責務である。
+case-open は Root Case 確立時に完了条件を確定しない。
 件数等の変動しやすい実測値は補助値として扱う。
-詳細は `agentdev-workflow-case-open` の STEP-2-3（issue-body-and-execution-contract.md）参照。
 
 ```
 ## 完了条件（識別子中心）

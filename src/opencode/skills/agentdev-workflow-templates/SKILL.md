@@ -34,13 +34,12 @@ agentdev系コマンドで使用するIssue/PR本文、コメントテンプレ�
 
 コメントテンプレートの本文は Read tool で読み込んで変数置換し、Custom Tool `agentdev_gh` の comment_create 操作で投稿する。テンプレートファイル名 `issue_comment_*.md` は用途識別子であり、Tool 操作名を指さない。
 
-### case-open 完了報告テンプレート
+### case-open テンプレート（Root Case 用）
 
-| テンプレート | 用途 | 対象コマンド | flow |
+| テンプレート | 用途 | 対象コマンド | 適用対象 |
 |---|---|---|---|
-| `templates/case-open/standard.md` | Standard flow 完了報告 | case-open | Standard flow |
-| `templates/case-open/epic.md` | 単一REQ Epic flow 完了報告 | case-open | Epic flow（単一REQ） |
-| `templates/case-open/multi-req-epic.md` | マルチREQ Epic flow 完了報告 | case-open | Epic flow（マルチREQ） |
+| `templates/case-open/root-case.md` | Root Case Issue 本文 | case-open | 全 Case |
+| `templates/case-open/root-case-report.md` | Root Case 完了報告 | case-open | 全 Case |
 
 ### PR本文テンプレート
 
@@ -71,6 +70,7 @@ Issue 本文テンプレートと PR 本文テンプレートに、ADF 実行の
 
 | テンプレート | 記録する識別情報 |
 |---|---|
+| `templates/case-open/root-case.md` | 対象 Case（Root Case 自身）、実行単位（case-ready で確定。取得不能時は N/A） |
 | `issue_desc_feature.md` | 対象 Case、実行単位 |
 | `issue_desc_bug.md` | 対象 Case、実行単位 |
 | `issue_desc_epic.md` | 対象 Case、実行単位 |
@@ -156,32 +156,28 @@ case-open が draft-data の `review_dispositions` を読み取り、Issue 本�
 
 #### 対象テンプレートと内容
 
-| テンプレート | work_type | セクション内容 |
+| テンプレート | 適用対象 | セクション内容 |
 |---|---|---|
-| `issue_desc_feature.md` | feature | 全 disposition 明細（`<!-- 【必須】 -->`） |
-| `issue_desc_bug.md` | bugfix | 全 disposition 明細（`<!-- 【必須】 -->`） |
-| `issue_desc_epic.md` | feature (Epic) | 全 disposition 明細（`<!-- 【必須】 -->`）。Epic flow の場合は全 disposition を Epic Issue へ転記 |
-| `issue_desc_child.md` | feature (Epic child) | 親 Epic Issue 参照のみ（明細重複転記なし、`<!-- 【必須】 -->`、「該当なし」不使用） |
+| `templates/case-open/root-case.md` | Root Case（case-open） | 全 disposition 明細（`<!-- 【必須】 -->`） |
+
+Epic Issue / 子 Issue 本文への転記は case-ready が Epic 構成確定後に実行し、そのテンプレート規約は case-ready 配布物が定める。case-open は Epic / 子 Issue への転記を行わない。
 
 #### セクション仕様
 
 「レビュー判断」セクションは `<!-- 【必須】 -->` マーカー付きの必須セクションとする。
-feature、bug、epic テンプレートでは転記対象 disposition がない場合「該当なし」と記載する。
-child テンプレートでは「該当なし」を使用せず、親 Epic Issue 参照のみを記載する。
+root-case テンプレートでは転記対象 disposition がない場合「該当なし」と記載する。
 
 各 disposition 明細は id（`RD-NNN`）、disposition、reason_code、reason、evidence（path、section、checked_at_commit）を記載する。
 `checked_at_commit` は case-open が default branch 最新化後に再確認した commit SHA を記録する。
 
 #### 配置規則
 
-feature、bug、child テンプレートでは「テスト戦略」セクションの直後、「補足情報」セクションの前に配置する。
-epic テンプレートでは「完了条件」セクションの直後、「補足情報」セクションの前に配置する。
+root-case テンプレートでは「Case 状態と次工程」セクションの直後、「補足情報（オプション）」セクションの前に配置する。
 
-#### 転記規則（AG-{NNN}）
+#### 転記規則
 
-- 単一 Standard Issue: 全 disposition を当該 Issue へ転記
-- Epic flow: 全 disposition を Epic Issue へ転記。子 Issue へは重複転記しない
-- 複数 Standard Issue: 各 Issue の OU、変更対象に関連する disposition を当該 Issue へ転記。ドラフト全体の disposition はルート Issue（`recommended_order` 最小）へ転記
+- case-open は全 disposition を Root Case 本文「レビュー判断」セクションへ転記する
+- Epic Issue / 子 Issue への転記は case-ready が Epic 構成確定後に実行する。case-open は重複転記しない
 
 ### テンプレートパス
 
@@ -195,13 +191,13 @@ epic テンプレートでは「完了条件」セクションの直後、「補
 
 ### Issue作成時のテンプレート選定（case-open）
 
-| 条件 | 本文テンプレート | コメントテンプレート |
-|------|-----------------|---------------------|
-| bugfix | `issue_desc_bug.md` | `issue_comment_bug_analysis.md` |
-| feature | `issue_desc_feature.md` | `issue_comment_feature_technical.md` |
-| maintenance | `issue_desc_feature.md` | `issue_comment_bug_analysis.md` |
-| docs_chore | `issue_desc_feature.md` | `issue_comment_bug_analysis.md` |
-| Epic フロー | `issue_desc_epic.md` | work_type に応じて子Issueと同一ルール適用 |
+| 条件 | 本文テンプレート |
+|------|-----------------|
+| 全 work_type（Root Case） | `templates/case-open/root-case.md` |
+
+Root Case 本文は work_type によらず同一テンプレートを使用する。
+work_type は Definition Package の属性として記録し、ラベル付与と Definition PR の実変更判定（bugfix 等の実変更なし Case では PR 不作成）に用いる。
+work_type 判定基準と固有ルールは `agentdev-workflow-lifecycle` を参照する。
 
 ### Issueクローズ時のテンプレート選定（case-close）
 
@@ -214,9 +210,7 @@ epic テンプレートでは「完了条件」セクションの直後、「補
 
 | 条件 | 完了報告テンプレート |
 |------|---------------------|
-| Standard flow | `templates/case-open/standard.md` |
-| Epic flow（単一REQ） | `templates/case-open/epic.md` |
-| Epic flow（マルチREQ） | `templates/case-open/multi-req-epic.md` |
+| Root Case（全 Case） | `templates/case-open/root-case-report.md` |
 
 ### 共通ルール
 
