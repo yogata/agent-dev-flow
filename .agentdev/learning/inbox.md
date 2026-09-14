@@ -81,3 +81,24 @@
 - 内容: worktree での bun test は node_modules 未伝播により、`.opencode/` 配下の依存（zod 等）と src 側 import 解決の双方で事前整備が必要。`.opencode/package.json` 取得 + bun install に加え、src/opencode からの解決のため worktree root への node_modules junction 作成が必要だった（整備資産は gitignore 対象、commit 対象外）
 - 関連: Issue #2808（OU-003）、PR #2816 対応記録コメント、既存知識 docs/knowledge/checker-cli-stdout-loss-on-windows-bun.md
 - タグ: `#worktree` `#bun-test` `#node-modules` `#junction`
+
+## 2026-09-14 case 2805 OU-004（PR #2817）: worktree の bun test 依存整備は .opencode/skills 側 bun install で完結する
+
+- 観測元: case 2805 OU-004（DEL-2809-1、PR #2817）本文 learning 候補、case-close 2026-09-14 回収
+- 内容: worktree での bun test 分割①は zod 解決のため node_modules junction 接続が要る。`.opencode/`（package.json + node_modules/zod）は worktree へ伝播せず、`agentdev-project-extensions/scripts` を import するテストが「Cannot find package 'zod'」で error 化する。REQ-018 fallback 契約（src/opencode/ への fallback）では解決しない依存解決系の構造的制約。QG-4 正規形の `bun install --cwd` 2 dir 前置（`src/opencode/skills/agentdev-project-extensions/scripts` と `.opencode/skills/repo-agentdev-integrity/scripts`）で解決できる（case-close 再実行で確認済み）
+- 関連: Issue #2809（OU-004）、PR #2817 対応記録コメント、同 inbox の「worktree での bun test 実行に必要な node_modules 事前整備」（OU-003）と関連。統合判断は learning-promote が行う
+- タグ: `#worktree` `#bun-test` `#zod` `#junction` `#qg4`
+
+## 2026-09-14 case 2805 OU-004（PR #2817）: check_integrity の --json 出力は bun CLI 経由・Windows で末尾破損することがある
+
+- 観測元: case 2805 OU-004（DEL-2809-1、PR #2817）本文 learning 候補、case-close 2026-09-14 回収
+- 内容: bun CLI 経由の checker `--json` 出力が Windows で途中破損する事例。human readable 出力 + node 単独実行へ切り替えて回避。checker 実行契約の「stdout flush 前 exit」回避策の実例
+- 関連: Issue #2809（OU-004）、PR #2817 対応記録コメント、既存知識 docs/knowledge/checker-cli-stdout-loss-on-windows-bun.md
+- タグ: `#windows` `#bun` `#json` `#stdout` `#checker`
+
+## 2026-09-14 case 2805 OU-004（PR #2817）: main root 対照実行は mid-Epic の stale 状態で環境特有 fail を出す。由来分類には PR HEAD での pass 確認を併記する
+
+- 観測元: case 2805 OU-004 case-close の bun test 分割① main root 対照実行（2026-09-14、エージェント自律観測）
+- 内容: main root での分割①対照実行が worktree（PR HEAD）より 4 件多い fail を出した（IR-055 runtime-unresolved-reference delta 系 2件・NG21 N16/N17 2件）。原因は mid-Epic の main root 環境が次子 Issue の manifest 未反映 / stale junction 状態にあることで、同一テストは PR HEAD worktree では pass する。対照実行による fail 由来分類では「baseline（main）で再現する pre-existing」と「main 環境固有で PR HEAD では pass の環境起因（無効分類）」を区別し、後者には PR HEAD での pass 結果を根拠として併記する。 Epic 進行中の main root は対照実行の baseline として絶対視しない
+- 関連: PR #2817 対応記録コメント検証差分、同 inbox の「Integrity suite・textlint final gate の Windows 環境依存失敗と timeout」（OU-002）、QG-4 環境ラベル（junction 伝播状態）
+- タグ: `#integrity-suite` `#ir055` `#ng21` `#main-root` `#fail-origin` `#epic`
