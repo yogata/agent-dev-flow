@@ -214,7 +214,7 @@ describe("Workflow Skill 本文・extension の切替", () => {
   });
 
   it.each([
-    ".agentdev/extensions/skills/agentdev-workflow-design-save.yaml",
+    ".agentdev/extensions/skills/agentdev-workflow-case-ready.yaml",
     ".agentdev/extensions/skills/agentdev-workflow-case-open.yaml",
     ".agentdev/extensions/skills/agentdev-adversarial-review.yaml",
   ])("traceability を利用しない工程の extension が rules を持たない: %s", (rel) => {
