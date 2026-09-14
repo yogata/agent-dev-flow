@@ -3,7 +3,7 @@
 description: 単一 Issue または単一 Wave（Epic Issue 指定時: 現在 ready な Wave の子Issue を並列実行）を実行担当サブエージェントへ委譲し、result を処理する。worktree前提、委譲、結果処理を責務とする。3フェーズ構成でべき等性、再開ポイントを提供
 ---
 
-<!-- ADF-COVERS(implementation): REQ-032-024 -->
+<!-- ADF-COVERS(implementation): REQ-032-024, REQ-031-004, REQ-031-010, REQ-031-011 -->
 
 # 実装パイプライン
 Case に対して実装実行を実行担当サブエージェント経由で委譲し、その result を処理する。
@@ -43,7 +43,9 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 - result の4状態（completed-pr/blocked/failed/delegation-unavailable）は `agentdev-case-run-execution-adapter` の result 契約に従う。成功成果は PR 作成である。SSoT は状態別に PR 本文（成功）と Issue コメント（blocked/ failed）とし、一時会話コンテキスト・中間ファイルを SSoT としない
 - 外部実行ハーネスの plan artifact 等の中間成果物は AgentDevFlow の永続成果物から除外し、最終結果は PR URL で受領する（内部構造に依存した処理・検証は行わない。委譲契約は I/O 境界 Design 参照）
 - Issue 本文の Execution Contract セクションに投影された実現面の変更方針（realization_actions 由来）は既確定契約として消費し、実現責務・変更意図・検証方針を再決定せず、その範囲内の内部実装方針（関数配置、命名、データ構造、実装順序、具体的 diff）だけを決定する。実現責務の変更が必要と判断した場合は既存の blocked 境界に従う（req_draft を再読込せず Issue 本文だけで変更責務、変更意図、検証方針を取得する）
-- 実装作業開始前に QG 前置 staleness check（ファイルパス現行存在確認、検査結果件数再計測）を実行する。差異検出時は検出結果を委譲プロンプトで実行担当サブエージェントに引き渡し、PR 本文の `## Findings / Capture候補` に `### stale-reference` 小見出しで記録する（実行担当サブエージェント責務）
+- 実装中に新たな変更影響候補を発見した場合、既存 Issue scope 内で処理可能な内部実装上の影響は自律処理する。Issue scope、完了条件、REQ/Decision/Design、必須品質統制の追加変更が必要な場合は blocked とし、Root Case の resume_command による正規再開経路（新しい意味判断が必要な場合は req-define、再合意済みの場合は case-revise）に従う
+- 実装作業開始前に QG 前置 staleness check（ファイルパス現行存在確認、検査結果件数再計測）を実行する。差異検出時は検出結果を委譲プロンプトで実行担当サブエージェントに引き渡し、PR 本文の `## Findings / Capture候補` に `### stale-reference` 小見出しで記録する（実行担当サブエージェント責務）。差異検出時は Issue 本文を単独で書き換えず、差異を報告して blocked とし、Root Case の resume_command による正規再開経路に従う
+- PR 対象ファイルに docs 変更を含む場合は docs 整合性検査を実行し、結果を PR 本文に記録して case-close へ連携する（検査対象 root の誤解決を見逃さない起動契約は `agentdev-quality-gates` と `agentdev-workflow-lifecycle` を参照する）
 - 本筋外の発見は PR 本文に記録して修正は後続処理に委ねる（スコープ拡大は行わない）。intake 候補・learning 候補は区別して記録する（capture 境界（capture-boundaries）は `agentdev-workflow-orchestration` 参照、case-run の capture 責務は記録のみ）
 - Design確定候補（実装で発見された Design レベル詳細）は PR 本文の `## Design確定候補` セクションに記録し、`## Findings / Capture候補` とは区別する（本セクションは case-close の Design 状態評価（棚卸し制）への補助入力であり、case-close は申告の有無に関わらず棚卸し列挙を実行する。確定・反映判断は case-close の責務）
 
@@ -56,4 +58,4 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 - `.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md` への直接変更は行わない（capture 情報は PR 本文経由のみ case-close に引き継ぐ）
 - 完了条件チェックボックスの評価・更新は case-close QG-4 の責務であり、case-run と実行担当サブエージェントは完了条件チェックボックスを更新しない（`POL-completion-checkbox-single-writer`）
 - 実行担当サブエージェント委譲の前に worktree+ブランチが作成済みであることを前置の precondition gate で検証する。未作成時・メインリポジトリにいる場合は実行担当サブエージェントを起動しない。委譲では worktree root（相対パス、`.worktrees/{N}-{type}/`）を引き渡し、メインリポジトリパスは引き渡さない
-- Issue 本文の書き換えは case-update が所有する（case-run が単独で Issue 本文を書き換えない。staleness 差異は case-update へ連携する）
+- Issue 本文を単独で書き換えない（blocked 時の差異・判断事項は Issue コメントと PR 本文への報告に限定し、Issue 本文の更新は Root Case の resume_command による正規再開経路が担う）

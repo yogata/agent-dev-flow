@@ -7,7 +7,7 @@ description: 自然言語で追跡Issue（未解決事項の育成管理単位�
 開発過程で生じた未解決事項を追跡Issueとして管理する人間向け公開入口である。
 ユーザーは自然言語で意図を伝え、現在の会話文脈、対象追跡Issue、状態から必要な操作（起票、検索、参照、更新、検討経過追加、保留、再評価、実行準備完了、解決、反映確認、クローズ、再オープン）を判断して実行する。
 
-追跡Issueは GitHub Issue を Case Issue（req/case パイプラインの実行票）と共有する管理単位であり、論理 role により区別される。Case Issue の操作（case-open、case-run、case-close、case-update）は本コマンドの対象外。
+追跡Issueは GitHub Issue を Case Issue（req/case パイプラインの実行票）と共有する管理単位であり、論理 role により区別される。Case Issue の操作（case-open、case-ready、case-revise、case-run、case-close）は本コマンドの対象外。
 サブコマンド、引数、ラベル名等の操作文法や GitHub 実装詳細をユーザーに要求しない。内部実装で明示的な操作種別を持つことは禁止しない。
 
 ## 入力

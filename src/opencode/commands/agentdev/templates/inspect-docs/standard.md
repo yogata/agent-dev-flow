@@ -11,7 +11,7 @@
 git 永続化: commit: {hash}, push: {成功/失敗}
 次のコマンド:
  - 要件変更が必要な場合:/agentdev/req-define
- - 実装逸脱の場合: 該当Issueで case-update
+ - 実装逸脱の場合: 該当Issueを blocked 化し、Root Case の resume_command 正規再開経路（req-define / case-revise）へ従う
  - 問題なしの場合: なし
 
 

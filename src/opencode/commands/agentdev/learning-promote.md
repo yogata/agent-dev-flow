@@ -8,7 +8,7 @@ description: inbox.mdから正規化、分類、8軸評価、自律確定・HITL
 実現先（Skill、Command、script 等の種別）を選ぶ分類・マッピングは行わず、req-define の変更影響・実現方法決定を先取りしない。
 
 **重要**: `.opencode/` への直接配置、直接反映は行わない。
-反映ルート: promoted → `/agentdev/backlog-review`（RU 生成）→ `/agentdev/req-define` → `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run`。
+反映ルート: promoted → `/agentdev/backlog-review`（RU 生成）→ `/agentdev/req-define` → `/agentdev/case-open` → `/agentdev/case-run`。
 旧 `learning-refine` の全機能を吸収済み（事前実行不要）。
 
 ## 入力
@@ -33,7 +33,7 @@ description: inbox.mdから正規化、分類、8軸評価、自律確定・HITL
 工程上の選好を反映した肯定形の不変条件:
 
 - `evaluation-report.md` は本コマンドが生成・管理する（外部コマンドの事前生成に依存しない）
-- 採用済み成果物の受け渡しは `/agentdev/backlog-review` 経由とする（case-run への直接受け渡しは行わない。反映ルート: promoted → `/agentdev/backlog-review`（RU 生成）→ `/agentdev/req-define` → `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run`）
+- 採用済み成果物の受け渡しは `/agentdev/backlog-review` 経由とする（case-run への直接受け渡しは行わない。反映ルート: promoted → `/agentdev/backlog-review`（RU 生成）→ `/agentdev/req-define` → `/agentdev/case-open` → `/agentdev/case-run`）
 - 主入力は `inbox.md` とし、raw learning item の再分類は行わない
 - learning-promote は反映先を直接変更せず、実現先（Skill、Command、script、checker、hook、Custom Tool 等）を選ぶ分類・マッピングを行わない。採用済み成果物は、問題、根拠、望ましい状態、制約、既存事実を req-define が既存 REQ / Decision / Design と実装を再調査して変更方針を確定できる自足的な情報として保持する
 - 学びは直接 REQ 化せず、恒久契約（REQ/Decision/Design）への昇華可能性を判定工程で評価し、昇華可能なもののみ `promoted/` へ出力する。昇華不能な知見は保留プール（`deferred.md`）で維持する

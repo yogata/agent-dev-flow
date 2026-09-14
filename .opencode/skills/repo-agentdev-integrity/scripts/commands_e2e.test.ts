@@ -305,7 +305,9 @@ const VALID_SKILL_REFS = new Set([
 const COMMAND_COUNT = EXPECTED_COMMANDS.length;
 
 // Pipeline definitions
-const REQ_CASE_PIPELINE = ["req-define", "req-save", "design-save", "case-open", "case-run", "case-update", "case-close"];
+// req-save / design-save / case-update は Issue #2810（DEC-029）で廃止済み。
+// case-ready は Definition 確定境界、case-revise は再合意済み Definition 変更の例外経路。
+const REQ_CASE_PIPELINE = ["req-define", "case-open", "case-ready", "case-revise", "case-run", "case-close"];
 const LEARNING_PIPELINE = ["learning-promote"];
 const INTAKE_PIPELINE = ["intake-capture", "intake-from-github", "intake-promote"];
 
@@ -396,29 +398,29 @@ describe("REQ-0030-009: E2E workflow tests for all commands", () => {
   // ─── Pipeline continuity ─────────────────────────────────────────────────
 
   describe("Pipeline continuity: req/case pipeline", () => {
-    it("req-define output matches req-save input expectations", () => {
+    it("req-define output matches case-open input expectations", () => {
       const reqDefine = commands.get("req-define");
-      const reqSave = commands.get("req-save");
+      const caseOpen = commands.get("case-open");
       expect(reqDefine).toBeDefined();
-      expect(reqSave).toBeDefined();
-      if (reqDefine && reqSave) {
+      expect(caseOpen).toBeDefined();
+      if (reqDefine && caseOpen) {
         const reqDefineOutput = extractSection(reqDefine, "出力");
-        const reqSaveInput = extractSection(reqSave, "入力");
+        const caseOpenInput = extractSection(caseOpen, "入力");
         expect(reqDefineOutput).toContain(".agentdev/drafts");
-        expect(reqSaveInput).toContain(".agentdev/drafts");
+        expect(caseOpenInput).toContain("req-define");
       }
     });
 
-    it("req-save output matches case-open input expectations", () => {
-      const reqSave = commands.get("req-save");
-      const caseOpen = commands.get("case-open");
-      expect(reqSave).toBeDefined();
-      expect(caseOpen).toBeDefined();
-      if (reqSave && caseOpen) {
-        const reqSaveOutput = extractSection(reqSave, "出力");
-        const caseOpenInput = extractSection(caseOpen, "入力");
-        expect(reqSaveOutput).toContain("REQ");
-        expect(caseOpenInput).toContain("req-define");
+    it("case-ready output matches case-run input expectations", () => {
+      const caseReady = commands.get("case-ready");
+      const caseRun = commands.get("case-run");
+      expect(caseReady).toBeDefined();
+      expect(caseRun).toBeDefined();
+      if (caseReady && caseRun) {
+        const caseReadyOutput = extractSection(caseReady, "出力");
+        const caseRunInput = extractSection(caseRun, "入力");
+        expect(caseReadyOutput).toContain("execution contract");
+        expect(caseRunInput).toContain("Issue番号");
       }
     });
 
@@ -508,8 +510,8 @@ describe("REQ-0030-009: E2E workflow tests for all commands", () => {
   });
 
   // ─── Template skill coverage per command ─────────────────────────────────
-  // case-open/close reference templates through `agentdev-workflow-templates` skill.
-  // case-update uses its own templates under commands/agentdev/templates/case-update/.
+  // case-open/close/revise reference templates through `agentdev-workflow-templates` skill.
+  // case-update（独自 templates ディレクトリ参照）は Issue #2810（DEC-029）で廃止済み。
   describe("Template skill coverage for issue/PR-creating commands", () => {
     it("case-open references agentdev-workflow-templates skill", () => {
       const content = commands.get("case-open");
@@ -527,11 +529,11 @@ describe("REQ-0030-009: E2E workflow tests for all commands", () => {
       }
     });
 
-    it("case-update references its own template directory", () => {
-      const content = commands.get("case-update");
+    it("case-revise references agentdev-workflow-templates skill", () => {
+      const content = commands.get("case-revise");
       expect(content).toBeDefined();
       if (content) {
-        expect(content).toMatch(/templates\/case-update\//);
+        expect(content).toMatch(/agentdev-workflow-templates/);
       }
     });
   });

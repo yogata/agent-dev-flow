@@ -6,22 +6,20 @@ description: agentdev コマンドリファレンス
 
 AgentDevFlow の各コマンドの入力、出力、次アクションを一覧化する。
 
-req-save / design-save の要否は req_draft の `artifact_actions` 存在で動的判定する（work_type による固定判定は行わない）。
-該当対象がない場合は req-define の直後に case-open へ進む。
+REQ/Decision/Design の保存は case-ready（初回確定時）と case-revise（再合意済み Definition 変更の反映時）の内部責務として実行する。
+要件doc の保存対象の有無によらず、req-define の直後に case-open へ進む。
 
 ## コマンド一覧
 
 | Command | Primary Input | Primary Output | Next |
 |---------|--------------|----------------|------|
-| `/agentdev/req-define` | セッション会話/ RU | 要件doc（draft） | `/agentdev/req-save`（REQ/Decision 対象 artifact_actions がある場合）/ `/agentdev/case-open` |
-| `/agentdev/req-save` | 要件doc（REQ/Decision 対象 artifact_actions がある場合） | REQ/Decision ファイル | `/agentdev/design-save`（Design 対象 artifact_actions がある場合）/ `/agentdev/case-open` |
-| `/agentdev/design-save` | 要件doc（Design 対象 artifact_actions がある場合） | Design ファイル | `/agentdev/case-open` |
+| `/agentdev/req-define` | セッション会話/ RU | 要件doc（draft） | `/agentdev/case-open` |
 | `/agentdev/case-open` | REQ ファイル/ 要件doc | GitHub Issue | `/agentdev/case-ready` |
 | `/agentdev/case-ready` | Root Case Issue | ready 状態の Root Case + 実行構造 | `/agentdev/case-run` |
+| `/agentdev/case-revise` | Root Case + 再合意済み Definition 変更 | Definition Amendment PR（実変更時のみ）+ case-ready 引き継ぎ | `/agentdev/case-ready` |
 | `/agentdev/case-run` | Issue | 実装済みブランチ + PR | レビュー後: `/agentdev/case-close` |
-| `/agentdev/case-update` | Issue | 更新済み Issue | 継続または `/agentdev/case-close` |
 | `/agentdev/case-close` | PR + Issue | マージ済み + クローズ済み | 完了 |
-| `/agentdev/case-auto` | 要件doc/ Issue番号、URL | マージ済み + クローズ済み（req-save〜design-save〜case-close自走） | 完了 |
+| `/agentdev/case-auto` | 要件doc/ Issue番号、URL | マージ済み + クローズ済み（case-open〜case-close自走） | 完了 |
 | `/agentdev/backlog-auto` | なし（durable state から解決） | 検出事項、採用済み成果物、`RU-*.md`（backlog整理サイクル一巡） | RU がある場合: `/agentdev/req-define` |
 | `/agentdev/intake-capture` | ユーザー手動入力 | `inbox/` item | `/agentdev/intake-promote` |
 | `/agentdev/intake-from-github` | クローズ済み Case Issue/PR | `inbox/` item | `/agentdev/intake-promote` |
@@ -37,12 +35,10 @@ req-save / design-save の要否は req_draft の `artifact_actions` 存在で�
 ## 各コマンドの定義ファイル
 
 - [req-define.md](./req-define.md)
-- [req-save.md](./req-save.md)
-- [design-save.md](./design-save.md)
 - [case-open.md](./case-open.md)
 - [case-ready.md](./case-ready.md)
+- [case-revise.md](./case-revise.md)
 - [case-run.md](./case-run.md)
-- [case-update.md](./case-update.md)
 - [case-close.md](./case-close.md)
 - [case-auto.md](./case-auto.md)
 - [backlog-auto.md](./backlog-auto.md)

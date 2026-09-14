@@ -15,7 +15,7 @@ Design ファイルは、REQ を満たすために現在採用している内部
 
 - **情報源**: 本ファイル（`docs/designs/README.md`）のみ
 - **status 値**: `draft` / `accepted` の2つ。新規 Design は `draft` で作成され、確定時に `accepted` へ遷移する
-- **更新タイミング**: design-save（draft 保存）、case-close（draft から accepted への昇格）の各工程で本ファイルの status 列を更新する。基盤Design も同一工程に従う
+- **更新タイミング**: case-ready / case-revise（draft 保存。保存実体は Capability Skill 委譲）、case-close（draft から accepted への昇格）の各工程で本ファイルの status 列を更新する。基盤Design も同一工程に従う
 - **欠落扱い**: `status` frontmatter を持たない Design は `accepted` 相当として扱う
 
 draft status の Design が一定期間更新されず放置されることを検出するルール（IR-054）は [integrity-rule-catalog.md](integrity/integrity-rule-catalog.md) 参照。
@@ -27,10 +27,10 @@ draft status の Design が一定期間更新されず放置されることを�
 
 ### 新規 Design 追加時の index 登録手順
 
-新規 Design ファイルを `docs/designs/` 配下に作成した場合（design-save 完了後）、本ファイルの該当一覧表へ当該 Design の行を登録する。
+新規 Design ファイルを `docs/designs/` 配下に作成した場合（case-ready / case-revise による保存完了後）、本ファイルの該当一覧表へ当該 Design の行を登録する。
 登録漏れを docs-check で検出する。
 
-**タイミング**: design-save が新規 Design を作成した直後。
+**タイミング**: 新規 Design の保存が完了した直後（case-ready / case-revise）。
 既存 Design への追記（update）では行を追加せず、status 列のみ更新する。
 
 **登録先一覧表の特定**: Design の配置ディレクトリに基づき、対応する一覧表へ登録する。
@@ -47,7 +47,7 @@ draft status の Design が一定期間更新されず放置されることを�
 | `designs/local/` | 「基盤 Design 一覧」> local/ 表 |
 | `designs/authoring/` | 「基盤 Design 一覧」> authoring/ 表 |
 
-**登録内容**: Design パス（相対リンク）、`status`（design-save 新規作成時は `draft`）、タイトル、責務の概要。
+**登録内容**: Design パス（相対リンク）、`status`（新規作成時は `draft`）、タイトル、責務の概要。
 
 **docs-check 検出仕組み**: docs-check は `docs/designs/**/*.md` の実ファイルと本ファイルの一覧表エントリを突き合わせし、一覧表に未登録の Design ファイルを検出する。
 `_template.md` はテンプレートのため検出対象外とする。
@@ -83,15 +83,12 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 |------|--------|------|
 | [commands/_template.md](commands/_template.md) | accepted | command Design テンプレート |
 | [commands/req-define.md](commands/req-define.md) | accepted | `/agentdev/req-define` |
-| [commands/req-save.md](commands/req-save.md) | accepted | `/agentdev/req-save` |
-| [commands/design-save.md](commands/design-save.md) | accepted | `/agentdev/design-save` |
 | [commands/case-open.md](commands/case-open.md) | accepted | `/agentdev/case-open` |
 | [commands/case-ready.md](commands/case-ready.md) | draft | `/agentdev/case-ready`（Definition 受入と実行準備完了への状態遷移） |
 | [commands/case-revise.md](commands/case-revise.md) | draft | `/agentdev/case-revise`（再合意済み Definition 変更の既存 Case 反映、主フロー例外経路） |
 | [commands/case-run.md](commands/case-run.md) | accepted | `/agentdev/case-run` |
 | [commands/case-close.md](commands/case-close.md) | accepted | `/agentdev/case-close` |
 | [commands/case-auto.md](commands/case-auto.md) | accepted | `/agentdev/case-auto` |
-| [commands/case-update.md](commands/case-update.md) | accepted | `/agentdev/case-update` |
 | [commands/intake-capture.md](commands/intake-capture.md) | accepted | `/agentdev/intake-capture` |
 | [commands/intake-from-github.md](commands/intake-from-github.md) | accepted | `/agentdev/intake-from-github` |
 | [commands/intake-promote.md](commands/intake-promote.md) | accepted | `/agentdev/intake-promote` |

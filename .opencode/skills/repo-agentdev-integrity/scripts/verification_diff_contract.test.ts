@@ -68,7 +68,6 @@ const KNOWN_TEMPLATE_FILES = [
   "issue_comment_feature_implementation.md",
   "issue_comment_feature_technical.md",
   "issue_comment_review_ng.md",
-  "issue_comment_update.md",
   "issue_desc_bug.md",
   "issue_desc_child.md",
   "issue_desc_epic.md",
