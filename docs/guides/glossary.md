@@ -7,12 +7,11 @@ AgentDevFlow で使う用語の定義。
 | 用語 | 読み方 | 定義 |
 |------|--------|------|
 | req-define | レキ、ディファイン | AI と対話して要件を整理するコマンド |
-| req-save | レキ、セーブ | 要件doc を REQ/Decision ファイルとして保存するコマンド（REQ/Decision 対象 artifact_actions がある場合） |
-| design-save | デザイン、セーブ | 要件doc の Design 保存対象を Design ファイルとして docs/designs/ に保存、確定するコマンド（Design 対象 artifact_actions がある場合） |
+| case-ready | ケース、レディ | Definition Package を保存・確定し、Epic / Wave / Issue の実行構造を確定するコマンド |
+| case-revise | ケース、リバイス | 再合意済み Definition 変更を既存 Root Case に反映するコマンド |
 | case-open | ケース、オープン | 要件から GitHub Issue を作成するコマンド |
 | case-run | ケース、ラン | Issue に基づいて実装し、PR を作成するコマンド |
 | case-close | ケース、クローズ | PR をマージし、Issue をクローズするコマンド |
-| case-update | ケース、アップデート | Issue の本文更新、コメント追加を行うコマンド |
 | intake-capture | インテイク、キャプチャ | 手動で気づき、課題を inbox に記録するコマンド |
 | intake-from-github | インテイク、フロム、ギットハブ | クローズ済み Case Issue/PR から改善候補を抽出するコマンド（role: tracking の追跡Issueは抽出対象外） |
 | intake-promote | インテイク、プロモート | inbox の項目をレビュー、採用、却下、保留判定し、採用済み成果物に整形するコマンド |
@@ -26,7 +25,7 @@ AgentDevFlow で使う用語の定義。
 | inspect-docs | インスペクト、ドックス | docs 全体の意味整合性を検出し、検出事項（finding）を出力するコマンド |
 | inspect-skills | インスペクト、スキルズ | Command/Skill 参照妥当性を検出し、検出事項（finding）を出力するコマンド |
 | inspect-promote | インスペクト、プロモート | 検出事項（finding）を分類（promote/defer/reject）し、採用済み成果物を生成するコマンド |
-| case-auto | ケース、オート | 最大自走モード。req-save → design-save（Design候補がある場合）→ case-open → case-run → case-close を順次実行するコマンド |
+| case-auto | ケース、オート | 最大自走モード。case-open → case-ready → case-run → case-close（再合意変更時は case-revise → case-ready）を順次実行するコマンド |
 
 ## 成果物
 
@@ -59,7 +58,7 @@ AgentDevFlow で使う用語の定義。
 
 | 用語 | 定義 |
 |------|------|
-| work_type | Issue の作業分類（bugfix / feature / maintenance / docs_chore）。参考情報であり、工程分岐（req-save / design-save の要否）は req_draft の `artifact_actions` 存在で判定する |
+| work_type | Issue の作業分類（bugfix / feature / maintenance / docs_chore）。参考情報であり、工程分岐は入力状態と `artifact_actions` を case-ready に渡して判定する |
 | 実装分類（Implementation Pattern） | コマンド内部構造の分類軸（wall-session=対話セッション型 / file-pipeline=ファイル変換パイプライン型 / manager-orchestrator=状態機械統制型 / capture-only=データ収集型 / read-only-diagnostic=検査対象を直接修正しない診断型）。work_type とは別概念（workflow-contracts.md） |
 | SSoT（Single Source of Truth / 唯一の情報源） | 各フェーズでの信頼できる唯一の情報源 |
 | HITL（Human-in-the-loop / 人の判断を挟む） | ユーザーの確認を挟む判断ポイント |

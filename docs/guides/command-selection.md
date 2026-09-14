@@ -9,12 +9,11 @@
 | 現在の状態 | 次のコマンド | 出力 |
 |-----------|-------------|------|
 | 要件を整理したい | `/agentdev/req-define` | 要件doc（draft） |
-| 要件docに REQ/Decision ファイルとして保存する対象がある | `/agentdev/req-save` | REQ/Decision ファイル |
-| 要件docに Design ファイルとして保存する対象がある | `/agentdev/design-save` | Design ファイル（`docs/designs/`） |
+| 要件docから Case を開始する | `/agentdev/case-open` → `/agentdev/case-ready` | Definition Package と実行構造 |
 | REQ ファイルまたは要件docがある | `/agentdev/case-open` | GitHub Issue |
 | Issue がある | `/agentdev/case-run` | 実装済みブランチ + PR |
 | PR がある | `/agentdev/case-close` | マージ済み + クローズ済み |
-| Issue の更新、コメント追加が必要 | `/agentdev/case-update` | 更新済み Issue |
+| 再合意済み Definition の変更を既存 Case に反映 | `/agentdev/case-revise` → `/agentdev/case-ready` | Amendment と再確定済み Definition |
 | 具体的な作業候補を収集したい | `/agentdev/intake-capture` | inbox 項目 |
 | クローズ済み Case Issue/PR から残課題を抽出したい | `/agentdev/intake-from-github` | inbox 項目 |
 | inbox に項目がある | `/agentdev/intake-promote` | 採用済み / archive |
@@ -46,14 +45,14 @@
 
 ## 補足
 
-### req-save と design-save の要否判定
+### case-ready の Definition 確定
 
 工程分岐は req_draft の `artifact_actions` 存在で動的判定する。
 work_type（bugfix / feature / maintenance / docs_chore）による固定判定は行わない。
 
-- REQ/Decision 保存対象（`artifact: req` / `artifact: decision`）がある場合は req-save を実行する
-- Design 保存対象（`artifact: design`）がある場合は design-save を実行する
-- いずれの保存対象もない場合は req-save と design-save を経由せず、`/agentdev/req-define` の直後に `/agentdev/case-open` へ直行する
+- `artifact_actions`（`artifact: req` / `artifact: decision` / `artifact: design`）は case-ready に渡して Definition action として適用する
+- 保存対象の有無で case-ready をスキップしない。case-ready が Definition 保存・確定と実行構造を担う
+- 再合意済み Definition 変更は case-revise で既存 Root Case に関連付けた後、case-ready を再実行する
 - バグ修正、保守作業、ドキュメント作業は保存対象を持たないため、直行の対象になる
 
 ### 長い出力の補足

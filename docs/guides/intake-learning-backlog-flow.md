@@ -116,7 +116,7 @@ RU 本文は後続工程（req-define）で必要な情報を自足し、整理�
 | RU の内容が Issue に永続化完了（Issue作成 + VERIFY 成功） | `/agentdev/case-open` | 該当 RU ファイル |
 | 採用済み成果物の RU 化成功 | `/agentdev/backlog-review` | 該当する採用済み成果物 |
 
-`/agentdev/req-save` は RU を残置し、RU パスを docs 永続文書の根拠参照から除外する。
+`/agentdev/case-ready` は Definition 確定後に RU を削除し、RU パスを docs 永続文書の根拠参照から除外する。
 RU は一時成果物であり、永続化未完了の場合は残置する。
 
 ## 矛盾検出
