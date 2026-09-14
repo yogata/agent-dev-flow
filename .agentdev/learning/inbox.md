@@ -116,3 +116,10 @@
 - 内容: Windows の junction 未伝播環境では worktree link profile を直接測定できないため、main root の読取専用 runner と Bun 実行で検査した。case-close 配布依存境界 最終 gate（source profile）でも同様に main root から bun run し、CLI の repoRoot 位置引数に PR HEAD worktree を指定する読取専用実行で case-run STEP-S5 と同一 detector を再現した（CLI 契約 `[--profile P] [--json] [repoRoot]`）
 - 関連: Issue #2810（OU-005）、PR #2818 対応記録コメント、同 inbox の「worktree での bun test 実行に必要な node_modules 事前整備」（OU-003）
 - タグ: `#windows` `#junction` `#distribution-boundary` `#worktree` `#fail-origin`
+
+## 2026-09-15 case 2805 OU-006（PR #2819）: 初回委譲応答が4状態契約を完了せずに要約で終了した
+
+- 観測元: case 2805 OU-006（DEL-2811-1、PR #2819）本文 learning 候補、case-close 2026-09-15 回収
+- 内容: 初回 delegation turn は実装・検証の要約を返したが、契約上必要な commit と PR を作成せず、completed-pr / blocked / failed の4状態結果も返さなかった。adapter contract の完了判定が未達のまま後続工程へ進めない状態になり、再開セッションで残りの検証・10コミット・PR作成まで完了した。delegated task の最終ゲートとして、commit hash・PR URL・4-state result の3点を必須検査し、不足時は要約で終了せず再開する guard が有効
+- 関連: Issue #2811（OU-006）、PR #2819 対応記録、同 inbox の「background task 起動の連続消失と同期実行への切替」。統合判断は learning-promote が行う
+- タグ: `#delegation` `#adapter-contract` `#four-state` `#guard`
