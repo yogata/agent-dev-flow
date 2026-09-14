@@ -50,3 +50,13 @@
 - **想定反映先**: agentdev-workflow-orchestration（Split Rule・委譲時の作業衛生）、learning pipeline 経由でサブエージェント委譲プロンプトの規約へ
 - **関連**: Issue #2805（case-open 実行）、adversarial-review 委譲（ultrabrain、2026-09-14）
 - **タグ**: `#windows` `#bash` `#subagent-delegation` `#git-hygiene`
+
+## 2026-09-14 case 2805 Wave 1 / case 2812（PR #2812）: Bun.YAML 依存 checker の stdout flush 保証ラッパー
+
+- 観測元: case 2812（DEL-2806-1、PR #2812）本文 learning 候補、case-close 2026-09-14 回収
+- 内容: Windows + bun 環境で process.exit を呼ぶ checker CLI を bun 直実行すると stdout レポートが失われる（既知知識 docs/knowledge/checker-cli-stdout-loss-on-windows-bun.md）。本実行では Bun.YAML 依存のため node import 経路が使えず、Bun.write(Bun.stdout) による flush 保証ラッパー（一時ファイル、実行後に削除）で対処した。Bun.YAML 依存 checker 向けの flush 保証ラッパー実行手順は既存知識文書に明記されていない
+
+## 2026-09-14 case 2805 Wave 1 / case 2812（PR #2812）: PR HEAD worktree root でのトレーサビリティ check は main 側カタログ更新を反映しない
+
+- 観測元: case-close QG-4 独立再検査（case 2812、PR #2812）、case-close 2026-09-14 検知
+- 内容: トレーサビリティ check の --root を PR HEAD worktree に向けると、ブランチ分岐後に main へ commit された検証対応要否カタログ登録（本件は前回 case-close ゲート停止の解消 RU-0002、commit 4987ea1e）が存在せず、durable state では解消済みの対象 6 行が unclassified と判定される。検証対応要否段階ゲートの判定対象は REQ ファイル・検証対応要否カタログ・対応宣言という横断 durable state であり、未分類判定が出た場合は main 側 root で再実行し、カタログ登録 commit の時系列（ブランチ分岐の前後）を確認してから完了阻止を判断する
