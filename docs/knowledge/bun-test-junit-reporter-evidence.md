@@ -1,7 +1,7 @@
 ---
 title: bun test の fail 証跡は junit reporter で構造化取得する
 created: 2026-09-13
-updated: 2026-09-13
+updated: 2026-09-14
 ---
 
 # bun test の fail 証跡は junit reporter で構造化取得する
@@ -34,3 +34,4 @@ bun test の進捗表示は CR（キャリッジリターン）上書き + ANSI 
 
 - [checker CLI の stdout 証跡が Windows + bun で失される問題と安定実行経路](checker-cli-stdout-loss-on-windows-bun.md)（別現象の判別。checker CLI は process.exit flush・cp932 再解釈起因、本知識は bun test runner 出力の CR/ANSI 上書き起因）。
 - [Windows + bun test の spawn timeout 由来分類と単独再実行手順](windows-bun-test-spawn-timeout-classification.md)（fail の由来分類・記録手順）。
+- [bun test 実行形態逸脱の検知条件と判別観点](bun-test-execution-form-drift-signals.md)（実行形態逸脱（repo root 外 cwd・`./` なしパス指定）由来の fail・0 件実行の判別。fail 証跡取得前の実行形態確認）。

@@ -1,7 +1,7 @@
 ---
 title: checker CLI の stdout 証跡が Windows + bun で失われる問題と安定実行経路
 created: 2026-09-03
-updated: 2026-09-07
+updated: 2026-09-14
 ---
 
 # checker CLI の stdout 証跡が Windows + bun で失われる問題と安定実行経路
@@ -38,3 +38,4 @@ stdout ロスと区別すべき隣接現象として、stdout 自体は取得で
 
 - [Windows PowerShell の一括読み書きによる UTF-8 ファイル破壊リスク](windows-powershell-bulk-io-corruption.md)（項3としてコンソール出力退避の cp932 再解釈系統が規定化済み。checker stdout のファイル退避・パイプ受信の両場面で関連）。
 - 規範面の所在: [checker 実行契約と検出基盤規則](../designs/integrity/checker-execution-contracts.md)（bun run 標準・stdout 機械可読契約の正規所在。安定実行経路の補完は同契約の更新工程で行う）。
+- [bun test 実行形態逸脱の検知条件と判別観点](bun-test-execution-form-drift-signals.md)（bun test 実行形態由来の fail・0 件実行の判別。checker CLI の stdout ロスとは別現象）。

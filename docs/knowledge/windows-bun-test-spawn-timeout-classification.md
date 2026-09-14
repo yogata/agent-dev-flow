@@ -1,7 +1,7 @@
 ---
 title: Windows + bun test の spawn timeout 由来分類と単独再実行手順
 created: 2026-09-11
-updated: 2026-09-13
+updated: 2026-09-14
 ---
 
 # Windows + bun test の spawn timeout 由来分類と単独再実行手順
@@ -41,3 +41,4 @@ timeout 延長・単独再実行で確定できない環境起因が疑われる
 - [checker CLI の stdout 証跡が Windows + bun で失われる問題と安定実行経路](checker-cli-stdout-loss-on-windows-bun.md)（stdout ロスは別現象。JSON parse error に見える fail の切り分けで関連）。
 - [Windows PowerShell の一括読み書きによる UTF-8 ファイル破壊リスク](windows-powershell-bulk-io-corruption.md)（Windows 環境の検証系知識）。
 - [bun test の fail 証跡は junit reporter で構造化取得する](bun-test-junit-reporter-evidence.md)（fail の証跡取得・差分分離手法）。
+- [bun test 実行形態逸脱の検知条件と判別観点](bun-test-execution-form-drift-signals.md)（実行形態逸脱（repo root 外 cwd・`./` なしパス指定）由来の fail 判別。timeout 由来との切り分け）。
