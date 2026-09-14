@@ -5,14 +5,14 @@ created: 2026-06-21
 updated: 2026-09-05
 ---
 <!-- ADF-COVERS(implementation): REQ-015-012 -->
-<!-- ADF-COVERS(implementation): REQ-034-001, REQ-034-002, REQ-034-003, REQ-034-004, REQ-034-005, REQ-034-006, REQ-034-007, REQ-034-008, REQ-034-009, REQ-034-010, REQ-034-011, REQ-034-012, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-017, REQ-034-018, REQ-034-019, REQ-034-020, REQ-034-021, REQ-034-022, REQ-034-023, REQ-034-024, REQ-034-025, REQ-034-026, REQ-034-027, REQ-034-028, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-033, REQ-034-034, REQ-034-035, REQ-034-036 -->
+<!-- ADF-COVERS(implementation): REQ-034-001, REQ-034-002, REQ-034-003, REQ-034-004, REQ-034-005, REQ-034-006, REQ-034-007, REQ-034-008, REQ-034-009, REQ-034-010, REQ-034-011, REQ-034-012, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-017, REQ-034-018, REQ-034-019, REQ-034-020, REQ-034-021, REQ-034-022, REQ-034-023, REQ-034-024, REQ-034-025, REQ-034-026, REQ-034-027, REQ-034-028, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-033, REQ-034-034, REQ-034-035, REQ-034-036, REQ-034-037, REQ-034-038 -->
 <!-- ADF-COVERS(implementation): REQ-003-017, REQ-003-018, REQ-006-108, REQ-034-002, REQ-034-003, REQ-034-007, REQ-034-008, REQ-034-009, REQ-034-010, REQ-034-011, REQ-034-012, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-018, REQ-034-019, REQ-034-020, REQ-034-021, REQ-034-022, REQ-034-023, REQ-034-024, REQ-034-025, REQ-034-026, REQ-034-027, REQ-034-028, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-034, REQ-034-035, REQ-034-036 -->
 
 # case-auto Design
 
 ## 目的
 
-要件doc から req-save → design-save → case-open → case-run → case-close を順次自走実行する最大自走モード。
+要件doc から case-open → case-ready → case-run → case-close を順次自走実行する最大自走モード。req-define で再合意済みの Definition 変更がある場合は case-revise → case-ready → case-run → case-close を自走する。
 ユーザーが明示的に指定した場合のみ使用する追加入口であり、標準ワークフローを置き換えない。
 
 ## 承認・HITL 境界
@@ -22,17 +22,17 @@ updated: 2026-09-05
 
 ## 入力
 
-- Issue番号（数値）または Issue URL（既存Issue から case-run → case-close を自走する場合）
+- Issue番号（数値）または Issue URL（既存 Root Case の状態から case-ready / case-run / case-close を自走する場合）
 - 要件doc（引数なし時は `.agentdev/drafts/req-draft-*.md` 全件処理がデフォルト / 明示パス指定 / セッション指定キーワードによるセッション内要件doc参照（暗黙判断廃止、構造化 `draft-data` 形式: REQ-008, DEC-003））
 
 ## 出力
 
-- REQ/Decision artifact_actions がある場合: REQ/Decisionファイル + GitHub Issue + 実装済みブランチ + PR + マージ済み + クローズ済み
-- artifact_actions に応じた各工程の出力（工程分岐は「現在の動作」参照）
+- Root Case + 実装済みブランチ + PR + マージ済み + クローズ済み（Definition 保存は case-ready / case-revise の内部責務）
+- 工程に応じた各工程の出力（工程分岐は Workflow Skill を参照）
 
 ## 副作用
 
-- 各工程（req-save / design-save / case-open / case-run / case-close）の副作用を集約
+- 各工程（case-open / case-ready / case-revise / case-run / case-close）の副作用を集約
 - 委譲起動: 各工程を実行担当サブエージェントへ順次起動（v2:ADR-0127）。起動手段、実行制御パラメータは AGENTS.md および references/<harness>.md に配置する（REQ-002-002）
 - git 操作: 各工程の委譲範囲内で実行。case-auto 自体は git 操作を行わない
 - 自走対象: repo にファイルとして残る変更のみ。DB migration実行、deploy/apply、課金、権限変更は対象外
@@ -44,16 +44,17 @@ updated: 2026-09-05
 
 - 入力解決
   - 実行開始時刻の記録（REQ-006-082）（JST、人間が読みやすい形式で case_auto_started_at 変数に保持）
-  - Issue番号/URL入力モード（^\d+$ または GitHub Issue URL の場合、case-run移行モードへ分岐）
+  - Issue番号/URL入力モード（^\d+$ または GitHub Issue URL の場合、Root Case の durable state に基づく継続工程へ分岐）
   - 要件doc入力モード（引数なし時は `.agentdev/drafts/req-draft-*.md` 全件処理がデフォルト / 明示パス指定時は当該draft / セッション指定キーワード時はセッション内要件doc参照、暗黙判断は行わない）
-- work_type 読取（draft-data から work_type 取得（参考情報、パイプライン分岐には使用しない、REQ-008-010））
-- 工程分岐（work_type 固定分岐ではなく artifact_actions 存在による動的判定、REQ-008-009）
-  - Issue番号/URL入力: case-run（インライン）→ case-close（req-save、design-save、case-open、work_type読取スキップ）
-  - artifact_actions ベース分岐: artifact: req or artifact: decision → req-save / artifact: design → design-save（req-save の後）/ 常に → case-open / その後 → case-run（インライン）→ case-close
-  - design-save 実行判定（v2:ADR-0123 Decision #3, REQ-001-014）（req-save 完了後に artifact: design entry 確認）
+- work_type 読取（draft-data から取得する参考情報。パイプライン分岐には使用しない）
+- 工程分岐（work_type 固定分岐ではなく入力状態と artifact_actions による動的判定）
+  - 要件doc入力: case-open → case-ready → クリーンアップ検証ゲート → case-run（インライン）→ case-close
+  - 再合意済み Definition 変更: case-revise → case-ready → クリーンアップ検証ゲート → case-run（インライン）→ case-close
+  - Issue番号/URL入力: Root Case が open なら case-ready から、ready/running/review なら case-run（インライン）→ case-close。再合意済み変更がある場合は case-revise から開始
+  - artifact_actions は case-ready の Definition action 入力へ渡し、work_type 固定分岐には使用しない
   - auto_gate preflight（auto_gate.auto_ready が false または未解決 item 残る場合は停止）
 - 各工程の実行
-  - 委譲工程（req-save / design-save / case-open / case-close）: 実行担当サブエージェントとして起動（v2:ADR-0127, REQ-006-006/084/085）。req-save / design-save 統合委譲で順次実行、case-open / case-close は各コマンド委譲契約に従い起動。委譲起動不能時に delegation-unavailable 報告（REQ-002-003/004）
+  - 委譲工程（case-open / case-ready / case-revise / case-close）: 各コマンド委譲契約に従い実行担当サブエージェントとして起動。委譲起動不能時に delegation-unavailable 報告（REQ-002-003/004）
   - case-run（インライン実行）: case-auto が case-run の Workflow Skill（`agentdev-workflow-case-run`）を正規情報源として読み込み、準備/クリーンアップフェーズを自ら実行。実行担当サブエージェント委譲フェーズでは case-auto から直接実行担当サブエージェントへ委譲（委譲起点の折りたたみ/002）。adapter skill（agentdev-case-run-execution-adapter）を case-auto が読み込む
   - 結果状態の4次元集約（REQ-034-031）: 各工程の output_contract から (1) 工程結果 pass/warn/fail、(2) artifact_action 適用結果 applied/skipped/failed/no-op、(3) 定義適用工程完了状態、(4) OU ライフサイクル完了状態を収集し混同なく保持する。集約規則の詳細は後述「結果状態の4次元集約（REQ-034-031）」セクション
 - Wave 反復制御（Epic Issue 指定時）
@@ -63,13 +64,13 @@ updated: 2026-09-05
   - completed-pr の子Issue がある場合、case-close(#epic) へ委譲
   - 残 Wave がある場合、次 Wave を実行（べき等）
 - 工程間の状態引き継ぎ（Issue番号、PR番号、RU ファイルパス、capture 対象情報を最終工程まで保持）
-- 複数REQ対応（req-save 委譲の出力から複数 REQ doc または scale:large 検出時、case-open の Issue 構造ルールを使用）
-- 停止条件の検出（停止時タイミング情報の追記。10項目の停止条件いずれかを検出時、実行停止）
+- 複数REQ対応（case-ready の確定結果から複数 REQ doc または scale:large 検出時、確定済みの Issue 構造に従う）
+- 停止条件の検出（停止時タイミング情報の追記。11項目の停止条件いずれかを検出時、実行停止。新しい意味判断時は Root Case に `resume_command: req-define` を記録）
 - 完了報告（タイミング情報追記。インライン実行の適用を記録。結果状態の4次元報告（REQ-034-031）を含める）
 
 ### 委譲起動不能時の扱い（REQ-002-003/004）
 
-委譲工程（req-save / design-save / case-open / case-close）の委譲が起動できなかった場合、case-auto は当該工程を delegation-unavailable として報告する。
+委譲工程（case-open / case-ready / case-revise / case-close）の委譲が起動できなかった場合、case-auto は当該工程を delegation-unavailable として報告する。
 
 case-run インライン実行時の実行担当サブエージェントへの委譲失敗は、case-run result 契約（completed-pr / blocked / failed / delegation-unavailable）に従い処理する。
 delegation-unavailable の場合は当該子Issue を pending に戻す（REQ-002-004）。
@@ -101,14 +102,14 @@ context 管理:
 - migrationファイル、IaCファイルの作成、修正以外の migration実行、IaC apply
 - remote branch 削除で当該 case-auto / case-run が作成した branch 以外の対象
 - 各工程のインライン実行は通常時対象外（委譲起動必須、v2:ADR-0127, REQ-006-006/073/084）。委譲起動不能時の `delegation-unavailable` 報告は例外として許可（REQ-002-003/004）
-- 既存 req-save / design-save / case-open / case-run / case-close の責務変更（委譲は起動方式変更のみ）
+- 既存 case-open / case-ready / case-revise / case-run / case-close の責務変更（case-auto は起動方式と工程間制御のみを所有）
 - source path の実行時パス読み替え
 - Issue 階層決定ロジックの独自保持（case-open に委譲）
-- req-save 委譲から case-open 委譲への状態引き継ぎ時のフィルタリング、再評価（保存結果をそのまま渡す）
+- case-open / case-ready から後工程への状態引き継ぎ時のフィルタリング、再評価（保存結果をそのまま渡す）
 - 子Issue 選択ロジック、子Issue 単位の並列起動（case-run(#epic) / case-close(#epic) に委譲）
 - Epic Issue 本文の書き込み（case-close の単一書き手責務、v2:ADR-0125、case-auto は読み取るのみ、`POL-epic-tracking-single-writer`）
 - 操作単位本文の抽出、変換、REQ 操作解釈（REQ-006-051）
-- case-open 完了後の draft SSoT 扱い（case-open 完了後は子Issue が SSoT）
+- case-ready 完了後の draft SSoT 扱い（case-ready 完了後は Issue と Epic が SSoT）
 - OU 間依存のみでの Epic Issue 化（REQ-006-055）
 - Epic Issue 化判定への関与（REQ-006-057）
 - case-auto 固有の capture 振る舞い（構成コマンドの capture 責務境界に従う）
@@ -129,14 +130,14 @@ case-auto は各工程の結果を次の4状態次元で保持し、集約報告
 
 | 次元 | 取得元 | 値 |
 |---|---|---|
-| (1) 工程結果 | 全工程（req-save+design-save / case-open / case-run / case-close）の pass/warn/fail | pass / warn / fail |
-| (2) artifact_action 適用結果 | req-save+design-save 統合委譲の action id ごとの適用結果 | applied / skipped / failed / no-op |
+| (1) 工程結果 | 全工程（case-open / case-ready / case-revise / case-run / case-close）の pass/warn/fail | pass / warn / fail |
+| (2) artifact_action 適用結果 | case-ready / case-revise の action id ごとの適用結果 | applied / skipped / failed / no-op |
 | (3) 定義適用工程の完了状態 | (1)(2) の組み合わせから導出 | 定義適用完了 / 警告付き工程完了 / 定義適用未完了 |
 | (4) OU ライフサイクル完了状態 | case-open（Issue 作成）、case-run（PR 作成）、case-close（PR マージ、Issue クローズ）の各成否 | 各ライフサイクル事象ごとに 完了 / 未完了 |
 
 集約規則:
 
-- (3) の導出: 全必須 action が applied または正当な no-op で工程結果 (1) が pass → 定義適用完了。同条件で (1) が warn → 警告付き工程完了（warn を pass へ変換しない）。必須 action に skipped または failed が1件以上ある → 定義適用未完了（この場合は定義適用完了/警告付き工程完了と報告しない）。正当な no-op とは、対象外 artifact（例: design-save における `artifact: design` entry 不存在、後方互換の `artifact_actions` フィールド不存在）による action 不実施を指す。正当な理由なく必須 action を飛ばした場合は skipped として扱う
+- (3) の導出: 全必須 action が applied または正当な no-op で工程結果 (1) が pass → 定義適用完了。同条件で (1) が warn → 警告付き工程完了（warn を pass へ変換しない）。必須 action に skipped または failed が1件以上ある → 定義適用未完了（この場合は定義適用完了/警告付き工程完了と報告しない）。正当な no-op とは、case-ready / case-revise の contract が対象外と判定した action 不実施を指す。正当な理由なく必須 action を飛ばした場合は skipped として扱う
 - (4) の独立性: OU ライフサイクル完了状態は (3) と独立して扱う。(3) が定義適用完了/警告付き工程完了であっても case-open（Issue 作成）が未実行なら OU ライフサイクルは未完了と報告する
 - Phase 0 と OU 完了の分離: Phase 0 成功（(3) の定義適用完了/警告付き工程完了）と OU 完了（(4) の全ライフサイクル事象完了）を別々に報告する。一方を他方へすり替えて報告しない
 - warn 変換禁止: (1) が warn の工程を pass として集約しない。完了報告には warn を warn のまま残す
@@ -312,7 +313,7 @@ case-auto 親ループが当該 worktree で回復処理を代行する。
 
 ## 工程別タイムスタンプ計測（L1: case-auto）（REQ-003-008）
 
-case-auto は各工程（req-save / design-save / case-open / case-run / case-close）の委譲起動前後にタイムスタンプを記録し、工程別の壁時計時間を完了報告に含める。
+case-auto は各工程（case-open / case-ready / case-revise / case-run / case-close）の委譲起動前後にタイムスタンプを記録し、工程別の壁時計時間を完了報告に含める。
 現行の開始、終了時刻記録（REQ-006-082/083）を工程別内訳へ拡張する（REQ-006-094）。
 
 - 計測単位: 委譲起動前後の壁時計時刻（JST、REQ-006-082 の時刻形式に準拠）
@@ -322,7 +323,7 @@ case-auto は各工程（req-save / design-save / case-open / case-run / case-cl
 ## Phase 0 commit スコープ設計運用
 
 Phase 0（枝PR作成フェーズ）の commit スコープ設計運用を明示する。
-Phase 0 は定義層（req-save / design-save）で確定した REQ/Decision/Design をコミットし、枝PR を作成するフェーズである。
+Phase 0 は case-ready / case-revise で確定した Definition をコミットし、枝PR を作成するフェーズである。
 本節は Phase 0 の commit 構成と、後続する case-run（実装フェーズ）の委譲内 commit に適用するスコープ設計運用を規定する。
 case-run Design（`docs/designs/commands/case-run.md`）の同名節と整合する内容を維持する（OU-013a / OU-013b）。
 
@@ -331,7 +332,7 @@ case-run Design（`docs/designs/commands/case-run.md`）の同名節と整合す
 Phase 0 で複数孫 Issue（Epic Wave 内の子Issue、または並列 execution_unit 内の個別 Issue）の実装が同一 Design ファイルに触れる場合の扱いを以下で規定する。
 
 **Design 本文修正の非許容**: 孫 Issue の test strategy が `on_failure: fix-and-reverify` を指示する場合でも、Phase 0 の case-run 委譲内で Design 本文（`docs/designs/**`）を修正しない。
-Phase 0 の Design 成果物は既に design-save 工程で確定済みであり、case-run 委譲内で再修正すると定義層の一貫性が損なわれる。
+Phase 0 の Design 成果物は既に case-ready / case-revise 工程で確定済みであり、case-run 委譲内で再修正すると定義層の一貫性が損なわれる。
 Design 修正が必要と判明した場合は `record-in-findings` で PR 本文の `## Design確定候補` セクションへ記録し、case-close の docs 検証における Design 確定チェックへ引き継ぐ（`agentdev-case-run-execution-adapter` SKILL の Design確定候補配置契約に従う）。
 
 **target_area の重複判定と並列制御**:
@@ -355,9 +356,9 @@ Phase 0 の枝PR に含まれるコミット構成運用を規定する。
 - レビュー単位の分離: 成果物変更は Design 品質査読の対象、ドメイン state はキャプチャ境界（intake/learning）の対象。査読観点が異なるため分離する
 - capture 境界の遵守: `.agentdev/intake/`、`.agentdev/learning/` の直接編集は case-run 委譲内では禁止（委譲内の対象外制約、`agentdev-case-run-execution-adapter` SKILL）。実行担当サブエージェントは PR 本文の `## Findings / Capture候補` へ記録し、case-close が intake/learning pipeline へ引き継ぐ。よって case-run 委譲内でドメイン state をコミットへ含めることは原則として発生しない
 
-**例外**: `.agentdev/drafts/` の削除（req-save / design-save 完了後のクリーンアップ）は、成果物変更とは独立したクリーンアップコミットとして扱う。
+**例外**: `.agentdev/drafts/` と RU の削除（case-ready 完了後のクリーンアップ）は、成果物変更とは独立したクリーンアップコミットとして扱う。
 本運用が禁止する同一コミット混在には該当しない。
-当該クリーンアップは req-save / design-save 工程の責務であり、Phase 0 の case-run 委譲内では発生しない。
+当該クリーンアップ検証は case-ready 後の case-auto gate の責務であり、case-run 委譲内では発生しない。
 
 **commit 分割手順**: 実行担当サブエージェントは成果物変更を先にコミットする。
 ドメイン state に触れる必要がある場合は別コミットへ分離するが、前述の通り case-run 委譲内では原則として `.agentdev/` 配下を編集せず、PR 本文経由で case-close へ引き継ぐ。
@@ -370,12 +371,12 @@ Phase 0 の枝PR に含まれるコミット構成運用を規定する。
 - 委譲工程の result が blocked / failed の場合（当該工程で自走停止、ユーザー判断待ち）。
 - 委譲起動不能時（delegation-unavailable 報告、当該工程を停止）。
 - auto_gate preflight の未解決 item 残存時（`auto_gate.auto_ready` が false または未解決 item が残る場合は停止）。
-- 停止条件（10項目の停止条件いずれか）検出時（実行停止、停止時タイミング情報を追記）。
+- 停止条件（11項目の停止条件いずれか）検出時（実行停止、停止時タイミング情報を追記）。新しい意味判断では Root Case に `resume_command: req-define` を記録する。
 - user-decision-required（上位合意矛盾、新規ユーザー判断事項）検出時（自走を停止しユーザーへ判断を求める）。
 
 ## See Also
 
-- [req-save.md](req-save.md), [design-save.md](design-save.md), [case-open.md](case-open.md), [case-run.md](case-run.md), [case-close.md](case-close.md)（構成工程）
+- [case-open.md](case-open.md), [case-ready.md](case-ready.md), [case-revise.md](case-revise.md), [case-run.md](case-run.md), [case-close.md](case-close.md)（構成工程）
 - `agentdev-workflow-case-auto` skill（workflow 実装本体（orchestration stage モデル、Wave 反復制御、停止理由分類））
 - `agentdev-quality-gates` skill（QG-1〜QG-4（各工程で適用））
 - `agentdev-case-run-execution-adapter` skill（case-run 外部実行委譲）
@@ -481,4 +482,3 @@ case-auto が解決対象とするのは下位 command が構造化した decisi
 本節の「上位合意矛盾」「新規ユーザー判断事項」は前述「停止理由分類（REQ-006-016/108 拡張）」節の分類軸へ統合される。
 case-auto が decision_context を自律解決できずユーザー停止へ分類する場合、本2分類のいずれかを停止理由として報告する。
 HITL 境界の変更ではなく、既存停止経路（REQ-006-086）の分類精度向上である。
-

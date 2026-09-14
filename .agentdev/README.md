@@ -16,7 +16,7 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-001�
 | `learning/promoted/*.md` | promoted artifact | `learning-promote` | `backlog-review` | `backlog-review` による RU 化成功後に削除 |
 | `backlog/req-units/RU-*.md` | RU（Requirement Unit） | `backlog-review`, session-sourced | `req-define`, `case-open` | `case-ready` 成功後に削除（blocked / failed / 中断時は保持。REQ-008-010, REQ-008-011） |
 | `drafts/req-draft-*.md` | working draft | `req-define` | `case-open`, `case-ready`, `case-revise` | `case-ready` 成功後に削除（blocked / failed / 中断時は保持。REQ-008-010, REQ-008-011） |
-| `drafts/requirements-review-finding-*.md` | review finding | `req-save`（SPLIT 検出時） | `req-define` | `req-define` の消化後に削除 |
+| `drafts/requirements-review-finding-*.md` | review finding | `req-define`（SPLIT 検出時） | `req-define` | `req-define` の消化後に削除 |
 | `integrity/reports/*.md` | 検証レポート（非永続） | `docs-check` | `docs-check`（intake化）・ユーザー参照 | 非永続・git管理対象外（`.gitignore` で除外） |
 | `inspect/inbox/*.md` | 未分類 inspect finding | `inspect-docs`, `inspect-skills` | `inspect-promote` | `inspect-promote` の分類後に削除（promote 時は promoted/ へ保存、reject 時は即時削除、defer 時は inbox 残置） |
 | `inspect/promoted/*.md` | promoted artifact（採用済み・RU化対象） | `inspect-promote` | `backlog-review` | `backlog-review` による RU 化成功後に削除 |
@@ -29,7 +29,7 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-001�
 |---|---|---|
 | `.agentdev/` | 永続 domain state（`integrity/reports/` は例外: 非永続・git管理対象外） | intake items、learning data、RU、drafts（req-draft, review finding） |
 
-**原則**: `req-define` が生成する working draft（`.agentdev/drafts/req-draft-*.md`）は command 間ハンドオフ用の中間アーティファクトであり、`req-save` の出力（REQ/ADR ファイル）が canonical である。
+**原則**: `req-define` が生成する working draft（`.agentdev/drafts/req-draft-*.md`）は command 間ハンドオフ用の中間アーティファクトであり、`case-ready` が保存・確定した Definition Package が canonical である。
 
 ## ディレクトリ構成
 
