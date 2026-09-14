@@ -1,29 +1,30 @@
 // Projection chain test for the realization_actions → execution contract
-// flow (REQ-017-017, TS-006, Issue #2547). Pins the projection chain between:
+// flow (REQ-017-017, TS-006, Issue #2547; updated for the REQ-030 state
+// transition refactor, Issue #2808). Pins the chain between:
 //   - the req-draft template (realization_actions source section):
 //     src/opencode/commands/agentdev/templates/req-define/req-draft.md
-//   - the case-open command (projection contract):
-//     src/opencode/commands/agentdev/case-open.md
-//   - the Issue body templates (projection target section):
-//     src/opencode/skills/agentdev-workflow-templates/templates/issue_desc_child.md
-//     src/opencode/skills/agentdev-workflow-templates/templates/issue_desc_epic.md
+//   - the case-open command (handoff contract): case-open holds
+//     realization_actions as a Definition Package constituent and does not
+//     finalize the execution contract (REQ-030-003, REQ-030-008)
+//   - the case-ready command (projection into the Issue / Epic Execution
+//     Contract): the projection subject per REQ-017-017 as amended; its
+//     distribution is pinned when case-ready lands
 //   - the case-run command (consumption as a settled contract):
 //     src/opencode/commands/agentdev/case-run.md
 //   - the requirement:
 //     docs/requirements/REQ-017.md (REQ-017-017)
 // as a permanent regression guard (TS-006):
-//   - case-open declares the realization_actions processing target and the
-//     projection into the Issue / Epic Execution Contract section
-//   - both Issue templates define the projection target section
-//     ("実現面の変更方針（realization_actions 由来）") with the same name
+//   - case-open declares the realization_actions processing target and holds
+//     it in the Definition Package without loss
 //   - case-run declares consumption of the projected policy as a settled
 //     contract: no re-decision, internal implementation policy only,
 //     blocked boundary for realization-responsibility changes
-//   - after case-open success, case-run obtains change responsibility,
+//   - after case-ready success, case-run obtains change responsibility,
 //     intent, and verification policy from the Issue body alone
 //     (no req_draft re-read, REQ-017-016)
 
 // ADF-COVERS(verification): REQ-017-017
+// ADF-COVERS(verification): REQ-030-003, REQ-030-008
 
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "fs";
@@ -68,28 +69,20 @@ describe("projection chain source (req-draft template)", () => {
   });
 });
 
-describe("case-open command projection contract (REQ-017-017)", () => {
+describe("case-open command handoff contract (REQ-030-003/008)", () => {
   const doc = read(CASE_OPEN_REL);
 
   test("lists realization_actions as a draft processing target", () => {
     expect(doc).toMatch(/draft 全体の `agreed_items`、`artifact_actions`、`operation_units`、`realization_actions` を処理対象/);
   });
 
-  test("declares the projection into the Issue / Epic Execution Contract section", () => {
-    expect(doc).toContain(`「${PROJECTION_SECTION}」へ投影`);
-    expect(doc).toMatch(/Issue \/ Epic 本文の Execution Contract セクション/);
+  test("holds realization_actions as a Definition Package constituent without loss", () => {
+    expect(doc).toMatch(/Definition Package の構成要素として保持する/);
   });
 
-  test("keeps the req-define confirmed policy without loss", () => {
-    expect(doc).toMatch(/req-define が確定した内容を失わず Issue 本文へ永続化する/);
-  });
-
-  test("enables case-run to read change responsibility, intent, and verification policy from the Issue body alone", () => {
-    expect(doc).toMatch(/case-run が Issue 本文だけで変更責務、変更意図、検証方針を取得できる/);
-  });
-
-  test("anchors the projection to the functional projection contract label", () => {
-    expect(doc).toContain("（実現面投影契約）");
+  test("does not finalize the execution contract (projection is case-ready's responsibility)", () => {
+    expect(doc).toMatch(/execution contract の確定、Standard \/ Epic の最終確定、Child Issue \/ Wave の作成、RU 削除、proposed Decision の受理評価は行わない/);
+    expect(doc).toContain("case-ready 実行契約 REQ へ移管");
   });
 });
 

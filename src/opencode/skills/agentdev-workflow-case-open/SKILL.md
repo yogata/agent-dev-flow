@@ -1,109 +1,104 @@
 ---
 name: agentdev-workflow-case-open
-description: "case-open command の workflow 実装本体。要件定義から GitHub Issue（Epic flow / Standard flow）作成までの制御構造、execution contract 確定、execution_unit 構成、Decision 状態評価（関連 proposed Decision の受理評価）、検証対応要否未分類行残存時の Issue 作成停止ゲート、draft/RU 削除クリーンアップを所有する。USE FOR: case-open 実行時の workflow 制御（Issue 本文生成・execution contract 確定・execution_unit 構成・preflight・Epic flow/Standard flow）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "case-open command の workflow 実装本体。合意済み要件doc からの Root Case 確立、Definition Package 生成と Root Case 関連付け、実変更判定と Draft Definition PR 作成（実変更時のみ、Case 単位 1 件）、冪等再実行（既存 Root Case / 既存 Draft Definition PR の再利用、不足分のみ処理）、deviation capture（Split Rule 分類）を所有する。USE FOR: case-open 実行時の workflow 制御（Root Case 確立・Definition Package 生成・実変更判定と Definition PR 作成・冪等再実行・deviation capture）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）、execution contract 確定・Standard / Epic 最終確定・Child Issue / Wave 作成・RU 削除・proposed Decision 受理評価（case-ready 側の責務）。"
 ---
 
-<!-- ADF-COVERS(implementation): REQ-030-023, REQ-030-024, REQ-030-025 -->
+<!-- ADF-COVERS(implementation): REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-004, REQ-030-005, REQ-030-006, REQ-030-007, REQ-030-008, REQ-030-009, REQ-030-010, REQ-030-011, REQ-021-024 -->
 
 # case-open workflow スキル
 
 case-open command の workflow 実装本体である。
-要件doc（構造化 `draft-data`）から GitHub Issue（Epic flow または Standard flow）を作成する制御構造、execution contract 確定（EC-{N}〜EC-{N}）、execution_unit 構成（連結成分アルゴリズム + 3軸判断 + preflight）、Decision 状態評価（関連 proposed Decision の受理評価、accepted 遷移または HITL/開始阻止、冪等再実行）、draft/RU 削除クリーンアップ（Form Zero）を所有する。
+合意済み要件doc（構造化 `draft-data`）から Root Case 確立、Definition Package 生成と Root Case 関連付け、実変更判定と Draft Definition PR 作成、冪等再実行、deviation captureまでの制御構造を所有する。
+execution contract の確定、Standard / Epic の最終確定、Child Issue / Wave の作成、RU 削除、proposed Decision の受理評価は行わない（case-ready 実行契約 REQ へ移管）。
 
-case-open command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
+case-open command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}）。
 
 ## 入力
 
-- case-open command から渡される要件doc（構造化 `draft-data` 形式、`agreed_items` / `artifact_actions` / `operation_units` / `realization_actions` / `test_strategy` / `review_dispositions` / `case_open_hints` / `auto_gate` / `conflict_resolutions`）
-- OU ID 指定（任意、OU モード時）
+- case-open command から渡される要件doc（構造化 `draft-data` 形式、`agreed_items` / `artifact_actions` / `operation_units` / `realization_actions` / `review_dispositions` / `case_open_hints` / `auto_gate` / `conflict_resolutions`）
 
 ## 出力
 
-- GitHub Issue（Standard flow または Epic flow + 子Issue群）。ラベル付き、要件doc埋め込み
-- 完了報告（Standard / Epic / マルチREQ Epic テンプレート別）
-- draft/RU 削除結果（Form Zero + 即時 push）
-- Decision 状態評価の評価記録（評価対象、判定根拠（合意内容と現行状態の照合結果）、遷移結果。停止時は停止理由）
+- Root Case GitHub Issue。ラベル付き、対象 REQ 番号埋め込み、状態 open
+- Definition Package（要件doc から生成し Root Case に関連付ける。構成は definition-readiness Design。）
+- Draft Definition PR（canonical Definition に実変更がある場合のみ。Case 単位で 1 件。）
+- 完了報告（Root Case テンプレート）
 
 ## 副作用
 
-- GitHub Issue 作成、コメント追加（Custom Tool `agentdev_gh` 経由）
-- Decision ファイル更新: 関連 proposed Decision の受理評価結果に基づく frontmatter `status` 変更（proposed → accepted）と本文末尾「## 承認記録」セクション追記（patterns.md Design 正規形式）。git commit/push は既存の並列実行安全ステージング規律・明示パス指定に従う
-- `.agentdev/drafts/req-draft-*.md` 削除、`.agentdev/backlog/req-units/RU-*.md` 削除（Form Zero、`git rm` + 即時 commit + push）
+- Root Case 作成、Draft Definition PR 作成（Custom Tool `agentdev_gh` 経由。VERIFY は Tool 内部）
+- deviation capture 保存: 自工程で実観測した deviation を `agentdev-learning-capture` skill または `agentdev-intake-pipeline` へ委譲し、capture 境界 Design の Split Rule に従い `.agentdev/intake/` または `.agentdev/learning/` へ保存する。git 永続化は明示パス指定（並列実行安全ステージング）で行う
 - 当該 Workflow Skill は worktree root 配下以外を編集しない（case-open command の worktree 隔離に従う）
+- 行わない副作用: draft / RU 削除、Decision ファイルの status 変更、execution contract 確定と Standard / Epic 最終確定と Child Issue / Wave 作成
 
 ## 制御平面（STEP 一覧）
 
 case-open workflow は次の6 STEP で構成する。
-各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
-会話コンテキストに依存せず、永続状態（draft-data、GitHub Issue、commit hash）から再開点を再構成する。
+各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`<workflows/step-reference-contract>` Design）。
+会話コンテキストに依存せず、永続状態（draft-data、Root Case Issue、Definition PR）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
-| STEP-1 | 引き継ぎ・OU選択 | 要件doc 受領 | 処理対象確定（OU 単位） | [references/handoff-and-ou-gate.md](references/handoff-and-ou-gate.md) |
-| STEP-2 | Issue本文生成・execution contract 確定 | 処理対象確定 | Issue 本文候補（EC-{N}〜EC-{N} 反映済み、QG-2 検証済み） | [references/issue-body-and-execution-contract.md](references/issue-body-and-execution-contract.md) |
-| STEP-3 | 構成判定・preflight | Issue 本文候補確定 | execution structure（Epic vs Standard、Wave 構成、preflight合格。対象要件行の検証対応要否未分類残存チェック込み） | [references/execution-unit-and-preflight.md](references/execution-unit-and-preflight.md) |
-| STEP-4 | adversarial-review | execution structure + Issue 本文 + 完了条件の3者確定 | review 結果反映（4パターン再実行ルール） | [references/adversarial-review-integration.md](references/adversarial-review-integration.md) |
-| STEP-5 | Decision 状態評価・Issue 作成（Epic flow / Standard flow） | adversarial-review skip または review 完了 | Decision 状態評価完了（関連 proposed Decision の受理評価、accepted 遷移または HITL/開始阻止）、GitHub Issue 作成済み（親Epic + 子Issue群、または Standard Issue） | [references/issue-creation-flows.md](references/issue-creation-flows.md) |
-| STEP-6 | 終了処理・クリーンアップ | Issue 作成完了 | コメント追加、draft/RU 削除（Form Zero）、完了報告 | [references/termination-and-cleanup.md](references/termination-and-cleanup.md) |
+| STEP-1 | 引き継ぎ判定 | 要件doc 受領 | 引き継ぎ停止判定完了（継続 / consumer 停止） | [references/handoff.md](references/handoff.md) |
+| STEP-2 | Root Case 確立 | STEP-1 継続確定 + adversarial-review 完了（skip 含む） | Root Case GitHub Issue 作成済み（対象 REQ 番号埋め込み、状態 open） | [references/root-case-and-definition-package.md](references/root-case-and-definition-package.md) |
+| STEP-3 | Definition Package 生成 | Root Case 確立 | Definition Package 生成・Root Case 関連付け済み | [references/root-case-and-definition-package.md](references/root-case-and-definition-package.md) |
+| STEP-4 | 実変更判定と Definition PR 作成 | Definition Package 確定 | 実変更時: Draft Definition PR 作成済み（Case 単位 1 件）。実変更なし: 作成しない | [references/definition-pr-and-idempotency.md](references/definition-pr-and-idempotency.md) |
+| STEP-5 | 冪等再実行確認 | STEP-4 完了 | 既存 Root Case・既存 Draft Definition PR 再利用済み、重複生成なし、不足分のみ処理済み | [references/definition-pr-and-idempotency.md](references/definition-pr-and-idempotency.md) |
+| STEP-6 | deviation capture・完了報告 | STEP-5 完了 | deviation 保存（Split Rule 分類）、完了報告出力 | [references/capture-and-completion.md](references/capture-and-completion.md) |
 
 ### STEP 間の依存と分岐
 
-- **Standard flow**: STEP-1 → STEP-2 → STEP-3（Standard ルート）→ STEP-4（skip 条件該当時は省略）→ STEP-5（Decision 状態評価 → Standard flow）→ STEP-6
-- **Epic flow（単一REQ `scale: large`、マルチREQ、複数 OU）**: STEP-1 → STEP-2 → STEP-3（Epic ルート、execution_unit 構成）→ STEP-4 → STEP-5（Decision 状態評価 → Epic flow、子Issue 並列作成）→ STEP-6
-- **adversarial-review skip 条件**: Standard flow で単一 OU の機械的確定、Wave 分割なし（REQ-{NNNN}-{NNN}）。ユーザー明示指定時は強制発動（REQ-{NNNN}-{NNN}）
+- **基本順序**: STEP-1 → STEP-2 → STEP-3 → STEP-4 → STEP-5 → STEP-6
+- **実変更なし分岐**: STEP-4 で canonical Definition との差分が空と判定した場合、Draft Definition PR を作成せず STEP-5 へ進む。空の PR を作成しない
+- **冪等分岐**: 再実行時、既存 Root Case または既存 Draft Definition PR を検出した場合はそれを再利用し、不足分だけを処理する。2件目の Root Case、2件目の Draft Definition PR を重複生成しない
+- **adversarial-review 挿入**: Root Case 本文候補と Definition Package 構成案確定後、STEP-2 の Root Case 作成（最初の GitHub Issue 作成）の前に挿入する。詳細は [references/adversarial-review-integration.md](references/adversarial-review-integration.md)
 
 ### 再開プロトコル（resume protocol）
 
-- 再開点は永続状態から再構成する: draft-data（`status`、`auto_gate`、`artifact_actions`）、GitHub Issue の存在と本文、RU ファイルの存在、削除 commit（Form Zero の残存検証）
-- 処理済み draft/RU は削除済み（永続状態）で判定し、会話コンテキストの記憶に依存しない。Epic/子Issue 作成の進捗は Issue 本文のステータス追跡テーブルが正である
+- 再開点は永続状態から再構成する: draft-data（`status`、`auto_gate`）、Root Case Issue の存在と状態、Draft Definition PR の存在と状態、capture 成果物
+- 再実行時は冪等キー（definition-readiness Design）で既存 Root Case / 既存 Draft Definition PR を検出し、会話コンテキストの記憶に依存せず再利用する
 
 ### 終了条件（termination）
 
-- 正常終了: 終了処理・クリーンアップ STEP の完了報告出力まで（draft/RU 削除残存検証合格を含む）
-- 停止終了: `auto_gate.auto_ready` が false、未解決質問、未解決衝突、repo 外操作、停止理由が残る場合。preflight 不合格（対象要件行の検証対応要否未分類残存を含む）、子Issue 上限超過、QG-2 fail、Decision 状態評価の停止条件（受理不能・判断情報不足・関連取得不能・related_reqs 宣言欠落・解釈不能宣言）
+- 正常終了: deviation capture・完了報告 STEP の完了報告出力まで
+- 停止終了: 要件が曖昧で Root Case を確立できない場合、`auto_gate.auto_ready` が false、未解決質問、未解決衝突、repo 外操作、停止理由が残る場合、adversarial-review 由来の unresolved ユーザー判断事項、引き継ぎ停止（consumer リポジトリ）、canonical Definition との実変更判定不能
 
 ## 主要 Capability Skill 連携
 
-本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
+本スキルは次の Capability Skill を名レベルで参照する。
 
-- `agentdev-issue-management`: Issue 操作の安全手続き、テンプレート選定、委譲接続点
-- `agentdev-decision-file-manager`: Decision frontmatter `status` 変更（proposed → accepted）、承認記録セクション追記の安全手続き、存在確認
-- `agentdev-epic-tracker`: Epic 進捗追跡、Wave 構成、自律構成生成、子Issue 数上限
-- `agentdev-quality-gates`: QG-2 完了条件網羅性検証
-- Custom Tool `agentdev_gh`: GitHub I/O 境界（Issue 作成、comment_create によるコメント追加。VERIFY は Tool 内部）
-- `agentdev-workflow-templates`: Issue/PR/コメントテンプレート選定、実行識別情報セクション形式
-- `agentdev-workflow-lifecycle`: 引き継ぎ停止判定（runtime-package-boundary）
-- `agentdev-req-file-manager`: RU ファイル削除
-- `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ（draft/RU 削除、Form Zero）
-- `agentdev-traceability`: 検証対応要否未分類行の導出（check。分類状態の導出定義はトレーサビリティモデル「対応関係の完全性規則」が所有。STEP-3 preflight の停止判定に利用）
-- `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
+- `agentdev-issue-management`: Issue 操作の安全手続き、テンプレート充足、委譲接続点
+- `agentdev-workflow-templates`: Issue/PR/コメントテンプレート選定、実行識別情報セクション形式、レビュー判断セクション形式
+- `agentdev-workflow-lifecycle`: 引き継ぎ停止判定（runtime-package-boundary）、work_type 判定、ラベル付与
+- Custom Tool `agentdev_gh`: GitHub I/O 境界（issue_create、pr_create、comment_create。VERIFY は Tool 内部）
 - `agentdev-adversarial-review`: case-open の review 呼出
-- `agentdev-learning-capture` / `agentdev-intake-pipeline`: deviation capture 委譲（STEP-4/5 で実観測時）
+- `agentdev-learning-capture` / `agentdev-intake-pipeline`: deviation capture 委譲（STEP-6 で実観測時）
+- `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ（capture 成果物の git 永続化）
+- `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 
 ## トレーサビリティ能力の利用
 
-case-open は、上流工程（req-define）で確定した対象要件と実行契約を Issue へ引き継ぐ。
-Issue の対象範囲、完了条件、test strategy の確定（STEP-2、STEP-3）は、上流工程の引き継ぎ情報（draft-data、artifact_actions、operation_units）を基に行う。
+case-open は、上流工程（req-define）で確定した対象要件を実行契約候補（realization_actions 等の Definition Package 構成要素）として Root Case へ引き継ぐ。
 
 - req-define と重複して一般的な変更影響探索や依存関係探索を行い、対象範囲を再決定しない
-- 検証対応要否の分類状態の導出（STEP-3 preflight の未分類残存チェック）は `agentdev-traceability` の check 利用であり、一般的な変更影響探索・依存関係探索には該当しない
-- 引き継ぎ情報に欠落があり変更影響候補の確認が必要な場合は、req-define へ差し戻す
-- 必須品質統制の導出は artifact type から品質能力キーへの変換（品質統制 routing Design が定める）に従う
+- 対象要件行に検証対応要否の未分類行が残る場合も Root Case の確立を妨げない。検証対応要否の最終ゲートは case-ready が所有する
+- 引き継ぎ情報に欠落があり実行契約候補の構成が不能な場合は、req-define へ差し戻す
 
 ## 共通制約
 
-- **draft-data 入力**: 本スキルは構造化 `draft-data` を入力として読み取る。`auto_gate.auto_ready` が false、未解決質問、未解決衝突、repo 外操作、停止理由が残る場合は停止する。`conflict_resolutions` に記録済みの衝突は再確認しない
-- **OU 単位処理**: Issue 化単位は REQ doc 単位ではなく OU 単位（command 不変条件）。子Issue は OU 単位で作成し、Wave 単位のみの子Issue 構造は作成しない（command 不変条件）
-- **子Issue 上限**: Epic 1件あたり最大10件（case-open 前出出力検証表 STEP-3 の検証基準）、case-open STEP-5-4 子Issue 作成並列上限は5件（3つの「5件」文脈の (1) に該当）
-- **Form Zero**: draft/RU 削除は `git rm <path>` で明示パスをステージし、同一ステップで `git commit -- <path>` により即時コミットし、未ステージ残存を許さない
-- **統合先**: Case に割り当てられた統合先（main）を Issue 本文の execution contract へ記録する（詳細は STEP-2/ STEP-6 各 reference）
-- **実行識別情報の記録**: 新規作成 Issue 本文に実行識別情報セクション（対象 Case、ADF 工程、実行単位、前工程で確定した事項）を構造化形式で記録する。形式は `agentdev-workflow-templates` の実行識別情報セクション規約に従う。機械的解析は同セクションの key-value 行を正とし、自由文中の ID に依存しない。識別情報の一部が取得不能でも停止せず「N/A」を記録する。作成時点で番号が確定しない自己参照値は Issue 作成後に埋め戻す。既存 Issue への遡及適用は行わない（詳細は STEP-2/ STEP-5 各 reference）
-- **本文 verbatim**: Issue 本文は Custom Tool `agentdev_gh` の操作引数としてそのまま渡す（文字コード・一時ファイルの実装詳細は Tool 内部）（`POL-gh-io-delegation`）
+- **draft-data 入力**: 本スキルは構造化 `draft-data` を入力として読み取る。機能要件、非機能要件、制約、対象外、受け入れ条件は新規に作成せず合意済み入力を反映する。`conflict_resolutions` に記録済みの衝突は再確認しない
+- **Root Case 状態**: Root Case 確立後の状態は open とし、実装開始を許可しない。ready への遷移は case-ready が実行する
+- **Definition PR**: canonical Definition に実変更がある場合のみ、Case 単位で 1 件の Draft Definition PR を作成する。実変更判定不能時は作成せず停止する。冪等キーは definition-readiness Design に従う
+- **Decision 非遷移**: 新規 Decision は proposed のままとし、accepted への状態遷移を実行しない
+- **実行識別情報の記録**: Root Case 本文に実行識別情報セクション（対象 Case、実行単位、前工程で確定した事項）を構造化形式で記録する。形式は `agentdev-workflow-templates` の実行識別情報セクション規約に従う。機械的解析は同セクションの key-value 行を正とし、自由文中の ID に依存しない。識別情報の一部が取得不能でも停止せず「N/A」を記録する。作成時点で番号が確定しない自己参照値は Issue 作成後に埋め戻す。既存 Issue への遡及適用は行わない
+- **本文 verbatim**: Root Case 本文、PR 本文は Custom Tool `agentdev_gh` の操作引数としてそのまま渡す（文字コード・一時ファイルの実装詳細は Tool 内部）（`POL-gh-io-delegation`）
 
 ## See Also
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
 - **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
+- **`<workflows/definition-readiness>` Design**: Definition Package 構成、Draft Definition PR lifecycle、冪等キー
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
 - **case-open command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）
+- **case-ready command**: 後続コマンド（Definition 受入と実行準備完了。execution contract 確定と構成確定を所有）

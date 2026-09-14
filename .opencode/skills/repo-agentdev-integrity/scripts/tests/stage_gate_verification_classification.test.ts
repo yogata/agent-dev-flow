@@ -324,15 +324,9 @@ describe("段階ゲートの工程契約文言（3 Workflow Skill）", () => {
     },
     {
       file: "src/opencode/skills/agentdev-workflow-case-open/SKILL.md",
-      phrases: ["対象要件行の検証対応要否未分類残存を含む"],
-    },
-    {
-      file: "src/opencode/skills/agentdev-workflow-case-open/references/execution-unit-and-preflight.md",
-      phrases: [
-        "対象要件行に検証対応要否が未分類の行が残っていないこと",
-        "分類完了を case-open または実装着手前までの必須条件として扱う",
-        "未分類行が残る場合は Issue を作成せずに停止する",
-      ],
+      // REQ-030 縮小後: case-open は未分類行が残っても Root Case 確立を妨げない（REQ-021-024）。
+      // 検証対応要否の最終ゲートは case-ready へ移管された。
+      phrases: ["対象要件行に検証対応要否の未分類行が残る場合も Root Case の確立を妨げない"],
     },
     {
       file: "src/opencode/skills/agentdev-workflow-case-close/SKILL.md",
