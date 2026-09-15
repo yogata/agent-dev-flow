@@ -1,4 +1,5 @@
 // ADF-COVERS(implementation): REQ-047-009
+// ADF-COVERS(implementation): REQ-047-010
 // IR-046/047/048 rules: repo-self-hosting-specific distribution integrity
 // checks that complement the canonical detector. Phase 3 §6.3 / Phase 6
 // delegation. Declarative data is in data/distribution-targets.yaml (Wave 6).
@@ -7,6 +8,12 @@
 // per the declarative data loading principle, ACT-DESIGN-007). Output-facing
 // finding fields (rule, description wording) stay here so the CLI output
 // contract is unchanged (REQ-047-005).
+// Per REQ-047-010 a present, valid definition file loads without warning
+// noise: the YAML text is parsed via Bun.YAML under the Bun runtime and via
+// the deterministic subset parser (lib/minimal-yaml.ts) on the standard
+// `node --experimental-strip-types` route, where Bun.YAML is undefined (its
+// ReferenceError used to surface as a "not valid YAML" warning). Both paths
+// share the same single load site and the same fail-closed error messages.
 // Self-host detectable concerns implemented here; consumer-environment
 // specific detection is delegated to install-consumer-opencode.ps1.
 //
@@ -17,6 +24,7 @@ import * as path from "path";
 import * as fs from "fs";
 import { classifyByExtension } from "./distribution-boundary.ts";
 import type { DistributionRuleFinding } from "./distribution-boundary-types.ts";
+import { parseMinimalYaml } from "./minimal-yaml.ts";
 import {
   PUBLIC_COMMAND_DIR,
   PUBLIC_SKILLS_PARENT,
@@ -75,6 +83,18 @@ function requireStringArray(value: unknown, label: string): string[] {
   });
 }
 
+// REQ-047-010: parse the canonical YAML text without runtime-specific
+// warning noise. Bun.YAML under the Bun runtime; the deterministic subset
+// parser on the node standard route (Bun is undefined there and its
+// ReferenceError must not be misreported as invalid-YAML).
+function parseYamlCanonical(text: string): unknown {
+  const bun = (globalThis as { Bun?: { YAML?: { parse?: (t: string) => unknown } } }).Bun;
+  if (typeof bun?.YAML?.parse === "function") {
+    return bun.YAML.parse(text);
+  }
+  return parseMinimalYaml(text);
+}
+
 export function loadDistributionTargets(repoRoot: string): DistributionTargets {
   const yamlPath = path.join(repoRoot, DISTRIBUTION_TARGETS_REL_PATH);
   let text: string;
@@ -87,7 +107,7 @@ export function loadDistributionTargets(repoRoot: string): DistributionTargets {
   }
   let parsed: unknown;
   try {
-    parsed = Bun.YAML.parse(text);
+    parsed = parseYamlCanonical(text);
   } catch {
     throw new Error(
       `fail-closed: distribution targets file is not valid YAML (${DISTRIBUTION_TARGETS_REL_PATH})`,
