@@ -11,11 +11,14 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   AREA_README_FILENAME,
+  README_LISTING_SECTION_TITLE,
   REQUIRED_SECTIONS,
   extractFrontmatterLines,
   extractHeadings,
+  extractReadmeListing,
   findFrontmatterViolations,
   findMissingSections,
+  findReadmeListingViolations,
   isKebabCaseSlug,
   isValidIsoDate,
   scanKnowledgeDocs,
@@ -78,6 +81,25 @@ updated: 2026-09-01
     "utf-8",
   );
   return filePath;
+}
+
+function writeAreaReadme(root: string, content: string): void {
+  const area = join(root, "docs", "knowledge");
+  mkdirSync(area, { recursive: true });
+  writeFileSync(join(area, AREA_README_FILENAME), content, "utf-8");
+}
+
+function readmeContentWithListing(listedFiles: readonly string[], count?: number): string {
+  return (
+    `# 知識（Knowledge）\n` +
+    `\n` +
+    `## ${README_LISTING_SECTION_TITLE}\n` +
+    `\n` +
+    `${count ?? listedFiles.length}件。\n` +
+    `\n` +
+    listedFiles.map((f) => `- [${f}](${f})`).join("\n") +
+    `\n`
+  );
 }
 
 // ─── 純関数: extractHeadings / findMissingSections / isKebabCaseSlug ────
@@ -228,14 +250,102 @@ describe("findFrontmatterViolations", () => {
   });
 });
 
+// ─── 純関数: README 列挙整合（REQ-056-010） ─────────────────────────────
+
+describe("extractReadmeListing", () => {
+  test("「現在の知識文書」セクションの .md リンクを列挙順に返す（正常例）", () => {
+    const content = [
+      "# 知識（Knowledge）",
+      "",
+      `## ${README_LISTING_SECTION_TITLE}`,
+      "",
+      "2件。",
+      "",
+      "- [a-doc.md](a-doc.md)",
+      "- [b-doc.md](b-doc.md)",
+      "",
+      "知識文書は learning から昇華されて成長する（REQ-056）。",
+    ].join("\n");
+    expect(extractReadmeListing(content)).toEqual(["a-doc.md", "b-doc.md"]);
+  });
+
+  test("セクション外のリンクは無視する（境界例）", () => {
+    const content = [
+      "## 導入",
+      "",
+      "- [外のリンク.md](外のリンク.md)",
+      "",
+      `## ${README_LISTING_SECTION_TITLE}`,
+      "",
+      "- [inside.md](inside.md)",
+      "",
+      "## 配置規約",
+      "",
+      "- [次セクション.md](次セクション.md)",
+    ].join("\n");
+    expect(extractReadmeListing(content)).toEqual(["inside.md"]);
+  });
+
+  test("セクションが存在しない場合は空配列（境界例）", () => {
+    expect(extractReadmeListing("# 案内のみ\n")).toEqual([]);
+  });
+
+  test("CRLF 行とリスト項目前後の空白を許容する（境界例）", () => {
+    const content =
+      `## ${README_LISTING_SECTION_TITLE}\r\n\r\n- [crlf-doc.md](crlf-doc.md)\r\n  - [indented.md](indented.md)\r\n`;
+    expect(extractReadmeListing(content)).toEqual(["crlf-doc.md", "indented.md"]);
+  });
+
+  test("非 Markdown リンクは無視する（境界例）", () => {
+    const content = [
+      `## ${README_LISTING_SECTION_TITLE}`,
+      "",
+      "- [外部](https://example.com/x.md)",
+      "- [相対.md](../requirements/REQ-056.md)",
+      "- [plain.md](plain.md)",
+    ].join("\n");
+    expect(extractReadmeListing(content)).toEqual(["plain.md"]);
+  });
+});
+
+describe("findReadmeListingViolations", () => {
+  test("一致する場合は過不足なし（正常例）", () => {
+    const files = ["a.md", "b.md"];
+    expect(findReadmeListingViolations(files, [...files])).toEqual({
+      listedButMissing: [],
+      presentButUnlisted: [],
+    });
+  });
+
+  test("実ファイルのみ存在する場合は不足（違反例）", () => {
+    const result = findReadmeListingViolations(["a.md"], ["a.md", "b.md"]);
+    expect(result.presentButUnlisted).toEqual(["b.md"]);
+    expect(result.listedButMissing).toEqual([]);
+  });
+
+  test("列挙のみ存在する場合は過剰（違反例）", () => {
+    const result = findReadmeListingViolations(["a.md", "ghost.md"], ["a.md"]);
+    expect(result.listedButMissing).toEqual(["ghost.md"]);
+    expect(result.presentButUnlisted).toEqual([]);
+  });
+
+  test("同一ファイルの重複列挙は過剰として重複報告しない（境界例）", () => {
+    const result = findReadmeListingViolations(["a.md", "a.md"], ["a.md"]);
+    expect(result.listedButMissing).toEqual([]);
+    expect(result.presentButUnlisted).toEqual([]);
+  });
+});
+
 // ─── scanKnowledgeDocs（領域構造検査） ───────────────────────────────────
 
 describe("scanKnowledgeDocs", () => {
-  test("正常例: 完備した知識文書と領域 README は違反0件", () => {
+  test("正常例: 完備した知識文書と README 列挙一致の領域 README は違反0件", () => {
     const root = makeTempRoot();
     writeKnowledgeDoc(root, "risk-boundary-extraction.md");
-    const area = join(root, "docs", "knowledge");
-    writeFileSync(join(area, AREA_README_FILENAME), "# 知識（Knowledge）\n", "utf-8");
+    writeAreaReadme(
+      root,
+      readmeContentWithListing(["risk-boundary-extraction.md"]),
+    );
 
     const result = scanKnowledgeDocs(root);
     expect(result.findings).toEqual([]);
@@ -385,5 +495,68 @@ describe("scanKnowledgeDocs", () => {
     const result = scanKnowledgeDocs(root);
     const missing = result.findings.filter((f) => f.kind === "missing-required-section");
     expect(missing).toHaveLength(5);
+  });
+
+  test("違反例: README 未列挙の実ファイルを README 列挙整合違反として検出する", () => {
+    const root = makeTempRoot();
+    writeKnowledgeDoc(root, "listed-doc.md");
+    writeKnowledgeDoc(root, "unlisted-doc.md");
+    writeAreaReadme(root, readmeContentWithListing(["listed-doc.md"]));
+
+    const result = scanKnowledgeDocs(root);
+    const mismatches = result.findings.filter((f) => f.kind === "readme-listing-mismatch");
+    expect(mismatches).toHaveLength(1);
+    expect(mismatches[0].file).toBe("docs/knowledge/README.md");
+    expect(mismatches[0].detail).toContain("unlisted-doc.md");
+  });
+
+  test("違反例: 実ファイルのない列挙を README 列挙整合違反として検出する", () => {
+    const root = makeTempRoot();
+    writeKnowledgeDoc(root, "real-doc.md");
+    writeAreaReadme(
+      root,
+      readmeContentWithListing(["real-doc.md", "ghost-doc.md"]),
+    );
+
+    const result = scanKnowledgeDocs(root);
+    const mismatches = result.findings.filter((f) => f.kind === "readme-listing-mismatch");
+    expect(mismatches).toHaveLength(1);
+    expect(mismatches[0].file).toBe("docs/knowledge/README.md");
+    expect(mismatches[0].detail).toContain("ghost-doc.md");
+    expect(mismatches[0].detail).not.toContain("real-doc.md");
+  });
+
+  test("違反例: 列挙セクション自体がなく知識文書が実在する場合は不足として検出する", () => {
+    const root = makeTempRoot();
+    writeKnowledgeDoc(root, "solo-doc.md");
+    writeAreaReadme(root, "# 知識（Knowledge）\n\n案内のみで列挙セクションがない。\n");
+
+    const result = scanKnowledgeDocs(root);
+    const mismatches = result.findings.filter((f) => f.kind === "readme-listing-mismatch");
+    expect(mismatches).toHaveLength(1);
+    expect(mismatches[0].detail).toContain("solo-doc.md");
+  });
+
+  test("境界例: README 未設置は README 列挙整合検査の対象外", () => {
+    const root = makeTempRoot();
+    writeKnowledgeDoc(root, "orphan-doc.md");
+
+    const result = scanKnowledgeDocs(root);
+    const mismatches = result.findings.filter((f) => f.kind === "readme-listing-mismatch");
+    expect(mismatches).toHaveLength(0);
+  });
+
+  test("境界例: README 自身と非 Markdown・サブディレクトリは README 列挙整合の突合対象外", () => {
+    const root = makeTempRoot();
+    writeKnowledgeDoc(root, "known-doc.md");
+    const area = join(root, "docs", "knowledge");
+    writeFileSync(join(area, "notes.txt"), "not a knowledge doc\n", "utf-8");
+    writeAreaReadme(root, readmeContentWithListing(["known-doc.md"]));
+
+    const result = scanKnowledgeDocs(root);
+    const mismatches = result.findings.filter((f) => f.kind === "readme-listing-mismatch");
+    expect(mismatches).toHaveLength(0);
+    const placements = result.findings.filter((f) => f.kind === "non-regular-placement");
+    expect(placements.map((f) => f.file)).toContain("docs/knowledge/notes.txt");
   });
 });
