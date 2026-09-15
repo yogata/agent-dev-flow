@@ -2,7 +2,7 @@
 title: Targeted Docs Guard 実装詳細
 status: accepted
 created: 2026-07-15
-updated: 2026-09-12
+updated: 2026-09-16
 ---
 
 # Targeted Docs Guard 実装詳細
@@ -100,8 +100,14 @@ case-close では保存工程より広めに以下を確認する。
 
 case-run プロファイルは docs/** 変更ファイルを対象とし、Definition 保存 / Design 保存向けプロファイルと同等の docs 整合性検査ルールセット（obsolete-spec-path, legacy-local-generation-vocab, doc-type-responsibility 等）を適用する。
 case-run プロファイル固有の追加ルールとして `full_docs_check_recommended` 判定は持たない（case-close の責務）。
-appliesTo は `docs/designs/**`, `docs/requirements/**`, `docs/decisions/**`, `docs/guides/**`, `AGENTS.md`, `README.md` 等、docs 配下および文書整合性に関連するファイルに限定する。
-case-run プロファイルの対象範囲は、case-run で変更され得る docs 領域を網羅するか、代替検査指定（全ファイル対象プロファイル等）の運用として明記すること（REQ-010-077）。`docs/knowledge/**` を含む case-run 変更で `files_checked` 空（TARGET-EMPTY）を恒常運用として発生させないこと。対象追加（appliesTo への `docs/knowledge/**` 追加）または代替検査指定の運用明記のいずれかを選定する基準は、fail-closed 意味論の維持、検査見逃しゼロ、false-clean の発生なしであり、適用結果と選定根拠を記録する。
+appliesTo は `docs/designs/**`, `docs/requirements/**`, `docs/decisions/**`, `docs/guides/**`, `AGENTS.md`, `README.md` 等、docs 配下および文書整合性に関連するファイルに限定する。`docs/knowledge/**` は appliesTo 対象外とし、後述の代替検査指定の運用を適用する。
+case-run プロファイルの対象範囲は、case-run で変更され得る docs 領域を網羅するか、代替検査指定（全ファイル対象プロファイル等）の運用として明記すること（REQ-010-077）。`docs/knowledge/**` を含む case-run 変更で `files_checked` 空（TARGET-EMPTY）を恒常運用として発生させないこと。対象追加（appliesTo への `docs/knowledge/**` 追加）または代替検査指定の運用明記のいずれかを選定する基準は、fail-closed 意味論の維持、検査見逃しゼロ、false-clean の発生なしである。
+
+<!-- ADF-COVERS(implementation): REQ-010-077 -->
+選定の適用結果（REQ-010-077、case 実行 RA-001 による確定）: 対象追加ではなく、代替検査指定の運用明記を採用する。
+`docs/knowledge/**` を含む case-run 変更では、case-run プロファイル単独実行による TARGET-EMPTY を禁止し、全ファイル対象プロファイル（`--workflow case-close --files <変更ファイル群>`。case-close プロファイルの appliesTo は全ファイル対象）を `--files` 明示指定で実行する運用を正とする。
+選定根拠: (1) fail-closed 意味論の維持 — 代替プロファイル実行時も `files_checked` 空は REQ-010-076 により FAILURE であり、検証モード問わず確認なく合格扱いにならない。(2) 検査見逃しゼロ — case-close プロファイルは全ファイル対象のため `docs/knowledge/**` 変更が検査対象となり TARGET-EMPTY が発生せず、運用明記は本 Design（対象範囲・検査契約の正）に置かれて case-run 実行手順を拘束する。(3) false-clean なし — 対象追加は checker 設定（check_changed_docs.ts の case-run プロファイル appliesTo。本 Design から正参照）の変更を要するため、checker 設定と検査意味論を変更せず Design 記載のみで完結する本方式を採用した。対象追加への将来移行は checker 設定変更と本節の同時更新をセットで行う。
+本 Design の case-run 向け検査節の記載（workflow プロファイル対象範囲の運用明記、`docs/knowledge/**` 変更時の TARGET-EMPTY 恒常化禁止、guard 対象外領域の配布依存境界 gate との検査責務分担明示）が REQ-010-077 を実装する。
 配布 skill（`src/opencode/skills/**`）のみを変更する case-run において guard の `files_checked` が空となる場合、配布物検査の責務は配布依存境界 gate（check_distribution_boundary。case-run STEP-S5 / case-close STEP-3 共用 detector、case-close 側は `--files` 明示指定に対応）が担う。guard（check_changed_docs）は docs 変更の検査責務に限定する。この責務分担は case-run 側の配布物検査契約（TS-007 系）と矛盾しない。
 
 ## full_docs_check_recommended 条件
