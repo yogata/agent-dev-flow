@@ -3,6 +3,8 @@ name: agentdev-design-file-manager
 description: Manages Design file operations (CREATE/APPEND/UPDATE), placement resolution, target_area section replacement, Design-specific integrity, and Design-specific script invocation contract. USE FOR: creating Design files, appending sections, updating Designs via target_area, Design lifecycle (draft/accepted) application. DO NOT USE FOR: REQ/Decision operations, Design content inference, accepted promotion, user approval, commit, push.
 ---
 
+<!-- ADF-COVERS(implementation): REQ-021-026 -->
+
 # Designファイル管理
 
 このスキルは Design ファイル（`* Design`）の管理に関する**知識ベース**として機能する。
@@ -55,6 +57,15 @@ Design frontmatter の `status`（`draft` / `accepted` の2値）を本スキル
 - 置換済み Design は現行 Design ツリーへ保持しない。置換時は旧 Design を現行ツリーから除外し、履歴は Git、Issue、Decision 等の既存履歴手段から確認する
 
 詳細は [references/design-lifecycle-application.md](references/design-lifecycle-application.md) 参照。
+
+---
+
+## ADF-COVERS 宣言ブロックの更新確認（design-save 時）
+
+design-save 工程（Design 本体へ要件を反映する保存工程）は、当該 Design ヘッダの既存 ADF-COVERS 宣言ブロックの更新要否（実装対応・検証対応の過不足）を確認対象に含める。
+確認結果に基づく宣言ブロックの更新を要する場合、保存工程の一部として反映する。
+
+確認の詳細（確認対象の限定、更新要否の判定観点、反映タイミング）は [references/design-lifecycle-application.md](references/design-lifecycle-application.md) 参照。
 
 ---
 
@@ -124,6 +135,7 @@ Design 保存内部責務は本スクリプト群を bash 経由で呼び出し�
 
 - 新規 Design 作成時の frontmatter 完全性（`title`, `status: draft`, `created`, `updated`）
 - 既存 Design 追記時の `status` 変更がないこと
+- design-save 工程（Design 本体へ要件を反映する保存工程）での、当該 Design ヘッダの既存 ADF-COVERS 宣言ブロックの更新要否（実装対応・検証対応の過不足）確認の包含と、更新を要する場合の保存工程内反映
 - target_area マッチング規則の適用結果（単一マッチ採用、複数マッチ時の warn、未検出時のスキップ + follow-up）
 - Design 固有 script が単一の正規所有者（本スキル）に集約されていること
 - 共通検証を重複実装せず `agentdev-artifact-validation` の公開検証契約へ委譲すること
