@@ -1,6 +1,7 @@
 # single workflow: 単一 Issue 実行（single）
 
 <!-- ADF-COVERS(implementation): REQ-031-028 -->
+<!-- ADF-COVERS(implementation): REQ-036-027 -->
 
 > 本 reference は `agentdev-workflow-case-run` SKILL.md の single workflow 詳細である。
 > STEP-S1〜S3（フェーズ判定から前置 gate 群まで）と STEP-S6（クリーンアップ・完了報告）を所有する。
@@ -261,7 +262,7 @@ verify-only closure（PR も carrier commit も存在しない Issue 完了。�
 
 - **テスト戦略（TS）標準手順**: 関数削除を伴う Issue の test strategy には、削除対象関数の全使用箇所 grep 確認手順を含める（L-014、PR #1140 / #1139 Epic #1138 由来。詳細は `agentdev-req-analysis` 参照）
 - **Windows PowerShell 外部 CLI 出力のエンコーディング防御**: 検証・比較系タスク（Issue 本文読取、検証結果の文字列突合、stdout 退避等）で PowerShell 経由の gh / git 出力を扱う場合の防御手順（Issue #2634 の4障害事例由来）。PowerShell はネイティブコマンド（gh、git）の UTF-8 出力をコンソールコードページ（cp932）でデコードするため、パイプ・変数キャプチャ・リダイレクト経由の文字列処理で mojibake と静かな情報欠落が発生する:
-  - (1) gh 書き込み系: `gh issue edit --body-file` の UTF-8 ファイル文字化けを回避するため、`gh api -X PATCH --input <json-file>`（UTF-8 JSON payload）経路へ標準化する。書き込み後の検証は生バイト出力（`Start-Process -RedirectStandardOutput`）で行う。Issue/PR 操作は Custom Tool `agentdev_gh` を標準とする（UTF-8 (BOM なし) JSON ファイル渡しと読み戻し検証が Tool 実装の内側に隠蔽されている）
+  - (1) Issue/PR 書き込み系: gh CLI 書き込み操作（Issue 本文更新等の body-file 渡し）では UTF-8 ファイル文字化けが発生した事例があるため、UTF-8 (BOM なし) JSON ファイル渡しと読み戻し検証が Tool 実装の内側に隠蔽された Custom Tool `agentdev_gh` 経路へ標準化済みである。Issue/PR 操作は Custom Tool `agentdev_gh` を標準とし、gh 書き込み系の直接実行は行わない。書き込み後の検証は Tool の VERIFY 手順（読み戻し検証）で行う
   - (2) gh 読み取り系: `--jq` は複数行文字列を正しく扱えない事例がある（実際の文字数より大幅に少なく取得される）。`--json` 全体取得 + `ConvertFrom-Json` パースへ標準化する。`--jq` は単一行フィールドに限定し、取得結果の文字数突合 VERIFY を必須とする
   - (3) 退避・書き戻し: stdout 直接パイプ・変数キャプチャで多バイト文字列を受け取らない。UTF-8 明示のファイル退避（`Out-File -Encoding utf8`）→ Read ツール参照に置き換える。書き戻しは JSON payload + `gh api --input` に統一する
   - (4) git 出力解析: `[Console]::OutputEncoding` の UTF-8 設定に加え、生バイト系コマンド（`git grep` 等の件数カウント）によるクロスチェックを行う。Windows 環境での git 出力処理の詳細は `agentdev-git-worktree` の「Windows git 出力のエンコーディング処理」（`references/git-common-procedures.md`）を参照する

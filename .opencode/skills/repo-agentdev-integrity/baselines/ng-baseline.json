@@ -1,7 +1,7 @@
 {
   "version": 1,
   "rule_id": "NG-BASELINE",
-  "generated_at": "2026-09-04",
+  "generated_at": "2026-09-15",
   "entries": [
     {
       "category": "ADR",
@@ -38,6 +38,15 @@
       "count": 11,
       "provenance": "legacy",
       "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
+    },
+    {
+      "category": "Canonical",
+      "check": "req-range-staleness",
+      "file": "docs/README.md",
+      "evidence": "現行要件は50件",
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "docs/README.md 手書き部の現行要件数表記の鮮度 drift（main 既知 NG）。AUTOGEN 部分は正しい値を保持。本 case 対象範囲外のため正規管理下で修復候補として追跡"
     },
     {
       "category": "Canonical",
@@ -148,6 +157,15 @@
       "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
+      "category": "CaptureBoundary",
+      "check": "command-capture-duty",
+      "file": "src/opencode/commands/agentdev/req-save.md",
+      "evidence": null,
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "req-save.md の capture duty 宣言不在（main 既知 NG）。本 case 対象範囲外のため正規管理下で追跡"
+    },
+    {
       "category": "Decision",
       "check": "accepted-adr-only-citation",
       "file": "docs/designs/commands/case-auto.md",
@@ -173,6 +191,15 @@
       "count": 1,
       "provenance": "proposed-decision-citation",
       "reason": "proposed-decision-citation: proposed Decision DEC-015 を根拠として引用する意図的な記述。Decision の accepted 昇格または SPEC 再構成（OU-009）で解消するまでの承認（Issue #2136 NG21 外 warning 分類）"
+    },
+    {
+      "category": "Decision",
+      "check": "accepted-adr-only-citation",
+      "file": "docs/designs/integrity/index-auto-generation.md",
+      "evidence": "DEC-007",
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "index-auto-generation.md による superseded DEC-007 の歴史的引用（main 既知 warning）。本 case 対象範囲外のため正規管理下で追跡"
     },
     {
       "category": "Decision",
@@ -263,6 +290,15 @@
       "count": 1,
       "provenance": "v3-migration",
       "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "IndexGenerationConsistency",
+      "check": "index-generation-consistency",
+      "file": "docs/designs/quality/req-health-metrics.md",
+      "evidence": "block_id=req-metrics-measurement-example, current_lines=55, expected_lines=55",
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "AUTOGEN ブロックの行数 drift（main 既知 NG）。本 case 対象範囲外のため正規管理下で追跡"
     },
     {
       "category": "IndexGenerationConsistency",
@@ -1516,6 +1552,105 @@
       "reason": "REQ-010-066 (IR-065) detection rollout: pre-existing legacy ADR kind enumeration (REQ/ADR/) residue outside Wave 2 normalization scope (audit viewpoint V1 did not enumerate kind lists). Bulk normalization to REQ/Decision/Design is an intake decision."
     },
     {
+      "category": "PluginProjection",
+      "check": "repo-local-plugin-projection-symmetry",
+      "file": ".opencode/plugins/agentdev-distribution-boundary-guard",
+      "evidence": "projection-missing:plugins/agentdev-distribution-boundary-guard",
+      "count": 1,
+      "provenance": "environment-specific-worktree",
+      "reason": "junction 未伝播環境（worktree）固有の projection 対称性検出差。main（junction 実在環境）では検出 0 件の環境差（REQ-018 環境差扱い）。実装欠陥ではなく検査環境差として正規管理する"
+    },
+    {
+      "category": "PluginProjection",
+      "check": "repo-local-plugin-projection-symmetry",
+      "file": ".opencode/plugins/agentdev-distribution-boundary-guard.ts",
+      "evidence": "shim-missing:plugins/agentdev-distribution-boundary-guard.ts",
+      "count": 1,
+      "provenance": "environment-specific-worktree",
+      "reason": "junction 未伝播環境（worktree）固有の projection 対称性検出差。main（junction 実在環境）では検出 0 件の環境差（REQ-018 環境差扱い）。実装欠陥ではなく検査環境差として正規管理する"
+    },
+    {
+      "category": "PluginProjection",
+      "check": "repo-local-plugin-projection-symmetry",
+      "file": ".opencode/plugins/agentdev-gh-tool",
+      "evidence": "projection-missing:plugins/agentdev-gh-tool",
+      "count": 1,
+      "provenance": "environment-specific-worktree",
+      "reason": "junction 未伝播環境（worktree）固有の projection 対称性検出差。main（junction 実在環境）では検出 0 件の環境差（REQ-018 環境差扱い）。実装欠陥ではなく検査環境差として正規管理する"
+    },
+    {
+      "category": "PluginProjection",
+      "check": "repo-local-plugin-projection-symmetry",
+      "file": ".opencode/plugins/agentdev-gh-tool.ts",
+      "evidence": "shim-missing:plugins/agentdev-gh-tool.ts",
+      "count": 1,
+      "provenance": "environment-specific-worktree",
+      "reason": "junction 未伝播環境（worktree）固有の projection 対称性検出差。main（junction 実在環境）では検出 0 件の環境差（REQ-018 環境差扱い）。実装欠陥ではなく検査環境差として正規管理する"
+    },
+    {
+      "category": "PluginProjection",
+      "check": "repo-local-plugin-projection-symmetry",
+      "file": ".opencode/plugins/agentdev-gh-write-guard",
+      "evidence": "projection-missing:plugins/agentdev-gh-write-guard",
+      "count": 1,
+      "provenance": "environment-specific-worktree",
+      "reason": "junction 未伝播環境（worktree）固有の projection 対称性検出差。main（junction 実在環境）では検出 0 件の環境差（REQ-018 環境差扱い）。実装欠陥ではなく検査環境差として正規管理する"
+    },
+    {
+      "category": "PluginProjection",
+      "check": "repo-local-plugin-projection-symmetry",
+      "file": ".opencode/plugins/agentdev-gh-write-guard.ts",
+      "evidence": "shim-missing:plugins/agentdev-gh-write-guard.ts",
+      "count": 1,
+      "provenance": "environment-specific-worktree",
+      "reason": "junction 未伝播環境（worktree）固有の projection 対称性検出差。main（junction 実在環境）では検出 0 件の環境差（REQ-018 環境差扱い）。実装欠陥ではなく検査環境差として正規管理する"
+    },
+    {
+      "category": "PluginProjection",
+      "check": "repo-local-plugin-projection-symmetry",
+      "file": ".opencode/plugins/agentdev-textlint-guard",
+      "evidence": "projection-missing:plugins/agentdev-textlint-guard",
+      "count": 1,
+      "provenance": "environment-specific-worktree",
+      "reason": "junction 未伝播環境（worktree）固有の projection 対称性検出差。main（junction 実在環境）では検出 0 件の環境差（REQ-018 環境差扱い）。実装欠陥ではなく検査環境差として正規管理する"
+    },
+    {
+      "category": "PluginProjection",
+      "check": "repo-local-plugin-projection-symmetry",
+      "file": ".opencode/plugins/agentdev-textlint-guard.ts",
+      "evidence": "shim-missing:plugins/agentdev-textlint-guard.ts",
+      "count": 1,
+      "provenance": "environment-specific-worktree",
+      "reason": "junction 未伝播環境（worktree）固有の projection 対称性検出差。main（junction 実在環境）では検出 0 件の環境差（REQ-018 環境差扱い）。実装欠陥ではなく検査環境差として正規管理する"
+    },
+    {
+      "category": "PluginProjection",
+      "check": "repo-local-plugin-projection-symmetry",
+      "file": ".opencode/plugins/agentdev-third-party-tool",
+      "evidence": "projection-missing:plugins/agentdev-third-party-tool",
+      "count": 1,
+      "provenance": "environment-specific-worktree",
+      "reason": "junction 未伝播環境（worktree）固有の projection 対称性検出差。main（junction 実在環境）では検出 0 件の環境差（REQ-018 環境差扱い）。実装欠陥ではなく検査環境差として正規管理する"
+    },
+    {
+      "category": "PluginProjection",
+      "check": "repo-local-plugin-projection-symmetry",
+      "file": ".opencode/plugins/agentdev-third-party-tool.ts",
+      "evidence": "shim-missing:plugins/agentdev-third-party-tool.ts",
+      "count": 1,
+      "provenance": "environment-specific-worktree",
+      "reason": "junction 未伝播環境（worktree）固有の projection 対称性検出差。main（junction 実在環境）では検出 0 件の環境差（REQ-018 環境差扱い）。実装欠陥ではなく検査環境差として正規管理する"
+    },
+    {
+      "category": "ReferencePath",
+      "check": "reference-path-existence",
+      "file": "src/opencode/skills/agentdev-workflow-case-ready/SKILL.md",
+      "evidence": "scripts/src/inspect_cross_dependencies.ts",
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "inspect_cross_dependencies.ts は agentdev-workflow-case-open へ移設済みの参照残骸（main 既知 NG、本 case 対象範囲外）。正規管理下で追跡し、別途修復候補として扱う"
+    },
+    {
       "category": "ReqCitation",
       "check": "referenced-req-row-existence",
       "file": ".agentdev/extensions/skills/agentdev-workflow-case-auto.yaml",
@@ -2481,6 +2616,15 @@
     {
       "category": "ReqCitation",
       "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/req-define.md",
+      "evidence": "REQ-003-038",
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
       "file": "docs/designs/commands/req-save.md",
       "evidence": "REQ-004-081",
       "count": 1,
@@ -2603,6 +2747,33 @@
       "count": 1,
       "provenance": "issue-2383-ir067-initial-baseline",
       "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/foundations/references/verification-scope-catalog.md",
+      "evidence": "REQ-030-022",
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/foundations/references/verification-scope-catalog.md",
+      "evidence": "REQ-030-023",
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/foundations/references/verification-scope-catalog.md",
+      "evidence": "REQ-030-025",
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
     },
     {
       "category": "ReqCitation",
@@ -2904,11 +3075,47 @@
     {
       "category": "ReqCitation",
       "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/artifact-contracts.md",
+      "evidence": "REQ-003-033",
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
       "file": "docs/designs/responsibilities/artifact-responsibilities.md",
       "evidence": "REQ-002-057",
       "count": 1,
       "provenance": "issue-2383-ir067-initial-baseline",
       "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/artifact-responsibilities.md",
+      "evidence": "REQ-003-038",
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/artifact-responsibilities.md",
+      "evidence": "REQ-003-033",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/artifact-responsibilities.md",
+      "evidence": "REQ-003-034",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
     },
     {
       "category": "ReqCitation",
@@ -3017,6 +3224,231 @@
       "count": 1,
       "provenance": "issue-2383-ir067-initial-baseline",
       "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/responsibility-boundary-purification.md",
+      "evidence": "REQ-003-038",
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-030",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-031",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-032",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-033",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-034",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-035",
+      "count": 4,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-036",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-037",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-038",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-039",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-040",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-041",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-043",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-044",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-045",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-046",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-047",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-048",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-049",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-050",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-051",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-052",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-053",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-adversarial-review.md",
+      "evidence": "REQ-003-054",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
     },
     {
       "category": "ReqCitation",
@@ -3444,11 +3876,29 @@
     {
       "category": "ReqCitation",
       "check": "referenced-req-row-existence",
+      "file": "docs/requirements/REQ-014.md",
+      "evidence": "REQ-003-035",
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
       "file": "docs/requirements/REQ-027.md",
       "evidence": "REQ-002-022",
       "count": 1,
       "provenance": "issue-2383-ir067-initial-baseline",
       "reason": "REQ-010-069 (IR-067) detection rollout: pre-existing phantom row citations (old row IDs from the 2026-08-14 requirement splitting still cited in docs). Corpus correction is OU-007/OU-010 scope (RU-0002/RU-0001). New phantom citations (PR 2284 pattern) keep failing strict beyond this baseline."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/requirements/REQ-082.md",
+      "evidence": "REQ-003-030",
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "REQ-003 行番号帯（REQ-003-030〜054 等）引用先行の不在（main 既知 NG、REQ 再編に伴う参照 drift）。本 case 対象範囲外のため正規管理下で修復候補として追跡"
     },
     {
       "category": "RuntimeReference",
