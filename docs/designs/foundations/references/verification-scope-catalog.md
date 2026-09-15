@@ -150,7 +150,7 @@ Issue #2362 の移行作業（棚卸し (a')）で全現行要件行を判定し
 
 ### REQ-030（case-open 実行契約）
 
-- REQ-030-001..REQ-030-021: Issue 本文生成、flow ルーティング、Epic/Wave 構成自律生成、構成検証、RU 削除と同期確認の実行時振る舞い
+- REQ-030-001..REQ-030-011: Root Case 確立と対象 REQ 番号埋め込み、Draft Definition PR 作成、Definition Package 生成と Root Case 関連付け、合意済み入力の反映、冪等再実行、deviation capture の実行時振る舞い
 - REQ-030-022: Wave 構成時の変更対象ファイル重複前置検出と処置確定。case-open 実行時の振る舞い
 - REQ-030-023..REQ-030-025: Case Issue 作成前の関連 Decision 状態評価（正規情報源による特定、受理評価と accepted 遷移または開始阻止、再実行時の冪等）の実行時振る舞い。Case Issue のテスト戦略とレビューで検証
 

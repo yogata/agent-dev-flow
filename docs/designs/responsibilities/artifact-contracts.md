@@ -324,7 +324,7 @@ draft file は原本アーティファクト（REQ/Decision/Design/RU）では�
 
 | draft_type | file pattern | producer | allowed consumers | 位置づけ | lifecycle |
 |---|---|---|---|---|---|
-| `req_draft` | `.agentdev/drafts/req-draft-{topic}.md` | `req-define` | `case-ready`, `case-revise`, `case-open` | 保存前の要件ドラフト | case-open の Issue 作成 + VERIFY 成功後に削除 |
+| `req_draft` | `.agentdev/drafts/req-draft-{topic}.md` | `req-define` | `case-ready`, `case-revise`, `case-open` | 保存前の要件ドラフト | case-ready 成功後に削除（blocked / failed / 中断時は保持） |
 
 標準 draft type は `req_draft` の 1 種のみとする（REQ-002-132）。
 `requirements-review-finding` および旧 `skill_review_finding` は標準 draft type に含めない。
@@ -374,10 +374,11 @@ draft type registry の allowed consumers 列、REQ-008、REQ-006-083、document
 | orchestration pre-reader | `{case-auto}` | case-open 前だけ req_draft を読み、後続工程の orchestration 入力とする command |
 | invalid post-case reader | `{case-auto, case-run, case-close}` | case-open 成功後に req_draft を参照してはならない command 群 |
 
-#### case-open 成功後の SSoT 遷移
+#### case-ready 成功後の SSoT 遷移
 
-- case-open 成功後は Issue と Epic を SSoT とし、req_draft は削除されてよい一時成果物となる
-- case-auto は case-open 成功後の停止、再開、完了処理を Issue と Epic だけで成立させる
+- case-open 成功後も req_draft は保持され、case-ready が Definition 確定の入力として消費する
+- case-ready 成功後は Root Case Issue と確定済み canonical Definition を SSoT とし、req_draft は削除される（blocked / failed / 中断時は保持。REQ-008-010, REQ-008-011）
+- case-auto は case-open 以降の停止、再開、完了処理を Issue と実行構造（execution contract）だけで成立させる
 - case-run、case-close は case-open 成功後に req_draft を参照しない
 - draft type registry の allowed consumers 列は `{case-open, case-ready, case-revise}` とする（REQ/Decision 保存と Design 保存を case-ready / case-revise の Definition 保存内部責務として統合した構成に対応）
 

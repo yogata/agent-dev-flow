@@ -33,7 +33,7 @@ v2:REQ-0140（文書品質ゲート）の原本仕様（文書種別配置、用
 REQ/Decision/Design/guides の役割定義、記述対象、記述対象外の基準境界は `../foundations/document-model.md` の「責務マトリックス」「文書分類ポリシー」を正本とする。
 本 Design は基準境界を再定義せず、執筆時の配置判定のみを扱う。
 
-README は agent-dev-flow リポジトリの構成要素（identity、入口表、参照先リンク、最小限のクイックスタート）であり、REQ/Decision/Design/guide と並ぶ基準境界対象ではなく README.md の構造要件に従う。
+README は agent-dev-flow リポジトリの構成要素（identity、参照先リンク、最小限のクイックスタート）であり、索引構成として扱う。コマンド選択の入口表は `docs/guides/command-selection.md` が一元所有する（REQ-057-016）。README は REQ/Decision/Design/guide と並ぶ基準境界対象ではなく README.md の構造要件に従う。
 
 ### 新規文書作成時の分類判断ツリー <!-- REQ-001 -->
 
