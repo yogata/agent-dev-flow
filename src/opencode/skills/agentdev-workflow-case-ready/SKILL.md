@@ -1,9 +1,9 @@
 ---
 name: agentdev-workflow-case-ready
-description: "case-ready command の workflow 実装本体。Definition PR 受入（忠実性・整合性・品質検査の確認、新しい意味判断が不要な場合の自動確定・merge、HITL 停止、CI 失敗時の ready 不遷移と既存 PR 保持）、canonical Definition 再取得、proposed Decision の受理評価と accepted 遷移、execution contract 確定、Standard / Epic 確定（連結成分と3軸判断、Child Issue / Wave / 依存構造生成、構成検証、Wave 重複前置検出）、検証対応要否最終ゲート、ready 遷移、draft / RU 削除、冪等再実行を所有する。USE FOR: case-ready 実行時の workflow 制御（Definition 受入・自動確定・merge・HITL 停止・canonical 再取得・Decision 受理評価・execution contract 確定・Standard / Epic 確定・検証ゲート・ready 遷移・draft / RU 削除・冪等再実行）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）、Root Case 確立・Definition Package 生成・Draft Definition PR 作成（case-open 側の責務）、実装実行（case-run 側の責務）、PR マージ判定・完了条件チェックボックス評価（case-close 側の責務）。"
+description: "case-ready command の workflow 実装本体。Definition PR 受入（忠実性・整合性・品質検査の確認、新しい意味判断が不要な場合の自動確定・merge、HITL 停止、CI 失敗時の ready 不遷移と既存 PR 保持）、canonical Definition 再取得、proposed Decision の受理評価と accepted 遷移、execution contract 確定、Standard / Epic 確定（連結成分と3軸判断、Child Issue / Wave / 依存構造生成、構成検証、Wave 重複前置検出）、検証対応要否最終ゲート（横断依存検査を含む）、ready 遷移、draft / RU 削除、冪等再実行を所有する。USE FOR: case-ready 実行時の workflow 制御（Definition 受入・自動確定・merge・HITL 停止・canonical 再取得・Decision 受理評価・execution contract 確定・Standard / Epic 確定・検証ゲート・横断依存検査・ready 遷移・draft / RU 削除・冪等再実行）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）、Root Case 確立・Definition Package 生成・Draft Definition PR 作成（case-open 側の責務）、実装実行（case-run 側の責務）、PR マージ判定・完了条件チェックボックス評価（case-close 側の責務）。"
 ---
 
-<!-- ADF-COVERS(implementation): REQ-061-001, REQ-061-002, REQ-061-003, REQ-061-004, REQ-061-005, REQ-061-006, REQ-061-007, REQ-061-008, REQ-061-009, REQ-061-010, REQ-061-011, REQ-061-012, REQ-061-013, REQ-061-014, REQ-061-015, REQ-061-016, REQ-061-017, REQ-061-018, REQ-061-019, REQ-061-020, REQ-061-021, REQ-061-022, REQ-061-023, REQ-061-024, REQ-061-025, REQ-061-026, REQ-061-027, REQ-061-028, REQ-017-001, REQ-017-002, REQ-017-004, REQ-017-005, REQ-017-008, REQ-017-009, REQ-017-010, REQ-017-011, REQ-017-012, REQ-017-013, REQ-017-015, REQ-017-016, REQ-017-017, REQ-035-013, REQ-035-014, REQ-035-015 -->
+<!-- ADF-COVERS(implementation): REQ-061-001, REQ-061-002, REQ-061-003, REQ-061-004, REQ-061-005, REQ-061-006, REQ-061-007, REQ-061-008, REQ-061-009, REQ-061-010, REQ-061-011, REQ-061-012, REQ-061-013, REQ-061-014, REQ-061-015, REQ-061-016, REQ-061-017, REQ-061-018, REQ-061-019, REQ-061-020, REQ-061-021, REQ-061-022, REQ-061-023, REQ-061-024, REQ-061-025, REQ-061-026, REQ-061-027, REQ-061-028, REQ-061-029, REQ-061-030, REQ-061-031, REQ-017-001, REQ-017-002, REQ-017-004, REQ-017-005, REQ-017-008, REQ-017-009, REQ-017-010, REQ-017-011, REQ-017-012, REQ-017-013, REQ-017-015, REQ-017-016, REQ-017-017, REQ-035-013, REQ-035-014, REQ-035-015 -->
 
 # case-ready workflow スキル
 
@@ -47,7 +47,7 @@ case-ready workflow は次の7 STEP で構成する。
 | STEP-3 | Decision 受理評価 | STEP-2 完了 | proposed Decision の評価完了（accepted 遷移実行 / 受理不能で停止 / 評価対象 0 件で継続） | [references/decision-acceptance.md](references/decision-acceptance.md) |
 | STEP-4 | execution contract 確定 | STEP-3 完了 | execution contract を Root Case 本文へ確定済み | [references/execution-contract.md](references/execution-contract.md) |
 | STEP-5 | 実行構造確定 | STEP-4 完了 | Standard / Epic 確定済み。Epic 時は Child Issue / Wave / 依存構造作成済み、構成検証合格 | [references/execution-structure.md](references/execution-structure.md) |
-| STEP-6 | 検証ゲートと ready 遷移 | STEP-5 完了 | 対象要件行の未分類 0 件確認、Root Case を ready へ遷移済み | [references/readiness-and-cleanup.md](references/readiness-and-cleanup.md) |
+| STEP-6 | 検証ゲートと ready 遷移 | STEP-5 完了 | 対象要件行の未分類 0 件確認、横断依存検査実施済み（警告提示記録または検出不能報告。警告は ready 遷移判定を変更しない）、Root Case を ready へ遷移済み | [references/readiness-and-cleanup.md](references/readiness-and-cleanup.md) |
 | STEP-7 | draft / RU 削除と同期確認 | STEP-6 完了 | draft / RU 削除済み、main ブランチの作業ディレクトリとリモートの同期確認済み | [references/readiness-and-cleanup.md](references/readiness-and-cleanup.md) |
 
 ### STEP 間の依存と分岐
@@ -84,6 +84,8 @@ case-ready workflow は次の7 STEP で構成する。
 - Custom Tool `agentdev_gh`: GitHub I/O 境界（issue_read、issue_update、issue_create、pr_read、pr_merge、comment_create。VERIFY は Tool 内部）
 - `agentdev-learning-capture` / `agentdev-intake-pipeline`: deviation capture 委譲（実観測時）
 - `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ（capture 成果物の git 永続化）
+- `agentdev-project-extensions`: 検証ゲート横断依存検査の共有領域解決（workflow-extension の context。fail-open）
+- 横断依存検査エンジン（`agentdev-workflow-case-open` スキル配下 `scripts/src/inspect_cross_dependencies.ts`）: 検証ゲート横断次元の機械的比較の単一実装。case-open STEP-5 と比較手続きを共有する（重複実装禁止）
 
 ## トレーサビリティ能力の利用
 

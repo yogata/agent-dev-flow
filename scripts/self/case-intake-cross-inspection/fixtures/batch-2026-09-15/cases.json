@@ -1,0 +1,149 @@
+{
+  "_comment": "2026-09-15 の 20 Case バッチの要約データ（Root Case 本文 execution contract 相当、case-ready 側検出源の再現）。カタログ依存 10 Case（#2822 / #2823 / #2824 / #2825 / #2831 / #2832 / #2833 / #2846 / #2856 / #2858）の対象行集合は Issue #2867 の実施記録（verification-scope-catalog 棚卸し）に基づく。Case と行グループの割当は要約割合の再現であり、行集合の総和（48行）は記録と一致する。artifact_paths は要約データに記録されていないため (a) 検出が空となる互いに素なプレースホルダーとする（(b) 検出の単独検証のため）。独立 10 Case（batch-A..J）は行レベルの個別記録のない独立 RU の再現で、対象行はスナップショットカタログの登録済み行から採る。",
+  "mode": "case-ready",
+  "current_case": {
+    "case_ref": "#2822",
+    "epic_ref": null,
+    "is_epic_intake": false,
+    "artifact_paths": ["src/synthetic/issue-2822/module.ts"],
+    "target_rows": ["REQ-010-077"]
+  },
+  "unclosed_cases": [
+    {
+      "case_ref": "#2823",
+      "epic_ref": null,
+      "artifact_paths": ["src/synthetic/issue-2823/module.ts"],
+      "target_rows": ["REQ-021-026", "REQ-021-027"]
+    },
+    {
+      "case_ref": "#2824",
+      "epic_ref": null,
+      "artifact_paths": ["src/synthetic/issue-2824/module.ts"],
+      "target_rows": ["REQ-031-029", "REQ-031-030"]
+    },
+    {
+      "case_ref": "#2825",
+      "epic_ref": null,
+      "artifact_paths": ["src/synthetic/issue-2825/module.ts"],
+      "target_rows": ["REQ-036-027"]
+    },
+    {
+      "case_ref": "#2831",
+      "epic_ref": null,
+      "artifact_paths": ["src/synthetic/issue-2831/module.ts"],
+      "target_rows": ["REQ-047-010"]
+    },
+    {
+      "case_ref": "#2832",
+      "epic_ref": null,
+      "artifact_paths": ["src/synthetic/issue-2832/module.ts"],
+      "target_rows": ["REQ-057-026", "REQ-057-027", "REQ-057-028", "REQ-057-029"]
+    },
+    {
+      "case_ref": "#2833",
+      "epic_ref": null,
+      "artifact_paths": ["src/synthetic/issue-2833/module.ts"],
+      "target_rows": [
+        "REQ-058-001", "REQ-058-002", "REQ-058-003",
+        "REQ-058-004", "REQ-058-005", "REQ-058-006"
+      ]
+    },
+    {
+      "case_ref": "#2856",
+      "epic_ref": null,
+      "artifact_paths": ["src/synthetic/issue-2856/module.ts"],
+      "target_rows": [
+        "REQ-058-007", "REQ-058-008", "REQ-058-009",
+        "REQ-058-010", "REQ-058-011", "REQ-058-012"
+      ]
+    },
+    {
+      "case_ref": "#2846",
+      "epic_ref": null,
+      "artifact_paths": ["src/synthetic/issue-2846/module.ts"],
+      "target_rows": [
+        "REQ-082-001", "REQ-082-002", "REQ-082-003", "REQ-082-004", "REQ-082-005",
+        "REQ-082-006", "REQ-082-007", "REQ-082-008", "REQ-082-009", "REQ-082-010",
+        "REQ-082-011", "REQ-082-012", "REQ-082-013"
+      ]
+    },
+    {
+      "case_ref": "#2858",
+      "epic_ref": null,
+      "artifact_paths": ["src/synthetic/issue-2858/module.ts"],
+      "target_rows": [
+        "REQ-082-014", "REQ-082-015", "REQ-082-016", "REQ-082-017", "REQ-082-018",
+        "REQ-082-019", "REQ-082-020", "REQ-082-021", "REQ-082-022", "REQ-082-023",
+        "REQ-082-024", "REQ-082-025"
+      ]
+    },
+    {
+      "case_ref": "batch-A",
+      "epic_ref": null,
+      "artifact_paths": ["src/synthetic/batch-a/module.ts"],
+      "target_rows": ["REQ-001-007"]
+    },
+    {
+      "case_ref": "batch-B",
+      "epic_ref": null,
+      "artifact_paths": ["src/synthetic/batch-b/module.ts"],
+      "target_rows": ["REQ-001-022", "REQ-001-023"]
+    },
+    {
+      "case_ref": "batch-C",
+      "epic_ref": null,
+      "artifact_paths": ["src/synthetic/batch-c/module.ts"],
+      "target_rows": ["REQ-001-033", "REQ-001-034", "REQ-001-035"]
+    },
+    {
+      "case_ref": "batch-D",
+      "epic_ref": null,
+      "artifact_paths": ["src/synthetic/batch-d/module.ts"],
+      "target_rows": ["REQ-002-006"]
+    },
+    {
+      "case_ref": "batch-E",
+      "epic_ref": null,
+      "artifact_paths": ["src/synthetic/batch-e/module.ts"],
+      "target_rows": ["REQ-002-012", "REQ-002-016"]
+    },
+    {
+      "case_ref": "batch-F",
+      "epic_ref": null,
+      "artifact_paths": ["src/synthetic/batch-f/module.ts"],
+      "target_rows": ["REQ-003-001"]
+    },
+    {
+      "case_ref": "batch-G",
+      "epic_ref": null,
+      "artifact_paths": ["src/synthetic/batch-g/module.ts"],
+      "target_rows": ["REQ-005-001", "REQ-005-002"]
+    },
+    {
+      "case_ref": "batch-H",
+      "epic_ref": null,
+      "artifact_paths": ["src/synthetic/batch-h/module.ts"],
+      "target_rows": ["REQ-030-005"]
+    },
+    {
+      "case_ref": "batch-I",
+      "epic_ref": null,
+      "artifact_paths": ["src/synthetic/batch-i/module.ts"],
+      "target_rows": ["REQ-030-010", "REQ-030-011"]
+    },
+    {
+      "case_ref": "batch-J",
+      "epic_ref": null,
+      "artifact_paths": ["src/synthetic/batch-j/module.ts"],
+      "target_rows": ["REQ-035-012"]
+    }
+  ],
+  "shared_areas": [
+    {
+      "area_id": "verification-scope-catalog",
+      "display_name": "検証対応要否カタログ（要約スナップショット）",
+      "kind": "req-row-list",
+      "file_paths": ["verification-scope-catalog.snapshot.md"]
+    }
+  ]
+}
