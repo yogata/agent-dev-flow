@@ -274,11 +274,11 @@ Source path は agent-dev-flow 開発リポジトリ内でのみ有効であり�
 
 | 用途 | 実行時パス（✅ 使用する） | Source path（❌ 使用しない） |
 |------|---------------------------|---------------------------|
-| Command 定義 | `.opencode/commands/agentdev/` | `src/opencode/commands/agentdev/` |
-| Skill 本体 | `.opencode/skills/{name}/SKILL.md` | `src/opencode/skills/{name}/SKILL.md` |
-| Skill テンプレート | `.opencode/skills/{name}/templates/` | `src/opencode/skills/{name}/templates/` |
-| Skill 参照 | `.opencode/skills/{name}/references/` | `src/opencode/skills/{name}/references/` |
-| Skill スクリプト | `.opencode/skills/{name}/scripts/` | `src/opencode/skills/{name}/scripts/` |
+| Command 定義 | `.opencode/commands/agentdev/` | source ツリーの `commands/agentdev/` |
+| Skill 本体 | `.opencode/skills/{name}/SKILL.md` | source ツリーの `skills/{name}/SKILL.md` |
+| Skill テンプレート | `.opencode/skills/{name}/templates/` | source ツリーの対応 `templates/` |
+| Skill 参照 | `.opencode/skills/{name}/references/` | source ツリーの対応 `references/` |
+| Skill スクリプト | `.opencode/skills/{name}/scripts/` | source ツリーの対応 `scripts/` |
 
 ### OK/ NG 具体例
 
@@ -364,11 +364,11 @@ Command本文でテンプレート、スキル参照のパスを記述する際�
 |------|--------|------|
 | ✅ OK | `.opencode/skills/{name}/templates/pr_desc.md` | 実行時パス（投影先でアクセス可能） |
 | ✅ OK | `.opencode/commands/agentdev/case-close.md` | 実行時パス（commandの実際の配置場所） |
-| ❌ NG | `src/opencode/skills/{name}/templates/pr_desc.md` | source path（実行時環境に存在しない） |
-| ❌ NG | `src/opencode/commands/agentdev/case-close.md` | source path（開発リポジトリ内のみ有効） |
+| ❌ NG | source ツリーの `skills/{name}/templates/pr_desc.md` | source path（実行時環境に存在しない） |
+| ❌ NG | source ツリーの `commands/agentdev/case-close.md` | source path（開発リポジトリ内のみ有効） |
 
 - [ ] Command本文内のパス参照が実行時パス（`.opencode/...`）を使用しているか
-- [ ] `src/opencode/...` で始まるパス参照が Command 本文に含まれていないか
+- [ ] source path（`src/` 配下）で始まるパス参照が Command 本文に含まれていないか
 - [ ] テンプレート参照先が `.opencode/skills/{skill-name}/templates/` で記述されているか
 
 ### 完了報告の種別確認

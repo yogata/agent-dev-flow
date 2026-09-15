@@ -19,7 +19,7 @@
 
 | 対象 Design | 対応 操作契約実体 |
 |-----------|------------------------------|
-| Design `custom-tool-contracts.md`「対象操作の境界（初期セット）」 | `src/opencode/tools/agentdev-gh/contracts.ts`（GitHub 実装と Local 実装で同一の操作契約） |
+| Design `custom-tool-contracts.md`「対象操作の境界（初期セット）」 | `agentdev_gh` Custom Tool の操作カタログ定義（GitHub 実装と Local 実装で同一の操作契約） |
 
 新規に `## 操作契約` セクションを持つ Design が追加された場合、本診断の対象に自動的に含まれる。
 Design 内の「操作契約」見出しを走査し、対応する操作契約実体（`contracts.ts`）が存在するかを確認する。

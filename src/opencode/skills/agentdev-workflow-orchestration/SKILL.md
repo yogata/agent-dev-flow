@@ -78,7 +78,7 @@ Windows + ジャンクション環境の worktree では `.opencode/skills/agent
 
 - 構造化文脈（10意味）を構造化して含めること。意味の一覧と直列化形式は `agentdev-case-run-execution-adapter` スキルの委譲プロンプト雛形「構造化文脈の直列化（委譲時）」を参照
 - worktree 内 `.opencode/` は空（ジャンクション未伝播）であること
-- source（`src/opencode/`）と projection（`.opencode/`）の編集は手動両辺編集を行うこと
+- source（`src/` 配下）と projection（`.opencode/`）の編集は手動両辺編集を行うこと
 - 同期スクリプト（`self-sync.ps1` 等）には依存しないこと
 - 起動プロンプトテンプレートは `references/subagent-protocol.md` の「driver 起動プロンプトテンプレート（Windows + ジャンクション環境）」を参照
 

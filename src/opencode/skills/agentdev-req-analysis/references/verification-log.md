@@ -1,11 +1,11 @@
 # references 参照整合性検証ログ
 
-`src/opencode/skills/agentdev-req-analysis/SKILL.md` の `references/*.md` 参照整合性検証結果を記録する。
+本スキル（`agentdev-req-analysis`）の SKILL.md の `references/*.md` 参照整合性検証結果を記録する。
 dangling 参照（参照先ファイル不在）を検出した場合は本ログに追記し、当該 PR で是正する。
 
 ## 検証結果（2026-06-26、PR #1197）
 
-- **対象**: `src/opencode/skills/agentdev-req-analysis/SKILL.md` の `references/*.md` 全参照
+- **対象**: 本スキル（`agentdev-req-analysis`）の SKILL.md の `references/*.md` 全参照
 - **結論**: dangling 参照なし。全参照が実在ファイルを指す。
 - **根拠**: req-define 壁打ち（2026-06-25）で事前確認済み。本検証で再確定。
 

@@ -6,14 +6,14 @@
 
 ## 適用範囲
 
-Command→Skill 参照妥当性診断で、配布物（`src/opencode/skills/agentdev-*/SKILL.md`）の frontmatter `name:` 行が YAML スカラー値として不正なバッククォート囲み形式になっているかを検出する。
+Command→Skill 参照妥当性診断で、配布物の source 原本（`agentdev-*/SKILL.md`）の frontmatter `name:` 行が YAML スカラー値として不正なバッククォート囲み形式になっているかを検出する。
 
 frontmatter は構造データであり Markdown インラインコード表記の対象外である。
 バッククォート囲みの name は opencode のスキル名解決を不正にし、名前空間解決の不具合を引き起こす（PR #1334 事例）。
 
 ## 背景: PR #1334 事例
 
-PR #1334（commit ad086200, 2026-06-28）の機械横断是正で、`src/opencode/skills/agentdev-*/SKILL.md` 計27ファイルの frontmatter `name:` 行にバッククォートが誤って付与された。
+PR #1334（commit ad086200, 2026-06-28）の機械横断是正で、配布スキル `agentdev-*/SKILL.md` 計27ファイルの frontmatter `name:` 行にバッククォートが誤って付与された。
 本来バッククォートは Markdown 本文の識別子に付与するものだが、frontmatter 値（YAML スカラー値）に対して誤付与された。
 この事例に基づき、backticks-identifier-threshold Design「適用対象外」で frontmatter 値への backticks 付与を明示的に禁止し、本検出基準で再発を防止する。
 
@@ -38,7 +38,7 @@ YAML ではこの形式は文字列スカラー値として `` `agentdev-xxx` ``
 
 ### 1. スキャン対象の限定
 
-本検出の対象は配布物の `src/opencode/skills/agentdev-*/SKILL.md` の frontmatter（先頭 `---` で始まる最初のブロック）のみ。以下は対象外:
+本検出の対象は配布物の source 原本（`agentdev-*/SKILL.md`）の frontmatter（先頭 `---` で始まる最初のブロック）のみ。以下は対象外:
 
 - `src/opencode-local/` 配下（ローカル版、別系統）
 - `.opencode/skills/` 配下（ジャンクション、原本修正で自動反映）
