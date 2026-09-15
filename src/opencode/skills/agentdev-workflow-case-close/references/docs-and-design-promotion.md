@@ -1,5 +1,3 @@
-<!-- ADF-COVERS(implementation): REQ-032-024, REQ-032-025, REQ-032-026 -->
-
 # STEP-3: docs 検証・Design 確定（docs-and-spec-promotion）
 
 > 本 reference は `agentdev-workflow-case-close` SKILL.md の制御平面（STEP 一覧）STEP-3 詳細である。

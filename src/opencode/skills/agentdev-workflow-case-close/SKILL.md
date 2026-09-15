@@ -4,7 +4,6 @@ description: "case-close command の workflow 実装本体。PR マージ（squa
 ---
 
 <!-- ADF-COVERS(implementation): REQ-057-017 -->
-<!-- ADF-COVERS(implementation): REQ-032-024, REQ-032-025, REQ-032-026 -->
 <!-- ADF-COVERS(implementation): REQ-032-027 -->
 <!-- ADF-COVERS(implementation): REQ-006-112, REQ-006-114 -->
 

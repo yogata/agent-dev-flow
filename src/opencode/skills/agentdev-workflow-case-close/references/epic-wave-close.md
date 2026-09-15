@@ -1,5 +1,3 @@
-<!-- ADF-COVERS(implementation): REQ-032-024, REQ-032-025, REQ-032-026 -->
-
 # STEP-E1〜E6: Epic Wave クローズ（epic-wave-close）
 
 > 本 reference は `agentdev-workflow-case-close` SKILL.md の制御平面（STEP 一覧）STEP-E1〜E6 詳細である。

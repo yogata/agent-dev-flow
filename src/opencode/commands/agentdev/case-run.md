@@ -2,8 +2,6 @@
 description: 単一 Issue または単一 Wave（Epic Issue 指定時: 現在 ready な Wave の子Issue を並列実行）を実行担当サブエージェントへ委譲し、result を処理する。worktree前提、委譲、結果処理を責務とする。3フェーズ構成でべき等性、再開ポイントを提供
 ---
 
-<!-- ADF-COVERS(implementation): REQ-032-024, REQ-031-004, REQ-031-010, REQ-031-011 -->
-
 # 実装パイプライン
 Case に対して実装実行を実行担当サブエージェント経由で委譲し、その result を処理する。
 case-run 本体は orchestration に専念し、実装実行そのものは行わない。
