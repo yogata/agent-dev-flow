@@ -7,7 +7,7 @@ updated: 2026-09-07
 
 # 語彙レジストリ
 
-AgentDevFlow 管理下の文書で使用する正規語彙と旧語彙の対照表の配置基準、連携契約、IR-045 文意品質検出対象語の移管状態を定義する（ACT-SPEC-007、REQ-028-007、DEC-013 適用）。
+AgentDevFlow 管理下の文書で使用する正規語彙と旧語彙の対照表の配置基準、連携契約、IR-045 文意品質検出対象語の移管状態を定義する（ACT-SPEC-007、retired REQ-028-007（後継は DEC-006/REQ-036 系の inspect 3-command 構成）、DEC-013 適用）。
 
 ## 目的
 
@@ -29,7 +29,7 @@ repo-agentdev-integrity は repo-local スキル（配布対象外）である�
 
 「実現面」語彙の正典は REQ-004-037 変更後の本文であり、Design（vocabulary-registry を含む）は正典を参照する。Design 側に語彙の定義本文を複製しない。
 
-## IR-045 文意品質検出対象語の移管状態（ACT-SPEC-007、REQ-028-007）
+## IR-045 文意品質検出対象語の移管状態（ACT-SPEC-007、retired REQ-028-007（後継は DEC-006/REQ-036 系））
 
 IR-045（docs 日本語表現、文意整合検査）は REQ-010-003、REQ-036-023 により docs-check 機械検出対象から除外し、`agentdev-doc-writing` スキル配下へ移譲済みである。
 catalog-only tombstone として管理され、本 Design では文意品質検出対象語の参照として保持する。

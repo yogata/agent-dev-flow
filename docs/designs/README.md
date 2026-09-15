@@ -241,7 +241,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | Design | status | タイトル | 責務 |
 |------|--------|---------|------|
 | authoring/command-file-format.md | accepted | コマンドファイルフォーマット規約 | command 定義ファイルの Markdown 構成標準。本文構造・見出し構成・Step 表現・記述形式を扱い、`foundations/patterns.md`（共通文書モデル規約）と責務分離。authoring/ は REQ/Design/SKILL/guide 執筆規約の集約先として将来拡張余地あり（即時統合・authoring/ 削除は行わない） |
-| authoring/vocabulary-registry.md | accepted | 語彙レジストリ | 語彙対照表の配置基準、連携契約、IR-045 文意品質検出対象語の移管状態、IR-050/IR-051/IR-044 協調契約（ACT-DESIGN-007、REQ-028-007、DEC-013 適用） |
+| authoring/vocabulary-registry.md | accepted | 語彙レジストリ | 語彙対照表の配置基準、連携契約、IR-045 文意品質検出対象語の移管状態、IR-050/IR-051/IR-044 協調契約（ACT-DESIGN-007、retired REQ-028-007（後継は DEC-006/REQ-036 系）、DEC-013 適用） |
 
 > 上記分類は段階的に適用する。
 > 既存直下Designの移送は inspect/backlog 経由で個別に行い、一括移送しない。
