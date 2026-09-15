@@ -1,3 +1,4 @@
+<!-- ADF-COVERS(implementation): REQ-005-010 -->
 # クイックスタート
 
 要件定義からマージまでの標準フロー。
@@ -6,7 +7,6 @@
 /agentdev/req-define    # 要件を壁打ちする
 /agentdev/case-open     # Case Issue と Definition Package の作成
 /agentdev/case-ready    # Definition Package と実行構造の確定
-/agentdev/case-open     # Issue を作成する
 /agentdev/case-run      # 実装して PR を作成する
 /agentdev/case-close    # PR をマージして Issue をクローズする
 ```

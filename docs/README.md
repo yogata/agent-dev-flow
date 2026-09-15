@@ -9,7 +9,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 現行 REQ: 51件、廃止済み: 12件
 <!-- AUTOGEN:END -->
 
-現行要件は50件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
+現行要件は51件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
 各 REQ の詳細は各 REQ ファイル本文を参照。
 
 | REQ | タイトル |
@@ -35,7 +35,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [REQ-021](requirements/REQ-021.md) | トレーサビリティのワークフロー統合 |
 | [REQ-027](requirements/REQ-027.md) | Capability Skill・Soft guard・代表ケース検証 |
 | [REQ-029](requirements/REQ-029.md) | 配布依存境界 |
-| [REQ-030](requirements/REQ-030.md) | case-open 実行契約（Issue構成生成） |
+| [REQ-030](requirements/REQ-030.md) | case-open 実行契約（Root Case 確立と Definition Package） |
 | [REQ-031](requirements/REQ-031.md) | case-run 実行契約（実装実行と委譲） |
 | [REQ-032](requirements/REQ-032.md) | case-close 実行契約（完了判定とマージ） |
 | [REQ-034](requirements/REQ-034.md) | case-auto 実行契約（自走オーケストレーション） |
@@ -64,6 +64,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [REQ-060](requirements/REQ-060.md) | bun test 実行形態の統一（repo root 起 cwd・`./` 付きパス指定） |
 | [REQ-061](requirements/REQ-061.md) | case-ready 実行契約 |
 | [REQ-062](requirements/REQ-062.md) | case-revise 実行契約 |
+| [REQ-082](requirements/REQ-082.md) | 対論型レビュー審議契約 |
 
 - [要件インデックス](requirements/README.md)
 

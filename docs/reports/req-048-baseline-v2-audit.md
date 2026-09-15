@@ -98,7 +98,7 @@ covers 宣言は旧行 ID（REQ-048-001〜021）のまま残存している。
 | L181-198 | describe「REQ-048-017」: 同種検証の複数工程実施時の行並びと工程間比較規約、templates スキルによる case-run / case-close 記録先定義 |
 | L200-227 | describe「REQ-048-016」: 検証差分セクションを持つテンプレートが pr_desc.md のみ、配布物内部 ID 不在、templates スキルの規約と5分類定義 |
 | L229-251 | describe「REQ-048-015/016」: Findings セクション（`### intake` / `### learning` 小見出し）との共存、置換しない |
-| L253-288 | describe「REQ-048-018」: 審議中 finding 状態（REQ-003-042）と修正証跡（REQ-007-005）の所有境界非変更。case-close の pr-merge-and-conflict.md、adversarial-review の protocol 参照を検査 |
+| L253-288 | describe「REQ-048-018」: 審議中 finding 状態（REQ-082-013）と修正証跡（REQ-007-005）の所有境界非変更。case-close の pr-merge-and-conflict.md、adversarial-review の protocol 参照を検査 |
 | L290-336 | describe「REQ-048-015/017」: adapter スキルと harness-delegation.md の検証差分記録指示、case-run delegation-and-result.md の委譲 prompt 記録指示、case-close pr-merge-and-conflict.md の対応記録コメント記録指示 |
 | L338-350 | describe「REQ-048-019」: PR テンプレートのベースライン必須セクション全残存、検証差分セクション自体の必須登録 |
 
