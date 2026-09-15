@@ -147,7 +147,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-005 | relates-to | v2:ADR-0135 | Project Extensions Architecture に関する過去版の決定 |
 | DEC-006 | supersedes | DEC-005 | inspect-extensions 廃止と extension 検査の3層責務分離を確定し、DEC-005 を置換 |
 | DEC-006 | relates-to | v2:ADR-0135 | Project Extensions Architecture に関する過去版の決定（inspect-extensions 廃止後の責務移管先） |
-| DEC-007 | supersedes-spec | docs/designs/local/artifact-graph.md | 現行 Design「対象外」節を撤回し、標準配布スキルへ昇格。後継 Design は docs/designs/skills/agentdev-artifact-graph.md |
+| DEC-007 | supersedes-spec | docs/designs/local/artifact-graph.md | 現行 Design「対象外」節を撤回し、標準配布スキルへ昇格。後継 Design は docs/designs/skills/agentdev-artifact-graph.md（履歴記録）。現行後継は agentdev-traceability / docs/designs/foundations/traceability-model.md（DEC-017 により移管） |
 | DEC-007 | relates-to | DEC-002 | 配布物原本は src/opencode/ へ配置する原則に従う |
 | DEC-008 | relates-to | DEC-001 | case-auto 自走境界（決定4）の適用範囲内で bounded parent decision resolution を確定 |
 | DEC-008 | relates-to | v2:ADR-0112, v2:ADR-0138 | case-auto 判断委譲に関する過去版合意履歴 |

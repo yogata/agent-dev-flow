@@ -534,7 +534,7 @@ agent-dev-flow リポジトリの docs/designs/ 直下の基盤Designは、既�
 
 | ディレクトリ | 責務 | 配置対象Design |
 |---|---|---|
-| foundations/ | 基盤モデル、システム構成、文書フォーマット、設計原則、縮小済みワークフロー契約 | system.md, document-model.md, patterns.md, design-principles.md, workflow-contracts.md（縮小済み旧版） |
+| foundations/ | 基盤モデル、システム構成、文書フォーマット、設計原則 | numbering-policy.md, system.md, document-model.md, decision-lifecycle.md, patterns.md, design-principles.md, project-extensions.md, harness-separation-model.md, traceability-model.md |
 | responsibilities/ | 文書種別責務、成果物責任、アーティファクト契約、REQ影響マップ | document-type-responsibilities.md, artifact-responsibilities.md, artifact-contracts.md, req-impact-map.md |
 | quality/ | 品質仕様、品質ゲート、健全性メトリクス（REQ/Design 双方向） | quality-specs.md, quality-gates.md, req-health-metrics.md, design-health-metrics.md |
 | integrity/ | 整合性契約、整合性ルールカタログ、ルール所有権、配布物整合性、backticks 判定閾値 | integrity-contracts.md, integrity-rule-catalog.md, rule-ownership.md, docs-spec-rebuild-integrity.md, backticks-identifier-threshold.md |
@@ -546,7 +546,6 @@ agent-dev-flow リポジトリの docs/designs/ 直下の基盤Designは、既�
 | ファイル | 分類先 | 根拠 |
 |---|---|---|
 | req-impact-map.md | responsibilities/ | REQ → アーティファクト影響マッピングであり、責務、影響追跡の位置づけ。artifact-responsibilities.md、artifact-contracts.md と同領域 |
-| workflow-contracts.md | foundations/ | 縮小済み旧版であり、基盤的なワークフロー契約の残存。内容の大部分は workflows/workflow-contracts.md へ移管済み。廃止、統合の検討は段階移送方針に従い別途 inspect-docs で行う |
 
 ### 整合性ルールの局所物理分離
 
