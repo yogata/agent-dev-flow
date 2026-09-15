@@ -75,7 +75,7 @@ document-model Design の Design Separation Criteria に基づき、現行 REQ �
 | schema field残留 | report/schema field 名の列挙または field 定義が要件行を占有している | `level/category/route/file/line/evidence`, `field`, `schema` |
 | enum値一覧残留 | enum 値の一覧そのものが要件内容になっている | `promote/defer/reject`, `accepted/superseded/deprecated`, `strict/heuristic/observation` |
 | route判定表残留 | route/category/status の詳細判定表または分岐表が要件行に入っている | `route 判定`, `category 判定`, `status 判定`, `分類表`, `判定表` |
-| file pattern残留 | 具体的な glob/path pattern が要件行の主内容になっている | `docs/requirements/<REQ-*>.md`, `*.md`, `src/opencode/**/*.md` |
+| file pattern残留 | 具体的な glob/path pattern が要件行の主内容になっている | `docs/requirements/<REQ-*>.md`, `*.md`, 配布物の `**/*.md` |
 | template variant残留 | テンプレート種別の選択ロジックまたは種別名一覧が要件行を占有している | `standard/compact`, `variant`, `テンプレート種別`, `選択ロジック` |
 | report format残留 | report 出力形式、列、セクション、ファイル名形式の詳細が要件行を占有している | `report format`, `出力形式`, `7フィールド`, `列構成`, `finding-{timestamp}.md` |
 | 内部アルゴリズム残留 | 検査、抽出、検証の内部手順やアルゴリズムが要件行を占有している | `抽出手順`, `検証手順`, `照合順`, `スコアリング`, `正規表現で検出` |
@@ -98,8 +98,8 @@ AgentDevFlow 内部 ID（`REQ-XXXX`/`ADR-XXXX`/`SPEC-{KIND}-{NNN}`/`IR-XX` 等�
 
 | 対象 | 理由 |
 |------|------|
-| `src/opencode/commands/**/*.md` | 利用者向けコマンド定義 |
-| `src/opencode/skills/**/*.md` | 利用者向けスキル知識ベース |
+| 配布コマンド定義の `**/*.md` | 利用者向けコマンド定義 |
+| 配布スキル知識の `**/*.md` | 利用者向けスキル知識ベース |
 
 `docs/` 配下、`scripts/` 配下は検査対象外（AgentDevFlow 内部アーティファクトであり内部 ID 記述を許容する）。
 
@@ -131,8 +131,8 @@ ID 汚染（前節）が 0 件でも本検査は実施する。
 
 | 対象 | 理由 |
 |------|------|
-| `src/opencode/commands/**/*.md` | 利用者向けコマンド定義 |
-| `src/opencode/skills/**/*.md` | 利用者向けスキル知識ベース |
+| 配布コマンド定義の `**/*.md` | 利用者向けコマンド定義 |
+| 配布スキル知識の `**/*.md` | 利用者向けスキル知識ベース |
 
 ### 構文健全性検査
 
@@ -222,7 +222,7 @@ Design は 3 層構造（commands、skills、workflows）を持ち、横断 Desi
 | 間接的なスキル名直参照 | `agentdev-xxx` を要件文中に埋め込み | `MOVE` |
 | 旧名称の残存 | diagnostics → inspect 改名前の名称 | `DRIFT` |
 | CLI 詳細の抽象化漏れ | コマンドライン引数、フラグ詳細 | `MOVE` |
-| ファイルパスの直接参照 | `src/opencode/...` 等の実装パス | `MOVE` |
+| ファイルパスの直接参照 | source path 等の実装パス | `MOVE` |
 
 機械的除去の単パスでこれらを完全に捕えられないため、acceptance criteria 順位による再検証を必ず実施する。
 

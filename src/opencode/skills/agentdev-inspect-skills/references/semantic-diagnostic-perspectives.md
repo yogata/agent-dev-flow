@@ -107,7 +107,7 @@ Command と Skill 間で工程、状態、責務、停止条件の意味が矛�
 
 ### 1. 対象配布物の特定
 
-`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/` 配下の配布物を対象とする。
+`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/` 配下の配布物を対象とする。
 関連する template / reference / script も必要に応じて含める。
 `src/opencode-local/` は別系統として扱うが、標準版との契約一致性を確認する場合は対象に含める。
 

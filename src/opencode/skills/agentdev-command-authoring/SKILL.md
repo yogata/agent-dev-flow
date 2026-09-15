@@ -96,13 +96,13 @@ Source path は開発時のみ有効であり、個別プロジェクトでの�
 
 | 用途 | 実行時パス（使用する） | Source path（使用しない） |
 |------|-------------------------|--------------------------|
-| Command | `.opencode/commands/agentdev/` | `src/opencode/commands/agentdev/` |
-| Skill | `.opencode/skills/{skill-name}/` | `src/opencode/skills/{skill-name}/` |
-| Template | `.opencode/skills/{skill-name}/templates/` | `src/opencode/skills/{skill-name}/templates/` |
-| Reference | `.opencode/skills/{skill-name}/references/` | `src/opencode/skills/{skill-name}/references/` |
+| Command | `.opencode/commands/agentdev/` | source ツリーの `commands/agentdev/` |
+| Skill | `.opencode/skills/{skill-name}/` | source ツリーの `skills/{skill-name}/` |
+| Template | `.opencode/skills/{skill-name}/templates/` | source ツリーの対応 `templates/` |
+| Reference | `.opencode/skills/{skill-name}/references/` | source ツリーの対応 `references/` |
 
 Commandの Steps/ Guardrails 内で template や reference のパスを記述する際は、必ず `.opencode/skills/...` で始めること。
-`src/opencode/...` は実行時環境に投影されない。
+source ツリー（`src/` 配下）のパスは実行時環境に投影されない。
 
 ## サブエージェント編集安全性（Subagent Edit Safety）
 
@@ -112,7 +112,7 @@ Subagent に編集を委譲する場合、および Issue #653/#655/#656 の再�
 - **パスプレフィクス確認**: 編集操作の前に、対象パスが worktree root からの相対パスであることを検証しなければならない。絶対パスや worktree 外パスを使用してはならない
 - **ファイル存在確認**: 編集対象ファイルの存在を事前に確認しなければならない。存在しないファイルへの edit 操作を行ってはならない
 
-Source path と実行時パス（runtime path）の混同を防止するため、`src/opencode/...`（source path）と `.opencode/...`（実行時パス）を明確に区別すること。
+Source path と実行時パス（runtime path）の混同を防止するため、source path（`src/` 配下）と `.opencode/...`（実行時パス）を明確に区別すること。
 Command/ skill 定義内のパス参照は記述された通りに解釈し、source path を実行時参照先として使用してはならない。
 
 ## 文章品質観点（作成時）
@@ -136,7 +136,7 @@ Command作成、改定時に以下を確認する:
 - [ ] 詳細な判定表、分類表がSkillに移されているか
 - [ ] ロジックが宣言的（Skill参照）になっているか
 - [ ] Script化すべき決定的処理がCommandに残っていないか
-- [ ] パス参照が実行時パス（`.opencode/...`）を使用しているか（`src/opencode/...` は禁止）
+- [ ] パス参照が実行時パス（`.opencode/...`）を使用しているか（source path は禁止）
 - [ ] 文章品質観点（上記 6 観点）に違反がないか
 
 → 詳細な DoD 項目とチェックリストは `references/command-authoring-standards.md` を参照
