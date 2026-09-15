@@ -152,6 +152,11 @@ verify-only PR（実装差分0件、検証のみ）の場合、QG-4 の完了条
 verify-only PR は実装差分を含まないため、根拠欄の記載で完了条件を評価する。
 verify-only PR では case-close STEP-3 targeted docs guard の `files_checked` が空配列となるが、根拠欄の記載により空の `files_checked` が無根拠にならない。
 verify-only PR の判定基準（PR 変更ファイル一覧が空配列、根拠欄の記載十分性、受け入れ基準の検証充足）は [case-close.md](../commands/case-close.md)「verification-only PR の files_checked 空確認（v2:REQ-0158-002）」が定め、QG-4 は当該判定を経た PR のみを PASS とする。
+verify-only closure（PR も carrier commit も存在しない Issue 完了）の場合、QG-4 の完了条件評価は case-run が記録した SSoT コメント（Issue コメント）の実行コマンド列と検証結果を証拠ソースとして認める（REQ-032-027・REQ-031-028）。
+verify-only closure では SSoT コメントが存在しない場合、または検証結果の記載が欠落する場合は完了扱いとしない。
+verify-only closure の判定条件（execution contract での事前確定または実行結果による変更不要確定）は [case-run.md](../commands/case-run.md)「verify-only closure の検証実行と SSoT コメント記録工程」節と [case-close.md](../commands/case-close.md)「verify-only closure の QG-4 達成判定（SSoT コメント参照）」節が定め、QG-4 は当該判定を経た完了のみを PASS とする。
+carrier commit（差分捏造）による verify-only PR 作成の禁止は REQ-031-028 が所有する規則であり、本 Design は引用形式で言及するにとどめる。
+docs_chore 特例フロー（main 直接 commit が存在する PR なし完了）は、直接 commit 内容で QG-4 を検証する別経路であり、verify-only PR・verify-only closure のいずれの証拠ソース契約とも区別する。
 
 PR テンプレート（pr_desc.md）と Issue 本文構造は workflow-templates（[agentdev-workflow-templates.md](../skills/agentdev-workflow-templates.md)）の責務である。
 verify-only 根拠欄の記入規則は [case-run.md](../commands/case-run.md)「verify-only 根拠欄の記入規則」参照。
