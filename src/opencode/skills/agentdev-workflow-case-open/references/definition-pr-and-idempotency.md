@@ -34,22 +34,42 @@ canonical Definition との実変更を判定し、実変更がある場合の�
 2. 検出した成果物を再利用し、重複生成しない。Root Case の重複は STEP-2 で、Draft Definition PR の重複は STEP-4 で排除する
 3. 不足分だけを処理する: Root Case が存在し Definition PR が存在しない場合は STEP-4 の手順で PR のみ作成する。Root Case が存在しない場合は STEP-2 から実行する。両者とも存在する場合は新規生成を行わない
 4. 重複生成がないことを確認し、結果を記録する
+5. 横断依存検査（後述）を実行し、警告の提示記録または検出不能報告を完了報告へ含める
+
+### 横断依存検査（STEP-5 実行時）
+
+共通契約の正規所有はワークフロー契約 Design「Case 投入時の横断依存検査契約」節である。本節は case-open 側（STEP-5）の実行手順を定める（case-open 実行契約 REQ の横断依存検査行に対応する）。
+
+- **検出源の限定**: draft の `artifact_actions` が宣言する変更対象成果物パスと、未クローズ Case 群の宣言（Issue 本文の execution contract 系セクションが宣言する変更対象成果物）に限定する。合意済み宣言以外の読み取り、一般的な変更影響探索・依存関係探索を行わず、対象範囲を再決定しない
+- **スキャン範囲**: 未クローズ Case 群の全体とする。時間窓による狭域化はしない
+- **機械的比較の実行**: 検出源を検査入力 JSON に組み、本スキル配下の共有エンジンを実行する:
+  `bun .opencode/skills/agentdev-workflow-case-open/scripts/src/inspect_cross_dependencies.ts --input <input.json> --root <repo-root>`
+  （投影先パスから実行する。worktree で投影が利用できない場合は worktree 構造的制約の fallback 手順に従う。入力 JSON の構成は `scripts/README.md` 参照）
+- **検出条件**: 2 以上の Case 間で変更対象成果物の同一パスが重複する場合、警告として投入者に提示する
+- **警告時の挙動**: エラーではなく警告とし、投入者（HITL）へ (1) 先行整備 Case の切り出し提案、(2) 既存 Case への登録責務の割り当て、(3) このまま並行投入、の選択肢を提示する。整備 Case を自動作成せず、マージ順序を自動決定しない。case-auto 配下では警告検出時の判断を decision_context による親判断解決へ委譲する
+- **警告のみでの阻止禁止**: 警告のみで Root Case の確立を自動阻止しない。警告の提示記録を完了報告へ含める
+- **検出源取得不能時**: 未クローズ Case 群の取得に失敗した場合は比較を省略せず、検出不能として報告する（検査入力の `source_failures` に失敗を記録し、報告の `detection_unavailable` に出力する）
+- **Epic 経路の委譲境界**: draft の構成ヒント（`case_open_hints`）が Epic 構成を示す投入では、同一投入内（Epic 配下 Wave 内）の重複検出は Wave 重複前置検出（Epic/Wave 実行モデル Design の前置検出契約）へ委譲し二重検査としない。Epic をまたぐ Case 間の重複は本検査が検出対象とする
+- **冪等再実行時の再提示**: 再実行時も本検査を再実行し、警告を再提示する（エンジンは同一入力から同一の報告を返す）
 
 ## Result
 
 - 実変更判定結果（実変更あり / なし）
 - Draft Definition PR 作成結果（実変更時のみ。Case 単位 1 件）
 - 冪等確認結果（既存成果物の再利用、重複生成なし、不足分のみ処理）
+- 横断依存検査結果（警告の提示記録、または検出不能報告。警告のみで Root Case の確立は阻止しない）
 
 ## Evidence
 
 - 実変更判定根拠（canonical Definition との差分）、作成した PR 番号、既存成果物の検出結果
+- 横断依存検査の実行証跡（検査入力、エンジンの報告 JSON、投入者への選択肢提示とその応答）
 
 ## Completion Verification
 
 - 実変更がない Case について Draft Definition PR が存在しないこと
 - 実変更がある Case について Draft Definition PR が 1 件であること
 - 再実行時に Root Case と Draft Definition PR の件数が増加しないこと
+- 横断依存検査が実行され、警告検出時は提示記録が、検出源取得不能時は検出不能報告が残っていること
 
 ## Resume-Idempotency
 
