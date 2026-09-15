@@ -1,7 +1,7 @@
 ---
 title: checker CLI の stdout 証跡が Windows + bun で失われる問題と安定実行経路
 created: 2026-09-03
-updated: 2026-09-14
+updated: 2026-09-15
 ---
 
 # checker CLI の stdout 証跡が Windows + bun で失われる問題と安定実行経路
@@ -14,11 +14,19 @@ stdout 証跡（機械可読出力のファイル退避・突合）を必要と�
 
 stdout ロスと区別すべき隣接現象として、stdout 自体は取得できても checker stdout が Windows + bun 環境の PowerShell パイプ経由で cp932 再解釈され、機械可読出力が破壊されて JSON パースが失敗する事象がある（PR #2582 / Issue #2561）。回避には外部コマンド stdout の取得で `spawnSync` の `encoding: "utf8"` を明示する。コンソールコードページの一時変更（chcp 65001）も回避策として有効。コンソール出力退避全般の標準手順は windows-powershell-bulk-io-corruption.md を参照する。
 
+Bun.YAML に依存する checker は `node --experimental-strip-types` によるモジュール import 経路（標準経路）を利用できず、bun 直実行となるため process.exit による stdout flush 前終了でレポートが失われる。この場合は stdout を一時ファイルへ書き出した上で flush を保証してから出力し、実行後に一時ファイルを削除する `Bun.write(Bun.stdout)` による flush 保証ラッパー手順を例外経路として用いる（PR #2812 / Issue #2806）。
+
+bun CLI 経由の checker `--json` 出力が Windows で末尾破損（途中破損）し、JSON パース不能となる variant がある。この場合は human readable 出力へ切り替え、可能な場合は node 単独実行で再取得する（PR #2817 / Issue #2809）。
+
+これら例外経路の checker 実行契約 Design「安定実行経路」への補完は、req-define の変更影響分析による確定候補として本知識に記録する（知識文書更新と bundling しない）。
+
 ## 適用条件
 
 - Windows（win32）+ bun 環境で、`process.exit` を使用する checker CLI を実行する場合。
 - checker の stdout 機械可読出力を証跡として取得し、ファイル退避や突合に使う場合。
 - Windows + bun 環境で checker stdout を PowerShell パイプ経由で受け取り、cp932 再解釈により UTF-8 機械可読出力の JSON パースが失敗する場合。
+- Bun.YAML 依存の checker を Windows + bun で実行し、node によるモジュール import 経路を利用できない場合。
+- bun CLI 経由で checker `--json` 出力を取得し、出力末尾が破損して JSON パースに失敗する場合。
 - check_integrity、traceability check 等、checker-execution-contracts.md の実行契約対象 checker を含む。
 
 ## 適用対象
@@ -33,6 +41,8 @@ stdout ロスと区別すべき隣接現象として、stdout 自体は取得で
 - learning inbox 2026-09-03 エントリ「checker CLI は bun + Windows で process.exit により stdout が失われることがありモジュール import 経由が安定」（PR #2539 / Issue #2538 の case-run 中の観測）。
 - 対象 CLI（check_distribution_boundary_cli.ts）の `process.exit` 使用の実ファイル確認。
 - PR #2582（Issue #2561）: checker stdout が PowerShell パイプ経由で cp932 再解釈され JSON パースが失敗。`spawnSync` の `encoding: "utf8"` が回避策として有効なことを確認。
+- PR #2812（Issue #2806、case 2805 Wave 1 / case 2812、DEL-2806-1）: Bun.YAML 依存のため node import 経路が使えず、Bun.write(Bun.stdout) による flush 保証ラッパー（一時ファイル、実行後に削除）で対処した観測。同手順は当時の既存知識文書に明記されていなかった。
+- PR #2817（Issue #2809、case 2805 OU-004、DEL-2809-1）: bun CLI 経由の checker --json 出力が Windows で途中破損。human readable 出力 + node 単独実行へ切り替えて回避した観測（checker 実行契約の「stdout flush 前 exit」回避策の実例）。
 
 ## 関連知識
 
