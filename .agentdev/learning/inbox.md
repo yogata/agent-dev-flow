@@ -116,3 +116,67 @@
 - **想定反映先**: agentdev-workflow-case-close（STEP-2/3 checker 実行手順）、agentdev-traceability（実行前提の補足）
 - **関連**: Case #2870、PR #2872、.opencode/skills/ の配置（git 管理実体と junction）
 - **タグ**: `#worktree` `#checker` `#execution-path`
+
+## coverage 突合では役割（implementation / verification / design）を区別せず集合を結合すると誤認が生じる
+
+- **問題事象**: REQ-053-023 の coverage 突合で、docs 側 ADF-COVERS 宣言（verification 役割のみ）を implementation 集約と同一視すると「docs に implementation 宣言がある」という誤認が生じる。実際は verification のみで implementation は配布物側 2 件が唯一の所有（docs 集約未完了）。役割を無視した単純突合では配布物 cleanup（宣言除去）の安全性を誤判定し得る
+- **発生局面**: 完了処理（case-close STEP-3 配布依存境界 / coverage 突合。Case #2824、PR #2874）
+- **検知方法**: 宣言行の role 注記（implementation / verification）を明示的に分解して再突合した結果、突合結果が逆転
+- **根本原因**: ADF-COVERS 宣言は role を持つが、突合時に役割フィルタを省略すると同一 REQ 行の宣言集合が一つに潰れる
+- **自律対応内容**: 役割区別突合で REQ-053-023 の docs implementation 集約未完了を認定し、配布物 2 宣言の除去を「docs 集約後」として残置（cleanup 前置条件として intake 化）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（突合手順の運用知識。配布物 cleanup は宣言除去後も coverage 不変であることを確認して初めて実行）
+- **横展開観点**: ADF-COVERS 宣言を突合する全工程（case-run 事前検査、case-close 独立再検査、traceability check の解釈）で役割区別が前提。役割をまたぐ集約値（合計件数等）だけを見た判断は誤認の温床
+- **再発条件**: 宣言行の role を無視して REQ 行単位の宣言集合を突合する場合に毎回発生し得る
+- **予防策候補**: (1) coverage 突合手順に role 分解の明記、(2) 配布物 cleanup 判断は「除去後の role 別 coverage」で実施する規定の追加
+- **想定反映先**: agentdev-traceability（突合解釈の注記）、agentdev-workflow-case-close（STEP-3 集約突合手順）
+- **関連**: Case #2824、PR #2874、docs/designs/integrity/prose-quality-sentinel-checks.md:9、REQ-053-023
+- **タグ**: `#traceability` `#coverage` `#role-separation` `#verification-process`
+
+## adversarial-review 発動契約非該当の case も判定理由を対応記録に残す（silent skip 回避）
+
+- **問題事象**: adversarial-review の発動契約（要件案・設計案等の合意形成対象）に非該当の case では、審議をスキップしても何も記録しないと「レビュー未実施」と誤認され得る。Case #2832（PR #2877）等の bugfix 系では発動条件を満たさないが、silent skip では検証証跡として不完全
+- **発生局面**: 完了処理（case-close 対応記録コメント作成。Batch 全 10 Case）
+- **検知方法**: 対応記録コメントの検証差分テーブルに adversarial-review 行が無い case があること
+- **根本原因**: 非発動が自明な case では記録様式が規定されておらず、記録する／しないの判断が実行者に依存していた
+- **自律対応内容**: 非発動 case も「発動契約非該当（対象: bugfix/maintenance の機械検証中心、合意形成対象なし）」を対応記録へ明記し、判定理由を残す運用に統一
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（記録運用の明確化）
+- **横展開観点**: 条件分岐する検査（発動契約ありの gate）は「非該当」も記録対象。silent skip は後工程の独立性検査（QG-4 等）で未実施と区別できなくなる
+- **再発条件**: 発動契約を持つ検査を条件非該当でスキップする場合に毎回発生し得る
+- **予防策候補**: (1) 対応記録テンプレートに adversarial-review の判定欄（発動/非発動+理由）を追加、(2) workflow-templates 側で非発動記録の様式を規定
+- **想定反映先**: agentdev-workflow-templates（対応記録コメント様式）、agentdev-adversarial-review（非発動時の記録契約）
+- **関連**: Case #2832、PR #2877、Batch 10 Case の case-close 対応記録コメント
+- **タグ**: `#adversarial-review` `#record-keeping` `#verification-process`
+
+## coverage 突合で役割を区別しないと verification・design 役割の docs 宣言を implementation 集約と誤認する
+
+- **問題事象**: 配布物本体 ADF-COVERS 宣言の除去可否判定（docs 集約突合）において、REQ ID の有無のみで判定すると、docs 配下の verification・design 役割宣言を implementation 集約と誤認し、除去後に traceability check の missing-implementation が新規発生する
+- **発生局面**: 実装（case-run。Case #2824 の PR #2874 実行中に REQ-053-023 で検出、役割区別判定へ修正）
+- **検知方法**: 初回の役割非区別 coverage 突合で removable 判定された 2 宣言が、traceability check 実行（役割フィルタ＋docs/ パスフィルタ適用の再突合）で blocked へ反転
+- **根本原因**: 「docs 配下に同 REQ 行の宣言が存在する」ことと「implementation 役割の宣言が存在する」ことは別条件。除去可否は同一役割（implementation）の docs 宣言の存在が前提
+- **自律対応内容**: 監査を役割区別突合に修正し、REQ-053-023 の 2 宣言を復元（新規 missing 発生を防止）。判定基準を REQ-057-028 行と PR 本文の Design 確定候補へ記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（REQ-057-028 の運用詳細の明確化。判定基準自体は既存行が所有）
+- **横展開観点**: 配布物宣言の cleanup・集約処理を扱う全 workflow（case-run / case-close / inspect 系）で同一の誤認が発生し得る。coverage CLI の利用時は常に役割フィルタを明示する
+- **再発条件**: ADF-COVERS 宣言の除去・移動判定で役割を区別せず REQ ID の存在のみを突合する場合に毎回発生
+- **予防策候補**: (1) coverage 突合に役割フィルタ＋docs/ パスフィルタを必須化、(2) REQ-057-028 の運用詳細を traceability 関連 Design へ記載、(3) 除去実行後に traceability check で新規 missing 0 を確認する後置検査の徹底
+- **想定反映先**: agentdev-traceability（coverage 利用時の注意）、agentdev-workflow-case-run / agentdev-workflow-case-close（cleanup 手順）
+- **関連**: Case #2824、PR #2874、REQ-057-028、docs/designs/integrity/prose-quality-sentinel-checks.md:9（REQ-053-023 verification 宣言のみの箇所）
+- **タグ**: `#traceability` `#coverage` `#role-distinction` `#cleanup`
+
+## adversarial-review の発動条件非該当時は silent skip せず判定理由を記録し、代替として自己反証を実施する
+
+- **問題事象**: 委譲 prompt が adversarial-review default-on を指示していても、Issue 本文 Execution Contract の review 発動契約「該当なし（ユーザー明示指定なし）」が正である場合、正規 review 呼出を行わないことがある。呼出を省略するだけだと silent skip となり、委譲側から実施有無が確認できない
+- **発生局面**: 実装（case-run 委譲内の検証。Case #2832 の PR #2877、Case #2831 の PR #2876 で記録運用を実施）
+- **検知方法**: 委譲 prompt と Issue 本文 review 発動契約の突合（adapter 発動条件はユーザー明示指定のみを正とする契約）
+- **根本原因**: 発動条件の判定主体（Issue 本文の契約 > 委譲 prompt の指示）と、非発動時の記録義務が委譲先に伝わっていない
+- **自律対応内容**: 非発動の理由を PR 本文へ明記（発動契約引用 + silent skip 回避の宣言）し、代替として実装方針の自己反証（却下案・緩和策・unresolved なしの確認）を記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（adapter reference の発動条件契約どおりの運用記録）
+- **横展開観点**: default-on 指示と発動契約が不一致になる全委譲で発生し得る。非発動の判断自体は正規だが、記録がなければ上流は実施漏れと区別できない
+- **再発条件**: case-run が adversarial-review を委譲し、Issue 本文の発動契約が「該当なし」の場合に毎回発生し得る
+- **予防策候補**: (1) 委譲 prompt に「発動条件は Issue 本文契約を正とする」を明記、(2) 非発動時は PR 本文へ判定理由の記録を必須化、(3) adapter reference の発動条件節を委譲先が参照する形に統一
+- **想定反映先**: agentdev-case-run-execution-adapter（発動条件判定の記録運用）、agentdev-workflow-case-run（委譲 prompt の注意書き）
+- **関連**: Case #2831（PR #2876）、Case #2832（PR #2877）、adversarial-review-integration.md 発動条件判定節
+- **タグ**: `#adversarial-review` `#delegation` `#silent-skip` `#recording`
