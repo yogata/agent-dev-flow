@@ -295,7 +295,7 @@ bg task API、実行エージェント選定、実行担当サブエージェン
 stage 2 の bg task がシステムにより破棄されたことを検知した場合、commit 済みで PR 未作成の状態と未コミット変更が残る状態を区別し、それぞれの状態に対応する回復パターンを適用する。
 並列実行が利用できない場合だけ順次フォールバックを使用し、理由を完了報告に残す。
 
-## 前工程完了度3段階分類（REQ-003-027）
+## 前工程完了度3段階分類
 
 OU 属性「前工程完了度」を追加する。
 本属性は子 Issue 実行状態 enum（pending / ready / running / completed / blocked / failed / delegation-unavailable）とは直交する分類であり、前工程（Definition 保存（case-ready / case-revise））の完了状況を表す。
@@ -306,7 +306,7 @@ OU 属性「前工程完了度」を追加する。
 | 検証のみ | 前工程完了を前提、acceptance criteria 順位検証のみ実施 | acceptance criteria 順位検証は必須、前工程相当作業は実施しない |
 | 補完あり | 前工程に残余あり、補完実装の可能性 | 前工程相当作業の補完可能性を考慮しつつ acceptance criteria 順位検証を実施 |
 
-case-open は子 Issue 本文に本属性を埋め込む（REQ-003-011）。
+子 Issue の作成と子 Issue 本文への本属性の埋め込みは case-ready が行う（case-open は Child Issue を作成しない、REQ-030-008 と整合）。
 subagent は属性に応じた振る舞い指針に従う。
 
 ## バッチ Issue 運用における OU ごとの完了判定追跡性（REQ-003-014）
