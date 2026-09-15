@@ -1,3 +1,4 @@
+<!-- ADF-COVERS(implementation): REQ-036-027 -->
 # 意味的診断観点の判定基準
 
 > **原本**: 正規な定義元の原則、同一契約再定義抑止の原則、artifact-responsibilities Design（責務分担マッピング、重複許容基準）。
@@ -199,7 +200,7 @@ Recommended route には対象配布物の種別と修正方向を提示する�
 ## 対象外
 
 - 機械的パターンマッチングによる検出（`load_skills` 誤指定、`/` 先頭識別子表記等）は integrity-rule-catalog Design が担う。本観点は意味的・文脈的な検出を担う。
-- Design 操作契約テーブルと references/contracts.md のフィールド一致性は別観点（[spec-operation-contract-consistency.md](spec-operation-contract-consistency.md)）が担う。本観点は意味段階の重複・矛盾・越境・欠落に限定し、SPEC- contracts.md 間のフィールド単位の突合は含まない。
+- Design 操作契約テーブルと操作契約実体（`contracts.ts`、`agentdev_gh` Tool 配下）のフィールド一致性は別観点（[spec-operation-contract-consistency.md](spec-operation-contract-consistency.md)）が担う。本観点は意味段階の重複・矛盾・越境・欠落に限定し、SPEC と操作契約実体間のフィールド単位の突合は含まない。
 - 配布物の Markdown 構文健全性、frontmatter 構文は別観点（配布物 frontmatter 構文健全性等）が担う。
 - 公開契約の維持（横断是正の前後で公開目的・入力・出力・停止条件等を維持すること）は公開契約維持原則が担う。本観点は静的記述の意味整合性に限定し、是正作業の前後比較は含まない。
 - 横断評価の対象範囲の網羅（全配布 Command/Skill を対象とすること）は横断評価対象範囲網羅原則が担う。本観点は個別の検出基準を扱う。
@@ -210,4 +211,4 @@ Recommended route には対象配布物の種別と修正方向を提示する�
 - **artifact-responsibilities Design**: 責務分担マッピング、重複許容基準
 - **検出事項の報告形式**: 対象・観点・分類・根拠・推奨経路
 - **Command/Skill/Template/Script 責任分界**: 配布物種別間の責務分担基盤
-- **[spec-operation-contract-consistency.md](spec-operation-contract-consistency.md)**: Design 操作契約テーブルと contracts.md のフィールド一致性（本観点と互补）
+- **[spec-operation-contract-consistency.md](spec-operation-contract-consistency.md)**: Design 操作契約テーブルと操作契約実体のフィールド一致性（本観点と互补）
