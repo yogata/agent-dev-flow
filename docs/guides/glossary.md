@@ -32,7 +32,7 @@ AgentDevFlow で使う用語の定義。
 | 用語 | 定義 |
 |------|------|
 | REQ | 要件定義の永続基準。`docs/requirements/REQ-{NNN}.md` に配置 |
-| Decision | 取り返しのつかない技術判断の記録。配置は `docs/decisions/DEC-{NNN}.md`。後継関係は `docs/decisions/README.md` の Decision Map を参照（旧称: ADR） |
+| Decision | 将来の設計、運用、文書システムを制約する決定とその理由（WHY）。配置は `docs/decisions/DEC-{NNN}.md`。後継関係は `docs/decisions/README.md` の Decision Map を参照（旧称: ADR） |
 | Design | 実装者が参照する現在設計。`docs/designs/**/*.md` に配置（commands/skills/workflows の3層と基盤6ドメイン） |
 | Report | 監査・評価・観測の事実記録。`docs/reports/**/*.md` に配置 |
 | README | ドキュメント入口、各ディレクトリの索引。`docs/README.md` 等 |
@@ -64,7 +64,7 @@ AgentDevFlow で使う用語の定義。
 | HITL（Human-in-the-loop / 人の判断を挟む） | ユーザーの確認を挟む判断ポイント |
 | マクロフェーズ | 壁打ち、構造的実行、レビュー完了の3段階 |
 | マイクロフェーズ | requirement / analyzed / created / in_progress / review / done の6状態（説明用ラベルであり、状態管理モデルではない） |
-| 検出事項（Finding） | docs-check や case-run で検出された乖離、発見事項 |
+| 検出事項（Finding） | docs-check や case-run、inspect 系コマンド（inspect-docs / inspect-skills / inspect-promote）で検出された乖離、発見事項 |
 
 ## Epic 関連
 

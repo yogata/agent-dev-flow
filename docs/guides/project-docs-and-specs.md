@@ -85,7 +85,7 @@ REQ/Decision/Design と矛盾する記述がある場合は基準文書を優先
 参照の方向は次のとおりである。
 
 - REQ → Decision、Decision → Decision、Issue → Decision の参照を許可する
-- REQ → Issue の一方向参照である。Issue から REQ への逆参照は行わない
+- Issue → REQ の一方向参照である（Issue 本文に REQ 番号を記載）。REQ から Issue への逆参照は行わない
 - Decision → Issue の逆参照は不可
 
 guides（本ファイルを含む）は参照用読み物であり、基準文書への導線を提供する。

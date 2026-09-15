@@ -62,4 +62,4 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-001�
 - [REQ-002](../docs/requirements/REQ-002.md): 配布成果物の責務境界（drafts 配置、配布境界）
 - [REQ-008](../docs/requirements/REQ-008.md): 一時成果物ライフサイクル（intake / learning / backlog lifecycle）
 - [DEC-001](../docs/decisions/DEC-001.md): AgentDevFlow 憲章（namespace、基本原則）
-- [DEC-005](../docs/decisions/DEC-005.md): Project Extensions Architecture（`.agentdev/extensions/**`）
+- [DEC-005](../docs/decisions/DEC-005.md): Project Extensions Architecture（`.agentdev/extensions/**`）。superseded by DEC-006（extensions 機構の配置規約は現行のまま、DEC-006 が inspect-extensions 廃止と extension 検査の責務分離により部分置換）
