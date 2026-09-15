@@ -364,22 +364,22 @@ frontmatter の基本フィールドは `draft_type`、`topic`、`status`、`cre
 
 ### req_draft consumer 4 集合
 
-req_draft（`.agentdev/drafts/req-draft-{topic}.md`）の consumer 境界を次の 4 集合で確定する（REQ-008、REQ-006-083）。
-draft type registry の allowed consumers 列、REQ-008、REQ-006-083、document-model の req_draft 説明、各 command 実体から抽出した 4 集合がすべて一致すること。
+req_draft（`.agentdev/drafts/req-draft-{topic}.md`）の consumer 境界を次の 4 集合で確定する（REQ-008）。
+draft type registry の allowed consumers 列、REQ-008、document-model の req_draft 説明、各 command 実体から抽出した 4 集合がすべて一致すること。
 
 | 集合 | 要素 | 役割 |
 |---|---|---|
 | producer | `{req-define}` | req_draft を生成する唯一の command |
 | direct consumer | `{case-open, case-ready, case-revise}` | req_draft を主入力として消費し、REQ/Decision/Design/Issue を生成・確定する command 群 |
 | orchestration pre-reader | `{case-auto}` | case-open 前だけ req_draft を読み、後続工程の orchestration 入力とする command |
-| invalid post-case reader | `{case-auto, case-run, case-close}` | case-open 成功後に req_draft を参照してはならない command 群 |
+| invalid post-case reader | `{case-auto, case-run, case-close}` | case-ready 成功後に req_draft を参照してはならない command 群 |
 
 #### case-ready 成功後の SSoT 遷移
 
 - case-open 成功後も req_draft は保持され、case-ready が Definition 確定の入力として消費する
 - case-ready 成功後は Root Case Issue と確定済み canonical Definition を SSoT とし、req_draft は削除される（blocked / failed / 中断時は保持。REQ-008-010, REQ-008-011）
 - case-auto は case-open 以降の停止、再開、完了処理を Issue と実行構造（execution contract）だけで成立させる
-- case-run、case-close は case-open 成功後に req_draft を参照しない
+- case-run、case-close は case-ready 成功後に req_draft を参照しない
 - draft type registry の allowed consumers 列は `{case-open, case-ready, case-revise}` とする（REQ/Decision 保存と Design 保存を case-ready / case-revise の Definition 保存内部責務として統合した構成に対応）
 
 ## req_draft 出力構造
