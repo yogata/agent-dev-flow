@@ -208,11 +208,11 @@ case-open は OU 群の依存グラフから連結成分（必須依存のみを
 
 連結成分アルゴリズムと3軸判断モデルの機械的判定手順、依存強度3レベルの定義表、Epic 分割例外の適用条件、Epic 構成推論根拠の記録先は [references/execution-unit-construction.md](references/execution-unit-construction.md) 参照。
 
-### execution_unit 構成の依存ヒントと Wave 構成の重複前置検出契約（REQ-030-022、REQ-031-027、REQ-035-012）
+### execution_unit 構成の依存ヒントと Wave 構成の重複前置検出契約（REQ-061-019、REQ-031-027、REQ-035-012）
 
 連結成分計算の必須依存エッジに加え、同一 Wave 候補の子 Issue（execution_unit）間で変更対象ファイル集合
 （realization_actions・artifact_actions の対象）の重複をファイル単位で前置検出することを必須とする。
-検出タイミングは Wave 構成時（case-open）と fan-out 前（case-run）の2点とする。
+検出タイミングは Wave 構成時（case-ready）と fan-out 前（case-run）の2点とする。
 重複検出時は Wave 分離・変更対象分割・重複許容のいずれかを Wave 構成の判断として決定し、判断記録を必須とする。
 重複許容時は衝突解消の担当とマージ順序を事前記録する。
 
