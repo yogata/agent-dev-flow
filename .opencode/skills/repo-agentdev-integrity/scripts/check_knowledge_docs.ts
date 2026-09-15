@@ -2,9 +2,11 @@
 /**
  * check_knowledge_docs.ts — docs/knowledge/ 構造検査 checker (REQ-056-010/011).
  *
- * docs/knowledge/ 配下のプロジェクト知識文書について、次の4点を機械検査する
+ * docs/knowledge/ 配下のプロジェクト知識文書について、次の5点を機械検査する
  * （REQ-056-010「docs/knowledge/ の正規配置、命名、必須内容を機械検査できること。
- * 検査範囲は本体 5 項目に加え frontmatter（title / created / updated）を含むこと」）:
+ * 検査範囲は本体 5 項目に加え frontmatter（title / created / updated）、および知識領域
+ * README（docs/knowledge/README.md）の知識文書列挙と実ファイルの過不足（README 列挙整合）
+ * を含むこと」）:
  *
  *   1. non-regular-placement: docs/knowledge/ 配下は知識文書（1知識1 Markdown ファイル、
  *      REQ-056-001）と領域案内 README.md のみを配置する。サブディレクトリと
@@ -17,9 +19,12 @@
  *      ことを検出する（invalid）
  *   4. missing-required-section: 本体は知識内容、適用条件、適用対象、根拠、関連知識の
  *      5項目を見出しとして備える（REQ-056-003、patterns Design「Knowledge frontmatter 規約」）
+ *   5. readme-listing-mismatch: 領域案内 README.md の「現在の知識文書」一覧と実ファイル
+ *      （README.md を除く知識文書）の過不足（README 列挙整合、REQ-056-010）。列挙の過不足
+ *      （構造的整合）のみを検出し、一覧の記述内容の意味的妥当性は検査しない（REQ-056-011）
  *
  * REQ-056-011（知識文書の意味的妥当性を機械検査で確定させない）に従い、本 checker は
- * 構造面（配置、ファイル名、必須見出しの存在）のみを検査する。セクション本文の内容品質、
+ * 構造面（配置、ファイル名、必須見出しの存在、README 列挙の過不足）のみを検査する。セクション本文の内容品質、
  * 内容とセクション名の意味一致は検査対象に含まない（見出しが存在すれば本文が空でも合格）。
  *
  * 参考 REQ:    docs/requirements/REQ-056.md（REQ-056-001/003/010/011）
@@ -60,6 +65,9 @@ export const REQUIRED_SECTIONS: readonly string[] = [
 /** 領域案内ファイル名。知識文書ではないため命名・必須セクション検査の対象外。 */
 export const AREA_README_FILENAME = "README.md";
 
+/** 領域案内 README の知識文書一覧セクション見出し（README 列挙整合、REQ-056-010）。 */
+export const README_LISTING_SECTION_TITLE = "現在の知識文書";
+
 /** kebab-case slug（REQ-056-001）。小英字・数字をハイフンで連結する。 */
 export const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
@@ -83,7 +91,8 @@ export type KnowledgeFindingKind =
   | "invalid-slug"
   | "missing-frontmatter"
   | "invalid-frontmatter"
-  | "missing-required-section";
+  | "missing-required-section"
+  | "readme-listing-mismatch";
 
 export interface KnowledgeFinding {
   /** repo root 相対パス（ディレクトリ違反時はディレクトリパス）。 */
@@ -234,6 +243,48 @@ interface KnowledgeEntry {
 }
 
 /**
+ * 領域案内 README の「現在の知識文書」セクションから知識文書ファイル名を列挙する
+ * （README 列挙整合、REQ-056-010）。セクション見出しから次の見出しまでの範囲で、
+ * 行全体マッチ（checker 契約 Design の行全体マッチ統一規約）の Markdown リスト項目
+ * `- [text](link)` のうち link がパス区切りを含まない領域直下の相対 .md
+ * ファイル名であるものを抽出する。外部 URL、サブパス参照は列挙として受理しない。
+ * セクションが存在しない場合は空配列を返す。
+ */
+export function extractReadmeListing(content: string): string[] {
+  const listing: string[] = [];
+  let inSection = false;
+  for (const line of content.split(/\r?\n/)) {
+    const heading = /^#{1,6}\s+(.+)$/.exec(line);
+    if (heading) {
+      inSection = heading[1].trim() === README_LISTING_SECTION_TITLE;
+      continue;
+    }
+    if (!inSection) continue;
+    const m = /^\s*-\s+\[[^\]]+\]\(([^)/\\]+\.md)\)\s*$/.exec(line);
+    if (m) listing.push(m[1]);
+  }
+  return listing;
+}
+
+/**
+ * README 列挙と実ファイル集合の過不足を検出する
+ * （README 列挙整合、REQ-056-010）。列挙の過不足（構造的整合）のみを検出し、
+ * 一覧の記述内容の意味的妥当性は判定しない（REQ-056-011）。
+ */
+export function findReadmeListingViolations(
+  listedFileNames: readonly string[],
+  actualFileNames: readonly string[],
+): { listedButMissing: string[]; presentButUnlisted: string[] } {
+  const listed = new Set(listedFileNames);
+  const actual = new Set(actualFileNames);
+  const presentButUnlisted = actualFileNames.filter((name) => !listed.has(name));
+  const listedButMissing = listedFileNames.filter(
+    (name, index) => !actual.has(name) && listedFileNames.indexOf(name) === index,
+  );
+  return { listedButMissing, presentButUnlisted };
+}
+
+/**
  * docs/knowledge/ 直下のエントリを列挙する。
  * サブディレクトリは違反検出対象であり、その内部は走査しない
  * （1知識1 Markdown ファイル、REQ-056-001 のため領域はフラットである）。
@@ -319,6 +370,44 @@ export function scanKnowledgeDocs(root: string): {
     }
   }
 
+  const readmeEntry = entries.find(
+    (e) => !e.isDirectory && e.fileName === AREA_README_FILENAME,
+  );
+  if (readmeEntry) {
+    const readmeContent = fs.readFileSync(readmeEntry.absPath, "utf-8") as string;
+    const listedFileNames = extractReadmeListing(readmeContent);
+    const actualFileNames = entries
+      .filter(
+        (e) =>
+          !e.isDirectory &&
+          e.fileName !== AREA_README_FILENAME &&
+          e.fileName.endsWith(".md"),
+      )
+      .map((e) => e.fileName);
+    const { listedButMissing, presentButUnlisted } = findReadmeListingViolations(
+      listedFileNames,
+      actualFileNames,
+    );
+    for (const fileName of presentButUnlisted) {
+      findings.push({
+        file: readmeEntry.relPath,
+        kind: "readme-listing-mismatch",
+        detail:
+          `知識文書「${fileName}」が README「${README_LISTING_SECTION_TITLE}」一覧に列挙されていない` +
+          `（README 列挙整合、REQ-056-010）`,
+      });
+    }
+    for (const fileName of listedButMissing) {
+      findings.push({
+        file: readmeEntry.relPath,
+        kind: "readme-listing-mismatch",
+        detail:
+          `README「${README_LISTING_SECTION_TITLE}」一覧の「${fileName}」は実ファイルとして存在しない` +
+          `（README 列挙整合、REQ-056-010）`,
+      });
+    }
+  }
+
   return {
     findings,
     filesScanned: entries.length,
@@ -352,6 +441,7 @@ function formatText(report: KnowledgeReport): string {
       "missing-frontmatter": "frontmatter 欠落",
       "invalid-frontmatter": "frontmatter 不備",
       "missing-required-section": "必須セクション欠落",
+      "readme-listing-mismatch": "README 列挙整合違反",
     };
     for (const f of report.findings) {
       lines.push(`### [${kindLabel[f.kind]}] ${f.file}`);
@@ -422,6 +512,8 @@ CHECKS (REQ-056-010, structure only — REQ-056-011):
                           (YYYY-MM-DD); updated earlier than created
   missing-required-section  Knowledge docs missing any of the required 5 section headings:
                           ${REQUIRED_SECTIONS.join(", ")}
+  readme-listing-mismatch  Knowledge docs missing from the area README "現在の知識文書"
+                          listing, or listing entries without an actual file (README 列挙整合)
 
 RELATED:
   - REQ: docs/requirements/REQ-056.md (REQ-056-001/003/010/011)
