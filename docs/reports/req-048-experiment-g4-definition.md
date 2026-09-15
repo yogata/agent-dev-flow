@@ -50,7 +50,7 @@ REQ-054 と DEC-024 の変更誘発境界リスク分析が導出した case-spe
 
 ### finding / modification state
 
-REQ-048-008 の finding 差分（新規、修正済み、既出、撤回、無効）、REQ-003-042 の審議中 finding 状態、前工程で確認済みの finding を使用する。新規 finding の発生、修正済み finding の反復、未解決の審議中 finding、変更状態の不明は trigger 不成立として扱い、省略しない。finding の状態と変更状態を工程間で追跡できる記録を残す。
+REQ-048-008 の finding 差分（新規、修正済み、既出、撤回、無効）、REQ-082-013 の審議中 finding 状態、前工程で確認済みの finding を使用する。新規 finding の発生、修正済み finding の反復、未解決の審議中 finding、変更状態の不明は trigger 不成立として扱い、省略しない。finding の状態と変更状態を工程間で追跡できる記録を残す。
 
 この3ソースは、実行条件を評価するための入力であり、hard governance 不変条件や QG 必須統制を置き換えない。実測データが不足する場合は保守的に常時実行側へ倒す。
 
@@ -117,7 +117,7 @@ G4 の主要構造変更は次の1件のみである。
 - finding 5分類の意味変更、検証差分セクション形式の変更（G1 対象）
 - structured handoff field 集合の変更（G2 対象）
 - source / projection 参照方式の変更（G3 対象）
-- adversarial-review の審議契約、review NG フロー、REQ-003-042 と REQ-007-005 の所有境界の変更
+- adversarial-review の審議契約、review NG フロー、REQ-082-013 と REQ-007-005 の所有境界の変更
 - integrity suite、docs-check、契約テストの廃止または常時実行の緩和
 
 ## Guardrail
@@ -204,7 +204,7 @@ Issue #2609 テスト戦略 TS-012E に従い、本 Report の読み戻しで次
 | 確認項目 | 結果 | 証拠 |
 |---|---|---|
 | REQ-048-012 の6要素（Baseline、Hypothesis、単一の主要構造変更、Guardrail、Observation、Decision）が識別可能である | 合格 | `## Baseline`、`## Hypothesis`、`## 主要構造変更`、`## Guardrail`、`## Observation`、`## Decision 記録形式` が存在する |
-| trigger の定義根拠（実測データ、既存 risk、finding / modification state）が明示されている | 合格 | 「trigger の定義根拠」節に3ソースを独立して記載し、Baseline V2、REQ-054 / DEC-024、REQ-048-008 / REQ-003-042 を参照している |
+| trigger の定義根拠（実測データ、既存 risk、finding / modification state）が明示されている | 合格 | 「trigger の定義根拠」節に3ソースを独立して記載し、Baseline V2、REQ-054 / DEC-024、REQ-048-008 / REQ-082-013 を参照している |
 | Guardrail が hard governance 不変条件と QG 必須統制の維持を定義している | 合格 | GR-1 が DEC-001 決定3の8点を条件付き化対象外として維持し、GR-2 が QG-1〜QG-4 を対象外として維持する。GR-5 は N/A 非停止を定義する |
 | 実行・判定が後続の技術検証に分離されている | 合格 | 「実験の実行・判定の分離（後続の技術検証）」節が本 Issue の完了条件外、実行時の測定条件・手順確定、G1〜G4 直列実行を明示している |
 

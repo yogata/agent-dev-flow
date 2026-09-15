@@ -1,3 +1,4 @@
+<!-- ADF-COVERS(implementation): REQ-008-010, REQ-008-011 -->
 # Intake / Learning / Backlog フロー
 
 作業候補、学びの収集から RU（Requirement Unit）生成までの流れを説明する。
@@ -113,7 +114,7 @@ RU 本文は後続工程（req-define）で必要な情報を自足し、整理�
 
 | トリガー | 実行コマンド | 対象 |
 |----------|-------------|------|
-| RU の内容が Issue に永続化完了（Issue作成 + VERIFY 成功） | `/agentdev/case-open` | 該当 RU ファイル |
+| Definition 確定 + VERIFY 成功 | `/agentdev/case-ready` | 該当 RU ファイル |
 | 採用済み成果物の RU 化成功 | `/agentdev/backlog-review` | 該当する採用済み成果物 |
 
 `/agentdev/case-ready` は Definition 確定後に RU を削除し、RU パスを docs 永続文書の根拠参照から除外する。

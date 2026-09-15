@@ -1,4 +1,4 @@
-<!-- ADF-COVERS(implementation): REQ-057-022 -->
+<!-- ADF-COVERS(implementation): REQ-057-022, REQ-008-010, REQ-008-011 -->
 
 # トラブルシューティング
 
@@ -23,14 +23,15 @@ AgentDevFlow の利用でよくある問題と対処法をまとめる。
 **対処**: REQ ファイルが存在する場合、req-define の Step 0 でセッションコンテキスト検知が正しく動作しているか確認する。
 セッションに前段の情報が残っていない場合、手動で関連 REQ 番号を伝える。
 
-### case-open で RU が削除されない
+### case-ready 後も RU が削除されない
 
-**症状**: Issue 作成後に RU ファイルが `.agentdev/backlog/req-units/` に残っている。
+**症状**: case-ready 完了後も RU ファイルが `.agentdev/backlog/req-units/` に残っている。
 
-**原因**: Issue 作成後の VERIFY（読み戻し検証）が失敗した場合、RU は残置される。
+**原因**: 現行契約では case-open 後の RU 残置は正常であり、RU を削除する唯一の工程は case-ready である（REQ-008-010、REQ-030-007）。case-ready の Definition 確定 + VERIFY（読み戻し検証）が失敗した場合、または blocked / failed / 中断した場合、RU は残置される（REQ-008-011）。
 
-**対処**: Issue 本文が正しく作成されているか確認する。
-エンコーディング問題やテンプレート必須セクション欠落がないか確認し、問題がなければ再度 case-open を実行する。
+**対処**: case-ready の VERIFY 結果と実行状態を確認する。
+Definition 保存内容の不備（読み戻し検証の不一致、テンプレート必須セクション欠落等）を解消し、case-ready を再実行する。
+case-open を再実行しても RU は削除されない。
 
 ## エンコーディング関連
 

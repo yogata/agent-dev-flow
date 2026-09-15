@@ -123,7 +123,7 @@ req-define は次の7項目を判定し、`artifact_actions`、`operation_units`
 | 利用者から見える外部契約が変わるか | 外部契約変更（change_nature: `external_contract_change`）に該当するか |
 | REQ の作成・更新が必要か | 上記3項目から REQ 作成・更新要否を確定 |
 | Design の論理区分 | v2:REQ-0155-009 の5区分（挙動Design、カタログDesign、横断契約Design、パラメータDesign、実装詳細Design）のいずれか |
-| 正規所有者 | 対象 command、skill、workflow、品質ルール、整合性ルール等の関心キー（REQ-003-038） |
+| 正規所有者 | 対象 command、skill、workflow、品質ルール、整合性ルール等の関心キー（REQ-082-009） |
 | 正規追記先 | 既存 Design のどの領域へ追記するか（target_area、target_design） |
 
 ### Design action への分類根拠出力

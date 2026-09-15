@@ -1,3 +1,4 @@
+<!-- ADF-COVERS(implementation): REQ-008-010, REQ-008-011 -->
 # 成果物、状態モデル
 
 AgentDevFlow を構成する成果物の種別、配置、ライフサイクルを説明する。
@@ -116,7 +117,7 @@ scripts/
 
 流れは以下の通り。
 採用済み成果物 / セッション由来 → RU → REQ ファイル / Issue → マージ → クローズ。
-RU 削除は `/agentdev/case-open` の永続化成功に限定する。
+RU 削除は `/agentdev/case-ready` の Definition 確定 + VERIFY 成功時に行う（case-open は RU を削除しない）。
 
 ## フェーズ体系
 
