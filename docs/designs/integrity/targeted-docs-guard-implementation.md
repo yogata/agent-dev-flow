@@ -101,6 +101,8 @@ case-close では保存工程より広めに以下を確認する。
 case-run プロファイルは docs/** 変更ファイルを対象とし、Definition 保存 / Design 保存向けプロファイルと同等の docs 整合性検査ルールセット（obsolete-spec-path, legacy-local-generation-vocab, doc-type-responsibility 等）を適用する。
 case-run プロファイル固有の追加ルールとして `full_docs_check_recommended` 判定は持たない（case-close の責務）。
 appliesTo は `docs/designs/**`, `docs/requirements/**`, `docs/decisions/**`, `docs/guides/**`, `AGENTS.md`, `README.md` 等、docs 配下および文書整合性に関連するファイルに限定する。
+case-run プロファイルの対象範囲は、case-run で変更され得る docs 領域を網羅するか、代替検査指定（全ファイル対象プロファイル等）の運用として明記すること（REQ-010-077）。`docs/knowledge/**` を含む case-run 変更で `files_checked` 空（TARGET-EMPTY）を恒常運用として発生させないこと。対象追加（appliesTo への `docs/knowledge/**` 追加）または代替検査指定の運用明記のいずれかを選定する基準は、fail-closed 意味論の維持、検査見逃しゼロ、false-clean の発生なしであり、適用結果と選定根拠を記録する。
+配布 skill（`src/opencode/skills/**`）のみを変更する case-run において guard の `files_checked` が空となる場合、配布物検査の責務は配布依存境界 gate（check_distribution_boundary。case-run STEP-S5 / case-close STEP-3 共用 detector、case-close 側は `--files` 明示指定に対応）が担う。guard（check_changed_docs）は docs 変更の検査責務に限定する。この責務分担は case-run 側の配布物検査契約（TS-007 系）と矛盾しない。
 
 ## full_docs_check_recommended 条件
 
