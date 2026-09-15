@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下50件を第一参照先とする。
+現在の要件判断では、以下51件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -62,6 +62,7 @@
 | [REQ-060](REQ-060.md) | bun test 実行形態の統一（repo root 起 cwd・`./` 付きパス指定） |
 | [REQ-061](REQ-061.md) | case-ready 実行契約 |
 | [REQ-062](REQ-062.md) | case-revise 実行契約 |
+| [REQ-082](REQ-082.md) | 対論型レビュー審議契約 |
 <!-- AUTOGEN:END -->
 
 ## 廃止済み要件
