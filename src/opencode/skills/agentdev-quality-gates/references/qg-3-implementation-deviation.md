@@ -138,13 +138,13 @@ Issue/ REQ/ Decision/ Design/ work plan のいずれかの記載内容を満た�
 
 QG-3 は乖離の分類と推奨アクションの提示までを責務とし、Definition 変更の最終判断は case-revise（ユーザー承認入力）に委譲する。
 
-### 乖離タイプ → case-revise フラグ mapping
+### 乖離タイプ → 対応経路 mapping
 
-| 乖離タイプ | case-revise コマンド | 説明 |
+| 乖離タイプ | 対応経路 | 説明 |
 |---|---|---|
-| `spec-bug` | `/agentdev/case-revise {N} --review-ng` | Definition の修正が必要 |
-| `impl-bug` | `/agentdev/case-revise {N} --comment --review-ng` | 実装の修正が必要（Definition は不変） |
-| `scope-creep` | `/agentdev/case-revise {N} --review-ng` | Definition スコープの再定義が必要 |
+| `spec-bug` | `/agentdev/case-revise {N}` → `/agentdev/case-ready {N}` → `/agentdev/case-run {N}`（再開） | Definition の修正が必要 |
+| `impl-bug` | `/agentdev/case-run {N}` 再開（レビュー NG コメントは Issue コメントへ記録） | 実装の修正が必要（Definition は不変） |
+| `scope-creep` | `/agentdev/case-revise {N}` → `/agentdev/case-ready {N}` → 不要実装削除 → `/agentdev/case-run {N}` | Definition スコープの再定義が必要 |
 
 報告フォーマットの出力は `issue_comment_review_ng.md` テンプレートに埋め込める形式とする。
 
@@ -166,5 +166,5 @@ QG-3 の検査をサブエージェントに委譲する場合:
 
 - [common-gate-contract.md](common-gate-contract.md)
 - [qg-4-final-acceptance.md](qg-4-final-acceptance.md)（次工程の最終受け入れ。QG-4 は QG-3 の結果を前提とする）
-- **agentdev-workflow-routing**: case-revise --review-ng 手順（QG-3 結果の消費先）
+- **agentdev-workflow-routing**: レビュー NG 対応手順（QG-3 結果の消費先）
 - **agentdev-workflow-templates**: `issue_comment_review_ng.md` テンプレート

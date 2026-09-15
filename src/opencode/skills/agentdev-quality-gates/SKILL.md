@@ -34,7 +34,7 @@ AgentDevFlow 主ワークフローの品質ゲート QG-1〜QG-4 の判定基準
 - `intake-*`（intake-capture/ intake-from-github/ intake-promote）
 - `learning-*`（learning-capture/ learning-promote）
 - `backlog-*`（backlog-review）
-- `case-revise`（QG 直接参照なし。`--review-ng` 時は QG-3 の結果を引用する）
+- `case-revise`（QG 直接参照なし。レビュー NG 対応時は QG-3 の結果を引用する）
 
 ## 責務境界
 
@@ -73,4 +73,4 @@ QG-4（full integrity suite 合格基準）における bun test フル suite �
 - quality-gates Design（QG-1〜QG-4 の Design 定義、機械化境界、実装マッピング、skill extension 経由）
 - **agentdev-req-analysis**: 要件分析手法、チェックボックス品質基準（QG-1 の基準）
 - **agentdev-workflow-lifecycle**: work_type 判定、フェーズ定義
-- **agentdev-workflow-routing**: case-revise --review-ng 手順（QG-3 結果の消費先）
+- **agentdev-workflow-routing**: レビュー NG 対応手順（QG-3 結果の消費先）
