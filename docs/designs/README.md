@@ -84,8 +84,8 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [commands/_template.md](commands/_template.md) | accepted | command Design テンプレート |
 | [commands/req-define.md](commands/req-define.md) | accepted | `/agentdev/req-define` |
 | [commands/case-open.md](commands/case-open.md) | accepted | `/agentdev/case-open` |
-| [commands/case-ready.md](commands/case-ready.md) | draft | `/agentdev/case-ready`（Definition 受入と実行準備完了への状態遷移） |
-| [commands/case-revise.md](commands/case-revise.md) | draft | `/agentdev/case-revise`（再合意済み Definition 変更の既存 Case 反映、主フロー例外経路） |
+| [commands/case-ready.md](commands/case-ready.md) | accepted | `/agentdev/case-ready`（Definition 受入と実行準備完了への状態遷移） |
+| [commands/case-revise.md](commands/case-revise.md) | accepted | `/agentdev/case-revise`（再合意済み Definition 変更の既存 Case 反映、主フロー例外経路） |
 | [commands/case-run.md](commands/case-run.md) | accepted | `/agentdev/case-run` |
 | [commands/case-close.md](commands/case-close.md) | accepted | `/agentdev/case-close` |
 | [commands/case-auto.md](commands/case-auto.md) | accepted | `/agentdev/case-auto` |
@@ -155,7 +155,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [workflows/delegation-contracts.md](workflows/delegation-contracts.md) | accepted | サブエージェント委譲契約 | 委譲時最小契約、委譲種別、制約、manager-orchestrator 分離 |
 | [workflows/capture-boundaries.md](workflows/capture-boundaries.md) | accepted | キャプチャ境界 | intake / learning 境界、Split Rule、PR 本文永続チャネル |
 | [workflows/epic-wave-model.md](workflows/epic-wave-model.md) | accepted | Epic / Wave / Issue 実行モデル | OU 階層、子Issue 状態 enum、Wave スケジューリング、execution_unit 構成契約、orchestration stage モデル、per-Epic 単一書き手 |
-| [workflows/definition-readiness.md](workflows/definition-readiness.md) | draft | Definition Readiness | Definition Package、Draft Definition PR / Definition Amendment PR の lifecycle、canonical Definition 判定、冪等キー、backend 意味論の物理写像 |
+| [workflows/definition-readiness.md](workflows/definition-readiness.md) | accepted | Definition Readiness | Definition Package、Draft Definition PR / Definition Amendment PR の lifecycle、canonical Definition 判定、冪等キー、backend 意味論の物理写像 |
 | [workflows/backlog-artifact-lifecycle.md](workflows/backlog-artifact-lifecycle.md) | accepted | RU / 採用済み成果物 / draft lifecycle | artifact lifecycle、検出事項プロトコル、artifact_actions 工程分岐 |
 | [workflows/references/execution-unit-construction.md](workflows/references/execution-unit-construction.md) | accepted | execution_unit 構成アルゴリズム参照 | epic-wave-model.md から参照される連結成分アルゴリズム、3軸判断モデルの機械的判定手順 |
 

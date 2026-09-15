@@ -1,6 +1,6 @@
 ---
 title: Definition Readiness Design
-status: draft
+status: accepted
 created: 2026-09-14
 updated: "2026-09-14"
 ---
@@ -10,6 +10,8 @@ updated: "2026-09-14"
 ## 目的
 
 Definition Package、Draft Definition PR / Definition Amendment PR の lifecycle、canonical Definition の判定、冪等キー、backend 意味論の物理写像を定義する（REQ-030、REQ-061、REQ-062）。
+
+本 Design は ADF-COVERS 宣言を持たないため、REQ 対応の確定は PR 記録にもとづく REQ ファイル単位の近似判定（PR #2817 が REQ-061/REQ-005 対応を記録、Case #2806 closed）に基づく。2026-09-15 に REQ-032-025 の評価契約に従う棚卸し評価の結果、status を draft から accepted へ昇格した（RU-0015、Case #2848）。
 
 ## Definition Package
 
