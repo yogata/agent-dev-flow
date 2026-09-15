@@ -68,3 +68,19 @@
 - **想定反映先**: agentdev-workflow-case-open（STEP-4 reference）、agentdev-issue-management（push 安全手順）
 - **関連**: Case #2870、main push 17afaf86、docs/designs/workflows/definition-readiness.md、src/opencode/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md
 - **タグ**: `#git` `#push` `#definition-pr` `#workflow-deviation`
+
+## worktree で bun test 実行時、ルート package.json が存在せず scripts 配下の package.json（bun.lock 付き）ごとに bun install の前置が必要
+
+- **問題事象**: worktree 内で bun test フル suite を実行すると、`./src/opencode/skills/agentdev-project-extensions/scripts/` 配下のテストが zod 未解決で error 4 件を発生させた。worktree にはルート package.json が存在せず、node_modules も gitignore 対象のため伝播していない
+- **発生局面**: 実装（case-run 検証。bun test 3 cwd 分割実行のフル suite。Case #2867、PR #2869）
+- **検知方法**: bun test の初回実行結果（2556 pass / 3 fail / 4 errors。error は zod 未解決）
+- **根本原因**: worktree は git 追跡ファイルのみで構成され、node_modules（gitignore 対象）とルート package.json（リポジトリに存在しない）が欠落する。bun は対象ディレクトリ直近の package.json（bun.lock 付き）を依存解決の単位とするため、依存を持つ scripts 配下ごとの bun install 前置が必要
+- **自律対応内容**: `bun install --cwd src/opencode/skills/agentdev-project-extensions/scripts` を前置して再実行し、zod 未解決 error 4 件を解消（前置後は 2556 pass / 3 fail / 0 errors）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（実行環境の整備手順の明確化。QG-4 reference の依存パッケージ前置契約と整合）
+- **横展開観点**: worktree 内での bun test 実行は、依存を持つ scripts ディレクトリ集合（integrity suite の実体と分割② の双方）すべてで bun install 前置を要する。前置を省略すると依存解決失敗 error が変更起因 fail と誤認され得る
+- **再発条件**: worktree 新規作成直後に依存パッケージ前置なしで bun test を実行する場合に毎回発生
+- **予防策候補**: (1) worktree 作成直後の bun test 実行前に `bun install --cwd <scripts 配下>` を前置する手順の徹底、(2) QG-4 reference「依存パッケージ前置」の対象ディレクトリ集合を worktree 実行時チェックリストとして明記
+- **想定反映先**: agentdev-quality-gates（bun test 実行形態契約の運用注記）、agentdev-git-worktree（worktree 構造的制約の補足）
+- **関連**: Case #2867、PR #2869、.opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md（依存パッケージ前置）
+- **タグ**: `#bun` `#worktree` `#dependency` `#test-environment`
