@@ -3,6 +3,8 @@ name: agentdev-case-run-execution-adapter
 description: "case-run external execution adapter. USE FOR: connecting case-run issue execution to 実行担当サブエージェント via adapter skill delegation, handling completed-pr/blocked/failed/delegation-unavailable results. DO NOT USE FOR: workflow state management, Issue completion checkbox evaluation."
 ---
 
+<!-- ADF-COVERS(implementation): REQ-031-029, REQ-031-030 -->
+
 # case-run 外部実行アダプター（External Execution Adapter）
 
 case-run が1 Issue 単位（または1 Wave 単位）の実装作業を実行担当サブエージェントへ接続する際のアダプタープロトコル（adapter protocol）を定義する知識ベースである。
@@ -108,6 +110,32 @@ CI typecheck job での `git diff --exit-code` 検証は検討候補として記
 | blocked/ failed | **Issue コメント** |
 
 一時会話コンテキスト、ローカル変数、中間ファイルは SSoT としない。
+
+## 委譲結果受領の最終ゲート（3点ゲート）
+
+case-run（受領側）は、委譲結果の受領時に最終ゲートとして次の3点を必須検査する:
+
+| 検査点 | 内容 |
+|---|---|
+| 4状態 result | `completed-pr` / `blocked` / `failed` / `delegation-unavailable` のいずれか1状態が明示されていること |
+| commit hash | 委譲内作業の commit hash が含まれること |
+| PR URL | 作成された PR の URL が含まれること |
+
+- 3点のいずれかが欠ける委譲応答を「要約で完結した `completed-pr`」として扱わない。実装・検証の要約は3点検査の通過を代替しない
+- 不足する委譲応答は `completed-pr` として扱わず再開（再委譲または継続指示）する。継続指示の場合、委譲先へ欠落している情報（commit hash、PR URL 等）の提出を指示する
+- **verify-only closure との整合**: PR も carrier commit も存在しない Issue 完了（verify-only closure）は、SSoT コメント（Issue コメント）契約の別経路として既存どおり扱う。3点ゲートの不足判定が正当な verify-only closure を再開扱いにしない。verify-only closure の完了証跡は SSoT コメントに記録された検証結果であり、PR URL・carrier commit の不在は不足判定の対象としない
+
+## background 委譲の起動消失の回復手順
+
+case-run は background 委譲の起動直後消失を検知した場合、委譲先の会話応答（一時コンテキスト）に依存せず、durable state で実行の帰属を確認して回復する:
+
+1. **帰属確認（durable state）**: 次の永続状態で委譲先の実行の帰属を確認する
+   - worktree の git status・commit（実行中の変更や commit の有無）
+   - PR の存在（`completed-pr` の証跡）
+   - Issue コメント（blocked / failed の SSoT）
+2. **実行未試行と判定した場合**: 同期実行による再委譲を行う（実行未試行のため result 状態は付かない。委譲起動不能時の `delegation-unavailable` とは区別する）
+3. **実行中断と判定した場合**: 継続の判断（継続指示または再委譲）も当該 durable state に基づく。git status の残留変更と PR 有無を根拠とし、会話コンテキストの推定で判断しない
+4. **フォールバック限定**: 同期実行への切替は消失検知時のフォールバックに限定する。委譲方式を常時同期化せず、並列委譲（最大5件）を維持する
 
 ## 責務境界（非対象）
 

@@ -1,6 +1,6 @@
 # 共通委譲・result 処理（delegation-and-result）
 
-<!-- ADF-COVERS(implementation): REQ-031-028 -->
+<!-- ADF-COVERS(implementation): REQ-031-028, REQ-031-029, REQ-031-030 -->
 
 > 本 reference は `agentdev-workflow-case-run` SKILL.md の共通 STEP 詳細である。
 > STEP-S4（実行担当サブエージェント委譲）と STEP-S5（result 処理・配布依存境界 最終 gate）を所有する。
@@ -48,6 +48,7 @@
 - **PR URL 受領**: 実行担当サブエージェントが直接 PR 作成を行い、PR URL を委譲 result として返却する（PR URL フォールバック検索は使用しない）
 - **case-run 本体は実装方針を生成・審査しない**: 実装方針の形成、adversarial-review 呼出、結果反映は委譲内で adapter の委譲契約に従い、最初の実装変更前に実施する。case-run 本体が実装方針を生成、保持、審査するステップを新設しない。委譲 result（4状態）のみで委譲内の結果を受領する
 - **adapter 委譲内 adversarial-review**: 発動条件判定と review 呼出は adapter 委譲内で実行担当サブエージェントが分離して実施する。default-on、skip 条件（実装方針が自明の場合）該当時は省略して従来フローを継続、ユーザー明示指定時は強制発動。実装方針限定、blocked 遷移（(1) 既確定文書の変更・追加・撤回が必要、(2) 要件・仕様問題の検出、(3) unresolved な本質的争点またはユーザー判断事項が残る）の詳細は `agentdev-case-run-execution-adapter` 参照
+- **background 委譲の起動消失の回復**: background 委譲の起動直後消失を検知した場合、durable state（worktree の git status、PR 存在、Issue コメント）で実行の帰属を確認する。実行未試行と判定した場合は同期実行による再委譲を行い、実行中断と判定した場合の継続判断も当該 durable state に基づく。同期実行への切替は消失検知時のフォールバックに限定し、並列委譲（最大5件）を維持する（詳細は `agentdev-case-run-execution-adapter` 参照）
 
 ### Result
 
@@ -84,6 +85,7 @@
 
 ### Procedure
 
+- **委譲応答の3点ゲート（最終ゲート）**: result 4状態処理の前に、委譲応答の4状態 result（completed-pr / blocked / failed / delegation-unavailable）・commit hash・PR URL の3点を必須検査する。不足する委譲応答を「要約で完結した completed-pr」として扱わず、再開（再委譲または継続指示）する。実装・検証の要約は3点検査の通過を代替しない。verify-only closure（PR も carrier commit も存在しない Issue 完了）は SSoT コメント契約の別経路として既存どおり扱い、3点の不足判定を適用しない（詳細は `agentdev-case-run-execution-adapter` 参照）
 - **result 4状態処理**（`agentdev-case-run-execution-adapter` の result 契約）:
   - **completed-pr**: 実装完了、PR作成済み。PR番号を受け取り最終 gate（後述）へ。成功成果は PR 作成である。verify-only closure（PR も carrier commit も存在しない Issue 完了）ではこの限りではなく、検証証跡は SSoT コメント（Issue コメント）へ記録する（references/single.md「verify-only closure の検証実行と SSoT コメント記録」参照）
   - **blocked**: 回答可能な blocker。詳細本文は Issue コメントに SSoT として記録済み（実行担当サブエージェント責務）。エラー処理に従い停止、ユーザー報告
@@ -110,7 +112,7 @@
 
 ### Completion Verification
 
-- 4状態いずれかの処理が完了していること。completed-pr + src/opencode 変更時は双方反映検証（source / link 両 profile）を伴う最終 gate 合格（または違反記録済み停止）であること
+- 委譲応答の3点ゲート（4状態 result・commit hash・PR URL）を通過した result の4状態処理が完了していること。completed-pr + src/opencode 変更時は双方反映検証（source / link 両 profile）を伴う最終 gate 合格（または違反記録済み停止）であること
 
 ### Resume-Idempotency
 
