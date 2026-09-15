@@ -166,6 +166,15 @@ verify-only 根拠欄の記入規則は [case-run.md](../commands/case-run.md)�
 全 test strategy 項目が合格済みまたは Findings 記録済みであることを確認する。
 未処理の test strategy 項目が残る場合、完了扱いとしない。
 
+#### traceability check の横断 durable state 前提手順
+
+QG-4 の traceability check は Design ヘッダの ADF-COVERS 宣言と検証対応要否カタログという単一 PR の差分に閉じない横断 durable state を判定対象とするため、次の前提手順を要求する。
+
+- design-save 工程（Design 本体へ要件反映時）は、当該 Design ヘッダの既存 ADF-COVERS 宣言ブロックの更新要否（実装対応・検証対応の過不足）を確認対象に含める
+- worktree root 起点の判定で未分類（unclassified）行が検出された場合は main 側 root で check を再実行し、検証対応要否カタログ登録 commit の時系列（ブランチ分岐の前後）を確認してから完了阻止を判断する（durable state 上で解消済みの対象行を本変更起因の失敗と誤判定しない）
+- 検証対応要否カタログ不在時は全要件行を検証対応必須として扱う安全側既定は維持する
+- checker 実装（--root の意味・検査項目）の変更は含まない
+
 ### full integrity suite 受入れ基準
 
 検証スイート全体（bun test 全件、整合性検査群）の合格判定は、次の受入れ基準に従う。
