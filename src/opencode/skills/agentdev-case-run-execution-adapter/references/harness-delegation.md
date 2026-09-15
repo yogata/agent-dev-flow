@@ -1,5 +1,4 @@
 <!-- ADF-COVERS(implementation): REQ-017-019 -->
-<!-- ADF-COVERS(implementation): REQ-032-024 -->
 # harness 委譲実装ノート
 
 AgentDevFlow 側（case-run）から実行担当サブエージェントを委譲起動するための実装ノート。
