@@ -62,6 +62,12 @@ capture_handoff:
 
 `side_effect_boundary` に `read_only` のような包括値（blanket value）を使用せず、許可する操作を具体名で列挙すること。
 
+### 実装委譲の受領側検査情報候補（output_contract）
+
+実装作業の委譲（case-run から実行担当サブエージェントへの委譲）では、受領側（case-run / case-auto）が契約完了検査（3点ゲート: 4状態 result・commit hash・PR URL）を実行するため、委譲応答にこれらの情報候補を含める。
+output_contract の status 値（pass | warn | fail | partial）は委譲時最小契約の一般形であり、実装委譲の result 4状態契約（completed-pr / blocked / failed / delegation-unavailable、workflow-contracts.md が正規所有）とは別契約として区別する。
+委譲時最小契約の骨格（inputs、side_effect_boundary、output_contract、capture_handoff）は変更しない。
+
 ### structured_context の SSoT 抽出制約
 
 - 委譲 prompt に含める structured_context の作業内容・purpose は、委譲先 Issue 本文の概要または正規 REQ から抽出する。
