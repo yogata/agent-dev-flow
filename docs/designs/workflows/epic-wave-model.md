@@ -2,7 +2,7 @@
 title: Epic / Wave / Issue 実行モデル
 status: accepted
 created: 2026-06-21
-updated: 2026-09-09
+updated: 2026-09-15
 ---
 <!-- ADF-COVERS(implementation): REQ-035-001, REQ-035-002, REQ-035-003, REQ-035-004, REQ-035-005, REQ-035-006, REQ-035-007, REQ-035-008, REQ-035-009, REQ-035-010, REQ-035-011 -->
 
@@ -232,6 +232,10 @@ case-open は OU 群の依存グラフから連結成分（必須依存のみを
 - 比較対象の子 Issue の変更対象集合が取得不能またはファイル粒度に展開不能な場合は、比較を省略せず検出不能として報告し判断を求める（比較省略の禁止）
 - case-auto 配下では重複時の判断・検出不能時の判断は decision_context による親判断解決（DEC-008）へ委譲する
 - mergeable 作成時状態のみで Wave の安全性を判断しない（REQ-035-012）
+
+本節は Wave 内（同一 Epic 配下の子 Issue 間）重複前置検出の唯一の正規所有者であり、Epic をまたぐ Case 間の
+横断依存検査は workflow-contracts Design「Case 投入時の横断依存検査契約」（REQ-030-014、REQ-061-031）が所有する。
+Epic を構成する投入では横断検査側から本節の前置検出へ委譲し、二重検査を行わない。
 
 ### execution_unit 並列 orchestration
 

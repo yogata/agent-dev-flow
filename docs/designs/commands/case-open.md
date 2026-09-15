@@ -2,7 +2,7 @@
 title: case-open Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-14"
+updated: "2026-09-15"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-004, REQ-030-005, REQ-030-006, REQ-030-007, REQ-030-008, REQ-030-009, REQ-030-010, REQ-030-011 -->
@@ -58,7 +58,7 @@ canonical Definition に実変更がある場合のみ Draft Definition PR を�
 - STEP-2 Root Case 確立（Root Case 本文候補生成、実行識別情報セクション付与、review_dispositions 転記、GitHub Issue 作成。状態 open、実装開始不許可）
 - STEP-3 Definition Package 生成・Root Case 関連付け（REQ-030-003）
 - STEP-4 実変更判定と Draft Definition PR 作成（実変更時のみ、Case 単位 1 件。REQ-030-002）
-- STEP-5 冪等再実行確認（既存 Root Case・既存 Draft Definition PR の再利用、重複生成禁止、不足分のみ処理。REQ-030-010）
+- STEP-5 冪等再実行確認（既存 Root Case・既存 Draft Definition PR の再利用、重複生成禁止、不足分のみ処理。REQ-030-010）と横断依存検査（draft の artifact_actions と未クローズ Case 群の変更対象成果物の機械的比較、同一パス重複時の警告提示。REQ-030-012〜014）
 - STEP-6 deviation capture・完了報告（REQ-030-011）
 
 adversarial-review は Root Case 本文候補と Definition Package 構成案確定後、Root Case 作成前に挿入する（「adversarial-review 挿入境界（case-open）」セクション参照）。
@@ -76,6 +76,13 @@ adversarial-review は Root Case 本文候補と Definition Package 構成案確
 - case-open は再実行時、既存 Root Case および既存 Draft Definition PR を冪等キーで検出し、再利用する。重複生成しない（REQ-030-010）。
 - 不足分だけを処理する。Root Case が存在し Definition PR が存在しない場合は PR 生成のみを実行し、Root Case が存在しない場合は Root Case 確立から実行する。両者とも存在する場合は新規生成を行わない。
 - Draft Definition PR は canonical Definition に実変更がある場合のみ作成する。canonical との差分が空の場合（bugfix / maintenance / docs_chore 等の実変更なし Case）は作成しない（REQ-030-002）。実変更判定が不能な場合は PR を作成せず停止し、判定不能の理由を報告する。
+
+### 横断依存検査（STEP-5、REQ-030-012〜014）
+
+- STEP-5 冪等確認の実行時、draft の artifact_actions と未クローズ Case 群の変更対象成果物を機械的に比較し、2 以上の Case 間で同一パスが重複する場合、警告として投入者に提示する。共通契約は workflow-contracts Design「Case 投入時の横断依存検査契約」が正規所有する。
+- 検出源は draft の artifact_actions と未クローズ Case 群の宣言に限定し、合意済み宣言以外の一般的な変更影響探索・依存関係探索を行わない（REQ-021-014、REQ-030-013）。
+- Epic を構成する投入では同一投入内（Epic 配下 Wave 内）の重複検出を Wave 重複前置検出（REQ-035-012）へ委譲し、Epic をまたぐ Case 間の重複のみを検出対象とする（REQ-030-014）。
+- 警告は Root Case の確立を自動阻止せず、警告の提示記録を完了報告へ含める。
 
 ## review_dispositions の消費と証跡転記
 

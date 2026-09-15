@@ -2,7 +2,7 @@
 title: case-ready Design
 status: accepted
 created: 2026-09-14
-updated: "2026-09-14"
+updated: "2026-09-15"
 ---
 
 # case-ready Command Design
@@ -23,7 +23,7 @@ case-ready の公開契約（入出力、副作用、安全性、承認境界、
 - 保存実体: REQ / Decision / Design の保存は req-file-manager、decision-file-manager、design-file-manager、artifact-validation へ委譲する。case-ready 自身は保存手続きを実装しない
 - canonical 再取得: merge 後に canonical Definition を再取得し、以降の処理基準とする
 - 実行構造確定: 連結成分、3軸判断、単独根の Standard 化、上限遵守、構成検証、Wave ファイル重複前置検出（詳細は epic-wave-model Design）
-- 検証対応要否ゲート: 未分類行残存時は ready へ遷移させない
+- 検証対応要否ゲート: 未分類行残存時は ready へ遷移させない。横断依存検査（canonical Definition と未クローズ Case 群の同一パス重複・共有領域未登録行重複需要の検出、警告+HITL 3選択肢、警告は ready 遷移判定を変更しない。REQ-061-029〜031）
 - クリーンアップ: 成功後に draft / RU を削除する（blocked / failed / 中断時は保持）
 
 ## 停止条件

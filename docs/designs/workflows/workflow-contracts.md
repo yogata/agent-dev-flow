@@ -2,7 +2,7 @@
 title: ワークフロー契約（横断）
 status: accepted
 created: 2026-06-21
-updated: 2026-09-05
+updated: 2026-09-15
 ---
 <!-- ADF-COVERS(implementation): REQ-003-021, REQ-003-022, REQ-003-023, REQ-003-055, REQ-003-056 -->
 <!-- ADF-COVERS(implementation): REQ-005-001, REQ-005-002, REQ-005-003, REQ-005-004, REQ-005-025, REQ-005-026, REQ-005-027, REQ-005-028 -->
@@ -403,3 +403,19 @@ delegation-unavailable）から判別する。
 OpenCode の実行履歴と ADF の識別情報の対応付けは、実行後の分析において OpenCode セッションデータと ADF 側
 識別情報を結合して行う。識別情報の一部が取得できなくても observability gap として分析時に扱い、ADF workflow
 の実行結果とは分離し、workflow を停止させない（REQ-048-004）。
+
+## Case 投入時の横断依存検査契約
+
+case-open（STEP-5 冪等確認、REQ-030-012〜014）と case-ready（検証対応要否ゲート、REQ-061-029〜031）は、
+2 以上の Case 間で変更対象成果物の重複依存を検出する横断検査を実行する。本節は両工程の横断検査の共通契約を定める。
+
+- 検出条件: (a) 2 以上の未クローズ Case の変更対象成果物の同一パス重複、(b) 2 以上の Case の対象要件行が同一共有領域（検証対応要否カタログ、AUTOGEN 対象索引、対応宣言領域等）への未登録行を含む重複需要
+- 検出源: case-open は draft の artifact_actions、case-ready は canonical Definition（execution contract）。(b) の検出では共有領域を構成する正規成果物実ファイルの現行登録状態を機械的に読み取る
+- 検出源の取得に失敗した場合は比較を省略せず、検出不能として報告する
+- 検出時の挙動はエラーではなく警告とし、投入者（HITL）へ (1) 先行整備 Case の切り出し提案、(2) 既存 Case への登録責務の割り当て、(3) このまま並行投入、の選択肢を提示する。整備 Case を自動作成せず、マージ順序を自動決定しない
+- 冪等再実行時も警告を再提示する
+- 検査は合意済み宣言の機械的比較に限定され、一般的な変更影響探索・依存関係探索（REQ-021-014）に該当せず、対象範囲を再決定せず、警告のみで Root Case の確立や ready 遷移を自動阻止しない（REQ-021-024、REQ-061-023、REQ-061-031）
+- Epic 経路の委譲境界: Wave 内重複（同一 Epic 配下の子 Issue 間）の正規所有は epic-wave-model Design の Wave 構成重複前置検出契約である（REQ-061-019、REQ-035-012）。Epic を構成する投入では本検査側から前置検出へ委譲し、二重検査としない。委譲条件の判定キーは draft の構成ヒント（case_open_hints）とし、最終 Epic 確定（case-ready 責務）を判定キーとしない。Epic をまたぐ Case 間の重複は本検査が検出対象とする
+- スキャン範囲は未クローズ Case 群とし、時間窓による狭域化はしない
+- 共有領域は「複数 Case から新規行登録需要が発生し得る共有カタログ・索引・宣言領域」として一般化して定義し、配布物は特定プロジェクトの具体パスを参照しない。プロジェクト側の解決は project-extensions の既存の拡張点（workflow-extension の context 等）で行う（REQ-002）
+- case-auto 配下では警告検出時の判断は decision_context による親判断解決（DEC-008）へ委譲する
