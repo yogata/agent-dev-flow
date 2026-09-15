@@ -1,6 +1,8 @@
 # Design ライフサイクル適用
 
-本資料は SKILL.md「Design ライフサイクル適用」「ファイル操作モード」セクションの補完であり、Design frontmatter の `status`（`draft` / `accepted` の2値）を Design 操作（CREATE/APPEND/UPDATE）で適用する規則を記述する。
+<!-- ADF-COVERS(implementation): REQ-021-026 -->
+
+本資料は SKILL.md「Design ライフサイクル適用」「ファイル操作モード」「ADF-COVERS 宣言ブロックの更新確認（design-save 時）」セクションの補完であり、Design frontmatter の `status`（`draft` / `accepted` の2値）を Design 操作（CREATE/APPEND/UPDATE）で適用する規則と、design-save 工程での ADF-COVERS 宣言ブロック更新確認手順を記述する。
 
 ## status 値と遷移契機
 
@@ -51,3 +53,14 @@ frontmatter 完全性（4フィールド）:
 
 既存 Design へ追記（APPEND/UPDATE）の場合は一覧表の `status` 列のみ更新し、行を追加しない。
 Design のドメイン間移送が発生した場合は旧ドメイン表から行を削除し、新ドメイン表へ登録する。
+
+## ADF-COVERS 宣言ブロックの更新確認（design-save 時）
+
+design-save 工程（Design 本体へ要件を反映する保存工程）は、当該 Design ヘッダの既存 ADF-COVERS 宣言ブロックについて今回の反映による更新要否（実装対応・検証対応の過不足）を確認対象に含める。
+確認結果に基づく宣言ブロックの更新を要する場合、保存工程の一部として反映する。
+
+確認手順:
+
+1. **確認対象の特定**: 保存対象 Design のヘッダ（frontmatter 直後）に既存の `ADF-COVERS` 宣言ブロックが存在するか確認する。宣言ブロックが存在しない場合（新規 Design の CREATE 等）、既存宣言ブロックの更新確認は対象とならず、対応宣言の付与は実装担当工程（case-run の対応宣言）へ委ねる
+2. **更新要否の判定**: 今回の反映で追加・更新される Design 節の内容が、既存宣言ブロックの実装対応・検証対応の範囲に対して過不足（新たな対応関係の宣言追加要否、既存宣言の対応範囲からの逸脱）とならないか確認する
+3. **保存工程内での反映**: 更新を要すると確認した場合、宣言ブロックの追加・更新を Design 本文の保存と同一の保存工程の一部として反映する。保存後の後追い修正工程を別途設けない
