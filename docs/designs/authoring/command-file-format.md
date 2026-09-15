@@ -22,6 +22,14 @@ AgentDevFlow が管理する command 定義ファイルの Markdown 構成標準
 - **対象**: `src/opencode/commands/agentdev/*.md`（AgentDevFlow 配布 command 原本）、`.opencode/commands/repo/*.md`（repo-local command）
 - **対象外**: AgentDevFlow 適用プロジェクト（consumer project）の独自 command
 
+## frontmatter 標準形式
+
+配布 command 定義ファイルの frontmatter は、開始デリミタ「---」の直後に「description:」を置き、先頭に空行を挟まない。
+全配布 command（19ファイル: 18 command + README）でこの形式を一致させる。
+frontmatter 先頭空行は形式的逸脱として扱い、新規・変更 command の保存時確認で検出する。
+一般の frontmatter 規約（ID 体系・命名規則等）は `../foundations/patterns.md` が所有する既存の責務分界を維持する。
+frontmatter 先頭空行検出の機械検出 route は新設しない（単発の形式的逸脱に対する恒久検査 route の新設は過剰であり、決定的破損検査クラス〔content-corruption-checker〕が frontmatter 破損を意図的に対象外とする設計を維持する。再発時の検出は inspect-skills 構造診断と保存時形式確認に委ねる）。
+
 ## Command 構造
 
 Command は公開interface（入出力契約・ガードレール）と workflow dispatch を中心とする
@@ -171,5 +179,5 @@ Step 番号の不一致は違反として扱わず、公開契約の欠落、相
 
 ## 他 Design との関係
 
-- **`patterns.md`**: frontmatter 規約、テンプレート命名規則を担当。本 Design は command 本文構造を担当し、frontmatter 規約は `patterns.md` を参照する。
+- **`patterns.md`**: 一般の frontmatter 規約、テンプレート命名規則を担当。本 Design は command 本文構造と配布 command 固有の frontmatter 標準形式（開始デリミタ直後に description、全 command 形式一致）を担当し、一般の frontmatter 規約は `patterns.md` を参照する。
 - **`docs/designs/commands/*.md`**: 個別 command Design の位置づけを維持する。横断フォーマット規約は本 Design に集約し、個別 command Design は公開契約の各対応付け軸を定義する。
