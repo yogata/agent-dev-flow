@@ -84,3 +84,35 @@
 - **想定反映先**: agentdev-quality-gates（bun test 実行形態契約の運用注記）、agentdev-git-worktree（worktree 構造的制約の補足）
 - **関連**: Case #2867、PR #2869、.opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md（依存パッケージ前置）
 - **タグ**: `#bun` `#worktree` `#dependency` `#test-environment`
+
+## 配布物（.md）へのスクリプト呼出パスと要件行参照は最初から投影先形式・意味参照で書く
+
+- **問題事象**: PR #2872（Case #2870）の実装で、配布物本文に `src/opencode/` 直参照のスクリプト呼出パス 2 件（IR-055 strict 違反）と散文中の具体 REQ ID 8 件（配布依存境界 concrete-id 違反）が入り、2 段階で検出・修正した
+- **発生局面**: 実装（case-run 検証。IR-055 delta check と配布依存境界 最終 gate。Case #2870、PR #2872）
+- **検知方法**: check_integrity 直接実行（IR-055 delta: 新規違反 2 件）と check_distribution_boundary --profile source（concrete-id 違反 8 件相当）の実行結果
+- **根本原因**: 新規配布スクリプト（case-open scripts/ エンジン）を配布物から参照する際、リポジトリ内の物理パス（src/opencode/）をそのまま記載した。配布物は投影先（.opencode/）を正とする
+- **自律対応内容**: 呼出パスを投影先 `.opencode/` 形式へ修正、散文中の REQ ID を意味参照（Design・REQ 名）へ修正し 0 違反化。具体 ID は ADF-COVERS 宣言行に限定
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（記述慣行の明確化。IR-055 と配布依存境界 Design の既存契約どおり）
+- **横展開観点**: 配布スクリプトを新規追加する workflow skill では必ず発生し得る。検証 gate での検出・修正は可能だが、最初から慣行どおりに書くことで修正コストを回避できる
+- **再発条件**: 配布物に新規スクリプトの参照を追加する場合に毎回発生し得る
+- **予防策候補**: (1) 呼出パスは投影先形式で書く、(2) 要件行は意味参照で記述し具体 ID は ADF-COVERS 宣言行に限る、(3) workflow_body_contract.test.ts のような具体パス・具体 ID 回帰ガードを新規配布物に付ける
+- **想定反映先**: agentdev-skill-authoring（配布物記述慣行）、agentdev-workflow-case-run（事前検査の観点）
+- **関連**: Case #2870、PR #2872、IR-055、配布依存境界 Design
+- **タグ**: `#distribution` `#ir-055` `#concrete-id` `#authoring`
+
+## worktree 内 checker 実行は git 管理実体と非管理配置で経路が異なる（非管理配置スクリプトは main root から --root 明示）
+
+- **問題事象**: case-close の検証で worktree 内に `.opencode/skills/agentdev-traceability/` が存在せず（非 git 管理配置）、worktree root cwd からの bun 実行が Module not found で失敗した
+- **発生局面**: 完了処理（case-close STEP-2 トレーサビリティ独立再検査。Case #2870）
+- **検知方法**: bun 実行の error 応答（Module not found）。worktree 内 .opencode/skills/ の ls で repo-agentdev-integrity のみ投影を確認
+- **根本原因**: .opencode/skills/ 配下のスクリプトは git 管理実体（repo-agentdev-integrity 等）と main worktree 側のみの配置（agentdev-traceability 等）が混在する。worktree には git 追跡ファイルのみ存在する
+- **自律対応内容**: main worktree root から `bun .opencode/skills/agentdev-traceability/scripts/src/check.ts --root <worktree絶対パス> --req ...` の形態で実行し、検査対象を PR HEAD worktree に明示して合格確認
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（実行形態の運用知識。配布依存境界 最終 gate の「PR HEAD の worktree を検査する」契約と整合）
+- **横展開観点**: worktree 内で checker を実行する前に対象スクリプトが git 管理実体かを確認する。git 管理実体（repo-agentdev-integrity）は junction 伝播で worktree 内から直接実行可能、非管理配置は main root 起動 + --root 明示が実行形態
+- **再発条件**: case-close / case-run で worktree 内検証に非管理配置スクリプトを使う場合に毎回発生
+- **予防策候補**: (1) checker 実行手順にスクリプト所在（git 管理実体 / 非管理配置）の確認ステップ追加、(2) --root 明示形態を各 checker 実行契約に明記
+- **想定反映先**: agentdev-workflow-case-close（STEP-2/3 checker 実行手順）、agentdev-traceability（実行前提の補足）
+- **関連**: Case #2870、PR #2872、.opencode/skills/ の配置（git 管理実体と junction）
+- **タグ**: `#worktree` `#checker` `#execution-path`
