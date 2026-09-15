@@ -1,6 +1,6 @@
 # epic-wave workflow: Epic Wave 実行（epic-wave）
 
-<!-- ADF-COVERS(implementation): REQ-031-027, REQ-035-012 -->
+<!-- ADF-COVERS(implementation): REQ-031-027, REQ-031-029, REQ-031-030, REQ-035-012 -->
 
 > 本 reference は `agentdev-workflow-case-run` SKILL.md の epic-wave workflow 詳細である。
 > `case-run #epic` 受領時に現在 ready な Wave の子Issue を並列実行する制御（STEP-W1〜W5）を所有する。
@@ -177,9 +177,9 @@ Wave 内子Issue を実行担当サブエージェントへ最大5件並列委�
 
 ### Procedure
 
-- 全委譲完了を待機し、各子Issue の result を4状態契約（delegation-and-result.md STEP-S5 と同一処理）で収集する
+- 全委譲完了を待機し、各子Issue の委譲応答を委譲応答の3点ゲート（4状態 result・commit hash・PR URL の必須検査、不足時の再開。要約で完結した completed-pr 扱い禁止）を含む4状態契約（delegation-and-result.md STEP-S5 と同一処理）で収集する
 - **partial result**: 一部の子Issue が blocked / failed / delegation-unavailable でも、完了済み子Issue の PR は有効として保持する。blocked/failed 子Issue を次 Wave へ進めない、`completed` に上書きしない
-- **child task recovery**: 子 task 異常終了・bg task 破棄検知時は worktree の git status と残留変更で帰属を確認し、個別に blocked / failed へ分離する。帰属が確認できない場合は強制 commit せず当該子 task を blocked とする
+- **child task recovery**: 子 task 異常終了・bg task 破棄検知時は worktree の git status と残留変更で帰属を確認し、個別に blocked / failed へ分離する。帰属が確認できない場合は強制 commit せず当該子 task を blocked とする。background 委譲の起動直後消失を検知した場合は、durable state（worktree の git status、PR 存在、Issue コメント）で帰属を確認し、実行未試行と判定した子Issue は同期実行による再委譲で回復する（実行中断と判定した場合の継続判断も当該 durable state に基づく。同期実行への切替は消失検知時のフォールバックに限定し、並列委譲〔最大5件〕を維持する）
 - **compaction 復元**: 会話コンテキスト喪失後は、子 task 状態を Harness から復元し、完了済み子Issue 状態を durable domain state（PR・Issue コメント・Epic Issue 本文）と再構成して fan-in 判定を行う
 
 ### Result
