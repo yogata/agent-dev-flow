@@ -2,14 +2,16 @@
 
 <!-- 元コマンド: learning-promote.md -->
 <!-- 抽出日: 2026-06-07 -->
+<!-- ADF-COVERS(implementation): REQ-057-026 -->
 
 learning-promote コマンドの Steps における判定ロジック（旧フォーマット正規化、問題クラス分類、8軸評価、廃棄判定、HITL承認）を定義する。
 
 ## Phase 2: 内部正規化（旧フォーマット正規化）
 
-全エントリの読込と旧フォーマット正規化:
+読込と旧フォーマット正規化（2フェーズ読込）:
 
-- inbox.md + deferred.md から全エントリをパース
+- inbox.md と deferred.md の読込は、プールサイズに依存しない突合スコープで行う。第1フェーズのインデックススキャンでエントリ一覧を取得し、第2フェーズで判定対象の候補を絞り込む
+- 候補0件または判定が曖昧なエントリは、全面読みフォールバックの対象とする
 - **旧フォーマット正規化**を必ず実施。スキーマとマッピングは `agentdev-learning-pipeline` skill の `references/inbox-and-evaluation-schema.md`（Inbox Entry Schema）を参照
 - 正規化は解析時のみ適用し、元ファイル（inbox.md/ deferred.md）の内容は書き換えない
 - 旧フォーマットパース失敗時 → 当該エントリをスキップし警告を出力。処理は継続

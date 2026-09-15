@@ -3,7 +3,7 @@ name: agentdev-workflow-templates
 description: Manages Issue/PR description and comment templates, selection rules, and section conventions for the agentdev command pipeline. USE FOR: determining which template to use for a given situation, reading template files, understanding template section structure. DO NOT USE FOR: workflow phase definitions, requirement analysis, architecture decisions.
 ---
 
-<!-- ADF-COVERS(implementation): REQ-032-024 -->
+<!-- ADF-COVERS(implementation): REQ-032-024, REQ-057-026 -->
 
 # Issue テンプレート管理スキル
 
@@ -18,8 +18,8 @@ agentdev系コマンドで使用するIssue/PR本文、コメントテンプレ�
 |---|---|---|---|
 | `issue_desc_feature.md` | 機能追加、変更 | case-open | feature |
 | `issue_desc_bug.md` | バグ修正 | case-open | bugfix |
-| `issue_desc_epic.md` | Epic Issue本文 | case-open | feature (Epic) |
-| `issue_desc_child.md` | 子Issue本文 | case-open | feature (Epic) |
+| `issue_desc_epic.md` | Epic Issue本文 | case-ready | feature (Epic) |
+| `issue_desc_child.md` | 子Issue本文 | case-ready | feature (Epic) |
 
 ### コメントテンプレート
 
