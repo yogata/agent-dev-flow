@@ -42,6 +42,20 @@ unchecked 項目を達成判定する。
 - 今回の完了条件に含まれる未対応事項を intake に逃がして完了扱いにしない（case-close 不変条件）。
 - スコープ外項目は `> ℹ️ 別途確認: {項目名}` 形式に変換（case-run STEP-S5 の責務）。
 
+#### verify-only PR と verify-only closure の証拠ソース契約
+
+完了条件評価の証拠ソースは、変更の有無に応じて次の2経路を区別する。
+
+verify-only PR（実装差分0件、検証のみ）の場合、完了条件評価は PR 本文の verify-only 根拠欄（実装差分を含まない理由、根拠成果物または commit、検証対象、検証結果）を証拠ソースとして認める。
+verify-only PR の判定基準（PR 変更ファイル一覧が空配列、根拠欄の記載十分性、受け入れ基準の検証充足）は case-close 側の規則が定め、QG-4 は当該判定を経た PR のみを PASS とする。
+
+verify-only closure（PR も carrier commit も存在しない Issue 完了）の場合、完了条件評価は case-run が記録した SSoT コメント（Issue コメント）の実行コマンド列と検証結果を証拠ソースとして認める。
+verify-only closure では SSoT コメントが存在しない場合、または検証結果の記載が欠落する場合は完了扱いとしない。
+verify-only closure の判定条件（execution contract での事前確定または実行結果による変更不要確定）は case-run・case-close の各 command Design が定め、QG-4 は当該判定を経た完了のみを PASS とする。
+
+carrier commit（差分捏造）による verify-only PR 作成の禁止は case-run の実行契約（command Design）が所有する規則であり、本 reference は引用形式で言及するにとどめる。
+docs_chore 特例フロー（main 直接 commit が存在する PR なし完了）は、直接 commit 内容で QG-4 を検証する別経路であり、verify-only PR・verify-only closure のいずれの証拠ソース契約とも区別する。
+
 ### 2. CI 通過確認
 
 PR の CI が全て通過しているか。
