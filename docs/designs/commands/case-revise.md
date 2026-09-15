@@ -1,6 +1,6 @@
 ---
 title: case-revise Design
-status: draft
+status: accepted
 created: 2026-09-14
 updated: "2026-09-14"
 ---
@@ -31,3 +31,7 @@ case-revise の公開契約を定義する。case-revise は req-define で再�
 ## 冪等性
 
 同じ再合意内容に対応する既存 Amendment PR を重複生成しない。中断済み成果物は巻き戻さない。
+
+## 対応記録
+
+- 2026-09-15: status を draft から accepted へ昇格（REQ-032-025 の評価契約に従う棚卸し評価の結果）。昇格根拠: REQ-062 対応 Case #2810（closed）・PR #2818（merged）における実装・検証との整合確認に基づく昇格であること、および見送り記録が存在しないことを確認済み（RU-0015、Case #2848）。

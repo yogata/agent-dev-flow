@@ -1,6 +1,6 @@
 ---
 title: case-ready Design
-status: draft
+status: accepted
 created: 2026-09-14
 updated: "2026-09-14"
 ---
@@ -36,3 +36,7 @@ case-ready の公開契約（入出力、副作用、安全性、承認境界、
 ## 冪等性
 
 再実行時は merge 済み Definition、既存 Child Issue、既存 Wave / 依存構造、Decision 受理記録を再利用し、不足分のみ処理する。merge は巻き戻さない。
+
+## 対応記録
+
+- 2026-09-15: status を draft から accepted へ昇格（REQ-032-025 の評価契約に従う棚卸し評価の結果）。昇格根拠: REQ-061 対応 Case #2809（closed）・PR #2817（merged）における実装・検証との整合確認に基づく昇格であること、および見送り記録が存在しないことを確認済み（RU-0015、Case #2848）。
