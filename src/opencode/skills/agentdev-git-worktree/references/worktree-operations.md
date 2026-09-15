@@ -1,3 +1,4 @@
+<!-- ADF-COVERS(implementation): REQ-018-002 -->
 # Worktree 作成、削除、ブランチ操作の詳細手順
 
 ## 目次
@@ -99,6 +100,15 @@ worktree 環境の運用落とし穴に対する標準運用ガイド（L-003, L
 
 worktree 内では `.opencode/skills/` の junction が再作成されないため、junction 切断時に `.opencode/` 経由参照が失敗する。
 整合性検査、スキル参照は、配置先（`.opencode/`）ではなく source 側ツリー（SoT パス）を直接参照すること。
+
+### git 管理外実体の未投影に起因する運用
+
+worktree へは git 管理外の実体（`node_modules`、`.opencode/skills/` の junction 等）が投影されない。
+このため、worktree 内では次の3運用を守る。
+
+1. **SoT パス起点実行**: 構造系テスト、整合性検査、スキル参照等の実行は source 側ツリー（SoT パス）を起点とする。背景と手順は「source 側ツリー直接参照（SoT パス）」を参照する
+2. **src 側のみ編集**: 編集対象は git 管理対象の source 側ツリー（`src/` 配下）に限定する。配置先（`.opencode/`）配下の投影実体は git 管理外であり、編集しても main へ反映されず、install による再生成で失われる。gitignore 対象ファイルを参照・編集する場合の扱いは「gitignore 対象ファイル受け渡し不可」を参照する
+3. **依存整備**: `node_modules` は gitignore 対象のため worktree へ未伝播である。bun test・tsc 型検証の実行前に依存整備を前置する。整備手段（対象ディレクトリでの `bun install`、または main 側 `node_modules` への junction 作成。検証後は junction エントリのみを削除し、参照先の main 側 `node_modules` は破壊しない）の詳細は「bun test 実行の環境前提」を参照する
 
 ### isInsideWorktree 適用
 
@@ -247,6 +257,20 @@ worktree 内の未追跡ファイル（実行時作業領域配下の一時フ�
 ```bash
 git worktree remove ".worktrees/{N}-{type}"
 ```
+
+**削除前のシェル cwd ハンドル解放**: 永続シェルセッションの `workdir` が削除対象 worktree パス（またはその配下）を指している場合、cwd ハンドルがディレクトリを掴んだままとなり、`git worktree remove` の成功後も空ディレクトリが残留する（Windows 環境で顕著）。
+削除を実行する前に、削除操作に使用するセッションの `workdir` をリポジトリルート（`.worktrees/` を含まないパス）へ変更し、当該 worktree パスに対する cwd ハンドルを解放してから削除を実行する。
+
+**解放不能時の削除完了判定**: 削除実行セッション以外のシェルセッションが worktree パスを `workdir` に使用しており解放できない場合、ディレクトリの物理削除を断念し、git 管理状態のみで削除完了を判定する。
+削除完了の判定基準は次の2点である。
+
+1. `git worktree list` の出力から当該 worktree が消滅していること
+2. 当該 worktree のローカルブランチ（`{type}/issue-{N}`）が削除されていること
+
+上記を満たす場合は削除完了として扱う。
+worktree パスの空ディレクトリが残留している場合は、残留ディレクトリの警告を記録する（例: `WARN: worktree directory remains at {path}: cwd handle held by another session. Git-managed state is clean.`）。
+残留ディレクトリの実削除は、当該セッション終了後またはハンドル解放後の手動削除に委ねる。
+本完了判定は `git worktree remove` 自体の失敗リトライ（後述の Permission denied 時のリトライ）を代替するものではなく、コマンド成功後にディレクトリが残留した場合の完了判定にのみ適用する。
 
 **Permission denied 時のリトライ**: ファイルハンドル解放待ちのため短い待機を挟んでリトライ。
 最大3回。
