@@ -7,6 +7,7 @@ updated: 2026-09-07
 <!-- ADF-COVERS(implementation): REQ-002-033, REQ-002-034 -->
 <!-- ADF-COVERS(implementation): REQ-003-001, REQ-003-002, REQ-003-003, REQ-003-004, REQ-003-006, REQ-003-011, REQ-003-012, REQ-003-014, REQ-003-020 -->
 <!-- ADF-COVERS(implementation): REQ-011-011, REQ-011-012, REQ-011-017 -->
+<!-- ADF-COVERS(implementation): REQ-017-020 -->
 <!-- ADF-COVERS(implementation): REQ-048-007, REQ-048-014 -->
 
 # サブエージェント委譲契約（横断）
@@ -73,6 +74,9 @@ output_contract の status 値（pass | warn | fail | partial）は委譲時最�
 - 委譲 prompt に含める structured_context の作業内容・purpose は、委譲先 Issue 本文の概要または正規 REQ から抽出する。
   親セッションの会話コンテキスト由来の推定・波及解釈を注入しない（REQ-017-019）。
 - 委譲 prompt 生成時に、対象 Issue 番号と対象成果物パスの突合を行い、不一致の場合は委譲を開始しない。
+- case-run / case-auto は、正典から導出可能な補助情報（対象一覧・操作サマリ等）を委譲 prompt へ含める場合、当該補助情報を正典と機械突合可能な形式で記述する。対象集合（対象ファイル、対象 REQ、対象成果物パス等）は正典から機械的に列挙できる形を維持する（REQ-017-020）。
+- 委譲 prompt 生成時に、正典から導出した補助情報を正典と突合する。突合で不一致を検出した場合、当該補助情報を委譲 prompt から除去するか、正典に一致する内容へ置換してから委譲を開始する。
+- 委譲を受けた実行側は、補助情報と正典の不一致を検出した場合、正典を優先し、補助情報を根拠とした対象判断・本文更新・実行継続を行わない。不一致の検出自体を親エージェントへ報告する（REQ-017-020）。
 
 ## 委譲種別（delegation_type 参考分類）
 

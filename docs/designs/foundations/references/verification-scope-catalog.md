@@ -151,6 +151,7 @@ Issue #2362 の移行作業（棚卸し (a')）で全現行要件行を判定し
 - REQ-017-001..REQ-017-016: execution contract の Issue 埋め込み、品質統制の適用、blocked 遷移、runtime-only 判定の保持の実行時振る舞い
 - REQ-017-018: Issue 監査値の計測基準（基準 commit または時点）の記録と第三者による鮮度検証可能性。Case Issue のテスト戦略とレビューで検証
 - REQ-017-019: 委譲 prompt 生成側の structured_context の Issue 本文 SSoT 抽出制約と Issue 番号×対象成果物パス突合。委譲契約 Design・配布物 references との整合確認とレビューで検証
+- REQ-017-020: 委譲 prompt 生成側の正典導出補助情報の機械突合可能形式記述と、実行側の正典優先と親への不一致報告。委譲契約 Design との整合確認とレビューで検証
 
 ### REQ-021（トレーサビリティのワークフロー統合）
 
