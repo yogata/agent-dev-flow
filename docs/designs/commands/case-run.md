@@ -161,7 +161,7 @@ v2:ADR-0128 Decision #3 に基づく。
 4. 子Issue の worktree 作成（worktree 作成と precondition gate を各子Issue について実行）
 5. 各子Issue を実行担当サブエージェントに並列委譲する（adapter protocol: `agentdev-case-run-execution-adapter`）。
  委譲の起動手段、実行制御パラメータは AGENTS.md および references/<harness>.md に配置する（REQ-002-002）。
- 最大5件同時起動
+ 最大5件まで並列委譲（起動間隔10秒、epic-wave-model Design「並列起動の間隔」参照。同一Tool一括ブロックでの同時起動は行わない）
 6. 全委譲完了待機
 7. 結果収集（各子Issue の result（completed-pr / blocked / failed / delegation-unavailable）を収集）
 8. return（収集結果を報告して return）。Wave 境界（PR マージ）は case-close の責務

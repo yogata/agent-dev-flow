@@ -77,7 +77,7 @@ case-auto workflow は次の8 STEP で構成する。
 
 - 各 orchestration stage を前 stage 完了後に開始する。stage 1 と stage 3 を直列集約ポイントとし、main への push、capture、commit を並列実行区間の外で処理する
 - case-run internal lifecycle（state machine、self-healing loop 等）を複製せず case-run 側の正規所有に委譲する
-- stage 2 の同時起動数は固定値（最大5件、実行安全境界）。順次実行はフォールバック時にのみ許可しフォールバック理由を完了報告に含める
+- stage 2 の同時起動数は固定値（最大5件、実行安全境界）。順次実行はフォールバック時にのみ許可しフォールバック理由を完了報告に含める。並列起動時は委譲起動ごとに10秒の起動間隔を置き、同一Tool一括ブロックでの複数起動発行は行わない（epic-wave-model Design「並列起動の間隔」）
 - case-ready 完了後（stage 1 と stage 2 の間）にクリーンアップ検証ゲート（ドラフト残存、RU 残存の検証）を実行する。残存を検出した場合は停止する（case-auto 実行契約）
 
 ## 下位 Workflow Skill 連携（上位 orchestrator）

@@ -265,6 +265,13 @@ case-open、case-auto、case-run で参照される並列上限と停止条件�
 
 3つの「5件」は別文脈であり、混同しない。
 
+#### 並列起動の間隔
+
+上記2文脈（case-run Wave 内子 Issue 並列委譲、case-auto orchestration stage 2 同時起動）で複数のサブエージェントを起動する場合、起動バーストによる実行基盤・モデル provider への瞬間的なリクエスト集中を抑えるため、委譲起動と委譲起動の間に10秒の起動間隔を置く（固定値、実行制御パラメータ）。
+最初の1件は直ちに起動し、以降の各委譲起動は10秒の待機後に発行する。
+同一のTool呼び出し一括ブロックで複数の委譲起動を発行せず、起動→待機→起動を逐次発行する（1ブロック1委譲起動）。
+間隔の実現手段（待機コマンド等）は harness 責務とし、`agentdev-case-run-execution-adapter` スキルの harness 委譲実装ノート（`references/harness-delegation.md`）に配置する（REQ-011-018、REQ-002-002）。
+
 #### case-open 停止条件
 
 case-open は以下の場合に限り GitHub Issue 作成前に停止する。
