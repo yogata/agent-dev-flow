@@ -130,3 +130,57 @@
 - **タグ**: #worktree #bun-test #zod #junction
 
 ---
+
+## 2026-09-16: Draft Definition PR の draft 解除担当が case-open と case-ready の間で未定義のまま blocked 停止した
+
+- **問題事象**: case-open が Draft Definition PR を作成し、case-ready が merge 責務を持つ構成のなかで、draft 解除（Ready for review 化）を担当する工程がどの workflow にも定義されておらず、case-ready の `pr_merge` が HTTP 405 (Pull Request is still a draft) で失敗して stage 1b が blocked 停止した。
+- **発生局面**: case-auto stage 1b case-ready（Case #2895、Definition PR #2896。停止記録は Issue コメント 5697968508、2026-09-16）。
+- **検知方法**: `agentdev_gh pr_merge` の HTTP 405 エラー（merge 不能原因が Draft 状態）。
+- **根本原因**: Definition PR の作成（case-open）と merge（case-ready）の工程分割に対し、draft 解除の責務割当が不在のままだった。
+- **自律対応内容**: 迂回操作（raw `gh pr ready`）は agentdev-gh-write-guard 違反のため実行せず、blocked 停止して resume_command（case-ready）を記録。ユーザー判断で PR を Ready for review 化した後、冪等再実行契約で再開し merge 完了。
+- **ユーザー確認の有無**: あり（PR #2896 の Ready for review 化をユーザーが実施）。
+- **Decision/REQ/spec影響**: なし（本学びの記録のみ。責務定義の更新は追跡Issue候補）。
+- **横展開観点**: Draft PR を作成する工程と merge する工程が分かれている全 workflow で同種の責務空白が発生し得る。draft 解除手段が整備されるまで、Draft Definition PR を含む Case は同条件で blocked になり得る。
+- **再発条件**: case-open が Draft Definition PR を作成し、かつ draft 解除の正規手段が整備されない限り毎回発生。
+- **予防策候補**: (a) case-open での非 Draft 作成、(b) case-open または case-ready への draft 解除責務の定義、(c) Custom Tool への draft 解除操作追加、のいずれかの整備。
+- **想定反映先**: case-open / case-ready workflow 定義（REQ-034 系）、agentdev_gh 操作カタログ。
+- **関連**: Issue #2895（Ref）、PR #2896（Refs）、Issue コメント 5697968508（停止記録）。
+- **タグ**: #draft-pr #responsibility-gap #case-ready #blocked
+
+---
+
+## 2026-09-16: Custom Tool agentdev_gh に Draft PR の draft 解除操作が存在しない
+
+- **問題事象**: Custom Tool `agentdev_gh` の操作カタログに Draft PR の draft 解除（ready for review）操作が存在しない。`pr_update` は draft フィールド非対応、`pr_merge` は Draft PR に対して HTTP 405 で失敗するため、Tool 経由では Draft PR を merge 可能状態へ遷移できない。
+- **発生局面**: case-auto stage 1b case-ready（Case #2895、Definition PR #2896）。
+- **検知方法**: HTTP 405 エラーの原因分析と agentdev_gh 操作カタログ（issue/pr 系操作一覧）の確認。
+- **根本原因**: Tool 操作カタログが PR ライフサイクルの draft→ready 遷移をカバーしていない。
+- **自律対応内容**: Tool カバレッジ外と判定し、正規手段での解消を断念して blocked 停止（解消はユーザーの GitHub UI 操作）。
+- **ユーザー確認の有無**: あり（ユーザーが Ready for review 化を実施）。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: Tool カタログは実行 workflow が必要とする GitHub 操作を網羅している前提で設計されているが、工程間のハンドオフ境界（作成と merge の分離）で初めて必要になる操作が欠落し得る。同様の「特定工程でのみ必要な操作」の欠落は他の状態遷移（reopen、label 操作等）でも再点検の価値がある。
+- **再発条件**: Draft PR を Tool 経由で merge する工程が存在し、draft 解除操作が追加されない限り再発生。
+- **予防策候補**: `agentdev_gh` へ `pr_ready`（draft 解除）操作の追加。追加時は agentdev-gh-write-guard の許可リスト同期も要確認。
+- **想定反映先**: agentdev_gh（Custom Tool）の操作カタログ、REQ-006 系の Tool 操作契約。
+- **関連**: Issue #2895（Ref）、PR #2896（Refs）、Issue コメント 5697968508。
+- **タグ**: #custom-tool #github-api #coverage-gap #pr-lifecycle
+
+---
+
+## 2026-09-16: agentdev-gh-write-guard 下では Tool カバレッジ外の GitHub side-effect に正規手段がなく raw CLI 迂回は契約違反になる
+
+- **問題事象**: draft 解除のような Custom Tool カバレッジ外の GitHub side-effect が必要になった際、raw `gh pr ready` は agentdev-gh-write-guard により機械ブロックされ、エージェントが単独で実行できる正規手段が存在しない。迂回実行はガード契約違反のため選択できない。
+- **発生局面**: case-auto stage 1b case-ready（Case #2895、Definition PR #2896）。
+- **検知方法**: raw `gh pr ready` 実行前の guard 判定（機械ブロック）。
+- **根本原因**: write-guard は GitHub write 系を Custom Tool 経由に限定する安全機構であり、Tool カタログの網羅性が前提となっている。カタログ外の write は「安全に停止する」挙動が正（意図された設計）。
+- **自律対応内容**: 迂回せず blocked 停止してユーザー判断へエスカレーション（resume_command 記録）。再開後の収束は冪等再実行契約で達成。
+- **ユーザー確認の有無**: あり（ユーザー操作で解消）。
+- **Decision/REQ/spec影響**: なし（ガード契約の正常動作の確認）。
+- **横展開観点**: blocked → ユーザー操作 → 冪等再開の経路が期待どおり機能した実例。Tool カタログ拡張の要否判断は、ガードの安全側設計（fail-closed）を維持したまま行うべき。
+- **再発条件**: Tool カタログ外の GitHub write 操作が必要になる局面が続く限り、同様の blocked 停止が発生し得る（ガード正常動作として）。
+- **予防策候補**: workflow 定義時に必要な GitHub 操作を洗い出し、Custom Tool カタログとの差分を事前確認する運用。
+- **想定反映先**: agentdev-gh-write-guard の運用知識、REQ-006 系 Tool 操作契約、workflow 定義時の操作洗い出し観点。
+- **関連**: Issue #2895（Ref）、Issue コメント 5697968508。
+- **タグ**: #write-guard #safety #fail-closed #escalation
+
+---
