@@ -2,7 +2,7 @@
 title: case-ready Design
 status: accepted
 created: 2026-09-14
-updated: "2026-09-15"
+updated: "2026-09-17"
 ---
 
 # case-ready Command Design
@@ -13,13 +13,13 @@ case-ready の公開契約（入出力、副作用、安全性、承認境界、
 
 ## 公開 interface
 
-- 入力: Root Case（Issue 番号または URL）、関連する req_draft（存在する場合）、Draft Definition PR（存在する場合）
+- 入力: Root Case（Issue 番号または URL）、関連する req_draft（存在する場合）、Definition PR（存在する場合）
 - 出力: ready 状態の Root Case、確定済み execution contract、実行構造（Standard は Root Case 単一 execution unit、Epic は Child Issue と Wave / 依存構造）
 - 副作用: Definition PR の merge、REQ / Decision / Design の保存（Capability Skill 委譲）、Decision の accepted 遷移、Child Issue / Wave の作成、draft / RU の削除、Root Case の ready 遷移
 
 ## 内部構成
 
-- Definition 受入: Draft Definition PR の忠実性確認（req-define 合意内容との投影検査）、整合性検査、品質検査。新しい意味判断が不要な場合は追加承認なしで自動確定・merge。新しい Decision、意味変更、対象範囲拡大、意味的不整合の解消が必要な場合は停止し HITL とする
+- Definition 受入: Definition PR の忠実性確認（req-define 合意内容との投影検査）、整合性検査、品質検査、merge 前の Draft 状態確認（pr_read の isDraft、REQ-061-032）。新しい意味判断が不要な場合は追加承認なしで自動確定・merge。新しい Decision、意味変更、対象範囲拡大、意味的不整合の解消が必要な場合は停止し HITL とする
 - 保存実体: REQ / Decision / Design の保存は req-file-manager、decision-file-manager、design-file-manager、artifact-validation へ委譲する。case-ready 自身は保存手続きを実装しない
 - canonical 再取得: merge 後に canonical Definition を再取得し、以降の処理基準とする
 - 実行構造確定: 連結成分、3軸判断、単独根の Standard 化、上限遵守、構成検証、Wave ファイル重複前置検出（詳細は epic-wave-model Design）
@@ -28,6 +28,7 @@ case-ready の公開契約（入出力、副作用、安全性、承認境界、
 
 ## 停止条件
 
+- 対象 Definition PR が GitHub Draft PR（isDraft: true）の場合（pr_merge を実行せず blocked で停止。draft 解除の自動実行や正規 Tool 外の操作による復旧は行わない。REQ-061-032）
 - Definition PR の CI / 品質検査失敗（ready 不遷移、既存 PR 保持で再実行可能）
 - 新しい意味判断が必要（HITL）
 - 構成検証の上限超過または構成不備
