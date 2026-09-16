@@ -34,7 +34,7 @@ case-run は実行担当サブエージェントを委譲起動する。
 - 委譲プロンプト: 実行 command を prompt 内で指定し Issue #N の実装を指示する（command の具体名は AGENTS.md 参照）。実行 command は Issue を success criteria に分解、各 criterion に observable evidence を要求、品質ゲート（code review + QA review + gate review）を実行する
 - 委譲プロンプト（worktree 指定）: 実行 command 指定以降に worktree root とブランチ名を含める（後述「委譲プロンプト構築例」参照）
 
-複数の実行担当サブエージェントを並列委譲する場合（Epic Wave 並列委譲、case-auto orchestration stage 2）、起動バーストによる実行基盤・モデル provider への瞬間的なリクエスト集中を抑えるため、委譲起動ごとに10秒の起動間隔を置く（epic-wave-model Design「並列起動の間隔」）。
+複数の実行担当サブエージェントを並列委譲する場合（Epic Wave 並列委譲、case-auto orchestration stage 3）、起動バーストによる実行基盤・モデル provider への瞬間的なリクエスト集中を抑えるため、委譲起動ごとに10秒の起動間隔を置く（epic-wave-model Design「並列起動の間隔」）。
 最初の1件を起動した後、以降の各委譲起動の前に待機コマンド（例: `bash: sleep 10`）を実行してから発行する。
 同一のTool呼び出し一括ブロックで複数の委譲起動を発行しない（1ブロック1委譲起動）。
 

@@ -24,7 +24,7 @@ case-auto command は公開 interface（入出力契約・ガードレール）�
 ## 副作用
 
 - 各工程の委譲起動（case-open、case-ready、case-revise（例外経路時）、case-close）とインライン実行（case-run）
-- bg task API による stage 2 並列起動（最大5件）
+- bg task API による stage 3 並列起動（最大5件）
 - GitHub Issue/PR/comment/merge/close（自走対象、command 不変条件）
 - remote branch 削除（当該 case-auto/ case-run が作成した branch に限定）
 - docs/ REQ/ Decision/ Design/ command reference/ guide の更新（自走対象、command 不変条件）
@@ -72,17 +72,17 @@ case-auto workflow は次の8 STEP で構成する。
 
 | stage | 工程 | 実行方式 | 並列性 |
 |---|---|---|---|
-| stage 1a | case-open | 直列集約 | 単一 |
-| stage 1b | case-ready（例外経路時は case-revise → case-ready） | 直列集約 | 単一 |
-| stage 2 | case-run | bg task（最大5件） | 並列（3つの「5件」文脈の (2) に該当） |
-| stage 3 | case-close | 直列集約 | 単一 |
+| stage 1 | case-open（再合意済み Definition 変更の例外経路時は case-revise） | 委譲起動 | stage 内最大並列（直列化要因のみ局所直列化） |
+| stage 2 | case-ready | 委譲起動 | stage 内最大並列（直列化要因のみ局所直列化） |
+| stage 3 | case-run | インライン実行（子 task 委譲は bg task 最大5件） | 並列（3つの「5件」文脈の (2) に該当） |
+| stage 4 | case-close | 委譲起動 | stage 内最大並列（直列化要因のみ局所直列化） |
 
-- 各 orchestration stage を起動時対象群全体への barrier として適用し、対象ごとの縦切り pipeline としない。当該 stage に属する全対象が正常完了しまたは後続 stage へ進めないことが既存契約上確定した結果（blocked / failed 等）に収束するまで次 stage を開始せず（未実行・実行中・状態不明・再試行対象の残存は収束済みとしない）、後続不能対象を後続 stage の対象から除外しその存在だけを理由として独立した他対象の進行を停止しない
-- stage 1a・stage 1b・stage 3 を直列集約ポイントとし、main への push、capture、commit を並列実行区間の外で処理する
+- 各 orchestration stage は stage 内最大並列・stage 間全対象収束（fan-in）で進行し、対象ごとの縦切り pipeline としない。当該 stage に属する全対象が正常完了し、または当該実行において後続 stage へ進めないことが既存契約上確定した結果（blocked / failed / delegation-unavailable 等の後続不能確定）に収束するまで次 stage を開始せず（未実行・実行中・状態不明・再試行要否未確定対象の残存は収束済みとしない）、後続不能対象を後続 stage の対象から除外しその存在だけを理由として独立した他対象の進行を停止しない（case-auto 実行契約）
+- main への push、capture、commit、同一 Epic Issue 本文への更新等の競合する共有書き込みは、当該競合部分のみを必要な単位で局所的に直列化し、当該競合と無関係な対象を含む stage 全体の直列化を行わない（case-auto 実行契約）。共有資源カテゴリと直列化単位の運用表（main への merge / push はリポジトリ単位、同一 Epic Issue 本文への更新は Epic 単位の per-Epic 単一書き手、採番・AUTOGEN 索引更新はグローバル、対象固有ファイルは対象単位で並列可。lock / queue / scheduler 方式は指定しない）は case-auto Design「複数 execution_unit 並列 orchestration」節参照
 - case-run internal lifecycle（state machine、self-healing loop 等）を複製せず case-run 側の正規所有に委譲する
-- stage 2 の同時起動数は固定値（最大5件、実行安全境界）。順次実行はフォールバック時にのみ許可しフォールバック理由を完了報告に含める。並列起動時は委譲起動ごとに10秒の起動間隔を置き、同一Tool一括ブロックでの複数起動発行は行わない（epic-wave-model Design「並列起動の間隔」）。scheduling 制約（最大同時起動数・起動間隔・順次フォールバック）による batch 分割を orchestration stage の分割として扱わない
-- クリーンアップ検証ゲート（ドラフト残存、RU 残存の検証）を stage 1b の対象群収束後・stage 2 開始前の barrier として実行し、stage 1b を正常完了した対象について残存を検出した場合は停止する。stage 1b が blocked / failed / 中断等で正常完了していない対象について、既存 lifecycle 契約に従って保持された draft / RU を cleanup 違反として扱わない（case-auto 実行契約）
-- Epic execution_unit の Wave 間および最終 Wave の case-close(#epic) は Wave 反復を進行・完結させる stage 2 内部の状態遷移処理であり、stage 3 barrier の開始とみなさない。Epic execution_unit の stage 2 完了は後続 Wave が残存しない状態への Wave 反復の完遂であり、stage 3 では追加の case-close を行わない。stage の分類は orchestration 上の位置づけにより行い、command 名単独では分類しない（epic-wave-model Design「ドラフト間並列実行モデル」）
+- stage 3 の case-run 同時起動数は固定値（最大5件、実行安全境界）。順次実行はフォールバック時にのみ許可しフォールバック理由を完了報告に含める。並列起動時は委譲起動ごとに10秒の起動間隔を置き、同一Tool一括ブロックでの複数起動発行は行わない（epic-wave-model Design「並列起動の間隔」）。起動間隔は stage 1（case-open / case-revise 委譲）・stage 2（case-ready 委譲）・stage 4（case-close 委譲）の並列委譲起動にも同一に適用する。scheduling 制約（最大同時起動数・起動間隔・順次フォールバック）による batch 分割を orchestration stage の分割として扱わない
+- クリーンアップ検証ゲート（ドラフト残存、RU 残存の検証）を stage 2 の対象群収束後・stage 3 開始前に実行し、stage 2 を正常完了した対象について残存を検出した場合は停止する。stage 2 が blocked / failed / 中断等で正常完了していない対象について、既存 lifecycle 契約に従って保持された draft / RU を cleanup 違反として扱わない（case-auto 実行契約）
+- Epic execution_unit の Wave 間および最終 Wave の case-close(#epic) は Wave 反復を進行・完結させる stage 3 内部の状態遷移処理であり、stage 4 の開始とみなさない。Epic execution_unit の stage 3 完了は後続 Wave が残存しない状態への Wave 反復の完遂であり、stage 3 完了判定は既存 Epic/Wave workflow の execution_unit 完了状態基準に従い、その内部ロジックを複製しない。stage 4 では追加の case-close を行わない。stage の分類は orchestration 上の位置づけにより行い、command 名単独では分類しない（epic-wave-model Design「ドラフト間並列実行モデル」）
 
 ## 下位 Workflow Skill 連携（上位 orchestrator）
 
@@ -113,8 +113,8 @@ case-auto workflow は次の8 STEP で構成する。
 
 - **自走境界（ガードレール: 自走対象外・remote branch 削除限定、ほか不変条件）**: repo にファイルとして残る変更のみ自走対象。DB migration 実行、deploy/apply、クラウドリソース操作、外部SaaS 設定変更、課金、権限、認証情報、repo外実データ操作、通知送信は対象外
 - **委譲・参照制約（command 不変条件、ガードレール: Epic Issue 本文書き込み禁止）**: 各工程は対応するコマンド定義を authoritative source として実行（case-auto 定義内再実装回避）。case-run はインライン実行（標準動作）。Epic Issue 本文書き込みは case-close 単一書き手（case-auto は読取のみ、`POL-epic-tracking-single-writer`）。case-auto は Issue 階層決定ロジックを持たない、Epic / Wave / Issue 構成は case-ready の確定結果に従う（command 不変条件）
-- **3つの「5件」文脈の区別**: (1) case-run Wave 内子 Issue 並列、(2) case-auto stage 2 同時起動数、(3) execution_unit 全体並列（上限なし）。混同しない
-- **OU処理ループ**: Standard flow の case-close 完了後に未処理 OU が残存する場合は次 OU の処理を STEP-3 から開始（全 OU 処理完了時のみ全体完了報告）
+- **3つの「5件」文脈の区別**: (1) case-run Wave 内子 Issue 並列、(2) case-auto stage 3 同時起動数、(3) execution_unit 全体並列（上限なし）。混同しない
+- **OU処理ループ**: Standard flow の case-close（stage 4）完了後に未処理 OU が残存する場合は次 OU の処理を STEP-3 から開始（全 OU 処理完了時のみ全体完了報告）。起動時対象集合は case-ready が確定した全 execution_unit であり、OU の必須依存は stage 内の直列化要因である（case-auto 実行契約）。必須依存で結合した execution_unit 群は順次（stage 内局所直列化）、必須依存のない execution_unit 群は並列で処理し、OU 逐次処理は orchestration stage モデルを置き換えない
 - **親コンテキスト非累積（command 不変条件）**: 委譲工程の完了結果（Issue/PR番号、pass/warn/fail）のみを親コンテキストに保持し、委譲工程内部の調査過程、中間ログ、読解メモを親コンテキストに累積しない
 - **L1 タイムスタンプ**: 開始時刻（`case_auto_started_at`）、工程別タイムスタンプ（case-open / case-ready / case-run / case-close、例外経路時は case-revise を含む）、終了時刻を記録。case-run の L2 内訳は case-run result から読み取って含める
 - **既存成果物検出ガード（STEP-3 各工程起動時の前置ガード）**: 各工程の起動時に git log で当該工程成果物の既存 commit を確認する。成果物が既に commit 済みの場合は配置検証のみで pass 判定する配置検証モードへ切替え、同一成果物の二重 commit と内容衝突を予防する（未 commit の場合は通常経路で当該工程を実行する）
