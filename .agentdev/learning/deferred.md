@@ -2280,3 +2280,43 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（出現1件・原因未特定。VERIFY への state 突合追加は再発時に再評価）
 
 ---
+
+## case-run が PR 作成後に完了報告を残さず中断すると case-close が PR を検出できない（422 + refs/pull 照合で回収）
+
+- **問題事象**: Case #2852 の case-run が PR #2868 作成まで完了しながら、Issue 本文・コメントへの PR 番号記録（完了報告コメント）を残さず中断した。case-close 実行時に Issue 側の永続状態から PR 番号を解決できず、PR 未作成と誤認して pr_create を試行すると「Validation Failed (HTTP 422)」で失敗した
+- **発生局面**: 完了処理（case-close STEP-1/STEP-4。PR 自動検出は Issue 本文・コメントの記録が前提、agentdev_gh に pr_list 操作は存在しない）
+- **検知方法**: pr_create の fail-closed 失敗応答（HTTP 422 = head ブランチの既存 PR 存在の典型応答）。`git ls-remote origin refs/pull/*/head` による head SHA（d7372002）照合で PR #2868 を特定（gh コマンド不使用、git transport 経由で POL-gh-io-delegation 準拠）
+- **根本原因**: case-run の PR 作成と PR 番号の SSoT 記録（Issue 本文/コメントへの完了報告）が分離しており、PR 作成後に中断すると PR の所在が永続状態から復元できない。エージェント本体の中断は SSoT 記録を保証しない
+- **自律対応内容**: 重複 PR 作成は fail-closed で防止された（副作用なし）。refs/pull/*/head 照合で既存 PR #2868 を特定し、pr_read で本文・mergeable（MERGEABLE）を確認の上、そのまま squash merge して完了処理を継続した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（実行時の運用ギャップ。将来の反映候補: case-close の PR 自動検出手順へのフォールバック明記）
+- **横展開観点**: PR 番号を入力とする全操作（pr_merge、pr_mergeable、pr_changed_files）で同じ検出不能状態が発生し得る。git transport（ls-remote の refs/pull/*）は GitHub API を経由しないため gh-io 委譲境界外の読取手段として使える
+- **再発条件**: case-run 等の PR 作成者が、PR 作成後・Issue 側記録前に中断・失敗した場合に毎回発生
+- **予防策候補**: (1) case-run が PR 作成直後に Issue 本文またはコメントへ PR 番号を記録する前倒し、(2) case-close STEP-1 の PR 自動検出へ refs/pull/*/head 照合フォールバックの明記（Issue 側記録不在時）、(3) pr_create の HTTP 422 を「既存 PR 存在シグナル」として特定手順に接続する経路の文書化
+- **想定反映先**: agentdev-workflow-case-run / agentdev-workflow-case-close（Design・skill・references）
+- **関連**: Case #2852、PR #2868（head d7372002、merge 後 main HEAD bf4a3224）、.opencode/skills/agentdev-workflow-case-close/references/issue-resolution-and-qg4.md
+- **タグ**: `#github-io` `#pr-detection` `#custom-tool` `#workflow-deviation`
+- **移動日**: 2026-09-16
+- **処分判定**: deferred（出現1件・再発条件レア。次回 learning-promote で再評価）
+
+---
+
+## case-open が Definition 変更を main へ直接 push し Draft Definition PR を作成不能にした
+
+- **問題事象**: case-open STEP-4 で Definition 変更 commit を `git push origin HEAD:main` により main へ直接 push し、Draft Definition PR を経由せず canonical Definition（origin/main の docs）が更新された。その後の pr_create は head branch（feature/issue-2870）が remote に存在せず、かつ main との差分が消失していたため HTTP 422 で失敗し、PR 作成不能となった
+- **発生局面**: 実装（case-open workflow STEP-4 実変更判定と Definition PR 作成。Case #2870）
+- **検知方法**: pr_create の失敗応答（HTTP 422 Validation Failed）。初回 push 自体は成功していたため、PR 作成失敗時に push refspec（`HEAD:main`）を見直して発見
+- **根本原因**: Definition 変更の push 先を worktree branch（`git push origin feature/issue-2870`）ではなく main（`git push origin HEAD:main`）に誤指定。直前の並行セッションの capture 回収（16c397dd）が main 直接 push 形式であるのを参照し、capture 永続化の手順と Definition 変更の push 手順を混同した
+- **自律対応内容**: force push による巻き戻しは禁止（並行セッション影響・承認要件）のため不実施。revert + PR 再投入は deviation の増幅と履歴汚染のため見送り。main 反映済みの内容は draft-data の正規投影であり diff 検証済みのため現状を活かし、Root Case #2870 本文へ PR 未作成の実態を記録、本 learning へ capture
+- **ユーザー確認有無**: なし（完了報告で報告）
+- **Decision/REQ/spec影響**: Definition 変更の内容・配置は Definition Package 投影どおり。case-ready の Definition 受入（Draft Definition PR の忠実性・整合性・品質検査 → merge）は PR 不在のため canonical 照合へのフォールバックが必要となり、case-ready 実行時の停止リスクが残る
+- **横展開観点**: worktree branch push（PR 作成前提）と main 直接 push（capture 等の継続作業永続化）は目的も受入経路も異なる別手順。push refspec は実行前に必ず検査する
+- **再発条件**: case-open が Definition 変更を worktree branch push せず main へ直接 push する場合に毎回発生
+- **予防策候補**: (1) case-open STEP-4 reference に push コマンド（`git push origin {worktree-branch}`）を明記、(2) push 実行前の refspec 検査（`:main` を含まないこと）の追加、(3) pr_create 失敗時の head branch push 状態確認手順を reference へ明記
+- **想定反映先**: agentdev-workflow-case-open（STEP-4 reference）、agentdev-issue-management（push 安全手順）
+- **関連**: Case #2870、main push 17afaf86、docs/designs/workflows/definition-readiness.md、src/opencode/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md
+- **タグ**: `#git` `#push` `#definition-pr` `#workflow-deviation`
+- **移動日**: 2026-09-16
+- **処分判定**: deferred（出現1件・運用回避済み。次回 learning-promote で再評価）
+
+---
