@@ -58,6 +58,7 @@ case-auto workflow は次の8 STEP で構成する。
 ### 再開プロトコル（resume protocol）
 
 - 再開点は永続状態から再構成する: `case_auto_started_at` と L1 工程別タイムスタンプ、Issue/PR の存在と番号、Epic Issue 本文のステータス追跡テーブル（Wave 進行）、draft の有無（case-open 完了前のみ pre-reader）、各工程の完了結果、Root Case の状態（open / ready / running / blocked / review / closed）と resume_command
+- 現在 stage は stage cursor を新たな正規状態として保存せず、起動時対象集合と各対象の正規状態（Issue / PR / Case 等）から最も早い未収束 stage として再構成する。完了済み対象を再実行せず、同一対象だけを後続 stage へ先行させない。起動時対象集合の安定識別子は中断再開に必要な期間に限りローカル一時実行状態として保持し、draft / RU の削除によって対象を実行中の対象集合から消失させない。正規成果物から再構成できる情報を別の正規状態として重複管理しない（epic-wave-model Design「ドラフト間並列実行モデル」）
 - 停止時報告に再開点と再開可能な次コマンドを明示し、会話コンテキストの記憶に依存しない。case-ready 成功後の再開は Issue と Epic だけで成立させる（orchestration pre-reader 契約）
 
 ### 終了条件（termination）
@@ -71,14 +72,17 @@ case-auto workflow は次の8 STEP で構成する。
 
 | stage | 工程 | 実行方式 | 並列性 |
 |---|---|---|---|
-| stage 1 | case-open → case-ready（例外経路時は case-revise → case-ready） | 直列集約 | 単一 |
+| stage 1a | case-open | 直列集約 | 単一 |
+| stage 1b | case-ready（例外経路時は case-revise → case-ready） | 直列集約 | 単一 |
 | stage 2 | case-run | bg task（最大5件） | 並列（3つの「5件」文脈の (2) に該当） |
 | stage 3 | case-close | 直列集約 | 単一 |
 
-- 各 orchestration stage を前 stage 完了後に開始する。stage 1 と stage 3 を直列集約ポイントとし、main への push、capture、commit を並列実行区間の外で処理する
+- 各 orchestration stage を起動時対象群全体への barrier として適用し、対象ごとの縦切り pipeline としない。当該 stage に属する全対象が正常完了しまたは後続 stage へ進めないことが既存契約上確定した結果（blocked / failed 等）に収束するまで次 stage を開始せず（未実行・実行中・状態不明・再試行対象の残存は収束済みとしない）、後続不能対象を後続 stage の対象から除外しその存在だけを理由として独立した他対象の進行を停止しない
+- stage 1a・stage 1b・stage 3 を直列集約ポイントとし、main への push、capture、commit を並列実行区間の外で処理する
 - case-run internal lifecycle（state machine、self-healing loop 等）を複製せず case-run 側の正規所有に委譲する
-- stage 2 の同時起動数は固定値（最大5件、実行安全境界）。順次実行はフォールバック時にのみ許可しフォールバック理由を完了報告に含める。並列起動時は委譲起動ごとに10秒の起動間隔を置き、同一Tool一括ブロックでの複数起動発行は行わない（epic-wave-model Design「並列起動の間隔」）
-- case-ready 完了後（stage 1 と stage 2 の間）にクリーンアップ検証ゲート（ドラフト残存、RU 残存の検証）を実行する。残存を検出した場合は停止する（case-auto 実行契約）
+- stage 2 の同時起動数は固定値（最大5件、実行安全境界）。順次実行はフォールバック時にのみ許可しフォールバック理由を完了報告に含める。並列起動時は委譲起動ごとに10秒の起動間隔を置き、同一Tool一括ブロックでの複数起動発行は行わない（epic-wave-model Design「並列起動の間隔」）。scheduling 制約（最大同時起動数・起動間隔・順次フォールバック）による batch 分割を orchestration stage の分割として扱わない
+- クリーンアップ検証ゲート（ドラフト残存、RU 残存の検証）を stage 1b の対象群収束後・stage 2 開始前の barrier として実行し、stage 1b を正常完了した対象について残存を検出した場合は停止する。stage 1b が blocked / failed / 中断等で正常完了していない対象について、既存 lifecycle 契約に従って保持された draft / RU を cleanup 違反として扱わない（case-auto 実行契約）
+- Epic execution_unit の Wave 間および最終 Wave の case-close(#epic) は Wave 反復を進行・完結させる stage 2 内部の状態遷移処理であり、stage 3 barrier の開始とみなさない。Epic execution_unit の stage 2 完了は後続 Wave が残存しない状態への Wave 反復の完遂であり、stage 3 では追加の case-close を行わない。stage の分類は orchestration 上の位置づけにより行い、command 名単独では分類しない（epic-wave-model Design「ドラフト間並列実行モデル」）
 
 ## 下位 Workflow Skill 連携（上位 orchestrator）
 

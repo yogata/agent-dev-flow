@@ -46,6 +46,15 @@ PR 作成代行は case-auto 親ループの責務であり、子 task 側で再
 rebase で解消できないコンフリクトは Design が定めるコンフリクト解消モデル（3レベルエスカレーション）Level 2/3 へ委譲する。
 bg task 破棄時の状態別回復とコンフリクト解消モデルは協調関係にあり、rebase 失敗を境に後者へ委譲する。
 
+## orchestration stage barrier への復帰（接続規則）
+
+本回復プロトコルは case-auto の orchestration stage barrier 契約と接続する。
+stage 再構成規則の正本は epic-wave-model Design「ドラフト間並列実行モデル」節と `agentdev-workflow-case-auto` SKILL.md「再開プロトコル」が保持し、本ファイルは正本を持たない。
+
+- 中断回復後に再開する場合、現在 stage を stage cursor ではなく永続状態（起動時対象集合と各対象の正規状態）から最も早い未収束 stage として再構成し、当該 stage の対象群 barrier へ復帰する
+- 回復した単一対象を後続 stage へ先行させない。他対象が当該 stage で未収束である間は、回復済み対象も次 stage を開始しない
+- 回復完了済み対象は当該 stage の収束判定に含め、完了済み対象を再実行しない
+
 ## Epic Wave 並列委譲への拡張可能性
 
 本プロトコルは case-auto の単一 Wave 内の子 task を対象とする。
