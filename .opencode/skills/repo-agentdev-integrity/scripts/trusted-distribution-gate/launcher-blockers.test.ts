@@ -19,7 +19,7 @@
 // These tests were written BEFORE the refactor and MUST fail on the
 // pre-refactor code, then pass after the refactor.
 
-import { describe, expect, test } from "bun:test";
+import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
@@ -51,6 +51,32 @@ import {
 function asRepo(p: string): RepoPath {
   return p as RepoPath;
 }
+
+// Issue #2882 (REQ-083-001): the orphan scan below reads the GLOBAL
+// os.tmpdir() and was flaky under parallel runs (foreign trust-archive-*
+// residue). bun's os.tmpdir() re-reads these env vars per call, so the
+// swap isolates fixtures and scans to this file's suite-private root.
+let suiteTmpRoot = "";
+const prevTmpEnv: Record<string, string | undefined> = {};
+
+beforeAll(() => {
+  suiteTmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), "launcher-blockers-suite-"));
+  for (const key of ["TMP", "TMPDIR", "TEMP"]) {
+    prevTmpEnv[key] = process.env[key];
+    process.env[key] = suiteTmpRoot;
+  }
+});
+
+afterAll(() => {
+  for (const key of ["TMP", "TMPDIR", "TEMP"]) {
+    if (prevTmpEnv[key] === undefined) {
+      delete process.env[key];
+    } else {
+      process.env[key] = prevTmpEnv[key];
+    }
+  }
+  try { fs.rmSync(suiteTmpRoot, { recursive: true, force: true }); } catch { /* already gone */ }
+});
 
 function opts(repo: string, base: string, candidate: string, outName: string, extra?: Partial<LauncherOptions>): LauncherOptions {
   return {
