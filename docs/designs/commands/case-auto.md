@@ -42,7 +42,7 @@ updated: 2026-09-05
 
 処理段階（外部から意味のある順序）。
 各段階の詳細手順は Workflow Skill（`agentdev-workflow-case-auto`）が正規情報源である。
-複数対象を処理する場合、各 orchestration stage は起動時に確定した対象群全体への barrier として進行する（REQ-034-025、対象ごとの縦切り pipeline として実行しない）。
+複数対象を処理する場合、各 orchestration stage は stage 内最大並列・stage 間全対象収束（fan-in）で進行する（REQ-034-025。対象ごとの縦切り pipeline として実行しない）。
 
 - 入力解決
   - 実行開始時刻の記録（REQ-006-082）（JST、人間が読みやすい形式で case_auto_started_at 変数に保持）
@@ -50,8 +50,8 @@ updated: 2026-09-05
   - 要件doc入力モード（引数なし時は `.agentdev/drafts/req-draft-*.md` 全件処理がデフォルト / 明示パス指定時は当該draft / セッション指定キーワード時はセッション内要件doc参照、暗黙判断は行わない）
 - work_type 読取（draft-data から取得する参考情報。パイプライン分岐には使用しない）
 - 工程分岐（work_type 固定分岐ではなく入力状態と artifact_actions による動的判定）
-  - 要件doc入力: stage 1a case-open → stage 1b case-ready（例外経路時は case-revise → case-ready）→ クリーンアップ検証ゲート（stage 1b 対象群収束後）→ stage 2 case-run（インライン）→ stage 3 case-close
-  - 再合意済み Definition 変更: stage 1b（case-revise → case-ready）→ クリーンアップ検証ゲート → stage 2 case-run（インライン）→ stage 3 case-close
+  - 要件doc入力: stage 1 case-open（例外経路時は case-revise）→ stage 2 case-ready → クリーンアップ検証ゲート（stage 2 対象群収束後・stage 3 開始前）→ stage 3 case-run（インライン）→ stage 4 case-close。stage 1 の収束条件には全対象確立後の横断依存検査の実施を含める（並列 case-open によって兄弟対象をタイミング依存で欠落させない。実現手順は Workflow Skill references）（REQ-034-025、RU 方向4の Design 受け皿）
+  - 再合意済み Definition 変更: stage 1（case-revise → stage 2 case-ready）→ クリーンアップ検証ゲート → stage 3 case-run（インライン）→ stage 4 case-close
   - Issue番号/URL入力: Root Case が open なら case-ready から、ready/running/review なら case-run（インライン）→ case-close。再合意済み変更がある場合は case-revise から開始。再開時は起動時対象集合と各対象の正規状態から現在 stage を最も早い未収束 stage として再構成する（REQ-034-025）
   - artifact_actions は case-ready の Definition action 入力へ渡し、work_type 固定分岐には使用しない
   - auto_gate preflight（auto_gate.auto_ready が false または未解決 item 残る場合は停止）
@@ -63,7 +63,7 @@ updated: 2026-09-05
   - case-auto が Epic Issue 番号を記録。Epic Issue 本文から Wave 構成、各子Issue ステータスを読み取る（読み取りのみ、Epic Issue 本文の書き込みは case-close の責務）
   - case-auto が現在 Wave の ready 子Issue を選択し、各子Issue ごとにインライン case-run を実行（最大5件並列、起動間隔10秒。REQ-006-026 踏襲、並列起動の間隔は epic-wave-model Design 参照）。各子Issue の実行担当サブエージェントへ case-auto から直接委譲
   - Wave 内全子Issue の完了（completed-pr / blocked / failed / delegation-unavailable）を待機
-  - completed-pr の子Issue がある場合、case-close(#epic) へ委譲（Wave 反復を進行させる stage 2 内部処理、REQ-034-025）
+  - completed-pr の子Issue がある場合、case-close(#epic) へ委譲（Wave 反復を進行させる stage 3 内部処理、REQ-034-025）
   - 残 Wave がある場合、次 Wave を実行（べき等）
 - 工程間の状態引き継ぎ（Issue番号、PR番号、RU ファイルパス、capture 対象情報を最終工程まで保持）
 - 複数REQ対応（case-ready の確定結果から複数 REQ doc または scale:large 検出時、確定済みの Issue 構造に従う）
@@ -120,7 +120,7 @@ context 管理:
 
 - 工程別委譲契約遵守: inputs に指定された情報のみを渡し、output_contract に指定された結果のみを受領
 - 親コンテキスト非累積: 各委譲の完了結果（Issue/PR番号、pass/warn/fail）のみを親コンテキストに保持
-- クリーンアップ検証ゲート（Standard / Epic Issue flow 双方）: stage 1b の対象群収束後・stage 2 開始前に評価する。stage 1b を正常完了した対象についてドラフトファイル、RU ファイルの残存がないこと。stage 1b が blocked / failed / 中断等で正常完了していない対象について、既存 lifecycle 契約に従って保持された draft / RU は cleanup 違反としない（REQ-034-020、REQ-034-025）
+- クリーンアップ検証ゲート（Standard / Epic Issue flow 双方）: stage 2 の対象群収束後・stage 3 開始前に評価する。stage 2 を正常完了した対象についてドラフトファイル、RU ファイルの残存がないこと。stage 2 が blocked / failed / 中断等で正常完了していない対象について、既存 lifecycle 契約に従って保持された draft / RU は cleanup 違反としない（REQ-034-020、REQ-034-025）
 - 出力制約: 成果物本文 verbatim、調査過程等は圧縮
 - タイミング情報: 開始時刻、終了時刻、所要時間を人間が読みやすい形式で報告（REQ-006-082/083）
 - 結果状態の4次元集約（REQ-034-031）: 後述「結果状態の4次元集約（REQ-034-031）」セクションの4状態次元と集約規則に従い、warn を pass へ変換しない
@@ -206,13 +206,22 @@ N 個の execution_unit が並列実行された場合、N×5 件の委譲同時
 ### execution_unit 群反復制御への一般化
 
 従来の「単一 Epic の Wave 反復制御」は execution_unit 群反復制御の特殊ケース（execution_unit = 1 件の Epic）となる。
-execution_unit 群の実行は orchestration stage を起動時対象群全体への barrier として制御し、execution_unit 単位の縦切り pipeline（各 unit が case-run → case-close を先行完結する実行）として制御しない（REQ-034-025）。
+execution_unit 群の実行は orchestration stage を stage 内最大並列・stage 間全対象収束で制御し、execution_unit 単位の縦切り pipeline（各 unit が case-run → case-close を先行完結する実行）として制御しない（REQ-034-025）。
 
-- execution_unit が standard issue の場合: stage 2 で case-run(standard) を実行し、stage 2 の対象群収束後に stage 3 で case-close を実行
-- execution_unit が epic issue の場合: stage 2 で Wave 反復制御（case-run(#epic) → case-close(#epic) の反復）を完遂する（v2:ADR-0128 Decision #5, REQ-006-084）。Wave 間および最終 Wave の case-close(#epic) は Wave 反復を進行・完結させる stage 2 内部処理であり、stage 3 barrier の開始とはみなさない。stage 3 では追加の case-close を行わない
+- execution_unit が standard issue の場合: stage 3 で case-run(standard) を実行し、stage 3 の対象群収束後に stage 4 で case-close を実行
+- execution_unit が epic issue の場合: stage 3 で Wave 反復制御（case-run(#epic) → case-close(#epic) の反復）を完遂する（v2:ADR-0128 Decision #5, REQ-006-084 の既存引用は維持する）。Wave 間および最終 Wave の case-close(#epic) は Wave 反復を進行・完遂させる stage 3 内部処理であり、stage 4 の開始とはみなさない。stage 4 では追加の case-close を行わない
 
 OU 逐次処理（REQ-006-053）は、必須依存で結合した execution_unit 群に適用される。
 必須依存のない execution_unit 群は順序を問わず並列実行できる（REQ-006-053 例外条項）。
+
+共有書き込みの局所直列化（REQ-034-026）の対象範囲と単位は、共有資源カテゴリごとに次のとおりである。
+
+- main への merge / push はリポジトリ単位で直列化する
+- 同一 Epic Issue 本文への更新は Epic 単位で直列化する（per-Epic 単一書き手。無関係な Epic 間は並列可）
+- 採番・AUTOGEN 索引更新はグローバルに直列化する
+- 対象固有ファイルは対象単位で並列実行可
+
+lock、queue、scheduler 方式は本 Design の範囲外とする（REQ-034-036）。
 
 ### 結果集約
 
