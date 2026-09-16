@@ -112,3 +112,21 @@
 - **タグ**: #precedence #delegation-contracts #docs
 
 ---
+
+## 2026-09-16: node_modules 未伝播の worktree で bun test の zod 依存テストが fail する（junction 前置で回避）
+
+- **問題事象**: package.json/node_modules をリポジトリに持たない構成の worktree で bun test フルスイートを実行すると、agentdev-project-extensions のテストが `zod` 解決失敗で 4件 fail した（変更起因ではなく環境依存の fail）。
+- **発生局面**: case-run（Case #2890、PR #2892 の bun test 3分割正規形実行、初回第1分割）。
+- **検知方法**: bun test 初回実行の 4 fail（zod 未解決）と、fail 内容の環境依存分類。
+- **根本原因**: git worktree は非 git 管理の node_modules を伝播させない。bun のモジュール解決は実行 cwd の node_modules を辿るため worktree ルートから zod が解決できず、bun グローバル install キャッシュの zod は自動では使われない。
+- **自律対応内容**: bun グローバル install の zod を指す `node_modules/zod` junction を worktree ルートへ前置して再実行し 0 fail を確認、検証後に junction を削除（PR #2892 テスト結果に環境ラベル付きで記録）。
+- **ユーザー確認の有無**: なし（case-run 内で解消・case-close で記録受理）。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: zod 以外の外部パッケージ依存テストでも同様の worktree 依存解決失敗が発生し得る。junction 前置 → 検証後削除は汎用の回避手順。既存の worktree 依存整備知識（agentdev-git-worktree の bun test 環境前提）との重複・統合判定は learning-promote に委ねる。
+- **再発条件**: node_modules をリポジトリに持たず外部パッケージ（zod 等）に依存するテストを、依存前置なしの worktree で実行した場合。
+- **予防策候補**: worktree 検証手順に「依存解決失敗時は bun グローバル該当パッケージへの node_modules junction 前置、検証後削除」を明記する拡張。
+- **想定反映先**: agentdev-git-worktree の bun test 環境前提（references/worktree-operations.md）の拡張候補。
+- **関連**: Case #2890（Ref）、PR #2892（Refs）。
+- **タグ**: #worktree #bun-test #zod #junction
+
+---
