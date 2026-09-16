@@ -2,7 +2,7 @@
 title: case-open Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-15"
+updated: "2026-09-17"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-004, REQ-030-005, REQ-030-006, REQ-030-007, REQ-030-008, REQ-030-009, REQ-030-010, REQ-030-011 -->
@@ -15,7 +15,7 @@ updated: "2026-09-15"
 ## 目的
 
 合意済み要件doc をもとに Root Case（GitHub Issue）を確立し、Definition Package を生成して関連付ける。
-canonical Definition に実変更がある場合のみ Draft Definition PR を作成する。
+canonical Definition に実変更がある場合のみ Definition PR を作成する。
 壁打ち（req-define）→ Definition 受入準備（case-ready）の境界であり、execution contract の確定、Standard / Epic の最終確定、Child Issue / Wave の作成、RU 削除、proposed Decision の受理評価は case-ready 実行契約（REQ-061）が所有する。
 
 ## 承認・HITL 境界
@@ -36,12 +36,12 @@ canonical Definition に実変更がある場合のみ Draft Definition PR を�
 
 - Root Case GitHub Issue（ラベル付き、対象 REQ 番号埋め込み、状態 open。REQ-030-001、REQ-030-009）
 - Definition Package（要件行、Decision、Design、Issue 構成案、受入条件一式を Case 単位で集約し Root Case に関連付ける。構成は definition-readiness Design。REQ-030-003）
-- Draft Definition PR（canonical Definition に実変更がある場合のみ、Case 単位で 1 件。REQ-030-002）
+- Definition PR（canonical Definition に実変更がある場合のみ、Case 単位で 1 件。GitHub Draft PR ではない通常 Pull Request。REQ-030-002、REQ-083-001）
 - 完了報告（Root Case 完了報告テンプレート）
 
 ## 副作用
 
-- GitHub I/O: Root Case 作成、Draft Definition PR 作成（Custom Tool `agentdev_gh` 操作契約。Tool 内 VERIFY 付き）
+- GitHub I/O: Root Case 作成、Definition PR 作成（Custom Tool `agentdev_gh` 操作契約。Tool 内 VERIFY 付き）
 - deviation capture: case-open 実行中に実観測した deviation を agentdev-learning-capture skill または
   agentdev-intake-pipeline（自動capture向け item 生成操作）へ委譲して保存する（REQ-030-011）。
   保存先は capture-boundaries.md の Split Rule に従う。
@@ -57,8 +57,8 @@ canonical Definition に実変更がある場合のみ Draft Definition PR を�
 - STEP-1 引き継ぎ判定（`agentdev_handoff: true` 検出時はリポジトリ種別に応じ継続または停止）
 - STEP-2 Root Case 確立（Root Case 本文候補生成、実行識別情報セクション付与、review_dispositions 転記、GitHub Issue 作成。状態 open、実装開始不許可）
 - STEP-3 Definition Package 生成・Root Case 関連付け（REQ-030-003）
-- STEP-4 実変更判定と Draft Definition PR 作成（実変更時のみ、Case 単位 1 件。REQ-030-002）
-- STEP-5 冪等再実行確認（既存 Root Case・既存 Draft Definition PR の再利用、重複生成禁止、不足分のみ処理。REQ-030-010）と横断依存検査（draft の artifact_actions と未クローズ Case 群の変更対象成果物の機械的比較、同一パス重複時の警告提示。REQ-030-012〜014）
+- STEP-4 実変更判定と Definition PR 作成（実変更時のみ、Case 単位 1 件。REQ-030-002）
+- STEP-5 冪等再実行確認（既存 Root Case・既存 Definition PR の再利用、重複生成禁止、不足分のみ処理。REQ-030-010）と横断依存検査（draft の artifact_actions と未クローズ Case 群の変更対象成果物の機械的比較、同一パス重複時の警告提示。REQ-030-012〜014）
 - STEP-6 deviation capture・完了報告（REQ-030-011）
 
 adversarial-review は Root Case 本文候補と Definition Package 構成案確定後、Root Case 作成前に挿入する（「adversarial-review 挿入境界（case-open）」セクション参照）。
@@ -72,10 +72,10 @@ adversarial-review は Root Case 本文候補と Definition Package 構成案確
 
 ## Definition Package と冪等再実行（REQ-030-010）
 
-- Definition Package の構成、Draft Definition PR / Definition Amendment PR の lifecycle、canonical Definition の判定、冪等キーは definition-readiness Design が正規所有する。
-- case-open は再実行時、既存 Root Case および既存 Draft Definition PR を冪等キーで検出し、再利用する。重複生成しない（REQ-030-010）。
+- Definition Package の構成、Definition PR / Definition Amendment PR の lifecycle、canonical Definition の判定、冪等キーは definition-readiness Design が正規所有する。
+- case-open は再実行時、既存 Root Case および既存 Definition PR を冪等キーで検出し、再利用する。重複生成しない（REQ-030-010）。
 - 不足分だけを処理する。Root Case が存在し Definition PR が存在しない場合は PR 生成のみを実行し、Root Case が存在しない場合は Root Case 確立から実行する。両者とも存在する場合は新規生成を行わない。
-- Draft Definition PR は canonical Definition に実変更がある場合のみ作成する。canonical との差分が空の場合（bugfix / maintenance / docs_chore 等の実変更なし Case）は作成しない（REQ-030-002）。実変更判定が不能な場合は PR を作成せず停止し、判定不能の理由を報告する。
+- Definition PR は canonical Definition に実変更がある場合のみ作成する。canonical との差分が空の場合（bugfix / maintenance / docs_chore 等の実変更なし Case）は作成しない（REQ-030-002）。実変更判定が不能な場合は PR を作成せず停止し、判定不能の理由を報告する。
 
 ### 横断依存検査（STEP-5、REQ-030-012〜014）
 
@@ -124,7 +124,7 @@ case-open は、上流工程（req-define）で確定した対象要件と実行
 ## 参照する横断 Design
 
 - [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（フェーズ定義、主フロー構成）
-- [workflows/definition-readiness.md](../workflows/definition-readiness.md)（Definition Package 構成、Draft Definition PR lifecycle、canonical Definition 判定、冪等キー）
+- [workflows/definition-readiness.md](../workflows/definition-readiness.md)（Definition Package 構成、Definition PR lifecycle、canonical Definition 判定、冪等キー）
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Split Rule、自工程 deviation capture）
 - [document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md)（Issue 本文品質検査）
 
@@ -145,7 +145,7 @@ case-open が使用する検査ツール（[integrity-contracts.md](../integrity
 - 機能要件、非機能要件、制約、対象外、受け入れ条件の新規作成（REQ-030-004）
 - Root Case 確立後の実装開始（状態 open、REQ-030-009）
 - Definition Amendment PR の作成（case-revise の責務）
-- GitHub I/O の Tool 操作契約（Custom Tool `agentdev_gh`）経由の省略。Root Case 作成、Draft Definition PR 作成は Tool 操作契約経由で行い、Tool 内 VERIFY を迂回する直接実行を行わないこと
+- GitHub I/O の Tool 操作契約（Custom Tool `agentdev_gh`）経由の省略。Root Case 作成、Definition PR 作成は Tool 操作契約経由で行い、Tool 内 VERIFY を迂回する直接実行を行わないこと
 - Root Case 本文、PR 本文の文字列変数での持ち回り、親エージェントによる本文再構成の禁止
 - スイープ操作（`git add -A` / `git add .` / `git commit -a` / `git checkout .` / `git reset --hard` / `git stash` 等）の実行（v2:REQ-0137-001）
 - 明示パス指定以外のステージ、コミット（v2:REQ-0137-002/005）
@@ -156,7 +156,7 @@ case-open が使用する検査ツール（[integrity-contracts.md](../integrity
 - テンプレート必須セクション完備確認（Root Case 本文テンプレートの `<!-- 【必須】 -->` セクション）
 - Root Case 本文への対象 REQ 番号埋め込み確認（REQ-030-001）
 - Root Case 状態 open の確認と実装開始不許可の確認（REQ-030-009）
-- Draft Definition PR の Case 単位 1 件制約と実変更なし Case での不作成確認（REQ-030-002）
+- Definition PR の Case 単位 1 件制約と実変更なし Case での不作成確認（REQ-030-002）
 - 再実行時の重複生成なし確認（REQ-030-010）
 - 出力制約: Issue 本文、PR 本文、commit message は verbatim で返す。「verbatim」とは LF・空行・インデントを含む行構造を byte 単位で保持することを指し、文字列の正規化、改行圧縮、空白挿入・削除をすべて禁止する。委譲接続点（Root Case 本文生成、PR 本文生成）と最終 gh CLI 渡し（Issue 作成、PR 作成）の双方に適用する。判定結果、調査過程、中間ログ、読解メモは要約、成果物パス、根拠、親判断事項、capture候補へ圧縮して返す
 - deviation capture の Split Rule 分類と保存結果の完了報告記載確認（REQ-030-011）
@@ -167,7 +167,7 @@ case-open が使用する検査ツール（[integrity-contracts.md](../integrity
 - `auto_gate.auto_ready` が false、未解決質問、未解決衝突、repo外操作、停止理由が残る場合。
 - 前工程からの引き継ぎ停止判定（`agentdev_handoff: true`、consumer リポジトリ）検出時（Root Case を作成せず停止する）。
 - adversarial-review 審議で unresolved なユーザー判断事項が残る場合（Root Case 作成へ進まない）。
-- canonical Definition との実変更判定が不能な場合（Draft Definition PR を作成せず停止し、判定不能の理由を報告する）。
+- canonical Definition との実変更判定が不能な場合（Definition PR を作成せず停止し、判定不能の理由を報告する）。
 
 ## adversarial-review 挿入境界（case-open）
 

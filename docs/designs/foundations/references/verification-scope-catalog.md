@@ -2,7 +2,7 @@
 title: 検証対応要否カタログ（トレーサビリティモデル references）
 status: accepted
 created: 2026-08-21
-updated: 2026-09-16
+updated: 2026-09-17
 ---
 
 <!-- ADF-COVERS(implementation): REQ-057-006 -->
@@ -138,7 +138,7 @@ Issue #2362 の移行作業（棚卸し (a')）で全現行要件行を判定し
 - REQ-011-015..REQ-011-019: 委譲形式の維持、新規 command の前提、外部実行境界と harness 実行機構・状態機構の所有区分宣言
 - REQ-011-020..REQ-011-021: Tool の非担当範囲（本文生成等の意味判断）、Hook による迂回防止適用の実行時振る舞い
 - REQ-011-022..REQ-011-024: 追跡Issue操作の Tool 操作契約提供、追加・変更操作の Tool 内 VERIFY 完了後成功返却と読み取り操作の応答自己整合、GitHub 版とローカル版の同一上位操作契約提供の実行時振る舞いと契約宣言
-- REQ-011-025..REQ-011-030: Issue 更新の追跡軸保持、再オープンの追跡状態遷移機械適用、一覧完全性（黙示切断禁止）、操作単位の入力契約（副作用発生前拒否）、失敗分類の区別、pr_read body と pr_update 部分更新の実行時振る舞い。Tool 実装の回帰テスト（Case Issue のテスト戦略）で検証
+- REQ-011-025..REQ-011-032: Issue 更新の追跡軸保持、再オープンの追跡状態遷移機械適用、一覧完全性（黙示切断禁止）、操作単位の入力契約（副作用発生前拒否）、失敗分類の区別、pr_read body と pr_update 部分更新、pr_create の draft 入力不在（契約外フィールド拒否）、pr_read の isDraft 写像（GitHub版は実状態、Local版は false 固定）の実行時振る舞い。Tool 実装の回帰テスト（Case Issue のテスト戦略）で検証
 
 ### REQ-014（adversarial-review caller integration 共通契約）
 
@@ -170,7 +170,7 @@ Issue #2362 の移行作業（棚卸し (a')）で全現行要件行を判定し
 
 ### REQ-030（case-open 実行契約）
 
-- REQ-030-001..REQ-030-014: Root Case 確立と対象 REQ 番号埋め込み、Draft Definition PR 作成、Definition Package 生成と Root Case 関連付け、合意済み入力の反映、冪等再実行、deviation capture、STEP-5 冪等確認での横断依存検査（draft の artifact_actions と未クローズ Case 群の機械的比較、同一パス重複時の警告提示、検出源の限定、Epic 経路の Wave 重複前置検出への委譲境界）の実行時振る舞い
+- REQ-030-001..REQ-030-014: Root Case 確立と対象 REQ 番号埋め込み、Definition PR 作成、Definition Package 生成と Root Case 関連付け、合意済み入力の反映、冪等再実行、deviation capture、STEP-5 冪等確認での横断依存検査（draft の artifact_actions と未クローズ Case 群の機械的比較、同一パス重複時の警告提示、検出源の限定、Epic 経路の Wave 重複前置検出への委譲境界）の実行時振る舞い
 
 ### REQ-031（case-run 実行契約）
 
@@ -330,7 +330,7 @@ Issue #2362 の移行作業（棚卸し (a')）で全現行要件行を判定し
 
 ### REQ-061（case-ready 実行契約）
 
-- REQ-061-029..REQ-061-031: case-ready 検証対応要否ゲートでの横断依存検査（canonical Definition と未クローズ Case 群の同一パス重複・共有領域未登録行重複需要の検出、未分類行残存警告との同時提示と HITL 3 選択肢、警告の ready 遷移非影響、Epic 経路の Wave 内重複前置検出への委譲）の実行時振る舞い。REQ-061-001..REQ-061-028 は検証対応宣言済みのため本カタログへ登録しない。恒続的な検証手段（検出条件 (b) の fixture 回帰テスト、TS-002 / TS-003、RA-002 の bun test 基盤）は実現 Case 側の整備候補として検証対応宣言の配置先であり、整備までの間は安全側の任意行として本カタログへ登録した
+- REQ-061-029..REQ-061-032: case-ready 検証対応要否ゲートでの横断依存検査（canonical Definition と未クローズ Case 群の同一パス重複・共有領域未登録行重複需要の検出、未分類行残存警告との同時提示と HITL 3 選択肢、警告の ready 遷移非影響、Epic 経路の Wave 内重複前置検出への委譲）、および merge 前 Draft 状態確認（pr_read の isDraft、GitHub Draft PR 検出時の pr_merge 未実行・blocked 停止、復旧操作なし）の実行時振る舞い。REQ-061-001..REQ-061-028 は検証対応宣言済みのため本カタログへ登録しない。恒続的な検証手段（検出条件 (b) の fixture 回帰テスト、TS-002 / TS-003、RA-002 の bun test 基盤）は実現 Case 側の整備候補として検証対応宣言の配置先であり、整備までの間は安全側の任意行として本カタログへ登録した
 
 ### REQ-082（対論型レビュー審議契約）
 

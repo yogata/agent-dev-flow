@@ -155,7 +155,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [workflows/delegation-contracts.md](workflows/delegation-contracts.md) | accepted | サブエージェント委譲契約 | 委譲時最小契約、委譲種別、制約、manager-orchestrator 分離 |
 | [workflows/capture-boundaries.md](workflows/capture-boundaries.md) | accepted | キャプチャ境界 | intake / learning 境界、Split Rule、PR 本文永続チャネル |
 | [workflows/epic-wave-model.md](workflows/epic-wave-model.md) | accepted | Epic / Wave / Issue 実行モデル | OU 階層、子Issue 状態 enum、Wave スケジューリング、execution_unit 構成契約、orchestration stage モデル、per-Epic 単一書き手 |
-| [workflows/definition-readiness.md](workflows/definition-readiness.md) | accepted | Definition Readiness | Definition Package、Draft Definition PR / Definition Amendment PR の lifecycle、canonical Definition 判定、冪等キー、backend 意味論の物理写像 |
+| [workflows/definition-readiness.md](workflows/definition-readiness.md) | accepted | Definition Readiness | Definition Package、Definition PR / Definition Amendment PR の lifecycle（通常 Pull Request、merge 前 isDraft 確認を含む）、canonical Definition 判定、冪等キー、backend 意味論の物理写像 |
 | [workflows/backlog-artifact-lifecycle.md](workflows/backlog-artifact-lifecycle.md) | accepted | RU / 採用済み成果物 / draft lifecycle | artifact lifecycle、検出事項プロトコル、artifact_actions 工程分岐 |
 | [workflows/references/execution-unit-construction.md](workflows/references/execution-unit-construction.md) | accepted | execution_unit 構成アルゴリズム参照 | epic-wave-model.md から参照される連結成分アルゴリズム、3軸判断モデルの機械的判定手順 |
 

@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下51件を第一参照先とする。
+現在の要件判断では、以下52件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -63,6 +63,7 @@
 | [REQ-061](REQ-061.md) | case-ready 実行契約 |
 | [REQ-062](REQ-062.md) | case-revise 実行契約 |
 | [REQ-082](REQ-082.md) | 対論型レビュー審議契約 |
+| [REQ-083](REQ-083.md) | Definition PR の状態契約（通常 Pull Request・ブランチ命名・用語・正規操作完結） |
 <!-- AUTOGEN:END -->
 
 ## 廃止済み要件

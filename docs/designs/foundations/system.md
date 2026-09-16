@@ -2,7 +2,7 @@
 title: システム仕様
 status: accepted
 created: 2026-08-20
-updated: 2026-09-08
+updated: 2026-09-17
 ---
 <!-- ADF-COVERS(implementation): REQ-001-033 -->
 <!-- ADF-COVERS(implementation): REQ-002-009, REQ-002-010, REQ-002-012 -->
@@ -146,8 +146,8 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 
 ### `/agentdev/case-ready`
 
-- **公開契約**: Root Case（Issue 番号または URL）+ 関連 req_draft / Draft Definition PR → ready 状態の Root Case + 確定済み execution contract + 実行構造（Standard は Root Case 単一 execution unit、Epic は Child Issue と Wave / 依存構造）。Definition 確定境界の主フローコマンド（REQ-061）。
-- **主要処理段階**: Definition 受入（Draft Definition PR の忠実性確認、整合性・品質検査、自動確定・merge と HITL 停止の分岐）→ REQ/Decision/Design 保存（Definition 保存 / Design 保存内部責務、Capability Skill 委譲）→ canonical Definition 再取得 → proposed Decision の受理評価と accepted 遷移 → execution contract 確定 → 実行構造確定（連結成分、3軸判断、単独根の Standard 化、構成検証、Wave ファイル重複前置検出）→ 検証対応要否ゲート → draft / RU 削除 → ready 遷移。
+- **公開契約**: Root Case（Issue 番号または URL）+ 関連 req_draft / Definition PR → ready 状態の Root Case + 確定済み execution contract + 実行構造（Standard は Root Case 単一 execution unit、Epic は Child Issue と Wave / 依存構造）。Definition 確定境界の主フローコマンド（REQ-061）。
+- **主要処理段階**: Definition 受入（Definition PR の忠実性確認、整合性・品質検査、merge 前 Draft 状態確認（isDraft）、自動確定・merge と HITL 停止の分岐）→ REQ/Decision/Design 保存（Definition 保存 / Design 保存内部責務、Capability Skill 委譲）→ canonical Definition 再取得 → proposed Decision の受理評価と accepted 遷移 → execution contract 確定 → 実行構造確定（連結成分、3軸判断、単独根の Standard 化、構成検証、Wave ファイル重複前置検出）→ 検証対応要否ゲート → draft / RU 削除 → ready 遷移。
 - **分岐**: 新しい意味判断が不要（自動確定・merge）vs 必要（HITL 停止）、proposed Decision の受理可否（一意確定 vs HITL）、Standard vs Epic 構成、構成検証の上限超過・構成不備で停止。
 - **副作用**: Definition PR の merge、`docs/requirements/**` / `docs/decisions/**` / `docs/designs/**` の保存（Capability Skill 委譲）、Decision の accepted 遷移、Child Issue / Wave 作成、draft / RU 削除、Root Case の ready 遷移。
 - **HITL**: 新しい Decision、意味変更、対象範囲拡大、意味的不整合の解消が必要な場合の停止、proposed Decision の受理が一意に確定できない場合の停止、構成検証失敗時の停止。
