@@ -1,27 +1,11 @@
 # inspect-docs finding 20260901T120043Z（defer 残置分）
 
 > 本ファイルは inspect-promote（2026-09-01 実施、/agentdev/backlog-auto 経由）の分類確定後、defer となった検出事項のみを残置する。promote 採用分（F-01〜F-07, F-13〜F-26, F-28〜F-33, F-35 の27件）は .agentdev/inspect/promoted/inspect-docs-promoted-20260901T120043Z.md へ保存済み。reject 0件（旧 20260815 ファイルの F-15 のみ reject・即時削除済み）。
-> 2026-09-07 実施（backlog-auto stage 2 inspect 系統）の再評価で F-36 を reject・即時削除した（却下理由は当該 commit message 参照）。残る F-08〜F-12/F-27/F-34 は defer 継続。
+> 2026-09-07 実施（backlog-auto stage 2 inspect 系統）の再評価で F-36 を、2026-09-16 実施（backlog-auto stage 2 inspect レーン、直列実行）の再評価で F-08/F-09 を reject・即時削除した（いずれも却下理由は当該 commit message 参照）。残る F-10〜F-12/F-27/F-34 は defer 継続。
 >
-> - F-08〜F-12: 構造改善候補（SPLIT / DUPLICATE / RETIRE / MOVE）で採否が意味判断のため intake 送付候補
+> - F-10〜F-12: 構造改善候補（DUPLICATE / RETIRE / MOVE）で採否が意味判断のため intake 送付候補
 > - F-27: guides 間の参照方向ルール分岐（正本記述が未確定）のため intake 送付候補
 > - F-34: 出典履歴注記の許容可能性判断のため intake 送付候補
-
-### F-08: REQ-003 に委譲境界と対論型レビュー振る舞い契約が混在（SPLIT 候補）
-- **category**: SPLIT
-- **target**: docs/requirements/REQ-003.md:52-73（REQ-003-035〜054 の25行）対 同 :10-12（目的節）
-- **evidence**: REQ-014.md L14/L34 が「adversarial-review 自身の振る舞い契約は REQ-003-035〜040 が所有する」と宣言。req-health-metrics 閾値適用: 要件行数 56（+1）＋関心分類 2（+1）＝シグナル 2＝「SPLIT 検討」。目的節は対論型レビューに言及なし
-- **severity**: low / **confidence**: medium
-- **source_of_truth**: req-health-metrics「関心分類」シグナル。対論型レビュー契約は委譲境界 REQ の関心対象の総体として説明できない
-- **recommended_route**: 意味診断検出事項
-
-### F-09: adversarial-review の default-on と再起票禁止が REQ-014/REQ-015/REQ-003 に二重規定
-- **category**: DUPLICATE
-- **target**: docs/requirements/REQ-014.md:32（REQ-014-013）対 docs/requirements/REQ-015.md:25（REQ-015-002）。docs/requirements/REQ-003.md:71（REQ-003-054）対 docs/requirements/REQ-014.md:26（REQ-014-007）
-- **evidence**: REQ-003-054 が自ら「（REQ-014-007 と整合）」と相互参照を要する状態。REQ-014-015 は「単一所有」を宣言するが実態は同一規範が REQ-003 と REQ-014 に分散
-- **severity**: low / **confidence**: medium
-- **source_of_truth**: 3 REQ に同系規範が分散し同期コストが発生（document-model 6処置の REFERENCE/MERGE 対象）
-- **recommended_route**: 意味診断検出事項
 
 ### F-10: 検証実行結果を TIM に保存しない規範が REQ-012/REQ-021 に二重規定（軽度）
 - **category**: DUPLICATE
@@ -89,3 +73,4 @@
 - 旧 20260815 F-15（workflow-skill-model draft）は accepted 昇格確認済みのため reject（即時削除済み、commit message 参照）
 - 旧 20260822 F-05（draft Design 被参照）は defer 継続（該当ファイルは残置）
 - 2026-09-07 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: F-08〜F-12/F-27/F-34 は前提条件に変化なく defer 継続（自律確定）。F-36 は reject・即時削除（自律確定）: 現行ファイル確認で「各 command の参照方法」見出しは汎用トップレベル節（H2、`---` 区切り直下）と各手順セクション内小節（H3）の正当な階層差であり設計上の反復、「見出しレベル不統一」検出パターンの誤検知と確認（前回予告の reject 余地再観查で確定。却下理由は commit message に記録）
+- 2026-09-16 実施（backlog-auto stage 2 inspect レーン、--auto なし、直列実行）再評価: F-08/F-09 は解消済みのため reject・即時削除（自律確定）: #2846 により REQ-003-035〜054 が REQ-082 へ分離移管済み（SPLIT 懸念の対象が消滅）、REQ-003-054 も消滅し default-on・再起票禁止の規定は REQ-014-013 のみに単一化（REQ-003/REQ-082/REQ-014 の行実在突合で確認。却下理由は commit message に記録）。F-10〜F-12/F-27/F-34 は新情報なく defer 継続（自律確定）
