@@ -170,13 +170,15 @@ case-close が Epic Issue 番号を受領した場合の PR マージ、子Issue
 ## Epic 統率者契約（Epic Orchestrator Contract）
 
 scale: large（Epic）の場合、case-auto は Epic Issue に対し case-run(#epic) → case-close(#epic) の反復を実行する（REQ-034-012）。
-この反復は orchestration stage 3（barrier の外側）ではなく、当該 Epic execution_unit の stage 2 参加における Wave 反復（内部状態遷移処理）である（REQ-034-025）。
+この反復は orchestration stage 4 の case-close ではなく、当該 Epic execution_unit の stage 3 参加における Wave 反復（内部状態遷移処理）である（REQ-034-025）。
 複数 execution_unit 並列実行時は、各 execution_unit に相当する Issue または Epic Issue に対し個別に処理する（REQ-034-018）。
 詳細は `docs/designs/commands/case-auto.md` 参照。
 
-- case-auto: orchestration stage barrier 制御（stage 1a case-open・stage 1b case-ready・stage 2 case-run・stage 3 case-close を起動時対象群への barrier で進行）、execution_unit 群反復制御、OU 逐次処理。case-run は case-auto 内でインライン実行し、実行担当サブエージェントへの委譲を case-auto から直接行う（委譲起点の折りたたみ、多重委譲回避）
+- case-auto: orchestration stage 制御（stage 1 case-open・stage 2 case-ready・stage 3 case-run・stage 4 case-close を stage 内最大並列・stage 間全対象収束で進行）、execution_unit 群反復制御、OU 逐次処理。case-run は case-auto 内でインライン実行し、実行担当サブエージェントへの委譲を case-auto から直接行う（委譲起点の折りたたみ、多重委譲回避）
 - case-run: Epic Wave 実行時の子Issue 並列委譲、全委譲完了待機、結果収集、Findings / Capture候補件数の集約
 - case-close: Epic Wave クローズ時の PR マージ、子Issue クローズ、Epic Issue 本文ステータス追跡テーブルの単一書き手
+
+Epic execution_unit の stage 3 完了状態の基準は、既存 Epic / Wave workflow が返す execution_unit 完了状態（Epic Issue 本文ステータス追跡テーブルの全子Issue 終端と Epic Issue 状態）とする（REQ-034-025）。case-auto は Epic / Wave 内部ロジックを複製しない。
 
 **per-Epic 単一書き手（REQ-035-007）**: 複数 execution_unit 並列実行時、Epic Issue 本文の単一書き手は per-Epic-Issue-body で維持される。
 複数 case-close が並列実行されても、それぞれが書き込む Epic 本文は異なる。
@@ -261,14 +263,14 @@ case-open、case-auto、case-run で参照される並列上限と停止条件�
 | 文脈 | 上限 | 根拠 |
 |---|---|---|
 | case-run Wave 内子 Issue 並列 | 5件 | REQ-031-015（同一 Wave 内の case-run サブエージェント並列起動上限） |
-| case-auto orchestration stage 2 同時起動数 | 5件 | REQ-034-027（orchestration stage における case-run bg task 同時起動数） |
+| case-auto orchestration stage 3 同時起動数 | 5件 | REQ-034-027（orchestration stage における case-run bg task 同時起動数） |
 | execution_unit 全体並列 | 上限なし | REQ-034-011（必須依存がない execution_unit 群は全て並列実行可能） |
 
 3つの「5件」は別文脈であり、混同しない。
 
 #### 並列起動の間隔
 
-上記2文脈（case-run Wave 内子 Issue 並列委譲、case-auto orchestration stage 2 同時起動）で複数のサブエージェントを起動する場合、起動バーストによる実行基盤・モデル provider への瞬間的なリクエスト集中を抑えるため、委譲起動と委譲起動の間に10秒の起動間隔を置く（固定値、実行制御パラメータ）。
+上記2文脈（case-run Wave 内子 Issue 並列委譲、case-auto orchestration stage 3 同時起動）で複数のサブエージェントを起動する場合、起動バーストによる実行基盤・モデル provider への瞬間的なリクエスト集中を抑えるため、委譲起動と委譲起動の間に10秒の起動間隔を置く（固定値、実行制御パラメータ）。case-auto orchestration stage 1（case-open / case-revise 委譲）・stage 2（case-ready 委譲）・stage 4（case-close 委譲）の並列委譲起動にも同一の起動間隔を適用する（全 stage 共通の固定並列上限の新設ではなく、起動間隔による実行基盤側の安全制約として扱う）。
 最初の1件は直ちに起動し、以降の各委譲起動は10秒の待機後に発行する。
 同一のTool呼び出し一括ブロックで複数の委譲起動を発行せず、起動→待機→起動を逐次発行する（1ブロック1委譲起動）。
 間隔の実現手段（待機コマンド等）は harness 責務とし、`agentdev-case-run-execution-adapter` スキルの harness 委譲実装ノート（`references/harness-delegation.md`）に配置する（REQ-011-018、REQ-002-002）。
@@ -297,21 +299,20 @@ case-auto は停止時に停止理由を以下の分類で報告する（REQ-034
 
 ## ドラフト間並列実行モデル（REQ-034-025〜029）
 
-case-auto が複数の対象を処理する場合、orchestration stage モデルを起動時に確定した対象群全体に対する barrier として適用する（対象ごとの縦切り pipeline として適用しない）。
-通常経路の stage 構成は stage 1a（case-open 順次）→ stage 1b（case-ready 順次、例外経路時は case-revise → case-ready）→ クリーンアップ検証ゲート → stage 2（case-run を bg task として最大5件ずつ並列実行）→ stage 3（case-close 順次）であり、例外経路も同等の対象群 barrier 原則に従う。
+case-auto が複数の対象を処理する場合、orchestration stage モデル（stage 1 case-open（例外経路時は case-revise）→ stage 2 case-ready → クリーンアップ検証ゲート → stage 3 case-run → stage 4 case-close）に従い、各 stage は直列化要因（必須依存、実行安全上限、競合書き込み、単一書き手契約等）を満たす処理を除き stage 内で最大限並列実行し、stage 間は対象群の収束（fan-in）で進行する（対象ごとの縦切り pipeline として適用しない）。
 各 stage は、当該 stage に属する全対象が当該 stage を正常完了し、または当該実行において後続 stage へ進めないことが既存契約上確定した結果（blocked / failed 等）に収束するまで、後続 stage を開始しない（未実行・実行中・状態不明・再試行対象の残存は収束済みとしない）。後続 stage へ進めない対象は後続 stage の対象から除外するが、その存在だけを理由として独立した他対象の進行を停止しない。
 最大同時起動数、起動間隔、順次フォールバック等は stage 内の scheduling 制約であり、これらによる batch 分割は orchestration stage の分割ではない。
 
-Epic execution_unit における Wave 間および最終 Wave の case-close(#epic) は、Wave 反復を進行・完結させる stage 2 内部の状態遷移処理であり、orchestration stage 3 の case-close とは意味が異なる。Epic execution_unit の stage 2 完了は、その Wave 反復が完遂し後続 Wave が残存しない状態への収束とし、stage 3 では追加の case-close を行わない。stage の分類は orchestration 上の位置づけにより行い、command 名単独では分類しない。
+Epic execution_unit における Wave 間および最終 Wave の case-close(#epic) は、Wave 反復を進行・完遂させる stage 3 内部の状態遷移処理であり、orchestration stage 4 の case-close とは意味が異なる。Epic execution_unit の stage 3 完了は、その Wave 反復が完遂し後続 Wave が残存しない状態への収束とし、stage 4 では追加の case-close を行わない。stage の分類は orchestration 上の位置づけにより行い、command 名単独では分類しない。
 
-stage 1a・stage 1b・stage 3 を main push と capture の直列集約ポイントとし、commit も並列実行区間の外で処理する。
+main への push、capture、commit、同一 Epic Issue 本文への更新等の競合する共有書き込みは、当該競合部分のみを必要な単位で局所的に直列化する（REQ-034-026）。
 
 再開時は stage cursor を新たな正規状態として保存せず、起動時対象集合と各対象の正規状態（Issue / PR / Case 等）から現在 stage を最も早い未収束 stage として再構成し、完了済み対象を再実行せず、同一対象だけを後続 stage へ先行させない。起動時対象集合の安定識別子は中断再開に必要な期間に限りローカル一時実行状態（REQ-002-036）として保持し、draft / RU の削除によって対象を実行中の対象集合から消失させない。正規成果物から再構成できる情報を別の正規状態として重複管理しない。
 
-orchestration stage（stage 1a・1b・2・3）、stage 2 の同時起動数固定値5、bg task の状態管理、破棄検知時の状態別回復、stage 1a・1b・3 の直列集約は AgentDevFlow 側の制御点である。
+orchestration stage（stage 1〜4）、stage 3 の同時起動数固定値5、bg task の状態管理、破棄検知時の状態別回復、共有書き込みの局所直列化は AgentDevFlow 側の制御点である。
 bg task API、実行エージェント選定、実行担当サブエージェント内部の推論、context 管理、retry、heartbeat、エラー解析は harness 側に維持する（harness execution mechanism、ADF 規範所有対象外、REQ-011-018）。
 
-stage 2 の bg task がシステムにより破棄されたことを検知した場合、commit 済みで PR 未作成の状態と未コミット変更が残る状態を区別し、それぞれの状態に対応する回復パターンを適用する。
+stage 3 の bg task がシステムにより破棄されたことを検知した場合、commit 済みで PR 未作成の状態と未コミット変更が残る状態を区別し、それぞれの状態に対応する回復パターンを適用する。
 並列実行が利用できない場合だけ順次フォールバックを使用し、理由を完了報告に残す。
 
 ## 前工程完了度3段階分類

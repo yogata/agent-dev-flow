@@ -86,11 +86,11 @@ case-run、case-auto の実行結果契約は次の4状態を区別する。
 
 ## case-auto の orchestration stage と bg task 管理
 
-case-auto の orchestration stage（stage 1a case-open・stage 1b case-ready 順次、stage 2 case-run 並列、stage 3 case-close 順次。各 stage は起動時対象群全体への barrier として適用される、REQ-034-025）、stage 2 の固定並列数、bg task の状態管理、破棄検知時の状態別回復（commit 済み PR 未作成、未コミット変更残存の区別）は AgentDevFlow 側の業務ワークフロー契約として所有する。
+case-auto の orchestration stage（stage 1 case-open・stage 2 case-ready・stage 4 case-close は stage 内最大並列、stage 3 case-run は並列実行。各 stage は stage 内最大並列・stage 間全対象収束で進行、REQ-034-025）、stage 3 の固定並列数、bg task の状態管理、破棄検知時の状態別回復（commit 済み PR 未作成、未コミット変更残存の区別）は AgentDevFlow 側の業務ワークフロー契約として所有する。
 これらは後続工程が依存する安全境界と回復契約であり、配布物で共有する。
 
 bg task API、実行エージェント選定、実行担当サブエージェント内部の推論、context 管理、retry、heartbeat、エラー解析は harness 側の所有とする（harness execution mechanism、ADF 規範所有対象外、REQ-011-018）。
-stage 1a・stage 1b と stage 3 の直列集約ポイントは main push、capture、commit を並列実行区間の外で処理する AgentDevFlow 側の契約とし、bg task API 経由の実行制御は harness 側の責務として維持する。
+共有状態への書き込み（main push、capture、commit、同一 Epic Issue 本文等）は競合部分のみを局所的に直列化する AgentDevFlow 側の契約（REQ-034-026）とし、bg task API 経由の実行制御は harness 側の責務として維持する。
 
 工程別の所有対象、非所有対象の詳細リストは `docs/designs/responsibilities/responsibility-boundary-purification.md` を正規所有者とする。
 
