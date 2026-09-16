@@ -58,3 +58,57 @@
 - **タグ**: #docs-chore #traceability #unclassified
 
 ---
+
+## 2026-09-16: REQ/Design の内容変更時は frontmatter updated を必須セットとして同時更新する
+
+- **問題事象**: REQ/Design ファイルの内容変更 commit で frontmatter `updated`（最終更新日、patterns.md 定義）の同時更新が漏れた。機械ゲート（docs-check / targeted docs guard）では検出されず、review-work 品質ゲートの MINOR 所見として後から検出された（REQ-017.md 直近 4 コミット連続で更新慣行あり）。
+- **発生局面**: case-run（RU-0023、REQ-017-020 APPEND。PR #2889 初回 commit 4247798c）。
+- **検知方法**: review-work Code Quality レーン。
+- **根本原因**: 内容変更と frontmatter 更新を必須セットとして扱う運用が慣行止まりで機械ゲート化されていない。
+- **自律対応内容**: 第 2 commit 6725eb28 で frontmatter updated を補修（REQ-017.md / delegation-contracts.md / verification-scope-catalog.md）。
+- **ユーザー確認の有無**: なし（case-run 内で補修完了）。
+- **Decision/REQ/spec影響**: なし（lifecycle メタデータの運用慣行）。
+- **横展開観点**: 内容変更 commit には frontmatter 更新を必須セットとして扱うのが安全。機械ゲート不在のため人的レビューに依存している点は同種の REQ/Design 系 Case で再発し得る。
+- **再発条件**: frontmatter 更新を伴わない内容変更 commit が続く限り発生し得る。
+- **予防策候補**: targeted docs guard への frontmatter 鮮度検査（内容変更と updated の整合）追加を検討。
+- **想定反映先**: REQ-053 文書品質系、integrity rules（将来の検討候補）。
+- **関連**: Issue #2884（Ref）、PR #2889（Refs）。
+- **タグ**: #frontmatter #lifecycle-metadata #docs
+
+---
+
+## 2026-09-16: REQ 行本文と Design/カタログの「報告根拠」粒度差は正典 verbatim 原則で意図的に残り得る
+
+- **問題事象**: REQ-017-020 の行本文（正典 verbatim 採用）には「親への不一致報告」が明示されず、Design 箇条書き・検証対応カタログの説明文が報告義務を含む粒度差が残った。
+- **発生局面**: case-run（RU-0023。PR #2889）。
+- **検知方法**: review-work 品質ゲート意味論所見（非ブロッキング）。
+- **根本原因**: 行本文は Issue 本文 Definition Package を正とするため、派生物側の粒度を正に引き上げない判断が正規（正典優先）。
+- **自律対応内容**: 現行維持（行本文を変更しない判断を記録）。
+- **ユーザー確認の有無**: なし。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: 正典 verbatim 採用の REQ 行では、Design/カタログ側がより具体的な粒度を持つ粒度差が構造的に生じる。粒度差の検出自体は品質所見として正常であり、正典側への無断反映はしない。
+- **再発条件**: 正典 verbatim 原則で REQ 行を APPEND する Case で派生物側が詳細化する限り発生し得る。
+- **予防策候補**: docs 診断（inspect-docs）の DUPLICATE/DRIFT 観点で正典と派生物の粒度差を意図的差異と誤検出差異に分類する観点の整備検討。
+- **想定反映先**: REQ-036 inspect 系、REQ-056 Project Knowledge の整備候補。
+- **関連**: Issue #2884（Ref）、PR #2889（Refs）。
+- **タグ**: #canonical-granularity #req-design #verbatim
+
+---
+
+## 2026-09-16: 同種突合規定群への新規定追記時は既存規定との優先順位の非明示が残り得る
+
+- **問題事象**: delegation-contracts.md の既存突合規定（Issue 番号×対象成果物パス不一致時は委譲を開始しない）と新規規定（補助情報不一致時は除去/置換後に委譲開始可）の優先順位が「既存特定規定が優先」と読み解けるのみで明示されなかった。
+- **発生局面**: case-run（RU-0023。PR #2889）。
+- **検知方法**: review-work 品質ゲート意味論所見（非ブロッキング）。
+- **根本原因**: 既存規定（REQ-017-019 対応 2 箇条書き）の改変が対象外のため、新規規定側で優先順位に触れられなかった。
+- **自律対応内容**: 記録のみ（対象外変更は実施しない）。
+- **ユーザー確認の有無**: なし。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: 既存節への追記系 Case では、既存規定の非改変制約と新規定の優先順位明示の両立が課題になる。優先順位の明文化は別途の追跡Issue（REQ-017 隣接）として起票する経路が安全。
+- **再発条件**: 対象外制約付きの既存節追記 Case が続く限り発生し得る。
+- **予防策候補**: 同種規定群への追記時は優先順位の非明示を PR 本文 Findings へ明示的に記録し、追跡Issue 化の判断材料にする運用。
+- **想定反映先**: REQ-017 委譲契約系の将来の追跡Issue、docs 診断の DRIFT 観点。
+- **関連**: Issue #2884（Ref）、PR #2889（Refs）。
+- **タグ**: #precedence #delegation-contracts #docs
+
+---
