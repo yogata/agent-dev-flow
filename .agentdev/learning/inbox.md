@@ -40,3 +40,21 @@
 - **タグ**: #tempdir #residue #cleanup
 
 ---
+
+## 2026-09-16: docs_chore の REQ 行 APPEND では traceability の missing-verification（unclassified）が必ず残る
+
+- **問題事象**: REQ 行を新規 APPEND する docs_chore Case では、traceability check の missing-verification（unclassified）が必ず 1 件残る。検証対応要否カタログ（verification-scope-catalog.md）への登録が対象範囲に含まれない場合、case-run では self-decide できず Design確定候補への記録で case-close に引き継ぐことになる。
+- **発生局面**: case-run（RU-0022、REQ-053-040 APPEND。PR #2888）。
+- **検知方法**: worktree root での traceability check（--req REQ-053-040）で unclassified 検出。
+- **根本原因**: 新規 REQ 行は実装直後にはカタログ未登録かつ検証対応宣言なしのため、未分類行として missing-verification に出る。
+- **自律対応内容**: case-run では PR 本文「## Design確定候補」へ記録して case-close へ引き継ぎ、case-close STEP-3 Design 状態評価で検証対応任意行としてカタログ登録（commit 673f66a2）して解消。
+- **ユーザー確認の有無**: なし（fail-open 運用と Design 確定候補処理で解消）。
+- **Decision/REQ/spec影響**: なし（verification-scope-catalog.md への 1 行登録のみ）。
+- **横展開観点**: REQ 行 APPEND を含む docs_chore Case の定義時には、カタログ登録を対象範囲に含めるか「## Design確定候補」への記録を想定しておくと case-run の検証差分説明が不要になる。あわせて `generate_indexes.ts` の再生成が req-health-metrics.md の AUTOGEN ブロックを更新する点（REQ 行数変化は README 索引ではなく健康メトリクスへ現れる点）は docs_chore 実装時の既知帰結として想定しておくと検証差分の説明が不要になる。
+- **再発条件**: 検証対応要否カタログ登録を対象外とした REQ 行 APPEND Case が続く限り毎回発生。
+- **予防策候補**: case-open の検証対応要否分類ゲートで新規行のカタログ登録を同時に確定する運用。
+- **想定反映先**: REQ-031 / REQ-032 の Design 確定候補・capture 運用、case-open 分類ゲート。
+- **関連**: Issue #2883（Ref）、PR #2888（Refs）。
+- **タグ**: #docs-chore #traceability #unclassified
+
+---
