@@ -36,13 +36,13 @@ AgentDevFlow 配布物と harness 実行制御の責務境界を、所有対象�
 - plan task監査ログ
 
 ### case-auto所有/非所有リスト
-**所有**: 入力解決、auto_gate確認、artifact_actions基準工程決定、入力引き渡し、永続状態再読込、継続停止再開判定、完了進行未実行報告、壁時計時間計測、orchestration stage（stage 1 case-open 順次実行、stage 2 case-run 並列実行、stage 3 case-close 順次実行、REQ-006-089）、stage 2 の固定並列数5（REQ-006-091）、bg task の状態管理、破棄検知（REQ-006-093）、状態別回復（commit 済み PR 未作成 / 未コミット変更残存の区別）、stage 1 と stage 3 の直列集約ポイント（main push / capture / commit、REQ-006-090）
+**所有**: 入力解決、auto_gate確認、artifact_actions基準工程決定、入力引き渡し、永続状態再読込、継続停止再開判定、完了進行未実行報告、壁時計時間計測、orchestration stage（stage 1a case-open・stage 1b case-ready 順次実行、stage 2 case-run 並列実行、stage 3 case-close 順次実行、起動時対象群全体への barrier 適用、REQ-006-089、REQ-034-025）、stage 2 の固定並列数5（REQ-006-091）、bg task の状態管理、破棄検知（REQ-006-093）、状態別回復（commit 済み PR 未作成 / 未コミット変更残存の区別）、stage 1a・stage 1b と stage 3 の直列集約ポイント（main push / capture / commit、REQ-006-090）、起動時対象集合の維持（ローカル一時実行状態、REQ-002-036、REQ-034-025）
 **非所有**: 工程内部手順再実装、エージェント選定、スケジューリング、エラー解析、context圧縮、retry、QG再評価、capture再実装、bg task API、実行担当サブエージェント内部の実行制御（推論、context 管理、retry、エラー解析等）、heartbeat、plan task監査ログ
 
 > **用語注記**: 「実行担当サブエージェント内部の実行制御」は、推論、context 管理、retry、エラー解析等を含む上位概念として扱う。
 > line 38 限定注記内の表記と一致させる（語彙揺れ是正）。
 
-> **v2:ADR-0138 による v2:ADR-0136 決定2の限定範囲（REQ-006-089〜093）**: v2:ADR-0136 決定2「配布物は業務ワークフロー契約のみを記述し、実行制御は harness 責務」に対し、case-auto の orchestration stage（stage 1〜3）、stage 2 の固定並列数、bg task の状態管理と状態別回復、stage 1 と stage 3 の直列集約だけを AgentDevFlow 側の業務ワークフロー契約として規定する。
+> **v2:ADR-0138 による v2:ADR-0136 決定2の限定範囲（REQ-006-089〜093）**: v2:ADR-0136 決定2「配布物は業務ワークフロー契約のみを記述し、実行制御は harness 責務」に対し、case-auto の orchestration stage（stage 1a・1b・2・3）、stage 2 の固定並列数、bg task の状態管理と状態別回復、stage 1a・stage 1b と stage 3 の直列集約だけを AgentDevFlow 側の業務ワークフロー契約として規定する。
 > bg task API と実行担当サブエージェント内部の実行制御は harness 側に維持し、決定2の本体を変更しない。
 
 ### case-run所有/分離対象リスト
@@ -88,7 +88,7 @@ case 実行に関わる責務を 4 用語へ分解し、正規所有者を固定
 
 - 永続文書（REQ、Decision、Design、guide）の規範記述で修飾なしの「Phase」を使用しない
 - 「Phase」は orchestration stage、case-run internal lifecycle など修飾付きの用語へ置き換える
-- 既存の「Phase 1 case-open 順次、Phase 2 case-run 並列、Phase 3 case-close 順次」は「orchestration stage 1 case-open 順次、stage 2 case-run 並列、stage 3 case-close 順次」へ置き換える
+- 既存の「Phase 1 case-open 順次、Phase 2 case-run 並列、Phase 3 case-close 順次」は「orchestration stage 1a case-open・stage 1b case-ready 順次、stage 2 case-run 並列、stage 3 case-close 順次」へ置き換える
 
 ### 関連 Design（参照レベル、別途 Definition 保存（case-ready / case-revise）の Design 保存内部責務 対象）
 
