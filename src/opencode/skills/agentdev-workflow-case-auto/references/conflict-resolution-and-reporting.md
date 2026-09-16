@@ -83,7 +83,7 @@ Epic Issue を伴う Wave 反復実行時は、完了・blocked・failed 子Issu
 - **工程別タイムスタンプ内訳（L1）**: case-open / case-ready / case-run / case-close（例外経路時は case-revise を含む）、スキップした工程は除外可、case-run の L2 内訳は case-run result から読み取って含める
 - **インライン実行の記録**: case-run をインライン実行した旨
 - **orchestration stage 別結果・フォールバック理由・破棄回復記録**:
-  - stage 1 case-open / stage 2 case-run / stage 3 case-close
+  - stage 1a case-open / stage 1b case-ready / stage 2 case-run / stage 3 case-close
   - stage 2 を順次フォールバック時は理由
   - bg task 破棄を検知して回復した場合は状態区分と回復結果
 - **結果状態の4次元報告**:
