@@ -60,7 +60,7 @@ updated: 2026-09-05
   - 結果状態の4次元集約（REQ-034-031）: 各工程の output_contract から (1) 工程結果 pass/warn/fail、(2) artifact_action 適用結果 applied/skipped/failed/no-op、(3) 定義適用工程完了状態、(4) OU ライフサイクル完了状態を収集し混同なく保持する。集約規則の詳細は後述「結果状態の4次元集約（REQ-034-031）」セクション
 - Wave 反復制御（Epic Issue 指定時）
   - case-auto が Epic Issue 番号を記録。Epic Issue 本文から Wave 構成、各子Issue ステータスを読み取る（読み取りのみ、Epic Issue 本文の書き込みは case-close の責務）
-  - case-auto が現在 Wave の ready 子Issue を選択し、各子Issue ごとにインライン case-run を実行（最大5件並列、REQ-006-026 踏襲）。各子Issue の実行担当サブエージェントへ case-auto から直接委譲
+  - case-auto が現在 Wave の ready 子Issue を選択し、各子Issue ごとにインライン case-run を実行（最大5件並列、起動間隔10秒。REQ-006-026 踏襲、並列起動の間隔は epic-wave-model Design 参照）。各子Issue の実行担当サブエージェントへ case-auto から直接委譲
   - Wave 内全子Issue の完了（completed-pr / blocked / failed / delegation-unavailable）を待機
   - completed-pr の子Issue がある場合、case-close(#epic) へ委譲
   - 残 Wave がある場合、次 Wave を実行（べき等）

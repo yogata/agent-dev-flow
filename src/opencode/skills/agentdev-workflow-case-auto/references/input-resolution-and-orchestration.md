@@ -115,7 +115,7 @@ STEP-8（停止時報告）・STEP-8（完了報告）での所要時間算出�
 
 1. SSoT 再構成: 各工程の durable state（REQ/Decision/Design ファイル、Issue/PR、Epic Issue 本文）
 2. identifier 保持: Issue番号、PR番号、OU ID、draft パス、RU パス
-3. 最小 scalar: L1 工程別タイムスタンプ、stage 2 並列数（最大5件）
+3. 最小 scalar: L1 工程別タイムスタンプ、stage 2 並列数（最大5件、起動間隔10秒。epic-wave-model Design「並列起動の間隔」）
 4. runtime artifact: なし（委譲工程内部の過程は親コンテキストに累積しない、command 不変条件）
 
 ### Preconditions
@@ -140,6 +140,7 @@ OU の統合・分割・REQ 操作分類・Issue 階層判定を再評価しな�
 | stage 3 | case-close | 直列集約 | 単一 |
 
 順次フォールバック可能（command 不変条件）。
+並列起動時は委譲起動ごとに10秒の起動間隔を置き、同一Tool一括ブロックでの複数起動発行は行わない（epic-wave-model Design「並列起動の間隔」）。
 bg task 破棄検知時の3状態回復は `agentdev-workflow-orchestration` 参照。
 
 #### Wave 反復制御（case-auto 直接制御）
