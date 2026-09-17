@@ -1,4 +1,4 @@
-// ADF-COVERS(implementation): REQ-011-025, REQ-011-026, REQ-011-027, REQ-011-029, REQ-011-030
+// ADF-COVERS(implementation): REQ-011-025, REQ-011-026, REQ-011-027, REQ-011-029, REQ-011-030, REQ-083-001
 // agentdev-gh Custom Tool の GitHub 実装（GhRunner）。
 //
 // 環境依存の実装詳細（gh オプション運用、--input によるファイル渡し、

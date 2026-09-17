@@ -3,7 +3,7 @@ name: agentdev-workflow-case-open
 description: "case-open command の workflow 実装本体。合意済み要件doc からの Root Case 確立、Definition Package 生成と Root Case 関連付け、実変更判定と Definition PR 作成（実変更時のみ、Case 単位 1 件）、冪等再実行（既存 Root Case / 既存 Definition PR の再利用、不足分のみ処理）、STEP-5 横断依存検査（draft の artifact_actions と未クローズ Case 群の機械的比較、同一パス重複時の警告提示）、deviation capture（Split Rule 分類）を所有する。USE FOR: case-open 実行時の workflow 制御（Root Case 確立・Definition Package 生成・実変更判定と Definition PR 作成・冪等再実行・横断依存検査・deviation capture）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）、execution contract 確定・Standard / Epic 最終確定・Child Issue / Wave 作成・RU 削除・proposed Decision 受理評価（case-ready 側の責務）。"
 ---
 
-<!-- ADF-COVERS(implementation): REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-004, REQ-030-005, REQ-030-006, REQ-030-007, REQ-030-008, REQ-030-009, REQ-030-010, REQ-030-011, REQ-030-012, REQ-030-013, REQ-030-014, REQ-021-024 -->
+<!-- ADF-COVERS(implementation): REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-004, REQ-030-005, REQ-030-006, REQ-030-007, REQ-030-008, REQ-030-009, REQ-030-010, REQ-030-011, REQ-030-012, REQ-030-013, REQ-030-014, REQ-021-024, REQ-083-003 -->
 
 # case-open workflow スキル
 
