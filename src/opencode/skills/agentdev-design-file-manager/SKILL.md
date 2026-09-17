@@ -3,7 +3,7 @@ name: agentdev-design-file-manager
 description: Manages Design file operations (CREATE/APPEND/UPDATE), placement resolution, target_area section replacement, Design-specific integrity, and Design-specific script invocation contract. USE FOR: creating Design files, appending sections, updating Designs via target_area, Design lifecycle (draft/accepted) application. DO NOT USE FOR: REQ/Decision operations, Design content inference, accepted promotion, user approval, commit, push.
 ---
 
-<!-- ADF-COVERS(implementation): REQ-021-026 -->
+<!-- ADF-COVERS(implementation): REQ-021-026, REQ-057-036 -->
 
 # Designファイル管理
 
@@ -56,7 +56,10 @@ Design frontmatter の `status`（`draft` / `accepted` の2値）を本スキル
 - **APPEND / UPDATE**: 既存 Design の `status` を変更しない。`accepted` 昇格は case-close の責務
 - 置換済み Design は現行 Design ツリーへ保持しない。置換時は旧 Design を現行ツリーから除外し、履歴は Git、Issue、Decision 等の既存履歴手段から確認する
 
-詳細は [references/design-lifecycle-application.md](references/design-lifecycle-application.md) 参照。
+Design status を draft から accepted へ昇格する場合、Design 本体に見出し名 `## 対応記録` の標準形式セクションを設け、昇格日、評価契約根拠、対応 Case/PR、REQ との整合確認結果を記録する。
+昇格根拠の記録と見送り記録は同一対象で排他に管理する。既存 Design への遡及適用は行わず、新規の昇格案件から標準形式に従う。
+
+記録項目の詳細と見送り記録の保存チャネルは [references/design-lifecycle-application.md](references/design-lifecycle-application.md) 参照。
 
 ---
 
