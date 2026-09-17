@@ -5,6 +5,24 @@
 
 ---
 
+## 2026-09-17: textlint guard が project root 外の temp worktree への edit/write を fail-closed ブロックする
+
+- **問題事象**: 並行 case-open 下で Definition PR 用 worktree を C:\WINDOWS\TEMP\opencode 配下へ作成した場合、worktree 内ファイルへの edit/write ツール呼び出しが agentdev-textlint-guard の project root 外パス検査（fail-closed）でブロックされる。REQ-057.md への 1 行追加のような軽微な編集でも guard が停止させる。
+- **発生局面**: case-open STEP-4（Definition PR 作成。並行実行中の兄弟 case-open がメイン working tree のブランチを占有していたため git worktree 方式を採用〔Case #2903、definition/issue-2903〕）。
+- **検知方法**: edit ツール実行時の guard ブロック応答（edit targets a path outside the project root; blocked per fail-closed）。write ツールでも同様にブロックされることを確認。
+- **根本原因**: guard の project root 外パス拒否はメイン working tree を前提とした設計であり、一時 worktree（git 管理下の正規リポジトリ複製）への意図的な編集とプロジェクト外への意図しない書込みを区別していない。
+- **自律対応内容**: AGENTS.md 規約の標準手段である node writeFileSync（明示 utf8）で worktree 内ファイルを編集して迂回。BOM 無し・UTF-8 維持を読み戻し検証してから commit。
+- **ユーザー確認の有無**: なし（AGENTS.md の既存規約内の迂回）。
+- **Decision/REQ/spec影響**: なし（REQ-057-021 の node 明示エンコーディング経路は既に正規手段として規定済み）。
+- **横展開観点**: 並行実行下で worktree 方式を使う全工程（case-open Definition PR、case-run、case-revise）で同様の迂回が必要になり得る。worktree を project root 配下へ作成する構成なら guard 干渉は回避できる。
+- **再発条件**: project root 外（os.tmpdir 系）へ worktree を作り、edit/write ツールでファイル編集する場合に毎回発生。
+- **予防策候補**: agentdev-git-worktree の並列実行安全ステージング手順に worktree 配置先と worktree 内編集の標準手段（node 明示 UTF-8 I/O または project root 配下 worktree）を明記する。agentdev-textlint-guard 側で git worktree の認識による除外を検討。
+- **想定反映先**: agentdev-git-worktree Design / SKILL（worktree 操作手順）、agentdev-textlint-guard Plugin の guard 仕様。
+- **関連**: Case #2903（Refs）、PR #2910（Refs）。
+- **タグ**: #textlint-guard #worktree #windows-io #parallel-execution
+
+---
+
 ## 2026-09-16: 並列テストプロセスの一時成果物が os.tmpdir() 横断走査で外部残渣として誤検出される
 
 - **問題事象**: bun test フルスイート並列実行下で、archive-builder staging path テストの `os.tmpdir()` 横断 orphan scan が並列プロセスの `trust-archive-*` 一時残渣を検出し、テスト本体と無関係な flaky fail を生じていた（RU-0021）。

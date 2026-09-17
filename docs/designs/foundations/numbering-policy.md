@@ -38,6 +38,8 @@ AgentDevFlow 配布物が前提する採番の不変条件を宣言し、各所�
 採番の判断は人間または LLM が行わず、`agentdev-req-file-manager/scripts/`（REQ、複合 ID）と `agentdev-decision-file-manager/scripts/`（Decision）が提供する決定的スクリプト（`alloc-req-number.ts`、`alloc-decision-number.ts`、`alloc-composite-id.ts`）が機械的に確定する（design-principles.md 第5節）。
 Definition 保存 / Design 保存内部責務（case-ready / case-revise）は当該スクリプトを bash 経由で呼び出す。
 
+分割・付け替えに伴う採番のみの付け替えでは、ユーザー裁定による番号指定を例外として許容する。例外採番は REQ 本文の該当行にユーザー裁定の記録を伴い、指定番号が既知欠番と重複する場合も欠番を消費せず、欠番は意図的予約として維持する（REQ-082 採番の前例: 2026-09-15 ユーザー裁定）。決定的採番スクリプトによる新規採番は既定経路であり続ける。
+
 ### 廃止時の扱い
 
 REQ、Decision、IR を廃止した場合、当該識別子は再利用しない。
@@ -55,6 +57,8 @@ REQ、Decision、IR を廃止した場合、当該識別子は再利用しない
 欠番管理の責務を明記。
 IR 廃止時の交叉参照（v2:REQ-NNN 等）の再配置先として req-impact-map.md/retired/ を正規所有者として指定。
 numbering-policy は欠番の存在宣言のみを担い、交叉参照データの体系的蓄積は req-impact-map/retired/ が担う。
+
+REQ の既知欠番: REQ-063〜REQ-081 の 19 連番は、REQ-082 採番（2026-09-15 ユーザー裁定）に伴う意図的予約欠番である。requirements/README.md と docs/README.md で「欠番」として明記し、実体不在と整合する。
 
 ### 採番ミスの是正
 
