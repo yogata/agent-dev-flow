@@ -90,7 +90,7 @@ case-open は、上流工程（req-define）で確定した対象要件を実行
 - **draft-data 入力**: 本スキルは構造化 `draft-data` を入力として読み取る。機能要件、非機能要件、制約、対象外、受け入れ条件は新規に作成せず合意済み入力を反映する。`conflict_resolutions` に記録済みの衝突は再確認しない
 - **Root Case 状態**: Root Case 確立後の状態は open とし、実装開始を許可しない。ready への遷移は case-ready が実行する
 - **Definition PR**: canonical Definition に実変更がある場合のみ、Case 単位で 1 件の Definition PR を作成する。実変更判定不能時は作成せず停止する。冪等キーは definition-readiness Design に従う
-- **verification-scope-catalog 追随確認**: REQ 行追加を伴う Definition Package 生成時は、verification-scope-catalog 更新の追随要否を工程上明示し、必要なカタログエントリ追加を Definition Package の構成要素として含める。カタログ編集は実変更であるため Definition PR 経由以外の適用経路を取らない（REQ-030-015、STEP-3）
+- **verification-scope-catalog 追随確認**: REQ 行追加を伴う Definition Package 生成時は、verification-scope-catalog 更新の追随要否を工程上明示し、必要なカタログエントリ追加を Definition Package の構成要素として含める。カタログ編集は実変更であるため Definition PR 経由以外の適用経路を取らない（対象要件行、STEP-3）
 - **Decision 非遷移**: 新規 Decision は proposed のままとし、accepted への状態遷移を実行しない
 - **横断依存検査の警告非阻止**: STEP-5 の横断依存検査は警告の提示のみを行い、Root Case の確立を自動阻止しない。検出源の取得不能時は比較を省略せず検出不能として報告する。警告時の判断は投入者（HITL）への選択肢提示により行い、case-auto 配下では decision_context による親判断解決へ委譲する
 - **実行識別情報の記録**: Root Case 本文に実行識別情報セクション（対象 Case、実行単位、前工程で確定した事項）を構造化形式で記録する。形式は `agentdev-workflow-templates` の実行識別情報セクション規約に従う。機械的解析は同セクションの key-value 行を正とし、自由文中の ID に依存しない。識別情報の一部が取得不能でも停止せず「N/A」を記録する。作成時点で番号が確定しない自己参照値は Issue 作成後に埋め戻す。既存 Issue への遡及適用は行わない
