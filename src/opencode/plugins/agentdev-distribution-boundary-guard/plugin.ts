@@ -146,6 +146,8 @@ export function makeGuardEnv(opts: MakeGuardEnvOptions = {}): GuardEnv {
       repository_identity: identity,
       producer_internal_id_prefixes: producerPrefixes,
       distributed_workflow_control_prefixes: workflowPrefixes,
+      producer_metadata_enforcement:
+        DEFAULT_DETECTOR_CONFIG.producer_metadata_enforcement,
     },
     readFile: opts.readFile ?? defaultReadFile,
     projection: opts.projection ?? "source",

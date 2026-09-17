@@ -106,6 +106,7 @@ export function runCli(): void {
       concrete_id_hits: countCategory(exemptionResult.remaining, "concrete-id"),
       concrete_path_hits: countCategory(exemptionResult.remaining, "concrete-path"),
       fixed_url_hits: countCategory(exemptionResult.remaining, "fixed-url"),
+      producer_metadata_hits: rawReport.stats.producer_metadata_hits,
     },
   };
 

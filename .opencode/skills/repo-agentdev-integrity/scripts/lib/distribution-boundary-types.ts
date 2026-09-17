@@ -23,6 +23,12 @@ export interface BoundaryReport {
     concrete_id_hits: number;
     concrete_path_hits: number;
     fixed_url_hits: number;
+    /**
+     * Producer-side traceability metadata findings (ADF-COVERS declaration
+     * marker matches). Counted in both enforcement modes; only "enforce"
+     * mode additionally turns them into gate failures.
+     */
+    producer_metadata_hits: number;
   };
 }
 

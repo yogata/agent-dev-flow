@@ -1257,17 +1257,16 @@ describe("Stage B regression: Unicode / hex evasion detection", () => {
 });
 
 // =============================================================================
-// IR-059 exemption: ADF-COVERS traceability declaration comments (OU-016).
+// Producer-side traceability metadata detection signal (DEC-030 decision 5).
 //
-// ADF-COVERS(<role>): REQ-... declarations consumed by agentdev-traceability are
-// inspection-target declarations (IR-059 exemption: "patterns defining the
-// inspection target and inspection-target path declarations"), not residual
-// prose references. Whole-line declaration comments MUST NOT trip the
-// concrete-id gate; ordinary prose with concrete IDs MUST continue to fail.
+// The former IR-059 exemption is gone: ADF-COVERS declaration marker matches
+// are detected in distribution-bound artifacts with NO role filter and NO
+// path filter. In "report" mode (current operating level, activation is Wave
+// 4) the gate does not fail; in "enforce" mode the gate fails closed.
 // =============================================================================
 
-describe("IR-059 exemption: ADF-COVERS declaration comments", () => {
-  test("whole-line HTML declaration comment is not flagged as concrete-id", () => {
+describe("producer metadata detection signal (DEC-030 decision 5)", () => {
+  test("whole-line HTML declaration comment is detected as producer-metadata without failing the report-mode gate", () => {
     const d = classifyLineConfig(
       {
         text: "<!-- ADF-COVERS(implementation): REQ-057-013 -->",
@@ -1278,10 +1277,32 @@ describe("IR-059 exemption: ADF-COVERS declaration comments", () => {
       DEFAULT_DETECTOR_CONFIG,
     );
     expect(d.filter((x) => x.category === "concrete-id").length).toBe(0);
+    const meta = d.filter((x) => x.category === "producer-metadata");
+    expect(meta.length).toBe(1);
+    expect(meta[0]!.matched).toBe("ADF-COVERS");
     expect(decideGate(d).pass).toBe(true);
   });
 
-  test("whole-line // and # declaration comment forms are not flagged", () => {
+  test("marker match has no role filter: any role and no-role forms are detected", () => {
+    for (const line of [
+      "<!-- ADF-COVERS(implementation): REQ-057-013 -->",
+      "<!-- ADF-COVERS(verification): REQ-029-001 -->",
+      "<!-- ADF-COVERS(design): REQ-029-001 -->",
+    ]) {
+      const d = classifyLineConfig(
+        {
+          text: line,
+          lineNumber: 1,
+          filePath: "x.md",
+          projection: "source",
+        },
+        DEFAULT_DETECTOR_CONFIG,
+      );
+      expect(d.filter((x) => x.category === "producer-metadata").length).toBe(1);
+    }
+  });
+
+  test("whole-line // and # declaration comment forms carry the marker signal", () => {
     for (const line of [
       "// ADF-COVERS(verification): REQ-029-001, REQ-029-002",
       "# ADF-COVERS(implementation): REQ-057-021",
@@ -1295,8 +1316,37 @@ describe("IR-059 exemption: ADF-COVERS declaration comments", () => {
         },
         DEFAULT_DETECTOR_CONFIG,
       );
-      expect(d.filter((x) => x.category === "concrete-id").length).toBe(0);
+      expect(d.filter((x) => x.category === "producer-metadata").length).toBe(1);
     }
+  });
+
+  test("report mode keeps declaration contents out of id/path/url extraction", () => {
+    const d = classifyLineConfig(
+      {
+        text: "<!-- ADF-COVERS(implementation): REQ-057-013 -->",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    expect(d.filter((x) => x.category === "concrete-id").length).toBe(0);
+    expect(decideGate(d).pass).toBe(true);
+  });
+
+  test("enforce mode fails the gate on the declaration line (Wave 4 activation state)", () => {
+    const d = classifyLineConfig(
+      {
+        text: "<!-- ADF-COVERS(implementation): REQ-057-013 -->",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      { ...DEFAULT_DETECTOR_CONFIG, producer_metadata_enforcement: "enforce" },
+    );
+    expect(d.filter((x) => x.category === "producer-metadata").length).toBe(1);
+    expect(d.filter((x) => x.category === "concrete-id").length).toBe(1);
+    expect(decideGate(d).pass).toBe(false);
   });
 
   test("declaration sharing a line with prose keeps the prose detectable (fail-closed)", () => {
@@ -1311,6 +1361,7 @@ describe("IR-059 exemption: ADF-COVERS declaration comments", () => {
     );
     const ids = d.filter((x) => x.category === "concrete-id");
     expect(ids.length).toBe(2);
+    expect(d.filter((x) => x.category === "producer-metadata").length).toBe(1);
     expect(decideGate(d).pass).toBe(false);
   });
 
@@ -1325,6 +1376,7 @@ describe("IR-059 exemption: ADF-COVERS declaration comments", () => {
       DEFAULT_DETECTOR_CONFIG,
     );
     expect(d.filter((x) => x.category === "concrete-id").length).toBe(1);
+    expect(d.filter((x) => x.category === "producer-metadata").length).toBe(1);
     expect(decideGate(d).pass).toBe(false);
   });
 
@@ -1358,6 +1410,7 @@ describe("IR-059 exemption: ADF-COVERS declaration comments", () => {
       DEFAULT_DETECTOR_CONFIG,
     );
     expect(d.filter((x) => x.category === "concrete-id").length).toBe(1);
+    expect(d.filter((x) => x.category === "producer-metadata").length).toBe(0);
     expect(decideGate(d).pass).toBe(false);
   });
 
@@ -1377,6 +1430,46 @@ describe("IR-059 exemption: ADF-COVERS declaration comments", () => {
     expect(decideGate(d).pass).toBe(false);
   });
 
+  test("deliberate inline declaration in a distributed skill artifact is detected via classifyContent (fixture)", () => {
+    const content = [
+      "---",
+      "name: agentdev-fixture-skill",
+      "---",
+      "",
+      "# fixture skill",
+      "",
+      "<!-- ADF-COVERS(implementation): REQ-029-010 -->",
+      "",
+      "Generalized body text with no concrete references.",
+    ].join("\n");
+    const reportMode = classifyContent(
+      content,
+      "src/opencode/skills/agentdev-fixture-skill/SKILL.md",
+      "source",
+    );
+    const reportMeta = reportMode.filter((x) => x.category === "producer-metadata");
+    expect(reportMeta.length).toBe(1);
+    expect(reportMeta[0]!.line).toBe(7);
+    expect(decideGate(reportMode).pass).toBe(true);
+
+    const enforced = classifyContentConfig(
+      content,
+      "src/opencode/skills/agentdev-fixture-skill/SKILL.md",
+      "source",
+      { ...DEFAULT_DETECTOR_CONFIG, producer_metadata_enforcement: "enforce" },
+    );
+    expect(enforced.filter((x) => x.category === "producer-metadata").length).toBe(1);
+    expect(decideGate(enforced).pass).toBe(false);
+  });
+
+  test("link projection content carries the same marker signal (clean state, no conversion step)", () => {
+    const content = "restored skill body\n<!-- ADF-COVERS(implementation): REQ-001-001 -->\n";
+    const source = classifyContent(content, "src/opencode/skills/x/SKILL.md", "source");
+    const link = classifyContent(content, ".opencode/skills/x/SKILL.md", "link");
+    expect(source.filter((x) => x.category === "producer-metadata").length).toBe(1);
+    expect(link.filter((x) => x.category === "producer-metadata").length).toBe(1);
+  });
+
   test("declaration line still passes through classifyContent with line numbers intact", () => {
     const content = [
       "# skill doc",
@@ -1389,7 +1482,9 @@ describe("IR-059 exemption: ADF-COVERS declaration comments", () => {
       "source",
     );
     const matched = d.map((x) => x.matched).sort();
-    expect(matched).toEqual(["ADR-0135"]);
-    expect(d[0]!.line).toBe(3);
+    expect(matched).toEqual(["ADF-COVERS", "ADR-0135"]);
+    const meta = d.find((x) => x.category === "producer-metadata");
+    expect(meta).toBeDefined();
+    expect(meta!.line).toBe(2);
   });
 });

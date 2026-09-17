@@ -44,7 +44,25 @@ export type DetectionCategory =
   | "unclassified-entry"
   | "adapter-failure"
   | "distributed-control"
-  | "evasion-attempt";
+  | "evasion-attempt"
+  | "producer-metadata";
+
+/**
+ * Enforcement mode for the producer-side traceability metadata detection
+ * signal (DEC-030 decision 5: distribution purity, no ADF-COVERS exception).
+ *
+ * - "report": the current operating level. Inline ADF-COVERS declarations
+ *   remaining in the consumer distribution closure are DETECTED as
+ *   producer-metadata findings (marker match over the full text, no role or
+ *   path filter) but do not fail the gate. The id/path/url extraction skip on
+ *   declaration lines is kept only in this mode so the gate outcome is
+ *   unchanged during the migration window.
+ * - "enforce": the Wave 4 activation state. Declaration lines lose the
+ *   extraction skip and producer-metadata detections classify as
+ *   unclassified (gate-not-passed, DEC-014 decision 5). Owned by the Wave 4
+ *   issue, not by the exception-removal implementation.
+ */
+export type ProducerMetadataEnforcement = "report" | "enforce";
 
 export interface LineInput {
   /** Full line text including any trailing newline already stripped by caller. */

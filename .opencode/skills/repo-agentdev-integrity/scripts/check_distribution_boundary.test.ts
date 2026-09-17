@@ -18,6 +18,7 @@ import {
   computeDelta,
 } from "./check_distribution_boundary.ts";
 import { loadDistributionTargets } from "./lib/distribution-boundary-rules.ts";
+import { DEFAULT_DETECTOR_CONFIG } from "./lib/distribution-boundary.ts";
 import * as path from "path";
 import * as fs from "fs";
 
@@ -89,6 +90,40 @@ beforeAll(() => {
       "  \"https://github.com/yogata/agent-dev-flow/blob/main/docs/foo.md\",",
       "];",
       "export default samples;",
+      "",
+    ].join("\n"),
+  );
+
+  // TS-012 deliberate contamination fixtures (REQ-029-010): inline
+  // declaration, traceability sidecar, and policy-style files carrying
+  // producer-side traceability metadata inside the consumer distribution
+  // closure. Detected via the ADF-COVERS declaration marker signal with no
+  // role or path filter; the gate failure decision is deferred to the Wave 4
+  // enforcement switch.
+  writeFile(
+    "src/opencode/skills/agentdev-foo/references/contaminated-inline.md",
+    [
+      "# contaminated reference",
+      "",
+      "<!-- ADF-COVERS(implementation): REQ-029-010 -->",
+      "",
+    ].join("\n"),
+  );
+  writeFile(
+    "src/opencode/skills/agentdev-foo/traceability/covers-sidecar.md",
+    [
+      "# traceability sidecar",
+      "",
+      "<!-- ADF-COVERS(verification): REQ-029-011 -->",
+      "",
+    ].join("\n"),
+  );
+  writeFile(
+    "src/opencode/skills/agentdev-foo/traceability/policy.md",
+    [
+      "# traceability policy",
+      "",
+      "<!-- ADF-COVERS(design): REQ-029-010 -->",
       "",
     ].join("\n"),
   );
@@ -167,6 +202,54 @@ describe("checkDistributionBoundary", () => {
       f.file.replace(/\\/g, "/").includes("/tests/"),
     );
     expect(testsHits.length).toBe(0);
+  });
+});
+
+describe("producer-side traceability metadata detection (DEC-030 decision 5)", () => {
+  test("report mode counts deliberate contamination without failing the gate", () => {
+    const report = checkDistributionBoundary(TMP_ROOT);
+    // inline + sidecar + policy fixtures are all detected by the marker signal.
+    expect(report.stats.producer_metadata_hits).toBe(3);
+    const metaFailures = report.failures.filter(
+      (f) => f.category === "producer-metadata",
+    );
+    expect(metaFailures.length).toBe(0);
+  });
+
+  test("enforce mode turns deliberate contamination into gate violations", () => {
+    const report = checkDistributionBoundary(TMP_ROOT, "source", {
+      ...DEFAULT_DETECTOR_CONFIG,
+      producer_metadata_enforcement: "enforce",
+    });
+    const meta = report.failures.filter(
+      (f) => f.category === "producer-metadata",
+    );
+    expect(meta.length).toBe(3);
+    expect(meta.length).toBe(report.stats.producer_metadata_hits);
+    expect(report.ok).toBe(false);
+    const inlineHit = meta.find((f) =>
+      f.file.replace(/\\/g, "/").includes("contaminated-inline.md"),
+    );
+    expect(inlineHit).toBeDefined();
+    expect(inlineHit!.matched).toBe("ADF-COVERS");
+    expect(inlineHit!.line).toBe(3);
+  });
+
+  test("marker signal has no role filter and no path filter", () => {
+    const report = checkDistributionBoundary(TMP_ROOT, "source", {
+      ...DEFAULT_DETECTOR_CONFIG,
+      producer_metadata_enforcement: "enforce",
+    });
+    const meta = report.failures.filter(
+      (f) => f.category === "producer-metadata",
+    );
+    const snippets = meta.map((f) => f.snippet).join(" ");
+    for (const role of ["implementation", "verification", "design"]) {
+      expect(snippets).toContain(`ADF-COVERS(${role})`);
+    }
+    const files = meta.map((f) => f.file.replace(/\\/g, "/"));
+    expect(files.some((f) => f.includes("/references/"))).toBe(true);
+    expect(files.some((f) => f.includes("/traceability/"))).toBe(true);
   });
 });
 
@@ -387,9 +470,8 @@ describe("checkDistributionBoundary: mandatory repository_identity", () => {
 
   test("empty owner_slash_name produces adapter-failure Detection (no silent scan)", () => {
     const report = checkDistributionBoundary(EMPTY_IDENTITY_ROOT, "source", {
+      ...DEFAULT_DETECTOR_CONFIG,
       repository_identity: { owner_slash_name: "", default_branch: "" },
-      producer_internal_id_prefixes: ["ADR", "REQ", "DEC"],
-      distributed_workflow_control_prefixes: ["STEP", "QG"],
     });
     expect(report.ok).toBe(false);
     const identityFailures = report.failures.filter(

@@ -16,6 +16,7 @@ import type {
   Detection,
   DetectionCategory,
   LineInput,
+  ProducerMetadataEnforcement,
   Projection,
 } from "./distribution-boundary.ts";
 import {
@@ -24,6 +25,7 @@ import {
   GENERIC_ID_PATTERN,
   ID_EVASION_PATTERN,
   URL_CANDIDATE_PATTERN,
+  containsAdfCoversMarker,
   isAdfCoversDeclarationLine,
   isConcreteDocsPath,
   isProducerOwnedUrl,
@@ -71,6 +73,15 @@ export interface DetectorConfig {
    * STEP/QG here cannot accidentally relax a real producer-internal family.
    */
   readonly distributed_workflow_control_prefixes: readonly string[];
+  /**
+   * Producer-side traceability metadata enforcement mode (DEC-030 decision 5).
+   * "report" keeps the current operating level: inline ADF-COVERS declarations
+   * in the distribution closure are detected as producer-metadata findings but
+   * do not fail the gate, and the declaration-line extraction skip stays in
+   * effect. "enforce" is the Wave 4 activation state: the extraction skip is
+   * removed and producer-metadata detections fail the gate as unclassified.
+   */
+  readonly producer_metadata_enforcement: ProducerMetadataEnforcement;
 }
 
 /**
@@ -87,6 +98,9 @@ export const DEFAULT_DETECTOR_CONFIG: DetectorConfig = {
   repository_identity: DEFAULT_REPOSITORY_IDENTITY,
   producer_internal_id_prefixes: ["ADR", "REQ", "DEC"],
   distributed_workflow_control_prefixes: ["STEP", "QG"],
+  // Activation stays at "report" until the Wave 4 issue performs the switch
+  // (RA-006 activation part); inline declarations still exist in src/opencode.
+  producer_metadata_enforcement: "report",
 };
 
 // ---------------------------------------------------------------------------
@@ -102,16 +116,23 @@ export interface Candidate {
 
 export function detectCandidates(
   line: string,
-  _cfg: DetectorConfig,
+  cfg: DetectorConfig,
 ): Candidate[] {
   const out: Candidate[] = [];
 
-  // IR-059 exemption (inspection-target declaration): a whole-line ADF-COVERS
-  // traceability declaration comment is a machine-readable artifact claim, not
-  // residual prose. Skip id/path/url extraction on it but keep evasion
-  // extraction fail-closed — an escape sequence must not hide inside a
+  // DEC-030 decision 5 removed the ADF-COVERS exemption. The declaration-line
+  // id/path/url extraction skip is no longer an unconditional exemption: it
+  // survives only outside "enforce" mode to keep the current operating level
+  // during the migration window, and is removed in "enforce" mode so
+  // declaration contents are scanned like any other line. Anything other than
+  // an explicit "enforce" (including an undefined field on a hand-built
+  // DetectorConfig) stays at the report level. Evasion extraction stays
+  // fail-closed in both modes — an escape sequence must not hide inside a
   // declaration comment.
-  if (isAdfCoversDeclarationLine(line)) {
+  if (
+    cfg.producer_metadata_enforcement !== "enforce" &&
+    isAdfCoversDeclarationLine(line)
+  ) {
     for (const m of line.matchAll(ID_EVASION_PATTERN)) {
       out.push({ type: "evasion", value: m[0] });
     }
@@ -233,6 +254,13 @@ export function classifyLineConfig(
     snippet: trimSnippet(input.text, 200),
   };
 
+  // Producer-side traceability metadata detection signal (DEC-030 decision 5):
+  // a bare ADF-COVERS declaration marker match, no role or path filter, over
+  // the full artifact text. Always emitted; the classification decides whether
+  // the gate fails (enforce => producer-internal) or the finding is reported
+  // without failing the gate (report => distributed-control).
+  const hasProducerMetadata = containsAdfCoversMarker(input.text);
+
   const candidates = detectCandidates(input.text, cfg);
   for (const c of candidates) {
     const resolved = resolveCandidateConfig(c, cfg);
@@ -249,6 +277,22 @@ export function classifyLineConfig(
         category: resolved.category,
       });
     }
+  }
+
+  if (hasProducerMetadata) {
+    out.push({
+      ...base,
+      // "enforce": producer-side traceability metadata is a producer-internal
+      // contamination (violation). "report": distributed-control keeps the
+      // finding observable without failing the gate (current operating level;
+      // the activation switch belongs to the Wave 4 issue).
+      classification:
+        cfg.producer_metadata_enforcement === "enforce"
+          ? "producer-internal"
+          : "distributed-control",
+      matched: "ADF-COVERS",
+      category: "producer-metadata",
+    });
   }
 
   return out;
