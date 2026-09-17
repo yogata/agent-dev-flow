@@ -10,6 +10,7 @@ updated: 2026-09-14
 <!-- ADF-COVERS(design): REQ-018-004 -->
 <!-- ADF-COVERS(implementation): REQ-057-004 -->
 <!-- ADF-COVERS(implementation): REQ-057-018 -->
+<!-- ADF-COVERS(implementation): REQ-060-006 -->
 <!-- ADF-COVERS(design): REQ-060-001, REQ-060-002, REQ-060-003 -->
 
 # checker 実行契約と検出基盤規則
@@ -217,8 +218,14 @@ bun test の全ての実行は、フル suite の 3 cwd 分割正規形（agentd
 - 対象パスは `./` 付き相対パスとして指定する。`.opencode/...` のような `./` なし表記は bun test の
   パスフィルタで no test files matched となり 0 件実行になるため標準としない。
   ファイル単体指定も `./` 付きとする
-- worktree 実行時は依存パッケージ前置（bun install）の要否を事前確認する
-  （node_modules 未伝播の依存解決 fail 予防。詳細は agentdev-git-worktree の worktree 構造的制約を参照）
+- 依存整備の要否は、正規テストが参照する package 境界ごとに必要な依存が解決可能な状態であることを
+  環境 precondition として判定する。リポジトリルートの package.json / node_modules の有無のみで
+  整備要否を判定しない
+- worktree で依存が未解決の場合は、依存を所有する package ディレクトリを対象とする bun install、
+  または agentdev-git-worktree 契約に従う main 側 node_modules への junction のいずれかの正規手段で
+  依存解決状態を確立してからテストを実行する。bun install を一般原則としてリポジトリルートで
+  実行しない（node_modules 未伝播の依存解決 fail 予防。詳細は agentdev-git-worktree の
+  worktree 構造的制約を参照）
 
 逸脱時の検知条件（次のシグナルが観測された場合は実行形態逸脱を疑う）:
 
