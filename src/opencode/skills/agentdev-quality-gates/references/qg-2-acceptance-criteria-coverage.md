@@ -25,6 +25,8 @@ case-open で Issue を作成する前に、Issue の完了条件が対象 REQ/D
 関連 Decision の決定事項（アーキテクチャ上の制約）が完了条件に反映されているか。
 実装が Decision に矛盾しないことを確認できる完了条件が含まれるか。
 
+> Decision は役割付き対応関係モデル（decision / design / implementation / verification の4役割）において任意役割であり、Decision 対応の欠落は不完全と判定されない（Decision 欠落非計上）。本観点もこれに従い、Decision 関連の反映欠落を fail にしない。対応関係モデルの参照は [common-gate-contract.md](common-gate-contract.md)「トレーサビリティ対応関係の参照」を参照。
+
 - **warn**: Decision が関連するが完了条件に反映が見られない。
 - **pass**: 関連 Decision が存在しない、または決定事項が完了条件に反映されている。
 
@@ -143,5 +145,6 @@ QG-2 の検査をサブエージェントに委譲する場合:
 
 - [common-gate-contract.md](common-gate-contract.md)
 - [qg-1-definition-integrity.md](qg-1-definition-integrity.md)（前工程の要件定義の完全性。QG-2 はその成果物を入力とする）
+- **agentdev-traceability**: 成果物と要件の対応関係（coverage、impact、check）の参照。対応関係は decision / design / implementation / verification の4役割で表現される。本 Gate の「Acceptance Criteria Coverage」は完了条件の網羅性の意味であり、対応関係の coverage 能力とは区別する
 - **agentdev-issue-management**: Issue 本文生成、テンプレート選定
 - **agentdev-workflow-templates**: Issue 本文テンプレート（`issue_desc_*.md`）

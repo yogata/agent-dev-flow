@@ -78,6 +78,14 @@ QG-3 は乖離検出結果を含むため、上記に加えて乖離報告を付
 エージェントは推奨アクションを提示し、ユーザーが決定する。
 例外は実行担当サブエージェント委譲内の自律修正ループ（test-fix ループ: CI/lint 失敗の機械的再試行）のみで、これは Gate の外にある。
 
+### 4. トレーサビリティ対応関係の参照
+
+Gate が成果物と要件の対応関係（coverage、impact、check）を参照する場合、対応関係は decision / design / implementation / verification の4役割で表現される役割付きモデルを前提とする。
+
+- Decision 対応は任意役割であり、Decision 対応の欠落を Gate 不合格の理由にしない（Decision 欠落非計上）
+- Design 対応と implementation 対応は全要件行で必須、verification 対応の要否は検証スコープポリシー（project の `traceability/policy.yaml`）が決定する
+- 対応関係の参照・検査の実行手順と検査結果の解釈は `agentdev-traceability` スキルを参照する
+
 ## See Also
 
 - [qg-1-definition-integrity.md](qg-1-definition-integrity.md)

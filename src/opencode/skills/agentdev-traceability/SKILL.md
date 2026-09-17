@@ -1,6 +1,6 @@
 ---
 name: agentdev-traceability
-description: Requirement-artifact traceability (coverage, impact, check) by scanning ADF-COVERS declarations. USE FOR: artifacts covering a requirement, reverse lookup of covered requirements, re-confirmation candidates via artifact hops, declaration integrity checks (malformed declarations, unknown roles/references, missing implementation/verification, unavailable evidence). DO NOT USE FOR: document exploration, path search, diagnostics, dependency exploration, index management, semantic coverage inference.
+description: Requirement-artifact traceability (coverage, impact, check) resolving role-tagged relations from traceability sidecars, the policy, and ADF-COVERS declarations. USE FOR: artifacts covering a requirement, reverse lookup of covered requirements, re-confirmation candidates via artifact hops, relation integrity checks, sidecar and policy authoring procedures, check finding interpretation. DO NOT USE FOR: document exploration, path search, diagnostics, dependency exploration, index management, semantic coverage inference.
 ---
 
 # agentdev-traceability
@@ -9,18 +9,43 @@ description: Requirement-artifact traceability (coverage, impact, check) by scan
 要件と成果物の明示的な対応関係（covers）について、coverage、impact、check の3能力を提供する。
 正規成果物を直接走査して対応関係をその場で解決し、派生 Graph を前提としない。
 
-## 対応宣言の表記
+## モデルの基本（最小 TIM と4役割）
 
-対応宣言は対応する成果物自身が保持し、中央台帳を新設しない。
+対応関係は、要件行（`REQ-{NNNN}-{MMM}` 形式の個別要件行）を中心に、成果物役割（artifact role）付きで表現する。
+成果物役割は次の4種である。
 
-- 宣言形式: `ADF-COVERS(<role>): <REQ-ID>{, <REQ-ID>}*`（role は design / implementation / verification、REQ-ID は `REQ-{NNNN}-{MMM}` 形式の要件行ID）
+| 役割 | 意味 | 必須性 |
+|---|---|---|
+| decision | 要件に関する正式な意思決定を記録する永続成果物 | 任意（欠落を不完全と判定しない） |
+| design | 要件を実現する現在の設計 | 全要件行で1件以上必須 |
+| implementation | 要件を実現する永続成果物（ソースコードという物理種別を前提しない） | 全要件行で1件以上必須 |
+| verification | 要件を検証する永続的な検証手段（個々の検証実行結果は保持しない） | 検証スコープポリシーが required とする要件行で1件以上必須 |
+
+- Decision・Design・実装・検証の各対応は要件へ直接対応付ける。Design 対応を経由して実装または検証が成立したものと推定しない（推移阻止）
+- 1つの成果物が複数の要件へ対応でき、複数の役割を持てる
+- モデル要素・完全性規則・用語の正本は producer 側リポジトリの最小トレーサビリティモデル（TIM）の Design が所有する。本スキルはその利用知識と手順を提供し、規範の独立定義を行わない
+
+## 対応関係の表現
+
+対応関係は component / package 単位の sidecar（標準保存方式）と、producer-only artifact の inline declaration で保持する。
+中央台帳を新設しない。
+
+### sidecar（標準保存方式）
+
+- 配置: リポジトリ top-level `traceability/` 配下の YAML（`traceability/<component-slug>.yaml`）。作成・更新手順は [references/sidecar-and-policy.md](references/sidecar-and-policy.md) を参照
+- 最小データ: component 識別子、artifact のリポジトリ相対パス、role（4役割）、要件行 ID の列挙
+- `traceability/policy.yaml`（検証スコープポリシー）は sidecar ではない。対応関係を保持せず、検証対応の要否のみを宣言する
+
+### inline declaration（producer-only）
+
+- 宣言形式: `ADF-COVERS(<role>): <REQ-ID>{, <REQ-ID>}*`（role は decision / design / implementation / verification、REQ-ID は `REQ-{NNNN}-{MMM}` 形式の要件行ID）
 - 宣言は各ファイル種別のコメント記法（Markdown は HTML コメント、TypeScript は `//` 等）の内部に1行で記述する
+- consumer distribution closure（配布対象の製品ソース）に含まれる成果物では使用しない。配布対象成果物の対応関係は sidecar で保持する
 - 解析対象は正規宣言位置（各ファイル種別のコメント記法内部の宣言行）に限定する。本文 prose（見出し・段落・箇条書き等）内の宣言マーカー形状の言及は解析対象外とする（説明文コンテキスト対象外判定）。正規位置の形式不備宣言は引き続き検出する
 - 1ファイルに複数の宣言行を含められる。解析結果は和集合とする
 - 解析は行単位のパターン照合で行い、意味推定を行わない
-- 宣言の REQ-ID は子要件行 ID で指定する。親要件 ID のみの参照（bare ID）は実装宣言・検証宣言の配置対象とならず、check に missing-implementation として計上され得る
-- 実装対応宣言の配置先は成果物責任表（`artifact-responsibilities.md`）の正規配置先カタログに従う
-- 宣言が未付与の既存行は missing-implementation として計上され、fail-open 運用の下で段階的に付与される
+- 宣言の REQ-ID は子要件行 ID で指定する。親要件 ID のみの参照（bare ID）は対応宣言の配置対象とならず、check に対応の欠落として計上され得る
+- sidecar と inline declaration は同一の論理的な対応関係へ正規化され、coverage、impact、check から同一に扱われる。同一論理関係の不整合な重複は check が検出する
 
 ## Scripts（決定的処理）
 
@@ -44,25 +69,13 @@ description: Requirement-artifact traceability (coverage, impact, check) by scan
 |---|---|---|---|
 | `src/coverage.ts` | coverage | `--root` + `--req` または `--artifact` | 要件起点: 役割付き対応関係の全件（`relations`, `counts`, `truncated: false`）/ 成果物起点: 当該成果物の対応要件（`relations`, `emptyResult`） |
 | `src/impact.ts` | impact | `--root` + `--req` または `--artifact` | 要件起点: 再確認候補 / 成果物起点: `viaRequirements` + `recheckCandidates`。空結果は `emptyResult: true` と `note`（影響なしの証明ではない旨）で明示 |
-| `src/check.ts` | check | `--root`（任意: `--req` で完全性検査対象限定、`--artifact` で根拠検査追加） | 7種検査の `checks`（項目ごと pass / fail と findings）、`summary`、全現行要件行の分類状態 `verificationClassification` |
+| `src/check.ts` | check | `--root`（任意: `--req` で完全性検査対象限定、`--artifact` で根拠検査追加） | 9種検査の `checks`（項目ごと pass / fail と findings）、`summary` |
 
-check の7種検査: `malformed-declarations`（形式・構文違反）、`unknown-roles`（未知の成果物役割）、`unknown-req-refs`（存在しない要件への参照）、`invalid-catalog-refs`（検証対応要否カタログの無効なエントリ・参照）、`missing-implementation`（実装対応の欠落）、`missing-verification`（検証対応の欠落。検証対応必須行のみ計上）、`evidence-unavailable`（根拠箇所を取得できない状態）。
-Design 対応（design 役割）0件のみを理由に異常としない。
-検証対応の要否区分は検証対応要否カタログ（自己ホストリポジトリ内の `verification-scope-catalog.md` の `## 任意行エントリ` 節、要件行ID の列挙または同一REQファイル内の範囲表現）が所有する。check はカタログを既定パスから自動的に読み込み、カタログが存在しない場合（consumer 環境を含む）は全要件行を検証対応必須として扱う（安全側既定）。
+check の9種検査: `malformed-declarations`（sidecar および inline declaration の形式・構文違反）、`unknown-roles`（未知の成果物役割）、`unknown-req-refs`（存在しない要件行への参照。sidecar、inline declaration、policy.yaml の optional 列挙を含む）、`invalid-artifact-paths`（存在しない、または取得不能な artifact path）、`missing-design`（Design 対応の欠落。現行要件行で0件）、`missing-implementation`（実装対応の欠落。現行要件行で0件）、`missing-verification`（検証対応の欠落。検証スコープポリシーが required と判定する現行要件行のみ計上）、`policy-invalid`（検証スコープポリシーの不正。schema 違反、default 値不正、optional 列挙の要件行 ID 形式違反、存在しない要件行の列挙、policy 読取不能）、`duplicate-inconsistencies`（同一論理関係の不整合な重複。同一 artifact パス × role × 要件行 ID の組み合わせが sidecar と inline declaration の間、または同一情報源内で矛盾する状態）。
 
-### 検証対応要否の分類状態導出
-
-トレーサビリティモデル（最小 TIM の「対応関係の完全性規則」）が所有する分類状態の導出契約に基づき、check は全現行要件行の検証対応要否分類状態を、既存の恒久成果物（対応宣言コーパスと検証対応要否カタログ）からその場で導出し、`verificationClassification`（`reqId` と `classification` の組、`--req` の対象限定の影響を受けない）として報告する。`classification` は次の3値である。
-
-| 値 | 意味 | 導出条件 |
-|---|---|---|
-| `unclassified` | 未分類 | 検証対応宣言なし かつ 検証対応要否カタログ未登録 |
-| `verification-present` | 分類済み（恒久検証対応あり） | 検証対応宣言あり（カタログ登録の有無は問わない） |
-| `catalog-registered` | 分類済み（検証対応任意行） | 検証対応宣言なし・カタログ登録済み |
-
-- 分類状態のみを保持する独立した台帳、REQ frontmatter 項目、派生索引を新設しない。導出は毎回宣言とカタログから計算し、呼び出し間で状態を保持しない
-- `unclassified` と `missing-verification` 検査の findings は同一の行集合（検証対応必須行の検証対応0件 = 未分類）であり、単一の導出から計上する。契約上の役割は異なる（`missing-verification` は対応関係の完全性規則に基づく完全性検査、分類状態は工程ゲートの判定入力）
-- 段階ゲート（Definition 保存内部責務（case-ready / case-revise）の未分類検出・記録、case-open の未分類残存の停止、case-close の未分類残存と検証対応必須行の恒久検証対応欠落の完了阻止）は本導出を利用する（ゲート挙動の契約所有は各 Workflow Skill 側）。`catalog-registered` 行に恒久的な検証手段が存在しないことだけを理由として完了阻止しない
+- Decision 対応の欠落は不合格に計上しない（TIM 完全性規則の任意役割）
+- 検証スコープポリシーは `traceability/policy.yaml` から解決する。ポリシーが存在しない場合は全現行要件行を検証対応必須として扱う（安全側既定）。読取不能または schema 不適合の場合、検証対応の要否判定が不能となるため当該検査を不合格にする（完全性判定不能を合格として扱わない、fail-closed）
+- 各検出項目の finding の読み方と解消手順は [references/check-interpretation.md](references/check-interpretation.md) を参照
 
 ### 実行方法
 
@@ -99,10 +112,11 @@ bun .opencode/skills/agentdev-traceability/scripts/src/check.ts --root <repo-roo
 ## 運用規約
 
 - coverage は明示された対応関係を全件返す。候補数上限、ランキング、探索深度による切り捨てを行わない
-- coverage は design / implementation / verification の役割付き対応関係を全件返却し、役割毎の絞り込みを行わない。役割付き出力の解釈は呼出側の責務である。配布物本体の ADF-COVERS 宣言の除去可否判定（cleanup 突合）で集約済み実装対応と認定する対象は、implementation 役割かつ docs/ 配下パスの対応関係のみであり、役割フィルタと docs/ パスフィルタの適用が必須である。design 役割・verification 役割や docs/ 配下以外のパス（配布物側の宣言等）は認定対象外である
+- coverage は decision / design / implementation / verification の4役割の役割付き対応関係を全件返却し、役割毎の絞り込みを行わない。役割付き出力の解釈は呼出側の責務である。coverage を配布物本文の対応宣言除去可否判定（cleanup 突合）の認定根拠として使用しない。配布対象成果物の対応関係は sidecar のみに保持され、配布物本体に対応宣言は存在しないため、cleanup 突合の判定根拠は配布物本文の対応宣言 0件突合である
 - impact の探索範囲は成果物 ↔ 要件 ↔ 成果物（固定2ホップ）であり、任意深度のグラフ探索を行わない。空結果を「影響なし」の証明として扱わない
 - 現行要件の判定は `docs/requirements/REQ-{NNNN}.md` 直下の要件テーブル行（`REQ-{NNNN}-{MMM}`）を標準とする。`retired/` サブディレクトリは廃止扱い
-- 完全性の基準は、実装対応は全現行要件行で1件以上、検証対応は検証対応必須行（検証対応要否カタログの未登録行）で1件以上（Design 対応は任意）。未登録の要件行は検証対応必須として扱う（安全側既定）
+- 完全性の基準は、Design 対応は全現行要件行で1件以上、implementation 対応は全現行要件行で1件以上、verification 対応は検証スコープポリシーが required と判定する要件行で1件以上。Decision 対応は任意であり、Decision 対応0件のみを理由に不完全と判定しない。ポリシー不在時は全現行要件行を検証対応必須として扱う（安全側既定）
+- coverage と impact は補助的（advisory）な能力であり、fail-open で運用する。機能の不在または実行失敗のみを理由に workflow を恒常停止させず、正規成果物の直接読取等の独立した確認へ fallback できる。workflow が対応完全性を完了条件として要求する工程では、check が完全性判定できていない状態（実行不能、読取不能、判定不能）を pass として扱わない（fail-closed）。「対応関係が完全である」と「完全性を検査できなかった」を区別して扱う
 
 ## 対象外
 
@@ -113,6 +127,7 @@ bun .opencode/skills/agentdev-traceability/scripts/src/check.ts --root <repo-roo
 
 ## See Also
 
-- **Design**: `agentdev-traceability` Design（本スキルの原本仕様）
-- **トレーサビリティ要件**: producer 側リポジトリの要件インデックスを参照
-- **最小トレーサビリティモデル採用の意思決定**: producer 側リポジトリの Decision インデックスを参照
+- [references/sidecar-and-policy.md](references/sidecar-and-policy.md): sidecar の作成・更新手順、検証スコープポリシー（`traceability/policy.yaml`）の利用手順、要件・Design・実装・検証変更時の対応関係更新手順
+- [references/check-interpretation.md](references/check-interpretation.md): check の9検出項目の finding 解釈、coverage / impact の利用方法と結果の読み方
+- **Design**: producer 側リポジトリの `agentdev-traceability` Design と最小トレーサビリティモデル（TIM）Design（本スキルの原本仕様とモデルの正本）
+- **トレーサビリティ要件・意思決定**: producer 側リポジトリの要件インデックスと Decision インデックスを参照

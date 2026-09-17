@@ -354,10 +354,10 @@ QG-4 は判定基準を提供し、case-close が実際のチェックボック�
 
 ## traceability check の横断 durable state 前提手順
 
-QG-4 の traceability check は Design ヘッダの ADF-COVERS 宣言と検証対応要否カタログという単一 PR の差分に閉じない横断 durable state を判定対象とするため、次の前提手順を要求する。
+QG-4 の traceability check は Design ヘッダの ADF-COVERS 宣言とトレーサビリティポリシー（`traceability/policy.yaml`）という単一 PR の差分に閉じない横断 durable state を判定対象とするため、次の前提手順を要求する。
 
-- worktree root 起点の判定で未分類（unclassified）行が検出された場合、main 側 root で check を再実行し、検証対応要否カタログ登録 commit の時系列（ブランチ分岐の前後）を確認してから完了阻止を判断する。durable state 上で解消済みの対象行を本変更起因の失敗と誤判定しない
-- 検証対応要否カタログ不在時は全要件行を検証対応必須として扱う安全側既定は維持する
+- worktree root 起点の判定で検出対象の完全性が確定できない場合、main 側 root で check を再実行し、トレーサビリティポリシー（`traceability/policy.yaml`）登録 commit の時系列（ブランチ分岐の前後）を確認してから完了阻止を判断する。durable state 上で解消済みの対象行を本変更起因の失敗と誤判定しない
+- トレーサビリティポリシー不在時は全要件行を検証対応必須として扱う安全側既定は維持する
 - checker 実装（--root の意味・検査項目）の変更は本前提手順に含まない。main 側 root での再実行は読取系 check の実行のみで行う
 
 design-save 工程（Design 本体へ要件を反映する保存工程）における Design ヘッダの既存 ADF-COVERS 宣言ブロックの更新要否確認（横断 durable state の書き込み側前提）は `agentdev-design-file-manager` の design-save 手順が定める。
