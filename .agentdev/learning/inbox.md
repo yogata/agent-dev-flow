@@ -518,3 +518,21 @@
 - **想定反映先**: agentdev-skill-authoring（description 規約）、integrity 規約（IR-061 運用）、backlog 対応候補。
 - **関連**: Case #2936（Refs）、PR #2950（Refs）、PR #2951（Refs）。
 - **タグ**: #lint-skills #description-length #autogen #pre-existing
+
+---
+
+## 2026-09-18: verification 対応の同一論理関係は inline 既存宣言への集約を優先し、sidecar 新設は inline なしの場合の選択肢とする運用が要る
+
+- **問題事象**: REQ-012-054 の missing-verification 解消で、traceability_coverage.test.ts の verification 登録を sidecar 新設ではなく既存 inline 宣言への追記で行う判断を要した。sidecar 新設ルート（inline 宣言を sidecar へ移行）も論理的に成立するため、配置先の優先順位が規則として明文化されていない。
+- **発生局面**: case-close 差し戻し修正（Case #2936、PR #2953 の REQ-012-054 verification 登録時）。
+- **検知方法**: duplicate-inconsistencies（同一論理対応の重複宣言の不整合）の検出リスク評価（REQ-012-045 の verification 宣言を既に保持するテストファイルへ、同一論理関係を sidecar で併存させると check が検出する）。
+- **根本原因**: 同一論理関係（artifact パス × verification role）の宣言を 1 情報源に集約する duplicate-inconsistencies 規則は存在するが、inline 既存宣言と sidecar 新設の優先順位（配置先集約の一般規則）は明文化されていない。
+- **自律対応内容**: 既存 inline 宣言への追記を採用（repo-local artifact は inline 宣言保持が正規配置先規則に適合）。sidecar 併存を回避し check で findings 0 を確認。
+- **ユーザー確認の有無**: なし（正規配置先規則と duplicate-inconsistencies 規則からの機械的判断）。
+- **Decision/REQ/spec影響**: なし。配置先集約の一般規則化（inline 既存宣言と sidecar の優先順位明文化）は将来の知識化候補。
+- **横展開観点**: sidecar と inline の 2 情報源が併存するモデルでは、同一論理関係の追加登録が常に「どちらへ書くか」の判断を伴う。優先順位が不明のまま作業すると duplicate-inconsistencies が発火し、差し戻し修正コストが生じる。
+- **再発条件**: 既存 inline 宣言を持つ artifact への同一論理関係の verification / implementation 対応追加が必要な case-run・case-close 修正。
+- **予防策候補**: agentdev-traceability 運用知識へ「同一論理関係の追加登録は既存情報源への集約を優先（inline 既存があれば inline 追記、sidecar のみなら sidecar）」を明文化する候補。
+- **想定反映先**: src/opencode/skills/agentdev-traceability/SKILL.md と references/**（運用知識）、case-run 差し戻し修正手順。
+- **関連**: Case #2936（Refs）、PR #2953（Refs）。
+- **タグ**: #traceability #sidecar #inline-declaration #duplicate-inconsistencies
