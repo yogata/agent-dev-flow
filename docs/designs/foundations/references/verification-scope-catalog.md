@@ -25,6 +25,8 @@ updated: 2026-09-17
 
 - 実施記録: Issue #2902（RU-0024 bun test 正規形の環境前提の実行契約明記、docs_chore）の case-ready 検証対応要否ゲートで実施した。canonical Definition 確定（Definition PR #2905、squash merge commit 0ee29675）による新規行 REQ-060-006 を棚卸し単位（REQ 単位）で分類確定した。REQ-060-006 は既存 REQ-060-001..REQ-060-005 と同一系統の bun test 実行契約の明記要求・実行時振る舞い行であり、恒続的な検証手段を特定しないため、安全側の任意行として本カタログへ登録した（REQ-060 節の範囲を 001..005 から 001..006 へ拡張）
 
+- 実施記録: Issue #2914（RU-0031 adversarial-review 発動契約非該当時の判定理由記録様式の整備、maintenance）の case-ready 検証対応要否ゲートで実施した。canonical Definition 確定（Definition PR #2916、squash merge commit 03c14734）による新規行 REQ-014-016 を棚卸し単位（REQ 単位）で分類確定した。REQ-014-016 は既存 REQ-014-001..REQ-014-015 と同一系統の adversarial-review caller 統合の実行時契約（非発動時の判定理由記録と代替自己反証の様式・義務）であり、恒続的な検証手段を特定しないため、安全側の任意行として本カタログへ登録した（REQ-014 節の範囲を 001..015 から 001..016 へ拡張）
+
 ## 形式
 
 - 1行1エントリとする
@@ -144,7 +146,7 @@ Issue #2362 の移行作業（棚卸し (a')）で全現行要件行を判定し
 
 ### REQ-014（adversarial-review caller integration 共通契約）
 
-- REQ-014-001..REQ-014-015: 原則適用・skip 可能、副作用禁止、再 review 条件、停止条件、正規所有者マトリックスの実行時契約
+- REQ-014-001..REQ-014-016: 原則適用・skip 可能、副作用禁止、再 review 条件、停止条件、正規所有者マトリックス、発動契約非該当時の判定理由記録と代替自己反証の実行時契約
 
 ### REQ-015（adversarial-review caller integration 7呼出元+case-auto）
 
