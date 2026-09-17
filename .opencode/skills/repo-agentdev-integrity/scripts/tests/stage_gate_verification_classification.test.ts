@@ -329,22 +329,22 @@ describe("段階ゲートの工程契約文言（3 Workflow Skill）", () => {
     // Definition 保存工程の割り当て先は REQ-021 側の更新（後続工程）で対応する。
     {
       file: "src/opencode/skills/agentdev-workflow-case-open/SKILL.md",
-      // REQ-030 縮小後: case-open は未分類行が残っても Root Case 確立を妨げない（REQ-021-024）。
-      // 検証対応要否の最終ゲートは case-ready へ移管された。
-      phrases: ["対象要件行に検証対応要否の未分類行が残る場合も Root Case の確立を妨げない"],
+      // REQ-030 縮小後: case-open は Design 対応が未成立でも Root Case 確立を妨げない（REQ-021-024）。
+      // Design 対応の成立判定（トレーサビリティ完全性ゲート）は case-ready が所有する。
+      phrases: ["対象要件行に Design 対応が未成立でも Root Case の確立を妨げない"],
     },
     {
       file: "src/opencode/skills/agentdev-workflow-case-close/SKILL.md",
       phrases: [
-        "に恒久的な検証手段が存在しないことだけを理由として完了を阻害しない",
+        "policy が optional と明示した要件行の verification 対応欠落は完全性違反に含めない",
       ],
     },
     {
       file: "src/opencode/skills/agentdev-workflow-case-close/references/issue-resolution-and-qg4.md",
       phrases: [
-        "検証対応要否の段階ゲート（完了阻止）",
+        "検証対応の3完全性ゲート（完了阻止）",
         "完了として扱わない",
-        "検証対応必須行に恒久検証対応が存在しない場合",
+        "required 行の verification 対応の欠落が残る場合",
       ],
     },
     {

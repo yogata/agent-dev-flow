@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-ready
-description: "case-ready command の workflow 実装本体。Definition PR 受入（忠実性・整合性・品質検査の確認、merge 前の isDraft 確認と blocked 停止、新しい意味判断が不要な場合の自動確定・merge、HITL 停止、CI 失敗時の ready 不遷移と既存 PR 保持）、canonical Definition 再取得、proposed Decision の受理評価と accepted 遷移、execution contract 確定、Standard / Epic 確定（連結成分と3軸判断、Child Issue / Wave / 依存構造生成、構成検証、Wave 重複前置検出）、検証対応要否最終ゲート（横断依存検査を含む）、ready 遷移、draft / RU 削除、冪等再実行を所有する。USE FOR: case-ready 実行時の workflow 制御（Definition 受入・自動確定・merge・HITL 停止・canonical 再取得・Decision 受理評価・execution contract 確定・Standard / Epic 確定・検証ゲート・横断依存検査・ready 遷移・draft / RU 削除・冪等再実行）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）、Root Case 確立・Definition Package 生成・Definition PR 作成（case-open 側の責務）、実装実行（case-run 側の責務）、PR マージ判定・完了条件チェックボックス評価（case-close 側の責務）。"
+description: "case-ready command の workflow 実装本体。Definition PR 受入（忠実性・整合性・品質検査の確認、merge 前の isDraft 確認と blocked 停止、新しい意味判断が不要な場合の自動確定・merge、HITL 停止、CI 失敗時の ready 不遷移と既存 PR 保持）、canonical Definition 再取得、proposed Decision の受理評価と accepted 遷移、execution contract 確定、Standard / Epic 確定（連結成分と3軸判断、Child Issue / Wave / 依存構造生成、構成検証、Wave 重複前置検出）、トレーサビリティ完全性ゲート、ready 遷移、draft / RU 削除、冪等再実行を所有する。USE FOR: case-ready 実行時の workflow 制御（Definition 受入・自動確定・merge・HITL 停止・canonical 再取得・Decision 受理評価・execution contract 確定・Standard / Epic 確定・検証ゲート・横断依存検査・ready 遷移・draft / RU 削除・冪等再実行）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）、Root Case 確立・Definition Package 生成・Definition PR 作成（case-open 側の責務）、実装実行（case-run 側の責務）、PR マージ判定・完了条件チェックボックス評価（case-close 側の責務）。"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-061-001, REQ-061-002, REQ-061-003, REQ-061-004, REQ-061-005, REQ-061-006, REQ-061-007, REQ-061-008, REQ-061-009, REQ-061-010, REQ-061-011, REQ-061-012, REQ-061-013, REQ-061-014, REQ-061-015, REQ-061-016, REQ-061-017, REQ-061-018, REQ-061-019, REQ-061-020, REQ-061-021, REQ-061-022, REQ-061-023, REQ-061-024, REQ-061-025, REQ-061-026, REQ-061-027, REQ-061-028, REQ-061-029, REQ-061-030, REQ-061-031, REQ-061-032, REQ-061-033, REQ-083-001, REQ-083-003, REQ-017-001, REQ-017-002, REQ-017-004, REQ-017-005, REQ-017-008, REQ-017-009, REQ-017-010, REQ-017-011, REQ-017-012, REQ-017-013, REQ-017-014, REQ-017-015, REQ-017-016, REQ-017-017, REQ-035-013, REQ-035-014, REQ-035-015, REQ-057-033 -->
@@ -8,7 +8,7 @@ description: "case-ready command の workflow 実装本体。Definition PR 受�
 # case-ready workflow スキル
 
 case-ready command の workflow 実装本体である。
-Definition PR 受入、canonical Definition 再取得、Decision 受理評価、execution contract 確定、Standard / Epic 確定、検証対応要否最終ゲート、ready 遷移、draft / RU 削除、冪等再実行までの制御構造を所有する。
+Definition PR 受入、canonical Definition 再取得、Decision 受理評価、execution contract 確定、Standard / Epic 確定、トレーサビリティ完全性ゲート、ready 遷移、draft / RU 削除、冪等再実行までの制御構造を所有する。
 case-ready は Definition 確定境界として単一責務を保ち、REQ / Decision / Design の保存実体は Capability Skill へ委譲する（保存手続きを実装しない）。
 
 case-ready command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}）。
@@ -43,17 +43,17 @@ case-ready workflow は次の7 STEP で構成する。
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
 | STEP-1 | Definition PR 受入 | Root Case 受領 | Definition PR 確定判定完了（自動確定・merge 実行済み / 実変更なしで PR 不在のまま継続 / HITL 停止 / CI 失敗停止） | [references/definition-acceptance.md](references/definition-acceptance.md) |
-| STEP-2 | canonical 再取得 | STEP-1 確定判定完了 | canonical Definition 再取得済み、traceability check 機械実行済み（unclassified 検出時は case-open へ差し戻し）、以降の処理基準確定 | [references/definition-acceptance.md](references/definition-acceptance.md) |
+| STEP-2 | canonical 再取得 | STEP-1 確定判定完了 | canonical Definition 再取得済み、traceability check 機械実行済み（missing-design または verification policy の不正検出時は case-open へ差し戻し）、以降の処理基準確定 | [references/definition-acceptance.md](references/definition-acceptance.md) |
 | STEP-3 | Decision 受理評価 | STEP-2 完了 | proposed Decision の評価完了（accepted 遷移実行 / 受理不能で停止 / 評価対象 0 件で継続） | [references/decision-acceptance.md](references/decision-acceptance.md) |
 | STEP-4 | execution contract 確定 | STEP-3 完了 | execution contract を Root Case 本文へ確定済み | [references/execution-contract.md](references/execution-contract.md) |
 | STEP-5 | 実行構造確定 | STEP-4 完了 | Standard / Epic 確定済み。Epic 時は Child Issue / Wave / 依存構造作成済み、構成検証合格 | [references/execution-structure.md](references/execution-structure.md) |
-| STEP-6 | 検証ゲートと ready 遷移 | STEP-5 完了 | 対象要件行の未分類 0 件確認、横断依存検査実施済み（警告提示記録または検出不能報告。警告は ready 遷移判定を変更しない）、Root Case を ready へ遷移済み | [references/readiness-and-cleanup.md](references/readiness-and-cleanup.md) |
+| STEP-6 | 検証ゲートと ready 遷移 | STEP-5 完了 | 対象要件行の Design 対応 1 件以上・トレーサビリティポリシー有効の確認（missing-design / policy 不正 0 件）、横断依存検査実施済み（警告提示記録または検出不能報告。警告は ready 遷移判定を変更しない）、Root Case を ready へ遷移済み | [references/readiness-and-cleanup.md](references/readiness-and-cleanup.md) |
 | STEP-7 | draft / RU 削除と同期確認 | STEP-6 完了 | draft / RU 削除済み、main ブランチの作業ディレクトリとリモートの同期確認済み | [references/readiness-and-cleanup.md](references/readiness-and-cleanup.md) |
 
 ### STEP 間の依存と分岐
 
 - **基本順序**: STEP-1 → STEP-2 → STEP-3 → STEP-4 → STEP-5 → STEP-6 → STEP-7
-- **unclassified 差し戻し分岐（STEP-2）**: canonical 再取得時の traceability check 機械実行で unclassified を検出した場合は case-open へ差し戻し、ready へ遷移せず停止する。検証対応要否の最終ゲート（STEP-6）は case-ready が所有し続け、unclassified と missing-verification は同一行集合から単一導出される（二重定義しない）
+- **missing-design / policy 不正差し戻し分岐（STEP-2）**: canonical 再取得時の traceability check 機械実行で missing-design または verification policy の不正を検出した場合は case-open へ差し戻し、ready へ遷移せず停止する。トレーサビリティ完全性ゲート（STEP-6）は case-ready が所有し続け、STEP-2 との二重定義は行わない。required 行の verification 対応欠落（missing-verification）は ready 拒否条件に含めない。verification 対応の作成・更新は case-run が担い、対応完全性の最終完全性検査は case-close が所有する
 - **実変更なし分岐（STEP-1）**: Definition PR が存在しない場合（実変更のない bugfix 等の Case）は Definition PR を作らず canonical Definition は現行 main の状態を採用し、execution contract 確定と ready 遷移へ進む。空の Definition PR を作成する経路は存在しない
 - **HITL 分岐（STEP-1）**: 新しい Decision、意味変更、対象範囲拡大、意味的な不整合解消が必要と判定した場合は停止し、既存 PR を保持したままユーザー判断を求める
 - **CI 失敗分岐（STEP-1）**: Definition PR の CI / 品質検査失敗時は ready へ遷移せず、既存 PR を保持したまま停止する。修復後に再実行できる
@@ -70,7 +70,7 @@ case-ready workflow は次の7 STEP で構成する。
 ### 終了条件（termination）
 
 - 正常終了: draft / RU 削除・同期確認 STEP の完了報告出力まで
-- 停止終了: Definition PR の忠実性・整合性・品質検査で新しい意味判断が必要な場合、CI / 品質検査失敗、canonical 再取得時の traceability check による unclassified 検出（case-open へ差し戻し）、構成検証の上限超過または構成不備、受理不能または判断情報不足の proposed Decision、検証対応要否の未分類残存、main 同期不一致
+- 停止終了: Definition PR の忠実性・整合性・品質検査で新しい意味判断が必要な場合、CI / 品質検査失敗、canonical 再取得時の traceability check による missing-design または verification policy の不正検出（case-open へ差し戻し）、構成検証の上限超過または構成不備、受理不能または判断情報不足の proposed Decision、トレーサビリティ完全性ゲートの missing-design / policy 不正残存、main 同期不一致
 
 ## 主要 Capability Skill 連携
 
@@ -82,7 +82,7 @@ case-ready workflow は次の7 STEP で構成する。
 - `agentdev-workflow-templates`: Issue 本文 / 完了報告テンプレート選定、実行識別情報セクション形式
 - `agentdev-workflow-lifecycle`: work_type 判定、ラベル付与、Standard / Epic 判定の lifecycle 基準
 - `agentdev-workflow-orchestration`: capture 境界の Split Rule、deviation capture 委譲
-- `agentdev-traceability`: coverage / check による実装・検証対応の整合確認、検証対応要否分類状態の導出
+- `agentdev-traceability`: coverage / check による対応関係の整合確認、Design 対応・トレーサビリティポリシー有効性のゲート判定
 - Custom Tool `agentdev_gh`: GitHub I/O 境界（issue_read、issue_update、issue_create、pr_read、pr_merge、comment_create。VERIFY は Tool 内部）
 - `agentdev-learning-capture` / `agentdev-intake-pipeline`: deviation capture 委譲（実観測時）
 - `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ（capture 成果物の git 永続化）
@@ -91,11 +91,12 @@ case-ready workflow は次の7 STEP で構成する。
 
 ## トレーサビリティ能力の利用
 
-case-ready は検証対応要否の最終ゲートで、対象要件行の実装対応・検証対応の整合を確認する。
+case-ready はトレーサビリティ完全性ゲートで、対象要件行の Design 対応の成立とトレーサビリティポリシーの有効性を ready 遷移の必要条件として確認する。
 
-- 実行対象 REQ の要件行について `agentdev-traceability` の coverage / check を用い、実装対応・検証対応の未分類行を検出する
-- canonical Definition 再取得時（STEP-2）にも traceability check を機械実行し、unclassified を検出した場合は case-open へ差し戻す。検証対応要否の最終ゲート（未分類残存時の ready 不遷移、STEP-6）は引き続き case-ready が所有し、STEP-2 との二重定義は行わない。両検査の unclassified と missing-verification は同一行集合から単一導出される
-- 未分類行が残る場合は ready へ遷移させず、停止理由と未分類行一覧を報告する
+- 実行対象 REQ の要件行について `agentdev-traceability` の check を用い、Design 対応 1 件以上の存在とトレーサビリティポリシーの有効性を確認する。missing-design が残る行または verification policy の不正がある場合は ready へ遷移させない
+- required 行の verification 対応の欠落（missing-verification）は本ゲートの ready 拒否条件に含めない。verification 対応の作成・更新は case-run が担い、対応完全性の最終検査は case-close の QG-4 が担う
+- canonical Definition 再取得時（STEP-2）にも traceability check を機械実行し、missing-design または verification policy の不正を検出した場合は case-open へ差し戻す。トレーサビリティ完全性ゲート（STEP-6）は引き続き case-ready が所有し、STEP-2 との二重定義は行わない
+- Design 対応が 0 件の行または policy 不正が残る場合は ready へ遷移させず、停止理由と該当行一覧を報告する
 - 問い合わせ結果は候補提供であり最終判断としない。機能の不在、実行失敗、空結果の場合は README 索引、正規成果物の直接読取等の代替探索で継続する（fail-open）
 
 ## 共通制約

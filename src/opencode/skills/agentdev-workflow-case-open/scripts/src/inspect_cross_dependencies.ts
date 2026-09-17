@@ -1,7 +1,7 @@
 // ADF-COVERS(implementation): REQ-030-012, REQ-061-029, REQ-061-030
 //
 // Case 投入時の横断依存検査の CLI 入口。
-// case-open（STEP-5 冪等確認）と case-ready（検証対応要否ゲート）の両 workflow skill から
+// case-open（STEP-5 冪等確認）と case-ready（トレーサビリティ完全性ゲート）の両 workflow skill から
 // 共有される単一実装（比較ロジックは lib/cross_dependency_engine.ts）。
 //
 // 入力: `--input` に検査入力 JSON ファイル、`--root` に共有領域ファイル相対パスの

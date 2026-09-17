@@ -168,11 +168,11 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 
 ## 配布物本体 ADF-COVERS 宣言の除去可否判定（cleanup 判定）
 
-実行担当サブエージェントが委譲内の実装作業（STEP-S4）で配布物本体に残存する ADF-COVERS 宣言の除去（docs 配下の正規成果物への集約に伴う除去）を扱う場合、除去可否の判定は次のとおり行う（epic-wave workflow の子Issue 委譲にも同一条件を適用する）。
+実行担当サブエージェントが委譲内の実装作業（STEP-S4）で配布物本体に残存する ADF-COVERS 宣言の除去を扱う場合、配布物本体の ADF-COVERS 宣言は producer 側のトレーサビリティ metadata であり、対応関係の移行先（docs 配下の正規成果物の inline 宣言、または repository top-level の `traceability/` 配下の sidecar）が成立していることを条件に除去する（epic-wave workflow の子Issue 委譲にも同一条件を適用する）。
 
-- 除去可否判定の coverage 突合では、coverage 出力から implementation 役割かつ docs/ 配下パスの対応関係のみを集約済み実装対応として認定する（役割フィルタと docs/ パスフィルタの適用は必須）。design 役割・verification 役割の対応関係、および docs/ 配下以外のパス（配布物側の宣言等）は集約済み実装対応として扱わない
-- 対象要件について implementation 役割かつ docs/ 配下の対応が確認できない宣言は除去可と判定せず、除去しない
-- 除去を実行した場合は、除去後に traceability check を実行し、role 別 coverage の対応関係が維持されていること（新規 missing-implementation 0 件）を後置検査として確認する
+- 除去可否判定の coverage 突合では、coverage 出力から implementation 役割かつ producer 側パス（docs/ 配下の正規成果物の inline 宣言、または repository top-level の `traceability/` 配下 sidecar の登録分）の対応関係を集約済み実装対応として認定する。coverage は sidecar と inline declaration を同じ論理的な対応関係として返すため、突合は対応関係の表現形式を区別せずに行う。役割フィルタの適用は必須であり、design 役割・verification 役割の対応関係は集約済み実装対応として扱わない
+- 対象要件について implementation 役割かつ producer 側パスの対応が確認できない配布物本体の宣言は除去可と判定せず、対応関係の移行先（sidecar または producer 側正規成果物）を成立させた上で除去する
+- 除去を実行した場合は、除去後に traceability check を実行し、implementation 対応の対応関係が維持されていること（新規 missing-implementation 0 件）を後置検査として確認する
 - coverage は役割付き対応関係を全件返却するため、役割とパスの解釈は呼出側の責務で行う（agentdev-traceability の運用規約参照）
 
 ## verify-only closure の検証実行と SSoT コメント記録

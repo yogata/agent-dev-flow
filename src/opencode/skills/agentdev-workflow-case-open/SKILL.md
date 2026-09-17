@@ -41,7 +41,7 @@ case-open workflow は次の6 STEP で構成する。
 |---|---|---|---|---|
 | STEP-1 | 引き継ぎ判定 | 要件doc 受領 | 引き継ぎ停止判定完了（継続 / consumer 停止） | [references/handoff.md](references/handoff.md) |
 | STEP-2 | Root Case 確立 | STEP-1 継続確定 + adversarial-review 完了（skip 含む） | Root Case GitHub Issue 作成済み（対象 REQ 番号埋め込み、状態 open） | [references/root-case-and-definition-package.md](references/root-case-and-definition-package.md) |
-| STEP-3 | Definition Package 生成 | Root Case 確立 | Definition Package 生成・Root Case 関連付け済み。REQ 行追加を伴う場合は verification-scope-catalog 追随確認済み | [references/root-case-and-definition-package.md](references/root-case-and-definition-package.md) |
+| STEP-3 | Definition Package 生成 | Root Case 確立 | Definition Package 生成・Root Case 関連付け済み。REQ 行追加を伴う場合はトレーサビリティポリシー追随確認済み | [references/root-case-and-definition-package.md](references/root-case-and-definition-package.md) |
 | STEP-4 | 実変更判定と Definition PR 作成 | Definition Package 確定 | 実変更時: Definition PR 作成済み（Case 単位 1 件）。実変更なし: 作成しない | [references/definition-pr-and-idempotency.md](references/definition-pr-and-idempotency.md) |
 | STEP-5 | 冪等再実行確認 | STEP-4 完了 | 既存 Root Case・既存 Definition PR 再利用済み、重複生成なし、不足分のみ処理済み、横断依存検査実施済み（警告提示記録または検出不能報告） | [references/definition-pr-and-idempotency.md](references/definition-pr-and-idempotency.md) |
 | STEP-6 | deviation capture・完了報告 | STEP-5 完了 | deviation 保存（Split Rule 分類）、完了報告出力 | [references/capture-and-completion.md](references/capture-and-completion.md) |
@@ -75,14 +75,14 @@ case-open workflow は次の6 STEP で構成する。
 - `agentdev-learning-capture` / `agentdev-intake-pipeline`: deviation capture 委譲（STEP-6 で実観測時）
 - `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ（capture 成果物の git 永続化）
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
-- 横断依存検査エンジン（本スキル配下 `scripts/src/inspect_cross_dependencies.ts`）: STEP-5 横断依存検査の機械的比較の単一実装。case-ready 検証対応要否ゲートも同一実装を共有する（比較手続きの重複実装禁止）
+- 横断依存検査エンジン（本スキル配下 `scripts/src/inspect_cross_dependencies.ts`）: STEP-5 横断依存検査の機械的比較の単一実装。case-ready トレーサビリティ完全性ゲートも同一実装を共有する（比較手続きの重複実装禁止）
 
 ## トレーサビリティ能力の利用
 
 case-open は、上流工程（req-define）で確定した対象要件を実行契約候補（realization_actions 等の Definition Package 構成要素）として Root Case へ引き継ぐ。
 
 - req-define と重複して一般的な変更影響探索や依存関係探索を行い、対象範囲を再決定しない
-- 対象要件行に検証対応要否の未分類行が残る場合も Root Case の確立を妨げない。検証対応要否の最終ゲートは case-ready が所有する
+- 対象要件行に Design 対応が未成立でも Root Case の確立を妨げない。Design 対応の成立判定（トレーサビリティ完全性ゲート）は case-ready が所有する
 - 引き継ぎ情報に欠落があり実行契約候補の構成が不能な場合は、req-define へ差し戻す
 
 ## 共通制約
@@ -90,7 +90,7 @@ case-open は、上流工程（req-define）で確定した対象要件を実行
 - **draft-data 入力**: 本スキルは構造化 `draft-data` を入力として読み取る。機能要件、非機能要件、制約、対象外、受け入れ条件は新規に作成せず合意済み入力を反映する。`conflict_resolutions` に記録済みの衝突は再確認しない
 - **Root Case 状態**: Root Case 確立後の状態は open とし、実装開始を許可しない。ready への遷移は case-ready が実行する
 - **Definition PR**: canonical Definition に実変更がある場合のみ、Case 単位で 1 件の Definition PR を作成する。実変更判定不能時は作成せず停止する。冪等キーは definition-readiness Design に従う
-- **verification-scope-catalog 追随確認**: REQ 行追加を伴う Definition Package 生成時は、verification-scope-catalog 更新の追随要否を工程上明示し、必要なカタログエントリ追加を Definition Package の構成要素として含める。カタログ編集は実変更であるため Definition PR 経由以外の適用経路を取らない（対象要件行、STEP-3）
+- **トレーサビリティポリシー追随確認**: REQ 行追加を伴う Definition Package 生成時は、トレーサビリティポリシー（検証対応を任意とする要件行の明示登録）更新の追随要否を工程上明示し、必要な policy エントリ追加を Definition Package の構成要素として含める。policy 編集は当該要件行の変更と同一の Definition 変更として扱い、Definition PR 経由以外の適用経路を取らない（対象要件行、STEP-3）
 - **Decision 非遷移**: 新規 Decision は proposed のままとし、accepted への状態遷移を実行しない
 - **横断依存検査の警告非阻止**: STEP-5 の横断依存検査は警告の提示のみを行い、Root Case の確立を自動阻止しない。検出源の取得不能時は比較を省略せず検出不能として報告する。警告時の判断は投入者（HITL）への選択肢提示により行い、case-auto 配下では decision_context による親判断解決へ委譲する
 - **実行識別情報の記録**: Root Case 本文に実行識別情報セクション（対象 Case、実行単位、前工程で確定した事項）を構造化形式で記録する。形式は `agentdev-workflow-templates` の実行識別情報セクション規約に従う。機械的解析は同セクションの key-value 行を正とし、自由文中の ID に依存しない。識別情報の一部が取得不能でも停止せず「N/A」を記録する。作成時点で番号が確定しない自己参照値は Issue 作成後に埋め戻す。既存 Issue への遡及適用は行わない
