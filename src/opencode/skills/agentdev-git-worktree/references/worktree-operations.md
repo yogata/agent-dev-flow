@@ -139,7 +139,7 @@ bun test によるフル suite 実行は、次の環境前提を踏まえて実�
 - worktree は独立した working tree のため、gitignore 対象の `node_modules` は worktree へ未伝播である。bun test（フル suite 正規形、bun test 単独実行の別を問わない）および tsc 型検証の実行前に依存整備を前置する。未実施の場合、integrity suite の一部テスト・tsc 型検証が依存解決失敗で fail する。依存整備の対象ディレクトリ集合と前置の実行形態は正規形（`agentdev-quality-gates` QG-4 の依存パッケージ前置）を参照する。worktree における依存整備前提は次のとおり:
   - **対象ディレクトリ集合**: Project Extensions の scripts ディレクトリ（source 側ツリー配下。zod 等の依存解決。integrity suite からの相対 import 参照の前提を含む）と、本体リポジトリ専用の整合性検査 skill の scripts ディレクトリ（配置先配下の worktree 実体。`typescript`・`@types/bun`・`@types/node` の依存解決）の両方。片方のみ整備した場合、未整備側を参照するテスト・型検証が依存解決失敗で fail する
   - **tsc 型検証の型解決前提**: tsc 型検証（`tsc --noEmit`）を含む場合は、対象パッケージでの `bun install` により `@types/bun` 等の型定義と `typescript` を復元済みであること。node_modules 未整備の状態では tsc の型解決が失敗する
-  - **bun test 単独実行の依存前提と junction 代替**: bun test 単独実行（フル suite 正規形以外の実行）で依存解決が必要な場合は、次のいずれかの手段で整備する
+  - **依存整備の正規手段（フル suite 正規形を含む全 bun test 実行形態で共通）**: 依存解決が必要な場合は、次のいずれかの手段で整備する（QG-4 の依存パッケージ前置と同じ許容手段・適用範囲）
     1. main 側の当該 scripts ディレクトリ配下の `node_modules` への junction を worktree 側に作成する。検証後に junction を削除する（junction エントリのみの削除とし、参照先の main 側 `node_modules` は破壊しない）
     2. worktree の当該 skill ディレクトリで `bun install` を実行し、worktree 内に `node_modules` を生成する
 
