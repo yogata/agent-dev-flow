@@ -47,9 +47,9 @@ realization_actions は構成要素として保持する（構造化ハンドオ
 
 <!-- Root Case 確立後の状態は open とし、実装開始を許可しない。
 execution contract 確定、Standard / Epic 最終確定、Child Issue / Wave 作成は case-ready が実行する。
-Draft Definition PR は canonical Definition に実変更がある場合のみ作成する -->
+Definition PR は canonical Definition に実変更がある場合のみ作成する -->
 - 状態: open
-- Draft Definition PR: [作成済み: PR番号 / 不作成（実変更なし）]
+- Definition PR: [作成済み: PR番号 / 不作成（実変更なし）]
 - 次工程: `case-ready`
 
 ## レビュー判断

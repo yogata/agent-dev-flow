@@ -152,6 +152,12 @@ describe("Definition revision scenarios", () => {
     expect(doc).toMatch(/既存 PR を再利用し、STEP-3 を省略して STEP-4 へ進む（重複生成しない）/);
     expect(doc).toMatch(/作成前に既存 PR の再検索を実行し、検出時は新規作成を取りやめて再利用へ切り替える/);
   });
+
+  test("(d) Amendment PR is created as a normal Pull Request (REQ-083-001)", () => {
+    expect(doc).toMatch(
+      /Definition Amendment PR として通常 Pull Request（GitHub Draft PR ではない）で作成する/,
+    );
+  });
 });
 
 describe("Impact reassessment protects completed Issues (REQ-062-004)", () => {

@@ -6,7 +6,8 @@ description: Root Case の Definition を受入し実行準備完了（ready）�
 
 Root Case の Definition 受入と実行準備完了（ready）への状態遷移を行う。
 本コマンドは Definition 受入準備フェーズ（case-open）と実装実行フェーズ（case-run）の境界に位置する。
-Definition PR が存在する場合、req-define で合意済みの意味内容に対する忠実な投影であること、整合性、必要な品質検査を確認し、新しい意味判断が不要なら追加承認なしで自動確定・merge する。
+Definition PR が存在する場合、req-define で合意済みの意味内容に対する忠実な投影であること、整合性、必要な品質検査を確認し、merge 実行前に pr_read の isDraft で Draft 状態を確認した上で、新しい意味判断が不要なら追加承認なしで自動確定・merge する。
+isDraft: true の場合は pr_merge を実行せず、GitHub Draft PR が正規 lifecycle 外であり merge 不可であることを理由として blocked で停止する（draft 解除の自動実行、raw gh WRITE による復旧は行わない）。
 新しい Decision、意味変更、対象範囲拡大、意味的な不整合解消等が必要な場合は停止し HITL とする。
 merge 後に canonical Definition を再取得し、execution contract 確定、Standard / Epic 確定、検証対応要否の最終ゲート、ready 遷移、draft / RU 削除を実行する。
 
@@ -14,7 +15,7 @@ merge 後に canonical Definition を再取得し、execution contract 確定、
 
 - Root Case（Issue 番号または URL。case-open が作成した状態 open の Root Case）
 - 関連する req_draft（存在する場合）
-- Draft Definition PR / Definition Amendment PR（存在する場合）
+- Definition PR / Definition Amendment PR（存在する場合）
 
 ## 出力
 

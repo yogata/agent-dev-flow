@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-ready
-description: "case-ready command の workflow 実装本体。Definition PR 受入（忠実性・整合性・品質検査の確認、新しい意味判断が不要な場合の自動確定・merge、HITL 停止、CI 失敗時の ready 不遷移と既存 PR 保持）、canonical Definition 再取得、proposed Decision の受理評価と accepted 遷移、execution contract 確定、Standard / Epic 確定（連結成分と3軸判断、Child Issue / Wave / 依存構造生成、構成検証、Wave 重複前置検出）、検証対応要否最終ゲート（横断依存検査を含む）、ready 遷移、draft / RU 削除、冪等再実行を所有する。USE FOR: case-ready 実行時の workflow 制御（Definition 受入・自動確定・merge・HITL 停止・canonical 再取得・Decision 受理評価・execution contract 確定・Standard / Epic 確定・検証ゲート・横断依存検査・ready 遷移・draft / RU 削除・冪等再実行）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）、Root Case 確立・Definition Package 生成・Draft Definition PR 作成（case-open 側の責務）、実装実行（case-run 側の責務）、PR マージ判定・完了条件チェックボックス評価（case-close 側の責務）。"
+description: "case-ready command の workflow 実装本体。Definition PR 受入（忠実性・整合性・品質検査の確認、merge 前の pr_read による isDraft 確認、isDraft: true 時は pr_merge 未実行で blocked 停止、新しい意味判断が不要な場合の自動確定・merge、HITL 停止、CI 失敗時の ready 不遷移と既存 PR 保持）、canonical Definition 再取得、proposed Decision の受理評価と accepted 遷移、execution contract 確定、Standard / Epic 確定（連結成分と3軸判断、Child Issue / Wave / 依存構造生成、構成検証、Wave 重複前置検出）、検証対応要否最終ゲート（横断依存検査を含む）、ready 遷移、draft / RU 削除、冪等再実行を所有する。USE FOR: case-ready 実行時の workflow 制御（Definition 受入・isDraft 事前確認・自動確定・merge・HITL 停止・canonical 再取得・Decision 受理評価・execution contract 確定・Standard / Epic 確定・検証ゲート・横断依存検査・ready 遷移・draft / RU 削除・冪等再実行）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）、Root Case 確立・Definition Package 生成・Definition PR 作成（case-open 側の責務）、実装実行（case-run 側の責務）、PR マージ判定・完了条件チェックボックス評価（case-close 側の責務）。"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-061-001, REQ-061-002, REQ-061-003, REQ-061-004, REQ-061-005, REQ-061-006, REQ-061-007, REQ-061-008, REQ-061-009, REQ-061-010, REQ-061-011, REQ-061-012, REQ-061-013, REQ-061-014, REQ-061-015, REQ-061-016, REQ-061-017, REQ-061-018, REQ-061-019, REQ-061-020, REQ-061-021, REQ-061-022, REQ-061-023, REQ-061-024, REQ-061-025, REQ-061-026, REQ-061-027, REQ-061-028, REQ-061-029, REQ-061-030, REQ-061-031, REQ-017-001, REQ-017-002, REQ-017-004, REQ-017-005, REQ-017-008, REQ-017-009, REQ-017-010, REQ-017-011, REQ-017-012, REQ-017-013, REQ-017-014, REQ-017-015, REQ-017-016, REQ-017-017, REQ-035-013, REQ-035-014, REQ-035-015 -->
@@ -17,7 +17,7 @@ case-ready command は公開 interface（入出力契約・ガードレール）
 
 - case-ready command から渡される Root Case（Issue 番号または URL、状態 open）
 - 関連する req_draft（存在する場合。`.agentdev/drafts/req-draft-*.md`。`agreed_items` / `operation_units` / `realization_actions` / `review_dispositions` / `case_open_hints` / `conflict_resolutions`）
-- Draft Definition PR / Definition Amendment PR（存在する場合）
+- Definition PR / Definition Amendment PR（存在する場合）
 
 ## 出力
 
@@ -56,6 +56,7 @@ case-ready workflow は次の7 STEP で構成する。
 - **実変更なし分岐（STEP-1）**: Definition PR が存在しない場合（実変更のない bugfix 等の Case）は Definition PR を作らず canonical Definition は現行 main の状態を採用し、execution contract 確定と ready 遷移へ進む。空の Definition PR を作成する経路は存在しない
 - **HITL 分岐（STEP-1）**: 新しい Decision、意味変更、対象範囲拡大、意味的な不整合解消が必要と判定した場合は停止し、既存 PR を保持したままユーザー判断を求める
 - **CI 失敗分岐（STEP-1）**: Definition PR の CI / 品質検査失敗時は ready へ遷移せず、既存 PR を保持したまま停止する。修復後に再実行できる
+- **Draft 状態分岐（STEP-1）**: merge 実行前に pr_read の isDraft で Draft 状態を確認する（REQ-{NNNN}-{NNN}）。isDraft: true の場合は pr_merge を実行せず、GitHub Draft PR が正規 lifecycle 外であることを識別可能な理由とともに blocked で停止する。draft 解除の自動実行、pr_ready 相当操作、raw gh WRITE による復旧は行わない
 - **Epic 分岐（STEP-5）**: Epic 確定時は Child Issue と Wave / 依存構造を作成する。Standard 確定時は Child Issue を作成しない
 - **冪等分岐（全体）**: 再実行時、merge 済み Definition、既存 Child Issue、既存 Wave / 依存構造、Decision 受理記録を再利用し、不足分だけを処理する
 
@@ -97,7 +98,7 @@ case-ready は検証対応要否の最終ゲートで、対象要件行の実装
 
 ## 共通制約
 
-- **Definition 受入**: 忠実性確認（req-define 合意内容との投影検査）、整合性検査、品質検査を Definition PR 確定前に行う。新しい意味判断を必要としない場合は追加承認なしで merge する。merge 後は canonical Definition を再取得し、merge を巻き戻さない
+- **Definition 受入**: 忠実性確認（req-define 合意内容との投影検査）、整合性検査、品質検査を Definition PR 確定前に行う。merge 実行前に pr_read の isDraft 確認を行い、isDraft: true 時は pr_merge を実行せず blocked で停止する。新しい意味判断を必要としない場合は追加承認なしで merge する。merge 後は canonical Definition を再取得し、merge を巻き戻さない
 - **execution contract 投影**: 機能要件、非機能要件、制約、対象外、受け入れ条件は新規作成せず合意済み Definition を投影する。runtime-only 判断（worktree 状態、staleness、実 diff、実装結果、test 実行結果）は事前確定せず case-run の安全検査として維持する
 - **Standard / Epic 確定**: 連結成分（必須依存のみをエッジ）と依存強度、Epic サイズ、機能的一貫性の3軸で自律生成する。単独根は Epic 化せず Standard flow とする。無関係な operation_unit 群を単一 Epic へ機械的に集約しない
 - **Decision 受理の冪等**: 再実行時、既に accepted へ遷移済みの Decision に対して重複する状態遷移や承認記録を生成しない
@@ -113,5 +114,5 @@ case-ready は検証対応要否の最終ゲートで、対象要件行の実装
 - **`<workflows/epic-wave-model>` Design**: OU / Epic / Wave / Issue 階層、execution_unit 構成、Wave 重複前置検出
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **case-ready command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）
-- **case-open workflow スキル**: 前工程（Root Case 確立と Definition Package 生成、Draft Definition PR 作成）
+- **case-open workflow スキル**: 前工程（Root Case 確立と Definition Package 生成、Definition PR 作成）
 - **case-run workflow スキル**: 後続工程（execution contract の消費と実装実行）
