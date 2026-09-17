@@ -1,4 +1,5 @@
 // ADF-COVERS(verification): REQ-010-002, REQ-010-003, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-066, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008
+// ADF-COVERS(verification): REQ-087-002, REQ-087-003
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
 import { mkdirSync, writeFileSync, copyFileSync, rmSync, existsSync, readFileSync, symlinkSync } from "fs";
 import { join } from "path";
@@ -4676,6 +4677,257 @@ describe("IR-068 skill-projection-manifest (Issue #2383 (d), inspect F-01)", () 
         res.check === "skill-projection-manifest",
     );
     expect(warnings.length).toBe(2);
+  });
+});
+
+// ─── IR-069 req-number-gap-recorded (REQ-087-002/003, Case #2917) ─────────────
+// Fixture kinds: 正常例 (帯中欠番の両 README 明記), 違反例 (無記録欠番・陳腐化範囲明記),
+// 境界例 (AUTOGEN 内のみの明記・4桁帯混在), 許容例 (retired 番号・末尾予約枠・文脈言及),
+// 再現例 (RU-0034: 帯中予約欠番の無記録 + 末尾予約枠の過渡帯)。
+
+const IR069_ROOT = join(TEMP_ROOT, "ir069");
+
+interface Ir069FixtureOptions {
+  activeReqs: number[];
+  retiredReqs?: number[];
+  reqReadmeLines: string[];
+  docsReadmeLines: string[];
+}
+
+function buildIr069Fixture(root: string, opts: Ir069FixtureOptions): void {
+  const reqDir = join(root, "docs", "requirements");
+  mkdirp(reqDir);
+  for (const n of opts.activeReqs) {
+    const id = `REQ-${String(n).padStart(3, "0")}`;
+    writeFileSync(
+      join(reqDir, `${id}.md`),
+      [
+        "---",
+        `id: ${id}`,
+        "title: IR-069 fixture",
+        "created: 2025-01-01",
+        "updated: 2025-01-01",
+        "---",
+        "",
+        "Body.",
+        "",
+      ].join("\n"),
+      "utf-8",
+    );
+  }
+  if (opts.retiredReqs && opts.retiredReqs.length > 0) {
+    const retiredDir = join(reqDir, "retired");
+    mkdirp(retiredDir);
+    for (const n of opts.retiredReqs) {
+      const id = `REQ-${String(n).padStart(3, "0")}`;
+      writeFileSync(
+        join(retiredDir, `${id}.md`),
+        `---\nid: ${id}\ntitle: retired fixture\n---\n\nBody.\n`,
+        "utf-8",
+      );
+    }
+  }
+  writeFileSync(
+    join(reqDir, "README.md"),
+    opts.reqReadmeLines.join("\n") + "\n",
+    "utf-8",
+  );
+  writeFileSync(
+    join(root, "docs", "README.md"),
+    opts.docsReadmeLines.join("\n") + "\n",
+    "utf-8",
+  );
+  mkdirp(join(root, "docs", "designs"));
+  writeFileSync(join(root, "docs", "designs", "README.md"), "# Design\n", "utf-8");
+  copyScripts(root);
+}
+
+function ir069Results(root: string): {
+  ng: Array<{ message: string; evidence?: string; file?: string }>;
+  info: Array<{ message: string; evidence?: string }>;
+  ok: Array<{ message: string }>;
+} {
+  const r = runScript(root, ["--json"]);
+  const parsed = JSON.parse(r.stdout);
+  const of = (level: string) =>
+    parsed.results.filter(
+      (res: { category: string; level: string }) =>
+        res.category === "ReqNumbering" && res.level === level,
+    );
+  return { ng: of("ng"), info: of("info"), ok: of("ok") };
+}
+
+describe("IR-069 req-number-gap-recorded (REQ-087-002/003, Case #2917)", () => {
+  it("passes when mid-band gaps are annotated in both READMEs (正常例)", () => {
+    const root = join(IR069_ROOT, "ok");
+    mkdirp(root);
+    const annotation =
+      "REQ-006〜REQ-008 は REQ-009 採番時（ユーザー裁定）による意図的予約欠番であり、実体は存在しない";
+    buildIr069Fixture(root, {
+      activeReqs: [1, 2, 3, 4, 5, 9, 13],
+      reqReadmeLines: ["# REQ インデックス", "", annotation],
+      docsReadmeLines: ["# ドキュメント入口", "", annotation],
+    });
+    const { ng, ok } = ir069Results(root);
+    expect(ng.length).toBe(0);
+    expect(ok.length).toBeGreaterThan(0);
+    expect(ok[0].message).toContain("3 recorded gap numbers");
+  });
+
+  it("detects mid-band gaps missing from README annotations in both files (違反例)", () => {
+    const root = join(IR069_ROOT, "unrecorded");
+    mkdirp(root);
+    buildIr069Fixture(root, {
+      activeReqs: [1, 2, 3, 4, 5, 9, 13],
+      reqReadmeLines: ["# REQ インデックス", ""],
+      docsReadmeLines: ["# ドキュメント入口", ""],
+    });
+    const { ng } = ir069Results(root);
+    const evidence = ng.map((res) => res.evidence ?? "");
+    expect(evidence).toContain("unrecorded-gap:REQ-006〜REQ-008");
+    expect(ng.filter((res) => (res.file ?? "").endsWith("docs/requirements/README.md")).length).toBe(1);
+    expect(ng.filter((res) => (res.file ?? "").endsWith("docs/README.md")).length).toBe(1);
+  });
+
+  it("does not count annotations written inside AUTOGEN blocks (境界例: AUTOGEN)", () => {
+    const root = join(IR069_ROOT, "autogen-only");
+    mkdirp(root);
+    const inAutogen = [
+      "<!-- AUTOGEN:BEGIN:id=fixture-gap-note -->",
+      "REQ-006〜REQ-008 は意図的予約欠番である",
+      "<!-- AUTOGEN:END -->",
+    ];
+    buildIr069Fixture(root, {
+      activeReqs: [1, 2, 3, 4, 5, 9, 13],
+      reqReadmeLines: ["# REQ インデックス", "", ...inAutogen],
+      docsReadmeLines: ["# ドキュメント入口", "", ...inAutogen],
+    });
+    const { ng } = ir069Results(root);
+    const evidence = ng.map((res) => res.evidence ?? "");
+    expect(evidence).toContain("unrecorded-gap:REQ-006〜REQ-008");
+    expect(evidence.filter((e) => e.includes("REQ-010")).length).toBe(0);
+  });
+
+  it("scopes the band to 3-digit REQ ids and ignores the 4-digit legacy band (境界例: 番号帯)", () => {
+    const root = join(IR069_ROOT, "four-digit");
+    mkdirp(root);
+    const annotation =
+      "REQ-006〜REQ-008 は意図的予約欠番であり、実体は存在しない";
+    buildIr069Fixture(root, {
+      activeReqs: [1, 2, 3, 4, 5, 9, 13, 9001],
+      reqReadmeLines: ["# REQ インデックス", "", annotation],
+      docsReadmeLines: ["# ドキュメント入口", "", annotation],
+    });
+    const { ng, ok } = ir069Results(root);
+    expect(ng.length).toBe(0);
+    expect(ok[0].message).toContain("band 001-013");
+  });
+
+  it("treats retired REQ numbers as existing and tolerates context mentions (許容例)", () => {
+    const root = join(IR069_ROOT, "retired-tolerated");
+    mkdirp(root);
+    buildIr069Fixture(root, {
+      activeReqs: [1, 2, 3, 4, 5, 9, 13],
+      retiredReqs: [6, 7],
+      reqReadmeLines: [
+        "# REQ インデックス",
+        "",
+        "REQ-008 は REQ-009 採番時のユーザー裁定による欠番であり、実体は存在しない",
+      ],
+      docsReadmeLines: [
+        "# ドキュメント入口",
+        "",
+        "REQ-008 は REQ-009 採番時のユーザー裁定による欠番であり、実体は存在しない",
+      ],
+    });
+    const { ng } = ir069Results(root);
+    expect(ng.length).toBe(0);
+  });
+
+  it("detects stale range annotations whose numbers all exist (違反例: 陳腐化明記)", () => {
+    const root = join(IR069_ROOT, "stale-range");
+    mkdirp(root);
+    const stale = "REQ-001〜REQ-003 は意図的予約欠番である";
+    buildIr069Fixture(root, {
+      activeReqs: [1, 2, 3, 4, 5, 9, 13],
+      reqReadmeLines: ["# REQ インデックス", "", stale],
+      docsReadmeLines: ["# ドキュメント入口", "", stale],
+    });
+    const { ng } = ir069Results(root);
+    const evidence = ng.map((res) => res.evidence ?? "");
+    expect(evidence).toContain("stale-gap-annotation:REQ-001〜REQ-003");
+    expect(evidence).toContain("unrecorded-gap:REQ-006〜REQ-008");
+  });
+
+  it("reproduces the RU-0034 shape: unrecorded mid-band reservation plus tolerated tail window (再現例)", () => {
+    const root = join(IR069_ROOT, "ru0034-shape");
+    mkdirp(root);
+    buildIr069Fixture(root, {
+      activeReqs: [1, 2, 3, 4, 5, 9, 13],
+      reqReadmeLines: ["# REQ インデックス", ""],
+      docsReadmeLines: ["# ドキュメント入口", ""],
+    });
+    const { ng, info } = ir069Results(root);
+    const evidence = ng.map((res) => res.evidence ?? "");
+    expect(evidence).toContain("unrecorded-gap:REQ-006〜REQ-008");
+    // 末尾予約枠 (REQ-010〜REQ-012) は過渡帯として許容し検出しない
+    expect(evidence.filter((e) => e.includes("REQ-010") || e.includes("REQ-012")).length).toBe(0);
+    const window = info.find((res) => (res.message ?? "").includes("Reservation window"));
+    expect(window).toBeDefined();
+    expect(window!.message).toContain("REQ-010〜REQ-012");
+    expect(window!.message).toContain("REQ-013");
+  });
+});
+
+// ─── broken-req-ref 範囲表現除外 (v2:REQ-0108-194, Case #2917) ─────────────────
+// REQ-063〜REQ-081 のような帯表現の端点は個別参照ではなく、broken-req-ref の
+// 検出対象から除外する。範囲外の単独出現は引き続き検出する。
+
+describe("broken-req-ref range-span exemption (v2:REQ-0108-194, Case #2917)", () => {
+  it("exempts refs inside range expressions and still flags bare refs (正常例・違反例)", () => {
+    const root = join(IR069_ROOT, "range-span-exemption");
+    mkdirp(root);
+    const reqDir = join(root, "docs", "requirements");
+    mkdirp(reqDir);
+    writeFileSync(
+      join(reqDir, "README.md"),
+      "# Requirements\n\n| ID | Title |\n|----|-------|\n| REQ-001 | fixture |\n",
+      "utf-8",
+    );
+    writeFileSync(
+      join(reqDir, "REQ-001.md"),
+      "---\nid: REQ-001\ntitle: fixture\ncreated: 2025-01-01\nupdated: 2025-01-01\n---\n\nBody.\n",
+      "utf-8",
+    );
+    mkdirp(join(root, "docs", "designs"));
+    writeFileSync(join(root, "docs", "designs", "README.md"), "# Design\n", "utf-8");
+    const guidesDir = join(root, "docs", "guides");
+    mkdirp(guidesDir);
+    writeFileSync(
+      join(guidesDir, "range-refs.md"),
+      [
+        "# Range refs",
+        "",
+        "REQ-006〜REQ-008 は REQ-009 採番時のユーザー裁定による意図的予約欠番である。",
+        "REQ-899 は範囲外の単独参照である。",
+        "",
+      ].join("\n"),
+      "utf-8",
+    );
+    copyScripts(root);
+    const r = runScript(root, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const evidence = parsed.results
+      .filter(
+        (res: { category: string; check: string; level: string }) =>
+          res.category === "LinkIntegrity" &&
+          res.check === "broken-req-ref" &&
+          res.level === "ng",
+      )
+      .map((res: { evidence?: string }) => res.evidence ?? "");
+    expect(evidence).not.toContain("REQ-006");
+    expect(evidence).not.toContain("REQ-008");
+    expect(evidence).toContain("REQ-899");
   });
 });
 

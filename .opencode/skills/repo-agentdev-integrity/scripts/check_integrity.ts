@@ -16,6 +16,8 @@
 // ADF-COVERS(verification): REQ-037-008, REQ-037-010
 // ADF-COVERS(implementation): REQ-059-003
 // ADF-COVERS(verification): REQ-059-002, REQ-059-003
+// ADF-COVERS(implementation): REQ-087-002, REQ-087-003
+// ADF-COVERS(verification): REQ-087-002
 import {
   EXIT_OK,
   EXIT_NG,
@@ -1686,6 +1688,10 @@ function checkLinkIntegrity(root: string): CheckResult[] {
       if (isTemplateLike) break;
       // v2:REQ-0161-004: skip deletion self-references
       if (isDeletionSelfReference(relPath, ref)) continue;
+      // v2:REQ-0108-194: REQ range expressions ("REQ-063〜REQ-081" 等) reference
+      // band endpoints, not individual requirement rows. Only refs whose every
+      // occurrence sits inside a range span are exempt; bare occurrences still flag.
+      if (isRefOnlyInsideRangeSpan(contentLines, ref)) continue;
       const activePath = path.join(root, "docs", "requirements", `${ref}.md`);
       const retiredPath = path.join(
         root,
@@ -3649,6 +3655,32 @@ function isRangeExpression(token: string): boolean {
   return /[\w-]+\s*(?:から|〜|~|through|thru|–|—)\s*[\w-]+/i.test(token);
 }
 
+// v2:REQ-0108-194: range span detector for REQ band references.
+// "REQ-063〜REQ-081" / "REQ-0101 through REQ-0116" 形式の範囲表現の一致 span に
+// 端点参照が含まれるかを判定する（行レベル判定。ファイル全体の除外はしない）。
+const RANGE_EXPRESSION_SPAN_RE = /[\w-]+\s*(?:から|〜|~|through|thru|–|—)\s*[\w-]+/g;
+
+function isRefInsideRangeSpan(line: string, refIndex: number): boolean {
+  RANGE_EXPRESSION_SPAN_RE.lastIndex = 0;
+  let m: RegExpExecArray | null;
+  while ((m = RANGE_EXPRESSION_SPAN_RE.exec(line)) !== null) {
+    if (refIndex >= m.index && refIndex < m.index + m[0].length) return true;
+  }
+  return false;
+}
+
+function isRefOnlyInsideRangeSpan(lines: string[], ref: string): boolean {
+  for (const line of lines) {
+    if (!line.includes(ref)) continue;
+    let idx = line.indexOf(ref);
+    while (idx !== -1) {
+      if (!isRefInsideRangeSpan(line, idx)) return false;
+      idx = line.indexOf(ref, idx + ref.length);
+    }
+  }
+  return true;
+}
+
 function isNegationContext(line: string): boolean {
   return /廃止|不要|禁止|使用しない|べきではない|持たない|含まない|除く|混入させない|書かない|含めない|させない|記述しない|否定|抗わない|abolish|deprecated|obsolete|superseded|prohibit|do not use|must not|not\s+to\s+include|without\s+including/i.test(
     line,
@@ -5016,6 +5048,7 @@ function checkSkillCategoryGap(
     ["Obsolete vocabulary & legacy path", ["ObsoleteVocabulary"]],
     ["引用 REQ 行実在性", ["ReferencedReqRowExistence"]],
     ["スキル集合突合（投影マニフェスト）", ["SkillProjectionManifest"]],
+    ["REQ 番号ギャップ検査", ["ReqNumberGap"]],
   ]);
 
   let foundGap = false;
@@ -10339,6 +10372,222 @@ function checkSkillProjectionManifest(root: string): CheckResult[] {
   return results;
 }
 
+// ─── IR-069: req-number-gap-recorded (REQ-087-002/003, Case #2917) ────────────
+// REQ 番号（3桁帯 REQ-001〜REQ-999）の実体（active + retired）から欠番を算出し、
+// docs/requirements/README.md と docs/README.md の両「欠番」明記（AUTOGEN 外の
+// 本文行での REQ-NNN 単体または REQ-NNN〜REQ-NNN 範囲）と突合する。
+// 検出対象は「無記録の欠番」: 最大採番番号の直前に位置する末尾予約枠（並行 Case の
+// 共有予約・採番返却の過渡帯。REQ-083〜096 共有予約枠運用参照）を除く欠番は、
+// 両 README での明記を必須とする（numbering-policy「既知の欠番」、REQ-087-002）。
+const IR069_REQ_FILE_RE = /^REQ-(\d{3})\.md$/;
+const IR069_RANGE_RE = /REQ-(\d{3})\s*[〜~]\s*REQ-(\d{3})/g;
+const IR069_SINGLE_RE = /REQ-(\d{3})/g;
+
+function collectIr069ReqNumbers(root: string): Set<number> {
+  const numbers = new Set<number>();
+  const reqDir = path.join(root, "docs", "requirements");
+  for (const dir of [reqDir, path.join(reqDir, "retired")]) {
+    if (!fs.existsSync(dir)) continue;
+    for (const file of listFiles(dir)) {
+      const m = file.match(IR069_REQ_FILE_RE);
+      if (m) numbers.add(parseInt(m[1], 10));
+    }
+  }
+  return numbers;
+}
+
+interface Ir069GapClaims {
+  ranges: { lo: number; hi: number; line: number; claim: string }[];
+  missingSingles: { n: number; line: number }[];
+}
+
+// 「欠番」を含む本文行（AUTOGEN 外）から REQ 番号の主張を抽出する。
+// 範囲主張（REQ-a〜REQ-b）は欠番帯の明記、単体トークンのうち実体が存在しない
+// 番号は欠番の明記として扱う。実体が存在する単体トークン（採番由来などの
+// 文脈言及）は主張として扱わない。
+function parseIr069GapClaims(
+  readmePath: string,
+  existing: Set<number>,
+): Ir069GapClaims | null {
+  const content = readText(readmePath);
+  if (content === null) return null;
+  const lines = content.split("\n");
+  const mask = buildAutogenLineMask(lines);
+  const ranges: Ir069GapClaims["ranges"] = [];
+  const missingSingles: Ir069GapClaims["missingSingles"] = [];
+  for (let i = 0; i < lines.length; i++) {
+    if (mask[i]) continue;
+    if (!lines[i].includes("欠番")) continue;
+    const rangeSpans: Array<[number, number]> = [];
+    IR069_RANGE_RE.lastIndex = 0;
+    let rm: RegExpExecArray | null;
+    while ((rm = IR069_RANGE_RE.exec(lines[i])) !== null) {
+      rangeSpans.push([rm.index, rm.index + rm[0].length]);
+      const a = parseInt(rm[1], 10);
+      const b = parseInt(rm[2], 10);
+      ranges.push({
+        lo: Math.min(a, b),
+        hi: Math.max(a, b),
+        line: i + 1,
+        claim: rm[0].replace(/\s+/g, ""),
+      });
+    }
+    IR069_SINGLE_RE.lastIndex = 0;
+    let sm: RegExpExecArray | null;
+    while ((sm = IR069_SINGLE_RE.exec(lines[i])) !== null) {
+      if (rangeSpans.some(([s, e]) => sm.index >= s && sm.index < e)) {
+        continue;
+      }
+      const n = parseInt(sm[1], 10);
+      if (!existing.has(n)) {
+        missingSingles.push({ n, line: i + 1 });
+      }
+    }
+  }
+  return { ranges, missingSingles };
+}
+
+function formatIr069Number(n: number): string {
+  return `REQ-${String(n).padStart(3, "0")}`;
+}
+
+function formatIr069Run(run: number[]): string {
+  if (run.length === 1) return formatIr069Number(run[0]);
+  return `${formatIr069Number(run[0])}〜${formatIr069Number(run[run.length - 1])}`;
+}
+
+function checkReqNumberGapRecorded(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const numbers = collectIr069ReqNumbers(root);
+  const band = [...numbers].filter((n) => n >= 1 && n <= 999).sort((a, b) => a - b);
+  if (band.length === 0) {
+    results.push(
+      info(
+        "ReqNumbering",
+        "req-number-gap-recorded",
+        "No 3-digit REQ files found; IR-069 skipped (REQ-087-002/003)",
+      ),
+    );
+    return results;
+  }
+  const existing = new Set(band);
+  const max = band[band.length - 1];
+  const prev = band.length >= 2 ? band[band.length - 2] : 0;
+  const requiredGaps: number[] = [];
+  const reservationWindow: number[] = [];
+  for (let n = 1; n <= max; n++) {
+    if (existing.has(n)) continue;
+    if (n > prev) reservationWindow.push(n);
+    else requiredGaps.push(n);
+  }
+
+  const readmeRels = ["docs/requirements/README.md", "docs/README.md"];
+  let violationCount = 0;
+  for (const rel of readmeRels) {
+    const abs = path.join(root, ...rel.split("/"));
+    const claims = parseIr069GapClaims(abs, existing);
+    if (claims === null) {
+      results.push(
+        info(
+          "ReqNumbering",
+          "req-number-gap-recorded",
+          `${rel} not found; IR-069 README cross-check skipped`,
+        ),
+      );
+      continue;
+    }
+    const covered = new Set<number>();
+    for (const range of claims.ranges) {
+      for (let n = range.lo; n <= range.hi; n++) covered.add(n);
+    }
+    for (const single of claims.missingSingles) covered.add(single.n);
+
+    // 無記録の欠番: 末尾予約枠を除く欠番のうち、当該 README の明記がカバーしない番号。
+    const unrecorded = requiredGaps.filter((n) => !covered.has(n));
+    let run: number[] = [];
+    const flushRun = (): void => {
+      if (run.length === 0) return;
+      violationCount++;
+      results.push(
+        ng(
+          "ReqNumbering",
+          "req-number-gap-recorded",
+          `Gap ${formatIr069Run(run)} has no REQ file but is not annotated as 欠番 in ${rel} (REQ-087-002, IR-069)`,
+          rel,
+          undefined,
+          {
+            evidence: `unrecorded-gap:${formatIr069Run(run)}`,
+            expected: `annotate ${formatIr069Run(run)} as 欠番 on a line outside AUTOGEN blocks in ${rel}`,
+            route: "intake",
+            finding_category: "document-drift",
+            finding_level: "strict",
+          },
+        ),
+      );
+      run = [];
+    };
+    for (const n of unrecorded) {
+      if (run.length > 0 && n === run[run.length - 1] + 1) {
+        run.push(n);
+      } else {
+        flushRun();
+        run = [n];
+      }
+    }
+    flushRun();
+
+    // 陳腐化した範囲明記: 範囲主張の全番号が実体を持つ場合は欠番明記として不正。
+    for (const range of claims.ranges) {
+      let allExist = true;
+      for (let n = range.lo; n <= range.hi; n++) {
+        if (!existing.has(n)) {
+          allExist = false;
+          break;
+        }
+      }
+      if (allExist) {
+        violationCount++;
+        results.push(
+          ng(
+            "ReqNumbering",
+            "req-number-gap-recorded",
+            `Range annotation ${range.claim} on a 欠番 line covers only existing REQ numbers (stale gap annotation, ${rel}:${range.line}) (IR-069)`,
+            rel,
+            range.line,
+            {
+              evidence: `stale-gap-annotation:${range.claim}`,
+              expected: `annotate only numbers without REQ files, or remove the stale range from ${rel}`,
+              route: "intake",
+              finding_category: "document-drift",
+              finding_level: "strict",
+            },
+          ),
+        );
+      }
+    }
+  }
+
+  if (violationCount === 0) {
+    results.push(
+      ok(
+        "ReqNumbering",
+        "req-number-gap-recorded",
+        `IR-069 req-number-gap-recorded: ${existing.size} REQ numbers in band 001-${String(max).padStart(3, "0")}, ${requiredGaps.length} recorded gap numbers, ${reservationWindow.length} reservation-window numbers tolerated (REQ-087-002/003)`,
+      ),
+    );
+  }
+  if (reservationWindow.length > 0) {
+    results.push(
+      info(
+        "ReqNumbering",
+        "req-number-gap-recorded",
+        `Reservation window ${formatIr069Run(reservationWindow)} below max ${formatIr069Number(max)} tolerated without 欠番 annotation (transient shared-reservation band, IR-069)`,
+      ),
+    );
+  }
+  return results;
+}
+
 // ─── repo-local Plugin 自己ホスト投影対称性検査（runtime-package-boundary.md） ───
 
 // depth-1 loader shim の固定内容テンプレート。scripts/self-sync.ps1 の
@@ -10846,6 +11095,7 @@ async function main(): Promise<void> {
     ...checkObsoleteVocabulary(root), // IR-065/IR-066 (REQ-010-066/067, Issue #2372)
     ...checkReferencedReqRowExistence(root), // IR-067 (REQ-010-069, Issue #2383 (a))
     ...checkSkillProjectionManifest(root), // IR-068 (Issue #2383 (d), inspect F-01)
+    ...checkReqNumberGapRecorded(root), // IR-069 (REQ-087-002/003, Case #2917)
     ...checkRepoLocalPluginProjectionSymmetry(root), // repo-local Plugin 投影対称性検査（runtime-package-boundary.md、Issue #2787）
   ];
 
