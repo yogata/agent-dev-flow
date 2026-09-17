@@ -328,3 +328,21 @@
 - **タグ**: `#issue-update` `#case-close` `#full-body-replace` `#verification`
 
 ---
+
+## 2026-09-17: Design accepted 昇格時の対応記録は変更対象 Design と同じ PR で保存する
+
+- **問題事象**: Design を `accepted` へ昇格する Case で、昇格理由・Decision 適用状況・REQ 対応範囲・検証証跡を別 Issue や一時メモへ分散すると、Design のライフサイクル状態と対応記録の追跡が切れる。
+- **発生局面**: case-close（Case #2906、PR #2929）。
+- **検知方法**: Design acceptance の保存契約を QG-4 と docs 検証の対象として確認。
+- **根本原因**: Design 本体の状態変更と、昇格時の対応記録保存を別工程として扱うと、同一変更単位の監査証跡が欠落し得る。
+- **自律対応内容**: 対象 Design の `accepted` 状態と対応記録を同一 PR の変更として保存し、PR 本文に理由・Decision・REQ・検証証跡を記録した。
+- **ユーザー確認の有無**: なし（既存の Design lifecycle 契約と QG-4 に基づく機械的確定）。
+- **Decision/REQ/spec影響**: なし（既存契約の文書化・適用）。
+- **横展開観点**: Design の accepted 昇格を含む全 Case で、変更対象 Design と acceptance record の同一 PR 保存を標準化する。
+- **再発条件**: Design 状態変更と対応記録を別 PR・別一時成果物へ分離した場合。
+- **予防策候補**: case-close の Design 確定ゲートで、acceptance record の同一 PR 保存と必須項目（理由、Decision、REQ、検証証跡）を確認する。
+- **想定反映先**: agentdev-design-file-manager の lifecycle application / accepted promotion 契約、case-close の Design 確定手順。
+- **関連**: Case #2906（Refs）、PR #2929（Refs）。
+- **タグ**: `#design-lifecycle` `#accepted` `#case-close` `#traceability`
+
+---
