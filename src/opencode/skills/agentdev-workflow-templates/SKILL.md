@@ -3,7 +3,6 @@ name: agentdev-workflow-templates
 description: Manages Issue/PR description and comment templates, selection rules, and section conventions for the agentdev command pipeline. USE FOR: determining which template to use for a given situation, reading template files, understanding template section structure. DO NOT USE FOR: workflow phase definitions, requirement analysis, architecture decisions.
 ---
 
-<!-- ADF-COVERS(implementation): REQ-057-026 -->
 
 # Issue テンプレート管理スキル
 

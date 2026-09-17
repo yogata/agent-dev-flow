@@ -1,4 +1,3 @@
-// ADF-COVERS(implementation): REQ-053-025, REQ-053-026, REQ-053-029, REQ-053-032, REQ-053-039
 // agentdev-textlint-guard 共通実行基盤: 対象解決。
 //
 // 標準対象は docs/**/*.md とする。追加対象はルート相対の glob として標準対象へ

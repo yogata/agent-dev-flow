@@ -1,0 +1,9 @@
+component: agentdev-case-run-execution-adapter
+implementation:
+  src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md:
+    - REQ-031-029
+    - REQ-031-030
+  src/opencode/skills/agentdev-case-run-execution-adapter/references/adversarial-review-integration.md:
+    - REQ-014-016
+  src/opencode/skills/agentdev-case-run-execution-adapter/references/harness-delegation.md:
+    - REQ-017-019

@@ -1,4 +1,3 @@
-// ADF-COVERS(implementation): REQ-011-022, REQ-011-025, REQ-011-026
 // Issue 系・Comment 系操作のスペック実装。
 //
 // 各スペックは操作ごとの差分（入力検証、runner 要求の組立て、応答解釈、

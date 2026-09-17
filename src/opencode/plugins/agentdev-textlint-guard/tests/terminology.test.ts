@@ -1,4 +1,3 @@
-// ADF-COVERS(verification): REQ-053-004, REQ-053-024, REQ-053-030
 //
 // TS-002: プロジェクト固有用語と構造除外。
 // - 慣行パスのプロジェクト prh 辞書を散文で検出し、修正指針（replacement）を返す

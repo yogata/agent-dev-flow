@@ -1,0 +1,17 @@
+component: agentdev-traceability
+implementation:
+  src/opencode/skills/agentdev-traceability/SKILL.md:
+    - REQ-012-052
+    - REQ-012-057
+  src/opencode/skills/agentdev-traceability/scripts/lib/check.ts:
+    - REQ-012-056
+  src/opencode/skills/agentdev-traceability/scripts/lib/sidecar.ts:
+    - REQ-012-053
+  src/opencode/skills/agentdev-traceability/scripts/lib/verification_scope.ts:
+    - REQ-012-056
+  src/opencode/skills/agentdev-traceability/scripts/src/check.ts:
+    - REQ-057-028
+  src/opencode/skills/agentdev-traceability/scripts/src/coverage.ts:
+    - REQ-057-028
+  traceability/policy.yaml:
+    - REQ-002-048

@@ -292,6 +292,7 @@ case-run の実行担当（委譲内サブエージェント）は、対象要�
 ## 配布物本体 ADF-COVERS 宣言の除去可否判定（cleanup 判定）
 
 <!-- ADF-COVERS(implementation): REQ-057-030 -->
+<!-- ADF-COVERS(design): REQ-057-028 -->
 本節の coverage 突合の運用詳細（役割フィルタ、producer 側パス認定、sidecar と inline の同一扱い、除去後の後置検査）が REQ-057-030 を実装する。
 
 case-run の実行担当（委譲内サブエージェント）が、実装作業で配布物本体に残存する ADF-COVERS 宣言の除去を扱う場合、配布物本体の ADF-COVERS 宣言は producer 側のトレーサビリティ metadata であり、対応関係の移行先（docs 配下の正規成果物の inline 宣言、または repository top-level の `traceability/` 配下の sidecar）が成立していることを条件に除去する。single workflow（STEP-S4 の委譲）と epic-wave workflow（STEP-W3 の各子Issue 委譲）の双方に同じ条件を適用する。

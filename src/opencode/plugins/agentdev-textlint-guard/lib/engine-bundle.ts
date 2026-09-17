@@ -1,4 +1,3 @@
-// ADF-COVERS(implementation): REQ-053-033, REQ-053-034, REQ-010-071
 // agentdev-textlint-guard 共通実行基盤: 配布前解決済み依存（vendored engine bundle）の読込み。
 //
 // 依存は配布前に解決した成果物として供給する（導入系スクリプトはネットワーク取得を

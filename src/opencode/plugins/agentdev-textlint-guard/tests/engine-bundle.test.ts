@@ -1,4 +1,3 @@
-// ADF-COVERS(verification): REQ-053-033, REQ-053-034, REQ-053-037, REQ-010-071
 //
 // 依存配布のテスト（TS-009 の package 単位側面）。
 // vendored engine bundle は package の node_modules に依存せず、コミット済みの

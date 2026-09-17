@@ -94,13 +94,14 @@ export const DEFAULT_REPOSITORY_IDENTITY: RepositoryIdentity = {
   default_branch: "main",
 };
 
+// ADF-COVERS(implementation): REQ-029-010
 export const DEFAULT_DETECTOR_CONFIG: DetectorConfig = {
   repository_identity: DEFAULT_REPOSITORY_IDENTITY,
   producer_internal_id_prefixes: ["ADR", "REQ", "DEC"],
   distributed_workflow_control_prefixes: ["STEP", "QG"],
-  // Activation stays at "report" until the Wave 4 issue performs the switch
-  // (RA-006 activation part); inline declarations still exist in src/opencode.
-  producer_metadata_enforcement: "report",
+  // Wave 4 issue #2945 activated RA-006: producer-metadata detections fail the
+  // gate and the declaration-line extraction skip no longer applies.
+  producer_metadata_enforcement: "enforce",
 };
 
 // ---------------------------------------------------------------------------

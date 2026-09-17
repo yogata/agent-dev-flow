@@ -1,0 +1,4 @@
+component: agentdev-workflow-learning-promote
+implementation:
+  src/opencode/skills/agentdev-workflow-learning-promote/references/analysis-and-review.md:
+    - REQ-038-006

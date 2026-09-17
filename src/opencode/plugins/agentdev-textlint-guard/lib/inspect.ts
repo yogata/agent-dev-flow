@@ -1,4 +1,3 @@
-// ADF-COVERS(implementation): REQ-053-004, REQ-053-024, REQ-053-025, REQ-053-026, REQ-053-027, REQ-053-028, REQ-053-031, REQ-053-032, REQ-053-034
 // agentdev-textlint-guard 共通実行基盤: 文章検査（両入口の共通判定点）。
 //
 // pre-write 検査も最終検査も、このモジュールの inspectText / inspectFile を経由する。

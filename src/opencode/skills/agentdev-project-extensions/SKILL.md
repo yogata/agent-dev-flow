@@ -3,7 +3,6 @@ name: agentdev-project-extensions
 description: Resolves project-specific extensions (.agentdev/extensions/skills/**) for Workflow and Capability Skills at runtime. USE FOR: extension discovery, load-time state classification, reading extension context/rules/checks, extracting project-local delegation targets. DO NOT USE FOR: defining extension schema, diagnosing/inspecting extension structure, modifying distribution command/skill bodies, implementing project-local skills, creating/editing or migrating extensions.
 ---
 
-<!-- ADF-COVERS(implementation): REQ-050-016 -->
 
 # Project Extensions
 

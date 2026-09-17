@@ -1,0 +1,4 @@
+component: agentdev-project-extensions
+implementation:
+  src/opencode/skills/agentdev-project-extensions/SKILL.md:
+    - REQ-050-016

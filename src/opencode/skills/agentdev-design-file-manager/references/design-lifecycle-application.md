@@ -1,6 +1,5 @@
 # Design ライフサイクル適用
 
-<!-- ADF-COVERS(implementation): REQ-021-026 -->
 
 本資料は SKILL.md「Design ライフサイクル適用」「ファイル操作モード」「ADF-COVERS 宣言ブロックの更新確認（design-save 時）」セクションの補完であり、Design frontmatter の `status`（`draft` / `accepted` の2値）を Design 操作（CREATE/APPEND/UPDATE）で適用する規則と、design-save 工程での ADF-COVERS 宣言ブロック更新確認手順を記述する。
 

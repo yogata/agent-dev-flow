@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-012-044, REQ-012-048, REQ-012-049
+// ADF-COVERS(verification): REQ-012-044, REQ-012-048, REQ-012-049, REQ-012-052
 //
 // agentdev-traceability 配布スキルの3能力（coverage、impact、check）の統合検証
 // （OU-002、Issue #2360）。派生 Graph が存在しない状態での動作（AC-001）、

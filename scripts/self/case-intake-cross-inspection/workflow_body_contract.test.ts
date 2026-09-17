@@ -38,6 +38,12 @@ const ENGINE_TREE = path.join(
 const CASE_READY_SKILL_DIR = path.join(
   REPO_ROOT, "src", "opencode", "skills", "agentdev-workflow-case-ready",
 );
+const CASE_OPEN_SIDECAR = path.join(
+  REPO_ROOT, "traceability", "agentdev-workflow-case-open.yaml",
+);
+const CASE_READY_SIDECAR = path.join(
+  REPO_ROOT, "traceability", "agentdev-workflow-case-ready.yaml",
+);
 
 function read(file: string): string {
   return fs.readFileSync(file, "utf-8");
@@ -72,10 +78,10 @@ describe("case-open STEP-5 への横断依存検査の組み込み（REQ-030-012
     return step5Row.includes("横断依存検査") && step5Row.includes("警告提示記録");
   }
 
-  test("SKILL.md の対応宣言に REQ-030-012〜014 が含まれる", () => {
-    const skill = read(CASE_OPEN_SKILL);
+  test("case-open component sidecar に REQ-030-012〜014 の実装対応が含まれる", () => {
+    const sidecar = read(CASE_OPEN_SIDECAR);
     for (const id of ["REQ-030-012", "REQ-030-013", "REQ-030-014"]) {
-      expect(skill).toContain(id);
+      expect(sidecar).toContain(id);
     }
   });
 
@@ -105,10 +111,10 @@ describe("case-ready 検証ゲートへの横断次元の組み込み（REQ-061-
     expect(step6).toContain("ready 遷移判定を変更しない");
   });
 
-  test("SKILL.md の対応宣言に REQ-061-029〜031 が含まれる", () => {
-    const skill = read(CASE_READY_SKILL);
+  test("case-ready component sidecar に REQ-061-029〜031 の実装対応が含まれる", () => {
+    const sidecar = read(CASE_READY_SIDECAR);
     for (const id of ["REQ-061-029", "REQ-061-030", "REQ-061-031"]) {
-      expect(skill).toContain(id);
+      expect(sidecar).toContain(id);
     }
   });
 

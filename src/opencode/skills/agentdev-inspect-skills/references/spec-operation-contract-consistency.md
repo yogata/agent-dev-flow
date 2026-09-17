@@ -1,4 +1,3 @@
-<!-- ADF-COVERS(implementation): REQ-036-027 -->
 # Design 操作契約テーブルと操作契約実体のフィールド一致性判定基準
 
 > **原本**: 本ファイルは inspect-skills 診断観点「Design 操作契約テーブル ↔ 操作契約実体（contracts.ts）フィールド一致性」の判定基準詳細、対象 Design 範囲、フィールド対応規則を集約する運用ビューである。

@@ -1,4 +1,3 @@
-// ADF-COVERS(implementation): REQ-053-004, REQ-053-024, REQ-053-030
 // agentdev-textlint-guard 共通実行基盤: プロジェクト固有用語の接続点。
 //
 // プロジェクトが所有する native な prh 形式の用語辞書は、対象プロジェクトの

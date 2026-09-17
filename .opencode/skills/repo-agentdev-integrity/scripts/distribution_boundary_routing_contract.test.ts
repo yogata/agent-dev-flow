@@ -303,8 +303,8 @@ describe("distribution-boundary final gate routing contract", () => {
   });
 
   describe("detector behind the routes carries the exception-free producer metadata signal (RA-006)", () => {
-    it("detector default stays at report level: enforcement switch is not activated by this Issue", () => {
-      expect(DEFAULT_DETECTOR_CONFIG.producer_metadata_enforcement).toBe("report");
+    it("detector default is enforce: the Wave 4 activation (issue #2945) switched RA-006 on", () => {
+      expect(DEFAULT_DETECTOR_CONFIG.producer_metadata_enforcement).toBe("enforce");
     });
 
     it("detector emits the producer-metadata marker signal without role or path filters", () => {
@@ -322,7 +322,7 @@ describe("distribution-boundary final gate routing contract", () => {
       expect(meta[0]!.matched).toBe("ADF-COVERS");
     });
 
-    it("report level keeps the routed gates passing while the signal is observed", () => {
+    it("enforce level (default) fails the routed gate on the producer-metadata signal", () => {
       const d = classifyLineConfig(
         {
           text: "<!-- ADF-COVERS(implementation): REQ-029-010 -->",
@@ -332,7 +332,7 @@ describe("distribution-boundary final gate routing contract", () => {
         },
         DEFAULT_DETECTOR_CONFIG,
       );
-      expect(decideGate(d).pass).toBe(true);
+      expect(decideGate(d).pass).toBe(false);
     });
   });
 });

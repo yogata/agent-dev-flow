@@ -1,6 +1,5 @@
 # 共通委譲・result 処理（delegation-and-result）
 
-<!-- ADF-COVERS(implementation): REQ-031-028, REQ-031-029, REQ-031-030, REQ-014-016 -->
 
 > 本 reference は `agentdev-workflow-case-run` SKILL.md の共通 STEP 詳細である。
 > STEP-S4（実行担当サブエージェント委譲）と STEP-S5（result 処理・配布依存境界 最終 gate）を所有する。

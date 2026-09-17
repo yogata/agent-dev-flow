@@ -1,4 +1,3 @@
-<!-- ADF-COVERS(implementation): REQ-060-005, REQ-060-006, REQ-021-027 -->
 # QG-4: Final Acceptance Gate
 
 case-close で PR マージ前に、最終受け入れ状態を確認する Gate。

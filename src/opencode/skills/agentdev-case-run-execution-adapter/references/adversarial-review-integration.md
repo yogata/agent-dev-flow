@@ -1,4 +1,3 @@
-<!-- ADF-COVERS(implementation): REQ-014-016 -->
 # adversarial-review 統合（adapter 委譲内）
 
 本ファイルは case-run の adapter 委譲内における adversarial-review 統合の実行時参照を提供する。

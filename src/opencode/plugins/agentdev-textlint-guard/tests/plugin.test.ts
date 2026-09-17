@@ -1,5 +1,3 @@
-// ADF-COVERS(verification): REQ-053-025, REQ-053-026, REQ-053-027, REQ-053-028, REQ-053-029, REQ-053-030
-// ADF-COVERS(verification): REQ-052-002, REQ-052-004
 //
 // TS-004: pre-write Plugin の検査契約。
 // - write の新規と更新、edit、複数ファイル apply_patch の正常と違反

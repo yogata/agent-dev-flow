@@ -1,0 +1,4 @@
+component: agentdev-workflow-lifecycle
+implementation:
+  src/opencode/skills/agentdev-workflow-lifecycle/references/structured-stage-handoff.md:
+    - REQ-017-019

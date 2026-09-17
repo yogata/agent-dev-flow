@@ -1,0 +1,6 @@
+component: agentdev-inspect-skills
+implementation:
+  src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md:
+    - REQ-036-027
+  src/opencode/skills/agentdev-inspect-skills/references/spec-operation-contract-consistency.md:
+    - REQ-036-027

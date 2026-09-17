@@ -1,4 +1,3 @@
-// ADF-COVERS(implementation): REQ-011-028, REQ-011-029
 // agentdev-gh Custom Tool の fail-closed 実行ゲート（決定6）。
 //
 // 全操作に共通する実行制御を所有する:

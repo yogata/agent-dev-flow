@@ -1,4 +1,3 @@
-// ADF-COVERS(implementation): REQ-053-025, REQ-053-026, REQ-053-027, REQ-053-028, REQ-053-031, REQ-053-033, REQ-053-034
 // agentdev-textlint-guard 共通実行基盤: 結果型と整形。
 //
 // 共通の結果は対象パス、行と列などの位置、rule ID、該当表現または範囲を含む。

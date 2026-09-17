@@ -77,9 +77,9 @@ adversarial-review は Root Case 本文候補と Definition Package 構成案確
 - 不足分だけを処理する。Root Case が存在し Definition PR が存在しない場合は PR 生成のみを実行し、Root Case が存在しない場合は Root Case 確立から実行する。両者とも存在する場合は新規生成を行わない。
 - Definition PR は canonical Definition に実変更がある場合のみ作成する。canonical との差分が空の場合（bugfix / maintenance / docs_chore 等の実変更なし Case）は作成しない（REQ-030-002）。実変更判定が不能な場合は PR を作成せず停止し、判定不能の理由を報告する。
 
-### verification-scope-catalog 追随工程（REQ-030-015）
+### 検証スコープポリシー追随工程（REQ-030-015）
 
-REQ 行追加を伴う Definition Package の生成時、verification-scope-catalog 更新の追随要否を確認し、必要なカタログエントリ追加を Definition に含める。カタログ編集は Definition PR の構成要素として扱い、直接適用しない。
+REQ 行追加を伴う Definition Package の生成時、検証スコープポリシー（`traceability/policy.yaml`）更新の追随要否を確認し、必要なポリシー更新を Definition に含める。ポリシー編集は Definition PR の構成要素として扱い、直接適用しない。
 
 ### 横断依存検査（STEP-5、REQ-030-012〜014）
 

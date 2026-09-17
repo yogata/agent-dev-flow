@@ -1,4 +1,3 @@
-<!-- ADF-COVERS(implementation): REQ-083-001 -->
 # Definition Revision（再合意受入、実変更判定、Amendment PR 冪等作成）
 
 case-revise workflow STEP-1〜STEP-3 の実行詳細（SKILL.md「制御平面（STEP 一覧）」から参照される）。

@@ -1,0 +1,4 @@
+component: agentdev-workflow-templates
+implementation:
+  src/opencode/skills/agentdev-workflow-templates/SKILL.md:
+    - REQ-057-026

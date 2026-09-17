@@ -3,7 +3,6 @@ name: agentdev-workflow-case-revise
 description: "case-revise command の workflow 実装本体。再合意済み Definition 変更の受入確認（未合意変更の req-define 差し戻し）、canonical Definition との実変更判定（実変更なし時は Amendment PR 不作成で case-ready 引き継ぎ）、冪等キーによる既存 Amendment PR の検出と再利用（重複生成禁止）、Definition Amendment PR 作成、Epic 完了済み Issue の影響再評価（影響あるもののみ再評価、影響なし完了済み Issue の巻き戻し禁止）、Case 関連 Issue 本文更新（テンプレート構造と必須セクション維持）、case-ready 引き継ぎ、中断済み成果物の再利用による収束を所有する。USE FOR: case-revise 実行時の workflow 制御（再合意受入・実変更判定・Amendment PR 冪等作成・影響再評価・Issue 本文更新・case-ready 引き継ぎ・冪等再実行）。DO NOT USE FOR: 新しい要求・Decision・対象範囲の決定と Definition の意味判断（req-define 側の責務）、execution contract / execution structure の再確定（case-ready 側の責務）、実装実行（case-run 側の責務）、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
-<!-- ADF-COVERS(implementation): REQ-062-001, REQ-062-002, REQ-062-003, REQ-062-004, REQ-062-005, REQ-062-006, REQ-062-007, REQ-062-008 -->
 
 # case-revise workflow スキル
 
