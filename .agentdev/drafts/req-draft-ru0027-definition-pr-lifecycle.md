@@ -600,6 +600,21 @@ artifact_actions:
       ### REQ-061（case-ready 実行契約）
 
       - REQ-061-029..REQ-061-032: case-ready 検証対応要否ゲートでの横断依存検査（canonical Definition と未クローズ Case 群の同一パス重複・共有領域未登録行重複需要の検出、未分類行残存警告との同時提示と HITL 3 選択肢、警告の ready 遷移非影響、Epic 経路の Wave 内重複前置検出への委譲）、および merge 前 Draft 状態確認（pr_read の isDraft、GitHub Draft PR 検出時の pr_merge 未実行・blocked 停止、復旧操作なし）の実行時振る舞い。REQ-061-001..REQ-061-028 は検証対応宣言済みのため本カタログへ登録しない。恒続的な検証手段（検出条件 (b) の fixture 回帰テスト、TS-002 / TS-003、RA-002 の bun test 基盤）は実現 Case 側の整備候補として検証対応宣言の配置先であり、整備までの間は安全側の任意行として本カタログへ登録した
+  - id: ACT-DESIGN-022
+    artifact: design
+    operation: append
+    target: docs/designs/foundations/references/verification-scope-catalog.md
+    target_design:
+      operation: append
+      domain: foundations
+      slug: verification-scope-catalog
+    target_area: "### REQ-082（対論型レビュー審議契約）"
+    placement: tail
+    source_items: [AG-001, AG-006, AG-007, AG-008, AG-009]
+    content: |
+      ### REQ-083（Definition PR の状態契約）
+
+      - REQ-083-001..REQ-083-006: Definition PR / Definition Amendment PR の状態契約（通常 Pull Request 原則と外部由来 GitHub Draft PR の観測・blocked 停止扱い、definition/issue-{N}・definition-amend/issue-{N} ブランチ命名の Design 正規所有、「Definition PR」用語統一と履歴成果物の旧表現保護、agentdev_gh 正規操作のみによる作成から merge 完結、write guard・pr_merge fail-closed・partial merge 禁止の維持、状態契約以外の対象外宣言）の実行時振る舞い。REQ / Design / workflow reference の契約照合と Case Issue のテスト戦略（TS-001〜014）で検証
 conflict_resolutions:
   - id: CR-001
     conflict: >-
@@ -642,6 +657,17 @@ conflict_resolutions:
     resolution: >-
       義務（merge 前確認・blocked 停止）は REQ-061-032 へ、不変条件（通常 PR 原則・異常状態の定義）は
       REQ-085-001 へ住み分ける（アーキテクチャ助言の確定事項を採用）。両方に義務を書かない。
+  - id: CR-006
+    conflict: >-
+      case-ready 検証対応要否ゲート（Root Case #2898、Definition merge 243621e4 後）で REQ-083-001〜006
+      （決定的採番後の REQ-085 相当行）が未分類行として検出された。新規 REQ CREATE に伴う
+      verification-scope-catalog への当該 REQ 節（任意行エントリ）登録が、req-define 合意時点の
+      artifact_actions に含まれていなかった（REQ-082 等の新規 REQ CREATE と同型の登録が必要）。
+    resolution: >-
+      case-auto の bounded parent decision resolution により先行整備として本 Case の Definition 変更へ
+      含める（ACT-DESIGN-022）。登録内容は合意済み test_strategy（TS-001〜014）と agreed_items
+      （AG-001〜009）の機械的記述であり、新しい意味判断・上位合意矛盾を含まない。REQ-011/REQ-061
+      範囲行更新（ACT-DESIGN-020/021）と同一の catalog への追従完了として位置づける。
 operation_units:
   - ou_id: OU-001
     source_ru: RU-0027
