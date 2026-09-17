@@ -310,3 +310,21 @@
 - **タグ**: #traceability #definition-pr #adf-covers
 
 ---
+
+## 2026-09-17: case-close の Issue 本文更新で要約版 body を書き込み元セクションを欠落させ、再読込の事後確認で検知し復元した
+
+- **確定事項**: agentdev_gh issue_update による Issue 本文更新は、更新対象箇所のみの部分差分ではなく渡した body 全文による全面置換である。本文全文を組み立てる際に元本文の複数セクション（実行識別情報、テスト戦略、scope-affecting impact candidate、横断依存検査記録）を省略した要約版を渡すと、欠落したまま read-back 検証済みの success が返る
+- **発生工程**: case-close（Case #2902 の完了条件チェックボックス [x] 化更新、2026-09-17）
+- **検知方法**: QG-4 完了条件評価の事後確認手順（更新後に issue_read で本文を再読込し全チェックボックス反映を確認）の過程で、初回読取時と比較してセクション欠落を検知
+- **根本原因**: チェックボックス更新を「該当セクションだけの書き換え」と捉えて要約版 body を組み立てた。Custom Tool の更新操作が全文置換であるという操作モデルの把握不足
+- **恒久対応内容**: 初回 issue_read で取得済みの元本文を正とし、完了条件の 5 行のみ `- [ ]` → `- [x]` に置換した完全版 body で再更新。再読込で全セクション復元とチェックボックス反映を確認
+- **ユーザー確認の有無**: なし（エージェント自律の検知・修正）
+- **Decision/REQ/spec影響**: なし。ただし issue 更新操作の全文置換性と元本文保持手順は agentdev-issue-management（Issue 更新時の前後内容比較）・agentdev-issue-tracking の操作知識に既存記述がある可能性があり、promote 側で重複統合を要する
+- **展開観点**: Issue/PR 本文を更新する全 workflow（issue、case-close、epic-tracker、case-revise の Issue 本文更新等）に適用可能。「元本文取得 → 最小差分変換 → 全文書き戻し → 再読込で全文整合確認」を一連の手順として扱う。部分一致チェック（チェックボックスの [x] 化確認のみ）では欠落を検知できない
+- **再発条件**: issue_update / pr_update で元本文を再構築せず要約・部分版 body を渡した場合
+- **防止策**: 本文更新前に必ず直近本文を取得して保持し、差分行のみ編集して全文を書き戻す。更新後の再読込では本文全体の前後比較を行い、セクション欠落を含めて確認する
+- **想定反映先**: agentdev-issue-management または agentdev-issue-tracking の操作手順、case-close workflow の Issue 本文更新手順
+- **関連**: Case #2902、Issue #2902、Custom Tool agentdev_gh issue_update
+- **タグ**: `#issue-update` `#case-close` `#full-body-replace` `#verification`
+
+---
