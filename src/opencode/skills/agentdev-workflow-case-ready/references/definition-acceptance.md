@@ -1,4 +1,4 @@
-<!-- ADF-COVERS(implementation): REQ-061-032, REQ-083-001 -->
+<!-- ADF-COVERS(implementation): REQ-061-032, REQ-061-033, REQ-083-001 -->
 # Definition 受入と canonical 再取得（STEP-1 / STEP-2）
 
 Definition PR の受入判定と merge、canonical Definition 再取得の実行時詳細である。
@@ -60,3 +60,11 @@ merge 実行前に、Custom Tool `agentdev_gh` の pr_read で対象 PR の isDr
 - 再取得対象: merge 済み main の REQ / Decision / Design、Root Case、Epic 構造の確定状態
 - 取得した canonical Definition と req_draft の差分を以降の投影（STEP-4）の入力として扱う。req_draft が取得不能な場合も canonical Definition だけで継続できる（req_draft は補助入力）
 - 後続 STEP が失敗して再実行した場合も、merge を巻き戻さず canonical Definition を基準として再開する
+
+### traceability check の機械実行と case-open 差し戻し（REQ-061-033）
+
+canonical 再取得時に、`agentdev-traceability` の check を対象 Case の要件行について機械実行する。
+
+- **機械実行**: 対象は canonical Definition（merge 済み main の docs 永続文書）である。手動判断（記録を伴わない裁量判断）で代替しない。traceability 能力の不在、実行失敗、空結果時は README 索引、正規成果物の直接読取等の代替手段で継続する（fail-open）
+- **unclassified 検出時の差し戻し**: unclassified（検証対応宣言なし・カタログ未登録行）を検出した場合は case-open へ差し戻す。差し戻し時は ready へ遷移せず停止し、検出された未分類行一覧と停止理由を報告する。case-open 側は Definition Package 生成時の verification-scope-catalog 追随確認（REQ-030-015）の漏れ解消を Definition 経由で行う。既存 merge は巻き戻さない
+- **最終ゲート所有の維持（二重定義なし）**: 検証対応要否の最終ゲート（REQ-061-023 の未分類残存時 ready 拒否）は引き続き case-ready（STEP-6）が所有する。STEP-2 の本検査は canonical 再取得時点での導出確認であり、最終ゲートを二重定義しない。両検査の unclassified と missing-verification は同一行集合から単一導出される計上仕様を変更しない
