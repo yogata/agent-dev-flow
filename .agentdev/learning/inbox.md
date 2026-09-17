@@ -292,3 +292,21 @@
 - **タグ**: #adf-covers #traceability #delegation #case-run
 
 ---
+
+## 2026-09-17: 新規 REQ CREATE を含む Definition PR で ADF-COVERS(implementation) 宣言付与責務が未定義のまま merge され case-run の traceability check で補完した
+
+- **発生事象**: 新規 REQ CREATE（REQ-087）を含む Definition PR #2919 で、REQ 実現面の成果物（numbering-policy.md 等の Design）への ADF-COVERS(implementation) 宣言付与責務が case-open/case-ready のどちらにあるか明文化されておらず、REQ-087-001 が宣言欠落のまま merge された。case-run の traceability check で missing-implementation / missing-verification として検出され、実装 PR #2923 で補完した。
+- **発生工程**: case-run（Case #2917、traceability check 実行時）。
+- **検知方法**: agentdev-traceability check（check.ts --req REQ-087-001,002,003）が REQ-087-001 の missing 宣言を検出。
+- **根本原因**: Definition 保存工程（case-open / case-ready）の品質検査に ADF-COVERS 宣言付与チェックが組込まれておらず、REQ 実現面成果物の宣言付与責務が定義されていない。
+- **恒久対応内容**: 今回は numbering-policy.md へ ADF-COVERS(implementation): REQ-087-001 を付与し、検証対応要否カタログへ任意行登録して解消（PR #2923）。
+- **ユーザー確認の有無**: なし（エージェント自律検知・修正）。
+- **Decision/REQ/spec影響**: 影響の記録まで。Definition 保存工程での宣言付与チェック組込みの要否判断は promote 側に委ねる。
+- **横展開視点**: 他の新規 REQ CREATE を含む Definition PR で同様の宣言欠落が再発し得る。REQ 行 APPEND の場合と新規 CREATE の場合で宣言対象成果物の範囲が異なる点にも注意。
+- **再発条件**: 新規 REQ CREATE を含む Definition PR で REQ 実現面成果物へ ADF-COVERS 宣言を付与せずに merge した場合。
+- **予防方法**: case-open / case-ready の Definition 品質検査へ、artifact_actions で宣言した成果物の ADF-COVERS 宣言存在確認を組込む。
+- **想定反映先**: agentdev-workflow-case-open / agentdev-workflow-case-ready の Design（Definition 品質検査の検証対象）。
+- **関連**: Case #2917（Refs）、PR #2919（Refs）、PR #2923（Refs）。
+- **タグ**: #traceability #definition-pr #adf-covers
+
+---
