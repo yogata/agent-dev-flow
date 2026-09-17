@@ -48,7 +48,7 @@ Command→Skill 依存方向（[artifact-contracts.md](../responsibilities/artif
 | 呼出元 command | REQ 根拠 | 委譲対象 |
 |---|---|---|
 | `case-ready` / `case-revise` | REQ-006-106 / REQ-006-107 | Definition 保存 / Design 保存の内部責務実行中に実観測した deviation のうち intake 該当分（REQ 再構成 intake を含む） |
-| `case-open` | REQ-006-021 | `case-open` 実行中に実観測した deviation のうち intake 該当分 |
+| `case-open` | REQ-030-011 | `case-open` 実行中に実観測した deviation のうち intake 該当分 |
 | `case-close` | REQ-006-105 | `case-close` 実行中に実観測した deviation のうち intake 該当分（PR 本文から回収した intake 候補を含む） |
 
 `case-run` は `.agentdev/` 直接変更を禁止し PR 本文記録のみを行うため、本操作の呼出元とならない（[capture-boundaries.md](../workflows/capture-boundaries.md)「各コマンドの capture 責務」参照）。

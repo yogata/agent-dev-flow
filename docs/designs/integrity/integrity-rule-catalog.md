@@ -228,7 +228,7 @@ AG-005 規則群（`lint_skills.ts`、RU-0018 / Issue #2179、PR #2184 で main 
 
 登録判断: 新規カテゴリ追加判定フローに従い、(1) 検出が機械的パターンマッチで完結する、(2) 判定基準の正典が既存 Design（skill authoring 層1〜2）に存在し checker は検出ビューに留まる、(3) 既存 IR カテゴリと検出対象が重複しない、の各条件を満たすため checker カテゴリとして登録し IR 番号付与は行わないものと判定した。既知違反は `baselines/lint-skills-baseline.json`（delta-aware、baseline-known は info 降格）で管理する。
 
-### IR-055 heuristic 行内複数パターン集計仕様（REQ-002-079〜081）
+### IR-055 heuristic 行内複数パターン集計仕様（REQ-029-002〜081）
 
 IR-055（runtime-unresolved-reference）の heuristic 検出は、行内に複数のパターンマッチ（`docs/designs/`、`docs/guides/`、`docs/decisions/` 等）が存在する場合の集計規則を以下のとおり定める。
 本節は `check_integrity.ts` 実装が従うべき契約であり、実装詳細は対象外とする。
@@ -336,11 +336,11 @@ checkWorkflowStatusProhibition
 
 | バックエンド | 適用範囲 | 根拠 |
 |--------------|----------|------|
-| `check_integrity.ts`（docs-check + IR ルール） | REQ/Design/reference 整合性の**決定論的**検出。frontmatter 許可フィールド、ID 一意性、リンク到達性、Step 形式、namespace legacy 残存、ADR status 正規化、draft Design 放置検出、配布物内の導入先未解決参照検出等、本カタログ（IR-001〜IR-055、IR-045 は docs-check 対象外として削除済み）が定義する検出 | 機械的検出層（[integrity-contracts.md](integrity-contracts.md)「3層検出構造の責務分担」、REQ-010-003、REQ-036-008、REQ-002-079/080/081） |
+| `check_integrity.ts`（docs-check + IR ルール） | REQ/Design/reference 整合性の**決定論的**検出。frontmatter 許可フィールド、ID 一意性、リンク到達性、Step 形式、namespace legacy 残存、ADR status 正規化、draft Design 放置検出、配布物内の導入先未解決参照検出等、本カタログ（IR-001〜IR-055、IR-045 は docs-check 対象外として削除済み）が定義する検出 | 機械的検出層（[integrity-contracts.md](integrity-contracts.md)「3層検出構造の責務分担」、REQ-010-003、REQ-036-008、REQ-029-002/080/081） |
 | inspect-* skills（inspect-docs / inspect-skills） | 配布物整合性検査（REQ-002-006/007）。構文健全性の重複検出、文意保持の意味解析、責務説明照合など意味判断を含む診断 | 意味的診断層。詳細は [docs-spec-rebuild-integrity.md](docs-spec-rebuild-integrity.md)「検査バックエンド責務分担」参照 |
 
 **配布物整合性検査（REQ-002-006/007: 文意保持・構文健全性・責務整合などの意味的観点）は `check_integrity.ts` に追加せず、inspect-* skills に集約する**。
-配布物に対する決定論的検出（IR ルール）は既存カテゴリおよび REQ-002-079/080/081 に基づく機械検出（IR-055 runtime-unresolved-reference）で構成し、機械的検出層（docs-check + IR）と意味的診断層（inspect-* skills）の責務境界は 3層検出構造（[integrity-contracts.md](integrity-contracts.md)）に従う。
+配布物に対する決定論的検出（IR ルール）は既存カテゴリおよび REQ-029-002/080/081 に基づく機械検出（IR-055 runtime-unresolved-reference）で構成し、機械的検出層（docs-check + IR）と意味的診断層（inspect-* skills）の責務境界は 3層検出構造（[integrity-contracts.md](integrity-contracts.md)）に従う。
 これにより `categoryToCheckPattern` map への新カテゴリ追加（skill-category-gap、REQ-010-005）を不要とし、ターゲットング隠退化を防ぐ。
 
 ### check_changed_docs.ts profile rules と Design 記載項目の対応関係（REQ-010-009）

@@ -173,7 +173,7 @@ agent 起動、background task、並列実行、context 管理は ADF 配布物�
 | 委譲定義の最小構成、delegated_check、中間成果基準 | `agentdev-command-authoring` skill references |
 | 決定的な変換、検証、生成 | Script（`scripts/*.js`） |
 
-## case-auto 並列委譲モデル拡張（REQ-006-087〜093）
+## case-auto 並列委譲モデル拡張（REQ-034-027〜093）
 
 ### 並列委譲と直列集約の分離
 
@@ -187,8 +187,8 @@ agent 起動、background task、並列実行、context 管理は ADF 配布物�
 
 ### 集約原則
 
-- 並列委譲された単位の成功、失敗は親コマンドが集約し、最終判定に反映する（REQ-006-092）
-- 直列集約対象は並列委譲の完了を待ってから親コマンドが実行する（REQ-006-093）
+- 並列委譲された単位の成功、失敗は親コマンドが集約し、最終判定に反映する（REQ-034-028）
+- 直列集約対象は並列委譲の完了を待ってから親コマンドが実行する（REQ-034-029）
 
 ## case-auto 委譲契約 MUST NOT DO 精密化（REQ-003-004）
 
@@ -277,7 +277,7 @@ case-auto は下位 command（case-run インライン実行、工程委譲）�
 **parent_decision_required の解決拡張**: case-auto は `parent_decision_required` へ列挙された unresolved 判断事項について、現行正規成果物から一意に回答可能なものを自律解決する（REQ-034-032）。
 外部仕様・互換性・データ保持・セキュリティ・対象範囲・受け入れ条件を変更しない可逆的内部詳細は、既存契約で許容された範囲に限り作業仮定と根拠を明示して自走継続できる（REQ-034-033）。
 
-**resume point の拡張利用**: case-auto が decision_context を解決した場合、回答または作業仮定を下位 command へ返し、既存 resume point（REQ-006-085）から処理を継続する。
+**resume point の拡張利用**: case-auto が decision_context を解決した場合、回答または作業仮定を下位 command へ返し、既存 resume point（REQ-006-114）から処理を継続する。
 新規の永続結果型を導入せず、既存 resume point 機構を再利用する（DEC-008 決定5）。
 resume point の仕様は workflow-contracts Design「case-auto への伝播と resume point」節が正である。
 

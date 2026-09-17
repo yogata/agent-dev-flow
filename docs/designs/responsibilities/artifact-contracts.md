@@ -88,13 +88,13 @@ REQ-002-015・017・018 に従い本Design が維持する。
 
 ## スキル参照妥当性契約
 
-`references/*` は同一 Skill 内の段階的開示であり、小さい Skill ではない（REQ-002-103）。
+`references/*` は同一 Skill 内の段階的開示であり、小さい Skill ではない（REQ-002-015）。
 
 - `references/*` は SKILL.md の入口カードから必要に応じて読み込まれる詳細参照ファイル。
-- `references/*` ごとに独自の `USE FOR` / `DO NOT USE FOR` が必要になる場合は Skill 分割候補とする（REQ-002-104）。
+- `references/*` ごとに独自の `USE FOR` / `DO NOT USE FOR` が必要になる場合は Skill 分割候補とする（REQ-002-018）。
 - `references/*` に抽出するのは実行時配布物のみ（REQ-002-045）。
 
-Command 固有の実行順序、Issue 作成、保存、更新、削除、完了報告は Skill 化せず、以下に配置する（REQ-002-105）。
+Command 固有の実行順序、Issue 作成、保存、更新、削除、完了報告は Skill 化せず、以下に配置する（REQ-002-002）。
 
 | 配置先 | 対象 |
 |--------|------|
@@ -312,27 +312,27 @@ Template の配置先は以下の 2 種類を定義する（REQ-002-040）。
 - `.opencode/skills/repo-*/`（AgentDevFlow 本体リポジトリ専用スキル）。同上
 - `repo-*` プレフィックスは AgentDevFlow 配布コマンド体系（`agentdev-*`）とは独立に管理される
 
-## ドラフトアーティファクト契約（REQ-002-129〜139）
+## ドラフトアーティファクト契約（REQ-008-001〜139）
 
 `.agentdev/drafts/` 配下の中間成果物（draft file）の契約を定義する。
-draft file は原本アーティファクト（REQ/Decision/Design/RU）ではなく、コマンド間で受け渡す中間成果物である（REQ-002-126-128）。
+draft file は原本アーティファクト（REQ/Decision/Design/RU）ではなく、コマンド間で受け渡す中間成果物である（REQ-008-001-128）。
 
 ### ドラフト種別レジストリ（Draft Type Registry）
 
-各 draft type（ドラフト種別）はレジストリ側で生成元（producer）、許可消費元（allowed consumers）、ライフサイクルを定義する（REQ-002-130, REQ-002-136）。
+各 draft type（ドラフト種別）はレジストリ側で生成元（producer）、許可消費元（allowed consumers）、ライフサイクルを定義する（REQ-008-003, REQ-008-005）。
 個別 draft file の frontmatter にはこれらを記述せず、レジストリを唯一の定義源とする。
 
 | draft_type | file pattern | producer | allowed consumers | 位置づけ | lifecycle |
 |---|---|---|---|---|---|
 | `req_draft` | `.agentdev/drafts/req-draft-{topic}.md` | `req-define` | `case-ready`, `case-revise`, `case-open` | 保存前の要件ドラフト | case-ready 成功後に削除（blocked / failed / 中断時は保持） |
 
-標準 draft type は `req_draft` の 1 種のみとする（REQ-002-132）。
+標準 draft type は `req_draft` の 1 種のみとする（REQ-008-006）。
 `requirements-review-finding` および旧 `skill_review_finding` は標準 draft type に含めない。
-Skill/Command 参照妥当性の検出結果は inspect lifecycle（`.agentdev/inspect/inbox/`、REQ-002-140-151）へ出力する。
+Skill/Command 参照妥当性の検出結果は inspect lifecycle（`.agentdev/inspect/inbox/`、REQ-036-012-151）へ出力する。
 
 ### ドラフトファイルフロントマター
 
-`.agentdev/drafts/` 配下の draft file は、以下の frontmatter を基本とする（REQ-002-135）:
+`.agentdev/drafts/` 配下の draft file は、以下の frontmatter を基本とする（REQ-008-026）:
 
 ```yaml
 ---
@@ -343,11 +343,11 @@ created_at: 2026-06-14T19:36:47+09:00
 ---
 ```
 
-frontmatter の基本フィールドは `draft_type`、`topic`、`status`、`created_at` とし、producer、allowed consumers、lifecycle は registry 側で `draft_type` ごとに定義する（REQ-002-135, REQ-002-136）。
+frontmatter の基本フィールドは `draft_type`、`topic`、`status`、`created_at` とし、producer、allowed consumers、lifecycle は registry 側で `draft_type` ごとに定義する（REQ-008-026, REQ-008-005）。
 
 ### Command 側 draft_type 検証
 
-各コマンドは、入力 draft の `draft_type` とレジストリ上の許可消費元（allowed consumers）を照合して受理可否を判定する（REQ-002-131, REQ-002-136）。
+各コマンドは、入力 draft の `draft_type` とレジストリ上の許可消費元（allowed consumers）を照合して受理可否を判定する（REQ-008-007, REQ-008-005）。
 
 | command | 受け付ける draft_type |
 |---|---|
@@ -358,7 +358,7 @@ frontmatter の基本フィールドは `draft_type`、`topic`、`status`、`cre
 ### inspect-skills 副作用境界
 
 `inspect-skills` は検査対象（Command/Skill 定義ファイル）を直接修正しない診断コマンドとする。
-許可される副作用は `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit / push）のみとし、それ以外の原本文書変更、REQ/Decision/Design 変更、Command/Skill/Template/Script 変更、RU 保存、Issue 作成、PR 作成、許可範囲外の commit/push を行わない（inspect lifecycle、REQ-002-140-151、REQ-010-007）。
+許可される副作用は `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit / push）のみとし、それ以外の原本文書変更、REQ/Decision/Design 変更、Command/Skill/Template/Script 変更、RU 保存、Issue 作成、PR 作成、許可範囲外の commit/push を行わない（inspect lifecycle、REQ-036-012-151、REQ-010-007）。
 最終判断（promote / defer / reject）は `inspect-promote` が行う。
 検出事項（inspect finding）は `inspect-promote` による promote/defer/reject ライフサイクルの対象となる。
 

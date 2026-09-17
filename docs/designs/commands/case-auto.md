@@ -45,7 +45,7 @@ updated: 2026-09-05
 複数対象を処理する場合、各 orchestration stage は stage 内最大並列・stage 間全対象収束（fan-in）で進行する（REQ-034-025。対象ごとの縦切り pipeline として実行しない）。
 
 - 入力解決
-  - 実行開始時刻の記録（REQ-006-082）（JST、人間が読みやすい形式で case_auto_started_at 変数に保持）
+  - 実行開始時刻の記録（REQ-034-023）（JST、人間が読みやすい形式で case_auto_started_at 変数に保持）
   - Issue番号/URL入力モード（^\d+$ または GitHub Issue URL の場合、Root Case の durable state に基づく継続工程へ分岐）
   - 要件doc入力モード（引数なし時は `.agentdev/drafts/req-draft-*.md` 全件処理がデフォルト / 明示パス指定時は当該draft / セッション指定キーワード時はセッション内要件doc参照、暗黙判断は行わない）
 - work_type 読取（draft-data から取得する参考情報。パイプライン分岐には使用しない）
@@ -61,7 +61,7 @@ updated: 2026-09-05
   - 結果状態の4次元集約（REQ-034-031）: 各工程の output_contract から (1) 工程結果 pass/warn/fail、(2) artifact_action 適用結果 applied/skipped/failed/no-op、(3) 定義適用工程完了状態、(4) OU ライフサイクル完了状態を収集し混同なく保持する。集約規則の詳細は後述「結果状態の4次元集約（REQ-034-031）」セクション
 - Wave 反復制御（Epic Issue 指定時）
   - case-auto が Epic Issue 番号を記録。Epic Issue 本文から Wave 構成、各子Issue ステータスを読み取る（読み取りのみ、Epic Issue 本文の書き込みは case-close の責務）
-  - case-auto が現在 Wave の ready 子Issue を選択し、各子Issue ごとにインライン case-run を実行（最大5件並列、起動間隔10秒。REQ-006-026 踏襲、並列起動の間隔は epic-wave-model Design 参照）。各子Issue の実行担当サブエージェントへ case-auto から直接委譲
+  - case-auto が現在 Wave の ready 子Issue を選択し、各子Issue ごとにインライン case-run を実行（最大5件並列、起動間隔10秒。REQ-034-027 踏襲、並列起動の間隔は epic-wave-model Design 参照）。各子Issue の実行担当サブエージェントへ case-auto から直接委譲
   - Wave 内全子Issue の完了（completed-pr / blocked / failed / delegation-unavailable）を待機
   - completed-pr の子Issue がある場合、case-close(#epic) へ委譲（Wave 反復を進行させる stage 3 内部処理、REQ-034-025）
   - 残 Wave がある場合、次 Wave を実行（べき等）
@@ -81,7 +81,7 @@ genuine blocker（実装上の問題、スコープ外操作、コンフリク�
 
 context 管理:
 - case-run インライン実行時のコンテキスト管理は harness の責務（REQ-002-002）
-- REQ-006-073（親コンテキスト非累積）は case-run インライン実行時の例外として取り扱う
+- REQ-034-007（親コンテキスト非累積）は case-run インライン実行時の例外として取り扱う
 
 ## 所有関係と委譲
 
@@ -103,17 +103,17 @@ context 管理:
 - DB migration実行、deploy/apply、クラウドリソース操作、外部SaaS設定変更、課金、権限、認証情報変更、repo 外実データ操作、通知送信
 - migrationファイル、IaCファイルの作成、修正以外の migration実行、IaC apply
 - remote branch 削除で当該 case-auto / case-run が作成した branch 以外の対象
-- 各工程のインライン実行は通常時対象外（委譲起動必須、v2:ADR-0127, REQ-006-006/073/084）。委譲起動不能時の `delegation-unavailable` 報告は例外として許可（REQ-002-003/004）
+- 各工程のインライン実行は通常時対象外（委譲起動必須、v2:ADR-0127, REQ-030-006/073/084）。委譲起動不能時の `delegation-unavailable` 報告は例外として許可（REQ-002-003/004）
 - 既存 case-open / case-ready / case-revise / case-run / case-close の責務変更（case-auto は起動方式と工程間制御のみを所有）
 - source path の実行時パス読み替え
 - Issue 階層決定ロジックの独自保持（case-open に委譲）
 - case-open / case-ready から後工程への状態引き継ぎ時のフィルタリング、再評価（保存結果をそのまま渡す）
 - 子Issue 選択ロジック、子Issue 単位の並列起動（case-run(#epic) / case-close(#epic) に委譲）
 - Epic Issue 本文の書き込み（case-close の単一書き手責務、v2:ADR-0125、case-auto は読み取るのみ、`POL-epic-tracking-single-writer`）
-- 操作単位本文の抽出、変換、REQ 操作解釈（REQ-006-051）
+- 操作単位本文の抽出、変換、REQ 操作解釈（REQ-034-010）
 - case-ready 完了後の draft SSoT 扱い（case-ready 完了後は Issue と Epic が SSoT）
-- OU 間依存のみでの Epic Issue 化（REQ-006-055）
-- Epic Issue 化判定への関与（REQ-006-057）
+- OU 間依存のみでの Epic Issue 化（REQ-034-011）
+- Epic Issue 化判定への関与（REQ-034-011）
 - case-auto 固有の capture 振る舞い（構成コマンドの capture 責務境界に従う）
 
 ## 検証観点
@@ -122,7 +122,7 @@ context 管理:
 - 親コンテキスト非累積: 各委譲の完了結果（Issue/PR番号、pass/warn/fail）のみを親コンテキストに保持
 - クリーンアップ検証ゲート（Standard / Epic Issue flow 双方）: stage 2 の対象群収束後・stage 3 開始前に評価する。stage 2 を正常完了した対象についてドラフトファイル、RU ファイルの残存がないこと。stage 2 が blocked / failed / 中断等で正常完了していない対象について、既存 lifecycle 契約に従って保持された draft / RU は cleanup 違反としない（REQ-034-020、REQ-034-025）
 - 出力制約: 成果物本文 verbatim、調査過程等は圧縮
-- タイミング情報: 開始時刻、終了時刻、所要時間を人間が読みやすい形式で報告（REQ-006-082/083）
+- タイミング情報: 開始時刻、終了時刻、所要時間を人間が読みやすい形式で報告（REQ-034-023/083）
 - 結果状態の4次元集約（REQ-034-031）: 後述「結果状態の4次元集約（REQ-034-031）」セクションの4状態次元と集約規則に従い、warn を pass へ変換しない
 
 ## 結果状態の4次元集約（REQ-034-031）
@@ -149,7 +149,7 @@ case-auto は各工程の結果を次の4状態次元で保持し、集約報告
 
 ## 複数 execution_unit 並列 orchestration（REQ-006, v2:ADR-0129）
 
-case-auto は case-open が生成した execution_unit 群（standard | epic の混在）を orchestration 対象とする（REQ-006-012）。
+case-auto は case-open が生成した execution_unit 群（standard | epic の混在）を orchestration 対象とする（REQ-034-018）。
 従来の「単一 Epic の Wave 反復制御」を「複数 execution_unit 群反復制御」へ一般化する。
 case-auto は case-open の判定結果に従い case-run(#epic) / case-run(standard) を起動する（薄いオーケストレーター原則、Issue 階層決定・子 Issue 選択・Epic 化判定の委譲を維持）。
 Issue 階層決定、子 Issue 選択、Epic 化判定の判断ロジックは持たない。
@@ -178,19 +178,19 @@ Git 上の変更を伴う並列処理では処理単位を worktree で隔離す
 
 ### 並列実行の判定
 
-並列可否は連結成分（必須依存のみをエッジとする）で判定する（REQ-006-014）:
+並列可否は連結成分（必須依存のみをエッジとする）で判定する（REQ-034-013）:
 
 - 必須依存がない複数 execution_unit 間（Epic 間、Standard 間、混在）は並列実行
-- 同一 Epic 内の Wave 間は直列（REQ-006-013）
-- 技術的依存レベル（L0-L3）は並列判定軸から外す。ファイル衝突（L2）があっても並列を許容し、PR マージコンフリクトは後続 PR の rebase で解決する（REQ-006-014, REQ-006-024）
+- 同一 Epic 内の Wave 間は直列（REQ-034-012）
+- 技術的依存レベル（L0-L3）は並列判定軸から外す。ファイル衝突（L2）があっても並列を許容し、PR マージコンフリクトは後続 PR の rebase で解決する（REQ-034-013, REQ-031-003）
 
-グローバル並列上限は設定しない（REQ-006-018）。
-case-run 単位の5件上限（REQ-006-026 踏襲）のみを制御対象とする。
+グローバル並列上限は設定しない（REQ-034-013）。
+case-run 単位の5件上限（REQ-034-027 踏襲）のみを制御対象とする。
 N 個の execution_unit が並列実行された場合、N×5 件の委譲同時起動リスクを許容する（運用監視対象、v2:ADR-0129）。
 
 ### blocked 部分停止、ready 継続判定フロー
 
-各 execution_unit の状態（closed/blocked/failed/running/ready）を読み取り、以下の判定フローで orchestration する（REQ-006-015, REQ-006-016）:
+各 execution_unit の状態（closed/blocked/failed/running/ready）を読み取り、以下の判定フローで orchestration する（REQ-034-035, REQ-034-015）:
 
 | execution_unit 状態 | case-auto アクション |
 |---|---|
@@ -201,7 +201,7 @@ N 個の execution_unit が並列実行された場合、N×5 件の委譲同時
 | failed | 当該 execution_unit のみ case-close 対象外。他の completed-pr は case-close 対象 |
 
 **終了条件**: 全 execution_unit が closed/blocked/failed になったら終了する。
-一部 blocked が残存する場合は partial blocked として報告する（REQ-006-016）。
+一部 blocked が残存する場合は partial blocked として報告する（REQ-034-015）。
 
 ### execution_unit 群反復制御への一般化
 
@@ -211,8 +211,8 @@ execution_unit 群の実行は orchestration stage を stage 内最大並列・s
 - execution_unit が standard issue の場合: stage 3 で case-run(standard) を実行し、stage 3 の対象群収束後に stage 4 で case-close を実行
 - execution_unit が epic issue の場合: stage 3 で Wave 反復制御（case-run(#epic) → case-close(#epic) の反復）を完遂する（v2:ADR-0128 Decision #5, REQ-006-084 の既存引用は維持する）。Wave 間および最終 Wave の case-close(#epic) は Wave 反復を進行・完遂させる stage 3 内部処理であり、stage 4 の開始とはみなさない。stage 4 では追加の case-close を行わない
 
-OU 逐次処理（REQ-006-053）は、必須依存で結合した execution_unit 群に適用される。
-必須依存のない execution_unit 群は順序を問わず並列実行できる（REQ-006-053 例外条項）。
+OU 逐次処理（REQ-034-011）は、必須依存で結合した execution_unit 群に適用される。
+必須依存のない execution_unit 群は順序を問わず並列実行できる（REQ-034-011 例外条項）。
 
 共有書き込みの局所直列化（REQ-034-026）の対象範囲と単位は、共有資源カテゴリごとに次のとおりである。
 
@@ -225,10 +225,10 @@ lock、queue、scheduler 方式は本 Design の範囲外とする（REQ-034-036
 
 ### 結果集約
 
-各 execution_unit の結果（completed-pr / blocked / failed / delegation-unavailable）を case-auto が集約し最終判定に反映する（REQ-006-092）。
+各 execution_unit の結果（completed-pr / blocked / failed / delegation-unavailable）を case-auto が集約し最終判定に反映する（REQ-034-031）。
 親コンテキスト非累積原則に従い、実装詳細は保持せず Issue / PR 状態から再読込する。
 
-### 停止理由分類（REQ-006-016/108 拡張）
+### 停止理由分類（REQ-034-015/108 拡張）
 
 case-auto は停止時に停止理由を以下の分類で報告する。
 分類は再開コマンド選択とユーザー通知の精度向上が目的であり、HITL 境界の変更ではない。
@@ -236,7 +236,7 @@ case-auto は停止時に停止理由を以下の分類で報告する。
 | 分類 | 定義 |
 |---|---|
 | req-define 合意要件からの逸脱 | case-open または後続工程が合意済み要件、対象外、受け入れ条件を変更した場合、合意されていない機能要件または制約を追加した場合、合意済み OU を欠落・統合・分割して要件の意味を変更した場合 |
-| command 契約・実装不整合 | execution_unit へ分割可能であるにもかかわらず case-open が単一 Epic 子 Issue 上限により停止した場合、case-open または後続工程の実装が契約へ整合していない場合、構成生成事前検証（REQ-006-027）が実装されていない場合 |
+| command 契約・実装不整合 | execution_unit へ分割可能であるにもかかわらず case-open が単一 Epic 子 Issue 上限により停止した場合、case-open または後続工程の実装が契約へ整合していない場合、構成生成事前検証（REQ-032-015）が実装されていない場合 |
 | 要件未合意のスコープ拡大 | 合意されていないスコープが実行中に追加された場合 |
 | repo 外実体変更 | DB マイグレーション実行、デプロイ/apply、クラウドリソース操作、外部SaaS設定変更、課金、権限、認証情報変更が必要な場合 |
 | CI/test/lint 失敗 | コンフリクト解消モデル（v2:ADR-0132）の Level 2 まで試行しても自己修復不能な場合 |
@@ -251,7 +251,7 @@ execution_unit 分割可能性があるにもかかわらず case-open が停止
 case-auto は現行正規成果物から一意に回答可能な decision_context を自律解決するが、解決できないものは本2分類のいずれかへ分類してユーザーへ返す。
 詳細は後述「bounded parent decision resolution（REQ-034-032〜034、DEC-008）」節を参照。
 
-詳細な停止条件の全量は REQ-006-016（本拡張で11項目）を参照。
+詳細な停止条件の全量は REQ-034-015（本拡張で11項目）を参照。
 
 ### コンフリクト解消モデル（3レベルエスカレーション）（REQ-003, v2:ADR-0132）
 
@@ -263,7 +263,7 @@ PR マージコンフリクト発生時は、以下3レベルのエスカレー�
 |---|---|---|---|
 | Level 1 | case-close | `git rebase` による機械的解消。自動解決時は再マージ（REQ-003-001） | case-auto へエスカレーション（REQ-003-002） |
 | Level 2 | case-auto | 両PRのdiffを読み取りコンフリクト箇所を特定し、コンフリクト文脈を付けて case-run へ再委譲。最大2回（元の並列実行を含む計3回の case-run 実行）（REQ-003-003/004） | Level 3 へ |
-| Level 3 | case-auto | マージ順序変更、blocked 単位の隔離（REQ-006-015 拡張） | 停止 |
+| Level 3 | case-auto | マージ順序変更、blocked 単位の隔離（REQ-034-035 拡張） | 停止 |
 
 **停止条件の段階化**: case-auto はコンフリクト解消に対して常に全力で解消を図る。
 発生元（同一 case-auto 内、別 case-auto 跨ぎ）に関わらずアクセス可能な文脈を総動員する（REQ-003-005）。
@@ -326,11 +326,11 @@ case-auto 親ループが当該 worktree で回復処理を代行する。
 ## 工程別タイムスタンプ計測（L1: case-auto）（REQ-003-008）
 
 case-auto は各工程（case-open / case-ready / case-revise / case-run / case-close）の委譲起動前後にタイムスタンプを記録し、工程別の壁時計時間を完了報告に含める。
-現行の開始、終了時刻記録（REQ-006-082/083）を工程別内訳へ拡張する（REQ-006-094）。
+現行の開始、終了時刻記録（REQ-034-023/083）を工程別内訳へ拡張する（REQ-034-030）。
 
-- 計測単位: 委譲起動前後の壁時計時刻（JST、REQ-006-082 の時刻形式に準拠）
+- 計測単位: 委譲起動前後の壁時計時刻（JST、REQ-034-023 の時刻形式に準拠）
 - 記録先: case-auto 完了報告への工程別内訳追記。永続化は必要になった段階で別途検討
-- 対象外: 委譲先内部メトリクス（L3）は harness 依存が強すぎるため対象外（REQ-003-010）。case-run 内の L2 計測は case-run result に含まれる（REQ-003-009、REQ-006-028）
+- 対象外: 委譲先内部メトリクス（L3）は harness 依存が強すぎるため対象外（REQ-003-010）。case-run 内の L2 計測は case-run result に含まれる（REQ-003-009、REQ-031-017）
 
 ## Phase 0 commit スコープ設計運用
 
@@ -349,7 +349,7 @@ Design 修正が必要と判明した場合は `record-in-findings` で PR 本�
 
 **target_area の重複判定と並列制御**:
 
-- 同一 Design ファイルの異なる target_area を複数孫 Issue が編集する場合: git diff が競合しないため並列マージを許容する。並列判定軸は REQ-006-014 の連結成分ベースに従い、ファイル衝突（L2）は並列許容、PR マージコンフリクトは後続 PR の rebase で解決する
+- 同一 Design ファイルの異なる target_area を複数孫 Issue が編集する場合: git diff が競合しないため並列マージを許容する。並列判定軸は REQ-034-013 の連結成分ベースに従い、ファイル衝突（L2）は並列許容、PR マージコンフリクトは後続 PR の rebase で解決する
 - 同一 Design ファイルの同一 target_area を複数孫 Issue が編集する場合: case-open 構成生成時に必須依存（depends_on）として連結させ、直列化する。Wave 構成で同一 Wave へ割り当てない
 
 ### ドメイン state 更新と成果物変更の同一コミット混在
@@ -427,7 +427,7 @@ case-auto は user-decision-required を新規 result 状態として扱わず�
 | case-run 起源 | result enum `blocked` に付随する停止理由として user-decision-required 分類を受領する |
 | 工程委譲起源（req-define、case-open、case-close 等） | 既存 status（pass/warn/fail/partial）+ `parent_decision_required` を通じて受領する |
 
-本節の停止理由分類は「停止理由分類（REQ-006-016/108 拡張）」節の分類軸とは独立する。
+本節の停止理由分類は「停止理由分類（REQ-034-015/108 拡張）」節の分類軸とは独立する。
 同節は case-auto 自身の HITL 境界停止条件（11項目）の分類であり、user-decision-required は下位 command の adversarial-review 由来の停止信号の分類である。
 両者を混同しない。
 
@@ -435,7 +435,7 @@ case-auto は user-decision-required を新規 result 状態として扱わず�
 
 case-auto は下位 command から user-decision-required + decision_context を受領した場合、以下の挙動をとる。
 
-1. **自走停止**: 対象 execution_unit（Issue）の処理を停止し、ユーザー判断を待機する。他の ready 対象の execution_unit がある場合は継続する（部分停止、REQ-006-015/016 準拠）
+1. **自走停止**: 対象 execution_unit（Issue）の処理を停止し、ユーザー判断を待機する。他の ready 対象の execution_unit がある場合は継続する（部分停止、REQ-034-035/016 準拠）
 2. **ユーザー提示**: decision_context（対象案、合意候補、未解決争点、推奨案と根拠、ユーザーに確定してほしい判断）をユーザーへ提示する（decision_context 構成は delegation-contracts Design が正）
 3. **resume point の記録**: 停止時の resume point を記録する。resume point は workflow-contracts Design「case-auto への伝播と resume point」節に従い、case-run 起源の場合は当該 Issue の case-run 再開ポイント（準備フェーズ、実装フェーズ、提出フェーズのいずれか）、工程委譲起源の場合は当該工程の委譲起点とする
 4. **resume point から再開**: ユーザー判断の解決後、resume point から処理を再開する。
@@ -478,7 +478,7 @@ case-auto は下位 command から受領した decision_context について、�
 
 ### resume 機構（DEC-008 決定5）
 
-case-auto は回答、根拠、または作業仮定を下位 command へ返し、既存 resume point（REQ-006-085）から処理を継続する。
+case-auto は回答、根拠、または作業仮定を下位 command へ返し、既存 resume point（REQ-006-114）から処理を継続する。
 新規の永続結果型を導入しない。
 resume point の仕様は workflow-contracts Design「case-auto への伝播と resume point」節、delegation-contracts Design「review 経路での parent_decision_required / decision_context 適用」節に従う。
 adversarial-review の再実行要否は adversarial-review 側の再 review 契約（REQ-014-007/008）に従い、case-auto は独自の再 review 条件を持たない。
@@ -491,6 +491,6 @@ case-auto が解決対象とするのは下位 command が構造化した decisi
 
 ### 停止理由分類との関係
 
-本節の「上位合意矛盾」「新規ユーザー判断事項」は前述「停止理由分類（REQ-006-016/108 拡張）」節の分類軸へ統合される。
+本節の「上位合意矛盾」「新規ユーザー判断事項」は前述「停止理由分類（REQ-034-015/108 拡張）」節の分類軸へ統合される。
 case-auto が decision_context を自律解決できずユーザー停止へ分類する場合、本2分類のいずれかを停止理由として報告する。
-HITL 境界の変更ではなく、既存停止経路（REQ-006-086）の分類精度向上である。
+HITL 境界の変更ではなく、既存停止経路（REQ-034-022）の分類精度向上である。

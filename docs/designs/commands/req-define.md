@@ -377,9 +377,9 @@ case-open が default branch 最新化後に evidence の path/section を再確
 `review_dispositions` は optional な soft-contract である。
 本フィールドを持たない旧ドラフトを Definition 保存内部責務（case-ready / case-revise）、case-open は入力として拒否しない（DEC-003 準拠）。
 
-## 未確定内容の auto_ready 抑止（REQ-008-059）
+## 未確定内容の auto_ready 抑止（REQ-004-047）
 
-req-define は、後続工程で決定する必要がある未確定事項、必須内容の欠落、暫定プレースホルダーが `agreed_items` または `artifact_actions` に残る場合、`auto_gate.auto_ready` を `true` にしないこと（REQ-008-059）。
+req-define は、後続工程で決定する必要がある未確定事項、必須内容の欠落、暫定プレースホルダーが `agreed_items` または `artifact_actions` に残る場合、`auto_gate.auto_ready` を `true` にしないこと（REQ-004-047）。
 本抑止は REQ-008-030（`artifact_actions` の `content` 完全確定）の強制機構として働く。
 
 ### 抑止条件

@@ -21,11 +21,11 @@ updated: 2026-09-12
 
 ## 目的
 
-AgentDevFlow の実行時パッケージ境界を定義し、本体リポジトリと consumer プロジェクトでの `.opencode/` 役割、命名、導入方式、同期範囲を明確化する（REQ-002-061~065, REQ-009）。
+AgentDevFlow の実行時パッケージ境界を定義し、本体リポジトリと consumer プロジェクトでの `.opencode/` 役割、命名、導入方式、同期範囲を明確化する（REQ-009-006~065, REQ-009）。
 
 ## 4 種のリポジトリ種別（Repo Type）
 
-> plugin/npm/package 配布形態は現在未対応である（REQ-002-064 参照）。
+> plugin/npm/package 配布形態は現在未対応である（REQ-009-009 参照）。
 > REQ-009-006 は5種のリポジトリ種別として将来対応の `plugin-future` を含めて定義する。
 > 本 Design の4種表は現行実装済みの種別のみを扱い、`plugin-future` は将来対応の第5種として本表から除外する。
 > REQ と本 Design の種別数の差は対応時期の違いによるものであり、矛盾ではない。
@@ -120,7 +120,7 @@ vendored engine bundle（`src/opencode/plugins/agentdev-textlint-guard/vendor/te
   skills/{local}-*/   → プロジェクトローカルスキルのみ
 ```
 
-- プロジェクトローカル名前空間（`agentdev` 以外）を使用する（REQ-002-056）
+- プロジェクトローカル名前空間（`agentdev` 以外）を使用する（REQ-009-008）
 - 自由に `.opencode/` を管理
 
 ### Consumer（ローカル版 link mode）
@@ -147,7 +147,7 @@ link mode 接続の技術詳細:
 
 ## プロジェクトローカル命名規則（Project-Local Naming Rules）
 
-Consumer プロジェクトで独自 command/skill を追加する際の命名規約（REQ-002-063）。
+Consumer プロジェクトで独自 command/skill を追加する際の命名規約（REQ-009-008）。
 
 ### 予約名（Reserved Names）
 
@@ -161,7 +161,7 @@ Consumer プロジェクトで独自 command/skill を追加する際の命名�
 
 | 規則 | 説明 | 根拠 |
 |------|------|------|
-| 名前空間衝突回避 | `agentdev` / `agentdev-*` / `.agentdev/` 以外の名前を使用 | REQ-002-056 |
+| 名前空間衝突回避 | `agentdev` / `agentdev-*` / `.agentdev/` 以外の名前を使用 | REQ-009-008 |
 | kebab-case | skill 名は小文字、数字、ハイフンのみ | REQ-002-011 |
 | 意味的命名 | プロジェクト名やドメイン名をプレフィックスに含めることを推奨 | 運用規約 |
 | 独自ディレクトリ | 独自 skill は `.opencode/skills/{project}-*/` に配置 | 運用規約 |
@@ -190,7 +190,7 @@ ZIP 展開による provisioning は手動 copy インストールに該当せ�
 | Symlink / ジャンクション | 対応済み | **推奨** | 更新自動反映、原本単一管理 |
 | Copy | 対応済み | 非推奨 | 手動更新必要、乖離リスク |
 | Git submodule | 検討可能 | 実験的 | 複雑性増加 |
-| Plugin / npm / package | 未対応 | - | REQ-002-064 参照 |
+| Plugin / npm / package | 未対応 | - | REQ-009-009 参照 |
 | Release archive projection | 別投影 | 別投影 | REQ-009-045、copy インストールの延長ではない |
 
 ### Symlink / ジャンクションの制約
@@ -457,7 +457,7 @@ wrong target 検出、再作成ロジックは LocalMode と通常版 install �
 - [Artifact Contracts](../responsibilities/artifact-contracts.md)（Command/Skill/Template/Script の責務境界）
 - [ローカルIssue共通スキーマ](local-case-file.md)（`consumer-generated` リポジトリ種別のローカルIssueスキーマ）
 - [整合性ルールカタログ](../integrity/integrity-rule-catalog.md)（IR-058 distribution-untracked-skill-reference）
-- REQ-002-061~065（リポジトリ種別 / `.opencode/` 意味 / 命名 / 導入 / 同期範囲の要件定義）
+- REQ-009-006~065（リポジトリ種別 / `.opencode/` 意味 / 命名 / 導入 / 同期範囲の要件定義）
 - REQ-009（配布基盤: link mode 導入の宣言）
 - REQ-009（ローカル版 OpenCode 導入方式とローカルIssue運用（`consumer-generated` リポジトリ種別））
 - REQ-002（配布物依存スキルの src 昇格方針と未トラックスキル検出）

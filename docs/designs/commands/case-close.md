@@ -47,8 +47,8 @@ case-run / 実行担当サブエージェント / 外部実行バックエンド
 
 ## 副作用
 
-- GitHub API: squash merge（Custom Tool `agentdev_gh` の pr_merge、リトライ最大5回、フォールバック手順あり）、Issue クローズ（Custom Tool `agentdev_gh` の issue_close、reason: completed）、Issue 本文更新（Custom Tool `agentdev_gh` の issue_update、VERIFY 付き）、mergeable 状態取得（Custom Tool `agentdev_gh` の pr_mergeable、squash merge 前の mergeable UNKNOWN ポーリング、REQ-006-028、最大60秒・10秒間隔）
-- git 操作: `git pull --ff-only`、`git fetch origin main:main`（非 main ブランチ占有時の代替同期、REQ-006-029）、`git add` / `git commit` / `git push`（`.agentdev/` 配下、明示パスステージング、v2:REQ-0137-002/005）
+- GitHub API: squash merge（Custom Tool `agentdev_gh` の pr_merge、リトライ最大5回、フォールバック手順あり）、Issue クローズ（Custom Tool `agentdev_gh` の issue_close、reason: completed）、Issue 本文更新（Custom Tool `agentdev_gh` の issue_update、VERIFY 付き）、mergeable 状態取得（Custom Tool `agentdev_gh` の pr_mergeable、squash merge 前の mergeable UNKNOWN ポーリング、REQ-031-017、最大60秒・10秒間隔）
+- git 操作: `git pull --ff-only`、`git fetch origin main:main`（非 main ブランチ占有時の代替同期、REQ-031-008）、`git add` / `git commit` / `git push`（`.agentdev/` 配下、明示パスステージング、v2:REQ-0137-002/005）
 - worktree / ブランチ削除: `agentdev-git-worktree` 手順に従う
 - capture 回収: PR 本文から intake / learning を分離回収し `.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md` へ保存
 - deviation capture（自工程）: case-close 実行中に実観測した deviation を agentdev-learning-capture skill または
@@ -83,15 +83,15 @@ worktree を削除する前に、未追跡ファイルだけを対象とする c
 - Issue番号解決: ユーザー入力またはセッション内会話から取得。Tool 操作契約（Custom Tool `agentdev_gh`）で本文取得
   - Epic Issue 判定（ステータス追跡テーブル存在確認）。存在時は Epic Wave クローズへ分岐
 
-### Epic Wave クローズ（REQ-006-021/022/023/027）
+### Epic Wave クローズ（REQ-030-011/022/023/027）
 
 - Epic Issue 本文読込（ステータス追跡テーブル（新4列/旧4列形式）を解析）
 - 現在 Wave 特定（`running` ステータスの子Issue が属する Wave）。`running` がない場合は Wave 番号昇順で最も若い未完了 Wave
 - PR作成済み子Issue 特定（現在 Wave 内の `running` 子Issue）
-- 各子Issue のクローズ処理を準並列化する（REQ-006-027）
+- 各子Issue のクローズ処理を準並列化する（REQ-032-015）
   - 並列実行: PR情報取得、PR変更ファイル取得、Issue本文読取、PR本文読取、完了条件チェック事前評価、capture候補抽出、Design確定候補確認、worktree/branch削除前チェック
   - 直列集約: squash merge、main pull&hash確認、Epic本文ステータス追跡テーブル更新、.agentdev永続化commit&push、branch/worktree最終削除
-  - rebase による機械的コンフリクト解消は停止条件外（REQ-003-006 Level1）。解消不能時は case-auto へエスカレーション（REQ-006-025、REQ-003-002 Level2/3）
+  - rebase による機械的コンフリクト解消は停止条件外（REQ-003-006 Level1）。解消不能時は case-auto へエスカレーション（REQ-031-004、REQ-003-002 Level2/3）
 - Epic status table 更新（単一書き手: case-close、v2:ADR-0125）（`running` → `completed ([PR#N](URL))` に更新）
 
 ### Epic Issue 完了条件チェックボックス最終評価・更新
@@ -133,15 +133,15 @@ Epic Issue 本文の `## 完了条件` セクションを読み込み、全完�
   - Design 確定フロー（v2:ADR-0123 Decision #4, REQ-001-015）（対象 REQ に基づく draft Design 棚卸し列挙と、PR 本文 `## Design確定候補` セクションの申告候補（補助入力）の統合による全件評価、確定判断（(a) 昇格 / (b) case-revise 再起動提案（case-ready の Design 保存内部責務で反映）/ (c) 見送り）。申告の有無に関わらず棚卸し列挙を実行する）
   - AUTOGEN block 索引再生成差分検出（project extension checks 経由）。docs/ 検証の後、generate_indexes.ts --dry-run を実行し AUTOGEN block の再生成差分を検出する。本検証は case-close の手順を直接編集せず、Workflow Skill extension（.agentdev/extensions/skills/agentdev-workflow-case-close.yaml）の checks セクション経由で導入する（project-extensions Design 準拠）。case-close は dry-run/差分検査で停止し、直接編集・commit しない。差分がある場合は case-run へ差戻し、再生成（実 commit）は case-run が行う。複数 PR 跨ぎでの AUTOGEN block 再生成漏れを防止する。Epic Wave クローズ経路では Epic Issue 完了条件チェックボックス最終評価の前段に同等の dry-run/diff による索引健全性検証を適用する（Epic Issue クローズ時の索引検証は case_open_hints 参照）
 - PRマージ（squash merge（Custom Tool `agentdev_gh` の pr_merge、リトライ最大5回、フォールバック手順）、対応記録コメント追記）
-  - squash merge 前の mergeable UNKNOWN ポーリング（REQ-006-028）（Custom Tool `agentdev_gh` の pr_mergeable で mergeable 状態を取得し、UNKNOWN の場合は最大60秒・10秒間隔でポーリング待機。上限超過時はマージ中止・構造化エラー停止。CONFLICTING 遷移時はコンフリクト解消 rebase パスへ分岐）
+  - squash merge 前の mergeable UNKNOWN ポーリング（REQ-031-017）（Custom Tool `agentdev_gh` の pr_mergeable で mergeable 状態を取得し、UNKNOWN の場合は最大60秒・10秒間隔でポーリング待機。上限超過時はマージ中止・構造化エラー停止。CONFLICTING 遷移時はコンフリクト解消 rebase パスへ分岐）
   - Squash merge 後のローカル先行 commit 検出、処理（REQ-003-005）（`git log origin/{branch}..HEAD --oneline` で検出、内容重複確認後に `git reset --hard origin/{branch}` で reset（`agentdev-git-worktree` の squash merge 後分岐ハンドリング手順参照））
-  - コンフリクト解消 rebase パス（REQ-003-001/002、REQ-006-024/025）（squash merge 失敗時）。squash merge がコンフリクトで失敗した場合、`git rebase` による機械的解消を試みる。rebase が自動解決した場合は再マージ（PR マージへ戻る）。rebase 自体がコンフリクトを発生した場合は実装変更を行わず case-auto へエスカレーションし停止する（コンフリクト解消モデル Level 1、`docs/designs/commands/case-auto.md` コンフリクト解消モデル Level 2/3 参照）
+  - コンフリクト解消 rebase パス（REQ-003-001/002、REQ-031-003/025）（squash merge 失敗時）。squash merge がコンフリクトで失敗した場合、`git rebase` による機械的解消を試みる。rebase が自動解決した場合は再マージ（PR マージへ戻る）。rebase 自体がコンフリクトを発生した場合は実装変更を行わず case-auto へエスカレーションし停止する（コンフリクト解消モデル Level 1、`docs/designs/commands/case-auto.md` コンフリクト解消モデル Level 2/3 参照）
 - Post-merge テスト戦略検証（CI通過等の反映）
 - Issueクローズ（Custom Tool `agentdev_gh` の issue_close、reason: completed）
 - ブランチ、worktree削除（`agentdev-git-worktree` 手順）。未コミット変更検出、共有作業ツリーでの `git checkout .` 禁止（v2:REQ-0137-001）
 - 親Epic Issue更新（`agentdev-epic-tracker`、Epic 自動クローズ判定）
 - 実行前同期（`git pull --ff-only`、hash 検証）
-  - git main 同期リスク事前検出、代替同期手順選択（REQ-006-029）（`git pull --ff-only` 直前に worktree 状態（dirty tree）・並列実行による ref lock 競合・非 main ブランチ占有の3リスクを事前検出。検出時に安全な代替同期手順（直列化待機、`git fetch origin main:main` による非チェックアウト同期）を選択。`agentdev-git-worktree` の git main 同期リスク事前検出プロシージャ参照）
+  - git main 同期リスク事前検出、代替同期手順選択（REQ-031-008）（`git pull --ff-only` 直前に worktree 状態（dirty tree）・並列実行による ref lock 競合・非 main ブランチ占有の3リスクを事前検出。検出時に安全な代替同期手順（直列化待機、`git fetch origin main:main` による非チェックアウト同期）を選択。`agentdev-git-worktree` の git main 同期リスク事前検出プロシージャ参照）
 - 学びの検知、抽出（`agentdev-learning-capture`、ユーザーに学び有無を問わない（エージェント自律）、Capture 回収（PR 本文から intake/learning を分離））
 - ドメイン状態永続化（`.agentdev/` 配下を commit/push（learning と intake を同一 commit））
 - 完了報告（結果状態の分離報告（GitHub側、`.agentdev`、ブランチ削除））
@@ -239,8 +239,8 @@ JSON 出力は `workflow`、`files_checked`、`coupled_files_checked`、`failure
 - QG-4（Final Acceptance Gate）: 前提確認で Issue 本文の完了条件チェックボックスを最終評価、更新
 - チェックボックス事後確認: 更新後に Issue 本文を再読込し全 `- [ ]` が `[x]` に反映されたことを確認（最大2回）
 - Squash merge リトライ: 最大5回（5秒待機付き）
-- mergeable UNKNOWN ポーリング（REQ-006-028）: squash merge 前に Custom Tool `agentdev_gh` の pr_mergeable で mergeable・mergeStateStatus 状態を事前確認、UNKNOWN 時は最大60秒（10秒間隔）でポーリング、上限超過時はマージ中止・構造化エラー停止
-- git main 同期リスク事前検出（REQ-006-029）: `git pull --ff-only` 直前に worktree 状態・並列実行 ref lock 競合・非 main ブランチ占有の3リスクを事前検出、検出時に安全な代替同期手順（直列化待機、`git fetch origin main:main`）を選択
+- mergeable UNKNOWN ポーリング（REQ-031-017）: squash merge 前に Custom Tool `agentdev_gh` の pr_mergeable で mergeable・mergeStateStatus 状態を事前確認、UNKNOWN 時は最大60秒（10秒間隔）でポーリング、上限超過時はマージ中止・構造化エラー停止
+- git main 同期リスク事前検出（REQ-031-008）: `git pull --ff-only` 直前に worktree 状態・並列実行 ref lock 競合・非 main ブランチ占有の3リスクを事前検出、検出時に安全な代替同期手順（直列化待機、`git fetch origin main:main`）を選択
 - 出力制約: 成果物本文（PR本文、commit message）は verbatim で返す（別途成果物パス、根拠、親判断事項は圧縮）
 - 結果状態分離報告: GitHub側、`.agentdev` 永続化、ブランチ削除状態を独立して報告
 
