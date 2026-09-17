@@ -17,6 +17,12 @@
  *       Skill reference.
  *
  * All three must reference the same detector entry point and profile token.
+ * The new routing contract (RA-006, DEC-030 decision 5) additionally requires
+ * the detector behind those routes to carry the exception-free producer
+ * metadata detection signal while staying at the report level: the gate
+ * routes are unchanged and the enforcement switch is not part of this
+ * Issue (Wave 4 owns activation).
+ *
  * Assertions verify only routing-bearing machine/LLM-dispatch tokens:
  * section IDs, detector entrypoint, profile token, result-state tokens,
  * and ordering/exclusion structure. No natural language prose assertions.
@@ -24,6 +30,11 @@
 import { describe, it, expect } from "bun:test";
 import * as fs from "fs";
 import * as path from "path";
+import {
+  classifyLineConfig,
+  decideGate,
+  DEFAULT_DETECTOR_CONFIG,
+} from "./lib/distribution-boundary.ts";
 
 const SCRIPT_DIR = import.meta.dir;
 
@@ -288,6 +299,40 @@ describe("distribution-boundary final gate routing contract", () => {
       if (epicRow !== null) {
         expect(epicRow[0]).toContain("epic-wave-close.md");
       }
+    });
+  });
+
+  describe("detector behind the routes carries the exception-free producer metadata signal (RA-006)", () => {
+    it("detector default stays at report level: enforcement switch is not activated by this Issue", () => {
+      expect(DEFAULT_DETECTOR_CONFIG.producer_metadata_enforcement).toBe("report");
+    });
+
+    it("detector emits the producer-metadata marker signal without role or path filters", () => {
+      const d = classifyLineConfig(
+        {
+          text: "<!-- ADF-COVERS(implementation): REQ-029-010 -->",
+          lineNumber: 1,
+          filePath: "src/opencode/skills/agentdev-fixture/SKILL.md",
+          projection: "source",
+        },
+        DEFAULT_DETECTOR_CONFIG,
+      );
+      const meta = d.filter((x) => x.category === "producer-metadata");
+      expect(meta.length).toBe(1);
+      expect(meta[0]!.matched).toBe("ADF-COVERS");
+    });
+
+    it("report level keeps the routed gates passing while the signal is observed", () => {
+      const d = classifyLineConfig(
+        {
+          text: "<!-- ADF-COVERS(implementation): REQ-029-010 -->",
+          lineNumber: 1,
+          filePath: "src/opencode/skills/agentdev-fixture/SKILL.md",
+          projection: "source",
+        },
+        DEFAULT_DETECTOR_CONFIG,
+      );
+      expect(decideGate(d).pass).toBe(true);
     });
   });
 });

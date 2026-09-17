@@ -156,23 +156,26 @@ export function isTemplateWrappedId(
 }
 
 // ---------------------------------------------------------------------------
-// ADF-COVERS declaration comment (IR-059 exemption: inspection-target declaration)
+// ADF-COVERS declaration comment marker (DEC-030 decision 5: distribution purity)
 // ---------------------------------------------------------------------------
 
 /**
- * Decide whether a line is an ADF-COVERS traceability declaration comment.
+ * Decide whether a line carries an ADF-COVERS traceability declaration marker.
  *
- * IR-059 explicitly exempts "patterns defining the inspection target and
- * inspection-target path declarations" from concrete-id detection. The
- * machine-readable declarations consumed by agentdev-traceability
- * (`<!-- ADF-COVERS(<role>): REQ-... -->`, `// ADF-COVERS(<role>): REQ-...`,
- * `# ADF-COVERS(<role>): REQ-...`, where <role> is a placeholder) are such
- * inspection-target declarations — symmetric with the already-accepted
- * AGENTS.md header declarations — not residual prose references.
+ * This is the detection signal for producer-side traceability metadata in
+ * distribution-bound artifacts (DEC-030 decision 5): a bare marker match with
+ * NO role filter and NO path filter, applied over the full artifact text.
+ * The former IR-059 exemption (skipping id/path/url extraction on declaration
+ * lines) is gone; what remains of this predicate is the signal itself. In
+ * "report" mode the detector keeps the extraction skip to preserve the
+ * current operating level during the migration window; in "enforce" mode the
+ * skip is removed. Evasion sequences inside a declaration line are detected
+ * in both modes (fail-closed).
  *
- * Only WHOLE-LINE comment forms are exempted: a declaration sharing a line
- * with prose keeps that prose detectable, and a truncated HTML comment that
- * never closes is not a well-formed declaration (both fail closed).
+ * Only WHOLE-LINE comment forms carry the marker signal: a declaration
+ * sharing a line with prose keeps that prose detectable, and a truncated
+ * HTML comment that never closes is not a well-formed declaration (both
+ * fail closed).
  *
  * Pure: no fs/path/I/O imports; same input => same output.
  */
@@ -183,4 +186,17 @@ export function isAdfCoversDeclarationLine(text: string): boolean {
   if (t.startsWith("//")) return true;
   if (t.startsWith("#")) return true;
   return false;
+}
+
+/**
+ * Bare ADF-COVERS marker match for the producer-metadata detection signal
+ * (DEC-030 decision 5). Unlike isAdfCoversDeclarationLine this has NO
+ * whole-line constraint: the signal scans the full artifact text, so a
+ * marker on a line shared with prose or a truncated comment still counts.
+ * The whole-line predicate above only gates the report-mode extraction skip.
+ *
+ * Pure: no fs/path/I/O imports; same input => same output.
+ */
+export function containsAdfCoversMarker(text: string): boolean {
+  return /ADF-COVERS\s*\(/.test(text);
 }

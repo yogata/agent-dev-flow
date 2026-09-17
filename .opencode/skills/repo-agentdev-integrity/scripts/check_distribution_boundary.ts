@@ -104,6 +104,7 @@ function emptyStats() {
     concrete_id_hits: 0,
     concrete_path_hits: 0,
     fixed_url_hits: 0,
+    producer_metadata_hits: 0,
   };
 }
 
@@ -196,6 +197,16 @@ export function checkDistributionBoundary(
     }
     const detections = classifyContentConfig(read.text, file, projection, detectorConfig);
     for (const d of detections) {
+      // Producer-metadata findings (DEC-030 decision 5): always counted, but
+      // they become gate failures only in "enforce" mode. "report" keeps the
+      // current operating level (activation is the Wave 4 issue's scope).
+      if (d.category === "producer-metadata") {
+        stats.producer_metadata_hits += 1;
+        if (detectorConfig.producer_metadata_enforcement === "enforce") {
+          failures.push(detectionToFailure(d));
+        }
+        continue;
+      }
       const f = detectionToFailure(d);
       if (f.category === "concrete-id") stats.concrete_id_hits += 1;
       else if (f.category === "concrete-path") stats.concrete_path_hits += 1;

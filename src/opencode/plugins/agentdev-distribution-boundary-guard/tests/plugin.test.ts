@@ -18,6 +18,7 @@
 
 import { expect, test, describe } from "bun:test";
 import { tmpdir } from "node:os";
+import { DEFAULT_DETECTOR_CONFIG } from "../../../../../.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts";
 import {
   evaluateWriteContent,
   evaluateEdit,
@@ -1245,5 +1246,80 @@ describe("Stage B round 3: distributed-workflow-control prefixes preserved by ma
     expect(env.detector_config.distributed_workflow_control_prefixes).toContain("QG");
     expect(Array.isArray(env.detector_config.producer_internal_id_prefixes)).toBe(true);
     expect(env.detector_config.repository_identity).toBeDefined();
+  });
+
+  test("default detector config stays at report level (activation deferred to Wave 4)", () => {
+    expect(DEFAULT_DETECTOR_CONFIG.producer_metadata_enforcement).toBe("report");
+    expect(makeGuardEnv().detector_config.producer_metadata_enforcement).toBe("report");
+  });
+});
+
+describe("producer metadata enforcement (DEC-030 decision 5)", () => {
+  const ENFORCE_ENV: GuardEnv = {
+    detector_config: {
+      ...DEFAULT_DETECTOR_CONFIG,
+      producer_metadata_enforcement: "enforce",
+    },
+    readFile: () => null,
+    projection: "source",
+  };
+  const contaminated = "# title\n<!-- ADF-COVERS(implementation): REQ-029-010 -->\n";
+
+  test("report mode (default) observes the inline declaration without blocking", () => {
+    const r = evaluateWriteContent(
+      "src/opencode/skills/agentdev-foo/SKILL.md",
+      contaminated,
+    );
+    expect(r.ok).toBe(true);
+    const meta = r.detections.filter((d) => d.category === "producer-metadata");
+    expect(meta.length).toBe(1);
+    expect(meta[0]!.matched).toBe("ADF-COVERS");
+    expect(meta[0]!.classification).toBe("distributed-control");
+  });
+
+  test("enforce mode blocks the same write as a violation", () => {
+    const r = evaluateWriteContentEnv(
+      "src/opencode/skills/agentdev-foo/SKILL.md",
+      contaminated,
+      ENFORCE_ENV,
+    );
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.errorKind).toBe("violation");
+      const meta = r.detections.filter((d) => d.category === "producer-metadata");
+      expect(meta.length).toBe(1);
+      expect(meta[0]!.classification).toBe("producer-internal");
+    }
+  });
+
+  test("enforce mode no longer skips id extraction on declaration lines", () => {
+    const r = evaluateWriteContentEnv(
+      "src/opencode/skills/agentdev-foo/SKILL.md",
+      contaminated,
+      ENFORCE_ENV,
+    );
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      const ids = r.detections.filter((d) => d.category === "concrete-id");
+      expect(ids.length).toBe(1);
+      expect(ids[0]!.matched).toBe("REQ-029");
+    }
+  });
+
+  test("clean content passes in both modes", () => {
+    const clean = "# title\nGeneralized body with no concrete references.\n";
+    const reportMode = evaluateWriteContent(
+      "src/opencode/skills/agentdev-foo/SKILL.md",
+      clean,
+    );
+    expect(reportMode.ok).toBe(true);
+    expect(reportMode.detections.length).toBe(0);
+    const enforceMode = evaluateWriteContentEnv(
+      "src/opencode/skills/agentdev-foo/SKILL.md",
+      clean,
+      ENFORCE_ENV,
+    );
+    expect(enforceMode.ok).toBe(true);
+    expect(enforceMode.detections.length).toBe(0);
   });
 });
