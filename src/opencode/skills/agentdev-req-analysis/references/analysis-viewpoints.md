@@ -1,4 +1,3 @@
-<!-- ADF-COVERS(implementation): REQ-053-023 -->
 # 要件分析観点と品質基準
 
 本ファイルは `agentdev-req-analysis` SKILL.md の補助資料であり、要件展開の観点（ユーザーストーリー、完了条件、境界条件、必達要件記述、状態要件/反映作業分離、REQ/Design境界判定、用語定義、分析フレーム選択、両面分析）と、Issue チェックボックス品質基準、Decision閾値判定ブリッジの詳細を扱う。

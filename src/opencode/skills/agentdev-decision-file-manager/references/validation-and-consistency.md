@@ -1,4 +1,3 @@
-<!-- ADF-COVERS(implementation): REQ-053-023 -->
 # Decision ファイル検証と整合性チェック
 
 本ファイルは `agentdev-decision-file-manager` SKILL.md の補助資料であり、Decision frontmatter のバリデーションルール、ステータス遷移の詳細、整合性チェック（README ↔ Decision、Decision ↔ Decision、REQ ↔ Decision、Issue ↔ Decision）、README 分類ビューの運用、accepted Decision 直接編集チェックリスト、APPEND/UPDATE 判定基準の詳細を扱う。
