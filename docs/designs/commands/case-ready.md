@@ -21,7 +21,7 @@ case-ready の公開契約（入出力、副作用、安全性、承認境界、
 
 - Definition 受入: Definition PR の忠実性確認（req-define 合意内容との投影検査）、整合性検査、品質検査、merge 前の Draft 状態確認（pr_read の isDraft、REQ-061-032）。新しい意味判断が不要な場合は追加承認なしで自動確定・merge。新しい Decision、意味変更、対象範囲拡大、意味的不整合の解消が必要な場合は停止し HITL とする
 - 保存実体: REQ / Decision / Design の保存は req-file-manager、decision-file-manager、design-file-manager、artifact-validation へ委譲する。case-ready 自身は保存手続きを実装しない
-- canonical 再取得: merge 後に canonical Definition を再取得し、以降の処理基準とする
+- canonical 再取得: merge 後に canonical Definition を再取得し、traceability check を機械実行する。unclassified を検出した場合は case-open への差し戻し経路を扱う。REQ-061-023 の未分類残存時 ready 拒否を最終ゲートとして維持し、unclassified と missing-verification は同一行集合から導出する（REQ-061-033）
 - 実行構造確定: 連結成分、3軸判断、単独根の Standard 化、上限遵守、構成検証、Wave ファイル重複前置検出（詳細は epic-wave-model Design）
 - 検証対応要否ゲート: 未分類行残存時は ready へ遷移させない。横断依存検査（canonical Definition と未クローズ Case 群の同一パス重複・共有領域未登録行重複需要の検出、警告+HITL 3選択肢、警告は ready 遷移判定を変更しない。REQ-061-029〜031）
 - クリーンアップ: 成功後に draft / RU を削除する（blocked / failed / 中断時は保持）

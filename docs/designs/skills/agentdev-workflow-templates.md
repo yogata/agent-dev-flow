@@ -2,7 +2,7 @@
 title: `agentdev-workflow-templates` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-11
+updated: 2026-09-17
 ---
 <!-- ADF-COVERS(implementation): REQ-007-002, REQ-007-003, REQ-007-005, REQ-017-003 -->
 <!-- ADF-COVERS(implementation): REQ-048-001, REQ-048-002, REQ-048-008, REQ-048-016, REQ-057-020 -->
@@ -253,5 +253,9 @@ Issue テンプレートと PR テンプレートに、実行識別情報と検�
 現在の識別情報 field 集合と検証差分の分類・表形式（8列）は現行ベースラインであり、REQ-048-008、
 REQ-048-014 のとおり REQ-048 の成立条件として固定しない。形式の変更は REQ-048-012 の実験契約に従い、
 後続工程の incremental value 比較可能性（REQ-048-008）を Guardrail として行う。
+
+対応記録コメントテンプレート（issue_comment_bug_record.md 系）には adversarial-review 判定欄のセクションを新設する（REQ-014-016）。
+判定値は発動または非発動とし、非発動の場合は発動契約非該当の理由を必須記録する。
+既存記録への遡及適用はせず、新規作成の対応記録から適用する。
 
 

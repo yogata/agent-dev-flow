@@ -69,6 +69,9 @@ Design operation の公式 enum は `create` / `append` / `update` の3値であ
 正規入力（例: `### IR-044`）で回帰テストを維持する。
 この契約は `target_area` マッチング規則と `append` の anchor マッチング規則の双方に適用される。
 
+### accepted 昇格時の対応記録
+Design status を draft から accepted へ昇格する場合、Design 本体に `## 対応記録` セクションを置き、昇格日、評価契約根拠、対応 Case/PR、REQ との整合確認結果を記録する。昇格根拠の記録と見送り記録は排他に扱い、新規昇格案件から適用する。既存 Design への遡及適用は行わず、見送り記録は既存の対応記録コメントおよび Design ファイル本体へ保存する。
+
 ## 参照する references
 
 - artifact-contracts.md「append operation」（Design 操作の append 契約）
