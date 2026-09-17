@@ -329,6 +329,7 @@ Issue #2362 の移行作業（棚卸し (a')）で全現行要件行を判定し
 - REQ-057-026..REQ-057-030: 配布物本文の現行契約整合（陳腐化した運用記述の排除）、traceability check fail の実測対象選定による段階解消、宣言集約済み除去の coverage 前置確認、IR-055 baseline 残置検出の段階解消運用、ADF-COVERS 除去可否判定 coverage 突合の運用詳細（implementation 役割と docs/ パスのフィルタ必須、除去後の traceability check による後置検査）。docs-check 検査・traceability check・integrity suite（REQ-010-068、Case Issue のテスト戦略）とレビューで検証
 - REQ-057-031..REQ-057-032: IR-067 baseline 由来の旧行番号引用の一回限りの付け替え是正と、消化後の本文全走査 strict 適用継続を規定する実行詳細行。恒続的な検証は IR-067 の既存検査（REQ-010-069/068）と Case Issue のテスト戦略・レビューで検証
 - REQ-057-033: 配布 skill 本体の移設残骸参照の実在する参照先への解決と、解消後の IR-062 baseline-known 検出の ReferencePath bucket（provenance: legacy）からの除去運用。一回限りの baseline 整合・参照修復の実行詳細であり、恒続的な検証は IR-062 reference-path-existence 自体（既存検査）とレビューで検証
+- REQ-057-034: ADF-COVERS implementation 宣言の段階付与残務を規定する実行時品質規範行。恒続的な検証手段を追加せず、case-ready / case-close の品質ゲートと一回的な traceability・coverage 確認で検証する任意行として扱う
 - REQ-057-035: 検査 checker の CLI 用分割スクリプトの直接起動時検査実行（runCli の top-level 起動、無出力・exit 0 の無検証成功の排除）と exit code 契約（0 ok / 1 violation / 2 error）の維持、checker 共通実行契約の CLI 分割スクリプト エントリポイント契約と正規起動経路の注意の保持。一回限りの CLI エントリポイント修復と共通契約の注意追記の実行詳細であり、恒続的な検証は checker 共通実行契約（既存 Design）の明示内容と Case Issue のテスト戦略（直接起動と正規起動の突合）で検証
 - REQ-057-036: Design status を draft から accepted へ昇格した場合の昇格根拠記録標準形式（Design 本体の見出し名「対応記録」、4必須項目、見送り記録との排他）の運用規範行。一回限りの Definition 保存と、case-close Design 状態評価での記録運用が適用経路であり、恒続的な検証手段を特定しないため任意行（Case Issue のテスト戦略〔TS-001〜TS-003 の保存契約読取確認とチャネル比較〕とレビューで検証）
 
