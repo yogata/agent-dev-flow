@@ -277,27 +277,28 @@ verification-only PR は case-close の targeted docs guard で files_checked �
 
 ## トレーサビリティ能力の利用
 
-case-run の実行担当（委譲内サブエージェント）は、対象要件について `agentdev-traceability` の coverage で既存の対応関係を確認しながら、実際に要件を実現する成果物へ実装対応を、実際に要件を検証する恒常的な検証手段へ検証対応を、対応宣言として正規成果物へ明示する（REQ-021-015）。
-実行担当は PR 作成前に対象要件について check を実行し、実装対応、検証対応、対応宣言の整合性を検査する（REQ-021-016）。
-対応宣言の表記仕様は `agentdev-traceability` Design「対応宣言の表記」が正規所有する。
+case-run の実行担当（委譲内サブエージェント）は、対象要件について `agentdev-traceability` の coverage で既存の対応関係を確認しながら、実際に要件を実現する成果物へ implementation 対応を、実際に要件を検証する恒常的な検証手段へ verification 対応を作成・更新する（REQ-021-015）。
+対応宣言の作成先は成果物の配布境界で決定する。consumer distribution closure に含まれる配布対象成果物（command、skill、template、runtime script 等）の対応関係は、repository top-level の `traceability/` 配下の component / package 単位 sidecar へ作成・更新する。producer 側の開発管理成果物（docs/designs/** 等の正規成果物）の対応関係は、inline `ADF-COVERS` 宣言または sidecar へ作成・更新でき、sidecar と inline declaration は同じ論理的な対応関係へ正規化される。
+対応宣言の表記仕様、sidecar の作成・更新方法は `agentdev-traceability` Design が正規所有する。
 
 - 単に変更されたファイルであることを理由に、そのファイルを要件へ自動的に対応付けない
+- 実行担当は PR 作成前に対象要件について check を実行し、Design 対応欠落、implementation 対応欠落、policy が required と判定する要件行の verification 対応欠落、verification policy の不正、sidecar / inline declaration の構文不正、同一論理関係の不整合な重複を検出対象として検査する（REQ-021-016）
 - check の不合格が承認済み対象範囲内で修正可能な場合は、修正して再検証する
 - 要件変更、対象範囲拡大、追加設計判断、外部依存解消が必要な場合は反復を停止し、blocked として必要な判断事項を報告する（REQ-021-017）。証拠源にかかわらず既存 scope を超える変更を自律拡大しない
-- 検証対応は「何が要件を検証するか」という検証手段との恒常的な対応関係であり、「今回その検証を実行して合格したか」という実行結果は Issue, PR, QG 側で扱う。特定時点の検証結果を対応宣言として保存しない（REQ-021-019）
-- 中断後の再実行では、正規成果物に保存済みの対応関係を再利用し、同じ対応宣言を重複生成しない（REQ-021-020）
+- verification 対応は「何が要件を検証するか」という検証手段との恒常的な対応関係であり、「今回その検証を実行して合格したか」という実行結果は Issue, PR, QG 側で扱う。特定時点の検証結果を対応宣言として保存しない（REQ-021-019）
+- 中断後の再実行では、sidecar と正規成果物に保存済みの対応関係を再利用し、同じ対応宣言を重複生成しない（REQ-021-020）
 - agentdev-traceability の不在、実行失敗、空結果、候補過多だけを理由として workflow を停止しない（fail-open）。README 索引、正規成果物の直接読取、`rg` 等の独立探索手段で継続し、正規成果物そのものの異常とトレーサビリティ機能側の異常を区別する
 
 ## 配布物本体 ADF-COVERS 宣言の除去可否判定（cleanup 判定）
 
 <!-- ADF-COVERS(implementation): REQ-057-030 -->
-本節の coverage 突合の運用詳細（役割フィルタ、docs/ パスフィルタ、除去後の後置検査）が REQ-057-030 を実装する。
+本節の coverage 突合の運用詳細（役割フィルタ、producer 側パス認定、sidecar と inline の同一扱い、除去後の後置検査）が REQ-057-030 を実装する。
 
-case-run の実行担当（委譲内サブエージェント）が、実装作業で配布物本体に残存する ADF-COVERS 宣言の除去（docs 配下の正規成果物への集約に伴う除去）を扱う場合、除去可否の判定は次のとおり行う。single workflow（STEP-S4 の委譲）と epic-wave workflow（STEP-W3 の各子Issue 委譲）の双方に同じ条件を適用する。
+case-run の実行担当（委譲内サブエージェント）が、実装作業で配布物本体に残存する ADF-COVERS 宣言の除去を扱う場合、配布物本体の ADF-COVERS 宣言は producer 側のトレーサビリティ metadata であり、対応関係の移行先（docs 配下の正規成果物の inline 宣言、または repository top-level の `traceability/` 配下の sidecar）が成立していることを条件に除去する。single workflow（STEP-S4 の委譲）と epic-wave workflow（STEP-W3 の各子Issue 委譲）の双方に同じ条件を適用する。
 
-- 除去可否判定の coverage 突合では、coverage 出力から implementation 役割かつ docs/ 配下パスの対応関係のみを集約済み実装対応として認定する。役割フィルタと docs/ パスフィルタの適用は必須であり、design 役割・verification 役割の対応関係、および docs/ 配下以外のパス（配布物側の宣言等）は集約済み実装対応として扱わない
-- 対象要件について implementation 役割かつ docs/ 配下の対応が確認できない宣言は除去可と判定せず、除去しない
-- 除去を実行した場合は、除去後に traceability check を実行し、role 別 coverage の対応関係が維持されていること（新規 missing-implementation 0 件）を後置検査として確認する
+- 除去可否判定の coverage 突合では、coverage 出力から implementation 役割かつ producer 側パス（docs/ 配下の正規成果物の inline 宣言、または repository top-level の `traceability/` 配下 sidecar の登録分）の対応関係を集約済み実装対応として認定する。coverage は sidecar と inline declaration を同じ論理的な対応関係として返すため、突合は対応関係の表現形式を区別せずに行う。役割フィルタの適用は必須であり、design 役割・verification 役割の対応関係は集約済み実装対応として扱わない
+- 対象要件について implementation 役割かつ producer 側パスの対応が確認できない配布物本体の宣言は除去可と判定せず、対応関係の移行先（sidecar または producer 側正規成果物）を成立させた上で除去する
+- 除去を実行した場合は、除去後に traceability check を実行し、implementation 対応の対応関係が維持されていること（新規 missing-implementation 0 件）を後置検査として確認する
 - coverage は役割付き対応関係を全件返却するため、役割とパスの解釈は呼出側の責務で行う（agentdev-traceability の運用規約参照）
 
 判定基準の中核は要件行が所有し、本節は coverage 突合の運用詳細のみを定めて重複定義しない。

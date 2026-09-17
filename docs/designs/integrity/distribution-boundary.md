@@ -2,7 +2,7 @@
 title: "配布依存境界"
 status: accepted
 created: "2026-08-11"
-updated: "2026-09-14"
+updated: "2026-09-17"
 ---
 <!-- ADF-COVERS(implementation): REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-045 -->
@@ -39,13 +39,19 @@ distribution は consumer 環境へ配布されるテキスト成果物の集合
 ## 配布物本文の記述規則
 
 配布物（配布 command / skill / template / script）の本文・コメント・reference における
-内部参照の記述規則を以下のとおり明文化する。
-- 対応関係（REQ/Decision ID との対応）は ADF-COVERS 宣言行へ集約する。配布物本文に concrete ID を直接記載しない
+記述規則を以下のとおり明文化する。
+- 配布対象成果物の本文・コメントへ、producer 側トレーサビリティ metadata（inline ADF-COVERS 宣言、要件行 ID、Decision ID 等の concrete ID を含む）を記載しない。consumer distribution closure 内の producer 側トレーサビリティ metadata は0件とする
+- 配布対象成果物の対応関係（REQ / Decision ID との対応）は、producer / project 側の `traceability/` 配下 sidecar のみへ保持する。対応関係を配布物へ投影せず、配布時 strip 処理を前提としない
 - 配布物本文は設計契約名、Design 節名、内容説明などの一般化表現で記述する
 - docs/ 内部パス参照（docs/designs/、docs/requirements/ 等のパス表記）を配布物へ残さない。
   導入先で解決できない参照は「Design一覧」等の一般名詞表現へ置換する
 - 本規則は REQ-029（配布依存境界）および IR-055 の enforcement に接続し、
   違反は配布依存境界検査・IR-055 検査で検出する
+
+distribution purity check は、distribution-bound artifact 内の producer 側トレーサビリティ metadata を例外許容せず検出する。
+検出シグナルは distribution-bound テキスト成果物全文に対する ADF-COVERS 宣言マーカー一致とし、役割フィルタやパスフィルタによる例外許容を持たない。
+対象は配布テキスト成果物の全種別（command、skill、reference、tool、plugin / hook、template、runtime script、package 付随ファイル、その他 consumer distribution closure に含まれるテキスト成果物）とする。
+配布入力となる製品ソース自体を clean な状態で保持し、変換工程を通さない配布形態（link projection を含む）でも同一の clean 状態が維持される。
 
 ## 候補抽出から決定までのパイプライン
 

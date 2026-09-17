@@ -35,6 +35,8 @@ updated: 2026-09-17
 
 - 実施記録: Issue #2906（RU-0028 Design accepted 昇格時の対応記録標準形式、maintenance）の case-ready 検証対応要否ゲートで実施した。case-ready STEP-6（canonical 再取得時の traceability check）で新規行 REQ-057-036 の未分類を検出し、REQ-061-033 の差し戻し経路に従い case-open が REQ-030-015 のとおり本カタログ追随を Definition Amendment PR に包含して登録した。canonical Definition 確定（Definition PR #2911、squash merge commit 6285ca2b）による新規行 REQ-057-036 を棚卸し単位（REQ 単位）で分類確定した。REQ-057-036 は既存 REQ-057-023..REQ-057-030 と同一系統の Design 昇格時の対応記録標準形式の運用規範行であり、恒続的な検証手段を特定しない（本 Case のテスト戦略 TS-001〜TS-003 が保存契約の読み取り確認と記録チャネル比較の一回的検証）ため、安全側の任意行として本カタログへ登録した（REQ-057 節へ単独行として追加。031/032/034/035 は他 Case 割当中のため既存 026..030 との範囲統合は行わない）。本登録により traceability check の missing-verification（unclassified）は解消する
 
+- 実施記録: Issue #2936（RU-0001 トレーサビリティ標準機能と producer / distribution 境界の再設計、feature / large）の case-open 検証対応要否分類（REQ-030-015、Definition Package 生成時の追随確認）で実施した。draft の新規行 REQ-012-052..REQ-012-057、REQ-021-028、REQ-029-010、REQ-029-011、REQ-002-047、REQ-002-048 の 12行を draft の test_strategy（TS-001..TS-017）との突合で分類確定した。恒続的な回帰テスト（declarations 4役割解析、sidecar 読込、sidecar/inline 正規化、policy 解決、種別非依存、check 検出項目、fail-closed、distribution purity、release archive、self-hosting・consumer シミュレーション、配布スキル内容検査）を draft で定義する REQ-012-052..057、REQ-029-010、REQ-002-048 は必須行とし本カタログへ登録しない（検証対応宣言の配置先は case-run の対応関係作成）。恒続的な検証手段を特定しない実行時規範行 REQ-021-028、REQ-029-011、REQ-002-047 は安全側の任意行として本カタログへ登録した（各 REQ 節へ単独行として追加）。merge 後の実施記録（squash merge commit hash を含む）は既存運用どおり後工程で記録する
+
 ## 形式
 
 - 1行1エントリとする
@@ -79,6 +81,7 @@ Issue #2362 の移行作業（棚卸し (a')）で全現行要件行を判定し
 - REQ-002-042..REQ-002-044: third-party Skill の第三区分定義、宣言に基づく取得機構経由配置と Git 管理境界、宣言済み+参照点集約の参照規律。機構の取得テスト・失敗系テスト（Case Issue のテスト戦略）、IR-058 の宣言済み判定とレビューで検証する実行時規範
 - REQ-002-045: repo-local Plugin/Hook の正本配置、consumer 配布対象外、自己ホスト投影許容の構造規範。docs-check の配布境界検査とレビューで検証
 - REQ-002-046: ADF core の技術固有知識非保持と REQ-056 との正本相互参照の原則規範。docs-check とレビューで検証
+- REQ-002-047: リポジトリ成果物の3層区分（開発管理成果物 / 製品ソース / 配布成果物）管理と区分ごとの配置・原本詳細の Design 委譲を規定する構造規範行。配置と原本の判断とレビューで検証
 
 ### REQ-003（委譲時の判断・承認・副作用境界）
 
@@ -170,6 +173,7 @@ Issue #2362 の移行作業（棚卸し (a')）で全現行要件行を判定し
 ### REQ-021（トレーサビリティのワークフロー統合）
 
 - REQ-021-026..REQ-021-027: design-save 工程での既存宣言ブロック更新要否確認と、QG-4 traceability check の worktree/main root 時系列を踏まえた完了阻止判断。case-run・case-close 実行時の振る舞い
+- REQ-021-028: トレーサビリティポリシー（policy.yaml）への検証対応任意行の追加・解除を当該要件行の変更と同一 Definition 変更として扱う運用規範行。Definition 変更の取り扱いとレビューで検証
 
 ### REQ-027（Capability Skill・Soft guard・代表ケース検証）
 
@@ -179,6 +183,7 @@ Issue #2362 の移行作業（棚卸し (a')）で全現行要件行を判定し
 ### REQ-029（配布依存境界）
 
 - REQ-029-009: third-party 依存の宣言に基づく取得後解決による runtime 依存境界充足の規範。宣言+取得機構の動作テスト（Case Issue のテスト戦略）とレビューで検証する実行時規範
+- REQ-029-011: 配布成果物が必要とする対応関係情報を consumer プロジェクト側のトレーサビリティデータとして管理する運用原則行。運用とレビューで検証
 
 ### REQ-030（case-open 実行契約）
 

@@ -20,10 +20,12 @@ case-ready の公開契約（入出力、副作用、安全性、承認境界、
 ## 内部構成
 
 - Definition 受入: Definition PR の忠実性確認（req-define 合意内容との投影検査）、整合性検査、品質検査、merge 前の Draft 状態確認（pr_read の isDraft、REQ-061-032）。新しい意味判断が不要な場合は追加承認なしで自動確定・merge。新しい Decision、意味変更、対象範囲拡大、意味的不整合の解消が必要な場合は停止し HITL とする
-- 保存実体: REQ / Decision / Design の保存は req-file-manager、decision-file-manager、design-file-manager、artifact-validation へ委譲する。case-ready 自身は保存手続きを実装しない
-- canonical 再取得: merge 後に canonical Definition を再取得し、traceability check を機械実行する。unclassified を検出した場合は case-open への差し戻し経路を扱う。REQ-061-023 の未分類残存時 ready 拒否を最終ゲートとして維持し、unclassified と missing-verification は同一行集合から導出する（REQ-061-033）
+- 保存実体: REQ / Decision / Design の保存は req-file-manager、decision-file-manager、design-file-manager、artifact-validation へ委譲する。case-ready 自身は保存手続きを実装しない。REQ の保存では Design 対応が未成立の要件行が残っても保存を失敗させない（Design 対応の成立判定は ready 遷移ゲートの責務）
+- canonical 再取得: merge 後に canonical Definition を再取得し、traceability check を機械実行する（REQ-061-023）。check は inline declaration と top-level `traceability/` 配下の sidecar を同じ論理的な対応関係へ正規化した対応関係全体を検査対象とする。missing-design を検出した場合は case-open への差し戻し経路を扱う
+- Design 対応ゲート: 対象 Definition の要件行ごとに Design 対応が 1 件以上存在することを ready 遷移の必要条件とする（missing-design 残存時は ready へ遷移させない）。verification policy（`traceability/policy.yaml`）との整合も同一の check で検証し、verification policy の不正を検出した場合は ready へ遷移させない
+- 検証対応の作成責務: required 行の verification 対応の作成・更新は case-run が担い、missing-verification を含む対応完全性の最終検査は case-close の QG-4 が担う（REQ-021-015、REQ-021-018）。case-ready の ready 遷移条件に verification 対応の完全性を含めない。policy の既定値は required であり、optional は policy の明示指定のみで成立する。新規要件行を含む Definition は、その行の verification 対応が case-run で作成される前の状態で ready を通過できる
 - 実行構造確定: 連結成分、3軸判断、単独根の Standard 化、上限遵守、構成検証、Wave ファイル重複前置検出（詳細は epic-wave-model Design）
-- 検証対応要否ゲート: 未分類行残存時は ready へ遷移させない。横断依存検査（canonical Definition と未クローズ Case 群の同一パス重複・共有領域未登録行重複需要の検出、警告+HITL 3選択肢、警告は ready 遷移判定を変更しない。REQ-061-029〜031）
+- 横断依存検査: canonical Definition と未クローズ Case 群の同一パス重複・共有領域（トレーサビリティポリシー、sidecar 等）への登録重複需要の検出（警告+HITL 3選択肢、警告は ready 遷移判定を変更しない。REQ-061-029〜031）
 - クリーンアップ: 成功後に draft / RU を削除する（blocked / failed / 中断時は保持）
 
 ## 停止条件
@@ -31,6 +33,8 @@ case-ready の公開契約（入出力、副作用、安全性、承認境界、
 - 対象 Definition PR が GitHub Draft PR（isDraft: true）の場合（pr_merge を実行せず blocked で停止。draft 解除の自動実行や正規 Tool 外の操作による復旧は行わない。REQ-061-032）
 - Definition PR の CI / 品質検査失敗（ready 不遷移、既存 PR 保持で再実行可能）
 - 新しい意味判断が必要（HITL）
+- canonical Definition の要件行に Design 対応が 0 件の行が残る場合（missing-design 検出、ready 不遷移、case-open への差し戻し）
+- `traceability/policy.yaml` の不正を check が検出した場合（ready 不遷移。required 行の verification 対応欠落（missing-verification）は case-close の QG-4 最終完全性検査の対象であり、ready 不遷移条件に含めない）
 - 構成検証の上限超過または構成不備
 - proposed Decision の受理が一意に確定できない（proposed のまま ready 不遷移）
 

@@ -2,7 +2,7 @@
 title: ルール所有権マトリックス
 status: accepted
 created: 2026-08-20
-updated: 2026-09-02
+updated: 2026-09-17
 ---
 
 # ルール所有権マトリックス
@@ -24,7 +24,7 @@ req-impact-map.md の配置の正本は `../responsibilities/req-impact-map.md` 
 
 ## 配布物対応宣言（ADF-COVERS）の配置規則
 
-配布物（`src/opencode/commands/agentdev/**`、`src/opencode/skills/agentdev-*/**` 等の実行時配布 .md）には対応宣言（ADF-COVERS implementation / verification）を記述せず、当該配布物の宣言は docs 配下の正規成果物（command Design、skill Design）へ配置する。repo-local 実装（`.opencode/skills/repo-*` の scripts 等の配布対象外ファイル）は宣言を保持できる。本配置規則により、配布物の concrete ID 排除（配布境界 baseline）と宣言の検出可能性を両立する。
+対応関係の正規保存方式は、repository top-level の producer/project-side `traceability/` 配下の component / package 単位 sidecar である。ADF-COVERS（implementation / verification）は、producer-only artifact に対応関係を inline 保持する場合の表現形式とし、consumer distribution closure に含まれる成果物では使用しない。配布物（`src/opencode/commands/agentdev/**`、`src/opencode/skills/agentdev-*/**` 等の実行時配布 .md）には対応宣言を記述せず、当該成果物の対応関係は sidecar で保持する。docs 配下の正規成果物（command Design、skill Design 等のリポジトリ内部設計文書）と repo-local 実装（`.opencode/skills/repo-*` の scripts 等の配布対象外ファイル）は producer-only artifact であり、inline 宣言を保持できる。inline 宣言と sidecar は同じ論理的な対応関係へ正規化され、coverage / impact / check から同一に扱われる。本配置規則により、配布物の concrete ID 排除（配布境界 baseline）と producer-side traceability metadata の非混入（distribution purity）を両立する。
 
 ## ルールドメイン一覧
 
