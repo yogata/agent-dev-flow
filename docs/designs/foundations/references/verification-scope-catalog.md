@@ -27,6 +27,8 @@ updated: 2026-09-17
 
 - 実施記録: Issue #2914（RU-0031 adversarial-review 発動契約非該当時の判定理由記録様式の整備、maintenance）の case-ready 検証対応要否ゲートで実施した。canonical Definition 確定（Definition PR #2916、squash merge commit 03c14734）による新規行 REQ-014-016 を棚卸し単位（REQ 単位）で分類確定した。REQ-014-016 は既存 REQ-014-001..REQ-014-015 と同一系統の adversarial-review caller 統合の実行時契約（非発動時の判定理由記録と代替自己反証の様式・義務）であり、恒続的な検証手段を特定しないため、安全側の任意行として本カタログへ登録した（REQ-014 節の範囲を 001..015 から 001..016 へ拡張）
 
+- 実施記録: Issue #2893（RU-0030 ADF-COVERS 除去可否判定の coverage 突合に役割フィルタと除去後検査を必須化、maintenance）の case-close 検証対応要否段階ゲートで実施した。canonical Definition 確定（Definition PR #2894、squash merge commit 21dfdd9c）による新規行 REQ-057-030 を棚卸し単位（REQ 単位）で分類確定した。REQ-057-030 は既存 REQ-057-026..REQ-057-029 と同一系統の ADF-COVERS 除去可否判定 coverage 突合の運用詳細（workflow・traceability 手順への投影）行であり、恒続的な検証手段を特定しない（本 Case のテスト戦略 TS-001〜TS-003 が実ファイル確認と cleanup シナリオの一回的検証）ため、安全側の任意行として本カタログへ登録した（REQ-057 節の範囲を 026..029 から 026..030 へ拡張）。本登録により traceability check の missing-verification（unclassified）は解消する
+
 ## 形式
 
 - 1行1エントリとする
@@ -318,7 +320,7 @@ Issue #2362 の移行作業（棚卸し (a')）で全現行要件行を判定し
 - REQ-057-023: ADF-COVERS 実装対応宣言の未付与行は正規配置先カタログ（artifact-responsibilities）に従い段階的に付与され、triage で retire を選択した要求行は宣言対象外であること。traceability check の検証対応計上で検証（検証対応任意行）
 - REQ-057-024: IR-055 既知 delta の baseline 鮮度維持と、配布物 Markdown 変更時のマージ前置確認（baseline 再生成または該当表現の解消）の運用規則。integrity suite（IR-055 delta 由来の fail なし）と Case Issue のテスト戦略（baseline 再生成・前置確認運用の検証）で検証。恒久検証手段（検証対応宣言）の配置は該当 Case の対応関係補完で判断する
 - REQ-057-025: docs/knowledge/README.md の知識文書一覧（列挙・件数表記）と docs/knowledge/ 配下の実態整合。Case Issue のテスト戦略（README 列挙と実態の機械的突合）とレビューで検証。恒久検証手段（docs-check の README 列挙整合検査）の整備は本 Case の恒久対策候補として別 Case で判断する
-- REQ-057-026..REQ-057-029: 配布物本文の現行契約整合（陳腐化した運用記述の排除）、traceability check fail の実測対象選定による段階解消、宣言集約済み除去の coverage 前置確認、IR-055 baseline 残置検出の段階解消運用。docs-check 検査・traceability check・integrity suite（REQ-010-068、Case Issue のテスト戦略）とレビューで検証
+- REQ-057-026..REQ-057-030: 配布物本文の現行契約整合（陳腐化した運用記述の排除）、traceability check fail の実測対象選定による段階解消、宣言集約済み除去の coverage 前置確認、IR-055 baseline 残置検出の段階解消運用、ADF-COVERS 除去可否判定 coverage 突合の運用詳細（implementation 役割と docs/ パスのフィルタ必須、除去後の traceability check による後置検査）。docs-check 検査・traceability check・integrity suite（REQ-010-068、Case Issue のテスト戦略）とレビューで検証
 
 ### REQ-058（ADF 管理投影物の廃止時クリーンアップ契約）
 
