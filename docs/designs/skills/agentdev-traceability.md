@@ -2,11 +2,12 @@
 title: agentdev-traceability Design
 status: accepted
 created: "2026-08-21"
-updated: "2026-09-11"
+updated: "2026-09-17"
 ---
 
 <!-- ADF-COVERS(design): REQ-012-027, REQ-012-028, REQ-012-033, REQ-012-042 -->
 <!-- ADF-COVERS(implementation): REQ-012-030, REQ-012-043, REQ-012-044, REQ-012-045, REQ-012-046, REQ-012-047, REQ-012-048, REQ-012-049, REQ-012-050, REQ-012-051 -->
+<!-- ADF-COVERS(implementation): REQ-057-030 -->
 
 ## 目的
 
@@ -39,6 +40,7 @@ updated: "2026-09-11"
 - 要件起点: 対応する Design 文書、実装成果物、検証手段を役割付きで返す
 - 成果物起点: 当該成果物が対応する要件を返す
 - 明示された対応関係を全件返し、候補数上限、ランキング、探索深度によって黙って切り捨てない
+- 役割付き出力の解釈は呼出側の責務であり、coverage 側で役割毎の絞り込みを行わない。配布物本体の ADF-COVERS 宣言の除去可否判定（cleanup 突合）では、implementation 役割かつ docs/ 配下パスの対応関係のみを集約済み実装対応として認定する（役割フィルタと docs/ パスフィルタ必須、REQ-057-030）。この利用時注意の運用規約は配布スキル（`agentdev-traceability` SKILL.md）の運用規約節が保持する
 
 ### impact
 

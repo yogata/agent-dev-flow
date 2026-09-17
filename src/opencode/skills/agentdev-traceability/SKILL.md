@@ -99,6 +99,7 @@ bun .opencode/skills/agentdev-traceability/scripts/src/check.ts --root <repo-roo
 ## 運用規約
 
 - coverage は明示された対応関係を全件返す。候補数上限、ランキング、探索深度による切り捨てを行わない
+- coverage は design / implementation / verification の役割付き対応関係を全件返却し、役割毎の絞り込みを行わない。役割付き出力の解釈は呼出側の責務である。配布物本体の ADF-COVERS 宣言の除去可否判定（cleanup 突合）で集約済み実装対応と認定する対象は、implementation 役割かつ docs/ 配下パスの対応関係のみであり、役割フィルタと docs/ パスフィルタの適用が必須である。design 役割・verification 役割や docs/ 配下以外のパス（配布物側の宣言等）は認定対象外である
 - impact の探索範囲は成果物 ↔ 要件 ↔ 成果物（固定2ホップ）であり、任意深度のグラフ探索を行わない。空結果を「影響なし」の証明として扱わない
 - 現行要件の判定は `docs/requirements/REQ-{NNNN}.md` 直下の要件テーブル行（`REQ-{NNNN}-{MMM}`）を標準とする。`retired/` サブディレクトリは廃止扱い
 - 完全性の基準は、実装対応は全現行要件行で1件以上、検証対応は検証対応必須行（検証対応要否カタログの未登録行）で1件以上（Design 対応は任意）。未登録の要件行は検証対応必須として扱う（安全側既定）

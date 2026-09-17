@@ -2,7 +2,7 @@
 title: case-run Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-14"
+updated: "2026-09-17"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-015, REQ-021-016, REQ-021-017, REQ-021-019, REQ-021-020, REQ-021-022 -->
@@ -287,6 +287,20 @@ case-run の実行担当（委譲内サブエージェント）は、対象要�
 - 検証対応は「何が要件を検証するか」という検証手段との恒常的な対応関係であり、「今回その検証を実行して合格したか」という実行結果は Issue, PR, QG 側で扱う。特定時点の検証結果を対応宣言として保存しない（REQ-021-019）
 - 中断後の再実行では、正規成果物に保存済みの対応関係を再利用し、同じ対応宣言を重複生成しない（REQ-021-020）
 - agentdev-traceability の不在、実行失敗、空結果、候補過多だけを理由として workflow を停止しない（fail-open）。README 索引、正規成果物の直接読取、`rg` 等の独立探索手段で継続し、正規成果物そのものの異常とトレーサビリティ機能側の異常を区別する
+
+## 配布物本体 ADF-COVERS 宣言の除去可否判定（cleanup 判定）
+
+<!-- ADF-COVERS(implementation): REQ-057-030 -->
+本節の coverage 突合の運用詳細（役割フィルタ、docs/ パスフィルタ、除去後の後置検査）が REQ-057-030 を実装する。
+
+case-run の実行担当（委譲内サブエージェント）が、実装作業で配布物本体に残存する ADF-COVERS 宣言の除去（docs 配下の正規成果物への集約に伴う除去）を扱う場合、除去可否の判定は次のとおり行う。single workflow（STEP-S4 の委譲）と epic-wave workflow（STEP-W3 の各子Issue 委譲）の双方に同じ条件を適用する。
+
+- 除去可否判定の coverage 突合では、coverage 出力から implementation 役割かつ docs/ 配下パスの対応関係のみを集約済み実装対応として認定する。役割フィルタと docs/ パスフィルタの適用は必須であり、design 役割・verification 役割の対応関係、および docs/ 配下以外のパス（配布物側の宣言等）は集約済み実装対応として扱わない
+- 対象要件について implementation 役割かつ docs/ 配下の対応が確認できない宣言は除去可と判定せず、除去しない
+- 除去を実行した場合は、除去後に traceability check を実行し、role 別 coverage の対応関係が維持されていること（新規 missing-implementation 0 件）を後置検査として確認する
+- coverage は役割付き対応関係を全件返却するため、役割とパスの解釈は呼出側の責務で行う（agentdev-traceability の運用規約参照）
+
+判定基準の中核は要件行が所有し、本節は coverage 突合の運用詳細のみを定めて重複定義しない。
 
 ## 参照する横断 Design
 

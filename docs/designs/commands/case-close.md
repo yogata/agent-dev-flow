@@ -2,7 +2,7 @@
 title: case-close Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-14
+updated: 2026-09-17
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-018, REQ-021-019, REQ-021-022, REQ-021-025 -->
@@ -11,6 +11,7 @@ updated: 2026-09-14
 <!-- ADF-COVERS(implementation): REQ-057-004 -->
 <!-- ADF-COVERS(implementation): REQ-003-015, REQ-003-016, REQ-003-019, REQ-003-026, REQ-006-105, REQ-032-001, REQ-032-002, REQ-032-003, REQ-032-004, REQ-032-005, REQ-032-007, REQ-032-008, REQ-032-010, REQ-032-012, REQ-032-013, REQ-032-014, REQ-032-015, REQ-032-016, REQ-032-017, REQ-032-018, REQ-032-019, REQ-032-020, REQ-032-021 -->
 <!-- ADF-COVERS(implementation): REQ-032-024, REQ-032-025, REQ-032-026 -->
+<!-- ADF-COVERS(implementation): REQ-057-030 -->
 
 # case-close Design
 
@@ -267,6 +268,9 @@ PR 本文読取記述、design-lifecycle-application.md の旧昇格条件文言
 3. PR 本文「Design 確定候補」セクションの申告候補を列挙結果へ統合する（重複は 1 件にまとめ、
    二重処理しない）。申告は補助入力であり、申告の不在を理由に棚卸しを省略しない
 4. 列挙結果が 0 件の場合は 0 件確認を記録して Design 状態評価を正常完了する
+
+<!-- ADF-COVERS(implementation): REQ-057-030 -->
+集約突合時の coverage 参照における役割解釈（REQ-057-030）: `agentdev-traceability` の coverage は役割付き対応関係を全件返却するため、呼出側が役割解釈を行う。列挙・集約突合の対象として数えるのは implementation 役割かつ docs/ 配下（docs/designs/** の正規成果物）パスの対応関係のみとし、役割フィルタと docs/ パスフィルタの適用を必須とする。design 役割・verification 役割の対応関係や docs/ 配下以外のパス（配布物側の宣言等）は列挙・突合対象に含めない。
 
 列挙の限界: 列挙は ADF-COVERS 宣言に基づく近似であり、宣言を持たない draft Design は
 漏れ得る（宣言付与は REQ-057-023 の段階的付与契約に従い、棚卸しが宣言を要求しない）。

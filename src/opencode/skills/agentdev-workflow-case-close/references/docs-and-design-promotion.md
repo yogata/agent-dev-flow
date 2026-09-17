@@ -1,5 +1,7 @@
 # STEP-3: docs 検証・Design 確定（docs-and-spec-promotion）
 
+<!-- ADF-COVERS(implementation): REQ-057-030 -->
+
 > 本 reference は `agentdev-workflow-case-close` SKILL.md の制御平面（STEP 一覧）STEP-3 詳細である。
 > docs/ 検証、targeted docs guard、check_extensions.ts、Design 確定フロー（draft → accepted 昇格）を提供する。
 
@@ -101,6 +103,10 @@ QG-4 の full integrity suite 合格基準により検証スイート全体（bu
    逆算列挙する。projection 配下は対象外とし、列挙対象は正規成果物のみとする。
    ADF-COVERS 宣言の解析は `agentdev-traceability` の能力（coverage）を参照できる（fail-open。
    不在・実行失敗・空結果時は正規成果物の直接走査（`rg` 等）で継続する）
+   coverage で解析する場合は役割付き対応関係が全件返却されるため、呼出側が役割解釈を行う。
+   列挙・集約突合の対象として数えるのは implementation 役割かつ docs/ 配下（正規 Design 文書）パスの
+   対応関係のみ（役割フィルタと docs/ パスフィルタの適用は必須）とし、design 役割・verification 役割や
+   docs/ 配下以外のパス（配布物側の宣言等）は対象に含めない
 3. PR 本文「Design 確定候補」セクションの申告候補を列挙結果へ統合する（同一 Design は 1 候補にまとめ、
    二重処理しない。申告のみ存在する Design も評価対象に含める）
 4. 統合後の候補が 0 件の場合は 0 件確認を記録して Design 状態評価を正常完了する（エラー停止しない）
