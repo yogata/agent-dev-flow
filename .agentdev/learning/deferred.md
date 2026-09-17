@@ -2320,3 +2320,250 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（出現1件・運用回避済み。次回 learning-promote で再評価）
 
 ---
+
+---
+
+## 2026-09-17: 実装 PR 分岐後に先行 merge された main 側解消行が case-close の全 corpus check で新規 missing に誤解釈され得る
+
+- **問題事象**: 実装 PR の分岐以降に Definition Amendment（検証対応要否カタログ登録）や他 Case の解消 commit が先行 merge された状態で case-close を実行すると、PR HEAD worktree 起点の全 corpus traceability check で main 側で解消済みの行が「新規 missing-implementation / missing-verification」「unclassified」として列挙され、完了ゲートの誤差し戻しを招き得る。
+- **発生局面**: case-close STEP-2 / STEP-3（Case #2908。PR #2927 は 6b35b5df 分岐、Amendment #2932 と AUTOGEN 修正 #2933 が先行 merge 済みの状態で再開）。
+- **検知方法**: worktree 起点 check で REQ-057-034 の unclassified / missing-verification を検出。worktree vs main の reqId 集合差分に REQ-014-016、REQ-057-034/035/036、REQ-061-033 の4行が出現。
+- **根本原因**: worktree vs main の全 corpus 差分の reqId 集合比較は「PR 変更起因の新規 missing」と「ブランチ分岐後の main 側後続解消（worktree だけが旧状態を保持）」を区別しない。
+- **自律対応内容**: 既存契約（case-close の worktree root 起点再実行・カタログ登録 commit の時系列確認）に従い main 起点で check を再実行し、対象行の分岐前後関係を確認して誤差し戻しを回避。merge 後に main 起点で対象行 missing 0 / 0 を再検証して完了判定。
+- **ユーザー確認の有無**: なし（既存契約内の運用）。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: 並行セッションで main が進む docs_chore PR の case-close 全般で再発し得る。worktree vs main 差分行は merge-base と main 解消 commit の時系列を確認してから「新規」判定する。coverage の `--req` は単一 ID のみ対応のため複数行確認は個別実行が必要。
+- **再発条件**: PR 分岐後に main 側で対象 REQ 行のカタログ登録・宣言付与・他 Case 解消が入る場合。
+- **予防策候補**: case-close references に「worktree vs main 差分行の分岐後 main 解消確認」手順を明記する候補。
+- **想定反映先**: case-close references（issue-resolution-and-qg4.md、docs-and-design-promotion.md）。
+- **関連**: Case #2908（Refs）、PR #2927（Refs）、PR #2932（Refs）。
+- **タグ**: #traceability #case-close #parallel-execution #worktree
+- **移動日**: 2026-09-18
+
+---
+
+## 2026-09-16: 並列テストプロセスの一時成果物が os.tmpdir() 横断走査で外部残渣として誤検出される
+
+- **問題事象**: bun test フルスイート並列実行下で、archive-builder staging path テストの `os.tmpdir()` 横断 orphan scan が並列プロセスの `trust-archive-*` 一時残渣を検出し、テスト本体と無関係な flaky fail を生じていた（RU-0021）。
+- **発生局面**: case-run（REQ-083-001 の flaky 隔離是正。PR #2885 RA-001）。
+- **検知方法**: フルスイート並列実行の反復で flaky fail が継続することを case-open 前の観察で検知。
+- **根本原因**: テスト固有の一時領域と並列プロセス間で共有される `os.tmpdir()` を走査対象として区別していなかった。
+- **自律対応内容**: suite-private TMP/TMPDIR/TEMP 隔離を `mkdtempSync` で実装し、fixture 作成と残渣検査を同一専用領域へ閉じた（PR #2885 で適用済み・マージ済み）。
+- **ユーザー確認の有無**: なし（case-run / case-close の検証で解消確認）。
+- **Decision/REQ/spec影響**: なし（REQ-083-001 の完了条件として解消済み）。
+- **横展開観点**: `os.tmpdir()` を横断走査するテスト・検査スクリプト全般で同種の誤検出が発生し得る。専用領域への閉じ込みは汎用パターン。
+- **再発条件**: 新規テストが再びグローバル `os.tmpdir()` を横断走査対象に含めた場合。
+- **予防策候補**: 残渣検査を含むテストではテスト固有 TMP を `mkdtempSync` で確保し、検査範囲をその配下に限定する規約化。
+- **想定反映先**: REQ-083 隣接資産（trusted-distribution-gate 検査テスト規約）、将来の検査テスト新設時。
+- **関連**: Issue #2882（Ref）、PR #2885（Refs）。
+- **タグ**: #testing #parallel-flaky #tempdir
+- **移動日**: 2026-09-18
+
+---
+
+## 2026-09-16: TEMP に残存する既存 trust-archive-verify 残渣の観察
+
+- **問題事象**: `trust-archive-verify-y0os8C` が本 Case 実行前に TEMP へ残存（作成時刻 2026-09-14）。PRE/POST で増分なし、本 Case の対象外。
+- **発生局面**: case-run 検証（REQ-083-001 の orphan 検査 PRE/POST 計測）。
+- **検知方法**: 検証時の TEMP trust-archive 残渣 PRE/POST 突合。
+- **根本原因**: 過去の verify 系実行が残渣を清理せず放置した痕跡と推定（特定は未実施、対象外）。
+- **自律対応内容**: 既存残渣として記録し、本 Case では増分なし（無変動）を確認。
+- **ユーザー確認の有無**: なし（記録のみ）。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: checker 本体の残渣管理（古い残渣の清掃・期限管理）の別候補。
+- **再発条件**: verify 系ツールが TEMP 残渣を清理しないまま運用が続く場合。
+- **予防策候補**: checker 本体側の残渣クリーンアップ・期限切れ残渣の掃除導入を検討。
+- **想定反映先**: trusted-distribution-gate checker 本体の残渣管理（将来の追跡Issue候補）。
+- **関連**: PR #2885（Refs）の Findings 記録。
+- **タグ**: #tempdir #residue #cleanup
+- **移動日**: 2026-09-18
+
+---
+
+## 2026-09-16: docs_chore の REQ 行 APPEND では traceability の missing-verification（unclassified）が必ず残る
+
+- **問題事象**: REQ 行を新規 APPEND する docs_chore Case では、traceability check の missing-verification（unclassified）が必ず 1 件残る。検証対応要否カタログ（verification-scope-catalog.md）への登録が対象範囲に含まれない場合、case-run では self-decide できず Design確定候補への記録で case-close に引き継ぐことになる。
+- **発生局面**: case-run（RU-0022、REQ-053-040 APPEND。PR #2888）。
+- **検知方法**: worktree root での traceability check（--req REQ-053-040）で unclassified 検出。
+- **根本原因**: 新規 REQ 行は実装直後にはカタログ未登録かつ検証対応宣言なしのため、未分類行として missing-verification に出る。
+- **自律対応内容**: case-run では PR 本文「## Design確定候補」へ記録して case-close へ引き継ぎ、case-close STEP-3 Design 状態評価で検証対応任意行としてカタログ登録（commit 673f66a2）して解消。
+- **ユーザー確認の有無**: なし（fail-open 運用と Design 確定候補処理で解消）。
+- **Decision/REQ/spec影響**: なし（verification-scope-catalog.md への 1 行登録のみ）。
+- **横展開観点**: REQ 行 APPEND を含む docs_chore Case の定義時には、カタログ登録を対象範囲に含めるか「## Design確定候補」への記録を想定しておくと case-run の検証差分説明が不要になる。あわせて `generate_indexes.ts` の再生成が req-health-metrics.md の AUTOGEN ブロックを更新する点（REQ 行数変化は README 索引ではなく健康メトリクスへ現れる点）は docs_chore 実装時の既知帰結として想定しておくと検証差分の説明が不要になる。
+- **再発条件**: 検証対応要否カタログ登録を対象外とした REQ 行 APPEND Case が続く限り毎回発生。
+- **予防策候補**: case-open の検証対応要否分類ゲートで新規行のカタログ登録を同時に確定する運用。
+- **想定反映先**: REQ-031 / REQ-032 の Design 確定候補・capture 運用、case-open 分類ゲート。
+- **関連**: Issue #2883（Ref）、PR #2888（Refs）。
+- **タグ**: #docs-chore #traceability #unclassified
+- **移動日**: 2026-09-18
+
+---
+
+## 2026-09-16: REQ/Design の内容変更時は frontmatter updated を必須セットとして同時更新する
+
+- **問題事象**: REQ/Design ファイルの内容変更 commit で frontmatter `updated`（最終更新日、patterns.md 定義）の同時更新が漏れた。機械ゲート（docs-check / targeted docs guard）では検出されず、review-work 品質ゲートの MINOR 所見として後から検出された（REQ-017.md 直近 4 コミット連続で更新慣行あり）。
+- **発生局面**: case-run（RU-0023、REQ-017-020 APPEND。PR #2889 初回 commit 4247798c）。
+- **検知方法**: review-work Code Quality レーン。
+- **根本原因**: 内容変更と frontmatter 更新を必須セットとして扱う運用が慣行止まりで機械ゲート化されていない。
+- **自律対応内容**: 第 2 commit 6725eb28 で frontmatter updated を補修（REQ-017.md / delegation-contracts.md / verification-scope-catalog.md）。
+- **ユーザー確認の有無**: なし（case-run 内で補修完了）。
+- **Decision/REQ/spec影響**: なし（lifecycle メタデータの運用慣行）。
+- **横展開観点**: 内容変更 commit には frontmatter 更新を必須セットとして扱うのが安全。機械ゲート不在のため人的レビューに依存している点は同種の REQ/Design 系 Case で再発し得る。
+- **再発条件**: frontmatter 更新を伴わない内容変更 commit が続く限り発生し得る。
+- **予防策候補**: targeted docs guard への frontmatter 鮮度検査（内容変更と updated の整合）追加を検討。
+- **想定反映先**: REQ-053 文書品質系、integrity rules（将来の検討候補）。
+- **関連**: Issue #2884（Ref）、PR #2889（Refs）。
+- **タグ**: #frontmatter #lifecycle-metadata #docs
+- **移動日**: 2026-09-18
+
+---
+
+## 2026-09-16: REQ 行本文と Design/カタログの「報告根拠」粒度差は正典 verbatim 原則で意図的に残り得る
+
+- **問題事象**: REQ-017-020 の行本文（正典 verbatim 採用）には「親への不一致報告」が明示されず、Design 箇条書き・検証対応カタログの説明文が報告義務を含む粒度差が残った。
+- **発生局面**: case-run（RU-0023。PR #2889）。
+- **検知方法**: review-work 品質ゲート意味論所見（非ブロッキング）。
+- **根本原因**: 行本文は Issue 本文 Definition Package を正とするため、派生物側の粒度を正に引き上げない判断が正規（正典優先）。
+- **自律対応内容**: 現行維持（行本文を変更しない判断を記録）。
+- **ユーザー確認の有無**: なし。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: 正典 verbatim 採用の REQ 行では、Design/カタログ側がより具体的な粒度を持つ粒度差が構造的に生じる。粒度差の検出自体は品質所見として正常であり、正典側への無断反映はしない。
+- **再発条件**: 正典 verbatim 原則で REQ 行を APPEND する Case で派生物側が詳細化する限り発生し得る。
+- **予防策候補**: docs 診断（inspect-docs）の DUPLICATE/DRIFT 観点で正典と派生物の粒度差を意図的差異と誤検出差異に分類する観点の整備検討。
+- **想定反映先**: REQ-036 inspect 系、REQ-056 Project Knowledge の整備候補。
+- **関連**: Issue #2884（Ref）、PR #2889（Refs）。
+- **タグ**: #canonical-granularity #req-design #verbatim
+- **移動日**: 2026-09-18
+
+---
+
+## 2026-09-16: 同種突合規定群への新規定追記時は既存規定との優先順位の非明示が残り得る
+
+- **問題事象**: delegation-contracts.md の既存突合規定（Issue 番号×対象成果物パス不一致時は委譲を開始しない）と新規規定（補助情報不一致時は除去/置換後に委譲開始可）の優先順位が「既存特定規定が優先」と読み解けるのみで明示されなかった。
+- **発生局面**: case-run（RU-0023。PR #2889）。
+- **検知方法**: review-work 品質ゲート意味論所見（非ブロッキング）。
+- **根本原因**: 既存規定（REQ-017-019 対応 2 箇条書き）の改変が対象外のため、新規規定側で優先順位に触れられなかった。
+- **自律対応内容**: 記録のみ（対象外変更は実施しない）。
+- **ユーザー確認の有無**: なし。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: 既存節への追記系 Case では、既存規定の非改変制約と新規定の優先順位明示の両立が課題になる。優先順位の明文化は別途の追跡Issue（REQ-017 隣接）として起票する経路が安全。
+- **再発条件**: 対象外制約付きの既存節追記 Case が続く限り発生し得る。
+- **予防策候補**: 同種規定群への追記時は優先順位の非明示を PR 本文 Findings へ明示的に記録し、追跡Issue 化の判断材料にする運用。
+- **想定反映先**: REQ-017 委譲契約系の将来の追跡Issue、docs 診断の DRIFT 観点。
+- **関連**: Issue #2884（Ref）、PR #2889（Refs）。
+- **タグ**: #precedence #delegation-contracts #docs
+- **移動日**: 2026-09-18
+
+---
+
+## 2026-09-17: Design accepted 昇格時の対応記録は変更対象 Design と同じ PR で保存する
+
+- **問題事象**: Design を `accepted` へ昇格する Case で、昇格理由・Decision 適用状況・REQ 対応範囲・検証証跡を別 Issue や一時メモへ分散すると、Design のライフサイクル状態と対応記録の追跡が切れる。
+- **発生局面**: case-close（Case #2906、PR #2929）。
+- **検知方法**: Design acceptance の保存契約を QG-4 と docs 検証の対象として確認。
+- **根本原因**: Design 本体の状態変更と、昇格時の対応記録保存を別工程として扱うと、同一変更単位の監査証跡が欠落し得る。
+- **自律対応内容**: 対象 Design の `accepted` 状態と対応記録を同一 PR の変更として保存し、PR 本文に理由・Decision・REQ・検証証跡を記録した。
+- **ユーザー確認の有無**: なし（既存の Design lifecycle 契約と QG-4 に基づく機械的確定）。
+- **Decision/REQ/spec影響**: なし（既存契約の文書化・適用）。
+- **横展開観点**: Design の accepted 昇格を含む全 Case で、変更対象 Design と acceptance record の同一 PR 保存を標準化する。
+- **再発条件**: Design 状態変更と対応記録を別 PR・別一時成果物へ分離した場合。
+- **予防策候補**: case-close の Design 確定ゲートで、acceptance record の同一 PR 保存と必須項目（理由、Decision、REQ、検証証跡）を確認する。
+- **想定反映先**: agentdev-design-file-manager の lifecycle application / accepted promotion 契約、case-close の Design 確定手順。
+- **関連**: Case #2906（Refs）、PR #2929（Refs）。
+- **タグ**: `#design-lifecycle` `#accepted` `#case-close` `#traceability`
+- **移動日**: 2026-09-18
+
+---
+
+## 2026-09-18: BASELINE_CATEGORIES に producer-metadata が含まれず、汚染状態での buildBaseline が baseline 全体を null 化し得る
+
+- **問題事象**: distribution-boundary-baseline.ts の BASELINE_CATEGORIES に producer-metadata カテゴリが含まれない。配布閉包が汚染された状態で buildBaseline を実行すると producer-metadata エントリを含む baseline JSON が生成され、loadBaseline（parseBaseline）が未知カテゴリを棄却して baseline 全体が null になる非整合がある。現行は汚染 0 件で問題顕在化なし。
+- **発生局面**: case-run Wave 4-1（Case #2936。PR #2952 の producer_metadata_enforcement 既定 enforce 切替時の周辺コード確認）。
+- **検知方法**: enforce 切替の影響範囲確認での baseline 生成・読込経路の構造確認。
+- **根本原因**: DetectionCategory.producer-metadata の追加（Wave 2-3）に対し baseline カテゴリ一覧が追随更新されていない。
+- **自律対応内容**: 本 PR では変更しない（baseline 仕様は Wave 2-3 の所有。汚染 0 件で顕在化なし）。記録のみ。
+- **ユーザー確認の有無**: なし。
+- **Decision/REQ/spec影響**: 記録のみ。baseline に producer-metadata を加えるか buildBaseline 側で除外するかの設計判断は別途。
+- **横展開観点**: 検出カテゴリ追加時は baseline カテゴリ一覧と parseBaseline の棄却ロジックの同時更新をセットで扱うべき。
+- **再発条件**: 配布閉包に producer-metadata 混入がある状態で baseline を再生成した場合。
+- **予防策候補**: BASELINE_CATEGORIES への producer-metadata 追加、または buildBaseline 側での producer-metadata 除外。
+- **想定反映先**: distribution-boundary-baseline.ts（Wave 2-3 仕様の所有範囲）、REQ-029 隣接。
+- **関連**: Case #2936（Refs）、PR #2952（Refs）。
+- **タグ**: #distribution-boundary #baseline #producer-metadata
+- **移動日**: 2026-09-18
+
+---
+
+## 2026-09-18: テスト fixture に実在しない REQ ID を書くと tim_declarations_contract の現行 REQ 行存在検査で不合格になる
+
+- **問題事象**: 配布境界検査テストの意図的混入 fixture に REQ-999-NNN のような実在しない REQ ID を記述したところ、tim_declarations_contract.test.ts の現行 REQ 行存在検査（コーパス = docs/**.md + scripts/**.ts の ADF-COVERS 宣言）が不合格になった。実在 ID（REQ-029-010 等）へ修正して解消。
+- **発生局面**: case-run Wave 2-3（Case #2936。PR #2949 の fixture 作成時）。
+- **検知方法**: fixture 作成後の bun test 実行での tim_declarations_contract 不合格。
+- **根本原因**: fixture コードもコーパス走査対象に含まれるため、fixture 内の REQ ID も現行 REQ 行存在検査の対象になる。
+- **自律対応内容**: fixture の REQ ID を実在 ID へ修正（検査ロジックにとって ID の具体値は不問のため検証上の意図は不変）。
+- **ユーザー確認の有無**: なし。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: REQ ID を含むテスト fixture・サンプルコードを作成する全 Case で同様の制約が効く。実在しない ID によるテスト自立性確保と機械検査との互換性は両立しないため実在 ID を使う。
+- **再発条件**: REQ ID を含む新規 fixture・サンプルを作成した場合。
+- **予防策候補**: fixture 作成規約に「REQ ID は実在 ID を使用」を明記する候補。
+- **想定反映先**: repo-integrity テスト規約、REQ-019 隣接。
+- **関連**: Case #2936（Refs）、PR #2949（Refs）。
+- **タグ**: #test-fixture #req-id #corpus
+- **移動日**: 2026-09-18
+
+---
+
+## 2026-09-18: Definition 変更（Wave 1 docs 更新）により既存テストの期待文言が陳腐化し、実装 Wave で先行 fail が混入する
+
+- **問題事象**: traceability_workflow_integration.test.ts の REQ-021-015/022 割り当て文言検査が Wave 1（Definition PR #2937）の docs 更新により陳腐化しており、本 PR 変更前から fail していた。本 PR で docs 現行文言へ期待を更新して解消。
+- **発生局面**: case-run Wave 2-1（Case #2936。PR #2948）。
+- **検知方法**: worktree bun test 実行での本 PR 変更外テストの fail。
+- **根本原因**: docs（正規文言）を期待値とするテストは docs 変更と同一変更単位で更新されないと陳腐化する。Definition PR（docs 変更）ではテスト更新が行われない運用。
+- **自律対応内容**: 本 PR の変更対象テストとして docs 現行文言へ期待更新（traceability_* テストは本 Issue の変更対象）。
+- **ユーザー確認の有無**: なし。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: docs 現行文言を期待値とする文言検証テスト全般で、Definition 変更のたびに同種の先行 fail が混入し得る。
+- **再発条件**: docs 文言を期待値とするテストが存在し、Definition PR がその文言を変更した場合。
+- **予防策候補**: Definition 変更時にテスト更新担当を明示する規約の検討（REQ-019 の影響範囲検出 gate の適用範囲確認）。
+- **想定反映先**: REQ-019 影響範囲検出 gate、case-open/case-ready の Definition 品質検査。
+- **関連**: Case #2936（Refs）、PR #2948（Refs）。
+- **タグ**: #definition-pr #test-staleness #docs-test-coupling
+- **移動日**: 2026-09-18
+
+---
+
+## 2026-09-18: 同一 Wave 並列 Issue 間の fixture・API 依存は worktree 単独では解決不能で、統合待ち検証の明記運用が要る
+
+- **問題事象**: (1) Wave 2-2 の TS-001 該当部が参照する declarations 側 fixture は Wave 2-1 の成果物であり worktree に存在せず、同等検証への置換と統合時確認を要した（PR #2946）。(2) Wave 2-4 は policy.yaml 解決置換（#2939）・policy 読取 kind 実装（#2940）後に合格するテスト 15 fail が worktree で残留し、統合待ちを PR 本文に明記して管理した（PR #2947）。
+- **発生局面**: case-run Wave 2 並列実行（Case #2936）。
+- **検知方法**: worktree bun test での依存先不在 fail・統合待ち fail。
+- **根本原因**: Wave 並列 Issue 間で成果物（fixture・実装 API）の依存があると、各 worktree は Wave 兄弟の成果物を持たないため単独では全体合格できない。
+- **自律対応内容**: 依存先の同等検証への置換、統合待ち fail の PR 本文への明記、統合 bun test は先行 Wave マージ後の rebase で最終確認、を運用として実施。
+- **ユーザー確認の有無**: なし。
+- **Decision/REQ/spec影響**: なし（case-open の Wave 重複前置検出は変更対象ファイル重複を対象とし、fixture・API 依存は検出対象外）。
+- **横展開観点**: 並列 Wave 構成の Epic では、変更対象ファイルの重複がなくても fixture・API・期待文言依存で worktree 単独合格が崩れ得る。
+- **再発条件**: 同一 Wave の複数 Issue 間に fixture・API・期待文言の依存がある場合。
+- **予防策候補**: case-open 構成検証に Wave 内 Issue 間の成果物依存の前置検出観点を追加する候補。統合待ち検証の PR 本文明記を標準運用化。
+- **想定反映先**: agentdev-workflow-case-open（構成検証・Wave 重複前置検出）、agentdev-workflow-case-run（fan-in 時の統合 bun test）。
+- **関連**: Case #2936（Refs）、PR #2946（Refs）、PR #2947（Refs）。
+- **タグ**: #epic-wave #parallel-issues #fixture-dependency #integration-deferred
+- **移動日**: 2026-09-18
+
+---
+
+## 2026-09-18: 検証対応要否カタログ（policy.yaml 移行元）に現行要件が存在しない欠番行 28 件が含まれていた
+
+- **問題事象**: verification-scope-catalog の範囲記述（REQ-003-021..056 等）に現行要件が存在しない欠番行（REQ-003-025/027/030..054、REQ-011-004）が 28 件含まれていた。policy.yaml への移行時、unknown-req-ref 回避のため現行 737 行のみを移行し欠番行は除外。
+- **発生局面**: case-run Wave 4-1（Case #2936。PR #2952 の policy 移行時）。
+- **検知方法**: 移行対象列挙と現行 REQ 行集合の突合。
+- **根本原因**: カタログの範囲列挙（..等）が要件行の採番変更・欠番を追従していない棚卸し品質の課題。
+- **自律対応内容**: 欠番行は移行対象から除外（policy に残すと unknown-req-ref になる安全側除外）し、検証差分に記録。
+- **ユーザー確認の有無**: なし。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: 要件行の採番・削除運用では範囲列挙型の登録物（カタログ・policy・索引）の追随が漏れやすい。policy.yaml は列挙型のため範囲列挙より追随品質は高いが、新規行追加時の policy 追随運用は別途の注意点。
+- **再発条件**: 要件行の削除・欠番後にカタログ・policy 系の登録物を棚卸ししない場合。
+- **予防策候補**: REQ 行削除時の登録物追随チェック（policy・索引・カタログ系）を docs-check 観点へ追加する候補。
+- **想定反映先**: REQ-030 系、inspect-docs の REQ 構造診断。
+- **関連**: Case #2936（Refs）、PR #2952（Refs）。
+- **タグ**: #policy-yaml #req-numbering #catalog-migration
+- **移動日**: 2026-09-18
