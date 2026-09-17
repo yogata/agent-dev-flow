@@ -71,7 +71,7 @@ REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）によ
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-029 の28件である（DEC-005、DEC-007 は superseded）。
+現行 Decision は DEC-001 から DEC-030 の29件である（DEC-005、DEC-007 は superseded）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
@@ -104,6 +104,7 @@ REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）によ
 | [DEC-027](decisions/DEC-027.md) | 観測ベース統制縮小評価ループ |
 | [DEC-028](decisions/DEC-028.md) | 文章表層品質の共通実行基盤 |
 | [DEC-029](decisions/DEC-029.md) | 公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入 |
+| [DEC-030](decisions/DEC-030.md) | トレーサビリティ標準機能への一般化と producer / consumer 境界の確立 |
 
 ## 設計（Design）
 
