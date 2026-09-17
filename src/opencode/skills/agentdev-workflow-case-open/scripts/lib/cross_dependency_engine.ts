@@ -1,7 +1,7 @@
 // ADF-COVERS(implementation): REQ-030-012, REQ-030-013, REQ-030-014, REQ-061-029, REQ-061-030, REQ-061-031
 //
 // Case 投入時の横断依存検査の比較エンジン（純粋関数）。
-// case-open（STEP-5 冪等確認）と case-ready（検証対応要否ゲート）の両 workflow skill が
+// case-open（STEP-5 冪等確認）と case-ready（トレーサビリティ完全性ゲート）の両 workflow skill が
 // 共有する単一実装であり、両スキル間で比較手続きを重複実装しない。
 //
 // - 検出条件 (a): 2 以上の未クローズ Case の変更対象成果物の同一パス重複

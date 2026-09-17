@@ -68,10 +68,10 @@ Issue 本文の Execution Contract セクションに投影された実現面の
 トレーサビリティ能力（`agentdev-traceability` の coverage）を、対象要件と正規成果物の既存の対応関係確認に利用できる。
 問い合わせ結果は候補提供であり最終判断としない、新規の依存関係、実行構成、Wave 構成、実行順序の設計には使用しない、機能の不在、実行失敗、空結果、候補過多の場合は README 索引、正規成果物の直接読取、`rg` 等の代替探索で継続する（fail-open）
 3. **実装、検証、PR 作成**: 実行 command に従い evidence-backed に実装を実行し、品質ゲートを通して `agentdev_gh` の pr_create 操作で PR を作成する。
-実際に要件を実現する成果物へ実装対応を、実際に要件を検証する恒常的な検証手段へ検証対応を、対応宣言として正規成果物へ明示する（単に変更されたファイルであることを理由に、そのファイルを要件へ自動的に対応付けない）。
+実際に要件を実現する成果物へ実装対応を、実際に要件を検証する恒常的な検証手段へ検証対応を、対応先の配置層に応じて sidecar（配布対象成果物）または inline（producer 側文書）により明示する（単に変更されたファイルであることを理由に、そのファイルを要件へ自動的に対応付けない）。
 PR 本文には実行識別情報セクション（対象 Case、実行単位、委譲単位識別子）を記録する。形式は `agentdev-workflow-templates` の実行識別情報セクション規約に従い、委譲 prompt の委譲識別情報ブロックから `adf_delegation` へ転記する。
 PR 本文には検証差分セクション（実行工程、検証種別、検証結果、finding 差分の5分類: 新規、修正済み、既出、撤回、無効）を記録する。形式は `agentdev-workflow-templates` の検証差分セクション規約に従い、実施した各検証（test strategy 項目検証、品質ゲート等）ごとに実行工程 case-run の行として記録する。
-PR 作成前に `agentdev-traceability` の check を実行し、対象要件の実装対応、検証対応、対応宣言の整合性を検査する。check の不合格が承認済み対象範囲内で修正可能な場合は修正して再検証し、要件変更、対象範囲拡大、追加設計判断、外部依存解消が必要な場合は blocked として判断事項を報告する。
+PR 作成前に `agentdev-traceability` の check を実行し、対象要件について次の9検出項目（check の findings 種別）を検査する: `malformed-declarations`（対応宣言の形式・構文違反）、`unknown-roles`（未知の成果物役割）、`unknown-req-refs`（存在しない要件行への参照）、`invalid-artifact-paths`（存在しない・取得不能な artifact パス）、`missing-design`（Design 対応の欠落）、`missing-implementation`（実装対応の欠落）、`missing-verification`（policy が required と判定する要件行の検証対応の欠落。required 行のみ計上）、`policy-invalid`（検証スコープポリシーの不正）、`duplicate-inconsistencies`（同一論理関係の不整合な重複）。Decision 対応の欠落は検出対象に含めない。check の不合格が承認済み対象範囲内で修正可能な場合は修正して再検証し、要件変更、対象範囲拡大、追加設計判断、外部依存解消が必要な場合は blocked として判断事項を報告する。
 ハーネスの plan artifact 等の中間成果物は解釈せず、PR URL で最終結果を受領する。
 コミット前に `git status --porcelain` で tsconfig 系ファイル（tsconfig*.json）の変更を検出した場合は、意図した変更と TypeScript コンパイラによるメタデータ書き戻し（`--noEmit` 指定でも incremental / project references 構成で発生し得る）の区別を確認する警告として扱う。検出時の処置は確認を促すことに限定し、自動破棄、自動 checkout を行わない。
 本チェックは配布物側 case-run 手順として独立しており、本プロジェクト側の `repo:guard:tsconfig`（bun install 起因の書き換え検出）とは別個に維持する。

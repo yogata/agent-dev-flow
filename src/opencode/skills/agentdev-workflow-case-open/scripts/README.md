@@ -1,6 +1,6 @@
 # `agentdev-workflow-case-open` scripts（横断依存検査エンジン）
 
-Case 投入時の横断依存検査の決定的エンジン。case-open（STEP-5 冪等確認）と case-ready（検証対応要否ゲート）の両 workflow skill が共有する単一実装であり、両スキル間で比較手続きを重複実装しない。
+Case 投入時の横断依存検査の決定的エンジン。case-open（STEP-5 冪等確認）と case-ready（トレーサビリティ完全性ゲート）の両 workflow skill が共有する単一実装であり、両スキル間で比較手続きを重複実装しない。
 
 ## 構成
 

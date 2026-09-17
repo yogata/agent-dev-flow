@@ -78,8 +78,8 @@ Issue 本文の完了条件チェックボックスを最終評価・更新し�
 
 - **完了条件チェックボックス評価・更新は case-close の責務**（QG-4）。case-run、実行担当サブエージェント、外部実行バックエンドは完了条件チェックボックスを更新しない。case-close は case-run/ 実行担当サブエージェントとは**別コンテキスト**で、PR 作成後に独立して完了条件を再読込して最終完了判定する
 - **トレーサビリティ check の実行前提**: 下記の段階ゲートで check を実行する際は、`agentdev-traceability` SKILL.md「実行方法」節の実行前提に従う（`--req` は要件行IDの個別カンマ指定のみ受理し `..` 形式の範囲構文は非対応、`--root` は検証対象リポジトリのルート明示、宣言の走査対象は拡張子・除外ディレクトリの前提どおり）。前提を満たさない実行の結果は QG-4 の判定根拠に使わない
-- **検証対応要否の段階ゲート（完了阻止）**: 完了条件チェックボックスの評価とは別に、対象要件行（当該 Case の Issue 本文が対象とする要件行）の検証対応要否の分類状態を判定する。対象要件行に未分類の行（検証対応宣言なし かつ 検証対応要否カタログ未登録）が残る場合、または検証対応必須行に恒久検証対応が存在しない場合、当該 Case を**完了として扱わない**（チェックボックスが全て checked でも完了扱いにしない）。導出定義はトレーサビリティモデル「対応関係の完全性規則」が正規所有し、`agentdev-traceability` の check（`--req` で対象要件行に限定、`missing-verification` の findings を未分類行・恒久検証対応欠落行として扱う）で機械的に導出する。check が実行不能な場合はカタログ登録状態と検証対応宣言の有無を定義どおり手動確認する。**検証対応任意行（カタログ登録行）に恒久的な検証手段が存在しないことだけを理由として完了を阻害しない**。判定の所有は本 Workflow Skill が保持し、command 定義へ複製しない。ゲート停止の状態は REQ ファイル、検証対応要否カタログ、対応宣言という durable state から再構成可能である。実行の詳細は SKILL.md「トレーサビリティ能力の利用（QG-4 独立再検査）」参照
-- **worktree root 起点の unclassified 判定時の再実行（誤差し戻し防止）**: traceability check を worktree root 起点で実行して未分類（unclassified）行が検出された場合、main 側 root で check を再実行し、検証対応要否カタログ登録 commit の時系列（ブランチ分岐の前後）を確認してから完了阻止を判断する。durable state 上で解消済みの対象行を本変更起因の失敗と誤判定しない。再実行は読取系 check の実行のみで行い、GitHub I/O・Tool 操作契約は変更しない
+- **検証対応の3完全性ゲート（完了阻止）**: 完了条件チェックボックスの評価とは別に、対象要件行（当該 Case の Issue 本文が対象とする要件行）の Design 対応、implementation 対応、verification 対応（policy が required と判定する要件行）の完全性を判定する。対象要件行に Design 対応、implementation 対応、または required 行の verification 対応の欠落が残る場合、当該 Case を**完了として扱わない**（チェックボックスが全て checked でも完了扱いにしない）。`agentdev-traceability` の check（`--req` で対象要件行に限定、`missing-design` / `missing-implementation` / `missing-verification` の findings を該当行の完了阻止条件として扱う）で機械的に導出する。check が正常に完全性を判定できなかった場合（check 実行不能、検査対象の取得不能等）は対応完全性の合格として扱わず、検査不能の旨を報告してマージに進まない（fail-closed）。**policy が optional と明示した要件行の verification 対応欠落は完全性違反に含めない**。Decision 対応の欠落は完了阻止条件に含めない。判定の所有は本 Workflow Skill が保持し、command 定義へ複製しない。ゲート停止の状態は REQ ファイル、トレーサビリティポリシー、対応宣言という durable state から再構成可能である。実行の詳細は SKILL.md「トレーサビリティ能力の利用（QG-4 独立再検査）」参照
+- **worktree root 起点の完全性判定時の再実行（誤差し戻し防止）**: traceability check を worktree root 起点で実行して検出対象の完全性が確定できない場合、main 側 root で check を再実行し、トレーサビリティポリシー登録 commit の時系列（ブランチ分岐の前後）を確認してから完了阻止を判断する。durable state 上で解消済みの対象行を本変更起因の失敗と誤判定しない。再実行は読取系 check の実行のみで行い、GitHub I/O・Tool 操作契約は変更しない
 - **PR 対象範囲 vs 全体 評価スコープ判定（QG-4 観点8）**: unchecked 完了条件を達成判定する前に、各完了条件の評価スコープ（PR 対象範囲 or 全体）を QG-4 観点8「PR 対象範囲 vs 全体 判定マトリクス」に従い決定する（境界ケース #1532 由来）
 - 手順、再 grep/再検査/再計測、事後確認（再読込 VERIFY）、未達項目残存時の停止（完了条件評価専任責務）、test strategy 処理完了確認（未処理項目が残る場合は構造化エラーで停止）の詳細は `agentdev-quality-gates` の QG-4 を参照
 - PR 存在確認
@@ -94,7 +94,7 @@ Issue 本文の完了条件チェックボックスを最終評価・更新し�
 - 完了条件チェックボックス評価・更新完了（再読込 VERIFY 済み）
 - 観点8 評価スコープ確定
 - test strategy 処理完了確認
-- 検証対応要否の分類状態判定結果（未分類行・検証対応必須行の恒久検証対応欠落の有無）
+- 対象要件行の3完全性判定結果（Design 対応・implementation 対応・required 行 verification 対応の欠落の有無）
 - verify-only closure 時: SSoT コメント参照手順の確認結果（3検査記録、件数突合、再実行可能性）
 
 ### Evidence
@@ -104,7 +104,7 @@ Issue 本文の完了条件チェックボックスを最終評価・更新し�
 
 ### Completion Verification
 
-- 未達チェックボックスが残っていないこと（残る場合は構造化エラーで停止）。更新後の再読込 VERIFY が合格であること。対象要件行に未分類の行が残らず、検証対応必須行の恒久検証対応が存在すること（未分類残存または恒久検証対応欠落時は完了として扱わない。検証対応任意行に恒久的な検証手段が存在しないことだけを理由とした阻止は行わない）。verify-only closure 時は SSoT コメントが存在し検証結果の記載が欠落していないこと（SSoT コメント不在または検証結果記載欠落時は完了として扱わない）
+- 未達チェックボックスが残っていないこと（残る場合は構造化エラーで停止）。更新後の再読込 VERIFY が合格であること。対象要件行に Design 対応・implementation 対応の欠落が残らず、policy が required と判定する要件行の verification 対応が存在すること（該当行の欠落残存時は完了として扱わない。policy が optional と明示した要件行の verification 対応欠落は完了阻止の理由にしない。Decision 対応の欠落は完了阻止条件に含めない）。verify-only closure 時は SSoT コメントが存在し検証結果の記載が欠落していないこと（SSoT コメント不在または検証結果記載欠落時は完了として扱わない）
 
 ### Resume-Idempotency
 
@@ -129,7 +129,7 @@ Issue 本文の完了条件チェックボックスを最終評価・更新し�
 - `agentdev-epic-tracker`: Epic Issue 判定、ステータス追跡テーブル形式
 - `agentdev-git-worktree`: 重複ファイルチェックプロシージャ
 - `agentdev-quality-gates`: QG-4 Final Acceptance Gate、観点8 判定マトリクス
-- `agentdev-traceability`: 検証対応要否未分類行・恒久検証対応欠落行の導出（check。段階ゲートの完了阻止判定手段）
+- `agentdev-traceability`: Design 対応・implementation 対応・required 行 verification 対応欠落行の導出（check。3完全性ゲートの完了阻止判定手段）
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 

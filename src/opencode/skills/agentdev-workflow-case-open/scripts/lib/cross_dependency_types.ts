@@ -1,6 +1,6 @@
 // ADF-COVERS(implementation): REQ-030-012, REQ-030-013, REQ-030-014, REQ-061-029, REQ-061-030, REQ-061-031
 //
-// Case 投入時の横断依存検査（case-open STEP-5 / case-ready 検証対応要否ゲート）の
+// Case 投入時の横断依存検査（case-open STEP-5 / case-ready トレーサビリティ完全性ゲート）の
 // 入力・報告契約の型定義。共通契約の正規所有はワークフロー契約 Design
 // 「Case 投入時の横断依存検査契約」節である。本モジュールは型と正規化のみを担い、
 // 比較ロジックは cross_dependency_engine.ts、共有領域登録状態の読取は

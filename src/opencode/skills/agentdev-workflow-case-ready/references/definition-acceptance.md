@@ -66,5 +66,5 @@ merge 実行前に、Custom Tool `agentdev_gh` の pr_read で対象 PR の isDr
 canonical 再取得時に、`agentdev-traceability` の check を対象 Case の要件行について機械実行する。
 
 - **機械実行**: 対象は canonical Definition（merge 済み main の docs 永続文書）である。手動判断（記録を伴わない裁量判断）で代替しない。traceability 能力の不在、実行失敗、空結果時は README 索引、正規成果物の直接読取等の代替手段で継続する（fail-open）
-- **unclassified 検出時の差し戻し**: unclassified（検証対応宣言なし・カタログ未登録行）を検出した場合は case-open へ差し戻す。差し戻し時は ready へ遷移せず停止し、検出された未分類行一覧と停止理由を報告する。case-open 側は Definition Package 生成時の verification-scope-catalog 追随確認の漏れ解消を Definition 経由で行う。既存 merge は巻き戻さない
-- **最終ゲート所有の維持（二重定義なし）**: 検証対応要否の最終ゲート（未分類残存時の ready 拒否）は引き続き case-ready（STEP-6）が所有する。STEP-2 の本検査は canonical 再取得時点での導出確認であり、最終ゲートを二重定義しない。両検査の unclassified と missing-verification は同一行集合から単一導出される計上仕様を変更しない
+- **missing-design / policy 不正検出時の差し戻し**: missing-design（Design 対応 0 件の要件行）または verification policy の不正を検出した場合は case-open へ差し戻す。差し戻し時は ready へ遷移せず停止し、検出された該当行一覧と停止理由を報告する。case-open 側は Definition Package 生成時のトレーサビリティポリシー追随確認の漏れ解消を Definition 経由で行う。既存 merge は巻き戻さない
+- **トレーサビリティ完全性ゲート所有の維持（二重定義なし）**: トレーサビリティ完全性ゲート（Design 対応・トレーサビリティポリシー有効性の確認、STEP-6）は引き続き case-ready が所有する。STEP-2 の本検査は canonical 再取得時点での確認であり、完全性ゲートを二重定義しない。required 行の verification 対応欠落（missing-verification）は ready 拒否条件に含めない（case-run の対応作成・更新と case-close の QG-4 最終完全性検査が所有する）
