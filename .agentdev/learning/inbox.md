@@ -5,6 +5,24 @@
 
 ---
 
+## 2026-09-17: 実装 PR 分岐後に先行 merge された main 側解消行が case-close の全 corpus check で新規 missing に誤解釈され得る
+
+- **問題事象**: 実装 PR の分岐以降に Definition Amendment（検証対応要否カタログ登録）や他 Case の解消 commit が先行 merge された状態で case-close を実行すると、PR HEAD worktree 起点の全 corpus traceability check で main 側で解消済みの行が「新規 missing-implementation / missing-verification」「unclassified」として列挙され、完了ゲートの誤差し戻しを招き得る。
+- **発生局面**: case-close STEP-2 / STEP-3（Case #2908。PR #2927 は 6b35b5df 分岐、Amendment #2932 と AUTOGEN 修正 #2933 が先行 merge 済みの状態で再開）。
+- **検知方法**: worktree 起点 check で REQ-057-034 の unclassified / missing-verification を検出。worktree vs main の reqId 集合差分に REQ-014-016、REQ-057-034/035/036、REQ-061-033 の4行が出現。
+- **根本原因**: worktree vs main の全 corpus 差分の reqId 集合比較は「PR 変更起因の新規 missing」と「ブランチ分岐後の main 側後続解消（worktree だけが旧状態を保持）」を区別しない。
+- **自律対応内容**: 既存契約（case-close の worktree root 起点再実行・カタログ登録 commit の時系列確認）に従い main 起点で check を再実行し、対象行の分岐前後関係を確認して誤差し戻しを回避。merge 後に main 起点で対象行 missing 0 / 0 を再検証して完了判定。
+- **ユーザー確認の有無**: なし（既存契約内の運用）。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: 並行セッションで main が進む docs_chore PR の case-close 全般で再発し得る。worktree vs main 差分行は merge-base と main 解消 commit の時系列を確認してから「新規」判定する。coverage の `--req` は単一 ID のみ対応のため複数行確認は個別実行が必要。
+- **再発条件**: PR 分岐後に main 側で対象 REQ 行のカタログ登録・宣言付与・他 Case 解消が入る場合。
+- **予防策候補**: case-close references に「worktree vs main 差分行の分岐後 main 解消確認」手順を明記する候補。
+- **想定反映先**: case-close references（issue-resolution-and-qg4.md、docs-and-design-promotion.md）。
+- **関連**: Case #2908（Refs）、PR #2927（Refs）、PR #2932（Refs）。
+- **タグ**: #traceability #case-close #parallel-execution #worktree
+
+---
+
 ## 2026-09-17: textlint guard が project root 外の temp worktree への edit/write を fail-closed ブロックする
 
 - **問題事象**: 並行 case-open 下で Definition PR 用 worktree を C:\WINDOWS\TEMP\opencode 配下へ作成した場合、worktree 内ファイルへの edit/write ツール呼び出しが agentdev-textlint-guard の project root 外パス検査（fail-closed）でブロックされる。REQ-057.md への 1 行追加のような軽微な編集でも guard が停止させる。
@@ -328,3 +346,49 @@
 - **タグ**: `#issue-update` `#case-close` `#full-body-replace` `#verification`
 
 ---
+
+## 2026-09-17: Design accepted 昇格時の対応記録は変更対象 Design と同じ PR で保存する
+
+- **問題事象**: Design を `accepted` へ昇格する Case で、昇格理由・Decision 適用状況・REQ 対応範囲・検証証跡を別 Issue や一時メモへ分散すると、Design のライフサイクル状態と対応記録の追跡が切れる。
+- **発生局面**: case-close（Case #2906、PR #2929）。
+- **検知方法**: Design acceptance の保存契約を QG-4 と docs 検証の対象として確認。
+- **根本原因**: Design 本体の状態変更と、昇格時の対応記録保存を別工程として扱うと、同一変更単位の監査証跡が欠落し得る。
+- **自律対応内容**: 対象 Design の `accepted` 状態と対応記録を同一 PR の変更として保存し、PR 本文に理由・Decision・REQ・検証証跡を記録した。
+- **ユーザー確認の有無**: なし（既存の Design lifecycle 契約と QG-4 に基づく機械的確定）。
+- **Decision/REQ/spec影響**: なし（既存契約の文書化・適用）。
+- **横展開観点**: Design の accepted 昇格を含む全 Case で、変更対象 Design と acceptance record の同一 PR 保存を標準化する。
+- **再発条件**: Design 状態変更と対応記録を別 PR・別一時成果物へ分離した場合。
+- **予防策候補**: case-close の Design 確定ゲートで、acceptance record の同一 PR 保存と必須項目（理由、Decision、REQ、検証証跡）を確認する。
+- **想定反映先**: agentdev-design-file-manager の lifecycle application / accepted promotion 契約、case-close の Design 確定手順。
+- **関連**: Case #2906（Refs）、PR #2929（Refs）。
+- **タグ**: `#design-lifecycle` `#accepted` `#case-close` `#traceability`
+
+---
+
+## 2026-09-17: worktree の bun test integrity suite で依存パッケージ未伝播 fail が発生し、2つの依存解決手法の選択基準が未明示
+
+- **問題事象**: worktree で bun test integrity suite（分割①）を実行すると、src/opencode/skills/agentdev-project-extensions/scripts/ の依存（zod）が node_modules 未伝播のため Cannot find package zod で 4 fail / 4 errors が発生する。
+- **発生局面**: case-run（Case #2904、PR #2934）の TS-002 integrity suite 実行。worktree .worktrees/2904-maintenance。
+- **検知方法**: 分割①初回実行で 2496 pass / 4 fail / 4 errors。stderr 退避ファイルの fail 詳細から Cannot find package zod を特定。
+- **根本原因**: worktree は gitignore 対象 node_modules を継承しない（agentdev-git-worktree の worktree 構造的制約）。依存を所有する package ディレクトリ単位の整備が必要。
+- **自律対応内容**: 許容手段の1つ「bun install --frozen-lockfile」（package 単位整備）を実行して zod@4.4.3 を導入し再実行 → 2574 pass / 0 fail。
+- **ユーザー確認の有無**: なし（既存契約内の運用）。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: 先行例 #2928 は同一課題に対し「main 側 node_modules への junction 作成」を採用。両手法とも QG-4 正規形の許容手段だが、選択基準（一回限りの検証なら junction、繰り返し実行する worktree なら install 等）が明文化されていない。
+- **再発条件**: 新規 worktree で bun test 正規形を実行する全 case。
+- **予防策候補**: case-run/QG-4 references に worktree 依存解決2手法（package 単位 bun install vs main 側 junction）の選択基準を追記する候補。
+- **想定反映先**: agentdev-quality-gates references（qg-4-final-acceptance.md の依存パッケージ前置節）または agentdev-git-worktree の worktree 構造的制約節。
+
+## 2026-09-17: main root での integrity suite 実行は junction 環境特有 fail を生み、merge 判定は worktree 実行と baseline 再現確認の組み合わせで由来分類する運用が必要
+
+- **問題事象**: merge 後 main root で分割①（bun test ./.opencode/skills/repo-agentdev-integrity/scripts/）を再実行すると、junction 伝播環境でのみ収集される IR-055・NG21 系テストが 4 fail し、worktree 実行（0 fail）と乖離する。コード内容は同一（squash merge で同一ツリーが反映）。
+- **発生局面**: case-close（Case #2904、PR #2934）の merge 後検証。main root d25fa34c。
+- **検知方法**: merge 後 main root の分割①で 2581 pass / 4 fail。fail 名から IR-055（delta・閾値）と NG21 N16/N17 を特定。
+- **根本原因**: fail テストは配布物投影（junction 経由の .opencode 実体）を検査対象とする main root 環境依存テストであり、worktree（junction 未伝播）では検査対象自体が不在で fail しない。merge 変更（1 file 5 行、import.meta.main ブロック追加）はこれら検査の挙動に影響しない。
+- **自律対応内容**: baseline commit（merge 前 main 18391a9e）で detached checkout による読取専用 filter 実行を行い、同一 fail が再現することを確認（IR-055 filter 2 fail、N16/N17 filter 各 2 fail）→ 全 4 件を pre-existing（環境依存）と分類し、変更起因 0 件・不明 0 件で機械受理基準を充足。
+- **ユーザー確認の有無**: なし（QG-4 由来分類契約内の運用）。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: main root 直実行の suite は worktree 実行結果と件数・fail が乖離するため、件数突合の比較対象は同環境の直前実績を使う必要がある。由来分類の baseline 再現確認は detached checkout（未コミット変更ゼロ確認後）で軽量に実施可能。
+- **再発条件**: case-close の merge 後検証や main root で bun test 正規形を実行する全 case。
+- **予防策候補**: QG-4 機械受理基準の記録に「main root 実行時は worktree 実行結果との環境差を由来分類に明示」する項目追加の候補。
+- **想定反映先**: agentdev-quality-gates references（qg-4-final-acceptance.md の環境ラベル・fail 由来分類節）。

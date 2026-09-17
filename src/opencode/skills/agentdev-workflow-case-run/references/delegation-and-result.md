@@ -1,6 +1,6 @@
 # 共通委譲・result 処理（delegation-and-result）
 
-<!-- ADF-COVERS(implementation): REQ-031-028, REQ-031-029, REQ-031-030 -->
+<!-- ADF-COVERS(implementation): REQ-031-028, REQ-031-029, REQ-031-030, REQ-014-016 -->
 
 > 本 reference は `agentdev-workflow-case-run` SKILL.md の共通 STEP 詳細である。
 > STEP-S4（実行担当サブエージェント委譲）と STEP-S5（result 処理・配布依存境界 最終 gate）を所有する。
@@ -47,7 +47,7 @@
 - **構造化文脈の直列化（委譲時）**: 委譲プロンプトの入力（inputs）内に構造化文脈（10意味）を構造化して直列化する。直列化形式、制約（全文履歴・巨大な計画本文の複製禁止、正規情報源の非代替、初期文脈としての利用と再確認の維持）は `agentdev-case-run-execution-adapter` スキルの委譲プロンプト雛形「構造化文脈の直列化（委譲時）」に従う。前工程で確定した事項は Issue 本文（前工程完了度、関連 ADR 拘束条件等）と durable state から構成する。canonical_references の各項目は、配布物参照において目的判別（正規原本確認、実行時投影確認、双方整合確認）を含める。判別は `agentdev-workflow-lifecycle` スキルの参照先解決ポリシー（`references/reference-resolution.md`）に従う
 - **PR URL 受領**: 実行担当サブエージェントが直接 PR 作成を行い、PR URL を委譲 result として返却する（PR URL フォールバック検索は使用しない）
 - **case-run 本体は実装方針を生成・審査しない**: 実装方針の形成、adversarial-review 呼出、結果反映は委譲内で adapter の委譲契約に従い、最初の実装変更前に実施する。case-run 本体が実装方針を生成、保持、審査するステップを新設しない。委譲 result（4状態）のみで委譲内の結果を受領する
-- **adapter 委譲内 adversarial-review**: 発動条件判定と review 呼出は adapter 委譲内で実行担当サブエージェントが分離して実施する。default-on、skip 条件（実装方針が自明の場合）該当時は省略して従来フローを継続、ユーザー明示指定時は強制発動。実装方針限定、blocked 遷移（(1) 既確定文書の変更・追加・撤回が必要、(2) 要件・仕様問題の検出、(3) unresolved な本質的争点またはユーザー判断事項が残る）の詳細は `agentdev-case-run-execution-adapter` 参照
+- **adapter 委譲内 adversarial-review**: 発動条件判定と review 呼出は adapter 委譲内で実行担当サブエージェントが分離して実施する。default-on、skip 条件（実装方針が自明の場合）該当時は省略して従来フローを継続、ユーザー明示指定時は強制発動。発動条件の判定は Issue 本文の実行契約（review 発動契約）を正とし、Issue 本文が非発動を記す場合、その契約に従い非発動とし、非発動の判定理由と代替自己反証（却下案・緩和策・unresolved なしの確認）を PR 本文へ必須記録する（silent skip の防止）。実装方針限定、blocked 遷移（(1) 既確定文書の変更・追加・撤回が必要、(2) 要件・仕様問題の検出、(3) unresolved な本質的争点またはユーザー判断事項が残る）の詳細は `agentdev-case-run-execution-adapter` 参照
 - **background 委譲の起動消失の回復**: background 委譲の起動直後消失を検知した場合、durable state（worktree の git status、PR 存在、Issue コメント）で実行の帰属を確認する。実行未試行と判定した場合は同期実行による再委譲を行い、実行中断と判定した場合の継続判断も当該 durable state に基づく。同期実行への切替は消失検知時のフォールバックに限定し、並列委譲（最大5件）を維持する（詳細は `agentdev-case-run-execution-adapter` 参照）
 
 ### Result

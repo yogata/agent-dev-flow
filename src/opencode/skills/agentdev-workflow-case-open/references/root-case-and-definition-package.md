@@ -1,5 +1,7 @@
 # STEP-2 / STEP-3: Root Case 確立と Definition Package 生成（root-case-and-definition-package）
 
+<!-- ADF-COVERS(implementation): REQ-030-015 -->
+
 > 本 reference は `agentdev-workflow-case-open` SKILL.md の制御平面（STEP 一覧）STEP-2、STEP-3 詳細である。
 > SKILL.md は control plane として STEP 遷移を管理し、本 reference は両 STEP の実行詳細を提供する。
 
@@ -33,9 +35,10 @@
 ### STEP-3: Definition Package 生成と関連付け
 
 1. 要件行（REQ 変更後本文）、Decision、Design、Issue 構成案（`operation_units`、`case_open_hints` 由来）、受入条件一式を Case 単位で集約し Definition Package を生成する
-2. `realization_actions` は Definition Package の構成要素として保持する（構造化ハンドオフ: DEC-{N}）。case-open が execution contract を確定しない
-3. 生成した Definition Package を Root Case に関連付ける（Root Case 本文の Definition Package セクションへ所在を記録する）
-4. Definition Package の構成、索引・補助メタデータの具体形式は definition-readiness Design の管理下とする
+2. REQ 行追加を伴う Definition Package 生成時、verification-scope-catalog 更新の追随要否を確認する。REQ 行の新設・追記を含む場合は、当該行の verification-scope-catalog 登録範囲への追随要否を確認し、必要なカタログエントリ追加を Definition Package の構成要素として含める。カタログ編集は実変更であるため Definition PR 経由以外の適用経路を取らない（直接 main へ適用しない）。カタログ登録が不要と判断した場合は、その判断理由を Definition Package 構成案に記録する
+3. `realization_actions` は Definition Package の構成要素として保持する（構造化ハンドオフ: DEC-{N}）。case-open が execution contract を確定しない
+4. 生成した Definition Package を Root Case に関連付ける（Root Case 本文の Definition Package セクションへ所在を記録する）
+5. Definition Package の構成、索引・補助メタデータの具体形式は definition-readiness Design の管理下とする
 
 ## Result
 
@@ -50,6 +53,7 @@
 
 - Root Case 本文に対象 REQ 番号が埋め込まれていること
 - Definition Package が Root Case に関連付けられ、構成要素が揃っていること
+- REQ 行追加を伴う場合は verification-scope-catalog 追随要否の確認（必要エントリの Definition 包含、または不要判断の記録）が行われていること
 - 状態が open であり実装開始が許可されていないこと
 
 ## Resume-Idempotency
