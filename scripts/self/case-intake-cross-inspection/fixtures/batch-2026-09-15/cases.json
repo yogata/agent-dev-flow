@@ -142,7 +142,7 @@
     {
       "area_id": "traceability-policy",
       "display_name": "トレーサビリティポリシー（要約スナップショット）",
-      "kind": "traceability-policy",
+      "kind": "adf-covers-declarations",
       "file_paths": ["policy.snapshot.yaml"]
     }
   ]
