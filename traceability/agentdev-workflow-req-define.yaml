@@ -2,3 +2,6 @@ component: agentdev-workflow-req-define
 implementation:
   src/opencode/skills/agentdev-workflow-req-define/SKILL.md:
     - REQ-005-029
+    - REQ-021-012
+    - REQ-021-023
+    - REQ-021-028
