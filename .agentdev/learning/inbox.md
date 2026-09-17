@@ -5,6 +5,24 @@
 
 ---
 
+## 2026-09-17: agentdev_gh issue_list が大規模リポジトリで safety page limit に到達し search フィルタ付きでも失敗する
+
+- **問題事象**: Custom Tool agentdev_gh の issue_list 操作が、search フィルタの有無（title substring、state=open 等）にかかわらず safety page limit（10ページ×100件）に到達して operation-failed となり、case-open の冪等検出入口（既存 Root Case / Definition PR の検索）が Tool 経由では完結しない。
+- **発生局面**: case-open STEP-5 冪等確認の事前冪等検出（Case #2936。Issue 総数 2900+ のリポジトリ）。
+- **検知方法**: issue_list 応答の failure detail「issue_list reached the safety page limit (10 pages of 100); narrow the filters (state, labels, kind, trackingState, search) and retry」。state=open、search 付きの再試行でも同様に失敗。
+- **根本原因**: Issue 総数が Tool 側の走査上限を超えており、検索条件の絞り込みが Tool 内部走査の page limit 到達を回避できていない。search は title 部分一致であり、失敗はフィルタ指定の有無に依存しない。
+- **自律対応内容**: Tool 応答の contingency（fallbacks: gh CLI 読み取り系の手動実行）に従い `gh issue list --state open --json number,title` と `gh pr list --state open` で既存 Root Case / Definition PR の不在を確認。closed 側も gh CLI で補完検索し、同 topic の旧 Case（#2358）が別 RU 由来の完了済み Case であることを確認して新規作成経路を確定した。
+- **ユーザー確認の有無**: なし（Tool contingency 内の読み取り系フォールバック）。
+- **Decision/REQ/spec影響**: なし（REQ-011 の読み取り系 gh CLI fallback は既存契約）。
+- **横展開観点**: 2900+ Issue 規模のリポジトリでは issue_list 依存の手順（case-open 冪等検出、case-ready 構成検証等）は gh CLI fallback が実質必須。page limit 失敗時は再試行を繰り返さず直ちに state=open 付き gh CLI へ切替えるのが低コスト。
+- **再発条件**: Issue 総数が Tool 走査上限を超えた状態で issue_list を呼ぶ場合に毎回発生。
+- **予防策候補**: agentdev-issue-management の Issue 検索安全手順へ「大規模リポジトリでは state=open 絞り込み付き gh CLI を第一手段とする」追記、または agentdev_gh issue_list へ絞り込み不足の早期検知（page limit 到達前の件数プリチェック）を検討。
+- **想定反映先**: agentdev-issue-management（Issue 検索の安全手順）、agentdev-workflow-case-open / case-ready references（冪等検出手順）。
+- **関連**: Case #2936（Refs）、PR #2937（Refs）。
+- **タグ**: #agentdev-gh #issue-list #idempotency
+
+---
+
 ## 2026-09-17: 実装 PR 分岐後に先行 merge された main 側解消行が case-close の全 corpus check で新規 missing に誤解釈され得る
 
 - **問題事象**: 実装 PR の分岐以降に Definition Amendment（検証対応要否カタログ登録）や他 Case の解消 commit が先行 merge された状態で case-close を実行すると、PR HEAD worktree 起点の全 corpus traceability check で main 側で解消済みの行が「新規 missing-implementation / missing-verification」「unclassified」として列挙され、完了ゲートの誤差し戻しを招き得る。
@@ -392,3 +410,111 @@
 - **再発条件**: case-close の merge 後検証や main root で bun test 正規形を実行する全 case。
 - **予防策候補**: QG-4 機械受理基準の記録に「main root 実行時は worktree 実行結果との環境差を由来分類に明示」する項目追加の候補。
 - **想定反映先**: agentdev-quality-gates references（qg-4-final-acceptance.md の環境ラベル・fail 由来分類節）。
+
+---
+
+## 2026-09-18: BASELINE_CATEGORIES に producer-metadata が含まれず、汚染状態での buildBaseline が baseline 全体を null 化し得る
+
+- **問題事象**: distribution-boundary-baseline.ts の BASELINE_CATEGORIES に producer-metadata カテゴリが含まれない。配布閉包が汚染された状態で buildBaseline を実行すると producer-metadata エントリを含む baseline JSON が生成され、loadBaseline（parseBaseline）が未知カテゴリを棄却して baseline 全体が null になる非整合がある。現行は汚染 0 件で問題顕在化なし。
+- **発生局面**: case-run Wave 4-1（Case #2936。PR #2952 の producer_metadata_enforcement 既定 enforce 切替時の周辺コード確認）。
+- **検知方法**: enforce 切替の影響範囲確認での baseline 生成・読込経路の構造確認。
+- **根本原因**: DetectionCategory.producer-metadata の追加（Wave 2-3）に対し baseline カテゴリ一覧が追随更新されていない。
+- **自律対応内容**: 本 PR では変更しない（baseline 仕様は Wave 2-3 の所有。汚染 0 件で顕在化なし）。記録のみ。
+- **ユーザー確認の有無**: なし。
+- **Decision/REQ/spec影響**: 記録のみ。baseline に producer-metadata を加えるか buildBaseline 側で除外するかの設計判断は別途。
+- **横展開観点**: 検出カテゴリ追加時は baseline カテゴリ一覧と parseBaseline の棄却ロジックの同時更新をセットで扱うべき。
+- **再発条件**: 配布閉包に producer-metadata 混入がある状態で baseline を再生成した場合。
+- **予防策候補**: BASELINE_CATEGORIES への producer-metadata 追加、または buildBaseline 側での producer-metadata 除外。
+- **想定反映先**: distribution-boundary-baseline.ts（Wave 2-3 仕様の所有範囲）、REQ-029 隣接。
+- **関連**: Case #2936（Refs）、PR #2952（Refs）。
+- **タグ**: #distribution-boundary #baseline #producer-metadata
+
+---
+
+## 2026-09-18: テスト fixture に実在しない REQ ID を書くと tim_declarations_contract の現行 REQ 行存在検査で不合格になる
+
+- **問題事象**: 配布境界検査テストの意図的混入 fixture に REQ-999-NNN のような実在しない REQ ID を記述したところ、tim_declarations_contract.test.ts の現行 REQ 行存在検査（コーパス = docs/**.md + scripts/**.ts の ADF-COVERS 宣言）が不合格になった。実在 ID（REQ-029-010 等）へ修正して解消。
+- **発生局面**: case-run Wave 2-3（Case #2936。PR #2949 の fixture 作成時）。
+- **検知方法**: fixture 作成後の bun test 実行での tim_declarations_contract 不合格。
+- **根本原因**: fixture コードもコーパス走査対象に含まれるため、fixture 内の REQ ID も現行 REQ 行存在検査の対象になる。
+- **自律対応内容**: fixture の REQ ID を実在 ID へ修正（検査ロジックにとって ID の具体値は不問のため検証上の意図は不変）。
+- **ユーザー確認の有無**: なし。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: REQ ID を含むテスト fixture・サンプルコードを作成する全 Case で同様の制約が効く。実在しない ID によるテスト自立性確保と機械検査との互換性は両立しないため実在 ID を使う。
+- **再発条件**: REQ ID を含む新規 fixture・サンプルを作成した場合。
+- **予防策候補**: fixture 作成規約に「REQ ID は実在 ID を使用」を明記する候補。
+- **想定反映先**: repo-integrity テスト規約、REQ-019 隣接。
+- **関連**: Case #2936（Refs）、PR #2949（Refs）。
+- **タグ**: #test-fixture #req-id #corpus
+
+---
+
+## 2026-09-18: Definition 変更（Wave 1 docs 更新）により既存テストの期待文言が陳腐化し、実装 Wave で先行 fail が混入する
+
+- **問題事象**: traceability_workflow_integration.test.ts の REQ-021-015/022 割り当て文言検査が Wave 1（Definition PR #2937）の docs 更新により陳腐化しており、本 PR 変更前から fail していた。本 PR で docs 現行文言へ期待を更新して解消。
+- **発生局面**: case-run Wave 2-1（Case #2936。PR #2948）。
+- **検知方法**: worktree bun test 実行での本 PR 変更外テストの fail。
+- **根本原因**: docs（正規文言）を期待値とするテストは docs 変更と同一変更単位で更新されないと陳腐化する。Definition PR（docs 変更）ではテスト更新が行われない運用。
+- **自律対応内容**: 本 PR の変更対象テストとして docs 現行文言へ期待更新（traceability_* テストは本 Issue の変更対象）。
+- **ユーザー確認の有無**: なし。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: docs 現行文言を期待値とする文言検証テスト全般で、Definition 変更のたびに同種の先行 fail が混入し得る。
+- **再発条件**: docs 文言を期待値とするテストが存在し、Definition PR がその文言を変更した場合。
+- **予防策候補**: Definition 変更時にテスト更新担当を明示する規約の検討（REQ-019 の影響範囲検出 gate の適用範囲確認）。
+- **想定反映先**: REQ-019 影響範囲検出 gate、case-open/case-ready の Definition 品質検査。
+- **関連**: Case #2936（Refs）、PR #2948（Refs）。
+- **タグ**: #definition-pr #test-staleness #docs-test-coupling
+
+---
+
+## 2026-09-18: 同一 Wave 並列 Issue 間の fixture・API 依存は worktree 単独では解決不能で、統合待ち検証の明記運用が要る
+
+- **問題事象**: (1) Wave 2-2 の TS-001 該当部が参照する declarations 側 fixture は Wave 2-1 の成果物であり worktree に存在せず、同等検証への置換と統合時確認を要した（PR #2946）。(2) Wave 2-4 は policy.yaml 解決置換（#2939）・policy 読取 kind 実装（#2940）後に合格するテスト 15 fail が worktree で残留し、統合待ちを PR 本文に明記して管理した（PR #2947）。
+- **発生局面**: case-run Wave 2 並列実行（Case #2936）。
+- **検知方法**: worktree bun test での依存先不在 fail・統合待ち fail。
+- **根本原因**: Wave 並列 Issue 間で成果物（fixture・実装 API）の依存があると、各 worktree は Wave 兄弟の成果物を持たないため単独では全体合格できない。
+- **自律対応内容**: 依存先の同等検証への置換、統合待ち fail の PR 本文への明記、統合 bun test は先行 Wave マージ後の rebase で最終確認、を運用として実施。
+- **ユーザー確認の有無**: なし。
+- **Decision/REQ/spec影響**: なし（case-open の Wave 重複前置検出は変更対象ファイル重複を対象とし、fixture・API 依存は検出対象外）。
+- **横展開観点**: 並列 Wave 構成の Epic では、変更対象ファイルの重複がなくても fixture・API・期待文言依存で worktree 単独合格が崩れ得る。
+- **再発条件**: 同一 Wave の複数 Issue 間に fixture・API・期待文言の依存がある場合。
+- **予防策候補**: case-open 構成検証に Wave 内 Issue 間の成果物依存の前置検出観点を追加する候補。統合待ち検証の PR 本文明記を標準運用化。
+- **想定反映先**: agentdev-workflow-case-open（構成検証・Wave 重複前置検出）、agentdev-workflow-case-run（fan-in 時の統合 bun test）。
+- **関連**: Case #2936（Refs）、PR #2946（Refs）、PR #2947（Refs）。
+- **タグ**: #epic-wave #parallel-issues #fixture-dependency #integration-deferred
+
+---
+
+## 2026-09-18: 検証対応要否カタログ（policy.yaml 移行元）に現行要件が存在しない欠番行 28 件が含まれていた
+
+- **問題事象**: verification-scope-catalog の範囲記述（REQ-003-021..056 等）に現行要件が存在しない欠番行（REQ-003-025/027/030..054、REQ-011-004）が 28 件含まれていた。policy.yaml への移行時、unknown-req-ref 回避のため現行 737 行のみを移行し欠番行は除外。
+- **発生局面**: case-run Wave 4-1（Case #2936。PR #2952 の policy 移行時）。
+- **検知方法**: 移行対象列挙と現行 REQ 行集合の突合。
+- **根本原因**: カタログの範囲列挙（..等）が要件行の採番変更・欠番を追従していない棚卸し品質の課題。
+- **自律対応内容**: 欠番行は移行対象から除外（policy に残すと unknown-req-ref になる安全側除外）し、検証差分に記録。
+- **ユーザー確認の有無**: なし。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: 要件行の採番・削除運用では範囲列挙型の登録物（カタログ・policy・索引）の追随が漏れやすい。policy.yaml は列挙型のため範囲列挙より追随品質は高いが、新規行追加時の policy 追随運用は別途の注意点。
+- **再発条件**: 要件行の削除・欠番後にカタログ・policy 系の登録物を棚卸ししない場合。
+- **予防策候補**: REQ 行削除時の登録物追随チェック（policy・索引・カタログ系）を docs-check 観点へ追加する候補。
+- **想定反映先**: REQ-030 系、inspect-docs の REQ 構造診断。
+- **関連**: Case #2936（Refs）、PR #2952（Refs）。
+- **タグ**: #policy-yaml #req-numbering #catalog-migration
+
+---
+
+## 2026-09-18: lint-skills description 長 NG 2件と check_integrity AUTOGEN 滞留は main で恒常再現する pre-existing として棚卸し記録した
+
+- **問題事象**: (1) lint-skills delta NG 2件（agentdev-workflow-case-ready description 743 chars、case-revise 663 chars の 600 上限超過）と aggregate budget warning。(2) check_integrity の index-generation-consistency（req-metrics-measurement-example AUTOGEN block out of sync）。いずれも本 Case 変更と無関係に main @ c421a4b4 で同一再現を確認済み。
+- **発生局面**: case-run Wave 3（Case #2936。PR #2950、PR #2951 検証時）。
+- **検知方法**: skill 構造 lint・check_integrity の base との同一再現確認（baseline 再現手順）。
+- **根本原因**: (1) workflow スキル本文更新で description が肥大した履歴。(2) AUTOGEN ブロックの生成日付刻印と再生成運用の欠如。
+- **自律対応内容**: pre-existing として分類し本 Case では変更しない。対処候補を記録。
+- **ユーザー確認の有無**: なし。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: SKILL.md の description は機能追加のたびに肥大しやすく、600 上限運用は本文更新 Case での同時短縮が要る。AUTOGEN 系は日付跨ぎや REQ 行増減で滞留しやすい。
+- **再発条件**: (1) description 制約に触れる本文更新 Case。(2) generate_indexes 再生成を伴わない REQ 行変動 Case の日付跨ぎ。
+- **予防策候補**: (1) description 一括短縮の別 Case 化。(2) generate_indexes.ts 再生成の標準工程化または日付刻印の据え置き仕様。
+- **想定反映先**: agentdev-skill-authoring（description 規約）、integrity 規約（IR-061 運用）、backlog 対応候補。
+- **関連**: Case #2936（Refs）、PR #2950（Refs）、PR #2951（Refs）。
+- **タグ**: #lint-skills #description-length #autogen #pre-existing
