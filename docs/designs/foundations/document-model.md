@@ -2,9 +2,10 @@
 title: 文書モデル
 status: accepted
 created: 2026-08-20
-updated: "2026-09-03"
+updated: "2026-09-17"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-001, REQ-001-002, REQ-001-003, REQ-001-004, REQ-001-005, REQ-001-006, REQ-001-007, REQ-001-020, REQ-001-035, REQ-001-038, REQ-001-039, REQ-001-040, REQ-001-041, REQ-001-052 -->
+<!-- ADF-COVERS(implementation): REQ-001-066, REQ-001-067, REQ-001-068 -->
 <!-- ADF-COVERS(implementation): REQ-049-019 -->
 <!-- ADF-COVERS(implementation): REQ-057-001 -->
 
