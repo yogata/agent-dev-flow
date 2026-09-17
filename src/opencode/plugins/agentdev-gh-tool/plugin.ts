@@ -137,7 +137,6 @@ export const REQUEST_PROPERTY_SCHEMA = {
     reason: { type: "string", enum: ["completed", "not_planned"], description: "Close reason for issue_close." },
     base: { type: "string", description: "Base branch for pr_create." },
     head: { type: "string", description: "Head branch for pr_create." },
-    draft: { type: "boolean", description: "Draft flag for pr_create." },
     method: { type: "string", enum: ["merge", "squash", "rebase"], description: "Merge method for pr_merge." },
   },
   required: ["operation"],

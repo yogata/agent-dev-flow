@@ -670,12 +670,25 @@ describe("LocalRunner: 論理 PR 本文（3セクション直列化と PR タイ
     if (read.ok) {
       const payload = read.payload as Record<string, unknown>;
       expect(payload.title).toBe("旧タイトル");
+      expect(payload.isDraft).toBe(false);
       const body = String(payload.body);
       expect(body.indexOf("## マージ前確認")).toBeLessThan(body.indexOf("## Design確定候補"));
       expect(body.indexOf("## Design確定候補")).toBeLessThan(body.indexOf("## Findings / Capture候補"));
       expect(body).toContain("### PR title: 旧タイトル");
       expect(body).toContain("マージ前確認本文");
       expect(body).toContain("### intake");
+    }
+    fs.rmSync(issuesDir, { recursive: true, force: true });
+  });
+
+  test("Local backend の pr_read は isDraft: false を固定で返す（GitHub Draft PR 相当状態を持たない）", async () => {
+    const issuesDir = makeIssuesDir();
+    await setupPrIssue(issuesDir);
+    const read = await run(issuesDir, { operation: "pr_read", args: { number: 1 } });
+    expect(read.ok).toBe(true);
+    if (read.ok) {
+      const payload = read.payload as Record<string, unknown>;
+      expect(payload.isDraft).toBe(false);
     }
     fs.rmSync(issuesDir, { recursive: true, force: true });
   });

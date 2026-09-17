@@ -602,7 +602,6 @@ export class CliRunner implements GhRunner {
       head: args.head,
       base: args.base,
     };
-    if (args.draft === true) body.draft = true;
     return this.apiWithInput("POST", `repos/${this.repo}/pulls`, body, (rec) => {
       const number = rec.number;
       const url = str(rec.html_url);
@@ -613,7 +612,7 @@ export class CliRunner implements GhRunner {
     });
   }
 
-  /** `gh pr view --json` を使う読み取り（pr_read / pr_mergeable）。mergeable は時間変動値のため単一読取の正規化結果を返す。 */
+  /** `gh pr view --json` を使う読み取り（pr_read / pr_mergeable）。mergeable は時間変動値のため単一読取の正規化結果を返す。isDraft は GitHub Draft 状態の観測値（REQ-{NNNN}-{NNN}）。 */
   private prView(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
     if (number === null) return this.fail("pr view requires number", 0, "invalid-input");
@@ -624,7 +623,7 @@ export class CliRunner implements GhRunner {
       "--repo",
       this.repo,
       "--json",
-      "number,title,body,state,mergeable",
+      "number,title,body,state,mergeable,isDraft",
     ]);
     if (!r.ok) return r;
     if (!isRecord(r.payload)) {
@@ -635,10 +634,13 @@ export class CliRunner implements GhRunner {
     const body = str(rec.body) ?? "";
     const state = normalizePrState(rec.state);
     const mergeable = str(rec.mergeable);
+    if (typeof rec.isDraft !== "boolean") {
+      return this.fail("pr view reply missing isDraft", 0);
+    }
     if (title === null || state === null || mergeable === null) {
       return this.fail("pr view reply missing title/state/mergeable", 0);
     }
-    return { ok: true, payload: { number, title, body, state, mergeable } };
+    return { ok: true, payload: { number, title, body, state, mergeable, isDraft: rec.isDraft } };
   }
 
   private prUpdate(args: Record<string, unknown>): GhRunnerReply {

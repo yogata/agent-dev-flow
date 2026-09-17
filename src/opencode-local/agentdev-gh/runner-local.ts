@@ -1285,6 +1285,7 @@ export class LocalRunner implements GhRunner {
         body: this.serializePrBody(lines),
         state,
         mergeable: this.mergeableOf(target.parsed),
+        isDraft: false,
       },
     };
   }
