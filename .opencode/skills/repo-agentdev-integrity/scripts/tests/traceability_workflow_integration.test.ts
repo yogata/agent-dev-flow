@@ -112,7 +112,8 @@ describe("REQ-021-011〜022 の割り当て文言の存在", () => {
       file: "docs/designs/commands/case-run.md",
       phrases: [
         "そのファイルを要件へ自動的に対応付けない",
-        "対応宣言として正規成果物へ明示する",
+        // Wave 1（Definition PR #2937）で sidecar 配置先の文言へ更新された
+        "component / package 単位 sidecar へ作成・更新する",
       ],
     },
     {
@@ -174,7 +175,8 @@ describe("REQ-021-011〜022 の割り当て文言の存在", () => {
     {
       req: "REQ-021-022",
       file: "docs/designs/commands/case-close.md",
-      phrases: ["トレーサビリティ機能側の異常を区別する"],
+      // Wave 1（Definition PR #2937）で fail-closed 区別の文言へ更新された
+      phrases: ["対応完全性の合格として扱わず"],
     },
   ];
 

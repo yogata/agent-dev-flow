@@ -85,6 +85,7 @@ describe("派生 Graph が存在しない状態での3能力の動作（AC-001�
 
     const coverage = coverageByRequirement(scan.declarations, "REQ-910-001");
     expect(coverage.counts).toEqual({
+      decision: 0,
       design: 1,
       implementation: 1,
       verification: 1,
@@ -100,8 +101,9 @@ describe("派生 Graph が存在しない状態での3能力の動作（AC-001�
     const known = currentRequirementLineIds(ROOT);
     expect(known).toContain("REQ-910-001");
     const report = runChecks(scan, known, { completenessReqIds: ["REQ-910-001"] });
-    // 7種検査（invalid-catalog-refs 追加に伴い 6 → 7。フィクスチャにカタログはなく pass）
-    expect(report.summary).toEqual({ pass: 7, fail: 0 });
+    // 9種検査（missing-design / policy-invalid / duplicate-inconsistencies 追加に伴い 7 → 9。
+    // フィクスチャに sidecar・policy はなく pass）
+    expect(report.summary).toEqual({ pass: 9, fail: 0 });
   });
 });
 

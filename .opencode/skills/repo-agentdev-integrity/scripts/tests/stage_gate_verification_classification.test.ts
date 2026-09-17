@@ -1,19 +1,21 @@
 // ADF-COVERS(verification): REQ-021-023, REQ-021-024, REQ-021-025
 //
-// 検証対応要否分類の段階制ゲート（OU-2、Issue #2418、REQ-021-023〜025 工程契約面）の
-// fixture 検証（TS-004）。agentdev-traceability 配布スキルの解析コア
-// （scanCorpus、resolveVerificationScopeFromRoot、runChecks）で fixture コーパスから
-// 分類状態（未分類 = 検証対応宣言なし かつ 検証対応要否カタログ未登録、REQ-012-051）を導出し、
-// req-save（検出・記録、保存は失敗させない）/ case-open（Issue 作成停止）/
-// case-close（完了阻止、任意行保護）の3ゲート判定の状態遷移 (1)〜(7) を検証する。
+// 検証スコープポリシーと段階制ゲート（REQ-021-023〜025 工程契約面）の
+// fixture 検証。agentdev-traceability 配布スキルの解析コア
+// （scanCorpus、resolveVerificationPolicyFromRoot、runChecks）で fixture コーパスから
+// 要否判定（policy 未登録行 = 検証対応必須、明示登録行 = 任意、REQ-012-030）を導出し、
+// Definition 保存（記録、未登録を理由に失敗させない）/ case-open（Root Case 確立を
+// 妨げない）/ case-ready（policy 有効性と Design 対応の確認）/ case-close
+// （必須行の完了阻止、任意行保護）のゲート状態遷移を検証する。
 // あわせて3 Workflow Skill の工程契約文言の存在を検証する。
+// 旧「未分類」中間状態の導出（classification.ts）は policy 導入により廃止済みである。
 
 import { afterAll, describe, expect, it } from "bun:test";
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { scanCorpus } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/corpus.ts";
 import { runChecks } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/check.ts";
-import { resolveVerificationScopeFromRoot } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/verification_scope.ts";
+import { resolveVerificationPolicyFromRoot } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/verification_scope.ts";
 
 const REPO_ROOT = join(import.meta.dir, "..", "..", "..", "..", "..");
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
@@ -35,12 +37,20 @@ function implDeclComment(id: string): string {
 interface FixtureSpec {
   readonly reqId: string;
   readonly rows: readonly string[];
-  /** 検証対応要否カタログの任意行エントリ（未指定時はカタログを配置しない = 全行が検証対応必須） */
-  readonly catalogEntries?: readonly string[];
+  /** traceability/policy.yaml の optional 列挙（未指定時は policy を配置しない = 全行が検証対応必須） */
+  readonly policyOptional?: readonly string[];
+  /** policy.yaml を読取不能（ディレクトリ）にする（fail-closed 検証用） */
+  readonly policyUnreadable?: boolean;
   /** 検証対応宣言を持つ恒久検証手段を配置する要件行 */
   readonly verificationDeclarations?: readonly string[];
-  /** 実装対応宣言を配置する要件行（検証対応要否の分類状態とは独立させる） */
+  /** 実装対応宣言を配置する要件行 */
   readonly implementationDeclarations?: readonly string[];
+}
+
+function writeFixture(root: string, rel: string, lines: readonly string[]): void {
+  const filePath = join(root, rel);
+  mkdirSync(join(filePath, ".."), { recursive: true });
+  writeFileSync(filePath, lines.join("\n") + "\n", "utf-8");
 }
 
 function buildFixtureRoot(name: string, spec: FixtureSpec): string {
@@ -61,26 +71,15 @@ function buildFixtureRoot(name: string, spec: FixtureSpec): string {
     ].join("\n") + "\n",
     "utf-8",
   );
-  if (spec.catalogEntries && spec.catalogEntries.length > 0) {
-    mkdirSync(join(root, "docs", "designs", "foundations", "references"), { recursive: true });
-    writeFileSync(
-      join(
-        root,
-        "docs",
-        "designs",
-        "foundations",
-        "references",
-        "verification-scope-catalog.md",
-      ),
-      [
-        "# 検証対応要否カタログ",
-        "",
-        "## 任意行エントリ",
-        "",
-        ...spec.catalogEntries.map((entry) => `- ${entry}`),
-      ].join("\n") + "\n",
-      "utf-8",
-    );
+  if (spec.policyUnreadable) {
+    mkdirSync(join(root, "traceability", "policy.yaml"), { recursive: true });
+  } else if (spec.policyOptional && spec.policyOptional.length > 0) {
+    writeFixture(root, "traceability/policy.yaml", [
+      "verification:",
+      "  default: required",
+      "  optional:",
+      ...spec.policyOptional.map((id) => `    - ${id}`),
+    ]);
   }
   const artifactLines: string[] = ["// 段階ゲート検証の fixture 成果物"];
   for (const id of spec.implementationDeclarations ?? []) {
@@ -94,81 +93,98 @@ function buildFixtureRoot(name: string, spec: FixtureSpec): string {
   return root;
 }
 
-type RowState = "unclassified" | "optional" | "mandatory-covered";
+type RowState = "required-missing" | "optional" | "covered";
 
 interface GateFacts {
-  /** 未分類 = 検証対応宣言なし かつ 検証対応要否カタログ未登録（REQ-012-051） */
-  readonly unclassified: readonly string[];
-  /** 任意行（カタログ登録行）のうち検証対応宣言を持たない行（完了阻止理由にしない） */
+  /** 検証対応必須行（policy 未登録）のうち検証対応宣言を持たない行 */
+  readonly requiredMissing: readonly string[];
+  /** 任意行（policy 明示登録行）のうち検証対応宣言を持たない行（完了阻止理由にしない） */
   readonly optionalWithoutVerification: readonly string[];
-  /** 必須行（カタログ未登録）のうち検証対応宣言を持つ行 */
-  readonly mandatoryCovered: readonly string[];
+  /** 検証対応宣言を持つ行 */
+  readonly covered: readonly string[];
+  /** policy の要否判定が実行不能か（fail-closed 判定の根拠） */
+  readonly policyUnavailable: boolean;
 }
 
 /**
- * 導出定義（検証対応宣言の有無 + カタログ登録状態）から分類状態を直接導出し、
+ * 導出定義（検証対応宣言の有無 + policy 登録状態）から要否判定を直接導出し、
  * 工程ゲート手続きが利用する agentdev-traceability check の missing-verification
  * findings と一致することを突合する。
  */
 function deriveGateFacts(root: string, known: readonly string[], target: readonly string[]): GateFacts {
   const scan = scanCorpus(root);
-  const scope = resolveVerificationScopeFromRoot(root, known);
+  const policy = resolveVerificationPolicyFromRoot(root, known);
   const report = runChecks(scan, known, {
     completenessReqIds: target,
-    verificationScope: scope,
+    verificationPolicy: policy,
   });
 
   const hasVerification = (id: string): boolean =>
     scan.declarations.some((d) => d.role === "verification" && d.reqIds.includes(id));
-  const isRegistered = (id: string): boolean => scope.optionalReqIds.has(id);
+  const isRegistered = (id: string): boolean => policy.optionalReqIds.has(id);
   const stateOf = (id: string): RowState => {
     if (isRegistered(id)) return "optional";
-    return hasVerification(id) ? "mandatory-covered" : "unclassified";
+    return hasVerification(id) ? "covered" : "required-missing";
   };
 
-  const unclassified = target.filter((id) => stateOf(id) === "unclassified");
+  const requiredMissing = target.filter((id) => stateOf(id) === "required-missing");
   const optionalWithoutVerification = target.filter(
     (id) => stateOf(id) === "optional" && !hasVerification(id),
   );
-  const mandatoryCovered = target.filter((id) => stateOf(id) === "mandatory-covered");
+  const covered = target.filter((id) => stateOf(id) === "covered");
 
-  // 工程ゲート手続き（check の missing-verification findings を未分類行として採用）と
-  // 導出定義が同一の集合を返すことの突合
+  // 工程ゲート手続き（check の missing-verification findings を必須欠落行として採用）と
+  // 導出定義が同一の集合を返すことの突合。policy 判定不能時は check が
+  // fail-closed 計上（blocked finding）を行い、合格を返さない。
   const checkFindings = report.checks["missing-verification"].findings.map((f) => f.reqId);
-  expect(checkFindings).toEqual(unclassified);
+  if (policy.unavailable) {
+    expect(report.checks["missing-verification"].status).toBe("fail");
+  } else {
+    expect(checkFindings).toEqual(requiredMissing);
+  }
 
-  return { unclassified, optionalWithoutVerification, mandatoryCovered };
+  return { requiredMissing, optionalWithoutVerification, covered, policyUnavailable: policy.unavailable };
 }
 
-/** REQ-021-023: req-save は未分類行を検出・記録するが、未分類だけを理由に保存を失敗させない */
-function gateReqSave(facts: GateFacts): {
+/** REQ-021-023: Definition 保存は未登録（必須）行を記録するが、未登録だけを理由に保存を失敗させない */
+function gateDefinitionSave(facts: GateFacts): {
   readonly saveSucceeded: boolean;
-  readonly recordedUnclassifiedRows: readonly string[];
+  readonly recordedRequiredRows: readonly string[];
 } {
-  return { saveSucceeded: true, recordedUnclassifiedRows: facts.unclassified };
+  return { saveSucceeded: true, recordedRequiredRows: facts.requiredMissing };
 }
 
-/** REQ-021-024: case-open は未分類行の残存を停止条件とする（Issue を作成しない） */
-function gateCaseOpen(facts: GateFacts): { readonly issueCreated: boolean } {
-  return { issueCreated: facts.unclassified.length === 0 };
+/** REQ-021-024: case-open は policy 未登録行の残存があっても Root Case の確立を妨げない */
+function gateCaseOpen(_facts: GateFacts): { readonly issueCreated: boolean } {
+  return { issueCreated: true };
 }
 
 /**
- * REQ-021-025: case-close は未分類行の残存、および検証対応必須行への恒久検証対応の
- * 欠落を完了として扱わない。検証対応任意行に恒久的な検証手段が存在しないことだけを
+ * REQ-021-024: case-ready は対象要件行に Design 対応1件以上が存在し、
+ * 検証スコープポリシーが有効であることを ready への遷移の必要条件として扱う。
+ * policy が判定不能な場合、対応完全性の合格は返らない（fail-closed）。
+ */
+function gateCaseReady(facts: GateFacts): { readonly ready: boolean } {
+  if (facts.policyUnavailable) return { ready: false };
+  return { ready: true };
+}
+
+/**
+ * REQ-021-025: case-close は対象要件行の Design 対応、実装対応、検証対応
+ * （policy が required と判定する要件行）の恒久的な対応が存在しない場合、
+ * 完了として扱わない。任意行に恒久的な検証手段が存在しないことだけを
  * 理由として完了を阻害しない。
  */
 function gateCaseClose(facts: GateFacts): {
   readonly treatedAsComplete: boolean;
   readonly blockReasons: readonly string[];
 } {
-  const missingMandatoryPermanentVerification = facts.unclassified.filter(
-    (id) => !facts.optionalWithoutVerification.includes(id),
-  );
   const blockReasons: string[] = [];
-  if (facts.unclassified.length > 0) blockReasons.push("unclassified-remaining");
-  if (missingMandatoryPermanentVerification.length > 0) {
-    blockReasons.push("mandatory-missing-permanent-verification");
+  if (facts.requiredMissing.length > 0) {
+    blockReasons.push("required-missing-permanent-verification");
+  }
+  if (facts.policyUnavailable) {
+    blockReasons.push("policy-evaluation-unavailable");
   }
   return { treatedAsComplete: blockReasons.length === 0, blockReasons };
 }
@@ -177,124 +193,129 @@ afterAll(() => {
   rmSync(BASE_ROOT, { recursive: true, force: true });
 });
 
-describe("TS-004: 検証対応要否分類の段階ゲート状態遷移", () => {
-  const UNCLASSIFIED_ROWS = ["REQ-910-001", "REQ-910-002", "REQ-910-003"];
+describe("検証スコープポリシーと段階ゲート状態遷移", () => {
+  const ALL_REQUIRED_ROWS = ["REQ-910-001", "REQ-910-002", "REQ-910-003"];
 
-  it("(1) 未分類要件行を含む要件の req-save が成功し、未分類行が記録される", () => {
-    const root = buildFixtureRoot("unclassified-remaining", {
+  it("(1) policy 未登録行を含む要件の Definition 保存が成功し、必須行が記録される（REQ-021-023）", () => {
+    const root = buildFixtureRoot("required-remaining", {
       reqId: "REQ-910",
-      rows: UNCLASSIFIED_ROWS,
-      // 実装対応は検証対応要否の分類状態と独立することを示すため全行に配置する
-      implementationDeclarations: UNCLASSIFIED_ROWS,
-      // 検証対応宣言もカタログ登録もないため全行が未分類になる
+      rows: ALL_REQUIRED_ROWS,
+      // 実装対応は要否判定と独立することを示すため全行に配置する
+      implementationDeclarations: ALL_REQUIRED_ROWS,
+      // policy も検証対応宣言もないため全行が必須欠落になる
     });
-    const facts = deriveGateFacts(root, UNCLASSIFIED_ROWS, UNCLASSIFIED_ROWS);
-    expect(facts.unclassified).toEqual(UNCLASSIFIED_ROWS);
+    const facts = deriveGateFacts(root, ALL_REQUIRED_ROWS, ALL_REQUIRED_ROWS);
+    expect(facts.requiredMissing).toEqual(ALL_REQUIRED_ROWS);
 
-    const result = gateReqSave(facts);
+    const result = gateDefinitionSave(facts);
     expect(result.saveSucceeded).toBe(true);
-    expect(result.recordedUnclassifiedRows).toEqual(UNCLASSIFIED_ROWS);
+    expect(result.recordedRequiredRows).toEqual(ALL_REQUIRED_ROWS);
   });
 
-  it("(2) 未分類行が残るまま case-open を実行すると停止する（Issue を作成しない）", () => {
-    const root = buildFixtureRoot("unclassified-remaining", {
+  it("(2) policy 未登録行の残存があっても case-open は Root Case を確立する（REQ-021-024）", () => {
+    const root = buildFixtureRoot("open-with-required", {
       reqId: "REQ-910",
-      rows: UNCLASSIFIED_ROWS,
-      implementationDeclarations: UNCLASSIFIED_ROWS,
+      rows: ALL_REQUIRED_ROWS,
+      implementationDeclarations: ALL_REQUIRED_ROWS,
     });
-    const facts = deriveGateFacts(root, UNCLASSIFIED_ROWS, UNCLASSIFIED_ROWS);
-
-    const result = gateCaseOpen(facts);
-    expect(result.issueCreated).toBe(false);
-  });
-
-  it("(3) 全行を検証対応必須または任意へ分類すると停止が解除される", () => {
-    const rows = ["REQ-911-001", "REQ-911-002"];
-    const root = buildFixtureRoot("classified", {
-      reqId: "REQ-911",
-      rows,
-      // 001 は検証対応宣言を持つ恒久検証手段で必須分類、002 はカタログ登録で任意分類
-      verificationDeclarations: ["REQ-911-001"],
-      catalogEntries: ["REQ-911-002: 実行時振る舞いを規定する要件行"],
-    });
-    const facts = deriveGateFacts(root, rows, rows);
-    expect(facts.unclassified).toEqual([]);
-    expect(facts.mandatoryCovered).toEqual(["REQ-911-001"]);
-    expect(facts.optionalWithoutVerification).toEqual(["REQ-911-002"]);
+    const facts = deriveGateFacts(root, ALL_REQUIRED_ROWS, ALL_REQUIRED_ROWS);
+    expect(facts.requiredMissing).toEqual(ALL_REQUIRED_ROWS);
 
     const result = gateCaseOpen(facts);
     expect(result.issueCreated).toBe(true);
   });
 
-  it("(4) 未分類行が残る状態で case-close を実行すると完了できない", () => {
+  it("(3) policy 明示登録行は任意、未登録行は必須と判定される", () => {
+    const rows = ["REQ-911-001", "REQ-911-002"];
+    const root = buildFixtureRoot("classified", {
+      reqId: "REQ-911",
+      rows,
+      // 001 は検証対応宣言を持つ必須行、002 は policy 登録の任意行
+      verificationDeclarations: ["REQ-911-001"],
+      policyOptional: ["REQ-911-002"],
+      implementationDeclarations: rows,
+    });
+    const facts = deriveGateFacts(root, rows, rows);
+    expect(facts.requiredMissing).toEqual([]);
+    expect(facts.covered).toEqual(["REQ-911-001"]);
+    expect(facts.optionalWithoutVerification).toEqual(["REQ-911-002"]);
+
+    const open = gateCaseOpen(facts);
+    expect(open.issueCreated).toBe(true);
+  });
+
+  it("(4) 必須行の検証対応が欠落した状態で case-close を実行すると完了できない（REQ-021-025）", () => {
     const rows = ["REQ-912-001", "REQ-912-002"];
-    const root = buildFixtureRoot("close-unclassified", {
+    const root = buildFixtureRoot("close-required-missing", {
       reqId: "REQ-912",
       rows,
-      // 002 は宣言もカタログ登録もない未分類行として残存させる
+      // 002 は policy 未登録（必須）で検証対応が欠落する
       verificationDeclarations: ["REQ-912-001"],
       implementationDeclarations: rows,
     });
     const facts = deriveGateFacts(root, rows, rows);
-    expect(facts.unclassified).toEqual(["REQ-912-002"]);
+    expect(facts.requiredMissing).toEqual(["REQ-912-002"]);
 
     const result = gateCaseClose(facts);
     expect(result.treatedAsComplete).toBe(false);
-    expect(result.blockReasons).toContain("unclassified-remaining");
+    expect(result.blockReasons).toContain("required-missing-permanent-verification");
   });
 
-  it("(5) 検証対応必須行の恒久検証対応が欠落した状態で case-close を実行すると完了できない", () => {
+  it("(5) 任意行の検証対応欠落だけでは case-close は完了を阻害しない（REQ-021-025）", () => {
     const rows = ["REQ-913-001", "REQ-913-002"];
-    const root = buildFixtureRoot("close-mandatory-missing", {
+    const root = buildFixtureRoot("close-optional-no-test", {
       reqId: "REQ-913",
       rows,
-      // 002 は必須行（カタログ未登録）であり、実装対応宣言はあるが恒久検証対応（検証対応宣言）が欠落する
+      // 002 は policy 登録の任意行で検証対応を持たない。これだけでは完了を阻害しない
       verificationDeclarations: ["REQ-913-001"],
+      policyOptional: ["REQ-913-002"],
       implementationDeclarations: rows,
     });
     const facts = deriveGateFacts(root, rows, rows);
-    expect(facts.unclassified).toEqual(["REQ-913-002"]);
+    expect(facts.requiredMissing).toEqual([]);
+    expect(facts.optionalWithoutVerification).toEqual(["REQ-913-002"]);
 
     const result = gateCaseClose(facts);
-    expect(result.treatedAsComplete).toBe(false);
-    expect(result.blockReasons).toContain("mandatory-missing-permanent-verification");
+    expect(result.treatedAsComplete).toBe(true);
+    expect(result.blockReasons).toEqual([]);
   });
 
-  it("(6) 全行分類済みかつ必須行に恒久検証対応が存在する場合、本要件起因の完了阻止が発生しない", () => {
+  it("(6) 全必須行に検証対応が存在する場合、本要件起因の完了阻止が発生しない（REQ-021-025）", () => {
     const rows = ["REQ-914-001", "REQ-914-002"];
     const root = buildFixtureRoot("close-all-covered", {
       reqId: "REQ-914",
       rows,
-      // 全行が必須行として分類済みで、いずれも検証対応宣言を持つ
+      // policy 未配置 = 全行必須。いずれも検証対応宣言を持つ
       verificationDeclarations: rows,
       implementationDeclarations: rows,
     });
     const facts = deriveGateFacts(root, rows, rows);
-    expect(facts.unclassified).toEqual([]);
-    expect(facts.mandatoryCovered).toEqual(rows);
+    expect(facts.requiredMissing).toEqual([]);
+    expect(facts.covered).toEqual(rows);
 
     const result = gateCaseClose(facts);
     expect(result.treatedAsComplete).toBe(true);
     expect(result.blockReasons).toEqual([]);
   });
 
-  it("(7) 任意行に恒久テストが存在しないことだけを理由として case-close が失敗しない", () => {
+  it("(7) policy が判定不能な場合、case-ready / case-close は fail-closed で停止する（REQ-021-024、REQ-021-025）", () => {
     const rows = ["REQ-915-001", "REQ-915-002"];
-    const root = buildFixtureRoot("close-optional-no-test", {
+    const root = buildFixtureRoot("close-policy-unreadable", {
       reqId: "REQ-915",
       rows,
-      // 002 は任意行（カタログ登録）で検証対応宣言を持たない。これだけでは完了を阻害しない
-      verificationDeclarations: ["REQ-915-001"],
-      catalogEntries: ["REQ-915-002: 実行時振る舞いを規定する要件行"],
+      // policy.yaml をディレクトリ化して読取不能を再現する
+      policyUnreadable: true,
+      verificationDeclarations: rows,
       implementationDeclarations: rows,
     });
     const facts = deriveGateFacts(root, rows, rows);
-    expect(facts.unclassified).toEqual([]);
-    expect(facts.optionalWithoutVerification).toEqual(["REQ-915-002"]);
+    expect(facts.policyUnavailable).toBe(true);
 
-    const result = gateCaseClose(facts);
-    expect(result.treatedAsComplete).toBe(true);
-    expect(result.blockReasons).toEqual([]);
+    const ready = gateCaseReady(facts);
+    expect(ready.ready).toBe(false);
+    const close = gateCaseClose(facts);
+    expect(close.treatedAsComplete).toBe(false);
+    expect(close.blockReasons).toContain("policy-evaluation-unavailable");
   });
 });
 
@@ -305,7 +326,7 @@ describe("段階ゲートの工程契約文言（3 Workflow Skill）", () => {
 
   it.each([
     // req-save 系（SKILL、references、Design）は Issue #2810（DEC-029）で廃止済みのため検査対象から除去した。
-    // 未分類検出・記録（段階ゲート）の割り当て先再設定は REQ-021 側の更新（後続工程）で対応する。
+    // Definition 保存工程の割り当て先は REQ-021 側の更新（後続工程）で対応する。
     {
       file: "src/opencode/skills/agentdev-workflow-case-open/SKILL.md",
       // REQ-030 縮小後: case-open は未分類行が残っても Root Case 確立を妨げない（REQ-021-024）。

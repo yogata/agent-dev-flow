@@ -19,7 +19,13 @@ export interface CoverageByRequirement {
   readonly mode: "requirement";
   readonly reqId: string;
   readonly relations: readonly CoverageRelation[];
-  readonly counts: { readonly design: number; readonly implementation: number; readonly verification: number; readonly total: number };
+  readonly counts: {
+    readonly decision: number;
+    readonly design: number;
+    readonly implementation: number;
+    readonly verification: number;
+    readonly total: number;
+  };
   /** 全件返却の明示。切り捨て経路が存在しないため常に false。 */
   readonly truncated: false;
   readonly emptyResult: boolean;
@@ -43,7 +49,7 @@ function byFileLine(a: CoverageRelation | CoverDeclaration, b: CoverageRelation 
   return a.file === b.file ? a.line - b.line : a.file < b.file ? -1 : 1;
 }
 
-/** 要件起点: 当該要件へ対応する Design 文書、実装成果物、検証手段を役割付きで全件返す。 */
+/** 要件起点: 当該要件へ対応する Decision、Design 文書、実装成果物、検証手段を役割付きで全件返す。 */
 export function coverageByRequirement(
   declarations: readonly CoverDeclaration[],
   reqId: string,
@@ -58,6 +64,7 @@ export function coverageByRequirement(
     reqId,
     relations,
     counts: {
+      decision: count("decision"),
       design: count("design"),
       implementation: count("implementation"),
       verification: count("verification"),

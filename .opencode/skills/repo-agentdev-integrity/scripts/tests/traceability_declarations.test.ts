@@ -2,12 +2,15 @@
 //
 // agentdev-traceability 配布スキルの ADF-COVERS 対応宣言の解析仕様検証
 // （行単位パターン照合、和集合、意味推定なし）と配置・構造
-// （lib 解析コアと CLI の分離）の検証（OU-002、Issue #2360）。
+// （lib 解析コアと CLI の分離）、および TIM 4役割（decision / design /
+// implementation / verification）の解析（TS-001、DEC-030 決定1）を検証する。
 
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
-import { mkdirSync, readFileSync, rmSync } from "node:fs";
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseDeclarations } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/declarations.ts";
+import { scanCorpus } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/corpus.ts";
+import { runChecks } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/check.ts";
 
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `trace-decls-${crypto.randomUUID().slice(0, 8)}`;
@@ -43,9 +46,51 @@ describe("対応宣言の解析", () => {
       reqIds: ["REQ-900-001"],
       file: "a.md",
       line: 1,
+      source: "inline",
+      sourceFile: "a.md",
     });
     expect(declarations[1]?.reqIds).toEqual(["REQ-900-001", "REQ-900-002"]);
     expect(declarations[2]?.reqIds).toEqual(["REQ-900-003", "REQ-900-004"]);
+  });
+
+  it("TIM 4役割（decision / design / implementation / verification）の宣言を解析する（TS-001）", () => {
+    const content = [
+      decl("decision", "REQ-900-001"),
+      decl("design", "REQ-900-001"),
+      decl("implementation", "REQ-900-001"),
+      decl("verification", "REQ-900-001"),
+    ].join("\n");
+    const { declarations, issues } = parseDeclarations("four-roles.md", content);
+    expect(issues).toEqual([]);
+    expect(declarations).toHaveLength(4);
+    expect(declarations.map((d) => d.role)).toEqual([
+      "decision",
+      "design",
+      "implementation",
+      "verification",
+    ]);
+  });
+
+  it("4役割の完全性規則を機械判定する（decision 0件は不合格にしない、TS-001）", () => {
+    // decision 役割を1件も含まない完全充足コーパス。decision 0件のみを理由に
+    // 不合格としない（REQ-012-028、REQ-012-036）。
+    const KNOWN = ["REQ-900-001", "REQ-900-002"];
+    const write = (rel: string, lines: readonly string[]) => {
+      const filePath = join(TEMP_ROOT, rel);
+      mkdirSync(join(filePath, ".."), { recursive: true });
+      writeFileSync(filePath, lines.join("\n") + "\n", "utf-8");
+    };
+    write("completeness/design.md", [decl("design", "REQ-900-001, REQ-900-002")]);
+    write("completeness/impl.ts", [`// ${MARKER}(implementation): REQ-900-001, REQ-900-002`]);
+    write("completeness/verify.test.ts", [`// ${MARKER}(verification): REQ-900-001, REQ-900-002`]);
+    const scan = scanCorpus(TEMP_ROOT);
+    expect(scan.declarations.some((d) => d.role === "decision")).toBe(false);
+    const report = runChecks(scan, KNOWN, { completenessReqIds: KNOWN });
+    expect(report.checks["missing-design"].status).toBe("pass");
+    expect(report.checks["missing-implementation"].status).toBe("pass");
+    expect(report.checks["missing-verification"].status).toBe("pass");
+    // Decision 欠落を計上する検査項目は存在しない
+    expect(Object.keys(report.checks).some((k) => k.includes("decision"))).toBe(false);
   });
 
   it("4桁第1セグメントの宣言行を単一ID・カンマ区切りリストともに解析する（第2セグメントは3桁維持）", () => {
@@ -61,6 +106,8 @@ describe("対応宣言の解析", () => {
       reqIds: ["REQ-0039-002"],
       file: "wide.md",
       line: 1,
+      source: "inline",
+      sourceFile: "wide.md",
     });
     expect(declarations[1]?.reqIds).toEqual(["REQ-0039-002", "REQ-1234-011"]);
   });

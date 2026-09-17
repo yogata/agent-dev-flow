@@ -1,6 +1,7 @@
-// check CLI。対応宣言コーパスの7種検査（lib/check.ts の公開契約）。
-// 検証対応要否カタログ（既定パス、不在時は全要件行が検証対応必須）も自動的に読み込む。
-// レポートには全現行要件行の分類状態導出（verificationClassification）を含む。
+// check CLI。対応関係コーパスの9種検査（lib/check.ts の公開契約）。
+// 検証スコープポリシー（traceability/policy.yaml、不在時は全要件行が検証対応必須）も
+// 自動的に読み込む。policy または sidecar の解決が実行不能な場合、対応完全性の
+// 合格を返さない（fail-closed）。
 //
 // 使い方:
 //   bun scripts/src/check.ts --root <repo-root>
@@ -13,7 +14,7 @@ import { fail, emitJson, normalizeArtifactPath, parseArgs, resolveRoot } from ".
 import { locateEvidence, scanCorpus } from "../lib/corpus.ts";
 import { runChecks } from "../lib/check.ts";
 import { currentRequirementLineIds } from "../lib/requirements.ts";
-import { resolveVerificationScopeFromRoot } from "../lib/verification_scope.ts";
+import { resolveVerificationPolicyFromRoot } from "../lib/verification_scope.ts";
 
 const args = parseArgs(process.argv.slice(2));
 const rootValue = args.get("root");
@@ -40,9 +41,9 @@ if (artifact) {
 
 const scan = scanCorpus(root);
 const knownReqIds = currentRequirementLineIds(root);
-const verificationScope = resolveVerificationScopeFromRoot(root, knownReqIds);
+const verificationPolicy = resolveVerificationPolicyFromRoot(root, knownReqIds);
 const report = runChecks(scan, knownReqIds, {
-  verificationScope,
+  verificationPolicy,
   ...(completenessReqIds ? { completenessReqIds } : {}),
   ...(evidenceArtifacts.length > 0 ? { evidenceArtifacts } : {}),
 });

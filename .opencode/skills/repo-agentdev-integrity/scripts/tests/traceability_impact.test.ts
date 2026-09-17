@@ -54,6 +54,14 @@ describe("impact（要件起点）", () => {
     expect(roles).toEqual(["design", "implementation", "verification"]);
   });
 
+  it("Decision 対応（decision 役割）を含む役割付き候補を返す（TS-006、RA-004）", () => {
+    writeFixture("docs/dec/d2.md", [decl("decision", "REQ-900-011")]);
+    writeFixture("src/i11.ts", [tsDecl("implementation", "REQ-900-011")]);
+    const { declarations } = scanCorpus(ROOT);
+    const result = impactByRequirement(declarations, "REQ-900-011");
+    expect(result.recheckCandidates.map((c) => c.role)).toEqual(["decision", "implementation"]);
+  });
+
   it("対応のない要件は空結果を明示し、影響なしの証明として扱わない（AC-005）", () => {
     const { declarations } = scanCorpus(ROOT);
     const result = impactByRequirement(declarations, "REQ-900-999");
