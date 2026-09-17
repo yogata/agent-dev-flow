@@ -5,6 +5,8 @@ created: 2026-09-14
 updated: "2026-09-17"
 ---
 
+<!-- ADF-COVERS(design): REQ-021-024 -->
+
 # case-ready Command Design
 
 ## 目的

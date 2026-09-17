@@ -1,0 +1,13 @@
+component: agentdev-workflow-case-revise
+implementation:
+  src/opencode/skills/agentdev-workflow-case-revise/SKILL.md:
+    - REQ-062-001
+    - REQ-062-002
+    - REQ-062-003
+    - REQ-062-004
+    - REQ-062-005
+    - REQ-062-006
+    - REQ-062-007
+    - REQ-062-008
+  src/opencode/skills/agentdev-workflow-case-revise/references/definition-revision.md:
+    - REQ-083-001

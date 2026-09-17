@@ -1,4 +1,3 @@
-<!-- ADF-COVERS(implementation): REQ-036-027 -->
 # 意味的診断観点の判定基準
 
 > **原本**: 正規な定義元の原則、同一契約再定義抑止の原則、artifact-responsibilities Design（責務分担マッピング、重複許容基準）。

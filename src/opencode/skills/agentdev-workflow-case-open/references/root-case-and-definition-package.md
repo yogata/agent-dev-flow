@@ -1,6 +1,5 @@
 # STEP-2 / STEP-3: Root Case 確立と Definition Package 生成（root-case-and-definition-package）
 
-<!-- ADF-COVERS(implementation): REQ-030-015 -->
 
 > 本 reference は `agentdev-workflow-case-open` SKILL.md の制御平面（STEP 一覧）STEP-2、STEP-3 詳細である。
 > SKILL.md は control plane として STEP 遷移を管理し、本 reference は両 STEP の実行詳細を提供する。

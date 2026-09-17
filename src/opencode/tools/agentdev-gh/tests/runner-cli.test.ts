@@ -1,4 +1,3 @@
-// ADF-COVERS(verification): REQ-011-025, REQ-011-026, REQ-011-027, REQ-011-029, REQ-011-030
 //
 // GitHub 実装（CliRunner）のテスト。
 //

@@ -1,4 +1,3 @@
-// ADF-COVERS(implementation): REQ-010-068, REQ-053-004, REQ-053-024, REQ-053-025, REQ-053-034, REQ-053-037
 // agentdev-textlint-guard 共通実行基盤: 規則構成と用語。
 //
 // 標準構成は textlint-rule-preset-ja-technical-writing、

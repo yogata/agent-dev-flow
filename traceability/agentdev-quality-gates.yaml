@@ -1,0 +1,6 @@
+component: agentdev-quality-gates
+implementation:
+  src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md:
+    - REQ-021-027
+    - REQ-060-005
+    - REQ-060-006

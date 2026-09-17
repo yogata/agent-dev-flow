@@ -1,4 +1,3 @@
-<!-- ADF-COVERS(implementation): REQ-032-027, REQ-021-027 -->
 # STEP-1/2: Issue 番号解決・QG-4 達成判定（issue-resolution-and-qg4）
 
 > 本 reference は `agentdev-workflow-case-close` SKILL.md の制御平面（STEP 一覧）STEP-1, STEP-2 詳細である。

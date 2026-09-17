@@ -1,0 +1,44 @@
+component: agentdev-workflow-case-open
+implementation:
+  src/opencode/skills/agentdev-workflow-case-open/SKILL.md:
+    - REQ-021-024
+    - REQ-030-001
+    - REQ-030-002
+    - REQ-030-003
+    - REQ-030-004
+    - REQ-030-005
+    - REQ-030-006
+    - REQ-030-007
+    - REQ-030-008
+    - REQ-030-009
+    - REQ-030-010
+    - REQ-030-011
+    - REQ-030-012
+    - REQ-030-013
+    - REQ-030-014
+    - REQ-030-015
+    - REQ-083-003
+  src/opencode/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md:
+    - REQ-083-001
+  src/opencode/skills/agentdev-workflow-case-open/references/root-case-and-definition-package.md:
+    - REQ-030-015
+  src/opencode/skills/agentdev-workflow-case-open/scripts/lib/cross_dependency_engine.ts:
+    - REQ-030-012
+    - REQ-030-013
+    - REQ-030-014
+    - REQ-061-029
+    - REQ-061-030
+    - REQ-061-031
+  src/opencode/skills/agentdev-workflow-case-open/scripts/lib/cross_dependency_types.ts:
+    - REQ-030-012
+    - REQ-030-013
+    - REQ-030-014
+    - REQ-061-029
+    - REQ-061-030
+    - REQ-061-031
+  src/opencode/skills/agentdev-workflow-case-open/scripts/lib/shared_area_registration.ts:
+    - REQ-061-030
+  src/opencode/skills/agentdev-workflow-case-open/scripts/src/inspect_cross_dependencies.ts:
+    - REQ-030-012
+    - REQ-061-029
+    - REQ-061-030

@@ -1,4 +1,3 @@
-<!-- ADF-COVERS(implementation): REQ-061-032, REQ-061-033, REQ-083-001 -->
 # Definition 受入と canonical 再取得（STEP-1 / STEP-2）
 
 Definition PR の受入判定と merge、canonical Definition 再取得の実行時詳細である。

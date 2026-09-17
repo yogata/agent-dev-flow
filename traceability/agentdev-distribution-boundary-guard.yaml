@@ -1,0 +1,4 @@
+component: agentdev-distribution-boundary-guard
+verification:
+  src/opencode/plugins/agentdev-distribution-boundary-guard/tests/plugin.test.ts:
+    - REQ-029-010

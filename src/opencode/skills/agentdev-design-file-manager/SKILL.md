@@ -3,7 +3,6 @@ name: agentdev-design-file-manager
 description: Manages Design file operations (CREATE/APPEND/UPDATE), placement resolution, target_area section replacement, Design-specific integrity, and Design-specific script invocation contract. USE FOR: creating Design files, appending sections, updating Designs via target_area, Design lifecycle (draft/accepted) application. DO NOT USE FOR: REQ/Decision operations, Design content inference, accepted promotion, user approval, commit, push.
 ---
 
-<!-- ADF-COVERS(implementation): REQ-021-026, REQ-057-036 -->
 
 # Designファイル管理
 

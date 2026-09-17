@@ -1,5 +1,3 @@
-// ADF-COVERS(verification): REQ-053-031, REQ-053-032, REQ-053-033, REQ-053-039, REQ-010-075
-// ADF-COVERS(verification): REQ-052-002
 //
 // TS-008: 二入口の同一性と bypass 検出。
 // - 同じ全文、パス、規則と設定を pre-write と最終検査へ入力して比較する

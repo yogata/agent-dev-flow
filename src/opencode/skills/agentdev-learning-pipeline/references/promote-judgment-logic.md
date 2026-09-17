@@ -2,7 +2,6 @@
 
 <!-- 元コマンド: learning-promote.md -->
 <!-- 抽出日: 2026-06-07 -->
-<!-- ADF-COVERS(implementation): REQ-057-026 -->
 
 learning-promote コマンドの Steps における判定ロジック（旧フォーマット正規化、問題クラス分類、8軸評価、廃棄判定、HITL承認）を定義する。
 

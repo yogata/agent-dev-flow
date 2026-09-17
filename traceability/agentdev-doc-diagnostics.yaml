@@ -1,0 +1,4 @@
+component: agentdev-doc-diagnostics
+implementation:
+  src/opencode/skills/agentdev-doc-diagnostics/references/diagnostic-categories.md:
+    - REQ-036-026

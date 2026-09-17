@@ -1,4 +1,3 @@
-<!-- ADF-COVERS(implementation): REQ-038-006 -->
 # inbox entry schema と評価ディメンション
 
 本ファイルは `agentdev-learning-pipeline` SKILL.md の補助資料であり、inbox entry の schema（13フィールド新フォーマット、旧5フィールドからのマッピング、正規化ルール）、問題クラス分類基準、8軸評価ディメンション、禁止条件フィルタリングゲート、evaluation-report schema の詳細を扱う。

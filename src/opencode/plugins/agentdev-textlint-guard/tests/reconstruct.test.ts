@@ -1,4 +1,3 @@
-// ADF-COVERS(verification): REQ-053-025, REQ-053-027
 //
 // 完成予定全文の再構成テスト。write（新規・更新）、edit（一意置換・replaceAll・
 // 改行・失敗系）、apply_patch（Add / Update / Delete / Move to / 複数ファイル / End of File /

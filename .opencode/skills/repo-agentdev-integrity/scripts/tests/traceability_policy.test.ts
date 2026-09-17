@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-012-030, REQ-012-047, REQ-012-051
+// ADF-COVERS(verification): REQ-012-030, REQ-012-047, REQ-012-051, REQ-012-056
 //
 // agentdev-traceability 配布スキルの検証スコープポリシー（traceability/policy.yaml）
 // の解決検証（TS-004、旧検証対応要否カタログの廃止に伴う置換）。

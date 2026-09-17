@@ -38,7 +38,7 @@ description: Requirement-artifact traceability (coverage, impact, check) resolvi
 
 ### inline declaration（producer-only）
 
-- 宣言形式: `ADF-COVERS(<role>): <REQ-ID>{, <REQ-ID>}*`（role は decision / design / implementation / verification、REQ-ID は `REQ-{NNNN}-{MMM}` 形式の要件行ID）
+- 宣言形式の表記仕様（対応宣言マーカーと4役割、`REQ-{NNNN}-{MMM}` 形式の要件行 ID で構成される）は producer 側 Design が正規所有する
 - 宣言は各ファイル種別のコメント記法（Markdown は HTML コメント、TypeScript は `//` 等）の内部に1行で記述する
 - consumer distribution closure（配布対象の製品ソース）に含まれる成果物では使用しない。配布対象成果物の対応関係は sidecar で保持する
 - 解析対象は正規宣言位置（各ファイル種別のコメント記法内部の宣言行）に限定する。本文 prose（見出し・段落・箇条書き等）内の宣言マーカー形状の言及は解析対象外とする（説明文コンテキスト対象外判定）。正規位置の形式不備宣言は引き続き検出する

@@ -1,4 +1,3 @@
-// ADF-COVERS(verification): REQ-011-022, REQ-011-023
 //
 // 操作契約の契約テスト。
 //

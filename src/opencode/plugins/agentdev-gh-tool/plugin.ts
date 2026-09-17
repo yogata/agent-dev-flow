@@ -1,4 +1,3 @@
-// ADF-COVERS(implementation): REQ-011-028, REQ-083-001
 // agentdev-gh-tool Plugin（Custom Tool `agentdev_gh` の harness 登録配線）。
 //
 // OpenCode のプラグイン機構（.opencode/plugins/ 直下の depth-1 ファイルから読み込まれる）

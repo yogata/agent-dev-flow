@@ -1,4 +1,3 @@
-<!-- ADF-COVERS(implementation): REQ-017-019 -->
 # 工程間構造化文脈引き継ぎ（structured-stage-handoff）
 
 AgentDevFlow の工程間（req-define → case-open → case-ready → case-run → case-close、および再合意経路 case-revise → case-ready、上流工程（backlog-review 等）から req-define への接続）で引き継ぐ構造化文脈の、配布物側の直列化形式と生成・消費契約。

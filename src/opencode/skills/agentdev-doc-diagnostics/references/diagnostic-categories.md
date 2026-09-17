@@ -1,4 +1,3 @@
-<!-- ADF-COVERS(implementation): REQ-036-026 -->
 # docs 横断診断カテゴリ
 
 inspect-docs command が実行する docs 横断診断のカテゴリ定義と、各専門 skill へのルーティング対象を定義する。

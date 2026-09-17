@@ -1,4 +1,3 @@
-// ADF-COVERS(implementation): REQ-053-025, REQ-053-027, REQ-053-033
 // agentdev-textlint-guard 共通実行基盤: プロジェクト解決。
 //
 // OpenCode 初期化入力の input.worktree を第一候補とし、現行 API と既存 Plugin 契約で

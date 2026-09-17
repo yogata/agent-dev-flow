@@ -1,4 +1,3 @@
-// ADF-COVERS(verification): REQ-011-023, REQ-011-025, REQ-011-028, REQ-011-029
 //
 // fail-closed 実行ゲートの異常系テスト（TS 相当: 強制機能の fail-closed）。
 //

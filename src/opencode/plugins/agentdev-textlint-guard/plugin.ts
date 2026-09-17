@@ -1,5 +1,3 @@
-// ADF-COVERS(implementation): REQ-053-025, REQ-053-026, REQ-053-027, REQ-053-028, REQ-053-029, REQ-053-030, REQ-053-031
-// ADF-COVERS(implementation): REQ-052-002, REQ-052-004, REQ-052-006, REQ-052-007
 // agentdev-textlint-guard Plugin（pre-write 検査入口）。
 //
 // OpenCode の tool.execute.before フックで write / edit / apply_patch の完成予定全文を

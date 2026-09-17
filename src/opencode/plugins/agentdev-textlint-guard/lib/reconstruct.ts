@@ -1,4 +1,3 @@
-// ADF-COVERS(implementation): REQ-053-025, REQ-053-026, REQ-053-027
 // agentdev-textlint-guard 共通実行基盤: 完成予定全文のメモリ上再構成。
 //
 // OpenCode 1.18.x の write / edit / apply_patch 入力形式（現行 API で固定）から、

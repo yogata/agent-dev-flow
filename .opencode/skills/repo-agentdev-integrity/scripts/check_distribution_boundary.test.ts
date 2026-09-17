@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-029-001, REQ-029-002, REQ-029-003, REQ-029-005, REQ-029-006, REQ-029-007, REQ-047-009
+// ADF-COVERS(verification): REQ-029-001, REQ-029-002, REQ-029-003, REQ-029-005, REQ-029-006, REQ-029-007, REQ-029-010, REQ-047-009
 /**
  * Tests for check_distribution_boundary.ts.
  *
@@ -207,7 +207,10 @@ describe("checkDistributionBoundary", () => {
 
 describe("producer-side traceability metadata detection (DEC-030 decision 5)", () => {
   test("report mode counts deliberate contamination without failing the gate", () => {
-    const report = checkDistributionBoundary(TMP_ROOT);
+    const report = checkDistributionBoundary(TMP_ROOT, "source", {
+      ...DEFAULT_DETECTOR_CONFIG,
+      producer_metadata_enforcement: "report",
+    });
     // inline + sidecar + policy fixtures are all detected by the marker signal.
     expect(report.stats.producer_metadata_hits).toBe(3);
     const metaFailures = report.failures.filter(
@@ -255,7 +258,10 @@ describe("producer-side traceability metadata detection (DEC-030 decision 5)", (
 
 describe("baseline build / save / load", () => {
   test("buildBaseline dedupes by (file, category, matched) and counts occurrences", () => {
-    const report = checkDistributionBoundary(TMP_ROOT);
+    const report = checkDistributionBoundary(TMP_ROOT, "source", {
+      ...DEFAULT_DETECTOR_CONFIG,
+      producer_metadata_enforcement: "report",
+    });
     const baseline = buildBaseline(report, TMP_ROOT, "test baseline");
     expect(baseline.version).toBe(1);
     expect(baseline.rule_id).toBe("IR-059");
@@ -273,7 +279,10 @@ describe("baseline build / save / load", () => {
   });
 
   test("saveBaseline then loadBaseline round-trips", () => {
-    const report = checkDistributionBoundary(TMP_ROOT);
+    const report = checkDistributionBoundary(TMP_ROOT, "source", {
+      ...DEFAULT_DETECTOR_CONFIG,
+      producer_metadata_enforcement: "report",
+    });
     const baseline = buildBaseline(report, TMP_ROOT, "roundtrip");
     const tmpFile = path.join(TMP_ROOT, "baseline.json");
     saveBaseline(baseline, tmpFile);

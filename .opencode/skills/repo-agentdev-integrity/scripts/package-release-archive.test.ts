@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-009-009, REQ-009-045
+// ADF-COVERS(verification): REQ-002-048, REQ-009-009, REQ-009-045, REQ-012-057
 // ADF-COVERS(verification): REQ-010-060
 // ADF-COVERS(verification): REQ-050-010, REQ-050-011
 // ADF-COVERS(verification): REQ-052-007

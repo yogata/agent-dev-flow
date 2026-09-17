@@ -1,9 +1,5 @@
 # single workflow: 単一 Issue 実行（single）
 
-<!-- ADF-COVERS(implementation): REQ-031-028 -->
-<!-- ADF-COVERS(implementation): REQ-036-027 -->
-<!-- ADF-COVERS(implementation): REQ-057-030 -->
-<!-- ADF-COVERS(implementation): REQ-014-016 -->
 
 > 本 reference は `agentdev-workflow-case-run` SKILL.md の single workflow 詳細である。
 > STEP-S1〜S3（フェーズ判定から前置 gate 群まで）と STEP-S6（クリーンアップ・完了報告）を所有する。

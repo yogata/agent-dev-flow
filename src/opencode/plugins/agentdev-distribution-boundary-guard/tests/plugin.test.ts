@@ -1248,9 +1248,9 @@ describe("Stage B round 3: distributed-workflow-control prefixes preserved by ma
     expect(env.detector_config.repository_identity).toBeDefined();
   });
 
-  test("default detector config stays at report level (activation deferred to Wave 4)", () => {
-    expect(DEFAULT_DETECTOR_CONFIG.producer_metadata_enforcement).toBe("report");
-    expect(makeGuardEnv().detector_config.producer_metadata_enforcement).toBe("report");
+  test("default detector config is enforce (activated by Wave 4 issue #2945)", () => {
+    expect(DEFAULT_DETECTOR_CONFIG.producer_metadata_enforcement).toBe("enforce");
+    expect(makeGuardEnv().detector_config.producer_metadata_enforcement).toBe("enforce");
   });
 });
 
@@ -1263,12 +1263,21 @@ describe("producer metadata enforcement (DEC-030 decision 5)", () => {
     readFile: () => null,
     projection: "source",
   };
+  const REPORT_ENV: GuardEnv = {
+    detector_config: {
+      ...DEFAULT_DETECTOR_CONFIG,
+      producer_metadata_enforcement: "report",
+    },
+    readFile: () => null,
+    projection: "source",
+  };
   const contaminated = "# title\n<!-- ADF-COVERS(implementation): REQ-029-010 -->\n";
 
-  test("report mode (default) observes the inline declaration without blocking", () => {
-    const r = evaluateWriteContent(
+  test("report mode observes the inline declaration without blocking", () => {
+    const r = evaluateWriteContentEnv(
       "src/opencode/skills/agentdev-foo/SKILL.md",
       contaminated,
+      REPORT_ENV,
     );
     expect(r.ok).toBe(true);
     const meta = r.detections.filter((d) => d.category === "producer-metadata");

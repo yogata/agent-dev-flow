@@ -1,0 +1,8 @@
+component: agentdev-gh-tool
+implementation:
+  src/opencode/plugins/agentdev-gh-tool/plugin.ts:
+    - REQ-011-028
+    - REQ-083-001
+verification:
+  src/opencode/plugins/agentdev-gh-tool/tests/plugin.test.ts:
+    - REQ-011-028

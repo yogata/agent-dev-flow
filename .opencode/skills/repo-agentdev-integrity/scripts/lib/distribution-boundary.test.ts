@@ -1266,6 +1266,8 @@ describe("Stage B regression: Unicode / hex evasion detection", () => {
 // =============================================================================
 
 describe("producer metadata detection signal (DEC-030 decision 5)", () => {
+  const REPORT_CONFIG = { ...DEFAULT_DETECTOR_CONFIG, producer_metadata_enforcement: "report" };
+
   test("whole-line HTML declaration comment is detected as producer-metadata without failing the report-mode gate", () => {
     const d = classifyLineConfig(
       {
@@ -1274,7 +1276,7 @@ describe("producer metadata detection signal (DEC-030 decision 5)", () => {
         filePath: "src/opencode/skills/agentdev-doc-writing/SKILL.md",
         projection: "source",
       },
-      DEFAULT_DETECTOR_CONFIG,
+      REPORT_CONFIG,
     );
     expect(d.filter((x) => x.category === "concrete-id").length).toBe(0);
     const meta = d.filter((x) => x.category === "producer-metadata");
@@ -1328,7 +1330,7 @@ describe("producer metadata detection signal (DEC-030 decision 5)", () => {
         filePath: "x.md",
         projection: "source",
       },
-      DEFAULT_DETECTOR_CONFIG,
+      REPORT_CONFIG,
     );
     expect(d.filter((x) => x.category === "concrete-id").length).toBe(0);
     expect(decideGate(d).pass).toBe(true);
@@ -1442,10 +1444,11 @@ describe("producer metadata detection signal (DEC-030 decision 5)", () => {
       "",
       "Generalized body text with no concrete references.",
     ].join("\n");
-    const reportMode = classifyContent(
+    const reportMode = classifyContentConfig(
       content,
       "src/opencode/skills/agentdev-fixture-skill/SKILL.md",
       "source",
+      REPORT_CONFIG,
     );
     const reportMeta = reportMode.filter((x) => x.category === "producer-metadata");
     expect(reportMeta.length).toBe(1);
@@ -1476,10 +1479,11 @@ describe("producer metadata detection signal (DEC-030 decision 5)", () => {
       "<!-- ADF-COVERS(implementation): REQ-057-013 -->",
       "ref ADR-0135 here",
     ].join("\n");
-    const d = classifyContent(
+    const d = classifyContentConfig(
       content,
       "src/opencode/skills/agentdev-doc-writing/SKILL.md",
       "source",
+      REPORT_CONFIG,
     );
     const matched = d.map((x) => x.matched).sort();
     expect(matched).toEqual(["ADF-COVERS", "ADR-0135"]);

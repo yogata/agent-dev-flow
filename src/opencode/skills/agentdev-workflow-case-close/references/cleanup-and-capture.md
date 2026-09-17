@@ -1,4 +1,3 @@
-<!-- ADF-COVERS(implementation): REQ-032-027 -->
 # STEP-5/6: Post-merge・Issue クローズ・クリーンアップ・Capture 回収・永続化（cleanup-and-capture）
 
 > 本 reference は `agentdev-workflow-case-close` SKILL.md の制御平面（STEP 一覧）STEP-5, STEP-6 詳細である。

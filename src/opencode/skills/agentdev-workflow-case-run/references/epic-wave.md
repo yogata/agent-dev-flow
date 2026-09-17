@@ -1,7 +1,5 @@
 # epic-wave workflow: Epic Wave 実行（epic-wave）
 
-<!-- ADF-COVERS(implementation): REQ-031-027, REQ-031-029, REQ-031-030, REQ-035-012 -->
-<!-- ADF-COVERS(implementation): REQ-057-030 -->
 
 > 本 reference は `agentdev-workflow-case-run` SKILL.md の epic-wave workflow 詳細である。
 > `case-run #epic` 受領時に現在 ready な Wave の子Issue を並列実行する制御（STEP-W1〜W5）を所有する。

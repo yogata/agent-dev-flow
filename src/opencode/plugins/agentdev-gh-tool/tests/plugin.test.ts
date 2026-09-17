@@ -1,4 +1,3 @@
-// ADF-COVERS(verification): REQ-011-028
 //
 // agentdev-gh-tool Plugin のテスト。
 //

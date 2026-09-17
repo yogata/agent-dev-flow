@@ -1,4 +1,3 @@
-// ADF-COVERS(implementation): REQ-011-022, REQ-011-030, REQ-083-001, REQ-083-004
 // agentdev-gh Custom Tool の操作契約（種別契約 REQ、決定4・6）。
 //
 // 本ファイルは Design `docs/designs/responsibilities/custom-tool-contracts.md`
