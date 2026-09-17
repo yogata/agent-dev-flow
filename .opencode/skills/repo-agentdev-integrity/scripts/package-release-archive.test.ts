@@ -49,8 +49,12 @@ const REAL_PUBLISHER = path.join(REPO_ROOT, "scripts", "self", "release", "publi
 // would mask the regression where the script forgets to scan archive extras
 // (README-INSTALL.md, scripts/install.ps1 archive edition) that live outside
 // src/opencode/. A failure is recorded when any scanned file contains the
-// literal VIOLATION-MARKER-REQ-9999.
+// literal VIOLATION-MARKER-REQ-9999 or an inline producer-side traceability
+// declaration marker (distribution purity, DEC-030 decision 5: no exemptions,
+// no strip reliance).
+const COVERS_MARKER = ["ADF", "-", "COVERS"].join("");
 const STUB_CHECKER_TS = `const fs=require("fs");const p=require("path");
+const M=["ADF","-","COVERS"].join("");
 const a=process.argv.slice(2);
 let profile="source",root=".";
 for(let i=0;i<a.length;i++){
@@ -68,7 +72,7 @@ function walk(d){
     else if(e.isFile()){
       try{
         const t=fs.readFileSync(f,"utf-8");
-        if(t.includes("VIOLATION-MARKER-REQ-9999")){console.error("VIOLATION "+f);process.exit(1);}
+        if(t.includes("VIOLATION-MARKER-REQ-9999")||t.includes(M+"(")){console.error("VIOLATION "+f);process.exit(1);}
       }catch{}
     }
   }
@@ -299,6 +303,75 @@ describe("package-release-archive.ps1 / archive boundary violation", () => {
       rmrf(repo.root);
     }
   }, 120000);
+});
+
+describe("package-release-archive.ps1 / producer traceability metadata purity (TS-013, DEC-030 decision 5)", () => {
+  test("scanner catches inline producer-side declarations in staged sources (exit 6)", () => {
+    const repo = makeFakeRepo();
+    try {
+      // Inject an inline traceability declaration into a staged-source file.
+      // The marker is assembled from parts so the corpus scan of this test
+      // file does not count it as a real declaration.
+      fs.writeFileSync(
+        path.join(repo.commandsDir, "violate-trace.md"),
+        `<!-- ${COVERS_MARKER}(implementation): REQ-9999-001 -->\n`,
+      );
+      execFileSync("git", ["add", "."], { cwd: repo.root, env: gitEnv() });
+      execFileSync("git", ["commit", "-q", "-m", "violate-trace"], { cwd: repo.root, env: gitEnv() });
+
+      const res = runScript(repo);
+      expect(res.exitCode).toBe(6);
+      const report = inspect(repo);
+      expect(report.finalZip).toBe(false);
+      expect(report.legacyStageRoot).toBe(false);
+      expect(report.trustStageDirs).toEqual([]);
+    } finally {
+      rmrf(repo.root);
+    }
+  }, 120000);
+
+  test("archive contents contain no traceability/ sidecar or policy files", () => {
+    const repo = makeFakeRepo();
+    try {
+      // Producer-side traceability data (sidecar + policy) exists in the repo
+      // but must never be staged into the release archive (REQ-002-048,
+      // distribution purity without strip reliance).
+      const traceDir = path.join(repo.root, "traceability");
+      fs.mkdirSync(traceDir, { recursive: true });
+      fs.writeFileSync(path.join(traceDir, "policy.yaml"), "verification:\n  default: required\n  optional: []\n");
+      fs.writeFileSync(
+        path.join(traceDir, "probe-component.yaml"),
+        "component: probe-component\nimplementation:\n  src/opencode/commands/agentdev/probe-cmd.md:\n    - REQ-9999-001\n",
+      );
+      execFileSync("git", ["add", "."], { cwd: repo.root, env: gitEnv() });
+      execFileSync("git", ["commit", "-q", "-m", "traceability-data"], { cwd: repo.root, env: gitEnv() });
+      // The archive name embeds the current HEAD short hash; re-resolve it
+      // because this scenario commits additional files after makeFakeRepo.
+      const headShort = execFileSync("git", ["rev-parse", "--short", "HEAD"], {
+        cwd: repo.root,
+        env: gitEnv(),
+      }).toString().trim();
+      const finalZip = path.join(repo.root, "dist", `agentdev-release-${headShort}.zip`);
+
+      const res = runScript(repo);
+      expect(res.exitCode).toBe(0);
+      expect(fs.existsSync(finalZip)).toBe(true);
+
+      const extracted = path.join(repo.root, "dist", "check-extract");
+      fs.mkdirSync(extracted, { recursive: true });
+      const expand = spawnSync(
+        "pwsh",
+        ["-NoProfile", "-NonInteractive", "-Command",
+          `Expand-Archive -LiteralPath "${finalZip}" -DestinationPath "${extracted}" -Force`],
+        { encoding: "utf-8" },
+      );
+      expect(expand.status).toBe(0);
+      const stagedRoot = path.join(extracted, `agentdev-release-${headShort}`);
+      expect(fs.existsSync(path.join(stagedRoot, "traceability"))).toBe(false);
+    } finally {
+      rmrf(repo.root);
+    }
+  }, 180000);
 });
 
 describe("package-release-archive.ps1 / archive extras boundary violation", () => {

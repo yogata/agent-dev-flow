@@ -1,5 +1,5 @@
 {
-  "_comment": "2026-09-15 の 20 Case バッチの要約データ（Root Case 本文 execution contract 相当、case-ready 側検出源の再現）。カタログ依存 10 Case（#2822 / #2823 / #2824 / #2825 / #2831 / #2832 / #2833 / #2846 / #2856 / #2858）の対象行集合は Issue #2867 の実施記録（verification-scope-catalog 棚卸し）に基づく。Case と行グループの割当は要約割合の再現であり、行集合の総和（48行）は記録と一致する。artifact_paths は要約データに記録されていないため (a) 検出が空となる互いに素なプレースホルダーとする（(b) 検出の単独検証のため）。独立 10 Case（batch-A..J）は行レベルの個別記録のない独立 RU の再現で、対象行はスナップショットカタログの登録済み行から採る。",
+  "_comment": "2026-09-15 の 20 Case バッチの要約データ（Root Case 本文 execution contract 相当、case-ready 側検出源の再現）。ポリシー依存 10 Case（#2822 / #2823 / #2824 / #2825 / #2831 / #2832 / #2833 / #2846 / #2856 / #2858）の対象行集合は Issue #2867 の実施記録（検証対応任意行の棚卸し）に基づく。Case と行グループの割当は要約割合の再現であり、行集合の総和（48行）は記録と一致する。artifact_paths は要約データに記録されていないため (a) 検出が空となる互いに素なプレースホルダーとする（(b) 検出の単独検証のため）。独立 10 Case（batch-A..J）は行レベルの個別記録のない独立 RU の再現で、対象行はスナップショットポリシーの登録済み行から採る。",
   "mode": "case-ready",
   "current_case": {
     "case_ref": "#2822",
@@ -140,10 +140,10 @@
   ],
   "shared_areas": [
     {
-      "area_id": "verification-scope-catalog",
-      "display_name": "検証対応要否カタログ（要約スナップショット）",
-      "kind": "req-row-list",
-      "file_paths": ["verification-scope-catalog.snapshot.md"]
+      "area_id": "traceability-policy",
+      "display_name": "トレーサビリティポリシー（要約スナップショット）",
+      "kind": "adf-covers-declarations",
+      "file_paths": ["policy.snapshot.yaml"]
     }
   ]
 }

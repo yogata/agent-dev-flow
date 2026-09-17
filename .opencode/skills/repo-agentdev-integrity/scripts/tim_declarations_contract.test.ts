@@ -1,14 +1,16 @@
 // ADF-COVERS(verification): REQ-012-026, REQ-012-027, REQ-012-028, REQ-012-029, REQ-012-030, REQ-012-031, REQ-012-032, REQ-012-033, REQ-012-034, REQ-012-035, REQ-012-036, REQ-012-037, REQ-012-038, REQ-012-039, REQ-012-040, REQ-012-041, REQ-012-042
 //
 // 最小 TIM（docs/designs/foundations/traceability-model.md）の対応宣言コーパス契約検証。
-// RU-0001 AC-001〜AC-010（Issue #2359、OU-001）を恒常的に検証する。
+// DEC-030（4役割・Decision 任意・Design 必須）に従い恒常的に検証する。
 //
 // スコープ注記:
-// - 完全性判定の対象は OU-001 の確定範囲 REQ-012-026〜042 に限定する。
-//   全現行要件行への対応付け拡大は棚卸し移行（OU-004）、判定機能の一般化は
-//   agentdev-traceability スキル実装（OU-002）の責務であり、本テストはその完了を前提としない。
-// - 解析は agentdev-traceability.md「対応宣言の表記（正規情報源）」の行単位パターン照合に従う。
+// - 完全性判定の対象は REQ-012-026〜042 に限定する。
+//   全現行要件行への対応付け拡大は棚卸し移行、判定機能の一般化は
+//   agentdev-traceability スキル実装（Wave 2-1）の責務であり、本テストはその完了を前提としない。
+// - 解析は agentdev-traceability.md「対応関係データの取得と正規化」の行単位パターン照合に従う。
 //   意味推定は行わず、マーカー文字列 ADF-COVERS(...) のみを手がかりにする。
+// - 対応関係の標準保存方式は traceability/ 配下 sidecar（DEC-030 決定3）であり、
+//   inline 宣言は producer 側成果物のための直列化形式（REQ-012-054）である。
 
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "fs";
@@ -29,7 +31,7 @@ const OU001_SCOPE: readonly string[] = Array.from(
 
 // ─── 対応宣言の解析（行単位パターン照合） ───────────────────────────────────
 
-type CoverRole = "design" | "implementation" | "verification";
+type CoverRole = "decision" | "design" | "implementation" | "verification";
 
 interface CoverDeclaration {
   readonly role: CoverRole;
@@ -45,9 +47,9 @@ interface ParseIssue {
 }
 
 const DECLARATION_RE =
-  /ADF-COVERS\((design|implementation|verification)\):\s*(REQ-\d{3}-\d{3}(?:\s*,\s*REQ-\d{3}-\d{3})*)/;
+  /ADF-COVERS\((decision|design|implementation|verification)\):\s*(REQ-\d{3}-\d{3}(?:\s*,\s*REQ-\d{3}-\d{3})*)/;
 const ROLE_PROBE_RE = /ADF-COVERS\(([A-Za-z][A-Za-z-]*)\):/;
-const KNOWN_ROLES: readonly string[] = ["design", "implementation", "verification"];
+const KNOWN_ROLES: readonly string[] = ["decision", "design", "implementation", "verification"];
 
 // フィクスチャ用の宣言行生成。テストソース内にマーカー文字列を直接記述すると
 // コーパス走査（本ファイル自身を含む）で実宣言として誤検出されるため、
@@ -86,11 +88,12 @@ function parseDeclarations(
 
 interface CompletenessEntry {
   readonly reqId: string;
+  readonly decision: number;
   readonly design: number;
   readonly implementation: number;
   readonly verification: number;
   readonly complete: boolean;
-  readonly missing: readonly ("implementation" | "verification")[];
+  readonly missing: readonly ("design" | "implementation" | "verification")[];
 }
 
 function judgeCompleteness(
@@ -100,16 +103,21 @@ function judgeCompleteness(
   return reqIds.map((reqId) => {
     const count = (role: CoverRole): number =>
       declarations.filter((d) => d.role === role && d.reqIds.includes(reqId)).length;
+    const design = count("design");
     const implementation = count("implementation");
     const verification = count("verification");
-    // Design 対応は件数を数えるが完全性判定には使わない（Design 対応0件のみを理由に不完全としない）。
+    // Decision 対応は件数を数えるが完全性判定には使わない（任意対応、DEC-030 決定1）。
+    // Decision 対応0件のみを理由に不完全としない。
+    // Design 対応・実装対応・検証対応（policy required 行）は必須対応。
     // Design 対応を経由して実装対応・検証対応の成立を推定しない（推移阻止）。
-    const missing: ("implementation" | "verification")[] = [];
+    const missing: ("design" | "implementation" | "verification")[] = [];
+    if (design === 0) missing.push("design");
     if (implementation === 0) missing.push("implementation");
     if (verification === 0) missing.push("verification");
     return {
       reqId,
-      design: count("design"),
+      decision: count("decision"),
+      design,
       implementation,
       verification,
       complete: missing.length === 0,
@@ -181,21 +189,28 @@ function parseCorpus(): { declarations: CoverDeclaration[]; issues: ParseIssue[]
 // ─── 実リポジトリコーパスの検証 ─────────────────────────────────────────────
 
 describe("TIM 対応宣言コーパス（実リポジトリ）", () => {
-  it("REQ-012-026〜042 の各要件行へ実装対応が1件以上保存されている（RU-0001 AC-001/006、完了条件2）", () => {
+  it("REQ-012-026〜042 の各要件行へ実装対応が1件以上保存されている（完了条件）", () => {
     const { declarations } = parseCorpus();
     const entries = judgeCompleteness(declarations, OU001_SCOPE);
     const lacking = entries.filter((e) => e.implementation === 0).map((e) => e.reqId);
     expect(lacking).toEqual([]);
   });
 
-  it("REQ-012-026〜042 の各要件行へ検証対応が1件以上保存されている（RU-0001 AC-003/004、完了条件3）", () => {
+  it("REQ-012-026〜042 の各要件行へ Design 対応が1件以上保存されている（DEC-030 決定1）", () => {
+    const { declarations } = parseCorpus();
+    const entries = judgeCompleteness(declarations, OU001_SCOPE);
+    const lacking = entries.filter((e) => e.design === 0).map((e) => e.reqId);
+    expect(lacking).toEqual([]);
+  });
+
+  it("REQ-012-026〜042 の各要件行へ検証対応が1件以上保存されている（完了条件）", () => {
     const { declarations } = parseCorpus();
     const entries = judgeCompleteness(declarations, OU001_SCOPE);
     const lacking = entries.filter((e) => e.verification === 0).map((e) => e.reqId);
     expect(lacking).toEqual([]);
   });
 
-  it("コーパス内の全参照要件IDが現行 REQ ファイルの要件行として存在する（RU-0001 AC-008）", () => {
+  it("コーパス内の全参照要件IDが現行 REQ ファイルの要件行として存在する", () => {
     const { declarations } = parseCorpus();
     const unknown = findUnknownReqRefs(declarations, currentRequirementLineIds());
     expect(unknown).toEqual([]);
@@ -206,7 +221,7 @@ describe("TIM 対応宣言コーパス（実リポジトリ）", () => {
     expect(issues).toEqual([]);
   });
 
-  it("1つの成果物が複数の役割を持てる（traceability-model.md の design と implementation、RU-0001 AC-007）", () => {
+  it("1つの成果物が複数の役割を持てる（traceability-model.md の design と implementation）", () => {
     const { declarations } = parseCorpus();
     const fromModel = declarations.filter((d) => d.file.endsWith("foundations/traceability-model.md"));
     const roles = new Set(fromModel.map((d) => d.role));
@@ -214,7 +229,7 @@ describe("TIM 対応宣言コーパス（実リポジトリ）", () => {
     expect(roles.has("implementation")).toBe(true);
   });
 
-  it("複数の成果物が同一要件行へ対応できる（REQ-012-042 の実装対応2件、RU-0001 AC-006）", () => {
+  it("複数の成果物が同一要件行へ対応できる（REQ-012-042 の実装対応2件）", () => {
     const { declarations } = parseCorpus();
     const files = declarations
       .filter((d) => d.role === "implementation" && d.reqIds.includes("REQ-012-042"))
@@ -232,7 +247,7 @@ describe("TIM 対応宣言コーパス（実リポジトリ）", () => {
     expect(readme).toContain("| foundations/traceability-model.md | accepted |");
   });
 
-  it("更新対象の規範文書で coverage の直訳語を正式用語として使用していない（RU-0001 AC-010、REQ-012-042）", () => {
+  it("更新対象の規範文書で coverage の直訳語を正式用語として使用していない（用語政策）", () => {
     const targets = [
       join(REPO_ROOT, "docs", "requirements", "REQ-012.md"),
       join(REPO_ROOT, "docs", "designs", "foundations", "traceability-model.md"),
@@ -269,38 +284,50 @@ describe("TIM モデル規則（フィクスチャ）", () => {
     return files.flatMap((f) => parseDeclarations(f, readFileSync(f, "utf-8")).declarations);
   }
 
-  it("AC-001: 実装対応と検証対応が各1件以上なら完全性を満たすと判定する（正常系）", () => {
-    const a = writeFixture("ac001-impl.md", [decl("implementation", "REQ-900-001")]);
-    const b = writeFixture("ac001-verify.md", [decl("verification", "REQ-900-001")]);
-    const [entry] = judgeCompleteness(parseFiles([a, b]), ["REQ-900-001"]);
+  it("正常系: Design・実装・検証対応が各1件以上なら完全性を満たすと判定する", () => {
+    const d = writeFixture("ok-design.md", [decl("design", "REQ-900-001")]);
+    const a = writeFixture("ok-impl.md", [decl("implementation", "REQ-900-001")]);
+    const b = writeFixture("ok-verify.md", [decl("verification", "REQ-900-001")]);
+    const [entry] = judgeCompleteness(parseFiles([d, a, b]), ["REQ-900-001"]);
     expect(entry.complete).toBe(true);
     expect(entry.missing).toEqual([]);
   });
 
-  it("AC-002: Design 対応が0件でも、それだけを理由に不完全と判定しない（境界）", () => {
-    const a = writeFixture("ac002-impl.md", [decl("implementation", "REQ-900-001")]);
-    const b = writeFixture("ac002-verify.md", [decl("verification", "REQ-900-001")]);
-    const [entry] = judgeCompleteness(parseFiles([a, b]), ["REQ-900-001"]);
-    expect(entry.design).toBe(0);
+  it("Decision 対応が0件でも、それだけを理由に不完全と判定しない（DEC-030 決定1）", () => {
+    const d = writeFixture("no-decision-design.md", [decl("design", "REQ-900-001")]);
+    const a = writeFixture("no-decision-impl.md", [decl("implementation", "REQ-900-001")]);
+    const b = writeFixture("no-decision-verify.md", [decl("verification", "REQ-900-001")]);
+    const [entry] = judgeCompleteness(parseFiles([d, a, b]), ["REQ-900-001"]);
+    expect(entry.decision).toBe(0);
     expect(entry.complete).toBe(true);
   });
 
-  it("AC-003: 実装対応が0件の場合、実装対応の欠落として個別に検出する（異常系）", () => {
-    const b = writeFixture("ac003-verify.md", [decl("verification", "REQ-900-001")]);
-    const [entry] = judgeCompleteness(parseFiles([b]), ["REQ-900-001"]);
+  it("Design 対応が0件の場合、Design 対応の欠落として個別に検出する（DEC-030 決定1）", () => {
+    const a = writeFixture("missing-design-impl.md", [decl("implementation", "REQ-900-001")]);
+    const b = writeFixture("missing-design-verify.md", [decl("verification", "REQ-900-001")]);
+    const [entry] = judgeCompleteness(parseFiles([a, b]), ["REQ-900-001"]);
+    expect(entry.complete).toBe(false);
+    expect(entry.missing).toEqual(["design"]);
+  });
+
+  it("実装対応が0件の場合、実装対応の欠落として個別に検出する（異常系）", () => {
+    const d = writeFixture("missing-impl-design.md", [decl("design", "REQ-900-001")]);
+    const b = writeFixture("missing-impl-verify.md", [decl("verification", "REQ-900-001")]);
+    const [entry] = judgeCompleteness(parseFiles([d, b]), ["REQ-900-001"]);
     expect(entry.complete).toBe(false);
     expect(entry.missing).toEqual(["implementation"]);
   });
 
-  it("AC-004: 検証対応が0件の場合、検証対応の欠落として個別に検出する（異常系）", () => {
-    const a = writeFixture("ac004-impl.md", [decl("implementation", "REQ-900-001")]);
-    const [entry] = judgeCompleteness(parseFiles([a]), ["REQ-900-001"]);
+  it("検証対応が0件の場合、検証対応の欠落として個別に検出する（異常系）", () => {
+    const d = writeFixture("missing-verif-design.md", [decl("design", "REQ-900-001")]);
+    const a = writeFixture("missing-verif-impl.md", [decl("implementation", "REQ-900-001")]);
+    const [entry] = judgeCompleteness(parseFiles([d, a]), ["REQ-900-001"]);
     expect(entry.complete).toBe(false);
     expect(entry.missing).toEqual(["verification"]);
   });
 
-  it("AC-005: Design 対応のみの要件を実装済みまたは検証済みと判定しない（推移誤判定防止）", () => {
-    const d = writeFixture("ac005-design.md", [decl("design", "REQ-900-001")]);
+  it("Design 対応のみの要件を実装済みまたは検証済みと判定しない（推移誤判定防止）", () => {
+    const d = writeFixture("transitive-design.md", [decl("design", "REQ-900-001")]);
     const [entry] = judgeCompleteness(parseFiles([d]), ["REQ-900-001"]);
     expect(entry.design).toBe(1);
     expect(entry.implementation).toBe(0);
@@ -309,39 +336,41 @@ describe("TIM モデル規則（フィクスチャ）", () => {
     expect(entry.missing).toEqual(["implementation", "verification"]);
   });
 
-  it("AC-006: 1成果物から複数要件、複数成果物から1要件の双方を表現できる（境界）", () => {
-    const x = writeFixture("ac006-multi.md", [decl("implementation", "REQ-900-001, REQ-900-002")]);
-    const y = writeFixture("ac006-y.md", [decl("implementation", "REQ-900-003")]);
-    const z = writeFixture("ac006-z.md", [decl("implementation", "REQ-900-003")]);
+  it("1成果物から複数要件、複数成果物から1要件の双方を表現できる（境界）", () => {
+    const x = writeFixture("multi-x.md", [decl("implementation", "REQ-900-001, REQ-900-002")]);
+    const y = writeFixture("multi-y.md", [decl("implementation", "REQ-900-003")]);
+    const z = writeFixture("multi-z.md", [decl("implementation", "REQ-900-003")]);
     const entries = judgeCompleteness(parseFiles([x, y, z]), KNOWN);
     expect(entries.find((e) => e.reqId === "REQ-900-001")?.implementation).toBe(1);
     expect(entries.find((e) => e.reqId === "REQ-900-002")?.implementation).toBe(1);
     expect(entries.find((e) => e.reqId === "REQ-900-003")?.implementation).toBe(2);
   });
 
-  it("AC-007: 1つの成果物が複数の役割を持つ場合も正常に表現できる（境界）", () => {
-    const w = writeFixture("ac007-roles.md", [
+  it("1つの成果物が複数の役割を持つ場合も正常に表現できる（境界）", () => {
+    const w = writeFixture("roles-w.md", [
       decl("design", "REQ-900-001"),
       decl("implementation", "REQ-900-001"),
+      decl("verification", "REQ-900-001"),
     ]);
     const [entry] = judgeCompleteness(parseFiles([w]), ["REQ-900-001"]);
     expect(entry.design).toBe(1);
     expect(entry.implementation).toBe(1);
-    expect(entry.complete).toBe(false); // 検証対応が0件のため（役割の複数持ちとは独立）
+    expect(entry.verification).toBe(1);
+    expect(entry.complete).toBe(true);
   });
 
-  it("AC-008: 存在しない要件への対応宣言を正常な対応関係として扱わない（異常系）", () => {
-    const a = writeFixture("ac008-unknown.md", [decl("implementation", "REQ-900-999")]);
+  it("存在しない要件への対応宣言を正常な対応関係として扱わない（異常系）", () => {
+    const a = writeFixture("unknown-req.md", [decl("implementation", "REQ-900-999")]);
     const declarations = parseFiles([a]);
     const unknown = findUnknownReqRefs(declarations, KNOWN);
     expect(unknown.map((u) => u.reqId)).toEqual(["REQ-900-999"]);
     const [entry] = judgeCompleteness(declarations, KNOWN);
     expect(entry.complete).toBe(false);
-    expect(entry.missing).toEqual(["implementation", "verification"]);
+    expect(entry.missing).toEqual(["design", "implementation", "verification"]);
   });
 
-  it("AC-009: 一般的な文書参照や言及を対応関係として扱わず、Decision 等がなくても判定できる", () => {
-    const g = writeFixture("ac009-general.md", [
+  it("一般的な文書参照や言及を対応関係として扱わず、Decision 宣言がなくても判定できる", () => {
+    const g = writeFixture("general-ref.md", [
       "[REQ-900-001](../requirements/REQ-900.md) へのリンクと、本文中の REQ-900-001 言及。",
     ]);
     const declarations = parseFiles([g]);
@@ -349,6 +378,14 @@ describe("TIM モデル規則（フィクスチャ）", () => {
     const entries = judgeCompleteness(declarations, KNOWN);
     expect(entries).toHaveLength(3);
     expect(entries.every((e) => e.complete === false)).toBe(true);
+  });
+
+  it("decision 役割の対応宣言は unknown role ではなく受理される（DEC-030 決定1）", () => {
+    const r = writeFixture("role-decision.md", [decl("decision", "REQ-900-001")]);
+    const { declarations, issues } = parseDeclarations(r, readFileSync(r, "utf-8"));
+    expect(issues).toEqual([]);
+    expect(declarations).toHaveLength(1);
+    expect(declarations[0]?.role).toBe("decision");
   });
 
   it("REQ-012-028/040: 未知の成果物役割を対応関係として数えず、検出する", () => {
@@ -381,6 +418,7 @@ describe("TIM モデル規則（フィクスチャ）", () => {
   it("REQ-012-041: 派生索引やグラフDBを前提とせず、正規成果物の直接走査で判定が成立する", () => {
     // TEMP_ROOT は本テストが新規作成した直下のディレクトリであり、索引・キャッシュ類は存在しない。
     const f = writeFixture("direct-scan.md", [
+      decl("design", "REQ-900-001"),
       decl("implementation", "REQ-900-001"),
       decl("verification", "REQ-900-001"),
     ]);
@@ -389,8 +427,9 @@ describe("TIM モデル規則（フィクスチャ）", () => {
     expect(entry.complete).toBe(true);
   });
 
-  it("RU-0001 3.1（REQ-012-026）: 要件行 REQ-{NNNN}-{MMM} 形式のみを判定単位として解釈する", () => {
+  it("要件行 REQ-{NNNN}-{MMM} 形式のみを判定単位として解釈する（REQ-012-026）", () => {
     const good = writeFixture("line-id-good.md", [
+      decl("design", "REQ-900-001"),
       decl("implementation", "REQ-900-001"),
       decl("verification", "REQ-900-001"),
     ]);
