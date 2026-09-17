@@ -1642,15 +1642,6 @@
       "reason": "junction 未伝播環境（worktree）固有の projection 対称性検出差。main（junction 実在環境）では検出 0 件の環境差（REQ-018 環境差扱い）。実装欠陥ではなく検査環境差として正規管理する"
     },
     {
-      "category": "ReferencePath",
-      "check": "reference-path-existence",
-      "file": "src/opencode/skills/agentdev-workflow-case-ready/SKILL.md",
-      "evidence": "scripts/src/inspect_cross_dependencies.ts",
-      "count": 1,
-      "provenance": "legacy",
-      "reason": "inspect_cross_dependencies.ts は agentdev-workflow-case-open へ移設済みの参照残骸（main 既知 NG、本 case 対象範囲外）。正規管理下で追跡し、別途修復候補として扱う"
-    },
-    {
       "category": "ReqCitation",
       "check": "referenced-req-row-existence",
       "file": ".agentdev/extensions/skills/agentdev-workflow-case-auto.yaml",
