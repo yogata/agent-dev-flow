@@ -37,7 +37,7 @@ scripts/
 | kind | 登録状態の読取 |
 |---|---|
 | `req-row-list` | 箇条書きエントリ行（`- REQ-NNN-MMM..REQ-NNN-MMM: 説明` 形式。範囲は同一 REQ 内で展開） |
-| `adf-covers-declarations` | 対応宣言行（ADF-COVERS(role): ID リスト）の ID |
+| `adf-covers-declarations` | 対応宣言行（ADF-COVERS(role): ID リスト、role は decision / design / implementation / verification の4役割）の ID。sidecar 対応関係ファイル（role キー配下の要件行 ID 列挙）も同一の論理対応関係として受理する |
 | `req-row-mentions` | ファイル本文に現れる要件行IDすべて |
 
 ## 実行方法

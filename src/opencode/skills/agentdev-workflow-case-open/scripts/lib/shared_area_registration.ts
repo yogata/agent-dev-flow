@@ -41,14 +41,26 @@ function collectReqRowListEntries(content: string): Set<string> {
 // 対応宣言領域形式: 宣言行の ID リストを登録状態とする。
 // 正規表現リテラル内の丸括弧はエスケープしており、本ファイル本文が
 // 宣言コーパス走査で宣言行として誤検出されない構造としている。
+// inline 宣言行（4役割）に加え、sidecar 対応関係ファイル（role キー配下の
+// 要件行 ID 列挙。専用 ID 等の必須データなし）を同一の論理対応関係として
+// 受理する。sidecar の要件行 ID は inline と同一の ID 形式であり、
+// 登録状態の抽出は行単位の決定的照合とする。
 function collectDeclarationReqRows(content: string): Set<string> {
   const registered = new Set<string>();
   const declarationLineRe =
-    /^\s*(?:<!--|\/\/)\s*ADF-COVERS\((?:design|implementation|verification)\):\s*([^>]*?)(?:-->\s*)?$/;
+    /^\s*(?:<!--|\/\/)\s*ADF-COVERS\((?:decision|design|implementation|verification)\):\s*([^>]*?)(?:-->\s*)?$/;
+  const sidecarEntryLineRe =
+    /^\s*[-*]\s+(REQ-\d{3,4}-\d{3}(?:\.\.REQ-\d{3,4}-\d{3})?)\s*$/;
   for (const line of content.split(/\r?\n/)) {
     const m = line.match(declarationLineRe);
-    if (!m || m[1] === undefined) continue;
-    collectSpans(registered, m[1]);
+    if (m && m[1] !== undefined) {
+      collectSpans(registered, m[1]);
+      continue;
+    }
+    const s = line.match(sidecarEntryLineRe);
+    if (s && s[1] !== undefined) {
+      collectSpans(registered, s[1]);
+    }
   }
   return registered;
 }
