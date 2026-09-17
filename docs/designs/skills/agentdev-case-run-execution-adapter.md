@@ -2,7 +2,7 @@
 title: `agentdev-case-run-execution-adapter` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-15
+updated: 2026-09-17
 ---
 <!-- ADF-COVERS(implementation): REQ-011-010, REQ-011-011, REQ-011-012, REQ-011-017, REQ-015-010, REQ-015-011, REQ-031-007, REQ-031-008 -->
 
@@ -86,6 +86,11 @@ adversarial-review 自身の振る舞い契約、再 review 条件、停止条�
 発動条件判定と review 呼出は分離する（REQ-015-001）。
 発動条件はユーザー明示指定のみ（REQ-015-002、REQ-014-001）を正とする。
 明示指定の検出、伝達経路（委譲 prompt、メタデータ等）の詳細は harness execution mechanism に属し、本 Design の対象外とする。
+
+非発動時の記録: adversarial-review の発動条件は Issue 本文の実行契約を正とする（REQ-014-016）。
+発動契約非該当で非発動とする場合、実行担当サブエージェントは判定理由を必須記録する（case-run 委譲では PR 本文、case-close では対応記録コメント）。
+非発動時は却下案、緩和策、unresolved なしの確認を代替自己反証として実施・記録し、silent skip を発生させない。
+発動条件と審議プロトコルの正（REQ-014-013〜015、adversarial-review Design）は本 Design で変更しない。
 
 発動条件該当時、実行担当サブエージェントは `agentdev-adversarial-review` を起動し、実装方針を審議対象へ渡す。
 呼出契約、返却契約、副作用境界は `agentdev-adversarial-review` と delegation-contracts Design（`semantic_review`、書き込み禁止型）を正とする。
