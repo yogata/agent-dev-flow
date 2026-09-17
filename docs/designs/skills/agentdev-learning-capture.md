@@ -46,7 +46,7 @@ command は他 command を直接呼び出さず、Skill へ一方向に委譲す
 | 呼出元 command | REQ 根拠 | 委譲対象 |
 |---|---|---|
 | case-ready / case-revise | REQ-006-106 / REQ-006-107 | Definition 保存 / Design 保存の内部責務実行中に実観測した deviation のうち learning 該当分 |
-| case-open | REQ-006-021 | case-open 実行中に実観測した deviation のうち learning 該当分 |
+| case-open | REQ-030-011 | case-open 実行中に実観測した deviation のうち learning 該当分 |
 | case-close | REQ-006-105 | case-close 実行中に実観測した deviation のうち learning 該当分（PR 本文から回収した learning 候補を含む） |
 
 `case-run` は `.agentdev/` 直接変更を禁止し PR 本文記録のみを行うため、本スキルへの委譲を行わない（[capture-boundaries.md](../workflows/capture-boundaries.md)「各コマンドの capture 責務」参照）。

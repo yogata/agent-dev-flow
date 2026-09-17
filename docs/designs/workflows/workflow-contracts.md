@@ -341,9 +341,9 @@ case-auto は user-decision-required + decision_context を受領した際、bou
 
 **ユーザー停止時の伝播**: case-auto が decision_context を自律解決できない場合（上位合意矛盾、新規ユーザー判断事項）、対象 execution_unit の処理を停止し、前節「case-auto への伝播と resume point」の resume point 仕様に従い resume point を記録する。
 ユーザー判断の解決後、resume point から処理を再開する点は従来の user-decision-required 停止と同一である。
-bounded parent decision resolution は新規の永続結果型を導入せず、既存 resume point 機構（REQ-006-085）を再利用する（DEC-008 決定5）。
+bounded parent decision resolution は新規の永続結果型を導入せず、既存 resume point 機構（REQ-006-114）を再利用する（DEC-008 決定5）。
 
-**他 execution_unit への影響**: bounded parent decision resolution による停止は部分停止（REQ-006-015/016）であり、他の ready 対象の execution_unit がある場合は継続する。
+**他 execution_unit への影響**: bounded parent decision resolution による停止は部分停止（REQ-034-035/016）であり、他の ready 対象の execution_unit がある場合は継続する。
 ある execution_unit の decision_context 解決で他 execution_unit がブロックされることはない。
 
 ## 工程間構造化文脈引き継ぎ契約

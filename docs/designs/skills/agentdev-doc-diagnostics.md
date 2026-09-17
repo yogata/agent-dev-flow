@@ -74,7 +74,7 @@ inspect-docs の診断観点は正規の観点レジストリが所有する（r
 - inspect-docs command は診断の実行と finding 出力を担い、診断カテゴリ、証拠構造、出力契約、ルーティングは本 skill が一次所有する（REQ-039-004）
 - REQ 固有診断（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）は `agentdev-req-structure-diagnostics`、Command/Skill 診断は `agentdev-inspect-skills`、文章表層検査は `agentdev-textlint-guard` が担う。探索・導線は README 索引と独立探索手段（正規成果物の直接読取、`rg` 等）が担う（廃止済み探索順スキルの後継構成）
 - 本 skill は横断編成と結果統合のみを所有し、専門診断の再定義を行わない
-- 診断対象は読み取り専用とし、許可される副作用は `.agentdev/inspect/inbox/*.md` の生成と `.agentdev/inspect/` 配下の git 永続化（commit / push）のみ（REQ-002-140-151、inspect lifecycle 準拠）
+- 診断対象は読み取り専用とし、許可される副作用は `.agentdev/inspect/inbox/*.md` の生成と `.agentdev/inspect/` 配下の git 永続化（commit / push）のみ（REQ-036-012-151、inspect lifecycle 準拠）
 
 ## 境界
 

@@ -32,7 +32,7 @@ updated: 2026-07-18
 ## 現在の動作
 
 - 新4列形式と旧4列形式の両方をサポート
-- `⏭スキップ` は採用しない（前提未達は `pending` のまま選択対象外、REQ-006-030）
+- `⏭スキップ` は採用しない（前提未達は `pending` のまま選択対象外、REQ-031-009）
 - `ready` / `running` は case-run(#epic) の内部状態であり永続状態には書き込まれない
 - 永続状態に書き込まれるのは `pending` → `completed` / `blocked` / `failed` の遷移のみ（case-close が単一書き手、v2:ADR-0125）
 

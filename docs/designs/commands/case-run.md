@@ -29,7 +29,7 @@ case-run から実行担当サブエージェントへの委譲契約を以下�
 - **adapter skill**: AgentDevFlow 側の case-run 実行 adapter skill（`agentdev-case-run-execution-adapter`）を指定する。adapter skill は委譲契約、result 契約、worktree 隔離等の case-run 固有知識を提供する。adapter skill 経由で委譲を起動する。
 - **委譲 prompt**: 実行 command を prompt 内に含めて委譲する。実行担当サブエージェントは prompt 内で指定された command を起動する。command の具体名は AGENTS.md および references/<harness>.md 参照。
 - **実行主体分類**: 委譲 prompt 内で実行される command は skill ではなく command である。`load_skills` には command 名を指定せず、adapter skill 名を指定する。
-- **test strategy 項目の test-fix ループ（REQ-006-029/030）**: Issue 本文のテスト戦略セクションに test strategy 項目（3要素構造: verification / pass_criteria / on_failure）が含まれる場合、委譲契約は各項目の検証、不合格時の処置（実装修正して再検証、または Findings 記録）、全項目処理までの反復を実行担当サブエージェントに要求する。詳細な責務は adapter skill（`agentdev-case-run-execution-adapter`）が定義する。
+- **test strategy 項目の test-fix ループ（REQ-031-008/030）**: Issue 本文のテスト戦略セクションに test strategy 項目（3要素構造: verification / pass_criteria / on_failure）が含まれる場合、委譲契約は各項目の検証、不合格時の処置（実装修正して再検証、または Findings 記録）、全項目処理までの反復を実行担当サブエージェントに要求する。詳細な責務は adapter skill（`agentdev-case-run-execution-adapter`）が定義する。
 
 ## 承認・HITL 境界
 
@@ -51,7 +51,7 @@ case-run から実行担当サブエージェントへの委譲契約を以下�
 ## 副作用
 
 - worktree 作成: `.worktrees/{N}-{type}/`（`agentdev-git-worktree`）
-- git fetch: Epic Wave 実行時、PR merge 後再開時に worktree 作成前に `git fetch origin` を実行し origin/main 鮮度確認（REQ-006-023）
+- git fetch: Epic Wave 実行時、PR merge 後再開時に worktree 作成前に `git fetch origin` を実行し origin/main 鮮度確認（REQ-031-002）
 - GitHub API: PR 作成は実行担当サブエージェントが実施。case-run 本体は Issue コメント読取のみ
 - intake / learning capture: PR 本文記録のみ（直接 inbox 変更禁止）
 
@@ -82,10 +82,10 @@ Workflow Skill は単一 Issue 実行（single workflow）と Epic Wave 実行�
 
 ### 実行担当サブエージェント委譲フェーズ
 
-- 実行担当サブエージェント起動（adapter protocol: `agentdev-case-run-execution-adapter`）（v2:ADR-0128, REQ-006-016/017）。委譲契約の詳細は前述「委譲契約」セクション参照。起動手段は AGENTS.md および references/<harness>.md 参照（REQ-002-002）
+- 実行担当サブエージェント起動（adapter protocol: `agentdev-case-run-execution-adapter`）（v2:ADR-0128, REQ-034-015/017）。委譲契約の詳細は前述「委譲契約」セクション参照。起動手段は AGENTS.md および references/<harness>.md 参照（REQ-002-002）
  - 委譲プロンプト: 実行 command を prompt 内で指定（command の具体名は AGENTS.md 参照）
- - 実行担当サブエージェント責務: 委譲 prompt 内で指定された command による目標分解、observable evidence 要求、品質ゲート（code review + QA review + gate review）、test strategy 項目の test-fix ループ（各項目ごとの検証、不合格時処置（fix-and-reverify / record-in-findings）、全項目処理までの反復、REQ-006-030）
- - 委譲起動失敗、異常終了時の扱い: 即 `failed` とせず**実装完了、検証未完了**として扱う（REQ-006-025）。委譲起動不能の場合は `delegation-unavailable` として報告する（REQ-002-003/004）
+ - 実行担当サブエージェント責務: 委譲 prompt 内で指定された command による目標分解、observable evidence 要求、品質ゲート（code review + QA review + gate review）、test strategy 項目の test-fix ループ（各項目ごとの検証、不合格時処置（fix-and-reverify / record-in-findings）、全項目処理までの反復、REQ-031-009）
+ - 委譲起動失敗、異常終了時の扱い: 即 `failed` とせず**実装完了、検証未完了**として扱う（REQ-031-004）。委譲起動不能の場合は `delegation-unavailable` として報告する（REQ-002-003/004）
  - case-run が直接行わない（実行担当サブエージェント責務）: work plan生成、実装実行、TDD、乖離検出（QG-3）、specs更新、関連ドキュメント整合性確認、ローカル検証、PR本文作成、PR作成、デプロイ検証
  - PR URL 受領: 実行担当サブエージェントが直接 PR 作成し PR URL を委譲 result として返却
  - Findings / Capture 候補: 実行担当サブエージェントが PR 本文の `## Findings / Capture候補` に記録
@@ -157,7 +157,7 @@ v2:ADR-0128 Decision #3 に基づく。
 
 1. Epic Issue 本文読込（子Issue一覧、Wave 構成、ステータス追跡テーブル（永続状態を SSoT とする、REQ-006））
 2. 現在 ready な Wave の子Issue 特定（`ready` がない場合、依存が満たされた `pending` Issue を `ready` に遷移させて選択）。前提Issue が blocked/failed の場合は `pending` のまま選択対象外
-3. `git fetch origin` 実行（REQ-006-023）
+3. `git fetch origin` 実行（REQ-031-002）
 4. 子Issue の worktree 作成（worktree 作成と precondition gate を各子Issue について実行）
 5. 各子Issue を実行担当サブエージェントに並列委譲する（adapter protocol: `agentdev-case-run-execution-adapter`）。
  委譲の起動手段、実行制御パラメータは AGENTS.md および references/<harness>.md に配置する（REQ-002-002）。
@@ -182,7 +182,7 @@ v2:ADR-0128 Decision #3 に基づく。
 
 ## QG-3 前置 staleness check 手順（新規セクション）
 
-case-run は実装作業開始前に QG-3 本体とは独立した前置検査として staleness check を実行する（REQ-006-031〜034）。
+case-run は実装作業開始前に QG-3 本体とは独立した前置検査として staleness check を実行する（REQ-031-009〜034）。
 本検査は QG-3 deviation 分類（spec-bug 等）運用を変更せず、deviation 発生前の予防層として位置づける。
 
 ### 検証項目
@@ -204,17 +204,17 @@ staleness check は QG-3 本体（PR 作成直前の実装充足・乖離ゲー�
 QG-3 が実装結果に対するゲートであるのに対し、staleness check は実装開始前の入力妥当性検査である。
 両者は順序依存を持たず、staleness check で差異を検出しても QG-3 本体の実施要否には影響しない。
 
-## docs/** 変更時の targeted docs guard（REQ-006-035）
+## docs/** 変更時の targeted docs guard（REQ-031-011）
 
-case-run は PR 対象ファイルに docs/** 変更を含む場合、実行担当サブエージェント起動の委譲前に targeted docs guard を実行する（REQ-006-035）。
-本検査は QG-3 本体・QG-3 前置 staleness check とは独立した前置 docs 整合性検査であり、3つの検査は順序依存を持たず、それぞれの実施要否に影響しない（REQ-006-033 準拠）。
+case-run は PR 対象ファイルに docs/** 変更を含む場合、実行担当サブエージェント起動の委譲前に targeted docs guard を実行する（REQ-031-011）。
+本検査は QG-3 本体・QG-3 前置 staleness check とは独立した前置 docs 整合性検査であり、3つの検査は順序依存を持たず、それぞれの実施要否に影響しない（REQ-031-012 準拠）。
 
 changed-path routing と配布依存境界の検出経路は共有境界 adapter へ接続する（DEC-014）。
 最終 gate 基底は REQ-010-012 を再利用し、検査エラー（検査対象欠落、読込不能、未分類エントリ、adapter 起動失敗）は gate-not-passed として扱い、clean として通過させない（DEC-014 決定5、`integrity/distribution-boundary.md`「検査エラーの意味」）。
 
 ### 実行条件
 
-- PR 対象ファイルに docs/** 変更を含む場合に実行する。docs/** 変更を含まない PR（コードのみ、SCRIPT のみ等）ではスキップする（REQ-006-007 の QG-3 限定原則を維持、docs全体grep ではなく変更ファイル限定の targeted 検査）
+- PR 対象ファイルに docs/** 変更を含む場合に実行する。docs/** 変更を含まない PR（コードのみ、SCRIPT のみ等）ではスキップする（REQ-031-005 の QG-3 限定原則を維持、docs全体grep ではなく変更ファイル限定の targeted 検査）
 
 ### 実行コマンド
 
@@ -314,10 +314,10 @@ case-run の実行担当（委譲内サブエージェント）が、実装作�
 
 case-run が使用する検査ツール（[integrity-contracts.md](../integrity/integrity-contracts.md)「Workflow × 使用ツールマトリックス」参照）:
 
-- check_changed_docs.ts（--workflow case-run）: PR 対象ファイルに docs/** 変更を含む場合、委譲前に実行（[docs/** 変更時の targeted docs guard（REQ-006-035）](#docs-変更時の-targeted-docs-guardREQ-006-035) 参照）
+- check_changed_docs.ts（--workflow case-run）: PR 対象ファイルに docs/** 変更を含む場合、委譲前に実行（[docs/** 変更時の targeted docs guard（REQ-031-011）](#docs-変更時の-targeted-docs-guardREQ-031-011) 参照）
 - check_integrity.ts（全体監査）: PR 対象ファイルに docs/** 変更を含む case では commit 前に full 実行し、base 既知違反と新規違反を分離して新規違反 0 件を確認する（「docs 変更を含む case での commit 前 full check_integrity 工程」参照）
 - check_extensions.ts（IR-056）: `src/opencode/commands/agentdev/**/*.md`, `src/opencode/skills/agentdev-*/SKILL.md`, `src/opencode/skills/agentdev-*/references/**/*.md`, `.agentdev/extensions/**` のいずれかを変更した場合に実行
-- test_strategy: Issue 完了条件検証（REQ-006-029/030）
+- test_strategy: Issue 完了条件検証（REQ-031-008/030）
 
 case-run は check_integrity.ts（全体監査）を、docs 変更を含む case での commit 前検査として条件付きで使用する（base 既知違反と新規違反の分離、新規違反 0 件確認）。targeted docs guard（PR 単位の targeted 検査）は維持する。docs 変更を含まない case での全体監査は /repo/docs-check の責務である。
 
@@ -338,8 +338,8 @@ case-run は REQ-017 に定義される execution contract を消費境界とし
 ### runtime-only 判断の維持
 
 次は case-run の安全検査として維持し、execution contract 確定へ移管しない。
-- worktree 状態確認（REQ-006-023）
-- QG-3 前置 staleness check（REQ-006-030）
+- worktree 状態確認（REQ-031-002）
+- QG-3 前置 staleness check（REQ-031-009）
 - 実 diff 検査
 - 実装結果、test 実行結果
 
@@ -407,16 +407,16 @@ case-run は Issue 本文の execution contract 必須セクション存在有�
 - Epic Wave 実行時の1 Wave のみ処理、べき等性（同コマンド再実行で次 Wave に進む）
 - 出力制約: PR 本文、commit message は verbatim で返す（成果物本文）
 
-## case-auto 並列委譲モデル（REQ-006-087〜093）
+## case-auto 並列委譲モデル（REQ-034-027〜093）
 
-case-run は同一 Wave 内子Issue 処理を最大5件まで並列委譲する（REQ-006-026、REQ-006-087）。
+case-run は同一 Wave 内子Issue 処理を最大5件まで並列委譲する（REQ-034-027、REQ-034-027）。
 本機能は Epic Wave モデル（v2:ADR-0128）で既に実装済み。
-case-auto 並列委譲モデル拡張により、Standard flow 起因の独立 OU 自動 Epic 化（REQ-006-088）でも本機能が適用される。
+case-auto 並列委譲モデル拡張により、Standard flow 起因の独立 OU 自動 Epic 化（REQ-034-027）でも本機能が適用される。
 case-run 側の新規機能追加は不要で、入力としての Epic Issue が増えるのみ。
 
 ## L2 タイムスタンプ計測
 
-case-run は実行担当サブエージェント委譲の起動直前、直後にタイムスタンプを記録し、実行担当サブエージェント実行時間および worktree 設定/クリーンアップ時間を result に含める（REQ-003-009、REQ-006-028）。
+case-run は実行担当サブエージェント委譲の起動直前、直後にタイムスタンプを記録し、実行担当サブエージェント実行時間および worktree 設定/クリーンアップ時間を result に含める（REQ-003-009、REQ-031-017）。
 
 計測対象は以下のフェーズ前後とする。
 各フェーズは Workflow Skill（`agentdev-workflow-case-run`）の L2 タイムスタンプ計測ポイントと対応する（内部手順番号によらず、下記フェーズ前後で計測する）。
@@ -425,7 +425,7 @@ case-run は実行担当サブエージェント委譲の起動直前、直後�
 - 委譲（起動直前、直後）
 - worktree クリーンアップ（開始、完了）
 
-検証（test strategy 項目の test-fix ループ、QG-3）は委譲範囲内で実行担当サブエージェントが実行する責務分担（REQ-006-029/030）であり、case-run 本体から独立した L2 計測ポイントではない。
+検証（test strategy 項目の test-fix ループ、QG-3）は委譲範囲内で実行担当サブエージェントが実行する責務分担（REQ-031-008/030）であり、case-run 本体から独立した L2 計測ポイントではない。
 検証時間は委譲の起動直前、直後のタイムスタンプに含まれる。
 
 記録された L2 タイムスタンプは case-auto の工程別壁時計時間報告（REQ-003-008）の入力として消費される。
@@ -447,7 +447,7 @@ Design 修正が必要と判明した場合は `record-in-findings` で PR 本�
 
 **target_area の重複判定と並列制御**:
 
-- 同一 Design ファイルの異なる target_area を複数孫 Issue が編集する場合: git diff が競合しないため並列マージを許容する。並列判定軸は REQ-006-014 の連結成分ベースに従い、ファイル衝突（L2）は並列許容、PR マージコンフリクトは後続 PR の rebase で解決する
+- 同一 Design ファイルの異なる target_area を複数孫 Issue が編集する場合: git diff が競合しないため並列マージを許容する。並列判定軸は REQ-034-013 の連結成分ベースに従い、ファイル衝突（L2）は並列許容、PR マージコンフリクトは後続 PR の rebase で解決する
 - 同一 Design ファイルの同一 target_area を複数孫 Issue が編集する場合: case-open 構成生成時に必須依存（depends_on）として連結させ、直列化する。Wave 構成で同一 Wave へ割り当てない
 
 case-run は case-open が生成した Wave 構成と depends_on を前提として受け取り、委譲内で並列制御を新たに判定しない。
