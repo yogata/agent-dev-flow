@@ -19,3 +19,10 @@ link profile の「双方反映（src/opencode 正本と .opencode 配置先投�
 ## 根拠（任意）
 
 PR #2922 本文「品質メトリクス」表 配布依存境界 link profile 行（scanned 39 files、skills 投影対象外の環境ラベル記録あり）。実行例: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary.ts --profile link --root .`（2026-09-17、main 3464fa46 / worktree e0ca2454 時点）。
+
+## intake-promote 確定注記（2026-09-18、adversarial-review 実施済み）
+
+本 item は intake-promote の対論型レビューを経て「採用」で自律確定した（観測はコード実読みで裏付け済み）。
+
+- collectTargets の実体は scripts/lib/distribution-boundary-fs.ts の L126 / L158-159（Dirent.isDirectory() フィルタ、isSymbolicLink 分岐なし）であり、item 本文の記述と機能的に同一チェーン。
+- checker 実装修正（junction 走査対応）と既知制限の文書化のいずれを採るかは backlog-review → req-define の判断。

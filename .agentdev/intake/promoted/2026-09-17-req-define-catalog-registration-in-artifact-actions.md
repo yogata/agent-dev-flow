@@ -14,3 +14,11 @@ req-define の draft 生成規則（artifact_actions）へ「新規 REQ CREATE �
 
 ## 根拠（任意）
 Case #2898（Case 状態遷移記録・Issue コメント参照）、PR #2900（definition-amend/issue-2898、squash merge c6c2cce4）、Issue #2898 Execution Contract（case-ready 再実行記録）。
+
+## intake-promote 確定注記（2026-09-18、adversarial-review 実施済み）
+
+本 item は intake-promote の対論型レビューを経て「採用（前提現行化）」で自律確定した。
+
+- 前提現行化（必須）: verification-scope-catalog は DEC-030（accepted、2026-09-17）で廃止され物理削除済み。検証対応要否は traceability/policy.yaml へ移行（未指定 = required、任意行は明示登録制、Case #2936 Wave 4-1 / PR #2952 で移行完了）。本 item の課題は「新規 REQ CREATE を含む draft は traceability/policy.yaml への検証対応要否判断（optional 登録または required 許容）を artifact_actions に含める規則」として現行化して扱うこと。
+- 根底の failure mode は現行モデルでも反転存続する（未指定 = required のため、policy 判断を含めない新規 REQ CREATE の Definition は case-ready トレーサビリティ完全性ゲートで fail し得る）。現行 req-define Design の artifact_actions 生成規則に policy 登録の規定は確認できない（grep レベル）。規則追加要否の判断時に req-define Design の全文精査を backend 側で行うこと。
+- 観測時点の「未分類」停止は旧モデルの語彙である点にも注意（現行は未分類状態なし）。

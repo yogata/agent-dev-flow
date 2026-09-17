@@ -14,3 +14,9 @@ harness-delegation.md「structured_context の SSoT 抽出と突合検査」節�
 
 ## 根拠（任意）
 Issue #2884 / PR #2889 の Findings 記録（case-run DEL-2884-1、context mining レーン）。REQ-017-020 行（docs/requirements/REQ-017.md）。
+
+## intake-promote 確定注記（2026-09-18、adversarial-review 実施済み）
+
+本 item は intake-promote の対論型レビューを経て「採用」で自律確定した（観測正確: harness-delegation.md の当該節は REQ-017-019 のみ再述、意図的省略・現時点の機能欠落なし・矛盾なし）。
+
+- 本 item は「将来の追随反映候補」の性質を持つ（原本ポインタ型のため未反映でも機能欠落なし）。backlog-review で保留（育成対象）と判定される可能性が高いことを明示しておく。反映要否の判断は backlog-review の正規 HITL に属する。

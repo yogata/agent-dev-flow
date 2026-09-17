@@ -19,3 +19,11 @@ docs-check STEP-1 の AUTOGEN 鮮度検出 gate が main の状態で恒常的�
 ## 根拠（任意）
 
 `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_autogen_freshness.ts --root .` exit 1（2026-09-17、main 03c58bf4 時点。block req-metrics-measurement-example、current 56 lines / expected 57 lines）。PR #2910 本文「AUTOGEN 索引影響」セクション。commit 21dfdd9c（#2894）・4373fce0（#2909）・03c58bf4（#2910）の各 diff（docs/requirements/REQ-057.md のみ変更で AUTOGEN 再生成なし）。
+
+## intake-promote 確定注記（2026-09-18、adversarial-review 実施済み）
+
+本 item は intake-promote の対論型レビューを経て「採用（対象限定）」で自律確定した。
+
+- 対象限定: main の strict failure 即時解消（先行整備 Case）は現行 tree で解消済み（REQ-057.md 36 行と AUTOGEN 表示 36 行の一致、計測日 2026-09-18 を確認）。本 item の採用対象は、REQ-057-018 の「AUTOGEN 対象索引」定義の非対称解消と再発構造（日付跨ぎ・REQ 行変動で AUTOGEN が滞留し docs-check gate が fail する構造）の恒久対策である。
+- 同一事象の学びが learning-promote 2026-09-18 で採用済み成果物「design-candidate-autogen-staleness-prevention.md」として同時昇格している。統合判定は backlog-review で実施すること。
+- 観測内訳の「REQ-057-031/032 欠番」表現は検証未了のため、根拠の引用は commit ハッシュ付き実行記録ベースとすること（中核観測への影響なし）。

@@ -14,3 +14,10 @@ REQ-053-040 の新規範の適用対象（網羅是正候補リスト）への�
 
 ## 根拠（任意）
 出所不明引用の防止規定 REQ-053-040（docs/requirements/REQ-053.md L56）。Issue #2883 / PR #2888 の Findings 記録（case-run DEL-2883-1）。
+
+## intake-promote 確定注記（2026-09-18、adversarial-review 実施済み）
+
+本 item は intake-promote の対論型レビューを経て「採用」で自律確定した（誤アンカーの乖離は REQ-082-004 実本文との对照で裏付け済み）。
+
+- 管理経路の選択（本 item の RU 化 vs 既存追跡Issue #2883 への網羅是正リスト追記）は backlog-review の統合判断で明示的に決定すること。backlog-review 実施時に Issue #2883 の現状（未解決か、網羅是正を管理中か）を GitHub 側で確認すること（ローカル検証不能のため引き継ぎ）。
+- REQ-053-040 の適用対象候補としての位置づけは REQ-053.md L56 の既定どおり。

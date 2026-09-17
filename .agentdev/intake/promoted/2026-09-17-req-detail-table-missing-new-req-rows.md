@@ -19,3 +19,10 @@ Case #2917（実装 PR #2923）の case-run で、`docs/README.md` の REQ 詳�
 ## 根拠（任意）
 
 PR #2923 本文「Findings/Capture 候補」セクション。`docs/README.md` の REQ 詳細一覧表（現行 main `c6198313` 時点で REQ-082 まで）。Definition PR #2919 の変更ファイル一覧（docs/README.md は欠番明記1行のみ）。
+
+## intake-promote 確定注記（2026-09-18、adversarial-review 実施済み）
+
+本 item は intake-promote の対論型レビューを経て「採用」で自律確定した（現行も未解決、REQ-083/087 実在・docs/README.md 表の欠落を再確認済み）。
+
+- 同一事象が inspect-docs 検出事項 IDX-1（2026-09-17）としても検出されており、inspect-promote 2026-09-18 実行で IDX-1 が「既存 intake item との統合必須（統合は backlog-review 責務）」の注記付きで promote されている。本 item と IDX-1 の統合は backlog-review で実施すること。
+- AUTOGEN 移行か手動チェックかの運用決定は item 本文「レビューで決めること」どおり backlog-review 以降で判断。
