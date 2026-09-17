@@ -33,6 +33,8 @@ updated: 2026-09-17
 
 - 実施記録: Issue #2904（RU-0026 check_distribution_boundary_cli.ts の誤起動防止、maintenance）の case-ready 検証対応要否最終ゲートの差し戻し経路（REQ-061-033、Definition Amendment PR 経由・REQ-030-015）で実施した。canonical Definition 確定（Definition PR #2907、squash merge commit 8ce3c113）による新規行 REQ-057-035 を棚卸し単位（REQ 単位）で分類確定した。REQ-057-035 は検査 checker の CLI 用分割スクリプトの直接起動時検査実行（runCli の top-level 起動による無出力・exit 0 の無検証成功の排除）と exit code 契約（0 ok / 1 violation / 2 error）維持の実行時規範行であり、恒続的な検証手段を特定しない（本 Case のテスト戦略 TS-001/TS-002 が直接起動と正規起動の突合と docs-check・関連 integrity 検査の一回的検証）ため、安全側の任意行として本カタログへ登録した。本登録により traceability check の missing-verification（unclassified）は解消する
 
+- 実施記録: Issue #2906（RU-0028 Design accepted 昇格時の対応記録標準形式、maintenance）の case-ready 検証対応要否ゲートで実施した。case-ready STEP-6（canonical 再取得時の traceability check）で新規行 REQ-057-036 の未分類を検出し、REQ-061-033 の差し戻し経路に従い case-open が REQ-030-015 のとおり本カタログ追随を Definition Amendment PR に包含して登録した。canonical Definition 確定（Definition PR #2911、squash merge commit 6285ca2b）による新規行 REQ-057-036 を棚卸し単位（REQ 単位）で分類確定した。REQ-057-036 は既存 REQ-057-023..REQ-057-030 と同一系統の Design 昇格時の対応記録標準形式の運用規範行であり、恒続的な検証手段を特定しない（本 Case のテスト戦略 TS-001〜TS-003 が保存契約の読み取り確認と記録チャネル比較の一回的検証）ため、安全側の任意行として本カタログへ登録した（REQ-057 節へ単独行として追加。031/032/034/035 は他 Case 割当中のため既存 026..030 との範囲統合は行わない）。本登録により traceability check の missing-verification（unclassified）は解消する
+
 ## 形式
 
 - 1行1エントリとする
@@ -327,6 +329,7 @@ Issue #2362 の移行作業（棚卸し (a')）で全現行要件行を判定し
 - REQ-057-026..REQ-057-030: 配布物本文の現行契約整合（陳腐化した運用記述の排除）、traceability check fail の実測対象選定による段階解消、宣言集約済み除去の coverage 前置確認、IR-055 baseline 残置検出の段階解消運用、ADF-COVERS 除去可否判定 coverage 突合の運用詳細（implementation 役割と docs/ パスのフィルタ必須、除去後の traceability check による後置検査）。docs-check 検査・traceability check・integrity suite（REQ-010-068、Case Issue のテスト戦略）とレビューで検証
 - REQ-057-033: 配布 skill 本体の移設残骸参照の実在する参照先への解決と、解消後の IR-062 baseline-known 検出の ReferencePath bucket（provenance: legacy）からの除去運用。一回限りの baseline 整合・参照修復の実行詳細であり、恒続的な検証は IR-062 reference-path-existence 自体（既存検査）とレビューで検証
 - REQ-057-035: 検査 checker の CLI 用分割スクリプトの直接起動時検査実行（runCli の top-level 起動、無出力・exit 0 の無検証成功の排除）と exit code 契約（0 ok / 1 violation / 2 error）の維持、checker 共通実行契約の CLI 分割スクリプト エントリポイント契約と正規起動経路の注意の保持。一回限りの CLI エントリポイント修復と共通契約の注意追記の実行詳細であり、恒続的な検証は checker 共通実行契約（既存 Design）の明示内容と Case Issue のテスト戦略（直接起動と正規起動の突合）で検証
+- REQ-057-036: Design status を draft から accepted へ昇格した場合の昇格根拠記録標準形式（Design 本体の見出し名「対応記録」、4必須項目、見送り記録との排他）の運用規範行。一回限りの Definition 保存と、case-close Design 状態評価での記録運用が適用経路であり、恒続的な検証手段を特定しないため任意行（Case Issue のテスト戦略〔TS-001〜TS-003 の保存契約読取確認とチャネル比較〕とレビューで検証）
 
 ### REQ-058（ADF 管理投影物の廃止時クリーンアップ契約）
 
