@@ -3,10 +3,12 @@
 <!-- ADF-COVERS(implementation): REQ-031-028 -->
 <!-- ADF-COVERS(implementation): REQ-036-027 -->
 <!-- ADF-COVERS(implementation): REQ-057-030 -->
+<!-- ADF-COVERS(implementation): REQ-014-016 -->
 
 > 本 reference は `agentdev-workflow-case-run` SKILL.md の single workflow 詳細である。
 > STEP-S1〜S3（フェーズ判定から前置 gate 群まで）と STEP-S6（クリーンアップ・完了報告）を所有する。
 > STEP-S4/S5 は [references/delegation-and-result.md](delegation-and-result.md) を参照。
+> STEP-S4 の委譲では、adversarial-review の発動条件を含む実行契約は Issue 本文を正とする。Issue 本文が非発動を記す場合、その契約に従い非発動とし、非発動の判定理由と代替自己反証（却下案・緩和策・unresolved なしの確認）を PR 本文へ必須記録する。
 
 ## 目次
 
