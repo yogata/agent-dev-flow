@@ -43,7 +43,7 @@ case-ready workflow は次の7 STEP で構成する。
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
 | STEP-1 | Definition PR 受入 | Root Case 受領 | Definition PR 確定判定完了（自動確定・merge 実行済み / 実変更なしで PR 不在のまま継続 / HITL 停止 / CI 失敗停止） | [references/definition-acceptance.md](references/definition-acceptance.md) |
-| STEP-2 | canonical 再取得 | STEP-1 確定判定完了 | canonical Definition 再取得済み、traceability check 機械実行済み（unclassified 検出時は case-open へ差し戻し。REQ-061-033）、以降の処理基準確定 | [references/definition-acceptance.md](references/definition-acceptance.md) |
+| STEP-2 | canonical 再取得 | STEP-1 確定判定完了 | canonical Definition 再取得済み、traceability check 機械実行済み（unclassified 検出時は case-open へ差し戻し）、以降の処理基準確定 | [references/definition-acceptance.md](references/definition-acceptance.md) |
 | STEP-3 | Decision 受理評価 | STEP-2 完了 | proposed Decision の評価完了（accepted 遷移実行 / 受理不能で停止 / 評価対象 0 件で継続） | [references/decision-acceptance.md](references/decision-acceptance.md) |
 | STEP-4 | execution contract 確定 | STEP-3 完了 | execution contract を Root Case 本文へ確定済み | [references/execution-contract.md](references/execution-contract.md) |
 | STEP-5 | 実行構造確定 | STEP-4 完了 | Standard / Epic 確定済み。Epic 時は Child Issue / Wave / 依存構造作成済み、構成検証合格 | [references/execution-structure.md](references/execution-structure.md) |
@@ -53,7 +53,7 @@ case-ready workflow は次の7 STEP で構成する。
 ### STEP 間の依存と分岐
 
 - **基本順序**: STEP-1 → STEP-2 → STEP-3 → STEP-4 → STEP-5 → STEP-6 → STEP-7
-- **unclassified 差し戻し分岐（STEP-2）**: canonical 再取得時の traceability check 機械実行で unclassified を検出した場合は case-open へ差し戻し、ready へ遷移せず停止する（REQ-061-033）。検証対応要否の最終ゲート（STEP-6）は case-ready が所有し続け、unclassified と missing-verification は同一行集合から単一導出される（二重定義しない）
+- **unclassified 差し戻し分岐（STEP-2）**: canonical 再取得時の traceability check 機械実行で unclassified を検出した場合は case-open へ差し戻し、ready へ遷移せず停止する。検証対応要否の最終ゲート（STEP-6）は case-ready が所有し続け、unclassified と missing-verification は同一行集合から単一導出される（二重定義しない）
 - **実変更なし分岐（STEP-1）**: Definition PR が存在しない場合（実変更のない bugfix 等の Case）は Definition PR を作らず canonical Definition は現行 main の状態を採用し、execution contract 確定と ready 遷移へ進む。空の Definition PR を作成する経路は存在しない
 - **HITL 分岐（STEP-1）**: 新しい Decision、意味変更、対象範囲拡大、意味的な不整合解消が必要と判定した場合は停止し、既存 PR を保持したままユーザー判断を求める
 - **CI 失敗分岐（STEP-1）**: Definition PR の CI / 品質検査失敗時は ready へ遷移せず、既存 PR を保持したまま停止する。修復後に再実行できる
@@ -70,7 +70,7 @@ case-ready workflow は次の7 STEP で構成する。
 ### 終了条件（termination）
 
 - 正常終了: draft / RU 削除・同期確認 STEP の完了報告出力まで
-- 停止終了: Definition PR の忠実性・整合性・品質検査で新しい意味判断が必要な場合、CI / 品質検査失敗、canonical 再取得時の traceability check による unclassified 検出（case-open へ差し戻し。REQ-061-033）、構成検証の上限超過または構成不備、受理不能または判断情報不足の proposed Decision、検証対応要否の未分類残存、main 同期不一致
+- 停止終了: Definition PR の忠実性・整合性・品質検査で新しい意味判断が必要な場合、CI / 品質検査失敗、canonical 再取得時の traceability check による unclassified 検出（case-open へ差し戻し）、構成検証の上限超過または構成不備、受理不能または判断情報不足の proposed Decision、検証対応要否の未分類残存、main 同期不一致
 
 ## 主要 Capability Skill 連携
 
@@ -94,7 +94,7 @@ case-ready workflow は次の7 STEP で構成する。
 case-ready は検証対応要否の最終ゲートで、対象要件行の実装対応・検証対応の整合を確認する。
 
 - 実行対象 REQ の要件行について `agentdev-traceability` の coverage / check を用い、実装対応・検証対応の未分類行を検出する
-- canonical Definition 再取得時（STEP-2）にも traceability check を機械実行し、unclassified を検出した場合は case-open へ差し戻す（REQ-061-033）。検証対応要否の最終ゲート（REQ-061-023 の未分類残存時 ready 不遷移、STEP-6）は引き続き case-ready が所有し、STEP-2 との二重定義は行わない。両検査の unclassified と missing-verification は同一行集合から単一導出される
+- canonical Definition 再取得時（STEP-2）にも traceability check を機械実行し、unclassified を検出した場合は case-open へ差し戻す。検証対応要否の最終ゲート（未分類残存時の ready 不遷移、STEP-6）は引き続き case-ready が所有し、STEP-2 との二重定義は行わない。両検査の unclassified と missing-verification は同一行集合から単一導出される
 - 未分類行が残る場合は ready へ遷移させず、停止理由と未分類行一覧を報告する
 - 問い合わせ結果は候補提供であり最終判断としない。機能の不在、実行失敗、空結果の場合は README 索引、正規成果物の直接読取等の代替探索で継続する（fail-open）
 
