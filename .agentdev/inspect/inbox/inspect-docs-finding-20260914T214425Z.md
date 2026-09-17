@@ -2,6 +2,8 @@
 
 > 本ファイルは inspect-promote（2026-09-15 実施、/agentdev/backlog-auto stage 2 inspect 系統経由、--auto なし）の分類確定後、defer となった検出事項のみを残置する。promote 採用分（22件）は `.agentdev/inspect/promoted/inspect-docs-promoted-20260914T214425Z.md` へ保存済み。reject 1件（DIST-02）は即時削除（却下理由は当該 commit message 参照）。
 >
+> 2026-09-18 inspect-promote 再審議（対論型レビュー、/agentdev/backlog-auto stage 2 経由）: 本ファイルの defer 5件（F-04/F-05/GUIDE-6/GUIDE-8/DESIGN-3）は全件 defer 継続と判定した（再評価条件に変化なし、unresolved 0件）。F-05 のみ learning 2026-09-18 顕在化事象との関連注記を追加（下記 F-05 notes 参照）。
+>
 > - F-04: REQ-038-006 の内部アルゴリズム混入は安定契約例外候補があり採否が意味判断（20260901 defer F-12 と同型の MOVE 系）
 > - F-05: REQ-050-016 の SPLIT は新規 REQ 対象範囲の決定を伴う構造再編（20260901 defer F-08 と同型）
 > - GUIDE-6: 節の意図がワークフロー状態限定の可能性があり要文脈判断
@@ -31,6 +33,7 @@
 - **recommended_route**: SPLIT（独立関心として専用 REQ へ分割）+ 数値詳細は Design 参照へ縮約
 - **ng_classification**: 今回修正対象（2026-09-12 `1003eb4c` 追加行）
 - **notes**: req-define入力案「skill description 集約予算の運用方針を REQ-050 から切り出し、独立 REQ へ配置。予算数値の詳細は Design 参照とする」
+- **2026-09-18 審議注記**（inspect-promote 対論型レビュー）: learning 2026-09-18 に「lint-skills description 長 NG 2件（agentdev-workflow-case-ready 743 chars、case-revise 663 chars の 600 上限超過）+ aggregate budget warning が main @ c421a4b4 で恒常再現する pre-existing」という顕在化事象が記録された。予算制度の履行状況に疑問を投げかける観察だが、超過は warning であり lint_skills 検査契約どおりの動作であるため履行違反と即断できない。**SPLIT 採否の意味判断は不変で defer 継続**。ただし learning-promote 2026-09-18 が採用済み成果物 `design-candidate-autogen-staleness-prevention.md` の付帯記録として description 長の独立改善要求（一括短縮の別 Case 化候補）を昇格させており、**次回再評価では当該 learning 成果物の backlog-review 処置結果を再評価条件に含める**こと。
 
 ### [文書種別] GUIDE-6: 状態モデル制約が Design/Decision の frontmatter status 管理と冲突
 
