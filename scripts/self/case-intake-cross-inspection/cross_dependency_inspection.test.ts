@@ -333,6 +333,179 @@ describe("条件 (b): 共有領域未登録行の重複需要（TS-002）", () =
   });
 });
 
+describe("4役割宣言と sidecar 対応関係の受理（TS-001 該当部・TS-009）", () => {
+  test("decision を含む4役割の宣言行がすべて登録状態として受理される", () => {
+    const files: Record<string, string> = {
+      "decls.md": [
+        "# declarations",
+        "",
+        mdDecl("decision", "REQ-900-001"),
+        mdDecl("design", "REQ-900-002"),
+        mdDecl("implementation", "REQ-900-003"),
+        mdDecl("verification", "REQ-900-004"),
+      ].join("\n"),
+    };
+    const report = inspectCrossDependencies(makeInput({
+      mode: "case-ready",
+      current_case: {
+        case_ref: "#current",
+        epic_ref: null,
+        is_epic_intake: false,
+        artifact_paths: [],
+        target_rows: ["REQ-900-001", "REQ-900-002", "REQ-900-003", "REQ-900-004", "REQ-900-005"],
+      },
+      unclosed_cases: [],
+      shared_areas: [
+        {
+          area_id: "decl-area",
+          display_name: "対応宣言領域",
+          kind: "adf-covers-declarations",
+          file_paths: ["decls.md"],
+        },
+      ],
+    }), (rel) => {
+      const content = files[rel];
+      if (content === undefined) throw new Error(`missing fixture: ${rel}`);
+      return content;
+    });
+    const area = report.condition_b[0];
+    expect(area?.case_count).toBe(1);
+    const current = area?.demand_cases.find((c) => c.case_ref === "#current");
+    // 4役割の宣言済み行は需要とならず、未宣言の 005 のみ需要となる（decision 0件は不合格として扱われない）
+    expect(current?.unregistered_rows).toEqual(["REQ-900-005"]);
+    expect(report.ok).toBe(true);
+    expect(report.gate_effect).toBe("none");
+  });
+
+  test("sidecar 対応関係ファイル（role キー配下の ID 列挙）を登録状態として読み取る", () => {
+    const files: Record<string, string> = {
+      "traceability/component-a.yaml": [
+        "component: component-a",
+        "decision:",
+        "  docs/decisions/DEC-900.md:",
+        "    - REQ-900-001",
+        "design:",
+        "  docs/designs/x.md:",
+        "    - REQ-900-002",
+        "implementation:",
+        "  src/x.ts:",
+        "    - REQ-900-003",
+        "verification:",
+        "  scripts/x.test.ts:",
+        "    - REQ-900-004",
+      ].join("\n"),
+    };
+    const report = inspectCrossDependencies(makeInput({
+      mode: "case-ready",
+      current_case: {
+        case_ref: "#current",
+        epic_ref: null,
+        is_epic_intake: false,
+        artifact_paths: [],
+        target_rows: ["REQ-900-001", "REQ-900-002", "REQ-900-003", "REQ-900-004", "REQ-900-005"],
+      },
+      unclosed_cases: [],
+      shared_areas: [
+        {
+          area_id: "sidecar",
+          display_name: "sidecar 対応関係",
+          kind: "adf-covers-declarations",
+          file_paths: ["traceability/component-a.yaml"],
+        },
+      ],
+    }), (rel) => {
+      const content = files[rel];
+      if (content === undefined) throw new Error(`missing fixture: ${rel}`);
+      return content;
+    });
+    const area = report.condition_b[0];
+    const current = area?.demand_cases.find((c) => c.case_ref === "#current");
+    // role キー配下の 4役割分の登録行は需要とならず、未登録の 005 のみ需要となる
+    expect(current?.unregistered_rows).toEqual(["REQ-900-005"]);
+  });
+
+  test("inline 宣言と sidecar 対応関係を同一領域の複数ファイルとして統合して読み取る", () => {
+    const files: Record<string, string> = {
+      "producer/decs.md": [
+        mdDecl("implementation", "REQ-900-001"),
+        mdDecl("design", "REQ-900-002"),
+      ].join("\n"),
+      "traceability/component-a.yaml": [
+        "component: component-a",
+        "verification:",
+        "  scripts/x.test.ts:",
+        "    - REQ-900-003",
+      ].join("\n"),
+    };
+    const report = inspectCrossDependencies(makeInput({
+      mode: "case-ready",
+      current_case: {
+        case_ref: "#current",
+        epic_ref: null,
+        is_epic_intake: false,
+        artifact_paths: [],
+        target_rows: ["REQ-900-001", "REQ-900-002", "REQ-900-003", "REQ-900-004"],
+      },
+      unclosed_cases: [],
+      shared_areas: [
+        {
+          area_id: "decl-area",
+          display_name: "対応宣言領域",
+          kind: "adf-covers-declarations",
+          file_paths: ["producer/decs.md", "traceability/component-a.yaml"],
+        },
+      ],
+    }), (rel) => {
+      const content = files[rel];
+      if (content === undefined) throw new Error(`missing fixture: ${rel}`);
+      return content;
+    });
+    const area = report.condition_b[0];
+    const current = area?.demand_cases.find((c) => c.case_ref === "#current");
+    // inline（001, 002）と sidecar（003）の双方が登録済み、未登録は 004 のみ
+    expect(current?.unregistered_rows).toEqual(["REQ-900-004"]);
+    expect(area?.file_results.length).toBe(2);
+  });
+
+  test("policy の optional 登録行を登録状態として受理する（policy・sidecar 領域の機械面）", () => {
+    const files: Record<string, string> = {
+      "traceability/policy.yaml": [
+        "verification:",
+        "  default: required",
+        "  optional:",
+        "    - REQ-900-001",
+      ].join("\n"),
+    };
+    const report = inspectCrossDependencies(makeInput({
+      mode: "case-ready",
+      current_case: {
+        case_ref: "#current",
+        epic_ref: null,
+        is_epic_intake: false,
+        artifact_paths: [],
+        target_rows: ["REQ-900-001", "REQ-900-002"],
+      },
+      unclosed_cases: [],
+      shared_areas: [
+        {
+          area_id: "policy",
+          display_name: "検証スコープポリシー",
+          kind: "adf-covers-declarations",
+          file_paths: ["traceability/policy.yaml"],
+        },
+      ],
+    }), (rel) => {
+      const content = files[rel];
+      if (content === undefined) throw new Error(`missing fixture: ${rel}`);
+      return content;
+    });
+    const area = report.condition_b[0];
+    const current = area?.demand_cases.find((c) => c.case_ref === "#current");
+    // policy に明示登録された 001 は登録済み、未登録の 002 のみ需要となる
+    expect(current?.unregistered_rows).toEqual(["REQ-900-002"]);
+  });
+});
+
 describe("検出不能報告と非阻止（TS-003）", () => {
   test("共有領域実ファイルの読取失敗時、比較を省略せず検出不能として報告する", () => {
     const report = inspectCrossDependencies(makeInput({
