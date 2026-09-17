@@ -1,6 +1,7 @@
 # epic-wave workflow: Epic Wave 実行（epic-wave）
 
 <!-- ADF-COVERS(implementation): REQ-031-027, REQ-031-029, REQ-031-030, REQ-035-012 -->
+<!-- ADF-COVERS(implementation): REQ-057-030 -->
 
 > 本 reference は `agentdev-workflow-case-run` SKILL.md の epic-wave workflow 詳細である。
 > `case-run #epic` 受領時に現在 ready な Wave の子Issue を並列実行する制御（STEP-W1〜W5）を所有する。
@@ -11,6 +12,7 @@
 - STEP-W1: Epic Issue 解析・Wave 選択
 - STEP-W2: fan-out 準備
 - STEP-W3: fan-out 並列委譲
+- 配布物本体 ADF-COVERS 宣言の除去可否判定（cleanup 判定）
 - STEP-W4: fan-in・結果集約
 - STEP-W5: Wave 完了報告・return
 
@@ -157,6 +159,15 @@ Wave 内子Issue を実行担当サブエージェントへ最大5件並列委�
 ### Resume-Idempotency
 
 - PR 未作成かつ result 未確定の子Issue は委譲フェーズから再開できる。完了済み子Issue は再委譲しない（PR 存在で判定）
+
+## 配布物本体 ADF-COVERS 宣言の除去可否判定（cleanup 判定）
+
+子Issue ごとの委譲（STEP-W3）で実行担当サブエージェントが配布物本体に残存する ADF-COVERS 宣言の除去（docs 配下の正規成果物への集約に伴う除去）を扱う場合、除去可否の判定は次のとおり行う（single workflow の委譲にも同一条件を適用する）。
+
+- 除去可否判定の coverage 突合では、coverage 出力から implementation 役割かつ docs/ 配下パスの対応関係のみを集約済み実装対応として認定する（役割フィルタと docs/ パスフィルタの適用は必須）。design 役割・verification 役割の対応関係、および docs/ 配下以外のパス（配布物側の宣言等）は集約済み実装対応として扱わない
+- 対象要件について implementation 役割かつ docs/ 配下の対応が確認できない宣言は除去可と判定せず、除去しない
+- 除去を実行した場合は、除去後に traceability check を実行し、role 別 coverage の対応関係が維持されていること（新規 missing-implementation 0 件）を後置検査として確認する
+- coverage は役割付き対応関係を全件返却するため、役割とパスの解釈は呼出側の責務で行う（agentdev-traceability の運用規約参照）
 
 ## STEP-W4: fan-in・結果集約
 

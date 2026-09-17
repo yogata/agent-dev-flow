@@ -2,6 +2,7 @@
 
 <!-- ADF-COVERS(implementation): REQ-031-028 -->
 <!-- ADF-COVERS(implementation): REQ-036-027 -->
+<!-- ADF-COVERS(implementation): REQ-057-030 -->
 
 > 本 reference は `agentdev-workflow-case-run` SKILL.md の single workflow 詳細である。
 > STEP-S1〜S3（フェーズ判定から前置 gate 群まで）と STEP-S6（クリーンアップ・完了報告）を所有する。
@@ -12,6 +13,7 @@
 - STEP-S1: フェーズ判定・再開ポイント検出
 - STEP-S2: Issue 抽出・確認・判定
 - STEP-S3: Worktree 作成・ブランチ準備・前置 gate 群
+- 配布物本体 ADF-COVERS 宣言の除去可否判定（cleanup 判定）
 - verify-only closure の検証実行と SSoT コメント記録
 - STEP-S6: worktree クリーンアップ確認・完了報告
 
@@ -161,6 +163,15 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 ### Resume-Idempotency
 
 - worktree・ブランチ既存時は作成をスキップする。gate 群は再実行可能であり、同一 worktree 状態に対して同一判定を返す
+
+## 配布物本体 ADF-COVERS 宣言の除去可否判定（cleanup 判定）
+
+実行担当サブエージェントが委譲内の実装作業（STEP-S4）で配布物本体に残存する ADF-COVERS 宣言の除去（docs 配下の正規成果物への集約に伴う除去）を扱う場合、除去可否の判定は次のとおり行う（epic-wave workflow の子Issue 委譲にも同一条件を適用する）。
+
+- 除去可否判定の coverage 突合では、coverage 出力から implementation 役割かつ docs/ 配下パスの対応関係のみを集約済み実装対応として認定する（役割フィルタと docs/ パスフィルタの適用は必須）。design 役割・verification 役割の対応関係、および docs/ 配下以外のパス（配布物側の宣言等）は集約済み実装対応として扱わない
+- 対象要件について implementation 役割かつ docs/ 配下の対応が確認できない宣言は除去可と判定せず、除去しない
+- 除去を実行した場合は、除去後に traceability check を実行し、role 別 coverage の対応関係が維持されていること（新規 missing-implementation 0 件）を後置検査として確認する
+- coverage は役割付き対応関係を全件返却するため、役割とパスの解釈は呼出側の責務で行う（agentdev-traceability の運用規約参照）
 
 ## verify-only closure の検証実行と SSoT コメント記録
 
