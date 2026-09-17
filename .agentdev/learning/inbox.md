@@ -5,6 +5,24 @@
 
 ---
 
+## 2026-09-17: 実装 PR 分岐後に先行 merge された main 側解消行が case-close の全 corpus check で新規 missing に誤解釈され得る
+
+- **問題事象**: 実装 PR の分岐以降に Definition Amendment（検証対応要否カタログ登録）や他 Case の解消 commit が先行 merge された状態で case-close を実行すると、PR HEAD worktree 起点の全 corpus traceability check で main 側で解消済みの行が「新規 missing-implementation / missing-verification」「unclassified」として列挙され、完了ゲートの誤差し戻しを招き得る。
+- **発生局面**: case-close STEP-2 / STEP-3（Case #2908。PR #2927 は 6b35b5df 分岐、Amendment #2932 と AUTOGEN 修正 #2933 が先行 merge 済みの状態で再開）。
+- **検知方法**: worktree 起点 check で REQ-057-034 の unclassified / missing-verification を検出。worktree vs main の reqId 集合差分に REQ-014-016、REQ-057-034/035/036、REQ-061-033 の4行が出現。
+- **根本原因**: worktree vs main の全 corpus 差分の reqId 集合比較は「PR 変更起因の新規 missing」と「ブランチ分岐後の main 側後続解消（worktree だけが旧状態を保持）」を区別しない。
+- **自律対応内容**: 既存契約（case-close の worktree root 起点再実行・カタログ登録 commit の時系列確認）に従い main 起点で check を再実行し、対象行の分岐前後関係を確認して誤差し戻しを回避。merge 後に main 起点で対象行 missing 0 / 0 を再検証して完了判定。
+- **ユーザー確認の有無**: なし（既存契約内の運用）。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: 並行セッションで main が進む docs_chore PR の case-close 全般で再発し得る。worktree vs main 差分行は merge-base と main 解消 commit の時系列を確認してから「新規」判定する。coverage の `--req` は単一 ID のみ対応のため複数行確認は個別実行が必要。
+- **再発条件**: PR 分岐後に main 側で対象 REQ 行のカタログ登録・宣言付与・他 Case 解消が入る場合。
+- **予防策候補**: case-close references に「worktree vs main 差分行の分岐後 main 解消確認」手順を明記する候補。
+- **想定反映先**: case-close references（issue-resolution-and-qg4.md、docs-and-design-promotion.md）。
+- **関連**: Case #2908（Refs）、PR #2927（Refs）、PR #2932（Refs）。
+- **タグ**: #traceability #case-close #parallel-execution #worktree
+
+---
+
 ## 2026-09-17: textlint guard が project root 外の temp worktree への edit/write を fail-closed ブロックする
 
 - **問題事象**: 並行 case-open 下で Definition PR 用 worktree を C:\WINDOWS\TEMP\opencode 配下へ作成した場合、worktree 内ファイルへの edit/write ツール呼び出しが agentdev-textlint-guard の project root 外パス検査（fail-closed）でブロックされる。REQ-057.md への 1 行追加のような軽微な編集でも guard が停止させる。
