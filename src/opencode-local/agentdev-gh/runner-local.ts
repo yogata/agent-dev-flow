@@ -1,5 +1,5 @@
 // agentdev-gh Custom Tool の Local 実現（GhRunner、REQ-011-006 / DEC-004）。
-// ADF-COVERS(implementation): REQ-011-024, REQ-011-025, REQ-011-026, REQ-011-027, REQ-011-030
+// ADF-COVERS(implementation): REQ-011-024, REQ-011-025, REQ-011-026, REQ-011-027, REQ-011-030, REQ-083-001
 //
 // 同一の操作契約（contracts.ts の16操作）を、GitHub Issue/PR の代わりに
 // ローカルIssue（`.agentdev/issues/issue-{NNNN}.md`、単一採番空間）の
@@ -1285,6 +1285,7 @@ export class LocalRunner implements GhRunner {
         body: this.serializePrBody(lines),
         state,
         mergeable: this.mergeableOf(target.parsed),
+        isDraft: false,
       },
     };
   }

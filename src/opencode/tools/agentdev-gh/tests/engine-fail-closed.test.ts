@@ -472,11 +472,18 @@ describe("操作単位の入力定義（構造化 invalid-input・フィール�
     ["pr_update の空更新は empty-update で拒否される", { operation: "pr_update", number: 7 }, "empty-update"],
     ["issue_update の終端 trackingState は invalid-field で拒否される", { operation: "issue_update", number: 7, trackingState: "closed" }, "invalid-field"],
     ["comment_create の空 body は invalid-field で拒否される", { operation: "comment_create", number: 7, body: "" }, "invalid-field"],
-    ["pr_create の draft に真偽値以外は invalid-field で拒否される", { operation: "pr_create", title: "T", body: "B", base: "main", head: "x", draft: "yes" }, "invalid-field"],
   ])("%s", async (_label, rawRequest, code) => {
     const r = await invalidInput(rawRequest);
     expect(r.kind).toBe("invalid-input");
     expect(r.detail).toContain(code);
+    expect(r.runnerCalls).toBe(0);
+  });
+
+  test("pr_create の契約外 draft フィールドは副作用発生前に unknown-field で拒否され draft が特定される（REQ-011-029）", async () => {
+    const r = await invalidInput({ operation: "pr_create", title: "T", body: "B", base: "main", head: "x", draft: true });
+    expect(r.kind).toBe("invalid-input");
+    expect(r.detail).toContain("unknown-field");
+    expect(r.detail).toContain("draft");
     expect(r.runnerCalls).toBe(0);
   });
 });

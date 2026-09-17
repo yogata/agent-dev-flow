@@ -1,4 +1,4 @@
-// ADF-COVERS(implementation): REQ-011-028
+// ADF-COVERS(implementation): REQ-011-028, REQ-083-001
 // agentdev-gh-tool Plugin（Custom Tool `agentdev_gh` の harness 登録配線）。
 //
 // OpenCode のプラグイン機構（.opencode/plugins/ 直下の depth-1 ファイルから読み込まれる）
@@ -137,7 +137,6 @@ export const REQUEST_PROPERTY_SCHEMA = {
     reason: { type: "string", enum: ["completed", "not_planned"], description: "Close reason for issue_close." },
     base: { type: "string", description: "Base branch for pr_create." },
     head: { type: "string", description: "Head branch for pr_create." },
-    draft: { type: "boolean", description: "Draft flag for pr_create." },
     method: { type: "string", enum: ["merge", "squash", "rebase"], description: "Merge method for pr_merge." },
   },
   required: ["operation"],

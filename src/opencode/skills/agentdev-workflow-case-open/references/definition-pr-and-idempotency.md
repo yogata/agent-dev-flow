@@ -1,3 +1,4 @@
+<!-- ADF-COVERS(implementation): REQ-083-001 -->
 # STEP-4 / STEP-5: 実変更判定・Definition PR 作成と冪等再実行（definition-pr-and-idempotency）
 
 > 本 reference は `agentdev-workflow-case-open` SKILL.md の制御平面（STEP 一覧）STEP-4、STEP-5 詳細である。
@@ -5,13 +6,13 @@
 
 ## Purpose
 
-canonical Definition との実変更を判定し、実変更がある場合のみ Draft Definition PR を作成する。
-再実行時は既存 Root Case と既存 Draft Definition PR を再利用し、不足分だけを処理して重複生成しない。
+canonical Definition との実変更を判定し、実変更がある場合のみ Definition PR を作成する。
+再実行時は既存 Root Case と既存 Definition PR を再利用し、不足分だけを処理して重複生成しない。
 
 ## Input Resolution
 
 1. SSoT 再構成: Definition Package（STEP-3 生成）、canonical Definition（merge 済み main の docs 永続文書（REQ / Decision / Design）と Issue / Epic 構造の確定状態）
-2. identifier 保持: 対象 REQ 番号、Root Case Issue 番号、既存 Draft Definition PR 番号
+2. identifier 保持: 対象 REQ 番号、Root Case Issue 番号、既存 Definition PR 番号
 3. 最小 scalar: 実変更判定結果
 4. runtime artifact: canonical Definition との差分
 
@@ -25,13 +26,13 @@ canonical Definition との実変更を判定し、実変更がある場合の�
 ### STEP-4: 実変更判定と Definition PR 作成
 
 1. 実変更判定: Definition Package と canonical Definition を比較する（definition-readiness Design「canonical Definition の判定」）。差分が空の場合は実変更なし → PR を作成せず STEP-5 へ進む。実変更のない Case（bugfix / maintenance / docs_chore 等では作成しない）
-2. 実変更がある場合: 実変更を Case 単位で 1 件の Draft Definition PR として集約し作成する。1 Case につき 2 件以上作成しない
-3. PR 作成は `agentdev_gh` の pr_create で行う（VERIFY）。PR 本文は verbatim で記録する
+2. 実変更がある場合: 実変更を Case 単位で 1 件の Definition PR として集約し作成する。1 Case につき 2 件以上作成しない
+3. PR 作成は `agentdev_gh` の pr_create で行い、GitHub Draft PR ではない通常 Pull Request として作成する（draft 指定は公開契約に存在しない。REQ-{NNNN}-{NNN}）。PR 本文は verbatim で記録する
 
 ### STEP-5: 冪等再実行確認
 
-1. 冪等キー（definition-readiness Design「冪等キー」）で既存成果物を検出する: 既存 Root Case、既存 Draft Definition PR
-2. 検出した成果物を再利用し、重複生成しない。Root Case の重複は STEP-2 で、Draft Definition PR の重複は STEP-4 で排除する
+1. 冪等キー（definition-readiness Design「冪等キー」）で既存成果物を検出する: 既存 Root Case、既存 Definition PR
+2. 検出した成果物を再利用し、重複生成しない。Root Case の重複は STEP-2 で、Definition PR の重複は STEP-4 で排除する
 3. 不足分だけを処理する: Root Case が存在し Definition PR が存在しない場合は STEP-4 の手順で PR のみ作成する。Root Case が存在しない場合は STEP-2 から実行する。両者とも存在する場合は新規生成を行わない
 4. 重複生成がないことを確認し、結果を記録する
 5. 横断依存検査（後述）を実行し、警告の提示記録または検出不能報告を完了報告へ含める
@@ -55,7 +56,7 @@ canonical Definition との実変更を判定し、実変更がある場合の�
 ## Result
 
 - 実変更判定結果（実変更あり / なし）
-- Draft Definition PR 作成結果（実変更時のみ。Case 単位 1 件）
+- Definition PR 作成結果（実変更時のみ。Case 単位 1 件）
 - 冪等確認結果（既存成果物の再利用、重複生成なし、不足分のみ処理）
 - 横断依存検査結果（警告の提示記録、または検出不能報告。警告のみで Root Case の確立は阻止しない）
 
@@ -66,9 +67,9 @@ canonical Definition との実変更を判定し、実変更がある場合の�
 
 ## Completion Verification
 
-- 実変更がない Case について Draft Definition PR が存在しないこと
-- 実変更がある Case について Draft Definition PR が 1 件であること
-- 再実行時に Root Case と Draft Definition PR の件数が増加しないこと
+- 実変更がない Case について Definition PR が存在しないこと
+- 実変更がある Case について Definition PR が 1 件であること
+- 再実行時に Root Case と Definition PR の件数が増加しないこと
 - 横断依存検査が実行され、警告検出時は提示記録が、検出源取得不能時は検出不能報告が残っていること
 
 ## Resume-Idempotency

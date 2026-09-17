@@ -1,4 +1,4 @@
-// ADF-COVERS(implementation): REQ-011-030
+// ADF-COVERS(implementation): REQ-011-030, REQ-083-001, REQ-083-005
 // PR 系操作（6 操作）のスペック実装。
 //
 // 各スペックは操作ごとの差分（入力検証、runner 要求の組立て、応答解釈、
@@ -109,7 +109,6 @@ const prCreateSpec: OperationSpec = {
       "body",
       "base",
       "head",
-      "draft",
     ]);
     if (unknown !== null) return unknown;
     for (const field of ["title", "body", "base", "head"] as const) {
@@ -140,18 +139,13 @@ const prCreateSpec: OperationSpec = {
     if (head === null || head.length === 0) {
       return { ok: false, error: { code: "invalid-field", field: "head", detail: "head must be a non-empty string" } };
     }
-    const request: GhToolRequest = { operation: "pr_create", title, body, base, head };
-    if (raw.draft !== undefined && typeof raw.draft !== "boolean") {
-      return { ok: false, error: { code: "invalid-field", field: "draft", detail: "draft must be a boolean" } };
-    }
-    if (raw.draft === true) return { ok: true, request: { ...request, draft: true } };
-    return { ok: true, request };
+    return { ok: true, request: { operation: "pr_create", title, body, base, head } };
   },
   buildRequest(request): GhRunnerRequest {
     const r = request as Extract<GhToolRequest, { operation: "pr_create" }>;
     return {
       operation: "pr_create",
-      args: { title: r.title, body: r.body, base: r.base, head: r.head, draft: r.draft },
+      args: { title: r.title, body: r.body, base: r.base, head: r.head },
     };
   },
   parseSuccess(payload): GhToolSuccess | null {
@@ -196,6 +190,7 @@ const prReadSpec: OperationSpec = {
     const state = parsePrState(payload.state);
     const mergeable = parseMergeable(payload.mergeable);
     const body = str(payload.body);
+    if (typeof payload.isDraft !== "boolean") return null;
     if (number === null || title === null || state === null || mergeable === null) return null;
     if (body === null) return null;
     return {
@@ -205,6 +200,7 @@ const prReadSpec: OperationSpec = {
       body,
       state,
       mergeable,
+      isDraft: payload.isDraft,
     };
   },
   async verify(runner, _request, success) {

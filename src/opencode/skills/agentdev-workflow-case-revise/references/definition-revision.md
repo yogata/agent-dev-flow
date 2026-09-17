@@ -1,3 +1,4 @@
+<!-- ADF-COVERS(implementation): REQ-083-001 -->
 # Definition Revision（再合意受入、実変更判定、Amendment PR 冪等作成）
 
 case-revise workflow STEP-1〜STEP-3 の実行詳細（SKILL.md「制御平面（STEP 一覧）」から参照される）。
@@ -19,7 +20,7 @@ case-revise workflow STEP-1〜STEP-3 の実行詳細（SKILL.md「制御平面�
 
 ## STEP-3 Definition Amendment PR 作成
 
-- 再合意済みの実変更を Definition Amendment PR として作成する（Custom Tool `agentdev_gh` の pr_create 操作。VERIFY は Tool 内部）
+- 再合意済みの実変更を Definition Amendment PR として通常 Pull Request（GitHub Draft PR ではない）で作成する（Custom Tool `agentdev_gh` の pr_create 操作。VERIFY は Tool 内部。REQ-{NNNN}-{NNN}）
 - PR 作成は Case 単位で同一再合意内容に対応するものを重複生成しない。作成前に既存 PR の再検索を実行し、検出時は新規作成を取りやめて再利用へ切り替える
 - REQ / Decision / Design 変更の保存実体は `agentdev-req-file-manager` / `agentdev-decision-file-manager` / `agentdev-design-file-manager` へ委譲する（case-revise は意味判断せず、合意済み内容を投影する）
 - 変更範囲は `agentdev-artifact-validation` の公開検証契約で検査する（frontmatter id↔filename 整合、README entry 存在、変更範囲検証）

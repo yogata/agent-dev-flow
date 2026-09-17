@@ -437,6 +437,7 @@ describe("CliRunner: 各操作の API 写像", () => {
         body: "PR 本文",
         state: "MERGED",
         mergeable: "MERGEABLE",
+        isDraft: false,
       }),
       stderr: "",
     }));
@@ -449,6 +450,7 @@ describe("CliRunner: 各操作の API 写像", () => {
         body: "PR 本文",
         state: "merged",
         mergeable: "MERGEABLE",
+        isDraft: false,
       });
     }
   });
@@ -462,6 +464,7 @@ describe("CliRunner: 各操作の API 写像", () => {
         body: null,
         state: "OPEN",
         mergeable: "UNKNOWN",
+        isDraft: false,
       }),
       stderr: "",
     }));
@@ -523,7 +526,38 @@ describe("CliRunner: 各操作の API 写像", () => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
-  test("draft を指定した pr_create は draft: true を投入する", async () => {
+  test("pr_read は isDraft を要求し false（通常 PR）と true（Draft PR）を写像する", async () => {
+    for (const isDraft of [false, true]) {
+      const tempDir = makeTempDir();
+      let requestedFields = "";
+      const { exec } = fakeExec((call) => {
+        const i = call.args.indexOf("--json");
+        if (i >= 0) requestedFields = String(call.args[i + 1] ?? "");
+        return {
+          status: 0,
+          stdout: JSON.stringify({
+            number: 10,
+            title: "P",
+            body: "B",
+            state: "OPEN",
+            mergeable: "MERGEABLE",
+            isDraft,
+          }),
+          stderr: "",
+        };
+      });
+      const reply = await run(exec, tempDir, { operation: "pr_read", args: { number: 10 } });
+      expect(reply.ok).toBe(true);
+      if (reply.ok) {
+        const payload = reply.payload as Record<string, unknown>;
+        expect(payload.isDraft).toBe(isDraft);
+      }
+      expect(requestedFields).toContain("isDraft");
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  test("pr_create は draft を要求へ投入しない", async () => {
     const tempDir = makeTempDir();
     let body = "";
     const { exec } = fakeExec((call) => {
@@ -537,11 +571,11 @@ describe("CliRunner: 各操作の API 写像", () => {
     });
     const reply = await run(exec, tempDir, {
       operation: "pr_create",
-      args: { title: "P", body: "B", base: "main", head: "feature/x", draft: true },
+      args: { title: "P", body: "B", base: "main", head: "feature/x" },
     });
     expect(reply.ok).toBe(true);
     const parsed = JSON.parse(body) as Record<string, unknown>;
-    expect(parsed.draft).toBe(true);
+    expect(Object.hasOwn(parsed, "draft")).toBe(false);
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 });
@@ -573,6 +607,7 @@ interface StubPr {
   body: string;
   state: "open" | "closed" | "merged";
   mergeable: string;
+  isDraft: boolean;
 }
 
 interface GithubStub {
@@ -642,6 +677,7 @@ function githubStub(init: {
               body: pr.body,
               state: pr.state.toUpperCase(),
               mergeable: pr.mergeable,
+              isDraft: pr.isDraft,
             }),
             stderr: "",
           };
@@ -1062,7 +1098,7 @@ describe("CliRunner + engine: 一覧完全性（TS-008 / TS-009）", () => {
 
 describe("CliRunner + engine: pr_update と pr_read（TS-010 / TS-011）", () => {
   function stubPr(): StubPr {
-    return { number: 9, title: "旧タイトル", body: "旧本文", state: "open", mergeable: "MERGEABLE" };
+    return { number: 9, title: "旧タイトル", body: "旧本文", state: "open", mergeable: "MERGEABLE", isDraft: false };
   }
 
   test("(a) title のみ更新: 未指定の body は保持される", async () => {

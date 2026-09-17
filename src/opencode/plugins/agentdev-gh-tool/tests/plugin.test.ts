@@ -69,6 +69,7 @@ describe("登録形状（OpenCode registry が要求する構造）", () => {
     expect(request.properties.operation?.enum).toContain("comment_delete");
     expect(request.properties.operation?.enum).not.toContain("issue_comment");
     expect(request.required).toEqual(["operation"]);
+    expect(request.properties.draft).toBeUndefined();
     expect(request.properties.commentId).toBeDefined();
     expect(request.properties.commentId?.type).toBe("string");
     expect(request.properties.labels).toBeDefined();
@@ -103,7 +104,6 @@ describe("公開スキーマと実行時 validator の一致性（実行時受�
     { operation: "issue_list", role: "tracking", kind: "idea", state: "open", trackingState: "ready", labels: ["x"], search: "語" },
     { operation: "issue_reopen", number: 7 },
     { operation: "pr_create", title: "P", body: "B", base: "main", head: "feature/x" },
-    { operation: "pr_create", title: "P", body: "B", base: "main", head: "feature/x", draft: true },
     { operation: "pr_read", number: 9 },
     { operation: "pr_merge", number: 9, method: "squash" },
     { operation: "pr_changed_files", number: 9 },

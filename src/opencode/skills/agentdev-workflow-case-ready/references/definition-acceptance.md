@@ -1,3 +1,4 @@
+<!-- ADF-COVERS(implementation): REQ-061-032, REQ-083-001 -->
 # Definition 受入と canonical 再取得（STEP-1 / STEP-2）
 
 Definition PR の受入判定と merge、canonical Definition 再取得の実行時詳細である。
@@ -8,11 +9,11 @@ Definition PR lifecycle、canonical Definition の判定、backend 意味論の�
 ### 前提の確認
 
 - Root Case を読み込み、Definition Package の構成（要件行、Decision、Design、Issue 構成案、受入条件一式）を確認する
-- Case 単位で高々1件の Draft Definition PR と、case-revise 由来の Definition Amendment PR の有無を確認する（Custom Tool `agentdev_gh` の pr_read / issue_read 経由）
+- Case 単位で高々1件の Definition PR と、case-revise 由来の Definition Amendment PR の有無を確認する（Custom Tool `agentdev_gh` の pr_read / issue_read 経由）
 
 ### Definition PR なし分岐（実変更なし）
 
-- canonical Definition（merge 済み main の docs 永続文書と Issue / Epic 構造）との差分が空の Case（実変更のない bugfix 等では Draft Definition PR が存在しない）では、PR を作成せず現行 main の状態を canonical Definition として採用し、STEP-2 へ進む
+- canonical Definition（merge 済み main の docs 永続文書と Issue / Epic 構造）との差分が空の Case（実変更のない bugfix 等では Definition PR が存在しない）では、PR を作成せず現行 main の状態を canonical Definition として採用し、STEP-2 へ進む
 - 空の Definition PR を作成する経路は存在しない
 
 ### 忠実性・整合性・品質検査（Definition PR あり）
@@ -21,10 +22,18 @@ Definition PR lifecycle、canonical Definition の判定、backend 意味論の�
 2. **整合性検査**: REQ / Decision / Design の相互整合と frontmatter 整合を確認する。決定的検証は `agentdev-artifact-validation` の公開検証契約へ委譲する
 3. **品質検査**: Definition PR の CI 結果とリポジトリの品質検査結果を確認する
 
+### merge 前の isDraft 確認（STEP-1 の正規経路）
+
+merge 実行前に、Custom Tool `agentdev_gh` の pr_read で対象 PR の isDraft を確認する（REQ-{NNNN}-{NNN}）。
+
+- **isDraft: false（通常 Pull Request）**: 3検査 pass を前提に pr_merge へ進む。確認位置は merge 実行より前でなければならない
+- **isDraft: true（GitHub Draft PR）**: pr_merge を実行せず、blocked で停止する。停止理由には「GitHub Draft PR が正規 lifecycle 外であり merge 不可」であることを識別可能な情報（対象 PR 番号を含む）を記録する。GitHub Draft PR は外部変更・既存成果物・旧版由来を含む正規 lifecycle 外の異常状態として扱う
+- **復旧操作の不在**: isDraft: true による blocked 時に、pr_ready 相当操作、draft 解除（ready 化）の自動実行、raw gh WRITE による復旧は存在しない。操作カタログへ draft 解除操作を追加しない。停止理由の報告後、ユーザー判断を求めて停止する
+
 ### 確定判定と merge
 
-- 新しい意味判断を必要としない（上記3検査が pass し、合意済み意味内容からの逸脱がない）場合、追加の人間承認を要求せず Definition PR を merge する
-- merge は Case 単位の Definition PR（Draft / Amendment のいずれか）に対して実行する
+- merge 前の isDraft 確認（上記）で isDraft: false を確認した後、新しい意味判断を必要としない（上記3検査が pass し、合意済み意味内容からの逸脱がない）場合、追加の人間承認を要求せず Definition PR を merge する
+- merge は Case 単位の Definition PR（Definition / Amendment のいずれか）に対して実行する
 
 ### HITL 停止条件
 

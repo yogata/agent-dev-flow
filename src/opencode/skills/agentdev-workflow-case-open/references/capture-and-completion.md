@@ -31,7 +31,7 @@ case-close への capture 委譲は廃止済みである。draft / RU は削除�
 ### STEP-6-2: 完了報告
 
 1. `agentdev-workflow-templates` の Root Case テンプレートに従い完了報告を出力する
-2. Root Case Issue 番号、Definition Package の生成・関連付け結果、Draft Definition PR 作成結果（実変更なしの場合は不作成を記録）、Capture結果（保存した成果物のパス・分類・保存結果）を含める
+2. Root Case Issue 番号、Definition Package の生成・関連付け結果、Definition PR 作成結果（実変更なしの場合は不作成を記録）、Capture結果（保存した成果物のパス・分類・保存結果）を含める
 3. 次のコマンドとして `case-ready` を記載する（Root Case 状態 open。ready への遷移は case-ready が実行する）
 
 draft / RU の削除、削除残存検証、main 同期確認は行わない（draft / RU 削除は case-ready が実行する: ）。

@@ -11,7 +11,7 @@ about: case-open Root Case flow 完了報告テンプレート
  - Root Case Issue #{N} を作成（状態 open）
  - REQ-{NNNN} を Root Case 本文の対象 REQ セクションへ記録
  - Definition Package を生成し Root Case へ関連付け
- - Draft Definition PR: {作成済み: #{pr_N}（実変更あり） / 不作成（実変更なし）}
+ - Definition PR: {作成済み: #{pr_N}（実変更あり） / 不作成（実変更なし）}
  Capture結果: {該当なし省略可 / 以下capture 成果物がある場合のみ}
   - パス: {.agentdev/intake/inbox/*.md または .agentdev/learning/inbox.md への相対パス}
   - 分類: {intake/learning}
