@@ -1,3 +1,4 @@
+<!-- ADF-COVERS(implementation): REQ-083-001 -->
 # STEP-4 / STEP-5: 実変更判定・Definition PR 作成と冪等再実行（definition-pr-and-idempotency）
 
 > 本 reference は `agentdev-workflow-case-open` SKILL.md の制御平面（STEP 一覧）STEP-4、STEP-5 詳細である。
