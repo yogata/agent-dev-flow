@@ -178,13 +178,14 @@ SSoT コメントが検証証跡の恒久記録の正となる。
 
 ## トレーサビリティ能力の利用（QG-4 独立再検査）
 
-case-close は QG-4 の一部として、対象要件の実装対応と検証対応の完全性を `agentdev-traceability` の check で正規成果物から独立して再検査する（REQ-021-018）。
+case-close は QG-4 の一部として、対象要件行の Design 対応、implementation 対応、verification 対応の完全性を `agentdev-traceability` の check で対応関係全体（正規成果物の inline declaration と top-level `traceability/` 配下の sidecar を同一に扱う）から独立して再検査する（REQ-021-018）。
 case-run 側の事前検査とは独立に実施する。検証手段との対応関係と「今回その検証を実行して合格したか」という実行結果（Issue, PR, QG の記録）を分離して扱う（REQ-021-019）。
 
-- 対象要件に実装対応または検証対応の欠落が残る場合はマージせず停止する
+- 対象要件行に Design 対応、implementation 対応、または policy が required と判定する要件行の verification 対応の欠落が残る場合はマージせず停止する。Decision 対応の欠落は QG-4 の不合格条件に含めない
 - 不足する対応関係を自動追加または修正せず、検査失敗を case-run 側の修正対象として差し戻せる
-- QG-4 の対応完全性検査は有効である。全現行要件の実装対応と検証対応必須行の検証対応が成立し、check の未解決不合格が0件であることを移行完了条件とする（DEC-017 決定4）。検証対応の完全性判定は検証対応必須行のみを計上する（検証対応任意行はトレーサビリティモデルの検証対応要否カタログが宣言する）
-- agentdev-traceability の不在、実行失敗、空結果、候補過多だけを理由に case-close を失敗させない（fail-open）。正規成果物そのものの異常とトレーサビリティ機能側の異常を区別する
+- verification 対応の完全性判定は、project-level verification policy が required と判定する要件行のみを計上する。policy の正規情報源は `traceability/policy.yaml`（既定 required、optional な要件行のみ明示、未指定の要件行は required）であり、policy が optional と明示した要件行の verification 対応欠落は完全性違反に含めない
+- QG-4 の対応完全性検査は有効である。全現行要件行の Design 対応と implementation 対応、および policy が required と判定する要件行の verification 対応が成立し、check の未解決不合格が0件であることを移行完了条件とする（DEC-017 決定4）
+- check 自体が正常に完全性を判定できなかった場合（check 実行不能、検査対象の取得不能等）は、対応完全性の合格として扱わず、検査不能の旨を報告してマージに進まない
 - 正規成果物側の実不整合が確認された場合は、既存の品質ゲート, 受け入れ条件に従って fail とする
 
 ## 参照する横断 Design
@@ -271,7 +272,7 @@ PR 本文読取記述、design-lifecycle-application.md の旧昇格条件文言
 4. 列挙結果が 0 件の場合は 0 件確認を記録して Design 状態評価を正常完了する
 
 <!-- ADF-COVERS(implementation): REQ-057-030 -->
-集約突合時の coverage 参照における役割解釈（REQ-057-030）: `agentdev-traceability` の coverage は役割付き対応関係を全件返却するため、呼出側が役割解釈を行う。列挙・集約突合の対象として数えるのは implementation 役割かつ docs/ 配下（docs/designs/** の正規成果物）パスの対応関係のみとし、役割フィルタと docs/ パスフィルタの適用を必須とする。design 役割・verification 役割の対応関係や docs/ 配下以外のパス（配布物側の宣言等）は列挙・突合対象に含めない。
+集約突合時の coverage 参照における役割解釈（REQ-057-030）: `agentdev-traceability` の coverage は役割付き対応関係を全件返却するため、呼出側が役割解釈を行う。coverage は sidecar と inline declaration を同じ論理的な対応関係へ正規化して返すため、列挙・集約突合は対応関係の表現形式を区別せずに行う。列挙・集約突合の対象として数えるのは implementation 役割かつ docs/ 配下（docs/designs/** の正規成果物）パスの対応関係のみとし、役割フィルタと docs/ パスフィルタの適用を必須とする。design 役割・verification 役割の対応関係や docs/ 配下以外のパスの対応関係は列挙・突合対象に含めない。
 
 列挙の限界: 列挙は ADF-COVERS 宣言に基づく近似であり、宣言を持たない draft Design は
 漏れ得る（宣言付与は REQ-057-023 の段階的付与契約に従い、棚卸しが宣言を要求しない）。
