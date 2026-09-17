@@ -1,4 +1,4 @@
-<!-- ADF-COVERS(implementation): REQ-060-005, REQ-021-027 -->
+<!-- ADF-COVERS(implementation): REQ-060-005, REQ-060-006, REQ-021-027 -->
 # QG-4: Final Acceptance Gate
 
 case-close で PR マージ前に、最終受け入れ状態を確認する Gate。
@@ -257,17 +257,24 @@ bun test ./src/opencode/skills/
 bun test ./.opencode/plugins/ ./scripts/
 ```
 
-- **依存パッケージ前置**: フル suite 実行の前に、対象ディレクトリ集合の両方で `bun install` を実行済みであること。node_modules は gitignore 対象のため worktree へ未伝播であり、未実施の場合は integrity suite・分割② の一部テストが依存解決失敗で fail する
+- **worktree での分割③ 対象欠落の環境差**: worktree では `.opencode/plugins` の junction 未伝播により、分割③の対象（plugins）が実行対象から欠落し得る。この環境差を隠蔽せず、実行記録から実施範囲を判別できるように扱う。件数突合（「Ran N tests across M files」の N/M 件数）と環境ラベル（実行環境、junction 伝播状態）の双方から分割③の実施範囲（plugins 分割の実施・未実施の別）を判別可能に記録し、plugins 分割が未実施の場合は未実行対象を実行済みとして扱わない。plugins 分割を代替する検証手順（main root からの読取専用実行等）を運用する場合は、実在を確認した実行コマンド・手順のみを用い、実在確認していない CLI option を正規手順として固定しない
 
-  ```bash
-  bun install --cwd src/opencode/skills/agentdev-project-extensions/scripts
-  bun install --cwd .opencode/skills/repo-agentdev-integrity/scripts
-  ```
+- **依存パッケージ前置**: フル suite 実行の前に、正規テストが参照する package 境界（後述の対象ディレクトリ集合の両方）ごとに、必要な依存が解決可能な状態であること。本前置は `bun install` の実施そのものではなく依存解決状態を要求する契約であり、依存解決済みの正規環境を `bun install` 未実施であることのみを理由に fail としない。依存整備の要否をリポジトリルートの package.json / node_modules の有無のみで判定しない。node_modules は gitignore 対象のため worktree へ未伝播であり、依存未解決のまま実行した場合は integrity suite・分割② の一部テストが依存解決失敗で fail する
+
+  依存が未解決の場合の正規整備手段は次の2つであり、フル suite 正規形・bun test 単独実行の別を問わず同一の許容手段を適用する（`agentdev-git-worktree` の worktree 構造的制約と同じ許容手段・適用範囲）:
+
+  1. 依存を所有する package ディレクトリを対象とする `bun install`（package 単位の整備。リポジトリルートでの `bun install` を一般原則としない）
+
+     ```bash
+     bun install --cwd src/opencode/skills/agentdev-project-extensions/scripts
+     bun install --cwd .opencode/skills/repo-agentdev-integrity/scripts
+     ```
+
+  2. main 側 `node_modules` への junction 作成（検証後に junction エントリのみを削除し、参照先の main 側 `node_modules` は破壊しない。手順詳細は `agentdev-git-worktree` の worktree 構造的制約を参照）
 
   - **対象ディレクトリ集合**: `agentdev-project-extensions` スキルの `scripts` ディレクトリ（zod 等の依存解決。分割② のテストと integrity suite からの相対 import 参照の前提）と `.opencode/skills/` 配下の `repo-` プレフィックス検査基盤の `scripts` ディレクトリ（worktree 実体。`typescript`・`@types/bun`・`@types/node` の依存解決）の両方
   - **tsc 型検証の型解決前提**: tsc 型検証（`tsc --noEmit`）を含む場合は、対象パッケージでの `bun install` による `@types/bun` 等の復元を前提とする。node_modules 未整備の状態では tsc の型解決が失敗する
-  - **bun test 単独実行の依存前提と junction 代替**: bun test 単独実行（フル suite 正規形以外）で依存解決が必要な場合は、main 側 `node_modules` への junction 作成（検証後削除）または当該 skill ディレクトリでの `bun install` のいずれかで整備する（手順詳細は `agentdev-git-worktree` の worktree 構造的制約を参照）
-  - **整備後の再実行手順**: 依存整備実施後は、依存解決失敗で fail したテスト・型検証を同一環境で再実行して当該 fail の解消を確認し、依存整備実施済みの旨を環境ラベル（依存パッケージ状態）へ記録する
+  - **整備後の再実行手順**: 依存整備実施後は、依存解決失敗で fail したテスト・型検証を同一環境で再実行して当該 fail の解消を確認し、依存整備実施済みの旨（整備手段を含む）を環境ラベル（依存パッケージ状態）へ記録する
 
 - **bun test 単独実行・ファイル単体指定の実行形態契約**: フル suite 正規形以外の bun test 実行（単独実行・ファイル単体指定を含む）の実行形態一般規約（repo root 起 cwd 統一、`./` 付きパス指定、逸脱時の検知条件）は、checker 実行契約 Design（checker 実行契約と検出基盤規則）「bun test 実行形態契約（単独実行・ファイル単体指定を含む）」節が所有する
 
