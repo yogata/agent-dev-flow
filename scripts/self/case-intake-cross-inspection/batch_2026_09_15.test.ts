@@ -2,10 +2,12 @@
 //
 // TS-005: 2026-09-15 の 20 Case バッチ要約データ（Root Case 本文 execution contract
 // 相当、case-ready 側検出源の再現）を fixture として再現適用し、検出条件 (b)
-// 共有領域未登録行の重複需要として verification-scope-catalog 依存の 10 Case が
-// 検出されることを検証する。検出数 = 10 が合格条件であり、(a) 同一パス重複の
-// 併検出を妨げないが (a) 単独での合格は合格とみなさないため、本テストは
-// (b) の検出結果そのものを比較対象とする。
+// トレーサビリティポリシー（検証対応任意行）未登録の重複需要として
+// policy スナップショット依存の 10 Case が検出されることを検証する。
+// 検出数 = 10 が合格条件であり、(a) 同一パス重複の併検出を妨げないが (a) 単独での
+// 合格は合格とみなさないため、本テストは (b) の検出結果そのものを比較対象とする。
+// カタログから policy への移行（DEC-030 決定4）に伴い、共有領域は
+// トレーサビリティポリシー（traceability-policy）を正とする。
 
 import { describe, expect, test } from "bun:test";
 import * as fs from "node:fs";
@@ -15,7 +17,7 @@ import type { CrossDependencyInspectionInput } from "../../../src/opencode/skill
 
 const FIXTURE_DIR = path.join(import.meta.dir, "fixtures", "batch-2026-09-15");
 
-const CATALOG_DEPENDENT_CASES = [
+const POLICY_DEPENDENT_CASES = [
   "#2822", "#2823", "#2824", "#2825", "#2831",
   "#2832", "#2833", "#2846", "#2856", "#2858",
 ] as const;
@@ -27,7 +29,7 @@ function loadBatchInput(): CrossDependencyInspectionInput {
 }
 
 describe("TS-005: 2026-09-15 の 20 Case バッチ再現", () => {
-  test("条件 (b) で verification-scope-catalog 依存の 10 Case が検出される", () => {
+  test("条件 (b) で policy スナップショット未登録の 10 Case が検出される", () => {
     const input = loadBatchInput();
     const report = inspectCrossDependencies(input, (rel) =>
       fs.readFileSync(path.join(FIXTURE_DIR, rel), "utf-8"),
@@ -39,22 +41,22 @@ describe("TS-005: 2026-09-15 の 20 Case バッチ再現", () => {
 
     // 合格条件: 条件 (b) の検出数 = 10（(a) 単独の合格は合格とみなさない）
     expect(report.condition_b.length).toBe(1);
-    const catalogArea = report.condition_b[0];
-    expect(catalogArea?.area_id).toBe("verification-scope-catalog");
-    expect(catalogArea?.case_count).toBe(10);
-    expect(catalogArea?.demand_cases.map((c) => c.case_ref)).toEqual(
-      [...CATALOG_DEPENDENT_CASES].sort(),
+    const policyArea = report.condition_b[0];
+    expect(policyArea?.area_id).toBe("traceability-policy");
+    expect(policyArea?.case_count).toBe(10);
+    expect(policyArea?.demand_cases.map((c) => c.case_ref)).toEqual(
+      [...POLICY_DEPENDENT_CASES].sort(),
     );
 
     // 要約データの行集合の総和（48行）が未登録需要として検出される
-    const totalRows = catalogArea?.demand_cases.reduce(
+    const totalRows = policyArea?.demand_cases.reduce(
       (sum, c) => sum + c.unregistered_rows.length,
       0,
     );
     expect(totalRows).toBe(48);
 
     // 独立 10 Case（batch-A..J）は検出対象外（対象行はスナップショット登録済み）
-    for (const demand of catalogArea?.demand_cases ?? []) {
+    for (const demand of policyArea?.demand_cases ?? []) {
       expect(demand.case_ref.startsWith("batch-")).toBe(false);
     }
   });
@@ -96,7 +98,7 @@ describe("TS-005: 2026-09-15 の 20 Case バッチ再現", () => {
     const report = JSON.parse(new TextDecoder().decode(result.stdout)) as {
       condition_b: { area_id: string; case_count: number }[];
     };
-    expect(report.condition_b[0]?.area_id).toBe("verification-scope-catalog");
+    expect(report.condition_b[0]?.area_id).toBe("traceability-policy");
     expect(report.condition_b[0]?.case_count).toBe(10);
   });
 });

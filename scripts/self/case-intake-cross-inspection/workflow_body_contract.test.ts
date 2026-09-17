@@ -180,19 +180,21 @@ describe("配布物の具体参照排除（RA-003、TS-004）", () => {
       ["case-open", openSection],
       ["case-ready", readySection],
     ] as const) {
-      for (const forbidden of ["docs/designs/", "docs/requirements/", "docs/decisions/", "verification-scope-catalog"]) {
+      for (const forbidden of ["docs/designs/", "docs/requirements/", "docs/decisions/", "traceability/policy.yaml", "verification-scope-catalog"]) {
         expect(section.includes(forbidden), `${name}: ${forbidden}`).toBe(false);
       }
     }
   });
 
-  test("エンジン配布ファイルに docs/ 具体パスが含まれない", () => {
+  test("エンジン配布ファイルに docs/ 具体パスと共有領域の具体パスが含まれない", () => {
     for (const file of walkFiles(ENGINE_TREE, [".ts", ".md"])) {
       const content = read(file);
       for (const forbidden of ["docs/designs/", "docs/requirements/", "docs/decisions/"]) {
         expect(content.includes(forbidden), `${path.relative(REPO_ROOT, file)}: ${forbidden}`).toBe(false);
       }
-      expect(content.includes("verification-scope-catalog"), path.relative(REPO_ROOT, file)).toBe(false);
+      for (const forbidden of ["traceability/policy.yaml", "verification-scope-catalog"]) {
+        expect(content.includes(forbidden), `${path.relative(REPO_ROOT, file)}: ${forbidden}`).toBe(false);
+      }
     }
   });
 
