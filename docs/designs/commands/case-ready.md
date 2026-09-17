@@ -6,6 +6,7 @@ updated: "2026-09-17"
 ---
 
 <!-- ADF-COVERS(design): REQ-021-024 -->
+<!-- ADF-COVERS(design): REQ-061-023, REQ-061-029, REQ-061-030, REQ-061-033 -->
 
 # case-ready Command Design
 

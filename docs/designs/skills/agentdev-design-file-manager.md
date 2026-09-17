@@ -5,6 +5,8 @@ created: 2026-07-22
 updated: 2026-09-04
 ---
 
+<!-- ADF-COVERS(design): REQ-021-013, REQ-021-026 -->
+
 # agentdev-design-file-manager Design
 
 Design ファイルの作成、更新、配置先判断、target_area 処理、Design 固有整合性確認、Design 固有 script の選択と呼出契約を担う操作用 skill の仕様を定める。

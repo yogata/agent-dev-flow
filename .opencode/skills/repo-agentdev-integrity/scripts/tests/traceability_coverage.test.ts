@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-012-045
+// ADF-COVERS(verification): REQ-012-045, REQ-012-054
 //
 // agentdev-traceability 配布スキル coverage の公開契約検証（OU-002、Issue #2360）。
 // 全件返却（候補数上限・ランキング・探索深度による黙った切り捨ての不在）、

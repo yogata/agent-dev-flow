@@ -3,8 +3,14 @@ implementation:
   src/opencode/skills/agentdev-traceability/SKILL.md:
     - REQ-012-052
     - REQ-012-057
+    - REQ-029-011
   src/opencode/skills/agentdev-traceability/scripts/lib/check.ts:
     - REQ-012-056
+  src/opencode/skills/agentdev-traceability/scripts/lib/corpus.ts:
+    - REQ-012-054
+    - REQ-012-055
+  src/opencode/skills/agentdev-traceability/scripts/lib/declarations.ts:
+    - REQ-012-054
   src/opencode/skills/agentdev-traceability/scripts/lib/sidecar.ts:
     - REQ-012-053
   src/opencode/skills/agentdev-traceability/scripts/lib/verification_scope.ts:

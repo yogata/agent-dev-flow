@@ -5,6 +5,8 @@ created: 2026-08-20
 updated: 2026-09-17
 ---
 
+<!-- ADF-COVERS(design): REQ-057-023 -->
+
 # ルール所有権マトリックス
 
 > **位置づけ**: 本ファイルは全ドメイン（foundations/responsibilities/quality/integrity/local/authoring）横断のルール所有権マトリックスである。
