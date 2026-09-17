@@ -23,6 +23,8 @@ updated: 2026-09-17
 
 - 実施記録: Issue #2883（RU-0022 正規成果物内 REQ 行引用の実本文整合、docs_chore）の case-close STEP-3 Design 状態評価で実施した。PR 本文の Design確定候補として記録された新規行 REQ-053-040 を棚卸し単位（REQ 単位）で分類確定した。REQ-053-040 は正規成果物本文内の引用品質という実行時の文書品質規範行であり、本 Case の実行契約では恒久 checker を作らない（TS-001/TS-002 が一回的検証）ため、安全側の任意行として本カタログへ登録した。本登録により traceability check の missing-verification（unclassified）は解消する
 
+- 実施記録: Issue #2902（RU-0024 bun test 正規形の環境前提の実行契約明記、docs_chore）の case-ready 検証対応要否ゲートで実施した。canonical Definition 確定（Definition PR #2905、squash merge commit 0ee29675）による新規行 REQ-060-006 を棚卸し単位（REQ 単位）で分類確定した。REQ-060-006 は既存 REQ-060-001..REQ-060-005 と同一系統の bun test 実行契約の明記要求・実行時振る舞い行であり、恒続的な検証手段を特定しないため、安全側の任意行として本カタログへ登録した（REQ-060 節の範囲を 001..005 から 001..006 へ拡張）
+
 ## 形式
 
 - 1行1エントリとする
@@ -326,7 +328,7 @@ Issue #2362 の移行作業（棚卸し (a')）で全現行要件行を判定し
 
 ### REQ-060（bun test 実行形態の統一）
 
-- REQ-060-001..REQ-060-005: bun test 実行形態の統一（repo root 起 cwd・`./` 付きパス指定、ファイル単体指定も `./` 付き）、逸脱時の検知条件併記、QG-4 フル suite 正規形（agentdev-quality-gates 所有）への所有権非侵食、docs/knowledge/ 知識文書化と相互参照、配布 references からの参照追加。checker/bun test 実行時の振る舞いとレビューで検証
+- REQ-060-001..REQ-060-006: bun test 実行形態の統一（repo root 起 cwd・`./` 付きパス指定、ファイル単体指定も `./` 付き）、逸脱時の検知条件併記、QG-4 フル suite 正規形（agentdev-quality-gates 所有）への所有権非侵食、docs/knowledge/ 知識文書化と相互参照、配布 references からの参照追加、環境 precondition（package 境界ごとの依存解決状態と worktree plugins 分割環境差）の明記。checker/bun test 実行時の振る舞いとレビューで検証
 
 ### REQ-061（case-ready 実行契約）
 
