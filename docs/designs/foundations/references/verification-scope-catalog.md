@@ -343,3 +343,7 @@ Issue #2362 の移行作業（棚卸し (a')）で全現行要件行を判定し
 ### REQ-083（Definition PR の状態契約）
 
 - REQ-083-001..REQ-083-006: Definition PR / Definition Amendment PR の状態契約（通常 Pull Request 原則と外部由来 GitHub Draft PR の観測・blocked 停止扱い、definition/issue-{N}・definition-amend/issue-{N} ブランチ命名の Design 正規所有、「Definition PR」用語統一と履歴成果物の旧表現保護、agentdev_gh 正規操作のみによる作成から merge 完結、write guard・pr_merge fail-closed・partial merge 禁止の維持、状態契約以外の対象外宣言）の実行時振る舞い。REQ / Design / workflow reference の契約照合と Case Issue のテスト戦略（TS-001〜014）で検証
+
+### REQ-087（採番例外の記録と REQ 番号ギャップ検査）
+
+- REQ-087-001: 採番例外規定（ユーザー裁定による番号指定・REQ 本文への裁定記録・欠番非消費・決定的スクリプト既定経路）の numbering-policy「新規採番」への存在と REQ-082 前例との整合。numbering-policy 本文の記述整合確認とレビューで検証（REQ-087-002/003 の検査体系は ADF-COVERS 宣言対象）
