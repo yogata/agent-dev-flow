@@ -335,3 +335,7 @@ Issue #2362 の移行作業（棚卸し (a')）で全現行要件行を判定し
 ### REQ-082（対論型レビュー審議契約）
 
 - REQ-082-001..REQ-082-025: 対論型レビューの審議本体契約（3論理役割、往復反証、自律審議とユーザー付議境界、合意候補再検証、副作用権限非代行、動的レビュー戦略、finding 管理、2 stream 独立性、収束判定、本質的争点、収束後再検証、根本原因整理、指摘解消と実装修正の分離）の実行時振る舞い。adversarial-review の審議実行とレビューで検証
+
+### REQ-083（Definition PR の状態契約）
+
+- REQ-083-001..REQ-083-006: Definition PR / Definition Amendment PR の状態契約（通常 Pull Request 原則と外部由来 GitHub Draft PR の観測・blocked 停止扱い、definition/issue-{N}・definition-amend/issue-{N} ブランチ命名の Design 正規所有、「Definition PR」用語統一と履歴成果物の旧表現保護、agentdev_gh 正規操作のみによる作成から merge 完結、write guard・pr_merge fail-closed・partial merge 禁止の維持、状態契約以外の対象外宣言）の実行時振る舞い。REQ / Design / workflow reference の契約照合と Case Issue のテスト戦略（TS-001〜014）で検証
