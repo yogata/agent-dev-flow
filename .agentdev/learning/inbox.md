@@ -202,3 +202,75 @@
 - **タグ**: #textlint-guard #fail-closed #tempdir #agents-md
 
 ---
+
+## 2026-09-17: req-health-metrics.md の AUTOGEN 計測日鮮度 NG は日付依存で再発する（内容不変でも日付だけで NG 化）
+
+- **問題事象**: check_integrity --profile source で req-health-metrics.md の req-metrics-measurement-example AUTOGEN ブロックの計測日が前日（2026-09-16）のままのとき、REQ 行数変更がなくても index-generation-consistency NG（IR-061、SC-002）が 1 件出る。ベース commit e07ca49e で同一 NG を再現確認済み（case-run 記録）。
+- **発生局面**: case-close STEP-3 docs 検証（Case #2898。実装 PR #2901 マージ後の check_integrity 再実行）。
+- **検知方法**: check_integrity --json の summary.ng=1 と results の ng 項目（index-generation-consistency、first mismatch at line 56 の計測日不一致）。
+- **根本原因**: AUTOGEN ブロックの計測日が生成時の日付刻印であり、日付が変わるとソース派生との突合が内容変更なしで不一致になる構造。
+- **自律対応内容**: generate_indexes.ts を既存生成契約どおり実行して計測日を 2026-09-17 へ更新（commit 8ac79899）。check_integrity 再実行で ok 781 / ng 0 を確認。
+- **ユーザー確認の有無**: なし（既存生成契約に従う機械的再生成）。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: 日付・時刻をブロックへ書き込む AUTOGEN 生成は、docs_chore（REQ 行 APPEND）でなくても、REQ 行数変化を伴う通常の実装 Case の case-close でも日付跨ぎで同様に再発し得る。docs_chore 学び（2026-09-16）の「REQ 行数変化は README 索引でなく健康メトリクスへ現れる」に日付依存性の軸を追加する形。
+- **再発条件**: 計測日跨ぎのタイミングで check_integrity を実行する限り継続発生。
+- **予防策候補**: 生成内容が不変の場合は計測日の日付刻印を据え置く生成器仕様、または case-close docs-check での AUTOGEN 再生成を標準工程化。
+- **想定反映先**: generate_indexes.ts の生成仕様、case-close STEP-3 docs 検証手順、integrity 規約（IR-061 運用）。
+- **関連**: Case #2898（Ref）、PR #2901（Refs）の Findings ②。
+- **タグ**: #autogen #date-dependent #check-integrity #indexes
+
+---
+
+## 2026-09-17: bun test フルスイート初回実行のタイムアウト系 flaky は単独再実行とフル再実行の証跡で由来分類する
+
+- **問題事象**: フルスイート分割①初回で IR-055 delta テストが 5000ms タイムアウトで 1 fail（2576 pass / 1 fail、2577 tests / 105 files）。単独再実行（137 pass / 0 fail）とフル再実行（2577 pass / 0 fail）で非再現。case-run 側でも runner-local.test.ts 1 件が初回のみ非再現 fail（並列実行時の一時領域干渉、PR #2901 Findings ③）。
+- **発生局面**: case-close STEP-3 QG-4 bun test 正規形（Case #2898、main root）。
+- **検知方法**: 分割実行の stderr/stdout 分離退避証跡（fail 全件の詳細、`timed out after 5000ms` の記録）。
+- **根本原因**: 大規模スイート並列実行時の一時的な負荷・領域干渉による実行時間超過（アサーション失敗ではない）。
+- **自律対応内容**: fail テストを単独再実行 → フル再実行の順で非再現を確認し、fail 由来分類を「環境依存（非再現、変更起因なし）」として記録。最終状態は fail 0 件・由来不明 0 件で機械受理基準を充足。
+- **ユーザー確認の有無**: なし。
+- **Decision/REQ/spec影響**: なし（fail 由来分類運用の確認）。
+- **横展開観点**: 機械受理基準の「由来不明 0 件」を満たすためには、タイムアウト系 flaky の由来分類に再実行証跡（単独 + フル）の取得が必要。stderr/stdout 分離退避の証跡契約が分類根拠として機能した。
+- **再発条件**: フルスイート実行の負荷環境が同様に重なった場合。
+- **予防策候補**: 実行時間の長い統合系テストの per-test timeout 閾値の明示的見直し。
+- **想定反映先**: agentdev-quality-gates の bun test 正規形運用知識、IR-055 関連テストの timeout 設定。
+- **関連**: Case #2898（Ref）、PR #2901（Refs）。
+- **タグ**: #bun-test #timeout #flaky #fail-classification
+
+---
+
+## 2026-09-17: 子 agent による長文 Issue 本文更新は部分更新指定か親回復で行う（trackingState 適用は親または正規機構）
+
+- **問題事象**: case-auto stage 2（case-ready）で実行担当子 agent が Case Issue の ready 遷移（trackingState 適用）を agentdev_gh に拒否され、さらに長文 Issue 本文の全面再構成による更新にも 2 回失敗した。正規機構（Root Case 本文「Case 状態と次工程」セクションの部分更新、または親への復帰）で解決した。
+- **発生局面**: case-auto 親 orchestration（Case #2898、stage 2 case-ready。pipeline 観察）。
+- **検知方法**: 子 agent の agentdev_gh 拒否応答と本文全面再構成の失敗（2 回）の観察。
+- **根本原因**: 子 agent への委譲プロンプトが、長文本文を持つ Issue の更新方法（precise old/new 行指定による部分更新または親回復）を規定しておらず、誤差リスクが高く失敗しやすい全面再構成経路を試みた。
+- **自律対応内容**: 親側で本文の正規セクション部分更新/親回復を実施して ready 遷移を完了（case-ready 正規記録は Issue 本文に残存）。
+- **ユーザー確認の有無**: なし。
+- **Decision/REQ/spec影響**: なし（delegation prompt の運用改善）。
+- **横展開観点**: 長文 Issue 本文の更新を委譲する場合、委譲プロンプトに「Tool 管理フィールド（trackingState 等）は親または正規機構で適用」「本文更新は precise old/new 行指定による部分更新」を明示するのが安全。全面再構成は byte-exact 保存要件（agentdev-issue-management の前後内容比較）と衝突する。
+- **再発条件**: 長文本文 Issue の状態遷移・本文更新を部分更新指定なしで子 agent に委譲した場合。
+- **予防策候補**: case-ready / case-run の delegation prompt テンプレートに部分更新指示と trackingState 適用の親責務を明記。
+- **想定反映先**: agentdev-workflow-case-ready / agentdev-workflow-case-auto の delegation 指針、agentdev-workflow-orchestration のサブエージェント protocol。
+- **関連**: Case #2898（Ref）。
+- **タグ**: #delegation #issue-body #partial-update #tracking-state
+
+---
+
+## 2026-09-17: ADF-COVERS(implementation) 宣言付与は case-run 実行担当の標準責務（親の過度な抑制指示が差し戻しを生む）
+
+- **問題事象**: case-run 初回委譲で親の抑制指示（declare ONLY rows the artifact genuinely implements）が過度に狭く働き、実装した REQ 行への ADF-COVERS(implementation) 宣言付与が行われず、traceability check の missing-implementation 検出で follow-up（DEL-2898-002）差し戻しが発生した。
+- **発生局面**: case-auto stage 3 case-run → case-close STEP-3（Case #2898。PR #2901 Findings ①）。
+- **検知方法**: traceability check の missing-implementation findings（REQ-083-001〜006、REQ-061-032）。
+- **根本原因**: ADF-COVERS(implementation) 宣言の付与は case-run トレーサビリティ契約上の実行担当の標準的義務（実装する行の宣言は inventing ではない）であるにもかかわらず、委譲プロンプトの抑制文言が宣言そのものをためらわせる形になった。
+- **自律対応内容**: bounded parent decision（DEL-2898-002）で標準責務を明示し、coverage query で既存宣言を確認のうえ 9 ファイルへ宣言付与。再実行で missing-implementation は REQ-083-002 / REQ-083-006（実装対象が構造的に存在しない Design 正規所有行・スコープ限定メタ行）のみの正しい残留に収斂。
+- **ユーザー確認の有無**: なし（bounded parent decision 内の機械的完了）。
+- **Decision/REQ/spec影響**: なし（既存契約の運用確認）。
+- **横展開観点**: 実装対応・検証対応の対応宣言は実行担当の標準責務として委譲プロンプトに正の義務として書くべきで、inventing 抑制は「実際に実装しない行を無理に宣言しない」限定に留める。
+- **再発条件**: 対応宣言を明示義務として書かない case-run 委譲プロンプトが続く限り発生。
+- **予防策候補**: case-run delegation prompt に「変更成果物が実際に実装する REQ 行への ADF-COVERS(implementation) 宣言付与は標準責務」を明記。
+- **想定反映先**: case-run command / agentdev-workflow-case-run の delegation 指針、agentdev-traceability の運用知識。
+- **関連**: Case #2898（Ref）、PR #2901（Refs）の Findings ①。
+- **タグ**: #adf-covers #traceability #delegation #case-run
+
+---
