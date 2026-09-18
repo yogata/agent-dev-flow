@@ -9,8 +9,9 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 現行 REQ: 54件、廃止済み: 12件
 <!-- AUTOGEN:END -->
 
-現行要件は53件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
+現行要件は54件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
 REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）による意図的予約欠番であり、実体は存在しない（[採番管理](designs/foundations/numbering-policy.md) 参照）。
+REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却枠であり、意図的予約欠番として維持する。
 各 REQ の詳細は各 REQ ファイル本文を参照。
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-table -->
