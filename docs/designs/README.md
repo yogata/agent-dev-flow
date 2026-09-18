@@ -158,6 +158,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [workflows/definition-readiness.md](workflows/definition-readiness.md) | accepted | Definition Readiness | Definition Package、Definition PR / Definition Amendment PR の lifecycle（通常 Pull Request、merge 前 isDraft 確認を含む）、canonical Definition 判定、冪等キー、backend 意味論の物理写像 |
 | [workflows/backlog-artifact-lifecycle.md](workflows/backlog-artifact-lifecycle.md) | accepted | RU / 採用済み成果物 / draft lifecycle | artifact lifecycle、検出事項プロトコル、artifact_actions 工程分岐 |
 | [workflows/references/execution-unit-construction.md](workflows/references/execution-unit-construction.md) | accepted | execution_unit 構成アルゴリズム参照 | epic-wave-model.md から参照される連結成分アルゴリズム、3軸判断モデルの機械的判定手順 |
+| [workflows/v4-standard-lifecycle.md](workflows/v4-standard-lifecycle.md) | draft | ADF v4 標準ライフサイクル | v4 標準ライフサイクルの定義（work_type/scale/Epic/Wave の語彙直交性、公開 UX 2入口収斂と内部 lifecycle への回収、req-define 入口の入力意味、継続コラボレーションループ） |
 
 ### 基盤 Design 一覧（6 ドメイン配下）
 
@@ -182,6 +183,11 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | foundations/harness-separation-model.md | accepted | harness 分離モデル | 配布物と harness 実行制御の責務分離モデル。配布物の大多数を harness 非依存とし、依存具体を references/ へ集約 |
 | foundations/traceability-model.md | accepted | 最小トレーサビリティモデル（TIM） | 要件を中心とした最小 TIM のモデル要素（要件行、対応関係（covers）、design/implementation/verification の3役割）、対応関係の完全性規則、用語政策を正規所有（REQ-012、DEC-017） |
 | foundations/references/concrete-abstraction.md | accepted | 配布物具体参照の抽象化参照 | 配布物から harness 固有・実装固有の具体を抽象化する手順の参照。harness-separation-model.md、responsibility-boundary-purification.md から参照される |
+| foundations/v4-operating-model.md | draft | ADF v4 Operating Model | v4 の目的・適用範囲・標準語彙・プロセス/実装分離原則、三層責務モデル（ADF Runtime / Standard Operating Model / Project Model）、Project Contract の論理ビュー、8 情報寿命モデル、中核文書モデル（REQ/Decision/Design/Implementation/Evidence）の定義 |
+| foundations/v4-responsibility-boundaries.md | draft | ADF v4 実装責務境界 | semantic Skill / deterministic code / Harness adapter / Project Extensions の実装責務境界（semantic 6 項目・deterministic 11 項目の分類基準、OpenCode first-class reference harness、semantic extension point）の定義 |
+| foundations/v4-traceability-model.md | draft | ADF v4 Traceability モデル | Change / Evidence 中心の Traceability モデル（4 問いへの回答能力、永続情報と導出可能情報の分離、global completeness の位置づけ）の定義 |
+| foundations/v3-v4-crosswalk.md | draft | v3 -> v4 Concept / Artifact Crosswalk | v3 の主要概念・成果物の v4 での処遇の 9 分類記録と planned supersede の記録（実際の置換・廃止は RU §24 で実行） |
+| foundations/v4-migration-and-release.md | draft | ADF v4 Migration と Release の標準境界 | 標準 migration pattern（非破壊移行原則）、RC tag 運用と cutover sequence、pilot migration と v4.0.0 final 条件、v3-baseline と rollback anchor、後続 v4 Implementation Sequence の定義 |
 
 #### responsibilities/（文書種別、成果物責務）
 
@@ -204,6 +210,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | quality/req-health-metrics.md | accepted | REQ 健全性メトリクス | REQ 肥大化、関心ズレ検出の定量閾値 |
 | quality/design-health-metrics.md | accepted | Design 健全性メトリクス | Design 肥大化、放置、ドメイン分類適合の定量閾値 |
 | quality/textlint-quality-runtime.md | accepted | textlint 品質基盤 | 文章表層品質の共通実行基盤（プロジェクト解決、設定読込み、対象解決、規則構成、文章検査、結果整形）。書込み前検査と最終検査の共通化、Plugin と単独実行入口の2入口 |
+| quality/v4-quality-gate-model.md | draft | ADF v4 Quality / Verification / Evidence / Gate モデル | Quality Policy / Verification Obligation / Verifier / Evidence / Gate の 5 概念分解、Gate = 状態遷移 predicate 契約、v4 standard lifecycle からの Gate 再導出手順、Verifier 分類の定義 |
 
 #### integrity/（整合性契約、ルール）
 
