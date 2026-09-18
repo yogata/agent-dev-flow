@@ -7,6 +7,8 @@ updated: "2026-09-17"
 
 # Definition Readiness Design
 
+処遇注記（v4 移行）: 本 Design の状態記述は ADF v4 ライフサイクル状態機械（workflows/v4-lifecycle-state-machine.md）の Definition lifecycle 部分ビューが一般化契約として被覆する。本 Design の権威移行（置換）は後続 Sequence 第4段階で実行する（処遇の正本: foundations/v3-v4-crosswalk.md の references/crosswalk-inventory.md）。
+
 ## 目的
 
 Definition Package、Definition PR / Definition Amendment PR の lifecycle、canonical Definition の判定、冪等キー、backend 意味論の物理写像を定義する（REQ-030、REQ-061、REQ-062、REQ-083）。

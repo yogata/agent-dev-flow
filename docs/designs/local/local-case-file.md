@@ -9,6 +9,8 @@ updated: 2026-09-08
 
 # ローカルIssue共通スキーマ
 
+処遇注記（v4 移行）: 本 Design の状態記述は ADF v4 ライフサイクル状態機械（workflows/v4-lifecycle-state-machine.md）の backend 抽象・物理写像が一般化契約として被覆する。本 Design の権威移行（置換）は後続 Sequence 第11段階で実行する（処遇の正本: foundations/v3-v4-crosswalk.md の references/crosswalk-inventory.md）。
+
 > **Scope**: 本 Design は agent-dev-flow リポジトリのリポジトリ内部設計文書である（REQ-001）。
 > ローカル版 OpenCode 導入先リポジトリで運用されるローカルIssueの共通スキーマ、role 条件付きスキーマ、採番、見出しを定義する。
 > 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（REQ-001）。

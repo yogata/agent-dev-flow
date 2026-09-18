@@ -8,6 +8,8 @@ updated: 2026-09-10
 
 # Decision Lifecycle
 
+処遇注記（v4 移行）: 本 Design の状態記述は ADF v4 ライフサイクル状態機械（workflows/v4-lifecycle-state-machine.md）の Decision status 部分ビューが一般化契約として被覆する。本 Design の権威移行（置換）は後続 Sequence 第4段階で実行する。関係モデル・粒度管理・健全性評価は本 Design が引き続き所有する（処遇の正本: foundations/v3-v4-crosswalk.md の references/crosswalk-inventory.md）。
+
 本 Design は agent-dev-flow リポジトリのみに適用される。
 
 ## 目的

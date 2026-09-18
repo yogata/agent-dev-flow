@@ -8,6 +8,8 @@ updated: 2026-09-02
 
 # STEP Reference Contract
 
+処遇注記（v4 移行）: 本 Design の状態記述は ADF v4 ライフサイクル状態機械（workflows/v4-lifecycle-state-machine.md）およびADF v4 durable state と再構成・恢復（foundations/v4-durable-state-and-recovery.md）が一般化契約として被覆する。本 Design の権威移行（置換）は後続 Sequence 第4段階で実行する（処遇の正本: foundations/v3-v4-crosswalk.md の references/crosswalk-inventory.md）。
+
 ## 目的
 
 STEP reference の構造、開始条件、結果、証拠、完了確認、べき等性を定義する。

@@ -8,6 +8,8 @@ updated: 2026-09-15
 
 # Epic / Wave / Issue 実行モデル
 
+処遇注記（v4 移行）: 本 Design の状態記述は ADF v4 ライフサイクル状態機械（workflows/v4-lifecycle-state-machine.md）の階層合成・直列化単位が一般化契約として被覆する。本 Design の権威移行（置換）は後続 Sequence 第5段階で実行する。語彙意味の再定義を含む（処遇の正本: foundations/v3-v4-crosswalk.md の references/crosswalk-inventory.md）。
+
 > 本 Design は case-open / case-run / case-close / case-auto にまたがる Epic 実行モデルの横断契約を定義する。
 > 各コマンド固有の振る舞いは各 command Design を参照。
 

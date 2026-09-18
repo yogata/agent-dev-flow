@@ -60,6 +60,7 @@ IR 廃止時の交叉参照（v2:REQ-NNN 等）の再配置先として req-impa
 numbering-policy は欠番の存在宣言のみを担い、交叉参照データの体系的蓄積は req-impact-map/retired/ が担う。
 
 REQ の既知欠番: REQ-063〜REQ-081 の 19 連番は、REQ-082 採番（2026-09-15 ユーザー裁定）に伴う意図的予約欠番である。requirements/README.md と docs/README.md で「欠番」として明記し、実体不在と整合する。
+REQ-084〜REQ-086 は、共有予約枠（REQ-083〜REQ-096）の未使用・返却枠として維持される意図的予約欠番である（IR-069、REQ-088 採番に伴う枠解消時の記録）。
 
 ### 採番ミスの是正
 

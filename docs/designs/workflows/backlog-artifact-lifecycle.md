@@ -9,6 +9,8 @@ updated: 2026-09-05
 
 # RU / 採用済み成果物 / draft ライフサイクル
 
+処遇注記（v4 移行）: 本 Design の状態記述は ADF v4 ライフサイクル状態機械（workflows/v4-lifecycle-state-machine.md）の RU/draft 部分ビューが一般化契約として被覆する。本 Design の権威移行（置換）は後続 Sequence 第9段階で実行する（処遇の正本: foundations/v3-v4-crosswalk.md の references/crosswalk-inventory.md）。
+
 > 本 Design は intake / learning / inspect / backlog パイプラインにまたがるアーティファクトライフサイクル契約を定義する。
 > 個別コマンドの動作は各 command Design を参照。
 
