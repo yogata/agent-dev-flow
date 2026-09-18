@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は27件、提案中の Decision は0件である。
+現行の承認済み Decision は27件、提案中の Decision は7件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -44,6 +44,13 @@
 | DEC-028 | 文章表層品質の共通実行基盤 | accepted | 2026-09-09 |
 | DEC-029 | 公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入 | accepted | 2026-09-14 |
 | DEC-030 | トレーサビリティ標準機能への一般化と producer / consumer 境界の確立 | accepted | 2026-09-17 |
+| DEC-031 | ADF v4 Standard Operating Model の採用とプロセス・実装の責務分離 | proposed | 2026-09-18 |
+| DEC-032 | ADF 責務の三層モデルと Project Contract の論理ビュー・情報寿命モデル | proposed | 2026-09-18 |
+| DEC-033 | ADF v4 公開運用モデル（UX 2入口収斂・内部 lifecycle・継続コラボレーションループ・学習昇格ガード） | proposed | 2026-09-18 |
+| DEC-034 | v4 の移行・release 標準境界（非破壊移行原則・v4.0.0-rc.1 cutover・self-hosting） | proposed | 2026-09-18 |
+| DEC-035 | v4 Quality / Verification / Evidence / Gate モデルへの分解 | proposed | 2026-09-18 |
+| DEC-036 | 意味 Skill と決定的実装の責務分離および Harness/Backend adapter 境界 | proposed | 2026-09-18 |
+| DEC-037 | Traceability の Change / Evidence 中心への再中心化 | proposed | 2026-09-18 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -88,6 +95,13 @@
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
+- [DEC-031](DEC-031.md)（ADF v4 Standard Operating Model の採用とプロセス・実装の責務分離）
+- [DEC-032](DEC-032.md)（ADF 責務の三層モデルと Project Contract の論理ビュー・情報寿命モデル）
+- [DEC-033](DEC-033.md)（ADF v4 公開運用モデル（UX 2入口収斂・内部 lifecycle・継続コラボレーションループ・学習昇格ガード））
+- [DEC-034](DEC-034.md)（v4 の移行・release 標準境界（非破壊移行原則・v4.0.0-rc.1 cutover・self-hosting））
+- [DEC-035](DEC-035.md)（v4 Quality / Verification / Evidence / Gate モデルへの分解）
+- [DEC-036](DEC-036.md)（意味 Skill と決定的実装の責務分離および Harness/Backend adapter 境界）
+- [DEC-037](DEC-037.md)（Traceability の Change / Evidence 中心への再中心化）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -203,6 +217,13 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-028 | [REQ-053](../requirements/REQ-053.md), [REQ-010](../requirements/REQ-010.md), [REQ-036](../requirements/REQ-036.md) | 文章表層品質の共通実行基盤（REQ-053 全面更新、REQ-010-071/074 UPDATE と REQ-010-075 APPEND、REQ-036-008/023 UPDATE と整合） |
 | DEC-029 | [REQ-005](../requirements/REQ-005.md), [REQ-006](../requirements/REQ-006.md) | - |
 | DEC-030 | [REQ-012](../requirements/REQ-012.md), [REQ-021](../requirements/REQ-021.md), [REQ-029](../requirements/REQ-029.md), [REQ-002](../requirements/REQ-002.md), [REQ-061](../requirements/REQ-061.md), [REQ-057](../requirements/REQ-057.md) | トレーサビリティ標準機能への一般化と producer / consumer 境界の確立（REQ-012 UPDATE、REQ-021 UPDATE、REQ-029 APPEND、REQ-002 APPEND、REQ-061 UPDATE、REQ-057 UPDATE と整合。DEC-017 決定1の部分改正） |
+| DEC-031 | - | - |
+| DEC-032 | - | - |
+| DEC-033 | - | - |
+| DEC-034 | - | - |
+| DEC-035 | - | - |
+| DEC-036 | - | - |
+| DEC-037 | - | - |
 <!-- AUTOGEN:END -->
 
 ## 過去版の履歴基盤

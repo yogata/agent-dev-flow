@@ -75,7 +75,7 @@ REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）によ
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-030 の29件である（DEC-005、DEC-007 は superseded）。
+現行 Decision は DEC-001 から DEC-037 の36件である（DEC-005、DEC-007 は superseded、DEC-031〜037 は proposed）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
@@ -109,6 +109,13 @@ REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）によ
 | [DEC-028](decisions/DEC-028.md) | 文章表層品質の共通実行基盤 |
 | [DEC-029](decisions/DEC-029.md) | 公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入 |
 | [DEC-030](decisions/DEC-030.md) | トレーサビリティ標準機能への一般化と producer / consumer 境界の確立 |
+| [DEC-031](decisions/DEC-031.md) | ADF v4 Standard Operating Model の採用とプロセス・実装の責務分離 |
+| [DEC-032](decisions/DEC-032.md) | ADF 責務の三層モデルと Project Contract の論理ビュー・情報寿命モデル |
+| [DEC-033](decisions/DEC-033.md) | ADF v4 公開運用モデル（UX 2入口収斂・内部 lifecycle・継続コラボレーションループ・学習昇格ガード） |
+| [DEC-034](decisions/DEC-034.md) | v4 の移行・release 標準境界（非破壊移行原則・v4.0.0-rc.1 cutover・self-hosting） |
+| [DEC-035](decisions/DEC-035.md) | v4 Quality / Verification / Evidence / Gate モデルへの分解 |
+| [DEC-036](decisions/DEC-036.md) | 意味 Skill と決定的実装の責務分離および Harness/Backend adapter 境界 |
+| [DEC-037](decisions/DEC-037.md) | Traceability の Change / Evidence 中心への再中心化 |
 
 ## 設計（Design）
 
@@ -126,6 +133,7 @@ Design は 3 層構造（commands / skills / workflows）と基盤 6 ドメイ�
 - [Epic / Wave / Issue 実行モデル](designs/workflows/epic-wave-model.md)
 - [RU / 採用済み成果物 / draft lifecycle](designs/workflows/backlog-artifact-lifecycle.md)
 - [execution_unit 構成アルゴリズム参照](designs/workflows/references/execution-unit-construction.md)
+- [ADF v4 標準ライフサイクル](designs/workflows/v4-standard-lifecycle.md)
 
 ### command Design / skill Design
 
@@ -149,6 +157,11 @@ status（draft / accepted）を含む完全一覧は [Design インデックス]
 - [Project Extensions](designs/foundations/project-extensions.md)
 - [harness 分離モデル](designs/foundations/harness-separation-model.md)
 - [最小トレーサビリティモデル（TIM）](designs/foundations/traceability-model.md)
+- [ADF v4 Operating Model](designs/foundations/v4-operating-model.md)
+- [ADF v4 実装責務境界](designs/foundations/v4-responsibility-boundaries.md)
+- [ADF v4 Traceability モデル](designs/foundations/v4-traceability-model.md)
+- [v3 -> v4 Concept / Artifact Crosswalk](designs/foundations/v3-v4-crosswalk.md)
+- [ADF v4 Migration と Release の標準境界](designs/foundations/v4-migration-and-release.md)
 
 #### responsibilities/（文書種別、成果物責務）
 
@@ -166,6 +179,7 @@ status（draft / accepted）を含む完全一覧は [Design インデックス]
 - [品質ゲート](designs/quality/quality-gates.md)
 - [REQ 健全性メトリクス](designs/quality/req-health-metrics.md)
 - [Design 健全性メトリクス](designs/quality/design-health-metrics.md)
+- [ADF v4 Quality / Verification / Evidence / Gate モデル](designs/quality/v4-quality-gate-model.md)
 
 #### integrity/（整合性契約、ルール）
 
