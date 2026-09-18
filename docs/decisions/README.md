@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は27件、提案中の Decision は7件である。
+現行の承認済み Decision は27件、提案中の Decision は9件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -51,6 +51,8 @@
 | DEC-035 | v4 Quality / Verification / Evidence / Gate モデルへの分解 | proposed | 2026-09-18 |
 | DEC-036 | 意味 Skill と決定的実装の責務分離および Harness/Backend adapter 境界 | proposed | 2026-09-18 |
 | DEC-037 | Traceability の Change / Evidence 中心への再中心化 | proposed | 2026-09-18 |
+| DEC-038 | ADF v4 durable state 配置と再構成の契約（状態権威・証跡分離・非原子調整原則） | proposed | 2026-09-19 |
+| DEC-039 | ADF v4 authority・副作用統制と冪等・並行性モデル | proposed | 2026-09-19 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -102,6 +104,8 @@
 - [DEC-035](DEC-035.md)（v4 Quality / Verification / Evidence / Gate モデルへの分解）
 - [DEC-036](DEC-036.md)（意味 Skill と決定的実装の責務分離および Harness/Backend adapter 境界）
 - [DEC-037](DEC-037.md)（Traceability の Change / Evidence 中心への再中心化）
+- [DEC-038](DEC-038.md)（ADF v4 durable state 配置と再構成の契約（状態権威・証跡分離・非原子調整原則））
+- [DEC-039](DEC-039.md)（ADF v4 authority・副作用統制と冪等・並行性モデル）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -224,6 +228,8 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-035 | - | - |
 | DEC-036 | - | - |
 | DEC-037 | - | - |
+| DEC-038 | - | - |
+| DEC-039 | - | - |
 <!-- AUTOGEN:END -->
 
 ## 過去版の履歴基盤

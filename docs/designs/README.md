@@ -159,6 +159,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [workflows/backlog-artifact-lifecycle.md](workflows/backlog-artifact-lifecycle.md) | accepted | RU / 採用済み成果物 / draft lifecycle | artifact lifecycle、検出事項プロトコル、artifact_actions 工程分岐 |
 | [workflows/references/execution-unit-construction.md](workflows/references/execution-unit-construction.md) | accepted | execution_unit 構成アルゴリズム参照 | epic-wave-model.md から参照される連結成分アルゴリズム、3軸判断モデルの機械的判定手順 |
 | [workflows/v4-standard-lifecycle.md](workflows/v4-standard-lifecycle.md) | draft | ADF v4 標準ライフサイクル | v4 標準ライフサイクルの定義（work_type/scale/Epic/Wave の語彙直交性、公開 UX 2入口収斂と内部 lifecycle への回収、req-define 入口の入力意味、継続コラボレーションループ） |
+| [workflows/v4-lifecycle-state-machine.md](workflows/v4-lifecycle-state-machine.md) | draft | ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応） | v4 ライフサイクル状態機械の定義（durable state enum と runtime 実行状態の二層モデル、階層合成〔子=実状態、上位=導出投影〕、deterministic/semantic gate 分離、v3 command と内部状態遷移の対応表、v3 状態関連 Design の planned supersede 記録） |
 
 ### 基盤 Design 一覧（6 ドメイン配下）
 
@@ -188,6 +189,8 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | foundations/v4-traceability-model.md | draft | ADF v4 Traceability モデル | Change / Evidence 中心の Traceability モデル（4 問いへの回答能力、永続情報と導出可能情報の分離、global completeness の位置づけ）の定義 |
 | foundations/v3-v4-crosswalk.md | draft | v3 -> v4 Concept / Artifact Crosswalk | v3 の主要概念・成果物の v4 での処遇の 9 分類記録と planned supersede の記録（実際の置換・廃止は RU §24 で実行） |
 | foundations/v4-migration-and-release.md | draft | ADF v4 Migration と Release の標準境界 | 標準 migration pattern（非破壊移行原則）、RC tag 運用と cutover sequence、pilot migration と v4.0.0 final 条件、v3-baseline と rollback anchor、後続 v4 Implementation Sequence の定義 |
+| foundations/v4-durable-state-and-recovery.md | draft | ADF v4 durable state と再構成・恢復（配置表・権威移行・部分失敗調整） | durable state の 5 分類と配置表、状態と証跡の分離、導出可能情報の判定基準、再構成優先順位の全実行単位への一般化、権威移行点、部分失敗の調整の定義 |
+| foundations/v4-runtime-execution-model.md | draft | ADF v4 Runtime 実行モデル（authority 格子・直列化単位・冪等経路・runtime 制御ループ） | 副作用 4 分類と authority 格子、直列化単位 5 種、冪等経路、直列化違反・競合検出時の意味論、runtime 制御ループ、fail-closed 適用範囲の定義 |
 
 #### responsibilities/（文書種別、成果物責務）
 
