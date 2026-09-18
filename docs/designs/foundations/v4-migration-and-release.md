@@ -1,8 +1,8 @@
 ---
 title: ADF v4 Migration と Release の標準境界
-status: draft
+status: accepted
 created: 2026-09-18
-updated: 2026-09-18
+updated: 2026-09-19
 ---
 
 # ADF v4 Migration と Release の標準境界

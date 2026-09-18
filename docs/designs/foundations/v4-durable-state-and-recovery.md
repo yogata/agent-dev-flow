@@ -1,6 +1,6 @@
 ---
 title: ADF v4 durable state と再構成・恢復（配置表・権威移行・部分失敗調整）
-status: draft
+status: accepted
 created: 2026-09-19
 updated: 2026-09-19
 ---

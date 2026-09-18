@@ -1,8 +1,8 @@
 ---
 title: ADF v4 実装責務境界（semantic Skill / deterministic code / Harness adapter / Project Extensions）
-status: draft
+status: accepted
 created: 2026-09-18
-updated: 2026-09-18
+updated: 2026-09-19
 ---
 
 # ADF v4 実装責務境界（semantic Skill / deterministic code / Harness adapter / Project Extensions）

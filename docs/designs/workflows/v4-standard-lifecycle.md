@@ -1,8 +1,8 @@
 ---
 title: ADF v4 標準ライフサイクル（語彙直交性・公開 UX・req-define 入口・継続コラボレーションループ）
-status: draft
+status: accepted
 created: 2026-09-18
-updated: 2026-09-18
+updated: 2026-09-19
 ---
 
 # ADF v4 標準ライフサイクル（語彙直交性・公開 UX・req-define 入口・継続コラボレーションループ）

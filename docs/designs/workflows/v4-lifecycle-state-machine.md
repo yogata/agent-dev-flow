@@ -1,6 +1,6 @@
 ---
 title: ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応）
-status: draft
+status: accepted
 created: 2026-09-19
 updated: 2026-09-19
 ---

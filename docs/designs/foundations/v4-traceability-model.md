@@ -1,8 +1,8 @@
 ---
 title: ADF v4 Traceability モデル（Change / Evidence 中心）
-status: draft
+status: accepted
 created: 2026-09-18
-updated: 2026-09-18
+updated: 2026-09-19
 ---
 
 # ADF v4 Traceability モデル（Change / Evidence 中心）
