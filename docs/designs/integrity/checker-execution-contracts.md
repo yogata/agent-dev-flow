@@ -10,6 +10,7 @@ created: 2026-08-15
 <!-- ADF-COVERS(design): REQ-018-004 -->
 <!-- ADF-COVERS(implementation): REQ-057-004 -->
 <!-- ADF-COVERS(implementation): REQ-057-018 -->
+<!-- ADF-COVERS(design): REQ-057-018 -->
 <!-- ADF-COVERS(implementation): REQ-060-006 -->
 <!-- ADF-COVERS(design): REQ-060-001, REQ-060-002, REQ-060-003 -->
 
