@@ -75,7 +75,7 @@ REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）によ
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-037 の36件である（DEC-005、DEC-007 は superseded、DEC-031〜037 は proposed）。
+現行 Decision は DEC-001 から DEC-039 の38件である（DEC-005、DEC-007 は superseded、DEC-031〜039 は proposed）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
@@ -116,6 +116,8 @@ REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）によ
 | [DEC-035](decisions/DEC-035.md) | v4 Quality / Verification / Evidence / Gate モデルへの分解 |
 | [DEC-036](decisions/DEC-036.md) | 意味 Skill と決定的実装の責務分離および Harness/Backend adapter 境界 |
 | [DEC-037](decisions/DEC-037.md) | Traceability の Change / Evidence 中心への再中心化 |
+| [DEC-038](decisions/DEC-038.md) | ADF v4 durable state 配置と再構成の契約（状態権威・証跡分離・非原子調整原則） |
+| [DEC-039](decisions/DEC-039.md) | ADF v4 authority・副作用統制と冪等・並行性モデル |
 
 ## 設計（Design）
 
@@ -134,6 +136,7 @@ Design は 3 層構造（commands / skills / workflows）と基盤 6 ドメイ�
 - [RU / 採用済み成果物 / draft lifecycle](designs/workflows/backlog-artifact-lifecycle.md)
 - [execution_unit 構成アルゴリズム参照](designs/workflows/references/execution-unit-construction.md)
 - [ADF v4 標準ライフサイクル](designs/workflows/v4-standard-lifecycle.md)
+- [ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応）](designs/workflows/v4-lifecycle-state-machine.md)
 
 ### command Design / skill Design
 
@@ -162,6 +165,8 @@ status（draft / accepted）を含む完全一覧は [Design インデックス]
 - [ADF v4 Traceability モデル](designs/foundations/v4-traceability-model.md)
 - [v3 -> v4 Concept / Artifact Crosswalk](designs/foundations/v3-v4-crosswalk.md)
 - [ADF v4 Migration と Release の標準境界](designs/foundations/v4-migration-and-release.md)
+- [ADF v4 durable state と再構成・恢復（配置表・権威移行・部分失敗調整）](designs/foundations/v4-durable-state-and-recovery.md)
+- [ADF v4 Runtime 実行モデル（authority 格子・直列化単位・冪等経路・runtime 制御ループ）](designs/foundations/v4-runtime-execution-model.md)
 
 #### responsibilities/（文書種別、成果物責務）
 
