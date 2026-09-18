@@ -2,7 +2,7 @@
 title: "配布依存境界"
 status: accepted
 created: "2026-08-11"
-updated: "2026-09-17"
+updated: "2026-09-18"
 ---
 <!-- ADF-COVERS(implementation): REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-045 -->
@@ -55,6 +55,8 @@ distribution purity check は、distribution-bound artifact 内の producer 側�
 配布入力となる製品ソース自体を clean な状態で保持し、変換工程を通さない配布形態（link projection を含む）でも同一の clean 状態が維持される。
 
 ## 候補抽出から決定までのパイプライン
+
+走査契約: checker の走査判定は isDirectory() に加えて isSymbolicLink() を併用し、link profile (.opencode/** 配下) の junction (directory symlink) をディレクトリとして走査対象に含める。走査の意味論: (1) junction 経由の走査は link projection の検査であり、参照先 source projection (src 側原本) との重複検出は link profile / source profile の区別表示により回避する、(2) junction 参照先の配布対象外ファイル (テスト・開発用 scripts 等) は link projection の検査対象外とする、(3) 循環参照防止のため走査済み実パスの追跡を行う。
 
 検出パイプラインは次の 4 段階で構成する。
 各段階で副作用を発生させない。
