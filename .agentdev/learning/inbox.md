@@ -22,3 +22,57 @@
 - **タグ**: #case-open #definition-pr #traceability #宣言追随 #REQ-021-026 #missing-design
 
 ---
+
+## 2026-09-18: 配布 skill 文言追記が機械検査 3 系統に同時衝突する (PR 本文 Findings 回収)
+
+- **問題事象**: 配布物 (src/opencode/skills/**) への文言追記 1 件が、既存の機械検査 3 系統に同時に引っかかる: (1) 配布スキル配下の concrete 要件行 ID (REQ-021-028 形式。完全性テスト + IR-055 delta)、(2) repo-* 接頭辞用語 (repo-local、IR-055 runtime-unresolved-reference)、(3) 対応宣言マーカー形状の文字列 (distribution purity check)。
+- **発生局面**: case-run (DEL-2954-1) 実装中。delegation-and-result.md への ADF-COVERS 宣言付与の正の義務追記時に 3 系統すべてを経験。
+- **検知方法**: bun test 分割① (integrity suite)、IR-055 delta、distribution purity check の機械検査。
+- **根本原因**: 配布物は配布依存境界で repo 固有の concrete ID・repo-local 用語・宣言マーカー形状の持ち込みが禁止されており、追記文言の初稿がその契約に触れる書き方になっていた。
+- **自律対応内容**: concrete ID の一般化表現化・repo-* 用語の回避・マーカー形状文字列の回避へ文言修正し、fix-and-reverify で全検査合格。
+- **ユーザー確認の有無**: なし (文言修正のみ、case-auto 委譲内で完結)
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 今後の配布物追記では上記 3 系統を初稿から回避する。検査は 3 系統が独立に走るため、1 系統の修正が別系統を解消しない。
+- **再発条件**: 配布 skill 文言に concrete REQ 行 ID、repo-* 用語、または対応宣言マーカーと同一形状の文字列を直接書いた場合に再発する。
+- **予防策候補**: 配布物編集時の初稿チェックリスト化 (concrete ID 一般化、repo-* 用語回避、マーカー形状回避)。
+- **想定反映先**: agentdev-distribution-boundary 関連 reference または配布物編集 knowledge、learning-promote の評価対象。
+- **関連**: Case #2954、PR #2957、delegation-and-result.md
+- **タグ**: #distribution-boundary #配布物 #機械検査 #fix-and-reverify
+
+---
+
+## 2026-09-18: bun run による .ts 直接実行は package.json なし環境で Module not found (PR 本文 Findings 回収)
+
+- **問題事象**: repo root に package.json がない場合、`bun run <path>.ts` は Module not found となる (bun run は package.json scripts を解決する)。checker CLI の実行は `bun <path>` 形式を使う必要がある。また PowerShell リダイレクトによる checker stdout 退避が cp932 破壊の対象であること (AGENTS.md 既知事象) は spawnSync + writeFileSync (UTF-8 明示) での退避で継続回避。
+- **発生局面**: case-run (DEL-2954-1) の checker 実行。
+- **検知方法**: checker CLI 実行時の Module not found エラー。
+- **根本原因**: `bun run` と `bun <直接パス実行>` の解決経路の違い (run サブコマンドは scripts 解決を挟む) の認識不足。
+- **自律対応内容**: checker CLI 実行を `bun <path>` 形式へ統一。
+- **ユーザー確認の有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: checker 実行契約 Design「安定実行経路」の bun 経路実行時に影響し得る環境差。REQ-060 の bun test 形態 (`bun test ./path`) とは別経路である点の混同に注意。
+- **再発条件**: package.json 非存在の cwd で `bun run <path>.ts` 形式を使った場合に再発する。
+- **予防策候補**: checker CLI 実行は `bun <path>` 形式に統一する知識の明示化。
+- **想定反映先**: checker 実行契約関連 knowledge、learning-promote の評価対象。
+- **関連**: Case #2954、PR #2957、REQ-060
+- **タグ**: #bun #checker実行 #実行形態
+
+---
+
+## 2026-09-18: PR タイトル事前変更は 1-commit PR の squash タイトルを制御できない (case-close STEP-4-3 手順の限界)
+
+- **問題事象**: case-close STEP-4-3 の「PR タイトル事前変更」(issue_update で Conventional Commits + (Refs #N) 形式へ変更) を実施したが、squash merge commit のタイトルには反映されなかった。本リポジトリの squash merge 設定が 1-commit PR で commit message を採用する動作のため、branch HEAD の元 commit メッセージ (5ccfa74c) がそのまま squash タイトルになった。
+- **発生局面**: case-close STEP-4-3 (PR #2957 squash merge)。
+- **検知方法**: merge 後の `git log --oneline origin/main` で squash commit タイトルを確認。
+- **根本原因**: squash コミットタイトルの由来がリポジトリ設定 (PR title 優先 vs commit message 優先) に依存する点の認識不足。reference の手順は PR title 優先設定を前提とする。
+- **自律対応内容**: 実害の確認のみ (採用された元 commit message に auto-close キーワードを含まず、Issue 誤 close は発生しなかった。Issue は case-close が明示 close で完了)。
+- **ユーザー確認の有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: auto-close 回避の担保は「merge 前の branch HEAD commit message 自体に auto-close キーワードを含めない」ことでも成立する。PR タイトル変更は補助手段にすぎない環境がある。
+- **再発条件**: commit message 優先設定のリポジトリで、case-close が branch HEAD commit message の auto-close キーワードを確認せず merge した場合に、誤 close リスクとして再発し得る。
+- **予防策候補**: case-close STEP-4-3 の前置に「branch HEAD commit message の auto-close キーワード確認 (fixes/closes/resolves + 近接参照なし)」を追加する候補。
+- **想定反映先**: agentdev-workflow-case-close reference (pr-merge-and-conflict.md STEP-4-3)、learning-promote の評価対象。
+- **関連**: Case #2954、PR #2957、case-close STEP-4-3
+- **タグ**: #case-close #squash-merge #auto-close回避 #GitHub
+
+---
