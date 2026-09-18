@@ -2,7 +2,7 @@
 title: req-define Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-05
+updated: 2026-09-18
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-011, REQ-021-022 -->
@@ -220,6 +220,8 @@ test_strategy:
 | record-in-findings | Findings に out-of-scope として記録する | スコープ外または修正困難な事象の場合 |
 
 ## artifact_actions 生成
+
+req-define は新規 REQ CREATE の要件doc生成において、当該要件行の検証対応を任意とする場合に traceability/policy.yaml への登録判断を要件展開に含める。登録が必要な場合は当該登録を Definition 保存の作業項目として case-open へ引き継ぎ (REQ-021-028: 同一 Definition 変更として扱う)、不要な場合はその根拠を draft に記録する。
 
 req-define は `artifact_actions` の producer である。
 要件doc生成の artifact_actions 生成で要件展開の結果を `draft-data` の `artifact_actions` へ出力する。

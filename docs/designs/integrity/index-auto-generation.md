@@ -2,7 +2,7 @@
 title: 索引類自動生成 Design
 status: accepted
 created: 2026-07-19
-updated: 2026-09-12
+updated: 2026-09-18
 ---
 <!-- ADF-COVERS(implementation): REQ-001-026, REQ-001-028 -->
 <!-- ADF-COVERS(implementation): REQ-010-011 -->
@@ -102,6 +102,7 @@ AUTOGEN block ID は `{target}-{section}-{subsection}` 形式に従う。
 | `req-metrics-measurement-example` | quality/req-health-metrics.md |
 | `spec-metrics-measurement-example` | quality/design-health-metrics.md |
 | `readme-req-summary-count` | README.md |
+| `readme-req-summary-table` | README.md |
 
 新規 AUTOGEN block は本形式に従う。
 camelCase、英語以外の混在等は許容しない。

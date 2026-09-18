@@ -2,7 +2,7 @@
 title: アーティファクト契約
 status: accepted
 created: 2026-08-20
-updated: "2026-09-03"
+updated: "2026-09-18"
 ---
 <!-- ADF-COVERS(implementation): REQ-002-005, REQ-002-006, REQ-002-016, REQ-002-034 -->
 
@@ -123,7 +123,7 @@ Command 固有の実行順序、Issue 作成、保存、更新、削除、完了
 - 同一 script または共有 lib を複製しない（REQ-002-006「Script は決定的: テスト可能、再現可能」の延長）
 - 新規 script 追加時は所有者候補を文書種別で判定し、既存所有者との重複を確認する
 
-本契約は Command → Skill → Script の依存方向を維持し、新規 Decision を作成せず v2:ADR-0107（Command/Skill/Template/Script 責任分界）の適用条件の精緻化として扱う（REQ-082-004 準拠）。
+本契約は Command → Skill → Script の依存方向を維持し、新規 Decision を作成せず v2:ADR-0107（Command/Skill/Template/Script 責任分界）の適用条件の精緻化として扱う。
 
 ## 分類根拠伝播契約
 
