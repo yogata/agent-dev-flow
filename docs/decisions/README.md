@@ -221,15 +221,15 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-028 | [REQ-053](../requirements/REQ-053.md), [REQ-010](../requirements/REQ-010.md), [REQ-036](../requirements/REQ-036.md) | 文章表層品質の共通実行基盤（REQ-053 全面更新、REQ-010-071/074 UPDATE と REQ-010-075 APPEND、REQ-036-008/023 UPDATE と整合） |
 | DEC-029 | [REQ-005](../requirements/REQ-005.md), [REQ-006](../requirements/REQ-006.md) | - |
 | DEC-030 | [REQ-012](../requirements/REQ-012.md), [REQ-021](../requirements/REQ-021.md), [REQ-029](../requirements/REQ-029.md), [REQ-002](../requirements/REQ-002.md), [REQ-061](../requirements/REQ-061.md), [REQ-057](../requirements/REQ-057.md) | トレーサビリティ標準機能への一般化と producer / consumer 境界の確立（REQ-012 UPDATE、REQ-021 UPDATE、REQ-029 APPEND、REQ-002 APPEND、REQ-061 UPDATE、REQ-057 UPDATE と整合。DEC-017 決定1の部分改正） |
-| DEC-031 | - | - |
-| DEC-032 | - | - |
-| DEC-033 | - | - |
-| DEC-034 | - | - |
-| DEC-035 | - | - |
-| DEC-036 | - | - |
-| DEC-037 | - | - |
-| DEC-038 | - | - |
-| DEC-039 | - | - |
+| DEC-031 | [REQ-088](../requirements/REQ-088.md) | - |
+| DEC-032 | [REQ-088](../requirements/REQ-088.md), [REQ-001](../requirements/REQ-001.md) | - |
+| DEC-033 | [REQ-005](../requirements/REQ-005.md), [REQ-006](../requirements/REQ-006.md) | - |
+| DEC-034 | [REQ-009](../requirements/REQ-009.md), [REQ-088](../requirements/REQ-088.md) | - |
+| DEC-035 | [REQ-007](../requirements/REQ-007.md), [REQ-055](../requirements/REQ-055.md) | - |
+| DEC-036 | [REQ-002](../requirements/REQ-002.md), [REQ-044](../requirements/REQ-044.md), [REQ-052](../requirements/REQ-052.md) | - |
+| DEC-037 | [REQ-012](../requirements/REQ-012.md), [REQ-021](../requirements/REQ-021.md) | - |
+| DEC-038 | [REQ-017](../requirements/REQ-017.md), [REQ-061](../requirements/REQ-061.md) | - |
+| DEC-039 | [REQ-003](../requirements/REQ-003.md), [REQ-034](../requirements/REQ-034.md) | - |
 <!-- AUTOGEN:END -->
 
 ## 過去版の履歴基盤

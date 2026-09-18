@@ -11,6 +11,8 @@ created: 2026-06-21
 
 # ワークフロー契約（横断）
 
+処遇注記（v4 移行）: 本 Design の状態記述は ADF v4 ライフサイクル状態機械（workflows/v4-lifecycle-state-machine.md）が一般化契約として被覆する。本 Design の権威移行（置換）は後続 Sequence 第4段階で実行する（処遇の正本: foundations/v3-v4-crosswalk.md の references/crosswalk-inventory.md）。
+
 > **Scope**: 本 Design は agent-dev-flow リポジトリに適用される横断契約である。
 > 個別 command / skill の現在動作は各 command Design（`docs/designs/commands/`）、各 skill Design（`docs/designs/skills/`）を参照のこと。
 > 横断 Design は個別 Design の代替ではない。

@@ -7,7 +7,7 @@ updated: 2026-09-19
 
 # ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応）
 
-位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、v4.0.0-rc.1 cutover 前は v3 を正とする。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は RU §24 の後続 Sequence で段階的に実施する。
+位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）までは v3 を正とする。当該段階での置換実行をもって権威は本 Design へ移行する。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施する。
 
 ## 二層状態モデル
 
@@ -73,18 +73,7 @@ v4 ライフサイクル状態は、durable state enum（永続状態）と runt
 
 ## v3 状態関連 Design の処遇（planned supersede 記録）
 
-| v3 Design | v4 での処遇（planned supersede 記録。実行は後続段階） |
-|---|---|
-| workflow-contracts（SSoT 遷移・result 4 状態・result 記録契約） | 状態機械全体像へ吸収される予定。result 記録契約は 1 権威 + 導出投影へ再編される予定 |
-| input-resolution-and-durable-state（再構成優先順位） | v4-durable-state-and-recovery Design が一般化契約として引き継ぐ予定 |
-| step-reference-contract（STEP resume point） | 再開単位の階層（STEP/処理単位/Case）は v4 再構成契約へ整理される予定 |
-| epic-wave-model（子Issue 状態・Wave・per-Epic 単一書き手） | 階層合成と直列化単位モデルへ再編される予定（語彙意味の再定義は work_type/scale/Epic/Wave 段階） |
-| definition-readiness（Definition PR lifecycle・冪等キー） | Definition lifecycle 部分ビューと冪等経路要件へ整理される予定 |
-| backlog-artifact-lifecycle（RU/draft lifecycle） | RU/draft 部分ビューとして整理される予定 |
-| decision-lifecycle（Decision status） | Decision status 部分ビューとして整理される予定 |
-| delegation-contracts（委譲契約） | 委譲単位の再開・result を本機械の部分ビューへ接続する予定 |
-| local-case-file（ローカルIssue 状態遷移） | backend 抽象の論理状態と物理写像へ整理される予定 |
-
+v3 状態関連 Design 9 件の処遇（planned supersede・実行段階）の正本は foundations/v3-v4-crosswalk.md の references/crosswalk-inventory.md（Design 表の supersede 行）が所有する。本 Design は各 v3 Design を一般化契約として被覆する関係のみを所有する。
 ## enum 整合の機械検査可能性
 
 状態 enum とその記録表現（Epic 本文ステータス表、Issue 本文状態記載、テンプレート）の間に不整合が生じないよう、enum 値の定義表を正とし、記録側表現は enum 値の写像であることを宣言する（v3 運用で観測された表現ドリフトの再発防止）。

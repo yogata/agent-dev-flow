@@ -7,7 +7,7 @@ updated: 2026-09-19
 
 # ADF v4 durable state と再構成・恢復（配置表・権威移行・部分失敗調整）
 
-位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、v4.0.0-rc.1 cutover 前は v3 を正とする。既存 Design 群の本モデルへの準拠更新は RU §24 の後続 Sequence で段階的に実施する。DEC-038 の詳細を所有する。
+位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）までは v3 を正とする。当該段階での置換実行をもって権威は本 Design へ移行する。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施する。
 
 ## 5 分類と配置表
 
@@ -35,7 +35,7 @@ durable state 関連の情報を次の 5 分類に配置する。各論理状態
 
 ## 再構成優先順位の一般化
 
-中断再開の入力解決は SSoT 再構成 > identifier 保持 > 最小 scalar > runtime artifact の優先順位に従う（input-resolution-and-durable-state Design の v3 契約を全実行単位（Case、Wave、委譲、STEP）へ一般化。v3 側の当該節は planned supersede として記録し、置換は後続段階が所有する）。
+中断再開の入力解決は SSoT 再構成 > identifier 保持 > 最小 scalar > runtime artifact の優先順位に従う（input-resolution-and-durable-state Design の v3 契約を全実行単位（Case、Wave、委譲、STEP）へ一般化。v3 側の処遇・実行段階の正本は foundations/v3-v4-crosswalk.md の references/crosswalk-inventory.md が所有する）。
 
 - cursor 的状態（現在 stage、workflow route）を正規状態として保存しない。最も早い未収束 stage として再構成する
 - 起動時対象集合等の実行中の一時保持は、中断再開に必要な期間に限定してローカルに保持してよい（正規状態ではない）
@@ -59,4 +59,4 @@ repo 外の一時証跡退避先（OS 一時ディレクトリ等）はローカ
 
 ## v3 関連 Design の処遇
 
-input-resolution-and-durable-state Design の再構成優先順位節は本 Design が一般化契約として引き継ぐ予定（planned supersede 記録。実行は後続段階）。step-reference-contract の再開単位階層は本 Design の再構成契約へ整理される予定。
+input-resolution-and-durable-state、step-reference-contract 等、v3 関連 Design の処遇・実行段階・被覆関係の正本は foundations/v3-v4-crosswalk.md の references/crosswalk-inventory.md が所有する。

@@ -12,6 +12,8 @@ updated: 2026-09-16
 
 # サブエージェント委譲契約（横断）
 
+処遇注記（v4 移行）: 本 Design の状態記述は ADF v4 ライフサイクル状態機械（workflows/v4-lifecycle-state-machine.md）の委譲単位接続が一般化契約として被覆する。本 Design の権威移行（置換）は後続 Sequence 第8段階で実行する（処遇の正本: foundations/v3-v4-crosswalk.md の references/crosswalk-inventory.md）。
+
 > 本 Design は v2:ADR-0112 で定義されたサブエージェント委譲の一般概念に基づく共通契約を定義する。
 > 個別 command / skill の委譲利用は各 Design を参照のこと。
 

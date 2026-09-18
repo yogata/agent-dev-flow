@@ -9,6 +9,8 @@ updated: 2026-09-02
 
 # Input Resolution and Durable State
 
+処遇注記（v4 移行）: 本 Design の状態記述は ADF v4 durable state と再構成・恢復（foundations/v4-durable-state-and-recovery.md）が一般化契約として被覆する。本 Design の権威移行（置換）は後続 Sequence 第4段階で実行する（処遇の正本: foundations/v3-v4-crosswalk.md の references/crosswalk-inventory.md）。
+
 ## 目的
 
 入力解決優先順位、永続状態、current STEP 再構成、並列child task 復元の契約を定義する。
