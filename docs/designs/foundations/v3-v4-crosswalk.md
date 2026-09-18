@@ -47,7 +47,7 @@ Sequence（v4-migration-and-release.md）の各段階で行う。
 
 ## 集約サマリ
 
-- REQ（現行 53）: keep 26 / redefine 26 / 新設 1（REQ-088、第3段実行）。retired 12 件は
+- REQ（現行 53）: keep 23 / redefine 30 / 新設 1（REQ-088、第3段実行）。retired 12 件は
   retired を維持する（識別子再利用禁止）
 - Decision（v3 側 30、DEC-018 欠番）: keep 20 / redefine 2（DEC-010、DEC-012）/
   supersede 5（DEC-002、DEC-015、DEC-017、DEC-029、DEC-030）/ 既に superseded 済み 2

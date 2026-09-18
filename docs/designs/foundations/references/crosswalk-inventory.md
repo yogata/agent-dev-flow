@@ -102,8 +102,9 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | 対象 | 意味処遇 | 帰属 | 実行段階 | 確定状態 | 備考 |
 |---|---|---|---|---|---|
 | designs/commands/*.md（19 件） | redefine | ― | 4 | planned | 公開 UX 2入口収斂・内部 lifecycle 回収に伴う再編 |
-| designs/skills/*.md（35 件、_template 含む） | redefine | semantic Skill | 8 | planned | semantic/deterministic 再分類（DEC-036） |
+| designs/skills/*.md（34 件、_template 含む） | redefine | semantic Skill | 8 | planned | semantic/deterministic 再分類（DEC-036） |
 | workflows/workflow-contracts.md | supersede | ― | 4 | planned | v4-lifecycle-state-machine へ吸収（result 契約の 1 権威+導出投影への再編を含む） |
+| workflows/workflow-skill-model.md | redefine | semantic Skill | 8 | planned | 責務 3 層分化・1:N 分割・配置契約の v4 Skill 再編での再定義（DEC-010 実装詳細） |
 | workflows/input-resolution-and-durable-state.md | supersede | ― | 4 | planned | v4-durable-state-and-recovery が一般化契約を承継 |
 | workflows/step-reference-contract.md | supersede | ― | 4 | planned | 再開単位階層（STEP/処理単位/Case）の v4 再構成 |
 | workflows/epic-wave-model.md | supersede | ― | 5 | planned | 階層合成+直列化単位への再編。語彙意味の再定義は第5段 |
@@ -128,6 +129,7 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | responsibilities/req-impact-map.md | keep | ― | ― | planned | REQ 影響マップは維持 |
 | responsibilities/responsibility-boundary-purification.md | redefine | Adapter | 11 | planned | 責務境界浄化の adapter 再編 |
 | responsibilities/artifact-quality-control-routing.md | redefine | ― | 6 | planned | Gate モデル接続 |
+| responsibilities/custom-tool-contracts.md | redefine | Adapter | 11 | planned | Custom Tool 操作契約・迂回防止の adapter 再編（REQ-052 対応 Design） |
 | quality/quality-specs.md | redefine | ― | 6 | planned | Quality 5 概念への再編 |
 | quality/quality-gates.md | supersede | ― | 6 | planned | v4-quality-gate-model が承継（DEC-035） |
 | quality/req-health-metrics.md | keep | ― | ― | planned | REQ 健全性メトリクスは維持 |
