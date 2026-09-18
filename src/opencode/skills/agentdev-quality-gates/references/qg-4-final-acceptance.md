@@ -292,6 +292,12 @@ bun test ./.opencode/plugins/ ./scripts/
 - **junction 伝播状態**: worktree では `.opencode/skills/agentdev-*` junction の未伝播、main では junction 構成の鮮度（未再構築の stale junction 有無）
 - **依存パッケージ状態**: gitignore 対象 node_modules の伝播状態と `bun install` の要否・実施済み否か
 
+採取手順（各実行の直前に採取し、実行記録と同じ PR 本文セクションへ記録する）:
+
+1. **実行環境**: `git rev-parse --show-toplevel` で top-level パスを取得し、パスが `.worktrees/` 配下かで worktree / main の別を判定する。ブランチ名（`git branch --show-current`）と HEAD hash を併記する
+2. **junction 伝播状態**: 対象 root 直下の `.opencode/skills/` 配下で junction エントリの有無を確認する（main root: junction 構成が存在するか、stale junction（参照先不在）の有無。worktree: 未伝播である旨）
+3. **依存パッケージ状態**: integrity scripts ディレクトリと Project Extensions scripts ディレクトリの `node_modules` 存在確認結果と、`bun install` 前置の実施有無を記録する（整備手段と選択根拠は `agentdev-git-worktree` worktree-operations「bun test 実行の環境前提」の選択基準参照）
+
 ### fail 由来分類
 
 フル suite の合格判定は、fail 全件の由来分類（変更由来 / pre-existing / 不明）と検証環境の記録を前提とする。
@@ -308,6 +314,13 @@ remediation 開始後に作成した commit や base ブランチ比較のみを
 | pre-existing | 既知欠陥、環境依存（baseline commit で再現する fail） |
 | 不明 | いずれにも分類できない fail |
 
+証跡手順（fail 発見時にこの順序で実行し、記録を PR 本文の検証差分セクションへ残す）:
+
+1. **単独再実行**: fail したテストファイルを単独で再実行し、再現性（同一 fail の再現 / 非再現）を確認する。単独実行結果（起動コマンド、pass/ fail 件数）を記録する。単独実行で再現しない fail は、同一環境ラベル下でのフル suite 再実行により状態依存性を確認する
+2. **フル再実行**: 単独再実行の後にフル suite（同一 cwd 分割）を再実行し、fail 件数の変化を確認する。単独→フルの順序で得られた両記録は、fail が個別テストの問題か suite 実行の相互作用かを区別する証拠となる
+3. **同一環境件数比較**: 単独再実行とフル再実行の pass/ fail 件数を、同一環境ラベル（実行環境、junction 伝播状態、依存パッケージ状態の3要素が一致する実行）の間でのみ比較する。環境ラベルが異なる実行結果の件数差を由来判定の根拠にしない。件数比較の結果（fail 件数の一致・不一致と、その解釈）を記録する
+4. **baseline 再現確認**: pre-existing と分類する場合は、ワークツリー変更ゼロの baseline commit で同一テストを再実行した再現確認を記録する。baseline 再現確認の実施手順は、stash による退避を行わない detached worktree による baseline 比較（`agentdev-git-worktree` worktree-operations「git stash 運用手順（一時退避）」の detached worktree 標準手順）を用いる
+
 ### 機械受理基準
 
 フル suite の受理判断は、次の受理由件の記録が PR 本文に機械的に検証可能な形で存在することを満たす場合のみ pass とする。
@@ -315,11 +328,11 @@ remediation 開始後に作成した commit や base ブランチ比較のみを
 
 1. 正規ランナー構成確認の記録: 正規ランナー構成確認（package.json scripts 定義等の確認結果と判定した正規ランナー）の記録が存在すること
 2. 正規形実行の記録: 3 cwd 分割それぞれの起動コマンド（`./` prefix 付き、cwd はリポジトリルート）の実行記録が存在すること
-3. 環境ラベルの記録: 環境ラベルの3要素（実行環境、junction 伝播状態、依存パッケージ状態）が記録されていること
+3. 環境ラベルの記録: 環境ラベルの3要素（実行環境、junction 伝播状態、依存パッケージ状態）が記録されていること。採取手順は「環境ラベル」節のとおり
 4. 件数突合の記録: 各分割実行の「Ran N tests across M files」件数が記録されていること
 5. fail 全件の由来分類: fail が 0 件、または全 fail に由来分類（変更由来 / pre-existing / 不明）が付与され、由来不明が 0 件であること
 6. baseline 基準の明示: 由来判定が remediation 開始前の baseline commit 基準で行われたことが記録されていること
-7. pre-existing fail の baseline 再現確認の記録: pre-existing と分類した fail がある場合、ワークツリー変更ゼロの baseline commit で同一テストを再実行した同一 fail 再現確認の記録が存在すること
+7. pre-existing fail の baseline 再現確認の記録: pre-existing と分類した fail がある場合、ワークツリー変更ゼロの baseline commit で同一テストを再実行した同一 fail 再現確認の記録が存在すること。baseline 再現確認は detached worktree による baseline 比較（`agentdev-git-worktree` worktree-operations「git stash 運用手順（一時退避）」の detached worktree 標準手順、stash を使わない）で実施したことが記録から確認できること。単独→フル再実行の証拠順序と同一環境件数比較の実施は「fail 由来分類」節の証跡手順に従う
 
 いずれかの記録が欠落する場合、由来不明の fail が残存する場合、未登録の既知欠陥を合格の根拠にする場合は fail とする。
 

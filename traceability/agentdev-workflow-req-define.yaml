@@ -5,3 +5,7 @@ implementation:
     - REQ-021-012
     - REQ-021-023
     - REQ-021-028
+    - REQ-021-029
+verification:
+  docs/designs/commands/req-define.md:
+    - REQ-021-029

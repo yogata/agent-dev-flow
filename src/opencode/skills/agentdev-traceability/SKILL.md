@@ -47,6 +47,14 @@ description: Requirement-artifact traceability (coverage, impact, check) resolvi
 - 宣言の REQ-ID は子要件行 ID で指定する。親要件 ID のみの参照（bare ID）は対応宣言の配置対象とならず、check に対応の欠落として計上され得る
 - sidecar と inline declaration は同一の論理的な対応関係へ正規化され、coverage、impact、check から同一に扱われる。同一論理関係の不整合な重複は check が検出する
 
+#### inline declaration 優先規則（重複解消の整備方向）
+
+同一論理関係（同一 artifact パス × role × 要件行 ID）が inline declaration と sidecar の両方から生じた場合の整備方向の優先を定める。
+
+- **適用範囲は producer 側限定**: 優先規則は producer 側文書（docs 配下の正規成果物、producer 側スクリプト等、inline declaration の正規配置対象）にのみ適用する。consumer distribution closure に含まれる配布対象成果物では inline declaration を使用しないため、sidecar が唯一の情報源であり本規則は適用されない（配布対象成果物の対応関係は sidecar 正規配置とする現行規定による除外）
+- **優先保持**: producer 側成果物に対応する同一論理関係の二重宣言を解消する場合、inline declaration を優先保持し、sidecar 側の重複行を解消する。inline declaration は成果物本体と同一ファイルに共存するため、成果物の rename・移動・削除時に対応関係が追随し、sidecar の更新漏れを構造的に起こしにくいことが優先の根拠である
+- **検出と整備の分離**: 検出自体は check の `duplicate-inconsistencies` が行う（sidecar と inline declaration の間、または同一情報源内で矛盾する状態を fail として検出）。本優先規則は検出結果の解消方向のみを定め、check の検出条件、判定、検出計上を変更しない。二重宣言が内容矛盾していなくても、`duplicate-inconsistencies` 節が検出する重複状態にある場合、本優先規則に従い単一情報源へ解消する
+
 ## Scripts（決定的処理）
 
 `scripts/` 配下の決定的スクリプトが3能力を機械的に実行する。

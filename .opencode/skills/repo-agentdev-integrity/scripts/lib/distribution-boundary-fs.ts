@@ -34,7 +34,7 @@ export const PUBLIC_SKILLS_PARENT = "src/opencode/skills";
 export const PUBLIC_TOOLS_PARENT = "src/opencode/tools";
 export const PUBLIC_PLUGINS_PARENT = "src/opencode/plugins";
 
-// ADF-COVERS(implementation): REQ-052-006, REQ-052-007
+// ADF-COVERS(implementation): REQ-052-006, REQ-052-007, REQ-029-006
 
 export type FailureCategory = BoundaryFailure["category"];
 
@@ -42,6 +42,39 @@ export function dirExists(p: string): boolean {
   try {
     return fs.existsSync(p) && fs.statSync(p).isDirectory();
   } catch {
+    return false;
+  }
+}
+
+/**
+ * Resolve a path to its canonical real path for traversal dedup.
+ * Returns the input unchanged when realpath fails (deleted/mid-scan race),
+ * so dedup stays best-effort and never blocks the scan.
+ */
+function safeRealpath(p: string): string {
+  try {
+    return fs.realpathSync(p);
+  } catch {
+    return p;
+  }
+}
+
+/**
+ * Dirent directory test that also treats directory symlinks / junctions as
+ * directories (Windows junctions report isSymbolicLink() === true and
+ * isDirectory() === false from lstat-based readdirSync entries, so
+ * isDirectory() alone silently skips them and the link projection scan
+ * misses the projection entirely).
+ * A symlink is followed via statSync only to confirm it targets a directory;
+ * file symlinks fall through to the regular file branch.
+ */
+function direntPointsToDirectory(ent: fs.Dirent, full: string): boolean {
+  if (ent.isDirectory()) return true;
+  if (!ent.isSymbolicLink()) return false;
+  try {
+    return fs.statSync(full).isDirectory();
+  } catch {
+    // Broken symlink: treat as traversal failure target-free, skip it.
     return false;
   }
 }
@@ -87,6 +120,10 @@ function listArtifactsRec(dirPath: string): ArtifactListing {
   if (!dirExists(dirPath)) {
     return { textFiles, binaryFiles, unknownFiles };
   }
+  // Cycle prevention: track visited real paths so junction / symlink loops
+  // (e.g. a symlink pointing back to an ancestor) terminate instead of
+  // looping forever.
+  const visited = new Set<string>([safeRealpath(dirPath)]);
   const stack: string[] = [dirPath];
   while (stack.length > 0) {
     const current = stack.pop();
@@ -99,10 +136,13 @@ function listArtifactsRec(dirPath: string): ArtifactListing {
     }
     for (const ent of entries) {
       const full = path.join(current, ent.name);
-      if (ent.isDirectory()) {
+      if (direntPointsToDirectory(ent, full)) {
         if (ent.name === "node_modules") continue;
+        const real = safeRealpath(full);
+        if (visited.has(real)) continue;
+        visited.add(real);
         stack.push(full);
-      } else if (ent.isFile()) {
+      } else if (ent.isFile() || ent.isSymbolicLink()) {
         const cls = classifyByExtension(ent.name);
         const normalized = full.replace(/\\/g, "/");
         if (cls.kind === "text") {
@@ -156,11 +196,14 @@ export function collectTargets(repoRoot: string, projection: Projection): Artifa
       continue;
     }
     for (const ent of entries) {
-      if (!ent.isDirectory()) continue;
+      const full = path.join(parent, ent.name);
+      // Junction / symlink skill entries count as directories (link
+      // projection traversal).
+      if (!direntPointsToDirectory(ent, full)) continue;
       if (!accept(ent.name)) continue;
       merged = appendListing(
         merged,
-        listArtifactsRec(path.join(parent, ent.name)),
+        listArtifactsRec(full),
       );
     }
   }

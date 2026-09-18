@@ -61,6 +61,7 @@ import {
   REQ_RETIRED_TABLE_BLOCK_ID,
   REQ_METRICS_BLOCK_ID,
   README_REQ_SUMMARY_COUNT_BLOCK_ID,
+  README_REQ_SUMMARY_TABLE_BLOCK_ID,
 } from "./generate_indexes.ts";
 
 const path = require("path") as typeof import("path");
@@ -396,15 +397,22 @@ function buildBlockTargets(root: string): BlockTarget[] {
     });
   }
 
-  // docs/README.md（1ブロック）。REQ ファイル群が存在しない場合は計測不能のため対象外。
+  // docs/README.md（2ブロック）。REQ ファイル群が存在しない場合は計測不能のため対象外。
+  // readme-req-summary-table は req-active-table と同一生成元・同一構造（REQ-057-018）。
   if (fs.existsSync(reqDir) && fs.existsSync(reqRetiredDir)) {
+    const docsReadmeReqInfos = collectReqFiles(reqDir);
     targets.push({
       file: docsReadmePath,
       blockId: README_REQ_SUMMARY_COUNT_BLOCK_ID,
       expected: generateReadmeReqSummaryCount({
-        activeReqCount: collectReqFiles(reqDir).length,
+        activeReqCount: docsReadmeReqInfos.length,
         retiredReqCount: collectRetiredReqFiles(reqRetiredDir).length,
       }),
+    });
+    targets.push({
+      file: docsReadmePath,
+      blockId: README_REQ_SUMMARY_TABLE_BLOCK_ID,
+      expected: generateReqActiveTable(docsReadmeReqInfos),
     });
   }
 

@@ -33,6 +33,11 @@ import {
   findUndeclaredRelatedReqDecisions,
   formatRelatedReqCell,
   generateDecisionRelatedReqTable,
+  collectReqFiles,
+  generateReqActiveTable,
+  README_REQ_SUMMARY_COUNT_BLOCK_ID,
+  README_REQ_SUMMARY_TABLE_BLOCK_ID,
+  README_REQ_SUMMARY_TABLE_GENERATOR,
 } from "./generate_indexes.ts";
 import { findRepoRoot } from "./cli_utils.ts";
 
@@ -535,6 +540,49 @@ describe("doc_decision template related_reqs initial value (REQ-059-004)", () =>
       .split("\n")
       .find((l) => /^related_reqs:/.test(l));
     expect(relatedReqLine).toBe("related_reqs: []");
+  });
+});
+
+describe("readme-req-summary-table (REQ-057-018)", () => {
+  it("uses the adopted block ID registered in index-auto-generation Design", () => {
+    expect(README_REQ_SUMMARY_TABLE_BLOCK_ID).toBe("readme-req-summary-table");
+    expect(README_REQ_SUMMARY_COUNT_BLOCK_ID).toBe("readme-req-summary-count");
+  });
+
+  it("generates the same structure as req-active-table (same source, same shape)", () => {
+    const rows = [
+      { id: "REQ-001", relPath: "requirements/REQ-001.md", title: "文書体系" },
+      { id: "REQ-002", relPath: "requirements/REQ-002.md", title: "配布成果物の責務境界" },
+    ] as never[];
+    expect(README_REQ_SUMMARY_TABLE_GENERATOR(rows)).toEqual(
+      generateReqActiveTable(rows),
+    );
+  });
+
+  it("replaces docs/README.md readme-req-summary-table block with REQ ID + title rows", () => {
+    const original = [
+      "現行要件の説明文（人手編集領域）",
+      "",
+      "<!-- AUTOGEN:BEGIN:id=readme-req-summary-table -->",
+      "| REQ | タイトル |",
+      "|---|---|",
+      "| [REQ-001](requirements/REQ-001.md) | 旧手動行 |",
+      "<!-- AUTOGEN:END -->",
+      "",
+      "- [要件インデックス](requirements/README.md)",
+    ].join("\n");
+    const rows = [
+      { id: "REQ-001", relPath: "requirements/REQ-001.md", title: "文書体系" },
+    ] as never[];
+    const updated = replaceAutogenBlock(
+      original,
+      README_REQ_SUMMARY_TABLE_BLOCK_ID,
+      README_REQ_SUMMARY_TABLE_GENERATOR(rows),
+    );
+    expect(updated).toContain("<!-- AUTOGEN:BEGIN:id=readme-req-summary-table -->");
+    expect(updated).toContain("| REQ ID | タイトル |");
+    expect(updated).toContain("現行要件の説明文（人手編集領域）");
+    expect(updated).not.toContain("旧手動行");
   });
 });
 

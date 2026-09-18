@@ -13,59 +13,63 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）による意図的予約欠番であり、実体は存在しない（[採番管理](designs/foundations/numbering-policy.md) 参照）。
 各 REQ の詳細は各 REQ ファイル本文を参照。
 
-| REQ | タイトル |
+<!-- AUTOGEN:BEGIN:id=readme-req-summary-table -->
+| REQ ID | タイトル |
 |---|---|
-| [REQ-001](requirements/REQ-001.md) | 文書体系と持続可能な基準構造 |
-| [REQ-002](requirements/REQ-002.md) | 配布成果物の責務境界 |
-| [REQ-003](requirements/REQ-003.md) | 委譲時の判断・承認・副作用境界 |
-| [REQ-004](requirements/REQ-004.md) | 要求の形成と合意 |
-| [REQ-005](requirements/REQ-005.md) | ワークフロープロトコルと工程接続 |
-| [REQ-006](requirements/REQ-006.md) | Case実行オーケストレーション |
-| [REQ-007](requirements/REQ-007.md) | 完了報告と成果物品質ゲート |
-| [REQ-008](requirements/REQ-008.md) | 一時成果物ライフサイクル |
-| [REQ-009](requirements/REQ-009.md) | 配布基盤と導入モデル |
-| [REQ-010](requirements/REQ-010.md) | 自己監査コマンド（docs-check） |
-| [REQ-011](requirements/REQ-011.md) | I/O境界と外部連携手段 |
-| [REQ-012](requirements/REQ-012.md) | 成果物トレーサビリティ |
-| [REQ-014](requirements/REQ-014.md) | adversarial-review caller integration 共通契約 |
-| [REQ-015](requirements/REQ-015.md) | adversarial-review caller integration（7 caller と case-auto 停止伝播） |
-| [REQ-016](requirements/REQ-016.md) | adversarial-review caller integration 横断整合 |
-| [REQ-017](requirements/REQ-017.md) | Issue Execution Contract |
-| [REQ-018](requirements/REQ-018.md) | worktree 構造的制約とテスト fallback |
-| [REQ-019](requirements/REQ-019.md) | テスト影響範囲検出 gate |
-| [REQ-021](requirements/REQ-021.md) | トレーサビリティのワークフロー統合 |
-| [REQ-027](requirements/REQ-027.md) | Capability Skill・Soft guard・代表ケース検証 |
-| [REQ-029](requirements/REQ-029.md) | 配布依存境界 |
-| [REQ-030](requirements/REQ-030.md) | case-open 実行契約（Root Case 確立と Definition Package） |
-| [REQ-031](requirements/REQ-031.md) | case-run 実行契約（実装実行と委譲） |
-| [REQ-032](requirements/REQ-032.md) | case-close 実行契約（完了判定とマージ） |
-| [REQ-034](requirements/REQ-034.md) | case-auto 実行契約（自走オーケストレーション） |
-| [REQ-035](requirements/REQ-035.md) | Epic と Wave 実行モデル |
-| [REQ-036](requirements/REQ-036.md) | 検出と診断コマンド群（inspect 系） |
-| [REQ-037](requirements/REQ-037.md) | 取り込みパイプライン（intake） |
-| [REQ-038](requirements/REQ-038.md) | 学習パイプライン（learning） |
-| [REQ-039](requirements/REQ-039.md) | バックログ統合（backlog-review） |
-| [REQ-041](requirements/REQ-041.md) | backlog 一括整理コマンド（backlog-auto）実行契約 |
-| [REQ-044](requirements/REQ-044.md) | 標準API委譲の状態制約 |
-| [REQ-045](requirements/REQ-045.md) | 現行成果物体系の整合性網羅監査 |
-| [REQ-046](requirements/REQ-046.md) | 横断正規化後の不変条件 |
-| [REQ-047](requirements/REQ-047.md) | 規則所有権の一方向化 |
-| [REQ-048](requirements/REQ-048.md) | ADF 実行観測と統制縮小評価 |
-| [REQ-049](requirements/REQ-049.md) | 追跡Issue管理機構 |
-| [REQ-050](requirements/REQ-050.md) | scripts 公開入口境界 |
-| [REQ-051](requirements/REQ-051.md) | ガードレール識別体系と機械検査の再編 |
-| [REQ-052](requirements/REQ-052.md) | Custom Tool・Plugin/Hook の種別契約と配布境界 |
-| [REQ-053](requirements/REQ-053.md) | 文書と配布物の文章品質契約 |
-| [REQ-054](requirements/REQ-054.md) | 変更誘発境界リスク分析 |
-| [REQ-055](requirements/REQ-055.md) | production-equivalent verification の定義 |
-| [REQ-056](requirements/REQ-056.md) | Project Knowledge の所有と workflow 利用 |
-| [REQ-057](requirements/REQ-057.md) | docs corpus 整合・現行化バッチ |
-| [REQ-058](requirements/REQ-058.md) | ADF 管理投影物の廃止時クリーンアップ契約 |
-| [REQ-059](requirements/REQ-059.md) | Decision と REQ の関連宣言管理 |
-| [REQ-060](requirements/REQ-060.md) | bun test 実行形態の統一（repo root 起 cwd・`./` 付きパス指定） |
-| [REQ-061](requirements/REQ-061.md) | case-ready 実行契約 |
-| [REQ-062](requirements/REQ-062.md) | case-revise 実行契約 |
-| [REQ-082](requirements/REQ-082.md) | 対論型レビュー審議契約 |
+| [REQ-001](REQ-001.md) | 文書体系と持続可能な基準構造 |
+| [REQ-002](REQ-002.md) | 配布成果物の責務境界 |
+| [REQ-003](REQ-003.md) | 委譲時の判断・承認・副作用境界 |
+| [REQ-004](REQ-004.md) | 要求の形成と合意 |
+| [REQ-005](REQ-005.md) | ワークフロープロトコルと工程接続 |
+| [REQ-006](REQ-006.md) | Case実行オーケストレーション |
+| [REQ-007](REQ-007.md) | 完了報告と成果物品質ゲート |
+| [REQ-008](REQ-008.md) | 一時成果物ライフサイクル |
+| [REQ-009](REQ-009.md) | 配布基盤と導入モデル |
+| [REQ-010](REQ-010.md) | 自己監査コマンド（docs-check） |
+| [REQ-011](REQ-011.md) | I/O境界と外部連携手段 |
+| [REQ-012](REQ-012.md) | 成果物トレーサビリティ |
+| [REQ-014](REQ-014.md) | adversarial-review caller integration 共通契約 |
+| [REQ-015](REQ-015.md) | adversarial-review caller integration（7 caller と case-auto 停止伝播） |
+| [REQ-016](REQ-016.md) | adversarial-review caller integration 横断整合 |
+| [REQ-017](REQ-017.md) | Issue Execution Contract |
+| [REQ-018](REQ-018.md) | worktree 構造的制約とテスト fallback |
+| [REQ-019](REQ-019.md) | テスト影響範囲検出 gate |
+| [REQ-021](REQ-021.md) | トレーサビリティのワークフロー統合 |
+| [REQ-027](REQ-027.md) | Capability Skill・Soft guard・代表ケース検証 |
+| [REQ-029](REQ-029.md) | 配布依存境界 |
+| [REQ-030](REQ-030.md) | case-open 実行契約（Root Case 確立と Definition Package） |
+| [REQ-031](REQ-031.md) | case-run 実行契約（実装実行と委譲） |
+| [REQ-032](REQ-032.md) | case-close 実行契約（完了判定とマージ） |
+| [REQ-034](REQ-034.md) | case-auto 実行契約（自走オーケストレーション） |
+| [REQ-035](REQ-035.md) | Epic と Wave 実行モデル |
+| [REQ-036](REQ-036.md) | 検出と診断コマンド群（inspect 系） |
+| [REQ-037](REQ-037.md) | 取り込みパイプライン（intake） |
+| [REQ-038](REQ-038.md) | 学習パイプライン（learning） |
+| [REQ-039](REQ-039.md) | バックログ統合（backlog-review） |
+| [REQ-041](REQ-041.md) | backlog 一括整理コマンド（backlog-auto）実行契約 |
+| [REQ-044](REQ-044.md) | 標準API委譲の状態制約 |
+| [REQ-045](REQ-045.md) | 現行成果物体系の整合性網羅監査 |
+| [REQ-046](REQ-046.md) | 横断正規化後の不変条件 |
+| [REQ-047](REQ-047.md) | 規則所有権の一方向化 |
+| [REQ-048](REQ-048.md) | ADF 実行観測と統制縮小評価 |
+| [REQ-049](REQ-049.md) | 追跡Issue管理機構 |
+| [REQ-050](REQ-050.md) | scripts 公開入口境界 |
+| [REQ-051](REQ-051.md) | ガードレール識別体系と機械検査の再編 |
+| [REQ-052](REQ-052.md) | Custom Tool・Plugin/Hook の種別契約と配布境界 |
+| [REQ-053](REQ-053.md) | 文書と配布物の文章品質契約 |
+| [REQ-054](REQ-054.md) | 変更誘発境界リスク分析 |
+| [REQ-055](REQ-055.md) | production-equivalent verification の定義 |
+| [REQ-056](REQ-056.md) | Project Knowledge の所有と workflow 利用 |
+| [REQ-057](REQ-057.md) | docs corpus 整合・現行化バッチ |
+| [REQ-058](REQ-058.md) | ADF 管理投影物の廃止時クリーンアップ契約 |
+| [REQ-059](REQ-059.md) | Decision と REQ の関連宣言管理 |
+| [REQ-060](REQ-060.md) | bun test 実行形態の統一（repo root 起 cwd・`./` 付きパス指定） |
+| [REQ-061](REQ-061.md) | case-ready 実行契約 |
+| [REQ-062](REQ-062.md) | case-revise 実行契約 |
+| [REQ-082](REQ-082.md) | 対論型レビュー審議契約 |
+| [REQ-083](REQ-083.md) | Definition PR の状態契約（通常 Pull Request・ブランチ命名・用語・正規操作完結） |
+| [REQ-087](REQ-087.md) | 採番例外の記録と REQ 番号ギャップ検査 |
+<!-- AUTOGEN:END -->
 
 - [要件インデックス](requirements/README.md)
 
