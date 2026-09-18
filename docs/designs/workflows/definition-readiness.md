@@ -18,6 +18,7 @@ Definition Package、Definition PR / Definition Amendment PR の lifecycle、can
 - 構成: 要件行（REQ 変更後本文）、Decision、Design、Issue 構成案（operation_units、case_open_hints 由来）、受入条件一式を Case 単位で集約したパッケージ
 - 生成: case-open が req_draft から生成し Root Case に関連付ける
 - 索引・補助メタデータの具体形式は本 Design の管理下（draft の対象外）
+- docs 文言を期待するテストへの影響確認の対応境界（REQ-061-035）: case-ready の Definition 品質検査で、Definition 変更が docs 文言を期待するテスト（repo-local checker fixture を含む）に影響すると確認された場合のテスト更新は、Definition Package の構成要素ではない。テスト更新は実現面の変更であり、realization_actions 経由で case-run へ割り当てる。Definition Package 側の責務は、影響確認の結果を受入条件一式（test_strategy）へ反映することに限定される。影響確認自体（影響の有無判定）は case-ready の品質検査手順が実行する
 
 ## Definition PR lifecycle
 

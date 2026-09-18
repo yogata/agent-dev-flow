@@ -1492,3 +1492,112 @@ describe("producer metadata detection signal (DEC-030 decision 5)", () => {
     expect(meta!.line).toBe(2);
   });
 });
+
+describe("distribution-boundary-fs junction / symlink traversal (REQ-029-006)", () => {
+  const fs = require("fs") as typeof import("fs");
+  const os = require("os") as typeof import("os");
+  const path = require("path") as typeof import("path");
+  const { collectTargets } = require("./distribution-boundary-fs.ts") as {
+    collectTargets: (root: string, projection: Projection) => {
+      textFiles: readonly string[];
+      binaryFiles: readonly string[];
+      unknownFiles: readonly string[];
+    };
+  };
+
+  function makeTempRepo(): string {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "dist-boundary-fs-"));
+    const skillSrc = path.join(root, "src", "opencode", "skills", "agentdev-demo");
+    fs.mkdirSync(path.join(skillSrc, "references"), { recursive: true });
+    fs.writeFileSync(
+      path.join(skillSrc, "SKILL.md"),
+      "# demo skill\nproducer anchor: docs/designs/dummy.md\n",
+      "utf-8",
+    );
+    fs.writeFileSync(
+      path.join(skillSrc, "references", "guide.md"),
+      "# guide\n",
+      "utf-8",
+    );
+    const linkParent = path.join(root, ".opencode", "skills");
+    fs.mkdirSync(linkParent, { recursive: true });
+    return root;
+  }
+
+  function createSkillJunction(root: string, linkName: string): boolean {
+    const target = path.join(root, "src", "opencode", "skills", "agentdev-demo");
+    const linkPath = path.join(root, ".opencode", "skills", linkName);
+    try {
+      const kind = process.platform === "win32" ? "junction" : "dir";
+      fs.symlinkSync(target, linkPath, kind);
+      return fs.existsSync(linkPath);
+    } catch {
+      return false;
+    }
+  }
+
+  test("link projection traverses through a junction / directory symlink", () => {
+    const root = makeTempRepo();
+    try {
+      if (!createSkillJunction(root, "agentdev-demo")) {
+        console.log("skipping: junction / symlink unavailable on this environment");
+        return;
+      }
+      const listing = collectTargets(root, "link");
+      const normalized = listing.textFiles.map((f) => f.replace(/\\/g, "/"));
+      expect(
+        normalized.some((f) =>
+          f.endsWith(".opencode/skills/agentdev-demo/SKILL.md"),
+        ),
+      ).toBe(true);
+      expect(
+        normalized.some((f) =>
+          f.endsWith(".opencode/skills/agentdev-demo/references/guide.md"),
+        ),
+      ).toBe(true);
+      // Link projection must not leak the junction target's real (src) path.
+      expect(normalized.some((f) => f.includes("/src/opencode/"))).toBe(false);
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("cycle via symlink back to an ancestor terminates without looping", () => {
+    const root = makeTempRepo();
+    try {
+      const linkParent = path.join(root, ".opencode", "skills");
+      // Loop: junction whose target is an ancestor of itself.
+      try {
+        const kind = process.platform === "win32" ? "junction" : "dir";
+        fs.symlinkSync(linkParent, path.join(linkParent, "loop"), kind);
+      } catch {
+        return;
+      }
+      // Completion (no hang / no stack overflow) is the assertion.
+      const listing = collectTargets(root, "link");
+      expect(Array.isArray(listing.textFiles)).toBe(true);
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("source and link projections report the same logical content under distinct paths", () => {
+    const root = makeTempRepo();
+    try {
+      if (!createSkillJunction(root, "agentdev-demo")) {
+        console.log("skipping: junction / symlink unavailable on this environment");
+        return;
+      }
+      const src = collectTargets(root, "source").textFiles
+        .map((f) => f.replace(/\\/g, "/"));
+      const link = collectTargets(root, "link").textFiles
+        .map((f) => f.replace(/\\/g, "/"));
+      expect(src.some((f) => f.endsWith("src/opencode/skills/agentdev-demo/SKILL.md"))).toBe(true);
+      expect(link.some((f) => f.endsWith(".opencode/skills/agentdev-demo/SKILL.md"))).toBe(true);
+      // Profile distinction: path prefixes differ while logical content matches.
+      expect(src.length).toBe(link.length);
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+});

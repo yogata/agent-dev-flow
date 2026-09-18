@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-ready
-description: "case-ready command の workflow 実装本体。Definition PR 受入（忠実性・整合性・品質検査の確認、merge 前の isDraft 確認と blocked 停止、新しい意味判断が不要な場合の自動確定・merge、HITL 停止、CI 失敗時の ready 不遷移と既存 PR 保持）、canonical Definition 再取得、proposed Decision の受理評価と accepted 遷移、execution contract 確定、Standard / Epic 確定（連結成分と3軸判断、Child Issue / Wave / 依存構造生成、構成検証、Wave 重複前置検出）、トレーサビリティ完全性ゲート、ready 遷移、draft / RU 削除、冪等再実行を所有する。USE FOR: case-ready 実行時の workflow 制御（Definition 受入・自動確定・merge・HITL 停止・canonical 再取得・Decision 受理評価・execution contract 確定・Standard / Epic 確定・検証ゲート・横断依存検査・ready 遷移・draft / RU 削除・冪等再実行）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）、Root Case 確立・Definition Package 生成・Definition PR 作成（case-open 側の責務）、実装実行（case-run 側の責務）、PR マージ判定・完了条件チェックボックス評価（case-close 側の責務）。"
+description: "case-ready command の workflow 実装本体。Definition PR 受入（忠実性・整合性・品質検査の確認、isDraft 確認と blocked 停止、自動確定・merge、HITL 停止）、canonical Definition 再取得、Decision 受理評価（accepted 遷移）、execution contract 確定、Standard / Epic 確定（3軸判断、Child Issue / Wave / 依存構造生成、Wave 重複前置検出）、トレーサビリティ完全性ゲート、ready 遷移、draft / RU 削除、冪等再実行を所有する。USE FOR: case-ready 実行時の workflow 制御。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）、Root Case 確立・Definition Package 生成・Definition PR 作成（case-open 側の責務）、実装実行（case-run 側の責務）、PR マージ判定・完了条件チェックボックス評価（case-close 側の責務）。"
 ---
 
 

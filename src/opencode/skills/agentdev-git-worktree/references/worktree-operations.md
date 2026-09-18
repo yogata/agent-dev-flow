@@ -7,6 +7,7 @@
 - [worktree 標準運用ガイド](#worktree-標準運用ガイド)
 - [worktree 構造的制約（agentdev-git-worktree-test-fallback Design）](#worktree-構造的制約agentdev-git-worktree-test-fallback-design)
 - [bun test 実行の環境前提](#bun-test-実行の環境前提)
+- [書込み guard 運用指針（Windows エンコーディング破壊回避の集約）](#書込み-guard-運用指針windows-エンコーディング破壊回避の集約)
 - [git stash 運用手順（一時退避）](#git-stash-運用手順一時退避)
 - [削除手順](#削除手順)
 - [ツール実行規約](#ツール実行規約)
@@ -152,6 +153,10 @@ bun test によるフル suite 実行は、次の環境前提を踏まえて実�
        ```
 
   - **整備後の再実行手順**: 依存整備実施後、依存解決失敗で fail したテスト・型検証を同一 worktree で再実行し、当該 fail が解消したことを確認する。再実行結果には依存整備実施済みの旨を環境ラベル（依存パッケージ状態）へ記録し、整備前の fail と整備後の結果を混在させない
+  - **整備手段の選択基準（junction 作成と bun install の使い分け）**: 上記2手段は次の判断基準で使い分ける。判断根拠は検証記録の環境ラベルへ記録する
+    - **`bun install` を選択する**: (a) worktree 内で `package.json`・`bun.lock` を変更する Case（依存定義の変更を伴う実装）。(b) 検証結果の再現性が依存状態そのものに依存する検証（依存状態を実験条件の一部として扱う場合）。junction 経由では依存実体が main 側の現在状態に依存し、main 側の整備操作が worktree 側の検証結果へ干渉するため、この条件では junction を使わない
+    - **junction 作成を選択する**: (a) 依存定義の変更がなく、main 側の整備済み依存と同一の状態で足りる一時的な検証。(b) 検証後に worktree へ `node_modules` 実体を残したくない場合（junction エントリ削除のみでクリーンアップが完結し、gitignore 対象の実体が worktree に残留しない）。(c) `bun install` による復元時間を要しない速い前置が有利な場合
+    - **共通制約**: いずれの手段でも、選択根拠と依存パッケージ状態を環境ラベルとして検証記録に残す。整備手段の切替（junction → bun install 等）を行った場合は切替後の結果を正とし、切替前の結果を再利用しない
   - **package rename 時の bun.lock 確認**: package rename を伴う変更で `bun install` を実行した場合は、bun.lock の root workspace name が新パッケージ名へ追従していることを確認する（確認手順は runtime-package-boundary Design「本体リポジトリ sync」節参照）
 - worktree の `.opencode/` 配下 junction は未伝播である。junction を前提とする構造系テストは source パス（SoT パス）への fallback で実行される
 - worktree の構造上の理由でテストスイートが実行できない場合は、メインリポジトリからの読取専用実行でエビデンスを採取できる。この場合は実行環境（worktree または main、junction 伝播状態、依存パッケージ状態）を環境ラベルとして検証記録に明記し、fail 全件の由来分類（既知欠陥・環境依存・当該変更起因）を行う
@@ -163,6 +168,30 @@ bun test によるフル suite 実行は、次の環境前提を踏まえて実�
 
 junction 依存 checker は worktree 実行時（`isInsideWorktree` 判定で worktree 内と判定された場合）に skip する。
 skip せずに検査が必要な場合は構造系テスト fallback（commands_e2e / skills_structure / templates_structure の source パス切替）を適用する。
+
+## 書込み guard 運用指針（Windows エンコーディング破壊回避の集約）
+
+worktree 操作（実装、検証、証跡退避を含む）におけるファイル書込みは、Windows 環境のエンコーディング破壊回避 guard の対象である。
+本節は worktree 操作文脈での運用指針を集約する。規範の正は AGENTS.md 行動規範と `docs/knowledge/windows-powershell-bulk-io-corruption.md` とし、本節はそれらを worktree 操作から参照できるようにした集約点である。
+
+### guard が書込みをブロックする操作（worktree 内で実行禁止）
+
+- PowerShell 標準 cmdlet（`Get-Content` / `Set-Content` / `Out-File`）経由の既存 UTF-8（BOM なし）/LF ファイルの一括読み書き（cp932 解釈・CRLF 書き出しによる破壊）
+- PowerShell のリダイレクト演算子（`>` / `>>` / `*>`）やパイプによるファイル出力（checker stdout・gh CLI 出力等の証跡退避を含む）
+- Write ツールによる既存 UTF-8（BOM なし）ファイルの全面上書き（新規ファイル作成に限定する）
+
+### 標準手段（guard ブロック時の切替先）
+
+- 既存ファイルの部分編集: edit ツール（per-line string replace）
+- プログラム経由の一括読み書き: node の `readFileSync` / `writeFileSync`（エンコーディング明示）または `[System.IO.File]` の明示エンコーディング指定
+- 証跡退避（checker CLI stdout、gh CLI 出力等）: `spawnSync` + `fs.writeFileSync`（UTF-8 明示）
+
+### fail-closed の維持
+
+guard が書込みをブロックした場合、ブロックの解除・迂回（エンコーディング指定の変更、リダイレクト回避ハック等）で進めず、上記の標準手段へ切替する。
+ブロックを検知した edit の oldString がファイル実内容と不一致の場合は、ファイルを再読取して正確な内容で再試行する（本規定は guard の fail-closed 挙動自体を維持対象とする）。
+
+git 出力のエンコーディング処理の詳細は `git-common-procedures.md`「Windows git 出力のエンコーディング処理」を参照する。
 
 ## git stash 運用手順（一時退避）
 

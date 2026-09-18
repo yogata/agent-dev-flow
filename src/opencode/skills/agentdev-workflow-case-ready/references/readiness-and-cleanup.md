@@ -28,6 +28,15 @@
 - **Epic 経路の委譲境界**: Epic 経路の Wave 内重複（同一 Epic 配下の子 Issue 間）は Wave 構成の重複前置検出（execution-structure の前置検出）へ委譲し二重検査としない。Epic をまたぐ Case 間の重複は本検査が検出対象とする
 - **冪等再実行時の再提示**: 再実行時も本検査を再実行し、警告を再提示する（エンジンは同一入力から同一の報告を返す）
 
+### docs 文言期待テスト影響確認（Definition 品質検査）
+
+Definition 変更が docs 文言を期待するテスト（リポジトリ固有の checker fixture を含む）に影響するかを確認する。本確認は Definition 品質検査の確認項目であり、case-ready 実行契約の品質検査行に対応する。
+
+- **対象**: docs 文書の見出し・表構造・特定文言を期待するリポジトリ固有テスト、checker の fixture 期待値、docs 文書を直接読み取って期待値を組み立てる検査実装等。配布物テキストを固定文字列で期待するテストを含む
+- **確認方法**: Definition 変更（canonical Definition との差分）で変化する docs 文書の見出し・文言・構造を抽出し、それらを期待するテスト・fixture の有無を検索する
+- **対応境界**: 影響を確認した場合の対応要否は definition-readiness Design「Definition Package」構成の境界に従う。テスト更新は Definition Package の構成要素ではなく実現面の変更であり、realization_actions 経由で case-run へ割り当てる。本品質検査は影響の有無判定と、確認結果の test_strategy（受入条件一式）への反映までを行う。テスト本体を本検査で修正しない
+- **記録**: 影響の有無の判定と根拠を完了報告へ含める（影響ありと判定した場合は、影響を受けるテスト・fixture の一覧と test_strategy への反映内容を含める）
+
 ### ready 遷移
 
 - 実行準備条件を満たした場合のみ Root Case を ready に遷移させる
@@ -57,6 +66,16 @@
 - Decision の受理記録（accepted 遷移済み）を再利用し、重複する状態遷移や承認記録を生成しない
 - execution contract 確定済みの Root Case 本文は現行値を検証し、差分がある場合のみ更新する
 - 冪等キーの具体形は `<workflows/definition-readiness>` Design の冪等キー節を参照する
+
+### GitHub I/O 失敗時の gh CLI 切替継続手順（冪等再実行の再利用検出）
+
+冪等再実行の再利用判定（merge 済み Definition PR、既存 Child Issue 等の検出）は `agentdev_gh` の読み取り操作に依存する。`agentdev_gh` の読み取り操作が失敗し、再利用検出が完了できない場合、次の手順で継続する。
+
+1. **切替判定**: 読み取り操作の失敗を検知した場合、同一操作を1回再試行する。再試行でも失敗する場合に gh CLI へ切替する
+2. **切替範囲の限定**: gh CLI による切替は**読み取り専用の検出**に限定する。merge、Issue 更新、draft / RU 削除の git 永続化等の書込み操作を gh CLI で代替しない（GitHub I/O の正規経路は Custom Tool `agentdev_gh` に限定する契約を維持する）
+3. **検出基準の不変性**: gh CLI で検出した結果も同一の冪等キー基準で解釈し、再利用判定の基準を変えない
+4. **切替の記録**: 切替理由、使用した gh CLI コマンド、検出結果を検証記録へ残す
+5. **切替後も検出不能な場合**: 検出不能として報告し停止する。検出不能のまま新規生成へ進まない（重複生成の防止を優先する）
 
 ## 完了報告
 
