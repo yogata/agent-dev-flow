@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は27件、提案中の Decision は9件である。
+現行の承認済み Decision は36件、提案中の Decision は0件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -44,15 +44,15 @@
 | DEC-028 | 文章表層品質の共通実行基盤 | accepted | 2026-09-09 |
 | DEC-029 | 公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入 | accepted | 2026-09-14 |
 | DEC-030 | トレーサビリティ標準機能への一般化と producer / consumer 境界の確立 | accepted | 2026-09-17 |
-| DEC-031 | ADF v4 Standard Operating Model の採用とプロセス・実装の責務分離 | proposed | 2026-09-18 |
-| DEC-032 | ADF 責務の三層モデルと Project Contract の論理ビュー・情報寿命モデル | proposed | 2026-09-18 |
-| DEC-033 | ADF v4 公開運用モデル（UX 2入口収斂・内部 lifecycle・継続コラボレーションループ・学習昇格ガード） | proposed | 2026-09-18 |
-| DEC-034 | v4 の移行・release 標準境界（非破壊移行原則・v4.0.0-rc.1 cutover・self-hosting） | proposed | 2026-09-18 |
-| DEC-035 | v4 Quality / Verification / Evidence / Gate モデルへの分解 | proposed | 2026-09-18 |
-| DEC-036 | 意味 Skill と決定的実装の責務分離および Harness/Backend adapter 境界 | proposed | 2026-09-18 |
-| DEC-037 | Traceability の Change / Evidence 中心への再中心化 | proposed | 2026-09-18 |
-| DEC-038 | ADF v4 durable state 配置と再構成の契約（状態権威・証跡分離・非原子調整原則） | proposed | 2026-09-19 |
-| DEC-039 | ADF v4 authority・副作用統制と冪等・並行性モデル | proposed | 2026-09-19 |
+| DEC-031 | ADF v4 Standard Operating Model の採用とプロセス・実装の責務分離 | accepted | 2026-09-18 |
+| DEC-032 | ADF 責務の三層モデルと Project Contract の論理ビュー・情報寿命モデル | accepted | 2026-09-18 |
+| DEC-033 | ADF v4 公開運用モデル（UX 2入口収斂・内部 lifecycle・継続コラボレーションループ・学習昇格ガード） | accepted | 2026-09-18 |
+| DEC-034 | v4 の移行・release 標準境界（非破壊移行原則・v4.0.0-rc.1 cutover・self-hosting） | accepted | 2026-09-18 |
+| DEC-035 | v4 Quality / Verification / Evidence / Gate モデルへの分解 | accepted | 2026-09-18 |
+| DEC-036 | 意味 Skill と決定的実装の責務分離および Harness/Backend adapter 境界 | accepted | 2026-09-18 |
+| DEC-037 | Traceability の Change / Evidence 中心への再中心化 | accepted | 2026-09-18 |
+| DEC-038 | ADF v4 durable state 配置と再構成の契約（状態権威・証跡分離・非原子調整原則） | accepted | 2026-09-19 |
+| DEC-039 | ADF v4 authority・副作用統制と冪等・並行性モデル | accepted | 2026-09-19 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -92,11 +92,6 @@
 - [DEC-028](DEC-028.md)（文章表層品質の共通実行基盤）
 - [DEC-029](DEC-029.md)（公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入）
 - [DEC-030](DEC-030.md)（トレーサビリティ標準機能への一般化と producer / consumer 境界の確立）
-<!-- AUTOGEN:END -->
-
-### 提案中（proposed）
-
-<!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
 - [DEC-031](DEC-031.md)（ADF v4 Standard Operating Model の採用とプロセス・実装の責務分離）
 - [DEC-032](DEC-032.md)（ADF 責務の三層モデルと Project Contract の論理ビュー・情報寿命モデル）
 - [DEC-033](DEC-033.md)（ADF v4 公開運用モデル（UX 2入口収斂・内部 lifecycle・継続コラボレーションループ・学習昇格ガード））
@@ -106,6 +101,11 @@
 - [DEC-037](DEC-037.md)（Traceability の Change / Evidence 中心への再中心化）
 - [DEC-038](DEC-038.md)（ADF v4 durable state 配置と再構成の契約（状態権威・証跡分離・非原子調整原則））
 - [DEC-039](DEC-039.md)（ADF v4 authority・副作用統制と冪等・並行性モデル）
+<!-- AUTOGEN:END -->
+
+### 提案中（proposed）
+
+<!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
