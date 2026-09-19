@@ -6720,9 +6720,11 @@ function checkCommandCaptureDuties(cmdDir: string, root: string): CheckResult[] 
   // 下記 duties は具体的 capture 責務を持つ command の正例集合（capture 責務表から導出）。
   // リスト外の command は一般規則により検出対象外となる。
   const duties: Record<string, { dutyKeyword: string; dutyLabel: string }> = {
-    "case-run.md": { dutyKeyword: "記録のみ", dutyLabel: "record only" },
-    "case-close.md": { dutyKeyword: "回収・保存", dutyLabel: "recover and save" },
     "req-save.md": { dutyKeyword: "原則非関与", dutyLabel: "principle: non-involvement" },
+    // Case #2981（DEC-033）: case-run.md / case-close.md は公開 command から内部
+    // lifecycle 段階へ移行し定義ファイルは削除済み。capture 責務は対応する
+    // Workflow Skill（agentdev-workflow-case-run / case-close）側へ継承されるため
+    // command 検査対象から除去する。
   };
 
   for (const [filename, { dutyKeyword, dutyLabel }] of Object.entries(duties)) {

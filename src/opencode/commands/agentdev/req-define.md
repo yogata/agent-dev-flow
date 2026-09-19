@@ -1,21 +1,21 @@
 ---
-description: 要件を整理、定義する（機能追加、バグ修正共通）
+description: 要件を整理、定義する（手動要求入口。機能要求、bug report、エラー・ログ・障害事象、外部課題、設計・調査メモ、診断由来 finding 共通）
 ---
 
 # 要件定義
 
-機能追加またはバグ修正の要件を整理、定義する。
-壁打ちフェーズ（Case 確立前）で使用し、主フロー req-define → case-open → case-ready → case-run → case-close の起点となる。
-Case 確立後の Definition 変更も本コマンドで再合意し、実変更がある場合は例外経路 case-revise → case-ready へ進む。
+自然言語による機能要求、bug report、エラー・ログ・障害事象、外部課題、設計・調査メモ、診断由来 finding を入力として要件を整理、定義する。
+壁打ちフェーズ（Case 確立前）で使用する手動要求入口であり、標準経路 req-define → case-auto の起点となる。
+Case 確立後の Definition 変更も本コマンドで再合意し、再合意後の実行は case-auto が Root Case の状態から内部 lifecycle（実変更がある場合は例外経路 case-revise → case-ready）を解決して駆動する。
 
 **draft-data 入力・出力**: 本コマンドは構造化 `draft-data`（`# draft-data` fenced YAML block）を扱う。
 対話の進行は永続状態（durable state。入力ファイル、draft 下書き、`status` frontmatter）から再構成され、会話コンテキストのみを再開の根拠（resume source）としない。
 
 ## 入力
 
-- ユーザーの自然言語による機能追加/バグ修正の説明
-- GitHub Issue URL（既存Issueの場合）
-- エラーログ（バグ修正の場合）
+- ユーザーの自然言語による機能要求（機能追加と bug report を含む）
+- GitHub Issue URL（外部課題を入力とする場合）
+- エラー・ログ・障害事象（bug report 以外の障害事象の説明を含む）
 - **ユーザーが明示した入力ファイル**: 設計メモ、調査メモ、RU（`.agentdev/backlog/req-units/RU-*.md`）等。全て参照専用入力
 - Definition 保存内部責務の SPLIT 検出時の検出事項（`.agentdev/drafts/requirements-review-finding-{topic-slug}.md`）
 - inspect-skills 診断結果の検出事項（`.agentdev/inspect/inbox/inspect-skills-finding-{topic-slug}.md`）。参照専用入力として扱い、未確認事項・採否未確定事項は要件本文と分離する（inspect ライフサイクルに従う）
@@ -42,6 +42,7 @@ Case 確立後の Definition 変更も本コマンドで再合意し、実変更
 - チェックボックスは測定可能で一意にする（`agentdev-req-analysis` 品質基準）
 - 要件doc 構造は req-draft.md テンプレート（構造化 `draft-data` 形式）に従う
 - Decision 閾値以上の判断は `agentdev-decision-guidelines` で判定する。Decision 要否確認ゲートでは `agentdev-architecture-advisory` の助言を親エージェントが分類して採用し、未確認事項は要件本文と分離して扱う
+- エラー・ログ・障害事象を入力として受け付けた場合は、現象理解、原因分析、期待状態、影響分析、要求化の必要性の評価経路を順に実行し、REQ/Decision/Design への接続可否を評価する。評価経路は work_type の判定要素ではなく、評価経路の実行は work_type の値に依存しない
 - work_type・Scale 判定は `agentdev-workflow-lifecycle` の基準に従う
 - draft は `operation_units` セクションを出力する（単一REQ操作も1件の OU として出力）。`depends_on` は必須依存のみ記録し、Issue 階層・Epic/Wave 構成の決定は case-open が担う
 - Design 分離基準に該当する要件行は `artifact_actions`（`artifact: design`）へ分離する（安定契約例外は除く）。test strategy 項目は verification（検証手順）・pass_criteria（合格基準）・on_failure（不合格時の処置）の3要素を欠落なく持ち、欠落項目は保存前に QG fail として扱う

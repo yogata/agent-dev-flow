@@ -1,9 +1,9 @@
 // Anchor test for the case-revise Definition revision boundary
 // (TS-008, Issue #2810). Pins the distribution artifacts to the canonical
 // requirements:
-//   - the case-revise command (public interface / dispatch only):
-//     src/opencode/commands/agentdev/case-revise.md
-//   - the case-revise workflow skill (workflow implementation body):
+//   - the case-revise workflow skill (workflow implementation body; the public
+//     command definition was removed by Case #2981 / DEC-033 and case-auto
+//     drives case-revise as an internal lifecycle stage):
 //     src/opencode/skills/agentdev-workflow-case-revise/ (SKILL.md + references)
 //   - the case-revise templates:
 //     src/opencode/skills/agentdev-workflow-templates/templates/case-revise/
@@ -30,7 +30,6 @@ import * as path from "path";
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 
-const COMMAND_REL = "src/opencode/commands/agentdev/case-revise.md";
 const SKILL_REL = "src/opencode/skills/agentdev-workflow-case-revise/SKILL.md";
 const REF_REV_REL =
   "src/opencode/skills/agentdev-workflow-case-revise/references/definition-revision.md";
@@ -78,7 +77,6 @@ const ROW_ANCHORS: Array<[string, string, RegExp]> = [
 
 describe("distribution artifacts exist", () => {
   const files = [
-    COMMAND_REL,
     SKILL_REL,
     REF_REV_REL,
     REF_IMPACT_REL,
@@ -94,17 +92,13 @@ describe("distribution artifacts exist", () => {
   }
 });
 
-describe("case-revise command is public interface and dispatch only", () => {
-  const doc = read(COMMAND_REL);
-
-  test("dispatches to the workflow skill", () => {
-    expect(doc).toContain("`agentdev-workflow-case-revise`");
-    expect(doc).toMatch(/workflow 実装本体を `agentdev-workflow-case-revise` スキルへ委譲する/);
-  });
+// Case #2981（DEC-033）: the case-revise public command definition was removed.
+// The semantic judgment boundary is anchored to the workflow skill body.
+describe("case-revise workflow skill owns the semantic judgment boundary", () => {
+  const doc = read(SKILL_REL);
 
   test("does not own semantic judgment (req-define owns it)", () => {
-    expect(doc).toMatch(/新しい要求、Decision、対象範囲を自身では決定せず/);
-    expect(doc).toMatch(/意味判断は req-define が所有する/);
+    expect(doc).toMatch(/新しい要求、Decision、対象範囲を自身では決定せず、意味判断は req-define が所有する/);
   });
 });
 
@@ -226,7 +220,6 @@ describe("REQ-033 retired state agrees with REQ-062-008 (history kept in Git onl
   });
 
   test("distribution artifacts keep no deprecated alias of case-update", () => {
-    expect(read(COMMAND_REL)).not.toMatch(/case-update/);
     expect(read(SKILL_REL)).not.toMatch(/case-update/);
   });
 });
