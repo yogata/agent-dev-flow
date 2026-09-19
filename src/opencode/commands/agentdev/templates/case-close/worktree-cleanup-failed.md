@@ -1,6 +1,6 @@
 ⚠️ case-close 完了（部分失敗）
 
-完了コマンド:/agentdev/case-close
+完了工程: case-close（case-auto 内部 lifecycle）
 対象: Issue #{N}/ PR #{PR_N}
 結果:
  GitHub側:
