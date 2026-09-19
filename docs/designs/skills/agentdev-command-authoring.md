@@ -86,3 +86,11 @@ command 作成時に次の文章品質観点を検査し、違反を残さない
 - 名詞連結: 過長な名詞連結列を残さず、読み手の切れ目を示す
 - 条件連結: 1 文に 3 以上の条件節を連結しない
 
+
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: 0 件
+- **deterministic 委譲先**: なし（機械検査は repo-local checker）
+- **知識提供**: command 記述品質基準

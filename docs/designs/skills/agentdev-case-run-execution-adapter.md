@@ -152,3 +152,11 @@ adversarial-review は v4-delegation-contracts Design の `semantic_review`（�
 本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、v4-delegation-contracts Design「adversarial-review との委譲契約接続」節、case-run command Design「adversarial-review 挿入境界（case-run: adapter 委譲内）」節との間で意味の重複、矛盾を生じない。
 adapter 委譲内の内部手続き（実装方針形成、review 呼出、結果反映、blocked 遷移）のみを本節が所有し、挿入境界（委譲内実施、STEP-S4 投影）、実装方針限定の契約は case-run command Design を正とする。
 
+
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: 0 件
+- **deterministic 委譲先**: API I/O → Custom Tool agentdev_gh・実行基盤起動
+- **知識提供**: adapter 契約・result 4 状態接続

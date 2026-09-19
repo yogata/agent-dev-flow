@@ -55,3 +55,11 @@ req-define が要件を確定する前にアーキテクチャ上の影響を確
 - [commands/req-define.md](../commands/req-define.md)
 - REQ-003（外部エージェント統合契約）
 
+
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: architecture/design judgment
+- **deterministic 委譲先**: なし（影響探索は上流工程が所有）
+- **知識提供**: 助言観点・判断基準
