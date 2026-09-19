@@ -128,10 +128,7 @@ Design は 3 層構造（commands / skills / workflows）と基盤 6 ドメイ�
 
 ### 横断 Design（`designs/workflows/`）
 
-- [ワークフロー契約（横断）](designs/workflows/workflow-contracts.md)
 - [Workflow Skill Model](designs/workflows/workflow-skill-model.md)
-- [STEP Reference Contract](designs/workflows/step-reference-contract.md)
-- [Input Resolution and Durable State](designs/workflows/input-resolution-and-durable-state.md)
 - [サブエージェント委譲契約](designs/workflows/delegation-contracts.md)
 - [キャプチャ境界](designs/workflows/capture-boundaries.md)
 - [Epic / Wave / Issue 実行モデル](designs/workflows/epic-wave-model.md)

@@ -48,7 +48,7 @@ const TPL_REPORT_REL =
   "src/opencode/skills/agentdev-workflow-templates/templates/case-ready/root-case-report.md";
 const REQ_061_REL = "docs/requirements/REQ-061.md";
 const REQ_035_REL = "docs/requirements/REQ-035.md";
-const DEF_READINESS_REL = "docs/designs/workflows/definition-readiness.md";
+const CASE_READY_DESIGN_REL = "docs/designs/commands/case-ready.md";
 
 function read(rel: string): string {
   return readFileSync(path.join(REPO_ROOT, rel), "utf-8");
@@ -187,27 +187,25 @@ describe("Definition acceptance scenarios (TS-003)", () => {
 
 describe("Idempotency key enumeration agreement (TS-008)", () => {
   const readyDoc = read(REF_READY_REL);
-  const designDoc = read(DEF_READINESS_REL);
-  const designSection = extractHeadingSection(designDoc, "## 冪等キー");
+  const designDoc = read(CASE_READY_DESIGN_REL);
+  const designSection = extractHeadingSection(designDoc, "## 冪等性");
 
-  test("definition-readiness Design owns the idempotency key section", () => {
+  test("case-ready Design owns the idempotency section", () => {
     expect(designSection).not.toBe("");
   });
 
   test("REQ enumeration (reuse targets) is covered by the Design enumeration", () => {
     // REQ-061-027 enumerates: Root Case, Definition PR, Child Issue,
-    // Wave / 依存構造, Decision 受理記録. The Design enumeration is the
-    // superset (it additionally names the Amendment PR lifecycle variant).
+    // Wave / 依存構造, Decision 受理記録. The successor case-ready Design
+    // idempotency section enumerates the reuse targets in v4 wording.
     for (const key of [
-      "Root Case",
-      "Definition PR",
-      "Child Issue",
-      "Wave / 依存関係",
+      "merge 済み Definition",
+      "既存 Child Issue",
+      "既存 Wave / 依存構造",
       "Decision 受理記録",
     ]) {
       expect(designSection).toContain(key);
     }
-    expect(designSection).toMatch(/Amendment PR/);
   });
 
   test("skill cleanup reference pins the reuse list and forbids duplicates", () => {

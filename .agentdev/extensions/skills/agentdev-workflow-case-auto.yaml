@@ -7,10 +7,10 @@ context:
     paths:
       - "docs/designs/workflows/epic-wave-model.md"
     purpose: Epic/Wave/Issue 実行モデルと execution_unit 構成の確認
-  - id: workflow-contracts
+  - id: v4-lifecycle-state-machine
     when: ワークフロー契約（フェーズ、SSoT 遷移、実装分類）参照時
     paths:
-      - "docs/designs/workflows/workflow-contracts.md"
+      - "docs/designs/workflows/v4-lifecycle-state-machine.md"
     purpose: パイプライン概要と共通フェーズ契約の確認
   - id: case-auto-spec
     when: 本コマンド Design（adversarial-review 由来の停止伝播契約、bounded parent decision resolution、コンフリクト解消モデル3レベル、停止理由分類の分類軸、実証Case自走）参照時

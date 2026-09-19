@@ -30,10 +30,10 @@ context:
     paths:
       - "docs/designs/workflows/epic-wave-model.md"
     purpose: OU 階層と Wave スケジューリングの確認
-  - id: workflow-contracts
+  - id: v4-lifecycle-state-machine
     when: ワークフロー契約（フェーズ、SSoT 遷移）参照時
     paths:
-      - "docs/designs/workflows/workflow-contracts.md"
+      - "docs/designs/workflows/v4-lifecycle-state-machine.md"
     purpose: パイプライン概要と共通フェーズ契約の確認
   - id: req-file-manager-procedure
     when: REQ ファイル管理手順参照時

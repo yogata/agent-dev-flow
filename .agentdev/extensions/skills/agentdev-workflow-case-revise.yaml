@@ -3,13 +3,13 @@ kind: workflow-extension
 id: agentdev-workflow-case-revise
 
 context:
-  - id: definition-readiness
+  - id: case-ready-design
     paths:
-      - "docs/designs/workflows/definition-readiness.md"
+      - "docs/designs/commands/case-ready.md"
     purpose: Definition Amendment の保存・確定境界の確認
-  - id: workflow-contracts
+  - id: v4-lifecycle-state-machine
     paths:
-      - "docs/designs/workflows/workflow-contracts.md"
+      - "docs/designs/workflows/v4-lifecycle-state-machine.md"
     purpose: 再合意済み変更後の case-ready 接続の確認
   - id: case-revise-spec
     paths:
