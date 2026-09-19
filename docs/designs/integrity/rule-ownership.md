@@ -2,7 +2,7 @@
 title: ルール所有権マトリックス
 status: accepted
 created: 2026-08-20
-updated: 2026-09-17
+updated: "2026-09-19"
 ---
 
 <!-- ADF-COVERS(design): REQ-057-023 -->
@@ -54,10 +54,10 @@ req-impact-map.md の配置の正本は `../responsibilities/req-impact-map.md` 
 | 20 | Authoring DoD | REQ-010 (060, 062-063), REQ-038 (005) | quality-specs.md | 行数、Steps、共通化、正規パス（`canonical path`） |
 | 21 | Command Step 整数化 | -（要件行レベルの正規所有者なし） | command-file-format.md | 最上位 Step は整数のみ。小数 Step を禁止。旧 `### Step N` 様式の残存・誤用検出（IR-028。REQ-047 で正規所有者を Design へ整理） |
 | 22 | Command サブステップ表記 | -（要件行レベルの正規所有者なし） | command-file-format.md | サブステップは N-M 形式のみ許容。英字サブステップを禁止（IR-029。REQ-047 で正規所有者を Design へ整理） |
-| 23 | Subagent verbatim 条件 | REQ-003 (013) | workflow-contracts.md | 成果物本文のみそのまま（verbatim）。一律 verbatim 制約を禁止 |
-| 24 | Findings / Capture候補 見出し | REQ-003 (014, 020, 021) | workflow-contracts.md | current/source は新見出しへ統一。旧語検出用文字列は許容 |
-| 25 | Delegation envelope 最小契約 | REQ-003 (017, 018) | workflow-contracts.md | `delegation_type`/`on_result` は必須 envelope ではないことを確認 |
-| 26 | lightweight-delegation 位置付け | REQ-003 (015, 016) | workflow-contracts.md | 主要パターン（`primary pattern`）ではなく重ねる委譲として扱う |
+| 23 | Subagent verbatim 条件 | REQ-003 (013) | v4-responsibility-boundaries.md | 成果物本文のみそのまま（verbatim）。一律 verbatim 制約を禁止 |
+| 24 | Findings / Capture候補 見出し | REQ-003 (014, 020, 021) | v4-responsibility-boundaries.md | current/source は新見出しへ統一。旧語検出用文字列は許容 |
+| 25 | Delegation envelope 最小契約 | REQ-003 (017, 018) | v4-responsibility-boundaries.md | `delegation_type`/`on_result` は必須 envelope ではないことを確認 |
+| 26 | lightweight-delegation 位置付け | REQ-003 (015, 016) | v4-responsibility-boundaries.md | 主要パターン（`primary pattern`）ではなく重ねる委譲として扱う |
 | 27 | 語彙ポリシー横断検出 | REQ-004 (024-028) | integrity-contracts.md | 現行対象範囲の語彙ポリシー違反検出 |
 | 28 | Cross-REQ 語彙矛盾 | REQ-010 | integrity-contracts.md | 現行 REQ 間の語彙矛盾検出 |
 | 29 | REQ 検証基準（必達要件） | REQ-010 | integrity-contracts.md | 規範語ではなく必達要件判定に基づく検証（v2:REQ-0115-044 から REQ-010 に移管） |
@@ -135,12 +135,12 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-024 | Command README ↔ 実体 | REQ-001-026, REQ-010-003 | integrity-contracts.md |
 | IR-025 | 廃止 Decision path 規則 | REQ-001-047, REQ-001-048 | integrity-contracts.md, document-model.md |
 | IR-027 | 廃止 ADR 現行根拠引用検出 | REQ-001-048, REQ-001-050 | integrity-contracts.md, document-model.md |
-| IR-028 | Command 最上位 Step 整数化 | -（要件行レベルの正規所有者なし。サブステップ様式の正規契約は command-file-format.md が所有） | ../../authoring/command-file-format.md, artifact-contracts.md, workflow-contracts.md |
-| IR-029 | Command 英字サブステップ禁止 | -（要件行レベルの正規所有者なし。サブステップ様式の正規契約は command-file-format.md が所有） | ../../authoring/command-file-format.md, artifact-contracts.md, workflow-contracts.md |
-| IR-030 | Subagent verbatim 条件付き返却 | REQ-003-013, REQ-003-021 | workflow-contracts.md, artifact-contracts.md, artifact-responsibilities.md |
-| IR-031 | Findings / Capture候補 見出し統一 | REQ-003-014, REQ-003-020, REQ-003-021 | workflow-contracts.md |
-| IR-032 | delegation_type/on_result 必須 envelope 禁止 | REQ-003-017, REQ-003-018 | workflow-contracts.md, artifact-contracts.md |
-| IR-033 | lightweight-delegation primary pattern 禁止 | REQ-003-015, REQ-003-016 | workflow-contracts.md, artifact-contracts.md |
+| IR-028 | Command 最上位 Step 整数化 | -（要件行レベルの正規所有者なし。サブステップ様式の正規契約は command-file-format.md が所有） | ../../authoring/command-file-format.md, artifact-contracts.md, v4-responsibility-boundaries.md |
+| IR-029 | Command 英字サブステップ禁止 | -（要件行レベルの正規所有者なし。サブステップ様式の正規契約は command-file-format.md が所有） | ../../authoring/command-file-format.md, artifact-contracts.md, v4-responsibility-boundaries.md |
+| IR-030 | Subagent verbatim 条件付き返却 | REQ-003-013, REQ-003-021 | v4-responsibility-boundaries.md, artifact-contracts.md, artifact-responsibilities.md |
+| IR-031 | Findings / Capture候補 見出し統一 | REQ-003-014, REQ-003-020, REQ-003-021 | v4-responsibility-boundaries.md |
+| IR-032 | delegation_type/on_result 必須 envelope 禁止 | REQ-003-017, REQ-003-018 | v4-responsibility-boundaries.md, artifact-contracts.md |
+| IR-033 | lightweight-delegation primary pattern 禁止 | REQ-003-015, REQ-003-016 | v4-responsibility-boundaries.md, artifact-contracts.md |
 | IR-034 | Skill 内部 section / protocol / Step 参照検出 | REQ-010 | integrity-contracts.md |
 | IR-035 | Skill See Also 検出観点 | REQ-010 | integrity-contracts.md |
 | IR-037 | retired-ADR-current-baseline-ref | REQ-001-048 | integrity-contracts.md, document-model.md |

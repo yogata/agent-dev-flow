@@ -2,7 +2,7 @@
 title: `agentdev-workflow-lifecycle` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-05
+updated: "2026-09-19"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-052, REQ-001-053, REQ-001-054, REQ-005-005, REQ-005-006, REQ-005-007, REQ-005-008, REQ-005-009, REQ-005-010, REQ-005-011, REQ-005-012, REQ-005-013, REQ-005-014, REQ-005-015, REQ-005-016, REQ-005-017, REQ-005-018, REQ-005-019, REQ-005-020, REQ-005-021, REQ-005-022, REQ-005-023, REQ-011-016 -->
 
@@ -59,7 +59,7 @@ AgentDevFlow のフェーズ定義、SSoT 遷移、work_type 判定基準、ス�
 
 - [agentdev-workflow-routing.md](agentdev-workflow-routing.md)
 - [agentdev-workflow-orchestration.md](agentdev-workflow-orchestration.md)
-- [../workflows/workflow-contracts.md](../workflows/workflow-contracts.md)
+- [../workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)
 - REQ-001（Decision ライフサイクル、文書体系基盤）
 - REQ-005（workflow-lifecycle 宣言的純化）
 

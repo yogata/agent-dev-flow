@@ -103,12 +103,12 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 |---|---|---|---|---|---|
 | designs/commands/*.md（19 件） | redefine | ― | 4 | planned | 公開 UX 2入口収斂・内部 lifecycle 回収に伴う再編 |
 | designs/skills/*.md（34 件、_template 含む） | redefine | semantic Skill | 8 | planned | semantic/deterministic 再分類（DEC-036） |
-| workflows/workflow-contracts.md | supersede | ― | 4 | planned | v4-lifecycle-state-machine へ吸収（result 契約の 1 権威+導出投影への再編を含む） |
+| workflows/workflow-contracts.md | supersede | ― | 4 | planned | v4-lifecycle-state-machine へ吸収（result 契約の 1 権威+導出投影への再編を含む） |（第4段 case-open 実行時点: Definition PR で後継吸収と宣言承継を実行。物理削除は docs-chore OU-003、executed 化は case-close）
 | workflows/workflow-skill-model.md | redefine | semantic Skill | 8 | planned | 責務 3 層分化・1:N 分割・配置契約の v4 Skill 再編での再定義（DEC-010 実装詳細） |
-| workflows/input-resolution-and-durable-state.md | supersede | ― | 4 | planned | v4-durable-state-and-recovery が一般化契約を承継 |
-| workflows/step-reference-contract.md | supersede | ― | 4 | planned | 再開単位階層（STEP/処理単位/Case）の v4 再構成 |
+| workflows/input-resolution-and-durable-state.md | supersede | ― | 4 | planned | v4-durable-state-and-recovery が一般化契約を承継 |（第4段 case-open 実行時点: Definition PR で後継吸収と宣言承継を実行。物理削除は docs-chore OU-003、executed 化は case-close）
+| workflows/step-reference-contract.md | supersede | ― | 4 | planned | 再開単位階層（STEP/処理単位/Case）の v4 再構成 |（第4段 case-open 実行時点: Definition PR で後継吸収と宣言承継を実行。物理削除は docs-chore OU-003、executed 化は case-close）
 | workflows/epic-wave-model.md | supersede | ― | 5 | planned | 階層合成+直列化単位への再編。語彙意味の再定義は第5段 |
-| workflows/definition-readiness.md | supersede | ― | 4 | planned | Definition lifecycle 部分ビューと冪等経路への整理 |
+| workflows/definition-readiness.md | supersede | ― | 4 | planned | Definition lifecycle 部分ビューと冪等経路への整理 |（第4段 case-open 実行時点: Definition PR で後継吸収と宣言承継を実行。物理削除は docs-chore OU-003、executed 化は case-close）
 | workflows/backlog-artifact-lifecycle.md | supersede | ― | 9 | planned | RU/draft 部分ビューとして継続ループへ整理 |
 | workflows/delegation-contracts.md | supersede | ― | 8 | planned | 委譲単位の再開・result の v4 接続 |
 | workflows/capture-boundaries.md | redefine | ― | 9 | planned | Intake/Learning 境界の v4 整理 |

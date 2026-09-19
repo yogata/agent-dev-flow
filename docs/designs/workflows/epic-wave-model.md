@@ -2,7 +2,7 @@
 title: Epic / Wave / Issue 実行モデル
 status: accepted
 created: 2026-06-21
-updated: 2026-09-15
+updated: "2026-09-19"
 ---
 <!-- ADF-COVERS(implementation): REQ-035-001, REQ-035-002, REQ-035-003, REQ-035-004, REQ-035-005, REQ-035-006, REQ-035-007, REQ-035-008, REQ-035-009, REQ-035-010, REQ-035-011 -->
 
@@ -239,7 +239,7 @@ case-open は OU 群の依存グラフから連結成分（必須依存のみを
 - mergeable 作成時状態のみで Wave の安全性を判断しない（REQ-035-012）
 
 本節は Wave 内（同一 Epic 配下の子 Issue 間）重複前置検出の唯一の正規所有者であり、Epic をまたぐ Case 間の
-横断依存検査は workflow-contracts Design「Case 投入時の横断依存検査契約」（REQ-030-014、REQ-061-031）が所有する。
+横断依存検査は case-open / case-ready Design（REQ-030-014、REQ-061-031）が所有する。
 Epic を構成する投入では横断検査側から本節の前置検出へ委譲し、二重検査を行わない。
 
 ### execution_unit 並列 orchestration
@@ -363,7 +363,7 @@ Epic Issue のステータス追跡テーブルは「バッチ Issue 単位」�
 ## See Also
 
 - [REQ-006](../../requirements/REQ-006.md)（Case実行オーケストレーション: 本 Design の親 REQ）
-- [workflow-contracts.md](workflow-contracts.md)（ワークフロー全体契約）
+- [v4-lifecycle-state-machine.md](v4-lifecycle-state-machine.md)（ワークフロー全体契約）
 - [delegation-contracts.md](delegation-contracts.md)（サブエージェント委譲契約）
 - [references/execution-unit-construction.md](references/execution-unit-construction.md)（連結成分アルゴリズム、3軸判断モデルの機械的判定手順）
 - `docs/designs/commands/case-open.md`（Epic 構成生成）

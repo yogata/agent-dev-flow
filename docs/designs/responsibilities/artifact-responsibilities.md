@@ -2,7 +2,7 @@
 title: 成果物責任表
 status: accepted
 created: 2026-08-20
-updated: 2026-08-23
+updated: "2026-09-19"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-053-040 -->
@@ -100,7 +100,7 @@ Command は Skill を参照して判断を利用し、Skill は必要な詳細�
 |---|---|---|
 | Command | 公開interface・dispatch | REQ-002・各command固有REQ |
 | Workflow Skill | workflow実装本体・STEP transition | REQ-005・workflow-skill-model.md |
-| STEP reference | STEP詳細・resume point | REQ-005・step-reference-contract.md |
+| STEP reference | STEP詳細・resume point | REQ-005・v4-durable-state-and-recovery.md |
 | Capability Skill | 共通能力 | REQ-027・workflow-skill-model.md |
 | Workflow Extension | 公開Workflow Skill 拡張 | REQ-002・project-extensions.md |
 | internal Workflow Extension | Workflow Skill 内部拡張 | REQ-002・project-extensions.md |

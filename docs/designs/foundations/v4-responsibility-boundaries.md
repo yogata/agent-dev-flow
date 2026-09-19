@@ -4,6 +4,7 @@ status: accepted
 created: 2026-09-18
 updated: 2026-09-19
 ---
+<!-- ADF-COVERS(implementation): REQ-003-021, REQ-003-022, REQ-003-023 -->
 
 # ADF v4 実装責務境界（semantic Skill / deterministic code / Harness adapter / Project Extensions）
 
@@ -32,3 +33,7 @@ ADF（semantic contract）と Harness（実行機構）の責務分担、OpenCod
 - Project Extensions は、project context、rules、quality/evidence policy、project-specific verifier/check、tool/config integration、semantic guidance を標準プロセスへ追加する semantic extension point である（表現力 6 項目）
 - 標準プロセスを別 workflow へ置き換える仕組みとしない
 - 現行 Skill 名への直接結合を v4 の安定 API としない
+
+## HITL 判断確定原則
+
+HITL は判断の確定に限定し作業実行を代行しない（REQ-003-021）。判断確定後の処理は明示された許可条件の下で自動実行してよい（REQ-003-022）。明示承認を維持し、暗黙の承認扱いとしない（REQ-003-023）。promote 系 workflow（intake-promote、learning-promote、inspect-promote）への適用判断の詳細は各 Command Design が所有する。

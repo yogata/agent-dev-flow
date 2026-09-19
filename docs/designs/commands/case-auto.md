@@ -2,7 +2,7 @@
 title: case-auto Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-05
+updated: "2026-09-19"
 ---
 <!-- ADF-COVERS(implementation): REQ-015-012 -->
 <!-- ADF-COVERS(implementation): REQ-034-001, REQ-034-002, REQ-034-003, REQ-034-004, REQ-034-005, REQ-034-006, REQ-034-007, REQ-034-008, REQ-034-009, REQ-034-010, REQ-034-011, REQ-034-012, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-017, REQ-034-018, REQ-034-019, REQ-034-020, REQ-034-021, REQ-034-022, REQ-034-023, REQ-034-024, REQ-034-025, REQ-034-026, REQ-034-027, REQ-034-028, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-033, REQ-034-034, REQ-034-035, REQ-034-036, REQ-034-037, REQ-034-038 -->
@@ -14,16 +14,16 @@ updated: 2026-09-05
 ## 目的
 
 要件doc から case-open → case-ready → case-run → case-close を順次自走実行する最大自走モード。req-define で再合意済みの Definition 変更がある場合は case-revise → case-ready → case-run → case-close を自走する。
-ユーザーが明示的に指定した場合のみ使用する追加入口であり、標準ワークフローを置き換えない。
+要求入口 2 つ（req-define、backlog-auto）から合流する標準実行コマンドである。標準導線は req-define 完了直後の単一要件doc 処理であり、引数なし時の drafts 全件処理は従来どおりの対象解決として維持する。
 
 ## 承認・HITL 境界
 
-- ユーザーが case-auto の実行を明示的に指定した場合のみ使用する追加入口である（起動自体が唯一の事前判断）。
+- case-auto は標準実行コマンドである（起動自体が唯一の事前判断）。
 - 自走中に新規の承認点を追加しない。blocked / failed、停止条件検出時は自走を停止し、ユーザー判断を待つ（bounded parent decision resolution による decision_context の限定的親判断を除く）。
 
 ## 入力
 
-- Issue番号（数値）または Issue URL（既存 Root Case の状態から case-ready / case-run / case-close を自走する場合）
+- Issue番号（数値）または Issue URL（Root Case の状態と resume_command から通常経路と例外経路を解決して自走する。resume_command が case-revise を指す場合は再合意済み Definition 変更の例外経路として case-revise → case-ready を駆動する。REQ-034-039）
 - 要件doc（引数なし時は `.agentdev/drafts/req-draft-*.md` 全件処理がデフォルト / 明示パス指定 / セッション指定キーワードによるセッション内要件doc参照（暗黙判断廃止、構造化 `draft-data` 形式: REQ-008, DEC-003））
 
 ## 出力
@@ -34,7 +34,7 @@ updated: 2026-09-05
 ## 副作用
 
 - 各工程（case-open / case-ready / case-revise / case-run / case-close）の副作用を集約
-- 委譲起動: 各工程を実行担当サブエージェントへ順次起動（v2:ADR-0127）。起動手段、実行制御パラメータは AGENTS.md および references/<harness>.md に配置する（REQ-002-002）
+- 委譲起動: case-open、case-ready、case-close を各 Workflow Skill（agentdev-workflow-case-open / case-ready / case-close）の load 指定により実行担当サブエージェントへ委譲する（case-run はインライン実行）。起動手段、実行制御パラメータは AGENTS.md および references/<harness>.md に配置する（REQ-002-002）
 - git 操作: 各工程の委譲範囲内で実行。case-auto 自体は git 操作を行わない
 - 自走対象: repo にファイルとして残る変更のみ。DB migration実行、deploy/apply、課金、権限変更は対象外
 
@@ -93,7 +93,7 @@ context 管理:
 
 ## 参照する横断 Design
 
-- [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（Pattern Taxonomy（manager-orchestrator））
+- [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（Pattern Taxonomy（manager-orchestrator））
 - [workflows/delegation-contracts.md](../workflows/delegation-contracts.md)（step_execution 委譲（v2:ADR-0127））
 - [workflows/epic-wave-model.md](../workflows/epic-wave-model.md)（Epic Wave 反復制御）
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 責務（委譲））
@@ -413,13 +413,13 @@ Phase 0 の枝PR に含まれるコミット構成運用を規定する。
 本節は case-auto が下位 command（case-run インライン実行、工程委譲）から adversarial-review 由来の停止信号を受領した際の停止伝播挙動を所有する（REQ-015-012）。
 共通契約（REQ-014）の正規定義は重複せず、各正規所有者を参照する（REQ-014-011）。
 
-- user-decision-required の位置づけ: [workflow-contracts.md](../workflows/workflow-contracts.md)「adversarial-review 由来の停止信号」節（REQ-014-012）
+- user-decision-required の位置づけ: [skills/agentdev-adversarial-review.md](../skills/agentdev-adversarial-review.md)（REQ-014-012。停止信号の状態遷移一般化は v4-lifecycle-state-machine）
 - parent_decision_required / decision_context 適用: [delegation-contracts.md](../workflows/delegation-contracts.md)「review 経路での parent_decision_required / decision_context 適用」節
 - 再 review 条件、再 review 停止条件: adversarial-review Design（REQ-014-007）
 
 ### user-decision-required の位置づけ（REQ-014-012）
 
-user-decision-required は case-run result enum（completed-pr / blocked / failed / delegation-unavailable）の第5状態ではなく、既存結果に付随する停止理由分類である（REQ-014-012、workflow-contracts Design が正）。
+user-decision-required は case-run result enum（completed-pr / blocked / failed / delegation-unavailable）の第5状態ではなく、既存結果に付随する停止理由分類である（REQ-014-012、v4-lifecycle-state-machine Design が正）。
 case-auto は user-decision-required を新規 result 状態として扱わず、result 4状態のいずれかに付随する分類として受領する。
 
 | 起源 | 受領形式 |
@@ -437,7 +437,7 @@ case-auto は下位 command から user-decision-required + decision_context を
 
 1. **自走停止**: 対象 execution_unit（Issue）の処理を停止し、ユーザー判断を待機する。他の ready 対象の execution_unit がある場合は継続する（部分停止、REQ-034-035/016 準拠）
 2. **ユーザー提示**: decision_context（対象案、合意候補、未解決争点、推奨案と根拠、ユーザーに確定してほしい判断）をユーザーへ提示する（decision_context 構成は delegation-contracts Design が正）
-3. **resume point の記録**: 停止時の resume point を記録する。resume point は workflow-contracts Design「case-auto への伝播と resume point」節に従い、case-run 起源の場合は当該 Issue の case-run 再開ポイント（準備フェーズ、実装フェーズ、提出フェーズのいずれか）、工程委譲起源の場合は当該工程の委譲起点とする
+3. **resume point の記録**: 停止時の resume point を記録する。resume point は v4-lifecycle-state-machine Design に従い、case-run 起源の場合は当該 Issue の case-run 再開ポイント（準備フェーズ、実装フェーズ、提出フェーズのいずれか）、工程委譲起源の場合は当該工程の委譲起点とする
 4. **resume point から再開**: ユーザー判断の解決後、resume point から処理を再開する。
 adversarial-review の再発動要否は adversarial-review Design「再 review 条件」「再 review 停止条件」の各節に従い（REQ-014-007）、case-auto は独自に判断しない。
 adversarial-review 自体を恒久的な統制ゲートとしない（REQ-014-009）
@@ -480,7 +480,7 @@ case-auto は下位 command から受領した decision_context について、�
 
 case-auto は回答、根拠、または作業仮定を下位 command へ返し、既存 resume point（REQ-006-114）から処理を継続する。
 新規の永続結果型を導入しない。
-resume point の仕様は workflow-contracts Design「case-auto への伝播と resume point」節、delegation-contracts Design「review 経路での parent_decision_required / decision_context 適用」節に従う。
+resume point の仕様は v4-lifecycle-state-machine Design、delegation-contracts Design「review 経路での parent_decision_required / decision_context 適用」節に従う。
 adversarial-review の再実行要否は adversarial-review 側の再 review 契約（REQ-014-007/008）に従い、case-auto は独自の再 review 条件を持たない。
 
 ### case-auto が行わないこと（REQ-015-012 維持、DEC-008 決定6）

@@ -2,7 +2,7 @@
 title: キャプチャ境界
 status: accepted
 created: 2026-06-21
-updated: 2026-07-27
+updated: "2026-09-19"
 ---
 <!-- ADF-COVERS(implementation): REQ-003-005 -->
 <!-- ADF-COVERS(implementation): REQ-006-105, REQ-006-106, REQ-006-107, REQ-006-108, REQ-006-109, REQ-006-111 -->
@@ -155,7 +155,7 @@ req-define の明示入力としてルーティングする（backlog-review 経
 
 ## See Also
 
-- [workflow-contracts.md](workflow-contracts.md)（ワークフロー全体契約）
+- [v4-lifecycle-state-machine.md](v4-lifecycle-state-machine.md)（ワークフロー全体契約）
 - [epic-wave-model.md](epic-wave-model.md)（Epic Issue 本文の単一書き手制約）
 - [backlog-artifact-lifecycle.md](backlog-artifact-lifecycle.md)（採用済み成果物 lifecycle）
 - [../responsibilities/artifact-contracts.md](../responsibilities/artifact-contracts.md)（Command→Skill 依存方向、`Capture結果` 小節の共通意味契約）

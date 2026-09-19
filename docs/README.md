@@ -77,7 +77,7 @@ REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-039 の38件である（DEC-005、DEC-007 は superseded、DEC-031〜039 は proposed）。
+現行 Decision は DEC-001 から DEC-039 の38件である（DEC-005、DEC-007、DEC-029 は superseded、proposed は 0 件）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |

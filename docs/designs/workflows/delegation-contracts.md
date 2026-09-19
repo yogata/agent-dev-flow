@@ -2,7 +2,7 @@
 title: サブエージェント委譲契約
 status: accepted
 created: 2026-06-21
-updated: 2026-09-16
+updated: "2026-09-19"
 ---
 <!-- ADF-COVERS(implementation): REQ-002-033, REQ-002-034 -->
 <!-- ADF-COVERS(implementation): REQ-003-001, REQ-003-002, REQ-003-003, REQ-003-004, REQ-003-006, REQ-003-011, REQ-003-012, REQ-003-014, REQ-003-020 -->
@@ -68,7 +68,7 @@ capture_handoff:
 ### 実装委譲の受領側検査情報候補（output_contract）
 
 実装作業の委譲（case-run から実行担当サブエージェントへの委譲）では、受領側（case-run / case-auto）が契約完了検査（3点ゲート: 4状態 result・commit hash・PR URL）を実行するため、委譲応答にこれらの情報候補を含める。
-output_contract の status 値（pass | warn | fail | partial）は委譲時最小契約の一般形であり、実装委譲の result 4状態契約（completed-pr / blocked / failed / delegation-unavailable、workflow-contracts.md が正規所有）とは別契約として区別する。
+output_contract の status 値（pass | warn | fail | partial）は委譲時最小契約の一般形であり、実装委譲の result 4状態契約（completed-pr / blocked / failed / delegation-unavailable、v4-lifecycle-state-machine.md が正規所有）とは別契約として区別する。
 委譲時最小契約の骨格（inputs、side_effect_boundary、output_contract、capture_handoff）は変更しない。
 
 ### structured_context の SSoT 抽出制約
@@ -230,7 +230,7 @@ subagent は当該属性に応じた振る舞い指針（検証のみでも acce
 
 ## See Also
 
-- [workflow-contracts.md](workflow-contracts.md)（ワークフロー全体契約）
+- [v4-lifecycle-state-machine.md](v4-lifecycle-state-machine.md)（ワークフロー全体契約）
 - [epic-wave-model.md](epic-wave-model.md)（Epic Wave 実行モデル）
 - [../responsibilities/responsibility-boundary-purification.md](../responsibilities/responsibility-boundary-purification.md)（case 実行責務の 4 用語と所有者 SSoT、external execution boundary / harness execution mechanism の所有権）
 - v2:ADR-0112（サブエージェント委譲の一般概念）
@@ -243,7 +243,7 @@ subagent は当該属性に応じた振る舞い指針（検証のみでも acce
 
 本節は adversarial-review caller integration（REQ-014）が委譲契約へ接続する際の適用を所有する。
 共通 caller integration 契約の正規所有者は adversarial-review Design であり（REQ-014-003）、本節は重複定義せず、委譲契約側からの接続のみを規定する。
-REQ-003-011/012 の4状態契約（completed-pr/blocked/failed/delegation-unavailable）は維持し、adversarial-review 由来の結果は第5状態を増やさず既存状態へ折り畳む（REQ-014-012、workflow-contracts Design「adversarial-review 由来の停止信号」節参照）。
+REQ-003-011/012 の4状態契約（completed-pr/blocked/failed/delegation-unavailable）は維持し、adversarial-review 由来の結果は第5状態を増やさず既存状態へ折り畳む（REQ-014-012、v4-lifecycle-state-machine Design）。
 
 ### 委譲種別と副作用境界
 
@@ -281,7 +281,7 @@ case-auto は下位 command（case-run インライン実行、工程委譲）�
 
 **resume point の拡張利用**: case-auto が decision_context を解決した場合、回答または作業仮定を下位 command へ返し、既存 resume point（REQ-006-114）から処理を継続する。
 新規の永続結果型を導入せず、既存 resume point 機構を再利用する（DEC-008 決定5）。
-resume point の仕様は workflow-contracts Design「case-auto への伝播と resume point」節が正である。
+resume point の仕様は v4-lifecycle-state-machine Design が正である。
 
 **非対象（REQ-015-012 維持）**: case-auto は decision_context の解決において raw finding を解釈、採否、候補反映しない。
 各 caller command は自身が所有する候補について finding の意味解釈、採否、候補への反映を維持し（REQ-014-006）、raw finding を case-auto へそのまま渡さない（REQ-034-032、AG-006）。
@@ -316,7 +316,7 @@ adversarial-review の呼出失敗時（スキル不在、起動異常、timeout
 
 この意味集合および具体化する field 集合は現行ベースラインであり、REQ-048-014 のとおり REQ-048 の成立条件と
 して固定しない。field 集合の変更は REQ-048-012 の実験契約（単一の主要構造変更、Guardrail 付き）に従い、
-工程間の直列化（workflow-contracts Design「工程間構造化文脈引き継ぎ契約」）と意味対応を維持するため
+工程間の直列化（agentdev-workflow-lifecycle Design「工程間構造化文脈引き継ぎ契約」）と意味対応を維持するため
 同時変更を要する。
 
 ADF は委譲単位識別子を発行し、親子実行関係の識別の正規手段とする。委譲 prompt には対象 Case、Issue、PR、

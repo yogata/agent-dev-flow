@@ -114,10 +114,10 @@ RU 本文は後続工程（req-define）で必要な情報を自足し、整理�
 
 | トリガー | 実行コマンド | 対象 |
 |----------|-------------|------|
-| Definition 確定 + VERIFY 成功 | `/agentdev/case-ready` | 該当 RU ファイル |
+| Definition 確定 + VERIFY 成功 | case-ready（case-auto 駆動） | 該当 RU ファイル |
 | 採用済み成果物の RU 化成功 | `/agentdev/backlog-review` | 該当する採用済み成果物 |
 
-`/agentdev/case-ready` は Definition 確定後に RU を削除し、RU パスを docs 永続文書の根拠参照から除外する。
+case-ready（内部 lifecycle 段階）は Definition 確定後に RU を削除し、RU パスを docs 永続文書の根拠参照から除外する。
 RU は一時成果物であり、永続化未完了の場合は残置する。
 
 ## 矛盾検出
@@ -131,7 +131,7 @@ RU は一時成果物であり、永続化未完了の場合は残置する。
 
 - **管理単位**: GitHub Issue（role: tracking）。docs/ 配下に課題ファイルの文書種別は設けない（REQ-049）
 - **操作**: 起票、検索・参照、更新、コメント追加、保留、再評価、実行準備完了、解決、反映確認、クローズ、再オープン。読み書きは Custom Tool `agentdev_gh` の操作契約経由で行う
-- **要件化への接続**: 実行が確定した未解決事項は req-define 経由で要件化し、case-open が別の Case Issue を作成する
+- **要件化への接続**: 実行が確定した未解決事項は req-define 経由で要件化し、case-open（case-auto 駆動）が別の Case Issue を作成する
 - **指示方法**: サブコマンドや引数を覚える必要はなく、自然言語で指示する
 
 ## 状態モデルと `.agentdev/` の位置づけ

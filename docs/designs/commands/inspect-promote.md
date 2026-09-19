@@ -2,7 +2,7 @@
 title: inspect-promote Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-19
+updated: "2026-09-19"
 ---
 <!-- ADF-COVERS(implementation): REQ-015-005 -->
 <!-- ADF-COVERS(implementation): REQ-036-001, REQ-036-002, REQ-036-004, REQ-036-017, REQ-036-018, REQ-036-019, REQ-036-020, REQ-036-021, REQ-036-022 -->
@@ -68,12 +68,12 @@ updated: 2026-08-19
 
 ## 参照する横断 Design
 
-- [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（コマンド分類）
+- [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（コマンド分類）
 - [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（検出事項プロトコル、inspect-promote 自動 promote 対象カテゴリ、投入先、実行ログ、誤検知 revoke 手順）
 
 ## 自律確定の判定位置とHITLフォールバック（新規セクション）
 
-本節は inspect-promote における自律確定の判定位置とHITLフォールバックの実行詳細を所有する。判断確定の境界は REQ-003-055 の共通原則に従い、詳細判定表は横断契約Design（workflows/workflow-contracts.md「promote系判断確定とHITL境界」節）が集約所有する（本 Design と Workflow Skill は同一内容を重複保持しない）。
+本節は inspect-promote における自律確定の判定位置とHITLフォールバックの実行詳細を所有する。判断確定の境界は REQ-003-055 の共通原則に従い、詳細判定表は HITL 境界契約Design（v4-responsibility-boundaries）が集約所有する（本 Design と Workflow Skill は同一内容を重複保持しない）。
 
 ### 分類・検証・adversarial-review 後の自律確定判定の挿入位置
 
@@ -202,5 +202,5 @@ skip 条件該当時、呼出失敗時（REQ-014-010）のいずれの場合も�
 
 review 挿入境界（inspect-promote の発動条件、挿入位置、戻り先、--auto fast path）は本 Design が正規所有する（REQ-014-011、REQ-015-005）。
 共通 caller integration 契約は adversarial-review Design を正とし、本節は再定義しない。
-user-decision-required の停止理由分類は workflow-contracts Design、review 経路での parent_decision_required / decision_context 適用は delegation-contracts Design をそれぞれ正とする。
+user-decision-required の停止理由分類は v4-lifecycle-state-machine Design、review 経路での parent_decision_required / decision_context 適用は delegation-contracts Design をそれぞれ正とする。
 

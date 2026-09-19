@@ -2,11 +2,12 @@
 title: case-revise Design
 status: accepted
 created: 2026-09-14
-updated: "2026-09-14"
+updated: "2026-09-19"
 ---
 
 # case-revise Command Design
 
+位置づけ変更（v4、DEC-033）: 本 Design が定義する case-revise は公開 command ではなく内部 lifecycle 段階である。公開 UX は要求入口（req-define、backlog-auto）と標準実行コマンド case-auto へ収斂しており、本段階は case-auto の orchestration から駆動される。例外経路段階であり、case-auto の例外経路解決（resume_command: case-revise）から駆動される。本 Design は内部 lifecycle 段階の契約として継続して正規文書である（処遇の正本: v3-v4-crosswalk references/crosswalk-inventory.md）。
 ## 目的
 
 case-revise の公開契約を定義する。case-revise は req-define で再合意済みの Definition 変更を既存 Case へ反映する主フローの例外経路コマンドである（REQ-062）。

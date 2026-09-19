@@ -2,7 +2,7 @@
 title: issue Design
 status: accepted
 created: 2026-08-23
-updated: 2026-08-25
+updated: "2026-09-19"
 ---
 <!-- ADF-COVERS(implementation): REQ-049-004, REQ-049-005, REQ-049-009, REQ-049-010, REQ-049-011, REQ-049-015, REQ-049-016 -->
 
@@ -15,5 +15,5 @@ updated: 2026-08-25
 - Workflow Skill への委譲構造（Command / Workflow Skill / Capability Skill 責務分離に従う）。追跡Issueの論理スキーマは agentdev-issue-tracking Design が一元管理し、本 command は再定義しない。
 - 編集スコープのガードレール: 追跡Issue操作は Tool 操作契約経由に限定する。GitHub 版ではリポジトリ内に課題ファイルを作成・commit しない。
 - 課題化判定の実行位置: 現在の作業で解決できず将来に影響する未解決事項の候補判定、正規成果物確認による事前解決の試行、重複起票防止のための既存追跡Issue検索。ユーザー合意が必要な設計判断を課題管理側だけで確定しない。
-- 実行許可の境界: 追跡Issueの存在自体を Agent の実行許可としない。実行が確定した場合は req-define 等の正規要件化・設計経路への引き継ぎを行い、Case Issue の生成は case-open へ委ねる。追跡Issueを実行票へ直接変質させない。
+- 実行許可の境界: 追跡Issueの存在自体を Agent の実行許可としない。実行が確定した場合は req-define 等の正規要件化・設計経路への引き継ぎを行い、Case Issue の生成は case-auto（内部 lifecycle の case-open 段階）経由で行われる。追跡Issueを実行票へ直接変質させない。
 - 共通能力としての公開: 本 command の明示実行を利用必須とせず、他 workflow から追跡Issue操作能力を利用できる。各 workflow は追跡Issueスキーマや GitHub I/O を再実装しない。
