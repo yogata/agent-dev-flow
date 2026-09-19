@@ -104,3 +104,33 @@
 - **配布反映先**: agentdev-git-worktree「書込み guard 運用指針」節、docs/knowledge/windows-powershell-bulk-io-corruption.md、learning-promote の評価対象
 - **関連**: Case #2967、PR #2968、Case #2958（関連学習: v4 worktree file tool write guard）
 - **タグ**: #case-open #v4-worktree #textlint-guard #fail-closed #一時証跡退避 #証跡退避
+
+## 2026-09-19: REQ 行追加を伴う Definition の TS「missing-implementation 不変」期待は新規 positioning 行で常に乖離する
+
+- **問題事象**: case-open（Case #2979）で REQ 新規 8 行（REQ-004-054/055、REQ-030-016、REQ-031-031、REQ-032-028、REQ-061-036、REQ-062-009、REQ-034-039。いずれも positioning・評価経路行で implementation 実装を持たない）を含む Definition PR を作成したところ、draft TS-003 の期待「missing-implementation 103 不変」に対し実測 111（103 + 8）となった。policy.yaml verification.optional への登録は missing-verification のみ回避し、missing-implementation の加算を防がない。REQ-088 の 7 行も第3段で同じく 103 に加算済みであり（baseline 103 は REQ-088 7 行を含む）、既知パターンとして確認した。
+- **工程位置**: case-open STEP-4〜検証（RA-001 baseline 採取、TS-003 traceability check）
+- **検知方法**: traceability check（--json）の findings に新規行 ID が含まれる機械確認と、REQ-088 行が baseline findings に含まれる遡及確認- **根本原因**: draft のテスト戦略で数値期待を「絶対値不変」形式で書くと、REQ 行追加を伴う Case では新規行の implementation 未被覆分が常に加算される。宣言の design 側新設には既存行解消の負の寄与（v4-standard-lifecycle 宣言で missing-design 955→949、6 行解消）もあり、単純な相殺計算では期待を実装できない。
+- **対応内容**: REQ-088 前例（positioning 行の implementation 未被覆は既知）に基づき「baseline + 新規行数 − 宣言解消」で実測整合を判断し、PR 本文に計算内訳を記録して Definition として確定。
+- **ユーザー確認の有無**: なし（TS-003 on_failure の fix 手順内で判断。REQ-004-055 の design 宣言追加〔draft リストの抜け〕は on_failure の被覆追加手順で対応）
+- **Decision/REQ/spec影響**: なし（検証期待値の書式問題）
+- **展開視点**: REQ 行追加を伴う Case のテスト戦略では、トレーサビリティ数値を「絶対値不変」でなく「増減理由の型」（新規行数、宣言解消数、policy optional 登録の効果範囲）で書く。
+- **再発条件**: REQ 行追加（positioning 行を含む）を伴う draft で TS に「missing-implementation / missing-design 不変」型の期待を書いた場合
+- **予防策**: req-define で TS 数値を記述する際、artifact_actions の REQ 行追加の有無を確認し、増減理由型で記述する
+- **配布反映先**: agentdev-learning-pipeline の評価対象、agentdev-req-analysis（TS 記述ガイド）、learning-promote の評価対象
+- **関連**: Case #2979、PR #2980、Case #2973（REQ-088 前例）
+- **タグ**: #case-open #traceability #TS数値期待 #REQ行追加 #positioning行
+## 2026-09-19: 削除 Design 参照の「後継」注記が旧名 grep 0 件検査（TS-004 型）と衝突する
+
+- **問題事象**: case-open（Case #2979）で 4 Design（workflow-contracts、input-resolution-and-durable-state、step-reference-contract、definition-readiness）の参照張替えを行う際、「v4-lifecycle-state-machine（旧 workflow-contracts「X」節を吸収）」「case-open / case-ready Design（definition-readiness 後継）」形式の注記を本文へ残したところ、TS-004 の「4 Design ファイル名 grep 0 件」検査が旧名に引っかかり 0 件にならなかった。
+- **工程位置**: case-open STEP-4（ACT-DESIGN-017 参照張替え、TS-004 事前確認）
+- **検知方法**: docs 配下の旧 Design 名 grep の再実行（残存 55 → 注記除去後 22、その内訳は全て正当クラス）
+- **根本原因**: 対応関係の説明を各本文へ分散すると、旧名の grep 検査と構造的に衝突する。v3-v4-crosswalk references/crosswalk-inventory.md が対応関係の正本である以上、本文は後継 Design 名のみを持つべき
+- **対応内容**: 「後継」注記を全除去し旧名を本文から排除（残存 22 箇所は DEC-029 superseded 本文・DEC-038 v3 歴史記述・crosswalk 処遇行・v4 Design 吸収節・OU-003 削除予定ファイル・reports の正当クラスに分類し記録）
+- **ユーザー確認の有無**: なし（TS-004 の pass_criteria と AG-012「対応関係の正本は crosswalk」の契約からの機械的帰結）
+- **Decision/REQ/spec影響**: なし
+- **展開視点**: RETIRE / supersede を伴う再編 Case では、参照張替え時に対応関係の説明本文への残置を禁止し正本（crosswalk / 処遇記録）へ集約するのが機械検査整合の最短経路。張替え PR の本文に正本への集約を明記する
+- **再発条件**: 削除予定 Design 名の grep 0 件を要求する検査項目を持つ Case で、「旧〜の後継」形式の注記を本文へ残した場合
+- **予防策**: 参照張替えの標準手順に「旧名注記を残さない（正本参照のみ）」を含める
+- **配布反映先**: agentdev-doc-diagnostics（参照整合診断）、learning-promote の評価対象
+- **関連**: Case #2979、PR #2980
+- **タグ**: #case-open #参照張替え #grep検査 #v4移行 #crosswalk
