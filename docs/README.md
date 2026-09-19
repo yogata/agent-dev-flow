@@ -157,7 +157,6 @@ status（draft / accepted）を含む完全一覧は [Design インデックス]
 - [設計原則](designs/foundations/design-principles.md)
 - [Project Extensions](designs/foundations/project-extensions.md)
 - [harness 分離モデル](designs/foundations/harness-separation-model.md)
-- [最小トレーサビリティモデル（TIM）](designs/foundations/traceability-model.md)
 - [ADF v4 Operating Model](designs/foundations/v4-operating-model.md)
 - [ADF v4 実装責務境界](designs/foundations/v4-responsibility-boundaries.md)
 - [ADF v4 Traceability モデル](designs/foundations/v4-traceability-model.md)
