@@ -286,9 +286,11 @@ const templateFiles = getTemplateFiles();
 /**
  * REQ-057-011 (Q2 Plan A): derive the expected list from the actual public
  * command enumeration instead of a fixed list. The minimum-count floor keeps
- * enumeration-leak detection meaningful (last known correct state: 18).
+ * enumeration-leak detection meaningful (last known correct state: 13; the v4
+ * 2-entry model removed the case-* 5 command definitions as internal lifecycle
+ * stages, Case #2981 / DEC-033).
  */
-const MIN_COMMAND_COUNT = 18;
+const MIN_COMMAND_COUNT = 13;
 
 function deriveExpectedCommands(commandFiles: Map<string, string>): string[] {
   return [...commandFiles.keys()].sort();
@@ -306,8 +308,10 @@ const COMMAND_COUNT = EXPECTED_COMMANDS.length;
 
 // Pipeline definitions
 // req-save / design-save / case-update は Issue #2810（DEC-029）で廃止済み。
-// case-ready は Definition 確定境界、case-revise は再合意済み Definition 変更の例外経路。
-const REQ_CASE_PIPELINE = ["req-define", "case-open", "case-ready", "case-revise", "case-run", "case-close"];
+// case-open/case-ready/case-revise/case-run/case-close は Case #2981（DEC-033）で
+// 公開 command から内部 lifecycle 段階へ移行し、定義ファイルは削除済み。公開経路は
+// 2 入口モデル（req-define 手動要求入口、backlog-auto 要求蓄積入口）→ case-auto 合流。
+const REQ_CASE_PIPELINE = ["req-define", "case-auto"];
 const LEARNING_PIPELINE = ["learning-promote"];
 const INTAKE_PIPELINE = ["intake-capture", "intake-from-github", "intake-promote"];
 
@@ -398,55 +402,19 @@ describe("REQ-0030-009: E2E workflow tests for all commands", () => {
   // ─── Pipeline continuity ─────────────────────────────────────────────────
 
   describe("Pipeline continuity: req/case pipeline", () => {
-    it("req-define output matches case-open input expectations", () => {
+    it("req-define output matches case-auto input expectations", () => {
+      // Case #2981（DEC-033）: case-* 5 commands は内部 lifecycle 段階として削除済み。
+      // 公開経路の連続性は req-define（手動要求入口）→ case-auto（標準実行コマンド）で検査する。
       const reqDefine = commands.get("req-define");
-      const caseOpen = commands.get("case-open");
+      const caseAuto = commands.get("case-auto");
       expect(reqDefine).toBeDefined();
-      expect(caseOpen).toBeDefined();
-      if (reqDefine && caseOpen) {
+      expect(caseAuto).toBeDefined();
+      if (reqDefine && caseAuto) {
         const reqDefineOutput = extractSection(reqDefine, "出力");
-        const caseOpenInput = extractSection(caseOpen, "入力");
+        const caseAutoInput = extractSection(caseAuto, "入力");
         expect(reqDefineOutput).toContain(".agentdev/drafts");
-        expect(caseOpenInput).toContain("req-define");
-      }
-    });
-
-    it("case-ready output matches case-run input expectations", () => {
-      const caseReady = commands.get("case-ready");
-      const caseRun = commands.get("case-run");
-      expect(caseReady).toBeDefined();
-      expect(caseRun).toBeDefined();
-      if (caseReady && caseRun) {
-        const caseReadyOutput = extractSection(caseReady, "出力");
-        const caseRunInput = extractSection(caseRun, "入力");
-        expect(caseReadyOutput).toContain("execution contract");
-        expect(caseRunInput).toContain("Issue番号");
-      }
-    });
-
-    it("case-open output matches case-run input expectations", () => {
-      const caseOpen = commands.get("case-open");
-      const caseRun = commands.get("case-run");
-      expect(caseOpen).toBeDefined();
-      expect(caseRun).toBeDefined();
-      if (caseOpen && caseRun) {
-        const caseOpenOutput = extractSection(caseOpen, "出力");
-        const caseRunInput = extractSection(caseRun, "入力");
-        expect(caseOpenOutput).toContain("Issue");
-        expect(caseRunInput).toContain("Issue");
-      }
-    });
-
-    it("case-run output matches case-close input expectations", () => {
-      const caseRun = commands.get("case-run");
-      const caseClose = commands.get("case-close");
-      expect(caseRun).toBeDefined();
-      expect(caseClose).toBeDefined();
-      if (caseRun && caseClose) {
-        const caseRunOutput = extractSection(caseRun, "出力");
-        const caseCloseInput = extractSection(caseClose, "入力");
-        expect(caseRunOutput).toContain("PR");
-        expect(caseCloseInput).toContain("PR");
+        expect(caseAutoInput).toContain("req-define");
+        expect(caseAutoInput).toContain(".agentdev/drafts/req-draft-*.md");
       }
     });
   });
@@ -497,7 +465,7 @@ describe("REQ-0030-009: E2E workflow tests for all commands", () => {
   // ─── Guardrail completeness ──────────────────────────────────────────────
 
   describe("Guardrail completeness for complex commands", () => {
-    const commandsWithGuardrails = ["case-open", "case-run", "case-close"];
+    const commandsWithGuardrails = ["req-define", "case-auto", "backlog-auto"];
     for (const cmdName of commandsWithGuardrails) {
       it(`${cmdName} has Guardrails section`, () => {
         const content = commands.get(cmdName);
@@ -510,33 +478,9 @@ describe("REQ-0030-009: E2E workflow tests for all commands", () => {
   });
 
   // ─── Template skill coverage per command ─────────────────────────────────
-  // case-open/close/revise reference templates through `agentdev-workflow-templates` skill.
-  // case-update（独自 templates ディレクトリ参照）は Issue #2810（DEC-029）で廃止済み。
-  describe("Template skill coverage for issue/PR-creating commands", () => {
-    it("case-open references agentdev-workflow-templates skill", () => {
-      const content = commands.get("case-open");
-      expect(content).toBeDefined();
-      if (content) {
-        expect(content).toMatch(/agentdev-workflow-templates/);
-      }
-    });
-
-    it("case-close references agentdev-workflow-templates skill", () => {
-      const content = commands.get("case-close");
-      expect(content).toBeDefined();
-      if (content) {
-        expect(content).toMatch(/agentdev-workflow-templates/);
-      }
-    });
-
-    it("case-revise references agentdev-workflow-templates skill", () => {
-      const content = commands.get("case-revise");
-      expect(content).toBeDefined();
-      if (content) {
-        expect(content).toMatch(/agentdev-workflow-templates/);
-      }
-    });
-  });
+  // Case #2981（DEC-033）で case-open/close/revise の公開 command 定義は削除され、
+  // agentdev-workflow-templates 参照は対応する Workflow Skill 側へ継承された。
+  // 現行公開 command に templates 参照者は存在しないため、本 describe は撤去。
 
   // ─── Harness separation ──────────────────────────────────────────────────
 
@@ -581,7 +525,7 @@ describe("TS-008: 不存在 command 参照検出", () => {
       "",
       "See /agentdev/req-define for the requirement flow.",
       "Removed: /agentdev/retired-old-command is gone.",
-      "See /agentdev/case-open next.",
+      "See /agentdev/backlog-review next.",
       "",
     ].join("\n");
     const findings = detectNonExistentCommandRefs(content, validCommands, {
@@ -597,7 +541,7 @@ describe("TS-008: 不存在 command 参照検出", () => {
     const content = [
       "# sample",
       "",
-      "See /agentdev/req-define and /agentdev/case-open.",
+      "See /agentdev/req-define and /agentdev/case-auto.",
       "Skill invocation: /agentdev/learning-capture.",
       "",
     ].join("\n");
@@ -626,7 +570,18 @@ describe("TS-008: 不存在 command 参照検出", () => {
     const readmePath = path.join(CMD_DIR, "README.md");
     if (!fs.existsSync(readmePath)) return;
     const readme = fs.readFileSync(readmePath, "utf-8");
-    const readmeFindings = detectNonExistentCommandRefs(readme, validCommands, {
+    // 「廃止コマンドの移行案内」セクションは旧コマンド表記の案内自体が目的のため、
+    // 不存在 command 参照検査の対象から除外する。
+    const migrationStart = readme.indexOf("## 廃止コマンドの移行案内");
+    let readmeForScan = readme;
+    if (migrationStart !== -1) {
+      const nextHeading = readme.indexOf("\n## ", migrationStart + 1);
+      readmeForScan =
+        nextHeading === -1
+          ? readme.slice(0, migrationStart)
+          : readme.slice(0, migrationStart) + readme.slice(nextHeading);
+    }
+    const readmeFindings = detectNonExistentCommandRefs(readmeForScan, validCommands, {
       skillRefAllowList: skillRefs,
     });
     expect(readmeFindings).toEqual([]);

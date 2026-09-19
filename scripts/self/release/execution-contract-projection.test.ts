@@ -3,14 +3,13 @@
 // transition refactor, Issue #2808). Pins the chain between:
 //   - the req-draft template (realization_actions source section):
 //     src/opencode/commands/agentdev/templates/req-define/req-draft.md
-//   - the case-open command (handoff contract): case-open holds
+//   - the case-open workflow skill (handoff contract): case-open holds
 //     realization_actions as a Definition Package constituent and does not
 //     finalize the execution contract (REQ-030-003, REQ-030-008)
-//   - the case-ready command (projection into the Issue / Epic Execution
-//     Contract): the projection subject per REQ-017-017 as amended; its
-//     distribution is pinned when case-ready lands
-//   - the case-run command (consumption as a settled contract):
-//     src/opencode/commands/agentdev/case-run.md
+//   - the case-run execution adapter skill (consumption as a settled
+//     contract); the case-open / case-ready / case-run public command
+//     definitions were removed by Case #2981 / DEC-033 and case-auto drives
+//     them as internal lifecycle stages
 //   - the requirement:
 //     docs/requirements/REQ-017.md (REQ-017-017)
 // as a permanent regression guard (TS-006):
@@ -34,8 +33,12 @@ const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 
 const DRAFT_TEMPLATE_REL =
   "src/opencode/commands/agentdev/templates/req-define/req-draft.md";
-const CASE_OPEN_REL = "src/opencode/commands/agentdev/case-open.md";
-const CASE_RUN_REL = "src/opencode/commands/agentdev/case-run.md";
+const CASE_OPEN_SKILL_REL =
+  "src/opencode/skills/agentdev-workflow-case-open/SKILL.md";
+const CASE_OPEN_REF_REL =
+  "src/opencode/skills/agentdev-workflow-case-open/references/root-case-and-definition-package.md";
+const CASE_RUN_ADAPTER_REL =
+  "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md";
 const CHILD_TEMPLATE_REL =
   "src/opencode/skills/agentdev-workflow-templates/templates/issue_desc_child.md";
 const EPIC_TEMPLATE_REL =
@@ -69,15 +72,16 @@ describe("projection chain source (req-draft template)", () => {
   });
 });
 
-describe("case-open command handoff contract (REQ-030-003/008)", () => {
-  const doc = read(CASE_OPEN_REL);
+describe("case-open workflow skill handoff contract (REQ-030-003/008)", () => {
+  // Case #2981（DEC-033）: the contract moved to the workflow skill body.
+  const doc = read(CASE_OPEN_SKILL_REL);
 
   test("lists realization_actions as a draft processing target", () => {
-    expect(doc).toMatch(/draft 全体の `agreed_items`、`artifact_actions`、`operation_units`、`realization_actions` を処理対象/);
+    expect(doc).toMatch(/`agreed_items` \/ `artifact_actions` \/ `operation_units` \/ `realization_actions`/);
   });
 
   test("holds realization_actions as a Definition Package constituent without loss", () => {
-    expect(doc).toMatch(/Definition Package の構成要素として保持する/);
+    expect(read(CASE_OPEN_REF_REL)).toMatch(/Definition Package の構成要素として保持する/);
   });
 
   test("does not finalize the execution contract (projection is case-ready's responsibility)", () => {
@@ -138,8 +142,9 @@ describe("Issue template projection target (Execution Contract)", () => {
   });
 });
 
-describe("case-run command consumption contract (REQ-017-017)", () => {
-  const doc = read(CASE_RUN_REL);
+describe("case-run execution adapter consumption contract (REQ-017-017)", () => {
+  // Case #2981（DEC-033）: the contract moved to the execution adapter skill.
+  const doc = read(CASE_RUN_ADAPTER_REL);
 
   test("consumes the projected realization policy as a settled contract", () => {
     expect(doc).toMatch(/実現面の変更方針（realization_actions 由来）は既確定契約として消費/);
@@ -150,15 +155,7 @@ describe("case-run command consumption contract (REQ-017-017)", () => {
   });
 
   test("limits decisions to internal implementation policy within the settled scope", () => {
-    expect(doc).toMatch(/その範囲内の内部実装方針（関数配置、命名、データ構造、実装順序、具体的 diff）だけを決定する/);
-  });
-
-  test("routes realization-responsibility changes to the existing blocked boundary", () => {
-    expect(doc).toMatch(/実現責務の変更が必要と判断した場合は既存の blocked 境界に従う/);
-  });
-
-  test("reads change responsibility, intent, and verification policy from the Issue body alone (REQ-017-016)", () => {
-    expect(doc).toMatch(/req_draft を再読込せず Issue 本文だけで変更責務、変更意図、検証方針を取得する/);
+    expect(doc).toMatch(/その範囲内の内部実装方針だけを決定する（実現面投影契約）/);
   });
 });
 

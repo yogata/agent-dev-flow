@@ -617,6 +617,17 @@ export interface SkillClassification {
  * Paths are resolved against repoRoot when given, process.cwd() otherwise
  * (cwd-independent: REQ-018 worktree test fallback).
  */
+// Case #2981（DEC-033）: case-* 5 commands は公開 command 定義から削除されたが、
+// 対応する Workflow Skill（agentdev-workflow-case-*）は内部 lifecycle 実装として
+// Workflow Skill 分類を維持する（公開 command 定義の不在で Capability へ降格しない）。
+const INTERNAL_LIFECYCLE_COMMANDS = [
+  "case-open",
+  "case-ready",
+  "case-run",
+  "case-close",
+  "case-revise",
+] as const;
+
 export function deriveSkillClassification(repoRoot?: string): SkillClassification {
   const root = repoRoot ?? process.cwd();
   const workflowSkills = new Set<string>();
@@ -625,6 +636,9 @@ export function deriveSkillClassification(repoRoot?: string): SkillClassificatio
   );
   for (const cf of commandFiles) {
     const base = path.basename(cf).replace(/\.md$/, "");
+    workflowSkills.add(`agentdev-workflow-${base}`);
+  }
+  for (const base of INTERNAL_LIFECYCLE_COMMANDS) {
     workflowSkills.add(`agentdev-workflow-${base}`);
   }
   const capabilitySkills = new Set<string>();

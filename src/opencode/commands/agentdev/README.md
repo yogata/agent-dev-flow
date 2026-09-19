@@ -6,7 +6,7 @@ description: agentdev コマンドリファレンス
 
 AgentDevFlow の各コマンドの入力、出力、次アクションを一覧化する。
 
-公開コマンドは要求入口、標準実行コマンド、補助フロー、検出フロー、repo-local 検査のいずれかに分類する。
+公開コマンドは要求入口、標準実行コマンド、補助フロー、検出フロー、リポジトリ内検査のいずれかに分類する。
 要求入口は req-define（手動要求入口）と backlog-auto（要求蓄積入口）の2つであり、両経路の実行は case-auto へ合流する。
 case-open、case-ready、case-run、case-close、case-revise は公開コマンドではなく内部 lifecycle 段階であり、case-auto が駆動する。
 REQ/Decision/Design の保存は内部 lifecycle の case-ready（初回確定時）と case-revise（再合意済み Definition 変更の反映時）の内部責務として実行する。
@@ -48,13 +48,11 @@ REQ/Decision/Design の保存は内部 lifecycle の case-ready（初回確定�
 
 ## 廃止コマンドの移行案内
 
-旧コマンドは v4 で公開コマンドから廃止され、alias は残さない。内部 lifecycle 段階として case-auto が駆動する（DEC-033）。
+旧コマンドは v4 で公開コマンドから廃止され、alias は残さない。内部 lifecycle 段階として case-auto が駆動する。
 
-| 旧コマンド | v4 後継 |
-|---|---|
-| `/agentdev/case-open` | `/agentdev/case-auto`（内部 lifecycle の case-open 段階が駆動） |
-| `/agentdev/case-ready` | `/agentdev/case-auto`（内部 lifecycle の case-ready 段階が駆動） |
-| `/agentdev/case-revise` | req-define で再合意後の `/agentdev/case-auto`（例外経路 case-revise → case-ready を解決） |
-| `/agentdev/case-run` | `/agentdev/case-auto`（内部 lifecycle の case-run 段階が駆動） |
-| `/agentdev/case-close` | `/agentdev/case-auto`（内部 lifecycle の case-close 段階が駆動） |
+- `/agentdev/case-open` → `/agentdev/case-auto`（内部 lifecycle の case-open 段階が駆動）
+- `/agentdev/case-ready` → `/agentdev/case-auto`（内部 lifecycle の case-ready 段階が駆動）
+- `/agentdev/case-revise` → req-define で再合意後の `/agentdev/case-auto`（例外経路 case-revise → case-ready を解決）
+- `/agentdev/case-run` → `/agentdev/case-auto`（内部 lifecycle の case-run 段階が駆動）
+- `/agentdev/case-close` → `/agentdev/case-auto`（内部 lifecycle の case-close 段階が駆動）
 

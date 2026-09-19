@@ -63,7 +63,6 @@ function readFileIfExists(p: string): string | null {
   return fs.readFileSync(p, "utf-8");
 }
 
-const CASE_RUN_COMMAND = resolveWorkflowPath("commands/agentdev/case-run.md");
 const CASE_RUN_DELEGATION_AND_RESULT = resolveWorkflowPath(
   "skills/agentdev-workflow-case-run/references/delegation-and-result.md",
 );
@@ -136,8 +135,9 @@ function assertSectionExists(result: SectionExtractionResult, fileName: string):
 }
 
 describe("distribution-boundary final gate routing contract", () => {
-  it("case-run command and workflow gate reference are reachable from the test harness", () => {
-    expect(fs.existsSync(CASE_RUN_COMMAND)).toBe(true);
+  // Case #2981（DEC-033）で case-run 公開 command 定義は削除された。routing の正は
+  // Workflow Skill 側 reference（delegation-and-result.md STEP-S5-1）のみ。
+  it("case-run workflow gate reference is reachable from the test harness", () => {
     expect(fs.existsSync(CASE_RUN_DELEGATION_AND_RESULT)).toBe(true);
   });
 

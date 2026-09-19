@@ -28,8 +28,9 @@ describe("checkWorkflowPreventive (integration against real repo)", () => {
     }
     expect(report.failures.filter((f) => f.severity === "strict").length).toBe(0);
     // REQ-057-011 (Q2 Plan A): public_commands is compared against a minimum
-    // floor instead of a fixed count (last known correct state: 18).
-    expect(report.stats.public_commands).toBeGreaterThanOrEqual(18);
+    // floor instead of a fixed count (last known correct state: 13; the v4
+    // 2-entry model removed the case-* 5 command definitions, Case #2981).
+    expect(report.stats.public_commands).toBeGreaterThanOrEqual(13);
     expect(report.stats.legacy_kind_files).toBe(0);
     expect(report.stats.legacy_commands_dir_files).toBe(0);
   });
