@@ -74,7 +74,7 @@ Decision体系の全面改定時は、`DEC-NNN` 以降の番号帯を基準番�
 - **検証**: REQ 識別子形式（`REQ-{NNNN}`）、実在 REQ の指先確認（`docs/requirements/` または
   `docs/requirements/retired/` に実在すること）、空宣言（`related_reqs: []`、関連なしの正規状態）と
   未宣言（フィールド欠落、正規状態ではなく機械検出対象）の区別
-- 本フィールドは Decision 成果物のローカルメタデータであり、TIM の ADF-COVERS 宣言・covers 関係とは
+- 本フィールドは Decision 成果物のローカルメタデータであり、トレーサビリティの ADF-COVERS 宣言・covers 対応関係とは
   独立に管理される。agentdev-traceability は本フィールドを消費しない
 - `docs/decisions/README.md` 関連REQ表は本フィールドから自動生成される（混合領域構成。
   「説明」列のみ人手管理）。整合検査は docs-check の索引整合 checker が担う
