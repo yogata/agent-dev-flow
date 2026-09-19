@@ -70,7 +70,7 @@ QG-4（full integrity suite 合格基準）における bun test フル suite �
 ## See Also
 
 - [common-gate-contract.md](references/common-gate-contract.md)（全 Gate 共通契約。pass/warn/fail/partial、evidence-first、結果フォーマット）
-- quality-gates Design（QG-1〜QG-4 の Design 定義、機械化境界、実装マッピング、skill extension 経由）
+- ADF v4 Quality / Verification / Evidence / Gate モデル Design（v4-quality-gate-model。QG-1〜QG-4 の Design 定義〔再導出結果表の Verification Obligation〕、機械化境界、実装マッピング、skill extension 経由）
 - **agentdev-req-analysis**: 要件分析手法、チェックボックス品質基準（QG-1 の基準）
 - **agentdev-workflow-lifecycle**: work_type 判定、フェーズ定義
 - **agentdev-workflow-routing**: レビュー NG 対応手順（QG-3 結果の消費先）

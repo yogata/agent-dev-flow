@@ -4,6 +4,23 @@ case-open で Issue を作成する前に、Issue の完了条件が対象 REQ/D
 本ファイルは QG-2 の判定基準、検査観点を定義する。
 共通契約は [common-gate-contract.md](common-gate-contract.md) を参照。
 
+## v4 Quality モデルへの接続
+
+本 Gate は ADF v4 Quality モデル（v4-quality-gate-model Design）の lifecycle 級 semantic Gate 群として再導出された QG-2（Acceptance Coverage）である。
+本ファイルの 3 層は同 Design「再導出結果（lifecycle 級 semantic Gate 群）」表の QG-2 行と次のように対応する。
+
+| 層 | 対応内容 |
+|---|---|
+| Verification Obligation | 完了条件・acceptance criteria が対象要件行を網羅し参照整合が取れている |
+| Verifier | semantic |
+| Evidence | Issue 本文・チェックボックス投影・構成対応表（構造的証拠） |
+
+- 対象遷移（v4 lifecycle deterministic gate predicate 接続点）: ready 遷移時の execution structure 確定（Epic・子 Issue 構成）
+- 判定値と Gate predicate の写像: `pass`/ `warn` で継続可、`fail` は遷移不可。写像の正規定義は v4-quality-gate-model Design「判定値と遷移接続」節と [common-gate-contract.md](common-gate-contract.md)「5 概念への写像」を参照する
+- 証拠分類の直交: 上表 Evidence の証拠分類（構造的）は Evidence の属性であり、Verifier 分類（deterministic/ semantic）とは直交する。正規定義は v4-quality-gate-model Design「証拠種別と Verifier 分類の直交」節を参照する
+- v3 からの処遇: 保持（配置点を case-ready の execution structure 確定へ移動。同 Design「QG-1〜QG-4 個別処遇対応表」の QG-2 行。移動の根拠は「v4 lifecycle で Issue 構成確定は case-ready 側に集約された」）
+- 責務分界: Gate の意味契約の正は v4-quality-gate-model Design が所有し、本ファイルは判定観点・検査手順の実行詳細を所有する（二重管理を行わない）
+
 ## 配置
 
 | コマンド | 配置ステップ | 対象成果物 |
