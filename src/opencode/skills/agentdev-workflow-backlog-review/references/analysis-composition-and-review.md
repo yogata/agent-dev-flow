@@ -161,7 +161,7 @@ skip 判断のためだけの新規 HITL、承認点は追加しない。
 ユーザー明示指定時は skip 条件の該当にかかわらず必ず発動する
 2. **review 呼出**: 発動と判定された場合のみ `agentdev-adversarial-review` を起動する。
 審議対象は RU 構成案（統合・分割判定結果、depends_on 解決結果、暫定分類付与結果）。
-呼出契約、返却契約、副作用境界は `agentdev-adversarial-review` と delegation-contracts Design（`semantic_review`、書き込み禁止型）を正とする
+呼出契約、返却契約、副作用境界は `agentdev-adversarial-review` と v4-delegation-contracts Design（`semantic_review`、書き込み禁止型）を正とする
 3. **accepted finding 反映**: accepted finding の RU 構成案への反映は本 workflow（呼出元）の責務である。
 反映後に RU 構成案の意味内容が変更された場合、必要な既存検証（depends_on 再解決、矛盾検出再実行）を行い、意味内容変更から新たな本質的争点が生じ得る場合のみ再 review を発動できる。
 同一 finding を新証拠・新前提・異なる failure condition・未評価範囲なしに再起票しない

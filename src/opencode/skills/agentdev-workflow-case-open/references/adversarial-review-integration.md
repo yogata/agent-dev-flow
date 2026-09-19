@@ -41,7 +41,7 @@ case-open は adversarial-review を**原則実行する**（default-on）。
 1. Root Case 本文候補
 2. Definition Package 構成案
 
-委譲契約は delegation-contracts Design「adversarial-review との委譲契約接続」節に従い、`semantic_review`（書き込み禁止型）として適用する。
+委譲契約は v4-delegation-contracts Design「adversarial-review との委譲契約接続」節に従い、`semantic_review`（書き込み禁止型）として適用する。
 adversarial-review 自身はファイル、Issue、PR、git 操作を行わない。
 
 ### 結果反映

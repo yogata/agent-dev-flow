@@ -159,7 +159,7 @@ plan_change: なし（委譲中に計画変更が生じた場合は result に�
 ## 構造化文脈の直列化（委譲時）
 
 委譲 prompt は、委譲時最小契約（入力（inputs）、副作用境界（side_effect_boundary）、出力契約（output_contract）、capture 引継ぎ（capture_handoff））の骨格を変更せず、入力（inputs）内に構造化文脈を直列化する。
-原本仕様は `<workflows/delegation-contracts>` Design「構造化文脈引き継ぎ（委譲時）の直列化契約」であり、本節は配布物への適用形を定める。
+原本仕様は `<workflows/v4-delegation-contracts>` Design「構造化文脈引き継ぎ（委譲時）の直列化契約」であり、本節は配布物への適用形を定める。
 
 構造化文脈は次の意味を扱う。
 
@@ -212,7 +212,7 @@ inputs:
 ### structured_context の SSoT 抽出と突合検査
 
 structured_context の生成（委譲 prompt 構築）は、次の抽出制約と突合検査に従う。
-原本仕様は `<workflows/delegation-contracts>` Design「structured_context の SSoT 抽出制約」である。
+原本仕様は `<workflows/v4-delegation-contracts>` Design「structured_context の SSoT 抽出制約」である。
 
 - structured_context の作業内容・purpose は、委譲先 Issue 本文の概要または正規 REQ から抽出する。親セッションの会話コンテキスト由来の推定・波及解釈を注入しない。
 - 委譲 prompt 生成時に、委譲先 Issue 番号と structured_context に含める対象成果物パス（Issue 本文の Execution Contract が示す変更対象成果物）の一致を検査する。不一致の場合は委譲を開始しない。

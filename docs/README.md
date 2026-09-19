@@ -129,7 +129,6 @@ Design は 3 層構造（commands / skills / workflows）と基盤 6 ドメイ�
 ### 横断 Design（`designs/workflows/`）
 
 - [Workflow Skill Model](designs/workflows/workflow-skill-model.md)
-- [サブエージェント委譲契約](designs/workflows/delegation-contracts.md)
 - [サブエージェント委譲契約（v4）](designs/workflows/v4-delegation-contracts.md)
 - [キャプチャ境界](designs/workflows/capture-boundaries.md)
 - [RU / 採用済み成果物 / draft lifecycle](designs/workflows/backlog-artifact-lifecycle.md)

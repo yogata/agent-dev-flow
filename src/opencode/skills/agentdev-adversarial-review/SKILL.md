@@ -102,7 +102,7 @@ QG-1〜QG-4 を代替せず、通常のコードレビュー、テスト、機�
 | unresolved 時の扱い | REQ-{NNNN}-{NNN} | unresolved 残時は不可逆処理へ進まず、adversarial-review 自体を恒久統制ゲート化しない |
 | 呼出失敗時の扱い | REQ-{NNNN}-{NNN} | silent skip 禁止、利用不能報告後に従来フローと既存 QG/HITL を維持 |
 
-user-decision-required の位置づけ（case-run result enum の第5状態ではなく case-auto の停止理由分類）は v4-lifecycle-state-machine Design「adversarial-review 由来の停止信号」節、review 経路での parent_decision_required / decision_context 適用は delegation-contracts Design「adversarial-review との委譲契約接続」節をそれぞれ正とする（REQ-{NNNN}-{NNN}）。
+user-decision-required の位置づけ（case-run result enum の第5状態ではなく case-auto の停止理由分類）は v4-lifecycle-state-machine Design「adversarial-review 由来の停止信号」節、review 経路での parent_decision_required / decision_context 適用は v4-delegation-contracts Design「adversarial-review との委譲契約接続」節をそれぞれ正とする（REQ-{NNNN}-{NNN}）。
 
 ## 非対象
 
