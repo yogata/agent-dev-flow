@@ -49,6 +49,11 @@ intake-from-github と intake-promote コマンドの知識ベースである。
 呼出元 STEP は本スキルの出力（採用済み成果物、分類結果レポート）を STEP の result evidence として扱い、次 STEP の Input Resolution で再取得できる。
 STEP reference 8 要素は `<foundations/v4-durable-state-and-recovery>` Design 参照。
 
+## 継続コラボレーションループにおける位置づけ
+
+intake-from-github / intake-promote は継続コラボレーションループ（`<workflows/v4-collaboration-loop>` Design）の Intake 段の実現手段であり、intake-from-github のクローズ済み成果物からの抽出は Observe 段の実現手段の一部でもある。
+受容した観測結果は inbox に未評価 Observation として蓄積され、採用後に backlog-review を経て RU へ合流する。
+
 ## See Also
 
 - **agentdev-workflow-lifecycle**: work_type 判定基準、フェーズ定義

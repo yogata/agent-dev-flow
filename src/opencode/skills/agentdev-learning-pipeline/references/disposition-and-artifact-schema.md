@@ -6,6 +6,7 @@ SKILL.md 本文では処分区分の存在と living pool 維持の不変条件�
 ## 目次
 
 - [処分区分](#処分区分)
+- [継続コラボレーションループと三方対応表](#継続コラボレーションループと三方対応表)
 - [既存対策照合](#既存対策照合)
 - [採用済み成果物スキーマ](#採用済み成果物スキーマ)
 - [req-define 変更影響分析への情報候補](#req-define-変更影響分析への情報候補)
@@ -37,6 +38,27 @@ living pool は終端保管ではなく、次回 `/agentdev/learning-promote` �
 | 6 | deferred | まだ昇華の余地がない、情報が断片的、出現回数が少ない。**living pool（`deferred.md`）で維持し REQ 化しない** |
 | 7 | rejected | ユーザーが明示的に却下、すでに別の対策で十分対応済み |
 | + | duplicate | 同等の内容が既存の恒久契約、知識、配布物で十分にカバーされている |
+
+## 継続コラボレーションループと三方対応表
+
+本処分区分は継続コラボレーションループ（`<workflows/v4-collaboration-loop>` Design）の Learning 段で参照される。
+Learning 評価結果の 7 系統・処分区分・8 寿命を次の三方対応表で対応づける。
+
+**二層注記**: 7 系統はループ全体の集計ビュー（最終振り分け先）であり、処分区分は learning-promote の局所判定である。ループ Design の .agentdev/ 整合表は durable state 5 分類 × 8 寿命の repo 内正規状態側の整合表であり、本表は振り分け処分区分側を担う（役割分担）。
+
+| 系統（最終振り分け先） | 対応する処分区分 | 最終振り分け先の寿命 |
+|---|---|---|
+| 1. Knowledge | 4 project knowledge | reusable Knowledge |
+| 2. Decision | 2 恒久契約候補（Decision） | Architecture lifetime |
+| 3. Project Policy | 対応区分なし（下流の req-define が実現先を選択する） | Project lifetime |
+| 4. Design update | 3 恒久契約候補（Design） | Architecture lifetime |
+| 5. REQ update | 1 恒久契約候補（REQ） | Requirement lifetime |
+| 6. Intake/Backlog | 対応区分なし（capture 時点の Split Rule により実現される。learning-promote 時点の振替経路は現行の処分区分に存在しない） | 未評価 Observation（RU 化で Change/Case lifetime、要件化後は Requirement lifetime） |
+| 7. 一時的記録の終了 | 7 rejected（duplicate・prune 対象を含む） | 寿命外（情報寿命の終結であり、8 寿命のいずれにも分類されない） |
+
+- 系統 1 の「Knowledge」は docs/knowledge/ への再利用可能知識、系統 7 の「一時的記録の終了」は評価終了を指す（7 系統の列挙の正はループ Design）
+- 処分区分 5（既存対策の更新）は採用済み成果物経由で req-define の変更影響分析へ情報候補として引き渡され、系統 2〜5 のいずれかに合流する（実現先の確定は req-define）
+- 処分区分 6（deferred）は振り分け先外である。未評価 Observation として living pool（`deferred.md`）に滞留し、次回 learning-promote 実行時に再評価される
 
 ## 既存対策照合
 

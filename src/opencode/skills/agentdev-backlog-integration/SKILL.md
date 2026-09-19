@@ -53,6 +53,11 @@ backlog-review は promoted artifact を source type に依存しない共通モ
 REQ / Decision / Design 反映、ガードレール移管、Project Extension 接続、通常の Issue による修正等の具体的実現先へのルーティングは learning 由来を含めて行わず、システム変更を必要とするものは RU として req-define へ渡す。source type をルーティング条件にしない。
 正規原本はバックログ統合の要件が正規所有する backlog 自体の処置と docs/knowledge/ 直接保存の要件行であり、本節は配布物側の実行時参照である。詳細は `references/learning-outcome-routing.md` を参照。
 
+## 継続コラボレーションループにおける位置づけ
+
+backlog-review は継続コラボレーションループ（`<workflows/v4-collaboration-loop>` Design）の Backlog 段の実現手段である。
+Intake / Learning / inspect の各昇格系統由来の採用済み成果物は本段で統合・分析され、RU 化によって req-define へ合流する。docs/knowledge/ へ直接保存される知識文書は RU 化を経ない。
+
 ## See Also
 
 - **agentdev-workflow-lifecycle**: work_type 判定基準、フェーズ定義、前工程からの引き継ぎ（upstream handoff）判定

@@ -8,6 +8,7 @@ description: "backlog-auto command の workflow 実装本体。orchestration sta
 backlog-auto command の workflow 実装本体である。
 backlog 整理サイクル（inspect-docs → 昇格3系統 → backlog-review）の工程間制御（順序、並列と直列化、合流（fan-in）、停止伝播、再開）を所有する。
 子ワークフロー内部の分類、評価、昇格、RU 生成ロジックは各子 Workflow Skill が正規の処理主体として所有し、本スキルはこれらを複製しない。
+backlog 整理サイクルは継続コラボレーションループ（`<workflows/v4-collaboration-loop>` Design）における要求入口としてのループ駆動点であり、Observe → Intake/Learning → Backlog の実行順序で一巡する。
 
 backlog-auto command は公開 interface（入出力契約、ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。
 
