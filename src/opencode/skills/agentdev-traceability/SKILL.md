@@ -23,7 +23,7 @@ description: Requirement-artifact traceability (coverage, impact, check) resolvi
 
 - Decision・Design・実装・検証の各対応は要件へ直接対応付ける。Design 対応を経由して実装または検証が成立したものと推定しない（推移阻止）
 - 1つの成果物が複数の要件へ対応でき、複数の役割を持てる
-- モデル要素・完全性規則・用語の正本は producer 側リポジトリの最小トレーサビリティモデル（TIM）の Design が所有する。本スキルはその利用知識と手順を提供し、規範の独立定義を行わない
+- モデル要素・完全性規則・用語の正本は producer 側リポジトリの ADF v4 Traceability モデル Design（v4-traceability-model、docs/designs/<foundations/v4-traceability-model>.md）が所有する。本スキルはその利用知識と手順を提供し、規範の独立定義を行わない
 
 ## 対応関係の表現
 
@@ -137,5 +137,5 @@ bun .opencode/skills/agentdev-traceability/scripts/src/check.ts --root <repo-roo
 
 - [references/sidecar-and-policy.md](references/sidecar-and-policy.md): sidecar の作成・更新手順、検証スコープポリシー（`traceability/policy.yaml`）の利用手順、要件・Design・実装・検証変更時の対応関係更新手順
 - [references/check-interpretation.md](references/check-interpretation.md): check の9検出項目の finding 解釈、coverage / impact の利用方法と結果の読み方
-- **Design**: producer 側リポジトリの `agentdev-traceability` Design と最小トレーサビリティモデル（TIM）Design（本スキルの原本仕様とモデルの正本）
+- **Design**: producer 側リポジトリの `agentdev-traceability` Design と ADF v4 Traceability モデル Design（v4-traceability-model、docs/designs/<foundations/v4-traceability-model>.md。本スキルの原本仕様とモデルの正本）
 - **トレーサビリティ要件・意思決定**: producer 側リポジトリの要件インデックスと Decision インデックスを参照
