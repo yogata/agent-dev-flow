@@ -77,7 +77,7 @@ REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-039 の38件である（DEC-005、DEC-007、DEC-029 は superseded、proposed は 0 件）。
+現行 Decision は DEC-001 から DEC-039 の38件である（DEC-005、DEC-007、DEC-017、DEC-029、DEC-030 は superseded、proposed は 0 件）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
@@ -98,7 +98,7 @@ REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却
 | [DEC-014](decisions/DEC-014.md) | 配布依存境界の多層 enforcement |
 | [DEC-015](decisions/DEC-015.md) | ADF決定論的実行中核と実行基盤実行機構の責務分界 |
 | [DEC-016](decisions/DEC-016.md) | 導入系スクリプトの副作用ゼロ原則 |
-| [DEC-017](decisions/DEC-017.md) | 最小トレーサビリティモデルの採用と Artifact Graph の廃止 |
+| [DEC-017](decisions/DEC-017.md) | 最小トレーサビリティモデルの採用と Artifact Graph の廃止（superseded by DEC-037） |
 | [DEC-019](decisions/DEC-019.md) | 一般処理の標準API委譲とADF固有意味論の所有境界 |
 | [DEC-020](decisions/DEC-020.md) | GitHub Issue 共通管理単位の採用 |
 | [DEC-021](decisions/DEC-021.md) | scripts 公開入口の2本固定と安定契約 |
@@ -110,7 +110,7 @@ REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却
 | [DEC-027](decisions/DEC-027.md) | 観測ベース統制縮小評価ループ |
 | [DEC-028](decisions/DEC-028.md) | 文章表層品質の共通実行基盤 |
 | [DEC-029](decisions/DEC-029.md) | 公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入 |
-| [DEC-030](decisions/DEC-030.md) | トレーサビリティ標準機能への一般化と producer / consumer 境界の確立 |
+| [DEC-030](decisions/DEC-030.md) | トレーサビリティ標準機能への一般化と producer / consumer 境界の確立（superseded by DEC-037） |
 | [DEC-031](decisions/DEC-031.md) | ADF v4 Standard Operating Model の採用とプロセス・実装の責務分離 |
 | [DEC-032](decisions/DEC-032.md) | ADF 責務の三層モデルと Project Contract の論理ビュー・情報寿命モデル |
 | [DEC-033](decisions/DEC-033.md) | ADF v4 公開運用モデル（UX 2入口収斂・内部 lifecycle・継続コラボレーションループ・学習昇格ガード） |

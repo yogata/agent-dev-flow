@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は35件、提案中の Decision は0件である。
+現行の承認済み Decision は33件、提案中の Decision は0件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -31,7 +31,7 @@
 | DEC-014 | 配布依存境界の多層 enforcement | accepted | 2026-08-11 |
 | DEC-015 | ADF決定論的実行中核と実行基盤実行機構の責務分界 | accepted | 2026-08-15 |
 | DEC-016 | 導入系スクリプトの副作用ゼロ原則 | accepted | 2026-08-15 |
-| DEC-017 | 最小トレーサビリティモデルの採用と Artifact Graph の廃止 | accepted | 2026-08-17 |
+| DEC-017 | 最小トレーサビリティモデルの採用と Artifact Graph の廃止 | superseded | 2026-08-17 |
 | DEC-019 | 一般処理の標準API委譲とADF固有意味論の所有境界 | accepted | 2026-08-20 |
 | DEC-020 | GitHub Issue 共通管理単位の採用 | accepted | 2026-08-23 |
 | DEC-021 | scripts 公開入口の2本固定と安定契約 | accepted | 2026-08-23 |
@@ -43,7 +43,7 @@
 | DEC-027 | 観測ベース統制縮小評価ループ | accepted | 2026-09-04 |
 | DEC-028 | 文章表層品質の共通実行基盤 | accepted | 2026-09-09 |
 | DEC-029 | 公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入 | superseded | 2026-09-14 |
-| DEC-030 | トレーサビリティ標準機能への一般化と producer / consumer 境界の確立 | accepted | 2026-09-17 |
+| DEC-030 | トレーサビリティ標準機能への一般化と producer / consumer 境界の確立 | superseded | 2026-09-17 |
 | DEC-031 | ADF v4 Standard Operating Model の採用とプロセス・実装の責務分離 | accepted | 2026-09-18 |
 | DEC-032 | ADF 責務の三層モデルと Project Contract の論理ビュー・情報寿命モデル | accepted | 2026-09-18 |
 | DEC-033 | ADF v4 公開運用モデル（UX 2入口収斂・内部 lifecycle・継続コラボレーションループ・学習昇格ガード） | accepted | 2026-09-18 |
@@ -79,7 +79,6 @@
 - [DEC-014](DEC-014.md)（配布依存境界の多層 enforcement）
 - [DEC-015](DEC-015.md)（ADF決定論的実行中核と実行基盤実行機構の責務分界）
 - [DEC-016](DEC-016.md)（導入系スクリプトの副作用ゼロ原則）
-- [DEC-017](DEC-017.md)（最小トレーサビリティモデルの採用と Artifact Graph の廃止）
 - [DEC-019](DEC-019.md)（一般処理の標準API委譲とADF固有意味論の所有境界）
 - [DEC-020](DEC-020.md)（GitHub Issue 共通管理単位の採用）
 - [DEC-021](DEC-021.md)（scripts 公開入口の2本固定と安定契約）
@@ -90,7 +89,6 @@
 - [DEC-026](DEC-026.md)（実現面変更方針の構造化ハンドオフ（realization_actions））
 - [DEC-027](DEC-027.md)（観測ベース統制縮小評価ループ）
 - [DEC-028](DEC-028.md)（文章表層品質の共通実行基盤）
-- [DEC-030](DEC-030.md)（トレーサビリティ標準機能への一般化と producer / consumer 境界の確立）
 - [DEC-031](DEC-031.md)（ADF v4 Standard Operating Model の採用とプロセス・実装の責務分離）
 - [DEC-032](DEC-032.md)（ADF 責務の三層モデルと Project Contract の論理ビュー・情報寿命モデル）
 - [DEC-033](DEC-033.md)（ADF v4 公開運用モデル（UX 2入口収斂・内部 lifecycle・継続コラボレーションループ・学習昇格ガード））
@@ -112,7 +110,9 @@
 <!-- AUTOGEN:BEGIN:id=decision-status-superseded -->
 - [DEC-005](DEC-005.md)（Project Extensions Architecture）
 - [DEC-007](DEC-007.md)（Artifact Graph 標準化と配布スキル昇格）
+- [DEC-017](DEC-017.md)（最小トレーサビリティモデルの採用と Artifact Graph の廃止）
 - [DEC-029](DEC-029.md)（公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入）
+- [DEC-030](DEC-030.md)（トレーサビリティ標準機能への一般化と producer / consumer 境界の確立）
 <!-- AUTOGEN:END -->
 
 ### 非推奨（deprecated）
@@ -186,6 +186,8 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-017 | relates-to | DEC-009 | Decision 成果物型の TIM 上の位置づけ（ADF 拡張） |
 | DEC-017 | relates-to | DEC-010 | 4層分離はトレーサビリティ機能内部の概念層であり、Command / Workflow Skill / Capability Skill の配布物3層モデルとは別軸である |
 | DEC-019 | relates-to | DEC-015 | ADF vs harness の責務分界とは軸が異なる（ADF 固有 vs 一般処理の標準 API 委譲）。責務分界の類推として参照する |
+| DEC-037 | supersedes | DEC-017 | Traceability の主目的の定義権（要件中心の対応完全性から Change/Evidence 中心への再中心化）を v4-traceability-model Design へ移動。DEC-017 決定2（直接走査）・決定3（標準スキル）・決定5（用語政策）は搬送範囲表で維持 |
+| DEC-037 | supersedes | DEC-030 | Traceability の主目的の定義権（要件中心の対応完全性から Change/Evidence 中心への再中心化）を v4-traceability-model Design へ移動。DEC-030 の機構上の決定は搬送範囲表で維持 |
 | DEC-033 | supersedes | DEC-029 | 公開ワークフロー状態遷移中心再構成を v4 公開運用モデル（UX 2入口収斂・内部 lifecycle）へ一般化して置換 |
 
 ## 関連 REQ
