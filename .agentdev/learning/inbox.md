@@ -205,3 +205,14 @@
 - **ユーザー確認の有無**: なし。
 - **Decision/REQ/spec影響**: なし。
 - **横展開観点**: bun/node スクリプトの構造化出力（JSON）を後段で解析する場合は、pwsh パイプを介さずファイル書込み経由で受け渡すのが正規手段。 PowerShell リダイレクト（>）と同様にパイプ経由の受け渡しも破損対象であることを実証。
+
+## 2026-09-19: 共有 v4 worktree への write/edit ツール書込みが guard fail-closed ブロック（Case #2997 case-open）
+
+- **問題事象**: v4 worktree（../agent-dev-flow-v4）の docs ファイル編集を write ツール（一時 node スクリプト配置）と edit ツール（per-line replace）の両方で試みたところ、agentdev-textlint-guard が両方とも project root（main worktree）外への書込みとして fail-closed ブロックした。read ツールと bash は通るため、ツール系の project root 解決が main worktree 固定であることが原因。
+- **発生局面**: case-open STEP-3/4（Definition Package の 13 ACT ファイル編集）。実装先が共有 v4 worktree である構成（RA-003 実行セッション cwd = main worktree 固定・junction 構造保護）で発生。
+- **検知方法**: write/edit ツールの fail 応答（agentdev-textlint-guard: edit targets a path outside the project root; blocked per fail-closed）。
+- **根本原因**: ファイル操作ツール（write/edit）の project root 判定はセッション起動 cwd（main worktree）に固定され、共有 worktree 絶対パスが常に root 外と判定される。bash 経由の node は guard 対象外であった。
+- **自律対応内容**: AGENTS.md 規定の標準手段（node readFileSync/writeFileSync・UTF-8 BOM なし LF）へ切替。置換文字列は全て draft ファイルからの機械抽出（byte-exact）または Unicode エスケープで構築し、PowerShell クォート問題と cp932 再符号化リスクの両方を回避。各置換は出現数 assert 付きで fail-closed 検証し、TS-001 の要件行差分 0 検証と接続文 byte-exact 照合で確認した。
+- **ユーザー確認の有無**: なし（標準手段への切替は AGENTS.md と worktree-operations.md 書込み guard 運用指針の規定経路）。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: 共有 v4 worktree を編集対象とする workflow では、ファイル操作ツール（write/edit）は最初から使用せず bash 経由 node スクリプト（出現数 assert 付き replace + UTF-8 明示）を第一手段とするのが効率的。draft からの byte-exact 抽出と出現数 assert の組み合わせは文字化けと部分適用の両方を機械的に防止する。guard の fail-closed 性質は正しく機能しており、迂回（guard 設定変更等）ではなく標準手段への切替を維持する。

@@ -68,7 +68,7 @@ AgentDevFlow の配布コマンドではなく、AgentDevFlow 本体リポジト
 
 ### 品質ゲート
 
-品質ゲート（QG-1〜QG-4）は [quality-gates.md](../quality/quality-gates.md) で定義する。
+品質ゲート（QG-1〜QG-4）は [v4-quality-gate-model.md](../quality/v4-quality-gate-model.md) で定義する。Gate は lifecycle 遷移点から再導出され、判定値と遷移接続は同 Design の定めるところに従う。
 case-run（内部 lifecycle 段階）が QG-1〜QG-3（ローカル検証、CI 検証、乖離検出）、case-close（内部 lifecycle 段階）が QG-4（最終完了判定ゲート）を担う。
 詳細は同 Design および [skills/agentdev-quality-gates.md](../skills/agentdev-quality-gates.md) を参照。
 

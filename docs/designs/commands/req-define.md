@@ -474,7 +474,7 @@ req-define は、既存の明示的な対応関係（`agentdev-traceability` の
 - [workflows/delegation-contracts.md](../workflows/delegation-contracts.md)（extraction / classification 委譲）
 - [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（REQ再構成 intake、draft lifecycle）
 - [req-health-metrics.md](../quality/req-health-metrics.md)（SPLIT 予兆計測閾値）
-- [quality-gates.md](../quality/quality-gates.md)（QG-1）
+- [v4-quality-gate-model.md](../quality/v4-quality-gate-model.md)（QG-1）
 - [document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md)（draft body 品質検査）
 
 ## 対象外

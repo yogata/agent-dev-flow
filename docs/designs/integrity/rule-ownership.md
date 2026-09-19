@@ -61,7 +61,7 @@ req-impact-map.md の配置の正本は `../responsibilities/req-impact-map.md` 
 | 27 | 語彙ポリシー横断検出 | REQ-004 (024-028) | integrity-contracts.md | 現行対象範囲の語彙ポリシー違反検出 |
 | 28 | Cross-REQ 語彙矛盾 | REQ-010 | integrity-contracts.md | 現行 REQ 間の語彙矛盾検出 |
 | 29 | REQ 検証基準（必達要件） | REQ-010 | integrity-contracts.md | 規範語ではなく必達要件判定に基づく検証（v2:REQ-0115-044 から REQ-010 に移管） |
-| 30 | Quality Gates | REQ-010 | quality-gates.md | QG-1〜QG-4 定義、機械化境界、実装マッピング（v2:REQ-0115 から REQ-010 に移管） |
+| 30 | Quality Gates | REQ-010 | v4-quality-gate-model.md | QG-1〜QG-4 定義、機械化境界、実装マッピング（v2:REQ-0115 から REQ-010 に移管） |
 | 31 | docs 日本語表現、文意整合 | v2:REQ-0140, REQ-010 (003), REQ-036 (023) | integrity-rule-catalog.md (IR-045) | 英字混じり抽象用語、読取専用セマンティクスの検出。文書表記、文意品質ゲート（付帯品質ゲート）の機械検査担当 |
 | 32 | local-case-file（ローカルIssue共通スキーマ） | REQ-009 (016-020, 024, 025) | local-case-file.md | ローカル版 OpenCode のローカルIssue YAML 前書き、role 条件付き status enum、labels 値域、見出し一覧、マージ結果記録 |
 | 33 | ローカル版 link mode 導入フロー、安全ゲート | REQ-009 (001-015) | runtime-package-boundary.md | link mode 接続手順、link target 確認、ジャンクション検出安全ゲート |
@@ -157,7 +157,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-049 | Command file format violation | v2:REQ-0143, REQ-010 | command-file-format.md, integrity-contracts.md |
 | IR-050 | load_skills command 誤指定検出 | v2:REQ-0140-027, REQ-010-010 | integrity-contracts.md, document-type-responsibilities.md |
 | IR-051 | 実行主体の skill 表記誤認検出 | v2:REQ-0140-027, REQ-010-010 | integrity-contracts.md, document-type-responsibilities.md |
-| IR-052 | 完了条件 grep パターン設計（REQ-010-011） | REQ-010-011 | integrity-contracts.md, quality-gates.md |
+| IR-052 | 完了条件 grep パターン設計（REQ-010-011） | REQ-010-011 | integrity-contracts.md, v4-quality-gate-model.md |
 | IR-053 | gh 直接記述検出 | REQ-011 | integrity-rule-catalog.md, integrity-contracts.md, ../../responsibilities/custom-tool-contracts.md |
 | IR-054 | draft Design 放置検出 | REQ-001-002 | integrity-rule-catalog.md, integrity-contracts.md |
 | IR-055 | runtime-unresolved-reference（配布物内の導入先未解決参照検出） | REQ-002-079, REQ-002-080, REQ-002-081 | integrity-rule-catalog.md, integrity-contracts.md |
