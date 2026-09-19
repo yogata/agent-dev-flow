@@ -216,3 +216,21 @@
 - **ユーザー確認の有無**: なし（標準手段への切替は AGENTS.md と worktree-operations.md 書込み guard 運用指針の規定経路）。
 - **Decision/REQ/spec影響**: なし。
 - **横展開観点**: 共有 v4 worktree を編集対象とする workflow では、ファイル操作ツール（write/edit）は最初から使用せず bash 経由 node スクリプト（出現数 assert 付き replace + UTF-8 明示）を第一手段とするのが効率的。draft からの byte-exact 抽出と出現数 assert の組み合わせは文字化けと部分適用の両方を機械的に防止する。guard の fail-closed 性質は正しく機能しており、迂回（guard 設定変更等）ではなく標準手段への切替を維持する。
+
+---
+
+## 2026-09-19: check_distribution_boundary への契約外 --base-ref/--head-ref 指定は repoRoot 誤解釈で fail-closed になる（Case #2997 境界委譲）
+
+- **問題事象**: check_changed_docs 由来のオプション習慣で check_distribution_boundary に --base-ref / --head-ref を渡したところ、両オプションは同 checker の CLI 契約（[--profile P] [--json] [--save-baseline|--delta] [--exemptions] [repoRoot]・exit 0/1/2）に存在せず、値が repoRoot 位置に誤解釈されて検査が fail-closed 失敗した。
+- **工程位置**: case-close 前段の境界委譲（Epic #3001 Wave fan-in 検査。Case #2997 第6段）
+- **検知方法**: checker 実行時の fail-closed 応答（契約外フラグの実証）
+- **根本原因**: checker 間の CLI 契約の取り違え。--base-ref は check_changed_docs の契約オプションであり、check_distribution_boundary には存在しない。未知フラグは値ごと位置引数（repoRoot）へ落ちる
+- **対応内容**: 正規形 `--profile source` + repoRoot 位置引数で再実行し合格（failures 0・scanned 342）
+- **ユーザー確認の有無**: なし（正規 CLI 契約への切替のみ）
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: checker CLI は checker ごとに契約が独立しており、同名オプションの存在は checker 間で互換ではない。契約外フラグがエラーにならず位置引数へ誤解釈される経路は、fail-closed な exit 契約があるため誤検査の隠蔽には至らないが、実行コマンドは usage / CLI 契約コメントからの複写を第一とする
+- **再発条件**: check_changed_docs の --base-ref 習慣を check_distribution_boundary 実行へ持ち込んだ場合
+- **予防策**: checker 実行コマンド列は実装の usage コメント（check_distribution_boundary_cli.ts 冒頭）から複写し、記憶から組み立てない
+- **配布反映先**: docs/designs/integrity/checker-execution-contracts.md 関連 knowledge、learning-promote の評価対象
+- **関連**: Case #2997、Epic #3001、check_distribution_boundary_cli.ts、docs/designs/integrity/distribution-boundary.md
+- **タグ**: #case-close #distribution-boundary #CLI契約 #fail-closed #checker実行
