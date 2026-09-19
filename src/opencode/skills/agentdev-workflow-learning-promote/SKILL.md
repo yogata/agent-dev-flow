@@ -79,6 +79,12 @@ HITL（STEP-5）の承認状態は単独では永続状態に記録されない�
 ただし自律確定分の証跡はユーザー承認ではなく evaluation-report.md の自律確定記録（判定結果、主要根拠、HITL 不要理由）であり、当該記録と永続化成果物の双方から再構成できる。
 不可逆処理（deferred 移動、prune、採用済み成果物生成）は判定確定（自律確定またはユーザー承認）後にのみ実行する。
 
+## 継続コラボレーションループにおける位置づけ
+
+本 workflow は継続コラボレーションループ（`<workflows/v4-collaboration-loop>` Design）の Learning 段の実現手段である。
+STEP-3 の処分区分判定（7カテゴリ + duplicate）は learning-promote の局所判定であり、Learning 評価結果の 7 系統（ループ全体の集計ビュー・最終振り分け先）とは別の軸である。
+7 系統・処分区分・8 寿命の三方対応表は `agentdev-learning-pipeline` の処分区分スキーマ参照ファイルが所有する（正）。
+
 ## 主要 Capability Skill 連携
 
 本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
