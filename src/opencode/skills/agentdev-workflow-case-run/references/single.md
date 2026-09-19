@@ -79,7 +79,7 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 
 - Issue本文から要件docと受け入れ基準を抽出する（べき等性: worktree とブランチが既に存在する場合、STEP-S3 の作成処理をスキップする）。`agentdev-req-analysis` のチェックボックス品質基準で検証する
 - 関連Decision特定: `docs/decisions/README.md` を読み込み、関連Decisionがあれば個別に読み込み、実装がDecisionの決定事項に矛盾しないことを確認する
-- work_type 判定: `agentdev-workflow-lifecycle` に従い bugfix/feature/maintenance/docs_chore を判定する（scale は feature のみ standard/large、workflow_route は都度導出し保存しない）
+- work_type 判定: `agentdev-workflow-lifecycle` に従い bugfix/feature/maintenance/docs_chore を判定する（scale は全 work_type に standard/large を設定可、workflow_route は Definition 構成から都度導出し保存しない）
 - **作業起点・PR base**: worktree の作成元と PR の base は main を参照する
 - **工程間構造化文脈の初期文脈利用**: 前工程（case-open、case-auto 等）から構造化文脈が引き継がれている場合、前工程で確定した事項を初期文脈として利用し、同じ情報をゼロから探索、再構築することを原則としない。独立検証、鮮度確認、矛盾検出、正規成果物との整合確認を目的とする再確認は維持する。手動起動等で構造化文脈が引き継がれていない場合は、durable state（Issue 本文、要件doc、REQ/Decision/Design）から入力解決を行う（形式と制約は `agentdev-workflow-lifecycle` スキルの工程間構造化文脈引き継ぎ参照）
 - **execution contract 消費境界**: 完了条件、test strategy、必須品質統制を実行契約として扱う。不足・曖昧さ・矛盾・実現不能を検出した場合は自律補完せず blocked とする。test strategy を新規設計せず記録済み項目を実行する。必須品質統制の適用要否を再判断しない。work_type/scale/Issue structure を再分類して実行契約を変更しない
