@@ -79,7 +79,7 @@ case-run（内部 lifecycle 段階）が QG-1〜QG-3（ローカル検証、CI �
 
 | 旧セクション | 移行先 |
 |---|---|
-| Epic（複数 execution unit の協調管理）、Epic 自動クローズ、Epic ステータス追跡 | [commands/case-close.md](../commands/case-close.md)（Epic Wave クローズ・Epic ステータス追跡）+ [workflows/v4-runtime-execution-model.md](../workflows/v4-runtime-execution-model.md)（per-Epic 単一書き手）+ [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（階層合成導出投影） |
+| Epic（複数 execution unit の協調管理）、Epic 自動クローズ、Epic ステータス追跡 | [commands/case-close.md](../commands/case-close.md)（Epic Wave クローズ・Epic ステータス追跡）+ [v4-runtime-execution-model.md](v4-runtime-execution-model.md)（per-Epic 単一書き手）+ [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（階層合成導出投影） |
 | 自律修正ループ（Self-Healing Loop） | Workflow Skill `agentdev-workflow-orchestration`（実装本体）・[commands/case-run.md](../commands/case-run.md)（契約 Design） |
 | case-close 達成判定プロトコル | Workflow Skill `agentdev-workflow-case-close`（実装本体）・[commands/case-close.md](../commands/case-close.md)（契約 Design） |
 | Post-Run Capture（実行後キャプチャ） | [workflows/capture-boundaries.md](../workflows/capture-boundaries.md) |
