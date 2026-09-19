@@ -2,7 +2,7 @@
 title: backlog-auto Design
 status: accepted
 created: 2026-08-17
-updated: 2026-08-17
+updated: "2026-09-19"
 ---
 <!-- ADF-COVERS(implementation): REQ-041-001, REQ-041-002, REQ-041-003, REQ-041-004, REQ-041-005, REQ-041-006, REQ-041-007, REQ-041-008, REQ-041-009, REQ-041-010, REQ-041-011, REQ-041-012, REQ-041-013, REQ-041-014, REQ-041-015, REQ-041-016 -->
 
@@ -12,7 +12,7 @@ updated: 2026-08-17
 
 `/agentdev/backlog-auto` 公開コマンド。backlog 整理サイクル（inspect-docs → 昇格3系統 → backlog-review）を1回起動で実行する薄いオーケストレータの公開 interface を定義する。workflow 実装本体は `agentdev-workflow-backlog-auto` Workflow Skill が所有する。
 
-既存5コマンド（inspect-docs、learning-promote、intake-promote、inspect-promote、backlog-review）は置換せず、標準の backlog 整理フロー（個別コマンドの逐次実行）を置き換えない追加入口として位置づける。
+既存5コマンド（inspect-docs、learning-promote、intake-promote、inspect-promote、backlog-review）は置換しない。backlog-auto は backlog-driven の要求入口であり、整理結果（RU）は req-define → case-auto へ接続する。
 
 ## 入力
 
@@ -45,7 +45,7 @@ updated: 2026-08-17
 
 ## 参照する横断 Design
 
-- [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（コマンド分類、共通実行契約）
+- [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（コマンド分類、共通実行契約）
 - [workflows/epic-wave-model.md](../workflows/epic-wave-model.md)（orchestration stage モデル）
 - [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（RU / 採用済み成果物 lifecycle）
 

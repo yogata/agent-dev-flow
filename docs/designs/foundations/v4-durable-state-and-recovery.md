@@ -4,6 +4,7 @@ status: accepted
 created: 2026-09-19
 updated: 2026-09-19
 ---
+<!-- ADF-COVERS(implementation): REQ-002-036, REQ-005-002, REQ-005-003, REQ-005-004, REQ-005-024, REQ-048-001, REQ-048-002, REQ-048-003, REQ-048-004, REQ-048-005 -->
 
 # ADF v4 durable state と再構成・恢復（配置表・権威移行・部分失敗調整）
 
@@ -60,3 +61,11 @@ repo 外の一時証跡退避先（OS 一時ディレクトリ等）はローカ
 ## v3 関連 Design の処遇
 
 input-resolution-and-durable-state、step-reference-contract 等、v3 関連 Design の処遇・実行段階・被覆関係の正本は foundations/v3-v4-crosswalk.md の references/crosswalk-inventory.md が所有する。
+
+## フェーズ境界と SSoT 遷移
+
+マクロフェーズ境界を跨ぐ情報は次フェーズが参照する成果物へ永続化する（REQ-005-002/003/004 被覆）。durable state は権威記録先へ遷移する。エラー回復はデータ損失を伴わず、部分失敗は権威順調整で処理する。
+
+## ADF 実行識別情報の記録契約
+
+workflow-contracts Design から迁移した契約（REQ-048-001〜005 被覆）。実行単位・委譲単位・Case・GitHub Issue・PR・ADF 成果物を最小限の識別子で相関可能とする。機械検出可能識別子（Issue 番号、PR 番号、adf_case、DEL-{N}-{n} 形式の SSoT コメントヘッダ等）を優先する。harness 生履歴は読取専用の補助情報とし、harness 内部識別子を正規状態としない。既存情報から導出できる対応付け情報を優先し、新しい必須 field の追加判断は DEC-001 決定4 に従う。adf_* field 系の縮小は導出可能性監査に基づく。

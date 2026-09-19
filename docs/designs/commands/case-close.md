@@ -2,7 +2,7 @@
 title: case-close Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-17
+updated: "2026-09-19"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-018, REQ-021-019, REQ-021-022, REQ-021-025 -->
@@ -18,6 +18,7 @@ updated: 2026-09-17
 
 # case-close Design
 
+位置づけ変更（v4、DEC-033）: 本 Design が定義する case-close は公開 command ではなく内部 lifecycle 段階である。公開 UX は要求入口（req-define、backlog-auto）と標準実行コマンド case-auto へ収斂しており、本段階は case-auto の orchestration から駆動される。本 Design は内部 lifecycle 段階の契約として継続して正規文書である（処遇の正本: v3-v4-crosswalk references/crosswalk-inventory.md）。
 ## 目的
 
 PR をマージし、Case に記録を追記し、クローズ後に worktree とブランチを削除する。
@@ -173,9 +174,9 @@ SSoT コメントが検証証跡の恒久記録の正となる。
 
 ## 所有関係と委譲
 
-- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、command 定義（`src/opencode/commands/agentdev/case-close.md`）はその実行時投影である（DEC-010）。
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、case-auto の orchestration による Workflow Skill load 時に本 Design が読み込まれる（DEC-010。第4段以降は command 定義の実行時投影ではなく直接読込）。
 - workflow 実装本体（単一 Issue クローズと Epic Wave クローズの STEP 構成、内部手順、reference 構成）は Workflow Skill（`agentdev-workflow-case-close`）が所有し、本 Design はこれらを複製しない。
-- Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
+- Workflow Skill の単独起動防止（soft guard）は、case-auto orchestration の委譲制御と Workflow Skill description の DO NOT USE FOR トリガーにより実効する。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
 ## トレーサビリティ能力の利用（QG-4 独立再検査）
@@ -192,7 +193,7 @@ case-run 側の事前検査とは独立に実施する。検証手段との対�
 
 ## 参照する横断 Design
 
-- [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（Pattern Taxonomy（file-pipeline））
+- [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（Pattern Taxonomy（file-pipeline））
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 回収（intake/learning 分離））
 - [workflows/epic-wave-model.md](../workflows/epic-wave-model.md)（Epic Wave クローズモデル）
 - [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（REQ ファイル整合性検査）

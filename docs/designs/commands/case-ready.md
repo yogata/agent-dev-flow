@@ -2,7 +2,7 @@
 title: case-ready Design
 status: accepted
 created: 2026-09-14
-updated: "2026-09-17"
+updated: "2026-09-19"
 ---
 
 <!-- ADF-COVERS(design): REQ-021-024 -->
@@ -10,6 +10,7 @@ updated: "2026-09-17"
 
 # case-ready Command Design
 
+位置づけ変更（v4、DEC-033）: 本 Design が定義する case-ready は公開 command ではなく内部 lifecycle 段階である。公開 UX は要求入口（req-define、backlog-auto）と標準実行コマンド case-auto へ収斂しており、本段階は case-auto の orchestration から駆動される。本 Design は内部 lifecycle 段階の契約として継続して正規文書である（処遇の正本: v3-v4-crosswalk references/crosswalk-inventory.md）。
 ## 目的
 
 case-ready の公開契約（入出力、副作用、安全性、承認境界、停止条件、順序契約）を定義する。case-ready は Definition の受入と実行準備完了への状態遷移を所有する主フローコマンドである（REQ-061）。

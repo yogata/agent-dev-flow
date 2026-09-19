@@ -110,14 +110,14 @@ scripts/
 |--------|------|------|-------------|
 | 採用済み成果物（Intake） | `/agentdev/intake-promote` | `/agentdev/backlog-review` | RU 化成功時 |
 | 採用済み成果物（Learning） | `/agentdev/learning-promote` | `/agentdev/backlog-review` | RU 化成功時 |
-| RU | `/agentdev/backlog-review`, セッション由来 | `/agentdev/req-define`, `/agentdev/case-open`, `/agentdev/case-ready` | `/agentdev/case-ready` の Definition 確定 + VERIFY 成功時 |
-| REQ ファイル | `/agentdev/case-ready`, `/agentdev/case-revise` | `/agentdev/case-open`, `/agentdev/case-run`, `/agentdev/case-close` | なし（永続） |
+| RU | `/agentdev/backlog-review`, セッション由来 | `/agentdev/req-define`, case-open / case-ready（内部 lifecycle 段階） | case-ready（case-auto 駆動）の Definition 確定 + VERIFY 成功時 |
+| REQ ファイル | case-ready, case-revise（内部 lifecycle 段階） | case-open, case-run, case-close（内部 lifecycle 段階） | なし（永続） |
 | 追跡Issue | `/agentdev/issue`、各 workflow | `/agentdev/issue`、`/agentdev/req-define`（実行確定時の要件化経路） | なし（永続。解決済み、クローズ済みも同一体系内に残置） |
-| Case Issue | `/agentdev/case-open` | `/agentdev/case-run`, `/agentdev/case-close` | なし（永続） |
+| Case Issue | case-open（case-auto 駆動） | case-run, case-close（内部 lifecycle 段階） | なし（永続） |
 
 流れは以下の通り。
 採用済み成果物 / セッション由来 → RU → REQ ファイル / Issue → マージ → クローズ。
-RU 削除は `/agentdev/case-ready` の Definition 確定 + VERIFY 成功時に行う（case-open は RU を削除しない）。
+RU 削除は case-ready（内部 lifecycle 段階）の Definition 確定 + VERIFY 成功時に行う（case-open は RU を削除しない）。
 
 ## フェーズ体系
 

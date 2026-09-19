@@ -2,7 +2,7 @@
 title: intake-capture Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-15
+updated: "2026-09-19"
 ---
 <!-- ADF-COVERS(implementation): REQ-037-001, REQ-037-002, REQ-037-004, REQ-037-008, REQ-037-010 -->
 <!-- ADF-COVERS(implementation): REQ-037-002, REQ-037-004 -->
@@ -31,7 +31,7 @@ updated: 2026-08-15
 
 - git commit/push: `.agentdev/intake/` 配下のみ（commit message: `chore: capture intake item`）
 - 実行前同期: `git pull --ff-only`
-- GitHub Issue 作成: 行わない（case-open 責務）
+- GitHub Issue 作成: 行わない（case-auto が駆動する内部 lifecycle の case-open 段階の責務）
 - 採用可否判断: 行わない（intake-promote 責務）
 
 ## 現在の動作

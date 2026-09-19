@@ -2,7 +2,7 @@
 title: システム仕様
 status: accepted
 created: 2026-08-20
-updated: 2026-09-17
+updated: "2026-09-19"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-033 -->
 <!-- ADF-COVERS(implementation): REQ-002-009, REQ-002-010, REQ-002-012 -->
@@ -26,12 +26,12 @@ AgentDevFlow（`/agentdev/*` コマンド体系）は 3 つのパイプライン
 | コマンド | 役割 | 詳細 |
 |---|---|---|
 | `/agentdev/req-define` | 要件定義（壁打ち） | [commands/req-define.md](../commands/req-define.md) |
-| `/agentdev/case-open` | Issue 登録（連結成分ベース複数 Standard/Epic 構成生成、3軸判断） | [commands/case-open.md](../commands/case-open.md) |
-| `/agentdev/case-ready` | Definition 受入と実行準備完了への状態遷移（Definition 保存の内部責務を含む） | [commands/case-ready.md](../commands/case-ready.md) |
-| `/agentdev/case-revise` | 再合意済み Definition 変更の既存 Case 反映（主フロー例外経路） | [commands/case-revise.md](../commands/case-revise.md) |
-| `/agentdev/case-run` | 実装パイプライン（3 フェーズ構成） | [commands/case-run.md](../commands/case-run.md) |
-| `/agentdev/case-close` | 完了処理（達成判定プロトコル付き完了ゲート） | [commands/case-close.md](../commands/case-close.md) |
-| `/agentdev/case-auto` | 最大自走モード（複数 execution_unit 並列 orchestration、blocked 部分停止） | [commands/case-auto.md](../commands/case-auto.md) |
+| case-open（内部 lifecycle 段階、case-auto 駆動） | Issue 登録（連結成分ベース複数 Standard/Epic 構成生成、3軸判断） | [commands/case-open.md](../commands/case-open.md) |
+| case-ready（内部 lifecycle 段階、case-auto 駆動） | Definition 受入と実行準備完了への状態遷移（Definition 保存の内部責務を含む） | [commands/case-ready.md](../commands/case-ready.md) |
+| case-revise（内部 lifecycle 例外経路段階、case-auto 駆動） | 再合意済み Definition 変更の既存 Case 反映（例外経路） | [commands/case-revise.md](../commands/case-revise.md) |
+| case-run（内部 lifecycle 段階、case-auto インライン実行） | 実装パイプライン（3 フェーズ構成） | [commands/case-run.md](../commands/case-run.md) |
+| case-close（内部 lifecycle 段階、case-auto 駆動） | 完了処理（達成判定プロトコル付き完了ゲート） | [commands/case-close.md](../commands/case-close.md) |
+| `/agentdev/case-auto` | 標準実行コマンド（複数 execution_unit 並列 orchestration、blocked 部分停止） | [commands/case-auto.md](../commands/case-auto.md) |
 
 #### learning パイプライン
 
@@ -69,7 +69,7 @@ AgentDevFlow の配布コマンドではなく、AgentDevFlow 本体リポジト
 ### 品質ゲート
 
 品質ゲート（QG-1〜QG-4）は [quality-gates.md](../quality/quality-gates.md) で定義する。
-case-run が QG-1〜QG-3（ローカル検証、CI 検証、乖離検出）、case-close が QG-4（最終完了判定ゲート）を担う。
+case-run（内部 lifecycle 段階）が QG-1〜QG-3（ローカル検証、CI 検証、乖離検出）、case-close（内部 lifecycle 段階）が QG-4（最終完了判定ゲート）を担う。
 詳細は同 Design および [skills/agentdev-quality-gates.md](../skills/agentdev-quality-gates.md) を参照。
 
 ### 移管済みセクション（参照先）
@@ -80,21 +80,21 @@ case-run が QG-1〜QG-3（ローカル検証、CI 検証、乖離検出）、ca
 | 旧セクション | 移行先 |
 |---|---|
 | Epic（大規模 Issue 分割フロー）、Epic 自動クローズ、Epic ステータス追跡 | [workflows/epic-wave-model.md](../workflows/epic-wave-model.md) |
-| 自律修正ループ（Self-Healing Loop） | [commands/case-run.md](../commands/case-run.md) |
-| case-close 達成判定プロトコル | [commands/case-close.md](../commands/case-close.md) |
+| 自律修正ループ（Self-Healing Loop） | Workflow Skill `agentdev-workflow-orchestration`（実装本体）・[commands/case-run.md](../commands/case-run.md)（契約 Design） |
+| case-close 達成判定プロトコル | Workflow Skill `agentdev-workflow-case-close`（実装本体）・[commands/case-close.md](../commands/case-close.md)（契約 Design） |
 | Post-Run Capture（実行後キャプチャ） | [workflows/capture-boundaries.md](../workflows/capture-boundaries.md) |
-| 関連ドキュメントの要件達成対象化 | [commands/case-run.md](../commands/case-run.md), [commands/case-close.md](../commands/case-close.md) |
+| 関連ドキュメントの要件達成対象化 | [commands/case-run.md](../commands/case-run.md), [commands/case-close.md](../commands/case-close.md)（実装本体は各 Workflow Skill） |
 | ID 体系（REQ/Decision/IR 桁数） | [patterns.md](patterns.md), [integrity-rule-catalog.md](../integrity/integrity-rule-catalog.md) |
 | REQ 体系基準構造 | [req-health-metrics.md](../quality/req-health-metrics.md), [document-model.md](document-model.md) |
-| REQ 分類ゲート | [commands/req-define.md](../commands/req-define.md), [commands/case-ready.md](../commands/case-ready.md) |
-| Issue テンプレート完了条件セクション | [skills/agentdev-workflow-templates.md](../skills/agentdev-workflow-templates.md), [commands/case-open.md](../commands/case-open.md) |
+| REQ 分類ゲート | [commands/req-define.md](../commands/req-define.md), [commands/case-ready.md](../commands/case-ready.md)（case-ready 実装本体は Workflow Skill `agentdev-workflow-case-ready`） |
+| Issue テンプレート完了条件セクション | [skills/agentdev-workflow-templates.md](../skills/agentdev-workflow-templates.md), [commands/case-open.md](../commands/case-open.md)（case-open 実装本体は Workflow Skill `agentdev-workflow-case-open`） |
 | .opencode/ ディレクトリ責務、スクリプト配置方針、テスト配布方針 | [runtime-package-boundary.md](../local/runtime-package-boundary.md) |
 | 安全性スキル（gh-cli） | [responsibilities/custom-tool-contracts.md](../responsibilities/custom-tool-contracts.md) |
 | 整合性検査スキル（repo-`agentdev-integrity`） | (repo-local、配布対象外、Design 対象外) |
 
 ## Workflow Architecture Inventory
 
-全公開Command（17件）の Workflow Architecture Inventory を恒久カタログとして統合する。
+公開 Command（13件）と内部 lifecycle 段階（case-* 5 段階）の Workflow Architecture Inventory を恒久カタログとして統合する。
 各Command の11分析軸（公開契約・主要処理段階・分岐・副作用・HITL・並列性・resume・durable state・Harness依存・Capability依存・内部workflow候補）を記載する。
 個別Workflow Skill 移行（Wave 2）および Capability Skill 抽出の参照証拠とする。
 
@@ -114,11 +114,11 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 | Command | 主入力 | 主出力 | workflow 系統 |
 |---|---|---|---|
 | `/agentdev/req-define` | セッション会話 / RU | 要件doc（draft） | req/case |
-| `/agentdev/case-open` | 要件doc | GitHub Issue | req/case |
-| `/agentdev/case-ready` | Root Case Issue | ready 状態の Root Case + 実行構造（REQ/Decision/Design ファイル保存を含む） | req/case |
-| `/agentdev/case-revise` | 再合意済み Definition 差分（draft） | Definition Amendment PR + case-ready 引き継ぎ | req/case |
-| `/agentdev/case-run` | Issue | 実装済みブランチ + PR | req/case |
-| `/agentdev/case-close` | Issue + PR | マージ済み + クローズ済み | req/case |
+| case-open（内部 lifecycle 段階） | 要件doc | GitHub Issue | case-auto 駆動 |
+| case-ready（内部 lifecycle 段階） | Root Case Issue | ready 状態の Root Case + 実行構造（REQ/Decision/Design ファイル保存を含む） | case-auto 駆動 |
+| case-revise（内部 lifecycle 例外経路段階） | 再合意済み Definition 差分（draft） | Definition Amendment PR + case-ready 引き継ぎ | case-auto 例外経路解決駆動 |
+| case-run（内部 lifecycle 段階） | Issue | 実装済みブランチ + PR | case-auto インライン実行 |
+| case-close（内部 lifecycle 段階） | Issue + PR | マージ済み + クローズ済み | case-auto 駆動 |
 | `/agentdev/case-auto` | 要件doc / Issue番号 | マージ済み + クローズ済み | req/case |
 | `/agentdev/intake-capture` | 手動入力 | `inbox/` item | intake |
 | `/agentdev/intake-from-github` | クローズ済み Issue/PR | `inbox/` item | intake |
@@ -160,7 +160,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 
 ### `/agentdev/case-revise`
 
-- **公開契約**: Root Case + req-define で再合意済みの Definition 変更差分（draft） → Definition Amendment PR（canonical Definition に実変更がある場合のみ）+ case-ready への引き継ぎ。主フローの例外経路コマンド（REQ-062）。
+- **公開契約**: Root Case + req-define で再合意済みの Definition 変更差分（draft） → Definition Amendment PR（canonical Definition に実変更がある場合のみ）+ case-ready への引き継ぎ。例外経路の内部 lifecycle 段階（REQ-062）。
 - **主要処理段階**: 再合意済み差分の読込 → 実変更判定（canonical Definition との差分比較、実変更なしは Amendment PR を作らず case-ready へ移行）→ Definition Amendment PR 作成 → 影響再評価（Definition 変更の影響がある Issue のみを再評価対象とし、影響なしと確認できた完了済み Issue は維持）→ case-ready 経由の execution contract / execution structure 再確定。
 - **分岐**: 実変更あり vs なし、既存 Amendment PR 検出（重複生成禁止、既存 PR 再利用）。
 - **副作用**: Definition Amendment PR 作成、影響ある Issue の再評価マーキング、Case 関連 Issue 本文更新（作成時のテンプレート構造と必須セクション維持）。
@@ -216,7 +216,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 
 ### `/agentdev/case-auto`
 
-- **公開契約**: 要件doc / Issue番号・URL → case-open → case-ready → case-run → case-close を順次自走しマージまで完了。明示指定時のみの追加入口（標準workflowの置換えではない）。
+- **公開契約**: 要件doc / Issue番号・URL → case-open → case-ready → case-run → case-close を順次自走しマージまで完了。標準実行コマンド（要求入口 2 つ〔req-define、backlog-auto〕から合流する実行経路）。
 - **主要処理段階**: STEP-1 入力解決・開始時刻記録（JST）→ STEP-2 work_type 読取・工程分岐（artifact_actions 動的判定 / auto_gate preflight）→ STEP-3 orchestration 実行（委譲起動 / case-run インライン / orchestration stage モデル / Wave 反復）→ STEP-4 停止条件検出・停止理由分類（11項目、7軸＋上位合意矛盾/新規ユーザー判断）→ STEP-5 adversarial-review 由来の停止伝播 → STEP-6 bounded parent decision resolution → STEP-7 コンフリクト解消 Level 2/3 → STEP-8 完了報告（L1 タイムスタンプ + 4次元集約 + OU処理ループ）。
 - **分岐**: 入力モード（Issue番号/URL vs 要件doc 4パターン）、artifact_actions ベース分岐（Definition 保存内部責務の実行要否）、Epic Wave 反復（子Issue並列最大5件、直接制御 AG-003）、Standard flow vs Epic Issue flow、停止条件11項目、停止理由分類（7軸 + 上位合意矛盾/新規ユーザー判断）、コンフリクト Level 1/2/3 エスカレーション、adversarial-review 由来の user-decision-required、bounded parent decision resolution（自律解決/作業仮定/上位合意矛盾/新規ユーザー判断）、delegation-unavailable。
 - **副作用**: case-open/case-ready/case-run/case-close の各委譲起動、case-run インライン実行（実行担当サブエージェント委譲を含む）、GitHub Issue/PR/comment/merge/close（自走対象）、remote branch 削除（自作branch限定）、docs/ 更新。DB migration実行/deploy/apply/外部SaaS/認証は対象外。Epic Issue 本文への直接書込はしない（case-close 単一書き手、`POL-epic-tracking-single-writer`）。
@@ -300,7 +300,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 
 ### `/agentdev/backlog-auto`
 
-- **公開契約**: 引数なし → backlog 整理サイクル（inspect-docs → 昇格3系統 → backlog-review）を1回起動で実行し RU 生成まで一巡。追加入口（標準の backlog 整理フローを置換しない）。子ワークフロー内部の分類、評価、昇格、RU 生成ロジックは再実装しない。
+- **公開契約**: 引数なし → backlog 整理サイクル（inspect-docs → 昇格3系統 → backlog-review）を1回起動で実行し RU 生成まで一巡。backlog-driven の要求入口（整理結果は req-define → case-auto へ接続）。子ワークフロー内部の分類、評価、昇格、RU 生成ロジックは再実装しない。
 - **主要処理段階**: STEP-1 開始時刻記録・進行状態初期化（durable state 再構成）→ STEP-2 stage 1 inspect-docs 単独直列 → STEP-3 stage 2 昇格3系統（learning-promote / intake-promote / inspect-promote、競合処理の直列化）→ STEP-4 fan-in 判定 → STEP-5 stage 3 backlog-review → STEP-6 完了報告（工程別結果、停止理由、再開コマンド提示）。
 - **分岐**: stage 1 停止経路（inspect-docs blocked/failed で下流非開始）、fan-in 判定（全系統正常完了 or 対象なし終了で開始可、1系統でも blocked・failed・未完了で開始不可）、系統別結果状態の読み替え（対象なし終了を正常扱い、learning-promote の inbox.md 不在を対象なし扱い）、部分停止時の独立系統継続、新規 promoted 0件でも backlog-review 実行、inspect-promote --auto 非有効化。
 - **副作用**: 各子コマンドの既存副作用のみ（`.agentdev/` 配下の成果物作成・削除、git commit/push、ユーザー対話）。backlog-auto 自身は新規副作用を追加しない。capture 系コマンド、inspect-skills、req-define、Issue/PR 作成の自動起動はしない。
@@ -351,8 +351,8 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **resume**: inbox 検出事項一覧、暫定分類、`--auto` 実行ログ、HITL 承認状態。
 - **durable state**: `.agentdev/inspect/promoted/*.md`、`.agentdev/intake/promoted/inspect-auto-*.md`、`auto-promote-log.md`、inbox 削除状態、commit hash。
 - **Harness依存**: LLM 推論（分類）、subagent 起動（`agentdev-adversarial-review`）、git（pull/commit/push）、拡張読込。
-- **Capability依存**: workflow-contracts Design（自動 promote 対象カテゴリ、extension 経由）、`agentdev-git-worktree`、`agentdev-adversarial-review`、`agentdev-project-extensions`。
-- **内部workflow候補**: 分類workflow（STEP-3 + promote/defer/reject）、`--auto` fast path workflow（STEP-4 + カテゴリマッチング + 自動投入）、HITL+永続化workflow（STEP-6〜8）。自動 promote 対象カテゴリと誤検知 revoke 手順は Capability Skill 候補（workflow-contracts Design が所有）。
+- **Capability依存**: v4-responsibility-boundaries Design（自動 promote 対象カテゴリ〔HITL 境界系の後継〕、extension 経由）、`agentdev-git-worktree`、`agentdev-adversarial-review`、`agentdev-project-extensions`。
+- **内部workflow候補**: 分類workflow（STEP-3 + promote/defer/reject）、`--auto` fast path workflow（STEP-4 + カテゴリマッチング + 自動投入）、HITL+永続化workflow（STEP-6〜8）。自動 promote 対象カテゴリと誤検知 revoke 手順は Capability Skill 候補（v4-responsibility-boundaries Design が所有）。
 
 ### `/agentdev/third-party-sync`
 
@@ -382,7 +382,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 ## 代表ケース検証（REQ-027-003、DEC-010/011）
 
 新 workflow model（STEP reference, resume point, Input Resolution, durable state）の妥当性を代表ケース4種で検証した結果（REQ-027-003）。
-検証基準は workflow-skill-model Design、step-reference-contract Design、input-resolution-and-durable-state Design、DEC-010/011。
+検証基準は workflow-skill-model Design、v4-durable-state-and-recovery Design、DEC-010/011。
 
 ### 検証対象と結果
 

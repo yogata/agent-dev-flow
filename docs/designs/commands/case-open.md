@@ -2,7 +2,7 @@
 title: case-open Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-17"
+updated: "2026-09-19"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-004, REQ-030-005, REQ-030-006, REQ-030-007, REQ-030-008, REQ-030-009, REQ-030-010, REQ-030-011, REQ-030-015 -->
@@ -12,6 +12,7 @@ updated: "2026-09-17"
 
 # case-open Design
 
+位置づけ変更（v4、DEC-033）: 本 Design が定義する case-open は公開 command ではなく内部 lifecycle 段階である。公開 UX は要求入口（req-define、backlog-auto）と標準実行コマンド case-auto へ収斂しており、本段階は case-auto の orchestration から駆動される。本 Design は内部 lifecycle 段階の契約として継続して正規文書である（処遇の正本: v3-v4-crosswalk references/crosswalk-inventory.md）。
 ## 目的
 
 合意済み要件doc をもとに Root Case（GitHub Issue）を確立し、Definition Package を生成して関連付ける。
@@ -35,7 +36,7 @@ canonical Definition に実変更がある場合のみ Definition PR を作成�
 ## 出力
 
 - Root Case GitHub Issue（ラベル付き、対象 REQ 番号埋め込み、状態 open。REQ-030-001、REQ-030-009）
-- Definition Package（要件行、Decision、Design、Issue 構成案、受入条件一式を Case 単位で集約し Root Case に関連付ける。構成は definition-readiness Design。REQ-030-003）
+- Definition Package（要件行、Decision、Design、Issue 構成案、受入条件一式を Case 単位で集約し Root Case に関連付ける。構成は case-open / case-ready Design（v4）。REQ-030-003）
 - Definition PR（canonical Definition に実変更がある場合のみ、Case 単位で 1 件。GitHub Draft PR ではない通常 Pull Request。REQ-030-002、REQ-083-001）
 - 完了報告（Root Case 完了報告テンプレート）
 
@@ -65,14 +66,14 @@ adversarial-review は Root Case 本文候補と Definition Package 構成案確
 
 ## 所有関係と委譲
 
-- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、command 定義（`src/opencode/commands/agentdev/case-open.md`）はその実行時投影である（DEC-010）。
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、case-auto の orchestration による Workflow Skill load 時に本 Design が読み込まれる（DEC-010。第4段以降は command 定義の実行時投影ではなく直接読込）。
 - workflow 実装本体（STEP 構成、内部手順、reference 構成）は Workflow Skill（`agentdev-workflow-case-open`）が所有し、本 Design はこれらを複製しない。
-- Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
+- Workflow Skill の単独起動防止（soft guard）は、case-auto orchestration の委譲制御と Workflow Skill description の DO NOT USE FOR トリガーにより実効する。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
 ## Definition Package と冪等再実行（REQ-030-010）
 
-- Definition Package の構成、Definition PR / Definition Amendment PR の lifecycle、canonical Definition の判定、冪等キーは definition-readiness Design が正規所有する。
+- Definition Package の構成、Definition PR / Definition Amendment PR の lifecycle、canonical Definition の判定、冪等キーは case-open / case-ready Design が正規所有する（v4）。
 - case-open は再実行時、既存 Root Case および既存 Definition PR を冪等キーで検出し、再利用する。重複生成しない（REQ-030-010）。
 - 不足分だけを処理する。Root Case が存在し Definition PR が存在しない場合は PR 生成のみを実行し、Root Case が存在しない場合は Root Case 確立から実行する。両者とも存在する場合は新規生成を行わない。
 - Definition PR は canonical Definition に実変更がある場合のみ作成する。canonical との差分が空の場合（bugfix / maintenance / docs_chore 等の実変更なし Case）は作成しない（REQ-030-002）。実変更判定が不能な場合は PR を作成せず停止し、判定不能の理由を報告する。
@@ -83,7 +84,7 @@ REQ 行追加を伴う Definition Package の生成時、検証スコープポ�
 
 ### 横断依存検査（STEP-5、REQ-030-012〜014）
 
-- STEP-5 冪等確認の実行時、draft の artifact_actions と未クローズ Case 群の変更対象成果物を機械的に比較し、2 以上の Case 間で同一パスが重複する場合、警告として投入者に提示する。共通契約は workflow-contracts Design「Case 投入時の横断依存検査契約」が正規所有する。
+- STEP-5 冪等確認の実行時、draft の artifact_actions と未クローズ Case 群の変更対象成果物を機械的に比較し、2 以上の Case 間で同一パスが重複する場合、警告として投入者に提示する。共通契約は case-open / case-ready Design が正規所有する（v4）。
 - 検出源は draft の artifact_actions と未クローズ Case 群の宣言に限定し、合意済み宣言以外の一般的な変更影響探索・依存関係探索を行わない（REQ-021-014、REQ-030-013）。
 - Epic を構成する投入では同一投入内（Epic 配下 Wave 内）の重複検出を Wave 重複前置検出（REQ-035-012）へ委譲し、Epic をまたぐ Case 間の重複のみを検出対象とする（REQ-030-014）。
 - 警告は Root Case の確立を自動阻止せず、警告の提示記録を完了報告へ含める。
@@ -127,8 +128,8 @@ case-open は、上流工程（req-define）で確定した対象要件と実行
 
 ## 参照する横断 Design
 
-- [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（フェーズ定義、主フロー構成）
-- [workflows/definition-readiness.md](../workflows/definition-readiness.md)（Definition Package 構成、Definition PR lifecycle、canonical Definition 判定、冪等キー）
+- [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（フェーズ定義、標準経路構成）
+- [commands/case-ready.md](../commands/case-ready.md)（Definition Package 構成、Definition PR lifecycle、canonical Definition 判定、冪等キー。case-open 側は本 Design）
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Split Rule、自工程 deviation capture）
 - [document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md)（Issue 本文品質検査）
 
@@ -199,7 +200,7 @@ REQ-030 への縮小に伴い、かつて case-open が構成していた execut
 - **委譲契約**: adversarial-review は `semantic_review`（書き込み禁止型）として適用する（[delegation-contracts Design](../workflows/delegation-contracts.md)「adversarial-review との委譲契約接続」節）。adversarial-review 自身は対象ファイル、Issue、PR、git 操作を行わない（REQ-014-004）。
 - **review 対象**: Root Case 本文候補、Definition Package 構成案の2者。
 - **採用後戻り先**: Root Case 本文候補に関わる finding は本文候補生成へ戻し再評価する。Definition Package 構成案に関わる finding は構成案評価へ戻す。accepted finding の対象候補への反映は case-open（呼出元）の責務である（REQ-014-006）。
-- **unresolved 時の取扱い**: 未解決のユーザー判断事項が残る場合、Root Case 作成へ進まない（REQ-014-009）。工程委譲起源であるため、既存 status（pass/warn/fail/partial）に unresolved 判断事項を付加し、case-auto 経由時は user-decision-required 停止理由分類として伝播する（REQ-014-012、[workflow-contracts Design](../workflows/workflow-contracts.md)「adversarial-review 由来の停止信号」節）。
+- **unresolved 時の取扱い**: 未解決のユーザー判断事項が残る場合、Root Case 作成へ進まない（REQ-014-009）。工程委譲起源であるため、既存 status（pass/warn/fail/partial）に unresolved 判断事項を付加し、case-auto 経由時は user-decision-required 停止理由分類として伝播する（REQ-014-012、[v4-lifecycle-state-machine Design](../workflows/v4-lifecycle-state-machine.md)「adversarial-review 由来の停止信号」節）。
 - **呼出失敗時**: adversarial-review の呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止し、利用不能を報告した上で従来フローと既存 QG/HITL を維持する（REQ-014-010）。
 
 ### 変更影響別の再実行ルール（REQ-014-007）
@@ -225,7 +226,7 @@ review の結果、Root Case 本文候補、Definition Package 構成案のい�
 
 ### 正規所有者マトリックス参照
 
-本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts Design「adversarial-review との委譲契約接続」節、workflow-contracts Design「adversarial-review 由来の停止信号」節との間で意味の重複、矛盾を生じない。
+本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts Design「adversarial-review との委譲契約接続」節、v4-lifecycle-state-machine Design との間で意味の重複、矛盾を生じない。
 case-open command 固有の挿入境界（発動条件、挿入構造、変更影響別再実行ルール、順序）のみを本節が所有し、共通 caller integration 契約、adversarial-review 自身の振る舞い契約、再 review 条件と停止条件の詳細は各正規所有者 Design を正とする。
 
 ## See Also
@@ -241,4 +242,4 @@ case-open command 固有の挿入境界（発動条件、挿入構造、変更�
 - Custom Tool `agentdev_gh`（GitHub I/O 操作契約。[custom-tool-contracts.md](../responsibilities/custom-tool-contracts.md)）
 - REQ-030（case-open 実行契約）
 - REQ-061（case-ready 実行契約）
-- [workflows/definition-readiness.md](../workflows/definition-readiness.md)（Definition Package、冪等キー）
+- [commands/case-ready.md](../commands/case-ready.md)（Definition Package、冪等キーの後継）

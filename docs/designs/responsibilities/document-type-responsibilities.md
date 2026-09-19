@@ -2,7 +2,7 @@
 title: 文書種別責務・配置基準
 status: accepted
 created: 2026-06-23
-updated: 2026-09-17
+updated: "2026-09-19"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-001, REQ-001-002, REQ-001-003, REQ-001-004, REQ-001-005, REQ-001-006 -->
 <!-- ADF-COVERS(implementation): REQ-001-017, REQ-001-018, REQ-001-019 -->
@@ -298,6 +298,7 @@ ADF 本体も同じ仕組みを利用する。
 REQ 作成時の分析は agentdev-req-analysis、事後構造診断は agentdev-req-structure-diagnostics が所有する。
 docs 横断診断と専門能力への振分けは agentdev-doc-diagnostics が所有する。
 Command と Skill は既存の作成支援と事後診断の責務を維持する。
+`docs/designs/commands/case-*.md` の 5 件（case-open、case-ready、case-revise、case-run、case-close）は内部 lifecycle 段階契約を所有する Design である（v4、DEC-033）。対応する公開 command 定義は存在せず、case-auto の orchestration から駆動される。Design 実体の配置規則は不変である。
 Decision の要否は既存の判断能力が、文書保存は既存のファイル管理能力が担い、意味品質の観点をこれらの既存責務へ接続する。
 
 ## 規範情報と非規範情報の配置基準

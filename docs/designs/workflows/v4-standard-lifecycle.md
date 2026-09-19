@@ -4,6 +4,7 @@ status: accepted
 created: 2026-09-18
 updated: 2026-09-19
 ---
+<!-- ADF-COVERS(design): REQ-004-054, REQ-004-055, REQ-005-001, REQ-005-010, REQ-005-011, REQ-005-029, REQ-006-114, REQ-030-016, REQ-031-031, REQ-032-028, REQ-034-001, REQ-034-039, REQ-061-036, REQ-062-009 -->
 
 # ADF v4 標準ライフサイクル（語彙直交性・公開 UX・req-define 入口・継続コラボレーションループ）
 

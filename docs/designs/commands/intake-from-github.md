@@ -2,7 +2,7 @@
 title: intake-from-github Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-15
+updated: "2026-09-19"
 ---
 <!-- ADF-COVERS(implementation): REQ-037-001, REQ-037-004, REQ-037-006, REQ-037-007 -->
 
@@ -32,8 +32,8 @@ updated: 2026-08-15
 - git commit/push: `.agentdev/intake/` 配下のみ（commit message: `chore: capture intake items from github`）
 - 実行前同期: `git pull --ff-only`
 - GitHub API 読み取り: gh CLI のみ使用（GitHub API 直接呼出禁止）
-- GitHub Issue 作成: 行わない（case-open 責務）
-- Issue/PR コメント投稿、マーカー付与: 行わない（case-run / case-close 責務）
+- GitHub Issue 作成: 行わない（case-auto が駆動する内部 lifecycle の case-open 段階の責務）
+- Issue/PR コメント投稿、マーカー付与: 行わない（case-auto が駆動する内部 lifecycle の case-run / case-close 段階の責務）
 
 ## 現在の動作
 

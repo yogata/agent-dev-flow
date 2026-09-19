@@ -2,7 +2,7 @@
 title: agentdev-artifact-validation Design
 status: accepted
 created: 2026-07-22
-updated: 2026-09-04
+updated: "2026-09-19"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-042 -->
 
@@ -49,7 +49,7 @@ REQ、Decision、Design 固有の内容判断を行わず、決定的検証の�
 
 - artifact-contracts.md「Script 所有権と委譲契約」
 - artifact-responsibilities.md「操作 skill 正規所有者台帳」
-- workflow-contracts.md（保存内部責務からの共通検証 script 呼出契約）
+- v4-lifecycle-state-machine.md（保存内部責務からの共通検証 script 呼出契約）
 
 ## 現在の動作
 

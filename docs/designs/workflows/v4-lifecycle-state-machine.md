@@ -4,6 +4,7 @@ status: accepted
 created: 2026-09-19
 updated: 2026-09-19
 ---
+<!-- ADF-COVERS(implementation): REQ-005-001, REQ-005-025, REQ-005-026, REQ-005-027, REQ-005-028 -->
 
 # ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応）
 
@@ -77,3 +78,7 @@ v3 状態関連 Design 9 件の処遇（planned supersede・実行段階）の�
 ## enum 整合の機械検査可能性
 
 状態 enum とその記録表現（Epic 本文ステータス表、Issue 本文状態記載、テンプレート）の間に不整合が生じないよう、enum 値の定義表を正とし、記録側表現は enum 値の写像であることを宣言する（v3 運用で観測された表現ドリフトの再発防止）。
+
+## v3 workflow-contracts Design からの吸収
+
+v3 workflow-contracts Design が所有していた result 契約の 1 権威と導出投影への再編、共通実行契約の一般化、状態機械選択適用原則の継承（REQ-005-026）、runtime 実行状態の非永続化と正規状態からの再構成、報告における実行状態・停止理由・再開可否・処理固有結果の意味区別（REQ-005-025/027/028）は本 Design の規定へ吸収された。旧 Design は第4段で削除され、対応関係の正本は v3-v4-crosswalk references/crosswalk-inventory.md が追跡する。

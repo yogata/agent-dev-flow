@@ -2,7 +2,7 @@
 title: RU / 採用済み成果物 / draft ライフサイクル
 status: accepted
 created: 2026-06-21
-updated: 2026-09-05
+updated: "2026-09-19"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-034, REQ-001-043 -->
 <!-- ADF-COVERS(implementation): REQ-008-001, REQ-008-002, REQ-008-003, REQ-008-004, REQ-008-005, REQ-008-006, REQ-008-007, REQ-008-008, REQ-008-009, REQ-008-010, REQ-008-011, REQ-008-012, REQ-008-013, REQ-008-014, REQ-008-015, REQ-008-016, REQ-008-017, REQ-008-018, REQ-008-019, REQ-008-020, REQ-008-021, REQ-008-022, REQ-008-023, REQ-008-024, REQ-008-025, REQ-008-026, REQ-008-027, REQ-008-028, REQ-008-029, REQ-008-030, REQ-008-031, REQ-008-032, REQ-008-033, REQ-008-034, REQ-008-035, REQ-008-036, REQ-008-037, REQ-008-038, REQ-008-039, REQ-008-040, REQ-008-041, REQ-008-042, REQ-008-043, REQ-008-044, REQ-008-045, REQ-008-046, REQ-008-047, REQ-008-048, REQ-008-049, REQ-008-050, REQ-008-051, REQ-008-052, REQ-008-053, REQ-008-054, REQ-008-055, REQ-008-056, REQ-008-057, REQ-008-058 -->
@@ -298,7 +298,7 @@ one-time 成果物（監査台帳、照合表、一時分析ファイル等）�
 
 ## See Also
 
-- [workflow-contracts.md](workflow-contracts.md)（ワークフロー全体契約）
+- [v4-lifecycle-state-machine.md](v4-lifecycle-state-machine.md)（ワークフロー全体契約）
 - [capture-boundaries.md](capture-boundaries.md)（キャプチャ境界）
 - 各 command Design（`docs/designs/commands/`）
 - `agentdev-backlog-integration` skill（採用済み成果物の統合、RU 生成）
