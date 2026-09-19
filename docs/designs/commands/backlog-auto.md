@@ -46,7 +46,7 @@ updated: "2026-09-19"
 ## 参照する横断 Design
 
 - [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（コマンド分類、共通実行契約）
-- [workflows/epic-wave-model.md](../workflows/epic-wave-model.md)（orchestration stage モデル）
+- [case-auto.md](case-auto.md)（orchestration stage モデル・ドラフト間並列実行モデル。v3 epic-wave-model Design 吸収先）
 - [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（RU / 採用済み成果物 lifecycle）
 
 ## 対象外

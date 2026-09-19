@@ -5,7 +5,7 @@ created: 2026-06-21
 updated: "2026-09-19"
 ---
 
-<!-- ADF-COVERS(implementation): REQ-021-015, REQ-021-016, REQ-021-017, REQ-021-019, REQ-021-020, REQ-021-022 -->
+<!-- ADF-COVERS(implementation): REQ-021-015, REQ-021-016, REQ-021-017, REQ-021-019, REQ-021-020, REQ-021-022, REQ-035-002 -->
 <!-- ADF-COVERS(design): REQ-021-015, REQ-021-016 -->
 <!-- ADF-COVERS(implementation): REQ-015-010, REQ-015-011 -->
 <!-- ADF-COVERS(implementation): REQ-017-007, REQ-017-008, REQ-017-010, REQ-017-011, REQ-017-013, REQ-017-016 -->
@@ -163,7 +163,7 @@ v2:ADR-0128 Decision #3 に基づく。
 4. 子Issue の worktree 作成（worktree 作成と precondition gate を各子Issue について実行）
 5. 各子Issue を実行担当サブエージェントに並列委譲する（adapter protocol: `agentdev-case-run-execution-adapter`）。
  委譲の起動手段、実行制御パラメータは AGENTS.md および references/<harness>.md に配置する（REQ-002-002）。
- 最大5件まで並列委譲（起動間隔10秒、epic-wave-model Design「並列起動の間隔」参照。同一Tool一括ブロックでの同時起動は行わない）
+ 最大5件まで並列委譲（起動間隔10秒、v4-runtime-execution-model「runtime 制御ループ」節〔起動間隔・並列数制御〕参照。同一Tool一括ブロックでの同時起動は行わない）
 6. 全委譲完了待機
 7. 結果収集（各子Issue の result（completed-pr / blocked / failed / delegation-unavailable）を収集）
 8. return（収集結果を報告して return）。Wave 境界（PR マージ）は case-close の責務
@@ -311,7 +311,7 @@ case-run の実行担当（委譲内サブエージェント）が、実装作�
 - [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（Pattern Taxonomy（manager-orchestrator）の後継）
 - [workflows/delegation-contracts.md](../workflows/delegation-contracts.md)（controlled_case_execution 委譲）
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（intake / learning capture（PR 本文記録のみ））
-- [workflows/epic-wave-model.md](../workflows/epic-wave-model.md)（Epic Wave 実行モデル、子Issue 状態 enum）
+- [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（子Issue 状態 enum〔durable state enum・階層合成〕。Epic Wave 実行モデルの運用契約は本 Design「v3 epic-wave-model Design からの吸収」節）
 - [quality-gates.md](../quality/quality-gates.md)（QG-3（実行担当サブエージェント責務））
 
 ### case-run が使用する検査ツール
@@ -414,7 +414,7 @@ case-run は Issue 本文の execution contract 必須セクション存在有�
 ## case-auto 並列委譲モデル（REQ-034-027〜093）
 
 case-run は同一 Wave 内子Issue 処理を最大5件まで並列委譲する（REQ-034-027、REQ-034-027）。
-本機能は Epic Wave モデル（v2:ADR-0128）で既に実装済み。
+本機能は v2:ADR-0128（case-run の実行モデル: 実行担当サブエージェント委譲）で確立した委譲実行構造を基盤とし、現行の Epic Wave 運用契約は本 Design「v3 epic-wave-model Design からの吸収」節が所有する。
 case-auto 並列委譲モデル拡張により、Standard flow 起因の独立 OU 自動 Epic 化（REQ-034-027）でも本機能が適用される。
 case-run 側の新規機能追加は不要で、入力としての Epic Issue が増えるのみ。
 
@@ -579,3 +579,10 @@ unresolved な本質的争点またはユーザー判断事項が残る場合、
 本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts Design「adversarial-review との委譲契約接続」節、`agentdev-case-run-execution-adapter` Design「adversarial-review 統合（実装方針→review→結果反映）」節との間で意味の重複、矛盾を生じない。
 case-run command 固有の挿入境界（委譲内実施、委譲起動位置、実装方針限定、blocked 遷移）のみを本節が所有し、実装方針形成、review 呼出、結果反映の内部手続きの詳細は `agentdev-case-run-execution-adapter` Design を正とする。
 
+
+## v3 epic-wave-model Design からの吸収
+
+v3 epic-wave-model Design が所有していた case-run Epic Wave 実行モデル、Epic 検出ルール、Wave 解析プロトコルのうち case-run 実行側の運用契約（REQ-035-002）は本 Design の規定へ吸収された。REQ-035-012（同一 Wave 内の子 Issue 間の変更対象ファイル重複の前置検出とその判断記録、コンフリクト解消モデルと execution_unit 間並列可否の判定軸の維持、mergeable 作成時状態のみで Wave の安全性を判断しないこと）の implementation 側の唯一の正規所有者は本 Design である（sidecar `traceability/agentdev-workflow-case-run.yaml`）。構成判断側の重複前置検出契約は case-ready Design「v3 epic-wave-model Design からの吸収」節が所有する。旧 Design は第5段で supersede とされ（物理削除は docs-chore OU-003）、対応関係の正本は v3-v4-crosswalk references/crosswalk-inventory.md が追跡する。
+
+- Epic 検出ルール: Epic Issue 指定の Case を Epic Wave 実行として解析する。Epic は複数 execution unit の協調管理が必要な変更であり、規模（scale）から独立した概念である
+- Wave 解析プロトコル: Epic Issue 本文から Wave 構成を読み取り、現在 Wave の子 Issue 状態（pending/completed/blocked/failed/delegation-unavailable）から実行可能な Wave を判定する。Wave 状態は永続化せず子 Issue 状態から導出する（REQ-035-005、v4-lifecycle-state-machine 階層合成）

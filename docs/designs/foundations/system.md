@@ -79,7 +79,7 @@ case-run（内部 lifecycle 段階）が QG-1〜QG-3（ローカル検証、CI �
 
 | 旧セクション | 移行先 |
 |---|---|
-| Epic（大規模 Issue 分割フロー）、Epic 自動クローズ、Epic ステータス追跡 | [workflows/epic-wave-model.md](../workflows/epic-wave-model.md) |
+| Epic（複数 execution unit の協調管理）、Epic 自動クローズ、Epic ステータス追跡 | [commands/case-close.md](../commands/case-close.md)（Epic Wave クローズ・Epic ステータス追跡）+ [workflows/v4-runtime-execution-model.md](../workflows/v4-runtime-execution-model.md)（per-Epic 単一書き手）+ [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（階層合成導出投影） |
 | 自律修正ループ（Self-Healing Loop） | Workflow Skill `agentdev-workflow-orchestration`（実装本体）・[commands/case-run.md](../commands/case-run.md)（契約 Design） |
 | case-close 達成判定プロトコル | Workflow Skill `agentdev-workflow-case-close`（実装本体）・[commands/case-close.md](../commands/case-close.md)（契約 Design） |
 | Post-Run Capture（実行後キャプチャ） | [workflows/capture-boundaries.md](../workflows/capture-boundaries.md) |
@@ -156,7 +156,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **durable state**: canonical Definition（merge 済み REQ/Decision/Design）、execution contract（Issue 本文）、実行構造（Child Issue / Wave / 依存構造）、Decision 受理記録。
 - **Harness依存**: bash による決定的スクリプト呼出、拡張読込。
 - **Capability依存**: `agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-design-file-manager`、`agentdev-artifact-validation`、`agentdev-quality-gates`、`agentdev-project-extensions`。
-- **内部workflow候補**: Definition 受入workflow（忠実性確認 + 自動確定境界）、実行構造確定workflow（連結成分 + 3軸判断、epic-wave-model Design 参照）。
+- **内部workflow候補**: Definition 受入workflow（忠実性確認 + 自動確定境界）、実行構造確定workflow（連結成分 + 3軸判断、[workflows/references/execution-unit-construction.md](../workflows/references/execution-unit-construction.md) 参照）。
 
 ### `/agentdev/case-revise`
 
@@ -375,7 +375,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **adversarial-review 呼出元**: 7呼出元（req-define、inspect-promote、intake-promote、learning-promote、backlog-review、case-open、case-run adapter 委譲内）が Command 定義に挿入境界を持つ。case-auto は停止伝播のみ受領（直接起動しない）。全呼出元で default-on + skip policy + 呼出失敗時従来フロー維持が共通（REQ-015-002/003、REQ-014-010）。
 - **resume と durable state**: 全 Command が GitHub Issue/PR（公開状態）と `.agentdev/`（ドメイン状態）を durable state とする。draft/RU/promoted/inbox/deferred/RU/REQ/Decision/Design が工程間引き継ぎの権威情報源。会話コンテキストは権威情報源としない（DEC-011 原則、`status` frontmatter + commit hash 検証で再開点を再構成）。
 - **HITL 密度**: req-define（壁打ち・Scale協議・SPLIT提案）、case-open（execution contract・preflight）、intake-promote/learning-promote/backlog-review（分類承認）、inspect-promote（手動分類確定）が高 HITL。case-run/case-close/intake-capture/intake-from-github/inspect-docs/inspect-skills は低 HITL（委任・診断・保存専用）。case-auto は停止条件11項目と bounded parent decision resolution で本質的 HITL に集約。
-- **並列性の集中**: 並列実行モデルを持つ Command は case-open（子Issue 作成最大5件）、case-run（Epic Wave 最大5件）、case-auto（orchestration stage 3 最大5件、execution_unit 全体は上限なし）、case-close（Epic Wave 準並列化）。3つの「5件」文脈の区別を要する（epic-wave-model Design）。それ以外は単一ワークフロー。
+- **並列性の集中**: 並列実行モデルを持つ Command は case-open（子Issue 作成最大5件）、case-run（Epic Wave 最大5件）、case-auto（orchestration stage 3 最大5件、execution_unit 全体は上限なし）、case-close（Epic Wave 準並列化）。3つの「5件」文脈の区別を要する（v4-runtime-execution-model「runtime 制御ループ」）。それ以外は単一ワークフロー。
 - **内部workflow候補の分布**: case-open（execution_unit 構成・Epic flow・Standard flow・execution contract 確定・クリーンアップ）、case-close（PRマージ・QG-4 達成判定・Design確定・Capture回収・Epic Wave クローズ）、case-auto（orchestration・bounded parent decision resolution・コンフリクト解消 Level 2/3・停止理由分類）が Workflow Skill 抽出の有力候補。req-define（壁打ち・照合・要件展開・Decision判断）、case-ready / case-revise（Definition 保存の内部責務、実行構造確定）、intake-promote/learning-promote/backlog-review（review/分類ワークフロー）、inspect-docs（診断カタログ）も抽出候補。intake-capture/intake-from-github/inspect-skills/inspect-promote は単純または既存 Capability Skill でカバーされており抽出優先度低。
 - **Capability Skill 候補**: 全 Command 共通の git I/O、GitHub I/O（Custom Tool `agentdev_gh` 操作契約）・決定的スクリプト・並列ステージング・target_area マッチング・8軸評価・廃棄判定カテゴリ・統合分割判定基準・自動 promote カテゴリ・adversarial-review 共通契約は既存 Capability Skill 群と Tool 操作契約が所有。新規 Capability Skill 抽出の余地は test strategy 定義（req-define STEP-4）、EC-2 必須品質統制導出（case-open）、EC-6 scope-affecting impact 探索（case-open）、コンフリクト Level 1 解消判断、Design status 昇格判断、bounded parent decision resolution、Wave 反復制御あたり。
 

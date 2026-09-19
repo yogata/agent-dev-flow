@@ -2,14 +2,14 @@
 title: execution_unit 構成アルゴリズム参照
 status: accepted
 created: 2026-07-25
-updated: 2026-09-09
+updated: 2026-09-19
 ---
 <!-- ADF-COVERS(implementation): REQ-030-007, REQ-030-008, REQ-030-009 -->
 
 # execution_unit 構成アルゴリズム参照
 
-> **位置づけ**: 本資料は `docs/designs/workflows/epic-wave-model.md` から参照される実装アルゴリズム詳細である。
-> 現行契約（依存強度3レベル定義、Epic サイズ上限、単独根 Standard flow 等）の宣言は親 Design を正とし、本資料はその機械的判定手順を示す。
+> **位置づけ**: 本資料は `docs/designs/workflows/v4-standard-lifecycle.md`（語彙定義）および `docs/designs/commands/case-open.md`（運用主体）から参照される実装アルゴリズム詳細である。
+> 現行契約（依存強度3レベル定義、Epic あたり子 Issue 数上限、単独根 Standard flow 等）の宣言は参照先 Design を正とし、本資料はその機械的判定手順を示す。
 
 ## 目的
 
@@ -38,7 +38,7 @@ case-open は OU 群の依存グラフから連結成分を計算し、各連結
 2. AUTOGEN 対象ファイル重複: 変更に付随して再生成される AUTOGEN 対象ファイル（README 索引、メトリクス表等）の重複
 3. 同一ファイル行近接: 同一ファイル内での変更行近接（一括機械置換等の隣接行変更）
 
-依存ヒントを検知した場合の Wave 構成判断（重複前置検出、Wave 分離・変更対象分割・重複許容）は親 Design「execution_unit 構成の依存ヒントと Wave 構成の重複前置検出契約（REQ-061-019、REQ-031-027、REQ-035-012）」節が定める。
+依存ヒントを検知した場合の Wave 構成判断（重複前置検出、Wave 分離・変更対象分割・重複許容）は case-ready Design「v3 epic-wave-model Design からの吸収」節（重複前置検出契約、REQ-061-019、REQ-031-027、REQ-035-012）が定める。
 
 ## 3軸判断モデル
 
@@ -47,7 +47,7 @@ case-open は OU 群の依存グラフから連結成分を計算し、各連結
 | 軸 | 定義 | 制約 |
 |---|---|---|
 | 依存強度 | 連結成分内の OU 間依存強度（必須/弱/関連） | 必須依存で結合した OU 群は原則として同一 Epic。例外は後述「必須依存がある場合の Epic 分割例外」参照 |
-| Epic サイズ | 1 Epic あたりの子 Issue 数 | 推奨 3-10、上限 10 ハード制約。上限超過時は必須依存があっても分割を検討 |
+| Epic 構成サイズ | 1 Epic あたりの子 Issue 数 | 推奨 3-10、上限 10 ハード制約。上限超過時は必須依存があっても分割を検討 |
 | 機能的一貫性 | 連結成分内の OU 群が単一の機能的主題を成すか | 機能的主題を欠く場合は複数 Epic へ分割、または Standard flow へ分散 |
 
 ### 単独根の Standard flow 扱い
@@ -67,9 +67,9 @@ case-open は OU 群の依存グラフから連結成分を計算し、各連結
 case-open は無関係な OU 群を単一 Epic へ機械的に集約しない。
 Epic 構成推論の根拠を Epic Issue 本文または `case_open_hints` に記録する。
 3軸判断の個別エッジケース（同機能独立、共通基盤等）は LLM 推論に委ねる。
-REQ/Design で固定するのは不変の方針（依存強度3レベル定義、Epic サイズ上限、単独根 Standard flow）のみである。
+REQ/Design で固定するのは不変の方針（依存強度3レベル定義、Epic あたり子 Issue 数上限、単独根 Standard flow）のみである。
 
 ## See Also
 
-- [../epic-wave-model.md](../epic-wave-model.md)（親 Design: 現行契約宣言）
+- [../v4-standard-lifecycle.md](../v4-standard-lifecycle.md)（語彙定義: work_type / scale / Epic / Wave の v4 意味モデル）
 - `docs/designs/commands/case-open.md`（適用主体 command Design）

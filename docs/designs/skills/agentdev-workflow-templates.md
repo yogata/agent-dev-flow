@@ -2,7 +2,7 @@
 title: `agentdev-workflow-templates` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-17
+updated: 2026-09-19
 ---
 <!-- ADF-COVERS(implementation): REQ-007-002, REQ-007-003, REQ-007-005, REQ-017-003 -->
 <!-- ADF-COVERS(implementation): REQ-048-001, REQ-048-002, REQ-048-008, REQ-048-016, REQ-057-020, REQ-014-016 -->
@@ -199,7 +199,7 @@ Epic Issue・子 Issue テンプレートの次の正規形を本 Design が正�
 - 分解テーブル（Epic 本文の子 Issue 一覧）は `| {wave}-{seq} | #{child_issue} | {status} | {child_title} |` 形式とする（agentdev-epic-tracker 新4列形式と整合）
 - 行 ID は `{wave}-{seq}` 形式（例: `1-1`）。Issue 列は `#N` のみ（OU ID の接尾は内容欄へ置く）
 - ステータス初期値は `pending`（更新は agentdev-epic-tracker が単一書き手として行う）
-- テンプレート選定規則は本 Design が、Wave 構成（wave 番号の付番）は epic-wave-model Design がそれぞれ所有する責務分担を維持する
+- テンプレート選定規則は本 Design が、Wave 構成（wave 番号の付番）は case-ready Design「v3 epic-wave-model Design からの吸収」節（Wave 構成ルール）がそれぞれ所有する責務分担を維持する
 
 ## 対象外
 

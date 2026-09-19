@@ -4,6 +4,7 @@ status: accepted
 created: 2026-09-19
 updated: 2026-09-19
 ---
+<!-- ADF-COVERS(implementation): REQ-035-001, REQ-035-007 -->
 
 # ADF v4 Runtime 実行モデル（authority 格子・直列化単位・冪等経路・runtime 制御ループ）
 

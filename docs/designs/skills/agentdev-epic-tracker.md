@@ -2,7 +2,7 @@
 title: `agentdev-epic-tracker` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-09-19
 ---
 
 # `agentdev-epic-tracker` Design
@@ -27,7 +27,7 @@ updated: 2026-07-18
 
 ## 参照する references
 
-- なし（SKILL.md 本文に集約、`agentdev-workflow-lifecycle`、`docs/designs/workflows/epic-wave-model.md` 参照）
+- なし（SKILL.md 本文に集約、`agentdev-workflow-lifecycle`、`docs/designs/commands/case-close.md`（Epic Wave クローズ・Epic ステータス追跡テーブル）、`docs/designs/foundations/v4-runtime-execution-model.md`（per-Epic 単一書き手）参照）
 
 ## 現在の動作
 
@@ -53,7 +53,7 @@ updated: 2026-07-18
 
 - [agentdev-issue-management.md](agentdev-issue-management.md)
 - [agentdev-workflow-lifecycle.md](agentdev-workflow-lifecycle.md)
-- [../workflows/epic-wave-model.md](../workflows/epic-wave-model.md)
+- [../foundations/v4-runtime-execution-model.md](../foundations/v4-runtime-execution-model.md)（Epic Issue 本文の単一書き手〔直列化単位表〕）
 - [commands/case-close.md](../commands/case-close.md)
 - REQ-006（Case実行オーケストレーション / Epic、Wave）
 - v2:ADR-0125（Epic Issue 本文単一書き手）
