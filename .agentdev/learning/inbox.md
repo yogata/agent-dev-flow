@@ -134,3 +134,52 @@
 - **配布反映先**: agentdev-doc-diagnostics（参照整合診断）、learning-promote の評価対象
 - **関連**: Case #2979、PR #2980
 - **タグ**: #case-open #参照張替え #grep検査 #v4移行 #crosswalk
+---
+
+## 2026-09-19: check_integrity spawn 系テストの固定 timeout は環境性能差で flaky 化する
+
+- **問題事象**: case-run（Case #2979 OU-003）の bun test 分割 1 で、check_integrity spawn 系 4 テストが手動実行 ~5.1 秒（5120/5284/5174/5147ms 実測）に対し 5000ms 固定 timeout で失敗。baseline 環境では通過する環境性能差が原因。
+- **工程位置**: case-run（OU-003 実装、release fixture 追随 commit 23eb0e0d）
+- **検知方法**: bun test 分割 1 の fail（2 errors・タイミング失敗）
+- **根本原因**: spawn 系テストの timeout が実行環境の性能差を考慮しない固定値 5000ms である
+- **対応内容**: 検証内容不変で timeout 15000ms へ猶予（commit 23eb0e0d）。恒久的な timeout 設定方針（環境差考慮・猶予倍率の標準化）の見直しは未解決の intake 候補
+- **ユーザー確認の有無**: なし（タイミング猶予のみで検証内容不変）
+- **Decision/REQ/spec影響**: なし
+- **展開視点**: spawn を伴う回帰テストを worktree 等の非 baseline 環境で実行する場合、固定 timeout は flaky の常在要因になる
+- **再発条件**: 性能差のある環境で spawn 系固定 timeout テストを実行した場合
+- **予防策**: spawn 系テストの timeout は環境差を織り込んだ猶予値を設定する
+- **配布反映先**: repo-agentdev-integrity scripts（timeout 方針見直し）、learning-promote の評価対象
+- **関連**: Case #2979、Issue #2983（SSoT コメント判定根拠 4）、PR #2986（commit 23eb0e0d）
+- **タグ**: #case-run #flaky #timeout #spawn #環境差
+
+## 2026-09-19: release テスト fixture の文言完全一致期待は Design 吸収節の粒度差で破損する
+
+- **問題事象**: 4 Design 物理削除（Case #2979 OU-003）で scripts/self/release の 2 テストが definition-readiness.md を fixture 参照し ENOENT。fixture を後継正規文書（case-ready.md / case-revise.md）へ追随した際、definition-readiness の「冪等キー」等の節は文言レベルでは後継に承継されておらず（意味は case-ready「冪等性」節等へ吸収済み）、文言完全一致型の fixture 期待は維持できなかった。
+- **工程位置**: case-run（OU-003 実装、commit 23eb0e0d）
+- **検知方法**: bun test 分割 1 の 2 errors（ENOENT）と fixture 追随時の文言照合
+- **根本原因**: Definition 吸収は文言承継ではなく意味吸収の粒度で行われ、fixture の文言完全一致期待と噛み合わない
+- **対応内容**: fixture を後継正規文書の実在節へ追随（commit 23eb0e0d）
+- **ユーザー確認の有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **展開視点**: supersede を伴う再編で fixture を追随する場合、Definition 吸収節の粒度（語彙承継の有無）を先に確認してから fixture の期待形式を選ぶ
+- **再発条件**: Design 削除・吸収を伴う Case で文言完全一致型 fixture を後継へ追随した場合
+- **予防策**: fixture 追随手順に吸収節粒度の確認を含める
+- **配布反映先**: scripts/self/release（fixture 運用）、learning-promote の評価対象
+- **関連**: Case #2979、PR #2986（commit 23eb0e0d）
+- **タグ**: #case-run #fixture #supersede #吸収節粒度
+
+## 2026-09-19: 削除帰結の実行時設定（.agentdev/extensions 等）の参照追随はどの OU にも明示割当がない
+
+- **問題事象**: 4 Design 物理削除（Case #2979 OU-003）の帰結で .agentdev/extensions/skills/ 7 ファイル 9 paths が dangling（checkExtensions strict failure 9 件）。extensions 参照追随は Root Case の 3 OU いずれの対象範囲にも明示割当がなく、削除を実施した OU-003 が帰結を吸収した（commit 0dc505b8）。同種の事例として learning-promote.md 参照張替え（commands scope と skills scope の隙間・E6-2）が Epic #2984 コメント 5739535761 / 5739649814 に記録済みで、本件は同問題クラスの 2 事例目。
+- **工程位置**: case-run（OU-003 実装。削除帰結として session 内で発見・対応）
+- **検知方法**: checkExtensions strict failure 9 件（fan-in 検査）
+- **根本原因**: docs-chore OU の対象範囲定義が「削除起因の実行時設定参照の追随」を含まず、OU 間の隙間になった
+- **対応内容**: OU-003 が旧→新参照マッピング表に従い extensions context.paths を v4 後継へ張替え。docs-chore OU の対象範囲定義への「削除起因の実行時設定参照の追随」追加は未解決の運用候補
+- **ユーザー確認の有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **展開視点**: 物理削除を含む docs-chore OU の対象範囲定義に「削除起因の実行時設定参照の追随」を含める運用の候補。E6-2 と同問題クラス（OU 対象範囲定義の隙間）
+- **再発条件**: 物理削除を含む docs-chore OU で、削除対象に依存する実行時設定の参照が存在する場合
+- **予防策**: 削除対象の参照先を extensions / templates 等の実行時設定まで含めて事前確認する
+- **配布反映先**: agentdev-case-run-execution-adapter（OU 対象範囲定義）、learning-promote の評価対象
+- **関連**: Case #2979、PR #2986（commit 0dc505b8）、Epic #2984（E6-2 記録）
+- **タグ**: #case-run #OU隙間 #extensions #docs-chore
