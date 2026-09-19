@@ -149,7 +149,6 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | Design | status | タイトル | 責務 |
 |------|--------|---------|------|
 | [workflows/workflow-skill-model.md](workflows/workflow-skill-model.md) | accepted | Workflow Skill Model | Command / Workflow Skill / Capability Skill の責務、依存方向、1:N分割基準、配置契約。DEC-010 実装詳細 |
-| [workflows/delegation-contracts.md](workflows/delegation-contracts.md) | accepted | サブエージェント委譲契約 | 委譲時最小契約、委譲種別、制約、manager-orchestrator 分離 |
 | [workflows/v4-delegation-contracts.md](workflows/v4-delegation-contracts.md) | accepted | サブエージェント委譲契約（v4） | 委譲時最小契約、委譲種別 8 種、制約、実行主体分類、adversarial-review 接続、構造化文脈直列化契約。result 4 状態と authority は v4-lifecycle-state-machine / v4-runtime-execution-model 参照（旧 delegation-contracts.md から集約 supersede） |
 | [workflows/capture-boundaries.md](workflows/capture-boundaries.md) | accepted | キャプチャ境界 | intake / learning 境界、Split Rule、PR 本文永続チャネル |
 | [workflows/backlog-artifact-lifecycle.md](workflows/backlog-artifact-lifecycle.md) | accepted | RU / 採用済み成果物 / draft lifecycle | artifact lifecycle、検出事項プロトコル、artifact_actions 工程分岐 |

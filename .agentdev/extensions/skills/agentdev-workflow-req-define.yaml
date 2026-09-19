@@ -20,10 +20,10 @@ context:
     paths:
       - "docs/designs/commands/req-define.md"
     purpose: 実証Case判定と評価契約セクションの実行詳細の確認
-  - id: delegation-contracts
+  - id: v4-delegation-contracts
     when: サブエージェント委譲契約参照時
     paths:
-      - "docs/designs/workflows/delegation-contracts.md"
+      - "docs/designs/workflows/v4-delegation-contracts.md"
     purpose: 委譲時最小契約と制約の確認
   - id: epic-wave-model
     when: Epic/Wave 構成参照時

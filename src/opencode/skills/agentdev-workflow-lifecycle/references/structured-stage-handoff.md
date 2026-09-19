@@ -69,8 +69,8 @@ workflow_phase: {現在の ADF 工程（req-define / case-open / case-ready / ca
 ## 参照
 
 - `<workflows/v4-lifecycle-state-machine>` Design（原本仕様）
-- `<workflows/delegation-contracts>` Design「構造化文脈引き継ぎ（委譲時）の直列化契約」（委譲時の原本仕様）
-- `<workflows/delegation-contracts>` Design「structured_context の SSoT 抽出制約」（structured_context の SSoT 抽出と Issue 番号×対象成果物パス突合の原本仕様）
+- `<workflows/v4-delegation-contracts>` Design「構造化文脈引き継ぎ（委譲時）の直列化契約」（委譲時の原本仕様）
+- `<workflows/v4-delegation-contracts>` Design「structured_context の SSoT 抽出制約」（structured_context の SSoT 抽出と Issue 番号×対象成果物パス突合の原本仕様）
 - `agentdev-case-run-execution-adapter` スキルの委譲プロンプト雛形（委譲時の直列化形式、意味対応先）
 - 参照先解決ポリシー（`references/reference-resolution.md`。canonical_references の source / projection 目的判別）
 - 前工程からの引き継ぎ 共通方針（agentdev_handoff、consumer リポジトリの引き継ぎ停止）

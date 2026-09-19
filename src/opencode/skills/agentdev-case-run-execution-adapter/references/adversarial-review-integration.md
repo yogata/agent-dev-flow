@@ -38,7 +38,7 @@
 ### review 呼出（発動条件該当時）
 
 発動条件該当時、実行担当サブエージェントは `agentdev-adversarial-review` を起動し、実装方針を審議対象へ渡す。
-呼出契約、返却契約、副作用境界は `agentdev-adversarial-review` と delegation-contracts Design（`semantic_review`、書き込み禁止型）を正とする。
+呼出契約、返却契約、副作用境界は `agentdev-adversarial-review` と v4-delegation-contracts Design（`semantic_review`、書き込み禁止型）を正とする。
 adversarial-review は実装ファイル、Issue、PR、git 操作を行わず、審議結果は中間成果として実行担当サブエージェントへ返却され、新規正規 artifact を生成しない。
 
 審議対象へ渡す実装方針の内容:
@@ -114,7 +114,7 @@ review 呼出を行わず、実装方針形成から直接実装、検証、PR �
 
 ## 副作用境界と委譲契約
 
-adversarial-review は delegation-contracts Design の `semantic_review`（書き込み禁止型）として適用する。
+adversarial-review は v4-delegation-contracts Design の `semantic_review`（書き込み禁止型）として適用する。
 許可操作は `read_files`、`inspect_content`、`return_summary`、`return_evidence`、`return_artifact_body_when_requested` に限定し、`file_write`、`issue_pr_update`、`commit`、`push`、`user_confirmation` を forbidden とする。
 審議結果は中間成果として実行担当サブエージェントへ返却し、新規正規 artifact を生成しない。
 呼出失敗時の取扱いは前節「従来フロー（review 非発動時）」を参照。
