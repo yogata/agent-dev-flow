@@ -298,3 +298,19 @@
 - **配布反映先**: agentdev-git-worktree（worktree-operations の書込み guard 運用指針）、learning-promote の評価対象
 - **関連**: Case #3011、agentdev-textlint-guard、AGENTS.md 書込み標準手段
 - **タグ**: #write-guard #fail-closed #node-e #ヒアドキュメント #worktree運用
+
+## 2026-09-20: squash merge commit の committer date が deriveMeasureDateFromLastCommit の期待値を反転させ AUTOGEN drift を生む
+
+- **問題事象**: 境界 case-close（Case #3011 第8段・子 Issue 実装 PR #3018/#3021/#3020/#3019 の squash merge 後 fan-in 検査）で check_autogen_freshness が AUTOGEN 計測日 drift（req-health-metrics ブロック）を検出した。AUTOGEN 計測日の導出（generate_indexes.ts deriveMeasureDateFromLastCommit）は git log -1 --format=%cI（committer date 基準）で対象ドキュメント群の最終コミット日付を取るが、GitHub 側で実行した squash merge commit の committer date は merge 実行時刻（サーバー時刻）に置き換わるため、merge 前に記録していた計測日と導出期待値の日付が反転し、ドキュメント群に実変更がなくても鮮度違反となった。
+- **工程位置**: case-close 境界（Epic #3017 Wave 1 fan-in green 判定。Definition PR #3012 の 5 REQ 目的節接続が docs/requirements/** に触れた squash merge 21434202 後）
+- **検知方法**: check_autogen_freshness の鮮度違反検出（fan-in green 判定時の機関検査）
+- **根本原因**: 計測日導出の %cI（committer date）と、GitHub squash merge が merge commit に付与する committer date（merge 実行時刻）の組み合わせ。ローカル検証時点の committer date と GitHub merge 時の committer date が日付境界をまたいで乖離すると、AUTOGEN ブロック記録の計測日が導出値と一致しなくなる（author date ではなく committer date 基準である点が本件の要因）
+- **対応内容**: AUTOGEN 計測日再生成 commit 1befae99（chore(indexes): AUTOGEN 計測日再生成）で drift を解消し、autogen violations 0・fan-in green を回復した。
+- **ユーザー確認の有無**: なし（機械検出 → 計測日再生成の正規経路）
+- **Decision/REQ/spec影響**: なし（AUTOGEN 鮮度 gate 仕様は不変。運用知見）
+- **展開観点**: GitHub 側 squash merge を経るワークフロー（case-close 境界）では、merge をまたぐ fan-in 検査で committer date 起点の drift が構造的に発生し得る。計測日導出を author date 基準へ切り替えるか merge commit を除外するかは恒久検討候補（現行は merge 後の計測日再生成で運用解消）
+- **再発条件**: AUTOGEN 計測日ブロックを持つ対象ドキュメント群への最終コミットが GitHub squash merge となり、その committer date が記録済み計測日と日付境界をまたいで反転する場合
+- **予防策**: squash merge を伴う境界 close の fan-in 検査では check_autogen_freshness を必ず実行し、drift 検出時は計測日再生成（generate_indexes）で解消してから green 判定する
+- **配布反映先**: integrity/autogen-freshness-gate Design・index-auto-generation Design（計測日導出基準の明示候補）、learning-promote の評価対象
+- **関連**: Case #3011、Epic #3017、fan-in fix 1befae99、check_autogen_freshness.ts、generate_indexes.ts（deriveMeasureDateFromLastCommit）
+- **タグ**: #case-close #squash-merge #AUTOGEN #committer-date #fan-in #autogen-freshness
