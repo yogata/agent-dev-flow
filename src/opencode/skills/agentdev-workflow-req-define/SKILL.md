@@ -45,7 +45,7 @@ req-define workflow は次の11 STEP で構成する。
 | STEP-4 | 要件展開 | 操作分類確定 | 変更影響候補、分類ゲート、Decision要否確認、変更誘発境界リスク導出（5観点境界）、test strategy 定義 | [references/requirement-development.md](references/requirement-development.md) |
 | STEP-5 | Decision判断 | 要件展開完了 | Decision判断記録（`new:{topic-slug}` 形式） | [references/requirement-development.md](references/requirement-development.md) |
 | STEP-6 | 要件doc生成 | Decision判断完了 | 構造化 `draft-data`（operation_units、artifact_actions、test_strategy、review_dispositions） | [references/draft-generation.md](references/draft-generation.md) |
-| STEP-7 | work_type・Scale 判定 | 要件doc生成完了 | work_type 4値、scale（feature のみ） | [references/draft-generation.md](references/draft-generation.md) |
+| STEP-7 | work_type・Scale 判定 | 要件doc生成完了 | work_type 4値、scale（全 work_type で standard/large 設定可） | [references/draft-generation.md](references/draft-generation.md) |
 | STEP-8 | adversarial-review | STEP-7 完了後、STEP-9 前 | review 結果反映（skip 時は従来フロー継続） | [references/adversarial-review-integration.md](references/adversarial-review-integration.md) |
 | STEP-9 | ドラフト保存 | review 完了または skip | `.agentdev/drafts/req-draft-{topic-slug}.md` 保存 | [references/draft-generation.md](references/draft-generation.md) |
 | STEP-10 | 要件doc確認 | ドラフト保存完了 | ユーザー提示済み（承認は求めず提示のみ） | [references/draft-generation.md](references/draft-generation.md) |

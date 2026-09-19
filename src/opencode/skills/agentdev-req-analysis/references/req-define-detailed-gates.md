@@ -13,7 +13,7 @@ req-define が要件 doc を生成する際の詳細ゲートを定義する。
 - [Decision 禁止ゲート](#decision-禁止ゲート)
 - [Decision 判断根拠の記録](#decision-判断根拠の記録)
 - [複数 RU 処理](#複数-ru-処理)
-- [Epic 規模記録](#epic-規模記録)
+- [scale と Epic 構成の記録](#scale-と-epic-構成の記録)
 
 ## 変更影響候補抽出
 
@@ -162,9 +162,9 @@ Step 1 で 2 件以上の RU が検出または指定された場合、全ての
 両系統は後方互換性のため既存の `create`/ `append`/ `update` を維持する。
 Design 候補（STEP-4 で分離した `draft-meta.spec-candidates`）が存在する場合、対応する Design 操作 OU を生成し `target_design` に想定配置先 Design パスを設定する。
 
-## Epic 規模記録
+## scale と Epic 構成の記録
 
-scale が large かつ Epic 規模と判定された場合、`scale: large` と分解計画を draft-meta に記録する。
+scale を large と判定した場合、または Epic 構成が必要と判定した場合、`scale` と分解計画（decomposition）を draft-meta に記録する。
 複数 RU にまたがる Epic の場合は、関係する RU 群を関連付けて記録する。
 
 操作間に逐次制約が存在する場合は、wave 候補および依存関係を draft-meta に記録する。
