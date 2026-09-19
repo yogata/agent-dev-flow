@@ -173,7 +173,7 @@ case-open は Root Case 確立時に完了条件を確定しない。
 ```
 ## 完了条件（識別子中心）
 
-- [ ] `agentdev-workflow-case-run` Workflow Skill（`src/opencode/skills/agentdev-workflow-case-run/SKILL.md`）に staleness check Step が追加されていること
+- [ ] `agentdev-workflow-case-run` Workflow Skill（`.opencode/skills/agentdev-workflow-case-run/SKILL.md`）に staleness check Step が追加されていること
 - [ ] 解消対象の NG 違反が解消されていること
 - [ ] IR 違反が 0 件であること（参考: 現行 3 件）
 ```

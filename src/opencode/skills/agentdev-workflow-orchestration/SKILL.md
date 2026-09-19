@@ -92,7 +92,7 @@ Windows + ジャンクション環境の worktree では `.opencode/skills/agent
 | 自律修正ループ、CI 対応ループ、エラー | `references/self-healing-and-errors.md`（自律修正ループ、CI対応、エラー回復マップ） |
 | サブエージェント編集安全手順 | `references/subagent-protocol.md`（oldString最小化、Read検証、大規模ファイル分割、AST-grep推奨、driver 起動プロンプトテンプレート（Windows + ジャンクション環境）） |
 
-case-run 内部 lifecycle 段階の実装本体は `agentdev-workflow-case-run` Workflow Skill（`src/opencode/skills/agentdev-workflow-case-run/SKILL.md`）。
+case-run 内部 lifecycle 段階の実装本体は `agentdev-workflow-case-run` Workflow Skill（`.opencode/skills/agentdev-workflow-case-run/SKILL.md`）。
 command 本文内で case-run を参照する場合はこちらを使用。
 
 ## See Also
