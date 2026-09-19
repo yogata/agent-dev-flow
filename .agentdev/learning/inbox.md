@@ -314,3 +314,21 @@
 - **配布反映先**: integrity/autogen-freshness-gate Design・index-auto-generation Design（計測日導出基準の明示候補）、learning-promote の評価対象
 - **関連**: Case #3011、Epic #3017、fan-in fix 1befae99、check_autogen_freshness.ts、generate_indexes.ts（deriveMeasureDateFromLastCommit）
 - **タグ**: #case-close #squash-merge #AUTOGEN #committer-date #fan-in #autogen-freshness
+
+---
+
+## 2026-09-20: Aborted 中断復帰時の編集漏れ照合は instruction 粒度で行う必要がある
+
+- **問題事象**: case-open 委譲が Root Case 作成・docs 編集 (22 files 変更 + 新規 1) まで完了した後に Session error: Aborted で中断した。冪等再実行時に永続状態 (Root Case Issue・worktree 差分・draft) から再開点を再構成して残工程を完走したが、draft artifact_actions (ACT 15) と実差分の全項目突合で編集漏れ 2 件を検出した (capture-boundaries.md の v4 接続節・検出事項プロトコル帰属宣言追記が未実施〔See Also 張替えのみ実施済み〕、新規 Loop Design の AG-011 先送り記録段落の欠落)。
+- **発生局面**: case-open STEP-3〜4 での中断 → 冪等再実行 (STEP-1 引き継ぎ判定による再開点再構成)。
+- **検知方法**: draft の artifact_actions instruction と git diff の突合をファイル単位でなく instruction 要件単位 (追記べき節・宣言・参照張替えの別) で実施したことにより検出。
+- **根本原因**: 中断時点の編集完了度はファイル単位の近似で判断されやすいが、同一ファイル内の複数 instruction (例: See Also 張替えは済み・節追記は未実施) は部分的に完了し得る。復帰時の照合を「差分ファイルの存在」のみで行うと instruction 粒度の漏れを見逃す。
+- **自律対応内容**: 漏れ 2 件を node writeFileSync (UTF-8 明示) で補完し、commit (99777c7a) → 検証 (check_integrity {ok 792, ng 54, warning 3, info 109}・traceability 942/111/0/0・bun test 3 分割 2558/102/550・ADF-COVERS エントリ比較で追加 49・削除 0 の機械証明) → push → Definition PR #3023 作成 → Root Case #3022 本文への PR 番号埋め戻しまで完走。Root Case 本文の充実度も issue_read で節単位確認した。
+- **ユーザー確認の有無**: なし (冪等再実行委譲内で完結)
+- **Decision/REQ/spec影響**: なし (DEC-011「STEP resume point と会話記憶非依存」の実効確認事例。新規 Decision / REQ 変更なし)
+- **横展開観点**: 中断復帰時の再開点再構成は「永続状態の存在確認」だけでは不十分で、正本 (draft の artifact_actions instruction・Issue 本文の必要節) と実差分の要件単位突合が必要。編集途中の Aborted はどの instruction 境界でも起こり得る。
+- **再発条件**: 長時間委譲が GitHub 書込み・worktree 編集の途中で中断し、再実行時に差分ファイルの存在確認のみで編集完了と判断した場合に再発する。
+- **予防策候補**: case-open 冪等再実行 (STEP-1) の再開手順に「draft artifact_actions の instruction 粒度照合」を明示する (resume protocol の照合単位をファイル単位から instruction 単位へ引き上げ)。
+- **想定反映先**: agentdev-workflow-case-open skill (references/handoff.md または references/definition-pr-and-idempotency.md の冪等再実行節)、learning-promote の評価対象。
+- **関連**: Case #3022、Definition PR #3023、commit 99777c7a、draft req-draft-adf-v4-loop.md (AG-007 / AG-011 / ACT-DESIGN-003)
+- **タグ**: #case-open #冪等再実行 #resume #Aborted復帰 #instruction粒度照合
