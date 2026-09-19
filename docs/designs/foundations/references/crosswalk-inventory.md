@@ -13,10 +13,10 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | REQ-004 | redefine | ― | 4 | executed | req-define 入口の v4 入力意味。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | REQ-005 | redefine | ― | 4 | executed | 内部 lifecycle 状態遷移への回収。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | REQ-006 | redefine | ― | 4 | executed | 自走オーケストレーションの v4 再編。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
-| REQ-007 | redefine | ― | 6 | planned | Quality/Verification/Evidence/Gate 分解 |
+| REQ-007 | redefine | ― | 6 | executed | Quality/Verification/Evidence/Gate 分解。第6段実行 2026-09-19（Case #2997、Definition merge 7d717d8b、実装 merge 95f9655516592b82c710fac55ae6352d981dbcd1・ffccea6a9c35cb32f82428c4a63ffa8389a0993b） |
 | REQ-008 | redefine | ― | 4 | executed | 一時成果物ライフサイクルの v4 整理。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | REQ-009 | redefine | ― | 12 | planned | 配布基盤・導入の migration implementation |
-| REQ-010 | redefine | deterministic code/tool | 6 | planned | 検証基盤の Gate モデル接続 |
+| REQ-010 | redefine | deterministic code/tool | 6 | executed | 検証基盤の Gate モデル接続。第6段実行 2026-09-19（Case #2997、Definition merge 7d717d8b、実装 merge 95f9655516592b82c710fac55ae6352d981dbcd1・ffccea6a9c35cb32f82428c4a63ffa8389a0993b） |
 | REQ-011 | redefine | Adapter | 11 | planned | I/O 境界の adapter 再編 |
 | REQ-012 | redefine | ― | 7 | planned | Change/Evidence 再中心化（DEC-037） |
 | REQ-014 | keep | ― | ― | planned | adversarial-review は v4 でも保持 |
@@ -49,7 +49,7 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | REQ-052 | redefine | Adapter | 11 | planned | Custom Tool・Plugin 種別契約の adapter 再編 |
 | REQ-053 | keep | ― | ― | planned | 文章品質契約は維持 |
 | REQ-054 | keep | ― | ― | planned | 変更誘発境界リスク分析は維持 |
-| REQ-055 | redefine | ― | 6 | planned | Verification/Evidence モデル接続 |
+| REQ-055 | redefine | ― | 6 | executed | Verification/Evidence モデル接続。第6段実行 2026-09-19（Case #2997、Definition merge 7d717d8b、実装 merge 95f9655516592b82c710fac55ae6352d981dbcd1・ffccea6a9c35cb32f82428c4a63ffa8389a0993b） |
 | REQ-056 | keep | ― | ― | planned | Project Knowledge は維持 |
 | REQ-057 | keep | ― | ― | planned | docs corpus 整合は維持 |
 | REQ-058 | keep | ― | ― | planned | 廃止時クリーンアップは維持 |
@@ -128,10 +128,10 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | responsibilities/artifact-contracts.md | redefine | semantic Skill | 8 | planned | アーティファクト契約の v4 再編 |
 | responsibilities/req-impact-map.md | keep | ― | ― | planned | REQ 影響マップは維持 |
 | responsibilities/responsibility-boundary-purification.md | redefine | Adapter | 11 | planned | 責務境界浄化の adapter 再編 |
-| responsibilities/artifact-quality-control-routing.md | redefine | ― | 6 | planned | Gate モデル接続 |
+| responsibilities/artifact-quality-control-routing.md | redefine | ― | 6 | executed | Gate モデル接続。第6段実行 2026-09-19（Case #2997、Definition merge 7d717d8b、実装 merge 95f9655516592b82c710fac55ae6352d981dbcd1・ffccea6a9c35cb32f82428c4a63ffa8389a0993b） |
 | responsibilities/custom-tool-contracts.md | redefine | Adapter | 11 | planned | Custom Tool 操作契約・迂回防止の adapter 再編（REQ-052 対応 Design） |
-| quality/quality-specs.md | redefine | ― | 6 | planned | Quality 5 概念への再編 |
-| quality/quality-gates.md | supersede | ― | 6 | planned | v4-quality-gate-model が承継（DEC-035） |
+| quality/quality-specs.md | redefine | ― | 6 | executed | Quality 5 概念への再編。第6段実行 2026-09-19（Case #2997、Definition merge 7d717d8b、実装 merge 95f9655516592b82c710fac55ae6352d981dbcd1・ffccea6a9c35cb32f82428c4a63ffa8389a0993b） |
+| quality/quality-gates.md | supersede | ― | 6 | executed | v4-quality-gate-model が承継（DEC-035）。第6段実行 2026-09-19（Case #2997、Definition merge 7d717d8b、実装 merge 95f9655516592b82c710fac55ae6352d981dbcd1・ffccea6a9c35cb32f82428c4a63ffa8389a0993b） |
 | quality/req-health-metrics.md | keep | ― | ― | planned | REQ 健全性メトリクスは維持 |
 | quality/design-health-metrics.md | keep | ― | ― | planned | Design 健全性メトリクスは維持 |
 | quality/textlint-quality-runtime.md | keep | ― | ― | planned | textlint 基盤は維持 |
@@ -151,5 +151,5 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | Intake/Learning/Backlog（概念） | redefine | ― | 9 | planned | 継続コラボレーションループ |
 | work_type/scale/workflow_route（概念） | redefine | ― | 5 | executed | 語彙直交性への再定義。第5段实行 2026-09-19（Case #2988、Definition merge b86354a9、実装 merge 0f8b1e10/abf77201/70bf897d、fan-in fix 57664e33） |
 | Epic/Wave（概念） | redefine | ― | 5 | executed | 階層合成・実行スケジューリング。第5段实行 2026-09-19（Case #2988、Definition merge b86354a9、実装 merge 0f8b1e10/abf77201/70bf897d、fan-in fix 57664e33） |
-| QG-1〜QG-4（概念） | redefine | Standard Operating Model | 6 | planned | Quality 5 概念分解・Gate 再導出 |
+| QG-1〜QG-4（概念） | redefine | Standard Operating Model | 6 | executed | Quality 5 概念分解・Gate 再導出。第6段実行 2026-09-19（Case #2997、Definition merge 7d717d8b、実装 merge 95f9655516592b82c710fac55ae6352d981dbcd1・ffccea6a9c35cb32f82428c4a63ffa8389a0993b）。QG-1〜QG-4 の SSoT 所在は quality/v4-quality-gate-model Design（再導出結果表・個別処遇対応表） |
 | 配布物・プロジェクション（概念） | redefine | ― | 12 | planned | migration implementation |
