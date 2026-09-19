@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-close
-description: "case-close command の workflow 実装本体。PR マージ（squash merge 先 main、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase）、同期時のリスク事前検出、QG-4 最終完了判定ゲート、docs 検証・Design 確定、Capture 回収（PR 本文→intake/learning 分離）、Epic Wave クローズを所有する。USE FOR: case-close 実行時の workflow 制御（単一 Issue クローズ・Epic Wave クローズ・PR マージ・QG-4・Design 確定・Capture 回収）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "内部 lifecycle 段階 case-close の workflow 実装本体。PR マージ（squash merge 先 main、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase）、同期時のリスク事前検出、QG-4 最終完了判定ゲート、docs 検証・Design 確定、Capture 回収（PR 本文→intake/learning 分離）、Epic Wave クローズを所有する。USE FOR: case-close 実行時の workflow 制御（単一 Issue クローズ・Epic Wave クローズ・PR マージ・QG-4・Design 確定・Capture 回収）。DO NOT USE FOR: 単独起動（case-auto の内部 lifecycle orchestration から起動される内部段階である）。"
 ---
 
 
@@ -35,7 +35,7 @@ case-close command は公開 interface（入出力契約・ガードレール）
 
 case-close workflow は次の STEP で構成する。
 Epic Wave クローズは STEP-1 のルーティングで分岐し、E1〜E6 として並列記述する。
-各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
+各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<foundations/v4-durable-state-and-recovery>.md`）。
 会話コンテキストに依存せず、永続状態（GitHub Issue/PR、`.agentdev/`、commit hash、Design status）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
@@ -120,7 +120,7 @@ case-run 側の事前検査とは独立に実施する。検証手段との対�
 ## See Also
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
+- **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
 - **case-close command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

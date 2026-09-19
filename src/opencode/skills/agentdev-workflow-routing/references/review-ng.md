@@ -6,9 +6,9 @@
 
 | NG理由 | 定義 | 対応フロー |
 | ------ | ---- | ---------- |
-| 仕様バグ | 要件定義と実装の間に論理的矛盾がある | QG-3 乖離検出結果（`agentdev-quality-gates`）確認 → `/agentdev/case-revise {N}`（Definition 変更の反映）→ `/agentdev/case-ready {N}` → `/agentdev/case-run {N}`（再開） |
-| 実装バグ | 要件定義は正しいが実装が仕様を満たさない | QG-3 乖離検出結果（`agentdev-quality-gates`）確認 → レビューNGコメント投稿（レビューNGテンプレート使用）→ `/agentdev/case-run {N}`（再開） |
-| スコープ外逸脱 | 実装が要件定義の範囲を超えている | `/agentdev/case-revise {N}`（Definition スコープの再定義）→ `/agentdev/case-ready {N}` → 不要な実装を削除 → `/agentdev/case-run {N}` |
+| 仕様バグ | 要件定義と実装の間に論理的矛盾がある | QG-3 乖離検出結果（`agentdev-quality-gates`）確認 → `/agentdev/case-auto` による再開（内部 lifecycle 経路: case-revise〔Definition 変更の反映〕→ case-ready → case-run） |
+| 実装バグ | 要件定義は正しいが実装が仕様を満たさない | QG-3 乖離検出結果（`agentdev-quality-gates`）確認 → レビューNGコメント投稿（レビューNGテンプレート使用）→ `/agentdev/case-auto` による再開（内部 lifecycle 段階 case-run） |
+| スコープ外逸脱 | 実装が要件定義の範囲を超えている | `/agentdev/case-auto` による再開（内部 lifecycle 経路: case-revise〔Definition スコープの再定義〕→ case-ready → 不要な実装を削除 → case-run） |
 
 ### レビューNGコメント
 

@@ -4,10 +4,10 @@
 
 | 条件 | 推論結果 |
 | ---- | -------- |
-| レビュー結果に「仕様バグ」が含まれる | `/agentdev/case-revise {N}` → `/agentdev/case-ready {N}` → `/agentdev/case-run {N}`（再開） |
-| レビュー結果に「実装バグ」が含まれる | `/agentdev/case-run {N}` 再開（Root Case の resume_command。レビューNGコメントは Issue コメントへ記録） |
-| レビュー結果に「スコープ外逸脱」が含まれる | `/agentdev/case-revise {N}` → `/agentdev/case-ready {N}` → 不要実装削除 → `/agentdev/case-run {N}` |
-| レビュー結果がOK | `/agentdev/case-close {N}` |
+| レビュー結果に「仕様バグ」が含まれる | `/agentdev/case-auto` による再開（内部 lifecycle 経路: case-revise → case-ready → case-run） |
+| レビュー結果に「実装バグ」が含まれる | `/agentdev/case-auto` による再開（内部 lifecycle 段階 case-run、Root Case の resume_command。レビューNGコメントは Issue コメントへ記録） |
+| レビュー結果に「スコープ外逸脱」が含まれる | `/agentdev/case-auto` による再開（内部 lifecycle 経路: case-revise → case-ready → 不要実装削除 → case-run） |
+| レビュー結果がOK | `/agentdev/case-auto` 内部 lifecycle 段階 case-close |
 
 ## Epic関連の推論ルール
 
@@ -24,7 +24,7 @@
 
 | 条件 | 推論結果 |
 | ---- | -------- |
-| Issueに `epic` ラベルがある AND 子Issue番号が存在する | `/agentdev/case-run {child1} {child2} ...` （全ての子Issueを並列実行） |
+| Issueに `epic` ラベルがある AND 子Issue番号が存在する | `/agentdev/case-auto` 内部 lifecycle 段階 case-run による全ての子Issueの並列実行 |
 
 ### 子Issueクローズ後の推論ルール
 
@@ -32,5 +32,5 @@
 
 | 条件 | 推論結果 |
 | ---- | -------- |
-| 子Issueクローズ後、親Epicに未クローズの子が残っている | `/agentdev/case-run {next_child}` （次の未クローズ子Issueを実行）または待機 |
-| 子Issueクローズ後、親Epicの全ての子がクローズ済み | `/agentdev/case-close {epic_number}` （Epic自動クローズ） |
+| 子Issueクローズ後、親Epicに未クローズの子が残っている | `/agentdev/case-auto` 内部 lifecycle 段階 case-run で次の未クローズ子Issueを実行、または待機 |
+| 子Issueクローズ後、親Epicの全ての子がクローズ済み | `/agentdev/case-auto` 内部 lifecycle 段階 case-close（Epic自動クローズ） |

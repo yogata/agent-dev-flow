@@ -37,7 +37,7 @@
 2. REQ 行追加を伴う Definition Package 生成時、トレーサビリティポリシー更新の追随要否を確認する。REQ 行の新設・追記を含む場合は、当該行のトレーサビリティポリシー（検証対応を任意とする要件行の明示登録）への追随要否を確認し、必要な policy エントリ追加を Definition Package の構成要素として含める。policy 編集は当該要件行の変更と同一の Definition 変更として扱うため Definition PR 経由以外の適用経路を取らない（直接 main へ適用しない）。policy 登録が不要と判断した場合は、その判断理由を Definition Package 構成案に記録する
 3. `realization_actions` は Definition Package の構成要素として保持する（構造化ハンドオフ: DEC-{N}）。case-open が execution contract を確定しない
 4. 生成した Definition Package を Root Case に関連付ける（Root Case 本文の Definition Package セクションへ所在を記録する）
-5. Definition Package の構成、索引・補助メタデータの具体形式は definition-readiness Design の管理下とする
+5. Definition Package の構成、索引・補助メタデータの具体形式は case-open / case-ready Design の管理下とする
 
 ## Result
 

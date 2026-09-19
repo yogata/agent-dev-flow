@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-ready
-description: "case-ready command の workflow 実装本体。Definition PR 受入（忠実性・整合性・品質検査の確認、isDraft 確認と blocked 停止、自動確定・merge、HITL 停止）、canonical Definition 再取得、Decision 受理評価（accepted 遷移）、execution contract 確定、Standard / Epic 確定（3軸判断、Child Issue / Wave / 依存構造生成、Wave 重複前置検出）、トレーサビリティ完全性ゲート、ready 遷移、draft / RU 削除、冪等再実行を所有する。USE FOR: case-ready 実行時の workflow 制御。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）、Root Case 確立・Definition Package 生成・Definition PR 作成（case-open 側の責務）、実装実行（case-run 側の責務）、PR マージ判定・完了条件チェックボックス評価（case-close 側の責務）。"
+description: "内部 lifecycle 段階 case-ready の workflow 実装本体。Definition PR 受入（忠実性・整合性・品質検査の確認、isDraft 確認と blocked 停止、自動確定・merge、HITL 停止）、canonical Definition 再取得、Decision 受理評価（accepted 遷移）、execution contract 確定、Standard / Epic 確定（3軸判断、Child Issue / Wave / 依存構造生成、Wave 重複前置検出）、トレーサビリティ完全性ゲート、ready 遷移、draft / RU 削除、冪等再実行を所有する。USE FOR: case-ready 実行時の workflow 制御。DO NOT USE FOR: 単独起動（case-auto の内部 lifecycle orchestration から起動される内部段階である）、Root Case 確立・Definition Package 生成・Definition PR 作成（case-open 側の責務）、実装実行（case-run 側の責務）、PR マージ判定・完了条件チェックボックス評価（case-close 側の責務）。"
 ---
 
 
@@ -36,7 +36,7 @@ case-ready command は公開 interface（入出力契約・ガードレール）
 ## 制御平面（STEP 一覧）
 
 case-ready workflow は次の7 STEP で構成する。
-各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`<workflows/step-reference-contract>` Design）。
+各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`<foundations/v4-durable-state-and-recovery>` Design）。
 会話コンテキストに依存せず、永続状態（Root Case Issue、Definition PR、REQ / Decision / Design、Epic Issue、capture 成果物）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
@@ -64,7 +64,7 @@ case-ready workflow は次の7 STEP で構成する。
 
 - 再開点は永続状態から再構成する: Root Case Issue の状態、Definition PR の存在と状態（merge 済みかどうかを含む）、Decision ファイルの status、Epic Issue / 子 Issue の存在、capture 成果物
 - merge 済み Definition PR の検出後は merge を巻き戻さず、canonical Definition（merge 済み main の docs 永続文書）を基準として再開する
-- 冪等キー（definition-readiness Design）で既存成果物を検出し、会話コンテキストの記憶に依存せず再利用する
+- 冪等キー（case-open / case-ready Design）で既存成果物を検出し、会話コンテキストの記憶に依存せず再利用する
 
 ### 終了条件（termination）
 
@@ -111,8 +111,8 @@ case-ready はトレーサビリティ完全性ゲートで、対象要件行の
 ## See Also
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
-- **`<workflows/definition-readiness>` Design**: Definition Package、Definition PR lifecycle、canonical Definition 判定、冪等キー
+- **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
+- **case-open / case-ready Design**: Definition Package、Definition PR lifecycle、canonical Definition 判定、冪等キー
 - **`<workflows/epic-wave-model>` Design**: OU / Epic / Wave / Issue 階層、execution_unit 構成、Wave 重複前置検出
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **case-ready command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

@@ -11,7 +11,7 @@ case-revise workflow STEP-1〜STEP-3 の実行詳細（SKILL.md「制御平面�
 ## STEP-2 実変更判定と冪等検索
 
 - canonical Definition（merge 済み main の docs 永続文書（REQ / Decision / Design）と Issue / Epic 構造の確定状態）と再合意内容の差分を比較し、実変更の有無を判定する
-- 実変更判定と並行して、冪等キー（definition-readiness Design「冪等キー」）で同じ再合意内容に対応する既存 Definition Amendment PR の有無を検索する
+- 実変更判定と並行して、冪等キー（case-open / case-ready Design）で同じ再合意内容に対応する既存 Definition Amendment PR の有無を検索する
 - 分岐:
   - 実変更なし（差分が空）: Amendment PR を作成せず STEP-5 へ進み、execution contract / execution structure の再確定を case-ready へ引き継ぐ。空の Amendment PR を作る経路は存在しない
   - 実変更ありかつ既存 Amendment PR あり: 既存 PR を再利用し、STEP-3 を省略して STEP-4 へ進む（重複生成しない）

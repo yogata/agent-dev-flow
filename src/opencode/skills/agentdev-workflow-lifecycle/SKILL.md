@@ -20,18 +20,18 @@ agentdev系コマンドのフェーズ定義、SSoT遷移、work_type 判定基�
 ### 宣言的定義と Input Resolution
 
 本スキルが提供する宣言的定義は、各 STEP の Input Resolution において永続状態の優先順位の最上位（SSoT 再構成）に位置する。
-優先順位の詳細は `<workflows/input-resolution-and-durable-state>` Design 参照。
+優先順位の詳細は `<foundations/v4-durable-state-and-recovery>` Design 参照。
 
 | 宣言的定義 | SSoT 配置 | 利用 STEP |
 |---|---|---|
-| work_type 判定基準 | 本スキル + `<workflows/workflow-contracts>` Design | case-open / case-run `prepare` STEP |
+| work_type 判定基準 | 本スキル + `<workflows/v4-standard-lifecycle>` Design「work_type / scale / Epic / Wave の v4 意味モデル」節 | case-open / case-run `prepare` STEP |
 | scale 判定基準 | 本スキル | req-define / case-open `prepare` STEP |
 | SSoT 遷移定義 | 本スキル | 全 workflow の STEP transition |
 | 上位への引き継ぎ判定 | 本スキル（`references/upstream-handoff.md`） | 全 workflow の `prepare` STEP |
 | 工程間構造化文脈引き継ぎ | 本スキル（`references/structured-stage-handoff.md`） | 全 workflow の STEP transition、完了報告 |
 | 参照先解決ポリシー（source / projection 目的判別） | 本スキル（`references/reference-resolution.md`） | 全 workflow の canonical_references 生成・消費、配布物参照の読み取り先解決 |
 
-STEP reference 8 要素、STEP 識別子、永続状態復元契約は `<workflows/step-reference-contract>` Design に従う。
+STEP reference 8 要素、STEP 識別子、永続状態復元契約は `<foundations/v4-durable-state-and-recovery>` Design に従う。
 compaction 後の current STEP 復元、ToDo 使用、compaction 検出の実処理は harness 固有（AGENTS.md、harness reference）。
 
 ## work_type とコマンド経路
@@ -40,12 +40,12 @@ work_type は工程分岐の参照軸である。
 全 work_type が GitHub Issue と PR を経由する標準経路をとる。
 Issue/PR をスキップする直接完了経路は存在しない。
 
-`workflow-contracts` Design は bugfix, maintenance, docs_chore を `direct_case` に分類する。
+`v4-standard-lifecycle` Design は bugfix, maintenance, docs_chore を `direct_case` に分類する。
 `direct_case` は Definition 保存工程を別入口で実行しないことを指し、Issue/PR を経由しないことを指さない。
 
 ### 経路一覧
 
-| work_type | scale | コマンド経路 |
+| work_type | scale | 実行経路（内部 lifecycle 段階） |
 |---|---|---|
 | bugfix | - | req-define → case-open → case-run → case-close |
 | maintenance | - | req-define → case-open → case-run → case-close |
@@ -53,7 +53,7 @@ Issue/PR をスキップする直接完了経路は存在しない。
 | feature | standard | req-define → case-open → case-ready → case-run → case-close |
 | feature | large | req-define → case-open → case-ready → case-run → case-close（OU/ 子Issue 構成） |
 
-各コマンドの正式名は `/agentdev/<name>` である（例: `/agentdev/req-define`）。
+req-define は公開コマンド（`/agentdev/req-define`）である。case-* は内部 lifecycle 段階であり、起動入口は標準実行コマンド `/agentdev/case-auto` である。
 一覧は command README 参照。
 
 feature の Definition action は req_draft の `artifact_actions` を case-ready に渡して動的適用する。

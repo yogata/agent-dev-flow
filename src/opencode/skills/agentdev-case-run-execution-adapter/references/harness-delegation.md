@@ -144,7 +144,7 @@ plan_change: なし（委譲中に計画変更が生じた場合は result に�
 ## 委譲識別情報ブロック
 
 委譲 prompt には `<delegation-ident>` ブロックとして委譲識別情報を記録する。
-記録先割当は workflow-contracts Design「ADF 実行識別情報の記録契約」に従い、委譲 prompt が委譲単位識別子の記録先となる。
+記録先割当は v4-durable-state-and-recovery Design「ADF 実行識別情報の記録契約」節に従い、委譲 prompt が委譲単位識別子の記録先となる。
 
 | key | 意味 |
 |---|---|

@@ -24,13 +24,13 @@ canonical Definition との実変更を判定し、実変更がある場合の�
 
 ### STEP-4: 実変更判定と Definition PR 作成
 
-1. 実変更判定: Definition Package と canonical Definition を比較する（definition-readiness Design「canonical Definition の判定」）。差分が空の場合は実変更なし → PR を作成せず STEP-5 へ進む。実変更のない Case（bugfix / maintenance / docs_chore 等では作成しない）
+1. 実変更判定: Definition Package と canonical Definition を比較する（case-open / case-ready Design）。差分が空の場合は実変更なし → PR を作成せず STEP-5 へ進む。実変更のない Case（bugfix / maintenance / docs_chore 等では作成しない）
 2. 実変更がある場合: 実変更を Case 単位で 1 件の Definition PR として集約し作成する。1 Case につき 2 件以上作成しない
 3. PR 作成は `agentdev_gh` の pr_create で行い、GitHub Draft PR ではない通常 Pull Request として作成する（draft 指定は公開契約に存在しない。REQ-{NNNN}-{NNN}）。PR 本文は verbatim で記録する
 
 ### STEP-5: 冪等再実行確認
 
-1. 冪等キー（definition-readiness Design「冪等キー」）で既存成果物を検出する: 既存 Root Case、既存 Definition PR
+1. 冪等キー（case-open / case-ready Design）で既存成果物を検出する: 既存 Root Case、既存 Definition PR
 2. 検出した成果物を再利用し、重複生成しない。Root Case の重複は STEP-2 で、Definition PR の重複は STEP-4 で排除する
 3. 不足分だけを処理する: Root Case が存在し Definition PR が存在しない場合は STEP-4 の手順で PR のみ作成する。Root Case が存在しない場合は STEP-2 から実行する。両者とも存在する場合は新規生成を行わない
 4. 重複生成がないことを確認し、結果を記録する

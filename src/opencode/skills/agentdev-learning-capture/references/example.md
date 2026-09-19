@@ -59,7 +59,7 @@ SKILL.md 本文では実観測原則、 trigger、禁止事項、 split rule の
 - **再発条件**: `agentdev-conventional-commits` スキルをロードせずにコミットメッセージを生成する場合
 - **予防策候補**: case-run や case-close のコミット生成ステップに agentdev-conventional-commits スキルのロードを必須化する
 - **想定反映先**: `agentdev-conventional-commits` スキル、`case-run` コマンド
-- **関連**: `.opencode/skills/agentdev-conventional-commits/SKILL.md`, `.opencode/commands/agentdev/case-run.md`
+- **関連**: `.opencode/skills/agentdev-conventional-commits/SKILL.md`, `.opencode/skills/agentdev-workflow-case-run/SKILL.md`
 - **タグ**: `#ci` `#コミットメッセージ` `#テンプレート逸脱`
 ```
 

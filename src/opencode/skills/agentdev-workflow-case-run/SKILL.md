@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-run
-description: "case-run command の workflow 実装本体。単一 Issue 実行（single workflow）と Epic Wave 実行（epic-wave workflow）の 1:N 分離構成、実行担当サブエージェント委譲（最大5件並列）、fan-out・fan-in、partial result、child task recovery、result 4状態処理を所有する。USE FOR: case-run 実行時の workflow 制御（single Issue 実行・Epic Wave 実行・再開フェーズ判定・委譲・前置/最終 gate）。DO NOT USE FOR: 実装実行そのもの（委譲内の実行担当サブエージェントが担う）、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "内部 lifecycle 段階 case-run の workflow 実装本体。単一 Issue 実行（single workflow）と Epic Wave 実行（epic-wave workflow）の 1:N 分離構成、実行担当サブエージェント委譲（最大5件並列）、fan-out・fan-in、partial result、child task recovery、result 4状態処理を所有する。USE FOR: case-run 実行時の workflow 制御（single Issue 実行・Epic Wave 実行・再開フェーズ判定・委譲・前置/最終 gate）。DO NOT USE FOR: 実装実行そのもの（委譲内の実行担当サブエージェントが担う）、単独起動（case-auto の内部 lifecycle orchestration から起動される内部段階である）。"
 ---
 
 
@@ -56,7 +56,7 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 
 ## 制御平面（STEP 一覧）
 
-各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
+各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<foundations/v4-durable-state-and-recovery>.md`）。
 会話コンテキストに依存せず、永続状態（GitHub Issue/PR、Issue コメント、worktree・ブランチの存在、PR URL）から再開点を再構成する。
 
 ### single workflow（単一 Issue 実行モード）
@@ -130,7 +130,7 @@ case-run の実行担当（委譲内サブエージェント）は、対象要�
 
 ## 共通制約
 
-- **スコープ**: 単一 Issue または単一 Wave のみを処理する。Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）は扱わない（workflow-contracts Design SC-{NNN}、extension 経由で解決）
+- **スコープ**: 単一 Issue または単一 Wave のみを処理する。Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）は扱わない（v4-lifecycle-state-machine Design、extension 経由で解決）
 - **統合先基準（作業起点・PR base）**: worktree の作成元と PR の base は main を参照する。rebase・同期基準、鮮度確認、Epic 後続 Wave の作業起点も main を参照する
 - **実装実行の非所有**: case-run 本体は work plan 生成、実装、TDD、乖離検出、specs 更新、PR 本文作成、PR 作成を行わない（実行担当サブエージェント責務、adapter protocol 参照）
 - **SSoT**: blocked/failed の詳細本文 SSoT は Issue コメント。completed の SSoT は PR 本文。verify-only closure（PR も carrier commit も存在しない Issue 完了）ではこの例外として、検証証跡（3検査+integrity suite の結果と再実行可能な実行コマンド列）を SSoT コメント（Issue コメント）へ記録する。一時会話コンテキスト、中間ファイルは SSoT としない
@@ -146,7 +146,7 @@ case-run の実行担当（委譲内サブエージェント）は、対象要�
 ## See Also
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
+- **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
 - **case-run command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）
