@@ -63,3 +63,10 @@ AgentDevFlow のフェーズ定義、SSoT 遷移、work_type 判定基準、ス�
 - REQ-001（Decision ライフサイクル、文書体系基盤）
 - REQ-005（workflow-lifecycle 宣言的純化）
 
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: semantic classification（work_type・Scale 判定）
+- **deterministic 委譲先**: なし
+- **知識提供**: SSoT 遷移・コマンド対応・引き継ぎ停止判定

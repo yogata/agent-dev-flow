@@ -123,3 +123,10 @@ pass_criteria が「存在」「変更」を検証する場合、対象に応じ
 - [commands/req-define.md](../commands/req-define.md)
 - REQ-004（要件定義、保存）
 
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: requirement analysis
+- **deterministic 委譲先**: なし
+- **知識提供**: 要件品質基準・Decision 閾値判断
