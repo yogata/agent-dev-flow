@@ -113,7 +113,8 @@ case-ready はトレーサビリティ完全性ゲートで、対象要件行の
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
 - **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **case-open / case-ready Design**: Definition Package、Definition PR lifecycle、canonical Definition 判定、冪等キー
-- **`<workflows/epic-wave-model>` Design**: OU / Epic / Wave / Issue 階層、execution_unit 構成、Wave 重複前置検出
+- **`<workflows/v4-standard-lifecycle>` Design**: work_type / scale / Epic / Wave の v4 意味モデル（OU / Epic / Wave / Issue 階層の語彙）
+- **case-open / case-ready Design**: execution_unit 構成（連結成分・3軸判断の機械的判定手順を含む）と Wave 構成・Wave 重複前置検出
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **case-ready command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）
 - **case-open workflow スキル**: 前工程（Root Case 確立と Definition Package 生成、Definition PR 作成）

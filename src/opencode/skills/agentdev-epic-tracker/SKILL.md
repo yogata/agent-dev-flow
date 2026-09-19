@@ -6,7 +6,7 @@ description: Updates parent Epic Issue status tracking tables in case-close work
 # Epic 状態追跡（Epic Status Tracker）
 
 親Epic Issueのステータス追跡テーブル（`pending`/ `completed`/ `blocked`/ `failed`）を更新する知識ベースである。
-`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文（永続状態）には書き込まれない（Decision 単一書き手制約、epic-wave-model Design 参照）。
+`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文（永続状態）には書き込まれない（Decision 単一書き手制約、v4-lifecycle-state-machine Design「二層状態モデル」参照）。
 
 - **参照元**: `case-close`（completed/ blocked/ failed 更新、単一書き手）。`case-auto`、`case-run` は Epic Issue 本文を読み取るのみで書き込まない
 - **`⏭スキップ` は採用しない**。前提未達の Issue は `pending` のまま選択対象外となる。Wave status は保存せず、Wave 内 Issue 状態から導出する
@@ -32,7 +32,7 @@ description: Updates parent Epic Issue status tracking tables in case-close work
 
 ## ステータス値定義
 
-子Issue 実行状態 enum（epic-wave-model Design「子Issue実行状態 enum」参照）:
+子Issue 実行状態 enum（v4-lifecycle-state-machine Design「二層状態モデル」「階層合成」参照）:
 
 | 値 | 意味 | 設定主体 | 終了状態 |
 |---|---|---|---|

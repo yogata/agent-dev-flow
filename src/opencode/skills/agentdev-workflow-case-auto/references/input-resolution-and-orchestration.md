@@ -115,7 +115,7 @@ STEP-8（停止時報告）・STEP-8（完了報告）での所要時間算出�
 
 1. SSoT 再構成: 各工程の durable state（REQ/Decision/Design ファイル、Issue/PR、Epic Issue 本文）
 2. identifier 保持: Issue番号、PR番号、OU ID、draft パス、RU パス
-3. 最小 scalar: L1 工程別タイムスタンプ、stage 3 並列数（最大5件、起動間隔10秒。epic-wave-model Design「並列起動の間隔」）
+3. 最小 scalar: L1 工程別タイムスタンプ、stage 3 並列数（最大5件、起動間隔10秒。v4-runtime-execution-model Design「runtime 制御ループ」節〔起動間隔・並列数制御〕）
 4. runtime artifact: なし（委譲工程内部の過程は親コンテキストに累積しない、command 不変条件）
 
 ### Preconditions
@@ -144,8 +144,8 @@ OU の統合・分割・REQ 操作分類・Issue 階層判定を再評価しな�
 当該 stage に属する全対象が正常完了し、または当該実行において後続 stage へ進めないことが既存契約上確定した結果（blocked / failed / delegation-unavailable 等の後続不能確定）に収束するまで次 stage を開始せず（未実行・実行中・状態不明・再試行要否未確定対象の残存は収束済みとしない）、後続不能対象を後続 stage の対象から除外しその存在だけを理由として独立した他対象の進行を停止しない（case-auto 実行契約）。
 main への push、capture、commit、同一 Epic Issue 本文への更新等の競合する共有書き込みは、当該競合部分のみを必要な最小単位で局所的に直列化し、当該競合と無関係な対象の並列実行を妨げず、stage 全体を一括して扱う直列集約ポイントを設けない（case-auto 実行契約。共有資源カテゴリと直列化単位の運用表は case-auto Design「複数 execution_unit 並列 orchestration」節参照）。
 クリーンアップ検証ゲート（ドラフト残存、RU 残存の検証）を stage 2 の対象群収束後・stage 3 開始前に実行し、評価対象を stage 2 を正常完了した対象に限定する（case-auto 実行契約）。
-scheduling 制約（最大同時起動数・起動間隔・順次フォールバック）による batch 分割を orchestration stage の分割として扱わない（epic-wave-model Design「ドラフト間並列実行モデル」）。
-Epic execution_unit の Wave 間および最終 Wave の case-close(#epic) は Wave 反復を進行・完結させる stage 3 内部の状態遷移処理であり stage 4 の開始とみなさず、stage の分類は orchestration 上の位置づけにより行い command 名単独では分類しない（epic-wave-model Design「ドラフト間並列実行モデル」）。
+scheduling 制約（最大同時起動数・起動間隔・順次フォールバック）による batch 分割を orchestration stage の分割として扱わない（case-auto Design「ドラフト間並列実行モデル」）。
+Epic execution_unit の Wave 間および最終 Wave の case-close(#epic) は Wave 反復を進行・完結させる stage 3 内部の状態遷移処理であり stage 4 の開始とみなさず、stage の分類は orchestration 上の位置づけにより行い command 名単独では分類しない（case-auto Design「ドラフト間並列実行モデル」）。
 
 #### stage 1 収束条件と横断依存検査（全対象確立後・case-auto 側で横断評価）
 
@@ -159,7 +159,7 @@ stage 1（case-open）の収束条件には、全対象確立後の横断依存�
 横断依存検査の単独起動（case-open STEP-5）と case-auto 側の横断評価は二重実行とせず、case-auto 側評価は全対象確立を前提とした population 補完の位置づけである。
 
 順次フォールバック可能（command 不変条件）。
-並列起動時は委譲起動ごとに10秒の起動間隔を置き、同一Tool一括ブロックでの複数起動発行は行わない（epic-wave-model Design「並列起動の間隔」）。起動間隔は stage 3（case-run 子 task 委譲）に限らず stage 1（case-open / case-revise 委譲）・stage 2（case-ready 委譲）・stage 4（case-close 委譲）の並列委譲起動にも同一に適用する。
+並列起動時は委譲起動ごとに10秒の起動間隔を置き、同一Tool一括ブロックでの複数起動発行は行わない（v4-runtime-execution-model Design「runtime 制御ループ」節〔起動間隔・並列数制御〕）。起動間隔は stage 3（case-run 子 task 委譲）に限らず stage 1（case-open / case-revise 委譲）・stage 2（case-ready 委譲）・stage 4（case-close 委譲）の並列委譲起動にも同一に適用する。
 bg task 破棄検知時の3状態回復は `agentdev-workflow-orchestration` 参照。
 
 #### Wave 反復制御（case-auto 直接制御、stage 3 内部処理）
@@ -213,7 +213,7 @@ case-open の判定結果に従う。
 
 ### Resume-Idempotency
 
-- 各工程の durable state（Issue/PR、REQ/Decision/Design ファイル、Epic Issue 本文）から進捗を再構成する。現在 stage は stage cursor を新たな正規状態として保存せず、起動時対象集合と各対象の正規状態から最も早い未収束 stage として再構成し、完了済み対象を再実行せず単一対象を後続 stage へ先行させない（epic-wave-model Design「ドラフト間並列実行モデル」。case-open 成功後は draft を読まない、command 不変条件）
+- 各工程の durable state（Issue/PR、REQ/Decision/Design ファイル、Epic Issue 本文）から進捗を再構成する。現在 stage は stage cursor を新たな正規状態として保存せず、起動時対象集合と各対象の正規状態から最も早い未収束 stage として再構成し、完了済み対象を再実行せず単一対象を後続 stage へ先行させない（case-auto Design「ドラフト間並列実行モデル」。case-open 成功後は draft を読まない、command 不変条件）
 
 ## resume point
 

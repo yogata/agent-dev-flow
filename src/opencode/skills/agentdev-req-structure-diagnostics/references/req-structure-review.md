@@ -160,7 +160,7 @@ ID 汚染（前節）が 0 件でも本検査は実施する。
 | command 本体 ↔ 関連 skill | 当該 command の責務、権限、禁止事項が skill 記述と矛盾していないか |
 | case-open ↔ case-run ↔ case-close ↔ case-auto | 責務境界（PR 作成、Wave 境界、Epic Issue 単一書き手、クリーンアップ、委譲モデル）が全ての記述元で一致しているか |
 
-判定の SSoT 優先順位: 現行 REQ > 承認済み Decision > Design（command Design 群、epic-wave-model Design）> command 本体 > skill。
+判定の SSoT 優先順位: 現行 REQ > 承認済み Decision > Design（command Design 群、v4-standard-lifecycle / v4-lifecycle-state-machine / v4-runtime-execution-model Design）> command 本体 > skill。
 
 ### NG 分類
 

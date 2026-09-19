@@ -1,7 +1,7 @@
 # 実行構造確定（STEP-5）
 
 execution contract 確定後の Standard / Epic 確定、Child Issue / Wave / 依存構造の生成、構成検証の実行時詳細である。
-OU / Epic / Wave / Issue 階層、連結成分アルゴリズム、3軸判断モデルの正規所有は Epic / Wave / Issue 実行モデル Design（機械的判定手順は同 Design の execution_unit 構成アルゴリズム参照）である。
+OU / Epic / Wave / Issue 階層の語彙意味の正規所有は v4-standard-lifecycle Design「work_type / scale / Epic / Wave の v4 意味モデル」節、連結成分アルゴリズムと 3軸判断モデルの正規所有は case-open Design（運用主体。機械的判定手順は execution_unit 構成アルゴリズム参照）である。
 
 ## Standard / Epic 確定
 
@@ -9,7 +9,7 @@ OU / Epic / Wave / Issue 階層、連結成分アルゴリズム、3軸判断モ
 - 依存強度、Epic サイズ、機能的一貫性の3軸で最終 Issue 構成を自律生成する。複数 Standard、複数 Epic、混在のいずれも作成できる
 - 単独根（1 operation_unit だけの連結成分）は Epic 化せず Standard flow として扱い、Root Case 自身を単一 execution unit とする
 - 無関係な operation_unit 群を単一 Epic へ機械的に集約しない
-- Epic サイズ上限と Wave 同時実行上限を実行安全境界として遵守する（数値の詳細は Epic / Wave 実行モデル Design）
+- Epic サイズ上限と Wave 同時実行上限を実行安全境界として遵守する（数値の詳細は v4-runtime-execution-model Design「runtime 制御ループ」節）
 
 ## Epic 確定時の生成物
 
