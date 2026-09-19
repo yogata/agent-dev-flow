@@ -155,6 +155,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [workflows/references/execution-unit-construction.md](workflows/references/execution-unit-construction.md) | accepted | execution_unit 構成アルゴリズム参照 | v4-standard-lifecycle（語彙）と case-open Design（運用主体）から参照される連結成分アルゴリズム、3軸判断モデルの機械的判定手順 |
 | [workflows/v4-standard-lifecycle.md](workflows/v4-standard-lifecycle.md) | accepted | ADF v4 標準ライフサイクル | v4 標準ライフサイクルの定義（work_type/scale/Epic/Wave の語彙直交性、公開 UX 2入口収斂と内部 lifecycle への回収、req-define 入口の入力意味、継続コラボレーションループ） |
 | [workflows/v4-lifecycle-state-machine.md](workflows/v4-lifecycle-state-machine.md) | accepted | ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応） | v4 ライフサイクル状態機械の定義（durable state enum と runtime 実行状態の二層モデル、階層合成〔子=実状態、上位=導出投影〕、deterministic/semantic gate 分離、v3 command と内部状態遷移の対応表、v3 状態関連 Design の planned supersede 記録） |
+| [workflows/v4-collaboration-loop.md](workflows/v4-collaboration-loop.md) | accepted | ADF v4 継続コラボレーションループ | 循環の各段責務（Observe・Integrate 定義、実現手段対応表）、Learning 評価結果 7 系統、昇格ガード、.agentdev/ 状態領域の整合、v3 backlog-artifact-lifecycle Design からの吸収 |
 
 ### 基盤 Design 一覧（6 ドメイン配下）
 

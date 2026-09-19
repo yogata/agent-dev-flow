@@ -2,8 +2,9 @@
 title: ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応）
 status: accepted
 created: 2026-09-19
-updated: 2026-09-19
+updated: 2026-09-20
 ---
+<!-- ADF-COVERS(implementation): REQ-008-003, REQ-008-008, REQ-008-036, REQ-008-037 -->
 <!-- ADF-COVERS(implementation): REQ-005-001, REQ-005-025, REQ-005-026, REQ-005-027, REQ-005-028, REQ-035-004, REQ-035-005 -->
 
 # ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応）
@@ -71,6 +72,7 @@ v4 ライフサイクル状態は、durable state enum（永続状態）と runt
 - 子Issue 実行状態（永続系 5 状態）と case-run result 4 状態、verify-only closure
 
 統合対象外の関連状態空間として、追跡Issue 6 状態（created/in-discussion/on-hold/ready/resolved/closed）を挙げる。追跡Issue lifecycle は Case 実行ライフサイクルの外の独立状態空間であり、本機械の部分ビューに含めない。
+v3 backlog-artifact-lifecycle Design の RU/draft 状態・削除契約は本 Design の RU/採用済み成果物/draft lifecycle 部分ビュー定義へ承継された（承継分配の正は第9段 Root Case #3022。配置・権威の詳細は v4-durable-state-and-recovery Design 参照）。
 
 ## v3 状態関連 Design の処遇（planned supersede 記録）
 

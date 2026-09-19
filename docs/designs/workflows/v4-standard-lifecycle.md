@@ -38,3 +38,6 @@ Observe -> Intake/Learning -> Backlog -> req-define -> REQ/Decision/Design -> ca
 
 - Intake は未処理の開発需要の受容、Learning は実行経験から得た再利用可能な知識の評価を担う
 - Learning の評価結果は寿命と内容に応じて 7 系統（Knowledge、Decision、Project Policy、Design update、REQ update、Intake/Backlog、一時的記録の終了）へ振り分ける
+- Loop 詳細（循環の各段責務、Observe と Integrate の責務定義、Learning 評価結果 7 系統の詳細、昇格ガード、.agentdev/ 状態領域の整合、v3 backlog-artifact-lifecycle Design からの吸収）は v4-collaboration-loop Design が所有する
+- Observe = 検出と回収（inspect 系コマンドの検出、クローズ済み GitHub 成果物からの回収（intake-from-github）、case-close における PR 本文 Capture 回収）。新規コマンドを増設しない
+- Integrate = 検証結果の統合と正規成果物の確定（case-close における PR マージ、docs 確定、Close 処理）

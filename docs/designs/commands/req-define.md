@@ -2,8 +2,9 @@
 title: req-define Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-19"
+updated: "2026-09-20"
 ---
+<!-- ADF-COVERS(implementation): REQ-008-018, REQ-008-019, REQ-008-020, REQ-008-021, REQ-008-023, REQ-008-024, REQ-008-025, REQ-008-026, REQ-008-027, REQ-008-028, REQ-008-029, REQ-008-030, REQ-008-031, REQ-008-034, REQ-008-035, REQ-008-038, REQ-008-039, REQ-008-040, REQ-008-042, REQ-008-043, REQ-008-044, REQ-008-045, REQ-008-046, REQ-008-050, REQ-008-051, REQ-008-054, REQ-008-058 -->
 
 <!-- ADF-COVERS(implementation): REQ-021-011, REQ-021-022 -->
 <!-- ADF-COVERS(design): REQ-021-012, REQ-021-023, REQ-021-028, REQ-021-029 -->
@@ -472,7 +473,7 @@ req-define は、既存の明示的な対応関係（`agentdev-traceability` の
 
 - [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（フェーズ定義、SSoT 遷移）
 - [workflows/v4-delegation-contracts.md](../workflows/v4-delegation-contracts.md)（extraction / classification 委譲）
-- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（REQ再構成 intake、draft lifecycle）
+- [workflows/v4-collaboration-loop.md](../workflows/v4-collaboration-loop.md)（ループ統合: RU または明示入力ファイル経由の入力経路。v3 ライフサイクル Design からの吸収記録〔artifact_actions ベース工程分岐の帰属〕）
 - [req-health-metrics.md](../quality/req-health-metrics.md)（SPLIT 予兆計測閾値）
 - [v4-quality-gate-model.md](../quality/v4-quality-gate-model.md)（QG-1）
 - [document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md)（draft body 品質検査）

@@ -153,11 +153,16 @@ req-define の明示入力としてルーティングする（backlog-review 経
 - case-run 退避方針: case-run command Design 参照
 - case-close post-run capture: case-close command Design 参照
 
+## v4 継続コラボレーションループへの接続
+
+本 Design が定義する intake / learning 境界は、v4 継続コラボレーションループ（v4-collaboration-loop Design）における Observe から Intake・Learning への流入境界として位置づく。capture 成果物の配置とライフサイクルの整合は v4-collaboration-loop Design「.agentdev/ 状態領域の整合」節が、状態遷移は v4-lifecycle-state-machine Design が所有する。
+v3 backlog-artifact-lifecycle Design の検出事項プロトコル（検出事項の保存・分類・昇格の入力契約）は本 Design が引き継ぐ（redefine 先）。節内容の帰属の記録は v4-collaboration-loop Design「v3 backlog-artifact-lifecycle Design からの吸収」節が所有する。
+
 ## See Also
 
 - [v4-lifecycle-state-machine.md](v4-lifecycle-state-machine.md)（ワークフロー全体契約）
 - [../foundations/v4-runtime-execution-model.md](../foundations/v4-runtime-execution-model.md)（Epic Issue 本文の単一書き手〔直列化単位表〕）
-- [backlog-artifact-lifecycle.md](backlog-artifact-lifecycle.md)（採用済み成果物 lifecycle）
+- [v4-collaboration-loop.md](v4-collaboration-loop.md)（継続コラボレーションループ: ループ各段責務、採用済み成果物の .agentdev/ 状態領域の整合、v3 backlog-artifact-lifecycle Design からの吸収記録）
 - [../responsibilities/artifact-contracts.md](../responsibilities/artifact-contracts.md)（Command→Skill 依存方向、`Capture結果` 小節の共通意味契約）
 - 各 command Design（`docs/designs/commands/`）
 - `agentdev-workflow-orchestration` skill（capture 境界の詳細）

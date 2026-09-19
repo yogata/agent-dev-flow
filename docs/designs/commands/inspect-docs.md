@@ -2,7 +2,7 @@
 title: inspect-docs Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-19"
+updated: "2026-09-20"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-021 -->
@@ -82,7 +82,7 @@ agentdev-traceability の coverage, impact, check を一般文書探索、構造
 ## 参照する横断 Design
 
 - [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（コマンド分類）
-- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（検出事項プロトコル、inspect-promote 自動 promote 連携）
+- [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（検出事項プロトコル〔v4 帰属先〕）、[workflows/v4-collaboration-loop.md](../workflows/v4-collaboration-loop.md)（ループ統合: 検出事項の入力経路）
 
 ## 対象外
 

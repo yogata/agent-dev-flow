@@ -2,7 +2,7 @@
 title: intake-promote Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-19"
+updated: "2026-09-20"
 ---
 <!-- ADF-COVERS(implementation): REQ-015-006 -->
 <!-- ADF-COVERS(implementation): REQ-037-001, REQ-037-003, REQ-037-004, REQ-037-005 -->
@@ -94,7 +94,7 @@ intake-promote は change_nature と併せて、observed_evidence（根拠とな
 ## 参照する横断 Design
 
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 境界、Split Rule）
-- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（採用済み成果物 lifecycle）
+- [workflows/v4-collaboration-loop.md](../workflows/v4-collaboration-loop.md)（Intake 段の責務、採用済み成果物の .agentdev/ 状態領域の整合）
 
 ## 自律確定の判定位置とHITLフォールバック（新規セクション）
 

@@ -2,8 +2,9 @@
 title: ADF v4 durable state と再構成・恢復（配置表・権威移行・部分失敗調整）
 status: accepted
 created: 2026-09-19
-updated: 2026-09-19
+updated: 2026-09-20
 ---
+<!-- ADF-COVERS(implementation): REQ-001-034, REQ-001-043, REQ-008-001, REQ-008-002, REQ-008-004, REQ-008-005, REQ-008-006, REQ-008-007, REQ-008-009, REQ-008-012, REQ-008-014 -->
 <!-- ADF-COVERS(implementation): REQ-002-036, REQ-005-002, REQ-005-003, REQ-005-004, REQ-005-024, REQ-048-001, REQ-048-002, REQ-048-003, REQ-048-004, REQ-048-005 -->
 
 # ADF v4 durable state と再構成・恢復（配置表・権威移行・部分失敗調整）
@@ -23,6 +24,7 @@ durable state 関連の情報を次の 5 分類に配置する。各論理状態
 | 導出可能情報 | 現在 stage、workflow route、Wave 状態、Epic 集約、進捗表、索引類 | 保存しない（正規状態から再構成） | （保存しない） |
 
 8 情報寿命（ADF lifetime、Project lifetime、Architecture lifetime、Requirement lifetime、Change/Case lifetime、Runtime lifetime、reusable Knowledge、未評価 Observation）と各分類の対応は本表の寿命列が基準とする。docs/knowledge/ の知識は repo 内正規状態（reusable Knowledge）に配置する。未評価 Observation（learning/intake の未評価エントリ）は repo 内正規状態（.agentdev/ ドメイン状態）として保存し、評価結果は昇格ガード（DEC-033）に従って振り分けられる。
+REQ-001-034「状態保持領域内の作業用ドラフトは正規のドメイン状態ではなく、コマンド間引き渡し用の中間成果物であること」は Case 状態機械上の正規状態（durable state enum）を指し、本表の「repo 内正規状態（drafts 含む）」は durable state 配置分類（保存権威の置き場所）を指すため、両者は権威クラスを異にして調和する（v3 backlog-artifact-lifecycle Design 配置系 11 識別子の承継・分配の正は第9段 Root Case #3022）。
 
 ## 状態と証跡の分離
 

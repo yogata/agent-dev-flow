@@ -2,7 +2,7 @@
 title: learning-promote Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-19"
+updated: "2026-09-20"
 ---
 <!-- ADF-COVERS(implementation): REQ-015-007 -->
 <!-- ADF-COVERS(implementation): REQ-038-001, REQ-038-002, REQ-038-003, REQ-038-004, REQ-038-005 -->
@@ -109,7 +109,7 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
 ## 参照する横断 Design
 
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 境界）
-- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（採用済み成果物 lifecycle）
+- [workflows/v4-collaboration-loop.md](../workflows/v4-collaboration-loop.md)（Learning 段の責務、7 系統振り分け、採用済み成果物の .agentdev/ 状態領域の整合）
 
 ## 自律確定の判定位置とHITLフォールバック（新規セクション）
 
