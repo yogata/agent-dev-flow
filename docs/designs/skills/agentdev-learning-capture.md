@@ -82,3 +82,10 @@ command は他 command を直接呼び出さず、Skill へ一方向に委譲す
 - [../workflows/capture-boundaries.md](../workflows/capture-boundaries.md)
 - [commands/case-close.md](../commands/case-close.md)
 
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: learning evaluation（学び抽出判断）
+- **deterministic 委譲先**: なし
+- **知識提供**: inbox entry schema・Split Rule

@@ -80,3 +80,11 @@ REQ ファイルの作成、追記、更新を管理する知識ベースとし�
 - [agentdev-decision-file-manager.md](agentdev-decision-file-manager.md)
 - REQ-001（文書、REQ 管理基準）
 - REQ-004（要件定義、保存）
+
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: 0 件
+- **deterministic 委譲先**: ID 採番 → scripts/src/alloc-req-number.ts・alloc-composite-id.ts
+- **知識提供**: CREATE/APPEND/UPDATE 判断・既存 REQ 照合

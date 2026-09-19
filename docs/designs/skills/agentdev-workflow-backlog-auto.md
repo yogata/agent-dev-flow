@@ -85,3 +85,11 @@ manager-orchestrator（既存の実装分類を利用する）
 - 工程間の開始順序と開始条件ゲートが守られること（inspect-docs 正常終了前の昇格3系統非開始、全系統正常完了前の backlog-review 非開始）
 - 競合処理の直列化と系統識別付きユーザー対話が機能すること
 - 中断時・再実行時に完了済み工程の重複実行と未完了工程の誤認がないこと
+
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: 0 件
+- **deterministic 委譲先**: Wave scheduling（fan-in 判定）は委譲先未整備の債務（第13段 full validation で再評価）
+- **知識提供**: orchestration stage 構成・停止伝播・resume 契約

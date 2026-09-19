@@ -75,3 +75,10 @@ updated: 2026-07-27
 - REQ-002（Project Extensions 機構と配布物参照境界）
 - DEC-006（inspect 3-command 構成への正規化）
 
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: 0 件
+- **deterministic 委譲先**: parsing/validation（extension 状態解決）→ scripts/lib/extension_state.ts
+- **知識提供**: 5 セクション読込契約（fail-open）

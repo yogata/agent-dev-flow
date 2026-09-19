@@ -61,3 +61,10 @@ case-run の状態機械、サブエージェントプロトコル、自律修�
 - [../workflows/capture-boundaries.md](../workflows/capture-boundaries.md)
 - REQ-006（case-run / 実装パイプライン）
 
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: 0 件
+- **deterministic 委譲先**: 状態遷移・依存判定（deterministic 11 項目該当）は委譲先未整備の債務（現行は workflow 実装内）
+- **知識提供**: case-run 状態機械・self-healing・委譲プロトコル

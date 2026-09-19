@@ -259,3 +259,10 @@ REQ-048-014 のとおり REQ-048 の成立条件として固定しない。形�
 既存記録への遡及適用はせず、新規作成の対応記録から適用する。
 
 
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: 0 件
+- **deterministic 委譲先**: なし（テンプレート本体は Template 種別資産）
+- **知識提供**: テンプレート選定規則・セクション規約

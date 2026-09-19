@@ -42,3 +42,11 @@ updated: 2026-09-08
 12. **再オープン遷移（拡張）**: 追跡Issueの再オープンは closed → in-discussion（再検討）へ遷移させる。再オープンによって kind と通常ラベルを失わない。GitHub 版では Tool が状態ラベルの再付与によって遷移を機械適用する。ローカル版の role: case は終端状態からの遷移を定義しないため、reopen を拒否する（ローカルIssue共通スキーマ Design の role: case 状態遷移と整合）
 13. **ローカル版追跡Issueの labels 値域**: ローカル版 role: tracking の `labels` は kind 4値（`problem`、`idea`、`task`、`risk`）からちょうど 1 つを持つ（機械検証）。追加ラベルは許容しない（role ごとの値域検証の実効性のため）
 14. **Comment 更新・削除の利用規律（新規）**: comment_update と comment_delete は Comment を管理する汎用操作として Tool に提供される。追跡Issueの検討経過コメントへの適用は、時系列履歴の整合を損なわない範囲（誤記修正、機密情報の除去、重複の統合、直前誤投稿の訂正等）に限る。適用可否の判断規律の正は agentdev-issue-tracking Capability Skill の操作知識が単一参照点として所有し、操作能力を利用する workflow はこれに従う。本項は検討経過コメントが正規の時系列履歴である要件（REQ-049-012）との整合境界を定める
+
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: 0 件
+- **deterministic 委譲先**: 状態遷移・物理ラベル写像 → Custom Tool agentdev_gh 内実装
+- **知識提供**: 追跡Issue論理スキーマ・本文標準構造

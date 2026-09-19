@@ -85,3 +85,11 @@ Decision 対応の欠落は不合格としない。
 
 - ワークフロー統合の工程割り当て（REQ-021、各 command Design）
 - 性能の数値基準（受け入れ基準を設けない）
+
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: 0 件（対応解釈は知識提供）
+- **deterministic 委譲先**: traceability extraction / evidence aggregation / validation → scripts/src/check.ts・coverage.ts・impact.ts + lib
+- **知識提供**: coverage/impact/check の解釈
