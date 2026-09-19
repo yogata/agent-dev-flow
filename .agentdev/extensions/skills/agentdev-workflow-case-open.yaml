@@ -5,7 +5,7 @@ id: agentdev-workflow-case-open
 context:
   - id: must-1
     paths:
-      - "docs/designs/workflows/epic-wave-model.md"
+      - "docs/designs/commands/case-ready.md"
     purpose: Epic/Wave/Issue 実行モデルと連結成分ベース構成生成の確認
   - id: v4-lifecycle-state-machine
     when: ワークフロー契約（フェーズ、SSoT 遷移）参照時
