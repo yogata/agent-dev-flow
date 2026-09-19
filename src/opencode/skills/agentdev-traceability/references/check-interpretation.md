@@ -1,7 +1,7 @@
 # check 結果の解釈と coverage / impact の利用方法
 
 本 reference は、check の9検出項目の finding の読み方と解消手順、および coverage / impact の利用方法と結果の読み方を提供する。
-検査契約の正本は producer 側リポジトリの `agentdev-traceability` Design と最小トレーサビリティモデル（TIM）の Design が所有する。本 reference は正本を参照して使うための解釈手順を記述し、規範の独立定義を行わない。
+検査契約の正本は producer 側リポジトリの `agentdev-traceability` Design と ADF v4 Traceability モデル Design（v4-traceability-model、docs/designs/<foundations/v4-traceability-model>.md）が所有する。本 reference は正本を参照して使うための解釈手順を記述し、規範の独立定義を行わない。
 
 ## check の実行と出力の読み方
 
@@ -21,7 +21,7 @@ check は `src/check.ts` を `--root <repo-root>` 付きで実行する。出力
 
 | kind | 意味 | 主な原因と解消手順 |
 |---|---|---|
-| `malformed-declarations` | sidecar または inline declaration の形式・構文違反 | 宣言行・YAML を正規形式へ修正する。形式の正本は TIM Design と `agentdev-traceability` Design |
+| `malformed-declarations` | sidecar または inline declaration の形式・構文違反 | 宣言行・YAML を正規形式へ修正する。形式の正本は ADF v4 Traceability モデル Design（v4-traceability-model、docs/designs/<foundations/v4-traceability-model>.md）と `agentdev-traceability` Design |
 | `unknown-roles` | decision / design / implementation / verification 以外の role | role キーを4種のいずれかへ修正する |
 | `unknown-req-refs` | 存在しない要件行 ID への参照（sidecar、inline declaration、policy.yaml の optional 列挙を含む） | 要件行 ID の誤記を修正する。参照先が廃止済み要件行の場合は後継要件行へ対応付け替える、または対応関係を削除する |
 | `invalid-artifact-paths` | 存在しない、または取得不能な artifact path（sidecar 参照先のファイル不在・読取不能を含む） | sidecar のパスを成果物の現行リポジトリ相対パスへ更新する。成果物を削除した場合は対応関係ごと整理する |
@@ -36,6 +36,19 @@ check は `src/check.ts` を `--root <repo-root>` 付きで実行する。出力
 - Decision 対応の欠落はどの検出項目にも計上されない（TIM 完全性規則の任意役割）。Decision の有無を理由に対応関係を追加・修正する必要はない
 - 検証スコープポリシーが存在しない場合、全現行要件行が `missing-verification` の計上対象になる（安全側既定）。これは検査の誤動作ではなく規定の挙動である。任意行として扱いたい要件行は policy へ明示登録する
 - findings の解消は対応関係データの修正のみで行い、要件そのものや検査基準を改変しない
+
+## completeness の 2 層解釈（lifecycle gate と corpus）
+
+missing 系検出項目（`missing-design` / `missing-implementation` / `missing-verification`）の完全性は、ADF v4 Traceability モデル Design（v4-traceability-model、docs/designs/<foundations/v4-traceability-model>.md）「completeness の 2 層」節の定義に従い、次の2層で解釈する。
+
+| 層 | 対象 scope | 判定性格 | 運用 |
+|---|---|---|---|
+| lifecycle gate completeness | 対象要件行 scope（当該 Case の対象要件行） | fail-closed | case-ready のトレーサビリティ完全性ゲート、case-close の QG-4 が対象要件行の design 対応・implementation 対応・verification 対応（policy が required と判定する行）の欠落を不合格とする |
+| corpus completeness | corpus 全体（全現行要件行） | advisory・fail-open | missing 系の計数を診断指標として数値追跡する。corpus の到達目標状態の診断に用い、lifecycle gate の判定には使用しない |
+
+- 完全性規則を規定する要件行群は corpus の到達目標状態を定め、lifecycle gate での判定対象（対象要件行 scope）はワークフロー統合側の要件行群が所有する。この区分の正は v4-traceability-model Design「解釈 clause」節を参照する
+- corpus 債務方針: v4 移行期間の corpus 計数（missing-design・missing-implementation の既知債務）は診断指標として数値追跡し、是正評価は full validation（第13段）で行う。corpus 計数は lifecycle gate を阻害しない（v4-traceability-model Design「corpus 債務方針」節）
+- check を `--root` 指定のみで実行した場合の missing 系計数は corpus completeness（corpus 全体）の診断指標である。lifecycle gate の完全性判定は `--req` で対象要件行へ限定した実行で導出する（fail-closed）
 
 ## coverage の利用方法
 
