@@ -2,7 +2,7 @@
 title: `agentdev-quality-gates` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-11
+updated: 2026-09-19
 ---
 <!-- ADF-COVERS(implementation): REQ-007-001, REQ-007-003, REQ-007-004, REQ-007-005 -->
 <!-- ADF-COVERS(implementation): REQ-057-004 -->
@@ -115,7 +115,7 @@ QG-4 final acceptance の変更ファイル突合検証における I/O 操作�
 
 ## See Also
 
-- [quality-gates.md](../quality/quality-gates.md)（Design 定義）
+- [v4-quality-gate-model.md](../quality/v4-quality-gate-model.md)（Design 定義）
 - [commands/req-define.md](../commands/req-define.md), [commands/case-ready.md](../commands/case-ready.md), [commands/case-revise.md](../commands/case-revise.md), [commands/case-open.md](../commands/case-open.md), [commands/case-run.md](../commands/case-run.md), [commands/case-close.md](../commands/case-close.md)（適用先）
 - REQ-001（REQ/Design 責務分離の徹底）
 

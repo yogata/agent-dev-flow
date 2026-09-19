@@ -312,7 +312,7 @@ case-run の実行担当（委譲内サブエージェント）が、実装作�
 - [workflows/delegation-contracts.md](../workflows/delegation-contracts.md)（controlled_case_execution 委譲）
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（intake / learning capture（PR 本文記録のみ））
 - [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（子Issue 状態 enum〔durable state enum・階層合成〕。Epic Wave 実行モデルの運用契約は本 Design「v3 epic-wave-model Design からの吸収」節）
-- [quality-gates.md](../quality/quality-gates.md)（QG-3（実行担当サブエージェント責務））
+- [v4-quality-gate-model.md](../quality/v4-quality-gate-model.md)（QG-3（実行担当サブエージェント責務））
 
 ### case-run が使用する検査ツール
 

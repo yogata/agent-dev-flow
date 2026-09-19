@@ -2,7 +2,7 @@
 title: 品質仕様
 status: accepted
 created: 2026-08-20
-updated: 2026-08-06
+updated: 2026-09-19
 ---
 <!-- ADF-COVERS(implementation): REQ-007-006, REQ-007-007, REQ-007-008, REQ-007-009 -->
 
@@ -12,13 +12,9 @@ AgentDevFlow の品質基準、検証ルールを定義する。
 
 ## 品質ゲート（QG-1〜QG-4）
 
-主ワークフローの品質ゲート定義は [quality-gates.md](quality-gates.md) を原本とする。
+品質要件の検証体系は v4 Quality モデル（docs/designs/quality/v4-quality-gate-model.md）が所有する。Quality Policy（何を品質として要求するか）・Verification Obligation・Verifier・Evidence・Gate の 5 概念に分解され、QG-1〜QG-4 は本モデルが lifecycle 遷移点から再導出した Gate 群の呼称である。判定値と遷移接続・証拠種別の扱いは同 Design の定めるところに従う。
 各 Gate の判定基準、検査観点は `agentdev-quality-gates` スキルの参照ファイルを参照。
 
-- QG-1 Definition Integrity Gate（req-define / Definition 保存（case-ready / case-revise））
-- QG-2 Acceptance Criteria Coverage Gate（case-open）
-- QG-3 Implementation Deviation Gate（case-run）
-- QG-4 Final Acceptance Gate（case-close）
 
 ## 品質メトリクス収集
 
