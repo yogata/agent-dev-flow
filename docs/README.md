@@ -131,7 +131,6 @@ Design は 3 層構造（commands / skills / workflows）と基盤 6 ドメイ�
 - [Workflow Skill Model](designs/workflows/workflow-skill-model.md)
 - [サブエージェント委譲契約（v4）](designs/workflows/v4-delegation-contracts.md)
 - [キャプチャ境界](designs/workflows/capture-boundaries.md)
-- [RU / 採用済み成果物 / draft lifecycle](designs/workflows/backlog-artifact-lifecycle.md)
 - [execution_unit 構成アルゴリズム参照](designs/workflows/references/execution-unit-construction.md)
 - [ADF v4 標準ライフサイクル](designs/workflows/v4-standard-lifecycle.md)
 - [ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応）](designs/workflows/v4-lifecycle-state-machine.md)
