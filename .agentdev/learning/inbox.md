@@ -183,3 +183,25 @@
 - **配布反映先**: agentdev-case-run-execution-adapter（OU 対象範囲定義）、learning-promote の評価対象
 - **関連**: Case #2979、PR #2986（commit 0dc505b8）、Epic #2984（E6-2 記録）
 - **タグ**: #case-run #OU隙間 #extensions #docs-chore
+
+## 2026-09-19: 張替えリンクの相対パス誤りが check_integrity 新增 NG として検出（Case #2988 case-open）
+
+- **問題事象**: Definition PR の docs 参照張替えで、v4-runtime-execution-model への新規リンク 2 箇所（case-close.md・system.md）を相対パス ../workflows/v4-runtime-execution-model.md で作成した。同 Design の実際の配置は foundations/ 配下であり、check_integrity の designs-relative-link-existence 2 件 + broken-file-link 2 件（合計 ng 54 → 58）として検出された。
+- **発生局面**: case-open STEP-4（Definition PR 搭載 docs 編集の AG-015 語 3 種張替え）。
+- **検知方法**: commit → 検証 → push の順序で実施した check_integrity --json summary の baseline 比較（baseline v4-dev @a3a3b981 {ok 794, ng 54, warning 3} に対し {ok 793, ng 58, warning 3}）。
+- **根本原因**: 張替え先 Design 名（v4-runtime-execution-model）は foundations/ 配下である一方、張替え元の epic-wave-model が workflows/ 配下であったため、旧パスのディレクトリ部分を無意識に踏襲した。リンク先名とリンク先配置ディレクトリの対応を確認する手順が張替え作業に含まれていなかった。
+- **自律対応内容**: fix commit d92d1add（case-close.md は ../foundations/ へ、system.md は同階層表記へ修正）。fix-and-reverify 正規経路で check_integrity 再実行し baseline 完全一致（{ok 794, ng 54, warning 3}・新增 0）へ復帰。
+- **ユーザー確認の有無**: なし（機械検出 → 機械的修正）。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: 参照張替え（ref remap）系の作業では、張替え後リンクの「対象ファイル配置ディレクトリと相対パスの整合」を編集 script 内の assert に含めるか、張替えリストに絶対配置（docs/designs/foundations 等の実パス）を明記して作成すべき。commit → 検証 → push の順序（check_changed_docs が diff を持つ条件）と check_integrity baseline 比較の組み合わせが本種の欠陥を高確度で捕捉する。
+
+## 2026-09-19: pwsh パイプ経由の bun script JSON 出力解析での文字化け（Case #2988 case-open）
+
+- **問題事象**: inspect_cross_dependencies.ts の stdout JSON を pwsh パイプで node -e に渡して JSON.parse したところ、日本語メッセージのエンコード変換破損により Bad control character で parse 失敗した。
+- **発生局面**: case-open STEP-5（横断依存検査の機械的比較）。
+- **検知方法**: JSON.parse 例外（SyntaxError: Bad control character in string literal）。
+- **根本原因**: pwsh のパイプはネイティブ出力をエンコード変換して渡すため、UTF-8 バイト列が破損する（docs/knowledge/windows-powershell-bulk-io-corruption.md のパイプ版事象の再確認）。
+- **自律対応内容**: engine を import する薄い wrapper（x-dep-run.mts）を作成し、報告 JSON を fs.writeFileSync でファイルへ書かせてから読み取る方式へ切替。正常に解析できた。
+- **ユーザー確認の有無**: なし。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: bun/node スクリプトの構造化出力（JSON）を後段で解析する場合は、pwsh パイプを介さずファイル書込み経由で受け渡すのが正規手段。 PowerShell リダイレクト（>）と同様にパイプ経由の受け渡しも破損対象であることを実証。
