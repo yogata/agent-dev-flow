@@ -2,7 +2,7 @@
 title: intake-from-github Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-19"
+updated: "2026-09-20"
 ---
 <!-- ADF-COVERS(implementation): REQ-037-001, REQ-037-004, REQ-037-006, REQ-037-007 -->
 
@@ -61,7 +61,7 @@ updated: "2026-09-19"
 ## 参照する横断 Design
 
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 境界）
-- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（backlog draft プロトコル）
+- [workflows/v4-collaboration-loop.md](../workflows/v4-collaboration-loop.md)（ループ統合。バックログドラフトプロトコル〔draft → approved → issued〕は本 Design が全量移管の受け先である〔帰属の記録は同 Design 吸収節〕）
 
 ## 対象外
 

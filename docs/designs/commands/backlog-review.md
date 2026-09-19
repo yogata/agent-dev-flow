@@ -2,12 +2,13 @@
 title: backlog-review Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-19"
+updated: "2026-09-20"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-021 -->
 <!-- ADF-COVERS(implementation): REQ-015-008 -->
 <!-- ADF-COVERS(implementation): REQ-039-001, REQ-039-002, REQ-039-003, REQ-039-004, REQ-039-005, REQ-039-006 -->
+<!-- ADF-COVERS(implementation): REQ-008-055, REQ-008-056, REQ-008-057 -->
 
 # backlog-review Design
 
@@ -88,7 +89,7 @@ agentdev-traceability の coverage, impact, check を一般文書探索、構造
 ## 参照する横断 Design
 
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 境界）
-- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（RU lifecycle、採用済み成果物 lifecycle）
+- [workflows/v4-collaboration-loop.md](../workflows/v4-collaboration-loop.md)（継続コラボレーションループ: ループ各段責務、RU 生成・合流、採用済み成果物の .agentdev/ 状態領域の整合、v3 backlog-artifact-lifecycle Design からの吸収記録）
 
 ## 対象外
 

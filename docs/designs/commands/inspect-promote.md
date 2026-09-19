@@ -2,7 +2,7 @@
 title: inspect-promote Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-19"
+updated: "2026-09-20"
 ---
 <!-- ADF-COVERS(implementation): REQ-015-005 -->
 <!-- ADF-COVERS(implementation): REQ-036-001, REQ-036-002, REQ-036-004, REQ-036-017, REQ-036-018, REQ-036-019, REQ-036-020, REQ-036-021, REQ-036-022 -->
@@ -62,14 +62,14 @@ updated: "2026-09-19"
 ## 所有関係と委譲
 
 - public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、command 定義（`src/opencode/commands/agentdev/inspect-promote.md`）はその実行時投影である（DEC-010）。
-- workflow 実装本体（STEP 構成、resume protocol、reference 構成）は Workflow Skill（`agentdev-workflow-inspect-promote`）が所有し、本 Design はこれらを複製しない。検出事項ごとの分類確定状態の再構成規則（durable state からの復元）は backlog-artifact-lifecycle Design「inspect-promote 自動 promote」節が正規所有する。
+- workflow 実装本体（STEP 構成、resume protocol、reference 構成）は Workflow Skill（`agentdev-workflow-inspect-promote`）が所有し、本 Design はこれらを複製しない。検出事項ごとの分類確定状態の再構成規則（durable state からの復元）は本 Design が正規所有する（v3 backlog-artifact-lifecycle Design からの移管。帰属の記録は v4-collaboration-loop Design「v3 backlog-artifact-lifecycle Design からの吸収」節）。
 - Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
 ## 参照する横断 Design
 
 - [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（コマンド分類）
-- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（検出事項プロトコル、inspect-promote 自動 promote 対象カテゴリ、投入先、実行ログ、誤検知 revoke 手順）
+- [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（検出事項プロトコル〔v4 帰属先〕）、[workflows/v4-collaboration-loop.md](../workflows/v4-collaboration-loop.md)（ループ統合と v3 backlog-artifact-lifecycle Design からの吸収記録: 自動 promote 対象カテゴリ・投入先・実行ログ・誤検知 revoke 手順・分類確定状態再構成規則の帰属）
 
 ## 自律確定の判定位置とHITLフォールバック（新規セクション）
 

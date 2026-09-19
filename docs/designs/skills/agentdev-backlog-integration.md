@@ -2,7 +2,7 @@
 title: `agentdev-backlog-integration` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-09-20
 ---
 <!-- ADF-COVERS(implementation): REQ-004-016, REQ-004-017, REQ-039-001, REQ-039-002, REQ-039-003 -->
 
@@ -55,7 +55,7 @@ backlog-review における採用済み成果物の統合、分割判定、矛�
 - [agentdev-intake-pipeline.md](agentdev-intake-pipeline.md)
 - [agentdev-learning-pipeline.md](agentdev-learning-pipeline.md)
 - [commands/backlog-review.md](../commands/backlog-review.md)
-- [../workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)
+- [../workflows/v4-collaboration-loop.md](../workflows/v4-collaboration-loop.md)（継続コラボレーションループ: RU 生成・合流のループ統合、v3 backlog-artifact-lifecycle Design からの吸収記録）
 - REQ-008（RU lifecycle）
 - REQ-039（バックログ統合）
 

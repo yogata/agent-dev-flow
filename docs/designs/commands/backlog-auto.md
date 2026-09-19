@@ -2,7 +2,7 @@
 title: backlog-auto Design
 status: accepted
 created: 2026-08-17
-updated: "2026-09-19"
+updated: "2026-09-20"
 ---
 <!-- ADF-COVERS(implementation): REQ-041-001, REQ-041-002, REQ-041-003, REQ-041-004, REQ-041-005, REQ-041-006, REQ-041-007, REQ-041-008, REQ-041-009, REQ-041-010, REQ-041-011, REQ-041-012, REQ-041-013, REQ-041-014, REQ-041-015, REQ-041-016 -->
 
@@ -47,7 +47,7 @@ updated: "2026-09-19"
 
 - [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（コマンド分類、共通実行契約）
 - [case-auto.md](case-auto.md)（orchestration stage モデル・ドラフト間並列実行モデル。v3 epic-wave-model Design 吸収先）
-- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（RU / 採用済み成果物 lifecycle）
+- [workflows/v4-collaboration-loop.md](../workflows/v4-collaboration-loop.md)（継続コラボレーションループ: ループ内位置づけ、RU 生成・合流）
 
 ## 対象外
 
