@@ -61,7 +61,7 @@ updated: "2026-09-19"
   - 結果状態の4次元集約（REQ-034-031）: 各工程の output_contract から (1) 工程結果 pass/warn/fail、(2) artifact_action 適用結果 applied/skipped/failed/no-op、(3) 定義適用工程完了状態、(4) OU ライフサイクル完了状態を収集し混同なく保持する。集約規則の詳細は後述「結果状態の4次元集約（REQ-034-031）」セクション
 - Wave 反復制御（Epic Issue 指定時）
   - case-auto が Epic Issue 番号を記録。Epic Issue 本文から Wave 構成、各子Issue ステータスを読み取る（読み取りのみ、Epic Issue 本文の書き込みは case-close の責務）
-  - case-auto が現在 Wave の ready 子Issue を選択し、各子Issue ごとにインライン case-run を実行（最大5件並列、起動間隔10秒。REQ-034-027 踏襲、並列起動の間隔は epic-wave-model Design 参照）。各子Issue の実行担当サブエージェントへ case-auto から直接委譲
+  - case-auto が現在 Wave の ready 子Issue を選択し、各子Issue ごとにインライン case-run を実行（最大5件並列、起動間隔10秒。REQ-034-027 踏襲、起動間隔・並列数制御は v4-runtime-execution-model「runtime 制御ループ」節参照）。各子Issue の実行担当サブエージェントへ case-auto から直接委譲
   - Wave 内全子Issue の完了（completed-pr / blocked / failed / delegation-unavailable）を待機
   - completed-pr の子Issue がある場合、case-close(#epic) へ委譲（Wave 反復を進行させる stage 3 内部処理、REQ-034-025）
   - 残 Wave がある場合、次 Wave を実行（べき等）
@@ -95,7 +95,7 @@ context 管理:
 
 - [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（Pattern Taxonomy（manager-orchestrator））
 - [workflows/delegation-contracts.md](../workflows/delegation-contracts.md)（step_execution 委譲（v2:ADR-0127））
-- [workflows/epic-wave-model.md](../workflows/epic-wave-model.md)（Epic Wave 反復制御）
+- [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（Epic Wave 反復制御〔Wave 状態は子Issue 状態からの導出投影〕）
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 責務（委譲））
 
 ## 対象外
@@ -402,7 +402,7 @@ Phase 0 の枝PR に含まれるコミット構成運用を規定する。
 - REQ-002（配布物の harness 実行制御分離）
 - v2:ADR-0112（サブエージェント委譲）
 - v2:ADR-0127（case-auto 工程委譲）
-- v2:ADR-0128（case-run / case-close Epic Wave モデル）
+- v2:ADR-0128（case-run の実行モデル: 実行担当サブエージェント委譲）
 - v2:ADR-0129（複数 execution_unit 並列実行モデル）
 - v2:ADR-0132（コンフリクト解消モデル（3レベルエスカレーションと責務割当））
 - v2:ADR-0137（case-auto における case-run インライン実行（多重委譲回避））
@@ -494,3 +494,11 @@ case-auto が解決対象とするのは下位 command が構造化した decisi
 本節の「上位合意矛盾」「新規ユーザー判断事項」は前述「停止理由分類（REQ-034-015/108 拡張）」節の分類軸へ統合される。
 case-auto が decision_context を自律解決できずユーザー停止へ分類する場合、本2分類のいずれかを停止理由として報告する。
 HITL 境界の変更ではなく、既存停止経路（REQ-034-022）の分類精度向上である。
+
+## v3 epic-wave-model Design からの吸収
+
+v3 epic-wave-model Design が所有していた orchestration stage モデル、ドラフト間並列実行モデル（REQ-034-025〜029）、execution_unit 並列 orchestration、case-auto 停止条件と停止理由分類のうち case-auto 実行側の運用契約は本 Design の規定へ吸収された。旧 Design は第5段で supersede とされ（物理削除は docs-chore OU-003）、対応関係の正本は v3-v4-crosswalk references/crosswalk-inventory.md が追跡する。
+
+- orchestration stage: case-auto 内部工程を stage として構成し、ドラフト間並列実行は stage 3 で最大 5 件並列（起動間隔 10 秒、REQ-034-027 踏襲）とする
+- ドラフト間並列実行モデル: 複数 draft（OU 群）を依存グラフから解析し、並列実行可能性に基づいて同時起動する。直列化の単位は v4-runtime-execution-model「直列化単位表」に従う
+- 停止理由分類: 停止条件の発生時に停止理由を分類して報告する。user-decision-required は result enum の状態ではなく停止理由分類として維持する（v4-lifecycle-state-machine 異常・例外状態と回復経路）

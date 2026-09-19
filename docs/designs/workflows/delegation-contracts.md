@@ -225,13 +225,13 @@ case-run 引き継ぎ時の `git pull` 失敗を防止するため、削除 comm
 ## 前工程完了度属性（REQ-003-011）
 
 case-open は子 Issue 本文に「前工程完了度」属性を埋め込む。
-分類定義は [epic-wave-model.md](epic-wave-model.md) の「前工程完了度3段階分類」セクション参照。
+分類定義は [../commands/case-ready.md](../commands/case-ready.md)「v3 epic-wave-model Design からの吸収」節の「前工程完了度 3 分類」参照。
 subagent は当該属性に応じた振る舞い指針（検証のみでも acceptance criteria 順位検証は必須等）に従う（REQ-003-012）。
 
 ## See Also
 
 - [v4-lifecycle-state-machine.md](v4-lifecycle-state-machine.md)（ワークフロー全体契約）
-- [epic-wave-model.md](epic-wave-model.md)（Epic Wave 実行モデル）
+- [../commands/case-run.md](../commands/case-run.md)（Epic Wave 実行モデル〔v3 epic-wave-model Design 吸収先〕）
 - [../responsibilities/responsibility-boundary-purification.md](../responsibilities/responsibility-boundary-purification.md)（case 実行責務の 4 用語と所有者 SSoT、external execution boundary / harness execution mechanism の所有権）
 - v2:ADR-0112（サブエージェント委譲の一般概念）
 - v2:ADR-0127（case-auto の工程委譲）

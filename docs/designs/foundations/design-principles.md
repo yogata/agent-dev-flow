@@ -2,7 +2,7 @@
 title: 設計原則
 status: accepted
 created: 2026-08-20
-updated: 2026-09-08
+updated: 2026-09-19
 ---
 
 # 設計原則
@@ -23,29 +23,32 @@ updated: 2026-09-08
 
 ## 1. work_type 分類の存在理由
 
-Issue の種別に応じて異なるワークフローを適用する。
-work_type と scale の組み合わせで workflow_route を導出する（REQ-005）。
+work_type は変更の性質を表し、実行経路を直接決定する責務を持たない。
+実行経路の派生元の一次表現は Definition 構成（artifact_actions の有無等）であり、work_type と scale は Definition 構成決定の入力情報である（REQ-001-053、REQ-001-054、REQ-005-005、REQ-005-006、REQ-034-003、REQ-008-046）。
 
-**bugfix** は既存機能の不具合修正であり、要件定義書（REQ）の作成を不要とする。
+**bugfix** は既存機能の不具合修正であり、多くの場合新しい REQ の作成を不要とする。
 バグ修正は観察可能な事実（再現手順、期待動作、実際動作）に基づいて完結するため、壁打ちによる要件形成が不要である。
-ただし影響を受ける docs（REQ/Decision/Design/guide）の更新は完了条件に含まれる（REQ-005-008）。
-最小限の経路（req-define → case-open → case-run → case-close）で処理する。
+ただし中核文書モデル上の外部契約、期待状態、安定した制約に該当する変更は REQ 作成を要し、該当しない場合の影響を受ける docs（REQ/Decision/Design/guide）の更新は完了条件に含まれる（REQ-005-007、REQ-005-008）。
 
 **feature** は新しい振る舞いをシステムに導入するため、WHAT（要件）と HOW（実装）の分離が必要である。
-壁打ちフェーズでの要件形成、REQ/Decision ファイルの保存、specs 更新など、複数の確認ポイントを経由する経路（req-define → case-open → case-ready → case-run → case-close）を辿る。
+壁打ちフェーズでの要件形成、REQ/Decision ファイルの保存、specs 更新など、複数の確認ポイントを経由する内部 lifecycle（defining → ready → running → closing）を辿る。
 
-**maintenance** はリファクタリング、保守作業向けの軽量経路である。
-**docs_chore** はドキュメント、雑務向けの軽量経路である。
+**maintenance** はリファクタリング、保守作業向けの軽量処理である。
+**docs_chore** はドキュメント、雑務向けの軽量処理である。
+軽量性は work_type に固定された属性ではなく、Definition 構成（artifact_actions の構成、REQ 保存・Definition PR の有無等）で決まる。
 
-### work_type / scale / workflow_route 導出ルール
+### 実行経路の導出（Definition 構成一次）
 
-| work_type | scale | workflow_route | 経路 |
+実行経路の一次表現は Definition 構成（artifact_actions の有無等）である。
+workflow_route（direct_case 等）は導出結果ラベルであり、work_type 固定分類ではない（REQ-005-006、REQ-034-003、REQ-008-046）。
+
+| Definition 構成（artifact_actions の有無等） | 典型的な work_type / scale | 導出結果ラベル | 実行の特徴 |
 |---|---|---|---|
-| bugfix | - | direct_case | req-define → case-open → case-run → case-close |
-| feature | standard | req_backed_case | req-define → case-open → case-ready → case-run → case-close |
-| feature | large | epic_case | req-define → case-open（Epic）→ case-ready → case-run（Wave）→ case-close |
-| maintenance | - | direct_case | req-define → case-open → case-run → case-close |
-| docs_chore | - | direct_case | req-define → case-open → case-run → case-close |
+| REQ 保存なし・Definition PR なし（Issue 本文で要件管理） | bugfix、maintenance、docs_chore 等 | direct_case | req-define → case-auto。最小 Definition 構成での内部 lifecycle 実行 |
+| REQ 保存あり・Definition PR あり・Epic 構成なし | feature standard 等 | req_backed_case | req-define → case-auto。defining（Definition PR）→ ready → running → closing |
+| REQ 保存あり・Epic 構成あり | feature large、大規模 bugfix・maintenance 等 | epic_case | req-define → case-auto。Epic 構成と Wave スケジューリング付きの実行 |
+
+大規模 bugfix 等も scale/Epic/Wave の対象になり得る。work_type と scale は直交する（v4-standard-lifecycle Design）。
 
 ---
 

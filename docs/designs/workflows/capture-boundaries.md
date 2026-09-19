@@ -114,7 +114,7 @@ Skill は候補生成と file 書き込みまでを担い、commit 実行は委�
 
 ### Epic Issue 単一書き手制約（case-close 経由）
 
-Epic Issue 本文（ステータス追跡テーブル）の更新は `case-close(#epic)` のみが行う（REQ-030-011、`docs/designs/workflows/epic-wave-model.md`「Epic Issue 本文の単一書き手制約」参照）。
+Epic Issue 本文（ステータス追跡テーブル）の更新は `case-close(#epic)` のみが行う（REQ-030-011、`docs/designs/foundations/v4-runtime-execution-model.md`「直列化単位表」（per-Epic 単一書き手）参照）。
 
 - `case-run(#epic)` は Epic Issue 本文を読み取るのみで書き込まない
 - `case-auto` 自身は Epic Issue を更新せず、case-close 経由で更新する
@@ -156,7 +156,7 @@ req-define の明示入力としてルーティングする（backlog-review 経
 ## See Also
 
 - [v4-lifecycle-state-machine.md](v4-lifecycle-state-machine.md)（ワークフロー全体契約）
-- [epic-wave-model.md](epic-wave-model.md)（Epic Issue 本文の単一書き手制約）
+- [../foundations/v4-runtime-execution-model.md](../foundations/v4-runtime-execution-model.md)（Epic Issue 本文の単一書き手〔直列化単位表〕）
 - [backlog-artifact-lifecycle.md](backlog-artifact-lifecycle.md)（採用済み成果物 lifecycle）
 - [../responsibilities/artifact-contracts.md](../responsibilities/artifact-contracts.md)（Command→Skill 依存方向、`Capture結果` 小節の共通意味契約）
 - 各 command Design（`docs/designs/commands/`）

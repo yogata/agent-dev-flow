@@ -118,7 +118,7 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | foundations/document-model.md | redefine | ― | 3 | executed | 本段: モデル定義 Design 昇格条件と移行期間優先規則の最小 UPDATE。第3段实行（Case #2973、merge a098b0f1） |
 | foundations/decision-lifecycle.md | redefine | ― | 4 | executed | 本段は権威移行注記のみ。Decision status 部分ビュー整理は第4段。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | foundations/patterns.md | keep | ― | ― | planned | 共通フォーマット規約は維持 |
-| foundations/design-principles.md | keep | ― | ― | planned | 設計原則は維持 |
+| foundations/design-principles.md | keep | ― | ― | planned | 設計原則は維持（第5段: work_type×scale→workflow_route 導出表を v4 直交性へ準拠改訂〔一次表現 Definition 構成・direct_case は導出結果ラベル〕、keep 処遇維持・内容更新） |
 | foundations/project-extensions.md | redefine | Project Extension | 10 | planned | semantic extension point 化 |
 | foundations/harness-separation-model.md | redefine | Adapter | 11 | planned | adapter 境界の再編 |
 | foundations/traceability-model.md | supersede | ― | 7 | planned | v4-traceability-model が承継（DEC-037） |
