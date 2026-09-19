@@ -4,6 +4,7 @@ status: accepted
 created: 2026-06-21
 updated: 2026-07-18
 ---
+<!-- ADF-COVERS(implementation): REQ-005-026, REQ-031-029, REQ-034-029 -->
 
 # `agentdev-workflow-orchestration` Design
 

@@ -2,7 +2,7 @@
 title: ADF v4 実装責務境界（semantic Skill / deterministic code / Harness adapter / Project Extensions）
 status: accepted
 created: 2026-09-18
-updated: 2026-09-19
+updated: 2026-09-20
 ---
 <!-- ADF-COVERS(implementation): REQ-003-021, REQ-003-022, REQ-003-023 -->
 
@@ -17,6 +17,10 @@ semantic 責務と deterministic 責務の分類基準と、現行 Skill の再�
 - semantic 責務（Skill が所有）: requirement analysis、architecture/design judgment、decomposition judgment、adversarial review、learning evaluation、semantic classification（6 項目）
 - deterministic 責務（code/script/tool が所有）: parsing、validation、ID 採番、状態遷移、dependency graph、Wave scheduling、path safety、traceability extraction、evidence aggregation、API I/O、file transformation（11 項目）
 - Skill 数の削減自体を目的としない
+
+## 知識提供層（3 区分の第3区分）
+
+semantic 6 項目にも deterministic 11 項目にも直接対応しない責務を「知識提供」層とする。判定基準・安全手続き・様式・選定規則などの知識を一次情報として提供し、workflow 制御も決定的処理の実行も所有しない。各 skill の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）への帰属は `designs/skills/` 各 Design の「v4 責務分類」節が記録する（分類語彙表は当該 Case の execution contract が確定する）。分類が確定しない項目は semantic 6 項目への該当性を優先して判定し、該当しない場合に知識提供層へ分類する。
 
 ## Harness / Backend adapter 境界
 

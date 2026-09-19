@@ -4,6 +4,7 @@ status: accepted
 created: 2026-06-21
 updated: 2026-09-08
 ---
+<!-- ADF-COVERS(implementation): REQ-030-001, REQ-049-005 -->
 
 # `agentdev-issue-management` Design
 

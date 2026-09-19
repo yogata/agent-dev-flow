@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は33件、提案中の Decision は0件である。
+現行の承認済み Decision は32件、提案中の Decision は0件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -29,7 +29,7 @@
 | DEC-012 | Extension を file-kind から workflow/capability responsibility へ再編 | accepted | 2026-08-10 |
 | DEC-013 | IR 登録モデルの簡素化 — 現存 IR を実行可能な恒久統制に限定 | accepted | 2026-08-11 |
 | DEC-014 | 配布依存境界の多層 enforcement | accepted | 2026-08-11 |
-| DEC-015 | ADF決定論的実行中核と実行基盤実行機構の責務分界 | accepted | 2026-08-15 |
+| DEC-015 | ADF決定論的実行中核と実行基盤実行機構の責務分界 | superseded | 2026-08-15 |
 | DEC-016 | 導入系スクリプトの副作用ゼロ原則 | accepted | 2026-08-15 |
 | DEC-017 | 最小トレーサビリティモデルの採用と Artifact Graph の廃止 | superseded | 2026-08-17 |
 | DEC-019 | 一般処理の標準API委譲とADF固有意味論の所有境界 | accepted | 2026-08-20 |
@@ -77,7 +77,6 @@
 - [DEC-012](DEC-012.md)（Extension を file-kind から workflow/capability responsibility へ再編）
 - [DEC-013](DEC-013.md)（IR 登録モデルの簡素化 — 現存 IR を実行可能な恒久統制に限定）
 - [DEC-014](DEC-014.md)（配布依存境界の多層 enforcement）
-- [DEC-015](DEC-015.md)（ADF決定論的実行中核と実行基盤実行機構の責務分界）
 - [DEC-016](DEC-016.md)（導入系スクリプトの副作用ゼロ原則）
 - [DEC-019](DEC-019.md)（一般処理の標準API委譲とADF固有意味論の所有境界）
 - [DEC-020](DEC-020.md)（GitHub Issue 共通管理単位の採用）
@@ -110,6 +109,7 @@
 <!-- AUTOGEN:BEGIN:id=decision-status-superseded -->
 - [DEC-005](DEC-005.md)（Project Extensions Architecture）
 - [DEC-007](DEC-007.md)（Artifact Graph 標準化と配布スキル昇格）
+- [DEC-015](DEC-015.md)（ADF決定論的実行中核と実行基盤実行機構の責務分界）
 - [DEC-017](DEC-017.md)（最小トレーサビリティモデルの採用と Artifact Graph の廃止）
 - [DEC-029](DEC-029.md)（公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入）
 - [DEC-030](DEC-030.md)（トレーサビリティ標準機能への一般化と producer / consumer 境界の確立）
@@ -189,6 +189,9 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-037 | supersedes | DEC-017 | Traceability の主目的の定義権（要件中心の対応完全性から Change/Evidence 中心への再中心化）を v4-traceability-model Design へ移動。DEC-017 決定2（直接走査）・決定3（標準スキル）・決定5（用語政策）は搬送範囲表で維持 |
 | DEC-037 | supersedes | DEC-030 | Traceability の主目的の定義権（要件中心の対応完全性から Change/Evidence 中心への再中心化）を v4-traceability-model Design へ移動。DEC-030 の機構上の決定は搬送範囲表で維持 |
 | DEC-033 | supersedes | DEC-029 | 公開ワークフロー状態遷移中心再構成を v4 公開運用モデル（UX 2入口収斂・内部 lifecycle）へ一般化して置換 |
+| DEC-036 | supersedes | DEC-015 | 主後継。決定論的実行中核と実行基盤実行機構の責務分界を semantic Skill / deterministic code 分離へ発展・置換 |
+| DEC-038 | supersedes | DEC-015 | 補完後継。durable state 配置と再構成の契約への一般化 |
+| DEC-039 | supersedes | DEC-015 | 補完後継。authority・副作用統制と冪等・並行性モデルへの一般化 |
 
 ## 関連 REQ
 

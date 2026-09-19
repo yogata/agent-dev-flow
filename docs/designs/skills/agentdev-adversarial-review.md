@@ -338,7 +338,7 @@ adversarial-review の呼出失敗時（スキル不在、起動異常、timeout
 |---|---|
 | adversarial-review 自身の振る舞い契約（入力コンテキスト、返却契約、呼出失敗時取扱い、再 review 条件、停止条件4点、原則適用・skip 可能、default-on + skip policy、副作用禁止、QG/HITL 非代替、正規所有者マトリックス） | 本 Design（agentdev-adversarial-review） |
 | user-decision-required 停止理由分類、case-auto 伝播、resume point | v4-lifecycle-state-machine Design、case-auto Design |
-| review 経路での parent_decision_required / decision_context 適用、副作用境界 | delegation-contracts Design |
+| review 経路での parent_decision_required / decision_context 適用、副作用境界 | v4-delegation-contracts Design |
 | 各 command の個別呼出統合（発動条件、挿入境界、戻り先） | 各 command Design（REQ-015） |
 | caller integration 関連の domain skill 振る舞い | 各 domain skill Design（REQ-015） |
 

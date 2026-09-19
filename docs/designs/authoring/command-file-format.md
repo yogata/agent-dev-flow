@@ -37,6 +37,8 @@ Command は公開interface（入出力契約・ガードレール）と workflow
 workflow 手順本体は Workflow Skill へ移行し、Command に重複残存しない。
 workflow への参照は Workflow Skill 名レベルとする（REQ-002-017）。
 
+workflow dispatch 先および委譲先 skill の責務分類（semantic 担当 / deterministic 委譲先 / 知識提供）は DEC-036 の分類と `../workflows/workflow-skill-model.md` の機械分類規則に従う。command 定義は分類語彙を再掲しない。委譲契約の正本は `../workflows/v4-delegation-contracts.md` が所有する。
+
 ## extensions 手順
 
 command 本文は extensions 手順（Design `../foundations/project-extensions.md`）のみを持ち、具体的な project docs 内部パスを固定しない。
@@ -181,3 +183,4 @@ Step 番号の不一致は違反として扱わず、公開契約の欠落、相
 
 - **`patterns.md`**: 一般の frontmatter 規約、テンプレート命名規則を担当。本 Design は command 本文構造と配布 command 固有の frontmatter 標準形式（開始デリミタ直後に description、全 command 形式一致）を担当し、一般の frontmatter 規約は `patterns.md` を参照する。
 - **`docs/designs/commands/*.md`**: 個別 command Design の位置づけを維持する。横断フォーマット規約は本 Design に集約し、個別 command Design は公開契約の各対応付け軸を定義する。
+- **`workflows/v4-delegation-contracts.md`**: command 定義から参照する委譲契約（委譲時最小契約、委譲種別、実行主体分類）の正本。本 Design は command 定義ファイルの記述形式のみを扱う。

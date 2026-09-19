@@ -4,6 +4,7 @@ status: accepted
 created: 2026-07-04
 updated: 2026-07-27
 ---
+<!-- ADF-COVERS(implementation): REQ-002-030, REQ-002-031 -->
 
 # agentdev-project-extensions Design
 

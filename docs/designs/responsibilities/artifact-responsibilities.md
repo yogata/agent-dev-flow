@@ -108,7 +108,7 @@ Command は Skill を参照して判断を利用し、Skill は必要な詳細�
 
 ## 親エージェント / サブエージェント責務
 
-サブエージェント委譲時の責務境界は v2:ADR-0112 と REQ-003 に従う。
+サブエージェント委譲時の責務境界は v2:ADR-0112 と REQ-003 に従う。委譲時最小契約・委譲種別・委譲制約の正本は workflows/v4-delegation-contracts Design が所有し、責務の semantic / deterministic 分類は DEC-036 と foundations/v4-responsibility-boundaries Design に従う。
 
 | 主体 | 保持する責務 | 禁止される責務 |
 |---|---|---|

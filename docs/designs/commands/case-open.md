@@ -198,7 +198,7 @@ REQ-030 への縮小に伴い、かつて case-open が構成していた execut
 
 発動条件判定 Step で発動と判定された場合、review 呼出 Step で adversarial-review を呼び出す（REQ-015-001）。
 
-- **委譲契約**: adversarial-review は `semantic_review`（書き込み禁止型）として適用する（[delegation-contracts Design](../workflows/delegation-contracts.md)「adversarial-review との委譲契約接続」節）。adversarial-review 自身は対象ファイル、Issue、PR、git 操作を行わない（REQ-014-004）。
+- **委譲契約**: adversarial-review は `semantic_review`（書き込み禁止型）として適用する（[v4-delegation-contracts Design](../workflows/v4-delegation-contracts.md)「adversarial-review との委譲契約接続」節）。adversarial-review 自身は対象ファイル、Issue、PR、git 操作を行わない（REQ-014-004）。
 - **review 対象**: Root Case 本文候補、Definition Package 構成案の2者。
 - **採用後戻り先**: Root Case 本文候補に関わる finding は本文候補生成へ戻し再評価する。Definition Package 構成案に関わる finding は構成案評価へ戻す。accepted finding の対象候補への反映は case-open（呼出元）の責務である（REQ-014-006）。
 - **unresolved 時の取扱い**: 未解決のユーザー判断事項が残る場合、Root Case 作成へ進まない（REQ-014-009）。工程委譲起源であるため、既存 status（pass/warn/fail/partial）に unresolved 判断事項を付加し、case-auto 経由時は user-decision-required 停止理由分類として伝播する（REQ-014-012、[v4-lifecycle-state-machine Design](../workflows/v4-lifecycle-state-machine.md)「adversarial-review 由来の停止信号」節）。
@@ -227,7 +227,7 @@ review の結果、Root Case 本文候補、Definition Package 構成案のい�
 
 ### 正規所有者マトリックス参照
 
-本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts Design「adversarial-review との委譲契約接続」節、v4-lifecycle-state-machine Design との間で意味の重複、矛盾を生じない。
+本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、v4-delegation-contracts Design「adversarial-review との委譲契約接続」節、v4-lifecycle-state-machine Design との間で意味の重複、矛盾を生じない。
 case-open command 固有の挿入境界（発動条件、挿入構造、変更影響別再実行ルール、順序）のみを本節が所有し、共通 caller integration 契約、adversarial-review 自身の振る舞い契約、再 review 条件と停止条件の詳細は各正規所有者 Design を正とする。
 
 ## See Also

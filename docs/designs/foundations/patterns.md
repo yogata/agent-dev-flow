@@ -193,7 +193,7 @@ Issue/PR/コメント本文にリポジトリ内ファイル、ディレクト�
   （status: proposed → accepted）。{承認根拠}（REQ-001-021 との矛盾解消）。」
 - 承認根拠には、評価時点で照合した根拠（合意内容と現行 REQ・Design・実装の一致、
   またはユーザー承認の旨）を記載する
-- 本形式は DEC-008 / DEC-015 / DEC-019〜027 / DEC-028 の昇格実績で採用された慣行の
+- 本形式は DEC-008 / DEC-015（superseded by DEC-036/038/039）/ DEC-019〜027 / DEC-028 の昇格実績で採用された慣行の
   正規化である。遷移の実行主体（case-open、確認手続きによる一括昇格）を問わず同一形式を用いる
 - 形式の正本は本 Design（patterns.md）、テンプレート実体は doc_decision.md、
   存在確認・検証は agentdev-decision-file-manager、「明示承認記録が存在する」存在要件は

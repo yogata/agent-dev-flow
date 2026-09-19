@@ -239,6 +239,6 @@ unresolved な本質的争点またはユーザー判断事項が残る場合、
 
 ### 正規所有者マトリックス参照
 
-本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts Design「adversarial-review との委譲契約接続」節、agentdev-backlog-integration Design「adversarial-review 候補判断と内部挿入」節との間で意味の重複、矛盾を生じない。
+本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、v4-delegation-contracts Design「adversarial-review との委譲契約接続」節、agentdev-backlog-integration Design「adversarial-review 候補判断と内部挿入」節との間で意味の重複、矛盾を生じない。
 backlog-review command 固有の挿入境界（発動条件、挿入構造、順序、矛盾取扱い）のみを本節が所有し、候補判断基準、内部手続きの詳細は agentdev-backlog-integration Design を正とする。
 
