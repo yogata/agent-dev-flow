@@ -18,14 +18,14 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | REQ-009 | redefine | ― | 12 | planned | 配布基盤・導入の migration implementation |
 | REQ-010 | redefine | deterministic code/tool | 6 | executed | 検証基盤の Gate モデル接続。第6段実行 2026-09-19（Case #2997、Definition merge 7d717d8b、実装 merge 95f9655516592b82c710fac55ae6352d981dbcd1・ffccea6a9c35cb32f82428c4a63ffa8389a0993b） |
 | REQ-011 | redefine | Adapter | 11 | planned | I/O 境界の adapter 再編 |
-| REQ-012 | redefine | ― | 7 | planned | Change/Evidence 再中心化（DEC-037） |
+| REQ-012 | redefine | ― | 7 | executed | Change/Evidence 再中心化（DEC-037）。第7段実行 2026-09-19（Case #3004、Definition merge fa1b5ac9、実装 merge 236e6cf4・40098b27）。redefine（目的節接続・要件行文言不変） |
 | REQ-014 | keep | ― | ― | planned | adversarial-review は v4 でも保持 |
 | REQ-015 | keep | ― | ― | planned | 同上 |
 | REQ-016 | keep | ― | ― | planned | 同上 |
 | REQ-017 | redefine | ― | 4 | executed | Issue Execution Contract の v4 整理。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | REQ-018 | keep | ― | ― | planned | worktree 構造制約は維持 |
 | REQ-019 | keep | ― | ― | planned | テスト影響範囲 gate は維持 |
-| REQ-021 | redefine | ― | 7 | planned | トレーサビリティのワークフロー統合 v4 版 |
+| REQ-021 | redefine | ― | 7 | executed | トレーサビリティのワークフロー統合 v4 版。第7段実行 2026-09-19（Case #3004、Definition merge fa1b5ac9、実装 merge 236e6cf4・40098b27）。redefine（目的節接続・要件行文言不変） |
 | REQ-027 | redefine | semantic Skill | 8 | planned | Capability Skill 再分類 |
 | REQ-029 | keep | ― | ― | planned | 配布依存境界は移行期間維持 |
 | REQ-030 | redefine | ― | 4 | executed | case-open 内部状態への回収。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
@@ -83,7 +83,7 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | DEC-014 | keep | ― | ― | planned | 配布依存境界は維持 |
 | DEC-015 | supersede | ― | 8 | planned | 後継: DEC-036/038/039（責務分界の三層+権威モデルへの分解） |
 | DEC-016 | keep | ― | ― | planned | 副作用ゼロ原則は維持 |
-| DEC-017 | supersede | ― | 7 | planned | 後継: DEC-037（Change/Evidence 再中心化） |
+| DEC-017 | supersede | ― | 7 | executed | 後継: DEC-037（Change/Evidence 再中心化）。第7段実行 2026-09-19（Case #3004、Definition merge fa1b5ac9、実装 merge 236e6cf4・40098b27）。supersede（frontmatter のみ・本文不変・承継 ADF-COVERS 41 識別子 v4-traceability-model へ） |
 | DEC-019 | keep | ― | ― | planned | 標準API委譲は維持 |
 | DEC-020 | keep | ― | ― | planned | Issue 共通管理単位は維持 |
 | DEC-021 | keep | ― | ― | planned | scripts 公開入口は維持 |
@@ -95,7 +95,7 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | DEC-027 | keep | ― | ― | planned | 観測ベース統制縮小は維持 |
 | DEC-028 | keep | ― | ― | planned | 文章表層品質基盤は維持 |
 | DEC-029 | supersede | ― | 4 | executed | 後継: DEC-033 + v4-standard-lifecycle（UX 2入口・内部 lifecycle）。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
-| DEC-030 | supersede | ― | 7 | planned | 後継: DEC-037（producer/consumer 境界の v4 再中心化） |
+| DEC-030 | supersede | ― | 7 | executed | 後継: DEC-037（producer/consumer 境界の v4 再中心化）。第7段実行 2026-09-19（Case #3004、Definition merge fa1b5ac9、実装 merge 236e6cf4・40098b27）。supersede（frontmatter のみ・本文不変・承継 ADF-COVERS 41 識別子 v4-traceability-model へ） |
 
 ## Design（v3 側 accepted）
 
@@ -121,7 +121,7 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | foundations/design-principles.md | keep | ― | ― | executed | 設計原則は維持（第5段: work_type×scale→workflow_route 導出表を v4 直交性へ準拠改訂〔一次表現 Definition 構成・direct_case は導出結果ラベル〕、keep 処遇維持・内容更新）。第5段实行 2026-09-19（Case #2988、Definition merge b86354a9、実装 merge 0f8b1e10/abf77201/70bf897d、fan-in fix 57664e33） |
 | foundations/project-extensions.md | redefine | Project Extension | 10 | planned | semantic extension point 化 |
 | foundations/harness-separation-model.md | redefine | Adapter | 11 | planned | adapter 境界の再編 |
-| foundations/traceability-model.md | supersede | ― | 7 | planned | v4-traceability-model が承継（DEC-037） |
+| foundations/traceability-model.md | supersede | ― | 7 | executed | v4-traceability-model が承継（DEC-037）。第7段実行 2026-09-19（Case #3004、Definition merge fa1b5ac9、実装 merge 236e6cf4・40098b27）。supersede（物理削除・吸収節は v4-traceability-model） |
 | foundations/references/concrete-abstraction.md | keep | ― | ― | planned | 具体抽象化参照は維持 |
 | responsibilities/document-type-responsibilities.md | redefine | ― | 4 | executed | v4 中核文書モデルの執筆規約反映。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | responsibilities/artifact-responsibilities.md | redefine | semantic Skill | 8 | planned | 成果物責任表の v4 再編 |
@@ -145,7 +145,7 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | 対象 | 意味処遇 | 帰属 | 実行段階 | 確定状態 | 備考 |
 |---|---|---|---|---|---|
 | scripts/**（決定的ツール・検証スイート） | redefine | deterministic code/tool | 8 | planned | semantic/deterministic 再分類 |
-| traceability/**（sidecar・policy 機構） | redefine | ― | 7 | planned | Change/Evidence 再中心化 |
+| traceability/**（sidecar・policy 機構） | redefine | ― | 7 | executed | Change/Evidence 再中心化。第7段実行 2026-09-19（Case #3004、Definition merge fa1b5ac9、実装 merge 236e6cf4・40098b27）。redefine（機構搬送範囲表で v4 側に定義・実データ 21 sidecar + policy.yaml 不変） |
 | Command/Skill/Custom Tool/Plugin（概念） | redefine | ― | 8 | planned | 実装責務境界の再分類 |
 | .agentdev/ 状態領域（概念） | redefine | Project Model | 9 | planned | durable state 5 分類への整理 |
 | Intake/Learning/Backlog（概念） | redefine | ― | 9 | planned | 継続コラボレーションループ |
