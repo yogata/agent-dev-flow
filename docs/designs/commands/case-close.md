@@ -187,7 +187,7 @@ case-run 側の事前検査とは独立に実施する。検証手段との対�
 - 対象要件行に Design 対応、implementation 対応、または policy が required と判定する要件行の verification 対応の欠落が残る場合はマージせず停止する。Decision 対応の欠落は QG-4 の不合格条件に含めない
 - 不足する対応関係を自動追加または修正せず、検査失敗を case-run 側の修正対象として差し戻せる
 - verification 対応の完全性判定は、project-level verification policy が required と判定する要件行のみを計上する。policy の正規情報源は `traceability/policy.yaml`（既定 required、optional な要件行のみ明示、未指定の要件行は required）であり、policy が optional と明示した要件行の verification 対応欠落は完全性違反に含めない
-- QG-4 の対応完全性検査は有効である。全現行要件行の Design 対応と implementation 対応、および policy が required と判定する要件行の verification 対応が成立し、check の未解決不合格が0件であることを移行完了条件とする（DEC-017 決定4）
+- QG-4 の対応完全性検査は有効である。対象要件行の Design 対応と implementation 対応、および policy が required と判定する対象要件行の verification 対応が成立し、check の未解決不合格が0件であることを完了条件とする（対象要件行 scope。REQ-021-018/024/025）。DEC-017 決定4 の「全現行要件行」を条件とする移行完了規定は履行済みの履歴であり、corpus 全体の完全性は ADF v4 Traceability モデルの completeness 2 層（corpus＝診断・advisory）と corpus 債務方針（第13段 full validation で評価）へ移管する
 - check 自体が正常に完全性を判定できなかった場合（check 実行不能、検査対象の取得不能等）は、対応完全性の合格として扱わず、検査不能の旨を報告してマージに進まない
 - 正規成果物側の実不整合が確認された場合は、既存の品質ゲート, 受け入れ条件に従って fail とする
 
