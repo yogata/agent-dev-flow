@@ -266,3 +266,35 @@
 - **配布反映先**: agentdev-issue-management（Issue 操作後 VERIFY 手順）、learning-promote の評価対象
 - **関連**: Case #3004、agentdev_gh
 - **タグ**: #case-open #agentdev_gh #read-back #Issue本文 #VERIFY
+
+## 2026-09-20: bun test の件数サマリーは stderr 出力（stdout capture だけでは証跡ファイルが空になる）
+
+- **問題事象**: bun test の実行結果（`2558 pass` / `Ran 2558 tests across 105 files` 等のサマリー行）は stderr へ出力される。node の execFileSync（stdout のみ返却）で証跡ファイルへ保存すると本文が `bun test v1.3.6` のみになり、pass 件数の証跡が残らない（終了コード 0 で全 pass の事実のみ得られる）
+- **工程位置**: case-open STEP-4 検証（Case #3011 Definition PR commit 7642962f 後の bun test 3 分割）
+- **検知方法**: 保存した証跡ファイルの内容確認（サマリー行不在）
+- **根本原因**: bun test がテスト進行・結果を stderr 経路で出力する仕様に対し、キャプチャ実装が stdout のみを前提としていた
+- **対応内容**: spawnSync で stdout と stderr を連結して証跡保存する方式へ変更し、3 分割（2558/102/550）の件数証跡を取得
+- **ユーザー確認の有無**: なし（証跡取得方式の修正のみ）
+- **Decision/REQ/spec影響**: なし（REQ-060 の実行形態規定（repo root 起 cwd・`./` 付き）は不変。出力経路の話であり実行形態の話ではない）
+- **展開観点**: bun test の件数を完了条件・PR 本文の検証記録に使う検証系は、stdout のみキャプチャする実装だと件数根拠を失う。checker CLI（stdout JSON）と test runner（stderr サマリー）で出力経路が異なる点の混同に注意
+- **再発条件**: execFileSync 等の stdout のみ返却する API で bun test を実行し証跡保存する場合
+- **予防策**: bun test の証跡保存は spawnSync + (stdout + stderr) 連結で実装する
+- **配布反映先**: 検証運用（Case の case-open/case-run 検証記録）、learning-promote の評価対象
+- **関連**: Case #3011、bun test、REQ-060
+- **タグ**: #bun-test #stderr #証跡 #検証運用
+
+## 2026-09-20: write tool の guard は承認済み temp dir 含む project root 外を fail-closed block する（node -e + PS ヒアドキュメントで大規模編集を実行）
+
+- **問題事象**: v4 worktree 外へ大規模編集スクリプトを退避しようと `C:\WINDOWS\TEMP\opencode` 配下へ write tool で書き出したところ、agentdev-textlint-guard が「write targets a path outside the project root; blocked per fail-closed」で block した。AGENTS.md の指針（v4 worktree 内の file/edit/write block・node writeFileSync 標準手段）は worktree 内を語るが、実効 guard は outside-project-root 全般に及ぶ
+- **工程位置**: case-open STEP-4（Case #3011 Definition 適用スクリプトの組み立て）
+- **検知方法**: write tool 実行時の guard block エラー
+- **根本原因**: harness の write guard 設定が project root 外の書込みを一律 fail-closed としており、temp dir の事前承認とは独立に作用する
+- **対応内容**: スクリプトをファイル化せず、PowerShell 単一引用符ヒアドキュメント（@'...'@）を node -e の引数として渡す方式で編集スクリプトを直接実行した。単一引用符ヒアドキュメントは変数展開・バックティックエスケープなしで JS 本文（日本語・改行含む）を素通しし、node が受け取る時点で UTF-16 引数のため cp932 再符号化の経路も通らない。41 files / +376 行の適用をこの方式で完遂し、事後の UTF-8 健全検査（BOM なし・LF・U+FFFD なし）で破損なしを確認
+- **ユーザー確認の有無**: なし（実行手段の切替のみ）
+- **Decision/REQ/spec影響**: なし（guard の fail-closed 維持は正規運用。block 解除・迂回ではなく標準手段への切替）
+- **展開観点**: v4 worktree 等で file/edit/write tool が block される環境で大規模一括編集を行う場合、スクリプトのファイル退避を前提とせず node -e + PS 単一引用符ヒアドキュメントで直接実行できる。長文でも実用可能（本次 40+ 編集を単一セッションで適用）
+- **再発条件**: project root 外への write tool 実行（temp dir でも発生）
+- **予防策**: 大規模編集は node -e ヒアドキュメント方式を第一候補にする。スクリプトファイルの退避が必要な場合は v4 worktree 内の gitignore 領域（.agentdev/integrity/reports 等）を用いる
+- **配布反映先**: agentdev-git-worktree（worktree-operations の書込み guard 運用指針）、learning-promote の評価対象
+- **関連**: Case #3011、agentdev-textlint-guard、AGENTS.md 書込み標準手段
+- **タグ**: #write-guard #fail-closed #node-e #ヒアドキュメント #worktree運用
