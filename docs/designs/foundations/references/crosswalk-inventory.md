@@ -32,7 +32,7 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | REQ-031 | redefine | ― | 4 | executed | case-run 内部状態への回収。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | REQ-032 | redefine | ― | 4 | executed | case-close 内部状態への回収。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | REQ-034 | redefine | ― | 4 | executed | case-auto の v4 再編。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
-| REQ-035 | redefine | ― | 5 | planned | Epic/Wave 語彙の再定義 |
+| REQ-035 | redefine | ― | 5 | executed | Epic/Wave 語彙の再定義。第5段实行 2026-09-19（Case #2988、Definition merge b86354a9、実装 merge 0f8b1e10/abf77201/70bf897d、fan-in fix 57664e33） |
 | REQ-036 | keep | ― | ― | planned | inspect 系診断は維持 |
 | REQ-037 | redefine | ― | 9 | planned | Intake の継続コラボレーションループ化 |
 | REQ-038 | redefine | ― | 9 | planned | Learning のループ化・7 系統振分 |
@@ -107,12 +107,12 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | workflows/workflow-skill-model.md | redefine | semantic Skill | 8 | planned | 責務 3 層分化・1:N 分割・配置契約の v4 Skill 再編での再定義（DEC-010 実装詳細） |
 | workflows/input-resolution-and-durable-state.md | supersede | ― | 4 | executed | v4-durable-state-and-recovery が一般化契約を承継。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |（第4段 case-open 実行時点: Definition PR で後継吸収と宣言承継を実行。物理削除は docs-chore OU-003、executed 化は case-close）
 | workflows/step-reference-contract.md | supersede | ― | 4 | executed | 再開単位階層（STEP/処理単位/Case）の v4 再構成。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |（第4段 case-open 実行時点: Definition PR で後継吸収と宣言承継を実行。物理削除は docs-chore OU-003、executed 化は case-close）
-| workflows/epic-wave-model.md | supersede | ― | 5 | planned | 階層合成+直列化単位への再編。語彙意味の再定義は第5段 |
+| workflows/epic-wave-model.md | supersede | ― | 5 | executed | 階層合成+直列化単位への再編。語彙意味の再定義は第5段。第5段实行 2026-09-19（Case #2988、Definition merge b86354a9、実装 merge 0f8b1e10/abf77201/70bf897d、fan-in fix 57664e33） |
 | workflows/definition-readiness.md | supersede | ― | 4 | executed | Definition lifecycle 部分ビューと冪等経路への整理。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |（第4段 case-open 実行時点: Definition PR で後継吸収と宣言承継を実行。物理削除は docs-chore OU-003、executed 化は case-close）
 | workflows/backlog-artifact-lifecycle.md | supersede | ― | 9 | planned | RU/draft 部分ビューとして継続ループへ整理 |
 | workflows/delegation-contracts.md | supersede | ― | 8 | planned | 委譲単位の再開・result の v4 接続 |
 | workflows/capture-boundaries.md | redefine | ― | 9 | planned | Intake/Learning 境界の v4 整理 |
-| workflows/references/execution-unit-construction.md | supersede | ― | 5 | planned | execution_unit 構成の v4 再編（Wave モデル改訂に追随） |
+| workflows/references/execution-unit-construction.md | supersede | ― | 5 | executed | execution_unit 構成の v4 再編（Wave モデル改訂に追随）。第5段实行 2026-09-19（Case #2988、Definition merge b86354a9、実装 merge 0f8b1e10/abf77201/70bf897d、fan-in fix 57664e33）・in-place v4 再編として実行 |
 | foundations/numbering-policy.md | keep | ― | ― | planned | 採番規則は v4 でも維持 |
 | foundations/system.md | redefine | ― | 4 | executed | コマンドシステム構成の v4 再編。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | foundations/document-model.md | redefine | ― | 3 | executed | 本段: モデル定義 Design 昇格条件と移行期間優先規則の最小 UPDATE。第3段实行（Case #2973、merge a098b0f1） |
@@ -138,7 +138,7 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | integrity/*.md（14 件）+ integrity/rules/IR-NNN 群 | keep | deterministic code/tool | ― | planned | 検証基盤は v4 でも維持。個別再編が必要になった時点で個別行へ展開 |
 | local/*.md（4 件） | redefine | Adapter | 11 | planned | backend 抽象・物理写像への整理 |
 | authoring/command-file-format.md | redefine | ― | 8 | planned | コマンド執筆規約の v4 再編 |
-| authoring/vocabulary-registry.md | redefine | ― | 5 | planned | 語彙直交性の再定義への接続 |
+| authoring/vocabulary-registry.md | redefine | ― | 5 | executed | 語彙直交性の再定義への接続。第5段实行 2026-09-19（Case #2988、Definition merge b86354a9、実装 merge 0f8b1e10/abf77201/70bf897d、fan-in fix 57664e33） |
 
 ## その他（概念・実装資産）
 
@@ -149,7 +149,7 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | Command/Skill/Custom Tool/Plugin（概念） | redefine | ― | 8 | planned | 実装責務境界の再分類 |
 | .agentdev/ 状態領域（概念） | redefine | Project Model | 9 | planned | durable state 5 分類への整理 |
 | Intake/Learning/Backlog（概念） | redefine | ― | 9 | planned | 継続コラボレーションループ |
-| work_type/scale/workflow_route（概念） | redefine | ― | 5 | planned | 語彙直交性への再定義 |
-| Epic/Wave（概念） | redefine | ― | 5 | planned | 階層合成・実行スケジューリング |
+| work_type/scale/workflow_route（概念） | redefine | ― | 5 | executed | 語彙直交性への再定義。第5段实行 2026-09-19（Case #2988、Definition merge b86354a9、実装 merge 0f8b1e10/abf77201/70bf897d、fan-in fix 57664e33） |
+| Epic/Wave（概念） | redefine | ― | 5 | executed | 階層合成・実行スケジューリング。第5段实行 2026-09-19（Case #2988、Definition merge b86354a9、実装 merge 0f8b1e10/abf77201/70bf897d、fan-in fix 57664e33） |
 | QG-1〜QG-4（概念） | redefine | Standard Operating Model | 6 | planned | Quality 5 概念分解・Gate 再導出 |
 | 配布物・プロジェクション（概念） | redefine | ― | 12 | planned | migration implementation |
