@@ -234,3 +234,35 @@
 - **配布反映先**: docs/designs/integrity/checker-execution-contracts.md 関連 knowledge、learning-promote の評価対象
 - **関連**: Case #2997、Epic #3001、check_distribution_boundary_cli.ts、docs/designs/integrity/distribution-boundary.md
 - **タグ**: #case-close #distribution-boundary #CLI契約 #fail-closed #checker実行
+
+## 2026-09-19: bun test のディレクトリ filter は `./` なしの深い .opencode パスでサイレント 0 件一致になる
+
+- **問題事象**: bun 1.3.6 で `bun test .opencode/skills/repo-agentdev-integrity/scripts/` を実行すると「filters did not match any test files」（exit 1・995 files searched）となり、テストが 1 件も実行されなかった。同一コマンド形式の `bun test src/opencode/skills/` と `bun test .opencode/plugins/ ./scripts/` は正常に一致するため、失敗に気づきにくい。`./` 付きの `bun test ./.opencode/skills/repo-agentdev-integrity/scripts/` では 2558 pass（exit 0）。
+- **工程位置**: case-open STEP-4 検証（Case #3004 Definition PR commit 後の bun test 3 分割）
+- **検知方法**: bun test 標準出力に pass/fail 行が現れないこと（フィルタ不一致メッセージの確認）
+- **根本原因**: bun test の位置引数 filter とパス先頭形式の解決差異。REQ-060（repo root 起 cwd・`./` 付きパス指定）の規定は本挙動の回避則でもあるが、`./` なしでも一致するディレクトリが存在するため規定から外れても偶然成功し、深い .opencode 配下のパスでのみ顕在化した
+- **対応内容**: `./` 付き形式へ統一して再実行し 2558 pass を確認。Root Case #3004 の case-open 検証記録節と Definition PR 本文の判断記録に実行形態を記録
+- **ユーザー確認の有無**: なし（REQ-060 準拠への切替のみ）
+- **Decision/REQ/spec影響**: なし（REQ-060 の遵守強化）
+- **展開視点**: bun test の filter 不一致は「0 テスト実行」で失敗するため、pass 数 0 と全 pass を取り違えない。検証記録には pass 数まで含めて記録する
+- **再発条件**: `./` なしの深いパス（.opencode 配下のサブディレクトリ等）を bun test の filter に使った場合
+- **予防策**: bun test のパス指定は常に `./` 付き（REQ-060）で統一し、実行後に pass/fail 行を目視または機械確認する
+- **配布反映先**: learning-promote の評価対象、REQ-060 関連 knowledge
+- **関連**: Case #3004、PR #3005、REQ-060
+- **タグ**: #case-open #bun #bun-test #REQ-060 #検証
+
+## 2026-09-19: agentdev_gh issue_create の長文本文は作成直後の read-back で構造検証する（改行誤記の混入）
+
+- **問題事象**: agentdev_gh issue_create で Root Case 本文（約 90 行の日本語 Markdown）を作成した際、冒頭の `Tracking: #2966` 直後の改行が `\nn`（stray n 1 文字）となり「n## 概要」という崩れた見出しで作成された。Tool の VERIFY は書込み成功の検証であり、本文内容の意図検証は行われない
+- **工程位置**: case-open STEP-2（Root Case 確立。Case #3004）
+- **検知方法**: issue_create 直後に issue_read で本文を読み戻した際の構造確認（見出し行の先頭確認）
+- **根本原因**: 長文本文の手組み立て時にエスケープ列 `\n\n` の入力ミス。Tool 側検証は存在性・状態のみで内容の正しさは保証しないため、作成者側の read-back が唯一の検知経路
+- **対応内容**: issue_read の戻り本文を正として stray n の 1 箇所のみ修正した同一本文で issue_update を再実行し、再度 read-back で修正確認
+- **ユーザー確認の有無**: なし（作成直後の自己訂正）
+- **Decision/REQ/spec影響**: なし
+- **展開観点**: 実行識別情報（adf_case キー・バリュー行）を含む本文は機械解析対象となるため、見出し・キー行の崩れは後続工程（case-ready の機械解析）に影響し得る。長文 body の issue_create / issue_update では「作成 → read-back → 必要なら最小差分で再更新」を標準サイクルにする
+- **再発条件**: 手組み立ての長文 Markdown を Tool 引数として渡す場合
+- **予防策**: issue_create 後は必ず issue_read で本文 read-back し、見出し行（## で始まる行）と key-value 行の構造を確認してから次工程へ進む
+- **配布反映先**: agentdev-issue-management（Issue 操作後 VERIFY 手順）、learning-promote の評価対象
+- **関連**: Case #3004、agentdev_gh
+- **タグ**: #case-open #agentdev_gh #read-back #Issue本文 #VERIFY
