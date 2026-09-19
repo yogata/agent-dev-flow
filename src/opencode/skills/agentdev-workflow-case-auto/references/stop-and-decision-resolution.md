@@ -107,7 +107,7 @@ execution_unit 分割可能性があるにも関わらず case-open が停止し
 case-auto は当該 execution_unit の自走を停止し、ユーザー判断を待機する。
 停止伝播契約の詳細は case-auto command Design（project extension 経由参照）「adversarial-review 由来の停止伝播（case-auto の停止伝播受領）」節を正とする。
 
-- **受領**: case-run 起源は result `blocked` + user-decision-required 分類、工程委譲起源は既存 status + `parent_decision_required`（workflow-contracts Design「adversarial-review 由来の停止信号」節、delegation-contracts Design「review 経路での parent_decision_required / decision_context 適用」節）。user-decision-required は case-run result enum 第5状態ではなく停止理由分類である
+- **受領**: case-run 起源は result `blocked` + user-decision-required 分類、工程委譲起源は既存 status + `parent_decision_required`（v4-lifecycle-state-machine Design「adversarial-review 由来の停止信号」節、delegation-contracts Design「review 経路での parent_decision_required / decision_context 適用」節）。user-decision-required は case-run result enum 第5状態ではなく停止理由分類である
 - **自走停止**: 当該 execution_unit のみ停止。他 ready 対象は継続（部分停止、STEP-3 Wave 反復制御）
 - **ユーザー提示**: decision_context をユーザーへ提示し判断を待機
 - **resume point**: case-run 起源は当該 Issue の case-run 再開ポイント（準備フェーズ、実装フェーズ、提出フェーズのいずれか）、工程委譲起源は当該工程の委譲起点
@@ -157,7 +157,7 @@ user-decision-required は STEP-4 の HITL 境界停止条件分類とは独立�
 
 case-auto は下位 command から受領した decision_context を限定的に自律解決する。
 default-on + skip policy と case-auto の自走性を両立し、ユーザー停止を本質的な場面へ集約する。
-解決範囲、作業仮定の明示要件、停止理由分類の詳細は case-auto command Design（project extension 経由参照）「bounded parent decision resolution」節、delegation-contracts Design「case-auto による decision_context の限定的親判断解決」節、workflow-contracts Design「bounded parent decision resolution と停止・resume 伝播」節が正である。
+解決範囲、作業仮定の明示要件、停止理由分類の詳細は case-auto command Design（project extension 経由参照）「bounded parent decision resolution」節、delegation-contracts Design「case-auto による decision_context の限定的親判断解決」節、v4-lifecycle-state-machine Designが正である。
 
 | 分類 | 条件 | アクション |
 |---|---|---|

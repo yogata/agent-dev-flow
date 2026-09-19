@@ -142,9 +142,9 @@ QG-3 は乖離の分類と推奨アクションの提示までを責務とし、
 
 | 乖離タイプ | 対応経路 | 説明 |
 |---|---|---|
-| `spec-bug` | `/agentdev/case-revise {N}` → `/agentdev/case-ready {N}` → `/agentdev/case-run {N}`（再開） | Definition の修正が必要 |
-| `impl-bug` | `/agentdev/case-run {N}` 再開（レビュー NG コメントは Issue コメントへ記録） | 実装の修正が必要（Definition は不変） |
-| `scope-creep` | `/agentdev/case-revise {N}` → `/agentdev/case-ready {N}` → 不要実装削除 → `/agentdev/case-run {N}` | Definition スコープの再定義が必要 |
+| `spec-bug` | `/agentdev/case-auto` による再開（内部 lifecycle 経路: case-revise → case-ready → case-run） | Definition の修正が必要 |
+| `impl-bug` | `/agentdev/case-auto` による再開（内部 lifecycle 段階 case-run。レビュー NG コメントは Issue コメントへ記録） | 実装の修正が必要（Definition は不変） |
+| `scope-creep` | `/agentdev/case-auto` による再開（内部 lifecycle 経路: case-revise → case-ready → 不要実装削除 → case-run） | Definition スコープの再定義が必要 |
 
 報告フォーマットの出力は `issue_comment_review_ng.md` テンプレートに埋め込める形式とする。
 

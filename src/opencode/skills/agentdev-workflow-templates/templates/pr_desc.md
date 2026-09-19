@@ -15,7 +15,7 @@ Pull Request作成時の本文テンプレート。
 ## 実行識別情報
 <!-- 【必須】 -->
 
-<!-- 実行識別情報: workflow-contracts Design「ADF 実行識別情報の記録契約」に基づく構造化識別情報セクション。
+<!-- 実行識別情報: v4-durable-state-and-recovery Design「ADF 実行識別情報の記録契約」節に基づく構造化識別情報セクション。
 機械的解析は本セクション内の adf_ 接頭辞付き key-value 行を正とし、自由文中に偶然出現する ID に依存しない。
 adf_delegation は委譲 prompt の委譲識別情報ブロックから転記し、委譲実行と PR の対応付けの正規手段とする。
 harness 側識別子は取得可能な場合の付加情報に限定し、必須契約としない。
@@ -73,7 +73,7 @@ case-close と QG-{N} は当該欄を完了条件の証拠ソースとして読�
 <!-- 【必須】 -->
 
 <!-- 検証差分: 検証種別、検証結果、前段階からの finding 差分を工程ごとに記録する構造化検証記録セクション。
-記録先割当（PR 本文: 検証種別と検証結果）は workflow-contracts Design「ADF 実行識別情報の記録契約」に基づき、
+記録先割当（PR 本文: 検証種別と検証結果）は v4-durable-state-and-recovery Design「ADF 実行識別情報の記録契約」節に基づき、
 形式は agentdev-workflow-templates の検証差分セクション規約に従う。
 1行に1検証を記録し、実行工程には検証を実施した ADF 工程（case-run、case-close、レビュー等）を記録する。
 finding 差分は 新規 / 修正済み / 既出 / 撤回 / 無効 の5分類で区別して記録する（撤回と無効は「撤回または無効となった finding」の内訳）。

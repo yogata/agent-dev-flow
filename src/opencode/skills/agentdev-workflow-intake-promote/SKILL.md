@@ -33,7 +33,7 @@ intake-promote command は公開 interface（入出力契約・ガードレー�
 ## 制御平面（STEP 一覧）
 
 intake-promote workflow は次の6 STEP で構成する。
-各 STEP は再開ポイント（resume point）を持ち（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）、classification / review / HITL / persistence / destructive handling の5段階がそれぞれ独立した再開ポイントである。
+各 STEP は再開ポイント（resume point）を持ち（DEC-{N}、`docs/designs/<foundations/v4-durable-state-and-recovery>.md`）、classification / review / HITL / persistence / destructive handling の5段階がそれぞれ独立した再開ポイントである。
 会話コンテキストに依存せず、永続状態（inbox / promoted の実ファイル状態、分類確定状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
@@ -71,7 +71,7 @@ intake-promote workflow は次の6 STEP で構成する。
 ## 再開プロトコル（永続状態による再開）
 
 会話コンテキストを権威情報源とせず、永続状態から current STEP を再構成する（DEC-{N}）。
-優先順位は `<workflows/input-resolution-and-durable-state>` Design に従う。
+優先順位は `<foundations/v4-durable-state-and-recovery>` Design に従う。
 
 1. SSoT 再構成: `.agentdev/intake/inbox/` と `.agentdev/intake/promoted/` の実ファイル状態
 2. identifier 保持: item ファイルパス、採用済み成果物パス
@@ -115,10 +115,10 @@ HITL（STEP-3）の承認状態は単独では永続状態に記録されない�
 
 ## See Also
 
-- **`<workflows/workflow-contracts>` Design**: promote系判断確定とHITL境界の詳細判定表の集約所有者
+- **`<foundations/v4-responsibility-boundaries>` Design**: HITL 判断確定原則の詳細判定表の集約所有者
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
-- **`<workflows/input-resolution-and-durable-state>` Design**: 永続状態の優先順位、current STEP 再構成
+- **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
+- **`<foundations/v4-durable-state-and-recovery>` Design**: 永続状態の優先順位、current STEP 再構成
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
 - **intake-promote command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

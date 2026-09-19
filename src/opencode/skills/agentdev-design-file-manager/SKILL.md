@@ -153,10 +153,10 @@ Design 保存内部責務は本スクリプト群を bash 経由で呼び出し�
 
 本スキルが操作する Design ファイル群は永続状態の最上位（SSoT 再構成）に位置する。
 Design `status`（`draft` / `accepted`）は最小 scalar 相当の状態値として扱う。
-優先順位の詳細は `<workflows/input-resolution-and-durable-state>` Design 参照。
+優先順位の詳細は `<foundations/v4-durable-state-and-recovery>` Design 参照。
 
 呼出元 STEP（Design 保存内部責務）は本スキルの操作結果（Design ファイル作成、target_area 置換結果）を STEP の result evidence として扱い、次 STEP の Input Resolution で SSoT 再構成から再取得できる。
-STEP reference 8 要素は `<workflows/step-reference-contract>` Design 参照。
+STEP reference 8 要素は `<foundations/v4-durable-state-and-recovery>` Design 参照。
 
 ## See Also
 

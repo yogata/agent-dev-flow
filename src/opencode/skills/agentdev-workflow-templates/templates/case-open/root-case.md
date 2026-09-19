@@ -14,7 +14,7 @@ labels: enhancement
 ## 実行識別情報
 <!-- 【必須】 -->
 
-<!-- 実行識別情報: workflow-contracts Design「ADF 実行識別情報の記録契約」に基づく構造化識別情報セクション。
+<!-- 実行識別情報: v4-durable-state-and-recovery Design「ADF 実行識別情報の記録契約」節に基づく構造化識別情報セクション。
 機械的解析は本セクション内の adf_ 接頭辞付き key-value 行を正とし、自由文中に偶然出現する ID に依存しない。
 harness 側識別子は取得可能な場合の付加情報に限定し、必須契約としない。
 識別情報の一部が取得不能な場合は「N/A」と記録し、workflow を停止しない。
@@ -33,7 +33,7 @@ harness 側識別子は取得可能な場合の付加情報に限定し、必須
 <!-- 【必須】 -->
 
 <!-- Definition Package: case-open が壁打ち済み内容から生成し Root Case に関連付ける。
-構成は definition-readiness Design に従う（要件行、Decision、Design、Issue 構成案、受入条件一式）。
+構成は case-open / case-ready Design に従う（要件行、Decision、Design、Issue 構成案、受入条件一式）。
 realization_actions は構成要素として保持する（構造化ハンドオフ）。case-open は execution contract を確定しない -->
 - 要件行: [REQ 変更後本文または所在]
 - Decision: [関連 Decision 一覧（新規 Decision は proposed のまま維持）]

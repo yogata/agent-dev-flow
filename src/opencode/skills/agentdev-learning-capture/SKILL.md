@@ -33,7 +33,7 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 以下のタイミングでこのスキルを検討する:
 
-- `/agentdev/case-close` の実行中
+- case-auto 内部 lifecycle 段階 case-close の実行中
 - バグを修正したとき
 - 調査が完了し、原因が判明したとき
 - CI/CDパイプラインが失敗したとき

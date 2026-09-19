@@ -18,7 +18,7 @@
 ### Input Resolution
 
 - STEP-2〜STEP-4 の評価・判定結果（中断時は evaluation-report.md と inbox.md 実ファイルから再構築する）
-- 自律確定可否の詳細判定表（自律確定可能要件、HITL移送条件、判定と運用の共通規則）は横断契約Design `<workflows/workflow-contracts>`「promote系判断確定とHITL境界」節が集約所有する（extension 経由で解決）。本 reference は判定表を複製しない
+- 自律確定可否の詳細判定表（自律確定可能要件、HITL移送条件、判定と運用の共通規則）は横断契約Design `<foundations/v4-responsibility-boundaries>`「HITL 判断確定原則」節が集約所有する（extension 経由で解決）。本 reference は判定表を複製しない
 - 提示形式、承認フローは `agentdev-learning-pipeline` の公開操作契約に従う
 
 ### Preconditions

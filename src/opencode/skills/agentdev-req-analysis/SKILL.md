@@ -15,7 +15,7 @@ description: Provides requirement analysis methods with quality criteria and Dec
 
 ## 入力
 
-- RU（採用済み成果物）、セッションコンテキスト、明示入力ファイル
+- RU（採用済み成果物）、セッションコンテキスト、明示入力ファイル。エラー・ログ・障害情報、外部課題、finding も入力種別として扱う（`v4-standard-lifecycle` Design「req-define の入力意味と要件化責務」節）
 
 ## 出力
 
@@ -31,7 +31,7 @@ description: Provides requirement analysis methods with quality criteria and Dec
 - **扱う**: 分析観点、品質基準、壁打ちメソドロジー、REQ/Design 境界判定基準、Decision 閾値判定ブリッジ、変更誘発境界リスク分析（5観点境界からの case-specific risk 導出、リスク導出規則の参照契約と不在時挙動、test strategy への投影）、検証手段の質基準（production-equivalent verification の一般原則と test strategy 設計時点への適用、完了時点の証跡契約を正規所有する要件群との時点分担）、プロジェクト知識の参照観点（docs/knowledge/ 配下の知識を判断材料へ加える適用条件判定と知識不在時の分析続行）
 - **扱わない**:
   - REQファイルの採番、CREATE/APPEND/UPDATE、frontmatter更新、README更新（→ `agentdev-req-file-manager`）
-  - コードレベルの work plan（実装計画、タスク分割等の確定）（→ `/agentdev/case-run` の work plan）。どの実現面を変更すべきかの確定は req-define 責務であり case-run へ先送りしない（実現面確定の先送り禁止）
+  - コードレベルの work plan（実装計画、タスク分割等の確定）（→ case-auto 内部 lifecycle 段階 case-run の work plan）。どの実現面を変更すべきかの確定は req-define 責務であり case-run へ先送りしない（実現面確定の先送り禁止）
   - Decisionファイルの作成、更新（→ `agentdev-decision-file-manager`）。Decision閾値に達する判断候補の抽出は行うが、ファイル操作は扱わない
 
 ## 常に守る不変条件
@@ -93,11 +93,11 @@ description: Provides requirement analysis methods with quality criteria and Dec
 
 ### 呼出元 STEP と Input Resolution
 
-呼出元 STEP は本スキルへの入力（RU、セッションコンテキスト、明示入力ファイル）を Input Resolution（`<workflows/input-resolution-and-durable-state>` Design）に従って解決する。
+呼出元 STEP は本スキルへの入力（RU、セッションコンテキスト、明示入力ファイル）を Input Resolution（`<foundations/v4-durable-state-and-recovery>` Design）に従って解決する。
 優先順位: (1) SSoT 再構成（docs/ 配下の永続文書）、(2) identifier 保持（RU-ID、REQ-ID、Issue番号）、(3) 最小 scalar、(4) runtime artifact（要件doc draft、検出事項等、REQ-{NNNN} lifecycle）。
 
 本スキルの出力（要件doc候補、壁打ち出力）は runtime artifact に分類され、呼出元 STEP の result evidence および次 STEP の Input Resolution 入力として扱われる。
-STEP reference 8 要素は `<workflows/step-reference-contract>` Design 参照。
+STEP reference 8 要素は `<foundations/v4-durable-state-and-recovery>` Design 参照。
 
 ## See Also
 

@@ -21,7 +21,7 @@ Skill、Command、script、checker、hook、Custom Tool 等の具体的な実現
 **昇華可能性評価、無条件自動REQ化禁止**: 各問題クラスについて恒久契約（REQ/Decision/Design）への昇華可能性を評価する。
 8軸評価スコア、禁止条件フィルタリングゲート、既存対策照合を基に判定する。
 **無条件の自動REQ化は禁止する**。
-学びは `promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/case-open` → `/agentdev/case-ready` の昇華経路を経て初めて REQ 化される。
+学びは `promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/case-auto`（内部 lifecycle）の昇華経路を経て初めて REQ 化される。
 
 **living pool 維持**: 昇華不能な知見（`deferred` 判定、情報が断片的、出現回数が少ない等）は `deferred.md` の living pool で維持し、REQ 化しない。
 living pool は終端保管ではなく、次回 `/agentdev/learning-promote` 実行時に再評価の対象となる。
@@ -29,7 +29,7 @@ living pool は終端保管ではなく、次回 `/agentdev/learning-promote` �
 
 | # | カテゴリ | 判定基準 |
 |---|---|---|
-| 1 | 恒久契約候補（REQ） | 要件変更、機能追加の要因となる知見、既存 REQ の更新が必要な内容。**自動 REQ 化ではなく候補扱い**。確定は `/agentdev/req-define` → `/agentdev/case-open` → `/agentdev/case-ready` 経路で行う |
+| 1 | 恒久契約候補（REQ） | 要件変更、機能追加の要因となる知見、既存 REQ の更新が必要な内容。**自動 REQ 化ではなく候補扱い**。確定は `/agentdev/req-define` → `/agentdev/case-auto`（内部 lifecycle）経路で行う |
 | 2 | 恒久契約候補（Decision） | アーキテクチャに関する設計判断、技術選定の理由を記録すべき内容。禁止条件フィルタリングゲート適用後の候補 |
 | 3 | 恒久契約候補（Design） | システム仕様、実装パターン、設計原則として docs/designs/ に反映すべき内容 |
 | 4 | project knowledge | プロジェクト固有の落とし穴、環境依存の知見、汎用化が難しい内容。保存先の候補判定は「プロジェクト固有知識の反映先振り分け」参照 |

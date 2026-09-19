@@ -363,9 +363,9 @@ Command本文でテンプレート、スキル参照のパスを記述する際�
 | 判定 | 記述例 | 理由 |
 |------|--------|------|
 | ✅ OK | `.opencode/skills/{name}/templates/pr_desc.md` | 実行時パス（投影先でアクセス可能） |
-| ✅ OK | `.opencode/commands/agentdev/case-close.md` | 実行時パス（commandの実際の配置場所） |
+| ✅ OK | `.opencode/commands/agentdev/case-auto.md` | 実行時パス（commandの実際の配置場所） |
 | ❌ NG | source ツリーの `skills/{name}/templates/pr_desc.md` | source path（実行時環境に存在しない） |
-| ❌ NG | source ツリーの `commands/agentdev/case-close.md` | source path（開発リポジトリ内のみ有効） |
+| ❌ NG | source ツリーの `commands/agentdev/case-auto.md` | source path（開発リポジトリ内のみ有効） |
 
 - [ ] Command本文内のパス参照が実行時パス（`.opencode/...`）を使用しているか
 - [ ] source path（`src/` 配下）で始まるパス参照が Command 本文に含まれていないか

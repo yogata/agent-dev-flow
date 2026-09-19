@@ -149,7 +149,7 @@ Epic execution_unit の Wave 間および最終 Wave の case-close(#epic) は W
 
 #### stage 1 収束条件と横断依存検査（全対象確立後・case-auto 側で横断評価）
 
-stage 1（case-open）の収束条件には、全対象確立後の横断依存検査の実施を含める（case-auto Design「現在の動作」節、workflow-contracts Design「Case 投入時の横断依存検査契約」）。
+stage 1（case-open）の収束条件には、全対象確立後の横断依存検査の実施を含める（case-auto Design「現在の動作」節、case-open / case-ready Design「横断依存検査」節）。
 並列 case-open によって兄弟対象をタイミング依存で欠落させないため、case-auto は stage 1 を収束させる前に次を実行する:
 
 1. stage 1 の委譲先（case-open / case-revise）が全対象の Root Case Issue を確立したことを確認する（起動時対象集合と確立済み Issue 集合の一致）

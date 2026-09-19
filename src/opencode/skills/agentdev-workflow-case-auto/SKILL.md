@@ -122,6 +122,6 @@ case-auto workflow は次の8 STEP で構成する。
 ## See Also
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
+- **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **Decision records**: Command / Workflow Skill / Capability Skill の責務分化、STEP resume point、bounded parent decision resolution、Definition 確定境界の正規判断
 - **case-auto command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）
