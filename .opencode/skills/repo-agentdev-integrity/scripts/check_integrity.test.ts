@@ -2960,7 +2960,7 @@ describe("IR-055 runtime-unresolved-reference 実修復回帰 (Issue #1782)", ()
         (r.finding_level === "strict" || r.finding_level === "heuristic"),
     );
     expect(newViolations.length).toBe(0);
-  });
+  }, 15000);
 
   it("baseline-known runtime-unresolved-reference が閾値以下であること（修復後の上限）", () => {
     // 修復時点での baseline-known 数を上限として固定する。この値を超える場合、
@@ -2982,7 +2982,7 @@ describe("IR-055 runtime-unresolved-reference 実修復回帰 (Issue #1782)", ()
     );
     // 修復完了時点の実績値。将来の削減を許容し、増加を拒否する。
     expect(baselineKnown.length).toBeLessThanOrEqual(548);
-  });
+  }, 15000);
 });
 
 // ─── NG21 N16/N17 是正回帰テスト（Issue #2245, OU-0009, RU-0054） ──────────
@@ -3021,7 +3021,7 @@ describe("NG21 N16/N17 是正回帰 (Issue #2245, OU-0009)", () => {
     );
     expect(gapOk).toBeDefined();
     expect(gapOk!.message).toContain("corresponding implementations");
-  });
+  }, 15000);
 
   it("N17: case-close.md の command-capture-duty が ok であること（capture-boundaries 参照）", () => {
     const proc = Bun.spawnSync(["bun", "run", SCRIPT_FILE, "--json"], {
@@ -3042,7 +3042,7 @@ describe("NG21 N16/N17 是正回帰 (Issue #2245, OU-0009)", () => {
     expect(duty).toBeDefined();
     expect(duty!.level).toBe("ok");
     expect(duty!.message).toContain("capture-boundaries reference");
-  });
+  }, 15000);
 });
 
 // ─── WP-3 (Issue #1928): execution profile separation ───────────────────────

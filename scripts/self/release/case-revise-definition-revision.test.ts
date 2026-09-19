@@ -44,7 +44,7 @@ const TPL_REPORT_REL =
   "src/opencode/skills/agentdev-workflow-templates/templates/case-revise/root-case-report.md";
 const REQ_062_REL = "docs/requirements/REQ-062.md";
 const REQ_033_RET_REL = "docs/requirements/retired/REQ-033.md";
-const DEF_READINESS_REL = "docs/designs/workflows/definition-readiness.md";
+const CASE_REVISE_DESIGN_REL = "docs/designs/commands/case-revise.md";
 
 function read(rel: string): string {
   return readFileSync(path.join(REPO_ROOT, rel), "utf-8");
@@ -181,24 +181,25 @@ describe("Impact reassessment protects completed Issues (REQ-062-004)", () => {
 });
 
 describe("Idempotency key enumeration agreement (TS-008)", () => {
-  const designDoc = read(DEF_READINESS_REL);
-  const designSection = extractHeadingSection(designDoc, "## 冪等キー");
+  const designDoc = read(CASE_REVISE_DESIGN_REL);
+  const designSection = extractHeadingSection(designDoc, "## 冪等性");
 
-  test("definition-readiness Design owns the idempotency key section", () => {
+  test("case-revise Design owns the idempotency section", () => {
     expect(designSection).not.toBe("");
   });
 
-  test("Amendment PR is covered by the Design idempotency key enumeration", () => {
+  test("Amendment PR is covered by the Design idempotency section", () => {
     // REQ-062-005 forbids duplicate generation of the same re-agreed
     // Amendment PR. The Design enumeration that owns the duplicate
     // detection keys must name the Amendment PR.
     expect(designSection).toContain("Amendment PR");
   });
 
-  test("Design lifecycle pins the Amendment PR creation condition and no-rollback", () => {
-    const lifecycle = extractHeadingSection(designDoc, "## Definition PR lifecycle");
-    expect(lifecycle).toMatch(/Definition Amendment PR: case-revise が再合議済みの実変更がある場合のみ作成する/);
-    expect(lifecycle).toMatch(/merge を巻き戻さず、canonical Definition を基準に再開する/);
+  test("Design contract pins the Amendment PR creation condition and no-rollback", () => {
+    const structure = extractHeadingSection(designDoc, "## 内部構成");
+    expect(structure).toMatch(/実変更がなければ Amendment PR を作成せず case-ready へ移行する/);
+    const idempotency = extractHeadingSection(designDoc, "## 冪等性");
+    expect(idempotency).toMatch(/中断済み成果物は巻き戻さない/);
   });
 
   test("skill pins the reuse list and forbids duplicates (same re-agreed change)", () => {
