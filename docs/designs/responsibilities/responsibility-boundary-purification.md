@@ -92,7 +92,7 @@ case 実行に関わる責務を 4 用語へ分解し、正規所有者を固定
 
 ### 関連 Design（参照レベル、別途 Definition 保存（case-ready / case-revise）の Design 保存内部責務 対象）
 
-- `workflows/delegation-contracts.md`: 委譲契約で 4 用語を使用
+- `workflows/v4-delegation-contracts.md`: 委譲契約で 4 用語を使用
 - `foundations/harness-separation-model.md`: harness execution mechanism の ADF 規範所有対象外を明記
 - `skills/agentdev-workflow-orchestration.md`: orchestration stage と case-run internal lifecycle の区別を使用
 - `skills/agentdev-case-run-execution-adapter.md`: external execution boundary への委譲契約を使用

@@ -77,7 +77,7 @@ REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-039 の38件である（DEC-005、DEC-007、DEC-017、DEC-029、DEC-030 は superseded、proposed は 0 件）。
+現行 Decision は DEC-001 から DEC-039 の38件である（DEC-005、DEC-007、DEC-015、DEC-017、DEC-029、DEC-030 は superseded、proposed は 0 件）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
@@ -96,7 +96,7 @@ REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却
 | [DEC-012](decisions/DEC-012.md) | Extension を file-kind から workflow/capability responsibility へ再編 |
 | [DEC-013](decisions/DEC-013.md) | IR 登録モデルの簡素化 — 現存 IR を実行可能な恒久統制に限定 |
 | [DEC-014](decisions/DEC-014.md) | 配布依存境界の多層 enforcement |
-| [DEC-015](decisions/DEC-015.md) | ADF決定論的実行中核と実行基盤実行機構の責務分界 |
+| [DEC-015](decisions/DEC-015.md) | ADF決定論的実行中核と実行基盤実行機構の責務分界（superseded by DEC-036） |
 | [DEC-016](decisions/DEC-016.md) | 導入系スクリプトの副作用ゼロ原則 |
 | [DEC-017](decisions/DEC-017.md) | 最小トレーサビリティモデルの採用と Artifact Graph の廃止（superseded by DEC-037） |
 | [DEC-019](decisions/DEC-019.md) | 一般処理の標準API委譲とADF固有意味論の所有境界 |
@@ -130,6 +130,7 @@ Design は 3 層構造（commands / skills / workflows）と基盤 6 ドメイ�
 
 - [Workflow Skill Model](designs/workflows/workflow-skill-model.md)
 - [サブエージェント委譲契約](designs/workflows/delegation-contracts.md)
+- [サブエージェント委譲契約（v4）](designs/workflows/v4-delegation-contracts.md)
 - [キャプチャ境界](designs/workflows/capture-boundaries.md)
 - [RU / 採用済み成果物 / draft lifecycle](designs/workflows/backlog-artifact-lifecycle.md)
 - [execution_unit 構成アルゴリズム参照](designs/workflows/references/execution-unit-construction.md)

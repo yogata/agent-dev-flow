@@ -69,7 +69,7 @@ updated: "2026-09-19"
   - 文書分類妥当性検証（Design 分離基準違反残留検出）
     - Decision要否確認ゲート（`agentdev-architecture-advisory` 経由でアーキテクチャ助言サブエージェントへ委譲）
     - アーキテクチャ助言サブエージェントへの入力標準テンプレート使用 + 出力 4 ラベル構造要求（REQ-004-042）。ラベル構造は soft-contract（DEC-003）とし、分類権限は親が保持する
-  - 実行主体分類表（REQ-003-007）（委譲契約を定義する場合、実行主体分類表（adapter skill / command / subagent / harness）を必須とする（`docs/designs/workflows/delegation-contracts.md` 参照））。委譲を含まない要件では省略可
+  - 実行主体分類表（REQ-003-007）（委譲契約を定義する場合、実行主体分類表（adapter skill / command / subagent / harness）を必須とする（`docs/designs/workflows/v4-delegation-contracts.md` 参照））。委譲を含まない要件では省略可
   - Test strategy 定義（要件展開内）
     - 各 test strategy 項目を verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素構造として定義
     - on_failure（不合格時の処置）を持たない検証項目は test strategy に含めない
@@ -471,7 +471,7 @@ req-define は、既存の明示的な対応関係（`agentdev-traceability` の
 ## 参照する横断 Design
 
 - [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（フェーズ定義、SSoT 遷移）
-- [workflows/delegation-contracts.md](../workflows/delegation-contracts.md)（extraction / classification 委譲）
+- [workflows/v4-delegation-contracts.md](../workflows/v4-delegation-contracts.md)（extraction / classification 委譲）
 - [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（REQ再構成 intake、draft lifecycle）
 - [req-health-metrics.md](../quality/req-health-metrics.md)（SPLIT 予兆計測閾値）
 - [v4-quality-gate-model.md](../quality/v4-quality-gate-model.md)（QG-1）
@@ -558,7 +558,7 @@ review の finding は Decision判断、要件doc生成の成果物へ反映可�
 
 発動条件判定 Step で発動と判定された場合、review 呼出 Step で adversarial-review を呼び出す（REQ-015-001）。
 
-- **委譲契約**: adversarial-review は `semantic_review`（書き込み禁止型）として適用する（[delegation-contracts Design](../workflows/delegation-contracts.md)「adversarial-review との委譲契約接続」節）。adversarial-review 自身は対象ファイル、Issue、PR、git 操作を行わない（REQ-014-004）。
+- **委譲契約**: adversarial-review は `semantic_review`（書き込み禁止型）として適用する（[v4-delegation-contracts Design](../workflows/v4-delegation-contracts.md)「adversarial-review との委譲契約接続」節）。adversarial-review 自身は対象ファイル、Issue、PR、git 操作を行わない（REQ-014-004）。
 - **review 対象**: 当該 req-define で生成した要件候補（draft-data、`agreed_items`、`artifact_actions`、Decision判断結果、Scale判断結果）。
 - **採用後戻り先**: accepted finding のうち Decision 関連の finding は Decision判断へ戻し再評価する。要件展開に関わる finding は該当段階（要件展開以降）へ戻す。accepted finding の対象候補への反映は req-define（呼出元）の責務である（REQ-014-006）。
 - **unresolved 時の取扱い**: 未解決のユーザー判断事項が残る場合、ドラフト保存へ進まない（REQ-014-009）。工程委譲起源であるため、既存 status（pass/warn/fail/partial）に unresolved 判断事項を付加し、case-auto 経由時は user-decision-required 停止理由分類として伝播する（REQ-014-012、[v4-lifecycle-state-machine Design](../workflows/v4-lifecycle-state-machine.md)「adversarial-review 由来の停止信号」節）。

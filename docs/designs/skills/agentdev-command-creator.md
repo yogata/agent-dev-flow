@@ -4,6 +4,7 @@ status: accepted
 created: 2026-06-21
 updated: 2026-07-18
 ---
+<!-- ADF-COVERS(implementation): REQ-002-001, REQ-002-009 -->
 
 # `agentdev-command-creator` Design
 

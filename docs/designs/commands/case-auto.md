@@ -94,7 +94,7 @@ context 管理:
 ## 参照する横断 Design
 
 - [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（Pattern Taxonomy（manager-orchestrator））
-- [workflows/delegation-contracts.md](../workflows/delegation-contracts.md)（step_execution 委譲（v2:ADR-0127））
+- [workflows/v4-delegation-contracts.md](../workflows/v4-delegation-contracts.md)（step_execution 委譲（v2:ADR-0127））
 - [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（Epic Wave 反復制御〔Wave 状態は子Issue 状態からの導出投影〕）
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 責務（委譲））
 
@@ -154,7 +154,7 @@ case-auto は case-open が生成した execution_unit 群（standard | epic の
 case-auto は case-open の判定結果に従い case-run(#epic) / case-run(standard) を起動する（薄いオーケストレーター原則、Issue 階層決定・子 Issue 選択・Epic 化判定の委譲を維持）。
 Issue 階層決定、子 Issue 選択、Epic 化判定の判断ロジックは持たない。
 
-### 処理単位の一級概念化（DEC-015）
+### 処理単位の一級概念化（DEC-015（superseded by DEC-036/038/039））
 
 case-auto は処理単位を一級概念として扱う（REQ-034-035）。
 処理単位は少なくとも次の意味を持つ。
@@ -414,7 +414,7 @@ Phase 0 の枝PR に含まれるコミット構成運用を規定する。
 共通契約（REQ-014）の正規定義は重複せず、各正規所有者を参照する（REQ-014-011）。
 
 - user-decision-required の位置づけ: [skills/agentdev-adversarial-review.md](../skills/agentdev-adversarial-review.md)（REQ-014-012。停止信号の状態遷移一般化は v4-lifecycle-state-machine）
-- parent_decision_required / decision_context 適用: [delegation-contracts.md](../workflows/delegation-contracts.md)「review 経路での parent_decision_required / decision_context 適用」節
+- parent_decision_required / decision_context 適用: [v4-delegation-contracts.md](../workflows/v4-delegation-contracts.md)「review 経路での parent_decision_required / decision_context 適用」節
 - 再 review 条件、再 review 停止条件: adversarial-review Design（REQ-014-007）
 
 ### user-decision-required の位置づけ（REQ-014-012）
@@ -436,7 +436,7 @@ case-auto は user-decision-required を新規 result 状態として扱わず�
 case-auto は下位 command から user-decision-required + decision_context を受領した場合、以下の挙動をとる。
 
 1. **自走停止**: 対象 execution_unit（Issue）の処理を停止し、ユーザー判断を待機する。他の ready 対象の execution_unit がある場合は継続する（部分停止、REQ-034-035/016 準拠）
-2. **ユーザー提示**: decision_context（対象案、合意候補、未解決争点、推奨案と根拠、ユーザーに確定してほしい判断）をユーザーへ提示する（decision_context 構成は delegation-contracts Design が正）
+2. **ユーザー提示**: decision_context（対象案、合意候補、未解決争点、推奨案と根拠、ユーザーに確定してほしい判断）をユーザーへ提示する（decision_context 構成は v4-delegation-contracts Design が正）
 3. **resume point の記録**: 停止時の resume point を記録する。resume point は v4-lifecycle-state-machine Design に従い、case-run 起源の場合は当該 Issue の case-run 再開ポイント（準備フェーズ、実装フェーズ、提出フェーズのいずれか）、工程委譲起源の場合は当該工程の委譲起点とする
 4. **resume point から再開**: ユーザー判断の解決後、resume point から処理を再開する。
 adversarial-review の再発動要否は adversarial-review Design「再 review 条件」「再 review 停止条件」の各節に従い（REQ-014-007）、case-auto は独自に判断しない。
@@ -480,7 +480,7 @@ case-auto は下位 command から受領した decision_context について、�
 
 case-auto は回答、根拠、または作業仮定を下位 command へ返し、既存 resume point（REQ-006-114）から処理を継続する。
 新規の永続結果型を導入しない。
-resume point の仕様は v4-lifecycle-state-machine Design、delegation-contracts Design「review 経路での parent_decision_required / decision_context 適用」節に従う。
+resume point の仕様は v4-lifecycle-state-machine Design、v4-delegation-contracts Design「review 経路での parent_decision_required / decision_context 適用」節に従う。
 adversarial-review の再実行要否は adversarial-review 側の再 review 契約（REQ-014-007/008）に従い、case-auto は独自の再 review 条件を持たない。
 
 ### case-auto が行わないこと（REQ-015-012 維持、DEC-008 決定6）

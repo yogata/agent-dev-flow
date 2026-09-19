@@ -68,7 +68,7 @@ AgentDevFlow 配布物と harness 実行制御の責務分離モデルを定義�
 本 Design は harness execution mechanism の境界宣言のみを所有し、起動 API、並列数、timeout 等の具体は各 skill の `references/` へ集約する。
 external execution boundary（外部バックエンド接続）は REQ-011 が正規所有する（REQ-011-017）。
 
-並列判断と並列起動機構の境界（DEC-015）: 並列可否、処理単位間の依存関係、合流条件等の判定は ADF の決定論的実行中核が所有し、実際の並列起動機構は実行基盤（harness）が所有する。
+並列判断と並列起動機構の境界（DEC-015（superseded by DEC-036/038/039））: 並列可否、処理単位間の依存関係、合流条件等の判定は ADF の決定論的実行中核が所有し、実際の並列起動機構は実行基盤（harness）が所有する。
 REQ-011-018 の「並列実行」は並列起動機構を指し、並列の可否・依存・合流の判定は ADF 側実行判断（REQ-011-019）が所有する。
 実際に起動するエージェント数、起動 API、実行基盤固有の並列化手段を ADF の正規契約へ固定しない。
 
@@ -82,7 +82,7 @@ case-run、case-auto の実行結果契約は次の4状態を区別する。
 - `delegation-unavailable`: 実行インフラ起動不能
 
 `failed` と `delegation-unavailable` は異なる回復アクションを要する独立の結果状態として扱う。
-結果状態の遷移機械、委譲契約、ラベル構造の詳細は `docs/designs/workflows/delegation-contracts.md` を正規所有者とし、本 Design は境界宣言へ縮約する。
+結果状態の遷移機械、委譲契約、ラベル構造の詳細は `docs/designs/workflows/v4-delegation-contracts.md` を正規所有者とし、本 Design は境界宣言へ縮約する。
 
 ## case-auto の orchestration stage と bg task 管理
 
@@ -142,5 +142,5 @@ AgentDevFlow 配布command / Workflow Skill / Design は ToDo を必須機構と
 - v2:ADR-0136（配布物の harness 実行制御分離）: 吸収元。決定本質は charter 決定2 に先駆的適用として含まれる。
 - v2:REQ-0162（配布物の harness 実行制御分離）: 吸収元。原則の SSoT と各要件行（4状態結果契約、配布 docs 制約、ADF 可観測タイムスタンプ境界、ID 除去、パス除去）を本 Design および REQ-002 へ統合した。
 - v2:ADR-0114（case-run 実行責務の外部実行バックエンド委譲）: 吸収元。harness 選定領域に降格された実行制御側の知見を取り込み、result 4状態契約の前身である委譲モデルを本 Design の前段として位置づける。
-- `docs/designs/workflows/delegation-contracts.md`: 委譲契約詳細（result state machine、launch mechanism、delegation envelope）の正規所有者。
+- `docs/designs/workflows/v4-delegation-contracts.md`: 委譲契約詳細（delegation envelope、委譲種別、adversarial-review 接続）の正規所有者。result 4 状態は v4-lifecycle-state-machine、authority・副作用は v4-runtime-execution-model が正である。
 - `docs/designs/responsibilities/responsibility-boundary-purification.md`: 工程別（case-auto、case-run、execution adapter、Project Extensions、タイムスタンプ）の所有/非所有リスト詳細。

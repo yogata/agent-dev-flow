@@ -309,7 +309,7 @@ case-run の実行担当（委譲内サブエージェント）が、実装作�
 ## 参照する横断 Design
 
 - [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（Pattern Taxonomy（manager-orchestrator）の後継）
-- [workflows/delegation-contracts.md](../workflows/delegation-contracts.md)（controlled_case_execution 委譲）
+- [workflows/v4-delegation-contracts.md](../workflows/v4-delegation-contracts.md)（controlled_case_execution 委譲）
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（intake / learning capture（PR 本文記録のみ））
 - [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（子Issue 状態 enum〔durable state enum・階層合成〕。Epic Wave 実行モデルの運用契約は本 Design「v3 epic-wave-model Design からの吸収」節）
 - [v4-quality-gate-model.md](../quality/v4-quality-gate-model.md)（QG-3（実行担当サブエージェント責務））
@@ -576,7 +576,7 @@ unresolved な本質的争点またはユーザー判断事項が残る場合、
 
 ### 正規所有者マトリックス参照
 
-本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts Design「adversarial-review との委譲契約接続」節、`agentdev-case-run-execution-adapter` Design「adversarial-review 統合（実装方針→review→結果反映）」節との間で意味の重複、矛盾を生じない。
+本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、v4-delegation-contracts Design「adversarial-review との委譲契約接続」節、`agentdev-case-run-execution-adapter` Design「adversarial-review 統合（実装方針→review→結果反映）」節との間で意味の重複、矛盾を生じない。
 case-run command 固有の挿入境界（委譲内実施、委譲起動位置、実装方針限定、blocked 遷移）のみを本節が所有し、実装方針形成、review 呼出、結果反映の内部手続きの詳細は `agentdev-case-run-execution-adapter` Design を正とする。
 
 

@@ -98,7 +98,7 @@ adversarial-review 自身は矛盾を自動解決せず（REQ-015-008）、矛�
 
 ### 副作用境界と委譲契約
 
-adversarial-review は delegation-contracts Design の `semantic_review`（書き込み禁止型）として適用する。
+adversarial-review は v4-delegation-contracts Design の `semantic_review`（書き込み禁止型）として適用する。
 許可操作は `read_files`、`inspect_content`、`return_summary`、`return_evidence`、`return_artifact_body_when_requested` に限定し、`file_write`、`issue_pr_update`、`commit`、`push`、`user_confirmation` を forbidden とする（REQ-014-004）。
 審議結果は中間成果として呼出元へ返却し、新規正規 artifact を生成しない（REQ-014-005）。
 
@@ -106,6 +106,6 @@ adversarial-review は delegation-contracts Design の `semantic_review`（書�
 
 ### 正規所有者マトリックス参照
 
-本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts Design「adversarial-review との委譲契約接続」節、backlog-review command Design「adversarial-review 挿入境界（backlog-review）」節との間で意味の重複、矛盾を生じない。
+本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、v4-delegation-contracts Design「adversarial-review との委譲契約接続」節、backlog-review command Design「adversarial-review 挿入境界（backlog-review）」節との間で意味の重複、矛盾を生じない。
 挿入境界、発動条件、順序は backlog-review command Design を正とし、本節は domain skill 固有の候補判断基準、内部手続き（候補確定位置、呼出タイミング、矛盾検出への引き渡し）のみを所有する。
 

@@ -202,5 +202,5 @@ skip 条件該当時、呼出失敗時（REQ-014-010）のいずれの場合も�
 
 review 挿入境界（inspect-promote の発動条件、挿入位置、戻り先、--auto fast path）は本 Design が正規所有する（REQ-014-011、REQ-015-005）。
 共通 caller integration 契約は adversarial-review Design を正とし、本節は再定義しない。
-user-decision-required の停止理由分類は v4-lifecycle-state-machine Design、review 経路での parent_decision_required / decision_context 適用は delegation-contracts Design をそれぞれ正とする。
+user-decision-required の停止理由分類は v4-lifecycle-state-machine Design、review 経路での parent_decision_required / decision_context 適用は v4-delegation-contracts Design をそれぞれ正とする。
 
