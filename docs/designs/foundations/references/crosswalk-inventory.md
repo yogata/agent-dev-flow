@@ -7,14 +7,14 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 
 | 対象 | 意味処遇 | 帰属 | 実行段階 | 確定状態 | 備考 |
 |---|---|---|---|---|---|
-| REQ-001 | redefine | ― | 3 | planned | 最小 UPDATE（行 ID 全て不変・行数不増） |
+| REQ-001 | redefine | ― | 3 | executed | 最小 UPDATE（行 ID 全て不変・行数不増）。第3段实行（Case #2973、merge a098b0f1） |
 | REQ-002 | redefine | semantic Skill | 8 | planned | 三層・実装帰属確定後に再編 |
 | REQ-003 | redefine | Adapter | 8 | planned | authority 格子（DEC-039）への一般化 |
-| REQ-004 | redefine | ― | 4 | planned | req-define 入口の v4 入力意味 |
-| REQ-005 | redefine | ― | 4 | planned | 内部 lifecycle 状態遷移への回収 |
-| REQ-006 | redefine | ― | 4 | planned | 自走オーケストレーションの v4 再編 |
+| REQ-004 | redefine | ― | 4 | executed | req-define 入口の v4 入力意味。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
+| REQ-005 | redefine | ― | 4 | executed | 内部 lifecycle 状態遷移への回収。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
+| REQ-006 | redefine | ― | 4 | executed | 自走オーケストレーションの v4 再編。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | REQ-007 | redefine | ― | 6 | planned | Quality/Verification/Evidence/Gate 分解 |
-| REQ-008 | redefine | ― | 4 | planned | 一時成果物ライフサイクルの v4 整理 |
+| REQ-008 | redefine | ― | 4 | executed | 一時成果物ライフサイクルの v4 整理。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | REQ-009 | redefine | ― | 12 | planned | 配布基盤・導入の migration implementation |
 | REQ-010 | redefine | deterministic code/tool | 6 | planned | 検証基盤の Gate モデル接続 |
 | REQ-011 | redefine | Adapter | 11 | planned | I/O 境界の adapter 再編 |
@@ -22,16 +22,16 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | REQ-014 | keep | ― | ― | planned | adversarial-review は v4 でも保持 |
 | REQ-015 | keep | ― | ― | planned | 同上 |
 | REQ-016 | keep | ― | ― | planned | 同上 |
-| REQ-017 | redefine | ― | 4 | planned | Issue Execution Contract の v4 整理 |
+| REQ-017 | redefine | ― | 4 | executed | Issue Execution Contract の v4 整理。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | REQ-018 | keep | ― | ― | planned | worktree 構造制約は維持 |
 | REQ-019 | keep | ― | ― | planned | テスト影響範囲 gate は維持 |
 | REQ-021 | redefine | ― | 7 | planned | トレーサビリティのワークフロー統合 v4 版 |
 | REQ-027 | redefine | semantic Skill | 8 | planned | Capability Skill 再分類 |
 | REQ-029 | keep | ― | ― | planned | 配布依存境界は移行期間維持 |
-| REQ-030 | redefine | ― | 4 | planned | case-open 内部状態への回収 |
-| REQ-031 | redefine | ― | 4 | planned | case-run 内部状態への回収 |
-| REQ-032 | redefine | ― | 4 | planned | case-close 内部状態への回収 |
-| REQ-034 | redefine | ― | 4 | planned | case-auto の v4 再編 |
+| REQ-030 | redefine | ― | 4 | executed | case-open 内部状態への回収。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
+| REQ-031 | redefine | ― | 4 | executed | case-run 内部状態への回収。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
+| REQ-032 | redefine | ― | 4 | executed | case-close 内部状態への回収。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
+| REQ-034 | redefine | ― | 4 | executed | case-auto の v4 再編。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | REQ-035 | redefine | ― | 5 | planned | Epic/Wave 語彙の再定義 |
 | REQ-036 | keep | ― | ― | planned | inspect 系診断は維持 |
 | REQ-037 | redefine | ― | 9 | planned | Intake の継続コラボレーションループ化 |
@@ -55,12 +55,12 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | REQ-058 | keep | ― | ― | planned | 廃止時クリーンアップは維持 |
 | REQ-059 | keep | ― | ― | planned | Decision/REQ 関連宣言管理は維持 |
 | REQ-060 | keep | ― | ― | planned | bun test 実行形態は維持 |
-| REQ-061 | redefine | ― | 4 | planned | case-ready 内部状態への回収 |
-| REQ-062 | redefine | ― | 4 | planned | case-revise 内部状態への回収 |
+| REQ-061 | redefine | ― | 4 | executed | case-ready 内部状態への回収。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
+| REQ-062 | redefine | ― | 4 | executed | case-revise 内部状態への回収。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | REQ-082 | keep | ― | ― | planned | 審議契約は維持 |
 | REQ-083 | keep | ― | ― | planned | Definition PR 状態契約は維持 |
 | REQ-087 | keep | ― | ― | planned | 採番例外記録は維持 |
-| REQ-088 | create | ― | 3 | planned | 第3段新設（v4 基盤要件） |
+| REQ-088 | create | ― | 3 | executed | 第3段新設（v4 基盤要件）。第3段实行（Case #2973、merge a098b0f1） |
 | retired 12 件（REQ-013、020、022〜026、028、033、040、042、043） | keep | ― | ― | executed | retired 維持・識別子再利用禁止 |
 
 ## Decision（v3 側: DEC-001〜030、DEC-018 欠番。DEC-031〜039 は v4 側のため対象外）
@@ -94,36 +94,36 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | DEC-026 | keep | ― | ― | planned | realization_actions は維持 |
 | DEC-027 | keep | ― | ― | planned | 観測ベース統制縮小は維持 |
 | DEC-028 | keep | ― | ― | planned | 文章表層品質基盤は維持 |
-| DEC-029 | supersede | ― | 4 | planned | 後継: DEC-033 + v4-standard-lifecycle（UX 2入口・内部 lifecycle） |
+| DEC-029 | supersede | ― | 4 | executed | 後継: DEC-033 + v4-standard-lifecycle（UX 2入口・内部 lifecycle）。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | DEC-030 | supersede | ― | 7 | planned | 後継: DEC-037（producer/consumer 境界の v4 再中心化） |
 
 ## Design（v3 側 accepted）
 
 | 対象 | 意味処遇 | 帰属 | 実行段階 | 確定状態 | 備考 |
 |---|---|---|---|---|---|
-| designs/commands/*.md（19 件） | redefine | ― | 4 | planned | 公開 UX 2入口収斂・内部 lifecycle 回収に伴う再編 |
+| designs/commands/*.md（19 件） | redefine | ― | 4 | executed | 公開 UX 2入口収斂・内部 lifecycle 回収に伴う再編。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | designs/skills/*.md（34 件、_template 含む） | redefine | semantic Skill | 8 | planned | semantic/deterministic 再分類（DEC-036） |
-| workflows/workflow-contracts.md | supersede | ― | 4 | planned | v4-lifecycle-state-machine へ吸収（result 契約の 1 権威+導出投影への再編を含む） |（第4段 case-open 実行時点: Definition PR で後継吸収と宣言承継を実行。物理削除は docs-chore OU-003、executed 化は case-close）
+| workflows/workflow-contracts.md | supersede | ― | 4 | executed | v4-lifecycle-state-machine へ吸収（result 契約の 1 権威+導出投影への再編を含む）。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |（第4段 case-open 実行時点: Definition PR で後継吸収と宣言承継を実行。物理削除は docs-chore OU-003、executed 化は case-close）
 | workflows/workflow-skill-model.md | redefine | semantic Skill | 8 | planned | 責務 3 層分化・1:N 分割・配置契約の v4 Skill 再編での再定義（DEC-010 実装詳細） |
-| workflows/input-resolution-and-durable-state.md | supersede | ― | 4 | planned | v4-durable-state-and-recovery が一般化契約を承継 |（第4段 case-open 実行時点: Definition PR で後継吸収と宣言承継を実行。物理削除は docs-chore OU-003、executed 化は case-close）
-| workflows/step-reference-contract.md | supersede | ― | 4 | planned | 再開単位階層（STEP/処理単位/Case）の v4 再構成 |（第4段 case-open 実行時点: Definition PR で後継吸収と宣言承継を実行。物理削除は docs-chore OU-003、executed 化は case-close）
+| workflows/input-resolution-and-durable-state.md | supersede | ― | 4 | executed | v4-durable-state-and-recovery が一般化契約を承継。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |（第4段 case-open 実行時点: Definition PR で後継吸収と宣言承継を実行。物理削除は docs-chore OU-003、executed 化は case-close）
+| workflows/step-reference-contract.md | supersede | ― | 4 | executed | 再開単位階層（STEP/処理単位/Case）の v4 再構成。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |（第4段 case-open 実行時点: Definition PR で後継吸収と宣言承継を実行。物理削除は docs-chore OU-003、executed 化は case-close）
 | workflows/epic-wave-model.md | supersede | ― | 5 | planned | 階層合成+直列化単位への再編。語彙意味の再定義は第5段 |
-| workflows/definition-readiness.md | supersede | ― | 4 | planned | Definition lifecycle 部分ビューと冪等経路への整理 |（第4段 case-open 実行時点: Definition PR で後継吸収と宣言承継を実行。物理削除は docs-chore OU-003、executed 化は case-close）
+| workflows/definition-readiness.md | supersede | ― | 4 | executed | Definition lifecycle 部分ビューと冪等経路への整理。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |（第4段 case-open 実行時点: Definition PR で後継吸収と宣言承継を実行。物理削除は docs-chore OU-003、executed 化は case-close）
 | workflows/backlog-artifact-lifecycle.md | supersede | ― | 9 | planned | RU/draft 部分ビューとして継続ループへ整理 |
 | workflows/delegation-contracts.md | supersede | ― | 8 | planned | 委譲単位の再開・result の v4 接続 |
 | workflows/capture-boundaries.md | redefine | ― | 9 | planned | Intake/Learning 境界の v4 整理 |
 | workflows/references/execution-unit-construction.md | supersede | ― | 5 | planned | execution_unit 構成の v4 再編（Wave モデル改訂に追随） |
 | foundations/numbering-policy.md | keep | ― | ― | planned | 採番規則は v4 でも維持 |
-| foundations/system.md | redefine | ― | 4 | planned | コマンドシステム構成の v4 再編 |
-| foundations/document-model.md | redefine | ― | 3 | planned | 本段: モデル定義 Design 昇格条件と移行期間優先規則の最小 UPDATE |
-| foundations/decision-lifecycle.md | redefine | ― | 4 | planned | 本段は権威移行注記のみ。Decision status 部分ビュー整理は第4段 |
+| foundations/system.md | redefine | ― | 4 | executed | コマンドシステム構成の v4 再編。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
+| foundations/document-model.md | redefine | ― | 3 | executed | 本段: モデル定義 Design 昇格条件と移行期間優先規則の最小 UPDATE。第3段实行（Case #2973、merge a098b0f1） |
+| foundations/decision-lifecycle.md | redefine | ― | 4 | executed | 本段は権威移行注記のみ。Decision status 部分ビュー整理は第4段。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | foundations/patterns.md | keep | ― | ― | planned | 共通フォーマット規約は維持 |
 | foundations/design-principles.md | keep | ― | ― | planned | 設計原則は維持 |
 | foundations/project-extensions.md | redefine | Project Extension | 10 | planned | semantic extension point 化 |
 | foundations/harness-separation-model.md | redefine | Adapter | 11 | planned | adapter 境界の再編 |
 | foundations/traceability-model.md | supersede | ― | 7 | planned | v4-traceability-model が承継（DEC-037） |
 | foundations/references/concrete-abstraction.md | keep | ― | ― | planned | 具体抽象化参照は維持 |
-| responsibilities/document-type-responsibilities.md | redefine | ― | 4 | planned | v4 中核文書モデルの執筆規約反映 |
+| responsibilities/document-type-responsibilities.md | redefine | ― | 4 | executed | v4 中核文書モデルの執筆規約反映。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | responsibilities/artifact-responsibilities.md | redefine | semantic Skill | 8 | planned | 成果物責任表の v4 再編 |
 | responsibilities/artifact-contracts.md | redefine | semantic Skill | 8 | planned | アーティファクト契約の v4 再編 |
 | responsibilities/req-impact-map.md | keep | ― | ― | planned | REQ 影響マップは維持 |
