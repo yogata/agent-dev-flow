@@ -1,6 +1,6 @@
 // 検証スコープポリシー（traceability/policy.yaml）の読み込みと解決
-// （agentdev-traceability Design「公開能力 check」、TIM traceability-model.md
-// 「対応関係の完全性規則」の実装側）。
+// （agentdev-traceability Design「公開能力 check」、v4-traceability-model
+// Design「completeness の 2 層」節の実装側）。
 //
 // - ポリシーの正規情報源はリポジトリ top-level の traceability/policy.yaml
 // - 未指定の要件行は検証対応必須（default は required 固定）。検証対応を任意とする

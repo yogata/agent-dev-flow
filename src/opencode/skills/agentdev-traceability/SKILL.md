@@ -9,7 +9,7 @@ description: Requirement-artifact traceability (coverage, impact, check) resolvi
 要件と成果物の明示的な対応関係（covers）について、coverage、impact、check の3能力を提供する。
 正規成果物を直接走査して対応関係をその場で解決し、派生 Graph を前提としない。
 
-## モデルの基本（最小 TIM と4役割）
+## モデルの基本（対応関係と4役割）
 
 対応関係は、要件行（`REQ-{NNNN}-{MMM}` 形式の個別要件行）を中心に、成果物役割（artifact role）付きで表現する。
 成果物役割は次の4種である。
@@ -81,7 +81,7 @@ description: Requirement-artifact traceability (coverage, impact, check) resolvi
 
 check の9種検査: `malformed-declarations`（sidecar および inline declaration の形式・構文違反）、`unknown-roles`（未知の成果物役割）、`unknown-req-refs`（存在しない要件行への参照。sidecar、inline declaration、policy.yaml の optional 列挙を含む）、`invalid-artifact-paths`（存在しない、または取得不能な artifact path）、`missing-design`（Design 対応の欠落。現行要件行で0件）、`missing-implementation`（実装対応の欠落。現行要件行で0件）、`missing-verification`（検証対応の欠落。検証スコープポリシーが required と判定する現行要件行のみ計上）、`policy-invalid`（検証スコープポリシーの不正。schema 違反、default 値不正、optional 列挙の要件行 ID 形式違反、存在しない要件行の列挙、policy 読取不能）、`duplicate-inconsistencies`（同一論理関係の不整合な重複。同一 artifact パス × role × 要件行 ID の組み合わせが sidecar と inline declaration の間、または同一情報源内で矛盾する状態）。
 
-- Decision 対応の欠落は不合格に計上しない（TIM 完全性規則の任意役割）
+- Decision 対応の欠落は不合格に計上しない（対応完全性規則の任意役割）
 - 検証スコープポリシーは `traceability/policy.yaml` から解決する。ポリシーが存在しない場合は全現行要件行を検証対応必須として扱う（安全側既定）。読取不能または schema 不適合の場合、検証対応の要否判定が不能となるため当該検査を不合格にする（完全性判定不能を合格として扱わない、fail-closed）
 - 各検出項目の finding の読み方と解消手順は [references/check-interpretation.md](references/check-interpretation.md) を参照
 

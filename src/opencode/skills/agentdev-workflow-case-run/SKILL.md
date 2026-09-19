@@ -118,7 +118,7 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 ## トレーサビリティ能力の利用
 
 case-run の実行担当（委譲内サブエージェント）は、対象要件について `agentdev-traceability` の coverage で既存の対応関係を確認しながら、実際に要件を実現する成果物へ実装対応を、実際に要件を検証する恒常的な検証手段へ検証対応を作成・更新する（STEP-S2 の関連Decision確認、委譲内 context 再確認）。対応宣言の作成先は成果物の配布境界で決定する。consumer distribution closure に含まれる配布対象成果物（command、skill、template、runtime script 等）の対応関係は、repository top-level の `traceability/` 配下の component / package 単位 sidecar へ作成・更新する。producer 側の開発管理成果物（docs 配下の正規成果物）の対応関係は、inline `ADF-COVERS` 宣言または sidecar へ作成・更新でき、sidecar と inline declaration は同じ論理的な対応関係へ正規化される。
-実行担当は PR 作成前に対象要件について check を実行し、Design 対応欠落、implementation 対応欠落、policy が required と判定する要件行の verification 対応欠落、verification policy の不正、sidecar / inline declaration の構文不正、同一論理関係の不整合な重複を検出対象として検査する。Decision 対応の欠落は検出対象に含めない。
+実行担当は PR 作成前に対象要件行に scope を限定した check（`--req`）を実行し、Design 対応欠落、implementation 対応欠落、policy が required と判定する要件行の verification 対応欠落、verification policy の不正、sidecar / inline declaration の構文不正、同一論理関係の不整合な重複を検出対象として検査する。Decision 対応の欠落は検出対象に含めない。
 対応宣言の表記仕様は `agentdev-traceability` Design「対応宣言の表記」が正規所有し、本スキルは表記仕様を再定義しない。
 
 - 単に変更されたファイルであることを理由に、そのファイルを要件へ自動的に対応付けない

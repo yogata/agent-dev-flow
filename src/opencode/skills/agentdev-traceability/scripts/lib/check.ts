@@ -16,7 +16,7 @@
 //    role × 要件行 ID の組み合わせが sidecar と inline declaration の間、または
 //    同一情報源内で矛盾する状態）
 //
-// Decision 対応の欠落は不合格に計上しない（TIM 完全性規則の任意役割）。
+// Decision 対応の欠落は不合格に計上しない（対応完全性規則の任意役割）。
 // policy の要否判定が実行不能な場合、または sidecar の解析が実行不能な場合、
 // 対応完全性の合格を返さない（fail-closed、agentdev-traceability Design
 // 「advisory 能力と品質ゲートとしての check の境界」）。
