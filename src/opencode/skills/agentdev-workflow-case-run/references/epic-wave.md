@@ -38,7 +38,7 @@ Epic Issue 本文を読み込み（`agentdev-epic-tracker` 参照）、現在 re
 同一コマンド再実行で次 Wave に進む（べき等、Epic Issue 本文から進行状況判定）。
 
 **Epic Issue の入力ソース**: Epic Issue は本来の Epic flow（マルチREQ、`scale: large`）に加え、Standard flow 起因の独立 OU 自動 Epic 化（case-open が `depends_on` 空、L0 相当の独立 OU を検出して Epic 化）によるものも含む。
-入力ソースを区別せず、Epic Wave モデル（epic-wave-model Design、最大5件並列委譲）で一様に処理する。
+入力ソースを区別せず、Epic Wave 実行モデル（case-run Design、最大5件並列委譲）で一様に処理する。
 いずれのモードでも他Issue の実装履歴や Epic 全体の実装過程を前提としない。
 
 ### Result
@@ -79,7 +79,7 @@ Epic Issue 本文を読み込み（`agentdev-epic-tracker` 参照）、現在 re
 **変更ファイル重複前置検出（fan-out 前）**:
 
 Wave 構成時（case-open STEP-3）の前置検出に対する最終検出であり、fan-out 前の重複検出と停止条件を所有する。
-前置検出契約の正は epic-wave-model Design「execution_unit 構成の依存ヒントと Wave 構成の重複前置検出契約」節である。
+前置検出契約の正は case-ready Design「execution_unit 構成の依存ヒントと Wave 構成の重複前置検出契約」節である。
 
 1. Wave 内 ready 子Issue ごとに変更対象ファイル集合を取得する（子Issue 本文の実現面の変更方針・変更対象成果物）
 2. 子Issue 間でファイル単位の重複を比較する
