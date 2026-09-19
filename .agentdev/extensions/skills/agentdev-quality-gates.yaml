@@ -6,7 +6,7 @@ context:
   - id: quality-gates
     when: "QG-1〜QG-4 品質ゲート参照時"
     paths:
-      - "docs/designs/quality/quality-gates.md"
+      - "docs/designs/quality/v4-quality-gate-model.md"
     purpose: 品質ゲート定義と機械化境界の確認
   - id: document-model
     when: 文書モデル参照時
