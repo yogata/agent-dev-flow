@@ -179,7 +179,6 @@ status（draft / accepted）を含む完全一覧は [Design インデックス]
 #### quality/（品質、メトリクス）
 
 - [品質仕様](designs/quality/quality-specs.md)
-- [品質ゲート](designs/quality/quality-gates.md)
 - [REQ 健全性メトリクス](designs/quality/req-health-metrics.md)
 - [Design 健全性メトリクス](designs/quality/design-health-metrics.md)
 - [ADF v4 Quality / Verification / Evidence / Gate モデル](designs/quality/v4-quality-gate-model.md)
