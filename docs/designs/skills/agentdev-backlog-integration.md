@@ -109,3 +109,11 @@ adversarial-review は v4-delegation-contracts Design の `semantic_review`（�
 本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、v4-delegation-contracts Design「adversarial-review との委譲契約接続」節、backlog-review command Design「adversarial-review 挿入境界（backlog-review）」節との間で意味の重複、矛盾を生じない。
 挿入境界、発動条件、順序は backlog-review command Design を正とし、本節は domain skill 固有の候補判断基準、内部手続き（候補確定位置、呼出タイミング、矛盾検出への引き渡し）のみを所有する。
 
+
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: semantic classification（統合・分割判定）
+- **deterministic 委譲先**: dependency graph（depends_on 依存解決）は委譲先未整備の債務
+- **知識提供**: 分析メタデータ・RU 生成基準

@@ -126,3 +126,12 @@ docs 横断診断、証拠構造、finding 出力契約は `agentdev-doc-diagnos
 - [agentdev-doc-diagnostics.md](agentdev-doc-diagnostics.md)（docs 横断診断 skill）
 - v2:ADR-0123（Design lifecycle と保存内部責務の導入）
 - REQ-001（REQ/Design 責務分離）、REQ-002-016（script は該当 skill の scripts/ 配下へ配置し所有 skill の公開操作契約経由で呼び出す）、REQ-008-058（Design operation enum 公式契約。別名不受理）
+
+
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: 0 件
+- **deterministic 委譲先**: parsing（target_area 検索）→ scripts/src/search-target-area.ts
+- **知識提供**: 配置判断・Design lifecycle 手順

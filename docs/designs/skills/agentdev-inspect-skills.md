@@ -59,3 +59,12 @@ Command→Skill 参照妥当性と Skill 構造を、ファイル修正なしで
 - [IR-053: gh 直接記述検出](../integrity/rules/IR-053-gh-direct-invocation-detection.md)（gh 直接記述の検出スコープ）
 - REQ-036（inspect-skills / Command/Skill 参照妥当性検出）
 - REQ-011（GitHub I/O の Custom Tool `agentdev_gh` 操作契約委譲）
+
+
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: semantic classification（構造診断の観点評価）
+- **deterministic 委譲先**: 構文検査は repo-local checker へ委譲
+- **知識提供**: 参照妥当性・粒度・責務境界の観点

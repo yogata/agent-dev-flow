@@ -363,3 +363,12 @@ adversarial-review の呼出失敗時（スキル不在、起動異常、timeout
 
 形式の機械判定は、`docs/designs/commands/` 配下を `adversarial-review 挿入境界（` および `adversarial-review 由来の停止伝播（` で grep し、抽出された見出しが上表の形式のいずれかに一致することで行える。
 形式に一致しない見出しは、本節に例外を追加するか、見出しを規約どおりへ修正する。
+
+
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: adversarial review
+- **deterministic 委譲先**: なし（審議は非決定的）
+- **知識提供**: 審議手続き・3 論理役割・read-only 境界
