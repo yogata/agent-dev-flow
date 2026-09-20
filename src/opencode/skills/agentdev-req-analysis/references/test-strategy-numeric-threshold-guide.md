@@ -77,6 +77,33 @@ QG-2（[qg-2-acceptance-criteria-coverage.md](../../agentdev-quality-gates/refer
 | 平均の罠 | 平均値を閾値化したが、外れ値に引っ張られて中央値から乖離 | 中央値（median）ベースを基本 |
 | 範囲無視 | 最小値を下回る閾値で実質意味を持たない | min/max/central の3点を把握 |
 
+## traceability 数値期待の増減理由型記述
+
+トレーサビリティ check の件数期待（missing-design、missing-implementation、missing-verification、policy-invalid 等）を完了条件や test strategy の pass_criteria に数値で記述する場合、固定スナップショット値ではなく増減理由型で記述する。REQ 行の追加は、対応宣言（ADF-COVERS 宣言・sidecar 登録）とポリシー登録が揃うまで missing 計上の必然的な増加要因であるため、固定値のみの期待は必然増加を誤検出する。
+
+増減理由型の構成要素:
+
+- **baseline**: 基準時点（基準 commit 等）で計測した件数
+- **新規行数**: 当該変更で追加される要件行数（missing 計上の増加要因）
+- **宣言解消数**: 当該変更で追加・解消される対応宣言（ADF-COVERS 宣言・sidecar 登録）の件数（missing 計上の減少要因）
+- **policy 効果**: トレーサビリティポリシー（検証対応を任意とする要件行の登録）の追加・削除による missing-verification 計上範囲の変化
+
+記述例:
+
+```yaml
+- id: TS-{NNN}
+  target_item: AG-{NNN}
+  verification: |
+    トレーサビリティ check を実行し件数を確認する
+  pass_criteria: |
+    policy-invalid 0 件。missing-verification が baseline・新規行数・policy 効果の内訳と整合すること
+    （内訳: baseline N 件〔基準 commit {c} 時点〕・新規 REQ 行 M 件・policy 登録により検証対応任意化される行数 K 件）
+  on_failure: |
+    fix-and-reverify。増減内訳と不整合な場合、対象行・宣言・policy の差分を特定して再計測
+```
+
+実際の計測値が期待と乖離した場合は、乖離の内訳（どの要件行・対応宣言・policy 登録の差分によるか）を検証記録に残す。本様式は新規に策定する test strategy への適用であり、既存 Definition（過去 Issue の test strategy）の数値期待を遡って本様式へ書き換えることを要求しない。
+
 ## QG-2 観点6 との連動
 
 QG-2（case-open 完了条件網羅性検証）の観点6「数値閾値到達可能性検証」は、本ガイドに従って策定された数値閾値を入力とする。

@@ -65,6 +65,22 @@ description: 追跡Issue（課題、ToDo、アイデア、リスク等の未解�
 
 `issue_list` の絞り込み軸（role、kind、state、trackingState、labels、search）は呼出引数として指定し、Tool がサーバ側の絞り込みクエリとして解決する。Tool は必要なページをすべて取得して完全一覧として返すため上位層はページングを指定せず、安全上の上限によって完全取得できない場合は不完全な一覧を成功結果として返さない。
 
+## Tool 呼出の 3 規則（tracking 軸限定）
+
+追跡Issue（role: tracking）の操作で、Tool 呼出形式に起因する失敗と検証漏れを予防するため、次の 3 規則を適用する。本節の規則は追跡軸の操作に限定する（Case Issue の操作手続きは case-open / case-run / case-close 側の参照先に従う）。Tool 内部実装の変更を前提とせず、呼出形式の運用で予防・復帰する。
+
+1. **labels 省略の取扱い**: `issue_create` の labels 引数は操作契約上必須であり、ラベルを付けない場合も空配列を明示する。`issue_update` で labels を省略した場合、Tool は追跡軸（role、kind、状態）のラベルを維持する。呼出側で追跡軸の物理ラベル名を指定・除去して写像を再実装しない
+2. **read-back 確認**: 書き込み系操作（`issue_create`、`issue_update`、`comment_create`、`issue_close`、`issue_reopen` 等）の成功応答は Tool 内部の読み戻し検証済みである。呼出側は成功応答をもって反映確認として扱い、機械的な同一内容の再読込を重複実行しない（状態遷移の意味確認など、読み取りに独立の目的がある場合はこの限りでない）
+3. **論理値指定**: role、kind、trackingState は Tool 操作契約の論理値で指定する。物理ラベル名を呼出側から指定しない（物理ラベル写像は Tool 内実装の責務）
+
+### verification-incomplete 復帰手順（fail-closed）
+
+書き込み操作の読み戻し検証に失敗した場合、Tool は検証失敗として成功を返さない（fail-closed）。呼出側は verification-incomplete を成功扱いせず、次の順で復帰する。
+
+1. 同一内容での再試行（一時的な書き込み・検証失敗の吸収）
+2. 読み取り操作（`issue_read`、`comment_list` 等）で現在状態を確認し、不足している節・コメントのみを再生成して再試行する
+3. 再試行上限に到達した場合は停止し、失敗した操作・試行段階・再試行回数をユーザーへ報告する（自動的な代替手段へ切替えない）
+
 ## Comment 利用規律（検討経過の更新と削除）
 
 検討経過は Issue コメントを正規の時系列履歴とする。Comment 系操作のうち、検討経過の追加は `comment_create`、Comment の時系列読取は `comment_list` を使う。

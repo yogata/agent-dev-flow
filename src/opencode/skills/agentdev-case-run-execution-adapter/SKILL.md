@@ -79,6 +79,8 @@ CI typecheck job での `git diff --exit-code` 検証は検討候補として記
 4. **blocker 処理**: 回答可能な blocker（Decision/REQ/Design/docs/Issue本文で回答できるもの）は自律的に実行 command 内で再評価できる
 5. **result 返却**: 後述の result 契約に従い case-run へ返却する
 
+物理削除を伴う docs-chore 系の委譲では、削除対象に対する extensions、templates 等の実行時設定からの参照を追随確認する。削除対象の参照先を事前確認し、残存参照を検出した場合は委譲スコープ内で解消する。解消に別 OU の対象範囲拡大・新規の意思決定が必要な場合は blocked として報告する（原本は `<workflows/references/execution-unit-construction>` Design「docs-chore OUの削除起因参照追随」節。根拠事例: E6-2〔Epic #2984 コメント記録〕、Case #2979）。
+
 ## test strategy 項目の test-fix ループ（REQ）
 
 実行担当サブエージェントは実装完了後、Issue 本文のテスト戦略セクションに含まれる各 test strategy 項目（3要素構造: verification / pass_criteria / on_failure）について以下のループを実行する。
