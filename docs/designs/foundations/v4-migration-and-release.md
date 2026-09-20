@@ -97,6 +97,22 @@ RC 成立条件（feature complete）は DEC-034 決定(3) の 15 項目とし�
 
 確認は full validation（第13段）で一括実施し、証跡は監査レポートと crosswalk executed 行に紐付ける。
 
+### cutover 実行手順
+
+cutover sequence（DEC-034 決定(2)）の実行手順。feature complete 確認と full validation 再確認を前置確認として実行し、正規 release line 統合から controller 切替までの 7 操作を read-back 検証とともに実行する。この時点で初めて main へ統合する（cutover までの main 不変の運用制約は本 sequence の正規工程をもって解禁される）。git 操作・tag・push・projection 適用は自走対象とし、GitHub 上の設定変更（default branch 切替・branch protection 等）は行わない（外部 SaaS 設定変更は自走対象外）。
+
+- 前置確認（cutover 直前の成立条件）: feature complete 15 項目（前節の対応表）・full validation 実施済み（第13段監査レポート）・crosswalk 全行 executed（第13段 case-close 成果）・main が cutover 直前状態（v3-baseline tag と同一 commit）・v4-dev と origin/v4-dev の同期・working tree clean。不成立の場合は blocked として報告し、cutover を開始しない
+- 実行操作は次の 7 工程とする
+  1. 正規 release line 統合: v4-dev から main への --no-ff merge とする（v3 から v4 への境界を merge commit として履歴に明示する。fast-forward は不可）。merge commit メッセージは「v4.0.0-rc.1 cutover: ADF v4 正規 release line 統合（v4-dev → main）」形式とし、本文に v3-baseline から v4-dev HEAD までの第1〜13段の経緯を要約する
+  2. branch push: main を origin へ push する
+  3. tag 作成: v4.0.0-rc.1 を annotated tag として merge 後の main HEAD（exact candidate commit）に付与する。tag message には DEC-034 決定(2) の境界宣言（controller cutover・full validation 済み candidate）を含む
+  4. tag push: tag を origin へ push する。既存 tag（v3-baseline・vX.Y.Z）は一切移動しない
+  5. worktree 更新: main repo の main branch を merge 後の状態へ更新する（pull・working tree clean 確認）。v4 worktree は untracked ファイル残存を確認した上で削除する（git worktree remove）。v4-dev branch は履歴保持のため残置する。cutover 後の canonical ADF state は main repo 一つのみである
+  6. v4 正規 installation/projection 適用: main repo 上で scripts/self-sync.ps1 を dry-run → check → apply の順に実行する（本体 repo 向けの正規入口。install.ps1 は本体 repo では実行しない）。適用後は check_integrity の installed profile（projection_missing・projection_extra・content_mismatch・broken_junction なし）で投影整合を検証する
+  7. controller 切替: 新世代が新世代自身を継続開発する段階への移行宣言とする。実体は cutover 証跡の SSoT コメント（Root Case への記録・merge SHA・tag SHA・projection 適用結果を含む）・進捗トラッカー（移行ロードマップ追跡 Issue）の当該段階行の更新・以後の v4 開発を main repo 上の main branch で実行する運用への切替である
+- read-back 検証: 各操作の実行結果（merge 後 main SHA・tag の commit 参照・origin との同期・worktree 一覧・projection の junction 状態）を操作直後に検証する
+- 失敗時の扱い: merge 前の失敗は main へ影響がないため v4-dev 上で fix-and-reverify とする。merge 後の失敗は rollback anchor（v3-baseline tag）を参照した報告とし、tag 移動・main 書換による回復は行わない。回復は正規開発経路（main 上の修正 commit）で行う
+
 ## pilot migration と v4.0.0 final 条件
 
 正式リリース前の ADF 自己 self-hosting と複数既存 v3 適用 Project の RC pilot migration（検証項目リスト、RC tag 明示、未タグ main を migration target としない）、v4.0.0 final tag の成立条件、rc.N の運用。
