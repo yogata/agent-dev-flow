@@ -7,3 +7,4 @@ implementation:
     - REQ-014-016
   src/opencode/skills/agentdev-case-run-execution-adapter/references/harness-delegation.md:
     - REQ-017-019
+    - REQ-017-020

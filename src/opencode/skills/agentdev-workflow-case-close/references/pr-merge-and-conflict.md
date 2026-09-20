@@ -66,6 +66,11 @@ base 移動判定（STEP-4-1）の導入は、本手順の mergeable UNKNOWN ポ
 
 **PR タイトルの事前変更**: pr_merge 操作は squash コミットタイトルを制御できない。マージ実行前に `agentdev_gh` の issue_update 操作で PR タイトルを Conventional Commits 形式 + (Refs #N) 形式へ変更する。squash コミットタイトル経由で auto-close キーワードが解釈されることによる Issue の意図しないクローズを回避するため、タイトル変更は pr_merge 実行の前に行う。
 
+**merge 前 branch HEAD commit message 確認（前置・常時確認）**: PR タイトルの制御に加え、branch HEAD の commit message に auto-close キーワード（fixes、closes、resolves 等）と Issue 番号の近接が残存する場合も、マージ経由で意図しない Issue クローズが発生し得る。マージ実行前に branch HEAD の commit message を確認する。確認は疑わしい場合に限定せず常時実施を安全側の既定とする（PR タイトル変更の完了で本確認を省略しない）。キーワードと Issue 番号の近接を検出した場合の処置は次のとおり:
+
+- commit message を修正（当該コミットの message 再作成）または rebase で書き換えてから、マージを再試行する
+- 修正は commit message の文面変更のみとし、実装内容（コミットの tree）を変更しない
+
 STEP-4-1 で確認した squash merge 先（main）へ `agentdev_gh` の pr_merge 操作（squash 方式）を実行 → HEAD commit hash 記録（`agentdev-git-worktree` skill に従い）。
 
 **Squash merge 失敗時のリトライ**: 本書が所有する「squash merge リトライ手順」に従う（待機間隔5秒、最大試行回数は初期試行 + 5回リトライ、各試行のログ記録、全試行失敗時のフォールバックは template `.opencode/commands/agentdev/templates/case-close/standard.md` 参照）。

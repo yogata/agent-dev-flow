@@ -28,6 +28,16 @@ Issue 本文、タイトルを書き込む操作（issue_create、issue_update�
 
 - issue_create 操作の labels 引数は操作契約上必須である。ラベルを付けない場合も `labels: []` を明示して呼び出す
 
+### tracking 軸操作の 3 規則（labels 省略・read-back 確認・論理値指定）
+
+追跡Issue（role: tracking）の操作では、次の 3 規則を標準呼出形式に重ねて適用する。規則の正は `agentdev-issue-tracking` SKILL.md「Tool 呼出の 3 規則（tracking 軸限定）」節であり、本節は安全手続き側の適用形を定める（agentdev_gh 内部実装の変更は前提としない）。
+
+- **labels 省略**: `issue_create` は labels 必須（空配列も明示）。`issue_update` で labels を省略した場合、Tool は追跡軸（role、kind、状態）のラベルを維持する
+- **read-back 確認**: 書き込み系操作の成功応答は Tool 内部の読み戻し検証済みであり、成功応答をもって反映確認として扱う。機械的な同一内容の再読込を重複実行しない
+- **論理値指定**: role、kind、trackingState は Tool 操作契約の論理値で指定し、物理ラベル名を呼出側から指定しない
+
+verification-incomplete（読み戻し検証失敗）時は、Tool は検証失敗として成功を返さない（fail-closed）。同一内容リトライ → 読み取り操作で現在状態を確認しての内容再生成 → 停止とユーザー報告、の順で復帰する（自動的な代替手段へ切替えない）。
+
 ## Issue 作成後の内容反映確認
 
 `agentdev_gh` の issue_create 操作実行後、Issue番号を取得し、本文が正しく反映されたかを確認する。

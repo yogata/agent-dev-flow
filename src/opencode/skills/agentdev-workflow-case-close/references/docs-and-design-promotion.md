@@ -65,6 +65,14 @@ Design 状態評価（棚卸し制、STEP-3-2）を実行する。PR 本文の `
 - **draft → accepted 等の Design status 変更時**: `spec_readme_update_required` を STEP-3-2 Design 確定フローに反映
 - **`files_checked` 空時の確認**: targeted docs guard の JSON 出力で `files_checked` が空の場合、検査見逃しリスクとして扱い、`warnings` 配列の警告を確認、`--files` 指定の妥当性と検査対象 root の解決（配置先起点の誤リポジトリ検査でないこと）を確認、`files_checked` の内容と検査対象変更ファイルの一致を確認、必要に応じて再実行または手動確認、空の理由が正当であることを確認してから続行する
 
+#### AUTOGEN 鮮度 gate（境界 close 時の再検査）
+
+squash merge を伴う境界 close では、AUTOGEN 計測日の drift 発生を前提として AUTOGEN 鮮度検出 gate を実行する。計測日 drift の発生機構は date rollover、Phase 0 起因、GitHub squash merge による committer date 置換の 3 種である。AUTOGEN 計測日は generate_indexes の最終 commit から git log の committer date（`%cI`）基準で導出され、author date とは区別される。原本は `<integrity/index-auto-generation>` Design「AUTOGEN計測日の導出基準」節と `<integrity/autogen-freshness-gate>` Design「計測日driftの発生機構」節である。
+
+- **実行コマンド**: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_autogen_freshness.ts`
+- **drift 検出時の処置**: `generate_indexes.ts`（`bun run .opencode/skills/<integrity-detector-skill>/scripts/generate_indexes.ts`）で再生成してから green 判定する。drift 検出を放置したまま green 扱いにしない
+- **Evidence 記録**: freshness が green、または再生成後 green になったことを Evidence に記録する
+
 #### 配布依存境界の最終変更経路 gate
 
 PR 変更ファイルが `--profile source` の配布 command/skill ソース面に含まれる場合、PR マージ前に配布依存境界の最終 gate を実行する。
@@ -135,6 +143,7 @@ Design status 昇格タイミング（draft → accepted）の詳細、frontmatt
 - `check_changed_docs.ts`（`--workflow case-close`、`--files <PR 変更ファイル一覧>`、targeted docs guard で実行）
 - `check_extensions.ts`（配布物パターンのいずれかを変更した場合に実行）
 - `check_distribution_boundary.ts`（`--profile source`、PR 変更ファイルが配布 command/skill ソース面に含まれる場合に実行）
+- `check_autogen_freshness.ts`（AUTOGEN 鮮度 gate。squash merge を伴う境界 close 時に実行）
 - `bun test ./.opencode/skills/<integrity-detector-skill>/scripts/`（full integrity suite 実行、QG-4 合格基準による検証で実行）
 - test_strategy（QG-4 完了条件確認）
 
@@ -145,12 +154,13 @@ Design status 昇格タイミング（draft → accepted）の詳細、frontmatt
 
 ## Evidence
 
-- targeted docs guard、check_extensions.ts、check_distribution_boundary.ts の各 JSON 結果、Design 状態評価（棚卸し制）の列挙結果・統合結果・全件評価結果（処理パターン a/b/c、0 件確認の有無）
+- targeted docs guard、check_extensions.ts、check_distribution_boundary.ts、check_autogen_freshness.ts の各 JSON 結果（check_autogen_freshness は green または再生成後 green）、Design 状態評価（棚卸し制）の列挙結果・統合結果・全件評価結果（処理パターン a/b/c、0 件確認の有無）
 - full integrity suite 実行時: 「Ran N tests across M files」の N/M 件数突合結果、実行 cwd と起動コマンド形式
 
 ## Completion Verification
 
 - targeted docs guard の `failures` に strict severity を含まないこと。check_extensions.ts の違反がないこと。配布依存境界 最終 gate が合格（または違反時はマージ停止）であること
+- squash merge を伴う境界 close 時、AUTOGEN 鮮度 gate が green（または drift 検出時の再生成後 green）であること
 - full integrity suite 実行時: N/M 件数突合にて直前実績と比較して件数の急減がないことを確認済みであること
 
 ## Resume-Idempotency

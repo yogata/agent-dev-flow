@@ -87,6 +87,8 @@ Issue 本文がテンプレート（`issue_desc_*.md`）の【必須】セクシ
 
 test strategy 策定時の具体的な閾値設定手順は `agentdev-req-analysis` の [test-strategy-numeric-threshold-guide.md](../../agentdev-req-analysis/references/test-strategy-numeric-threshold-guide.md) を参照。
 
+traceability 数値期待（missing-design、missing-implementation、missing-verification 等の件数閾値）を完了条件・pass_criteria に設定する場合は、増減理由型（baseline・新規行数・宣言解消数・policy 効果の内訳）で記述されているかを確認する。REQ 行追加による missing 数の必然的な増加を不合格とする固定スナップショット閾値には設定根拠を要求する。実際値との乖離時は内訳記録を要求する。既存 Definition の数値期待を遡って本様式へ書き換えることは要求しない（記述様式の詳細は同ガイド「traceability 数値期待の増減理由型記述」節参照）。
+
 ### 7. テスト戦略 vs Epic 対象外 整合性検証
 
 Epic Issue の場合、テスト戦略が Epic の「対象外」記述と矛盾しないかを QG-2 段階で検証する（境界ケース #1516 由来）。
