@@ -10,7 +10,6 @@ updated: 2026-09-12
 <!-- ADF-COVERS(implementation): REQ-011-006 -->
 <!-- ADF-COVERS(implementation): REQ-050-001, REQ-050-002, REQ-050-003, REQ-050-004, REQ-050-005, REQ-050-006, REQ-050-007, REQ-050-008, REQ-050-010, REQ-050-013 -->
 <!-- ADF-COVERS(implementation): REQ-052-007（scripts/consumer/archive/install.ps1、scripts/install.ps1 の宣言を docs 正規配置先へ移管） -->
-<!-- ADF-COVERS(implementation): REQ-057-009, REQ-057-010（配布物 concrete ID cleanup、ir-055/ir-059 baseline 整備、DEC-023（accepted）注記現行化、tmp 残渣抑止） -->
 <!-- 注: install/self-sync 各 ps1（scripts/）は走査対象拡張子外のため、導入器実装行の宣言は本 Design（正規仕様所有者）へ配置。実装実体は scripts/install.ps1、scripts/self-sync.ps1（内部処理は scripts/consumer/、scripts/self/ 配下） -->
 <!-- ADF-COVERS(design): REQ-002-047 -->
 
@@ -282,7 +281,7 @@ repo-local Plugin（REQ-002-045）の配布・投影については次のとお�
 配布境界 checker の repo-local モデル: 配布境界 checker は consumer 配布系と自己ホスト投影の非対称（上記のとおり）を repo-local モデルとして前提とする。detector の列挙条件（除外対象の検出箇所一覧）は repo-local Plugin の正本配置原則（`src/opencode/plugins/<agentdev-name>/`）と同期を維持し、列挙の乖離が観測された場合は個別特例の追加ではなく検査側の一般化で解消する方針とする。
 - 将来 repo-local Plugin が複数化した時点で、マーカー方式（package.json マーカーフィールド等）への拡張条件を判断する。
 
-outside-root 判定は、ワークスペース外の書き込みを原則ブロック（fail-closed）しつつ、事前承認済みディレクトリ（OS 標準 TEMP 等、実行環境が提供する一時領域）への書き込みを例外として許可する。例外はパス個別の特例列挙ではなく、承認済み一時領域カテゴリとして判定基準に組み込む（一般化: ru-batch-20260903、REQ-057-010 方針）。
+outside-root 判定は、ワークスペース外の書き込みを原則ブロック（fail-closed）しつつ、事前承認済みディレクトリ（OS 標準 TEMP 等、実行環境が提供する一時領域）への書き込みを例外として許可する。例外はパス個別の特例列挙ではなく、承認済み一時領域カテゴリとして判定基準に組み込む（一般化: ru-batch-20260903 方針、本 Design が所有）。
 
 ### 自己ホスト投影対称性検査の機械検査契約
 

@@ -6,10 +6,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 54件、廃止済み: 12件
+現行 REQ: 52件、廃止済み: 14件
 <!-- AUTOGEN:END -->
 
-現行要件は54件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
+現行要件は52件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
 REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）による意図的予約欠番であり、実体は存在しない（[採番管理](designs/foundations/numbering-policy.md) 参照）。
 REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却枠であり、意図的予約欠番として維持する。
 各 REQ の詳細は各 REQ ファイル本文を参照。
@@ -31,7 +31,6 @@ REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却
 | [REQ-012](REQ-012.md) | 成果物トレーサビリティ |
 | [REQ-014](REQ-014.md) | adversarial-review caller integration 共通契約 |
 | [REQ-015](REQ-015.md) | adversarial-review caller integration（7 caller と case-auto 停止伝播） |
-| [REQ-016](REQ-016.md) | adversarial-review caller integration 横断整合 |
 | [REQ-017](REQ-017.md) | Issue Execution Contract |
 | [REQ-018](REQ-018.md) | worktree 構造的制約とテスト fallback |
 | [REQ-019](REQ-019.md) | テスト影響範囲検出 gate |
@@ -61,7 +60,6 @@ REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却
 | [REQ-054](REQ-054.md) | 変更誘発境界リスク分析 |
 | [REQ-055](REQ-055.md) | production-equivalent verification の定義 |
 | [REQ-056](REQ-056.md) | Project Knowledge の所有と workflow 利用 |
-| [REQ-057](REQ-057.md) | docs corpus 整合・現行化バッチ |
 | [REQ-058](REQ-058.md) | ADF 管理投影物の廃止時クリーンアップ契約 |
 | [REQ-059](REQ-059.md) | Decision と REQ の関連宣言管理 |
 | [REQ-060](REQ-060.md) | bun test 実行形態の統一（repo root 起 cwd・`./` 付きパス指定） |

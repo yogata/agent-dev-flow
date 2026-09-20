@@ -5,7 +5,7 @@ created: 2026-09-18
 updated: 2026-09-19
 ---
 
-<!-- ADF-COVERS(implementation): REQ-003-013, REQ-007-006, REQ-007-007, REQ-007-008, REQ-007-009, REQ-057-003 -->
+<!-- ADF-COVERS(implementation): REQ-003-013, REQ-007-006, REQ-007-007, REQ-007-008, REQ-007-009 -->
 
 # ADF v4 Quality / Verification / Evidence / Gate モデル
 

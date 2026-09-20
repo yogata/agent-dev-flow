@@ -6,9 +6,6 @@
  * item's detection logic and the structured exemptions.
  */
 
-// ADF-COVERS(implementation): REQ-057-011
-// ADF-COVERS(verification): REQ-057-011
-
 import { expect, test, describe, beforeAll, afterAll } from "bun:test";
 import { checkWorkflowPreventive } from "./check_workflow_preventive.ts";
 import * as path from "path";

@@ -1271,7 +1271,7 @@ describe("producer metadata detection signal (DEC-030 decision 5)", () => {
   test("whole-line HTML declaration comment is detected as producer-metadata without failing the report-mode gate", () => {
     const d = classifyLineConfig(
       {
-        text: "<!-- ADF-COVERS(implementation): REQ-057-013 -->",
+        text: "<!-- ADF-COVERS(implementation): REQ-029-003 -->",
         lineNumber: 6,
         filePath: "src/opencode/skills/agentdev-doc-writing/SKILL.md",
         projection: "source",
@@ -1287,7 +1287,7 @@ describe("producer metadata detection signal (DEC-030 decision 5)", () => {
 
   test("marker match has no role filter: any role and no-role forms are detected", () => {
     for (const line of [
-      "<!-- ADF-COVERS(implementation): REQ-057-013 -->",
+      "<!-- ADF-COVERS(implementation): REQ-029-003 -->",
       "<!-- ADF-COVERS(verification): REQ-029-001 -->",
       "<!-- ADF-COVERS(design): REQ-029-001 -->",
     ]) {
@@ -1307,7 +1307,7 @@ describe("producer metadata detection signal (DEC-030 decision 5)", () => {
   test("whole-line // and # declaration comment forms carry the marker signal", () => {
     for (const line of [
       "// ADF-COVERS(verification): REQ-029-001, REQ-029-002",
-      "# ADF-COVERS(implementation): REQ-057-021",
+      "# ADF-COVERS(implementation): REQ-029-004",
     ]) {
       const d = classifyLineConfig(
         {
@@ -1325,7 +1325,7 @@ describe("producer metadata detection signal (DEC-030 decision 5)", () => {
   test("report mode keeps declaration contents out of id/path/url extraction", () => {
     const d = classifyLineConfig(
       {
-        text: "<!-- ADF-COVERS(implementation): REQ-057-013 -->",
+        text: "<!-- ADF-COVERS(implementation): REQ-029-003 -->",
         lineNumber: 1,
         filePath: "x.md",
         projection: "source",
@@ -1339,7 +1339,7 @@ describe("producer metadata detection signal (DEC-030 decision 5)", () => {
   test("enforce mode fails the gate on the declaration line (Wave 4 activation state)", () => {
     const d = classifyLineConfig(
       {
-        text: "<!-- ADF-COVERS(implementation): REQ-057-013 -->",
+        text: "<!-- ADF-COVERS(implementation): REQ-029-003 -->",
         lineNumber: 1,
         filePath: "x.md",
         projection: "source",
@@ -1354,7 +1354,7 @@ describe("producer metadata detection signal (DEC-030 decision 5)", () => {
   test("declaration sharing a line with prose keeps the prose detectable (fail-closed)", () => {
     const d = classifyLineConfig(
       {
-        text: "Read REQ-057-013 first. <!-- ADF-COVERS(implementation): REQ-057-013 -->",
+        text: "Read REQ-029-003 first. <!-- ADF-COVERS(implementation): REQ-029-003 -->",
         lineNumber: 1,
         filePath: "x.md",
         projection: "source",
@@ -1370,7 +1370,7 @@ describe("producer metadata detection signal (DEC-030 decision 5)", () => {
   test("truncated HTML declaration comment is still detected (fail-closed)", () => {
     const d = classifyLineConfig(
       {
-        text: "<!-- ADF-COVERS(implementation): REQ-057-013",
+        text: "<!-- ADF-COVERS(implementation): REQ-029-003",
         lineNumber: 1,
         filePath: "x.md",
         projection: "source",
@@ -1385,7 +1385,7 @@ describe("producer metadata detection signal (DEC-030 decision 5)", () => {
   test("ordinary prose concrete IDs continue to be detected", () => {
     const d = classifyLineConfig(
       {
-        text: "This implements REQ-057-013 for doc-writing reviews.",
+        text: "This implements REQ-029-003 for doc-writing reviews.",
         lineNumber: 1,
         filePath: "src/opencode/skills/agentdev-doc-writing/SKILL.md",
         projection: "source",
@@ -1393,10 +1393,10 @@ describe("producer metadata detection signal (DEC-030 decision 5)", () => {
       DEFAULT_DETECTOR_CONFIG,
     );
     const ids = d.filter((x) => x.category === "concrete-id");
-    // REQ-NNNN-NNNN matches its leading ID portion (REQ-057), consistent with
+    // REQ-NNNN-NNNN matches its leading ID portion (REQ-029), consistent with
     // the established subitem-form behavior.
     expect(ids.length).toBe(1);
-    expect(ids[0]!.matched).toBe("REQ-057");
+    expect(ids[0]!.matched).toBe("REQ-029");
     expect(ids[0]!.classification).toBe("producer-internal");
     expect(decideGate(d).pass).toBe(false);
   });
@@ -1404,7 +1404,7 @@ describe("producer metadata detection signal (DEC-030 decision 5)", () => {
   test("comment without the ADF-COVERS marker is still detected", () => {
     const d = classifyLineConfig(
       {
-        text: "<!-- some other comment REQ-057-013 -->",
+        text: "<!-- some other comment REQ-029-003 -->",
         lineNumber: 1,
         filePath: "x.md",
         projection: "source",
@@ -1476,7 +1476,7 @@ describe("producer metadata detection signal (DEC-030 decision 5)", () => {
   test("declaration line still passes through classifyContent with line numbers intact", () => {
     const content = [
       "# skill doc",
-      "<!-- ADF-COVERS(implementation): REQ-057-013 -->",
+      "<!-- ADF-COVERS(implementation): REQ-029-003 -->",
       "ref ADR-0135 here",
     ].join("\n");
     const d = classifyContentConfig(

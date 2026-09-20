@@ -1,5 +1,4 @@
 // ADF-COVERS(implementation): REQ-047-009
-// ADF-COVERS(implementation): REQ-057-035
 // CLI entry for the distribution boundary adapter.
 //
 // Split out of check_distribution_boundary.ts so the orchestrator stays

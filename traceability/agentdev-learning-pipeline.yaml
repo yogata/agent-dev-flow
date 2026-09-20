@@ -1,6 +1,1 @@
 component: agentdev-learning-pipeline
-implementation:
-  src/opencode/skills/agentdev-learning-pipeline/references/inbox-and-evaluation-schema.md:
-    - REQ-038-006
-  src/opencode/skills/agentdev-learning-pipeline/references/promote-judgment-logic.md:
-    - REQ-057-026

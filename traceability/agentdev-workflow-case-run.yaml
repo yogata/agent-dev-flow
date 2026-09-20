@@ -18,9 +18,9 @@ implementation:
     - REQ-031-029
     - REQ-031-030
     - REQ-035-012
-    - REQ-057-030
+    - REQ-021-030
   src/opencode/skills/agentdev-workflow-case-run/references/single.md:
     - REQ-014-016
     - REQ-031-028
     - REQ-036-027
-    - REQ-057-030
+    - REQ-021-030

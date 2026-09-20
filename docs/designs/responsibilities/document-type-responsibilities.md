@@ -7,7 +7,6 @@ updated: "2026-09-19"
 <!-- ADF-COVERS(implementation): REQ-001-001, REQ-001-002, REQ-001-003, REQ-001-004, REQ-001-005, REQ-001-006 -->
 <!-- ADF-COVERS(implementation): REQ-001-017, REQ-001-018, REQ-001-019 -->
 <!-- ADF-COVERS(implementation): REQ-001-066 -->
-<!-- ADF-COVERS(implementation): REQ-057-014 -->
 
 # 文書種別責務、配置基準
 
@@ -34,7 +33,7 @@ v2:REQ-0140（文書品質ゲート）の原本仕様（文書種別配置、用
 REQ/Decision/Design/guides の役割定義、記述対象、記述対象外の基準境界は `../foundations/document-model.md` の「責務マトリックス」「文書分類ポリシー」を正本とする。
 本 Design は基準境界を再定義せず、執筆時の配置判定のみを扱う。
 
-README は agent-dev-flow リポジトリの構成要素（identity、参照先リンク、最小限のクイックスタート）であり、索引構成として扱う。コマンド選択の入口表は `docs/guides/command-selection.md` が一元所有する（REQ-057-016）。README は REQ/Decision/Design/guide と並ぶ基準境界対象ではなく README.md の構造要件に従う。
+README は agent-dev-flow リポジトリの構成要素（identity、参照先リンク、最小限のクイックスタート）であり、索引構成として扱う。コマンド選択の入口表は `docs/guides/command-selection.md` が一元所有する。README は REQ/Decision/Design/guide と並ぶ基準境界対象ではなく README.md の構造要件に従う。
 
 ### 新規文書作成時の分類判断ツリー <!-- REQ-001 -->
 
@@ -274,7 +273,7 @@ ADF 本体も同じ仕組みを利用する。
 
 配布 command/skill の本文・コメントは、対象となる契約を定性参照で表現する。
 定性参照とは、対応する規約・Design の名称や概念を示す記述（例: 「トレーサビリティモデルの対応関係の完全性規則」）であり、要件行 ID（`REQ-{NNN}-{NNN}` 形式）を字面として含まない。
-配布物への concrete ID（REQ/Decision/Design の具象参照）の inline 記載排除と対応宣言（ADF-COVERS）の正規配置先（docs 配下の正規成果物）は REQ-029-003、REQ-029-004、REQ-057-019 が正規所有する。
+配布物への concrete ID（REQ/Decision/Design の具象参照）の inline 記載排除と対応宣言（ADF-COVERS）の正規配置先（docs 配下の正規成果物）は REQ-029-003、REQ-029-004、および [../skills/agentdev-skill-authoring.md](../skills/agentdev-skill-authoring.md)「配布物執筆時の ID 衛生」が正規所有する。
 本節は、配布物編集時に参照表記として定性参照を採用する運用を正文化するものである。
 
 本規約は配布物 inline の concrete REQ-ID 表記を肯定しない。

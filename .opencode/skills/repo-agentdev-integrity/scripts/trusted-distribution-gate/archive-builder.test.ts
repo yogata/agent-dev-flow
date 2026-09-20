@@ -12,8 +12,6 @@
 // timeouts; staging-residue checks poll for Windows deferred rmSync
 // release; absent-path fixtures derive uniqueness from mkdtempSync.
 
-// ADF-COVERS(verification): REQ-057-012
-
 import { describe, expect, test, beforeEach, afterEach } from "bun:test";
 import * as fs from "fs";
 import * as os from "os";

@@ -21,7 +21,7 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | REQ-012 | redefine | ― | 7 | executed | Change/Evidence 再中心化（DEC-037）。第7段実行 2026-09-19（Case #3004、Definition merge fa1b5ac9、実装 merge 236e6cf4・40098b27）。redefine（目的節接続・要件行文言不変） |
 | REQ-014 | keep | ― | ― | executed | adversarial-review は v4 でも保持。第13段 full validation で維持確認 2026-09-20（Case #3036） |
 | REQ-015 | keep | ― | ― | executed | 同上。第13段 full validation で維持確認 2026-09-20（Case #3036） |
-| REQ-016 | keep | ― | ― | executed | 同上。第13段 full validation で維持確認 2026-09-20（Case #3036） |
+| REQ-016 | keep → retired | ― | ― | executed | 同上。第13段 full validation で維持確認 2026-09-20（Case #3036）。その後 RETIRE 2026-09-20（Epic #3042・Issue #3044、retired/ へ移管・恒常契約は REQ-015 が所有） |
 | REQ-017 | redefine | ― | 4 | executed | Issue Execution Contract の v4 整理。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | REQ-018 | keep | ― | ― | executed | worktree 構造制約は維持。第13段 full validation で維持確認 2026-09-20（Case #3036） |
 | REQ-019 | keep | ― | ― | executed | テスト影響範囲 gate は維持。第13段 full validation で維持確認 2026-09-20（Case #3036） |
@@ -51,7 +51,7 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | REQ-054 | keep | ― | ― | executed | 変更誘発境界リスク分析は維持。第13段 full validation で維持確認 2026-09-20（Case #3036） |
 | REQ-055 | redefine | ― | 6 | executed | Verification/Evidence モデル接続。第6段実行 2026-09-19（Case #2997、Definition merge 7d717d8b、実装 merge 95f9655516592b82c710fac55ae6352d981dbcd1・ffccea6a9c35cb32f82428c4a63ffa8389a0993b） |
 | REQ-056 | keep | ― | ― | executed | Project Knowledge は維持。第13段 full validation で維持確認 2026-09-20（Case #3036） |
-| REQ-057 | keep | ― | ― | executed | docs corpus 整合は維持。第13段 full validation で維持確認 2026-09-20（Case #3036） |
+| REQ-057 | keep → retired | ― | ― | executed | docs corpus 整合は維持。第13段 full validation で維持確認 2026-09-20（Case #3036）。その後 RETIRE 2026-09-20（Epic #3042・Issue #3044、retired/ へ移管・恒常契約 5 行は移管先 REQ が所有） |
 | REQ-058 | keep | ― | ― | executed | 廃止時クリーンアップは維持。第13段 full validation で維持確認 2026-09-20（Case #3036） |
 | REQ-059 | keep | ― | ― | executed | Decision/REQ 関連宣言管理は維持。第13段 full validation で維持確認 2026-09-20（Case #3036） |
 | REQ-060 | keep | ― | ― | executed | bun test 実行形態は維持。第13段 full validation で維持確認 2026-09-20（Case #3036） |

@@ -5,7 +5,6 @@ created: 2026-06-21
 updated: 2026-09-19
 ---
 <!-- ADF-COVERS(implementation): REQ-007-001, REQ-007-003, REQ-007-004, REQ-007-005 -->
-<!-- ADF-COVERS(implementation): REQ-057-004 -->
 
 # `agentdev-quality-gates` Design
 
@@ -90,7 +89,7 @@ QG-4 機械受理基準: フル suite の受理判断は、次の受理由件の
 4. fail 全件の由来分類: fail が 0 件、または全 fail に由来分類（既知欠陥、環境依存、当該変更起因）が付与され、由来不明が 0 件
 5. baseline 基準の明示: 由来判定が remediation 開始前の baseline commit 基準で行われたこと
 
-integrity suite のコマンド数期待値は、公開コマンド列挙からの導出（動的化）により実コマンド数と整合させ、固定期待値による恒常 fail を発生させない。期待値の導出には最小件数下限の検証を併設し、漏れ検出の意味を損なわない（REQ-057-011）。期待値の導出手段の実装は integrity suite 側の責務である。
+integrity suite のコマンド数期待値は、公開コマンド列挙からの導出（動的化）により実コマンド数と整合させ、固定期待値による恒常 fail を発生させない。期待値の導出には最小件数下限の検証を併設し、漏れ検出の意味を損なわない。期待値の導出手段の実装は integrity suite 側の責務である。
 
 QG-4 の識別子中心評価の構造は維持する（固定値期待値化による脆化を行わない）。
 case-close / docs-check の full suite 実行手順と PR 本文テンプレート（Test Strategy 結果欄）への記録欄追加は case 実施側の適用とする。
