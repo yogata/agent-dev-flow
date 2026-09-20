@@ -213,7 +213,7 @@ extension 検査は DEC-006（inspect 3-command 構成への正規化）に基�
 
 | 層 | 正規所有者 | 検査内容 |
 |---|---|---|
-| deterministic check | IR-056 / `/repo/docs-check`（self-hosting）、`/agentdev/case-run`・`/agentdev/case-close` の changed-path routing（consumer） | extension 一覧化、YAML 構文、必須セクションと field、kind と配置、ID と対象 command/skill の対応、context path 実在、委譲先 skill 実在、旧 `.agentdev/doc-inputs/**` 残存 |
+| deterministic check | IR-056 / `/repo/docs-check`（self-hosting）、case-run・case-close の changed-path routing（consumer） | extension 一覧化、YAML 構文、必須セクションと field、kind と配置、ID と対象 command/skill の対応、context path 実在、委譲先 skill 実在、旧 `.agentdev/doc-inputs/**` 残存 |
 | semantic diagnosis | `/agentdev/inspect-skills` | extension 責務境界、標準 command/skill を上書きする意図の意味診断 |
 | finding disposition | `/agentdev/inspect-promote` | finding の promote、defer、reject |
 
@@ -240,4 +240,3 @@ extension 機構自体は追加・拡張・非上書き原則を維持して残�
 
 - DEC-006: inspect 3-command 構成への正規化（extension 検査の3層責務分離を確定）
 - REQ-001: 実行時独立性（本 Design は具体化機構を提供）
-

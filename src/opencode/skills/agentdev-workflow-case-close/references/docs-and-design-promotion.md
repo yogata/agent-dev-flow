@@ -72,6 +72,7 @@ squash merge を伴う境界 close では、AUTOGEN 計測日の drift 発生を
 - **実行コマンド**: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_autogen_freshness.ts`
 - **drift 検出時の処置**: `generate_indexes.ts`（`bun run .opencode/skills/<integrity-detector-skill>/scripts/generate_indexes.ts`）で再生成してから green 判定する。drift 検出を放置したまま green 扱いにしない
 - **Evidence 記録**: freshness が green、または再生成後 green になったことを Evidence に記録する
+- **再生成不能局面**: main への直接 commit 禁止または tag 対象ツリー不変維持が優先される場合、内容差分がなく計測日行だけが反転したことを両方向の増減内訳で完全特定できるときに限り warn とする。再生成処置の実行可否を green 判定の前提として記録し、境界 close 自身は索引を直接編集・commit しない。正規の再生成経路は case-run 成果物 commit または fan-in 時の再生成であり、次回 docs commit で解消する引継ぎを tag 実施側へ記録する。
 
 #### 配布依存境界の最終変更経路 gate
 

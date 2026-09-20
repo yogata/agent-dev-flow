@@ -72,6 +72,10 @@ bun run .opencode/skills/repo-agentdev-integrity/scripts/check_autogen_freshness
 
 ## 計測日driftの発生機構
 
+### 再生成不能局面の扱い
+
+main への直接 commit が禁止される境界、または tag 対象ツリーの不変維持が優先される境界 close で再生成できない場合は、drift を時間依存の測定誤差として扱う。内容差分がなく計測日行だけが反転したことを両方向の増減内訳で完全特定できた場合に限り限定的に warn とし、次回 docs commit の `generate_indexes.ts` で解消する引継ぎを記録する。再生成の正規経路は case-run 成果物 commit または fan-in 時の再生成であり、境界 close 自身は索引を直接編集・commit しない。
+
 driftの機構はdate rollover、Phase 0起因、GitHub squash mergeによるcommitter date置換の3種とする。squash mergeを伴う境界closeではcheck_autogen_freshnessを実行し、drift検出時はgenerate_indexesで再生成してからgreen判定する。author date基準への切替とmerge commit除外は将来の評価対象として記録するが、現行gate契約は変更しない。
 
 ## 関連
@@ -80,4 +84,3 @@ driftの機構はdate rollover、Phase 0起因、GitHub squash mergeによるcom
 - SC-002（定期再生成、`docs/designs/integrity/index-auto-generation.md`、REQ-010 関連）
 - IR-061（索引類自動生成整合性、`docs/designs/integrity/rules/IR-061-index-generation-consistency.md`）
 - `/repo/docs-check`（repo-local、配布対象外）
-

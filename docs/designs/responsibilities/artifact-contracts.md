@@ -221,7 +221,7 @@ Template の配置先は以下の 2 種類を定義する（REQ-002-040）。
 
 | # | フィールド | 説明 |
 |---|-----------|------|
-| 1 | 完了コマンド | 実行したコマンドのフルパス（例: `/agentdev/case-close`） |
+| 1 | 完了コマンド | 実行したコマンドのフルパス（例: `/agentdev/case-auto`） |
 | 2 | 対象 | 操作対象の識別子（Issue 番号、PR 番号、ファイルパス等） |
 | 3 | 結果 | ユーザー視点、ドメイン視点の成果（Issue 作成、PR 作成、REQ/Decision 保存等）。commit hash、push 成否、HEAD 同期確認等の git 操作結果は含めない |
 | 4 | 検証結果 | `✅ OK` / `⚠️ 注意` / `❌ NG` のいずれか |
@@ -412,7 +412,7 @@ case-open は `realization_actions` を Issue / Epic の execution contract へ�
 
 - **所有先**: 本節（`artifact-contracts.md`「req_draft 出力構造」節）が `review_dispositions` の schema を正規所有する
 - **producer**: req-define（`docs/designs/commands/req-define.md`、`src/opencode/commands/agentdev/req-define.md`、`src/opencode/commands/agentdev/templates/req-define/req-draft.md`）
-- **consumer**: case-open（`docs/designs/commands/case-open.md`、`src/opencode/commands/agentdev/case-open.md`）
+- **consumer**: case-open workflow（`src/opencode/skills/agentdev-workflow-case-open/SKILL.md`）
 - **Issue 本文永続化先**: workflow-templates（`docs/designs/skills/agentdev-workflow-templates.md`、`src/opencode/skills/agentdev-workflow-templates/SKILL.md`、Issue 本文テンプレート群）が Issue 本文の「レビュー判断」セクション構造を正規所有する
 
 #### 各エントリの field 構成

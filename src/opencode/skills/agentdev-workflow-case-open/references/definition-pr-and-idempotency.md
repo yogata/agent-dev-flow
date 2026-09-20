@@ -24,6 +24,10 @@ canonical Definition との実変更を判定し、実変更がある場合の�
 
 ### STEP-4: 実変更判定と Definition PR 作成
 
+#### 期待値確定前の branch HEAD 実測
+
+実変更がある Definition PR では、PR 本文へ検査期待値を記載する前に branch HEAD 全体を repo root 起点で実測する。`check_integrity`、`check_autogen_freshness`、`agentdev-traceability` の結果を取得し、期待値を実測値から確定する。いずれかが実行不能または期待値確定不能の場合は PR を作成せず blocked として報告する。対象 checker の実装、終了契約、baseline は変更しない。既存の UTF-8 健全性・対象内容の出現回数などの文字列検証は実測の後に実行し、実測と文字列検証の両方を Definition PR の検証証跡へ記録する。
+
 1. 実変更判定: Definition Package と canonical Definition を比較する（case-open / case-ready Design）。差分が空の場合は実変更なし → PR を作成せず STEP-5 へ進む。実変更のない Case（bugfix / maintenance / docs_chore 等では作成しない）
 2. 実変更がある場合: 実変更を Case 単位で 1 件の Definition PR として集約し作成する。1 Case につき 2 件以上作成しない
 3. REQ 行変更（新規行の追加・移管・廃止等）を伴う Definition PR では、PR 作成前に Design の ADF-COVERS 宣言の追随反映を確認し、トレーサビリティ check（`agentdev-traceability`）で当該 REQ 行の missing-design が 0 件であることを確認する（missing-design 0 件ゲート）。宣言追随が Definition に含まれておらず missing-design が 0 件でない場合は PR を作成せず、Definition Package の構成へ戻して宣言追随を確定する

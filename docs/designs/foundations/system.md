@@ -144,7 +144,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **Capability依存**: `agentdev-req-analysis`、`agentdev-req-file-manager`（照合）、`agentdev-decision-guidelines`、`agentdev-decision-file-manager`（参照のみ）、`agentdev-architecture-advisory`、`agentdev-workflow-lifecycle`、`agentdev-workflow-templates`（template 読込）、`agentdev-project-extensions`、`agentdev-adversarial-review`。
 - **内部workflow候補**: 壁打ち対話workflow（STEP-1〜2）、既存REQ照合workflow（STEP-3 + 定量計測）、要件展開と分類ゲートworkflow（STEP-4）、Decision判断workflow（STEP-5 + 副ステップ）、ドラフト保存workflow（STEP-6 + 9 + 10）。STEP-4 の test strategy 定義は Capability Skill 候補。
 
-### `/agentdev/case-ready`
+### case-ready（内部 lifecycle 段階）
 
 - **公開契約**: Root Case（Issue 番号または URL）+ 関連 req_draft / Definition PR → ready 状態の Root Case + 確定済み execution contract + 実行構造（Standard は Root Case 単一 execution unit、Epic は Child Issue と Wave / 依存構造）。Definition 確定境界の主フローコマンド（REQ-061）。
 - **主要処理段階**: Definition 受入（Definition PR の忠実性確認、整合性・品質検査、merge 前 Draft 状態確認（isDraft）、自動確定・merge と HITL 停止の分岐）→ REQ/Decision/Design 保存（Definition 保存 / Design 保存内部責務、Capability Skill 委譲）→ canonical Definition 再取得 → proposed Decision の受理評価と accepted 遷移 → execution contract 確定 → 実行構造確定（連結成分、3軸判断、単独根の Standard 化、構成検証、Wave ファイル重複前置検出）→ 検証対応要否ゲート → draft / RU 削除 → ready 遷移。
@@ -158,7 +158,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **Capability依存**: `agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-design-file-manager`、`agentdev-artifact-validation`、`agentdev-quality-gates`、`agentdev-project-extensions`。
 - **内部workflow候補**: Definition 受入workflow（忠実性確認 + 自動確定境界）、実行構造確定workflow（連結成分 + 3軸判断、[workflows/references/execution-unit-construction.md](../workflows/references/execution-unit-construction.md) 参照）。
 
-### `/agentdev/case-revise`
+### case-revise（内部 lifecycle 例外経路段階）
 
 - **公開契約**: Root Case + req-define で再合意済みの Definition 変更差分（draft） → Definition Amendment PR（canonical Definition に実変更がある場合のみ）+ case-ready への引き継ぎ。例外経路の内部 lifecycle 段階（REQ-062）。
 - **主要処理段階**: 再合意済み差分の読込 → 実変更判定（canonical Definition との差分比較、実変更なしは Amendment PR を作らず case-ready へ移行）→ Definition Amendment PR 作成 → 影響再評価（Definition 変更の影響がある Issue のみを再評価対象とし、影響なしと確認できた完了済み Issue は維持）→ case-ready 経由の execution contract / execution structure 再確定。
@@ -172,7 +172,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **Capability依存**: `agentdev-req-file-manager`、`agentdev-design-file-manager`、`agentdev-decision-file-manager`、`agentdev-artifact-validation`、`agentdev-project-extensions`。
 - **内部workflow候補**: 実変更判定workflow（差分比較 + 冪等検索キー）。意味判断は所有しない（req-define 責務）。
 
-### `/agentdev/case-open`
+### case-open（内部 lifecycle 段階）
 
 - **公開契約**: 要件doc（構造化 `draft-data`） → GitHub Issue（ラベル付き、要件doc埋め込み）。壁打ち→構造的実行フェーズの境界。
 - **主要処理段階**: STEP-1 引き継ぎ・OU選択 → STEP-2 Issue本文生成・execution contract 確定（QG-2 / test_strategy / 識別子中心 / EC-1〜EC-8）→ STEP-3 構成判定・preflight → STEP-4 adversarial-review → STEP-5 Issue 作成（Epic flow / Standard flow）→ STEP-6 終了処理・クリーンアップ（コメント追加、draft/RU 削除、Form Zero + 即時push、完了報告）。
@@ -186,7 +186,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **Capability依存**: `agentdev-issue-management`、`agentdev-epic-tracker`、`agentdev-workflow-templates`、`agentdev-workflow-lifecycle`、`agentdev-quality-gates`（QG-2）、`agentdev-git-worktree`、`agentdev-req-file-manager`（RU削除）、`agentdev-project-extensions`、`agentdev-adversarial-review`、`agentdev-learning-capture`/`agentdev-intake-pipeline`（deviation capture 委譲）。
 - **内部workflow候補**: execution_unit 構成workflow（STEP-3 連結成分アルゴリズム + 3軸判断）、Issue作成workflow（STEP-5、Epic flow / Standard flow）、execution contract 確定workflow（STEP-2、EC-1〜EC-8）、draft/RU 削除クリーンアップworkflow（STEP-6 + Form Zero）。EC-2 必須品質統制導出と EC-6 scope-affecting impact 探索は Capability Skill 候補。
 
-### `/agentdev/case-run`
+### case-run（内部 lifecycle 段階）
 
 - **公開契約**: Issue番号 / Epic Issue番号 → 実装済みブランチ + GitHub PR（実行担当サブエージェント作成）。case-run internal lifecycle 3フェーズ構成（準備・委譲・クリーンアップ）、べき等。
 - **主要処理段階**: Phase single: STEP-S1 フェーズ判定・再開ポイント検出 → STEP-S2 Issue 抽出・確認・判定（execution contract 消費境界）→ STEP-S3 Worktree 作成・ブランチ準備・前置 gate 群（QG-3 前置 staleness check / targeted docs guard）→ STEP-S4 実行担当サブエージェント委譲（adapter 委譲内 adversarial-review）→ STEP-S5 result 処理・配布依存境界 最終 gate（4状態）→ STEP-S6 クリーンアップ + 完了報告（L2 タイムスタンプ）。Phase epic-wave: STEP-W1 Epic Issue 解析・Wave 選択 → STEP-W2 fan-out 準備 → STEP-W3 fan-out 並列委譲 → STEP-W4 fan-in・結果集約 → STEP-W5 Wave 完了報告。
@@ -200,7 +200,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **Capability依存**: `agentdev-workflow-orchestration`（再開判定）、`agentdev-req-analysis`（品質基準）、`agentdev-workflow-lifecycle`（work_type）、`agentdev-git-worktree`（worktree・precondition gate・ staleness）、`agentdev-epic-tracker`（Epic Wave）、`agentdev-quality-gates`（QG-3 前置 staleness）、`agentdev-case-run-execution-adapter`（委譲契約）、`agentdev-adversarial-review`（adapter 委譲内）、`agentdev-project-extensions`、`repo-agentdev-integrity`（check_changed_docs.ts / check_extensions.ts）。
 - **内部workflow候補**: 準備フェーズworkflow（STEP-S1〜S3、worktree作成+前置検査群）、委譲起動workflow（STEP-S4 + adapter 契約）、result処理+クリーンアップworkflow（STEP-S5〜S6 + L2 計測）。adapter 委譲内の adversarial-review 統合と test-fix ループは Workflow Skill 候補。実行担当サブエージェントは外部実行基盤（I/O 境界 Design 所有）。
 
-### `/agentdev/case-close`
+### case-close（内部 lifecycle 段階）
 
 - **公開契約**: Issue番号 + PR番号（自動検出可）/ Epic Issue番号 → マージ済みPR + クローズ済みCase + 削除済みブランチ・worktree。Epic Issue番号時は現在 Wave の一括クローズ。
 - **主要処理段階**: STEP-1 Issue番号解決・ルーティング（Epic判定）→ Epic Wave クローズ（STEP-E1〜E6）or 単一Issueクローズ（STEP-2 QG-4 達成判定 → STEP-3 docs検証・Design確定（配布依存境界 最終 gate 含む）→ STEP-4 PRマージ・コンフリクト解消（mergeable UNKNOWN ポーリング / 先行commit検出 / Level 1 rebase）→ STEP-5 Post-merge・Issueクローズ → STEP-6 クリーンアップ・Capture回収・永続化（実行前同期、worktree/ブランチ削除、親Epic更新、完了報告））。
