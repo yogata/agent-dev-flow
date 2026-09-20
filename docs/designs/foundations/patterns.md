@@ -2,7 +2,7 @@
 title: 文書フォーマット規約
 status: accepted
 created: 2026-08-20
-updated: 2026-09-10
+updated: 2026-09-20
 ---
 <!-- ADF-COVERS(implementation): REQ-001-008, REQ-001-010, REQ-001-011, REQ-001-012, REQ-001-013, REQ-001-014, REQ-001-015, REQ-001-016, REQ-001-030, REQ-001-046, REQ-001-047 -->
 <!-- ADF-COVERS(implementation): REQ-059-001 -->
@@ -198,3 +198,7 @@ Issue/PR/コメント本文にリポジトリ内ファイル、ディレクト�
 - 形式の正本は本 Design（patterns.md）、テンプレート実体は doc_decision.md、
   存在確認・検証は agentdev-decision-file-manager、「明示承認記録が存在する」存在要件は
   document-model.md（現状維持）が所有する
+
+## Design status 昇格時の対応記録様式
+
+Designをdraftからacceptedへ昇格する場合は、Design本体の「対応記録」節に昇格日、評価契約根拠、対応Case/PR、REQとの整合確認結果を記録する。見送り記録とは排他的に管理し、既存Designへ遡及適用しない。

@@ -2,7 +2,7 @@
 title: 索引類自動生成 Design
 status: accepted
 created: 2026-07-19
-updated: 2026-09-18
+updated: 2026-09-20
 ---
 <!-- ADF-COVERS(implementation): REQ-001-026, REQ-001-028 -->
 <!-- ADF-COVERS(implementation): REQ-010-011 -->
@@ -229,6 +229,10 @@ decisions/README.md の関連REQ列は Decision frontmatter の related_reqs か
 - 補記の網羅性は retired 発生時・復帰時に確認する。機械検出対象外の運用情報であるため、
   網羅性確認は retired 登録操作とセットで行う
 - 説明列（人手判断列）の編集は AUTOGEN ブロック外で行い、自動生成結果と矛盾させない
+
+## AUTOGEN計測日の導出基準
+
+AUTOGEN計測日はgenerate_indexesの最終commitから導出し、git logの%cI（committer date）を基準とする。author dateとは区別し、squash merge等で両者が乖離する場合もcommitter dateを採用する。
 
 ## 関連情報
 

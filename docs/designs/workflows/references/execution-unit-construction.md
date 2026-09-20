@@ -2,7 +2,7 @@
 title: execution_unit 構成アルゴリズム参照
 status: accepted
 created: 2026-07-25
-updated: 2026-09-19
+updated: 2026-09-20
 ---
 <!-- ADF-COVERS(implementation): REQ-030-007, REQ-030-008, REQ-030-009 -->
 
@@ -68,6 +68,10 @@ case-open は無関係な OU 群を単一 Epic へ機械的に集約しない。
 Epic 構成推論の根拠を Epic Issue 本文または `case_open_hints` に記録する。
 3軸判断の個別エッジケース（同機能独立、共通基盤等）は LLM 推論に委ねる。
 REQ/Design で固定するのは不変の方針（依存強度3レベル定義、Epic あたり子 Issue 数上限、単独根 Standard flow）のみである。
+
+## docs-chore OUの削除起因参照追随
+
+物理削除を伴うdocs-chore OUは、extensions、templates等の実行時設定参照を対象範囲に明示的に含める。削除対象の参照先を事前確認し、OU分割時は他OU・実行時設定からの参照責務に隙間がないか検査する。checkExtensions等のfan-in事後検査は維持する。
 
 ## See Also
 
