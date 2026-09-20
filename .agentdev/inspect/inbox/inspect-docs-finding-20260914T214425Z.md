@@ -7,10 +7,10 @@
 > - F-04: REQ-038-006 の内部アルゴリズム混入は安定契約例外候補があり採否が意味判断（20260901 defer F-12 と同型の MOVE 系）
 > - F-05: REQ-050-016 の SPLIT は新規 REQ 対象範囲の決定を伴う構造再編（20260901 defer F-08 と同型）
 > - GUIDE-6: 節の意図がワークフロー状態限定の可能性があり要文脈判断
-> - GUIDE-8: 当該行は「REQ ファイル直指定」ケースの案内である解釈も可能
-> - DESIGN-3: KEEP（配置根拠として許容）と将来案表現除去の複数解釈（low/low）
 >
 > 2026-09-20 inspect-promote 再審議（in-context 審議、/agentdev/backlog-auto stage 2 inspect 系統経由、--auto なし）: GUIDE-8 は解消確認により reject・即時削除（自律確定。`docs/guides/command-selection.md:13` が「`/agentdev/case-auto`（内部 lifecycle の case-open 段階）」表記へ更新済み、旧 case-open 直接参照・旧責務出力は消滅。却下理由は当該 commit message 参照）。F-04/F-05/GUIDE-6/DESIGN-3 は defer 継続（自律確定）。F-05 に stage 1 観察（OBS-1）の注記を追加（下記 F-05 notes 参照）。
+>
+> 2026-09-21 inspect-promote 再審議（in-context 審議、/agentdev/backlog-auto stage 2 inspect 系統経由、--auto なし）: DESIGN-3 は reject・即時削除（自律確定）: 第16段 RC fixes（#3043/#3047）で command-file-format.md に配置理由注記（L16）と「即時統合・`authoring/` の削除は行わない」（L18）の明示的意思決定が追加され、指摘の判断軸（KEEP 許容 vs 将来案表現除去の複数解釈・low/low）が corpus 側で KEEP（配置根拠として許容）へ解消確定したため対応不要。将来案表現（L17）の除去は merge 済み意思決定と逆行する（L16-18 実読確認。却下理由は当該 commit message 参照）。F-04/F-05/GUIDE-6 は defer 継続（自律確定、再評価条件に変化なし）。
 
 ## 検出事項リスト（defer 残置分）
 
@@ -48,20 +48,10 @@
 - **recommended_route**: 同節を「ワークフロー進行状態」にスコープ明確化。inspect-promote → backlog-review
 - **ng_classification**: pre-existing
 
-### [文書種別] DESIGN-3: Design 内の将来拡張余地記述（責務境界の境界ケース）
-
-- **category**: Design 意味診断（将来計画の混入）
-- **target**: docs/designs/authoring/command-file-format.md L17（+ 同旨が docs/designs/README.md authoring 行にも重複記載）
-- **evidence**: 「`authoring/` は将来 REQ/Design/SKILL/guide 執筆規約の集約先として拡張余地を持つ（現状は command のみ）」。document-model L449 は「将来案…を Design に保持しない」。ただし本記述は現配置の維持根拠として機能しており複数解釈可能
-- **severity**: low / **confidence**: low
-- **source_of_truth**: Design 責務境界（document-model）。安定契約例外候補（配置方針の説明）として確信度下方調整
-- **recommended_route**: cleanup モデル処置候補: KEEP（配置根拠として許容）または将来案表現の除去。inspect-promote → backlog-review
-- **ng_classification**: pre-existing
-
 ## 推奨アクション（defer 残置分）
 
 - F-04 / F-05: 採否・範囲が意味判断のため継続見送り。次回以降の inspect サイクルまたは intake 経由で再評価（20260901 defer F-08/F-12 と同一の処遇）
-- GUIDE-6 / DESIGN-3: 代替解釈・文脈判断が残るため継続見送り。次回 inspect サイクルで再評価
+- GUIDE-6: 代替解釈・文脈判断が残るため継続見送り。次回 inspect サイクルで再評価
 
 ## docs-check route 候補（STEP-3-2、診断記録）
 
@@ -130,3 +120,4 @@
 - DIST-02 は HITL でユーザー判断を照会し reject 確定（agentdev-git-worktree-test-fallback の Design-only 構成は意図的: REQ-057-014 が当該 Design を「stale-junction 自己修復」運用規約の正規所有 Design として直接参照、REQ-045 整合監査・#2536 実装監査合格。README 一覧への例外注記追加も不要。即時削除、却下理由は commit message 参照）
 - 旧 defer 残置分（20260901/20260907 の 2ファイル）は原状維持。promote 採用の GUIDE-5 が 20260901 F-27 の project-docs 側前提（正本記述未確定）を部分的に解決する関係注記は promoted ファイル側に記載
 - 2026-09-20 実施（backlog-auto stage 2 inspect 系統、--auto なし、in-context 審議）再評価: GUIDE-8 は解消確認により reject・即時削除（自律確定）: `docs/guides/command-selection.md:13` は「`/agentdev/case-auto`（内部 lifecycle の case-open 段階）」表記へ更新済み（grep で確認、旧 `/agentdev/case-open` 直接参照・旧責務出力は zero hit）。F-04/F-05/GUIDE-6/DESIGN-3 は新情報なく defer 継続（自律確定）。なお 20260901 F-27（GUIDE-5 の前提）も同日実施の再評価で解消確認により reject（当該ファイル・commit message 参照）。却下理由の詳細は commit message に記録
+- 2026-09-21 実施（backlog-auto stage 2 inspect 系統、--auto なし、in-context 審議）再評価: DESIGN-3 は reject・即時削除（自律確定）: 対象行の実読で command-file-format.md L16 に「authoring/ ドメインでの配置理由」注記、L18 に「即時統合・`authoring/` の削除は行わない」の明示的意思決定が第16段 RC fixes（#3043/#3047）で追加済みであることを確認。指摘の判断軸（KEEP 許容 vs 将来案表現除去の複数解釈）は corpus の明示的意思決定により KEEP（配置根拠として許容）へ解消確定し、将来案表現（L17）の除去は merge 済み意思決定と逆行するため対応不要（adversarial-review で反証 2 件＋メタ反証 1 件を棄却、unresolved 0件。却下理由の詳細は commit message に記録）。F-04 は defer 継続（自律確定）: REQ-038-006（REQ-038.md:25）原状・REQ-057 RETIRE は対象領域（learning checker の安定契約例外候補判断）外で変化なし。F-05 は defer 継続（自律確定）: REQ-050-016（REQ-050.md:36・「350 字 × 50 件相当」残存）原状・再評価条件の learning 成果物は backlog-review 2026-09-20（60120646）で処置済みだが description 集約予算の独立改善要求が別 Case 化された形跡はなく SPLIT 採否の意味判断に変化なし。GUIDE-6 は defer 継続（自律確定）: artifacts-and-state.md 状態モデル制約節（L145-153）原状・#3047 の guides 変更（ADF-COVERS 注記除去）は当該節と無関係で文脈判断残存
