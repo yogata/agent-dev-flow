@@ -78,7 +78,7 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | DEC-009 | keep | ― | ― | planned | Decision モデル移行は維持 |
 | DEC-010 | redefine | semantic Skill | 8 | executed | 責務 3 層分化の v4 Skill 再編での再定義。第8段実行 2026-09-20（Case #3011、Definition merge 21434202、実装 merge eac6a5e9/b1207a0f/733eb40d/b0738869、fan-in fix 1befae99）。redefine（正本参照更新） |
 | DEC-011 | keep | ― | ― | planned | STEP resume point は維持 |
-| DEC-012 | redefine | Project Extension | 10 | planned | Extension の v4 semantic extension point 化 |
+| DEC-012 | redefine | Project Extension | 10 | executed | Extension の v4 semantic extension point 化。第10段実行 2026-09-20（Case #3029、Definition PR #3030 merge c08b741f・確定 496d2897・verify-only closure〔実装 PR なし〕）。redefine（relations 2 件追記と承認記録・決定本文不変・status: accepted 維持） |
 | DEC-013 | keep | ― | ― | planned | IR 登録モデル簡素化は維持 |
 | DEC-014 | keep | ― | ― | planned | 配布依存境界は維持 |
 | DEC-015 | supersede | ― | 8 | executed | 後継: DEC-036/038/039（責務分界の三層+権威モデルへの分解）。第8段実行 2026-09-20（Case #3011、Definition merge 21434202、実装 merge eac6a5e9/b1207a0f/733eb40d/b0738869、fan-in fix 1befae99）。supersede（frontmatter のみ・本文不変・17 識別子は v4-delegation-contracts が承継） |
@@ -119,7 +119,7 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | foundations/decision-lifecycle.md | redefine | ― | 4 | executed | 本段は権威移行注記のみ。Decision status 部分ビュー整理は第4段。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | foundations/patterns.md | keep | ― | ― | planned | 共通フォーマット規約は維持 |
 | foundations/design-principles.md | keep | ― | ― | executed | 設計原則は維持（第5段: work_type×scale→workflow_route 導出表を v4 直交性へ準拠改訂〔一次表現 Definition 構成・direct_case は導出結果ラベル〕、keep 処遇維持・内容更新）。第5段实行 2026-09-19（Case #2988、Definition merge b86354a9、実装 merge 0f8b1e10/abf77201/70bf897d、fan-in fix 57664e33） |
-| foundations/project-extensions.md | redefine | Project Extension | 10 | planned | semantic extension point 化 |
+| foundations/project-extensions.md | redefine | Project Extension | 10 | executed | semantic extension point 化。第10段実行 2026-09-20（Case #3029、Definition PR #3030 merge c08b741f・確定 496d2897・verify-only closure〔実装 PR なし〕）。redefine（2 節追記〔v4 semantic extension point・安定 API と移行〕と L7 重複宣言削除・既存節不変・skill Design 接続節追記） |
 | foundations/harness-separation-model.md | redefine | Adapter | 11 | planned | adapter 境界の再編 |
 | foundations/traceability-model.md | supersede | ― | 7 | executed | v4-traceability-model が承継（DEC-037）。第7段実行 2026-09-19（Case #3004、Definition merge fa1b5ac9、実装 merge 236e6cf4・40098b27）。supersede（物理削除・吸収節は v4-traceability-model） |
 | foundations/references/concrete-abstraction.md | keep | ― | ― | planned | 具体抽象化参照は維持 |
