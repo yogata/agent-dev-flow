@@ -6,11 +6,9 @@ updated: "2026-09-19"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-021 -->
-<!-- ADF-COVERS(implementation): REQ-057-014 -->
 <!-- ADF-COVERS(implementation): REQ-082-001, REQ-082-002, REQ-082-003, REQ-082-004, REQ-082-005, REQ-082-006, REQ-082-007, REQ-082-008, REQ-082-009, REQ-082-010, REQ-082-011, REQ-082-012, REQ-082-013, REQ-082-014, REQ-082-015, REQ-082-016, REQ-082-017, REQ-082-018, REQ-082-019, REQ-082-020, REQ-082-021, REQ-082-022, REQ-082-023, REQ-082-024, REQ-082-025 -->
 <!-- ADF-COVERS(implementation): REQ-014-001, REQ-014-002, REQ-014-003, REQ-014-004, REQ-014-005, REQ-014-006, REQ-014-007, REQ-014-008, REQ-014-009, REQ-014-010, REQ-014-011, REQ-014-012, REQ-014-013, REQ-014-014, REQ-014-015 -->
 <!-- ADF-COVERS(implementation): REQ-015-001, REQ-015-002, REQ-015-003 -->
-<!-- ADF-COVERS(implementation): REQ-016-001, REQ-016-002, REQ-016-003, REQ-016-004, REQ-016-005, REQ-016-006, REQ-016-007, REQ-016-008, REQ-016-009, REQ-016-010 -->
 <!-- ADF-COVERS(implementation): REQ-082-001, REQ-082-002, REQ-082-003, REQ-082-004, REQ-082-005, REQ-082-006, REQ-082-007, REQ-082-008, REQ-082-009, REQ-082-010, REQ-082-011, REQ-082-012, REQ-082-013, REQ-082-014, REQ-082-015, REQ-082-016, REQ-082-017, REQ-082-018, REQ-082-019, REQ-082-020, REQ-082-021, REQ-082-022, REQ-082-023, REQ-082-024, REQ-082-025, REQ-014-001, REQ-014-002, REQ-014-003, REQ-014-004, REQ-014-005, REQ-014-006, REQ-014-007, REQ-014-008, REQ-014-009, REQ-014-010, REQ-014-013, REQ-014-014, REQ-014-015 -->
 
 # agentdev-adversarial-review Design
@@ -342,7 +340,9 @@ adversarial-review の呼出失敗時（スキル不在、起動異常、timeout
 | 各 command の個別呼出統合（発動条件、挿入境界、戻り先） | 各 command Design（REQ-015） |
 | caller integration 関連の domain skill 振る舞い | 各 domain skill Design（REQ-015） |
 
-### 横断整合検証状態（REQ-016）
+### 横断整合検証状態（履歴記録・廃止済み REQ-016）
+
+> 履歴注記: REQ-016 は 2026-09-20 に廃止（retired）された。本節は統合完了時点（#1972）の検証記録であり、現行契約は REQ-015 が所有する（Issue #3044）。
 
 本マトリックスの遵守状態は REQ-016（横断整合）により検証済みである（#1972）。
 7呼出元（req-define、inspect-promote、intake-promote、learning-promote、backlog-review、case-open、case-run）+ case-auto 統合後について、QG 重複（REQ-016-001）、HITL 重複（REQ-016-002）、新規永続成果物混入（REQ-016-003）、case-auto 伝播 regression（REQ-016-004）、責務重複（REQ-016-005）、command 定義本体と Design の Step 表現整合（REQ-016-006）のいずれも不整合なし。
@@ -350,7 +350,7 @@ adversarial-review の呼出失敗時（スキル不在、起動異常、timeout
 
 ## caller 挿入境界の節見出し表記規約
 
-各 command Design が所有する adversarial-review 挿入境界の節見出しは、本節の表記規約に従う（REQ-057-014）。
+各 command Design が所有する adversarial-review 挿入境界の節見出しは、本節の表記規約に従う。
 個別呼出統合（発動条件、挿入境界、戻り先）の正規所有は各 command Design であり、本節は節見出しの表記のみを正規所有する。
 
 節見出しは次の形式を使い分ける。見出しレベルは command Design 内の第2レベル（`##`）とする。

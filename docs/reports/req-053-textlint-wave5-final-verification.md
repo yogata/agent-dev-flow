@@ -7,7 +7,7 @@ source_issue: "#2739"
 parent_epic: "#2734"
 ---
 
-<!-- ADF-COVERS(implementation): REQ-053-014, REQ-053-016, REQ-053-019, REQ-053-020, REQ-053-021, REQ-053-037, REQ-053-038, REQ-057-024 -->
+<!-- ADF-COVERS(implementation): REQ-053-014, REQ-053-016, REQ-053-019, REQ-053-020, REQ-053-021, REQ-053-037, REQ-053-038 -->
 
 # textlint Wave5 最終検証・完了証拠・実行記録
 

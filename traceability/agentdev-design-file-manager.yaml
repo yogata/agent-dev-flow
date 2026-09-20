@@ -3,6 +3,5 @@ implementation:
   src/opencode/skills/agentdev-design-file-manager/SKILL.md:
     - REQ-021-013
     - REQ-021-026
-    - REQ-057-036
   src/opencode/skills/agentdev-design-file-manager/references/design-lifecycle-application.md:
     - REQ-021-026

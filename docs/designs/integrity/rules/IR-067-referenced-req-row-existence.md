@@ -21,7 +21,7 @@ updated: 2026-09-17
 | false_positive_risk | 中。履歴・様式領域を免除する: `v2:` プレフィックス付き歴史識別子、code span / code block、テンプレート領域（`_template.md`、`templates/`）、IR ルール説明文（v2:REQ-0145-015）、AUTOGEN ブロック（checker-execution-contracts 検出対象除外規定）、retired ディレクトリ、`docs/reports/`。導入時点の既知違反（要件分割由来の旧行 ID 引用）は NG baseline で管理する |
 | regression_test | `check_integrity.test.ts` describe "IR-067 referenced-req-row-existence (REQ-010-069, Issue #2383 (a))"。正常例（実在行 ID の引用）・違反例（ファントム行 ID）・境界例（v2: プレフィックス・プレースホルダー・旧4桁番号帯・code span）・許容例（_template.md・AUTOGEN ブロック・IR ルール説明文）・再現例（PR 2284 ファントム引用パターン）の 5 種 fixture |
 | finding_route | intake |
-| triage_action | 新規検出（baseline 超過分）は引用先の再同定（現行要件行への置換、または履歴注記化・削除）。導入時点の既知違反は要件分割（2026-08-14、REQ-006 分割等）由来の旧行 ID 引用であり、REQ-057 の docs corpus 現行化バッチ（Design/Decision 本文の旧行番号引用の付け替え解消と IR-067 NG baseline 消化）で解消する。旧4桁番号帯（`REQ-0136-029` 等、F-04）は本ルールの検出対象外とし OU-007 の是正対象とする |
+| triage_action | 新規検出（baseline 超過分）は引用先の再同定（現行要件行への置換、または履歴注記化・削除）。導入時点の既知違反は要件分割（2026-08-14、REQ-006 分割等）由来の旧行 ID 引用であり、廃止済み REQ-057（2026-09-20 RETIRE）の docs corpus 現行化バッチ（Design/Decision 本文の旧行番号引用の付け替え解消と IR-067 NG baseline 消化）で解消する。旧4桁番号帯（`REQ-0136-029` 等、F-04）は本ルールの検出対象外とし OU-007 の是正対象とする |
 | last_verified | 2026-08-22 |
 
 ## 検査項目
@@ -48,7 +48,7 @@ updated: 2026-09-17
 
 ## baseline 運用
 
-導入時点（Issue #2383、2026-08-22）の既知違反は 318 件（要件分割由来の旧行 ID 引用。内訳: REQ-006 分割系が大半、docs/designs と docs/decisions に集中）。NG baseline additions（provenance `issue-2383-ir067-initial-baseline`）で管理する。導入時点の既知違反 318 件は、REQ-057 の docs corpus 現行化バッチによる旧行番号引用の付け替え解消と一体で消化する。消化後は baseline 登録を解除し、docs/designs・docs/decisions を含む本文全走査で全件 strict 適用を継続する。baseline 登録後、新規のファントム引用（未コミット草案番号の混入等、PR 2284 再現パターン）は即時に strict fail として検出する。前回診断（20260914T214425Z dangling 0 件）との検出差異は、宣言中心走査と本文全走査の走査範囲差によるものである。
+導入時点（Issue #2383、2026-08-22）の既知違反は 318 件（要件分割由来の旧行 ID 引用。内訳: REQ-006 分割系が大半、docs/designs と docs/decisions に集中）。NG baseline additions（provenance `issue-2383-ir067-initial-baseline`）で管理する。導入時点の既知違反 318 件は、廃止済み REQ-057（2026-09-20 RETIRE）の docs corpus 現行化バッチによる旧行番号引用の付け替え解消と一体で消化する。消化後は baseline 登録を解除し、docs/designs・docs/decisions を含む本文全走査で全件 strict 適用を継続する。baseline 登録後、新規のファントム引用（未コミット草案番号の混入等、PR 2284 再現パターン）は即時に strict fail として検出する。前回診断（20260914T214425Z dangling 0 件）との検出差異は、宣言中心走査と本文全走査の走査範囲差によるものである。
 
 ## See Also
 

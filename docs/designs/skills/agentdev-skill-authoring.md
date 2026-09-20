@@ -4,8 +4,7 @@ status: accepted
 created: 2026-06-21
 updated: 2026-09-09
 ---
-<!-- ADF-COVERS(implementation): REQ-002-013, REQ-002-014, REQ-002-015, REQ-053-011, REQ-057-019 -->
-<!-- ADF-COVERS(design): REQ-057-019 -->
+<!-- ADF-COVERS(implementation): REQ-002-013, REQ-002-014, REQ-002-015, REQ-053-011 -->
 <!-- ADF-COVERS(verification): REQ-002-004 -->
 
 # `agentdev-skill-authoring` Design
@@ -59,7 +58,7 @@ OpenCode SKILL.md の作成における品質基準とベストプラクティ�
 3. **`docs/designs/**` 内部パスの固定知識化の禁止**: extension に列挙されていない `docs/designs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/designs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
-## 配布物執筆時の ID 衛生（REQ-057-019）
+## 配布物執筆時の ID 衛生
 
 skill 執筆ガイダンスは、配布物への実行手順・例示を fenced code block とプレースホルダ表記で書き、要件・決定・設計等の具象参照（concrete ID）を本文 inline に記載しないことを不変条件として含む。
 対応宣言（ADF-COVERS implementation / verification）の正規配置先は docs 配下の正規成果物（skill Design・command Design）であり、配布物本体には対応宣言を書かない。

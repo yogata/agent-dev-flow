@@ -10,7 +10,6 @@ updated: "2026-09-19"
 <!-- ADF-COVERS(implementation): REQ-015-010, REQ-015-011 -->
 <!-- ADF-COVERS(implementation): REQ-017-007, REQ-017-008, REQ-017-010, REQ-017-011, REQ-017-013, REQ-017-016 -->
 <!-- ADF-COVERS(implementation): REQ-031-001, REQ-031-002, REQ-031-003, REQ-031-004, REQ-031-005, REQ-031-006, REQ-031-007, REQ-031-008, REQ-031-009, REQ-031-010, REQ-031-011, REQ-031-012, REQ-031-013, REQ-031-014, REQ-031-015, REQ-031-016, REQ-031-017, REQ-031-018, REQ-031-019, REQ-031-020, REQ-031-021, REQ-031-022, REQ-031-023, REQ-031-024 -->
-<!-- ADF-COVERS(implementation): REQ-057-004 -->
 <!-- ADF-COVERS(implementation): REQ-007-001, REQ-007-002, REQ-007-003, REQ-007-004, REQ-007-005, REQ-031-001, REQ-031-002, REQ-031-003, REQ-031-004, REQ-031-005, REQ-031-006, REQ-031-009, REQ-031-010, REQ-031-011, REQ-031-012, REQ-031-015, REQ-031-016, REQ-031-017, REQ-031-018, REQ-031-019, REQ-031-020, REQ-031-021, REQ-031-022, REQ-031-023, REQ-031-024, REQ-035-011 -->
 
 # case-run Design
@@ -293,9 +292,9 @@ case-run の実行担当（委譲内サブエージェント）は、対象要�
 
 ## 配布物本体 ADF-COVERS 宣言の除去可否判定（cleanup 判定）
 
-<!-- ADF-COVERS(implementation): REQ-057-030 -->
-<!-- ADF-COVERS(design): REQ-057-028 -->
-本節の coverage 突合の運用詳細（役割フィルタ、producer 側パス認定、sidecar と inline の同一扱い、除去後の後置検査）が REQ-057-030 を実装する。
+<!-- ADF-COVERS(implementation): REQ-021-030 -->
+<!-- ADF-COVERS(design): REQ-021-030 -->
+本節の coverage 突合の運用詳細（役割フィルタ、producer 側パス認定、sidecar と inline の同一扱い、除去後の後置検査）が REQ-021-030 を実装する。
 
 case-run の実行担当（委譲内サブエージェント）が、実装作業で配布物本体に残存する ADF-COVERS 宣言の除去を扱う場合、配布物本体の ADF-COVERS 宣言は producer 側のトレーサビリティ metadata であり、対応関係の移行先（docs 配下の正規成果物の inline 宣言、または repository top-level の `traceability/` 配下の sidecar）が成立していることを条件に除去する。single workflow（STEP-S4 の委譲）と epic-wave workflow（STEP-W3 の各子Issue 委譲）の双方に同じ条件を適用する。
 

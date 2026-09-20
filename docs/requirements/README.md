@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下54件を第一参照先とする。
+現在の要件判断では、以下52件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -26,7 +26,6 @@
 | [REQ-012](REQ-012.md) | 成果物トレーサビリティ |
 | [REQ-014](REQ-014.md) | adversarial-review caller integration 共通契約 |
 | [REQ-015](REQ-015.md) | adversarial-review caller integration（7 caller と case-auto 停止伝播） |
-| [REQ-016](REQ-016.md) | adversarial-review caller integration 横断整合 |
 | [REQ-017](REQ-017.md) | Issue Execution Contract |
 | [REQ-018](REQ-018.md) | worktree 構造的制約とテスト fallback |
 | [REQ-019](REQ-019.md) | テスト影響範囲検出 gate |
@@ -56,7 +55,6 @@
 | [REQ-054](REQ-054.md) | 変更誘発境界リスク分析 |
 | [REQ-055](REQ-055.md) | production-equivalent verification の定義 |
 | [REQ-056](REQ-056.md) | Project Knowledge の所有と workflow 利用 |
-| [REQ-057](REQ-057.md) | docs corpus 整合・現行化バッチ |
 | [REQ-058](REQ-058.md) | ADF 管理投影物の廃止時クリーンアップ契約 |
 | [REQ-059](REQ-059.md) | Decision と REQ の関連宣言管理 |
 | [REQ-060](REQ-060.md) | bun test 実行形態の統一（repo root 起 cwd・`./` 付きパス指定） |
@@ -74,6 +72,7 @@
 | REQ ID | タイトル |
 |---|---|
 | [REQ-013](retired/REQ-013.md) | DOC-MAP 依存除去 |
+| [REQ-016](retired/REQ-016.md) | adversarial-review caller integration 横断整合 |
 | [REQ-020](retired/REQ-020.md) | Artifact Graph 解析品質と検証 |
 | [REQ-022](retired/REQ-022.md) | Artifact Graph augmentation 配置先正規化 |
 | [REQ-023](retired/REQ-023.md) | Artifact Graph 問い合わせ結果の関係情報拡張 |
@@ -85,6 +84,7 @@
 | [REQ-040](retired/REQ-040.md) | トレーサビリティ高位問い合わせ（Trace Query） |
 | [REQ-042](retired/REQ-042.md) | Case統合先とブランチモデル |
 | [REQ-043](retired/REQ-043.md) | 評価ブランチ実証ワークフロー |
+| [REQ-057](retired/REQ-057.md) | docs corpus 整合・現行化バッチ |
 <!-- AUTOGEN:END -->
 
 ## 基準構造

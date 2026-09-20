@@ -8,8 +8,6 @@ parent_epic: "#2553 (ru-batch-20260903 Epic 1)"
 base_ref: f1637373 (origin/main)
 ---
 
-<!-- ADF-COVERS(implementation): REQ-057-011, REQ-057-012 -->
-
 # REQ-057-011/012 integrity suite 実装完遂と宣言付与の監査記録
 
 > **位置づけ**: 本ファイルは Issue #2569（OU-018）の実行成果物である。Case 冒頭の traceability check 現行計上再確認の結果、integrity suite 正規形実行の結果、REQ-057-011 / REQ-057-012 分の実装残存分特定結果、ADF-COVERS 実装対応宣言の付与状況を記録する。検証対応要否カタログ上、両 REQ 行は検証対応任意行であるが、本監査レポートは配置先カタログ (c)「テスト対象契約を所有する REQ のカバレージ記録または監査レポート」に従う宣言配置先でもある。監査時点の HEAD は f1637373（worktree `.worktrees/2569-case`、branch `case/issue-2569`）。

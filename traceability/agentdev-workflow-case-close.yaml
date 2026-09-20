@@ -5,11 +5,10 @@ implementation:
     - REQ-006-114
     - REQ-021-027
     - REQ-032-027
-    - REQ-057-017
   src/opencode/skills/agentdev-workflow-case-close/references/cleanup-and-capture.md:
     - REQ-032-027
   src/opencode/skills/agentdev-workflow-case-close/references/docs-and-design-promotion.md:
-    - REQ-057-030
+    - REQ-021-030
   src/opencode/skills/agentdev-workflow-case-close/references/issue-resolution-and-qg4.md:
     - REQ-021-027
     - REQ-032-027

@@ -1,4 +1,4 @@
-<!-- ADF-COVERS(implementation): REQ-057-022, REQ-008-010, REQ-008-011 -->
+<!-- ADF-COVERS(implementation): REQ-052-012, REQ-008-010, REQ-008-011 -->
 
 # トラブルシューティング
 

@@ -16,8 +16,8 @@ implementation:
   src/opencode/skills/agentdev-traceability/scripts/lib/verification_scope.ts:
     - REQ-012-056
   src/opencode/skills/agentdev-traceability/scripts/src/check.ts:
-    - REQ-057-028
+    - REQ-021-030
   src/opencode/skills/agentdev-traceability/scripts/src/coverage.ts:
-    - REQ-057-028
+    - REQ-021-030
   traceability/policy.yaml:
     - REQ-002-048
