@@ -104,6 +104,16 @@ bg task API、実行エージェント選定、実行担当サブエージェン
 他 skill も同一モデルへ整理する。
 `agentdev-architecture-advisory` は `references/architecture-review-delegation.md` を新設し同モデルへ移行する。
 
+## v4 Harness/Backend adapter 境界への接続
+
+本 Design が定める配布物の harness 非依存性と実行結果契約は、v4 において Harness/Backend adapter 境界（ADF v4 実装責務境界 Design「Harness / Backend adapter 境界」節・DEC-036）の下で維持される。
+
+OpenCode を first-class reference harness と位置づける。他 harness への adapter は必要になった時点で追加し、未使用の Harness/Backend adapter を先回りして実装しない。
+
+現行の tools/（agentdev-gh・agentdev-third-party）と plugins/（tool 登録配線・guard 3 本）はこの境界の OpenCode 実装例であり、配布物の harness 非依存原則（本 Design 既有）に従う。
+
+定義の所有は v4-responsibility-boundaries と DEC-036 にあり、本節は参照にとどめる。既存節は不変とする。
+
 ## 適用基準
 
 配布物から harness 固有の記述を分離する基準を次に示す。

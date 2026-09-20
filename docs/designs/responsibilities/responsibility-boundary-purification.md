@@ -56,6 +56,14 @@ AgentDevFlow 配布物と harness 実行制御の責務境界を、所有対象�
 **禁止事項**: worktree外変更、Issue完了判定、capture直接書込、harness中間成果物のADF永続状態化
 **含めない**: エージェント構成、実行command、timeout、retry、並列数、plan
 
+### v4 adapter 境界への接続
+
+本 Design の execution adapter 最小契約は、v4 では Harness/Backend adapter 境界（ADF v4 実装責務境界 Design・DEC-036）の一部として位置づく。
+
+adapter の追加は必要になった時点で行い、未使用 adapter を先回りして実装しない。実行責務の所有境界（本 Design 既有の 4 用語と所有者）は v4 でも維持する。
+
+定義の所有は v4-responsibility-boundaries にあり、本節は参照にとどめる。既存節は不変とする。
+
 ### Project Extensions境界
 **宣言データ層**: context、rules、checks、acceptance_gates、must_not
 **行わない**: 標準command上書き、実行skillエージェント指定、委譲方法標準契約要求
