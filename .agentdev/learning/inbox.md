@@ -332,3 +332,21 @@
 - **想定反映先**: agentdev-workflow-case-open skill (references/handoff.md または references/definition-pr-and-idempotency.md の冪等再実行節)、learning-promote の評価対象。
 - **関連**: Case #3022、Definition PR #3023、commit 99777c7a、draft req-draft-adf-v4-loop.md (AG-007 / AG-011 / ACT-DESIGN-003)
 - **タグ**: #case-open #冪等再実行 #resume #Aborted復帰 #instruction粒度照合
+
+---
+
+## 2026-09-20: agentdev_gh issue_update の labels 明示渡しは tracking Issue で read-back 検証を失敗させうる（Case #3036 case-close）
+
+- **問題事象**: tracking Issue（#2966・role tracking）への issue_update で labels を現行値どおり明示渡ししたところ、GitHub 側には本文が正しく反映されている（issue_read で確認）にもかかわらず Tool の read-back 検証が verification-incomplete（fail-closed・retryable false）を 2 回連続で返した。同一本文で labels 引数を省略した再実行では検証付き成功が返った。
+- **発生局面**: case-close（Case #3036 第13段・#2966 段階一覧表 13 行の完了更新）
+- **検知方法**: issue_update の verification-incomplete 応答と、issue_read による独立 read-back との突合（本文適用済み・検証のみ不一致）
+- **根本原因**: （推定）tracking role の Issue は tracking 軸の物理ラベル写像を Tool 内部で管理しており、labels の明示渡しが検証パスと干渉する。case role の Issue（#3036・labels [feature] 明示渡しで成功）では発生せず、tracking 軸ラベル管理が関与する場合に特徴的
+- **自律対応内容**: issue_read で耐久状態の正確性を独立確認した上で、labels を省略した冪等再実行で検証付き成功を取得（本文は無変更・適用済み状態を再確認）
+- **ユーザー確認の有無**: なし
+- **Decision/REQ/spec影響**: なし（agentdev-issue-tracking「物理ラベル写像の再実装は Tool 内実装の責務」の運用確認知見）
+- **横展開観点**: tracking Issue の本文のみ更新では labels 引数を渡さず、ラベル操作が必要な場合は trackingState / kind の論理値で指示する。検証失敗時に GitHub 側適用状態を issue_read で独立確認してから冪等再実行する二段構えが安全
+- **再発条件**: tracking role の Issue へ labels を明示渡して issue_update する場合
+- **予防策候補**: 本文のみの issue_update では labels 引数を省略する（不変ラベルは Tool が保持する）
+- **想定反映先**: agentdev-issue-tracking（Issue 操作手順の labels 取扱い）、learning-promote の評価対象
+- **関連**: Case #3036、#2966、agentdev_gh、comment 5748406773
+- **タグ**: #agentdev_gh #issue_update #labels #tracking #read-back検証 #fail-closed
