@@ -119,6 +119,33 @@ cutover sequence（DEC-034 決定(2)）の実行手順。feature complete 確認
 
 - pilot migration の検証項目: semantic preservation、Project Contract 再構成、Loop continuity、Extensions migration、Quality 実用性、Traceability migration、req-define -> case-auto 実利用、context reconstruction、resume/recovery、rollback
 
+### v4.0.0 final 成立条件
+
+v4.0.0 final tag は次の Evidence に基づいてのみ付与する（DEC-034 決定(3)）。
+
+- (a) self-hosting 成立: cutover 後の main repo で v4 コマンド群による開発が継続していること（本段の Evidence 記録による実証）
+- (b) pilot migration の Evidence: 検証 10 項目の判定記録（DEC-034 決定(3) の要求）
+- (c) RC fixes の完了: 第16段・rc.N 運用での修正サイクル
+- (d) full validation の再実施: v4.0.0 tag 直前
+- v4.0.0 final の実行自体は第17段の範囲である（本段は定義と Evidence の蓄積まで）
+
+### rc.N 運用
+
+- rc.N tag は各 RC サイクルの full validation 済み candidate commit に付与する（annotated・DEC-034 決定(2)）
+- rc.N → rc.(N+1) は RC fixes の完了と再検証後に付与する
+- RC 期間の修正は main（v4）上の正規開発経路（要件 → Case）で行う
+- migration target は tag 明示とする（未タグ main を migration target としない）
+- rollback anchor は v3-baseline tag（不変）
+- RC fixes（第16段）の詳細運用は第16段が確定する
+
+### self-hosting 開始手順
+
+- (1) projection 整合確認: scripts/self-sync.ps1 -Mode check を実行する（REQ-050-001/006）
+- (2) .agentdev/ 状態領域の整合確認: v4-collaboration-loop「.agentdev/ 状態領域の整合」表の 6 実体・5 分類・8 寿命との突合
+- (3) v4 コマンド群による開発開始: 最初の開発活動として self-hosting 側 repo で req-define → case-auto を実行する（本段 Case の実行そのものとして記録）
+- (4) collaboration loop の駆動開始: Observe → Intake/Learning → Backlog → req-define/case-auto → Verify/Integrate（RC 以降の self-hosting loop）
+- 専用の開始操作（新規ツール実行等）は行わない
+
 ## v3 baseline と rollback anchor
 
 v3-baseline tag の参照方法、rollback 手順の骨子、非 SemVer 命名（v3-baseline）の採用根拠（release tag 空間との分離、SemVer ツールの誤解析回避）。
