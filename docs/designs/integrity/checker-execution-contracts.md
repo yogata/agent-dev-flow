@@ -243,7 +243,7 @@ agentdev-quality-gates が正規所有する。本節はその所有権を変更
 
 ## Design frontmatter 必須キー検証観点
 
-docs/designs/** のDesign frontmatterはtitle/status/created/updatedを必須キーとして機械検査する。キー欠落、updated値のキー名欠落、値形式不正を検出し、既存のKnowledge frontmatter必須キー検査と同じ検出基準で整合性ルールカタログへ登録する。
+docs/designs/** のDesign frontmatterは `title` / `status` / `created` / `updated` を必須キーとして機械検査する。キー欠落、`updated` 値のキー名欠落、値形式不正を検出し、既存のKnowledge frontmatter必須キー検査と同じ検出基準で整合性ルールカタログへ登録する。
 
 ## See Also
 

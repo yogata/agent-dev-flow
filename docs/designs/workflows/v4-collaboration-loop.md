@@ -3,6 +3,7 @@ id: v4-collaboration-loop
 title: ADF v4 継続コラボレーションループ
 created: 2026-09-20
 status: accepted
+updated: 2026-09-20
 ---
 
 # ADF v4 継続コラボレーションループ
