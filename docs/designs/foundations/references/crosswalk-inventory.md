@@ -17,7 +17,7 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | REQ-008 | redefine | ― | 4 | executed | 一時成果物ライフサイクルの v4 整理。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | REQ-009 | redefine | ― | 12 | planned | 配布基盤・導入の migration implementation |
 | REQ-010 | redefine | deterministic code/tool | 6 | executed | 検証基盤の Gate モデル接続。第6段実行 2026-09-19（Case #2997、Definition merge 7d717d8b、実装 merge 95f9655516592b82c710fac55ae6352d981dbcd1・ffccea6a9c35cb32f82428c4a63ffa8389a0993b） |
-| REQ-011 | redefine | Adapter | 11 | planned | I/O 境界の adapter 再編 |
+| REQ-011 | redefine | Adapter | 11 | executed | I/O 境界の adapter 再編。第11段実行 2026-09-20（Case #3031、Definition PR #3032 merge d5303e6b・verify-only closure〔実装 PR なし〕）。redefine（REQ-011-009・REQ-011-018 の文言更新・行 ID 不変・目的節 1 文接続・scoped check で対応維持を機械証明） |
 | REQ-012 | redefine | ― | 7 | executed | Change/Evidence 再中心化（DEC-037）。第7段実行 2026-09-19（Case #3004、Definition merge fa1b5ac9、実装 merge 236e6cf4・40098b27）。redefine（目的節接続・要件行文言不変） |
 | REQ-014 | keep | ― | ― | planned | adversarial-review は v4 でも保持 |
 | REQ-015 | keep | ― | ― | planned | 同上 |
@@ -46,7 +46,7 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | REQ-049 | keep | ― | ― | planned | 追跡Issue管理は維持 |
 | REQ-050 | keep | ― | ― | planned | scripts 公開入口は維持 |
 | REQ-051 | redefine | deterministic code/tool | 8 | executed | ガードレール識別体系の再編。第8段実行 2026-09-20（Case #3011、Definition merge 21434202、実装 merge eac6a5e9/b1207a0f/733eb40d/b0738869、fan-in fix 1befae99）。redefine（目的節接続・要件行文言不変） |
-| REQ-052 | redefine | Adapter | 11 | planned | Custom Tool・Plugin 種別契約の adapter 再編 |
+| REQ-052 | redefine | Adapter | 11 | executed | Custom Tool・Plugin 種別契約の adapter 再編。第11段実行 2026-09-20（Case #3031、Definition PR #3032 merge d5303e6b・verify-only closure〔実装 PR なし〕）。redefine（REQ-052-007 の文言更新・行 ID 不変・目的節 1 文接続・scoped check で対応維持を機械証明） |
 | REQ-053 | keep | ― | ― | planned | 文章品質契約は維持 |
 | REQ-054 | keep | ― | ― | planned | 変更誘発境界リスク分析は維持 |
 | REQ-055 | redefine | ― | 6 | executed | Verification/Evidence モデル接続。第6段実行 2026-09-19（Case #2997、Definition merge 7d717d8b、実装 merge 95f9655516592b82c710fac55ae6352d981dbcd1・ffccea6a9c35cb32f82428c4a63ffa8389a0993b） |
@@ -68,7 +68,7 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | 対象 | 意味処遇 | 帰属 | 実行段階 | 確定状態 | 備考 |
 |---|---|---|---|---|---|
 | DEC-001 | keep | ― | ― | planned | 憲章。第13段 full validation で再確認 |
-| DEC-002 | supersede | Adapter | 11 | planned | 配布・ソース分離の v4 再定義（adapter 境界） |
+| DEC-002 | supersede | Adapter | 11 | executed | 配布・ソース分離の v4 再定義（adapter 境界）。第11段実行 2026-09-20（Case #3031、Definition PR #3032 merge d5303e6b・verify-only closure〔実装 PR なし〕）。supersede（後継: DEC-036〔adapter 境界の v4 正規所有者〕・frontmatter のみ・決定本文不変） |
 | DEC-003 | keep | ― | ― | planned | req_draft ソフトコントラクトは維持 |
 | DEC-004 | keep | ― | ― | planned | I/O 境界原則は維持 |
 | DEC-005 | keep | ― | ― | executed | superseded by DEC-006（履歴維持） |
@@ -120,23 +120,23 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | foundations/patterns.md | keep | ― | ― | planned | 共通フォーマット規約は維持 |
 | foundations/design-principles.md | keep | ― | ― | executed | 設計原則は維持（第5段: work_type×scale→workflow_route 導出表を v4 直交性へ準拠改訂〔一次表現 Definition 構成・direct_case は導出結果ラベル〕、keep 処遇維持・内容更新）。第5段实行 2026-09-19（Case #2988、Definition merge b86354a9、実装 merge 0f8b1e10/abf77201/70bf897d、fan-in fix 57664e33） |
 | foundations/project-extensions.md | redefine | Project Extension | 10 | executed | semantic extension point 化。第10段実行 2026-09-20（Case #3029、Definition PR #3030 merge c08b741f・確定 496d2897・verify-only closure〔実装 PR なし〕）。redefine（2 節追記〔v4 semantic extension point・安定 API と移行〕と L7 重複宣言削除・既存節不変・skill Design 接続節追記） |
-| foundations/harness-separation-model.md | redefine | Adapter | 11 | planned | adapter 境界の再編 |
+| foundations/harness-separation-model.md | redefine | Adapter | 11 | executed | adapter 境界の再編。第11段実行 2026-09-20（Case #3031、Definition PR #3032 merge d5303e6b・verify-only closure〔実装 PR なし〕）。redefine（「v4 Harness/Backend adapter 境界への接続」節追記・既存節不変） |
 | foundations/traceability-model.md | supersede | ― | 7 | executed | v4-traceability-model が承継（DEC-037）。第7段実行 2026-09-19（Case #3004、Definition merge fa1b5ac9、実装 merge 236e6cf4・40098b27）。supersede（物理削除・吸収節は v4-traceability-model） |
 | foundations/references/concrete-abstraction.md | keep | ― | ― | planned | 具体抽象化参照は維持 |
 | responsibilities/document-type-responsibilities.md | redefine | ― | 4 | executed | v4 中核文書モデルの執筆規約反映。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | responsibilities/artifact-responsibilities.md | redefine | semantic Skill | 8 | executed | 成果物責任表の v4 再編。第8段実行 2026-09-20（Case #3011、Definition merge 21434202、実装 merge eac6a5e9/b1207a0f/733eb40d/b0738869、fan-in fix 1befae99）。redefine（in-place） |
 | responsibilities/artifact-contracts.md | redefine | semantic Skill | 8 | executed | アーティファクト契約の v4 再編。第8段実行 2026-09-20（Case #3011、Definition merge 21434202、実装 merge eac6a5e9/b1207a0f/733eb40d/b0738869、fan-in fix 1befae99）。redefine（in-place） |
 | responsibilities/req-impact-map.md | keep | ― | ― | planned | REQ 影響マップは維持 |
-| responsibilities/responsibility-boundary-purification.md | redefine | Adapter | 11 | planned | 責務境界浄化の adapter 再編 |
+| responsibilities/responsibility-boundary-purification.md | redefine | Adapter | 11 | executed | 責務境界浄化の adapter 再編。第11段実行 2026-09-20（Case #3031、Definition PR #3032 merge d5303e6b・verify-only closure〔実装 PR なし〕）。redefine（「v4 adapter 境界への接続」節追記・既存節不変） |
 | responsibilities/artifact-quality-control-routing.md | redefine | ― | 6 | executed | Gate モデル接続。第6段実行 2026-09-19（Case #2997、Definition merge 7d717d8b、実装 merge 95f9655516592b82c710fac55ae6352d981dbcd1・ffccea6a9c35cb32f82428c4a63ffa8389a0993b） |
-| responsibilities/custom-tool-contracts.md | redefine | Adapter | 11 | planned | Custom Tool 操作契約・迂回防止の adapter 再編（REQ-052 対応 Design） |
+| responsibilities/custom-tool-contracts.md | redefine | Adapter | 11 | executed | Custom Tool 操作契約・迂回防止の adapter 再編（REQ-052 対応 Design）。第11段実行 2026-09-20（Case #3031、Definition PR #3032 merge d5303e6b・verify-only closure〔実装 PR なし〕）。redefine（「v4 adapter 経由の harness 接続」節追記・既存節不変） |
 | quality/quality-specs.md | redefine | ― | 6 | executed | Quality 5 概念への再編。第6段実行 2026-09-19（Case #2997、Definition merge 7d717d8b、実装 merge 95f9655516592b82c710fac55ae6352d981dbcd1・ffccea6a9c35cb32f82428c4a63ffa8389a0993b） |
 | quality/quality-gates.md | supersede | ― | 6 | executed | v4-quality-gate-model が承継（DEC-035）。第6段実行 2026-09-19（Case #2997、Definition merge 7d717d8b、実装 merge 95f9655516592b82c710fac55ae6352d981dbcd1・ffccea6a9c35cb32f82428c4a63ffa8389a0993b） |
 | quality/req-health-metrics.md | keep | ― | ― | planned | REQ 健全性メトリクスは維持 |
 | quality/design-health-metrics.md | keep | ― | ― | planned | Design 健全性メトリクスは維持 |
 | quality/textlint-quality-runtime.md | keep | ― | ― | planned | textlint 基盤は維持 |
 | integrity/*.md（14 件）+ integrity/rules/IR-NNN 群 | keep | deterministic code/tool | ― | planned | 検証基盤は v4 でも維持。個別再編が必要になった時点で個別行へ展開 |
-| local/*.md（4 件） | redefine | Adapter | 11 | planned | backend 抽象・物理写像への整理 |
+| local/*.md（4 件） | redefine | Adapter | 11 | executed | backend 抽象・物理写像への整理。第11段実行 2026-09-20（Case #3031、Definition PR #3032 merge d5303e6b・verify-only closure〔実装 PR なし〕）。redefine（local-case-file・runtime-package-boundary・install-script-usability・third-party-skill-management の 4 ファイルへ「v4 adapter 境界への接続」節追記・既存節不変） |
 | authoring/command-file-format.md | redefine | ― | 8 | executed | コマンド執筆規約の v4 再編。第8段実行 2026-09-20（Case #3011、Definition merge 21434202、実装 merge eac6a5e9/b1207a0f/733eb40d/b0738869、fan-in fix 1befae99）。redefine（in-place） |
 | authoring/vocabulary-registry.md | redefine | ― | 5 | executed | 語彙直交性の再定義への接続。第5段实行 2026-09-19（Case #2988、Definition merge b86354a9、実装 merge 0f8b1e10/abf77201/70bf897d、fan-in fix 57664e33） |
 
