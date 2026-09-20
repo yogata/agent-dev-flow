@@ -15,7 +15,7 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | REQ-006 | redefine | ― | 4 | executed | 自走オーケストレーションの v4 再編。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | REQ-007 | redefine | ― | 6 | executed | Quality/Verification/Evidence/Gate 分解。第6段実行 2026-09-19（Case #2997、Definition merge 7d717d8b、実装 merge 95f9655516592b82c710fac55ae6352d981dbcd1・ffccea6a9c35cb32f82428c4a63ffa8389a0993b） |
 | REQ-008 | redefine | ― | 4 | executed | 一時成果物ライフサイクルの v4 整理。第4段实行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
-| REQ-009 | redefine | ― | 12 | planned | 配布基盤・導入の migration implementation |
+| REQ-009 | redefine | ― | 12 | executed | 配布基盤・導入の migration implementation。第12段実行 2026-09-20（Case #3033、Definition PR #3034 merge 6ccf5248・実装 PR #3035 merge ac5a199b）。redefine（REQ-009-004 文言更新・行 ID 不変・目的節 1 文接続） |
 | REQ-010 | redefine | deterministic code/tool | 6 | executed | 検証基盤の Gate モデル接続。第6段実行 2026-09-19（Case #2997、Definition merge 7d717d8b、実装 merge 95f9655516592b82c710fac55ae6352d981dbcd1・ffccea6a9c35cb32f82428c4a63ffa8389a0993b） |
 | REQ-011 | redefine | Adapter | 11 | executed | I/O 境界の adapter 再編。第11段実行 2026-09-20（Case #3031、Definition PR #3032 merge d5303e6b・verify-only closure〔実装 PR なし〕）。redefine（REQ-011-009・REQ-011-018 の文言更新・行 ID 不変・目的節 1 文接続・scoped check で対応維持を機械証明） |
 | REQ-012 | redefine | ― | 7 | executed | Change/Evidence 再中心化（DEC-037）。第7段実行 2026-09-19（Case #3004、Definition merge fa1b5ac9、実装 merge 236e6cf4・40098b27）。redefine（目的節接続・要件行文言不変） |
@@ -152,4 +152,4 @@ v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則
 | work_type/scale/workflow_route（概念） | redefine | ― | 5 | executed | 語彙直交性への再定義。第5段实行 2026-09-19（Case #2988、Definition merge b86354a9、実装 merge 0f8b1e10/abf77201/70bf897d、fan-in fix 57664e33） |
 | Epic/Wave（概念） | redefine | ― | 5 | executed | 階層合成・実行スケジューリング。第5段实行 2026-09-19（Case #2988、Definition merge b86354a9、実装 merge 0f8b1e10/abf77201/70bf897d、fan-in fix 57664e33） |
 | QG-1〜QG-4（概念） | redefine | Standard Operating Model | 6 | executed | Quality 5 概念分解・Gate 再導出。第6段実行 2026-09-19（Case #2997、Definition merge 7d717d8b、実装 merge 95f9655516592b82c710fac55ae6352d981dbcd1・ffccea6a9c35cb32f82428c4a63ffa8389a0993b）。QG-1〜QG-4 の SSoT 所在は quality/v4-quality-gate-model Design（再導出結果表・個別処遇対応表） |
-| 配布物・プロジェクション（概念） | redefine | ― | 12 | planned | migration implementation |
+| 配布物・プロジェクション（概念） | redefine | ― | 12 | executed | migration implementation。第12段実行 2026-09-20（Case #3033、Definition PR #3034 merge 6ccf5248・実装 PR #3035 merge ac5a199b）。redefine（標準 migration pattern 5 節展開: semantic inventory/mapping・v4 state 構築手順・v4 validation・配布物・プロジェクションの移行・移行ツール群。inventory 生成ツール実装つき） |
