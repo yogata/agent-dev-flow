@@ -350,3 +350,21 @@
 - **想定反映先**: agentdev-issue-tracking（Issue 操作手順の labels 取扱い）、learning-promote の評価対象
 - **関連**: Case #3036、#2966、agentdev_gh、comment 5748406773
 - **タグ**: #agentdev_gh #issue_update #labels #tracking #read-back検証 #fail-closed
+
+---
+
+## 2026-09-20: agentdev_gh issue_update labels 明示渡しの read-back 検証失敗は tracking Issue で再発する（Case #3038 case-close・既存学びの再発実績）
+
+- **問題事象**: tracking Issue（#2966・role tracking）の段階一覧表第14段行更新で labels を現行値どおり明示渡して issue_update したところ、GitHub 側には本文が正しく反映された（直後の issue_read で本文・他行・labels すべて意図どおり確認）にもかかわらず Tool の read-back 検証が verification-incomplete（fail-closed・retryable false）を返した。Case #3036 close 時（2026-09-20・inbox 既存エントリ「labels 明示渡しは tracking Issue で read-back 検証を失敗させうる」）の同現象の再発（2 Case 目・通算 3 回）。
+- **発生局面**: case-close（Case #3038 第14段・#2966 段階一覧表 14 行の完了更新）
+- **検知方法**: issue_update の verification-incomplete 応答と、issue_read による独立 read-back との突合（本文適用済み・検証のみ不一致）
+- **根本原因**: （既存エントリと同一推定）tracking role の Issue は tracking 軸の物理ラベル写像を Tool 内部で管理しており、labels の明示渡しが検証パスと干渉する。既存学びは inbox に蓄積済みだが skill・手順へ昇華される前のため予防策（labels 省略）が実行時に参照されず、同一操作形態で再発した
+- **自律対応内容**: 今回は再実行せず、独立 issue_read で durable state（本文意図どおり・他行他節不変・labels 不変）の正確性を確認して完結と判断（本文は適用済み・再書込は冗長）。#3036 事例の「labels 省略冪等再実行で検証付き成功を取得」と合わせ、検証失敗時は「まず独立 read-back → 適用済みなら再実行不要・未適用なら labels 省略で冪等再実行」の分岐が確立した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（agentdev-issue-tracking「物理ラベル写像の再実装は Tool 内実装の責務」の運用確認知見の追実績）
+- **横展開観点**: tracking Issue の本文のみ更新では labels 引数を渡さない（予防）に加え、検証失敗時の復帰手順（独立 read-back → 適用済みなら完了・未適用なら labels 省略冪等再実行）を二段構えで運用する。同一セッション内の case role 本文更新（#3038・labels [feature] 明示渡し）では発生せず tracking 軸特性が維持されていることも確認
+- **再発条件**: tracking role の Issue へ labels を明示渡して issue_update する場合（学びの昇華前に同一操作形態を踏んだ場合）
+- **予防策候補**: 本文のみの issue_update では labels 引数を省略する（不変ラベルは Tool が保持する）。再発 2 Case・通算 3 回のため learning-promote での早期昇華候補
+- **想定反映先**: agentdev-issue-tracking（Issue 操作手順の labels 取扱い）、「agentdev_gh 標準呼出形式」の labels 明示規定への tracking 例外、learning-promote の評価対象
+- **関連**: Case #3038、Case #3036（既存学び・comment 5748406773）、#2966、agentdev_gh
+- **タグ**: #agentdev_gh #issue_update #labels #tracking #read-back検証 #fail-closed #再発
