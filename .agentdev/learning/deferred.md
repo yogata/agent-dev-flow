@@ -178,26 +178,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
-### L-002: HITL 境界精密化パターンの汎用性
-
-- **問題事象**: HITL 境界の精密化パターン（判断確定→自動実行・破壊的変更は別承認）の汎用性
-- **発生局面**: HITL 境界設計全般
-- **検知方法**: 設計レビュー
-- **根本原因**: HITL 境界パターンが promote/review 系以外に明示されていない
-- **自律対応内容**: REQ-0147 で promote 系に実装
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: REQ-0147（promote 系に実装済み）
-- **横展開観点**: case-close 等の他コマンドにも適用可能な汎用パターン
-- **再発条件**: HITL 境界を設計する新規コマンド追加時
-- **予防策候補**: 別途整備候補（具体性・出現回数ともに不足）
-- **想定反映先**: 検討候補
-- **関連**: PR #1033 (#1031 / REQ-0147)
-- **タグ**: `#hitl` `#boundary` `#precision` `#generalization`
-- **移動日**: 2026-06-25
-- **処分判定**: deferred（promote 系以外への汎用化は候補止まり。具体性不足）
-
----
-
 ### L-004: docs 系 Issue で case-run task() 委譲不可時に adapter skill フォールバックパスが有効
 
 - **問題事象**: docs 系（REQ/ADR ファイル検証・カタログ参照追加）の Issue で、case-run の Sisyphus-Junior への task() 委譲がハーネス制約で利用不可になる場合がある
@@ -235,26 +215,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **タグ**: `#mechanical-replacement` `#parallel-wave` `#merge-conflict` `#character-level-merge`
 - **移動日**: 2026-06-25
 - **処分判定**: deferred（文字レベルマージツール未標準化・出現1件。専用ツール整備が前提）
-
----
-
-### L-007: REQ の手続き列挙に中核操作（PR 作成）が抜けていた場合の SPEC 拡張判断
-
-- **問題事象**: REQ-0149-002 は agentdev-gh-cli の8手続きを列挙したが「PR 作成」が含まれていなかった
-- **発生局面**: 実装（REQ で手続き・API・コマンド等を列挙定義した場合）
-- **検知方法**: 実装中の REQ 整合確認
-- **根本原因**: 要件定義で「列挙」を明示した場合、実装上必須の中核操作が漏れることがある
-- **自律対応内容**: SPEC 拡張として「PR 作成」を追加（9手続き）し、REQ-0149-002 本体への追記は別途検討。SPEC 拡張で即時対応しつつ REQ 更新を後続工程に委ねる二段階判断
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: SPEC（standard-procedures）に「PR 作成」追加
-- **横展開観点**: 実装で中核操作の欠落に気づいた際、SPEC 拡張で即時対応しつつ REQ 更新を後続工程に委ねる判断基準
-- **再発条件**: REQ で手続き・API・コマンド等を列挙定義し、実装上必須の中核操作が漏れた場合
-- **予防策候補**: 二段階判断フロー（SPEC 拡張で即時対応 + REQ 更新は後続 req-save で処理）
-- **想定反映先**: req-define, req-save
-- **関連**: PR #1098 (#1094 / REQ-0149 + ADR-0130)
-- **タグ**: `#req` `#enumeration` `#core-operation` `#spec-extension` `#two-stage-judgment`
-- **移動日**: 2026-06-25
-- **処分判定**: deferred（出現1件・手順化困難。個別判断で対応可能）
 
 ---
 
@@ -395,26 +355,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **タグ**: `#case-open` `#epic-decomposition` `#scope-overlap` `#cross-epic` `#横断是正`
 - **移動日**: 2026-06-27
 - **処分判定**: deferred（出現1件・特定シナリオ。横断是正 Epic と横断 Issue 並行再発時に具体化）
-
----
-
-## 学び: docs_chore + `artifact: spec` の場合の case-run/spec-save 境界（PR が作成できない）
-
-- **問題事象**: `work_type: docs_chore` で SPEC ファイルそのものが実装成果物（`artifact: spec`）のケースでは、spec-save が SPEC 変更を直接 main へコミットする。このため case-run は作業ブランチを作成しても main との差分が空（empty diff）となり、意味ある PR を作成できない。結果として case-close は「PR マージ → 子Issue クローズ」の標準フローから外れ、「PR なし・変更は main 上にある」というエッジケースとして子Issue を直接クローズする運用になった。
-- **発生局面**: case-run（実装フェーズ、Step 5-6: 実装とPR作成）、case-close（Step E3: PR作成済み子Issue 特定、Step E4: PRマージ）
-- **検知方法**: Epic #1301 Wave 1 の case-close 実行時。子Issue #1302〜#1307 は case-run で受け入れ基準 TS-001〜TS-006 を PASS（verify-complete）したが、紐づく PR が一つも存在しなかった。コミット 7f9e3472 で SPEC 変更が既に main にあることを確認して境界事象と判定。
-- **根本原因**: spec-save と case-run の責務境界設計。spec-save は SPEC ファイルを直接 main にコミットするが、case-run はブランチ + PR モデルを前提としている。`docs_chore` + `artifact: spec` の組み合わせでは、両者が競合し case-run の出力（PR）が空になる。設計上、artifact 種別に応じた PR 要否判定が case-run/case-open に存在しない。
-- **自律対応内容**: case-close で PR マージステップをスキップし、子Issue を直接クローズする運用で対応。各子Issue の close comment で「SPEC 変更は main commit 7f9e3472 で適用済み、PR は作成されていない（docs_chore + spec-save ワークフロー）」と理由を明示。
-- **ユーザー確認の有無**: あり（タスク指示で「PR は存在しない、変更は main 上にある」という境界条件が明示指定された）。
-- **ADR/REQ/spec影響**: あり。case-run SPEC、case-close SPEC、spec-save SPEC、REQ-0130（case-run）、REQ-0131（case-close）で「artifact 種別に応じた PR 要否」の境界仕様を見直す候補。
-- **横展開観点**: docs_chore 以外で spec-save が main に直接コミットする全ケース。将来 artifact 種別が拡張された場合（`artifact: adr` 等）にも同様の境界が発生する可能性。
-- **再発条件**: `work_type: docs_chore`（または maintenance）で `artifact: spec` を指定し、spec-save → case-run → case-close と進めた時。
-- **予防策候補**: (a) case-run に「artifact 種別に応じた PR 要否判定」を組み込み、spec の場合は PR スキップを自動判定する。(b) case-open 時に work_type + artifact から PR 不要フラグを設定し、case-run/case-close がそれに従う。(c) case-close に「PR なしクローズ」の明示手順を追加し、エッジケースを正規ルートとして文書化する。
-- **想定反映先**: SPEC `docs/specs/commands/case-run.md`（PR 作成要否判定）、SPEC `docs/specs/commands/case-close.md` Step E3/E4（PR なしクローズ手順）、SPEC `docs/specs/commands/spec-save.md`（commit 直接適用時の case-run 連携）、REQ-0130、REQ-0131。
-- **関連**: Epic #1301、子Issue #1302〜#1307、SPEC 変更 main commit 7f9e3472。実行日時 2026-06-27。
-- **タグ**: `#case-run` `#spec-save` `#docs-chore` `#edge-case` `#boundary` `#pr-less-close`
-- **移動日**: 2026-07-03
-- **処分判定**: deferred（出現1件。完全な責務境界再設計(a/b)は費用対効果低、現状は「PR なしクローズ運用」で回避済み。最小手順(c)は有望だが単独昇華には具体性不足。docs_chore + spec-save 再発時または artifact 種別拡張時に再評価）
 
 ---
 
@@ -598,26 +538,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
-## ADR frontmatter の relates-to / supersedes を本文と Decision Map で表現する運用
-
-- **問題事象**: ADR-0138 を新規作成する Issue #1582 の完了条件に「relates-to=ADR-0136,ADR-0137,ADR-0129,ADR-0132、supersedes=none であること」と frontmatter 項目として扱う前提で記載されていた。しかし本リポジトリの ADR frontmatter は `id/title/status/created/updated` のみで構成され（ADR-0135/0136/0137/0138 で一貫）、`relates-to` / `supersedes` は本文「関連する決定」セクションと ADR-README の Decision Map テーブルで表現する形式が採用されている。Issue 完了条件の記述と実体の表現形式が一致しておらず、QG-4 評価時に形式の齟齬を解釈する手間が発生した。
-- **発生局面**: レビュー・クローズ（case-close の QG-4 完了条件評価）
-- **検知方法**: 手動確認。PR #1589 の QG-3 staleness check で ADR-0138 frontmatter に `relates-to` / `supersedes` が無いことを確認し、Decision Map と本文「関連する決定」セクションで表現されていることを照合。
-- **根本原因**: case-open が Issue 完了条件を起票する際、ADR frontmatter の形式を `id/title/status/created/updated/relates-to/supersedes` の7項目と想定して記載した。リポジトリの実運用では relates-to / supersedes を frontmatter ではなく本文 + Decision Map で表現する方針が暗黙に採用されているが、これが SPEC/ガイドレベルで明文化されていないため、case-open の自動生成条件文に齟齬が混入した。
-- **自律対応内容**: PR #1589 本文の Findings セクションに「ADR frontmatter は id/title/status/created/updated のみ。relates-to/supersedes は本文と Decision Map で表現する形式」と明記し、Issue 完了条件を実体の表現形式で達成していることを記録した。Issue 本文の完了条件は frontmatter 項目としての記載のままで、case-close で実体照合により pass 判定。
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: あり。document-type-responsibilities SPEC または ADR 運用ガイドで「ADR frontmatter の必須項目は id/title/status/created/updated。relates-to/supersedes は本文 + Decision Map で表現する」ことが明文化されていない。ADR 形式 SPEC への追記候補。
-- **横展開観点**: REQ/ADR を対象とする case-open の自動完了条件生成で、対象文書の実運用形式（frontmatter vs 本文 vs 別ファイル）を前提とする記述を置く際、実形式との整合を確認せず一般的テンプレートで記載すると同種の齟齬が再発する。SPEC や README の形式定義を参照してから完了条件を書く、または「実運用形式に従い表現されていること」の抽象度で記載することが望ましい。
-- **再発条件**: (1) ADR を新規作成または更新する Issue を case-open が起票する、(2) 完了条件に frontmatter 項目として relates-to/supersedes を指定する、(3) リポジトリの実運用が frontmatter 項目ではなく本文 + Decision Map 表現を採用している、の全てが揃った場合。
-- **予防策候補**: (a) ADR 形式 SPEC または agentdev-adr-file-manager skill に「ADR frontmatter 構成要素（id/title/status/created/updated の5項目）と relates-to/supersedes の表現場所（本文 + Decision Map）」を明文化する。(b) case-open テンプレートで ADR を対象とする完了条件を「指定メタデータが frontmatter または本文の適切な位置に表現されていること」の抽象度で記載する。
-- **想定反映先**: ADR 運用形式 SPEC（document-type-responsibilities 配下）、agentdev-adr-file-manager skill、case-open テンプレート（ADR 対応の完了条件記述抽象度）
-- **関連**: PR #1589, Issue #1582, Epic #1581, ADR-0138, ADR-0136（限定注記）, ADR-README Decision Map
-- **タグ**: `#adr` `#frontmatter` `#case-open` `#completion-criteria` `#qg-4` `#form-policy`
-- **移動日**: 2026-07-22
-- **処分判定**: deferred（learning-promote 2026-07-22 評価。詳細は evaluation-report.md 参照）
-
----
-
 ## Issue 本文崩壊（LF 圧縮・見出し消失）の修復手法と予防線
 
 - **問題事象**: Issue #1533 の本文が LF=0（事実上1行化）に圧縮され、Markdown の見出し構造（`## ...`）が崩壊。GitHub Web UI で見出しが見出しとしてレンダリングされず、本文全体が平文化して読めなくなっていた。前工程の draft（commit `51fff8b2`）は LF=246 で正常、テンプレート原本も正常であり、#1525〜#1535 の11件中 #1533 だけが異常だった。
@@ -718,26 +638,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
-## 2026-07-20: AG-001 制約内で公開 SKILL.md の文書構成を是正する REFERENCE 強化パターン（#1610）
-
-- **問題事象**: doc-writing SKILL.md の査読観点 table が `references/` 配下10ファイルのうち `mechanical-replacement-rules.md`, `japanese-replacement-dictionary.md` の2ファイルへの参照を欠いていた。また doc-map SKILL.md に intro 段落と重複する redundant な `### 目的` subsection が存在した。これらは AG-006' 候補6/7 Wave 1 が指摘する SKILL.md 重複問題の一部だが、動作（発火条件、判定ロジック等）に影響しない文書構成の不備であり、AG-001「公開 skill 動作不改」制約内で修正可能かの判断が必要だった。
-- **発生局面**: 実装・検証（case-run 実装フェーズ、Wave 3 #1610 PR #1621）
-- **検知方法**: Phase1 監査台帳 AG-006' M節 item 8（候補6/7 Wave 1）の指示と、`src/opencode/skills/agentdev-doc-writing/SKILL.md` の査読観点 table と `references/` 配下実ファイルの突合で検出。doc-map については冒頭 `# DOC-MAP 読み方ガイド` 直下の `### 目的` が intro 段落と意味重複するかの精読で検出。
-- **根本原因**: SKILL.md の参照漏れ・redundant subsection は拡張時の accumulate 結果。動作不改範囲での是正判断基準が SPEC に明示されず、「動作箇所（description frontmatter, Trigger conditions, 制約事項, コマンド実行, フラグ判定, 判定ロジック等）に触れない変更」と「文書構成（查読観点 table の参照追加、原本 section の対応表、リード文への構造変更、count 表記訂正）」の区別を case-run 側で都度判断していた。
-- **自律対応内容**: PR #1621 で3変更を適用。(a) doc-writing 査読観点 table へ2参照を追加、(b) doc-writing「原本」section に「運用ビュー↔原本」対応表を新設（原本節は `japanese-tech-writing`、document-type-responsibilities SPEC と明示）、(c) doc-map redundant `### 目的` subsection を intro 段落へ統合、参照可能 section の count 表記を 7→10 ファイルへ訂正。`git diff` で動作箇所への変更なしを確認。
-- **ユーザー確認有無**: なし（エージェント自律で実施、PR 本文に AG-001 制約遵守確認セクションを明記）
-- **ADR/REQ/spec影響**: なし。AG-001 制約内の運用知見であり、新規 ADR/REQ/spec 影響なし。SC-002 DERIVE/GENERATE 機構（フェーズ3対象）で SKILL.md 参照整合性を自動維持する候補が補強される。
-- **横展開観点**: 公開 SKILL.md の動作不改範囲での文書構成是正（参照追加、redundant subsection 統合、count 表記訂正、原本への対応表新設等）は Wave 1 パターンとして標準化可能。動作箇所（発火・判定・実行）と文書構成箇所（参照・構造・表記）を `git diff` で区別して確認する観点が、他の agentdev-* SKILL.md でも適用可能。
-- **再発条件**: (1) 公開 SKILL.md に `references/` 配下ファイルへの参照漏れ、redundant subsection、count 表記不正のいずれかが存在、(2) AG-001「公開 skill 動作不改」制約下で修正可否の判断が必要、(3) 動作箇所と文書構成箇所の区別基準が SPEC に未明文化、の全てが揃った場合。
-- **予防策候補**: (a) document-type-responsibilities SPEC（または後続SPEC）に「SKILL.md 重複読の優先度基準と段階的スケジュール」節で Wave 1 対象ファイル一覧（doc-writing, doc-map 等）を明示する。(b) case-run skill 検証テンプレートに「SKILL.md 変更時は動作箇所（Trigger/制約/ロジック）と文書構成箇所（参照/構造/表記）を git diff で区別確認」の観点を追加する。
-- **想定反映先**: `docs/specs/responsibilities/document-type-responsibilities.md`（SKILL.md 重複読章）、case-run skill 検証テンプレート、workflow-templates skill `templates/pr_desc.md`（AG-001 制約確認セクション）
-- **関連**: PR #1621, Issue #1610, Epic #1601 Wave 3, AG-006' 候補6（doc-writing REFERENCE 強化）・候補7 Wave 1（SKILL.md 手作業重複除去）, CR-003 フェーズ2/3 振り分け基準
-- **タグ**: `#ag-001` `#skill-md` `#reference` `#redundant-subsection` `#wave-1` `#case-run` `#verification` `#ag-008`
-- **移動日**: 2026-07-22
-- **処分判定**: deferred（learning-promote 2026-07-22 評価。詳細は evaluation-report.md 参照）
-
----
-
 ## IR-* frontmatter の Related REQ/SPEC フィールド不在と本文 prose 抽出代替パターン
 
 - **問題事象**: IR-061 の frontmatter は新形式（id/title/domain 等）だが elated_req / elated_spec フィールドを持たない。関連情報は本文「## 関連」セクションに prose 形式で記載される。そのため rule-ownership appendix の IR-061 行は Related REQ/SPEC が - となる。Wave 1 では Phase E での対応候補として記録するにとどめ、この Issue スコープ外とする。
@@ -817,26 +717,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（出現1件、即時昇華には具体性不足。deferred.md に類似事例（duty keyword 中黒化、SUB-D gloss 形式）あり。次回再評価対象）
 
 ---
-
----
-
-## 2026-08-09: 移行計画 §5.3 の明示対象不足による壊れた fixture 修復見送りリスク
-
-- **問題事象**: 移行計画 §5.3 で `commands_error_cases.test.ts` の修復を明示したが、`commands_structure.test.ts` と `command_fixtures.test.ts` も同様の文字化け・改行崩壊があった。§5.3 は前者のみを明示対象としたが、壊れた fixture の修復としては後者2件も含めて対処すべきだった
-- **発生局面**: 実装（Wave 2 WP-1 case-run、PR #1933 作成時）
-- **検知方法**: PR #1933 本文「Findings / Capture候補」セクション learning の自己申告。実装修復中に §5.3 明示対象外の fixture にも同種の文字化け・改行崩壊を発見
-- **根本原因**: 移行計画の事前調査が壊れた fixture を網羅せず、代表例のみを明示対象とした。同種の問題を持つファイルの横展開確認が計画段階で実施されなかった
-- **自律対応内容**: PR #1933 で §5.3 明示対象外の `commands_structure.test.ts`、`command_fixtures.test.ts` も併せて修復し、新 frontmatter 契約（description 単一）へ適合させた
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし（移行計画の記載精度の改善候補。SPEC/REQ 本文の変更は伴わない）
-- **横展開観点**: 移行計画や要件定義で「代表例を明示」する全ケースで、同種の問題を持つ対象の横展開確認を計画段階で実施すべき。明示対象を「例示」として扱い、同種調査を暗黙に含意させる記述が有効
-- **再発条件**: 移行計画や要件定義で、同種の問題を持つ複数対象のうち代表例のみを明示し、横展開確認を省いた場合
-- **予防策候補**: 移行計画の対象一覧に「同種問題の横展開確認」を暗黙の前提とする旨を記載、または明示対象を「例示」と注記する運用ルールを定める
-- **想定反映先**: 移行計画テンプレート（`.omo/plans/` 配下）の対象一覧記述ガイドライン、または `docs/guides/` の計画策定解説文書
-- **関連**: Epic #1924、Issue #1926（WP-1）、PR #1933、移行計画 `.omo/plans/agentdev-migration-2026-08-05.md` §5.3
-- **タグ**: `#learning` `#migration-plan` `#fixture-repair` `#scope-precision` `#horizontal-expansion`
-- **移動日**: 2026-08-09
-- **処分判定**: deferred（出現1件・反映先曖昧・移行一回限り・情報断片的。次回 learning-promote で再評価）
 
 ---
 
@@ -1149,26 +1029,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **タグ**: #backlog #case-open #freshness
 - **移動日**: 2026-08-22
 - **処分判定**: deferred（learning-promote 2026-08-22 評価。単発。case-open preflight への already-done 検出の反映候補として living pool で保持し次回再評価）
-
----
-
-## augmentation の意味定義・役割宣言追加が変更対象成果物リストに事前明示されないまま実施された
-
-- **問題事象**: augmentation の意味定義・役割宣言追加（`.agentdev/artifact-graph.yaml`）は Issue 2204 の変更対象成果物リストに明示されていなかった。TIM 語彙カタログ SPEC が拡張関係型の意味定義場所を augmentation 宣言と定めているため、カタログ定義への置換の実体として実施し、解釈の明示を PR 2262 本文に記録した。
-- **発生局面**: 要件定義（case-open の execution contract 生成）、実装（case-run）
-- **検知方法**: 実装時の変更対象成果物リストと実際の変更内容の突合（PR 本文への解釈明示として記録）
-- **根本原因**: カタログ定義への置換に伴う augmentation 宣言の追従変更が、execution contract の変更対象成果物リスト作成時点で見えていなかった
-- **自律対応内容**: TIM 語彙カタログ SPEC の定める意味定義場所に従い augmentation 宣言として実施し、解釈を PR 本文に明示した
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし（augmentation 変更の実行契機明示の SPEC 層への取込みは intake item 化済み）
-- **横展開観点**: 関係意味・語彙の変更では定義場所（カタログ本体か augmentation 宣言か）を先に確定し、変更対象成果物リストへ反映する
-- **再発条件**: 拡張関係型の意味定義や役割宣言の変更を伴う Issue で、変更対象成果物リストに augmentation 宣言を明示しない場合
-- **予防策候補**: 語彙・関係意味の変更を伴う Issue の execution contract で augmentation 宣言（`.agentdev/artifact-graph.yaml`）を対象成果物候補として確認する
-- **想定反映先**: agentdev-workflow-case-open の execution contract 生成、REQ-017 Issue Execution Contract 運用
-- **関連**: PR 2262、Issue 2204、docs/specs/foundations/traceability-model.md、docs/specs/skills/agentdev-artifact-graph.md
-- **タグ**: #execution-contract #augmentation #tim
-- **移動日**: 2026-08-22
-- **処分判定**: deferred（learning-promote 2026-08-22 評価。単発、かつ artifact-graph 撤去（DEC-017）により反映先 `.agentdev/artifact-graph.yaml` の一部が消滅。「execution contract の変更対象成果物リスト網羅」という一般知見のみ living pool で保持）
 
 ---
 
@@ -1713,15 +1573,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **タグ**: `#traceability` `#adf-covers` `#missing-verification` `#宣言網羅性`
 
 - **移動日**: 2026-09-01
-
----
-
-## harness 異常終了後の PR 再利用時は PR 本文置換ができずコメントを SSoT とする
-- **根本原因**: agentdev_gh操作契約にPR本文更新操作がない。
-- **恒久対応内容**: コメントを正とする運用は適用済み。手順明文化を再評価する。
-- **関連**: PR #2522、Issue #2509、Epic #2504
-- **タグ**: `#case-run` `#再委譲` `#pr-comment-ssot`
-- **移動日**: 2026-09-03
 
 ---
 
@@ -2571,23 +2422,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
-## 2026-09-18: v4 worktree での file tool 書込みが textlint guard の project root 固定により fail-closed ブロックされる
-
-- **問題事象**: case-open を v4 worktree（../agent-dev-flow-v4、v4-dev branch）で実行した際、file tool（write）による docs 配下新規ファイル作成が「write targets a path outside the project root」として agentdev-textlint-guard に fail-closed ブロックされた。guard の project root 解決が起動元の main worktree（C:\Users\ogatay\work\agent-dev-flow）に固定され、同一リポジトリの別 worktree パスが project 外と判定される。
-- **発生局面**: case-open STEP-4（v4 worktree 上での Decision 7 件・Design 7 件の新規作成、Case #2958、Definition PR #2959）
-- **検知方法**: file tool 書込み時の guard エラー（fail-closed、迂回せず標準手段へ切替）
-- **根本原因**: guard の project root 判定が harness セッションの起動元 worktree 基準であり、git worktree で分離された同一リポジトリの並行 worktree を project 外として扱う
-- **自律対応内容**: AGENTS.md および docs/knowledge/windows-powershell-bulk-io-corruption.md の標準手段（node writeFileSync / 明示 UTF-8、PowerShell リダイレクト・標準 cmdlet 不使用）へ切替して書込みを継続し、全 17 ファイルの UTF-8 整合（置換文字混入なし）を node 読戻しで機械検証した
-- **ユーザー確認の有無**: なし（guard の迂回・解除ではなく標準手段への切替。AGENTS.md 遵守）
-- **Decision/REQ/spec影響**: なし（v4 worktree 上の .agentdev/ 実行状態の v4-dev commit は CR-006 の通常運用）
-- **横展開観点**: case-ready/case-run/case-close を v4 worktree で実行する後続段階（RU §24 Sequence）でも同様に発生し得る。v4 worktree を起動元とするセッションでは guard の project root が v4 worktree を指すため解消する見込み。guard の project root 解決が同一リポジトリの worktree を project 内と判定する worktree 対応を持つかの確認は将来の改善候補
-- **再発条件**: main worktree 起動のセッションから、git worktree で分離された別パス（../agent-dev-flow-v4 等）のファイルへ file tool で書込む場合に再発する。
-
-- **移動日**: 2026-09-20
-- **処分判定**: deferred（2026-09-20 評価。問題クラス: guard の project root 固定。v4 worktree 運用は cutover で終了、運用回避は worktree-operations.md 書込み guard 運用指針で対応済み。再評価条件: rc.N 運用・RC fixes で外部 worktree を再用する場合）
-
----
-
 ## 2026-09-19: 証跡退避先・一時作業先の OS 一時ディレクトリも textlint guard の project root 外判定で fail-closed ブロックされる
 
 - **観測事実**: case-open の v4 worktree 実行（Case #2967、Decision 2 件・Design 3 件の Definition 作成）で、(1) 検証用スクリプトを C:\\WINDOWS\\TEMP\\opencode へ write ツールで保存しようとした際「write targets a path outside the project root」で agentdev-textlint-guard の fail-closed ブロック、(2) v4 worktree 配下の既存ファイル（docs/designs/README.md）への edit ツール適用も同一 guard でブロック、の両方を実観測した。
@@ -2664,22 +2498,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 - **移動日**: 2026-09-20
 - **処分判定**: deferred（2026-09-20 評価。単発・check_integrity が機械検出済み。再評価条件: 参照張替えを伴う Case の起票時）
-
----
-
-## 2026-09-19: 共有 v4 worktree への write/edit ツール書込みが guard fail-closed ブロック（Case #2997 case-open）
-
-- **問題事象**: v4 worktree（../agent-dev-flow-v4）の docs ファイル編集を write ツール（一時 node スクリプト配置）と edit ツール（per-line replace）の両方で試みたところ、agentdev-textlint-guard が両方とも project root（main worktree）外への書込みとして fail-closed ブロックした。read ツールと bash は通るため、ツール系の project root 解決が main worktree 固定であることが原因。
-- **発生局面**: case-open STEP-3/4（Definition Package の 13 ACT ファイル編集）。実装先が共有 v4 worktree である構成（RA-003 実行セッション cwd = main worktree 固定・junction 構造保護）で発生。
-- **検知方法**: write/edit ツールの fail 応答（agentdev-textlint-guard: edit targets a path outside the project root; blocked per fail-closed）。
-- **根本原因**: ファイル操作ツール（write/edit）の project root 判定はセッション起動 cwd（main worktree）に固定され、共有 worktree 絶対パスが常に root 外と判定される。bash 経由の node は guard 対象外であった。
-- **自律対応内容**: AGENTS.md 規定の標準手段（node readFileSync/writeFileSync・UTF-8 BOM なし LF）へ切替。置換文字列は全て draft ファイルからの機械抽出（byte-exact）または Unicode エスケープで構築し、PowerShell クォート問題と cp932 再符号化リスクの両方を回避。各置換は出現数 assert 付きで fail-closed 検証し、TS-001 の要件行差分 0 検証と接続文 byte-exact 照合で確認した。
-- **ユーザー確認の有無**: なし（標準手段への切替は AGENTS.md と worktree-operations.md 書込み guard 運用指針の規定経路）。
-- **Decision/REQ/spec影響**: なし。
-- **横展開観点**: 共有 v4 worktree を編集対象とする workflow では、ファイル操作ツール（write/edit）は最初から使用せず bash 経由 node スクリプト（出現数 assert 付き replace + UTF-8 明示）を第一手段とするのが効率的。draft からの byte-exact 抽出と出現数 assert の組み合わせは文字化けと部分適用の両方を機械的に防止する。guard の fail-closed 性質は正しく機能しており、迂回（guard 設定変更等）ではなく標準手段への切替を維持する。
-
-- **移動日**: 2026-09-20
-- **処分判定**: deferred（2026-09-20 評価。問題クラス: guard の project root 固定。byte-exact 抽出 + 出現数 assert の技法を保持。再評価条件: 外部 worktree 再用時）
 
 ---
 
