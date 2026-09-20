@@ -821,13 +821,16 @@ export function generateReqActiveCaption(activeReqs: ReqInfo[]): string[] {
  * 現行要件一覧表（ヘッダー + active REQ 行）。関心対象列は hand-curated のため
  * AG-009 では REQ ID + タイトルの 2 列自動生成とする（SC-002 混合領域許容）。
  */
-export function generateReqActiveTable(activeReqs: ReqInfo[]): string[] {
+export function generateReqActiveTable(
+  activeReqs: ReqInfo[],
+  linkPrefix = "",
+): string[] {
   const lines: string[] = [];
   lines.push("| REQ ID | タイトル |");
   lines.push("|---|---|");
   for (const info of activeReqs) {
     lines.push(
-      `| [${info.id}](${info.relPath}) | ${sanitizeTableCell(info.title)} |`,
+      `| [${info.id}](${linkPrefix}${info.relPath}) | ${sanitizeTableCell(info.title)} |`,
     );
   }
   return lines;
@@ -1483,7 +1486,10 @@ RELATED:
   let docsReadmeUpdated = docsReadmeOriginal;
   const docsReadmeReplacements: Record<string, string[]> = {
     [README_REQ_SUMMARY_COUNT_BLOCK_ID]: readmeReqSummary,
-    [README_REQ_SUMMARY_TABLE_BLOCK_ID]: reqActiveTable,
+    [README_REQ_SUMMARY_TABLE_BLOCK_ID]: generateReqActiveTable(
+      reqInfos,
+      "requirements/",
+    ),
   };
   for (const blockId of docsReadmeExpectedIds) {
     docsReadmeUpdated = replaceAutogenBlock(

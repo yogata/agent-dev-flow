@@ -412,7 +412,7 @@ function buildBlockTargets(root: string): BlockTarget[] {
     targets.push({
       file: docsReadmePath,
       blockId: README_REQ_SUMMARY_TABLE_BLOCK_ID,
-      expected: generateReqActiveTable(docsReadmeReqInfos),
+      expected: generateReqActiveTable(docsReadmeReqInfos, "requirements/"),
     });
   }
 

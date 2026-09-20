@@ -7,11 +7,11 @@ AgentDevFlow で使う用語の定義。
 | 用語 | 読み方 | 定義 |
 |------|--------|------|
 | req-define | レキ、ディファイン | AI と対話して要件を整理するコマンド |
-| case-ready | ケース、レディ | Definition Package を保存・確定し、Epic / Wave / Issue の実行構造を確定するコマンド |
-| case-revise | ケース、リバイス | 再合意済み Definition 変更を既存 Root Case に反映するコマンド |
-| case-open | ケース、オープン | 要件から GitHub Issue を作成するコマンド |
-| case-run | ケース、ラン | Issue に基づいて実装し、PR を作成するコマンド |
-| case-close | ケース、クローズ | PR をマージし、Issue をクローズするコマンド |
+| case-ready | ケース、レディ | 内部 lifecycle 段階の一つ。Definition Package を保存・確定し、Epic / Wave / Issue の実行構造を確定する（v4 では公開コマンドではなく case-auto が駆動、DEC-033） |
+| case-revise | ケース、リバイス | 内部 lifecycle 段階の一つ。再合意済み Definition 変更を既存 Root Case に反映する（v4 では公開コマンドではなく case-auto が駆動、DEC-033） |
+| case-open | ケース、オープン | 内部 lifecycle 段階の一つ。要件から GitHub Issue を作成する（v4 では公開コマンドではなく case-auto が駆動、DEC-033） |
+| case-run | ケース、ラン | 内部 lifecycle 段階の一つ。Issue に基づいて実装し、PR を作成する（v4 では公開コマンドではなく case-auto が駆動、DEC-033） |
+| case-close | ケース、クローズ | 内部 lifecycle 段階の一つ。PR をマージし、Issue をクローズする（v4 では公開コマンドではなく case-auto が駆動、DEC-033） |
 | intake-capture | インテイク、キャプチャ | 手動で気づき、課題を inbox に記録するコマンド |
 | intake-from-github | インテイク、フロム、ギットハブ | クローズ済み Case Issue/PR から改善候補を抽出するコマンド（role: tracking の追跡Issueは抽出対象外） |
 | intake-promote | インテイク、プロモート | inbox の項目をレビュー、採用、却下、保留判定し、採用済み成果物に整形するコマンド |
