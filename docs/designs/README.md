@@ -83,11 +83,11 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 |------|--------|------|
 | [commands/_template.md](commands/_template.md) | accepted | command Design テンプレート |
 | [commands/req-define.md](commands/req-define.md) | accepted | `/agentdev/req-define` |
-| [commands/case-open.md](commands/case-open.md) | accepted | `/agentdev/case-open` |
-| [commands/case-ready.md](commands/case-ready.md) | accepted | `/agentdev/case-ready`（Definition 受入と実行準備完了への状態遷移） |
-| [commands/case-revise.md](commands/case-revise.md) | accepted | `/agentdev/case-revise`（再合意済み Definition 変更の既存 Case 反映、主フロー例外経路） |
-| [commands/case-run.md](commands/case-run.md) | accepted | `/agentdev/case-run` |
-| [commands/case-close.md](commands/case-close.md) | accepted | `/agentdev/case-close` |
+| [commands/case-open.md](commands/case-open.md) | accepted | case-open（内部 lifecycle 段階、case-auto 駆動） |
+| [commands/case-ready.md](commands/case-ready.md) | accepted | case-ready（内部 lifecycle 段階、case-auto 駆動。Definition 受入と実行準備完了への状態遷移） |
+| [commands/case-revise.md](commands/case-revise.md) | accepted | case-revise（内部 lifecycle 例外経路段階、case-auto 駆動。再合意済み Definition 変更の既存 Case 反映） |
+| [commands/case-run.md](commands/case-run.md) | accepted | case-run（内部 lifecycle 段階、case-auto 駆動） |
+| [commands/case-close.md](commands/case-close.md) | accepted | case-close（内部 lifecycle 段階、case-auto 駆動） |
 | [commands/case-auto.md](commands/case-auto.md) | accepted | `/agentdev/case-auto` |
 | [commands/intake-capture.md](commands/intake-capture.md) | accepted | `/agentdev/intake-capture` |
 | [commands/intake-from-github.md](commands/intake-from-github.md) | accepted | `/agentdev/intake-from-github` |
@@ -269,4 +269,3 @@ Guides (guides/*.md)           -- 人間向けナビゲーション（規範的�
 - **Decision** ファイルは意思決定記録とその判断根拠を記録する。
 - **Design** ファイルは、REQ を満たすために現在採用している内部構造、内部動作、責務分担、データ構造、処理方式、規則、パラメータを記述する。3 層構造（commands / skills / workflows）と基盤 6 ドメイン（foundations / responsibilities / quality / integrity / local / authoring）を持つ。3 層は個別 command/skill と共通契約を扱い、基盤 6 ドメインはシステム全体の構成・フォーマット・整合性検査等を扱う（両系統を混同しない）。横断 Design は個別 Design の代替ではない。
 - **Guides** は人間向けナビゲーション層である。規範的権限を持たない。
-
