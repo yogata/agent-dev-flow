@@ -13,7 +13,7 @@ updated: 2026-09-20
 | description | docs/designs/** の Design frontmatter は `title` / `status` / `created` / `updated` を必須キーとして機械検査する。キー欠落、行頭空白付きキー行によるキー名破損（正典の検出列挙における「updated値のキー名欠落」）、値形式不正（created / updated の ISO 8601 日付形式、status の draft / accepted 値域）を検出する（checker-execution-contracts Design「Design frontmatter 必須キー検証観点」節の実現、Case #3042 Wave 2・RA-006） |
 | severity | strict |
 | category | document-drift |
-| detection_method | `check_design_frontmatter.ts`（repo-local 独立 checker）による走査。(1) `docs/designs/**/*.md` を `globWalkRel`（node:fs glob 共有ヘルパー）で列挙し、列挙件数と検査対象・対象外の件数整合を report に含める（二重確認）。(2) 除外規定（README.md、`references/` / `audits/` / `baselines/` 配下、`baseline_for` / `audit_for` 信号キー保持ファイル）を適用する。(3) frontmatter ブロック抽出と ISO 8601 日付妥当性は Knowledge frontmatter 検査（`check_knowledge_docs.ts`）と同一実装を import して用いる（REQ-010-062: 既存 checker 規則からの期待値導出）。(4) 必須キー（title / status / created / updated）の欠落・空値、クォート剥がし後の日付形式、status 値域、行頭空白付き必須キー行を検出する |
+| detection_method | `check_design_frontmatter.ts`（repo-local 独立 checker）による走査。(1) `docs/designs/**/*.md` を `globWalkRel`（node:fs glob 共有ヘルパー）で列挙し、列挙件数と検査対象・対象外の件数整合を report に含める（二重確認）。(2) 除外規定（README.md、`references/` / `audits/` / `baselines/` 配下、`baseline_for` / `audit_for` 信号キー保持ファイル）を適用する。(3) frontmatter ブロック抽出と ISO 8601 日付妥当性は Knowledge frontmatter 検査（`check_knowledge_docs.ts`）と同一実装を import して用いる（REQ-010-062: 既存 checker 規則からの期待値導出）。(4) 必須キー（`title` / `status` / `created` / `updated`）の欠落・空値、クォート剥がし後の日付形式、status 値域、行頭空白付き必須キー行を検出する |
 | affected_artifacts | [docs/designs/**/*.md] |
 | related_req | [REQ-010-062, REQ-010-068, REQ-010-070] |
 | related_design | [../checker-execution-contracts.md, ../integrity-rule-catalog.md, ../../foundations/patterns.md] |
@@ -53,4 +53,4 @@ updated: 2026-09-20
 - [integrity-rule-catalog.md](../integrity-rule-catalog.md)
 - [checker-execution-contracts.md](../checker-execution-contracts.md)（Design frontmatter 必須キー検証観点の正典・checker 共通実行契約）
 - [../../foundations/patterns.md](../../foundations/patterns.md)（Design frontmatter 形式: status は draft / accepted）
-- [check_knowledge_docs.ts](../../../.opencode/skills/repo-agentdev-integrity/scripts/check_knowledge_docs.ts)（同一検出基準の参照元・共有純関数の所有者）
+- `check_knowledge_docs.ts`（repo-local: `.opencode/skills/repo-agentdev-integrity/scripts/check_knowledge_docs.ts`。同一検出基準の参照元・共有純関数の所有者）
