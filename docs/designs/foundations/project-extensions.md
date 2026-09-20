@@ -4,7 +4,6 @@ status: accepted
 created: 2026-07-04
 updated: 2026-08-20
 ---
-<!-- ADF-COVERS(implementation): REQ-002-030, REQ-002-031 -->
 <!-- ADF-COVERS(implementation): REQ-002-030, REQ-002-031, REQ-044-001, REQ-044-002, REQ-044-005 -->
 
 # Project Extensions
@@ -107,6 +106,36 @@ deterministic checker は malformed を NG として報告してよいが、runt
 | 有効な新kind | 通常処理 | - |
 
 extension missing と legacy extension exists は別状態であり、前者は標準動作継続、後者は migration-required として停止する。
+
+## v4 semantic extension point
+
+Project Extensions は v4 において標準プロセスへの追加を行う semantic extension point である。
+定義と権威は ADF v4 責務境界 Design（foundations/v4-responsibility-boundaries）が所有し、本節は参照にとどまる。
+
+表現力 6 項目（project context・rules・quality と evidence policy・project-specific verifier と check・tool と config integration・semantic guidance）は概念分類（拡張点カタログ）であり、現行 yaml スキーマの物理的な機能一覧を意味しない。
+現行 5 セクションとの対応は次のとおり。
+
+- project context は context セクションが中心
+- rules は rules セクションと must_not セクション
+- quality と evidence policy は acceptance_gates セクションと checks セクションの複合
+- project-specific verifier と check は checks セクション
+- semantic guidance は context セクションが中心（project context と重なる領域を持つ）
+- tool と config integration は対応する専用セクションを持たず、rules の project-local skill 委譲と context で部分的に表現する。専用表現の要否は将来の判断事項とする
+
+標準プロセスを別 workflow へ置き換える仕組みとはしない（追加モデル原則）。
+
+## 安定 API と移行
+
+v4 が安定 API としない対象は Skill 名 id binding（{skill-name}.yaml の配置と id が対象 Skill 名と一致する要求）に限る。
+yaml スキーマ自体は外部契約維持の対象として従来どおり管理する。
+
+現行の Skill 名結合と 28 yaml は当面維持し、consumer への破壊的変更は行わない。
+当面の終点は cutover 後の Project Contract 層における評価とし、本 Design はその時点までの移行方針を定める。
+
+Skill 名を変更した場合は id と対象の一致検査により当該 extension yaml の追従が必要になります。この追従は consumer 側の責任として明記する。
+
+なお本宣言と配布スキルの外部契約維持（安定契約として管理される対象）は対象階層が異なる。
+前者は Skill 名との結合様式、後者は yaml スキーマと検査契約を指す。
 
 ## 実行時読み込み契約
 
