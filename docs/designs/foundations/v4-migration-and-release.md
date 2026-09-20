@@ -73,6 +73,30 @@ target canonical paths への v4 state 構築は次の原則と構築順序で�
 
 v4.0.0-rc.N の annotated tag 運用（exact candidate commit、tag push、detached HEAD を通常開発環境としない）、RC 成立条件（feature complete 条件リスト）、cutover sequence（feature complete -> full validation -> 正規 release line 統合 -> branch push -> tag -> tag push -> worktree 更新 -> v4 正規 installation/projection 適用 -> controller 切替 -> self-hosting 開始）、RC 以降の self-hosting loop。
 
+### feature complete 条件リスト
+
+RC 成立条件（feature complete）は DEC-034 決定(3) の 15 項目とし、各項目に対応する実装段階と確認手段を持つ。確認手段は各段の Root Case Issue・Definition/実装 PR と crosswalk（v3-v4-crosswalk references/crosswalk-inventory.md）の executed 行への紐付けを基本とし、項目ごとの所有 Design・証跡は次表のとおりである。
+
+| # | 条件項目 | 実装段階 | 確認手段 |
+|---|---|---|---|
+| 1 | v4 model canonical 確定 | 第1〜3段（Foundation・Runtime・REQ/Decision/Design implementation） | 各段の Root Case Issue・Definition PR・crosswalk executed 行 |
+| 2 | Runtime | 第2段（二層状態機械・durable state・実行モデル） | v4-runtime-execution-model Design・crosswalk executed 行 |
+| 3 | 文書運用 | 第3段（REQ/Decision/Design 再編・受理） | 現行 REQ/Decision/Design の accepted 状態・crosswalk executed 行 |
+| 4 | req-define 相当入口 | 第4段（公開 UX 2 入口収斂） | v4-standard-lifecycle Design・crosswalk executed 行 |
+| 5 | case-auto 相当 orchestration | 第4段（内部 lifecycle 回収） | v4-standard-lifecycle Design・crosswalk executed 行 |
+| 6 | work_type/scale/Epic/Wave | 第5段（語彙直交性） | v4-standard-lifecycle Design・crosswalk executed 行 |
+| 7 | Collaboration Loop | 第9段（継続コラボレーションループ） | v4-collaboration-loop Design・crosswalk executed 行 |
+| 8 | Quality/Evidence/Gate | 第6段（Quality モデル） | v4-quality-gate-model Design・crosswalk executed 行 |
+| 9 | Traceability | 第7段（Change/Evidence 中心化） | v4-traceability-model Design・crosswalk executed 行 |
+| 10 | Skill 再編 | 第8段（semantic Skill / deterministic code 再分類） | 配布 Skill 構成（src/opencode/skills）・crosswalk executed 行 |
+| 11 | Extensions | 第10段（semantic extension point） | v4-responsibility-boundaries Design・crosswalk executed 行 |
+| 12 | adapter | 第11段（Harness/Backend adapter 境界） | v4-responsibility-boundaries Design・crosswalk executed 行 |
+| 13 | migration mechanism | 第12段（標準 migration pattern） | 本 Design「標準 migration pattern」節・crosswalk executed 行 |
+| 14 | automated validation | 第13段（full validation・本リストの全項目確認） | 本リスト全項目の確認記録・監査レポート（docs/reports/integrity/audits/） |
+| 15 | self-hosting 開始可能 | 第13段（readiness の確認。実行は cutover 後の self-hosting + pilot 段階が所有） | 本リスト項目 1〜14 の成立確認と bootstrap self-hosting readiness の確認 |
+
+確認は full validation（第13段）で一括実施し、証跡は監査レポートと crosswalk executed 行に紐付ける。
+
 ## pilot migration と v4.0.0 final 条件
 
 正式リリース前の ADF 自己 self-hosting と複数既存 v3 適用 Project の RC pilot migration（検証項目リスト、RC tag 明示、未タグ main を migration target としない）、v4.0.0 final tag の成立条件、rc.N の運用。
