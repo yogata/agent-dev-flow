@@ -9,6 +9,8 @@
 > - GUIDE-6: 節の意図がワークフロー状態限定の可能性があり要文脈判断
 > - GUIDE-8: 当該行は「REQ ファイル直指定」ケースの案内である解釈も可能
 > - DESIGN-3: KEEP（配置根拠として許容）と将来案表現除去の複数解釈（low/low）
+>
+> 2026-09-20 inspect-promote 再審議（in-context 審議、/agentdev/backlog-auto stage 2 inspect 系統経由、--auto なし）: GUIDE-8 は解消確認により reject・即時削除（自律確定。`docs/guides/command-selection.md:13` が「`/agentdev/case-auto`（内部 lifecycle の case-open 段階）」表記へ更新済み、旧 case-open 直接参照・旧責務出力は消滅。却下理由は当該 commit message 参照）。F-04/F-05/GUIDE-6/DESIGN-3 は defer 継続（自律確定）。F-05 に stage 1 観察（OBS-1）の注記を追加（下記 F-05 notes 参照）。
 
 ## 検出事項リスト（defer 残置分）
 
@@ -34,6 +36,7 @@
 - **ng_classification**: 今回修正対象（2026-09-12 `1003eb4c` 追加行）
 - **notes**: req-define入力案「skill description 集約予算の運用方針を REQ-050 から切り出し、独立 REQ へ配置。予算数値の詳細は Design 参照とする」
 - **2026-09-18 審議注記**（inspect-promote 対論型レビュー）: learning 2026-09-18 に「lint-skills description 長 NG 2件（agentdev-workflow-case-ready 743 chars、case-revise 663 chars の 600 上限超過）+ aggregate budget warning が main @ c421a4b4 で恒常再現する pre-existing」という顕在化事象が記録された。予算制度の履行状況に疑問を投げかける観察だが、超過は warning であり lint_skills 検査契約どおりの動作であるため履行違反と即断できない。**SPLIT 採否の意味判断は不変で defer 継続**。ただし learning-promote 2026-09-18 が採用済み成果物 `design-candidate-autogen-staleness-prevention.md` の付帯記録として description 長の独立改善要求（一括短縮の別 Case 化候補）を昇格させており、**次回再評価では当該 learning 成果物の backlog-review 処置結果を再評価条件に含める**こと。
+- **2026-09-20 観察注記**（inspect-promote、stage 1 OBS-1）: lint_skills description 長は NG 1件（agentdev-workflow-case-open 629 chars のみ）に減少（case-ready/case-revise は短縮済み。aggregate budget warning は継続）。再評価条件の learning 成果物 `design-candidate-autogen-staleness-prevention` は `.agentdev/` 全域・`docs/knowledge/` ともに不在（backlog-review での RU 化・消費済みと推定）。恒久対策は `docs/designs/integrity/index-auto-generation.md`・`check_autogen_freshness`（鮮度違反 0）として稼働中。REQ-050-016 の行は原状（`docs/requirements/REQ-050.md:36`、「350 字 × 50 件相当」の内部数値も残存。現行スキル数 49 との軽微なずれを含む）。**SPLIT 採否の意味判断は不変のため defer 継続**。本観察は次回再評価の入力情報。
 
 ### [文書種別] GUIDE-6: 状態モデル制約が Design/Decision の frontmatter status 管理と冲突
 
@@ -44,16 +47,6 @@
 - **source_of_truth**: Design（document-model.md、REQ-001-025）を正とし、ガイドの過度に一般化した記述を検出事項とする
 - **recommended_route**: 同節を「ワークフロー進行状態」にスコープ明確化。inspect-promote → backlog-review
 - **ng_classification**: pre-existing
-
-### [文書種別] GUIDE-8: 入口表の case-open 行が旧責務表現のまま重複行と混在
-
-- **category**: guides 意味診断（現行化漏れ）
-- **target**: docs/guides/command-selection.md L13
-- **evidence**: 「REQ ファイルまたは要件docがある | `/agentdev/case-open` | GitHub Issue」。L12 は新契約（case-open → case-ready、出力「Definition Package と実行構造」）。L13 は「要件doc」が L12 と重複し case-ready を伴わず出力も旧責務（#2808 で case-open は Root Case 確立と Definition Package 生成へ縮小）
-- **severity**: low / **confidence**: medium（行の意図が「REQ ファイル直指定」ケースの案内である解釈も可能）
-- **source_of_truth**: 現行 REQ-030（case-open 実行契約）
-- **recommended_route**: L13 を「REQ ファイル（case-ready 未実施分）」等へスコープ明確化、出力列を現行化。inspect-promote → backlog-review
-- **ng_classification**: 今回修正対象（#2806/#2808 波及の更新漏れ可能性）
 
 ### [文書種別] DESIGN-3: Design 内の将来拡張余地記述（責務境界の境界ケース）
 
@@ -68,7 +61,7 @@
 ## 推奨アクション（defer 残置分）
 
 - F-04 / F-05: 採否・範囲が意味判断のため継続見送り。次回以降の inspect サイクルまたは intake 経由で再評価（20260901 defer F-08/F-12 と同一の処遇）
-- GUIDE-6 / GUIDE-8 / DESIGN-3: 代替解釈・文脈判断が残るため継続見送り。次回 inspect サイクルで再評価
+- GUIDE-6 / DESIGN-3: 代替解釈・文脈判断が残るため継続見送り。次回 inspect サイクルで再評価
 
 ## docs-check route 候補（STEP-3-2、診断記録）
 
@@ -136,3 +129,4 @@
 - defer 5件は自律確定（採否・範囲・優先度が文脈判断のため inbox 残置）
 - DIST-02 は HITL でユーザー判断を照会し reject 確定（agentdev-git-worktree-test-fallback の Design-only 構成は意図的: REQ-057-014 が当該 Design を「stale-junction 自己修復」運用規約の正規所有 Design として直接参照、REQ-045 整合監査・#2536 実装監査合格。README 一覧への例外注記追加も不要。即時削除、却下理由は commit message 参照）
 - 旧 defer 残置分（20260901/20260907 の 2ファイル）は原状維持。promote 採用の GUIDE-5 が 20260901 F-27 の project-docs 側前提（正本記述未確定）を部分的に解決する関係注記は promoted ファイル側に記載
+- 2026-09-20 実施（backlog-auto stage 2 inspect 系統、--auto なし、in-context 審議）再評価: GUIDE-8 は解消確認により reject・即時削除（自律確定）: `docs/guides/command-selection.md:13` は「`/agentdev/case-auto`（内部 lifecycle の case-open 段階）」表記へ更新済み（grep で確認、旧 `/agentdev/case-open` 直接参照・旧責務出力は zero hit）。F-04/F-05/GUIDE-6/DESIGN-3 は新情報なく defer 継続（自律確定）。なお 20260901 F-27（GUIDE-5 の前提）も同日実施の再評価で解消確認により reject（当該ファイル・commit message 参照）。却下理由の詳細は commit message に記録

@@ -1,11 +1,9 @@
 # inspect-docs finding 20260901T120043Z（defer 残置分）
 
 > 本ファイルは inspect-promote（2026-09-01 実施、/agentdev/backlog-auto 経由）の分類確定後、defer となった検出事項のみを残置する。promote 採用分（F-01〜F-07, F-13〜F-26, F-28〜F-33, F-35 の27件）は .agentdev/inspect/promoted/inspect-docs-promoted-20260901T120043Z.md へ保存済み。reject 0件（旧 20260815 ファイルの F-15 のみ reject・即時削除済み）。
-> 2026-09-07 実施（backlog-auto stage 2 inspect 系統）の再評価で F-36 を、2026-09-16 実施（backlog-auto stage 2 inspect レーン、直列実行）の再評価で F-08/F-09 を reject・即時削除した（いずれも却下理由は当該 commit message 参照）。残る F-10〜F-12/F-27/F-34 は defer 継続。
+> 2026-09-07 実施（backlog-auto stage 2 inspect 系統）の再評価で F-36 を、2026-09-16 実施（backlog-auto stage 2 inspect レーン、直列実行）の再評価で F-08/F-09 を、2026-09-20 実施（backlog-auto stage 2 inspect 系統、--auto なし）の再評価で F-27/F-34 を reject・即時削除した（いずれも却下理由は当該 commit message 参照）。F-11 は 2026-09-20 に再評価条件の充足（REQ-057 完了）により REQ-057 RETIRE 審査へ統合昇格（promote）した（`.agentdev/inspect/promoted/inspect-docs-promoted-20260920T105602Z.md` 参照）。残る F-10/F-12 は defer 継続。
 >
-> - F-10〜F-12: 構造改善候補（DUPLICATE / RETIRE / MOVE）で採否が意味判断のため intake 送付候補
-> - F-27: guides 間の参照方向ルール分岐（正本記述が未確定）のため intake 送付候補
-> - F-34: 出典履歴注記の許容可能性判断のため intake 送付候補
+> - F-10/F-12: 構造改善候補（DUPLICATE / MOVE）で採否が意味判断のため intake 送付候補
 
 ### F-10: 検証実行結果を TIM に保存しない規範が REQ-012/REQ-021 に二重規定（軽度）
 - **category**: DUPLICATE
@@ -15,14 +13,6 @@
 - **source_of_truth**: REQ-001-006（索引は本文を重複保持しない）の精神に基づく重複縮約候補。相互参照で緩和済み
 - **recommended_route**: 意味診断検出事項
 
-### F-11: REQ-016 は一回きりの統合検証を恒久 REQ 化した「移行完了状態」（RETIRE 候補）
-- **category**: RETIRE
-- **target**: docs/requirements/REQ-016.md:18-27（REQ-016-001〜010）
-- **evidence**: REQ-016-001〜006 が全て「7呼出元と case-auto 停止伝播の統合後、…」等の完了時点検証条件。REQ-016-008/009 は是正手順（作業手段）
-- **severity**: low / **confidence**: medium
-- **source_of_truth**: REQ-001-052 廃止候補類型「移行完了状態」に該当。REQ-046 と同型の成立経緯だが検証工程の性質が強い
-- **recommended_route**: 意味診断検出事項
-
 ### F-12: REQ-008-059 が要件テーブル外の見出しセクションとして定義され、内部アルゴリズム詳細を含む
 - **category**: MOVE／分類一貫性
 - **target**: docs/requirements/REQ-008.md:77-85。参照元 docs/designs/commands/req-define.md:381
@@ -30,24 +20,6 @@
 - **severity**: low / **confidence**: high
 - **source_of_truth**: REQ-001-046（標準構成三区分）・REQ-001-009（テーブル行として一意識別）違反。document-model 移管候補の「内部アルゴリズム→Design」「fixture detail→Design/テスト文書」該当
 - **recommended_route**: 意味診断検出事項（決定的マーカー一覧は Design またはルールカタログへ MOVE 候補）
-
-### F-27: guides 間で参照方向ルールの記述が分岐（層間DRIFT）
-- **category**: 層間DRIFT
-- **target**: docs/guides/project-docs-and-specs.md:38-39 対 docs/guides/artifacts-and-state.md:23-25
-- **evidence**: project-docs-and-specs「REQ → Issue の一方向参照である（Issue から REQ への逆参照は行わない）」／artifacts-and-state「Decision → Issue の逆参照は不可」「文書間矛盾時は REQ を優先」。2つのガイドが異なる部分集合を正として提示し、正本（document-model.md）側に対応記述を確認できず
-- **severity**: low / **confidence**: medium
-- **source_of_truth**: 参照規則の正本は document-model.md（document-type-responsibilities.md L13）
-- **recommended_route**: 意味診断検出事項
-
-## 配布物整合性系
-
-### F-34: frontmatter source_note の参照先不所存（軽微）
-- **category**: stale参照
-- **target**: src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md:4
-- **evidence**: `source_note: agent-dev-flow-japanese-replacement-dictionary-2026-07-18.md（参照資料）の内容を踏襲` — 参照先ファイル全局不所存。出典履歴注記であり意図的な歴史明記の可能性
-- **severity**: low / **confidence**: medium
-- **source_of_truth**: file-level 存在チェック上は参照先不在
-- **recommended_route**: 意味診断検出事項（注記として許容かの判断）
 
 ## クリーン判定（問題なしと確認した観点）
 
@@ -74,3 +46,4 @@
 - 旧 20260822 F-05（draft Design 被参照）は defer 継続（該当ファイルは残置）
 - 2026-09-07 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: F-08〜F-12/F-27/F-34 は前提条件に変化なく defer 継続（自律確定）。F-36 は reject・即時削除（自律確定）: 現行ファイル確認で「各 command の参照方法」見出しは汎用トップレベル節（H2、`---` 区切り直下）と各手順セクション内小節（H3）の正当な階層差であり設計上の反復、「見出しレベル不統一」検出パターンの誤検知と確認（前回予告の reject 余地再観查で確定。却下理由は commit message に記録）
 - 2026-09-16 実施（backlog-auto stage 2 inspect レーン、--auto なし、直列実行）再評価: F-08/F-09 は解消済みのため reject・即時削除（自律確定）: #2846 により REQ-003-035〜054 が REQ-082 へ分離移管済み（SPLIT 懸念の対象が消滅）、REQ-003-054 も消滅し default-on・再起票禁止の規定は REQ-014-013 のみに単一化（REQ-003/REQ-082/REQ-014 の行実在突合で確認。却下理由は commit message に記録）。F-10〜F-12/F-27/F-34 は新情報なく defer 継続（自律確定）
+- 2026-09-20 実施（backlog-auto stage 2 inspect 系統、--auto なし、in-context 審議）再評価: F-27 は reject・即時削除（自律確定）: `docs/guides/artifacts-and-state.md` から参照方向ルール記述が削除され L17 が正本参照（project-docs-and-specs.md）へ変更、参照方向ルールは `docs/guides/project-docs-and-specs.md:87-89` に集約済み（artifacts-and-state.md で「逆参照」「REQ を優先」の grep 0 件で解消確認）。F-34 は reject・即時削除（自律確定）: 対象 `agentdev-doc-writing` スキルが v4 で削除され `src/opencode/skills/agentdev-doc-writing/` が不存在（対象消滅、glob 0 件確認）。F-11 は promote 統合昇格（自律確定）: REQ-057 完了（Epic #2504/#2505/#2633 全 closed・全子 completed を agentdev_gh issue_read で直接確認）により F-11 系統の再評価条件が到来し、REQ-057 RETIRE 審査（同型群一括整理候補）へ統合（`inspect-docs-promoted-20260920T105602Z.md` へ保存）。F-10/F-12 は新情報なく defer 継続（自律確定）。却下理由の詳細は commit message に記録
