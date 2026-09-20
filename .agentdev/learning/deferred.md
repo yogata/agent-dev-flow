@@ -976,25 +976,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
-## 旧表現を禁止する是正注記で旧表現の字面を引用すると grep 0 件基準の機械検査と衝突する
-- **問題事象**: system.md の Workflow Architecture Inventory 旧表現禁止注記が、禁止対象の旧表現の字面（「Command 定義が SSoT である」）をそのまま引用していた。このため「旧表現が 0 件であること」という grep 0 件基準の完了条件・機械検査と衝突する状態だった（禁止注記自体が grep に hit する）
-- **発生局面**: 実装（case-run、OU-001 規範契約整合の検証・修正）
-- **検知方法**: 完了条件の再 grep（「Command 定義が SSoT」全リポジトリ検索）で禁止注記の引用行が hit することで検知
-- **根本原因**: 是正注記の執筆時に、禁止対象の意味と旧表現の字面を分離していなかった。「〜という旧表現を使用しない」形式は意味としては正しいが、機械検査（grep 0 件基準）と両立しない
-- **自律対応内容**: 禁止の意図を維持したまま描写形（「Command 定義を権威情報源とする旧表現」）へ言い換え、字面の出現を 0 件にした（PR 2111、commit ce4ea7fd）
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし（執筆規範レベルの知見。agentdev-doc-writing / japanese-tech-writing の検証観点候補）
-- **横展開観点**: 横断是正・用語統一を行うすべての Issue で、是正注記・移行注記に旧語の字面を引用しない。完了条件に grep 0 件基準を置く場合は特に注意
-- **再発条件**: 旧表現禁止・用語統一のは正注記を、禁止対象の字面引用付きで執筆した場合
-- **予防策候補**: 是正注記は描写形（「X を権威情報源とする旧表現」等）で書く。grep 0 件基準の完了条件を持つ Issue では、注記も含めた全体 grep を case-run と case-close の両方で実施する
-- **想定反映先**: なし（知見記録。規範化の要否は backlog-review で判断）
-- **関連**: PR 2111 Findings learning セクション, Issue 2101（OU-001）, Epic 2099
-- **タグ**: #grep-zero-criteria #remediation-note #machine-check #writing-convention
-- **移動日**: 2026-08-15
-- **処分判定**: deferred（出現1件。執筆規範レベル知見。agentdev-doc-writing / japanese-tech-writing 検証観点の再評価対象）
-
----
-
 ## ハーネス Write ツールのリポジトリ外 temp 書き込みが distribution-boundary-guard でブロックされる（worktree 内配置で回避）
 - **問題事象**: ハーネス（OpenCode）の Write ツールでリポジトリ外 temp（`C:\WINDOWS\TEMP\opencode`）へスクリプトファイルを作成しようとすると、distribution-boundary-guard（`tool.execute.before` フック）にブロックされる事象を確認した。機械一括是正の作業ファイル出力先として同 temp を使用できない
 - **発生局面**: 実装（case-run Wave 3、TS-105 機械判定是正のスクリプト作成時）
@@ -2567,3 +2548,177 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **関連**: Case #2936（Refs）、PR #2952（Refs）。
 - **タグ**: #policy-yaml #req-numbering #catalog-migration
 - **移動日**: 2026-09-18
+---
+
+## 2026-09-18: bun run による .ts 直接実行は package.json なし環境で Module not found (PR 本文 Findings 回収)
+
+- **問題事象**: repo root に package.json がない場合、`bun run <path>.ts` は Module not found となる (bun run は package.json scripts を解決する)。checker CLI の実行は `bun <path>` 形式を使う必要がある。また PowerShell リダイレクトによる checker stdout 退避が cp932 破壊の対象であること (AGENTS.md 既知事象) は spawnSync + writeFileSync (UTF-8 明示) での退避で継続回避。
+- **発生局面**: case-run (DEL-2954-1) の checker 実行。
+- **検知方法**: checker CLI 実行時の Module not found エラー。
+- **根本原因**: `bun run` と `bun <直接パス実行>` の解決経路の違い (run サブコマンドは scripts 解決を挟む) の認識不足。
+- **自律対応内容**: checker CLI 実行を `bun <path>` 形式へ統一。
+- **ユーザー確認の有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: checker 実行契約 Design「安定実行経路」の bun 経路実行時に影響し得る環境差。REQ-060 の bun test 形態 (`bun test ./path`) とは別経路である点の混同に注意。
+- **再発条件**: package.json 非存在の cwd で `bun run <path>.ts` 形式を使った場合に再発する。
+- **予防策候補**: checker CLI 実行は `bun <path>` 形式に統一する知識の明示化。
+- **想定反映先**: checker 実行契約関連 knowledge、learning-promote の評価対象。
+- **関連**: Case #2954、PR #2957、REQ-060
+- **タグ**: #bun #checker実行 #実行形態
+
+- **移動日**: 2026-09-20
+- **処分判定**: deferred（2026-09-20 評価。単発・checker 実行契約 Design の bun run 規定と repo root package.json 不在の整合確認要。再評価条件: checker 契約の bun 経路更新時・bun 経路障害再発時）
+
+---
+
+## 2026-09-18: v4 worktree での file tool 書込みが textlint guard の project root 固定により fail-closed ブロックされる
+
+- **問題事象**: case-open を v4 worktree（../agent-dev-flow-v4、v4-dev branch）で実行した際、file tool（write）による docs 配下新規ファイル作成が「write targets a path outside the project root」として agentdev-textlint-guard に fail-closed ブロックされた。guard の project root 解決が起動元の main worktree（C:\Users\ogatay\work\agent-dev-flow）に固定され、同一リポジトリの別 worktree パスが project 外と判定される。
+- **発生局面**: case-open STEP-4（v4 worktree 上での Decision 7 件・Design 7 件の新規作成、Case #2958、Definition PR #2959）
+- **検知方法**: file tool 書込み時の guard エラー（fail-closed、迂回せず標準手段へ切替）
+- **根本原因**: guard の project root 判定が harness セッションの起動元 worktree 基準であり、git worktree で分離された同一リポジトリの並行 worktree を project 外として扱う
+- **自律対応内容**: AGENTS.md および docs/knowledge/windows-powershell-bulk-io-corruption.md の標準手段（node writeFileSync / 明示 UTF-8、PowerShell リダイレクト・標準 cmdlet 不使用）へ切替して書込みを継続し、全 17 ファイルの UTF-8 整合（置換文字混入なし）を node 読戻しで機械検証した
+- **ユーザー確認の有無**: なし（guard の迂回・解除ではなく標準手段への切替。AGENTS.md 遵守）
+- **Decision/REQ/spec影響**: なし（v4 worktree 上の .agentdev/ 実行状態の v4-dev commit は CR-006 の通常運用）
+- **横展開観点**: case-ready/case-run/case-close を v4 worktree で実行する後続段階（RU §24 Sequence）でも同様に発生し得る。v4 worktree を起動元とするセッションでは guard の project root が v4 worktree を指すため解消する見込み。guard の project root 解決が同一リポジトリの worktree を project 内と判定する worktree 対応を持つかの確認は将来の改善候補
+- **再発条件**: main worktree 起動のセッションから、git worktree で分離された別パス（../agent-dev-flow-v4 等）のファイルへ file tool で書込む場合に再発する。
+
+- **移動日**: 2026-09-20
+- **処分判定**: deferred（2026-09-20 評価。問題クラス: guard の project root 固定。v4 worktree 運用は cutover で終了、運用回避は worktree-operations.md 書込み guard 運用指針で対応済み。再評価条件: rc.N 運用・RC fixes で外部 worktree を再用する場合）
+
+---
+
+## 2026-09-19: 証跡退避先・一時作業先の OS 一時ディレクトリも textlint guard の project root 外判定で fail-closed ブロックされる
+
+- **観測事実**: case-open の v4 worktree 実行（Case #2967、Decision 2 件・Design 3 件の Definition 作成）で、(1) 検証用スクリプトを C:\\WINDOWS\\TEMP\\opencode へ write ツールで保存しようとした際「write targets a path outside the project root」で agentdev-textlint-guard の fail-closed ブロック、(2) v4 worktree 配下の既存ファイル（docs/designs/README.md）への edit ツール適用も同一 guard でブロック、の両方を実観測した。
+- **工程位置**: case-open STEP-4（実変更判定と Definition PR 作成。RA-002 docs 作成・索引登録、RA-003 検証実行）
+- **検知方法**: file tool（write/edit）実行時の guard エラー（fail-closed、選択肢は任意解除せず切替）
+- **根本原因**: guard の project root 判定は harness セッション起動 worktree（main root）固定であり、(1) OS 一時ディレクトリ等の repo 外パス、(2) git worktree で分離された別パスの双方が project 外として扱われる。Case #2958 の学習（v4 worktree 配下）に対し、repo 外一時パス（TEMP）も同一判定対象であることを確認したもの
+- **対応内容**: AGENTS.md 規範と docs/knowledge/windows-powershell-bulk-io-corruption.md の標準手段（node writeFileSync / 明示 UTF-8・LF、PowerShell リダイレクト・標準 cmdlet 不使用）へ切替し完遂。一時スクリプトは gitignore 対象の .agentdev/integrity/reports/ 配下へ置き、実行後に恒久証跡は GitHub（Issue/PR 本文・comment）へ記録（v4-durable-state-and-recovery Design の分類では OS 一時退避先はローカル実行環境状態であり恒久証跡としない、との整合も再確認）
+- **ユーザー確認の有無**: なし（guard の解除・迂回ではなく標準手段への切替。AGENTS.md 規範）
+- **Decision/REQ/spec影響**: なし（既存規範の運用確認のみ）
+- **展開視点**: v4 worktree 系の後続工程（case-ready/case-run/case-close）でも同様に発生し得る。証跡退避・一時スクリプトの置き場は project root 内の gitignore 領域に限定するのが正規経路
+- **再発条件**: main worktree 起動セッションから、repo 外一時パス（TEMP 等）または worktree 分離パスへ file tool で書込む場合
+- **予防策**: 一時スクリプト・作業用 JSON は .agentdev/integrity/reports/（非永続・gitignore）配下へ配置。証跡は GitHub 恒久記録へ。ファイル書込みは node writeFileSync（UTF-8 明示）を第一選択とする
+- **配布反映先**: agentdev-git-worktree「書込み guard 運用指針」節、docs/knowledge/windows-powershell-bulk-io-corruption.md、learning-promote の評価対象
+- **関連**: Case #2967、PR #2968、Case #2958（関連学習: v4 worktree file tool write guard）
+- **タグ**: #case-open #v4-worktree #textlint-guard #fail-closed #一時証跡退避 #証跡退避
+
+- **移動日**: 2026-09-20
+- **処分判定**: deferred（2026-09-20 評価。問題クラス: guard の project root 固定。再評価条件: 外部 worktree・TEMP 経由の証跡退避・一時作業の再開時。.agentdev/integrity/reports 配置と GitHub 恒久証跡の正規経路知見を保持）
+
+---
+
+## 2026-09-19: check_integrity spawn 系テストの固定 timeout は環境性能差で flaky 化する
+
+- **問題事象**: case-run（Case #2979 OU-003）の bun test 分割 1 で、check_integrity spawn 系 4 テストが手動実行 ~5.1 秒（5120/5284/5174/5147ms 実測）に対し 5000ms 固定 timeout で失敗。baseline 環境では通過する環境性能差が原因。
+- **工程位置**: case-run（OU-003 実装、release fixture 追随 commit 23eb0e0d）
+- **検知方法**: bun test 分割 1 の fail（2 errors・タイミング失敗）
+- **根本原因**: spawn 系テストの timeout が実行環境の性能差を考慮しない固定値 5000ms である
+- **対応内容**: 検証内容不変で timeout 15000ms へ猶予（commit 23eb0e0d）。恒久的な timeout 設定方針（環境差考慮・猶予倍率の標準化）の見直しは未解決の intake 候補
+- **ユーザー確認の有無**: なし（タイミング猶予のみで検証内容不変）
+- **Decision/REQ/spec影響**: なし
+- **展開視点**: spawn を伴う回帰テストを worktree 等の非 baseline 環境で実行する場合、固定 timeout は flaky の常在要因になる
+- **再発条件**: 性能差のある環境で spawn 系固定 timeout テストを実行した場合
+- **予防策**: spawn 系テストの timeout は環境差を織り込んだ猶予値を設定する
+- **配布反映先**: repo-agentdev-integrity scripts（timeout 方針見直し）、learning-promote の評価対象
+- **関連**: Case #2979、Issue #2983（SSoT コメント判定根拠 4）、PR #2986（commit 23eb0e0d）
+- **タグ**: #case-run #flaky #timeout #spawn #環境差
+
+- **移動日**: 2026-09-20
+- **処分判定**: deferred（2026-09-20 評価。windows-bun-test-spawn-timeout-classification.md が由来分類・単独再実行手順を所有。再評価条件: spawn 系テスト新規作成時・timeout 設定方針の intake 処分確定時）
+
+---
+
+## 2026-09-19: release テスト fixture の文言完全一致期待は Design 吸収節の粒度差で破損する
+
+- **問題事象**: 4 Design 物理削除（Case #2979 OU-003）で scripts/self/release の 2 テストが definition-readiness.md を fixture 参照し ENOENT。fixture を後継正規文書（case-ready.md / case-revise.md）へ追随した際、definition-readiness の「冪等キー」等の節は文言レベルでは後継に承継されておらず（意味は case-ready「冪等性」節等へ吸収済み）、文言完全一致型の fixture 期待は維持できなかった。
+- **工程位置**: case-run（OU-003 実装、commit 23eb0e0d）
+- **検知方法**: bun test 分割 1 の 2 errors（ENOENT）と fixture 追随時の文言照合
+- **根本原因**: Definition 吸収は文言承継ではなく意味吸収の粒度で行われ、fixture の文言完全一致期待と噛み合わない
+- **対応内容**: fixture を後継正規文書の実在節へ追随（commit 23eb0e0d）
+- **ユーザー確認の有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **展開視点**: supersede を伴う再編で fixture を追随する場合、Definition 吸収節の粒度（語彙承継の有無）を先に確認してから fixture の期待形式を選ぶ
+- **再発条件**: Design 削除・吸収を伴う Case で文言完全一致型 fixture を後継へ追随した場合
+- **予防策**: fixture 追随手順に吸収節粒度の確認を含める
+- **配布反映先**: scripts/self/release（fixture 運用）、learning-promote の評価対象
+- **関連**: Case #2979、PR #2986（commit 23eb0e0d）
+- **タグ**: #case-run #fixture #supersede #吸収節粒度
+
+- **移動日**: 2026-09-20
+- **処分判定**: deferred（2026-09-20 評価。Design 削除・吸収を伴う Case でのみ発火する状況依存知見。再評価条件: Design 削除・吸収を伴う Case の起票時）
+
+---
+
+## 2026-09-19: 張替えリンクの相対パス誤りが check_integrity 新增 NG として検出（Case #2988 case-open）
+
+- **問題事象**: Definition PR の docs 参照張替えで、v4-runtime-execution-model への新規リンク 2 箇所（case-close.md・system.md）を相対パス ../workflows/v4-runtime-execution-model.md で作成した。同 Design の実際の配置は foundations/ 配下であり、check_integrity の designs-relative-link-existence 2 件 + broken-file-link 2 件（合計 ng 54 → 58）として検出された。
+- **発生局面**: case-open STEP-4（Definition PR 搭載 docs 編集の AG-015 語 3 種張替え）。
+- **検知方法**: commit → 検証 → push の順序で実施した check_integrity --json summary の baseline 比較（baseline v4-dev @a3a3b981 {ok 794, ng 54, warning 3} に対し {ok 793, ng 58, warning 3}）。
+- **根本原因**: 張替え先 Design 名（v4-runtime-execution-model）は foundations/ 配下である一方、張替え元の epic-wave-model が workflows/ 配下であったため、旧パスのディレクトリ部分を無意識に踏襲した。リンク先名とリンク先配置ディレクトリの対応を確認する手順が張替え作業に含まれていなかった。
+- **自律対応内容**: fix commit d92d1add（case-close.md は ../foundations/ へ、system.md は同階層表記へ修正）。fix-and-reverify 正規経路で check_integrity 再実行し baseline 完全一致（{ok 794, ng 54, warning 3}・新增 0）へ復帰。
+- **ユーザー確認の有無**: なし（機械検出 → 機械的修正）。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: 参照張替え（ref remap）系の作業では、張替え後リンクの「対象ファイル配置ディレクトリと相対パスの整合」を編集 script 内の assert に含めるか、張替えリストに絶対配置（docs/designs/foundations 等の実パス）を明記して作成すべき。commit → 検証 → push の順序（check_changed_docs が diff を持つ条件）と check_integrity baseline 比較の組み合わせが本種の欠陥を高確度で捕捉する。
+
+- **移動日**: 2026-09-20
+- **処分判定**: deferred（2026-09-20 評価。単発・check_integrity が機械検出済み。再評価条件: 参照張替えを伴う Case の起票時）
+
+---
+
+## 2026-09-19: 共有 v4 worktree への write/edit ツール書込みが guard fail-closed ブロック（Case #2997 case-open）
+
+- **問題事象**: v4 worktree（../agent-dev-flow-v4）の docs ファイル編集を write ツール（一時 node スクリプト配置）と edit ツール（per-line replace）の両方で試みたところ、agentdev-textlint-guard が両方とも project root（main worktree）外への書込みとして fail-closed ブロックした。read ツールと bash は通るため、ツール系の project root 解決が main worktree 固定であることが原因。
+- **発生局面**: case-open STEP-3/4（Definition Package の 13 ACT ファイル編集）。実装先が共有 v4 worktree である構成（RA-003 実行セッション cwd = main worktree 固定・junction 構造保護）で発生。
+- **検知方法**: write/edit ツールの fail 応答（agentdev-textlint-guard: edit targets a path outside the project root; blocked per fail-closed）。
+- **根本原因**: ファイル操作ツール（write/edit）の project root 判定はセッション起動 cwd（main worktree）に固定され、共有 worktree 絶対パスが常に root 外と判定される。bash 経由の node は guard 対象外であった。
+- **自律対応内容**: AGENTS.md 規定の標準手段（node readFileSync/writeFileSync・UTF-8 BOM なし LF）へ切替。置換文字列は全て draft ファイルからの機械抽出（byte-exact）または Unicode エスケープで構築し、PowerShell クォート問題と cp932 再符号化リスクの両方を回避。各置換は出現数 assert 付きで fail-closed 検証し、TS-001 の要件行差分 0 検証と接続文 byte-exact 照合で確認した。
+- **ユーザー確認の有無**: なし（標準手段への切替は AGENTS.md と worktree-operations.md 書込み guard 運用指針の規定経路）。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: 共有 v4 worktree を編集対象とする workflow では、ファイル操作ツール（write/edit）は最初から使用せず bash 経由 node スクリプト（出現数 assert 付き replace + UTF-8 明示）を第一手段とするのが効率的。draft からの byte-exact 抽出と出現数 assert の組み合わせは文字化けと部分適用の両方を機械的に防止する。guard の fail-closed 性質は正しく機能しており、迂回（guard 設定変更等）ではなく標準手段への切替を維持する。
+
+- **移動日**: 2026-09-20
+- **処分判定**: deferred（2026-09-20 評価。問題クラス: guard の project root 固定。byte-exact 抽出 + 出現数 assert の技法を保持。再評価条件: 外部 worktree 再用時）
+
+---
+
+## 2026-09-20: bun test の件数サマリーは stderr 出力（stdout capture だけでは証跡ファイルが空になる）
+
+- **問題事象**: bun test の実行結果（`2558 pass` / `Ran 2558 tests across 105 files` 等のサマリー行）は stderr へ出力される。node の execFileSync（stdout のみ返却）で証跡ファイルへ保存すると本文が `bun test v1.3.6` のみになり、pass 件数の証跡が残らない（終了コード 0 で全 pass の事実のみ得られる）
+- **工程位置**: case-open STEP-4 検証（Case #3011 Definition PR commit 7642962f 後の bun test 3 分割）
+- **検知方法**: 保存した証跡ファイルの内容確認（サマリー行不在）
+- **根本原因**: bun test がテスト進行・結果を stderr 経路で出力する仕様に対し、キャプチャ実装が stdout のみを前提としていた
+- **対応内容**: spawnSync で stdout と stderr を連結して証跡保存する方式へ変更し、3 分割（2558/102/550）の件数証跡を取得
+- **ユーザー確認の有無**: なし（証跡取得方式の修正のみ）
+- **Decision/REQ/spec影響**: なし（REQ-060 の実行形態規定（repo root 起 cwd・`./` 付き）は不変。出力経路の話であり実行形態の話ではない）
+- **展開観点**: bun test の件数を完了条件・PR 本文の検証記録に使う検証系は、stdout のみキャプチャする実装だと件数根拠を失う。checker CLI（stdout JSON）と test runner（stderr サマリー）で出力経路が異なる点の混同に注意
+- **再発条件**: execFileSync 等の stdout のみ返却する API で bun test を実行し証跡保存する場合
+- **予防策**: bun test の証跡保存は spawnSync + (stdout + stderr) 連結で実装する
+- **配布反映先**: 検証運用（Case の case-open/case-run 検証記録）、learning-promote の評価対象
+- **関連**: Case #3011、bun test、REQ-060
+- **タグ**: #bun-test #stderr #証跡 #検証運用
+
+- **移動日**: 2026-09-20
+- **処分判定**: deferred（2026-09-20 評価。fail 証跡の標準経路は junit reporter。再評価条件: 証跡取得系知識文書の更新時・stdout キャプチャ証跡の再発時）
+
+---
+
+## 2026-09-20: write tool の guard は承認済み temp dir 含む project root 外を fail-closed block する（node -e + PS ヒアドキュメントで大規模編集を実行）
+
+- **問題事象**: v4 worktree 外へ大規模編集スクリプトを退避しようと `C:\WINDOWS\TEMP\opencode` 配下へ write tool で書き出したところ、agentdev-textlint-guard が「write targets a path outside the project root; blocked per fail-closed」で block した。AGENTS.md の指針（v4 worktree 内の file/edit/write block・node writeFileSync 標準手段）は worktree 内を語るが、実効 guard は outside-project-root 全般に及ぶ
+- **工程位置**: case-open STEP-4（Case #3011 Definition 適用スクリプトの組み立て）
+- **検知方法**: write tool 実行時の guard block エラー
+- **根本原因**: harness の write guard 設定が project root 外の書込みを一律 fail-closed としており、temp dir の事前承認とは独立に作用する
+- **対応内容**: スクリプトをファイル化せず、PowerShell 単一引用符ヒアドキュメント（@'...'@）を node -e の引数として渡す方式で編集スクリプトを直接実行した。単一引用符ヒアドキュメントは変数展開・バックティックエスケープなしで JS 本文（日本語・改行含む）を素通しし、node が受け取る時点で UTF-16 引数のため cp932 再符号化の経路も通らない。41 files / +376 行の適用をこの方式で完遂し、事後の UTF-8 健全検査（BOM なし・LF・U+FFFD なし）で破損なしを確認
+- **ユーザー確認の有無**: なし（実行手段の切替のみ）
+- **Decision/REQ/spec影響**: なし（guard の fail-closed 維持は正規運用。block 解除・迂回ではなく標準手段への切替）
+- **展開観点**: v4 worktree 等で file/edit/write tool が block される環境で大規模一括編集を行う場合、スクリプトのファイル退避を前提とせず node -e + PS 単一引用符ヒアドキュメントで直接実行できる。長文でも実用可能（本次 40+ 編集を単一セッションで適用）
+- **再発条件**: project root 外への write tool 実行（temp dir でも発生）
+- **予防策**: 大規模編集は node -e ヒアドキュメント方式を第一候補にする。スクリプトファイルの退避が必要な場合は v4 worktree 内の gitignore 領域（.agentdev/integrity/reports 等）を用いる
+- **配布反映先**: agentdev-git-worktree（worktree-operations の書込み guard 運用指針）、learning-promote の評価対象
+- **関連**: Case #3011、agentdev-textlint-guard、AGENTS.md 書込み標準手段
+- **タグ**: #write-guard #fail-closed #node-e #ヒアドキュメント #worktree運用
+
+- **移動日**: 2026-09-20
+- **処分判定**: deferred（2026-09-20 評価。問題クラス: guard の project root 固定。node -e + PowerShell 単一引用符ヒアドキュメントによる大規模編集技法を保持。再評価条件: 外部 worktree・TEMP 経由の大規模編集再開時）
