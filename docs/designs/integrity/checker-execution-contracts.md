@@ -2,7 +2,7 @@
 title: checker 実行契約と検出基盤規則
 status: accepted
 created: 2026-08-15
- 2026-09-17
+updated: 2026-09-17
 ---
 <!-- ADF-COVERS(implementation): REQ-002-035 -->
 <!-- ADF-COVERS(implementation): REQ-010-062 -->
@@ -240,6 +240,10 @@ bun test の全ての実行は、フル suite の 3 cwd 分割正規形（agentd
 QG-4 フル suite 正規形（3 cwd 分割実行、正規ランナー構成確認、環境ラベル、fail 由来分類）は
 agentdev-quality-gates が正規所有する。本節はその所有権を変更せず、単独実行・ファイル単体指定時の
 一般規約と正規形への参照を提供する。
+
+## Design frontmatter 必須キー検証観点
+
+docs/designs/** のDesign frontmatterはtitle/status/created/updatedを必須キーとして機械検査する。キー欠落、updated値のキー名欠落、値形式不正を検出し、既存のKnowledge frontmatter必須キー検査と同じ検出基準で整合性ルールカタログへ登録する。
 
 ## See Also
 

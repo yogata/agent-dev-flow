@@ -2,7 +2,7 @@
 title: case-ready Design
 status: accepted
 created: 2026-09-14
-updated: "2026-09-19"
+updated: "2026-09-20"
 ---
 
 <!-- ADF-COVERS(design): REQ-021-024 -->
@@ -57,3 +57,7 @@ v3 epic-wave-model Design が所有していた case-ready 構成判断基準、
 - Wave 構成ルール: 必須依存で結合した連結成分を Epic 候補とし、技術的依存（L0-L3）は Wave 構成のための情報として連結成分計算から外す。Wave は Epic 内の依存関係と並列実行可能性を表す実行スケジューリング単位であり、Epic Issue 本文から読み取る内部構造である（REQ-035-006）。機械的判定手順は workflows/references/execution-unit-construction.md
 - 重複前置検出契約: 同一 Wave 内の子 Issue 間の変更対象ファイル重複の前置検出とその判断記録（Wave 分離・変更対象分割・重複許容）を Wave 構成の必須判断とし、重複許容時は衝突解消の担当とマージ順序を事前記録する（REQ-061-019、REQ-031-027、REQ-035-012。実行側の唯一の正規所有者表明は case-run Design 吸収節）
 - 前工程完了度 3 分類: 子 Issue 本文の「前工程完了度」属性の分類定義（REQ-003-011）と subagent の振る舞い指針（REQ-003-012）を本 Design が所有する
+
+## Decision受理評価時の承認記録整合
+
+Decision受理評価でstatusをacceptedへ遷移させる際は、承認記録節がacceptedの現状と整合するかを確認する。proposed前提の記述が残る場合は、同じ保存工程で現状整合化する。

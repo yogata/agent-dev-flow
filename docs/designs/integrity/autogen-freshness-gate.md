@@ -2,7 +2,7 @@
 title: "AUTOGEN ブロック鮮度検出 gate"
 status: accepted
 created: "2026-08-09"
-updated: "2026-09-10"
+updated: "2026-09-20"
 ---
 
 # AUTOGEN ブロック鮮度検出 gate
@@ -69,6 +69,10 @@ bun run .opencode/skills/repo-agentdev-integrity/scripts/check_autogen_freshness
 | `--root <path>` | 明示的リポジトリルート（worktree / CI サポート） |
 
 終了コード: 0（鮮度維持）、1（陳腐化検出、再生成要求）、2（入力エラー）。
+
+## 計測日driftの発生機構
+
+driftの機構はdate rollover、Phase 0起因、GitHub squash mergeによるcommitter date置換の3種とする。squash mergeを伴う境界closeではcheck_autogen_freshnessを実行し、drift検出時はgenerate_indexesで再生成してからgreen判定する。author date基準への切替とmerge commit除外は将来の評価対象として記録するが、現行gate契約は変更しない。
 
 ## 関連
 
