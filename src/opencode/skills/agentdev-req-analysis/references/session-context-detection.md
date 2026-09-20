@@ -8,7 +8,7 @@
 
 1. **要件内容**（何をやりたいか）→ セッション内で機能追加/バグ修正の説明が存在するか
 2. **work_type 判定**（bugfix/feature/maintenance/docs_chore）→ 要件内容の性質から bugfix/critical=bugfix, feature/enhancement=feature, refactor/maintenance=maintenance, docs/chore=docs_chore を推論
-3. **Scale判定**（feature のみ）→ 複数モジュール跨ぎ、PR肥大化リスク、段階的リリースの有無から standard/large を推論。bugfix の場合 Scale は推論不要（undefined）
+3. **Scale判定**（全 work_type）→ 複数モジュール跨ぎ、PR肥大化リスク、段階的リリースの有無から standard/large を推論。scale は全 work_type に standard/large を設定でき、大規模 bugfix 等も large/Epic 構成の対象になり得る
 4. **Decision判断**（必要/不要）→ 技術判断の複雑さ、影響範囲から adr-required を推論
 5. **要件docの構造化** → セッション内でテーブル形式の要件が展開済みか
 6. **適用範囲**（対象/対象外）→ セッション内で明示的に議論されているか
@@ -41,7 +41,7 @@
 📋 セッションコンテキスト検知結果:
   要件内容: {推論結果} [信頼度: 高/低]
   work_type: {bugfix/feature/maintenance/docs_chore} [信頼度: 高/低]
-  {featureの場合} Scale: {standard/large} [信頼度: 高/低]
+  Scale: {standard/large} [信頼度: 高/低]
   Decision: {必要/不要} [信頼度: 高/低]
   要件構造化: {完了/未完了} [信頼度: 高/低]
   適用範囲: {確定/未確定} [信頼度: 高/低]
@@ -56,11 +56,9 @@
 推論サマリー表示後、ユーザーの同意を確認した後に実行:
 
 - **全項目 高信頼度で推論済み（+ draft 存在）**:
- - feature → Step 10 へスキップ
- - bugfix → Step 10 へスキップ
+ - Step 10 へスキップ
 - **全項目 高信頼度で推論済み（draft なし）**:
- - feature → Step 9 へスキップ
- - bugfix → Step 10 へスキップ
+ - REQ 生成の要否を work_type ではなく中核文書モデル該当性（外部契約、期待状態、安定した制約）で判定する。生成する場合は Step 9 へ、生成しない場合は Step 10 へスキップ
 - **一部項目が低信頼度または未推論**:
  - 推論済み項目（高信頼度）を継承し、不足項目のみを対象に Step 1（壁打ち）を開始
 - **推論結果なし（セッションに要件情報が存在しない）**:

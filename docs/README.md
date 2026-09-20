@@ -6,11 +6,12 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 53件、廃止済み: 12件
+現行 REQ: 54件、廃止済み: 12件
 <!-- AUTOGEN:END -->
 
-現行要件は53件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
+現行要件は54件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
 REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）による意図的予約欠番であり、実体は存在しない（[採番管理](designs/foundations/numbering-policy.md) 参照）。
+REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却枠であり、意図的予約欠番として維持する。
 各 REQ の詳細は各 REQ ファイル本文を参照。
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-table -->
@@ -69,19 +70,20 @@ REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）によ
 | [REQ-082](REQ-082.md) | 対論型レビュー審議契約 |
 | [REQ-083](REQ-083.md) | Definition PR の状態契約（通常 Pull Request・ブランチ命名・用語・正規操作完結） |
 | [REQ-087](REQ-087.md) | 採番例外の記録と REQ 番号ギャップ検査 |
+| [REQ-088](REQ-088.md) | ADF v4 基盤要件（三層責務・情報寿命・Project Contract・中核文書モデル） |
 <!-- AUTOGEN:END -->
 
 - [要件インデックス](requirements/README.md)
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-030 の29件である（DEC-005、DEC-007 は superseded）。
+現行 Decision は DEC-001 から DEC-039 の38件である（DEC-002、DEC-005、DEC-007、DEC-015、DEC-017、DEC-029、DEC-030 は superseded、proposed は 0 件）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
 |---|---|
 | [DEC-001](decisions/DEC-001.md) | AgentDevFlow 憲章 |
-| [DEC-002](decisions/DEC-002.md) | OpenCode ソース・プロジェクション分離 |
+| [DEC-002](decisions/DEC-002.md) | OpenCode ソース・プロジェクション分離（superseded by DEC-036） |
 | [DEC-003](decisions/DEC-003.md) | req_draft ソフトコントラクト原則 |
 | [DEC-004](decisions/DEC-004.md) | 差し替え可能な I/O 境界 |
 | [DEC-005](decisions/DEC-005.md) | Project Extensions Architecture（superseded by DEC-006） |
@@ -94,9 +96,9 @@ REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）によ
 | [DEC-012](decisions/DEC-012.md) | Extension を file-kind から workflow/capability responsibility へ再編 |
 | [DEC-013](decisions/DEC-013.md) | IR 登録モデルの簡素化 — 現存 IR を実行可能な恒久統制に限定 |
 | [DEC-014](decisions/DEC-014.md) | 配布依存境界の多層 enforcement |
-| [DEC-015](decisions/DEC-015.md) | ADF決定論的実行中核と実行基盤実行機構の責務分界 |
+| [DEC-015](decisions/DEC-015.md) | ADF決定論的実行中核と実行基盤実行機構の責務分界（superseded by DEC-036） |
 | [DEC-016](decisions/DEC-016.md) | 導入系スクリプトの副作用ゼロ原則 |
-| [DEC-017](decisions/DEC-017.md) | 最小トレーサビリティモデルの採用と Artifact Graph の廃止 |
+| [DEC-017](decisions/DEC-017.md) | 最小トレーサビリティモデルの採用と Artifact Graph の廃止（superseded by DEC-037） |
 | [DEC-019](decisions/DEC-019.md) | 一般処理の標準API委譲とADF固有意味論の所有境界 |
 | [DEC-020](decisions/DEC-020.md) | GitHub Issue 共通管理単位の採用 |
 | [DEC-021](decisions/DEC-021.md) | scripts 公開入口の2本固定と安定契約 |
@@ -108,7 +110,16 @@ REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）によ
 | [DEC-027](decisions/DEC-027.md) | 観測ベース統制縮小評価ループ |
 | [DEC-028](decisions/DEC-028.md) | 文章表層品質の共通実行基盤 |
 | [DEC-029](decisions/DEC-029.md) | 公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入 |
-| [DEC-030](decisions/DEC-030.md) | トレーサビリティ標準機能への一般化と producer / consumer 境界の確立 |
+| [DEC-030](decisions/DEC-030.md) | トレーサビリティ標準機能への一般化と producer / consumer 境界の確立（superseded by DEC-037） |
+| [DEC-031](decisions/DEC-031.md) | ADF v4 Standard Operating Model の採用とプロセス・実装の責務分離 |
+| [DEC-032](decisions/DEC-032.md) | ADF 責務の三層モデルと Project Contract の論理ビュー・情報寿命モデル |
+| [DEC-033](decisions/DEC-033.md) | ADF v4 公開運用モデル（UX 2入口収斂・内部 lifecycle・継続コラボレーションループ・学習昇格ガード） |
+| [DEC-034](decisions/DEC-034.md) | v4 の移行・release 標準境界（非破壊移行原則・v4.0.0-rc.1 cutover・self-hosting） |
+| [DEC-035](decisions/DEC-035.md) | v4 Quality / Verification / Evidence / Gate モデルへの分解 |
+| [DEC-036](decisions/DEC-036.md) | 意味 Skill と決定的実装の責務分離および Harness/Backend adapter 境界 |
+| [DEC-037](decisions/DEC-037.md) | Traceability の Change / Evidence 中心への再中心化 |
+| [DEC-038](decisions/DEC-038.md) | ADF v4 durable state 配置と再構成の契約（状態権威・証跡分離・非原子調整原則） |
+| [DEC-039](decisions/DEC-039.md) | ADF v4 authority・副作用統制と冪等・並行性モデル |
 
 ## 設計（Design）
 
@@ -117,15 +128,13 @@ Design は 3 層構造（commands / skills / workflows）と基盤 6 ドメイ�
 
 ### 横断 Design（`designs/workflows/`）
 
-- [ワークフロー契約（横断）](designs/workflows/workflow-contracts.md)
 - [Workflow Skill Model](designs/workflows/workflow-skill-model.md)
-- [STEP Reference Contract](designs/workflows/step-reference-contract.md)
-- [Input Resolution and Durable State](designs/workflows/input-resolution-and-durable-state.md)
-- [サブエージェント委譲契約](designs/workflows/delegation-contracts.md)
+- [サブエージェント委譲契約（v4）](designs/workflows/v4-delegation-contracts.md)
 - [キャプチャ境界](designs/workflows/capture-boundaries.md)
-- [Epic / Wave / Issue 実行モデル](designs/workflows/epic-wave-model.md)
-- [RU / 採用済み成果物 / draft lifecycle](designs/workflows/backlog-artifact-lifecycle.md)
 - [execution_unit 構成アルゴリズム参照](designs/workflows/references/execution-unit-construction.md)
+- [ADF v4 標準ライフサイクル](designs/workflows/v4-standard-lifecycle.md)
+- [ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応）](designs/workflows/v4-lifecycle-state-machine.md)
+- [ADF v4 継続コラボレーションループ](designs/workflows/v4-collaboration-loop.md)
 
 ### command Design / skill Design
 
@@ -148,7 +157,13 @@ status（draft / accepted）を含む完全一覧は [Design インデックス]
 - [設計原則](designs/foundations/design-principles.md)
 - [Project Extensions](designs/foundations/project-extensions.md)
 - [harness 分離モデル](designs/foundations/harness-separation-model.md)
-- [最小トレーサビリティモデル（TIM）](designs/foundations/traceability-model.md)
+- [ADF v4 Operating Model](designs/foundations/v4-operating-model.md)
+- [ADF v4 実装責務境界](designs/foundations/v4-responsibility-boundaries.md)
+- [ADF v4 Traceability モデル](designs/foundations/v4-traceability-model.md)
+- [v3 -> v4 Concept / Artifact Crosswalk](designs/foundations/v3-v4-crosswalk.md)
+- [ADF v4 Migration と Release の標準境界](designs/foundations/v4-migration-and-release.md)
+- [ADF v4 durable state と再構成・恢復（配置表・権威移行・部分失敗調整）](designs/foundations/v4-durable-state-and-recovery.md)
+- [ADF v4 Runtime 実行モデル（authority 格子・直列化単位・冪等経路・runtime 制御ループ）](designs/foundations/v4-runtime-execution-model.md)
 
 #### responsibilities/（文書種別、成果物責務）
 
@@ -163,9 +178,9 @@ status（draft / accepted）を含む完全一覧は [Design インデックス]
 #### quality/（品質、メトリクス）
 
 - [品質仕様](designs/quality/quality-specs.md)
-- [品質ゲート](designs/quality/quality-gates.md)
 - [REQ 健全性メトリクス](designs/quality/req-health-metrics.md)
 - [Design 健全性メトリクス](designs/quality/design-health-metrics.md)
+- [ADF v4 Quality / Verification / Evidence / Gate モデル](designs/quality/v4-quality-gate-model.md)
 
 #### integrity/（整合性契約、ルール）
 

@@ -254,3 +254,9 @@ PowerShell の comment-based help 仕様は、スクリプトヘルプが「ス�
   使いやすさ詳細（ウィザード、cwd 検査、ヘルプ、上級者向けオプション、検査カタログ、誤実行防止案内）
 - 対象外: junction 作成、clone、orphan 検出、VERIFY 等の核心ロジック
   （runtime-package-boundary.md 参照）
+
+## v4 adapter 境界への接続
+
+導入スクリプト（install/self-sync）が扱う配備形態（junction・copy・投影構造）は v4 の Harness/Backend adapter 境界（ADF v4 実装責務境界 Design・DEC-036）の配備層に属する。スクリプトの使いやすさ契約（本 Design 既有）は不変である。
+
+定義の所有は v4-responsibility-boundaries へ参照する。既存節は不変とする。

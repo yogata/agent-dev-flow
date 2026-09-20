@@ -1,7 +1,7 @@
 # Definition 受入と canonical 再取得（STEP-1 / STEP-2）
 
 Definition PR の受入判定と merge、canonical Definition 再取得の実行時詳細である。
-Definition PR lifecycle、canonical Definition の判定、backend 意味論の物理写像の正規所有は `<workflows/definition-readiness>` Design である。
+Definition PR lifecycle、canonical Definition の判定、backend 意味論の物理写像の正規所有は case-open / case-ready Design である。
 
 ## STEP-1: Definition PR 受入
 

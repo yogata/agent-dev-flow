@@ -110,7 +110,7 @@ adversarial-review 自身は矛盾を自動解決せず、矛盾の判定、part
 
 ### 副作用境界と委譲契約
 
-adversarial-review は delegation-contracts Design の `semantic_review`（書き込み禁止型）として適用する。
+adversarial-review は v4-delegation-contracts Design の `semantic_review`（書き込み禁止型）として適用する。
 許可操作は `read_files`、`inspect_content`、`return_summary`、`return_evidence`、`return_artifact_body_when_requested` に限定し、`file_write`、`issue_pr_update`、`commit`、`push`、`user_confirmation` を forbidden とする。
 審議結果は中間成果として呼出元へ返却し、新規正規 artifact を生成しない。
 

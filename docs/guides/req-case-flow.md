@@ -1,15 +1,15 @@
 # 要件定義 → Case実行フロー
 
-`/agentdev/req-define` から `/agentdev/case-close` までの流れを説明する。
+`/agentdev/req-define` から内部 lifecycle（case-open → case-ready → case-run → case-close。実行は `/agentdev/case-auto`）までの流れを説明する。
 機能追加、バグ修正ともにこの経路を通る。
 
 ## 全体の流れ
 
 ```
-/agentdev/req-define → /agentdev/case-open → /agentdev/case-ready → /agentdev/case-run → /agentdev/case-close
+/agentdev/req-define → /agentdev/case-auto（内部 lifecycle: case-open → case-ready → case-run → case-close）
 ```
 
-> `artifact_actions` は case-ready の Definition action として適用する。case-ready は保存対象の有無にかかわらず実行する。
+> `artifact_actions` は case-ready（内部 lifecycle 段階）の Definition action として適用する。case-ready は保存対象の有無にかかわらず実行される（case-auto が駆動）。
 > draft は構造化 `draft-data` 形式（緩やかな契約：soft contract）で req-define が生成し、後続コマンドが LLM 推論で消費する。
 
 ## req-define
@@ -120,15 +120,15 @@ docs 更新責務は全 work_type 共通である（bugfix も含む）。
 
 ## 最大自走モード
 
-`/agentdev/case-auto` は、`/agentdev/req-define` 完了後の後続工程を一括実行する追加入口である。
+`/agentdev/case-auto` は、`/agentdev/req-define` 完了後の後続工程を一括実行する標準実行コマンドである。
 標準ワークフロー（個別コマンドの順次実行）に並ぶ追加選択肢であり、ユーザーが明示的に指定した場合のみ使用する。
 
 ### 実行内容
 
 入力要件docの `draft-data` を読み取り、工程を実行する。`artifact_actions` は case-ready の入力として渡す:
 
-- `/agentdev/case-open` → `/agentdev/case-ready` → `/agentdev/case-run` → `/agentdev/case-close`
-- 再合意済み Definition 変更時は `/agentdev/case-revise` → `/agentdev/case-ready` → `/agentdev/case-run` → `/agentdev/case-close`
+- case-open → case-ready → case-run → case-close（いずれも内部 lifecycle 段階）
+- 再合意済み Definition 変更時は case-revise → case-ready → case-run → case-close（例外経路。case-auto が resume_command から解決）
 
 ### 自走対象
 
@@ -147,4 +147,4 @@ DB マイグレーションの実行、deploy/apply、クラウドリソース�
 
 case-auto の停止条件と停止理由分類の正は REQ-034（case-auto 実行契約）が所有する。
 
-停止時は個別コマンド（`/agentdev/case-open` / `/agentdev/case-run` / `/agentdev/case-close`）から再開できる。
+停止時は `/agentdev/case-auto` へ Root Case を指定して再開する（resume_command に基づく）。

@@ -8,16 +8,17 @@ description: "req-define command の workflow 実装本体。セッションコ�
 
 req-define command の workflow 実装本体である。
 機能追加またはバグ修正の要件を整理・定義する壁打ち workflow の制御構造を所有する。
-主フロー req-define → case-open → case-ready → case-run → case-close の起点であり、Case 確立後の Definition 変更は本 workflow での再合意を例外経路（case-revise → case-ready）の起点とする。
+主フロー req-define → case-auto（内部 lifecycle: case-open → case-ready → case-run → case-close）の起点であり、Case 確立後の Definition 変更は本 workflow での再合意を例外経路（case-revise → case-ready）の起点とする。
 対話（HITL）と永続状態（要件doc draft、RU）の分離を維持し、中断・再開できるようにする。
 
 req-define command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 
 ## 入力
 
-- ユーザーの自然言語による機能追加/バグ修正の説明
-- GitHub Issue URL（既存Issueの場合）、エラーログ（バグ修正の場合）
+- ユーザーの自然言語による要求説明（機能追加、bug report 等）
+- GitHub Issue URL（既存Issueの場合）、エラー・ログ・障害情報、外部課題、finding
 - ユーザーが明示した入力ファイル（設計メモ、調査メモ、RU `.agentdev/backlog/req-units/RU-*.md` 等、参照専用）
+- エラー・障害入力では、現象理解 → 原因分析 → 期待状態 → 影響分析 → 要求化の必要性の評価経路を経て REQ/Decision/Design へ接続する（`v4-standard-lifecycle` Design「req-define の入力意味と要件化責務」節）
 - Definition 保存内部責務の SPLIT 検出時の検出事項、inspect-skills 診断結果の検出事項
 
 ## 出力
@@ -33,7 +34,7 @@ req-define command は公開 interface（入出力契約・ガードレール）
 ## 制御平面（STEP 一覧）
 
 req-define workflow は次の11 STEP で構成する。
-各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
+各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<foundations/v4-durable-state-and-recovery>.md`）。
 対話の進行は永続状態（入力ファイル、壁打ちで確定した合議内容を含む draft-data 下書き）から再構成でき、会話コンテキストのみに依存しない。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
@@ -44,7 +45,7 @@ req-define workflow は次の11 STEP で構成する。
 | STEP-4 | 要件展開 | 操作分類確定 | 変更影響候補、分類ゲート、Decision要否確認、変更誘発境界リスク導出（5観点境界）、test strategy 定義 | [references/requirement-development.md](references/requirement-development.md) |
 | STEP-5 | Decision判断 | 要件展開完了 | Decision判断記録（`new:{topic-slug}` 形式） | [references/requirement-development.md](references/requirement-development.md) |
 | STEP-6 | 要件doc生成 | Decision判断完了 | 構造化 `draft-data`（operation_units、artifact_actions、test_strategy、review_dispositions） | [references/draft-generation.md](references/draft-generation.md) |
-| STEP-7 | work_type・Scale 判定 | 要件doc生成完了 | work_type 4値、scale（feature のみ） | [references/draft-generation.md](references/draft-generation.md) |
+| STEP-7 | work_type・Scale 判定 | 要件doc生成完了 | work_type 4値、scale（全 work_type で standard/large 設定可） | [references/draft-generation.md](references/draft-generation.md) |
 | STEP-8 | adversarial-review | STEP-7 完了後、STEP-9 前 | review 結果反映（skip 時は従来フロー継続） | [references/adversarial-review-integration.md](references/adversarial-review-integration.md) |
 | STEP-9 | ドラフト保存 | review 完了または skip | `.agentdev/drafts/req-draft-{topic-slug}.md` 保存 | [references/draft-generation.md](references/draft-generation.md) |
 | STEP-10 | 要件doc確認 | ドラフト保存完了 | ユーザー提示済み（承認は求めず提示のみ） | [references/draft-generation.md](references/draft-generation.md) |
@@ -105,7 +106,7 @@ req-define workflow は次の11 STEP で構成する。
 ## See Also
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
+- **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
 - **req-define command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

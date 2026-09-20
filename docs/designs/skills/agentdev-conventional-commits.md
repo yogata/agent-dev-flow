@@ -4,6 +4,7 @@ status: accepted
 created: 2026-06-21
 updated: 2026-09-08
 ---
+<!-- ADF-COVERS(implementation): REQ-003-001 -->
 
 # `agentdev-conventional-commits` Design
 
@@ -55,3 +56,11 @@ Conventional Commits v1.0.0 仕様に従ってコミットメッセージを生�
 - [commands/case-revise.md](../commands/case-revise.md)
 
 
+
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: 0 件
+- **deterministic 委譲先**: なし（検査 script なし）
+- **知識提供**: Conventional Commits 規約

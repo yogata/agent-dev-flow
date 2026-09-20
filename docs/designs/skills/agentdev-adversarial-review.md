@@ -2,7 +2,7 @@
 title: agentdev-adversarial-review Design
 status: accepted
 created: 2026-08-09
-updated: 2026-09-02
+updated: "2026-09-19"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-021 -->
@@ -337,8 +337,8 @@ adversarial-review の呼出失敗時（スキル不在、起動異常、timeout
 | 意味 | 正規所有者 Design |
 |---|---|
 | adversarial-review 自身の振る舞い契約（入力コンテキスト、返却契約、呼出失敗時取扱い、再 review 条件、停止条件4点、原則適用・skip 可能、default-on + skip policy、副作用禁止、QG/HITL 非代替、正規所有者マトリックス） | 本 Design（agentdev-adversarial-review） |
-| user-decision-required 停止理由分類、case-auto 伝播、resume point | workflow-contracts Design、case-auto command Design |
-| review 経路での parent_decision_required / decision_context 適用、副作用境界 | delegation-contracts Design |
+| user-decision-required 停止理由分類、case-auto 伝播、resume point | v4-lifecycle-state-machine Design、case-auto Design |
+| review 経路での parent_decision_required / decision_context 適用、副作用境界 | v4-delegation-contracts Design |
 | 各 command の個別呼出統合（発動条件、挿入境界、戻り先） | 各 command Design（REQ-015） |
 | caller integration 関連の domain skill 振る舞い | 各 domain skill Design（REQ-015） |
 
@@ -363,3 +363,12 @@ adversarial-review の呼出失敗時（スキル不在、起動異常、timeout
 
 形式の機械判定は、`docs/designs/commands/` 配下を `adversarial-review 挿入境界（` および `adversarial-review 由来の停止伝播（` で grep し、抽出された見出しが上表の形式のいずれかに一致することで行える。
 形式に一致しない見出しは、本節に例外を追加するか、見出しを規約どおりへ修正する。
+
+
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: adversarial review
+- **deterministic 委譲先**: なし（審議は非決定的）
+- **知識提供**: 審議手続き・3 論理役割・read-only 境界

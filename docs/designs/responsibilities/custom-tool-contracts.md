@@ -87,6 +87,14 @@ Plugin / Hook の設定契約:
 - 強制境界 Plugin の設定は環境変数経由で行う。gh-write-guard Plugin は `AGENTDEV_GH_WRITE_GUARD_CONFIG`（JSON、`enforcedTools` 一覧）を受け付け、未設定時は既定の強制対象で動作し、設定を解釈できない場合は対象副作用を実行せず fail-closed で拒否する（REQ-052-004）。gh-tool Plugin は `AGENTDEV_GH_REPO` で対象リポジトリを指定できる
 - 正規経路の Custom Tool 名は `agentdev_gh`（GitHub Issue / PR 操作）と `agentdev_third_party`（third-party Skill 取得）である。配布物の実行手順はこれらのツール名を経由し、生 gh WRITE の直接実行を正規経路としない（REQ-011-021、REQ-052-010）
 
+## v4 adapter 経由の harness 接続
+
+Custom Tool の操作契約（本 Design 既有）は、v4 では Harness/Backend adapter 境界（ADF v4 実装責務境界 Design・DEC-036）を経由して harness へ接続する。現行の plugins/ による tool 登録配線（agentdev-gh-tool・agentdev-third-party-tool）がこの形態の OpenCode 実装例である。
+
+adapter の追加は必要になった時点で行い、未使用 adapter を先回りして実装しない。種別契約の正は REQ-052、操作契約の正は本 Design、境界定義の正は v4-responsibility-boundaries が所有する。
+
+既存節（操作契約の構成要素・対象操作の境界・ローカル版実装差し替え・迂回防止・移管記録）は不変とする。
+
 ## 移管記録（旧 `agentdev-gh-cli` Skill Design の廃止）
 
 GitHub I/O の操作契約、VERIFY、失敗時動作、環境依存隠蔽、ローカル版実装差し替えの正規所有は本 Design が一元的に担う。旧 Skill Design（`docs/designs/skills/agentdev-gh-cli.md`）はこの移管の完了に伴い現行 Design 体系から除去する。

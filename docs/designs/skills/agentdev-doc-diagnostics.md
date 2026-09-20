@@ -67,7 +67,7 @@ inspect-docs の診断観点は正規の観点レジストリが所有する（r
 
 - inspect-docs.md（command 手順）の診断実行 Step
 - artifact-responsibilities.md「操作 skill 正規所有者台帳」
-- artifact-contracts.md「サブエージェント委譲契約」（finding 出力契約）
+- workflows/v4-delegation-contracts.md「サブエージェント委譲契約」（finding 出力契約）
 
 ## 現在の動作
 
@@ -155,3 +155,12 @@ docs 横断診断は本 skill が正規の所有者となる（REQ-036-013 の d
 - [agentdev-req-structure-diagnostics.md](agentdev-req-structure-diagnostics.md)（REQ 固有診断 skill）
 - REQ-036-013（diagnostics 命名許容例外境界）
 - REQ-039-004（inspect-docs と diagnostics skill の責務分離）
+
+
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: semantic classification（診断カテゴリ・ルーティング）
+- **deterministic 委譲先**: 検査実行は artifact-validation scripts・repo-local checker へ委譲
+- **知識提供**: 共通証拠構造・finding 出力契約

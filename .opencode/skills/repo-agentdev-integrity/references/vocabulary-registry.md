@@ -344,4 +344,15 @@ IR-065（廃止語彙の現行使用検出）と IR-066（旧パス・削除済�
 
 - 新規語彙の追加・旧語彙の変更は docs-check（/repo/docs-check）の検出パターンと同期すること
 - REQ-0108-055 に基づき、検査ルール変更時は regression fixture を追加すること
-- 本レジストリは `src/opencode/skills/repo-agentdev-integrity/references/` 配下に配置し、`.opencode/skills/repo-agentdev-integrity/references/` へ投射する。canonical は source 側とする
+- 本レジストリは `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` を正（canonical）とする。repo-agentdev-integrity は repo-local スキル（配布対象外）であるため src 側配置と投射の対象外である（語彙レジストリ Design「配置と連携」節の配置基準に整合）
+
+## v4 概念語彙（意味参照）
+
+v4 概念語彙の正規定義は `docs/designs/workflows/v4-standard-lifecycle.md`「work_type / scale / Epic / Wave の v4 意味モデル」節（L13-21）を参照する。概念再定義であり改名でないため、旧語彙→新語彙の対照行は作成しない（消費する検出規則が存在しない）。
+
+| 概念語彙 | 意味参照（v4-standard-lifecycle「work_type / scale / Epic / Wave の v4 意味モデル」節） |
+|---|---|
+| work_type | 変更の性質。workflow route を直接決定する責務から分離する |
+| scale | 変更・実行・協調の規模。特定 work_type に限定しない |
+| Epic | 複数 execution unit の協調管理が必要な変更 |
+| Wave | Epic 内の依存関係と並列実行可能性を表す実行スケジューリング単位 |

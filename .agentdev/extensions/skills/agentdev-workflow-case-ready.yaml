@@ -3,13 +3,9 @@ kind: workflow-extension
 id: agentdev-workflow-case-ready
 
 context:
-  - id: definition-readiness
+  - id: v4-lifecycle-state-machine
     paths:
-      - "docs/designs/workflows/definition-readiness.md"
-    purpose: Definition Package の保存・確定と readiness 状態遷移の確認
-  - id: workflow-contracts
-    paths:
-      - "docs/designs/workflows/workflow-contracts.md"
+      - "docs/designs/workflows/v4-lifecycle-state-machine.md"
     purpose: case-ready を含む工程接続と SSoT 遷移の確認
   - id: case-ready-spec
     paths:

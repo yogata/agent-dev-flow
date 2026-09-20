@@ -40,7 +40,7 @@ command 本文内で backlog-review を参照する場合はこちらを使用�
 | 矛盾検出への引き渡し | REQ-{NNNN}-{NNN} | review で指摘された矛盾は既存矛盾検出ロジックへ渡し、review 内で自動解決しない |
 | 発動条件 | REQ-{NNNN}-{NNN} | ユーザー明示指定時のみ発動（順序、発動条件の正は backlog-review command Design） |
 | 従来フロー維持 | REQ-{NNNN}-{NNN} | 条件非該当時、呼出失敗時は従来フローを維持（順序の正は backlog-review command Design） |
-| 副作用境界 | REQ-{NNNN}-{NNN}/{NNN} | `semantic_review`（書き込み禁止型）、新規 artifact 非生成（正は adversarial-review Design、delegation-contracts Design） |
+| 副作用境界 | REQ-{NNNN}-{NNN}/{NNN} | `semantic_review`（書き込み禁止型）、新規 artifact 非生成（正は adversarial-review Design、v4-delegation-contracts Design） |
 | accepted finding 反映 | REQ-{NNNN}-{NNN} | accepted finding の RU 構成案への反映は呼出元責務（正は adversarial-review Design） |
 | 再 review 条件 | REQ-{NNNN}-{NNN} | 意味内容変更時のみ再発動可能、同一 finding 再起票禁止（正は adversarial-review Design） |
 | unresolved 時の扱い | REQ-{NNNN}-{NNN} | unresolved 残時は不可逆処理へ進まない（正は adversarial-review Design） |
@@ -52,6 +52,11 @@ command 本文内で backlog-review を参照する場合はこちらを使用�
 backlog-review は promoted artifact を source type に依存しない共通モデルで分析し、docs/knowledge/ への知識文書保存へ処置すると判定した採用済み成果物（learning-promote が知識としての保存適否ありと判定して受け渡したものを含む。source type は問わない）を、利用者承認を経て docs/knowledge/ へ直接保存する正規昇華経路で処理する。当該書き込みは git 永続化対象の副作用である。
 REQ / Decision / Design 反映、ガードレール移管、Project Extension 接続、通常の Issue による修正等の具体的実現先へのルーティングは learning 由来を含めて行わず、システム変更を必要とするものは RU として req-define へ渡す。source type をルーティング条件にしない。
 正規原本はバックログ統合の要件が正規所有する backlog 自体の処置と docs/knowledge/ 直接保存の要件行であり、本節は配布物側の実行時参照である。詳細は `references/learning-outcome-routing.md` を参照。
+
+## 継続コラボレーションループにおける位置づけ
+
+backlog-review は継続コラボレーションループ（`<workflows/v4-collaboration-loop>` Design）の Backlog 段の実現手段である。
+Intake / Learning / inspect の各昇格系統由来の採用済み成果物は本段で統合・分析され、RU 化によって req-define へ合流する。docs/knowledge/ へ直接保存される知識文書は RU 化を経ない。
 
 ## See Also
 

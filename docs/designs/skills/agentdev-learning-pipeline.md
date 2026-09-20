@@ -132,3 +132,10 @@ adversarial-review 自体を恒久的な統制ゲートとしない。
 | 候補判断基準、内部手続き（候補確定位置、呼出タイミング、evaluation-report 反映、Step 6 戻しループの実装詳細） | 本 Design（agentdev-learning-pipeline domain skill Design、ACT-SPEC-013） |
 | 共通 caller integration 契約 | `agentdev-adversarial-review` Design（REQ-014） |
 
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: learning evaluation（8 軸評価）
+- **deterministic 委譲先**: なし
+- **知識提供**: evaluation-report schema・prune 方針

@@ -1,17 +1,18 @@
 ---
-description: case-open→case-ready→case-run→case-closeを順次自走実行する（明示指定時のみ。再合意済みDefinition変更時はcase-revise→case-readyから）
+description: 要件docまたはRoot Caseを入力として内部lifecycle（case-open→case-ready→case-run→case-close、例外経路case-revise→case-ready）を自走駆動する標準実行コマンド
 ---
 
 # 最大自走モード
 
-要件docから case-open → case-ready → case-run → case-close を順次実行し、repo 内の変更に限りマージまで自走する。
-req-define で再合意済みの Definition 変更がある場合は case-revise → case-ready → case-run → case-close の例外経路を自走する。
-標準ワークフローの置き換えではなく、ユーザーが明示的に指定した場合のみ使用する追加入口である。
+要件doc または Root Case Issue を入力として内部 lifecycle（case-open → case-ready → case-run → case-close、例外経路 case-revise → case-ready）を順次自走実行し、repo 内の変更に限りマージまで進める標準実行コマンドである。
+要求入口は req-define（手動要求入口）と backlog-auto（要求蓄積入口）の2つであり、両経路の実行は本コマンドへ合流する。
+標準導線は req-define 完了直後の単一要件doc を引数とした起動であり、引数なし起動時は `.agentdev/drafts/req-draft-*.md` 全件を処理する。
+GitHub Issue 入力時は Root Case の状態と resume_command から通常経路と例外経路を解決する。resume_command が case-revise を指す場合は再合意済み Definition 変更の例外経路 case-revise → case-ready を駆動する。
 
 ## 入力
 
-- 要件doc（引数なし時は `.agentdev/drafts/req-draft-*.md` 全件処理がデフォルト / 明示パス指定 / セッション指定キーワードによるセッション内要件doc参照。暗黙判断廃止、構造化 `draft-data` 形式）
-- Issue番号（数値）または Issue URL: 既存 Root Case から継続工程（case-ready / case-run / case-close）を解決して自走する場合
+- 要件doc（標準導線は req-define 完了直後の単一要件doc 起動 / 引数なし時は `.agentdev/drafts/req-draft-*.md` 全件処理がデフォルト / 明示パス指定 / セッション指定キーワードによるセッション内要件doc参照。暗黙判断廃止、構造化 `draft-data` 形式）
+- Issue番号（数値）または Issue URL: 既存 Root Case から継続工程（case-ready / case-run / case-close）を解決して自走する場合。Root Case の状態と resume_command から通常経路と例外経路を解決し、resume_command が case-revise を指す場合は例外経路 case-revise → case-ready を駆動する
 
 ## 出力
 
@@ -29,9 +30,9 @@ case-auto は下位 workflow の契約確定後の上位 orchestrator として�
 工程上の選好を反映した肯定形の不変条件:
 
 - 自走対象は GitHub Issue/PR/comment/merge/close 操作と repo 内にファイルとして残る変更（docs/、REQ/Decision/Design、command reference、guide を含む）に限定する
-- 委譲工程（case-open/ case-ready/ case-revise/ case-close）は各コマンドの委譲契約に従って委譲起動し、各工程は対応する Workflow Skill を権威情報源として実行する（手順の case-auto 定義内再実装は回避）。case-run はインライン実行する（標準動作、`agentdev-workflow-case-run` を権威情報源として読み込む）。委譲起動不能時は `delegation-unavailable` として報告し、委譲工程のインライン実行への切替えは行わない。genuine blocker（実装上の問題、スコープ外操作等）は停止条件として扱い `delegation-unavailable` 対象外とする。case-run インライン実行時の実行担当サブエージェントへの委譲失敗は case-run result 契約に従って処理する。工程固有の詳細手順と case-auto 定義が矛盾する場合は工程固有処理（既存コマンド定義）を優先し、自走境界・入力解決・工程間制御は case-auto 定義を優先する（委譲起動・インライン実行は起動方式の変更であり、既存コマンドの責務・ガードレール・成果物を変更しない）
+- 委譲工程（case-open/ case-ready/ case-revise/ case-close）は対応する Workflow Skill（`agentdev-workflow-case-open` / `agentdev-workflow-case-ready` / `agentdev-workflow-case-revise` / `agentdev-workflow-case-close`）を load 指定したサブエージェントへ委譲起動し、各工程は当該 Workflow Skill を権威情報源として実行する（委譲起動の指定先は command ではなく Workflow Skill の load 指定とする。手順の case-auto 定義内再実装は回避）。case-run はインライン実行する（標準動作、読込主体は case-auto 自身で `agentdev-workflow-case-run` を権威情報源として読み込む）。委譲起動不能時は `delegation-unavailable` として報告し、委譲工程のインライン実行への切替えは行わない。genuine blocker（実装上の問題、スコープ外操作等）は停止条件として扱い `delegation-unavailable` 対象外とする。case-run インライン実行時の実行担当サブエージェントへの委譲失敗は case-run result 契約に従って処理する。工程固有の詳細手順と case-auto 定義が矛盾する場合は工程固有処理（既存コマンド定義）を優先し、自走境界・入力解決・工程間制御は case-auto 定義を優先する（委譲起動・インライン実行は起動方式の変更であり、既存コマンドの責務・ガードレール・成果物を変更しない）
 - 通常経路（case-open → case-ready → case-run → case-close）を自動継続し、req-define で再合意済みの Definition 変更がある場合は例外経路（case-revise → case-ready → case-run → case-close）を自動継続する。新しい意味判断が必要となった場合は blocked とし Root Case の resume_command: req-define で停止する（req-define の壁打ちは自動化しない）
-- orchestration stage モデル（stage 1 case-open（例外経路時は case-revise）→ stage 2 case-ready → クリーンアップ検証ゲート → stage 3 case-run（インライン）→ stage 4 case-close）に従い、各 orchestration stage は stage 内最大並列（直列化要因のみ局所直列化）・stage 間全対象収束（fan-in）で進行し、対象ごとの縦切り pipeline としない。当該 stage に属する全対象が正常完了し、または当該実行において後続 stage へ進めないことが既存契約上確定した結果（blocked / failed / delegation-unavailable 等の後続不能確定）に収束するまで次 stage を開始せず（未実行・実行中・状態不明・再試行要否未確定対象の残存は収束済みとしない）、後続不能対象を後続 stage の対象から除外しその存在だけを理由として独立した他対象の進行を停止しない。stage 1 の収束条件には全対象確立後の横断依存検査の実施を含める（並列 case-open によって兄弟対象をタイミング依存で欠落させない）。scheduling 制約（最大同時起動数・起動間隔・順次フォールバック）による batch 分割を orchestration stage の分割として扱わず、Epic execution_unit の Wave 間および最終 Wave の case-close(#epic) を Wave 反復を進行・完結させる stage 3 内部処理として扱い stage 4 の開始とみなさない（epic-wave-model Design「ドラフト間並列実行モデル」）。case-run internal lifecycle（state machine、self-healing loop 等）を複製せず case-run 側の正規所有に委譲する
+- orchestration stage モデル（stage 1 case-open（例外経路時は case-revise）→ stage 2 case-ready → クリーンアップ検証ゲート → stage 3 case-run（インライン）→ stage 4 case-close）に従い、各 orchestration stage は stage 内最大並列（直列化要因のみ局所直列化）・stage 間全対象収束（fan-in）で進行し、対象ごとの縦切り pipeline としない。当該 stage に属する全対象が正常完了し、または当該実行において後続 stage へ進めないことが既存契約上確定した結果（blocked / failed / delegation-unavailable 等の後続不能確定）に収束するまで次 stage を開始せず（未実行・実行中・状態不明・再試行要否未確定対象の残存は収束済みとしない）、後続不能対象を後続 stage の対象から除外しその存在だけを理由として独立した他対象の進行を停止しない。stage 1 の収束条件には全対象確立後の横断依存検査の実施を含める（並列 case-open によって兄弟対象をタイミング依存で欠落させない）。scheduling 制約（最大同時起動数・起動間隔・順次フォールバック）による batch 分割を orchestration stage の分割として扱わず、Epic execution_unit の Wave 間および最終 Wave の case-close(#epic) を Wave 反復を進行・完結させる stage 3 内部処理として扱い stage 4 の開始とみなさない（case-auto Design「ドラフト間並列実行モデル」）。case-run internal lifecycle（state machine、self-healing loop 等）を複製せず case-run 側の正規所有に委譲する
 - クリーンアップ検証ゲート（ドラフト残存、RU 残存の検証）を stage 2（case-ready）の対象群収束後・stage 3 開始前に実行し、stage 2 を正常完了した対象について残存を検出した場合は停止する。stage 2 が blocked / failed / 中断等で正常完了していない対象について、既存 lifecycle 契約に従って保持された draft / RU を cleanup 違反として扱わない（case-auto 実行契約）
 - case-open 前だけ req_draft を orchestration pre-reader として読み込み、case-ready 成功後は invalid post-case reader として req_draft を読まない。case-ready 成功後の停止、再開、完了処理は Issue と Epic（ステータス追跡テーブル含む）だけで成立させる
 - case-auto は case-ready が確定した Epic、Wave、Issue 構造に従って進行する（Issue 階層の決定と Epic Issue 化の判定は case-open / case-ready が担い、case-auto はその確定結果に従う。OU 間依存はキュー依存として扱い、依存関係のみで Epic Issue 化しない）。case-auto は OU 本文の抽出・変換・REQ 操作解釈を行わずキュー管理のみを担う

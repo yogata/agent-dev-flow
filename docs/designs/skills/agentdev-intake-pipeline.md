@@ -139,3 +139,11 @@ intake-promote が review 候補を確定する基準は次のとおり。
 副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱いは adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014）を正とし、本 Design は再定義しない。
 intake-promote 本体は本節に従い候補判断と内部手続きを実行する。
 
+
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: semantic classification（item review・分類）
+- **deterministic 委譲先**: なし（git 永続化は標準手段）
+- **知識提供**: 抽出ロジック・promoted 保存基準

@@ -8,16 +8,13 @@ AgentDevFlow は AI エージェントによる開発ワークフローを支え
 ## 最小クイックスタート
 
 ```
-/agentdev/req-define    # 要件を壁打ちする
-/agentdev/case-open     # Case Issue と Definition Package の作成
-/agentdev/case-ready    # Definition Package と実行構造の確定
-/agentdev/case-run      # 実装して PR を作成する
-/agentdev/case-close    # PR をマージして Issue をクローズする
+/agentdev/req-define    # 要件を壁打ちする（手動要求入口）
+/agentdev/case-auto     # 要件doc または Root Case から Definition 確定・実装・PR 作成・マージ・クローズまで自走する（標準実行コマンド）
 ```
 
-`case-ready` は Definition の保存・確定と実行構造の確定を担う。
-再合意済みの Definition 変更は `case-revise` → `case-ready` で反映する。
-自走入口は `/agentdev/case-auto` を明示指定した場合に限る。
+要求の継続的な蓄積・整理は `/agentdev/backlog-auto`（要求蓄積入口）から始め、生成された RU を req-define に渡す。
+`case-auto` は内部 lifecycle（case-open、case-ready、case-run、case-close、例外経路 case-revise）を駆動し、Definition の保存・確定と実行構造の確定もその内部責務として実行する。
+再合意済みの Definition 変更は req-define で再合意した後、`case-auto` が例外経路（case-revise → case-ready）を解決して反映する。
 
 ## 主要導線
 
@@ -34,4 +31,4 @@ AgentDevFlow は AI エージェントによる開発ワークフローを支え
 配布コマンドの索引。
 詳細な選び方は上表の[コマンド選択](docs/guides/command-selection.md)、各コマンドの入出力は[コマンドリファレンス](src/opencode/commands/agentdev/README.md)を参照する。
 
-`/agentdev/req-define`、`/agentdev/case-open`、`/agentdev/case-ready`、`/agentdev/case-revise`、`/agentdev/case-run`、`/agentdev/case-close`、`/agentdev/case-auto`、`/agentdev/intake-capture`、`/agentdev/intake-from-github`、`/agentdev/intake-promote`、`/agentdev/learning-promote`、`/agentdev/backlog-review`、`/agentdev/backlog-auto`、`/agentdev/inspect-docs`、`/agentdev/inspect-skills`、`/agentdev/inspect-promote`、`/agentdev/issue`、`/agentdev/third-party-sync`
+`/agentdev/req-define`、`/agentdev/backlog-auto`、`/agentdev/case-auto`、`/agentdev/intake-capture`、`/agentdev/intake-from-github`、`/agentdev/intake-promote`、`/agentdev/learning-promote`、`/agentdev/backlog-review`、`/agentdev/inspect-docs`、`/agentdev/inspect-skills`、`/agentdev/inspect-promote`、`/agentdev/issue`、`/agentdev/third-party-sync`

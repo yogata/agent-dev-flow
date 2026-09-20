@@ -2,7 +2,7 @@
 title: `agentdev-backlog-integration` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-09-20
 ---
 <!-- ADF-COVERS(implementation): REQ-004-016, REQ-004-017, REQ-039-001, REQ-039-002, REQ-039-003 -->
 
@@ -55,7 +55,7 @@ backlog-review における採用済み成果物の統合、分割判定、矛�
 - [agentdev-intake-pipeline.md](agentdev-intake-pipeline.md)
 - [agentdev-learning-pipeline.md](agentdev-learning-pipeline.md)
 - [commands/backlog-review.md](../commands/backlog-review.md)
-- [../workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)
+- [../workflows/v4-collaboration-loop.md](../workflows/v4-collaboration-loop.md)（継続コラボレーションループ: RU 生成・合流のループ統合、v3 backlog-artifact-lifecycle Design からの吸収記録）
 - REQ-008（RU lifecycle）
 - REQ-039（バックログ統合）
 
@@ -98,7 +98,7 @@ adversarial-review 自身は矛盾を自動解決せず（REQ-015-008）、矛�
 
 ### 副作用境界と委譲契約
 
-adversarial-review は delegation-contracts Design の `semantic_review`（書き込み禁止型）として適用する。
+adversarial-review は v4-delegation-contracts Design の `semantic_review`（書き込み禁止型）として適用する。
 許可操作は `read_files`、`inspect_content`、`return_summary`、`return_evidence`、`return_artifact_body_when_requested` に限定し、`file_write`、`issue_pr_update`、`commit`、`push`、`user_confirmation` を forbidden とする（REQ-014-004）。
 審議結果は中間成果として呼出元へ返却し、新規正規 artifact を生成しない（REQ-014-005）。
 
@@ -106,6 +106,14 @@ adversarial-review は delegation-contracts Design の `semantic_review`（書�
 
 ### 正規所有者マトリックス参照
 
-本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts Design「adversarial-review との委譲契約接続」節、backlog-review command Design「adversarial-review 挿入境界（backlog-review）」節との間で意味の重複、矛盾を生じない。
+本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、v4-delegation-contracts Design「adversarial-review との委譲契約接続」節、backlog-review command Design「adversarial-review 挿入境界（backlog-review）」節との間で意味の重複、矛盾を生じない。
 挿入境界、発動条件、順序は backlog-review command Design を正とし、本節は domain skill 固有の候補判断基準、内部手続き（候補確定位置、呼出タイミング、矛盾検出への引き渡し）のみを所有する。
 
+
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: semantic classification（統合・分割判定）
+- **deterministic 委譲先**: dependency graph（depends_on 依存解決）は委譲先未整備の債務
+- **知識提供**: 分析メタデータ・RU 生成基準

@@ -4,6 +4,7 @@ status: accepted
 created: 2026-06-21
 updated: 2026-07-18
 ---
+<!-- ADF-COVERS(implementation): REQ-002-001, REQ-002-009 -->
 
 # `agentdev-command-creator` Design
 
@@ -51,3 +52,11 @@ updated: 2026-07-18
 - [agentdev-command-authoring.md](agentdev-command-authoring.md)
 - [agentdev-skill-authoring.md](agentdev-skill-authoring.md)
 
+
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: 0 件
+- **deterministic 委譲先**: なし
+- **知識提供**: command 作成手順

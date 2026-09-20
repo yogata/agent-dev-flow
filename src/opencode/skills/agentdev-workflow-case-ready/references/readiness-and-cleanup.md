@@ -34,7 +34,7 @@ Definition 変更が docs 文言を期待するテスト（リポジトリ固有
 
 - **対象**: docs 文書の見出し・表構造・特定文言を期待するリポジトリ固有テスト、checker の fixture 期待値、docs 文書を直接読み取って期待値を組み立てる検査実装等。配布物テキストを固定文字列で期待するテストを含む
 - **確認方法**: Definition 変更（canonical Definition との差分）で変化する docs 文書の見出し・文言・構造を抽出し、それらを期待するテスト・fixture の有無を検索する
-- **対応境界**: 影響を確認した場合の対応要否は definition-readiness Design「Definition Package」構成の境界に従う。テスト更新は Definition Package の構成要素ではなく実現面の変更であり、realization_actions 経由で case-run へ割り当てる。本品質検査は影響の有無判定と、確認結果の test_strategy（受入条件一式）への反映までを行う。テスト本体を本検査で修正しない
+- **対応境界**: 影響を確認した場合の対応要否は case-open / case-ready Design の Definition Package 構成の境界に従う。テスト更新は Definition Package の構成要素ではなく実現面の変更であり、realization_actions 経由で case-run へ割り当てる。本品質検査は影響の有無判定と、確認結果の test_strategy（受入条件一式）への反映までを行う。テスト本体を本検査で修正しない
 - **記録**: 影響の有無の判定と根拠を完了報告へ含める（影響ありと判定した場合は、影響を受けるテスト・fixture の一覧と test_strategy への反映内容を含める）
 
 ### ready 遷移
@@ -65,7 +65,7 @@ Definition 変更が docs 文言を期待するテスト（リポジトリ固有
 - 既存 Wave / 依存構造を再利用し、重複確定しない
 - Decision の受理記録（accepted 遷移済み）を再利用し、重複する状態遷移や承認記録を生成しない
 - execution contract 確定済みの Root Case 本文は現行値を検証し、差分がある場合のみ更新する
-- 冪等キーの具体形は `<workflows/definition-readiness>` Design の冪等キー節を参照する
+- 冪等キーの具体形は case-open / case-ready Design の冪等性節を参照する
 
 ### GitHub I/O 失敗時の gh CLI 切替継続手順（冪等再実行の再利用検出）
 

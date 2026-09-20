@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-close
-description: "case-close command の workflow 実装本体。PR マージ（squash merge 先 main、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase）、同期時のリスク事前検出、QG-4 最終完了判定ゲート、docs 検証・Design 確定、Capture 回収（PR 本文→intake/learning 分離）、Epic Wave クローズを所有する。USE FOR: case-close 実行時の workflow 制御（単一 Issue クローズ・Epic Wave クローズ・PR マージ・QG-4・Design 確定・Capture 回収）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "内部 lifecycle 段階 case-close の workflow 実装本体。PR マージ（squash merge 先 main、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase）、同期時のリスク事前検出、QG-4 最終完了判定ゲート、docs 検証・Design 確定、Capture 回収（PR 本文→intake/learning 分離）、Epic Wave クローズを所有する。USE FOR: case-close 実行時の workflow 制御（単一 Issue クローズ・Epic Wave クローズ・PR マージ・QG-4・Design 確定・Capture 回収）。DO NOT USE FOR: 単独起動（case-auto の内部 lifecycle orchestration から起動される内部段階である）。"
 ---
 
 
@@ -35,7 +35,7 @@ case-close command は公開 interface（入出力契約・ガードレール）
 
 case-close workflow は次の STEP で構成する。
 Epic Wave クローズは STEP-1 のルーティングで分岐し、E1〜E6 として並列記述する。
-各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
+各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<foundations/v4-durable-state-and-recovery>.md`）。
 会話コンテキストに依存せず、永続状態（GitHub Issue/PR、`.agentdev/`、commit hash、Design status）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
@@ -103,7 +103,7 @@ case-run 側の事前検査とは独立に実施する。検証手段との対�
 - **検証対応の3完全性ゲート（完了阻止面）**: 対象要件行の Design 対応、implementation 対応、および policy が required と判定する要件行の verification 対応のいずれかに欠落が残る場合、当該 Case を完了として扱わない。導出は `agentdev-traceability` の check（`--req` で対象要件行に限定）で機械的に行い、`missing-design` / `missing-implementation` / `missing-verification` の findings を該当行の完了阻止条件として扱う。check が正常に完全性を判定できなかった場合（check 実行不能、検査対象の取得不能等）は対応完全性の合格として扱わず、検査不能の旨を報告してマージに進まない（fail-closed）
 - **policy optional 行の保護**: verification 対応の完全性判定は、project-level verification policy が required と判定する要件行のみを計上する。policy の正規情報源は `traceability/policy.yaml`（既定 required、optional な要件行のみ明示、未指定の要件行は required）であり、policy が optional と明示した要件行の verification 対応欠落は完全性違反に含めない
 - **worktree root 起点の完全性判定時の取扱い**: traceability check を worktree root 起点で実行して検出対象の完全性が確定できない場合、main 側 root で check を再実行し、トレーサビリティポリシー登録 commit の時系列（ブランチ分岐の前後）を確認してから完了阻止を判断する。durable state 上で解消済みの対象行を本変更起因の失敗と誤判定しない。再実行は読取系 check の実行のみで行う
-- QG-4 の対応完全性検査は有効である。全現行要件行の Design 対応と implementation 対応、および policy が required と判定する要件行の verification 対応が成立し、check の未解決不合格が0件であることを移行完了条件とする。verification 対応の完全性判定は policy が required と判定する要件行のみを計上する
+- QG-4 の対応完全性検査は有効である。対応完全性は2層で解釈する（正本: v4-traceability-model Design「completeness の 2 層」節）。lifecycle gate 完全性は対象要件行に scope を限定して判定し、対象要件行の Design 対応と implementation 対応、および policy が required と判定する要件行の verification 対応の欠落と、対象要件行に限定した check（`--req`）の未解決不合格を完了阻止条件とする（fail-closed）。全現行要件行を対象とする corpus 完全性の計数（missing 系の件数）は到達目標状態の診断指標として数値追跡し、lifecycle gate の判定と完了条件には使用しない（advisory・fail-open）。verification 対応の完全性判定は policy が required と判定する要件行のみを計上する
 - agentdev-traceability の不在、実行失敗、空結果、候補過多のみを理由に本 workflow を失敗させない（fail-open）。代替検証経路（既存の品質ゲート、targeted docs guard、`rg` 等の独立探索）で継続し、正規成果物そのものの異常とトレーサビリティ機能側の異常を区別する
 - 正規成果物側の実不整合が確認された場合は、既存の品質ゲート、受け入れ条件に従って fail とする
 
@@ -120,7 +120,7 @@ case-run 側の事前検査とは独立に実施する。検証手段との対�
 ## See Also
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
+- **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
 - **case-close command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

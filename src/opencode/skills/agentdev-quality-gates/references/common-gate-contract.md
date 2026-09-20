@@ -86,6 +86,32 @@ Gate が成果物と要件の対応関係（coverage、impact、check）を参�
 - Design 対応と implementation 対応は全要件行で必須、verification 対応の要否は検証スコープポリシー（project の `traceability/policy.yaml`）が決定する
 - 対応関係の参照・検査の実行手順と検査結果の解釈は `agentdev-traceability` スキルを参照する
 
+## 5 概念への写像
+
+本契約の判定結果・証拠・Gate は ADF v4 Quality モデル（v4-quality-gate-model Design）の 5 概念（Quality Policy / Verification Obligation / Verifier / Evidence / Gate）へ次のように写像する。
+
+### verdict と Gate predicate の写像
+
+Verifier の verdict は `pass`/ `warn`/ `fail`/ `partial` の 4 値であり（「判定結果」節）、Gate predicate への写像は次のとおり。
+
+| verdict | Gate predicate への写像 |
+|---------|------------------------|
+| `pass` | 遷移可 |
+| `warn` | 遷移可（対応記録コメントへの記録を条件とする） |
+| `fail` | 遷移不可 |
+| `partial` | 判定保留として遷移不可（残余 Obligation の解消後に再判定が必要） |
+
+QG-4 は `partial` を不可として扱い、再判定は当該 close 内で完了させる。
+QG-1〜QG-4 は lifecycle 級 semantic Gate であり、遷移に直接接続せず、v4-lifecycle-state-machine の deterministic gate predicate 接続点（唯一の接続点）を経由して遷移を制御する。
+正規定義は v4-quality-gate-model Design「判定値と遷移接続」節を参照する。
+
+### 証拠 3 分類と Verifier 分類の直交
+
+「証拠の種類」節の証拠 3 分類（機械的/ 構造的/ 推論）は Evidence の属性であり、Verifier 分類（deterministic/ semantic）とは直交する。
+構造的証拠はいずれの Verifier からも生成され得る。
+二つの分類を 1:1 対応として扱わない。
+正規定義は v4-quality-gate-model Design「証拠種別と Verifier 分類の直交」節を参照する。
+
 ## See Also
 
 - [qg-1-definition-integrity.md](qg-1-definition-integrity.md)

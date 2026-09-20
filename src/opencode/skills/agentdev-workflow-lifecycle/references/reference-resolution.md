@@ -1,7 +1,7 @@
 # 参照先解決ポリシー（source / projection 目的判別）
 
 AgentDevFlow の配布物参照で、正規原本（source）と実行時投影（projection）のどちらを確認対象とするかを実行目的に基づいて判別するポリシー。
-原本仕様は `<workflows/workflow-contracts>` Design「工程間構造化文脈引き継ぎ契約」（解決済み参照先の正規参照先渡し）と、source / projection 責務境界を定める Decision である。
+原本仕様は `<workflows/v4-lifecycle-state-machine>` Design（解決済み参照先の正規参照先渡し）と、source / projection 責務境界を定める Decision である。
 本参照は配布物への適用形を定める。
 
 ## 目的
@@ -65,7 +65,7 @@ projection  = .opencode/       （実行時投影）
 
 ## 参照
 
-- `<workflows/workflow-contracts>` Design「工程間構造化文脈引き継ぎ契約」（解決済み参照先の正規参照先渡し）
+- `<workflows/v4-lifecycle-state-machine>` Design（解決済み参照先の正規参照先渡し）
 - 「OpenCode ソース・プロジェクション分離」を定める Decision（source / projection 責務境界の原本）
 - `structured-stage-handoff.md`（工程間の直列化形式の所有者）
 - `agentdev-case-run-execution-adapter` スキルの委譲プロンプト雛形（委譲時の直列化形式の所有者）

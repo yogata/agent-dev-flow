@@ -33,7 +33,7 @@ case-run は実行担当サブエージェントを委譲起動する。
 - 委譲プロンプト: 実行 command を prompt 内で指定し Issue #N の実装を指示する（command の具体名は AGENTS.md 参照）。実行 command は Issue を success criteria に分解、各 criterion に observable evidence を要求、品質ゲート（code review + QA review + gate review）を実行する
 - 委譲プロンプト（worktree 指定）: 実行 command 指定以降に worktree root とブランチ名を含める（後述「委譲プロンプト構築例」参照）
 
-複数の実行担当サブエージェントを並列委譲する場合（Epic Wave 並列委譲、case-auto orchestration stage 3）、起動バーストによる実行基盤・モデル provider への瞬間的なリクエスト集中を抑えるため、委譲起動ごとに10秒の起動間隔を置く（epic-wave-model Design「並列起動の間隔」）。
+複数の実行担当サブエージェントを並列委譲する場合（Epic Wave 並列委譲、case-auto orchestration stage 3）、起動バーストによる実行基盤・モデル provider への瞬間的なリクエスト集中を抑えるため、委譲起動ごとに10秒の起動間隔を置く（v4-runtime-execution-model Design「runtime 制御ループ」節〔起動間隔・並列数制御〕）。
 最初の1件を起動した後、以降の各委譲起動の前に待機コマンド（例: `bash: sleep 10`）を実行してから発行する。
 同一のTool呼び出し一括ブロックで複数の委譲起動を発行しない（1ブロック1委譲起動）。
 
@@ -144,7 +144,7 @@ plan_change: なし（委譲中に計画変更が生じた場合は result に�
 ## 委譲識別情報ブロック
 
 委譲 prompt には `<delegation-ident>` ブロックとして委譲識別情報を記録する。
-記録先割当は workflow-contracts Design「ADF 実行識別情報の記録契約」に従い、委譲 prompt が委譲単位識別子の記録先となる。
+記録先割当は v4-durable-state-and-recovery Design「ADF 実行識別情報の記録契約」節に従い、委譲 prompt が委譲単位識別子の記録先となる。
 
 | key | 意味 |
 |---|---|
@@ -159,7 +159,7 @@ plan_change: なし（委譲中に計画変更が生じた場合は result に�
 ## 構造化文脈の直列化（委譲時）
 
 委譲 prompt は、委譲時最小契約（入力（inputs）、副作用境界（side_effect_boundary）、出力契約（output_contract）、capture 引継ぎ（capture_handoff））の骨格を変更せず、入力（inputs）内に構造化文脈を直列化する。
-原本仕様は `<workflows/delegation-contracts>` Design「構造化文脈引き継ぎ（委譲時）の直列化契約」であり、本節は配布物への適用形を定める。
+原本仕様は `<workflows/v4-delegation-contracts>` Design「構造化文脈引き継ぎ（委譲時）の直列化契約」であり、本節は配布物への適用形を定める。
 
 構造化文脈は次の意味を扱う。
 
@@ -212,7 +212,7 @@ inputs:
 ### structured_context の SSoT 抽出と突合検査
 
 structured_context の生成（委譲 prompt 構築）は、次の抽出制約と突合検査に従う。
-原本仕様は `<workflows/delegation-contracts>` Design「structured_context の SSoT 抽出制約」である。
+原本仕様は `<workflows/v4-delegation-contracts>` Design「structured_context の SSoT 抽出制約」である。
 
 - structured_context の作業内容・purpose は、委譲先 Issue 本文の概要または正規 REQ から抽出する。親セッションの会話コンテキスト由来の推定・波及解釈を注入しない。
 - 委譲 prompt 生成時に、委譲先 Issue 番号と structured_context に含める対象成果物パス（Issue 本文の Execution Contract が示す変更対象成果物）の一致を検査する。不一致の場合は委譲を開始しない。

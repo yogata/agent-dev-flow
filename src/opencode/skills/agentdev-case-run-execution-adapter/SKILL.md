@@ -189,14 +189,14 @@ AgentDevFlow の永続状態は既存の draft/ Issue/ PR/ REQ/ Decision/ Design
 
 ### 委譲コンテキストと Input Resolution
 
-委譲起動時に case-run から引き渡される worktree root、ブランチ名、Issue 番号、実行 command 指定は、永続状態の優先順位（`<workflows/input-resolution-and-durable-state>` Design）に従い、case-run `execute` STEP の入力解決（Input Resolution）で解決された入力である。
+委譲起動時に case-run から引き渡される worktree root、ブランチ名、Issue 番号、実行 command 指定は、永続状態の優先順位（`<foundations/v4-durable-state-and-recovery>` Design）に従い、case-run `execute` STEP の入力解決（Input Resolution）で解決された入力である。
 実行担当サブエージェントは委譲内で Issue 本文、REQ/Decision/Design を SSoT 再構成（最上位優先）で再取得・再検証し、自然言語の前STEP result のみに依存しない。
 
 ### 委譲内シーケンスと result 接合
 
 実行担当サブエージェントの責務（Issue 読込、context 再確認、実装・検証・PR 作成、blocker 処理、result 返却）は adapter 委譲内の内部シーケンスであり、case-run 側からは result 4状態（`completed-pr` / `blocked` / `failed` / `delegation-unavailable`）のみで観測される。
 内部シーケンスの STEP 遷移を case-run workflow の STEP model へ投影せず、PR URL（成功時）または Issue コメント（blocked/failed時）を SSoT として扱う。
-STEP reference 8 要素は `<workflows/step-reference-contract>` Design 参照。
+STEP reference 8 要素は `<foundations/v4-durable-state-and-recovery>` Design 参照。
 
 ## 委譲抽象IF
 
@@ -246,12 +246,12 @@ STEP reference 8 要素は `<workflows/step-reference-contract>` Design 参照�
 | accepted finding 反映 | REQ-{NNNN}-{NNN} | accepted finding の実装方針への反映は adapter 委譲内の実行担当サブエージェント責務 |
 | 再 review 条件 | REQ-{NNNN}-{NNN} | 意味内容変更時のみ再発動可能、同一 finding 再起票禁止（正は adversarial-review Design） |
 | 呼出失敗時の扱い | REQ-{NNNN}-{NNN} | silent skip 禁止、従来フロー維持（正は adversarial-review Design） |
-| 副作用境界 | REQ-{NNNN}-{NNN}/{NNN} | `semantic_review`（書き込み禁止型）、新規 artifact 非生成（正は adversarial-review Design、delegation-contracts Design） |
+| 副作用境界 | REQ-{NNNN}-{NNN}/{NNN} | `semantic_review`（書き込み禁止型）、新規 artifact 非生成（正は adversarial-review Design、v4-delegation-contracts Design） |
 
 ## See Also
 
 - **agentdev-workflow-orchestration**: サブエージェントプロトコル、capture 境界
 - **agentdev-workflow-templates**: PR 本文、コメント SSoT のテンプレート構造
-- **Design `delegation-contracts.md`**: 委譲契約横断 Design、case 実行責務の 4 用語
+- **Design `v4-delegation-contracts.md`**: 委譲契約横断 Design、case 実行責務の 4 用語
 - **Design `responsibility-boundary-purification.md`**: case 実行責務の 4 用語と所有者 SSoT
 - **references/harness-delegation.md**: 委譲起動、category 設計、異常終了回復の具象実装ノート

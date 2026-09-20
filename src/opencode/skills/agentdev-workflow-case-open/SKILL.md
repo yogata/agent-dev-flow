@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-open
-description: "case-open command の workflow 実装本体。合意済み要件doc からの Root Case 確立、Definition Package 生成と Root Case 関連付け、実変更判定と Definition PR 作成（実変更時のみ、Case 単位 1 件）、冪等再実行（既存 Root Case / 既存 Definition PR の再利用、不足分のみ処理）、STEP-5 横断依存検査（draft の artifact_actions と未クローズ Case 群の機械的比較、同一パス重複時の警告提示）、deviation capture（Split Rule 分類）を所有する。USE FOR: case-open 実行時の workflow 制御（Root Case 確立・Definition Package 生成・実変更判定と Definition PR 作成・冪等再実行・横断依存検査・deviation capture）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）、execution contract 確定・Standard / Epic 最終確定・Child Issue / Wave 作成・RU 削除・proposed Decision 受理評価（case-ready 側の責務）。"
+description: "内部 lifecycle 段階 case-open の workflow 実装本体。合意済み要件doc からの Root Case 確立、Definition Package 生成と Root Case 関連付け、実変更判定と Definition PR 作成（実変更時のみ、Case 単位 1 件）、冪等再実行（既存 Root Case / 既存 Definition PR の再利用、不足分のみ処理）、STEP-5 横断依存検査（draft の artifact_actions と未クローズ Case 群の機械的比較、同一パス重複時の警告提示）、deviation capture（Split Rule 分類）を所有する。USE FOR: case-open 実行時の workflow 制御（Root Case 確立・Definition Package 生成・実変更判定と Definition PR 作成・冪等再実行・横断依存検査・deviation capture）。DO NOT USE FOR: 単独起動（case-auto の内部 lifecycle orchestration から起動される内部段階である）、execution contract 確定・Standard / Epic 最終確定・Child Issue / Wave 作成・RU 削除・proposed Decision 受理評価（case-ready 側の責務）。"
 ---
 
 
@@ -19,7 +19,7 @@ case-open command は公開 interface（入出力契約・ガードレール）�
 ## 出力
 
 - Root Case GitHub Issue。ラベル付き、対象 REQ 番号埋め込み、状態 open
-- Definition Package（要件doc から生成し Root Case に関連付ける。構成は definition-readiness Design。）
+- Definition Package（要件doc から生成し Root Case に関連付ける。構成は case-open / case-ready Design。）
 - Definition PR（canonical Definition に実変更がある場合のみ。Case 単位で 1 件。）
 - 完了報告（Root Case テンプレート）
 
@@ -33,7 +33,7 @@ case-open command は公開 interface（入出力契約・ガードレール）�
 ## 制御平面（STEP 一覧）
 
 case-open workflow は次の6 STEP で構成する。
-各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`<workflows/step-reference-contract>` Design）。
+各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`<foundations/v4-durable-state-and-recovery>` Design）。
 会話コンテキストに依存せず、永続状態（draft-data、Root Case Issue、Definition PR）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
@@ -55,7 +55,7 @@ case-open workflow は次の6 STEP で構成する。
 ### 再開プロトコル（resume protocol）
 
 - 再開点は永続状態から再構成する: draft-data（`status`、`auto_gate`）、Root Case Issue の存在と状態、Definition PR の存在と状態、capture 成果物
-- 再実行時は冪等キー（definition-readiness Design）で既存 Root Case / 既存 Definition PR を検出し、会話コンテキストの記憶に依存せず再利用する
+- 再実行時は冪等キー（case-open / case-ready Design）で既存 Root Case / 既存 Definition PR を検出し、会話コンテキストの記憶に依存せず再利用する
 
 ### 終了条件（termination）
 
@@ -88,7 +88,7 @@ case-open は、上流工程（req-define）で確定した対象要件を実行
 
 - **draft-data 入力**: 本スキルは構造化 `draft-data` を入力として読み取る。機能要件、非機能要件、制約、対象外、受け入れ条件は新規に作成せず合意済み入力を反映する。`conflict_resolutions` に記録済みの衝突は再確認しない
 - **Root Case 状態**: Root Case 確立後の状態は open とし、実装開始を許可しない。ready への遷移は case-ready が実行する
-- **Definition PR**: canonical Definition に実変更がある場合のみ、Case 単位で 1 件の Definition PR を作成する。実変更判定不能時は作成せず停止する。冪等キーは definition-readiness Design に従う
+- **Definition PR**: canonical Definition に実変更がある場合のみ、Case 単位で 1 件の Definition PR を作成する。実変更判定不能時は作成せず停止する。冪等キーは case-open / case-ready Design に従う
 - **トレーサビリティポリシー追随確認**: REQ 行追加を伴う Definition Package 生成時は、トレーサビリティポリシー（検証対応を任意とする要件行の明示登録）更新の追随要否を工程上明示し、必要な policy エントリ追加を Definition Package の構成要素として含める。policy 編集は当該要件行の変更と同一の Definition 変更として扱い、Definition PR 経由以外の適用経路を取らない（対象要件行、STEP-3）
 - **Decision 非遷移**: 新規 Decision は proposed のままとし、accepted への状態遷移を実行しない
 - **横断依存検査の警告非阻止**: STEP-5 の横断依存検査は警告の提示のみを行い、Root Case の確立を自動阻止しない。検出源の取得不能時は比較を省略せず検出不能として報告する。警告時の判断は投入者（HITL）への選択肢提示により行い、case-auto 配下では decision_context による親判断解決へ委譲する
@@ -98,8 +98,8 @@ case-open は、上流工程（req-define）で確定した対象要件を実行
 ## See Also
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
-- **`<workflows/definition-readiness>` Design**: Definition Package 構成、Definition PR lifecycle、冪等キー
+- **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
+- **case-open / case-ready Design**: Definition Package 構成、Definition PR lifecycle、冪等キー
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
 - **case-open command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

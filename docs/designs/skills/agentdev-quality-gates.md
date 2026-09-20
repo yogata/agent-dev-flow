@@ -2,7 +2,7 @@
 title: `agentdev-quality-gates` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-11
+updated: 2026-09-19
 ---
 <!-- ADF-COVERS(implementation): REQ-007-001, REQ-007-003, REQ-007-004, REQ-007-005 -->
 <!-- ADF-COVERS(implementation): REQ-057-004 -->
@@ -115,7 +115,14 @@ QG-4 final acceptance の変更ファイル突合検証における I/O 操作�
 
 ## See Also
 
-- [quality-gates.md](../quality/quality-gates.md)（Design 定義）
+- [v4-quality-gate-model.md](../quality/v4-quality-gate-model.md)（Design 定義）
 - [commands/req-define.md](../commands/req-define.md), [commands/case-ready.md](../commands/case-ready.md), [commands/case-revise.md](../commands/case-revise.md), [commands/case-open.md](../commands/case-open.md), [commands/case-run.md](../commands/case-run.md), [commands/case-close.md](../commands/case-close.md)（適用先）
 - REQ-001（REQ/Design 責務分離の徹底）
 
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: 0 件
+- **deterministic 委譲先**: なし（判定実行は各工程の検証資産）
+- **知識提供**: QG 定義・受入基準

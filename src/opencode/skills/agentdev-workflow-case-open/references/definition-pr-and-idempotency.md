@@ -24,13 +24,13 @@ canonical Definition との実変更を判定し、実変更がある場合の�
 
 ### STEP-4: 実変更判定と Definition PR 作成
 
-1. 実変更判定: Definition Package と canonical Definition を比較する（definition-readiness Design「canonical Definition の判定」）。差分が空の場合は実変更なし → PR を作成せず STEP-5 へ進む。実変更のない Case（bugfix / maintenance / docs_chore 等では作成しない）
+1. 実変更判定: Definition Package と canonical Definition を比較する（case-open / case-ready Design）。差分が空の場合は実変更なし → PR を作成せず STEP-5 へ進む。実変更のない Case（bugfix / maintenance / docs_chore 等では作成しない）
 2. 実変更がある場合: 実変更を Case 単位で 1 件の Definition PR として集約し作成する。1 Case につき 2 件以上作成しない
 3. PR 作成は `agentdev_gh` の pr_create で行い、GitHub Draft PR ではない通常 Pull Request として作成する（draft 指定は公開契約に存在しない。REQ-{NNNN}-{NNN}）。PR 本文は verbatim で記録する
 
 ### STEP-5: 冪等再実行確認
 
-1. 冪等キー（definition-readiness Design「冪等キー」）で既存成果物を検出する: 既存 Root Case、既存 Definition PR
+1. 冪等キー（case-open / case-ready Design）で既存成果物を検出する: 既存 Root Case、既存 Definition PR
 2. 検出した成果物を再利用し、重複生成しない。Root Case の重複は STEP-2 で、Definition PR の重複は STEP-4 で排除する
 3. 不足分だけを処理する: Root Case が存在し Definition PR が存在しない場合は STEP-4 の手順で PR のみ作成する。Root Case が存在しない場合は STEP-2 から実行する。両者とも存在する場合は新規生成を行わない
 4. 重複生成がないことを確認し、結果を記録する
@@ -59,7 +59,7 @@ canonical Definition との実変更を判定し、実変更がある場合の�
 - **警告時の挙動**: エラーではなく警告とし、投入者（HITL）へ (1) 先行整備 Case の切り出し提案、(2) 既存 Case への登録責務の割り当て、(3) このまま並行投入、の選択肢を提示する。整備 Case を自動作成せず、マージ順序を自動決定しない。case-auto 配下では警告検出時の判断を decision_context による親判断解決へ委譲する
 - **警告のみでの阻止禁止**: 警告のみで Root Case の確立を自動阻止しない。警告の提示記録を完了報告へ含める
 - **検出源取得不能時**: 未クローズ Case 群の取得に失敗した場合は比較を省略せず、検出不能として報告する（検査入力の `source_failures` に失敗を記録し、報告の `detection_unavailable` に出力する）
-- **Epic 経路の委譲境界**: draft の構成ヒント（`case_open_hints`）が Epic 構成を示す投入では、同一投入内（Epic 配下 Wave 内）の重複検出は Wave 重複前置検出（Epic/Wave 実行モデル Design の前置検出契約）へ委譲し二重検査としない。Epic をまたぐ Case 間の重複は本検査が検出対象とする
+- **Epic 経路の委譲境界**: draft の構成ヒント（`case_open_hints`）が Epic 構成を示す投入では、同一投入内（Epic 配下 Wave 内）の重複検出は Wave 重複前置検出（case-ready Design「v3 epic-wave-model Design からの吸収」節の前置検出契約）へ委譲し二重検査としない。Epic をまたぐ Case 間の重複は本検査が検出対象とする
 - **冪等再実行時の再提示**: 再実行時も本検査を再実行し、警告を再提示する（エンジンは同一入力から同一の報告を返す）
 
 ## Result

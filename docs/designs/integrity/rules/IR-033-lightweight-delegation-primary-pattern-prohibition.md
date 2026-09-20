@@ -2,7 +2,7 @@
 title: "IR-033: lightweight-delegation primary pattern 禁止"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: "2026-09-19"
 ---
 
 # IR-033: lightweight-delegation primary pattern 禁止
@@ -16,7 +16,7 @@ updated: 2026-08-20
 | detection_method | `lightweight-delegation` 周辺文脈を検出し、primary pattern 宣言、frontmatter pattern、実装分類としての扱いがないことを確認 |
 | affected_artifacts | [commands, Design, skills] |
 | related_req | [REQ-003-015, REQ-003-016] |
-| related_design | [workflow-contracts.md, artifact-contracts.md] |
+| related_design | [v4-responsibility-boundaries.md, artifact-contracts.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 中。`primary pattern ではない` という否定表現と検出用文字列は許容 |
 | regression_test | (未実装) |

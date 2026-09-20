@@ -165,10 +165,10 @@ REQ間の関連（置き換え、関連、分割元/分割先）もREQ本文内�
 
 本スキルが操作する REQ ファイル（`docs/requirements/REQ-{NNNN}.md`）は永続状態の最上位（SSoT 再構成）に位置する。
 REQ-ID（`REQ-{NNNN}`）は identifier 保持として安定 ID として扱う。
-優先順位の詳細は `<workflows/input-resolution-and-durable-state>` Design 参照。
+優先順位の詳細は `<foundations/v4-durable-state-and-recovery>` Design 参照。
 
 呼出元 STEP は本スキルの操作結果（REQ ファイル更新、要件行 ID 採番結果）を STEP の result evidence として扱い、次 STEP の Input Resolution で SSoT 再構成または identifier 保持から再取得できる。
-STEP reference 8 要素は `<workflows/step-reference-contract>` Design 参照。
+STEP reference 8 要素は `<foundations/v4-durable-state-and-recovery>` Design 参照。
 
 ## See Also
 

@@ -59,7 +59,7 @@ AgentDevFlow で使う用語の定義。
 | 用語 | 定義 |
 |------|------|
 | work_type | Issue の作業分類（bugfix / feature / maintenance / docs_chore）。参考情報であり、工程分岐は入力状態と `artifact_actions` を case-ready に渡して判定する |
-| 実装分類（Implementation Pattern） | コマンド内部構造の分類軸（wall-session=対話セッション型 / file-pipeline=ファイル変換パイプライン型 / manager-orchestrator=状態機械統制型 / capture-only=データ収集型 / read-only-diagnostic=検査対象を直接修正しない診断型）。work_type とは別概念（workflow-contracts.md） |
+| 実装分類（Implementation Pattern） | コマンド内部構造の分類軸（wall-session=対話セッション型 / file-pipeline=ファイル変換パイプライン型 / manager-orchestrator=状態機械統制型 / capture-only=データ収集型 / read-only-diagnostic=検査対象を直接修正しない診断型）。work_type とは別概念（v4-lifecycle-state-machine.md） |
 | SSoT（Single Source of Truth / 唯一の情報源） | 各フェーズでの信頼できる唯一の情報源 |
 | HITL（Human-in-the-loop / 人の判断を挟む） | ユーザーの確認を挟む判断ポイント |
 | マクロフェーズ | 壁打ち、構造的実行、レビュー完了の3段階 |
@@ -70,10 +70,10 @@ AgentDevFlow で使う用語の定義。
 
 | 用語 | 定義 |
 |------|------|
-| Epic | 大規模 Issue を複数の子 Issue に分割した親 Issue |
-| Wave | Epic 統率者（Orchestrator）が子 Issue を並列実行する単位 |
+| Epic | 複数 execution unit の協調管理が必要な変更。Epic Issue が実行順序の SSoT となる（v4-standard-lifecycle.md、REQ-035） |
+| Wave | Epic 内の依存関係と並列実行可能性を表す実行スケジューリング単位。Epic Issue 本文から読み取る内部構造である（REQ-035-006） |
 | Epic 自動クローズ | 全子 Issue 完了時に親 Epic を自動的にクローズする仕組み |
-| ステータス追跡テーブル | Epic 本文内の子 Issue 進捗管理表（未着手/進行中/完了/対処不要/スキップ）。⏭スキップは前提条件未達等で Epic 統率者が設定する終了状態 |
+| ステータス追跡テーブル | Epic 本文内の子 Issue 進捗管理表（未着手/進行中/完了/対処不要/スキップ）。⏭スキップは実行状態ライフサイクルの終了状態ではなく、前提条件未達等で Epic 統率者が実行前に設定する追跡テーブル上の値である（REQ-035-004） |
 
 ## ツール、スキル
 
@@ -99,4 +99,4 @@ GitHub Issue/PR を使わない個人利用環境向けの AgentDevFlow 利用�
 | `src/opencode-local/` | ローカル版 link 先原本領域。AgentDevFlow 本体リポジトリに配置され、`README.md` と `agentdev-gh/` のみを保持する。IR-047 でディレクトリ構成を検証 |
 | link mode | ローカル版導入方式。`.opencode/` 配下を src 配下へ接続し、原本をそのまま利用する。`agentdev-gh` だけを `src/opencode-local/agentdev-gh/` から差し替える |
 | link target 確認 | ローカル版 link 設定前に `.opencode/` 配下の各 path が意図した link target へ解決されることを確認する安全機構。意図した target 以外へ解決される場合は link 設定を停止する |
-| Local backend | ローカル版 OpenCode のバックエンド区分。GitHub backend（GitHub Issue/PR を使う通常運用）との差分として Design `workflow-contracts.md` で定義される。SSoT は GitHub Issue/PR ではなくローカルIssue（`.agentdev/issues/issue-{NNNN}.md`）となる |
+| Local backend | ローカル版 OpenCode のバックエンド区分。GitHub backend（GitHub Issue/PR を使う通常運用）との差分として Design `v4-lifecycle-state-machine.md` で定義される。SSoT は GitHub Issue/PR ではなくローカルIssue（`.agentdev/issues/issue-{NNNN}.md`）となる |

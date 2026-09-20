@@ -180,36 +180,7 @@ change_nature が `new_user_requirement` または `external_contract_change` �
 サブエージェント委譲は、Command の詳細手順を増やさず、探索、検査、分類、候補抽出を独立した文脈へ分離するために使用する。
 親エージェントは最終判断と副作用を保持し、サブエージェントは判断材料だけを返す（v2:ADR-0112, REQ-003）。
 
-### 委譲時最小契約
-
-委譲定義は以下の 4 要素を中心に記述する。
-
-| 要素 | 説明 |
-|---|---|
-| `inputs` | 委譲先に渡す限定された入力範囲。対象ファイル、Issue/PR、ログ、参照基準、除外対象を含む |
-| `side_effect_boundary`（副作用境界） | 委譲先の副作用境界。許可操作は `read_files`（ファイル読み取り）/ `inspect_content`（内容検査）/ `return_evidence`（根拠返却）等に限定し、保存、Issue/PR 更新、commit、push、ユーザー確認は禁止。包括値 `read_only` は使用しない（v2:REQ-0140-011） |
-| `output_contract`（出力契約） | 返却形式。`pass` / `warn` / `fail` / `partial` を基本とし、要約、根拠、成果物パス、親判断事項、副作用なしの明示を含む |
-| `capture_handoff`（キャプチャ引き継ぎ） | intake / learning 候補を保存せず、capture 候補として親エージェントへ返す形式 |
-
-成果物本文（Issue 本文、PR 本文、commit message、保存対象ファイル本文、テンプレート成果物）はそのまま（verbatim）返す。
-判定結果、調査過程、中間ログ、読解メモは要約、成果物パス、根拠、親判断事項、capture 候補へ圧縮して返す。
-
-### delegation_type 参考分類
-
-`delegation_type`（委譲種別）は必須の envelope ではない。
-必要な場合のみ、委譲の意図を短く示す参考ラベルとして使用する。
-
-| delegation_type | 用途 | 副作用 |
-|---|---|---|
-| `gate_check`（ゲート検査） | 完了判定、ガードレール充足確認、保存前/close 前検査 | 禁止 |
-| `semantic_review`（意味レビュー） | 文書、差分、REQ/Decision/Design の意味レビュー | 禁止 |
-| `log_analysis`（ログ解析） | テストログ、CI ログ、review 結果解析 | 禁止 |
-| `classification`（分類） | アーティファクト / 検出事項 / intake / learning の分類 | 禁止 |
-| `extraction`（抽出） | 候補、論点、未回収事項の抽出 | 禁止 |
-| `draft_generation`（草案生成） | Issue 本文、PR 本文、レポート案などの草案生成 | 禁止 |
-| `controlled_case_execution`（統御下ケース実行） | case-run Epic / 複数 Issue 実行 | case-run のみ条件付きで許可 |
-
-Command 本文では分類ラベルより、実際の `inputs`、`side_effect_boundary`、`output_contract`、`capture_handoff` を優先する。
+委譲時最小契約（inputs、side_effect_boundary、output_contract、capture_handoff）、delegation_type 8 種、委譲制約、実行主体分類表、adversarial-review 接続、構造化文脈直列化契約の正本は [workflows/v4-delegation-contracts.md](../workflows/v4-delegation-contracts.md) が所有する。本 Design は配布成果物種別の入出力・依存方向の参照導線に留まり、委譲契約の詳細を再掲しない。
 
 ## テンプレート配置契約
 

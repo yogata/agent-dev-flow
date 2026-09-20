@@ -58,3 +58,11 @@ inspect-docs コマンドの REQ 構造診断ロジックの知識ベースと�
 - [commands/inspect-docs.md](../commands/inspect-docs.md)
 - REQ-036（inspect-docs / REQ 再構成運用）
 - REQ-001（Design 分離基準違反検出強化）
+
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: semantic classification（6 観点診断）
+- **deterministic 委譲先**: REQ 参照整合は検査 script（artifact-validation・repo-local）へ委譲
+- **知識提供**: 第一参照導線・世代境界・観点定義

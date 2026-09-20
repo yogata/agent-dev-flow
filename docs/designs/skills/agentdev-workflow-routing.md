@@ -4,6 +4,7 @@ status: accepted
 created: 2026-06-21
 updated: 2026-07-18
 ---
+<!-- ADF-COVERS(implementation): REQ-034-021 -->
 
 # `agentdev-workflow-routing` Design
 
@@ -56,3 +57,10 @@ updated: 2026-07-18
 - [commands/case-revise.md](../commands/case-revise.md)
 - REQ-031（case-run 実行契約）
 
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: semantic classification（拒否タイプ分類）
+- **deterministic 委譲先**: なし
+- **知識提供**: 次コマンド推論ルール

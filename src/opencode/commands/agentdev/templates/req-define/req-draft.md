@@ -17,10 +17,10 @@ source_rus: # optional: RU-* IDs that seeded this draft
 
 ```yaml
 # work_type: 要件の分類（bugfix / feature / maintenance / docs_chore）
-# workflow_route の派生値は保存せず、work_type + scale から各コマンドが導出する
+# workflow_route の派生値は保存せず、Definition 構成（artifact_actions の有無等）から各コマンドが導出する
 work_type: feature
 
-# scale: feature のみ standard / large。それ以外は未設定でよい
+# scale: standard / large（全 work_type で設定可。未設定の場合は standard 準拠）
 scale: standard
 
 # summary: 当該 draft が何を合意したかの1段落要約。人間可読補助（処理の正ではない）
@@ -91,7 +91,7 @@ operation_units:
     target_req: REQ-{NNNN}      # REQ 操作の対象 REQ
     target_design: # optional: Design 操作の対象 Design パス（例: docs/designs/{domain}/<existing-design>.md、新規は target_design: {operation, domain, slug} 構造化）
     operation: create           # create / append / update の3値（別名は持たない）
-    scale: standard             # standard / large
+    scale: standard             # standard / large（全 work_type で設定可）
     depends_on: []              # 実在する ou_id を参照
     recommended_order: 1
     issue_policy: single        # single / epic
@@ -148,7 +148,7 @@ review_dispositions:
 # case_open_hints: case-open 構成生成への参考情報（Issue 階層は case-open が決定する）
 case_open_hints:
   epic_needed: false            # 単一 Issue で完結する場合は false
-  decomposition: # optional: scale large 時の分解参考情報
+  decomposition: # optional: scale large 時、または Epic 構成が必要な場合の分解参考情報
   wave_hints: []                # optional: 技術的依存に基づく Wave 構成の参考
 ```
 

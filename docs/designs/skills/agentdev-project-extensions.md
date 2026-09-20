@@ -4,6 +4,7 @@ status: accepted
 created: 2026-07-04
 updated: 2026-07-27
 ---
+<!-- ADF-COVERS(implementation): REQ-002-030, REQ-002-031 -->
 
 # agentdev-project-extensions Design
 
@@ -74,3 +75,24 @@ updated: 2026-07-27
 - REQ-002（Project Extensions 機構と配布物参照境界）
 - DEC-006（inspect 3-command 構成への正規化）
 
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: 0 件
+- **deterministic 委譲先**: parsing/validation（extension 状態解決）→ scripts/lib/extension_state.ts
+- **知識提供**: 5 セクション読込契約（fail-open）
+
+## v4 semantic extension point への接続
+
+本スキルが担う Project Extensions は v4 では標準プロセスへの追加を行う semantic extension point として位置づける。
+
+定義の所有は ADF v4 責務境界 Design（foundations/v4-responsibility-boundaries）であり、拡張点の概念分類（表現力 6 項目）と追加モデル原則の詳細は同 Design を参照する。
+
+現行の kind 3 値・id binding・状態機械・5 セクション読取・上書きでない扱いは v4 でも維持する。
+
+v4 が安定 API としないのは Skill 名 id binding のみであり、yaml スキーマと検査契約は従来どおり管理する。
+
+runtime での新規警告等は行わない。
+
+internal-workflow-extension の使用が現時点で 0 件であることは廃止の根拠としない。

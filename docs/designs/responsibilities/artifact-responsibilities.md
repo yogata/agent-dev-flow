@@ -2,7 +2,7 @@
 title: 成果物責任表
 status: accepted
 created: 2026-08-20
-updated: 2026-08-23
+updated: "2026-09-19"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-053-040 -->
@@ -100,7 +100,7 @@ Command は Skill を参照して判断を利用し、Skill は必要な詳細�
 |---|---|---|
 | Command | 公開interface・dispatch | REQ-002・各command固有REQ |
 | Workflow Skill | workflow実装本体・STEP transition | REQ-005・workflow-skill-model.md |
-| STEP reference | STEP詳細・resume point | REQ-005・step-reference-contract.md |
+| STEP reference | STEP詳細・resume point | REQ-005・v4-durable-state-and-recovery.md |
 | Capability Skill | 共通能力 | REQ-027・workflow-skill-model.md |
 | Workflow Extension | 公開Workflow Skill 拡張 | REQ-002・project-extensions.md |
 | internal Workflow Extension | Workflow Skill 内部拡張 | REQ-002・project-extensions.md |
@@ -108,7 +108,7 @@ Command は Skill を参照して判断を利用し、Skill は必要な詳細�
 
 ## 親エージェント / サブエージェント責務
 
-サブエージェント委譲時の責務境界は v2:ADR-0112 と REQ-003 に従う。
+サブエージェント委譲時の責務境界は v2:ADR-0112 と REQ-003 に従う。委譲時最小契約・委譲種別・委譲制約の正本は workflows/v4-delegation-contracts Design が所有し、責務の semantic / deterministic 分類は DEC-036 と foundations/v4-responsibility-boundaries Design に従う。
 
 | 主体 | 保持する責務 | 禁止される責務 |
 |---|---|---|

@@ -2,7 +2,7 @@
 title: learning-promote Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-13
+updated: "2026-09-20"
 ---
 <!-- ADF-COVERS(implementation): REQ-015-007 -->
 <!-- ADF-COVERS(implementation): REQ-038-001, REQ-038-002, REQ-038-003, REQ-038-004, REQ-038-005 -->
@@ -17,7 +17,7 @@ inbox.md から正規化、分類、8軸評価、廃棄判定、既存対策確�
 backlog-review 経由で RU 化する。
 
 **昇華可能性評価、無条件自動REQ化禁止（v2:REQ-0155-005）**: 各問題クラスについて恒久契約（REQ/Decision/Design）への昇華可能性を評価し、昇華可能な知見のみ `promoted/` へ出力する。
-無条件の自動REQ化は禁止し、学びは backlog-review → req-define → case-open → case-ready の昇華経路を経て初めて REQ 化される。
+無条件の自動REQ化は禁止し、学びは backlog-review → req-define → case-auto（内部 lifecycle の case-open / case-ready 段階）の昇華経路を経て初めて REQ 化される。
 昇華不能な知見は `deferred.md` の living pool で維持する。
 `deferred.md` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である。
 
@@ -109,11 +109,11 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
 ## 参照する横断 Design
 
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 境界）
-- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（採用済み成果物 lifecycle）
+- [workflows/v4-collaboration-loop.md](../workflows/v4-collaboration-loop.md)（Learning 段の責務、7 系統振り分け、採用済み成果物の .agentdev/ 状態領域の整合）
 
 ## 自律確定の判定位置とHITLフォールバック（新規セクション）
 
-本節は learning-promote における自律確定の判定位置とHITLフォールバックの実行詳細を所有する。判断確定の境界は REQ-003-055 の共通原則に従い、詳細判定表は横断契約Design（workflows/workflow-contracts.md「promote系判断確定とHITL境界」節）が集約所有する（本 Design と Workflow Skill は同一内容を重複保持しない）。
+本節は learning-promote における自律確定の判定位置とHITLフォールバックの実行詳細を所有する。判断確定の境界は REQ-003-055 の共通原則に従い、詳細判定表は HITL 境界契約Design（v4-responsibility-boundaries）が集約所有する（本 Design と Workflow Skill は同一内容を重複保持しない）。
 
 ### 8軸評価・廃棄判定・昇華可能性・既存対策確認後の自律確定判定の挿入位置
 
@@ -134,7 +134,7 @@ deferred・未処理項目を自動削除しない既存の安全境界は維持
 ## 対象外
 
 - `.opencode/` 直接反映
-- case-run への直接受け渡し（backlog-review 経由のみ）
+- case-auto（内部 lifecycle の case-run 段階）への直接受け渡し（backlog-review 経由のみ）
 - raw learning item の再分類
 - 旧昇格台帳等の管理用ファイルの生成
 

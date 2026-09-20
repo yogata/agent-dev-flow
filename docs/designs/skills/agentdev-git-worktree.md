@@ -67,3 +67,11 @@ worktree の作成元は main を参照する。PR の base、rebase・同期基
 - v2:REQ-0110（Git worktree cleanup 信頼性）
 - v2:REQ-0137（並列実行安全 git 操作規律）
 
+
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: 0 件
+- **deterministic 委譲先**: path safety → git CLI 標準操作（script なし）
+- **知識提供**: worktree 作成・切替・クリーンアップ手順

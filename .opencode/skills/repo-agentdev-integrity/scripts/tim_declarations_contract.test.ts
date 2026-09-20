@@ -1,6 +1,6 @@
 // ADF-COVERS(verification): REQ-012-026, REQ-012-027, REQ-012-028, REQ-012-029, REQ-012-030, REQ-012-031, REQ-012-032, REQ-012-033, REQ-012-034, REQ-012-035, REQ-012-036, REQ-012-037, REQ-012-038, REQ-012-039, REQ-012-040, REQ-012-041, REQ-012-042
 //
-// 最小 TIM（docs/designs/foundations/traceability-model.md）の対応宣言コーパス契約検証。
+// TIM 対応宣言（docs/designs/foundations/v4-traceability-model.md）のコーパス契約検証。旧 traceability-model.md は Case #3004 第7段で supersede 物理削除済み。
 // DEC-030（4役割・Decision 任意・Design 必須）に従い恒常的に検証する。
 //
 // スコープ注記:
@@ -84,7 +84,7 @@ function parseDeclarations(
   return { declarations, issues };
 }
 
-// ─── 対応関係の完全性規則（traceability-model.md「対応関係の完全性規則」の判定器） ───
+// ─── 対応関係の完全性規則（v4-traceability-model.md 吸収節「対応関係の完全性規則」の判定器） ───
 
 interface CompletenessEntry {
   readonly reqId: string;
@@ -221,9 +221,9 @@ describe("TIM 対応宣言コーパス（実リポジトリ）", () => {
     expect(issues).toEqual([]);
   });
 
-  it("1つの成果物が複数の役割を持てる（traceability-model.md の design と implementation）", () => {
+  it("1つの成果物が複数の役割を持てる（v4-traceability-model.md の design と implementation）", () => {
     const { declarations } = parseCorpus();
-    const fromModel = declarations.filter((d) => d.file.endsWith("foundations/traceability-model.md"));
+    const fromModel = declarations.filter((d) => d.file.endsWith("foundations/v4-traceability-model.md"));
     const roles = new Set(fromModel.map((d) => d.role));
     expect(roles.has("design")).toBe(true);
     expect(roles.has("implementation")).toBe(true);
@@ -239,18 +239,18 @@ describe("TIM 対応宣言コーパス（実リポジトリ）", () => {
 
   it("Design status が accepted へ昇格している（完了条件1: frontmatter と designs/README.md status 列）", () => {
     const model = readFileSync(
-      join(REPO_ROOT, "docs", "designs", "foundations", "traceability-model.md"),
+      join(REPO_ROOT, "docs", "designs", "foundations", "v4-traceability-model.md"),
       "utf-8",
     );
     expect(model).toMatch(/^status: accepted$/m);
     const readme = readFileSync(join(REPO_ROOT, "docs", "designs", "README.md"), "utf-8");
-    expect(readme).toContain("| foundations/traceability-model.md | accepted |");
+    expect(readme).toContain("| foundations/v4-traceability-model.md | accepted |");
   });
 
   it("更新対象の規範文書で coverage の直訳語を正式用語として使用していない（用語政策）", () => {
     const targets = [
       join(REPO_ROOT, "docs", "requirements", "REQ-012.md"),
-      join(REPO_ROOT, "docs", "designs", "foundations", "traceability-model.md"),
+      join(REPO_ROOT, "docs", "designs", "foundations", "v4-traceability-model.md"),
       join(REPO_ROOT, "docs", "designs", "skills", "agentdev-traceability.md"),
       join(REPO_ROOT, "docs", "designs", "README.md"),
     ];

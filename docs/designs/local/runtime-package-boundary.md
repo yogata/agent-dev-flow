@@ -452,6 +452,12 @@ wrong target 検出、再作成ロジックは LocalMode と通常版 install �
 | `agentdev-*` 全 27 件 | 配布物依存 | `src/opencode/skills/` 配下、`agentdev-*` グロブで自動 junction |
 | `repo-agentdev-integrity` | repo-local 専用 | `/repo/docs-check` 実行スキル。REQ-001 の `repo-*` 卡out 対象。検証スクリプトを呼び出す command は DEC-006 により3 command（`docs-check`, `inspect-skills`, `inspect-promote`）へ正規化済み。これらが `repo-agentdev-integrity/scripts/*.ts` を呼び出すが、当該参照は consumer 環境で実行時欠落する別課題（本 Design の対象外） |
 
+## v4 adapter 境界への接続
+
+実行時パッケージ境界（本 Design 既有の Tools / Plugins 配布・更新）は v4 の Harness/Backend adapter 境界（ADF v4 実装責務境界 Design・DEC-036）の配備層に属する。未使用 adapter を先回りして実装しない。
+
+定義の所有は v4-responsibility-boundaries にあり、本節は参照にとどめる。既存節は不変とする。
+
 ## 関連項目（See Also）
 
 - [Consumer Project Setup Guide](../../guides/consumer-project-setup.md)（Consumer 向け導入手順）

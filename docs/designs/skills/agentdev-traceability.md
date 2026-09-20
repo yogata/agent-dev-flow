@@ -11,7 +11,7 @@ updated: "2026-09-17"
 
 ## 目的
 
-標準配布スキル `agentdev-traceability` は、最小 TIM（foundations/traceability-model.md）に基づき、要件と成果物の明示的な対応関係について coverage、impact、check の3能力を提供する。
+標準配布スキル `agentdev-traceability` は、ADF v4 Traceability モデル（foundations/v4-traceability-model.md）に基づき、要件と成果物の明示的な対応関係について coverage、impact、check の3能力を提供する。
 正規成果物を直接走査し、対応関係をその場で解決する（REQ-012、DEC-017。前身機能の廃止と移行の経緯は DEC-017 が記録する）。
 
 ## 適用対象
@@ -22,7 +22,7 @@ updated: "2026-09-17"
 ## 対応関係データの取得と正規化
 
 - 対応関係データの正規情報源は、リポジトリ top-level `traceability/` 配下の component / package 単位 sidecar（`traceability/<component-slug>.yaml`）と検証スコープポリシー（`traceability/policy.yaml`）、および producer-only artifact に許容された inline declaration とする
-- sidecar と policy.yaml の schema は最小 TIM（foundations/traceability-model.md）が所有する。本 skill は sidecar を読み込み、component、artifact パス、role、要件行 ID の組を論理的な対応関係へ正規化する。本 skill は ADF 自身の個別 REQ と個別成果物との対応データを保持しない
+- sidecar と policy.yaml の schema は ADF v4 Traceability モデル（foundations/v4-traceability-model.md）が所有する。本 skill は sidecar を読み込み、component、artifact パス、role、要件行 ID の組を論理的な対応関係へ正規化する。本 skill は ADF 自身の個別 REQ と個別成果物との対応データを保持しない
 - inline declaration は `ADF-COVERS(<role>): <REQ-ID>{, <REQ-ID>}*` 形式（role は decision / design / implementation / verification、REQ-ID は `REQ-{NNNN}-{MMM}` 形式の要件行ID）とし、producer-only artifact の各ファイル種別のコメント記法（Markdown は HTML コメント、TypeScript は `//` 等）の内部に1行で記述する。マーカー文字列 `ADF-COVERS(...)` 自体はファイル種別に依存しない。consumer distribution closure（src/opencode/**）に含まれる成果物では使用しない
 - sidecar と inline declaration は同一の論理的な対応関係へ正規化され、coverage、impact、check から同一に扱われる。同一論理関係の不整合な重複は check が検出する
 - 解析は行単位のパターン照合で行い、意味推定を行わない。存在しない要件IDへの参照は check が検出する
@@ -85,3 +85,11 @@ Decision 対応の欠落は不合格としない。
 
 - ワークフロー統合の工程割り当て（REQ-021、各 command Design）
 - 性能の数値基準（受け入れ基準を設けない）
+
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: 0 件（対応解釈は知識提供）
+- **deterministic 委譲先**: traceability extraction / evidence aggregation / validation → scripts/src/check.ts・coverage.ts・impact.ts + lib
+- **知識提供**: coverage/impact/check の解釈

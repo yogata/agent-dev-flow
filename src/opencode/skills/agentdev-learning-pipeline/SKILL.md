@@ -17,6 +17,13 @@ capture → inbox.md → promote（内部分析フェーズ + 昇華判定フェ
 - **capture**（`agentdev-learning-capture` skill）: エージェント主体で学びを検知、抽出、inbox.md に自律蓄積
 - **promote**（learning-promote command）: 問題クラス分類、8軸評価、evaluation-report 生成、inbox→deferred 移動、昇華判定、採用済み成果物の生成、prune を一括実行
 
+## 継続コラボレーションループにおける位置づけ
+
+本 pipeline は継続コラボレーションループ（`<workflows/v4-collaboration-loop>` Design）の Learning 段の知識ベースである。
+Learning 評価結果は 7 系統へ振り分けられる。7 系統はループ全体の集計ビュー（最終振り分け先）であり、本 skill が定義する処分区分（learning-promote の局所判定）とは別の軸である。
+7 系統・処分区分・8 寿命の三方対応表は本 skill の処分区分スキーマ参照ファイルが所有する（正）。
+昇華経路（`promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/case-auto`（内部 lifecycle）。docs/knowledge/ 直接保存分は RU を経ない）はループの Backlog → req-define 段に接続する。
+
 ## 成果物ライフサイクル
 
 pipeline 各層を構成する 4 成果物の役割、性格、command 間の振る舞いを定義する。
@@ -89,7 +96,7 @@ pipeline 各層を構成する 4 成果物の役割、性格、command 間の振
 ## 反映ルート
 
 ```
-promoted/ → /agentdev/backlog-review → /agentdev/req-define → /agentdev/case-open → /agentdev/case-ready → /agentdev/case-run
+promoted/ → /agentdev/backlog-review → /agentdev/req-define → /agentdev/case-auto（内部 lifecycle）
 ```
 
 - 採用済み成果物は `/agentdev/backlog-review` が読み込み、RU 化後に `/agentdev/req-define` の明示入力として扱われる

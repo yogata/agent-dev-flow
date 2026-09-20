@@ -169,7 +169,7 @@ frontmatter `status: proposed` の Decision のうち、関連 REQ の実装 Cas
 | 項目 | 内容 |
 |------|------|
 | 対象 | Decision ファイル群のうち frontmatter `status: proposed` の Decision |
-| 関連 REQ | 当該 Decision の frontmatter `related_reqs` 宣言（Decision 成果物のローカルメタデータ）が示す REQ。Case 特定の粒度は REQ ファイル単位の近似であり、finding に近似判定である旨を明示する。TIM の covers 関係、`agentdev-traceability` の API は使用しない |
+| 関連 REQ | 当該 Decision の frontmatter `related_reqs` 宣言（Decision 成果物のローカルメタデータ）が示す REQ。Case 特定の粒度は REQ ファイル単位の近似であり、finding に近似判定である旨を明示する。トレーサビリティの covers 対応関係、`agentdev-traceability` の API は使用しない |
 | Case 進行の取得源 | 関連 REQ の実装 Case が進行していること（完了 Case が存在する、またはオープンな実装 Case が存在する）の判定は、ローカル版ではローカルIssue共通スキーマに基づく永続ファイル（role: case、完了 Case は終端 `status: closed`。物理パスの正規記述は `agentdev-doc-diagnostics` Design「Decision 状態乖離 DRIFT 診断観点」節に正がある）、GitHub 版では Custom Tool 操作契約経由の読み取りとする。診断は読み取りと報告のみ |
 | 乖離条件 | 関連 REQ の実装 Case が進行しているにもかかわらず、受理評価されないまま frontmatter `status` が proposed ままであること |
 | 判定分離 | 単なる proposed の存在は指摘しない（新規作成直後で Case 未着手の Decision は指摘対象外）。経過時間を判定根拠に使わない。Design 状態乖離 DRIFT 診断とは観点として分離し、判定基準（対象成果物種別、対象 status、Case 状態条件）を混用しない |
@@ -179,7 +179,7 @@ frontmatter `status: proposed` の Decision のうち、関連 REQ の実装 Cas
 ### 横断スキャン観点
 
 - Decision ファイル群から frontmatter `status: proposed` の Decision を収集する（`accepted` 等、proposed 以外は対象外）
-- 各 proposed Decision の frontmatter `related_reqs` 宣言から関連 REQ を抽出する（TIM の covers 関係は使用しない）
+- 各 proposed Decision の frontmatter `related_reqs` 宣言から関連 REQ を抽出する（トレーサビリティの covers 対応関係は使用しない）
 - 関連 REQ の実装 Case の進行状態を Case 進行の取得源から確認する（時間は参照しない）
 - 完了 Case またはオープンな実装 Case が存在する proposed Decision を DRIFT 候補として検出する
 

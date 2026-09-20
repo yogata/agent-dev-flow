@@ -1,7 +1,7 @@
 # sidecar と検証スコープポリシーの作成・更新手順
 
 本 reference は、対応関係 sidecar（`traceability/<component-slug>.yaml`）と検証スコープポリシー（`traceability/policy.yaml`）の作成・更新手順、および要件・Design・実装・検証変更時の対応関係更新手順を提供する。
-schema とモデルの正本は producer 側リポジトリの最小トレーサビリティモデル（TIM）の Design が所有する。本 reference は正本への参照を前提とした利用手順を記述し、規範の独立定義を行わない。
+schema とモデルの正本は producer 側リポジトリの ADF v4 Traceability モデル Design（v4-traceability-model、docs/designs/<foundations/v4-traceability-model>.md）が所有する。本 reference は正本への参照を前提とした利用手順を記述し、規範の独立定義を行わない。
 
 ## sidecar の作成手順
 
@@ -26,7 +26,7 @@ verification:
     - REQ-{NNNN}-{MMM}
 ```
 
-記述上の規約（schema の詳細は TIM Design 正本を参照）:
+記述上の規約（schema の詳細は ADF v4 Traceability モデル Design〔v4-traceability-model、docs/designs/<foundations/v4-traceability-model>.md〕正本を参照）:
 
 - artifact パスは POSIX 区切り文字のリポジトリ相対パスで記述する
 - 1つの artifact パスを複数の role キー配下へ重複させてよい。同一 role 内での同一パスの重複定義は check（`duplicate-inconsistencies`）の検出対象とする

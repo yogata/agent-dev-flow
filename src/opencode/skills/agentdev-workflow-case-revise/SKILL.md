@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-revise
-description: "case-revise command の workflow 実装本体。再合意済み Definition 変更の受入確認（未合意変更の req-define 差し戻し）、canonical Definition との実変更判定（実変更なし時は Amendment PR 不作成で case-ready 引き継ぎ）、冪等キーによる既存 Amendment PR の検出と再利用、Definition Amendment PR 作成、Epic 完了済み Issue の影響再評価（巻き戻し禁止）、Case 関連 Issue 本文更新、case-ready 引き継ぎ、中断済み成果物の再利用による収束を所有する。USE FOR: case-revise 実行時の workflow 制御。DO NOT USE FOR: 新しい要求・Decision・対象範囲の決定と Definition の意味判断（req-define 側の責務）、execution contract / execution structure の再確定（case-ready 側の責務）、実装実行（case-run 側の責務）、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "内部 lifecycle 段階 case-revise の workflow 実装本体。再合意済み Definition 変更の受入確認（未合意変更の req-define 差し戻し）、canonical Definition との実変更判定（実変更なし時は Amendment PR 不作成で case-ready 引き継ぎ）、冪等キーによる既存 Amendment PR の検出と再利用、Definition Amendment PR 作成、Epic 完了済み Issue の影響再評価（巻き戻し禁止）、Case 関連 Issue 本文更新、case-ready 引き継ぎ、中断済み成果物の再利用による収束を所有する。USE FOR: case-revise 実行時の workflow 制御。DO NOT USE FOR: 新しい要求・Decision・対象範囲の決定と Definition の意味判断（req-define 側の責務）、execution contract / execution structure の再確定（case-ready 側の責務）、実装実行（case-run 側の責務）、単独起動（case-auto の内部 lifecycle orchestration から起動される内部段階である）。"
 ---
 
 
@@ -33,7 +33,7 @@ case-revise command は公開 interface（入出力契約・ガードレール�
 ## 制御平面（STEP 一覧）
 
 case-revise workflow は次の5 STEP で構成する。
-各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`<workflows/step-reference-contract>` Design）。
+各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`<foundations/v4-durable-state-and-recovery>` Design）。
 会話コンテキストに依存せず、永続状態（Root Case Issue、Definition Amendment PR、REQ / Decision / Design、Epic Issue、子 Issue）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
@@ -55,7 +55,7 @@ case-revise workflow は次の5 STEP で構成する。
 ### 再開プロトコル（resume protocol）
 
 - 再開点は永続状態から再構成する: Root Case Issue の状態、Definition Amendment PR の存在と状態（既存 PR が open か merge 済みかを含む）、Epic Issue / 子 Issue の本文、完了報告の有無
-- 冪等キー（definition-readiness Design）で既存 Amendment PR を検出し、会話コンテキストの記憶に依存せず再利用する
+- 冪等キー（case-open / case-ready Design）で既存 Amendment PR を検出し、会話コンテキストの記憶に依存せず再利用する
 - 中断済み成果物を原則として巻き戻さず、既存成果物を再利用して正しい最終状態へ収束する
 
 ### 終了条件（termination）
@@ -88,7 +88,7 @@ case-revise workflow は次の5 STEP で構成する。
 ## 共通制約
 
 - **意味判断の非所有**: 新しい要求、Decision、対象範囲を自身では決定しない。再合意済みでない変更の反映要求は req-define へ差し戻す
-- **Amendment PR の冪等**: 同じ再合意内容に対応する既存 Definition Amendment PR を重複生成しない（冪等キーは definition-readiness Design が所有）。既存 PR を検出した場合は再利用する
+- **Amendment PR の冪等**: 同じ再合意内容に対応する既存 Definition Amendment PR を重複生成しない（冪等キーは case-open / case-ready Design が所有）。既存 PR を検出した場合は再利用する
 - **中断済み成果物の再利用**: 中断済み成果物を原則として巻き戻さず、既存成果物を再利用して正しい最終状態へ収束する
 - **再確定の委譲**: execution contract / execution structure の再確定は case-ready が行う。case-revise 完了後は case-ready を経由し、case-revise 専用の Case 状態は追加しない
 - **本文 verbatim**: Root Case 本文、Issue 本文は Custom Tool `agentdev_gh` の操作引数としてそのまま渡す（文字コード・一時ファイルの実装詳細は Tool 内部）（`POL-gh-io-delegation`）
@@ -98,8 +98,8 @@ case-revise workflow は次の5 STEP で構成する。
 ## See Also
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
-- **`<workflows/definition-readiness>` Design**: Definition Package、Definition Amendment PR の lifecycle、canonical Definition 判定、冪等キー
+- **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
+- **case-open / case-ready Design**: Definition Package、Definition Amendment PR の lifecycle、canonical Definition 判定、冪等キー
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **case-revise command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）
 - **req-define workflow スキル**: 上流工程（Definition の意味判断と再合意。case-revise は未合意変更を本工程へ差し戻す）

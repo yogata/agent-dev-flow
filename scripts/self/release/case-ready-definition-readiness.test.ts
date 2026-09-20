@@ -1,9 +1,9 @@
 // Anchor test for the case-ready Definition acceptance boundary
 // (TS-003, TS-008, TS-010, Issue #2809). Pins the distribution artifacts to
 // the canonical requirements:
-//   - the case-ready command (public interface / dispatch only):
-//     src/opencode/commands/agentdev/case-ready.md
-//   - the case-ready workflow skill (workflow implementation body):
+//   - the case-ready workflow skill (workflow implementation body; the public
+//     command definition was removed by Case #2981 / DEC-033 and case-auto
+//     drives case-ready as an internal lifecycle stage):
 //     src/opencode/skills/agentdev-workflow-case-ready/ (SKILL.md + references)
 //   - the case-ready templates:
 //     src/opencode/skills/agentdev-workflow-templates/templates/case-ready/
@@ -30,7 +30,6 @@ import * as path from "path";
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 
-const COMMAND_REL = "src/opencode/commands/agentdev/case-ready.md";
 const SKILL_REL = "src/opencode/skills/agentdev-workflow-case-ready/SKILL.md";
 const REF_DEF_REL =
   "src/opencode/skills/agentdev-workflow-case-ready/references/definition-acceptance.md";
@@ -48,7 +47,7 @@ const TPL_REPORT_REL =
   "src/opencode/skills/agentdev-workflow-templates/templates/case-ready/root-case-report.md";
 const REQ_061_REL = "docs/requirements/REQ-061.md";
 const REQ_035_REL = "docs/requirements/REQ-035.md";
-const DEF_READINESS_REL = "docs/designs/workflows/definition-readiness.md";
+const CASE_READY_DESIGN_REL = "docs/designs/commands/case-ready.md";
 
 function read(rel: string): string {
   return readFileSync(path.join(REPO_ROOT, rel), "utf-8");
@@ -102,7 +101,6 @@ const ROW_ANCHORS: Array<[string, string, RegExp]> = [
 
 describe("distribution artifacts exist", () => {
   const files = [
-    COMMAND_REL,
     SKILL_REL,
     REF_DEF_REL,
     REF_DEC_REL,
@@ -120,14 +118,9 @@ describe("distribution artifacts exist", () => {
   }
 });
 
-describe("case-ready command is public interface and dispatch only", () => {
-  const doc = read(COMMAND_REL);
-
-  test("dispatches to the workflow skill", () => {
-    expect(doc).toContain("`agentdev-workflow-case-ready`");
-    expect(doc).toMatch(/workflow 実装本体を `agentdev-workflow-case-ready` スキルへ委譲する/);
-  });
-
+// Case #2981（DEC-033）: the case-ready public command definition was removed.
+// The dispatch-only separation contract is anchored to the workflow skill.
+describe("case-ready workflow skill declares the separation contract", () => {
   test("workflow skill declares the 3-layer separation contract", () => {
     expect(read(SKILL_REL)).toMatch(/公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち/);
   });
@@ -187,27 +180,25 @@ describe("Definition acceptance scenarios (TS-003)", () => {
 
 describe("Idempotency key enumeration agreement (TS-008)", () => {
   const readyDoc = read(REF_READY_REL);
-  const designDoc = read(DEF_READINESS_REL);
-  const designSection = extractHeadingSection(designDoc, "## 冪等キー");
+  const designDoc = read(CASE_READY_DESIGN_REL);
+  const designSection = extractHeadingSection(designDoc, "## 冪等性");
 
-  test("definition-readiness Design owns the idempotency key section", () => {
+  test("case-ready Design owns the idempotency section", () => {
     expect(designSection).not.toBe("");
   });
 
   test("REQ enumeration (reuse targets) is covered by the Design enumeration", () => {
     // REQ-061-027 enumerates: Root Case, Definition PR, Child Issue,
-    // Wave / 依存構造, Decision 受理記録. The Design enumeration is the
-    // superset (it additionally names the Amendment PR lifecycle variant).
+    // Wave / 依存構造, Decision 受理記録. The successor case-ready Design
+    // idempotency section enumerates the reuse targets in v4 wording.
     for (const key of [
-      "Root Case",
-      "Definition PR",
-      "Child Issue",
-      "Wave / 依存関係",
+      "merge 済み Definition",
+      "既存 Child Issue",
+      "既存 Wave / 依存構造",
       "Decision 受理記録",
     ]) {
       expect(designSection).toContain(key);
     }
-    expect(designSection).toMatch(/Amendment PR/);
   });
 
   test("skill cleanup reference pins the reuse list and forbids duplicates", () => {

@@ -1,11 +1,11 @@
 ---
-description: backlog整理サイクル（inspect-docs→昇格3系統→backlog-review）を1回の起動で実行する（追加入口）
+description: backlog整理サイクル（inspect-docs→昇格3系統→backlog-review）を1回の起動で実行する（要求入口。backlog-driven の要求蓄積入口）
 ---
 
 # backlog 一括整理
 
 backlog 整理サイクル（inspect-docs による文書診断、learning、intake、inspect の3昇格系統、backlog-review による統合と RU 生成）を1回の起動で一巡させる。
-既存5コマンド（inspect-docs、learning-promote、intake-promote、inspect-promote、backlog-review）を置換せず、標準の backlog 整理フロー（個別コマンドの逐次実行）を置き換えない追加入口である。
+要求入口の1つ（backlog-driven の要求蓄積入口）であり、検出事項と採用済み成果物を統合して RU として要求を蓄積する。生成した RU は req-define（手動要求入口）経由で case-auto へ合流する。
 
 ## 入力
 

@@ -59,7 +59,7 @@ STEP-5 の Decision禁止ゲート・STEP-4 の文書分類妥当性検証で分
 
 ### Purpose
 
-work_type（4値）と scale（feature のみ）を確定する。
+work_type（4値）と scale（全 work_type で standard/large 設定可）を確定する。
 
 ### Input Resolution
 
@@ -75,11 +75,11 @@ work_type（4値）と scale（feature のみ）を確定する。
 ### Procedure
 
 - **work_type 判定**: ラベルに基づき4値分類（bugfix/feature/maintenance/docs_chore）する。bugfix + Decision必要時は feature に昇格する
-- **Scale判断（feature のみ）**: `agentdev-workflow-lifecycle` で standard/large を判定する。large 時はユーザーと分解計画を協議する。実装スコープシグナル確認（ドラフト内に修正候補リスト、検出事項カタログ、影響ファイル一覧等の実装詳細セクション存在時に large 昇格判定、昇格理由をユーザー提示）の詳細は `agentdev-workflow-lifecycle` を参照
+- **Scale判断**: `agentdev-workflow-lifecycle` で standard/large を判定する。scale は全 work_type に standard/large を設定でき、大規模 bugfix 等も large/Epic 構成の対象になり得る。large 時はユーザーと分解計画を協議する。実装スコープシグナル確認（ドラフト内に修正候補リスト、検出事項カタログ、影響ファイル一覧等の実装詳細セクション存在時に large 昇格判定、昇格理由をユーザー提示）の詳細は `agentdev-workflow-lifecycle` を参照
 
 ### Result
 
-- work_type 確定、scale 確定（feature のみ）
+- work_type 確定、scale 確定（全 work_type）
 
 ### Evidence
 
@@ -87,7 +87,7 @@ work_type（4値）と scale（feature のみ）を確定する。
 
 ### Completion Verification
 
-- work_type が4値のいずれかであり、feature 以外で scale 判定を実施していないこと
+- work_type が4値のいずれかであり、scale が standard/large のいずれかであること（scale 判定は全 work_type に対して実施する）
 
 ### Resume-Idempotency
 

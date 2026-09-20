@@ -2,7 +2,7 @@
 title: case-close Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-17
+updated: "2026-09-20"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-018, REQ-021-019, REQ-021-022, REQ-021-025 -->
@@ -18,6 +18,7 @@ updated: 2026-09-17
 
 # case-close Design
 
+位置づけ変更（v4、DEC-033）: 本 Design が定義する case-close は公開 command ではなく内部 lifecycle 段階である。公開 UX は要求入口（req-define、backlog-auto）と標準実行コマンド case-auto へ収斂しており、本段階は case-auto の orchestration から駆動される。本 Design は内部 lifecycle 段階の契約として継続して正規文書である（処遇の正本: v3-v4-crosswalk references/crosswalk-inventory.md）。
 ## 目的
 
 PR をマージし、Case に記録を追記し、クローズ後に worktree とブランチを削除する。
@@ -173,9 +174,9 @@ SSoT コメントが検証証跡の恒久記録の正となる。
 
 ## 所有関係と委譲
 
-- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、command 定義（`src/opencode/commands/agentdev/case-close.md`）はその実行時投影である（DEC-010）。
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、case-auto の orchestration による Workflow Skill load 時に本 Design が読み込まれる（DEC-010。第4段以降は command 定義の実行時投影ではなく直接読込）。
 - workflow 実装本体（単一 Issue クローズと Epic Wave クローズの STEP 構成、内部手順、reference 構成）は Workflow Skill（`agentdev-workflow-case-close`）が所有し、本 Design はこれらを複製しない。
-- Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
+- Workflow Skill の単独起動防止（soft guard）は、case-auto orchestration の委譲制御と Workflow Skill description の DO NOT USE FOR トリガーにより実効する。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
 ## トレーサビリティ能力の利用（QG-4 独立再検査）
@@ -186,17 +187,17 @@ case-run 側の事前検査とは独立に実施する。検証手段との対�
 - 対象要件行に Design 対応、implementation 対応、または policy が required と判定する要件行の verification 対応の欠落が残る場合はマージせず停止する。Decision 対応の欠落は QG-4 の不合格条件に含めない
 - 不足する対応関係を自動追加または修正せず、検査失敗を case-run 側の修正対象として差し戻せる
 - verification 対応の完全性判定は、project-level verification policy が required と判定する要件行のみを計上する。policy の正規情報源は `traceability/policy.yaml`（既定 required、optional な要件行のみ明示、未指定の要件行は required）であり、policy が optional と明示した要件行の verification 対応欠落は完全性違反に含めない
-- QG-4 の対応完全性検査は有効である。全現行要件行の Design 対応と implementation 対応、および policy が required と判定する要件行の verification 対応が成立し、check の未解決不合格が0件であることを移行完了条件とする（DEC-017 決定4）
+- QG-4 の対応完全性検査は有効である。対象要件行の Design 対応と implementation 対応、および policy が required と判定する対象要件行の verification 対応が成立し、check の未解決不合格が0件であることを完了条件とする（対象要件行 scope。REQ-021-018/024/025）。DEC-017 決定4 の「全現行要件行」を条件とする移行完了規定は履行済みの履歴であり、corpus 全体の完全性は ADF v4 Traceability モデルの completeness 2 層（corpus＝診断・advisory）と corpus 債務方針（第13段 full validation で評価）へ移管する
 - check 自体が正常に完全性を判定できなかった場合（check 実行不能、検査対象の取得不能等）は、対応完全性の合格として扱わず、検査不能の旨を報告してマージに進まない
 - 正規成果物側の実不整合が確認された場合は、既存の品質ゲート, 受け入れ条件に従って fail とする
 
 ## 参照する横断 Design
 
-- [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（Pattern Taxonomy（file-pipeline））
+- [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（Pattern Taxonomy（file-pipeline））
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 回収（intake/learning 分離））
-- [workflows/epic-wave-model.md](../workflows/epic-wave-model.md)（Epic Wave クローズモデル）
-- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（REQ ファイル整合性検査）
-- [quality-gates.md](../quality/quality-gates.md)（QG-4）
+- [foundations/v4-runtime-execution-model.md](../foundations/v4-runtime-execution-model.md)（Epic Issue 本文の直列化〔per-Epic 単一書き手〕。Epic Wave クローズ運用は本 Design「Epic Wave クローズ」節）
+- [workflows/v4-collaboration-loop.md](../workflows/v4-collaboration-loop.md)（v3 ライフサイクル Design からの吸収記録: REQ ファイル整合性検査・README 索引影響規則の帰属〔agentdev-req-file-manager・agentdev-artifact-validation の各 Design 参照〕）
+- [v4-quality-gate-model.md](../quality/v4-quality-gate-model.md)（QG-4）
 - [integrity-rule-catalog.md](../integrity/integrity-rule-catalog.md)（IR-057 obsolete-spec-path-after-domain-split、targeted docs guard 連携）
 
 ## targeted docs guard (v2:REQ-0158-003)

@@ -10,7 +10,7 @@ case-run コマンドの状態機械、サブエージェントプロトコル�
 ## 状態機械
 
 case-run は単一 Issue または単一 Wave（`#epic` 指定時: 現在 ready な Wave の子Issue を 実行担当サブエージェント（adapter skill 経由、委譲 prompt 内で実行 command を指定）に並列委譲、最大5件）を処理し、Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）は扱わない（Wave 構成生成は case-open、Wave 境界クローズは case-close の責務）。
-Epic 全体の進行は case-auto が case-run(#epic) → case-close(#epic) の反復制御を担い、Wave 内の子Issue 選択、並列委譲は case-run(#epic) が、Wave 境界クローズ、Epic Issue 本文ステータス追跡テーブル更新は case-close(#epic) が担う（単一書き手: Decision、epic-wave-model Design、Decision）。
+Epic 全体の進行は case-auto が case-run(#epic) → case-close(#epic) の反復制御を担い、Wave 内の子Issue 選択、並列委譲は case-run(#epic) が、Wave 境界クローズ、Epic Issue 本文ステータス追跡テーブル更新は case-close(#epic) が担う（単一書き手: Decision、v4-runtime-execution-model Design「直列化単位表」、Decision）。
 
 ### case-run internal lifecycle フェーズ構成
 
@@ -26,8 +26,8 @@ case-run は orchestration stage（case-auto が管理する command 間進行�
 ## STEP model（REQ-{NNNN}-{NNN}、DEC-{N}）
 
 本スキルは Workflow Skill として case-run workflow の STEP transition を所有する（制御平面）。
-STEP 識別子は workflow 内安定識別子であり、STEP reference 8 要素（Purpose / Input Resolution / Preconditions / Procedure / Result / Evidence / Completion Verification / Resume-Idempotency）は `<workflows/step-reference-contract>` Design に従う。
-STEP 識別子と永続状態から current STEP を復元する契約は `<workflows/input-resolution-and-durable-state>` Design に従う。
+STEP 識別子は workflow 内安定識別子であり、STEP reference 8 要素（Purpose / Input Resolution / Preconditions / Procedure / Result / Evidence / Completion Verification / Resume-Idempotency）は `<foundations/v4-durable-state-and-recovery>` Design に従う。
+STEP 識別子と永続状態から current STEP を復元する契約は `<foundations/v4-durable-state-and-recovery>` Design に従う。
 
 ### STEP 識別子（case-run workflow）
 
@@ -43,7 +43,7 @@ STEP 識別子は command 固定番号（STEP-1, STEP-2 等）とは区別する
 ### 永続状態（case-run workflow）
 
 compaction や中断再開後に current STEP と必要入力を復元するための永続状態。
-優先順位は `<workflows/input-resolution-and-durable-state>` Design に従う。
+優先順位は `<foundations/v4-durable-state-and-recovery>` Design に従う。
 
 1. **SSoT 再構成**: Issue 本文、要件doc、REQ/Decision/Design から再取得・再検証
 2. **identifier 保持**: Issue 番号、PR 番号、worktree ブランチ名、STEP 識別子
@@ -92,7 +92,7 @@ Windows + ジャンクション環境の worktree では `.opencode/skills/agent
 | 自律修正ループ、CI 対応ループ、エラー | `references/self-healing-and-errors.md`（自律修正ループ、CI対応、エラー回復マップ） |
 | サブエージェント編集安全手順 | `references/subagent-protocol.md`（oldString最小化、Read検証、大規模ファイル分割、AST-grep推奨、driver 起動プロンプトテンプレート（Windows + ジャンクション環境）） |
 
-case-run コマンドのランタイムパス（projection 先）は `commands/agentdev/case-run.md`。
+case-run 内部 lifecycle 段階の実装本体は `agentdev-workflow-case-run` Workflow Skill（`.opencode/skills/agentdev-workflow-case-run/SKILL.md`）。
 command 本文内で case-run を参照する場合はこちらを使用。
 
 ## See Also

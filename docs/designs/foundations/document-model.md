@@ -2,7 +2,7 @@
 title: 文書モデル
 status: accepted
 created: 2026-08-20
-updated: "2026-09-17"
+updated: "2026-09-19"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-001, REQ-001-002, REQ-001-003, REQ-001-004, REQ-001-005, REQ-001-006, REQ-001-007, REQ-001-020, REQ-001-035, REQ-001-038, REQ-001-039, REQ-001-040, REQ-001-041, REQ-001-052 -->
 <!-- ADF-COVERS(implementation): REQ-001-066, REQ-001-067, REQ-001-068 -->
@@ -248,6 +248,7 @@ frontmatter形式は`patterns.md`が所有する。
 |---|---|---|---|
 | `draft` | Design 保存（case-ready / case-revise の Capability Skill 委譲）で保存された未確定状態 | 境界違反等の確定Design向け検査対象外 | 新規Design保存時 |
 | `accepted` | 実装との整合確認を通過した現在設計 | 通常の整合性検査対象 | case-closeで確定時 |
+| `accepted`（モデル定義 Design） | v4 モデル定義を所有する Design は、当該モデル定義の合意確定（Definition PR merge・Decision 受理評価・検査合格）をもって accepted へ遷移する。実装との整合は各担当段階の準拠更新で維持する | 通常の整合性検査対象 | case-close（v4 モデル定義 Design はモデル合意確定時） |
 
 - 新規Designは `draft` として作成され、確定時に `accepted` へ遷移する。`accepted` の付与は case-close の責務である
 - statusがない既存Designは後方互換のため`accepted`相当として扱う
@@ -298,6 +299,8 @@ consumer 境界は producer、direct consumer、orchestration pre-reader、inval
 2. Decision（承認済み）
 3. Design
 4. guides
+
+v4 移行期間中、accepted の v4 モデル定義 Design と未置換の v3 accepted Design の衝突は、当該 v3 Design の処遇実行段階まで v3 を正とする（v3-v4-crosswalk.md 処遇実行原則）。
 
 ## 設定規則
 
@@ -535,9 +538,9 @@ agent-dev-flow リポジトリの docs/designs/ 直下の基盤Designは、既�
 
 | ディレクトリ | 責務 | 配置対象Design |
 |---|---|---|
-| foundations/ | 基盤モデル、システム構成、文書フォーマット、設計原則 | numbering-policy.md, system.md, document-model.md, decision-lifecycle.md, patterns.md, design-principles.md, project-extensions.md, harness-separation-model.md, traceability-model.md |
+| foundations/ | 基盤モデル、システム構成、文書フォーマット、設計原則 | numbering-policy.md, system.md, document-model.md, decision-lifecycle.md, patterns.md, design-principles.md, project-extensions.md, harness-separation-model.md |
 | responsibilities/ | 文書種別責務、成果物責任、アーティファクト契約、REQ影響マップ | document-type-responsibilities.md, artifact-responsibilities.md, artifact-contracts.md, req-impact-map.md |
-| quality/ | 品質仕様、品質ゲート、健全性メトリクス（REQ/Design 双方向） | quality-specs.md, quality-gates.md, req-health-metrics.md, design-health-metrics.md |
+| quality/ | 品質仕様、品質ゲート、健全性メトリクス（REQ/Design 双方向） | quality-specs.md, v4-quality-gate-model.md, req-health-metrics.md, design-health-metrics.md, textlint-quality-runtime.md |
 | integrity/ | 整合性契約、整合性ルールカタログ、ルール所有権、配布物整合性、backticks 判定閾値 | integrity-contracts.md, integrity-rule-catalog.md, rule-ownership.md, docs-spec-rebuild-integrity.md, backticks-identifier-threshold.md |
 | local/ | ローカル版 Design 群（実行時パッケージ境界、link mode、Case ファイル） | runtime-package-boundary.md, local-case-file.md |
 | authoring/ | コマンドファイル執筆規約 | command-file-format.md |

@@ -4,6 +4,23 @@
 本ファイルは QG-1 の判定基準、検査観点を定義する。
 共通契約は [common-gate-contract.md](common-gate-contract.md) を参照。
 
+## v4 Quality モデルへの接続
+
+本 Gate は ADF v4 Quality モデル（v4-quality-gate-model Design）の lifecycle 級 semantic Gate 群として再導出された QG-1（Definition Integrity）である。
+本ファイルの 3 層は同 Design「再導出結果（lifecycle 級 semantic Gate 群）」表の QG-1 行と次のように対応する。
+
+| 層 | 対応内容 |
+|---|---|
+| Verification Obligation | Definition（要件doc・Definition Package）が構造完全性・frontmatter 妥当性・未確定内容抑止を満たす |
+| Verifier | semantic（機械的検査を部分的に内包） |
+| Evidence | 検査ログ・draft 検証記録（機械的証拠・推論証拠） |
+
+- 対象遷移（v4 lifecycle deterministic gate predicate 接続点）: Definition 保存完了時（draft 保存・Definition PR 化前）
+- 判定値と Gate predicate の写像: `pass`/ `warn` で継続可、`fail` は遷移不可。写像の正規定義は v4-quality-gate-model Design「判定値と遷移接続」節と [common-gate-contract.md](common-gate-contract.md)「5 概念への写像」を参照する
+- 証拠分類の直交: 上表 Evidence の証拠分類（機械的/ 推論）は Evidence の属性であり、Verifier 分類（deterministic/ semantic）とは直交する。正規定義は v4-quality-gate-model Design「証拠種別と Verifier 分類の直交」節を参照する
+- v3 からの処遇: 保持（配置点を v4 遷移へ再錨定。同 Design「QG-1〜QG-4 個別処遇対応表」の QG-1 行）
+- 責務分界: Gate の意味契約の正は v4-quality-gate-model Design が所有し、本ファイルは判定観点・検査手順の実行詳細を所有する（二重管理を行わない）
+
 ## 配置
 
 | コマンド | 配置ステップ | 対象成果物 |

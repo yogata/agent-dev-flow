@@ -58,7 +58,7 @@ case-auto workflow は次の8 STEP で構成する。
 ### 再開プロトコル（resume protocol）
 
 - 再開点は永続状態から再構成する: `case_auto_started_at` と L1 工程別タイムスタンプ、Issue/PR の存在と番号、Epic Issue 本文のステータス追跡テーブル（Wave 進行）、draft の有無（case-open 完了前のみ pre-reader）、各工程の完了結果、Root Case の状態（open / ready / running / blocked / review / closed）と resume_command
-- 現在 stage は stage cursor を新たな正規状態として保存せず、起動時対象集合と各対象の正規状態（Issue / PR / Case 等）から最も早い未収束 stage として再構成する。完了済み対象を再実行せず、同一対象だけを後続 stage へ先行させない。起動時対象集合の安定識別子は中断再開に必要な期間に限りローカル一時実行状態として保持し、draft / RU の削除によって対象を実行中の対象集合から消失させない。正規成果物から再構成できる情報を別の正規状態として重複管理しない（epic-wave-model Design「ドラフト間並列実行モデル」）
+- 現在 stage は stage cursor を新たな正規状態として保存せず、起動時対象集合と各対象の正規状態（Issue / PR / Case 等）から最も早い未収束 stage として再構成する。完了済み対象を再実行せず、同一対象だけを後続 stage へ先行させない。起動時対象集合の安定識別子は中断再開に必要な期間に限りローカル一時実行状態として保持し、draft / RU の削除によって対象を実行中の対象集合から消失させない。正規成果物から再構成できる情報を別の正規状態として重複管理しない（case-auto Design「ドラフト間並列実行モデル」）
 - 停止時報告に再開点と再開可能な次コマンドを明示し、会話コンテキストの記憶に依存しない。case-ready 成功後の再開は Issue と Epic だけで成立させる（orchestration pre-reader 契約）
 
 ### 終了条件（termination）
@@ -80,9 +80,9 @@ case-auto workflow は次の8 STEP で構成する。
 - 各 orchestration stage は stage 内最大並列・stage 間全対象収束（fan-in）で進行し、対象ごとの縦切り pipeline としない。当該 stage に属する全対象が正常完了し、または当該実行において後続 stage へ進めないことが既存契約上確定した結果（blocked / failed / delegation-unavailable 等の後続不能確定）に収束するまで次 stage を開始せず（未実行・実行中・状態不明・再試行要否未確定対象の残存は収束済みとしない）、後続不能対象を後続 stage の対象から除外しその存在だけを理由として独立した他対象の進行を停止しない（case-auto 実行契約）
 - main への push、capture、commit、同一 Epic Issue 本文への更新等の競合する共有書き込みは、当該競合部分のみを必要な単位で局所的に直列化し、当該競合と無関係な対象を含む stage 全体の直列化を行わない（case-auto 実行契約）。共有資源カテゴリと直列化単位の運用表（main への merge / push はリポジトリ単位、同一 Epic Issue 本文への更新は Epic 単位の per-Epic 単一書き手、採番・AUTOGEN 索引更新はグローバル、対象固有ファイルは対象単位で並列可。lock / queue / scheduler 方式は指定しない）は case-auto Design「複数 execution_unit 並列 orchestration」節参照
 - case-run internal lifecycle（state machine、self-healing loop 等）を複製せず case-run 側の正規所有に委譲する
-- stage 3 の case-run 同時起動数は固定値（最大5件、実行安全境界）。順次実行はフォールバック時にのみ許可しフォールバック理由を完了報告に含める。並列起動時は委譲起動ごとに10秒の起動間隔を置き、同一Tool一括ブロックでの複数起動発行は行わない（epic-wave-model Design「並列起動の間隔」）。起動間隔は stage 1（case-open / case-revise 委譲）・stage 2（case-ready 委譲）・stage 4（case-close 委譲）の並列委譲起動にも同一に適用する。scheduling 制約（最大同時起動数・起動間隔・順次フォールバック）による batch 分割を orchestration stage の分割として扱わない
+- stage 3 の case-run 同時起動数は固定値（最大5件、実行安全境界）。順次実行はフォールバック時にのみ許可しフォールバック理由を完了報告に含める。並列起動時は委譲起動ごとに10秒の起動間隔を置き、同一Tool一括ブロックでの複数起動発行は行わない（v4-runtime-execution-model Design「runtime 制御ループ」節〔起動間隔・並列数制御〕）。起動間隔は stage 1（case-open / case-revise 委譲）・stage 2（case-ready 委譲）・stage 4（case-close 委譲）の並列委譲起動にも同一に適用する。scheduling 制約（最大同時起動数・起動間隔・順次フォールバック）による batch 分割を orchestration stage の分割として扱わない
 - クリーンアップ検証ゲート（ドラフト残存、RU 残存の検証）を stage 2 の対象群収束後・stage 3 開始前に実行し、stage 2 を正常完了した対象について残存を検出した場合は停止する。stage 2 が blocked / failed / 中断等で正常完了していない対象について、既存 lifecycle 契約に従って保持された draft / RU を cleanup 違反として扱わない（case-auto 実行契約）
-- Epic execution_unit の Wave 間および最終 Wave の case-close(#epic) は Wave 反復を進行・完結させる stage 3 内部の状態遷移処理であり、stage 4 の開始とみなさない。Epic execution_unit の stage 3 完了は後続 Wave が残存しない状態への Wave 反復の完遂であり、stage 3 完了判定は既存 Epic/Wave workflow の execution_unit 完了状態基準に従い、その内部ロジックを複製しない。stage 4 では追加の case-close を行わない。stage の分類は orchestration 上の位置づけにより行い、command 名単独では分類しない（epic-wave-model Design「ドラフト間並列実行モデル」）
+- Epic execution_unit の Wave 間および最終 Wave の case-close(#epic) は Wave 反復を進行・完結させる stage 3 内部の状態遷移処理であり、stage 4 の開始とみなさない。Epic execution_unit の stage 3 完了は後続 Wave が残存しない状態への Wave 反復の完遂であり、stage 3 完了判定は既存 Epic/Wave workflow の execution_unit 完了状態基準に従い、その内部ロジックを複製しない。stage 4 では追加の case-close を行わない。stage の分類は orchestration 上の位置づけにより行い、command 名単独では分類しない（case-auto Design「ドラフト間並列実行モデル」）
 
 ## 下位 Workflow Skill 連携（上位 orchestrator）
 
@@ -122,6 +122,6 @@ case-auto workflow は次の8 STEP で構成する。
 ## See Also
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
+- **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **Decision records**: Command / Workflow Skill / Capability Skill の責務分化、STEP resume point、bounded parent decision resolution、Definition 確定境界の正規判断
 - **case-auto command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

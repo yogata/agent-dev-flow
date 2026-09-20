@@ -1,7 +1,7 @@
 # 工程間構造化文脈引き継ぎ（structured-stage-handoff）
 
 AgentDevFlow の工程間（req-define → case-open → case-ready → case-run → case-close、および再合意経路 case-revise → case-ready、上流工程（backlog-review 等）から req-define への接続）で引き継ぐ構造化文脈の、配布物側の直列化形式と生成・消費契約。
-原本仕様は `<workflows/workflow-contracts>` Design「工程間構造化文脈引き継ぎ契約」である（Design を正とし、本参照は配布物への適用形を定める）。
+原本仕様は `<workflows/v4-lifecycle-state-machine>` Designである（Design を正とし、本参照は配布物への適用形を定める）。
 
 ## 目的
 
@@ -36,7 +36,7 @@ workflow_phase: {現在の ADF 工程（req-define / case-open / case-ready / ca
 ```
 
 各キーは意味の最小集合であり、キーの追加は意味対応を壊さない範囲に限る。
-キーの集合は `<workflows/workflow-contracts>` Design「工程間構造化文脈引き継ぎ契約」が宣言する現行ベースラインであり、
+キーの集合は `<workflows/v4-lifecycle-state-machine>` Designが宣言する現行ベースラインであり、
 キーの削除、名称変更は Design の field 集合宣言の更新と同一 changeset で実施する変更管理対象とする
 （Design が宣言する実験契約の同時変更規約に従う）。
 
@@ -68,9 +68,9 @@ workflow_phase: {現在の ADF 工程（req-define / case-open / case-ready / ca
 
 ## 参照
 
-- `<workflows/workflow-contracts>` Design「工程間構造化文脈引き継ぎ契約」（原本仕様）
-- `<workflows/delegation-contracts>` Design「構造化文脈引き継ぎ（委譲時）の直列化契約」（委譲時の原本仕様）
-- `<workflows/delegation-contracts>` Design「structured_context の SSoT 抽出制約」（structured_context の SSoT 抽出と Issue 番号×対象成果物パス突合の原本仕様）
+- `<workflows/v4-lifecycle-state-machine>` Design（原本仕様）
+- `<workflows/v4-delegation-contracts>` Design「構造化文脈引き継ぎ（委譲時）の直列化契約」（委譲時の原本仕様）
+- `<workflows/v4-delegation-contracts>` Design「structured_context の SSoT 抽出制約」（structured_context の SSoT 抽出と Issue 番号×対象成果物パス突合の原本仕様）
 - `agentdev-case-run-execution-adapter` スキルの委譲プロンプト雛形（委譲時の直列化形式、意味対応先）
 - 参照先解決ポリシー（`references/reference-resolution.md`。canonical_references の source / projection 目的判別）
 - 前工程からの引き継ぎ 共通方針（agentdev_handoff、consumer リポジトリの引き継ぎ停止）

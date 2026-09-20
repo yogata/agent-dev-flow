@@ -2,9 +2,9 @@
 // reporting, and docs consistency linkage (REQ-031-004, REQ-031-010,
 // REQ-031-011, Issue #2810). Pins the distribution artifacts to the
 // canonical requirements:
-//   - the case-run command:
-//     src/opencode/commands/agentdev/case-run.md
-//   - the case-run workflow skill (workflow implementation body):
+//   - the case-run workflow skill (workflow implementation body; the public
+//     command definition was removed by Case #2981 / DEC-033 and case-auto
+//     drives case-run as an internal lifecycle stage):
 //     src/opencode/skills/agentdev-workflow-case-run/ (SKILL.md + references)
 //   - the requirements:
 //     docs/requirements/REQ-031.md (changed rows 004 / 010 / 011)
@@ -25,7 +25,6 @@ import * as path from "path";
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 
-const COMMAND_REL = "src/opencode/commands/agentdev/case-run.md";
 const SKILL_REL = "src/opencode/skills/agentdev-workflow-case-run/SKILL.md";
 const REF_SINGLE_REL = "src/opencode/skills/agentdev-workflow-case-run/references/single.md";
 const REQ_031_REL = "docs/requirements/REQ-031.md";
@@ -63,8 +62,11 @@ describe("canonical requirement rows exist", () => {
   });
 });
 
-describe("case-run command pins the blocked resume route (REQ-031-004, REQ-031-010)", () => {
-  const doc = read(COMMAND_REL);
+// Case #2981（DEC-033）: the case-run public command definition was removed.
+// The blocked resume route contracts are anchored to the workflow skill body
+// (「blocked 正規再開経路」constraint), which carries the same clauses.
+describe("case-run workflow skill pins the blocked resume route (REQ-031-004, REQ-031-010)", () => {
+  const doc = read(SKILL_REL);
 
   test("in-scope impact is handled autonomously, scope changes are blocked", () => {
     expect(doc).toMatch(/既存 Issue scope 内で処理可能な内部実装上の影響は自律処理する/);
@@ -72,11 +74,7 @@ describe("case-run command pins the blocked resume route (REQ-031-004, REQ-031-0
   });
 
   test("staleness difference is reported and blocked, Issue body never rewritten alone", () => {
-    expect(doc).toMatch(/差異検出時は Issue 本文を単独で書き換えず、差異を報告して blocked とし、Root Case の resume_command による正規再開経路に従う/);
-  });
-
-  test("stale-reference Findings subheading is kept", () => {
-    expect(doc).toMatch(/### stale-reference/);
+    expect(doc).toMatch(/staleness check で差異を検出した場合も Issue 本文を単独で書き換えず、差異を報告して blocked とし同一の正規再開経路に従う/);
   });
 });
 

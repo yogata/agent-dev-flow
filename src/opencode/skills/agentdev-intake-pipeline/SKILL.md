@@ -44,10 +44,15 @@ intake-from-github と intake-promote コマンドの知識ベースである。
 
 本スキルが扱う intake item（`.agentdev/intake/inbox/*.md`）、採用済み成果物（`.agentdev/intake/promoted/*.md`）は永続状態の優先順位に従う。
 (1) SSoT 再構成（inbox/ promoted/ 配下の永続ファイル、REQ/Decision/Design は docs/ 配下）、(2) identifier 保持（item path、promoted item path）、(3) 最小 scalar、(4) runtime artifact（暫定分類、評価結果、adversarial-review findings、REQ-{NNNN} lifecycle）。
-優先順位の詳細は `<workflows/input-resolution-and-durable-state>` Design 参照。
+優先順位の詳細は `<foundations/v4-durable-state-and-recovery>` Design 参照。
 
 呼出元 STEP は本スキルの出力（採用済み成果物、分類結果レポート）を STEP の result evidence として扱い、次 STEP の Input Resolution で再取得できる。
-STEP reference 8 要素は `<workflows/step-reference-contract>` Design 参照。
+STEP reference 8 要素は `<foundations/v4-durable-state-and-recovery>` Design 参照。
+
+## 継続コラボレーションループにおける位置づけ
+
+intake-from-github / intake-promote は継続コラボレーションループ（`<workflows/v4-collaboration-loop>` Design）の Intake 段の実現手段であり、intake-from-github のクローズ済み成果物からの抽出は Observe 段の実現手段の一部でもある。
+受容した観測結果は inbox に未評価 Observation として蓄積され、採用後に backlog-review を経て RU へ合流する。
 
 ## See Also
 

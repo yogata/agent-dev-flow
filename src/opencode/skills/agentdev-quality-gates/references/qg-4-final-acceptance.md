@@ -4,8 +4,26 @@ case-close で PR マージ前に、最終受け入れ状態を確認する Gate
 本ファイルは QG-4 の判定基準、検査観点を定義する。
 共通契約は [common-gate-contract.md](common-gate-contract.md) を参照。
 
+## v4 Quality モデルへの接続
+
+本 Gate は ADF v4 Quality モデル（v4-quality-gate-model Design）の lifecycle 級 semantic Gate 群として再導出された QG-4（Final Acceptance）である。
+本ファイルの 3 層は同 Design「再導出結果（lifecycle 級 semantic Gate 群）」表の QG-4 行と次のように対応する。
+
+| 層 | 対応内容 |
+|---|---|
+| Verification Obligation | test strategy 3 要素完全性・リスクから test strategy への投影完全性・full integrity suite 受入れ・traceability check 前提手順・verify-only 証拠ソース |
+| Verifier | deterministic + semantic |
+| Evidence | QG-4 結果コメント・suite 実行ログ・SSoT コメント（機械的証拠） |
+
+- 対象遷移（v4 lifecycle deterministic gate predicate 接続点）: closing 前（子 Issue・Epic・Root Case の close 前）
+- 判定値と Gate predicate の写像: `pass`/ `warn` のみ close 可。QG-4 は `partial` を不可として扱い、再判定は当該 close 内で完了させる。写像の正規定義は v4-quality-gate-model Design「判定値と遷移接続」節と [common-gate-contract.md](common-gate-contract.md)「5 概念への写像」を参照する
+- 証拠分類の直交: 上表 Evidence の証拠分類（機械的）は Evidence の属性であり、Verifier 分類（deterministic/ semantic）とは直交する。正規定義は v4-quality-gate-model Design「証拠種別と Verifier 分類の直交」節を参照する
+- v3 からの処遇: 保持（verify-only closure 証拠ソースと full suite 受入れ基準を維持。同 Design「QG-1〜QG-4 個別処遇対応表」の QG-4 行）
+- 責務分界: Gate の意味契約の正は v4-quality-gate-model Design が所有し、full integrity suite 受入れ基準・bun test 正規形・機械受理基準の正規形は本スキル Design（本ファイルおよび references）が原本として保持する（二重管理を行わない）
+
 ## 目次
 
+- [v4 Quality モデルへの接続](#v4-quality-モデルへの接続)
 - [配置](#配置)
 - [検査観点](#検査観点)
 - [bun test フル suite 正規形（実行形態契約）](#bun-test-フル-suite-正規形実行形態契約)
@@ -173,7 +191,7 @@ case-open は Root Case 確立時に完了条件を確定しない。
 ```
 ## 完了条件（識別子中心）
 
-- [ ] `src/opencode/commands/agentdev/case-run.md` に staleness check Step が追加されていること
+- [ ] `agentdev-workflow-case-run` Workflow Skill（`.opencode/skills/agentdev-workflow-case-run/SKILL.md`）に staleness check Step が追加されていること
 - [ ] 解消対象の NG 違反が解消されていること
 - [ ] IR 違反が 0 件であること（参考: 現行 3 件）
 ```

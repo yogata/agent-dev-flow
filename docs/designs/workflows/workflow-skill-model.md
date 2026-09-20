@@ -2,7 +2,7 @@
 title: Workflow Skill Model
 status: accepted
 created: 2026-08-10
-updated: 2026-09-08
+updated: 2026-09-20
 ---
 <!-- ADF-COVERS(implementation): REQ-002-001, REQ-002-002, REQ-002-003, REQ-002-004, REQ-002-017, REQ-002-018, REQ-002-034 -->
 <!-- ADF-COVERS(implementation): REQ-027-001, REQ-027-002, REQ-027-003 -->
@@ -44,8 +44,8 @@ Workflow Skill は STEP model の適用有無により次の4型に分類され�
 
 | 型 | 対象 | STEP model | resume point / export / import |
 |---|---|---|---|
-| 標準型 | req-define、case-open、case-ready、case-revise、case-run、case-close、case-auto、intake-promote、learning-promote、backlog-review、inspect-promote | 対象 | 持つ（DEC-011） |
-| capture-only 型 | intake-capture、intake-from-github | 対象外 | 持たない。工程は逐次実行し、中断時は先頭から再実行する |
+| 標準型 | req-define、case-open、case-ready、case-revise、case-run、case-close、case-auto、intake-promote、learning-promote、backlog-review、backlog-auto、inspect-promote | 対象 | 持つ（DEC-011） |
+| capture-only 型 | intake-capture、intake-from-github、third-party-sync | 対象外 | 持たない。工程は逐次実行し、中断時は先頭から再実行する |
 | read-only-diagnostic 型 | inspect-docs、inspect-skills | 対象外 | 持たない。工程一覧のラベルは順序ラベルであり、中断時は先頭から再実行する |
 | 対話操作完結型 | issue | 対象外 | 持たない。各操作が1完結単位であり、追跡Issue自体が durable state（管理単位・永続状態）であるため、中断時は同一指示から再実行して現在状態を再構成できる |
 
@@ -79,7 +79,7 @@ case-run は単一 Issue 実行と Epic Wave 実行で制御構造に実質差�
 workflow 固有STEP から横断抽出し、workflow 制御構造を持たない（REQ-002-003、REQ-027-001、DEC-010）。
 
 Capability Skill は workflow STEP を所有しない。
-各 Workflow Skill が所有する STEP から名レベルで参照される宣言的定義、判断基準、決定的処理を提供する。
+各 Workflow Skill が所有する STEP から名レベルで参照される宣言的定義と判断基準を提供する。決定的処理は script / Custom Tool として公開され、参照される（DEC-036）。
 
 ### Capability Skill の判定基準
 
@@ -92,6 +92,7 @@ Capability Skill は workflow STEP を所有しない。
 要件 1 は Workflow Skill との区別（REQ-002-018）を担保する。
 要件 2 は1Workflow で完結する能力を Workflow Skill 内 `references/` 配下へ配置する基準との区別を担保する。
 要件 3 は workflow 制御と混在しない単一責務境界を担保する。
+要件 3 への照合にあたり、当該能力が DEC-036 の semantic 6 項目（requirement analysis、architecture/design judgment、decomposition judgment、adversarial review、learning evaluation、semantic classification）のいずれにも該当しない場合、その能力は deterministic 側（script / Custom Tool）または知識提供層（[../foundations/v4-responsibility-boundaries.md](../foundations/v4-responsibility-boundaries.md)）への配置を検討する（新要件は設けない。分類の正典は DEC-036 と同 Design が所有する）。
 
 ### Capability Skill の配置と命名
 
@@ -135,9 +136,9 @@ Capability Skill と Workflow Skill は異なる責務境界・判断モデル�
 |---|---|---|
 | workflow STEP | 所有する（resume point、control plane） | 所有しない |
 | 対応 Command | 1:1 または 1:N | N:N（複数 Workflow Skill から参照） |
-| 制御構造 | STEP 順序、分岐、停止条件 | なし（宣言的定義、判断基準、決定的処理） |
+| 制御構造 | STEP 順序、分岐、停止条件 | なし（宣言的定義、判断基準。決定的処理は script/Tool として参照） |
 | 責務境界 | 特定 workflow の実装本体 | 複数 workflow 共通能力 |
-| 判断モデル | workflow 状態遷移に基づく制御判断 | 宣言的ルール、分類基準、決定的変換 |
+| 判断モデル | workflow 状態遷移に基づく制御判断 | 宣言的ルール、分類基準（決定的変換は script/Tool 参照） |
 
 1つの skill が両側面を持つ場合、責務境界を明示的に分離し、2つの skill へ分割する。
 新規に作成する skill は作成時にどちらの層へ属するかを判定基準（「Capability Skill の判定基準」節）に照らして確定する。
@@ -154,9 +155,11 @@ checker 実装と本表は同一規則を反映し、乖離は検査で検出対
 | 制御構造の記述 | STEP 順序、分岐、停止条件を本文で所有する | workflow 制御構造を本文に持たない |
 | 呼称の例外 | なし | `agentdev-workflow-*` プレフィックスの一部スキルは歴史的経緯で Capability Skill として運用する（「workflow-* プレフィックスを持つ Capability Skill 的スキル」節） |
 
-## 決定論的処理との責務接続（DEC-015）
+内部 lifecycle 例外（INTERNAL_LIFECYCLE_COMMANDS）: checker 実測の分類件数は 18 である（公開 command 13 + 内部 lifecycle 5）。公開 command 定義から削除された case-* 5 command（case-open、case-ready、case-revise、case-run、case-close）は、対応する Workflow Skill（`agentdev-workflow-case-*`）が内部 lifecycle 実装として Workflow Skill 分類を維持する（check_extensions.ts の INTERNAL_LIFECYCLE_COMMANDS・Case #2981/DEC-033）。公開 command 定義の不在を理由に Capability へ降格しない。
 
-Command / Workflow Skill / Capability Skill の3層構造（DEC-010）を維持したまま、決定論的処理を次の責務分離で接続する（DEC-015、REQ-002-035）。
+## 決定論的処理との責務接続（DEC-036）
+
+Command / Workflow Skill / Capability Skill の3層構造（DEC-010）を維持したまま、決定論的処理を次の責務分離で接続する（DEC-036、REQ-002-035）。semantic Skill と deterministic code の分類基準の列挙正典は DEC-036 と [../foundations/v4-responsibility-boundaries.md](../foundations/v4-responsibility-boundaries.md) が所有し、本節は再掲しない。
 
 | 層 | 責務 |
 |---|---|
@@ -165,7 +168,7 @@ Command / Workflow Skill / Capability Skill の3層構造（DEC-010）を維持�
 | Capability Skill | 複数の処理手順で共通する判断基準・能力（宣言的ルール、分類基準） |
 | 決定論的処理 | 規則に基づき一意に判定・変換できるテスト可能な処理（採番、整合性検査、見出し検索等） |
 
-- Capability Skill は決定論的処理を公開能力として所有できる（例: `agentdev-artifact-validation` の公開検証契約、`agentdev-req-file-manager` の採番スクリプト）。この場合も workflow の処理順序、分岐、停止条件の移管は行わず、それらは Workflow Skill が所有したまま参照する。
+- Capability Skill は決定論的処理の公開操作契約を参照できる（例: `agentdev-artifact-validation` の公開検証契約、`agentdev-req-file-manager` の採番スクリプト）。決定的処理の実体は script / Custom Tool として公開・参照され、workflow の処理順序、分岐、停止条件の移管は行わず、それらは Workflow Skill が所有したまま参照する。
 - 決定論的処理は既存の script 種別（決定的でテスト可能な実行ロジック、`scripts/` 配下の TypeScript、I/O 契約: argv/stdin → stdout JSON）へ接続し、新たな層や成果物種別を導入しない。決定論的に処理できる事項を理由なく LLM の推論だけへ委ねない（REQ-002-035）。
 
 ## Capability Skill 横断抽出（DEC-010 Inventory に基づく）
@@ -222,7 +225,7 @@ Workflow Skill の単独起動防止（soft guard）は OpenCode 1.18.15 が ski
 
 | 層 | 実装 | 全 Workflow Skill での実装有無 |
 |---|---|---|
-| Skill 層 | Workflow Skill description の DO NOT USE FOR に置く簡潔なトリガー項（「単独起動（対応する /agentdev/* コマンド経由で利用すること）」） | 全17 Workflow Skill で実装（実効の主層） |
+| Skill 層 | Workflow Skill description の DO NOT USE FOR に置く簡潔なトリガー項（「単独起動（対応する /agentdev/* コマンド経由で利用すること）」） | 全18 Workflow Skill で実装（実効の主層・checker 実測 18 = 公開 command 13 + 内部 lifecycle 5） |
 | Command 層 | command 定義本文 workflow 節の soft guard 宣言節（grep 可能な `soft guard` マーカー） | core Command（req-define、case-open、case-ready、case-revise、case-run、case-close、case-auto）と inspect 3 Command（inspect-docs、inspect-skills、inspect-promote）、issue Command で実装。intake / learning / backlog 5 Command（intake-capture、intake-from-github、intake-promote、learning-promote、backlog-review）は command 定義本文に宣言節を持たず、Skill 層のみで実効する |
 
 マーカー語、内部 ID、運用規則の散文は description に置かない。

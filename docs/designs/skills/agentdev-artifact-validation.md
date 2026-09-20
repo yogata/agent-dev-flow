@@ -2,7 +2,7 @@
 title: agentdev-artifact-validation Design
 status: accepted
 created: 2026-07-22
-updated: 2026-09-04
+updated: "2026-09-19"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-042 -->
 
@@ -49,7 +49,7 @@ REQ、Decision、Design 固有の内容判断を行わず、決定的検証の�
 
 - artifact-contracts.md「Script 所有権と委譲契約」
 - artifact-responsibilities.md「操作 skill 正規所有者台帳」
-- workflow-contracts.md（保存内部責務からの共通検証 script 呼出契約）
+- v4-lifecycle-state-machine.md（保存内部責務からの共通検証 script 呼出契約）
 
 ## 現在の動作
 
@@ -88,3 +88,12 @@ REQ 固有 script は `agentdev-req-file-manager`、Decision 固有 script は `
 - [agentdev-design-file-manager.md](agentdev-design-file-manager.md)（Design 操作 skill、Design 固有 script 所有）
 - REQ-002-040（決定的処理の正規配置基準）、REQ-002-016（script は該当 skill の scripts/ 配下へ配置し所有 skill の公開操作契約経由で呼び出す）
 - REQ-002-035（決定的処理の script 委譲）
+
+
+## v4 責務分類
+
+ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+
+- **semantic 担当**: 0 件
+- **deterministic 委譲先**: validation → scripts/src/check-change-impact.ts・check-entry-existence.ts・check-frontmatter-consistency.ts
+- **知識提供**: 公開検証契約（I/O・JSON 結果）

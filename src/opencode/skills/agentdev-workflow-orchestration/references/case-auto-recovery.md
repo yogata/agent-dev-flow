@@ -49,7 +49,7 @@ bg task 破棄時の状態別回復とコンフリクト解消モデルは協調
 ## orchestration stage モデルへの復帰（接続規則）
 
 本回復プロトコルは case-auto の orchestration stage モデル（stage 1 case-open（例外経路時は case-revise）/ stage 2 case-ready / stage 3 case-run / stage 4 case-close、stage 内最大並列・stage 間全対象収束 fan-in）と接続する。
-stage 再構成規則の正本は epic-wave-model Design「ドラフト間並列実行モデル」節と `agentdev-workflow-case-auto` SKILL.md「再開プロトコル」が保持し、本ファイルは正本を持たない。
+stage 再構成規則の正本は case-auto Design「ドラフト間並列実行モデル」節と `agentdev-workflow-case-auto` SKILL.md「再開プロトコル」が保持し、本ファイルは正本を持たない。
 
 - 中断回復後に再開する場合、現在 stage を stage cursor ではなく永続状態（起動時対象集合と各対象の正規状態）から最も早い未収束 stage として再構成し、当該 stage の全対象収束（fan-in）へ復帰する
 - 回復した単一対象を後続 stage へ先行させない。他対象が当該 stage で未収束である間は、回復済み対象も次 stage を開始しない

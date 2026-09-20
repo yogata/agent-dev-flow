@@ -564,6 +564,22 @@ function buildInvalidFixture(root: string): void {
     ].join("\n"),
     "utf-8",
   );
+
+  // Case #2981（DEC-033）: case-run / case-close は duties 表から除去済みのため、
+  // command-capture-duty の NG 検出検査は duties 残存の req-save.md で行う。
+  writeFileSync(
+    join(cmdDir, "req-save.md"),
+    [
+      "---",
+      "description: req-save",
+      "agent: sisyphus",
+      "---",
+      "",
+      "Missing capture-boundaries reference and duty keyword.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
 }
 const VALID_ROOT = join(TEMP_ROOT, "valid");
 const INVALID_ROOT = join(TEMP_ROOT, "invalid");
@@ -938,7 +954,9 @@ describe("Capture boundary checks", () => {
     expect(check.level).toBe("ok");
   });
 
-  it("valid fixture: command-capture-duty checks pass for 3 specific-duty commands", () => {
+  it("valid fixture: command-capture-duty checks pass for the remaining specific-duty command (req-save)", () => {
+    // Case #2981（DEC-033）: case-run / case-close は duties 表から除去済み（内部
+    // lifecycle 段階化）。残る specific-duty command は req-save のみ。
     const r = runScript(VALID_ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
     const dutyOk = parsed.results.filter(
@@ -947,7 +965,7 @@ describe("Capture boundary checks", () => {
         res.check === "command-capture-duty" &&
         res.level === "ok",
     );
-    expect(dutyOk.length).toBe(3);
+    expect(dutyOk.length).toBe(1);
   });
 
   it("valid fixture: exempt commands (case-open, case-auto) are not checked even without capture-boundaries reference", () => {
@@ -963,10 +981,10 @@ describe("Capture boundary checks", () => {
     expect(exemptResults.length).toBe(0);
   });
 
-  it("valid fixture: specific-duty commands (case-run, case-close, req-save) are checked", () => {
+  it("valid fixture: the remaining specific-duty command (req-save) is checked and retired commands are not", () => {
     const r = runScript(VALID_ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
-    const checkedCommands = ["case-run.md", "case-close.md", "req-save.md"];
+    const checkedCommands = ["req-save.md"];
     for (const cmd of checkedCommands) {
       const found = parsed.results.find(
         (res: { check: string; category: string; message: string; level: string }) =>
@@ -976,6 +994,16 @@ describe("Capture boundary checks", () => {
       );
       expect(found).toBeDefined();
       expect(found.level).toBe("ok");
+    }
+    // Case #2981（DEC-033）: 廃止された case-run.md / case-close.md は検査対象外。
+    for (const retired of ["case-run.md", "case-close.md"]) {
+      const found = parsed.results.find(
+        (res: { check: string; category: string; message: string }) =>
+          res.category === "CaptureBoundary" &&
+          res.check === "command-capture-duty" &&
+          res.message.includes(retired),
+      );
+      expect(found).toBeUndefined();
     }
   });
 
@@ -1012,7 +1040,7 @@ describe("Capture boundary checks", () => {
         res.category === "CaptureBoundary" &&
         res.check === "command-capture-duty" &&
         res.level === "ng" &&
-        res.message.includes("case-run.md"),
+        res.message.includes("req-save.md"),
     );
     expect(dutyNg.length).toBeGreaterThanOrEqual(1);
   });
@@ -2960,7 +2988,7 @@ describe("IR-055 runtime-unresolved-reference 実修復回帰 (Issue #1782)", ()
         (r.finding_level === "strict" || r.finding_level === "heuristic"),
     );
     expect(newViolations.length).toBe(0);
-  });
+  }, 15000);
 
   it("baseline-known runtime-unresolved-reference が閾値以下であること（修復後の上限）", () => {
     // 修復時点での baseline-known 数を上限として固定する。この値を超える場合、
@@ -2982,7 +3010,7 @@ describe("IR-055 runtime-unresolved-reference 実修復回帰 (Issue #1782)", ()
     );
     // 修復完了時点の実績値。将来の削減を許容し、増加を拒否する。
     expect(baselineKnown.length).toBeLessThanOrEqual(548);
-  });
+  }, 15000);
 });
 
 // ─── NG21 N16/N17 是正回帰テスト（Issue #2245, OU-0009, RU-0054） ──────────
@@ -3021,9 +3049,12 @@ describe("NG21 N16/N17 是正回帰 (Issue #2245, OU-0009)", () => {
     );
     expect(gapOk).toBeDefined();
     expect(gapOk!.message).toContain("corresponding implementations");
-  });
+  }, 15000);
 
-  it("N17: case-close.md の command-capture-duty が ok であること（capture-boundaries 参照）", () => {
+  it("N17: case-close.md 廃止後、command-capture-duty の検査対象から除去されていること", () => {
+    // Case #2981（DEC-033）で case-close 公開 command 定義は削除された。capture 責務は
+    // Workflow Skill（agentdev-workflow-case-close）側へ継承され、command-capture-duty
+    // の duties 表から除去済みであること（NG21 是正回帰の継続保持）を検証する。
     const proc = Bun.spawnSync(["bun", "run", SCRIPT_FILE, "--json"], {
       cwd: REPO_ROOT,
       stdout: "pipe",
@@ -3039,10 +3070,8 @@ describe("NG21 N16/N17 是正回帰 (Issue #2245, OU-0009)", () => {
         r.check === "command-capture-duty" &&
         (r.message ?? "").includes("case-close.md"),
     );
-    expect(duty).toBeDefined();
-    expect(duty!.level).toBe("ok");
-    expect(duty!.message).toContain("capture-boundaries reference");
-  });
+    expect(duty).toBeUndefined();
+  }, 15000);
 });
 
 // ─── WP-3 (Issue #1928): execution profile separation ───────────────────────

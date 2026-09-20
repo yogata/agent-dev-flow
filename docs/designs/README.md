@@ -111,7 +111,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [skills/agentdev-req-analysis.md](skills/agentdev-req-analysis.md) | accepted | 中核 | 要件分析 |
 | [skills/agentdev-req-file-manager.md](skills/agentdev-req-file-manager.md) | accepted | 中核 | REQ ファイル管理 |
 | [skills/agentdev-req-structure-diagnostics.md](skills/agentdev-req-structure-diagnostics.md) | accepted | 中核 | REQ 構造診断 |
-| [skills/agentdev-traceability.md](skills/agentdev-traceability.md) | accepted | 中核 | トレーサビリティ標準配布スキル（coverage、impact、check、対応宣言の解析、正規成果物の直接走査）（REQ-012、DEC-017） |
+| [skills/agentdev-traceability.md](skills/agentdev-traceability.md) | accepted | 中核 | トレーサビリティ標準配布スキル（coverage、impact、check、対応宣言の解析、正規成果物の直接走査）（REQ-012、DEC-037） |
 | [skills/agentdev-decision-file-manager.md](skills/agentdev-decision-file-manager.md) | accepted | 中核 | Decision ファイル管理 |
 | [skills/agentdev-decision-guidelines.md](skills/agentdev-decision-guidelines.md) | accepted | 中核 | Decision 要否判定 |
 | [skills/agentdev-architecture-advisory.md](skills/agentdev-architecture-advisory.md) | accepted | 中核 | アーキテクチャ助言 |
@@ -148,16 +148,13 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 
 | Design | status | タイトル | 責務 |
 |------|--------|---------|------|
-| [workflows/workflow-contracts.md](workflows/workflow-contracts.md) | accepted | ワークフロー契約（横断） | パイプライン概要、共通フェーズ、SSoT 遷移、実装分類、case-auto と case-run の委譲モデル、result 4状態契約 |
 | [workflows/workflow-skill-model.md](workflows/workflow-skill-model.md) | accepted | Workflow Skill Model | Command / Workflow Skill / Capability Skill の責務、依存方向、1:N分割基準、配置契約。DEC-010 実装詳細 |
-| [workflows/step-reference-contract.md](workflows/step-reference-contract.md) | accepted | STEP Reference Contract | STEP reference 構造、開始条件、結果、証拠、完了確認、べき等性。DEC-011 実装詳細 |
-| [workflows/input-resolution-and-durable-state.md](workflows/input-resolution-and-durable-state.md) | accepted | Input Resolution and Durable State | 入力解決優先順位、永続状態、current STEP 再構成、並列child task 復元。DEC-011 入力解決・永続状態側面 |
-| [workflows/delegation-contracts.md](workflows/delegation-contracts.md) | accepted | サブエージェント委譲契約 | 委譲時最小契約、委譲種別、制約、manager-orchestrator 分離 |
+| [workflows/v4-delegation-contracts.md](workflows/v4-delegation-contracts.md) | accepted | サブエージェント委譲契約（v4） | 委譲時最小契約、委譲種別 8 種、制約、実行主体分類、adversarial-review 接続、構造化文脈直列化契約。result 4 状態と authority は v4-lifecycle-state-machine / v4-runtime-execution-model 参照（旧 delegation-contracts.md から集約 supersede） |
 | [workflows/capture-boundaries.md](workflows/capture-boundaries.md) | accepted | キャプチャ境界 | intake / learning 境界、Split Rule、PR 本文永続チャネル |
-| [workflows/epic-wave-model.md](workflows/epic-wave-model.md) | accepted | Epic / Wave / Issue 実行モデル | OU 階層、子Issue 状態 enum、Wave スケジューリング、execution_unit 構成契約、orchestration stage モデル、per-Epic 単一書き手 |
-| [workflows/definition-readiness.md](workflows/definition-readiness.md) | accepted | Definition Readiness | Definition Package、Definition PR / Definition Amendment PR の lifecycle（通常 Pull Request、merge 前 isDraft 確認を含む）、canonical Definition 判定、冪等キー、backend 意味論の物理写像 |
-| [workflows/backlog-artifact-lifecycle.md](workflows/backlog-artifact-lifecycle.md) | accepted | RU / 採用済み成果物 / draft lifecycle | artifact lifecycle、検出事項プロトコル、artifact_actions 工程分岐 |
-| [workflows/references/execution-unit-construction.md](workflows/references/execution-unit-construction.md) | accepted | execution_unit 構成アルゴリズム参照 | epic-wave-model.md から参照される連結成分アルゴリズム、3軸判断モデルの機械的判定手順 |
+| [workflows/references/execution-unit-construction.md](workflows/references/execution-unit-construction.md) | accepted | execution_unit 構成アルゴリズム参照 | v4-standard-lifecycle（語彙）と case-open Design（運用主体）から参照される連結成分アルゴリズム、3軸判断モデルの機械的判定手順 |
+| [workflows/v4-standard-lifecycle.md](workflows/v4-standard-lifecycle.md) | accepted | ADF v4 標準ライフサイクル | v4 標準ライフサイクルの定義（work_type/scale/Epic/Wave の語彙直交性、公開 UX 2入口収斂と内部 lifecycle への回収、req-define 入口の入力意味、継続コラボレーションループ） |
+| [workflows/v4-lifecycle-state-machine.md](workflows/v4-lifecycle-state-machine.md) | accepted | ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応） | v4 ライフサイクル状態機械の定義（durable state enum と runtime 実行状態の二層モデル、階層合成〔子=実状態、上位=導出投影〕、deterministic/semantic gate 分離、v3 command と内部状態遷移の対応表、v3 状態関連 Design の planned supersede 記録） |
+| [workflows/v4-collaboration-loop.md](workflows/v4-collaboration-loop.md) | accepted | ADF v4 継続コラボレーションループ | 循環の各段責務（Observe・Integrate 定義、実現手段対応表）、Learning 評価結果 7 系統、昇格ガード、.agentdev/ 状態領域の整合、v3 backlog-artifact-lifecycle Design からの吸収 |
 
 ### 基盤 Design 一覧（6 ドメイン配下）
 
@@ -180,8 +177,14 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | foundations/design-principles.md | accepted | 設計原則 | アーキテクチャ設計原則 |
 | foundations/project-extensions.md | accepted | Project Extensions | 実行時プロジェクト固有追加・拡張機構（`.agentdev/extensions/**`）、extension schema、実行時読み込み契約、project-local skill 委譲、配布物具体参照禁止（REQ-002） |
 | foundations/harness-separation-model.md | accepted | harness 分離モデル | 配布物と harness 実行制御の責務分離モデル。配布物の大多数を harness 非依存とし、依存具体を references/ へ集約 |
-| foundations/traceability-model.md | accepted | 最小トレーサビリティモデル（TIM） | 要件を中心とした最小 TIM のモデル要素（要件行、対応関係（covers）、design/implementation/verification の3役割）、対応関係の完全性規則、用語政策を正規所有（REQ-012、DEC-017） |
 | foundations/references/concrete-abstraction.md | accepted | 配布物具体参照の抽象化参照 | 配布物から harness 固有・実装固有の具体を抽象化する手順の参照。harness-separation-model.md、responsibility-boundary-purification.md から参照される |
+| foundations/v4-operating-model.md | accepted | ADF v4 Operating Model | v4 の目的・適用範囲・標準語彙・プロセス/実装分離原則、三層責務モデル（ADF Runtime / Standard Operating Model / Project Model）、Project Contract の論理ビュー、8 情報寿命モデル、中核文書モデル（REQ/Decision/Design/Implementation/Evidence）の定義 |
+| foundations/v4-responsibility-boundaries.md | accepted | ADF v4 実装責務境界 | semantic Skill / deterministic code / Harness adapter / Project Extensions の実装責務境界（semantic 6 項目・deterministic 11 項目の分類基準、OpenCode first-class reference harness、semantic extension point）の定義 |
+| foundations/v4-traceability-model.md | accepted | ADF v4 Traceability モデル | Change / Evidence 中心の Traceability モデル（4 問いへの回答能力、永続情報と導出可能情報の分離、global completeness の位置づけ）の定義 |
+| foundations/v3-v4-crosswalk.md | accepted | v3 -> v4 Concept / Artifact Crosswalk | v3 成果物の v4 での処遇の正規記録先（3 列 schema〔意味処遇・帰属・実行段階〕、処遇実行原則〔living tracking〕、段階割当規則、集約サマリ）。処遇の完全一覧は references/crosswalk-inventory.md が所有する（references/ は親 Design 行の備考欄で言及）。実際の置換・廃止は後続 v4 Implementation Sequence で実行 |
+| foundations/v4-migration-and-release.md | accepted | ADF v4 Migration と Release の標準境界 | 標準 migration pattern（非破壊移行原則）、RC tag 運用と cutover sequence、pilot migration と v4.0.0 final 条件、v3-baseline と rollback anchor、後続 v4 Implementation Sequence の定義 |
+| foundations/v4-durable-state-and-recovery.md | accepted | ADF v4 durable state と再構成・恢復（配置表・権威移行・部分失敗調整） | durable state の 5 分類と配置表、状態と証跡の分離、導出可能情報の判定基準、再構成優先順位の全実行単位への一般化、権威移行点、部分失敗の調整の定義 |
+| foundations/v4-runtime-execution-model.md | accepted | ADF v4 Runtime 実行モデル（authority 格子・直列化単位・冪等経路・runtime 制御ループ） | 副作用 4 分類と authority 格子、直列化単位 5 種、冪等経路、直列化違反・競合検出時の意味論、runtime 制御ループ、fail-closed 適用範囲の定義 |
 
 #### responsibilities/（文書種別、成果物責務）
 
@@ -200,10 +203,10 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | Design | status | タイトル | 責務 |
 |------|--------|---------|------|
 | quality/quality-specs.md | accepted | 品質仕様 | 品質基準、検証ルール |
-| quality/quality-gates.md | accepted | 品質ゲート | QG-1〜QG-4 定義、機械化境界 |
 | quality/req-health-metrics.md | accepted | REQ 健全性メトリクス | REQ 肥大化、関心ズレ検出の定量閾値 |
 | quality/design-health-metrics.md | accepted | Design 健全性メトリクス | Design 肥大化、放置、ドメイン分類適合の定量閾値 |
 | quality/textlint-quality-runtime.md | accepted | textlint 品質基盤 | 文章表層品質の共通実行基盤（プロジェクト解決、設定読込み、対象解決、規則構成、文章検査、結果整形）。書込み前検査と最終検査の共通化、Plugin と単独実行入口の2入口 |
+| quality/v4-quality-gate-model.md | accepted | ADF v4 Quality / Verification / Evidence / Gate モデル | Quality Policy / Verification Obligation / Verifier / Evidence / Gate の 5 概念分解、Gate = 状態遷移 predicate 契約、v4 standard lifecycle からの Gate 再導出手順、Verifier 分類の定義 |
 
 #### integrity/（整合性契約、ルール）
 

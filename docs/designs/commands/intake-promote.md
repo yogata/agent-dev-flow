@@ -2,7 +2,7 @@
 title: intake-promote Design
 status: accepted
 created: 2026-06-21
-updated: 2026-08-19
+updated: "2026-09-20"
 ---
 <!-- ADF-COVERS(implementation): REQ-015-006 -->
 <!-- ADF-COVERS(implementation): REQ-037-001, REQ-037-003, REQ-037-004, REQ-037-005 -->
@@ -68,7 +68,7 @@ intake-promote は change_nature と併せて、observed_evidence（根拠とな
 - 採用 item の inbox 元ファイルを削除（`archive/promoted/` への移動を廃止）
 - reject item の inbox 元ファイルを削除（`archive/rejected/` への移動を廃止）。reject 時の commit message に却下理由を含める（監査証跡の補強）
 - 実行前同期: `git pull --ff-only`
-- GitHub Issue 作成: 行わない（case-open 責務）
+- GitHub Issue 作成: 行わない（case-auto が駆動する内部 lifecycle の case-open 段階の責務）
 
 ## 現在の動作
 
@@ -94,11 +94,11 @@ intake-promote は change_nature と併せて、observed_evidence（根拠とな
 ## 参照する横断 Design
 
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 境界、Split Rule）
-- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（採用済み成果物 lifecycle）
+- [workflows/v4-collaboration-loop.md](../workflows/v4-collaboration-loop.md)（Intake 段の責務、採用済み成果物の .agentdev/ 状態領域の整合）
 
 ## 自律確定の判定位置とHITLフォールバック（新規セクション）
 
-本節は intake-promote における自律確定の判定位置とHITLフォールバックの実行詳細を所有する。判断確定の境界は REQ-003-055 の共通原則に従い、詳細判定表は横断契約Design（workflows/workflow-contracts.md「promote系判断確定とHITL境界」節）が集約所有する（本 Design と Workflow Skill は同一内容を重複保持しない）。
+本節は intake-promote における自律確定の判定位置とHITLフォールバックの実行詳細を所有する。判断確定の境界は REQ-003-055 の共通原則に従い、詳細判定表は HITL 境界契約Design（v4-responsibility-boundaries）が集約所有する（本 Design と Workflow Skill は同一内容を重複保持しない）。
 
 ### classification〜review〜HITL〜persistence の各 STEP における自律確定判定の挿入位置
 

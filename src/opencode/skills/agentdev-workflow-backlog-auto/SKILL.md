@@ -8,6 +8,7 @@ description: "backlog-auto command の workflow 実装本体。orchestration sta
 backlog-auto command の workflow 実装本体である。
 backlog 整理サイクル（inspect-docs → 昇格3系統 → backlog-review）の工程間制御（順序、並列と直列化、合流（fan-in）、停止伝播、再開）を所有する。
 子ワークフロー内部の分類、評価、昇格、RU 生成ロジックは各子 Workflow Skill が正規の処理主体として所有し、本スキルはこれらを複製しない。
+backlog 整理サイクルは継続コラボレーションループ（`<workflows/v4-collaboration-loop>` Design）における要求入口としてのループ駆動点であり、Observe → Intake/Learning → Backlog の実行順序で一巡する。
 
 backlog-auto command は公開 interface（入出力契約、ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。
 
@@ -28,7 +29,7 @@ backlog-auto command は公開 interface（入出力契約、ガードレール�
 ## 制御平面（STEP 一覧）
 
 backlog-auto workflow は次の6 STEP で構成する。
-各 STEP は再開ポイント（resume point）を持ち（DEC-{N}、`<workflows/step-reference-contract>` Design）、会話コンテキストに依存せず、永続状態（`backlog_auto_started_at`、各子コマンドの永続状態）から再開点を再構成する。
+各 STEP は再開ポイント（resume point）を持ち（DEC-{N}、`<foundations/v4-durable-state-and-recovery>` Design）、会話コンテキストに依存せず、永続状態（`backlog_auto_started_at`、各子コマンドの永続状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -90,7 +91,7 @@ backlog-auto workflow は次の6 STEP で構成する。
 ## See Also
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
+- **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
 - **backlog-auto command**: 本スキルの呼出元（公開 interface、ガードレール、dispatch を所有）

@@ -2,7 +2,7 @@
 title: ルール所有権マトリックス
 status: accepted
 created: 2026-08-20
-updated: 2026-09-17
+updated: "2026-09-20"
 ---
 
 <!-- ADF-COVERS(design): REQ-057-023 -->
@@ -27,6 +27,10 @@ req-impact-map.md の配置の正本は `../responsibilities/req-impact-map.md` 
 ## 配布物対応宣言（ADF-COVERS）の配置規則
 
 対応関係の正規保存方式は、repository top-level の producer/project-side `traceability/` 配下の component / package 単位 sidecar である。ADF-COVERS（implementation / verification）は、producer-only artifact に対応関係を inline 保持する場合の表現形式とし、consumer distribution closure に含まれる成果物では使用しない。配布物（`src/opencode/commands/agentdev/**`、`src/opencode/skills/agentdev-*/**` 等の実行時配布 .md）には対応宣言を記述せず、当該成果物の対応関係は sidecar で保持する。docs 配下の正規成果物（command Design、skill Design 等のリポジトリ内部設計文書）と repo-local 実装（`.opencode/skills/repo-*` の scripts 等の配布対象外ファイル）は producer-only artifact であり、inline 宣言を保持できる。inline 宣言と sidecar は同じ論理的な対応関係へ正規化され、coverage / impact / check から同一に扱われる。本配置規則により、配布物の concrete ID 排除（配布境界 baseline）と producer-side traceability metadata の非混入（distribution purity）を両立する。
+
+## semantic / deterministic 分類注記（DEC-036）
+
+各ルールドメインの正規所有者の所在は、DEC-036 の責務分類（semantic 6 項目・deterministic 11 項目）に従って読む。判定基準・運用規則の意味契約は Design または Skill の知識（semantic 側）が、checker 実体・採番・整合検査・機械分類（check_extensions.ts deriveSkillClassification 等）の決定的処理は script / repo-local checker（deterministic 側）が所有する。正典は DEC-036 と `../foundations/v4-responsibility-boundaries.md`（知識提供層の定義を含む 3 区分）である。v4 分類軸を検査する新規 checker は現段階で作らない（第13段 full validation で再評価する）。
 
 ## ルールドメイン一覧
 
@@ -54,14 +58,14 @@ req-impact-map.md の配置の正本は `../responsibilities/req-impact-map.md` 
 | 20 | Authoring DoD | REQ-010 (060, 062-063), REQ-038 (005) | quality-specs.md | 行数、Steps、共通化、正規パス（`canonical path`） |
 | 21 | Command Step 整数化 | -（要件行レベルの正規所有者なし） | command-file-format.md | 最上位 Step は整数のみ。小数 Step を禁止。旧 `### Step N` 様式の残存・誤用検出（IR-028。REQ-047 で正規所有者を Design へ整理） |
 | 22 | Command サブステップ表記 | -（要件行レベルの正規所有者なし） | command-file-format.md | サブステップは N-M 形式のみ許容。英字サブステップを禁止（IR-029。REQ-047 で正規所有者を Design へ整理） |
-| 23 | Subagent verbatim 条件 | REQ-003 (013) | workflow-contracts.md | 成果物本文のみそのまま（verbatim）。一律 verbatim 制約を禁止 |
-| 24 | Findings / Capture候補 見出し | REQ-003 (014, 020, 021) | workflow-contracts.md | current/source は新見出しへ統一。旧語検出用文字列は許容 |
-| 25 | Delegation envelope 最小契約 | REQ-003 (017, 018) | workflow-contracts.md | `delegation_type`/`on_result` は必須 envelope ではないことを確認 |
-| 26 | lightweight-delegation 位置付け | REQ-003 (015, 016) | workflow-contracts.md | 主要パターン（`primary pattern`）ではなく重ねる委譲として扱う |
+| 23 | Subagent verbatim 条件 | REQ-003 (013) | v4-responsibility-boundaries.md | 成果物本文のみそのまま（verbatim）。一律 verbatim 制約を禁止 |
+| 24 | Findings / Capture候補 見出し | REQ-003 (014, 020, 021) | v4-responsibility-boundaries.md | current/source は新見出しへ統一。旧語検出用文字列は許容 |
+| 25 | Delegation envelope 最小契約 | REQ-003 (017, 018) | v4-responsibility-boundaries.md | `delegation_type`/`on_result` は必須 envelope ではないことを確認 |
+| 26 | lightweight-delegation 位置付け | REQ-003 (015, 016) | v4-responsibility-boundaries.md | 主要パターン（`primary pattern`）ではなく重ねる委譲として扱う |
 | 27 | 語彙ポリシー横断検出 | REQ-004 (024-028) | integrity-contracts.md | 現行対象範囲の語彙ポリシー違反検出 |
 | 28 | Cross-REQ 語彙矛盾 | REQ-010 | integrity-contracts.md | 現行 REQ 間の語彙矛盾検出 |
 | 29 | REQ 検証基準（必達要件） | REQ-010 | integrity-contracts.md | 規範語ではなく必達要件判定に基づく検証（v2:REQ-0115-044 から REQ-010 に移管） |
-| 30 | Quality Gates | REQ-010 | quality-gates.md | QG-1〜QG-4 定義、機械化境界、実装マッピング（v2:REQ-0115 から REQ-010 に移管） |
+| 30 | Quality Gates | REQ-010 | v4-quality-gate-model.md | QG-1〜QG-4 定義、機械化境界、実装マッピング（v2:REQ-0115 から REQ-010 に移管） |
 | 31 | docs 日本語表現、文意整合 | v2:REQ-0140, REQ-010 (003), REQ-036 (023) | integrity-rule-catalog.md (IR-045) | 英字混じり抽象用語、読取専用セマンティクスの検出。文書表記、文意品質ゲート（付帯品質ゲート）の機械検査担当 |
 | 32 | local-case-file（ローカルIssue共通スキーマ） | REQ-009 (016-020, 024, 025) | local-case-file.md | ローカル版 OpenCode のローカルIssue YAML 前書き、role 条件付き status enum、labels 値域、見出し一覧、マージ結果記録 |
 | 33 | ローカル版 link mode 導入フロー、安全ゲート | REQ-009 (001-015) | runtime-package-boundary.md | link mode 接続手順、link target 確認、ジャンクション検出安全ゲート |
@@ -135,12 +139,12 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-024 | Command README ↔ 実体 | REQ-001-026, REQ-010-003 | integrity-contracts.md |
 | IR-025 | 廃止 Decision path 規則 | REQ-001-047, REQ-001-048 | integrity-contracts.md, document-model.md |
 | IR-027 | 廃止 ADR 現行根拠引用検出 | REQ-001-048, REQ-001-050 | integrity-contracts.md, document-model.md |
-| IR-028 | Command 最上位 Step 整数化 | -（要件行レベルの正規所有者なし。サブステップ様式の正規契約は command-file-format.md が所有） | ../../authoring/command-file-format.md, artifact-contracts.md, workflow-contracts.md |
-| IR-029 | Command 英字サブステップ禁止 | -（要件行レベルの正規所有者なし。サブステップ様式の正規契約は command-file-format.md が所有） | ../../authoring/command-file-format.md, artifact-contracts.md, workflow-contracts.md |
-| IR-030 | Subagent verbatim 条件付き返却 | REQ-003-013, REQ-003-021 | workflow-contracts.md, artifact-contracts.md, artifact-responsibilities.md |
-| IR-031 | Findings / Capture候補 見出し統一 | REQ-003-014, REQ-003-020, REQ-003-021 | workflow-contracts.md |
-| IR-032 | delegation_type/on_result 必須 envelope 禁止 | REQ-003-017, REQ-003-018 | workflow-contracts.md, artifact-contracts.md |
-| IR-033 | lightweight-delegation primary pattern 禁止 | REQ-003-015, REQ-003-016 | workflow-contracts.md, artifact-contracts.md |
+| IR-028 | Command 最上位 Step 整数化 | -（要件行レベルの正規所有者なし。サブステップ様式の正規契約は command-file-format.md が所有） | ../../authoring/command-file-format.md, artifact-contracts.md, v4-responsibility-boundaries.md |
+| IR-029 | Command 英字サブステップ禁止 | -（要件行レベルの正規所有者なし。サブステップ様式の正規契約は command-file-format.md が所有） | ../../authoring/command-file-format.md, artifact-contracts.md, v4-responsibility-boundaries.md |
+| IR-030 | Subagent verbatim 条件付き返却 | REQ-003-013, REQ-003-021 | v4-responsibility-boundaries.md, artifact-contracts.md, artifact-responsibilities.md |
+| IR-031 | Findings / Capture候補 見出し統一 | REQ-003-014, REQ-003-020, REQ-003-021 | v4-responsibility-boundaries.md |
+| IR-032 | delegation_type/on_result 必須 envelope 禁止 | REQ-003-017, REQ-003-018 | v4-responsibility-boundaries.md, artifact-contracts.md |
+| IR-033 | lightweight-delegation primary pattern 禁止 | REQ-003-015, REQ-003-016 | v4-responsibility-boundaries.md, artifact-contracts.md |
 | IR-034 | Skill 内部 section / protocol / Step 参照検出 | REQ-010 | integrity-contracts.md |
 | IR-035 | Skill See Also 検出観点 | REQ-010 | integrity-contracts.md |
 | IR-037 | retired-ADR-current-baseline-ref | REQ-001-048 | integrity-contracts.md, document-model.md |
@@ -157,7 +161,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-049 | Command file format violation | v2:REQ-0143, REQ-010 | command-file-format.md, integrity-contracts.md |
 | IR-050 | load_skills command 誤指定検出 | v2:REQ-0140-027, REQ-010-010 | integrity-contracts.md, document-type-responsibilities.md |
 | IR-051 | 実行主体の skill 表記誤認検出 | v2:REQ-0140-027, REQ-010-010 | integrity-contracts.md, document-type-responsibilities.md |
-| IR-052 | 完了条件 grep パターン設計（REQ-010-011） | REQ-010-011 | integrity-contracts.md, quality-gates.md |
+| IR-052 | 完了条件 grep パターン設計（REQ-010-011） | REQ-010-011 | integrity-contracts.md, v4-quality-gate-model.md |
 | IR-053 | gh 直接記述検出 | REQ-011 | integrity-rule-catalog.md, integrity-contracts.md, ../../responsibilities/custom-tool-contracts.md |
 | IR-054 | draft Design 放置検出 | REQ-001-002 | integrity-rule-catalog.md, integrity-contracts.md |
 | IR-055 | runtime-unresolved-reference（配布物内の導入先未解決参照検出） | REQ-002-079, REQ-002-080, REQ-002-081 | integrity-rule-catalog.md, integrity-contracts.md |

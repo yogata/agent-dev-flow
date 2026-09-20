@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-run
-description: "case-run command の workflow 実装本体。単一 Issue 実行（single workflow）と Epic Wave 実行（epic-wave workflow）の 1:N 分離構成、実行担当サブエージェント委譲（最大5件並列）、fan-out・fan-in、partial result、child task recovery、result 4状態処理を所有する。USE FOR: case-run 実行時の workflow 制御（single Issue 実行・Epic Wave 実行・再開フェーズ判定・委譲・前置/最終 gate）。DO NOT USE FOR: 実装実行そのもの（委譲内の実行担当サブエージェントが担う）、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "内部 lifecycle 段階 case-run の workflow 実装本体。単一 Issue 実行（single workflow）と Epic Wave 実行（epic-wave workflow）の 1:N 分離構成、実行担当サブエージェント委譲（最大5件並列）、fan-out・fan-in、partial result、child task recovery、result 4状態処理を所有する。USE FOR: case-run 実行時の workflow 制御（single Issue 実行・Epic Wave 実行・再開フェーズ判定・委譲・前置/最終 gate）。DO NOT USE FOR: 実装実行そのもの（委譲内の実行担当サブエージェントが担う）、単独起動（case-auto の内部 lifecycle orchestration から起動される内部段階である）。"
 ---
 
 
@@ -56,7 +56,7 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 
 ## 制御平面（STEP 一覧）
 
-各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
+各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<foundations/v4-durable-state-and-recovery>.md`）。
 会話コンテキストに依存せず、永続状態（GitHub Issue/PR、Issue コメント、worktree・ブランチの存在、PR URL）から再開点を再構成する。
 
 ### single workflow（単一 Issue 実行モード）
@@ -118,19 +118,19 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 ## トレーサビリティ能力の利用
 
 case-run の実行担当（委譲内サブエージェント）は、対象要件について `agentdev-traceability` の coverage で既存の対応関係を確認しながら、実際に要件を実現する成果物へ実装対応を、実際に要件を検証する恒常的な検証手段へ検証対応を作成・更新する（STEP-S2 の関連Decision確認、委譲内 context 再確認）。対応宣言の作成先は成果物の配布境界で決定する。consumer distribution closure に含まれる配布対象成果物（command、skill、template、runtime script 等）の対応関係は、repository top-level の `traceability/` 配下の component / package 単位 sidecar へ作成・更新する。producer 側の開発管理成果物（docs 配下の正規成果物）の対応関係は、inline `ADF-COVERS` 宣言または sidecar へ作成・更新でき、sidecar と inline declaration は同じ論理的な対応関係へ正規化される。
-実行担当は PR 作成前に対象要件について check を実行し、Design 対応欠落、implementation 対応欠落、policy が required と判定する要件行の verification 対応欠落、verification policy の不正、sidecar / inline declaration の構文不正、同一論理関係の不整合な重複を検出対象として検査する。Decision 対応の欠落は検出対象に含めない。
+実行担当は PR 作成前に対象要件行に scope を限定した check（`--req`）を実行し、Design 対応欠落、implementation 対応欠落、policy が required と判定する要件行の verification 対応欠落、verification policy の不正、sidecar / inline declaration の構文不正、同一論理関係の不整合な重複を検出対象として検査する。Decision 対応の欠落は検出対象に含めない。
 対応宣言の表記仕様は `agentdev-traceability` Design「対応宣言の表記」が正規所有し、本スキルは表記仕様を再定義しない。
 
 - 単に変更されたファイルであることを理由に、そのファイルを要件へ自動的に対応付けない
 - check の不合格が承認済み対象範囲内で修正可能な場合は修正して再検証する。要件変更、対象範囲拡大、追加設計判断、外部依存解消が必要な場合は blocked として必要な判断事項を報告する
 - 検証対応は「何が要件を検証するか」という検証手段との恒常的な対応関係であり、「今回その検証を実行して合格したか」という実行結果は Issue、PR、QG 側で扱う
 - 中断後の再実行では、正規成果物に保存済みの対応関係を再利用し、同じ対応宣言を重複生成しない
-- トレーサビリティ能力を利用して新規の依存関係、実行構成、Wave 構成、実行順序を設計しない。依存関係と実行構成の決定責務は上流工程（case-open の execution_unit 構成、Epic Wave モデル）が所有する
+- トレーサビリティ能力を利用して新規の依存関係、実行構成、Wave 構成、実行順序を設計しない。依存関係と実行構成の決定責務は上流工程（case-open の execution_unit 構成）と Epic Wave 実行モデルの運用契約（case-run Design）が所有する
 - agentdev-traceability の不在、実行失敗、空結果、候補過多だけを理由として workflow を停止しない（fail-open）。README 索引、正規成果物の直接読取、`rg` 等の独立探索手段で継続し、正規成果物そのものの異常とトレーサビリティ機能側の異常を区別する
 
 ## 共通制約
 
-- **スコープ**: 単一 Issue または単一 Wave のみを処理する。Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）は扱わない（workflow-contracts Design SC-{NNN}、extension 経由で解決）
+- **スコープ**: 単一 Issue または単一 Wave のみを処理する。Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）は扱わない（v4-lifecycle-state-machine Design、extension 経由で解決）
 - **統合先基準（作業起点・PR base）**: worktree の作成元と PR の base は main を参照する。rebase・同期基準、鮮度確認、Epic 後続 Wave の作業起点も main を参照する
 - **実装実行の非所有**: case-run 本体は work plan 生成、実装、TDD、乖離検出、specs 更新、PR 本文作成、PR 作成を行わない（実行担当サブエージェント責務、adapter protocol 参照）
 - **SSoT**: blocked/failed の詳細本文 SSoT は Issue コメント。completed の SSoT は PR 本文。verify-only closure（PR も carrier commit も存在しない Issue 完了）ではこの例外として、検証証跡（3検査+integrity suite の結果と再実行可能な実行コマンド列）を SSoT コメント（Issue コメント）へ記録する。一時会話コンテキスト、中間ファイルは SSoT としない
@@ -146,7 +146,7 @@ case-run の実行担当（委譲内サブエージェント）は、対象要�
 ## See Also
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
+- **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
 - **case-run command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）
