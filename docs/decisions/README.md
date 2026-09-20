@@ -172,6 +172,8 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-008 | relates-to | DEC-001 | case-auto 自走境界（決定4）の適用範囲内で bounded parent decision resolution を確定 |
 | DEC-008 | relates-to | v2:ADR-0112, v2:ADR-0138 | case-auto 判断委譲に関する過去版合意履歴 |
 | DEC-009 | relates-to | v2:ADR-* | ADR から Decision への正規成果物モデル移行。過去版参照は v2:ADR-* のまま維持（AG-010） |
+| DEC-012 | relates-to | DEC-006 | 本 Decision 本文が宣言する関連（file-kind から workflow/capability responsibility への再編における前提）であり、frontmatter 上の関係宣言が欠けていた既存不整合の解消 |
+| DEC-012 | relates-to | DEC-036 | Project Extensions を標準プロセス置換ではなく semantic extension point とする決定(3) をもって本 Decision の再編方針が v4 で拡張されたことを示す関連 |
 | DEC-013 | relates-to | DEC-001 | 新規統制追加原則（決定4）との整合。本 Decision は lifecycle/enforcement の削除と新規存在条件の導入を伴う |
 | DEC-013 | relates-to | DEC-006 | 意味検査移管（RU-IR-007）は DEC-006 の適用範囲拡張ではなく REQ-010-003/004、REQ-036-006〜016 の一般原則の適用 |
 | DEC-013 | relates-to | DEC-009 | REQ-010-053..057 RETIRE は DEC-009 CR-001（ADR→Decision 移行の ID 変更例外）の適用外、欠番維持 |
