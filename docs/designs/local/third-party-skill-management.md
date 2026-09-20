@@ -58,3 +58,9 @@ REQ-002-042 から REQ-002-044、REQ-029-009、REQ-052-011 の Design が所有�
   git-less 環境での動作を確定する
 - 管理対象 Skill の判別方法: skills.yaml 宣言集合と予約接頭辞からの決定論的判定、
   provenance 履歴の要否を確定する
+
+## v4 adapter 境界への接続
+
+外部ソースからの取得操作（REQ-052-011・Custom Tool agentdev_third_party）は v4 の Harness/Backend adapter 境界（ADF v4 実装責務境界 Design・DEC-036）の I/O 側に位置づく。取得プロファイルと非破壊制御（本 Design 既有）は不変である。
+
+定義の所有は v4-responsibility-boundaries へ参照する。既存節は不変とする。ADF-COVERS 宣言は追加しない。

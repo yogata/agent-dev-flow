@@ -9,14 +9,14 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は32件、提案中の Decision は0件である。
+現行の承認済み Decision は31件、提案中の Decision は0件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
 | Decision番号 | タイトル | ステータス | 作成日 |
 |---------|---------|-----------|--------|
 | DEC-001 | AgentDevFlow 憲章 | accepted | 2026-07-24 |
-| DEC-002 | OpenCode ソース・プロジェクション分離 | accepted | 2026-07-25 |
+| DEC-002 | OpenCode ソース・プロジェクション分離 | superseded | 2026-07-25 |
 | DEC-003 | req_draft ソフトコントラクト原則 | accepted | 2026-07-25 |
 | DEC-004 | 差し替え可能な I/O 境界 | accepted | 2026-07-25 |
 | DEC-005 | Project Extensions Architecture | superseded | 2026-07-25 |
@@ -66,7 +66,6 @@
 
 <!-- AUTOGEN:BEGIN:id=decision-status-accepted -->
 - [DEC-001](DEC-001.md)（AgentDevFlow 憲章）
-- [DEC-002](DEC-002.md)（OpenCode ソース・プロジェクション分離）
 - [DEC-003](DEC-003.md)（req_draft ソフトコントラクト原則）
 - [DEC-004](DEC-004.md)（差し替え可能な I/O 境界）
 - [DEC-006](DEC-006.md)（inspect 3-command 構成への正規化）
@@ -107,6 +106,7 @@
 ### 置き換え済み（superseded）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-superseded -->
+- [DEC-002](DEC-002.md)（OpenCode ソース・プロジェクション分離）
 - [DEC-005](DEC-005.md)（Project Extensions Architecture）
 - [DEC-007](DEC-007.md)（Artifact Graph 標準化と配布スキル昇格）
 - [DEC-015](DEC-015.md)（ADF決定論的実行中核と実行基盤実行機構の責務分界）
@@ -192,6 +192,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-037 | supersedes | DEC-030 | Traceability の主目的の定義権（要件中心の対応完全性から Change/Evidence 中心への再中心化）を v4-traceability-model Design へ移動。DEC-030 の機構上の決定は搬送範囲表で維持 |
 | DEC-033 | supersedes | DEC-029 | 公開ワークフロー状態遷移中心再構成を v4 公開運用モデル（UX 2入口収斂・内部 lifecycle）へ一般化して置換 |
 | DEC-036 | supersedes | DEC-015 | 主後継。決定論的実行中核と実行基盤実行機構の責務分界を semantic Skill / deterministic code 分離へ発展・置換 |
+| DEC-036 | supersedes | DEC-002 | OpenCode ソース・プロジェクション分離の v4 再定義（配備形態として adapter 境界へ統合）を本 Decision の Harness/Backend adapter 境界が所有する |
 | DEC-038 | supersedes | DEC-015 | 補完後継。durable state 配置と再構成の契約への一般化 |
 | DEC-039 | supersedes | DEC-015 | 補完後継。authority・副作用統制と冪等・並行性モデルへの一般化 |
 

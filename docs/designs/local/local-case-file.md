@@ -206,6 +206,12 @@ case-schema 機械可読定義の更新方針: `src/opencode-local/agentdev-gh/c
 
 runner-local 固有の前提と差分（REQ-011-006）: ローカル版の Tool 操作は、同一の操作契約で Case ファイル読み書きを実装した Local 実装 Tool 経由で実行する。GitHub 環境の存在を前提とせず、GitHub 版との差分は上記の物理写像への集約に限られる。操作順序、読み戻し検証（VERIFY）契約、失敗時動作は GitHub 版と同一である。
 
+## v4 adapter 境界への接続
+
+Local backend adapter（同一操作契約の GitHub/Local 差し替え・REQ-011-006/007/024）は v4 の Harness/Backend adapter 境界（ADF v4 実装責務境界 Design・DEC-036）における Backend 側の実例である。
+
+定義の所有は v4-responsibility-boundaries にあり、本節は参照にとどめる。既存節は不変とする。
+
 ## 関連項目
 
 - **関連 REQ**: REQ-009（ローカル版導入方式とローカルIssue運用）、REQ-049（追跡Issue管理機構）、REQ-011-006（Custom Tool の Local 実装差し替え）

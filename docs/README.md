@@ -77,13 +77,13 @@ REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-039 の38件である（DEC-005、DEC-007、DEC-015、DEC-017、DEC-029、DEC-030 は superseded、proposed は 0 件）。
+現行 Decision は DEC-001 から DEC-039 の38件である（DEC-002、DEC-005、DEC-007、DEC-015、DEC-017、DEC-029、DEC-030 は superseded、proposed は 0 件）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
 |---|---|
 | [DEC-001](decisions/DEC-001.md) | AgentDevFlow 憲章 |
-| [DEC-002](decisions/DEC-002.md) | OpenCode ソース・プロジェクション分離 |
+| [DEC-002](decisions/DEC-002.md) | OpenCode ソース・プロジェクション分離（superseded by DEC-036） |
 | [DEC-003](decisions/DEC-003.md) | req_draft ソフトコントラクト原則 |
 | [DEC-004](decisions/DEC-004.md) | 差し替え可能な I/O 境界 |
 | [DEC-005](decisions/DEC-005.md) | Project Extensions Architecture（superseded by DEC-006） |
