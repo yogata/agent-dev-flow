@@ -25,7 +25,7 @@ AgentDevFlow で使う用語の定義。
 | inspect-docs | インスペクト、ドックス | docs 全体の意味整合性を検出し、検出事項（finding）を出力するコマンド |
 | inspect-skills | インスペクト、スキルズ | Command/Skill 参照妥当性を検出し、検出事項（finding）を出力するコマンド |
 | inspect-promote | インスペクト、プロモート | 検出事項（finding）を分類（promote/defer/reject）し、採用済み成果物を生成するコマンド |
-| case-auto | ケース、オート | 最大自走モード。case-open → case-ready → case-run → case-close（再合意変更時は case-revise → case-ready）を順次実行するコマンド |
+| case-auto | ケース、オート | 標準実行コマンド。内部 lifecycle（case-open → case-ready → case-run → case-close、再合意変更時は case-revise → case-ready）を順次駆動する（v4 では個別コマンドの順次手動実行を標準としない、DEC-033） |
 
 ## 成果物
 

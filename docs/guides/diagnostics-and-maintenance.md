@@ -46,7 +46,7 @@ REQ/Decision/Skill/Command/Template/Workflow/Link/Canonical/Lifecycle/Namespace/
 docs-check は Decision を現行の番号帯と廃止済みの番号帯に区別して検査する:
 
 - **現行 Decision**（`docs/decisions/DEC-001.md`〜`DEC-{NNN}.md`）: 3桁ID形式。status 遷移の妥当性、参照先 REQ の存在確認、誤分類の兆候検出を検査する
-- v2 歴史的 ADR（`v2:ADR-0001`〜`v2:ADR-0099`）: 4桁ID形式。履歴参照用。`v2:` プレフィックスで明示的に区別し、tag v2.11.0 で参照。Decision Map（`docs/decisions/README.md`）で後継関係のみ参照する
+- v2 歴史的 ADR（Decision Map では `v2:ADR-0101`〜`v2:ADR-0139` を参照）: 4桁ID形式。履歴参照用。`v2:` プレフィックスで明示的に区別し、tag v2.11.0 で参照。Decision Map（`docs/decisions/README.md`）で後継関係のみ参照する（v2:ADR-0001〜0099 帯は 2026-07-20 に物理削除済み）
 - 廃止済み Decision への履歴参照は、現行根拠としての引用による警告とは区別して扱う
 
 ### 振り分け先の判定
