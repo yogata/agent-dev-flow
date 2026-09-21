@@ -6,10 +6,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 52件、廃止済み: 14件
+現行 REQ: 53件、廃止済み: 14件
 <!-- AUTOGEN:END -->
 
-現行要件は52件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
+現行要件は53件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
 REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）による意図的予約欠番であり、実体は存在しない（[採番管理](designs/foundations/numbering-policy.md) 参照）。
 REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却枠であり、意図的予約欠番として維持する。
 各 REQ の詳細は各 REQ ファイル本文を参照。
@@ -69,6 +69,7 @@ REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却
 | [REQ-083](requirements/REQ-083.md) | Definition PR の状態契約（通常 Pull Request・ブランチ命名・用語・正規操作完結） |
 | [REQ-087](requirements/REQ-087.md) | 採番例外の記録と REQ 番号ギャップ検査 |
 | [REQ-088](requirements/REQ-088.md) | ADF v4 基盤要件（三層責務・情報寿命・Project Contract・中核文書モデル） |
+| [REQ-089](requirements/REQ-089.md) | J2 shadow 実験（Jev 有効性検証・第1実験） |
 <!-- AUTOGEN:END -->
 
 - [要件インデックス](requirements/README.md)
