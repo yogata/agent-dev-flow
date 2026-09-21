@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下53件を第一参照先とする。
+現在の要件判断では、以下52件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -64,7 +64,6 @@
 | [REQ-083](REQ-083.md) | Definition PR の状態契約（通常 Pull Request・ブランチ命名・用語・正規操作完結） |
 | [REQ-087](REQ-087.md) | 採番例外の記録と REQ 番号ギャップ検査 |
 | [REQ-088](REQ-088.md) | ADF v4 基盤要件（三層責務・情報寿命・Project Contract・中核文書モデル） |
-| [REQ-089](REQ-089.md) | J2 shadow 実験（Jev 有効性検証・第1実験） |
 <!-- AUTOGEN:END -->
 
 ## 廃止済み要件
