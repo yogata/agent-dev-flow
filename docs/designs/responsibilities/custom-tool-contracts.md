@@ -79,7 +79,7 @@ GitHub版 / Local版等価性:
 - 出力: 質問ごとの結果（選択・真偽・水準）、候補別確率分布、正規化済み confidence（provider 固有の格納位置〔初期 Vercel adapter では AI SDK 7 experimental_evaluate 経由の providerMetadata.typesafe.confidence〕を内部吸収して共通形式へ正規化）、inputTokens（初期 Vercel adapter が返す場合）、機械的処理時間。失敗時は構造化失敗（分類: not_configured、timeout、429、5xx、network error、response validation error 等）。
 - 保証: 公開契約は provider・SDK 非依存とし、AI SDK の型名・API 名を公開スキーマと Workflow 層へ漏らさない。質問型（独立命題・排他候補・順序水準）と boolean/choice/score の対応づけは adapter mapping であり意味契約の変更ではない。Tool は判断対象の意味・評価基準・Jev を呼ぶべき箇所・最終判断を所有しない（REQ-011-020 準拠）。API key 未設定時は呼び出さない。代替手段は従来 LLM 経路であり、Jev 障害時も Workflow は継続できる（REQ-052-005 の代替手段・継続可否の定義義務に基づく）。評価言語は日本語とする。
 - 失敗時の意味: Jev API 呼出し後の失敗は自動 retry せず構造化失敗を呼出し元へ返し、呼出し元 Workflow は即座に従来 LLM 経路へ fallback する。観測記録の書込み失敗は構造化失敗として呼出し元へ返すが Workflow の成否とは独立（完了報告で識別可能な warning）とする。
-- 配布境界: ADF 汎用の Tool として配布対象とする（REQ-052-006）。Tool の正式名称・物理配置・operation 名は本 Case の実装設計時の自由度として合意済みであり、決定時に本 Design へ反映する。
+- 配布境界: ADF 汎用の Tool として配布対象とする（REQ-052-006）。Tool の正式名称・物理配置・operation 名は本 Case の実装設計時の自由度として合意済みであり、決定時に本 Design へ反映する。実装での確定値: 正式名称 `agentdev_jev`、物理配置 Tool 本体 `src/opencode/tools/agentdev-jev/`、初期 Vercel adapter `src/opencode/tools/agentdev-jev/adapter-vercel/`（評価 SDK 依存はこの adapter パッケージに閉じる）、Plugin 登録配線 `src/opencode/plugins/agentdev-jev-tool/`、operation カタログ `evaluate` と `observation_write`（観測 JSON の形式検証と書込み支援。REQ-090-006）
 
 ## ローカル版実装差し替え
 
