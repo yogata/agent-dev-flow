@@ -1,0 +1,150 @@
+{
+  "observationId": "20260922T061941Z-2c02",
+  "durationMs": 587,
+  "inputTokens": 2740,
+  "inputs": {
+    "references": [
+      {
+        "digest": "a356271b887aa0fb4e981d916c227ba27feaee3662f4cad91b51f7457c3a007b",
+        "label": "生成 RU（checker 欠番レジストリ考慮）",
+        "path": ".agentdev/backlog/req-units/RU-0127.md"
+      },
+      {
+        "digest": "808d08cff4c27842aa33bd40872b0aa070d93c090d025dc88ca6c71cf58ddc59",
+        "label": "生成 RU（req-define 構造突合強化）",
+        "path": ".agentdev/backlog/req-units/RU-0128.md"
+      },
+      {
+        "digest": "5d9261da2ae27d4f6d4339395ec56a9f753adc26acc41992ce946197619eba7c",
+        "label": "生成 RU（concrete-id 予防確認観点）",
+        "path": ".agentdev/backlog/req-units/RU-0129.md"
+      },
+      {
+        "digest": "e603eeabb24a7a49cdba72bb37a7078d3246bb11816acc78cd032cbc2d96aeaf",
+        "label": "生成 RU（pr_desc.md リンク修正）",
+        "path": ".agentdev/backlog/req-units/RU-0130.md"
+      }
+    ],
+    "requestDigest": "426c472bd3b32fb2a6d89eafd2b85bb2448ca26a474ce109c7b6fd04e16962f4",
+    "snapshot": "判断入力の元 promoted 4件は RU 化成功後に削除済み（内容は各 RU の Sources 節に出典・要点・影響として保存）。プロセス死亡（空応答、14:59頃）による再開後の実行: STEP-2/3 の Jev 評価は死亡前に実施済み（本観測の対象）、adversarial-review（STEP-4）も審議完了済み。承認（STEP-5）はユーザーの明示的実行指示「停止位置から再開し最後まで実行」により確定と解釈（RU 構成案の要点は再開時報告に明示）。採番は revert 済み RU-0122〜0126（run1 生成、git 履歴のみ）との混同防止のため 0127 から採番。"
+  },
+  "judgmentKind": "backlog-review-classification-composition",
+  "judgments": [
+    {
+      "confidence": 0.7471428571428572,
+      "jevResult": "REQ（要件変更・機能追加として要件化）",
+      "judgmentId": "class-artifact1",
+      "llmFinalJudgment": "REQ。check_integrity.ts への免除ロジック追加というツール挙動変更",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "REQ（要件変更・機能追加として要件化）": 0.85,
+        "カタログDesign": 0,
+        "guide": 0,
+        "作業記録": 0,
+        "対象外": 0.01,
+        "挙動Design": 0.14,
+        "learning維持": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7471428571428572,
+      "jevResult": "REQ（要件変更・機能追加として要件化）",
+      "judgmentId": "class-artifact2",
+      "llmFinalJudgment": "REQ。workflow skill への検査・手順追加",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "REQ（要件変更・機能追加として要件化）": 0.68,
+        "カタログDesign": 0,
+        "guide": 0.01,
+        "作業記録": 0,
+        "対象外": 0.02,
+        "挙動Design": 0.29,
+        "learning維持": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7471428571428572,
+      "jevResult": "guide",
+      "judgmentId": "class-artifact3",
+      "llmFinalJudgment": "guide。確認観点の明示は運用規則であり機能追加ではない。実現先は req-define が確定",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "REQ（要件変更・機能追加として要件化）": 0.17,
+        "カタログDesign": 0,
+        "guide": 0.67,
+        "作業記録": 0,
+        "対象外": 0.01,
+        "挙動Design": 0.11,
+        "learning維持": 0.04
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7471428571428572,
+      "jevResult": "対象外",
+      "judgmentId": "class-artifact4",
+      "llmFinalJudgment": "guide。Jev 分布僅差（対象外 0.36 / guide 0.32）につき adversarial-review 限定合意（F-A1）で guide を採用（「対象外」は RU 化不要と解釈され正規経路と不整合の恐れ、修正対象はテンプレート内案内文で guide 的性格）。RU-0130 に注記済みで req-define 最終確定時に「対象外」選択も可能",
+      "llmTreatment": "corrected",
+      "probabilityDistribution": {
+        "REQ（要件変更・機能追加として要件化）": 0.02,
+        "カタログDesign": 0.09,
+        "guide": 0.32,
+        "作業記録": 0.14,
+        "対象外": 0.36,
+        "挙動Design": 0.05,
+        "learning維持": 0.02
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7471428571428572,
+      "jevResult": "docs/knowledge/ 知識文書保存候補なし（全件 RU 経由）",
+      "judgmentId": "knowledge-disposition",
+      "llmFinalJudgment": "保存候補なし。4件とも具体的修正対象を持つため全件 RU 経由",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "docs/knowledge/ 知識文書保存候補なし（全件 RU 経由）": 0.95,
+        "保存候補あり（更新・置換）": 0,
+        "保存候補あり（新規）": 0.04,
+        "保留候補あり": 0.01,
+        "知識の削除候補あり": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7471428571428572,
+      "jevResult": "全件 1:1（統合・分割なし、RU 4件）",
+      "judgmentId": "composition",
+      "llmFinalJudgment": "全件 1:1。修正対象がそれぞれ異なる独立した改善要求（adversarial-review F-B1 撤回で確認）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "分割あり（1:N）": 0,
+        "統合あり（N:1）": 0.01,
+        "全件 1:1（統合・分割なし、RU 4件）": 0.99
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7471428571428572,
+      "jevResult": true,
+      "judgmentId": "depends-reorderable",
+      "llmFinalJudgment": "true（依存なし・並べ替え可能）。RU-0120/0121（session由来RU）とも主題が異なり依存不要（F-B2 撤回）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.27,
+        "true": 0.73
+      },
+      "questionForm": "boolean"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "86523adf",
+  "subject": "backlog-review（backlog-auto run2 stage 3）2026-09-22 採用済み成果物4件（intake 2・learning 1・inspect 1）の暫定分類・docs/knowledge 処置判定・統合分割判定・depends_on 並べ替え可能性",
+  "workflow": "backlog-review"
+}
