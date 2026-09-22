@@ -61,7 +61,8 @@ export function createVercelJevProvider(options: { env?: EnvSource; modelId?: st
           for (const option of question.options ?? []) criteria[option] = null;
           questions[question.id] = { type: "choice", instructions: question.prompt, criteria };
         } else {
-          questions[question.id] = { type: "score", instructions: question.prompt, criteria: (question.scale ?? []).map(() => null) };
+          // score の criteria は ordered levels の文字列配列（評価 SDK 契約: 最低 2 水準）。
+          questions[question.id] = { type: "score", instructions: question.prompt, criteria: question.scale ?? [] };
         }
       }
       const result = await experimental_evaluate({
