@@ -1,0 +1,9 @@
+component: agentdev-jev-tool
+implementation:
+  src/opencode/plugins/agentdev-jev-tool/plugin.ts:
+    - REQ-090-001
+    - REQ-090-002
+verification:
+  src/opencode/plugins/agentdev-jev-tool/tests/plugin.test.ts:
+    - REQ-090-002
+    - REQ-090-003

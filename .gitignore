@@ -20,3 +20,4 @@ docs/reports/local/
 AGENTS.md
 outputs/
 dist/
+node_modules/

@@ -1,0 +1,29 @@
+component: agentdev-jev
+implementation:
+  src/opencode/tools/agentdev-jev/contracts.ts:
+    - REQ-090-001
+    - REQ-090-005
+  src/opencode/tools/agentdev-jev/engine.ts:
+    - REQ-090-001
+    - REQ-090-002
+    - REQ-090-003
+    - REQ-090-008
+  src/opencode/tools/agentdev-jev/index.ts:
+    - REQ-090-002
+    - REQ-090-010
+  src/opencode/tools/agentdev-jev/observation.ts:
+    - REQ-090-006
+  src/opencode/tools/agentdev-jev/adapter-vercel/index.ts:
+    - REQ-090-001
+    - REQ-090-002
+    - REQ-090-003
+verification:
+  src/opencode/tools/agentdev-jev/tests/engine.test.ts:
+    - REQ-090-001
+    - REQ-090-002
+    - REQ-090-003
+    - REQ-090-005
+  src/opencode/tools/agentdev-jev/tests/observation.test.ts:
+    - REQ-090-006
+  src/opencode/tools/agentdev-jev/adapter-vercel/tests/config.test.ts:
+    - REQ-090-002
