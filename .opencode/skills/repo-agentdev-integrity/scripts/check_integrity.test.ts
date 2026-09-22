@@ -1,9 +1,11 @@
 // ADF-COVERS(verification): REQ-010-002, REQ-010-003, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-066, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008
 // ADF-COVERS(verification): REQ-087-002, REQ-087-003
+// ADF-COVERS(verification): REQ-087-004
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
 import { mkdirSync, writeFileSync, copyFileSync, rmSync, existsSync, readFileSync, symlinkSync } from "fs";
 import { join } from "path";
-import { checkRepoLocalPluginProjectionSymmetry } from "./check_integrity.ts";
+import { checkRepoLocalPluginProjectionSymmetry, extractKnownGapNumbers, loadKnownGapReqIds } from "./check_integrity.ts";
+import { extractKnownGapNumbers as extractKnownGapNumbersAllocator } from "../../../../src/opencode/skills/agentdev-req-file-manager/scripts/src/alloc-req-number.ts";
 
 const SCRIPT_DIR = import.meta.dir;
 const SCRIPT_FILE = join(SCRIPT_DIR, "check_integrity.ts");
@@ -12,6 +14,8 @@ const GEN_INDEXES_FILE = join(SCRIPT_DIR, "generate_indexes.ts");
 const HISTORY_EXEMPTION_FILE = join(SCRIPT_DIR, "ir057_history_exemption.ts");
 const CURRENT_REFS_FILE = join(SCRIPT_DIR, "current_refs.ts");
 const GLOB_WALK_FILE = join(SCRIPT_DIR, "lib", "glob_walk.ts");
+// REQ-087-004 対決テスト用: 正（採番スクリプト）側のリーダーと実リポジトリ numbering-policy。
+const REPO_ROOT_FROM_SCRIPT_DIR = join(SCRIPT_DIR, "..", "..", "..", "..");
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `integrity-test-${crypto.randomUUID().slice(0, 8)}`;
 const TEMP_ROOT = join(TEMP_BASE, RUN_ID);
@@ -4957,6 +4961,238 @@ describe("broken-req-ref range-span exemption (v2:REQ-0108-194, Case #2917)", ()
     expect(evidence).not.toContain("REQ-006");
     expect(evidence).not.toContain("REQ-008");
     expect(evidence).toContain("REQ-899");
+  });
+});
+
+// ─── broken-req-ref / adr-req-crossref 既知欠番レジストリ免除 (REQ-087-004, Issue #3069) ───
+// numbering-policy.md「既知の欠番」節の行頭 REQ-NNN: エントリへの参照は合格扱いとする。
+// 読込形式は alloc-req-number.ts extractKnownGapNumbers と同一（欠番レジストリの
+// 単一情報源は numbering-policy.md。checker 側に第二のレジストリは作らない）。
+// Case #3056 PR #3057 の偽陽性 3件（REQ-089 bare 参照）の再発防止。
+
+const GAP_ROOT = join(TEMP_ROOT, "gap-exemption-3069");
+
+const GAP_POLICY_BODY = [
+  "## 欠番の扱い",
+  "",
+  "過去の採番ミス、意図的予約、廃止由来を問わず、一度生じた欠番は維持する。",
+  "",
+  "### 既知の欠番",
+  "",
+  "欠番管理の責務を明記する。",
+  "REQ-089: J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全 revert）由来の廃止識別子であり、再利用しない。",
+  "",
+  "### 採番ミスの是正",
+  "",
+  "是正によって新たな欠番が生じる場合は欠番として維持する。",
+];
+
+const GAP_POLICY_BODY_NO_ENTRY = [
+  "## 欠番の扱い",
+  "",
+  "過去の採番ミス、意図的予約、廃止由来を問わず、一度生じた欠番は維持する。",
+  "",
+  "### 既知の欠番",
+  "",
+  "欠番管理の責務を明記する。",
+];
+
+const GAP_POLICY_BODY_OUT_OF_SECTION = [
+  "## 欠番の扱い",
+  "",
+  "REQ-089: この行頭エントリは「既知の欠番」節外なのでレジストリ対象外である。",
+  "",
+  "### 既知の欠番",
+  "",
+  "欠番管理の責務を明記する。",
+  "当該番号 REQ-085 は意図的予約欠番である（行頭エントリではない）。",
+];
+
+function buildGapFixture(
+  root: string,
+  policyBodyLines: string[],
+  guideLines: string[],
+  adrBody: string,
+): void {
+  const reqDir = join(root, "docs", "requirements");
+  mkdirp(reqDir);
+  writeFileSync(
+    join(reqDir, "REQ-001.md"),
+    "---\nid: REQ-001\ntitle: fixture\ncreated: 2025-01-01\nupdated: 2025-01-01\n---\n\nBody.\n",
+    "utf-8",
+  );
+  writeFileSync(
+    join(reqDir, "README.md"),
+    "# Requirements\n\n| ID | Title |\n|----|-------|\n| REQ-001 | fixture |\n",
+    "utf-8",
+  );
+  mkdirp(join(root, "docs", "designs", "foundations"));
+  writeFileSync(
+    join(root, "docs", "designs", "foundations", "numbering-policy.md"),
+    [
+      "---",
+      "id: numbering-policy",
+      "title: 採番管理",
+      "status: accepted",
+      "---",
+      "",
+      "# 採番管理",
+      "",
+      ...policyBodyLines,
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+  mkdirp(join(root, "docs", "designs"));
+  writeFileSync(join(root, "docs", "designs", "README.md"), "# Design\n", "utf-8");
+  const adrDir = join(root, "docs", "adr");
+  mkdirp(adrDir);
+  writeFileSync(
+    join(adrDir, "ADR-0001.md"),
+    ["---", "id: ADR-0001", "title: fixture decision", "---", "", adrBody, ""].join("\n"),
+    "utf-8",
+  );
+  const guidesDir = join(root, "docs", "guides");
+  mkdirp(guidesDir);
+  writeFileSync(
+    join(guidesDir, "gap-refs.md"),
+    ["# Gap refs", "", ...guideLines, ""].join("\n"),
+    "utf-8",
+  );
+}
+
+function runGapFixture(root: string): {
+  brokenEvidence: string[];
+  crossrefMessages: string[];
+} {
+  copyScripts(root);
+  const r = runScript(root, ["--json"]);
+  const parsed = JSON.parse(r.stdout);
+  const brokenEvidence = parsed.results
+    .filter(
+      (res: { category: string; check: string; level: string }) =>
+        res.category === "LinkIntegrity" &&
+        res.check === "broken-req-ref" &&
+        res.level === "ng",
+    )
+    .map((res: { evidence?: string }) => res.evidence ?? "");
+  const crossrefMessages = parsed.results
+    .filter(
+      (res: { check: string; level: string }) =>
+        res.check === "adr-req-crossref" && res.level === "ng",
+    )
+    .map((res: { message?: string }) => res.message ?? "");
+  return { brokenEvidence, crossrefMessages };
+}
+
+describe("known-gap registry exemption (REQ-087-004, Issue #3069)", () => {
+  it("exempts known gap REQ-089 references in guides and ADR (Case #3056 再現・許容例)", () => {
+    const root = join(GAP_ROOT, "known-gap-pass");
+    mkdirp(root);
+    buildGapFixture(
+      root,
+      GAP_POLICY_BODY,
+      [
+        "REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全 revert）由来の廃止識別子であり、再利用しない。",
+      ],
+      "See REQ-089 for the gap history of the J2 shadow experiment.",
+    );
+    const { brokenEvidence, crossrefMessages } = runGapFixture(root);
+    expect(brokenEvidence).not.toContain("REQ-089");
+    expect(crossrefMessages.filter((m) => m.includes("REQ-089")).length).toBe(0);
+  });
+
+  it("still flags references to non-gap non-existent REQ numbers (違反例)", () => {
+    const root = join(GAP_ROOT, "non-gap-flag");
+    mkdirp(root);
+    buildGapFixture(
+      root,
+      GAP_POLICY_BODY,
+      ["REQ-899 は実在しない番号への参照である。"],
+      "See REQ-899 which does not exist.",
+    );
+    const { brokenEvidence, crossrefMessages } = runGapFixture(root);
+    expect(brokenEvidence).toContain("REQ-899");
+    expect(crossrefMessages.some((m) => m.includes("REQ-899"))).toBe(true);
+  });
+
+  it("flags REQ-089 when the registry section has no line-top entry (単一情報源・ハードコード不在)", () => {
+    const root = join(GAP_ROOT, "no-entry-flag");
+    mkdirp(root);
+    buildGapFixture(
+      root,
+      GAP_POLICY_BODY_NO_ENTRY,
+      ["REQ-089 への参照である。"],
+      "See REQ-089.",
+    );
+    const { brokenEvidence, crossrefMessages } = runGapFixture(root);
+    expect(brokenEvidence).toContain("REQ-089");
+    expect(crossrefMessages.some((m) => m.includes("REQ-089"))).toBe(true);
+  });
+
+  it("does not exempt out-of-section entries or prose-only mentions (境界例)", () => {
+    const root = join(GAP_ROOT, "boundary-scope");
+    mkdirp(root);
+    buildGapFixture(
+      root,
+      GAP_POLICY_BODY_OUT_OF_SECTION,
+      ["REQ-089 への参照と、当該番号 REQ-085 は意図的予約欠番である旨の記述。"],
+      "See REQ-089 and REQ-085.",
+    );
+    const { brokenEvidence, crossrefMessages } = runGapFixture(root);
+    expect(brokenEvidence).toContain("REQ-089");
+    expect(brokenEvidence).toContain("REQ-085");
+    expect(crossrefMessages.some((m) => m.includes("REQ-089"))).toBe(true);
+  });
+
+  it("keeps range-span exemption behavior independent of the gap registry (境界例)", () => {
+    const root = join(GAP_ROOT, "range-span-still-exempt");
+    mkdirp(root);
+    buildGapFixture(
+      root,
+      GAP_POLICY_BODY,
+      [
+        "REQ-063〜REQ-081 は意図的予約欠番である。",
+        "REQ-899 は範囲外の単独参照である。",
+      ],
+      "Relates to REQ-001.",
+    );
+    const { brokenEvidence } = runGapFixture(root);
+    expect(brokenEvidence).not.toContain("REQ-063");
+    expect(brokenEvidence).not.toContain("REQ-081");
+    expect(brokenEvidence).toContain("REQ-899");
+  });
+
+  it("loads the same gap set as alloc-req-number.ts from the real numbering-policy (単一情報源)", () => {
+    const realRoot = REPO_ROOT_FROM_SCRIPT_DIR;
+    const policyContent = readFileSync(
+      join(realRoot, "docs", "designs", "foundations", "numbering-policy.md"),
+      "utf-8",
+    );
+    const gapNumbers = extractKnownGapNumbers(policyContent);
+    expect(gapNumbers).toContain(89);
+    expect(gapNumbers).toEqual(extractKnownGapNumbersAllocator(policyContent));
+    expect(loadKnownGapReqIds(realRoot)).toEqual(
+      new Set(
+        gapNumbers.map((n) => `REQ-${String(n).padStart(3, "0")}`),
+      ),
+    );
+  });
+
+  it("matches alloc-req-number.ts extraction on synthetic policies (同一読込形式)", () => {
+    const syntheticPolicies = [
+      "## 前置\n\n### 既知の欠番\n\nREQ-089: a\nREQ-090: b\n",
+      "### 既知の欠番\n\nprose 中の REQ-085 言及\nREQ-088: c\n\n### 次\n\nREQ-087: 節外エントリ\n",
+      "# 欠番なし\n\n## 既知の欠番\n\n本文のみ。\n",
+      "### 既知の欠番\n\nREQ-1000: 4桁\n",
+      "#### 既知の欠番  \n\nREQ-089: 末尾空白付き見出し\n",
+      "### 既知の欠番\n\n  REQ-084: 行頭空白エントリ\n",
+    ];
+    for (const policy of syntheticPolicies) {
+      expect(extractKnownGapNumbers(policy)).toEqual(
+        extractKnownGapNumbersAllocator(policy),
+      );
+    }
   });
 });
 
