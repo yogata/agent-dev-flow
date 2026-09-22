@@ -36,6 +36,8 @@
 STEP-5 の Decision禁止ゲート・STEP-4 の文書分類妥当性検証で分離した Design 候補は `artifact_actions`（`artifact: design`）として統合し、`## Design候補` 補助セクションは出力しない。
 保存対象は単一の `artifact_actions` 配列に統合する。
 
+`artifact_actions` の `action` が append / update で対象ファイルが既存の場合、生成前に実ファイルを Read し、対象テーブルの表列構造（列数・列順）と追記先セクションの見出し構造を突合する。生成する行と content は突合した実ファイル構造に適合させる。本突合は既存の content 完全確定義務（target_area/content 形式）への追加であり、既存手順を置換するものではない。
+
 各副ステップ（定義完全性ゲート QG-1、operation_units 生成、depends_on/recommended_order 定義、artifact_actions 生成、target_area/content 形式、Design action 分類根拠出力、test_strategy 生成、review_dispositions 生成）の詳細、フィールドスキーマ、委譲接続点は `agentdev-req-analysis` の req-define detailed gates、および req-define command Design（extension 経由）の各フィールドスキーマを参照。
 `target_design`、`canonical_owner`、`on_failure`、`review_dispositions` の出力形式も同 Design を正とする。
 
@@ -45,11 +47,11 @@ STEP-5 の Decision禁止ゲート・STEP-4 の文書分類妥当性検証で分
 
 ### Evidence
 
-- 生成済み draft-data、QG-1 検証結果
+- 生成済み draft-data、QG-1 検証結果、append / update 対象の突合結果（該当時）
 
 ### Completion Verification
 
-- 必須 fields が揃い、`execution_groups` を含まないこと。Design 候補が `artifact_actions` へ統合済みであること
+- 必須 fields が揃い、`execution_groups` を含まないこと。Design 候補が `artifact_actions` へ統合済みであること。append / update 対象の既存ファイルがある場合、表列構造・見出し構造の突合が実施済みであること
 
 ### Resume-Idempotency
 
