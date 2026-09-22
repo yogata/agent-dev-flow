@@ -36,7 +36,7 @@ harness 側識別子は取得可能な場合の付加情報に限定し、必須
 通常実装 PR では本セクションを省略する。
 verify-only PR の場合、「実装内容」欄は空欄にせず「実装差分なし」と理由を記録し、本セクションで詳細根拠を示す。
 根拠は姉妹実装 PR、実装 PR、先行 commit、main 反映済み commit、既存成果物、検証のみで完結する理由のいずれかを許容する。
-case-close と QG-{N} は当該欄を完了条件の証拠ソースとして読む（[case-run.md](../../../../../case-run Design)「verify-only 根拠欄の記入規則」、[case-close.md](../../../../../case-close Design)「verification-only PR の files_checked 空確認」参照）。
+case-close と QG-{N} は当該欄を完了条件の証拠ソースとして読む（[case-run.md](../../../../../docs/designs/commands/case-run.md)「verify-only 根拠欄の記入規則」、[case-close.md](../../../../../docs/designs/commands/case-close.md)「verification-only PR の files_checked 空確認」参照）。
 -->
 
 - **種別**: verify-only
