@@ -7,6 +7,7 @@ updated: 2026-09-22
 <!-- ADF-COVERS(implementation): REQ-001-008, REQ-001-009, REQ-001-013, REQ-001-042 -->
 <!-- ADF-COVERS(implementation): REQ-004-003 -->
 <!-- ADF-COVERS(implementation): REQ-087-001 -->
+<!-- ADF-COVERS(design): REQ-087-004 -->
 
 # 採番管理 Design
 

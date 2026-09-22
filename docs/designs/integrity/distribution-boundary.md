@@ -2,12 +2,13 @@
 title: "配布依存境界"
 status: accepted
 created: "2026-08-11"
-updated: "2026-09-18"
+updated: "2026-09-22"
 ---
 <!-- ADF-COVERS(implementation): REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-045 -->
 <!-- ADF-COVERS(implementation): REQ-029-001, REQ-029-002, REQ-029-003, REQ-029-004, REQ-029-005, REQ-029-006, REQ-029-007, REQ-029-008 -->
 <!-- ADF-COVERS(design): REQ-029-010, REQ-029-011 -->
+<!-- ADF-COVERS(design): REQ-031-032 -->
 
 # 配布依存境界 Design
 
@@ -125,6 +126,12 @@ trust root / manifest の検証は projection スコープで実施し、両者�
 最終 gate は REQ-010-060 が宣言する ADF 所有の保存・完了・release 経路での最終保証である。
 adapter を利用者または編集経路がバイパスしても、最終 gate で停止する。
 事前 gate を通過しても最終 gate を省略しない。
+
+作成時予防と事後検知の両面運用: 配布物の新規作成を委譲する実行系（case-run の委譲 context）は、
+配布物本文の記述規則（concrete-id・ADF-COVERS 宣言の本文直書き禁止、traceability sidecar への対応宣言
+登録）を作成時の予防観点として実行担当サブエージェントへ引き渡す。事前書き込み gate・最終 gate
+（check_distribution_boundary --profile source 等）は事後検知として両立し、予防観点の引き渡しは
+検知機構の代替にも検知機構の変更にもしない（REQ-031-032）。
 
 ## archive 公開前検査
 
