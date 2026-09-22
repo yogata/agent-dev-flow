@@ -2,8 +2,9 @@
 title: ADF v4 durable state と再構成・恢復（配置表・権威移行・部分失敗調整）
 status: accepted
 created: 2026-09-19
-updated: 2026-09-20
+updated: 2026-09-22
 ---
+<!-- ADF-COVERS(design): REQ-090-006, REQ-090-008 -->
 <!-- ADF-COVERS(implementation): REQ-001-034, REQ-001-043, REQ-008-001, REQ-008-002, REQ-008-004, REQ-008-005, REQ-008-006, REQ-008-007, REQ-008-009, REQ-008-012, REQ-008-014 -->
 <!-- ADF-COVERS(implementation): REQ-002-036, REQ-005-002, REQ-005-003, REQ-005-004, REQ-005-024, REQ-048-001, REQ-048-002, REQ-048-003, REQ-048-004, REQ-048-005 -->
 
@@ -18,12 +19,13 @@ durable state 関連の情報を次の 5 分類に配置する。各論理状態
 | 分類 | 内容 | 権威の置き場所 | 寿命（8 種対応） |
 |---|---|---|---|
 | GitHub 正規状態 | Case/子Issue 状態、PR state、Definition 確定状態 | Issue/PR の権威記録先（本文状態節・state・ラベル写像） | Change/Case lifetime |
-| repo 内正規状態 | docs/ 正規成果物（REQ/Decision/Design）、.agentdev/ の Git 管理ドメイン状態（drafts、intake/learning inbox、検出事項） | 各正規成果物ファイル | Requirement/Architecture/Project lifetime |
+| repo 内正規状態 | docs/ 正規成果物（REQ/Decision/Design）、.agentdev/ の Git 管理ドメイン状態（drafts、intake/learning inbox、検出事項、.agentdev/jev-observations/） | 各正規成果物ファイル | Requirement/Architecture/Project lifetime |
 | ローカル実行環境状態 | worktree・checkout・git index・導入状態（junction、依存 install）、起動時対象集合 | ローカル実行環境（保存しない。正規状態から再構成） | Runtime lifetime |
 | 証跡 | 検証 SSoT コメント、対応記録、PR 本文、監査記録 | Issue comment・PR 本文等の不変記録 | Change/Case lifetime（記録として） |
 | 導出可能情報 | 現在 stage、workflow route、Wave 状態、Epic 集約、進捗表、索引類 | 保存しない（正規状態から再構成） | （保存しない） |
 
 8 情報寿命（ADF lifetime、Project lifetime、Architecture lifetime、Requirement lifetime、Change/Case lifetime、Runtime lifetime、reusable Knowledge、未評価 Observation）と各分類の対応は本表の寿命列が基準とする。docs/knowledge/ の知識は repo 内正規状態（reusable Knowledge）に配置する。未評価 Observation（learning/intake の未評価エントリ）は repo 内正規状態（.agentdev/ ドメイン状態）として保存し、評価結果は昇格ガード（DEC-033）に従って振り分けられる。
+`.agentdev/jev-observations/` は Jev 先行評価の観測記録の配置先である（REQ-090-006）。分類は repo 内正規状態（git 管理対象、REQ-002-012 準拠）、保存形式は JSON（1 Workflow 実行 = 1 ファイル、JSONL は正本としない）、寿命は未評価 Observation（評価・置換判断の進行に応じた整理方針は評価 Issue で定める）である。再開契約: 観測記録は再開ポイントの構成要素とせず、Workflow 再開時に Jev を再呼出しする。
 REQ-001-034「状態保持領域内の作業用ドラフトは正規のドメイン状態ではなく、コマンド間引き渡し用の中間成果物であること」は Case 状態機械上の正規状態（durable state enum）を指し、本表の「repo 内正規状態（drafts 含む）」は durable state 配置分類（保存権威の置き場所）を指すため、両者は権威クラスを異にして調和する（v3 backlog-artifact-lifecycle Design 配置系 11 識別子の承継・分配の正は第9段 Root Case #3022）。
 
 ## 状態と証跡の分離

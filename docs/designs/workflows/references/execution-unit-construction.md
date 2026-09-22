@@ -2,23 +2,24 @@
 title: execution_unit 構成アルゴリズム参照
 status: accepted
 created: 2026-07-25
-updated: 2026-09-20
+updated: 2026-09-22
 ---
+<!-- ADF-COVERS(design): REQ-090-007 -->
 <!-- ADF-COVERS(implementation): REQ-030-007, REQ-030-008, REQ-030-009 -->
 
 # execution_unit 構成アルゴリズム参照
 
-> **位置づけ**: 本資料は `docs/designs/workflows/v4-standard-lifecycle.md`（語彙定義）および `docs/designs/commands/case-open.md`（運用主体）から参照される実装アルゴリズム詳細である。
+> **位置づけ**: 本資料は `docs/designs/workflows/v4-standard-lifecycle.md`（語彙定義）および `docs/designs/commands/case-ready.md`（運用主体）から参照される実装アルゴリズム詳細である。
 > 現行契約（依存強度3レベル定義、Epic あたり子 Issue 数上限、単独根 Standard flow 等）の宣言は参照先 Design を正とし、本資料はその機械的判定手順を示す。
 
 ## 目的
 
-case-open が OU 群から execution_unit（standard | epic）を構成する際の連結成分計算と3軸判断の機械的手順を規定する。
+case-ready が OU 群から execution_unit（standard | epic）を構成する際の連結成分計算と3軸判断の機械的手順を規定する。
 親 Design が定める不変の方針を、決定的に適用するための手順書である。
 
 ## 連結成分アルゴリズム
 
-case-open は OU 群の依存グラフから連結成分を計算し、各連結成分を Epic 候補の出発点とする。
+case-ready は OU 群の依存グラフから連結成分を計算し、各連結成分を Epic 候補の出発点とする。
 エッジには**必須依存のみ**を含める。
 技術的依存（L0-L3）、弱依存、関連依存は連結成分のエッジから外す。
 
@@ -32,7 +33,7 @@ case-open は OU 群の依存グラフから連結成分を計算し、各連結
 
 技術的依存レベル（L0-L3）は Wave 構成（Epic 内部）のための情報であり、連結成分計算と execution_unit 並列判定からは外す。
 
-エッジ判定要素（同一ファイル衝突の抑制ヒント）: 連結成分のエッジには必須依存のみを含める現行構造を維持した上で、次の3種を依存ヒントとしてエッジ判定要素へ追加する。依存ヒントは OU 間の変更重複を case-open の判断へ供する信号であり、連結成分アルゴリズムの構造（エッジ定義・探索順序）を変更しない。
+エッジ判定要素（同一ファイル衝突の抑制ヒント）: 連結成分のエッジには必須依存のみを含める現行構造を維持した上で、次の3種を依存ヒントとしてエッジ判定要素へ追加する。依存ヒントは OU 間の変更重複を case-ready の判断へ供する信号であり、連結成分アルゴリズムの構造（エッジ定義・探索順序）を変更しない。
 
 1. 変更ファイル重複: 複数 OU の推定変更ファイル（target_design、target_req、操作対象パス）の重複
 2. AUTOGEN 対象ファイル重複: 変更に付随して再生成される AUTOGEN 対象ファイル（README 索引、メトリクス表等）の重複
@@ -42,7 +43,7 @@ case-open は OU 群の依存グラフから連結成分を計算し、各連結
 
 ## 3軸判断モデル
 
-連結成分を Epic 化するか、複数 Epic に分割するか、Standard flow に分散するかは、以下3軸で case-open が自律判定する。
+連結成分を Epic 化するか、複数 Epic に分割するか、Standard flow に分散するかは、以下3軸で case-ready が自律判定する。
 
 | 軸 | 定義 | 制約 |
 |---|---|---|
@@ -64,7 +65,7 @@ case-open は OU 群の依存グラフから連結成分を計算し、各連結
 
 ## 適用指針
 
-case-open は無関係な OU 群を単一 Epic へ機械的に集約しない。
+case-ready は無関係な OU 群を単一 Epic へ機械的に集約しない。
 Epic 構成推論の根拠を Epic Issue 本文または `case_open_hints` に記録する。
 3軸判断の個別エッジケース（同機能独立、共通基盤等）は LLM 推論に委ねる。
 REQ/Design で固定するのは不変の方針（依存強度3レベル定義、Epic あたり子 Issue 数上限、単独根 Standard flow）のみである。

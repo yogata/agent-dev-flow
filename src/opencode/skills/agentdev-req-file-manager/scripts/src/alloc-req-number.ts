@@ -2,7 +2,11 @@
  * REQ番号採番スクリプト（AG-{NNN}、AG-{NNN}、REQ-{NNNN}-{NNN}/160）。
  *
  * 既存の REQ ファイル群から最大番号を特定し、その +1 を採番する。
- * 欠番があっても埋めない（REQ-NNNN 安定 ID 規約）。
+ * あわせて既知欠番レジストリ（docs/designs/foundations/numbering-policy.md
+ * 「既知の欠番」節の `REQ-NNN:` 行頭エントリ）を読み込み、現行ファイル群の
+ * 最大番号が既知欠番を下回る場合も既知欠番を埋めない
+ * （欠番があっても埋めない REQ-NNNN 安定 ID 規約。numbering-policy の記録との
+ * 単一情報源化）。
  *
  * I/O:
  *   入力: argv[2] = REQ ディレクトリパス（例: docs/requirements）
@@ -18,6 +22,51 @@ import { emitJson, emitError } from "../lib/result.ts";
 export function nextReqNumber(existingNumbers: number[]): number {
   const max = safeMax(existingNumbers);
   return max + 1;
+}
+
+/**
+ * 既知欠番レジストリ（numbering-policy.md「既知の欠番」節本文）から欠番番号を
+ * 抽出する（純粋関数）。行頭が `REQ-NNN:` で始まる行を欠番エントリとみなし、
+ * その番号のみを採番する（本文 prose 中の言及は採番しない）。
+ */
+export function extractKnownGapNumbers(policyContent: string): number[] {
+  const sectionLines: string[] = [];
+  let inSection = false;
+  for (const line of policyContent.split(/\r?\n/)) {
+    if (/^#{2,6}\s*既知の欠番\s*$/.test(line)) {
+      inSection = true;
+      continue;
+    }
+    if (inSection && /^#{1,6}\s/.test(line)) {
+      break;
+    }
+    if (inSection) {
+      sectionLines.push(line);
+    }
+  }
+  const gaps: number[] = [];
+  for (const line of sectionLines) {
+    const m = /^REQ-(\d{3,4})\s*:/.exec(line.trim());
+    if (m && m[1] !== undefined) {
+      gaps.push(Number(m[1]));
+    }
+  }
+  return gaps;
+}
+
+/**
+ * REQ ディレクトリから既知欠番レジストリ（numbering-policy.md）を読み込む。
+ * レジストリが読み取れない場合は空配列を返し、従来どおりファイル群の max+1 で
+ * 採番する（レジストリ不在をエラーにしない）。
+ */
+async function loadKnownGapNumbers(dir: string): Promise<number[]> {
+  const policyPath = joinPath(dir, "..", "designs", "foundations", "numbering-policy.md");
+  try {
+    const content = readFileContent(policyPath);
+    return extractKnownGapNumbers(content);
+  } catch {
+    return [];
+  }
 }
 
 /** 番号から `REQ-NNNN` 形式の ID を生成する（純粋関数）。 */
@@ -49,7 +98,8 @@ async function main(): Promise<void> {
   }
 
   const max = safeMax(numbers);
-  const next = nextReqNumber(numbers);
+  const gapNumbers = await loadKnownGapNumbers(dir!);
+  const next = nextReqNumber(numbers.concat(gapNumbers));
   emitJson({ ok: true, allocated: formatReqId(next), max });
 }
 

@@ -2,8 +2,9 @@
 title: Custom Tool 操作契約
 status: accepted
 created: 2026-08-24
-updated: 2026-09-17
+updated: 2026-09-22
 ---
+<!-- ADF-COVERS(design): REQ-090-001, REQ-090-002, REQ-090-003, REQ-090-004, REQ-090-009, REQ-090-010 -->
 <!-- ADF-COVERS(implementation): REQ-011-001, REQ-011-002, REQ-011-003, REQ-011-005, REQ-011-008, REQ-011-009, REQ-011-013, REQ-011-014, REQ-011-015, REQ-011-020, REQ-011-021, REQ-011-022, REQ-011-023, REQ-011-024, REQ-011-031, REQ-011-032, REQ-052-001, REQ-052-002, REQ-052-003, REQ-052-004, REQ-052-005, REQ-052-008, REQ-052-009, REQ-052-010, REQ-052-011 -->
 
 # Custom Tool 操作契約
@@ -71,6 +72,14 @@ GitHub版 / Local版等価性:
 - 失敗: 失敗を成功扱いとしない。部分取得状態を開始前状態へ解消し、失敗要因を報告する
 
 取得プロファイル（単一 SKILL.md URL 型・GitHub Skill ディレクトリ型の判定、正規化、再帰取得、相対構造保持、Skill ディレクトリ外非取得）の詳細は Design third-party-skill-management が所有する。
+
+「Jev 先行評価」操作契約:
+
+- 入力: 評価リクエスト（state、instructions、criteria、質問群〔形式: boolean 相当・choice（候補付き）・score（水準付き）〕）。provider 接続設定は AI_GATEWAY_API_KEY 環境変数で解決する。
+- 出力: 質問ごとの結果（選択・真偽・水準）、候補別確率分布、正規化済み confidence（provider 固有の格納位置〔初期 Vercel adapter では AI SDK 7 experimental_evaluate 経由の providerMetadata.typesafe.confidence〕を内部吸収して共通形式へ正規化）、inputTokens（初期 Vercel adapter が返す場合）、機械的処理時間。失敗時は構造化失敗（分類: not_configured、timeout、429、5xx、network error、response validation error 等）。
+- 保証: 公開契約は provider・SDK 非依存とし、AI SDK の型名・API 名を公開スキーマと Workflow 層へ漏らさない。質問型（独立命題・排他候補・順序水準）と boolean/choice/score の対応づけは adapter mapping であり意味契約の変更ではない。Tool は判断対象の意味・評価基準・Jev を呼ぶべき箇所・最終判断を所有しない（REQ-011-020 準拠）。API key 未設定時は呼び出さない。代替手段は従来 LLM 経路であり、Jev 障害時も Workflow は継続できる（REQ-052-005 の代替手段・継続可否の定義義務に基づく）。評価言語は日本語とする。
+- 失敗時の意味: Jev API 呼出し後の失敗は自動 retry せず構造化失敗を呼出し元へ返し、呼出し元 Workflow は即座に従来 LLM 経路へ fallback する。観測記録の書込み失敗は構造化失敗として呼出し元へ返すが Workflow の成否とは独立（完了報告で識別可能な warning）とする。
+- 配布境界: ADF 汎用の Tool として配布対象とする（REQ-052-006）。Tool の正式名称・物理配置・operation 名は本 Case の実装設計時の自由度として合意済みであり、決定時に本 Design へ反映する。
 
 ## ローカル版実装差し替え
 

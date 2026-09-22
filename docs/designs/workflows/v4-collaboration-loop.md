@@ -3,8 +3,10 @@ id: v4-collaboration-loop
 title: ADF v4 継続コラボレーションループ
 created: 2026-09-20
 status: accepted
-updated: 2026-09-20
+updated: 2026-09-22
 ---
+
+<!-- ADF-COVERS(design): REQ-090-005, REQ-090-006 -->
 
 # ADF v4 継続コラボレーションループ
 
@@ -84,6 +86,7 @@ Learning と Observation は無条件に REQ へ昇格しない（v4-operating-m
 | .agentdev/learning/deferred.md | repo 内正規状態 | 未評価 Observation（living pool） |
 | .agentdev/inspect*/promoted/ | repo 内正規状態 | 未評価 Observation（採用済み） |
 | .agentdev/backlog/req-units/ | repo 内正規状態 | Change/Case lifetime（要件化後は Requirement lifetime） |
+| .agentdev/jev-observations/ | repo 内正規状態 | 未評価 Observation（Jev 先行評価の観測記録。1 Workflow 実行 = 1 JSON。生成元: Jev 先行評価を実行する6系統 Workflow（Jev Custom Tool 経由）。利用元: Jev 有効性評価（Issue B）。git 管理対象の永続 domain state（REQ-002-012 準拠。JSONL は正本としない）。評価・置換判断の進行に応じた整理方針は評価 Issue（B）で定める） |
 
 ## ループ図の読み方
 
