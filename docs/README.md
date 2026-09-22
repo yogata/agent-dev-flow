@@ -77,7 +77,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-040 の39件である（DEC-002、DEC-005、DEC-007、DEC-015、DEC-017、DEC-029、DEC-030 は superseded、proposed は 1 件〔DEC-040〕）。
+現行 Decision は DEC-001 から DEC-040 の39件である（DEC-002、DEC-005、DEC-007、DEC-015、DEC-017、DEC-029、DEC-030 は superseded、proposed は 0 件）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
