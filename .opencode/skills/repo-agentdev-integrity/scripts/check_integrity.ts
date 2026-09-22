@@ -17,6 +17,7 @@
 // ADF-COVERS(implementation): REQ-059-003
 // ADF-COVERS(verification): REQ-059-002, REQ-059-003
 // ADF-COVERS(implementation): REQ-087-002, REQ-087-003
+// ADF-COVERS(implementation): REQ-087-004
 // ADF-COVERS(verification): REQ-087-002
 import {
   EXIT_OK,
@@ -552,12 +553,66 @@ function isIntegrityRuleDescriptionFile(relPath: string): boolean {
   return /docs\/designs\/integrity\/rules\/IR-\d+/.test(relPath);
 }
 
+// REQ-087-004: 既知欠番レジストリ（numbering-policy.md「既知の欠番」節の行頭
+// `REQ-NNN:` エントリ）への参照は broken-req-ref / adr-req-crossref の合格扱い
+// （REQ-087-002 の欠番明記義務の履行が偽陽性 NG を強制しない。Case #3056 偽陽性
+// 3件解消）。抽出形式は採番スクリプト alloc-req-number.ts の extractKnownGapNumbers
+// と同一であり、欠番レジストリの単一情報源（numbering-policy.md）を維持する。
+// checker 側で第二のレジストリ・別形式の読込は作らない。同一性は
+// check_integrity.test.ts の対決テストで機械検証する。レジストリが読み取れない
+// 場合は空集合を返し、従来どおり検出する（alloc-req-number.ts 側と同一の fail-open）。
+export function extractKnownGapNumbers(policyContent: string): number[] {
+  const sectionLines: string[] = [];
+  let inSection = false;
+  for (const line of policyContent.split(/\r?\n/)) {
+    if (/^#{2,6}\s*既知の欠番\s*$/.test(line)) {
+      inSection = true;
+      continue;
+    }
+    if (inSection && /^#{1,6}\s/.test(line)) {
+      break;
+    }
+    if (inSection) {
+      sectionLines.push(line);
+    }
+  }
+  const gaps: number[] = [];
+  for (const line of sectionLines) {
+    const m = /^REQ-(\d{3,4})\s*:/.exec(line.trim());
+    if (m && m[1] !== undefined) {
+      gaps.push(Number(m[1]));
+    }
+  }
+  return gaps;
+}
+
+export function loadKnownGapReqIds(root: string): Set<string> {
+  const policyPath = path.join(
+    root,
+    "docs",
+    "designs",
+    "foundations",
+    "numbering-policy.md",
+  );
+  let content: string;
+  try {
+    content = fs.readFileSync(policyPath, "utf-8");
+  } catch {
+    return new Set();
+  }
+  return new Set(
+    extractKnownGapNumbers(content).map((n) => `REQ-${n.toString().padStart(3, "0")}`),
+  );
+}
+
 function checkAdrReqCrossReference(
   reqDir: string,
   adrDir: string,
   root: string,
 ): CheckResult[] {
   const results: CheckResult[] = [];
+  // REQ-087-004: known REQ gap references (numbering-policy registry) are valid.
+  const knownGapReqIds = loadKnownGapReqIds(root);
   const reqFiles = listFiles(reqDir).filter((f) => f.startsWith("REQ-"));
   const adrFiles = listFiles(adrDir).filter((f) => f.startsWith("ADR-"));
   const existingAdrIds = new Set(adrFiles.map((f) => f.replace(".md", "")));
@@ -636,6 +691,8 @@ function checkAdrReqCrossReference(
     if (!content) continue;
     const uniqueRefs = extractCurrentReqRefs(content);
     for (const ref of uniqueRefs) {
+      // REQ-087-004: skip known REQ gap references
+      if (knownGapReqIds.has(ref)) continue;
       // v2:REQ-0108-074: active or retired existence check
       if (!allReqIds.has(ref)) {
         results.push(
@@ -655,6 +712,8 @@ function checkAdrReqCrossReference(
     if (!content) continue;
     const uniqueRefs = extractCurrentReqRefs(content);
     for (const ref of uniqueRefs) {
+      // REQ-087-004: skip known REQ gap references
+      if (knownGapReqIds.has(ref)) continue;
       if (!allReqIds.has(ref)) {
         results.push(
           ng(
@@ -1597,6 +1656,8 @@ function checkLinkIntegrity(root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const allFiles = collectAllArtifactPaths(root);
   const brokenRefCount = new Map<string, number>();
+  // REQ-087-004: known REQ gap references (numbering-policy registry) are valid.
+  const knownGapReqIds = loadKnownGapReqIds(root);
 
   for (const filePath of allFiles) {
     const content = readText(filePath);
@@ -1692,6 +1753,8 @@ function checkLinkIntegrity(root: string): CheckResult[] {
       // band endpoints, not individual requirement rows. Only refs whose every
       // occurrence sits inside a range span are exempt; bare occurrences still flag.
       if (isRefOnlyInsideRangeSpan(contentLines, ref)) continue;
+      // REQ-087-004: skip known REQ gap references
+      if (knownGapReqIds.has(ref)) continue;
       const activePath = path.join(root, "docs", "requirements", `${ref}.md`);
       const retiredPath = path.join(
         root,
