@@ -6,7 +6,10 @@ implementation:
     - REQ-021-023
     - REQ-021-028
     - REQ-021-029
+  src/opencode/skills/agentdev-workflow-req-define/references/draft-generation.md:
+    - REQ-008-061
   src/opencode/skills/agentdev-workflow-req-define/references/requirement-development.md:
+    - REQ-008-062
     - REQ-090-004
 verification:
   docs/designs/commands/req-define.md:
