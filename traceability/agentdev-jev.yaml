@@ -17,6 +17,7 @@ implementation:
     - REQ-090-001
     - REQ-090-002
     - REQ-090-003
+    - REQ-090-011
 verification:
   src/opencode/tools/agentdev-jev/tests/engine.test.ts:
     - REQ-090-001
@@ -27,3 +28,5 @@ verification:
     - REQ-090-006
   src/opencode/tools/agentdev-jev/adapter-vercel/tests/config.test.ts:
     - REQ-090-002
+  src/opencode/tools/agentdev-jev/adapter-vercel/tests/questions.test.ts:
+    - REQ-090-011
