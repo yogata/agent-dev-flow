@@ -1,6 +1,6 @@
 # 適用プロジェクトへの導入モデル
 
-<!-- ADF-COVERS(implementation): REQ-050-014 -->
+<!-- ADF-COVERS(implementation): REQ-050-014, REQ-009-051 -->
 
 AgentDevFlow を適用プロジェクトに導入する際のモデルを定義する（REQ-009）。
 
@@ -188,6 +188,24 @@ git clone https://github.com/yogata/agent-dev-flow.git .agentdev-plugin
 > ZIP 展開チェックアウト（`.git` なし）は正規の provisioning 形態だが、サポート対象外の環境である（不具合報告の受け付け対象外、REQ-009-048）。
 >
 > スクリプトを `./scripts/` として導入先リポジトリに置く場合は、`.agentdev-plugin/` と同一のチェックアウトから scripts/ ディレクトリ全体をコピーする（公開入口 `install.ps1` は内部処理 `scripts/consumer/` に依存する）。
+
+### AGENTDEV_GH_REPO の起動環境設定
+
+Custom Tool `agentdev_gh` は、GitHub 操作の対象リポジトリ（`owner/name` 形式）を、環境変数 `AGENTDEV_GH_REPO`、未設定時は `gh repo view` の順で解決する。Plugin 側の設定詳細は [agentdev-gh-tool Plugin](../../src/opencode/plugins/agentdev-gh-tool/README.md) の「設定」節を参照。
+
+`gh repo view` による解決は gh CLI の認証とカレントディレクトリのリモートリポジトリに依存するため、gh CLI 未認証やリモート不在のチェックアウトでは解決に失敗する。解決に失敗した場合、`agentdev_gh` の全操作は `config-uninterpretable` として fail-closed で失敗し、failure detail に試行した解決手段、`gh repo view` の終了コードと stderr の要因が診断情報として含まれる。
+
+`gh repo view` で解決できない環境では、gh CLI の認証状態を確認した上で、launcher または `.env` 相当の起動環境に `AGENTDEV_GH_REPO` を設定する。
+
+1. `gh auth status` で gh CLI の認証状態を確認する。未認証の場合は `gh auth login` で認証する
+2. launcher（ターミナルや OpenCode の起動スクリプト）または `.env` 相当の起動環境ファイルに `AGENTDEV_GH_REPO` を設定する
+
+```powershell
+# 起動環境（launcher / .env 相当）に設定する
+$env:AGENTDEV_GH_REPO = "owner/name"   # 例: yogata/agent-dev-flow
+```
+
+設定後、OpenCode を再起動し、`agentdev_gh` の操作（例: `issue_list`）が成功することを確認する。
 
 ### 更新手順
 

@@ -16,6 +16,10 @@ OpenCode は `.opencode/plugins/` 直下のファイル（depth-1）のみを自
 
 環境変数 `AGENTDEV_GH_REPO`（`owner/name` 形式）で対象リポジトリを指定できる。未指定の場合は `gh repo view` で解決する。解決不能な場合、全操作は `config-uninterpretable` として失敗する（fail-closed）。
 
+gh CLI の認証状態は `gh auth status` で確認できる。未認証やリモート不在のチェックアウトでは `gh repo view` による解決に失敗するため、`AGENTDEV_GH_REPO` を起動環境（launcher / .env 相当）へ設定する。設定手順は導入ガイド [Consumer Project 導入](../../../docs/guides/consumer-project-setup.md) の「AGENTDEV_GH_REPO の起動環境設定」節を参照する。
+
+リポジトリ解決に失敗した場合の failure detail には、試行した解決手段、`gh repo view` の終了コードと stderr の要因が診断情報として含まれる。診断情報と併せて、`AGENTDEV_GH_REPO` 設定による解決手続きの導線が維持される。
+
 ## 実行権限の所有者
 
 本 Plugin は登録機構であり、副作用の実行権限の所有者を変更しない。判断・承認は Workflow / 利用者側に残る。

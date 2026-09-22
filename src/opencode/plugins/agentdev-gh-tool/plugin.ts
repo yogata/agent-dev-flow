@@ -144,33 +144,83 @@ export const REQUEST_PROPERTY_SCHEMA = {
 
 /** 依存の注入点（テストは偽実装を差し込める）。 */
 export interface AgentdevGhToolDeps {
-  /** リポジトリ（owner/name）の解決。失敗時は null。既定は gh repo view と環境変数。 */
-  readonly resolveRepo?: () => string | null;
+  /** リポジトリ（owner/name）の解決。失敗時は null。既定は gh repo view と環境変数。診断情報付き失敗は RepoResolution で返す。 */
+  readonly resolveRepo?: () => string | RepoResolution | null;
   /** 実行の構築。既定は投影パスの Local 実装検出 → GitHub 実装。 */
   readonly createRunner?: (worktree: string, repo: string) => GhRunner | Promise<GhRunner>;
   readonly now?: () => Date;
 }
 
+/** リポジトリ解決失敗時の診断情報（解決手続き導線と併せて failure detail へ転記する）。 */
+export type RepoResolveDiagnostics = {
+  /** 試行した解決手段（環境変数、gh repo view の順）。 */
+  readonly attemptedMeans: readonly string[];
+  /** gh repo view の終了コード（起動不能・シグナル終了時は null）。 */
+  readonly ghExitCode: number | null;
+  /** gh repo view の stderr 要因の要約（最初の非空行・切詰め）。 */
+  readonly ghStderrSummary: string;
+};
+
+/** リポジトリ解決の結果。解決順（環境変数 → gh repo view）は変更しない。 */
+export type RepoResolution =
+  | { readonly repo: string }
+  | { readonly repo: null; readonly diagnostics: RepoResolveDiagnostics };
+
 const REPO_ENV = "AGENTDEV_GH_REPO";
+const REPO_PATTERN = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
 const LOCAL_RUNNER_PROJECTION = path.join(".opencode", "tools", "agentdev-gh", "runner-local.ts");
 
-function resolveRepoFromGh(worktree: string): string | null {
+/** 外部コマンド出力の要因要約（最初の非空行、200文字で切詰め）。 */
+function summarizeCause(text: unknown): string {
+  if (typeof text !== "string") return "(unavailable)";
+  const firstLine = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .find((line) => line !== "");
+  if (firstLine === undefined) return "(empty)";
+  return firstLine.length > 200 ? `${firstLine.slice(0, 200)}...` : firstLine;
+}
+
+function resolveRepoFromGh(worktree: string): {
+  repo: string | null;
+  exitCode: number | null;
+  cause: string;
+} {
   const r = spawnSync("gh", ["repo", "view", "--json", "nameWithOwner", "-q", ".nameWithOwner"], {
     encoding: "utf8",
     cwd: worktree,
     maxBuffer: 1024 * 1024,
   });
-  if (r.status !== 0 || typeof r.stdout !== "string") return null;
+  const cause = r.error !== undefined ? summarizeCause(r.error.message) : summarizeCause(r.stderr);
+  if (r.status !== 0 || typeof r.stdout !== "string") {
+    return { repo: null, exitCode: r.status, cause };
+  }
   const repo = r.stdout.trim();
-  return /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repo) ? repo : null;
+  if (!REPO_PATTERN.test(repo)) {
+    return { repo: null, exitCode: r.status, cause: `unexpected output: ${summarizeCause(r.stdout)}` };
+  }
+  return { repo, exitCode: r.status, cause };
 }
 
-function defaultResolveRepo(worktree: string): string | null {
+function defaultResolveRepo(worktree: string): RepoResolution {
   const fromEnv = process.env[REPO_ENV];
-  if (fromEnv !== undefined && /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(fromEnv)) {
-    return fromEnv;
+  if (fromEnv !== undefined && REPO_PATTERN.test(fromEnv)) {
+    return { repo: fromEnv };
   }
-  return resolveRepoFromGh(worktree);
+  const envMean =
+    fromEnv === undefined
+      ? `${REPO_ENV} environment variable (not set)`
+      : `${REPO_ENV} environment variable (set but invalid format)`;
+  const gh = resolveRepoFromGh(worktree);
+  if (gh.repo !== null) return { repo: gh.repo };
+  return {
+    repo: null,
+    diagnostics: {
+      attemptedMeans: [envMean, "gh repo view"],
+      ghExitCode: gh.exitCode,
+      ghStderrSummary: gh.cause,
+    },
+  };
 }
 
 async function defaultCreateRunner(worktree: string, repo: string): Promise<GhRunner> {
@@ -203,9 +253,21 @@ export function createAgentdevGhToolDefinition(deps: AgentdevGhToolDeps = {}): {
 
   async function runnerFor(worktree: string): Promise<GhRunner | { error: string }> {
     if (cachedRunner !== null && cachedRepo !== null) return cachedRunner;
-    const repo = deps.resolveRepo ? deps.resolveRepo() : defaultResolveRepo(worktree);
+    const resolution = deps.resolveRepo ? deps.resolveRepo() : defaultResolveRepo(worktree);
+    const repo = typeof resolution === "string" ? resolution : (resolution?.repo ?? null);
     if (repo === null) {
-      return { error: `cannot resolve the target repository (set ${REPO_ENV}=owner/name or run inside a gh repo)` };
+      const diagnostics =
+        resolution !== null && typeof resolution !== "string" && resolution.repo === null
+          ? resolution.diagnostics
+          : undefined;
+      let detail = `cannot resolve the target repository (set ${REPO_ENV}=owner/name or run inside a gh repo)`;
+      if (diagnostics !== undefined) {
+        detail +=
+          `; attempted: ${diagnostics.attemptedMeans.join(", ")}` +
+          `; gh repo view exitCode=${String(diagnostics.ghExitCode)}` +
+          `; gh repo view stderr cause: ${diagnostics.ghStderrSummary}`;
+      }
+      return { error: detail };
     }
     const create = deps.createRunner ?? defaultCreateRunner;
     const runner = await create(worktree, repo);
