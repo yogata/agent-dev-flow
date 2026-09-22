@@ -1,0 +1,55 @@
+{
+  "observationId": "20260922T143347Z-fc6d",
+  "durationMs": 1840,
+  "inputs": {
+    "requestDigest": "8b95b82028d7bfdb7a22d2c678de54bbc7b27eec1f55a521894db48db3bec392",
+    "snapshot": "3 judgments of case-ready STEP-5: (1) Standard/Epic attribution via 3-axis (choice + 3 score questions), (2) Wave composition for 6 child Issues with disjoint file sets vs 5-launch boundary (boolean + choice), (3) scope overlap vs open Issue #3059 (boolean + choice). Full judgment inputs are reconstructable from Root Case #3063 body, draft .agentdev/drafts/req-draft-run3-backlog-operational-hardening.md (deleted after success), and v4-runtime-execution-model Design."
+  },
+  "judgmentKind": "execution-structure",
+  "judgments": [
+    {
+      "confidence": 0.825,
+      "jevResult": "Epic",
+      "judgmentId": "standard-epic-attribution",
+      "llmFinalJudgment": "Epic flow を採用。依存エッジ 0 件だが実行対象は RA 6件の実現面で同一承認バッチ（run3 運用堅牢化）の関連主題であり無関係群の機械的集約に非該当。case_open_hints epic_needed: true（ユーザー承認済み構成案）に反証なし。子 Issue 数 6 は推奨範囲内。3軸: 依存強度=弱（必須依存なし）・Epic サイズ=推奨範囲内（6件）・機能的一貫性=単一バッチ主題下の機能的グルーピング",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "Epic": 0.79,
+        "Standard": 0.21
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.97,
+      "jevResult": false,
+      "judgmentId": "wave-composition",
+      "llmFinalJudgment": "全 6 子 Issue の同一 Wave 並列配置は実行安全境界（最大同時起動数 5 件）に不適合のため不可。処置は Wave 分離（Wave 1: 5 Issue 並列・Wave 2: 1 Issue〔最軽量の RU-0127 docs_chore・recommended_order 9〕）。ファイル重複 0 件のため変更対象分割・重複許容は不適切",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.94,
+        "true": 0.06
+      },
+      "questionForm": "boolean"
+    },
+    {
+      "confidence": 0.755,
+      "jevResult": false,
+      "judgmentId": "scope-overlap",
+      "llmFinalJudgment": "スコープ重複なし。#3059 は Jev 先行評価の追跡 Issue（tracking task）であり、本 Case の変更対象成果物・対象 REQ 行（REQ-008-061/062・REQ-009-051・REQ-018-005・REQ-031-032・REQ-052-013・REQ-087-004）と非重複。重複時の規定処置は子 Issue 生成のスキップではなくユーザー確認だが、重複なしのため全 6 子 Issue を生成する",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.81,
+        "true": 0.19
+      },
+      "questionForm": "boolean"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "eb141ebc8ba28fdfe326e648c11515b4da3430d2",
+  "subject": "Case #3063（run3 backlog 運用堅牢化）の実行構造判断（Standard/Epic 確定・Wave 構成・スコープ重複）",
+  "workflow": "case-ready"
+}
