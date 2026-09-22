@@ -1,0 +1,4 @@
+component: agentdev-workflow-inspect-promote
+implementation:
+  src/opencode/skills/agentdev-workflow-inspect-promote/references/auto-promote-and-review.md:
+    - REQ-090-004

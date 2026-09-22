@@ -2,3 +2,6 @@ component: agentdev-workflow-learning-promote
 implementation:
   src/opencode/skills/agentdev-workflow-learning-promote/references/analysis-and-review.md:
     - REQ-038-006
+    - REQ-090-004
+    - REQ-090-009
+    - REQ-090-010

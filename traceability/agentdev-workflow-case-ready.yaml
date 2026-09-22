@@ -57,6 +57,8 @@ implementation:
     - REQ-061-032
     - REQ-061-033
     - REQ-083-001
+  src/opencode/skills/agentdev-workflow-case-ready/references/execution-structure.md:
+    - REQ-090-004
   src/opencode/skills/agentdev-workflow-case-ready/references/readiness-and-cleanup.md:
     - REQ-061-035
 verification:

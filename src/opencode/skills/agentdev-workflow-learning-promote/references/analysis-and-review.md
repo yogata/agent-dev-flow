@@ -194,3 +194,32 @@ inbox → deferred 移動、prune、commit/push 等の不可逆処理は未実�
 ### Resume-Idempotency
 
 - review は書き込み禁止型（`semantic_review`）のため再呼出に副作用がない。evaluation-report.md 実ファイルから反映状態を再構築できる
+
+## Jev 先行評価の逐次経路（REQ-{NNNN}、DEC-{NNN}）
+
+閉じた意味判断ごとに、次の逐次経路を実行できる。Jev は最終判断者ではなく、後段の LLM 推論への追加情報として扱う（Stage 1: 観測可能化）。
+
+1. **Jev 先行評価**: Custom Tool `agentdev_jev` の `evaluate` に、本 Workflow が構成した閉じた判断入力（state、指示、基準、質問群。日本語。repository 全文を渡さない）を渡す
+2. **LLM 推論**: Jev 結果と confidence を情報として含み、従来の判断材料（inbox / deferred 実ファイル、問題クラス分類基準、8軸評価ディメンション、処分区分基準、既存対策照合結果）も参照して推論する。Jev 結果だけで判断しない
+3. **LLM 最終判断**: 従来経路と同一の判断基準で最終判断を確定する。Jev 結果・confidence は最終判断を確定させない
+4. **unchanged/corrected 記録**: Jev 結果に対して LLM が判断を変更しなかったか（unchanged）/変更したか（corrected）を観測事実として記録する。評価カテゴリを混入させない
+
+共通契約:
+
+- 利用可否は `AI_GATEWAY_API_KEY` の設定有無で決まる（デフォルト有効、feature flag や opt-in 手続きは不要）。未設定時は呼び出さず `not_configured` を観測に記録し、従来 LLM 経路のみで本 Workflow を完了する
+- Jev API 失敗（timeout、429、5xx、network error、response validation error）時は自動 retry せず即座に従来 LLM 経路へ fallback し、失敗分類を観測に記録する。正規状態を破損しない
+- 観測は 1 Workflow 実行 = 1 JSON で `.agentdev/jev-observations/` に保存する（`agentdev_jev` の `observation_write`）。判断単位の confidence と llm_treatment は独立した一次観測値とし、閾値依存の分類結果を含めない。観測書込み失敗時は本 Workflow の success を維持し、完了報告に識別可能な warning を明示する。rollback・再実行・擬似再生成を行わない
+- 再構成可能な判断入力は判断入力全文を保存せず、評価リクエストの digest と参照で保持する。再構成不能な入力のみ最小 snapshot を渡す
+- 操作契約（入力、出力、失敗分類）の正は `docs/designs/responsibilities/custom-tool-contracts.md`「Jev 先行評価」節である
+
+適用位置: STEP-2 の問題クラス分類と 8軸評価、STEP-3 の廃棄判定と昇華可能性評価、STEP-4 の発動条件判定に適用する。
+
+初期割当て（適用対象19件のうち本 Workflow が所有する5件）:
+
+| 判断単位 | 質問形式 |
+|---|---|
+| 問題クラス分類（根本原因 + 再発条件 + 予防策が同じ単位への帰属） | choice（既存問題クラス候補 + 新規クラス） |
+| 8軸評価スコアリング（軸ごとの水準） | score ×8（各軸の水準） |
+| 廃棄判定（7カテゴリ + duplicate の処分区分） | choice（7カテゴリ + duplicate） |
+| 昇華可能性評価 | boolean（昇華可能/不能。禁止条件・既存対策照合を基準に含む） |
+| adversarial-review 発動条件判定 | boolean（発動/ skip。skip 条件該当の有無） |

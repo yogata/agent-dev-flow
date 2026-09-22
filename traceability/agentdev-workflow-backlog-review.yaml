@@ -1,0 +1,4 @@
+component: agentdev-workflow-backlog-review
+implementation:
+  src/opencode/skills/agentdev-workflow-backlog-review/references/analysis-composition-and-review.md:
+    - REQ-090-004

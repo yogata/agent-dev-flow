@@ -104,3 +104,36 @@ skip 判断のためだけの新規 HITL、承認点は追加しない。
 ### Resume-Idempotency
 
 - review 未実施で中断した場合、STEP-1 から暫定分類を再構築して発動条件判定をやり直す。review 自体は書き込み禁止型（`semantic_review`）のため再呼出に副作用がない
+
+## Jev 先行評価の逐次経路（REQ-{NNNN}、DEC-{NNN}）
+
+閉じた意味判断ごとに、次の逐次経路を実行できる。Jev は最終判断者ではなく、後段の LLM 推論への追加情報として扱う（Stage 1: 観測可能化）。
+
+1. **Jev 先行評価**: Custom Tool `agentdev_jev` の `evaluate` に、本 Workflow が構成した閉じた判断入力（state、指示、基準、質問群。日本語。repository 全文を渡さない）を渡す
+2. **LLM 推論**: Jev 結果と confidence を情報として含み、従来の判断材料（item 本文、Review 観点、横断契約 Design の判定表、既存要件との関連）も参照して推論する。Jev 結果だけで判断しない
+3. **LLM 最終判断**: 従来経路と同一の判断基準で最終判断を確定する。Jev 結果・confidence は最終判断を確定させない
+4. **unchanged/corrected 記録**: Jev 結果に対して LLM が判断を変更しなかったか（unchanged）/変更したか（corrected）を観測事実として記録する。評価カテゴリを混入させない
+
+共通契約:
+
+- 利用可否は `AI_GATEWAY_API_KEY` の設定有無で決まる（デフォルト有効、feature flag や opt-in 手続きは不要）。未設定時は呼び出さず `not_configured` を観測に記録し、従来 LLM 経路のみで本 Workflow を完了する
+- Jev API 失敗（timeout、429、5xx、network error、response validation error）時は自動 retry せず即座に従来 LLM 経路へ fallback し、失敗分類を観測に記録する。正規状態を破損しない
+- 観測は 1 Workflow 実行 = 1 JSON で `.agentdev/jev-observations/` に保存する（`agentdev_jev` の `observation_write`）。判断単位の confidence と llm_treatment は独立した一次観測値とし、閾値依存の分類結果を含めない。観測書込み失敗時は本 Workflow の success を維持し、完了報告に識別可能な warning を明示する。rollback・再実行・擬似再生成を行わない
+- 再構成可能な判断入力は判断入力全文を保存せず、評価リクエストの digest と参照で保持する。再構成不能な入力のみ最小 snapshot を渡す
+- 操作契約（入力、出力、失敗分類）の正は `docs/designs/responsibilities/custom-tool-contracts.md`「Jev 先行評価」節である
+
+適用位置: STEP-1 の item 評価と暫定分類、STEP-2 の発動条件判定に適用する。
+
+初期割当て（適用対象19件のうち本 Workflow が所有する3件）:
+
+| 判断単位 | 質問形式 |
+|---|---|
+| item 評価（Review 観点ごとの妥当性・影響・緊急度） | score（観点ごとの水準） |
+| 暫定分類（採用/ 保留/ 却下） | choice（採用・保留・却下） |
+| adversarial-review 発動条件判定 | boolean（発動/ skip。skip 条件該当の有無） |
+
+適用可否を本 Case 内で確定した判断（REQ-{NNNN}-{NNN}）:
+
+- **自律確定候補/ユーザー判断必要の判定（STEP-1 Procedure 4）: Jev を適用しない。**
+  理由: 本判断の現行契約は「モデルの自己申告による確信度や固定パーセンテージのみで可否を判定しない」と明示しており、判定基準は横断契約 Design の詳細判定表（自律確定可能要件、HITL移送条件）の適用である。Jev の confidence は確信度情報であり、本判断へ情報として与えることはこの禁じ手と競合し得る。また本判断の結論は HITL 境界（ユーザー判断の要否）の確定へ直接影響するため、Stage 1 の観測のみの段階で確率情報を混入させず、判定表適用による現行経路を維持する。将来の適用は観測結果（Issue B）を踏まえ、confidence を与えない質問形式（判定表要素の boolean/choice 化）でのみ再評価する。
+
