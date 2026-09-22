@@ -263,7 +263,7 @@ Issue #1538 では case-auto から case-open を `category=writing` で委譲�
 adapter skill 経由の委譲（case-run からの実行担当サブエージェント委譲を含む）は、以下を満たす:
 
 - **category 選定**: 委譲先 command の責務と category 名の意味的距離を評価し、誤誘導しない category を選定する。事務的手続きには `unspecified-high` を推奨し、`writing` は執筆作業のみに限定する
-- **MUST NOT DO 必須**: 委譲 prompt に MUST NOT DO セクションを必須で記載する。当該 command 責務外のファイル作成、REQ/ Design/ src の直接修正、文書監査の実施、capture 境界を超える `.agentdev/` 直接変更等を列挙する
+- **MUST NOT DO 必須**: 委譲 prompt に MUST NOT DO セクションを必須で記載する。当該 command 責務外のファイル作成、REQ/ Design/ src の直接修正、文書監査の実施、capture 境界を超える `.agentdev/` 直接変更等を列挙する。新規配布物の作成を含む委譲では、配布物の本文・コメントへの producer 側トレーサビリティ metadata（inline ADF-COVERS 宣言、要件行 ID、Decision ID 等の concrete ID）の直書き禁止（対応関係は repository top-level の `traceability/` 配下 sidecar へ登録する作成先規約）を、作成時の予防観点の引き渡しとして MUST NOT DO セクションに含める。予防観点の引き渡しは配布依存境界 checker による事後検知と両立し、検知機構の代替にも検知機構の変更にもしない
 - **プロンプトテンプレート**: category 選定基準と MUST NOT DO 記載要件を統合した形式とし、特定 command 名と category 名の意味的距離が大きい場合の注意事項を含む
 
 adapter skill は本要件を宣言的に定義し、case-run からの委譲 prompt 構築時に参照される。
