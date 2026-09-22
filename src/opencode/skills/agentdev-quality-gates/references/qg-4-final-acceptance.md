@@ -387,6 +387,7 @@ QG-4 は判定基準を提供し、case-close が実際のチェックボック�
 QG-4 の traceability check は Design ヘッダの ADF-COVERS 宣言とトレーサビリティポリシー（`traceability/policy.yaml`）という単一 PR の差分に閉じない横断 durable state を判定対象とするため、次の前提手順を要求する。
 
 - worktree root 起点の判定で検出対象の完全性が確定できない場合、main 側 root で check を再実行し、トレーサビリティポリシー（`traceability/policy.yaml`）登録 commit の時系列（ブランチ分岐の前後）を確認してから完了阻止を判断する。durable state 上で解消済みの対象行を本変更起因の失敗と誤判定しない
+- main 側 root での check 再実行を worktree 検証から行う場合の汎用手順（`bun <path>` 形式・`--root <worktree root>` 指定・読取系 check の実行に限定・worktree 内検査結果との混在禁止）は `agentdev-git-worktree` references `worktree-operations.md`「main root 実体 + --root 指定による読取系 checker 実行手順」を参照する
 - トレーサビリティポリシー不在時は全要件行を検証対応必須として扱う安全側既定は維持する
 - checker 実装（--root の意味・検査項目）の変更は本前提手順に含まない。main 側 root での再実行は読取系 check の実行のみで行う
 

@@ -169,6 +169,38 @@ bun test によるフル suite 実行は、次の環境前提を踏まえて実�
 junction 依存 checker は worktree 実行時（`isInsideWorktree` 判定で worktree 内と判定された場合）に skip する。
 skip せずに検査が必要な場合は構造系テスト fallback（commands_e2e / skills_structure / templates_structure の source パス切替）を適用する。
 
+### main root 実体 + --root 指定による読取系 checker 実行手順
+
+junction 系 skill scripts を用いる検査で、skip せずに実行する必要がある読取系 check は、main root 実体から `--root <worktree root>` 指定（必要に応じ `--files` 併用）で実行できる。
+worktree 内から `.opencode/skills/agentdev-*` 配下の script を直接実行すると junction 未伝播により Module not found で失敗するため、script の起動パスを main root 実体側へ置き、検査対象だけを worktree へ向ける。
+
+手順:
+
+1. main root（メインリポジトリルート）を cwd として、script 実体を `bun <path>` 形式で起動する
+2. 検査対象の worktree root を `--root <worktree root>` で指定する（絶対パスを推奨。相対パスは実行時のカレントディレクトリ基準で解決される）
+3. 変更ファイル限定検査では `--files` を併用する（`--files` と `--base-ref` は排他。worktree 上のコミット前検証では untracked ファイルを含む `--files` による明示指定を標準とする。`--files` は checker の workflow profile の対象に一致するファイルを指定する。docs/** 変更を含まない PR では `--workflow case-run` の gate がスキップ対象となるため、文書品質の targeted 検査は `--workflow docs-check`（全ファイル対象）で行う）
+
+実行手順例（代表検査。`<worktree 絶対パス>` は検査対象 worktree の root に置換する）:
+
+```bash
+# targeted docs guard（--root 対応、--files 併用）
+bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts --workflow case-run --root <worktree 絶対パス> --files src/opencode/skills/agentdev-git-worktree/references/worktree-operations.md --json
+
+# traceability check（--root 必須。--req は対象要件行 ID のカンマ区切り個別指定のみ。.. 範囲構文は非対応）
+bun .opencode/skills/agentdev-traceability/scripts/src/check.ts --root <worktree 絶対パス> --req REQ-{NNNN}-{MMM}
+
+# 契約テスト（配布物の構造様式を固定する *.test.ts。--root を取らないため main root 実体側の状態が検査対象になる）
+bun test ./.opencode/skills/repo-agentdev-integrity/scripts/skills_structure.test.ts
+```
+
+制約:
+
+- **読取系 check の実行のみに限定**: main 側 root での実行は読取系 check の実行のみに限定する。書込み・状態変更を伴う操作（索引再生成、auto-fix 等）を main root 実体から実行しない
+- **結果混在禁止**: worktree 内検査結果と main root 実体からの検査結果を混在させない。実行記録には環境ラベル（実行環境: main root 実体、検査対象: `--root` 指定の worktree root、ブランチ名・HEAD hash、junction 伝播状態）を付す。環境ラベルの記録運用は「bun test 実行の環境前提」に従う
+- **検査対象状態の明示**: `--root` を取らない契約テストを main root 実体から実行した場合、検査対象は main root 実体側の状態であり、worktree 内の未マージ変更は含まれない。worktree 内の変更を検査する契約テストは構造系テスト fallback（前節参照）を用いる
+
+QG-4 の traceability check における main 側 root 再実行の前提手順との相互参照は、`agentdev-quality-gates` references `qg-4-final-acceptance.md`「traceability check の横断 durable state 前提手順」を参照する。
+
 ## 書込み guard 運用指針（Windows エンコーディング破壊回避の集約）
 
 worktree 操作（実装、検証、証跡退避を含む）におけるファイル書込みは、Windows 環境のエンコーディング破壊回避 guard の対象である。
