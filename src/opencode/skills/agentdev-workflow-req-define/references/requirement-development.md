@@ -153,3 +153,35 @@
 - 不変条件（変更誘発境界リスク分析の省略禁止。リスク導出規則不在時は ADF core の一般規則のみで 5観点境界分析を実行する）
 - 不変条件（case-specific risk の test strategy 投影。投影完全性の検査は QG-1 が担い、本工程は投影の実施のみを行う）
 - 不変条件（test strategy 定義時の検証手段の質基準適用。質基準の正本は `agentdev-req-analysis` の analysis-viewpoints reference、完了時点の証跡契約を正規所有する要件群が正規所有するため複製しない）
+
+## Jev 先行評価の逐次経路（REQ-{NNNN}、DEC-{NNN}）
+
+閉じた意味判断ごとに、次の逐次経路を実行できる。Jev は最終判断者ではなく、後段の LLM 推論への追加情報として扱う（Stage 1: 観測可能化）。
+
+1. **Jev 先行評価**: Custom Tool `agentdev_jev` の `evaluate` に、本 Workflow が構成した閉じた判断入力（state、指示、基準、質問群。日本語。repository 全文を渡さない）を渡す
+2. **LLM 推論**: Jev 結果と confidence を情報として含み、従来の判断材料（既存 REQ/Decision/Design の照合結果、分類ゲート群の出力、Decision 判断基準）も参照して推論する。Jev 結果だけで判断しない
+3. **LLM 最終判断**: 従来経路と同一の判断基準で最終判断を確定する。Jev 結果・confidence は最終判断を確定させない
+4. **unchanged/corrected 記録**: Jev 結果に対して LLM が判断を変更しなかったか（unchanged）/変更したか（corrected）を観測事実として記録する。評価カテゴリを混入させない
+
+共通契約:
+
+- 利用可否は `AI_GATEWAY_API_KEY` の設定有無で決まる（デフォルト有効、feature flag や opt-in 手続きは不要）。未設定時は呼び出さず `not_configured` を観測に記録し、従来 LLM 経路のみで本 Workflow を完了する
+- Jev API 失敗（timeout、429、5xx、network error、response validation error）時は自動 retry せず即座に従来 LLM 経路へ fallback し、失敗分類を観測に記録する。正規状態を破損しない
+- 観測は 1 Workflow 実行 = 1 JSON で `.agentdev/jev-observations/` に保存する（`agentdev_jev` の `observation_write`）。判断単位の confidence と llm_treatment は独立した一次観測値とし、閾値依存の分類結果を含めない。観測書込み失敗時は本 Workflow の success を維持し、完了報告に識別可能な warning を明示する。rollback・再実行・擬似再生成を行わない
+- 再構成可能な判断入力は判断入力全文を保存せず、評価リクエストの digest と参照で保持する。再構成不能な入力のみ最小 snapshot を渡す
+- 操作契約（入力、出力、失敗分類）の正は `docs/designs/responsibilities/custom-tool-contracts.md`「Jev 先行評価」節である
+
+適用位置: STEP-3 の既存REQ照合、STEP-4 の要件展開（最終分類・Design 分離）に適用する。壁打ち対話（STEP-2）とユーザー承認境界へは適用しない。
+
+初期割当て（適用対象19件のうち本 Workflow が所有する2件）:
+
+| 判断単位 | 質問形式 |
+|---|---|
+| 既存REQ照合判断（CREATE/ APPEND/ UPDATE の帰属） | choice（CREATE・APPEND・UPDATE）+ boolean（照合確信の要否） |
+| 要件展開の最終分類・Design 分離（分類ゲート群の確定） | choice（REQ 行・Design 行の帰属）+ boolean（分離要否） |
+
+適用可否を本 Case 内で確定した判断（REQ-{NNNN}-{NNN}）:
+
+- **Decision 要否判断群（STEP-5。`agentdev-decision-guidelines` 判断基準の適用と Decision 候補の重複確認・禁止ゲート判定）: Jev を適用しない。**
+  理由: Decision 要否判断は Decision 禁止ゲートの判定（仕様変更のみ・workflow 定義・運用ルール等の該当可否）と既存 Decision の重複確認という判定表適用が主であり、かつ判断結論が Decision 正規成果物の作成可否（case-ready STEP-3 受理評価の入力）へ直接投影される。req-define はユーザー合意形成（壁打ち対話）を前提とする workflow であり、合意前に確率情報（confidence）を判断材料へ混入させると合意形成の主体性を損なうおそれがある。本判断群は Stage 1 では現行経路（判定表適用と architecture-advisory 委譲）のみで維持し、将来の適用は観測結果（Issue B）と別 Decision を前提に再評価する。
+

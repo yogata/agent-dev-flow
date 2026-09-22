@@ -5,7 +5,7 @@ created: 2026-07-25
 updated: 2026-09-22
 ---
 <!-- ADF-COVERS(design): REQ-090-007 -->
-<!-- ADF-COVERS(implementation): REQ-030-007, REQ-030-008, REQ-030-009 -->
+<!-- ADF-COVERS(implementation): REQ-030-007, REQ-030-008, REQ-030-009, REQ-090-007 -->
 
 # execution_unit 構成アルゴリズム参照
 
@@ -77,4 +77,4 @@ REQ/Design で固定するのは不変の方針（依存強度3レベル定義�
 ## See Also
 
 - [../v4-standard-lifecycle.md](../v4-standard-lifecycle.md)（語彙定義: work_type / scale / Epic / Wave の v4 意味モデル）
-- `docs/designs/commands/case-open.md`（適用主体 command Design）
+- `docs/designs/commands/case-ready.md`（適用主体 command Design。Epic/Wave 構成判断の正規所有者は case-ready。REQ-090-007）

@@ -1,0 +1,19 @@
+{
+  "name": "agentdev-jev-tool-adapter-vercel",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Initial Vercel AI Gateway adapter for the agentdev-jev Custom Tool. Evaluation SDK usage is confined to this adapter package (distribution dependency boundary).",
+  "type": "module",
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "ai": "^7.0.108",
+    "@ai-sdk/gateway": "^4.0.88"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "@types/bun": "^1.3.0"
+  }
+}
