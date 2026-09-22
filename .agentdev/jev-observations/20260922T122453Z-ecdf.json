@@ -1,0 +1,230 @@
+{
+  "observationId": "20260922T122453Z-ecdf",
+  "durationMs": 2324,
+  "inputTokens": 6305,
+  "inputs": {
+    "references": [
+      {
+        "digest": "50b74dd5d5bf19ab7700a8ee7c3bbc4776e22f5bc67bf763d115d276425a3e3e",
+        "label": "ru-a-learning-gh-repo-resolution",
+        "path": ".agentdev/learning/promoted/measure-update-agentdev-gh-repo-resolution-env-setup.md"
+      },
+      {
+        "digest": "ab48766b8d739a0cd6d0449a81ccd0f7ce971601f35e8b9cc5ca4e73338bca2a",
+        "label": "ru-b-learning-distribution-declaration",
+        "path": ".agentdev/learning/promoted/measure-update-distribution-artifact-declaration-application-miss.md"
+      },
+      {
+        "digest": "db8ee4fcaed9471b2d27a3bfddfa21ea5fe0b402c9be2ee533e2b11076eb5aef",
+        "label": "ru-c-learning-worktree-junction",
+        "path": ".agentdev/learning/promoted/measure-update-worktree-junction-skill-scripts-main-root-execution.md"
+      },
+      {
+        "digest": "61bbccace251c6d863503bf1341a94bcf428076aa3a67cbcab57fb2eec7facae",
+        "label": "ru-d-intake-artifact-actions",
+        "path": ".agentdev/intake/promoted/intake-draft-artifact-actions-row-structure.md"
+      },
+      {
+        "digest": "571cdb12f4100f1142751701379e8bcf7473772873d20877135544c5c3e94827",
+        "label": "ru-e-intake-checker-gap-registry",
+        "path": ".agentdev/intake/promoted/intake-checker-known-gap-registry.md"
+      },
+      {
+        "digest": "2c68d2e09faa8b630bd56ee3d536b9123f5e3d730c3ef761504317728ec55406",
+        "label": "ru-a-intake-gh-repo-resolution",
+        "path": ".agentdev/intake/promoted/intake-gh-tool-repo-resolution-failure.md"
+      },
+      {
+        "digest": "d805ba1a88f0a17a6f283001e58e533dfc09b00d7a6dd1ead74c75f1bd8ca331",
+        "label": "disposition-intake-jev-followup",
+        "path": ".agentdev/intake/promoted/intake-jev-ts001-ts010-real-env-verification.md"
+      },
+      {
+        "digest": "3c28bc44ba736e57b77596a37b033698fc73879de9df500dc2ff80d3663dedf1",
+        "label": "ru-f-inspect-pr-desc-links",
+        "path": ".agentdev/inspect/promoted/2026-09-22-pr-desc-broken-design-links.md"
+      }
+    ],
+    "requestDigest": "049d4154dc5772d7e8583ae8e3667605ab95c750f901d371742a3cc77c161548",
+    "snapshot": "Jev evaluate 4回（判断単位4件、計11問: 暫定分類 choice 6問 + docs/knowledge/ 処置 choice 2問 + 統合分割 choice 1問 + depends_on boolean 1問 + score 1問）。requestDigest は workflow・judgmentKind・4 request 構成（判断単位、参照 digest キー、questions・criteria・instructions 構造）連結 JSON の sha256。state 本体は判断材料原本（references の promoted 8件）と references〔analysis-composition-and-review.md、learning-outcome-routing.md、integration-judgment.md〕から再構成可能。LLM 最終判断: 暫定分類は RU-A/B/D/E/F=REQ・RU-C=REQ（Jev の guide を corrected、変更先が配布 skill reference であるため）・処置=保留・統合=N:1 統合・depends_on=並べ替え可能/影響なし。Q-rua〜ruf のうち q-ruc-class のみ corrected、他は unchanged。処置の最終確定は STEP-5 HITL。"
+  },
+  "judgmentKind": "backlog-review-composition-judgment",
+  "judgments": [
+    {
+      "confidence": 0.8783333333333333,
+      "jevResult": "REQ",
+      "judgmentId": "q-rua-class",
+      "llmFinalJudgment": "REQ（導入ガイド・plugin README・plugin 実装への具体的システム変更を必要とする）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "REQ": 0.99,
+        "カタログDesign": 0,
+        "guide": 0.01,
+        "learning維持": 0,
+        "作業記録": 0,
+        "挙動Design": 0,
+        "対象外": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.8783333333333333,
+      "jevResult": "REQ",
+      "judgmentId": "q-rub-class",
+      "llmFinalJudgment": "REQ（case-run 実行系 skill reference・委譲手順への具体的変更）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "REQ": 0.77,
+        "カタログDesign": 0.01,
+        "guide": 0.08,
+        "learning維持": 0.01,
+        "作業記録": 0,
+        "挙動Design": 0.13,
+        "対象外": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.8783333333333333,
+      "jevResult": "guide",
+      "judgmentId": "q-ruc-class",
+      "llmFinalJudgment": "REQ（Jev の guide を corrected。変更先は docs/guides/ の案内文書ではなく .opencode/skills/ 配下の配布 skill reference〔システム成果物・配布依存境界検査対象〕であり、guide〔人間向けナビゲーション層〕に該当しない。Jev の REQ 分布 0.26 も近接していた）",
+      "llmTreatment": "corrected",
+      "probabilityDistribution": {
+        "REQ": 0.26,
+        "カタログDesign": 0.01,
+        "guide": 0.67,
+        "learning維持": 0.01,
+        "作業記録": 0,
+        "挙動Design": 0.05,
+        "対象外": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.8783333333333333,
+      "jevResult": "REQ",
+      "judgmentId": "q-rud-class",
+      "llmFinalJudgment": "REQ（req-define workflow skill 手順への追加）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "REQ": 0.96,
+        "カタログDesign": 0.01,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "挙動Design": 0.03,
+        "対象外": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.8783333333333333,
+      "jevResult": "REQ",
+      "judgmentId": "q-rue-class",
+      "llmFinalJudgment": "REQ（checker 実装変更）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "REQ": 0.99,
+        "カタログDesign": 0.01,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "挙動Design": 0,
+        "対象外": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.8783333333333333,
+      "jevResult": "REQ",
+      "judgmentId": "q-ruf-class",
+      "llmFinalJudgment": "REQ（配布物テンプレート pr_desc.md の修正はシステム変更。backlog-review の処置語彙に直接修正経路はなく RU 化して req-define へ渡す。req-define 側で軽微修正として処理される）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "REQ": 0.89,
+        "カタログDesign": 0.04,
+        "guide": 0.03,
+        "learning維持": 0,
+        "作業記録": 0,
+        "挙動Design": 0.04,
+        "対象外": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.875,
+      "jevResult": "保留",
+      "judgmentId": "q-jev-followup-disposition",
+      "llmFinalJudgment": "保留（case-ready Epic 初回実行まで確認不能で観測 JSON 生成時に自然充足、未充足状態の恒久知識化による陳腐化リスク、観測 JSON 自体が RU-0120〔Issue B〕の直接入力。promoted に残置し次回 backlog-review で再評価。最終確定は STEP-5 HITL）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "保留": 0.75,
+        "削除": 0.06,
+        "保存": 0.19
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.875,
+      "jevResult": "新規",
+      "judgmentId": "q-jev-followup-op",
+      "llmFinalJudgment": "保留のため操作種別判断は不発（Jev 結果の新規を記録として保持）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "更新": 0,
+        "新規": 1,
+        "置換": 0,
+        "削除": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.98,
+      "jevResult": "統合",
+      "judgmentId": "q-gh-integration",
+      "llmFinalJudgment": "統合（N:1。learning 受け入れ条件が統合判定と重複 RU 防止を明記、運用面と実装面は同一事象の補完的2側面、矛盾なし）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "1:1": 0.01,
+        "分割": 0.01,
+        "統合": 0.98
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.985,
+      "jevResult": true,
+      "judgmentId": "q-depends-reorderable",
+      "llmFinalJudgment": "並べ替え可能（depends_on 指定なし、循環・未解決・同時処理対象外なし）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.03,
+        "true": 0.97
+      },
+      "questionForm": "boolean"
+    },
+    {
+      "confidence": 0.985,
+      "jevResult": 0,
+      "judgmentId": "q-depends-impact",
+      "llmFinalJudgment": "影響なし（レベル0）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "致命的": 0,
+        "軽微": 0,
+        "重大": 0,
+        "影響なし": 1
+      },
+      "questionForm": "score"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "7c75585b",
+  "subject": "promoted 8件（backlog-auto run3 stage 3、learning 3・intake 4・inspect 1）の暫定分類・docs/knowledge/ 処置候補・統合分割判定・depends_on 並べ替え可能性",
+  "workflow": "backlog-review"
+}
