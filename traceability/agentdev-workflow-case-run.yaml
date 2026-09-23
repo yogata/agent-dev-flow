@@ -2,27 +2,27 @@ component: agentdev-workflow-case-run
 implementation:
   src/opencode/skills/agentdev-workflow-case-run/SKILL.md:
     - REQ-031-004
+    - REQ-031-006
     - REQ-031-010
     - REQ-031-011
+    - REQ-031-015
+    - REQ-031-016
     - REQ-031-028
     - REQ-031-029
     - REQ-031-030
     - REQ-031-032
   src/opencode/skills/agentdev-workflow-case-run/references/delegation-and-result.md:
     - REQ-014-016
+    - REQ-031-027
     - REQ-031-028
     - REQ-031-029
     - REQ-031-030
     - REQ-031-032
     - REQ-061-034
-  src/opencode/skills/agentdev-workflow-case-run/references/epic-wave.md:
-    - REQ-031-027
-    - REQ-031-029
-    - REQ-031-030
-    - REQ-035-012
-    - REQ-021-030
   src/opencode/skills/agentdev-workflow-case-run/references/single.md:
     - REQ-014-016
+    - REQ-031-015
+    - REQ-031-016
     - REQ-031-028
     - REQ-036-027
     - REQ-021-030

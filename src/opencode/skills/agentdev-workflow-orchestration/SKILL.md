@@ -9,12 +9,12 @@ case-run コマンドの状態機械、サブエージェントプロトコル�
 
 ## 状態機械
 
-case-run は単一 Issue または単一 Wave（`#epic` 指定時: 現在 ready な Wave の子Issue を 実行担当サブエージェント（adapter skill 経由、委譲 prompt 内で実行 command を指定）に並列委譲、最大5件）を処理し、Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）は扱わない（Wave 構成生成は case-open、Wave 境界クローズは case-close の責務）。
-Epic 全体の進行は case-auto が case-run(#epic) → case-close(#epic) の反復制御を担い、Wave 内の子Issue 選択、並列委譲は case-run(#epic) が、Wave 境界クローズ、Epic Issue 本文ステータス追跡テーブル更新は case-close(#epic) が担う（単一書き手: Decision、v4-runtime-execution-model Design「直列化単位表」、Decision）。
+case-run は常に単一 Issue を処理する（委譲は単一 Issue あたり1件。Epic・Wave を処理対象とする実行契約は廃止され、Wave 実行制御は case-auto の orchestration stage 3 が単一所有する）。Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）は扱わない（Wave 構成生成は case-open、Wave 境界クローズは case-close の責務）。
+Epic 全体の進行は case-auto が orchestration stage 3 の共有 active Issue task 枠で子 Issue へインライン case-run を反復制御する形で担い、Wave 内の子Issue 選択、実行並列制御は case-auto stage 3 が、Wave 境界クローズ、Epic Issue 本文ステータス追跡テーブル更新は case-close(#epic) が担う（単一書き手: v4-runtime-execution-model Design「直列化単位表」）。
 
 ### case-run internal lifecycle フェーズ構成
 
-case-run は orchestration stage（case-auto が管理する command 間進行、Case 実行オーケストレーション要件 / case-auto 所有）と区別し、単一 Issue または Wave 内の case-run internal lifecycle（Case 実行オーケストレーション要件 / case-run 所有）として次のフェーズを管理する。
+case-run は orchestration stage（case-auto が管理する command 間進行、Case 実行オーケストレーション要件 / case-auto 所有）と区別し、単一 Issue の case-run internal lifecycle（Case 実行オーケストレーション要件 / case-run 所有）として次のフェーズを管理する。
 本節のフェーズは case-run internal lifecycle に属し、orchestration stage とは混同しない（responsibility-boundary-purification Design「case 実行責務の 4 用語と所有者」参照）。
 
 | フェーズ | Steps | 再開条件 |
@@ -59,10 +59,10 @@ compaction 後も STEP 識別子と永続状態から current STEP を決定し�
 AgentDevFlow 配布契約は「STEP 識別子と永続状態から current STEP を復元できる契約」のみを所有する。
 ToDo 使用、compaction 検出、current STEP 選択の実処理は harness 固有（AGENTS.md、harness reference）であり、本スキルでは規定しない。
 
-### 並列child task 復元（Epic Wave 実行時）
+### 並列child task 復元（case-auto orchestration stage 3）
 
-Epic Wave 実行モードでは child identity（子Issue 番号）と status（`completed-pr` / `blocked` / `failed` / `delegation-unavailable`）を Harness から復元し、完了済み child 状態を durable domain state と再構成して fan-in 判定を行う。
-fan-in 判定モデルの詳細は `agentdev-epic-tracker` 参照。
+case-run は常に単一 Issue を処理するため、case-run workflow 内に並列 child task は存在しない。Epic・Wave 実行時の child identity（子Issue 番号）と status（`completed-pr` / `blocked` / `failed` / `delegation-unavailable`）の Harness からの復元、完了済み child 状態の durable domain state との再構成、fan-in 判定は case-auto の orchestration stage 3 が所有する。
+並列実行を伴う他 workflow（case-auto、backlog-auto 等）の child identity / status 復元と fan-in 判定は各 workflow が support する。
 
 ### 準備フェーズの既知の制約（Windows + ジャンクション環境）
 

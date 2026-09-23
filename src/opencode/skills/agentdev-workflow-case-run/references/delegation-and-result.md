@@ -3,7 +3,7 @@
 
 > 本 reference は `agentdev-workflow-case-run` SKILL.md の共通 STEP 詳細である。
 > STEP-S4（実行担当サブエージェント委譲）と STEP-S5（result 処理・配布依存境界 最終 gate）を所有する。
-> single workflow から直接参照され、epic-wave workflow からは子Issue ごとの委譲契約として並列適用される。
+> single workflow（単一 Issue 実行）から参照される。
 
 ## 目次
 
@@ -25,7 +25,7 @@
 
 ### Preconditions
 
-- STEP-S3（single）または STEP-W2（epic-wave）の前置 gate 群が合格していること（worktree 内検証済み）
+- STEP-S3（single）の前置 gate 群が合格していること（worktree 内検証済み）
 
 ### Procedure
 
@@ -33,6 +33,7 @@
 - **委譲識別情報の発行と記録**: 委譲 prompt に委譲識別情報ブロック（委譲単位識別子 `DEL-{N}-{seq}`）を含める。case-run が委譲単位識別子を発行し、委譲単位識別子の形式（N = 対象 Issue 番号）と委譲 prompt の構造化文脈（workflow_phase、execution_unit）から親子実行関係を導出する（harness 側識別子は付加情報に限定）。記録先割当は v4-durable-state-and-recovery Design「ADF 実行識別情報の記録契約」節に従う。実行担当サブエージェントが当該ブロックの委譲単位識別子を PR 本文の実行識別情報セクションへ転記する。詳細なブロック形式は `agentdev-case-run-execution-adapter` references 参照
 - **検証差分の記録指示**: 委譲 prompt で、実施する各検証（test strategy 項目検証、bun test フル suite、配布依存境界 gate、targeted docs guard、トレーサビリティ check、品質ゲート等）について検証種別、検証結果、finding 差分（新規、修正済み、既出、撤回、無効の5分類）を PR 本文の検証差分セクションへ実行工程 case-run の行として記録するよう実行担当サブエージェントへ指示する。形式は `agentdev-workflow-templates` の検証差分セクション規約に従う。前段階の同種検証が存在しない初回検証では全 finding を新規として記録し、後続工程（case-close）が対応記録コメントへ同一形式の case-close 行を記録する前提で工程間比較可能にする
 - **トレーサビリティ check の実行前提の引き渡し**: 委譲 prompt でトレーサビリティ check を指示する際は、`agentdev-traceability` SKILL.md「実行方法」節の実行前提（`--req` は要件行IDの個別カンマ指定のみ受理し `..` 形式の範囲構文は非対応、`--root` は検証対象リポジトリのルート明示、宣言の走査対象は拡張子・除外ディレクトリの前提どおり）を実行担当サブエージェントへ引き渡す
+- **重複解消方針の参照と検出不能報告**: 委譲 prompt で、対象 Issue に関連する重複解消方針（変更対象分割・重複許容時の衝突解消の担当とマージ順序。Epic Issue 本文・Wave 記録に記録された競合リスク情報）を参照して実行することを実行担当サブエージェントへ指示する。同一 Wave 内の変更対象ファイル重複の実行時検出は case-auto の stage 3 実行制御が所有するため、case-run 委譲内では重複の新規検出・解消方針の新規決定を行わず、事前記録された方針に従う。変更対象集合が取得不能な場合は比較を省略せず検出不能として報告する
 - **ADF-COVERS 宣言付与の正の義務**: 委譲 prompt で、対象 work_type で対応宣言を要求する実装成果物（実装対応を伴う成果物）に、実装対応役割の対応宣言を付与することを実行担当サブエージェントの正の義務として指示する。case-run は宣言の欠落を委譲先側の受動的修正対象ではなく、委譲時から要求される能動的な付与義務として委譲指針上で義務付ける。宣言が付与されていることの確認は、case-ready の Definition 品質検査が行う同一の確認（対象 work_type で対応宣言を要求する実装成果物への宣言付与確認）と同一対象・同一基準の要求であり、両要求は無矛盾である。宣言欠落が case-ready 品質検査で検出される前に委譲先が宣言を付与していない状態で PR を作成することを防止する。対応宣言の付与対象と宣言形式の正規所有はトレーサビリティ標準配布スキル（agentdev-traceability）とその参照先 Design が所有する
 - **配布物対応宣言の作成先規約の予防観点引き渡し**: 委譲 prompt で、新規配布物（配布 command、skill、template、runtime script 等の consumer distribution closure 対象成果物）の作成を含む委譲には、配布物本文の記述規則を作成時の予防観点として引き渡す。引き渡す規約は「配布物の本文・コメントへ producer 側トレーサビリティ metadata（inline ADF-COVERS 宣言、要件行 ID、Decision ID 等の concrete ID）を直書きせず、対応関係は repository top-level の `traceability/` 配下 sidecar へ登録する」という作成先規約である。作成時予防と事後検知（配布依存境界 checker の source profile 検査等）は両面運用であり、予防観点の引き渡しは検知機構の代替にも検知機構の変更にもしない。配布物を作成しない委譲（producer 側文書の変更のみ等）では、対応宣言の作成先は成果物の配布境界で決定する既存規約（producer 側成果物は inline 宣言または sidecar のいずれか）に従い、この引き渡しを適用しない。本項目と ADF-COVERS 宣言付与の正の義務は同一対象・無矛盾であり、付与義務が対応関係を「付与する」ことを要求するのに対し、本項目は配布対象成果物の場合の宣言の「作成先」を委譲 context へ規約として引き渡す。記述規則と両面運用契約の正規所有は配布依存境界 Design（「配布物本文の記述規則」「事前書き込み gate と最終 gate の契約」の各節）が所有し、本 reference は再定義しない
 - **L2 タイムスタンプ計測**: 委譲起動直前・直後に壁時計タイムスタンプ（JST）を記録し、実行担当サブエージェント実行時間を計測する。併せて STEP-S3（worktree 設置）と STEP-S6（クリーンアップ）の開始・終了時刻を記録する
@@ -49,7 +50,7 @@
 - **PR URL 受領**: 実行担当サブエージェントが直接 PR 作成を行い、PR URL を委譲 result として返却する（PR URL フォールバック検索は使用しない）
 - **case-run 本体は実装方針を生成・審査しない**: 実装方針の形成、adversarial-review 呼出、結果反映は委譲内で adapter の委譲契約に従い、最初の実装変更前に実施する。case-run 本体が実装方針を生成、保持、審査するステップを新設しない。委譲 result（4状態）のみで委譲内の結果を受領する
 - **adapter 委譲内 adversarial-review**: 発動条件判定と review 呼出は adapter 委譲内で実行担当サブエージェントが分離して実施する。default-on、skip 条件（実装方針が自明の場合）該当時は省略して従来フローを継続、ユーザー明示指定時は強制発動。発動条件の判定は Issue 本文の実行契約（review 発動契約）を正とし、Issue 本文が非発動を記す場合、その契約に従い非発動とし、非発動の判定理由と代替自己反証（却下案・緩和策・unresolved なしの確認）を PR 本文へ必須記録する（silent skip の防止）。実装方針限定、blocked 遷移（(1) 既確定文書の変更・追加・撤回が必要、(2) 要件・仕様問題の検出、(3) unresolved な本質的争点またはユーザー判断事項が残る）の詳細は `agentdev-case-run-execution-adapter` 参照
-- **background 委譲の起動消失の回復**: background 委譲の起動直後消失を検知した場合、durable state（worktree の git status、PR 存在、Issue コメント）で実行の帰属を確認する。実行未試行と判定した場合は同期実行による再委譲を行い、実行中断と判定した場合の継続判断も当該 durable state に基づく。同期実行への切替は消失検知時のフォールバックに限定し、並列委譲（最大5件）を維持する（詳細は `agentdev-case-run-execution-adapter` 参照）
+- **background 委譲の起動消失の回復**: background 委譲の起動直後消失を検知した場合、durable state（worktree の git status、PR 存在、Issue コメント）で実行の帰属を確認する。実行未試行と判定した場合は同期実行による再委譲を行い、実行中断と判定した場合の継続判断も当該 durable state に基づく。同期実行への切替は消失検知時のフォールバックに限定する。実行並列上限（共有 active Issue task 枠）は case-auto orchestration stage 3 が単一所有する（詳細は `agentdev-case-run-execution-adapter` 参照）
 
 ### Result
 
@@ -121,8 +122,8 @@
 
 ## 関連 STEP
 
-- 前: STEP-S3（single.md）/ STEP-W2（epic-wave.md）
-- 次: STEP-S6（single.md）/ epic-wave では STEP-W4 で集約
+- 前: STEP-S3（single.md）
+- 次: STEP-S6（single.md）
 
 ## 関連 Capability Skill
 
@@ -133,7 +134,7 @@
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- 不変条件（単一 Issue または単一 Wave のみ処理、実装実行の委譲、result 4状態契約）
+- 不変条件（単一 Issue のみ処理、委譲1件の実装実行委譲、result 4状態契約。Epic・Wave の実行制御は case-auto orchestration stage 3 が単一所有）
 - ガードレール（完了条件チェックボックスの評価・更新は case-close QG-4 の責務、`POL-completion-checkbox-single-writer`）
 - 不変条件（blocked/failed の SSoT は Issue コメント、completed の SSoT は PR 本文。verify-only closure では検証証跡は SSoT コメントへ記録し carrier commit を作成しない）
 - 不変条件（外部実行ハーネス中間成果物の非扱い、PR URL 受領）

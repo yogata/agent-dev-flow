@@ -1,7 +1,7 @@
 # single workflow: 単一 Issue 実行（single）
 
 
-> 本 reference は `agentdev-workflow-case-run` SKILL.md の single workflow 詳細である。
+> 本 reference は `agentdev-workflow-case-run` SKILL.md の workflow 詳細である。
 > STEP-S1〜S3（フェーズ判定から前置 gate 群まで）と STEP-S6（クリーンアップ・完了報告）を所有する。
 > STEP-S4/S5 は [references/delegation-and-result.md](delegation-and-result.md) を参照。
 > STEP-S4 の委譲では、adversarial-review の発動条件を含む実行契約は Issue 本文を正とする。Issue 本文が非発動を記す場合、その契約に従い非発動とし、非発動の判定理由と代替自己反証（却下案・緩和策・unresolved なしの確認）を PR 本文へ必須記録する。
@@ -19,11 +19,11 @@
 
 ### Purpose
 
-実行モード（single / epic-wave）を確定し、durable state から再開フェーズを判定する。
+単一 Issue 実行を確定し、durable state から再開フェーズを判定する。
 
 ### Input Resolution
 
-1. SSoT 再構成: Issue 本文（`agentdev_gh` issue_read）、Epic Issue 本文（ステータス追跡テーブル有無）
+1. SSoT 再構成: Issue 本文（`agentdev_gh` issue_read）
 2. identifier 保持: Issue番号（ユーザー入力またはセッション内会話）
 3. 最小 scalar: なし
 4. runtime artifact: なし（会話コンテキストのみに依存しない）
@@ -36,23 +36,22 @@
 
 `agentdev-workflow-orchestration` に従い再開フェーズを判定する（Issue番号解決、引数パース、妥当性確認、実行パス分岐、成果物チェックの詳細は同 skill 参照）。
 再開が必要なフェーズをユーザーに通知する（準備フェーズから開始する場合は省略）。
-実行モード分岐: 引数が Epic Issue 番号の場合は epic-wave workflow（[references/epic-wave.md](epic-wave.md)）へ。
-それ以外は本 workflow（STEP-S2）へ。
+case-run は常に単一 Issue を処理する。Epic Issue 入力経由での Wave 構成の読み取り、現在 Wave 判定、fan-out/fan-in、子 Issue 並列起動は行わない。Epic Issue の指定時も case-auto 経由の正規呼出へ限定し、Epic 再指定時の次 Wave 処理を引き受けない（Epic 全体の進行管理・未完了 Wave の処理は case-auto が所有する）。
 
 **前工程からの引き継ぎ停止判定**: Issue 本文、要件doc本文に `agentdev_handoff: true` が含まれる場合、リポジトリ種別に応じて分岐する（詳細は `agentdev-workflow-lifecycle` runtime-package-boundary 参照）。
 self-hosting リポジトリでは履歴メタデータとして通常の case workflow を実施、consumer リポジトリでは実装を開始せず停止し agent-dev-flow repository への手動取り込み対象として報告する。
 
 ### Result
 
-- 実行モード確定（single）、再開フェーズ判定結果、引き継ぎ停止判定結果
+- 単一 Issue 実行モード確定、再開フェーズ判定結果、引き継ぎ停止判定結果
 
 ### Evidence
 
-- Issue 本文読取結果、実行モード分岐の根拠（Epic 判定の有無）
+- Issue 本文読取結果、再開フェーズ判定の根拠
 
 ### Completion Verification
 
-- Issue番号が解決済みであり、実行モードが一意に確定していること
+- Issue番号が解決済みであり、単一 Issue 実行モードが確定していること
 
 ### Resume-Idempotency
 
@@ -123,7 +122,7 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 
 ### Procedure
 
-- **Worktree 作成・ブランチ準備**: `agentdev-git-worktree` に従って実行する。作成元は main を明示的に指定する。べき等チェック: worktree 既存時は作成をスキップする。Wave 実行時、PR merge 後再開時は worktree 作成前に `git fetch origin` を実行し main の鮮度を確認する（同期基準・鮮度確認も main を参照）
+- **Worktree 作成・ブランチ準備**: `agentdev-git-worktree` に従って実行する。作成元は main を明示的に指定する。べき等チェック: worktree 既存時は作成をスキップする。Epic の後続 Wave での再開時（PR merge 後）は worktree 作成前に `git fetch origin` を実行し main の鮮度を確認する（同期基準・鮮度確認も main を参照。Epic 後続 Wave の作業起点も main を参照する）
 - **L2 タイムスタンプ計測**: 本 Step の開始時刻・終了時刻（JST）を記録し、worktree 設定時間を計測する（完了報告の L2 内訳に含める）
 - **STEP-S3-1 親Epic ステータス更新**: `agentdev-epic-tracker` 参照
 - **STEP-S3-2 worktree precondition gate**: `agentdev-git-worktree` の「worktree 内判定ヘルパー」に従い、当該 Issue の worktree+ブランチが作成済みであり、現在 worktree 内にいることを検証する。検証失敗時（worktree 未作成、メインリポジトリにいる）は実行担当サブエージェントを起動せず停止し、STEP-S3 へ戻るようユーザーに報告する
@@ -164,7 +163,7 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 
 ## 配布物本体 ADF-COVERS 宣言の除去可否判定（cleanup 判定）
 
-実行担当サブエージェントが委譲内の実装作業（STEP-S4）で配布物本体に残存する ADF-COVERS 宣言の除去を扱う場合、配布物本体の ADF-COVERS 宣言は producer 側のトレーサビリティ metadata であり、対応関係の移行先（docs 配下の正規成果物の inline 宣言、または repository top-level の `traceability/` 配下の sidecar）が成立していることを条件に除去する（epic-wave workflow の子Issue 委譲にも同一条件を適用する）。
+実行担当サブエージェントが委譲内の実装作業（STEP-S4）で配布物本体に残存する ADF-COVERS 宣言の除去を扱う場合、配布物本体の ADF-COVERS 宣言は producer 側のトレーサビリティ metadata であり、対応関係の移行先（docs 配下の正規成果物の inline 宣言、または repository top-level の `traceability/` 配下の sidecar）が成立していることを条件に除去する。
 
 - 除去可否判定の coverage 突合では、coverage 出力から implementation 役割かつ producer 側パス（docs/ 配下の正規成果物の inline 宣言、または repository top-level の `traceability/` 配下 sidecar の登録分）の対応関係を集約済み実装対応として認定する。coverage は sidecar と inline declaration を同じ論理的な対応関係として返すため、突合は対応関係の表現形式を区別せずに行う。役割フィルタの適用は必須であり、design 役割・verification 役割の対応関係は集約済み実装対応として扱わない
 - 対象要件について implementation 役割かつ producer 側パスの対応が確認できない配布物本体の宣言は除去可と判定せず、対応関係の移行先（sidecar または producer 側正規成果物）を成立させた上で除去する
