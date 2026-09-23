@@ -2,7 +2,7 @@
 title: case-open Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-19"
+updated: "2026-09-23"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-004, REQ-030-005, REQ-030-006, REQ-030-007, REQ-030-008, REQ-030-009, REQ-030-010, REQ-030-011, REQ-030-015 -->
@@ -10,6 +10,7 @@ updated: "2026-09-19"
 <!-- ADF-COVERS(implementation): REQ-021-014, REQ-021-024 -->
 <!-- ADF-COVERS(implementation): REQ-035-006, REQ-035-008 -->
 <!-- ADF-COVERS(implementation): REQ-049-005 -->
+<!-- ADF-COVERS(design): REQ-030-014 -->
 
 # case-open Design
 
@@ -87,7 +88,7 @@ REQ 行追加を伴う Definition Package の生成時、検証スコープポ�
 
 - STEP-5 冪等確認の実行時、draft の artifact_actions と未クローズ Case 群の変更対象成果物を機械的に比較し、2 以上の Case 間で同一パスが重複する場合、警告として投入者に提示する。共通契約は case-open / case-ready Design が正規所有する（v4）。
 - 検出源は draft の artifact_actions と未クローズ Case 群の宣言に限定し、合意済み宣言以外の一般的な変更影響探索・依存関係探索を行わない（REQ-021-014、REQ-030-013）。
-- Epic を構成する投入では同一投入内（Epic 配下 Wave 内）の重複検出を Wave 重複前置検出（REQ-035-012）へ委譲し、Epic をまたぐ Case 間の重複のみを検出対象とする（REQ-030-014）。
+- Epic を構成する投入では同一投入内（Epic 配下 Wave 内）の変更対象ファイル重複検出を case-ready の前置検出（REQ-035-012）へ委譲し、二重検査としない。Epic をまたぐ Case 間の重複のみを検出対象とする（REQ-030-014）。
 - 警告は Root Case の確立を自動阻止せず、警告の提示記録を完了報告へ含める。
 
 ## review_dispositions の消費と証跡転記

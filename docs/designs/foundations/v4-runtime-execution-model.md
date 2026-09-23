@@ -2,7 +2,7 @@
 title: ADF v4 Runtime 実行モデル（authority 格子・直列化単位・冪等経路・runtime 制御ループ）
 status: accepted
 created: 2026-09-19
-updated: 2026-09-19
+updated: 2026-09-23
 ---
 <!-- ADF-COVERS(implementation): REQ-035-001, REQ-035-007 -->
 
@@ -64,7 +64,12 @@ tag・branch の lifecycle role 別サブ表:
 
 - 再試行カウンタ: コンフリクト解消 Level 2/3 の試行回数、委譲の再試行回数。ローカル一時状態として保持し、durable enum に含めない
 - 外部状態ポーリング: mergeable UNKNOWN のポーリング等。外部システムの非同期値を待つループであり、遷移 predicate とは区別する
-- 起動間隔・並列数制御: 並列委譲の起動間隔（10 秒）と最大同時起動数（5 件）の実行安全境界
+- 起動間隔と active 枠: 並列委譲の起動間隔（10 秒）の実行安全境界と、1 回の case-auto orchestration の stage 3 全体で共有される active Issue task 数の上限（現行 5、数値は case-auto Design が所有）を区別して管理する。起動数と active 数は区別し、空き枠補充により起動は実行進行中に継続する（REQ-034-027、REQ-034-040、DEC-041）
+- 空き枠補充: 各 Epic の現在 Wave と Standard Issue を横断した候補認識と、実行上の安全条件を満たす候補への補充（横断補充は best-effort でなく必須）。最初に起動した全 task の完了を待つ固定 batch 方式を取らない（REQ-034-040）
+- 状態管理: Issue 実行の状態を pending、ready、active、実行結果確定で区別して管理する（REQ-034-041）
+- 再開: 既存 active task を計上し、同一 Issue の二重起動と上限超過を防ぐ。状態不明の task は終了確認まで実行枠を解放せず、完了済み Issue を未完了に戻さない（REQ-034-041）
+- 統合処理: 統合処理（マージ・クローズ相当）は active Issue task の実行枠を消費しないが、共有書き込みの直列化点として扱う（REQ-034-042）
+- 論理上限と harness 制限の切り離し: active Issue task 数の論理上限は ADF 契約として所有する。harness の同時起動制限（bg task API 上限等）は adapter・実装制約（キューイング・バンドリング等）であり、論理上限の値の根拠としない。構成不変性の検証に多数の同時実行を要しない（DEC-041）
 
 ## fail-closed 適用範囲
 

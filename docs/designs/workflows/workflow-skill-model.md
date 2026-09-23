@@ -2,7 +2,7 @@
 title: Workflow Skill Model
 status: accepted
 created: 2026-08-10
-updated: 2026-09-20
+updated: 2026-09-23
 ---
 <!-- ADF-COVERS(implementation): REQ-002-001, REQ-002-002, REQ-002-003, REQ-002-004, REQ-002-017, REQ-002-018, REQ-002-034 -->
 <!-- ADF-COVERS(implementation): REQ-027-001, REQ-027-002, REQ-027-003 -->
@@ -61,17 +61,19 @@ capture-only 型も同様に型判定節と工程一覧を持ち、保存専用 
 
 ### 1:N 分割基準の適用実例（case-run）
 
-case-run は単一 Issue 実行と Epic Wave 実行で制御構造に実質差異があるため、Workflow Skill を single workflow と epic-wave workflow の2 workflow に分離する。
-両 workflow の実行契約差異は次の6軸で定義され、Workflow Skill（`agentdev-workflow-case-run`）が所有する。
+case-run は単一 Issue 実行へ収斂した。Epic Wave 実行（epic-wave workflow）の実行契約は廃止され、Wave 実行制御（Wave 構成の読み取り、現在 Wave 判定、fan-out/fan-in、子 Issue 並列起動）は case-auto の orchestration stage 3 が単一所有する（REQ-031-015、DEC-041）。
+かつて epic-wave workflow を分離していた6契約軸は次のとおり single workflow へ収斂した。
 
-| 契約軸 | single workflow | epic-wave workflow |
+| 契約軸 | single workflow（収斂後） | 旧 epic-wave workflow（廃止） |
 |---|---|---|
-| target cardinality | 1 Issue | 現在 ready な Wave の子Issue 群（1 Wave 分、最大5件） |
-| parallelism | 委譲1件（並列なし） | 子Issue 並列委譲（最大5件） |
-| fan-out / fan-in | fan-out なし。委譲1件の result を直接処理 | fan-out（子Issue ごとの worktree と委譲起動）→ fan-in（全委譲完了待機・結果収集） |
-| child task recovery | 対象外 | 委譲異常終了時の子タスク単位の回復 |
-| partial result | 対象外 | 一部子Issue の blocked / failed と他の completed-pr の混在保持 |
-| Wave-level completion | 対象外 | 1 Wave の完了判定と次 Wave へのべき等遷移（Wave 境界のマージは case-close 責務） |
+| target cardinality | 1 Issue（常に単一） | 現在 ready な Wave の子Issue 群（1 Wave 分、最大5件） |
+| parallelism | 委譲1件（並列なし） | 子Issue 並列委譲（最大5件。case-auto stage 3 の共有 active Issue task 枠へ移転） |
+| fan-out / fan-in | fan-out なし。委譲1件の result を直接処理 | fan-out（子Issue ごとの worktree と委譲起動）→ fan-in（全委譲完了待機・結果収集。case-auto stage 3 へ移転） |
+| child task recovery | 対象外 | 委譲異常終了時の子タスク単位の回復（case-auto stage 3 へ移転） |
+| partial result | 対象外 | 一部子Issue の blocked / failed と他の completed-pr の混在保持（case-auto stage 3 へ移転） |
+| Wave-level completion | 対象外 | 1 Wave の完了判定と次 Wave へのべき等遷移（Wave 収束と依存充足の確認は case-auto stage 3 が所有。Wave 境界のマージは case-close 責務） |
+
+1:N 分割基準自体（制御構造の実質差異による分離）は維持され、本節は実例の記述を上記へ差し替えたものである。
 
 ## Capability Skill 責務
 

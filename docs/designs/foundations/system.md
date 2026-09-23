@@ -2,7 +2,7 @@
 title: システム仕様
 status: accepted
 created: 2026-08-20
-updated: "2026-09-19"
+updated: "2026-09-23"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-033 -->
 <!-- ADF-COVERS(implementation): REQ-002-009, REQ-002-010, REQ-002-012 -->
@@ -179,7 +179,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **分岐**: 引き継ぎ停止（self-hosting vs consumer）、OU ID 指定有無、Standard flow vs 単一REQ Epic flow vs マルチREQ Epic flow、`scale: standard` vs `large`、子Issue 10件上限、preflight 6項目、adversarial-review skip（Standard + 単一OU 機械的確定）、review 結果による QG-2/preflight 再実行 4パターン。
 - **副作用**: GitHub Issue 作成・コメント追加（Custom Tool `agentdev_gh` 操作契約、Tool 内 VERIFY 付き）、draft/RU の `git rm` + commit + 即時 push（Form Zero）。`.agentdev/` 配下の capture 成果物保存（委譲）。REQ/Decision/Design ファイル編集は禁止。
 - **HITL**: adversarial-review 由来の unresolved 判断事項、preflight 失敗時の停止、QG-2 fail 時の req-define 差し戻し、execution contract EC-6 scope-affecting impact の確認、Capture結果 小節の保存報告。
-- **並列性**: STEP-5 子Issue 作成の並列化（最大5件、3つの「5件」文脈の(1)に該当）。Epic Issue 作成・Wave 1 配置・ステータステーブル更新は親が直列集約。
+- **並列性**: STEP-5 子Issue 作成の並列化（最大5件。Issue 実行とは別責務の実行安全値であり、stage 3 の共有 active Issue task 枠とは区別する〔REQ-061-010、DEC-041〕）。Epic Issue 作成・Wave 1 配置・ステータステーブル更新は親が直列集約。
 - **resume**: Issue番号（Standard）、Epic Issue番号 + ステータス追跡テーブル、OU の `result` フィールド（作成 Issue/Epic 番号の書き戻し）、draft/RU 削除残存検証（STEP-6）。
 - **durable state**: GitHub Issue 本文（要件doc 埋め込み、execution contract 必須セクション、EC-7 adversarial-review 発動契約永続化）、Epic Issue ステータス追跡テーブル、Issue 番号、draft/RU 削除状態。
 - **Harness依存**: GitHub I/O（Custom Tool `agentdev_gh` 経由）、subagent 起動（REQ 読解・テンプレート充足・完了条件抽出、adversarial-review）、並列実行安全ステージング、拡張読込。
@@ -190,10 +190,10 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 
 - **公開契約**: Issue番号 / Epic Issue番号 → 実装済みブランチ + GitHub PR（実行担当サブエージェント作成）。case-run internal lifecycle 3フェーズ構成（準備・委譲・クリーンアップ）、べき等。
 - **主要処理段階**: Phase single: STEP-S1 フェーズ判定・再開ポイント検出 → STEP-S2 Issue 抽出・確認・判定（execution contract 消費境界）→ STEP-S3 Worktree 作成・ブランチ準備・前置 gate 群（QG-3 前置 staleness check / targeted docs guard）→ STEP-S4 実行担当サブエージェント委譲（adapter 委譲内 adversarial-review）→ STEP-S5 result 処理・配布依存境界 最終 gate（4状態）→ STEP-S6 クリーンアップ + 完了報告（L2 タイムスタンプ）。Phase epic-wave: STEP-W1 Epic Issue 解析・Wave 選択 → STEP-W2 fan-out 準備 → STEP-W3 fan-out 並列委譲 → STEP-W4 fan-in・結果集約 → STEP-W5 Wave 完了報告。
-- **分岐**: 単一Issue 実行 vs Epic Wave 実行（最大5件並列）、再開フェーズ（準備/委譲/クリーンアップ）、`agentdev_handoff: true`、execution contract 消費原則（必須セクション有無で新旧Issue識別）、QG-3 前置 staleness check 差異、targeted docs guard 実行条件、result 4状態（completed-pr/blocked/failed/delegation-unavailable）、adversarial-review skip（自明な機械的反映）。
+- **分岐**: 単一 Issue 実行への収斂（Epic Wave 実行モード廃止、Wave 実行制御は case-auto stage 3 が単一所有。REQ-031-015、DEC-041）、再開フェーズ（準備/委譲/クリーンアップ）、`agentdev_handoff: true`、execution contract 消費原則（必須セクション有無で新旧Issue識別）、QG-3 前置 staleness check 差異、targeted docs guard 実行条件、result 4状態（completed-pr/blocked/failed/delegation-unavailable）、adversarial-review skip（自明な機械的反映）。
 - **副作用**: worktree 作成（`.worktrees/{N}-{type}/`）、ブランチ作成。実行担当サブエージェント経由で PR 作成、Issue コメント追加（blocked/failed SSoT）。case-run 本体は worktree root 配下以外を触れない（`POL-worktree-isolation`、worktree precondition gate・相対パス引き渡しの各制約）。完了条件チェックボックスは更新しない（case-close 責務、`POL-completion-checkbox-single-writer`）。
 - **HITL**: blocked/failed の停止・ユーザー報告、delegation-unavailable の pending 戻し、未コミット変更あり時のユーザー指示待ち（STEP-S6）、委譲内 adversarial-review の unresolved 判断事項。
-- **並列性**: Epic Wave 実行モードで現在 ready な Wave の子Issue を最大5件並列委譲。1 Wave の実行（PR作成まで）で return、Wave 境界（マージ）は扱わない（case-close 責務）。
+- **並列性**: case-run は常に単一 Issue を実行し、委譲は単一 Issue あたり 1 件（並列なし。REQ-031-015、DEC-041）。Wave 内子Issue の並列起動・fan-out/fan-in の制御は case-auto の orchestration stage 3 が単一所有する。
 - **resume**: 3フェーズのべき等性（準備: worktree+ブランチ存在 / 委譲: PR未作成 or result未確定 / クリーンアップ: result=completed-pr）。PR番号、PR URL、Issue コメント（blocked/failed SSoT）。
 - **durable state**: GitHub PR 本文（`## Findings / Capture候補` / `## Design確定候補` / `### stale-reference` / `### docs-integrity`）、Issue コメント（blocked/failed）、PR 番号、worktree+ブランチ、L2 タイムスタンプ。
 - **Harness依存**: 実行担当サブエージェント起動（adapter skill 経由委譲、外部実行基盤）、bg task、worktree 隔離検証ヘルパー、bash による check_changed_docs.ts / check_extensions.ts 呼出、タイムスタンプ計測（JST）、拡張読込。
@@ -218,13 +218,13 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 
 - **公開契約**: 要件doc / Issue番号・URL → case-open → case-ready → case-run → case-close を順次自走しマージまで完了。標準実行コマンド（要求入口 2 つ〔req-define、backlog-auto〕から合流する実行経路）。
 - **主要処理段階**: STEP-1 入力解決・開始時刻記録（JST）→ STEP-2 work_type 読取・工程分岐（artifact_actions 動的判定 / auto_gate preflight）→ STEP-3 orchestration 実行（委譲起動 / case-run インライン / orchestration stage モデル / Wave 反復）→ STEP-4 停止条件検出・停止理由分類（11項目、7軸＋上位合意矛盾/新規ユーザー判断）→ STEP-5 adversarial-review 由来の停止伝播 → STEP-6 bounded parent decision resolution → STEP-7 コンフリクト解消 Level 2/3 → STEP-8 完了報告（L1 タイムスタンプ + 4次元集約 + OU処理ループ）。
-- **分岐**: 入力モード（Issue番号/URL vs 要件doc 4パターン）、artifact_actions ベース分岐（Definition 保存内部責務の実行要否）、Epic Wave 反復（子Issue並列最大5件、直接制御 AG-003）、Standard flow vs Epic Issue flow、停止条件11項目、停止理由分類（7軸 + 上位合意矛盾/新規ユーザー判断）、コンフリクト Level 1/2/3 エスカレーション、adversarial-review 由来の user-decision-required、bounded parent decision resolution（自律解決/作業仮定/上位合意矛盾/新規ユーザー判断）、delegation-unavailable。
+- **分岐**: 入力モード（Issue番号/URL vs 要件doc 4パターン）、artifact_actions ベース分岐（Definition 保存内部責務の実行要否）、Epic Wave 反復（共有 active Issue task 枠による横断補充・空き枠補充の制御。REQ-034-027、REQ-034-040〜043、DEC-041）、Standard flow vs Epic Issue flow、停止条件11項目、停止理由分類（7軸 + 上位合意矛盾/新規ユーザー判断）、コンフリクト Level 1/2/3 エスカレーション、adversarial-review 由来の user-decision-required、bounded parent decision resolution（自律解決/作業仮定/上位合意矛盾/新規ユーザー判断）、delegation-unavailable。
 - **副作用**: case-open/case-ready/case-run/case-close の各委譲起動、case-run インライン実行（実行担当サブエージェント委譲を含む）、GitHub Issue/PR/comment/merge/close（自走対象）、remote branch 削除（自作branch限定）、docs/ 更新。DB migration実行/deploy/apply/外部SaaS/認証は対象外。Epic Issue 本文への直接書込はしない（case-close 単一書き手、`POL-epic-tracking-single-writer`）。
 - **HITL**: STEP-4 停止条件（11項目）、adversarial-review 由来の user-decision-required 待機、bounded parent decision resolution の上位合意矛盾/新規ユーザー判断、draft 0件時の req-define 実行要求。
-- **並列性**: orchestration stage モデル（stage 1 case-open / stage 2 case-ready / stage 4 case-close は stage 内最大並列（直列化要因のみ局所直列化）、stage 3 case-run は bg task 最大5件、stage 間は全対象収束（fan-in）で進行。REQ-034-025/026）。OU 間は必須依存で結合した群は順次、必須依存なし群は並列。3つの「5件」文脈の区別（Wave 内子Issue/stage 3 同時起動/execution_unit 全体）。順次フォールバック可能（stage 内 scheduling 制約であり stage 分割ではない）。bg task 破棄検知時の3状態回復。Epic の Wave 間 case-close(#epic) は stage 3 内部処理。
+- **並列性**: orchestration stage モデル（stage 1 case-open / stage 2 case-ready / stage 4 case-close は stage 内最大並列（直列化要因のみ局所直列化）、stage 3 は Epic・Wave・Standard Issue を横断する共有 active Issue task 枠（現行 5）を単一所有し、stage 間は全対象収束（fan-in）で進行。REQ-034-025/026/027、DEC-041）。OU 間は必須依存で結合した群は順次、必須依存なし群は並列。並列数の「5」は2文脈へ区別する: (1) Wave 構成は意味的依存のみから導出され並列数の「5」を持たない、(2) 実行並列上限は stage 3 全体で共有される active Issue task 数として単一所有。case-open の子 Issue 作成並列化（最大 5 件）は別責務の実行安全値として区別して維持。順次フォールバック可能（stage 内 scheduling 制約であり stage 分割ではない）。bg task 破棄検知時の3状態回復。Epic の Wave 間 case-close(#epic) 相当の統合処理は stage 3 内部処理。
 - **resume**: 入力解決結果、各工程の起動結果（Issue/PR番号）、RU パス、capture 対象情報、`case_auto_started_at`、L1 工程別タイムスタンプ、orchestration stage 別結果、bg task 状態、結果状態4次元、起動時対象集合の安定識別子（ローカル一時実行状態、REQ-002-036。現在 stage は最も早い未収束 stage として再構成、REQ-034-025）。
 - **durable state**: 各工程の永続成果物（REQ/Decision/Design/Issue/PR/RU削除）、`case_auto_started_at`、L1 タイムスタンプ内訳、Epic Issue ステータステーブル（case-close が書込、case-auto は読取のみ）。
-- **Harness依存**: bg task API（最大5件）、subagent 起動（委譲工程）、context 管理（親コンテキスト非累積）、タイムスタンプ計測（L1）、委譲起動判定、bg task 破棄検知・状態別回復、インライン case-run 実行、拡張読込。
+- **Harness依存**: bg task API（harness 同時起動制限。active Issue task 数の論理上限〔ADF 契約〕とは切り離され、adapter・実装制約〔キューイング・バンドリング等〕として扱う。DEC-041）、subagent 起動（委譲工程）、context 管理（親コンテキスト非累積）、タイムスタンプ計測（L1）、委譲起動判定、bg task 破棄検知・状態別回復、インライン case-run 実行、拡張読込。
 - **Capability依存**: `agentdev-workflow-orchestration`、`agentdev-case-run-execution-adapter`、`agentdev-git-worktree`、各工程の Capability Skill を継承（case-open/case-ready/case-run/case-close の依存スキル群）、`agentdev-adversarial-review`（停止伝播のみ受領、直接起動しない）、`agentdev-project-extensions`。
 - **内部workflow候補**: orchestration workflow（STEP-3 + stage モデル + Wave 反復）、bounded parent decision resolution workflow（decision_context 解決）、コンフリクト解消 Level 2/3 workflow（インライン case-run 再実行 + オーケストレーション級判断）、停止理由分類workflow（STEP-4）。これらは case-auto 固有の orchestration として Workflow Skill 抽出の有力候補。bounded parent decision resolution と Wave 反復制御は Capability Skill 候補。
 
@@ -375,7 +375,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **adversarial-review 呼出元**: 7呼出元（req-define、inspect-promote、intake-promote、learning-promote、backlog-review、case-open、case-run adapter 委譲内）が Command 定義に挿入境界を持つ。case-auto は停止伝播のみ受領（直接起動しない）。全呼出元で default-on + skip policy + 呼出失敗時従来フロー維持が共通（REQ-015-002/003、REQ-014-010）。
 - **resume と durable state**: 全 Command が GitHub Issue/PR（公開状態）と `.agentdev/`（ドメイン状態）を durable state とする。draft/RU/promoted/inbox/deferred/RU/REQ/Decision/Design が工程間引き継ぎの権威情報源。会話コンテキストは権威情報源としない（DEC-011 原則、`status` frontmatter + commit hash 検証で再開点を再構成）。
 - **HITL 密度**: req-define（壁打ち・Scale協議・SPLIT提案）、case-open（execution contract・preflight）、intake-promote/learning-promote/backlog-review（分類承認）、inspect-promote（手動分類確定）が高 HITL。case-run/case-close/intake-capture/intake-from-github/inspect-docs/inspect-skills は低 HITL（委任・診断・保存専用）。case-auto は停止条件11項目と bounded parent decision resolution で本質的 HITL に集約。
-- **並列性の集中**: 並列実行モデルを持つ Command は case-open（子Issue 作成最大5件）、case-run（Epic Wave 最大5件）、case-auto（orchestration stage 3 最大5件、execution_unit 全体は上限なし）、case-close（Epic Wave 準並列化）。3つの「5件」文脈の区別を要する（v4-runtime-execution-model「runtime 制御ループ」）。それ以外は単一ワークフロー。
+- **並列性の集中**: 並列実行モデルを持つ Command は case-open（子Issue 作成最大5件〔別責務の実行安全値〕）、case-run（単一 Issue 実行、委譲1件・並列なし）、case-auto（orchestration stage 3 全体で共有する active Issue task 枠〔現行 5〕、execution_unit 全体は上限なし）、case-close（Epic Wave 準並列化）。並列数の「5」は2文脈へ区別する: (1) Wave 構成は意味的依存のみから導出され並列数の「5」を持たない、(2) 実行並列上限は stage 3 全体で共有される active Issue task 数として単一所有（REQ-061-010、REQ-034-027、DEC-041、v4-runtime-execution-model「runtime 制御ループ」）。case-open の子 Issue 作成 5 件（別責務）は混同して削除しない。それ以外は単一ワークフロー。
 - **内部workflow候補の分布**: case-open（execution_unit 構成・Epic flow・Standard flow・execution contract 確定・クリーンアップ）、case-close（PRマージ・QG-4 達成判定・Design確定・Capture回収・Epic Wave クローズ）、case-auto（orchestration・bounded parent decision resolution・コンフリクト解消 Level 2/3・停止理由分類）が Workflow Skill 抽出の有力候補。req-define（壁打ち・照合・要件展開・Decision判断）、case-ready / case-revise（Definition 保存の内部責務、実行構造確定）、intake-promote/learning-promote/backlog-review（review/分類ワークフロー）、inspect-docs（診断カタログ）も抽出候補。intake-capture/intake-from-github/inspect-skills/inspect-promote は単純または既存 Capability Skill でカバーされており抽出優先度低。
 - **Capability Skill 候補**: 全 Command 共通の git I/O、GitHub I/O（Custom Tool `agentdev_gh` 操作契約）・決定的スクリプト・並列ステージング・target_area マッチング・8軸評価・廃棄判定カテゴリ・統合分割判定基準・自動 promote カテゴリ・adversarial-review 共通契約は既存 Capability Skill 群と Tool 操作契約が所有。新規 Capability Skill 抽出の余地は test strategy 定義（req-define STEP-4）、EC-2 必須品質統制導出（case-open）、EC-6 scope-affecting impact 探索（case-open）、コンフリクト Level 1 解消判断、Design status 昇格判断、bounded parent decision resolution、Wave 反復制御あたり。
 
@@ -388,7 +388,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 
 | 代表ケース | 検証対象の性質 | 結果 | 備考 |
 |---|---|---|---|
-| case-run / case-auto | orchestration・resume・single/Epic Wave・parallelism・compaction | pass | Workflow Skill（`agentdev-workflow-orchestration`、`agentdev-workflow-case-auto`）が STEP model を所有。durable state、Input Resolution、並列child task 復元、3つの「5件」文脈の区別、compaction 復元契約を明示 |
+| case-run / case-auto | orchestration・resume・single Issue 実行への収斂・並列性（共有 active 枠）・compaction | pass | Workflow Skill（`agentdev-workflow-orchestration`、`agentdev-workflow-case-auto`）が STEP model を所有。durable state、Input Resolution、並列child task 復元、並列数の2文脈の区別〔Wave 構成は並列数を持たない・実行並列上限は共有 active 枠〕、compaction 復元契約を明示 |
 | req-define | interactive / HITL / loop を持つ workflow | pass with observations | `agentdev-req-analysis` Capability Skill は STEP model 連携を明示。command 本体は workflow 実装を直接所有（Workflow Skill 抽出は候補）。interactive 壁打ちセッションは harness 固有領域、ドラフト保存（STEP-9）後の再開は durable state から復元可能 |
 | case-ready / case-revise（Definition 保存の内部責務） | deterministic mutation / verification / commit を持つ workflow | pass with observations | 決定的スクリプト呼出（REQ番号採番、target_area 検索、`check-change-impact`）、QG-1、targeted docs guard、変更範囲検証を各所で実施。Capability Skill（`agentdev-req-file-manager`、`agentdev-design-file-manager`、`agentdev-artifact-validation`）は STEP model 連携を明示。保存実体は Capability Skill 委譲（REQ-061） |
 | intake-promote | classification / review / approval / irreversible action 境界を持つ workflow | pass with observations | 分類3値（採用/保留/却下）、adversarial-review、ユーザー承認（採用済み成果物生成の明示承認・分類結果の提示・分類未確定時の自動進行禁止）、破壊的変更別承認、REQ-014-009 不可逆処理停止、分類承認後の自動実行（REQ）が明確。Capability Skill（`agentdev-intake-pipeline`）へ STEP model 連携セクションを付与済み（本 Issue で修正）。command 本体は workflow 実装を直接所有（Workflow Skill 抽出は候補） |

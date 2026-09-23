@@ -2,11 +2,11 @@
 title: case-run Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-19"
+updated: "2026-09-23"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-015, REQ-021-016, REQ-021-017, REQ-021-019, REQ-021-020, REQ-021-022, REQ-035-002 -->
-<!-- ADF-COVERS(design): REQ-021-015, REQ-021-016 -->
+<!-- ADF-COVERS(design): REQ-021-015, REQ-021-016, REQ-031-006, REQ-031-015, REQ-031-016, REQ-031-027, REQ-035-012 -->
 <!-- ADF-COVERS(implementation): REQ-015-010, REQ-015-011 -->
 <!-- ADF-COVERS(implementation): REQ-017-007, REQ-017-008, REQ-017-010, REQ-017-011, REQ-017-013, REQ-017-016 -->
 <!-- ADF-COVERS(implementation): REQ-031-001, REQ-031-002, REQ-031-003, REQ-031-004, REQ-031-005, REQ-031-006, REQ-031-007, REQ-031-008, REQ-031-009, REQ-031-010, REQ-031-011, REQ-031-012, REQ-031-013, REQ-031-014, REQ-031-015, REQ-031-016, REQ-031-017, REQ-031-018, REQ-031-019, REQ-031-020, REQ-031-021, REQ-031-022, REQ-031-023, REQ-031-024 -->
@@ -17,7 +17,7 @@ updated: "2026-09-19"
 位置づけ変更（v4、DEC-033）: 本 Design が定義する case-run は公開 command ではなく内部 lifecycle 段階である。公開 UX は要求入口（req-define、backlog-auto）と標準実行コマンド case-auto へ収斂しており、本段階は case-auto の orchestration から駆動される。case-auto によるインライン実行の内部段階である点を含む。本 Design は内部 lifecycle 段階の契約として継続して正規文書である（処遇の正本: v3-v4-crosswalk references/crosswalk-inventory.md）。
 ## 目的
 
-単一 Issue または単一 Wave（Epic Issue 指定時: 現在 ready な Wave の子Issue を並列実行）を実行担当サブエージェントへ委譲し、result を処理する。
+与えられた単一 Issue を実行担当サブエージェントへ委譲し、result を処理する。case-run は常に単一 Issue を処理し、Epic や Wave を処理対象とする実行契約は case-auto の orchestration が単一所有する（REQ-031-006、REQ-031-015、DEC-041）。
 worktree前提、委譲、結果処理を責務とする。
 3フェーズ構成でべき等性、再開ポイントを提供する。
 case-run 本体は orchestration に専念し、実装実行そのものは行わない（REQ-011、v2:ADR-0128）。
@@ -40,13 +40,12 @@ case-run から実行担当サブエージェントへの委譲契約を以下�
 
 ## 入力
 
-- Issue番号またはURL（要件doc埋め込み済み）（単一 Issue 実行モード）
-- Epic Issue番号またはURL（Epic Wave 実行モード（`case-run #epic`））
+- Issue番号またはURL（要件doc埋め込み済み）（単一 Issue 実行モード。case-run が受理するのは常に単一 Issue 入力であり、Epic Issue 入力経由の Wave 実行制御は case-auto の orchestration stage 3 へ移転済み（REQ-031-015、DEC-041）。Epic Issue 入力の扱いは現行実装に沿って case-auto 経由の正規呼出へ限定し、case-run 自身の Wave 構成読み取り・fan-out を行わない）
 - ブランチ名（自動生成または指定）
 
 ## 出力
 
-- 成功: 実装済みブランチ + GitHub PR（実行担当サブエージェントが作成）。**case-run の成功成果は PR 作成である**。Epic Wave 実行時は子Issue ごとに PR が作成される
+- 成功: 実装済みブランチ + GitHub PR（実行担当サブエージェントが作成）。**case-run の成功成果は PR 作成である**
 - blocked / failed / delegation-unavailable: blocker 詳細は Issue コメントに SSoT として記録される（実行担当サブエージェント責務）
 
 ## 副作用
@@ -60,13 +59,12 @@ case-run から実行担当サブエージェントへの委譲契約を以下�
 
 処理段階（外部から意味のある順序）。
 各段階の詳細手順は Workflow Skill（`agentdev-workflow-case-run`）が正規情報源である。
-Workflow Skill は単一 Issue 実行（single workflow）と Epic Wave 実行（epic-wave workflow）の2 workflow に分離される（後述「所有関係と委譲」）。
+Workflow Skill は常に単一 Issue 実行（single workflow）として動作する。Epic Wave 実行（epic-wave workflow）の実行契約は廃止され、Wave 実行制御は case-auto の orchestration stage 3 が単一所有する（REQ-031-015、DEC-041）。
 
 ### フェーズ判定（再開ポイント検出、実行モード分岐）
 
 `agentdev-workflow-orchestration` に従い再開フェーズを判定。実行モード分岐:
-- 単一 Issue 実行モード: 非 Epic Issue 番号の場合。当該1 Issue を実行担当サブエージェントに委譲
-- Epic Wave 実行モード（`case-run #epic`）: Epic Issue 番号の場合。現在 ready な Wave の子Issue を特定し各子Issue を並列委譲（最大5件）
+- 単一 Issue 実行モード: case-run は常に単一 Issue を処理し、当該1 Issue を実行担当サブエージェントに委譲する。Epic Issue 入力経由での Wave 構成の読み取り、現在 Wave 判定、fan-out/fan-in、子 Issue 並列起動は行わない（REQ-031-015）。Epic 再指定時の次 Wave 処理も引き受けない（Epic 全体の進行管理は case-auto が所有。REQ-031-016）
 
 前工程からの引き継ぎ停止判定: `agentdev_handoff: true` 含まれる場合は実装開始せず停止
 
@@ -150,22 +148,11 @@ case-close 最終 gate（QG-4）での初検出・blocked を防ぐ。
 baseline 既知違反の無断削除・隠蔽を行わない（「配布物変更時の commit 前3検査工程」と同一の扱い）。
 targeted docs guard（PR 単位の targeted 検査）は維持する。
 
-### Epic Wave 実行モード
+### Epic Wave 実行モードの廃止（Wave 実行制御の case-auto 移転）
 
-v2:ADR-0128 Decision #3 に基づく。
-1 Wave の実行（PR作成まで）で return し、Wave 境界（マージ）は扱わない。
-同一コマンド再実行で次 Wave に進む（べき等）。
-
-1. Epic Issue 本文読込（子Issue一覧、Wave 構成、ステータス追跡テーブル（永続状態を SSoT とする、REQ-006））
-2. 現在 ready な Wave の子Issue 特定（`ready` がない場合、依存が満たされた `pending` Issue を `ready` に遷移させて選択）。前提Issue が blocked/failed の場合は `pending` のまま選択対象外
-3. `git fetch origin` 実行（REQ-031-002）
-4. 子Issue の worktree 作成（worktree 作成と precondition gate を各子Issue について実行）
-5. 各子Issue を実行担当サブエージェントに並列委譲する（adapter protocol: `agentdev-case-run-execution-adapter`）。
- 委譲の起動手段、実行制御パラメータは AGENTS.md および references/<harness>.md に配置する（REQ-002-002）。
- 最大5件まで並列委譲（起動間隔10秒、v4-runtime-execution-model「runtime 制御ループ」節〔起動間隔・並列数制御〕参照。同一Tool一括ブロックでの同時起動は行わない）
-6. 全委譲完了待機
-7. 結果収集（各子Issue の result（completed-pr / blocked / failed / delegation-unavailable）を収集）
-8. return（収集結果を報告して return）。Wave 境界（PR マージ）は case-close の責務
+Epic Wave 実行モード（case-run #epic）は実行契約から廃止された（REQ-031-015、DEC-041）。
+Wave 構成の読み取り、現在 Wave 判定、fan-out/fan-in、子 Issue 並列起動の制御は case-auto の orchestration stage 3 が単一所有する。case-run は与えられた単一 Issue の実装を単一委譲で実行し、case-run 経由で case-auto の管理外の実行枠（独立実行枠）を生成できない。
+同一 Wave 内の子 Issue 間の変更対象ファイル重複の実行時検出は case-auto の stage 3 実行制御が所有する（REQ-034-043）。case-run は委譲された単一 Issue の実行において、当該 Issue に関連する重複解消方針（変更対象分割・重複許容時の担当とマージ順序）を参照して実行し、変更対象集合が取得不能な場合は比較を省略せず検出不能として報告する責務を維持する（REQ-031-027）。
 
 ### クリーンアップフェーズ
 
@@ -399,7 +386,7 @@ case-run は Issue 本文の execution contract 必須セクション存在有�
 - 外部実行手段中間成果物の永続成果物扱い（REQ-003-007）
 - worktree 未作成時、メインリポジトリでの 実行担当サブエージェント起動（worktree precondition gate）
 - 実行担当サブエージェントへメインリポジトリパスを渡すこと（worktree root 相対パス指定）
-- Epic Wave 実行モードで1 Wave を超える処理、Wave 境界（PR マージ）の実施（case-close へ委譲）
+- Epic Wave 実行モード由来の Wave 処理の引き受け（1 Wave を超える処理、Wave 境界（PR マージ）、Wave 構成の読み取りと fan-out。Wave 実行制御は case-auto stage 3 が単一所有し、Wave 境界（PR マージ）は case-close へ委譲）
 - スコープ拡大、intake 候選の `.agentdev/intake/inbox/` 直接変更、learning 候選と intake 候選の混在、`.agentdev/learning/inbox.md` 直接変更、Design確定候選と Findings の混在
 
 ## 検証観点
@@ -407,15 +394,14 @@ case-run は Issue 本文の execution contract 必須セクション存在有�
 - worktree precondition gate: worktree+ブランチ作成済みを検証（`git worktree list` + `git rev-parse --show-toplevel`）。検証失敗時は 実行担当サブエージェント起動禁止
 - 実行担当サブエージェント result 4状態（completed-pr / blocked / failed / delegation-unavailable）の取り扱い正確性
 - PR URL 受領の確実性（REQ-006-021 廃止に伴い PR URL フォールバック検索不使用）
-- Epic Wave 実行時の1 Wave のみ処理、べき等性（同コマンド再実行で次 Wave に進む）
+- Epic Wave 実行モード由来の Wave 単位処理の廃止（Wave 構成の読み取り、現在 Wave 判定、fan-out/fan-in、子 Issue 並列起動を行わない。REQ-031-015）、再開時の単一 Issue 冪等処理（REQ-031-016）
 - 出力制約: PR 本文、commit message は verbatim で返す（成果物本文）
 
-## case-auto 並列委譲モデル（REQ-034-027〜093）
+## case-auto 並列委譲モデル（REQ-034-027、REQ-031-015）
 
-case-run は同一 Wave 内子Issue 処理を最大5件まで並列委譲する（REQ-034-027、REQ-034-027）。
-本機能は v2:ADR-0128（case-run の実行モデル: 実行担当サブエージェント委譲）で確立した委譲実行構造を基盤とし、現行の Epic Wave 運用契約は本 Design「v3 epic-wave-model Design からの吸収」節が所有する。
-case-auto 並列委譲モデル拡張により、Standard flow 起因の独立 OU 自動 Epic 化（REQ-034-027）でも本機能が適用される。
-case-run 側の新規機能追加は不要で、入力としての Epic Issue が増えるのみ。
+case-run は与えられた単一 Issue を実行担当サブエージェントへ委譲1件で実行し（並列委譲なし）、同一 Wave 内子Issue の並列委譲制御は case-auto の orchestration stage 3 が単一所有する（REQ-031-015、REQ-034-027、DEC-041）。
+本節の旧記述（case-run による最大 5 件並列委譲）は廃止され、並列起動の共有 active Issue task 枠の制御は case-auto Design「複数 execution_unit 並列 orchestration」節が所有する。
+case-run は入力として与えられた単一 Issue を実行し、case-run 経由で case-auto の管理外の実行枠を生成できない（REQ-031-015）。
 
 ## L2 タイムスタンプ計測
 
@@ -581,7 +567,7 @@ case-run command 固有の挿入境界（委譲内実施、委譲起動位置、
 
 ## v3 epic-wave-model Design からの吸収
 
-v3 epic-wave-model Design が所有していた case-run Epic Wave 実行モデル、Epic 検出ルール、Wave 解析プロトコルのうち case-run 実行側の運用契約（REQ-035-002）は本 Design の規定へ吸収された。REQ-035-012（同一 Wave 内の子 Issue 間の変更対象ファイル重複の前置検出とその判断記録、コンフリクト解消モデルと execution_unit 間並列可否の判定軸の維持、mergeable 作成時状態のみで Wave の安全性を判断しないこと）の implementation 側の唯一の正規所有者は本 Design である（sidecar `traceability/agentdev-workflow-case-run.yaml`）。構成判断側の重複前置検出契約は case-ready Design「v3 epic-wave-model Design からの吸収」節が所有する。旧 Design は第5段で supersede とされ（物理削除は docs-chore OU-003）、対応関係の正本は v3-v4-crosswalk references/crosswalk-inventory.md が追跡する。
+v3 epic-wave-model Design が所有していた case-run Epic Wave 実行モデル、Epic 検出ルール、Wave 解析プロトコルのうち case-run 実行側の運用契約は本 Design の規定へ吸収された。Epic Wave 実行モード（case-run #epic）の実行契約は廃止され、Wave 実行制御は case-auto の orchestration stage 3 が単一所有する（REQ-031-015、DEC-041）。REQ-035-012（同一 Wave 内の子 Issue 間の変更対象ファイル重複の前置検出を Wave 構成時の情報収集として維持し、検出結果を実行・統合時の競合リスク情報として用いる。コンフリクト解消モデルと execution_unit 間並列可否の判定軸の維持、mergeable 作成時状態のみで Wave の安全性を判断しないこと）の implementation 側の正規所有者は本 Design である（sidecar `traceability/agentdev-workflow-case-run.yaml`）。構成判断側の重複前置検出契約は case-ready Design「v3 epic-wave-model Design からの吸収」節が所有する。旧 Design は第5段で supersede とされ（物理削除は docs-chore OU-003）、対応関係の正本は v3-v4-crosswalk references/crosswalk-inventory.md が追跡する。
 
-- Epic 検出ルール: Epic Issue 指定の Case を Epic Wave 実行として解析する。Epic は複数 execution unit の協調管理が必要な変更であり、規模（scale）から独立した概念である
-- Wave 解析プロトコル: Epic Issue 本文から Wave 構成を読み取り、現在 Wave の子 Issue 状態（pending/completed/blocked/failed/delegation-unavailable）から実行可能な Wave を判定する。Wave 状態は永続化せず子 Issue 状態から導出する（REQ-035-005、v4-lifecycle-state-machine 階層合成）
+- Epic 検出ルール: Epic 入力の受理は case-auto 経由の正規呼出へ限定され、case-run 自身は常に単一 Issue を処理する。Epic は複数 execution unit の協調管理が必要な変更であり、規模（scale）から独立した概念である
+- Wave 解析プロトコル: Wave 構成の読み取りと現在 Wave の子 Issue 状態判定（pending/completed/blocked/failed/delegation-unavailable から実行可能な Wave を判定）は case-auto の orchestration stage 3 が所有する。Wave 状態は永続化せず子 Issue 状態から導出する（REQ-035-005、v4-lifecycle-state-machine 階層合成）。case-run は委譲された単一 Issue の重複解消方針の参照と検出不能報告の責務を維持する（REQ-031-027）
