@@ -1,5 +1,13 @@
 # inspect-docs finding 20260923T050218Z
 
+> 2026-09-23 inspect-promote 処分記録（/agentdev/backlog-auto stage 2 inspect レーン経由、--auto なし、in-context 対論型レビュー）: README-1/REQ-1 は promote・採用済み（自律確定。`.agentdev/inspect/promoted/inspect-docs-promoted-20260923T050218Z.md` へ保存）。GUIDE-1 はユーザー判断事項として HITL 移送（inbox 残置、判断確定まで本ファイル保持）。
+>
+> - README-1: promote 自律確定（実在 DEC 40件×索引記述39件の機械突合、decisions/README.md 側は同期済み、docs/README.md 単独の取込み漏れ。promote 判定に本質的競合なし。反証2件を棄却）
+> - REQ-1: promote 自律確定（REQ-001.md:83 の検証履歴コメント残留を現物行確認、REQ-001-003・document-model Design・REQ-012-035 の保持禁止規定を確認、除去方向は一意。cleanup モデル RETIRE 適用候補。反証2件を棄却）
+> - GUIDE-1: HITL 移送（case-run 3フェーズ表記の不一致は事実確認済みだが、L84 の正規 delegation 文により「概要表現として許容 / 現行構成へ同期 / 対応不要」の採否解釈が収束せず unresolved。審議詳細は promoted ファイル冒頭を参照）
+>
+> Jev 先行評価（vercel-ai-gateway / typesafe-ai/jev、20260923T054728Z-4f4a）: 暫定分類妥当性 true（p=0.84、confidence 0.83）、defer 継続確信度 高い確信。LLM 判断と一致。
+
 ## サマリ
 
 - スキャン対象: docs/requirements/（現行 53 + retired 14 + README）、docs/decisions/（DEC 40 + README）、docs/designs/（176 md）、docs/guides/（12 md）、README.md（ルート + docs/README.md）、配布物（.opencode/commands/agentdev/ 34 md、skills は src/opencode/skills/ 実体 178 md〔node_modules 除く〕）
