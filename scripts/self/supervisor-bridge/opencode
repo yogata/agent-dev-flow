@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# opencode bridge shim — opencode コマンド解決を横取りし、ocenv 経由で opencode
+# 本体を起動する（REQ-091-001）。正本は agent-dev-flow リポジトリの
+# scripts/self/supervisor-bridge/ 配下。導入手順は
+# docs/guides/supervisor-credential-bridge.md を参照する。
+# ADF-COVERS(implementation): REQ-091-001, REQ-091-002
+
+# ADJUSTMENT POINT（調整点、REQ-091-002）: 導入環境の opencode 本体パス。
+# 既定は bun グローバル導入の標準配置（$HOME/.bun/bin/opencode）。
+# 環境変数 OPENCODE_BODY による上書き、または本ファイルの直接編集のいずれでもよい。
+# 本体が実在しないパスを指すと shim は失敗する（docs/guides/supervisor-credential-bridge.md
+# の「opencode 本体パス不一致」を参照）。
+OPENCODE_BODY="${OPENCODE_BODY:-$HOME/.bun/bin/opencode}"
+
+exec "$(dirname -- "$0")/ocenv" "$OPENCODE_BODY" "$@"

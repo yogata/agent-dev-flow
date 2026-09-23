@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+# ocenv — Windows User-scope (HKCU\Environment) credential supply wrapper.
+# ADF-COVERS(implementation): REQ-091-001, REQ-091-002
+#
+# Supervisor 環境（Hermes 等、spawn する子プロセスから provider 資格情報を削除する
+# 実行環境）から dispatch された実行でも、実行側が自身の起動コンテキストで
+# Windows User スコープ環境変数（AI_GATEWAY_API_KEY 等）を取得できるようにする
+# ラッパ（REQ-091）。正本は agent-dev-flow リポジトリの scripts/self/supervisor-bridge/
+# 配下であり、導入手順は docs/guides/supervisor-credential-bridge.md を参照する。
+#
+# 使い方:
+#   ocenv <command> [args...]
+#
+# 契約（REQ-091-002）:
+#   1. 取得元は HKCU\Environment の User スコープ変数に限定する（Machine スコープ
+#      は読まない。システム既定の環境合成は OS が行うため）
+#   2. 現在の環境で未設定の変数のみ供給する。既設定の変数は値を確認せずそのまま
+#      保持する（Supervisor や shell 設定が与えた値が優先される）
+#   3. 指定コマンドの引数を透過し、exec で置換実行するため終了コードも透過する
+#
+# DESIGN NOTES:
+#
+# - REG_EXPAND_SZ の展開: 列挙は powershell.exe -NoProfile から .NET
+#   RegistryKey.GetValue(name, $null, RegistryValueOptions.None) で行う。
+#   None 指定は REG_EXPAND_SZ 値の %VAR% 参照を展開して返す（DoNotExpandEnvironmentNames
+#   を指定しない）。これは Windows がプロセス起動時にユーザー環境を合成する際の
+#   展開挙動と同等である。展開前の生文字列は供給しない。
+# - 空文字列が設定された変数: レジストリ側の値が空文字列の場合も「設定あり」として
+#   供給する（空文字列は unset と区別する）。逆に現在の環境で空文字列が設定済みの
+#   変数は既設定扱いとし、レジストリ値で上書きしない（POSIX では空文字列の
+#   環境変数は設定済みである）。bash の ${!name+set} 判定は空文字列設定でも
+#   set を返すため、この契約をそのまま機械化する。
+# - 列挙結果の受け渡し: 値は credential（機密）を含み得るため、列挙結果を
+#   ディスクへ書かず、プロセス間通信のみで受け渡す。値に改行・NUL を含み得るため
+#   1エントリ = 1 base64 行（UTF-8 バイト列の base64）とし、bash 側でデコードする。
+#   列挙 PowerShell の stdout には base64（ASCII）のみが流れ、生の credential 値は
+#   出力されない。
+# - fail-closed: HKCU\Environment の列挙に失敗した場合（powershell.exe 異常終了）、
+#   部分的な環境で対象コマンドを実行すると credential 欠落による not_configured
+#   劣化が静かに起こるため、対象コマンドを実行せず終了コード 1 で失敗する。
+# - 既定値（レジストリの名前なし値）と空の変数名は環境変数名にならないため除外する。
+
+set -u
+
+if [ "$#" -eq 0 ]; then
+  printf 'ocenv: usage: ocenv <command> [args...]\n' >&2
+  exit 64
+fi
+
+# HKCU\Environment 列挙。出力: 1エントリ = 1 base64 行（"name=value" の UTF-8 バイト列）。
+# 改行は LF のみ（Console.WriteLine の CRLF を避けるため、標準出力へバイト列を
+# 直接書き出す。行末に CR が残ると base64 -d が失敗する）。
+ENUM_PS='
+$ErrorActionPreference = "Stop"
+$key = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey("Environment")
+if ($null -eq $key) { exit 0 }
+try {
+  $utf8 = New-Object System.Text.UTF8Encoding($false)
+  $out = [Console]::OpenStandardOutput()
+  foreach ($name in $key.GetValueNames()) {
+    if ([string]::IsNullOrEmpty($name)) { continue }
+    # RegistryValueOptions.None: REG_EXPAND_SZ is EXPANDED (see DESIGN NOTES).
+    $value = $key.GetValue($name, $null, [Microsoft.Win32.RegistryValueOptions]::None)
+    if ($null -eq $value) { $value = "" }
+    $entry = [string]$name + "=" + [string]$value
+    $line = [Convert]::ToBase64String($utf8.GetBytes($entry)) + "`n"
+    $bytes = $utf8.GetBytes($line)
+    $out.Write($bytes, 0, $bytes.Length)
+  }
+} finally {
+  $key.Close()
+}
+'
+
+ENUM_OUTPUT=$(powershell.exe -NoProfile -NonInteractive -Command "$ENUM_PS")
+ENUM_STATUS=$?
+if [ "$ENUM_STATUS" -ne 0 ]; then
+  printf 'ocenv: failed to enumerate HKCU\\Environment (powershell.exe exit %s); command not executed (fail-closed).\n' "$ENUM_STATUS" >&2
+  exit 1
+fi
+
+while IFS= read -r line; do
+  [ -n "$line" ] || continue
+  line=${line%$'\r'}
+  entry=$(printf '%s' "$line" | base64 -d 2>/dev/null) || {
+    printf 'ocenv: skipping malformed enumeration entry\n' >&2
+    continue
+  }
+  name=${entry%%=*}
+  value=${entry#*=}
+  [ -n "$name" ] || continue
+  # 既設定（空文字列設定を含む）は変更しない。
+  if [ "${!name+set}" = "set" ]; then
+    continue
+  fi
+  export "$name=$value"
+done <<EOF
+$ENUM_OUTPUT
+EOF
+
+exec "$@"
