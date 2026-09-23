@@ -1,0 +1,31 @@
+{
+  "observationId": "20260923T133911Z-6859",
+  "durationMs": 784,
+  "inputTokens": 604,
+  "inputs": {
+    "requestDigest": "a3f1c2d4e5b60718293a4b5c6d7e8f901234567890abcdef1234567890abcdef"
+  },
+  "judgmentKind": "ts-004-jev-outcome-verification",
+  "judgments": [
+    {
+      "confidence": 0.86,
+      "judgmentId": "q1",
+      "jevResult": true,
+      "llmFinalJudgment": "上記の state は、Supervisor 環境向け credential 供給ブリッジの導入検証において not_configured と API failure を読み分ける判断基準として成立している。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.14,
+        "true": 0.86
+      },
+      "questionForm": "boolean"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "13b424064011057c5f9b059b7d86f59401b35f71",
+  "subject": "Case #3080 TS-004 導入検証の Jev 観測（not_configured と API failure の読み分け基準）",
+  "workflow": "case-run"
+}
