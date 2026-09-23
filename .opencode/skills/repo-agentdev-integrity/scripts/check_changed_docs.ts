@@ -50,9 +50,9 @@ const DESCRIPTION =
 const USAGE =
   "bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts --workflow <name> [--files <path...> (space-separated recommended; comma-separated also accepted) | --base-ref <git-ref>] [--json] [--fail-level strict|warning] [--root <path>]";
 const REF_USAGE_NOTES =
-  "--files は main 環境（マージ後・コミット後、case-close 等）で PR 変更ファイルを直接指定するときに使用。" +
-  "--base-ref は worktree 環境（マージ前・コミット前、case-run 等）で git diff により変更ファイル検出するときに使用。" +
-  "モード使い分けの標準は コミット前（worktree 上での検証）= --base-ref、コミット後・PR 作成後（main 環境）= --files。" +
+  "--files は コミット前（worktree 上での検証、case-run 等）の標準モードで、untracked ファイルを含めて変更ファイルを明示指定する。main 環境（マージ後、case-close 等）での PR 変更ファイルの直接指定にも使用。" +
+  "--base-ref は コミット済み差分（base...HEAD）に基づく変更ファイル検出で、実行はコミット後・push 前に限定する（コミット前の worktree では未コミット差分が検出されず検査見逃しを生む）。" +
+  "--files と --base-ref は排他ではなく、いずれかの指定が必須。" +
   "誤用による誤 pass・誤 FAILURE を防ぐため、起動時に対象ファイルが検出できる見込みを確認してから実行する。";
 // v2:REQ-0158-001: --files の区切り形式（space 区切り推奨、comma 区切りも受入）。後方互換性を担保。
 const FILES_DELIMITER_NOTES =
@@ -185,9 +185,9 @@ function printHelp(): void {
   console.error("");
   console.error("options:");
   console.error("  --workflow <name>   req-save | design-save | case-run | case-close | docs-check (required)");
-  console.error("  --files <path...>   changed files (space-separated recommended; comma-separated also accepted); for main env (post-merge, case-close). mutually exclusive with --base-ref");
+  console.error("  --files <path...>   changed files (space-separated recommended; comma-separated also accepted); standard for pre-commit (worktree) verification including untracked files; also for explicit PR file specification on main (post-merge, case-close)");
   console.error(`  ${FILES_DELIMITER_NOTES}`);
-  console.error("  --base-ref <ref>    git base ref to compute changed files; for worktree env (pre-merge, case-run). mutually exclusive with --files");
+  console.error("  --base-ref <ref>    git base ref to compute changed files from committed diff (base...HEAD); run after commit and before push only (not for pre-commit worktree verification)");
   console.error(`  ${REF_USAGE_NOTES}`);
   console.error(`  ${POWERSHELL_ARGS_NOTES}`);
   console.error("  --json              emit JSON report (default: text)");
