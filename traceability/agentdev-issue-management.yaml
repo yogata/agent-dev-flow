@@ -1,0 +1,6 @@
+component: agentdev-issue-management
+implementation:
+  src/opencode/skills/agentdev-issue-management/references/issue-operation-safety.md:
+    - REQ-092-001
+    - REQ-092-002
+    - REQ-092-003
