@@ -128,3 +128,57 @@
 - **想定反映先**: `agentdev-workflow-case-open` の branch / worktree 運用手順、および `case-auto` 並列 stage の委譲境界
 - **関連**: Case #3087、Case #3088、Definition PR #3091、`definition/issue-3087`、`907a081e`、`a50ff629`
 - **タグ**: `#parallel-case` `#worktree` `#branch-isolation` `#case-open`
+
+---
+
+## worktree 内 checker 直接実行は junction 伝播なしで完結した
+
+- **問題事象**: なし（観察。worktree 環境での checker 実行・baseline 再生成が main-root fallback なしで完結したことの実証）
+- **発生局面**: 実装（Case #3085 IR-055 baseline 更新。worktree .worktrees/3085-refactor からの worktree-direct 実行）
+- **検知方法**: checker --json の environment.junctionPropagation = absent-skills-dir-fallback / executionRoot = worktree の計測値
+- **根本原因**: 該当なし（worktree の .opencode/skills 配下は junction 未伝播でも、checker 自体は worktree 内実体で動作する）
+- **自律対応内容**: checker 実行（--json）と baseline 再生成（--update-ir055-baseline）をすべて worktree 内で完結させ、main-root --root fallback 経路を不使用のまま全検証を合格させた
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree で動く checker の実行経路選定時に main-root fallback を前提にしない。IR-055 の検査対象は src/opencode/commands|skills（SoT 側）に固定されるため projection 参照差が再生成結果へ混入しない設計である点も根拠
+- **再発条件**: 該当なし（予防知見）
+- **予防策候補**: なし
+- **想定反映先**: worktree での checker 実行手順を記す skill references（実行経路選択の補強根拠）
+- **関連**: Case #3085、PR #3095
+- **タグ**: `#worktree` `#checker実行` `#junction`
+
+---
+
+## IR-055 baseline entry は file×pattern 単位で count 集約される（entries 数と検出件数は別指標）
+
+- **問題事象**: なし（観察。同一行の同一 pattern 複数出現は count=2 の 1 entry に機械統合されるため、entries 増分と検出件数増分が一致しない）
+- **発生局面**: 実装（Case #3085。pr_desc.md:39 の同一行 2 検出が count=2 の 1 entry に統合。entries 17 → 24 に対し検出 28 → 36）
+- **検知方法**: baseline 更新前後の entries 数（17 → 24）と violations 数（28 → 36）の突合
+- **根本原因**: baseline schema が file×pattern 単位の count 集約を持つため
+- **自律対応内容**: entries 数と検出件数を別指標として記録し、8検出 → 追加 7 entries の対応を説明付きで記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: baseline の ratchet 検証（純追加確認）では entries 差分と検出件数差分の両方を突合する
+- **再発条件**: 複数回出現する同一 pattern を含む差分の baseline 登録を件数比較だけで判断した場合
+- **予防策候補**: baseline 更新の記録テンプレートに entries 数と検出件数の両方の記載を必須化
+- **想定反映先**: docs/designs/integrity/integrity-contracts.md「RuntimeReference baseline 運用手順」周辺の記録様式
+- **関連**: Case #3085、PR #3095、.opencode/skills/repo-agentdev-integrity/baselines/ir-055-baseline.json
+- **タグ**: `#IR-055` `#baseline` `#ratchet`
+
+---
+
+## bun test の summary（Ran N tests / pass fail 件数）は stderr へ出力される（stdout 退避のみでは件数突合不能）
+
+- **問題事象**: bun test の実行証跡を stdout リダイレクトのみで退避したところ、ファイル容量 27 bytes でほぼ空となり「Ran N tests across M files」の件数突合に必要な summary が得られなかった
+- **発生局面**: 運用（case-close QG-4 観点10 フル suite 3-split 実行。main root、bun 直接実行）
+- **検知方法**: 退避 stdout ファイルの件数突合 grep が空になり、summary が stderr 側に出力されていることを確認
+- **根本原因**: bun test はテスト結果 summary を stderr へ書く。stdout のみの退避では fail 詳細・件数が失われる
+- **自律対応内容**: stdout / stderr を分離併退避する正規形（QG-4 bun test 実行形態契約どおり）で再取得し、3 分割合計 3294 pass / 0 fail / 145 files の件数突合を完了
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存契約「証跡の stdout・stderr 分離併退避」の正当性を実機で再確認したのみ）
+- **横展開観点**: QG-4 機械受理基準の件数突合・fail 由来分類は stderr 退避ファイルが前提。agentdev-quality-gates の bun test 正規形参照時に stdout 単独退避をしない
+- **再発条件**: bun test の証跡を stdout リダイレクトのみで取得した場合
+- **予防策候補**: bun test 実行手順のサンプルコマンドに 2> stderr.txt を常時含める
+- **想定反映先**: agentdev-quality-gates/references/qg-4-final-acceptance.md「証跡の stdout・stderr 分離併退避」節（既定どおりであることの実証記録）
+- **関連**: Case #3085、QG-4 観点10、bun test 3 cwd 分割実行
+- **タグ**: `#bun-test` `#QG-4` `#証跡` `#stderr`
