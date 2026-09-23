@@ -56,3 +56,21 @@
 - **タグ**: #integrity-checker #fixture-test #import-share
 
 ---
+
+## 2026-09-23: agentdev_gh issue_list は closed 全件検索で安全ページ上限に到達するため search 絞り込みが必須（labels 指定は物理ラベル不一致で 0 件になる）
+
+- **問題事象**: case-open の冪等検出後のラベル慣行確認で agentdev_gh issue_list（role: case、state: closed、labels: ["case"]、search なし）を実行したところ安全ページ上限（10 ページ × 100 件）に到達して operation-failed となり、さらに search を付けても labels 論理値を物理ラベル名 "case" と解釈して指定した場合は 0 件で絞り込みにならなかった（Case #3077 case-open 実測）
+- **発生局面**: case-open STEP-5 冪等再実行確認（既存 Root Case / Definition PR 検出）と Root Case ラベル慣行の確認
+- **検知方法**: issue_list の operation-failed detail（safety page limit 到達メッセージ）と labels 指定時の 0 件帰着
+- **根本原因**: closed Case 群は repo の累積 population として大規模であり filter を指定しない全件列挙はページ上限に達する。labels は tracking 論理値（role/kind/trackingState）の物理マッピング入力であり、Case Issue に付く物理ラベル（enhancement 等）とは名前空間が異なる
+- **自律対応内容**: 冪等検出は search（"RU-0131"、"REQ-034" 等の冪等キー語）+ state: open で絞り込み、ラベル慣行は Tool の contingency（gh CLI 読み取り系手動実行）に従い `gh issue list --search --json labels` で解消
+- **ユーザー確認の有無**: なし
+- **Decision/REQ/spec影響**: なし（Tool 操作契約の変更は対象外。運用側の絞り込み規律）
+- **横展開観点**: agentdev_gh issue_list を closed 含む広範 population で実行する全 workflow（case-open 冪等検出、case-ready 横断依存検査、issue 操作）
+- **再発条件**: issue_list に search を付けず state: closed 等の広範 filter で実行した場合、または Case 物理ラベル名を labels に渡した場合
+- **予防策候補**: issue_list の closed 検索には必ず search（topic_slug、REQ 番号等）を併用する手順化。labels 引数は tracking 論理値専用であり Case 物理ラベル（enhancement/bug 等）と混同しない旨の明記
+- **想定反映先**: agentdev-issue-management（Issue 検索の安全手順）、agentdev-issue-tracking Design（labels 論理値と Case 物理ラベルの対応明記）
+- **関連**: Case #3077（Definition PR #3078）
+- **タグ**: #agentdev-gh #issue_list #page-limit
+
+---
