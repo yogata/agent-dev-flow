@@ -171,8 +171,10 @@ skip せずに検査が必要な場合は構造系テスト fallback（commands_
 
 ### main root 実体 + --root 指定による読取系 checker 実行手順
 
-junction 系 skill scripts を用いる検査で、skip せずに実行する必要がある読取系 check は、main root 実体から `--root <worktree root>` 指定（必要に応じ `--files` 併用）で実行できる。
+junction 系 skill scripts および plugins 系 gate を用いる検査で、skip せずに実行する必要がある読取系 check は、main root 実体から `--root <worktree root>` 指定（必要に応じ `--files` 併用）で実行できる。
 worktree 内から `.opencode/skills/agentdev-*` 配下の script を直接実行すると junction 未伝播により Module not found で失敗するため、script の起動パスを main root 実体側へ置き、検査対象だけを worktree へ向ける。
+
+`.opencode/plugins/` 配下の junction も worktree へ未伝播である。textlint final gate（`agentdev-textlint-guard` plugin）も同様に、配布投影実体を直接起動せず、src 側原本の main root 実体から起動する。実在引数は `--root <project-root>` と `--json` であり、`--files` は受け付けない。そのため gate は検査対象 root 全体に対して実行し、変更ファイル限定が必要な場合は `--files` 併用に対応する checker 側の gate で行う。
 
 手順:
 
@@ -188,6 +190,9 @@ bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts -
 
 # traceability check（--root 必須。--req は対象要件行 ID のカンマ区切り個別指定のみ。.. 範囲構文は非対応）
 bun .opencode/skills/agentdev-traceability/scripts/src/check.ts --root <worktree 絶対パス> --req REQ-{NNNN}-{MMM}
+
+# textlint final gate（plugins 系 gate。src 側原本の main root 実体から起動し、検査対象 root に worktree を指定。対応引数は --root と --json）
+bun run src/opencode/plugins/agentdev-textlint-guard/gate.ts --root <worktree 絶対パス>
 
 # 契約テスト（配布物の構造様式を固定する *.test.ts。--root を取らないため main root 実体側の状態が検査対象になる）
 bun test ./.opencode/skills/repo-agentdev-integrity/scripts/skills_structure.test.ts
