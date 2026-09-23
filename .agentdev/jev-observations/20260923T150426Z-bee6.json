@@ -1,0 +1,71 @@
+{
+  "observationId": "20260923T150426Z-bee6",
+  "schemaVersion": 1,
+  "workflow": "req-define",
+  "judgmentKind": "req-define-judgments",
+  "subject": "RU-0124 の REQ-018-005 適用範囲判定と文書分類",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "sourceRevision": "unknown",
+  "outcome": "completed",
+  "durationMs": 974,
+  "inputTokens": 1657,
+  "inputs": {
+    "requestDigest": "4d96ef38e28081ee9b91c222ff642116e527e1a415df3ff8009c5978a34bbd3a",
+    "snapshot": "J1: REQ-018-005 の UPDATE/APPEND/CREATE と確信表示要否。J2: REQ-018-005 更新および skill reference 手順追記の文書帰属と Design 分離要否。判断根拠は REQ-018 と現行手順・gate.ts の限定的事実。"
+  },
+  "judgments": [
+    {
+      "judgmentId": "J1-classification",
+      "questionForm": "choice",
+      "jevResult": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0.04,
+        "APPEND": 0.32,
+        "UPDATE": 0.64
+      },
+      "confidence": 0.64,
+      "llmFinalJudgment": "UPDATE。REQ-018-005 の「junction 系 skill scripts」から plugins 系 gate まで適用範囲を拡張するため、既存行の意味変更となる。",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "J1-confidence-needed",
+      "questionForm": "boolean",
+      "jevResult": false,
+      "probabilityDistribution": {
+        "true": 0.25,
+        "false": 0.75
+      },
+      "confidence": 0.75,
+      "llmFinalJudgment": "独立した確信度質問は必要としない。根拠は現行要件と対象実体の直接照合で得られる。",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "J2-placement",
+      "questionForm": "choice",
+      "jevResult": "REQ行とDesign行の両方",
+      "probabilityDistribution": {
+        "REQ行のみ（REQ-018-005を更新）": 0.26,
+        "Design行のみ（REQ更新なし）": 0.01,
+        "REQ行とDesign行の両方": 0.66,
+        "既存要件内で新規artifact actionなし": 0.07
+      },
+      "confidence": 0.66,
+      "llmFinalJudgment": "REQ行のみ（REQ-018-005を更新）。具体的な起動コマンドと環境ラベルの適用は配布 skill reference の実現手順に引き継ぎ、独立 Design action は作らない。",
+      "llmTreatment": "corrected"
+    },
+    {
+      "judgmentId": "J2-separation",
+      "questionForm": "boolean",
+      "jevResult": true,
+      "probabilityDistribution": {
+        "true": 0.5,
+        "false": 0.5
+      },
+      "confidence": 0.5,
+      "llmFinalJudgment": "独立した Design artifact action への分離は不要。手順は正規所有先の配布 skill reference に追記し、REQ 行は適用範囲と検査可能な状態を規定する。",
+      "llmTreatment": "corrected"
+    }
+  ]
+}

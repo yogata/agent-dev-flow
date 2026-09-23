@@ -1,0 +1,70 @@
+{
+  "observationId": "20260923T150655Z-ba81",
+  "schemaVersion": 1,
+  "workflow": "req-define",
+  "judgmentKind": "req-define-judgments",
+  "subject": "RU-0128の既存REQ照合と要件分類（ガイド局所同期）",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "sourceRevision": "unknown",
+  "outcome": "completed",
+  "durationMs": 1027,
+  "inputTokens": 1483,
+  "inputs": {
+    "requestDigest": "086b839e0f0e99ecbe102c35f6c128ea7ce929e21d0368ed2bb2113cd2ad3661",
+    "snapshot": "J1/J2の閉じた評価入力はdocs/guides/req-case-flow.mdの局所同期、REQ-001、REQ-031、REQ-015-010、変更後の分類根拠。J1の全質問はJev結果を踏まえ、直接のREQ保存操作ではなく「既存REQ照合上、REQ更新を新規に行わない」へ訂正。"
+  },
+  "judgments": [
+    {
+      "judgmentId": "J1-operation",
+      "questionForm": "choice",
+      "jevResult": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0.01,
+        "UPDATE": 0.99
+      },
+      "confidence": 0.83,
+      "llmFinalJudgment": "REQ-001とREQ-031は既存の基準契約として照合対象だが、この要求はguideの案内記述を既存契約へ同期する反映作業であり、REQ行のCREATE/APPEND/UPDATEはいずれも実施しない。JevのUPDATEは関連REQへの関心の一致と直接のREQ保存操作を混同しているため訂正した。",
+      "llmTreatment": "corrected"
+    },
+    {
+      "judgmentId": "J1-confidence",
+      "questionForm": "boolean",
+      "jevResult": false,
+      "probabilityDistribution": {
+        "true": 0.33,
+        "false": 0.6699999999999999
+      },
+      "confidence": 0.83,
+      "llmFinalJudgment": "追加確信確認は不要。合意済みの内容と現行正規成果物で分類を確定できる。",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "J2-classification",
+      "questionForm": "choice",
+      "jevResult": "REQ/Design保存なしの実現作業",
+      "probabilityDistribution": {
+        "REQ行": 0,
+        "Design行": 0,
+        "REQ/Design保存なしの実現作業": 1
+      },
+      "confidence": 0.975,
+      "llmFinalJudgment": "RU項目は反映作業であり、REQ行にもDesign行にも保存しない実現作業に分類する。",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "J2-design-separation",
+      "questionForm": "boolean",
+      "jevResult": false,
+      "probabilityDistribution": {
+        "true": 0.05,
+        "false": 0.95
+      },
+      "confidence": 0.975,
+      "llmFinalJudgment": "新しいDesign仕様を作らず既存のcase-run Skill、REQ-015-010を参照するため分離不要。",
+      "llmTreatment": "unchanged"
+    }
+  ]
+}

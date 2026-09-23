@@ -1,0 +1,70 @@
+{
+  "observationId": "20260923T150333Z-281e",
+  "schemaVersion": 1,
+  "workflow": "req-define",
+  "judgmentKind": "req-define-judgments",
+  "subject": "RU-0122 IR-055 baseline の REQ 照合と文書分類",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "sourceRevision": "unknown",
+  "outcome": "completed",
+  "durationMs": 1083,
+  "inputTokens": 1602,
+  "inputs": {
+    "requestDigest": "4c48fe789048ceee627b7773a0767bc80a382a154a931f6d1e899cc33cb17d75",
+    "snapshot": "J1既存REQ照合とJ2要件展開・Design分離の2閉判断。ソースはREQ-010-007/009、IR-055 triage_action、integrity-contracts.md baseline運用手順、RU-0122。"
+  },
+  "judgments": [
+    {
+      "judgmentId": "J1",
+      "questionForm": "choice",
+      "jevResult": "req_operation=UPDATE; matching_confident=true",
+      "probabilityDistribution": {
+        "UPDATE": 0.9,
+        "CREATE": 0.02,
+        "APPEND": 0.08
+      },
+      "confidence": 0.905,
+      "llmFinalJudgment": "Jev は UPDATE と評価したが、実際は既存の REQ-010-007/009 が baseline 管理を既に規定し、RU も REQ 常設化しないと合意している。恒久要件の文言変更はないため REQ 更新操作なし（既存 REQ の適用範囲で実現作業）。Jevの操作分類は修正した。",
+      "llmTreatment": "corrected"
+    },
+    {
+      "judgmentId": "J1-confidence",
+      "questionForm": "boolean",
+      "jevResult": true,
+      "probabilityDistribution": {
+        "true": 0.91,
+        "false": 0.08999999999999997
+      },
+      "confidence": 0.905,
+      "llmFinalJudgment": "照合結果は確信あり。REQ-010-007 が既知/新規の区別、REQ-010-009 がchecker詳細の委譲を明示し、成果物はbaselineデータ更新である。",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "J2",
+      "questionForm": "choice",
+      "jevResult": "row_ownership=実現作業のみ; separation_required=true",
+      "probabilityDistribution": {
+        "REQ 行": 0,
+        "Design 行": 0,
+        "実現作業のみ": 1
+      },
+      "confidence": 0.93,
+      "llmFinalJudgment": "REQ/Design action を伴わない単発の baseline 登録という実現作業のみ。実現面をrealization_actionsへ分離し、Design手順は現行 integrity-contracts.md を参照する。",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "J2-separation",
+      "questionForm": "boolean",
+      "jevResult": true,
+      "probabilityDistribution": {
+        "true": 0.86,
+        "false": 0.14
+      },
+      "confidence": 0.93,
+      "llmFinalJudgment": "反映作業を恒久要件候補と分け、realization_actions と test_strategy に記録する。",
+      "llmTreatment": "unchanged"
+    }
+  ]
+}

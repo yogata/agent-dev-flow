@@ -1,0 +1,38 @@
+{
+  "observationId": "20260923T162604Z-8f4b",
+  "durationMs": 737,
+  "inputTokens": 616,
+  "inputs": {
+    "references": [
+      {
+        "digest": "5ca0e1f9ced1676abb5d444cdc0c11ddc0efdae4a522d161780a707f611a527b",
+        "label": "draft-data (req_draft RU-0126)",
+        "path": ".agentdev/drafts/req-draft-readme-decision-index-dec041.md"
+      }
+    ],
+    "requestDigest": "972fdea8a8557360f394adcccc144088698d16d9c7ae69bbe9699c6c2da7c70d"
+  },
+  "judgments": [
+    {
+      "confidence": 1,
+      "jevResult": "Standard",
+      "judgmentId": "q-exec-unit",
+      "llmFinalJudgment": "Standard。連結成分（必須依存のみエッジ）は1個で単独根（OU-001、depends_on 空）。単独根は Epic 化せず Standard flow とする規則により、Root Case #3083 自身を単一 execution unit とし Child Issue は作成しない。Jev 結果（Standard、confidence 1.0）から判断を変更しない。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "Epic": 0,
+        "Standard": 1
+      },
+      "questionForm": "choice"
+    }
+  ],
+  "judgmentKind": "standard-epic-finalization",
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "d72142cf15d285338a74ed187a02af30edb8f7dd",
+  "subject": "Root Case #3083 実行単位確定（RU-0126 docs_chore、OU-001 単独根）",
+  "workflow": "agentdev-workflow-case-ready"
+}

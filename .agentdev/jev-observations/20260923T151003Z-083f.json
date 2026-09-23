@@ -1,0 +1,105 @@
+{
+  "observationId": "20260923T151003Z-083f",
+  "durationMs": 1161,
+  "inputs": {
+    "references": [
+      {
+        "digest": "ff46e9f2b42568ca5acfbca33bef059c93593290bc1511295cdc471e2ae9b3df",
+        "label": "docs/README.md Decision 節（乖離現物）",
+        "path": "docs/README.md"
+      },
+      {
+        "digest": "46b34044c47859c2e36f2a85d8aca2c688fbd2421df730b425fe5403bf3123a2",
+        "label": "REQ-001 文書体系（案内・索引原則）",
+        "path": "docs/requirements/REQ-001.md"
+      },
+      {
+        "digest": "dc53d1a1af5e507dd19db082d5bb7beee9d22f37a0bd612001f11e9d1082e990",
+        "label": "REQ-059 Decision と REQ の関連宣言管理",
+        "path": "docs/requirements/REQ-059.md"
+      },
+      {
+        "digest": "0ecd3e0865b91139d46720a6a7562105070595fef2894c8b96f24af8f5dc80b2",
+        "label": "IR-038 Decision-index-consistency",
+        "path": "docs/designs/integrity/rules/IR-038-decision-index-consistency.md"
+      },
+      {
+        "digest": "10fa0b91bc2b69c7a4562171487f1eb4fcd6af93c491faea6c9d43e53a414fe0",
+        "label": "索引類自動生成 Design（手動管理区間契約）",
+        "path": "docs/designs/integrity/index-auto-generation.md"
+      },
+      {
+        "digest": "454c80256e6c805577f51b4912d51670f58fea98a4f9ad66a6b19e1727615f4c",
+        "label": "DEC-041 実体",
+        "path": "docs/decisions/DEC-041.md"
+      },
+      {
+        "digest": "1791f2f86f91b7f3f1b4f28ecd1d8ee4e8bdfe3e2d58a92e1cce38321080d0b3",
+        "label": "docs/decisions/README.md（同期済み索引）",
+        "path": "docs/decisions/README.md"
+      }
+    ],
+    "requestDigest": "5f8c3f7399541064243f710d642cfc5b11296383390059b4b1c8a6f61b5b0e80",
+    "snapshot": "J1（STEP-3 照合操作分類）: choice [CREATE/APPEND/UPDATE] + boolean（ユーザー確信要否）。J2（STEP-4 帰属・分離）: choice [REQ 行/Design 行] + boolean（Design 分離要否）。閉判別入力は RU-0126 対象変更の要約と現物証拠（REQ-001/REQ-059/IR-038/索引類自動生成 Design/DEC-041/両 README）の要点のみ。"
+  },
+  "judgmentKind": "req-define-judgments",
+  "judgments": [
+    {
+      "confidence": 0.69,
+      "jevResult": "UPDATE",
+      "judgmentId": "j1-operation",
+      "llmFinalJudgment": "REQ 操作帰属なし。CREATE/APPEND/UPDATE いずれの REQ 保存操作も実行しない。docs/README.md 案内層の現物追従であり、REQ-004-033 に従い artifact: req エントリは生成しない（操作対象となる既存 REQ 行が存在しないため）。",
+      "llmTreatment": "corrected",
+      "probabilityDistribution": {
+        "APPEND": 0.12,
+        "CREATE": 0.34,
+        "UPDATE": 0.54
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.69,
+      "jevResult": false,
+      "judgmentId": "j1-confidence-needed",
+      "llmFinalJudgment": "false。照合判断は repo 証拠（REQ-001/REQ-059/IR-038/索引類自動生成 Design）で解決済みであり、追加のユーザー確信は不要。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.84,
+        "true": 0.16
+      },
+      "questionForm": "boolean"
+    },
+    {
+      "confidence": 0.83,
+      "jevResult": "REQ 行",
+      "judgmentId": "j2-attribution",
+      "llmFinalJudgment": "帰属なし（実現面のみ）。docs/README.md は案内層であり REQ 行にも Design 行にも該当行は存在しない。修正は realization_actions に投影する。",
+      "llmTreatment": "corrected",
+      "probabilityDistribution": {
+        "Design 行": 0.27,
+        "REQ 行": 0.73
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.83,
+      "jevResult": false,
+      "judgmentId": "j2-separation-needed",
+      "llmFinalJudgment": "false。変更内容には REQ-001-067 の Design 分離対象（設計詳細・スキーマ・判定表等の REQ 行残留候補）は存在しない。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.93,
+        "true": 0.07
+      },
+      "questionForm": "boolean"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "unknown",
+  "subject": "req-define RU-0126（docs/README.md Decision 索引の DEC-041 反映）の STEP-3 照合と STEP-4 分類・分離判断",
+  "workflow": "req-define"
+}

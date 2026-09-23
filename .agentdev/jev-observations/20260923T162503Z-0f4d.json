@@ -1,0 +1,81 @@
+{
+  "observationId": "20260923T162503Z-0f4d",
+  "durationMs": 785,
+  "inputs": {
+    "requestDigest": "2396b28b493a359d8892a6320de9d81079e573254e61bb54608c334285667d70",
+    "references": [
+      {
+        "digest": "e84304701bea9502941da9289d1c5ee11360a54c58a294d9d94b77c8cd613796",
+        "label": "Root Case #3088 本文",
+        "path": "github://issues/3088"
+      },
+      {
+        "digest": "ed7002b439e9ac845f22348d8edd7bb5a28f66f8b11d5d0e7339c5e9bd97a3f4",
+        "label": "draft-data operation_units / case_open_hints",
+        "path": ".agentdev/drafts/req-draft-worktree-junction-textlint-gate.md"
+      }
+    ]
+  },
+  "judgmentKind": "standard-epic-finalization",
+  "judgments": [
+    {
+      "confidence": 0.99,
+      "jevResult": "Standard",
+      "judgmentId": "q_structure",
+      "llmFinalJudgment": "Standard。連結成分 1 個（単独根・必須依存エッジ 0 件）、Epic サイズ小、機能的一貫性高。単独根は Epic 化せず Standard flow とする機械的ルールに一致し、case_open_hints epic_needed: false と整合。Jev 結果と同一判断で変更なし。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "Epic": 0,
+        "Standard": 1
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.99,
+      "jevResult": "弱",
+      "judgmentId": "q_dependency",
+      "llmFinalJudgment": "弱。OU-001 単一で depends_on なし・必須依存エッジ 0 件のため依存強度は弱。Jev 結果と同一判断で変更なし。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "中": 0,
+        "強": 0,
+        "弱": 1
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.99,
+      "jevResult": "小",
+      "judgmentId": "q_epic_size",
+      "llmFinalJudgment": "小。連結成分は 1 operation_unit のみで Epic サイズは最小水準。Jev 結果と同一判断で変更なし。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "中": 0,
+        "大": 0,
+        "小": 1
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.99,
+      "jevResult": "高",
+      "judgmentId": "q_coherence",
+      "llmFinalJudgment": "高。単一 operation_unit が単一主題（REQ-018-005 の worktree 構造的制約手順への plugins 系 gate 適用例明文化）のみを扱い機能的一貫性は高。Jev 結果と同一判断で変更なし。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "中": 0.02,
+        "低": 0.02,
+        "高": 0.96
+      },
+      "questionForm": "score"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "d72142cf15d285338a74ed187a02af30edb8f7dd",
+  "subject": "Case #3088 実行構造確定（Root Case #3088・operation_units 1件・単独根・Standard/Epic 3軸判断）",
+  "workflow": "case-ready"
+}

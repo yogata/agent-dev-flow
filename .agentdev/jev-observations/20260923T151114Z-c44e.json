@@ -1,0 +1,70 @@
+{
+  "observationId": "20260923T151114Z-c44e",
+  "durationMs": 1025,
+  "inputTokens": 2151,
+  "inputs": {
+    "requestDigest": "50abbd03190304658cb48b4d0aab232d269a01f26e7a9b45a2701e273d81924f",
+    "snapshot": "Jev evaluate を 2 unit（J1: 既存REQ照合〔choice CREATE/APPEND/UPDATE + boolean 要件テーブル行非変更〕、J2: 要件展開の最終分類・Design 分離〔choice 帰属3値 + boolean Design action 不要〕）へ実行。requestDigest は 2 unit の state/instructions/criteria/questions を結合した評価リクエスト JSON の sha256。判定入力全文は保存せず、リポジトリ文本体も含まない。"
+  },
+  "judgmentKind": "req-define-judgments",
+  "judgments": [
+    {
+      "confidence": 0.985,
+      "jevResult": "UPDATE",
+      "judgmentId": "J1-q1-req-operation-classification",
+      "llmFinalJudgment": "既存 REQ-001.md の既存セクション内容の変更（残留コメント行の除去）に該当するため UPDATE。要件行の追加でないため APPEND、新規作成でないため CREATE ではない。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "APPEND": 0,
+        "CREATE": 0,
+        "UPDATE": 1
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.985,
+      "jevResult": true,
+      "judgmentId": "J1-q2-table-rows-unchanged",
+      "llmFinalJudgment": "本変更は 83 行目のコメント行除去のみであり、REQ-001-NNN 要件テーブル行は追加・修正・削除されない。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.03,
+        "true": 0.97
+      },
+      "questionForm": "boolean"
+    },
+    {
+      "confidence": 0.98,
+      "jevResult": "REQ 行でも Design 行でもない残留物の除去",
+      "judgmentId": "J2-q1-line-attribution",
+      "llmFinalJudgment": "除去対象行は検証実行結果の残留記録であり、REQ の状態要件行でも設計詳細行でもない。REQ-001-067 の Design 分離基準（要件行の主たる文意が設計詳細の場合に分離）の適用対象外。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "Design 行（設計詳細として Design へ分離すべき行）": 0,
+        "REQ 行（REQ-001 の状態要件の変更）": 0,
+        "REQ 行でも Design 行でもない残留物の除去": 1
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.98,
+      "jevResult": true,
+      "judgmentId": "J2-q2-design-separation-unnecessary",
+      "llmFinalJudgment": "規範は既に REQ-001-003、document-model Design L41/L452、REQ-012-035 が所有し、本件は行の除去のみで規範変更を伴わないため Design action は不要。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.04,
+        "true": 0.96
+      },
+      "questionForm": "boolean"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "unknown",
+  "subject": "RU-0127（REQ-001 検証履歴 HTML コメント除去）の既存REQ照合・要件展開分類判断",
+  "workflow": "req-define"
+}

@@ -1,0 +1,71 @@
+{
+  "observationId": "20260923T150431Z-66a3",
+  "schemaVersion": 1,
+  "workflow": "req-define",
+  "judgmentKind": "req-define-judgments",
+  "subject": "RU-0122 IR-055 baseline 登録の REQ 照合と要件展開分類",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "sourceRevision": "unknown",
+  "outcome": "completed",
+  "durationMs": 1113,
+  "inputTokens": 1673,
+  "inputs": {
+    "requestDigest": "4d9f2d101df08a47444f472587f7b7766f974c2447a1e2fad97bb9d6ea11b85f",
+    "snapshot": "J1: 既存 REQ 更新要否の operation 候補と照合確信。J2: 実作業/恒久要件の最終分類と Design 分離要否。詳細根拠は RU-0122、REQ-010、IR-055 rule、integrity-contracts、check_integrity CLI を参照。"
+  },
+  "judgments": [
+    {
+      "judgmentId": "J1-operation",
+      "questionForm": "choice",
+      "jevResult": "APPEND",
+      "probabilityDistribution": {
+        "APPEND": 0.82,
+        "CREATE": 0.1,
+        "UPDATE": 0.08
+      },
+      "confidence": 0.7,
+      "llmFinalJudgment": "REQ 更新不要（反映作業のみ）。REQ-010-007 は既知/新規検出を区別する恒久要件を既に定め、個別 baseline 登録は integrity-contracts.md の既存運用手順で処理する。Jev の APPEND は operation 選択肢内の近似回答に過ぎず、要件追加を意味しない。",
+      "llmTreatment": "corrected"
+    },
+    {
+      "judgmentId": "J1-confidence",
+      "questionForm": "boolean",
+      "jevResult": true,
+      "probabilityDistribution": {
+        "true": 0.58,
+        "false": 0.42
+      },
+      "confidence": 0.7,
+      "llmFinalJudgment": "照合確信は十分で、追加確認不要。REQ-010-007 と integrity-contracts.md の更新実行手順が現物で確認できる。",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "J2-classification",
+      "questionForm": "choice",
+      "jevResult": "Design 行のみ",
+      "probabilityDistribution": {
+        "REQ 行のみ": 0.04,
+        "Design 行のみ": 0.7,
+        "REQ 行と Design 行の両方": 0.05,
+        "REQ 行も Design 行も不要（反映作業のみ）": 0.21
+      },
+      "confidence": 0.645,
+      "llmFinalJudgment": "REQ 行も Design 行も不要（反映作業のみ）。RU は REQ 常設化しないと合意し、既存 Design が更新手順を規定するため、artifact_actions は空とする。",
+      "llmTreatment": "corrected"
+    },
+    {
+      "judgmentId": "J2-separation",
+      "questionForm": "boolean",
+      "jevResult": false,
+      "probabilityDistribution": {
+        "true": 0.41,
+        "false": 0.59
+      },
+      "confidence": 0.645,
+      "llmFinalJudgment": "新規 Design action を設けないため REQ/Design 分離の追加 action は不要。既存 Design を更新する要求はない。",
+      "llmTreatment": "unchanged"
+    }
+  ]
+}

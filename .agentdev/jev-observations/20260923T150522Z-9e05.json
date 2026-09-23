@@ -1,0 +1,70 @@
+{
+  "observationId": "20260923T150522Z-9e05",
+  "schemaVersion": 1,
+  "workflow": "req-define",
+  "judgmentKind": "req-define-judgments",
+  "subject": "RU-0128 の既存REQ照合および要件展開分類",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "sourceRevision": "unknown",
+  "outcome": "completed",
+  "durationMs": 1044,
+  "inputTokens": 1675,
+  "inputs": {
+    "requestDigest": "ac6b39927a2ffc6c5627aac37df7a7aed95c769a716583039deac2939743d3a0",
+    "snapshot": "J1評価入力: RU-0128の案内ガイド同期。REQ-001-005案内文書の責務、REQ-031-001とcase-run workflow skillのフェーズ表現差を提示し、CREATE/APPEND/UPDATE帰属および照合確信要否を質問。J2評価入力: 同件の要件展開分類・Design分離要否。正規フェーズ同期の承認済み判断、REQ/Design保存なしでガイド実現作業のみとする方針を提示。"
+  },
+  "judgments": [
+    {
+      "judgmentId": "J1-match",
+      "questionForm": "choice",
+      "jevResult": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0.09,
+        "APPEND": 0.1,
+        "UPDATE": 0.81
+      },
+      "confidence": 0.7,
+      "llmFinalJudgment": "該当するREQ操作なし。案内ガイドの編集を既存REQのUPDATEと分類するのは誤りで、REQ自体は変更しない。選択肢に「REQ操作なし」がなかったためJev結果を訂正。",
+      "llmTreatment": "corrected"
+    },
+    {
+      "judgmentId": "J1-confidence",
+      "questionForm": "boolean",
+      "jevResult": false,
+      "probabilityDistribution": {
+        "true": 0.41,
+        "false": 0.5900000000000001
+      },
+      "confidence": 0.7,
+      "llmFinalJudgment": "いいえ。既存REQの現物照合と文書責務で判断可能。",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "J2-classification",
+      "questionForm": "choice",
+      "jevResult": "REQ/Design保存対象なし、案内ガイドの実現作業のみ",
+      "probabilityDistribution": {
+        "REQ行として保存": 0,
+        "Design行として保存": 0,
+        "REQ/Design保存対象なし、案内ガイドの実現作業のみ": 1
+      },
+      "confidence": 0.965,
+      "llmFinalJudgment": "REQ/Design保存対象なし、案内ガイドの実現作業のみ。",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "J2-design",
+      "questionForm": "boolean",
+      "jevResult": false,
+      "probabilityDistribution": {
+        "true": 0.07,
+        "false": 0.9299999999999999
+      },
+      "confidence": 0.965,
+      "llmFinalJudgment": "Design 分離なし。",
+      "llmTreatment": "unchanged"
+    }
+  ]
+}

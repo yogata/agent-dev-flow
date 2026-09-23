@@ -1,0 +1,86 @@
+{
+  "observationId": "20260923T151417Z-76e4",
+  "durationMs": 1142,
+  "inputs": {
+    "references": [
+      {
+        "digest": "b62cc207c6768fd45ecc8847acc348859f99f2eb41867870ee01eda87ff3a36d",
+        "label": "input-ru",
+        "path": ".agentdev/backlog/req-units/RU-0123.md"
+      },
+      {
+        "digest": "c5b59bb9d44e37f45d3f8bce909514f8ee0c1749a021b59f710074a5c4b5a682",
+        "label": "target-script",
+        "path": ".opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts"
+      },
+      {
+        "digest": "99bad4669c7613348058ec571d0a5e3976d0c7ad9eb45f3bd7e7d65189da4e64",
+        "label": "canonical-design",
+        "path": "docs/designs/integrity/targeted-docs-guard-implementation.md"
+      }
+    ],
+    "requestDigest": "f9c0b223c9a2b9ce898fb3e4ec74903d58f5dcce4400bc08ad109e1602780b03",
+    "snapshot": "req-define 2判断単位（J1: STEP-3 既存REQ照合の choice+boolean、J2: STEP-4 最終分類・Design 分離の choice+boolean）。閉じた質問入力のみ、リポジトリ全文は含まない。durationMs は J1 747ms + J2 395ms の合計。"
+  },
+  "judgmentKind": "req-define-judgments",
+  "judgments": [
+    {
+      "confidence": 0.865,
+      "jevResult": "UPDATE（既存 REQ の既存セクション修正）",
+      "judgmentId": "J1-q1-req-operation",
+      "llmFinalJudgment": "REQ 操作なし（CREATE/APPEND/UPDATE いずれにも該当しない）。REQ-010-009 により checker 実装詳細は Design/skill/script が所有し、正典 Design が既に USAGE 文言契約を保持するため REQ ファイル操作は発生しない。bugfix として Issue 本文で要件管理する。",
+      "llmTreatment": "corrected",
+      "probabilityDistribution": {
+        "CREATE（新規 REQ ファイル作成）": 0.02,
+        "UPDATE（既存 REQ の既存セクション修正）": 0.96,
+        "APPEND（既存 REQ へ要件行追加）": 0.02
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.865,
+      "jevResult": false,
+      "judgmentId": "J1-q2-confidence-needed",
+      "llmFinalJudgment": "リポジトリ証拠（REQ-010-009、正典 Design L41 契約、REQ-004-033 境界判定）で確定可能であり、ユーザーの追加確信確認は不要。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.77,
+        "true": 0.23
+      },
+      "questionForm": "boolean"
+    },
+    {
+      "confidence": 0.96,
+      "jevResult": "いずれにも配置せず（実現面変更のみ）",
+      "judgmentId": "J2-q1-placement",
+      "llmFinalJudgment": "いずれにも配置せず（実現面変更のみ）。正典 Design が既に正しい契約を保持し、REQ 行・Design 行ともに新規配置内容は存在しない。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "いずれにも配置せず（実現面変更のみ）": 1,
+        "デザイン行へ帰属（Design 更新として保存）": 0,
+        "REQ 行へ帰属（REQ 要件行として保存）": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.96,
+      "jevResult": false,
+      "judgmentId": "J2-q2-design-edit",
+      "llmFinalJudgment": "Design 編集 action は不要。正典 Design（targeted-docs-guard-implementation.md）は既に正しい契約を記述しており、修正はスクリプト側を Design に合わせ込む実現面変更のみ。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.92,
+        "true": 0.08
+      },
+      "questionForm": "boolean"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "unknown",
+  "subject": "RU-0123 check_changed_docs.ts ヘルプ文言の正典不整合是正（STEP-3 既存REQ照合判断、STEP-4 最終分類・Design 分離判断）",
+  "workflow": "req-define"
+}

@@ -1,0 +1,106 @@
+{
+  "observationId": "20260923T162241Z-6f2a",
+  "durationMs": 435,
+  "inputTokens": 1375,
+  "inputs": {
+    "references": [
+      {
+        "digest": "f9479ad04b90d02cbabae3b9af400b7930f022d0ce3bc161dfca5d6d95bd22ff",
+        "label": "req_draft",
+        "path": ".agentdev/drafts/req-draft-checker-base-ref-help-wording.md"
+      },
+      {
+        "digest": "b62cc207c6768fd45ecc8847acc348859f99f2eb41867870ee01eda87ff3a36d",
+        "label": "source_ru",
+        "path": ".agentdev/backlog/req-units/RU-0123.md"
+      }
+    ],
+    "requestDigest": "35067485766c5878db61982802251bea664615ce8c906eaf7eb9b950524f3554"
+  },
+  "judgmentKind": "execution-structure-finalization",
+  "judgments": [
+    {
+      "confidence": 0.9183333333333333,
+      "jevResult": "Standard",
+      "judgmentId": "exec_structure",
+      "llmFinalJudgment": "Standard（OU-001 単独根は Epic 化せず Standard flow。Root Case #3084 自身を単一 execution unit とする）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "Epic": 0,
+        "Standard": 1
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.9183333333333333,
+      "jevResult": 0,
+      "judgmentId": "dep_strength",
+      "llmFinalJudgment": "無依存（OU 1 件・depends_on 空配列で依存エッジなし）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "弱依存": 0,
+        "強依存": 0,
+        "無依存": 1
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.9183333333333333,
+      "jevResult": 0.02,
+      "judgmentId": "epic_size",
+      "llmFinalJudgment": "最小（1 OU の単独根で Epic サイズ上限から大きく下回る）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "大（5 OU 以上）": 0.01,
+        "中（2〜4 OU）": 0,
+        "最小（1 OU）": 0.99
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.9183333333333333,
+      "jevResult": 1.96,
+      "judgmentId": "functional_coherence",
+      "llmFinalJudgment": "高（単一ファイル・単一目的のヘルプ文言修正で構成が機能的に一貫）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "中": 0.01,
+        "低": 0.01,
+        "高": 0.98
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.9183333333333333,
+      "jevResult": false,
+      "judgmentId": "scope_overlap",
+      "llmFinalJudgment": "重複なし（変更対象 check_changed_docs.ts は未クローズ 6 Case の宣言と同一パス重複しない。#3085 は同 skill 配下の別パス baseline JSON であり checker スクリプトは変更しない）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.91,
+        "true": 0.09
+      },
+      "questionForm": "boolean"
+    },
+    {
+      "confidence": 0.9183333333333333,
+      "jevResult": "スキップ",
+      "judgmentId": "overlap_treatment",
+      "llmFinalJudgment": "重複なしのため処置不発（重複検出時の基準〔スキップ・ユーザー確認〕は維持）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "ユーザー確認": 0.37,
+        "スキップ": 0.63
+      },
+      "questionForm": "choice"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "4452d7caca57d6555d88c347c1849d8df0f10305",
+  "subject": "Root Case #3084（RU-0123）実行構造確定",
+  "workflow": "case-ready"
+}

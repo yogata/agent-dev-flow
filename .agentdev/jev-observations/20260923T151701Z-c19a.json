@@ -1,0 +1,69 @@
+{
+  "observationId": "20260923T151701Z-c19a",
+  "durationMs": 1175,
+  "inputTokens": 1884,
+  "inputs": {
+    "requestDigest": "679f6b184d52e9824ee5ae2032d387cd3bcc647df7f3758dcf950e9816bcabdf",
+    "snapshot": "J1 単独 digest: 04f8df36e9190b24f5963f883ad2d3b23450b3df52a1bc34112fec8ab5e4a5d9 / J2 単独 digest: 7b42d09248f02c39d94140827aef55b5ace406905f5bf4fcff4f68a8fca49c3b。requestDigest は両 canonical request（キー順ソート・compact JSON の sha256）を LF 連結した文字列の sha256。full request text は日本語の state/instructions/criteria/questions を含み、生成物（.agentdev/drafts/req-draft-gh-issue-list-filter-discipline.md）と本 snapshot 以外に正本を保持しない"
+  },
+  "judgmentKind": "req-define-judgments",
+  "judgments": [
+    {
+      "confidence": 0.635,
+      "jevResult": "CREATE",
+      "judgmentId": "J1.q1-step3-req-matching",
+      "llmFinalJudgment": "CREATE（現行 54 REQ の定量照合の結果、REQ-011 は Tool 操作契約側の成果のみ、REQ-049 は論理スキーマの正を一元管理 Design へ帰属させラベル値域の具体を Design 確定事項とする。issue_list 呼出側運用規律の義務化を保持する既存要件行が存在しないため新規 REQ を作成する）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "APPEND": 0.32,
+        "CREATE": 0.62,
+        "UPDATE": 0.06
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.635,
+      "jevResult": true,
+      "judgmentId": "J1.q2-step3-req-matching",
+      "llmFinalJudgment": "true（既存 REQ 行の APPEND/UPDATE 不要の判断は、REQ-011/REQ-049/REQ-009/REQ-044 の要件行本文と README 索引の定量照合により確定でき、追加のユーザー照合を要しない）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.35,
+        "true": 0.65
+      },
+      "questionForm": "boolean"
+    },
+    {
+      "confidence": 0.855,
+      "jevResult": "Design 行（agentdev-issue-tracking Design 物理写像表への補記として分離）",
+      "judgmentId": "J2.q1-step4-design-separation",
+      "llmFinalJudgment": "Design 行分離（物理写像表の正の所有は REQ-049-008 により一元管理 Design に帰属するため、labels 引数の物理写像入力方向規律は agentdev-issue-tracking Design 確定事項への補記とする。呼出側運用義務は新規 REQ 要件行へ保持する二層構成）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "Design 行（agentdev-issue-tracking Design 物理写像表への補記として分離）": 0.99,
+        "REQ 行（新規 REQ の要件行として記録）": 0.01
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.855,
+      "jevResult": true,
+      "judgmentId": "J2.q2-step4-design-separation",
+      "llmFinalJudgment": "true（変更対象 (b) は docs/designs/skills/agentdev-issue-tracking.md であり、artifact: design の operation: update（target_area: ## 確定事項、canonical_owner: agentdev-issue-tracking）として REQ action から分離する）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.28,
+        "true": 0.72
+      },
+      "questionForm": "boolean"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "unknown",
+  "subject": "RU-0125 既存REQ照合と要件展開分類・Design分離（req-draft-gh-issue-list-filter-discipline）",
+  "workflow": "req-define"
+}
