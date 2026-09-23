@@ -203,6 +203,42 @@
 
 ---
 
+## worktree で check_integrity（source profile）の ng は junction 未伝播の環境依存として由来分類する
+
+- **問題事象**: check_integrity（source profile）を worktree で実行すると、`.opencode/plugins/` 配下 junction 未伝播により repo-local-plugin-projection-symmetry の ng 2 件（projection missing・shim missing）が環境依存として出力される
+- **発生局面**: 実装（Case #3088 case-run 検証。PR #3097 品質メトリクス収集中）
+- **検知方法**: check_integrity --profile source の ng 計数と main root 再実行結果との突合（worktree cwd: ng 2 / main root: ng 0）
+- **根本原因**: `.opencode/plugins` の junction が worktree へ未伝播の構造的制約により、projection 対称性検査が worktree 環境では不足状態を正しく報告する（検査の誤検出ではなく環境差の正検出）
+- **自律対応内容**: main root で同 check を実行して ng 0 を機械確認し、由来分類（環境依存・当該変更起因でない）を突合して検証差分へ記録。worktree 内結果と main root 実体からの結果は検証種別ごとに分離記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree 実行時の check_integrity 結果解釈手順（main root 再実行による由来分類突合）が実用的。本件は PR 本文の Findings / Capture候補（learning）から case-close が回収
+- **再発条件**: worktree cwd で check_integrity（source profile）を実行した場合
+- **予防策候補**: worktree 実行時の check_integrity 結果の解釈手順（main root 突合による由来分類）を知識化する
+- **想定反映先**: docs/knowledge/ 配下（worktree checker 実行の知識文書）または agentdev-git-worktree worktree-operations.md の checker 実行手順節周辺
+- **関連**: Case #3088、PR #3097 検証差分
+- **タグ**: `#check_integrity` `#worktree` `#junction` `#由来分類`
+
+---
+
+## bash から checker の --root に backslash パスを渡すと escape 解釈で破損し traceability check が見かけ上 missing を返す
+
+- **問題事象**: bash セッションから traceability check に `--root C:\Users\...`（backslash 含む生パス）を渡すと、シェルの escape 解釈でパスが破損（`C:Users...`）し、対応宣言が 1 件も走査されない状態で missing-design / missing-implementation / missing-verification の 3 fail が返る
+- **発生局面**: 運用（case-close STEP-2/3 の QG-4 トレーサビリティ独立再検査。Case #3088 case-close 再開実行）
+- **検知方法**: 同一コマンドを forward slash 形式（`C:/Users/...`）で再実行したところ pass 9 / fail 0 となり、worktree 起点でも同値（pass 9 / fail 0）を確認。case-run の記録値との突合で破損パス実行が誤判定の原因と特定
+- **根本原因**: bash は backslash を escape 文字として解釈するため、引用符なしの Windows 形式パスは引数段階で破損する。チェッカー側は破損パスを root として空コーパスを走査し、fail-closed 契約どおり missing を返す（チェッカー異常ではない）
+- **自律対応内容**: forward slash 形式への統一で解消。main root 起点と worktree HEAD 起点の両方で pass 9 / fail 0 を再取得し、durable state 上で解消済みの対象行を本変更起因の失敗と誤判定していないことを確認して対応記録コメントへ補足記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: Windows 環境で bash 経由の checker 実行パス指定は forward slash 形式（または引用符付き）に統一する。記録値との突合は「durable state 上で解消済みの対象行を誤失敗扱いしない」崩し手として有効
+- **再発条件**: bash から Windows 形式（backslash）パスを引用符なしで checker のパス引数へ渡した場合
+- **予防策候補**: checker 実行コマンド例のパス表記を forward slash 形式に統一する旨を実行手順例へ明記する
+- **想定反映先**: .opencode/skills/agentdev-git-worktree/references/worktree-operations.md「main root 実体 + --root 指定による読取系 checker 実行手順」節の例示補足
+- **関連**: Case #3088、PR #3097、agentdev-traceability check CLI
+- **タグ**: `#bash` `#Windows` `#パス指定` `#traceability`
+
+---
+
 ## Windows node fs.symlinkSync の相対 target は dest ディレクトリ基準で解決される（worktree junction 依存整備の誤リンク）
 
 - **問題事象**: Windows + node での junction 作成（worktree 依存整備の正規手段）で fs.symlinkSync に相対パス target を渡すと、cwd 基準ではなく dest ディレクトリ基準で絶対パス解決され、二重ネストの誤リンク先になる。本実行では worktree 側 junction が誤解決し stat ENOENT → TIM テスト 7 件 fail を一時的に誘発した（絶対パス指定で解消）
