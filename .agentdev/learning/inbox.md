@@ -110,3 +110,21 @@
 - **想定反映先**: docs/guides/consumer-project-setup.md「AGENTDEV_GH_REPO の起動環境設定」節（自ホスト環境での周知追記候補）、agentdev-workflow-case-auto（投入前前提確認の追加候補）
 - **関連**: .opencode/plugins/agentdev-gh-tool/plugin.ts（resolveRepoFromGh、defaultResolveRepo）、.agentdev/drafts/req-draft-checker-base-ref-help-wording.md（RU-0123。Root Case 未作成のまま停止）
 - **タグ**: `#agentdev-gh` `#リポジトリ解決` `#fail-closed` `#起動環境` `#AGENTDEV_GH_REPO`
+
+---
+
+## 並行 Case の共有 worktree で branch 混入を検知したら隔離 worktree で差分を再構成する
+
+- **問題事象**: 複数の並行 case-open が同じ worktree を共有し、別 Case のコミットが Definition branch の親履歴へ混入した。共有 worktree は別委譲による checkout・commit の影響も受け、対象 Case 専用 branch を保証できなかった
+- **発生局面**: 運用（case-open STEP-4 Definition PR 作成、Case #3087 / RU-0127）
+- **検知方法**: `git log` で Definition branch の親コミットが別 Case #3088 の commit `cb59cb4e` と判明し、main 起点との差分に別 Case の履歴が含まれることを確認
+- **根本原因**: 並行 Case の branch / checkout / commit 操作が共有 worktree と共有 git checkout 状態に対して行われ、個別の委譲作業境界が git worktree によって隔離されていなかった
+- **自律対応内容**: 汚染 branch を PR に使用せず、main 起点の `.worktrees/3087-chore` 隔離 worktree を作成し、対象ファイルだけを含む自分の commit の差分を cherry-pick して、branch 差分が `docs/requirements/REQ-001.md` のみに限定されることを確認した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（実行時の並列作業境界に関する知見。現時点では正規成果物の変更判断をしない）
+- **横展開観点**: 同一バッチ内で複数 Case が git 操作を行うすべての並行委譲に適用する。Issue ごとの作業ディレクトリと branch を共有 checkout から分離する
+- **再発条件**: 複数委譲が同時に同一 worktree / checkout で branch 切替、編集、commit を行う場合
+- **予防策候補**: case-open の Definition branch 作成を Case 専用 worktree 内で行い、PR 作成前に `merge-base` と `diff --stat` を検査して対象 Case の artifact path 以外の commit / file が含まれないことを確認する
+- **想定反映先**: `agentdev-workflow-case-open` の branch / worktree 運用手順、および `case-auto` 並列 stage の委譲境界
+- **関連**: Case #3087、Case #3088、Definition PR #3091、`definition/issue-3087`、`907a081e`、`a50ff629`
+- **タグ**: `#parallel-case` `#worktree` `#branch-isolation` `#case-open`
