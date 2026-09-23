@@ -2,10 +2,11 @@
 title: case-auto Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-19"
+updated: "2026-09-23"
 ---
 <!-- ADF-COVERS(implementation): REQ-015-012 -->
-<!-- ADF-COVERS(implementation): REQ-034-001, REQ-034-002, REQ-034-003, REQ-034-004, REQ-034-005, REQ-034-006, REQ-034-007, REQ-034-008, REQ-034-009, REQ-034-010, REQ-034-011, REQ-034-012, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-017, REQ-034-018, REQ-034-019, REQ-034-020, REQ-034-021, REQ-034-022, REQ-034-023, REQ-034-024, REQ-034-025, REQ-034-026, REQ-034-027, REQ-034-028, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-033, REQ-034-034, REQ-034-035, REQ-034-036, REQ-034-037, REQ-034-038 -->
+<!-- ADF-COVERS(implementation): REQ-034-001, REQ-034-002, REQ-034-003, REQ-034-004, REQ-034-005, REQ-034-006, REQ-034-007, REQ-034-008, REQ-034-009, REQ-034-010, REQ-034-011, REQ-034-012, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-017, REQ-034-018, REQ-034-019, REQ-034-020, REQ-034-021, REQ-034-022, REQ-034-023, REQ-034-024, REQ-034-025, REQ-034-026, REQ-034-027, REQ-034-028, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-033, REQ-034-034, REQ-034-035, REQ-034-036, REQ-034-037, REQ-034-038, REQ-034-039, REQ-034-040, REQ-034-041, REQ-034-042, REQ-034-043, REQ-035-016, REQ-035-017 -->
+<!-- ADF-COVERS(design): REQ-034-012, REQ-034-025, REQ-034-027, REQ-034-040, REQ-034-041, REQ-034-042, REQ-034-043, REQ-035-016, REQ-035-017 -->
 <!-- ADF-COVERS(verification): REQ-034-037, REQ-034-038 -->
 <!-- ADF-COVERS(implementation): REQ-003-017, REQ-003-018, REQ-006-108, REQ-034-002, REQ-034-003, REQ-034-007, REQ-034-008, REQ-034-009, REQ-034-010, REQ-034-011, REQ-034-012, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-018, REQ-034-019, REQ-034-020, REQ-034-021, REQ-034-022, REQ-034-023, REQ-034-024, REQ-034-025, REQ-034-026, REQ-034-027, REQ-034-028, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-034, REQ-034-035, REQ-034-036 -->
 
@@ -61,10 +62,11 @@ updated: "2026-09-19"
   - 結果状態の4次元集約（REQ-034-031）: 各工程の output_contract から (1) 工程結果 pass/warn/fail、(2) artifact_action 適用結果 applied/skipped/failed/no-op、(3) 定義適用工程完了状態、(4) OU ライフサイクル完了状態を収集し混同なく保持する。集約規則の詳細は後述「結果状態の4次元集約（REQ-034-031）」セクション
 - Wave 反復制御（Epic Issue 指定時）
   - case-auto が Epic Issue 番号を記録。Epic Issue 本文から Wave 構成、各子Issue ステータスを読み取る（読み取りのみ、Epic Issue 本文の書き込みは case-close の責務）
-  - case-auto が現在 Wave の ready 子Issue を選択し、各子Issue ごとにインライン case-run を実行（最大5件並列、起動間隔10秒。REQ-034-027 踏襲、起動間隔・並列数制御は v4-runtime-execution-model「runtime 制御ループ」節参照）。各子Issue の実行担当サブエージェントへ case-auto から直接委譲
-  - Wave 内全子Issue の完了（completed-pr / blocked / failed / delegation-unavailable）を待機
-  - completed-pr の子Issue がある場合、case-close(#epic) へ委譲（Wave 反復を進行させる stage 3 内部処理、REQ-034-025）
-  - 残 Wave がある場合、次 Wave を実行（べき等）
+  - case-auto が現在 Wave の ready 子Issue を認識し、Epic・Wave・Standard Issue を横断する共有 active Issue task 枠（REQ-034-027。上限・空き枠補充・起動間隔 10 秒は後述「runtime 制御契約」節と v4-runtime-execution-model「runtime 制御ループ」節参照）で各子Issue へインライン case-run を実行。各子Issue の実行担当サブエージェントへ case-auto から直接委譲
+  - case-run は単一 Issue 実行に専念し（REQ-031-015）、Wave 内子Issue の並列起動・fan-out/fan-in の制御は case-auto の orchestration が単一所有する（DEC-041）。case-run(#epic) 由来の独立実行枠は存在しない
+  - 現 Wave の全子Issue の完了（completed-pr / blocked / failed / delegation-unavailable）を待機し、現 Wave の収束（REQ-035-016）を確認する
+  - completed-pr の子Issue がある場合、case-close(#epic) 相当の統合処理を Wave 反復を進行させる stage 3 内部処理として実施（統合処理は active Issue task の実行枠を消費しないが共有書き込みの直列化点として扱う。REQ-034-042）
+  - 次 Wave の開始は現 Wave の収束（REQ-035-016）と後続 Wave の意味的依存条件の充足（必要な統合・マージの完了を含む。REQ-035-017）の両方を確認してから行う（REQ-034-012）
 - 工程間の状態引き継ぎ（Issue番号、PR番号、RU ファイルパス、capture 対象情報を最終工程まで保持）
 - 複数REQ対応（case-ready の確定結果から複数 REQ doc または scale:large 検出時、確定済みの Issue 構造に従う）
 - 停止条件の検出（停止時タイミング情報の追記。11項目の停止条件いずれかを検出時、実行停止。新しい意味判断時は Root Case に `resume_command: req-define` を記録）
@@ -87,7 +89,7 @@ context 管理:
 
 - public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、command 定義（`src/opencode/commands/agentdev/case-auto.md`）はその実行時投影である（DEC-010）。
 - workflow 実装本体（orchestration stage モデル、Wave 反復制御、停止理由分類、reference 構成）は Workflow Skill（`agentdev-workflow-case-auto`）が所有し、本 Design はこれらを複製しない。各工程の output_contract（工程別契約表）も Workflow Skill が所有する。
-- case-run（インライン実行）の workflow 実装本体は case-run の Workflow Skill（`agentdev-workflow-case-run`）が所有する（single workflow、epic-wave workflow の分離を含む）。
+- case-run（インライン実行）の workflow 実装本体は case-run の Workflow Skill（`agentdev-workflow-case-run`）が所有する（case-run は常に単一 Issue 実行。Wave 実行制御は case-auto stage 3 が所有するため epic-wave 実行契約は本 Design 側へ集約される）。
 - Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
@@ -108,7 +110,7 @@ context 管理:
 - source path の実行時パス読み替え
 - Issue 階層決定ロジックの独自保持（case-open に委譲）
 - case-open / case-ready から後工程への状態引き継ぎ時のフィルタリング、再評価（保存結果をそのまま渡す）
-- 子Issue 選択ロジック、子Issue 単位の並列起動（case-run(#epic) / case-close(#epic) に委譲）
+- 子Issue 選択ロジック、子Issue 単位の並列起動の外部委譲（Wave 実行制御は case-auto stage 3 の orchestration が単一所有し、case-run は単一 Issue 実行に専念する。case-close(#epic) 相当の統合処理は Wave 反復を進行させる stage 3 内部処理として case-auto が扱う）
 - Epic Issue 本文の書き込み（case-close の単一書き手責務、v2:ADR-0125、case-auto は読み取るのみ、`POL-epic-tracking-single-writer`）
 - 操作単位本文の抽出、変換、REQ 操作解釈（REQ-034-010）
 - case-ready 完了後の draft SSoT 扱い（case-ready 完了後は Issue と Epic が SSoT）
@@ -185,8 +187,21 @@ Git 上の変更を伴う並列処理では処理単位を worktree で隔離す
 - 技術的依存レベル（L0-L3）は並列判定軸から外す。ファイル衝突（L2）があっても並列を許容し、PR マージコンフリクトは後続 PR の rebase で解決する（REQ-034-013, REQ-031-003）
 
 グローバル並列上限は設定しない（REQ-034-013）。
-case-run 単位の5件上限（REQ-034-027 踏襲）のみを制御対象とする。
-N 個の execution_unit が並列実行された場合、N×5 件の委譲同時起動リスクを許容する（運用監視対象、v2:ADR-0129）。
+実行並列上限は 1 回の orchestration の stage 3 全体で共有される active Issue task 数の上限（REQ-034-027、数値 5）として case-auto が単一所有する（DEC-041）。
+Epic、Wave、Standard Issue、case-run 呼出しごとの独立した実行枠は設けない。N 個の execution_unit が並列実行された場合も、stage 3 全体で共有される active Issue task 数のみが制御対象となる。論理上限と harness の同時起動制限（bg task API 上限等）は切り離し、harness 制限は adapter・実装制約（キューイング・バンドリング等）として扱い、論理上限の値の根拠としない（DEC-041）。
+
+### runtime 制御契約
+
+stage 3 の runtime 制御ループは case-auto が所有し、次の契約に従う（REQ-034-040〜043、REQ-035-016、REQ-035-017、DEC-041。詳細は v4-runtime-execution-model「runtime 制御ループ」節）:
+
+- 共有 active 枠: 1 active task は 1 Issue への実装実行委譲であり、Epic・Wave・Standard Issue を横断して active Issue task 数が上限（現行 5）を超えない
+- 空き枠補充: 各 Epic の現在 Wave と Standard Issue から開始条件を満たす Issue を候補として認識し、active 数が上限未満で実行上の安全条件を満たす候補がある限り補充する（横断補充は best-effort でなく必須）。最初に起動した全 task の完了を待つ固定 batch 方式を取らず、起動間隔（10 秒）と局所的な競合回避の運用は維持する（REQ-034-040）
+- 状態管理: Issue 実行の状態を pending、ready、active、実行結果確定で区別して管理する（REQ-034-041）
+- 再開: 再開時は既存の active task を計上し、同一 Issue の二重起動と上限超過を防ぐ。状態不明の task は終了確認まで実行枠を解放せず、完了済み Issue を未完了に戻さない（REQ-034-041）
+- 統合処理: 統合処理（マージ・クローズ相当）は active Issue task の実行枠を消費しないが、共有書き込みの直列化点として扱う（REQ-034-042）
+- Wave 収束と依存充足: Wave 収束（全子 Issue の実行結果確定、未処理・実行中・状態不明なし）と後続 Wave の依存充足（意味的依存条件の成立、必要な統合・マージの完了を含む）を区別し、次 Wave の開始は両方の成立を条件とする（REQ-034-012、REQ-035-016、REQ-035-017）。blocked、failed、delegation-unavailable は収束には該当し得るが依存充足とはみなさない
+- 重複の実行時検出: stage 3 の委譲前に同一 Wave 内の子 Issue 間で変更対象ファイル集合の重複を検出し、一時直列化・変更対象の調整・merge 順序・衝突解消担当の判断に用いる。変更対象集合が取得不能な子 Issue を含む場合は比較を省略せず検出不能として報告する（REQ-034-043、REQ-035-012）
+- Wave 表現: Wave 表現は子 Issue 数の上限を持たない（Epic サイズ上限のみ適用）。runtime 上の batch や一時直列化を Wave 分割として永続化しない（DEC-041）
 
 ### blocked 部分停止、ready 継続判定フロー
 
@@ -194,7 +209,7 @@ N 個の execution_unit が並列実行された場合、N×5 件の委譲同時
 
 | execution_unit 状態 | case-auto アクション |
 |---|---|
-| ready | 起動（case-run(standard) または case-run(#epic)） |
+| ready | 起動（共有 active Issue task 枠でインライン case-run を起動。case-run は常に単一 Issue 実行） |
 | running | 完了待機 |
 | completed | case-close 相当処理へ進行 |
 | blocked | 当該 execution_unit のみ停止。他の ready 対象は継続 |
@@ -209,7 +224,7 @@ N 個の execution_unit が並列実行された場合、N×5 件の委譲同時
 execution_unit 群の実行は orchestration stage を stage 内最大並列・stage 間全対象収束で制御し、execution_unit 単位の縦切り pipeline（各 unit が case-run → case-close を先行完結する実行）として制御しない（REQ-034-025）。
 
 - execution_unit が standard issue の場合: stage 3 で case-run(standard) を実行し、stage 3 の対象群収束後に stage 4 で case-close を実行
-- execution_unit が epic issue の場合: stage 3 で Wave 反復制御（case-run(#epic) → case-close(#epic) の反復）を完遂する（v2:ADR-0128 Decision #5, REQ-006-084 の既存引用は維持する）。Wave 間および最終 Wave の case-close(#epic) は Wave 反復を進行・完遂させる stage 3 内部処理であり、stage 4 の開始とはみなさない。stage 4 では追加の case-close を行わない
+- execution_unit が epic issue の場合: stage 3 で Wave 反復制御を完遂する（子 Issue へのインライン case-run 実行と case-close(#epic) 相当の統合処理の反復。制御は case-auto stage 3 が単一所有し、case-run は単一 Issue 実行として呼び出される。DEC-041、REQ-031-015）。Wave 間および最終 Wave の case-close(#epic) 相当の統合処理は Wave 反復を進行・完遂させる stage 3 内部処理であり、stage 4 の開始とはみなさない。stage 4 では追加の case-close を行わない
 
 OU 逐次処理（REQ-034-011）は、必須依存で結合した execution_unit 群に適用される。
 必須依存のない execution_unit 群は順序を問わず並列実行できる（REQ-034-011 例外条項）。
@@ -499,6 +514,6 @@ HITL 境界の変更ではなく、既存停止経路（REQ-034-022）の分類�
 
 v3 epic-wave-model Design が所有していた orchestration stage モデル、ドラフト間並列実行モデル（REQ-034-025〜029）、execution_unit 並列 orchestration、case-auto 停止条件と停止理由分類のうち case-auto 実行側の運用契約は本 Design の規定へ吸収された。旧 Design は第5段で supersede とされ（物理削除は docs-chore OU-003）、対応関係の正本は v3-v4-crosswalk references/crosswalk-inventory.md が追跡する。
 
-- orchestration stage: case-auto 内部工程を stage として構成し、ドラフト間並列実行は stage 3 で最大 5 件並列（起動間隔 10 秒、REQ-034-027 踏襲）とする
+- orchestration stage: case-auto 内部工程を stage として構成し、ドラフト間並列実行は stage 3 で共有 active Issue task 枠（REQ-034-027、起動間隔 10 秒。Epic・Wave・Standard を横断する単一所有枠、DEC-041）とする
 - ドラフト間並列実行モデル: 複数 draft（OU 群）を依存グラフから解析し、並列実行可能性に基づいて同時起動する。直列化の単位は v4-runtime-execution-model「直列化単位表」に従う
 - 停止理由分類: 停止条件の発生時に停止理由を分類して報告する。user-decision-required は result enum の状態ではなく停止理由分類として維持する（v4-lifecycle-state-machine 異常・例外状態と回復経路）
