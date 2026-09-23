@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下54件を第一参照先とする。
+現在の要件判断では、以下55件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -66,6 +66,7 @@
 | [REQ-088](REQ-088.md) | ADF v4 基盤要件（三層責務・情報寿命・Project Contract・中核文書モデル） |
 | [REQ-090](REQ-090.md) | Jev 先行評価の実運用組込み（Stage 1: 観測可能化） |
 | [REQ-091](REQ-091.md) | Supervisor 環境向け credential 供給ブリッジの正本管理 |
+| [REQ-092](REQ-092.md) | agentdev_gh issue_list 運用規律と labels 論理値専用の文書整備 |
 <!-- AUTOGEN:END -->
 
 ## 廃止済み要件
@@ -96,7 +97,7 @@
 - 文書間に矛盾がある場合は現行 REQ を優先する
 - REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）による意図的予約欠番であり、実体は存在しない
 - REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却枠であり、意図的予約欠番として維持する
-- REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全 revert）由来の廃止識別子であり、再利用しない（次の新規 REQ は REQ-091）
+- REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全 revert）由来の廃止識別子であり、再利用しない（次の新規 REQ は REQ-092）
 
 ## 過去版との関係
 
