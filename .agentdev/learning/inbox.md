@@ -200,3 +200,21 @@
 - **想定反映先**: checker 実行契約と検出基盤規則 Design「安定実行経路」節の経路記述更新
 - **関連**: Case #3083、PR #3094、.opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts
 - **タグ**: `#checker` `#node-strip-types` `#bun-run` `#ESM`
+
+---
+
+## Windows node fs.symlinkSync の相対 target は dest ディレクトリ基準で解決される（worktree junction 依存整備の誤リンク）
+
+- **問題事象**: Windows + node での junction 作成（worktree 依存整備の正規手段）で fs.symlinkSync に相対パス target を渡すと、cwd 基準ではなく dest ディレクトリ基準で絶対パス解決され、二重ネストの誤リンク先になる。本実行では worktree 側 junction が誤解決し stat ENOENT → TIM テスト 7 件 fail を一時的に誘発した（絶対パス指定で解消）
+- **発生局面**: 実装（Case #3084。PR #3096 Findings learning 候補から回収）
+- **検知方法**: worktree 側 junction の stat ENOENT と TIM テスト 7 件 fail の発生確認
+- **根本原因**: fs.symlinkSync の相対 target は dest ディレクトリ基準で解決される。worktree 依存整備手順の junction 作成例は cwd 基準相対指定（cmd /c mklink /J）で書かれており、node 経由の場合の解決基準差異が手順記述にない
+- **自律対応内容**: 絶対パス指定で junction を再作成し、同一 worktree で TIM テストを再実行して 7 件 fail の解消を確認（整備前後の結果は混在させていない）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存手順の実行形態差異の知見記録のみ）
+- **横展開観点**: node 経由で junction/symlink を作る手順は dest ディレクトリ基準の解決を前提に絶対パス指定する。cmd /c mklink /J と fs.symlinkSync の解決基準差異は手順記述時に明記する
+- **再発条件**: fs.symlinkSync に相対パス target を渡して junction を作成した場合
+- **予防策候補**: worktree 依存整備手順の junction 作成例に node 経由の場合の絶対パス指定を追記
+- **想定反映先**: agentdev-git-worktree references worktree-operations.md の bun test 実行環境前提（junction 作成例）
+- **関連**: Case #3084、PR #3096、worktree 依存整備
+- **タグ**: `#junction` `#symlink` `#windows` `#worktree`
