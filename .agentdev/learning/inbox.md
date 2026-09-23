@@ -254,3 +254,39 @@
 - **想定反映先**: agentdev-git-worktree references worktree-operations.md の bun test 実行環境前提（junction 作成例）
 - **関連**: Case #3084、PR #3096、worktree 依存整備
 - **タグ**: `#junction` `#symlink` `#windows` `#worktree`
+
+---
+
+## harness 制約下の case-run 委譲では実行担当接合を委譲実行者のプロセス内直接実装として履行し能力検出に基づく接合判定の記録が必要
+
+- **問題事象**: 実行担当サブエージェント型の起動手段が研究系 agent に限定されたハーネスでは、adapter 委譲契約（agentdev-case-run-execution-adapter）の実行担当接合がそのままでは起動できない。即 delegation-unavailable と判断すると契約を満たせない
+- **発生局面**: 実装（case-run STEP-S4 委譲起動時の能力検出。Case #3086 / PR #3093 Findings learning 候補から回収）
+- **検知方法**: STEP-S4 委譲起動時の能力検出（実行担当サブエージェント型の起動手段が研究系 agent に限定されていることの確認）
+- **根本原因**: ハーネスの能力差。委譲起動手段が制限された環境では委譲契約の接合形態をその前提に合わせて選択する必要がある
+- **自律対応内容**: adapter 委譲契約の実行担当接合を委譲実行者のプロセス内直接実装として履行。result 4状態契約・3点ゲート・PR 本文 SSoT 契約は同一契約で self-applied して遵守した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（委譲契約自体の変更は不要。harness 差異の運用知見）
+- **横展開観点**: 委譲起動手段が制限されたハーネスでの case-run 実行時は、即 delegation-unavailable と判断せず、harness の能力検出結果に基づく接合判定とその記録が必要
+- **再発条件**: 実行担当サブエージェント型の起動手段が制限された harness で case-run の委譲を実行する場合
+- **予防策候補**: agentdev-case-run-execution-adapter の reference に harness 能力検出結果に基づく接合判定（起動手段不在時のプロセス内直接実装 + 契約 self-apply の記録）の経路を明記
+- **想定反映先**: .opencode/skills/agentdev-case-run-execution-adapter/references/（委譲実行手順の harness 差異節）
+- **関連**: Case #3086、PR #3093（Findings learning 候補から回収）
+- **タグ**: `#case-run` `#委譲` `#harness制約` `#adapter`
+
+---
+
+## worktree での bun test 3-split 実行は並行マージによる IR-055 baseline 更新の未追随で delta guard 疑似 fail を出す（由来分類は baseline 再現確認で機械確定）
+
+- **問題事象**: case-close の full integrity suite（bun test 3-split）を PR HEAD worktree で実行したところ、IR-055 delta guard（配布物に新規 delta 違反なし）が Expected 0 / Received 8 で fail。本 PR は docs guide のみ変更で配布物を変更していない
+- **発生局面**: 実装（case-close STEP-3 full integrity suite。Case #3086 case-close 実行中）
+- **検知方法**: 分割①の 1 fail（check_integrity.test.ts IR-055 delta guard）と違反 8 件の抽出（いずれも本 PR 未変更の配布物ファイル）
+- **根本原因**: 並行 sibling case-close（Case #3085、main merge 610fafd5）が IR-055 baseline に 8 件を baseline-known 登録済みで、worktree HEAD は分岐時点の旧 baseline（generated_at 2026-09-15）のまま。worktree の追随不足により baseline-known 判定が効かず「new (delta from baseline)」と誤分類される
+- **自律対応内容**: 3 点の証拠で環境依存と由来分類した。①単独再実行で再現（151 pass/1 fail）、②baseline commit（分岐点 b2e74364）の main root 変更ゼロ実行で 0 fail（152 pass）、③worktree の baseline を main 正規版へ一時差し替えた同一テストで 0 fail（152 pass、検証後復元）。由来不明 0 件で suite を受理
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree 起点の integrity suite 実行では、並行 main 進行による baseline 系 durable state の追随差を fail 由来分類の前提に入れる。QG-4「durable state 上で解消済みの対象を本変更起因の失敗と誤判定しない」の実手順として baseline 差し替え再実行が決定的証拠になる
+- **再発条件**: 並行セッションが IR-055 baseline（または同種 baseline 系ファイル）を更新した commit が main にマージした後、旧 baseline のままの worktree で delta guard を含む suite を実行した場合
+- **予防策候補**: bun test 3-split の worktree 実行手順に、baseline 系 fail 発生時の由来分類手順（単独再実行 → baseline commit main root 再現確認 → baseline 差し替え再実行〔検証後復元〕）を明記
+- **想定反映先**: agentdev-quality-gates references qg-4-final-acceptance.md「fail 由来分類」節、agentdev-git-worktree worktree-operations.md の bun test 実行環境前提
+- **関連**: Case #3086、Case #3085（baseline 更新元 main merge 610fafd5）、.opencode/skills/repo-agentdev-integrity/baselines/ir-055-baseline.json
+- **タグ**: `#IR-055` `#baseline` `#worktree` `#由来分類` `#bun-test`
