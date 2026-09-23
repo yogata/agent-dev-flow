@@ -6,13 +6,13 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 53件、廃止済み: 14件
+現行 REQ: 54件、廃止済み: 14件
 <!-- AUTOGEN:END -->
 
-現行要件は53件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
+現行要件は54件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
 REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）による意図的予約欠番であり、実体は存在しない（[採番管理](designs/foundations/numbering-policy.md) 参照）。
 REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却枠であり、意図的予約欠番として維持する。
-REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全 revert）由来の廃止識別子であり、再利用しない（次の新規 REQ は REQ-090）（[採番管理](designs/foundations/numbering-policy.md) 参照）。
+REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全 revert）由来の廃止識別子であり、再利用しない（次の新規 REQ は REQ-091）（[採番管理](designs/foundations/numbering-policy.md) 参照）。
 各 REQ の詳細は各 REQ ファイル本文を参照。
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-table -->
@@ -71,6 +71,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [REQ-087](requirements/REQ-087.md) | 採番例外の記録と REQ 番号ギャップ検査 |
 | [REQ-088](requirements/REQ-088.md) | ADF v4 基盤要件（三層責務・情報寿命・Project Contract・中核文書モデル） |
 | [REQ-090](requirements/REQ-090.md) | Jev 先行評価の実運用組込み（Stage 1: 観測可能化） |
+| [REQ-091](requirements/REQ-091.md) | Supervisor 環境向け credential 供給ブリッジの正本管理 |
 <!-- AUTOGEN:END -->
 
 - [要件インデックス](requirements/README.md)
