@@ -9,14 +9,14 @@ OU / Epic / Wave / Issue 階層の語彙意味の正規所有は v4-standard-lif
 - 依存強度、Epic サイズ、機能的一貫性の3軸で最終 Issue 構成を自律生成する。複数 Standard、複数 Epic、混在のいずれも作成できる
 - 単独根（1 operation_unit だけの連結成分）は Epic 化せず Standard flow として扱い、Root Case 自身を単一 execution unit とする
 - 無関係な operation_unit 群を単一 Epic へ機械的に集約しない
-- Epic サイズ上限と Wave 同時実行上限を実行安全境界として遵守する（数値の詳細は v4-runtime-execution-model Design「runtime 制御ループ」節）
+- Epic サイズ上限を実行安全境界として遵守する（数値の詳細は v4-runtime-execution-model Design「runtime 制御ループ」節）。Wave 構成は Epic 内の子 Issue 間の意味的依存関係のみから導出し、実行時の並列数・同時実行上限を Wave サイズや Wave 構成判断に適用しない
 
 ## Epic 確定時の生成物
 
 - Child Issue を作成し、Root Case に Wave / 依存構造を確定する
 - Epic Issue 本文に構成推論の根拠を記録する
 - Epic Issue 本文の Wave テーブルに各子 Issue の実行方法（並列、直列）を技術的依存関係に基づいて明記する
-- Wave 構成時に同一 Wave 候補の子 Issue 間で変更対象ファイル集合の重複をファイル単位で前置検出し、重複時の処置（Wave 分離・変更対象分割・重複許容）を Wave 構成の判断として確定する。比較対象の変更対象集合が取得不能またはファイル粒度に展開不能な子 Issue がある場合は比較を省略せず検出不能として報告する
+- Wave 構成時に同一 Wave 候補の子 Issue 間で変更対象ファイル集合の重複をファイル単位で前置検出し、検出結果を実行・統合時の競合リスク情報（一時直列化・変更対象の調整・merge 順序・rebase・衝突解消担当の判断に利用）として Epic Issue 本文・Wave 記録へ記録・引き渡す。重複時の処置は変更対象分割・重複許容（衝突解消の担当とマージ順序の事前記録を含む）とし、ファイル重複のみを理由とした Wave 分離を処置に含めない。依存ヒント（同一ファイル衝突の抑制ヒント）は競合リスク信号であり Wave 分離の判断材料としない。成果の成立順序への依存（一方が作成する成果を他方が利用する等）が確認された場合は、それを意味的依存として Wave 構成に反映する。比較対象の変更対象集合が取得不能またはファイル粒度に展開不能な子 Issue がある場合は比較を省略せず検出不能として報告し、無重複扱いしない
 - 既存オープン Issue とのスコープ重複を検知し、重複する子 Issue 生成をスキップまたはユーザー確認する
 - 初期 status は原則 pending とする
 
@@ -41,7 +41,7 @@ OU / Epic / Wave / Issue 階層の語彙意味の正規所有は v4-standard-lif
 
 - 構成確定後かつ GitHub Issue 作成前に構成検証（上限、依存維持、全割当）を実行する
 - 上限超過または構成不備を検出した場合は停止する（Issue を作成しない）
-- 検証項目: Epic サイズ上限、Wave 同時実行上限、必須依存の維持、全 operation_unit の割当完了
+- 検証項目: Epic サイズ上限、必須依存（意味的依存 DAG 整合）の維持、全 operation_unit の Wave 割当完了。「Wave 同時実行上限」の検査項目は Wave 構成純度の原則により存在しない
 
 ## Child Issue 本文の構成
 
@@ -75,6 +75,6 @@ Epic/Wave 構成判断は case-ready が所有する正規判断である（REQ-
 | 判断単位 | 質問形式 |
 |---|---|
 | Standard / Epic 確定（3軸判断の総合帰属） | choice（Standard・Epic）+ score（依存強度・Epic サイズ・機能的一貫性の各水準） |
-| Wave 構成判断（並列/ 直列、重複時の処置） | boolean（並列可否）+ choice（Wave 分離・変更対象分割・重複許容） |
+| Wave 構成判断（並列/ 直列、重複時の処置） | boolean（並列可否）+ choice（変更対象分割・重複許容） |
 | 既存オープン Issue とのスコープ重複判定 | boolean（重複の有無）+ choice（スキップ・ユーザー確認） |
 

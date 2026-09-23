@@ -78,7 +78,7 @@ const ROW_ANCHORS: Array<[string, string, RegExp]> = [
   ["REQ-061-007", REF_STRUCT_REL, /Standard \/ Epic 確定|Root Case 自身を単一 execution unit とする/],
   ["REQ-061-008", REF_STRUCT_REL, /連結成分（必須依存のみをエッジとする）/],
   ["REQ-061-009", REF_STRUCT_REL, /単独根（1 operation_unit だけの連結成分）は Epic 化せず/],
-  ["REQ-061-010", REF_STRUCT_REL, /Epic サイズ上限と Wave 同時実行上限/],
+  ["REQ-061-010", REF_STRUCT_REL, /Epic サイズ上限を実行安全境界として遵守/],
   ["REQ-061-011", REF_STRUCT_REL, /無関係な operation_unit 群を単一 Epic へ機械的に集約しない/],
   ["REQ-061-012", REF_STRUCT_REL, /構成推論の根拠を記録/],
   ["REQ-061-013", REF_STRUCT_REL, /実行方法（並列、直列）を技術的依存関係に基づいて明記/],

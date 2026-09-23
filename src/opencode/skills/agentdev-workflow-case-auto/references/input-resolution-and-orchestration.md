@@ -115,7 +115,7 @@ STEP-8（停止時報告）・STEP-8（完了報告）での所要時間算出�
 
 1. SSoT 再構成: 各工程の durable state（REQ/Decision/Design ファイル、Issue/PR、Epic Issue 本文）
 2. identifier 保持: Issue番号、PR番号、OU ID、draft パス、RU パス
-3. 最小 scalar: L1 工程別タイムスタンプ、stage 3 並列数（最大5件、起動間隔10秒。v4-runtime-execution-model Design「runtime 制御ループ」節〔起動間隔・並列数制御〕）
+3. 最小 scalar: L1 工程別タイムスタンプ、stage 3 共有 active Issue task 枠（上限 5、起動間隔10秒。v4-runtime-execution-model Design「runtime 制御ループ」節〔起動間隔・並列数制御〕）
 4. runtime artifact: なし（委譲工程内部の過程は親コンテキストに累積しない、command 不変条件）
 
 ### Preconditions
@@ -137,7 +137,7 @@ OU の統合・分割・REQ 操作分類・Issue 階層判定を再評価しな�
 |---|---|---|---|
 | stage 1 | case-open（再合意済み Definition 変更の例外経路時は case-revise） | 委譲起動 | stage 内最大並列（直列化要因のみ局所直列化） |
 | stage 2 | case-ready | 委譲起動 | stage 内最大並列（直列化要因のみ局所直列化） |
-| stage 3 | case-run | インライン実行（子 task 委譲は bg task 最大5件） | 並列（3つの「5件」文脈の (2) に該当） |
+| stage 3 | case-run | インライン実行（実装実行委譲は共有 active Issue task 枠、上限 5） | 並列（stage 3 全体で共有 active Issue task 枠を単一所有） |
 | stage 4 | case-close | 委譲起動 | stage 内最大並列（直列化要因のみ局所直列化） |
 
 各 orchestration stage は stage 内最大並列・stage 間全対象収束（fan-in）で進行し、対象ごとの縦切り pipeline としない。
@@ -159,18 +159,31 @@ stage 1（case-open）の収束条件には、全対象確立後の横断依存�
 横断依存検査の単独起動（case-open STEP-5）と case-auto 側の横断評価は二重実行とせず、case-auto 側評価は全対象確立を前提とした population 補完の位置づけである。
 
 順次フォールバック可能（command 不変条件）。
-並列起動時は委譲起動ごとに10秒の起動間隔を置き、同一Tool一括ブロックでの複数起動発行は行わない（v4-runtime-execution-model Design「runtime 制御ループ」節〔起動間隔・並列数制御〕）。起動間隔は stage 3（case-run 子 task 委譲）に限らず stage 1（case-open / case-revise 委譲）・stage 2（case-ready 委譲）・stage 4（case-close 委譲）の並列委譲起動にも同一に適用する。
+並列起動時は委譲起動ごとに10秒の起動間隔を置き、同一Tool一括ブロックでの複数起動発行は行わない（v4-runtime-execution-model Design「runtime 制御ループ」節〔起動間隔・並列数制御〕）。起動間隔は stage 3（case-run インライン実行の実装実行委譲）に限らず stage 1（case-open / case-revise 委譲）・stage 2（case-ready 委譲）・stage 4（case-close 委譲）の並列委譲起動にも同一に適用する。
 bg task 破棄検知時の3状態回復は `agentdev-workflow-orchestration` 参照。
+
+#### stage 3 runtime 制御契約（共有 active Issue task 枠）
+
+stage 3 の実行制御は case-auto が単一所有し、次の runtime 制御契約に従う（詳細は case-auto Design「runtime 制御契約」節と v4-runtime-execution-model Design「runtime 制御ループ」節）:
+
+1. **共有 active 枠**: 1 active task は 1 Issue への実装実行委譲であり、Epic・Wave・Standard Issue を横断して active Issue task 数が上限（5）を超えない。Epic・Wave・Standard Issue・case-run 呼出しごとの独立実行枠を設けない
+2. **空き枠補充**: active Issue task 数が上限未満の場合、各 Epic の現在 Wave と Standard Issue から開始条件を満たす Issue を横断して候補として認識し、実行上の安全条件を満たす候補がある限り補充する（横断補充は best-effort でなく必須）。最初に起動した全 task の完了を待つ固定 batch 方式を取らず、起動は実行進行中に継続する
+3. **状態管理**: Issue 実行の状態を pending、ready、active、実行結果確定で区別して管理する
+4. **再開**: 再開時は既存の active task を計上し、同一 Issue の二重起動と上限超過を防ぐ。状態不明の task は終了確認まで実行枠を解放せず、完了済み Issue を未完了に戻さない
+5. **統合処理**: 統合処理（マージ・クローズ相当）は active Issue task の実行枠を消費しないが、共有書き込みの直列化点として扱う
+6. **Wave 収束と依存充足**: Wave 収束（全子 Issue の実行結果確定、未処理・実行中・状態不明なし）と後続 Wave の依存充足（意味的依存条件の成立、必要な統合・マージの完了を含む）を区別し、次 Wave の開始は両方の成立を条件とする。blocked、failed、delegation-unavailable は収束には該当し得るが依存充足とはみなさない
+7. **重複の実行時検出**: stage 3 の委譲前に同一 Wave 内の子 Issue 間で変更対象ファイル集合の重複を検出し、一時直列化・変更対象の調整・merge 順序・衝突解消担当の判断に用いる。case-ready の重複前置検出の判断記録（競合リスク情報）を参照し、二重検査としない。変更対象集合が取得不能な子 Issue を含む場合は比較を省略せず検出不能として報告する
+8. **Wave 表現**: Wave 表現は子 Issue 数の上限を持たない（Epic サイズ上限のみ適用）。runtime 上の batch や一時直列化を Wave 分割として永続化しない
 
 #### Wave 反復制御（case-auto 直接制御、stage 3 内部処理）
 
 Epic execution_unit の Wave 反復は orchestration stage 3 の内部状態遷移処理であり、stage 4 の開始とみなさない（前述 orchestration stage モデル）。
 
 - Epic Issue 本文読み取りのみ（書き込みは case-close 単一書き手、`POL-epic-tracking-single-writer`）
-- 子Issue インライン case-run 並列実行 最大5件
+- 子Issue ごとのインライン case-run 実行は共有 active Issue task 枠（上限 5）で制御し、空き枠補充（横断必須・固定 batch 禁止）により起動を進行中に継続する（前述 stage 3 runtime 制御契約）
 - 委譲 → case-close(#epic)
-- 次 Wave 判定
-- blocked/ failed の扱い
+- 次 Wave 判定: Wave 収束と後続 Wave の依存充足の両条件 gate
+- blocked/ failed の扱い: 収束には該当し得るが依存充足とはみなさない
 
 #### 工程間の状態引き継ぎ
 
@@ -194,7 +207,7 @@ case-open の判定結果に従う。
 
 - 必須依存で結合した execution_unit 群は順次（stage 内の局所直列化。OU の必須依存は case-auto 実行契約の直列化要因であり、OU 逐次処理は orchestration stage モデルを置き換えない）
 - 必須依存のない execution_unit 群は並列（stage 開始時点で実行可能な全対象が起動時対象集合）
-- 3つの「5件」文脈の区別に注意
+- stage 3 の共有 active Issue task 枠（上限 5）は Epic・Wave・Standard Issue を横断して単一所有する（前述 stage 3 runtime 制御契約。execution_unit 全体並列との混同に注意）
 
 ### Result
 
@@ -244,7 +257,7 @@ case-open の判定結果に従う。
 - 不変条件（工程固有の詳細手順と case-auto 定義が矛盾する場合、工程固有処理は既存コマンド定義を優先）
 - 不変条件（case-auto は Issue 階層決定ロジックを持たない、複数 REQ doc または scale:large の場合は case-open のルールに委譲）
 - 不変条件（case-open / case-ready から後工程への状態引き継ぎ時、複数 REQ doc の保存結果をフィルタリングまたは再評価しない）
-- 不変条件（Epic Wave 実行時、Wave 反復制御、現在 Wave の ready 子Issue 選択、子Issue 並列委譲 最大5件 を直接担当、case-run(#epic) への委譲は行わない、各子Issue ごとにインライン case-run、Wave 境界のクローズは case-close(#epic) に委譲）
+- 不変条件（Epic Wave 実行時、Wave 反復制御、現在 Wave の ready 子Issue 選択、stage 3 共有 active Issue task 枠（上限 5）による空き枠補充・状態管理・再開時二重起動防止・Wave 収束と依存充足の両条件 gate・委譲前重複実行時検出 を直接担当、case-run(#epic) への委譲は行わない（legacy 経路は廃止済み）、各子Issue ごとにインライン case-run、Wave 境界のクローズは case-close(#epic) に委譲）
 - ガードレール（case-auto は独自の操作単位ステータス追跡を持たない、Epic Issue のステータス追跡テーブルを使用、Epic Issue 本文の書き込みは case-close 単一書き手、case-auto は読み取るのみ）
 - 不変条件（case-auto は操作単位キューの管理・制御のみを担い、OU 本文の抽出・変換・REQ 操作解釈を行わない）
 - 不変条件（case-auto は orchestration pre-reader として case-open 前のみ req_draft を読み込み、case-ready 成功後は invalid post-case reader として req_draft を読まない、case-ready 成功後の停止・再開・完了処理は Issue と Epic だけで成立、クリーンアップ検証ゲートは stage 2（case-ready）の対象群収束後・stage 3 開始前に実行し評価対象を stage 2 を正常完了した対象に限定、独自の OU 状態管理を持たない）

@@ -40,7 +40,7 @@ case-run (orchestration)
         └── result を case-run へ返却
 ```
 
-- **case-run 本体**: 単一 Issue または単一 Wave（Epic Issue 指定時、最大5件並列）で実行担当サブエージェントを委譲起動し、result を処理する。実装実行そのものは行わない。起動手段は AGENTS.md および references/harness-delegation.md 参照。
+- **case-run 本体**: 単一 Issue で実行担当サブエージェントを委譲起動し（委譲1件。Epic・Wave の実行制御は case-auto orchestration stage 3 が単一所有し、case-run に独立実行枠は存在しない）、result を処理する。実装実行そのものは行わない。起動手段は AGENTS.md および references/harness-delegation.md 参照。
 - **実行担当サブエージェント**: 外部実行基盤（AGENTS.md で選定）が提供するエージェント型。1 Issue あたり1起動。adapter skill（`agentdev-case-run-execution-adapter`）を読み込み、委譲 prompt 内で実行 command を起動する。仕様を再解釈、再設計しないアダプターである。
 - **実行 command（harness が提供）**: 委譲 prompt 内で指定される実行 command（skill ではない）。Issue を success criteria に分解、各 criterion に observable evidence を要求、品質ゲートを実行する。各ツール呼び出しの保護（timeout 等）は harness 側が提供する。command の具体名、起動手段は AGENTS.md および references/harness-delegation.md 参照。
 - **外部実行基盤（external execution boundary）**: 実行担当サブエージェントの背後で実行エンジンとして振る舞う外部実行境界。本境界は I/O 境界要件により I/O 境界 Design が正規所有し、case-run は自身で所有せず I/O 境界 Design へ委譲する。plan artifact 等の中間成果物の内部構造には依存しない。最終結果は **PR URL** で受領する（透明）。
@@ -137,7 +137,7 @@ case-run は background 委譲の起動直後消失を検知した場合、委�
    - Issue コメント（blocked / failed の SSoT）
 2. **実行未試行と判定した場合**: 同期実行による再委譲を行う（実行未試行のため result 状態は付かない。委譲起動不能時の `delegation-unavailable` とは区別する）
 3. **実行中断と判定した場合**: 継続の判断（継続指示または再委譲）も当該 durable state に基づく。git status の残留変更と PR 有無を根拠とし、会話コンテキストの推定で判断しない
-4. **フォールバック限定**: 同期実行への切替は消失検知時のフォールバックに限定する。委譲方式を常時同期化せず、並列委譲（最大5件）を維持する
+4. **フォールバック限定**: 同期実行への切替は消失検知時のフォールバックに限定する。委譲方式を常時同期化せず、実行並列制御（共有 active Issue task 枠）は case-auto orchestration stage 3 が単一所有する契約に従う
 
 ## 責務境界（非対象）
 

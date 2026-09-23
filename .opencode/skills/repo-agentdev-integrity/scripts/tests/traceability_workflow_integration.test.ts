@@ -303,16 +303,11 @@ describe("case-close QG-4 の3完全性再検査（REQ-021-018、REQ-021-025、R
 });
 
 describe("case-run cleanup 判定の producer 側パス認定（REQ-021-015、RA-009）", () => {
-  it("単一・Epic Wave の cleanup 判定が producer 側パス認定と表現形式非区別を記述する", () => {
-    for (const rel of [
-      "src/opencode/skills/agentdev-workflow-case-run/references/single.md",
-      "src/opencode/skills/agentdev-workflow-case-run/references/epic-wave.md",
-    ]) {
-      const content = read(rel);
-      expect(content.includes("implementation 役割かつ producer 側パス")).toBe(true);
-      expect(content.includes("対応関係の表現形式を区別せず")).toBe(true);
-      expect(content.includes("docs/ パスフィルタ")).toBe(false);
-    }
+  it("単一 Issue 実行の cleanup 判定が producer 側パス認定と表現形式非区別を記述する", () => {
+    const content = read("src/opencode/skills/agentdev-workflow-case-run/references/single.md");
+    expect(content.includes("implementation 役割かつ producer 側パス")).toBe(true);
+    expect(content.includes("対応関係の表現形式を区別せず")).toBe(true);
+    expect(content.includes("docs/ パスフィルタ")).toBe(false);
   });
 
   it("case-run SKILL.md が対応宣言の作成先を配布境界で決定することを記述する", () => {
