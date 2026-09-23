@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は32件、提案中の Decision は1件である。
+現行の承認済み Decision は33件、提案中の Decision は0件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -54,7 +54,7 @@
 | DEC-038 | ADF v4 durable state 配置と再構成の契約（状態権威・証跡分離・非原子調整原則） | accepted | 2026-09-19 |
 | DEC-039 | ADF v4 authority・副作用統制と冪等・並行性モデル | accepted | 2026-09-19 |
 | DEC-040 | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化） | accepted | 2026-09-22 |
-| DEC-041 | Wave 構成純度と実行並列上限の単一所有 | proposed | 2026-09-23 |
+| DEC-041 | Wave 構成純度と実行並列上限の単一所有 | accepted | 2026-09-23 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -99,12 +99,12 @@
 - [DEC-038](DEC-038.md)（ADF v4 durable state 配置と再構成の契約（状態権威・証跡分離・非原子調整原則））
 - [DEC-039](DEC-039.md)（ADF v4 authority・副作用統制と冪等・並行性モデル）
 - [DEC-040](DEC-040.md)（typesafe/Jev 先行評価の採用（Stage 1: 観測可能化））
+- [DEC-041](DEC-041.md)（Wave 構成純度と実行並列上限の単一所有）
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
-- [DEC-041](DEC-041.md)（Wave 構成純度と実行並列上限の単一所有）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
