@@ -182,3 +182,21 @@
 - **想定反映先**: agentdev-quality-gates/references/qg-4-final-acceptance.md「証跡の stdout・stderr 分離併退避」節（既定どおりであることの実証記録）
 - **関連**: Case #3085、QG-4 観点10、bun test 3 cwd 分割実行
 - **タグ**: `#bun-test` `#QG-4` `#証跡` `#stderr`
+
+---
+
+## check_changed_docs.ts の node --experimental-strip-types 経路が CJS/ESM 混在で不通（bun run 経路へ迂回）
+
+- **問題事象**: check_changed_docs.ts を node --experimental-strip-types で起動すると require is not defined in ES module scope で失敗する（scripts 側 package.json が type: module の一方でスクリプト内が CJS require 混在）
+- **発生局面**: 実装（Case #3083。PR #3094 Findings learning 候補から回収）
+- **検知方法**: checker 実行時の例外メッセージ確認（require is not defined in ES module scope）
+- **根本原因**: scripts 側 package.json type: module とスクリプト内 CJS require 混在により、checker 実行契約 Design「安定実行経路」の node 経路が本スクリプトに対して不通
+- **自律対応内容**: bun run 経路（spawnSync + stdout UTF-8 退避で flush 損失を防御）に迂回して targeted docs guard を合格
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（node 経路の復旧または経路記述の更新候補として本 entry に記録するのみ）
+- **横展開観点**: node --experimental-strip-types 経路を安定実行経路として記述する checker は、CJS require 混在スクリプトでの動作確認を経路記述時に実施する
+- **再発条件**: type: module 配下のスクリプトに CJS require が混在したまま node 経路で起動した場合
+- **予防策候補**: check_changed_docs.ts の require を ESM import へ移行、または checker 実行契約の経路記述を bun run 経路へ更新
+- **想定反映先**: checker 実行契約と検出基盤規則 Design「安定実行経路」節の経路記述更新
+- **関連**: Case #3083、PR #3094、.opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts
+- **タグ**: `#checker` `#node-strip-types` `#bun-run` `#ESM`
