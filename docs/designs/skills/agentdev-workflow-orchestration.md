@@ -34,7 +34,7 @@ case-run の状態機械、サブエージェントプロトコル、自律修�
 ## 現在の動作
 
 - case-run は常に1 Issue のみを処理
-- Epic 全体、Wave 一括実行は提供しない（case-auto、case-run #epic 責務）
+- Epic 全体、Wave 一括実行は提供しない（case-auto orchestration stage 3 責務。Epic Wave 実行モード（case-run #epic）は廃止済み）
 - worktree 内 `.opencode/` は空（ジャンクション未伝播）であることを必須項目として明記
 - ジャンクション依存の整合性検査を回避
 

@@ -164,7 +164,7 @@ Wave 構成の読み取り、現在 Wave 判定、fan-out/fan-in、子 Issue 並
 
 - public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、case-auto の orchestration による Workflow Skill load 時に本 Design が読み込まれる（DEC-010。第4段以降は command 定義の実行時投影ではなく直接読込）。
 - workflow 実装本体は Workflow Skill（`agentdev-workflow-case-run`）が所有し、本 Design は内部手順、STEP 構成、reference 構成を複製しない。
-- case-run の Workflow Skill は、単一 Issue 実行（single workflow）と Epic Wave 実行（epic-wave workflow）の2 workflow 構成に分離される（DEC-010 の 1:N 分割基準の適用。operation 差ではなく制御構造の実質差異による分割）。両 workflow の実行契約差異（target cardinality、parallelism、fan-out・fan-in、child task recovery、partial result、Wave-level completion の6軸）は Workflow Skill が所有する。
+- case-run の Workflow Skill は、単一 Issue 実行（single workflow）のみを所有する（REQ-031-015、DEC-041）。かつて single workflow と epic-wave workflow の2 workflow 構成に分離されていた構造は、Epic Wave 実行モード（case-run #epic）の実行契約廃止により single workflow へ収斂した。旧 epic-wave workflow が所有していた実行契約差異6軸（target cardinality、parallelism、fan-out・fan-in、child task recovery、partial result、Wave-level completion）の実行契約は case-auto orchestration stage 3 へ移転済みであり、Workflow Skill は保持しない（`<workflows/workflow-skill-model>` Design「1:N 分割基準の適用実例（case-run）」参照）。
 - Workflow Skill の単独起動防止（soft guard）は、case-auto orchestration の委譲制御と Workflow Skill description の DO NOT USE FOR トリガーにより実効する。case-auto が case-run をインライン実行する場合も同一の Workflow Skill を正規情報源として読み込む。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
@@ -283,7 +283,7 @@ case-run の実行担当（委譲内サブエージェント）は、対象要�
 <!-- ADF-COVERS(design): REQ-021-030 -->
 本節の coverage 突合の運用詳細（役割フィルタ、producer 側パス認定、sidecar と inline の同一扱い、除去後の後置検査）が REQ-021-030 を実装する。
 
-case-run の実行担当（委譲内サブエージェント）が、実装作業で配布物本体に残存する ADF-COVERS 宣言の除去を扱う場合、配布物本体の ADF-COVERS 宣言は producer 側のトレーサビリティ metadata であり、対応関係の移行先（docs 配下の正規成果物の inline 宣言、または repository top-level の `traceability/` 配下の sidecar）が成立していることを条件に除去する。single workflow（STEP-S4 の委譲）と epic-wave workflow（STEP-W3 の各子Issue 委譲）の双方に同じ条件を適用する。
+case-run の実行担当（委譲内サブエージェント）が、実装作業で配布物本体に残存する ADF-COVERS 宣言の除去を扱う場合、配布物本体の ADF-COVERS 宣言は producer 側のトレーサビリティ metadata であり、対応関係の移行先（docs 配下の正規成果物の inline 宣言、または repository top-level の `traceability/` 配下の sidecar）が成立していることを条件に除去する。single workflow（STEP-S4 の委譲）に同じ条件を適用する。
 
 - 除去可否判定の coverage 突合では、coverage 出力から implementation 役割かつ producer 側パス（docs/ 配下の正規成果物の inline 宣言、または repository top-level の `traceability/` 配下 sidecar の登録分）の対応関係を集約済み実装対応として認定する。coverage は sidecar と inline declaration を同じ論理的な対応関係として返すため、突合は対応関係の表現形式を区別せずに行う。役割フィルタの適用は必須であり、design 役割・verification 役割の対応関係は集約済み実装対応として扱わない
 - 対象要件について implementation 役割かつ producer 側パスの対応が確認できない配布物本体の宣言は除去可と判定せず、対応関係の移行先（sidecar または producer 側正規成果物）を成立させた上で除去する
