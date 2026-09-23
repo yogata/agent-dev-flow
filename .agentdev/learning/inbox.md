@@ -290,3 +290,21 @@
 - **想定反映先**: agentdev-quality-gates references qg-4-final-acceptance.md「fail 由来分類」節、agentdev-git-worktree worktree-operations.md の bun test 実行環境前提
 - **関連**: Case #3086、Case #3085（baseline 更新元 main merge 610fafd5）、.opencode/skills/repo-agentdev-integrity/baselines/ir-055-baseline.json
 - **タグ**: `#IR-055` `#baseline` `#worktree` `#由来分類` `#bun-test`
+
+---
+
+## 閉じた choice 判断の候補集合は正解クラスを尽くさないと意味評価器が最近似候補へ高確率で張り付き分布は候補欠落を通知しない
+
+- **問題事象**: 2026-09-24 の req-define 7 RU 一括実行（RU-0122〜0128 → Case #3083〜#3089）における Jev 観測14 JSON・55判断のうち、req-define レーンの corrected 10判断中7判断が同一構造だった。既存REQ照合判断（STEP-3）の choice 候補集合に「REQ操作なし（realization 作業のみ）」が存在せず、Jev が最近似の UPDATE/APPEND を選び（top 0.9/0.96/0.99 を含む高確率）、LLM が「REQ操作なし」へ是正した。一方 2026-09-22 観測（20260922T134720Z-61b9、RU-0127）では none_req_impact が候補に存在し top 1.00 で unchanged であり、同一契約下で質問構成（候補集合）が run 間で変動し、是正率が候補構成の偶発に左右されることが判明した
+- **発生局面**: 運用（req-define 7 RU 一括実行の Jev 先行評価観測。Stage 1 Jev 観測分析）
+- **検知方法**: Stage 1 Jev 観測分析（14 JSON・55判断の corrected 分布集計で7判断の同一構造性を検出し、候補集合の run 間比較で候補欠落と是正の相関を確認）
+- **根本原因**: STEP-3 既存REQ照合判断の choice 候補集合が、契約側（requirement-development.md の STEP-3 質問形式表「choice（CREATE・APPEND・UPDATE）」）で「REQ操作なし」系の正解クラスを含まず正解クラスを尽くしていなかった。閉じた choice 構成では候補が欠落しても意味評価器の分布（top・margin）は候補欠落を通知しないため（closed-looking construction）、最近似候補への高確率張り付きが発生し、正解が是正に依存する構造になった。加えて同一契約下で候補構成が run 間で変動しており、是正率が候補構成の偶発に左右されていた
+- **自律対応内容**: LLM 最終判断が「REQ操作なし」へ是正して判断を救済した（corrected として観測記録）。分析段階で7判断の同一構造性を検出し、この種のは正（false positive 的選択）は判断器の誤りではなく判断構成側（候補集合）の欠陥として分類した
+- **ユーザー確認有無**: なし（Stage 1 Jev 観測分析由来のエージェント抽出知見。正規投入指示のみ）
+- **Decision/REQ/spec影響**: 候補: src/opencode/skills/agentdev-workflow-req-define/references/requirement-development.md の STEP-3 質問形式表（choice 候補集合）。反映判断は learning-promote 以降に委ねる
+- **横展開観点**: agentdev_jev evaluate で choice 形式質問を構成する全 workflow（learning-promote、req-define、case-ready、intake-promote、inspect-promote、backlog-review の6系統）に適用する。閉じた choice 判断を構成する際は候補集合が正解クラスを尽くすこと、特に「何もしない・対象外・影響なし」系の正解（NULL 候補）を除外しないことを構成規則とする
+- **再発条件**: 閉じた choice 判断の候補集合に正解クラス（特に「操作なし・対象外・影響なし」系）が含まれないまま質問を構成した場合。意味評価器は最近似候補へ高確率で張り付き、分布の top・margin は候補欠落を通知しないため検知困難
+- **予防策候補**: choice 質問構成時の候補完備性チェック（正解クラスの網羅確認、NULL 候補の含む/含まないの明示判断）を Jev 質問構成手順へ明記する。候補欠落由来のは正は判断器精度の劣化として集計しない（判断構成側の欠陥として分類する）運用ルールを Jev 観測評価に設ける
+- **想定反映先**: src/opencode/skills/agentdev-workflow-req-define/references/requirement-development.md（STEP-3 質問形式表の候補集合）、Jev 評価の質問構成規約を所有する箇所（agentdev_jev 契約文書または各 workflow skill の Jev 質問構成 reference）
+- **関連**: .agentdev/jev-observations/20260923T150333Z-281e.json、20260923T150426Z-bee6、20260923T150431Z-66a3、20260923T150522Z-9e05、20260923T150655Z-ba81、20260923T151003Z-083f、20260923T151417Z-76e4（commit 57561bcc、REQ-090-006）、20260922T134720Z-61b9（RU-0127 比較対照）、hermes-vault ideas/2026-09-23-jev-semantic-observation-integrated-evaluation.md §9.2.2、RU-0122〜0128、Case #3083〜#3089
+- **タグ**: `#Jev` `#choice候補` `#候補完備性` `#req-define` `#判断構成`
