@@ -1,9 +1,9 @@
 # inspect promoted 20260923T050218Z
 
-> 本ファイルは inspect-promote（2026-09-23 実施、/agentdev/backlog-auto stage 2 inspect レーン経由、--auto なし）の promote 採用済み成果物である。元 finding: `.agentdev/inspect/inbox/inspect-docs-finding-20260923T050218Z.md`（同 finding の GUIDE-1 は HITL 審議中のため本ファイルに含まない。既知 defer 5件は inbox 残置）。
+> 本ファイルは inspect-promote（2026-09-23 実施、/agentdev/backlog-auto stage 2 inspect レーン経由、--auto なし）の promote 採用済み成果物である。元 finding: `.agentdev/inspect/inbox/inspect-docs-finding-20260923T050218Z.md`（GUIDE-1 のユーザー承認により全件 promote 確定したため、promote 処分の inbox 削除契約に従い元 finding ファイルは inbox から削除済み。本ファイルが分類・承認の正の記録。既知 defer 5件は各残置ファイルに inbox 残置）。
 >
-> 分類確定: promote 2件（README-1、REQ-1。いずれも自律確定）/ HITL 1件（GUIDE-1、inbox 残置・ユーザー判断待ち）/ 既存 defer 継続 5件（F-04/F-05/GUIDE-6/F-10/F-12、自律確定）。
-> 対論型レビュー: in-context 審議（2系統独立反証 → counter-challenge → convergence → convergence audit）。README-1/REQ-1 への反証4件はすべて棄却。GUIDE-1 のみ unresolved（HITL 移送）。
+> 分類確定: promote 3件（README-1、REQ-1 は自律確定 / GUIDE-1 はユーザー承認による確定）/ 既存 defer 継続 5件（F-04/F-05/GUIDE-6/F-10/F-12、自律確定）。
+> 対論型レビュー: in-context 審議（2系統独立反証 → counter-challenge → convergence → convergence audit）。README-1/REQ-1 への反証4件はすべて棄却。GUIDE-1 は unresolved 1件として HITL 移送ののち、ユーザー判断で promote 確定（下記 GUIDE-1 の承認証跡参照）。
 > Jev 先行評価（vercel-ai-gateway / typesafe-ai/jev、観測 20260923T054728Z-4f4a）: 暫定分類妥当性 true（p=0.84）、defer 継続確信度 高い確信（0.82）。LLM 判断と一致（補正なし、confidence 0.83）。
 
 ## README-1: docs/README.md の Decision 索引が DEC-041 を未反映（索引乖離 DRIFT）
@@ -29,3 +29,17 @@
 - **ng_classification**: pre-existing（2026-07-27 の commit 7bdfe281 由来、少なくとも 2026-09-01 以降の inspect サイクルで未検出のまま残置）
 - **req-define入力案**（cleanup モデル RETIRE 適用候補）: REQ-001.md:83 の検証履歴 HTML コメント1行を除去する。証跡は Issue #1813 と git 履歴（commit 7bdfe281）に残存するため情報欠損しない。処置実行は後続 Case の責務
 - **adversarial-review**: 反証1「document-model の保持禁止は Design 限定で REQ への直接規定ではない」→ REQ-001-003 自体が検証実行結果・作業履歴を REQ 側の記述対象外とし、REQ-012-035/REQ-021-019 が実行結果の正規配置を Issue/PR/QG 側に定めるため棄却。反証2「検証結果の参照として有用」→ 証跡は Issue #1813 側に正規配置済みで REQ 内重複保持の必要性がないため棄却
+
+## GUIDE-1: req-case-flow.md の case-run「3フェーズ構成」表記が正規フェーズ名と不一致
+
+- **disposition**: promote（2026-09-23 ユーザー承認による確定。STEP-6 HITL 照会に対する選択 A）
+- **approval_provenance**: ユーザー判断 2026-09-23 15:49 JST（選択 A「promote 採用」、interaction 種別 clarify）。ユーザー明示の判断根拠: フェーズ名の乖離は機械検証済みの事実であり、修正は局所範囲であること。本承認により STEP-6 の HITL フォールバックが解決し、STEP-7 処理実行（本保存）へ進んだ。
+- **category**: guides 意味診断 / 横断契約矛盾（軽微）
+- **target**: docs/guides/req-case-flow.md:63（「3フェーズ構成でべき等な再開ポイントを提供する」）、:71-75（3フェーズ構成表: 準備〔Issue 読取り、worktree 作成、Plan 策定〕/ 実装 / 提出）
+- **evidence**: case-run の正規 3フェーズは「準備・委譲・クリーンアップ」（`agentdev-workflow-case-run` SKILL L41「準備・委譲・クリーンアップの3フェーズを順次実行する」現物確認、STEP-S1〜S6 構成）。ガイド表の「Plan 策定」は case-run 本体 STEP に存在せず、実装方針の形成は adapter 委譲内へ移転済み（REQ-015-010「case-run 本体は実装方針を生成・審査せず…agentdev-case-run-execution-adapter の委譲契約内」現物確認）。同ファイル L84 に「現行の case-run STEP 構成…の正は、REQ-031（case-run 実行契約）と `agentdev-workflow-orchestration` スキルが所有する」の正規 delegation 文あり
+- **severity**: low / **confidence**: medium
+- **source_of_truth**: REQ-031（case-run 実行契約）・`agentdev-workflow-case-run` SKILL（準備・委譲・クリーンアップ）を正とし、ガイドのフェーズ名・工程内容の不一致を検出事項とする
+- **ng_classification**: pre-existing（v4 single workflow 収斂（commit 86adcab2 前後）以降の表記）
+- **adversarial-review**: 2系統独立反証で promote 主張側（案内層として正確性を損なう）と L84 正規 delegation 文による概要許容側の反証が互いに決定打ちせず、unresolved 1件として収束せず → HITL 移送（採否の意味判断）。自律確定を見送った理由は、解釈の余地（概要許容 vs 同期要 vs 対応不要）が採否を左右する意味判断だったため。ユーザー判断により解釈の余地は解消
+- **hitl決定記録**: 2026-09-23 HITL パケットで提示した選択肢 (A) promote 採用 / (B) defer（inbox 残置・次回再評価）/ (C) reject（概要表現として許容・即時削除）のうち (A) を選択。(B)(C) は不採用。
+- **req-define入力案**（ユーザー選択 A の適用範囲）: docs/guides/req-case-flow.md の case-run 節（L63・L69-75 の3フェーズ構成表）を正規フェーズ構成（準備・委譲・クリーンアップ）へ同期し、委譲内サブエージェント作業（Plan 策定、実装、テスト、docs/designs 整合性確認等）が 委譲フェーズに対応することの注記を併記する。実装方針形成が adapter 委譲契約内（REQ-015-010）にある旨を案内文として明記。修正は当該ガイドファイルの局所範囲に限定（ユーザー判断根拠どおり）。実修正は後続の RU 化（backlog-review → req-define → case）経由で実施
