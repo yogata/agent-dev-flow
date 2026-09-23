@@ -79,7 +79,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-040 の39件である（DEC-002、DEC-005、DEC-007、DEC-015、DEC-017、DEC-029、DEC-030 は superseded、proposed は 0 件）。
+現行 Decision は DEC-001 から DEC-041 の40件である（DEC-002、DEC-005、DEC-007、DEC-015、DEC-017、DEC-029、DEC-030 は superseded、proposed は 0 件）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
@@ -123,6 +123,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-038](decisions/DEC-038.md) | ADF v4 durable state 配置と再構成の契約（状態権威・証跡分離・非原子調整原則） |
 | [DEC-039](decisions/DEC-039.md) | ADF v4 authority・副作用統制と冪等・並行性モデル |
 | [DEC-040](decisions/DEC-040.md) | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化） |
+| [DEC-041](decisions/DEC-041.md) | Wave 構成純度と実行並列上限の単一所有 |
 
 ## 設計（Design）
 
