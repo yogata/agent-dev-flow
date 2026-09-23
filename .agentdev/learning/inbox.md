@@ -92,3 +92,21 @@
 - **想定反映先**: .opencode/skills/agentdev-git-worktree/references/worktree-operations.md（worktree 構造的制約・依存整備の節）
 - **関連**: PR #3082 検証差分、QG-4 依存パッケージ前置
 - **タグ**: `#bun-test` `#worktree` `#junction` `#依存整備`
+
+---
+
+## agentdev_gh は harness 起動環境でリポジトリ解決が壊れていると全操作が fail-closed 不能になる（AGENTDEV_GH_REPO 起動環境設定が対処）
+
+- **問題事象**: agentdev_gh の全操作（読み取り・書込みとも）が config-uninterpretable「cannot resolve the target repository」で確定失敗した。detail は「AGENTDEV_GH_REPO environment variable (not set)」「gh repo view exitCode=66」「stderr cause: (empty)」。同一セッションの bash からは `gh repo view` が正常（yogata/agent-dev-flow を返し exit 0）、`bun -e` からの spawnSync('gh') も status 0 で正常であり、呼出引数側の誤りではない
+- **発生局面**: 運用（case-auto stage-1 case-open の並列委譲実行。RU-0123 draft の Root Case 確立 STEP-2 直前の冪等検出）
+- **検知方法**: agentdev_gh issue_list 操作の config-uninterpretable（retryable: false）応答（3回同一失敗で確定的と判断）
+- **根本原因**: harness プロセス（OpenCode サーバ）の起動環境に AGENTDEV_GH_REPO が未設定であり、かつ harness プロセス内の spawnSync('gh') が exit 66・stderr 空で失敗する（bash 経由では再現しないプロセス環境差。PATH 解決差や shim 差が疑われるが harness 内からは詳細不明）。plugin はリポジトリ解決を環境変数 → gh repo view の順で行い、解決不能時は全操作を fail-closed で失敗させる（仕様どおりの動作）
+- **自律対応内容**: (1) 同一操作の再試行2回（同失敗）、(2) bash セッションへの AGENTDEV_GH_REPO export（Tool プロセスへは継承されず無効と実証）、(3) bun spawnSync 実証による bash 正常・harness 異常の切り分け、(4) 冪等検出のみ skill 契約どおり gh CLI 読取 fallback で完了（open Case Issue 0 件、open PR 0 件を確認）。書込み操作は raw gh 代替を禁止契約により行わず、Root Case 作成を停止して報告
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（plugin の fail-closed 契約と gh 読取 fallback 契約は仕様どおり機能。起動環境の運用問題であり契約変更不要）
+- **横展開観点**: agentdev_gh を使う全 workflow（case-open/ready/run/close、issue、intake-from-github 等）で同様の全操作不能が起こり得る。読取 fallback は冪等検出限定で書込みは代替不能のため、バッチ投入前の前提として「harness プロセスと同一環境で gh 解決が通ること、または AGENTDEV_GH_REPO 設定済みであること」の疎通確認が有効
+- **再発条件**: AGENTDEV_GH_REPO 未設定の launcher で harness を起動し、かつ harness プロセス環境で gh 実行解決が壊れている場合の全 agentdev_gh 呼出
+- **予防策候補**: case-auto の投入前前提確認に「agentdev_gh の軽量 read 操作1件による解決疎通確認」を追加する。launcher 側は plugin README の導線（AGENTDEV_GH_REPO を起動環境へ設定）に従う
+- **想定反映先**: docs/guides/consumer-project-setup.md「AGENTDEV_GH_REPO の起動環境設定」節（自ホスト環境での周知追記候補）、agentdev-workflow-case-auto（投入前前提確認の追加候補）
+- **関連**: .opencode/plugins/agentdev-gh-tool/plugin.ts（resolveRepoFromGh、defaultResolveRepo）、.agentdev/drafts/req-draft-checker-base-ref-help-wording.md（RU-0123。Root Case 未作成のまま停止）
+- **タグ**: `#agentdev-gh` `#リポジトリ解決` `#fail-closed` `#起動環境` `#AGENTDEV_GH_REPO`
