@@ -1,0 +1,285 @@
+{
+  "observationId": "20260922T113002Z-5f4d",
+  "durationMs": 1526,
+  "inputTokens": 4465,
+  "inputs": {
+    "references": [
+      {
+        "digest": "6f0fb1b9f9f4dc29e1318b7079f747d687da44f0037ded528fdedb76cbd674b5",
+        "label": "inbox-item1-artifact-actions",
+        "path": ".agentdev/intake/inbox/intake-draft-artifact-actions-row-structure.md"
+      },
+      {
+        "digest": "49d6b82a434dab5107e882f12ec491b015d998b564bb322f9d3e49f51f2a82f5",
+        "label": "inbox-item2-known-gap-registry",
+        "path": ".agentdev/intake/inbox/intake-checker-known-gap-registry.md"
+      },
+      {
+        "digest": "35e4afe5e908e6eff9bf93ddc286a9c00c94ea2b10e5076a50ad0ef97e3ed4da",
+        "label": "inbox-item3-gh-tool-repo-resolution",
+        "path": ".agentdev/intake/inbox/intake-gh-tool-repo-resolution-failure.md"
+      },
+      {
+        "digest": "38654cf59da12dee55b07c52216c48e2288fe9d32c9effe10517896f44ede982",
+        "label": "inbox-item4-jev-verification-followup",
+        "path": ".agentdev/intake/inbox/intake-jev-ts001-ts010-real-env-verification.md"
+      }
+    ],
+    "requestDigest": "4dc2aff916ba04c74932b48bc6d039fc543cd6671c35e861f2c87ace5fc60784",
+    "snapshot": "3回のJev先行評価（item評価 score 12問、暫定分類 choice 4問、adversarial-review 発動 boolean 1問）。LLM最終判断: item1〜3 採用（review 収束後確定）、item4 は adversarial-review で未解決争点（観測陳腐化と後続ルート適合）のため HITL 移送。accepted finding: item1 は TS-011 残留の解消済み確認を採用根拠から除外し手順欠落を根拠に修正、item2/3 は実装確認事実で根拠補強、item3 は learning 成果物との統合必須を明記。"
+  },
+  "judgmentKind": "intake-promote-classification-judgment",
+  "judgments": [
+    {
+      "confidence": 0.6129713804713804,
+      "jevResult": 3.06,
+      "judgmentId": "item1-validity",
+      "llmFinalJudgment": "高い（case-open が機械的補正を要した構造精度問題。突合手順の不在は機械確認済み）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "きわめて低い": 0,
+        "低い": 0,
+        "中程度": 0.05,
+        "高い": 0.83,
+        "非常に高い": 0.12
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.6129713804713804,
+      "jevResult": 2.26,
+      "judgmentId": "item1-impact",
+      "llmFinalJudgment": "中程度（req-define 全実行の draft 精度に影響。直接の runtime 障害ではない）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "きわめて低い": 0,
+        "低い": 0.11,
+        "中程度": 0.53,
+        "高い": 0.36,
+        "非常に高い": 0
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.6129713804713804,
+      "jevResult": 2.48,
+      "judgmentId": "item1-urgency",
+      "llmFinalJudgment": "高い（次回 req-define 実行で再発し得る。case-open 側補正の継続コスト）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "きわめて低い": 0,
+        "低い": 0.07,
+        "中程度": 0.38,
+        "高い": 0.54,
+        "非常に高い": 0.01
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.6129713804713804,
+      "jevResult": 3.15,
+      "judgmentId": "item2-validity",
+      "llmFinalJudgment": "高い（REQ-087-002 義務との構造的衝突を実装レベルで確認済み）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "きわめて低い": 0,
+        "低い": 0,
+        "中程度": 0.03,
+        "高い": 0.78,
+        "非常に高い": 0.19
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.6129713804713804,
+      "jevResult": 1.98,
+      "judgmentId": "item2-impact",
+      "llmFinalJudgment": "中程度（checker 偽陽性 NG による信頼性・運用コスト影響）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "きわめて低い": 0,
+        "低い": 0.24,
+        "中程度": 0.54,
+        "高い": 0.22,
+        "非常に高い": 0
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.6129713804713804,
+      "jevResult": 2.5,
+      "judgmentId": "item2-urgency",
+      "llmFinalJudgment": "中程度（既発生 NG は記録・許容済み。今後の欠番記録ごとに再発する構造問題）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "きわめて低い": 0,
+        "低い": 0.0909090909090909,
+        "中程度": 0.3333333333333333,
+        "高い": 0.5656565656565656,
+        "非常に高い": 0.0101010101010101
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.6129713804713804,
+      "jevResult": 1.71,
+      "judgmentId": "item3-validity",
+      "llmFinalJudgment": "高い（実行 2 回再現、learning 側でも同根確認。Jev 低評価は検証事実により修正）",
+      "llmTreatment": "corrected",
+      "probabilityDistribution": {
+        "きわめて低い": 0.02,
+        "低い": 0.4,
+        "中程度": 0.44,
+        "高い": 0.14,
+        "非常に高い": 0
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.6129713804713804,
+      "jevResult": 1.41,
+      "judgmentId": "item3-impact",
+      "llmFinalJudgment": "中程度（該当環境では全 workflow の書込み操作が毎回 blocked となる）",
+      "llmTreatment": "corrected",
+      "probabilityDistribution": {
+        "きわめて低い": 0.06,
+        "低い": 0.55,
+        "中程度": 0.32,
+        "高い": 0.07,
+        "非常に高い": 0
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.6129713804713804,
+      "jevResult": 1.4,
+      "judgmentId": "item3-urgency",
+      "llmFinalJudgment": "中程度（環境変数設定という運用回避が存在するが導線が未文書化）",
+      "llmTreatment": "corrected",
+      "probabilityDistribution": {
+        "きわめて低い": 0.04,
+        "低い": 0.59,
+        "中程度": 0.31,
+        "高い": 0.06,
+        "非常に高い": 0
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.6129713804713804,
+      "jevResult": 1.89,
+      "judgmentId": "item4-validity",
+      "llmFinalJudgment": "中程度（capture 時点は妥当。review 後は case-ready 系 1 系統分の確認のみが残存価値）",
+      "llmTreatment": "corrected",
+      "probabilityDistribution": {
+        "きわめて低い": 0.01,
+        "低い": 0.29,
+        "中程度": 0.51,
+        "高い": 0.19,
+        "非常に高い": 0
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.6129713804713804,
+      "jevResult": 1.18,
+      "judgmentId": "item4-impact",
+      "llmFinalJudgment": "中程度（Jev 有効性評価〔Issue B〕の入力、QG-4 warn 処分の恒久記録）",
+      "llmTreatment": "corrected",
+      "probabilityDistribution": {
+        "きわめて低い": 0.06,
+        "低い": 0.71,
+        "中程度": 0.22,
+        "高い": 0.01,
+        "非常に高い": 0
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.6129713804713804,
+      "jevResult": 0.94,
+      "judgmentId": "item4-urgency",
+      "llmFinalJudgment": "低い（blocker なし。将来の case-ready Epic 実行で自然に確認可能）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "きわめて低い": 0.15,
+        "低い": 0.77,
+        "中程度": 0.08,
+        "高い": 0,
+        "非常に高い": 0
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.8,
+      "jevResult": "採用",
+      "judgmentId": "cls-item1",
+      "llmFinalJudgment": "採用（具体的修正対象あり。TS-011 残留部分は review で解消済み確認につき採用根拠から除外し、手順欠落を根拠に修正）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "採用": 0.99,
+        "保留": 0.01,
+        "却下": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.8,
+      "jevResult": "採用",
+      "judgmentId": "cls-item2",
+      "llmFinalJudgment": "採用（構造的衝突は実装確認済み。alloc-req-number.ts との単一情報源化）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "採用": 0.99,
+        "保留": 0.01,
+        "却下": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.8,
+      "jevResult": "採用",
+      "judgmentId": "cls-item3",
+      "llmFinalJudgment": "採用（learning 成果物の受け入れ条件が統合判定を前提し、promoted 経由のみが統合成立経路）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "採用": 0.65,
+        "保留": 0.31,
+        "却下": 0.04
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.8,
+      "jevResult": "保留",
+      "judgmentId": "cls-item4",
+      "llmFinalJudgment": "採用（STEP-1 暫定。adversarial-review で未解決争点〔観測陳腐化と後続ルート適合〕のため HITL 移送へ修正）",
+      "llmTreatment": "corrected",
+      "probabilityDistribution": {
+        "採用": 0.39,
+        "保留": 0.57,
+        "却下": 0.04
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.93,
+      "jevResult": true,
+      "judgmentId": "review-trigger",
+      "llmFinalJudgment": "true（発動。skip 条件非該当: inbox 4件で意味的決定あり）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.07,
+        "true": 0.93
+      },
+      "questionForm": "boolean"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "5ecc631afeefdb5347772fcb6ea1c8a2693e66e0",
+  "subject": "intake-promote（backlog-auto run3 stage 2）2026-09-22 inbox 4件の item 評価・暫定分類と review 発動条件の判定",
+  "workflow": "intake-promote"
+}

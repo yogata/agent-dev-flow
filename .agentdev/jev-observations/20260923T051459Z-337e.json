@@ -1,0 +1,130 @@
+{
+  "observationId": "20260923T051459Z-337e",
+  "durationMs": 997,
+  "inputs": {
+    "references": [
+      {
+        "digest": "c6a83956e85e4b7b56ffaeac0e6cba1dd0c3fb9a16b52fa9f31cbe913364b545",
+        "label": "learning-inbox-20260923-4entries",
+        "path": ".agentdev/learning/inbox.md"
+      }
+    ],
+    "requestDigest": "5c5ffd4298337d0a9acd1524776efb74287ebb91d19a445f10cdb992cb97c926",
+    "snapshot": "Jev evaluate 1回（8問: 問題クラス1〜4の disposition choice 4問 + 昇華可能性 boolean 4問）。requestDigest は state・instructions・questions の構成 JSON（判断入力本体）の sha256。LLM 最終判断: pc1 promote / 昇華 false、pc2 promote / true、pc3 promote / true、pc4 promote / true（全問 Jev 結果と一致、unchanged）。pc1 昇華 false は恒久契約昇華の観点で、処分としては既存対策更新（checker ヘルプ文言修正）の採用済み成果物生成と両立。"
+  },
+  "judgmentKind": "sublimation-judgment",
+  "judgments": [
+    {
+      "confidence": 1,
+      "jevResult": "promote",
+      "judgmentId": "pc1-disposition",
+      "llmFinalJudgment": "promote（処分区分5 fix gap: checker ヘルプ文言修正。case-run STEP-S3-4 は既に正典化済みのため残存ギャップはヘルプ文言）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "defer": 0,
+        "duplicate": 0,
+        "promote": 1,
+        "reject": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.64,
+      "jevResult": false,
+      "judgmentId": "pc1-sublime",
+      "llmFinalJudgment": "false（恒久契約昇華なし。ただし checker ヘルプ文言修正の反映対象として採用済み成果物生成は有効）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.64,
+        "true": 0.36
+      },
+      "questionForm": "boolean"
+    },
+    {
+      "confidence": 0.94,
+      "jevResult": "promote",
+      "judgmentId": "pc2-disposition",
+      "llmFinalJudgment": "promote（処分区分5 fix gap: worktree-operations.md L172 節は checker 系のみで plugins 系 gate は未カバー）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "defer": 0.03,
+        "duplicate": 0.03,
+        "promote": 0.94,
+        "reject": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.6,
+      "jevResult": true,
+      "judgmentId": "pc2-sublime",
+      "llmFinalJudgment": "true（配布 skill reference への plugins 系 gate 手順整備は恒久性を持つ）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.4,
+        "true": 0.6
+      },
+      "questionForm": "boolean"
+    },
+    {
+      "confidence": 1,
+      "jevResult": "promote",
+      "judgmentId": "pc3-disposition",
+      "llmFinalJudgment": "promote（処分区分4 project knowledge: 同一形式リーダー複製 + 対決テストパターンの知識文書化）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "defer": 0,
+        "duplicate": 0,
+        "promote": 1,
+        "reject": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.86,
+      "jevResult": true,
+      "judgmentId": "pc3-sublime",
+      "llmFinalJudgment": "true（再利用可能な判断知識として docs/knowledge/ 知識文書候補）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.14,
+        "true": 0.86
+      },
+      "questionForm": "boolean"
+    },
+    {
+      "confidence": 1,
+      "jevResult": "promote",
+      "judgmentId": "pc4-disposition",
+      "llmFinalJudgment": "promote（処分区分5 fix gap: issue-management の Issue 検索安全手順不在）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "defer": 0,
+        "duplicate": 0,
+        "promote": 1,
+        "reject": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.73,
+      "jevResult": true,
+      "judgmentId": "pc4-sublime",
+      "llmFinalJudgment": "true（issue-management 手順整備と labels 論理値明記の反映先候補）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.27,
+        "true": 0.73
+      },
+      "questionForm": "boolean"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "9cf787b0994d7676a81ef71ec251607507d02bdc",
+  "subject": "learning-promote 昇華判定 2026-09-23 実行（inbox 4エントリ・4問題クラス）",
+  "workflow": "learning-promote"
+}

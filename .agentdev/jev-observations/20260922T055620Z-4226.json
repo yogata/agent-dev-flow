@@ -1,0 +1,52 @@
+{
+  "observationId": "20260922T055620Z-4226",
+  "durationMs": 562,
+  "inputTokens": 1567,
+  "inputs": {
+    "references": [
+      {
+        "digest": "e9951f3565b4b863b134f37705e5ecac503619cbbfa890eb8d60b5c01c182811",
+        "label": "採用済み成果物（DIST-1: pr_desc.md の壊れた Design 相対リンク 2件）",
+        "path": ".agentdev/inspect/promoted/2026-09-22-pr-desc-broken-design-links.md"
+      }
+    ],
+    "requestDigest": "d575310cab788afa9bcf004347a54dabfd336f77e59dfd1da4a5963bdca21bad",
+    "snapshot": "元検出事項ファイル（inspect-docs-finding-20260922T051848Z.md）は promote 確定後に inbox から削除済み（git commit 86523adf で削除、stage 1 診断の全記録は commit cd193ff6 の git 履歴に永続）。DIST-1 の判定根拠（機械的一意判定・正しい参照先・導入経緯 3801398d・同型壊れリンクは本2件のみ）は採用済み成果物に保存。--auto 未指定（backlog-auto 通常実行の契約どおり）。"
+  },
+  "judgmentKind": "inspect-promote-classification",
+  "judgments": [
+    {
+      "confidence": 0.95,
+      "jevResult": "promote（明確な不整合。採用済み成果物として backlog-review 経由で RU 化）",
+      "judgmentId": "dist1-classification",
+      "llmFinalJudgment": "promote。明確な不整合（機械的一意判定、修正対象明示、defer/reject の根拠なし）で自律確定",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "defer（採否・範囲・優先度・情報源が未確定、または再発防止知見。inbox 残置）": 0,
+        "promote（明確な不整合。採用済み成果物として backlog-review 経由で RU 化）": 1,
+        "reject（誤検知・対応不要。即時削除）": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.95,
+      "jevResult": true,
+      "judgmentId": "review-trigger",
+      "llmFinalJudgment": "true（発動）。手動分類対象 1件存在、--auto なし、skip 条件非該当。adversarial-review 実施済み（F-A1 維持・F-B1 撤回、unresolved なし）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.1,
+        "true": 0.9
+      },
+      "questionForm": "boolean"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "86523adf",
+  "subject": "inspect-promote（backlog-auto run2 stage 2）2026-09-22 新規検出事項 DIST-1（pr_desc.md 壊れた相対リンク 2件）の分類（promote/defer/reject・review 発動条件）",
+  "workflow": "inspect-promote"
+}

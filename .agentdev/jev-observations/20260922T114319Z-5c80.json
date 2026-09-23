@@ -1,0 +1,106 @@
+{
+  "observationId": "20260922T114319Z-5c80",
+  "durationMs": 815,
+  "inputTokens": 3354,
+  "inputs": {
+    "references": [
+      {
+        "digest": "21c24e65c0b4322ba52c66ac9bde5c8887f13da9a06814f7814abb2ee08bb518",
+        "label": "inbox-f1-20260901T120043Z-defer-F10F12",
+        "path": ".agentdev/inspect/inbox/inspect-docs-finding-20260901T120043Z.md"
+      },
+      {
+        "digest": "7e6937953dadad1a5c779320011b25b31861957541400f4a065bc3fec313caa0",
+        "label": "inbox-f2-20260914T214425Z-defer-F04F05GUIDE6",
+        "path": ".agentdev/inspect/inbox/inspect-docs-finding-20260914T214425Z.md"
+      },
+      {
+        "digest": "b0ed186ba79fd0b60f74c1cecfddfcd811729b768a9fce9dcd3f034c7784bb41",
+        "label": "inbox-f3-20260922T051848Z-DIST1-promote",
+        "path": ".agentdev/inspect/inbox/inspect-docs-finding-20260922T051848Z.md"
+      },
+      {
+        "digest": "bdcb430a81096f27355f58102bdb6e368f21e0d15903cc861936beace8275747",
+        "label": "inbox-f4-20260922T102316Z-DIST1-duplicate-reject",
+        "path": ".agentdev/inspect/inbox/inspect-docs-finding-20260922T102316Z.md"
+      }
+    ],
+    "requestDigest": "f112b93671a7f2769e8a29783fecc9f886bc929982e0aa9cca021e7a20b948bc",
+    "snapshot": "Jev evaluate 1回（5問: STEP-3 分類 choice 4問 + STEP-5 adversarial-review 発動条件 boolean 1問）。requestDigest は state・instructions・questions の構成 JSON（判断入力本体）の sha256。LLM 最終判断: 発動 true、F-10/F-12 defer、F-04/F-05/GUIDE-6 defer、DIST-1 promote、DIST-1 重複 reject（すべて Jev 結果と一致、unchanged）。adversarial-review（in-context）で反証4件棄却・accepted 1件（promoted 出典節への run3 再掲分併記）反映、unresolved 0件。全件自律確定、HITL 提示なし。"
+  },
+  "judgmentKind": "inspect-promote-classification-judgment",
+  "judgments": [
+    {
+      "confidence": 0.978,
+      "jevResult": true,
+      "judgmentId": "q-ard-trigger",
+      "llmFinalJudgment": "発動する（default-on: 手動分類対象4件、--auto 未指定で skip 条件非該当）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.06,
+        "true": 0.94
+      },
+      "questionForm": "boolean"
+    },
+    {
+      "confidence": 0.978,
+      "jevResult": "defer",
+      "judgmentId": "q-f1-defer",
+      "llmFinalJudgment": "defer（採否は構造縮約・移管の意味判断で未確定、2026-09-22 現物再検証で原状、再評価条件変化なし）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "defer": 1,
+        "promote": 0,
+        "reject": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.978,
+      "jevResult": "defer",
+      "judgmentId": "q-f2-defer",
+      "llmFinalJudgment": "defer（F-04 MOVE・F-05 SPLIT・GUIDE-6 文脈判断のいずれも採否・範囲が意味判断で未確定、原状確認）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "defer": 1,
+        "promote": 0,
+        "reject": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.978,
+      "jevResult": "promote",
+      "judgmentId": "q-f3-promote",
+      "llmFinalJudgment": "promote（現物検証済みの明確な不整合、正しい参照先一意、機械的一意判定 high、修正は req-define 不要の軽微修正）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "defer": 0,
+        "promote": 1,
+        "reject": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.978,
+      "jevResult": "reject",
+      "judgmentId": "q-f4-duplicate",
+      "llmFinalJudgment": "reject（同一 finding の重複記録、run2 分（20260922T051848Z）へ集約。診断記録本体は b0a51049 で git 履歴保存済み）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "defer": 0.01,
+        "promote": 0.04,
+        "reject": 0.95
+      },
+      "questionForm": "choice"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "50945caa",
+  "subject": "inbox 4件（backlog-auto run3 stage 2 inspect レーン、2026-09-22）の promote/defer/reject 分類と adversarial-review 発動条件",
+  "workflow": "inspect-promote"
+}

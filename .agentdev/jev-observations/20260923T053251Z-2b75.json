@@ -1,0 +1,101 @@
+{
+  "observationId": "20260923T053251Z-2b75",
+  "durationMs": 1147,
+  "inputTokens": 1244,
+  "inputs": {
+    "references": [
+      {
+        "digest": "62abe061f074baf98a10b3a7b44cabf39461562601154afe4389e1245a7b0a44",
+        "label": "intake item（判断対象の全文）",
+        "path": ".agentdev/intake/inbox/intake-ir055-baseline-update-run3.md"
+      },
+      {
+        "digest": "598e4c6d15c1204792413a198f1d6704765387aa0080cb7e0ac1a2985a0314a3",
+        "label": "IR-055 ルール本文（triage_action の根拠）",
+        "path": "docs/designs/integrity/rules/IR-055-runtime-unresolved-reference.md"
+      }
+    ],
+    "requestDigest": "8b9f8c1fbb57a25aa6a44f4220f10bfdac485ff0dfe26005c04adf6015ea867f"
+  },
+  "judgmentKind": "classification-and-review-trigger",
+  "judgments": [
+    {
+      "confidence": 0.638,
+      "jevResult": 3.43,
+      "judgmentId": "item-eval-validity",
+      "llmFinalJudgment": "決定的。checker 実行（check_integrity --profile source）により item が主張する IR-055 delta 8件が全件機械的に再現され、IR-055 ルールの triage_action とも整合する。妥当性の根拠は決定的。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "中程度": 0.02,
+        "決定的": 0.49,
+        "根拠なし": 0.01,
+        "弱い": 0.01,
+        "強い": 0.47
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.638,
+      "jevResult": 2.81,
+      "judgmentId": "item-eval-impact",
+      "llmFinalJudgment": "中。IR-055 delta の継続表示と delta guard による新規増加識別の妨げはあるが、baseline 0 到達前の full audit は報告のみ（fail なし）であり、機能劣化や gate 阻害を伴わない。Jev の「大」寄り評価を「中」へ修正。",
+      "llmTreatment": "corrected",
+      "probabilityDistribution": {
+        "中": 0.21,
+        "大": 0.58,
+        "小": 0.05,
+        "無視可能": 0.01,
+        "重大": 0.15
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.638,
+      "jevResult": 1.41,
+      "judgmentId": "item-eval-urgency",
+      "llmFinalJudgment": "低。繰り返し表示される運用ノイズであり即時性はないが、Case #3063 run3 の継続運用事項として処理する価値がある。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "中": 0.32,
+        "低": 0.59,
+        "即時": 0,
+        "対応不要": 0.03,
+        "高": 0.06
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.638,
+      "jevResult": "採用",
+      "judgmentId": "provisional-classification",
+      "llmFinalJudgment": "採用。取得可能な根拠（checker 実行による delta 完全再現、IR-055 triage_action の規定、finding_route: intake、文書化済み baseline 更新手順）から採用を一意に確定できる。HITL移送条件（ユーザー固有判断・未解決矛盾・情報不足・未解決争点・新規範囲決定・安全境界要求）のいずれにも該当しないため自律確定する。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "保留": 0.09,
+        "却下": 0.02,
+        "採用": 0.89
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.638,
+      "jevResult": false,
+      "judgmentId": "review-skip-condition",
+      "llmFinalJudgment": "該当する（skip）。inbox 1件のみで、暫定分類は機械的証拠とルール規定から一意に確定し（単一区分確定）、分類の妥当性・変更種別の適合・優先度・後続ルートのいずれにも review が新たに解決し得る本質的争点が残存しない（意味的決定なし）。Jev の false 信号は観測として保持し、LLM 最終判断は従来基準による。",
+      "llmTreatment": "corrected",
+      "probabilityDistribution": {
+        "false": 0.64,
+        "true": 0.36
+      },
+      "questionForm": "boolean"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "9cf787b0994d7676a81ef71ec251607507d02bdc",
+  "subject": "intake item 1件（intake-ir055-baseline-update-run3.md。IR-055 baseline 更新提案の評価・暫定分類・review 発動条件判定）",
+  "workflow": "intake-promote"
+}

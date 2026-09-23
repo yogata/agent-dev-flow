@@ -1,0 +1,58 @@
+{
+  "observationId": "20260923T012000Z-8c8c",
+  "durationMs": 1886,
+  "inputTokens": 2386,
+  "inputs": {
+    "references": [
+      {
+        "digest": "9e1bfcce6bb21bc46f618b2c6f092eb20db5b30a14f59ab49b199a8f5405aec6",
+        "label": "input-ru",
+        "path": ".agentdev/backlog/req-units/RU-0131.md"
+      },
+      {
+        "digest": "7006ca770289e9459e397cebcfd2bcee5930c243386d09dc710a64d7351b335a",
+        "label": "output-draft",
+        "path": ".agentdev/drafts/req-draft-wave-semantic-dependency-runtime-slot-separation.md"
+      }
+    ],
+    "requestDigest": "47b0e6a71e9ce1efd2c569e8c0b92814e6dc6eef48169ce8db7c7a93bc72e021",
+    "snapshot": "2つの evaluate リクエスト（STEP-3 照合判断: choice CREATE/APPEND/UPDATE + boolean、STEP-4 最終分類・Design分離: choice 分散配置妥当性 + boolean 移送要否）。state は RU-0131 要約と検証済み現行契約記述（REQ-061-010/019、REQ-035-012、REQ-031-015/016、REQ-034-027 の文言引用を含む）で構成。"
+  },
+  "judgments": [
+    {
+      "confidence": 0.77,
+      "jevResult": "UPDATE",
+      "judgmentId": "req-define-step3-matching-operation",
+      "llmFinalJudgment": "UPDATE（既存REQ群への UPDATE を主体とし、新規横断契約の置き場所は STEP-4 分類ゲートで確定: Oracle 助言により REQ-034 runtime / REQ-035 意味論 / REQ-061 構成純度の分散配置）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "APPEND": 0.01,
+        "CREATE": 0,
+        "UPDATE": 0.99
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.54,
+      "jevResult": "REQとDesignの分散配置が妥当",
+      "judgmentId": "req-define-step4-artifact-attribution",
+      "llmFinalJudgment": "REQとDesignの分散配置が妥当（数値5はREQ行に固定値として書かず Design 参照形式〔数値の詳細は Design〕とする既存慣行を維持）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "Design分離が過小（REQ行の一部をDesignへ移送すべき）": 0.31,
+        "Design分離が過大（Design行をREQへ戻すべき）": 0.18,
+        "REQとDesignの分散配置が妥当": 0.51
+      },
+      "questionForm": "choice"
+    }
+  ],
+  "judgmentKind": "existing-req-matching-and-artifact-attribution",
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "d3bb865149c69caace775fac254b15f30bdca95d",
+  "subject": "RU-0131（Wave構成純度と共有実行並列上限）req-define STEP-3 照合判断・STEP-4 最終分類 Design分離",
+  "workflow": "req-define"
+}

@@ -1,0 +1,102 @@
+{
+  "observationId": "20260922T110426Z-48b1",
+  "schemaVersion": 1,
+  "workflow": "learning-promote",
+  "judgmentKind": "learning-promote-sublimation-judgment",
+  "subject": "learning-promote（backlog-auto run3 stage 2）2026-09-22 inbox 4件の問題クラス分類・8軸評価・処分・昇華可能性と review 発動条件の判定",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "sourceRevision": "b0a510496764a372c8e4643940ae8dc8a090adb8",
+  "outcome": "completed",
+  "durationMs": 2995,
+  "inputTokens": 10688,
+  "inputs": {
+    "requestDigest": "08803de08f20ed1622e108984722f43bd31274da2418ae3721fa3deb0f1803af",
+    "references": [
+      {
+        "label": "evaluation-report",
+        "path": ".agentdev/learning/evaluation-report.md",
+        "digest": "ffcbdf73efbadd91d1b5c2f99c2e99b2e74bcf37f6aa7900daafd60be61d8a02"
+      },
+      {
+        "label": "promoted-agentdev-gh",
+        "path": ".agentdev/learning/promoted/measure-update-agentdev-gh-repo-resolution-env-setup.md",
+        "digest": "50b74dd5d5bf19ab7700a8ee7c3bbc4776e22f5bc67bf763d115d276425a3e3e"
+      },
+      {
+        "label": "promoted-worktree",
+        "path": ".agentdev/learning/promoted/measure-update-worktree-junction-skill-scripts-main-root-execution.md",
+        "digest": "db8ee4fcaed9471b2d27a3bfddfa21ea5fe0b402c9be2ee533e2b11076eb5aef"
+      },
+      {
+        "label": "promoted-distribution",
+        "path": ".agentdev/learning/promoted/measure-update-distribution-artifact-declaration-application-miss.md",
+        "digest": "ab48766b8d739a0cd6d0449a81ccd0f7ce971601f35e8b9cc5ca4e73338bca2a"
+      }
+    ],
+    "snapshot": "5回のJev先行評価と1回のreview-trigger判定を実施。4件の処分はpromote、rejected、promote、promote。review-triggerはtrue。LLM最終判断はevaluation-report.mdに記録し、未解決争点はなし。"
+  },
+  "judgments": [
+    {
+      "judgmentId": "class1-sublimability",
+      "questionForm": "boolean",
+      "jevResult": true,
+      "probabilityDistribution": {
+        "true": 0.97,
+        "false": 0.03
+      },
+      "confidence": 0.6672727272727274,
+      "llmFinalJudgment": "true（promote。処分区分5として成果物経由でreq-defineへ引き渡し）",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "class2-sublimability",
+      "questionForm": "boolean",
+      "jevResult": false,
+      "probabilityDistribution": {
+        "true": 0.06,
+        "false": 0.94
+      },
+      "confidence": 0.6354545454545455,
+      "llmFinalJudgment": "false（rejected。PR #3062で対応完了し新規昇華不要）",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "class3-sublimability",
+      "questionForm": "boolean",
+      "jevResult": true,
+      "probabilityDistribution": {
+        "true": 0.96,
+        "false": 0.04
+      },
+      "confidence": 0.770909090909091,
+      "llmFinalJudgment": "true（promote。既存事例との統合クラスタとして採用）",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "class4-sublimability",
+      "questionForm": "boolean",
+      "jevResult": true,
+      "probabilityDistribution": {
+        "true": 0.94,
+        "false": 0.06
+      },
+      "confidence": 0.7509090909090909,
+      "llmFinalJudgment": "true（promote。application missとして成果物化）",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "review-trigger",
+      "questionForm": "boolean",
+      "jevResult": true,
+      "probabilityDistribution": {
+        "true": 0.97,
+        "false": 0.03
+      },
+      "confidence": 0.97,
+      "llmFinalJudgment": "true（発動。skip条件非該当）",
+      "llmTreatment": "unchanged"
+    }
+  ]
+}

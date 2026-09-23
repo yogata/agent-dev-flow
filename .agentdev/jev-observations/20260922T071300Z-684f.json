@@ -1,0 +1,87 @@
+{
+  "observationId": "20260922T071300Z-684f",
+  "durationMs": 634,
+  "inputTokens": 1864,
+  "inputs": {
+    "references": [
+      {
+        "digest": "d24cdd5b00c9f49eae9c39d33a3afcf2412890ca31e119536e14b0dbdabc1335",
+        "label": "input-ru",
+        "path": ".agentdev/backlog/req-units/RU-0131.md"
+      },
+      {
+        "digest": "a38d229ad6d53615ff12ed03a01220afb7efb2625c46c82d1f21850d24f539fd",
+        "label": "existing-req",
+        "path": "docs/requirements/REQ-090.md"
+      },
+      {
+        "digest": "8e3c05a4196eadc01a127b0e8d6c77844b5b03b06c04f99902c6f1dbfa0f8b03",
+        "label": "target-adapter",
+        "path": "src/opencode/tools/agentdev-jev/adapter-vercel/index.ts"
+      }
+    ],
+    "requestDigest": "055a0229afbdc0d1a79a7b723c10dffaaea277b8b2d27cc261d59eaefaa0b6fd",
+    "snapshot": "判断入力 state（2438 bytes、Workflow が構成した閉じた判断入力の要約文。RU-0131・REQ-090・公開契約 Design・adapter 実装からの再構成不能な生成物のため最小 snapshot として保存）:\n\nリポジトリ: agent-dev-flow（AgentDevFlow 自己ホスティングリポジトリ）。入力: RU-0131「agentdev_jev adapter score 形式の gateway スキーマ不適合修正」（ユーザー承認済み、正式ルート合意済み）。実測事象（2026-09-22）: learning-promote が 8軸評価を score 形式（5水準）で agentdev_jev evaluate に渡したところ Vercel AI Gateway が GatewayInternalServerError（HTTP 500 検証エラー）を返した。gateway スキーマは questions[].score.criteria を空でない文字列配列として必須要求する。現行 adapter は score 質問の criteria に (scale ?? []).map(() => null) を渡しており必ず失敗する。boolean/choice は検証通過。REQ-090-001 は provider・SDK 非依存の公開契約と boolean/choice/score 対応づけを規定、REQ-090 は 001〜010 の 10 要件行。公開契約 Design は boolean・choice（候補付き）・score（水準付き）を規定済み。RU の主張: REQ-090 実装（PR #3058 / v4.0.2）の実装バグであり契約側の変更を要しない。修正要件: (1) criteria に空でない文字列配列（scale 水準ラベル、choice と対称）(2) adapter-vercel/tests/ にマッピング検証単体テスト追加 (3) 実 gateway score 1 問実呼出し検証 1 回、成否・inputTokens・confidence を実行記録に残す。対象外: 観測 JSON スキーマ、workflow 側質問構成、credential 供給経路。"
+  },
+  "judgmentKind": "step3-req-matching-and-step4-final-classification",
+  "judgments": [
+    {
+      "confidence": 0.8325,
+      "jevResult": "APPEND: 既存REQ-090へ新要件行を追加する",
+      "judgmentId": "q1-req-matching",
+      "llmFinalJudgment": "APPEND: 既存REQ-090へ新要件行を追加する",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "APPEND: 既存REQ-090へ新要件行を追加する": 0.76,
+        "CREATE: 新規REQファイルを作成する": 0,
+        "UPDATE: 既存REQ-090-001の要件行を書き換える": 0.24
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.8325,
+      "jevResult": false,
+      "judgmentId": "q2-matching-confidence",
+      "llmFinalJudgment": "false（REQ-090 以外への追加候補探索確認は不要。docs/requirements 全列挙済みで Jev 関連は REQ-090 のみ）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.68,
+        "true": 0.32
+      },
+      "questionForm": "boolean"
+    },
+    {
+      "confidence": 0.8325,
+      "jevResult": "REQ行のみ: REQ-090 への要件行追加のみ",
+      "judgmentId": "q3-final-classification",
+      "llmFinalJudgment": "REQ行のみ: REQ-090 への要件行追加のみ（Design 分離基準に照らしても公開契約・責務境界の変更なし）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "Design反映のみ: Custom Tool 操作契約 Design のみ": 0,
+        "REQ行のみ: REQ-090 への要件行追加のみ": 1,
+        "両方: REQ-090 の要件行と Design の両方": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.8325,
+      "jevResult": false,
+      "judgmentId": "q4-design-separation",
+      "llmFinalJudgment": "false（公開契約文書は score（水準付き）を既に規定しており変更不要）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.89,
+        "true": 0.11
+      },
+      "questionForm": "boolean"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "7dd9cdedc5711b60e3ab95f1b1717c61fd552f57",
+  "subject": "RU-0131（agentdev_jev adapter score 形式 gateway スキーマ不適合修正）の既存REQ照合・要件展開分類",
+  "workflow": "req-define"
+}

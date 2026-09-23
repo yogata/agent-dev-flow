@@ -1,0 +1,229 @@
+{
+  "observationId": "20260922T134720Z-61b9",
+  "durationMs": 1310,
+  "inputTokens": 4413,
+  "inputs": {
+    "references": [
+      {
+        "digest": "bc0a54ae5bc8d341188a0a0b1a782be4fef66a4ea293fed83b7c463c35bf0b55",
+        "label": "ru-0122",
+        "path": ".agentdev/backlog/req-units/RU-0122.md"
+      },
+      {
+        "digest": "85dbf0facb7fbb0a73e21cb9e95789b818379cd9b195de1624608586ef2a09cb",
+        "label": "ru-0123",
+        "path": ".agentdev/backlog/req-units/RU-0123.md"
+      },
+      {
+        "digest": "6764509fc1ea5c322bbf08ab52d36168b523fa0f277a63f0d3fe5d5ce9f6678a",
+        "label": "ru-0124",
+        "path": ".agentdev/backlog/req-units/RU-0124.md"
+      },
+      {
+        "digest": "7302c4dd5a38c42c2ab83f6524ed7aada9bcb665845aeee527d90afab997e954",
+        "label": "ru-0125",
+        "path": ".agentdev/backlog/req-units/RU-0125.md"
+      },
+      {
+        "digest": "0d91887b04c6d868894a341024799e21ac59fff9ab5e371e7d83b216c9c63fd2",
+        "label": "ru-0126",
+        "path": ".agentdev/backlog/req-units/RU-0126.md"
+      },
+      {
+        "digest": "99d010794b212b457e310c83db74c5efe3241cd58dfff3d73e9a3c04e12c5b15",
+        "label": "ru-0127",
+        "path": ".agentdev/backlog/req-units/RU-0127.md"
+      },
+      {
+        "digest": "7f082c4811f8436f7561acd9b909cecc1c85fa8f2a3c47e712bcf449c1862f1d",
+        "label": "req-009",
+        "path": "docs/requirements/REQ-009.md"
+      },
+      {
+        "digest": "994a75851aa8146c088483fdddfbe4e6de30dc87dc1bf24441424611e948d234",
+        "label": "req-052",
+        "path": "docs/requirements/REQ-052.md"
+      },
+      {
+        "digest": "d0d20995c0cf7dfa8ba5753596386a66605693d2f79b1f9440af130d5be1545d",
+        "label": "req-031",
+        "path": "docs/requirements/REQ-031.md"
+      },
+      {
+        "digest": "09e85f4c2eddd90d9388b383af91ecc4d244e6c54cd3d6adc7986db5f2eb686d",
+        "label": "req-018",
+        "path": "docs/requirements/REQ-018.md"
+      },
+      {
+        "digest": "a425ffc384a9d090610fa89ff0bb105a433be5b04321ee3a684582603180c3d6",
+        "label": "req-008",
+        "path": "docs/requirements/REQ-008.md"
+      },
+      {
+        "digest": "6ad7e78300e2d8cf2943d1ae272bd10f57d399aa306a3fa929033dbee17ab901",
+        "label": "req-087",
+        "path": "docs/requirements/REQ-087.md"
+      }
+    ],
+    "requestDigest": "d07afe6e24bc5680420b97c743d13f8ea2b58f4b3cd879641f815b17de88f7b6",
+    "snapshot": "プロセス死亡（22:10/22:20）を挟んだ durable state 再構成後に記録。requestDigest は圧縮記録から再構成した判断入力（RUN1: 6RU照合・質問群8件 / RUN2: 最終分類・Design分離・質問群5件）の正規化シリアライズの sha256 であり、初回送信原文とのバイト一致は保証しない。jevResult・probabilityDistribution・confidence・inputTokens（RUN1=2438, RUN2=1975）・durationMs（RUN1=684, RUN2=626）は初回 evaluate の実測値を集計（合計）したものである。判断単位ごとの confidence は各 RUN の集計値（0.73875 / 0.828）を用いる。"
+  },
+  "judgmentKind": "req-define-matching-and-classification",
+  "judgments": [
+    {
+      "confidence": 0.73875,
+      "jevResult": "APPEND_REQ-009",
+      "judgmentId": "match-ru-0122-guide",
+      "llmFinalJudgment": "APPEND_REQ-009（導入ガイドの記載義務は既存REQ-009 配布基盤と導入モデルの関心に帰属。CREATE 0.37 の残確率は新規関心の導入がないことで解消し APPEND が正しい）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "APPEND_REQ-009": 0.6,
+        "CREATE_new_REQ": 0.37
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.73875,
+      "jevResult": "APPEND_REQ-052",
+      "judgmentId": "match-ru-0122-diagnostics",
+      "llmFinalJudgment": "APPEND_REQ-052（failure detail の診断情報義務は既存REQ-052 Custom Tool・Plugin/Hook の種別契約への追加分。REQ-052-004 fail-closed 行の更新ではなく新規行）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "APPEND_REQ-052": 0.58,
+        "UPDATE_REQ-052": 0.37
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.73875,
+      "jevResult": "APPEND_REQ-031",
+      "judgmentId": "match-ru-0123",
+      "llmFinalJudgment": "APPEND_REQ-031（委譲 context への予防観点引き渡し義務は既存REQ-031 case-run 実行契約の関心）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "APPEND_REQ-031": 0.78
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.73875,
+      "jevResult": "APPEND_REQ-018",
+      "judgmentId": "match-ru-0124",
+      "llmFinalJudgment": "APPEND_REQ-018（main root + --root 実行手順の明文化義務は既存REQ-018 worktree 構造的制約への追加分。REQ-018-002 一般義務の更新ではなく新規行）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "APPEND_REQ-018": 0.66,
+        "UPDATE_REQ-018": 0.32
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.73875,
+      "jevResult": "APPEND_REQ-008",
+      "judgmentId": "match-ru-0125",
+      "llmFinalJudgment": "APPEND_REQ-008（draft-data 生成手順の構造契約は REQ-008。REQ-008-030 content 完全確定・REQ-008-047 test_strategy 定義の直接近傍への追加であり REQ-004 ではない）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "APPEND_REQ-008": 0.89
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.73875,
+      "jevResult": "APPEND_REQ-087",
+      "judgmentId": "match-ru-0126",
+      "llmFinalJudgment": "APPEND_REQ-087（既知欠番レジストリ免除は REQ-087 採番例外の記録と REQ 番号ギャップ検査の関心。REQ-087-002 記録義務との構造的衝突解消）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "APPEND_REQ-087": 0.67
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.73875,
+      "jevResult": "none_req_impact",
+      "judgmentId": "match-ru-0127",
+      "llmFinalJudgment": "none_req_impact（壊れリンク 2件の張替えは仕様変更を伴わない反映作業。既存 docs-spec-rebuild-integrity 検査への準拠回復であり新規REQ行不要）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "none_req_impact": 1
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.73875,
+      "jevResult": false,
+      "judgmentId": "match-confidence",
+      "llmFinalJudgment": "false（RU-0122/0124 の CREATE/UPDATE 残確率が目立つため照合確信の補完確認は要る。独立探索（表構造・関心帰属・既存行文言）で解消済み）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.73
+      },
+      "questionForm": "boolean"
+    },
+    {
+      "confidence": 0.828,
+      "jevResult": "REQ行とDesign更新の両方",
+      "judgmentId": "cls-ru-0122-diagnostics",
+      "llmFinalJudgment": "REQ行とDesign更新の両方（REQ-052 への要件行 APPEND と custom-tool-contracts.md 迂回防止節の Design 更新を併発）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "REQ行とDesign更新の両方": 0.71,
+        "Design更新のみ": 0.25
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.828,
+      "jevResult": "Design更新として分離する",
+      "judgmentId": "cls-ru-0123-design",
+      "llmFinalJudgment": "Design更新として分離する（両面運用の文書化は distribution-boundary.md の Design 更新として分離し、REQ-031 行は委譲義務側のみを保持）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "Design更新として分離する": 0.99
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.828,
+      "jevResult": "REQ行のみ",
+      "judgmentId": "cls-ru-0125",
+      "llmFinalJudgment": "REQ行のみ（突合・一致確認手順の義務は REQ-008 要件行で表現し、skill reference の手順追記は実現面 realization_actions へ分離）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "REQ行のみ": 0.87
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.828,
+      "jevResult": "実現面のみ（REQ行不要）",
+      "judgmentId": "cls-ru-0127",
+      "llmFinalJudgment": "実現面のみ・REQ行不要（軽量扱い。realization_actions RA-006 と実行専用 OU-0009 で表現）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "実現面のみ（REQ行不要）": 1
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.828,
+      "jevResult": false,
+      "judgmentId": "cls-separation-confidence",
+      "llmFinalJudgment": "false（RU-0122 diagnostics の分離帰属に 0.25 の残確率。REQ-052-004 既存行と新規行の区別を行単位確認で解消済み）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.57
+      },
+      "questionForm": "boolean"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "d0e79979",
+  "subject": "RU-0122〜0127（6件・backlog-review run3 承認）の既存REQ照合帰属（CREATE/APPEND/UPDATE/none）と要件展開の最終分類・Design 分離",
+  "workflow": "req-define"
+}

@@ -1,0 +1,64 @@
+{
+  "observationId": "20260923T054728Z-4f4a",
+  "durationMs": 611,
+  "inputs": {
+    "references": [
+      {
+        "digest": "df2551b6d10280998158a1d4a3e2f7df456b7071bb5df5842fe5879df408f953",
+        "label": "新規 finding ファイル（README-1/REQ-1/GUIDE-1）",
+        "path": ".agentdev/inspect/inbox/inspect-docs-finding-20260923T050218Z.md"
+      },
+      {
+        "digest": "9f358a1485cf46b0371b1a7f9222004aef7522f9876c09acf921a160e5d7b3c4",
+        "label": "defer 残置分（F-04/F-05/GUIDE-6）",
+        "path": ".agentdev/inspect/inbox/inspect-docs-finding-20260914T214425Z.md"
+      },
+      {
+        "digest": "d4aa55490ce2cabc90b31a17d75e2ee40b3b56ab325ca0de530c9eac5fb03e98",
+        "label": "defer 残置分（F-10/F-12）",
+        "path": ".agentdev/inspect/inbox/inspect-docs-finding-20260901T120043Z.md"
+      }
+    ],
+    "requestDigest": "521d816933d007dfad807f5e15042c81109375d2b08a60f67199c29c49d44764",
+    "snapshot": "閉判断2問（q1: 暫定分類妥当性 boolean、q2: defer 継続確信度 5段階 score）。判断材料は finding ファイル3件の参照 digest と state 要約に限る。"
+  },
+  "inputTokens": 969,
+  "judgmentKind": "classification-finalization",
+  "judgments": [
+    {
+      "confidence": 0.83,
+      "jevResult": true,
+      "judgmentId": "q1",
+      "llmFinalJudgment": "暫定分類は妥当（README-1/REQ-1 promote 自律確定、GUIDE-1 HITL 移送、既存 defer 5件 継続）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.16,
+        "true": 0.84
+      },
+      "questionForm": "boolean"
+    },
+    {
+      "confidence": 0.83,
+      "jevResult": "高い確信",
+      "judgmentId": "q2",
+      "llmFinalJudgment": "原状確認は現物行読取で実施済みであり defer 継続は高い確信で妥当",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "中程度の確信": 0.05,
+        "低い確信": 0.01,
+        "完全な確信": 0.1,
+        "高い確信": 0.82,
+        "確信できない": 0.02
+      },
+      "questionForm": "score"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "000bc77c5e1e521fe184c5553787d43dac621518",
+  "subject": "inspect-promote 2026-09-23 暫定分類確定（新規3件 README-1/REQ-1/GUIDE-1 ＋ 既存 defer 5件 F-04/F-05/F-10/F-12/GUIDE-6）",
+  "workflow": "inspect-promote"
+}
