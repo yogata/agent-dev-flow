@@ -41,6 +41,7 @@
 | [Intake / Learning / Backlog フロー](intake-learning-backlog-flow.md) | 作業候補、学びの収集から RU 生成まで（追跡Issue の別系統を含む） |
 | [診断、メンテナンス](diagnostics-and-maintenance.md) | docs-check / inspect 系コマンド |
 | [トラブルシューティング](troubleshooting.md) | よくある問題と対処法 |
+| [Supervisor 環境向け opencode credential 供給ブリッジ導入](supervisor-credential-bridge.md) | Supervisor 環境での ocenv と opencode bridge shim の導入、検証、失敗署名の対処 |
 
 ## リファレンス
 

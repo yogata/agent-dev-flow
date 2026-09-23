@@ -1,0 +1,31 @@
+component: supervisor-bridge
+implementation:
+  scripts/self/supervisor-bridge/ocenv:
+    - REQ-091-001
+    - REQ-091-002
+    - REQ-091-005
+  scripts/self/supervisor-bridge/opencode:
+    - REQ-091-001
+    - REQ-091-002
+    - REQ-091-005
+  docs/guides/supervisor-credential-bridge.md:
+    - REQ-091-003
+    - REQ-091-005
+    - REQ-091-006
+  docs/README.md:
+    - REQ-091-003
+  docs/guides/README.md:
+    - REQ-091-003
+  docs/knowledge/supervisor-bridge-credential-supply.md:
+    - REQ-091-004
+    - REQ-091-005
+    - REQ-091-006
+verification:
+  docs/guides/supervisor-credential-bridge.md:
+    - REQ-091-002
+    - REQ-091-003
+    - REQ-091-006
+  docs/knowledge/supervisor-bridge-credential-supply.md:
+    - REQ-091-005
+  .opencode/skills/repo-agentdev-integrity/scripts/check_knowledge_docs.ts:
+    - REQ-091-004
