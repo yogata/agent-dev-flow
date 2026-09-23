@@ -136,6 +136,7 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 | REQ-039 | 6 | +0 |  |
 | REQ-060 | 6 | +0 |  |
 | REQ-083 | 6 | +0 |  |
+| REQ-091 | 6 | +0 |  |
 | REQ-018 | 5 | +0 |  |
 | REQ-044 | 5 | +0 |  |
 | REQ-059 | 5 | +0 |  |
