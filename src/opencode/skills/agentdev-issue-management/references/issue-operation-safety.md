@@ -38,6 +38,19 @@ Issue 本文、タイトルを書き込む操作（issue_create、issue_update�
 
 verification-incomplete（読み戻し検証失敗）時は、Tool は検証失敗として成功を返さない（fail-closed）。同一内容リトライ → 読み取り操作で現在状態を確認しての内容再生成 → 停止とユーザー報告、の順で復帰する（自動的な代替手段へ切替えない）。
 
+### issue_list の絞り込み規律と上限到達時 contingency
+
+`issue_list` 操作を Issue 検索に使う場合、次の 2 規律を標準呼出形式に重ねて適用する。規律の正は `agentdev-issue-tracking` Design「確定事項」の物理写像表（issue_list の labels 引数の規律）であり、本節は安全手続き側の適用形を定める。
+
+- **search 併用必須**: `issue_list` を closed 等の広範 filter で実行する場合、`search` 引数（冪等キー語、REQ 番号、topic_slug 等の絞り込みキー）を必ず併用する。広範 filter を `search` なしで実行すると、closed Case 群等の累積 population の増加により、Tool 完全一覧契約の安全ページ上限へ構造的に到達して operation-failed となる
+- **labels 引数は tracking 論理値専用**: `labels` 引数は追跡Issue論理軸（role、kind、trackingState）の物理マッピング入力専用である。Case Issue は role: case と機械判定されるため、Case 物理ラベル名（enhancement、bug、docs 等の通常ラベル）を `labels` 引数へ指定した絞り込みは 0 件帰着または無効となる。Case Issue の絞り込みは `labels` 引数を使用せず、`search` 引数と state の組み合わせで行う
+
+安全ページ上限到達（operation-failed）時は、次の順で contingency 補完する。Tool 正規経路を第一とし、gh CLI による手動読取は operation-failed 時の補完手段として位置づける（読み取り系操作の gh 直接記述禁止を operation-failed 補完の範囲で緩和するものではない。書込み系は引き続き Tool 正規経路に限定する）。
+
+1. **絞り込みの推送（Tool 正規経路）**: operation-failed 応答を受け取ったら、`search` 引数の絞り込みキーを見直して Tool 正規経路で再実行する。
+2. **手動読取（operation-failed 時限定の補完手段）**: 絞り込み推送後も上限到達が解消しない場合に限り、`gh issue list --search <絞り込みクエリ> --json labels,number,title` の形式で手動読取し、Tool 操作で取得できなかった対象を補完する。読み取り限定であり、要求フィールドを目的に必要な範囲へ限定する。
+3. **補完結果の確認**: 手動読取を使った場合は、search 条件と取得件数を検証記録へ残し、欠落の疑義を検証結果に残す。
+
 ## Issue 作成後の内容反映確認
 
 `agentdev_gh` の issue_create 操作実行後、Issue番号を取得し、本文が正しく反映されたかを確認する。
