@@ -77,6 +77,8 @@ export type JevEvaluateSuccess = {
   processingMs: number;
   /** 質問ごとの結果（リクエスト順・ID 一致）。 */
   results: JevQuestionResult[];
+  /** evaluate 時点の部分レコード書込み結果（REQ-090-013。書込み失敗時は warning）。 */
+  observation?: JevObservationPersistOutcome;
 };
 
 export type JevEvaluateSuccessPayload = {
@@ -88,9 +90,22 @@ export type JevEvaluateSuccessPayload = {
 export type JevFailurePayload = {
   ok: false;
   failure: JevFailure;
+  /** 評価完了（not_configured・API 失敗を含む）時点の部分レコード書込み結果。invalid_input（評価未実施）では付与しない（REQ-090-013）。 */
+  observation?: JevObservationPersistOutcome;
+  /** 解決済み provider の接続種別識別子（provider 解決に失敗した not_configured では省略）。 */
+  provider?: string;
+  /** 解決済み provider の要求 model ID（provider 解決に失敗した not_configured では省略）。 */
+  requestedModel?: string;
 };
 
 export type JevEvaluateResult = JevEvaluateSuccessPayload | JevFailurePayload;
+
+/** 観測レコードの完了状態 field（機械判別可能。REQ-090-013 の 2段階書込み契約）。 */
+export type JevObservationRecordState =
+  /** evaluate 時点書込みの部分レコード（LLM 最終判断関連 field は未記録）。 */
+  | "partial"
+  /** observation_write 追記完成の完成レコード。 */
+  | "complete";
 
 /** 観測実行単位の成果区分。 */
 export type JevObservationOutcome = "completed" | "not_configured" | "jev_failed";
@@ -102,16 +117,16 @@ export type JevLlmTreatment = "unchanged" | "corrected";
 export type JevObservationJudgment = {
   judgmentId: string;
   questionForm: JevQuestionForm;
-  /** Jev 結果（jev_failed の場合は省略可。代わりに failureKind を記録）。 */
+  /** Jev 結果（jev_failed / not_configured の場合は省略。代わりに failureKind を記録）。 */
   jevResult?: boolean | string | number;
   probabilityDistribution?: JevProbabilityDistribution;
   /** 正規化済み confidence（completed 時必須）。 */
   confidence?: number;
-  /** 構造化失敗分類（jev_failed 時に記録）。 */
+  /** 構造化失敗分類（jev_failed / not_configured 時に記録）。 */
   failureKind?: JevFailureKind;
-  /** LLM の最終判断（日本語）。 */
-  llmFinalJudgment: string;
-  llmTreatment: JevLlmTreatment;
+  /** LLM の最終判断（日本語）。recordState partial の部分レコードでは省略（observation_write 追記完成で付与）。 */
+  llmFinalJudgment?: string;
+  llmTreatment?: JevLlmTreatment;
 };
 
 /** 再構成可能入力の参照（判断入力全文は保存しない）。 */
@@ -156,6 +171,36 @@ export type JevObservation = {
   };
   /** 判断単位の観測（1実行の複数 Jev 判断は同一 JSON 内に格納）。 */
   judgments: JevObservationJudgment[];
+  /** 完了状態 field（機械判別可能）。省略は入力上の後方互換（書込み時に既定 complete で永続化）。 */
+  recordState?: JevObservationRecordState;
+};
+
+/** evaluate 時点書込みの結果（評価結果の返却と独立。書込み失敗は warning。REQ-090-013）。 */
+export type JevObservationPersistOutcome =
+  | {
+      observationId: string;
+      /** 書込み先（worktree 相対パス）。 */
+      writtenPath: string;
+      recordState: "partial";
+    }
+  | { warning: string };
+
+/** evaluate 時点部分レコード作成のための呼出し元提供 metadata（run 級 field の内、評価結果から導出できない分）。 */
+export type JevObservationMetadata = {
+  /** Workflow 名（省略時は "unspecified"）。 */
+  workflow?: string;
+  /** 判断種別（省略時は "unspecified"）。 */
+  judgmentKind?: string;
+  /** 判断対象の最小識別情報（省略時は "unspecified"）。 */
+  subject?: string;
+  /** ソース revision（省略時は "unspecified"）。 */
+  sourceRevision?: string;
+  /** 1実行 1 JSON を維持する観測 ID（省略時は新規生成。同一 run の複数 evaluate で同一 ID を渡すと同一 JSON 内 judgments へ追記）。 */
+  observationId?: string;
+  /** 再構成可能入力の参照一覧。 */
+  references?: JevObservationInputReference[];
+  /** 再構成不能入力のみの最小 snapshot。 */
+  snapshot?: string;
 };
 
 /** 観測書込み結果（書込み失敗は構造化失敗として返すが Workflow の成否と独立）。 */
@@ -174,3 +219,4 @@ export type JevObservationWriteResult =
       operation: "observation_write";
       failure: JevFailure;
     };
+
