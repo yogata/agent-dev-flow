@@ -1,0 +1,139 @@
+{
+  "observationId": "20260924T004319Z-d1d9",
+  "durationMs": 988,
+  "inputs": {
+    "references": [
+      {
+        "digest": "856588c25be637498e5b3992acd52952a8db910b27c0bbb9620d85cc7cbde140",
+        "label": "defer 残置分（F-10/F-12）",
+        "path": ".agentdev/inspect/inbox/inspect-docs-finding-20260901T120043Z.md"
+      },
+      {
+        "digest": "f6825405102d93d8722095941b2b4607818136deb06e797dbc6dcfa810e7b0d6",
+        "label": "defer 残置分（F-04/F-05/GUIDE-6）",
+        "path": ".agentdev/inspect/inbox/inspect-docs-finding-20260914T214425Z.md"
+      },
+      {
+        "digest": "68281e9055a71967e540d4c22d18e0826a453323319a2467aa0f3dec0849e8ed",
+        "label": "新規 finding ファイル（REQ-2/DESIGN-4）",
+        "path": ".agentdev/inspect/inbox/inspect-docs-finding-20260923T225531Z.md"
+      }
+    ],
+    "requestDigest": "3d43f647c6ed07639889c2d87433856525871891d2cbd6921c86cbe13801b241",
+    "snapshot": "閉判断8問（q-activation: STEP-5 発動 boolean、q-f10〜q-design4: 検出事項分類 choice promote/defer/reject）。判断材料は finding ファイル3件の参照 digest と state 要約に限る。requestDigest は sha256(JSON.stringify({state,instructions,criteria,questions}))。"
+  },
+  "judgmentKind": "step3-classification-and-step5-activation",
+  "judgments": [
+    {
+      "confidence": 0.96,
+      "jevResult": true,
+      "judgmentId": "q-activation",
+      "llmFinalJudgment": "発動（手動分類対象7件、skip 条件不該当、default-on）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.04,
+        "true": 0.96
+      },
+      "questionForm": "boolean"
+    },
+    {
+      "confidence": 1,
+      "jevResult": "defer",
+      "judgmentId": "q-f10",
+      "llmFinalJudgment": "defer 継続（自律確定）: REQ-012-035/REQ-021-019 内容不変、採否は意味判断のため駐留",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "defer": 1,
+        "promote": 0,
+        "reject": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 1,
+      "jevResult": "defer",
+      "judgmentId": "q-f12",
+      "llmFinalJudgment": "defer 継続（自律確定）: REQ-008-059 テーブル外セクション原状、移管先判断残存",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "defer": 1,
+        "promote": 0,
+        "reject": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.99,
+      "jevResult": "defer",
+      "judgmentId": "q-f04",
+      "llmFinalJudgment": "defer 継続（自律確定）: REQ-038-006 原状、安定契約例外判断残存",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "defer": 0.99,
+        "promote": 0.01,
+        "reject": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.98,
+      "jevResult": "defer",
+      "judgmentId": "q-f05",
+      "llmFinalJudgment": "defer 継続（自律確定）: REQ-050-016 原状、再評価条件の learning 成果物は処置済みで変化なし",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "defer": 0.98,
+        "promote": 0.01,
+        "reject": 0.01
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 1,
+      "jevResult": "defer",
+      "judgmentId": "q-guide6",
+      "llmFinalJudgment": "defer 継続（自律確定）: 状態モデル制約節原状、文脈判断残存",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "defer": 1,
+        "promote": 0,
+        "reject": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.93,
+      "jevResult": "promote",
+      "judgmentId": "q-req2",
+      "llmFinalJudgment": "promote（自律確定）: ファントム参照は事実として一意確定、再アンカー先確定は req-define 側",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "defer": 0.07,
+        "promote": 0.93,
+        "reject": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.64,
+      "jevResult": "defer",
+      "judgmentId": "q-design4",
+      "llmFinalJudgment": "promote 判定案で HITL 移送: 履歴出典引用許容 vs DRIFT 是正の解釈と修正様式が本質的に割れ分類確定は利用者判断。Jev は defer 0.64 と解釈の割れを反映",
+      "llmTreatment": "corrected",
+      "probabilityDistribution": {
+        "defer": 0.64,
+        "promote": 0.36,
+        "reject": 0
+      },
+      "questionForm": "choice"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "9288a07b904587067e194c6a9c94207379a474d1",
+  "subject": "inspect-promote 2026-09-24 暫定分類確定（新規2件 REQ-2/DESIGN-4 ＋ 既存 defer 5件 F-04/F-05/F-10/F-12/GUIDE-6）",
+  "workflow": "inspect-promote"
+}
