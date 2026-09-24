@@ -20,8 +20,10 @@ implementation:
     - REQ-083-003
   src/opencode/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md:
     - REQ-083-001
+    - REQ-030-017
   src/opencode/skills/agentdev-workflow-case-open/references/root-case-and-definition-package.md:
     - REQ-030-015
+    - REQ-030-017
   src/opencode/skills/agentdev-workflow-case-open/scripts/lib/cross_dependency_engine.ts:
     - REQ-030-012
     - REQ-030-013
