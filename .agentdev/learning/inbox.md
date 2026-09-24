@@ -36,3 +36,19 @@
 - **想定反映先**: docs（case-open / issue tracking 系 skill reference への注記追記。具体化の判断は backlog/intake 側）
 - **関連**: Custom Tool agentdev_gh（issue_list）、Case #3103（PR #3104）
 - **タグ**: `#agentdev-gh` `#issue-list` `#idempotency-detection`
+
+## inspect finding 由来 draft の target_design.domain が実配置と不一致でも slug・行番号・文言で一意特定し実配置を正として扱える
+
+- **問題事象**: draft-data の ACT-DESIGN-001 が target_design.domain: responsibilities を宣言していたが、実ファイルは docs/designs/foundations/document-model.md であり domain が実配置と不一致。宣言パスを正として機械的転記すると誤パス（docs/designs/responsibilities/document-model.md・不在）への変更が発生し得た
+- **発生局面**: case-open workflow STEP-2/STEP-3（Case #3121・draft-data artifact_actions と実ファイルの突合）
+- **検知方法**: draft-data の target_design パスと実ファイルの突合（responsibilities/document-model.md の不在確認・grep による DEC-002 言及 1 箇所が foundations/document-model.md L375 に存在することの確認）
+- **根本原因**: inspect finding の domain 記録が document-model.md の過去の配置（responsibilities/）を参照しており、基盤 6 ドメイン再編による配置移動後に finding 側の domain が追随していない。slug・行番号・文言は実配置と一致
+- **自律対応内容**: slug（document-model）・行番号（L375）・文言 3点による一意特定の機械的照合で実配置（foundations/）を正として判定し、Definition Package に備考記録した上で Definition PR を作成。Root Case 本文に解決根拠を記録し、adversarial-review skip 判断の根拠（機械的照合であり意味的決定を含まない）にも使用
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: draft-data の artifact_actions を機械的転記する前に、target_design の実パス実在確認（grep による本文一意性確認込み）を入れる。domain/slug 宣言と実配置の不一致でも slug・行番号・文言が一致すれば機械的照合で解決でき、意味的決定（HITL）を要しない。宣言側の誤記を正にして不在パスを変更対象にしない
+- **再発条件**: inspect finding が配置移動（ドメイン間移送）済みの文書を旧配置の domain で参照する場合に再発
+- **予防策候補**: inspect-docs / req-define 系 workflow に、finding の domain 記録の鮮度確認（実パス照合）を入れる
+- **想定反映先**: docs（workflow skill reference への注記追記。具体化の判断は backlog/intake 側）
+- **関連**: agentdev-workflow-case-open（STEP-2/STEP-3）、Case #3121（PR #3122）
+- **タグ**: `#docs` `#domain-drift` `#mechanical-projection`
