@@ -14,6 +14,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { createCliRunner, type GhExec } from "../runner-cli.ts";
 import { issueNumber } from "../contracts.ts";
+import { kindToLabel } from "../tracking-schema.ts";
 import { buildGhToolEnv } from "../engine.ts";
 import { runAgentdevGhOperation } from "../index.ts";
 import type { GhRunnerReply, GhRunnerRequest } from "../runner.ts";
@@ -711,6 +712,28 @@ function githubStub(init: {
         const slice = filtered.slice((page - 1) * perPage, page * perPage);
         return { status: 0, stdout: JSON.stringify(slice.map(issueJson)), stderr: "" };
       }
+      if (path === "search/issues" && method === "GET") {
+        // search/issues の q 構文を模倣する（tokenized 照合は大文字小文字非区別の語照合で近似）。
+        const q = params.get("q") ?? "";
+        const perPage = Number.parseInt(params.get("per_page") ?? "100", 10);
+        const page = Number.parseInt(params.get("page") ?? "1", 10);
+        const stateMatch = /(?:^| )state:(\S+)/.exec(q);
+        const stateFilter = stateMatch?.[1];
+        const labelMatches = [...q.matchAll(/label:(?:"([^"]+)"|(\S+))/g)].map((m) => m[1] ?? m[2] ?? "");
+        const qualifierRe = /(?:^| )(?:repo:\S+|is:issue|in:title|state:\S+|label:(?:"[^"]+"|\S+))(?=$| )/g;
+        const terms = q.replace(qualifierRe, " ").trim().split(/\s+/).filter((t) => t.length > 0);
+        const filtered = issues.filter((i) => {
+          if (stateFilter !== undefined && stateFilter !== "all" && i.state !== stateFilter) return false;
+          if (!labelMatches.every((l) => i.labels.includes(l))) return false;
+          return terms.every((t) => i.title.toLowerCase().includes(t.toLowerCase()));
+        });
+        const slice = filtered.slice((page - 1) * perPage, page * perPage);
+        return {
+          status: 0,
+          stdout: JSON.stringify({ total_count: filtered.length, items: slice.map(issueJson) }),
+          stderr: "",
+        };
+      }
       const issueMatch = /^repos\/owner\/repo\/issues\/(\d+)$/.exec(path ?? "");
       if (issueMatch !== null) {
         const n = Number.parseInt(issueMatch[1] ?? "", 10);
@@ -1091,6 +1114,121 @@ describe("CliRunner + engine: 一覧完全性（TS-008 / TS-009）", () => {
     if (result.ok && result.success.operation === "issue_list") {
       expect(result.success.issues.length).toBe(150);
     }
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+});
+
+describe("CliRunner + engine: issue_list の search サーバ側推送（REQ-011-033 / TS-002）", () => {
+  function requestQuery(request: string): string {
+    const rawPath = request.slice("GET ".length);
+    return new URLSearchParams(rawPath.split("?")[1] ?? "").get("q") ?? "";
+  }
+
+  test("search 指定時は search/issues へ推送され q に repo/is:issue/state/in:title/label が写像される", async () => {
+    const tempDir = makeTempDir();
+    const stub = githubStub({
+      issues: [
+        trackingIssue({
+          number: 1,
+          title: "issue_list search pushdown",
+          labels: ["agentdev-tracking", "agentdev-kind/problem", "agentdev-tracking-status/created"],
+        }),
+        trackingIssue({
+          number: 2,
+          title: "無関係なタイトル",
+          labels: ["agentdev-tracking", "agentdev-kind/problem", "agentdev-tracking-status/created"],
+        }),
+      ],
+    });
+    const result = await runOp(stub.exec, tempDir, {
+      operation: "issue_list",
+      role: "tracking",
+      kind: "problem",
+      trackingState: "created",
+      state: "open",
+      search: "pushdown",
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok && result.success.operation === "issue_list") {
+      expect(result.success.issues.map((i) => i.number)).toEqual([issueNumber(1)]);
+    }
+    const searchRequests = stub.requests.filter((r) => r.startsWith("GET search/issues?"));
+    expect(searchRequests.length).toBe(1);
+    expect(stub.requests.some((r) => r.startsWith("GET repos/owner/repo/issues?"))).toBe(false);
+    const q = requestQuery(searchRequests[0] ?? "");
+    expect(q).toContain("repo:owner/repo");
+    expect(q).toContain("is:issue");
+    expect(q).toContain("state:open");
+    expect(q).toContain("pushdown");
+    expect(q).toContain("in:title");
+    expect(q).toContain(`label:${kindToLabel("problem")}`);
+    expect(q).toContain("label:agentdev-tracking");
+    expect(q).toContain("label:agentdev-tracking-status/created");
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test("search/issues 応答の title が検索語を大文字小文字違いで含む項目もクライアント側フィルタなしで返る", async () => {
+    const tempDir = makeTempDir();
+    const stub = githubStub({
+      issues: [
+        {
+          number: 1,
+          title: "Custom Tool CONTRACTS update",
+          body: "B",
+          state: "open",
+          state_reason: null,
+          labels: [],
+        },
+      ],
+    });
+    const result = await runOp(stub.exec, tempDir, {
+      operation: "issue_list",
+      search: "contract",
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok && result.success.operation === "issue_list") {
+      expect(result.success.issues.map((i) => i.number)).toEqual([issueNumber(1)]);
+    }
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test("search 経路も複数ページ（150件 = 100 + 50）を完全取得する", async () => {
+    const tempDir = makeTempDir();
+    const issues: StubIssue[] = Array.from({ length: 150 }, (_, i) => ({
+      number: i + 1,
+      title: `pushdown target ${i + 1}`,
+      body: "B",
+      state: "open" as const,
+      state_reason: null,
+      labels: [],
+    }));
+    const stub = githubStub({ issues });
+    const result = await runOp(stub.exec, tempDir, {
+      operation: "issue_list",
+      search: "pushdown",
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok && result.success.operation === "issue_list") {
+      expect(result.success.issues.length).toBe(150);
+    }
+    expect(stub.requests.filter((r) => r.startsWith("GET search/issues?")).length).toBe(2);
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test("search 未指定時は従来どおり list 系クエリの完全走査で search/issues を呼ばない", async () => {
+    const tempDir = makeTempDir();
+    const stub = githubStub({
+      issues: [
+        { number: 1, title: "pushdown target", body: "B", state: "open", state_reason: null, labels: [] },
+      ],
+    });
+    const result = await runOp(stub.exec, tempDir, { operation: "issue_list" });
+    expect(result.ok).toBe(true);
+    if (result.ok && result.success.operation === "issue_list") {
+      expect(result.success.issues.length).toBe(1);
+    }
+    expect(stub.requests.some((r) => r.startsWith("GET repos/owner/repo/issues?"))).toBe(true);
+    expect(stub.requests.some((r) => r.startsWith("GET search/issues?"))).toBe(false);
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 });

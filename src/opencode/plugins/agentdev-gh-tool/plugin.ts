@@ -132,7 +132,11 @@ export const REQUEST_PROPERTY_SCHEMA = {
       enum: ["open", "closed"],
       description: "Open/closed filter for issue_list.",
     },
-    search: { type: "string", description: "Title substring filter for issue_list." },
+    search: {
+      type: "string",
+      description:
+        "Server-side title search for issue_list; pushed to the GitHub search API (search/issues, in:title, tokenized match — not a substring filter).",
+    },
     reason: { type: "string", enum: ["completed", "not_planned"], description: "Close reason for issue_close." },
     base: { type: "string", description: "Base branch for pr_create." },
     head: { type: "string", description: "Head branch for pr_create." },
