@@ -5,7 +5,7 @@
 // ADF-COVERS(verification): REQ-006-105, REQ-006-106, REQ-006-107, REQ-006-109, REQ-006-111
 // ADF-COVERS(verification): REQ-008-050
 // ADF-COVERS(verification): REQ-009-018, REQ-009-019, REQ-009-020
-// ADF-COVERS(implementation): REQ-010-002, REQ-010-003, REQ-010-005, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-064, REQ-010-066, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008
+// ADF-COVERS(implementation): REQ-010-002, REQ-010-003, REQ-010-005, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-064, REQ-010-066, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008, REQ-051-009
 // ADF-COVERS(verification): REQ-010-009
 // ADF-COVERS(verification): REQ-010-072, REQ-010-073
 // ADF-COVERS(implementation): REQ-010-072, REQ-010-073
@@ -10653,6 +10653,96 @@ function checkReqNumberGapRecorded(root: string): CheckResult[] {
   return results;
 }
 
+// ─── IR-071: integrity-rule-related-req-existence (REQ-051-009) ──────────────
+// integrity rules（docs/designs/integrity/rules/IR-*.md）の related_req フィールドに
+// 記述された参照先 REQ の実在性を機械検査する。IR-067 は isIntegrityRuleDescriptionFile
+// （v2:REQ-0145-015）で rules/IR-*.md 自身を免除するため IR frontmatter related_req は
+// 検出盲点であった（IR-055 ファントム参照 REQ-002-079/080/081 由来）。
+// 階層 ID は IR-067 buildReqRowIndex、ファイルレベル ID は REQ ファイル実在で判定し、
+// v2: プレフィックスは歴史識別子として免除する。ID 形式に一致しない記述（注記セル、
+// 省略形等）は検出対象外。抽出は generate_indexes.ts collectIrFiles を再利用し、
+// rule-ownership.md AUTOGEN 派生表と単一情報源を維持する。検出契約の正本は
+// rules/IR-071-*.md。
+const IR071_ROW_ID_RE = /^REQ-(\d{3})-(\d{3})$/;
+const IR071_FILE_ID_RE = /^REQ-(\d{3})$/;
+const IR071_REQ_FILENAME_RE = /^(REQ-\d{3})\.md$/;
+
+function buildReqFileIndex(root: string): Set<string> {
+  const files = new Set<string>();
+  const reqDir = path.join(root, "docs", "requirements");
+  for (const dir of [reqDir, path.join(reqDir, "retired")]) {
+    if (!fs.existsSync(dir)) continue;
+    for (const file of listFiles(dir)) {
+      const m = file.match(IR071_REQ_FILENAME_RE);
+      if (!m) continue;
+      if (m[1] !== undefined) files.add(m[1]);
+    }
+  }
+  return files;
+}
+
+function checkIntegrityRuleRelatedReqExistence(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const rulesDir = path.join(root, "docs", "designs", "integrity", "rules");
+  if (!fs.existsSync(rulesDir)) {
+    results.push(
+      info(
+        "IntegrityRuleRelatedReq",
+        "integrity-rule-related-req-existence",
+        "No integrity rules directory; IR-071 skipped (REQ-051-009)",
+      ),
+    );
+    return results;
+  }
+  const rowIndex = buildReqRowIndex(root);
+  const fileIndex = buildReqFileIndex(root);
+  const irInfos = collectIrFiles(rulesDir);
+  let violationCount = 0;
+  let checkedRefCount = 0;
+  for (const ir of irInfos) {
+    for (const rawId of ir.relatedReq) {
+      if (rawId.startsWith("v2:")) continue;
+      const isRowId = IR071_ROW_ID_RE.test(rawId);
+      const isFileId = IR071_FILE_ID_RE.test(rawId);
+      if (!isRowId && !isFileId) continue;
+      checkedRefCount++;
+      const exists = isRowId
+        ? rowIndex.has(rawId)
+        : fileIndex.has(rawId);
+      if (exists) continue;
+      violationCount++;
+      results.push(
+        ng(
+          "IntegrityRuleRelatedReq",
+          "integrity-rule-related-req-existence",
+          `Phantom related_req '${rawId}' in integrity rule ${ir.id}: referenced REQ does not exist as a requirement row or file (REQ-051-009, IR-071)`,
+          ir.relPath,
+          undefined,
+          {
+            evidence: rawId,
+            expected: isRowId
+              ? `${rawId} must exist as a requirement row in docs/requirements/REQ-${rawId.slice(4, 7)}.md (current or retired)`
+              : `${rawId} must exist as docs/requirements/${rawId}.md (current or retired)`,
+            route: "intake",
+            finding_category: "document-drift",
+            finding_level: "strict",
+          },
+        ),
+      );
+    }
+  }
+  if (violationCount === 0) {
+    results.push(
+      ok(
+        "IntegrityRuleRelatedReq",
+        "integrity-rule-related-req-existence",
+        `IR-071 integrity-rule-related-req-existence: ${irInfos.length} rules, ${checkedRefCount} related_req references checked, 0 phantom references (REQ-051-009)`,
+      ),
+    );
+  }
+  return results;
+}
+
 // ─── repo-local Plugin 自己ホスト投影対称性検査（runtime-package-boundary.md） ───
 
 // depth-1 loader shim の固定内容テンプレート。scripts/self-sync.ps1 の
@@ -11161,6 +11251,7 @@ async function main(): Promise<void> {
     ...checkReferencedReqRowExistence(root), // IR-067 (REQ-010-069, Issue #2383 (a))
     ...checkSkillProjectionManifest(root), // IR-068 (Issue #2383 (d), inspect F-01)
     ...checkReqNumberGapRecorded(root), // IR-069 (REQ-087-002/003, Case #2917)
+    ...checkIntegrityRuleRelatedReqExistence(root), // IR-071 (REQ-051-009)
     ...checkRepoLocalPluginProjectionSymmetry(root), // repo-local Plugin 投影対称性検査（runtime-package-boundary.md、Issue #2787）
   ];
 

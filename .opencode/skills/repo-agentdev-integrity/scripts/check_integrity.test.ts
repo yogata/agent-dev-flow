@@ -4912,6 +4912,168 @@ describe("IR-069 req-number-gap-recorded (REQ-087-002/003, Case #2917)", () => {
   });
 });
 
+// ─── IR-071 integrity-rule-related-req-existence (REQ-051-009) ────────────────
+// Fixture kinds: 正常例 (実在階層 ID・ファイルレベル ID), 違反例 (ファントム階層 ID +
+// ファントムファイルレベル ID), 境界例 (v2: プレフィックス免除・注記セル・省略形),
+// 再現例 (IR-055 再アンカー後の related_req [実在行] 型が誤検知しない)。
+
+const IR071_ROOT = join(TEMP_ROOT, "ir071");
+
+function writeIr071RuleFile(
+  root: string,
+  filename: string,
+  relatedReqValue: string,
+): void {
+  const rulesDir = join(root, "docs", "designs", "integrity", "rules");
+  mkdirp(rulesDir);
+  writeFileSync(
+    join(rulesDir, filename),
+    [
+      "---",
+      `title: "${filename.replace(/\.md$/, "")} fixture"`,
+      "status: accepted",
+      "created: 2026-09-24",
+      "updated: 2026-09-24",
+      "---",
+      "",
+      `# ${filename.replace(/\.md$/, "")} fixture`,
+      "",
+      "| Field | Value |",
+      "|-------|-------|",
+      `| rule_id | ${filename.match(/^IR-(\d+)/)?.[0] ?? "IR-0000"} |`,
+      "| description | IR-071 fixture |",
+      "| severity | strict |",
+      "| category | document-drift |",
+      "| detection_method | fixture |",
+      "| affected_artifacts | [docs/designs/integrity/rules/IR-*.md] |",
+      `| related_req | ${relatedReqValue} |`,
+      "| related_design | [../integrity-rule-catalog.md] |",
+      "| gate_level | full-audit |",
+      "| false_positive_risk | fixture |",
+      "| regression_test | fixture |",
+      "| finding_route | intake |",
+      "| triage_action | fixture |",
+      "| last_verified | 2026-09-24 |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+}
+
+function buildIr071Fixture(
+  root: string,
+  { includePhantomRule = true }: { includePhantomRule?: boolean } = {},
+): void {
+  const reqDir = join(root, "docs", "requirements");
+  mkdirp(join(reqDir, "retired"));
+  writeFileSync(
+    join(reqDir, "README.md"),
+    "# Requirements\n\n| ID | Title |\n|----|-------|\n| REQ-931 | IR-071 fixture |\n",
+    "utf-8",
+  );
+  writeFileSync(
+    join(reqDir, "REQ-931.md"),
+    [
+      "---",
+      "id: REQ-931",
+      "title: IR-071 fixture",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "## 要件",
+      "",
+      "| ID | 要件 |",
+      "|---|---|",
+      "| REQ-931-001 | 実在する要件行その1 |",
+      "| REQ-931-002 | 実在する要件行その2 |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+  writeFileSync(
+    join(reqDir, "retired", "REQ-932.md"),
+    "---\nid: REQ-932\ntitle: IR-071 retired fixture\ncreated: 2025-01-01\nupdated: 2025-01-01\n---\n\nBody.\n",
+    "utf-8",
+  );
+
+  // 正常例: 実在階層 ID + 実在ファイルレベル ID（retired を含む）
+  writeIr071RuleFile(root, "IR-0990-ok-refs.md", "[REQ-931-001, REQ-932]");
+
+  // 違反例: ファントム階層 ID + ファントムファイルレベル ID
+  if (includePhantomRule) {
+    writeIr071RuleFile(root, "IR-0991-phantom-refs.md", "[REQ-931-099, REQ-999]");
+  }
+
+  // 再現例: IR-055 再アンカー後と同型の実在行単一参照
+  writeIr071RuleFile(root, "IR-0992-reanchor-shape.md", "[REQ-931-002]");
+
+  // 境界例: v2: 免除・注記セル・省略形・プレースホルダー
+  writeIr071RuleFile(
+    root,
+    "IR-0993-boundary-exemptions.md",
+    "[v2:REQ-0143, REQ-931 (注記), -（要件行レベルの正規所有者なし）, 039]",
+  );
+
+  copyScripts(root);
+}
+
+function ir071Results(root: string): {
+  ng: Array<{ evidence?: string; message: string; file?: string; finding_level?: string }>;
+  ok: Array<{ message: string }>;
+} {
+  const r = runScript(root, ["--json"]);
+  const parsed = JSON.parse(r.stdout);
+  const hits = parsed.results.filter(
+    (res: { category: string }) => res.category === "IntegrityRuleRelatedReq",
+  );
+  return { ng: hits.filter((x: { level: string }) => x.level === "ng"), ok: hits.filter((x: { level: string }) => x.level === "ok") };
+}
+
+describe("IR-071 integrity-rule-related-req-existence (REQ-051-009)", () => {
+  it("passes existing row and file level related_req references (正常例)", () => {
+    const root = join(IR071_ROOT, "ok");
+    mkdirp(root);
+    buildIr071Fixture(root, { includePhantomRule: false });
+    const { ng, ok } = ir071Results(root);
+    expect(ng.length).toBe(0);
+    expect(ok.length).toBeGreaterThan(0);
+    expect(ok[0].message).toContain("0 phantom references");
+  });
+
+  it("detects phantom row and phantom file level related_req (違反例)", () => {
+    const root = join(IR071_ROOT, "phantom");
+    mkdirp(root);
+    buildIr071Fixture(root);
+    const { ng } = ir071Results(root);
+    const evidence = ng.map((res) => res.evidence ?? "");
+    expect(evidence).toContain("REQ-931-099");
+    expect(evidence).toContain("REQ-999");
+    expect(ng.filter((res) => (res.file ?? "").includes("IR-0991-phantom-refs.md")).length).toBe(2);
+    for (const res of ng) {
+      expect(res.finding_level).toBe("strict");
+      expect(res.message).toContain("Phantom related_req");
+    }
+  });
+
+  it("exempts v2: prefix, annotation cells, shorthand numbers, and placeholders (境界例)", () => {
+    const root = join(IR071_ROOT, "boundary");
+    mkdirp(root);
+    buildIr071Fixture(root, { includePhantomRule: false });
+    const { ng } = ir071Results(root);
+    expect(ng.length).toBe(0);
+    expect(ng.filter((res) => (res.file ?? "").includes("IR-0993-boundary-exemptions.md")).length).toBe(0);
+  });
+
+  it("does not misfire on the IR-055 re-anchored single existing row reference (再現例)", () => {
+    const root = join(IR071_ROOT, "reanchor");
+    mkdirp(root);
+    buildIr071Fixture(root, { includePhantomRule: false });
+    const { ng } = ir071Results(root);
+    expect(ng.filter((res) => (res.file ?? "").includes("IR-0992-reanchor-shape.md")).length).toBe(0);
+  });
+});
+
 // ─── broken-req-ref 範囲表現除外 (v2:REQ-0108-194, Case #2917) ─────────────────
 // REQ-063〜REQ-081 のような帯表現の端点は個別参照ではなく、broken-req-ref の
 // 検出対象から除外する。範囲外の単独出現は引き続き検出する。

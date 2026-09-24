@@ -171,6 +171,7 @@ IR エントリ一覧（IR-046 以降）は `generate_indexes.ts` が自動生�
 - [IR-068: skill-projection-manifest](rules/IR-068-skill-projection-manifest.md)
 - [IR-069: req-number-gap-recorded](rules/IR-069-req-number-gap-recorded.md)
 - [IR-070: design-frontmatter-required-keys](rules/IR-070-design-frontmatter-required-keys.md)
+- [IR-071: integrity-rule-related-req-existence](rules/IR-071-integrity-rule-related-req-existence.md)
 <!-- AUTOGEN:END -->
 
 ### 新規 IR 候補（candidate state、新規 IR 登録 gate 前）
