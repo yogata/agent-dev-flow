@@ -4,7 +4,7 @@ status: accepted
 created: 2026-08-24
 updated: 2026-09-24
 ---
-<!-- ADF-COVERS(design): REQ-090-001, REQ-090-002, REQ-090-003, REQ-090-004, REQ-090-009, REQ-090-010, REQ-090-011, REQ-092-003 -->
+<!-- ADF-COVERS(design): REQ-090-001, REQ-090-002, REQ-090-003, REQ-090-004, REQ-090-009, REQ-090-010, REQ-090-011, REQ-090-013, REQ-092-003 -->
 <!-- ADF-COVERS(design): REQ-009-051, REQ-052-013 -->
 <!-- ADF-COVERS(implementation): REQ-011-001, REQ-011-002, REQ-011-003, REQ-011-005, REQ-011-008, REQ-011-009, REQ-011-013, REQ-011-014, REQ-011-015, REQ-011-020, REQ-011-021, REQ-011-022, REQ-011-023, REQ-011-024, REQ-011-031, REQ-011-032, REQ-052-001, REQ-052-002, REQ-052-003, REQ-052-004, REQ-052-005, REQ-052-008, REQ-052-009, REQ-052-010, REQ-052-011 -->
 
@@ -79,6 +79,7 @@ GitHub版 / Local版等価性:
 - 入力: 評価リクエスト（state、instructions、criteria、質問群〔形式: boolean 相当・choice（候補付き）・score（水準付き）〕）。provider 接続設定は AI_GATEWAY_API_KEY 環境変数で解決する。
 - 出力: 質問ごとの結果（選択・真偽・水準）、候補別確率分布、正規化済み confidence（provider 固有の格納位置〔初期 Vercel adapter では AI SDK 7 experimental_evaluate 経由の providerMetadata.typesafe.confidence〕を内部吸収して共通形式へ正規化）、inputTokens（初期 Vercel adapter が返す場合）、機械的処理時間。失敗時は構造化失敗（分類: not_configured、timeout、429、5xx、network error、response validation error 等）。
 - 保証: 公開契約は provider・SDK 非依存とし、AI SDK の型名・API 名を公開スキーマと Workflow 層へ漏らさない。質問型（独立命題・排他候補・順序水準）と boolean/choice/score の対応づけは adapter mapping であり意味契約の変更ではない。Tool は判断対象の意味・評価基準・Jev を呼ぶべき箇所・最終判断を所有しない（REQ-011-020 準拠）。API key 未設定時は呼び出さない。代替手段は従来 LLM 経路であり、Jev 障害時も Workflow は継続できる（REQ-052-005 の代替手段・継続可否の定義義務に基づく）。評価言語は日本語とする。
+- 2段階書込み（観測の永続化）: evaluate は評価完了（not_configured 完了を含む）時点で、当該実行の観測 JSON を部分レコードとして作成・永続化する（run 級 field〔workflow, judgmentKind, subject, provider, requestedModel, sourceRevision, outcome, durationMs, inputs, inputTokens〕に加え、Jev 側観測項目〔質問ごとの jevResult・候補別確率分布・confidence・失敗分類〕を含む）。observation_write は同一 JSON へ LLM 最終判断関連 field（llmFinalJudgment, llmTreatment）を追記して完成させる（追記完成 mode）。部分レコードであることは機械判別可能な完了状態 field で明示し、消費者（Issue B 評価）が不完全レコードを完全な観測と誤認しないようにする。観測の永続化は evaluate の時点書込みと observation_write の完成書込みのみが行う。書込先は REQ-090-006 が定める 1実行 1 JSON の観測 domain state であり、新規 durable state 機構を新設せず投機実行・rollback を伴わない（REQ-090-009 非違反確認済み）。evaluate 内部の書込み失敗は評価結果の返却と独立した warning とし、評価結果を失わない（観測記録の書込み失敗の既存意味論と同一）。
 - 失敗時の意味: Jev API 呼出し後の失敗は自動 retry せず構造化失敗を呼出し元へ返し、呼出し元 Workflow は即座に従来 LLM 経路へ fallback する。観測記録の書込み失敗は構造化失敗として呼出し元へ返すが Workflow の成否とは独立（完了報告で識別可能な warning）とする。
 - 配布境界: ADF 汎用の Tool として配布対象とする（REQ-052-006）。Tool の正式名称・物理配置・operation 名は本 Case の実装設計時の自由度として合意済みであり、決定時に本 Design へ反映する。実装での確定値: 正式名称 `agentdev_jev`、物理配置 Tool 本体 `src/opencode/tools/agentdev-jev/`、初期 Vercel adapter `src/opencode/tools/agentdev-jev/adapter-vercel/`（評価 SDK 依存はこの adapter パッケージに閉じる）、Plugin 登録配線 `src/opencode/plugins/agentdev-jev-tool/`、operation カタログ `evaluate` と `observation_write`（観測 JSON の形式検証と書込み支援。REQ-090-006）
 
