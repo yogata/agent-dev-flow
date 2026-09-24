@@ -1,0 +1,159 @@
+{
+  "observationId": "20260924T002529Z-85aa",
+  "durationMs": 1485,
+  "inputs": {
+    "references": [
+      {
+        "digest": "fca0182121e778cd3f4f87ed0320917b30f97c8751f3d8c71470e5f920e68b73",
+        "label": "inbox-item-1",
+        "path": ".agentdev/intake/inbox/2026-09-23-jev-observation-write-target-resolves-main.md"
+      },
+      {
+        "digest": "60c1e10db4b313fbf006cedeeddc94ed2af5c53db513ef4d436db34c6da68213",
+        "label": "inbox-item-2",
+        "path": ".agentdev/intake/inbox/2026-09-24-agentdev-gh-issue-list-search-page-limit.md"
+      },
+      {
+        "digest": "ed022e5440f3a812c0862c30b0fff1cf2438d77ff43f9535a1e8962b194fa95a",
+        "label": "inbox-item-3",
+        "path": ".agentdev/intake/inbox/2026-09-24-agentdev-jev-observation-loss.md"
+      },
+      {
+        "digest": "d219794812c29bcf796c6682787d0a1984808a3359f992a4c135c25c2ebdc73e",
+        "label": "inbox-item-4",
+        "path": ".agentdev/intake/inbox/2026-09-24-case-close-3084-checker-header-comment-stale-wording.md"
+      },
+      {
+        "digest": "45bf075d1edb1d2cbfef716e4da33f5a0a76450535c44c9cc24c4e0aada737f8",
+        "label": "inbox-item-5",
+        "path": ".agentdev/intake/inbox/2026-09-24-case-close-3085-ir055-remaining-warnings.md"
+      },
+      {
+        "digest": "5892e7f318a12d3c8dc5660b203bf0a741e40de67de3f922841a0cc846f7cfd1",
+        "label": "inbox-item-6",
+        "path": ".agentdev/intake/inbox/2026-09-24-case-ready-3089-pr-branch-stacking.md"
+      },
+      {
+        "digest": "e463d649bbe3057c306f7eaca57c25b372510902506316f55049240a420529d7",
+        "label": "inbox-item-7",
+        "path": ".agentdev/intake/inbox/2026-09-24-req-031-001-phase-name-desync.md"
+      }
+    ],
+    "requestDigest": "d0fd19b9c6696082972ba8373dbb6f16aee8236ce7f6070ec109417fa023fa98",
+    "snapshot": "call A（item 評価 score 21問 eval-i1〜i7-validity/impact/urgency）は jev_failed: server_error（GatewayInternalServerError、retryable:false、自動 retry なし）。従来 LLM 経路で評価し観測 JSON には格納せず完了報告へ記録。call B（暫定分類 choice 7問）と call C（発動条件 boolean 1問）は completed。"
+  },
+  "judgmentKind": "step1-classification-and-step2-review-trigger",
+  "judgments": [
+    {
+      "confidence": 0.7885714285714285,
+      "jevResult": "採用",
+      "judgmentId": "class-item-1",
+      "llmFinalJudgment": "採用（document_correction、低優先度。書込先意味論の契約・README 明記）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "保留": 0.37,
+        "却下": 0.04,
+        "採用": 0.59
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7885714285714285,
+      "jevResult": "採用",
+      "judgmentId": "class-item-2",
+      "llmFinalJudgment": "採用（nonconformance_fix、高優先度。issue_list search のサーバ推送。REQ-092 呼出側規律とは重複させない）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "保留": 0.23,
+        "却下": 0.23,
+        "採用": 0.54
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7885714285714285,
+      "jevResult": "採用",
+      "judgmentId": "class-item-3",
+      "llmFinalJudgment": "採用（nonconformance_fix。evaluate〜observation_write 間の観測喪失。REQ-090-003 未被覆、REQ-090-009 制約を明記）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "保留": 0.1,
+        "却下": 0,
+        "採用": 0.9
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7885714285714285,
+      "jevResult": "採用",
+      "judgmentId": "class-item-4",
+      "llmFinalJudgment": "採用（nonconformance_fix。L20-21 ヘッダコメントの正典契約整合。RD-002 主張は未確認として注記）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "保留": 0,
+        "却下": 0,
+        "採用": 1
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7885714285714285,
+      "jevResult": "保留",
+      "judgmentId": "class-item-5",
+      "llmFinalJudgment": "保留（候補改善が確認・棚卸し型で具体的修正対象未確定。次回観察サイクルで再評価）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "保留": 0.54,
+        "却下": 0.04,
+        "採用": 0.42
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7885714285714285,
+      "jevResult": "採用",
+      "judgmentId": "class-item-6",
+      "llmFinalJudgment": "採用（edge_case。Definition branch base 規律または stage-2 スタック検出。REQ-032-010/011 は事後救済として既存）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "保留": 0.04,
+        "却下": 0,
+        "採用": 0.96
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7885714285714285,
+      "jevResult": "採用",
+      "judgmentId": "class-item-7",
+      "llmFinalJudgment": "採用（document_correction。REQ-031-001 フェーズ名表記の guide 正規表記への同期）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "保留": 0,
+        "却下": 0.01,
+        "採用": 0.99
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.93,
+      "jevResult": true,
+      "judgmentId": "trigger-review",
+      "llmFinalJudgment": "発動（7 item・意味的決定あり・skip 条件非該当）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.07,
+        "true": 0.93
+      },
+      "questionForm": "boolean"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "f98383640cebfc1439f03c142aca1536024abe17",
+  "subject": "intake inbox 7 item の暫定分類（2026-09-24 backlog-auto stage-2、STEP-1 分類と STEP-2 発動条件判定）",
+  "workflow": "intake-promote"
+}
