@@ -5,6 +5,7 @@ created: 2026-08-20
 updated: 2026-08-24
 ---
 <!-- ADF-COVERS(implementation): REQ-010-009 -->
+<!-- ADF-COVERS(design): REQ-051-009 -->
 
 # 整合性ルールカタログ
 
