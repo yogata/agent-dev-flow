@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は33件、提案中の Decision は0件である。
+現行の承認済み Decision は33件、提案中の Decision は1件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -55,6 +55,7 @@
 | DEC-039 | ADF v4 authority・副作用統制と冪等・並行性モデル | accepted | 2026-09-19 |
 | DEC-040 | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化） | accepted | 2026-09-22 |
 | DEC-041 | Wave 構成純度と実行並列上限の単一所有 | accepted | 2026-09-23 |
+| DEC-042 | case-auto 最大並列維持と同期逐次フォールバック禁止 | proposed | 2026-09-24 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -105,6 +106,7 @@
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
+- [DEC-042](DEC-042.md)（case-auto 最大並列維持と同期逐次フォールバック禁止）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -245,6 +247,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-039 | [REQ-003](../requirements/REQ-003.md), [REQ-034](../requirements/REQ-034.md) | - |
 | DEC-040 | [REQ-090](../requirements/REQ-090.md) | - |
 | DEC-041 | [REQ-031](../requirements/REQ-031.md), [REQ-034](../requirements/REQ-034.md), [REQ-035](../requirements/REQ-035.md), [REQ-061](../requirements/REQ-061.md) | - |
+| DEC-042 | [REQ-031](../requirements/REQ-031.md), [REQ-034](../requirements/REQ-034.md) | case-auto 最大並列維持と同期逐次フォールバック禁止（REQ-034-025/028 意味変更・REQ-034-044/045 APPEND、REQ-031-030 UPDATE と整合） |
 <!-- AUTOGEN:END -->
 
 ## 過去版の履歴基盤

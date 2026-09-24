@@ -2,7 +2,7 @@
 title: システム仕様
 status: accepted
 created: 2026-08-20
-updated: "2026-09-23"
+updated: "2026-09-24"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-033 -->
 <!-- ADF-COVERS(implementation): REQ-002-009, REQ-002-010, REQ-002-012 -->
@@ -221,7 +221,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **分岐**: 入力モード（Issue番号/URL vs 要件doc 4パターン）、artifact_actions ベース分岐（Definition 保存内部責務の実行要否）、Epic Wave 反復（共有 active Issue task 枠による横断補充・空き枠補充の制御。REQ-034-027、REQ-034-040〜043、DEC-041）、Standard flow vs Epic Issue flow、停止条件11項目、停止理由分類（7軸 + 上位合意矛盾/新規ユーザー判断）、コンフリクト Level 1/2/3 エスカレーション、adversarial-review 由来の user-decision-required、bounded parent decision resolution（自律解決/作業仮定/上位合意矛盾/新規ユーザー判断）、delegation-unavailable。
 - **副作用**: case-open/case-ready/case-run/case-close の各委譲起動、case-run インライン実行（実行担当サブエージェント委譲を含む）、GitHub Issue/PR/comment/merge/close（自走対象）、remote branch 削除（自作branch限定）、docs/ 更新。DB migration実行/deploy/apply/外部SaaS/認証は対象外。Epic Issue 本文への直接書込はしない（case-close 単一書き手、`POL-epic-tracking-single-writer`）。
 - **HITL**: STEP-4 停止条件（11項目）、adversarial-review 由来の user-decision-required 待機、bounded parent decision resolution の上位合意矛盾/新規ユーザー判断、draft 0件時の req-define 実行要求。
-- **並列性**: orchestration stage モデル（stage 1 case-open / stage 2 case-ready / stage 4 case-close は stage 内最大並列（直列化要因のみ局所直列化）、stage 3 は Epic・Wave・Standard Issue を横断する共有 active Issue task 枠（現行 5）を単一所有し、stage 間は全対象収束（fan-in）で進行。REQ-034-025/026/027、DEC-041）。OU 間は必須依存で結合した群は順次、必須依存なし群は並列。並列数の「5」は2文脈へ区別する: (1) Wave 構成は意味的依存のみから導出され並列数の「5」を持たない、(2) 実行並列上限は stage 3 全体で共有される active Issue task 数として単一所有。case-open の子 Issue 作成並列化（最大 5 件）は別責務の実行安全値として区別して維持。順次フォールバック可能（stage 内 scheduling 制約であり stage 分割ではない）。bg task 破棄検知時の3状態回復。Epic の Wave 間 case-close(#epic) 相当の統合処理は stage 3 内部処理。
+- **並列性**: orchestration stage モデル（stage 1 case-open / stage 2 case-ready / stage 4 case-close は stage 内最大並列（直列化要因のみ局所直列化）、stage 3 は Epic・Wave・Standard Issue を横断する共有 active Issue task 枠（現行 5）を単一所有し、stage 間は全対象収束（fan-in）で進行。REQ-034-025/026/027、DEC-041）。OU 間は必須依存で結合した群は順次、必須依存なし群は並列。並列数の「5」は2文脈へ区別する: (1) Wave 構成は意味的依存のみから導出され並列数の「5」を持たない、(2) 実行並列上限は stage 3 全体で共有される active Issue task 数として単一所有。case-open の子 Issue 作成並列化（最大 5 件）は別責務の実行安全値として区別して維持。並列実行は必須（実行環境由来の障害時も同期逐次実行へ切替えず、並列起動不能時は停止と staggered background 並列再委譲。REQ-034-028/044）。bg task 破棄検知時の3状態回復。Epic の Wave 間 case-close(#epic) 相当の統合処理は stage 3 内部処理。
 - **resume**: 入力解決結果、各工程の起動結果（Issue/PR番号）、RU パス、capture 対象情報、`case_auto_started_at`、L1 工程別タイムスタンプ、orchestration stage 別結果、bg task 状態、結果状態4次元、起動時対象集合の安定識別子（ローカル一時実行状態、REQ-002-036。現在 stage は最も早い未収束 stage として再構成、REQ-034-025）。
 - **durable state**: 各工程の永続成果物（REQ/Decision/Design/Issue/PR/RU削除）、`case_auto_started_at`、L1 タイムスタンプ内訳、Epic Issue ステータステーブル（case-close が書込、case-auto は読取のみ）。
 - **Harness依存**: bg task API（harness 同時起動制限。active Issue task 数の論理上限〔ADF 契約〕とは切り離され、adapter・実装制約〔キューイング・バンドリング等〕として扱う。DEC-041）、subagent 起動（委譲工程）、context 管理（親コンテキスト非累積）、タイムスタンプ計測（L1）、委譲起動判定、bg task 破棄検知・状態別回復、インライン case-run 実行、拡張読込。
