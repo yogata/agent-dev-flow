@@ -1,0 +1,100 @@
+{
+  "observationId": "20260923T234909Z-3bff",
+  "durationMs": 2857,
+  "inputTokens": 7349,
+  "inputs": {
+    "references": [
+      {
+        "digest": "44bbe7222943b166eedbb5dee813f619f9a6eaa13967189213313ac3101703bf",
+        "label": "learning inbox",
+        "path": ".agentdev/learning/inbox.md"
+      },
+      {
+        "digest": "31605e181fe2a227f31a472675e30402537460566397784706e0affead4eab92",
+        "label": "learning deferred pool",
+        "path": ".agentdev/learning/deferred.md"
+      }
+    ],
+    "requestDigest": "a217dd839c03a7e03607b562216044b2eeb24c6cb661f690ed8b69ac893f80d0",
+    "snapshot": "5種の閉じた判断（分類4問・8軸16問・廃棄判定9問・昇華可能性3問・発動条件1問）を state+instructions+criteria+questions として構成して evaluate に投入。state 全文は保存せず digest と参照のみ"
+  },
+  "judgmentKind": "closed-judgment-batch",
+  "judgments": [
+    {
+      "confidence": 0.7025,
+      "jevResult": "4組すべて同一問題クラス（cls-junction 0.57 / cls-stale-state 0.82 / cls-parallel-boundary 0.77 / cls-stdevidence 0.65）",
+      "judgmentId": "classification",
+      "llmFinalJudgment": "4組すべて同一問題クラスと確定（K7 junction 処理系差分 / K6 旧 durable state 疑似 fail / K8 並行委譲作業境界 / K4 bun test stderr 証跡）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "cls-junction 同一": 0.57,
+        "cls-parallel-boundary 同一": 0.77,
+        "cls-stale-state 同一": 0.82,
+        "cls-stdevidence 同一": 0.65
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.5838,
+      "jevResult": "Jev 水準: K10 合計35 / K9 合計32（発生件数軸で 1件クラスタに水準3-4を示唆し軸定義と不整合）",
+      "judgmentId": "scoring",
+      "llmFinalJudgment": "軸定義の点数表に従い修正: K10 合計31 / K9 合計29（発生件数はエントリ数基準で再計上）。分布は 16 score 質問の水準別平均",
+      "llmTreatment": "corrected",
+      "probabilityDistribution": {
+        "1": 0.0375,
+        "2": 0.0669,
+        "3": 0.2044,
+        "4": 0.3406,
+        "5": 0.3506
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.7711,
+      "jevResult": "K2=cat4 / K4=cat5 / K6=cat5 / K7=cat4 / K8=cat4 / K9=deferred / K10=cat1 / K12=cat5 / E6=deferred",
+      "judgmentId": "disposal",
+      "llmFinalJudgment": "K7=cat5（既存正規手順の fix gap）/ K8=cat5（隔離原則への前置検査追記）/ K9=cat5（3系統発生・配置先指定済み）へ修正。K2=cat4・K4=cat5・K6=cat5・K10=cat1・K12=cat5・E6=deferred は Jev と同一。分布は 9 質問のカテゴリ別平均",
+      "llmTreatment": "corrected",
+      "probabilityDistribution": {
+        "duplicate": 0.019,
+        "category 1 恒久契約候補（REQ）": 0.112,
+        "category 4 project knowledge": 0.319,
+        "category 5 既存対策の更新": 0.369,
+        "category 6 deferred": 0.178
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.5933,
+      "jevResult": "K4=true (0.52) / K9=false (0.69) / K12=true (0.57)",
+      "judgmentId": "sublimation",
+      "llmFinalJudgment": "K9 を true に修正（L-004/L-010 を含む3系統発生・harness-delegation.md 配置先指定）。K4/K12 は true で同一。分布は 3 質問の平均",
+      "llmTreatment": "corrected",
+      "probabilityDistribution": {
+        "false": 0.5333,
+        "true": 0.4667
+      },
+      "questionForm": "boolean"
+    },
+    {
+      "confidence": 0.94,
+      "jevResult": "true",
+      "judgmentId": "review-trigger",
+      "llmFinalJudgment": "発動（default-on・skip 条件非該当〔17件・inbox 非空〕・evaluation-report 反映済み・不可逆処理未実行）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.06,
+        "true": 0.94
+      },
+      "questionForm": "boolean"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "68e75cef",
+  "subject": "2026-09-24 backlog-auto stage-2 learning-promote（inbox 17エントリ・問題クラス16）の問題クラス分類・8軸評価・廃棄判定・昇華可能性評価・adversarial-review 発動条件判定",
+  "workflow": "learning-promote"
+}

@@ -1,0 +1,36 @@
+{
+  "observationId": "20260923T232547Z-1aa0",
+  "durationMs": 1500,
+  "inputs": {
+    "requestDigest": "61f1c0d318316a27b94950e71bdb10c29cabac4ad7225e435175f9db03282a17",
+    "references": [
+      {
+        "digest": "44bbe7222943b166eedbb5dee813f619f9a6eaa13967189213313ac3101703bf",
+        "label": "inbox entries",
+        "path": ".agentdev/learning/inbox.md"
+      },
+      {
+        "digest": "00c89911511fdf6a3d2f67c2f637002c2ca89ded7b375b47545c7c7c3ad7f512",
+        "label": "REQ-092",
+        "path": "docs/requirements/REQ-092.md"
+      }
+    ]
+  },
+  "judgments": [
+    {
+      "failureKind": "server_error",
+      "judgmentId": "issue-list-state-filter",
+      "llmFinalJudgment": "問題クラス1（issue_list の state フィルタ規律欠落）として分類。8軸合計26/40、区分5「既存対策の更新」、昇華可能。REQ-092-001 は search 併用のみで state filter がなく、今回の再発を防げない。",
+      "llmTreatment": "unchanged",
+      "questionForm": "choice"
+    }
+  ],
+  "outcome": "jev_failed",
+  "provider": "AI Gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "68e75cefc3b767d67f4976f9e14e026be8c31e8e",
+  "subject": "learning-promote 2026-09-24 inbox 17件の評価",
+  "workflow": "learning-promote",
+  "judgmentKind": "problem-class-and-promotion-judgment"
+}
