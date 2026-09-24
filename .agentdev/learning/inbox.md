@@ -84,3 +84,35 @@
 - **想定反映先**: traceability 宣言運用手順。
 - **関連**: traceability/agentdev-gh.yaml、traceability/agentdev-gh-tool.yaml、Case #3113（PR #3133）。
 - **タグ**: #traceability #sidecar #component-boundary
+
+## Case Issue 本文のレビュー判断 evidence path が backlog-review prune 後に参照不能になる構造
+
+- **問題事象**: Case Issue 本文のレビュー判断（RD-001/RD-002）が参照する evidence path（`.agentdev/learning/promoted/existing-countermeasure-update-junction-os-command-differences.md`、`.agentdev/learning/promoted/existing-countermeasure-update-worktree-operations-backslash-path-note.md`）が、本 Case の SSoT 再取得時点で worktree・main とも存在しなかった。backlog-review の prune（成功成果物削除）による正常なライフサイクルの可能性が高いが、本文からは prune 済みなのか欠落なのか判別できない
+- **発生局面**: case-run SSoT 再取得（Case #3107、PR #3127）。
+- **検知方法**: PR 本文 Findings セクションの申告（RD-001/RD-002 の evidence path 不在の観察）。
+- **根本原因**: 採用済み学びの evidence path を Case Issue 本文へ絶対パスで記録する構成は、promoted 成果物の削除（prune）後に参照不能になる。prune は成功成果物の正常な削除であり、参照側の本文に tombstone もライフサイクル記録も残らない。
+- **自律対応内容**: 実装阻害なし（REQ-018-006/007 行本文に学びの内容が合意済み投影として凝縮済み）として case-close を継続し、本観察を learning inbox へ回収。
+- **ユーザー確認有無**: なし。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: Case Issue 本文の evidence path は、参照先成果物のライフサイクル（prune）を跨いで耐える識別子（promoted 時の RU 番号・learning タイトル・関連 Case 番号）と併記する。path 単独の参照は後工程（case-revise・監査）での証跡追跡を弱め得る。
+- **再発条件**: learning promoted 成果物を参照する Case Issue 本文が backlog-review prune 以降に後工程で再読込された場合。
+- **予防策候補**: Issue 本文テンプレートの evidence 記録規約に「path + prune 後も識別可能な代替識別子（RU 番号・タイトル）の併記」を追加する。backlog-review 側の prune 記録との突合手順の明記。
+- **想定反映先**: docs（Issue テンプレート・backlog-review 系 workflow skill への注記追記。具体化の判断は backlog/intake 側）。
+- **関連**: .agentdev/learning/promoted/（prune 対象）、agentdev-backlog-integration（prune 方針）、Case #3107（PR #3127）。
+- **タグ**: #traceability #evidence-path #prune #lifecycle
+
+## 配布物本文への concrete ID 直書きを配布依存境界 checker の事後検知が捕捉し節参照化で解消
+
+- **問題事象**: 初回実装で配布物本文（harness-delegation.md）へ要件行 ID（REQ-031-033、REQ-031-007）を直書きし、配布依存境界 checker の事後検知で捕捉された。
+- **発生局面**: 実装（case-run・Case #3111、PR #3132）。
+- **検知方法**: 配布依存境界 checker（check_distribution_boundary_cli.ts）の concrete_id_hits 事後検知（初回 concrete-id 違反 2 件）。
+- **根本原因**: 文書執筆中に配布物本文への concrete ID 直書き禁止（配布依存境界）の適用を漏らした。既存の作成時予防 + 事後検知の両面運用（DEC-014 配布依存境界多層 enforcement）の検知面が正常作動した事象であり、既存対策の範囲内。新規問題クラス・未防止の再発要因なし。
+- **自律対応内容**: 本文の要件行 ID を case-run Design の節参照へ置換して解消し、再検証合格（ok: true / concrete_id_hits 0）。
+- **ユーザー確認有無**: なし。
+- **Decision/REQ/spec影響**: なし（配布 SKILL 本体・REQ 行は無変更）。
+- **横展開観点**: 配布物本文を追記する場合は節参照方式を執筆時に先行選択する。検知面（checker）が正しく作動していることの実証事例として、多層 enforcement の運用継続判断の根拠になる。
+- **再発条件**: 配布物本文を新規執筆・追記する際に concrete ID を混入した場合（検知面は常時作動）。
+- **予防策候補**: なし（既存の作成時予防 + 事後検知で担保。追加施策不要）。
+- **想定反映先**: なし（既存対策で継続運用。具体化の判断は backlog/intake 側）。
+- **関連**: src/opencode/skills/agentdev-case-run-execution-adapter/references/harness-delegation.md、DEC-014（配布依存境界多層 enforcement）、Case #3111（PR #3132）。
+- **タグ**: #distribution-boundary #concrete-id #detection-working
