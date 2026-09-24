@@ -11,6 +11,7 @@ implementation:
   src/opencode/skills/agentdev-workflow-req-define/references/requirement-development.md:
     - REQ-008-062
     - REQ-090-004
+    - REQ-090-012
 verification:
   docs/designs/commands/req-define.md:
     - REQ-021-029

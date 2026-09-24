@@ -2,3 +2,4 @@ component: agentdev-workflow-intake-promote
 implementation:
   src/opencode/skills/agentdev-workflow-intake-promote/references/classification-and-review.md:
     - REQ-090-004
+    - REQ-090-012
