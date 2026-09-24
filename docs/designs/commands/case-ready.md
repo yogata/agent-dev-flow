@@ -6,7 +6,7 @@ updated: "2026-09-23"
 ---
 
 <!-- ADF-COVERS(design): REQ-021-024 -->
-<!-- ADF-COVERS(design): REQ-061-010, REQ-061-019, REQ-061-038, REQ-061-023, REQ-061-029, REQ-061-030, REQ-061-033, REQ-061-034, REQ-061-035, REQ-035-012, REQ-035-018 -->
+<!-- ADF-COVERS(design): REQ-061-010, REQ-061-019, REQ-061-038, REQ-061-023, REQ-061-029, REQ-061-030, REQ-061-033, REQ-061-034, REQ-061-035, REQ-061-039, REQ-035-012, REQ-035-018 -->
 
 # case-ready Command Design
 
@@ -24,6 +24,7 @@ case-ready の公開契約（入出力、副作用、安全性、承認境界、
 ## 内部構成
 
 - Definition 受入: Definition PR の忠実性確認（req-define 合意内容との投影検査）、整合性検査、品質検査、merge 前の Draft 状態確認（pr_read の isDraft、REQ-061-032）。新しい意味判断が不要な場合は追加承認なしで自動確定・merge。新しい Decision、意味変更、対象範囲拡大、意味的不整合の解消が必要な場合は停止し HITL とする
+- overlap 突合（REQ-061-039）: Definition PR 受入は、draft の宣言変更ファイル集合（artifact_actions の target 集合）と pr_changed_files 実報告の差分検査（overlap 突合）を含む。スタック構造（PR が兄弟 Case の commit を含む）や宣言・実報告の乖離を検出した場合は警告し、隔離 worktree での差分再構成手順に従って救済する。実効 squash diff が自 Case 分に収まった場合もスタック検出の警告は省略しない（スタック底が最後 merge の場合に空 diff / 同一領域競合となるリスクのため）
 - 保存実体: REQ / Decision / Design の保存は req-file-manager、decision-file-manager、design-file-manager、artifact-validation へ委譲する。case-ready 自身は保存手続きを実装しない。REQ の保存では Design 対応が未成立の要件行が残っても保存を失敗させない（Design 対応の成立判定は ready 遷移ゲートの責務）
 - canonical 再取得: merge 後に canonical Definition を再取得し、traceability check を機械実行する（REQ-061-023）。check は inline declaration と top-level `traceability/` 配下の sidecar を同じ論理的な対応関係へ正規化した対応関係全体を検査対象とする。missing-design を検出した場合は case-open への差し戻し経路を扱う
 - Design 対応ゲート: 対象 Definition の要件行ごとに Design 対応が 1 件以上存在することを ready 遷移の必要条件とする（missing-design 残存時は ready へ遷移させない）。verification policy（`traceability/policy.yaml`）との整合も同一の check で検証し、verification policy の不正を検出した場合は ready へ遷移させない

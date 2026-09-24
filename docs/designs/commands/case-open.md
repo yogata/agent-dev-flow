@@ -10,7 +10,7 @@ updated: "2026-09-23"
 <!-- ADF-COVERS(implementation): REQ-021-014, REQ-021-024 -->
 <!-- ADF-COVERS(implementation): REQ-035-006, REQ-035-008 -->
 <!-- ADF-COVERS(implementation): REQ-049-005 -->
-<!-- ADF-COVERS(design): REQ-030-014 -->
+<!-- ADF-COVERS(design): REQ-030-014, REQ-030-017 -->
 
 # case-open Design
 
@@ -79,6 +79,16 @@ adversarial-review は Root Case 本文候補と Definition Package 構成案確
 - case-open は再実行時、既存 Root Case および既存 Definition PR を冪等キーで検出し、再利用する。重複生成しない（REQ-030-010）。
 - 不足分だけを処理する。Root Case が存在し Definition PR が存在しない場合は PR 生成のみを実行し、Root Case が存在しない場合は Root Case 確立から実行する。両者とも存在する場合は新規生成を行わない。
 - Definition PR は canonical Definition に実変更がある場合のみ作成する。canonical との差分が空の場合（bugfix / maintenance / docs_chore 等の実変更なし Case）は作成しない（REQ-030-002）。実変更判定が不能な場合は PR を作成せず停止し、判定不能の理由を報告する。
+
+### 並行 case-open の作業隔離規律（REQ-030-017）
+
+並行して case-open を実行する場合の作業隔離規律を Definition branch 作成・PR 作成の運用手順へ定める:
+
+- **Case 専用 worktree の前置**: 並行 case-open を実行する場合、各 Case は専用 worktree（`.worktrees/{N}-definition`）で作業する。共有 working tree での Definition 変更作業を行わない。
+- **Definition branch の origin/main HEAD からの独立作成**: Definition branch は origin/main HEAD から独立して作成し、兄弟 Case の Definition commit を含むスタック構造を作らない。branch 命名（REQ-083）は既存規定のまま、本規律は branch 作成元と作業隔離を定める。
+- **PR 作成前の自 Case 差分検査**: PR 作成前に merge-base と diff --stat により差分が自 Case 分のみであることを検査する。兄弟 Case の commit を含むスタック構造を検出した場合は、隔離 worktree での差分再構成（origin/main HEAD からの branch 再作成と明示パスによる変更の再適用）で救済してから PR を作成する。
+- **明示パス指定ステージ**: ステージは明示パス指定で行い、スイープ操作（`git add -A` 等）は行わない。
+- **1-writer 前提侵害の検知と早期断念**: `git status` により worktree 1-writer 前提の侵害（in-scope 外の書込み混入）を検知した場合は直ちに停止する（早期断念）。
 
 ### 検証スコープポリシー追随工程（REQ-030-015）
 
