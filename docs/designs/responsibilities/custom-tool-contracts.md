@@ -4,7 +4,7 @@ status: accepted
 created: 2026-08-24
 updated: 2026-09-24
 ---
-<!-- ADF-COVERS(design): REQ-090-001, REQ-090-002, REQ-090-003, REQ-090-004, REQ-090-009, REQ-090-010, REQ-090-011, REQ-090-012, REQ-090-013, REQ-092-003 -->
+<!-- ADF-COVERS(design): REQ-090-001, REQ-090-002, REQ-090-003, REQ-090-004, REQ-090-009, REQ-090-010, REQ-090-011, REQ-090-012, REQ-090-013, REQ-092-003, REQ-011-033 -->
 <!-- ADF-COVERS(design): REQ-009-051, REQ-052-013 -->
 <!-- ADF-COVERS(implementation): REQ-011-001, REQ-011-002, REQ-011-003, REQ-011-005, REQ-011-008, REQ-011-009, REQ-011-013, REQ-011-014, REQ-011-015, REQ-011-020, REQ-011-021, REQ-011-022, REQ-011-023, REQ-011-024, REQ-011-031, REQ-011-032, REQ-052-001, REQ-052-002, REQ-052-003, REQ-052-004, REQ-052-005, REQ-052-008, REQ-052-009, REQ-052-010, REQ-052-011 -->
 
@@ -52,6 +52,9 @@ VERIFY 適用（READ / WRITE 分離）:
 一覧完全性:
 - issue_list と comment_list は Tool 内部で必要なページをすべて取得し、完全一覧として返す。上位層は GitHub API のページングを指定しない
 - フィルタ可能な軸（state、labels 等）はサーバ側絞り込みクエリへ推送し、安全上限への到達可能性を低減する。上限値は本 Design のパラメータとして定義する
+- issue_list の search 指定はサーバ側絞り込み推送の対象である（REQ-011-033）。search 指定時は search/issues エンドポイント（q=repo:{owner}/{repo} is:issue state:{state} {search} in:title label:...）へ切替え、クライアント側 title フィルタ（title.includes）は Local 版のみの実現手段とする。search 未指定時は従来どおり list 系クエリの完全走査とする
+- 物理写像差異の宣言（REQ-011-024）: GitHub 版 in:title は tokenized 照合であり substring と異なり前方部分文字列照合（例: 「REQ-012」で「REQ-0122」を拾う）が成立しない場合がある。重複回避検索の呼出側は検索キー選定でこの差を考慮する。Local 版は includes() を維持し同一観測契約とする
+- 運用注意: GitHub search index の更新遅延（作成直後の Issue が検索に現れるまで秒〜分程度かかる可能性）、search API rate limit（30 req/min）。安全上限（10ページ×100件）の意味は変更しない
 - 安全上の上限によって完全取得できない場合は再試行可能な失敗（operation-failed）として扱い、不完全な一覧を完全な成功結果として返さない。呼出側の回避手順（期間分割等）は各 workflow 文書が定める
 
 失敗分類の判定規則:
