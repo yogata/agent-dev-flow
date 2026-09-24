@@ -160,6 +160,7 @@ bun test によるフル suite 実行は、次の環境前提を踏まえて実�
   - **package rename 時の bun.lock 確認**: package rename を伴う変更で `bun install` を実行した場合は、bun.lock の root workspace name が新パッケージ名へ追従していることを確認する（確認手順は runtime-package-boundary Design「本体リポジトリ sync」節参照）
 - worktree の `.opencode/` 配下 junction は未伝播である。junction を前提とする構造系テストは source パス（SoT パス）への fallback で実行される
 - worktree の構造上の理由でテストスイートが実行できない場合は、メインリポジトリからの読取専用実行でエビデンスを採取できる。この場合は実行環境（worktree または main、junction 伝播状態、依存パッケージ状態）を環境ラベルとして検証記録に明記し、fail 全件の由来分類（既知欠陥・環境依存・当該変更起因）を行う
+- **旧 baseline と並行 main merge 追随差の注意（REQ-007-012）**: worktree 作成元の分岐点 baseline 以降に origin/main へ他 Case の merge が入った場合、baseline 系 durable state（baseline commit、baseline 期待値・許容リスト等）は現行 main より古い状態で検証が行われる。この追随差により、当該変更と無関係なテストが baseline の陳腐化で疑似 fail することがある。検証開始前に `git fetch origin` 後の main 鮮度確認（本リポジトリ「main の鮮度確認」参照）で追随差の有無を確認し、追随差下の疑似 fail については `agentdev-quality-gates` QG-4「fail 由来分類」節の baseline 追随差3点対照手順（単独再実行・分岐点 main root 再現・現行 baseline 差し替え再実行（検証後に旧状態へ復元））で由来分類する。疑似 fail を当該変更起因と誤分類しないこと
 
 ### junction 依存 checker の skip 挙動
 
