@@ -52,3 +52,19 @@
 - **想定反映先**: docs（workflow skill reference への注記追記。具体化の判断は backlog/intake 側）
 - **関連**: agentdev-workflow-case-open（STEP-2/STEP-3）、Case #3121（PR #3122）
 - **タグ**: `#docs` `#domain-drift` `#mechanical-projection`
+
+## case-ready トレーサビリティ完全性ゲートが baseline 既知 missing-design の対象行で fail-closed 停止する（対象行 design 対応の事前確認が Definition 計画に必要）
+
+- **問題事象**: case-ready STEP-2 canonical 再取得時の traceability check（対象要件行 scope・機械実行）で、本 Case が意味変更した既存行 REQ-031-030 の missing-design（Design 対応 0 件）を検出し、workflow 契約（STEP-2 差し戻し分岐・fail-closed・手動判断での代替禁止）により case-open 差し戻し・ready 未遷移で停止した。欠落は pre-merge baseline（7847b412）で既に存在し本 Case 由来の増分はなかったが、lifecycle gate completeness は対象要件行 scope で fail-closed であり、baseline 既知の例外は契約上 missing-verification にしかない
+- **発生局面**: case-ready workflow STEP-2（Case #3123・Definition PR #3124 merge 後の canonical 再取得）
+- **検知方法**: agentdev-traceability check.ts `--req REQ-034-025,REQ-034-028,REQ-034-044,REQ-034-045,REQ-031-030` の missing-design fail（exit 2）+ coverage.ts による design 0 件 / implementation 3 件の実査 + pre-merge baseline 7847b412 での同一検出再現
+- **根本原因**: req-define / case-open の Definition Package 計画時に「既存行の意味変更」を対象とする場合、当該行の現行 design 対応有無の確認が手順に組込まれておらず、baseline 既知の design 対応欠落行を含む Case が case-ready ゲートで必ず停止する構造になっている（case-open の missing-design 0 件ゲートは新規行 REQ-034-044/045 には適用・適合したが、意味変更行 REQ-031-030 には増分ベースの判定で適用されなかった。比較として兄弟 Case 新設の REQ-031-033 は case-run.md Design の design 対応 1 件を持つ）
+- **自律対応内容**: merge は巻き戻さず（resume protocol）、DEC-042 は proposed 維持、draft 保持で停止。Root Case #3123 本文へ停止理由・証跡・再開条件を記録し本学びを capture
+- **ユーザー確認有無**: なし（停止報告で判断肢を提示）
+- **Decision/REQ/spec影響**: なし（現行契約の正しい適用。ゲート契約変更は別 Case）
+- **横展開観点**: 既存 REQ 行を意味変更する Case の req-define / case-open では、対象行（新規行に加え意味変更行）の design 対応有無を traceability coverage で事前確認し、欠落している場合は Definition 内で design 対応追加（例: 実現 Design の ADF-COVERS(design) 宣言追記）を artifact_actions に含めて合意する。増分ベース（新規行のみ）の missing-design ゲート適用では case-ready の lifecycle gate を通過できない
+- **再発条件**: baseline で design 対応 0 件の既存 REQ 行を対象に含む Definition Case が case-ready に到達した場合に毎回再発し得る（corpus の missing-design 既知債務 877 行の範囲で発生余地がある）
+- **予防策候補**: req-define / case-open の Definition Package 生成手順に「対象行の design 対応事前確認（coverage --req）と欠落時の artifact_actions 組込み」ステップの追加
+- **想定反映先**: docs（req-define / case-open 系 workflow skill・Design への手順追記。具体化の判断は backlog/intake 側）
+- **関連**: agentdev-traceability（check-interpretation「completeness の 2 層解釈」）、Case #3123（PR #3124）
+- **タグ**: `#traceability` `#missing-design` `#case-ready` `#lifecycle-gate`
