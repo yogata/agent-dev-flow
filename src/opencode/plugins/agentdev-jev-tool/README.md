@@ -8,8 +8,12 @@ Jev 先行評価は最終判断者ではなく、後段の LLM 推論への追�
 
 | operation | 内容 |
 |---|---|
-| `evaluate` | 閉じた判断入力への Jev 先行評価。質問ごとの結果・候別別確率分布・正規化済み confidence・inputTokens（provider が返す場合）・機械的処理時間を返す。失敗は構造化失敗（not_configured、timeout、rate_limited、server_error、network_error、response_invalid）。自動 retry なし |
-| `observation_write` | 観測 JSON（1 Workflow 実行 = 1 JSON）の形式検証と `.agentdev/jev-observations/` への書込み（REQ-{NNNN}-{NNN}） |
+| `evaluate` | 閉じた判断入力への Jev 先行評価。質問ごとの結果・候別別確率分布・正規化済み confidence・inputTokens（provider が返す場合）・機械的処理時間を返す。失敗は構造化失敗（not_configured、timeout、rate_limited、server_error、network_error、response_invalid）。自動 retry なし。評価完了（not_configured を含む）時点で部分レコード（recordState partial）を `.agentdev/jev-observations/` へ書込み、書込み失敗は評価結果と独立した warning（REQ-090-013） |
+| `observation_write` | 観測 JSON（1 Workflow 実行 = 1 JSON）の形式検証と `.agentdev/jev-observations/` への書込み（REQ-{NNNN}-{NNN}）。observationId 付きは evaluate 時点部分レコードの同一 JSON への追記完成 mode（冪等・重複 JSON なし） |
+
+## 2段階書込み（REQ-090-013）
+
+evaluate は評価完了（not_configured を含む）時点で、機械判別可能な完了状態 field（`recordState: "partial"`）と Jev 側観測項目を含む部分レコードを永続化し、observation_write は同一 JSON へ LLM 最終判断関連 field（llmFinalJudgment、llmTreatment）を追記して完成させる。消費者は recordState で部分/完全を機械判別する。
 
 ## 公開契約
 
@@ -18,7 +22,7 @@ Jev 先行評価は最終判断者ではなく、後段の LLM 推論への追�
 - 利用可否: `AI_GATEWAY_API_KEY` 環境変数の設定有無で決まる（feature flag・opt-in 手続きは不要）
 - 未設定時: API を呼び出さず `not_configured` を返す（Jev API 失敗に含めない）。呼出し元 Workflow は従来 LLM 経路のみで完了させる
 - API 障害時: 自動 retry せず構造化失敗を返す。呼出し元 Workflow は即座に従来 LLM 経路へ fallback する
-- 観測書込み失敗時: Workflow の成否と独立（完了報告で識別可能な warning として扱うのは呼出し元の責務）
+- 観測書込み失敗時: Workflow の成否と独立（完了報告で識別可能な warning として扱うのは呼出し元の責務）。evaluate 内部の部分レコード書込み失敗は評価結果の返却と独立した warning とし、評価結果を失わない（REQ-090-013）
 - 評価言語: 日本語（state、instructions、criteria、判断の意味）
 - 責務境界: Tool は機械処理のみ。判断の意味・基準・Jev 呼出し位置・最終判断は所有しない（REQ-{NNNN}-{NNN}）
 

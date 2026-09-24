@@ -12,6 +12,10 @@ function context(worktree: string) {
   return { sessionID: "s", directory: worktree, worktree } as Parameters<ReturnType<typeof createAgentdevJevToolDefinition>["execute"]>[1];
 }
 
+async function tempWorktree(): Promise<string> {
+  return fs.mkdtemp(path.join(os.tmpdir(), "jev-plugin-"));
+}
+
 describe("plugin structure", () => {
   test("agentdev_jev tool を hooks として登録する", async () => {
     const hooks = await createAgentdevJevToolPlugin()({ worktree: "/tmp", directory: "/tmp" });
@@ -21,6 +25,19 @@ describe("plugin structure", () => {
   test("公開スキーマは操作カタログ（evaluate / observation_write）を固定する", () => {
     const schema = REQUEST_PROPERTY_SCHEMA as unknown as { properties: { operation: { enum: readonly string[] } } };
     expect(schema.properties.operation.enum).toEqual(["evaluate", "observation_write"]);
+  });
+
+  test("公開スキーマは 2段階書込み契約の入力（observationId・observationMetadata・recordState）を含む", () => {
+    const schema = REQUEST_PROPERTY_SCHEMA as unknown as {
+      properties: {
+        observationId: { type: string };
+        observationMetadata: { type: string };
+        observation: { properties: { recordState: { enum: readonly string[] } } };
+      };
+    };
+    expect(schema.properties.observationId.type).toBe("string");
+    expect(schema.properties.observationMetadata.type).toBe("object");
+    expect(schema.properties.observation.properties.recordState.enum).toEqual(["partial", "complete"]);
   });
 });
 
@@ -33,15 +50,18 @@ describe("evaluate through the tool surface", () => {
   };
 
   test("AI key 未設定相当（provider 未解決）では not_configured を返し API を呼ばない", async () => {
+    const worktree = await tempWorktree();
     const definition = createAgentdevJevToolDefinition({ resolveProvider: () => null });
-    const result = await definition.execute({ request }, context("/tmp"));
-    const payload = JSON.parse(result.output) as { ok: boolean; failure?: { kind: string; retryable: boolean } };
+    const result = await definition.execute({ request }, context(worktree));
+    const payload = JSON.parse(result.output) as { ok: boolean; failure?: { kind: string; retryable: boolean }; observation?: Record<string, unknown> };
     expect(payload.ok).toBe(false);
     expect(payload.failure?.kind).toBe("not_configured");
     expect(payload.failure?.retryable).toBe(false);
+    expect(payload.observation && "observationId" in payload.observation).toBe(true);
   });
 
   test("provider 偽実装で正規化済み結果を返す", async () => {
+    const worktree = await tempWorktree();
     const provider: JevProvider = {
       providerId: "mock",
       requestedModel: "mock/jev",
@@ -51,14 +71,17 @@ describe("evaluate through the tool surface", () => {
       },
     };
     const definition = createAgentdevJevToolDefinition({ resolveProvider: () => provider });
-    const result = await definition.execute({ request }, context("/tmp"));
-    const payload = JSON.parse(result.output) as { ok: boolean; success?: { confidence: number; results: Array<{ value: boolean }> } };
+    const result = await definition.execute({ request }, context(worktree));
+    const payload = JSON.parse(result.output) as { ok: boolean; success?: { confidence: number; results: Array<{ value: boolean }>; observation?: Record<string, unknown> } };
     expect(payload.ok).toBe(true);
     expect(payload.success?.confidence).toBeCloseTo(0.7);
     expect(payload.success?.results[0]?.value).toBe(true);
+    const observation = payload.success?.observation;
+    expect(observation && "observationId" in observation && observation.recordState === "partial").toBe(true);
   });
 
   test("provider 障害は構造化失敗（自動 retry なし）を返す", async () => {
+    const worktree = await tempWorktree();
     const provider: JevProvider = {
       providerId: "mock",
       requestedModel: "mock/jev",
@@ -68,7 +91,7 @@ describe("evaluate through the tool surface", () => {
       },
     };
     const definition = createAgentdevJevToolDefinition({ resolveProvider: () => provider });
-    const result = await definition.execute({ request }, context("/tmp"));
+    const result = await definition.execute({ request }, context(worktree));
     const payload = JSON.parse(result.output) as { ok: boolean; failure?: { kind: string } };
     expect(payload.ok).toBe(false);
     expect(payload.failure?.kind).toBe("rate_limited");
@@ -109,5 +132,50 @@ describe("observation_write through the tool surface", () => {
     expect(payload.success?.writtenPath).toBe(".agentdev/jev-observations/".concat(payload.success!.observationId, ".json"));
     const files = await fs.readdir(path.join(worktree, ".agentdev", "jev-observations"));
     expect(files).toHaveLength(1);
+  });
+
+  test("observationId 付きは evaluate 時点部分レコードを追記完成させる（同一 JSON・recordState complete）", async () => {
+    const worktree = await tempWorktree();
+    const definition = createAgentdevJevToolDefinition({ resolveProvider: () => null });
+    const evaluated = await definition.execute({
+      request: {
+        operation: "evaluate",
+        state: "判断状態",
+        instructions: "評価指示",
+        questions: [{ id: "q1", form: "boolean", prompt: "質問1" }],
+      },
+    }, context(worktree));
+    const evaluatePayload = JSON.parse(evaluated.output) as {
+      ok: boolean;
+      failure?: { kind: string };
+      observation?: { observationId?: string; writtenPath?: string };
+    };
+    expect(evaluatePayload.ok).toBe(false);
+    const partialId = evaluatePayload.observation?.observationId;
+    if (!partialId || !evaluatePayload.observation?.writtenPath) throw new Error("partial observation missing");
+
+    const completed = await definition.execute({
+      request: {
+        operation: "observation_write",
+        observationId: partialId,
+        observation: {
+          schemaVersion: 1,
+          judgments: [{ judgmentId: "q1", questionForm: "boolean", llmFinalJudgment: "採用", llmTreatment: "unchanged" }],
+        },
+      },
+    }, context(worktree));
+    const completePayload = JSON.parse(completed.output) as { ok: boolean; success?: { observationId: string } };
+    expect(completePayload.ok).toBe(true);
+    expect(completePayload.success?.observationId).toBe(partialId);
+    const content = JSON.parse(await fs.readFile(path.join(worktree, ".agentdev", "jev-observations", `${partialId}.json`), "utf8")) as {
+      recordState: string;
+      judgments: Array<Record<string, unknown>>;
+      outcome: string;
+    };
+    expect(content.recordState).toBe("complete");
+    expect(content.outcome).toBe("not_configured");
+    expect(content.judgments[0]?.llmFinalJudgment).toBe("採用");
+    const files = await fs.readdir(path.join(worktree, ".agentdev", "jev-observations"));
+    expect(files).toEqual([`${partialId}.json`]);
   });
 });

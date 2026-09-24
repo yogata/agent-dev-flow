@@ -15,7 +15,9 @@ import * as path from "node:path";
 import type {
   JevFailureKind,
   JevObservation,
+  JevObservationJudgment,
   JevObservationOutcome,
+  JevObservationRecordState,
   JevObservationWriteResult,
 } from "./contracts.ts";
 
@@ -36,7 +38,7 @@ function invalid(detail: string): { ok: false; kind: "invalid_input"; detail: st
   return { ok: false, kind: "invalid_input", detail };
 }
 
-/** 観測オブジェクトの形式検証（REQ-{NNNN}-{NNN} 必須項目 + 未知 field 拒否 + outcome 条件付き整合）。 */
+/** 観測オブジェクトの形式検証（REQ-{NNNN}-{NNN} 必須項目 + 未知 field 拒否 + outcome / recordState 条件付き整合）。 */
 export function validateObservation(raw: unknown): { ok: true; observation: JevObservation } | { ok: false; kind: JevFailureKind; detail: string } {
   if (!isRecord(raw)) return invalid("observation must be an object");
   const allowed = new Set([
@@ -53,6 +55,7 @@ export function validateObservation(raw: unknown): { ok: true; observation: JevO
     "inputTokens",
     "inputs",
     "judgments",
+    "recordState",
   ]);
   for (const key of Object.keys(raw)) {
     if (!allowed.has(key)) return invalid(`unknown observation field: ${key}`);
@@ -66,6 +69,10 @@ export function validateObservation(raw: unknown): { ok: true; observation: JevO
   if (raw.outcome !== "completed" && raw.outcome !== "not_configured" && raw.outcome !== "jev_failed") {
     return invalid('outcome must be "completed" | "not_configured" | "jev_failed"');
   }
+  if (raw.recordState !== undefined && raw.recordState !== "partial" && raw.recordState !== "complete") {
+    return invalid('recordState must be "partial" | "complete"');
+  }
+  const recordState: JevObservationRecordState = raw.recordState ?? "complete";
   if (typeof raw.durationMs !== "number" || !Number.isFinite(raw.durationMs) || raw.durationMs < 0) {
     return invalid("durationMs must be a non-negative finite number");
   }
@@ -95,7 +102,7 @@ export function validateObservation(raw: unknown): { ok: true; observation: JevO
   }
   if (!Array.isArray(raw.judgments)) return invalid("judgments must be an array");
   for (const judgment of raw.judgments) {
-    const judgmentCheck = validateJudgment(judgment, raw.outcome as JevObservationOutcome);
+    const judgmentCheck = validateJudgment(judgment, raw.outcome as JevObservationOutcome, recordState);
     if (!judgmentCheck.ok) return judgmentCheck;
   }
   if (raw.outcome === "completed" && (raw.judgments as unknown[]).length === 0) {
@@ -121,7 +128,11 @@ function validateReference(raw: unknown): { ok: true } | { ok: false; kind: JevF
   return { ok: true };
 }
 
-function validateJudgment(raw: unknown, outcome: JevObservationOutcome): { ok: true } | { ok: false; kind: JevFailureKind; detail: string } {
+function validateJudgment(
+  raw: unknown,
+  outcome: JevObservationOutcome,
+  recordState: JevObservationRecordState,
+): { ok: true } | { ok: false; kind: JevFailureKind; detail: string } {
   if (!isRecord(raw)) return invalid("judgment must be an object");
   const allowed = new Set([
     "judgmentId",
@@ -145,11 +156,15 @@ function validateJudgment(raw: unknown, outcome: JevObservationOutcome): { ok: t
   if (raw.questionForm !== "boolean" && raw.questionForm !== "choice" && raw.questionForm !== "score") {
     return invalid('questionForm must be "boolean" | "choice" | "score"');
   }
-  if (raw.llmTreatment !== "unchanged" && raw.llmTreatment !== "corrected") {
+  if (raw.llmTreatment !== undefined && raw.llmTreatment !== "unchanged" && raw.llmTreatment !== "corrected") {
     return invalid('llmTreatment must be "unchanged" | "corrected"');
   }
-  if (typeof raw.llmFinalJudgment !== "string" || raw.llmFinalJudgment.length === 0) {
+  if (raw.llmFinalJudgment !== undefined && (typeof raw.llmFinalJudgment !== "string" || raw.llmFinalJudgment.length === 0)) {
     return invalid("llmFinalJudgment must be a non-empty string");
+  }
+  if (recordState !== "partial") {
+    if (raw.llmTreatment === undefined) return invalid(`completed record requires llmTreatment: ${raw.judgmentId}`);
+    if (raw.llmFinalJudgment === undefined) return invalid(`completed record requires llmFinalJudgment: ${raw.judgmentId}`);
   }
   if (raw.confidence !== undefined) {
     if (typeof raw.confidence !== "number" || !Number.isFinite(raw.confidence) || raw.confidence < 0 || raw.confidence > 1) {
@@ -213,8 +228,223 @@ export function defaultObservationId(now: Date): string {
   return `${stamp}-${rand}`;
 }
 
+const OBSERVATION_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
+
+/** 外部入力の観測 ID の安全検証（路径構成要素への混入防止。ディレクトリ区切り・拡張子連結を不可とする）。 */
+export function isSafeObservationId(value: string): boolean {
+  return OBSERVATION_ID_PATTERN.test(value);
+}
+
+function invalidWrite(detail: string): { ok: false; operation: "observation_write"; failure: { kind: JevFailureKind; retryable: false; detail: string } } {
+  return { ok: false, operation: "observation_write", failure: { kind: "invalid_input", retryable: false, detail } };
+}
+
+function writeFailure(error: unknown): { ok: false; operation: "observation_write"; failure: { kind: JevFailureKind; retryable: false; detail: string } } {
+  const detail = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+  // 書込み失敗は Workflow の成否と独立。rollback・再実行は行わない。
+  return { ok: false, operation: "observation_write", failure: { kind: "network_error", retryable: false, detail: `observation write failed: ${detail}` } };
+}
+
+function resolveObservationId(deps: ObservationWriteDeps): string {
+  return deps.generateObservationId ? deps.generateObservationId() : defaultObservationId(deps.now ? deps.now() : new Date());
+}
+
+async function writeAtomic(dir: string, observationId: string, record: Record<string, unknown>): Promise<void> {
+  const finalPath = path.join(dir, `${observationId}.json`);
+  const payload = JSON.stringify(record, null, 2) + "\n";
+  const tmpPath = path.join(dir, `.${observationId}.tmp`);
+  await fs.writeFile(tmpPath, payload, "utf8");
+  await fs.rename(tmpPath, finalPath);
+}
+
+async function readObservationRecord(finalPath: string): Promise<Record<string, unknown> | null> {
+  let raw: string;
+  try {
+    raw = await fs.readFile(finalPath, "utf8");
+  } catch {
+    return null;
+  }
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!isRecord(parsed)) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * 同一 JSON 内 judgments へ judgmentId 単位で merge する（同一 judgmentId は後勝ち上書き = 冪等。
+ * 1実行 1 JSON 契約のため重複 JSON は生成しない）。
+ */
+function mergeJudgments(existing: unknown[], incoming: JevObservationJudgment[]): JevObservationJudgment[] {
+  const byId = new Map<string, JevObservationJudgment>();
+  for (const judgment of existing) {
+    if (isRecord(judgment) && typeof judgment.judgmentId === "string") {
+      byId.set(judgment.judgmentId, judgment as unknown as JevObservationJudgment);
+    }
+  }
+  for (const judgment of incoming) {
+    byId.set(judgment.judgmentId, judgment);
+  }
+  return [...byId.values()];
+}
+
+/**
+ * evaluate 時点書込み（REQ-090-013）。評価完了時点の部分レコード（recordState partial）を
+ * 1実行 1 JSON として作成・永続化する。observationId 指定時は既存 partial JSON 内 judgments へ
+ * 追記し、重複 JSON を生成しない。原子的書込み（一時ファイル + rename）。
+ */
+export async function upsertPartialObservation(
+  worktree: string,
+  observation: JevObservation,
+  deps: ObservationWriteDeps & { observationId?: string } = {},
+): Promise<JevObservationWriteResult> {
+  const partial: JevObservation = { ...observation, recordState: "partial" };
+  const validation = validateObservation(partial);
+  if (!validation.ok) {
+    return { ok: false, operation: "observation_write", failure: { kind: validation.kind, retryable: false, detail: validation.detail } };
+  }
+  if (deps.observationId !== undefined && !isSafeObservationId(deps.observationId)) {
+    return invalidWrite(`observationId must match ${OBSERVATION_ID_PATTERN.source}`);
+  }
+  const observationId = deps.observationId ?? resolveObservationId(deps);
+  const dir = observationsDir(worktree);
+  const finalPath = path.join(dir, `${observationId}.json`);
+  try {
+    await fs.mkdir(dir, { recursive: true });
+    const existing = await readObservationRecord(finalPath);
+    if (existing !== null && existing.recordState !== "partial") {
+      return invalidWrite(`observation already completed for id: ${observationId}`);
+    }
+    const record: Record<string, unknown> =
+      existing === null
+        ? { observationId, ...partial }
+        : {
+            ...existing,
+            ...partial,
+            observationId,
+            judgments: mergeJudgments(Array.isArray(existing.judgments) ? existing.judgments : [], partial.judgments),
+          };
+    await writeAtomic(dir, observationId, record);
+    return {
+      ok: true,
+      operation: "observation_write",
+      success: {
+        writtenPath: path.relative(worktree, finalPath).split(path.sep).join("/"),
+        observationId,
+      },
+    };
+  } catch (error) {
+    return writeFailure(error);
+  }
+}
+
+/**
+ * observation_write 追記完成 mode 入力の検証（REQ-090-013）。LLM 最終判断関連 field のみを運び、
+ * run 級 field と Jev 側観測項目は既存部分レコードが保持するため要求しない。
+ */
+export function validateCompletionObservation(raw: unknown): { ok: true; judgments: JevObservationJudgment[] } | { ok: false; kind: JevFailureKind; detail: string } {
+  if (!isRecord(raw)) return invalid("observation must be an object");
+  const allowed = new Set(["schemaVersion", "recordState", "judgments"]);
+  for (const key of Object.keys(raw)) {
+    if (!allowed.has(key)) return invalid(`unknown completion observation field: ${key}`);
+  }
+  if (raw.schemaVersion !== 1) return invalid("schemaVersion must be 1");
+  if (raw.recordState !== undefined && raw.recordState !== "complete") {
+    return invalid('completion observation requires recordState "complete" (or omitted)');
+  }
+  if (!Array.isArray(raw.judgments) || raw.judgments.length === 0) return invalid("completion observation requires at least one judgment");
+  for (const judgment of raw.judgments) {
+    if (!isRecord(judgment)) return invalid("judgment must be an object");
+    const judgmentAllowed = new Set(["judgmentId", "questionForm", "llmFinalJudgment", "llmTreatment"]);
+    for (const key of Object.keys(judgment)) {
+      if (!judgmentAllowed.has(key)) return invalid(`unknown completion judgment field: ${key}`);
+    }
+    if (typeof judgment.judgmentId !== "string" || judgment.judgmentId.length === 0) {
+      return invalid("judgmentId must be a non-empty string");
+    }
+    if (typeof judgment.llmFinalJudgment !== "string" || judgment.llmFinalJudgment.length === 0) {
+      return invalid(`llmFinalJudgment must be a non-empty string: ${judgment.judgmentId}`);
+    }
+    if (judgment.llmTreatment !== "unchanged" && judgment.llmTreatment !== "corrected") {
+      return invalid(`llmTreatment must be "unchanged" | "corrected": ${judgment.judgmentId}`);
+    }
+  }
+  return { ok: true, judgments: raw.judgments as unknown as JevObservationJudgment[] };
+}
+
+/**
+ * observation_write の追記完成 mode（REQ-090-013）。evaluate 時点部分レコードの同一 JSON へ
+ * LLM 最終判断関連 field（llmFinalJudgment、llmTreatment）を judgmentId 単位で追記し、
+ * 完了状態 field を complete へ更新する（追記は冪等・重複 JSON は生成しない）。
+ * run 級 field と Jev 側観測項目は既存部分レコードの値を保持する。
+ */
+export async function completeObservation(
+  worktree: string,
+  observationId: string,
+  judgments: JevObservationJudgment[],
+): Promise<JevObservationWriteResult> {
+  if (!isSafeObservationId(observationId)) {
+    return invalidWrite(`observationId must match ${OBSERVATION_ID_PATTERN.source}`);
+  }
+  const dir = observationsDir(worktree);
+  const finalPath = path.join(dir, `${observationId}.json`);
+  try {
+    const existing = await readObservationRecord(finalPath);
+    if (existing === null) {
+      return invalidWrite(`observation not found for id: ${observationId}`);
+    }
+    const existingJudgments = Array.isArray(existing.judgments) ? existing.judgments : [];
+    const merged = mergeLlmFields(existingJudgments, judgments);
+    const record: Record<string, unknown> = { ...existing, judgments: merged, recordState: "complete" };
+    await writeAtomic(dir, observationId, record);
+    return {
+      ok: true,
+      operation: "observation_write",
+      success: {
+        writtenPath: path.relative(worktree, finalPath).split(path.sep).join("/"),
+        observationId,
+      },
+    };
+  } catch (error) {
+    return writeFailure(error);
+  }
+}
+
+/** LLM 最終判断関連 field のみを judgmentId 単位で追記する（他の field は既存値を保持。二重追記で同一結果 = 冪等）。 */
+function mergeLlmFields(existing: unknown[], incoming: JevObservationJudgment[]): JevObservationJudgment[] {
+  const llmById = new Map<string, JevObservationJudgment>();
+  for (const judgment of incoming) {
+    llmById.set(judgment.judgmentId, judgment);
+  }
+  const merged: JevObservationJudgment[] = [];
+  const seen = new Set<string>();
+  for (const judgment of existing) {
+    if (isRecord(judgment) && typeof judgment.judgmentId === "string") {
+      seen.add(judgment.judgmentId);
+      const incomingJudgment = llmById.get(judgment.judgmentId);
+      merged.push(
+        incomingJudgment === undefined
+          ? (judgment as unknown as JevObservationJudgment)
+          : {
+              ...(judgment as unknown as JevObservationJudgment),
+              ...(incomingJudgment.llmFinalJudgment !== undefined ? { llmFinalJudgment: incomingJudgment.llmFinalJudgment } : {}),
+              ...(incomingJudgment.llmTreatment !== undefined ? { llmTreatment: incomingJudgment.llmTreatment } : {}),
+            },
+      );
+    }
+  }
+  for (const judgment of incoming) {
+    if (!seen.has(judgment.judgmentId)) merged.push(judgment);
+  }
+  return merged;
+}
+
 /**
  * 観測を 1 ファイルとして書き込む（1 Workflow 実行 = 1 JSON。複数判断は同一 JSON 内 judgments）。
+ * observation_write は完成書込みのみを担う（REQ-090-013）。recordState partial の直接書込みは拒否し、
+ * evaluate の時点書込み（upsertPartialObservation）経由でのみ部分レコードを作成する。
  * 原子的書込み（一時ファイル + rename）で正規状態破損を避ける。JSONL は生成しない。
  */
 export async function writeObservation(
@@ -226,15 +456,16 @@ export async function writeObservation(
   if (!validation.ok) {
     return { ok: false, operation: "observation_write", failure: { kind: validation.kind, retryable: false, detail: validation.detail } };
   }
-  const observationId = deps.generateObservationId ? deps.generateObservationId() : defaultObservationId(deps.now ? deps.now() : new Date());
+  if (observation.recordState === "partial") {
+    return invalidWrite("observation_write is the completion write only; partial records are written by evaluate (REQ-090-013)");
+  }
+  const observationId = resolveObservationId(deps);
   const dir = observationsDir(worktree);
   const finalPath = path.join(dir, `${observationId}.json`);
   try {
     await fs.mkdir(dir, { recursive: true });
-    const payload = JSON.stringify({ observationId, ...observation }, null, 2) + "\n";
-    const tmpPath = path.join(dir, `.${observationId}.tmp`);
-    await fs.writeFile(tmpPath, payload, "utf8");
-    await fs.rename(tmpPath, finalPath);
+    const record: Record<string, unknown> = { observationId, ...observation, recordState: observation.recordState ?? "complete" };
+    await writeAtomic(dir, observationId, record);
     return {
       ok: true,
       operation: "observation_write",
@@ -244,8 +475,6 @@ export async function writeObservation(
       },
     };
   } catch (error) {
-    const detail = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
-    // 書込み失敗は Workflow の成否と独立。rollback・再実行は行わない。
-    return { ok: false, operation: "observation_write", failure: { kind: "network_error", retryable: false, detail: `observation write failed: ${detail}` } };
+    return writeFailure(error);
   }
 }

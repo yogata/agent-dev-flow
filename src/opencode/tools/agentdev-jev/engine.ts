@@ -327,7 +327,12 @@ export async function evaluateWithProvider(
     };
   }
   if (!provider.isConfigured()) {
-    return { ok: false, failure: notConfiguredFailure(`provider ${provider.providerId} reports no usable credential`) };
+    return {
+      ok: false,
+      failure: notConfiguredFailure(`provider ${provider.providerId} reports no usable credential`),
+      provider: provider.providerId,
+      requestedModel: provider.requestedModel,
+    };
   }
   const startedAt = deps.now ? deps.now() : Date.now();
   const timeoutMs = deps.timeoutMs ?? 120_000;
@@ -356,7 +361,12 @@ export async function evaluateWithProvider(
     };
     return success;
   } catch (error) {
-    return { ok: false, failure: classifyError(error) };
+    return {
+      ok: false,
+      failure: classifyError(error),
+      provider: provider.providerId,
+      requestedModel: provider.requestedModel,
+    };
   } finally {
     clearTimeout(timer);
   }
