@@ -116,3 +116,20 @@
 - **想定反映先**: なし（既存対策で継続運用。具体化の判断は backlog/intake 側）。
 - **関連**: src/opencode/skills/agentdev-case-run-execution-adapter/references/harness-delegation.md、DEC-014（配布依存境界多層 enforcement）、Case #3111（PR #3132）。
 - **タグ**: #distribution-boundary #concrete-id #detection-working
+
+
+## worktree 型検証で bun types が未解決の場合の依存整備手段選択
+
+- **問題事象**: Case #3103 の worktree 内で tsc 型検証を実行した際、bun types の解決失敗（TS2688）が発生した。
+- **発生局面**: case-run の型検証（DEL-3103-2、Case #3103）。
+- **検知方法**: tsc --noEmit の TS2688 エラー。
+- **根本原因**: worktree には main 側 node_modules が自動伝播しない。main 側 node_modules が存在しない場合は junction による依存共有が成立せず、依存整備手段は worktree 内 bun install へ決定的に切り替わる。
+- **自律対応内容**: agentdev-git-worktree の bun test 実行環境前提に従って worktree 内 bun install を実行し、型検証を再実行した。tsconfig の書き戻しがないことを git status で確認した（PR 本文の記録）。
+- **ユーザー確認有無**: なし。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: worktree で型検証・テストを行う際は node_modules の伝播状態を確認し、main 側 node_modules がない場合は worktree 内 bun install を選択する。
+- **再発条件**: worktree 内で依存パッケージを必要とする検証を行い、依存未伝播かつ main 側 node_modules が存在しない場合。
+- **予防策候補**: bun 依存整備手段の選択基準表に、main 側 node_modules 不在時は手段2（worktree 内 bun install）へ一意に決まる判定補助を追記する。
+- **想定反映先**: agentdev-git-worktree の worktree-operations.md「bun test 実行の環境前提」。
+- **関連**: DEL-3103-2、REQ-018、Case #3103（PR #3130）。
+- **タグ**: #worktree #bun #typecheck #dependency-setup
