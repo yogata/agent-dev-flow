@@ -178,23 +178,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
-### L-004: docs 系 Issue で case-run task() 委譲不可時に adapter skill フォールバックパスが有効
-
-- **問題事象**: docs 系（REQ/ADR ファイル検証・カタログ参照追加）の Issue で、case-run の Sisyphus-Junior への task() 委譲がハーネス制約で利用不可になる場合がある
-- **発生局面**: 実装（case-run で docs 系 Issue を扱い task() 委譲が利用不可の場合）
-- **検知方法**: task() 起動失敗のハーネス応答
-- **根本原因**: ハーネスのツール制約で task() による別サブエージェント起動が不可
-- **自律対応内容**: `agentdev-case-run-execution-adapter` スキルの「task() 起動失敗時事後処理（Item 5）」パス（手動修正または PR 化）に従い、検証とカタログ更新を直接実施して PR 化
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし（adapter skill のフォールバックパス適用範囲内）
-- **横展開観点**: task() 委譲がハーネス制約で不可な環境では adapter skill フォールバックパスで完結できる
-- **再発条件**: task() ツールを提供しないハーネス環境で case-run を実行する場合
-- **予防策候補**: adapter skill のフォールバック判断基準の運用実証
-- **想定反映先**: agentdev-case-run-execution-adapter
-- **関連**: PR #1068 (#1061 / REQ-0148 + ADR-0129)
-- **タグ**: `#case-run` `#task-delegation` `#adapter-skill` `#fallback` `#docs-issue`
-- **移動日**: 2026-06-25
-- **処分判定**: deferred（adapter skill L131-148 が task() 起動失敗時フォールバックを完全カバー。L-010 とともに既存設計の妥当性実証記録。事前 probe 強化のみ未成熟）
 
 ---
 
@@ -218,23 +201,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
-### L-010: ハーネス制約で task() 委譲不可時に同一エージェント統合実行が有効（adapter protocol 準拠）
-
-- **問題事象**: case-run orchestration（worktree 準備・Step 1-5 相当）と Sisyphus-Junior 実装実行を別エージェントへ task() 委譲しようとしたが、ハーネスのツール制約で task() による別 Sisyphus-Junior 起動が不可だった
-- **発生局面**: 実装（case-run の実行担当サブエージェント起動ステップ）
-- **検知方法**: task() 起動失敗のハーネス応答
-- **根本原因**: 当該ハーネス実行環境では task() ツールが提供されておらず、別サブエージェント起動経路が存在しない
-- **自律対応内容**: case-run orchestration と実装実行を同一エージェント（case-run 起動元の Sisyphus-Junior）が統合実施。adapter protocol（証拠ベース実装・品質ゲート・PR 作成・worktree 隔離・Findings 配置）には従い、委譲先が不在でもプロトコル要件を満たす形で完結
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし。adapter protocol（agentdev-case-run-execution-adapter）のフォールバックパス適用範囲内。L-004 と同根の知見だが本件は docs 系に限らず task() 不可時の汎用パターンとして再実証
-- **横展開観点**: task() 委譲がハーネス制約で不可な環境では、起動元エージェントが orchestration + 実装を統合実行する経路を標準的に取る
-- **再発条件**: task() ツールを提供しないハーネス環境（またはツール権限で task() が無効化された環境）で case-run を実行する場合
-- **予防策候補**: case-run の driver 起動ステップで task() 可否を事前 probe し、不可の場合は起動元統合実行へ自動切替するプロトコル記述を adapter skill に明記
-- **想定反映先**: agentdev-case-run-execution-adapter（task() 起動失敗時事後処理セクションの拡充）、agentdev-workflow-orchestration references（委譲可否 probe 手順）
-- **関連**: PR #1103 (#1102)、L-004 (PR #1068)、agentdev-case-run-execution-adapter SKILL.md
-- **タグ**: `#case-run` `#task-delegation` `#adapter-protocol` `#harness-constraint`
-- **移動日**: 2026-06-25
-- **処分判定**: deferred（adapter skill L131-148 が task() 起動失敗時フォールバックを完全カバー。L-004 とともに既存設計の妥当性実証記録。事前 probe 強化のみ未成熟）
 
 ---
 
@@ -640,16 +606,22 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ## IR-* frontmatter の Related REQ/SPEC フィールド不在と本文 prose 抽出代替パターン
 
-- **問題事象**: IR-061 の frontmatter は新形式（id/title/domain 等）だが elated_req / elated_spec フィールドを持たない。関連情報は本文「## 関連」セクションに prose 形式で記載される。そのため rule-ownership appendix の IR-061 行は Related REQ/SPEC が - となる。Wave 1 では Phase E での対応候補として記録するにとどめ、この Issue スコープ外とする。
+- **問題事象**: IR-061 の frontmatter は新形式（id/title/domain 等）だが 
+elated_req / 
+elated_spec フィールドを持たない。関連情報は本文「## 関連」セクションに prose 形式で記載される。そのため rule-ownership appendix の IR-061 行は Related REQ/SPEC が - となる。Wave 1 では Phase E での対応候補として記録するにとどめ、この Issue スコープ外とする。
 - **発生局面**: 実装（Wave 1: catalog + rule-ownership GENERATE 化、IR-* 依存）
-- **検知方法**: 実装中に IR-061 frontmatter を読み込み、elated_req / elated_spec フィールド不在を確認。IR-060/062 には同フィールドが存在することと対比し、IR-061 の frontmatter 形式不整合を検知。
+- **検知方法**: 実装中に IR-061 frontmatter を読み込み、
+elated_req / 
+elated_spec フィールド不在を確認。IR-060/062 には同フィールドが存在することと対比し、IR-061 の frontmatter 形式不整合を検知。
 - **根本原因**: IR-061 は Phase C（生成スクリプト実装）で新規作成された IR であり、IR-* frontmatter の標準形式（id/title/domain/related_req/related_spec）への移行が不完全であった。関連情報は本文 prose で記載する暫定形式が採用された。
 - **自律対応内容**: Wave 1 では本 Issue スコープ外として記録のみ。rule-ownership appendix の IR-061 行は Related REQ/SPEC を - とし、Phase E での対応候補として PR 本文 Findings に明記。appendix 自体は Wave 1 スコープで完成させた。
 - **ユーザー確認有無**: なし（エージェント自律でスコープ外判断、PR 本文 Findings に明記）
 - **ADR/REQ/spec影響**: なし（本件は IR-061 の frontmatter 形式不整合であり、既存 IR-* 形式への整合化は Phase E 以降のスコープ）。
 - **横展開観点**: IR-* frontmatter 形式統一に向けた知見。新規 IR 作成時は標準形式（id/title/domain/related_req/related_spec）を必須とし、本文 prose は補足用途とすることで、機械的処理（rule-ownership appendix 生成等）の信頼性向上。
 - **再発条件**: (1) 新規 IR 作成、(2) IR-* frontmatter 標準形式不遵守、(3) 機械的処理（appendix 生成等）で関連情報参照、の全てが揃った場合。
-- **予防策候補**: (a) 新規 IR 作成時、frontmatter に elated_req / elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatter への同フィールド追加、または本文 prose からの抽出拡張を実装。
+- **予防策候補**: (a) 新規 IR 作成時、frontmatter に 
+elated_req / 
+elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatter への同フィールド追加、または本文 prose からの抽出拡張を実装。
 - **想定反映先**: IR-061 frontmatter、Phase E での IR-* 形式整合化、rule-ownership appendix 生成ロジック
 - **関連**: PR #1628, Issue #1623, IR-061, Wave 1, Phase E
 - **タグ**: #ir-format #frontmatter #related-req-spec #phase-e #wave-1 #rule-ownership
@@ -658,23 +630,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
-## worktree 委譲先での cd 操作誤りによるメインリポジトリ一時汚染と検出・是正パターン（Wave 5 実証）
-
-- **問題事象**: Wave 5（PR #1632）で case-run 実行担当サブエージェント（deep category）へ worktree root（`.worktrees/1626-maintenance`）配下での作業を委譲した際、委譲先が検証ステップで cd 操作を誤り、一時的にメインリポジトリ（`C:/Users/ogatay/work/agent-dev-flow`）の作業ツリーへ変更を迷い込ませた。委譲先は即座に異常を検知し、(a) パッチ抽出、(b) worktree 再適用、(c) メインリポジトリ `git checkout --` で原状復帰する手順で是正。最終状態でメインリポジトリに本 PR 由来の変更は一切残らなかったが、worktree 隔離原則の一時的破綻事例として記録する。
-- **発生局面**: 実装・検証（case-run Wave 5 #1626 PR #1632、委譲先での検証ステップ）
-- **検知方法**: 委譲先の自律検知。cd 操作後に git status で対象ファイルパスが worktree root 配下でないことを確認し、即座に是正シーケンスへ移行。
-- **根本原因**: 委譲先プロンプトで worktree root の絶対パスを明示していたが、検証ステップで bash コマンドを連続実行する際に `cd` を伴う操作（例: 別ディレクトリへの移動を伴うスクリプト実行）で worktree root を離れる余地があった。委譲先は worktree 隔離原則を理解していたが、操作の連続性の中で一時的な離脱が発生。
-- **自律対応内容**: 委譲先が (a) 異常検知、(b) 変更内容のパッチ抽出、(c) worktree root への再適用、(d) メインリポジトリ `git checkout --` で原状復帰、(e) 最終 git status でクリーン状態を確認、の5ステップで是正。PR 本文 Findings に経緯を明示。case-auto 側でもマージ前に git status でメインリポジトリの状態を確認し、本 PR 由来の変更が残っていないことを検証済み。
-- **ユーザー確認有無**: なし（エージェント自律で検出・是正、PR 本文 Findings に明記）
-- **ADR/REQ/spec影響**: なし（本件は case-run 委譲時の worktree 運用リスクの運用知見であり、新規 ADR/REQ/spec 影響はない。adapter protocol で規定される worktree 隔離原則の一時的破綻と回復の具体的事例）。
-- **横展開観点**: case-run 実行担当サブエージェントへ worktree root 配下での作業を委譲する全ケースに適用可能。(a) 委譲先プロンプトで worktree root の絶対パスを明示するだけでなく、検証ステップで `cd` を伴う操作を禁止する、または worktree root 配下でのみ実行するスクリプト形式を推奨する。(b) case-auto 親ループは case-run 委譲完了後にメインリポジトリの git status を確認し、本 PR 由来の変更がないことを検証する防壁を標準搭載する。(c) 委譲先は worktree 隔離原則を事前確認し、cd 操作の必要性がある場合は作業前に親へ申請する運用。
-- **再発条件**: (1) case-run を委譲先へ worktree root 配下で実行させる、(2) 委譲先が検証ステップで `cd` を伴う操作を実行する、(3) worktree root の絶対パスを離れる余地がある、の全てが揃った場合。
-- **予防策候補**: (a) 委譲先プロンプトの MUST DO に「worktree root 配下でのみ作業し、cd で worktree root を離れる操作は禁止。検証コマンドは worktree root を基準とした相対パスまたは絶対パスで実行」を明記。(b) adapter protocol skill または case-run skill に worktree 隔離原則違反時の検出・是正手順を標準化。(c) case-auto 親ループに「case-run 委譲完了後、メインリポジトリ git status でクリーン状態を確認する」標準ゲートを組み込む。
-- **想定反映先**: `agentdev-case-run-execution-adapter` SKILL.md（worktree 隔離原則と検出・是正手順）、case-auto command SPEC（委譲完了後のメインリポジトリ状態確認ゲート）
-- **関連**: PR #1632, Issue #1626, Epic #1622 Wave 5, adapter protocol, worktree 隔離原則
-- **タグ**: #wave5 #worktree #isolation-violation #delegation #adapter-protocol #case-auto #case-run #recovery
-- **移動日**: 2026-07-22
-- **処分判定**: deferred（learning-promote 2026-07-22 評価。詳細は evaluation-report.md 参照）
 
 ---
 
@@ -1996,13 +1951,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
-## 2026-09-14 case 2796 Wave 1 / case 2797（PR #2801）: worktree で full check_integrity を実行する際の repo-local Plugin 投影前提
-
-- 観測元: case 2797（DEL-2797-3、PR #2801）本文 learning 候補、case-close 2026-09-14 回収
-- 内容: worktree は `.opencode/plugins/<plugin>` junction・loader shim・plugins 配下 node_modules が未整備だと PluginProjection 検査で環境由来 NG（only-worktree 10 件）が発生する。検証時は一時構成（junction + shim 配置 → 検証 → 削除）で解消でき、base との分離突合で変更起因と環境起因を分離できる
-
-- **移動日**: 2026-09-15
-- **処分判定**: deferred（出現1件。`.opencode/plugins` 投影の一時構成手順は未整備。再発時に具体化して再評価）
 
 ---
 
@@ -2016,13 +1964,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
-## 2026-09-14 case 2799（PR #2803）: repo-agentdev-integrity 検査スクリプトの実行ランナーは bun
-
-- 観測元: case 2799（DEL-2799-3、PR #2803）本文 learning 候補、case 2800（PR #2804）でも同様、case-close 2026-09-14 回収
-- 内容: check_changed_docs.ts・generate_indexes.ts 等 repo-agentdev-integrity の scripts は CommonJS の require() を使用するため node --experimental-strip-types では ReferenceError で実行不可。bun 経由（`bun .opencode/skills/repo-agentdev-integrity/scripts/<script>.ts`）が現行の実行手段。checker 実行契約の安定実行経路（node モジュール import）は check_distribution_boundary_cli.ts のような runCli export 型に適用され、require() 混在スクリプトには適用できない
-
-- **移動日**: 2026-09-15
-- **処分判定**: deferred（出現1件。checker 実行契約の適用範囲の事実記録）
 
 ---
 
@@ -2047,15 +1988,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
-## 2026-09-15 case 2805 OU-006（PR #2820）: worktree 内並行書き込みの検知と明示パス・ステージ確認の対処
-
-- 観測元: case 2805 OU-006（DEL-2811-2、PR #2820）本文 learning 候補、case-close 2026-09-15 回収
-- 内容: 作業中に git status の差分監視で別主体とみられる書き込み（routing references・learning 関連・docs/designs 多数ファイル）を検知した。対処として (1) in-scope ファイルのみ明示パス指定でステージ、(2) ステージ後の `git diff --stat <scope>` が空であることの確認、(3) コミットはステージスナップショットに対して実行、により PR への混入を防止できた。worktree は 1 writer 前提であり、並行書き込み検知時の早期断念基準（in-scope ファイルへの書き込み検知時は直ちに停止等）を adapter protocol 側で明文化すると再発防止になる
-- 関連: Issue #2811（OU-006）、PR #2820 対応記録
-- タグ: `#worktree` `#parallel-write` `#staging` `#adapter-protocol`
-
-- **移動日**: 2026-09-15
-- **処分判定**: deferred（出現1件。adapter protocol の早期断念基準明文化は候補止まり）
 
 ---
 
@@ -2134,22 +2066,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
-## 2026-09-17: 実装 PR 分岐後に先行 merge された main 側解消行が case-close の全 corpus check で新規 missing に誤解釈され得る
-
-- **問題事象**: 実装 PR の分岐以降に Definition Amendment（検証対応要否カタログ登録）や他 Case の解消 commit が先行 merge された状態で case-close を実行すると、PR HEAD worktree 起点の全 corpus traceability check で main 側で解消済みの行が「新規 missing-implementation / missing-verification」「unclassified」として列挙され、完了ゲートの誤差し戻しを招き得る。
-- **発生局面**: case-close STEP-2 / STEP-3（Case #2908。PR #2927 は 6b35b5df 分岐、Amendment #2932 と AUTOGEN 修正 #2933 が先行 merge 済みの状態で再開）。
-- **検知方法**: worktree 起点 check で REQ-057-034 の unclassified / missing-verification を検出。worktree vs main の reqId 集合差分に REQ-014-016、REQ-057-034/035/036、REQ-061-033 の4行が出現。
-- **根本原因**: worktree vs main の全 corpus 差分の reqId 集合比較は「PR 変更起因の新規 missing」と「ブランチ分岐後の main 側後続解消（worktree だけが旧状態を保持）」を区別しない。
-- **自律対応内容**: 既存契約（case-close の worktree root 起点再実行・カタログ登録 commit の時系列確認）に従い main 起点で check を再実行し、対象行の分岐前後関係を確認して誤差し戻しを回避。merge 後に main 起点で対象行 missing 0 / 0 を再検証して完了判定。
-- **ユーザー確認の有無**: なし（既存契約内の運用）。
-- **Decision/REQ/spec影響**: なし。
-- **横展開観点**: 並行セッションで main が進む docs_chore PR の case-close 全般で再発し得る。worktree vs main 差分行は merge-base と main 解消 commit の時系列を確認してから「新規」判定する。coverage の `--req` は単一 ID のみ対応のため複数行確認は個別実行が必要。
-- **再発条件**: PR 分岐後に main 側で対象 REQ 行のカタログ登録・宣言付与・他 Case 解消が入る場合。
-- **予防策候補**: case-close references に「worktree vs main 差分行の分岐後 main 解消確認」手順を明記する候補。
-- **想定反映先**: case-close references（issue-resolution-and-qg4.md、docs-and-design-promotion.md）。
-- **関連**: Case #2908（Refs）、PR #2927（Refs）、PR #2932（Refs）。
-- **タグ**: #traceability #case-close #parallel-execution #worktree
-- **移動日**: 2026-09-18
 
 ---
 
@@ -2480,24 +2396,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
-## 2026-09-20: bun test の件数サマリーは stderr 出力（stdout capture だけでは証跡ファイルが空になる）
-
-- **問題事象**: bun test の実行結果（`2558 pass` / `Ran 2558 tests across 105 files` 等のサマリー行）は stderr へ出力される。node の execFileSync（stdout のみ返却）で証跡ファイルへ保存すると本文が `bun test v1.3.6` のみになり、pass 件数の証跡が残らない（終了コード 0 で全 pass の事実のみ得られる）
-- **工程位置**: case-open STEP-4 検証（Case #3011 Definition PR commit 7642962f 後の bun test 3 分割）
-- **検知方法**: 保存した証跡ファイルの内容確認（サマリー行不在）
-- **根本原因**: bun test がテスト進行・結果を stderr 経路で出力する仕様に対し、キャプチャ実装が stdout のみを前提としていた
-- **対応内容**: spawnSync で stdout と stderr を連結して証跡保存する方式へ変更し、3 分割（2558/102/550）の件数証跡を取得
-- **ユーザー確認の有無**: なし（証跡取得方式の修正のみ）
-- **Decision/REQ/spec影響**: なし（REQ-060 の実行形態規定（repo root 起 cwd・`./` 付き）は不変。出力経路の話であり実行形態の話ではない）
-- **展開観点**: bun test の件数を完了条件・PR 本文の検証記録に使う検証系は、stdout のみキャプチャする実装だと件数根拠を失う。checker CLI（stdout JSON）と test runner（stderr サマリー）で出力経路が異なる点の混同に注意
-- **再発条件**: execFileSync 等の stdout のみ返却する API で bun test を実行し証跡保存する場合
-- **予防策**: bun test の証跡保存は spawnSync + (stdout + stderr) 連結で実装する
-- **配布反映先**: 検証運用（Case の case-open/case-run 検証記録）、learning-promote の評価対象
-- **関連**: Case #3011、bun test、REQ-060
-- **タグ**: #bun-test #stderr #証跡 #検証運用
-
-- **移動日**: 2026-09-20
-- **処分判定**: deferred（2026-09-20 評価。fail 証跡の標準経路は junit reporter。再評価条件: 証跡取得系知識文書の更新時・stdout キャプチャ証跡の再発時）
 
 ---
 
@@ -2519,3 +2417,102 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 - **移動日**: 2026-09-20
 - **処分判定**: deferred（2026-09-20 評価。問題クラス: guard の project root 固定。node -e + PowerShell 単一引用符ヒアドキュメントによる大規模編集技法を保持。再評価条件: 外部 worktree・TEMP 経由の大規模編集再開時）
+
+---
+
+
+---
+
+
+
+---
+
+## agentdev_gh は harness 起動環境でリポジトリ解決が壊れていると全操作が fail-closed 不能になる（AGENTDEV_GH_REPO 起動環境設定が対処）
+
+- **問題事象**: agentdev_gh の全操作（読み取り・書込みとも）が config-uninterpretable「cannot resolve the target repository」で確定失敗した。detail は「AGENTDEV_GH_REPO environment variable (not set)」「gh repo view exitCode=66」「stderr cause: (empty)」。同一セッションの bash からは `gh repo view` が正常（yogata/agent-dev-flow を返し exit 0）、`bun -e` からの spawnSync('gh') も status 0 で正常であり、呼出引数側の誤りではない
+- **発生局面**: 運用（case-auto stage-1 case-open の並列委譲実行。RU-0123 draft の Root Case 確立 STEP-2 直前の冪等検出）
+- **検知方法**: agentdev_gh issue_list 操作の config-uninterpretable（retryable: false）応答（3回同一失敗で確定的と判断）
+- **根本原因**: harness プロセス（OpenCode サーバ）の起動環境に AGENTDEV_GH_REPO が未設定であり、かつ harness プロセス内の spawnSync('gh') が exit 66・stderr 空で失敗する（bash 経由では再現しないプロセス環境差。PATH 解決差や shim 差が疑われるが harness 内からは詳細不明）。plugin はリポジトリ解決を環境変数 → gh repo view の順で行い、解決不能時は全操作を fail-closed で失敗させる（仕様どおりの動作）
+- **自律対応内容**: (1) 同一操作の再試行2回（同失敗）、(2) bash セッションへの AGENTDEV_GH_REPO export（Tool プロセスへは継承されず無効と実証）、(3) bun spawnSync 実証による bash 正常・harness 異常の切り分け、(4) 冪等検出のみ skill 契約どおり gh CLI 読取 fallback で完了（open Case Issue 0 件、open PR 0 件を確認）。書込み操作は raw gh 代替を禁止契約により行わず、Root Case 作成を停止して報告
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（plugin の fail-closed 契約と gh 読取 fallback 契約は仕様どおり機能。起動環境の運用問題であり契約変更不要）
+- **横展開観点**: agentdev_gh を使う全 workflow（case-open/ready/run/close、issue、intake-from-github 等）で同様の全操作不能が起こり得る。読取 fallback は冪等検出限定で書込みは代替不能のため、バッチ投入前の前提として「harness プロセスと同一環境で gh 解決が通ること、または AGENTDEV_GH_REPO 設定済みであること」の疎通確認が有効
+- **再発条件**: AGENTDEV_GH_REPO 未設定の launcher で harness を起動し、かつ harness プロセス環境で gh 実行解決が壊れている場合の全 agentdev_gh 呼出
+- **予防策候補**: case-auto の投入前前提確認に「agentdev_gh の軽量 read 操作1件による解決疎通確認」を追加する。launcher 側は plugin README の導線（AGENTDEV_GH_REPO を起動環境へ設定）に従う
+- **想定反映先**: docs/guides/consumer-project-setup.md「AGENTDEV_GH_REPO の起動環境設定」節（自ホスト環境での周知追記候補）、agentdev-workflow-case-auto（投入前前提確認の追加候補）
+- **関連**: .opencode/plugins/agentdev-gh-tool/plugin.ts（resolveRepoFromGh、defaultResolveRepo）、.agentdev/drafts/req-draft-checker-base-ref-help-wording.md（RU-0123。Root Case 未作成のまま停止）
+- **タグ**: `#agentdev-gh` `#リポジトリ解決` `#fail-closed` `#起動環境` `#AGENTDEV_GH_REPO`
+
+---
+
+- **移動日**: 2026-09-24
+
+---
+
+
+---
+
+## worktree 内 checker 直接実行は junction 伝播なしで完結した
+
+- **問題事象**: なし（観察。worktree 環境での checker 実行・baseline 再生成が main-root fallback なしで完結したことの実証）
+- **発生局面**: 実装（Case #3085 IR-055 baseline 更新。worktree .worktrees/3085-refactor からの worktree-direct 実行）
+- **検知方法**: checker --json の environment.junctionPropagation = absent-skills-dir-fallback / executionRoot = worktree の計測値
+- **根本原因**: 該当なし（worktree の .opencode/skills 配下は junction 未伝播でも、checker 自体は worktree 内実体で動作する）
+- **自律対応内容**: checker 実行（--json）と baseline 再生成（--update-ir055-baseline）をすべて worktree 内で完結させ、main-root --root fallback 経路を不使用のまま全検証を合格させた
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree で動く checker の実行経路選定時に main-root fallback を前提にしない。IR-055 の検査対象は src/opencode/commands|skills（SoT 側）に固定されるため projection 参照差が再生成結果へ混入しない設計である点も根拠
+- **再発条件**: 該当なし（予防知見）
+- **予防策候補**: なし
+- **想定反映先**: worktree での checker 実行手順を記す skill references（実行経路選択の補強根拠）
+- **関連**: Case #3085、PR #3095
+- **タグ**: `#worktree` `#checker実行` `#junction`
+
+---
+
+- **移動日**: 2026-09-24
+
+---
+
+## IR-055 baseline entry は file×pattern 単位で count 集約される（entries 数と検出件数は別指標）
+
+- **問題事象**: なし（観察。同一行の同一 pattern 複数出現は count=2 の 1 entry に機械統合されるため、entries 増分と検出件数増分が一致しない）
+- **発生局面**: 実装（Case #3085。pr_desc.md:39 の同一行 2 検出が count=2 の 1 entry に統合。entries 17 → 24 に対し検出 28 → 36）
+- **検知方法**: baseline 更新前後の entries 数（17 → 24）と violations 数（28 → 36）の突合
+- **根本原因**: baseline schema が file×pattern 単位の count 集約を持つため
+- **自律対応内容**: entries 数と検出件数を別指標として記録し、8検出 → 追加 7 entries の対応を説明付きで記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: baseline の ratchet 検証（純追加確認）では entries 差分と検出件数差分の両方を突合する
+- **再発条件**: 複数回出現する同一 pattern を含む差分の baseline 登録を件数比較だけで判断した場合
+- **予防策候補**: baseline 更新の記録テンプレートに entries 数と検出件数の両方の記載を必須化
+- **想定反映先**: docs/designs/integrity/integrity-contracts.md「RuntimeReference baseline 運用手順」周辺の記録様式
+- **関連**: Case #3085、PR #3095、.opencode/skills/repo-agentdev-integrity/baselines/ir-055-baseline.json
+- **タグ**: `#IR-055` `#baseline` `#ratchet`
+
+---
+
+- **移動日**: 2026-09-24
+
+---
+
+
+---
+
+
+---
+
+
+---
+
+
+---
+
+
+---
+
+
+---
+
+
+---
