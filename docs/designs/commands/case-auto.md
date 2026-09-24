@@ -2,11 +2,11 @@
 title: case-auto Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-23"
+updated: "2026-09-24"
 ---
 <!-- ADF-COVERS(implementation): REQ-015-012 -->
-<!-- ADF-COVERS(implementation): REQ-034-001, REQ-034-002, REQ-034-003, REQ-034-004, REQ-034-005, REQ-034-006, REQ-034-007, REQ-034-008, REQ-034-009, REQ-034-010, REQ-034-011, REQ-034-012, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-017, REQ-034-018, REQ-034-019, REQ-034-020, REQ-034-021, REQ-034-022, REQ-034-023, REQ-034-024, REQ-034-025, REQ-034-026, REQ-034-027, REQ-034-028, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-033, REQ-034-034, REQ-034-035, REQ-034-036, REQ-034-037, REQ-034-038, REQ-034-039, REQ-034-040, REQ-034-041, REQ-034-042, REQ-034-043, REQ-035-016, REQ-035-017 -->
-<!-- ADF-COVERS(design): REQ-034-012, REQ-034-025, REQ-034-027, REQ-034-040, REQ-034-041, REQ-034-042, REQ-034-043, REQ-035-016, REQ-035-017 -->
+<!-- ADF-COVERS(implementation): REQ-034-001, REQ-034-002, REQ-034-003, REQ-034-004, REQ-034-005, REQ-034-006, REQ-034-007, REQ-034-008, REQ-034-009, REQ-034-010, REQ-034-011, REQ-034-012, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-017, REQ-034-018, REQ-034-019, REQ-034-020, REQ-034-021, REQ-034-022, REQ-034-023, REQ-034-024, REQ-034-025, REQ-034-026, REQ-034-027, REQ-034-028, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-033, REQ-034-034, REQ-034-035, REQ-034-036, REQ-034-037, REQ-034-038, REQ-034-039, REQ-034-040, REQ-034-041, REQ-034-042, REQ-034-043, REQ-034-044, REQ-034-045, REQ-035-016, REQ-035-017 -->
+<!-- ADF-COVERS(design): REQ-034-012, REQ-034-025, REQ-034-027, REQ-034-028, REQ-034-040, REQ-034-041, REQ-034-042, REQ-034-043, REQ-034-044, REQ-034-045, REQ-035-016, REQ-035-017 -->
 <!-- ADF-COVERS(verification): REQ-034-037, REQ-034-038 -->
 <!-- ADF-COVERS(implementation): REQ-003-017, REQ-003-018, REQ-006-108, REQ-034-002, REQ-034-003, REQ-034-007, REQ-034-008, REQ-034-009, REQ-034-010, REQ-034-011, REQ-034-012, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-018, REQ-034-019, REQ-034-020, REQ-034-021, REQ-034-022, REQ-034-023, REQ-034-024, REQ-034-025, REQ-034-026, REQ-034-027, REQ-034-028, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-034, REQ-034-035, REQ-034-036 -->
 
@@ -72,12 +72,18 @@ updated: "2026-09-23"
 - 停止条件の検出（停止時タイミング情報の追記。11項目の停止条件いずれかを検出時、実行停止。新しい意味判断時は Root Case に `resume_command: req-define` を記録）
 - 完了報告（タイミング情報追記。インライン実行の適用を記録。結果状態の4次元報告（REQ-034-031）を含める）
 
-### 委譲起動不能時の扱い（REQ-002-003/004）
+### 委譲起動不能時の扱い（REQ-031-029、REQ-034-028/044）
 
 委譲工程（case-open / case-ready / case-revise / case-close）の委譲が起動できなかった場合、case-auto は当該工程を delegation-unavailable として報告する。
 
 case-run インライン実行時の実行担当サブエージェントへの委譲失敗は、case-run result 契約（completed-pr / blocked / failed / delegation-unavailable）に従い処理する。
-delegation-unavailable の場合は当該子Issue を pending に戻す（REQ-002-004）。
+delegation-unavailable の場合は当該子Issue を pending に戻す（REQ-031-029）。
+
+並列起動不能（REQ-034-028、REQ-034-044、DEC-042）: 当該 stage の起動可能対象集合に対して背景起動が1件も成立しない場合は、直列化で完了を装わず停止理由「並列起動不能」（原因の断定を含まない）と再開可能性を報告して停止する。弁別基準と優先規則は次のとおりとする:
+
+- 個別対象の起動失敗は delegation-unavailable として集約し、並列起動不能と二重分類しない
+- 並列起動不能（orchestration レベル）は当該 stage の起動可能対象集合に対する背景起動の成立数が 0 の場合に限り報告し、個別対象の起動失敗の報告に優先する
+- 一部の対象の起動が成立している場合は部分継続原則（REQ-034-014、REQ-034-025）に従い、起動失敗対象を delegation-unavailable で確定させ、稼働中の対象と起動可能な残対象の継続を妨げない
 
 genuine blocker（実装上の問題、スコープ外操作、コンフリクト解消不能等）は停止条件として扱う。
 
@@ -192,7 +198,7 @@ Epic、Wave、Standard Issue、case-run 呼出しごとの独立した実行枠�
 
 ### runtime 制御契約
 
-stage 3 の runtime 制御ループは case-auto が所有し、次の契約に従う（REQ-034-040〜043、REQ-035-016、REQ-035-017、DEC-041。詳細は v4-runtime-execution-model「runtime 制御ループ」節）:
+stage 3 の runtime 制御ループは case-auto が所有し、次の契約に従う（REQ-034-040〜045、REQ-035-016、REQ-035-017、DEC-041、DEC-042。詳細は v4-runtime-execution-model「runtime 制御ループ」節）:
 
 - 共有 active 枠: 1 active task は 1 Issue への実装実行委譲であり、Epic・Wave・Standard Issue を横断して active Issue task 数が上限（現行 5）を超えない
 - 空き枠補充: 各 Epic の現在 Wave と Standard Issue から開始条件を満たす Issue を候補として認識し、active 数が上限未満で実行上の安全条件を満たす候補がある限り補充する（横断補充は best-effort でなく必須）。最初に起動した全 task の完了を待つ固定 batch 方式を取らず、起動間隔（10 秒）と局所的な競合回避の運用は維持する（REQ-034-040）
@@ -202,6 +208,7 @@ stage 3 の runtime 制御ループは case-auto が所有し、次の契約に�
 - Wave 収束と依存充足: Wave 収束（全子 Issue の実行結果確定、未処理・実行中・状態不明なし）と後続 Wave の依存充足（意味的依存条件の成立、必要な統合・マージの完了を含む）を区別し、次 Wave の開始は両方の成立を条件とする（REQ-034-012、REQ-035-016、REQ-035-017）。blocked、failed、delegation-unavailable は収束には該当し得るが依存充足とはみなさない
 - 重複の実行時検出: stage 3 の委譲前に同一 Wave 内の子 Issue 間で変更対象ファイル集合の重複を検出し、一時直列化・変更対象の調整・merge 順序・衝突解消担当の判断に用いる。変更対象集合が取得不能な子 Issue を含む場合は比較を省略せず検出不能として報告する（REQ-034-043、REQ-035-012）
 - Wave 表現: Wave 表現は子 Issue 数の上限を持たない（Epic サイズ上限のみ適用）。runtime 上の batch や一時直列化を Wave 分割として永続化しない（DEC-041）
+- 並列維持（REQ-034-028、REQ-034-044、DEC-042）: 並列実行は必須であり、実行環境由来の障害（background task の消失、親 run の中断、provider failure 等）を理由とする同期逐次実行（順次フォールバック）への切替を行わない。並列起動が当該 stage の起動可能対象集合に対して1件も成立しない場合は、直列化で完了を装わず停止理由「並列起動不能」（原因の断定を含まない）と再開可能性を報告して停止する。再開時は REQ-034-025 の再開契約および REQ-034-041（再開時の active task 計上、同一 Issue の二重起動防止）に従うことを条件に、durable state（Issue、PR、RU、draft、bg task 状態、worktree の git 状態）を照合して未完了かつ再試行可能な対象のみを特定し、起動間隔契約（最初の委譲は直ちに開始、以降の委譲起動ごとに間隔を置く、同一ツール呼び出し一括ブロックでの複数起動を行わない、前 task の完了待ちを起動の条件にしない）に従う staggered background fan-out で並列再委譲し、並列性の回復を resume の反復で追求する（反復に回数上限を設けない）。REQ-034-029 の状態別回復（親ループによる代行回復を含む）および REQ-034-030 のコンフリクト解消再委譲は本条の対象外とし各既存契約に従う
 
 ### blocked 部分停止、ready 継続判定フロー
 
@@ -258,6 +265,7 @@ case-auto は停止時に停止理由を以下の分類で報告する。
 | 未コミット変更の帰属不明 | 変更の由来が不明で安全に続行できない場合 |
 | 上位合意矛盾 | case-auto が受領した decision_context が現行正規成果物（REQ/Decision/Design/Issue）間の矛盾に起因する場合。当該矛盾そのものが finding の対象であり、case-auto が一方を勝手に採用できない（REQ-034-034、DEC-008 決定3） |
 | 新規ユーザー判断事項 | case-auto が受領した decision_context が新しいユーザー価値判断、対象範囲変更、外部契約変更を必要とし、現行正規成果物から一意に回答できない場合（REQ-034-034、DEC-008 決定4） |
+| 並列起動不能（実行環境由来） | 当該 stage の起動可能対象集合に対して背景起動が1件も成立しない場合。原因の断定を含まない。delegation-unavailable との弁別基準は「委譲起動不能時の扱い」節を参照（REQ-034-028、REQ-034-044、DEC-042）。停止報告には起動試行履歴（試行回数、起動成立数、最終成功起動時刻）を含める（REQ-034-045） |
 
 execution_unit 分割可能性があるにもかかわらず case-open が停止した場合、「req-define 合意要件からの逸脱」ではなく「command 契約・実装不整合」として報告する。
 これは case-open の契約・実装不整合であり、要件doc側の問題ではない。
@@ -338,12 +346,17 @@ case-auto 親ループが当該 worktree で回復処理を代行する。
 - **v2:ADR-0132（コンフリクト解消モデル）**: 状態 (a) の rebase で解消できないコンフリクトは v2:ADR-0132 の 3レベルエスカレーションモデル（Level 2/3）へ委譲する。bg task 破棄時の状態別回復とコンフリクト解消モデルは協調関係にある（v2:ADR-0138 relates-to v2:ADR-0132）
 - **v2:ADR-0137（case-run インライン実行、多重委譲回避）**: 回復時の PR 作成代行は case-auto 親ループの責務とし、委譲起点の折りたたみモデルを維持する。子 task 側で再び委譲を起こして多重委譲を誘発しない
 
-## 工程別タイムスタンプ計測（L1: case-auto）（REQ-003-008）
+### 回復後の再委譲形態（REQ-034-044）
+
+状態 (a)/(b) の親ループによる回復代行（REQ-034-029）は維持する。回復代行によらず子 task へ再委譲する場合（実行未試行判定時等）、再委譲の形態は同期実行によらず staggered background fan-out とし、並列性の回復を resume の反復で追求する（REQ-034-044、REQ-031-030、DEC-042）。background 再委譲の起動失敗が継続する場合は、Design が所有する再試行計上契約に基づき delegation-unavailable として再開可能な停止報告へ確定する。
+
+## 工程別タイムスタンプ計測と対象別・stage 別観測証跡（L1: case-auto）（REQ-003-028、REQ-034-045）
 
 case-auto は各工程（case-open / case-ready / case-revise / case-run / case-close）の委譲起動前後にタイムスタンプを記録し、工程別の壁時計時間を完了報告に含める。
-現行の開始、終了時刻記録（REQ-034-023/083）を工程別内訳へ拡張する（REQ-034-030）。
+現行の開始、終了時刻記録（REQ-034-023/083）を工程別内訳へ拡張する。
 
 - 計測単位: 委譲起動前後の壁時計時刻（JST、REQ-034-023 の時刻形式に準拠）
+- 対象別・stage 別観測証跡（REQ-034-045）: 完了報告に対象別・stage 別の起動時刻、完了時刻、識別情報（adf_delegation_id 等の既存発行型委譲識別子、bg task ID、Issue status 遷移記録を含む等価な観測証跡）を含め、並列実行の overlap と stage 間の全対象収束（fan-in）を実測で検証できるようにする（overlap 検証の判定対象は当該 stage 開始時に実行可能な対象が2以上である場合）。時刻は親（case-auto）の観測時刻を一次とし子側報告時刻は補助として区別する。REQ-034-028 に従い同期逐次実行へ切替えずに停止した場合は、当該実行の起動試行履歴（試行回数、起動成立数、最終成功起動時刻）を停止報告に含める。観測証跡の記録形式と永続化の詳細は本 Design が所有し、本契約は採用後に起動した対象に適用し既存起動へ遡及適用しない
 - 記録先: case-auto 完了報告への工程別内訳追記。永続化は必要になった段階で別途検討
 - 対象外: 委譲先内部メトリクス（L3）は harness 依存が強すぎるため対象外（REQ-003-010）。case-run 内の L2 計測は case-run result に含まれる（REQ-003-009、REQ-031-017）
 
