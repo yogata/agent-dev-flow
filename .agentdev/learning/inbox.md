@@ -149,3 +149,19 @@
 - **想定反映先**: なし（観測記録。具体化の判断は backlog/intake 側）。
 - **関連**: skills_structure.test.ts、REQ-018-001、Case #3109（PR #3129）。
 - **タグ**: #skills-structure #worktree-junction #fallback
+
+## agentdev_gh がハーネスプロセス内で gh exited with 66（無出力）で全系操作失敗 — セッション内診断の限界と durable checkpoint 回復
+
+- **問題事象**: case-auto 最終 Case #3123 の case-ready 再開中、agentdev_gh Custom Tool の全操作（issue_read 等の読み取りを含む）が「operation execution failed (operation-failed): gh exited with 66」と失敗。gh の stdout/stderr が完全に空のまま終了コード 66（runner-cli.ts は stderr/stdout 両空時のみこの書式を生成）。2つの子委譲セッションとオーケストレータセッションで計12回以上、約1.5時間安定再現。同一引数の gh は bash・bash 起動 node・bash 起動 bun のいずれの spawnSync でも正常終了（status 0）。
+- **発生局面**: 運用（case-auto orchestration・夜間の親プロセス退出/再起動後のセッション群）。
+- **検知方法**: 子委譲の fail-closed 停止報告（10回連続失敗の記録）とオーケストレータによる直接再試行（3回）。
+- **根本原因**: 特定済み範囲では「ハーネスプロセス内部の gh 起動に固有の環境故障」。実行コード（defaultGhExec は env/cwd を継承するだけで上書きなし）と起動対象（gh 2.101.0 システムに1つ・auth 正常）の間に差がなく、故障はハーネスプロセスの内部状態に孤立。否定済み仮説 8 件: (1) env 認証欠損（空環境では exit 4＋メッセージで挙動不一致）(2) WindowsApps 実行エイリアス stub（不存在）(3) TEMP=/tmp POSIX 化（C:\tmp 存在下で gh 正常）(4) PATH 上の壊れた shim（システム全体で gh は1つのみ）(5) Bun spawnSync 起動不能（bun からツール同一引数パターンで status 0）(6) 一時故障（1.5時間継続で安定）(7) #3133 による plugin コード変更（schema description の記述変更のみ）(8) gh-write-guard の内部干渉（guard は bash ツール呼び出しの tool.execute.before コマンド文字列検査のみで spawnSync へ非干渉）。再起動前の同一ハーネスでは直前まで数百回の操作が成功しており、プロセス再起動を契機とする内部状態変化の疑い（確定不能）。
+- **自律対応内容**: (a) 子は生 gh WRITE による代替を契約（POL-gh-io-delegation・gh-write-guard fail-closed）遵守で拒否し停止 (b) 判定結果の durable checkpoint 化: ready 版 Issue 本文を .agentdev/tmp/issue-3123-body-step7.md に保存し、draft は resume protocol 保護で保持（Issue 未反映のままの削除は再開点破綻のため拒否）(c) オーケストレータが 8 仮説を系統検証・否定して故障をハーネスプロセス内に孤立させた (d) 回復 runbook（issue_update 1操作＋draft 削除＋case-run/case-close 委譲）を整備。
+- **ユーザー確認有無**: なし（診断・checkpoint 保存は自律。環境アクション（ハーネス再起動）のみユーザー依頼）。
+- **Decision/REQ/spec影響**: なし（時点）。ただし custom-tool-contracts.md「副作用操作は代替なし・継続不可（fail-closed）」契約が Custom Tool の環境故障時にパイプライン全体をブロックする運用特性の記録に値する（契約変更の要否は promote 判断に委譲）。
+- **横展開観点**: 長時間パイプラインのハーネス再起動後は、最初の委譲前に読み取り 1 操作で Custom Tool の死活を確認すると以降の委譲コストを節約できる。「無出力・非零終了」は実プロセスの通常エラー出力と異なり早期死亡の特徴であり、実行境界の外（bash/node/bun）で再現不能ならプロセス環境固有と早めに切り分ける。
+- **再発条件**: OpenCode ハーネスプロセス再起動後、plugin 内 spawnSync による外部 CLI 起動が同様に無出力で失敗する環境条件（詳細不明。再起動後最初の agentdev_gh 読み取り操作で検出可能）。
+- **予防策候補**: (1) パイプライン再開時の前置チェックとして読み取り 1 操作の死活確認 (2) 判定完了ごとの durable checkpoint（本件で機能・子委譲 3 回全損を回避）(3) 将来候補: tool 失敗 detail への r.error 情報拡充、ハーネス起動時の spawnSync 自己診断。
+- **想定反映先**: agentdev-workflow-case-* の再開時前置チェック、custom-tool-contracts.md の運用特性記録、src/opencode/tools/agentdev-gh/runner-cli.ts の失敗 detail 拡充（反映判断は learning-promote に委譲）。
+- **関連**: src/opencode/tools/agentdev-gh/runner-cli.ts、src/opencode/plugins/agentdev-gh-tool/plugin.ts、src/opencode/plugins/agentdev-gh-write-guard/plugin.ts、.agentdev/tmp/issue-3123-body-step7.md、Issue #3123、learning 74ffa047（同 Case 前回 capture）。
+- **タグ**: #custom-tool #harness-environment #fail-closed #orchestration-recovery
