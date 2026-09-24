@@ -68,3 +68,19 @@
 - **想定反映先**: docs（req-define / case-open 系 workflow skill・Design への手順追記。具体化の判断は backlog/intake 側）
 - **関連**: agentdev-traceability（check-interpretation「completeness の 2 層解釈」）、Case #3123（PR #3124）
 - **タグ**: `#traceability` `#missing-design` `#case-ready` `#lifecycle-gate`
+
+## トレーサビリティ sidecar は宣言元 component に対応づける
+
+- **問題事象**: producer 側ソースの実装・verification 宣言を plugin 登録層用 sidecar に置いた初回検査で duplicate-inconsistencies が2件検出された。
+- **発生局面**: 実装・検証（Case #3113、PR #3133）。
+- **検知方法**: REQ-011-033 を対象とした traceability check の findings。
+- **根本原因**: sidecar の所属は変更対象ファイルの見た目ではなく、producer/component（配布物単位）の責務境界で決める必要があるが、宣言作成時にその対応先を誤った。
+- **自律対応内容**: producer ソースとテストの宣言を traceability/agentdev-gh.yaml に移し、check を再実行して全9項目 pass を確認した（PR 本文の記録）。
+- **ユーザー確認有無**: なし。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: 対応宣言を追加する前に対象ファイルの producer/component と sidecar 対応を照合する。Tool 本体は agentdev-gh、plugin 登録層は agentdev-gh-tool の sidecar を用いる。
+- **再発条件**: producer 側実装の宣言を隣接する登録層 component の sidecar へ追加した場合。
+- **予防策候補**: 宣言追加前の component/sidecar 対応一覧確認を定型化する。
+- **想定反映先**: traceability 宣言運用手順。
+- **関連**: traceability/agentdev-gh.yaml、traceability/agentdev-gh-tool.yaml、Case #3113（PR #3133）。
+- **タグ**: #traceability #sidecar #component-boundary
