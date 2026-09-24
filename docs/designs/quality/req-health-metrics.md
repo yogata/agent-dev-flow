@@ -2,7 +2,7 @@
 title: REQ 健全性メトリクス
 status: accepted
 created: 2026-08-20
-updated: 2026-09-02
+updated: 2026-09-24
 ---
 <!-- ADF-COVERS(implementation): REQ-001-044 -->
 

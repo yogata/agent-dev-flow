@@ -2,7 +2,7 @@
 title: "IR-055: runtime-unresolved-reference（配布物内の導入先未解決参照検出）"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-09-24
 ---
 
 # IR-055: runtime-unresolved-reference（配布物内の導入先未解決参照検出）
