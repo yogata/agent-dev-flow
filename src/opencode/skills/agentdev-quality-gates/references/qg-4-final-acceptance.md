@@ -266,7 +266,7 @@ full integrity suite 合格判定に用いる bun test フル suite の実行形
 | ② src 側 skill script テスト | 配布 skill の script テスト群 |
 | ③ repo ルート系 guard テスト | plugins・発行系等の repo ルート直下テスト |
 
-起動コマンド（`<integrity-detector-skill>` は対象リポジトリの integrity 検査 skill 名に解決する）。各実行は stdout・stderr を分離した退避ファイルへ併退避し、stderr リダイレクト（`2>`）を常時付与する（REQ-007-011）。退避ファイル名は実行ごとに採番し、stdout 側と stderr 側の対応が判別できる形とする:
+起動コマンド（`<integrity-detector-skill>` は対象リポジトリの integrity 検査 skill 名に解決する）。各実行は stdout・stderr を分離した退避ファイルへ併退避し、stderr リダイレクト（`2>`）を常時付与する。退避ファイル名は実行ごとに採番し、stdout 側と stderr 側の対応が判別できる形とする:
 
 ```bash
 bun test ./.opencode/skills/<integrity-detector-skill>/scripts/ >stdout-1.log 2>stderr-1.log
@@ -339,7 +339,7 @@ remediation 開始後に作成した commit や base ブランチ比較のみを
 3. **同一環境件数比較**: 単独再実行とフル再実行の pass/ fail 件数を、同一環境ラベル（実行環境、junction 伝播状態、依存パッケージ状態の3要素が一致する実行）の間でのみ比較する。環境ラベルが異なる実行結果の件数差を由来判定の根拠にしない。件数比較の結果（fail 件数の一致・不一致と、その解釈）を記録する
 4. **baseline 再現確認**: pre-existing と分類する場合は、ワークツリー変更ゼロの baseline commit で同一テストを再実行した再現確認を記録する。baseline 再現確認の実施手順は、stash による退避を行わない detached worktree による baseline 比較（`agentdev-git-worktree` worktree-operations「git stash 運用手順（一時退避）」の detached worktree 標準手順）を用いる
 
-#### baseline 系 durable state の並行追随差に起因する疑似 fail の3点対照手順（REQ-007-012）
+#### baseline 系 durable state の並行追随差に起因する疑似 fail の3点対照手順
 
 baseline 系 durable state（baseline commit、baseline 期待値・許容リスト等、並行 Case の merge で更新される基準状態）は、worktree 作成元の分岐点（baseline）と origin/main の現行状態との間に追随差を持ち得る。分岐点以降に origin/main へ他 Case の merge が入った状況では、当該変更と無関係なテストが baseline の陳腐化により疑似 fail することがある。この疑似 fail の由来分類は、次の3点対照手順で確定する。
 
