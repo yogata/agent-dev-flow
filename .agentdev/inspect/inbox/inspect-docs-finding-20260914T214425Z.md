@@ -11,6 +11,8 @@
 > 2026-09-20 inspect-promote 再審議（in-context 審議、/agentdev/backlog-auto stage 2 inspect 系統経由、--auto なし）: GUIDE-8 は解消確認により reject・即時削除（自律確定。`docs/guides/command-selection.md:13` が「`/agentdev/case-auto`（内部 lifecycle の case-open 段階）」表記へ更新済み、旧 case-open 直接参照・旧責務出力は消滅。却下理由は当該 commit message 参照）。F-04/F-05/GUIDE-6/DESIGN-3 は defer 継続（自律確定）。F-05 に stage 1 観察（OBS-1）の注記を追加（下記 F-05 notes 参照）。
 >
 > 2026-09-21 inspect-promote 再審議（in-context 審議、/agentdev/backlog-auto stage 2 inspect 系統経由、--auto なし）: DESIGN-3 は reject・即時削除（自律確定）: 第16段 RC fixes（#3043/#3047）で command-file-format.md に配置理由注記（L16）と「即時統合・`authoring/` の削除は行わない」（L18）の明示的意思決定が追加され、指摘の判断軸（KEEP 許容 vs 将来案表現除去の複数解釈・low/low）が corpus 側で KEEP（配置根拠として許容）へ解消確定したため対応不要。将来案表現（L17）の除去は merge 済み意思決定と逆行する（L16-18 実読確認。却下理由は当該 commit message 参照）。F-04/F-05/GUIDE-6 は defer 継続（自律確定、再評価条件に変化なし）。
+>
+> 2026-09-24 inspect-promote 再審議（in-context 審議、/agentdev/backlog-auto stage 2 inspect 系統経由、--auto なし）: F-04/F-05/GUIDE-6 は defer 継続（自律確定）: REQ-038.md:25 / REQ-050.md:36 / artifacts-and-state.md L145-153 の現物行・節を再読取で原状確認、再評価条件に変化なし（F-05 の learning 成果物 design-candidate-autogen-staleness-prevention は本サイクル learning promoted 8件・intake promoted 6件に該当なし）。REQ-091/092 新設・Jev 観測蓄積は対象領域外。Jev 先行評価（分類 choice 7判断）＋ adversarial-review（反証棄却、unresolved は DESIGN-4 のみで本ファイル対象外）実施済み。
 
 ## 検出事項リスト（defer 残置分）
 
