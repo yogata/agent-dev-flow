@@ -144,13 +144,21 @@ bun test によるフル suite 実行は、次の環境前提を踏まえて実�
     1. main 側の当該 scripts ディレクトリ配下の `node_modules` への junction を worktree 側に作成する。検証後に junction を削除する（junction エントリのみの削除とし、参照先の main 側 `node_modules` は破壊しない）
     2. worktree の当該 skill ディレクトリで `bun install` を実行し、worktree 内に `node_modules` を生成する
 
-       junction 作成・削除の例（main root で実行、`{N}-{type}` は対象 worktree 名に置換）:
+       junction 作成・削除の手順例（node 経由で bash から転記可能。main root で実行し、`{N}-{type}` は対象 worktree 名に置換、`<main root 絶対パス>` はメインリポジトリルートの絶対パスに置換する。パスは forward slash 形式で与える）:
 
-       ```powershell
-       cmd /c mklink /J ".worktrees\{N}-{type}\src\opencode\skills\agentdev-project-extensions\scripts\node_modules" "src\opencode\skills\agentdev-project-extensions\scripts\node_modules"
-       # 検証後の削除（junction エントリのみ）
-       Remove-Item -LiteralPath ".worktrees\{N}-{type}\src\opencode\skills\agentdev-project-extensions\scripts\node_modules"
+       ```bash
+       # 作成（node fs.symlinkSync、junction 型。リンク先（target）・作成先（dest）とも絶対パス指定）
+       node -e "const fs=require('fs'); fs.symlinkSync('<main root 絶対パス>/src/opencode/skills/agentdev-project-extensions/scripts/node_modules', '<main root 絶対パス>/.worktrees/{N}-{type}/src/opencode/skills/agentdev-project-extensions/scripts/node_modules', 'junction')"
+       # 検証後の削除（junction エントリのみ。node fs.rmdirSync が正規手段。参照先の main 側 node_modules は破壊しない）
+       node -e "const fs=require('fs'); fs.rmdirSync('<main root 絶対パス>/.worktrees/{N}-{type}/src/opencode/skills/agentdev-project-extensions/scripts/node_modules')"
        ```
+
+       処理系差の注意:
+
+       - 作成は絶対パス指定を前提とする。node fs.symlinkSync の相対 target は cwd ではなく dest（作成先）ディレクトリ基準で解決される。cmd `mklink /J` は target を cwd 基準で解決するため、その cwd 相対指定をそのまま fs.symlinkSync へ転記すると意図しない場所へ junction が張られる
+       - 削除の正規手段は node fs.rmdirSync。junction エントリのみを削除し、参照先実体を破壊しない
+       - Git Bash の `rmdir` は junction を空でないディレクトリとして扱い削除を拒否する。補記であり正規手段ではない
+       - PowerShell の `Remove-Item` は環境・対象の内容により確認プロンプトが出ることがあり、手順転記では応答待ちの停止要因になる。補記であり正規手段ではない
 
   - **整備後の再実行手順**: 依存整備実施後、依存解決失敗で fail したテスト・型検証を同一 worktree で再実行し、当該 fail が解消したことを確認する。再実行結果には依存整備実施済みの旨を環境ラベル（依存パッケージ状態）へ記録し、整備前の fail と整備後の結果を混在させない
   - **整備手段の選択基準（junction 作成と bun install の使い分け）**: 上記2手段は次の判断基準で使い分ける。判断根拠は検証記録の環境ラベルへ記録する
@@ -181,7 +189,8 @@ worktree 内から `.opencode/skills/agentdev-*` 配下の script を直接実�
 
 1. main root（メインリポジトリルート）を cwd として、script 実体を `bun <path>` 形式で起動する
 2. 検査対象の worktree root を `--root <worktree root>` で指定する（絶対パスを推奨。相対パスは実行時のカレントディレクトリ基準で解決される）
-3. 変更ファイル限定検査では `--files` を併用する（`--files` と `--base-ref` は排他。worktree 上のコミット前検証では untracked ファイルを含む `--files` による明示指定を標準とする。`--files` は checker の workflow profile の対象に一致するファイルを指定する。docs/** 変更を含まない PR では `--workflow case-run` の gate がスキップ対象となるため、文書品質の targeted 検査は `--workflow docs-check`（全ファイル対象）で行う）
+3. `--root` のパス形式は forward slash 形式に統一する（例: `C:/Users/.../.worktrees/{N}-{type}`）。bash は引用符なしの Windows 形式パス（backslash）を escape 解釈して backslash を落とすため、引数段階でパスが破損する。破損した root は存在しない root として扱われ、checker の fail-closed 契約により検査対象が見かけ上全件 missing となる恐れがある
+4. 変更ファイル限定検査では `--files` を併用する（`--files` と `--base-ref` は排他。worktree 上のコミット前検証では untracked ファイルを含む `--files` による明示指定を標準とする。`--files` は checker の workflow profile の対象に一致するファイルを指定する。docs/** 変更を含まない PR では `--workflow case-run` の gate がスキップ対象となるため、文書品質の targeted 検査は `--workflow docs-check`（全ファイル対象）で行う）
 
 実行手順例（代表検査。`<worktree 絶対パス>` は検査対象 worktree の root に置換する）:
 
@@ -367,7 +376,7 @@ git worktree prune
 
 **手順**:
 1. worktree 管理情報を更新: `git worktree prune`
-2. ジャンクションディレクトリを手動削除: `Remove-Item -LiteralPath "{worktree_path}" -Recurse -Force` または `rmdir /s /q "{worktree_path}"`
+2. ジャンクションディレクトリを手動削除: `Remove-Item -LiteralPath "{worktree_path}" -Recurse -Force` または `rmdir /s /q "{worktree_path}"`（`rmdir /s /q` は cmd 専用構文で Git Bash からは転記不能。bash から実行する場合は node fs.rmSync の再帰削除 `fs.rmSync('{worktree_path}', { recursive: true, force: true })` へ置き換える）
 3. ローカルブランチを削除: `git branch -d {branch_name}`（必要時のみ `-D`）
 4. リモートブランチがある場合のみ削除: `git push origin --delete {branch_name}`
 
