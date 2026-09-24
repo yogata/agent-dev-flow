@@ -464,7 +464,7 @@ export class CliRunner implements GhRunner {
     });
   }
 
-  /** search/issues の q 値。repo と is:issue で対象を限定し、state と label は既存のサーバ側絞り込み写像を qualifier へ写像する（REQ-011-033）。 */
+  /** search/issues の q 値。repo と is:issue で対象を限定し、state と label は既存のサーバ側絞り込み写像を qualifier へ写像する（search 推送要件は traceability sidecar を参照）。 */
   private searchIssuesQuery(search: string, state: string, labels: readonly string[]): string {
     const parts = [`repo:${this.repo}`, "is:issue"];
     if (state !== "all") parts.push(`state:${state}`);
@@ -509,7 +509,7 @@ export class CliRunner implements GhRunner {
       if (stateLabel !== null) serverLabels.push(stateLabel);
     }
     if (role === "tracking") serverLabels.push(TRACKING_ROLE_LABEL);
-    // search 指定時は search/issues エンドポイントへ推送し（REQ-011-033）、
+    // search 指定時は search/issues エンドポイントへ推送し、
     // 安全ページ上限到達前に結果集合をサーバ側で絞り込む。
     // tokenized in:title 照合と substring の差は Design「一覧完全性」の物理写像差異宣言に従う。
     // search 未指定時は従来どおり list 系クエリの完全走査とする。
