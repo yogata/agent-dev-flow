@@ -162,7 +162,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-052 | 完了条件 grep パターン設計（REQ-010-011） | REQ-010-011 | integrity-contracts.md, v4-quality-gate-model.md |
 | IR-053 | gh 直接記述検出 | REQ-011 | integrity-rule-catalog.md, integrity-contracts.md, ../../responsibilities/custom-tool-contracts.md |
 | IR-054 | draft Design 放置検出 | REQ-001-002 | integrity-rule-catalog.md, integrity-contracts.md |
-| IR-055 | runtime-unresolved-reference（配布物内の導入先未解決参照検出） | REQ-002-079, REQ-002-080, REQ-002-081 | integrity-rule-catalog.md, integrity-contracts.md |
+| IR-055 | runtime-unresolved-reference（配布物内の導入先未解決参照検出） | REQ-029-003 | integrity-rule-catalog.md, integrity-contracts.md |
 | IR-056 | project-extensions-integrity | REQ-002 | `foundations/project-extensions.md`, `integrity-rule-catalog.md` |
 | IR-057 | obsolete-spec-path-after-domain-split | REQ-001-006, REQ-009-004, REQ-036-012 | ../integrity/integrity-rule-catalog.md, obsolete-path-map.yaml, ../local/runtime-package-boundary.md |
 | IR-058 | distribution-untracked-skill-reference | REQ-002-001, REQ-002-002, REQ-002-003 | ../integrity/integrity-rule-catalog.md, ../local/runtime-package-boundary.md |

@@ -2,7 +2,7 @@
 title: REQ 健全性メトリクス
 status: accepted
 created: 2026-08-20
-updated: 2026-09-02
+updated: 2026-09-24
 ---
 <!-- ADF-COVERS(implementation): REQ-001-044 -->
 
@@ -128,9 +128,9 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 | REQ-047 | 10 | +0 |  |
 | REQ-006 | 9 | +0 |  |
 | REQ-045 | 9 | +0 |  |
+| REQ-051 | 9 | +0 |  |
 | REQ-062 | 9 | +0 |  |
 | REQ-046 | 8 | +0 |  |
-| REQ-051 | 8 | +0 |  |
 | REQ-018 | 7 | +0 |  |
 | REQ-088 | 7 | +0 |  |
 | REQ-038 | 6 | +0 |  |
