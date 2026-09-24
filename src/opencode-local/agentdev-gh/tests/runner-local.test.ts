@@ -316,6 +316,25 @@ describe("LocalRunner: issue_read / issue_update / issue_list", () => {
     }
     fs.rmSync(issuesDir, { recursive: true, force: true });
   });
+
+  test("issue_list の search は title の substring 照合（includes）で絞り込む（Local 版契約・REQ-011-033）", async () => {
+    const issuesDir = makeIssuesDir();
+    await run(issuesDir, {
+      operation: "issue_create",
+      args: { title: "issue_list search pushdown", body: "b", labels: [], role: "case" },
+    });
+    await run(issuesDir, {
+      operation: "issue_create",
+      args: { title: "無関係なタイトル", body: "b", labels: [], role: "case" },
+    });
+    const reply = await run(issuesDir, { operation: "issue_list", args: { search: "pushdown" } });
+    expect(reply.ok).toBe(true);
+    if (reply.ok) {
+      const issues = (reply.payload as Record<string, unknown>).issues as Record<string, unknown>[];
+      expect(issues.map((i) => i.number)).toEqual([1]);
+    }
+    fs.rmSync(issuesDir, { recursive: true, force: true });
+  });
 });
 
 describe("LocalRunner: Comment CRUD（c{NN} 物理写像）", () => {

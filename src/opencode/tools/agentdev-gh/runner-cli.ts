@@ -464,6 +464,23 @@ export class CliRunner implements GhRunner {
     });
   }
 
+  /** search/issues の q 値。repo と is:issue で対象を限定し、state と label は既存のサーバ側絞り込み写像を qualifier へ写像する（REQ-011-033）。 */
+  private searchIssuesQuery(search: string, state: string, labels: readonly string[]): string {
+    const parts = [`repo:${this.repo}`, "is:issue"];
+    if (state !== "all") parts.push(`state:${state}`);
+    parts.push(search, "in:title");
+    for (const label of labels) {
+      parts.push(label.includes(" ") ? `label:"${label}"` : `label:${label}`);
+    }
+    return parts.join(" ");
+  }
+
+  /** search/issues 応答（total_count / items 形式）から items 配列を取り出す。 */
+  private searchItemsFrom(payload: unknown): unknown[] | null {
+    if (!isRecord(payload) || !Array.isArray(payload.items)) return null;
+    return payload.items;
+  }
+
   private issueList(args: Record<string, unknown>): GhRunnerReply {
     const role = args.role === "tracking" || args.role === "case" ? args.role : null;
     const kind = args.kind === undefined ? null : parseTrackingKind(args.kind);
@@ -492,18 +509,31 @@ export class CliRunner implements GhRunner {
       if (stateLabel !== null) serverLabels.push(stateLabel);
     }
     if (role === "tracking") serverLabels.push(TRACKING_ROLE_LABEL);
-    let query = `repos/${this.repo}/issues?state=${serverState}&per_page=${LIST_PER_PAGE}`;
-    if (serverLabels.length > 0) {
+    // search 指定時は search/issues エンドポイントへ推送し（REQ-011-033）、
+    // 安全ページ上限到達前に結果集合をサーバ側で絞り込む。
+    // tokenized in:title 照合と substring の差は Design「一覧完全性」の物理写像差異宣言に従う。
+    // search 未指定時は従来どおり list 系クエリの完全走査とする。
+    const searchQuery = search === null
+      ? null
+      : this.searchIssuesQuery(search, serverState, serverLabels);
+    let query = searchQuery === null
+      ? `repos/${this.repo}/issues?state=${serverState}&per_page=${LIST_PER_PAGE}`
+      : `search/issues?q=${encodeURIComponent(searchQuery)}&per_page=${LIST_PER_PAGE}`;
+    if (searchQuery === null && serverLabels.length > 0) {
       query += `&labels=${serverLabels.map((l) => encodeURIComponent(l)).join(",")}`;
     }
 
     const collected: Record<string, unknown>[] = [];
     for (let page = 1; page <= LIST_MAX_PAGES; page++) {
       const r = this.apiGetAny(`${query}&page=${page}`, (payload) => {
-        if (!Array.isArray(payload)) {
-          return this.fail("issues list reply is not an array", 0);
+        const list = searchQuery === null ? payload : this.searchItemsFrom(payload);
+        if (!Array.isArray(list)) {
+          return this.fail(
+            searchQuery === null ? "issues list reply is not an array" : "issue search reply has no items array",
+            0,
+          );
         }
-        return { ok: true, payload };
+        return { ok: true, payload: list };
       });
       if (!r.ok) return r;
       const list = r.payload as unknown[];
@@ -533,7 +563,6 @@ export class CliRunner implements GhRunner {
       if (kind !== null && meta.kind !== kind) continue;
       if (trackingState !== null && meta.trackingState !== trackingState) continue;
       if (labels.length > 0 && !labels.every((l) => meta.labels.includes(l))) continue;
-      if (search !== null && !title.includes(search)) continue;
       issues.push({
         number,
         title,

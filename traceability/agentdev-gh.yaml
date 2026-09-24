@@ -14,6 +14,7 @@ implementation:
     - REQ-011-027
     - REQ-011-029
     - REQ-011-030
+    - REQ-011-033
     - REQ-083-001
   src/opencode/tools/agentdev-gh/specs-issue.ts:
     - REQ-011-022
@@ -38,3 +39,4 @@ verification:
     - REQ-011-027
     - REQ-011-029
     - REQ-011-030
+    - REQ-011-033
