@@ -178,6 +178,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-068 | skill-projection-manifest | REQ-010-068, REQ-018-002 | ../../local/runtime-package-boundary.md, ../checker-execution-contracts.md, ../integrity-rule-catalog.md |
 | IR-069 | req-number-gap-recorded | REQ-087-002, REQ-087-003, REQ-010-068, REQ-010-070 | ../integrity-rule-catalog.md, ../../foundations/numbering-policy.md, ../checker-execution-contracts.md |
 | IR-070 | design-frontmatter-required-keys | REQ-010-062, REQ-010-068, REQ-010-070 | ../checker-execution-contracts.md, ../integrity-rule-catalog.md, ../../foundations/patterns.md |
+| IR-071 | integrity-rule-related-req-existence | REQ-051-009 | ../integrity-rule-catalog.md, ../checker-execution-contracts.md |
 <!-- AUTOGEN:END -->
 
 > **IR-019, IR-022, IR-026, IR-036 について（2026-08-11 移管）**: 4件の意味判断系 IR は docs-check 機械検出層から除外し、inspect/diagnostics 層（`/agentdev/inspect-docs`、`/agentdev/inspect-skills`、`agentdev-doc-writing` skill）へ移管した（retired REQ-028-007、DEC-006、Phase 3 §5.2）。
