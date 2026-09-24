@@ -1,4 +1,8 @@
 component: agentdev-quality-gates
+design:
+  src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md:
+    - REQ-007-011
+    - REQ-007-012
 implementation:
   src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md:
     - REQ-021-027

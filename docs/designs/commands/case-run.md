@@ -2,11 +2,11 @@
 title: case-run Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-23"
+updated: "2026-09-24"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-015, REQ-021-016, REQ-021-017, REQ-021-019, REQ-021-020, REQ-021-022, REQ-035-002 -->
-<!-- ADF-COVERS(design): REQ-021-015, REQ-021-016, REQ-031-006, REQ-031-015, REQ-031-016, REQ-031-027, REQ-035-012 -->
+<!-- ADF-COVERS(design): REQ-021-015, REQ-021-016, REQ-031-006, REQ-031-015, REQ-031-016, REQ-031-027, REQ-031-033, REQ-035-012 -->
 <!-- ADF-COVERS(implementation): REQ-015-010, REQ-015-011 -->
 <!-- ADF-COVERS(implementation): REQ-017-007, REQ-017-008, REQ-017-010, REQ-017-011, REQ-017-013, REQ-017-016 -->
 <!-- ADF-COVERS(implementation): REQ-031-001, REQ-031-002, REQ-031-003, REQ-031-004, REQ-031-005, REQ-031-006, REQ-031-007, REQ-031-008, REQ-031-009, REQ-031-010, REQ-031-011, REQ-031-012, REQ-031-013, REQ-031-014, REQ-031-015, REQ-031-016, REQ-031-017, REQ-031-018, REQ-031-019, REQ-031-020, REQ-031-021, REQ-031-022, REQ-031-023, REQ-031-024 -->
@@ -85,6 +85,7 @@ Workflow Skill は常に単一 Issue 実行（single workflow）として動作�
  - 委譲プロンプト: 実行 command を prompt 内で指定（command の具体名は AGENTS.md 参照）
  - 実行担当サブエージェント責務: 委譲 prompt 内で指定された command による目標分解、observable evidence 要求、品質ゲート（code review + QA review + gate review）、test strategy 項目の test-fix ループ（各項目ごとの検証、不合格時処置（fix-and-reverify / record-in-findings）、全項目処理までの反復、REQ-031-009）
  - 委譲起動失敗、異常終了時の扱い: 即 `failed` とせず**実装完了、検証未完了**として扱う（REQ-031-004）。委譲起動不能の場合は `delegation-unavailable` として報告する（REQ-002-003/004）
+ - 委譲起動手段が制限された harness での起動不能時経路（REQ-031-033）: 実行担当の接合を起動できない場合、直ちに delegation-unavailable と判断せず、能力検出→接合形態の決定（委譲実行者によるプロセス内直接実装と、result 4状態・3点ゲート・PR 本文 SSoT の契約 self-apply）→記録の経路に従う。本経路は起動前の事前判定であり、上記の起動後の事後処理規定と排他的でなく接続する。接合形態決定の実行詳細は adapter skill reference（harness-delegation.md）が所有し、配布 SKILL（`agentdev-case-run-execution-adapter` SKILL.md）の委譲契約自体は変更しない（REQ-031-007、起動手段は harness 責務）
  - case-run が直接行わない（実行担当サブエージェント責務）: work plan生成、実装実行、TDD、乖離検出（QG-3）、specs更新、関連ドキュメント整合性確認、ローカル検証、PR本文作成、PR作成、デプロイ検証
  - PR URL 受領: 実行担当サブエージェントが直接 PR 作成し PR URL を委譲 result として返却
  - Findings / Capture 候補: 実行担当サブエージェントが PR 本文の `## Findings / Capture候補` に記録
