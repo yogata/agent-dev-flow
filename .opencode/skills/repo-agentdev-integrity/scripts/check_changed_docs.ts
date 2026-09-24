@@ -1,5 +1,5 @@
 // ADF-COVERS(verification): REQ-001-017
-// ADF-COVERS(implementation): REQ-010-005, REQ-010-012
+// ADF-COVERS(implementation): REQ-010-005, REQ-010-012, REQ-031-034
 // ADF-COVERS(verification): REQ-032-020
 /**
  * check_changed_docs.ts — Targeted docs guard (v2:REQ-0158-003).
@@ -17,8 +17,8 @@
  *
  * CLI:
  *   --workflow req-save|design-save|case-run|case-close|docs-check
- *   --files <path...>             変更ファイル（main 環境向け。--base-ref と排他）
- *   --base-ref <git-ref>          git diff の base ref（worktree 環境向け。--files と排他）
+ *   --files <path...>             変更ファイルの明示指定（コミット前検証の標準モード。--base-ref と排他ではなくいずれか必須）
+ *   --base-ref <git-ref>          コミット済み差分の base ref（実行はコミット後・push 前に限定。--files と排他ではなくいずれか必須）
  *   --json                        JSON 出力
  *   --fail-level strict|warning   失敗扱いとする最低レベル（デフォルト strict）
  *   --root <path>                 明示的リポジトリルート（v2:REQ-0145-014: worktree/CI 対応）
