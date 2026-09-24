@@ -266,12 +266,12 @@ full integrity suite 合格判定に用いる bun test フル suite の実行形
 | ② src 側 skill script テスト | 配布 skill の script テスト群 |
 | ③ repo ルート系 guard テスト | plugins・発行系等の repo ルート直下テスト |
 
-起動コマンド（`<integrity-detector-skill>` は対象リポジトリの integrity 検査 skill 名に解決する）:
+起動コマンド（`<integrity-detector-skill>` は対象リポジトリの integrity 検査 skill 名に解決する）。各実行は stdout・stderr を分離した退避ファイルへ併退避し、stderr リダイレクト（`2>`）を常時付与する（REQ-007-011）。退避ファイル名は実行ごとに採番し、stdout 側と stderr 側の対応が判別できる形とする:
 
 ```bash
-bun test ./.opencode/skills/<integrity-detector-skill>/scripts/
-bun test ./src/opencode/skills/
-bun test ./.opencode/plugins/ ./scripts/
+bun test ./.opencode/skills/<integrity-detector-skill>/scripts/ >stdout-1.log 2>stderr-1.log
+bun test ./src/opencode/skills/ >stdout-2.log 2>stderr-2.log
+bun test ./.opencode/plugins/ ./scripts/ >stdout-3.log 2>stderr-3.log
 ```
 
 - **worktree での分割③ 対象欠落の環境差**: worktree では `.opencode/plugins` の junction 未伝播により、分割③の対象（plugins）が実行対象から欠落し得る。この環境差を隠蔽せず、実行記録から実施範囲を判別できるように扱う。件数突合（「Ran N tests across M files」の N/M 件数）と環境ラベル（実行環境、junction 伝播状態）の双方から分割③の実施範囲（plugins 分割の実施・未実施の別）を判別可能に記録し、plugins 分割が未実施の場合は未実行対象を実行済みとして扱わない。plugins 分割を代替する検証手順（main root からの読取専用実行等）を運用する場合は、実在を確認した実行コマンド・手順のみを用い、実在確認していない CLI option を正規手順として固定しない
@@ -297,8 +297,8 @@ bun test ./.opencode/plugins/ ./scripts/
 
 - **Bun 依存 checker の実行経路**: integrity 検査の checker スクリプトを bun test の枠組み外で個別実行する場合は、Bun ランタイム API（Bun.YAML 等）に依存する checker を bun 経路で実行する。実行経路の使い分けの正契約は checker 実行契約 Design（checker 実行契約と検出基盤規則）「安定実行経路」節が所有する
 
-- **件数突合**: 各実行結果の「Ran N tests across M files」の N/M 件数突合を行う。直前実績と比較して件数が急減していないかの妥当性を検証する（固定値の期待値化は行わない）
-- **証跡の stdout・stderr 分離併退避**: 各分割実行の証跡は stdout と stderr を分離してファイルへ併退避する。bun test は fail の詳細を stderr へ出力するため、stdout のみの退避では「fail 由来分類」に必要な情報が失われる。PowerShell コンソール上の表示出力はコンソールコードページによる再解釈を含むため証跡として扱わず、退避ファイルをもって証跡とする
+- **件数突合**: 各実行結果の「Ran N tests across M files」の N/M 件数突合を行う。bun test はテスト結果サマリー（`Ran N tests across M files` 等の件数サマリー）を stderr へ出力するため、突合の根拠は stderr 側の退避ファイルとする。直前実績と比較して件数が急減していないかの妥当性を検証する（固定値の期待値化は行わない）
+- **証跡の stdout・stderr 分離併退避（`2>` 常時付与）**: 各分割実行の証跡は stdout と stderr を分離してファイルへ併退避する。bun test は fail の詳細に加えて件数サマリーを stderr へ出力するため、stderr リダイレクト（`2>`）の付与を常時明示し、stdout のみの退避では「fail 由来分類」に必要な情報と件数突合の根拠が失われる。PowerShell コンソール上の表示出力はコンソールコードページによる再解釈を含むため証跡として扱わず、退避ファイルをもって証跡とする
 - **カレントディレクトトリビアな実行の禁止**: 対象スイートには cwd 依存テストが混在するため、`bun test` 単体等での実行で正規形を代替しない
 
 ### 環境ラベル
@@ -338,6 +338,28 @@ remediation 開始後に作成した commit や base ブランチ比較のみを
 2. **フル再実行**: 単独再実行の後にフル suite（同一 cwd 分割）を再実行し、fail 件数の変化を確認する。単独→フルの順序で得られた両記録は、fail が個別テストの問題か suite 実行の相互作用かを区別する証拠となる
 3. **同一環境件数比較**: 単独再実行とフル再実行の pass/ fail 件数を、同一環境ラベル（実行環境、junction 伝播状態、依存パッケージ状態の3要素が一致する実行）の間でのみ比較する。環境ラベルが異なる実行結果の件数差を由来判定の根拠にしない。件数比較の結果（fail 件数の一致・不一致と、その解釈）を記録する
 4. **baseline 再現確認**: pre-existing と分類する場合は、ワークツリー変更ゼロの baseline commit で同一テストを再実行した再現確認を記録する。baseline 再現確認の実施手順は、stash による退避を行わない detached worktree による baseline 比較（`agentdev-git-worktree` worktree-operations「git stash 運用手順（一時退避）」の detached worktree 標準手順）を用いる
+
+#### baseline 系 durable state の並行追随差に起因する疑似 fail の3点対照手順（REQ-007-012）
+
+baseline 系 durable state（baseline commit、baseline 期待値・許容リスト等、並行 Case の merge で更新される基準状態）は、worktree 作成元の分岐点（baseline）と origin/main の現行状態との間に追随差を持ち得る。分岐点以降に origin/main へ他 Case の merge が入った状況では、当該変更と無関係なテストが baseline の陳腐化により疑似 fail することがある。この疑似 fail の由来分類は、次の3点対照手順で確定する。
+
+| 対照 | 手順 | 判定への寄与 |
+|---|---|---|
+| ① 単独再実行 | fail したテストを同一環境ラベル下で単独に再実行し、再現の有無を確認する | 再現しない場合は状態依存・相互作用由来として本節証跡手順 1〜2 へ分岐する |
+| ② 分岐点 main root 再現 | 分岐点 baseline での同一テスト再現を確認する。detached worktree による baseline 比較（`agentdev-git-worktree` worktree-operations「git stash 運用手順（一時退避）」の detached worktree 標準手順、stash を使わない）または分岐点 commit 指定の main root 読取系実行で行う | ② の再現有無だけで由来を確定せず、③の現行 baseline 差し替え再実行と併せて分類する |
+| ③ 現行 baseline 差し替え再実行（検証後に旧状態へ復元） | baseline 系 durable state を現行（origin/main 追随後）の状態へ一時差し替えし、同一テストを再実行する。検証完了後、旧状態へ復元する | ③ で fail が解消する場合、fail は baseline 追随差（baseline の陳腐化）起因の疑似 fail と分類する |
+
+由来分類への写像:
+
+- ② で同一 fail が再現し ③ で解消する場合、かつ分岐点と現行 baseline 系 durable state の追随差が確認できる場合は **pre-existing（baseline 追随差起因）** と分類し、当該変更由来としては扱わない
+- ② で同一 fail が再現し ③ でも解消しない場合は、ワークツリー変更ゼロの分岐点 baseline で同一 fail が再現するという既存基準に基づき **pre-existing** と分類する。baseline 系 durable state の追随差起因とは分類しない
+- ② で再現しない場合、または②と③の結果が一致せず由来を説明できない場合は **不明** とし、同一環境ラベル下の再検証と追加調査を行う。別途、当該変更との因果関係を確認できた場合のみ **変更由来** と確定する
+
+差し替え・復元の取扱い:
+
+- ③ の baseline 差し替えは検証用の一時操作とし、差し替え対象のパスと旧状態を事前に記録した上で、検証完了後に同一の旧状態へ復元することを必須とする。復元後、`git status --porcelain` で baseline 系 durable state の差分が残留していないことを確認し、復元漏れを残留変更として扱わない
+- 3点対照の実行記録（各対照の起動コマンド、pass/ fail 件数、判定、復元確認）を PR 本文の検証差分セクションへ残す。証跡は本節「証跡の stdout・stderr 分離併退避（`2>` 常時付与）」の形式に従う
+- 分岐点以降の追随差の有無は、検証開始前に `git fetch origin` 後の `git log --oneline origin/main -1` と worktree 作成元 baseline commit の比較で確認できる（`agentdev-git-worktree`「main の鮮度確認」参照）
 
 ### 機械受理基準
 
