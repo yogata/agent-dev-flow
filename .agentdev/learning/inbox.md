@@ -133,3 +133,19 @@
 - **想定反映先**: agentdev-git-worktree の worktree-operations.md「bun test 実行の環境前提」。
 - **関連**: DEL-3103-2、REQ-018、Case #3103（PR #3130）。
 - **タグ**: #worktree #bun #typecheck #dependency-setup
+
+## skills_structure checker は projection 不在環境で src/opencode/skills へ fallback する
+
+- **問題事象**: worktree ジャンクション未伝播環境での skills_structure checker 実行時、projection（.opencode/skills）不在を自動検出して src/opencode/skills へ fallback する動作が機能するかが検証要件となった。
+- **発生局面**: Case #3109 実装時の品質ゲート実行（skills_structure checker・worktree .worktrees/3109-case・PR #3129）。
+- **検知方法**: skills_structure.test.ts 内 fallback 実装の実測確認（bun test 455 pass / 0 fail）。
+- **根本原因**: 該当なし（正常動作の確認）。fallback は本次善経路として機能し、投影未伝播環境での誤検出はなかった（REQ-018-001 fallback 動作の正常性確認）。
+- **自律対応内容**: fallback 経由の checker 実行結果（455 pass）を PR 本文の品質ゲート表へ検証証跡として記録した。
+- **ユーザー確認有無**: なし。
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: junction 未伝播環境（並行 worktree 実行）での checker 実行は projection 不在 fallback に依存する。fallback 経由では検査対象が src 側実体となるため、--root 指定（forward slash 形式・REQ-018-007）と併せて実行形態を証跡に明記する。
+- **再発条件**: 該当なし（正常系の観測）。
+- **予防策候補**: なし（既存機構が本次善経路として機能）。
+- **想定反映先**: なし（観測記録。具体化の判断は backlog/intake 側）。
+- **関連**: skills_structure.test.ts、REQ-018-001、Case #3109（PR #3129）。
+- **タグ**: #skills-structure #worktree-junction #fallback
