@@ -43,3 +43,4 @@ Windows 環境で PowerShell を既存ファイルへ使う場合、次の4系�
 - Write ツール全面上書きの cp932 事象（AGENTS.md に実証済みの既知事象として記録。Write ツールは新規ファイル作成に限定）。
 - edit ツール優先ガイドレール（既存 UTF-8（BOM なし）ファイルの編集は per-line string replace の edit ツールを優先する AGENTS.md 行動規範）。
 - checker CLI の stdout ロス（Windows + bun）と encoding 破壊の区別（[checker-cli-stdout-loss-on-windows-bun.md](checker-cli-stdout-loss-on-windows-bun.md)。bun の process.exit による stdout ロス系統と本書の cp932 再解釈系統は別現象だが隣接）。
+- PowerShell コンソール標準出力の CRLF が bash パイプ受信の行指向処理を破壊する問題（[powershell-console-stdout-crlf-bash-pipe.md](powershell-console-stdout-crlf-bash-pipe.md)。本書のファイル I/O 系に対する stdout パイプ面の隣接知見）。
