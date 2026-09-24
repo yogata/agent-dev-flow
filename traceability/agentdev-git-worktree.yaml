@@ -2,3 +2,5 @@ component: agentdev-git-worktree
 implementation:
   src/opencode/skills/agentdev-git-worktree/references/worktree-operations.md:
     - REQ-018-005
+    - REQ-018-006
+    - REQ-018-007
