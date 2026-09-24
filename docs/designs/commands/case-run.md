@@ -6,7 +6,7 @@ updated: "2026-09-24"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-015, REQ-021-016, REQ-021-017, REQ-021-019, REQ-021-020, REQ-021-022, REQ-035-002 -->
-<!-- ADF-COVERS(design): REQ-021-015, REQ-021-016, REQ-031-006, REQ-031-015, REQ-031-016, REQ-031-027, REQ-031-033, REQ-035-012 -->
+<!-- ADF-COVERS(design): REQ-021-015, REQ-021-016, REQ-031-006, REQ-031-015, REQ-031-016, REQ-031-027, REQ-031-033, REQ-031-034, REQ-035-012 -->
 <!-- ADF-COVERS(implementation): REQ-015-010, REQ-015-011 -->
 <!-- ADF-COVERS(implementation): REQ-017-007, REQ-017-008, REQ-017-010, REQ-017-011, REQ-017-013, REQ-017-016 -->
 <!-- ADF-COVERS(implementation): REQ-031-001, REQ-031-002, REQ-031-003, REQ-031-004, REQ-031-005, REQ-031-006, REQ-031-007, REQ-031-008, REQ-031-009, REQ-031-010, REQ-031-011, REQ-031-012, REQ-031-013, REQ-031-014, REQ-031-015, REQ-031-016, REQ-031-017, REQ-031-018, REQ-031-019, REQ-031-020, REQ-031-021, REQ-031-022, REQ-031-023, REQ-031-024 -->
@@ -224,6 +224,14 @@ case-run プロファイル固有の追加ルールとして full_docs_check_rec
 <!-- ADF-COVERS(implementation): REQ-031-026 -->
 本 Design の docs 整合性検査手順（worktree に対する検査 skill 起点指定、コミット後 push 前限定の
 差分検出、コミット前の明示ファイル列挙）が REQ-031-025、REQ-031-026 を実装する。
+
+<!-- ADF-COVERS(design): REQ-031-034 -->
+targeted docs guard の CLI 表示（usage・ヘッダコメントを含む）は正典契約（REQ-031-026 および
+targeted-docs-guard-implementation Design）と矛盾しない（REQ-031-034）。本 Design が定める CLI 契約は
+--files = コミット前（worktree 上での検証等）の標準モード（untracked 含む明示ファイル列挙、main 環境の
+PR 変更ファイル直接指定にも使用）、--base-ref = コミット済み差分（コミット後・push 前限定）、
+両者は排他でなくいずれかの指定が必須、であり、CLI 表示（スクリプトヘッダコメント等）の
+正典からの drift（環境割当の逆転・排他表記の残存等）を本不変条件で検出・是正対象とする。
 
 ## verification-only PR（実装差分なし、検証のみ）（v2:REQ-0158-002）
 
