@@ -1,0 +1,5 @@
+component: agentdev-workflow-case-auto
+implementation:
+  src/opencode/skills/agentdev-workflow-case-auto/references/input-resolution-and-orchestration.md:
+    - REQ-030-017
+    - REQ-061-039

@@ -146,6 +146,7 @@ main への push、capture、commit、同一 Epic Issue 本文への更新等の
 クリーンアップ検証ゲート（ドラフト残存、RU 残存の検証）を stage 2 の対象群収束後・stage 3 開始前に実行し、評価対象を stage 2 を正常完了した対象に限定する（case-auto 実行契約）。
 scheduling 制約（最大同時起動数・起動間隔・順次フォールバック）による batch 分割を orchestration stage の分割として扱わない（case-auto Design「ドラフト間並列実行モデル」）。
 Epic execution_unit の Wave 間および最終 Wave の case-close(#epic) は Wave 反復を進行・完結させる stage 3 内部の状態遷移処理であり stage 4 の開始とみなさず、stage の分類は orchestration 上の位置づけにより行い command 名単独では分類しない（case-auto Design「ドラフト間並列実行モデル」）。
+並行して委譲起動する stage 1（case-open / case-revise）・stage 2（case-ready）の委譲先は、並行実行時の作業隔離規律（REQ-030-017。case-open Design「並行 case-open の作業隔離規律（REQ-030-017）」節）と Definition PR 受入の overlap 突合（REQ-061-039。case-ready Design「内部構成」節 overlap 突合）を各委譲先工程の実行手順として適用する。case-auto は委譲先工程の手順を再定義せず、委譲境界の整合のみを保持する（stage モデルの並列性〔REQ-034-025〕と REQ-030-017 / REQ-061-039 の機構分散は矛盾しない）。
 
 #### stage 1 収束条件と横断依存検査（全対象確立後・case-auto 側で横断評価）
 

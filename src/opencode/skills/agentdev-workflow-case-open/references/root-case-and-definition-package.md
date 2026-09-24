@@ -41,6 +41,14 @@
 6. 生成した Definition Package を Root Case に関連付ける（Root Case 本文の Definition Package セクションへ所在を記録する）
 7. Definition Package の構成、索引・補助メタデータの具体形式は case-open / case-ready Design の管理下とする
 
+### 並行 case-open の作業隔離（REQ-030-017）
+
+並行して case-open を実行する場合、Definition 変更作業（branch 作成、ファイル編集）の起点で次の作業隔離手順を実行する。正規所有は case-open Design「並行 case-open の作業隔離規律（REQ-030-017）」節であり、本節は STEP-2 / STEP-3 の実行手順を提供する。
+
+1. **Case 専用 worktree の前置**: Definition 変更作業は Case 専用 worktree（`.worktrees/{N}-definition`）で行う。共有 working tree での Definition 変更作業を行わない
+2. **Definition branch の origin/main HEAD からの独立作成**: Definition branch は origin/main HEAD から独立して作成する（`git fetch origin` 後の origin/main HEAD を作成元とする）。兄弟 Case の Definition commit を含むスタック構造を作らない。branch 命名（REQ-083）は既存規定に従い、本手順は branch 作成元と作業隔離のみを扱う
+3. **1-writer 前提侵害の検知と早期断念**: worktree 内の `git status` 確認により、in-scope 外の書込み混入（worktree 1-writer 前提の侵害）を検知した場合は直ちに停止する（早期断念）。検知した書込みを Definition 変更に含めない
+
 ## Result
 
 - Root Case GitHub Issue 作成済み（対象 REQ 番号埋め込み、状態 open）
@@ -57,6 +65,7 @@
 - REQ 行追加を伴う場合はトレーサビリティポリシー追随要否の確認（必要エントリの Definition 包含、または不要判断の記録）が行われていること
 - REQ 行変更を伴う場合は Design の ADF-COVERS 宣言追随要否の確認（必要な宣言の Definition 包含）が行われていること
 - 物理削除を伴う docs-chore OU を含む場合は、当該 OU の対象範囲への実行時設定参照の明示包含が確認されていること
+- 並行 case-open 実行時に、Definition 変更作業が Case 専用 worktree かつ origin/main HEAD 起点の独立 branch で行われ、1-writer 侵害の検知手順が実行されていること（REQ-030-017）
 - 状態が open であり実装開始が許可されていないこと
 
 ## Resume-Idempotency

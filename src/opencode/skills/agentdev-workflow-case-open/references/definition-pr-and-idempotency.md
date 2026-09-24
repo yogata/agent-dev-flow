@@ -31,7 +31,15 @@ canonical Definition との実変更を判定し、実変更がある場合の�
 1. 実変更判定: Definition Package と canonical Definition を比較する（case-open / case-ready Design）。差分が空の場合は実変更なし → PR を作成せず STEP-5 へ進む。実変更のない Case（bugfix / maintenance / docs_chore 等では作成しない）
 2. 実変更がある場合: 実変更を Case 単位で 1 件の Definition PR として集約し作成する。1 Case につき 2 件以上作成しない
 3. REQ 行変更（新規行の追加・移管・廃止等）を伴う Definition PR では、PR 作成前に Design の ADF-COVERS 宣言の追随反映を確認し、トレーサビリティ check（`agentdev-traceability`）で当該 REQ 行の missing-design が 0 件であることを確認する（missing-design 0 件ゲート）。宣言追随が Definition に含まれておらず missing-design が 0 件でない場合は PR を作成せず、Definition Package の構成へ戻して宣言追随を確定する
-4. PR 作成は `agentdev_gh` の pr_create で行い、GitHub Draft PR ではない通常 Pull Request として作成する（draft 指定は公開契約に存在しない。REQ-{NNNN}-{NNN}）。PR 本文は verbatim で記録する
+4. PR 作成は `agentdev_gh` の pr_create で行い、GitHub Draft PR ではない通常 Pull Request として作成する（draft 指定は公開契約に存在しない。REQ-{NNNN}-{NNN}）。PR 本文は verbatim で記録する。並行 case-open 実行時は、PR 作成前に下記「並行 case-open の PR 作成前隔離検査（REQ-030-017）」を実行し、検査を通過した場合のみ PR を作成する
+
+#### 並行 case-open の PR 作成前隔離検査（REQ-030-017）
+
+並行して case-open を実行する場合、手順 4 の PR 作成前に次の隔離検査を実行する。正規所有は case-open Design「並行 case-open の作業隔離規律（REQ-030-017）」節であり、本節は STEP-4 の実行手順を提供する。
+
+1. **PR 作成前の自 Case 差分検査**: merge-base と diff --stat（`git merge-base origin/main HEAD`、`git diff --stat origin/main HEAD`）により、差分が自 Case 分のみであることを検査する。兄弟 Case の commit を含むスタック構造を検出した場合は、隔離 worktree での差分再構成（origin/main HEAD からの branch 再作成と明示パスによる変更の再適用）で救済してから PR を作成する
+2. **明示パス指定ステージ**: Definition 変更のステージは明示パス指定で行い、スイープ操作（`git add -A` 等）は行わない
+3. **1-writer 前提侵害の検知と早期断念**: `git status` により worktree 1-writer 前提の侵害（in-scope 外の書込み混入）を検知した場合は直ちに停止する（早期断念）。検知した書込みを Definition 変更・PR に含めない
 
 ### STEP-5: 冪等再実行確認
 
@@ -72,12 +80,14 @@ canonical Definition との実変更を判定し、実変更がある場合の�
 
 - 実変更判定結果（実変更あり / なし）
 - Definition PR 作成結果（実変更時のみ。Case 単位 1 件）
+- 並行 case-open 実行時の PR 作成前隔離検査結果（自 Case 差分のみの確認、スタック検出時は差分再構成救済の実施。REQ-030-017）
 - 冪等確認結果（既存成果物の再利用、重複生成なし、不足分のみ処理）
 - 横断依存検査結果（警告の提示記録、または検出不能報告。警告のみで Root Case の確立は阻止しない）
 
 ## Evidence
 
 - 実変更判定根拠（canonical Definition との差分）、作成した PR 番号、既存成果物の検出結果
+- 並行 case-open 実行時の PR 作成前隔離検査実行証跡（merge-base / diff --stat の結果、救済実施時は差分再構成の記録。REQ-030-017）
 - 横断依存検査の実行証跡（検査入力、エンジンの報告 JSON、投入者への選択肢提示とその応答）
 
 ## Completion Verification
@@ -85,6 +95,7 @@ canonical Definition との実変更を判定し、実変更がある場合の�
 - 実変更がない Case について Definition PR が存在しないこと
 - 実変更がある Case について Definition PR が 1 件であること
 - REQ 行変更を伴う Case について、PR 作成前の missing-design 0 件ゲート確認が行われていること
+- 並行 case-open 実行時に、PR 作成前隔離検査（自 Case 差分のみ・明示パスステージ・1-writer 侵害検知時の早期断念）が実行されていること（REQ-030-017）
 - 再実行時に Root Case と Definition PR の件数が増加しないこと
 - 再利用判定が instruction 単位・Issue 節単位の完了度照合に基づいていること（ファイル単位の近似照合で部分完了を完了扱いにしていないこと）
 - 横断依存検査が実行され、警告検出時は提示記録が、検出源取得不能時は検出不能報告が残っていること
