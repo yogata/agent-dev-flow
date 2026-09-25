@@ -1,0 +1,58 @@
+{
+  "observationId": "20260925T190202Z-91df",
+  "schemaVersion": 1,
+  "workflow": "case-ready",
+  "judgmentKind": "execution-structure-standard-epic",
+  "subject": "Root Case #3142 実行構造確定（Standard / Epic 確定）",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "sourceRevision": "4a11364c",
+  "outcome": "completed",
+  "durationMs": 573,
+  "resolvedModel": "typesafe-ai/jev",
+  "inputTokens": 975,
+  "inputs": {
+    "requestDigest": "68946035eba77e103481a5b30761357af4fa659e1560848efc563caabbc63d95"
+  },
+  "judgments": [
+    {
+      "judgmentId": "q1",
+      "questionForm": "choice",
+      "jevResult": "Standard",
+      "probabilityDistribution": {
+        "Standard": 1,
+        "Epic": 0
+      },
+      "confidence": 0.8733333333333334,
+      "llmFinalJudgment": "Standard。機械的連結成分計算（必須依存 0 エッジ → 連結成分 5 つすべて単独根）により、単独根は Epic 化せず Standard flow とする規約から execution_unit は Standard と確定する。case_open_hints epic_needed: false、3軸判断（必須依存なし・Epic 構成サイズ判断は Epic 化しないため不適用・機能的一貫性は単一主題で Epic 必要性なし）と整合する。Root Case 自身を単一 execution unit とし、Child Issue は作成しない",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "q2",
+      "questionForm": "score",
+      "jevResult": 0.64,
+      "probabilityDistribution": {
+        "関連（同一領域で依存なし）": 0.36,
+        "弱（順序推奨のみ・並列実行可能）": 0.64,
+        "必須（一方が他方なしでは成立しない）": 0
+      },
+      "confidence": 0.8733333333333334,
+      "llmFinalJudgment": "関連（同一領域で依存なし）。draft operation_units は全件 depends_on: [] を明示し、必須依存（連結成分エッジ）は 0 であることが機械的事実。Jev 分布（弱 0.64 / 関連 0.36）は依存強度の判定確度の参考情報として保持するが、明示された依存グラフの機械的事実を優先し「関連」と確定する",
+      "llmTreatment": "corrected"
+    },
+    {
+      "judgmentId": "q3",
+      "questionForm": "score",
+      "jevResult": 1.97,
+      "probabilityDistribution": {
+        "無関係な OU 群": 0,
+        "複数主題の混在": 0.02,
+        "単一の機能的主題": 0.98
+      },
+      "confidence": 0.8733333333333334,
+      "llmFinalJudgment": "単一の機能的主題。5 OU は検証・測定・Tool・worktree 運用の適合是正という単一 topic（verification-measurement-and-tool-contract）配下の同一 draft バッチに属し、機能的一貫性は単一主題と判定する。Epic 必要性の根拠（無関係 OU 群の集約需要）は存在しない",
+      "llmTreatment": "unchanged"
+    }
+  ],
+  "recordState": "complete"
+}

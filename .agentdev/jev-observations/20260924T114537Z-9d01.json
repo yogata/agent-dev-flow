@@ -1,0 +1,102 @@
+{
+  "observationId": "20260924T114537Z-9d01",
+  "durationMs": 594,
+  "inputTokens": 1254,
+  "inputs": {
+    "references": [
+      {
+        "digest": "796a5c2ce4e3dc2fe28d5c94dfac6e7ac965e6814b8348c126b273e2457874ac",
+        "label": "実行構造確定規約（case-ready STEP-5 reference。単独根は Standard flow の機械的規則と Jev 逐次経路の契約）",
+        "path": ".opencode/skills/agentdev-workflow-case-ready/references/execution-structure.md"
+      }
+    ],
+    "requestDigest": "e4d6f085b58701979bb3592d8c8e56afbe173cb2a4ae074ef392a3334cc8abed",
+    "snapshot": "判断対象: Root Case #3103（REQ-090-013、work_type: maintenance / scale: standard）。operation_units: OU-001 のみ・depends_on なし・issue_policy: single・epic_needed: false。依存グラフ: 頂点 1・エッジ 0 の単独根 1 連結成分。比較対象: 既存オープン Case 群（#3101 が同一 Design ファイルの別目的更新で REQ 行非共有）。判断入力の本文は GitHub Issue #3103 と draft（.agentdev/drafts/req-draft-ru0124-jev-evaluate-time-partial-persistence.md）から再構成可能。"
+  },
+  "judgmentKind": "execution-structure-standard-epic",
+  "judgments": [
+    {
+      "confidence": 0.9116666666666667,
+      "jevResult": "Standard",
+      "judgmentId": "q_structure",
+      "llmFinalJudgment": "Standard。OU-001 の単独根（連結成分 1 件、必須依存エッジ 0）であり execution-structure 規約の機械的規則（単独根は Epic 化せず Standard flow、Root Case 自身を単一 execution unit）に一致。Child Issue は作成しない。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "Epic": 0,
+        "Standard": 1
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.9116666666666667,
+      "jevResult": 0,
+      "judgmentId": "q_dep_strength",
+      "llmFinalJudgment": "低（依存エッジ 0）。operation_units 間の必須依存は存在しない。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "中": 0,
+        "低（依存エッジ 0）": 1,
+        "高": 0
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.9116666666666667,
+      "jevResult": 0,
+      "judgmentId": "q_size",
+      "llmFinalJudgment": "小（1 OU）。operation_unit は 1 件のみで Epic サイズ上限の検討対象にならない。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "中": 0,
+        "大": 0,
+        "小（1 OU）": 1
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.9116666666666667,
+      "jevResult": 1.99,
+      "judgmentId": "q_cohesion",
+      "llmFinalJudgment": "高。全変更が単一契約（2段階書込み: evaluate 時点書込み + observation_write 追記完成）に帰属し機能的一貫性は高い。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "中": 0,
+        "低": 0,
+        "高（単一契約 2段階書込みに一貫）": 1
+      },
+      "questionForm": "score"
+    },
+    {
+      "confidence": 0.9116666666666667,
+      "jevResult": false,
+      "judgmentId": "q_scope_dup",
+      "llmFinalJudgment": "重複有無の最終確定は STEP-6 横断依存検査エンジンの機械的判定に委譲する。STEP-5 段階の判断材料（#3101 は同一 Design ファイルの別目的の更新で REQ 行非共有）から重複ありとは判断せず、Jev 結果 (false) から変更しない。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.78,
+        "true": 0.22
+      },
+      "questionForm": "boolean"
+    },
+    {
+      "confidence": 0.9116666666666667,
+      "jevResult": "ユーザー確認",
+      "judgmentId": "q_dup_handling",
+      "llmFinalJudgment": "重複検出時の判断は decision_context による親判断解決に委譲され、既にユーザー確認済み（2026-09-24 parallel handling 承認、known condition_a 9-path overlap warning、gate_effect none）。追加の確認停止は行わずこのまま並行投入とする。",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "ユーザー確認": 0.69,
+        "スキップ": 0.31
+      },
+      "questionForm": "choice"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "889c16ceec272aa9b7543eceb2ae173bec3e9894",
+  "subject": "Root Case #3103（REQ-090-013 実行構造確定: Standard/Epic 3軸判断とスコープ重複判定）",
+  "workflow": "case-ready"
+}

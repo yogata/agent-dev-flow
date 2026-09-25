@@ -1,0 +1,46 @@
+{
+  "observationId": "20260925T190014Z-5278",
+  "schemaVersion": 1,
+  "workflow": "case-ready",
+  "judgmentKind": "execution-structure-standard-epic",
+  "subject": "Case #3144 実行構造確定（Standard / Epic 3軸判断）",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "sourceRevision": "95ac532c555f137503b1e976d952fd247cf921a0",
+  "outcome": "jev_failed",
+  "durationMs": 390,
+  "inputs": {
+    "requestDigest": "50b0eb869d2664200e758ea4a8f2719342dd01efe2654715220f0a962a210ba8"
+  },
+  "judgments": [
+    {
+      "judgmentId": "q1_structure",
+      "questionForm": "choice",
+      "failureKind": "server_error",
+      "llmFinalJudgment": "Standard（Root Case を単一 execution unit）。連結成分（必須依存のみをエッジ）はエッジ 0 件のため4つの単独根に分解され、単独根は Epic 化せず Standard flow とする規則に従う。case_open_hints epic_needed=false と整合。",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "q2_dependency_strength",
+      "questionForm": "score",
+      "failureKind": "server_error",
+      "llmFinalJudgment": "独立（必須依存なし）。全 OU の depends_on が空で、成果の成立順序への依存も存在しない。",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "q3_epic_size",
+      "questionForm": "score",
+      "failureKind": "server_error",
+      "llmFinalJudgment": "Epic 不要。単独根のみの構成であり Epic 化の規模条件を満たさない。",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "q4_functional_cohesion",
+      "questionForm": "score",
+      "failureKind": "server_error",
+      "llmFinalJudgment": "同一運用契約整備として強く一貫。ただし機能的一貫性単独では Epic 集約の根拠とならず、必須依存（規則上の判断軸）がゼロであることを優先する。",
+      "llmTreatment": "unchanged"
+    }
+  ],
+  "recordState": "complete"
+}

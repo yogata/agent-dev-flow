@@ -1,0 +1,82 @@
+{
+  "observationId": "20260924T093804Z-f3eb",
+  "durationMs": 2028,
+  "inputTokens": 2744,
+  "inputs": {
+    "references": [
+      {
+        "digest": "e82968ec4ec14114fd067a35710d6e7b1f222c19efc2cc013a38f3553886616b",
+        "label": "REQ-034",
+        "path": "docs/requirements/REQ-034.md"
+      },
+      {
+        "digest": "377dd23a5b244d4ba70f93796c32919a6d4a1213069c198ee53bb74b0ce02b66",
+        "label": "REQ-031",
+        "path": "docs/requirements/REQ-031.md"
+      }
+    ],
+    "requestDigest": "eec35990ae30683025a1e3b9d2e216fa92dde9994909bde6d53deaa8524d88aa",
+    "snapshot": "STEP-3 既存REQ照合（2問）と STEP-4 最終分類・Design分離（2問）の計2評価。requestDigest は第1評価（STEP-3）の digest。第2評価（STEP-4）の digest は 0ec56987b7ea6aae3b98321f48a990847254e3d2f2ead08b3f380ee9dbe946f3。判断入力は入力ファイル（repo 外: hermes-vault/project-list/req-input-case-auto-parallel-recovery.md）と REQ-034/REQ-031 の要点から合成。"
+  },
+  "judgmentKind": "req-define-step3-step4",
+  "judgments": [
+    {
+      "confidence": 0.645,
+      "jevResult": "UPDATE",
+      "judgmentId": "req-matching-operation",
+      "llmFinalJudgment": "UPDATE",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "APPEND": 0.32,
+        "CREATE": 0.04,
+        "UPDATE": 0.64
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.645,
+      "jevResult": true,
+      "judgmentId": "matching-confidence-confirmation-needed",
+      "llmFinalJudgment": "false",
+      "llmTreatment": "corrected",
+      "probabilityDistribution": {
+        "false": 0.35,
+        "true": 0.65
+      },
+      "questionForm": "boolean"
+    },
+    {
+      "confidence": 0.91,
+      "jevResult": "REQ行中心＋Design整合更新＋実現面指示（realization_actions）",
+      "judgmentId": "final-classification-artifact",
+      "llmFinalJudgment": "REQ行中心＋Design整合更新＋実現面指示（realization_actions）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "Design分離必要（要件行がDesign分離基準に該当）": 0,
+        "REQ行のみ（Design更新・実現面指示とも不要）": 0,
+        "REQ行中心＋Design整合更新＋実現面指示（realization_actions）": 1
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.91,
+      "jevResult": false,
+      "judgmentId": "design-separation-residual",
+      "llmFinalJudgment": "false",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.82,
+        "true": 0.18
+      },
+      "questionForm": "boolean"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "6d40f9a2b148ff7eb3929b284701f933ff9b023a",
+  "subject": "case-auto 並列維持要件（case-auto-parallel-recovery）の既存REQ照合と要件展開分離",
+  "workflow": "req-define"
+}

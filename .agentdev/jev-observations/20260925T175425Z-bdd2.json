@@ -1,0 +1,99 @@
+{
+  "observationId": "20260925T175425Z-bdd2",
+  "schemaVersion": 1,
+  "workflow": "req-define",
+  "judgmentKind": "ru-batch-0120-0141-classification",
+  "subject": "RU-0120〜0141（22件）5サブバッチ構成における REQ/Design/実現面の帰属判断6件",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "sourceRevision": "unspecified",
+  "outcome": "completed",
+  "durationMs": 581,
+  "resolvedModel": "typesafe-ai/jev",
+  "inputTokens": 2783,
+  "inputs": {
+    "requestDigest": "83c638d3367fd06868d1e0a11763315ff33abb98caa17f33bb2359b28fc5e471",
+    "snapshot": "22 RU を5サブバッチへ構成する req-define バッチ。主要判断: RU-0126対称性→REQ-036-032/033更新、RU-0128選択性→REQ-092行追加+運用文書、RU-0129 schema一致→REQ-052行追加+Tool実装、RU-0140 infra-transient→REQ-034-022更新+case-auto Design、RU-0122/0141→case-open/req-define Design両方へ追記、RU-0134→IR-044自己根拠化（行履歴確認条件付き）"
+  },
+  "judgments": [
+    {
+      "judgmentId": "q1-ru0126-symmetry",
+      "questionForm": "choice",
+      "jevResult": "REQ-036-032/033 既存行の UPDATE（対称性要件と非対称不採用を既存測定契約行へ明示）",
+      "probabilityDistribution": {
+        "REQ-036-032/033 既存行の UPDATE（対称性要件と非対称不採用を既存測定契約行へ明示）": 0.8,
+        "REQ-036 への新規行 APPEND（対称性確認を独立要件行として追加）": 0.19,
+        "REQ 変更なし（inspect-docs 等の測定手順側の注記のみ）": 0.01
+      },
+      "confidence": 0.88,
+      "llmFinalJudgment": "REQ-036-032/033 の既存行 UPDATE とする。対称性確認は既存の比較測定契約行の意味補強であり、独立した新規関心（別要件行）ではなく測定設計の前提条件である。測定手順側への注記も併用する。",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "q2-ru0128-selectivity",
+      "questionForm": "choice",
+      "jevResult": "REQ 変更なし（issue-operation-safety.md 等の運用文書のみ）",
+      "probabilityDistribution": {
+        "REQ-092 への新規行 APPEND（選択性を持つ語の使用を呼出側制約として追加）": 0.29,
+        "REQ-092-001 既存行の UPDATE（選択性文言を既存行へ追加）": 0.12,
+        "REQ 変更なし（issue-operation-safety.md 等の運用文書のみ）": 0.59
+      },
+      "confidence": 0.88,
+      "llmFinalJudgment": "REQ-092-004 の新規行 APPEND とする。REQ-092-001（search 併用義務）はトークンが非選択性だと実効的に要件を満たせない実事故（Case #3103 で page limit 到達）が発生しており、選択性を持つ語の使用は呼出側外部契約の補完として REQ 行に値する。state: open 限定の適用境界と再試行判断基準は運用文書へ配置し REQ には入れない。",
+      "llmTreatment": "corrected"
+    },
+    {
+      "judgmentId": "q3-ru0129-schema-contract",
+      "questionForm": "choice",
+      "jevResult": "REQ 変更なし（Tool 実装修正と Design 既記述の明確化のみ）",
+      "probabilityDistribution": {
+        "REQ-052 への新規行 APPEND（全 Custom Tool に一般化した契約行として追加）": 0.01,
+        "REQ-090 への新規行 APPEND（agentdev_jev 固有の契約行として追加）": 0.01,
+        "REQ 変更なし（Tool 実装修正と Design 既記述の明確化のみ）": 0.98
+      },
+      "confidence": 0.88,
+      "llmFinalJudgment": "REQ 行追加なし・Tool 実装修正のみとする。公開 schema は REQ-052-001 の操作契約（入力、出力、保証、失敗時の意味）の入力記述であり、乖離は既存契約への不適合（bug）であって契約の欠落ではない。追記完成 mode は custom-tool-contracts.md:86 と REQ-090-013 が既に規定済みで、Design・REQ への新規追記は二重管理となる。RU 暫定分類 REQ の迷いを「REQ 行追加なし」に確定した。",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "q4-ru0140-infra-transient",
+      "questionForm": "choice",
+      "jevResult": "REQ-034-022 既存行の UPDATE（分類列挙へ infra-transient を追加し回復経路報告を明示）",
+      "probabilityDistribution": {
+        "REQ-034-022 既存行の UPDATE（分類列挙へ infra-transient を追加し回復経路報告を明示）": 0.92,
+        "REQ-034 への新規行 APPEND（infra-transient を独立要件行として追加）": 0.07,
+        "REQ 変更なし（case-auto Design と配布 skill のみ）": 0.01
+      },
+      "confidence": 0.88,
+      "llmFinalJudgment": "REQ-034-022 の UPDATE とする。停止理由分類の列挙は同行が正規所有しており、infra-transient は分類項目の追加（既存契約の拡張）であって独立した新規関心ではない。判定条件と報告形式の詳細は case-auto Design の停止理由分類節が所有する。",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "q5-ru0122-design-anchor",
+      "questionForm": "choice",
+      "jevResult": "case-open Design と req-define Design の両方へ追記（各工程の Design が各自の手順契約を所有）",
+      "probabilityDistribution": {
+        "case-open Design と req-define Design の両方へ追記（各工程の Design が各自の手順契約を所有）": 1,
+        "case-open Design のみへ追記（Definition Package 生成は case-open の責務）": 0,
+        "Design 追記なし（配布 skill reference の手順記述のみ）": 0
+      },
+      "confidence": 0.88,
+      "llmFinalJudgment": "両 Design へ追記する。RU-0122 の事前確認（design 対応）は Definition Package 生成を所有する case-open Design、RU-0141 の実パス確認は artifact_actions 生成を所有する req-define Design がそれぞれ正規所有し、配布 skill reference は実行手順として追従する。",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "q6-ru0134-ir044",
+      "questionForm": "choice",
+      "jevResult": "引用除去と IR-044 自己根拠化（保護除外の記録根拠を IR-044 Design 内の根拠明示へ変更）",
+      "probabilityDistribution": {
+        "引用除去と IR-044 自己根拠化（保護除外の記録根拠を IR-044 Design 内の根拠明示へ変更）": 0.99,
+        "現行 REQ-036 の別行への再アンカー（保護除外に意味近い現行行へ引用を付け替え）": 0.01,
+        "REQ-036-00005 の側を保護除外記録義務へ拡張（REQ 行を更新して IR-044 の引用を正当化）": 0
+      },
+      "confidence": 0.88,
+      "llmFinalJudgment": "引用除去と IR-044 自己根拠化を既定方針とする。現行 REQ-036-005 は保護除外記録義務と意味的に無関係であり、source-of-truth priority では現行 REQ が正であるため下位 Design の引用を解消する。git 行履歴確認（行付け替え有無）を Case の受入条件とし、付け替え由来と確認された場合のみ現行行への再アンカーへ方針変更を許す。",
+      "llmTreatment": "unchanged"
+    }
+  ],
+  "recordState": "complete"
+}

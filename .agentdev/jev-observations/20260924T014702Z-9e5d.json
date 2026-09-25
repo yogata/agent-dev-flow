@@ -1,0 +1,260 @@
+{
+  "observationId": "20260924T014702Z-9e5d",
+  "durationMs": 837,
+  "inputTokens": 2664,
+  "inputs": {
+    "references": [
+      {
+        "digest": "2e581f57ed4750826be808af02629ee145096dbcbd56066a7a31c4d9740131ec",
+        "label": "RU-0122",
+        "path": ".agentdev/backlog/req-units/RU-0122.md"
+      },
+      {
+        "digest": "1312af6cfce85748943f48f1a449f7135ac6101886409b723f72433eb7fb77b0",
+        "label": "RU-0123",
+        "path": ".agentdev/backlog/req-units/RU-0123.md"
+      },
+      {
+        "digest": "cd470faa98a3e8e1ebfb62377568094fcf9c8614d6ae4081f69ae73ec97a83ca",
+        "label": "RU-0124",
+        "path": ".agentdev/backlog/req-units/RU-0124.md"
+      },
+      {
+        "digest": "6da441aa841d59d875a5ef6be56412d0cf5982225893450efacb51f769c3bbc9",
+        "label": "RU-0125",
+        "path": ".agentdev/backlog/req-units/RU-0125.md"
+      },
+      {
+        "digest": "164757512b4f519f446c52f0540622dd2ea871d225af58d78609a390ac912492",
+        "label": "RU-0126",
+        "path": ".agentdev/backlog/req-units/RU-0126.md"
+      },
+      {
+        "digest": "1fae8584ed55e1c9a39534533b6a679d9144177e8fdc5ecc75db1b6abadc90fb",
+        "label": "RU-0127",
+        "path": ".agentdev/backlog/req-units/RU-0127.md"
+      },
+      {
+        "digest": "1d28240cf35f92bbd059db843a62ad8ea09336ba4d25e75af24eb14bf904ea60",
+        "label": "RU-0128",
+        "path": ".agentdev/backlog/req-units/RU-0128.md"
+      },
+      {
+        "digest": "75d3dc30a82a6aa7f874b159f734c0613a3b3b936ade645060d8646789ae74d9",
+        "label": "RU-0129",
+        "path": ".agentdev/backlog/req-units/RU-0129.md"
+      },
+      {
+        "digest": "3bbfd74251b017a65c27d2c30716ae5f684464798dabf8fb7793e5aa8832c10c",
+        "label": "RU-0130",
+        "path": ".agentdev/backlog/req-units/RU-0130.md"
+      },
+      {
+        "digest": "6a775016508364fcd698c2a7ccba43e7c3e3a8b6b366e7891ddea2172f87b89d",
+        "label": "RU-0131",
+        "path": ".agentdev/backlog/req-units/RU-0131.md"
+      },
+      {
+        "digest": "0f6f3b2003484b60c1b14f8b1839879393097bdf7dd10ea52e48748d6841be8c",
+        "label": "RU-0132",
+        "path": ".agentdev/backlog/req-units/RU-0132.md"
+      },
+      {
+        "digest": "968a49a01cdb20499454d67ea7c62cc738a81a208d3400f65c92047b536ba8ef",
+        "label": "RU-0133",
+        "path": ".agentdev/backlog/req-units/RU-0133.md"
+      }
+    ],
+    "requestDigest": "c299acbaa1abbc33ca5256c6b8fa4165f777a9d0351beaad3ed98056380a6320"
+  },
+  "judgmentKind": "existing-req-matching",
+  "judgments": [
+    {
+      "confidence": 0.7684615384615385,
+      "jevResult": "append",
+      "judgmentId": "q-ru0122",
+      "llmFinalJudgment": "append（REQ-090-012 への追記）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "append": 0.63,
+        "append_and_design": 0.28,
+        "design_update_only": 0.05,
+        "update": 0.04
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7684615384615385,
+      "jevResult": "design_update_only",
+      "judgmentId": "q-ru0123",
+      "llmFinalJudgment": "design_update_only（custom-tool-contracts Design Jev 節の更新のみ）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "append_and_design": 0.13,
+        "design_update_only": 0.86,
+        "update": 0
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7684615384615385,
+      "jevResult": "append_and_design",
+      "judgmentId": "q-ru0124",
+      "llmFinalJudgment": "append_and_design（REQ-090-013 追記 + custom-tool-contracts Design Jev 節更新）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "append": 0.07,
+        "append_and_design": 0.72,
+        "design_update_only": 0.14,
+        "update": 0.07
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7684615384615385,
+      "jevResult": "append",
+      "judgmentId": "q-ru0125",
+      "llmFinalJudgment": "append（REQ-007-011/012 の2行追記）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "append": 0.76,
+        "append_and_design": 0.1,
+        "design_update_only": 0.02,
+        "update": 0.12
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7684615384615385,
+      "jevResult": "design_update_only",
+      "judgmentId": "q-ru0126",
+      "llmFinalJudgment": "append（REQ-018-006/007 追記）。是正理由: worktree-operations.md は src/opencode/skills 配下の配布 skill reference であり docs/designs の Design ファイルではないため design_update_only は候補構成の解釈混同（候補に skill reference 更新のみのクラスが不在）に由来する。REQ-018-005 が skill references への明文化を REQ 行で担保する前例に従い、処理系差の正規手順特定という状態要件は REQ-018 行として所有する",
+      "llmTreatment": "corrected",
+      "probabilityDistribution": {
+        "append": 0.12,
+        "append_and_design": 0.25,
+        "design_update_only": 0.48,
+        "update": 0.15
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7684615384615385,
+      "jevResult": "append_and_design",
+      "judgmentId": "q-ru0127",
+      "llmFinalJudgment": "append_and_design（REQ-030-017・REQ-061-039 追記 + docs/designs/commands/case-open.md・case-ready.md の Design 更新）。採用理由: 内部 lifecycle 段階の public contract の正規文書は Command Design であり（REQ-034-008）、受入検査と branch 規律の拡張は Command Design の記述追随を要する",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "append": 0.32,
+        "append_and_design": 0.52,
+        "design_update_only": 0.08,
+        "update": 0.08
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7684615384615385,
+      "jevResult": "append",
+      "judgmentId": "q-ru0128",
+      "llmFinalJudgment": "append（REQ-031-033 追記）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "append": 0.78,
+        "append_and_design": 0.17,
+        "design_update_only": 0.03,
+        "update": 0.02
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7684615384615385,
+      "jevResult": "append_and_design",
+      "judgmentId": "q-ru0129",
+      "llmFinalJudgment": "append_and_design（REQ-011-033 追記 + custom-tool-contracts 一覧完全性節の Design 更新）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "append": 0.02,
+        "append_and_design": 0.82,
+        "design_update_only": 0.09,
+        "update": 0.07
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7684615384615385,
+      "jevResult": "update",
+      "judgmentId": "q-ru0130",
+      "llmFinalJudgment": "append（REQ-031-034 追記）。是正理由: 更新対象となる既存要件行が実在せず（CLI 表示文言の整合を所有する行は不在）、update は実現面修正（コメント書換）との混同に由来する。正典契約 REQ-031-026 と表示文言の整合という状態要件は新規行として所有する",
+      "llmTreatment": "corrected",
+      "probabilityDistribution": {
+        "append": 0,
+        "append_and_design": 0.01,
+        "design_update_only": 0.16,
+        "update": 0.83
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7684615384615385,
+      "jevResult": "update",
+      "judgmentId": "q-ru0131",
+      "llmFinalJudgment": "update（REQ-031-001 行の表記修正）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "append": 0,
+        "append_and_design": 0,
+        "design_update_only": 0.01,
+        "update": 0.99
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7684615384615385,
+      "jevResult": "append_and_design",
+      "judgmentId": "q-ru0132",
+      "llmFinalJudgment": "append_and_design（REQ-051-009 追記 + IR-055 rule ファイルの Design 更新）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "append": 0.2,
+        "append_and_design": 0.72,
+        "design_update_only": 0.02,
+        "update": 0.06
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7684615384615385,
+      "jevResult": "design_update_only",
+      "judgmentId": "q-ru0133",
+      "llmFinalJudgment": "design_update_only（4 Design ファイルの出典注記式修正のみ）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "append": 0,
+        "append_and_design": 0.01,
+        "design_update_only": 0.93,
+        "update": 0.06
+      },
+      "questionForm": "choice"
+    },
+    {
+      "confidence": 0.7684615384615385,
+      "jevResult": true,
+      "judgmentId": "q-create-none",
+      "llmFinalJudgment": "true（全 RU とも新規 REQ ファイル作成は不要）",
+      "llmTreatment": "unchanged",
+      "probabilityDistribution": {
+        "false": 0.05,
+        "true": 0.95
+      },
+      "questionForm": "boolean"
+    }
+  ],
+  "outcome": "completed",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "resolvedModel": "typesafe-ai/jev",
+  "schemaVersion": 1,
+  "sourceRevision": "a2b3737fb35daa7611abf91633dea68f899eab55",
+  "subject": "RU-0122〜RU-0133 一括要件定義の既存REQ照合帰属判断（12 RU × 操作帰属 + CREATE 不要判断）",
+  "workflow": "req-define"
+}

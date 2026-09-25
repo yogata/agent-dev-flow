@@ -1,0 +1,72 @@
+{
+  "observationId": "20260925T034636Z-7635",
+  "schemaVersion": 1,
+  "workflow": "req-define",
+  "judgmentKind": "step3-4-existing-req-matching-and-design-separation",
+  "subject": "inspect-docs 意味診断並列化要件の既存REQ照合とREQ/Design帰属",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "sourceRevision": "unspecified",
+  "outcome": "completed",
+  "durationMs": 935,
+  "resolvedModel": "typesafe-ai/jev",
+  "inputTokens": 2101,
+  "inputs": {
+    "requestDigest": "96338fb3168e1babb9f1fe40e525e35a60240ed471e6b35a6477e7fb55973462",
+    "snapshot": "入力: req-input-inspect-docs-duration.md（合意済み単一Case、壁打ち完了）。対象: inspect-docs 意味診断の並列化・委譲回収・評価。"
+  },
+  "judgments": [
+    {
+      "judgmentId": "q1-matching-operation",
+      "questionForm": "choice",
+      "jevResult": "APPEND（REQ-036へ要件行を追記する）",
+      "probabilityDistribution": {
+        "CREATE（新規REQを作成し今回の関心を独立関心として所有する）": 0.24,
+        "APPEND（REQ-036へ要件行を追記する）": 0.74,
+        "UPDATE（既存REQの既存行を更新する）": 0.02,
+        "REQ操作なし（既存REQのみで足りる）": 0
+      },
+      "confidence": 0.775,
+      "llmFinalJudgment": "APPEND を確定。根拠: (1) 要件行27行は行数シグナル+0（0〜50の健全域）で APPEND 可能、(2) 今回の関心（診断の実行構造・委譲・評価）は inspect-docs の診断実行契約として REQ-036 の関心単位内、(3) SPLIT シグナル合計は関心分類・アーティファクト種別で+2となるが DEC-006 が inspect 3-command を単一の正規化単位と定めるため分割は不採用、(4) 入力ファイルの「不要な新規 REQ を強制しない」指示に適合。Jev の最高確率候補と同一結論。",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "q1-confidence-need",
+      "questionForm": "boolean",
+      "jevResult": false,
+      "probabilityDistribution": {
+        "true": 0.26,
+        "false": 0.74
+      },
+      "confidence": 0.775,
+      "llmFinalJudgment": "ユーザーへの追加確認は不要。SPLIT 要否は DEC-006 の単一正規化単位規定から自明に解消でき、照合判断は確定済みのため質問0件で進行。",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "q2-design-separation",
+      "questionForm": "choice",
+      "jevResult": "REQ行中心（品質維持・委譲契約・評価条件を新規REQに集約し、Design は既存 command Design の最小更新のみ）",
+      "probabilityDistribution": {
+        "REQ行中心（品質維持・委譲契約・評価条件を新規REQに集約し、Design は既存 command Design の最小更新のみ）": 0.77,
+        "REQ行とDesign行の両方に実質的内容（並列実行構造の詳細を新規Designとして作成する）": 0.12,
+        "REQ行のみ（Design変更は不要）": 0.11
+      },
+      "confidence": 0.775,
+      "llmFinalJudgment": "REQ行中心を採用（ただし保存先は新規REQでなく REQ-036 への APPEND）。品質維持・委譲契約・評価条件を REQ-036 の追記要件行へ集約し、実行手順詳細（担当分割方法・同期/非同期選択・fan-in 手順）は Workflow Skill 実装側へ分離して realization_actions へハンドオフ。Design は既存 command Design（docs/designs/commands/inspect-docs.md）の「現在の動作」への最小更新のみ。",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "q2-separation-need",
+      "questionForm": "boolean",
+      "jevResult": true,
+      "probabilityDistribution": {
+        "true": 0.85,
+        "false": 0.15000000000000002
+      },
+      "confidence": 0.775,
+      "llmFinalJudgment": "分離が必要。REQ 要件行には成果・品質・契約（並列診断の品質維持、単一 writer、委譲の結果回収契約・評価条件）のみを記し、実行手順（同期委譲の所要上限値、headless 起動時の背景子 Abort 対策、serve 検証手続等）は REQ 行に書かず Workflow Skill と realization_actions 側へ置く。",
+      "llmTreatment": "unchanged"
+    }
+  ],
+  "recordState": "complete"
+}
