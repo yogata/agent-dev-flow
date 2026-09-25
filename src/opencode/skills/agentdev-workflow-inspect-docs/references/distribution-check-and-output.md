@@ -5,7 +5,7 @@
 
 ## 開始条件
 
-- STEP-3: STEP-2 の文書種別別意味診断の完了
+- STEP-3: STEP-2 の文書種別別意味診断の完了（診断担当からの結果回収と親の fan-in を含む）
 - STEP-4: STEP-1〜3 の診断結果の確定
 
 ## 結果
@@ -20,6 +20,8 @@
 
 配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）について、docs-spec-rebuild-integrity Design（extension 経由）が定義する検査パターンに従い、構文健全性（frontmatter 重複、見出し重複、Markdown 構文破損、存在しない command 参照、エンコーディング不整合）、文意保持（壊れた括弧、壊れた参照表現、主語/目的語欠落文）、責務整合（command 本体と Design 間の責務説明照合、case-open/run/close/auto の責務境界一致）を診断する。
 `agentdev-req-structure-diagnostics` 参照。
+
+配布物整合性検査は STEP-2 意味診断の並列委譲の対象外であり、親が従来どおり逐次で実行する（並列化による本工程の結果品質への影響を生まない）。
 
 存在しない command 参照の検出は、README listing と command 本文の相互参照について存在しない command を指す参照を検出事項とし、実在する command 参照は検出対象外とする（docs-spec-rebuild-integrity Design 構文健全性検査準拠）。
 
@@ -36,6 +38,7 @@
 ### STEP-4-1: 検出事項出力
 
 検出事項を `.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md` へ出力する。
+検出事項ファイルの生成と `.agentdev/inspect/` 配下の git 永続化は親の単一 writer が実施する（STEP-2 の診断担当は書き込まない。診断担当の戻り値は中間成果として親が統合した結果のみを出力する）。
 source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides。
 NG 分類（false positive/ pre-existing/ 今回修正対象）は docs-spec-rebuild-integrity Design（extension 経由）の NG 分類表に従い、各検出事項に分類、理由、後続対象を付ける。
 
