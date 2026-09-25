@@ -213,3 +213,19 @@
 - **想定反映先**: docs（.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts の修正候補。具体化の判断は backlog/intake 側）
 - **関連**: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts、Case #3139（本 Case・PR #3140）
 - **タグ**: `#check-integrity` `#json-output` `#machine-parsing`
+
+## agentdev_jev observation_write の completion モードは LLM final-judgment フィールドのみ受理し schema 表示の run-level 必須フィールドは拒否される
+
+- **問題事象**: agentdev_jev observation_write の completion 書込み（observationId 指定・partial 記録の完成）で、ツール schema 定義の observation 必須フィールド群（workflow、judgmentKind、subject、provider、requestedModel、sourceRevision、outcome、durationMs、inputs、judgments[].confidence 等の run-level フィールド）を含む payload を送ったところ「unknown completion observation field: durationMs」（順に confidence、inputs、judgmentKind も同様）の invalid_input で拒否が連続。実際の受理条件は schemaVersion + judgments[].llmFinalJudgment / llmTreatment（judgmentId 付き）の最小 payload のみで、run-level フィールドは evaluate 時点で partial 記録へ既に書き込まれているため不要。4回の invalid_input 試行後に最小 payload で成功
+- **発生局面**: case-ready workflow STEP-5 Jev 先行評価の観測完成書込み（Case #3139・observationId case-ready-3139-standard-epic）
+- **検知方法**: observation_write の invalid_input（retryable: false）連続応答。partial レコード JSON を直接読取して既存フィールド群との差分比較で必要フィールドを特定
+- **根本原因**: completion モード（observationId あり）のバリデーションが「追記許容フィールド = LLM final-judgment 関連のみ」の厳密 allowlist で実装されているのに対し、公開 schema 定義は run-level 必須フィールドを含む完全 observation 形を required として表示しており、両者の乖離が呼出側に伝わらない
+- **自律対応内容**: 拒否対象フィールドを順次除去する最小化試行で受理フォーマットを実測特定（schemaVersion + judgments[].{judgmentId, llmFinalJudgment, llmTreatment}）。workflow 成功に支障なし（観測記録は completed で完成・partial からの差分追記は idempotent）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: あり（候補）。custom-tool-contracts Design「Jev 先行評価」節の observation_write completion モード契約記述と実装の整合（追記許容フィールドの明示）を要する
+- **横展開観点**: Custom Tool の completion / idempotent 追記系操作は、schema 定義の required 表示を信用せず partial レコードの実物と差分比較で必要フィールドを特定するのが安全。この乖離は Jev 以外の 2段階書込み系操作でも再現し得る
+- **再発条件**: observation_write completion モードで schema required 表示どおりの完全 observation を送る場合に毎回再発
+- **予防策候補**: observation_write completion モードの入力 schema を「llmFinalJudgment / llmTreatment 追記専用」へ明示分離する修正（Custom Tool 内部実装の責務）
+- **想定反映先**: docs（docs/designs/responsibilities/custom-tool-contracts.md「Jev 先行評価」節への completion モード許容フィールド明記。具体化の判断は backlog/intake 側）
+- **関連**: docs/designs/responsibilities/custom-tool-contracts.md、.agentdev/jev-observations/case-ready-3139-standard-epic.json、Case #3139（本 Case）
+- **タグ**: `#agentdev-jev` `#observation-write` `#schema-contract-mismatch`
