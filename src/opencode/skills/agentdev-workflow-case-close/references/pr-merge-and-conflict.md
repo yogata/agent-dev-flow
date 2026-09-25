@@ -59,6 +59,8 @@ base 移動の検出は squash merge を妨げない。squash merge 可否は ST
 
 ポーリング間隔・上限値は gh-cli 手続き側が所有する。
 
+**infra-transient 分類との区別**: mergeable ポーリング上限超過は GitHub 側の mergeability 再計算遅延であり、infra-transient（ツール基盤故障）ではない。一方、`agentdev_gh` 等のツール基盤自体の恒常失敗（単一ツール恒常失敗・プロセス生存・再試行無効・他経路正常の4条件同時成立。判定条件の正規所有は case-auto Design「停止理由分類」節）を検出した場合は、Case 失敗と区別して infra-transient（ツール基盤故障）分類として停止報告へ付随させ、停止報告に回復経路（supervisor 等による harness 再起動による回復の見込みと durable state からの冪等再開）を含める。infra-transient 分類は既存の停止経路（blocked への遷移と resume_command 記録）に付随する分類であり、状態遷移と result 形式を変更しない。harness 側の修正（fresh process 分離・自動再初期化）は本リポジトリの対象外とする。
+
 squash merge 可否の判定は、`agentdev_gh` の pr_mergeable 操作が返す mergeStateStatus（CLEAN）を基準とする。
 base 移動判定（STEP-4-1）の導入は、本手順の mergeable UNKNOWN ポーリング契約（10秒間隔、上限60秒）を変更しない。
 

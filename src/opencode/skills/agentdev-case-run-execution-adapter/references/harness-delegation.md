@@ -94,6 +94,18 @@ case-run は result から PR URL（PR番号）を取り出す。
 - ランタイム作業領域は worktree 削除時に破棄される（永続状態として扱わない）
 - 実行担当サブエージェント内部で evidence 不足が検知された場合は実行 command の品質ゲートが機能し、`blocked` または `failed` として result に反映される
 
+### 観測証跡の永続チャネル受領経路の同時準備
+
+検証契約で観測証跡（実行記録、test strategy 項目の検証結果、品質ゲートの実行結果等）を要求する委譲では、委譲契約の確定時に、証跡の永続チャネル受領経路を検証契約と同時に用意する。
+
+- 一時 session 通信（background_output 等の子 task 応答）を受領経路としない。証跡の引き継ぎが一時 session 通信のみに依存すると、子 task 完了後の応答喪失で後工程での引用・監査が不能になる
+- 永続チャネルの候補は次のいずれかとし、委譲 prompt で受領経路を実行担当サブエージェントへ明示する:
+  - PR 本文の指定セクション（検証差分セクション、`## Findings/ Capture候補` セクション等。record-in-findings 形式の明示的な記録）
+  - Issue コメント（blocked / failed 時の SSoT コメント）
+  - durable state ファイル（`.agentdev/` 配下、git 永続化対象）
+- 委譲側（case-run）は受領経路を委譲時に把握し、子 task 完了後の証跡読み戻しは一時 session 応答からではなく永続チャネルから行う
+- 本手順は委譲時の運用手順の明示であり、record-in-findings 契約自体、一時 session 通信機構、委譲契約の最小水準（手段非依存）は変更しない。`v4-delegation-contracts.md` Design への追記は行わない（証跡の永続チャネル受領経路の具体は adapter の運用手順として本 reference に属する）
+
 ## timeout、中断
 
 - 実行担当サブエージェントの各ツール呼び出しごとに120秒 timeout が適用される

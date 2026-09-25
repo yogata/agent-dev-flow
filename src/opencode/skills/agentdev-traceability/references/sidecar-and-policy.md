@@ -36,6 +36,16 @@ verification:
 - 専用の artifact ID、graph node ID、edge ID、revision、digest は必須データとしない
 - `traceability/` 配下の sidecar と policy.yaml は project 側の開発管理成果物であり、配布対象の製品ソースへ含めない
 
+## 対応宣言追加前の component / sidecar 対応一覧の事前確認
+
+sidecar へ対応宣言（artifact パス × role × 要件行 ID）を追加する前に、component / sidecar 対応一覧を事前確認する。対応宣言の所属は、変更対象ファイルの見た目（配置場所、ディレクトリ構造、隣接ファイル）ではなく、producer / component（配布物単位）の責務境界で決まる。
+
+1. 変更対象 artifact の producer component を特定する。producer 本体と、隣接する plugin 登録層・tool 定義層等の間で責務境界を確認し、宣言を追加すべき sidecar を1つに決める
+2. 既存 sidecar 一覧（`traceability/*.yaml` の `component` キー）を確認し、当該 component の sidecar の有無と、対象 artifact パスが既に他 component の sidecar へ宣言されていないかを確認する
+3. 同一論理関係が既存 sidecar と矛盾する配置になる場合は宣言を追加せず、所属を訂正してから追加する
+
+事前確認を省略して producer 本体の実装を隣接層の sidecar へ宣言すると、check（`duplicate-inconsistencies`）の検出後に所属訂正と check 再実行の手戻りが発生する。検出機構（`duplicate-inconsistencies`）は事後検知として機能しており、本確認ステップは作成時の予防であり、検出機構の代替にも変更にもしない。
+
 ## 検証スコープポリシー（policy.yaml）の利用手順
 
 `traceability/policy.yaml` は project-level の正規情報源であり、検証対応の要否のみを宣言する。対応関係を保持しない。sidecar ではないため、component との関連も持たない。

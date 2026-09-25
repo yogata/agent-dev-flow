@@ -77,6 +77,7 @@ harness 側識別子は取得可能な場合の付加情報に限定し、必須
 <!-- レビュー判断: case-open が draft-data の review_dispositions を読み取り、採否判断（covered / rejected 等）を恒久証跡として転記する。転記対象がない場合は「該当なし」と記載する -->
 [review_dispositions の転記内容。
 各 disposition は id、disposition、reason_code、reason、evidence（path、section、checked_at_commit）を記載する。
+evidence.path には promote 済み成果物等の削除可能性があるパスを記録する場合、path 単独に依存せず、prune 後も識別可能な代替識別子（RU 番号、learning タイトル、関連 Case 番号）を併記する（evidence 記録規約: `agentdev-workflow-templates` Design「review_dispositions 証跡セクション」参照）。
 該当なしの場合は「該当なし」]
 
 ## 補足情報（オプション）

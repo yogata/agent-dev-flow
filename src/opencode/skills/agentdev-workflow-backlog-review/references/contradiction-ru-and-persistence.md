@@ -81,7 +81,10 @@ RU を生成し、承認済みの docs/knowledge/ 知識文書保存を実行し
 削除条件は当該成果物が RU に取り込まれ、RU ファイルの生成が確認できた場合のみ。
 RU 化に失敗した成果物、矛盾により除外された成果物は残置する
 6. docs/knowledge/ 知識の削除処置は、STEP-5 で明示承認済みの場合に限り実行し、該当採用済み成果物を promoted から削除する。保留および project-local 資産への昇華指示（指示出力型）の成果物は promoted に残置する
-7. 削除結果、知識文書保存結果、RU 以外の処置の実行結果を記録する
+7. 削除結果、知識文書保存結果、RU 以外の処置の実行結果を記録する。
+削除済み成果物の記録には、パスに加えて prune を跨ぐ代替識別子（生成した RU の番号、元 intake / learning item のタイトル、関連 Case 番号）を含める。
+これは Issue / PR 本文の evidence 記録（path + prune 後耐久識別子の併記。evidence 記録規約は `agentdev-workflow-templates` Design「review_dispositions 証跡セクション」節が正規所有）との突合手順の前提である。
+後続工程・監査で evidence path の不在が指摘された場合、本記録との突合により、当該 path の不在が prune 済みか欠落かを判別できる。
 
 ### Result
 
@@ -91,7 +94,7 @@ RU 化に失敗した成果物、矛盾により除外された成果物は残�
 
 ### Evidence
 
-- 生成済み RU のファイルパス一覧、docs/knowledge/ 知識文書の保存結果（操作種別と対象ファイル）、削除/ 残置の成果物一覧、RU 以外の処置別の実行結果
+- 生成済み RU のファイルパス一覧、docs/knowledge/ 知識文書の保存結果（操作種別と対象ファイル）、削除/ 残置の成果物一覧（削除済み成果物には prune を跨ぐ代替識別子〔RU 番号、learning タイトル、関連 Case 番号〕を含む）、RU 以外の処置別の実行結果
 
 ### Completion Verification
 

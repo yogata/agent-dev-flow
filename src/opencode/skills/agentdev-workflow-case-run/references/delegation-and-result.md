@@ -93,6 +93,7 @@
   - **blocked**: 回答可能な blocker。詳細本文は Issue コメントに SSoT として記録済み（実行担当サブエージェント責務）。エラー処理に従い停止、ユーザー報告
   - **failed**: repository context で回答不能な blocker。詳細本文は Issue コメントに構造化して記録済み。エラー処理に従い停止、ユーザー報告
   - **delegation-unavailable**: 実行インフラが委譲を起動できなかった状態。実行未試行のため `pending` に戻す
+- **infra-transient 分類（停止報告への付随。result enum への追加なし）**: ツール基盤（harness・Custom Tool 実行環境）の故障に起因する停止は、Case 失敗（blocked / failed）と区別して infra-transient（ツール基盤故障）分類として停止報告へ付随させ、停止報告に回復経路（supervisor 等による harness 再起動による回復の見込みと durable state からの冪等再開）を含める。判定条件（単一ツール恒常失敗・プロセス生存・再試行無効・他経路正常の4条件同時成立）の正規所有は case-auto Design「停止理由分類」節である。infra-transient は result 契約（4状態）の第5状態ではなく、既存の停止報告に付随する停止理由分類である。harness 側の修正（fresh process 分離・自動再初期化）は本リポジトリの対象外とする
 - **L2 タイムスタンプ受け渡し**: result 状態（completed-pr/blocked/failed）にかかわらず、STEP-S3（worktree 設定）、STEP-S4（実行担当サブエージェント実行）で計測した L2 タイムスタンプを result に含める。case-auto は本 L2 内訳を case-run 委譲の L1 壁時計時間の内訳として読み取る
 - **STEP-S5-1: 配布依存境界の最終変更経路 gate（実装後、command 公開順序の STEP-S5 に対応）**: result が `completed-pr` の場合、STEP-S6 に進む前に、実装後の実際の worktree HEAD に対して最終 gate を行う（実装担当サブエージェントが追加した変更も含めて検査する）。本 gate は src 側（原本）と .opencode 側（投影）の双方反映検証を必須とする
   - 実行条件: result が `completed-pr` であり、PR 対象ファイルに `src/opencode/{commands,skills}/**` 変更を含む場合。当該変更を含まない PR（docs のみ等）ではスキップする

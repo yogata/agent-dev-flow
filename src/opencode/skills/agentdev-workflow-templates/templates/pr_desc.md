@@ -90,6 +90,8 @@ finding の特定は要約と参照（セクション名、コメント番号等
 ## Findings/ Capture候補
 <!-- 【必須】 -->
 
+<!-- 本セクションへ promote 済み成果物等の削除可能性があるパスを記録する場合、path 単独に依存せず、prune 後も識別可能な代替識別子（RU 番号、learning タイトル、関連 Case 番号）を併記する（evidence 記録規約: `agentdev-workflow-templates` Design「review_dispositions 証跡セクション」参照） -->
+
 ### intake
 
 該当なし
