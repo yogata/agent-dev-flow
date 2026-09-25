@@ -2,12 +2,14 @@
 title: inspect-docs Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-20"
+updated: "2026-09-25"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-021 -->
 <!-- ADF-COVERS(implementation): REQ-036-001, REQ-036-002, REQ-036-006, REQ-036-007, REQ-036-008, REQ-036-009, REQ-036-010, REQ-036-011, REQ-036-024 -->
 <!-- ADF-COVERS(implementation): REQ-036-001, REQ-036-004, REQ-036-006, REQ-036-008, REQ-036-009, REQ-036-010 -->
+<!-- ADF-COVERS(design): REQ-036-028, REQ-036-029, REQ-036-030, REQ-036-031, REQ-036-032, REQ-036-033 -->
+<!-- ADF-COVERS(implementation): REQ-036-028, REQ-036-029, REQ-036-030, REQ-036-031, REQ-036-032, REQ-036-033 -->
 
 # inspect-docs Design
 
@@ -57,6 +59,9 @@ REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて De
 - 文書分類一貫性検査（`docs/designs/foundations/document-model.md` の classification policy への適合確認）。REQ 要件行への Design 分離基準違反残留（schema field、enum 値一覧、判定表、file pattern、テンプレート種別、report format、内部アルゴリズム、作業履歴、実装パラメータ等）自動検出
 - 配布物整合性検査。配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）について、`docs/designs/integrity/docs-spec-rebuild-integrity.md` が定義する検査パターンに従い、構文健全性（frontmatter 重複、見出し重複、Markdown 構文破損）、文意保持（壊れた括号、壊れた参照表現、主語/目的語欠落文）、責務整合（command 本体と Design 間の責務説明照合、case-open/run/close/auto の責務境界一致）を診断する（`agentdev-req-structure-diagnostics` 参照）
 - docs-check route 判定（意味的疑いのうち機械的検査に落とせるものを docs-check ルール／検査データ候補として提示）
+
+意味診断系の段階（REQ 参照 ID 整合性確認から文書分類一貫性検査までの、Workflow Skill の工程定義において STEP-2 に属する意味診断・構造診断群）は、範囲が重複しない診断担当への並列委譲で実行できる。各診断担当は読取専用で候補・file:line 形式の根拠・正規情報源・不確実性を親へ返し、親が fan-in して横断矛盾判定・候補の重複排除・6観点の網羅確認を行う。配布物整合性検査は並列化の対象外とし、STEP-2 完了後の後続工程（Workflow Skill の工程定義において STEP-3 に相当）で従来どおり実行して結果品質を維持する。委譲は同期方式（同期委譲で完了できる単位）または非同期方式（子の完了まで親の実行コンテキストを維持）を選択し、失敗した診断担当のみを識別して再実行または取得済みの結果から回収する。finding の生成と .agentdev/inspect/ 配下の git 永続化は親の単一 writer のまま維持する。担当分割、同期/非同期の選択基準、fan-in と再実行の詳細な実行手順は Workflow Skill（agentdev-workflow-inspect-docs）が正規情報源であり、本 Design は複製しない。
+
 - 未処理 artifact 確認（`agentdev-req-structure-diagnostics`）
 - 検出事項出力（`.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md`）。source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides
 - 実行前同期（`git pull --ff-only`、失敗時は git-error-messages template で停止）
