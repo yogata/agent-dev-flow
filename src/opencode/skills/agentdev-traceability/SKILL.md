@@ -32,7 +32,7 @@ description: Requirement-artifact traceability (coverage, impact, check) resolvi
 
 ### sidecar（標準保存方式）
 
-- 配置: リポジトリ top-level `traceability/` 配下の YAML（`traceability/<component-slug>.yaml`）。作成・更新手順は [references/sidecar-and-policy.md](references/sidecar-and-policy.md) を参照
+- 配置: リポジトリ top-level `traceability/` 配下の YAML（`traceability/<component-slug>.yaml`）。作成・更新手順は [references/sidecar-and-policy.md](references/sidecar-and-policy.md) を参照。対応宣言の追加前には、producer / component（配布物単位）の責務境界で所属 sidecar を事前確認する（変更対象ファイルの見た目で所属を決めない。手順は [references/sidecar-and-policy.md](references/sidecar-and-policy.md)「対応宣言追加前の component / sidecar 対応一覧の事前確認」参照）
 - 最小データ: component 識別子、artifact のリポジトリ相対パス、role（4役割）、要件行 ID の列挙
 - `traceability/policy.yaml`（検証スコープポリシー）は sidecar ではない。対応関係を保持せず、検証対応の要否のみを宣言する
 

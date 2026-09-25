@@ -140,7 +140,7 @@ review_dispositions:
     reason: |                  # 人間可読の判断理由本文
       {判断理由の本文}
     evidence:                  # 根拠
-      path: {file-path}        # 根拠ファイルパス（該当なし時は null）
+      path: {file-path}        # 根拠ファイルパス（該当なし時は null）。promote 済み成果物等の削除可能性があるパスを記録する場合、prune 後も識別可能な代替識別子（RU 番号、learning タイトル、関連 Case 番号）を reason または path の併記として含める（evidence 記録規約: `agentdev-workflow-templates` Design「review_dispositions 証跡セクション」参照）
       section: {section}       # 根拠セクション（該当なし時は null）
       checked_at_commit: null  # req-define 生成時は null。case-open が確認 commit SHA を記録する
     related_removed_items: []  # 本判断により除外された関連項目の識別子リスト（該当なし時は空リスト）

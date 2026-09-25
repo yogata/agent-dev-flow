@@ -81,4 +81,4 @@ Definition 変更が docs 文言を期待するテスト（リポジトリ固有
 
 - case-ready 完了報告テンプレートに従い、結果（ready 遷移、execution contract 確定、実行構造、Definition PR merge の有無、横断依存検査結果（警告の提示記録または検出不能報告）、capture 結果）を報告する
 - Capture結果: 自工程で実観測した deviation を capture 委譲した場合、保存した成果物のパス・分類・保存結果を含める
-- 停止時は停止理由の分類（HITL 判断事項、CI 失敗、構成不備、受理不能 Decision、missing-design / policy 不正残存、同期不一致）と再開条件を報告する
+- 停止時は停止理由の分類（HITL 判断事項、CI 失敗、構成不備、受理不能 Decision、missing-design / policy 不正残存、同期不一致、infra-transient（ツール基盤故障））と再開条件を報告する。infra-transient と分類した場合は、Case 失敗と区別して報告し、停止報告に回復経路（supervisor 等による harness 再起動による回復の見込みと durable state からの冪等再開）を含める。判定条件の正規所有は case-auto Design「停止理由分類」節である

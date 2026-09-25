@@ -102,7 +102,8 @@ case-run は本セクションを既確定契約として消費し、実現責�
 
 <!-- レビュー判断: case-open が draft-data の review_dispositions を読み取り、採否判断（covered / rejected 等）を恒久証跡として転記する。
 Epic flow の場合は全 disposition を Epic Issue へ転記する。
-転記対象がない場合は「該当なし」と記載する -->
+転記対象がない場合は「該当なし」と記載する。
+evidence.path には promote 済み成果物等の削除可能性があるパスを記録する場合、path 単独に依存せず、prune 後も識別可能な代替識別子（RU 番号、learning タイトル、関連 Case 番号）を併記する（evidence 記録規約: `agentdev-workflow-templates` Design「review_dispositions 証跡セクション」参照） -->
 {review_dispositions}
 
 ## 補足情報
