@@ -136,11 +136,11 @@
 
 ### 配布基盤・ソースモデル
 
-- [DEC-002](DEC-002.md)（OpenCode ソース・プロジェクション分離）
+- [DEC-002](DEC-002.md)（OpenCode ソース・プロジェクション分離、superseded by DEC-036）
 - [DEC-004](DEC-004.md)（差し替え可能な I/O 境界）
 - [DEC-005](DEC-005.md)（Project Extensions Architecture、superseded by DEC-006）
 - [DEC-006](DEC-006.md)（inspect 3-command 構成への正規化、extension 検査の3層責務分離）
-- [DEC-007](DEC-007.md)（Artifact Graph 標準化と配布スキル昇格）
+- [DEC-007](DEC-007.md)（Artifact Graph 標準化と配布スキル昇格、superseded by DEC-017）
 - [DEC-012](DEC-012.md)（Extension を file-kind から workflow/capability responsibility へ再編）
 - [DEC-014](DEC-014.md)（配布依存境界の多層 enforcement、IR-059 範囲と enforcement 経路の変更）
 - [DEC-016](DEC-016.md)（導入系スクリプトの副作用ゼロ原則、provisioning 責務の利用者移転）
