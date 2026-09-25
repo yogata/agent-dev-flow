@@ -77,3 +77,57 @@
 
 ---
 
+## 2026-09-26: issue_list の role: case labels 絞り込み 0 件帰着が横断依存検査の検出源収集で再観測（topic_slug 選択的 search への切替で回避）
+
+- **問題事象**: case-open STEP-5 の横断依存検査で未クローズ Case 群を収集するため agentdev_gh issue_list に labels: ["case"] + state: open を指定したところ 0 件帰着し、並行バッチ兄弟 Case を含む未クローズ Case 群の全体列挙ができなかった
+- **発生局面**: case-open STEP-5（横断依存検査の検出源収集）。並行 case-open 5件稼働中の自 Case（Case #3145）
+- **検知方法**: issue_list 成功応答（ok: true）で issues: [] の 0 件帰着。自 Case #3145 が open 状態で存在する事実との矛盾で即検知
+- **根本原因**: issue_create（role: case）で作成した Case Issue の物理ラベルには case が付かず（role は論理判定のみ）、labels: ["case"] による物理ラベル絞り込みは何も一致しない。REQ-092-002 が記録済みの既知挙動の再観測
+- **自律対応内容**: 切替判定に従い 1 回再試行（search トークン変更）でも 0 件帰着を確認した後、検出源の取得方法を topic_slug（委譲構造化文脈に含まれる値・draft 読込不要）の選択的 search（REQ-092-004 相当の選択性規律）へ切替し、兄弟 4 Case（#3142 / #3143 / #3144 / #3146）を取得。検査入力の source_failures に「open の Case Issue 全体列挙不能・部分集合」を記録しエンジンの detection_unavailable に出力（比較の黙示省略を回避）。検査自体は成立し警告 0 件
+- **ユーザー確認の有無**: なし（自律解決）
+- **Decision/REQ/spec影響**: なし（REQ-092-002 既知。運用指針の整備は本 Case の成果物 REQ-092-004 / issue-operation-safety.md 追記〔AG-003〕が担当）
+- **横展開観点**: 横断依存検査の検出源収集（case-open STEP-5 / case-ready トレーサビリティ完全性ゲート共通）で同条件が再現し得る。Case 群列挙に role: case labels 絞り込みを用いないこと
+- **再発条件**: Case Issue の role 論理軸を labels 引数の物理値として信頼した検索を行った場合
+- **予防策候補**: 横断依存検査の検出源収集手順に「labels: case 絞り込みは使用せず、topic_slug / REQ 番号等の選択的 search で列挙する」注記。AG-003 の運用指針追記（本 Case）と方向性は同一
+- **想定反映先**: agentdev-workflow-case-open references/definition-pr-and-idempotency.md（横断依存検査節）、agentdev-issue-management references/issue-operation-safety.md（AG-003 追記先）
+- **関連**: Case #3145、REQ-092-002、REQ-092-004（本 Case 成果物）
+- **タグ**: #issue-list #labels-zero-hit #cross-dependency-inspection #case-open
+
+---
+
+## 2026-09-26: write guard が workspace 外一時ファイル書込みを fail-closed ブロック、git 管理対象外の .agentdev/integrity/reports/ への配置で解消
+
+- **問題事象**: 横断依存検査エンジンの検査入力 JSON を環境指定の一時ディレクトリ（C:\WINDOWS\TEMP\opencode）へ Write したところ、agentdev-textlint-guard が project root 外書込みとして fail-closed ブロックした
+- **発生局面**: case-open STEP-5（横断依存検査の検査入力 JSON 作成。Case #3145）
+- **検知方法**: write 時の guard ブロック応答（fail-closed、迂回指示なし）
+- **根本原因**: guard の書込み範囲制御は project root を境界とし、ワークスペース外の一時ディレクトリは許可済みであっても guard 層ではブロックされる（guard と環境側の一時許可設定の粒度差）
+- **自律対応内容**: guard を解除・迂回せず標準手段へ切替し、検査入力 JSON を git 管理対象外の worktree 内 `.agentdev/integrity/reports/`（AGENTS.md・.agentdev/README.md が非永続領域として規定、検証レポート配置先）へ配置して解消
+- **ユーザー確認の有無**: なし（自律解決）
+- **Decision/REQ/spec影響**: なし（既存指針「guard による書込みブロックは fail-closed として維持し、標準手段へ切替」の実践）
+- **横展開観点**: 検査入力 JSON 等の一時ファイル置き場所指針は RU-0131（Case #3142 が scripts/README.md へ規定予定）と同一主題。本観測はその実ユースケースでの実証であり、RU-0131 の置き場所指針に `.agentdev/integrity/reports/`（git 管理対象外）を候補として含める根拠になる
+- **再発条件**: guard 有効環境でワークスペース外へ一時ファイルを書込んだ場合
+- **予防策候補**: RU-0131 による scripts/README.md への一時ファイル置き場所指針の規定（実施済み RU の適用待ち）
+- **想定反映先**: agentdev-workflow-case-open scripts/README.md（RU-0131 / Case #3142 の成果物）
+- **関連**: Case #3145、Case #3142（RU-0131）、AGENTS.md 書込み guard 運用指針
+- **タグ**: #write-guard #fail-closed #temp-file #cross-dependency-inspection
+
+---
+
+## 2026-09-26: canonical REQ 行 ID の運用文書への展開は sidecar 宣言パターンで行う（配布物への直書きは配布境界 checker の新規 hit になる）
+
+- **問題事象**: case-run 実装（DEL-3145-1）で選択性指針節の運用文書追記に canonical REQ 行 ID（REQ-092-004）を直書きした箇所があり、配布依存境界 final gate で新規 concrete_id hit 1件として検出された
+- **発生局面**: case-run 委譲（DEL-3145-1）での配布依存境界 final gate 実行時（PR #3153）
+- **検知方法**: check_distribution_boundary.ts --profile source --json の failures 増分（baseline 38 → 途中 39、最終 34）
+- **根本原因**: canonical REQ 行から運用文書へ規律を展開する際、REQ 行 ID を運用文書本文に直書きすると配布境界 checker（concrete-id ルール）が新規 hit として計上する。規律の展開自体は ID を本文に必要としない
+- **自律対応内容**: 運用文書側の表記を機能的記述のみへ修正し、対応関係は traceability/ 配下 sidecar（agentdev-issue-management.yaml の implementation 宣言）で宣言する方式へ切替。最終 gate で baseline delta -4（本 Case 解消分）・新規 0件を確認
+- **ユーザー確認の有無**: なし（fix-and-reverify で自律解決）
+- **Decision/REQ/spec影響**: なし（配布境界契約・traceability 宣言契約の遵守方法の知識であり契約変更なし）
+- **横展開観点**: canonical REQ 行から運用文書へ規律を展開する全 Case で同型違反が起こり得る。sidecar 宣言パターンが正規の対応関係記録手段。「配布物本文への canonical 参照は節名のみで記述する」（Case #3144 capture 分）と同主題で、sidecar 宣言まで含む実装パターンとしての補完
+- **再発条件**: canonical REQ 行 ID を配布物（src/ 配下）本文へ直書きした場合
+- **予防策候補**: 配布物追記時は機能的記述のみとし、REQ 行との対応は sidecar 宣言で行う。baseline delta の機械確認を final gate で必須化（現行契約どおり）
+- **想定反映先**: agentdev-issue-tracking（REQ-092-004 運用規律）、agentdev-case-run-execution-adapter references（実装指示規約）
+- **関連**: Case #3145、PR #3153、DEL-3145-1、traceability/agentdev-issue-management.yaml
+- **タグ**: #distribution-boundary #concrete-id #traceability-sidecar #case-run
+
+---
+
