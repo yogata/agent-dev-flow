@@ -162,6 +162,10 @@ bun test によるフル suite 実行は、次の環境前提を踏まえて実�
 
   - **整備後の再実行手順**: 依存整備実施後、依存解決失敗で fail したテスト・型検証を同一 worktree で再実行し、当該 fail が解消したことを確認する。再実行結果には依存整備実施済みの旨を環境ラベル（依存パッケージ状態）へ記録し、整備前の fail と整備後の結果を混在させない
   - **整備手段の選択基準（junction 作成と bun install の使い分け）**: 上記2手段は次の判断基準で使い分ける。判断根拠は検証記録の環境ラベルへ記録する
+    - **node_modules 伝播状態の確認手順（手段選択の前置）**: 手段を選択する前に、次の2点を確認し、結果を環境ラベルへ記録する
+      1. **main 側 `node_modules` の存否**: 対象ディレクトリの main 側実体（SoT パス）配下に `node_modules` が存在するかを確認する。存在しない場合は main 側未整備の状態である
+      2. **worktree 側 junction の成立有無**: worktree 側の当該パスに `node_modules`（junction）が既に存在し、参照先が main 側の `node_modules` へ向いているかを確認する（worktree への伝播は発生しないため、基本は「未成立」が初期状態）
+    - **main 側 `node_modules` 不在時の一意決定**: main 側の当該ディレクトリ配下に `node_modules` が存在しない場合、junction 作成は参照先不在で成立しないため、worktree 内での `bun install` が唯一の確定的な整備手段となる。この条件下では junction 選択肢は採らず、`bun install` を実行する（判断に迷う余地なし）
     - **`bun install` を選択する**: (a) worktree 内で `package.json`・`bun.lock` を変更する Case（依存定義の変更を伴う実装）。(b) 検証結果の再現性が依存状態そのものに依存する検証（依存状態を実験条件の一部として扱う場合）。junction 経由では依存実体が main 側の現在状態に依存し、main 側の整備操作が worktree 側の検証結果へ干渉するため、この条件では junction を使わない
     - **junction 作成を選択する**: (a) 依存定義の変更がなく、main 側の整備済み依存と同一の状態で足りる一時的な検証。(b) 検証後に worktree へ `node_modules` 実体を残したくない場合（junction エントリ削除のみでクリーンアップが完結し、gitignore 対象の実体が worktree に残留しない）。(c) `bun install` による復元時間を要しない速い前置が有利な場合
     - **共通制約**: いずれの手段でも、選択根拠と依存パッケージ状態を環境ラベルとして検証記録に残す。整備手段の切替（junction → bun install 等）を行った場合は切替後の結果を正とし、切替前の結果を再利用しない
@@ -237,6 +241,12 @@ worktree 操作（実装、検証、証跡退避を含む）におけるファ�
 
 guard が書込みをブロックした場合、ブロックの解除・迂回（エンコーディング指定の変更、リダイレクト回避ハック等）で進めず、上記の標準手段へ切替する。
 ブロックを検知した edit の oldString がファイル実内容と不一致の場合は、ファイルを再読取して正確な内容で再試行する（本規定は guard の fail-closed 挙動自体を維持対象とする）。
+
+### workspace 外書込みのブロック事例と切替（fail-closed 維持）
+
+- **ブロック事例**: 検査入力 JSON 等の一時ファイルを OS の一時ディレクトリ等、workspace の外へ出力しようとした操作は、workspace 外書込み guard によりブロックされ得る。guard は fail-closed で動作し、ブロックされた操作自体は成功しない
+- **標準手段への切替**: ブロックされた場合は、一時ファイルの置き場所を workspace 外から project root 内（リポジトリ配下の実行時作業領域）へ変更する。置き場所指針は横断依存検査エンジンの scripts README（`agentdev-workflow-case-open` scripts「検査入力 JSON」）を参照する。書込み手段自体は「標準手段（guard ブロック時の切替先）」のとおりとする
+- **別 API 経路による迂回の不採用**: guard にブロックされた操作を、別の API・ツール経路（リダイレクト先の変更、出力手段の差し替え等）で workspace 外へ迂回書込みしない。guard の fail-closed 動作自体を維持対象とし、迂回ではなく置き場所の変更（標準手段切替）で対処する
 
 git 出力のエンコーディング処理の詳細は `git-common-procedures.md`「Windows git 出力のエンコーディング処理」を参照する。
 

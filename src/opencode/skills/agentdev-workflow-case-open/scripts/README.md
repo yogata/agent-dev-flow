@@ -40,6 +40,19 @@ scripts/
 | `adf-covers-declarations` | 対応宣言行（対応宣言マーカー＋(role): ID リスト、role は decision / design / implementation / verification の4役割）の ID。sidecar 対応関係ファイル（role キー配下の要件行 ID 列挙）も同一の論理対応関係として受理する |
 | `req-row-mentions` | ファイル本文に現れる要件行IDすべて |
 
+### 検査入力 JSON の置き場所指針
+
+検査入力 JSON は検査実行のための一時ファイルとして扱い、次の方針で置き場所を定める。
+
+| 方針 | 内容 |
+|---|---|
+| workspace 外 temp 禁止 | OS の一時ディレクトリ等、workspace の外へ置かない（workspace 外書込み guard のブロック対象となるため） |
+| project root 内限定 | project root 内（リポジトリ配下）の実行時作業領域へ置く |
+| commit 対象外 | 検査入力は commit に含めない。git 管理対象の追跡ファイルとして置かない |
+| 検査後削除 | 検査完了後に入力ファイルを削除する（一時ファイルの残留を残さない） |
+
+書込み手段は worktree 操作の書込み guard 運用指針（`agentdev-git-worktree` reference「書込み guard 運用指針」）の標準手段（node の `fs.writeFileSync` 等のエンコーディング明示）に従う。workspace 外への書込みが guard によりブロックされた場合は、ブロックの解除・別 API 経路への迂回を行わず、置き場所を project root 内へ変更して切替する（fail-closed 維持）。
+
 ## 実行方法
 
 ```bash

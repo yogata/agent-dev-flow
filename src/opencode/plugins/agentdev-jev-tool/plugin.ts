@@ -211,6 +211,76 @@ const OBSERVATION_METADATA_SCHEMA = {
   additionalProperties: false,
 } as const;
 
+/**
+ * observation_write 追記完成 mode（observationId 付き）の入力スキーマ。
+ * 実装受理条件（completion allowlist）と一致させる: run 級 field（workflow、judgmentKind、subject、
+ * provider、requestedModel、sourceRevision、outcome、durationMs、resolvedModel、inputTokens、inputs）は
+ * evaluate 時点の部分レコードに既に記録済みであり、本操作の入力としては受理されない（追記不要）。
+ * 追記対象は judgment 単位の LLM 最終判断関連 field（llmFinalJudgment、llmTreatment）のみ。
+ */
+const COMPLETION_APPEND_OBSERVATION_SCHEMA = {
+  type: "object",
+  description:
+    "Completion append input for observation_write WITH observationId. Run-level fields (workflow, judgmentKind, " +
+    "subject, provider, requestedModel, sourceRevision, outcome, durationMs, resolvedModel, inputTokens, inputs) " +
+    "are already recorded in the evaluate-time partial record (recordState partial) and are NOT accepted here " +
+    "(no append needed): this operation carries only the appendable LLM final-judgment fields. Send schemaVersion, " +
+    "optional recordState 'complete', and one or more judgments, each carrying only judgmentId, questionForm, " +
+    "llmFinalJudgment, llmTreatment (both LLM fields required). Jev-side observation fields (jevResult, " +
+    "probabilityDistribution, confidence, failureKind) stay untouched from the partial record.",
+  properties: {
+    schemaVersion: { type: "integer", enum: [1], description: "Observation schema version." },
+    recordState: {
+      type: "string",
+      enum: ["complete"],
+      description: "Completion state after the append (complete only). The partial record left by evaluate is completed by this operation.",
+    },
+    judgments: {
+      type: "array",
+      minItems: 1,
+      description:
+        "Per-judgment append payload keyed by judgmentId of the partial record. Only the LLM final-judgment fields " +
+        "are accepted and appended; every other field is kept from the partial record (append is idempotent).",
+      items: {
+        type: "object",
+        properties: {
+          judgmentId: {
+            type: "string",
+            minLength: 1,
+            description: "Judgment identifier of the partial-record judgment to complete (non-empty).",
+          },
+          questionForm: { type: "string", enum: ["boolean", "choice", "score"] },
+          llmFinalJudgment: {
+            type: "string",
+            minLength: 1,
+            description: "LLM final judgment (Japanese). Required for the append (non-empty).",
+          },
+          llmTreatment: {
+            type: "string",
+            enum: ["unchanged", "corrected"],
+            description: "Observed fact of whether the LLM changed the judgment. Required for the append.",
+          },
+        },
+        required: ["judgmentId", "questionForm", "llmFinalJudgment", "llmTreatment"],
+        additionalProperties: false,
+      },
+    },
+  },
+  required: ["schemaVersion", "judgments"],
+  additionalProperties: false,
+} as const;
+
+/** observation_write の入力 observation スキーマ（observationId の有無で受理形が分岐する）。 */
+const OBSERVATION_INPUT_SCHEMA = {
+  type: "object",
+  description:
+    "Observation record to validate and write (observation_write only). The accepted input shape branches on " +
+    "observationId: WITH observationId this is the completion append input (COMPLETION_APPEND branch) carrying ONLY " +
+    "the LLM final-judgment fields, because run-level fields are already recorded by the evaluate-time partial " +
+    "record; WITHOUT observationId this is a completed observation written as a new file (FULL_RECORD branch).",
+  oneOf: [COMPLETION_APPEND_OBSERVATION_SCHEMA, OBSERVATION_SCHEMA],
+} as const;
+
 /** 操作要求の公開スキーマ（JSON Schema）。正の契約は Tool の contracts.ts が所有する。 */
 export const REQUEST_PROPERTY_SCHEMA = {
   type: "object",
@@ -245,10 +315,13 @@ export const REQUEST_PROPERTY_SCHEMA = {
       description: "Caller-provided metadata for the evaluate-time partial observation record (evaluate only, optional).",
     },
     observation: {
-      ...OBSERVATION_SCHEMA,
+      ...OBSERVATION_INPUT_SCHEMA,
       description:
-        "Observation record to validate and write (observation_write only). With observationId this carries the LLM " +
-        "final-judgment fields (llmFinalJudgment, llmTreatment) to append to the same JSON; without it this is a completed observation written as a new file.",
+        "Observation record to validate and write (observation_write only). Input shape branches on observationId " +
+        "(see oneOf branches). With observationId: completion append input carrying only the LLM final-judgment " +
+        "fields (llmFinalJudgment, llmTreatment) per judgment; run-level fields are already recorded by the " +
+        "evaluate-time partial record and are not re-accepted. Without observationId: a completed observation " +
+        "written as a new file (full record shape).",
     },
     observationId: {
       type: "string",

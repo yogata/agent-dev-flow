@@ -9,7 +9,7 @@ Jev 先行評価 Custom Tool `agentdev_jev` の本体（REQ-{NNNN}、DEC-{NNN}�
 | operation | 内容 |
 |---|---|
 | `evaluate` | 閉じた判断入力への Jev 先行評価。質問ごとの結果・候別別確率分布・正規化済み confidence・inputTokens（provider が返す場合）・機械的処理時間を返す。失敗は構造化失敗（not_configured、timeout、rate_limited、server_error、network_error、response_invalid）。自動 retry なし。評価完了（not_configured を含む）時点で Jev 側観測項目を含む部分レコード（`recordState: "partial"`）を `.agentdev/jev-observations/` へ書込み、書込み失敗は評価結果と独立した warning として返す（REQ-090-013）。呼出し元は `observationMetadata`（workflow、judgmentKind、subject、sourceRevision、observationId 等）で run 級 field を提供でき、同一 run の複数 evaluate で同一 observationId を渡すと同一 JSON 内 judgments へ追記する（1実行 1 JSON 維持） |
-| `observation_write` | 観測 JSON（1 Workflow 実行 = 1 JSON）の形式検証と `.agentdev/jev-observations/` への原子的書込み（一時ファイル + rename）。JSONL は生成しない。`observationId` 付きは追記完成 mode で、evaluate 時点部分レコードの同一 JSON へ LLM 最終判断関連 field（llmFinalJudgment、llmTreatment）を judgmentId 単位で追記し、完了状態 field（recordState）を complete へ更新する（冪等・重複 JSON なし）。`observationId` なしは完成観測の新規書込み（後方互換経路）。recordState partial の直接書込みは拒否する |
+| `observation_write` | 観測 JSON（1 Workflow 実行 = 1 JSON）の形式検証と `.agentdev/jev-observations/` への原子的書込み（一時ファイル + rename）。JSONL は生成しない。`observationId` 付きは追記完成 mode で、入力は追記対象 field（LLM 最終判断関連 field: llmFinalJudgment、llmTreatment）のみを受け付ける。run 級 field（workflow、provider、outcome、durationMs、inputs 等）と Jev 側観測項目は evaluate 時点部分レコードに既に記録済みのため、入力に再送しても受理されない（追記不要）。同一 JSON へ judgmentId 単位で追記し、完了状態 field（recordState）を complete へ更新する（冪等・重複 JSON なし）。`observationId` なしは完成観測（フルレコード形状）の新規書込み（後方互換経路）。recordState partial の直接書込みは拒否する |
 
 ## 2段階書込み（REQ-090-013）
 
