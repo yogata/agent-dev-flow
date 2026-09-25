@@ -165,3 +165,19 @@
 - **想定反映先**: agentdev-workflow-case-* の再開時前置チェック、custom-tool-contracts.md の運用特性記録、src/opencode/tools/agentdev-gh/runner-cli.ts の失敗 detail 拡充（反映判断は learning-promote に委譲）。
 - **関連**: src/opencode/tools/agentdev-gh/runner-cli.ts、src/opencode/plugins/agentdev-gh-tool/plugin.ts、src/opencode/plugins/agentdev-gh-write-guard/plugin.ts、.agentdev/tmp/issue-3123-body-step7.md、Issue #3123、learning 74ffa047（同 Case 前回 capture）。
 - **タグ**: #custom-tool #harness-environment #fail-closed #orchestration-recovery
+
+## 子 task 側の観測証跡を親が永続チャネル経由で受領する経路が現状ない（REQ-034-045 型検証の証跡引き継ぎ）
+
+- **問題事象**: TS-006 統合検証（durable state からの再開と staggered background 並列再委譲の overlap 実測確認）において、対象別・stage 別観測証跡（REQ-034-045）を子 task 側が PR 本文等へ引用可能な形で親が受領する経路が現状ない。実例として driver の blocked 報告が一時 session 出力のみとなり SSoT コメント不能となった
+- **発生局面**: 実装（case-run 委譲実行・Case #3123、PR #3138）
+- **検知方法**: TS-006 on_failure record-in-findings 契約による PR 本文 Findings セクションへの記録（case-close Capture 回収時に確認）
+- **根本原因**: 親子間の観測証跡引き継ぎが background_output 等の一時 session 通信に依存しており、子が証跡を永続チャネル（PR 本文・Issue コメント・durable state ファイル）へ書込む手段が委譲契約に存在しない
+- **自律対応内容**: record-in-findings 契約どおり PR 本文 Findings へ記録し（運用環境依存のため契約側の不備を示さない）、case-close の Capture 回収で learning inbox へ取り込んだ
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 観測証跡を要求する検証を子 task に委譲する場合、証跡の永続チャネル経由の受領経路（例: Issue コメント・PR 本文の指定セクション・durable state ファイル）を検証契約と同時に用意する
+- **再発条件**: 観測証跡を必要とする検証（REQ-034-045 型）を子 task で実施し、証跡が一時 session 出力のみで完結する場合
+- **予防策候補**: case-run 委譲契約（adapter / orchestration 系 reference）に観測証跡の永続チャネル記録手順（Issue コメントまたは PR 本文 Findings への明示的な記録形式）の追加
+- **想定反映先**: docs（agentdev-case-run-execution-adapter・case-run 系 workflow skill reference への手順追記。具体化の判断は backlog/intake 側）
+- **関連**: REQ-034-045、Case #3123（PR #3138）Findings セクション、agentdev-workflow-case-close（Capture 回収）
+- **タグ**: `#observation-evidence` `#parent-child-delegation` `#record-in-findings`
