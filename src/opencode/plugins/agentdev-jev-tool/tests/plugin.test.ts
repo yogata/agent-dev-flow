@@ -6,6 +6,7 @@ import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
 import { createAgentdevJevToolDefinition, createAgentdevJevToolPlugin, REQUEST_PROPERTY_SCHEMA } from "../plugin.ts";
+import { validateCompletionObservation } from "../../../tools/agentdev-jev/observation.ts";
 import type { JevProvider } from "../../../tools/agentdev-jev/provider.ts";
 
 function context(worktree: string) {
@@ -32,12 +33,66 @@ describe("plugin structure", () => {
       properties: {
         observationId: { type: string };
         observationMetadata: { type: string };
-        observation: { properties: { recordState: { enum: readonly string[] } } };
+        observation: { oneOf: Array<{ properties: { recordState?: { enum: readonly string[] } } }> };
       };
     };
     expect(schema.properties.observationId.type).toBe("string");
     expect(schema.properties.observationMetadata.type).toBe("object");
-    expect(schema.properties.observation.properties.recordState.enum).toEqual(["partial", "complete"]);
+    // observation 入力は observationId の有無で 2 分岐する（追記完成 / legacy 完成新規書込み）
+    const branches = schema.properties.observation.oneOf;
+    expect(branches).toHaveLength(2);
+    const fullBranch = branches.find((b) => b.properties.recordState?.enum?.includes("partial"));
+    const completionBranch = branches.find((b) => b.properties.recordState?.enum?.includes("complete") && !b.properties.recordState?.enum?.includes("partial"));
+    expect(fullBranch?.properties.recordState?.enum).toEqual(["partial", "complete"]);
+    expect(completionBranch?.properties.recordState?.enum).toEqual(["complete"]);
+  });
+
+  test("completion 追記分岐の入力 schema は実装受理条件（completion allowlist）と一致する", () => {
+    const schema = REQUEST_PROPERTY_SCHEMA as unknown as {
+      properties: {
+        observation: {
+          oneOf: Array<{
+            properties: Record<string, unknown>;
+            required?: string[];
+            additionalProperties?: boolean;
+          }>;
+        };
+      };
+    };
+    const completionBranch = schema.properties.observation.oneOf.find((b) => {
+      const recordState = b.properties?.recordState as { enum?: string[] } | undefined;
+      return recordState?.enum?.includes("complete") === true && !recordState.enum.includes("partial");
+    });
+    expect(completionBranch).toBeDefined();
+    // top-level: 追記専用形（schemaVersion / recordState / judgments のみ）
+    expect(Object.keys(completionBranch!.properties).sort()).toEqual(["judgments", "recordState", "schemaVersion"]);
+    expect(completionBranch!.additionalProperties).toBe(false);
+    // judgment 単位: 追記対象 field（llmFinalJudgment / llmTreatment）のみ completion 系操作の入力として示される
+    const judgments = completionBranch!.properties.judgments as {
+      minItems?: number;
+      items: { properties: Record<string, unknown>; required?: string[]; additionalProperties?: boolean };
+    };
+    expect(judgments.minItems).toBe(1);
+    expect(Object.keys(judgments.items.properties).sort()).toEqual(["judgmentId", "llmFinalJudgment", "llmTreatment", "questionForm"]);
+    expect(judgments.items.required).toEqual(["judgmentId", "questionForm", "llmFinalJudgment", "llmTreatment"]);
+    expect(judgments.items.additionalProperties).toBe(false);
+    // 実装受理条件との実測一致: 追記専用形は受理し、run 級 field の混入は拒否する
+    const appendOnly = {
+      schemaVersion: 1,
+      judgments: [{ judgmentId: "q1", questionForm: "boolean", llmFinalJudgment: "最終判断", llmTreatment: "unchanged" }],
+    };
+    expect(validateCompletionObservation(appendOnly).ok).toBe(true);
+    const runLevelMixed = {
+      ...appendOnly,
+      workflow: "wf",
+      provider: "p",
+      requestedModel: "m",
+      sourceRevision: "r",
+      outcome: "completed",
+      durationMs: 1,
+      inputs: { requestDigest: "0".repeat(64) },
+    };
+    expect(validateCompletionObservation(runLevelMixed).ok).toBe(false);
   });
 });
 

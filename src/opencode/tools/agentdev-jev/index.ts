@@ -57,10 +57,13 @@ export const AGENTDEV_JEV_PUBLIC_CONTRACTS: ReadonlyArray<{
     sideEffect: true,
     summary:
       "Validate and write one observation JSON (one Workflow run = one JSON) under .agentdev/jev-observations/. " +
-      "With observationId: completion write mode that appends LLM final-judgment fields (llmFinalJudgment, llmTreatment) " +
-      "to the same JSON written by evaluate and marks it complete (idempotent, no duplicate JSON). Without observationId: " +
-      "legacy write of a completed observation as a new file. Per-judgment confidence and llmTreatment are stored as " +
-      "independent primary observations; no confidence-threshold classification is admitted.",
+      "With observationId: completion write mode whose accepted input is append-only (llmFinalJudgment, llmTreatment) " +
+      "— per-judgment LLM final-judgment fields appended to the same JSON written by evaluate, marking it complete " +
+      "(idempotent, no duplicate JSON). Run-level fields (workflow, provider, outcome, durationMs, inputs, etc.) and " +
+      "Jev-side observation fields are already recorded in the evaluate-time partial record and are NOT re-accepted " +
+      "in the completion input. Without observationId: legacy write of a completed observation as a new file (full " +
+      "record shape). Per-judgment confidence and llmTreatment are stored as independent primary observations; no " +
+      "confidence-threshold classification is admitted.",
   },
 ];
 

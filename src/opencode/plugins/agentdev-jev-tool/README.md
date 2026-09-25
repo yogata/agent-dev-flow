@@ -9,7 +9,7 @@ Jev 先行評価は最終判断者ではなく、後段の LLM 推論への追�
 | operation | 内容 |
 |---|---|
 | `evaluate` | 閉じた判断入力への Jev 先行評価。質問ごとの結果・候別別確率分布・正規化済み confidence・inputTokens（provider が返す場合）・機械的処理時間を返す。失敗は構造化失敗（not_configured、timeout、rate_limited、server_error、network_error、response_invalid）。自動 retry なし。評価完了（not_configured を含む）時点で部分レコード（recordState partial）を `.agentdev/jev-observations/` へ書込み、書込み失敗は評価結果と独立した warning（REQ-090-013） |
-| `observation_write` | 観測 JSON（1 Workflow 実行 = 1 JSON）の形式検証と `.agentdev/jev-observations/` への書込み（REQ-{NNNN}-{NNN}）。observationId 付きは evaluate 時点部分レコードの同一 JSON への追記完成 mode（冪等・重複 JSON なし） |
+| `observation_write` | 観測 JSON（1 Workflow 実行 = 1 JSON）の形式検証と `.agentdev/jev-observations/` への書込み（REQ-{NNNN}-{NNN}）。observationId 付きは evaluate 時点部分レコードの同一 JSON への追記完成 mode（冪等・重複 JSON なし）。追記完成 mode の入力は追記対象 field（llmFinalJudgment、llmTreatment）のみで、run 級 field は evaluate 時点部分レコードに記録済みのため追記不要・再送不可 |
 
 ## 2段階書込み（REQ-090-013）
 
