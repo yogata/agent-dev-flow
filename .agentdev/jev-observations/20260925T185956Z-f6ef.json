@@ -1,0 +1,71 @@
+{
+  "observationId": "20260925T185956Z-f6ef",
+  "schemaVersion": 1,
+  "workflow": "case-ready",
+  "judgmentKind": "execution-structure",
+  "subject": "Root Case #3143（Jev 実験後続2段の起票 Case）の Standard / Epic 確定3軸判断",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "sourceRevision": "95ac532c555f137503b1e976d952fd247cf921a0",
+  "outcome": "completed",
+  "durationMs": 865,
+  "resolvedModel": "typesafe-ai/jev",
+  "inputTokens": 1840,
+  "inputs": {
+    "requestDigest": "490edc1903ad52dd251e3526b704fc77a092196abd7027480eef8589e5280982"
+  },
+  "judgments": [
+    {
+      "judgmentId": "q1-structure",
+      "questionForm": "choice",
+      "jevResult": "Standard（Root Case 自身を単一 execution unit とし Child Issue を作成しない。OU 順序は Root Case 内の直列実行順序として execution contract に記録）",
+      "probabilityDistribution": {
+        "Standard（Root Case 自身を単一 execution unit とし Child Issue を作成しない。OU 順序は Root Case 内の直列実行順序として execution contract に記録）": 0.95,
+        "Epic（Epic Issue を作成し、OU-0001/OU-0002 を Child Issue 化して Wave 直列依存構造を確定する）": 0.05
+      },
+      "confidence": 0.9875,
+      "llmFinalJudgment": "Standard と確定する。Jev 結果（Standard、0.95）と従来経路の判断材料（2 OU 直列連結成分、Epic サイズ小、機能的一貫性高、case-open 合意の epic_needed=false）から、Epic 化を強制する3軸条件（大規模・機能的分岐）は不在であり、Root Case 自身を単一 execution unit とし Child Issue を作成しない。OU-0001 → OU-0002 の順序依存（OU-0002 着手条件: Issue B 評価結果とユーザー承認済み置換対象・閾値の存在、承認未確定時は HITL 停止）は Root Case 本文の execution contract への記録と Issue 起票時の着手条件明記で制御する。3軸スコアは依存強度=強（2/2）、Epic サイズ=小（0/2）、機能的一貫性=高（2/2）で Jev 結果と一致する。",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "q2-dependency-strength",
+      "questionForm": "score",
+      "jevResult": 2,
+      "probabilityDistribution": {
+        "弱い（依存なしまたは参照のみ）": 0,
+        "中程度（成果参照だが順序制御で十分）": 0,
+        "強い（成果の成立順序への依存が必須）": 1
+      },
+      "confidence": 0.9875,
+      "llmFinalJudgment": "強い（成果の成立順序への依存が必須）と確定する。OU-0002（Issue C）の採用閾値は Issue B の観測結果から決定されたものを使用し、着手条件は Issue B の評価結果とユーザー承認済み置換対象・閾値の存在であるため、成果の成立順序への依存が必須である。Jev 結果（2）と一致する。",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "q3-epic-size",
+      "questionForm": "score",
+      "jevResult": 0,
+      "probabilityDistribution": {
+        "小（1〜2 OU）": 1,
+        "中（3〜5 OU）": 0,
+        "大（6 OU 以上）": 0
+      },
+      "confidence": 0.9875,
+      "llmFinalJudgment": "小（1〜2 OU）と確定する。連結成分は OU-0001 と OU-0002 の 2 OU であり Jev 結果（0）と一致する。",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "q4-functional-coherence",
+      "questionForm": "score",
+      "jevResult": 2,
+      "probabilityDistribution": {
+        "低（無関係な OU の集約）": 0,
+        "中（関連するが複数主題）": 0,
+        "高（単一機能主題に一貫）": 1
+      },
+      "confidence": 0.9875,
+      "llmFinalJudgment": "高（単一機能主題に一貫）と確定する。両 OU は「Jev 実験の後続2段（有効性評価→置換実装）」という単一主題に属し Jev 結果（2）と一致する。",
+      "llmTreatment": "unchanged"
+    }
+  ],
+  "recordState": "complete"
+}
