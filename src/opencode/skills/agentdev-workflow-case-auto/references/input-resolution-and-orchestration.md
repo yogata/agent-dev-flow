@@ -144,7 +144,7 @@ OU の統合・分割・REQ 操作分類・Issue 階層判定を再評価しな�
 当該 stage に属する全対象が正常完了し、または当該実行において後続 stage へ進めないことが既存契約上確定した結果（blocked / failed / delegation-unavailable 等の後続不能確定）に収束するまで次 stage を開始せず（未実行・実行中・状態不明・再試行要否未確定対象の残存は収束済みとしない）、後続不能対象を後続 stage の対象から除外しその存在だけを理由として独立した他対象の進行を停止しない（case-auto 実行契約）。
 main への push、capture、commit、同一 Epic Issue 本文への更新等の競合する共有書き込みは、当該競合部分のみを必要な最小単位で局所的に直列化し、当該競合と無関係な対象の並列実行を妨げず、stage 全体を一括して扱う直列集約ポイントを設けない（case-auto 実行契約。共有資源カテゴリと直列化単位の運用表は case-auto Design「複数 execution_unit 並列 orchestration」節参照）。
 クリーンアップ検証ゲート（ドラフト残存、RU 残存の検証）を stage 2 の対象群収束後・stage 3 開始前に実行し、評価対象を stage 2 を正常完了した対象に限定する（case-auto 実行契約）。
-scheduling 制約（最大同時起動数・起動間隔・順次フォールバック）による batch 分割を orchestration stage の分割として扱わない（case-auto Design「ドラフト間並列実行モデル」）。
+scheduling 制約（最大同時起動数・起動間隔）による batch 分割を orchestration stage の分割として扱わない（case-auto Design「ドラフト間並列実行モデル」）。
 Epic execution_unit の Wave 間および最終 Wave の case-close(#epic) は Wave 反復を進行・完結させる stage 3 内部の状態遷移処理であり stage 4 の開始とみなさず、stage の分類は orchestration 上の位置づけにより行い command 名単独では分類しない（case-auto Design「ドラフト間並列実行モデル」）。
 並行して委譲起動する stage 1（case-open / case-revise）・stage 2（case-ready）の委譲先は、並行実行時の作業隔離規律（REQ-030-017。case-open Design「並行 case-open の作業隔離規律（REQ-030-017）」節）と Definition PR 受入の overlap 突合（REQ-061-039。case-ready Design「内部構成」節 overlap 突合）を各委譲先工程の実行手順として適用する。case-auto は委譲先工程の手順を再定義せず、委譲境界の整合のみを保持する（stage モデルの並列性〔REQ-034-025〕と REQ-030-017 / REQ-061-039 の機構分散は矛盾しない）。
 
@@ -159,7 +159,7 @@ stage 1（case-open）の収束条件には、全対象確立後の横断依存�
 
 横断依存検査の単独起動（case-open STEP-5）と case-auto 側の横断評価は二重実行とせず、case-auto 側評価は全対象確立を前提とした population 補完の位置づけである。
 
-順次フォールバック可能（command 不変条件）。
+並列実行は必須であり、実行環境由来の障害（background task の消失、親 run の中断、provider failure 等）を理由とする同期逐次実行（順次フォールバック）への切替を行わない。並列起動が当該 stage の起動可能対象集合に対して1件も成立しない場合は、直列化で完了を装わず停止理由「並列起動不能」（原因の断定を含まない）と再開可能性を報告して停止する（case-auto Design「runtime 制御契約」節、command 不変条件）。
 並列起動時は委譲起動ごとに10秒の起動間隔を置き、同一Tool一括ブロックでの複数起動発行は行わない（v4-runtime-execution-model Design「runtime 制御ループ」節〔起動間隔・並列数制御〕）。起動間隔は stage 3（case-run インライン実行の実装実行委譲）に限らず stage 1（case-open / case-revise 委譲）・stage 2（case-ready 委譲）・stage 4（case-close 委譲）の並列委譲起動にも同一に適用する。
 bg task 破棄検知時の3状態回復は `agentdev-workflow-orchestration` 参照。
 
@@ -213,7 +213,7 @@ case-open の判定結果に従う。
 ### Result
 
 - 各工程の実行結果（Issue/PR番号、pass/warn/fail）
-- orchestration stage 別結果・フォールバック理由・破棄回復記録
+- orchestration stage 別結果・破棄回復記録（並列起動不能で停止した場合は起動試行履歴〔試行回数、起動成立数、最終成功起動時刻〕を含める。case-auto Design「工程別タイムスタンプ計測と対象別・stage 別観測証跡」節）
 - 結果状態の4次元（工程結果 / artifact_action 適用結果 / 定義適用工程の完了状態 / OU ライフサイクル完了状態、warn 変換禁止）
 - L1 タイムスタンプ内訳
 
@@ -269,4 +269,4 @@ case-open の判定結果に従う。
 - 不変条件（case-auto の所有対象の限定。harness 実行機構との責務分界は harness 分離モデル Design 参照）
 - 不変条件（subagent 委譲時の category 選定、事務的手続きには `unspecified-high` を推奨、`writing` category は執筆作業のみに限定）
 - 不変条件（全ての subagent 委譲 prompt に MUST NOT DO セクションを必須、スコープ外作業を明示列挙）
-- 不変条件（case-auto は orchestration stage 3 だけで case-run を並列起動、stage 1・2・4 で case-run を並列起動せず、並列実行を利用できない場合だけ順次フォールバック）
+- 不変条件（case-auto は orchestration stage 3 だけで case-run を並列起動し、stage 1・2・4 では case-run を並列起動しない。並列実行は必須であり、並列起動が当該 stage の起動可能対象集合に対して1件も成立しない場合は停止理由「並列起動不能」と再開可能性を報告して停止する）

@@ -83,9 +83,9 @@ Epic Issue を伴う Wave 反復実行時は、完了・blocked・failed 子Issu
 - **工程別タイムスタンプ内訳（L1）**: case-open / case-ready / case-run / case-close（例外経路時は case-revise を含む）、スキップした工程は除外可、case-run の L2 内訳は case-run result から読み取って含める
 - **対象別・stage 別の開始/完了観測証跡**: 各 orchestration stage における対象別の開始/完了を観測可能にするため、L1 タイムスタンプを対象別拡張（対象識別子付きの開始/完了時刻）で記録するか、等価の bg task ID と Issue status 遷移記録（pending → running → completed / blocked / failed / pending 戻しの遷移）を保持する。並列実行が逐次処理へ退化していないこと、stage 間の全対象収束（fan-in）前に次 stage が先行開始していないことの判定、および完了報告の stage 別集約は、この観測証跡に基づいて行う
 - **インライン実行の記録**: case-run をインライン実行した旨
-- **orchestration stage 別結果・フォールバック理由・破棄回復記録**:
+- **orchestration stage 別結果・破棄回復記録**:
   - stage 1 case-open（例外経路時は case-revise を含む）/ stage 2 case-ready / stage 3 case-run / stage 4 case-close の各対象別結果
-  - stage を順次フォールバック時は理由（stage 1・2・4 の並列委譲、stage 3 の case-run 並列起動のいずれかで並列実行を利用できなかった場合）
+  - 並列起動不能で停止した場合は起動試行履歴（試行回数、起動成立数、最終成功起動時刻）を含める（case-auto Design「停止理由分類」節）
   - bg task 破棄を検知して回復した場合は状態区分と回復結果
 - **結果状態の4次元報告**:
   - (1) 工程結果 pass/warn/fail

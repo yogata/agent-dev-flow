@@ -135,9 +135,9 @@ case-run は background 委譲の起動直後消失を検知した場合、委�
    - worktree の git status・commit（実行中の変更や commit の有無）
    - PR の存在（`completed-pr` の証跡）
    - Issue コメント（blocked / failed の SSoT）
-2. **実行未試行と判定した場合**: 同期実行による再委譲を行う（実行未試行のため result 状態は付かない。委譲起動不能時の `delegation-unavailable` とは区別する）
+2. **実行未試行と判定した場合**: 同期実行によらず background での再委譲（親 orchestration が所有する起動間隔契約に従う）を行う（実行未試行のため result 状態は付かない。委譲起動不能時の `delegation-unavailable` とは区別する）。background 再委譲の起動失敗が継続する場合は、Design が所有する再試行計上契約に基づき delegation-unavailable として再開可能な停止報告へ確定する
 3. **実行中断と判定した場合**: 継続の判断（継続指示または再委譲）も当該 durable state に基づく。git status の残留変更と PR 有無を根拠とし、会話コンテキストの推定で判断しない
-4. **フォールバック限定**: 同期実行への切替は消失検知時のフォールバックに限定する。委譲方式を常時同期化せず、実行並列制御（共有 active Issue task 枠）は case-auto orchestration stage 3 が単一所有する契約に従う
+4. **再委譲形態限定**: 再委譲は staggered background とし、委譲方式を同期実行へ切替えない。実行並列制御（共有 active Issue task 枠）は case-auto orchestration stage 3 が単一所有する契約に従う
 
 ## 責務境界（非対象）
 
