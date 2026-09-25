@@ -41,3 +41,39 @@
 
 ---
 
+## 2026-09-26: 配布物本文への canonical 参照は節名のみで記述する（要件行 ID 直書きは配布境界 checker の新規違反になる）
+
+- **問題事象**: 配布 skill reference・テンプレート（src/opencode 配下）への canonical 文書参照追記において、要件行 ID（REQ-{NNNN}-{NNN} 形式）や CR 番号を本文に直書きした箇所があり、配布境界 final gate（--profile source）で concrete_id_hits が BASE 38 から 42（+4）へ増加し「新規違反ゼロ」要求を不合格とした
+- **発生局面**: case-run 委譲（DEL-3144-1）での配布依存境界 final gate 1 回目実行時
+- **検知方法**: check_distribution_boundary.ts --profile source --json の concrete_id_hits 増分（BASE との差分比較）
+- **根本原因**: 配布物本文へ canonical 参照を書く際、機械参照可能な concrete ID を併記すると配布境界 checker が concrete_id 直書きとして計上する。参照導線自体は ID を必要としない
+- **自律対応内容**: 該当 5 件の concrete ID を節名のみの参照（例: 「case-auto Design「停止理由分類」節」）へ書き換え、2 回目 gate 実行で BASE 同値（38）へ復帰・合格
+- **ユーザー確認の有無**: なし（fix-and-reverify で自律解決）
+- **Decision/REQ/spec影響**: なし（配布境界契約の遵守方法の知識であり、契約変更なし）
+- **横展開観点**: src/opencode 配下の reference・テンプレートへ canonical 文書を参照させる追記を行う全 Case（RA 実装系）で同型違反が起こり得る。evidence 併記規約（Case #3144 本体変更）により evidence path の prune 後識別子併記はケースバイケースで必要になるが、配布物本文への concrete ID 直書きは避ける
+- **再発条件**: 配布物本文へ REQ 行 ID・DEC 番号・CR 番号等の concrete ID を含む canonical 参照文言を追記した場合
+- **予防策候補**: case-run 実装委譲時の指示へ「配布物本文の canonical 参照は節名のみで記述する」規約の明示。実装前段での事前周知
+- **想定反映先**: agentdev-case-run-execution-adapter references（実装指示規約）、case-run delegation-and-result.md
+- **関連**: Case #3144、PR #3155、DEL-3144-1（PR 本文検証差分セクション参照）
+- **タグ**: `#distribution-boundary` `#concrete-id` `#canonical-reference` `#case-run`
+
+---
+
+## 2026-09-26: worktree 上の bun スクリプト実行は ./ prefix 形式のみ動作し、テストの import.meta.dir は junction パスを返す
+
+- **問題事象**: Case 専用 worktree 上で `.opencode` projection 配下のスキルスクリプトを `bun <path>` 形式で実行すると Module not found で失敗する。`bun run ./.<path>` の `./` prefix 形式のみ動作する。また bun test で実行する契約テストの `import.meta.dir` は junction パス（worktree 側の実ファイル）を返す
+- **発生局面**: case-run 委譲（DEL-3144-1）での検証実行（worktree root での checker・契約テスト実行）
+- **検知方法**: bun 実行時の Module not found エラー。probe test による import.meta.dir の表示確認
+- **根本原因**: bun の path filter 解析は相対 path 指定に `./` prefix を要求する。worktree の `.opencode` projection は junction 未伝播のため、checker 本体は projection 側（main root 側実装）を解決するが検査対象は worktree root になる。テストの import.meta.dir は junction パスを返すためテストは worktree の実ファイルを読む
+- **自律対応内容**: 全 bun 実行を `./` prefix 形式（`bun run ./.opencode/skills/...`、`bun test ./.opencode/...`）に統一。probe test でテストが読むツリーを事前確認してから検証を実行
+- **ユーザー確認の有無**: なし（自律解決）
+- **Decision/REQ/spec影響**: なし（実行環境の挙動観測であり契約変更なし）
+- **横展開観点**: worktree 上での検証実行を行う全 Case（case-run / case-close STEP-3）で同型の実行失敗が起こり得る。bun test は `./` prefix 形式が既定の実行形態契約
+- **再発条件**: worktree root を cwd として `bun <path>` 形式でスクリプト・テストを実行した場合
+- **予防策候補**: worktree 上の検証手順へ「bun は ./ prefix 形式」「check_templates.ts 単独実行は worktree で skip（junction 未伝播）するが check_templates.test.ts が補完する」旨の明記
+- **想定反映先**: agentdev-case-run-execution-adapter references/harness-delegation.md（実行コマンド形式指示）、repo-agentdev-integrity の実行契約記述
+- **関連**: Case #3144、PR #3155、DEL-3144-1
+- **タグ**: `#bun` `#worktree` `#junction` `#verification` `#case-run`
+
+---
+
