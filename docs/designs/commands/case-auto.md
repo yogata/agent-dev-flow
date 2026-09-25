@@ -6,7 +6,7 @@ updated: "2026-09-24"
 ---
 <!-- ADF-COVERS(implementation): REQ-015-012 -->
 <!-- ADF-COVERS(implementation): REQ-034-001, REQ-034-002, REQ-034-003, REQ-034-004, REQ-034-005, REQ-034-006, REQ-034-007, REQ-034-008, REQ-034-009, REQ-034-010, REQ-034-011, REQ-034-012, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-017, REQ-034-018, REQ-034-019, REQ-034-020, REQ-034-021, REQ-034-022, REQ-034-023, REQ-034-024, REQ-034-025, REQ-034-026, REQ-034-027, REQ-034-028, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-033, REQ-034-034, REQ-034-035, REQ-034-036, REQ-034-037, REQ-034-038, REQ-034-039, REQ-034-040, REQ-034-041, REQ-034-042, REQ-034-043, REQ-034-044, REQ-034-045, REQ-035-016, REQ-035-017 -->
-<!-- ADF-COVERS(design): REQ-034-012, REQ-034-025, REQ-034-027, REQ-034-028, REQ-034-040, REQ-034-041, REQ-034-042, REQ-034-043, REQ-034-044, REQ-034-045, REQ-035-016, REQ-035-017 -->
+<!-- ADF-COVERS(design): REQ-034-012, REQ-034-022, REQ-034-025, REQ-034-027, REQ-034-028, REQ-034-040, REQ-034-041, REQ-034-042, REQ-034-043, REQ-034-044, REQ-034-045, REQ-035-016, REQ-035-017 -->
 <!-- ADF-COVERS(verification): REQ-034-037, REQ-034-038 -->
 <!-- ADF-COVERS(implementation): REQ-003-017, REQ-003-018, REQ-006-108, REQ-034-002, REQ-034-003, REQ-034-007, REQ-034-008, REQ-034-009, REQ-034-010, REQ-034-011, REQ-034-012, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-018, REQ-034-019, REQ-034-020, REQ-034-021, REQ-034-022, REQ-034-023, REQ-034-024, REQ-034-025, REQ-034-026, REQ-034-027, REQ-034-028, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-034, REQ-034-035, REQ-034-036 -->
 
@@ -275,6 +275,22 @@ case-auto は現行正規成果物から一意に回答可能な decision_contex
 詳細は後述「bounded parent decision resolution（REQ-034-032〜034、DEC-008）」節を参照。
 
 詳細な停止条件の全量は REQ-034-015（本拡張で11項目）を参照。
+
+### infra-transient（ツール基盤故障）停止分類
+
+infra-transient はツール基盤（harness・Custom Tool 実行環境）の故障に起因する停止種別であり、
+Case 失敗（blocked / failed）と区別して報告する。判定条件は次の4条件の同時成立とする:
+
+1. 単一ツールの恒常失敗（再試行でも成功しない、決定的な失敗）
+2. プロセス生存（長寿命実行プロセス自体は生存し、HTTP API 等は応答する）
+3. 再試行無効（同一プロセス内での再試行が成功しない）
+4. 他経路正常（git・DB・ローカル FS 等の他の実行経路は正常に動作する）
+
+infra-transient と分類した場合、停止報告に回復経路を記載する: supervisor 等による harness 再起動で
+回復可能であること、および durable state（Issue、PR、RU、draft、git 状態）からの冪等再開が成立する
+こと。停止理由の分類は case-ready / case-run / case-close の停止報告を case-auto が集約する既存構造に
+のせ、各 workflow の停止報告形式に infra-transient の分類と回復経路の記載欄を反映する。
+harness 側の修正（fresh process 分離・自動再初期化）は本リポジトリの対象外とする。
 
 ### コンフリクト解消モデル（3レベルエスカレーション）（REQ-003, v2:ADR-0132）
 
