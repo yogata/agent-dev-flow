@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-092-001, REQ-092-002, REQ-092-003
+// ADF-COVERS(verification): REQ-092-001, REQ-092-002, REQ-092-003, REQ-092-004
 import { describe, expect, it } from "bun:test";
 import { readFileSync } from "fs";
 import { join } from "path";
@@ -39,5 +39,18 @@ describe("regression_req092: issue_list 運用規律の文書整備", () => {
     expect(safetyDoc).toContain("Tool 正規経路を第一");
     expect(safetyDoc).toContain("gh issue list --search");
     expect(safetyDoc).toContain("--json labels");
+  });
+
+  it("REQ-092-004: search トークン選択性指針・決定的違反と一時的 API エラーの再試行判断・state: open 限定の適用境界が存在する", () => {
+    expect(safetyDoc).toContain("search トークンの選択性指針");
+    expect(safetyDoc).toContain("選択性を持つ語（冪等キー語、REQ 番号、topic_slug 等）");
+    expect(safetyDoc).toContain("相互参照トークン（兄弟 Case の RU 番号等）は選択性が低いため");
+    expect(safetyDoc).toContain("単独の絞り込み根拠として用いない");
+    expect(safetyDoc).toContain("`state` と role（tracking / case）の指定を併用");
+    expect(safetyDoc).toContain("決定的違反と一時的 API エラーの区別と再試行判断");
+    expect(safetyDoc).toContain("同一呼出の再試行で解消しない");
+    expect(safetyDoc).toContain("state: open 限定の適用境界");
+    expect(safetyDoc).toContain("冪等検出（重複生成の防止）を目的とする検索に限定");
+    expect(safetyDoc).toContain("参照後続検索");
   });
 });

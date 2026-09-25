@@ -45,6 +45,22 @@ verification-incomplete（読み戻し検証失敗）時は、Tool は検証失�
 - **search 併用必須**: `issue_list` を closed 等の広範 filter で実行する場合、`search` 引数（冪等キー語、REQ 番号、topic_slug 等の絞り込みキー）を必ず併用する。広範 filter を `search` なしで実行すると、closed Case 群等の累積 population の増加により、Tool 完全一覧契約の安全ページ上限へ構造的に到達して operation-failed となる
 - **labels 引数は tracking 論理値専用**: `labels` 引数は追跡Issue論理軸（role、kind、trackingState）の物理マッピング入力専用である。Case Issue は role: case と機械判定されるため、Case 物理ラベル名（enhancement、bug、docs 等の通常ラベル）を `labels` 引数へ指定した絞り込みは 0 件帰着または無効となる。Case Issue の絞り込みは `labels` 引数を使用せず、`search` 引数と state の組み合わせで行う
 
+### search トークンの選択性指針
+
+`search` 引数に指定するトークンは、検索対象を実効的に絞り込める選択性を持つ語（冪等キー語、REQ 番号、topic_slug 等）を用いる。同一バッチの Case 群本文に頻出する相互参照トークン（兄弟 Case の RU 番号等）は選択性が低いため、単独の絞り込み根拠として用いない。search トークン単独で目的の絞り込みが満たせない場合は、`state` と role（tracking / case）の指定を併用して母集団を先に限定してから search トークンを適用する。
+
+### 決定的違反と一時的 API エラーの区別と再試行判断
+
+operation-failed / API 失敗応答を再試行するか否かは、失敗の分類に応じて判断する。
+
+- **決定的違反**: 絞り込み規律違反（search なしの広範 filter、labels への Case 物理ラベル指定、非選択的 search トークンの単独使用等）に由来する operation-failed は、同一呼出の再試行で解消しない。再試行せず、規律に適合するよう呼出側（絞り込み条件、search トークン選択性）を修正してから再実行する
+- **一時的 API エラー**: network error、timeout、5xx 等の一時的な API 障害に由来する失敗は、同一呼出の再試行で解消し得る。分類の根拠がない場合はまず1回の同一呼出再試行を許容し、再試行でも失敗する場合は決定的違反として呼出側の修正へ戻す。再試行上限到達時は「Issue 内容検証」節の3段階リトライ（同一内容リトライ → 内容再生成 → 停止、ユーザー報告）に従う
+
+### state: open 限定の適用境界
+
+- `state: open` の指定は、既存 Case / Issue の冪等検出（重複生成の防止）を目的とする検索に限定して用いる
+- クローズ済み Issue への参照後続検索（完了 Case の結果確認、過去判断の参照等）には state: open を付与しない。付与すると目的の対象（closed Issue）が母集団から除外される。closed を含む検索では search トークンの選択性をより高く保つ
+
 安全ページ上限到達（operation-failed）時は、次の順で contingency 補完する。Tool 正規経路を第一とし、gh CLI による手動読取は operation-failed 時の補完手段として位置づける（読み取り系操作の gh 直接記述禁止を operation-failed 補完の範囲で緩和するものではない。書込み系は引き続き Tool 正規経路に限定する）。
 
 1. **絞り込みの推送（Tool 正規経路）**: operation-failed 応答を受け取ったら、`search` 引数の絞り込みキーを見直して Tool 正規経路で再実行する。

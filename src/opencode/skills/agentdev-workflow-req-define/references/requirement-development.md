@@ -71,6 +71,7 @@
 
 - **変更影響候補抽出**: 変更影響候補を抽出しドラフトに保持する。RU からの対象領域キーワード抽出、glob/grep での関連 REQ/Decision/Design 事前特定、サブエージェント調査委譲への調査優先対象リスト（ヒント）構築、実ファイル完全列挙の維持（詳細は `agentdev-req-analysis`「調査スコープ洗練手順」参照）
 - **分類ゲート（REQ 最終分類確定）**: 各要件行候補を「変更後仕様」/「反映作業」に分類する。REQ/Design 境界判定を行い Design 保存対象を `artifact_actions`（`artifact: design`）に分離する。RU 暫定分類（`tentative_classification`）があれば document-model Design（extension 経由）の文書7分類モデルへ照らして最終分類を確定し上書きする
+- **design 対応事前確認**: 変更対象のうち既存 REQ 行の意味変更を含む場合、`agentdev-traceability` の coverage --req により当該行の design 対応有無を事前確認する。design 対応が欠落する意味変更行を検出した場合は、当該行の design 対応を `artifact_actions`（`artifact: design`）へ組込む。本確認は STEP-6 の生成手順（draft-generation.md の design 対応事前確認）へ引き継がれる前段の確認であり、後段の case-ready lifecycle gate completeness（fail-closed）での停止を予防する位置づけである（正規所有は case-open Design「意味変更行の design 対応事前確認」節）
 - **文書分類妥当性検証**: REQ 要件行に Design 分離基準違反残留がないか検出する。検出時は Design 保存対象へ移送する（安定契約例外は対象外）
 - **Decision要否確認ゲート**: Decision候補・既存REQ/Decision/Design との衝突候補・責務境界変更を含む場合、`agentdev-architecture-advisory` へ委譲する。出力は4ラベル構造（確定事項/推定事項/ユーザー確認事項/ブロッカー）。soft-contract（Decision）。ブロッカーまたは未決事項残存時は壁打ち（STEP-2）へ差し戻す
 - **実行主体分類表**: 委譲契約を定義する場合、各委譲について実行主体分類表（adapter skill / command / subagent / harness）を必須とする（詳細は v4-delegation-contracts Design（extension 経由）参照。委譲を含まない要件では省略可）
@@ -88,7 +89,7 @@
 
 ### Completion Verification
 
-- 全要件行候補の分類が確定し、Design 分離基準違反残留が0件であること。5観点境界の確認が実施済みであり、導出済み case-specific risk が test strategy へ投影済みであること（投影完全性は QG-1 が検査）。test strategy 項目が全て3要素を持つこと。検索系検証（rg 等）を含む test strategy 項目がある場合、網羅範囲と修正対象列挙の一致確認が実施済みであること
+- 全要件行候補の分類が確定し、Design 分離基準違反残留が0件であること。5観点境界の確認が実施済みであり、導出済み case-specific risk が test strategy へ投影済みであること（投影完全性は QG-1 が検査）。test strategy 項目が全て3要素を持つこと。検索系検証（rg 等）を含む test strategy 項目がある場合、網羅範囲と修正対象列挙の一致確認が実施済みであること。既存行の意味変更を含む場合、design 対応事前確認（coverage --req 実査・欠落時 artifact_actions 組込み）が実施済みであること
 
 ### Resume-Idempotency
 
