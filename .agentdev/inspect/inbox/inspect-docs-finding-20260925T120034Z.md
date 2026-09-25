@@ -1,54 +1,27 @@
-# inspect-docs finding 20260925T120034Z
+# inspect-docs finding 20260925T120034Z（defer 残置分）
 
-## サマリ
+> 本ファイルは inspect-promote（2026-09-25 実施、--auto なし）の分類確定後、defer となった検出事項のみを残置する。promote 採用分（7件: F-01 / F-02 / F-03 / F-11 / F-12 / F-18 / F-20）は `.agentdev/inspect/promoted/inspect-docs-promoted-20260925T120034Z.md` へ保存済み（ユーザー承認〔HITL〕）。reject 0件。
+>
+> - F-04: 裁定記録を残しつつ参照形式を現行体系へ整合させる方向は req-define 再壁打ち候補（意味判断）
+> - F-05: ユーザー指示により defer 継続（20260901 defer F-12 と同一内容・継続中）
+> - F-06: F-03 と同一ファイル（IR-044）で一括修正の方針判断が未了
+> - F-07: 「関連」節の交叉参照解釈が残り、#3122 修正方針との整合判断が未了
+> - F-08: Decision の歴史記録保持 vs 後継参照注記追加のポリシー判断が未確定
+> - F-09: 決定4 の後継群への搬送記述の有無確認が未了
+> - F-10: 宣言重複の許容性・検査仕様が未確認（意図的な工程群別分割の可能性）
+> - F-13: 読取系 contingency としての意図的記述の可能性があり、規則側の例外定義判断が未了
+> - F-14: 既知 drift 機構（baseline-known。generate_indexes 再生成で解消見込み）
+> - F-15: 恒常契約（029-031）と変更検証手順（032-033）の線引きが要ヒューマンレビュー
+> - F-16: 作業叙述の現行状態記述への書き換えは intake 経由の意味判断
+> - F-17: DEC-027 結合により REQ 行に残すべき境界が要ヒューマンレビュー
+> - F-19: numbering-policy 未精読であり別文書に記録がある可能性
+> - F-21: 類推参照は履歴的文脈に近く範囲外解釈も可能（優先度低）
+> - F-22: 先送り記録の正規配置先規約が存在せず違反確定不能
+> - F-23: 安定契約例外候補（confidence low〜medium）
+> - F-24: baseline 同種参照が多数存在する既知パターン（本件のみ新規 delta）
+> - F-25: 基準行との照合未実施（confidence low）
 
-- スキャン対象: REQ 69 件（現行 55 / retired 14）、Decision 41 件（accepted 34 / superseded 7 / proposed 0 / 欠番 DEC-018）、Design 177 件（draft 実体ゼロ・全件 accepted 相当）、guides 13 件、README 群（root / docs / requirements / decisions / knowledge）、配布物（commands/skills Markdown: 構文・エンコーディング検査 242 ファイル、内容破損検査 212 ファイル）、機械検査スクリプト 10 種（check_integrity / check_command_format / check_extensions / check_distribution_boundary / check_autogen_freshness / check_content_corruption / check_knowledge_docs / check_design_frontmatter ほか）
-- 診断体制: STEP-2 意味診断は 3 診断担当への並列委譲（REQ 体系 / Design / Decision・guides・README）で実施、fan-in で横断矛盾判定・重複排除・既知候補照合を実施。配布物整合性検査（STEP-3-1）は親が逐次実行
-- 検出件数: **25 件**（high 3 / medium 14 / low 8）
-- カテゴリ別内訳: MOVE（Design 分離違反含む）7 / DRIFT 4 / superseded 引用（横断契約矛盾）4 / 配布物（ID 汚染・参照・gh 直呼び）3 / 索引整合 2 / その他（宣言整合・世代境界・採番記録・将来計画境界・guides 導線境界）5
-- 6観点網羅: SPLIT 1（F-15）/ MERGE 0（REQ-014/015/082 分業確認済み）/ MOVE 7 / DUPLICATE 0（行重複定義なし・REQ-014/015/082 分業確認）/ RETIRE 0（全現行 REQ が外部参照 8 以上）/ DRIFT 4
-- high severity 3 件: F-01（REQ-082 が retired REQ-016 を現行所有者として参照）、F-02（配布物に REQ-083 具体参照残留）、F-03（IR-044 の REQ-036-005 準拠引用が現行行と意味不一致）
-
-## 検出事項リスト
-
-### F-01: REQ-082 が retired REQ-016 を現行所有者として参照【high】
-
-- id: F-01
-- category: DRIFT（retired 参照・参照ID整合性）
-- target: docs/requirements/REQ-082.md
-- evidence: 15 行目「caller 統合契約（…）は REQ-014/015/016 が所有し」、50 行目 対象外節「（… REQ-014/015/016）が所有」。retired/REQ-016.md:38-41 は 2026-09-20 に RETIRE（履歴注記「恒常契約は REQ-015 の既存契約が所有する」）。REQ-082 の updated は 2026-09-15 のまま廃止後未更新。シグナル 3（retired 参照 2 箇所 / 廃止後未更新 / REQ-036 のような「retired」明記慣行との不整合）
-- severity: high（retired 文書が現行判断の根拠として引用されている。REQ-001-012/013 抵触）
-- confidence: high
-- source_of_truth: 現行 REQ-082 と retired/REQ-016 の履歴注記を正として判定
-- recommended_route: intake（REQ-082 の所有者表記修正の要件化）
-- ng_classification: pre-existing
-- notes: REQ-015 本体が caller 統合の恒常契約を実際に所有しているかは REQ-016 移行先注記からの推定（REQ-015 本文は未深読み）
-
-### F-02: 配布物に REQ-083 具体参照残留（IR-055 delta・strict）【high】
-
-- id: F-02
-- category: 配布物 ID 汚染
-- target: src/opencode/skills/agentdev-workflow-case-open/references/root-case-and-definition-package.md:49
-- evidence: check_integrity.ts IR-055 delta 検出「New strict violation: REQ-NNNN reference 'REQ-083' detected」。PR #3136（12b92f3a fix(skills): remove concrete REQ IDs from distribution references）で配布 references から具体 REQ ID を除去した変更の残存 1 件
-- severity: high（配布物汚染に近い影響、機械的確定）
-- confidence: high
-- source_of_truth: IR-055 ルール（配布物は REQ-NNNN 参照を含まない）
-- recommended_route: intake（機能的記述への置換の要件化）
-- ng_classification: 今回修正対象（PR #3136 の除去漏れ）
-- notes: なし
-
-### F-03: IR-044 の「REQ-036-005 準拠」引用が現行 REQ-036-005 と意味不一致【high】
-
-- id: F-03
-- category: DRIFT（横断契約矛盾: Design が現行 REQ と矛盾）
-- target: docs/designs/integrity/rules/IR-044-req-spec-boundary-violation-detection.md ↔ docs/requirements/REQ-036.md
-- evidence: IR-044 の 72 行目「…真陽性保護対象から除外する（REQ-036-005）」、79 行目付「…保護対象から除外する（REQ-036-005 準拠）」。現行 REQ-036.md:24 の REQ-036-005 は「検出事項の文言は inspect finding に統一し、検出事項ファイル名は command ごとの接頭辞に従うこと」であり保護除外記録義務を含まない。REQ-036 は 2026-09-25 13:29 更新（コミット 39aa07f3、#3140）
-- severity: high（下位文書である Design ルールが上位の現行 REQ 行と矛盾）
-- confidence: medium
-- source_of_truth: 現行 REQ-036-005 を正として判定（source-of-truth priority）
-- recommended_route: intake（IR-044 側の引用再アンカーまたは Design 自己根拠化の要件化）
-- ng_classification: 今回修正対象（直近の REQ-036 更新由来の未同期の可能性が高い。git 履歴上の行付け替え確認は未実施）
-- notes: F-04/F-06（IR-044 の作業履歴残留）と同一ファイルのため一括修正を推奨
+## 検出事項リスト（defer 残置分）
 
 ### F-04: REQ-082.md:14 の移行経緯記述と phantom 範囲参照
 
@@ -141,32 +114,6 @@
 - ng_classification: 今回修正対象（#3140 由来の直近変更）
 - notes: 複数行 ADF-COVERS 宣言が意図的な分割用途（工程群別）の可能性あり。REQ-036-028〜033 の implementation 宣言は診断並列化の実際の動作変更を伴うため正当な可能性
 
-### F-11: 「次の新規 REQ は REQ-092」の記述が陳腐化（3 ファイル）
-
-- id: F-11
-- category: DRIFT（記述と実態の乖離）
-- target: docs/designs/foundations/numbering-policy.md:65、docs/README.md:15、docs/requirements/README.md:100
-- evidence: 3 ファイルが「REQ-089…再利用しない（次の新規 REQ は REQ-092）」と記述。REQ-092 は 2026-09-24 に作成済み（REQ-092.md:4）で、現時点の次番号は REQ-093。AUTOGEN 管轄外の手書き段落の更新忘れと推定
-- severity: medium
-- confidence: medium
-- source_of_truth: REQ 実ファイルの採番実態
-- recommended_route: intake（3 ファイルの記述更新）
-- ng_classification: pre-existing
-- notes: 意図的に採番時点の記述を固定している可能性は排除できない
-
-### F-12: knowledge README の列挙欠落・件数不一致
-
-- id: F-12
-- category: 索引整合
-- target: docs/knowledge/README.md
-- evidence: README 22-36 行目「13件」+ 13 ファイル列挙に対し、実ファイルは 14 件。powershell-console-stdout-crlf-bash-pipe.md（frontmatter created: 2026-09-24、REQ-056-010 由来）が列挙外。check_knowledge_docs.ts も同一不整合を検出
-- severity: medium
-- confidence: high
-- source_of_truth: docs/knowledge/ の実ファイル一覧
-- recommended_route: intake（README 列挙・件数の更新）
-- ng_classification: pre-existing（2026-09-24 の知識文書追加に追随していない）
-- notes: なし
-
 ### F-13: 配布 reference 中の gh CLI 直呼び記述（IR-053）
 
 - id: F-13
@@ -232,19 +179,6 @@
 - ng_classification: pre-existing
 - notes: DEC-027 が REQ-048 を第一適用対象とし baseline 運用と密接に結合。REQ 行に残すべき境界は要ヒューマンレビュー
 
-### F-18: retired/REQ-016.md・retired/REQ-057.md の frontmatter status 欠落
-
-- id: F-18
-- category: 世代境界（retired メタデータ慣行不一致）
-- target: docs/requirements/retired/REQ-016.md、docs/requirements/retired/REQ-057.md
-- evidence: 両ファイルの frontmatter に status なし（他の retired 12 ファイルは `status: migrated`/`retired` を持つ）。一方で REQ-016.md:38・REQ-057.md:59 の履歴注記は「RETIRE、status: migrated、2026-09-20」と宣言しファイル内で自己矛盾
-- severity: low
-- confidence: medium（REQ-001-010 の必須メタデータは識別子・表題・作成日・更新日のみで status は必須ではないため慣行不一致）
-- source_of_truth: 他 retired ファイルの慣例と各ファイル内履歴注記
-- recommended_route: intake（status: migrated 追加）
-- ng_classification: pre-existing
-- notes: なし
-
 ### F-19: DEC-018 欠番の採番管理での明示記録が見当たらない
 
 - id: F-19
@@ -257,19 +191,6 @@
 - recommended_route: intake（欠番理由の記録追加または既存記録の所在確認）
 - ng_classification: pre-existing
 - notes: なし
-
-### F-20: decisions/README トピック別ビューの superseded 注記不整合
-
-- id: F-20
-- category: README 索引（表記一貫性）
-- target: docs/decisions/README.md:139,143
-- evidence: 141 行目 DEC-005・147 行目 DEC-017 には「superseded by …」注記があるが、139 行目 DEC-002・143 行目 DEC-007 には同種注記がない（同一「配布基盤・ソースモデル」節内の表記ゆれ）
-- severity: low
-- confidence: medium（表記不整合自体は確実、重要度は低）
-- source_of_truth: 同 README 内の注記慣行
-- recommended_route: intake（注記の統一）
-- ng_classification: pre-existing
-- notes: トピック別ビューが AUTOGEN 管理か手書きか未確認
 
 ### F-21: accepted Decision による superseded Decision の類推参照（3 件）
 
@@ -336,13 +257,11 @@
 - ng_classification: pre-existing
 - notes: REQ-030/REQ-061 の該当行との一致度までは照合未実施
 
-## 推奨アクション
+## 推奨アクション（defer 残置分）
 
-- 全検出事項 25 件を `.agentdev/inspect/inbox/` に保存済み。次段は `/agentdev/inspect-promote` による分類（promote/defer/reject）と採用
-- req-define 再壁打ち候補（REQ 構造の本質的再構成を伴う）: F-04、F-05、F-15、F-17（4 件）
-- intake 経由の局所修正候補（UPDATE/MOVE 中心）: F-01〜F-03、F-06〜F-14、F-16、F-18〜F-25（21 件）
-- 一括修正推奨クラスタ: F-03 + F-06（IR-044 同一ファイル）、F-15 + F-16 + F-10（REQ-036/inspect-docs Design の直近 #3140/#3141 由来群）、F-07 + F-08 + F-21（superseded DEC-002/015/017 参照群）
-- 高優先度（high severity）: F-01（REQ-082 所有者表記）、F-02（REQ-083 配布物参照）、F-03（IR-044 引用不一致）
+- defer 18件（F-04〜F-10、F-13〜F-17、F-19、F-21〜F-25）は inbox 残置。次回以降の inspect サイクルまたは intake 経由で再評価
+- req-define 再壁打ち候補（REQ 構造の本質的再構成を伴う）: F-04、F-05、F-15、F-17（4件）
+- promote 採用済み: high severity の F-01 / F-02 / F-03、intake 経由の局所修正候補の F-11 / F-12 / F-18 / F-20（`.agentdev/inspect/promoted/inspect-docs-promoted-20260925T120034Z.md` 参照）
 
 ## 対象外（Out of Scope）
 
@@ -363,3 +282,11 @@
 - 機械フルスキャン: 全 69 REQ frontmatter・全 docs/*.md の REQ 参照走査・参照数集計、全 41 Decision frontmatter、全 177 Design frontmatter・パターンスキャン（将来計画/REQ 混入/Decision 混入/superseded 引用）、README 索引突合
 - 深読み実施: REQ 001/006/036/048/082/087/092（+008 部分、+retired 013/016）、Design 8 件（README / v4-lifecycle-state-machine / inspect-docs / workflow-skill-model / harness-separation-model / index-auto-generation / req-health-metrics / v4-migration-and-release）、Decision 010/013/022（+grep 文脈検証 007/012/016/017/019/027/030/032/036/037/038/039）、guides README/command-selection/quickstart/charter（+consumer-project-setup 部分、diagnostics-and-maintenance 部分）
 - 既知の走査限界: 範囲参照表記（例: 「REQ-034-031〜034」）は始点のみ存在検証。REQ 内の Markdown URL リンク切れは未検査。177 Design 中 169 件は frontmatter/パターンスキャンのみ
+
+## 審議記録（参照）
+
+- 暫定分類（25件: promote 7 / defer 18 / reject 0）→ ユーザー承認（HITL）により確定（--auto なし、自動 promote 0件）
+- promote 7件（F-01 / F-02 / F-03 / F-11 / F-12 / F-18 / F-20）はユーザー明示承認により採用確定し、`.agentdev/inspect/promoted/inspect-docs-promoted-20260925T120034Z.md` へ保存（元 evidence は原状で保持）
+- F-05 / F-07 はユーザー指示により defer 継続。その他の FID（F-04 / F-06 / F-08〜F-10 / F-13〜F-17 / F-19 / F-21〜F-25）はユーザー承認範囲外のため承認を新設せず defer（inbox 残置）
+- reject 0件
+- 旧 defer 残置分（20260901 / 20260914 の 2ファイル、計5件）は本 run では一切変更していない（原状維持）
