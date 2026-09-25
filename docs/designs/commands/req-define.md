@@ -2,7 +2,7 @@
 title: req-define Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-20"
+updated: "2026-09-26"
 ---
 <!-- ADF-COVERS(implementation): REQ-008-018, REQ-008-019, REQ-008-020, REQ-008-021, REQ-008-023, REQ-008-024, REQ-008-025, REQ-008-026, REQ-008-027, REQ-008-028, REQ-008-029, REQ-008-030, REQ-008-031, REQ-008-034, REQ-008-035, REQ-008-038, REQ-008-039, REQ-008-040, REQ-008-042, REQ-008-043, REQ-008-044, REQ-008-045, REQ-008-046, REQ-008-050, REQ-008-051, REQ-008-054, REQ-008-058 -->
 <!-- ADF-COVERS(design): REQ-008-061, REQ-008-062 -->
@@ -272,6 +272,14 @@ req-define 側は入力フィールドの選択と値の生成のみを規定し
 Design operation の旧別名（`spec-create` / `spec-update` / `spec-append`）は出力も受理もしない（REQ-008-058）。
 `target_area`、`placement`、`anchor` 等のフィールドを持たない旧形式 draft は consumer は入力として拒否しない。
 操作契約の正規定義は [artifact-contracts.md](../responsibilities/artifact-contracts.md)「Design operation enum」を参照。
+
+### finding 由来 draft の target_design 実パス実在確認
+
+finding 由来の draft で design 操作を artifact_actions へ転記する前に、target_design.domain / slug の
+宣言と実配置（docs/designs/{domain}/ 配下の実ファイル）の一致を実パス実在確認（grep による本文一意性
+確認を含む）で検証する。宣言と実配置が不一致の場合は、slug・該当行番号・文言の3点一致による機械的照合で
+実配置を正と判定し、不在パスを正として採用しない（配置移動済み文書を旧配置の domain で参照する finding の
+機械的転記による誤パス更新の防止）。
 
 ## draft-data artifact_actions フィールド形式
 
