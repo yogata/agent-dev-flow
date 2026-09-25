@@ -149,3 +149,21 @@
 
 ---
 
+## 2026-09-26: targeted docs guard は docs/knowledge/README.md を検査対象外とし、knowledge README 整合は check_knowledge_docs.ts が正規担当
+
+- **問題事象**: check_changed_docs.ts（targeted docs guard）に --files で docs/knowledge/README.md を明示指定しても files_checked に含まれず、knowledge README 列挙整合の検査が guard 側では実施されない
+- **発生局面**: case-run 委譲（DEL-3146-1）での targeted docs guard 実行時（Case #3146、PR #3152）
+- **検知方法**: guard --json 出力の files_checked に docs/knowledge/README.md が含まれないことの確認（failures/warnings 0 件の中身の確認）
+- **根本原因**: targeted docs guard の検査対象種別に docs/knowledge/ は含まれず、knowledge README の列挙整合は check_knowledge_docs.ts が正規担当という検査責務分離になっている
+- **自律対応内容**: guard とは別に check_knowledge_docs.ts を実行し、検出構造違反 0 件（readme-listing-mismatch 解消）を確認。case-close STEP-3 でも 4 ファイル明示指定 guard と check_knowledge_docs.ts の両立で再確認
+- **ユーザー確認の有無**: なし（観測・手順遵守）
+- **Decision/REQ/spec影響**: なし（既存の検査責務分離の観測であり契約変更なし）
+- **横展開観点**: docs/knowledge/README.md を変更する Case では targeted docs guard のみで合格判定せず check_knowledge_docs.ts の実行が必須。検査結果の解釈時に両者の担当範囲の違いを認識する必要がある
+- **再発条件**: docs/knowledge/README.md 変更を含む Case で targeted docs guard のみを検証根拠とした場合
+- **予防策候補**: knowledge README 変更 Case の検証手順へ check_knowledge_docs.ts 実行の明示（PR 本文へ記録済み）
+- **想定反映先**: agentdev-doc-diagnostics（検査ルーティング知識）、case-run / case-close の docs 検証手順
+- **関連**: Case #3146、PR #3152、DEL-3146-1、check_knowledge_docs.ts、check_changed_docs.ts
+- **タグ**: #targeted-docs-guard #knowledge-readme #checker-responsibility #case-run
+
+---
+
