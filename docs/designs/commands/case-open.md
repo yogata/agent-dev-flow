@@ -2,7 +2,7 @@
 title: case-open Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-23"
+updated: "2026-09-26"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-004, REQ-030-005, REQ-030-006, REQ-030-007, REQ-030-008, REQ-030-009, REQ-030-010, REQ-030-011, REQ-030-015 -->
@@ -100,6 +100,16 @@ REQ 行追加を伴う Definition Package の生成時、検証スコープポ�
 - 検出源は draft の artifact_actions と未クローズ Case 群の宣言に限定し、合意済み宣言以外の一般的な変更影響探索・依存関係探索を行わない（REQ-021-014、REQ-030-013）。
 - Epic を構成する投入では同一投入内（Epic 配下 Wave 内）の変更対象ファイル重複検出を case-ready の前置検出（REQ-035-012）へ委譲し、二重検査としない。Epic をまたぐ Case 間の重複のみを検出対象とする（REQ-030-014）。
 - 警告は Root Case の確立を自動阻止せず、警告の提示記録を完了報告へ含める。
+
+### 意味変更行の design 対応事前確認
+
+Definition Package の生成・転記（STEP-2 / STEP-3）は、対象要件行のうち既存行の意味変更を含む場合、
+agentdev-traceability の coverage --req による当該行の design 対応有無の事前確認を実施する。
+事前確認で design 対応が欠落する意味変更行を検出した場合は、当該行の design 対応を
+artifact_actions（artifact: design）へ組込んだ上で合意を完了する。事前確認を省略した Case は
+case-ready の lifecycle gate completeness（fail-closed）で停止し得る（missing-design 既知債務の範囲で
+発生余地がある）。missing-design 0 件ゲートが増分ベース（新規行のみ）であることへの予防手順として
+位置づける。
 
 ## review_dispositions の消費と証跡転記
 
