@@ -131,3 +131,21 @@
 
 ---
 
+## 2026-09-26: bash の node -e への正規表現 inline 記述は Git Bash の escape 解釈で破損する（checker 出力解析は一時スクリプトファイル経由が確実）
+
+- **問題事象**: bash から `node -e` で正規表現を inline 記述した場合（`replace(/\\/g,'/')` 等のバックスラッシュを含むパターン）、Git Bash の escape 解釈により意図しない文字列として node へ渡り、解析処理が破損する
+- **発生局面**: case-run 委譲（DEL-3142-1）での checker stdout 解析時（PR #3154）
+- **検知方法**: checker 出力の解析結果が期待と不一致となることで発覚
+- **根本原因**: Git Bash は引数内のバックスラッシュを escape 解釈するため、shell 引数経由で正規表現リテラルを inline 記述すると、node に到達する時点でパターンが変質する。worktree-operations.md「main root 実体 + --root 指定」節の backslash 警告と同根の shell 解釈起因
+- **自律対応内容**: checker stdout の解析は、node スクリプトを project root 内の一時ファイルへ配置して実行する方式へ切替（scripts/README.md の置き場所指針に従い、project root 内限定・commit 対象外・検査後削除を実施）
+- **ユーザー確認の有無**: なし（自律解決）
+- **Decision/REQ/spec影響**: なし（既存指針の実践であり契約変更なし）
+- **横展開観点**: checker 出力の機械解析を行う全 workflow（case-run / case-close / inspect 系）で同型破損が起こり得る。一時スクリプトファイル経由の実行が標準手段
+- **再発条件**: bash から `node -e` 等の shell 引数経由でバックスラッシュを含む正規表現を inline 記述した場合
+- **予防策候補**: 正規表現を含む解析は shell 引数に inline 記述せず、project root 内の一時スクリプトファイルへ配置して実行し、検査後に削除する
+- **想定反映先**: worktree-operations.md「書込み guard 運用指針」節（標準手段切替の知見拡張候補）
+- **関連**: Case #3142、PR #3154、DEL-3142-1、scripts/README.md「検査入力 JSON の置き場所指針」
+- **タグ**: #git-bash #escape #node-e #temp-file #checker-output
+
+---
+
