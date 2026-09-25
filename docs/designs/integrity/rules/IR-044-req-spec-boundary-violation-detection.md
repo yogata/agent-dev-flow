@@ -69,13 +69,13 @@ docs-check 側での機械免除は行わない（REQ-010-002 準拠）。
 回帰テストで既知の true positive（Design 詳細が REQ に残留している実例）が META 規則行 exemption により誤って免除されないことを検証する（retired REQ-028-009 準拠）。
 保護対象の真陽性は件数・内容を規定する Design 詳細の残留であり、META 規則行（責務範囲規定）には該当しないことをテストで固定する。
 
-**是正済み経緯（保護対象から除外）**: REQ-006-082、REQ-010-008 は #1109 PR で Design 詳細が REQ から Design へ移行済みであり、真陽性保護対象から除外する（REQ-036-005）。
+**是正済み経緯（保護対象から除外）**: REQ-006-082、REQ-010-008 は #1109 PR で Design 詳細が REQ から Design へ移行済みであり、真陽性保護対象から除外する。
 当該 REQ は Design 詳細を残留させないため META 規則行 exemption の誤免除検証の根拠とならない。
 保護対象の真陽性は、件数・内容を規定する Design 詳細の残留実例に限定する。
 この明記により RU-0011（検出ロジック改良）実施前に同箇所を根拠としたテスト設計の前提崩壊を防ぐ。
 REQ-001-049、REQ-003-007 は Step 番号直接参照から機能名・段階名参照へ是正済みであり、真陽性保護対象から除外する。
 当該 REQ は Step 番号直接参照を残留させないため、Step 番号検出の回帰テスト根拠とならない（REQ-001-049 の case-open 由来）。
-true positive として新たに分類し Design 詳細を切り出した件は、対象 REQ-ID、切り出し先 Design、command reference または skill reference の区別、是正根拠 PR 番号を本欄へ追記し、保護対象から除外する（REQ-036-005 準拠）。
+true positive として新たに分類し Design 詳細を切り出した件は、対象 REQ-ID、切り出し先 Design、command reference または skill reference の区別、是正根拠 PR 番号を本欄へ追記し、保護対象から除外する。当該追記記録様式は本ルール（IR-044）の検出仕様として自身が規定する。
 #1335（RU-0011）で true positive に分類し是正した件: fixture copy のミラーリング実装詳細（Design `integrity-rule-catalog.md`「regression test fixture mirroring 方式」へ切り出し、REQ 側は外部契約の要約へ置換）、REQ-006-099（Step 番号直接参照 `Step 1-5, 7-8`/`Step 6` をフェーズ名参照へ置換、REQ-001-049 準拠）、REQ-036-004（テストファイルパス `scripts/tests/check_integrity.test.ts`/`scripts/check_integrity.test.ts` を Design `integrity-rule-catalog.md`「check_integrity test suite 責務分担」へ切り出し済み、REQ 側は外部契約の要約へ置換）。
 当該 REQ は Design 詳細を残留させないため、回帰テストの真陽性保護根拠とならない。
 
