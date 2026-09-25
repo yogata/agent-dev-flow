@@ -50,7 +50,7 @@
 - **PR URL 受領**: 実行担当サブエージェントが直接 PR 作成を行い、PR URL を委譲 result として返却する（PR URL フォールバック検索は使用しない）
 - **case-run 本体は実装方針を生成・審査しない**: 実装方針の形成、adversarial-review 呼出、結果反映は委譲内で adapter の委譲契約に従い、最初の実装変更前に実施する。case-run 本体が実装方針を生成、保持、審査するステップを新設しない。委譲 result（4状態）のみで委譲内の結果を受領する
 - **adapter 委譲内 adversarial-review**: 発動条件判定と review 呼出は adapter 委譲内で実行担当サブエージェントが分離して実施する。default-on、skip 条件（実装方針が自明の場合）該当時は省略して従来フローを継続、ユーザー明示指定時は強制発動。発動条件の判定は Issue 本文の実行契約（review 発動契約）を正とし、Issue 本文が非発動を記す場合、その契約に従い非発動とし、非発動の判定理由と代替自己反証（却下案・緩和策・unresolved なしの確認）を PR 本文へ必須記録する（silent skip の防止）。実装方針限定、blocked 遷移（(1) 既確定文書の変更・追加・撤回が必要、(2) 要件・仕様問題の検出、(3) unresolved な本質的争点またはユーザー判断事項が残る）の詳細は `agentdev-case-run-execution-adapter` 参照
-- **background 委譲の起動消失の回復**: background 委譲の起動直後消失を検知した場合、durable state（worktree の git status、PR 存在、Issue コメント）で実行の帰属を確認する。実行未試行と判定した場合は同期実行による再委譲を行い、実行中断と判定した場合の継続判断も当該 durable state に基づく。同期実行への切替は消失検知時のフォールバックに限定する。実行並列上限（共有 active Issue task 枠）は case-auto orchestration stage 3 が単一所有する（詳細は `agentdev-case-run-execution-adapter` 参照）
+- **background 委譲の起動消失の回復**: background 委譲の起動直後消失を検知した場合、durable state（worktree の git status、PR 存在、Issue コメント）で実行の帰属を確認する。実行未試行と判定した場合は同期実行によらず background での再委譲（親 orchestration が所有する起動間隔契約に従う）を行い、background 再委譲の起動失敗が継続する場合は、Design が所有する再試行計上契約に基づき delegation-unavailable として再開可能な停止報告へ確定する。実行中断と判定した場合の継続判断も当該 durable state に基づく。実行並列上限（共有 active Issue task 枠）は case-auto orchestration stage 3 が単一所有する（詳細は `agentdev-case-run-execution-adapter` 参照）
 
 ### Result
 

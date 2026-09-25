@@ -52,6 +52,7 @@ bg task 破棄時の状態別回復とコンフリクト解消モデルは協調
 stage 再構成規則の正本は case-auto Design「ドラフト間並列実行モデル」節と `agentdev-workflow-case-auto` SKILL.md「再開プロトコル」が保持し、本ファイルは正本を持たない。
 
 - 中断回復後に再開する場合、現在 stage を stage cursor ではなく永続状態（起動時対象集合と各対象の正規状態）から最も早い未収束 stage として再構成し、当該 stage の全対象収束（fan-in）へ復帰する
+- 回復代行によらず子 task へ再委譲する場合（実行未試行判定時等）、再委譲の形態は同期実行によらず staggered background fan-out とし、並列性の回復を resume の反復で追求する。background 再委譲の起動失敗が継続する場合は、Design が所有する再試行計上契約に基づき delegation-unavailable として再開可能な停止報告へ確定する（case-auto Design「回復後の再委譲形態」節）
 - 回復した単一対象を後続 stage へ先行させない。他対象が当該 stage で未収束である間は、回復済み対象も次 stage を開始しない
 - 回復完了済み対象は当該 stage の収束判定に含め、完了済み対象を再実行しない
 
@@ -87,10 +88,10 @@ orchestration stage モデルの 4-stage 化により、stage 1（case-open / ca
 Epic Wave 並列委譲で同種の子 task 破棄が発生した場合も、本回復プロトコルを per-Wave で適用できることを否定しない。
 
 Epic Wave 並列委譲では複数の子 task が同時に起動し、それぞれが独立した worktree を持つ。
-本プロトコルを並列委譲へ拡張する場合、各並列子 task の worktree を個別に管理し、中断検知を各 worktree で実施する必要がある。
+本プロトコルを並列委譲環境へ適用する場合、各並列子 task の worktree を個別に管理し、中断検知を各 worktree で実施する必要がある。
 並列委譲の集約原則に従い、各子 task の回復結果を case-auto 親ループが集約する。
 
-拡張の検証、実装は本ファイルの対象外とし、将来の Decision、REQ で判断する。
+Epic Wave 並列委譲の実行制御（Wave 反復制御、共有 active Issue task 枠、fan-out/fan-in）は case-auto orchestration stage 3 が単一所有して実装済みであり、本節は実装済みの並列委譲環境で本回復プロトコルを適用する際の worktree 管理・中断検知・回復集約の原則を示す。
 
 ## 前提と完了の扱い
 
