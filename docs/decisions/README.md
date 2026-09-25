@@ -56,6 +56,7 @@
 | DEC-040 | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化） | accepted | 2026-09-22 |
 | DEC-041 | Wave 構成純度と実行並列上限の単一所有 | accepted | 2026-09-23 |
 | DEC-042 | case-auto 最大並列維持と同期逐次フォールバック禁止 | accepted | 2026-09-24 |
+| DEC-043 | case-ready 実行構造判断への Jev 最終判断採用（Stage 2: 閾値ルーティング） | accepted | 2026-09-26 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -102,6 +103,7 @@
 - [DEC-040](DEC-040.md)（typesafe/Jev 先行評価の採用（Stage 1: 観測可能化））
 - [DEC-041](DEC-041.md)（Wave 構成純度と実行並列上限の単一所有）
 - [DEC-042](DEC-042.md)（case-auto 最大並列維持と同期逐次フォールバック禁止）
+- [DEC-043](DEC-043.md)（case-ready 実行構造判断への Jev 最終判断採用（Stage 2: 閾値ルーティング））
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
