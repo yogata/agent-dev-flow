@@ -1,0 +1,71 @@
+{
+  "observationId": "case-ready-3139-standard-epic",
+  "schemaVersion": 1,
+  "workflow": "case-ready",
+  "judgmentKind": "standard-epic-determination",
+  "subject": "Root Case #3139 の実行構造 Standard/Epic 帰属（OU-001 単独根）",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "sourceRevision": "39aa07f3b18b8a999bb9c48654b256f7ea3395d9",
+  "outcome": "completed",
+  "durationMs": 794,
+  "resolvedModel": "typesafe-ai/jev",
+  "inputTokens": 1120,
+  "inputs": {
+    "requestDigest": "1cd170584773a90ab2e83d5c304ae4893f994d12b27afe331fc30688d2f7447d"
+  },
+  "judgments": [
+    {
+      "judgmentId": "q1-structure",
+      "questionForm": "choice",
+      "jevResult": "Standard",
+      "probabilityDistribution": {
+        "Standard": 1,
+        "Epic": 0
+      },
+      "confidence": 0.995,
+      "llmFinalJudgment": "Standard。連結成分が OU-001 1件のみの単独根であり、execution-unit-construction Design の決定的ルール「単独根は Epic 化せず Standard flow とする」により Standard flow 確定。Jev 結果（Standard、confidence 0.995）と一致",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "q2-dependency",
+      "questionForm": "score",
+      "jevResult": 0.02,
+      "probabilityDistribution": {
+        "関連（実行上の依存なし）": 0.98,
+        "弱（順序推奨のみ・並列可能）": 0.02,
+        "必須（一方なしでは成立しない）": 0
+      },
+      "confidence": 0.995,
+      "llmFinalJudgment": "関連（実行上の依存なし）。OU が 1 件のみで depends_on: [] のため operation_units 間の必須依存は存在しない。Jev 結果と一致",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "q3-size",
+      "questionForm": "score",
+      "jevResult": 0,
+      "probabilityDistribution": {
+        "推奨範囲未満（1-2件）": 1,
+        "推奨範囲（3-10件）": 0,
+        "上限超過（11件以上）": 0
+      },
+      "confidence": 0.995,
+      "llmFinalJudgment": "推奨範囲未満（1-2件）。仮に Epic 化しても子 Issue 数は 1 件で推奨範囲（3-10）を下回る。Jev 結果と一致",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "q4-coherence",
+      "questionForm": "score",
+      "jevResult": 1.99,
+      "probabilityDistribution": {
+        "機能的主題を欠く": 0,
+        "部分的に一貫": 0,
+        "単一の機能的主題を成す": 1
+      },
+      "confidence": 0.995,
+      "llmFinalJudgment": "単一の機能的主題を成す。OU-001 は inspect-docs 意味診断並列化の単一主題で構成される。Jev 結果と一致",
+      "llmTreatment": "unchanged"
+    }
+  ],
+  "recordState": "complete"
+}
