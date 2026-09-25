@@ -90,6 +90,12 @@ child テンプレートでは「該当なし」を使用せず、親 Epic Issue
 - feature、bug、epic テンプレート: 「テスト戦略」セクション（epic は「完了条件」セクション）の直後、「補足情報」セクションの前に配置する
 - child テンプレート: 「テスト戦略」セクションの直後、「補足情報」セクションの前に配置する
 
+evidence 記録規約（prune 後耐久識別子の併記）: evidence.path には promote 済み成果物等の削除可能性が
+あるパスを記録する場合、path 単独に依存せず、prune 後も識別可能な代替識別子（RU 番号、learning タイトル、
+関連 Case 番号）を併記する。併記により、backlog-review の prune 記録（成功成果物削除の記録）との突合で
+当該 path の不在が prune 済みか欠落かを判別できる。遡及書換えは行わず、本規約は適用後の新規記録から
+効力を持つ。backlog-review 側の prune 記録形式との突合手順は backlog-review の手順資料が所有する。
+
 ### child 固定内容（AG-009）
 
 child テンプレートの「レビュー判断」セクションは親 Epic Issue 参照のみを記載する。
