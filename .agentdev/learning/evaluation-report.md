@@ -1,396 +1,201 @@
 # 評価レポート
 
 ## メタデータ
-- **実行日時**: 2026-09-24 (JST, learning-promote STEP-1〜STEP-5〔自律確定まで〕完了版)
-- **実行コンテキスト**: /agentdev/backlog-auto stage-2 learning サブシステム。STEP-6（promoted 生成・deferred 移動・prune・git 操作）と HITL 提示は親 orchestration が実行するため本実行では実施しない
-- **対象エントリ数**: 17件（inbox: 17件, deferred: 133見出し走査・候補本文読込 約30エントリ）
-- **問題クラス数**: 16（複数エントリクラスタ3 + 単独クラスタ13。観察系2件を含む）
-- **source revision**: 68e75cef
-- **入力 digest**: inbox.md sha256=44bbe7222943b166eedbb5dee813f619f9a6eaa13967189213313ac3101703bf / deferred.md sha256=31605e181fe2a227f31a472675e30402537460566397784706e0affead4eab92
-- **STEP-5 確定内訳**: 自律確定 16件（promote 8問題クラス9エントリ / duplicate 5 / deferred 3）、HITL 移送 0件
+- **実行日時**: 2026-09-25（STEP-4 accepted findings 修正版）／2026-09-25（STEP-5 判定確定・promoted 成果物生成）
+- **対象エントリ数**: 18件（inbox: 18件、deferred: 130エントリ中、同一クラス照合3件を確認）
+- **問題クラス数**: 1（未分類16エントリ含む）
+- **確定状態**: STEP-6 永続化完了（2026-09-25・ユーザー明示要求により実行）。promoted成果物11件生成済み。gh66 learning固有余部をdeferred.mdへ追記済み、inbox.md はヘッダーのみへクリア済み（staged 12件・duplicate 5件のpruneを含む）。git commit/push 実施済み
 
-## STEP-1 読込記録
+## STEP-4 修正記録
 
-- inbox.md 17エントリを全読込・正規化済み（全エントリ新13フィールドフォーマット。旧5フィールドからの変換は不要であった）
-- deferred.md は2フェーズ読込: 第1フェーズで grep により「## 」見出し133行とタグ行127行をインデックス化（分離インデックスファイルは作成しない）。第2フェーズで候補選択（タグ一致・見出しトークン一致・常時直近20エントリ）により候補本文を読込。候補0件のエントリは存在せず（直近20常時候補）、全面読みフォールバックは不要であった
-- 読込した候補本文（主なもの）: baseline分類の乖離(L49), L-010 ハーネス制約委譲(L221) と同根の L-004 の存在, wave5 worktree 隔離違反(L661〜683), PowerShell gh encoding(L767), IR-055 placeholder(L941), bun install gitignore(L1349), check_integrity レポート後始末(L1541), traceability 宣言網羅性(L1565), ADF-COVERS 宣言配置(L1585), agentdev_gh pr_create invalid-input(L1826), ng-baseline 削除(L1907), case 2796/2797/2799/2805 系(L2005〜L2052), worktree 並行書き込み(L2056), agentdev-gh issue_update state 変化(L2080), pr 検出(L2101), case 2908 traceability 誤解釈(L2143), os.tmpdir 誤検出(L2162), docs_chore unclassified(L2200), frontmatter updated(L2219), BASELINE_CATEGORIES(L2295), fixture REQ ID(L2314), Definition 変更テスト陳腐化(L2333), Wave 並列依存(L2352), カタログ欠番(L2371), bun run Module not found(L2389), textlint guard TEMP(L2410), spawn timeout(L2431), fixture 吸収節(L2452), 張替えリンク(L2473), bun test stderr(L2489), write guard(L2510)
+- **Class2分割**: Case #3123（対象REQ行のDesign対応事前確認欠落）とCase #3113（sidecarのcomponent対応誤り）は、根本原因・再発条件・予防策が異なる。前者はcoverage --reqによる確認と欠落時のartifact_actions組込み、後者は宣言追加前のcomponent/sidecar対応一覧確認が予防策であり、三要素が一致しない。各1件のため最小クラスタサイズ（2件）未満となり未分類へ移動。
+- **Class3分割**: 測定内容の非対称（候補検証の有無・入力同一性）とLLM推論の非決定性は原因と予防策が異なる。前者は測定設計の対称性確認、後者は検出差分の正当理由付けであり、各1件のため未分類へ移動。
+- **Class4の単独化**: deferredの「行移動系 baseline delta」（2026-08-09）はcheckerのbaseline行位置管理であり、inspect findingのdomain鮮度とは根本原因・再発条件・予防策が異なる。同一クラス対応を解除し、domain鮮度1件を未分類へ移動。
+- **未分類件数**: 前版の10件は誤り（前版の一覧は11件）。上記5件の移動を反映し、未分類は16件。
+- **算術修正**: 前版Class2の各軸（3+4+3+5+3+3+4+4）は29であり、記載の30/40は誤り。分割後、各エントリを個別評価。
+- **既存文書との照合**: REQ-036-032（`docs/requirements/REQ-036.md:51`）はfinding差分全件への正当理由付けを既に規定するため、LLM非決定性エントリを既存契約の実証（duplicate）とした。一方、測定内容の対称性は同要件に明記されず、真のギャップとして残す。`docs/designs/responsibilities/custom-tool-contracts.md:86` はJevの2段階書込みと `llmFinalJudgment` / `llmTreatment` 追記完成modeを既に規定するため、Design記述欠落は主張できない。入力schema表示と実装の乖離の処分はこの時点では未決とした（STEP-5で既存対策の更新として確定。「判定サマリ（STEP-5 確定版）」参照）。
+- **STEP-5先行記載の除去**: STEP-4時点で、前版の確定済み表現、自律確定記録、promoted成果物名、prune実施済み主張を除去し、その時点では全て暫定案として記載した。本節および「問題クラス一覧」「未分類」「全体傾向」「Decision候補除外記録」はSTEP-4時点の記録であり、全項目はその後のSTEP-5で確定済みである（確定内容は「STEP-5 判定確定記録」「判定サマリ（STEP-5 確定版）」「HITL 承認結果」を参照）。
+- **Decision除外範囲の修正**: 全項目を一括除外せず、運用手順追加が主な処分区分5候補のみを対象とする。Design候補は一括除外しない。
 
 ## 問題クラス一覧
 
-### 問題クラス1: agentdev_gh issue_list の全件走査（フィルタ未絞込）
-- **根本原因**: issue_list は filter に一致する Issue をページング全走査するため、state/search を絞らずに呼び出すと大規模リポジトリで安全ページ上限に到達する（呼出側の使い方）
-- **再発条件**: Issue 数が大きいリポジトリで issue_list を state なし・広義 search で呼び出した場合
-- **予防策**: 呼出側義務として絞り込みクエリ（state/search/labels）を必須化、上限到達時は contingency 参照
+### 問題クラス1: write ツールによる workspace 外一時ファイル書込みの guard ブロックと標準手段切替
+
+- **根本原因**: repo側write guard（fail-closed）はproject root外の書込みを一律ブロックし、harness環境情報のtempディレクトリ許可表示とは独立に判定する。機械的検査エンジンのREADMEに検査入力JSONの置き場所指針が定められていない。
+- **再発条件**: workflowがharness提示のworkspace外tempへwriteツールで一時ファイルを書き込む場合に再発。
+- **予防策**: case-open scripts/README.mdへの置き場所指針（workspace外temp禁止、一時ファイルはproject root内〔worktree配下一時パス・gitignore領域〕に限定、検査後削除）と、worktree-operations.md「書込み guard 運用指針」へのworkspace外ブロック知見（project root内配置への切替）の集約を候補とする。guardブロック後の別API経路（node writeFileSync等）によるworkspace外書込みは迂回として採用しない。
 
 #### 8軸評価スコア
+
 | 軸 | スコア | 判定理由 |
 |---|---|---|
-| 発生件数 | 1/5 | inbox 1件のみ |
-| 影響度 | 2/5 | 再試行で解消、検出自体は継続可能 |
-| 横展開性 | 4/5 | 大規模リポジトリの全 agentdev_gh 呼出に共通 |
-| 反映先明確度 | 5/5 | REQ-092（2026-09-24 作成）が呼出側規律を要件化済み |
-| 自動化適性 | 3/5 | 呼出規律の運用化が必要 |
-| プロジェクト固有知識再利用性 | 3/5 | |
-| 再発可能性 | 2/5 | REQ-092 運用化で低減見込み |
-| 費用対効果 | 4/5 | 規律文書の整備のみ |
-| **加重合計** | **24/40** | |
+| 発生件数 | 4/5 | inbox 2件（Case #3101・#3139）+同一クラスと確認したdeferred 3件（リポジトリ外temp書込みブロック〔2026-08-15移動〕、OS一時ディレクトリのproject root外判定〔2026-09-19〕、承認済みtempを含むproject root外のfail-closed block〔2026-09-20〕）=5件。基準4は5–7件。 |
+| 影響度 | 2/5 | 代替手段への切替で完結し、データ破壊なし。 |
+| 横展開性 | 4/5 | worktree運用・機械的検査実行全体で発生し得る。 |
+| 反映先明確度 | 5/5 | 対象ファイル・注記内容までinboxで特定済み。 |
+| 自動化適性 | 2/5 | guard自体は正しく動作し、主な候補は文書注記。 |
+| プロジェクト固有知識再利用性 | 4/5 | Windows worktree運用固有の知見。 |
+| 再発可能性 | 4/5 | harness提示tempへの書込みを試みるたびにブロック。 |
+| 費用対効果 | 4/5 | 注記追記は低コスト。 |
+| **加重合計** | **29/40** | 4+2+4+5+2+4+4+4=29。 |
 
-- **推奨処分案**: duplicate — REQ-092-001（広範 filter に search 併用必須）・REQ-092-003（上限到達時 contingency 参照）が本エントリの学習内容を恒久契約としてすでに包含する。E1 の予防策候補（workflow reference への明記）は REQ-092 適用範囲の運用文書（issue-operation-safety.md）整備事項であり、本 entry からの新規昇華は不要
-- **エントリ一覧**: agentdev_gh issue_list の全件走査で safety page limit に到達 [inbox]
+- **処分（STEP-5 確定）**: 5 既存対策の更新（fix gap）。worktree-operations.md「書込み guard 運用指針」の集約範囲にworkspace外writeブロック事例がなく、case-open scripts/README.mdに検査入力の置き場所指針がない。成果物 `existing-countermeasure-update-worktree-write-guard-temp-path.md` 生成済み。
 
-### 問題クラス2: PowerShell コンソール標準出力の CRLF が bash 行指向処理を破壊
-- **根本原因**: [Console]::WriteLine の CRLF 出力が LF 前提の bash パイプ（base64 -d 等）と不整合。末尾行のみ成功するため検出が遅延する
-- **再発条件**: PowerShell 標準出力を bash 側の行指向ツールへパイプする全処理
-- **予防策**: [Console]::OpenStandardOutput() + LF 付きバイト直書きを標準手段化
+#### エントリ一覧
+- 2026-09-20頃: 横断依存検査の検査入力JSONがworkspace外書込みでguardブロックされworktree内一時パスへ切替（Case #3101）[inbox]
+- 2026-09-25: writeツールのworkspace外一時ファイル書込みguardブロックはnode writeFileSync経由でも解消可能（Case #3139）[inbox]
+- 2026-08-15移動: ハーネスWriteツールのリポジトリ外temp書き込みがdistribution-boundary-guardでブロック（deferred.md:814）[deferred]
+- 2026-09-19: OS一時ディレクトリもtextlint guardのproject root外判定でfail-closedブロック（deferred.md:2320）[deferred]
+- 2026-09-20: 承認済みtempを含むproject root外へのwrite tool書込みをguardがfail-closed block（deferred.md:2402）[deferred]
 
-#### 8軸評価スコア
-| 軸 | スコア | 判定理由 |
-|---|---|---|
-| 発生件数 | 1/5 | inbox 1件 |
-| 影響度 | 2/5 | 14変数中13エントリのデコード失敗だが fix-and-reverify で解消 |
-| 横展開性 | 4/5 | Windows + PowerShell + bash 連携の全局面 |
-| 反映先明確度 | 5/5 | windows-powershell-bulk-io-corruption.md（隣接系統）と本 Case 知識文書に反映経路が明確 |
-| 自動化適性 | 3/5 | 手順知識として標準化可能 |
-| プロジェクト固有知識再利用性 | 4/5 | Windows 環境運用の中核的落とし穴 |
-| 再発可能性 | 3/5 | PowerShell→bash パイプは頻出 |
-| 費用対効果 | 4/5 | 知識追記のみで予防可能 |
-| **加重合計** | **26/40** | |
+上記deferred 3件は根本原因（project root外書込みをguardがfail-closedで拒否）、再発条件（一時ファイル等のproject root外書込み）、予防策（root内配置・標準手段への切替）の一致を確認した。今回、deferredの移動・pruneは行わない。
 
-- **推奨処分案**: project knowledge（category 4）— 既存知識文書 windows-powershell-bulk-io-corruption.md は「一括読み書きによるファイル破壊（cp932・Set-Content CRLF）」を対象とし、コンソール stdout パイプ経路の CRLF 問題（WriteLine → OpenStandardOutput LF バイト直書き）は未カバー。当該文書はファイル I/O 系にスコープを限定した文書であり手順の不備ではなく、本件は別面（stdout パイプ）の新規隣接知見であるため category 4（新規知識化）とし、category 5（既存文書の不備）としない。反映先の具体選択は req-define が確定する
-- **既存対策照合**: windows-powershell-bulk-io-corruption.md（ファイルI/O系のみ・本件経路は未 coverage）/ supervisor-bridge-credential-supply.md（base64 ASCII stdout の回避実例あり、WriteLine CRLF の一般化記載なし）
-- **エントリ一覧**: PowerShell WriteLine の CRLF 出力が bash パイプ受信の行指向処理を破壊する [inbox]
+### 未分類
 
-### 問題クラス3: worktree での checker 系検査の junction 未伝播環境由来 NG の由来分類
-- **根本原因**: .opencode/plugins 等の junction が worktree に未伝播の構造的制約により、projection 系検査が worktree では不足状態を正しく報告する（誤検出ではなく環境差の正検出）
-- **再発条件**: worktree cwd で check_integrity（source profile）等の projection 系検査を実行した場合
-- **予防策**: main root 再実行との突合による由来分類、環境ラベル記録、worktree 内結果と main 実体結果の分離記録
+以下16件は単独エントリのため問題クラスを形成しない（最小クラスタサイズ2件）。以下の各項はSTEP-4時点の暫定状態を記録した過去の記録であり、全項目はSTEP-5で確定済みである。「暫定:」「未決（HITL）」の表現はいずれも当時の状態を記録したものであり、現在未決の項目は存在しない。「全体傾向」「Decision候補除外記録」もSTEP-4時点の所見である。処分の確定結果と証跡は本レポート末尾の「STEP-5 判定確定記録」「判定サマリ（STEP-5 確定版）」「HITL 承認結果」を正とする。
 
-#### 8軸評価スコア
-| 軸 | スコア | 判定理由 |
-|---|---|---|
-| 発生件数 | 2/5 | inbox 1件 + deferred 同種先行1件（case 2797 投影前提） |
-| 影響度 | 2/5 | 突合で解消、検証差分への記録で完結 |
-| 横展開性 | 3/5 | worktree 運用全般 |
-| 反映先明確度 | 4/5 | checker-execution-contracts「worktree 環境での checker 実行 fallback」・qg-4 環境ラベル・worktree-operations skip 挙動 |
-| 自動化適性 | 2/5 | 突合は手続 |
-| プロジェクト固有知識再利用性 | 3/5 | |
-| 再発可能性 | 4/5 | worktree 運用が常態 |
-| 費用対効果 | 2/5 | 既存契約で処理済み、追加投資の余地が小 |
-| **加重合計** | **22/40** | |
+1. **Case #3123: case-readyトレーサビリティ完全性ゲート停止** — 意味変更対象行のDesign対応をcoverage --reqで事前確認し、欠落時にartifact_actionsへ含める手順がDefinition Package生成にない。対象手順・確認方法・欠落時の処置はエントリに特定されている。**暫定: 5 既存対策の更新（fix gap）**。
+2. **Case #3113: sidecarのcomponent対応誤り** — producer/componentとsidecarの対応一覧を宣言前に確認する定型手順がない。移動とcheck再実行で全9項目passの証跡あり。**暫定: 5 既存対策の更新（fix gap）**。
+3. **Case #3139: 並列測定の作業内容の非対称** — REQ-036-032は同一revision・corpus・既知findingを比較基準とするが、候補検証の有無・入力同一性など測定作業の対称性を明記しない。非対称subset測定を取り下げ全件対称測定で置換した実例がある。**暫定: 5 既存対策の更新（fix gap）**。測定内容の対称性確認を受け入れ条件へ明示する候補。
+4. **Case #3139: LLM意味診断の非決定性とfinding突合** — REQ-036-032（`docs/requirements/REQ-036.md:51`）がfinding差分全件への正当理由付けを既に規定し、エントリ自身も同要件の設計妥当性再確認と申告。**暫定: duplicate**（既存契約の実証。新規の差分説明型要件ギャップとは扱わない）。
+5. **Case #3121: inspect finding由来draftのdomain鮮度** — slug・行番号・文言で実パスを一意特定した証拠があり、finding domainの鮮度確認手順は不足。**暫定: 5 既存対策の更新（fix gap）**。
+6. **Case #3103: worktree bun types依存整備** — worktree-operations.mdの選択基準（junction/bun install）は存在するが、main側node_modules不在時にworktree内bun installへ一意に決まる判定補助の明示はない（同節の依存整備・選択基準を確認）。**暫定: 5 既存対策の更新（fix gap）**。
+7. **Case #3123: 子task観測証跡の永続チャネル** — 一時session出力では親が証跡を永続化できない事例と、PR本文Findingsへの記録実績あり。委譲契約に永続チャネル記録形式を定める候補。**暫定: 5 既存対策の更新（fix gap）**。
+8. **Case #3111: 配布物concrete ID検出実証** — エントリ自身が既存対策の範囲内・新規再発要因なし・予防策なしと記録。DEC-014のchecker検知面の実証。**暫定: duplicate**。
+9. **Case #3109: skills_structure fallback実証** — 正常動作確認で予防策候補なし。REQ-018-001のfallback実証。**暫定: duplicate**。
+10. **Case #3139: check_integrity --json stdout混在** — 同一問題を記録したintake item `2026-09-25-check-integrity-json-stdout-report-line.md` の存在を確認。エントリ自身もSplit Ruleによる分割を申告。**暫定: duplicate（intake経由で処理中）**。
+11. **Case #3139: 並列測定の委譲回収fan-in実証** — エントリ自身が実装側のSTEP-2-1 fan-in手順の存在を申告。**暫定: duplicate**。
+12. **Case #3123: gh exited with 66** — intake item `2026-09-25-agentdev-gh-spawn-infra-transient.md` はinfra-transient停止分類・serve再起動回復・spawn分離を扱う。ただしinbox側が判断を委譲したcustom-tool-contracts.mdへの運用特性記録要否（fail-closed契約が環境故障時にpipelineを止める特性）はintake itemで確認できない。**未決（HITL）**: intake重複として扱うか、契約記録候補を残すかを一意に決められない。
+13. **Case #3139: Jev observation_write completion schema** — `custom-tool-contracts.md:86`に2段階書込み・llmFinalJudgment/llmTreatment追記完成modeが既記載で、Design契約の記述欠落は確認できない。残る候補はTool入力schema表示と実装の乖離。**未決（HITL）**: duplicate、3 恒久契約候補（Design）、5 既存対策の更新のどれとするかは一意でない。Design候補をDecision候補除外の一括対象にしない。
+14. **agentdev_gh issue_list page limit** — REQ-092-001（`docs/requirements/REQ-092.md:24`）は広範filter時のsearch併用を規定し、`src/opencode/skills/agentdev-issue-management/references/issue-operation-safety.md`も存在する。一方、頻出トークンを避ける選択性とstate: open限定で足りるケースの知見は残余候補。**未決（HITL）**: 既存規律との重複度と残余知見について、duplicate / 5 既存対策の更新 / deferredが競合する。
+15. **Case #3107: evidence pathのprune後参照不能** — pathにRU番号・learningタイトル等の代替識別子を併記する候補は具体的だが、実装阻害はなく、REQ-018-006/007に学びの内容が凝縮済み。**未決（HITL）**: 5 既存対策の更新かdeferredか、間接影響とテンプレート変更の波及判断が必要。
+16. **Case #3139: headless同期委譲timeout目安** — 同期/非同期の選択基準自体は実装済みで、環境依存の数値断定を避ける候補注記が残る。**未決（HITL）**: 軽微・単発としてdeferredにするか、目安注記を5 既存対策の更新として扱うかが一意でない。
 
-- **推奨処分案**: duplicate — 既存配布契約（checker-execution-contracts.md「worktree 環境での checker 実行 fallback（junction 未伝播時の SoT 直参照）」、qg-4-final-acceptance.md 環境ラベル・fail 由来分類、worktree-operations.md「junction 依存 checker の skip 挙動」「main root 実体 + --root 指定」）が同等の手順知識をすでに所有し、本件もその契約どおりの適用で解消済み
-- **エントリ一覧**: worktree で check_integrity（source profile）の ng は junction 未伝播の環境依存として由来分類する [inbox] / case 2797 worktree で full check_integrity を実行する際の repo-local Plugin 投影前提 [deferred]
+## promote 時prune結果
 
-### 問題クラス4: bun test のサマリーは stderr 出力（stdout 単独退避では件数突合不能）
-- **根本原因**: bun test はテスト結果サマリー（Ran N tests 等）を stderr へ出力する仕様に対し、証跡退避実装が stdout のみを前提とした
-- **再発条件**: stdout リダイレクト・stdout のみ返却する API で bun test の証跡を取得した場合
-- **予防策**: stdout/stderr 分離併退避（正規形）、サンプルコマンドへの 2> 常時付与
-
-#### 8軸評価スコア
-| 軸 | スコア | 判定理由 |
-|---|---|---|
-| 発生件数 | 2/5 | inbox 1件 + deferred 2026-09-20 同種1件 = 2回発生 |
-| 影響度 | 2/5 | 正規形での再取得で解消 |
-| 横展開性 | 3/5 | bun test 証跡取得全般 |
-| 反映先明確度 | 5/5 | qg-4-final-acceptance.md「証跡の stdout・stderr 分離併退避」節 |
-| 自動化適性 | 3/5 | サンプルコマンド整備で機械的予防可能 |
-| プロジェクト固有知識再利用性 | 3/5 | |
-| 再発可能性 | 4/5 | 既存契約があるにもかかわらず再発（application miss） |
-| 費用対効果 | 4/5 | 参照のサンプル追記のみ |
-| **加重合計** | **26/40** | |
-
-- **推奨処分案**: 既存対策の更新（category 5）— 既存契約（分離併退避）は存在するが、stdout 単独退避の再発（Case #3085）により適用漏れが実証された。gap 分類: application miss（実装側が stdout 単独で退避）+ fix gap 候補（実行手順のサンプルコマンドに stderr 退避を常時含める旨の明示不足）。deferred 2026-09-20 エントリの再評価条件（stdout キャプチャ証跡の再発時）が成立
-- **エントリ一覧**: bun test の summary は stderr へ出力される [inbox] / 2026-09-20 bun test の件数サマリーは stderr 出力 [deferred]
-
-### 問題クラス5: checker script の CJS/ESM 実行経路（node strip-types 不通・bun 実行）
-- **根本原因**: scripts 側 package.json type: module とスクリプト内 CJS require 混在により node --experimental-strip-types 経路が require is not defined で不通
-- **再発条件**: type: module 配下の require 混在スクリプトを node 経路で起動した場合
-- **予防策**: require の ESM import 移行 or CLI 例外経路（bun）での実行に限定
-
-#### 8軸評価スコア
-| 軸 | スコア | 判定理由 |
-|---|---|---|
-| 発生件数 | 2/5 | inbox 1件 + deferred case 2799 同種1件 |
-| 影響度 | 2/5 | bun run 経路へ迂回して完結 |
-| 横展開性 | 3/5 | repo-agentdev-integrity scripts 全般 |
-| 反映先明確度 | 4/5 | checker-execution-contracts.md「安定実行経路」「ESM 互換性要件」（本実行で実在を検証済み） |
-| 自動化適性 | 3/5 | |
-| プロジェクト固有知識再利用性 | 3/5 | |
-| 再発可能性 | 2/5 | ESM 互換性要件（import 必須・CLI 例外経路限定）の運用化で低減 |
-| 費用対効果 | 3/5 | |
-| **加重合計** | **22/40** | |
-
-- **推奨処分案**: duplicate — checker-execution-contracts.md「安定実行経路」（node import 標準・bun は flush 保証付き例外経路）と「ESM 互換性要件」（require 依存は互換化 or CLI 例外経路限定・新規 checker は import 必須）が本学習の契約面を包含。deferred case 2799 エントリが check_changed_docs.ts の require() 依存と bun 実行の事実を記録済み。E11 はその再確認であり新たな gap を生じていない
-- **エントリ一覧**: check_changed_docs.ts の node --experimental-strip-types 経路が CJS/ESM 混在で不通 [inbox] / 2026-09-14 case 2799 検査スクリプトの実行ランナーは bun [deferred]
-
-### 問題クラス6: worktree の旧 durable state（baseline・解消行）追随不足による疑似 fail の由来分類
-- **根本原因**: 並行 sibling の main merge により baseline 系 durable state（IR-055 baseline・REQ 解消行等）が更新されても、分岐時点の旧 state のままの worktree で suite を実行すると delta guard・traceability check が「新規違反」と誤分類する
-- **再発条件**: 並行マージ後に旧 baseline / 旧解消状態の worktree で delta guard や全 corpus check を実行した場合
-- **予防策**: 由来分類3点（単独再実行 → baseline/分岐点の main root 再現確認 → baseline 差し替え同一テスト再実行〔検証後復元〕）、merge-base と時系列確認
-
-#### 8軸評価スコア
-| 軸 | スコア | 判定理由 |
-|---|---|---|
-| 発生件数 | 2/5 | inbox 1件 + deferred case 2908 同種1件 |
-| 影響度 | 3/5 | QG-4 完了判定の誤差し戻しリスク（今回は3点証拠で機械確定し回避） |
-| 横展開性 | 3/5 | baseline 系 durable state を持つ全検査 |
-| 反映先明確度 | 4/5 | qg-4「fail 由来分類」「traceability check の横断 durable state 前提手順」 |
-| 自動化適性 | 2/5 | 手続的由来分類 |
-| プロジェクト固有知識再利用性 | 4/5 | QG-4 運用の中核的崩し手知識 |
-| 再発可能性 | 4/5 | 並行 case-close / sibling merge が常態 |
-| 費用対効果 | 3/5 | 手順追記で済む |
-| **加重合計** | **25/40** | |
-
-- **推奨処分案**: 既存対策の更新（category 5）— 既存の qg-4 fail 由来分類（単独再実行・baseline 再現確認〔detached worktree〕）は存在するが、「baseline 系 durable state の並行追随差」を明示した fail パターンと、baseline 差し替え同一テスト再実行（検証後復元）による決定的対照証拠の手順は未記載（fix gap）。gap 分類: fix gap（baseline 系追随差の明示と対照実行手順の追記候補）
-- **エントリ一覧**: worktree での bun test 3-split 実行は並行マージによる IR-055 baseline 更新の未追随で delta guard 疑似 fail を出す [inbox] / 2026-09-17 実装 PR 分岐後に先行 merge された main 側解消行が誤解釈され得る [deferred]
-
-### 問題クラス7: Windows junction 操作の処理系差分（作成のパス解決・削除コマンド）
-- **根本原因**: worktree 依存整備の junction 操作は実行処理系（cmd mklink / node fs.symlinkSync / Git Bash rmdir / PowerShell Remove-Item / node fs.rmdirSync）によりパス解決基準と削除挙動が異なり、手順例（cmd /c mklink /J の cwd 相対指定・Remove-Item）が node / bash 経由の実行に転記できない
-- **再発条件**: 依存整備の junction 作成・削除を手順例と異なる処理系（node・非対話 bash）で実行した場合
-- **予防策**: node 経由の fs.symlinkSync は dest ディレクトリ基準解決のため絶対パス指定、junction 削除は node fs.rmdirSync を標準手段化（Remove-Item は NonInteractive で確認プロンプトが出る場合がある）
-
-#### 8軸評価スコア
-| 軸 | スコア | 判定理由 |
-|---|---|---|
-| 発生件数 | 2/5 | inbox 2件（Case #3080・#3084） |
-| 影響度 | 3/5 | 誤リンクによる TIM テスト7件 fail、削除不能による後始末滞留 |
-| 横展開性 | 3/5 | worktree 依存整備の全 Case |
-| 反映先明確度 | 5/5 | worktree-operations.md「bun test 実行の環境前提」の junction 作成・削除例（行番号特定済み） |
-| 自動化適性 | 3/5 | 正規コマンドの固定で機械化可能 |
-| プロジェクト固有知識再利用性 | 4/5 | Windows worktree 運用の常設知識 |
-| 再発可能性 | 3/5 | node / bash 経由実行は頻出 |
-| 費用対効果 | 4/5 | 例示補足のみ |
-| **加重合計** | **27/40** | |
-
-- **推奨処分案**: 既存対策の更新（category 5）— worktree-operations.md の junction 例は cmd mklink /J（cwd 相対 target）と Remove-Item -LiteralPath で記載され、(a) node fs.symlinkSync 相対 target は dest ディレクトリ基準で解決されること、(b) Git Bash rmdir は「Not a directory」で拒否、Remove-Item は NonInteractive で確認プロンプトが出る場合があること、(c) node fs.rmdirSync が確実な削除手段であること、が未記載（fix gap）。gap 分類: fix gap（処理系別の注意と node 正規手段の追記候補）。Jev は category 4 を示唆したが、当該節は worktree 依存整備の正規手順そのものであり、その手順が node / bash 実行で不成立になる記述欠落は既存手順の不備（category 5）と判定
-- **エントリ一覧**: worktree での bun test 依存整備は junction 2 ディレクトリで足りる（削除は node fs.rmdirSync が確実） [inbox] / Windows node fs.symlinkSync の相対 target は dest ディレクトリ基準で解決される [inbox]
-
-### 問題クラス8: 並行委譲間の worktree / git 作業境界の侵害
-- **根本原因**: 複数の並行 case-open / 委譲が同一 worktree・checkout 状態を共有し、worktree の 1-writer 前提が崩れて branch 混入・並行書込み・cd 誤りによる main 汚染が発生する
-- **再発条件**: 複数委譲が同時に同一 worktree / checkout で branch 切替・編集・commit を行う場合
-- **予防策**: Case 専用 worktree での branch 作成、PR 作成前の merge-base と diff --stat 検査、明示パスステージ、git status 検知、早期断念基準
-
-#### 8軸評価スコア
-| 軸 | スコア | 判定理由 |
-|---|---|---|
-| 発生件数 | 3/5 | inbox 1件 + deferred 同種2件（wave5 隔離違反・case 2805 並行書込み） |
-| 影響度 | 4/5 | 別 Case commit の PR 混入・PR 作り直し |
-| 横展開性 | 4/5 | 全並行委譲（case-open / case-run / capture） |
-| 反映先明確度 | 4/5 | case-open branch/worktree 運用手順・adapter protocol・case-auto 委譲境界 |
-| 自動化適性 | 3/5 | merge-base / diff --stat / git status 検査は機械化可能 |
-| プロジェクト固有知識再利用性 | 4/5 | |
-| 再発可能性 | 3/5 | 並行投入は backlog-auto stage 構造上常态化し得る |
-| 費用対効果 | 4/5 | 検査前置の追加のみ |
-| **加重合計** | **29/40** | |
-
-- **推奨処分案**: 既存対策の更新（category 5）— worktree 隔離原則（adapter protocol・case-open「worktree root 配下以外を編集しない」）は存在するが、(a) 並行 case-open 間で Case 専用 worktree を強制する前置、(b) PR 作成前の merge-base / diff --stat による混入検査、(c) worktree 1-writer 前提の早期断念基準、は明文化されていない（fix gap）。3系統の同種発生で適用漏れが構造化された。Jev は category 4 を示唆したが、隔離原則と運用手順が既存であり追加すべきは前置検査・早期断念基準の記述（既存対策への追記）であるため category 5 と判定
-- **エントリ一覧**: 並行 Case の共有 worktree で branch 混入を検知したら隔離 worktree で差分を再構成する [inbox] / wave5 cd 操作誤りによるメインリポジトリ一時汚染 [deferred] / case 2805 worktree 内並行書き込みの検知と明示パス・ステージ確認 [deferred]
-
-### 問題クラス9: harness 制約下の実行担当接合（能力検出とプロセス内直接実装）
-- **根本原因**: 実行担当サブエージェント型の起動手段が制限されたハーネスでは adapter 委譲契約の実行担当接合がそのまま起動できず、起動手段の能力検出に基づく接合形態の選択とその記録が必要になる
-- **再発条件**: 起動手段が制限された harness で case-run の委譲を実行する場合
-- **予防策**: 能力検出結果に基づく接合判定（プロセス内直接実装 + result 4状態・3点ゲート契約の self-apply）とその記録の経路を harness 固有委譲ノートへ明記
-
-#### 8軸評価スコア
-| 軸 | スコア | 判定理由 |
-|---|---|---|
-| 発生件数 | 3/5 | inbox 1件 + deferred 同種2件（L-004・L-010。L-010 は L-004 と同根の知見と自己記載） |
-| 影響度 | 2/5 | 契約どおり self-apply で完遂、委譲不能停止は回避 |
-| 横展開性 | 2/5 | harness 固有 |
-| 反映先明確度 | 4/5 | case-run-execution-adapter SKILL L213〜218 が「委譲起動手段・能力検出・インライン代替の有無は references/harness-delegation.md に配置」と指定 |
-| 自動化適性 | 3/5 | 事前 probe の手続化可能 |
-| プロジェクト固有知識再利用性 | 3/5 | |
-| 再発可能性 | 3/5 | harness 制約は継続 |
-| 費用対効果 | 3/5 | ノート追記のみ |
-| **加重合計** | **23/40** | |
-
-- **推奨処分案**: 既存対策の更新（category 5）— harness-delegation.md「委譲起動失敗、異常終了時事後処理」は委譲起動後の事後処理のみを扱い、起動不能の事前判定から接合形態決定（プロセス内直接実装 + 契約 self-apply）とその記録までの経路が未記載（fix gap）。deferred L-004/L-010 の再評価条件（事前 probe 強化）が3回目の発生で成立。Jev は deferred (0.53) を示唆したが、出現3系統かつ配置先が配布契約で指定済みである点を根拠に category 5 と判定。注記: インライン代替の有無を harness 責務とする配布契約（adapter SKILL L215〜216）との整合を保ち、配布 SKILL の委譲契約自体は変更しない
-- **エントリ一覧**: harness 制約下の case-run 委譲では実行担当接合を委譲実行者のプロセス内直接実装として履行 [inbox] / L-010 ハーネス制約で task() 委譲不可時に同一エージェント統合実行 [deferred] / L-004（L-010 と同根） [deferred]
-
-### 問題クラス10: 閉じた choice 判断の候補集合の正解クラス欠落（Jev 候補完備性）
-- **根本原因**: STEP-3 既存REQ照合判断の choice 候補集合が「REQ操作なし」系の正解クラスを含まず（requirement-development.md STEP-3 質問形式表「choice（CREATE・APPEND・UPDATE）」— 本実行で L181 を検証し候補欠落を確認済み）、閉じた構成では分布が候補欠落を通知しないため最近似候補へ高確率で張り付く
-- **再発条件**: 閉じた choice 判断の候補集合に正解クラス（特に「操作なし・対象外・影響なし」系 NULL 候補）が含まれないまま質問を構成した場合
-- **予防策**: choice 質問構成時の候補完備性チェック（正解クラス網羅・NULL 候補の含む/含まない明示判断）、候補欠落由来の是正は判断構成側の欠陥として分類する運用ルール
-
-#### 8軸評価スコア
-| 軸 | スコア | 判定理由 |
-|---|---|---|
-| 発生件数 | 1/5 | inbox 1件（ただし同一観測バッチ内に同一構造の corrected 7判断を含む単一観測バッチ） |
-| 影響度 | 4/5 | 7判断が Jev の誤選択 + LLM 是正で成立、評価の質が候補構成の偶発に左右される |
-| 横展開性 | 5/5 | agentdev_jev evaluate で choice を構成する6系統 workflow 全般 |
-| 反映先明確度 | 5/5 | requirement-development.md STEP-3 質問形式表（L181）を特定・検証済み |
-| 自動化適性 | 4/5 | 候補完備性チェックは構成規則として機械的適用可能 |
-| プロジェクト固有知識再利用性 | 4/5 | Jev 運用（REQ-090・DEC-027 観測ループ）の中核規則 |
-| 再発可能性 | 4/5 | choice 構成は判断のたびに発生 |
-| 費用対効果 | 4/5 | 形式表の候補追加と構成規則の明記のみ |
-| **加重合計** | **31/40** | |
-
-- **推奨処分案**: 恒久契約候補（REQ）（category 1）— Jev 質問構成契約（STEP-3 質問形式表・Jev 構成規約）の変更を要する要件変更要因。無条件の自動REQ化ではなく候補として promoted/ へ出力し、backlog-review → req-define 経路で確定する。Decision 候補ではなく REQ・配布 workflow reference 更新が代替反映先（「Decision候補除外記録」参照）
-- **エントリ一覧**: 閉じた choice 判断の候補集合は正解クラスを尽くさないと意味評価器が最近似候補へ高確率で張り付く [inbox]
-
-### 問題クラス11: worktree bun test 3-split の分割③ plugins 経路の環境差
-- **根本原因**: .opencode/plugins の junction が worktree に伝播しない構造的制約により、分割③の対象が実行対象から欠落する
-- **再発条件**: worktree 上で 3 cwd 分割実行の分割③を実行した場合
-- **予防策**: plugins 経路は main root から実行し環境ラベル（実行環境・実施範囲）で記録、未実施を未実行対象として扱う
-
-#### 8軸評価スコア
-| 軸 | スコア | 判定理由 |
-|---|---|---|
-| 発生件数 | 1/5 | inbox 1件 |
-| 影響度 | 2/5 | 実施範囲の判別記録で完結 |
-| 横展開性 | 3/5 | worktree bun test 全般 |
-| 反映先明確度 | 5/5 | qg-4-final-acceptance.md「worktree での分割③ 対象欠落の環境差」 |
-| 自動化適性 | 3/5 | |
-| プロジェクト固有知識再利用性 | 3/5 | |
-| 再発可能性 | 2/5 | 契約に運用注記済み |
-| 費用対効果 | 3/5 | |
-| **加重合計** | **22/40** | |
-
-- **推奨処分案**: duplicate — qg-4-final-acceptance.md 分割③環境差節（件数突合と環境ラベルによる実施範囲判別・未実施を未実行対象として扱う・代替手順は実在確認した手順のみ）が同等内容をすでに所有し、E3 自身も「QG-4 契約と整合・正規形を変更しない」と記録している
-- **エントリ一覧**: worktree で bun test フル suite 正規形（3 cwd 分割）は .opencode/plugins 未伝播のため分割実行への代替が必要 [inbox]
-
-### 問題クラス12: bash 経由 checker --root への backslash パス破損
-- **根本原因**: bash は backslash を escape 文字として解釈するため、引用符なし Windows 形式パスは引数段階で破損し、checker は空コーパス走査で fail-closed 契約どおり missing を返す（チェッカー異常ではない見かけ上の全件 missing）
-- **再発条件**: bash から Windows 形式（backslash）パスを引用符なしで checker のパス引数へ渡した場合
-- **予防策**: checker 実行コマンド例のパス表記を forward slash 形式に統一、durable state 解消済み行の誤判定崩し手（記録値との突合）と併用
-
-#### 8軸評価スコア
-| 軸 | スコア | 判定理由 |
-|---|---|---|
-| 発生件数 | 1/5 | inbox 1件 |
-| 影響度 | 3/5 | QG-4 独立再検査の見かけ上全件 missing（完了ゲート誤判定リスク） |
-| 横展開性 | 3/5 | Windows bash 環境の checker 実行全般 |
-| 反映先明確度 | 5/5 | worktree-operations.md「main root 実体 + --root 指定による読取系 checker 実行手順」節（例は forward slash・表記注意の明記なしを検証済み） |
-| 自動化適性 | 2/5 | 表記統一の運用 |
-| プロジェクト固有知識再利用性 | 4/5 | |
-| 再発可能性 | 3/5 | backslash パスの自然な記述ミスは頻出 |
-| 費用対効果 | 4/5 | 例示補足のみ |
-| **加重合計** | **25/40** | |
-
-- **推奨処分案**: 既存対策の更新（category 5）— worktree-operations.md 当該節は例示が forward slash 形式だが「backslash パスは escape 解釈で破損し全件 missing を返す」旨の注意記載が欠落（fix gap）。出現1件だが、完了ゲート（QG-4 独立再検査）の信頼性に直結する既存手順の記述欠落であり反映先と修正内容が一意に確定できる
-- **エントリ一覧**: bash から checker の --root に backslash パスを渡すと escape 解釈で破損し traceability check が見かけ上 missing を返す [inbox]
-
-### 問題クラス13: traceability sidecar と inline ADF-COVERS の二重宣言
-- **根本原因**: 同一対応関係が複数情報源に分散すると check が表現形式を区別せず突合するため duplicate-inconsistencies として検出される
-- **再発条件**: 同一 artifact に sidecar と inline の両方で同一 role の対応関係を宣言した場合
-- **予防策**: 同一 artifact × 同一 role は単一情報源のみ（role が異なれば併存可）
-
-#### 8軸評価スコア
-| 軸 | スコア | 判定理由 |
-|---|---|---|
-| 発生件数 | 1/5 | inbox 1件 |
-| 影響度 | 2/5 | 集約修正で解消 |
-| 横展開性 | 3/5 | 宣言作成工程全般 |
-| 反映先明確度 | 5/5 | agentdev-traceability SKILL.md「二重宣言の整備方向の優先」（本実行で該当規則を実在確認済み） |
-| 自動化適性 | 3/5 | check が検出済み |
-| プロジェクト固有知識再利用性 | 3/5 | |
-| 再発可能性 | 2/5 | 優先規則（inline 優先・単一情報源解消）明文化済み |
-| 費用対効果 | 4/5 | |
-| **加重合計** | **23/40** | |
-
-- **推奨処分案**: duplicate — agentdev-traceability SKILL.md が duplicate-inconsistencies による検出、単一情報源への解消方向（inline 優先保持）、role が異なる同一 artifact 併存可、をすでに規定しており本学習の帰結と完全一致
-- **エントリ一覧**: traceability sidecar と inline ADF-COVERS の同一 artifact × 同一 role 二重宣言 [inbox]
-
-### 単独・観察系クラスタ（未分類扱い）
-- **AGENTDEV_GH_REPO 未設定かつ harness プロセス内 gh 解決破損での全操作 fail-closed** [inbox] — deferred。出現1件。解決導線（consumer-project-setup.md「AGENTDEV_GH_REPO の起動環境設定」節・plugin README）は既存で完全、残りは case-auto 投入前疎通確認の任意強化（候補止まり）。living pool で再評価（再評価条件: case-auto 前提確認の整備時・再発時）
-- **worktree 内 checker 直接実行は junction 伝播なしで完結した（観察）** [inbox] — deferred。予防知見・再発条件なし。既存 fallback 契約（checker-execution-contracts「worktree 環境での checker 実行 fallback」）の妥当性実証記録として維持
-- **IR-055 baseline entry は file×pattern 単位で count 集約される（観察）** [inbox] — deferred。baseline schema の仕様知見。entries 数と検出件数の双方突合を記録様式へ必須化する候補は軽微かつ単発のため保留（再評価条件: baseline 運用手順の記録様式更新時）
-
-## promote 時 prune 結果
-
-- **対象エントリ数**: 0件（本実行は STEP-6 を実施しないため prune 未実施。親 orchestration の STEP-6 が本レポートの判定確定に基づき実行する）
-- **prune実施**: なし
-- **備考**: prune 対象（staged / rejected / duplicate）の実ファイル処理は STEP-6 責務。duplicate 判定5件（問題クラス1・3・5・11・13）が prune 候補に相当
+- **対象エントリ数**: 18件
+- **prune実施**: 完了（2026-09-25・STEP-6）。promoted 証拠検証（全11件の「元learning item / 根拠」確認）と deferred 追記検証（読み返し＋git diff で既存エントリ無変更を機械確認）を完了後に inbox.md をヘッダーのみへクリア
+- **prune対象**: duplicate確定5件（LLM非決定性突合、concrete ID検出実証、skills_structure fallback実証、委譲回収fan-in実証、check_integrity JSON stdout〔intake重複・修正適用済みをコード実証〕）および inbox の staged 12件（クラス1で2件を1成果物に統合したため成果物は11件）
+- **prune非対象**: deferred照合3件（問題クラス1の参照情報として現状維持・移動しない）、gh66 learning固有余部（deferred.md へ追記済み）
+- **証拠保存**: promoted 成果物の「元learning item / 根拠」セクションに inbox エントリの証拠を保存済み（prune 前に全11件を検証済み）
 
 ## 全体傾向
 
-- **高頻出・高影響の問題クラス**: worktree / Windows 環境差に起因する検査・実行系の知見が17件中12件を占める。並行委譲の作業境界侵害（問題クラス8）が3系統で最頻出
-- **横展開性が高い問題クラス**: Jev 候補完備性（問題クラス10、6系統 workflow へ適用可能）、並行委譲作業境界（問題クラス8）
-- **自動化適性が高い問題クラス**: Jev 候補完備性チェック（構成規則化）、並行委譲の merge-base / diff --stat 検査
-- **全体観察所見**: 「既存契約は存在するが運用での適用が追いつかない」型（問題クラス4・6・8）と「手順例の記述が処理系差分をカバーしていない」型（問題クラス2・7・12）の2系統に収斂。duplicate 判定5件はすべて既存契約・REQ による包含であり、配布契約面の整備水準は妥当。単独観察2件は実証記録として living pool で維持
+- **高頻出・高影響**: 問題クラス1（write guard、29/40、5件）。
+- **横展開性が高い**: 問題クラス1（4/5）。単独エントリはクラス集計に含めない。
+- **自動化適性**: 問題クラス1は2/5。未分類の対策候補は手順・契約確認が主。
+- **全体所見**: Case #3139の測定・委譲観察には既存契約の実証と手順上の不足が混在する。intakeとの重複候補はgh exited 66とcheck_integrity JSON stdoutの2件だが、gh exited 66は契約記録要否が未決。REQ-036の差分正当化規定とJev Design記述を既存事実として反映し、真のギャップと区別した。
 
 ## Decision候補除外記録
 
-- **対象item**: 問題クラス10（Jev 候補完備性）/ 問題クラス9（harness 委譲接合）/ 問題クラス8（並行委譲作業境界）/ 問題クラス4・7・12（運用手順系）
-- **除外理由**: command仕様・運用ルール（問題クラス10は質問形式表の候補集合変更=workflow 仕様変更、問題クラス9は harness 実行制御の運用ルール、問題クラス8は作業手順・検査追加の運用ルール、問題クラス4・7・12は実行手順の表記・標準手段整備）。いずれもアーキテクチャ上の決定、技術選定、技術的トレードオフ判断を含まない
-- **根拠事実**: 変更対象が質問形式表・reference 手順・環境ラベル運用であり、代替技術経路の選定判断を伴わない
-- **代替反映先候補**: 問題クラス10 → REQ（Jev 質問構成契約）+ 配布 workflow reference / 問題クラス9 → harness-delegation.md（harness 固有ノート）/ 問題クラス8 → case-open・adapter protocol 系 reference / 問題クラス4・7・12 → qg-4-final-acceptance.md・worktree-operations.md
+- **対象item**: 暫定処分区分5候補のうち、問題クラス1、Case #3123のtraceability事前確認、Case #3113のsidecar確認、Case #3139の測定対称性、Case #3121のdomain鮮度、worktree bun types、観測証跡永続チャネル
+- **除外理由**: 運用ルール（手順・注記の追加が主で、エントリ上にアーキテクチャ上の決定・技術選定がない）
+- **根拠事実**: 各予防策候補はworkflow手順、README注記、または選択基準への追記。
+- **代替反映先候補**: 既存対策の更新（処分区分5）候補としてreq-defineへ引き継ぐ。
+- **除外対象外**: Jev completion schemaはDesign/恒久契約候補としてエントリ自身が影響を申告しており、一括除外しない。Design記述の既存有無を踏まえた処分はHITL未決。
 
-## promote 確定分サマリ（STEP-6 親実行用）
+## 判定サマリ（STEP-5 確定版）
 
-- knowledge-powershell-console-stdout-crlf-bash-pipe.md（問題クラス2 / 元エントリ: PowerShell WriteLine CRLF）
-- existing-countermeasure-update-bun-test-evidence-stderr-capture.md（問題クラス4 / 元エントリ: bun test stderr ×2系統）
-- existing-countermeasure-update-worktree-stale-durable-state-fail-classification.md（問題クラス6 / 元エントリ: IR-055 baseline 未追随 + deferred case 2908）
-- existing-countermeasure-update-junction-os-command-differences.md（問題クラス7 / 元エントリ: junction 依存整備 + symlinkSync）
-- existing-countermeasure-update-parallel-delegation-worktree-boundary.md（問題クラス8 / 元エントリ: 共有 worktree branch 混入 + deferred 2件）
-- existing-countermeasure-update-harness-delegation-capability-probe.md（問題クラス9 / 元エントリ: harness 制約委譲接合 + deferred L-004/L-010）
-- req-jev-choice-candidate-completeness.md（問題クラス10 / 元エントリ: Jev choice 候補完備性）
-- existing-countermeasure-update-worktree-operations-backslash-path-note.md（問題クラス12 / 元エントリ: bash backslash パス破損）
+処分は確定済み。確定方式「自律確定」は HITL 不要（判定根拠・HITL 不要理由は「STEP-5 判定確定記録」参照）、「ユーザーHITL承認」はユーザー承認済み。promoted 成果物はすべて `.agentdev/learning/promoted/` 配下。
 
-## STEP-4 review 記録（adversarial-review）
-
-- **発動根拠**: default-on（Jev 発動条件判定も true・confidence 0.94）。inbox 17件のため skip 条件（1件のみで新規性なし / inbox 空）に非該当。evaluation-report.md に STEP-2・STEP-3 結果反映済み。不可逆処理（deferred 移動・prune・commit/push・promoted 生成）は未実行であることを確認済み
-- **審議構成**: Orchestrator / Reviewer（2系統独立 stream）/ Reviewee の3論理役割。Stream A = duplicate 判定と既存契約包含の反証、Stream B = promote 判定の自己促進バイアスと処分基準の反証。初期 challenge 完了後に finding を統合し counter-challenge → convergence audit の順で実施
-- **accepted findings と反映結果**:
-  1. [Stream A・accepted] K1 duplicate は REQ-092 由来だが運用文書 issue-operation-safety.md は本時点で未整備 → 「STEP-4 review 反映による既存対策照合補記」節へ注記を追記（duplicate 判定の根拠を REQ の包含に限定して明記）
-  2. [Stream B・accepted] K9 で Jev が deferred (0.53) を提示 → Reviewee 反証（deferred L-004/L-010 を含む3系統発生・配置先が adapter SKILL L215〜216 で指定済み・L-010 の再評価条件〔事前 probe 強化〕が未消化のまま2回再発）により promote 維持。発生件数スコアを 2→3 修正（加重合計 22→23/40）
-  3. [Stream B・accepted] K13（promote・出現1件）と AGENTDEV_GH_REPO（defer・出現1件）の処分基準の整合性を Reviewer が指摘 → 判定基準を明文化（「STEP-5 自律確定記録」の基準 (a)(b)(c)）し再適用、両判定は基準どおりと確認
-  4. [Stream B・accepted] K7・K8 で Jev が category 4 を示唆 → 「既存手順そのものの記述欠落は category 5、スコープ外の別面の新規知見は category 4」という区別規則を各クラスの推奨処分案へ明記（K2 は category 4 維持の根拠を補記）
-  5. [Stream A・accepted] K5 の「require() 混在の現状は ESM 互換性要件の CLI 例外経路として許容されるか」の問いに対し、契約文（互換化 or CLI 例外経路限定）と deferred 2025 の事実記録により反証不成立と記録
-- **rejected findings**: なし（全 finding を受入または反証成立として処理）
-- **evaluation-report 戻しループ**: accepted finding は根拠・注記・スコアの微修正であり処分区分の意味内容を変更しないため STEP-2 → STEP-3 の再実行は不要と判断（再 review 発動条件に非該当。新規本質的争点なし・全 finding 処理済み・unresolved 0件・意味内容変化なしの停止条件4点を満たしループ離脱）
-- **convergence audit**: 合意候補（全16クラスタの処分区分と根拠）と成立根拠を Reviewer/Reviewee が再検証。新たな本質的争点は発見されなかった
-- **unresolved**: 0件（HITL / blocker 候補なし）
-
-## STEP-4 review 反映による既存対策照合補記
-
-- 問題クラス1: REQ-092 は恒久契約として呼出側規律を包含するが、運用文書 issue-operation-safety.md は本時点で未整備。REQ-092 の実装（運用文書整備）は REQ-092 の昇華経路（req-define → case-auto）の責務であり、本 duplicate 判定は REQ の包含を根拠とする（運用文書の出来を根拠としない）
-- 問題クラス2: windows-powershell-bulk-io-corruption.md は「一括読み書きによる UTF-8 ファイル破壊」にスコープを限定した文書であり、stdout パイプ面をカバーしないことは文書の不備ではなく別面の知見である（category 4 判定の根拠）
-
-## Jev 先行評価記録
-
-- **実施方法**: 閉じた判断5種（問題クラス分類 / 8軸評価 / 廃棄判定 / 昇華可能性評価 / adversarial-review 発動条件判定）ごとに agentdev_jev evaluate を実行し、Jev 結果と confidence を情報として LLM が最終判断を確定
-- **接続情報**: provider=vercel-ai-gateway / requestedModel=typesafe-ai/jev / resolvedModel=typesafe-ai/jev
-- **判断単位ごとの結果と llmTreatment**:
-  1. 問題クラス分類: Jev は4組すべて「同一問題クラス」（cls-junction 0.57・cls-stale-state 0.82・cls-parallel-boundary 0.77・cls-stdevidence 0.65）→ LLM 最終判断と同一、**unchanged**（confidence 0.7025）
-  2. 8軸評価: Jev の水準は発生件数軸でエントリ数基準と不整合（1件クラスタに水準3-4を示唆）等 → 軸定義の点数表に従い LLM が水準を修正、**corrected**（confidence 0.5838）
-  3. 廃棄判定: Jev は K7=cat4・K8=cat4・K9=deferred を示唆 → K7/K8 は既存手順の fix gap として cat5、K9 は3系統発生を根拠に cat5 へ修正（K2=cat4・K4=cat5・K6=cat5・K10=cat1・K12=cat5・E6=deferred は Jev と同一）、**corrected**（confidence 0.7711）
-  4. 昇華可能性評価: Jev は K9=false を示唆 → 同上の根拠で true に修正（K4=true・K12=true は同一）、**corrected**（confidence 0.5933）
-  5. adversarial-review 発動条件判定: Jev true (0.94) → 発動と判断、**unchanged**
-- **観測**: 1実行1JSON で .agentdev/jev-observations/ に保存（observation_write は本レポート書込後に実施）
-
-## STEP-5 自律確定記録
-
-REQ-003-055/056・learning-promote Design「自律確定の判定位置とHITLフォールバック」に従い、全16問題クラスの処置を取得可能な根拠から一意に確定できるかを判定した。
-
-- **適用した判定基準**（STEP-4 対論で明文化・合意）: (a) 反映先と修正内容が実在文書の特定節まで確定し、(b) 処分区分が根拠（出現回数・既存対策照合・fix gap の具体性）から一意に導け、(c) ユーザーの価値判断・優先順位を要しない場合に自律確定。出現1件でも「既存手順の記述欠落が完了ゲート等の機械判定の信頼性を損ない反映先が確定する」場合は promote、「正規対処が既に完備し残りが任意強化の提案」場合は deferred
-- **HITL 移送条件の照合**（REQ-003-055）: ユーザー固有の目的・価値観・優先順位を要する事項=なし / 正規情報源間の未解決矛盾=なし / 判断に必要な情報不足=なし / 対論型レビューで未解決の本質的争点=0件（STEP-4 記録）/ 要件・仕様の対象範囲の新規決定=なし（全て candidate として req-define へ引き渡し）/ 既存の明示的な安全境界を要求する操作=なし（削除・移動なし）
-
-| 問題クラス | 判定結果 | 主要根拠 | HITL 不要理由 |
+| エントリ | 処分（確定） | 確定方式 | promoted 成果物 |
 |---|---|---|---|
-| K1 issue_list 全件走査 | duplicate | REQ-092-001/003 が呼出側規律と contingency を要件化 | 既存 REQ の包含範囲は条文突合で機械的に確認可能 |
-| K2 PowerShell stdout CRLF | promote（category 4） | 既存知識文書がファイルI/O系のみで本経路を未カバー、回避策は実証済み | 知識化の要否は coverage 突合で決まり、価値判断を含まない |
-| K3 worktree checker 環境由来 NG | duplicate | checker-execution-contracts / qg-4 / worktree-operations が同等手順を所有し本件も契約どおり処理済み | 契約包含の確認は条文突合で完結 |
-| K4 bun test stderr 証跡 | promote（category 5） | 既存契約あり・再発（application miss）・修正内容はサンプル追記 | application miss の実証（2回発生）で処分が一意 |
-| K5 checker CJS/ESM 経路 | duplicate | ESM 互換性要件が契約面を包含、deferred case 2799 が事実記録済み | 同上 |
-| K6 旧 durable state 疑似 fail | promote（category 5） | qg-4 に baseline 系追随差の明示と対照実行手順が未記載、2系統発生 | fix gap の位置と内容が特定済み |
-| K7 junction 処理系差分 | promote（category 5） | worktree-operations.md 例が node / bash 経由で転記不能、2件発生で実証 | 同上 |
-| K8 並行委譲作業境界 | promote（category 5） | 3系統の同種発生、前置検査の明文化が未整備 | 出現回数と gap で一意 |
-| K9 harness 委譲接合 | promote（category 5） | harness-delegation.md に起動不能時の接合判定・記録経路が未記載、deferred L-004/L-010 の再評価条件成立（3系統） | 配置先が契約で指定済み・Jev の deferred 示唆は STEP-4 で反証済み |
-| K10 Jev 候補完備性 | promote（category 1） | STEP-3 質問形式表の候補欠落を実ファイル検証、7判断の是正依存を実証 | 候補として昇華経路へ渡すのみで REQ 化判断は下流 |
-| K11 分割③ plugins | duplicate | qg-4 分割③環境差節が同等内容を所有 | 条文突合で完結 |
-| K12 backslash パス破損 | promote（category 5） | 該当節に表記注意が欠落、完了ゲート誤判定に直結 | fix gap の具体性で一意 |
-| K13 二重宣言 | duplicate | traceability SKILL.md 優先規則が検出・解消方向を規定済み | 同上 |
-| AGENTDEV_GH_REPO（E6） | deferred | 出現1件・正規対処（guide+launcher 設定）完備・残余は任意強化 | 判定基準 (a)〜(c) を適用すれば一意 |
-| checker 完結実証（E8） | deferred | 観察・再発条件なし・既存契約の実証記録 | 同上 |
-| IR-055 count 集約（E9） | deferred | 観察・記録様式候補は軽微かつ単発 | 同上 |
+| 問題クラス1 write guard（inbox 2件: #3101・#3139） | 5 既存対策の更新 | 自律確定 | existing-countermeasure-update-worktree-write-guard-temp-path.md |
+| Case #3123 traceability事前確認 | 5 既存対策の更新 | 自律確定 | existing-countermeasure-update-traceability-design-coverage-precheck.md |
+| Case #3113 sidecar component対応 | 5 既存対策の更新 | 自律確定 | existing-countermeasure-update-traceability-sidecar-component-check.md |
+| Case #3139 測定対称性 | 5 既存対策の更新 | 自律確定 | existing-countermeasure-update-parallel-measurement-symmetry-acceptance.md |
+| Case #3121 domain鮮度 | 5 既存対策の更新 | 自律確定 | existing-countermeasure-update-inspect-finding-domain-freshness.md |
+| worktree bun types（Case #3103） | 5 既存対策の更新 | 自律確定 | existing-countermeasure-update-worktree-bun-install-decision-aid.md |
+| 観測証跡永続チャネル（Case #3123） | 5 既存対策の更新 | 自律確定 | existing-countermeasure-update-delegation-evidence-persistent-channel.md |
+| issue_list page limit（Case #3103） | 5 既存対策の更新 | ユーザーHITL承認 | existing-countermeasure-update-issue-list-search-selectivity.md |
+| evidence path代替識別子（Case #3107） | 5 既存対策の更新 | ユーザーHITL承認 | existing-countermeasure-update-evidence-path-alternate-identifiers.md |
+| Jev completion schema（Case #3139） | 5 既存対策の更新（冗長なDesign追加なし） | ユーザーHITL承認 | existing-countermeasure-update-jev-observation-write-schema-mismatch.md |
+| headless timeout目安（Case #3139） | 5 既存対策の更新（実観測基準・固定数値閾値なし） | ユーザーHITL承認 | existing-countermeasure-update-sync-delegation-observed-timeout.md |
+| gh exited with 66（Case #3123） | intake先行・learning固有知見はdeferred | ユーザーHITL承認 | なし（deferred追記対象） |
+| Case #3139 LLM非決定性突合 | duplicate（REQ-036-032 既規定の実証） | 自律確定 | なし |
+| concrete ID検出実証（Case #3111） | duplicate | 自律確定 | なし |
+| skills_structure fallback実証（Case #3109） | duplicate | 自律確定 | なし |
+| 委譲回収fan-in実証（Case #3139） | duplicate | 自律確定 | なし |
+| check_integrity JSON stdout（Case #3139） | duplicate（intake重複・修正適用済みをコード実証） | 自律確定 | なし |
 
-- **確定内訳**: 自律確定 16件（promote 8問題クラス / duplicate 5問題クラス / deferred 3エントリ）・HITL 移送 0件
-- **破壊的変更**: なし（本実行は不可逆処理を実行しない）
+- **件数**: promoted 11成果物（inbox 12エントリ分。クラス1で2件統合）、duplicate 5、deferred追記対象 1。inbox 18エントリと一致（12+5+1）。
+- **移動・prune・inboxクリア・git永続化は本実行では未実施**（STEP-6 残処理）。上記の処分は確定済みであり、次回実行は確定済み処分に基づく残処理のみを行う。
 
-## STEP-5 判定結果集計
+## STEP-5 判定確定記録
 
-- **promote**: 9エントリ（8問題クラス）
-- **duplicate**: 5エントリ（問題クラス1・3・5・11・13。STEP-6 prune 候補）
-- **deferred**: 3エントリ（E6・E8・E9。living pool 維持）
-- **rejected**: 0件
+### 自律確定分（ユーザー承認なし。判定結果・主要根拠・HITL不要理由）
+
+1. **問題クラス1 write guard → 5 既存対策の更新**
+   - 主要根拠: 8軸29/40。inbox 2件（Case #3101・#3139）に加えdeferred照合3件（deferred.md:814・:2320・:2402、実読確認済み）が同一クラス（project root外書込みをguardがfail-closed拒否・再発条件・標準手段切替）で一致。既存対策ギャップは case-open scripts/README.md の検査入力置き場所指針不在（fix gap）と worktree-operations.md「書込み guard 運用指針」節の集約範囲外（同節は実在確認済み）。
+   - HITL不要理由: 処分区分候補が5に一意（運用手順・注記追加が主で、duplicate/deferred/reject の競合なし）。反映先候補ファイル特定済み。
+
+2. **Case #3123 traceability事前確認 → 5 既存対策の更新**
+   - 主要根拠: case-ready STEP-2 の lifecycle gate completeness が対象要件行 scope で fail-closed である一方、req-define / case-open の Definition Package 生成手順に「意味変更対象行の design 対応有無確認（coverage --req）と欠落時の artifact_actions 組込み」が存在しない。baseline 既知 missing-design（REQ-031-030 実例）を含む Case は case-ready で必ず停止する構造。
+   - HITL不要理由: 運用手順追加が唯一の処分。アーキテクチャ決定・技術選定を含まない。
+
+3. **Case #3113 sidecar component対応 → 5 既存対策の更新**
+   - 主要根拠: sidecar の所属は producer/component 境界で決まる（PR #3133 で宣言移動・check 全9項目 pass の証跡）。`src/opencode/skills/agentdev-traceability/references/sidecar-and-policy.md`（実在確認済み）に運用手順は存在するが、宣言追加前の component/sidecar 対応一覧確認の定型が明示されていない。
+   - HITL不要理由: 既存手順への確認ステップ追記のみ。
+
+4. **Case #3139 測定対称性 → 5 既存対策の更新**
+   - 主要根拠: REQ-036-032（`docs/requirements/REQ-036.md:51`、実読確認済み）は同一 Git revision・corpus・既知 finding を比較基準と規定するが、測定作業の対称性（候補検証の有無・入力同一性）は明記しない。非対称 subset 測定の取り下げ（ユーザー判断 2026-09-25）と全件対称再測定への置換実例あり。
+   - HITL不要理由: 既存 REQ 行への対称性明示候補の引き継ぎであり新規要件化ではない。ユーザーは本項について新たな判断を追加していない（STEP-4 暫定案からの処分変更なし）。
+
+5. **Case #3121 domain鮮度 → 5 既存対策の更新**
+   - 主要根拠: inspect finding の domain 記録が配置移動後の実配置と不一致でも、slug（document-model）・行番号（L375）・文言の3点で機械的一意特定できた実績。finding domain の鮮度確認（実パス照合）手順は不足。
+   - HITL不要理由: 手順注記追加が唯一の処分。
+
+6. **worktree bun types → 5 既存対策の更新**
+   - 主要根拠: `src/opencode/skills/agentdev-git-worktree/references/worktree-operations.md`「bun test 実行の環境前提」節は実在（実読確認済み）するが、main 側 node_modules 不在時に worktree 内 bun install へ一意に決まる判定補助の明示はない。
+   - HITL不要理由: 既存選択基準表への判定補助追記のみ。
+
+7. **観測証跡永続チャネル → 5 既存対策の更新**
+   - 主要根拠: 子 task の観測証跡が一時 session 出力のみで完結した実例（driver blocked 報告）と、record-in-findings 契約による PR 本文 Findings 記録の実績（PR #3138）。委譲契約に証跡の永続チャネル記録形式の定義なし。
+   - HITL不要理由: 委譲契約 reference への記録手順追記が唯一の処分。
+
+8. **LLM非決定性突合 → duplicate**
+   - 主要根拠: REQ-036-032 が「finding 差分には全件に正当理由を付すこと」を既に規定（`docs/requirements/REQ-036.md:51` 実読確認）。エントリ自身も REQ-036-032 設計の妥当性再確認と申告。意味的矛盾 0 件の観測は既存契約の実証。
+   - HITL不要理由: 既存契約条文とエントリ申告が一致する単一解。新規ギャップなし。
+
+9. **concrete ID検出実証 → duplicate**
+   - 主要根拠: エントリ自身が「既存対策の範囲内・新規問題クラスなし・予防策なし」と記録。checker（check_distribution_boundary_cli.ts）検知面の正常作動実証であり、同等内容が DEC-014 多層 enforcement の既存構成でカバー。
+   - HITL不要理由: エントリ申告と既存対策の一致。昇華すべき新規知見なし。
+
+10. **skills_structure fallback実証 → duplicate**
+    - 主要根拠: 正常動作確認（REQ-018-001 fallback 実証）で予防策候補なし。エントリ自身が観測記録と申告。
+    - HITL不要理由: 正常系観測の duplicate。昇華すべきギャップなし。
+
+11. **委譲回収fan-in実証 → duplicate**
+    - 主要根拠: エントリ自身が実装側 STEP-2-1 fan-in 手順（agentdev-workflow-inspect-docs）の既存を申告。担当別個別記録の実証記録。
+    - HITL不要理由: 既存手順の実証であり新規ギャップなし。
+
+12. **check_integrity JSON stdout → duplicate**
+    - 主要根拠: (a) 同一問題の intake item 実在（`.agentdev/intake/inbox/2026-09-25-check-integrity-json-stdout-report-line.md`、確認済み）。(b) **修正適用済みをコード実証**: `check_integrity.ts` L11346 は `console.log(formatJsonReport(report))`（--json 時の stdout は純 JSON）、L11352 は `console.error("Report written to: ...")`（通知は stderr に分離済み）。inbox 主張の stdout 混在は現行コードで発生しない。
+    - HITL不要理由: intake 重複と解決済み（修正適用済み）の機械確認による単一解。unsupported deletion を避けるため、本実行では prune（削除）を実施せず duplicate 確定の記録のみ。
+
+### ユーザーHITL承認分（5項目）
+
+ユーザーは以下5項目の処分を承認した。この5項目以外の争点についてユーザー承認を主張しない。
+
+1. **issue_list page limit → 5 既存対策の更新（承認）**: REQ-092-001（`docs/requirements/REQ-092.md:24`、実読確認済み）は広範 filter 時の search 併用を既規定するが、search トークンの選択性指針（相互参照頻出トークンの回避）と state: open 限定で冪等検出が足りるケースの知見は残余ギャップとして追記対象。duplicate/deferred は不採用。
+2. **evidence path代替識別子 → 5 既存対策の更新（承認）**: path 単独参照の prune 後参照不能構造に対し、prune を跨ぐ代替識別子（RU番号・learning タイトル・関連 Case 番号）の併記候補を既存対策の更新として引き継ぐ。deferred は不採用。
+3. **gh exited with 66 → intake先行＋learning固有知見deferred（承認）**: intake item `2026-09-25-agentdev-gh-spawn-infra-transient.md`（確認済み）が infra-transient 停止分類・回復経路・spawn 分離を先行処理するため本エントリの promoted 生成はしない。learning 固有の知見（判定完了ごとの durable checkpoint・再開時の前置死活チェック・「無出力・非零終了」による早期死亡切り分け・否定仮説8件の診断記録）は deferred として living pool 維持。custom-tool-contracts.md への新規契約記録は本承認の範囲に含めない。
+4. **Jev completion schema → 5 既存対策の更新（承認・冗長なDesign追加なし）**: custom-tool-contracts.md:86（実読確認済み）は 2段階書込みと llmFinalJudgment / llmTreatment 追記完成 mode を既に規定するため Design 記述の重複追加は行わない。promoted 対象は公開 schema 表示（Tool 入力 schema の required 表示）と実装の completion allowlist（LLM final-judgment フィールドのみ受理）の乖離の解消を既存対策の更新として扱うこと。
+5. **headless timeout目安 → 5 既存対策の更新（承認・実観測基準）**: 同期委譲の実効判定は事前見積もりでなく環境 timeout の実観測を基準とする（observed-time 原則）。固定数値閾値は定義しない（環境依存）。deferred は不採用。
+
+## HITL 承認結果
+
+- **承認済み**: 上記5項目（2026-09-25 ユーザー承認）。
+- **自律確定**: 上記12項目（ユーザー承認の擬制ではない。判定結果・主要根拠・HITL不要理由は自律確定分の記録を正とする）。
+- **確定済みの不可逆処理の実施状態**: promoted 成果物生成・deferred追記（gh66 learning固有余部）・inboxクリア（prune含む）・git commit/push すべて実施済み（2026-09-25・ユーザー明示要求）
+
+## 後続処理意向（STEP-6 残処理・次回実行対象）
+
+| 対象 | 処置（確定済み） | 実施状態 |
+|---|---|---|
+| inbox 12エントリ（promoted 生成済み分） | staged。prune 完了（証拠は各 promoted 成果物の「元learning item / 根拠」に保存済み・prune 前に検証済み） | 完了（inbox クリアにより実施） |
+| duplicate 5件 | prune 完了 | 完了（inbox クリアにより実施） |
+| gh66 learning固有余部 | deferred.md 追記（読み返し検証済み・既存130エントリ無変更をgit diffで機械確認） | 完了 |
+| deferred照合3件（問題クラス1参照情報） | 移動しない（現状維持） | 対象外 |
+| inbox.md | ヘッダーのみへクリア | 完了 |
+| git 永続化（commit/push） | `.agentdev/learning/` 配下のみ対象 | 完了 |
