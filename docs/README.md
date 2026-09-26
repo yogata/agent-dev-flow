@@ -79,7 +79,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-042 の41件である（DEC-002、DEC-005、DEC-007、DEC-015、DEC-017、DEC-029、DEC-030 は superseded）。
+現行 Decision は DEC-001 から DEC-044 の43件である（DEC-002、DEC-005、DEC-007、DEC-015、DEC-017、DEC-029、DEC-030、DEC-040、DEC-043 は superseded、DEC-044 は proposed）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
@@ -122,9 +122,11 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-037](decisions/DEC-037.md) | Traceability の Change / Evidence 中心への再中心化 |
 | [DEC-038](decisions/DEC-038.md) | ADF v4 durable state 配置と再構成の契約（状態権威・証跡分離・非原子調整原則） |
 | [DEC-039](decisions/DEC-039.md) | ADF v4 authority・副作用統制と冪等・並行性モデル |
-| [DEC-040](decisions/DEC-040.md) | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化） |
+| [DEC-040](decisions/DEC-040.md) | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化、superseded by DEC-044〔決定4 部分置換。決定1〜3は維持〕） |
 | [DEC-041](decisions/DEC-041.md) | Wave 構成純度と実行並列上限の単一所有 |
 | [DEC-042](decisions/DEC-042.md) | case-auto 最大並列維持と同期逐次フォールバック禁止 |
+| [DEC-043](decisions/DEC-043.md) | case-ready 実行構造判断への Jev 最終判断採用（Stage 2: 閾値ルーティング、superseded by DEC-044） |
+| [DEC-044](decisions/DEC-044.md) | Semantic Evaluation 観測契約の一次事実中心再設計と基本判断経路への復帰 |
 
 ## 設計（Design）
 
