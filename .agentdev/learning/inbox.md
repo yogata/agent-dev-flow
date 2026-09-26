@@ -185,3 +185,39 @@
 
 ---
 
+## 2026-09-27: Windows 環境の bash heredoc で日本語を含む長大なファイル内容を書き出すと中途で打ち切られる
+
+- **問題事象**: Windows 環境の bash heredoc（`<<'EOF'`）で日本語を含む長大なファイル内容を node stdin 経由で書き出すと、ヒアドキュメントが中途で打ち切られファイルが不完全になる事象が発生した
+- **発生局面**: Case #3158 実装（DEL-3158-1、PR #3160）。worktree 内でのファイル配置
+- **検知方法**: 書き出し結果の内容突合で中途打ち切りを検知
+- **根本原因**: Windows 環境における bash heredoc の stdin 伝達の長文日本語コンテンツ対応の問題
+- **自律対応内容**: worktree 内へ新規一時ファイルとして Write ツールで書き、node fs.copyFileSync でバイトコピーして正規パスへ配置する手順へ切替して解消。新規ファイルへの Write が UTF-8 BOM なしで書き出されることを事前に小さな検証ファイルで確認済み
+- **ユーザー確認の有無**: なし（自律解決）
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: Windows 環境の worktree 操作全般でのファイル書き出し。case-run/case-close 検証作業で heredoc を使いがちだが、日本語長文には本手順を使う
+- **再発条件**: bash heredoc で日本語を含む長大なファイル内容を書き出した場合
+- **予防策候補**: 長文日本語コンテンツは「Write ツール（新規一時ファイル）→ copyFileSync → 一時ファイル削除」を標準手順とする
+- **想定反映先**: worktree-operations.md 書込み guard 運用指針節（標準手段の知見拡張候補）
+- **関連**: Case #3158、PR #3160、DEL-3158-1
+- **タグ**: #windows #bash #heredoc #write #worktree
+
+---
+
+## 2026-09-27: integrity suite の delta baseline object が参照不能な際は baseline commit の detached worktree 再現で pre-existing 分類する（case-close QG-4）
+
+- **問題事象**: case-close QG-4 の bun test フル suite正規形で IR-055 runtime-unresolved-reference delta 回帰テストが 1件 fail した。当該テストが参照する delta baseline object `bac3ca4b...` が `fatal: bad object`（ワークツリーから参照不能）である一方、テストは継続動作し、当該変更対象外ファイル（scan-and-doc-diagnostics.md）由来の検出 2件（warning/heuristic）を報告した
+- **発生局面**: Case #3158 case-close STEP-2（QG-4 フル suite 正規形、integrity 分割①。worktree と main root の双方）
+- **検知方法**: 分割① stderr「Ran 2600 tests across 107 files」と fail 1件、check_integrity.ts --json 出力から検出 2件の特定（いずれも PR 変更外ファイル・PR 変更 25 ファイルに検出対象なし）
+- **根本原因**: delta 比較の基準 commit object がクローン内に存在せず、比較が参照可能な範囲で動作している。検出件は当該変更と無関係の既存状態
+- **自律対応内容**: ① 単独再実行（同一 fail 再現）、② PR 分岐点 baseline f392ca37 の detached worktree（stash 不使用標準手順・ワークツリー変更ゼロ）で同一テスト再現確認（同一 fail）、③ main root（base と同一 commit・変更ゼロ）でも同一 fail を確認。これにより pre-existing（由来不明 0件）と分類し、merge 判断の blocker から除外した
+- **ユーザー確認の有無**: あり（QG-4 での停止報告 1回。再開条件充足と merge 継続の指示を受領）
+- **Decision/REQ/spec影響**: なし（QG-4 fail 由来分類契約の運用実践）
+- **横展開観点**: case-close QG-4 で baseline 再現を要する integrity suite fail 全般。delta baseline object が参照不能になる事象自体は intake 化候補（bac3ca4b... の永続化・格納方針）
+- **再発条件**: integrity suite 内部の delta 比較の baseline commit がクローンに存在しない場合
+- **予防策候補**: IR-055 の delta baseline commit の永続化またはラベリング（intake item として扱う候補）
+- **想定反映先**: QG-4 fail 由来分類手順（agentdev-quality-gates 既定の実践例）
+- **関連**: Case #3158、PR #3160、check_integrity.test.ts、Issue #1782（IR-055）
+- **タグ**: #qg-4 #fail-origin-classification #pre-existing #detached-worktree #integrity-suite
+
+---
+
