@@ -2,7 +2,7 @@
 title: 索引類自動生成 Design
 status: accepted
 created: 2026-07-19
-updated: 2026-09-20
+updated: 2026-09-27
 ---
 <!-- ADF-COVERS(implementation): REQ-001-026, REQ-001-028 -->
 <!-- ADF-COVERS(implementation): REQ-010-011 -->
@@ -184,7 +184,7 @@ docs-check 既存資産（cli_utils.ts, check_integrity.ts の parseFrontmatter,
 後述「現在人手管理領域の3領域」参照。
 3. **各領域の正規情報源**: frontmatter、各文書本文のセクション構造、宣言等。
 4. **人手管理領域に対する整合性確認方法**: docs-check（IR-061、IR-038、IR-039、IR-042）による検出、人手レビュー等。
-5. **Decision frontmatter の supersede_note 由来の部分置換注記生成**: superseded Decision で frontmatter に `supersede_note` フィールドが存在する場合、decision 系 AUTOGEN ブロック（decision-status 表・superseded セクション）の該当 Decision 行へ部分置換注記を併記して生成する。`superseded_by` と `supersede_note` の両 frontmatter フィールドをデータ源とし、status 表・superseded セクション間で同一注記を出力する（DEC-040 部分置換〔決定4 のみ DEC-044 置換・決定1〜3 維持〕の README 反映。CR-004 裁定の generator 経由反映）。
+5. **Decision frontmatter の supersede_note 由来の部分置換注記生成**: superseded Decision で frontmatter に `supersede_note` フィールドが存在する場合、decision 系 AUTOGEN ブロック（decision-status 表・superseded セクション）の該当 Decision 行へ部分置換注記を併記して生成する。`superseded_by` と `supersede_note` の両 frontmatter フィールドをデータ源とし、status 表・superseded セクション間で同一注記を出力する（DEC-040 部分置換〔決定4 のみ DEC-044 置換・決定1〜3 維持〕の README 反映。CR-004 裁定の generator 経由反映）。注記の具体形式は `〔superseded by DEC-MMM。<supersede_note>〕`（`supersede_note` の内容をそのまま展開）とする。配置は status 表（decision-baseline-table）ではタイトルセル内のタイトル直後、superseded セクションでは bullet 行末とし、両ビューで同一文字列を付与する。`supersede_note` 未宣言（全体置換等）の場合は注記を付与しない。
 
 docs-check は検査対象不変原則（検査対象を直接修正しない）を維持し、生成スクリプトは docs-check から独立して動作する。
 
