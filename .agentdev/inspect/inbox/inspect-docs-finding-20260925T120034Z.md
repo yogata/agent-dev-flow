@@ -20,6 +20,7 @@
 > - F-23: 安定契約例外候補（confidence low〜medium）
 > - F-24: baseline 同種参照が多数存在する既知パターン（本件のみ新規 delta）
 > - F-25: 基準行との照合未実施（confidence low）
+> - 2026-09-27: F-07・F-13 は 20260926T180630Z DS-04・DB-01 へ併合 promote（backlog-auto stage 2）
 
 ## 検出事項リスト（defer 残置分）
 
@@ -62,19 +63,6 @@
 - ng_classification: pre-existing
 - notes: 「是正根拠 PR 番号を本欄へ追記」する運用自体が検査の安定契約として意図されている可能性があり、F-03 と一括で方針判断すべき
 
-### F-07: harness-separation-model.md の superseded DEC-002 引用が縮約注記式未修正
-
-- id: F-07
-- category: 横断契約矛盾（superseded 引用）
-- target: docs/designs/foundations/harness-separation-model.md:150
-- evidence: 「DEC-002（OpenCode ソース・プロジェクション分離）: 本 Design の harness 非依存原則を原本とプロジェクションの分離によって物理層で担保する。」— superseded 済み（DEC-036 が後継）の DEC-002 を「関連」節で現行根拠のように記述。同種引用は Case #3122（コミット 47918c05）で 4 ファイルが「〜由来、現行の責務体制は DEC-036」の縮約注記式へ修正済みだが本ファイルのみ旧式のまま残存
-- severity: medium
-- confidence: medium（「関連」節は交叉参照リストとの解釈も可能。ただし #3122 修正方針との一貫性が崩れている）
-- source_of_truth: 承認済み Decision の現行 status（superseded チェーン）を正として判定
-- recommended_route: intake（#3122 と同一の縮約注記式への修正）
-- ng_classification: pre-existing
-- notes: check_integrity の accepted-adr-only-citation WARNING 7 件のうち、現行候補と確定したのは本 1 件（v3-v4-crosswalk の DEC-002/005/007 は履歴文脈で対象外、他 4 件は #3122 修正済み）
-
 ### F-08: DEC-010 が superseded DEC-002 を現在形で「維持する」と記述
 
 - id: F-08
@@ -113,19 +101,6 @@
 - recommended_route: intake（重複 ID の統合または分割意図の明示）
 - ng_classification: 今回修正対象（#3140 由来の直近変更）
 - notes: 複数行 ADF-COVERS 宣言が意図的な分割用途（工程群別）の可能性あり。REQ-036-028〜033 の implementation 宣言は診断並列化の実際の動作変更を伴うため正当な可能性
-
-### F-13: 配布 reference 中の gh CLI 直呼び記述（IR-053）
-
-- id: F-13
-- category: 横断契約矛盾（GitHub I/O の正規経路委任）
-- target: src/opencode/skills/agentdev-issue-management/references/issue-operation-safety.md:51、src/opencode/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md:58
-- evidence: 「`gh issue list --search …` の形式で手動読取し」等。ただし直前に「operation-failed 時限定の補完手段」「書込み系は引き続き Tool 正規経路に限定」との限定付き。check_integrity IR-053 WARNING 2 件
-- severity: medium
-- confidence: medium（機械検出の再現は確実。違反か意図された例外かは規則側の判断）
-- source_of_truth: IR-053 ルールと REQ-011-001（GitHub I/O は Custom Tool 委任）
-- recommended_route: intake（IR-053 の例外条項化または記述の Tool 経由への変更）
-- ng_classification: pre-existing
-- notes: 両記述とも読取系 fallback に限定した contingency 手順として意図的に書かれている。検出ルール側の例外定義不足の可能性
 
 ### F-14: req-health-metrics AUTOGEN 計測日の鮮度逸脱（date rollover drift）
 
