@@ -39,7 +39,7 @@
 | docs-check（機械的検査の既存 owner） | 利用可能な環境では実行結果を機械的候補として取り込む。利用できない環境では残りの手段で候補収集を継続する |
 | README 索引 | README 索引の記載を実ファイル一覧と突き合わせ、導線範囲の超過候補と索引対象の実在候補を収集する |
 | `rg` | 未解決参照、superseded 成果物への現行参照、廃止済み識別子、参照先が取得できない記述、正規所有者のいない成果物、構造的重複候補の文字列シグナルを探索する |
-| 正規成果物の直接読取 | REQ/Decision/Design/guides/README の frontmatter、見出し、関連情報節を直接読み、文書種別、状態、関連宣言の候補を収集する |
+| 正規成果物の直接読取 | REQ/Decision/Design/guides/README の frontmatter、見出し、ADF-COVERS 宣言（repository top-level `traceability/` 配下 sidecar 含む）を直接読み、文書種別、状態、関連宣言の候補を収集する |
 
 - 収集結果は診断担当ごとに次の要素へ整理する: 対象範囲（ファイル一覧）、根拠箇所（file:line 形式）、機械的シグナルの種別
 - agentdev-traceability の coverage、impact、check を候補探索に使用しない

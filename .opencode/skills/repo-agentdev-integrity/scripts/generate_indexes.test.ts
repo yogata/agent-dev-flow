@@ -33,6 +33,9 @@ import {
   findUndeclaredRelatedReqDecisions,
   formatRelatedReqCell,
   generateDecisionRelatedReqTable,
+  generateDecisionBaselineTable,
+  generateDecisionStatusList,
+  formatSupersedeNoteSuffix,
   collectReqFiles,
   generateReqActiveTable,
   README_REQ_SUMMARY_COUNT_BLOCK_ID,
@@ -486,6 +489,85 @@ describe("extractRelatedReqNotes", () => {
   });
 });
 
+// ─── supersede_note 由来の部分置換注記生成（index-auto-generation.md「現在稼働
+// している自動生成契約」5、RA-002）─────────────────────────────────────────
+// superseded Decision の frontmatter superseded_by + supersede_note をデータ源として
+// status 表・superseded セクションの該当行へ同一注記を併記することを固定する。
+
+const SUP_TMP_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), "genidx-supersede-"));
+
+describe("formatSupersedeNoteSuffix (RA-002)", () => {
+  const supDecDir = path.join(SUP_TMP_ROOT, "decisions");
+  if (!fs.existsSync(supDecDir)) {
+    fs.mkdirSync(supDecDir, { recursive: true });
+    writeDecision(
+      supDecDir,
+      "DEC-040",
+      'title: "T40"\nstatus: superseded\nsuperseded_by: DEC-044\nsupersede_note: "決定4 は DEC-044 が置換。決定1〜3は維持"\nrelated_reqs: [REQ-090]\ncreated: "2026-01-01"\nupdated: "2026-01-01"',
+    );
+    writeDecision(
+      supDecDir,
+      "DEC-043",
+      'title: "T43"\nstatus: superseded\nsuperseded_by: DEC-044\nrelated_reqs: [REQ-090]\ncreated: "2026-01-01"\nupdated: "2026-01-01"',
+    );
+    writeDecision(
+      supDecDir,
+      "DEC-044",
+      'title: "T44"\nstatus: accepted\nrelated_reqs: [REQ-090]\ncreated: "2026-01-01"\nupdated: "2026-01-01"',
+    );
+  }
+
+  const collectById = () =>
+    new Map(collectDecisionFiles(supDecDir).map((d) => [d.id, d]));
+
+  it("parses superseded_by and supersede_note from frontmatter", () => {
+    const byId = collectById();
+    expect(byId.get("DEC-040")?.supersededBy).toBe("DEC-044");
+    expect(byId.get("DEC-040")?.supersedeNote).toBe(
+      "決定4 は DEC-044 が置換。決定1〜3は維持",
+    );
+    expect(byId.get("DEC-043")?.supersededBy).toBe("DEC-044");
+    expect(byId.get("DEC-043")?.supersedeNote).toBe(null);
+    expect(byId.get("DEC-044")?.supersededBy).toBe(null);
+  });
+
+  it("returns the note suffix only for a superseded decision with supersede_note", () => {
+    const byId = collectById();
+    expect(formatSupersedeNoteSuffix(byId.get("DEC-040")!)).toBe(
+      "〔superseded by DEC-044。決定4 は DEC-044 が置換。決定1〜3は維持〕",
+    );
+    expect(formatSupersedeNoteSuffix(byId.get("DEC-043")!)).toBe(null);
+    expect(formatSupersedeNoteSuffix(byId.get("DEC-044")!)).toBe(null);
+  });
+
+  it("appends the same note to the baseline table row and the superseded section row", () => {
+    const infos = collectDecisionFiles(supDecDir);
+    const table = generateDecisionBaselineTable(infos);
+    const list = generateDecisionStatusList(infos, "superseded");
+    const expectedNote =
+      "〔superseded by DEC-044。決定4 は DEC-044 が置換。決定1〜3は維持〕";
+    expect(table).toContain(`| DEC-040 | T40${expectedNote} | superseded | 2026-01-01 |`);
+    expect(list).toContain(
+      `- [DEC-040](DEC-040.md)（T40）${expectedNote}`,
+    );
+    expect(table.join("\n")).not.toContain("| DEC-043 | T43〔");
+    expect(list.join("\n")).not.toContain("[DEC-043](DEC-043.md)（T43）〔");
+  });
+
+  it("keeps generation idempotent across repeated runs", () => {
+    const infos = collectDecisionFiles(supDecDir);
+    const firstTable = generateDecisionBaselineTable(infos);
+    const firstList = generateDecisionStatusList(infos, "superseded");
+    const secondTable = generateDecisionBaselineTable(collectDecisionFiles(supDecDir));
+    const secondList = generateDecisionStatusList(
+      collectDecisionFiles(supDecDir),
+      "superseded",
+    );
+    expect(secondTable).toEqual(firstTable);
+    expect(secondList).toEqual(firstList);
+  });
+});
+
 describe("retired Decision restore handling (REQ-059-005)", () => {
   const restoreDecDir = path.join(RR_TMP_ROOT, "restore", "decisions");
   const restoreRetiredDir = path.join(restoreDecDir, "retired");
@@ -589,4 +671,5 @@ describe("readme-req-summary-table (REQ-057-018)", () => {
 afterAll(() => {
   fs.rmSync(TMP_ROOT, { recursive: true, force: true });
   fs.rmSync(RR_TMP_ROOT, { recursive: true, force: true });
+  fs.rmSync(SUP_TMP_ROOT, { recursive: true, force: true });
 });

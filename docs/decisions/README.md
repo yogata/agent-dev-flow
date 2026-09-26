@@ -53,7 +53,7 @@
 | DEC-037 | Traceability の Change / Evidence 中心への再中心化 | accepted | 2026-09-18 |
 | DEC-038 | ADF v4 durable state 配置と再構成の契約（状態権威・証跡分離・非原子調整原則） | accepted | 2026-09-19 |
 | DEC-039 | ADF v4 authority・副作用統制と冪等・並行性モデル | accepted | 2026-09-19 |
-| DEC-040 | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化） | superseded | 2026-09-22 |
+| DEC-040 | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化）〔superseded by DEC-044。決定4 は DEC-044 が置換。決定1〜3は維持〕 | superseded | 2026-09-22 |
 | DEC-041 | Wave 構成純度と実行並列上限の単一所有 | accepted | 2026-09-23 |
 | DEC-042 | case-auto 最大並列維持と同期逐次フォールバック禁止 | accepted | 2026-09-24 |
 | DEC-043 | case-ready 実行構造判断への Jev 最終判断採用（Stage 2: 閾値ルーティング） | superseded | 2026-09-26 |
@@ -121,7 +121,7 @@
 - [DEC-017](DEC-017.md)（最小トレーサビリティモデルの採用と Artifact Graph の廃止）
 - [DEC-029](DEC-029.md)（公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入）
 - [DEC-030](DEC-030.md)（トレーサビリティ標準機能への一般化と producer / consumer 境界の確立）
-- [DEC-040](DEC-040.md)（typesafe/Jev 先行評価の採用（Stage 1: 観測可能化））
+- [DEC-040](DEC-040.md)（typesafe/Jev 先行評価の採用（Stage 1: 観測可能化））〔superseded by DEC-044。決定4 は DEC-044 が置換。決定1〜3は維持〕
 - [DEC-043](DEC-043.md)（case-ready 実行構造判断への Jev 最終判断採用（Stage 2: 閾値ルーティング））
 <!-- AUTOGEN:END -->
 
