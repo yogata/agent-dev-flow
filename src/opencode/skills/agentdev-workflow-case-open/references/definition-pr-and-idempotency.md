@@ -31,7 +31,17 @@ canonical Definition との実変更を判定し、実変更がある場合の�
 1. 実変更判定: Definition Package と canonical Definition を比較する（case-open / case-ready Design）。差分が空の場合は実変更なし → PR を作成せず STEP-5 へ進む。実変更のない Case（bugfix / maintenance / docs_chore 等では作成しない）
 2. 実変更がある場合: 実変更を Case 単位で 1 件の Definition PR として集約し作成する。1 Case につき 2 件以上作成しない
 3. REQ 行変更（新規行の追加・移管・廃止等）を伴う Definition PR では、PR 作成前に Design の ADF-COVERS 宣言の追随反映を確認し、トレーサビリティ check（`agentdev-traceability`）で当該 REQ 行の missing-design が 0 件であることを確認する（missing-design 0 件ゲート）。宣言追随が Definition に含まれておらず missing-design が 0 件でない場合は PR を作成せず、Definition Package の構成へ戻して宣言追随を確定する
-4. PR 作成は `agentdev_gh` の pr_create で行い、GitHub Draft PR ではない通常 Pull Request として作成する（draft 指定は公開契約に存在しない。REQ-{NNNN}-{NNN}）。PR 本文は verbatim で記録する。並行 case-open 実行時は、PR 作成前に下記「並行 case-open の PR 作成前隔離検査（REQ-030-017）」を実行し、検査を通過した場合のみ PR を作成する
+4. head branch push（前段）: PR 作成の前に head branch を remote へ push する。`git push -u origin definition/issue-{N}` を実行し、push 先 refspec（remote branch 名と upstream 設定）が意図した先であることを push 出力で確認する。手順詳細は下記「PR 作成前の head branch push」参照
+5. PR 作成は `agentdev_gh` の pr_create で行い、GitHub Draft PR ではない通常 Pull Request として作成する（draft 指定は公開契約に存在しない。REQ-{NNNN}-{NNN}）。PR 本文は verbatim で記録する。並行 case-open 実行時は、PR 作成前に下記「並行 case-open の PR 作成前隔離検査（REQ-030-017）」を実行し、検査を通過した場合のみ PR を作成する
+
+#### PR 作成前の head branch push
+
+PR 作成（手順 5 の pr_create）の前段として、Definition 変更を含む head branch を remote へ push する。pr_create は remote に存在する branch を head とする PR 作成操作であり、未 push の branch で pr_create を実行すると失敗する（HTTP 422 由来の実失敗に基づく前段手順）。push を pr_create より手前に位置させる。
+
+1. push 対象 branch の確認: 作業 branch（`definition/issue-{N}` 形式）が HEAD であり、Definition 変更が commit 済みであることを確認する
+2. push の実行: `git push -u origin definition/issue-{N}` を実行する
+3. push 先 refspec の確認: push 出力で remote branch 名と upstream 設定（`origin/definition/issue-{N}`）が意図した先であることを確認する。refspec の省略・誤指定により意図しない branch へ push していないことを出力で検証する
+4. push 結果の記録: push 済み HEAD hash と remote branch 名を検証記録へ残す
 
 #### 並行 case-open の PR 作成前隔離検査（REQ-030-017）
 
@@ -80,6 +90,7 @@ canonical Definition との実変更を判定し、実変更がある場合の�
 
 - 実変更判定結果（実変更あり / なし）
 - Definition PR 作成結果（実変更時のみ。Case 単位 1 件）
+- head branch push 結果（実変更時のみ。push 済み HEAD hash と remote branch 名、refspec 確認済み）
 - 並行 case-open 実行時の PR 作成前隔離検査結果（自 Case 差分のみの確認、スタック検出時は差分再構成救済の実施。REQ-030-017）
 - 冪等確認結果（既存成果物の再利用、重複生成なし、不足分のみ処理）
 - 横断依存検査結果（警告の提示記録、または検出不能報告。警告のみで Root Case の確立は阻止しない）
@@ -87,6 +98,7 @@ canonical Definition との実変更を判定し、実変更がある場合の�
 ## Evidence
 
 - 実変更判定根拠（canonical Definition との差分）、作成した PR 番号、既存成果物の検出結果
+- head branch push の実行証跡（push 出力による refspec 確認結果、push 済み HEAD hash と remote branch 名。実変更時のみ）
 - 並行 case-open 実行時の PR 作成前隔離検査実行証跡（merge-base / diff --stat の結果、救済実施時は差分再構成の記録。REQ-030-017）
 - 横断依存検査の実行証跡（検査入力、エンジンの報告 JSON、投入者への選択肢提示とその応答）
 
@@ -94,6 +106,7 @@ canonical Definition との実変更を判定し、実変更がある場合の�
 
 - 実変更がない Case について Definition PR が存在しないこと
 - 実変更がある Case について Definition PR が 1 件であること
+- 実変更がある Case について、pr_create の前段で head branch push が実行され、push 先 refspec の確認が記録されていること
 - REQ 行変更を伴う Case について、PR 作成前の missing-design 0 件ゲート確認が行われていること
 - 並行 case-open 実行時に、PR 作成前隔離検査（自 Case 差分のみ・明示パスステージ・1-writer 侵害検知時の早期断念）が実行されていること（REQ-030-017）
 - 再実行時に Root Case と Definition PR の件数が増加しないこと

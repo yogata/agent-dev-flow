@@ -22,6 +22,8 @@ case-run は AGENTS.md で選定された外部実行基盤のエージェント
 - [委譲識別情報ブロック](#委譲識別情報ブロック)
 - [構造化文脈の直列化（委譲時）](#構造化文脈の直列化委譲時)
 - [委譲プロンプト雛形（委譲契約必須テンプレート）](#委譲プロンプト雛形委譲契約必須テンプレート)
+- [委譲指示規律（canonical 参照は節名のみ・traceability sidecar への記録）](#委譲指示規律canonical-参照は節名のみtraceability-sidecar-への記録)
+- [実行形式（bun ./ prefix・junction projection 挙動・checker skip の test 補完）](#実行形式bun--prefixjunction-projection-挙動checker-skip-の-test-補完)
 - [委譲プロトコルと category 設計](#委譲プロトコルと-category-設計)
 - [委譲起動不能時の事前判定経路](#委譲起動不能時の事前判定経路)
 - [委譲起動失敗、異常終了時事後処理](#委譲起動失敗異常終了時事後処理)
@@ -258,6 +260,25 @@ structured_context の生成（委譲 prompt 構築）は、次の抽出制約�
 ```
 
 case-run は委譲プロンプト構築時に本テンプレート構造を維持し、実行担当サブエージェントからの result に含まれる回収項目を PR 本文に転記する。
+
+## 委譲指示規律（canonical 参照は節名のみ・traceability sidecar への記録）
+
+委譲 prompt の構築者（case-run へ委譲する全場面）と委譲を受ける実行担当サブエージェントが、配布物本文・委譲 prompt・PR 本文・Issue コメントへ ID を書き込む際に従う指示規律。配布物本文への concrete ID 直書きが配布依存境界 checker の違反（consumer 環境で ID が解決不能となる設計制約）となり、既存違反の新規追加を誘発した実失敗に基づく予防規律である。「委譲プロトコルと category 設計」節の MUST NOT DO 必須化における予防観点の引き渡しを、独立した指示規律として拡充したものである。
+
+- **canonical 参照は節名のみ**: 委譲 prompt、配布物本文（SKILL.md、references、command 本文）、およびその追記では、REQ 行 ID、Decision ID、CR 番号等の concrete ID を本文に直書きしない。正規原本への参照は、対象文書名と節名（例: case-open Design「並行 case-open の作業隔離規律」節）による節名参照で記述する。本文に具体番号を書ける ID ファミリーの範囲（STEP 番号、QG 番号等）は配布依存境界 Design の正規規定に従う
+- **対応関係は traceability sidecar への記録**: concrete ID を伴う対応関係（どの配布物がどの要件行・決定事項に対応するか）は、repository top-level の `traceability/` 配下 sidecar へ記録する。配布物本体は対応関係の ID を持たず、sidecar への登録と配布物本文の節名参照の両立で接合する
+- **sidecar 宣言パターン**: sidecar は成果物パス単位に role キー配下へ要件行 ID を列挙する形式である。配布物（producer 側パス）に対する対応関係は implementation 役割で登録する。role の種類（decision / design / implementation / verification の4役割）と形式詳細は traceability の正規契約と配布依存境界 Design を参照する
+- **sidecar 記録手順**: 委譲内で配布物本文を変更した場合、該当する対応関係の sidecar 登録要否を確認する。対応関係が新設・変更される場合は PR 作成前に sidecar へ implementation 宣言を登録し、配布物本文は ID を直書きしない状態のまま merge する。sidecar 登録が REQ 行追加等の正規成果物変更を伴う場合はスコープ外として blocked で報告する
+- **適用範囲**: 新規配布物の作成を含まない委譲（既存配布物への本文追記を含む委譲）にも同一規律を適用する。委譲 prompt による作成時予防（MUST NOT DO セクションへの規律引き渡し）と配布依存境界 checker による事後検知は両立し、いずれか一方を他方の代替にしない
+
+## 実行形式（bun ./ prefix・junction projection 挙動・checker skip の test 補完）
+
+委譲内および worktree 上での bun スクリプト・テスト実行の実行形式。Module not found、0 件実行、skip による見かけ上の合格等の実失敗に基づく規律である。
+
+- **bun ./ prefix 形式のみ動作**: bun による checker・テスト実行は `./` prefix 付き相対パス（例: `bun ./.opencode/skills/<integrity-detector-skill>/scripts/check_*.ts`）で起動する。`./` なし指定（`bun .opencode/...` 形式）は Module not found（checker 単独実行）または no test files matched（0 件実行）となる。bun コマンド自体は起動するため、起動の成否を合格判定と混同しない
+- **junction projection 挙動**: worktree の `.opencode/skills/` 配下ジャンクションは未伝播である。checker 本体は projection 側解決（main root 実体）で動作するため host（メインリポジトリ root）起点で起動し、bun test は worktree の実ファイルを読む。起動パス（host / projection）とテストが読むツリー（worktree 実ファイル）の対応は環境ラベルへ記録する
+- **check_templates 単独 skip と test 補完**: templates 系 checker（`check_templates.ts`）の worktree 単独実行はジャンクション未伝播により skip され、失敗 0 件の見かけ上の合格となる。単独実行を合格扱いにせず、対応する test（bun test）実行で補完する。skip の有無と test による補完結果を検証記録へ残す
+- **probe test 事前確認**: bun test 実行の前に、テストが読むツリー（worktree 実ファイルまたは projection）を probe test（最小のテスト 1 件の事前実行）で確認する。読むツリーを確認せずに検証結果を解釈しない
 
 ## 委譲プロトコルと category 設計
 

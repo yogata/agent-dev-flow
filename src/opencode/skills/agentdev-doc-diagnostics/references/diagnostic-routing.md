@@ -51,6 +51,19 @@ inspect-docs command が実行する docs 横断診断のうち、専門診断�
 専門 skill から返却された検出事項（finding）は、本スキルが定める共通 finding 出力契約（`finding-output-contract.md`）へ適合させて統合する。
 severity、confidence、NG 分類は本スキルの共通契約へ正規化する。
 
+### 5. knowledge 変更の検証ルーティング
+
+targeted docs guard（`check_changed_docs.ts`）は docs/knowledge/** を検査対象外とする。knowledge README（docs/knowledge/README.md）の知識文書列挙と実ファイルの過不足（README 列挙整合）の検証は、knowledge README 列挙整合 checker（`check_knowledge_docs.ts`）が正規担当である。
+
+docs/knowledge/** を変更する Case の検証ルーティングは次の分担とする:
+
+| 検査対象 | 正規担当 | 対象外となる検査 |
+|----------|----------|------------------|
+| docs/knowledge/README.md の列挙整合（知識文書一覧と実ファイルの過不足） | `check_knowledge_docs.ts` | targeted docs guard（docs/knowledge/** を対象外とする） |
+| docs/knowledge/** 配下の知識文書構造（frontmatter、必須見出し、配置、命名） | `check_knowledge_docs.ts` | targeted docs guard（同上） |
+
+knowledge README 変更を含む Case では、targeted docs guard を docs/knowledge/** の検証担当とせず、`check_knowledge_docs.ts` の実行を docs 検証手順へ含める（実行タイミングと起動形式の記載先は case-run・case-close の docs 検証手順）。本節は担当分担のルーティング規則のみを定め、checker の検査内容・判定基準は再定義しない（「2. 専門診断の再定義禁止」と同一の境界）。
+
 ## ルーティング表と inspect-docs workflow 工程の対応
 
 inspect-docs Workflow Skill（`agentdev-workflow-inspect-docs`）の各工程は、次のように本スキルと専門 skill を組み合わせる。
