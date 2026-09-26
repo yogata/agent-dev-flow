@@ -56,3 +56,39 @@
 - **想定反映先**: agentdev-workflow-case-run・agentdev-workflow-case-close の配布依存境界 gate 手順（配布依存境界 Design 由来の差分突合記述）
 - **関連**: Case #3161・PR #3164 本文の Findings / Capture候補（learning 候補の case-close 回収）、.agentdev/learning/deferred.md（配布依存境界既存違反の既知事象管理）
 - **タグ**: `#distribution-boundary` `#base-diff` `#case-close`
+
+---
+
+## 配布物 references の規範参照を REQ ID 直書きで書くと IR-055 strict 違反になる — 宣言フィールド名・概念名での記述が安全
+
+- **問題事象**: 配布物（src/opencode/skills 配下）の references への改訂で、規範参照を REQ ID 直書き（例: REQ-059）で記述した結果、IR-055（runtime-unresolved-reference）strict 違反を検出した
+- **発生局面**: 実装（case-run RA-005: agentdev-decision-file-manager validation-and-consistency.md の照合手順改訂）
+- **検知方法**: check_integrity full-audit の IR-055 違反検出（stash 差分突合で本変更由来と特定）
+- **根本原因**: REQ ID 直書きは runtime 未解決参照として配布依存境界の検査対象になる（宣言の裏付けのない具体 ID 参照）
+- **自律対応内容**: fix-and-reverify で REQ ID 直書きを除去し、宣言フィールド名・概念名での記述へ置換して再検証合格（1 回の fix-and-reverify を要した）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存 IR-055 契約どおりの検出・再発防止知見）
+- **横展開観点**: 配布物 references を編集する全 Case で適用可能。「宣言フィールド名・概念名で書く」が記述指針として再利用できる
+- **再発条件**: 配布物（src/opencode/skills 配下）の references で規範参照を REQ ID 直書きで記述する場合
+- **予防策候補**: 配布物 references の執筆・改訂時に REQ ID 直書きを避け、宣言フィールド名・概念名での記述を標準とする指針の明文化候補
+- **想定反映先**: agentdev-skill-authoring（配布物 skill reference 執筆基準）、check_integrity IR-055 の該当規約
+- **関連**: Case #3162、PR #3165 本文 Findings / Capture候補（learning 候補の case-close 回収）
+- **タグ**: `#IR-055` `#distribution-boundary` `#references`
+
+---
+
+## check_integrity.test.ts の IR-055 delta テストが baseline commit 時点でも fail（テスト期待値と baseline の乖離の調査候補）
+
+- **問題事象**: check_integrity.test.ts の「IR-055 runtime-unresolved-reference 実修復回帰（Issue #1782）> 配布物に新規（delta from baseline）runtime-unresolved-reference 違反がないこと」テストが、base 時点（commit 3bd480cb の親 aed65975・ワークツリー変更ゼロ相当）でも fail（Received: 2）した
+- **発生局面**: 検証（case-run 既存テスト回帰・fail 由来分類の baseline 再現確認）
+- **検知方法**: stash による base 実行での同一 fail 再現確認（本変更非由来の確認）
+- **根本原因**: 本変更非由来の pre-existing 不整合。delta baseline とテスト期待値の乖離（既存 intake 2026-09-27-integrity-delta-baseline-commit-persistence.md の delta baseline commit 参照不能問題と同系統の疑い）
+- **自律対応内容**: fail 由来分類を pre-existing として記録（baseline 再現確認済み・PR 本文検証差分へ記載済み）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（調査候補の記録）
+- **横展開観点**: pre-existing fail の baseline 再現確認手順（3点対照）の有効性再確認。fail 由来分類の証跡として baseline commit 指定の再現記録を残す運用が機能した
+- **再発条件**: IR-055 delta テストを実行する全環境（baseline 系 durable state の追随差がある場合）
+- **予防策候補**: delta baseline とテスト期待値の乖離の調査（関連 intake の検討対象と統合）
+- **想定反映先**: check_integrity.test.ts（Issue #1782 系 delta テスト）、traceability 側の delta baseline 運用
+- **関連**: Case #3162、PR #3165 本文 Findings / Capture候補、.agentdev/intake/inbox/2026-09-27-integrity-delta-baseline-commit-persistence.md（同系統調査候補）
+- **タグ**: `#IR-055` `#pre-existing` `#baseline-diff`
