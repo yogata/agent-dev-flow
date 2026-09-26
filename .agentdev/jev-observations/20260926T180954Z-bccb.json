@@ -1,0 +1,40 @@
+{
+  "observationId": "20260926T180954Z-bccb",
+  "schemaVersion": 1,
+  "workflow": "learning-promote",
+  "judgmentKind": "adversarial-review-trigger",
+  "subject": "learning-promote STEP-4 adversarial-review 発動条件判定（inbox 12エントリ、skip 条件非該当の見込み）",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "sourceRevision": "93b6a68c",
+  "outcome": "completed",
+  "durationMs": 896,
+  "resolvedModel": "typesafe-ai/jev",
+  "inputTokens": 948,
+  "inputs": {
+    "requestDigest": "7334d44282e76f8c6a431ce42d947ad945a3003760f6e3339257606b542a27ab",
+    "references": [
+      {
+        "digest": "b3aa72a3d16ba76579c88e5305e57c7a3d0c40b8063d0e0252ea3fb30d8ec2ae",
+        "label": "learning inbox.md",
+        "path": ".agentdev/learning/inbox.md"
+      }
+    ],
+    "snapshot": "inbox 12 entries: gh pr_create 422 pre-push, check_integrity --json stdout pollution, distribution-boundary canonical reference conventions ×2, bun ./ prefix + junction behavior, issue_list labels zero-hit (REQ-092-002 known), write-guard fail-closed temp file, node -e regex escape corruption via Git Bash, targeted docs guard vs knowledge README responsibility split, LLM body verification filesystem-truth, bash heredoc truncation (Windows/CJK), integrity suite delta baseline pre-existing classification"
+  },
+  "judgments": [
+    {
+      "judgmentId": "review-trigger",
+      "questionForm": "boolean",
+      "jevResult": true,
+      "probabilityDistribution": {
+        "true": 0.97,
+        "false": 0.030000000000000027
+      },
+      "confidence": 0.97,
+      "llmFinalJudgment": "発動する。skip 条件（エントリ1件のみで重複確定、または inbox 空）は非該当。12エントリ存在し、単一エントリ重複確定とは言えないため default-on により adversarial-review を発動する。",
+      "llmTreatment": "unchanged"
+    }
+  ],
+  "recordState": "complete"
+}

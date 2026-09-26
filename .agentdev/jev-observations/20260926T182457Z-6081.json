@@ -1,0 +1,45 @@
+{
+  "observationId": "20260926T182457Z-6081",
+  "schemaVersion": 1,
+  "workflow": "intake-promote",
+  "judgmentKind": "adversarial-review-trigger",
+  "subject": "intake-promote STEP-2 adversarial-review 発動条件判定（2 item・意味的決定ありの見込み）",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "sourceRevision": "93b6a68c",
+  "outcome": "completed",
+  "durationMs": 754,
+  "resolvedModel": "typesafe-ai/jev",
+  "inputTokens": 822,
+  "inputs": {
+    "requestDigest": "b435b90b60a0c53e8436283bb0d5964b86f32cc9c09d78e6266153c5738ebd6a",
+    "references": [
+      {
+        "digest": "e5d3b1b3e6cf60a7d15b68a1e2f2e5d3c4b5a6978d21c3f4e5a6b7c8d9e0f1a2",
+        "label": "intake inbox item 1",
+        "path": ".agentdev/intake/inbox/2026-09-25-case-close-3139-parallel-measurement-findings.md"
+      },
+      {
+        "digest": "c8d2a4b6e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7",
+        "label": "intake inbox item 2",
+        "path": ".agentdev/intake/inbox/2026-09-26-case-open-3158-docs-readme-decision-static-table.md"
+      }
+    ],
+    "snapshot": "2 items: #3139 検出候補和集合（部分採用・却下2・重複除外2・保留2・裁定事項1含む）、#3158 docs/README Decision静的表（採用・構造存続）。暫定分類に意味的決定（patterns裁定扱い、重複排除、情報不足保留の取扱）が含まれる"
+  },
+  "judgments": [
+    {
+      "judgmentId": "review-trigger",
+      "questionForm": "boolean",
+      "jevResult": true,
+      "probabilityDistribution": {
+        "true": 0.97,
+        "false": 0.030000000000000027
+      },
+      "confidence": 0.97,
+      "llmFinalJudgment": "発動する。2 item の暫定分類に意味的決定（裁定候補の採用扱い、既存 defer との重複排除の妥当性、情報不足項目の保留扱い、部分採用と inbox ファイル削除の両立機構）が含まれ、skip 条件（1件のみで自明）に該当しないため adversarial-review を発動する。",
+      "llmTreatment": "unchanged"
+    }
+  ],
+  "recordState": "complete"
+}

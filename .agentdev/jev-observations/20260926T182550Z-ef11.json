@@ -1,0 +1,40 @@
+{
+  "observationId": "20260926T182550Z-ef11",
+  "schemaVersion": 1,
+  "workflow": "inspect-promote",
+  "judgmentKind": "adversarial-review-trigger",
+  "subject": "inspect-promote STEP-5 adversarial-review 発動条件判定（32件・意味的決定あり・再評価）",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "sourceRevision": "93b6a68c",
+  "outcome": "completed",
+  "durationMs": 372,
+  "resolvedModel": "typesafe-ai/jev",
+  "inputTokens": 894,
+  "inputs": {
+    "requestDigest": "220c11b192cacd66ef16df24fc538b021e1f2768ce9b68b649738e5154888936",
+    "references": [
+      {
+        "digest": "7ad834a1dda67535005f7d47de574d01ffc83d9b83ab32138563776ed42aaaf4",
+        "label": "inspect finding file (sha256 実測)",
+        "path": ".agentdev/inspect/inbox/inspect-docs-finding-20260926T180630Z.md"
+      }
+    ],
+    "snapshot": "32 findings (サマリは31件と表記・不整合あり): promote 15 (自律14+HITL承認1) / defer 17 (自律11+HITL6) / reject 0。既存 defer との重複4件捕捉。解釈依存の defer/promate 判定、件数不整合の取扱い等の意味的決定を含む"
+  },
+  "judgments": [
+    {
+      "judgmentId": "review-trigger",
+      "questionForm": "boolean",
+      "jevResult": true,
+      "probabilityDistribution": {
+        "true": 0.96,
+        "false": 0.040000000000000036
+      },
+      "confidence": 0.96,
+      "llmFinalJudgment": "発動する。32件の暫定分類に意味的決定（解釈依存項目の defer/promote 振り分け規則の適用一貫性、既存 defer との重複4件の判定、REQ-092-003 新設等の新情報による引き上げ可否、サマリ件数不整合の取扱い）が含まれるため adversarial-review を発動する（--auto なし手動分類フロー）。",
+      "llmTreatment": "unchanged"
+    }
+  ],
+  "recordState": "complete"
+}
