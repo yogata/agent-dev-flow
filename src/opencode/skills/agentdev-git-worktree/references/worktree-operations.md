@@ -236,6 +236,11 @@ worktree 操作（実装、検証、証跡退避を含む）におけるファ�
 - 既存ファイルの部分編集: edit ツール（per-line string replace）
 - プログラム経由の一括読み書き: node の `readFileSync` / `writeFileSync`（エンコーディング明示）または `[System.IO.File]` の明示エンコーディング指定
 - 証跡退避（checker CLI stdout、gh CLI 出力等）: `spawnSync` + `fs.writeFileSync`（UTF-8 明示）
+- shell inline・heredoc に起因するコンテンツ破損の回避（2技法）:
+  - (a) 一時スクリプトファイル経由の実行: 正規表現リテラル等を含む解析コード、日本語を含む長大なコンテンツの書き出しは、project root 内の一時スクリプトファイルへ配置して実行し、検査後に削除する（ファイルベース伝達）
+  - (b) PowerShell 単一引用符ヒアドキュメント: `node -e` と単一引用符ヒアドキュメントの組合せは、bash の escape 解釈・heredoc 打ち切りを経由しない素通し可能な代替技法である
+
+(a) と (b) の使い分け: 標準は (a) の一時スクリプトファイル経由であり、単発の短い解析等で一時ファイル作成が過剰になる場面を (b) の代替対象とする。2機構（argv escape 解釈による文字列変質、heredoc stdin の中途打ち切り）とその別個の検知方法、および本集約との相互参照は `docs/knowledge/windows-git-bash-inline-content-corruption.md` を参照する。両技法は shell inline を一律禁止する過剰一般化ではなく、破損機構に応じた切替手段である。guard の fail-closed 維持と、ブロック時は解除・迂回ではなく標準手段へ切替する原則は本節全体で維持する
 
 ### fail-closed の維持
 

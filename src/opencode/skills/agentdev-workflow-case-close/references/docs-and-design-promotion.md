@@ -65,6 +65,13 @@ Design 状態評価（棚卸し制、STEP-3-2）を実行する。PR 本文の `
 - **draft → accepted 等の Design status 変更時**: `spec_readme_update_required` を STEP-3-2 Design 確定フローに反映
 - **`files_checked` 空時の確認**: targeted docs guard の JSON 出力で `files_checked` が空の場合、検査見逃しリスクとして扱い、`warnings` 配列の警告を確認、`--files` 指定の妥当性と検査対象 root の解決（配置先起点の誤リポジトリ検査でないこと）を確認、`files_checked` の内容と検査対象変更ファイルの一致を確認、必要に応じて再実行または手動確認、空の理由が正当であることを確認してから続行する
 
+#### knowledge README 列挙整合検査（check_knowledge_docs.ts）
+
+docs/knowledge/README.md を変更する Case では、targeted docs guard（docs/knowledge/** を検査対象外とする）に加えて、knowledge README 列挙整合 checker（`check_knowledge_docs.ts`）を実行する。targeted docs guard は docs/knowledge/** を検査対象外とするため、knowledge README の知識文書列挙と実ファイルの過不足（README 列挙整合）の検証は本 checker が正規担当である。
+
+- **実行コマンド**: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_knowledge_docs.ts --root <検査対象 root> --json`（host 起点で起動し、`--root` で検査対象を指定する。check_knowledge_docs.ts は `--root` による worktree 指定に対応する）
+- **判定**: 列挙不整合（README 未記載の知識文書ファイル、実在しないエントリ等）の検出時は修正して再実行し、実行結果を Evidence へ記録する
+
 #### AUTOGEN 鮮度 gate（境界 close 時の再検査）
 
 squash merge を伴う境界 close では、AUTOGEN 計測日の drift 発生を前提として AUTOGEN 鮮度検出 gate を実行する。計測日 drift の発生機構は date rollover、Phase 0 起因、GitHub squash merge による committer date 置換の 3 種である。AUTOGEN 計測日は generate_indexes の最終 commit から git log の committer date（`%cI`）基準で導出され、author date とは区別される。原本は `<integrity/index-auto-generation>` Design「AUTOGEN計測日の導出基準」節と `<integrity/autogen-freshness-gate>` Design「計測日driftの発生機構」節である。
@@ -142,6 +149,7 @@ Design status 昇格タイミング（draft → accepted）の詳細、frontmatt
 ## case-close が使用する検査ツール
 
 - `check_changed_docs.ts`（`--workflow case-close`、`--files <PR 変更ファイル一覧>`、targeted docs guard で実行）
+- `check_knowledge_docs.ts`（`--root <検査対象 root>`、docs/knowledge/README.md 変更を含む場合に実行。targeted docs guard が docs/knowledge/** を対象外とするため knowledge README 列挙整合の正規担当）
 - `check_extensions.ts`（配布物パターンのいずれかを変更した場合に実行）
 - `check_distribution_boundary.ts`（`--profile source`、PR 変更ファイルが配布 command/skill ソース面に含まれる場合に実行）
 - `check_autogen_freshness.ts`（AUTOGEN 鮮度 gate。squash merge を伴う境界 close 時に実行）

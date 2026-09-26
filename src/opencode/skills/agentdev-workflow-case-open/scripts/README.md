@@ -51,6 +51,8 @@ scripts/
 | commit 対象外 | 検査入力は commit に含めない。git 管理対象の追跡ファイルとして置かない |
 | 検査後削除 | 検査完了後に入力ファイルを削除する（一時ファイルの残留を残さない） |
 
+置き場所の具体候補は `.agentdev/integrity/reports/` である。project root 内の実行時作業領域（git 管理対象外・.gitignore 除外領域）であり、上記4方針（workspace 外 temp 禁止、project root 内限定、commit 対象外、検査後削除）を満たす。検査入力 JSON は commit に含まれず、検査完了後に入力ファイルを削除する（削除の実施を検証記録へ残す）。
+
 書込み手段は worktree 操作の書込み guard 運用指針（`agentdev-git-worktree` reference「書込み guard 運用指針」）の標準手段（node の `fs.writeFileSync` 等のエンコーディング明示）に従う。workspace 外への書込みが guard によりブロックされた場合は、ブロックの解除・別 API 経路への迂回を行わず、置き場所を project root 内へ変更して切替する（fail-closed 維持）。
 
 ## 実行方法
