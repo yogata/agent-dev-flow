@@ -475,6 +475,15 @@ export interface DecisionInfo {
    * 空宣言（[]）と区別して null で表現する。
    */
   relatedReqs: string[] | null;
+  /**
+   * frontmatter superseded_by（例: "DEC-044"）。superseded 以外または未宣言は null。
+   */
+  supersededBy: string | null;
+  /**
+   * frontmatter supersede_note（部分置換注記の本文、例: "決定4 は DEC-044 が置換。決定1〜3は維持"）。
+   * 未宣言は null。
+   */
+  supersedeNote: string | null;
 }
 
 /**
@@ -499,6 +508,8 @@ function extractDecisionInfo(
   let status = "";
   let created = "";
   let relatedReqs: string[] | null = null;
+  let supersededBy: string | null = null;
+  let supersedeNote: string | null = null;
   if (fm) {
     if (typeof fm["title"] === "string") title = fm["title"];
     if (typeof fm["status"] === "string") status = fm["status"];
@@ -506,6 +517,12 @@ function extractDecisionInfo(
     const rr = fm["related_reqs"];
     if (Array.isArray(rr)) relatedReqs = rr;
     else if (typeof rr === "string") relatedReqs = [rr];
+    if (typeof fm["superseded_by"] === "string") {
+      supersededBy = fm["superseded_by"];
+    }
+    if (typeof fm["supersede_note"] === "string") {
+      supersedeNote = fm["supersede_note"];
+    }
   }
   // title が frontmatter に無い場合は H1 から抽出（フォールバック）。
   if (!title) {
@@ -517,7 +534,18 @@ function extractDecisionInfo(
     }
   }
 
-  return { id, num, title, status, created, filename, relPath, relatedReqs };
+  return {
+    id,
+    num,
+    title,
+    status,
+    created,
+    filename,
+    relPath,
+    relatedReqs,
+    supersededBy,
+    supersedeNote,
+  };
 }
 
 /**
@@ -638,6 +666,25 @@ export const DECISION_RETIRED_TABLE_BLOCK_ID = "decision-retired-table";
 export const DECISION_RELATED_REQ_TABLE_BLOCK_ID = "decision-related-req-table";
 
 /**
+ * superseded Decision 行の部分置換注記サフィックス（index-auto-generation.md
+ * 「現在稼働している自動生成契約」5「Decision frontmatter の supersede_note 由来の
+ * 部分置換注記生成」）。
+ *
+ * superseded Decision で frontmatter に `supersede_note` フィールドが存在する場合、
+ * `superseded_by` と `supersede_note` の両 frontmatter フィールドをデータ源として
+ * `〔superseded by DEC-MMM。<note>〕` 形式の注記文字列を返す。
+ * status 表（decision-baseline-table）・superseded セクション（decision-status-superseded）
+ * 間で同一注記文字列を出力する。
+ * supersede_note 未宣言（全体置換等）の場合は null を返し、注記を付与しない。
+ */
+export function formatSupersedeNoteSuffix(info: DecisionInfo): string | null {
+  if (info.status !== "superseded") return null;
+  if (!info.supersedeNote) return null;
+  const by = info.supersededBy ? `superseded by ${info.supersededBy}。` : "";
+  return `〔${by}${info.supersedeNote}〕`;
+}
+
+/**
  * 現行 Decision の件数表明キャプション（1行）。
  * 形式: "現行の承認済み Decision はN件、提案中の Decision はM件である。"
  */
@@ -662,8 +709,12 @@ export function generateDecisionBaselineTable(
   lines.push("| Decision番号 | タイトル | ステータス | 作成日 |");
   lines.push("|---------|---------|-----------|--------|");
   for (const info of decisions) {
+    const note = formatSupersedeNoteSuffix(info);
+    const titleCell = sanitizeTableCell(
+      note ? `${info.title}${note}` : info.title,
+    );
     lines.push(
-      `| ${info.id} | ${sanitizeTableCell(info.title)} | ${info.status} | ${info.created} |`,
+      `| ${info.id} | ${titleCell} | ${info.status} | ${info.created} |`,
     );
   }
   return lines;
@@ -679,7 +730,11 @@ export function generateDecisionStatusList(
 ): string[] {
   return decisions
     .filter((d) => d.status === status)
-    .map((info) => `- [${info.id}](${info.relPath})（${info.title}）`);
+    .map((info) => {
+      const base = `- [${info.id}](${info.relPath})（${info.title}）`;
+      const note = formatSupersedeNoteSuffix(info);
+      return note ? `${base}${note}` : base;
+    });
 }
 
 /**

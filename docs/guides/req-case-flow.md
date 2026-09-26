@@ -29,7 +29,7 @@ AI と対話して要件を整理するコマンド。
 
 ## case-open
 
-要件docまたは REQ ファイルから GitHub Issue を作成するコマンド。
+要件docまたは REQ ファイルから GitHub Issue（Root Case）を確立する内部 lifecycle 段階（case-auto が駆動）。
 
 **入力**: REQ ファイル / 要件doc
 
@@ -39,7 +39,7 @@ AI と対話して要件を整理するコマンド。
 
 ## case-ready
 
-Definition Package を保存・確定し、Case の実行構造を確定するコマンド。
+Definition Package を保存・確定し、Case の実行構造を確定する内部 lifecycle 段階（case-auto が駆動）。
 
 **入力**: Root Case、要件doc、`artifact_actions`
 
@@ -49,7 +49,7 @@ REQ、Decision、Design の保存と Design の成熟度管理は case-ready の
 
 ## case-revise
 
-再合意済み Definition の変更を既存 Root Case に反映するコマンド。
+再合意済み Definition の変更を既存 Root Case に反映する内部 lifecycle 段階（case-auto が例外経路として駆動）。
 
 **入力**: 既存 Root Case、再合意済み要件doc、Amendment
 
@@ -59,7 +59,7 @@ case-revise の後は case-ready を再実行し、変更後の Definition と�
 
 ## case-run
 
-Issue に基づいて実装し、PR を作成するコマンド。
+Issue に基づいて実装し、PR を作成する内部 lifecycle 段階（case-auto が駆動）。
 3フェーズ構成でべき等な再開ポイントを提供する。
 
 **入力**: Issue 本文
@@ -88,7 +88,7 @@ Issue に基づいて実装し、PR を作成するコマンド。
 
 ## case-close
 
-PR をマージし、Issue をクローズするコマンド。
+PR をマージし、Issue をクローズする内部 lifecycle 段階（case-auto が駆動）。
 
 **入力**: PR + Issue
 

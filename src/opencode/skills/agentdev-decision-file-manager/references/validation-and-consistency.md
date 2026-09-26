@@ -99,7 +99,8 @@ proposed → deprecated
 
 ### REQ ↔ Decision
 
-- REQ本文の「関連情報」セクションに記載されたDecision番号の存在確認
+- Decision frontmatter の `related_reqs` に記載された REQ 番号の実在確認（Decision ↔ REQ の関連宣言は Decision frontmatter の `related_reqs` が正規。REQ frontmatter 側に `related_reqs` 宣言が存在する場合は併せて照合する）
+- `superseded` status の Decision 照合は frontmatter `superseded_by` で後継 Decision 番号を確認する
 - Decisionが存在しない場合、Decision作成を推奨（要件がアーキテクチャ判断を含む場合）
 - DecisionがREQを参照していない場合、関連性の再評価を推奨
 
@@ -128,7 +129,7 @@ proposed → deprecated
 **README.md の更新タイミング**:
 - Decision CREATE 時: 全ビューに反映
 - Decision UPDATE（ステータス変更）時: 状態別ビュー（Status View）を更新
-- Decision APPEND（関連情報追加）時: 意思決定マップ/ 関連REQ を更新
+- Decision frontmatter の `related_reqs`/`relations` を更新する APPEND/UPDATE 時: 意思決定マップ/ 関連REQ を更新する（関連REQ ビューは generate_indexes 経由の AUTOGEN 再生成で反映する）
 
 ## ステータス変更時の README 整合性検証
 
