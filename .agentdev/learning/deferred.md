@@ -811,23 +811,6 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 
 ---
 
-## ハーネス Write ツールのリポジトリ外 temp 書き込みが distribution-boundary-guard でブロックされる（worktree 内配置で回避）
-- **問題事象**: ハーネス（OpenCode）の Write ツールでリポジトリ外 temp（`C:\WINDOWS\TEMP\opencode`）へスクリプトファイルを作成しようとすると、distribution-boundary-guard（`tool.execute.before` フック）にブロックされる事象を確認した。機械一括是正の作業ファイル出力先として同 temp を使用できない
-- **発生局面**: 実装（case-run Wave 3、TS-105 機械判定是正のスクリプト作成時）
-- **検知方法**: Write ツール実行時の distribution-boundary-guard によるブロック通知
-- **根本原因**: 配布依存境界の多層 enforcement（REQ-029、DEC-014）が tool.execute.before フックでリポジトリ外書き込み経路を検出・ブロックする構成として機能している。設計どおりの挙動である
-- **自律対応内容**: edit ツールによる逐次実行、または worktree 内（`.agentdev/tmp` 等、.git 管理領域配下）への作業ファイル配置で回避した
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし（guard の設計どおり。運用回避策の知見）
-- **横展開観点**: 機械一括是正・スクリプト実行を伴う作業の作業ファイルは worktree 内へ配置する。agentdev-gh-cli 標準手続きの `.agentdev/tmp`（workspace-local）配置規定と同一方向の運用
-- **再発条件**: Write ツールでリポジトリ外 temp へスクリプト等の作業ファイル作成を試みた場合
-- **予防策候補**: 作業ファイルの worktree 内配置（`.agentdev/tmp` 等）の徹底。既存配置規定（RU-{NNNN} AG-{NNN} の workspace-local 配置）との重複確認
-- **想定反映先**: なし（運用知見。規範化の要否は learning-promote で判断）
-- **関連**: PR 2115 Findings learning セクション, Issue 2105（OU-005）, Epic 2099, REQ-029（配布依存境界）, DEC-014（多層 enforcement）
-- **タグ**: `#distribution-boundary-guard` `#write-tool` `#temp-workspace` `#tool-execute-before` `#operations`
-- **移動日**: 2026-08-15
-- **処分判定**: deferred（出現1件。guard 設計どおりの挙動。回避策（worktree 内配置）の運用知見）
-
 ---
 
 ## autogen-index-regeneration-diff 拡張check の指定ツール generate_indexes.ts が adr-to-decision rename 未追随で EXIT_ERROR（中間 Wave は PR 索引影響なしで継続判断）
@@ -1558,13 +1541,6 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 
 ---
 
-## 配布物の不在ID参照残骸は概念名参照へ置換する
-- **根本原因**: concrete-id禁止境界との交点を事前に考慮していなかった。
-- **恒久対応内容**: S-08/S-09で機械検出済み。注意追記を再評価する。
-- **関連**: PR #2539、Issue #2538
-- **タグ**: `#req-029` `#配布依存境界` `#概念名参照`
-- **移動日**: 2026-09-03
-
 ---
 
 ## $PSScriptRoot自己解決型スクリプトは一時リポジトリ内コピーを実行する
@@ -2044,29 +2020,6 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 
 ---
 
-## case-open が Definition 変更を main へ直接 push し Draft Definition PR を作成不能にした
-
-- **問題事象**: case-open STEP-4 で Definition 変更 commit を `git push origin HEAD:main` により main へ直接 push し、Draft Definition PR を経由せず canonical Definition（origin/main の docs）が更新された。その後の pr_create は head branch（feature/issue-2870）が remote に存在せず、かつ main との差分が消失していたため HTTP 422 で失敗し、PR 作成不能となった
-- **発生局面**: 実装（case-open workflow STEP-4 実変更判定と Definition PR 作成。Case #2870）
-- **検知方法**: pr_create の失敗応答（HTTP 422 Validation Failed）。初回 push 自体は成功していたため、PR 作成失敗時に push refspec（`HEAD:main`）を見直して発見
-- **根本原因**: Definition 変更の push 先を worktree branch（`git push origin feature/issue-2870`）ではなく main（`git push origin HEAD:main`）に誤指定。直前の並行セッションの capture 回収（16c397dd）が main 直接 push 形式であるのを参照し、capture 永続化の手順と Definition 変更の push 手順を混同した
-- **自律対応内容**: force push による巻き戻しは禁止（並行セッション影響・承認要件）のため不実施。revert + PR 再投入は deviation の増幅と履歴汚染のため見送り。main 反映済みの内容は draft-data の正規投影であり diff 検証済みのため現状を活かし、Root Case #2870 本文へ PR 未作成の実態を記録、本 learning へ capture
-- **ユーザー確認有無**: なし（完了報告で報告）
-- **Decision/REQ/spec影響**: Definition 変更の内容・配置は Definition Package 投影どおり。case-ready の Definition 受入（Draft Definition PR の忠実性・整合性・品質検査 → merge）は PR 不在のため canonical 照合へのフォールバックが必要となり、case-ready 実行時の停止リスクが残る
-- **横展開観点**: worktree branch push（PR 作成前提）と main 直接 push（capture 等の継続作業永続化）は目的も受入経路も異なる別手順。push refspec は実行前に必ず検査する
-- **再発条件**: case-open が Definition 変更を worktree branch push せず main へ直接 push する場合に毎回発生
-- **予防策候補**: (1) case-open STEP-4 reference に push コマンド（`git push origin {worktree-branch}`）を明記、(2) push 実行前の refspec 検査（`:main` を含まないこと）の追加、(3) pr_create 失敗時の head branch push 状態確認手順を reference へ明記
-- **想定反映先**: agentdev-workflow-case-open（STEP-4 reference）、agentdev-issue-management（push 安全手順）
-- **関連**: Case #2870、main push 17afaf86、docs/designs/workflows/definition-readiness.md、src/opencode/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md
-- **タグ**: `#git` `#push` `#definition-pr` `#workflow-deviation`
-- **移動日**: 2026-09-16
-- **処分判定**: deferred（出現1件・運用回避済み。次回 learning-promote で再評価）
-
----
-
----
-
-
 ---
 
 ## 2026-09-16: 並列テストプロセスの一時成果物が os.tmpdir() 横断走査で外部残渣として誤検出される
@@ -2317,25 +2270,6 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 
 ---
 
-## 2026-09-19: 証跡退避先・一時作業先の OS 一時ディレクトリも textlint guard の project root 外判定で fail-closed ブロックされる
-
-- **観測事実**: case-open の v4 worktree 実行（Case #2967、Decision 2 件・Design 3 件の Definition 作成）で、(1) 検証用スクリプトを C:\\WINDOWS\\TEMP\\opencode へ write ツールで保存しようとした際「write targets a path outside the project root」で agentdev-textlint-guard の fail-closed ブロック、(2) v4 worktree 配下の既存ファイル（docs/designs/README.md）への edit ツール適用も同一 guard でブロック、の両方を実観測した。
-- **工程位置**: case-open STEP-4（実変更判定と Definition PR 作成。RA-002 docs 作成・索引登録、RA-003 検証実行）
-- **検知方法**: file tool（write/edit）実行時の guard エラー（fail-closed、選択肢は任意解除せず切替）
-- **根本原因**: guard の project root 判定は harness セッション起動 worktree（main root）固定であり、(1) OS 一時ディレクトリ等の repo 外パス、(2) git worktree で分離された別パスの双方が project 外として扱われる。Case #2958 の学習（v4 worktree 配下）に対し、repo 外一時パス（TEMP）も同一判定対象であることを確認したもの
-- **対応内容**: AGENTS.md 規範と docs/knowledge/windows-powershell-bulk-io-corruption.md の標準手段（node writeFileSync / 明示 UTF-8・LF、PowerShell リダイレクト・標準 cmdlet 不使用）へ切替し完遂。一時スクリプトは gitignore 対象の .agentdev/integrity/reports/ 配下へ置き、実行後に恒久証跡は GitHub（Issue/PR 本文・comment）へ記録（v4-durable-state-and-recovery Design の分類では OS 一時退避先はローカル実行環境状態であり恒久証跡としない、との整合も再確認）
-- **ユーザー確認の有無**: なし（guard の解除・迂回ではなく標準手段への切替。AGENTS.md 規範）
-- **Decision/REQ/spec影響**: なし（既存規範の運用確認のみ）
-- **展開視点**: v4 worktree 系の後続工程（case-ready/case-run/case-close）でも同様に発生し得る。証跡退避・一時スクリプトの置き場は project root 内の gitignore 領域に限定するのが正規経路
-- **再発条件**: main worktree 起動セッションから、repo 外一時パス（TEMP 等）または worktree 分離パスへ file tool で書込む場合
-- **予防策**: 一時スクリプト・作業用 JSON は .agentdev/integrity/reports/（非永続・gitignore）配下へ配置。証跡は GitHub 恒久記録へ。ファイル書込みは node writeFileSync（UTF-8 明示）を第一選択とする
-- **配布反映先**: agentdev-git-worktree「書込み guard 運用指針」節、docs/knowledge/windows-powershell-bulk-io-corruption.md、learning-promote の評価対象
-- **関連**: Case #2967、PR #2968、Case #2958（関連学習: v4 worktree file tool write guard）
-- **タグ**: #case-open #v4-worktree #textlint-guard #fail-closed #一時証跡退避 #証跡退避
-
-- **移動日**: 2026-09-20
-- **処分判定**: deferred（2026-09-20 評価。問題クラス: guard の project root 固定。再評価条件: 外部 worktree・TEMP 経由の証跡退避・一時作業の再開時。.agentdev/integrity/reports 配置と GitHub 恒久証跡の正規経路知見を保持）
-
 ---
 
 ## 2026-09-19: check_integrity spawn 系テストの固定 timeout は環境性能差で flaky 化する
@@ -2398,32 +2332,6 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 
 
 ---
-
-## 2026-09-20: write tool の guard は承認済み temp dir 含む project root 外を fail-closed block する（node -e + PS ヒアドキュメントで大規模編集を実行）
-
-- **問題事象**: v4 worktree 外へ大規模編集スクリプトを退避しようと `C:\WINDOWS\TEMP\opencode` 配下へ write tool で書き出したところ、agentdev-textlint-guard が「write targets a path outside the project root; blocked per fail-closed」で block した。AGENTS.md の指針（v4 worktree 内の file/edit/write block・node writeFileSync 標準手段）は worktree 内を語るが、実効 guard は outside-project-root 全般に及ぶ
-- **工程位置**: case-open STEP-4（Case #3011 Definition 適用スクリプトの組み立て）
-- **検知方法**: write tool 実行時の guard block エラー
-- **根本原因**: harness の write guard 設定が project root 外の書込みを一律 fail-closed としており、temp dir の事前承認とは独立に作用する
-- **対応内容**: スクリプトをファイル化せず、PowerShell 単一引用符ヒアドキュメント（@'...'@）を node -e の引数として渡す方式で編集スクリプトを直接実行した。単一引用符ヒアドキュメントは変数展開・バックティックエスケープなしで JS 本文（日本語・改行含む）を素通しし、node が受け取る時点で UTF-16 引数のため cp932 再符号化の経路も通らない。41 files / +376 行の適用をこの方式で完遂し、事後の UTF-8 健全検査（BOM なし・LF・U+FFFD なし）で破損なしを確認
-- **ユーザー確認の有無**: なし（実行手段の切替のみ）
-- **Decision/REQ/spec影響**: なし（guard の fail-closed 維持は正規運用。block 解除・迂回ではなく標準手段への切替）
-- **展開観点**: v4 worktree 等で file/edit/write tool が block される環境で大規模一括編集を行う場合、スクリプトのファイル退避を前提とせず node -e + PS 単一引用符ヒアドキュメントで直接実行できる。長文でも実用可能（本次 40+ 編集を単一セッションで適用）
-- **再発条件**: project root 外への write tool 実行（temp dir でも発生）
-- **予防策**: 大規模編集は node -e ヒアドキュメント方式を第一候補にする。スクリプトファイルの退避が必要な場合は v4 worktree 内の gitignore 領域（.agentdev/integrity/reports 等）を用いる
-- **配布反映先**: agentdev-git-worktree（worktree-operations の書込み guard 運用指針）、learning-promote の評価対象
-- **関連**: Case #3011、agentdev-textlint-guard、AGENTS.md 書込み標準手段
-- **タグ**: #write-guard #fail-closed #node-e #ヒアドキュメント #worktree運用
-
-- **移動日**: 2026-09-20
-- **処分判定**: deferred（2026-09-20 評価。問題クラス: guard の project root 固定。node -e + PowerShell 単一引用符ヒアドキュメントによる大規模編集技法を保持。再評価条件: 外部 worktree・TEMP 経由の大規模編集再開時）
-
----
-
-
----
-
-
 
 ---
 
