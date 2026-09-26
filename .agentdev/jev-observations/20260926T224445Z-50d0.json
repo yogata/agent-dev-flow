@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260926T224445Z-50d0",
+  "workflow": "case-ready",
+  "evaluationKind": "execution-structure-scope-overlap",
+  "subject": "Root Case #3162 docs-corpus-integrity-fixes スコープ重複判定",
+  "sourceRevision": "8e196955",
+  "durationMs": 414,
+  "inputTokens": 1051,
+  "inputs": {
+    "requestDigest": "7915153eedc9fe7aad0e98562f4d392653e1ca1324b123ab0ba0822680c1cdf7"
+  },
+  "identity": {
+    "resolvedModel": "typesafe-ai/jev"
+  },
+  "results": [
+    {
+      "questionId": "q1-overlap-exists",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.06,
+        "false": 0.94
+      }
+    },
+    {
+      "questionId": "q2-overlap-action",
+      "questionForm": "choice",
+      "value": "該当なし（重複なし・処置不要）",
+      "probabilityDistribution": {
+        "該当なし（重複なし・処置不要）": 1,
+        "重複する子 Issue 生成をスキップ": 0,
+        "ユーザー確認を求める": 0
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-overlap-exists",
+        "value": false
+      },
+      {
+        "questionId": "q2-overlap-action",
+        "value": "該当なし（重複なし・処置不要）"
+      }
+    ]
+  }
+}

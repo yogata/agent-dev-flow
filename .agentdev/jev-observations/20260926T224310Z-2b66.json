@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260926T224310Z-2b66",
+  "workflow": "case-ready",
+  "evaluationKind": "execution-structure-standard-epic",
+  "subject": "Root Case #3162 docs-corpus-integrity-fixes（RU-0142〜0146）実行構造確定",
+  "sourceRevision": "8e196955",
+  "durationMs": 663,
+  "inputTokens": 1788,
+  "inputs": {
+    "requestDigest": "0e1673c00e1c29fbd78353d2669f41f55d135c9e595889ac93687dd7a4b05780"
+  },
+  "identity": {
+    "resolvedModel": "typesafe-ai/jev"
+  },
+  "results": [
+    {
+      "questionId": "q1-structure",
+      "questionForm": "choice",
+      "value": "Standard（Root Case 自身を単一 execution unit・Child Issue なし）",
+      "probabilityDistribution": {
+        "Standard（Root Case 自身を単一 execution unit・Child Issue なし）": 0.99,
+        "Epic（Epic Issue + Child Issue 群と Wave 構造）": 0.01
+      }
+    },
+    {
+      "questionId": "q2-dep-strength",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "必須依存あり（成立順序依存）": 0,
+        "弱依存のみ（順序推奨・並列可）": 0,
+        "依存なし（完全独立）": 1
+      }
+    },
+    {
+      "questionId": "q3-epic-size",
+      "questionForm": "score",
+      "value": 1.01,
+      "probabilityDistribution": {
+        "上限超過（10超）": 0,
+        "推奨範囲未満（協調管理の必要なし）": 0.99,
+        "推奨範囲内（3-10・協調管理が成立）": 0.01
+      }
+    },
+    {
+      "questionId": "q4-coherence",
+      "questionForm": "score",
+      "value": 0.31,
+      "probabilityDistribution": {
+        "無関係（単一 Epic 集約は禁止）": 0.7,
+        "関連依存（同一機能領域・実行上の依存なし）": 0.29,
+        "単一機能主題（協調管理対象）": 0.01
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-structure",
+        "value": "Standard（Root Case 自身を単一 execution unit・Child Issue なし）"
+      },
+      {
+        "questionId": "q2-dep-strength",
+        "value": 2
+      },
+      {
+        "questionId": "q3-epic-size",
+        "value": 1
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "q4-coherence",
+        "value": 1
+      }
+    ]
+  }
+}
