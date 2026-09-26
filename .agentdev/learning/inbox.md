@@ -167,3 +167,21 @@
 
 ---
 
+## 2026-09-26: LLM 送信本文の識別子破損疑いは read-back 目視で断定せず filesystem を truth source とする機械検証で判定する
+
+- **問題事象**: case-open STEP-2 で Root Case Issue 本文を issue_create → issue_update した後、read-back 目視で「REQ-090-002 の連続文字欠落、traceability/adversarial-review 等の語の欠落」を疑う事象が連発した。検証スクリプト側に破損形を書き込んだつもりが正形と同一文字列になっており、検証手段自体の出力破損による循環検証（検証対象と検証手段が同じ出力経路を通るため区別不能）が発生した
+- **発生局面**: case-open STEP-2（Root Case 本文の Issue 作成・更新・read-back 照合）およびその検証スクリプト作成時
+- **検知方法**: issue_read の read-back と gh CLI による本文機械取得の突合で、疑われた破損形文字列が欠落しているという検出結果が「検証スクリプト側の破損による誤検出」であることを確認したこと
+- **根本原因**: 検証対象の読取も検証手段の記述も同一の LLM 出力経路を通るため、目視・文字列照合ベースの検証は循環し、破損を過大にも過小にも報告し得る
+- **自律対応内容**: truth source を filesystem（fs.existsSync によるパス実在確認）と数値突合（正規表現抽出した REQ/DEC/ACT ID の digit 群出力）に置く検証へ切替し、本文中の全パスがディスク実在ファイルと一致することを機械的に確認。結果、Issue 本文は健全であり破損なしと確定した
+- **ユーザー確認の有無**: なし（自律解決）
+- **Decision/REQ/spec影響**: なし（Tool 操作契約・VERIFY 契約の変更なし。検証手順の運用知見）
+- **横展開観点**: issue_create/issue_update/pr_create 等で長文 body を送信する全工程に適用可能。read-back 照合で破損を疑った場合、目視の再読ではなく「filesystem 実在性 + 数値突合」の機械検証で判定する
+- **再発条件**: 長文本文の送信後 read-back を目視で照合した場合。特に識別子・パスを多用する Definition/Root Case 本文
+- **予防策候補**: 本文検証は「抽出トークンの fs.existsSync 一致 + ID digit 突合（数値は破損耐性が高い）」を標準手順とする。検証スクリプト内の期待文字列も破損し得ることを前提に、正形をリポジトリ実ファイルから参照する
+- **想定反映先**: agentdev-issue-management（Issue 操作の安全手順）、case-open / case-ready / case-run の Issue・PR 本文照合手順
+- **関連**: Case #3158、PR #3159、issue_read、gh issue view、fs.existsSync
+- **タグ**: #issue-write #content-verification #self-reference-verification #machine-check
+
+---
+
