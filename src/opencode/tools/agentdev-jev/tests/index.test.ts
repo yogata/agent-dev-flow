@@ -1,9 +1,11 @@
-// agentdev-jev 操作統合テスト（evaluate 時点書込み・observation_write 追記完成。REQ-090-013）。
+// agentdev-jev 操作統合テスト（観測永続化・final result 反映）。
 //
-// TS-001: evaluate 完了直後（observation_write 前）の部分レコード存在と Jev 側観測項目、
-//         observation_write 後の 1実行 1 JSON と完了状態 field、not_configured 完了の部分レコード
-// TS-002: 完了状態 field の機械判別、二重 observation_write の冪等性、1 run 複数 evaluate の重複なし
-// TS-003: evaluate 成功後に observation_write を呼ばずプロセス中断相当でも部分レコードが残存する
+// TS-001: 1 semantic evaluation = 1 observation（1 JSON）、実行元 Workflow と評価種別の識別 field、
+//         観測単位集約入力の不在
+// TS-002: confidence は evaluation 単位のみ（質問単位複製なし・provider 返却時のみ）
+// TS-004: final result は evaluator 成功観測のみ、差異理由分類は差異時のみ
+// TS-006: not_configured・入力検証失敗は観測なし、呼出し開始後の失敗は失敗観測（分類 + 最小 diagnostic）
+// TS-007: 永続化失敗は fail-open（評価結果維持 + 識別可能 warning）、evaluator 成功後の観測存在
 
 import { describe, expect, test } from "bun:test";
 import * as fs from "node:fs/promises";
@@ -35,85 +37,164 @@ async function readObservationJson(worktree: string, relative: string): Promise<
   return JSON.parse(await fs.readFile(path.join(worktree, relative.replace(/\//g, path.sep)), "utf8")) as Record<string, unknown>;
 }
 
-describe("evaluate 時点書込み（TS-001）", () => {
-  test("evaluate 完了直後に部分レコードが存在し Jev 側観測項目が読み取れる（recordState partial）", async () => {
+function evaluateRequest(overrides: Record<string, unknown> = {}) {
+  return {
+    operation: "evaluate",
+    state: "判断状態",
+    instructions: "評価指示",
+    questions: [{ id: "q1", form: "boolean", prompt: "質問1" }],
+    observationMetadata: {
+      workflow: "learning-promote",
+      evaluationKind: "evaluation",
+      subject: "inbox エントリ 1件",
+      sourceRevision: SOURCE_REVISION,
+    },
+    ...overrides,
+  };
+}
+
+describe("1 semantic evaluation = 1 observation（TS-001）", () => {
+  test("評価1件から観測1件が生成され、Workflow と評価種別を識別できる", async () => {
     const worktree = await tempWorktree();
-    const result = await runAgentdevJevOperation(worktree, {
-      operation: "evaluate",
-      state: "判断状態",
-      instructions: "評価指示",
-      questions: [{ id: "q1", form: "boolean", prompt: "質問1" }],
-      observationMetadata: {
-        workflow: "learning-promote",
-        judgmentKind: "evaluation",
-        subject: "inbox エントリ 1件",
-        sourceRevision: SOURCE_REVISION,
-      },
-    }, { resolveProvider: () => mockProvider() });
+    const result = await runAgentdevJevOperation(worktree, evaluateRequest(), { resolveProvider: () => mockProvider() });
     expect(result.ok).toBe(true);
     if (!result.ok || result.operation !== "evaluate") return;
     const persisted = result.success.observation;
     expect(persisted && !("warning" in persisted)).toBe(true);
     if (!persisted || !("observationId" in persisted)) return;
-    expect(persisted.recordState).toBe("partial");
     expect(persisted.writtenPath).toBe(`.agentdev/jev-observations/${persisted.observationId}.json`);
     const content = await readObservationJson(worktree, persisted.writtenPath);
-    expect(content.recordState).toBe("partial");
-    expect(content.outcome).toBe("completed");
+    expect(content.schemaVersion).toBe(2);
     expect(content.workflow).toBe("learning-promote");
-    expect(content.judgmentKind).toBe("evaluation");
+    expect(content.evaluationKind).toBe("evaluation");
     expect(content.subject).toBe("inbox エントリ 1件");
     expect(content.sourceRevision).toBe(SOURCE_REVISION);
-    expect(content.provider).toBe("mock");
-    expect(content.requestedModel).toBe("mock/jev");
-    expect(content.inputTokens).toBe(589);
-    const judgment = (content.judgments as Array<Record<string, unknown>>)[0] as Record<string, unknown>;
-    expect(judgment.judgmentId).toBe("q1");
-    expect(judgment.jevResult).toBe(true);
-    expect(judgment.confidence).toBeCloseTo(0.91);
-    expect(judgment.probabilityDistribution).toBeDefined();
-    expect(judgment.llmFinalJudgment).toBeUndefined();
+    const results = content.results as Array<Record<string, unknown>>;
+    expect(results).toHaveLength(1);
+    expect(results[0]?.questionId).toBe("q1");
+    expect(results[0]?.value).toBe(true);
+    expect(results[0]?.probabilityDistribution).toBeDefined();
+    expect(content.failure).toBeUndefined();
     const files = await fs.readdir(path.join(worktree, ".agentdev", "jev-observations"));
     expect(files).toHaveLength(1);
   });
 
-  test("not_configured 完了でも部分レコードが作成される", async () => {
+  test("observationMetadata 未提供は invalid_input で観測を生成しない（観測の一意識別を保証）", async () => {
     const worktree = await tempWorktree();
     const result = await runAgentdevJevOperation(worktree, {
       operation: "evaluate",
       state: "判断状態",
       instructions: "評価指示",
       questions: [{ id: "q1", form: "boolean", prompt: "質問1" }],
-    }, { resolveProvider: () => null });
+    }, { resolveProvider: () => mockProvider() });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.failure.kind).toBe("invalid_input");
+    expect(result.failure.detail).toContain("observationMetadata");
+    const dir = await fs.stat(path.join(worktree, ".agentdev", "jev-observations")).catch(() => null);
+    expect(dir).toBeNull();
+  });
+
+  test("複数質問の評価も観測は1件（results の questionId で質問と1対1対応）", async () => {
+    const worktree = await tempWorktree();
+    const result = await runAgentdevJevOperation(worktree, evaluateRequest({
+      questions: [
+        { id: "qa", form: "boolean", prompt: "質問A" },
+        { id: "qb", form: "choice", prompt: "質問B", options: ["採用", "却下"] },
+      ],
+    }), { resolveProvider: () => mockProvider({
+      async evaluate() {
+        return {
+          requestedModel: "mock/jev",
+          confidenceRaw: 0.7,
+          answers: {
+            qa: { value: 0.9 },
+            qb: { value: "却下", probabilities: { 採用: 0.3, 却下: 0.7 } },
+          },
+        };
+      },
+    }) });
+    expect(result.ok).toBe(true);
+    if (!result.ok || result.operation !== "evaluate") return;
+    const files = await fs.readdir(path.join(worktree, ".agentdev", "jev-observations"));
+    expect(files).toHaveLength(1);
+    const persisted = result.success.observation;
+    if (!persisted || !("observationId" in persisted)) return;
+    const content = await readObservationJson(worktree, persisted.writtenPath);
+    const results = content.results as Array<Record<string, unknown>>;
+    expect(results.map((r) => r.questionId)).toEqual(["qa", "qb"]);
+    expect(results[1]?.value).toBe("却下");
+  });
+});
+
+describe("confidence の evaluation 単位意味論（TS-002）", () => {
+  test("provider が返した confidence は観測に evaluation 単位で1回のみ保存される（質問単位複製なし）", async () => {
+    const worktree = await tempWorktree();
+    const result = await runAgentdevJevOperation(worktree, evaluateRequest(), { resolveProvider: () => mockProvider() });
+    expect(result.ok).toBe(true);
+    if (!result.ok || result.operation !== "evaluate") return;
+    expect(result.success.confidence).toBeCloseTo(0.91);
+    const persisted = result.success.observation;
+    if (!persisted || !("observationId" in persisted)) return;
+    const content = await readObservationJson(worktree, persisted.writtenPath);
+    expect(content.confidence).toBeCloseTo(0.91);
+    const results = content.results as Array<Record<string, unknown>>;
+    for (const result of results) {
+      expect(result.confidence).toBeUndefined();
+    }
+  });
+
+  test("provider が confidence を返さない evaluation では confidence を保存しない", async () => {
+    const worktree = await tempWorktree();
+    const provider = mockProvider({
+      async evaluate() {
+        return { requestedModel: "mock/jev", answers: { q1: { value: 0.8 } } };
+      },
+    });
+    const result = await runAgentdevJevOperation(worktree, evaluateRequest(), { resolveProvider: () => provider });
+    expect(result.ok).toBe(true);
+    if (!result.ok || result.operation !== "evaluate") return;
+    expect(result.success.confidence).toBeUndefined();
+    const persisted = result.success.observation;
+    if (!persisted || !("observationId" in persisted)) return;
+    const content = await readObservationJson(worktree, persisted.writtenPath);
+    expect(content.confidence).toBeUndefined();
+  });
+});
+
+describe("基本判断経路の観測生成条件（TS-006）", () => {
+  test("not_configured は観測を生成しない（未設定は呼出し前判定）", async () => {
+    const worktree = await tempWorktree();
+    const result = await runAgentdevJevOperation(worktree, evaluateRequest(), { resolveProvider: () => null });
     const payload = result as JevEvaluateResult;
     expect(payload.ok).toBe(false);
     if (payload.ok) return;
     expect(payload.failure.kind).toBe("not_configured");
-    const persisted = payload.observation;
-    expect(persisted && !("warning" in persisted)).toBe(true);
-    if (!persisted || !("observationId" in persisted)) return;
-    const content = await readObservationJson(worktree, persisted.writtenPath);
-    expect(content.recordState).toBe("partial");
-    expect(content.outcome).toBe("not_configured");
-    expect(content.durationMs).toBe(0);
-    const judgment = (content.judgments as Array<Record<string, unknown>>)[0] as Record<string, unknown>;
-    expect(judgment.failureKind).toBe("not_configured");
+    expect(payload.observation).toBeUndefined();
+    const dir = await fs.stat(path.join(worktree, ".agentdev", "jev-observations")).catch(() => null);
+    expect(dir).toBeNull();
   });
 
-  test("provider API 失敗でも失敗分類を含む部分レコードが作成される（jev_failed）", async () => {
+  test("入力検証失敗も観測を生成しない", async () => {
+    const worktree = await tempWorktree();
+    const result = await runAgentdevJevOperation(worktree, evaluateRequest({ state: "" }), { resolveProvider: () => mockProvider() });
+    const payload = result as JevEvaluateResult;
+    expect(payload.ok).toBe(false);
+    if (payload.ok) return;
+    expect(payload.failure.kind).toBe("invalid_input");
+    expect(payload.observation).toBeUndefined();
+    const dir = await fs.stat(path.join(worktree, ".agentdev", "jev-observations")).catch(() => null);
+    expect(dir).toBeNull();
+  });
+
+  test("呼出し開始後の失敗は失敗分類と最小 diagnostic を持つ失敗観測を生成する", async () => {
     const worktree = await tempWorktree();
     const provider = mockProvider({
       async evaluate() {
         throw Object.assign(new Error("overloaded"), { statusCode: 429 });
       },
     });
-    const result = await runAgentdevJevOperation(worktree, {
-      operation: "evaluate",
-      state: "判断状態",
-      instructions: "評価指示",
-      questions: [{ id: "q1", form: "boolean", prompt: "質問1" }],
-      observationMetadata: { workflow: "intake-promote", judgmentKind: "classification", subject: "item 1件", sourceRevision: SOURCE_REVISION },
-    }, { resolveProvider: () => provider });
+    const result = await runAgentdevJevOperation(worktree, evaluateRequest(), { resolveProvider: () => provider });
     const payload = result as JevEvaluateResult;
     expect(payload.ok).toBe(false);
     if (payload.ok) return;
@@ -122,186 +203,196 @@ describe("evaluate 時点書込み（TS-001）", () => {
     expect(persisted && !("warning" in persisted)).toBe(true);
     if (!persisted || !("observationId" in persisted)) return;
     const content = await readObservationJson(worktree, persisted.writtenPath);
-    expect(content.recordState).toBe("partial");
-    expect(content.outcome).toBe("jev_failed");
-    expect(content.provider).toBe("mock");
-    const judgment = (content.judgments as Array<Record<string, unknown>>)[0] as Record<string, unknown>;
-    expect(judgment.failureKind).toBe("rate_limited");
+    const failure = content.failure as Record<string, unknown>;
+    expect(failure.kind).toBe("rate_limited");
+    expect(String(failure.detail)).toContain("overloaded");
+    expect(content.results).toBeUndefined();
+    expect(content.confidence).toBeUndefined();
   });
 
-  test("invalid_input（評価未実施）は部分レコードを作成しない", async () => {
+  test("実評価の呼出し時間が記録され、inputTokens は provider 返却時のみ保存される", async () => {
     const worktree = await tempWorktree();
-    const result = await runAgentdevJevOperation(worktree, {
-      operation: "evaluate",
-      state: "",
-      instructions: "評価指示",
-      questions: [{ id: "q1", form: "boolean", prompt: "質問1" }],
-    }, { resolveProvider: () => mockProvider() });
-    const payload = result as JevEvaluateResult;
-    expect(payload.ok).toBe(false);
-    if (payload.ok) return;
-    expect(payload.failure.kind).toBe("invalid_input");
-    expect(payload.observation).toBeUndefined();
-    const exists = await fs.stat(path.join(worktree, ".agentdev", "jev-observations")).catch(() => null);
-    expect(exists).toBeNull();
+    let clock = 1000;
+    const providerWithTokens = mockProvider();
+    const withTokens = await runAgentdevJevOperation(worktree, evaluateRequest(), { resolveProvider: () => providerWithTokens, now: () => ++clock });
+    expect(withTokens.ok).toBe(true);
+    if (!withTokens.ok || withTokens.operation !== "evaluate") return;
+    const persistedWith = withTokens.success.observation;
+    if (!persistedWith || !("observationId" in persistedWith)) return;
+    const contentWith = await readObservationJson(worktree, persistedWith.writtenPath);
+    expect(typeof contentWith.durationMs).toBe("number");
+    expect(contentWith.durationMs).toBeGreaterThan(0);
+    expect(contentWith.inputTokens).toBe(589);
+
+    const providerNoTokens = mockProvider({
+      async evaluate() {
+        return { requestedModel: "mock/jev", confidenceRaw: 0.9, answers: { q1: { value: 0.8 } } };
+      },
+    });
+    const withoutTokens = await runAgentdevJevOperation(worktree, evaluateRequest(), { resolveProvider: () => providerNoTokens, now: () => ++clock });
+    if (!withoutTokens.ok || withoutTokens.operation !== "evaluate") return;
+    const persistedWithout = withoutTokens.success.observation;
+    if (!persistedWithout || !("observationId" in persistedWithout)) return;
+    const contentWithout = await readObservationJson(worktree, persistedWithout.writtenPath);
+    expect(contentWithout.inputTokens).toBeUndefined();
+  });
+});
+
+describe("最終判断の観測反映（TS-004）", () => {
+  async function evaluateOnce(worktree: string): Promise<string> {
+    const evaluated = await runAgentdevJevOperation(worktree, evaluateRequest(), { resolveProvider: () => mockProvider() });
+    if (!evaluated.ok || evaluated.operation !== "evaluate") throw new Error("evaluate failed");
+    const persisted = evaluated.success.observation;
+    if (!persisted || !("observationId" in persisted)) throw new Error("observation missing");
+    return persisted.observationId;
+  }
+
+  test("evaluator 成功観測へ最終判断結果が保持される", async () => {
+    const worktree = await tempWorktree();
+    const observationId = await evaluateOnce(worktree);
+    const written = await runAgentdevJevOperation(worktree, {
+      operation: "observation_write",
+      observationId,
+      observation: {
+        schemaVersion: 2,
+        finalResult: { results: [{ questionId: "q1", value: true }] },
+      },
+    }) as JevObservationWriteResult;
+    expect(written.ok).toBe(true);
+    const content = await readObservationJson(worktree, `.agentdev/jev-observations/${observationId}.json`);
+    const finalResult = content.finalResult as { results: Array<Record<string, unknown>> };
+    expect(finalResult.results[0]?.questionId).toBe("q1");
+    expect(finalResult.results[0]?.value).toBe(true);
+    expect(finalResult.results[0]?.differenceReason).toBeUndefined();
   });
 
-  test("書込み失敗時も評価結果は維持され、独立した warning を返す（REQ-090-013）", async () => {
+  test("失敗観測への最終判断反映は拒否される（失敗観測への重複保存なし）", async () => {
+    const worktree = await tempWorktree();
+    const provider = mockProvider({
+      async evaluate() {
+        throw Object.assign(new Error("gateway error"), { statusCode: 503 });
+      },
+    });
+    const evaluated = await runAgentdevJevOperation(worktree, evaluateRequest(), { resolveProvider: () => provider });
+    expect(evaluated.ok).toBe(false);
+    const persisted = (evaluated as { observation?: { observationId?: string } }).observation;
+    if (!persisted?.observationId) throw new Error("failure observation missing");
+    const written = await runAgentdevJevOperation(worktree, {
+      operation: "observation_write",
+      observationId: persisted.observationId,
+      observation: { schemaVersion: 2, finalResult: { results: [{ questionId: "q1", value: true }] } },
+    }) as JevObservationWriteResult;
+    expect(written.ok).toBe(false);
+    if (!written.ok) expect(written.failure.detail).toContain("evaluator-success");
+  });
+
+  test("最終判断が evaluator 返却結果と一致する場合、差異理由分類は記録されない", async () => {
+    const worktree = await tempWorktree();
+    const observationId = await evaluateOnce(worktree);
+    const written = await runAgentdevJevOperation(worktree, {
+      operation: "observation_write",
+      observationId,
+      observation: {
+        schemaVersion: 2,
+        finalResult: { results: [{ questionId: "q1", value: true }] },
+      },
+    }) as JevObservationWriteResult;
+    expect(written.ok).toBe(true);
+    const content = await readObservationJson(worktree, `.agentdev/jev-observations/${observationId}.json`);
+    const finalResult = content.finalResult as { results: Array<Record<string, unknown>> };
+    expect(finalResult.results[0]?.differenceReason).toBeUndefined();
+  });
+
+  test("最終判断が evaluator 返却結果と異なる場合、4分類のいずれかの差異理由が記録される", async () => {
+    const worktree = await tempWorktree();
+    const observationId = await evaluateOnce(worktree);
+    const written = await runAgentdevJevOperation(worktree, {
+      operation: "observation_write",
+      observationId,
+      observation: {
+        schemaVersion: 2,
+        finalResult: { results: [{ questionId: "q1", value: false, differenceReason: "semantic_disagreement" }] },
+      },
+    }) as JevObservationWriteResult;
+    expect(written.ok).toBe(true);
+    const content = await readObservationJson(worktree, `.agentdev/jev-observations/${observationId}.json`);
+    const finalResult = content.finalResult as { results: Array<Record<string, unknown>> };
+    expect(finalResult.results[0]?.value).toBe(false);
+    expect(finalResult.results[0]?.differenceReason).toBe("semantic_disagreement");
+  });
+
+  test("不一致な最終判断への差異理由は4分類のみ受理され、一致時に differenceReason を付けると拒否される", async () => {
+    const worktree = await tempWorktree();
+    const observationId = await evaluateOnce(worktree);
+    const wrongReason = await runAgentdevJevOperation(worktree, {
+      operation: "observation_write",
+      observationId,
+      observation: {
+        schemaVersion: 2,
+        finalResult: { results: [{ questionId: "q1", value: true, differenceReason: "semantic_disagreement" }] },
+      },
+    }) as JevObservationWriteResult;
+    expect(wrongReason.ok).toBe(false);
+    if (!wrongReason.ok) expect(wrongReason.failure.detail).toContain("differenceReason");
+    const invalidReason = await runAgentdevJevOperation(worktree, {
+      operation: "observation_write",
+      observationId,
+      observation: {
+        schemaVersion: 2,
+        finalResult: { results: [{ questionId: "q1", value: false, differenceReason: "model_mood" }] },
+      },
+    }) as JevObservationWriteResult;
+    expect(invalidReason.ok).toBe(false);
+  });
+
+  test("追記は冪等で重複 JSON を生成しない", async () => {
+    const worktree = await tempWorktree();
+    const observationId = await evaluateOnce(worktree);
+    const request = {
+      operation: "observation_write" as const,
+      observationId,
+      observation: {
+        schemaVersion: 2,
+        finalResult: { results: [{ questionId: "q1", value: false, differenceReason: "unknown" }] },
+      },
+    };
+    await runAgentdevJevOperation(worktree, request);
+    const again = await runAgentdevJevOperation(worktree, request) as JevObservationWriteResult;
+    expect(again.ok).toBe(true);
+    const files = await fs.readdir(path.join(worktree, ".agentdev", "jev-observations"));
+    expect(files).toEqual([`${observationId}.json`]);
+  });
+});
+
+describe("fail-open と中断耐性（TS-007）", () => {
+  test("観測の永続化のみに失敗しても評価結果は維持され、識別可能な warning が構造化情報に含まれる", async () => {
     const worktree = await tempWorktree();
     await fs.mkdir(path.join(worktree, ".agentdev"), { recursive: true });
     await fs.writeFile(path.join(worktree, ".agentdev", "jev-observations"), "not-a-dir", "utf8");
-    const result = await runAgentdevJevOperation(worktree, {
-      operation: "evaluate",
-      state: "判断状態",
-      instructions: "評価指示",
-      questions: [{ id: "q1", form: "boolean", prompt: "質問1" }],
-    }, { resolveProvider: () => mockProvider() });
+    const result = await runAgentdevJevOperation(worktree, evaluateRequest(), { resolveProvider: () => mockProvider() });
     expect(result.ok).toBe(true);
     if (!result.ok || result.operation !== "evaluate") return;
-    expect(result.success.confidence).toBeCloseTo(0.91);
     expect(result.success.results[0]?.value).toBe(true);
     const persisted = result.success.observation;
     expect(persisted && "warning" in persisted).toBe(true);
     if (!persisted || !("warning" in persisted)) return;
-    expect(persisted.warning).toContain("partial observation write failed");
+    expect(persisted.warning).toContain("observation write failed");
   });
-});
 
-describe("observation_write 追記完成（TS-001・TS-002）", () => {
-  const evaluateRequest = {
-    operation: "evaluate",
-    state: "判断状態",
-    instructions: "評価指示",
-    questions: [{ id: "q1", form: "boolean", prompt: "質問1" }],
-    observationMetadata: {
-      workflow: "learning-promote",
-      judgmentKind: "evaluation",
-      subject: "inbox エントリ 1件",
-      sourceRevision: SOURCE_REVISION,
-    },
-  };
-
-  test("observation_write が同一 JSON を完成させる（LLM field 追記・recordState complete・1実行 1 JSON）", async () => {
+  test("evaluator 成功後の時点で観測ファイルが存在する（永続化成功後の中断でも観測は失われない）", async () => {
     const worktree = await tempWorktree();
-    const evaluated = await runAgentdevJevOperation(worktree, evaluateRequest, { resolveProvider: () => mockProvider() });
+    const evaluated = await runAgentdevJevOperation(worktree, evaluateRequest(), { resolveProvider: () => mockProvider() });
     expect(evaluated.ok).toBe(true);
     if (!evaluated.ok || evaluated.operation !== "evaluate") return;
-    const partial = evaluated.success.observation;
-    if (!partial || !("observationId" in partial)) throw new Error("partial observation missing");
-
-    const completed = await runAgentdevJevOperation(worktree, {
-      operation: "observation_write",
-      observationId: partial.observationId,
-      observation: {
-        schemaVersion: 1,
-        judgments: [
-          {
-            judgmentId: "q1",
-            questionForm: "boolean",
-            llmFinalJudgment: "採用",
-            llmTreatment: "unchanged",
-          },
-        ],
-      },
-    });
-    expect(completed.ok).toBe(true);
-    const completedPayload = completed as JevObservationWriteResult;
-    if (!completedPayload.ok) return;
-    expect(completedPayload.success.observationId).toBe(partial.observationId);
+    const persisted = evaluated.success.observation;
+    expect(persisted && !("warning" in persisted)).toBe(true);
+    if (!persisted || !("observationId" in persisted)) return;
     const files = await fs.readdir(path.join(worktree, ".agentdev", "jev-observations"));
-    expect(files).toEqual([`${partial.observationId}.json`]);
-    const content = await readObservationJson(worktree, completedPayload.success.writtenPath);
-    expect(content.recordState).toBe("complete");
-    const judgment = (content.judgments as Array<Record<string, unknown>>)[0] as Record<string, unknown>;
-    expect(judgment.llmFinalJudgment).toBe("採用");
-    expect(judgment.llmTreatment).toBe("unchanged");
-    expect(judgment.jevResult).toBe(true);
-    expect(judgment.confidence).toBeCloseTo(0.91);
-    expect(content.inputs).toBeDefined();
-  });
-
-  test("二重 observation_write は冪等で重複作成しない（TS-002）", async () => {
-    const worktree = await tempWorktree();
-    const evaluated = await runAgentdevJevOperation(worktree, evaluateRequest, { resolveProvider: () => mockProvider() });
-    if (!evaluated.ok || evaluated.operation !== "evaluate") throw new Error("evaluate failed");
-    const partial = evaluated.success.observation;
-    if (!partial || !("observationId" in partial)) throw new Error("partial observation missing");
-    const completionRequest = {
-      operation: "observation_write",
-      observationId: partial.observationId,
-      observation: {
-        schemaVersion: 1,
-        judgments: [{ judgmentId: "q1", questionForm: "boolean", llmFinalJudgment: "採用", llmTreatment: "unchanged" }],
-      },
-    };
-    await runAgentdevJevOperation(worktree, completionRequest);
-    const again = await runAgentdevJevOperation(worktree, completionRequest);
-    expect(again.ok).toBe(true);
-    const files = await fs.readdir(path.join(worktree, ".agentdev", "jev-observations"));
-    expect(files).toEqual([`${partial.observationId}.json`]);
-    const content = await readObservationJson(worktree, `.agentdev/jev-observations/${partial.observationId}.json`);
-    const judgments = content.judgments as Array<Record<string, unknown>>;
-    expect(judgments).toHaveLength(1);
-    expect(judgments[0]?.llmFinalJudgment).toBe("採用");
-    expect(content.recordState).toBe("complete");
-  });
-
-  test("1 run 内の複数 evaluate は同一 observationId で同一 JSON へ追記する（TS-002: 破壊・重複なし）", async () => {
-    const worktree = await tempWorktree();
-    const requestA = {
-      operation: "evaluate",
-      state: "判断状態A",
-      instructions: "評価指示",
-      questions: [{ id: "qa", form: "boolean", prompt: "質問A" }],
-      observationMetadata: { observationId: "run-multi", workflow: "backlog-review", judgmentKind: "integration", subject: "採用済み成果物", sourceRevision: SOURCE_REVISION },
-    };
-    const requestB = {
-      operation: "evaluate",
-      state: "判断状態B",
-      instructions: "評価指示",
-      questions: [{ id: "qb", form: "boolean", prompt: "質問B" }],
-      observationMetadata: { observationId: "run-multi", workflow: "backlog-review", judgmentKind: "integration", subject: "採用済み成果物", sourceRevision: SOURCE_REVISION },
-    };
-    const first = await runAgentdevJevOperation(worktree, requestA, { resolveProvider: () => mockProvider() });
-    const second = await runAgentdevJevOperation(worktree, requestB, { resolveProvider: () => mockProvider() });
-    expect(first.ok && second.ok).toBe(true);
-    const files = await fs.readdir(path.join(worktree, ".agentdev", "jev-observations"));
-    expect(files).toEqual(["run-multi.json"]);
-    const content = await readObservationJson(worktree, ".agentdev/jev-observations/run-multi.json");
-    const judgments = content.judgments as Array<Record<string, unknown>>;
-    expect(judgments).toHaveLength(2);
-    expect(judgments.map((j) => j.judgmentId).sort()).toEqual(["qa", "qb"]);
-    expect(content.recordState).toBe("partial");
-  });
-});
-
-describe("委譲境界死亡の再現検証（TS-003）", () => {
-  test("evaluate 成功後に observation_write を呼ばずに中断しても部分レコードが残存する", async () => {
-    const worktree = await tempWorktree();
-    const evaluated = await runAgentdevJevOperation(worktree, {
-      operation: "evaluate",
-      state: "判断状態",
-      instructions: "評価指示",
-      questions: [{ id: "q1", form: "boolean", prompt: "質問1" }],
-      observationMetadata: {
-        workflow: "req-define",
-        judgmentKind: "architecture-impact",
-        subject: "要件 1件",
-        sourceRevision: SOURCE_REVISION,
-      },
-    }, { resolveProvider: () => mockProvider() });
-    expect(evaluated.ok).toBe(true);
-    if (!evaluated.ok || evaluated.operation !== "evaluate") return;
-    const partial = evaluated.success.observation;
-    expect(partial && !("warning" in partial)).toBe(true);
-    if (!partial || !("observationId" in partial)) return;
-    const files = await fs.readdir(path.join(worktree, ".agentdev", "jev-observations"));
-    expect(files).toEqual([`${partial.observationId}.json`]);
-    const content = await readObservationJson(worktree, partial.writtenPath);
-    expect(content.recordState).toBe("partial");
-    const judgment = (content.judgments as Array<Record<string, unknown>>)[0] as Record<string, unknown>;
-    expect(judgment.jevResult).toBe(true);
-    expect(judgment.confidence).toBeCloseTo(0.91);
-    expect(judgment.probabilityDistribution).toBeDefined();
+    expect(files).toEqual([`${persisted.observationId}.json`]);
+    const content = await readObservationJson(worktree, persisted.writtenPath);
+    const results = content.results as Array<Record<string, unknown>>;
+    expect(results[0]?.value).toBe(true);
+    expect(results[0]?.probabilityDistribution).toBeDefined();
+    expect(content.confidence).toBeCloseTo(0.91);
   });
 });

@@ -2,7 +2,7 @@
   "name": "agentdev-jev-tool",
   "version": "0.1.0",
   "private": true,
-  "description": "agentdev-jev Custom Tool. Jev prior evaluation with a provider/SDK-independent public contract (per-question results, probability distributions, normalized confidence, structured failure classification, no auto-retry) plus observation write support (one Workflow run = one JSON under .agentdev/jev-observations/).",
+  "description": "agentdev-jev Custom Tool. Jev prior evaluation with a provider/SDK-independent public contract (per-question results, probability distributions, provider-returned confidence, structured failure classification, no auto-retry) plus observation persistence (one semantic evaluation = one observation under .agentdev/jev-observations/) and final-result append support.",
   "type": "module",
   "scripts": {
     "test": "bun test",

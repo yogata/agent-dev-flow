@@ -2,7 +2,7 @@
   "name": "agentdev-jev-tool-plugin",
   "version": "0.1.0",
   "private": true,
-  "description": "agentdev-jev-tool Plugin. Registers the agentdev_jev Custom Tool (Jev prior evaluation with a provider/SDK-independent public contract, and observation write support under .agentdev/jev-observations/) with the OpenCode runtime.",
+  "description": "agentdev-jev-tool Plugin. Registers the agentdev_jev Custom Tool (Jev prior evaluation with a provider/SDK-independent public contract, and observation persistence under .agentdev/jev-observations/) with the OpenCode runtime.",
   "type": "module",
   "scripts": {
     "test": "bun test",

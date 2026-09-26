@@ -1,14 +1,14 @@
 // agentdev-jev-tool Plugin（Custom Tool `agentdev_jev` の harness 登録配線）。
 //
-// OpenCode のプラグイン機構（.opencode/plugins/ 直下の depth-1 ファイルから読み込まれる）
-// 経由で、agentdev-jev Custom Tool をモデルに公開する。Plugin は登録の配線のみを担い、
+// OpenCode の plugin 機構（.opencode/plugins/ 直下の depth-1 ファイルから読み込まれる）
+// 経由で、agentdev-jev Custom Tool をモデルへ公開する。Plugin は登録の配線のみを担い、
 // 操作契約・正規化・失敗の構造化・観測の形式検証は Tool 本体
 // （src/opencode/tools/agentdev-jev/）が所有する。
 //
 // 公開スキーマは provider・SDK 非依存（REQ-{NNNN}-{NNN}）。provider 接続（初期 Vercel
 // adapter）は Tool 本体が動的解決し、API key（AI_GATEWAY_API_KEY）未設定時は
 // 呼び出さず not_configured を返す。Jev 障害時も Workflow は従来 LLM 経路で
-// 継続できる（代替手段の定義義務: REQ-{NNN}-{NNN}）。
+// 継続できる。
 //
 // args スキーマは zod を用いない（依存ゼロの構造的定義）。入力の検証は
 // Tool 本体（runAgentdevJevOperation）が操作契約で厳密に行う。
@@ -17,6 +17,7 @@ import {
   AGENTDEV_JEV_PUBLIC_CONTRACTS,
   runAgentdevJevOperation,
 } from "../../tools/agentdev-jev/index.ts";
+import { validateFinalResultObservation } from "../../tools/agentdev-jev/observation.ts";
 
 // OpenCode plugin plumbing 型（agentdev-gh-tool plugin と同一の構造的定義。依存ゼロを保つ）。
 
@@ -71,214 +72,99 @@ const QUESTION_SCHEMA = {
   additionalProperties: false,
 } as const;
 
-/** 観測 JSON のスキーマ（REQ-{NNNN}-{NNN} 必須項目。実行時 validator が outcome / recordState 条件付きで厳密検証する）。 */
-const OBSERVATION_SCHEMA = {
+/** 再構成可能入力の参照（path + sha256 digest。判断入力全文は保存しない）。 */
+const INPUT_REFERENCE_SCHEMA = {
   type: "object",
-  description:
-    "One observation record for one Workflow run (one run = one JSON). Required fields: provider, requestedModel, " +
-    "sourceRevision, workflow + judgmentKind, minimal subject identification, per-judgment Jev result, probability " +
-    "distribution, confidence, LLM final judgment, llmTreatment (unchanged/corrected), outcome, Jev call duration. " +
-    "recordState marks the two-phase write contract: partial records (written by evaluate) may omit per-judgment " +
-    "llmFinalJudgment/llmTreatment; completion via observation_write requires them. Reconstructable inputs must be " +
-    "stored as requestDigest + references (never full text); only non-reconstructable inputs may carry a minimal inputs.snapshot.",
+  description: "Reference to a reconstructable input (path + sha256 digest each).",
   properties: {
-    schemaVersion: { type: "integer", enum: [1], description: "Observation schema version." },
-    workflow: { type: "string", description: "Workflow name (e.g. learning-promote)." },
-    judgmentKind: { type: "string", description: "Judgment kind identifier within the workflow." },
-    subject: { type: "string", description: "Minimal identification of the judged subject (Japanese, no full text)." },
-    provider: { type: "string", description: "Connection kind identifier (SDK names excluded)." },
-    requestedModel: { type: "string", description: "Requested model ID." },
-    resolvedModel: { type: "string", description: "Resolved model ID (only when the provider returns it)." },
-    sourceRevision: { type: "string", description: "Source revision (e.g. git commit hash)." },
-    outcome: {
-      type: "string",
-      enum: ["completed", "not_configured", "jev_failed"],
-      description: "Run-level outcome. not_configured means the evaluation API was not called (no credential).",
-    },
-    durationMs: { type: "number", minimum: 0, description: "Jev call duration in milliseconds (0 when not called)." },
-    inputTokens: { type: "number", description: "Input tokens (recorded by the initial Vercel adapter when returned)." },
-    recordState: {
-      type: "string",
-      enum: ["partial", "complete"],
-      description: "Machine-readable completion state (two-phase write). partial = evaluate-time record awaiting observation_write; complete = finished record.",
-    },
-    inputs: {
-      type: "object",
-      description: "Input reconstruction info. Full judgment input text is never stored.",
-      properties: {
-        requestDigest: { type: "string", description: "sha256 hex digest (64 chars) of the full evaluation request." },
-        references: {
-          type: "array",
-          description: "References to reconstructable inputs (path + sha256 digest each).",
-          items: {
-            type: "object",
-            properties: {
-              label: { type: "string" },
-              path: { type: "string", description: "Repository-relative reference path." },
-              digest: { type: "string", description: "sha256 hex digest (64 chars)." },
-            },
-            required: ["label", "path", "digest"],
-            additionalProperties: false,
-          },
-        },
-        snapshot: {
-          type: "string",
-          description: "Minimal input snapshot for non-reconstructable inputs only.",
-        },
-      },
-      required: ["requestDigest"],
-      additionalProperties: false,
-    },
-    judgments: {
-      type: "array",
-      description:
-        "Per-judgment observations (multiple Jev judgments of one run live in the same JSON). llmFinalJudgment and " +
-        "llmTreatment are omitted in partial records (evaluate-time) and required once the record is completed via observation_write.",
-      items: {
-        type: "object",
-        properties: {
-          judgmentId: { type: "string", description: "Judgment identifier." },
-          questionForm: { type: "string", enum: ["boolean", "choice", "score"] },
-          jevResult: {
-            description: "Jev result value (boolean for form=boolean, candidate label for form=choice, level value for form=score). Required for outcome=completed.",
-          },
-          probabilityDistribution: {
-            type: "object",
-            description: "Candidate-level probability distribution (keys: true/false or option or level labels; values in [0,1]).",
-            additionalProperties: { type: "number" },
-          },
-          confidence: { type: "number", minimum: 0, maximum: 1, description: "Normalized confidence in [0,1]. Required for outcome=completed. Stored as an independent primary observation; no threshold-derived classification." },
-          failureKind: { type: "string", description: "Structured failure classification (recorded when the Jev call failed)." },
-          llmFinalJudgment: { type: "string", description: "LLM final judgment (Japanese). Omitted in partial records; required in completed records." },
-          llmTreatment: { type: "string", enum: ["unchanged", "corrected"], description: "Observed fact of whether the LLM changed the judgment. Omitted in partial records; required in completed records." },
-        },
-        required: ["judgmentId", "questionForm"],
-        additionalProperties: false,
-      },
-    },
+    label: { type: "string", description: "Short label of the reference." },
+    path: { type: "string", description: "Repository-relative reference path." },
+    digest: { type: "string", description: "sha256 hex digest (64 chars)." },
   },
-  required: [
-    "schemaVersion",
-    "workflow",
-    "judgmentKind",
-    "subject",
-    "provider",
-    "requestedModel",
-    "sourceRevision",
-    "outcome",
-    "durationMs",
-    "inputs",
-    "judgments",
-  ],
+  required: ["label", "path", "digest"],
   additionalProperties: false,
 } as const;
 
-/** evaluate 時点部分レコード作成のための呼出し元提供 metadata スキーマ（run 級 field の内、評価結果から導出できない分）。 */
+/** evaluate の観測永続化に呼出し元が提供する識別 metadata スキーマ（workflow・評価種別は観測の一意識別に必須）。 */
 const OBSERVATION_METADATA_SCHEMA = {
   type: "object",
   description:
-    "Caller-provided metadata for the evaluate-time partial observation record (REQ-090-013). All fields optional; " +
-    "omitted run-level fields are persisted as 'unspecified'. Reuse the same observationId across multiple evaluate " +
-    "calls of one run to keep one JSON per run (judgments are merged by judgmentId).",
+    "Caller-provided identification metadata for the observation persisted by evaluate (evaluate only, required). " +
+    "Each observation is one semantic evaluation (one JSON): workflow + evaluationKind identify the originating " +
+    "workflow and the evaluation kind uniquely. sourceRevision is the concrete base revision; references/snapshot " +
+    "keep inputs reconstructable without storing the full judgment input text.",
   properties: {
-    workflow: { type: "string", description: "Workflow name (e.g. learning-promote)." },
-    judgmentKind: { type: "string", description: "Judgment kind identifier within the workflow." },
+    workflow: { type: "string", description: "Originating workflow name (e.g. learning-promote)." },
+    evaluationKind: { type: "string", description: "Evaluation kind identifier within the workflow." },
     subject: { type: "string", description: "Minimal identification of the judged subject (Japanese, no full text)." },
-    sourceRevision: { type: "string", description: "Source revision (e.g. git commit hash)." },
-    observationId: {
-      type: "string",
-      description: "Observation ID to keep one run = one JSON (alphanumeric plus . _ -). Omit to generate a new one.",
-    },
+    sourceRevision: { type: "string", description: "Concrete source revision (e.g. git commit hash)." },
     references: {
       type: "array",
       description: "References to reconstructable inputs (path + sha256 digest each).",
-      items: {
-        type: "object",
-        properties: {
-          label: { type: "string" },
-          path: { type: "string", description: "Repository-relative reference path." },
-          digest: { type: "string", description: "sha256 hex digest (64 chars)." },
-        },
-        required: ["label", "path", "digest"],
-        additionalProperties: false,
-      },
+      items: INPUT_REFERENCE_SCHEMA,
     },
     snapshot: {
       type: "string",
       description: "Minimal input snapshot for non-reconstructable inputs only.",
     },
   },
+  required: ["workflow", "evaluationKind", "subject", "sourceRevision"],
   additionalProperties: false,
 } as const;
 
 /**
- * observation_write 追記完成 mode（observationId 付き）の入力スキーマ。
- * 実装受理条件（completion allowlist）と一致させる: run 級 field（workflow、judgmentKind、subject、
- * provider、requestedModel、sourceRevision、outcome、durationMs、resolvedModel、inputTokens、inputs）は
- * evaluate 時点の部分レコードに既に記録済みであり、本操作の入力としては受理されない（追記不要）。
- * 追記対象は judgment 単位の LLM 最終判断関連 field（llmFinalJudgment、llmTreatment）のみ。
+ * observation_write（observationId 付き）の入力スキーマ。
+ * 実装受理条件と一致: 追記入力は reasoning model の最終判断結果（final result）のみを運び、
+ * 評価側一次事実（results、confidence、durationMs、inputs 等）は evaluate 時点の観測に記録済みのため
+ * 再送不可。1対1対応と差異理由条件の突合は実観測に対して Tool 本体が行う。
  */
-const COMPLETION_APPEND_OBSERVATION_SCHEMA = {
+const FINAL_RESULT_OBSERVATION_SCHEMA = {
   type: "object",
   description:
-    "Completion append input for observation_write WITH observationId. Run-level fields (workflow, judgmentKind, " +
-    "subject, provider, requestedModel, sourceRevision, outcome, durationMs, resolvedModel, inputTokens, inputs) " +
-    "are already recorded in the evaluate-time partial record (recordState partial) and are NOT accepted here " +
-    "(no append needed): this operation carries only the appendable LLM final-judgment fields. Send schemaVersion, " +
-    "optional recordState 'complete', and one or more judgments, each carrying only judgmentId, questionForm, " +
-    "llmFinalJudgment, llmTreatment (both LLM fields required). Jev-side observation fields (jevResult, " +
-    "probabilityDistribution, confidence, failureKind) stay untouched from the partial record.",
+    "Final-judgment append input for observation_write WITH observationId. The evaluator-side primary facts " +
+    "(results, confidence, durationMs, inputTokens, inputs) are already recorded in the observation persisted by " +
+    "evaluate and are NOT accepted here. Send schemaVersion 2 and one finalResult whose results correspond " +
+    "one-to-one with the evaluator results (questionId + canonical value). A differenceReason " +
+    "(evaluation_input_defect | semantic_disagreement | deterministic_override | unknown) is recorded only when the " +
+    "final judgment differs from the evaluator result; sending one on a match is rejected.",
   properties: {
-    schemaVersion: { type: "integer", enum: [1], description: "Observation schema version." },
-    recordState: {
-      type: "string",
-      enum: ["complete"],
-      description: "Completion state after the append (complete only). The partial record left by evaluate is completed by this operation.",
-    },
-    judgments: {
-      type: "array",
-      minItems: 1,
-      description:
-        "Per-judgment append payload keyed by judgmentId of the partial record. Only the LLM final-judgment fields " +
-        "are accepted and appended; every other field is kept from the partial record (append is idempotent).",
-      items: {
-        type: "object",
-        properties: {
-          judgmentId: {
-            type: "string",
-            minLength: 1,
-            description: "Judgment identifier of the partial-record judgment to complete (non-empty).",
-          },
-          questionForm: { type: "string", enum: ["boolean", "choice", "score"] },
-          llmFinalJudgment: {
-            type: "string",
-            minLength: 1,
-            description: "LLM final judgment (Japanese). Required for the append (non-empty).",
-          },
-          llmTreatment: {
-            type: "string",
-            enum: ["unchanged", "corrected"],
-            description: "Observed fact of whether the LLM changed the judgment. Required for the append.",
+    schemaVersion: { type: "integer", enum: [2], description: "Observation schema version (2)." },
+    finalResult: {
+      type: "object",
+      description: "The reasoning model's final judgment per question (one-to-one with the evaluator results).",
+      properties: {
+        results: {
+          type: "array",
+          minItems: 1,
+          description: "Per-question final judgments keyed by questionId of the evaluator results (append is idempotent).",
+          items: {
+            type: "object",
+            properties: {
+              questionId: {
+                type: "string",
+                minLength: 1,
+                description: "Question identifier matching one evaluator result (non-empty).",
+              },
+              value: {
+                description: "Final judgment value (boolean for form=boolean, candidate label for form=choice, level value for form=score).",
+              },
+              differenceReason: {
+                type: "string",
+                enum: ["evaluation_input_defect", "semantic_disagreement", "deterministic_override", "unknown"],
+                description: "Difference reason classification. Accepted only when the value differs from the evaluator result.",
+              },
+            },
+            required: ["questionId", "value"],
+            additionalProperties: false,
           },
         },
-        required: ["judgmentId", "questionForm", "llmFinalJudgment", "llmTreatment"],
-        additionalProperties: false,
       },
+      required: ["results"],
+      additionalProperties: false,
     },
   },
-  required: ["schemaVersion", "judgments"],
+  required: ["schemaVersion", "finalResult"],
   additionalProperties: false,
-} as const;
-
-/** observation_write の入力 observation スキーマ（observationId の有無で受理形が分岐する）。 */
-const OBSERVATION_INPUT_SCHEMA = {
-  type: "object",
-  description:
-    "Observation record to validate and write (observation_write only). The accepted input shape branches on " +
-    "observationId: WITH observationId this is the completion append input (COMPLETION_APPEND branch) carrying ONLY " +
-    "the LLM final-judgment fields, because run-level fields are already recorded by the evaluate-time partial " +
-    "record; WITHOUT observationId this is a completed observation written as a new file (FULL_RECORD branch).",
-  oneOf: [COMPLETION_APPEND_OBSERVATION_SCHEMA, OBSERVATION_SCHEMA],
 } as const;
 
 /** 操作要求の公開スキーマ（JSON Schema）。正の契約は Tool の contracts.ts が所有する。 */
@@ -289,8 +175,10 @@ export const REQUEST_PROPERTY_SCHEMA = {
     "observation_write). The public contract is provider- and SDK-independent. When the gateway credential " +
     "(AI_GATEWAY_API_KEY) is unset, evaluate returns a distinct not_configured failure without calling the API; " +
     "callers fall back to the legacy LLM path. No auto-retry on API failure. Evaluation language is Japanese. " +
-    "Two-phase observation write: evaluate persists a partial record (recordState partial) at evaluation completion; " +
-    "observation_write with observationId appends the LLM final-judgment fields to the same JSON and completes it.",
+    "One semantic evaluation = one observation: evaluate persists the observation (one JSON) under " +
+    ".agentdev/jev-observations/ right after the evaluator succeeds (and a failure observation when the call " +
+    "fails after starting; no observation for not_configured or input validation failures), and observation_write " +
+    "appends the reasoning model's final judgment to an evaluator-success observation.",
   properties: {
     operation: {
       type: "string",
@@ -312,22 +200,15 @@ export const REQUEST_PROPERTY_SCHEMA = {
     },
     observationMetadata: {
       ...OBSERVATION_METADATA_SCHEMA,
-      description: "Caller-provided metadata for the evaluate-time partial observation record (evaluate only, optional).",
+      description: "Caller-provided identification metadata for the observation persisted by evaluate (evaluate only, required).",
     },
     observation: {
-      ...OBSERVATION_INPUT_SCHEMA,
-      description:
-        "Observation record to validate and write (observation_write only). Input shape branches on observationId " +
-        "(see oneOf branches). With observationId: completion append input carrying only the LLM final-judgment " +
-        "fields (llmFinalJudgment, llmTreatment) per judgment; run-level fields are already recorded by the " +
-        "evaluate-time partial record and are not re-accepted. Without observationId: a completed observation " +
-        "written as a new file (full record shape).",
+      ...FINAL_RESULT_OBSERVATION_SCHEMA,
+      description: "Final-judgment append input (observation_write only, with observationId). Carries only the reasoning model's final judgment; evaluator-side facts are already recorded.",
     },
     observationId: {
       type: "string",
-      description:
-        "Observation ID written by evaluate (observation_write only, optional). Present: completion write mode that " +
-        "appends LLM fields to the same JSON (idempotent). Absent: legacy write of a completed observation as a new file.",
+      description: "Observation ID written by evaluate (observation_write only, required). The final judgment is appended to that observation JSON.",
     },
   },
   required: ["operation"],
@@ -350,10 +231,13 @@ export function createAgentdevJevToolDefinition(deps: {
       AGENTDEV_JEV_PUBLIC_CONTRACTS.map((c) => `${c.operation} (side-effect, fail-closed)`).join(", ") +
       ". When the gateway credential is unset the tool returns a distinct not_configured failure without calling " +
       "the API and workflows continue on the legacy LLM path; API failures are never auto-retried and are returned " +
-      "as structured failures. Two-phase observation write: evaluate persists a partial record (recordState partial) " +
-      "under .agentdev/jev-observations/ at evaluation completion (including not_configured), and observation_write " +
-      "with observationId completes the same JSON with the LLM final-judgment fields; evaluate-internal write failures " +
-      "stay an independent warning on the evaluation result and observation writes are independent of workflow success.",
+      "as structured failures. One semantic evaluation = one observation: evaluate persists the observation (one " +
+      "JSON per evaluation) under .agentdev/jev-observations/ right after the evaluator succeeds — before the " +
+      "caller proceeds to the reasoning model — and persists a failure observation when a call fails after " +
+      "starting; not_configured and input validation failures generate no observation. observation_write appends " +
+      "the reasoning model's final judgment to an evaluator-success observation. Observation persistence failures " +
+      "stay an independent warning on the evaluation result (fail-open) and observation writes are independent of " +
+      "workflow success.",
     args: {
       request: REQUEST_PROPERTY_SCHEMA,
     },
@@ -375,6 +259,8 @@ export function createAgentdevJevToolDefinition(deps: {
     },
   };
 }
+
+export { validateFinalResultObservation };
 
 /** Plugin 実装（hooks として custom tool を登録する）。 */
 export function createAgentdevJevToolPlugin(deps: {
