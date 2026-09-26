@@ -6,7 +6,7 @@ updated: "2026-09-24"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-033 -->
 <!-- ADF-COVERS(implementation): REQ-002-009, REQ-002-010, REQ-002-012 -->
-<!-- ADF-COVERS(implementation): REQ-034-008, REQ-034-009 -->
+<!-- ADF-COVERS(implementation): REQ-034-007 -->
 
 # システム仕様
 
@@ -65,6 +65,12 @@ AgentDevFlow の配布コマンドではなく、AgentDevFlow 本体リポジト
 | `/agentdev/inspect-docs` | docs 全体の意味整合レビューと REQ 再構成診断 | [commands/inspect-docs.md](../commands/inspect-docs.md) |
 | `/agentdev/inspect-skills` | Command/Skill 参照妥当性、構造の検出 | [commands/inspect-skills.md](../commands/inspect-skills.md) |
 | `/agentdev/inspect-promote` | 検出事項（finding）の分類、昇格 | [commands/inspect-promote.md](../commands/inspect-promote.md) |
+
+#### 課題管理（issue）
+
+| Command | 概要 | Design |
+|---|---|---|
+| `/agentdev/issue` | 追跡Issue の自然言語操作入口（起票・検索・参照・更新・コメント追加・保留・再評価・実行準備完了・解決・反映確認・クローズ・再オープン）。特定の単一 workflow に閉じない横断入口（REQ-049-015）。Case Issue の操作は case-* 系内部 lifecycle が所有する | commands/issue.md |
 
 ### 品質ゲート
 
@@ -129,6 +135,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 | `/agentdev/inspect-docs` | docs 全体スキャン | 検出事項 | inspect |
 | `/agentdev/inspect-skills` | Command/Skill 定義 | 検出事項 | inspect |
 | `/agentdev/inspect-promote` | 検出事項 | 採用済み成果物 | inspect |
+| `/agentdev/issue` | 自然言語による課題管理の指示 | 追跡Issue の作成・更新・検索・参照（Tool 操作契約経由） | 横断（課題管理） |
 
 ### `/agentdev/req-define`
 
@@ -367,6 +374,20 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **Harness依存**: git（実行前同期）、Custom Tool（third-party Skill 取得）。
 - **Capability依存**: `agentdev-workflow-third-party-sync`（workflow 本体）、`third-party-skill-management` Design（正規仕様）。
 - **内部workflow候補**: なし（取得実行主体は Custom Tool 操作契約、workflow 制御は `agentdev-workflow-third-party-sync` が所有）。
+
+### `/agentdev/issue`
+
+- **公開契約**: 自然言語による課題管理の指示（起票、検索・参照、更新、コメント追加、保留、再評価、実行準備完了、解決、反映確認、クローズ、再オープン）→ 追跡Issue の操作結果（Tool 操作契約経由）
+- **主要処理段階**: 入力受領 → 操作種別判定 → 対象追跡Issue 特定 → Tool 操作実行 → 完了報告（workflow 実装本体は agentdev-workflow-issue へ委譲）
+- **分岐**: 追跡Issue と Case Issue の判定（Case Issue の操作は対象外、case-* 系内部 lifecycle が所有）、要件定義経路（/agentdev/req-define）への課題化判定
+- **副作用**: Custom Tool agentdev_gh 操作契約経由の GitHub I/O のみ（直接 I/O なし）
+- **HITL**: 破壊的操作（削除・クローズ等）の確認、曖昧指示の対象特定確認
+- **並列性**: 単一対話セッション（並列実行なし）
+- **resume**: durable state（追跡Issue 本文・ローカル .agentdev/issues/）から再構成
+- **durable state**: .agentdev/issues/issue-*.md（ローカル版。GitHub Issue が正）
+- **Harness依存**: Custom Tool agentdev_gh
+- **Capability依存**: agentdev-workflow-issue、agentdev-issue-tracking、agentdev-issue-management
+- **内部workflow候補**: agentdev-workflow-issue（実装本体）
 
 ### 横断観察（Cross-cutting observations）
 

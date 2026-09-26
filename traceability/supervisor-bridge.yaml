@@ -11,7 +11,6 @@ implementation:
   docs/guides/supervisor-credential-bridge.md:
     - REQ-091-003
     - REQ-091-005
-    - REQ-091-006
   docs/README.md:
     - REQ-091-003
   docs/guides/README.md:
@@ -19,12 +18,10 @@ implementation:
   docs/knowledge/supervisor-bridge-credential-supply.md:
     - REQ-091-004
     - REQ-091-005
-    - REQ-091-006
 verification:
   docs/guides/supervisor-credential-bridge.md:
     - REQ-091-002
     - REQ-091-003
-    - REQ-091-006
   docs/knowledge/supervisor-bridge-credential-supply.md:
     - REQ-091-005
   .opencode/skills/repo-agentdev-integrity/scripts/check_knowledge_docs.ts:
