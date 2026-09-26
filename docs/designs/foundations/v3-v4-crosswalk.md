@@ -52,7 +52,7 @@ Sequence（v4-migration-and-release.md）の各段階で行う。
 - Decision（v3 側 30、DEC-018 欠番）: keep 20 / redefine 2（DEC-010、DEC-012）/
   supersede 5（DEC-002、DEC-015、DEC-017、DEC-029、DEC-030）/ 既に superseded 済み 2
   （DEC-005、DEC-007）
-- Design（v3 側 accepted）: ドメイン別の内訳は inventory を正とする。状态系 9 件と
+- Design（v3 側 accepted）: ドメイン別の内訳は inventory を正とする。状態系 9 件と
   traceability-model、quality-gates が supersede、検証基盤系は keep 中心
 - 実装資産: scripts/** は第8段、traceability/** は第7段、.agentdev/ 状態領域は第9段、
   配布物・プロジェクションは第12段

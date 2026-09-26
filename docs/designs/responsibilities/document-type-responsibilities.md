@@ -4,7 +4,7 @@ status: accepted
 created: 2026-06-23
 updated: "2026-09-19"
 ---
-<!-- ADF-COVERS(implementation): REQ-001-001, REQ-001-002, REQ-001-003, REQ-001-004, REQ-001-005, REQ-001-006 -->
+<!-- ADF-COVERS(implementation): REQ-001-001, REQ-001-002, REQ-001-003, REQ-001-004, REQ-001-005, REQ-001-006, REQ-056-003 -->
 <!-- ADF-COVERS(implementation): REQ-001-017, REQ-001-018, REQ-001-019 -->
 <!-- ADF-COVERS(implementation): REQ-001-066 -->
 
@@ -306,7 +306,7 @@ Decision の要否は既存の判断能力が、文書保存は既存のファ�
 
 ### 規範情報（Decision、REQ、Design）
 
-- 決定内容、適用範囲、必須条件、制約、正規所有者、採用方式、観測可能結果（含义変更相当）
+- 決定内容、適用範囲、必須条件、制約、正規所有者、採用方式、観測可能結果（意味変更相当）
 - 安定的な仕様記述、契約、プロトコル
 - 現行アーキテクチャの基準
 

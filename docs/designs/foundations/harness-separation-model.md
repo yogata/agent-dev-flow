@@ -147,7 +147,7 @@ AgentDevFlow 配布command / Workflow Skill / Design は ToDo を必須機構と
 ## 関連
 
 - DEC-001（AgentDevFlow 憲章）: 決定2（ADF が所有しない領域）が本 Design の原本原則。
-- DEC-002（OpenCode ソース・プロジェクション分離）: 本 Design の harness 非依存原則を原本とプロジェクションの分離によって物理層で担保する。
+- DEC-002（OpenCode ソース・プロジェクション分離、現行の責務体制は DEC-036）: 本 Design の harness 非依存原則を原本とプロジェクションの分離によって物理層で担保する。
 - REQ-002（配布成果物の責務境界）: 配布成果物側の正規所有者。本 Design は交叉参照として所有内容を重複しない。
 - v2:ADR-0136（配布物の harness 実行制御分離）: 吸収元。決定本質は charter 決定2 に先駆的適用として含まれる。
 - v2:REQ-0162（配布物の harness 実行制御分離）: 吸収元。原則の SSoT と各要件行（4状態結果契約、配布 docs 制約、ADF 可観測タイムスタンプ境界、ID 除去、パス除去）を本 Design および REQ-002 へ統合した。

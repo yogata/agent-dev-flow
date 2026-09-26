@@ -13,7 +13,7 @@ updated: 2026-09-24
 <!-- 注: install/self-sync 各 ps1（scripts/）は走査対象拡張子外のため、導入器実装行の宣言は本 Design（正規仕様所有者）へ配置。実装実体は scripts/install.ps1、scripts/self-sync.ps1（内部処理は scripts/consumer/、scripts/self/ 配下） -->
 <!-- ADF-COVERS(design): REQ-002-047 -->
 <!-- ADF-COVERS(design): REQ-050-009 -->
-<!-- ADF-COVERS(design): REQ-091-001, REQ-091-002, REQ-091-003, REQ-091-004, REQ-091-005, REQ-091-006 -->
+<!-- ADF-COVERS(design): REQ-091-001, REQ-091-002, REQ-091-003, REQ-091-004, REQ-091-005 -->
 
 # 実行時パッケージ境界
 

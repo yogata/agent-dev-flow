@@ -12,7 +12,7 @@ updated: "2026-09-17"
 ## 目的
 
 標準配布スキル `agentdev-traceability` は、ADF v4 Traceability モデル（foundations/v4-traceability-model.md）に基づき、要件と成果物の明示的な対応関係について coverage、impact、check の3能力を提供する。
-正規成果物を直接走査し、対応関係をその場で解決する（REQ-012、DEC-017。前身機能の廃止と移行の経緯は DEC-017 が記録する）。
+正規成果物を直接走査し、対応関係をその場で解決する（REQ-012、DEC-037。直接走査は旧 DEC-017 決定2 の維持として DEC-037 配下で搬送され、前身機能の廃止と移行の経緯は旧 DEC-017 が記録する）。
 
 ## 適用対象
 

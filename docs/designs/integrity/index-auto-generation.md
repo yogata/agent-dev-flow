@@ -96,6 +96,7 @@ AUTOGEN block ID は `{target}-{section}-{subsection}` 形式に従う。
 | `rule-ownership-ir-crossref` | rule-ownership.md |
 | `decision-baseline-count`, `decision-baseline-table` | decisions/README.md |
 | `decision-status-accepted` 等（proposed/superseded/deprecated） | decisions/README.md |
+| `decision-status-accepted` 等（superseded 行の部分置換注記） | decisions/README.md |
 | `decision-retired-table` | decisions/README.md |
 | `decision-related-req-table` | decisions/README.md |
 | `req-active-count`, `req-active-table`, `req-retired-table` | requirements/README.md |
@@ -183,6 +184,7 @@ docs-check 既存資産（cli_utils.ts, check_integrity.ts の parseFrontmatter,
 後述「現在人手管理領域の3領域」参照。
 3. **各領域の正規情報源**: frontmatter、各文書本文のセクション構造、宣言等。
 4. **人手管理領域に対する整合性確認方法**: docs-check（IR-061、IR-038、IR-039、IR-042）による検出、人手レビュー等。
+5. **Decision frontmatter の supersede_note 由来の部分置換注記生成**: superseded Decision で frontmatter に `supersede_note` フィールドが存在する場合、decision 系 AUTOGEN ブロック（decision-status 表・superseded セクション）の該当 Decision 行へ部分置換注記を併記して生成する。`superseded_by` と `supersede_note` の両 frontmatter フィールドをデータ源とし、status 表・superseded セクション間で同一注記を出力する（DEC-040 部分置換〔決定4 のみ DEC-044 置換・決定1〜3 維持〕の README 反映。CR-004 裁定の generator 経由反映）。
 
 docs-check は検査対象不変原則（検査対象を直接修正しない）を維持し、生成スクリプトは docs-check から独立して動作する。
 

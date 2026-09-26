@@ -11,7 +11,6 @@ implementation:
     - REQ-090-001
     - REQ-090-002
     - REQ-090-003
-    - REQ-090-008
     - REQ-090-014
     - REQ-090-016
   src/opencode/tools/agentdev-jev/index.ts:
