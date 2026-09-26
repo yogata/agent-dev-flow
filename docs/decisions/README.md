@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は34件、提案中の Decision は0件である。
+現行の承認済み Decision は33件、提案中の Decision は1件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -53,10 +53,11 @@
 | DEC-037 | Traceability の Change / Evidence 中心への再中心化 | accepted | 2026-09-18 |
 | DEC-038 | ADF v4 durable state 配置と再構成の契約（状態権威・証跡分離・非原子調整原則） | accepted | 2026-09-19 |
 | DEC-039 | ADF v4 authority・副作用統制と冪等・並行性モデル | accepted | 2026-09-19 |
-| DEC-040 | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化） | accepted | 2026-09-22 |
+| DEC-040 | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化） | superseded | 2026-09-22 |
 | DEC-041 | Wave 構成純度と実行並列上限の単一所有 | accepted | 2026-09-23 |
 | DEC-042 | case-auto 最大並列維持と同期逐次フォールバック禁止 | accepted | 2026-09-24 |
-| DEC-043 | case-ready 実行構造判断への Jev 最終判断採用（Stage 2: 閾値ルーティング） | accepted | 2026-09-26 |
+| DEC-043 | case-ready 実行構造判断への Jev 最終判断採用（Stage 2: 閾値ルーティング） | superseded | 2026-09-26 |
+| DEC-044 | Semantic Evaluation 観測契約の一次事実中心再設計と基本判断経路への復帰 | proposed | 2026-09-26 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -100,15 +101,14 @@
 - [DEC-037](DEC-037.md)（Traceability の Change / Evidence 中心への再中心化）
 - [DEC-038](DEC-038.md)（ADF v4 durable state 配置と再構成の契約（状態権威・証跡分離・非原子調整原則））
 - [DEC-039](DEC-039.md)（ADF v4 authority・副作用統制と冪等・並行性モデル）
-- [DEC-040](DEC-040.md)（typesafe/Jev 先行評価の採用（Stage 1: 観測可能化））
 - [DEC-041](DEC-041.md)（Wave 構成純度と実行並列上限の単一所有）
 - [DEC-042](DEC-042.md)（case-auto 最大並列維持と同期逐次フォールバック禁止）
-- [DEC-043](DEC-043.md)（case-ready 実行構造判断への Jev 最終判断採用（Stage 2: 閾値ルーティング））
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
+- [DEC-044](DEC-044.md)（Semantic Evaluation 観測契約の一次事実中心再設計と基本判断経路への復帰）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -121,6 +121,8 @@
 - [DEC-017](DEC-017.md)（最小トレーサビリティモデルの採用と Artifact Graph の廃止）
 - [DEC-029](DEC-029.md)（公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入）
 - [DEC-030](DEC-030.md)（トレーサビリティ標準機能への一般化と producer / consumer 境界の確立）
+- [DEC-040](DEC-040.md)（typesafe/Jev 先行評価の採用（Stage 1: 観測可能化））
+- [DEC-043](DEC-043.md)（case-ready 実行構造判断への Jev 最終判断採用（Stage 2: 閾値ルーティング））
 <!-- AUTOGEN:END -->
 
 ### 非推奨（deprecated）
@@ -250,6 +252,8 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-040 | [REQ-090](../requirements/REQ-090.md) | - |
 | DEC-041 | [REQ-031](../requirements/REQ-031.md), [REQ-034](../requirements/REQ-034.md), [REQ-035](../requirements/REQ-035.md), [REQ-061](../requirements/REQ-061.md) | - |
 | DEC-042 | [REQ-031](../requirements/REQ-031.md), [REQ-034](../requirements/REQ-034.md) | case-auto 最大並列維持と同期逐次フォールバック禁止（REQ-034-025/028 意味変更・REQ-034-044/045 APPEND、REQ-031-030 UPDATE と整合） |
+| DEC-043 | [REQ-090](../requirements/REQ-090.md) | - |
+| DEC-044 | [REQ-090](../requirements/REQ-090.md), [REQ-091](../requirements/REQ-091.md) | - |
 <!-- AUTOGEN:END -->
 
 ## 過去版の履歴基盤

@@ -25,7 +25,7 @@ durable state 関連の情報を次の 5 分類に配置する。各論理状態
 | 導出可能情報 | 現在 stage、workflow route、Wave 状態、Epic 集約、進捗表、索引類 | 保存しない（正規状態から再構成） | （保存しない） |
 
 8 情報寿命（ADF lifetime、Project lifetime、Architecture lifetime、Requirement lifetime、Change/Case lifetime、Runtime lifetime、reusable Knowledge、未評価 Observation）と各分類の対応は本表の寿命列が基準とする。docs/knowledge/ の知識は repo 内正規状態（reusable Knowledge）に配置する。未評価 Observation（learning/intake の未評価エントリ）は repo 内正規状態（.agentdev/ ドメイン状態）として保存し、評価結果は昇格ガード（DEC-033）に従って振り分けられる。
-`.agentdev/jev-observations/` は Jev 先行評価の観測記録の配置先である（REQ-090-006）。分類は repo 内正規状態（git 管理対象、REQ-002-012 準拠）、保存形式は JSON（1 Workflow 実行 = 1 ファイル、JSONL は正本としない）、寿命は未評価 Observation（評価・置換判断の進行に応じた整理方針は評価 Issue で定める）である。再開契約: 観測記録は再開ポイントの構成要素とせず、Workflow 再開時に Jev を再呼出しする。
+`.agentdev/jev-observations/` は Jev 先行評価の観測記録の配置先である（REQ-090-006）。分類は repo 内正規状態（git 管理対象、REQ-002-012 準拠）、保存形式は JSON（1 semantic evaluation = 1 observation。JSONL は正本としない）、寿命は未評価 Observation（評価・置換判断の進行に応じた整理方針は評価 Issue で定める）である。再開契約: 観測記録は再開ポイントの構成要素とせず、Workflow 再開時に Jev を再呼出しする（再呼出しは別 observation として記録される）。
 REQ-001-034「状態保持領域内の作業用ドラフトは正規のドメイン状態ではなく、コマンド間引き渡し用の中間成果物であること」は Case 状態機械上の正規状態（durable state enum）を指し、本表の「repo 内正規状態（drafts 含む）」は durable state 配置分類（保存権威の置き場所）を指すため、両者は権威クラスを異にして調和する（v3 backlog-artifact-lifecycle Design 配置系 11 識別子の承継・分配の正は第9段 Root Case #3022）。
 
 ## 状態と証跡の分離
