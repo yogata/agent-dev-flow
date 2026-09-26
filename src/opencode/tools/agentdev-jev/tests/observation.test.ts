@@ -1,10 +1,16 @@
-// 観測書込み支援（REQ-090-006）のテスト。
+// 観測書込み支援（形式検証・1 evaluation = 1 observation の書込み・final result 追記）のテスト。
+//
+// TS-001: 評価1件 = 観測1ファイル
+// TS-002: 質問単位の confidence 複製・代替生成 field は schema が許容しない
+// TS-005: source revision 必須、判断入力全文の非保存、最小 snapshot、provider・model 構成値の非必須
+// TS-006: 失敗観測は呼出し開始後の失敗分類のみ
+// TS-007: 書込み失敗は構造化失敗（fail-open。他パスを変更しない）
 
 import { describe, expect, test } from "bun:test";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
-import { completeObservation, defaultObservationId, requestDigest, upsertPartialObservation, validateCompletionObservation, validateObservation, writeObservation } from "../observation.ts";
+import { appendFinalResult, defaultObservationId, requestDigest, validateFinalResultObservation, validateObservation, writeEvaluationObservation } from "../observation.ts";
 import type { JevObservation } from "../contracts.ts";
 
 const DIGEST = "a".repeat(64);
@@ -26,117 +32,142 @@ async function listRelative(root: string): Promise<string[]> {
   return entries;
 }
 
-function baseObservation(overrides: Partial<JevObservation> = {}): JevObservation {
+function successObservation(overrides: Partial<JevObservation> = {}): JevObservation {
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
+    observationId: "obs-fixture",
     workflow: "learning-promote",
-    judgmentKind: "evaluation",
+    evaluationKind: "evaluation",
     subject: "inbox エントリ 1件",
-    provider: "mock",
-    requestedModel: "mock/jev",
     sourceRevision: "c6c15e72e5cae9ba8c3a957e32662704db94283c",
-    outcome: "completed",
     durationMs: 120,
+    inputTokens: 300,
     inputs: { requestDigest: DIGEST },
-    judgments: [
+    results: [
       {
-        judgmentId: "j1",
+        questionId: "j1",
         questionForm: "boolean",
-        jevResult: true,
+        value: true,
         probabilityDistribution: { true: 0.8, false: 0.2 },
-        confidence: 0.8,
-        llmFinalJudgment: "採用",
-        llmTreatment: "unchanged",
       },
     ],
+    confidence: 0.91,
+    ...overrides,
+  };
+}
+
+function failureObservation(overrides: Partial<JevObservation> = {}): JevObservation {
+  return {
+    schemaVersion: 2,
+    observationId: "obs-fixture",
+    workflow: "learning-promote",
+    evaluationKind: "evaluation",
+    subject: "inbox エントリ 1件",
+    sourceRevision: "c6c15e72e5cae9ba8c3a957e32662704db94283c",
+    durationMs: 45,
+    inputs: { requestDigest: DIGEST },
+    failure: { kind: "timeout", detail: "AbortError: aborted" },
     ...overrides,
   };
 }
 
 describe("validateObservation", () => {
-  test("有効な観測を受理する", () => {
-    expect(validateObservation(baseObservation()).ok).toBe(true);
+  test("evaluator 成功観測を受理する", () => {
+    expect(validateObservation(successObservation()).ok).toBe(true);
   });
 
-  test("not_configured の実行は judgments 空で受理する", () => {
-    const result = validateObservation(baseObservation({ outcome: "not_configured", durationMs: 0, judgments: [] }));
-    expect(result.ok).toBe(true);
+  test("失敗観測（呼出し開始後の失敗分類）を受理する", () => {
+    expect(validateObservation(failureObservation()).ok).toBe(true);
   });
 
-  test("completed は jevResult・confidence・probabilityDistribution を要求する", () => {
-    const observation = baseObservation();
-    delete (observation.judgments[0] as Record<string, unknown>).confidence;
+  test("results と failure は排他必須（どちらも無い・双方有りの観測を拒否する）", () => {
+    const neither = successObservation() as unknown as Record<string, unknown>;
+    delete neither.results;
+    expect(validateObservation(neither).ok).toBe(false);
+    const both = successObservation({ failure: { kind: "timeout", detail: "x" } });
+    expect(validateObservation(both).ok).toBe(false);
+  });
+
+  test("schemaVersion 1 の履歴観測を現行観測として受理しない", () => {
+    const legacy = {
+      schemaVersion: 1,
+      workflow: "learning-promote",
+      judgmentKind: "evaluation",
+      subject: "履歴",
+      provider: "mock",
+      requestedModel: "mock/jev",
+      sourceRevision: "c6c15e72e5cae9ba8c3a957e32662704db94283c",
+      outcome: "completed",
+      durationMs: 100,
+      inputs: { requestDigest: DIGEST },
+      judgments: [],
+      recordState: "complete",
+    };
+    expect(validateObservation(legacy).ok).toBe(false);
+  });
+
+  test("未知 field を拒否する", () => {
+    const observation = successObservation() as unknown as Record<string, unknown>;
+    observation.unexpected = 1;
     const result = validateObservation(observation);
     expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.detail).toContain("unexpected");
   });
 
-  test("未知 field（閾値依存の分類結果など）を拒否する", () => {
-    const observation = baseObservation() as unknown as Record<string, unknown>;
-    observation.confidenceClassification = "high";
-    const result = validateObservation(observation);
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.detail).toContain("confidenceClassification");
+  test("failure observation への confidence・finalResult 付与を拒否する", () => {
+    const withConfidence = failureObservation({ confidence: 0.9 });
+    expect(validateObservation(withConfidence).ok).toBe(false);
+    const withFinal = failureObservation({ finalResult: { results: [{ questionId: "j1", value: true }] } });
+    expect(validateObservation(withFinal).ok).toBe(false);
   });
 
-  test("llmTreatment は unchanged/corrected のみ", () => {
-    const observation = baseObservation() as unknown as Record<string, unknown>;
-    (observation.judgments as Array<Record<string, unknown>>)[0]!["llmTreatment"] = "promising";
-    const result = validateObservation(observation);
-    expect(result.ok).toBe(false);
+  test("confidence は [0,1] の数値のみ受理する", () => {
+    const observation = successObservation({ confidence: 1.5 });
+    expect(validateObservation(observation).ok).toBe(false);
+  });
+
+  test("失敗分類は呼出し開始後の5分類のみ受理する", () => {
+    const notConfigured = failureObservation({ failure: { kind: "not_configured" as never, detail: "unset" } });
+    expect(validateObservation(notConfigured).ok).toBe(false);
+    const invalidInput = failureObservation({ failure: { kind: "invalid_input" as never, detail: "bad input" } });
+    expect(validateObservation(invalidInput).ok).toBe(false);
+  });
+
+  test("failure.detail（最小 diagnostic）の欠落を拒否する", () => {
+    const observation = failureObservation({ failure: { kind: "timeout", detail: "" } });
+    expect(validateObservation(observation).ok).toBe(false);
   });
 
   test("requestDigest は sha256 hex 64 桁を要求する", () => {
-    const observation = baseObservation();
+    const observation = successObservation();
     observation.inputs.requestDigest = "not-a-digest";
     expect(validateObservation(observation).ok).toBe(false);
   });
-});
 
-describe("validateObservation recordState（REQ-090-013）", () => {
-  function partialJudgment() {
-    return {
-      judgmentId: "j1",
-      questionForm: "boolean" as const,
-      jevResult: true,
-      probabilityDistribution: { true: 0.8, false: 0.2 },
-      confidence: 0.8,
-    };
-  }
-
-  test("recordState partial は LLM field 省略を受理する", () => {
-    const observation = baseObservation({ recordState: "partial" });
-    (observation.judgments as Array<Record<string, unknown>>)[0] = partialJudgment();
-    const result = validateObservation(observation);
-    expect(result.ok).toBe(true);
+  test("source revision は必須、identity は省略可能（provider・model 構成値は必須保存しない）", () => {
+    const observation = successObservation();
+    expect(validateObservation(observation).ok).toBe(true);
+    expect(observation.identity).toBeUndefined();
+    const withoutRevision = successObservation() as unknown as Record<string, unknown>;
+    delete withoutRevision.sourceRevision;
+    expect(validateObservation(withoutRevision).ok).toBe(false);
+    const withIdentity = successObservation({ identity: { resolvedModel: "mock/jev-0721" } });
+    expect(validateObservation(withIdentity).ok).toBe(true);
   });
 
-  test("recordState complete（明示）は LLM field を要求する", () => {
-    const observation = baseObservation({ recordState: "complete" });
-    delete (observation.judgments[0] as Record<string, unknown>).llmFinalJudgment;
-    delete (observation.judgments[0] as Record<string, unknown>).llmTreatment;
-    const result = validateObservation(observation);
-    expect(result.ok).toBe(false);
-  });
-
-  test("recordState 省略は complete 相当（LLM field 必須・後方互換）", () => {
-    const observation = baseObservation();
-    delete (observation.judgments[0] as Record<string, unknown>).llmTreatment;
-    expect(validateObservation(observation).ok).toBe(false);
-  });
-
-  test("recordState の不正値を拒否する", () => {
-    const observation = baseObservation() as unknown as Record<string, unknown>;
-    observation.recordState = "draft";
-    expect(validateObservation(observation).ok).toBe(false);
-  });
-
-  test("partial 判定でも LLM field の不正値は拒否する", () => {
-    const observation = baseObservation({ recordState: "partial" });
-    (observation.judgments as Array<Record<string, unknown>>)[0] = {
-      ...partialJudgment(),
-      llmTreatment: "promising",
-    };
-    expect(validateObservation(observation).ok).toBe(false);
+  test("finalResult は evaluator 返却結果と1対1対応し、不一致時のみ差異理由を受理する", () => {
+    const matching = successObservation({ finalResult: { results: [{ questionId: "j1", value: true }] } });
+    expect(validateObservation(matching).ok).toBe(true);
+    const differing = successObservation({ finalResult: { results: [{ questionId: "j1", value: false, differenceReason: "semantic_disagreement" }] } });
+    expect(validateObservation(differing).ok).toBe(true);
+    const matchingWithReason = successObservation({ finalResult: { results: [{ questionId: "j1", value: true, differenceReason: "semantic_disagreement" }] } });
+    expect(validateObservation(matchingWithReason).ok).toBe(false);
+    const unknownReason = successObservation({ finalResult: { results: [{ questionId: "j1", value: false, differenceReason: "mood" as never }] } });
+    expect(validateObservation(unknownReason).ok).toBe(false);
+    const missingQuestion = successObservation({ finalResult: { results: [] } });
+    expect(validateObservation(missingQuestion).ok).toBe(false);
+    const unrelatedQuestion = successObservation({ finalResult: { results: [{ questionId: "j2", value: true }] } });
+    expect(validateObservation(unrelatedQuestion).ok).toBe(false);
   });
 });
 
@@ -151,29 +182,35 @@ describe("requestDigest", () => {
   });
 });
 
-describe("writeObservation", () => {
-  test("1実行 = 1 JSON ファイルを原子的に書き込む", async () => {
+describe("writeEvaluationObservation", () => {
+  test("評価1件につき1ファイルを原子的に書き込む（TS-001）", async () => {
     const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
-    const result = await writeObservation(worktree, baseObservation(), { generateObservationId: () => "id-1" });
+    const result = await writeEvaluationObservation(worktree, successObservation());
     expect(result.ok).toBe(true);
-    if (result.ok) {
-      expect(result.success.writtenPath).toBe(".agentdev/jev-observations/id-1.json");
-      expect(result.success.observationId).toBe("id-1");
-    }
+    if (!result.ok) return;
+    expect(result.success.writtenPath).toMatch(/^\.agentdev\/jev-observations\/[^/]+\.json$/);
     const files = await fs.readdir(path.join(worktree, ".agentdev", "jev-observations"));
-    expect(files).toEqual(["id-1.json"]);
-    const content = JSON.parse(await fs.readFile(path.join(worktree, ".agentdev", "jev-observations", "id-1.json"), "utf8"));
-    expect(content.observationId).toBe("id-1");
+    expect(files).toEqual([`${result.success.observationId}.json`]);
+    const content = JSON.parse(await fs.readFile(path.join(worktree, ".agentdev", "jev-observations", `${result.success.observationId}.json`), "utf8"));
+    expect(content.observationId).toBe(result.success.observationId);
     expect(content.workflow).toBe("learning-promote");
-    expect(content.judgments).toHaveLength(1);
+    expect(content.evaluationKind).toBe("evaluation");
   });
 
-  test("書込み先が衝突する場合も例外を出さず構造化失敗を返し、jev-observations/ 以外を変更しない（TS-004・TS-005）", async () => {
+  test("連続する2評価は2ファイルを生成する（観測単位の集約を行わない）", async () => {
+    const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
+    await writeEvaluationObservation(worktree, successObservation());
+    await writeEvaluationObservation(worktree, successObservation());
+    const files = await fs.readdir(path.join(worktree, ".agentdev", "jev-observations"));
+    expect(files).toHaveLength(2);
+  });
+
+  test("書込み先が衝突する場合も例外を出さず構造化失敗を返し、jev-observations/ 以外を変更しない（TS-007）", async () => {
     const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
     await fs.mkdir(path.join(worktree, ".agentdev"), { recursive: true });
     await fs.writeFile(path.join(worktree, ".agentdev", "jev-observations"), "not-a-dir", "utf8");
     const before = await listRelative(worktree);
-    const result = await writeObservation(worktree, baseObservation(), { generateObservationId: () => "id-bad" });
+    const result = await writeEvaluationObservation(worktree, successObservation());
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.failure.retryable).toBe(false);
@@ -183,257 +220,135 @@ describe("writeObservation", () => {
     expect(after).toEqual(before);
   });
 
-  test("書込み成功時も jev-observations/ 以外のパスを変更しない（TS-005: 正規 domain state 非混入）", async () => {
+  test("書込み成功時も jev-observations/ 以外の正規状態パスを変更しない", async () => {
     const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
     await fs.mkdir(path.join(worktree, ".agentdev", "intake", "inbox"), { recursive: true });
     await fs.writeFile(path.join(worktree, ".agentdev", "intake", "inbox", "item.md"), "x", "utf8");
     const before = await listRelative(worktree);
-    await writeObservation(worktree, baseObservation(), { generateObservationId: () => "id-4" });
+    await writeEvaluationObservation(worktree, successObservation());
     const after = await listRelative(worktree);
     const added = after.filter((p) => !before.includes(p));
-    expect(added).toEqual([".agentdev/jev-observations/", ".agentdev/jev-observations/id-4.json"]);
-  });
-
-  test("複数判断は同一 JSON 内 judgments に格納される", async () => {
-    const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
-    const observation = baseObservation({
-      judgments: [
-        baseObservation().judgments[0] as never,
-        {
-          judgmentId: "j2",
-          questionForm: "choice",
-          jevResult: "採用",
-          probabilityDistribution: { 採用: 0.6, 却下: 0.4 },
-          confidence: 0.6,
-          llmFinalJudgment: "却下",
-          llmTreatment: "corrected",
-        },
-      ],
-    });
-    const result = await writeObservation(worktree, observation, { generateObservationId: () => "id-2" });
-    expect(result.ok).toBe(true);
-    const files = await fs.readdir(path.join(worktree, ".agentdev", "jev-observations"));
-    expect(files).toEqual(["id-2.json"]);
+    expect(added.length).toBeGreaterThan(0);
+    expect(added.every((p) => p.startsWith(".agentdev/jev-observations/"))).toBe(true);
   });
 
   test("検証不合格は書込みせず構造化失敗を返す", async () => {
     const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
-    const invalid = baseObservation();
-    (invalid as unknown as Record<string, unknown>).schemaVersion = 2;
-    const result = await writeObservation(worktree, invalid as unknown as JevObservation, { generateObservationId: () => "id-3" });
+    const invalid = successObservation() as unknown as Record<string, unknown>;
+    invalid.schemaVersion = 1;
+    const result = await writeEvaluationObservation(worktree, invalid as unknown as JevObservation);
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.failure.kind).toBe("invalid_input");
     const exists = await fs.stat(path.join(worktree, ".agentdev", "jev-observations")).catch(() => null);
     expect(exists).toBeNull();
   });
-
-  test("完成書込みには recordState complete を永続化する（機械判別可能な完了状態 field）", async () => {
-    const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
-    const result = await writeObservation(worktree, baseObservation(), { generateObservationId: () => "id-rec" });
-    expect(result.ok).toBe(true);
-    const content = JSON.parse(await fs.readFile(path.join(worktree, ".agentdev", "jev-observations", "id-rec.json"), "utf8"));
-    expect(content.recordState).toBe("complete");
-  });
-
-  test("recordState partial の直接書込みは拒否する（部分レコードは evaluate 時点書込みのみ）", async () => {
-    const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
-    const partial = baseObservation({ recordState: "partial" });
-    delete (partial.judgments[0] as Record<string, unknown>).llmFinalJudgment;
-    delete (partial.judgments[0] as Record<string, unknown>).llmTreatment;
-    const result = await writeObservation(worktree, partial, { generateObservationId: () => "id-partial" });
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.failure.detail).toContain("completion write only");
-    const exists = await fs.stat(path.join(worktree, ".agentdev", "jev-observations")).catch(() => null);
-    expect(exists).toBeNull();
-  });
 });
 
-describe("upsertPartialObservation（evaluate 時点書込み・REQ-090-013）", () => {
-  function partialObservation(overrides: Partial<JevObservation> = {}): JevObservation {
-    const base = baseObservation({ recordState: "partial", ...overrides });
-    delete (base.judgments[0] as Record<string, unknown>).llmFinalJudgment;
-    delete (base.judgments[0] as Record<string, unknown>).llmTreatment;
-    return base;
+describe("appendFinalResult", () => {
+  async function seedSuccess(worktree: string): Promise<string> {
+    const result = await writeEvaluationObservation(worktree, successObservation());
+    expect(result.ok).toBe(true);
+    if (!result.ok) throw new Error("seed failed");
+    return result.success.observationId;
   }
 
-  test("observationId 未指定は新規 ID で部分レコードを作成する（recordState partial を永続化）", async () => {
+  test("evaluator 成功観測の同一 JSON へ最終判断結果を追記する（重複 JSON なし）", async () => {
     const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
-    const result = await upsertPartialObservation(worktree, partialObservation());
+    const observationId = await seedSuccess(worktree);
+    const result = await appendFinalResult(worktree, observationId, { results: [{ questionId: "j1", value: false, differenceReason: "deterministic_override" }] });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    const content = JSON.parse(await fs.readFile(path.join(worktree, result.success.writtenPath), "utf8"));
-    expect(content.observationId).toBe(result.success.observationId);
-    expect(content.recordState).toBe("partial");
-    expect(content.judgments[0].llmFinalJudgment).toBeUndefined();
-    expect(content.judgments[0].jevResult).toBe(true);
-    expect(content.judgments[0].confidence).toBe(0.8);
-  });
-
-  test("observationId 指定時は既存 partial JSON 内 judgments へ追記する（重複 JSON を生成しない）", async () => {
-    const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
-    const first = await upsertPartialObservation(worktree, partialObservation(), { observationId: "run-1" });
-    expect(first.ok).toBe(true);
-    const second = await upsertPartialObservation(
-      worktree,
-      partialObservation({
-        judgments: [
-          {
-            judgmentId: "j2",
-            questionForm: "choice",
-            jevResult: "採用",
-            probabilityDistribution: { 採用: 0.6, 却下: 0.4 },
-            confidence: 0.6,
-          },
-        ],
-      }),
-      { observationId: "run-1" },
-    );
-    expect(second.ok).toBe(true);
+    expect(result.success.writtenPath).toBe(`.agentdev/jev-observations/${observationId}.json`);
     const files = await fs.readdir(path.join(worktree, ".agentdev", "jev-observations"));
-    expect(files).toEqual(["run-1.json"]);
-    const content = JSON.parse(await fs.readFile(path.join(worktree, ".agentdev", "jev-observations", "run-1.json"), "utf8"));
-    expect(content.judgments).toHaveLength(2);
-    expect(content.recordState).toBe("partial");
-  });
-
-  test("同一 judgmentId の再 upsert は上書きで冪等（JSON 破壊・判断重複なし）", async () => {
-    const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
-    await upsertPartialObservation(worktree, partialObservation(), { observationId: "run-idem" });
-    const again = await upsertPartialObservation(worktree, partialObservation(), { observationId: "run-idem" });
-    expect(again.ok).toBe(true);
-    const files = await fs.readdir(path.join(worktree, ".agentdev", "jev-observations"));
-    expect(files).toEqual(["run-idem.json"]);
-    const content = JSON.parse(await fs.readFile(path.join(worktree, ".agentdev", "jev-observations", "run-idem.json"), "utf8"));
-    expect(content.judgments).toHaveLength(1);
-  });
-
-  test("observationId 指定で既存 complete JSON に衝突した場合は失敗する（完成レコードの部分上書き禁止）", async () => {
-    const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
-    await writeObservation(worktree, baseObservation(), { generateObservationId: () => "done-1" });
-    const result = await upsertPartialObservation(worktree, partialObservation(), { observationId: "done-1" });
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.failure.detail).toContain("already completed");
-    const files = await fs.readdir(path.join(worktree, ".agentdev", "jev-observations"));
-    expect(files).toEqual(["done-1.json"]);
-  });
-
-  test("不安全な observationId（路径構成要素）は拒否する", async () => {
-    const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
-    const result = await upsertPartialObservation(worktree, partialObservation(), { observationId: "../escape" });
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.failure.kind).toBe("invalid_input");
-    const exists = await fs.stat(path.join(worktree, ".agentdev")).catch(() => null);
-    expect(exists).toBeNull();
-  });
-
-  test("検証不合格（workflow 空等）は書込みせず構造化失敗を返す", async () => {
-    const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
-    const invalid = partialObservation({ workflow: "" });
-    const result = await upsertPartialObservation(worktree, invalid, { observationId: "run-bad" });
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.failure.kind).toBe("invalid_input");
-    const exists = await fs.stat(path.join(worktree, ".agentdev")).catch(() => null);
-    expect(exists).toBeNull();
-  });
-});
-
-describe("completeObservation（observation_write 追記完成 mode・REQ-090-013）", () => {
-  function completionJudgments(): JevObservation["judgments"] {
-    return [
-      {
-        judgmentId: "j1",
-        questionForm: "boolean",
-        llmFinalJudgment: "採用",
-        llmTreatment: "unchanged",
-      },
-    ];
-  }
-
-  async function seedPartial(worktree: string): Promise<void> {
-    const base = baseObservation({ recordState: "partial" });
-    delete (base.judgments[0] as Record<string, unknown>).llmFinalJudgment;
-    delete (base.judgments[0] as Record<string, unknown>).llmTreatment;
-    const result = await upsertPartialObservation(worktree, base, { observationId: "run-c" });
-    expect(result.ok).toBe(true);
-  }
-
-  test("同一 JSON へ LLM field を追記し recordState を complete へ更新する（1実行 1 JSON 維持）", async () => {
-    const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
-    await seedPartial(worktree);
-    const result = await completeObservation(worktree, "run-c", completionJudgments());
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.success.writtenPath).toBe(".agentdev/jev-observations/run-c.json");
-    const files = await fs.readdir(path.join(worktree, ".agentdev", "jev-observations"));
-    expect(files).toEqual(["run-c.json"]);
-    const content = JSON.parse(await fs.readFile(path.join(worktree, ".agentdev", "jev-observations", "run-c.json"), "utf8"));
-    expect(content.recordState).toBe("complete");
-    expect(content.judgments[0].llmFinalJudgment).toBe("採用");
-    expect(content.judgments[0].llmTreatment).toBe("unchanged");
-    expect(content.judgments[0].jevResult).toBe(true);
+    expect(files).toEqual([`${observationId}.json`]);
+    const content = JSON.parse(await fs.readFile(path.join(worktree, ".agentdev", "jev-observations", `${observationId}.json`), "utf8"));
+    const finalResult = content.finalResult as { results: Array<Record<string, unknown>> };
+    expect(finalResult.results[0]?.value).toBe(false);
+    expect(finalResult.results[0]?.differenceReason).toBe("deterministic_override");
+    expect((content.results as Array<unknown>)).toHaveLength(1);
     expect(content.workflow).toBe("learning-promote");
   });
 
-  test("二重 observation_write は冪等（重複作成なし・同一結果）", async () => {
+  test("失敗観測への追記は拒否する（最終判断結果は evaluator 成功観測に限定）", async () => {
     const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
-    await seedPartial(worktree);
-    await completeObservation(worktree, "run-c", completionJudgments());
-    const again = await completeObservation(worktree, "run-c", completionJudgments());
-    expect(again.ok).toBe(true);
-    const files = await fs.readdir(path.join(worktree, ".agentdev", "jev-observations"));
-    expect(files).toEqual(["run-c.json"]);
-    const content = JSON.parse(await fs.readFile(path.join(worktree, ".agentdev", "jev-observations", "run-c.json"), "utf8"));
-    expect(content.recordState).toBe("complete");
-    expect(content.judgments).toHaveLength(1);
-  });
-
-  test("LLM field 欠落の完成要求は validateCompletionObservation が拒否する（部分レコードのまま残す）", async () => {
-    const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
-    await seedPartial(worktree);
-    const completion = validateCompletionObservation({
-      schemaVersion: 1,
-      judgments: [
-        {
-          judgmentId: "j1",
-          questionForm: "boolean",
-          llmFinalJudgment: "採用",
-        },
-      ],
-    });
-    expect(completion.ok).toBe(false);
-    const content = JSON.parse(await fs.readFile(path.join(worktree, ".agentdev", "jev-observations", "run-c.json"), "utf8"));
-    expect(content.recordState).toBe("partial");
-  });
-
-  test("validateCompletionObservation は Jev 側観測項目・run 級 field を要求しない（LLM field のみ）", () => {
-    const result = validateCompletionObservation({
-      schemaVersion: 1,
-      judgments: [{ judgmentId: "j1", llmFinalJudgment: "却下", llmTreatment: "corrected" }],
-    });
-    expect(result.ok).toBe(true);
-  });
-
-  test("validateCompletionObservation は recordState partial を拒否する", () => {
-    const result = validateCompletionObservation({
-      schemaVersion: 1,
-      recordState: "partial",
-      judgments: [{ judgmentId: "j1", llmFinalJudgment: "却下", llmTreatment: "corrected" }],
-    });
+    const seeded = await writeEvaluationObservation(worktree, failureObservation());
+    expect(seeded.ok).toBe(true);
+    if (!seeded.ok) return;
+    const result = await appendFinalResult(worktree, seeded.success.observationId, { results: [{ questionId: "j1", value: true }] });
     expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.failure.detail).toContain("evaluator-success");
   });
 
   test("存在しない observationId は invalid_input で失敗する", async () => {
     const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
-    const result = await completeObservation(worktree, "missing-1", completionJudgments());
+    const result = await appendFinalResult(worktree, "missing-1", { results: [{ questionId: "j1", value: true }] });
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.failure.detail).toContain("not found");
   });
 
-  test("不安全な observationId は拒否する", async () => {
+  test("パス構成要素を含む observationId は拒否する", async () => {
     const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
-    await seedPartial(worktree);
-    const result = await completeObservation(worktree, "sub/dir", completionJudgments());
+    const result = await appendFinalResult(worktree, "../escape", { results: [{ questionId: "j1", value: true }] });
     expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.failure.kind).toBe("invalid_input");
+  });
+
+  test("現行契約外の観測（履歴形式）への追記は拒否する", async () => {
+    const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
+    await fs.mkdir(path.join(worktree, ".agentdev", "jev-observations"), { recursive: true });
+    const legacy = {
+      schemaVersion: 1,
+      workflow: "learning-promote",
+      judgmentKind: "evaluation",
+      subject: "履歴",
+      provider: "mock",
+      requestedModel: "mock/jev",
+      sourceRevision: "c6c15e72e5cae9ba8c3a957e32662704db94283c",
+      outcome: "completed",
+      durationMs: 100,
+      inputs: { requestDigest: DIGEST },
+      judgments: [{ judgmentId: "j1", questionForm: "boolean", jevResult: true, confidence: 0.8, llmFinalJudgment: "採用", llmTreatment: "unchanged" }],
+      recordState: "complete",
+    };
+    await fs.writeFile(path.join(worktree, ".agentdev", "jev-observations", "legacy-1.json"), JSON.stringify(legacy, null, 2), "utf8");
+    const result = await appendFinalResult(worktree, "legacy-1", { results: [{ questionId: "j1", value: true }] });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.failure.detail).toContain("current-contract");
+    const content = JSON.parse(await fs.readFile(path.join(worktree, ".agentdev", "jev-observations", "legacy-1.json"), "utf8"));
+    expect(content.finalResult).toBeUndefined();
+  });
+
+  test("1対1対応を満たさない追記（評価返却結果に無い質問・欠落質問）は拒否する", async () => {
+    const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
+    const observationId = await seedSuccess(worktree);
+    const unknownQuestion = await appendFinalResult(worktree, observationId, { results: [{ questionId: "j9", value: true }] });
+    expect(unknownQuestion.ok).toBe(false);
+    const empty = await appendFinalResult(worktree, observationId, { results: [] });
+    expect(empty.ok).toBe(false);
+  });
+});
+
+describe("validateFinalResultObservation", () => {
+  test("schemaVersion 2 の final result 追記入力を受理する", () => {
+    const result = validateFinalResultObservation({
+      schemaVersion: 2,
+      finalResult: { results: [{ questionId: "j1", value: true }] },
+    });
+    expect(result.ok).toBe(true);
+  });
+
+  test("run 級 field の再送を拒否する（追記入力は最終判断結果のみ）", () => {
+    const result = validateFinalResultObservation({
+      schemaVersion: 2,
+      workflow: "learning-promote",
+      finalResult: { results: [{ questionId: "j1", value: true }] },
+    });
+    expect(result.ok).toBe(false);
+  });
+
+  test("finalResult 欠落と schemaVersion 違反を拒否する", () => {
+    expect(validateFinalResultObservation({ schemaVersion: 2 }).ok).toBe(false);
+    expect(validateFinalResultObservation({ schemaVersion: 1, finalResult: { results: [{ questionId: "j1", value: true }] } }).ok).toBe(false);
   });
 });
 

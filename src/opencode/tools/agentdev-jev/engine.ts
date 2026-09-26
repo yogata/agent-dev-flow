@@ -132,13 +132,6 @@ export function normalizeDistribution(raw: Record<string, number>): JevProbabili
   return normalized;
 }
 
-/** 正規化済み分布の最大確率。 */
-export function maxProbability(distribution: JevProbabilityDistribution): number {
-  const values = Object.values(distribution);
-  if (values.length === 0) return 0;
-  return Math.max(...values);
-}
-
 function booleanDistribution(probability: number): JevProbabilityDistribution {
   const p = clamp01(probability);
   return normalizeDistribution({ true: p, false: 1 - p });
@@ -148,17 +141,15 @@ function booleanDistribution(probability: number): JevProbabilityDistribution {
 export function normalizeProviderResponse(
   request: JevEvaluateRequest,
   response: JevProviderResponse,
-): { results: JevQuestionResult[]; confidence: number } {
+): { results: JevQuestionResult[]; confidence?: number } {
   const results: JevQuestionResult[] = [];
-  const perQuestionMax: number[] = [];
   for (const question of request.questions) {
-    const answer = response.answers[question.id];
-    const result = normalizeAnswer(question, answer);
-    results.push(result);
-    perQuestionMax.push(maxProbability(result.probabilityDistribution));
+    results.push(normalizeAnswer(question, response.answers[question.id]));
   }
-  const confidence = normalizeConfidence(response.confidenceRaw, perQuestionMax);
-  return { results, confidence };
+  // confidence は provider が実際に返した場合のみ保存する。確率分布から代替生成しない。
+  const confidence =
+    response.confidenceRaw !== undefined && Number.isFinite(response.confidenceRaw) ? clamp01(response.confidenceRaw) : undefined;
+  return { results, ...(confidence !== undefined ? { confidence } : {}) };
 }
 
 function normalizeAnswer(question: JevQuestion, answer: unknown): JevQuestionResult {
@@ -235,21 +226,6 @@ function normalizeAnswer(question: JevQuestion, answer: unknown): JevQuestionRes
     value: bounded,
     probabilityDistribution: distribution,
   };
-}
-
-/**
- * confidence の正規化。provider 固有の格納位置から吸収した生値を [0,1] へ
- * 正規化する。生値が取得できない場合、各質問の正規化済み分布の最大確率の
- * 平均から決定的に導出する（観測は閾値を固定しないため、導出後の値に
- * 分類を付与しない）。
- */
-export function normalizeConfidence(confidenceRaw: number | undefined, perQuestionMax: number[]): number {
-  if (confidenceRaw !== undefined && Number.isFinite(confidenceRaw)) {
-    return clamp01(confidenceRaw);
-  }
-  if (perQuestionMax.length === 0) return 0;
-  const avg = perQuestionMax.reduce((acc, v) => acc + v, 0) / perQuestionMax.length;
-  return clamp01(avg);
 }
 
 // ---------- 失敗の構造化 ----------
@@ -330,8 +306,6 @@ export async function evaluateWithProvider(
     return {
       ok: false,
       failure: notConfiguredFailure(`provider ${provider.providerId} reports no usable credential`),
-      provider: provider.providerId,
-      requestedModel: provider.requestedModel,
     };
   }
   const startedAt = deps.now ? deps.now() : Date.now();
@@ -350,11 +324,9 @@ export async function evaluateWithProvider(
       ok: true,
       operation: "evaluate",
       success: {
-        provider: provider.providerId,
-        requestedModel: provider.requestedModel,
         ...(response.resolvedModel !== undefined ? { resolvedModel: response.resolvedModel } : {}),
         ...(response.inputTokens !== undefined ? { inputTokens: response.inputTokens } : {}),
-        confidence: normalized.confidence,
+        ...(normalized.confidence !== undefined ? { confidence: normalized.confidence } : {}),
         processingMs,
         results: normalized.results,
       },
@@ -364,8 +336,6 @@ export async function evaluateWithProvider(
     return {
       ok: false,
       failure: classifyError(error),
-      provider: provider.providerId,
-      requestedModel: provider.requestedModel,
     };
   } finally {
     clearTimeout(timer);

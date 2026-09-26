@@ -106,7 +106,7 @@ describe("normalizeProviderResponse", () => {
     expect(results[0]?.probabilityDistribution["低"]).toBeCloseTo(0.1);
   });
 
-  test("confidence 生値は [0,1] に正規化される", () => {
+  test("provider が返した confidence 生値は [0,1] に正規化される", () => {
     const { confidence } = normalizeProviderResponse(
       { state: "s", instructions: "i", questions: [{ id: "q1", form: "boolean", prompt: "質問" }] },
       { requestedModel: "m", confidenceRaw: 1.7, answers: { q1: { value: 0.5 } } },
@@ -114,7 +114,7 @@ describe("normalizeProviderResponse", () => {
     expect(confidence).toBe(1);
   });
 
-  test("confidence 生値が無い場合は分布の最大確率の平均から決定的導出する", () => {
+  test("confidence 生値が無い場合は confidence を返さない（確率分布から代替生成しない）", () => {
     const { confidence } = normalizeProviderResponse(
       {
         state: "s",
@@ -126,7 +126,7 @@ describe("normalizeProviderResponse", () => {
       },
       { requestedModel: "m", answers: { q1: { value: 0.9 }, q2: { value: 0.7 } } },
     );
-    expect(confidence).toBeCloseTo(0.8);
+    expect(confidence).toBeUndefined();
   });
 });
 
@@ -200,7 +200,6 @@ describe("evaluateWithProvider", () => {
     });
     expect(result.ok).toBe(true);
     if (result.ok && result.operation === "evaluate") {
-      expect(result.success.provider).toBe("mock");
       expect(result.success.confidence).toBeCloseTo(0.9);
       expect(result.success.processingMs).toBeGreaterThan(0);
       expect(result.success.results[0]?.value).toBe(true);

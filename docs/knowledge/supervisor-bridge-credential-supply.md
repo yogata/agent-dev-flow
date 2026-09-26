@@ -8,7 +8,7 @@ updated: 2026-09-23
 
 ## 知識内容
 
-Supervisor（Hermes 等、spawn する子プロセスから provider 資格情報を削除する実行環境）から dispatch された opencode 実行では、AI_GATEWAY_API_KEY 等の provider 資格情報が子プロセスへ供給されず、Jev 先行評価の観測が `not_configured` に劣化する。この問題への対処原則は「Supervisor から env で配る」ではなく「実行側が自身の起動コンテキストで取得する」（2026-09-23 ユーザー合意）であり、その橋が実行環境ブリッジ道具である（REQ-091）。正本は `scripts/self/supervisor-bridge/` 配下の `ocenv`（merge wrapper）と `opencode`（bridge shim）である。Supervisor 側の scrub 設計は credential を env で配らない正しいセキュリティ境界であり、変更しない。
+Supervisor（Hermes 等、spawn する子プロセスから provider 資格情報を削除する実行環境）から dispatch された opencode 実行では、AI_GATEWAY_API_KEY 等の provider 資格情報が子プロセスへ供給されず、`agentdev_jev evaluate` が構造化失敗（not_configured 区分）を返すようになる。この問題への対処原則は「Supervisor から env で配る」ではなく「実行側が自身の起動コンテキストで取得する」（2026-09-23 ユーザー合意）であり、その橋が実行環境ブリッジ道具である（REQ-091）。正本は `scripts/self/supervisor-bridge/` 配下の `ocenv`（merge wrapper）と `opencode`（bridge shim）である。Supervisor 側の scrub 設計は credential を env で配らない正しいセキュリティ境界であり、変更しない。
 
 機構は次のとおりである。
 
@@ -38,13 +38,13 @@ ocenv の供給範囲と注意:
 
 - `scripts/self/supervisor-bridge/`（ocenv、opencode bridge shim）の運用と導入（REQ-091-001、REQ-091-002）。
 - 導入マニュアル（docs/guides/supervisor-credential-bridge.md）と知識文書（本書）の維持（REQ-091-003、REQ-091-004）。
-- Jev 先行評価（REQ-090、DEC-040）の観測 JSON の `outcome` 読み分け（`.agentdev/jev-observations/` 配下。`not_configured` と API failure の区別）。
+- Jev 先行評価（REQ-090、DEC-040）の `agentdev_jev evaluate` の構造化失敗応答の区分読み分け（not_configured 区分と API failure 区分の区別）。
 
 ## 根拠
 
 - Issue #3080（REQ-091: Supervisor 環境向け credential 供給ブリッジの正本管理）。credential 供給の原則「実行側が自身の起動コンテキストで取得する」の 2026-09-23 ユーザー合意を含む。
 - REQ-091（要件行 001〜006）と REQ-050-009（実行環境ブリッジ道具の `scripts/self/` 配下配置）。Design は docs/designs/local/runtime-package-boundary.md（release archive に supervisor-bridge/ が構造的に含まれない境界）。
-- 導入検証の実測（Case #3080 の case-run 完了報告、PR 検証差分セクション）: scrub 模擬環境（`env -u AI_GATEWAY_API_KEY`）での変数 SET 実測、Supervisor spawn コンテキストでの `command -v opencode` 解決先確認、実 Workflow での Jev 観測 outcome 確認。
+- 導入検証の実測（Case #3080 の case-run 完了報告、PR 検証差分セクション）: scrub 模擬環境（`env -u AI_GATEWAY_API_KEY`）での変数 SET 実測、Supervisor spawn コンテキストでの `command -v opencode` 解決先確認、実 Workflow での `agentdev_jev evaluate` の構造化失敗応答に not_configured 区分が出現しないことの確認。
 
 ## 関連知識
 

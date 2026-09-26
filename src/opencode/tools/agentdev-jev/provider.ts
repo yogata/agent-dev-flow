@@ -28,7 +28,7 @@ export type JevProviderResponse = {
   requestedModel: string;
   resolvedModel?: string;
   inputTokens?: number;
-  /** provider 固有の格納位置から adapter が吸収した生 confidence 値（省略時は engine が分布から決定的導出）。 */
+  /** provider 固有の格納位置から adapter が吸収した生 confidence 値（省略時は confidence を返さない。分布からの代替生成は行わない）。 */
   confidenceRaw?: number;
   /** 質問 ID ごとの応答。value は form に応じた生値、probabilities は生分布（正規化は engine が担う）。 */
   answers: Record<string, JevProviderAnswer>;

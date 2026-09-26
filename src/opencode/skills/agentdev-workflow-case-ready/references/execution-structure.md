@@ -53,32 +53,22 @@ OU / Epic / Wave / Issue 階層の語彙意味の正規所有は v4-standard-lif
 
 ## Jev 評価経路（REQ-{NNNN}、DEC-{NNN}）
 
-Epic/Wave 構成判断は case-ready が所有する正規判断である。本 Workflow が所有する3判断単位のうち、「Standard / Epic 確定（3軸判断の総合帰属）」は置換経路（Jev 単独採用の閾値ルーティング。採用契約の正は Jev 置換採用の Decision）で処理し、残り2判断単位は観測目的の逐次経路（Stage 1: 観測可能化）で処理する。
+Epic/Wave 構成判断は case-ready が所有する正規判断である。本 Workflow が所有する3判断単位（Standard / Epic 確定、Wave 構成判断、既存オープン Issue とのスコープ重複判定）は、いずれも基本判断経路（Jev 先行評価 → LLM 推論 → LLM 最終判断）の逐次経路で処理する。confidence による LLM 推論の機械的省略・Jev 結果の直接確定は行わず、最終判断は常に reasoning model（LLM 推論）が下す。
 
-### 置換経路: Standard / Epic 確定（3軸判断の総合帰属）
-
-Jev 有効性評価の評価結果と、ユーザー承認された置換対象・採用閾値に基づく置換契約である。採用閾値は評価結果から判断単位ごとに決定されユーザー承認されたものを使用し、Workflow 側で新規決定しない。
-
-1. **Jev 先行評価**: Custom Tool `agentdev_jev` の `evaluate` に、本 Workflow が構成した閉じた判断入力（state、指示、基準、質問群。日本語。repository 全文を渡さない）を渡す。判断入力の構成は置換前と同一で、機械的事実（operation_units 依存グラフ、連結成分の計算結果）を state に含める
-2. **閾値判定**: 当該判断単位の全 judgment の confidence が承認済み閾値（T = 0.9）以上の場合のみ、Jev 結果を最終判断として採用する（LLM 推論・LLM 最終判断を実行しない）。1 judgment でも閾値未満の場合は判断単位全体を後述の逐次経路で処理する。閾値未満での Jev 単独採用を行わない（LLM fallback 必須）
-3. **採用時の確定**: Jev 結果（Standard / Epic 帰属と3軸水準）を最終判断として確定し、構成検証（上限・依存維持・全割当。決定的検証で Jev 置換対象外）を従来どおり適用した上で次工程へ進む
-4. **観測（Jev 単独採用時）**: Jev 結果・候補別確率分布・confidence・outcome は従来どおり独立した一次観測値として `evaluate` による部分レコードに記録する。LLM 最終判断が存在しないため `observation_write` による LLM 最終判断 field の追記は行わず、部分レコード（recordState=partial）を正規の完了状態として確定する。これが置換経路（Jev 単独採用）の機械的識別子である（観測 schema の恒久改善は Issue A 系の後続課題）。Jev 単独採用の旨（判断単位、confidence、採用結果）を完了報告に明示する
-5. **失敗・未設定時**: Jev API 失敗時は自動 retry せず即座に逐次経路（従来 LLM 経路）へ fallback し、失敗分類を観測に記録する。API key 未設定時は従来 LLM 経路のみで本 STEP を完了する
-
-### 逐次経路（観測継続）: Wave 構成判断、既存オープン Issue とのスコープ重複判定
+### 基本判断経路（逐次経路）
 
 閉じた意味判断ごとに、次の逐次経路を実行する。Jev は最終判断者ではなく、後段の LLM 推論への追加情報として扱う。
 
-1. **Jev 先行評価**: Custom Tool `agentdev_jev` の `evaluate` に、本 Workflow が構成した閉じた判断入力（state、指示、基準、質問群。日本語。repository 全文を渡さない）を渡す
-2. **LLM 推論**: Jev 結果と confidence を情報として含み、従来の判断材料（operation_units 依存グラフ、3軸判断の判定結果、Wave 重複前置検出の結果、既存オープン Issue の検出結果）も参照して推論する。Jev 結果だけで判断しない
+1. **Jev 先行評価**: Custom Tool `agentdev_jev` の `evaluate` に、本 Workflow が構成した閉じた判断入力（state、指示、基準、質問群。日本語。repository 全文を渡さない）を渡す。判断入力には機械的事実（operation_units 依存グラフ、連結成分の計算結果）を state に含める。evaluator 成功後・LLM 推論へ進む前に、当該評価の観測（1 semantic evaluation = 1 observation）が `.agentdev/jev-observations/` へ永続化される
+2. **LLM 推論**: Jev 結果・候補別確率分布・取得できた confidence を情報として含み、従来の判断材料（operation_units 依存グラフ、3軸判断の判定結果、Wave 重複前置検出の結果、既存オープン Issue の検出結果）も参照して推論する。Jev 結果だけで判断しない
 3. **LLM 最終判断**: 従来経路と同一の判断基準で最終判断を確定する。Jev 結果・confidence は最終判断を確定させない
-4. **unchanged/corrected 記録**: Jev 結果に対して LLM が判断を変更しなかったか（unchanged）/変更したか（corrected）を観測事実として記録する。評価カテゴリを混入させない
+4. **最終判断の観測反映**: Custom Tool `agentdev_jev` の `observation_write` で、evaluator 成功観測へ最終判断結果（final result）を追記する。evaluator 返却結果と最終判断が異なる場合のみ、差異理由の分類（evaluation_input_defect / semantic_disagreement / deterministic_override / unknown）を記録する
 
 ### 共通契約
 
-- 利用可否は `AI_GATEWAY_API_KEY` の設定有無で決まる（デフォルト有効、feature flag や opt-in 手続きは不要）。未設定時は呼び出さず `not_configured` を観測に記録し、従来 LLM 経路のみで本 STEP を完了する
-- Jev API 失敗（timeout、429、5xx、network error、response validation error）時は自動 retry せず即座に従来 LLM 経路へ fallback し、失敗分類を観測に記録する。正規状態を破損しない
-- 観測は 1 Workflow 実行 = 1 JSON で `.agentdev/jev-observations/` に保存する（`agentdev_jev` の `observation_write`）。判断単位の confidence と llm_treatment は独立した一次観測値とし、観測記録に閾値依存の分類結果を含めない（置換経路の閾値判定は観測記録とは独立した実行時判定である）。観測書込み失敗時は本 STEP の success を維持し、完了報告に識別可能な warning を明示する。rollback・再実行・擬似再生成を行わない
+- 利用可否は `AI_GATEWAY_API_KEY` の設定有無で決まる（デフォルト有効、feature flag や opt-in 手続きは不要）。未設定時は API を呼び出さず構造化失敗（not_configured）を返し、観測を生成せず従来 LLM 経路のみで本 STEP を完了する
+- Jev API 失敗（timeout、429、5xx、network error、response validation error）時は自動 retry せず即座に従来 LLM 経路へ fallback し、失敗観測に失敗分類と最小 diagnostic が記録される。正規状態を破損しない
+- 観測は 1 semantic evaluation = 1 observation（1 JSON）で `.agentdev/jev-observations/` に保存する。confidence は evaluation 単位の一次事実であり、provider が返した場合のみ保存する。質問単位への複製・確率分布からの代替生成を行わない。観測書込み失敗時は本 STEP の success を維持し、完了報告に識別可能な warning を明示する。rollback・再実行・擬似再生成を行わない
 - 再構成可能な判断入力は判断入力全文を保存せず、評価リクエストの digest と参照で保持する。再構成不能な入力のみ最小 snapshot を渡す
 - 操作契約（入力、出力、失敗分類）の正は `docs/designs/responsibilities/custom-tool-contracts.md`「Jev 先行評価」節である
 
@@ -90,11 +80,9 @@ Jev 有効性評価の評価結果と、ユーザー承認された置換対象�
 
 | 判断単位 | 経路 | 質問形式 |
 |---|---|---|
-| Standard / Epic 確定（3軸判断の総合帰属） | 置換経路（承認済み閾値 T = 0.9。未満時は逐次経路へ fallback） | choice（Standard・Epic）+ score（依存強度・Epic サイズ・機能的一貫性の各水準） |
-| Wave 構成判断（並列/ 直列、重複時の処置） | 逐次経路（観測継続） | boolean（並列可否）+ choice（変更対象分割・重複許容） |
-| 既存オープン Issue とのスコープ重複判定 | 逐次経路（観測継続） | boolean（重複の有無）+ choice（スキップ・ユーザー確認） |
-
-Jev 最終判断範囲と LLM 維持範囲: Jev 最終判断範囲は「Standard / Epic 確定（3軸判断の総合帰属）」判断単位のうち confidence が承認済み閾値以上の実行時のみである。上記判断単位の閾値未満の実行時、残り2判断単位、他5系統（learning-promote、req-define、intake-promote、inspect-promote、backlog-review）の全判断単位は LLM 維持範囲である。
+| Standard / Epic 確定（3軸判断の総合帰属） | 逐次経路（基本判断経路） | choice（Standard・Epic）+ score（依存強度・Epic サイズ・機能的一貫性の各水準） |
+| Wave 構成判断（並列/ 直列、重複時の処置） | 逐次経路（基本判断経路） | boolean（並列可否）+ choice（変更対象分割・重複許容） |
+| 既存オープン Issue とのスコープ重複判定 | 逐次経路（基本判断経路） | boolean（重複の有無）+ choice（スキップ・ユーザー確認） |
 
 ### choice 形式質問の候補完備性規約（REQ-{NNNN}-{NNN}）
 
@@ -102,5 +90,5 @@ choice 形式質問を構成する際は、次の規約に従う。
 
 - **正解クラス網羅**: 正解となり得る操作クラス（REQ 操作なし等の非操作正解クラスを含む）を候補集合が網羅するように構成する。正解となり得るクラスを候補に含めないまま質問を確定しない
 - **NULL 候補の明示判断**: NULL 候補（該当なし等）を候補集合へ含めるか否かを質問構成時に明示判断する。含めないと判断した場合はその判断を明示して質問を確定する。要否を暗黙に決めない
-- **候補欠落由来是正の分類**: 候補集合の欠落に由来する判断是正（最近似候補への高確率張り付きと LLM 是正の組合せ）は質問構成側の欠陥として分類し、判断器精度の劣化要因として集計しない。unchanged/corrected 記録時に候補構造欠落由来と判明した是正は、判断器精度評価の集計から除外する
+- **候補欠落由来是正の分類**: 候補集合の欠落に由来する判断是正は質問構成側の欠陥として分類し、判断器精度の劣化要因として集計しない。最終判断の観測反映時に差異理由（evaluation_input_defect）として記録された是正のうち候補構造欠落由来と判明したものは、判断器精度評価の集計から除外する
 

@@ -76,16 +76,16 @@ test -x "$OPENCODE_BODY" && echo exists
    env -u AI_GATEWAY_API_KEY opencode --version
    ```
 
-3. 実 Workflow での Jev 観測の outcome 確認。Jev 対象の Workflow を 1 回以上実行した後、`.agentdev/jev-observations/` 配下の当該実行の観測 JSON を開き、`outcome` フィールドが `not_configured` 以外であることを確認する。
+3. 実 Workflow での `agentdev_jev evaluate` の構造化失敗応答の not_configured 区分の非出現確認。Jev 対象の Workflow を 1 回以上実行した後、当該実行の `agentdev_jev evaluate` の構造化失敗応答を確認し、API key 供給正常時は not_configured 区分が出現しないことを確認する。
 
-   `outcome` の読み分けは「失敗署名と対処」の節を参照する。
+   構造化失敗応答の区分の読み分けは「失敗署名と対処」の節を参照する。
 
 ## 失敗署名と対処
 
 | 失敗署名 | 読み分け | 対処 |
 |---|---|---|
-| 観測 JSON の `outcome` が `not_configured` | credential が opencode の子プロセスへ供給されていない。API は呼ばれていない | HKCU\Environment に変数が設定されているか確認する（`powershell.exe -NoProfile -Command "[Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment').GetValueNames()"`）。`command -v opencode` の解決先が shim か確認する。解決先が正しければ「opencode 本体パス不一致」を確認する |
-| `outcome` が `jev_failed`、または timeout / 429 / 5xx 等の API failure | credential は供給されており API は呼ばれたが、API 側の障害またはレート制限が発生している | `not_configured` とは区別する。リトライやレート制限の解消を待つ。credential 供給の設定変更では解消しない |
+| `agentdev_jev evaluate` が構造化失敗（not_configured 区分）を返す | credential が opencode の子プロセスへ供給されていない。API は呼ばれていない | HKCU\Environment に変数が設定されているか確認する（`powershell.exe -NoProfile -Command "[Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment').GetValueNames()"`）。`command -v opencode` の解決先が shim か確認する。解決先が正しければ「opencode 本体パス不一致」を確認する |
+| `agentdev_jev evaluate` が timeout / rate_limited / server_error / network_error / response_invalid 等の API failure 区分を返す | credential は供給されており API は呼ばれたが、API 側の障害またはレート制限が発生している | not_configured 区分とは区別する。リトライやレート制限の解消を待つ。credential 供給の設定変更では解消しない |
 | `command -v opencode` が shim 以外（本体直、Windows 側 `opencode.exe` 等）を返す | shim のサイレント bypass。PATH の優先順位で shim より先に本体が解決されている | PATH で shim 配置ディレクトリ（`~/bin` 等）が本体より先に来ているか確認する。Supervisor の spawn コンテキストの PATH も同様に確認する |
 | shim 実行で本体が起動せず失敗する | opencode 本体パス不一致。`OPENCODE_BODY` が実在しないパスを指している | `test -x "$OPENCODE_BODY"` で本体の実在を確認し、実体のパスに調整する（bun のグローバル導入先は `bun pm bin -g` で確認できる） |
 | `ocenv: failed to enumerate HKCU\Environment` が出力され終了コード 1 | HKCU\Environment の列挙失敗（fail-closed 動作。対象コマンドは実行されていない） | powershell.exe が実行可能か、レジストリ読取権限があるかを確認する |
