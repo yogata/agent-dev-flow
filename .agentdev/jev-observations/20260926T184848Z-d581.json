@@ -1,0 +1,32 @@
+{
+  "observationId": "20260926T184848Z-d581",
+  "schemaVersion": 1,
+  "workflow": "backlog-review",
+  "judgmentKind": "adversarial-review-trigger",
+  "subject": "backlog-review STEP-4 adversarial-review 発動条件判定（promoted 29件、RU構成案確定前提）",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "sourceRevision": "c726acf6",
+  "outcome": "completed",
+  "durationMs": 622,
+  "resolvedModel": "typesafe-ai/jev",
+  "inputTokens": 672,
+  "inputs": {
+    "requestDigest": "a0de39139a617a334e475941abe7fac40d3d1a25d61507547c654fd29547d0cb"
+  },
+  "judgments": [
+    {
+      "judgmentId": "review-trigger",
+      "questionForm": "boolean",
+      "jevResult": true,
+      "probabilityDistribution": {
+        "true": 0.96,
+        "false": 0.040000000000000036
+      },
+      "confidence": 0.96,
+      "llmFinalJudgment": "発動する。対象29件・複数系統由来で、SKIP 条件（対象0件等）は非該当。STEP-3 の RU 構成案確定後に STEP-4 adversarial-review を発動する。",
+      "llmTreatment": "unchanged"
+    }
+  ],
+  "recordState": "complete"
+}
