@@ -1,6 +1,6 @@
 # Supervisor 環境向け opencode credential 供給ブリッジ導入ガイド
 
-Supervisor（Hermes 等、spawn する子プロセスから provider 資格情報を削除する実行環境）から dispatch された opencode 実行でも、実行側が自身の起動コンテキストで Windows User スコープ環境変数（AI_GATEWAY_API_KEY 等）を取得できるようにするブリッジ道具の導入手順である（REQ-091）。
+Supervisor（Hermes 等、spawn する子プロセスから provider 資格情報を削除する実行環境）から dispatch された opencode 実行でも、実行側が自身の起動コンテキストで Windows User スコープ環境変数（CLOUDFLARE_ACCOUNT_ID、CLOUDFLARE_API_TOKEN 等）を取得できるようにするブリッジ道具の導入手順である（REQ-091）。
 
 道具の正本は agent-dev-flow リポジトリの `scripts/self/supervisor-bridge/` 配下（`ocenv` と `opencode` bridge shim）であり、機構の詳細は [知識文書](../knowledge/supervisor-bridge-credential-supply.md) を参照する。
 
@@ -8,7 +8,7 @@ Supervisor（Hermes 等、spawn する子プロセスから provider 資格情�
 
 - Windows 環境（win32）で bash が実行できること（Git Bash / MSYS2 環境を想定する）。
 - opencode 本体が導入済みであること（bun グローバル導入の標準配置は `$HOME/.bun/bin/opencode`。別の配置に導入した場合は「opencode 本体パスの調整」の手順に従う）。
-- Windows User スコープ環境変数（HKCU\Environment）に供給対象の変数（AI_GATEWAY_API_KEY 等）が設定済みであること。設定方法は `setx` コマンドまたは Windows の「環境変数」設定 UI を使う。credential の値は本ガイドには記述しない（REQ-091-005）。
+- Windows User スコープ環境変数（HKCU\Environment）に供給対象の変数（CLOUDFLARE_ACCOUNT_ID、CLOUDFLARE_API_TOKEN 等）が設定済みであること。設定方法は `setx` コマンドまたは Windows の「環境変数」設定 UI を使う。credential の値は本ガイドには記述しない（REQ-091-005）。
 
 ## インストール
 
@@ -62,18 +62,18 @@ test -x "$OPENCODE_BODY" && echo exists
 
    結果が配置した shim のパス（`~/bin/opencode` 等）であることを確認する。本体のパスが返った場合は「shim のサイレント bypass」の失敗署名を確認する。
 
-2. scrub 模擬環境での変数 SET 実測。`env -u AI_GATEWAY_API_KEY` で scrub を模擬し、shim 経由で起動した子プロセス内で変数が SET になることを実測する:
+2. scrub 模擬環境での変数 SET 実測。`env -u CLOUDFLARE_ACCOUNT_ID -u CLOUDFLARE_API_TOKEN` で scrub を模擬し、shim 経由で起動した子プロセス内で両変数が SET になることを実測する:
 
    ```bash
-   env -u AI_GATEWAY_API_KEY ocenv bash -c 'if [ -n "${AI_GATEWAY_API_KEY+set}" ]; then echo SET; else echo UNSET; fi'
+   env -u CLOUDFLARE_ACCOUNT_ID -u CLOUDFLARE_API_TOKEN ocenv bash -c 'if [ -n "${CLOUDFLARE_ACCOUNT_ID+set}" ] && [ -n "${CLOUDFLARE_API_TOKEN+set}" ]; then echo SET; else echo UNSET; fi'
    ```
 
-   `SET` が出力されれば供給が成立している。対照として、`ocenv` を経由しない場合（`env -u AI_GATEWAY_API_KEY bash -c '...'`）は `UNSET` になることも確認する。
+   `SET` が出力されれば供給が成立している。対照として、`ocenv` を経由しない場合（`env -u CLOUDFLARE_ACCOUNT_ID -u CLOUDFLARE_API_TOKEN bash -c '...'`）は `UNSET` になることも確認する。
 
    shim 経由の等価性確認（shim が opencode 本体を ocenv 経由で起動できること）:
 
    ```bash
-   env -u AI_GATEWAY_API_KEY opencode --version
+   env -u CLOUDFLARE_ACCOUNT_ID -u CLOUDFLARE_API_TOKEN opencode --version
    ```
 
 3. 実 Workflow での `agentdev_jev evaluate` の構造化失敗応答の not_configured 区分の非出現確認。Jev 対象の Workflow を 1 回以上実行した後、当該実行の `agentdev_jev evaluate` の構造化失敗応答を確認し、API key 供給正常時は not_configured 区分が出現しないことを確認する。

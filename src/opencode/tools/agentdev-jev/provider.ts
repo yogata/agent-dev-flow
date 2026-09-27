@@ -1,7 +1,7 @@
 // agentdev-jev provider 接続契約（provider・SDK 非依存の公開面）。
 //
-// provider 実装（初期 Vercel adapter）は本契約の構造適合を実装する。
-// adapter 内部でのみ評価 SDK を消費し、本契約面と Workflow 層へ SDK 固有の
+// provider 実装（Cloudflare adapter）は本契約の構造適合を実装する。
+// adapter 内部でのみ外部 API 固有処理を消費し、本契約面と Workflow 層へ API 固有の
 // 名称・型・格納位置を漏らさない（REQ-{NNNN}-{NNN}）。
 // 失敗は生エラーをそのまま throw し、構造化（失敗分類）は engine が担う。
 
@@ -42,7 +42,7 @@ export type JevProviderAnswer = {
 
 /** provider 接続契約。実装は構造適合で足りる（動的解決を許容）。 */
 export interface JevProvider {
-  /** 接続種別識別子（SDK 名を含まない。初期実装: "vercel-ai-gateway"）。 */
+  /** 接続種別識別子（API 名を含まない。現行実装: "cloudflare-ai-gateway"）。 */
   readonly providerId: string;
   readonly requestedModel: string;
   /** 接続設定の解決可否。false の場合は呼び出さず not_configured として扱う。 */

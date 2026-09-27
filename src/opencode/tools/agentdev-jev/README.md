@@ -20,7 +20,7 @@ evaluate は evaluator 成功後の時点で、evaluator 返却結果・候補�
 ## 公開契約
 
 - 操作契約の正は Custom Tool 操作契約 Design「Jev 先行評価」節（extension 経由で解決）
-- 公開契約は provider・SDK 非依存。provider 接続と評価 SDK 固有の名称・型・格納位置（provider 固有の confidence 格納位置を含む）は adapter パッケージ（`adapter-vercel/`）が内部吸収し、公開スキーマと Workflow 層へ漏らさない
+- 公開契約は provider・SDK 非依存。provider 接続と外部 API 固有の名称・型・格納位置（provider 固有の confidence 格納位置を含む）は adapter パッケージ（`adapter-cloudflare/`）が内部吸収し、公開スキーマと Workflow 層へ漏らさない
 - 質問型（独立命題・排他候補・順序水準）と boolean/choice/score の対応づけは adapter mapping
 - canonical result は provider 固有表現に依存せず、boolean は真偽、choice は候補、score は scale level として正規化する。評価入力の各質問と各結果は questionId で1対1対応し、各質問の結果と候補別確率分布の双方を保持する
 - confidence は provider が実際に返した場合のみ evaluation 単位で保存する。質問単位への複製、確率分布からの代替 confidence の生成・永続化は行わない
@@ -30,7 +30,7 @@ evaluate は evaluator 成功後の時点で、evaluator 返却結果・候補�
 
 ## provider 動的解決
 
-provider 実装は `adapter-vercel/` パッケージを動的に解決する（配布依存境界: 評価 SDK 依存は adapter パッケージに閉じる）。adapter が配布物に存在しない環境では `not_configured` として構造化失敗を返し、呼出し元 Workflow は従来 LLM 経路のみで継続できる。
+provider 実装は `adapter-cloudflare/` パッケージを動的に解決する（配布依存境界: 外部 API 固有処理と HTTP 依存は adapter パッケージに閉じる）。adapter が配布物に存在しない環境では `not_configured` として構造化失敗を返し、呼出し元 Workflow は従来 LLM 経路のみで継続できる。
 
 ## テスト実行
 

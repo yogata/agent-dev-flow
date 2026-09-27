@@ -11,7 +11,7 @@
 //   - observation_write: evaluator 成功観測の同一 JSON へ reasoning model の最終判断結果
 //     （final result）を追記する（evaluator 返却結果と異なる場合のみ差異理由分類を保持）
 //
-// provider 実装（初期 Vercel adapter）は配布依存境界を守るため動的解決する
+// provider 実装（Cloudflare adapter）は配布依存境界を守るため動的解決する
 // （adapter パッケージが存在しない環境では not_configured として構造化失敗を返し、
 // 呼出し元 Workflow は従来 LLM 経路のみで継続できる）。自動 retry は行わない。
 
@@ -54,7 +54,8 @@ export const AGENTDEV_JEV_PUBLIC_CONTRACTS: ReadonlyArray<{
       "Jev prior evaluation over a closed judgment input. Provider/SDK-independent contract: per-question results, " +
       "probability distributions, provider-returned confidence when present (evaluation-level only), inputTokens when " +
       "available, machine processing time, and structured failure classification (not_configured when " +
-      "AI_GATEWAY_API_KEY is unset). No auto-retry on API failure. Evaluation language is Japanese. After an " +
+      "CLOUDFLARE_ACCOUNT_ID or CLOUDFLARE_API_TOKEN is unset). No auto-retry on API failure. Evaluation language is " +
+      "Japanese. After an " +
       "evaluator success (before the calling workflow proceeds to the reasoning model) one observation per semantic " +
       "evaluation (one JSON) is persisted under .agentdev/jev-observations/; a call failure after the call started " +
       "persists a failure observation with its classification and minimal diagnostic. not_configured and input " +
@@ -151,7 +152,7 @@ function dispatch(raw: unknown): OperationDispatch {
 }
 
 export type AgentdevJevToolDeps = {
-  /** provider 解決の注入点（テストは偽実装を差し込める）。省略時は Vercel adapter を動的解決する。 */
+  /** provider 解決の注入点（テストは偽実装を差し込める）。省略時は Cloudflare adapter を動的解決する。 */
   resolveProvider?: () => JevProvider | null;
   timeoutMs?: number;
   now?: () => number;
@@ -160,12 +161,12 @@ export type AgentdevJevToolDeps = {
 /** 既定 provider 解決（動的 import により adapter パッケージへ依存境界を閉じる）。 */
 async function defaultResolveProvider(): Promise<JevProvider | null> {
   try {
-    const adapterUrl = new URL("./adapter-vercel/index.ts", import.meta.url);
+    const adapterUrl = new URL("./adapter-cloudflare/index.ts", import.meta.url);
     const mod = (await import(adapterUrl.href)) as {
-      createVercelJevProvider?: () => JevProvider;
+      createCloudflareJevProvider?: () => JevProvider;
     };
-    if (typeof mod.createVercelJevProvider !== "function") return null;
-    return mod.createVercelJevProvider();
+    if (typeof mod.createCloudflareJevProvider !== "function") return null;
+    return mod.createCloudflareJevProvider();
   } catch {
     return null;
   }

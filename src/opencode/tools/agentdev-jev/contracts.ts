@@ -2,7 +2,7 @@
 //
 // 操作契約の正は docs/designs/responsibilities/custom-tool-contracts.md
 // 「Jev 先行評価」節。本ファイルは公開スキーマと実行時 validator の共通契約型を定義する。
-// provider 接続（初期 Vercel AI Gateway）と評価 SDK 固有の名称・型・格納位置は adapter 内部に
+// provider 接続（現行 Cloudflare AI Gateway）と外部 API 固有の名称・型・格納位置は adapter 内部に
 // 隠蔽し、本契約面へ漏らさない。
 //
 // 観測 schema の現行版は 2（1 semantic evaluation = 1 observation）。schemaVersion 1 の観測は
