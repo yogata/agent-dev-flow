@@ -2421,8 +2421,104 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **タグ**: `#custom-tool` `#harness-environment` `#fail-closed` `#orchestration-recovery`
 - **移動日**: 2026-09-25
 - **処分判定**: deferred（2026-09-25 ユーザーHITL承認。intake item が infra-transient 停止分類・回復経路・spawn 分離を先行処理するため promoted 生成はしない。learning 固有の残余知見〔前置死活チェック・durable checkpoint・無出力早期死亡の切り分け・fail-closed 契約の運用特性記録要否〕を living pool で維持。再評価条件: intake item の消化完了時・同種 gh spawn 故障の再発時）
+- **追記（2026-09-27 amendment・A-2）**: 2026-09-27 に3回目の再発（並行 case-open 2セッションで全操作が gh exited with 66 で持続失敗・Root Case 2件が blocked 停止）。inbox 側2件の観測は本エントリと duplicate 判定で統合（症状・回復経路・予防策が一致）。予防策候補の反映先文書（docs/guides/consumer-project-setup.md 等）への反映は 2026-09-27 時点で未実施
 
 ---
 
+
+---
+
+## check_integrity.test.ts の IR-055 delta テストが baseline commit 時点でも fail（テスト期待値と baseline の乖離の調査候補）
+
+- **問題事象**: check_integrity.test.ts の「IR-055 runtime-unresolved-reference 実修復回帰（Issue #1782）> 配布物に新規（delta from baseline）runtime-unresolved-reference 違反がないこと」テストが、base 時点（commit 3bd480cb の親 aed65975・ワークツリー変更ゼロ相当）でも fail（Received: 2）した
+- **発生局面**: 検証（case-run 既存テスト回帰・fail 由来分類の baseline 再現確認）
+- **検知方法**: stash による base 実行での同一 fail 再現確認（本変更非由来の確認）
+- **根本原因**: 本変更非由来の pre-existing 不整合。delta baseline とテスト期待値の乖離（既存 intake 2026-09-27-integrity-delta-baseline-commit-persistence.md の delta baseline commit 参照不能問題と同系統の疑い）
+- **自律対応内容**: fail 由来分類を pre-existing として記録（baseline 再現確認済み・PR 本文検証差分へ記載済み）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（調査候補の記録）
+- **横展開観点**: pre-existing fail の baseline 再現確認手順（3点対照）の有効性再確認。fail 由来分類の証跡として baseline commit 指定の再現記録を残す運用が機能した
+- **再発条件**: IR-055 delta テストを実行する全環境（baseline 系 durable state の追随差がある場合）
+- **予防策候補**: delta baseline とテスト期待値の乖離の調査（関連 intake の検討対象と統合）
+- **想定反映先**: check_integrity.test.ts（Issue #1782 系 delta テスト）、traceability 側の delta baseline 運用
+- **関連**: Case #3162、PR #3165 本文 Findings / Capture候補、.agentdev/intake/inbox/2026-09-27-integrity-delta-baseline-commit-persistence.md（同系統調査候補）
+- **タグ**: `#IR-055` `#pre-existing` `#baseline-diff`
+- **移動日**: 2026-09-27
+
+---
+
+## bun:test で可変 export 配列を fixture push → finally で length = 0 クリアするパターンは、実装が初期空でなくなった時点で後続テストを破壊する — fixture 復元は常に元長さ保存型に
+
+- **問題事象**: ALLOWED_USAGE 等の可変 export 配列を fixture push し finally で length = 0 クリアするテストパターンが、実装が初期空でなくなった時点（初期エントリ保有）に後続テストを破壊した。Case #3166 で originalLength 復元型へ修正済み
+- **発生局面**: 検証（case-run 回帰テスト実装・TS-004/TS-007 系 fixture パターンの実装改修）
+- **検知方法**: PR #3168 実装時の fixture パターン修正（PR 本文 Findings / Capture候補 learning 候補・case-close 回収）
+- **根本原因**: length = 0 クリアは「実装の初期状態が空配列」を暗黙前提とする。実装が初期エントリを持つようになった時点で、先行テストが全要素を消去した状態を後続テストへ引き渡し破壊する
+- **自律対応内容**: originalLength 保存 + finally で元長さへ復元する形へ修正済み（Case #3166・PR #3168 で main 反映済み）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（テスト fixture パターンの知見）
+- **横展開観点**: 可変 export 配列を fixture として操作する全テストに適用可能
+- **再発条件**: 可変 export 配列への fixture push + finally での全消去（length = 0）を含むテストを新規実装または改修する場合
+- **予防策候補**: 可変配列の fixture 復元は常に元長さ保存型（originalLength 保存 + finally 復元）とする指針の明文化
+- **想定反映先**: check_content_corruption.test.ts 等の可変 export 配列 fixture を持つテスト群、テスト fixture パターンの知識化候補
+- **関連**: Case #3166、PR #3168 本文 Findings / Capture候補
+- **タグ**: `#bun-test` `#fixture-restoration` `#test-pattern`
+- **移動日**: 2026-09-27
+
+---
+
+## session 由来 RU の frontmatter が REQ-008-051 必須フィールド規律から逸脱する（generation_stage 不正値・generation_actor 欠落）
+
+- **問題事象**: session 由来の RU-0154 の frontmatter が `generation_stage: supervisor-session`（規定値 pre-req-define でない値）を持ち、`generation_actor` を欠く。session由来RU の frontmatter 必須フィールド（REQ-008-051）と一致しない
+- **発生局面**: case-open（内部 lifecycle 段階）への投入前の draft（req-draft-jev-semantic-eval-contract-hardening.md）準備時の RU-0154 frontmatter 確認。req-define 下流工程での発見。運用
+- **検知方法**: review_dispositions 作成時の RU frontmatter 実査（REQ-008-051 との突合）
+- **根本原因**: producer 側（session 内での RU 生成手順）が REQ-008-051 の必須フィールド規律に従っていない。RU 生成入口に frontmatter 必須フィールドの検証ゲートが存在しない
+- **自律対応内容**: review_dispositions RD-002 として not_applicable / out_of_scope（producer 側の契約逸脱で本 draft の要件対象外）で合意済み。恒久証跡は Root Case #3171 のレビュー判断セクションへ転記済み
+- **ユーザー確認有無**: あり（req-define の adversarial-review・STEP-10 提示経由で合意済み）
+- **Decision/REQ/spec影響**: なし（本 Case の対象外と合意。RU 生成手順の改善候補として記録）
+- **横展開観点**: session 由来 RU（backlog-review を経由しない direct 生成）は backlog-review 経由 RU と異なり frontmatter 品質の検証経路を持たない。REQ-008-051 追随チェックを RU 生成手順または req-define 入口の前置確認に組込む必要性
+- **再発条件**: session 内で REQ-008-051 の frontmatter 規律を参照せずに RU を直接生成する場合
+- **予防策候補**: session 由来 RU 生成時の frontmatter 必須フィールド検証（generation_stage 規定値・generation_actor 必須）を生成手順へ明文化する
+- **想定反映先**: agentdev-backlog-integration（session 由来 RU の生成基準）、REQ-008-051 の運用整備候補
+- **関連**: Case #3171、RU-0154
+- **タグ**: `#ru-frontmatter` `#req-008-051` `#session-sourced-ru` `#case-open`
+- **移動日**: 2026-09-27
+
+---
+
+## LSP 診断 timeout 時は tsc --noEmit を同等の型検証証跡として取得する
+
+- **問題事象**: case-run 委譲（DEL-3171-1）の QA review で、LSP 診断が harness 側 timeout（3秒）で応答せず、型検証の証跡を LSP から取得できなかった
+- **発生局面**: 実装（case-run 委譲内 QA review の型検証）。Case #3171、bun v1.3.6・worktree root 環境
+- **検知方法**: LSP 診断ツールの timeout エラー（QA review 実行時の実観測）
+- **根本原因**: 大規模 TypeScript パッケージでは LSP server 初期化・診断完了が harness の短い timeout 内に収まらず、LSP 応答が常態的に遅延する環境がある
+- **自律対応内容**: 型検証証跡を `tsc --noEmit`（対象 3 パッケージ）で取得し合格を確認。LSP timeout を証跡不在として扱わず、同等の型検証手段へ代替して検証記録を保持した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 型検証証跡を要求する全委譲・実装工程で、LSP timeout 時の代替証跡手順としてそのまま適用可能
+- **再発条件**: 大規模パッケージまたは LSP server 初期化が遅い環境で、LSP 診断に依存した型検証証跡を取得する場合
+- **予防策候補**: 型検証証跡の取得手順に「LSP timeout 時は tsc --noEmit（実行 cwd と対象パッケージを明記）を同等証跡とする」フォールバックを明文化する
+- **想定反映先**: 実装委譲の QA 手順（case-run execution adapter・型検証規約）
+- **関連**: Case #3171、PR #3174、src/opencode/tools/agentdev-jev/
+- **タグ**: `#lsp-timeout` `#typecheck-evidence` `#tsc-noemit` `#case-run`
+- **移動日**: 2026-09-27
+
+---
+
+## 構造検証強化の「入口だけ直して経路に残る」逆流を code review 自己反証で検出した
+
+- **問題事象**: score 離散化の入口（normalizeAnswer の正規化・連続値拒否）を実装した後も、観測書込み経路（evaluator 観測の保存）に連続 score が直接保存される経路が残存していた（REQ-090-014 の趣旨「連続値を canonical result に残さない」が保存経路まで届いていなかった）
+- **発生局面**: 実装（case-run 委譲 DEL-3171-1 の code review 自己反証）。Case #3171
+- **検知方法**: 委譲内 code review（自己反証）
+- **根本原因**: 構造検証強化系の変更で入口の validation のみを対象とし、同一制約が要求される別の書込み経路（観測永続化経路）への波及確認が漏れていた。制約対象値の流れの全経路を追跡しない単点レビューになっていた
+- **自律対応内容**: 連続 score 直接保存経路を検出し commit 76e676bc で修正。修正後、対象 100 テストと tsc --noEmit 3 パッケージで合格を確認
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（REQ-090-014 の実装完全化・要件変更なし）
+- **横展開観点**: 制約の機械強制を入口にのみ実装する構造検証系変更全般で起こり得る。「入口・経路・保存先の3層で同一制約の到達を確認する」レビュー観点として展開可能
+- **再発条件**: 制約対象値が流れ得る全経路を列挙せずに、入口の validation 追加のみで変更完了と判断する場合
+- **予防策候補**: 制約追加系の変更では「制約対象値が流れ得る全経路の列挙」と「各経路での制約到達確認」を code review チェックリストへ含める
+- **想定反映先**: 委譲内 code review 観点（case-run execution adapter）、REQ-090 系の後続 Case
+- **関連**: Case #3171、PR #3174、commit 76e676bc、src/opencode/tools/agentdev-jev/observation.ts
+- **タグ**: `#validation-bypass` `#score-discretization` `#code-review` `#jev`
+- **移動日**: 2026-09-27
 
 ---
