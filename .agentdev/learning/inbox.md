@@ -116,3 +116,35 @@
 - **想定反映先**: agentdev-issue-management reference issue-operation-safety.md（RA-001 で新設される population 実測節の隣接領域。本エントリは本 Case の合意済み追記対象外であり後続 learning-promote 対象）、agentdev-issue-tracking の論理スキーマ運用記述
 - **関連**: Root Case Issue #3210、Case #3186（label bug 実測）、Case #3193/#3197/#3200（label maintenance 実測）、本 inbox 既存エントリ「agentdev_gh issue_update の入力契約は role フィールドを受けない」
 - **タグ**: `#gh-tool` `#issue-create` `#input-contract` `#labels`
+
+## #3211（40bd84e4）が IR-055 新規 strict violation 2 件を checker 実測・baseline 登録なしで main へ merge した（host main が check_integrity EXIT 1 の状態で残留）
+
+- **問題事象**: case-open 冪等再実行（Case #3192 修復）で worktree branch へ origin/main（40bd84e4）を merge したところ、check_integrity --profile source が新規 unmanaged NG 2 件（IR-055 delta）で EXIT 1 となった。出所を確認すると host main（40bd84e4）でも同一 2 件・EXIT 1 が実測され、main 自体が新規 NG を抱えた状態で残留していた。
+- **発生局面**: case-open lifecycle 冪等再実行（case-ready STEP-1 品質検査差し戻し対応）の checker 再実測（worktree HEAD fac56445）
+- **検知方法**: check_integrity 応答の NG baseline applied サマリ（「2 new unmanaged NG (delta, exit code driver)」）と、該当 2 ファイルの `git show 40bd84e4` 追加行突合。あわせて host main での同一 checker 再実測で再現を確認
+- **根本原因**: #3211（40bd84e4「harden workflow operation references (Refs #3210)」）が distribution files（worktree-operations.md:173 の 'repo-local'・definition-pr-and-idempotency.md:33 の 'repo-agentdev-integrity'）へ repo-* 参照を含む行を追加し、IR-055 の新規 strict violation 実測と baseline（ir-055-baseline.json・最終 commit 207ac004）への approved 登録を行わないまま main へ merge された。Case #3210 の実績記録「main の check_integrity は NG 0 実測済み」は 40bd84e4 より前の時点（#3207 merge 時点）の実測値であり、40bd84e4 時点の実測ではなかった
+- **自律対応内容**: 出所が本 Case 変更と無関係な pre-existing（main 由来）であることを host main 同一実測で証明し、本 Case では修正せず Root Case #3192 本文と修復完了 comment に出所・実測値を記録。baseline approved 登録は該当元 Case（#3210/#3211 系）の対応範囲として実施しない判断を記録
+- **ユーザー確認有無**: なし（Root Case comment への出所確認記録と完了報告で明示）
+- **Decision/REQ/spec影響**: なし（本 Case での baseline 変更なし。要否判断は #3210/#3211 系へ委ねる）
+- **横展開観点**: distribution files に repo-* 参照を新規導入する変更は、同一 PR 内で IR-055 実測（新規 unmanaged NG 0 または provenance 登録済み）を完了してから merge する。先方の「NG 0 実測済み」記録を鵜呑みにせず、自 Case の merge 後 branch HEAD で再実測して出所を特定する
+- **再発条件**: checker 関連行を含む PR が QG-4 の checker 実測（branch HEAD 全体・新規 unmanaged NG 確認）を経ずに main へ merge され、後続 Case が origin/main 取り込み時にその delta を引き取る場合
+- **予防策候補**: QG-4 最終完了判定の checker 実測を merge 直前の main 取り込み済み branch HEAD で実施し、「baseline-known 以外の新規 NG の出所が自 Case 変更であること」を evidence 化する。provenance-tracked baseline 登録漏れの検査を QG-4 手順へ明記する
+- **想定反映先**: agentdev-quality-gates references qg-4-final-acceptance.md（checker 実測の coverage 範囲明記）、case-close workflow の QG-4 判定手順
+- **関連**: Case #3192、Definition PR #3195、40bd84e4（PR #3211 / Case #3210）、docs/designs/integrity/rules/ 配下 IR-055 関連 rule
+- **タグ**: `#integrity` `#ir055` `#baseline` `#qg4`
+
+## integrity checker 系スクリプトの実体は src/opencode/ 配下ではなく .opencode/skills/repo-agentdev-integrity/scripts/（merge 済み worktree の .opencode は実ディレクトリとして存在する）
+
+- **問題事象**: case-open 冪等再実行（Case #3192 修復）で委譲指示どおり `bun src/opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts` を実行したところ Module not found で失敗した。repo-agentdev-integrity は src/opencode/skills/ の 49 skill には含まれず、git 追跡実体は .opencode/skills/repo-agentdev-integrity/ 配下のみ。
+- **発生局面**: case-open lifecycle 冪等再実行の AUTOGEN 再生成（Case 専用 worktree 3192-definition。merge 済み状態）
+- **検知方法**: bun 応答の Module not found エラー → glob での実在パス特定（.opencode 側のみヒット）→ `ls src/opencode/skills/` と `git ls-files` の突合
+- **根本原因**: 委譲指示が「worktree の .opencode/ は空（ジャンクション未伝播）」を前提に src 側パスを指定したが、同 skill は src 側に存在せず、git 追跡済みの .opencode/skills/repo-agentdev-integrity/ が worktree では実ディレクトリとして checkout される（ジャンクション前提が環境実態と不一致）
+- **自律対応内容**: .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts を worktree 内で直接実行し、import.meta.dir 由来の findRepoRoot で worktree root が解決されることを確認した上で再生成を実行（成功・no changes）。host 側への誤書込みは発生しないことをパス構成確認で事前保証した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: integrity checker・generate_indexes 系の実行パス指定は .opencode/skills/repo-agentdev-integrity/scripts/ を正とする。worktree で「.opencode が空」という前提を使う手順は、実行前に当該パスの実在を確認してから src 側代替へ切り替える
+- **再発条件**: integrity 系スクリプトを src/opencode/skills/ 配下のパスで指定した場合、または worktree の .opencode 状態を未確認のままジャンクション前提で手順を組んだ場合
+- **予防策候補**: integrity 系 checker 実行手順のパス指定を .opencode/skills/repo-agentdev-integrity/scripts/ に統一する。worktree の .opencode 状態（ジャンクション/実ディレクトリ/欠落）は手順の前置確認項目とする
+- **想定反映先**: repo-agentdev-integrity SKILL.md（実行契約のパス記載）、case-ready / case-open reference の checker 実行手順
+- **関連**: Case #3192、Definition PR #3195、.opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts
+- **タグ**: `#integrity` `#path` `#worktree`
