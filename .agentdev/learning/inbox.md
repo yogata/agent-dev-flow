@@ -84,3 +84,35 @@
 - **想定反映先**: agentdev-workflow-case-ready reference readiness-and-cleanup.md「draft / RU 削除」節、agentdev-git-worktree reference worktree-operations.md「並列実行安全ステージング」関連節
 - **関連**: Root Case Issue #3186、Definition PR #3188、並走 Case #3189（commit 841a0c6f）
 - **タグ**: `#git` `#parallel-case-ready` `#stage-race`
+
+## bun test scripts/ 全体実行（2628 tests・約 190 秒）は既定 120 秒 timeout で途中打ち切りとなる（委譲時は 300〜600 秒へ延長）
+
+- **問題事象**: case-run（Case #3199、OU-004）で `bun test ./.opencode/skills/repo-agentdev-integrity/scripts/` 全体（107 ファイル / 2628 テスト / 6731 expect() calls）を Windows 環境で実行したところ、所要 188.64 秒で既定 120 秒のハーネス timeout を超え、初回実行は途中打ち切りとなった。
+- **発生局面**: 実装検証（case-run の TS-007 (2) 回帰テスト全体実行。Case 専用 worktree）
+- **検知方法**: bash 応答の timeout エラー（完了前の強制終了）
+- **根本原因**: scripts/ 配下の回帰テスト全体の所要時間（約 190 秒・Windows）がハーネス既定 timeout（120 秒）を上回る規模に達しているが、委譲プロンプト側で timeout 延長が指定されていなかった。
+- **自律対応内容**: timeout を延長して再実行し合格（2628 pass / 0 fail）を確認。case-close でも同範囲の独立再検証を timeout 600 秒指定で再実行し合格（177.10 秒）を確認済み。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（検証実行の timeout 指定運用の範囲内）
+- **横展開観点**: REQ-010-068 契約（checker スクリプト・fixture 変更 → bun test 回帰テスト合格）を満たすための scripts/ 全体実行は全 checker 系 Case で共通の重い検証。実行時は必ず timeout 明示指定が必要。case-close の独立再検証でも同様。
+- **再発条件**: scripts/ 配下の bun test 全体を timeout 指定なし（既定 120 秒）で実行した場合。
+- **予防策候補**: bun test scripts/ 全体実行を含む検証の委譲プロンプト・workflow reference に timeout 300〜600 秒の明示指定を追記する。
+- **想定反映先**: case-run / case-close の検証実行 reference（bun test 実行形態契約）、agentdev-quality-gates の QG 実行手順。
+- **関連**: Issue #3199、PR #3204、親 Epic #3197
+- **タグ**: `#bun-test` `#timeout` `#windows`
+
+## agentdev_gh issue_create は role: case で kind を受理しない（kind は tracking 専用。Case Issue の work_type は物理ラベルで指定）
+
+- **問題事象**: case-open（Root Case Issue #3210 作成）で agentdev_gh の issue_create を role: case + kind: task（work_type maintenance に対応させる意図）で呼び出したところ、invalid-input（detail: kind requires role 'tracking'）で rejected された。あわせて、gh issue list --label case の読取補完も 0 件を返した（Case Issue は role に対応する物理ラベル "case" を持たず、work_type 系ラベル〔bug / maintenance / enhancement / bugfix〕が付く）。
+- **発生局面**: case-open lifecycle STEP-2 の Root Case 作成（Root Case Issue #3210）
+- **検知方法**: Custom Tool agentdev_gh の fail-closed 応答（kind: invalid-input、retryable: true、detail: request does not match the issue_create input contract (invalid-field [kind]: kind requires role 'tracking')）。および gh issue list のラベル実測（#3186=bug、#3193/#3197/#3200=maintenance、#3192=enhancement、#3191=bugfix）
+- **根本原因**: agentdev_gh の操作契約では kind は role 'tracking' の追跡Issue に対する論理分類であり、role: case（Case Issue）では受理されない。Case Issue の work_type は論理 kind ではなく物理ラベル（work_type ラベル）で表現される。呼出側（委譲指示）が「kind は work_type に対応」という前提で呼出しを組み立てた契約把握不足。
+- **自律対応内容**: kind を外し、work_type 物理ラベル maintenance を labels で指定して再実行し、作成を完了（成功応答・Tool 内部 VERIFY 済み）。issue_create の kind 指定は再試行せず引数修正で対応（AG-004 の適用具体化どおり）。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（Tool 入力契約の範囲内の修正。Case Issue の work_type ラベル付与運用は既存 Case 実測と整合）
+- **横展開観点**: Case Issue（role: case）起票では work_type を物理ラベル（labels）で指定し、kind を渡さない。tracking 軸の論理値（role/kind/trackingState）と work_type 物理ラベルは別系統の概念として扱う。population 実測や読取補完で gh CLI を使う場合も「case」ラベルフィルタは機能しないため、ラベルなし列挙 + タイトル・本文確認を用いる。
+- **再発条件**: role: case の issue_create に kind を含めて渡した場合。または Case Issue の population 実測を物理ラベル "case" でフィルタした場合。
+- **予防策候補**: 委譲プロンプト・手順書の Case Issue 起票指示では「role: case + labels に work_type 物理ラベル」と契約どおりに明記する。agentdev_gh の role/kind/labels の受理対応表を issue 操作知識へ追記する。
+- **想定反映先**: agentdev-issue-management reference issue-operation-safety.md（RA-001 で新設される population 実測節の隣接領域。本エントリは本 Case の合意済み追記対象外であり後続 learning-promote 対象）、agentdev-issue-tracking の論理スキーマ運用記述
+- **関連**: Root Case Issue #3210、Case #3186（label bug 実測）、Case #3193/#3197/#3200（label maintenance 実測）、本 inbox 既存エントリ「agentdev_gh issue_update の入力契約は role フィールドを受けない」
+- **タグ**: `#gh-tool` `#issue-create` `#input-contract` `#labels`
