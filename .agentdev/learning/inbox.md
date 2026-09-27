@@ -244,3 +244,35 @@
 - **想定反映先**: agentdev-quality-gates / case-close references（配布依存境界 最終 gate の検証差分突合手順）、repo-agentdev-integrity scripts（checker 出力の正規化対応候補）
 - **関連**: Case #3169、PR #3173
 - **タグ**: `#distribution-boundary` `#baseline-diff` `#path-normalization` `#case-close`
+
+## LSP 診断 timeout 時は tsc --noEmit を同等の型検証証跡として取得する
+
+- **問題事象**: case-run 委譲（DEL-3171-1）の QA review で、LSP 診断が harness 側 timeout（3秒）で応答せず、型検証の証跡を LSP から取得できなかった
+- **発生局面**: 実装（case-run 委譲内 QA review の型検証）。Case #3171、bun v1.3.6・worktree root 環境
+- **検知方法**: LSP 診断ツールの timeout エラー（QA review 実行時の実観測）
+- **根本原因**: 大規模 TypeScript パッケージでは LSP server 初期化・診断完了が harness の短い timeout 内に収まらず、LSP 応答が常態的に遅延する環境がある
+- **自律対応内容**: 型検証証跡を `tsc --noEmit`（対象 3 パッケージ）で取得し合格を確認。LSP timeout を証跡不在として扱わず、同等の型検証手段へ代替して検証記録を保持した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 型検証証跡を要求する全委譲・実装工程で、LSP timeout 時の代替証跡手順としてそのまま適用可能
+- **再発条件**: 大規模パッケージまたは LSP server 初期化が遅い環境で、LSP 診断に依存した型検証証跡を取得する場合
+- **予防策候補**: 型検証証跡の取得手順に「LSP timeout 時は tsc --noEmit（実行 cwd と対象パッケージを明記）を同等証跡とする」フォールバックを明文化する
+- **想定反映先**: 実装委譲の QA 手順（case-run execution adapter・型検証規約）
+- **関連**: Case #3171、PR #3174、src/opencode/tools/agentdev-jev/
+- **タグ**: `#lsp-timeout` `#typecheck-evidence` `#tsc-noemit` `#case-run`
+
+## 構造検証強化の「入口だけ直して経路に残る」逆流を code review 自己反証で検出した
+
+- **問題事象**: score 離散化の入口（normalizeAnswer の正規化・連続値拒否）を実装した後も、観測書込み経路（evaluator 観測の保存）に連続 score が直接保存される経路が残存していた（REQ-090-014 の趣旨「連続値を canonical result に残さない」が保存経路まで届いていなかった）
+- **発生局面**: 実装（case-run 委譲 DEL-3171-1 の code review 自己反証）。Case #3171
+- **検知方法**: 委譲内 code review（自己反証）
+- **根本原因**: 構造検証強化系の変更で入口の validation のみを対象とし、同一制約が要求される別の書込み経路（観測永続化経路）への波及確認が漏れていた。制約対象値の流れの全経路を追跡しない単点レビューになっていた
+- **自律対応内容**: 連続 score 直接保存経路を検出し commit 76e676bc で修正。修正後、対象 100 テストと tsc --noEmit 3 パッケージで合格を確認
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（REQ-090-014 の実装完全化・要件変更なし）
+- **横展開観点**: 制約の機械強制を入口にのみ実装する構造検証系変更全般で起こり得る。「入口・経路・保存先の3層で同一制約の到達を確認する」レビュー観点として展開可能
+- **再発条件**: 制約対象値が流れ得る全経路を列挙せずに、入口の validation 追加のみで変更完了と判断する場合
+- **予防策候補**: 制約追加系の変更では「制約対象値が流れ得る全経路の列挙」と「各経路での制約到達確認」を code review チェックリストへ含める
+- **想定反映先**: 委譲内 code review 観点（case-run execution adapter）、REQ-090 系の後続 Case
+- **関連**: Case #3171、PR #3174、commit 76e676bc、src/opencode/tools/agentdev-jev/observation.ts
+- **タグ**: `#validation-bypass` `#score-discretization` `#code-review` `#jev`

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260927T042633Z-b244",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "deleteBranchOnMerge 必須化・case-close remote 削除撤廃要件の既存REQ照合判断（REQ-032/009/030 帰属）",
+  "sourceRevision": "working-tree-2026-09-27 (req-define git 禁止のため commit hash 取得せず)",
+  "durationMs": 823,
+  "inputs": {
+    "requestDigest": "cf1fed3f34b3be62021add2ee42fdbf80b4e33c359d69abbe8bb4ec73780845d",
+    "references": [
+      {
+        "label": "req-input (Hermes 壁打ちセッション由来構造化要件入力)",
+        "path": "C:/Users/ogatay/work/hermes-vault/project-list/req-input-adf-delete-branch-on-merge.md",
+        "digest": "ab284b18f1f34d17452e7de7c4c1b0bc89f0c750c7206fbaa6e4fedc65c56f3a"
+      }
+    ]
+  },
+  "failure": {
+    "kind": "network_error",
+    "detail": "GatewayInternalServerError: Free tier users do not have access to this model. Upgrade to paid credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up for unrestricted access."
+  }
+}

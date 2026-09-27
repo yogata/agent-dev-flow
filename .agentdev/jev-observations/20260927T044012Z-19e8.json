@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260927T044012Z-19e8",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0154 の REQ-090 に対する操作分類（既存REQ照合判断）",
+  "sourceRevision": "working-tree+RU-0154@2026-09-27",
+  "durationMs": 721,
+  "inputs": {
+    "requestDigest": "cb7743abdc6ff64d2f086a7a4552f3229e57737c05bb4edff5b355b1e5f63d9c",
+    "references": [
+      {
+        "label": "RU-0154（要件入力）",
+        "path": ".agentdev/backlog/req-units/RU-0154.md",
+        "digest": "2e0e70b7ecca6b7a465916fd74cd2232e39b0bc86916ae1ab8bedf3d495f5c91"
+      },
+      {
+        "label": "REQ-090（照合対象REQ）",
+        "path": "docs/requirements/REQ-090.md",
+        "digest": "107cc1d8d80311270a56e4a9d20aac0f374c959ce2c2575f838efd79361afac2"
+      },
+      {
+        "label": "custom-tool-contracts Design（design対応確認）",
+        "path": "docs/designs/responsibilities/custom-tool-contracts.md",
+        "digest": "f8c8a94729fdec284bff4d8013ed0b332eaa40bd4ec7efa7f3191691a3572968"
+      }
+    ]
+  },
+  "failure": {
+    "kind": "network_error",
+    "detail": "GatewayInternalServerError: Free tier users do not have access to this model. Upgrade to paid credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up for unrestricted access."
+  }
+}
