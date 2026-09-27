@@ -292,3 +292,19 @@
 - **想定反映先**: src/opencode/skills/agentdev-issue-management/references/issue-operation-safety.md（known-issues 節・REQ-093-001 整備時の記録候補）、agentdev-issue-tracking 運用知識
 - **関連**: Case #3175、PR #3178、REQ-092（issue_list search 規律）、.opencode/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md「GitHub I/O 失敗時の gh CLI 切替継続手順」節
 - **タグ**: `#github-search-index-lag` `#issue-list-empty-result` `#contingency` `#case-open` `#gh-cli-readonly`
+
+## case-open Definition PR 作成前 missing-design ゲートで draft 非宣言の design 宣言追随が確定する（新規 REQ 行）
+
+- **問題事象**: case-open STEP-4 で新規 REQ 行（REQ-007-013）を含む Definition PR を作成する際、draft に Design 変更宣言（artifact: design）がなかったため、PR 作成前の missing-design 0 件ゲート（agentdev-traceability check、fail-closed）で missing-design fail 1件を検出した
+- **発生局面**: case-open（Definition PR 作成前の branch HEAD 実測・traceability check）
+- **検知方法**: bun .opencode/skills/agentdev-traceability/scripts/src/check.ts --root <worktree> --req REQ-007-013 の missing-design fail（findings: REQ-007-013）
+- **根本原因**: 新規 REQ 行は増分ベースの missing-design ゲート（case-open STEP-4 PR 作成前・case-ready トレーサビリティ完全性ゲート）で design 宣言を必須とするが、req-define の draft 契約には新規行の design 対応有無の投影（policy 登録判断 REQ-021-029 の design 版に相当）がなく、draft に Design 変更がない Case では case-open 到達時に宣言追随が未確定になり得る
+- **自律対応内容**: STEP-4 手順3 に従い Definition Package の構成へ戻して宣言追随を確定した。宣言先は knowledge 配置規約（知識文書は ADF-COVERS 宣言を持たない）により RA-001 ownership_hints の知識文書を避け、前例 REQ-007-011/012 と同一の sidecar（traceability/agentdev-quality-gates.yaml）design セクションへ同一 artifact（qg-4-final-acceptance.md）+ REQ-007-013 を追加し、coverage で design 1件・check で missing-design pass を再検証した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（case-open reference STEP-4 手順3 の規定手順内での解消。宣言追随=同一 Definition 変更として Definition PR #3179 へ含めた）
+- **横展開観点**: 新規 REQ 行を含む Definition 変更全般で同様の宣言追随が発生し得る。draft の ownership_hints が知識文書のみの場合は design 宣言先を既存 sidecar / Design 宣言の前例から選定する（同一 REQ 系統行の既存宣言先へ統合するのが安全）
+- **再発条件**: req-define が新規 REQ 行を作成し、draft に artifact: design の宣言を含めないすべての Case
+- **予防策候補**: (1) req-define の要件展開時に新規行の design 対応有無・対応先候補を draft へ投影する（REQ-021-029 の design 版の検討）、(2) case-open STEP-4 では missing-design ゲートを PR 作成前検査の最初に実行し、fail 時は前例 artifact を含む sidecar design セクションへの追加を標準解決とする
+- **想定反映先**: docs/designs/commands/req-define.md（要件展開時の design 対応投影の検討）、src/opencode/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md（missing-design ゲート fail 時の宣言先選定指針）
+- **関連**: Case #3177、PR #3179、traceability/agentdev-quality-gates.yaml、docs/designs/workflows/capture-boundaries.md（Split Rule）
+- **タグ**: `#case-open` `#missing-design-gate` `#traceability` `#sidecar-declaration` `#new-req-row`
