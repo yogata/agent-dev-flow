@@ -5,6 +5,40 @@
 
 ---
 
+## main リポジトリに revert 進行中の中断残骸を検出し Definition branch 作成前に git revert --abort で復旧した
+
+- **問題事象**: case-open 委譲実行の開始直後、main リポジトリの `git status` が「Revert currently in progress」状態を示した。staged は空・untracked（drafts・jev-observations）のみで HEAD = origin/main（827c88fd）と一致しており、revert 操作の中間状態だけが残留していた
+- **発生局面**: case-open（case-auto orchestration stage 1 委譲）の STEP-4 Definition branch（definition/issue-3166）作成前の worktree 状態確認時。運用
+- **検知方法**: git status の "Revert currently in progress" 表示（porcelain 短形式では検出不能な状態）
+- **根本原因**: 未特定（観測限界）。同一環境での先行 Case 実行（case-close 系の revert 操作〔既知: DEC-040 部分置換 revert 等〕）が中断された残骸と推定。revert を開始したセッションの実行時点は観測不能
+- **自律対応内容**: (1) `git status --porcelain` で staged/untracked の内容を確認し、revert 状態が本 Case 作業と無関係な残留であることを確認 (2) `git revert --abort` を実行して revert 状態を解除 (3) 解除後に HEAD = origin/main 一致・clean（untracked のみ）を再確認してから Definition branch 作成と Design 編集へ進んだ
+- **ユーザー確認有無**: なし（abort は revert 中間状態の破棄のみであり、既に確定済みの HEAD・untracked 成果物へ影響しないことを事前確認の上で実施）
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: `git status` の短形式（`--porcelain`）では revert/rebase/merge 中間状態が表面化しない。worktree 操作前の状態確認は長形式 git status の表示（"Revert currently in progress" 等の operation in progress 行）を確認するのが確実。abort 前に staged 内容を porcelain で確認し、残留状態が自 Case の成果物を含まないことを検証してから解除する手順が resume 安全性を担保する
+- **再発条件**: revert 操作を含む先行セッションが中断された後に、別セッション（委譲子エージェント等）が同環境で git 操作を開始する場合
+- **予防策候補**: worktree・branch 作成を伴う workflow の前置確認に「長形式 git status で operation in progress 表示の有無確認」を含める。revert/rebase/merge 中間状態検出時は porcelain 確認 → abort 判定 → 解除後再確認の順で固定する
+- **想定反映先**: agentdev-git-worktree reference（worktree-operations.md の書込み guard 運用指針・前置状態確認）、case-open references（definition-pr-and-idempotency.md「期待値確定前の branch HEAD 実測」節の前置手順）
+- **関連**: Case #3166（本件検出時の実行 Case）、commit 827c88fd（解除後の確認済み HEAD）
+- **タグ**: `#git` `#revert-abort` `#worktree` `#case-open`
+
+## agentdev_gh issue_update 契約は role フィールドを受理しない（issue_create 専用）の実測
+
+- **問題事象**: Custom Tool agentdev_gh の issue_update 操作に `role: case` を含めて呼出したところ、invalid-input（"request does not match the issue_update input contract (unknown-field [role]: field 'role' is not part of the issue_update input contract)"、retryable: true）で拒否された。role を除去して再送したところ成功（VERIFY 通過）
+- **発生局面**: case-open（case-auto orchestration stage 1 委譲）の STEP-3 adf_case 埋め戻し（Root Case #3166 の実行識別情報セクション更新）。運用
+- **検知方法**: tool 応答の failure kind: invalid-input と detail（unknown-field 指摘）
+- **根本原因**: Tool 操作契約上 `role` は issue_create 専用の入力フィールドであり、issue_update は受理しない。Tool 公開説明の「Tracking-issue operations expose logical values (role, kind, trackingState)」の記述が、role を全 tracking 操作で受理できると誤解させる表現になっている
+- **自律対応内容**: invalid-input の detail を契約の実測として受入れ、role を除去した最小引数（body・labels・number・operation）で再送し成功。trackingState も指定せず本文更新のみとした（Case Issue の論理状態は case-ready 以降の工程で変化させる）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（Tool 契約自体は fail-closed に機能。呼出側の知見補完）
+- **横展開観点**: issue_update を使う全 workflow（case-ready の ready 遷移、case-close のクローズ、Epic tracker のステータス更新等）で同様の誤呼出が起こり得る。invalid-input は retryable 表示でも同一呼出の再試行では解消せず、引数修正が必須
+- **再発条件**: issue_create の引数構成を issue_update へ流用する場合
+- **予防策候補**: issue-operation-safety.md の tracking 軸 3 規則に「issue_update は role を受理しない（role は issue_create 専用）。labels は省略時追跡軸維持」を明記する。invalid-input（unknown-field）は再試行でなく引数修正対象である旨を contingency 記述へ補足する
+- **想定反映先**: agentdev-issue-management issue-operation-safety.md（tracking 軸操作の 3 規則節・issue_update 項）、agentdev-issue-tracking Design（操作別入力契約の明記）
+- **関連**: Case #3166（Root Case 本文更新・埋め戻し成功）
+- **タグ**: `#agentdev-gh` `#issue_update` `#invalid-input` `#tool-contract`
+
+---
+
 ## agentdev_gh 全操作で gh exit 66 が持続し Root Case 作成が blocked 停止した
 
 - **問題事象**: Custom Tool agentdev_gh の全操作（issue_list・issue_create・issue_read）で operation-failed（gh exited with 66、retryable: true）が持続発生した。同一環境での gh CLI 手動実行（読み取り系: issue list・issue view・label list）は正常動作していた。case-open STEP-2 の Root Case 作成（issue_create）が 6回失敗し、tool 呼出合計 9回（読み取りを含む）すべて失敗した
