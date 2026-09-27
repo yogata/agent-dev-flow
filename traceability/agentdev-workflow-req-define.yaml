@@ -12,6 +12,8 @@ implementation:
     - REQ-008-062
     - REQ-090-004
     - REQ-090-012
+    - REQ-090-018
+    - REQ-090-019
 verification:
   docs/designs/commands/req-define.md:
     - REQ-021-029

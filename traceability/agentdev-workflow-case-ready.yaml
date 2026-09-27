@@ -65,6 +65,8 @@ implementation:
     - REQ-061-038
     - REQ-090-004
     - REQ-090-012
+    - REQ-090-018
+    - REQ-090-019
   src/opencode/skills/agentdev-workflow-case-ready/references/readiness-and-cleanup.md:
     - REQ-061-035
 verification:

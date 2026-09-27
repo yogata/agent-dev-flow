@@ -5,9 +5,11 @@ implementation:
     - REQ-090-002
     - REQ-090-005
     - REQ-090-013
+    - REQ-090-019
 verification:
   src/opencode/plugins/agentdev-jev-tool/tests/plugin.test.ts:
     - REQ-090-002
     - REQ-090-003
     - REQ-090-005
     - REQ-090-013
+    - REQ-090-019

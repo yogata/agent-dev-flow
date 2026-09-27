@@ -92,6 +92,21 @@ describe("plugin structure", () => {
     };
     expect(validateFinalResultObservation(evaluatorFactsMixed).ok).toBe(false);
   });
+
+  test("公開 JSON Schema の description は差異理由の不一致時必須・一致時拒否と score 離散 level と同期する（TS-002）", () => {
+    const schema = REQUEST_PROPERTY_SCHEMA as unknown as {
+      properties: {
+        observation: { description: string; properties: { finalResult: { properties: { results: { items: { properties: Record<string, { description: string }> } } } } } };
+        questions: { items: { properties: Record<string, { description: string }> } };
+      };
+    };
+    const resultItems = schema.properties.observation.properties.finalResult.properties.results.items.properties;
+    expect(resultItems.differenceReason?.description).toContain("Required when the value differs");
+    expect(resultItems.differenceReason?.description).toContain("must be omitted");
+    expect(resultItems.value?.description).toContain("discrete scale level");
+    expect(resultItems.value?.description).toContain("continuous score values are rejected");
+    expect(schema.properties.questions.items.properties.scale?.description).toContain("unique");
+  });
 });
 
 describe("evaluate through the tool surface", () => {

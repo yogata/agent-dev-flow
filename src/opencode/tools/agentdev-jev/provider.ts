@@ -35,8 +35,8 @@ export type JevProviderResponse = {
 };
 
 export type JevProviderAnswer = {
-  /** boolean は P(true) を value に格納する（provider 契約上、選択は engine が決定的導出）。 */
-  value: boolean | string | number;
+  /** boolean は P(true) を value に格納する（provider 契約上、選択は engine が決定的導出）。score は provider 返却の生値で、正規化不能な値（欠落・非数・非有限を含む）の既定値 fallback は行わず engine が response_invalid として構造化する。 */
+  value: boolean | string | number | undefined;
   probabilities?: Record<string, number>;
 };
 

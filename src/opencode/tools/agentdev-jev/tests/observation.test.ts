@@ -56,6 +56,28 @@ function successObservation(overrides: Partial<JevObservation> = {}): JevObserva
   };
 }
 
+function scoreSuccessObservation(overrides: Partial<JevObservation> = {}): JevObservation {
+  return {
+    schemaVersion: 2,
+    observationId: "obs-score",
+    workflow: "learning-promote",
+    evaluationKind: "evaluation",
+    subject: "8軸評価 1軸",
+    sourceRevision: "c6c15e72e5cae9ba8c3a957e32662704db94283c",
+    durationMs: 90,
+    inputs: { requestDigest: DIGEST },
+    results: [
+      {
+        questionId: "s1",
+        questionForm: "score",
+        value: 1,
+        probabilityDistribution: { 低: 0.2, 中: 0.5, 高: 0.3 },
+      },
+    ],
+    ...overrides,
+  };
+}
+
 function failureObservation(overrides: Partial<JevObservation> = {}): JevObservation {
   return {
     schemaVersion: 2,
@@ -74,6 +96,15 @@ function failureObservation(overrides: Partial<JevObservation> = {}): JevObserva
 describe("validateObservation", () => {
   test("evaluator 成功観測を受理する", () => {
     expect(validateObservation(successObservation()).ok).toBe(true);
+  });
+
+  test("score evaluator の連続値・範囲外値は現行観測として受理しない", () => {
+    expect(validateObservation(scoreSuccessObservation()).ok).toBe(true);
+    for (const value of [0.31, 1.25, 3, -1, "中"]) {
+      const observation = scoreSuccessObservation();
+      observation.results![0]!.value = value;
+      expect(validateObservation(observation).ok).toBe(false);
+    }
   });
 
   test("失敗観測（呼出し開始後の失敗分類）を受理する", () => {
@@ -169,6 +200,28 @@ describe("validateObservation", () => {
     const unrelatedQuestion = successObservation({ finalResult: { results: [{ questionId: "j2", value: true }] } });
     expect(validateObservation(unrelatedQuestion).ok).toBe(false);
   });
+
+  test("canonical result 不一致時に differenceReason が無い finalResult を拒否する（不一致時必須・TS-002 ケース1）", () => {
+    const differingWithoutReason = successObservation({ finalResult: { results: [{ questionId: "j1", value: false }] } });
+    const result = validateObservation(differingWithoutReason);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.detail).toContain("required");
+  });
+
+  test("score の finalResult 値は定義済み scale 内の離散 level のみ受理する（連続値・範囲外を拒否・TS-001）", () => {
+    const matchLevel = scoreSuccessObservation({ finalResult: { results: [{ questionId: "s1", value: 1 }] } });
+    expect(validateObservation(matchLevel).ok).toBe(true);
+    const differentLevel = scoreSuccessObservation({ finalResult: { results: [{ questionId: "s1", value: 2, differenceReason: "deterministic_override" }] } });
+    expect(validateObservation(differentLevel).ok).toBe(true);
+    const unknownReason = scoreSuccessObservation({ finalResult: { results: [{ questionId: "s1", value: 0, differenceReason: "unknown" }] } });
+    expect(validateObservation(unknownReason).ok).toBe(true);
+    const continuous = scoreSuccessObservation({ finalResult: { results: [{ questionId: "s1", value: 1.25, differenceReason: "semantic_disagreement" }] } });
+    expect(validateObservation(continuous).ok).toBe(false);
+    const outOfRange = scoreSuccessObservation({ finalResult: { results: [{ questionId: "s1", value: 3, differenceReason: "semantic_disagreement" }] } });
+    expect(validateObservation(outOfRange).ok).toBe(false);
+    const labelString = scoreSuccessObservation({ finalResult: { results: [{ questionId: "s1", value: "高", differenceReason: "semantic_disagreement" }] } });
+    expect(validateObservation(labelString).ok).toBe(false);
+  });
 });
 
 describe("requestDigest", () => {
@@ -239,6 +292,16 @@ describe("writeEvaluationObservation", () => {
     const result = await writeEvaluationObservation(worktree, invalid as unknown as JevObservation);
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.failure.kind).toBe("invalid_input");
+    const exists = await fs.stat(path.join(worktree, ".agentdev", "jev-observations")).catch(() => null);
+    expect(exists).toBeNull();
+  });
+
+  test("連続値の score evaluator result を観測へ保存しない", async () => {
+    const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
+    const observation = scoreSuccessObservation();
+    observation.results![0]!.value = 1.25;
+    const result = await writeEvaluationObservation(worktree, observation);
+    expect(result.ok).toBe(false);
     const exists = await fs.stat(path.join(worktree, ".agentdev", "jev-observations")).catch(() => null);
     expect(exists).toBeNull();
   });
@@ -325,6 +388,21 @@ describe("appendFinalResult", () => {
     expect(unknownQuestion.ok).toBe(false);
     const empty = await appendFinalResult(worktree, observationId, { results: [] });
     expect(empty.ok).toBe(false);
+  });
+
+  test("score 観測への連続値 final result 追記は拒否され、離散 level 追記は同一正規化表現で比較される", async () => {
+    const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
+    const seeded = await writeEvaluationObservation(worktree, scoreSuccessObservation());
+    expect(seeded.ok).toBe(true);
+    if (!seeded.ok) return;
+    const continuous = await appendFinalResult(worktree, seeded.success.observationId, { results: [{ questionId: "s1", value: 0.31, differenceReason: "semantic_disagreement" }] });
+    expect(continuous.ok).toBe(false);
+    const missingReason = await appendFinalResult(worktree, seeded.success.observationId, { results: [{ questionId: "s1", value: 2 }] });
+    expect(missingReason.ok).toBe(false);
+    const unknownReason = await appendFinalResult(worktree, seeded.success.observationId, { results: [{ questionId: "s1", value: 0, differenceReason: "unknown" }] });
+    expect(unknownReason.ok).toBe(true);
+    const sameLevel = await appendFinalResult(worktree, seeded.success.observationId, { results: [{ questionId: "s1", value: 1 }] });
+    expect(sameLevel.ok).toBe(true);
   });
 });
 

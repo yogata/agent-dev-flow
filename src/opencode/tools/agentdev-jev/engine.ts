@@ -100,6 +100,9 @@ function validateQuestion(raw: unknown, seen: Set<string>): ValidationResult {
     ) {
       return { ok: false, kind: "invalid_input", detail: `score question requires 2+ ordered levels: ${raw.id}` };
     }
+    if (new Set(raw.scale).size !== raw.scale.length) {
+      return { ok: false, kind: "invalid_input", detail: `score scale levels must be unique: ${raw.id}` };
+    }
   }
   return { ok: true };
 }
@@ -137,22 +140,26 @@ function booleanDistribution(probability: number): JevProbabilityDistribution {
   return normalizeDistribution({ true: p, false: 1 - p });
 }
 
-/** provider 応答をリクエスト順に正規化する（provider 固有の格納差異はこの境界より内側で吸収済み）。 */
+/** provider 応答をリクエスト順に正規化する（provider 固有の格納差異はこの境界より内側で吸収済み）。正規化不能な値は response_invalid 失敗として返す（黙示的な既定値 fallback は行わない）。 */
 export function normalizeProviderResponse(
   request: JevEvaluateRequest,
   response: JevProviderResponse,
-): { results: JevQuestionResult[]; confidence?: number } {
+): { ok: true; results: JevQuestionResult[]; confidence?: number } | { ok: false; kind: "response_invalid"; detail: string } {
   const results: JevQuestionResult[] = [];
   for (const question of request.questions) {
-    results.push(normalizeAnswer(question, response.answers[question.id]));
+    const normalized = normalizeAnswer(question, response.answers[question.id]);
+    if (!normalized.ok) return normalized;
+    results.push(normalized.result);
   }
   // confidence は provider が実際に返した場合のみ保存する。確率分布から代替生成しない。
   const confidence =
     response.confidenceRaw !== undefined && Number.isFinite(response.confidenceRaw) ? clamp01(response.confidenceRaw) : undefined;
-  return { results, ...(confidence !== undefined ? { confidence } : {}) };
+  return { ok: true, results, ...(confidence !== undefined ? { confidence } : {}) };
 }
 
-function normalizeAnswer(question: JevQuestion, answer: unknown): JevQuestionResult {
+type NormalizedAnswer = { ok: true; result: JevQuestionResult } | { ok: false; kind: "response_invalid"; detail: string };
+
+function normalizeAnswer(question: JevQuestion, answer: unknown): NormalizedAnswer {
   if (question.form === "boolean") {
     // provider 契約: P(true)。選択は決定的導出（0.5 以上を true）。
     const p = answer !== undefined && typeof (answer as { value?: unknown }).value === "number"
@@ -160,10 +167,13 @@ function normalizeAnswer(question: JevQuestion, answer: unknown): JevQuestionRes
       : 0;
     const distribution = booleanDistribution(p);
     return {
-      id: question.id,
-      form: question.form,
-      value: p >= 0.5,
-      probabilityDistribution: distribution,
+      ok: true,
+      result: {
+        id: question.id,
+        form: question.form,
+        value: p >= 0.5,
+        probabilityDistribution: distribution,
+      },
     };
   }
   if (question.form === "choice") {
@@ -194,13 +204,18 @@ function normalizeAnswer(question: JevQuestion, answer: unknown): JevQuestionRes
       }
     }
     return {
-      id: question.id,
-      form: question.form,
-      value: chosen ?? (options[0] as string),
-      probabilityDistribution: distribution,
+      ok: true,
+      result: {
+        id: question.id,
+        form: question.form,
+        value: chosen ?? (options[0] as string),
+        probabilityDistribution: distribution,
+      },
     };
   }
-  // score: value は水準値（0..levels-1 の数値）。分布は水準名へ写像した正規化分布。
+  // score: canonical result は定義済み scale 内の離散的な level（scale 内の整数位置 0..levels-1）。
+  // provider の連続値は最近接水準への決定的写像で正規化し、連続値を canonical result として残さない。
+  // 欠落・非数・非有限などの正規化不能な値は黙示的な既定値 fallback せず response_invalid 失敗とする。
   const scale = question.scale ?? [];
   const rawAnswer = (answer ?? {}) as { value?: unknown; probabilities?: Record<string, number> };
   const rawDist: Record<string, number> = {};
@@ -216,15 +231,22 @@ function normalizeAnswer(question: JevQuestion, answer: unknown): JevQuestionRes
     if (!(level in rawDist)) rawDist[level] = 0;
   }
   const distribution = normalizeDistribution(rawDist);
-  const scoreValue = typeof rawAnswer.value === "number" && Number.isFinite(rawAnswer.value)
-    ? clamp01(rawAnswer.value / Math.max(1, scale.length - 1)) * (scale.length - 1)
-    : 0;
-  const bounded = Math.min(scale.length - 1, Math.max(0, scoreValue));
+  if (typeof rawAnswer.value !== "number" || !Number.isFinite(rawAnswer.value)) {
+    return {
+      ok: false,
+      kind: "response_invalid",
+      detail: `score answer value is not normalizable to a scale level (must be a finite number): ${question.id}`,
+    };
+  }
+  const bounded = Math.min(scale.length - 1, Math.max(0, Math.round(rawAnswer.value)));
   return {
-    id: question.id,
-    form: question.form,
-    value: bounded,
-    probabilityDistribution: distribution,
+    ok: true,
+    result: {
+      id: question.id,
+      form: question.form,
+      value: bounded,
+      probabilityDistribution: distribution,
+    },
   };
 }
 
@@ -320,6 +342,9 @@ export async function evaluateWithProvider(
     });
     const processingMs = (deps.now ? deps.now() : Date.now()) - startedAt;
     const normalized = normalizeProviderResponse(request, response);
+    if (!normalized.ok) {
+      return { ok: false, failure: { kind: normalized.kind, retryable: false, detail: normalized.detail } };
+    }
     const success: JevEvaluateResult = {
       ok: true,
       operation: "evaluate",

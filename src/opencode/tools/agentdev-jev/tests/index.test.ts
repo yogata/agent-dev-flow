@@ -364,6 +364,68 @@ describe("最終判断の観測反映（TS-004）", () => {
   });
 });
 
+describe("評価指標の分析時導出可能性（TS-005）", () => {
+  test("schemaVersion 2 観測の既存 field から raw agreement・semantic agreement・workflow×evaluationKind 別の差異理由分類を導出できる（観測への新規 field 追加なし）", async () => {
+    const worktree = await tempWorktree();
+    const questions = [
+      { id: "q1", form: "boolean", prompt: "質問1" },
+      { id: "q2", form: "boolean", prompt: "質問2" },
+      { id: "q3", form: "boolean", prompt: "質問3" },
+      { id: "q4", form: "boolean", prompt: "質問4" },
+      { id: "q5", form: "boolean", prompt: "質問5" },
+    ];
+    const evaluated = await runAgentdevJevOperation(worktree, evaluateRequest({ questions }), {
+      resolveProvider: () =>
+        mockProvider({
+          async evaluate() {
+            return {
+              requestedModel: "mock/jev",
+              answers: { q1: { value: 0.9 }, q2: { value: 0.9 }, q3: { value: 0.1 }, q4: { value: 0.9 }, q5: { value: 0.9 } },
+            };
+          },
+        }),
+    });
+    expect(evaluated.ok).toBe(true);
+    if (!evaluated.ok || evaluated.operation !== "evaluate") return;
+    const persisted = evaluated.success.observation;
+    if (!persisted || !("observationId" in persisted)) return;
+    const written = await runAgentdevJevOperation(worktree, {
+      operation: "observation_write",
+      observationId: persisted.observationId,
+      observation: {
+        schemaVersion: 2,
+        finalResult: {
+          results: [
+            { questionId: "q1", value: true },
+            { questionId: "q2", value: false, differenceReason: "evaluation_input_defect" },
+            { questionId: "q3", value: true, differenceReason: "semantic_disagreement" },
+            { questionId: "q4", value: false, differenceReason: "unknown" },
+            { questionId: "q5", value: false, differenceReason: "deterministic_override" },
+          ],
+        },
+      },
+    });
+    expect(written.ok).toBe(true);
+    const content = await readObservationJson(worktree, `.agentdev/jev-observations/${persisted.observationId}.json`);
+    // 分析時の導出（観測の一次事実から計算。観測側に集計 field は存在しない）
+    const evaluatorResults = content.results as Array<{ questionId: string; value: unknown }>;
+    const finalResults = (content.finalResult as { results: Array<{ questionId: string; value: unknown; differenceReason?: string }> }).results;
+    const finalById = new Map(finalResults.map((r) => [r.questionId, r]));
+    const rawAgreement = evaluatorResults.filter((r) => r.value === finalById.get(r.questionId)?.value);
+    expect(rawAgreement.map((r) => r.questionId)).toEqual(["q1"]);
+    const semanticPopulation = finalResults.filter(
+      (r) => r.differenceReason !== "evaluation_input_defect" && r.differenceReason !== "deterministic_override",
+    );
+    expect(semanticPopulation).toHaveLength(3);
+    const evaluatorById = new Map(evaluatorResults.map((r) => [r.questionId, r]));
+    const semanticDisagreements = semanticPopulation.filter((r) => r.value !== evaluatorById.get(r.questionId)?.value);
+    expect(semanticDisagreements.map((r) => r.differenceReason)).toEqual(["semantic_disagreement", "unknown"]);
+    // 集計粒度 workflow × evaluationKind は観測の識別 field から導出可能
+    expect(content.workflow).toBe("learning-promote");
+    expect(content.evaluationKind).toBe("evaluation");
+  });
+});
+
 describe("fail-open と中断耐性（TS-007）", () => {
   test("観測の永続化のみに失敗しても評価結果は維持され、識別可能な warning が構造化情報に含まれる", async () => {
     const worktree = await tempWorktree();

@@ -49,6 +49,15 @@ describe("validateEvaluateRequest", () => {
     expect(result.ok).toBe(false);
   });
 
+  test("score の重複水準を拒否する（scale 一意性）", () => {
+    const result = validateEvaluateRequest({
+      ...base,
+      questions: [{ id: "q1", form: "score", prompt: "質問", scale: ["低", "中", "低"] }],
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.detail).toContain("unique");
+  });
+
   test("重複 id を拒否する", () => {
     const result = validateEvaluateRequest({
       ...base,
@@ -76,57 +85,101 @@ describe("normalizeDistribution", () => {
 });
 
 describe("normalizeProviderResponse", () => {
-  test("boolean は P(true) から値と分布を決定的導出する", () => {
-    const { results } = normalizeProviderResponse(
-      { state: "s", instructions: "i", questions: [{ id: "q1", form: "boolean", prompt: "質問" }] },
-      { requestedModel: "m", answers: { q1: { value: 0.8 } } },
+  function normalize(
+    questions: JevEvaluateRequest["questions"],
+    answers: Record<string, unknown>,
+    confidenceRaw?: number,
+  ): ReturnType<typeof normalizeProviderResponse> {
+    return normalizeProviderResponse(
+      { state: "s", instructions: "i", questions },
+      { requestedModel: "m", answers: answers as never, ...(confidenceRaw !== undefined ? { confidenceRaw } : {}) },
     );
-    expect(results[0]?.value).toBe(true);
-    expect(results[0]?.probabilityDistribution["true"]).toBeCloseTo(0.8);
-    expect(results[0]?.probabilityDistribution["false"]).toBeCloseTo(0.2);
+  }
+
+  test("boolean は P(true) から値と分布を決定的導出する", () => {
+    const normalized = normalize([{ id: "q1", form: "boolean", prompt: "質問" }], { q1: { value: 0.8 } });
+    expect(normalized.ok).toBe(true);
+    if (!normalized.ok) return;
+    expect(normalized.results[0]?.value).toBe(true);
+    expect(normalized.results[0]?.probabilityDistribution["true"]).toBeCloseTo(0.8);
+    expect(normalized.results[0]?.probabilityDistribution["false"]).toBeCloseTo(0.2);
   });
 
   test("choice は候補外キーを除外し、provider 選択が有効候補なら採用する", () => {
-    const { results } = normalizeProviderResponse(
-      { state: "s", instructions: "i", questions: [{ id: "q1", form: "choice", prompt: "質問", options: ["採用", "却下"] }] },
-      { requestedModel: "m", answers: { q1: { value: "採用", probabilities: { 採用: 0.7, 却下: 0.2, 候補外: 0.1 } } } },
+    const normalized = normalize(
+      [{ id: "q1", form: "choice", prompt: "質問", options: ["採用", "却下"] }],
+      { q1: { value: "採用", probabilities: { 採用: 0.7, 却下: 0.2, 候補外: 0.1 } } },
     );
-    expect(results[0]?.value).toBe("採用");
-    expect(results[0]?.probabilityDistribution["候補外"]).toBeUndefined();
-    expect(results[0]?.probabilityDistribution["却下"]).toBeCloseTo(0.2 / 0.9);
+    expect(normalized.ok).toBe(true);
+    if (!normalized.ok) return;
+    expect(normalized.results[0]?.value).toBe("採用");
+    expect(normalized.results[0]?.probabilityDistribution["候補外"]).toBeUndefined();
+    expect(normalized.results[0]?.probabilityDistribution["却下"]).toBeCloseTo(0.2 / 0.9);
   });
 
-  test("score は水準名へ写像した分布を返す", () => {
-    const { results } = normalizeProviderResponse(
-      { state: "s", instructions: "i", questions: [{ id: "q1", form: "score", prompt: "質問", scale: ["低", "中", "高"] }] },
-      { requestedModel: "m", answers: { q1: { value: 2, probabilities: { 0: 0.1, 1: 0.3, 2: 0.6 } } } },
+  test("score は整数水準値を canonical result として返し、分布は水準名へ写像する", () => {
+    const normalized = normalize(
+      [{ id: "q1", form: "score", prompt: "質問", scale: ["低", "中", "高"] }],
+      { q1: { value: 2, probabilities: { 0: 0.1, 1: 0.3, 2: 0.6 } } },
     );
-    expect(results[0]?.value).toBe(2);
-    expect(results[0]?.probabilityDistribution["高"]).toBeCloseTo(0.6);
-    expect(results[0]?.probabilityDistribution["低"]).toBeCloseTo(0.1);
+    expect(normalized.ok).toBe(true);
+    if (!normalized.ok) return;
+    expect(normalized.results[0]?.value).toBe(2);
+    expect(Number.isInteger(normalized.results[0]?.value as number)).toBe(true);
+    expect(normalized.results[0]?.probabilityDistribution["高"]).toBeCloseTo(0.6);
+    expect(normalized.results[0]?.probabilityDistribution["低"]).toBeCloseTo(0.1);
+  });
+
+  test("score の連続値は定義済み scale level へ正規化され、連続値のまま canonical result に残らない（TS-001）", () => {
+    const scale = ["低", "中", "高"];
+    const low = normalize([{ id: "q1", form: "score", prompt: "質問", scale }], { q1: { value: 0.31 } });
+    const mid = normalize([{ id: "q1", form: "score", prompt: "質問", scale }], { q1: { value: 1.25 } });
+    expect(low.ok).toBe(true);
+    expect(mid.ok).toBe(true);
+    if (!low.ok || !mid.ok) return;
+    expect(low.results[0]?.value).toBe(0);
+    expect(mid.results[0]?.value).toBe(1);
+    const values = [...low.results, ...mid.results].map((r) => r.value);
+    expect(values.every((v) => Number.isInteger(v))).toBe(true);
+  });
+
+  test("score の範囲外連続値は最近接水準へ飽和する（canonical result は scale 内の離散 level）", () => {
+    const normalized = normalize([{ id: "q1", form: "score", prompt: "質問", scale: ["低", "中", "高"] }], { q1: { value: 2.9 } });
+    expect(normalized.ok).toBe(true);
+    if (!normalized.ok) return;
+    expect(normalized.results[0]?.value).toBe(2);
+  });
+
+  test("score の正規化不能な値（欠落・非数・非有限）は黙示的な level 0 fallback せず response_invalid で拒否する", () => {
+    const scale = ["低", "中", "高"];
+    const missing = normalize([{ id: "q1", form: "score", prompt: "質問", scale }], {});
+    const notNumber = normalize([{ id: "q1", form: "score", prompt: "質問", scale }], { q1: { value: "高" } });
+    const nonFinite = normalize([{ id: "q1", form: "score", prompt: "質問", scale }], { q1: { value: Number.NaN } });
+    for (const result of [missing, notNumber, nonFinite]) {
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.kind).toBe("response_invalid");
+    }
+    if (!missing.ok) expect(missing.detail).toContain("not normalizable");
   });
 
   test("provider が返した confidence 生値は [0,1] に正規化される", () => {
-    const { confidence } = normalizeProviderResponse(
-      { state: "s", instructions: "i", questions: [{ id: "q1", form: "boolean", prompt: "質問" }] },
-      { requestedModel: "m", confidenceRaw: 1.7, answers: { q1: { value: 0.5 } } },
-    );
-    expect(confidence).toBe(1);
+    const normalized = normalize([{ id: "q1", form: "boolean", prompt: "質問" }], { q1: { value: 0.5 } }, 1.7);
+    expect(normalized.ok).toBe(true);
+    if (!normalized.ok) return;
+    expect(normalized.confidence).toBe(1);
   });
 
   test("confidence 生値が無い場合は confidence を返さない（確率分布から代替生成しない）", () => {
-    const { confidence } = normalizeProviderResponse(
-      {
-        state: "s",
-        instructions: "i",
-        questions: [
-          { id: "q1", form: "boolean", prompt: "質問1" },
-          { id: "q2", form: "boolean", prompt: "質問2" },
-        ],
-      },
-      { requestedModel: "m", answers: { q1: { value: 0.9 }, q2: { value: 0.7 } } },
+    const normalized = normalize(
+      [
+        { id: "q1", form: "boolean", prompt: "質問1" },
+        { id: "q2", form: "boolean", prompt: "質問2" },
+      ],
+      { q1: { value: 0.9 }, q2: { value: 0.7 } },
     );
-    expect(confidence).toBeUndefined();
+    expect(normalized.ok).toBe(true);
+    if (!normalized.ok) return;
+    expect(normalized.confidence).toBeUndefined();
   });
 });
 
@@ -164,7 +217,7 @@ describe("evaluateWithProvider", () => {
     questions: [{ id: "q1", form: "boolean", prompt: "質問1" }],
   };
 
-  function mockProvider(answers: Record<string, { value: boolean | string | number }>, overrides: Partial<JevProvider> = {}): JevProvider {
+  function mockProvider(answers: Record<string, { value: boolean | string | number | undefined }>, overrides: Partial<JevProvider> = {}): JevProvider {
     return {
       providerId: "mock",
       requestedModel: "mock/jev",
@@ -226,5 +279,17 @@ describe("evaluateWithProvider", () => {
       expect(result.failure.kind).toBe("server_error");
       expect(result.failure.retryable).toBe(false);
     }
+  });
+
+  test("score の正規化不能応答は response_invalid として構造化失敗になる（level 0 fallback なし）", async () => {
+    const scoreRequest: JevEvaluateRequest = {
+      state: "判断状態",
+      instructions: "評価指示",
+      questions: [{ id: "s1", form: "score", prompt: "水準はどれか", scale: ["低", "中", "高"] }],
+    };
+    const provider = mockProvider({ s1: { value: undefined } });
+    const result = await evaluateWithProvider(scoreRequest, { resolveProvider: () => provider });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.failure.kind).toBe("response_invalid");
   });
 });
