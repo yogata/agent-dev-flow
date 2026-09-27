@@ -1,7 +1,7 @@
 ---
 title: QG-4 で baseline object が参照不能な場合は原因調査3確認を前置し対策3系統から選定して解消する（detached worktree 再現の3点確認による pre-existing 分類を含む）
 created: 2026-09-27
-updated: 2026-09-27
+updated: 2026-09-28
 ---
 
 # QG-4 で baseline object が参照不能な場合は原因調査3確認を前置し対策3系統から選定して解消する（detached worktree 再現の3点確認による pre-existing 分類を含む）
@@ -17,6 +17,17 @@ baseline commit 参照不能を検知した場合は、対策を選定する前�
 1. (i) gc 到達性確認: 検証環境と main root の双方で baseline commit の到達性を確認する。object 存在は `git cat-file -e <sha>^{commit}`、到達経路は `git reflog` と `git log -g --all` で確認する。HEAD・reflog は worktree ごとに独立して保持されるため、per-worktree HEAD・reflog を含めて検証環境 worktree と main root の双方で確認する
 2. (ii) shallow / partial clone 状態確認: `git rev-parse --is-shallow-repository` と `.git/shallow` の有無で shallow clone かを確認する。partial clone は `git config extensions.partialclone` と `git config remote.origin.promisor` の設定有無で確認する
 3. (iii) fetch / refspec 反映状態確認: `git config remote.<remote>.fetch` の refspec が baseline commit を取得対象に含むかを確認し、fetch 実行前後で `git rev-parse --verify <sha>^{commit}` の成否変化を確認して、baseline commit が fetch 未反映かを判別する
+
+### shallow clone 状態の確定的再現手順（Windows 環境の等価手順）
+
+shallow clone クラスの確定的再現（`git clone --depth`、file:// URL）は、Windows 本環境では file:// transport における upload-pack 経由のローカル clone/fetch が "does not appear to be a git repository" で失敗する環境制約のため実行できない（適用環境条件: git 2.53.0.windows.3 実測。git 本体の不具合詳細は未特定）。この場合は次の等価手順へ読替える:
+
+1. `git init <作業ディレクトリ>` で空リポジトリを作成する
+2. `git fetch --depth=1 <file:// remote> <ref>` で shallow 取得する
+3. `git rev-parse --is-shallow-repository` が true を返すこと（および `.git/shallow` の存在）で shallow 状態を確認する
+4. shallow boundary より古い baseline commit の参照不能を `git rev-parse --verify <sha>^{commit}` の失敗で確認する
+
+等価手順は shallow 状態の確定的再現が目的であり、手順3・4 の shallow 確認を伴うことを手順に含める。
 
 ### 対策3系統の選定
 
@@ -63,6 +74,7 @@ merge 判断の blocker からの除外は、由来不明 0 件の確認後と�
 
 - REQ-007-013（baseline 比較に用いる baseline commit が検証環境から参照不能となる事象への原因調査前置と対策3系統選定）
 - Case #3158（case-close STEP-2、QG-4 フル suite 正規形）: IR-055 runtime-unresolved-reference delta 回帰テストが 1件 fail。baseline object `bac3ca4b...` が参照不能な一方テストは継続動作し、PR 変更対象外ファイル由来の検出 2件を報告。3点確認で pre-existing と分類し、QG-4 停止報告 1回のユーザー確認（再開条件充足と merge 継続指示）を経て merge 判断から除外した（PR #3160、check_integrity.test.ts、Issue #1782〔IR-055〕）。
+- Case #3177（case-run TS-001 原因クラス別再現、PR #3181）: 検証ラボ local origin に対する `git clone --depth`（file:// URL）が Windows 本環境（git 2.53.0.windows.3）で "does not appear to be a git repository" で失敗。`git init` + `git fetch --depth=1` の等価手順へ読替し、`git rev-parse --is-shallow-repository` = true と shallow boundary より古い baseline commit の参照不能を確認して TS-001 判別力検証を完了した。
 
 ## 関連知識
 
