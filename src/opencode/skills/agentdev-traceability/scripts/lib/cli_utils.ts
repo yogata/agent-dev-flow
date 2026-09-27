@@ -42,3 +42,11 @@ export function normalizeArtifactPath(artifact: string): string {
 export function resolveRoot(root: string): string {
   return resolve(root);
 }
+
+// --req 値のカンマ分割正規化。check.ts と同一ロジック（split(",")・trim・空要素除去）。
+export function parseReqIds(value: string): string[] {
+  return value
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+}

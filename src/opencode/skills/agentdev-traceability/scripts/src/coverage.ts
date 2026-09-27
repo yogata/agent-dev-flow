@@ -2,11 +2,37 @@
 //
 // 使い方:
 //   bun scripts/src/coverage.ts --root <repo-root> --req REQ-{NNNN}-{MMM}
+//   bun scripts/src/coverage.ts --root <repo-root> --req REQ-{NNNN}-{MMM},REQ-{NNNN}-{MMM}   # 各 reqId の照合結果を指定順で連結
 //   bun scripts/src/coverage.ts --root <repo-root> --artifact src/example.md
 
-import { fail, emitJson, normalizeArtifactPath, parseArgs, resolveRoot } from "../lib/cli_utils.ts";
+import { fail, emitJson, normalizeArtifactPath, parseArgs, parseReqIds, resolveRoot } from "../lib/cli_utils.ts";
 import { locateEvidence, scanCorpus } from "../lib/corpus.ts";
-import { coverageByArtifact, coverageByRequirement } from "../lib/query.ts";
+import type { CoverDeclaration } from "../lib/declarations.ts";
+import { coverageByArtifact, coverageByRequirement, type CoverageByRequirement } from "../lib/query.ts";
+
+// 複数 reqId 指定時は各 reqId 個別の照合結果の連結（指定順）。検出ロジック自体は
+// coverageByRequirement（単数照合）を再利用する。
+function coverageByRequirementList(
+  declarations: readonly CoverDeclaration[],
+  reqIds: readonly string[],
+): CoverageByRequirement {
+  const results = reqIds.map((id) => coverageByRequirement(declarations, id));
+  const relations = results.flatMap((r) => r.relations);
+  return {
+    mode: "requirement",
+    reqId: reqIds.join(","),
+    relations,
+    counts: {
+      decision: results.reduce((acc, r) => acc + r.counts.decision, 0),
+      design: results.reduce((acc, r) => acc + r.counts.design, 0),
+      implementation: results.reduce((acc, r) => acc + r.counts.implementation, 0),
+      verification: results.reduce((acc, r) => acc + r.counts.verification, 0),
+      total: relations.length,
+    },
+    truncated: false,
+    emptyResult: relations.length === 0,
+  };
+}
 
 const args = parseArgs(process.argv.slice(2));
 const rootValue = args.get("root");
@@ -19,7 +45,12 @@ if (reqId && artifact) fail("--req と --artifact は同時に指定できませ
 
 if (reqId) {
   const scan = scanCorpus(root);
-  emitJson(coverageByRequirement(scan.declarations, reqId));
+  const reqIds = parseReqIds(reqId);
+  emitJson(
+    reqIds.length > 0
+      ? coverageByRequirementList(scan.declarations, reqIds)
+      : coverageByRequirement(scan.declarations, reqId),
+  );
 } else {
   const normalized = normalizeArtifactPath(artifact!);
   const evidence = locateEvidence(root, normalized);
