@@ -121,7 +121,7 @@ IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 か
 
 ### IR-019, IR-022, IR-026, IR-036: inspect-docs 移管（retired REQ-028-007（後継は DEC-006/REQ-036 系）、OU-006 Phase 5）
 
-> **docs-check 除外・inspect-docs 移管（2026-08-11）**: 4件の意味判断系 IR を docs-check（機械検出層）から除外し、inspect/diagnostics 層（`/agentdev/inspect-docs`、`/agentdev/inspect-skills`、`agentdev-doc-writing` skill）へ移管した（retired REQ-028-007（後継は DEC-006/REQ-036 系）、Phase 3 §5.2、§4.3）。
+> **docs-check 除外・inspect-docs 移管（2026-08-11）**: 4件の意味判断系 IR を docs-check（機械検出層）から除外し、inspect/diagnostics 層（`/agentdev/inspect-docs`、`/agentdev/inspect-skills`）へ移管した。文意品質の意味診断は docs 横断診断・inspect 系診断が、文章表層品質は textlint 共通基盤が担う（retired REQ-028-007（後継は DEC-006/REQ-036 系）、Phase 3 §5.2、§4.3）。
 > 意味判断・文脈判断を必要とする検査は機械検出層が保持せず、意味的診断層が担う（3層検出構造、`integrity-contracts.md`「3層検出構造の責務分担」）。
 > catalog↔実装双方向同期運用手順（REQ-010-003）に従い、当該 IR エントリを物理削除した。
 
@@ -136,7 +136,7 @@ IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 か
 
 ### IR-045: （削除）docs 日本語表現、文意整合検査
 
-> **削除済み（REQ-010-003、REQ-036-023）**: IR-045 の検査は docs-check の機械検出対象から除外し、`agentdev-doc-writing` スキル配下へ移譲した。
+> **削除済み（REQ-010-003、REQ-036-023）**: IR-045 の検査は docs-check の機械検出対象から除外し、文意品質の意味診断は docs 横断診断・inspect 系診断（`agentdev-doc-diagnostics`、`agentdev-inspect-skills`）、文章表層品質は textlint 共通基盤（`agentdev-textlint-guard`）へ移管した。
 > docs-check は意味判断を要する文意整合検査を保持しない（機械化原則 REQ-010-003、REQ-036-008）。
 > catalog↔実装双方向同期運用手順（REQ-010-003）に従い baseline_status: resolved の上で本エントリを削除した。
 > IR-045 識別子は `vocabulary-registry.md`「文意品質検出対象語（IR-045）」で文意品質検出対象語の参照として残る。

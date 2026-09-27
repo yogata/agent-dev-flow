@@ -31,7 +31,7 @@ repo-agentdev-integrity は repo-local スキル（配布対象外）である�
 
 ## IR-045 文意品質検出対象語の移管状態（ACT-SPEC-007、retired REQ-028-007（後継は DEC-006/REQ-036 系））
 
-IR-045（docs 日本語表現、文意整合検査）は REQ-010-003、REQ-036-023 により docs-check 機械検出対象から除外し、`agentdev-doc-writing` スキル配下へ移譲済みである。
+IR-045（docs 日本語表現、文意整合検査）は REQ-010-003、REQ-036-023 により docs-check 機械検出対象から除外した。文意品質の意味診断は docs 横断診断・inspect 系診断（`agentdev-doc-diagnostics`、`agentdev-inspect-skills`）が、文章表層品質は textlint 共通基盤（`agentdev-textlint-guard`）が担う。
 catalog-only tombstone として管理され、本 Design では文意品質検出対象語の参照として保持する。
 
 移管対象語（`read-only`、`read-only-diagnostic`、`advisor`/`advisory`、`architecture-affecting`、`Architecture advisory gate` 等）の対照表は repo-local 参照ファイル `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md`「文意品質検出対象語（IR-045）」節が正である。

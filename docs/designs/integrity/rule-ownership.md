@@ -181,7 +181,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-071 | integrity-rule-related-req-existence | REQ-051-009 | ../integrity-rule-catalog.md, ../checker-execution-contracts.md |
 <!-- AUTOGEN:END -->
 
-> **IR-019, IR-022, IR-026, IR-036 について（2026-08-11 移管）**: 4件の意味判断系 IR は docs-check 機械検出層から除外し、inspect/diagnostics 層（`/agentdev/inspect-docs`、`/agentdev/inspect-skills`、`agentdev-doc-writing` skill）へ移管した（retired REQ-028-007、DEC-006、Phase 3 §5.2）。
+> **IR-019, IR-022, IR-026, IR-036 について（2026-08-11 移管）**: 4件の意味判断系 IR は docs-check 機械検出層から除外し、inspect/diagnostics 層（`/agentdev/inspect-docs`、`/agentdev/inspect-skills`）へ移管した（文意品質の意味診断は docs 横断診断・inspect 系診断が、文章表層品質は textlint 共通基盤が担う。retired REQ-028-007、DEC-006、Phase 3 §5.2）。
 > 詳細は `integrity-rule-catalog.md`「IR-019, IR-022, IR-026, IR-036: inspect-docs 移管」節を参照。
 
 ## 重複ルールの解消状況
