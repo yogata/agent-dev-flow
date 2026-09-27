@@ -68,3 +68,19 @@
 - **想定反映先**: AGENTS.md 編集規律（edit ツール優先節の補足）、または agentdev-git-worktree reference worktree-operations.md「書込み guard 運用指針」節の補足
 - **関連**: Root Case Issue #3193、Definition PR #3196、docs/designs/responsibilities/req-impact-map.md
 - **タグ**: `#edit-tool` `#textlint-guard` `#fail-closed`
+
+## 並行 case-ready 間で git rm のステージが並走プロセスの git commit に混入し、コミットメッセージと削除内容が不一致になり得る
+
+- **問題事象**: case-ready STEP-7（Case #3186）で `.agentdev/backlog/req-units/RU-0001.md` を git rm してステージした直後、並走 Case #3189 の case-ready が実行した commit（841a0c6f「chore(agentdev): remove consumed RU-0012 and draft after case-ready (Case 3189)」）に、本 Case のステージ済み RU-0001.md 削除（37 行）が混入した。コミットメッセージは Case 3189 のみを示すが RU-0001.md（Case #3186 分）の削除を含む不一致状態となった
+- **発生局面**: case-ready lifecycle STEP-7 の draft / RU 削除と git 永続化（並行 7 Case 実行中。共有 working tree の main）
+- **検知方法**: push 前の git log --stat 確認で 841a0c6f の変更一覧に自 Case 分の RU-0001.md 削除が含まれることを検出（git status ではステージ消失として現れる）
+- **根本原因**: git commit はインデックス全体をコミットする。明示パス指定の git rm でも、commit 側をパス限定しない限り、rm と commit の間に並走プロセスの commit が割り込むと自 Case のステージが他 Case のコミットへ取り込まれる
+- **自律対応内容**: RU-0001.md 削除内容自体は本 Case の正規 STEP-7 作業どおりであり、混入コミットの amend（履歴書き換え）は並走 Case の push と競合するリスクが上回ると判断して混入のまま push し、本学びで記録。Root Case 完了報告にも混入経緯を記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（運用規律の補完要求は intake 管理候補）
+- **横展開観点**: draft / RU 削除の git 永続化を行う全工程（case-ready STEP-7、case-close の capture 永続化等）。共有 working tree の main で commit する並行 workflow 間で共通の競合様式
+- **再発条件**: 共有 working tree の main 上で複数プロセスが git rm（ステージ作成）→ git commit（無パス指定）を実行し、rm と commit の間に他プロセスの commit が割り込んだ場合
+- **予防策候補**: 削除の永続化は git rm <path> と git commit -- <path>（明示パス指定 commit）を連続実行で行う、または commit 前に git status --short でステージ全体を確認し自 Case 分以外のステージが存在すれば commit を待機して再確認する
+- **想定反映先**: agentdev-workflow-case-ready reference readiness-and-cleanup.md「draft / RU 削除」節、agentdev-git-worktree reference worktree-operations.md「並列実行安全ステージング」関連節
+- **関連**: Root Case Issue #3186、Definition PR #3188、並走 Case #3189（commit 841a0c6f）
+- **タグ**: `#git` `#parallel-case-ready` `#stage-race`
