@@ -194,3 +194,37 @@
 - **想定反映先**: src/opencode/skills/agentdev-workflow-case-ready/references/readiness-and-cleanup.md（STEP-7 前置ガード）、agentdev-workflow-case-open の worktree 隔離運用、learning-promote での docs/knowledge/ 知識化判定対象
 - **関連**: Case #3169、PR #3170
 - **タグ**: #case-ready #git-worktree #branch-conflict #persistence
+
+---
+
+## agentdev-traceability coverage.ts の --req 複数行カンマ指定は実測で emptyResult を返し、単体（1行）実行の繰返しが実効手段になる
+
+- **問題事象**: `bun src/opencode/skills/agentdev-traceability/scripts/src/coverage.ts --root <repo-root> --req REQ-090-014,REQ-090-015` のカンマ指定（2行）で relations 空かつ emptyResult: true を返した。単体指定（REQ-090-014 のみ）では design 1件・implementation 2件を正しく返す。カンマ指定3行（REQ-090-012,REQ-090-014,REQ-090-015）でも同様に空
+- **発生局面**: case-open（内部 lifecycle 段階）STEP-3 の意味変更行 design 対応事前確認（REQ-090-012/014/015 の coverage --req 実査）。運用
+- **検知方法**: カンマ指定の結果（design 0・emptyResult）と単体指定の結果（design 1）の矛盾。scripts/README.md は「--req は要件行ID（REQ-{NNNN}-{MMM}）の個別カンマ指定のみを受理する」と記述しており、カンマ指定が期待動作のはずが実測では機能しない
+- **根本原因**: 実装（coverage.ts）が --req 値をカンマ split せず入力文字列全体を単一 reqId として扱っている可能性（実装本体は未確認・挙動は repo root 実測）。README 文言と実装の不一致
+- **自律対応内容**: 対象行3つを単体実行（3回）に分解して design 対応事前確認（custom-tool-contracts.md design 1件×3）を完了した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（呼出側の知見補完）
+- **横展開観点**: coverage / impact / check の3 CLI が共通 argv 解析（cli_utils.ts）を共有するため、coverage だけでなく impact・check の --req 複数指定も同じ挙動になり得る。README の文言を鵜呑みにせず、複数行指定の初回は単体実行で結果を cross-check するのが安全
+- **再発条件**: scripts/README.md のカンマ指定文言を信頼して coverage / impact / check を複数行指定で呼出す場合
+- **予防策候補**: (1) 実装へカンマ split を追加する、または README 文言を実装実態（単一 reqId のみ）へ修正する。どちらかを coverage 3 CLI で統一
+- **想定反映先**: src/opencode/skills/agentdev-traceability/scripts/README.md（I/O 契約の文言修正候補）、scripts/lib/cli_utils.ts（argv 解析）、case-open / case-ready の design 対応事前確認手順（単体実行を既定とする記述）
+- **関連**: Case #3171
+- **タグ**: `#traceability` `#coverage` `#cli-contract` `#case-open`
+
+## session 由来 RU の frontmatter が REQ-008-051 必須フィールド規律から逸脱する（generation_stage 不正値・generation_actor 欠落）
+
+- **問題事象**: session 由来の RU-0154 の frontmatter が `generation_stage: supervisor-session`（規定値 pre-req-define でない値）を持ち、`generation_actor` を欠く。session由来RU の frontmatter 必須フィールド（REQ-008-051）と一致しない
+- **発生局面**: case-open（内部 lifecycle 段階）への投入前の draft（req-draft-jev-semantic-eval-contract-hardening.md）準備時の RU-0154 frontmatter 確認。req-define 下流工程での発見。運用
+- **検知方法**: review_dispositions 作成時の RU frontmatter 実査（REQ-008-051 との突合）
+- **根本原因**: producer 側（session 内での RU 生成手順）が REQ-008-051 の必須フィールド規律に従っていない。RU 生成入口に frontmatter 必須フィールドの検証ゲートが存在しない
+- **自律対応内容**: review_dispositions RD-002 として not_applicable / out_of_scope（producer 側の契約逸脱で本 draft の要件対象外）で合意済み。恒久証跡は Root Case #3171 のレビュー判断セクションへ転記済み
+- **ユーザー確認有無**: あり（req-define の adversarial-review・STEP-10 提示経由で合意済み）
+- **Decision/REQ/spec影響**: なし（本 Case の対象外と合意。RU 生成手順の改善候補として記録）
+- **横展開観点**: session 由来 RU（backlog-review を経由しない direct 生成）は backlog-review 経由 RU と異なり frontmatter 品質の検証経路を持たない。REQ-008-051 追随チェックを RU 生成手順または req-define 入口の前置確認に組込む必要性
+- **再発条件**: session 内で REQ-008-051 の frontmatter 規律を参照せずに RU を直接生成する場合
+- **予防策候補**: session 由来 RU 生成時の frontmatter 必須フィールド検証（generation_stage 規定値・generation_actor 必須）を生成手順へ明文化する
+- **想定反映先**: agentdev-backlog-integration（session 由来 RU の生成基準）、REQ-008-051 の運用整備候補
+- **関連**: Case #3171、RU-0154
+- **タグ**: `#ru-frontmatter` `#req-008-051` `#session-sourced-ru` `#case-open`
