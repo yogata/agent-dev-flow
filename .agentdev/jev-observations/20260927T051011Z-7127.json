@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260927T051011Z-7127",
+  "workflow": "case-ready",
+  "evaluationKind": "execution-structure-standard-epic-3axis",
+  "subject": "Case #3169 delete-branch-on-merge-delegation の Standard/Epic 確定（OU-001 単独根）",
+  "sourceRevision": "98cfda6cdae0e8faca76736294fcd3774bd7837b",
+  "durationMs": 824,
+  "inputs": {
+    "requestDigest": "f00d495f64ec197149a4ea6a4a62cb5ef54eac89e2cc6c1ec88a05ee88911249"
+  },
+  "failure": {
+    "kind": "network_error",
+    "detail": "GatewayInternalServerError: Free tier users do not have access to this model. Upgrade to paid credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up for unrestricted access."
+  }
+}

@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は34件、提案中の Decision は1件である。
+現行の承認済み Decision は35件、提案中の Decision は0件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -58,7 +58,7 @@
 | DEC-042 | case-auto 最大並列維持と同期逐次フォールバック禁止 | accepted | 2026-09-24 |
 | DEC-043 | case-ready 実行構造判断への Jev 最終判断採用（Stage 2: 閾値ルーティング） | superseded | 2026-09-26 |
 | DEC-044 | Semantic Evaluation 観測契約の一次事実中心再設計と基本判断経路への復帰 | accepted | 2026-09-26 |
-| DEC-045 | リモートブランチ削除の GitHub 自動削除への委譲と deleteBranchOnMerge 設定前提の必須化 | proposed | 2026-09-27 |
+| DEC-045 | リモートブランチ削除の GitHub 自動削除への委譲と deleteBranchOnMerge 設定前提の必須化 | accepted | 2026-09-27 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -105,12 +105,12 @@
 - [DEC-041](DEC-041.md)（Wave 構成純度と実行並列上限の単一所有）
 - [DEC-042](DEC-042.md)（case-auto 最大並列維持と同期逐次フォールバック禁止）
 - [DEC-044](DEC-044.md)（Semantic Evaluation 観測契約の一次事実中心再設計と基本判断経路への復帰）
+- [DEC-045](DEC-045.md)（リモートブランチ削除の GitHub 自動削除への委譲と deleteBranchOnMerge 設定前提の必須化）
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
-- [DEC-045](DEC-045.md)（リモートブランチ削除の GitHub 自動削除への委譲と deleteBranchOnMerge 設定前提の必須化）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
