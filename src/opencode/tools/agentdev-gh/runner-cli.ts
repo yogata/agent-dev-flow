@@ -192,7 +192,7 @@ export class CliRunner implements GhRunner {
   /**
    * exec 応答からの失敗 reply 生成。gh の終了コード、stderr の空・非空、
    * spawnSync エラー種別を detail に含め、環境起因失敗の識別に役立てる
-   * （REQ-093-003）。失敗分類の値域は変更しない。
+   * 失敗分類の値域は変更しない。
    */
   private failFromExec(r: RawReply): GhRunnerReply {
     if (r.status === null) {
