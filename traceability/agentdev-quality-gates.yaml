@@ -12,3 +12,8 @@ implementation:
     - REQ-060-005
     - REQ-060-006
     - REQ-018-005
+  docs/knowledge/qg4-baseline-detached-worktree-reproduction.md:
+    - REQ-007-013
+verification:
+  docs/knowledge/qg4-baseline-detached-worktree-reproduction.md:
+    - REQ-007-013
