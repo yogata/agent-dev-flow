@@ -13,7 +13,7 @@ case-run は AGENTS.md で選定された外部実行基盤のエージェント
 
 - [起動方式（委譲）](#起動方式委譲)
 - [worktree 取り扱い](#worktree-取り扱い)
-- [並行 Case 委譲の作業隔離（REQ-030-017）](#並行-case-委譲の作業隔離req-030-017)
+- [並行 Case 委譲の作業隔離](#並行-case-委譲の作業隔離)
 - [PR 作成と URL 受領](#pr-作成と-url-受領)
 - [result 受領](#result-受領)
 - [evidence 確認](#evidence-確認)
@@ -48,9 +48,9 @@ case-run は実行担当サブエージェントを委譲起動する。
 - case-run が委譲の prompt 内で worktree root（`.worktrees/{N}-{type}/`）を相対パスで明示的に指定する。メインリポジトリパスは渡さない
 - 実行担当サブエージェントは worktree 内で作業する。ランタイム作業領域（実行監査トレイル等）は worktree 配下に作成され、AgentDevFlow 側は関与しない。worktree 削除時にランタイム作業領域も破棄される（永続状態として扱わない）
 
-## 並行 Case 委譲の作業隔離（REQ-030-017）
+## 並行 Case 委譲の作業隔離
 
-並行して複数 Case を委譲実行する場合（case-auto orchestration stage 3 の Wave 並列、Standard Issue 並列等）の作業隔離 protocol。REQ-030-017 の正規所有は case-open Design「並行 case-open の作業隔離規律（REQ-030-017）」節であり、本節は委譲実行者（実行担当サブエージェント）が従う旨の protocol を定める。遵守違反時の result 処理は `agentdev-case-run-execution-adapter` SKILL.md「worktree 隔離の遵守」節に従う。
+並行して複数 Case を委譲実行する場合（case-auto orchestration stage 3 の Wave 並列、Standard Issue 並列等）の作業隔離 protocol。当該規律の正規所有は case-open Design の並行 case-open 作業隔離規律節であり、本節は委譲実行者（実行担当サブエージェント）が従う旨の protocol を定める。遵守違反時の result 処理は `agentdev-case-run-execution-adapter` SKILL.md「worktree 隔離の遵守」節に従う。
 
 - **専用 worktree**: 実行担当サブエージェントは引き渡された worktree root 配下でのみ作業する。メインリポジトリ、他 Case の worktree、共有 working tree は使用しない
 - **明示パスステージ**: 変更のステージは明示パス指定で行い、スイープ操作（`git add -A` 等）は行わない
