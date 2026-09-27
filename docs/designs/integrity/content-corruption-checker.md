@@ -125,6 +125,17 @@ CJK 統合漢字は `foreign-script` の対象外としつつ、簡体字専用�
 導入時点で許容例列挙は空である。
 現行配布 corpus には異言語文字・不可視文字・制御文字が存在しないことを導入時の実走査（配布物 230 ファイル、findings 0 件）で確認済みである。
 
+Case #3166（RA-007）で docs/designs 走査対象追加に伴い、実 corpus から file×rule 単位の許容例 7 エントリを登録した。
+rationale はいずれも例示由来（検出ルール自体が破損形・異字形を例として列挙する Design / ルール定義の記述）であり、正本は checker 実装の `ALLOWED_USAGE` 配列（file×rule・rationale 完備）とする:
+
+- docs/designs/integrity/content-corruption-checker.md × simplified-chinese: 簡体字検出シグナル自体が簡体字形（状态・含义等）を実例として列挙する Design 記述
+- docs/designs/integrity/content-corruption-checker.md × broken-code-span: inline backtick ラン検出ルールの記述がバッククォート1文字の形式を例示する Design 記述
+- docs/designs/integrity/integrity-contracts.md × broken-code-span: コードブロック検出平面の説明表でバッククォート3連（code fence）記法を例示
+- docs/designs/integrity/rules/IR-052-completion-grep-pattern-design.md × broken-code-span: コードブロック内検出対象の説明表でバッククォート3連（code fence）記法を例示
+- docs/designs/integrity/rules/IR-064-unresolved-placeholder.md × broken-code-span: 検出対象外（code block 囲み内）の説明でバッククォート3連（code fence）記法を例示
+- docs/designs/integrity/rules/IR-066-legacy-path-removed-name.md × stale-reference: REQ-0108-NNN 旧ナンバリング検出ルール自体が旧形式を実例として列挙するルール定義
+- docs/designs/integrity/rules/IR-069-req-number-gap-recorded.md × stale-reference: 採番例外記録の文脈で旧ナンバリング REQ-0108-194 を歴史的根拠として引用
+
 追加運用:
 許容例を追加する場合は、対象ファイル・rule_id・根拠（意図的使用の理由）を本節に追記した上で checker の列挙に反映する。
 許容例の追加は REQ-010-068 の回帰テスト（許容例 fixture）の更新を伴う。

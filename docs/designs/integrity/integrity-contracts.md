@@ -364,7 +364,9 @@ baseline は `.opencode/skills/repo-agentdev-integrity/baselines/ir-055-baseline
 
 ### IR-055 warning 総数 ratchet（full-audit 契約）
 
-full-audit 実行時（docs-check 全量検査）、実行時に観測される IR-055 warning の総数（baseline-known と新規の区別なし。applyNgBaseline による demote 前の総数）が baseline の `warning_total_cap` を超える場合は fail する。
+full-audit 実行時（docs-check 全量検査）、実行時に観測される IR-055 warning の総数が baseline の `warning_total_cap` を超える場合は fail する。
+計上対象の定義は「exemptions 適用後・applyNgBaseline による demote 前の全カテゴリ warning level findings 総数（baseline-known と新規の区別なし）」であり、runtime 契約として固定する（Case #3166）。
+初回 cap は本定義による実測 50 で確定した（Case #3166 の全変更適用後の demote 前総数と一致）。
 cap は純減方向のみ更新可能とし、増加は `--raise-warning-cap` 明示フラグ（実行ログへの明記を伴う）経由の更新のみ許可する（正統な新規残存の受入れ手順として機能させる）。
 これにより `--update-ir055-baseline` による heuristic 違反の自動取り込み（意図的残存分類）で警告総数が静かに増加する構造を封じ、棚卸し周期の機械化（絶対数検知）を実現する。cap の比較対象は demote 前の総数のため、baseline 再生成で警告が取り込まれても総数増加が検知される。
 
@@ -376,6 +378,8 @@ IR-055 warning のうち意味検証済みの正当な warning（例: accepted-a
 - loader は schema 違反の entry を fail として扱う
 - 免除された warning は恒久免除表示となり、baseline（未解決債務）の count に含めない。これにより「正当は免除・不正は純減」の分離を機械保証し、baseline は債務追跡に専念させる
 - 免除対象警告が ng-baseline.json の bucket を持つ場合は同時に prune し、恒久免除と baseline-known demote の二重適用を生じさせない
+- entry match 条件: `rule_id` は check 名と一致させ、`file`・`evidence` を指定した場合は観測された warning の file/evidence との同一性一致を必須とする。`file`・`evidence` が null の entry は当該 check 名に一致する警告の全体免除を意味する
+- 適用順序の構造保証: exemptions 適用は ng-baseline 適用（applyNgBaseline による demote）より前に実行される。免除された warning は info 化のうえ ng-baseline 対象外となるため、恒久免除と baseline-known demote の二重計上は構造的に発生しない（Case #3166 で runtime 契約として確定）
 
 ## NG baseline 運用手順（全カテゴリ strict pass、v2:REQ-0161-005 統合）
 
