@@ -119,7 +119,7 @@ learning/intake 成果物から後続工程（RU、req-define、case-ready / cas
 | REQ影響の有無 | 既存REQ への影響有無 |
 | 対象ステークホルダー | 変更が影響するステークホルダー |
 | 利用者から見える変更の有無 | 利用者から観測可能な変更か否か |
-| Design論理区分 | 挙動Design/カタログDesign/横断契約Design/パラメータDesign/実装詳細Design のいずれか |
+| Design論理区分 | 挙動Design/カタログDesign/横断契約Design/パラメータDesign/実装詳細Design のいずれか（定義の正は文書モデル Design「Design 論理区分（5区分）」節） |
 | 正規所有対象 | 対象 command、skill、workflow、品質ルール、整合性ルール等 |
 | 追記先を選択した理由 | 当該追記先を選んだ根拠 |
 | 根拠となる観測事実 | 変更が必要となった観測事実（CI 失敗、誤検出、エッジケース発見等） |
