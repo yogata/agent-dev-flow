@@ -126,7 +126,7 @@ req-define は次の7項目を判定し、`artifact_actions`、`operation_units`
 | 既存REQ が要求を既に保持しているか | 同一関心が既存REQ に存在するか |
 | 利用者から見える外部契約が変わるか | 外部契約変更（change_nature: `external_contract_change`）に該当するか |
 | REQ の作成・更新が必要か | 上記3項目から REQ 作成・更新要否を確定 |
-| Design の論理区分 | v2:REQ-0155-009 の5区分（挙動Design、カタログDesign、横断契約Design、パラメータDesign、実装詳細Design）のいずれか |
+| Design の論理区分 | 文書モデル Design「Design 論理区分（5区分）」節の5区分（挙動Design、カタログDesign、横断契約Design、パラメータDesign、実装詳細Design）のいずれか |
 | 正規所有者 | 対象 command、skill、workflow、品質ルール、整合性ルール等の関心キー（REQ-082-009） |
 | 正規追記先 | 既存 Design のどの領域へ追記するか（target_area、target_design） |
 
