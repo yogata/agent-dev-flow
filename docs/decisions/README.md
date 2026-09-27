@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は34件、提案中の Decision は0件である。
+現行の承認済み Decision は34件、提案中の Decision は1件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -58,6 +58,7 @@
 | DEC-042 | case-auto 最大並列維持と同期逐次フォールバック禁止 | accepted | 2026-09-24 |
 | DEC-043 | case-ready 実行構造判断への Jev 最終判断採用（Stage 2: 閾値ルーティング） | superseded | 2026-09-26 |
 | DEC-044 | Semantic Evaluation 観測契約の一次事実中心再設計と基本判断経路への復帰 | accepted | 2026-09-26 |
+| DEC-045 | リモートブランチ削除の GitHub 自動削除への委譲と deleteBranchOnMerge 設定前提の必須化 | proposed | 2026-09-27 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -109,6 +110,7 @@
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
+- [DEC-045](DEC-045.md)（リモートブランチ削除の GitHub 自動削除への委譲と deleteBranchOnMerge 設定前提の必須化）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -254,6 +256,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-042 | [REQ-031](../requirements/REQ-031.md), [REQ-034](../requirements/REQ-034.md) | case-auto 最大並列維持と同期逐次フォールバック禁止（REQ-034-025/028 意味変更・REQ-034-044/045 APPEND、REQ-031-030 UPDATE と整合） |
 | DEC-043 | [REQ-090](../requirements/REQ-090.md) | - |
 | DEC-044 | [REQ-090](../requirements/REQ-090.md), [REQ-091](../requirements/REQ-091.md) | - |
+| DEC-045 | [REQ-032](../requirements/REQ-032.md), [REQ-009](../requirements/REQ-009.md), [REQ-030](../requirements/REQ-030.md) | - |
 <!-- AUTOGEN:END -->
 
 ## 過去版の履歴基盤
