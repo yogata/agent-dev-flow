@@ -276,3 +276,19 @@
 - **想定反映先**: 委譲内 code review 観点（case-run execution adapter）、REQ-090 系の後続 Case
 - **関連**: Case #3171、PR #3174、commit 76e676bc、src/opencode/tools/agentdev-jev/observation.ts
 - **タグ**: `#validation-bypass` `#score-discretization` `#code-review` `#jev`
+
+## GitHub search API の index 遅延で issue_list が作成直後の Issue を 0件帰着させる
+
+- **問題事象**: agentdev_gh issue_list（search「REQ-093」・state open・role case）が、直前に作成した Root Case #3175（title に「REQ-093」を含む）を返さなかった（ok: true・0件帰着）。search「REQ」「agentdev」でも同様に 0件。一方 gh CLI 読み取り専用 contingency（gh issue list --json）では未クローズ Case 3件（#3175・#3176・#3177）が即時取得できた
+- **発生局面**: case-open STEP-5 冪等検出・横断依存検査の未クローズ Case 群取得。Case #3175、main worktree 環境
+- **検知方法**: issue_list 0件帰着と Issue 存在（issue_read #3175 成功・gh issue list 3件）の矛盾の突合
+- **根本原因**: GitHub search API（search/issues）の index は Issue 作成直後の反映に遅延がある。agentdev_gh issue_list の search は GitHub search API へ推送されるため、作成直後の Issue は search で検出されない時間窓が存在する。Tool 側は 0件帰着を ok: true の成功応答として返すため、不存在と失敗・遅延を区別できない
+- **自律対応内容**: 読み取り専用 contingency（gh issue list --json、definition-pr-and-idempotency.md「GitHub I/O 失敗時の gh CLI 切替継続手順」の切替基準に準拠・1回の再試行では解決しない index 遅延のため読み取り専用切替で補完）で未クローズ Case 群を取得し、横断検査の検出源を補完。切替後も冪等キー基準は変更せず、切替理由・使用コマンド・検出結果を検証記録へ残した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（運用 contingency の実観測。REQ-092 の search 規律は不変）
+- **横展開観点**: 冪等検出・横断検査に限らず、search 依存の全操作（REQ-092 の issue_list 規律を含む）で「作成直後の Issue が search 不能になる」時間窓が存在する。0件帰着を「不存在」と即断しない補完検出（issue_read 直参照・gh issue list）の併用観点は、REQ-093-001 の known-issues 節整備（Case #3175 の実装対象）に直接関連する実観測
+- **再発条件**: Issue/PR 作成直後に search で同一・関連 Issue を再検出する場合（冪等検出・横断検査・重複確認・自己参照値の埋め戻し確認）
+- **予防策候補**: search 0件帰着時に (1) 対象候補の issue_read 直参照、(2) gh issue list による読み取り専用補完のいずれかで不存在を二重確認する手順を known-issues へ記録する。search index 反映待ちの sleep ポーリングは非効率のため推奨しない
+- **想定反映先**: src/opencode/skills/agentdev-issue-management/references/issue-operation-safety.md（known-issues 節・REQ-093-001 整備時の記録候補）、agentdev-issue-tracking 運用知識
+- **関連**: Case #3175、PR #3178、REQ-092（issue_list search 規律）、.opencode/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md「GitHub I/O 失敗時の gh CLI 切替継続手順」節
+- **タグ**: `#github-search-index-lag` `#issue-list-empty-result` `#contingency` `#case-open` `#gh-cli-readonly`
