@@ -144,3 +144,37 @@
 - **想定反映先**: check_content_corruption.test.ts 等の可変 export 配列 fixture を持つテスト群、テスト fixture パターンの知識化候補
 - **関連**: Case #3166、PR #3168 本文 Findings / Capture候補
 - **タグ**: `#bun-test` `#fixture-restoration` `#test-pattern`
+
+---
+
+## REQ 行追加を伴う Definition 変更では AUTOGEN 派生物（REQ 行数メトリクス・Decision 索引）が必ず陳腐化する — check 実測の直後に generate_indexes.ts 再生成を手順に組み込む
+
+- **問題事象**: REQ 3行 append・Decision 1件新規作成を含む Definition 変更（Case #3169）で、check_integrity（index-generation-consistency NG 6件）と check_autogen_freshness（鮮度違反 2ブロック）が検出した。REQ 行数メトリクス（req-health-metrics.md の REQ-009 行数 51→52）、Decision 索引（docs/README.md・docs/decisions/README.md の DEC-045 追加）が REQ 行追加のみで自動追随せず、generate_indexes.ts 再生成が未実行のまま検査すると必ず失敗する
+- **発生局面**: case-open（case-auto orchestration stage 1 委譲）STEP-4 の「期待値確定前の branch HEAD 実測」check_integrity・check_autogen_freshness 実行時
+- **検知方法**: check_integrity の `[NG] index-generation-consistency` 6件（expected 差分に DEC-045 行・REQ-009 行数 52 と明示）と check_autogen_freshness の RENAME/CONTENT_CHANGE 報告
+- **根本原因**: REQ 行追加と Decision 新規作成は AUTOGEN ブロック（README 索引・行数メトリクス）の入力源を変えるが、definition-pr-and-idempotency.md の branch HEAD 実測手順は再生成実行を明示しておらず、変更作業と再生成の順序が手順上明文化されていない
+- **自律対応内容**: `bun .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts` を実行して docs/README.md・docs/decisions/README.md・docs/designs/quality/req-health-metrics.md を再生成し、同一 commit に含めた。再実行で check_integrity（ng 0 / warning 0 / info 126・新規 unmanaged NG 0 件）と check_autogen_freshness（0 件）が合格
+- **ユーザー確認有無**: なし（派生物の鮮度維持であり、要件内容の変更を伴わない）
+- **Decision/REQ/spec影響**: なし（運用手順の知見。definition-pr-and-idempotency.md の branch HEAD 実測手順への再生成明示は将来の改善候補）
+- **横展開観点**: REQ 行追加・Decision 追加・REQ ファイル行数を計上するメトリクス変更を含む全 Definition PR に適用。case-ready 受入時の check_integrity でも同様に失敗し得るため、PR 作成前に再生成して解消しておくのが安全
+- **再発条件**: REQ 行追加または Decision 追加を含む Definition 変更を generate_indexes.ts 再生成なしで commit する場合
+- **予防策候補**: STEP-4 変更手順に「REQ 行・Decision 変更後、check 実測前に generate_indexes.ts 再生成」を明文化
+- **想定反映先**: src/opencode/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md（実測手順の順序明示）、learning-promote での docs/knowledge/ 知識化判定対象
+- **関連**: Case #3169、PR #3170
+- **タグ**: `#case-open` `#autogen-freshness` `#definition-pr` `#generate-indexes`
+
+## agentdev_gh issue_list は role: case 指定でも物理ラベル依存で未クローズ Case 群を網羅列挙できず、横断依存検査の population 収集は gh CLI 読み取り補助が実質必要になる
+
+- **問題事象**: case-open STEP-5 冪等検出・横断依存検査で、`agentdev_gh` issue_list（role: case、labels: ["case"]、search「case」）が作成直後の Root Case #3169（title に「case」を含まない）を検出せず 0 件を返した。labels: ["case"] 単独指定でも 0 件。未クローズ Case 群の population 収集は gh CLI（`gh issue list --state open`）読み取り補助で代替した
+- **発生局面**: case-open（case-auto orchestration stage 1 委譲）STEP-5 冪等検出と横断依存検査の未クローズ Case 群取得時
+- **検知方法**: issue_create 直後の issue_list 再検索で自 Case が不在（作成検証済みの Issue が列挙に現れない矛盾）
+- **根本原因**: issue_list の search は GitHub search/issues の in:title トークン照合であり title 依存。labels フィルタは物理ラベル照合で「case」という物理ラベルは本リポジトリに存在しない（論理 role と物理ラベルの写像は Tool 内部管理のため、呼出側から論理 role 単位の網羅列挙を直接指定できない）。結果、論理 role: case の population 列挙は search トークン選択性に依存する
+- **自律対応内容**: STEP-5 reference の「GitHub I/O 失敗時の gh CLI 切替継続手順」の趣旨に従い、読み取り補助として `gh issue list --state open --json number,title,labels` で population を実測（open は #3169 のみ・population_count 1）。横断依存検査エンジンの入力は実測 population で構築し、検査を完了（警告 0 件）。gh CLI による書込み代替は行わない（切替範囲の限定を遵守）
+- **ユーザー確認有無**: なし（読み取り専用の補助）
+- **Decision/REQ/spec影響**: なし（観測。REQ-092〔agentdev_gh issue_list 運用規律と labels 論理値専用〕系の運用知見として将来の整備候補）
+- **横展開観点**: 横断依存検査・冪等検出など「population 全体列挙」を要する工程は、search トークン選択性規律（issue-operation-safety.md）に加え、title に工程識別語を含まない Issue の取りこぼし可能性を前提に、gh CLI 読み取りでの cross-check を標準手順として扱う
+- **再発条件**: title に検索トークンを含まない Case Issue が存在する状態で issue_list による population 列挙を行う場合
+- **予防策候補**: population 列挙時は search なし・state 単位の列挙（gh CLI または issue_list の等価操作）を実測手段とし、search トークン方式は重複排除・特定用途に限定する運用の明文化
+- **想定反映先**: agentdev-issue-management issue-operation-safety.md（issue_list 絞り込み規律の補完）、case-open / case-ready の横断依存検査手順、REQ-092 系文書整備
+- **関連**: Case #3169、PR #3170
+- **タグ**: `#agentdev-gh` `#issue_list` `#cross-dependency` `#population-scan`
