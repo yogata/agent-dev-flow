@@ -2,7 +2,7 @@
 title: REQ 影響マップ
 status: accepted
 created: 2026-08-20
-updated: 2026-09-02
+updated: 2026-09-27
 ---
 
 # REQ 影響マップ
@@ -11,7 +11,7 @@ updated: 2026-09-02
 > `../integrity/rule-ownership.md`（**ルールドメイン → canonical REQ/Design**）と逆方向の対応マップであり、両者は補完関係にある。
 > 配置の正本は本ファイル（`docs/designs/responsibilities/req-impact-map.md`）であり、`responsibilities/` 残置を現行配置として確定する。他文書（rule-ownership.md 等）は本行への参照導線として整合する。
 
-### 同期更新が必要なケース
+## 同期更新が必要なケース
 
 本ファイルと `rule-ownership.md` は逆方向の対応表であるため、以下の場合に両ファイルの同期更新が必要:
 

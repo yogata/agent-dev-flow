@@ -104,6 +104,7 @@ AUTOGEN block ID は `{target}-{section}-{subsection}` 形式に従う。
 | `spec-metrics-measurement-example` | quality/design-health-metrics.md |
 | `readme-req-summary-count` | README.md |
 | `readme-req-summary-table` | README.md |
+| `readme-decision-summary-table` | README.md（Decision 静的表のデータ行。対象: docs/README.md L87-129 相当の 43 行） |
 
 新規 AUTOGEN block は本形式に従う。
 camelCase、英語以外の混在等は許容しない。
@@ -185,6 +186,21 @@ docs-check 既存資産（cli_utils.ts, check_integrity.ts の parseFrontmatter,
 3. **各領域の正規情報源**: frontmatter、各文書本文のセクション構造、宣言等。
 4. **人手管理領域に対する整合性確認方法**: docs-check（IR-061、IR-038、IR-039、IR-042）による検出、人手レビュー等。
 5. **Decision frontmatter の supersede_note 由来の部分置換注記生成**: superseded Decision で frontmatter に `supersede_note` フィールドが存在する場合、decision 系 AUTOGEN ブロック（decision-status 表・superseded セクション）の該当 Decision 行へ部分置換注記を併記して生成する。`superseded_by` と `supersede_note` の両 frontmatter フィールドをデータ源とし、status 表・superseded セクション間で同一注記を出力する（DEC-040 部分置換〔決定4 のみ DEC-044 置換・決定1〜3 維持〕の README 反映。CR-004 裁定の generator 経由反映）。注記の具体形式は `〔superseded by DEC-MMM。<supersede_note>〕`（`supersede_note` の内容をそのまま展開）とする。配置は status 表（decision-baseline-table）ではタイトルセル内のタイトル直後、superseded セクションでは bullet 行末とし、両ビューで同一文字列を付与する。`supersede_note` 未宣言（全体置換等）の場合は注記を付与しない。
+6. **docs/README.md Decision 静的表の AUTOGEN 生成**: docs/README.md「## Decision」セクションの Decision 静的表（データ行 43 行）を AUTOGEN ブロック `readme-decision-summary-table` の生成対象とする。行生成は DEC frontmatter 由来（リンク・title）とし、「superseded by DEC-XXX」括弧注記は各 DEC の frontmatter `superseded_by` から導出する。
+
+### docs/README.md Decision 表の notes 記法抽出合成
+
+docs/README.md Decision 表の生成では、frontmatter から導出できない手動注記の保全のため、notes 記法の抽出合成を実装する。抽出合成関数は `extractRelatedReqNotes`（decisions/README の「## 関連 REQ」節専用の先行実装。AUTOGEN ブロック囲みの有無に依存せず見出しスコープで人手列を抽出する方式）と同様の方式を docs/README 用に新規実装する。
+
+notes 記法の定義:
+
+| 項目 | 定義 |
+|---|---|
+| 所在 | docs/README.md「## Decision」セクション内の Decision 表の title セル |
+| 構文 | title セル内の `〔...〕`（U+3014 開き括弧 / U+3015 閉じ括弧）で囲まれた部分置換詳細注記 |
+| 抽出対象 | 各 DEC 行の title セルに手動記載された部分置換詳細注記（例: DEC-040 行「〔決定4 部分置換。決定1〜3は維持〕」）。frontmatter `supersede_note` 由来の注記と突合して合成し、title 直後に「superseded by DEC-XXX」括弧注記の一部として出力する |
+
+初回 AUTOGEN 化時は現行静的表の title セル内 notes 記法を抽出して生成に反映する（手動注記の喪失を防止する。既存手動追記作業を消滅させ、DEC-043 追記漏れ〔実績事象〕の構造的原因を除去するのが本機構の目的）。表上部の件数 caption は生成対象外の手動残置とする。
 
 docs-check は検査対象不変原則（検査対象を直接修正しない）を維持し、生成スクリプトは docs-check から独立して動作する。
 

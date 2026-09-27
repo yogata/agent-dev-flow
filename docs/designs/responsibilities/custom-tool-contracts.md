@@ -99,6 +99,8 @@ Workflow は GitHub 版と Local 版の差を認識しない。
 Plugin / Hook（tool.execute.before 等）により、生 gh WRITE 等の正規経路迂回を検出・拒否できる。
 禁止範囲（読み取り系の許容等を含む）は本 Design が所有する。
 
+読み取り系の許容: agentdev_gh の読み取り操作が operation-failed（安全ページ上限到達等）で継続不能になった場合の contingency として、読み取り専用 gh CLI の手動実行（gh issue list --search 等、読取形式に限定）を許容する。書込み系（作成・更新・クローズ・merge・comment）の直接実行は許容しない。この許容に基づき、配布 reference（agentdev-issue-management/references/issue-operation-safety.md、agentdev-workflow-case-open/references/definition-pr-and-idempotency.md）における読取系 gh 直記述は IR-053 の例外パス（IR053_EXEMPT_PATHS）として登録する（REQ-092-003 の contingency 原則に基づく）。
+
 Plugin / Hook の設定契約:
 
 - 強制境界 Plugin の設定は環境変数経由で行う。gh-write-guard Plugin は `AGENTDEV_GH_WRITE_GUARD_CONFIG`（JSON、`enforcedTools` 一覧）を受け付け、未設定時は既定の強制対象で動作し、設定を解釈できない場合は対象副作用を実行せず fail-closed で拒否する（REQ-052-004）。gh-tool Plugin は `AGENTDEV_GH_REPO` で対象リポジトリを指定できる。リポジトリ解決に失敗した場合、failure detail には試行した解決手段（環境変数、gh repo view）、外部コマンドの終了コードと stderr の要因を診断情報として含め、環境変数設定による解決手続きへの導線を維持する（REQ-052-013）

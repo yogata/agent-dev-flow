@@ -2,7 +2,7 @@
 title: "決定的破損検査クラス"
 status: accepted
 created: "2026-08-30"
-updated: "2026-08-30"
+updated: "2026-09-27"
 ---
 
 <!-- ADF-COVERS(design): REQ-010-071, REQ-053-012 -->
@@ -20,10 +20,12 @@ checker 実装と回帰テストは本 Design の契約を実装・固定する�
 
 - 配布 command 本文: `src/opencode/commands/agentdev/**/*.md`
 - 配布 skill 本文: `src/opencode/skills/**/*.md`
+- docs design 本文: `docs/designs/**/*.md`
 
 REQ-010-071 が要求する docs-check 実行時の「配布 command・skill 全体」への適用をこの走査範囲で満たす。
+docs design 本文の追加により、docs corpus の表層品質を機械検査で担保する。
 
-### 検出対象（9 検出カテゴリ）
+### 検出対象（10 検出カテゴリ）
 
 | rule_id | 検出対象 | REQ 参照 |
 |---|---|---|
@@ -35,6 +37,7 @@ REQ-010-071 が要求する docs-check 実行時の「配布 command・skill 全
 | `control-char` | 制御文字混入（`\t` `\n` `\r` を除く C0/C1 制御文字と DEL） | REQ-053-009 |
 | `invalid-unicode` | 不正な Unicode 文字（BOM、U+FFFD、noncharacters、私用領域、不可視整形文字） | REQ-053-009 |
 | `foreign-script` | 意図しない異言語文字（日本語・英語コーパス外の文字スクリプト） | REQ-053-009 |
+| `simplified-chinese` | 簡体字検出（簡体字↔日本語字形ペア辞書による決定的照合。RU-0144 由来） | REQ-053-009 |
 | `stale-reference` | 既知形式の参照残骸（retired 配下パスへのリンク、`ADR-NNN` 旧形式、`REQ-0108-NNN` 旧ナンバリング） | REQ-053-010 |
 
 機械判定不能な項目（明らかな誤字等）は対象外であり、査読観点で扱う。
@@ -93,11 +96,20 @@ fence トグルは HTML コメント領域内では動作しない（コメン�
 一方で、壊れた `**` が 2 つ同じ段落に存在する場合、ペア除去が偽ペアを形成して検出から漏れることがある。
 この限界は行単位検出と段落単位検出のトレードオフとして受容する。
 
-### 文字系カテゴリ（control-char、invalid-unicode、foreign-script）
+### 文字系カテゴリ（control-char、invalid-unicode、foreign-script、simplified-chinese）
 
 1 文字単位で決定的に検出し、文字コードを報告に含める。
 `foreign-script` の検出対象スクリプト集合は checker 実装の文字クラス定義を正とする。
 日本語コーパスで正当な文字（ASCII、ひらがな、カタカナ、CJK 統合漢字、CJK 記号句読点、全角フォーム）は対象外である。
+
+CJK 統合漢字は `foreign-script` の対象外としつつ、簡体字専用字形ペアは `simplified-chinese` として検出する。
+`foreign-script` の意意的対象外性により日本語コーパスに混入した簡体字（RU-0144 実績: 简体「実行」U+5B9E×30、「状态」、「含义」）は既存文字系カテゴリで検出不能であり、簡体字↔日本語字形ペアの辞書ベース決定的照合（新シグナル `simplified-chinese`）が必須である。
+
+### 簡体字検出（simplified-chinese）
+
+簡体字↔日本語字形ペアの辞書ベース決定的照合により検出する。
+辞書は簡体字コードポイントと対応する日本語字形コードポイントのペア集合を正とし、日本語コーパスで正当な簡体字（対応する日本語字形が使われない伝統的・共通字形等）の誤検出を辞書管理で抑制する。
+日本語正当例（実行/状態/意味）は検出せず、簡体字混入例（実行/状态/含义）を検出する回帰テストを必須とする。
 
 ### 既知形式の参照残骸（stale-reference）
 
@@ -151,7 +163,7 @@ checker 実装またはテスト fixture のいずれかの修正で消去可能
 - 検査の実行 Hook の新設（REQ-010-071 対象外）
 - docs-check 検査体系の再設計
 - 機械判定不能な項目（明らかな誤字等、査読観点）
-- 配布物以外（repo-local command、docs/ 配下の本文記述）への適用
+- 配布物以外（repo-local command、docs/designs 以外の docs/ 配下の本文記述）への適用
 - 外部 URL の到達性検査（ネットワーク依存検査は決定的検査の対象外）
 
 ## See Also
