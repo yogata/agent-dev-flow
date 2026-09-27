@@ -1,7 +1,7 @@
 {
   "version": 1,
   "rule_id": "IR-055",
-  "generated_at": "2026-09-27",
+  "generated_at": "2026-09-28",
   "entries": [
     {
       "file": "src/opencode/commands/agentdev/inspect-docs.md",
@@ -50,6 +50,14 @@
       "count": 1,
       "classification": "baseline",
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
+    },
+    {
+      "file": "src/opencode/skills/agentdev-git-worktree/references/worktree-operations.md",
+      "pattern": "repo-*",
+      "severity": "strict",
+      "count": 1,
+      "classification": "baseline",
+      "reason": "意図的残存: Issue #3211（AG-006/AG-008 合意内容の反映）が worktree 操作中の書込み guard 運用指針節（:173 evidence 'repo-local'）に書いた正当な記述で、AGENTS.md 行動規範から正規参照される guard 運用の説明語。文言修正ではなく approved baseline 登録を選択（provenance: PR #3211 由来・Issue #3210 関連・2026-09-28 case-close Epic #3197 TS-001 実測時に approved 登録）"
     },
     {
       "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
@@ -130,6 +138,14 @@
       "count": 1,
       "classification": "baseline",
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md",
+      "pattern": "repo-*",
+      "severity": "strict",
+      "count": 1,
+      "classification": "baseline",
+      "reason": "意図的残存: Issue #3211 が case-open reference（:33 evidence 'repo-agentdev-integrity'）に書いた repo-local integrity checker skill への正規参照記述。Consumer 環境で未解決になる参照名の誤用ではなく運用上の意図的言及であり、文言修正（#3210 の成果物破壊）ではなく approved baseline 登録を選択（provenance: PR #3211 由来・Issue #3210 関連・2026-09-28 case-close Epic #3197 TS-001 実測時に approved 登録）"
     },
     {
       "file": "src/opencode/skills/agentdev-workflow-case-ready/references/execution-structure.md",
