@@ -13,6 +13,7 @@ updated: "2026-09-20"
 <!-- ADF-COVERS(implementation): REQ-032-024, REQ-032-025, REQ-032-026 -->
 <!-- ADF-COVERS(implementation): REQ-021-030 -->
 <!-- ADF-COVERS(design): REQ-021-030 -->
+<!-- ADF-COVERS(design): REQ-032-029 -->
 
 # case-close Design
 
@@ -43,14 +44,14 @@ case-run / 実行担当サブエージェント / 外部実行バックエンド
 
 ## 出力
 
-- 単一 Issue クローズ時: マージ済みPR、クローズ済みCase、削除済みブランチ、worktree
+- 単一 Issue クローズ時: マージ済みPR、クローズ済みCase、削除済みローカルブランチ、worktree
 - Epic Wave クローズ時: 現在 Wave の全子Issue マージ、クローズ、Epic status table 更新、最終 Wave 判定結果（Epic クローズ または 残 Wave 通知）
 
 ## 副作用
 
 - GitHub API: squash merge（Custom Tool `agentdev_gh` の pr_merge、リトライ最大5回、フォールバック手順あり）、Issue クローズ（Custom Tool `agentdev_gh` の issue_close、reason: completed）、Issue 本文更新（Custom Tool `agentdev_gh` の issue_update、VERIFY 付き）、mergeable 状態取得（Custom Tool `agentdev_gh` の pr_mergeable、squash merge 前の mergeable UNKNOWN ポーリング、REQ-031-017、最大60秒・10秒間隔）
 - git 操作: `git pull --ff-only`、`git fetch origin main:main`（非 main ブランチ占有時の代替同期、REQ-031-008）、`git add` / `git commit` / `git push`（`.agentdev/` 配下、明示パスステージング、v2:REQ-0137-002/005）
-- worktree / ブランチ削除: `agentdev-git-worktree` 手順に従う
+- worktree / ローカルブランチ削除: `agentdev-git-worktree` 手順に従う。リモートブランチ削除は GitHub の deleteBranchOnMerge 自動削除に委譲し case-close は実行しない（REQ-032-029、REQ-009-052）
 - capture 回収: PR 本文から intake / learning を分離回収し `.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md` へ保存
 - deviation capture（自工程）: case-close 実行中に実観測した deviation を agentdev-learning-capture skill または
   agentdev-intake-pipeline（自動capture向け item 生成操作）へ委譲して保存。
@@ -91,7 +92,7 @@ worktree を削除する前に、未追跡ファイルだけを対象とする c
 - PR作成済み子Issue 特定（現在 Wave 内の `running` 子Issue）
 - 各子Issue のクローズ処理を準並列化する（REQ-032-015）
   - 並列実行: PR情報取得、PR変更ファイル取得、Issue本文読取、PR本文読取、完了条件チェック事前評価、capture候補抽出、Design確定候補確認、worktree/branch削除前チェック
-  - 直列集約: squash merge、main pull&hash確認、Epic本文ステータス追跡テーブル更新、.agentdev永続化commit&push、branch/worktree最終削除
+  - 直列集約: squash merge、main pull&hash確認、Epic本文ステータス追跡テーブル更新、.agentdev永続化commit&push、ローカル branch/worktree 最終削除
   - rebase による機械的コンフリクト解消は停止条件外（REQ-003-006 Level1）。解消不能時は case-auto へエスカレーション（REQ-031-004、REQ-003-002 Level2/3）
 - Epic status table 更新（単一書き手: case-close、v2:ADR-0125）（`running` → `completed ([PR#N](URL))` に更新）
 
@@ -139,13 +140,13 @@ Epic Issue 本文の `## 完了条件` セクションを読み込み、全完�
   - コンフリクト解消 rebase パス（REQ-003-001/002、REQ-031-003/025）（squash merge 失敗時）。squash merge がコンフリクトで失敗した場合、`git rebase` による機械的解消を試みる。rebase が自動解決した場合は再マージ（PR マージへ戻る）。rebase 自体がコンフリクトを発生した場合は実装変更を行わず case-auto へエスカレーションし停止する（コンフリクト解消モデル Level 1、`docs/designs/commands/case-auto.md` コンフリクト解消モデル Level 2/3 参照）
 - Post-merge テスト戦略検証（CI通過等の反映）
 - Issueクローズ（Custom Tool `agentdev_gh` の issue_close、reason: completed）
-- ブランチ、worktree削除（`agentdev-git-worktree` 手順）。未コミット変更検出、共有作業ツリーでの `git checkout .` 禁止（v2:REQ-0137-001）
+- ローカルブランチ、worktree削除（`agentdev-git-worktree` 手順）。未コミット変更検出、共有作業ツリーでの `git checkout .` 禁止（v2:REQ-0137-001）
 - 親Epic Issue更新（`agentdev-epic-tracker`、Epic 自動クローズ判定）
 - 実行前同期（`git pull --ff-only`、hash 検証）
   - git main 同期リスク事前検出、代替同期手順選択（REQ-031-008）（`git pull --ff-only` 直前に worktree 状態（dirty tree）・並列実行による ref lock 競合・非 main ブランチ占有の3リスクを事前検出。検出時に安全な代替同期手順（直列化待機、`git fetch origin main:main` による非チェックアウト同期）を選択。`agentdev-git-worktree` の git main 同期リスク事前検出プロシージャ参照）
 - 学びの検知、抽出（`agentdev-learning-capture`、ユーザーに学び有無を問わない（エージェント自律）、Capture 回収（PR 本文から intake/learning を分離））
 - ドメイン状態永続化（`.agentdev/` 配下を commit/push（learning と intake を同一 commit））
-- 完了報告（結果状態の分離報告（GitHub側、`.agentdev`、ブランチ削除））
+- 完了報告（結果状態の分離報告（GitHub側、`.agentdev`、ローカルブランチ削除））
 
 ### full integrity suite 実行と tmp 残存確認
 
@@ -244,7 +245,7 @@ JSON 出力は `workflow`、`files_checked`、`coupled_files_checked`、`failure
 - mergeable UNKNOWN ポーリング（REQ-031-017）: squash merge 前に Custom Tool `agentdev_gh` の pr_mergeable で mergeable・mergeStateStatus 状態を事前確認、UNKNOWN 時は最大60秒（10秒間隔）でポーリング、上限超過時はマージ中止・構造化エラー停止
 - git main 同期リスク事前検出（REQ-031-008）: `git pull --ff-only` 直前に worktree 状態・並列実行 ref lock 競合・非 main ブランチ占有の3リスクを事前検出、検出時に安全な代替同期手順（直列化待機、`git fetch origin main:main`）を選択
 - 出力制約: 成果物本文（PR本文、commit message）は verbatim で返す（別途成果物パス、根拠、親判断事項は圧縮）
-- 結果状態分離報告: GitHub側、`.agentdev` 永続化、ブランチ削除状態を独立して報告
+- 結果状態分離報告: GitHub側、`.agentdev` 永続化、ローカルブランチ削除状態を独立して報告。報告次元の定義はローカルブランチ削除状態に確定し、remote ブランチの削除は GitHub 側の deleteBranchOnMerge 自動削除であり ADF の保証対象外
 
 ## 停止状態
 
@@ -252,7 +253,7 @@ JSON 出力は `workflow`、`files_checked`、`coupled_files_checked`、`failure
 - mergeable UNKNOWN ポーリング上限超過時（マージ中止、構造化エラー停止）。
 - squash merge のコンフリクトが rebase で解消不能な場合（実装変更を伴う解消は行わず、case-auto レベル判断へエスカレーションして停止）。
 - 最終 Wave で完了条件が残る場合（Epic クローズせずエラー停止、残 Wave 通知へ整理）。
-- worktree、ブランチ削除のリトライ上限超過時（`prune` と復元を実施し、削除失敗を報告して停止）。
+- worktree、ローカルブランチ削除のリトライ上限超過時（`prune` と復元を実施し、削除失敗を報告して停止。リトライ上限条項はローカルブランチ・worktree 削除に適用される）。
 
 ## Design 状態評価の棚卸し制（STEP-3 拡張）
 

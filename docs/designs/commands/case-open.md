@@ -10,7 +10,7 @@ updated: "2026-09-26"
 <!-- ADF-COVERS(implementation): REQ-021-014, REQ-021-024 -->
 <!-- ADF-COVERS(implementation): REQ-035-006, REQ-035-008 -->
 <!-- ADF-COVERS(implementation): REQ-049-005 -->
-<!-- ADF-COVERS(design): REQ-030-014, REQ-030-017 -->
+<!-- ADF-COVERS(design): REQ-030-014, REQ-030-017, REQ-030-018 -->
 
 # case-open Design
 
@@ -44,6 +44,7 @@ canonical Definition に実変更がある場合のみ Definition PR を作成�
 
 ## 副作用
 
+- preflight 設定検証（Root Case 確立の preflight。GitHub Issue/PR を使用するリポジトリ種別のみ。REQ-030-018）: 読取専用の repo meta 照会（`gh repo view --json deleteBranchOnMerge` を正規手段）で GitHub repo 設定 deleteBranchOnMerge が true であることを検証する。Custom Tool `agentdev_gh` の操作カタログは拡張しない（読取専用 repo meta 照会はローカル環境確認〔gh auth status と同格〕扱いの bash 実行 Harness 依存。agentdev-gh Local 実装への影響なし）。設定が true でない場合は「設定無効」として blocked 停止、照会自体が失敗する場合（gh 認証不良・ネットワーク不調等）は「検証不能」として blocked 停止（fail-closed、DEC-039 決定6）。両者を停止理由として区別報告する（DEC-014 決定5 の検査エラー/violation 区別先例に整合）。GitHub Issue/PR を使用しないローカル版では本検証をスキップする（REQ-009-031/034/039 整合）
 - GitHub I/O: Root Case 作成、Definition PR 作成（Custom Tool `agentdev_gh` 操作契約。Tool 内 VERIFY 付き）
 - deviation capture: case-open 実行中に実観測した deviation を agentdev-learning-capture skill または
   agentdev-intake-pipeline（自動capture向け item 生成操作）へ委譲して保存する（REQ-030-011）。
