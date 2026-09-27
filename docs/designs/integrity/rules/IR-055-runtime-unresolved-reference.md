@@ -21,8 +21,8 @@ updated: 2026-09-24
 | false_positive_risk | 中。code block 内部、template placeholder（`{xxx}`）、vocabulary-registry.md 等の正当使用例外パスは exemption 対象とする。`integrity-rule-catalog.md` 自身のルール記述も exemption 対象とする。exemption 設計を誤ると true positive が誤って免除される |
 | regression_test | check_integrity.test.ts。各検出パターン（REQ-NNNN、REQ-NNNN-NNN、DEC-NNN、residual ADR-NNNN、`src/opencode/`、`docs/designs/`、`docs/guides/`、`/repo/*`、`repo-*`、本体 docs URL、line number 付き参照）を含む fixture で検出されること、exemption 対象が報告されないことを検証する |
 | finding_route | intake（既知違反の段階解消は別途処理） |
-| triage_action | 新規検出時は baseline に追加し、delta guard で新規増加を fail 対象とする。既存違反の段階解消は docs-check report / intake / backlog 経由で処理する。baseline 0 到達後に full audit を fail gate 化する（REQ-010-007） |
-| last_verified | 2026-08-10 |
+| triage_action | 新規検出時は baseline に追加し、delta guard で新規増加を fail 対象とする。既存違反の段階解消は docs-check report / intake / backlog 経由で処理する。baseline 0 到達後に full audit を fail gate 化する（REQ-010-007）。warning 総数 ratchet（full-audit 契約の絶対数検知。実行時観測の warning 総数が baseline の warning_total_cap を超える場合は fail。cap は純減方向のみ更新可能。増加は --raise-warning-cap 明示フラグ経由のみ許可。詳細は integrity-contracts.md「IR-055 warning 総数 ratchet」節）を適用する |
+| last_verified | 2026-09-27 |
 
 ## IR-055 検出パターンと severity（REQ-029-003）
 

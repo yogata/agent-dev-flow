@@ -2,7 +2,7 @@
 title: Design 健全性メトリクス
 status: accepted
 created: 2026-06-26
-updated: 2026-08-20
+updated: 2026-09-27
 ---
 <!-- ADF-COVERS(implementation): REQ-001-027 -->
 
@@ -68,7 +68,7 @@ Design 計測例（全 Design の行数・status・ドメイン分類の表）�
 
 - **inspect-docs / inspect-skills**: 定期診断で本 Design の閾値を適用
 - **case-close**: draft → accepted 昇格時に放置期間をリセット
-- **/repo/docs-check**（`.opencode/skills/repo-agentdev-integrity/`）: 計測を必要時に実ファイルから実行する
+- **docs-check**（`/repo/docs-check`、`.opencode/skills/repo-agentdev-integrity/`）: 計測を必要時に実ファイルから実行する
 
 本 Design 自体は計測ロジックを実装しない。
 閾値の変更は本 Design の更新をもって正とし、各実装は本 Design を参照する。

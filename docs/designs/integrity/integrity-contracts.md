@@ -362,6 +362,21 @@ baseline は `.opencode/skills/repo-agentdev-integrity/baselines/ir-055-baseline
 - **保存工程での要否判定**: docs/designs 配下への新規参照追加・参照変更を伴う保存工程では、変更後に IR-055 の new violation を確認し、正当な実装修復由来でない場合に再生成要否を判定する
 - **ratchet 性の維持**: baseline は純減を健全とする ratchet であり、再生成により既知違反の隠蔽と検出対象の縮小を行わない。再生成の根拠は PR 本文に記録する
 
+### IR-055 warning 総数 ratchet（full-audit 契約）
+
+full-audit 実行時（docs-check 全量検査）、実行時に観測される IR-055 warning の総数（baseline-known と新規の区別なし。applyNgBaseline による demote 前の総数）が baseline の `warning_total_cap` を超える場合は fail する。
+cap は純減方向のみ更新可能とし、増加は `--raise-warning-cap` 明示フラグ（実行ログへの明記を伴う）経由の更新のみ許可する（正統な新規残存の受入れ手順として機能させる）。
+これにより `--update-ir055-baseline` による heuristic 違反の自動取り込み（意図的残存分類）で警告総数が静かに増加する構造を封じ、棚卸し周期の機械化（絶対数検知）を実現する。cap の比較対象は demote 前の総数のため、baseline 再生成で警告が取り込まれても総数増加が検知される。
+
+### 恒久免除レジストリ（baselines/exemptions.json）の運用
+
+IR-055 warning のうち意味検証済みの正当な warning（例: accepted-adr-only-citation 等の正当引用）は、恒久免除レジストリ `baselines/exemptions.json`（IR-059 由来の先行設計を全カテゴリ共通の機構として実装）へ登録することで、baseline（未解決債務）とは区別して恒久免除表示にする。
+
+- entry は `rule_id`・accepted な `rationale_ref`・`review_status` を必須とする（schema version 2）。`rationale_ref` の契約は rule 別に定義する（IR-059 は従来どおり docs/adr/**〔将来復活時〕、一般化分は現存する正当性根拠パス〔該当 Decision・Design〕を許容）
+- loader は schema 違反の entry を fail として扱う
+- 免除された warning は恒久免除表示となり、baseline（未解決債務）の count に含めない。これにより「正当は免除・不正は純減」の分離を機械保証し、baseline は債務追跡に専念させる
+- 免除対象警告が ng-baseline.json の bucket を持つ場合は同時に prune し、恒久免除と baseline-known demote の二重適用を生じさせない
+
 ## NG baseline 運用手順（全カテゴリ strict pass、v2:REQ-0161-005 統合）
 
 `check_integrity.ts` と `check_extensions.ts` は、既知の NG 集合を NG baseline として `.opencode/skills/repo-agentdev-integrity/baselines/ng-baseline.json` へ格納する。
