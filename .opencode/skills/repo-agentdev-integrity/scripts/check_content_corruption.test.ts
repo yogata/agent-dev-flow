@@ -335,6 +335,36 @@ describe("許容例（REQ-010-068 allowed-usage enumeration）", () => {
       },
     );
   });
+
+  test("the self-referential stale-reference allowance carries the Design-section rationale (OU-004, RA-006)", () => {
+    const entry = ALLOWED_USAGE.find(
+      (e) =>
+        e.file === "docs/designs/integrity/content-corruption-checker.md" &&
+        e.rule_id === "stale-reference",
+    );
+    expect(entry).toBeDefined();
+    const repoRoot = path.resolve(import.meta.dir, "..", "..", "..", "..");
+    const rationaleOwnerLinePrefix =
+      "- docs/designs/integrity/content-corruption-checker.md × stale-reference: ";
+    const designSectionPath = path.join(
+      repoRoot,
+      "docs",
+      "designs",
+      "integrity",
+      "content-corruption-checker.md",
+    );
+    const rationaleOwnerLine = fs
+      .readFileSync(designSectionPath, "utf-8")
+      .split(/\r?\n/)
+      .find((l) => l.startsWith(rationaleOwnerLinePrefix));
+    expect(rationaleOwnerLine).toBeDefined();
+    expect(entry!.rationale).toBe(rationaleOwnerLine!.slice(rationaleOwnerLinePrefix.length));
+    const designFileFindings = checkFile(
+      "docs/designs/integrity/content-corruption-checker.md",
+      repoRoot,
+    );
+    expect(designFileFindings.filter((f) => f.rule_id === "stale-reference")).toEqual([]);
+  });
 });
 
 describe("再現例（REQ-010-068 reproductions from the live corpus）", () => {
