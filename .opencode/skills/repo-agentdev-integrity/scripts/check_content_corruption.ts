@@ -165,6 +165,12 @@ export const ALLOWED_USAGE: AllowedUsageEntry[] = [
     rationale:
       "採番例外記録の文脈で旧ナンバリング REQ-0108-194 を歴史的根拠として引用（例示由来）",
   },
+  {
+    file: "docs/designs/integrity/content-corruption-checker.md",
+    rule_id: "stale-reference",
+    rationale:
+      "stale-reference 検出カテゴリの説明が旧ナンバリング形式参照を実例として列挙し、IR-069 許容例と同一の旧ナンバリング引用を含む Design 記述（自己言及）",
+  },
 ];
 
 function isAllowedUsage(file: string, ruleId: CorruptionRuleId): boolean {
