@@ -98,6 +98,15 @@ describe("validateObservation", () => {
     expect(validateObservation(successObservation()).ok).toBe(true);
   });
 
+  test("score evaluator の連続値・範囲外値は現行観測として受理しない", () => {
+    expect(validateObservation(scoreSuccessObservation()).ok).toBe(true);
+    for (const value of [0.31, 1.25, 3, -1, "中"]) {
+      const observation = scoreSuccessObservation();
+      observation.results![0]!.value = value;
+      expect(validateObservation(observation).ok).toBe(false);
+    }
+  });
+
   test("失敗観測（呼出し開始後の失敗分類）を受理する", () => {
     expect(validateObservation(failureObservation()).ok).toBe(true);
   });
@@ -283,6 +292,16 @@ describe("writeEvaluationObservation", () => {
     const result = await writeEvaluationObservation(worktree, invalid as unknown as JevObservation);
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.failure.kind).toBe("invalid_input");
+    const exists = await fs.stat(path.join(worktree, ".agentdev", "jev-observations")).catch(() => null);
+    expect(exists).toBeNull();
+  });
+
+  test("連続値の score evaluator result を観測へ保存しない", async () => {
+    const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
+    const observation = scoreSuccessObservation();
+    observation.results![0]!.value = 1.25;
+    const result = await writeEvaluationObservation(worktree, observation);
+    expect(result.ok).toBe(false);
     const exists = await fs.stat(path.join(worktree, ".agentdev", "jev-observations")).catch(() => null);
     expect(exists).toBeNull();
   });

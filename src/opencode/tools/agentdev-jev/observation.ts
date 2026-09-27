@@ -231,6 +231,12 @@ function validateObservationResult(raw: unknown, seen: Set<string>): { ok: true 
   }
   if (!isObservationValue(raw.value)) return invalid(`value must be a non-empty string, boolean, or number: ${raw.questionId}`);
   if (!isRecord(raw.probabilityDistribution)) return invalid(`probabilityDistribution must be an object: ${raw.questionId}`);
+  if (raw.questionForm === "score") {
+    const levelCount = Object.keys(raw.probabilityDistribution).length;
+    if (levelCount < 2 || typeof raw.value !== "number" || !Number.isInteger(raw.value) || raw.value < 0 || raw.value >= levelCount) {
+      return invalid(`score value must be a discrete level index within the defined scale: ${raw.questionId}`);
+    }
+  }
   for (const [k, v] of Object.entries(raw.probabilityDistribution)) {
     if (typeof v !== "number" || !Number.isFinite(v) || v < 0 || v > 1) {
       return invalid(`probabilityDistribution.${k} must be a number in [0,1]: ${raw.questionId}`);

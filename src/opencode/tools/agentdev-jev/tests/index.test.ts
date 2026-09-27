@@ -372,6 +372,7 @@ describe("評価指標の分析時導出可能性（TS-005）", () => {
       { id: "q2", form: "boolean", prompt: "質問2" },
       { id: "q3", form: "boolean", prompt: "質問3" },
       { id: "q4", form: "boolean", prompt: "質問4" },
+      { id: "q5", form: "boolean", prompt: "質問5" },
     ];
     const evaluated = await runAgentdevJevOperation(worktree, evaluateRequest({ questions }), {
       resolveProvider: () =>
@@ -379,7 +380,7 @@ describe("評価指標の分析時導出可能性（TS-005）", () => {
           async evaluate() {
             return {
               requestedModel: "mock/jev",
-              answers: { q1: { value: 0.9 }, q2: { value: 0.9 }, q3: { value: 0.1 }, q4: { value: 0.9 } },
+              answers: { q1: { value: 0.9 }, q2: { value: 0.9 }, q3: { value: 0.1 }, q4: { value: 0.9 }, q5: { value: 0.9 } },
             };
           },
         }),
@@ -399,6 +400,7 @@ describe("評価指標の分析時導出可能性（TS-005）", () => {
             { questionId: "q2", value: false, differenceReason: "evaluation_input_defect" },
             { questionId: "q3", value: true, differenceReason: "semantic_disagreement" },
             { questionId: "q4", value: false, differenceReason: "unknown" },
+            { questionId: "q5", value: false, differenceReason: "deterministic_override" },
           ],
         },
       },
