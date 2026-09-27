@@ -228,3 +228,19 @@
 - **想定反映先**: agentdev-backlog-integration（session 由来 RU の生成基準）、REQ-008-051 の運用整備候補
 - **関連**: Case #3171、RU-0154
 - **タグ**: `#ru-frontmatter` `#req-008-051` `#session-sourced-ru` `#case-open`
+
+## 配布境界ベースライン突合で --profile source と --profile link のパス表記差を正規化比較で解消した
+
+- **問題事象**: `--profile source`（worktree 実体、パスが `.worktrees/{N}-{type}/src/...`）と `--profile link`（main root 位置引数、ジャンクション経由でパスが `.opencode/...`）の検出結果を突合すると、同一違反がパス prefix 差で別エントリに現れ、生のファイル差分比較では「新規」誤判定となる
+- **発生局面**: case-close STEP-3 配布依存境界 最終 gate の case-run STEP-S5 記録との突合（Case #3169 の PR #3173 検証差分確認）。運用
+- **検知方法**: source 側 `.worktrees/3169-feature/src/...` と link 側 `.opencode/...` のパス差（case-run PR 本文の検証差分記録に明記）
+- **根本原因**: 両 profile が同一実体を異なる root 起点・異なるパス表現（worktree 物理パス / junction 論理パス）で列挙する構造差
+- **自律対応内容**: カテゴリ・行・スニペット一致 + パス prefix 正規化による比較で差分判定し、node による正規化比較で新規 0 件を確認した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 配布境界 gate を複数 profile（source/link）で実行して突合する全 Case（case-run STEP-S5 と case-close 最終 gate の検証差分比較）で同様の誤差分が起こり得る。突合手順の正規化ルールを共通化すべき
+- **再発条件**: worktree で source profile を実行し、main root で link profile を実行した結果を直接突合する場合
+- **予防策候補**: 配布境界ベースライン突合手順に「カテゴリ・行・スニペット一致 + パス prefix 正規化後の比較」を明文化する。可能であれば checker 側で正規化済みパスを出力するオプションの追加
+- **想定反映先**: agentdev-quality-gates / case-close references（配布依存境界 最終 gate の検証差分突合手順）、repo-agentdev-integrity scripts（checker 出力の正規化対応候補）
+- **関連**: Case #3169、PR #3173
+- **タグ**: `#distribution-boundary` `#baseline-diff` `#path-normalization` `#case-close`
