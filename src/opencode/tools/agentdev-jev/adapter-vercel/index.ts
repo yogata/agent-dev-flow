@@ -89,8 +89,9 @@ export function createVercelJevProvider(options: { env?: EnvSource; modelId?: st
             ...(typed.probabilities !== undefined ? { probabilities: typed.probabilities } : {}),
           };
         } else {
+          // score の生値は既定値 fallback せずそのまま渡す（正規化不能時は engine が response_invalid とする）。
           answers[id] = {
-            value: typed.score ?? 0,
+            value: typed.score,
             ...(typed.probabilities !== undefined ? { probabilities: typed.probabilities } : {}),
           };
         }

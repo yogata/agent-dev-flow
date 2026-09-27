@@ -20,7 +20,7 @@ export type JevQuestion = {
   prompt: string;
   /** form === "choice" の場合必須。排他候補（2つ以上、順序非保持）。 */
   options?: string[];
-  /** form === "score" の場合必須。順序水準（2つ以上、添字0が最低水準）。 */
+  /** form === "score" の場合必須。順序水準（2つ以上、重複なし、添字0が最低水準）。 */
   scale?: string[];
 };
 
@@ -43,7 +43,7 @@ export type JevProbabilityDistribution = Record<string, number>;
 export type JevQuestionResult = {
   id: string;
   form: JevQuestionForm;
-  /** canonical result（boolean は真偽、choice は候補、score は水準値〔0 以上・最大水準以下の数値〕）。 */
+  /** canonical result（boolean は真偽、choice は候補、score は定義済み scale 内の離散的な level〔0 以上・最大水準以下の整数＝scale 内の整数位置。連続値は正規化して残さない〕）。 */
   value: boolean | string | number;
   probabilityDistribution: JevProbabilityDistribution;
 };
@@ -119,7 +119,7 @@ export type JevObservedIdentity = {
 export type JevObservationResult = {
   questionId: string;
   questionForm: JevQuestionForm;
-  /** canonical result（boolean は真偽、choice は候補、score は水準値）。 */
+  /** canonical result（boolean は真偽、choice は候補、score は定義済み scale 内の離散的な level）。 */
   value: boolean | string | number;
   probabilityDistribution: JevProbabilityDistribution;
 };
@@ -134,9 +134,9 @@ export type JevDifferenceReason =
 /** 質問単位の reasoning model 最終判断結果。 */
 export type JevFinalResultItem = {
   questionId: string;
-  /** canonical result（evaluator 返却結果と同じ値域）。 */
+  /** canonical result（evaluator 返却結果と同じ値域。score は定義済み scale 内の離散的な level〔整数〕）。 */
   value: boolean | string | number;
-  /** 差異理由分類（evaluator 返却結果と最終判断が異なる場合のみ）。 */
+  /** 差異理由分類（evaluator 返却結果と最終判断が異なる場合のみ。一致時に指定すると受理しない）。 */
   differenceReason?: JevDifferenceReason;
 };
 

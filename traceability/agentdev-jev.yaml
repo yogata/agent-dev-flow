@@ -7,12 +7,15 @@ implementation:
     - REQ-090-015
     - REQ-090-016
     - REQ-090-017
+    - REQ-090-018
+    - REQ-090-020
   src/opencode/tools/agentdev-jev/engine.ts:
     - REQ-090-001
     - REQ-090-002
     - REQ-090-003
     - REQ-090-014
     - REQ-090-016
+    - REQ-090-019
   src/opencode/tools/agentdev-jev/index.ts:
     - REQ-090-002
     - REQ-090-005
@@ -38,6 +41,7 @@ verification:
     - REQ-090-005
     - REQ-090-014
     - REQ-090-016
+    - REQ-090-019
   src/opencode/tools/agentdev-jev/tests/observation.test.ts:
     - REQ-090-005
     - REQ-090-006
@@ -45,6 +49,7 @@ verification:
     - REQ-090-015
     - REQ-090-016
     - REQ-090-017
+    - REQ-090-018
   src/opencode/tools/agentdev-jev/tests/index.test.ts:
     - REQ-090-002
     - REQ-090-003
@@ -52,6 +57,7 @@ verification:
     - REQ-090-013
     - REQ-090-015
     - REQ-090-017
+    - REQ-090-020
   src/opencode/tools/agentdev-jev/adapter-vercel/tests/config.test.ts:
     - REQ-090-002
   src/opencode/tools/agentdev-jev/adapter-vercel/tests/questions.test.ts:

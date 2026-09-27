@@ -65,7 +65,7 @@ const QUESTION_SCHEMA = {
     scale: {
       type: "array",
       items: { type: "string" },
-      description: "Ordered level labels from lowest (index 0) (required for form=score).",
+      description: "Ordered level labels from lowest (index 0) (required for form=score). Levels must be unique (discrete scale).",
     },
   },
   required: ["id", "form", "prompt"],
@@ -125,8 +125,10 @@ const FINAL_RESULT_OBSERVATION_SCHEMA = {
     "(results, confidence, durationMs, inputTokens, inputs) are already recorded in the observation persisted by " +
     "evaluate and are NOT accepted here. Send schemaVersion 2 and one finalResult whose results correspond " +
     "one-to-one with the evaluator results (questionId + canonical value). A differenceReason " +
-    "(evaluation_input_defect | semantic_disagreement | deterministic_override | unknown) is recorded only when the " +
-    "final judgment differs from the evaluator result; sending one on a match is rejected.",
+    "(evaluation_input_defect | semantic_disagreement | deterministic_override | unknown) is required when the " +
+    "final judgment differs from the evaluator result and is rejected when the final judgment matches it " +
+    "(unknown is a valid difference reason). score final values must be discrete scale levels (non-negative " +
+    "integers within the defined scale); continuous values are rejected.",
   properties: {
     schemaVersion: { type: "integer", enum: [2], description: "Observation schema version (2)." },
     finalResult: {
@@ -146,12 +148,12 @@ const FINAL_RESULT_OBSERVATION_SCHEMA = {
                 description: "Question identifier matching one evaluator result (non-empty).",
               },
               value: {
-                description: "Final judgment value (boolean for form=boolean, candidate label for form=choice, level value for form=score).",
+                description: "Final judgment value (boolean for form=boolean, candidate label for form=choice, discrete scale level as a non-negative integer within the defined scale for form=score; continuous score values are rejected).",
               },
               differenceReason: {
                 type: "string",
                 enum: ["evaluation_input_defect", "semantic_disagreement", "deterministic_override", "unknown"],
-                description: "Difference reason classification. Accepted only when the value differs from the evaluator result.",
+                description: "Difference reason classification. Required when the value differs from the evaluator result; rejected (must be omitted) when the value matches it.",
               },
             },
             required: ["questionId", "value"],

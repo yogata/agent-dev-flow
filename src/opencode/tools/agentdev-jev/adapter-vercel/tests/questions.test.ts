@@ -5,12 +5,13 @@
 import { describe, expect, mock, test } from "bun:test";
 
 const evaluateInputs: Array<{ questions: Record<string, unknown> }> = [];
+let nextAnswers: Record<string, unknown> = {};
 
 mock.module("ai", () => ({
   experimental_evaluate: async (input: { questions: Record<string, unknown> }) => {
     evaluateInputs.push(input);
     return {
-      answers: {},
+      answers: nextAnswers,
       usage: undefined,
       response: undefined,
       providerMetadata: undefined,
@@ -67,5 +68,25 @@ describe("質問形式の criteria マッピング", () => {
       expect(typeof level).toBe("string");
       expect((level as string).length).toBeGreaterThan(0);
     }
+  });
+
+  test("score 応答の score 値欠落は既定値 0 へフォールバックせず生の欠落を engine へ渡す（level 0 黙示 fallback の廃止）", async () => {
+    nextAnswers = { s1: { type: "score" } };
+    const provider = createVercelJevProvider({ env: { [VERCEL_JEV_CREDENTIAL_ENV]: "token" } });
+    const response = await provider.evaluate({
+      state: "判断対象の状態",
+      questions: [{ id: "s1", form: "score", prompt: "どの水準か", scale: ["低", "中", "高"] }],
+    });
+    expect(response.answers["s1"]?.value).toBeUndefined();
+  });
+
+  test("score 応答の連続値は正規化せず生値のまま engine へ渡す（canonical result の正規化は engine 責務）", async () => {
+    nextAnswers = { s1: { type: "score", score: 1.25, probabilities: { 0: 0.2, 1: 0.5, 2: 0.3 } } };
+    const provider = createVercelJevProvider({ env: { [VERCEL_JEV_CREDENTIAL_ENV]: "token" } });
+    const response = await provider.evaluate({
+      state: "判断対象の状態",
+      questions: [{ id: "s1", form: "score", prompt: "どの水準か", scale: ["低", "中", "高"] }],
+    });
+    expect(response.answers["s1"]?.value).toBe(1.25);
   });
 });

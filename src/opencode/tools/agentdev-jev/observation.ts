@@ -244,6 +244,22 @@ export function sameCanonicalValue(a: boolean | string | number, b: boolean | st
   return a === b;
 }
 
+/**
+ * score の final result 値の離散性検証（canonical result は evaluator と同一の正規化表現〔scale 内の
+ * 整数位置〕に限定する。連続値・範囲外水準は拒否する）。水準上限は evaluator 結果の確率分布
+ * （水準名を全キーとして保持）から導出する。
+ */
+function validateDiscreteScoreValue(value: unknown, evaluatorResult: JevObservationResult): { ok: true } | { ok: false; kind: JevFailureKind; detail: string } {
+  if (typeof value !== "number" || !Number.isInteger(value) || value < 0) {
+    return invalid(`finalResult score value must be a discrete scale level (non-negative integer): ${evaluatorResult.questionId}`);
+  }
+  const levelCount = Object.keys(evaluatorResult.probabilityDistribution).length;
+  if (levelCount > 0 && value > levelCount - 1) {
+    return invalid(`finalResult score value is outside the defined scale (max level index ${levelCount - 1}): ${evaluatorResult.questionId}`);
+  }
+  return { ok: true };
+}
+
 function validateFinalResult(raw: unknown, results: JevObservationResult[]): { ok: true; finalResult: { results: JevFinalResultItem[] } } | { ok: false; kind: JevFailureKind; detail: string } {
   if (!isRecord(raw)) return invalid("finalResult must be an object");
   const allowed = new Set(["results"]);
@@ -269,7 +285,14 @@ function validateFinalResult(raw: unknown, results: JevObservationResult[]): { o
       return invalid(`finalResult questionId does not match any evaluator result: ${item.questionId}`);
     }
     if (!isObservationValue(item.value)) return invalid(`finalResult value must be a non-empty string, boolean, or number: ${item.questionId}`);
+    if (evaluatorResult.questionForm === "score") {
+      const discreteCheck = validateDiscreteScoreValue(item.value, evaluatorResult);
+      if (!discreteCheck.ok) return discreteCheck;
+    }
     const differs = !sameCanonicalValue(evaluatorResult.value, item.value as boolean | string | number);
+    if (differs && item.differenceReason === undefined) {
+      return invalid(`differenceReason is required when the final judgment differs from the evaluator result: ${item.questionId}`);
+    }
     if (item.differenceReason !== undefined) {
       if (!differs) {
         return invalid(`differenceReason requires a difference from the evaluator result: ${item.questionId}`);
