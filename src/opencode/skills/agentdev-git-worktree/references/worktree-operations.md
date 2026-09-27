@@ -170,7 +170,7 @@ bun test によるフル suite 実行は、次の環境前提を踏まえて実�
     - **junction 作成を選択する**: (a) 依存定義の変更がなく、main 側の整備済み依存と同一の状態で足りる一時的な検証。(b) 検証後に worktree へ `node_modules` 実体を残したくない場合（junction エントリ削除のみでクリーンアップが完結し、gitignore 対象の実体が worktree に残留しない）。(c) `bun install` による復元時間を要しない速い前置が有利な場合
     - **共通制約**: いずれの手段でも、選択根拠と依存パッケージ状態を環境ラベルとして検証記録に残す。整備手段の切替（junction → bun install 等）を行った場合は切替後の結果を正とし、切替前の結果を再利用しない
   - **package rename 時の bun.lock 確認**: package rename を伴う変更で `bun install` を実行した場合は、bun.lock の root workspace name が新パッケージ名へ追従していることを確認する（確認手順は runtime-package-boundary Design「本体リポジトリ sync」節参照）
-- worktree の `.opencode/` 配下 junction は未伝播である。junction を前提とする構造系テストは source パス（SoT パス）への fallback で実行される
+- worktree の `.opencode/` 配下では commands と skills の junction のみが伝播し、plugins および repo-local 実体は worktree 側に存在しない（無言欠落）。junction を前提とする構造系テストは source パス（SoT パス）へ切り替えるか、main root 実体から `--root <worktree root>` を指定した読取専用実行で補完する。QG-4「3 cwd 分割実行」の分割③（plugins）の環境差と補完時の記録要件は `agentdev-quality-gates` references `qg-4-final-acceptance.md`「worktree での分割③ 対象欠落の環境差」を参照する
 - worktree の構造上の理由でテストスイートが実行できない場合は、メインリポジトリからの読取専用実行でエビデンスを採取できる。この場合は実行環境（worktree または main、junction 伝播状態、依存パッケージ状態）を環境ラベルとして検証記録に明記し、fail 全件の由来分類（既知欠陥・環境依存・当該変更起因）を行う
 - **旧 baseline と並行 main merge 追随差の注意**: worktree 作成元の分岐点 baseline 以降に origin/main へ他 Case の merge が入った場合、baseline 系 durable state（baseline commit、baseline 期待値・許容リスト等）は現行 main より古い状態で検証が行われる。この追随差により、当該変更と無関係なテストが baseline の陳腐化で疑似 fail することがある。検証開始前に `git fetch origin` 後の main 鮮度確認（本リポジトリ「main の鮮度確認」参照）で追随差の有無を確認し、追随差下の疑似 fail については `agentdev-quality-gates` QG-4「fail 由来分類」節の baseline 追随差3点対照手順（単独再実行・分岐点 main root 再現・現行 baseline 差し替え再実行（検証後に旧状態へ復元））で由来分類する。疑似 fail を当該変更起因と誤分類しないこと
 
@@ -416,6 +416,21 @@ git branch -d "{type}/issue-{N}"
 - worktree 内で作業する場合、`workdir` パラメータに worktree パスを指定する
 - `cd` によるディレクトリ移動は行わない
 - Edit/Write ツールでもパスに `.worktrees/{N}-{type}/` を含める
+
+## git 操作の前置確認（operation in progress・commit 前 branch 確認）
+
+既存の個別操作前確認（stash 往復前の worktree 状態確認、merge 前の clean 確認、push 前の branch 確認）に先立つ共通の前置確認を行う。これらは既存確認の置換ではなく、次の段階として適用する。
+
+### operation in progress の確認
+
+1. 操作開始前に長形式の `git status` を実行し、rebase、merge、cherry-pick、revert 等の operation in progress が表示されないことを確認する
+2. 表示された場合は `git status --porcelain` でも状態を確認し、操作の性質に応じて abort または完了により解除する。解除後に長形式の `git status` を再実行し、進行中操作が消滅したことを確認してから次へ進む
+
+### commit 前の current branch 確認
+
+main への永続化を含む commit の直前に `git branch --show-current` を実行し、current branch が `main` であることを確認する。`main` 以外の場合は main で直接 commit せず、対象 worktree を用いる手順へ切り替える。
+
+この共通前置確認の後も、stash 往復前確認・merge 前 clean 確認・push 前 branch 確認はそれぞれの操作段階で引き続き実施する。
 
 ## Merge Conflict 対応パターン
 
