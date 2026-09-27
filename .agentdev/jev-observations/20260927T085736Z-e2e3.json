@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260927T085736Z-e2e3",
+  "workflow": "req-define",
+  "evaluationKind": "req-matching-and-classification",
+  "subject": "RU-0158（Jev 実行基盤 Cloudflare 完全置換）の既存REQ照合と要件分類",
+  "sourceRevision": "ru:RU-0158@2026-09-27T17:52:30+09:00",
+  "durationMs": 797,
+  "inputs": {
+    "requestDigest": "b9b4a6af94de85fc3ec33b00caf30b3829a98d58a3beb0484ddfd61ddfb2d591",
+    "references": [
+      {
+        "digest": "ab31970f62660e5ddd4184a5ae54bb1e0250422cff828d052355a8bd283fbeea",
+        "label": "入力 RU",
+        "path": ".agentdev/backlog/req-units/RU-0158.md"
+      }
+    ]
+  },
+  "failure": {
+    "kind": "network_error",
+    "detail": "GatewayInternalServerError: Free tier users do not have access to this model. Upgrade to paid credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up for unrestricted access."
+  }
+}

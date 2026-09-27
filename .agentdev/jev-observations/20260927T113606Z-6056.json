@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260927T113606Z-6056",
+  "workflow": "ts-010-reverify",
+  "evaluationKind": "real-gateway-three-forms",
+  "subject": "TS-010 再実測（TS-010 on_failure fix-and-reverify 発火後。adapter 物理 mapping 修正後の実 gateway 検証）",
+  "sourceRevision": "62ab5166",
+  "durationMs": 1000,
+  "inputTokens": 537,
+  "inputs": {
+    "requestDigest": "1efcdc5d44bc2ac4b4679279b830a6aafe0ab16a2c7ead2d78df9d222aef56f2"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.8,
+        "false": 0.19999999999999996
+      }
+    },
+    {
+      "questionId": "c1",
+      "questionForm": "choice",
+      "value": "案A",
+      "probabilityDistribution": {
+        "案A": 0.99,
+        "案B": 0.01
+      }
+    },
+    {
+      "questionId": "s1",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "低": 0.77,
+        "中": 0.22,
+        "高": 0.01
+      }
+    }
+  ],
+  "confidence": 0.97
+}

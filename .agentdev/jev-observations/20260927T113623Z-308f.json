@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260927T113623Z-308f",
+  "workflow": "ts-012-reverify",
+  "evaluationKind": "supervisor-bridge-supply",
+  "subject": "TS-012 実測（scrub 模擬環境 + ocenv bridge 経由での credential 供給確認）",
+  "sourceRevision": "62ab5166",
+  "durationMs": 278,
+  "inputTokens": 420,
+  "inputs": {
+    "requestDigest": "c4a347f47e66542465abc459d960e00706eb6f81604339d28bea0ee7d42a0b76"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.33,
+        "false": 0.6699999999999999
+      }
+    }
+  ]
+}

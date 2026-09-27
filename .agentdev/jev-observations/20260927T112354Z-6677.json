@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260927T112354Z-6677",
+  "workflow": "case-close",
+  "evaluationKind": "ts010-real-gateway-verification",
+  "subject": "Jev Cloudflare adapter 実 gateway 実測（boolean/choice/score、PR #3185 HEAD 62ab5166）",
+  "sourceRevision": "62ab5166",
+  "durationMs": 129,
+  "inputs": {
+    "requestDigest": "863f089eac816fad111574c4e6cb2e8d6cc33a7d7a62d5b38b0a4e93b53a2ebd"
+  },
+  "failure": {
+    "kind": "network_error",
+    "detail": "Error: gateway responded with HTTP 400: {\"success\":false,\"errors\":[{\"code\":7000,\"message\":\"No route for that URI\"}],\"messages\":[],\"result\":null}"
+  }
+}
