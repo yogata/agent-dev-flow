@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260927T101021Z-409b",
+  "workflow": "case-ready",
+  "evaluationKind": "standard-epic-attribution",
+  "subject": "Case #3183 実行構造の Standard/Epic 帰属（OU-001/OU-002 依存グラフ、連結成分 1・2ノード・Epic サイズ 2）",
+  "sourceRevision": "852adce0e790bf76f6a9e60835f39690f19f7636",
+  "durationMs": 674,
+  "inputs": {
+    "requestDigest": "fcdf484d26a14de2a67c678705b6e148444e876ac9379c64d19525f9c905ea11"
+  },
+  "failure": {
+    "kind": "network_error",
+    "detail": "GatewayInternalServerError: Free tier users do not have access to this model. Upgrade to paid credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up for unrestricted access."
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260927T101050Z-b38b",
+  "workflow": "case-ready",
+  "evaluationKind": "scope-overlap-detection",
+  "subject": "Case #3183 と既存オープン Issue のスコープ重複判定（重複候補 0 件）",
+  "sourceRevision": "852adce0e790bf76f6a9e60835f39690f19f7636",
+  "durationMs": 411,
+  "inputs": {
+    "requestDigest": "a92d4ab5cc9a8def686739ea5f627d02600e21dc0cc54c68e801a3f8cbf4f01e"
+  },
+  "failure": {
+    "kind": "network_error",
+    "detail": "GatewayInternalServerError: Free tier users do not have access to this model. Upgrade to paid credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up for unrestricted access."
+  }
+}
