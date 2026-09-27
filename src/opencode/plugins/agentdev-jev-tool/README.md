@@ -17,9 +17,9 @@ evaluate は evaluator 成功後の時点で観測（1 semantic evaluation = 1 o
 
 ## 公開契約
 
-操作契約の正は Custom Tool 操作契約 Design「Jev 先行評価」節（extension 経由で解決）。公開契約は provider・SDK 非依存であり、provider 接続（初期 Vercel adapter）と評価 SDK の名称・型・格納位置は adapter パッケージ（`src/opencode/tools/agentdev-jev/adapter-vercel/`）内部に隠蔽される（配布依存境界: REQ-{NNN}・DEC-{NNN} 決定2）。
+操作契約の正は Custom Tool 操作契約 Design「Jev 先行評価」節（extension 経由で解決）。公開契約は provider・SDK 非依存であり、provider 接続（現行 Cloudflare adapter）と外部 API 固有の名称・型・格納位置は adapter パッケージ（`src/opencode/tools/agentdev-jev/adapter-cloudflare/`）内部に隠蔽される（配布依存境界: REQ-{NNN}・DEC-{NNN} 決定2）。
 
-- 利用可否: `AI_GATEWAY_API_KEY` 環境変数の設定有無で決まる（feature flag・opt-in 手続きは不要）
+- 利用可否: `CLOUDFLARE_ACCOUNT_ID` と `CLOUDFLARE_API_TOKEN` 環境変数の設定有無で決まる（feature flag・opt-in 手続きは不要）
 - 未設定時: API を呼び出さず構造化失敗（not_configured）を返し、観測を生成しない。呼出し元 Workflow は従来 LLM 経路のみで完了させる
 - API 障害時: 自動 retry せず構造化失敗を返し、失敗観測に失敗分類と最小 diagnostic が記録される。呼出し元 Workflow は即座に従来 LLM 経路へ fallback する
 - 観測書込み失敗時: Workflow の成否と独立（完了報告で識別可能な warning として扱うのは呼出し元の責務）。evaluate 内部の観測永続化失敗は評価結果の返却と独立した warning とし、評価結果を失わない（fail-open。rollback・再実行・擬似再生成なし）
@@ -30,7 +30,7 @@ evaluate は evaluator 成功後の時点で観測（1 semantic evaluation = 1 o
 
 OpenCode は `.opencode/plugins/` 直下のファイル（depth-1）のみを自動読み込みする。本パッケージはディレクトリ型のため、インストーラ（`scripts/install.ps1` 等）が junction 作成に加えて、同ディレクトリ直下へローダーシム `<パッケージ名>.ts`（`plugin.ts` の default を再エクスポートする1行）を生成する。シム経由で本 Plugin が読み込まれ、custom tool `agentdev_jev` が登録される。
 
-provider 実装は Tool 本体が動的解決する（`adapter-vercel/` パッケージが配布物に存在しない環境では not_configured として構造化失敗を返し、配布依存境界を維持する）。
+provider 実装は Tool 本体が動的解決する（`adapter-cloudflare/` パッケージが配布物に存在しない環境では not_configured として構造化失敗を返し、配布依存境界を維持する）。
 
 ## テスト実行
 

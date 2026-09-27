@@ -1,0 +1,15 @@
+{
+  "name": "agentdev-jev-tool-adapter-cloudflare",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cloudflare AI Gateway adapter for the agentdev-jev Custom Tool. Cloudflare API specifics (endpoint, auth, request/response schema, provider metadata) are confined to this adapter package (distribution dependency boundary).",
+  "type": "module",
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "@types/bun": "^1.3.0"
+  }
+}

@@ -5,10 +5,10 @@
 // 操作契約・正規化・失敗の構造化・観測の形式検証は Tool 本体
 // （src/opencode/tools/agentdev-jev/）が所有する。
 //
-// 公開スキーマは provider・SDK 非依存（REQ-{NNNN}-{NNN}）。provider 接続（初期 Vercel
-// adapter）は Tool 本体が動的解決し、API key（AI_GATEWAY_API_KEY）未設定時は
-// 呼び出さず not_configured を返す。Jev 障害時も Workflow は従来 LLM 経路で
-// 継続できる。
+// 公開スキーマは provider・SDK 非依存（REQ-{NNNN}-{NNN}）。provider 接続（現行 Cloudflare
+// adapter）は Tool 本体が動的解決し、credential（CLOUDFLARE_ACCOUNT_ID と
+// CLOUDFLARE_API_TOKEN）未設定時は呼び出さず not_configured を返す。Jev 障害時も
+// Workflow は従来 LLM 経路で継続できる。
 //
 // args スキーマは zod を用いない（依存ゼロの構造的定義）。入力の検証は
 // Tool 本体（runAgentdevJevOperation）が操作契約で厳密に行う。
@@ -174,9 +174,10 @@ export const REQUEST_PROPERTY_SCHEMA = {
   type: "object",
   description:
     "Structured Jev prior-evaluation operation request. See the agentdev_jev operation contract (evaluate, " +
-    "observation_write). The public contract is provider- and SDK-independent. When the gateway credential " +
-    "(AI_GATEWAY_API_KEY) is unset, evaluate returns a distinct not_configured failure without calling the API; " +
-    "callers fall back to the legacy LLM path. No auto-retry on API failure. Evaluation language is Japanese. " +
+    "observation_write). The public contract is provider- and SDK-independent. When the credentials " +
+    "(CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN) are unset, evaluate returns a distinct not_configured failure " +
+    "without calling the API; callers fall back to the legacy LLM path. No auto-retry on API failure. Evaluation " +
+    "language is Japanese. " +
     "One semantic evaluation = one observation: evaluate persists the observation (one JSON) under " +
     ".agentdev/jev-observations/ right after the evaluator succeeds (and a failure observation when the call " +
     "fails after starting; no observation for not_configured or input validation failures), and observation_write " +
@@ -231,7 +232,7 @@ export function createAgentdevJevToolDefinition(deps: {
       "Jev prior evaluation with a verified provider/SDK-independent operation contract. " +
       "Operations: " +
       AGENTDEV_JEV_PUBLIC_CONTRACTS.map((c) => `${c.operation} (side-effect, fail-closed)`).join(", ") +
-      ". When the gateway credential is unset the tool returns a distinct not_configured failure without calling " +
+      ". When the credentials are unset the tool returns a distinct not_configured failure without calling " +
       "the API and workflows continue on the legacy LLM path; API failures are never auto-retried and are returned " +
       "as structured failures. One semantic evaluation = one observation: evaluate persists the observation (one " +
       "JSON per evaluation) under .agentdev/jev-observations/ right after the evaluator succeeds — before the " +

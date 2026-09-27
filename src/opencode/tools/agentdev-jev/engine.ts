@@ -320,7 +320,7 @@ export async function evaluateWithProvider(
     return {
       ok: false,
       failure: notConfiguredFailure(
-        "Jev provider is not configured (set AI_GATEWAY_API_KEY). Falling back to the legacy LLM path is the caller's decision.",
+        "Jev provider is not configured (set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN). Falling back to the legacy LLM path is the caller's decision.",
       ),
     };
   }
