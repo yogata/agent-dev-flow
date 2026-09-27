@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下55件を第一参照先とする。
+現在の要件判断では、以下56件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -67,6 +67,7 @@
 | [REQ-090](REQ-090.md) | Jev 先行評価の実運用組込み（Stage 1: 観測可能化） |
 | [REQ-091](REQ-091.md) | Supervisor 環境向け credential 供給ブリッジの正本管理 |
 | [REQ-092](REQ-092.md) | agentdev_gh issue_list 運用規律と labels 論理値専用の文書整備 |
+| [REQ-093](REQ-093.md) | agentdev_gh 起動環境障害の予防・診断・回復の恒久化 |
 <!-- AUTOGEN:END -->
 
 ## 廃止済み要件
