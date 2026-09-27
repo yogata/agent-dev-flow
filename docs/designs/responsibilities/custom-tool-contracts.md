@@ -2,9 +2,9 @@
 title: Custom Tool 操作契約
 status: accepted
 created: 2026-08-24
-updated: 2026-09-24
+updated: 2026-09-27
 ---
-<!-- ADF-COVERS(design): REQ-090-001, REQ-090-002, REQ-090-003, REQ-090-004, REQ-090-009, REQ-090-010, REQ-090-011, REQ-090-012, REQ-090-013, REQ-090-014, REQ-090-015, REQ-090-016, REQ-090-017, REQ-090-018, REQ-090-019, REQ-090-020, REQ-092-003, REQ-011-033 -->
+<!-- ADF-COVERS(design): REQ-090-001, REQ-090-002, REQ-090-003, REQ-090-004, REQ-090-009, REQ-090-010, REQ-090-011, REQ-090-012, REQ-090-013, REQ-090-014, REQ-090-015, REQ-090-016, REQ-090-017, REQ-090-018, REQ-090-019, REQ-090-020, REQ-090-021, REQ-090-022, REQ-090-023, REQ-092-003, REQ-011-033 -->
 <!-- ADF-COVERS(design): REQ-009-051, REQ-052-013, REQ-093-002, REQ-093-003 -->
 <!-- ADF-COVERS(implementation): REQ-011-001, REQ-011-002, REQ-011-003, REQ-011-005, REQ-011-008, REQ-011-009, REQ-011-013, REQ-011-014, REQ-011-015, REQ-011-020, REQ-011-021, REQ-011-022, REQ-011-023, REQ-011-024, REQ-011-031, REQ-011-032, REQ-052-001, REQ-052-002, REQ-052-003, REQ-052-004, REQ-052-005, REQ-052-008, REQ-052-009, REQ-052-010, REQ-052-011 -->
 
@@ -79,8 +79,8 @@ GitHub版 / Local版等価性:
 
 「Jev 先行評価」操作契約:
 
-- 入力: 評価リクエスト（state、instructions、criteria、質問群〔形式: boolean 相当・choice（候補付き）・score（重複のない離散的な水準付き）〕）。provider 接続設定は AI_GATEWAY_API_KEY 環境変数で解決する。判断対象・必要 state・判断基準・結果空間を評価入力だけで判断可能な形に閉じる構成は Workflow / Capability Skill の責務である（REQ-090-019）。
-- 出力: 質問ごとの結果（選択・真偽・水準）、候補別確率分布、provider が実際に返した confidence（evaluation 単位。provider 固有の格納位置〔初期 Vercel adapter では AI SDK 7 experimental_evaluate 経由の providerMetadata.typesafe.confidence〕を内部吸収して共通形式へ正規化。provider が返さない場合は返さない）、inputTokens（provider が返す場合）、機械的処理時間。失敗時は構造化失敗（分類: not_configured、timeout、429、5xx、network error、response validation error 等）。
+- 入力: 評価リクエスト（state、instructions、criteria、質問群〔形式: boolean 相当・choice（候補付き）・score（重複のない離散的な水準付き）〕）。provider 接続設定は `CLOUDFLARE_ACCOUNT_ID` と `CLOUDFLARE_API_TOKEN` 環境変数で解決する（Cloudflare AI Gateway の default Gateway を利用し、Gateway ID を ADF の設定契約として持たない）。判断対象・必要 state・判断基準・結果空間を評価入力だけで判断可能な形に閉じる構成は Workflow / Capability Skill の責務である（REQ-090-019）。
+- 出力: 質問ごとの結果（選択・真偽・水準）、候補別確率分布、provider が実際に返した confidence（evaluation 単位。provider 固有の格納位置〔Cloudflare adapter では Cloudflare AI Gateway `/ai/run` response 内の provider 固有 field。物理 field 名は adapter 実装の自由度とする〕を内部吸収して共通形式へ正規化。provider が返さない場合は返さない）、inputTokens（provider が返す場合）、機械的処理時間。失敗時は構造化失敗（分類: not_configured、timeout、429、5xx、network error、response validation error 等）。
 - 保証: 公開契約は provider・SDK 非依存とし、AI SDK の型名・API 名を公開スキーマと Workflow 層へ漏らさない。質問型（独立命題・排他候補・順序水準）と boolean/choice/score の対応づけは adapter mapping であり意味契約の変更ではない。Tool は判断対象の意味・評価基準・Jev を呼ぶべき箇所・最終判断を所有しない（REQ-011-020 準拠）。Tool は評価入力に対する構造検証に限定して携わり、semantic input の意味的完備性（判断対象・必要 state・判断基準・結果空間の閉じ性、候補集合の正解クラス網羅、水準の意味境界の適切性）を自動判定・推論・補完しない（REQ-090-019）。API key 未設定時は呼び出さず構造化失敗（not_configured）を返し、semantic evaluation observation を生成しない。評価入力の事前検証失敗（invalid input）でも observation を生成しない。代替手段は従来 LLM 経路であり、Jev 障害時も Workflow は継続できる（REQ-052-005 の代替手段・継続可否の定義義務に基づく）。評価言語は日本語とする。
 - 観測契約（一次事実）: 観測単位は 1 semantic evaluation = 1 observation（1 JSON）とし、1 Workflow 実行単位の JSON 集約を行わない。各 observation は実行元 Workflow と評価種別を識別できる情報を持つ。保存する一次事実は次に限定する。(1) evaluator 返却結果（canonical result: boolean=真偽、choice=候補、score=定義済み scale 内の離散的な level に一意対応する正規化表現〔level label と scale 内の整数位置のいずれか一方へ Custom Tool が正規化したもの。evaluator result と final result は同一の正規化表現で比較する〕。score の canonical result への連続値〔例: 0.31、1.25〕の受理・保存は機械検証可能な形で拒否し、判断の分布情報は候補別確率分布で保持する。REQ-090-014。評価入力の各質問と各結果の1対1対応、各質問の evaluator result と候補別確率分布の双方保持）、(2) provider が実際に返した confidence（evaluation 単位のみ。judgment 単位への複製、probability distribution からの代替 confidence の生成・永続化の禁止）、(3) 入力再構成情報（具体的 source revision、再構成可能入力は参照と request digest、再構成不能入力のみ最小 snapshot。source revision から一意に導出できる provider・requested model 等の観測ごとの必須保存をしない。非導出の identity 差異が実行時観測された場合のみ保持）、(4) reasoning model の最終判断結果と差異理由分類（final result は evaluator 成功観測に限定して保持。failure observation への重複保存を要求しない。差異理由は canonical result が evaluator result と final result で異なる場合に必須とし、一致する場合は保持せずその指定を拒否する。差異理由は evaluation_input_defect / semantic_disagreement / deterministic_override / unknown の4分類とし、原因を確定できない差異は unknown として保存できる。REQ-090-015）、(5) 呼出し時間と input token 数（provider 返却時のみ）、(6) 失敗分類と最小 diagnostic（実際の呼出し開始後の失敗のみ: timeout、429、5xx、network error、response validation error の5分類。REQ-090-016）。観測は append-only の一次事実であり、Workflow 再開・再実行による同一判断の再観測を排除・統合しない。
 - 永続化契約（中断耐性）: evaluate は evaluator 成功後・呼出元 Workflow が reasoning model へ進む前に、当該評価の一次観測の永続化を試みる。永続化成功後の中断でも一次観測が失われない。永続化自体の失敗は観測保存失敗契約（fail-open）に従う。観測の保存のみに失敗した場合、Workflow の正規処理結果を維持し、rollback・再実行・擬似再生成を行わず、識別可能な warning を構造化情報として呼出元へ返す（REQ-090-013）。
@@ -89,7 +89,7 @@ GitHub版 / Local版等価性:
 - 書込先: 書込先 root は Tool が内部解決し、呼出側から指定できない。worktree コンテキストの委譲実行から呼び出された場合も main リポジトリ側 `.agentdev/jev-observations/` に帰着する（実測: 20260923T133911Z-6859）。この振る舞いは worktree コンテキストに依存しない。機構記述（cwd 相対解説等）は契約文言に含めず、観測可能契約のみを規定する（実装は物理実装の自由度とする）。
 - 旧派生状態の除去: recordState、outcome、llmTreatment、unchanged/corrected、finalizedBy、direct-finalization marker、fallback reason、not_configured/invalid_input observation を正規観測契約から除去する（REQ-090-017）。既存の v1 観測（1 Workflow 実行 = 1 JSON、部分レコード/完成レコード形式）は履歴として保持し、migration・変換・読み取り互換を要求しない。v1 観測を新契約の現行 observation として解釈しない。
 - 操作構成の自由度: operation カタログ（evaluate、観測の永続化と final result 反映の操作分割の有無）、観測 JSON の field 名、filename、完了状態の物理表現は実装設計時の自由度とし、本節の意味契約（一次事実、evaluation 単位 confidence、中断耐性、fail-open）を変更しない範囲で定める。provider 返却の score 値から定義済み scale level への正規化の写像方法も、連続値を canonical result として残さない限りにおいて実装設計時の自由度とする（REQ-090-014）。
-- 配布境界: ADF 汎用の Tool として配布対象とする（REQ-052-006）。正式名称 `agentdev_jev`、物理配置 Tool 本体 `src/opencode/tools/agentdev-jev/`、初期 Vercel adapter `src/opencode/tools/agentdev-jev/adapter-vercel/`（評価 SDK 依存はこの adapter パッケージに閉じる）、Plugin 登録配線 `src/opencode/plugins/agentdev-jev-tool/`。
+- 配布境界: ADF 汎用の Tool として配布対象とする（REQ-052-006）。正式名称 `agentdev_jev`、物理配置 Tool 本体 `src/opencode/tools/agentdev-jev/`、Cloudflare adapter パッケージ（`src/opencode/tools/agentdev-jev/` 配下。Cloudflare AI Gateway 接続。物理ディレクトリ名は repository 規約に従う。評価 SDK・HTTP 依存はこの adapter パッケージに閉じる）、Plugin 登録配線 `src/opencode/plugins/agentdev-jev-tool/`。
 
 ## ローカル版実装差し替え
 
