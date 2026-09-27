@@ -27,10 +27,6 @@
 既存 Root Case（GitHub Issue）を入力にする場合も `/agentdev/case-auto` へ Issue番号・URL を指定する。
 Root Case の状態と resume_command から通常経路と例外経路が解決される。
 
-## 廃止コマンドの移行案内
-
-v4（DEC-033）では case-open、case-ready、case-run、case-close、case-revise は公開 command ではなく内部 lifecycle 段階へ回収された。旧 case-* コマンドに相当する操作は `/agentdev/case-auto` へ Root Case を指定して実行する。alias は残さない。
-
 ## 各コマンドの概要
 
 各コマンドの入出力の詳細は [コマンドリファレンス](../../src/opencode/commands/agentdev/README.md) を参照する。
