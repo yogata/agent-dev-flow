@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260927T073715Z-665a",
+  "workflow": "req-define",
+  "evaluationKind": "step3-existing-req-matching",
+  "subject": "RU-0157（REQ-012-026/042 実装宣言復帰）の既存REQ照合判断",
+  "sourceRevision": "a9e4828d",
+  "durationMs": 628,
+  "inputs": {
+    "requestDigest": "bfeca4aee17383caae9655b23784479061e3653890048a69e300c698e5178e79",
+    "references": [
+      {
+        "digest": "e19b3b14b0705905cb766aa68287c99d4f2d1d922e855c37c34845d17f82a653",
+        "label": "RU-0157",
+        "path": ".agentdev/backlog/req-units/RU-0157.md"
+      }
+    ]
+  },
+  "failure": {
+    "kind": "network_error",
+    "detail": "GatewayInternalServerError: Free tier users do not have access to this model. Upgrade to paid credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up for unrestricted access."
+  }
+}

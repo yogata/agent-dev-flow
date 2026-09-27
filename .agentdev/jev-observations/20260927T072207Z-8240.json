@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260927T072207Z-8240",
+  "workflow": "backlog-review",
+  "evaluationKind": "analysis-step23",
+  "subject": "intake promoted 3 成果物の暫定分類（文書7分類）と統合・分割判定・depends_on 解決",
+  "sourceRevision": "878cd379",
+  "durationMs": 882,
+  "inputs": {
+    "requestDigest": "2e4d9b7bfce31665f0fff5a7851d28cc5284b523154963c3ceed7b8e63b05340"
+  },
+  "failure": {
+    "kind": "network_error",
+    "detail": "GatewayInternalServerError: Free tier users do not have access to this model. Upgrade to paid credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up for unrestricted access."
+  }
+}
