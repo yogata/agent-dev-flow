@@ -52,3 +52,19 @@
 - **想定反映先**: req-define の draft 生成規約（該当箇所があれば）
 - **関連**: Root Case Issue #3192
 - **タグ**: `#req-update` `#draft-format`
+
+## 同一ファイルへの複数 edit 同時並行適用時、guard fail-closed ブロック後に部分適用残骸が残り得る（実取得 → 単発再 edit で解消）
+
+- **問題事象**: case-open（Root Case #3193、Definition 変更 18 artifact_actions 適用）で req-impact-map.md への 7 件の edit を同一メッセージで同時並行実行したところ、1 件が agentdev-textlint-guard の fail-closed ブロック（oldString is not found verbatim）で拒否された。ブロック後に行を grep で確認すると、当該 edit の newString の一部（列挙追加のみ）が反映され、パス修正部分が未反映の部分適用残骸が残っていた。
+- **発生局面**: 実装（case-open lifecycle STEP-4 の Definition 変更適用。Case 専用 worktree）
+- **検知方法**: edit 応答の fail-closed メッセージ（cannot verify edit … blocked per fail-closed）と、ブロック後に grep で該当行を実取得した結果の突合
+- **根本原因**: 同一ファイルへの複数 edit の同時並行適用では、guard の oldString verbatim 照合が他 edit の適用結果に依存して成立し得ず、拒否応答の return 時点で当該 edit の適用状態が「完全未適用」ではなく「部分的に適用された残骸」となり得ることを呼出側が前提としていなかった
+- **自律対応内容**: ブロックされた対象行を grep で実取得し、残骸状態を実体とした oldString で単発 edit を再実行して完全適用を完了（成功応答で検証済み。UTF-8 健全性と出現回数の文字列検証は後段の branch HEAD 実測で全件合格を確認）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 同一ファイルへ複数 edit を出す場合は相互非依存の oldString を選ぶか順次実行へ切り出す。guard ブロック後は行の実取得（grep）で現在状態を確認してから oldString を組み立てる（完全未適用を仮定した再 edit は失敗する）
+- **再発条件**: 同一ファイルへの複数 edit を 1 メッセージで同時並行実行し、かつ guard 検証が oldString verbatim 照合を行う環境
+- **予防策候補**: guard ブロック時の再 edit 手順（実取得 → 再 oldString → 単発 edit）と、同一ファイルへの複数 edit は順次実行に限定する運用規律を明文化する
+- **想定反映先**: AGENTS.md 編集規律（edit ツール優先節の補足）、または agentdev-git-worktree reference worktree-operations.md「書込み guard 運用指針」節の補足
+- **関連**: Root Case Issue #3193、Definition PR #3196、docs/designs/responsibilities/req-impact-map.md
+- **タグ**: `#edit-tool` `#textlint-guard` `#fail-closed`
