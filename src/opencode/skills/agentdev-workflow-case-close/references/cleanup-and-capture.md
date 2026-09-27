@@ -1,7 +1,7 @@
 # STEP-5/6: Post-merge・Issue クローズ・クリーンアップ・Capture 回収・永続化（cleanup-and-capture）
 
 > 本 reference は `agentdev-workflow-case-close` SKILL.md の制御平面（STEP 一覧）STEP-5, STEP-6 詳細である。
-> Post-merge テスト戦略検証、Issue クローズ、worktree/branch 削除、親Epic 自動クローズ判定、実行前同期（main）、Capture 回収、学び検知、ドメイン状態永続化、完了報告を提供する。
+> Post-merge テスト戦略検証、Issue クローズ、worktree/ローカルブランチ削除、親Epic 自動クローズ判定、実行前同期（main）、Capture 回収、学び検知、ドメイン状態永続化、完了報告を提供する。
 
 ## 目次
 
@@ -58,7 +58,7 @@
 
 ### Purpose
 
-worktree/branch 削除、親Epic 自動クローズ判定、実行前同期、Capture 回収、学び検知、ドメイン状態永続化、tmp/ 残存確認、完了報告を実施する。
+worktree/ローカルブランチ削除、親Epic 自動クローズ判定、実行前同期、Capture 回収、学び検知、ドメイン状態永続化、tmp/ 残存確認、完了報告を実施する。
 
 ### Input Resolution
 
@@ -74,7 +74,7 @@ worktree/branch 削除、親Epic 自動クローズ判定、実行前同期、Ca
 
 ### Procedure
 
-#### STEP-6-1: ブランチ、worktree 削除
+#### STEP-6-1: ローカルブランチ、worktree 削除
 
 `agentdev-git-worktree` の worktree 削除手順に従う。
 
@@ -85,8 +85,8 @@ worktree/branch 削除、親Epic 自動クローズ判定、実行前同期、Ca
 - **runtime workspace のクリーンアップは harness 側の責務**（charter 原則、harness 分離モデル Design 参照）、case-close は関与しない
 - worktree remove → Permission denied 時は停止（リトライは skill 定義に従う）
 - ローカルブランチ削除（squash merge 後の条件付き `-D` は skill 定義に従う）
-- リモートブランチ削除
-- 削除失敗時は警告表示して停止すること
+- リモートブランチ削除は実行しない（GitHub の deleteBranchOnMerge 自動削除に委譲）
+- ローカルブランチ・worktree の削除失敗時は警告表示して停止すること
 
 #### STEP-6-2: 親Epic Issue 更新
 
@@ -157,11 +157,11 @@ learning と intake を同一 commit に含める。
 | ブランチ・worktree 削除失敗 | `worktree-cleanup-failed.md` |
 
 GitHub 完了後に `.agentdev` push 失敗の場合は standard 種別を使用してはならない。
-**結果状態の分離報告**: GitHub 側完了状態、`.agentdev` 永続化状態、ブランチ削除状態を独立して報告。
+**結果状態の分離報告**: GitHub 側完了状態、`.agentdev` 永続化状態、ローカルブランチ削除状態を独立して報告。
 
 ### Result
 
-- worktree/branch 削除完了
+- worktree/ローカルブランチ削除完了
 - 親Epic 自動クローズ判定・更新完了
 - 実行前同期完了（main への `git pull --ff-only`）
 - Capture 回収完了（intake/learning 分離）
@@ -172,20 +172,20 @@ GitHub 完了後に `.agentdev` push 失敗の場合は standard 種別を使用
 
 ### Evidence
 
-- worktree・ブランチ削除結果、親Epic 更新の VERIFY 結果、重複ファイルチェックとリスク検出結果、Capture 回収ファイル群、`.agentdev/` commit hash と push 結果、tmp/ 残存確認結果、完了報告出力
+- worktree・ローカルブランチ削除結果、親Epic 更新の VERIFY 結果、重複ファイルチェックとリスク検出結果、Capture 回収ファイル群、`.agentdev/` commit hash と push 結果、tmp/ 残存確認結果、完了報告出力
 
 ### Completion Verification
 
-- worktree/branch 削除が完了（失敗時は警告表示して停止）していること。Capture 回収が intake/learning 分離済みであること。結果状態の分離報告（GitHub 側、`.agentdev` 永続化、ブランチ削除）がなされていること。当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（残存時は対応結果を報告済みであること）
+- worktree/ローカルブランチ削除が完了（失敗時は警告表示して停止）していること。Capture 回収が intake/learning 分離済みであること。結果状態の分離報告（GitHub 側、`.agentdev` 永続化、ローカルブランチ削除）がなされていること。当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（残存時は対応結果を報告済みであること）
 
 ### Resume-Idempotency
 
-- worktree・ブランチの非存在、Capture 回収済みファイル、`.agentdev/` の commit/push 状態（durable state）で再開点を判定する。削除済みリソースの再削除、回収済み capture の再回収を行わない
+- worktree・ローカルブランチの非存在、Capture 回収済みファイル、`.agentdev/` の commit/push 状態（durable state）で再開点を判定する。削除済みリソースの再削除、回収済み capture の再回収を行わない
 
 ## resume point
 
 - CI 通過状態、Issue close 状態
-- worktree/branch 削除状態
+- worktree/ローカルブランチ削除状態
 - 親Epic 自動クローズ判定結果、子Issue 状態一覧
 - 実行前同期状態（重複ファイルチェック、同期リスク検出）
 - Capture 回収状態（intake/learning 分離）
@@ -211,7 +211,7 @@ GitHub 完了後に `.agentdev` push 失敗の場合は standard 種別を使用
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- 不変条件（ブランチ、worktree 削除は必ず実行、失敗時は警告表示して停止）
+- 不変条件（ローカルブランチ、worktree 削除は必ず実行、失敗時は警告表示して停止。remote ブランチの削除は GitHub の deleteBranchOnMerge 自動削除に委譲し case-close は実行しない）
 - 不変条件（`git pull --ff-only` は必ず実行、pull 前 ローカル変更チェック、hash 検証必須）
 - 不変条件（テスト戦略チェックボックスを必ず更新）
 - 不変条件（コメントテンプレートの【必須】セクション確認）

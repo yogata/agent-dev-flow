@@ -39,7 +39,7 @@ case-open workflow は次の6 STEP で構成する。
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
 | STEP-1 | 引き継ぎ判定 | 要件doc 受領 | 引き継ぎ停止判定完了（継続 / consumer 停止） | [references/handoff.md](references/handoff.md) |
-| STEP-2 | Root Case 確立 | STEP-1 継続確定 + adversarial-review 完了（skip 含む） | Root Case GitHub Issue 作成済み（対象 REQ 番号埋め込み、状態 open） | [references/root-case-and-definition-package.md](references/root-case-and-definition-package.md) |
+| STEP-2 | Root Case 確立 | STEP-1 継続確定 + adversarial-review 完了（skip 含む）+ preflight 設定検証通過（GitHub Issue/PR 使用リポジトリ種別） | Root Case GitHub Issue 作成済み（対象 REQ 番号埋め込み、状態 open） | [references/root-case-and-definition-package.md](references/root-case-and-definition-package.md) |
 | STEP-3 | Definition Package 生成 | Root Case 確立 | Definition Package 生成・Root Case 関連付け済み。REQ 行追加を伴う場合はトレーサビリティポリシー追随確認済み。既存行の意味変更を含む場合は design 対応事前確認（coverage --req 実査・欠落時 artifact_actions 組込み）実施済み | [references/root-case-and-definition-package.md](references/root-case-and-definition-package.md) |
 | STEP-4 | 実変更判定と Definition PR 作成 | Definition Package 確定 | 実変更時: Definition PR 作成済み（Case 単位 1 件）。実変更なし: 作成しない | [references/definition-pr-and-idempotency.md](references/definition-pr-and-idempotency.md) |
 | STEP-5 | 冪等再実行確認 | STEP-4 完了 | 既存 Root Case・既存 Definition PR 再利用済み、重複生成なし、不足分のみ処理済み、横断依存検査実施済み（警告提示記録または検出不能報告） | [references/definition-pr-and-idempotency.md](references/definition-pr-and-idempotency.md) |
@@ -60,7 +60,7 @@ case-open workflow は次の6 STEP で構成する。
 ### 終了条件（termination）
 
 - 正常終了: deviation capture・完了報告 STEP の完了報告出力まで
-- 停止終了: 要件が曖昧で Root Case を確立できない場合、`auto_gate.auto_ready` が false、未解決質問、未解決衝突、repo 外操作、停止理由が残る場合、adversarial-review 由来の unresolved ユーザー判断事項、引き継ぎ停止（consumer リポジトリ）、canonical Definition との実変更判定不能
+- 停止終了: 要件が曖昧で Root Case を確立できない場合、`auto_gate.auto_ready` が false、未解決質問、未解決衝突、repo 外操作、停止理由が残る場合、adversarial-review 由来の unresolved ユーザー判断事項、引き継ぎ停止（consumer リポジトリ）、canonical Definition との実変更判定不能、preflight 設定検証の「設定無効」または「検証不能」（blocked。両者を停止理由として区別報告する）
 
 ## 主要 Capability Skill 連携
 

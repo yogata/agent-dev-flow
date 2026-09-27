@@ -20,13 +20,13 @@ case-close command は公開 interface（入出力契約・ガードレール）
 
 ## 出力
 
-- **単一 Issue クローズ時**: マージ済みPR、クローズ済みCase、削除済みブランチ、worktree
+- **単一 Issue クローズ時**: マージ済みPR、クローズ済みCase、削除済みローカルブランチ、worktree
 - **Epic Wave クローズ時**: 現在 Wave の全子Issue マージ、クローズ、Epic status table 更新、最終 Wave 判定結果（Epic クローズ または 残 Wave 通知）
 
 ## 副作用
 
 - PR squash merge、Issue close、Issue コメント追加、Epic Issue 本文ステータステーブル更新（Custom Tool `agentdev_gh` 経由、case-close 単一書き手）
-- worktree/ ブランチ削除（local + remote）
+- worktree/ ローカルブランチ削除（remote ブランチは GitHub の deleteBranchOnMerge 自動削除に委譲し、case-close は実行しない）
 - Design `status` frontmatter 昇格（draft → accepted、棚卸し制の Design 状態評価（STEP-3-2）で実装・検証との整合確認を通過した対象 Design）
 - `.agentdev/learning/inbox.md`、`.agentdev/intake/inbox/` への Capture 回収、`.agentdev/` 配下 commit/push
 - 当該 Workflow Skill は worktree root 配下以外を編集しない（case-close command の worktree 隔離に従う）
@@ -45,7 +45,7 @@ Epic Wave クローズは STEP-1 のルーティングで分岐し、E1〜E6 と
 | STEP-3 | docs 検証・Design 確定（配布依存境界 最終 gate 含む） | QG-4 合格 | targeted docs guard、IR-{NNN} check_extensions.ts、配布依存境界 最終 gate、full integrity suite 実行（bun test 実行形態契約）、Design 状態評価（棚卸し制：PR 本文申告候補の統合を含む全件評価）・Design status 昇格 | [references/docs-and-design-promotion.md](references/docs-and-design-promotion.md) |
 | STEP-4 | PR マージ・コンフリクト解消 | docs 検証合格（配布依存境界 最終 gate 含む） | マージ済みPR（squash merge 先は main）、HEAD commit hash 記録、コンフリクト Level 1 解消 or case-auto エスカレーション | [references/pr-merge-and-conflict.md](references/pr-merge-and-conflict.md) |
 | STEP-5 | Post-merge・Issue クローズ | PR マージ完了 | CI 通過確認、Issue 本文更新、Issue close | [references/cleanup-and-capture.md](references/cleanup-and-capture.md) |
-| STEP-6 | クリーンアップ・Capture 回収・永続化 | Issue クローズ完了 | worktree/branch 削除、親Epic 自動クローズ、実行前同期、Capture 回収、学び検知、`.agentdev/` 永続化、tmp/ 残存確認、完了報告 | [references/cleanup-and-capture.md](references/cleanup-and-capture.md) |
+| STEP-6 | クリーンアップ・Capture 回収・永続化 | Issue クローズ完了 | worktree/ローカルブランチ削除、親Epic 自動クローズ、実行前同期、Capture 回収、学び検知、`.agentdev/` 永続化、tmp/ 残存確認、完了報告 | [references/cleanup-and-capture.md](references/cleanup-and-capture.md) |
 | STEP-E1〜E6 | Epic Wave クローズ（E4-1 配布依存境界 最終 gate 含む） | Epic Issue 番号受領、ステータス追跡テーブル存在 | 現在 Wave の子Issue 一括マージ・クローズ（E4-1 gate 違反子Issue は `blocked` でマージ対象外）、Design 状態評価の Wave 内集約（E4-3、直列集約段で一元評価）、Epic status table 更新、当該 Wave スコープの一時成果物残留確認（E6-1、残留時は完了扱いにしない）、最終 Wave 判定 | [references/epic-wave-close.md](references/epic-wave-close.md) |
 
 ### STEP 間の依存と分岐
@@ -64,7 +64,7 @@ gate 違反時は両ルートとも PR マージを停止する。
 
 ### 再開プロトコル（resume protocol）
 
-- 再開点は永続状態から再構成する: Issue 本文の完了条件チェックボックス状態、PR の mergeable/マージ済み状態、HEAD commit hash、Design `status` frontmatter、worktree・ブランチの存在、Capture 回収済みファイルの存在
+- 再開点は永続状態から再構成する: Issue 本文の完了条件チェックボックス状態、PR の mergeable/マージ済み状態、HEAD commit hash、Design `status` frontmatter、worktree・ローカルブランチの存在、Capture 回収済みファイルの存在
 - 各 STEP の再実行はべき等であり、マージ済み PR への再マージ、更新済みチェックボックスの再評価を発生させない
 - 停止終了時は Case を blocked へ遷移させ、resume_command（case-close）を記録する。再開時は resume_command に従い review へ復帰してから未完了 STEP を続行する。review または closed へ遷移した時点で resume_command をクリアする。closed は終端状態であり、blocked から closed への直接遷移は行わない（review を経由する）
 
@@ -114,7 +114,7 @@ case-run 側の事前検査とは独立に実施する。検証手段との対�
 - **Capture 境界**: intake/ learning を別々の成果物として扱い、PR 本文のみを capture 入力源とする（一時会話コンテキスト不入力）
 - **検証差分の記録**: case-close が実施した各検証（QG-4 完了条件評価、docs 検証・配布依存境界 最終 gate、トレーサビリティ独立再検査等）について、検証種別、検証結果、finding 差分（新規、修正済み、既出、撤回、無効の5分類）を対応記録コメントへ記録する。形式は `agentdev-workflow-templates` の検証差分セクション規約（PR テンプレート形式と同一のテーブル）に従い、前段階（case-run）の PR 本文検証差分セクションの記録との差分で finding を分類し、工程間の比較ができる。対論型レビューの審議中 finding 状態の追跡と品質ゲート完了報告の修正証跡の所有境界を変更しない
 - **統合先基準（squash merge 先・同期基準）**: squash merge 先、ブランチ同期の対象は main とする。QG-4 は Issue 完了条件の最終判定として意味を変更しない
-- **`--delete-branch` 使用禁止**: PR マージ時に `--delete-branch` オプションを使用しない（アクティブ worktree で local 削除が失敗するため）。ブランチ削除は独立 STEP で実施
+- **`--delete-branch` 使用禁止**: PR マージ時に `--delete-branch` オプションを使用しない（マージと同時にブランチ削除を実行すると、アクティブ worktree に checkout されたブランチで local 削除が失敗する local checkout 副作用があるため）。ブランチ削除は独立 STEP で実施
 - **GitHub auto-close 回避**: commit message でコマンド名と Issue 番号を分離し、`#` 記号による近接参照を避ける
 
 ## See Also
