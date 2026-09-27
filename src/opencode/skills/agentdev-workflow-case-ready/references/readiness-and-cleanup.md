@@ -54,6 +54,7 @@ Definition 変更が docs 文言を期待するテスト（リポジトリ固有
 ### main 同期確認
 
 - draft / RU 削除後に main ブランチの作業ディレクトリとリモートの同期を確認する
+- 永続化または同期操作の前に `git branch --show-current` で current branch が `main` であることを確認する。確認手順は `agentdev-git-worktree` references `worktree-operations.md`「git 操作の前置確認」の「commit 前の current branch 確認」を参照する
 - 不一致を検出した場合は停止する（同期状況と差分を報告）
 
 ## 冪等再実行

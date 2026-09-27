@@ -43,6 +43,14 @@ GitHub Issue の作成、更新、リンク、確認を安全に行うための�
   - pr_create が中断された疑いがある場合は、同一 head ブランチの PR の有無を確認し、残骸 PR があればそれを正として扱う。残骸 PR が作成目的に合わない場合は、削除判断を含めて処置を確定してから作り直す。
 3. 残骸確認の結果を検証記録へ残し、再実行の対象範囲を確定してから中断した workflow を再開する。残骸不在を確認した場合は、その確認結果を根拠に中断した操作から再実行する。
 
+## 観測 known-issues（運用時発見事象の蓄積）
+
+本節は issue 操作の運用中に観測された既知事象を蓄積する。起動環境障害の known-issues 節とは対象が異なり、`agentdev_gh` の検索・操作結果に関する観測を記録する。
+
+| 観測事象 | 対処 |
+|---|---|
+| Case #3175: search index の遅延により、実在する Issue が search で 0 件帰着した | 検索結果 0 件だけで不在と判断せず、「search 0 件帰着の二重確認と population 実測」節に従って直接参照で確認する。index 反映待ちの sleep・ポーリングは行わない |
+
 ## 委譲接続点と本文受け渡し
 
 case-open がサブエージェントへ本文生成を委譲する接続点（STEP-2、STEP-4）では、本文候補をメッセージ本文ではなくファイルパスで受け渡す。
@@ -106,6 +114,26 @@ operation-failed / API 失敗応答を再試行するか否かは、失敗の分
 2. **手動読取（operation-failed 時限定の補完手段）**: 絞り込み推送後も上限到達が解消しない場合に限り、`gh issue list --search <絞り込みクエリ> --json labels,number,title` の形式で手動読取し、Tool 操作で取得できなかった対象を補完する。読み取り限定であり、要求フィールドを目的に必要な範囲へ限定する。
 3. **補完結果の確認**: 手動読取を使った場合は、search 条件と取得件数を検証記録へ残し、欠落の疑義を検証結果に残す。
 4. **補完結果の機械検証（read-back 目視断定の禁止）**: 手動読取した本文や識別子の破損疑いは、read-back 目視の再読で断定せず、機械検証へ置き換える。検証対象トークン（識別子・パス）の filesystem 実在性を `fs.existsSync` で照合し、REQ/DEC 等の ID digit（数値）を本文と正規参照先で突合する。手順の正は知識 `docs/knowledge/llm-body-verification-filesystem-truth.md`（LLM 送信本文の識別子破損疑いは read-back 目視で断定せず filesystem 実在性と ID digit 突合で検証する）であり、本節は contingency 補完結果への適用形を定める。
+
+## search 0 件帰着の二重確認と population 実測
+
+### search 0 件帰着の二重確認
+
+`issue_list` の `search` 結果が 0 件でも、対象 Issue が存在しないとは直ちに判断しない。検索 index 遅延等で実在と検索結果が不一致となることがあるため、次のいずれかで対象の存在を二重確認する。
+
+1. 対象が特定できる場合は `agentdev_gh` の `issue_read` で対象を直接参照する
+2. 対象番号が不明な場合は `gh issue list` の読み取りで存在を確認する
+
+gh CLI は読取専用の確認に限り、GitHub 書込みを代替しない。search index の反映を待つ sleep・ポーリングは行わず、観測事象は「観測 known-issues」節へ記録する。
+
+### population の実測
+
+closed 等の広範囲な population を実測する場合は、`search` なしで `state` 単位の `issue_list` を実行し、必要に応じて `role` 等の論理軸 labels で絞り込む。`search` トークン方式は、検索対象を実効的に絞り込む必要がある検索用途に限定する。選択性の低いトークンを使った population 実測は、0 件帰着を不在と誤解するリスクがある。
+
+### issue_update の引数制約
+
+- `issue_update` は `role` を受理しない。`role`、`kind`、`trackingState` の新規設定は `issue_create` 専用である。`issue_update` で `labels` を省略した場合は追跡軸の現行値が維持される
+- `invalid-input`（`unknown-field`）の構造化失敗は同一引数で再試行せず、不正な引数を修正してから再実行する
 
 ## Issue 作成後の内容反映確認
 
@@ -218,5 +246,4 @@ Issue 作成手続き/ `agentdev_gh` の issue_update 操作を使用する場�
 - `#{TBD}`/ `#{TBD_Wn}` 等のプレースホルダーが残存している状態で Issue 作成、更新を完了とすること禁止
 - 更新前スナップショットを取得せずに `agentdev_gh` の issue_update 操作を実行すること禁止
 - **Epic Issue 本文ステータス追跡テーブルの更新を case-close 以外のコマンド（case-run、case-auto）が直接行うこと禁止**（単一書き手制約）。case-run は読み取りのみ、case-auto は Wave 反復制御のみとし、Epic Issue 本文への書き込みは case-close に限定する
-
 

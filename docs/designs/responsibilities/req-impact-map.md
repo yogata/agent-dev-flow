@@ -29,10 +29,10 @@ updated: 2026-09-27
 
 | REQ | タイトル | 影響する Rule IDs | 影響する Artifact |
 |-----|---------|------------------|------------------|
-| REQ-001 | 文書、REQ 管理基準 | IR-001, IR-002, IR-003, IR-004, IR-017, IR-018, IR-022 | REQ, REQ index |
+| REQ-001 | 文書、REQ 管理基準 | IR-001, IR-002, IR-003, IR-004, IR-018 | REQ, REQ index |
 | REQ-002 | Artifact 責任分界 | IR-006, IR-008, IR-014, IR-016, IR-024 | commands, skills, templates, Design |
-| REQ-010 | Integrity/Validation/Tests | IR-001~IR-024 (全件) | 全アーティファクト |
-| v2:REQ-0107 | Reporting/Writing Quality | IR-013, IR-019 | templates, guides |
+| REQ-010 | Integrity/Validation/Tests | IR カタログ全件（現行一覧は integrity-rule-catalog.md が正） | 全アーティファクト |
+| v2:REQ-0107 | Reporting/Writing Quality | IR-013 | templates, guides |
 | REQ-005 | Workflow/Command Protocol | IR-006, IR-024 | commands |
 | REQ-008 | RU lifecycle / Requirement Unit 管理 | IR-016 | ドメイン状態 |
 | REQ-006 | Case 実行オーケストレーション / Epic、Wave | IR-006, IR-013, IR-016 | commands, templates |
@@ -60,15 +60,15 @@ updated: 2026-09-27
 | v2:REQ-0137 | 並列実行安全 git 操作規律 |（(infrastructure)）| - |
 | REQ-008 | 構造化 req_draft 契約 | IR-016 | ドメイン状態 |
 | REQ-003 | 外部エージェント統合契約 | IR-006, IR-024 | commands, skills |
-| v2:REQ-0140 | 文書品質ゲート | IR-013, IR-045 | docs, Design, document-type-responsibilities.md |
+| v2:REQ-0140 | 文書品質ゲート | IR-013 | docs, Design, document-type-responsibilities.md |
 | REQ-009 | ローカル版 OpenCode 導入方式とローカルIssue運用 | IR-016, IR-046, IR-047, IR-048 | src/opencode-local/, .opencode/commands/agentdev/, .opencode/skills/agentdev-*/, .agentdev/issues/, Design, guides |
 | REQ-002 | 配布物ID除去後の文意保持、構文健全性、責務整合 | IR-016 | docs, Design, docs-spec-rebuild-integrity.md |
 | v2:REQ-0143 | Command 定義ファイルフォーマット標準化 | IR-049 | commands, command-file-format.md |
 | REQ-010 | docs-check/integrity 運用是正 | IR-016, IR-052 | integrity scripts, docs-check, Design |
 | REQ-010 | docs-check/integrity 検出設計改善 | IR-044, IR-050, IR-051, IR-052 | integrity-rule-catalog.md, integrity scripts |
-| REQ-010 | docs-check 新規機械検査クラス（共通ポリシー意味識別子検査、未解決プレースホルダー、廃止語彙、旧パス・削除済み名称） | IR-063, IR-064, IR-065, IR-066 | integrity-rule-catalog.md, integrity scripts, data/obsolete-vocabulary-map.yaml, NG baseline |
+| REQ-010 | docs-check 新規機械検査クラス（共通ポリシー意味識別子検査、未解決プレースホルダー、廃止語彙、旧パス・削除済み名称） | IR-063, IR-064, IR-065, IR-066 | integrity-rule-catalog.md, integrity scripts, .opencode/skills/repo-agentdev-integrity/data/obsolete-vocabulary-map.yaml, NG baseline |
 | REQ-003 | 実行契約、委譲、プロセス設計 | IR-006, IR-032, IR-033 | commands, Design |
-| REQ-003 | 文書化規律、HITL境界 | IR-013, IR-019, IR-035 | docs, commands, skills, guides |
+| REQ-003 | 文書化規律、HITL境界 | IR-013, IR-035 | docs, commands, skills, guides |
 | REQ-006 | RU群バッチ処理と複数 execution_unit 並列実行 | IR-006, IR-016 | commands |
 | REQ-049 | 追跡Issue管理機構 | - | commands, skills, templates, Design（論理スキーマの一元管理は `agentdev-issue-tracking` skill Design） |
 
@@ -142,7 +142,7 @@ DEC-013 AG-008 適用により file-backed tombstone（IR-011 型）を物理削
 
 廃止 IR の交叉参照（v2:REQ-NNN 等）を再配置する節。
 AG-008（retired REQ-028-008）に基づき、file-backed tombstone の物理削除時に交叉参照を本節へ移行する。
-各エントリは廃止 IR ID、旧交叉参照、再配置日、後続 REQ 等のメタデータを持つ（Phase 3 §7.3、`docs/designs/integrity/audits/cross-cutting-integration-design-20260811.md`）。
+各エントリは廃止 IR ID、旧交叉参照、再配置日、後続 REQ 等のメタデータを持つ（Phase 3 §7.3、`docs/reports/integrity/audits/cross-cutting-integration-design-20260811.md`）。
 
 ### IR-011 削除に伴う交叉参照再配置
 

@@ -124,8 +124,7 @@ docs 横断診断は本 skill が正規の所有者となる（REQ-036-013 の d
   （棚卸し制）への差し戻しを提示する
 - 診断は読み取りと報告のみとし、Design の status・frontmatter を直接変更しない
 - 本観点は観点レジストリ（REQ-036-024 の正規実体）へ登録する
-- Decision の状態乖離（proposed Decision の受理評価漏れ）は本観点の対象外とし、
-  Decision と REQ の関係を正規情報から一意に取得できる情報源の確定後に別要件として追加する
+- Decision の状態乖離（proposed Decision の受理評価漏れ）は本観点の対象外である。独立の観点として本 Design の「Decision 状態乖離 DRIFT 診断観点」節がこれを所有する
 
 ## Decision 状態乖離 DRIFT 診断観点
 
@@ -159,7 +158,7 @@ docs 横断診断は本 skill が正規の所有者となる（REQ-036-013 の d
 
 ## v4 責務分類
 
-ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+ADF v4 の責務分類の正典は DEC-036、foundations/v4-responsibility-boundaries Design である（正典一元化）。本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）は当該正典に基づく確定値の記録であり、分類語彙の正本は正典側が所有する。当初の分類確定の観測経緯は Root Case #3011（第8段 v4 Skill 再編 Case）を根拠参照として確認できる（Case は一時成果物であり正典ではない）。
 
 - **semantic 担当**: semantic classification（診断カテゴリ・ルーティング）
 - **deterministic 委譲先**: 検査実行は artifact-validation scripts・repo-local checker へ委譲

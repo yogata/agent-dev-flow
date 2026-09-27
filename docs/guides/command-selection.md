@@ -67,4 +67,4 @@ work_type（bugfix / feature / maintenance / docs_chore）による固定判定�
 - 追跡Issue（`/agentdev/issue`）は Intake / Learning、Decision、RU とは別系統の課題管理である。詳細は [Intake / Learning / Backlog フロー](intake-learning-backlog-flow.md) の「追跡Issue（別系統）」節を参照
 - `/agentdev/case-auto` は標準実行コマンド。要求入口 2 つ（`/agentdev/req-define`、`/agentdev/backlog-auto`）から合流する標準経路（`/agentdev/req-define` → `/agentdev/case-auto`）を構成する
 - `/agentdev/backlog-auto` は backlog 整理サイクル（検出→昇格→統合）を1回で実行する backlog-driven の要求入口。整理結果は `/agentdev/req-define` → `/agentdev/case-auto` へ接続する
-- 既存5コマンド（inspect-docs、learning-promote、intake-promote、inspect-promote、backlog-review）は従来どおり単独実行できる
+- inspect-docs、learning-promote、intake-promote、inspect-promote、backlog-review は単独実行できるコマンドである

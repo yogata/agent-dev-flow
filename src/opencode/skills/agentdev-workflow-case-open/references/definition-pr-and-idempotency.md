@@ -26,13 +26,14 @@ canonical Definition との実変更を判定し、実変更がある場合の�
 
 #### 期待値確定前の branch HEAD 実測
 
-実変更がある Definition PR では、PR 本文へ検査期待値を記載する前に branch HEAD 全体を repo root 起点で実測する。`check_integrity`、`check_autogen_freshness`、`agentdev-traceability` の結果を取得し、期待値を実測値から確定する。いずれかが実行不能または期待値確定不能の場合は PR を作成せず blocked として報告する。対象 checker の実装、終了契約、baseline は変更しない。既存の UTF-8 健全性・対象内容の出現回数などの文字列検証は実測の後に実行し、実測と文字列検証の両方を Definition PR の検証証跡へ記録する。
+実変更がある Definition PR では、PR 本文へ検査期待値を記載する前に branch HEAD 全体を repo root 起点で実測する。REQ 行変更または Decision 変更を伴う場合は、手順 2.5 の索引再生成後に `check_integrity`、`check_autogen_freshness`、`agentdev-traceability` の結果を取得し、期待値を実測値から確定する。それ以外は索引再生成を前置せず、各 checker の結果を取得する。いずれかが実行不能または期待値確定不能の場合は PR を作成せず blocked として報告する。対象 checker の実装、終了契約、baseline は変更しない。既存の UTF-8 健全性・対象内容の出現回数などの文字列検証は実測の後に実行し、実測と文字列検証の両方を Definition PR の検証証跡へ記録する。
 
 1. 実変更判定: Definition Package と canonical Definition を比較する（case-open / case-ready Design）。差分が空の場合は実変更なし → PR を作成せず STEP-5 へ進む。実変更のない Case（bugfix / maintenance / docs_chore 等では作成しない）
 2. 実変更がある場合: 実変更を Case 単位で 1 件の Definition PR として集約し作成する。1 Case につき 2 件以上作成しない
-3. REQ 行変更（新規行の追加・移管・廃止等）を伴う Definition PR では、PR 作成前に Design の ADF-COVERS 宣言の追随反映を確認し、トレーサビリティ check（`agentdev-traceability`）で当該 REQ 行の missing-design が 0 件であることを確認する（missing-design 0 件ゲート）。宣言追随が Definition に含まれておらず missing-design が 0 件でない場合は PR を作成せず、Definition Package の構成へ戻して宣言追随を確定する
+2.5. REQ 行変更または Decision 変更を伴う場合: 検査期待値を実測する前に `bun .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts` を実行し、索引・AUTOGEN 派生物を最新化する。再生成された派生物（`docs/README.md`、`docs/decisions/README.md`、`req-health-metrics.md`）は同一 PR に含める。実行結果と同一 PR への含入を Evidence に記録する。worktree で `.opencode/` 投影が利用できない場合は、main root 実体からの読取専用 checker 実行と混同せず、対象 branch の派生物へ書き込める source script を worktree 内で実行する
+3. REQ 行変更（新規行の追加・移管・廃止等）を伴う Definition PR では、PR 作成前に Design の ADF-COVERS 宣言の追随反映を確認し、トレーサビリティ check（`agentdev-traceability`）で当該 REQ 行の missing-design が 0 件であることを確認する（missing-design 0 件ゲート）。missing-design が残る場合は既存 sidecar の `design` セクションへの追加を標準の宣言先とする。knowledge 文書は ADF-COVERS 宣言を持たないため宣言先として使用しない。宣言先の判断に先立つ req-define 側の design 対応事前確認は case-open Design「意味変更行の design 対応事前確認」節に従う。宣言追随が Definition に含まれておらず missing-design が 0 件でない場合は PR を作成せず、Definition Package の構成へ戻して宣言追随を確定する
 4. head branch push（前段）: PR 作成の前に head branch を remote へ push する。`git push -u origin definition/issue-{N}` を実行し、push 先 refspec（remote branch 名と upstream 設定）が意図した先であることを push 出力で確認する。手順詳細は下記「PR 作成前の head branch push」参照
-5. PR 作成は `agentdev_gh` の pr_create で行い、GitHub Draft PR ではない通常 Pull Request として作成する（draft 指定は公開契約に存在しない。REQ-{NNNN}-{NNN}）。PR 本文は verbatim で記録する。並行 case-open 実行時は、PR 作成前に下記「並行 case-open の PR 作成前隔離検査（REQ-030-017）」を実行し、検査を通過した場合のみ PR を作成する
+5. PR 作成は `agentdev_gh` の pr_create で行い、GitHub Draft PR ではない通常 Pull Request として作成する（draft 指定は公開契約に存在しない。REQ-{NNNN}-{NNN}）。PR 本文は verbatim で記録する。並行 case-open 実行時は、PR 作成前に下記「並行 case-open の PR 作成前隔離検査」を実行し、検査を通過した場合のみ PR を作成する
 
 #### PR 作成前の head branch push
 
@@ -43,9 +44,9 @@ PR 作成（手順 5 の pr_create）の前段として、Definition 変更を�
 3. push 先 refspec の確認: push 出力で remote branch 名と upstream 設定（`origin/definition/issue-{N}`）が意図した先であることを確認する。refspec の省略・誤指定により意図しない branch へ push していないことを出力で検証する
 4. push 結果の記録: push 済み HEAD hash と remote branch 名を検証記録へ残す
 
-#### 並行 case-open の PR 作成前隔離検査（REQ-030-017）
+#### 並行 case-open の PR 作成前隔離検査
 
-並行して case-open を実行する場合、手順 4 の PR 作成前に次の隔離検査を実行する。正規所有は case-open Design「並行 case-open の作業隔離規律（REQ-030-017）」節であり、本節は STEP-4 の実行手順を提供する。
+並行して case-open を実行する場合、手順 4 の PR 作成前に次の隔離検査を実行する。正規所有は case-open Design の並行 case-open 作業隔離規律節であり、本節は STEP-4 の実行手順を提供する。
 
 1. **PR 作成前の自 Case 差分検査**: merge-base と diff --stat（`git merge-base origin/main HEAD`、`git diff --stat origin/main HEAD`）により、差分が自 Case 分のみであることを検査する。兄弟 Case の commit を含むスタック構造を検出した場合は、隔離 worktree での差分再構成（origin/main HEAD からの branch 再作成と明示パスによる変更の再適用）で救済してから PR を作成する
 2. **明示パス指定ステージ**: Definition 変更のステージは明示パス指定で行い、スイープ操作（`git add -A` 等）は行わない
@@ -91,15 +92,16 @@ PR 作成（手順 5 の pr_create）の前段として、Definition 変更を�
 - 実変更判定結果（実変更あり / なし）
 - Definition PR 作成結果（実変更時のみ。Case 単位 1 件）
 - head branch push 結果（実変更時のみ。push 済み HEAD hash と remote branch 名、refspec 確認済み）
-- 並行 case-open 実行時の PR 作成前隔離検査結果（自 Case 差分のみの確認、スタック検出時は差分再構成救済の実施。REQ-030-017）
+- 並行 case-open 実行時の PR 作成前隔離検査結果（自 Case 差分のみの確認、スタック検出時は差分再構成救済の実施）
 - 冪等確認結果（既存成果物の再利用、重複生成なし、不足分のみ処理）
 - 横断依存検査結果（警告の提示記録、または検出不能報告。警告のみで Root Case の確立は阻止しない）
 
 ## Evidence
 
 - 実変更判定根拠（canonical Definition との差分）、作成した PR 番号、既存成果物の検出結果
+- REQ 行変更または Decision 変更を伴う場合の `generate_indexes.ts` 実行結果、再生成された派生物一覧、および派生物が同一 PR に含まれることの確認結果
 - head branch push の実行証跡（push 出力による refspec 確認結果、push 済み HEAD hash と remote branch 名。実変更時のみ）
-- 並行 case-open 実行時の PR 作成前隔離検査実行証跡（merge-base / diff --stat の結果、救済実施時は差分再構成の記録。REQ-030-017）
+- 並行 case-open 実行時の PR 作成前隔離検査実行証跡（merge-base / diff --stat の結果、救済実施時は差分再構成の記録）
 - 横断依存検査の実行証跡（検査入力、エンジンの報告 JSON、投入者への選択肢提示とその応答）
 
 ## Completion Verification
@@ -108,7 +110,7 @@ PR 作成（手順 5 の pr_create）の前段として、Definition 変更を�
 - 実変更がある Case について Definition PR が 1 件であること
 - 実変更がある Case について、pr_create の前段で head branch push が実行され、push 先 refspec の確認が記録されていること
 - REQ 行変更を伴う Case について、PR 作成前の missing-design 0 件ゲート確認が行われていること
-- 並行 case-open 実行時に、PR 作成前隔離検査（自 Case 差分のみ・明示パスステージ・1-writer 侵害検知時の早期断念）が実行されていること（REQ-030-017）
+- 並行 case-open 実行時に、PR 作成前隔離検査（自 Case 差分のみ・明示パスステージ・1-writer 侵害検知時の早期断念）が実行されていること
 - 再実行時に Root Case と Definition PR の件数が増加しないこと
 - 再利用判定が instruction 単位・Issue 節単位の完了度照合に基づいていること（ファイル単位の近似照合で部分完了を完了扱いにしていないこと）
 - 横断依存検査が実行され、警告検出時は提示記録が、検出源取得不能時は検出不能報告が残っていること
