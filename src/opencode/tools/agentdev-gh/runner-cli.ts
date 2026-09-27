@@ -41,17 +41,39 @@ import {
   type TrackingState,
 } from "./tracking-schema.ts";
 
+/** spawnSync 実行の異常情報（起動不能・シグナル終了等の要因）。 */
+export interface GhSpawnError {
+  /** Node のエラー種別コード（ENOENT、EACCES 等）。不明時は null。 */
+  readonly code: string | null;
+  readonly message: string;
+}
+
 /** gh 実行の注入点（テストは偽実装を差し込める）。 */
 export type GhExec = (
   file: string,
   args: readonly string[],
-) => { status: number | null; stdout: string; stderr: string };
+) => {
+  status: number | null;
+  stdout: string;
+  stderr: string;
+  /** 起動不能・異常終了時の spawnSync エラー情報（環境起因識別 detail の出所）。 */
+  error?: GhSpawnError;
+};
 
 /** 既定の gh 実行（シェル不使用、UTF-8 で応答を受け取る）。 */
 export function defaultGhExec(): GhExec {
   return (file, args) => {
     const r = spawnSync(file, [...args], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
-    return { status: r.status, stdout: r.stdout ?? "", stderr: r.stderr ?? "" };
+    if (r.error === undefined) {
+      return { status: r.status, stdout: r.stdout ?? "", stderr: r.stderr ?? "" };
+    }
+    const rawCode: unknown = "code" in r.error ? r.error.code : undefined;
+    return {
+      status: r.status,
+      stdout: r.stdout ?? "",
+      stderr: r.stderr ?? "",
+      error: { code: typeof rawCode === "string" ? rawCode : null, message: r.error.message },
+    };
   };
 }
 
@@ -68,6 +90,7 @@ interface RawReply {
   readonly status: number | null;
   readonly stdout: string;
   readonly stderr: string;
+  readonly error?: GhSpawnError;
 }
 
 /** 一覧完全取得のページング・パラメータ（Design「一覧完全性」の安全上限）。 */
@@ -166,26 +189,46 @@ export class CliRunner implements GhRunner {
     return { ok: false, error, exitCode, failureClass };
   }
 
+  /**
+   * exec 応答からの失敗 reply 生成。gh の終了コード、stderr の空・非空、
+   * spawnSync エラー種別を detail に含め、環境起因失敗の識別に役立てる
+   * 失敗分類の値域は変更しない。
+   */
+  private failFromExec(r: RawReply): GhRunnerReply {
+    if (r.status === null) {
+      let message = "failed to start gh (is gh installed and on PATH?)";
+      if (r.error !== undefined) {
+        message += `; spawnSync error: ${r.error.code ?? "unknown"} (${r.error.message})`;
+      }
+      return this.fail(message, null, "enforcement-crashed");
+    }
+    const stderr = r.stderr.trim();
+    const stdout = r.stdout.trim();
+    const envHint = "(non-zero exit with empty stderr may indicate a startup environment failure)";
+    let detail: string;
+    if (stderr.length > 0) {
+      detail = `gh exited with code ${r.status}; stderr: ${stderr}`;
+    } else if (stdout.length > 0) {
+      detail = `gh exited with code ${r.status}; stderr is empty; stdout: ${stdout} ${envHint}`;
+    } else {
+      detail =
+        `gh exited with code ${r.status}; stderr is empty ` +
+        `${envHint}; check the AGENTDEV_GH_REPO setting and gh authentication`;
+    }
+    return this.fail(detail, r.status, "operation-failed");
+  }
+
   private runGh(args: readonly string[]): { ok: true; payload: unknown } | GhRunnerReply {
     const r: RawReply = this.exec("gh", args);
-    if (r.status === null) {
-      return this.fail(
-        "failed to start gh (is gh installed and on PATH?)",
-        null,
-        "enforcement-crashed",
-      );
-    }
     if (r.status !== 0) {
-      const message = r.stderr.trim().length > 0 ? r.stderr.trim() : r.stdout.trim();
-      return this.fail(
-        message.length > 0 ? message : `gh exited with ${r.status}`,
-        r.status,
-        "operation-failed",
-      );
+      return this.failFromExec(r);
     }
     const trimmed = r.stdout.trim();
     if (trimmed.length === 0) {
-      return this.fail("gh replied with empty output", r.status, "operation-failed");
+      // 空応答も operation-failed 経路であり、stderr の空・非空を診断情報として添える。
+      const stderr = r.stderr.trim();
+      const stderrInfo = stderr.length > 0 ? `stderr: ${stderr}` : "stderr is empty";
+      return this.fail(`gh replied with empty output; ${stderrInfo}`, r.status, "operation-failed");
     }
     try {
       return { ok: true, payload: JSON.parse(trimmed) as unknown };
@@ -873,16 +916,8 @@ export class CliRunner implements GhRunner {
       return this.fail("comment reply missing issue_url", 0);
     }
     const r = this.exec("gh", ["api", "-X", "DELETE", `repos/${this.repo}/issues/comments/${id}`]);
-    if (r.status === null) {
-      return this.fail("failed to start gh (is gh installed and on PATH?)", null, "enforcement-crashed");
-    }
     if (r.status !== 0) {
-      const message = r.stderr.trim().length > 0 ? r.stderr.trim() : r.stdout.trim();
-      return this.fail(
-        message.length > 0 ? message : `gh exited with ${r.status}`,
-        r.status,
-        "operation-failed",
-      );
+      return this.failFromExec(r);
     }
     return { ok: true, payload: { commentId: String(id), number } };
   }

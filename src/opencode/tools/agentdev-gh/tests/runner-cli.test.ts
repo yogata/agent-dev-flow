@@ -12,7 +12,7 @@
 import { describe, expect, test } from "bun:test";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { createCliRunner, type GhExec } from "../runner-cli.ts";
+import { createCliRunner, type GhExec, type GhSpawnError } from "../runner-cli.ts";
 import { issueNumber } from "../contracts.ts";
 import { kindToLabel } from "../tracking-schema.ts";
 import { buildGhToolEnv } from "../engine.ts";
@@ -30,7 +30,12 @@ function makeTempDir(): string {
 }
 
 function fakeExec(
-  handler: (call: ExecCall) => { status: number | null; stdout: string; stderr: string },
+  handler: (call: ExecCall) => {
+    status: number | null;
+    stdout: string;
+    stderr: string;
+    error?: GhSpawnError;
+  },
 ): { exec: GhExec; calls: ExecCall[] } {
   const calls: ExecCall[] = [];
   const exec: GhExec = (file, args) => {
@@ -139,6 +144,88 @@ describe("CliRunner: 引数組み立ての環境依存隠蔽", () => {
     const reply = await run(exec, makeTempDir(), { operation: "issue_read", args: { number: 5 } });
     expect(reply.ok).toBe(false);
     if (!reply.ok) expect(reply.error).toContain("not valid JSON");
+  });
+});
+
+describe("CliRunner: 環境起因失敗の識別 detail（REQ-093-003 / TS-003）", () => {
+  test("(b) gh 実行失敗（終了コード 66・stderr 空）は operation-failed で環境起因示唆を detail に含む", async () => {
+    const { exec } = fakeExec(() => ({ status: 66, stdout: "", stderr: "" }));
+    const reply = await run(exec, makeTempDir(), { operation: "issue_read", args: { number: 5 } });
+    expect(reply.ok).toBe(false);
+    if (!reply.ok) {
+      expect(reply.exitCode).toBe(66);
+      expect(reply.failureClass).toBe("operation-failed");
+      expect(reply.error).toContain("gh exited with code 66");
+      expect(reply.error).toContain("stderr is empty");
+      expect(reply.error).toContain("startup environment failure");
+      expect(reply.error).toContain("AGENTDEV_GH_REPO");
+      expect(reply.error).toContain("gh authentication");
+    }
+  });
+
+  test("gh 実行失敗（stderr 空・stdout 非空）は stdout も detail に含む", async () => {
+    const { exec } = fakeExec(() => ({ status: 66, stdout: "partial output", stderr: "" }));
+    const reply = await run(exec, makeTempDir(), { operation: "issue_read", args: { number: 5 } });
+    expect(reply.ok).toBe(false);
+    if (!reply.ok) {
+      expect(reply.error).toContain("gh exited with code 66");
+      expect(reply.error).toContain("stderr is empty");
+      expect(reply.error).toContain("stdout: partial output");
+    }
+  });
+
+  test("gh 実行失敗（stderr 非空）は終了コードと stderr を detail に含む", async () => {
+    const { exec } = fakeExec(() => ({ status: 4, stdout: "", stderr: "gh: HTTP 401" }));
+    const reply = await run(exec, makeTempDir(), { operation: "issue_read", args: { number: 5 } });
+    expect(reply.ok).toBe(false);
+    if (!reply.ok) {
+      expect(reply.exitCode).toBe(4);
+      expect(reply.failureClass).toBe("operation-failed");
+      expect(reply.error).toContain("gh exited with code 4");
+      expect(reply.error).toContain("stderr: gh: HTTP 401");
+    }
+  });
+
+  test("spawnSync エラー種別（起動不能）はエラー種別を detail に含み enforcement-crashed を維持する", async () => {
+    const { exec } = fakeExec(() => ({
+      status: null,
+      stdout: "",
+      stderr: "",
+      error: { code: "ENOENT", message: "spawn gh ENOENT" },
+    }));
+    const reply = await run(exec, makeTempDir(), { operation: "issue_read", args: { number: 5 } });
+    expect(reply.ok).toBe(false);
+    if (!reply.ok) {
+      expect(reply.exitCode).toBeNull();
+      expect(reply.failureClass).toBe("enforcement-crashed");
+      expect(reply.error).toContain("failed to start gh");
+      expect(reply.error).toContain("spawnSync error: ENOENT");
+      expect(reply.error).toContain("spawn gh ENOENT");
+    }
+  });
+
+  test("空応答（終了コード 0・stdout 空）は stderr の空・非空を detail に含む", async () => {
+    const { exec } = fakeExec(() => ({ status: 0, stdout: "", stderr: "" }));
+    const reply = await run(exec, makeTempDir(), { operation: "issue_read", args: { number: 5 } });
+    expect(reply.ok).toBe(false);
+    if (!reply.ok) {
+      expect(reply.exitCode).toBe(0);
+      expect(reply.error).toContain("gh replied with empty output");
+      expect(reply.error).toContain("stderr is empty");
+    }
+  });
+
+  test("engine 経由でも fail-closed（ok=false の構造化失敗・success 不返却）を維持する", async () => {
+    const tempDir = makeTempDir();
+    const { exec } = fakeExec(() => ({ status: 66, stdout: "", stderr: "" }));
+    const result = await runOp(exec, tempDir, { operation: "issue_read", number: 5 });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.failure.kind).toBe("operation-failed");
+      expect(result.failure.detail).toContain("gh exited with code 66");
+      expect(result.failure.detail).toContain("stderr is empty");
+    }
+    fs.rmSync(tempDir, { recursive: true, force: true });
   });
 });
 

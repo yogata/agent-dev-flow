@@ -4,6 +4,45 @@ GitHub Issue の作成、更新、リンク、確認を安全に行うための�
 本書は Custom Tool `agentdev_gh`（書き込みは Tool 内部の読み戻し検証で完了）と連携し、Issue 操作特有の安全性要件を補完する。
 各手順の読み取りは Custom Tool `agentdev_gh` の読み取り操作に従うこと。
 
+## 起動環境障害の known-issues（全操作対象）
+
+`agentdev_gh` の起動環境障害（`AGENTDEV_GH_REPO` 未設定、harness 内 spawnSync 失敗による起動不能）は、issue_list 等の特定操作に限定されず、全操作に及ぶ。本節は全操作を対象とする既知事象の診断・回復・作業再開の手順である。特定操作だけが失敗する場合は本節ではなく各操作の規律（issue_list の絞り込み規律等）を確認する。
+
+### 事象
+
+| 事象 | 失敗分類 | failure detail の要点 |
+|---|---|---|
+| `AGENTDEV_GH_REPO` 未設定かつ `gh repo view` による解決に失敗 | config-uninterpretable | 試行した解決手段（環境変数設定状態の要点）、`gh repo view` の終了コード、stderr の要因 |
+| harness 内 spawnSync 失敗による gh 起動不能 | enforcement-crashed | 起動失敗の旨と spawnSync エラー種別（ENOENT 等） |
+| gh が非ゼロ終了コードで終了（stderr 空・非空を問わない） | operation-failed | gh 終了コードと stderr の空・非空。stderr 空の非ゼロ終了は環境起因の可能性を示唆する |
+
+起動環境障害の失敗は全操作で同一の失敗分類になる。読み取り操作も書き込み操作も同じ失敗に分類されるため、失敗分類から操作種別を推定しない。
+
+### 診断手順
+
+1. failure detail を読み、次の要点を確認する。
+  - 環境変数設定状態（`AGENTDEV_GH_REPO environment variable (not set)`、`set but invalid format` 等）
+  - gh の終了コード
+  - stderr の空・非空
+  - spawnSync エラー種別（起動不能時に出力される）
+2. `gh auth status` で gh CLI の認証状態を確認する。未認証の場合は `gh auth login` で認証する。
+3. `gh repo view --json nameWithOwner` を手動実行し、gh CLI 単体でのリポジトリ解決可否を切り分ける。
+
+### 回復手段（harness 再起動）
+
+- `AGENTDEV_GH_REPO` の設定追加・変更後は、harness を再起動して起動環境（環境変数、PATH）を再読込する。再起動後に同一操作を再実行し、構造化応答（`ok: true`）が返ることを確認する。
+- harness 内 spawnSync 失敗（spawnSync エラー種別付きの失敗）が継続する場合も、harness 再起動で起動環境を再読込してから再試行する。harness 再起動手段の実装は harness 責務であり、本手順は再起動の契機と再試行の確認のみを扱う。
+
+### blocked 時の resume 手順
+
+起動環境障害により workflow が blocked に遷移した場合、回復後の作業再開は次の順で行う。
+
+1. 診断手順と回復手段で起動環境を回復し、軽量な読み取り操作（issue_read 等）で疎通を確認する。
+2. 中断した副作用操作を冪等再実行する前に、残骸の有無を確認する。
+  - issue_create、issue_update、comment_create 等が中断された疑いがある場合は、対象を issue_read または issue_list（search 併用）で確認し、既に反映済みの対象を二重に作成・更新しない。
+  - pr_create が中断された疑いがある場合は、同一 head ブランチの PR の有無を確認し、残骸 PR があればそれを正として扱う。残骸 PR が作成目的に合わない場合は、削除判断を含めて処置を確定してから作り直す。
+3. 残骸確認の結果を検証記録へ残し、再実行の対象範囲を確定してから中断した workflow を再開する。残骸不在を確認した場合は、その確認結果を根拠に中断した操作から再実行する。
+
 ## 委譲接続点と本文受け渡し
 
 case-open がサブエージェントへ本文生成を委譲する接続点（STEP-2、STEP-4）では、本文候補をメッセージ本文ではなくファイルパスで受け渡す。
