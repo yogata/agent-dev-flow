@@ -174,7 +174,7 @@ worktree 内で `git status --short` を実行し、未コミット変更の有�
 ## 6. ブランチ、worktree削除
 
 → `agentdev-git-worktree` SKILL.md の「worktree削除手順」セクションに準拠。
-ローカルブランチ削除、リモートブランチ削除、squash merge 後の条件付き `-D` 許可を含む。
+ローカルブランチ削除、squash merge 後の条件付き `-D` 許可を含む。削除対象はローカルブランチと worktree に限定され、リモートブランチは GitHub の deleteBranchOnMerge 設定による自動削除に委譲される。
 
 ---
 
@@ -511,6 +511,14 @@ squash merge（`agentdev_gh` の pr_merge 操作）実行後にローカルと r
 squash merge により remote 側に1つの統合 commit が作成される一方、ローカル側には元の個別 commit が残存する場合、ローカルと remote が分岐状態となる。
 
 ### 手順
+
+0. **remote-tracking ref 存在確認（ref 不在時の分岐）**:
+ ```bash
+ git rev-parse --verify origin/{branch}
+ ```
+ GitHub の deleteBranchOnMerge 設定（true が必須前提）によるリモートブランチ自動削除と `git fetch --prune` の組合せでは、squash merge 後に origin/{branch} の remote-tracking ref が消失し得る。
+ ref が不在の場合、以降の origin/{branch} 依存の比較手順（手順1〜3）は適用外とする（比較不能）。エラーとして扱わない。
+ PR が MERGED 状態であることを呼び出し元が確認した上で、reset を行わず呼び出し元 workflow の後続クリーンアップ（ローカルブランチ・worktree 削除）へ進む。
 
 1. **ローカル先行 commit 検出**:
  ```bash

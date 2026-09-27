@@ -1,6 +1,6 @@
 # 適用プロジェクトへの導入モデル
 
-<!-- ADF-COVERS(implementation): REQ-050-014, REQ-009-051 -->
+<!-- ADF-COVERS(implementation): REQ-050-014, REQ-009-051, REQ-009-052 -->
 
 AgentDevFlow を適用プロジェクトに導入する際のモデルを定義する（REQ-009）。
 
@@ -189,6 +189,30 @@ git clone https://github.com/yogata/agent-dev-flow.git .agentdev-plugin
 >
 > スクリプトを `./scripts/` として導入先リポジトリに置く場合は、`.agentdev-plugin/` と同一のチェックアウトから scripts/ ディレクトリ全体をコピーする（公開入口 `install.ps1` は内部処理 `scripts/consumer/` に依存する）。
 
+### GitHub repo 設定 deleteBranchOnMerge（必須導入条件）
+
+GitHub Issue/PR を使用するリポジトリ種別では、GitHub repo 設定 `deleteBranchOnMerge=true` を必須の導入条件とする。対象は本体リポジトリ（self-hosting）と適用プロジェクト（consumer-with-agentdev）に限られる。
+PR マージ後のリモートブランチ削除は GitHub の自動削除に委譲され、workflow 側のクリーンアップ（case-close）はローカルブランチ・worktree に限定される。
+
+設定手順を次に示す（いずれかの方法で設定する）。
+
+```powershell
+# gh CLI による設定
+gh repo edit --delete-branch-on-merge
+```
+
+- Web UI による設定: リポジトリの Settings → General → Pull Requests で「Automatically delete head branches」を有効化する
+
+確認コマンドを次に示す。
+
+```powershell
+# true が出力されることを確認する
+gh repo view --json deleteBranchOnMerge
+```
+
+- GitHub Issue/PR を使用しないローカル版（consumer-generated）は対象外である
+- 導入系スクリプト（`scripts/install.ps1`、`scripts/self-sync.ps1`、`scripts/consumer/`）は network access を行わない契約を維持する。本設定の検証をスクリプトに実装せず、case-open の preflight（Root Case 確立前の読取専用照会）が担う
+
 ### AGENTDEV_GH_REPO の起動環境設定
 
 Custom Tool `agentdev_gh` は、GitHub 操作の対象リポジトリ（`owner/name` 形式）を、環境変数 `AGENTDEV_GH_REPO`、未設定時は `gh repo view` の順で解決する。Plugin 側の設定詳細は [agentdev-gh-tool Plugin](../../src/opencode/plugins/agentdev-gh-tool/README.md) の「設定」節を参照。
@@ -298,9 +322,10 @@ Custom Tool（`.opencode/tools/agentdev-*/`）と Plugin / Hook（`.opencode/plu
 
 1. `.agentdev-plugin/` に agent-dev-flow のチェックアウトを用意する（git clone またはソース ZIP 展開）
 2. `./.agentdev-plugin/scripts/install.ps1 -Mode apply` を実行
-3. `./.agentdev-plugin/scripts/install.ps1 -Mode check` で動作確認
-4. `.agentdev/` ディレクトリが存在することを確認（Intake/Learning 用）
-5. `.gitignore` に推奨エントリを追加
+3. GitHub repo 設定 `deleteBranchOnMerge=true` を設定し、確認コマンドで `true` を確認する（上記「GitHub repo 設定 deleteBranchOnMerge（必須導入条件）」参照）
+4. `./.agentdev-plugin/scripts/install.ps1 -Mode check` で動作確認
+5. `.agentdev/` ディレクトリが存在することを確認（Intake/Learning 用）
+6. `.gitignore` に推奨エントリを追加
 
 ### 既存プロジェクトへの導入手順
 

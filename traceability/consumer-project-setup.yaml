@@ -1,0 +1,6 @@
+component: consumer-project-setup
+implementation:
+  docs/guides/consumer-project-setup.md:
+    - REQ-050-014
+    - REQ-009-051
+    - REQ-009-052

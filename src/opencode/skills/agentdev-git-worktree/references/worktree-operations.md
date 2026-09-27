@@ -393,12 +393,14 @@ git worktree prune
 1. worktree 管理情報を更新: `git worktree prune`
 2. ジャンクションディレクトリを手動削除: `Remove-Item -LiteralPath "{worktree_path}" -Recurse -Force` または `rmdir /s /q "{worktree_path}"`（`rmdir /s /q` は cmd 専用構文で Git Bash からは転記不能。bash から実行する場合は node fs.rmSync の再帰削除 `fs.rmSync('{worktree_path}', { recursive: true, force: true })` へ置き換える）
 3. ローカルブランチを削除: `git branch -d {branch_name}`（必要時のみ `-D`）
-4. リモートブランチがある場合のみ削除: `git push origin --delete {branch_name}`
 
 **注意**: `install.ps1` が作成するジャンクション link 経由の worktree で発生する Windows 固有の挙動。
 背景: worktree ジャンクション削除フォールバック要件（関連Issue/PRは履歴参照）。
 
 ### 4. ローカルブランチの削除
+
+削除対象はローカルブランチに限定される。
+PR マージ後のリモートブランチは GitHub の deleteBranchOnMerge 設定による自動削除に委譲され、本手順では実行しない。
 
 ```bash
 git branch -d "{type}/issue-{N}"
@@ -408,15 +410,6 @@ git branch -d "{type}/issue-{N}"
 1. PR が `state: MERGED` と確認できること
 2. 呼び出し元が squash merge 済みを明示的に判定していること
 3. 条件を満たさない場合は `-D` 実行せず警告表示して停止
-
-### 5. リモートブランチの削除
-
-```bash
-git push origin --delete "{type}/issue-{N}"
-```
-
-- リモートにブランチが存在しない場合はエラーを無視して続行
-- 削除失敗時は警告表示して停止
 
 ## ツール実行規約
 
