@@ -36,6 +36,7 @@ const ALL_RULE_IDS: readonly CorruptionRuleId[] = [
   "control-char",
   "invalid-unicode",
   "foreign-script",
+  "simplified-chinese",
   "stale-reference",
 ];
 
@@ -307,6 +308,7 @@ describe("許容例（REQ-010-068 allowed-usage enumeration）", () => {
         "src/opencode/skills/agentdev-other/SKILL.md": cyrillic,
       },
       (root) => {
+        const originalLength = ALLOWED_USAGE.length;
         ALLOWED_USAGE.push({
           file: SKILL,
           rule_id: "foreign-script",
@@ -318,7 +320,7 @@ describe("許容例（REQ-010-068 allowed-usage enumeration）", () => {
           expect(findingsOf(report, "foreign-script").length).toBe(6);
           expect(findingsOf(report, "foreign-script")[0].file).toContain("agentdev-other");
         } finally {
-          ALLOWED_USAGE.length = 0;
+          ALLOWED_USAGE.length = originalLength;
         }
       },
     );
@@ -389,5 +391,50 @@ describe("再現例（REQ-010-068 reproductions from the live corpus）", () => 
         expect(findingsOf(report, "broken-code-span").length).toBe(1);
       },
     );
+  });
+});
+
+describe("簡体字検出（simplified-chinese, RU-0144 signal, Case #3166 RA-007）", () => {
+  test("detects simplified glyphs in the Japanese corpus (实行/状态/含义)", () => {
+    withFixture(
+      { [SKILL]: "# タイトル\n\n検証を実行する。实行と状态と含义が混入。\n" },
+      (root) => {
+        const findings = findingsOf(checkContentCorruption(root), "simplified-chinese");
+        expect(findings.length).toBe(3);
+        expect(JSON.stringify(findings.map((f) => f.matched))).toContain("\u5B9E");
+      },
+    );
+  });
+
+  test("does not flag legitimate Japanese glyphs (実行/状態/意味)", () => {
+    withFixture(
+      { [SKILL]: "# タイトル\n\n検証を実行する。実行と状態と意味は正当。\n" },
+      (root) => {
+        expect(findingsOf(checkContentCorruption(root), "simplified-chinese").length).toBe(0);
+      },
+    );
+  });
+
+  test("scan scope includes docs/designs", () => {
+    withFixture(
+      { "docs/designs/integrity/ra007-fixture.md": "# Design\n\n实行と状态と含义の簡体字混入例。\n" },
+      (root) => {
+        const findings = findingsOf(checkContentCorruption(root), "simplified-chinese");
+        expect(findings.length).toBe(3);
+        expect(findings[0].file).toContain(path.join(root, "docs", "designs"));
+      },
+    );
+  });
+
+  test("registered allowed-usage entries suppress the exemplar citations (file x rule)", () => {
+    expect(ALLOWED_USAGE.some((e) => e.rule_id === "simplified-chinese")).toBe(true);
+    expect(ALLOWED_USAGE.some((e) => e.rule_id === "broken-code-span")).toBe(true);
+    expect(ALLOWED_USAGE.some((e) => e.rule_id === "stale-reference")).toBe(true);
+    for (const entry of ALLOWED_USAGE) {
+      expect(entry.file.length).toBeGreaterThan(0);
+      expect(entry.rationale.length).toBeGreaterThan(0);
+    }
+    const keys = new Set(ALLOWED_USAGE.map((e) => `${e.file}\t${e.rule_id}`));
+    expect(keys.size).toBe(ALLOWED_USAGE.length);
   });
 });

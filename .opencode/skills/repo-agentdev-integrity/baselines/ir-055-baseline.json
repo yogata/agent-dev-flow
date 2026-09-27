@@ -1,7 +1,7 @@
 {
   "version": 1,
   "rule_id": "IR-055",
-  "generated_at": "2026-09-23",
+  "generated_at": "2026-09-27",
   "entries": [
     {
       "file": "src/opencode/commands/agentdev/inspect-docs.md",
@@ -143,7 +143,7 @@
       "file": "src/opencode/skills/agentdev-workflow-inspect-docs/references/scan-and-doc-diagnostics.md",
       "pattern": "docs/designs/",
       "severity": "heuristic",
-      "count": 1,
+      "count": 2,
       "classification": "baseline",
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
@@ -151,7 +151,7 @@
       "file": "src/opencode/skills/agentdev-workflow-inspect-docs/references/scan-and-doc-diagnostics.md",
       "pattern": "docs/guides/",
       "severity": "heuristic",
-      "count": 1,
+      "count": 2,
       "classification": "baseline",
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
@@ -195,5 +195,6 @@
       "classification": "baseline",
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     }
-  ]
+  ],
+  "warning_total_cap": 50
 }

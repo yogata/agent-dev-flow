@@ -82,6 +82,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 現行 Decision は DEC-001 から DEC-044 の43件である（DEC-002、DEC-005、DEC-007、DEC-015、DEC-017、DEC-029、DEC-030、DEC-040、DEC-043 は superseded）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
+<!-- AUTOGEN:BEGIN:id=readme-decision-summary-table -->
 | Decision | タイトル |
 |---|---|
 | [DEC-001](decisions/DEC-001.md) | AgentDevFlow 憲章 |
@@ -111,7 +112,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-026](decisions/DEC-026.md) | 実現面変更方針の構造化ハンドオフ（realization_actions） |
 | [DEC-027](decisions/DEC-027.md) | 観測ベース統制縮小評価ループ |
 | [DEC-028](decisions/DEC-028.md) | 文章表層品質の共通実行基盤 |
-| [DEC-029](decisions/DEC-029.md) | 公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入 |
+| [DEC-029](decisions/DEC-029.md) | 公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入（superseded by DEC-033） |
 | [DEC-030](decisions/DEC-030.md) | トレーサビリティ標準機能への一般化と producer / consumer 境界の確立（superseded by DEC-037） |
 | [DEC-031](decisions/DEC-031.md) | ADF v4 Standard Operating Model の採用とプロセス・実装の責務分離 |
 | [DEC-032](decisions/DEC-032.md) | ADF 責務の三層モデルと Project Contract の論理ビュー・情報寿命モデル |
@@ -122,11 +123,12 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-037](decisions/DEC-037.md) | Traceability の Change / Evidence 中心への再中心化 |
 | [DEC-038](decisions/DEC-038.md) | ADF v4 durable state 配置と再構成の契約（状態権威・証跡分離・非原子調整原則） |
 | [DEC-039](decisions/DEC-039.md) | ADF v4 authority・副作用統制と冪等・並行性モデル |
-| [DEC-040](decisions/DEC-040.md) | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化、superseded by DEC-044〔決定4 部分置換。決定1〜3は維持〕） |
+| [DEC-040](decisions/DEC-040.md) | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化）（superseded by DEC-044〔決定4 部分置換。決定1〜3は維持〕） |
 | [DEC-041](decisions/DEC-041.md) | Wave 構成純度と実行並列上限の単一所有 |
 | [DEC-042](decisions/DEC-042.md) | case-auto 最大並列維持と同期逐次フォールバック禁止 |
-| [DEC-043](decisions/DEC-043.md) | case-ready 実行構造判断への Jev 最終判断採用（Stage 2: 閾値ルーティング、superseded by DEC-044） |
+| [DEC-043](decisions/DEC-043.md) | case-ready 実行構造判断への Jev 最終判断採用（Stage 2: 閾値ルーティング）（superseded by DEC-044） |
 | [DEC-044](decisions/DEC-044.md) | Semantic Evaluation 観測契約の一次事実中心再設計と基本判断経路への復帰 |
+<!-- AUTOGEN:END -->
 
 ## 設計（Design）
 

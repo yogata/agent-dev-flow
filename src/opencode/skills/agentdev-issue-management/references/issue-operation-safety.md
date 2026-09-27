@@ -66,6 +66,7 @@ operation-failed / API 失敗応答を再試行するか否かは、失敗の分
 1. **絞り込みの推送（Tool 正規経路）**: operation-failed 応答を受け取ったら、`search` 引数の絞り込みキーを見直して Tool 正規経路で再実行する。
 2. **手動読取（operation-failed 時限定の補完手段）**: 絞り込み推送後も上限到達が解消しない場合に限り、`gh issue list --search <絞り込みクエリ> --json labels,number,title` の形式で手動読取し、Tool 操作で取得できなかった対象を補完する。読み取り限定であり、要求フィールドを目的に必要な範囲へ限定する。
 3. **補完結果の確認**: 手動読取を使った場合は、search 条件と取得件数を検証記録へ残し、欠落の疑義を検証結果に残す。
+4. **補完結果の機械検証（read-back 目視断定の禁止）**: 手動読取した本文や識別子の破損疑いは、read-back 目視の再読で断定せず、機械検証へ置き換える。検証対象トークン（識別子・パス）の filesystem 実在性を `fs.existsSync` で照合し、REQ/DEC 等の ID digit（数値）を本文と正規参照先で突合する。手順の正は知識 `docs/knowledge/llm-body-verification-filesystem-truth.md`（LLM 送信本文の識別子破損疑いは read-back 目視で断定せず filesystem 実在性と ID digit 突合で検証する）であり、本節は contingency 補完結果への適用形を定める。
 
 ## Issue 作成後の内容反映確認
 

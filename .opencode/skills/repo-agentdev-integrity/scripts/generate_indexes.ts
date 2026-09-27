@@ -934,6 +934,69 @@ export function generateReadmeReqSummaryCount(args: {
  */
 export const README_REQ_SUMMARY_TABLE_GENERATOR = generateReqActiveTable;
 
+// ─── AG-005: docs/README.md Decision 静的表生成 ──────────────────────────────
+
+// docs/README.md「## Decision」セクションの Decision 静的表 AUTOGEN block ID
+// （index-auto-generation.md「AUTOGEN block ID 命名パターン」採用 ID 参照例）。
+export const README_DECISION_SUMMARY_TABLE_BLOCK_ID =
+  "readme-decision-summary-table";
+
+/**
+ * docs/README.md「## Decision」セクションの Decision 表 title セル内 notes 記法
+ * （〔...〕部分置換詳細注記、U+3014/U+3015）を抽出する
+ * （index-auto-generation.md「docs/README.md Decision 表の notes 記法抽出合成」）。
+ * extractRelatedReqNotes と同様の見出しスコープ方式で、AUTOGEN ブロック囲みの
+ * 有無に依存せず抽出する（初回 AUTOGEN 化時の手動注記喪失防止対応）。
+ */
+export function extractDocsReadmeDecisionNotes(
+  readmeContent: string,
+): Record<string, string> {
+  const notes: Record<string, string> = {};
+  const lines = readmeContent.split("\n");
+  let inSection = false;
+  const notesRe = /〔([^〕]*)〕/;
+  for (const line of lines) {
+    if (/^##\s+/.test(line)) {
+      inSection = /^##\s+Decision\s*$/.test(line.trim());
+      continue;
+    }
+    if (!inSection) continue;
+    const rowMatch = line.match(/^\|\s*\[(DEC-\d+)\]\([^)]*\)\s*\|/);
+    if (!rowMatch) continue;
+    const cells = line.split("|").map((c) => c.trim());
+    if (cells.length < 3) continue;
+    const m = cells[2].match(notesRe);
+    if (m) notes[rowMatch[1]] = m[1];
+  }
+  return notes;
+}
+
+/**
+ * docs/README.md Decision 静的表（readme-decision-summary-table）の生成本体。
+ * 「superseded by DEC-XXX」括弧注記は frontmatter superseded_by から導出し、
+ * notes 記法（docs/README.md title セル手動注記を優先、frontmatter supersede_note
+ * がフォールバック）を括弧注記の一部として title 直後に合成する。
+ * 表上部の件数 caption は生成対象外の手動残置（AG-005 既知限界）。
+ */
+export function generateDocsReadmeDecisionTable(
+  decisions: DecisionInfo[],
+  notes: Record<string, string>,
+): string[] {
+  const lines: string[] = [];
+  lines.push("| Decision | タイトル |");
+  lines.push("|---|---|");
+  for (const info of decisions) {
+    let titleCell = sanitizeTableCell(info.title);
+    if (info.status === "superseded" && info.supersededBy) {
+      const note = notes[info.id] ?? info.supersedeNote ?? null;
+      const notePart = note ? `〔${note}〕` : "";
+      titleCell += `（superseded by ${info.supersededBy}${notePart}）`;
+    }
+    lines.push(`| [${info.id}](decisions/${info.relPath}) | ${titleCell} |`);
+  }
+  return lines;
+}
+
 // ─── AG-006候補5: REQ 健全性メトリクス計測例生成 (Phase C 拡張) ────────
 
 export const REQ_METRICS_BLOCK_ID = "req-metrics-measurement-example";
@@ -1527,6 +1590,7 @@ RELATED:
   const docsReadmeExpectedIds = [
     README_REQ_SUMMARY_COUNT_BLOCK_ID,
     README_REQ_SUMMARY_TABLE_BLOCK_ID,
+    README_DECISION_SUMMARY_TABLE_BLOCK_ID,
   ];
   const docsReadmeFoundIds = new Set(docsReadmeBlocks.map((b) => b.id));
   const docsReadmeMissing = docsReadmeExpectedIds.filter(
@@ -1538,12 +1602,21 @@ RELATED:
     );
     process.exit(EXIT_ERROR);
   }
+  // notes 記法抽出（AG-005）: title セル手動注記を優先し、frontmatter
+  // supersede_note はフォールバック（generateDocsReadmeDecisionTable 内）。
+  const docsReadmeDecisionNotes = extractDocsReadmeDecisionNotes(
+    docsReadmeOriginal,
+  );
   let docsReadmeUpdated = docsReadmeOriginal;
   const docsReadmeReplacements: Record<string, string[]> = {
     [README_REQ_SUMMARY_COUNT_BLOCK_ID]: readmeReqSummary,
     [README_REQ_SUMMARY_TABLE_BLOCK_ID]: generateReqActiveTable(
       reqInfos,
       "requirements/",
+    ),
+    [README_DECISION_SUMMARY_TABLE_BLOCK_ID]: generateDocsReadmeDecisionTable(
+      decisionInfos,
+      docsReadmeDecisionNotes,
     ),
   };
   for (const blockId of docsReadmeExpectedIds) {
@@ -1580,7 +1653,7 @@ RELATED:
       `[generate_indexes] req-health-metrics: ${reqMetrics.length} REQs (measure date ${reqMeasureDate})`,
     );
     console.log(
-      `[generate_indexes] docs/README.md: REQ summary active=${reqInfos.length} retired=${reqRetiredInfos.length}, table=${reqActiveTable.length - 2} rows`,
+      `[generate_indexes] docs/README.md: REQ summary active=${reqInfos.length} retired=${reqRetiredInfos.length}, table=${reqActiveTable.length - 2} rows, Decision table=${decisionInfos.length} rows (notes=${Object.keys(docsReadmeDecisionNotes).length})`,
     );
     for (const u of updates) {
       console.log(`[generate_indexes] WOULD UPDATE: ${u.file}`);

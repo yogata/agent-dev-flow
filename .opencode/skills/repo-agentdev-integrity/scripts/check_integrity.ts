@@ -85,7 +85,10 @@ import {
   generateReqMetricsTable,
   deriveReqMetricsMeasureDate,
   README_REQ_SUMMARY_COUNT_BLOCK_ID,
+  README_DECISION_SUMMARY_TABLE_BLOCK_ID,
   generateReadmeReqSummaryCount,
+  extractDocsReadmeDecisionNotes,
+  generateDocsReadmeDecisionTable,
 } from "./generate_indexes.ts";
 import {
   isFileLevelHistoryExempt,
@@ -103,7 +106,7 @@ import { globWalkRel } from "./lib/glob_walk.ts";
 const SCRIPT_NAME = "check_integrity.ts";
 const DESCRIPTION = "AgentDevFlow artifact integrity validator";
 const USAGE =
-  "bun run check_integrity.ts [--help] [--json] [--dry-run] [--classification] [--profile source|installed|release] [--archive <zip>] [--root <path>] [--update-ir055-baseline] [--update-ng-baseline --ng-baseline-additions <manifest.json>]";
+  "bun run check_integrity.ts [--help] [--json] [--dry-run] [--classification] [--profile source|installed|release] [--archive <zip>] [--root <path>] [--update-ir055-baseline] [--update-warning-cap [--raise-warning-cap]] [--update-ng-baseline --ng-baseline-additions <manifest.json>]";
 
 const path = require("path") as typeof import("path");
 const fs = require("fs") as typeof import("fs");
@@ -7158,8 +7161,17 @@ function checkReqDesignBoundaryViolation(root: string): CheckResult[] {
 const IR053_GH_DIRECT_PATTERN =
   /\bgh\s+(issue|pr)\s+(create|edit|view|comment|merge|close|list|status)\b/i;
 
-// Exemption paths (repo-root-relative, forward-slash normalized). None currently.
-const IR053_EXEMPT_PATHS: RegExp[] = [];
+// Exemption paths (repo-root-relative, forward-slash normalized). Read-only
+// contingency allowance per Custom Tool 契約 Design「迂回防止」（REQ-092-003）:
+// both references document the gh read-only fallback when issue_list hits the
+// safe page limit; write-path gh remains prohibited (compensation test).
+// Each file is registered in both projection spellings (`.opencode/` in the
+// main junction environment, `src/opencode/` in worktree fallback), mirroring
+// the ng-baseline bucket key normalization (OU-0008).
+const IR053_EXEMPT_PATHS: RegExp[] = [
+  /^(?:src\/opencode|\.opencode)\/skills\/agentdev-issue-management\/references\/issue-operation-safety\.md$/,
+  /^(?:src\/opencode|\.opencode)\/skills\/agentdev-workflow-case-open\/references\/definition-pr-and-idempotency\.md$/,
+];
 
 export function walkMarkdown(dirPath: string, acc: string[]): void {
   if (!fs.existsSync(dirPath)) return;
@@ -7380,6 +7392,12 @@ interface Ir055Baseline {
   version: number;
   rule_id: "IR-055";
   generated_at: string;
+  /**
+   * Full-audit warning ratchet cap (integrity-contracts「IR-055 warning 総数
+   * ratchet（full-audit 契約）」). Pre-demote warning total must stay <= cap;
+   * decreases are free, increases require --raise-warning-cap.
+   */
+  warning_total_cap?: number;
   entries: Ir055BaselineEntry[];
 }
 
@@ -7668,6 +7686,196 @@ function updateIr055Baseline(root: string): void {
   writeIr055Baseline(root, baseline);
   console.error(
     `[integrity] IR-055 baseline regenerated: ${baseline.entries.length} entries across ${new Set(baseline.entries.map((e) => e.file)).size} files (${violations.length} total violations).`,
+  );
+}
+
+// ===== 恒久免除レジストリ (integrity-contracts「恒久免除レジストリ
+// （baselines/exemptions.json）の運用」) + IR-055 warning 総数 ratchet =====
+// Schema version 2 (fail-closed): each entry carries rule_id, an accepted
+// rationale_ref pointing at an existing repo-relative justification path, and
+// review_status === "accepted". Exempted warnings become permanent-exemption
+// info findings and are excluded from the baseline debt (ng-baseline demote
+// and the warning_total_cap count).
+
+const EXEMPTIONS_PATH = path.join(
+  ".opencode",
+  "skills",
+  "repo-agentdev-integrity",
+  "baselines",
+  "exemptions.json",
+);
+
+interface IntegrityExemptionEntry {
+  rule_id: string;
+  file: string | null;
+  evidence: string | null;
+  rationale_ref: string;
+  review_status: string;
+}
+
+interface IntegrityExemptions {
+  version: 2;
+  entries: IntegrityExemptionEntry[];
+}
+
+function loadExemptions(root: string): IntegrityExemptions | null {
+  const abs = path.join(root, EXEMPTIONS_PATH);
+  const content = readText(abs);
+  if (!content) return null;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(content);
+  } catch (e) {
+    throw new Error(
+      `exemptions.json is not valid JSON: ${EXEMPTIONS_PATH} (${
+        e instanceof Error ? e.message : String(e)
+      })`,
+    );
+  }
+  const obj = parsed as Record<string, unknown> | null;
+  if (!obj || typeof obj !== "object" || obj.version !== 2) {
+    throw new Error(
+      `exemptions.json schema violation: "version" must be 2 (${EXEMPTIONS_PATH})`,
+    );
+  }
+  if (!Array.isArray(obj.entries)) {
+    throw new Error(
+      `exemptions.json schema violation: "entries" must be an array (${EXEMPTIONS_PATH})`,
+    );
+  }
+  const entries: IntegrityExemptionEntry[] = [];
+  const rawEntries = obj.entries as unknown[];
+  for (let i = 0; i < rawEntries.length; i++) {
+    const raw = rawEntries[i] as Record<string, unknown> | null;
+    if (!raw || typeof raw !== "object") {
+      throw new Error(
+        `exemptions.json schema violation: entries[${i}] is not an object (${EXEMPTIONS_PATH})`,
+      );
+    }
+    const ruleId = typeof raw.rule_id === "string" ? raw.rule_id.trim() : "";
+    if (!ruleId) {
+      throw new Error(
+        `exemptions.json schema violation: entries[${i}] missing required "rule_id" (${EXEMPTIONS_PATH})`,
+      );
+    }
+    const rationaleRef =
+      typeof raw.rationale_ref === "string" ? raw.rationale_ref.trim() : "";
+    if (!rationaleRef) {
+      throw new Error(
+        `exemptions.json schema violation: entries[${i}] (${ruleId}) missing required "rationale_ref" (${EXEMPTIONS_PATH})`,
+      );
+    }
+    if (!fs.existsSync(path.join(root, ...rationaleRef.split("/")))) {
+      throw new Error(
+        `exemptions.json schema violation: entries[${i}] (${ruleId}) rationale_ref does not resolve to an existing path: ${rationaleRef} (${EXEMPTIONS_PATH})`,
+      );
+    }
+    if (raw.review_status !== "accepted") {
+      throw new Error(
+        `exemptions.json schema violation: entries[${i}] (${ruleId}) review_status must be "accepted" (${EXEMPTIONS_PATH})`,
+      );
+    }
+    entries.push({
+      rule_id: ruleId,
+      file: raw.file == null ? null : String(raw.file),
+      evidence: raw.evidence == null ? null : String(raw.evidence),
+      rationale_ref: rationaleRef,
+      review_status: String(raw.review_status),
+    });
+  }
+  return { version: 2, entries };
+}
+
+/**
+ * Demote exempted warnings to permanent-exemption info findings.
+ * Runs BEFORE applyNgBaseline so an exempted warning can never be double-counted
+ * as a baseline-known demote (the info level removes it from summarizeNgResults).
+ * Returns the number of exempted findings.
+ */
+function applyExemptions(
+  results: CheckResult[],
+  exemptions: IntegrityExemptions | null,
+): number {
+  if (!exemptions || exemptions.entries.length === 0) return 0;
+  let exempted = 0;
+  for (const r of results) {
+    if (r.level !== "warning") continue;
+    const matched = exemptions.entries.some(
+      (e) =>
+        e.rule_id === r.check &&
+        (e.file === null || (r.file ?? "") === e.file) &&
+        (e.evidence === null || (r.evidence ?? "") === e.evidence),
+    );
+    if (matched) {
+      r.level = "info";
+      r.finding_level = "observation";
+      r.message = `[exempted] ${r.message} (permanent exemption: ${EXEMPTIONS_PATH.replace(/\\/g, "/")})`;
+      exempted++;
+    }
+  }
+  return exempted;
+}
+
+function countPreDemoteWarnings(results: CheckResult[]): number {
+  return results.filter((r) => r.level === "warning").length;
+}
+
+function enforceWarningTotalCap(
+  root: string,
+  results: CheckResult[],
+  warningTotal: number,
+): void {
+  const baseline = loadIr055Baseline(root);
+  if (!baseline || typeof baseline.warning_total_cap !== "number") return;
+  const cap = baseline.warning_total_cap;
+  if (warningTotal <= cap) return;
+  results.push(
+    ng(
+      "RuntimeReference",
+      "warning-total-cap",
+      `IR-055 warning total (${warningTotal}) exceeds warning_total_cap (${cap}) in ir-055-baseline.json (ratchet: increases require --raise-warning-cap)`,
+      null,
+      undefined,
+      {
+        evidence: `warning_total=${warningTotal}, warning_total_cap=${cap}`,
+        expected: `pre-demote warning total <= ${cap}`,
+        route: "intake",
+      },
+    ),
+  );
+}
+
+function updateWarningTotalCap(
+  root: string,
+  warningTotal: number,
+  raiseRequested: boolean,
+): void {
+  const baseline = loadIr055Baseline(root);
+  if (!baseline) {
+    console.error(
+      "[integrity] IR-055 baseline not found; cannot update warning_total_cap.",
+    );
+    process.exit(EXIT_ERROR);
+  }
+  const currentCap =
+    typeof baseline.warning_total_cap === "number"
+      ? baseline.warning_total_cap
+      : null;
+  if (currentCap !== null && warningTotal > currentCap && !raiseRequested) {
+    console.error(
+      `[integrity] warning_total_cap update rejected: ${warningTotal} > ${currentCap} (ratchet: increase requires --raise-warning-cap).`,
+    );
+    process.exit(EXIT_ERROR);
+  }
+  if (currentCap !== null && warningTotal > currentCap) {
+    console.error(
+      `[integrity] --raise-warning-cap: warning_total_cap raised ${currentCap} -> ${warningTotal} (explicit increase acceptance).`,
+    );
+  }
+  baseline.warning_total_cap = warningTotal;
+  writeIr055Baseline(root, baseline);
+  console.error(
+    `[integrity] warning_total_cap updated to ${warningTotal} (was ${currentCap ?? "unset"}).`,
   );
 }
 
@@ -8782,7 +8990,7 @@ function checkIndexGenerationConsistency(root: string): CheckResult[] {
 
 
 
-  // Phase E 残 (Wave 5): docs/README.md — 1 AUTOGEN block (REQ count summary only)
+  // Phase E 残 (Wave 5): docs/README.md — AUTOGEN blocks (REQ count summary + Decision summary table)
   const docsReadmePath = path.join(root, "docs", "README.md");
   const docsReadmeContent = readText(docsReadmePath);
   if (docsReadmeContent !== null && fs.existsSync(reqDir) && fs.existsSync(reqRetiredDir)) {
@@ -8796,6 +9004,21 @@ function checkIndexGenerationConsistency(root: string): CheckResult[] {
         label: "readme-req-summary-count",
       },
     ];
+    // AG-005: Decision 静的表の AUTOGEN 生成（index-auto-generation.md
+    // 「docs/README.md Decision 静的表の AUTOGEN 生成」「notes 記法抽出合成」）。
+    // notes は docs/README.md 現行静的表から抽出するため、検証は README 内容
+    // が存在する場合のみ行う（初回 AUTOGEN 化後の永続契約）。
+    if (findAutogenBlocks(docsReadmeContent).some((b) => b.id === README_DECISION_SUMMARY_TABLE_BLOCK_ID)) {
+      const docsReadmeNotes = extractDocsReadmeDecisionNotes(docsReadmeContent);
+      docsReadmeSpecs.push({
+        blockId: README_DECISION_SUMMARY_TABLE_BLOCK_ID,
+        expected: generateDocsReadmeDecisionTable(
+          collectDecisionFiles(decisionsDir),
+          docsReadmeNotes,
+        ),
+        label: "readme-decision-summary-table",
+      });
+    }
     const docsReadmeOutcome = verifyAutogenBlocksInFile(
       docsReadmeContent,
       docsReadmePath,
@@ -11295,6 +11518,29 @@ async function main(): Promise<void> {
 
   const processed = processResults(results);
 
+  // 恒久免除レジストリ適用（applyNgBaseline の demote 前に実施。exempt 分は
+  // info 化されるため ng-baseline demote と二重計上にならない）。
+  let exemptedCount: number | null = null;
+  try {
+    const exemptions = loadExemptions(root);
+    exemptedCount = applyExemptions(processed, exemptions);
+  } catch (e) {
+    console.error(`[integrity] ${e instanceof Error ? e.message : String(e)}`);
+    process.exit(EXIT_ERROR);
+  }
+
+  // IR-055 warning 総数 ratchet（demote 前総数・exemptions 適用後で比較）。
+  const preDemoteWarningTotal = countPreDemoteWarnings(processed);
+  if (args.includes("--update-warning-cap")) {
+    updateWarningTotalCap(
+      root,
+      preDemoteWarningTotal,
+      args.includes("--raise-warning-cap"),
+    );
+    process.exit(EXIT_OK);
+  }
+  enforceWarningTotalCap(root, processed, preDemoteWarningTotal);
+
   // v2:REQ-0161-005: baseline-aware strict pass. When --update-ng-baseline is
   // requested, merge the approved additions manifest into the baseline (the
   // manifest is required; unmanaged NGs are never absorbed). Otherwise demote
@@ -11350,6 +11596,11 @@ async function main(): Promise<void> {
 
   const reportPath = writeReportFile(root, report);
   console.error(`Report written to: ${reportPath}`);
+  if (exemptedCount !== null) {
+    console.error(
+      `[integrity] Permanent exemptions applied: ${exemptedCount} warning(s) demoted to info (${EXEMPTIONS_PATH.replace(/\\/g, "/")}), excluded from the pre-demote warning total (${preDemoteWarningTotal}).`,
+    );
+  }
   if (ngBaselineInfo) {
     console.error(
       `[integrity] NG baseline applied: ${ngBaselineInfo.baselineKnown} baseline-known (demoted to info), ${ngBaselineInfo.approvedAdditions} approved additions (provenance-tracked, demoted to info), ${ngBaselineInfo.newNg} new unmanaged NG (delta, exit code driver).`,

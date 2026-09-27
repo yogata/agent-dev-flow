@@ -37,6 +37,7 @@ export type CorruptionRuleId =
   | "control-char"
   | "invalid-unicode"
   | "foreign-script"
+  | "simplified-chinese"
   | "stale-reference";
 
 export interface CorruptionFinding {
@@ -65,6 +66,7 @@ const RULE_IDS: readonly CorruptionRuleId[] = [
   "control-char",
   "invalid-unicode",
   "foreign-script",
+  "simplified-chinese",
   "stale-reference",
 ];
 
@@ -94,6 +96,7 @@ function collectScanFiles(repoRoot: string): string[] {
   const dirs = [
     path.join(repoRoot, "src", "opencode", "commands", "agentdev"),
     path.join(repoRoot, "src", "opencode", "skills"),
+    path.join(repoRoot, "docs", "designs"),
   ];
   const out: string[] = [];
   for (const d of dirs) out.push(...listMarkdownRecursive(d));
@@ -116,8 +119,53 @@ interface AllowedUsageEntry {
 }
 
 /** Allowed-usage enumeration owned by the Design "allowed usage enumeration"
- * section. Tests append entries to exercise the exemption mechanism. */
-export const ALLOWED_USAGE: AllowedUsageEntry[] = [];
+ * section. Registered by Case #3166 (RA-007): docs/designs exemplar citations
+ * (the checker's own Design quoting corruption shapes and retired id forms),
+ * file x rule granularity. */
+export const ALLOWED_USAGE: AllowedUsageEntry[] = [
+  {
+    file: "docs/designs/integrity/content-corruption-checker.md",
+    rule_id: "simplified-chinese",
+    rationale:
+      "簡体字検出シグナル自体が簡体字形（状态・含义等）を実例として列挙する Design 記述（例示由来）",
+  },
+  {
+    file: "docs/designs/integrity/content-corruption-checker.md",
+    rule_id: "broken-code-span",
+    rationale:
+      "inline backtick ラン検出ルールの記述が `` ` `` 形式を例示する Design 記述（例示由来）",
+  },
+  {
+    file: "docs/designs/integrity/integrity-contracts.md",
+    rule_id: "broken-code-span",
+    rationale:
+      "コードブロック検出平面の説明表で ` ``` ` 記法を例示（例示由来）",
+  },
+  {
+    file: "docs/designs/integrity/rules/IR-052-completion-grep-pattern-design.md",
+    rule_id: "broken-code-span",
+    rationale:
+      "コードブロック内検出対象の説明表で ` ``` ` 記法を例示（例示由来）",
+  },
+  {
+    file: "docs/designs/integrity/rules/IR-064-unresolved-placeholder.md",
+    rule_id: "broken-code-span",
+    rationale:
+      "検出対象外（code block（``` 囲み）内）の説明で ``` 記法を例示（例示由来）",
+  },
+  {
+    file: "docs/designs/integrity/rules/IR-066-legacy-path-removed-name.md",
+    rule_id: "stale-reference",
+    rationale:
+      "REQ-0108-NNN 旧ナンバリング検出ルール自体が旧形式を実例として列挙するルール定義（例示由来）",
+  },
+  {
+    file: "docs/designs/integrity/rules/IR-069-req-number-gap-recorded.md",
+    rule_id: "stale-reference",
+    rationale:
+      "採番例外記録の文脈で旧ナンバリング REQ-0108-194 を歴史的根拠として引用（例示由来）",
+  },
+];
 
 function isAllowedUsage(file: string, ruleId: CorruptionRuleId): boolean {
   return ALLOWED_USAGE.some((e) => e.file === file && e.rule_id === ruleId);
@@ -147,6 +195,30 @@ const STALE_ID_RES: readonly RegExp[] = [
 ];
 
 const STALE_LINK_PATH_RE = /(?:requirements\/retired\/|retired\/REQ-)/;
+
+// ---------------------------------------------------------------------------
+// simplified-chinese: deterministic simplified<->Japanese glyph-pair dictionary
+// (content-corruption-checker Design「簡体字検出（simplified-chinese）」,
+// RU-0144 signal). CJK unified ideographs are outside foreign-script, so a
+// simplified glyph that slipped into the Japanese corpus needs this dedicated
+// pair dictionary. Entries are restricted to glyphs whose simplified form is
+// never legitimate in the Japanese corpus (whitelist management keeps false
+// positives out).
+// ---------------------------------------------------------------------------
+
+const SIMPLIFIED_CHINESE_PAIRS: ReadonlyArray<{
+  simplified: string;
+  japanese: string;
+}> = [
+  { simplified: "\u5B9E", japanese: "\u5B9F" }, // 实 -> 実 (RU-0144: 实行 x30)
+  { simplified: "\u6001", japanese: "\u72B6" }, // 态 -> 状 (RU-0144: 状态)
+  { simplified: "\u4E49", japanese: "\u610F" }, // 义 -> 意 (RU-0144: 含义)
+];
+
+const SIMPLIFIED_CHINESE_RE = new RegExp(
+  `[${SIMPLIFIED_CHINESE_PAIRS.map((p) => p.simplified).join("")}]`,
+  "g",
+);
 
 // ---------------------------------------------------------------------------
 // Line partitioning: frontmatter, fenced blocks, HTML comments
@@ -392,6 +464,7 @@ export function checkFile(fileRel: string, repoRoot: string): CorruptionFinding[
       ["control-char", CONTROL_CHAR_RE],
       ["invalid-unicode", INVALID_UNICODE_RE],
       ["foreign-script", FOREIGN_SCRIPT_RE],
+      ["simplified-chinese", SIMPLIFIED_CHINESE_RE],
     ] as const) {
       re.lastIndex = 0;
       let m: RegExpExecArray | null;
@@ -407,7 +480,9 @@ export function checkFile(fileRel: string, repoRoot: string): CorruptionFinding[
               ? `Control character U+${m[0].codePointAt(0)!.toString(16).padStart(4, "0").toUpperCase()} (REQ-053-009).`
               : ruleId === "invalid-unicode"
                 ? `Invalid Unicode character U+${m[0].codePointAt(0)!.toString(16).toUpperCase().padStart(5, "0")} (REQ-053-009).`
-                : `Foreign-script character U+${m[0].codePointAt(0)!.toString(16).toUpperCase().padStart(5, "0")} outside the Japanese/English corpus (REQ-053-009).`,
+                : ruleId === "simplified-chinese"
+                  ? `Simplified-Chinese glyph U+${m[0].codePointAt(0)!.toString(16).toUpperCase().padStart(4, "0")} '${m[0]}' (Japanese glyph: '${SIMPLIFIED_CHINESE_PAIRS.find((p) => p.simplified === m[0])?.japanese ?? "?"}') (REQ-053-009).`
+                  : `Foreign-script character U+${m[0].codePointAt(0)!.toString(16).toUpperCase().padStart(5, "0")} outside the Japanese/English corpus (REQ-053-009).`,
         });
       }
     }
@@ -444,7 +519,10 @@ export function checkFile(fileRel: string, repoRoot: string): CorruptionFinding[
     });
   }
 
-  return findings;
+  // file x rule allowed-usage enumeration applies to every rule family:
+  // structural rules (broken-code-span, stale-reference, ...) carry the same
+  // exemplar-citation exemptions as the char-plane rules.
+  return findings.filter((f) => !isAllowedUsage(fileRel, f.rule_id));
 }
 
 // ---------------------------------------------------------------------------
