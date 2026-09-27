@@ -80,8 +80,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-044 の43件である（DEC-002、DEC-005、DEC-007、DEC-015、DEC-017、DEC-029、DEC-030、DEC-040、DEC-043 は superseded）。
-詳細は [Decision インデックス](decisions/README.md) 参照。
+現行 Decision の件数と状態別内訳は [Decision インデックス](decisions/README.md) の集計を正とする。
 
 <!-- AUTOGEN:BEGIN:id=readme-decision-summary-table -->
 | Decision | タイトル |
@@ -127,7 +126,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-040](decisions/DEC-040.md) | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化）（superseded by DEC-044〔決定4 部分置換。決定1〜3は維持〕） |
 | [DEC-041](decisions/DEC-041.md) | Wave 構成純度と実行並列上限の単一所有 |
 | [DEC-042](decisions/DEC-042.md) | case-auto 最大並列維持と同期逐次フォールバック禁止 |
-| [DEC-043](decisions/DEC-043.md) | case-ready 実行構造判断への Jev 最終判断採用（Stage 2: 閾値ルーティング）（superseded by DEC-044） |
+| [DEC-043](decisions/DEC-043.md) | case-ready 実行構造判断への Jev 最終判断採用（Stage 2: 閾値ルーティング）（superseded by DEC-044〔本 Decision の決定（Stage 2: 閾値ルーティングによる Jev 最終判断採用）は DEC-044（基本判断経路への復帰）が置換する〕） |
 | [DEC-044](decisions/DEC-044.md) | Semantic Evaluation 観測契約の一次事実中心再設計と基本判断経路への復帰 |
 | [DEC-045](decisions/DEC-045.md) | リモートブランチ削除の GitHub 自動削除への委譲と deleteBranchOnMerge 設定前提の必須化 |
 | [DEC-046](decisions/DEC-046.md) | Jev 実行基盤の Cloudflare AI Gateway への完全置換 |
