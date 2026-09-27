@@ -326,3 +326,19 @@
 - **想定反映先**: docs/knowledge/qg4-baseline-detached-worktree-reproduction.md（shallow 再現手順の Windows 環境注記候補）
 - **関連**: Case #3177、PR #3181 本文 Findings / Capture候補、docs/knowledge/qg4-baseline-detached-worktree-reproduction.md
 - **タグ**: `#windows` `#git` `#shallow-clone` `#file-transport` `#verification`
+
+## agentdev-traceability coverage.ts --req へ要件行IDカンマ連結を渡すと空結果が静かに返る — 単一行指定での再実行が必要
+
+- **発生日時**: 2026-09-27（case-open Case #3183 STEP-2/3 design 対応事前確認）
+- **発生局面**: 意味変更行（REQ-090-001/002/011）の design 対応有無の事前確認（coverage --req）
+- **検知方法**: coverage.ts --req REQ-090-001,REQ-090-002,REQ-090-011 の実行が relations 空・counts 全 0 の emptyResult を終了コード 0 で返す（エラー・警告なし）
+- **根本原因**: --req は実行前提（SKILL.md）上「要件行IDの個別カンマ指定のみを受理」だが、カンマ連結複数行文字列が reqId としてそのまま解釈され該当なし扱いで静かに空結果を返す（範囲構文の .. と同様の未検査リスクの構造）
+- **自律対応内容**: 単一行指定（REQ-090-001 / REQ-090-011 / REQ-090-002 を個別実行）へ切替し、design role 対応の実在を確認して事前確認を完了。検証結果への影響なし
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（利用手順の知見）
+- **横展開観点**: traceability coverage / impact / check の --req 複数行指定を利用する全工程（case-open 事前確認、case-ready トレーサビリティ完全性ゲート）。emptyResult は「該当なしの証明」と「入力形式不一致」を区別しない
+- **再発条件**: coverage.ts --req へ複数要件行をカンマ連結で渡し、空結果を該当なしと誤読する場合
+- **予防策候補**: coverage.ts に --req の複数行受理時の動作明確化（形式エラー返却または個別展開）と、結果 JSON へ受理した reqId パース結果の明示
+- **想定反映先**: agentdev-traceability SKILL.md 実行前提節、coverage.ts 入力検証
+- **関連**: Case #3183、PR #3184 本文検証証跡
+- **タグ**: `#traceability` `#coverage` `#emptyResult` `#silent-empty`
