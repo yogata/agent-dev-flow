@@ -178,3 +178,19 @@
 - **想定反映先**: agentdev-issue-management issue-operation-safety.md（issue_list 絞り込み規律の補完）、case-open / case-ready の横断依存検査手順、REQ-092 系文書整備
 - **関連**: Case #3169、PR #3170
 - **タグ**: `#agentdev-gh` `#issue_list` `#cross-dependency` `#population-scan`
+
+## 並行 case-open による主リポジトリ branch 切替下で case-ready STEP-7 の永続化 commit が並行 Definition branch へ誤配置される
+
+- **問題事象**: case-ready STEP-7（draft 削除・DEC-045 accepted 遷移・索引再生成の git 永続化）で git add/commit を実行したところ、起動時に main であった主リポジトリの current branch が並行 Case #3171 の case-open が作業中の definition/issue-3171 へ切替わっており、commit 23593c94 が並行 Definition branch の先頭へ載った。git push origin main は Everything up-to-date で成果物が main に入らなかった
+- **発生局面**: case-ready（case-auto orchestration stage 2 委譲）STEP-7 draft/RU 削除と git 永続化時
+- **検知方法**: commit 出力の [definition/issue-3171 23593c94] 行と git push origin main の Everything up-to-date の組み合わせ矛盾
+- **根本原因**: 共有主リポジトリの current branch は工程実行中に他プロセスの branch 切替で変化し得る。case-ready STEP-7 の永続化手順に「commit 前の current branch 確認」の前置ガードがなく、並行 case-open 側の worktree 隔離（REQ-030-017）が主ツリーで守られなかった構造に依存していた
+- **自律対応内容**: commit 23593c94 が未 push（origin/definition/issue-3171 = 4319732d）を確認し、主ツリーで git reset --hard 4319732d により並行 branch を origin 状態へ復帰（自 commit の除去）。別 worktree で main を checkout し cherry-pick 23593c94 → push origin main（b2001d37）→ worktree 削除。並行プロセスの成果物（4087dfb8・4319732d）は不変
+- **ユーザー確認有無**: なし（誤配置した自工程 commit の正規位置への移動のみ。並行 branch の push も force push も行わない）
+- **Decision/REQ/spec影響**: なし（運用手順の知見）
+- **横展開観点**: main への永続化 commit を行う全工程（case-ready STEP-7、case-close ドメイン状態永続化、learning/intake capture の git 永続化）で、commit 直前に git branch --show-current で current branch を確認し、main 以外なら主ツリーでの commit を行わず worktree 経由（main checkout）へ切替する前置ガードを標準化すべき
+- **再発条件**: 共有主リポジトリで並行 Case の case-open が branch 切替した状態で、別工程が main への永続化 commit を行う場合
+- **予防策候補**: STEP-7 永続化手順への current branch 前置ガード明文化、case-open 側の REQ-030-017 worktree 隔離徹底の enforcement、並列実行安全ステージング指針への current branch 確認追加
+- **想定反映先**: src/opencode/skills/agentdev-workflow-case-ready/references/readiness-and-cleanup.md（STEP-7 前置ガード）、agentdev-workflow-case-open の worktree 隔離運用、learning-promote での docs/knowledge/ 知識化判定対象
+- **関連**: Case #3169、PR #3170
+- **タグ**: #case-ready #git-worktree #branch-conflict #persistence
