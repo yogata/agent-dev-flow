@@ -282,6 +282,33 @@ describe("failure detail 診断情報（リポジトリ解決失敗時）", () =
     expect(parsed.failure.kind).toBe("config-uninterpretable");
     expect(parsed.failure.detail).toContain("set AGENTDEV_GH_REPO=owner/name");
   });
+
+  test("TS-003(a): gh repo view 起動不能（spawnSync エラー種別・stderr 空）の診断情報を detail へ転記し fail-closed を維持する", async () => {
+    const def = createAgentdevGhToolDefinition({
+      resolveRepo: () =>
+        ({
+          repo: null,
+          diagnostics: {
+            attemptedMeans: [
+              "AGENTDEV_GH_REPO environment variable (not set)",
+              "gh repo view",
+            ],
+            ghExitCode: null,
+            ghStderrSummary: "spawn gh ENOENT",
+          },
+        }) as const,
+      createRunner: () =>
+        fakeRunner(async () => ({ ok: false, error: "unused", exitCode: 1, failureClass: "operation-failed" })),
+    });
+    const result = await def.execute({ request: { operation: "issue_read", number: 7 } }, makeContext("C:/w"));
+    const parsed = JSON.parse(result.output) as { ok: boolean; failure: { kind: string; detail: string } };
+    expect(parsed.ok).toBe(false);
+    expect(parsed.failure.kind).toBe("config-uninterpretable");
+    expect(parsed.failure.detail).toContain("AGENTDEV_GH_REPO environment variable (not set)");
+    expect(parsed.failure.detail).toContain("gh repo view exitCode=null");
+    expect(parsed.failure.detail).toContain("spawn gh ENOENT");
+    expect(result.metadata?.ok).toBe(false);
+  });
 });
 
 describe("ローカル版差し替え（投影パスの Local 実装検出）", () => {

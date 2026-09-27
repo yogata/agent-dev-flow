@@ -4,3 +4,7 @@ implementation:
     - REQ-050-014
     - REQ-009-051
     - REQ-009-052
+    - REQ-093-002
+verification:
+  docs/guides/consumer-project-setup.md:
+    - REQ-093-002
