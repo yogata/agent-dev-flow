@@ -1,7 +1,7 @@
 {
   "version": 1,
   "rule_id": "NG-BASELINE",
-  "generated_at": "2026-09-17",
+  "generated_at": "2026-09-27",
   "entries": [
     {
       "category": "ADR",
@@ -191,6 +191,15 @@
       "count": 1,
       "provenance": "proposed-decision-citation",
       "reason": "proposed-decision-citation: proposed Decision DEC-015 を根拠として引用する意図的な記述。Decision の accepted 昇格または SPEC 再構成（OU-009）で解消するまでの承認（Issue #2136 NG21 外 warning 分類）"
+    },
+    {
+      "category": "Decision",
+      "check": "accepted-adr-only-citation",
+      "file": "docs/designs/foundations/harness-separation-model.md",
+      "evidence": "DEC-002",
+      "count": 1,
+      "provenance": "ru-0145-pending-correction",
+      "reason": "Case #3166 RA-004 で恒久免除登録から除外した修正対象分。RU-0145（Decision/Design superseded 参照整合）で兄弟4ファイルと同一の縮約注記式への統一が計画されているため、恒久免除ではなく債務として ng-baseline 管理する"
     },
     {
       "category": "Decision",
@@ -1608,6 +1617,24 @@
     {
       "category": "PluginProjection",
       "check": "repo-local-plugin-projection-symmetry",
+      "file": ".opencode/plugins/agentdev-jev-tool",
+      "evidence": "projection-missing:plugins/agentdev-jev-tool",
+      "count": 1,
+      "provenance": "environment-specific-worktree",
+      "reason": "worktree 環境のジャンクション未伝播による projection missing。merge 後 main 環境ではジャンクション実在により検出されない（既存 environment-specific-worktree bucket と同種の環境差）"
+    },
+    {
+      "category": "PluginProjection",
+      "check": "repo-local-plugin-projection-symmetry",
+      "file": ".opencode/plugins/agentdev-jev-tool.ts",
+      "evidence": "shim-missing:plugins/agentdev-jev-tool.ts",
+      "count": 1,
+      "provenance": "environment-specific-worktree",
+      "reason": "worktree 環境のジャンクション未伝播による loader shim missing。merge 後 main 環境では検出されない（既存 environment-specific-worktree bucket と同種の環境差）"
+    },
+    {
+      "category": "PluginProjection",
+      "check": "repo-local-plugin-projection-symmetry",
       "file": ".opencode/plugins/agentdev-textlint-guard",
       "evidence": "projection-missing:plugins/agentdev-textlint-guard",
       "count": 1,
@@ -1640,6 +1667,195 @@
       "count": 1,
       "provenance": "environment-specific-worktree",
       "reason": "junction 未伝播環境（worktree）固有の projection 対称性検出差。main（junction 実在環境）では検出 0 件の環境差（REQ-018 環境差扱い）。実装欠陥ではなく検査環境差として正規管理する"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/decisions/DEC-013.md",
+      "evidence": "REQ-010-053",
+      "count": 4,
+      "provenance": "ru-0145-pending-correction",
+      "reason": "DEC-013.md:14 の ID 表記（DEC-013..057）は REQ-010-053..057 への誤記と推定され、RU-0145 で修正計画済み。Case #3166 の対象範囲外（Decision 編集禁止）のため債務として ng-baseline 管理する"
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/decisions/DEC-014.md",
+      "evidence": "REQ-002-028",
+      "count": 1,
+      "provenance": "preserved-history-or-out-of-scope",
+      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/decisions/README.md",
+      "evidence": "REQ-010-053",
+      "count": 1,
+      "provenance": "preserved-history-or-out-of-scope",
+      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-auto.md",
+      "evidence": "REQ-006-084",
+      "count": 1,
+      "provenance": "preserved-history-or-out-of-scope",
+      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/commands/case-run.md",
+      "evidence": "REQ-006-021",
+      "count": 1,
+      "provenance": "preserved-history-or-out-of-scope",
+      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/foundations/harness-separation-model.md",
+      "evidence": "REQ-002-021",
+      "count": 1,
+      "provenance": "preserved-history-or-out-of-scope",
+      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/foundations/harness-separation-model.md",
+      "evidence": "REQ-002-028",
+      "count": 1,
+      "provenance": "preserved-history-or-out-of-scope",
+      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/foundations/references/verification-scope-catalog.md",
+      "evidence": "REQ-030-022",
+      "count": 1,
+      "provenance": "preserved-history-or-out-of-scope",
+      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/foundations/references/verification-scope-catalog.md",
+      "evidence": "REQ-030-023",
+      "count": 1,
+      "provenance": "preserved-history-or-out-of-scope",
+      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/foundations/references/verification-scope-catalog.md",
+      "evidence": "REQ-030-025",
+      "count": 1,
+      "provenance": "preserved-history-or-out-of-scope",
+      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/integrity/docs-spec-rebuild-integrity.md",
+      "evidence": "REQ-002-028",
+      "count": 2,
+      "provenance": "preserved-history-or-out-of-scope",
+      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/integrity/docs-spec-rebuild-integrity.md",
+      "evidence": "REQ-002-029",
+      "count": 1,
+      "provenance": "preserved-history-or-out-of-scope",
+      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/integrity/integrity-rule-catalog.md",
+      "evidence": "REQ-002-021",
+      "count": 1,
+      "provenance": "preserved-history-or-out-of-scope",
+      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/integrity/integrity-rule-catalog.md",
+      "evidence": "REQ-002-028",
+      "count": 1,
+      "provenance": "preserved-history-or-out-of-scope",
+      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/artifact-contracts.md",
+      "evidence": "REQ-002-021",
+      "count": 1,
+      "provenance": "preserved-history-or-out-of-scope",
+      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/req-impact-map.md",
+      "evidence": "REQ-002-021",
+      "count": 1,
+      "provenance": "preserved-history-or-out-of-scope",
+      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/responsibilities/req-impact-map.md",
+      "evidence": "REQ-002-028",
+      "count": 1,
+      "provenance": "preserved-history-or-out-of-scope",
+      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/skills/agentdev-case-run-execution-adapter.md",
+      "evidence": "REQ-006-021",
+      "count": 1,
+      "provenance": "preserved-history-or-out-of-scope",
+      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/designs/workflows/capture-boundaries.md",
+      "evidence": "REQ-006-021",
+      "count": 2,
+      "provenance": "preserved-history-or-out-of-scope",
+      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/requirements/REQ-008.md",
+      "evidence": "REQ-008-059",
+      "count": 1,
+      "provenance": "preserved-history-or-out-of-scope",
+      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
+    },
+    {
+      "category": "ReqCitation",
+      "check": "referenced-req-row-existence",
+      "file": "docs/requirements/REQ-082.md",
+      "evidence": "REQ-003-030",
+      "count": 1,
+      "provenance": "preserved-history-or-out-of-scope",
+      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
     },
     {
       "category": "RuntimeReference",
@@ -3188,195 +3404,6 @@
       "count": 1,
       "provenance": "issue-2372-ir064-initial-baseline",
       "reason": "REQ-010-065 (IR-064) detection rollout: pre-existing bare ID placeholders used consistently as delegation-notation style. Style normalization (backticks or concrete IDs) is a Design candidate recorded in PR #2372; approve or remediate via intake."
-    },
-    {
-      "category": "ReqCitation",
-      "check": "referenced-req-row-existence",
-      "file": "docs/designs/commands/case-auto.md",
-      "evidence": "REQ-006-084",
-      "count": 1,
-      "provenance": "preserved-history-or-out-of-scope",
-      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
-    },
-    {
-      "category": "ReqCitation",
-      "check": "referenced-req-row-existence",
-      "file": "docs/designs/commands/case-run.md",
-      "evidence": "REQ-006-021",
-      "count": 1,
-      "provenance": "preserved-history-or-out-of-scope",
-      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
-    },
-    {
-      "category": "ReqCitation",
-      "check": "referenced-req-row-existence",
-      "file": "docs/designs/foundations/harness-separation-model.md",
-      "evidence": "REQ-002-021",
-      "count": 1,
-      "provenance": "preserved-history-or-out-of-scope",
-      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
-    },
-    {
-      "category": "ReqCitation",
-      "check": "referenced-req-row-existence",
-      "file": "docs/designs/foundations/harness-separation-model.md",
-      "evidence": "REQ-002-028",
-      "count": 1,
-      "provenance": "preserved-history-or-out-of-scope",
-      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
-    },
-    {
-      "category": "ReqCitation",
-      "check": "referenced-req-row-existence",
-      "file": "docs/designs/foundations/references/verification-scope-catalog.md",
-      "evidence": "REQ-030-022",
-      "count": 1,
-      "provenance": "preserved-history-or-out-of-scope",
-      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
-    },
-    {
-      "category": "ReqCitation",
-      "check": "referenced-req-row-existence",
-      "file": "docs/designs/foundations/references/verification-scope-catalog.md",
-      "evidence": "REQ-030-023",
-      "count": 1,
-      "provenance": "preserved-history-or-out-of-scope",
-      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
-    },
-    {
-      "category": "ReqCitation",
-      "check": "referenced-req-row-existence",
-      "file": "docs/designs/foundations/references/verification-scope-catalog.md",
-      "evidence": "REQ-030-025",
-      "count": 1,
-      "provenance": "preserved-history-or-out-of-scope",
-      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
-    },
-    {
-      "category": "ReqCitation",
-      "check": "referenced-req-row-existence",
-      "file": "docs/designs/integrity/docs-spec-rebuild-integrity.md",
-      "evidence": "REQ-002-028",
-      "count": 2,
-      "provenance": "preserved-history-or-out-of-scope",
-      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
-    },
-    {
-      "category": "ReqCitation",
-      "check": "referenced-req-row-existence",
-      "file": "docs/designs/integrity/docs-spec-rebuild-integrity.md",
-      "evidence": "REQ-002-029",
-      "count": 1,
-      "provenance": "preserved-history-or-out-of-scope",
-      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
-    },
-    {
-      "category": "ReqCitation",
-      "check": "referenced-req-row-existence",
-      "file": "docs/designs/integrity/integrity-rule-catalog.md",
-      "evidence": "REQ-002-021",
-      "count": 1,
-      "provenance": "preserved-history-or-out-of-scope",
-      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
-    },
-    {
-      "category": "ReqCitation",
-      "check": "referenced-req-row-existence",
-      "file": "docs/designs/integrity/integrity-rule-catalog.md",
-      "evidence": "REQ-002-028",
-      "count": 1,
-      "provenance": "preserved-history-or-out-of-scope",
-      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
-    },
-    {
-      "category": "ReqCitation",
-      "check": "referenced-req-row-existence",
-      "file": "docs/designs/responsibilities/artifact-contracts.md",
-      "evidence": "REQ-002-021",
-      "count": 1,
-      "provenance": "preserved-history-or-out-of-scope",
-      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
-    },
-    {
-      "category": "ReqCitation",
-      "check": "referenced-req-row-existence",
-      "file": "docs/designs/responsibilities/req-impact-map.md",
-      "evidence": "REQ-002-021",
-      "count": 1,
-      "provenance": "preserved-history-or-out-of-scope",
-      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
-    },
-    {
-      "category": "ReqCitation",
-      "check": "referenced-req-row-existence",
-      "file": "docs/designs/responsibilities/req-impact-map.md",
-      "evidence": "REQ-002-028",
-      "count": 1,
-      "provenance": "preserved-history-or-out-of-scope",
-      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
-    },
-    {
-      "category": "ReqCitation",
-      "check": "referenced-req-row-existence",
-      "file": "docs/designs/skills/agentdev-case-run-execution-adapter.md",
-      "evidence": "REQ-006-021",
-      "count": 1,
-      "provenance": "preserved-history-or-out-of-scope",
-      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
-    },
-    {
-      "category": "ReqCitation",
-      "check": "referenced-req-row-existence",
-      "file": "docs/designs/workflows/capture-boundaries.md",
-      "evidence": "REQ-006-021",
-      "count": 2,
-      "provenance": "preserved-history-or-out-of-scope",
-      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
-    },
-    {
-      "category": "ReqCitation",
-      "check": "referenced-req-row-existence",
-      "file": "docs/requirements/REQ-008.md",
-      "evidence": "REQ-008-059",
-      "count": 1,
-      "provenance": "preserved-history-or-out-of-scope",
-      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
-    },
-    {
-      "category": "ReqCitation",
-      "check": "referenced-req-row-existence",
-      "file": "docs/requirements/REQ-082.md",
-      "evidence": "REQ-003-030",
-      "count": 1,
-      "provenance": "preserved-history-or-out-of-scope",
-      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
-    },
-    {
-      "category": "ReqCitation",
-      "check": "referenced-req-row-existence",
-      "file": "docs/decisions/DEC-013.md",
-      "evidence": "REQ-010-053",
-      "count": 3,
-      "provenance": "preserved-history-or-out-of-scope",
-      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
-    },
-    {
-      "category": "ReqCitation",
-      "check": "referenced-req-row-existence",
-      "file": "docs/decisions/DEC-014.md",
-      "evidence": "REQ-002-028",
-      "count": 1,
-      "provenance": "preserved-history-or-out-of-scope",
-      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
-    },
-    {
-      "category": "ReqCitation",
-      "check": "referenced-req-row-existence",
-      "file": "docs/decisions/README.md",
-      "evidence": "REQ-010-053",
-      "count": 1,
-      "provenance": "preserved-history-or-out-of-scope",
-      "reason": "Preserved baseline for historical context or out-of-scope corpus reference after Case #2918 RA-001."
     }
   ]
 }

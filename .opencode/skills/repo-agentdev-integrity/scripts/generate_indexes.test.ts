@@ -41,6 +41,9 @@ import {
   README_REQ_SUMMARY_COUNT_BLOCK_ID,
   README_REQ_SUMMARY_TABLE_BLOCK_ID,
   README_REQ_SUMMARY_TABLE_GENERATOR,
+  README_DECISION_SUMMARY_TABLE_BLOCK_ID,
+  extractDocsReadmeDecisionNotes,
+  generateDocsReadmeDecisionTable,
 } from "./generate_indexes.ts";
 import { findRepoRoot } from "./cli_utils.ts";
 
@@ -665,6 +668,78 @@ describe("readme-req-summary-table (REQ-057-018)", () => {
     expect(updated).toContain("| REQ ID | タイトル |");
     expect(updated).toContain("現行要件の説明文（人手編集領域）");
     expect(updated).not.toContain("旧手動行");
+  });
+});
+
+describe("readme-decision-summary-table (AG-005, Case #3166)", () => {
+  const dec = (over: Partial<Record<string, unknown>>) =>
+    ({
+      id: "DEC-040",
+      num: 40,
+      title: "typesafe/Jev 先行評価の採用（Stage 1: 観測可能化）",
+      status: "superseded",
+      created: "2026-09-22",
+      filename: "DEC-040.md",
+      relPath: "DEC-040.md",
+      relatedReqs: ["REQ-090"],
+      supersededBy: "DEC-044",
+      supersedeNote: null,
+      ...over,
+    }) as never;
+
+  it("uses the block ID registered in index-auto-generation Design", () => {
+    expect(README_DECISION_SUMMARY_TABLE_BLOCK_ID).toBe(
+      "readme-decision-summary-table",
+    );
+  });
+
+  it("extracts notes notation (U+3014/U+3015) from Decision section title cells", () => {
+    const readme = [
+      "## Decision",
+      "",
+      "| Decision | タイトル |",
+      "|---|---|",
+      "| [DEC-040](decisions/DEC-040.md) | t（superseded by DEC-044〔決定4 部分置換。決定1〜3は維持〕） |",
+      "| [DEC-043](decisions/DEC-043.md) | t（superseded by DEC-044） |",
+      "",
+      "## 設計（Design）",
+    ].join("\n");
+    const notes = extractDocsReadmeDecisionNotes(readme);
+    expect(notes).toEqual({ "DEC-040": "決定4 部分置換。決定1〜3は維持" });
+  });
+
+  it("generates frontmatter-derived rows with superseded_by parenthesized annotation", () => {
+    const rows = generateDocsReadmeDecisionTable([dec({})], {});
+    expect(rows).toContain(
+      "| [DEC-040](decisions/DEC-040.md) | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化）（superseded by DEC-044） |",
+    );
+  });
+
+  it("composes manual notes as part of the annotation (DEC-040 partial-replacement preservation)", () => {
+    const rows = generateDocsReadmeDecisionTable([dec({})], {
+      "DEC-040": "決定4 部分置換。決定1〜3は維持",
+    });
+    expect(rows).toContain(
+      "| [DEC-040](decisions/DEC-040.md) | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化）（superseded by DEC-044〔決定4 部分置換。決定1〜3は維持〕） |",
+    );
+  });
+
+  it("falls back to frontmatter supersede_note when no manual notes exist", () => {
+    const rows = generateDocsReadmeDecisionTable(
+      [dec({ supersedeNote: "決定4 は DEC-044 が置換。決定1〜3は維持" })],
+      {},
+    );
+    expect(
+      rows.join("\n"),
+    ).toContain("（superseded by DEC-044〔決定4 は DEC-044 が置換。決定1〜3は維持〕）");
+  });
+
+  it("skips annotation for non-superseded decisions", () => {
+    const rows = generateDocsReadmeDecisionTable(
+      [dec({ status: "accepted", supersededBy: null })],
+      {},
+    );
+    expect(rows.join("\n")).not.toContain("superseded by");
   });
 });
 

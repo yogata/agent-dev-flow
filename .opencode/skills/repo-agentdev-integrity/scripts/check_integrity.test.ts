@@ -5,6 +5,7 @@ import { describe, it, expect, beforeAll, afterAll } from "bun:test";
 import { mkdirSync, writeFileSync, copyFileSync, rmSync, existsSync, readFileSync, symlinkSync } from "fs";
 import { join } from "path";
 import { checkRepoLocalPluginProjectionSymmetry, extractKnownGapNumbers, loadKnownGapReqIds } from "./check_integrity.ts";
+import { generateDocsReadmeDecisionTable } from "./generate_indexes.ts";
 import { extractKnownGapNumbers as extractKnownGapNumbersAllocator } from "../../../../src/opencode/skills/agentdev-req-file-manager/scripts/src/alloc-req-number.ts";
 
 const SCRIPT_DIR = import.meta.dir;
@@ -5510,4 +5511,411 @@ describe("repo-local Plugin projection symmetry (Issue #2787)", () => {
     expect(unmanagedInfo).toBeDefined();
   });
 });
+
+// ─── Case #3166: IR-053 exemption paths + compensation (RA-001, TS-001) ───────
+// The two registered read-only contingency references (Custom Tool 契約 Design
+// 「迂回防止」, REQ-092-003) must be skipped, non-exempt paths must stay
+// detected, and the live exempt files must not contain write-path gh literals.
+const RA001_ROOT = join(TEMP_ROOT, "ra001");
+
+function buildRa001Fixture(root: string): void {
+  const reqDir = join(root, "docs", "requirements");
+  mkdirp(reqDir);
+  writeFileSync(
+    join(reqDir, "README.md"),
+    ["# Requirements", "", "| ID | Title |", "|----|-------|", ""].join("\n"),
+    "utf-8",
+  );
+  mkdirp(join(root, "docs", "adr"));
+  writeFileSync(join(root, "docs", "adr", "README.md"), "# ADR\n", "utf-8");
+  mkdirp(join(root, "docs", "designs"));
+  writeFileSync(join(root, "docs", "designs", "README.md"), "# Design\n", "utf-8");
+
+  const exempt1Dir = join(root, "src", "opencode", "skills", "agentdev-issue-management", "references");
+  mkdirp(exempt1Dir);
+  writeFileSync(
+    join(exempt1Dir, "issue-operation-safety.md"),
+    "# 手順\n\n上限到達時は `gh issue list --search k` で補完する。\n",
+    "utf-8",
+  );
+  const exempt2Dir = join(root, "src", "opencode", "skills", "agentdev-workflow-case-open", "references");
+  mkdirp(exempt2Dir);
+  writeFileSync(
+    join(exempt2Dir, "definition-pr-and-idempotency.md"),
+    "# 手順\n\ngh CLI による切替は読み取り専用（`gh pr view` 等）に限定する。\n",
+    "utf-8",
+  );
+  const nonExemptDir = join(root, "src", "opencode", "skills", "agentdev-ra-nonexempt");
+  mkdirp(nonExemptDir);
+  writeFileSync(
+    join(nonExemptDir, "SKILL.md"),
+    ["---", "name: agentdev-ra-nonexempt", "---", "", "# Non-exempt", "", "`gh issue create` で作成する。", ""].join("\n"),
+    "utf-8",
+  );
+}
+
+describe("IR-053 exemption paths + compensation (Case #3166, RA-001, TS-001)", () => {
+  beforeAll(() => {
+    mkdirp(RA001_ROOT);
+    buildRa001Fixture(RA001_ROOT);
+    copyScripts(RA001_ROOT);
+  });
+
+  it("skips IR-053 warnings for the two registered read-only contingency paths", () => {
+    const r = runScript(RA001_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const exemptWarnings = parsed.results.filter(
+      (res: { check: string; level: string; file?: string }) =>
+        res.check === "gh-direct-invocation" &&
+        res.level === "warning" &&
+        ((res.file ?? "").includes("issue-operation-safety.md") ||
+          (res.file ?? "").includes("definition-pr-and-idempotency.md")),
+    );
+    expect(exemptWarnings.length).toBe(0);
+  });
+
+  it("keeps detecting direct gh invocations on non-exempt paths", () => {
+    const r = runScript(RA001_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const nonExempt = parsed.results.filter(
+      (res: { check: string; level: string; file?: string }) =>
+        res.check === "gh-direct-invocation" &&
+        res.level === "warning" &&
+        (res.file ?? "").includes("agentdev-ra-nonexempt"),
+    );
+    expect(nonExempt.length).toBe(1);
+  });
+
+  it("compensation: write-path gh literals are absent in both exempt files (live corpus)", () => {
+    const WRITE_GH = /\bgh\s+(issue|pr)\s+(create|edit|comment|merge|close)\b/i;
+    const exempt1 = readFileSync(
+      join(REPO_ROOT_FROM_SCRIPT_DIR, "src", "opencode", "skills", "agentdev-issue-management", "references", "issue-operation-safety.md"),
+      "utf-8",
+    );
+    const exempt2 = readFileSync(
+      join(REPO_ROOT_FROM_SCRIPT_DIR, "src", "opencode", "skills", "agentdev-workflow-case-open", "references", "definition-pr-and-idempotency.md"),
+      "utf-8",
+    );
+    expect(WRITE_GH.test(exempt1)).toBe(false);
+    expect(WRITE_GH.test(exempt2)).toBe(false);
+  });
+});
+
+// ─── Case #3166: IR-055 warning total ratchet (RA-003, TS-003) ────────────────
+const RA003_ROOT = join(TEMP_ROOT, "ra003");
+
+function buildRa003Fixture(root: string, warningTotalCap: number | null): void {
+  const reqDir = join(root, "docs", "requirements");
+  mkdirp(reqDir);
+  writeFileSync(join(reqDir, "README.md"), "# Requirements\n", "utf-8");
+  mkdirp(join(root, "docs", "adr"));
+  writeFileSync(join(root, "docs", "adr", "README.md"), "# ADR\n", "utf-8");
+  const designsDir = join(root, "docs", "designs");
+  mkdirp(designsDir);
+  writeFileSync(join(designsDir, "README.md"), "# Design\n", "utf-8");
+  mkdirp(join(designsDir, "authoring"));
+  writeFileSync(
+    join(designsDir, "authoring", "vocabulary-registry.md"),
+    "# 語彙レジストリ\n",
+    "utf-8",
+  );
+  mkdirp(join(root, ".opencode", "skills", "repo-agentdev-integrity", "references"));
+  copyFileSync(
+    join(REPO_ROOT_FROM_SCRIPT_DIR, ".opencode", "skills", "repo-agentdev-integrity", "references", "vocabulary-registry.md"),
+    join(root, ".opencode", "skills", "repo-agentdev-integrity", "references", "vocabulary-registry.md"),
+  );
+
+  const skillDir = join(root, "src", "opencode", "skills", "agentdev-ra003");
+  mkdirp(skillDir);
+  writeFileSync(
+    join(skillDir, "SKILL.md"),
+    [
+      "---",
+      "name: agentdev-ra003",
+      "---",
+      "",
+      "# Fixture skill",
+      "",
+      "## USE FOR",
+      "",
+      "- fixture",
+      "",
+      "参照: docs/designs/ と docs/guides/。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  const baselineDir = join(root, ".opencode", "skills", "repo-agentdev-integrity", "baselines");
+  mkdirp(baselineDir);
+  const baseline: Record<string, unknown> = {
+    version: 1,
+    rule_id: "IR-055",
+    generated_at: "2026-09-27",
+    entries: [],
+  };
+  if (warningTotalCap !== null) baseline.warning_total_cap = warningTotalCap;
+  writeFileSync(
+    join(baselineDir, "ir-055-baseline.json"),
+    JSON.stringify(baseline, null, 2) + "\n",
+    "utf-8",
+  );
+}
+
+describe("IR-055 warning total ratchet (Case #3166, RA-003, TS-003)", () => {
+  it("fails when the pre-demote warning total exceeds warning_total_cap", () => {
+    mkdirp(RA003_ROOT);
+    buildRa003Fixture(RA003_ROOT, 1);
+    copyScripts(RA003_ROOT);
+    const r = runScript(RA003_ROOT, ["--json"]);
+    expect(r.exitCode).not.toBe(0);
+    const parsed = JSON.parse(r.stdout);
+    const cap = parsed.results.filter(
+      (res: { check: string }) => res.check === "warning-total-cap",
+    );
+    expect(cap.length).toBe(1);
+  });
+
+  it("passes when the pre-demote warning total equals warning_total_cap", () => {
+    const root2 = `${RA003_ROOT}-ok`;
+    mkdirp(root2);
+    buildRa003Fixture(root2, 2);
+    copyScripts(root2);
+    const r = runScript(root2, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    expect(
+      parsed.results.filter(
+        (res: { check: string }) => res.check === "warning-total-cap",
+      ).length,
+    ).toBe(0);
+  });
+
+  it("rejects --update-warning-cap increase without --raise-warning-cap", () => {
+    const root3 = `${RA003_ROOT}-rej`;
+    mkdirp(root3);
+    buildRa003Fixture(root3, 1);
+    copyScripts(root3);
+    const r = runScript(root3, ["--update-warning-cap"]);
+    expect(r.exitCode).not.toBe(0);
+    expect(r.stderr).toContain("--raise-warning-cap");
+  });
+
+  it("accepts the increase only via --raise-warning-cap (logged)", () => {
+    const root4 = `${RA003_ROOT}-raise`;
+    mkdirp(root4);
+    buildRa003Fixture(root4, 1);
+    copyScripts(root4);
+    const r = runScript(root4, ["--update-warning-cap", "--raise-warning-cap"]);
+    expect(r.exitCode).toBe(0);
+    expect(r.stderr).toContain("--raise-warning-cap");
+    const baseline = JSON.parse(
+      readFileSync(join(root4, ".opencode", "skills", "repo-agentdev-integrity", "baselines", "ir-055-baseline.json"), "utf-8"),
+    );
+    expect(baseline.warning_total_cap).toBe(2);
+  });
+});
+
+// ─── Case #3166: permanent exemption registry (RA-004, TS-004) ────────────────
+const RA004_ROOT = join(TEMP_ROOT, "ra004");
+
+function buildRa004Fixture(root: string, exemptionsContent: string | null): void {
+  const reqDir = join(root, "docs", "requirements");
+  mkdirp(reqDir);
+  writeFileSync(join(reqDir, "README.md"), "# Requirements\n", "utf-8");
+  mkdirp(join(root, "docs", "adr"));
+  writeFileSync(join(root, "docs", "adr", "README.md"), "# ADR\n", "utf-8");
+  mkdirp(join(root, "docs", "designs"));
+  writeFileSync(join(root, "docs", "designs", "README.md"), "# Design\n", "utf-8");
+  mkdirp(join(root, "docs", "designs", "authoring"));
+  writeFileSync(
+    join(root, "docs", "designs", "authoring", "vocabulary-registry.md"),
+    "# 語彙レジストリ\n",
+    "utf-8",
+  );
+
+  const decDir = join(root, "docs", "decisions");
+  mkdirp(decDir);
+  writeFileSync(
+    join(decDir, "DEC-901.md"),
+    ["---", "id: DEC-901", "title: RA-004 fixture", "status: superseded", "superseded_by: DEC-902", "---", "", "Body.", ""].join("\n"),
+    "utf-8",
+  );
+  writeFileSync(
+    join(root, "docs", "designs", "ra004-citation.md"),
+    "# Design\n\nSee DEC-901 for context.\n",
+    "utf-8",
+  );
+
+  const baselineDir = join(root, ".opencode", "skills", "repo-agentdev-integrity", "baselines");
+  mkdirp(baselineDir);
+  if (exemptionsContent !== null) {
+    writeFileSync(join(baselineDir, "exemptions.json"), exemptionsContent, "utf-8");
+  }
+}
+
+function ra004Exemptions(version: number, reviewStatus: string, rationaleRef: string): string {
+  return JSON.stringify({
+    version,
+    entries: [
+      {
+        rule_id: "accepted-adr-only-citation",
+        file: "docs/designs/ra004-citation.md",
+        evidence: "DEC-901",
+        rationale_ref: rationaleRef,
+        review_status: reviewStatus,
+      },
+    ],
+  });
+}
+
+const RA004_VALID_EXEMPTIONS = ra004Exemptions(2, "accepted", "docs/designs/ra004-citation.md");
+
+describe("Permanent exemption registry (Case #3166, RA-004, TS-004)", () => {
+  it("demotes exempted accepted-adr-only-citation warnings to exemption info", () => {
+    mkdirp(RA004_ROOT);
+    buildRa004Fixture(RA004_ROOT, RA004_VALID_EXEMPTIONS);
+    copyScripts(RA004_ROOT);
+    const r = runScript(RA004_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    expect(
+      parsed.results.filter(
+        (res: { check: string; level: string }) =>
+          res.check === "accepted-adr-only-citation" && res.level === "warning",
+      ).length,
+    ).toBe(0);
+    const exempted = parsed.results.filter(
+      (res: { level: string; message: string }) =>
+        res.level === "info" && (res.message as string).startsWith("[exempted]"),
+    );
+    expect(exempted.length).toBe(1);
+  });
+
+  it("fails on a schema version violation (fail-closed)", () => {
+    const root2 = `${RA004_ROOT}-v1`;
+    mkdirp(root2);
+    buildRa004Fixture(root2, ra004Exemptions(1, "accepted", "docs/designs/ra004-citation.md"));
+    copyScripts(root2);
+    const r = runScript(root2, ["--json"]);
+    expect(r.exitCode).toBe(2);
+    expect(r.stderr).toContain("schema violation");
+  });
+
+  it("fails on a non-accepted review_status (fail-closed)", () => {
+    const root3 = `${RA004_ROOT}-st`;
+    mkdirp(root3);
+    buildRa004Fixture(root3, ra004Exemptions(2, "draft", "docs/designs/ra004-citation.md"));
+    copyScripts(root3);
+    const r = runScript(root3, ["--json"]);
+    expect(r.exitCode).toBe(2);
+    expect(r.stderr).toContain("review_status");
+  });
+
+  it("fails when rationale_ref does not resolve to an existing path (fail-closed)", () => {
+    const root4 = `${RA004_ROOT}-rr`;
+    mkdirp(root4);
+    buildRa004Fixture(root4, ra004Exemptions(2, "accepted", "docs/designs/missing-justification.md"));
+    copyScripts(root4);
+    const r = runScript(root4, ["--json"]);
+    expect(r.exitCode).toBe(2);
+    expect(r.stderr).toContain("rationale_ref");
+  });
+});
+
+// ─── Case #3166: readme-decision-summary-table IR-061 (RA-005, TS-005) ────────
+const RA005_ROOT = join(TEMP_ROOT, "ra005");
+
+function buildRa005Fixture(root: string, staleBody: boolean): void {
+  const reqDir = join(root, "docs", "requirements");
+  mkdirp(reqDir);
+  writeFileSync(join(reqDir, "README.md"), "# Requirements\n", "utf-8");
+  mkdirp(join(reqDir, "retired"));
+  mkdirp(join(root, "docs", "adr"));
+  writeFileSync(join(root, "docs", "adr", "README.md"), "# ADR\n", "utf-8");
+  mkdirp(join(root, "docs", "designs", "integrity", "rules"));
+
+  const decDir = join(root, "docs", "decisions");
+  mkdirp(decDir);
+  writeFileSync(
+    join(decDir, "DEC-9001.md"),
+    [
+      "---",
+      "id: DEC-9001",
+      "title: RA-005 fixture Decision",
+      "status: accepted",
+      'created: "2026-09-27"',
+      "---",
+      "",
+      "Body.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  const table = generateDocsReadmeDecisionTable(
+    [
+      {
+        id: "DEC-9001",
+        num: 9001,
+        title: "RA-005 fixture Decision",
+        status: "accepted",
+        created: "2026-09-27",
+        filename: "DEC-9001.md",
+        relPath: "DEC-9001.md",
+        relatedReqs: null,
+        supersededBy: null,
+        supersedeNote: null,
+      } as never,
+    ],
+    {},
+  );
+  const body = staleBody
+    ? [...table.slice(0, 2), "| [DEC-9999](decisions/DEC-9999.md) | stale row |"]
+    : table;
+  writeFileSync(
+    join(root, "docs", "README.md"),
+    [
+      "# Docs",
+      "",
+      "<!-- AUTOGEN:BEGIN:id=readme-decision-summary-table -->",
+      ...body,
+      "<!-- AUTOGEN:END -->",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+}
+
+describe("readme-decision-summary-table IR-061 (Case #3166, RA-005, TS-005)", () => {
+  it("passes IR-061 when the Decision table block matches the generated rows", () => {
+    mkdirp(RA005_ROOT);
+    buildRa005Fixture(RA005_ROOT, false);
+    copyScripts(RA005_ROOT);
+    const r = runScript(RA005_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const stale = parsed.results.filter(
+      (res: { check: string; level: string; message: string }) =>
+        res.check === "index-generation-consistency" &&
+        res.level === "ng" &&
+        (res.message as string).includes("readme-decision-summary-table"),
+    );
+    expect(stale.length).toBe(0);
+  });
+
+  it("fails IR-061 when the Decision table block is out of sync", () => {
+    const root2 = `${RA005_ROOT}-stale`;
+    mkdirp(root2);
+    buildRa005Fixture(root2, true);
+    copyScripts(root2);
+    const r = runScript(root2, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const stale = parsed.results.filter(
+      (res: { check: string; level: string; message: string }) =>
+        res.check === "index-generation-consistency" &&
+        res.level === "ng" &&
+        (res.message as string).includes("readme-decision-summary-table"),
+    );
+    expect(stale.length).toBe(1);
+  });
+});
+
 

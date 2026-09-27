@@ -1,5 +1,55 @@
 {
-  "version": 1,
-  "description": "IR-059 explicit exemptions (§6.4.1). Each entry must carry an accepted rationale_ref pointing at docs/adr/** or an accepted SPEC. review_status must be 'accepted' for the exemption to apply. Distinct from ir-059-baseline.json (which tracks unresolved debt).",
-  "entries": []
+  "version": 2,
+  "description": "Permanent exemption registry (integrity-contracts.md「恒久免除レジストリ（baselines/exemptions.json）の運用」, schema version 2). Each entry must carry a rule_id (check name), an accepted rationale_ref pointing at an existing repo-relative justification path, and review_status 'accepted'. Exempted warnings become permanent-exemption info findings and are excluded from the baseline debt. Distinct from ir-055-baseline.json (unresolved debt) and ng-baseline.json (strict-pass debt).",
+  "entries": [
+    {
+      "rule_id": "accepted-adr-only-citation",
+      "file": "docs/designs/authoring/vocabulary-registry.md",
+      "evidence": "DEC-002",
+      "rationale_ref": "docs/designs/authoring/vocabulary-registry.md",
+      "review_status": "accepted"
+    },
+    {
+      "rule_id": "accepted-adr-only-citation",
+      "file": "docs/designs/foundations/document-model.md",
+      "evidence": "DEC-002",
+      "rationale_ref": "docs/designs/foundations/document-model.md",
+      "review_status": "accepted"
+    },
+    {
+      "rule_id": "accepted-adr-only-citation",
+      "file": "docs/designs/local/runtime-package-boundary.md",
+      "evidence": "DEC-002",
+      "rationale_ref": "docs/designs/local/runtime-package-boundary.md",
+      "review_status": "accepted"
+    },
+    {
+      "rule_id": "accepted-adr-only-citation",
+      "file": "docs/designs/workflows/workflow-skill-model.md",
+      "evidence": "DEC-002",
+      "rationale_ref": "docs/designs/workflows/workflow-skill-model.md",
+      "review_status": "accepted"
+    },
+    {
+      "rule_id": "accepted-adr-only-citation",
+      "file": "docs/designs/foundations/v3-v4-crosswalk.md",
+      "evidence": "DEC-005",
+      "rationale_ref": "docs/designs/foundations/v3-v4-crosswalk.md",
+      "review_status": "accepted"
+    },
+    {
+      "rule_id": "accepted-adr-only-citation",
+      "file": "docs/designs/foundations/v3-v4-crosswalk.md",
+      "evidence": "DEC-007",
+      "rationale_ref": "docs/designs/foundations/v3-v4-crosswalk.md",
+      "review_status": "accepted"
+    },
+    {
+      "rule_id": "accepted-adr-only-citation",
+      "file": "docs/designs/integrity/index-auto-generation.md",
+      "evidence": "DEC-043",
+      "rationale_ref": "docs/designs/integrity/index-auto-generation.md",
+      "review_status": "accepted"
+    }
+  ]
 }
