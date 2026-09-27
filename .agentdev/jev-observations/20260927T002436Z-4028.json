@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260927T002436Z-4028",
+  "workflow": "case-ready",
+  "evaluationKind": "standard-epic-determination",
+  "subject": "Root Case #3166 実行構造確定（OU-001〜004・連結成分4単独根・case_open_hints epic_needed false）",
+  "sourceRevision": "f3a23bee",
+  "durationMs": 811,
+  "inputTokens": 1107,
+  "inputs": {
+    "requestDigest": "9254a9eb2a8c38498cd82eef2159eaed10292a49771b609775dc6d4c22e961f4"
+  },
+  "identity": {
+    "resolvedModel": "typesafe-ai/jev"
+  },
+  "results": [
+    {
+      "questionId": "q_standard_epic",
+      "questionForm": "choice",
+      "value": "Standard",
+      "probabilityDistribution": {
+        "Standard": 0.99,
+        "Epic": 0.01
+      }
+    },
+    {
+      "questionId": "q_dependency_strength",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "強（必須依存を含む密結合）": 0,
+        "中（非必須依存のみ）": 0,
+        "弱（OU間依存ゼロ・完全独立）": 1
+      }
+    },
+    {
+      "questionId": "q_epic_size",
+      "questionForm": "score",
+      "value": 0.18,
+      "probabilityDistribution": {
+        "小（単一 Issue で遂行可能）": 0.89,
+        "中（Epic 分割が妥当な規模）": 0.04,
+        "大（Epic サイズ上限に接近）": 0.07
+      }
+    },
+    {
+      "questionId": "q_functional_coherence",
+      "questionForm": "score",
+      "value": 1.25,
+      "probabilityDistribution": {
+        "疎（無関係な operation_unit 群）": 0.12,
+        "中（主題は共通だが機械的結合なし）": 0.51,
+        "高（単一の機能的一貫集合）": 0.37
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q_standard_epic",
+        "value": "Standard"
+      },
+      {
+        "questionId": "q_dependency_strength",
+        "value": 2
+      },
+      {
+        "questionId": "q_epic_size",
+        "value": 0
+      },
+      {
+        "questionId": "q_functional_coherence",
+        "value": 1
+      }
+    ]
+  }
+}

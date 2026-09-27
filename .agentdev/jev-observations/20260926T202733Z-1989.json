@@ -1,0 +1,58 @@
+{
+  "observationId": "20260926T202733Z-1989",
+  "schemaVersion": 1,
+  "workflow": "req-define",
+  "judgmentKind": "step3-4-existing-req-matching-and-design-separation",
+  "subject": "Draft C（実行委譲・検証手順 reference 拡充）の REQ操作なし判定と direct_case 構成",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "sourceRevision": "4431945f",
+  "outcome": "completed",
+  "durationMs": 371,
+  "resolvedModel": "typesafe-ai/jev",
+  "inputTokens": 1695,
+  "inputs": {
+    "requestDigest": "7ba2b23c93245def2d32a18cd6c338d2b8846cbe9bb8b231dddf02340d720749"
+  },
+  "judgments": [
+    {
+      "judgmentId": "q1-ru1503-operation",
+      "questionForm": "choice",
+      "jevResult": "REQ操作なし（実現面のみ）",
+      "probabilityDistribution": {
+        "REQ操作なし（実現面のみ）": 1,
+        "UPDATE": 0,
+        "APPEND": 0,
+        "CREATE": 0
+      },
+      "confidence": 0.9033333333333333,
+      "llmFinalJudgment": "REQ 操作なし（RU-0150〜0153 は既存 REQ・Decision の新規保存や更新を含まない。対象は配布 reference・知識文書・検証手順の実現面のみで、artifact_actions は空。adversarial-review 後も不変）",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "q2-direct-case",
+      "questionForm": "boolean",
+      "jevResult": true,
+      "probabilityDistribution": {
+        "true": 0.87,
+        "false": 0.13
+      },
+      "confidence": 0.9033333333333333,
+      "llmFinalJudgment": "true（artifact_actions が空のため direct_case 経路（req-define → case-open → case-run → case-close）で駆動する想定。Issue/PR は経由する。adversarial-review 後も不変）",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "q3-ou-split",
+      "questionForm": "boolean",
+      "jevResult": true,
+      "probabilityDistribution": {
+        "true": 0.84,
+        "false": 0.16000000000000003
+      },
+      "confidence": 0.9033333333333333,
+      "llmFinalJudgment": "4分割（RU-0150 委譲規律・RU-0151 push precheck・RU-0152 標準手段・RU-0153 検証手順参照の4 OU に分割。ファイル重複なしで並列実行可能。adversarial-review 後も不変）",
+      "llmTreatment": "unchanged"
+    }
+  ],
+  "recordState": "complete"
+}

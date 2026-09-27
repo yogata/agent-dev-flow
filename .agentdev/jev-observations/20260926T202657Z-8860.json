@@ -1,0 +1,58 @@
+{
+  "observationId": "20260926T202657Z-8860",
+  "schemaVersion": 1,
+  "workflow": "req-define",
+  "judgmentKind": "step3-4-existing-req-matching-and-design-separation",
+  "subject": "Draft A（docs corpus 機械的整合是正）の OU 操作分類・guide 帰属・直列化構成",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "sourceRevision": "4431945f",
+  "outcome": "completed",
+  "durationMs": 702,
+  "resolvedModel": "typesafe-ai/jev",
+  "inputTokens": 1707,
+  "inputs": {
+    "requestDigest": "008eb1e1016c77c5ac44769f6cf31c3371aeb6a657f8b004cad70521f3e0721d"
+  },
+  "judgments": [
+    {
+      "judgmentId": "q1-ru0142-operation",
+      "questionForm": "choice",
+      "jevResult": "UPDATE",
+      "probabilityDistribution": {
+        "UPDATE": 1,
+        "CREATE": 0,
+        "APPEND": 0,
+        "REQ操作なし": 0
+      },
+      "confidence": 0.9,
+      "llmFinalJudgment": "UPDATE（規約執行として12 REQ ファイルの「## 関連情報」節を削除する既存REQ更新。CREATE ではなく対象12ファイルの更新として扱う。adversarial-review 後も不変）",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "q2-guide-classification",
+      "questionForm": "boolean",
+      "jevResult": true,
+      "probabilityDistribution": {
+        "true": 0.93,
+        "false": 0.06999999999999995
+      },
+      "confidence": 0.9,
+      "llmFinalJudgment": "true（req-case-flow.md の語彙統一は要件行ではなく realization_actions へ分離。案内文書の編集は Design 保存ではなく実現面変更方針として構造化。adversarial-review 後も不変）",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "q3-serialization",
+      "questionForm": "boolean",
+      "jevResult": true,
+      "probabilityDistribution": {
+        "true": 0.77,
+        "false": 0.22999999999999998
+      },
+      "confidence": 0.9,
+      "llmFinalJudgment": "true（RU-0143 の一部対象が RU-0142 と同一ファイルのため編集直列化が必要。RU-0142 節削除を先に実行し、その後 RU-0143 の行統合を適用する depends_on を設定。adversarial-review 後も不変）",
+      "llmTreatment": "unchanged"
+    }
+  ],
+  "recordState": "complete"
+}

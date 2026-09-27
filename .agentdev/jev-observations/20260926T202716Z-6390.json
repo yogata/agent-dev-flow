@@ -1,0 +1,58 @@
+{
+  "observationId": "20260926T202716Z-6390",
+  "schemaVersion": 1,
+  "workflow": "req-define",
+  "judgmentKind": "step3-4-existing-req-matching-and-design-separation",
+  "subject": "Draft B（検査・索引体系改善）の実現面/Design 保存分担と Decision 不要判定",
+  "provider": "vercel-ai-gateway",
+  "requestedModel": "typesafe-ai/jev",
+  "sourceRevision": "4431945f",
+  "outcome": "completed",
+  "durationMs": 532,
+  "resolvedModel": "typesafe-ai/jev",
+  "inputTokens": 1920,
+  "inputs": {
+    "requestDigest": "150e201a99fee8c163423d907c5c5c07b5e04443e222880b612c562fbebd9266"
+  },
+  "judgments": [
+    {
+      "judgmentId": "q1-artifact-split",
+      "questionForm": "boolean",
+      "jevResult": true,
+      "probabilityDistribution": {
+        "true": 0.91,
+        "false": 0.08999999999999997
+      },
+      "confidence": 0.9266666666666667,
+      "llmFinalJudgment": "true（RU-0148/0149 は Design 保存（整合性ルール Design・索引生成 Design への追記）と realization_actions（check_integrity.ts・generate_indexes.ts・check_content_corruption.ts の実装・テスト・適用）に分離して構造化。adversarial-review 後も不変）",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "q2-no-decision",
+      "questionForm": "boolean",
+      "jevResult": true,
+      "probabilityDistribution": {
+        "true": 0.87,
+        "false": 0.13
+      },
+      "confidence": 0.9266666666666667,
+      "llmFinalJudgment": "true（Decision 不要。運用ルールの変更・整合性ルールカタログの運用は Decision 禁止ゲートに該当し、既存 Design 群が正規所有者として更新対象。adversarial-review 後も不変）",
+      "llmTreatment": "unchanged"
+    },
+    {
+      "judgmentId": "q3-ru0149-main-surface",
+      "questionForm": "choice",
+      "jevResult": "generate_indexes.ts 生成対象追加と docs/README.md Decision 表の AUTOGEN ブロック化（実現面中心）",
+      "probabilityDistribution": {
+        "generate_indexes.ts 生成対象追加と docs/README.md Decision 表の AUTOGEN ブロック化（実現面中心）": 1,
+        "check_integrity.ts への突合検査新設": 0,
+        "REQ ファイル保存": 0,
+        "Decision ファイル保存": 0
+      },
+      "confidence": 0.9266666666666667,
+      "llmFinalJudgment": "実現面中心（docs/README.md Decision 表の AUTOGEN 化の主役は generate_indexes.ts 実装・docs/README 置換・鮮度検証追加であり、Design 保存は生成仕様の追記にとどまる。adversarial-review 後も不変）",
+      "llmTreatment": "unchanged"
+    }
+  ],
+  "recordState": "complete"
+}
