@@ -126,3 +126,21 @@
 - **想定反映先**: check_integrity.test.ts（Issue #1782 系 delta テスト）、traceability 側の delta baseline 運用
 - **関連**: Case #3162、PR #3165 本文 Findings / Capture候補、.agentdev/intake/inbox/2026-09-27-integrity-delta-baseline-commit-persistence.md（同系統調査候補）
 - **タグ**: `#IR-055` `#pre-existing` `#baseline-diff`
+
+---
+
+## bun:test で可変 export 配列を fixture push → finally で length = 0 クリアするパターンは、実装が初期空でなくなった時点で後続テストを破壊する — fixture 復元は常に元長さ保存型に
+
+- **問題事象**: ALLOWED_USAGE 等の可変 export 配列を fixture push し finally で length = 0 クリアするテストパターンが、実装が初期空でなくなった時点（初期エントリ保有）に後続テストを破壊した。Case #3166 で originalLength 復元型へ修正済み
+- **発生局面**: 検証（case-run 回帰テスト実装・TS-004/TS-007 系 fixture パターンの実装改修）
+- **検知方法**: PR #3168 実装時の fixture パターン修正（PR 本文 Findings / Capture候補 learning 候補・case-close 回収）
+- **根本原因**: length = 0 クリアは「実装の初期状態が空配列」を暗黙前提とする。実装が初期エントリを持つようになった時点で、先行テストが全要素を消去した状態を後続テストへ引き渡し破壊する
+- **自律対応内容**: originalLength 保存 + finally で元長さへ復元する形へ修正済み（Case #3166・PR #3168 で main 反映済み）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（テスト fixture パターンの知見）
+- **横展開観点**: 可変 export 配列を fixture として操作する全テストに適用可能
+- **再発条件**: 可変 export 配列への fixture push + finally での全消去（length = 0）を含むテストを新規実装または改修する場合
+- **予防策候補**: 可変配列の fixture 復元は常に元長さ保存型（originalLength 保存 + finally 復元）とする指針の明文化
+- **想定反映先**: check_content_corruption.test.ts 等の可変 export 配列 fixture を持つテスト群、テスト fixture パターンの知識化候補
+- **関連**: Case #3166、PR #3168 本文 Findings / Capture候補
+- **タグ**: `#bun-test` `#fixture-restoration` `#test-pattern`
