@@ -342,3 +342,56 @@
 - **想定反映先**: agentdev-traceability SKILL.md 実行前提節、coverage.ts 入力検証
 - **関連**: Case #3183、PR #3184 本文検証証跡
 - **タグ**: `#traceability` `#coverage` `#emptyResult` `#silent-empty`
+
+---
+
+## Cloudflare `/ai/run` の model-in-path 形式は Workers AI `@cf/` モデル専用 — 第三者モデルは body で渡す（評価 SDK 依存から fetch 直呼び出しへ置換する場合、SDK が担っていた schema 知識の消失を実装前工程で補う）
+
+- **問題事象**: Cloudflare AI Gateway `/ai/run/{model}` 形式（model-in-path）で `typesafe/jev` を呼び出すと HTTP 400 `code 7000 "No route for that URI"` で失敗した（失敗観測 20260927T112354Z-6677。TS-010 on_failure 発火）
+- **発生日時**: 2026-09-27（Case #3183 初回実測〔HEAD 62ab5166〕。commit 58a0fad7 の adapter 物理 mapping 修正で解消・再実測成功）
+- **発生局面**: 実装・検証（case-run TS-010 実 gateway 検証の初回実測）
+- **検知方法**: 実 gateway 実測の HTTP 400（モデル不明の request schema エラー。SDK 依存時代には存在しなかった失敗クラス）
+- **根本原因**: model-in-path 継続形式（`/ai/run/{model}`）は Workers AI `@cf/` モデル専用であり、第三者モデル（`author/model` 形式の `typesafe/jev`）には path ルートが存在しない。公式の `/ai/run` は body の `{ model, input }` でモデルと入力を渡す。評価 SDK（`ai` / `@ai-sdk/gateway`）が暗黙に担っていた request schema 知識が、fetch 直呼び出しへ置換した時点で消失した
+- **自律対応内容**: on_failure（fix-and-reverify）に従い、公式カタログ（developers.cloudflare.com の model ページ配下 schema-input.json / schema-output.json）を取得・確認して request / response の物理 mapping を修正し、再実測で解消（観測 20260927T113606Z-6056）
+- **ユーザー確認有無**: なし（fix-and-reverify 契約内の修正）
+- **Decision/REQ/spec影響**: なし（adapter 内部物理 mapping の修正。REQ-090-022 の provider 境界どおり）
+- **横展開観点**: 外部 API SDK を fetch 直呼び出しへ置換する全 Case（provider 置換・依存削減系）で同様の schema 知識消失が起こり得る。接続先モデルの request schema は必ず公式カタログから取得・確認してから実装する
+- **再発条件**: 評価・推論系 SDK の依存を撤去して HTTP 直呼び出しに置換し、request schema の一次情報源（公式カタログ・OpenAPI 等）の確認を実装前に実施しない場合
+- **予防策候補**: SDK 置換系変更の実装手順に「置換対象 SDK が担っていた契約の列挙」と「公式 schema の取得確認」を実装前工程として組み込む
+- **想定反映先**: docs/knowledge/ 知識化候補（learning-promote 判定対象）、provider 置換系 Case の case-run 実装手順
+- **関連**: Case #3183、PR #3185 本文 Findings / Capture候補、失敗観測 20260927T112354Z-6677、commit 58a0fad7
+- **タグ**: `#cloudflare` `#ai-gateway` `#sdk-replacement` `#request-schema` `#case-run`
+
+## Windows + bun 環境で worktree の `.opencode` projection が commands / skills のみ伝播し plugins / tools が不在のため、bun test 3分割正規形の分割③ plugins 部分が読むツリーを持たない
+
+- **問題事象**: worktree root で `bun test ./.opencode/plugins/ ./scripts/`（bun test 3分割正規形の分割③）を実行すると、`.opencode/plugins` の junction 未伝播により bun がエラーにせず残りの `./scripts/` のみを実行した（plugins 分割が無言で欠落）
+- **発生日時**: 2026-09-27（Case #3183 case-run 検証）
+- **発生局面**: 検証（case-run の bun test 3分割正規形実行。worktree root cwd）
+- **検知方法**: 分割③の実行出力に plugins 系テストが一切現れないこと（「Ran N tests across M files」の対象ファイル群から plugins 欠落を判別）
+- **根本原因**: worktree の `.opencode` projection は commands / skills のみ伝播し plugins / tools は不在（junction 未伝播の環境差）。bun test は指定パスが実在しない場合にエラーにせず残りの対象のみ実行する
+- **自律対応内容**: `bun test ./src/opencode/plugins/ ./src/opencode/tools/` の補完実行で plugins / tools 部分（599 pass）を代替し、実施範囲を環境ラベルへ明記（worktree .opencode は plugins/tools projection 未伝播・plugins 部分は読むツリー無し・scripts/ のみ実行）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（bun test 正規形契約の運用知見。QG-4 観点10 の環境差明示要件を機能させた）
+- **横展開観点**: worktree で bun test 正規形を実行する全 Case（case-run 検証・case-close QG-4）で同様の無言欠落が起こり得る。件数突合と環境ラベル（junction 伝播状態）の双方から実施範囲を判別可能に記録する運用が有効
+- **再発条件**: junction 未伝播の worktree で bun test 3分割正規形を実行し、分割③の plugins 部分を検証済みとして扱う場合
+- **予防策候補**: worktree での正規形実行契約に projection 伝播前提と補完手順（main root からの読取専用実行または src 配下直指定）の明記
+- **想定反映先**: agentdev-quality-gates qg-4-final-acceptance.md（bun test 正規形の worktree 実行注記）、agentdev-git-worktree worktree-operations.md
+- **関連**: Case #3183、PR #3185 本文検証差分（bun test 3分割正規形・環境ラベル行）
+- **タグ**: `#bun-test` `#worktree-projection` `#junction` `#qg4`
+
+## worktree root には package.json が存在せず `bun install` を worktree root で実行しても tools / plugins 配下パッケージの devDependencies は導入されない — typecheck 前に package 単位の bun install が必要
+
+- **問題事象**: worktree root で `bun install` を実行しても no changes で終了し、tools / plugins 配下パッケージの devDependencies（typescript、@types/bun 等）が導入されず、`tsc --noEmit` の型解決が失敗した
+- **発生日時**: 2026-09-27（Case #3183 case-run typecheck 実施時）
+- **発生局面**: 検証（case-run の typecheck〔tsc --noEmit 3パッケージ〕の依存前置）
+- **検知方法**: tsc の型解決エラー（node_modules 未整備）と bun install no changes の矛盾
+- **根本原因**: worktree root に package.json が存在せず、bun install は worktree root を workspace root として解決する対象を持たない。依存は package ディレクトリ単位で導入する必要がある（node_modules は gitignore 対象のため worktree へ未伝播）
+- **自律対応内容**: `bun install --cwd <package ディレクトリ>`（tools/agentdev-jev、adapter-cloudflare、plugins/agentdev-jev-tool）で package 単位整備を実施し、typecheck 合格を確認。整備手段を環境ラベル（依存パッケージ状態）へ記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（bun test 正規形・tsc 実行の環境前提の運用知見）
+- **横展開観点**: worktree で tsc 型検証または bun test を実行する全 Case で、依存前置（package 単位 bun install または main 側 node_modules への junction）が前提になる
+- **再発条件**: worktree で typecheck（tsc --noEmit）を依存整備なしで実行する場合
+- **予防策候補**: worktree 環境の typecheck 手順に「package 単位 bun install の前置」を明記する
+- **想定反映先**: agentdev-git-worktree worktree-operations.md（bun test 実行の環境前提と同一の選択基準への typecheck 追記候補）、実装委譲の QA 手順
+- **関連**: Case #3183、PR #3185 本文検証差分（typecheck・環境ラベル行）
+- **タグ**: `#worktree` `#bun-install` `#typecheck` `#tsc-noemit`
