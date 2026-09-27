@@ -135,6 +135,7 @@ rationale はいずれも例示由来（検出ルール自体が破損形・異�
 - docs/designs/integrity/rules/IR-064-unresolved-placeholder.md × broken-code-span: 検出対象外（code block 囲み内）の説明でバッククォート3連（code fence）記法を例示
 - docs/designs/integrity/rules/IR-066-legacy-path-removed-name.md × stale-reference: REQ-0108-NNN 旧ナンバリング検出ルール自体が旧形式を実例として列挙するルール定義
 - docs/designs/integrity/rules/IR-069-req-number-gap-recorded.md × stale-reference: 採番例外記録の文脈で旧ナンバリング REQ-0108-194 を歴史的根拠として引用
+- docs/designs/integrity/content-corruption-checker.md × stale-reference: stale-reference 検出カテゴリの説明が旧ナンバリング形式参照を実例として列挙し、IR-069 許容例と同一の旧ナンバリング引用を含む Design 記述（自己言及）
 
 追加運用:
 許容例を追加する場合は、対象ファイル・rule_id・根拠（意図的使用の理由）を本節に追記した上で checker の列挙に反映する。

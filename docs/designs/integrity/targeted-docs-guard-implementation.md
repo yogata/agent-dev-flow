@@ -180,7 +180,7 @@ TargetedDocsReport 型契約の正本は [integrity-contracts.md](integrity-cont
 
 ## obsolete-path-map.yaml 運用
 
-`docs/designs/integrity/obsolete-path-map.yaml` による旧Design直下パス→現行ドメイン分割パス対応表の運用（v2:REQ-0158 より移管）。
+`.opencode/skills/repo-agentdev-integrity/data/obsolete-path-map.yaml` による旧Design直下パス→現行ドメイン分割パス対応表の運用（v2:REQ-0158 より移管）。
 
 - 各エントリは `old`、`new`、`severity`、`scope`（`include`、`exclude`）を持つ
 - `severity` は旧直下パス参照を `ng` とする
