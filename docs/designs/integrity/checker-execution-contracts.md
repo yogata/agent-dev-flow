@@ -11,7 +11,7 @@ updated: 2026-09-17
 <!-- ADF-COVERS(implementation): REQ-061-037 -->
 <!-- ADF-COVERS(design): REQ-061-037 -->
 <!-- ADF-COVERS(implementation): REQ-060-006 -->
-<!-- ADF-COVERS(design): REQ-060-001, REQ-060-002, REQ-060-003 -->
+<!-- ADF-COVERS(design): REQ-060-001, REQ-060-002, REQ-060-003, REQ-060-007 -->
 
 # checker 実行契約と検出基盤規則
 

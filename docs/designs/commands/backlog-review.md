@@ -2,7 +2,7 @@
 title: backlog-review Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-20"
+updated: "2026-09-29"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-021 -->
@@ -39,7 +39,7 @@ backlog-review が扱うのは backlog 自体の処置（RU 化、docs/knowledge
 
 ## 副作用
 
-- git commit/push: `.agentdev/` 配下（明示パスステージング、v2:REQ-0137-002/005）
+- git commit/push: `.agentdev/` 配下（明示パスステージング。v2:REQ-0137-002/005 由来、現行の並行 Case git 規律は REQ-030-017）
 - 実行前同期: `git pull --ff-only`
 - docs/knowledge/ 知識文書保存: learning 由来の分類結果が docs/knowledge/ への知識文書保存（REQ-056、REQ-039-006）に振り分けられた場合、利用者承認を経て docs/knowledge/ へ直接書き込む。docs/knowledge/ は git 管理対象（ドメイン状態の永続化対象）であり、当該書き込みは git 永続化対象の副作用である
 - REQ ファイル保存: 行わない（Definition 保存内部責務（case-ready / case-revise）の責務）
@@ -52,7 +52,7 @@ backlog-review が扱うのは backlog 自体の処置（RU 化、docs/knowledge
 
 - 実行前同期（`git pull --ff-only`）
 - 成果物検出（引数有無切り替え（引数あり: 指定ファイルのみ / 引数なし: `promoted/` 全件））
-- 成果物読込、分析 + 暫定分類付与（`agentdev-backlog-integration` 参照）。暫定分類は `docs/designs/foundations/document-model.md` の文書7分類モデルを参照して付与し、RU frontmatter `tentative_classification` に記録する（v2:REQ-0155-004）。`tentative_classification` の許容値、7値以外入力時、フィールド欠落時の取り扱いは v2:REQ-0155-008、後述「tentative_classification フィールド仕様」に定める。暫定分類は後続 `/agentdev/req-define` で最終確定される候補であり、本コマンドが確定しない
+- 成果物読込、分析 + 暫定分類付与（`agentdev-backlog-integration` 参照）。暫定分類は `docs/designs/foundations/document-model.md` の文書7分類モデルを参照して付与し、RU frontmatter `tentative_classification` に記録する（v2:REQ-0155-004 由来、現行の暫定分類契約は REQ-008）。`tentative_classification` の許容値、7値以外入力時、フィールド欠落時の取り扱いは v2:REQ-0155-008 由来（現行は REQ-008）、後述「tentative_classification フィールド仕様」に定める。暫定分類は後続 `/agentdev/req-define` で最終確定される候補であり、本コマンドが確定しない
 - 統合分割判定 + depends_on 依存解決 + ユーザー承認（判断の確定、REQ-003-003）（`agentdev-backlog-integration` 参照）
 - 矛盾検出（矛盾検出時のみ追加判断を求める（REQ-003-009））。矛盾なしの場合、統合、分割判定承認を RU 生成承認として扱い、単一承認で処理する。自動解決しない
 - RU 生成（採用済み成果物の単純コピー（パススルー）は禁止（REQ-008））

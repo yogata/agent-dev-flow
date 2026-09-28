@@ -2,7 +2,7 @@
 title: inspect-docs Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-25"
+updated: "2026-09-29"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-021 -->
@@ -53,7 +53,7 @@ REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて De
 - 現行/廃止/世代境界確認（`agentdev-req-structure-diagnostics`）
 - Design 意味診断（Design が REQ/Decision/guides の代替、将来計画の混入、実行時依存先としての不適切扱いを確認）
 - Decision 意味診断（承認済み Decision のみを現行判断の根拠として扱っているか確認）
-- guides 意味診断（guides が navigation layer の範囲を超えていないか確認）。履歴混入検出時は route 追加（v2:REQ-0115-041）
+- guides 意味診断（guides が navigation layer の範囲を超えていないか確認）。履歴混入検出時は route 追加（v2:REQ-0115-041 由来、現行の guides 意味診断契約は REQ-036-029 系）
 - README 索引診断（README 索引が導線の範囲を超えていないか確認）。内容過多検出時は分割誘導
 - REQ structure review（6観点）（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT（`agentdev-req-structure-diagnostics`））
 - 文書分類一貫性検査（`docs/designs/foundations/document-model.md` の classification policy への適合確認）。REQ 要件行への Design 分離基準違反残留（スキーマ field、enum 値一覧、判定表、file pattern、テンプレート種別、report format、内部アルゴリズム、作業履歴、実装パラメータ等）自動検出

@@ -2,7 +2,7 @@
 title: 具象参照抽象化 詳細（harness 分離モデル references）
 status: accepted
 created: 2026-07-12
-updated: 2026-07-25
+updated: 2026-09-29
 ---
 
 # 具象参照抽象化 詳細
@@ -28,7 +28,7 @@ updated: 2026-07-25
 
 ## baseline 既知違反
 
-`src/opencode/` 配下の既知違反（baseline 11件）は段階解消の対象とし、一括除去の完了条件から除外する。
+`src/opencode/` 配下の既知違反（baseline 件数は次節「baseline リスト」の実項目数から導出する）は段階解消の対象とし、一括除去の完了条件から除外する。
 baseline は delta 検出で新規違反と区別するための与件であり、baseline 自体の解消は段階的に実施する。
 
 ### 件数定義
@@ -41,11 +41,11 @@ baseline 件数は次の2軸で明記する。
 機械化判定はマッチ単位を採用し、grep 結果との1:1照合を可能にする。
 ファイル単位は進捗報告用の補助値とし、判定の主評価値とはしない。
 
-### baseline リスト（3件）
+### baseline リスト
 
-下記3件を baseline 既知違反として登録する。
+下記を baseline 既知違反として登録する（件数は実項目数）。
 各行は「ファイルパス:行番号:違反内容:検出ルール」形式である。
-抽出元は integrity 検査の warning level（3件）、ファイル単位の件数は3件である。
+抽出元は integrity 検査の warning level であり、マッチ単位・ファイル単位の件数は下記リストの実項目数から導出する。
 
 1. `src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md`:110:gh CLI 直接呼出し（`gh pr view`）:IR-053 (gh-direct-invocation)
 2. `src/opencode/skills/agentdev-inspect-skills/SKILL.md`:63:`docs/designs/` 参照:IR-055 (runtime-unresolved-reference, heuristic)

@@ -2,11 +2,11 @@
 title: case-ready Design
 status: accepted
 created: 2026-09-14
-updated: "2026-09-23"
+updated: "2026-09-29"
 ---
 
 <!-- ADF-COVERS(design): REQ-021-024 -->
-<!-- ADF-COVERS(design): REQ-061-010, REQ-061-019, REQ-061-038, REQ-061-023, REQ-061-029, REQ-061-030, REQ-061-033, REQ-061-034, REQ-061-035, REQ-061-039, REQ-035-012, REQ-035-018 -->
+<!-- ADF-COVERS(design): REQ-061-010, REQ-061-019, REQ-061-038, REQ-061-023, REQ-061-029, REQ-061-030, REQ-061-033, REQ-061-034, REQ-061-035, REQ-061-039, REQ-061-040, REQ-035-012, REQ-035-018 -->
 
 # case-ready Command Design
 

@@ -2,10 +2,11 @@
 title: harness 分離モデル
 status: accepted
 created: 2026-07-12
-updated: 2026-08-15
+updated: 2026-09-29
 ---
 <!-- ADF-COVERS(implementation): REQ-001-031, REQ-001-032 -->
 <!-- ADF-COVERS(implementation): REQ-011-018 -->
+<!-- ADF-COVERS(design): REQ-053-042 -->
 
 # harness 分離モデル
 

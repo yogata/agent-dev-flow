@@ -2,7 +2,7 @@
 title: 語彙レジストリ
 status: accepted
 created: 2026-08-20
-updated: 2026-09-28
+updated: 2026-09-29
 ---
 
 <!-- ADF-COVERS(design): REQ-094-008, REQ-094-012 -->
@@ -69,7 +69,6 @@ v4 概念語彙（work_type、scale、Epic、Wave）の正規定義は `docs/des
 
 ## 適用範囲
 
-- 対象: 語彙レジストリの配置基準、連携契約、IR-045/050/051/044/055 と配布物側語彙レジストリの責務分担
 - 対象: 語彙レジストリの配置基準、連携契約、IR-045/050/051/044/055 と実体対照表（repo-local）の責務分担
 - 対象外: 実体対照表の内容管理（`.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` の責務）、語彙検出ロジックの実装詳細（`check_integrity.ts`、IR-050/IR-051 個別ルールファイルの責務）
 

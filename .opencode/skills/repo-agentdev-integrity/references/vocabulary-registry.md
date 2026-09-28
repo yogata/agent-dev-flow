@@ -261,6 +261,9 @@ docs 日本語表現・文意整合検査（IR-045, REQ-0140）の検出対象�
 | `adapter` | アダプター | アダプター | 単独の一般名詞はアダプター、固定複合表現（Harness/Backend adapter 境界 等 Design 名・節名）は原表記 | Design 名・節名・識別子を含む固定複合表現 | 不可（固定複合表現との区別が必要） | 要 | 不要 |
 | `runtime` | ランタイム | ランタイム | 単独の技術用語はランタイム、固定複合表現（runtime 制御ループ、runtime command、runtime package 等）は原表記 | 固定複合表現・Design 名・IR 名（IR-055-runtime-unresolved-reference 等） | 不可（固定複合表現との区別が必要） | 要 | 不要 |
 | `cache` | キャッシュ | キャッシュ | 一般の説明文ではキャッシュ、token 種別の技術用法（cache read / cache write）と履歴保持記録は原表記 | 履歴上の文字列保持（REQ-048-015 等）、token 種別語 | 不可（履歴保持対象との区別が必要） | 要 | 不要 |
+| `stale` | 陳腐化した | なし | 単体の stale は「陳腐化した」へ統一 | 識別子・固定複合表現・履歴保持記録内の文字列 | 可（散文中の単体 stale → 陳腐化した） | 不要 | 不要 |
+| `staleness` | 現行性 | なし | 単体の staleness は「現行性」へ統一。staleness check は check 名の固定複合表現として対象外 | check 名の固定複合表現（staleness check） | 可（単体の英字表記 → 現行性。staleness check は対象外） | 不要 | 不要 |
+| `staleness check` | 原表記維持 | なし | check 名の固定複合表現として原表記維持（REQ-031-009 等で操作名として使用） | check 名としての使用すべて | 不可（原表記維持語） | 不要 | 不要 |
 | `current` | 現行 | なし | 「現行 Design」「現行 REQ」等の日本語修飾。harness 固有語彙（current STEP、current finding）と状態値・列挙値は原表記 | harness 固有語彙、状態値・列挙値、hyphenated 識別子（obsolete-vocabulary-current-use 等） | 不可（識別子的使用が多義） | 要 | 不要 |
 | `semantic judgment` | 意味判断 | なし | 日本語では「意味判断」。概念の説明を要する文脈では契約表現での文章説明 | Jev 観測契約の識別子的用法（semantic_evaluation 等） | 不可（意味説明型語。文章そのものの書き換えを要する場合がある） | 要 | 要（短い訳語で意味を正確に保持できない場合、当該文脈での契約を文章で表現） |
 | `read-only` 系（`read-only` / `Read-Only` / `read_only`） | 文脈分解（参照専用入力・検査対象を直接修正しない診断・保存更新を親に残す委譲・検出報告型） | なし | REQ-0140-004 の文脈分解に従い、一律「読み取り専用」にしない | 識別子（side_effect_boundary の enum 値 read-only-diagnostic 等。初出に日本語注記） | 不可（一律置換は REQ-0140-004 で禁止） | 要 | 要（実際に出力生成・commit・push を行う場合は許可/禁止操作を明記。REQ-0140-005） |

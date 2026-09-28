@@ -2,7 +2,7 @@
 title: 文書フォーマット規約
 status: accepted
 created: 2026-08-20
-updated: 2026-09-20
+updated: 2026-09-29
 ---
 <!-- ADF-COVERS(implementation): REQ-001-008, REQ-001-010, REQ-001-011, REQ-001-012, REQ-001-013, REQ-001-014, REQ-001-015, REQ-001-016, REQ-001-030, REQ-001-046, REQ-001-047, REQ-056-001 -->
 <!-- ADF-COVERS(implementation): REQ-059-001 -->
@@ -33,6 +33,7 @@ updated: {YYYY-MM-DD}
 
 - 許可フィールドは`id`、`title`、`created`、`updated`だけとする。
 - `id`は`REQ-{NNN}`、要件行IDは`REQ-{NNN}-{MMM}`形式とする。
+- REQ 本文を変更する際は frontmatter `updated` を変更日へ進行させる。機械検査（check_integrity の updated 鮮度突合）がこれを検証する。
 
 ### REQ セクション構成
 
@@ -115,8 +116,7 @@ knowledge 見出し一致の機械判定形式: 必須セクションの存在�
 **新基準 REQ 群**を現行仕様の主参照とする。
 現行 REQ の件数、範囲は `docs/README.md` の AUTOGEN 件数ブロックと `docs/requirements/README.md` を正とし、本 Design 本文では件数、範囲を固定値として記述しない。
 
-件数の固定記述を禁止する根拠の一つは、v3.0.0 移行後に旧表記（REQ-001〜0133、25 件）が残存した事象である。
-当該残存を IR-042（hardcoded-req-count）、IR-018（REQ 範囲表記鮮度）が検出しなかった理由は、両ルールが full-audit gate で検出器実装を持たず（regression_test は手動確認、`check_integrity.ts` 未実装）、v3.0.0 移行以降に full-audit が実行されていなかったためである（実行頻度の欠如）。
+件数の固定記述を禁止する根拠（v3.0.0 移行時の旧表記残存事象と、当時の検出器不在・full-audit 実行頻度の欠如による未検出経緯）は [../../reports/patterns-v3-migration-old-notation-incident.md](../../reports/patterns-v3-migration-old-notation-incident.md) を参照する。
 表記形式の対象漏れの有無は検出器不在のため未検証であり、検出器実装時に確認する。
 
 **要件行の記述規約**（REQ-010, 004）:

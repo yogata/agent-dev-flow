@@ -2,7 +2,7 @@
 title: 文書種別責務・配置基準
 status: accepted
 created: 2026-06-23
-updated: 2026-09-28
+updated: 2026-09-29
 ---
 <!-- ADF-COVERS(implementation): REQ-001-001, REQ-001-002, REQ-001-003, REQ-001-004, REQ-001-005, REQ-001-006, REQ-056-003 -->
 <!-- ADF-COVERS(implementation): REQ-094-003, REQ-094-005 -->
@@ -20,7 +20,7 @@ updated: 2026-09-28
 > 両 Design の境界変更時は相互参照を更新し、同一関心の説明が重複・矛盾しない状態を維持する。
 
 docs/ 配下の文書（REQ/Decision/Design/guides/README）および AGENTS.md の日本語執筆における文書種別責務、配置基準、用語政策を示す。
-v2:REQ-0140（文書品質ゲート）の原本仕様（文書種別配置、用語政策系）である。
+v2:REQ-0140（文書品質ゲート）由来、現行の文書品質契約は REQ-053（用語選択基準は REQ-094 系）である（retired v2:REQ）。
 配布 command/skill 本文のプロジェクト固有 Decision、REQ、Design 具体 ID、具体パス、固定 URL への非依存は REQ-029-003、REQ-029-004 が正規所有し、traceability 補完は extension 機構（`../foundations/project-extensions.md`）と協調する。
 意味境界の検出契約は `../integrity/distribution-boundary.md` を参照する。
 
@@ -280,6 +280,8 @@ ADF 本体も同じ仕組みを利用する。
 | semantic judgment | 意味説明型語 | 意味判断 | |
 | current | 標準日本語表現語 | 現行 | |
 | retry | 標準日本語表現語 | 再試行 | |
+| stale | 標準日本語表現語 | 陳腐化した | 単体の stale は訳語へ統一 |
+| staleness | 標準日本語表現語 | 現行性 | 単体の staleness は訳語へ統一。「staleness check」は check 名の固定複合表現として原表記維持（次節） |
 
 ### 英字許容リストと原表記維持対象
 
@@ -292,6 +294,7 @@ ADF 本体も同じ仕組みを利用する。
 - 外部製品・サービス・標準仕様の正式名称
 - ADF の正式なモデル名・成果物名（「ADF 正式名称の文章表現」節参照）
 - 履歴上その文字列自体を保持する必要がある記録内の文字列（過去の実際の名称、識別子、状態値）
+- check 名の固定複合表現（staleness check 等。REQ-031-009 等で操作名として使用する）
 
 ### 意味説明すべき概念の文章説明方針
 
