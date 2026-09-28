@@ -29,7 +29,7 @@ AgentDevFlow 配布物と harness 実行制御の責務境界を、所有対象�
 - 実行エージェント選定
 - サブエージェント階層
 - 委譲API
-- 固定並列数、timeout、retry
+- 固定並列数、タイムアウト、再試行
 - context管理
 - queue、heartbeat
 - エラー解析
@@ -37,9 +37,9 @@ AgentDevFlow 配布物と harness 実行制御の責務境界を、所有対象�
 
 ### case-auto所有/非所有リスト
 **所有**: 入力解決、auto_gate確認、artifact_actions基準工程決定、入力引き渡し、永続状態再読込、継続停止再開判定、完了進行未実行報告、壁時計時間計測、orchestration stage（stage 1 case-open・stage 2 case-ready・stage 4 case-close は stage 内最大並列実行、stage 3 case-run 並列実行、stage 間は対象群収束で進行、REQ-034-025）、stage 3 の固定並列数5（REQ-034-027）、bg task の状態管理、破棄検知（REQ-034-029）、状態別回復（commit 済み PR 未作成 / 未コミット変更残存の区別）、共有書き込みの局所直列化（main push / capture / commit、REQ-034-026）、起動時対象集合の維持（ローカル一時実行状態、REQ-002-036、REQ-034-025）
-**非所有**: 工程内部手順再実装、エージェント選定、スケジューリング、エラー解析、context圧縮、retry、QG再評価、capture再実装、bg task API、実行担当サブエージェント内部の実行制御（推論、context 管理、retry、エラー解析等）、heartbeat、plan task監査ログ
+**非所有**: 工程内部手順再実装、エージェント選定、スケジューリング、エラー解析、context圧縮、再試行、QG再評価、capture再実装、bg task API、実行担当サブエージェント内部の実行制御（推論、context 管理、再試行、エラー解析等）、heartbeat、plan task監査ログ
 
-> **用語注記**: 「実行担当サブエージェント内部の実行制御」は、推論、context 管理、retry、エラー解析等を含む上位概念として扱う。
+> **用語注記**: 「実行担当サブエージェント内部の実行制御」は、推論、context 管理、再試行、エラー解析等を含む上位概念として扱う。
 > line 38 限定注記内の表記と一致させる（語彙揺れ是正）。
 
 > **v2:ADR-0138 による v2:ADR-0136 決定2の限定範囲（REQ-034-025〜029、結果集約に相当するものは REQ-034-031）**: v2:ADR-0136 決定2「配布物は業務ワークフロー契約のみを記述し、実行制御は harness 責務」に対し、case-auto の orchestration stage（stage 1〜4）、stage 3 の固定並列数、bg task の状態管理と状態別回復、共有書き込みの局所直列化だけを AgentDevFlow 側の業務ワークフロー契約として規定する。
@@ -54,7 +54,7 @@ AgentDevFlow 配布物と harness 実行制御の責務境界を、所有対象�
 **結果4状態**: completed-pr、blocked、failed、delegation-unavailable
 **永続化先**: 成功=PR、blocker失敗詳細=Issueコメント
 **禁止事項**: worktree外変更、Issue完了判定、capture直接書込、harness中間成果物のADF永続状態化
-**含めない**: エージェント構成、実行command、timeout、retry、並列数、plan
+**含めない**: エージェント構成、実行command、タイムアウト、再試行、並列数、plan
 
 ### v4 adapter 境界への接続
 
@@ -71,7 +71,7 @@ adapter の追加は必要になった時点で行い、未使用 adapter を先
 
 ### タイムスタンプ境界
 **ADF可観測（所有）**: case-auto全体開始終了停止、構成工程開始終了所要、case-run worktree準備実行依頼結果受領後処理、結果状態確定時刻、停止時点工程別経過
-**ADF非管理**: harness内部timeout、サブエージェント内部フェーズ、推論時間、queue待機、retry単位、context圧縮時間、監視間隔
+**ADF非管理**: harness内部タイムアウト、サブエージェント内部フェーズ、推論時間、queue待機、再試行単位、context圧縮時間、監視間隔
 
 ## case 実行責務の 4 用語と所有者
 

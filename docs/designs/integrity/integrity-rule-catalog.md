@@ -42,7 +42,7 @@ DEC-013 AG-009 により、`lifecycle_state`、`enforcement_mode`、`baseline_st
 廃止済み IR の file-backed tombstone（IR-011 型）は AG-008 により物理削除し、`lifecycle_state: superseded` 等の表現を使わない。
 識別子の再利用禁止は `foundations/numbering-policy.md` が保持し、履歴性は Git で担保する。
 
-finding-baseline 分類（new/known/resolved）は IR schema から分離し、finding 側の状態として [integrity-contracts.md](integrity-contracts.md)「finding-baseline 分類」で定義する。
+finding-baseline 分類（new/known/resolved）は IR スキーマから分離し、finding 側の状態として [integrity-contracts.md](integrity-contracts.md)「finding-baseline 分類」で定義する。
 本カタログは finding-baseline 分類を再定義しない。
 
 `severity`、`gate_level` は現行 IR に対する独立軸として維持する（REQ-036-022、retired REQ-028-009 決定7）。

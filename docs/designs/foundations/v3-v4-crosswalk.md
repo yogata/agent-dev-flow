@@ -8,11 +8,11 @@ updated: 2026-09-19
 # v3 -> v4 Concept / Artifact Crosswalk
 
 位置づけ: 本 Design は v3 成果物の v4 での処遇の正規記録先である。処遇の完全一覧は
-references/crosswalk-inventory.md が所有し、本 Design は分類 schema、処遇実行原則、
+references/crosswalk-inventory.md が所有し、本 Design は分類スキーマ、処遇実行原則、
 段階割当規則、集約サマリを所有する。実際の置換・廃止の実行は後続 v4 Implementation
 Sequence（v4-migration-and-release.md）の各段階で行う。
 
-## 分類 schema（3 列）
+## 分類スキーマ（3 列）
 
 処遇は次の 3 列で記録する。
 
@@ -23,7 +23,7 @@ Sequence（v4-migration-and-release.md）の各段階で行う。
 - 実行段階: 後続 v4 Implementation Sequence の段階番号（1〜17）。keep は ―
 
 従来の 9 分類軸は、意味処遇・帰属・機構置換の 3 次元を単一列へ混在させた表現であり、
-本 schema へ再編成した。機構置換（旧第 9 軸）は意味処遇 supersede と置換先の備考で
+本スキーマへ再編成した。機構置換（旧第 9 軸）は意味処遇 supersede と置換先の備考で
 表現する。単一成果物が複数帰属を持つ場合は帰属列に列挙する。
 
 ## 処遇実行原則

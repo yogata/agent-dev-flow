@@ -35,7 +35,7 @@ learning-promote は採用済み成果物を生成する際、各問題クラス
 | external_contract_change（外部契約変更） | 利用者から見える外部契約の変更 | ○（REQ 作成または拡張） |
 | variation_addition（バリエーション追加） | 既存要求を満たすバリエーション追加 | ×（Design 拡張） |
 | edge_case（エッジケース） | エッジケース対応 | ×（Design 拡張） |
-| parameter_adjustment（パラメータ調整） | retry 回数、timeout、閾値、重み等の調整 | ×（パラメータDesign 拡張） |
+| parameter_adjustment（パラメータ調整） | 再試行回数、タイムアウト、閾値、重み等の調整 | ×（パラメータDesign 拡張） |
 | nonconformance_fix（不適合修正） | 既存REQ/Design への不適合修正 | ×（Design 修正） |
 | internal_restructuring（内部再構成） | 外部挙動を変えない内部再構成 | ×（Design 再構成） |
 | document_correction（文書訂正） | 文書記述の訂正 | ×（文書修正） |

@@ -21,7 +21,7 @@ durable state 関連の情報を次の 5 分類に配置する。各論理状態
 | GitHub 正規状態 | Case/子Issue 状態、PR state、Definition 確定状態 | Issue/PR の権威記録先（本文状態節・state・ラベル写像） | Change/Case lifetime |
 | repo 内正規状態 | docs/ 正規成果物（REQ/Decision/Design）、.agentdev/ の Git 管理ドメイン状態（drafts、intake/learning inbox、検出事項、.agentdev/jev-observations/） | 各正規成果物ファイル | Requirement/Architecture/Project lifetime |
 | ローカル実行環境状態 | worktree・checkout・git index・導入状態（junction、依存 install）、起動時対象集合 | ローカル実行環境（保存しない。正規状態から再構成） | Runtime lifetime |
-| 証跡 | 検証 SSoT コメント、対応記録、PR 本文、監査記録 | Issue comment・PR 本文等の不変記録 | Change/Case lifetime（記録として） |
+| 証跡 | 検証 SSoT コメント、対応記録、PR 本文、監査記録 | Issue コメント・PR 本文等の不変記録 | Change/Case lifetime（記録として） |
 | 導出可能情報 | 現在 stage、workflow route、Wave 状態、Epic 集約、進捗表、索引類 | 保存しない（正規状態から再構成） | （保存しない） |
 
 8 情報寿命（ADF lifetime、Project lifetime、Architecture lifetime、Requirement lifetime、Change/Case lifetime、Runtime lifetime、reusable Knowledge、未評価 Observation）と各分類の対応は本表の寿命列が基準とする。docs/knowledge/ の知識は repo 内正規状態（reusable Knowledge）に配置する。未評価 Observation（learning/intake の未評価エントリ）は repo 内正規状態（.agentdev/ ドメイン状態）として保存し、評価結果は昇格ガード（DEC-033）に従って振り分けられる。
@@ -60,7 +60,7 @@ REQ-001-034「状態保持領域内の作業用ドラフトは正規のドメイ
 
 ADF は複数 store にわたる原子トランザクションを前提としない。部分失敗（例: commit 成功・Issue 更新失敗、Issue 作成成功・ラベル付与失敗）時は、クラス別権威順（GitHub 正規状態 > repo 内正規状態 > ローカル実行環境状態）でどの書き込みが成立しているかを確認し、未成立分を冪等経路で再実行する。安全に自動解消できない場合は停止する。意味的な自動マージを行わない。
 
-repo 外の一時証跡退避先（OS 一時ディレクトリ等）はローカル実行環境状態に分類し、正規状態・証跡として扱わない。恒久的な証跡は Issue comment または PR 本文へ記録する。
+repo 外の一時証跡退避先（OS 一時ディレクトリ等）はローカル実行環境状態に分類し、正規状態・証跡として扱わない。恒久的な証跡は Issue コメントまたは PR 本文へ記録する。
 
 ## v3 関連 Design の処遇
 

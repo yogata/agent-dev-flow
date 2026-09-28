@@ -85,7 +85,7 @@ accepted Decision へ直接編集を実施する場合、次のチェックリ�
 
 - CREATE 時: Definition 保存内部責務が要件doc（draft-data）の Decision 対象操作から関連 REQ の初期値を
   決定的に取得する規約に基づき保存する（取得元の draft-data 内構造は patterns.md
-  （ACT-DESIGN-001）で確定する。draft-data schema の拡張要否は REQ-008・DEC-003 の管轄との
+  （ACT-DESIGN-001）で確定する。draft-data スキーマの拡張要否は REQ-008・DEC-003 の管轄との
   整合で Design 保存内部責務の実行時に確定する）
 - UPDATE 時: 関連 REQ の変更（要件再構成、Decision の置換・再確認）をフィールド更新として
   扱う。status 遷移とは独立に更新できる

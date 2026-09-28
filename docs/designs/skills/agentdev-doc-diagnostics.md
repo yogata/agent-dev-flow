@@ -30,7 +30,7 @@ REQ 固有診断（`agentdev-req-structure-diagnostics`）、Command/Skill 診�
 
 - inspect-docs command の診断カテゴリ定義
 - docs 横断の診断判定規則
-- 共通証拠構造（finding schema、severity、信頼度）
+- 共通証拠構造（finding スキーマ、severity、信頼度）
 - 診断結果（finding）の出力契約
 - 診断に必要な reference または script の選択
 - 文書種別別診断（REQ 固有、Command/Skill、文章表層、探索順）へのルーティング
@@ -59,9 +59,9 @@ REQ 固有診断（`agentdev-req-structure-diagnostics`）、Command/Skill 診�
 inspect-docs の診断観点は正規の観点レジストリが所有する（retired REQ-028-014 由来、現在は本 Design の references 配下レジストリが所有）。
 
 - **配置先**: `docs/designs/skills/agentdev-doc-diagnostics/references/perspective-registry.md`（本 Design の references 配下）
-- **schema**: 各観点エントリは観点ID（一意）、診断カテゴリ（SPLIT、MERGE、MOVE、DUPLICATE、RETIRE、DRIFT、残余参照、境界違反等）、適用文書種別、正規所有者 skill、詳細参照の項目を持つ
+- **スキーマ**: 各観点エントリは観点ID（一意）、診断カテゴリ（SPLIT、MERGE、MOVE、DUPLICATE、RETIRE、DRIFT、残余参照、境界違反等）、適用文書種別、正規所有者 skill、詳細参照の項目を持つ
 - 移管対応表（integrity-rule-catalog.md の inspect-docs 移管記録）で名指しされた観点は当該レジストリへ登録する
-- レジストリの追加、変更は本 schema に従い、本 Design が schema の正規所有者となる
+- レジストリの追加、変更は本スキーマに従い、本 Design がスキーマの正規所有者となる
 
 ## 参照する references
 

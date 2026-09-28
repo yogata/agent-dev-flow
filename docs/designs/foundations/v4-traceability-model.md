@@ -70,7 +70,7 @@ DEC-030（トレーサビリティ標準機能への一般化と producer / cons
 
 | DEC-030 機構 | 処遇 | 本 Design での扱い |
 |---|---|---|
-| sidecar / policy スキーマ（component / package 単位、最小データ構成） | 搬送 | 前提を解除して判定した結果、現行形式を搬送する。schema 詳細の正は skills/agentdev-traceability.md（REQ-012-053） |
+| sidecar / policy スキーマ（component / package 単位、最小データ構成） | 搬送 | 前提を解除して判定した結果、現行形式を搬送する。スキーマ詳細の正は skills/agentdev-traceability.md（REQ-012-053） |
 | 直接走査（派生索引不採用） | 搬送 | 正規成果物の直接走査で対応関係をその場で解決する（DEC-017 決定2 の維持。REQ-012-048） |
 | coverage / impact / check の 3 能力 | 搬送 | 標準公開能力は変更しない（REQ-012-044）。4 問い × 能力写像表に従う |
 | fail-closed と fail-open の境界 | 搬送 | check は fail-closed、coverage と impact は advisory・fail-open で運用する（REQ-012-056） |

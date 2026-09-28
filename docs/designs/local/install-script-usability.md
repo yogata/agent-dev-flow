@@ -234,7 +234,7 @@ PowerShell の comment-based help 仕様は、スクリプトヘルプが「ス�
 配置され、前方に許容されるのはコメントと空行のみと定めている。`#Requires` は directive であり
 コメントではないため、comment-based help より前に置くとヘルプ解析位置の条件を満たさなくなる。
 一方 `#Requires` は行頭にあればスクリプト内の任意の位置に配置可能であり、comment-based help の
-後に置いても runtime の version 要求、module 要求等の効力は変わらない。両立のための最小の
+後に置いてもランタイムのバージョン要求、モジュール要求等の効力は変わらない。両立のための最小の
 配置変更は「comment-based help を先頭に移動し、`#Requires` をその直後に置く」である。
 
 ### 検証方法
@@ -244,7 +244,7 @@ PowerShell の comment-based help 仕様は、スクリプトヘルプが「ス�
 - Synopsis に `.SYNOPSIS` の内容が表示される（パラメータ署名のフォールバック表示ではない）
 - Description、Parameters、Examples の各セクションが空でない
 
-あわせて `#Requires` の runtime 効力が維持されていることを確認する。具体的には `#Requires -Version`
+あわせて `#Requires` の実行時効力が維持されていることを確認する。具体的には `#Requires -Version`
 のバージョン番号を現行 PowerShell より高い値に一時置換したコピーを実行し、PowerShell の
 「requires PowerShell version ...」エラーが発生することを確認する（本番ファイルは `7.0` を維持）。
 

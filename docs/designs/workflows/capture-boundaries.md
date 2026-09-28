@@ -51,7 +51,7 @@ case-run で発見した本筋外検出事項（Finding）の永続化チャネ�
 PR 本文の capture 関連セクションは以下を分離する:
 
 - `## Findings / Capture候補`（本筋外発見（intake/learning 候補））。case-run 経由の実行担当サブエージェントが記録
-- `## Design確定候補`（実装で判明した Design レベル詳細（schema、enum、判定表、内部アルゴリズム等））。`## Findings / Capture候補` とは別セクション（v2:ADR-0123 Decision #4, REQ-001-015）
+- `## Design確定候補`（実装で判明した Design レベル詳細（スキーマ、enum、判定表、内部アルゴリズム等））。`## Findings / Capture候補` とは別セクション（v2:ADR-0123 Decision #4, REQ-001-015）
 
 ## 各コマンドの capture 責務
 

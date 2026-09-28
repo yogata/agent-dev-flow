@@ -7,8 +7,8 @@ updated: 2026-09-10
 
 # inspect-docs 診断観点レジストリ
 
-`agentdev-doc-diagnostics` Design「観点レジストリ」節が schema と配置先の正とする、inspect-docs の診断観点の正規レジストリ実体である（REQ-036-024）。
-本ファイルは観点エントリの正規の所有場所であり、レジストリの追加、変更は同節の schema に従う。
+`agentdev-doc-diagnostics` Design「観点レジストリ」節がスキーマと配置先の正とする、inspect-docs の診断観点の正規レジストリ実体である（REQ-036-024）。
+本ファイルは観点エントリの正規の所有場所であり、レジストリの追加、変更は同節のスキーマに従う。
 本ファイルは親 Design の `references/` 配下の詳細であり、`docs/designs/README.md` の Design 一覧表へは独立行として登録しない。
 
 ## 観点エントリ
@@ -24,4 +24,4 @@ updated: 2026-09-10
 
 - 移管対応表（integrity-rule-catalog.md の inspect-docs 移管記録）で名指しされた観点は本レジストリへ登録する
 - 観点ID は本レジストリ内で一意とし、kebab-case で採番する
-- エントリの追加、変更は `agentdev-doc-diagnostics` Design「観点レジストリ」節の schema に従い、本 Design が schema の正規所有者である
+- エントリの追加、変更は `agentdev-doc-diagnostics` Design「観点レジストリ」節のスキーマに従い、本 Design がスキーマの正規所有者である

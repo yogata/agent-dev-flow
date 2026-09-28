@@ -28,7 +28,7 @@ AgentDevFlow 配布物と harness 実行制御の責務分離モデルを定義�
 - モデル名
 - 必須 skill 名
 - timeout 値
-- retry 回数
+- 再試行回数
 - context 管理方式
 - TDD の具体手順
 - コードレビューエージェントの種類と構成
@@ -89,7 +89,7 @@ case-run、case-auto の実行結果契約は次の4状態を区別する。
 case-auto の orchestration stage（stage 1 case-open・stage 2 case-ready・stage 4 case-close は stage 内最大並列、stage 3 case-run は並列実行。各 stage は stage 内最大並列・stage 間全対象収束で進行、REQ-034-025）、stage 3 の固定並列数、bg task の状態管理、破棄検知時の状態別回復（commit 済み PR 未作成、未コミット変更残存の区別）は AgentDevFlow 側の業務ワークフロー契約として所有する。
 これらは後続工程が依存する安全境界と回復契約であり、配布物で共有する。
 
-bg task API、実行エージェント選定、実行担当サブエージェント内部の推論、context 管理、retry、heartbeat、エラー解析は harness 側の所有とする（harness execution mechanism、ADF 規範所有対象外、REQ-011-018）。
+bg task API、実行エージェント選定、実行担当サブエージェント内部の推論、context 管理、再試行、heartbeat、エラー解析は harness 側の所有とする（harness execution mechanism、ADF 規範所有対象外、REQ-011-018）。
 共有状態への書き込み（main push、capture、commit、同一 Epic Issue 本文等）は競合部分のみを局所的に直列化する AgentDevFlow 側の契約（REQ-034-026）とし、bg task API 経由の実行制御は harness 側の責務として維持する。
 
 工程別の所有対象、非所有対象の詳細リストは `docs/designs/responsibilities/responsibility-boundary-purification.md` を正規所有者とする。
@@ -108,7 +108,7 @@ bg task API、実行エージェント選定、実行担当サブエージェン
 
 本 Design が定める配布物の harness 非依存性と実行結果契約は、v4 において Harness/Backend adapter 境界（ADF v4 実装責務境界 Design「Harness / Backend adapter 境界」節・DEC-036）の下で維持される。
 
-OpenCode を first-class reference harness と位置づける。他 harness への adapter は必要になった時点で追加し、未使用の Harness/Backend adapter を先回りして実装しない。
+OpenCode を first-class reference harness と位置づける。他 harness へのアダプターは必要になった時点で追加し、未使用の Harness/Backend adapter を先回りして実装しない。
 
 現行の tools/（agentdev-gh・agentdev-third-party）と plugins/（tool 登録配線・guard 3 本）はこの境界の OpenCode 実装例であり、配布物の harness 非依存原則（本 Design 既有）に従う。
 

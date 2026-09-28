@@ -102,7 +102,7 @@ deterministic checker は malformed を NG として報告してよいが、runt
 | extension 不在 | 標準動作継続 | 正常状態 |
 | YAML 構文エラー / 必須field欠落 / kind判定以前の破損 | エラー表示 + 当該extension無視 + 標準動作継続 | fail-open（REQ-002-031 準拠） |
 | `kind: command-extension` / `kind: skill-extension`（旧kind） | migration-required + stop | silent ignore しない |
-| 構文上有効だが `kind` が公式3値以外（未知kind） | schema violation + stop | fail-open しない |
+| 構文上有効だが `kind` が公式3値以外（未知kind） | スキーマ違反 + stop | fail-open しない |
 | 有効な新kind | 通常処理 | - |
 
 extension missing と legacy extension exists は別状態であり、前者は標準動作継続、後者は migration-required として停止する。
@@ -147,7 +147,7 @@ command/skill は実行時に自分に対応する extension だけを読む。
 - 対応 extension が存在しない場合は標準動作で続行する。
 - 対応 extension が破損している場合（YAML 構文エラー、必須field 欠落等）はエラーを表示し、当該 extension を無視して標準動作で続行する（REQ-002-031 準拠、fail-open）。
 - 旧kind（command-extension / skill-extension）を検出した場合は migration-required として停止する。
-- 構文上有効な未知kind を検出した場合は schema violation として停止する。
+- 構文上有効な未知kind を検出した場合はスキーマ違反として停止する。
 - extension は標準 command/skill の上書きではなく、追加・拡張としてのみ扱う。
 
 対応 extension が存在しない command/skill は正常動作であり、異常状態ではない。
@@ -159,7 +159,7 @@ command が project 非依存で単体動作する正当な状態である。
 Extension 読込の状態機械（不在、破損、旧kind、未知kind、有効の各状態とその遷移）は、runtime resolver と deterministic checker（check_extensions.ts）が同一実装を共有する。
 runtime resolver は fail-open 契約（REQ-002-031）を、deterministic checker は NG 報告契約をそれぞれ担う。
 状態分類の正規入力となる kind enum は本 Design「Extension kind enum（公式）」が定める。
-共有実装の変更は runtime と checker の両契約へ同時に反映する。
+共有実装の変更はランタイムと checker の両契約へ同時に反映する。
 
 ### YAML 解析と構造検証の実装契約
 
@@ -225,13 +225,13 @@ agent-dev-flow リポジトリ自身は適用プロジェクトの1つとして 
 ## ハイブリッド方式
 
 extension 原本は各プロジェクトが所有する。
-AgentDevFlow 本体は初期テンプレート、schema、検査（`/repo/docs-check`、`/agentdev/inspect-skills`、`/agentdev/inspect-promote` の3層）を提供し、consumer はテンプレートを初期値として取り込みカスタマイズする。
+AgentDevFlow 本体は初期テンプレート、スキーマ、検査（`/repo/docs-check`、`/agentdev/inspect-skills`、`/agentdev/inspect-promote` の3層）を提供し、consumer はテンプレートを初期値として取り込みカスタマイズする。
 AgentDevFlow 本体リポジトリの .agentdev/extensions/** には本体固有 Design パスを記述してよい。
 
 ## 配布物参照境界の責務分担
 
 配布成果物と producer 内部成果物の間の意味依存境界の正規所有は REQ-029 および `integrity/distribution-boundary.md` が担う。
-本 Design は Project Extensions の schema、配置、読込、標準診断、責務境界を所有し、配布 command/skill 本文の具体 ID、具体パス、固定 URL に対する検知パターン、exemption、severity、false-positive 条件は IR-059 個別文書が所有する。
+本 Design は Project Extensions のスキーマ、配置、読込、標準診断、責務境界を所有し、配布 command/skill 本文の具体 ID、具体パス、固定 URL に対する検知パターン、exemption、severity、false-positive 条件は IR-059 個別文書が所有する。
 
 配布物参照境界の検出結果は generic 表記への是正へ接続する。
 extension はトレーサビリティを補完する手段の一つであり得るが、意味境界の唯一の解決手段ではない（REQ-029-003、REQ-029-004）。

@@ -54,7 +54,7 @@ extension は5セクション（`context`/`rules`/`checks`/`acceptance_gates`/`m
 command 本文に直接の docs パスを記述しない。
 
 extension はフロントマタ（`version: 1`, `kind:`（公式3値: workflow-extension / internal-workflow-extension / capability-skill-extension）, `id:`）と、5セクションを持つ。
-schema 詳細は Design `../foundations/project-extensions.md` 参照。
+スキーマ詳細は Design `../foundations/project-extensions.md` 参照。
 旧 kind（command-extension / skill-extension）は廃止済みであり、検出時は migration-required として停止する。
 
 ## 手順セクション形式

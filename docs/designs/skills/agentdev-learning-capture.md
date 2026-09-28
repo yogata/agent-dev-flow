@@ -88,4 +88,4 @@ ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundar
 
 - **semantic 担当**: learning evaluation（学び抽出判断）
 - **deterministic 委譲先**: なし
-- **知識提供**: inbox entry schema・Split Rule
+- **知識提供**: inbox entry スキーマ・Split Rule

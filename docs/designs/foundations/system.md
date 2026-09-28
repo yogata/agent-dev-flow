@@ -243,7 +243,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **分岐**: セクション省略（推測不能時）、同名ファイル連番付与、git pull/push 失敗時の構造化エラー停止。
 - **副作用**: `.agentdev/intake/inbox/` への保存、`.agentdev/intake/` 配下の commit/push（`chore(agentdev): capture intake item`）。他ディレクトリ保存禁止。Issue/PR 作成・採否・review・整形は禁止。
 - **HITL**: なし（保存専用、ユーザー入力を過度に解釈しない）。
-- **並列性**: 持たない（単一 item 保存）。
+- **並列性**: 持たない（単一項目の保存）。
 - **resume**: intake item ファイル（日付+topic-slug）、git 変更状態。
 - **durable state**: `.agentdev/intake/inbox/*.md`、commit hash、push 成否。
 - **Harness依存**: git（pull/commit/push、並列実行安全ステージング）、拡張読込。
@@ -253,7 +253,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 ### `/agentdev/intake-from-github`
 
 - **公開契約**: 期間指定 / Issue・PR番号 → `.agentdev/intake/inbox/*.md`（候補ごと1ファイル）+ 抽出サマリーレポート。保存専用。
-- **主要処理段階**: STEP-1 期間解釈 → STEP-2 データ取得（GitHub I/O）→ STEP-3 構造的検出 → STEP-4 LLM 全文解析 → STEP-5 item 生成（STEP-5-1 実行前同期）→ STEP-6 保存（STEP-6-1 commit/push）→ STEP-7 サマリーレポート → STEP-8 完了報告。
+- **主要処理段階**: STEP-1 期間解釈 → STEP-2 データ取得（GitHub I/O）→ STEP-3 構造的検出 → STEP-4 LLM 全文解析 → STEP-5 intake item 生成（STEP-5-1 実行前同期）→ STEP-6 保存（STEP-6-1 commit/push）→ STEP-7 サマリーレポート → STEP-8 完了報告。
 - **分岐**: 期間指定 vs 番号指定、候補0件、同名ファイル連番、git pull/push 失敗時停止。
 - **副作用**: `.agentdev/intake/inbox/` への保存、`.agentdev/intake/` 配下 commit/push（`chore(agentdev): capture intake items from github`）。オープン中 Issue/PR は対象外（クローズ済みのみ）、GitHub API 直接呼出不可（Tool 操作契約のみ使用）。
 - **HITL**: なし（抽出・保存専用、サマリーレポートでユーザー確認）。
@@ -262,21 +262,21 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **durable state**: `.agentdev/intake/inbox/*.md`、抽出サマリー、commit hash。
 - **Harness依存**: GitHub I/O（Custom Tool `agentdev_gh` 経由）、LLM 全文解析、git、拡張読込。
 - **Capability依存**: `agentdev-intake-pipeline`、`agentdev-git-worktree`、`agentdev-project-extensions`。
-- **内部workflow候補**: GitHub 抽出workflow（期間解釈→データ取得→構造的検出→LLM 解析→item 生成）。抽出アルゴリズムとキーワードリストは Capability Skill 候補（既に `agentdev-intake-pipeline` が所有）。
+- **内部workflow候補**: GitHub 抽出workflow（期間解釈→データ取得→構造的検出→LLM 解析→intake item 生成）。抽出アルゴリズムとキーワードリストは Capability Skill 候補（既に `agentdev-intake-pipeline` が所有）。
 
 ### `/agentdev/intake-promote`
 
 - **公開契約**: `.agentdev/intake/inbox/*.md` + ユーザーコンテキスト → `.agentdev/intake/promoted/*.md`（採用）+ 分類結果レポート。review/分類/整形を行い Issue 作成はしない。
-- **主要処理段階**: STEP-1 classification（inbox 確認・item 読込・review/評価・暫定分類提示・自律確定候補判定）→ STEP-2 review（adversarial-review、発動条件判定 / review 呼出）→ STEP-3 HITL（ユーザー確認・分類承認、分類確定後 自動実行 REQ）→ STEP-4 persistence（採用item整形・promoted保存）→ STEP-5 destructive handling（振り分け・inbox削除・実行前同期・commit/push）→ STEP-6 完了報告。
-- **分岐**: inbox 空、分類3値（採用/保留/却下）、adversarial-review skip（1件で自明/inbox空）、ユーザー明示指定時の必須発動、破壊的変更の明示承認維持（`POL-destructive-change-explicit-approval`）、`accepted/` 廃止、採用item inbox削除/reject item 即時削除。
-- **副作用**: `.agentdev/intake/promoted/` 保存、採用item の inbox 元ファイル削除、reject item の即時削除（commit message に却下理由）、`.agentdev/intake/` 配下 commit/push。Issue 作成・backlog-review 自動起動はしない。
+- **主要処理段階**: STEP-1 classification（inbox 確認・intake item 読込・review/評価・暫定分類提示・自律確定候補判定）→ STEP-2 review（adversarial-review、発動条件判定 / review 呼出）→ STEP-3 HITL（ユーザー確認・分類承認、分類確定後 自動実行 REQ）→ STEP-4 persistence（採用 item 整形・promoted 保存）→ STEP-5 destructive handling（振り分け・inbox 削除・実行前同期・commit/push）→ STEP-6 完了報告。
+- **分岐**: inbox 空、分類3値（採用/保留/却下）、adversarial-review skip（1件で自明/inbox空）、ユーザー明示指定時の必須発動、破壊的変更の明示承認維持（`POL-destructive-change-explicit-approval`）、`accepted/` 廃止、採用 item の inbox 削除/reject item の即時削除。
+- **副作用**: `.agentdev/intake/promoted/` 保存、採用 item の inbox 元ファイル削除、reject item の即時削除（commit message に却下理由）、`.agentdev/intake/` 配下 commit/push。Issue 作成・backlog-review 自動起動はしない。
 - **HITL**: STEP-3 ユーザー確認（分類確定、採用済み成果物生成の明示承認・分類結果の提示・分類未確定時の自動進行禁止）、破壊的変更の別承認（`POL-destructive-change-explicit-approval`）、adversarial-review unresolved 判断事項。
 - **並列性**: 持たない（対話的 review、親エージェントが集約）。
 - **resume**: inbox item 一覧、暫定分類、ユーザー承認状態、分類確定状態。
 - **durable state**: `.agentdev/intake/promoted/*.md`、inbox 削除状態、分類結果レポート、commit hash。
-- **Harness依存**: subagent 起動（item 読込・整形案・review）、git（pull/commit/push、並列実行安全ステージング）、`agentdev-adversarial-review`、拡張読込。
+- **Harness依存**: subagent 起動（intake item 読込・整形案・review）、git（pull/commit/push、並列実行安全ステージング）、`agentdev-adversarial-review`、拡張読込。
 - **Capability依存**: `agentdev-intake-pipeline`、`agentdev-git-worktree`、`agentdev-adversarial-review`、`agentdev-project-extensions`。
-- **内部workflow候補**: review/分類workflow（STEP-1〜3 + adversarial-review）、採用item整形+保存+振り分けworkflow（STEP-4〜5）。分類ロジック（採用/保留/却下）は Capability Skill 候補（`agentdev-intake-pipeline` が所有）。
+- **内部workflow候補**: review/分類workflow（STEP-1〜3 + adversarial-review）、採用 item 整形+保存+振り分けworkflow（STEP-4〜5）。分類ロジック（採用/保留/却下）は Capability Skill 候補（`agentdev-intake-pipeline` が所有）。
 
 ### `/agentdev/learning-promote`
 

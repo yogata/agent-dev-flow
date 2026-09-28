@@ -19,7 +19,7 @@ GitHub Issue 作成は行わない。
 ## 変更種別分類
 
 intake 成果物から RU へ引き継ぐ変更種別を定義する（REQ-001-033、REQ-001）。
-intake-promote は採用 item を採用済み成果物（promoted artifact）へ整形する際、各 item に基づき次の8変更種別のいずれかを付与する。
+intake-promote は採用 item を採用済み成果物（promoted artifact）へ整形する際、各項目に基づき次の8変更種別のいずれかを付与する。
 変更種別は分類根拠フィールド `change_nature` として RU へ伝播され、req-define が REQ 拡張可否を判定する入力となる。
 learning-promote.md「変更種別分類」と整合する。
 
@@ -31,7 +31,7 @@ learning-promote.md「変更種別分類」と整合する。
 | external_contract_change（外部契約変更） | 利用者から見える外部契約の変更 | ○（REQ 作成または拡張） |
 | variation_addition（バリエーション追加） | 既存要求を満たすバリエーション追加 | ×（Design 拡張） |
 | edge_case（エッジケース） | エッジケース対応 | ×（Design 拡張） |
-| parameter_adjustment（パラメータ調整） | retry 回数、timeout、閾値、重み等の調整 | ×（パラメータDesign 拡張） |
+| parameter_adjustment（パラメータ調整） | 再試行回数、タイムアウト、閾値、重み等の調整 | ×（パラメータDesign 拡張） |
 | nonconformance_fix（不適合修正） | 既存REQ/Design への不適合修正 | ×（Design 修正） |
 | internal_restructuring（内部再構成） | 外部挙動を変えない内部再構成 | ×（Design 再構成） |
 | document_correction（文書訂正） | 文書記述の訂正 | ×（文書修正） |
@@ -49,7 +49,7 @@ intake-promote は change_nature と併せて、observed_evidence（根拠とな
 
 - **HITL は「判断の確定」に限定**（REQ-003-003）: 分類承認（採用/保留/却下の確定）のみが HITL 対象。
 - **分類承認後の自動実行**（REQ-003-004/008）: 分類が確定した場合、採用 item 整形 / promoted 保存 / 振り分け / inbox 削除 / git pull / commit-push は追加確認なしで自動実行する。分類未確定、修正中の場合は進まない。
-- **破壊的変更の明示承認維持**（REQ-003-005）: inbox の大量削除、重要 item の誤分類是正等の破壊的操作は、分類承認とは別に明示的な承認を求める。
+- **破壊的変更の明示承認維持**（REQ-003-005）: inbox の大量削除、重要な項目の誤分類是正等の破壊的操作は、分類承認とは別に明示的な承認を求める。
 
 ## 入力
 
@@ -75,7 +75,7 @@ intake-promote は change_nature と併せて、observed_evidence（根拠とな
 5 フェーズ構成。
 各フェーズの詳細手順は Workflow Skill（`agentdev-workflow-intake-promote`）が正規情報源である。
 
-- フェーズ1 inbox スキャン: inbox 確認、item 読込
+- フェーズ1 inbox スキャン: inbox 確認、intake item 読込
 - フェーズ2 内部レビュー: レビュー評価、暫定分類の生成と提示
 - フェーズ3 HITL 確定（判断の確定、REQ-003-003）: ユーザー確認（ユーザー明示的承認必須、分類結果の提示と確認修正機会提供）
 - フェーズ4 振り分け（分類承認後の自動実行、REQ-003-008）: 採用 item 整形、保存（`.agentdev/intake/promoted/`、フラット構造、frontmatter なし）、振り分け（inbox 削除含む）
@@ -102,22 +102,22 @@ intake-promote は change_nature と併せて、observed_evidence（根拠とな
 
 ### classification〜review〜HITL〜persistence の各 STEP における自律確定判定の挿入位置
 
-- classification（フェーズ1、2）: 取得可能な根拠から採用・保留・却下を一意に確定できる item は自律確定候補とする
-- review（フェーズ2）: 自律確定候補のうち対論型レビューが必要な item は review を経た後に確定する
-- HITL（フェーズ3）: ユーザー判断が必要な item のみを HITL 対象とする（REQ-037-003）
+- classification（フェーズ1、2）: 取得可能な根拠から採用・保留・却下を一意に確定できる項目は自律確定候補とする
+- review（フェーズ2）: 自律確定候補のうち対論型レビューが必要な項目は review を経た後に確定する
+- HITL（フェーズ3）: ユーザー判断が必要な項目のみを HITL 対象とする（REQ-037-003）
 - persistence（フェーズ4、5）: 確定済み分類に従い自動実行する
 
 ### 部分自律確定の実行手順
 
-同一実行内に自律確定可能 item とユーザー判断必要 item が混在する場合、未決項目に依存しない item を先行確定し、ユーザー判断必要 item のみ HITL 対象とする（REQ-003-056）。
+同一実行内に自律確定可能な項目とユーザー判断必要な項目が混在する場合、未決項目に依存しない項目を先行確定し、ユーザー判断必要な項目のみ HITL 対象とする（REQ-003-056）。
 
 ### 自律確定項目の結果・主要根拠・HITL不要理由の報告形式
 
 判定結果、主要根拠、HITL不要と判断した理由は既存の分類結果、実行報告を優先利用して報告し、新規永続成果物を必須としない。
 
-### ユーザー判断必要 item のみの HITL 提示形式
+### ユーザー判断必要項目のみの HITL 提示形式
 
-HITL 確定フェーズではユーザー判断が必要な item のみを提示し、自律確定済み item は確定内容の報告にとどめる。
+HITL 確定フェーズではユーザー判断が必要な項目のみを提示し、自律確定済み項目は確定内容の報告にとどめる。
 
 ## 対象外
 

@@ -14,7 +14,7 @@ intake-from-github（GitHub 残課題抽出）と intake-promote（review、分�
 
 ## 適用対象
 
-- intake-from-github 実行時の抽出アルゴリズム、データ取得、検出ルール、item 生成
+- intake-from-github 実行時の抽出アルゴリズム、データ取得、検出ルール、intake item 生成
 - intake-promote 実行時の inbox スキャン、レビュー評価、分類提示、整形保存
 
 ## 提供する判断、操作
@@ -35,7 +35,7 @@ intake 系 command が呼び出す操作と、主ワークフロー各工程 com
 
 ### intake 系 command 向け操作
 
-- **抽出操作**: クローズ済み Issue/PR からの本筋外課題抽出（`intake-from-github` が呼出元）。期間解釈、gh CLI によるデータ取得、構造的検出、LLM 全文解析を経て item を生成する
+- **抽出操作**: クローズ済み Issue/PR からの本筋外課題抽出（`intake-from-github` が呼出元）。期間解釈、gh CLI によるデータ取得、構造的検出、LLM 全文解析を経て intake item を生成する
 - **promote 操作**: `inbox/` item の review、分類（採用/保留/却下）、整形保存（`intake-promote` が呼出元）
 
 ### 自動 capture 向け item 生成操作
@@ -56,12 +56,12 @@ Command→Skill 依存方向（[artifact-contracts.md](../responsibilities/artif
 #### 本操作の責務（呼出元に対する提供）
 
 - 実観測ベースで intake 該当分を判定する（[capture-boundaries.md](../workflows/capture-boundaries.md) Split Rule 準拠）
-- `.agentdev/intake/inbox/*.md` へ item を生成、保存する。REQ 再構成 intake は `.agentdev/intake/inbox/req-restructure/` 配下へ配置する（REQ-037）
+- `.agentdev/intake/inbox/*.md` へ intake item を生成、保存する。REQ 再構成 intake は `.agentdev/intake/inbox/req-restructure/` 配下へ配置する（REQ-037）
 - Split Rule に基づき learning 該当分を `agentdev-learning-capture` skill へ分割指示する（混在させない）
 
 #### 呼出元 command の責務（本操作が委譲しないもの）
 
-- git 永続化（commit、push）は呼出元 command が担う。本操作は item 生成と file 書き込みまでを担い、commit 実行を委譲しない
+- git 永続化（commit、push）は呼出元 command が担う。本操作は intake item 生成とファイル書き込みまでを担い、commit 実行を委譲しない
 - 完了報告の `Capture結果` 小節に保存先パス、分類（intake）、保存結果（成功/失敗、件数、コミットハッシュ等）を含める
 
 #### `intake-capture` command との区別
@@ -119,8 +119,8 @@ intake-promote が review 候補を確定する基準は次のとおり。
 
 | 基準 | 内容 |
 |---|---|
-| 暫定分類の意味的完成度 | Step 3「レビュー、評価」と Step 4「分類の提示」を経て各 item の採用/保留/却下、変更種別、根拠が提示済みであること |
-| review 対象の存在 | 暫定分類結果のうち、意味的争点（分類の妥当性、変更種別の適合、優先度、後続ルートの適切さ）を持ち得る item が少なくとも1件存在すること |
+| 暫定分類の意味的完成度 | Step 3「レビュー、評価」と Step 4「分類の提示」を経て各項目の採用/保留/却下、変更種別、根拠が提示済みであること |
+| review 対象の存在 | 暫定分類結果のうち、意味的争点（分類の妥当性、変更種別の適合、優先度、後続ルートの適切さ）を持ち得る項目が少なくとも1件存在すること |
 | ユーザー明示指定 | ユーザーが明示的に review を指定した場合は上記基準に関わらず候補確定とする（REQ-015-002） |
 
 候補確定後、review 呼出 Step へ進む。
@@ -144,6 +144,6 @@ intake-promote 本体は本節に従い候補判断と内部手続きを実行�
 
 ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
 
-- **semantic 担当**: semantic classification（item review・分類）
+- **semantic 担当**: semantic classification（intake item review・分類）
 - **deterministic 委譲先**: なし（git 永続化は標準手段）
 - **知識提供**: 抽出ロジック・promoted 保存基準

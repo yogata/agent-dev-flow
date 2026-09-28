@@ -128,7 +128,7 @@ Command 固有の実行順序、Issue 作成、保存、更新、削除、完了
 ## 分類根拠伝播契約
 
 learning/intake → RU → req-define → case-ready / case-revise（Design 保存内部責務）の各工程間で引き継ぐ分類根拠フィールドを定義する（REQ-001-033、REQ-001）。
-本節は工程間伝播フィールドの schema と req-define から Design 保存内部責務へのシリアライズ位置を正規所有する。
+本節は工程間伝播フィールドのスキーマと req-define から Design 保存内部責務へのシリアライズ位置を正規所有する。
 Design ファイルの基本frontmatterは `title`、`status`、`created`、`updated` の4キーであり、伝播フィールドを Design ファイルへ宣言として書き込まない（AG-005、AG-008）。
 req-define は Design action の `artifact_actions` と `operation_units` へ分類根拠を出力し、Design 保存内部責務（case-ready / case-revise）はこれを読み取って配置一貫性検証の入力とする。
 
@@ -386,7 +386,7 @@ draft type registry の allowed consumers 列、REQ-008、document-model の req
 
 `realization_actions` は req-define が確定した実現面の変更方針（正規所有責務、変更すべき実現面、変更意図、検証との対応）を後続工程へ引き継ぐ構造化情報である。
 
-- **所有先**: 本節（`artifact-contracts.md`「req_draft 出力構造」節）が `realization_actions` の schema を正規所有する
+- **所有先**: 本節（`artifact-contracts.md`「req_draft 出力構造」節）が `realization_actions` のスキーマを正規所有する
 - **producer**: req-define
 - **consumer**: case-open（execution contract への投影。REQ-017）
 - **ドメイン中立性**: ADF 固有の成果物種別（skill / command / plugin 等）や適用プロジェクト固有の成果物種別（frontend / backend 等）を固定 enum として列挙しない。責務、正規所有先、変更意図、対象の手掛かり、検証との対応を自由形式で表現し、対象リポジトリの既存正規所有関係と実体から具体を判断する
@@ -410,7 +410,7 @@ case-open は `realization_actions` を Issue / Epic の execution contract へ�
 
 `review_dispositions` は req-define が壁打ち過程で記録した採否判断（covered、rejected 等）を後続工程へ引き継ぐ optional な soft-contract である（DEC-003）。
 
-- **所有先**: 本節（`artifact-contracts.md`「req_draft 出力構造」節）が `review_dispositions` の schema を正規所有する
+- **所有先**: 本節（`artifact-contracts.md`「req_draft 出力構造」節）が `review_dispositions` のスキーマを正規所有する
 - **producer**: req-define（`docs/designs/commands/req-define.md`、`src/opencode/commands/agentdev/req-define.md`、`src/opencode/commands/agentdev/templates/req-define/req-draft.md`）
 - **consumer**: case-open workflow（`src/opencode/skills/agentdev-workflow-case-open/SKILL.md`）
 - **Issue 本文永続化先**: workflow-templates（`docs/designs/skills/agentdev-workflow-templates.md`、`src/opencode/skills/agentdev-workflow-templates/SKILL.md`、Issue 本文テンプレート群）が Issue 本文の「レビュー判断」セクション構造を正規所有する
@@ -421,7 +421,7 @@ case-open は `realization_actions` を Issue / Epic の execution contract へ�
 |---|---|---|
 | `id` | string | `RD-NNN` 形式の識別子（NNN は連番） |
 | `source_ru` | string | 単一の元 RU-ID（RU 入力でない場合は省略可） |
-| `source_item` | string | 単一の元 item 識別子（RU 内の要件行 ID 等。複数指定不可） |
+| `source_item` | string | 単一の元項目識別子（RU 内の要件行 ID 等。複数指定不可） |
 | `disposition` | enum | `covered` / `partially_covered` / `rejected` / `not_applicable`。必要に応じて `superseded` / `stale_target` を追加 |
 | `reason_code` | string | 判断理由のコード（例: `already_satisfied`、`out_of_scope`、`superseded_by`） |
 | `reason` | string | 人間可読の判断理由本文 |
