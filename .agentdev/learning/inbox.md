@@ -196,3 +196,35 @@
 - **想定反映先**: repo-agentdev-integrity SKILL.md（実行契約）、agentdev-git-worktree reference worktree-operations.md の読取系 checker 実行手順
 - **関連**: Case #3191、PR #3213、.opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary_cli.ts
 - **タグ**: `#integrity` `#worktree` `#checker`
+
+## ADF-COVERS 対応宣言の役割は design 対応ゲートを通すため ADF-COVERS(design) を使用する（implementation 宣言では missing-design が解消しない）
+
+- **問題事象**: case-open（Root Case #3214、Definition PR #3215）で、新規 REQ-094 行への design 対応宣言を ADF-COVERS(implementation) で記載したところ、coverage 実測で counts {design: 0, implementation: 12} となり missing-design 12 行（missing-design 0 件ゲート不合格）を検出した。
+- **発生局面**: Definition 変更（case-open STEP-4 missing-design 0 件ゲート。Case 専用 worktree .worktrees/3214-definition）
+- **検知方法**: agentdev-traceability coverage --req REQ-094-001〜012 の counts 実測（design: 0）
+- **根本原因**: ADF-COVERS 宣言の役割（design / implementation / verification）は宣言の役割タグがそのまま coverage の役割解釈になる。Design ファイル本体に書いた宣言でも implementation タグなら implementation 役割として解釈され、design 対応（case-open missing-design ゲート・case-ready ready 遷移ゲートの対象）には数えられない
+- **自律対応内容**: 宣言を ADF-COVERS(design) へ変更し、coverage 再実測で counts {design: 12}、missing-design 0 件を確認してゲート合格
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: Design ファイル（docs/designs/**）への新規 REQ 行対応宣言は ADF-COVERS(design) を標準とする（case-ready Design 冒頭の既存宣言 ADF-COVERS(design): REQ-061-xxx 系と同型）。coverage の4役割は decision / design / implementation / verification
+- **再発条件**: Design ファイルへ ADF-COVERS(implementation) で新規 REQ 行を宣言した場合
+- **予防策候補**: coverage --req 実測を宣言作成直後に実行して design 役割として解釈されていることを確認する（case-open STEP-4 ゲートが fail-closed として機能するため重大化はしないが、手戻りを削減できる）
+- **想定反映先**: case-open workflow skill reference（definition-pr-and-idempotency.md の missing-design 0 件ゲート手順）、agentdev-traceability check-interpretation.md の役割解釈の説明
+- **関連**: Root Case #3214、PR #3215、docs/designs/responsibilities/document-type-responsibilities.md、docs/designs/authoring/vocabulary-registry.md
+- **タグ**: `#traceability` `#adf-covers` `#case-open`
+
+## REQ 新規作成時の docs/README.md 件数言及行は generate_indexes.ts の自動更新対象外（req-range-staleness が検出する）
+
+- **問題事象**: case-open（Root Case #3214、Definition PR #3215）で REQ-094 新規作成後に generate_indexes.ts を実行したが、docs/README.md 本文の「現行要件は56件である」行は AUTOGEN ブロック外のため更新されず、check_integrity の req-range-staleness が新規 unmanaged NG 1 件を検出した。
+- **発生局面**: Definition 変更（case-open STEP-4 索引再生成後の checker 実測）
+- **検知方法**: check_integrity --profile source の req-range-staleness NG（docs/README.md states 56 active REQs but actual count is 57）
+- **根本原因**: generate_indexes.ts は AUTOGEN ブロック（id=readme-req-summary-count 等）のみ更新し、本文中の手動記述（「現行要件はN件である」等の件数言及行）は対象外
+- **自律対応内容**: docs/README.md 本文行を 57 件へ修正し、check_integrity 再実測で新規 unmanaged NG 0 件を確認
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: REQ/Decision/Design の件数や一覧を本文で言及する手動記述は索引再生成の追随対象外。REQ 新規作成・廃止を含む Definition PR では generate_indexes 実行後に req-range-staleness を含む check_integrity 実測が必須
+- **再発条件**: REQ ファイルを新規作成・廃止する Definition PR で generate_indexes.ts 実行のみで check_integrity を省略した場合
+- **予防策候補**: Definition PR の期待値確定手順（REQ 行変更時の check_integrity・check_autogen_freshness 実測）を case-open STEP-4 手順2.5 後の必須実測として維持する（本件はその手順どおりの実測で検出・修正完了）
+- **想定反映先**: case-open workflow skill reference（definition-pr-and-idempotency.md 手順2.5 の checker 実測の意図説明）
+- **関連**: Root Case #3214、PR #3215、docs/README.md、src/opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts
+- **タグ**: `#integrity` `#autogen` `#req-staleness`
