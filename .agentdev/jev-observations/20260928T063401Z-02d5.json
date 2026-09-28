@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260928T063401Z-02d5",
+  "workflow": "case-ready",
+  "evaluationKind": "wave-structure-determination",
+  "subject": "Root Case #3214（REQ-094）の Wave 2 構成判断（6バッチ並列可否と重複時処置）",
+  "sourceRevision": "d7997017",
+  "durationMs": 249,
+  "inputTokens": 1515,
+  "inputs": {
+    "requestDigest": "887238ce1c202b083eb8c950910138e62f6652fcf61352b484963f1d0d36e890"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-wave2-parallel",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.97,
+        "false": 0.030000000000000027
+      }
+    },
+    {
+      "questionId": "q2-duplicate-handling",
+      "questionForm": "choice",
+      "value": "変更対象分割",
+      "probabilityDistribution": {
+        "変更対象分割": 0.73,
+        "重複許容": 0.27
+      }
+    }
+  ],
+  "confidence": 0.45,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-wave2-parallel",
+        "value": true
+      },
+      {
+        "questionId": "q2-duplicate-handling",
+        "value": "変更対象分割"
+      }
+    ]
+  }
+}

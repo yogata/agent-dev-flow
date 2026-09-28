@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260928T063332Z-f664",
+  "workflow": "case-ready",
+  "evaluationKind": "standard-epic-determination",
+  "subject": "Root Case #3214（REQ-094 adf-markdown-japanese-terminology）の Standard / Epic 確定",
+  "sourceRevision": "d7997017",
+  "durationMs": 1175,
+  "inputTokens": 1876,
+  "inputs": {
+    "requestDigest": "574b264483019a5220754fa85c0591d47f63bfe680bf99a9fdd0c2e21978b97b"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-attribution",
+      "questionForm": "choice",
+      "value": "Epic",
+      "probabilityDistribution": {
+        "Standard": 0,
+        "Epic": 1
+      }
+    },
+    {
+      "questionId": "q2-dependency-strength",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "関連": 0,
+        "弱": 0.08,
+        "必須": 0.92
+      }
+    },
+    {
+      "questionId": "q3-functional-coherence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "分散": 0,
+        "部分的": 0,
+        "一貫": 1
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-attribution",
+        "value": "Epic"
+      },
+      {
+        "questionId": "q2-dependency-strength",
+        "value": 2
+      },
+      {
+        "questionId": "q3-functional-coherence",
+        "value": 2
+      }
+    ]
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260928T063422Z-96f5",
+  "workflow": "case-ready",
+  "evaluationKind": "open-issue-scope-overlap-determination",
+  "subject": "Root Case #3214（REQ-094）の既存オープン Issue スコープ重複判定",
+  "sourceRevision": "d7997017",
+  "durationMs": 227,
+  "inputTokens": 957,
+  "inputs": {
+    "requestDigest": "7210134d1a2fe6e9113ec75c9a3265ad25a5c054ed713f354de59b98da38d93a"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-scope-overlap",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.09,
+        "false": 0.91
+      }
+    },
+    {
+      "questionId": "q2-overlap-handling",
+      "questionForm": "choice",
+      "value": "スキップ",
+      "probabilityDistribution": {
+        "スキップ": 0.79,
+        "ユーザー確認": 0.21
+      }
+    }
+  ],
+  "confidence": 0.58,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-scope-overlap",
+        "value": false
+      },
+      {
+        "questionId": "q2-overlap-handling",
+        "value": "スキップ"
+      }
+    ]
+  }
+}
