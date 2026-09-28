@@ -3,11 +3,36 @@
 //
 // 使い方:
 //   bun scripts/src/impact.ts --root <repo-root> --req REQ-{NNNN}-{MMM}
+//   bun scripts/src/impact.ts --root <repo-root> --req REQ-{NNNN}-{MMM},REQ-{NNNN}-{MMM}   # 各 reqId の照合結果を指定順で連結
 //   bun scripts/src/impact.ts --root <repo-root> --artifact src/example.md
 
-import { fail, emitJson, normalizeArtifactPath, parseArgs, resolveRoot } from "../lib/cli_utils.ts";
+import { fail, emitJson, normalizeArtifactPath, parseArgs, parseReqIds, resolveRoot } from "../lib/cli_utils.ts";
 import { locateEvidence, scanCorpus } from "../lib/corpus.ts";
-import { impactByArtifact, impactByRequirement } from "../lib/query.ts";
+import type { CoverDeclaration } from "../lib/declarations.ts";
+import {
+  EMPTY_IMPACT_NOTE,
+  impactByArtifact,
+  impactByRequirement,
+  type ImpactByRequirement,
+} from "../lib/query.ts";
+
+// 複数 reqId 指定時は各 reqId 個別の照合結果の連結（指定順）。検出ロジック自体は
+// impactByRequirement（単数照合）を再利用する。
+function impactByRequirementList(
+  declarations: readonly CoverDeclaration[],
+  reqIds: readonly string[],
+): ImpactByRequirement {
+  const results = reqIds.map((id) => impactByRequirement(declarations, id));
+  const recheckCandidates = results.flatMap((r) => r.recheckCandidates);
+  const emptyResult = recheckCandidates.length === 0;
+  return {
+    mode: "requirement",
+    reqId: reqIds.join(","),
+    recheckCandidates,
+    emptyResult,
+    ...(emptyResult ? { note: EMPTY_IMPACT_NOTE } : {}),
+  };
+}
 
 const args = parseArgs(process.argv.slice(2));
 const rootValue = args.get("root");
@@ -20,7 +45,12 @@ if (reqId && artifact) fail("--req と --artifact は同時に指定できませ
 
 if (reqId) {
   const scan = scanCorpus(root);
-  emitJson(impactByRequirement(scan.declarations, reqId));
+  const reqIds = parseReqIds(reqId);
+  emitJson(
+    reqIds.length > 0
+      ? impactByRequirementList(scan.declarations, reqIds)
+      : impactByRequirement(scan.declarations, reqId),
+  );
 } else {
   const normalized = normalizeArtifactPath(artifact!);
   const evidence = locateEvidence(root, normalized);
