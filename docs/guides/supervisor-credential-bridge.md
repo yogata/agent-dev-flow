@@ -52,9 +52,9 @@ test -x "$OPENCODE_BODY" && echo exists
 
 ## 検証手順
 
-検証は Supervisor の spawn コンテキストで行うことを明示する。Supervisor（Hermes 等）が opencode を spawn するのと同一の環境（PATH、shell、環境変数の継承）で検証する。手動で開いたデスクトップ shell は PATH が異なる場合があり、検証の代わりにならない。
+検証は Supervisor の spawn コンテキストで行うことを明示する。Supervisor（Hermes 等）が opencode を spawn するのと同一の環境（PATH、シェル、環境変数の継承）で検証する。手動で開いたデスクトップのシェルは PATH が異なる場合があり、検証の代わりにならない。
 
-1. opencode コマンドの解決先確認（spawn コンテキストの shell 内で実行する）:
+1. opencode コマンドの解決先確認（spawn コンテキストのシェル内で実行する）:
 
    ```bash
    command -v opencode
@@ -96,7 +96,7 @@ test -x "$OPENCODE_BODY" && echo exists
 
 - opencode 本体の更新（グローバル導入先のパスや実体が変わることがある）
 - PATH の変更（`~/bin` の優先が崩れ、shim が解決されなくなることがある）
-- shell 設定（`~/.bashrc` 等）や Supervisor 側 spawn 設定の変更
+- シェル設定（`~/.bashrc` 等）や Supervisor 側 spawn 設定の変更
 
 ## 旧 AI_GATEWAY_API_KEY の扱い（確認手順と条件発火記録）
 

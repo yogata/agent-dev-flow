@@ -1,4 +1,4 @@
-<!-- ADF-COVERS(implementation): REQ-008-010, REQ-008-011 -->
+<!-- ADF-COVERS(implementation): REQ-008-010, REQ-008-011, REQ-094-001, REQ-094-002, REQ-094-004, REQ-094-005, REQ-094-007, REQ-094-010 -->
 # 成果物、状態モデル
 
 AgentDevFlow を構成する成果物の種別、配置、ライフサイクルを説明する。
@@ -21,7 +21,7 @@ AgentDevFlow を構成する成果物の種別、配置、ライフサイクル�
 
 | 成果物 | 格納先 | 役割 |
 |--------|--------|------|
-| Command | `src/opencode/commands/agentdev/`（実行時: `.opencode/commands/agentdev/`） | 実行手順の一次参照（Step 番号、入出力契約） |
+| Command | `src/opencode/commands/agentdev/`（実行時: `.opencode/commands/agentdev/`） | 実行手順の一次参照（ステップ番号、入出力契約） |
 | Skill | `src/opencode/skills/agentdev-*`（実行時: `.opencode/skills/agentdev-*`） | 判定基準、共通知識、宣言的ルールの一次参照 |
 | Template | Skill 配下 `templates/` | Issue/PR 本文の出力構造とプレースホルダー |
 | Script | Skill 配下 `scripts/` | ガードレール、検査、補助処理の実行可能ロジック |
@@ -29,7 +29,7 @@ AgentDevFlow を構成する成果物の種別、配置、ライフサイクル�
 | リポジトリ専用 Skill | `.opencode/skills/repo-*/`（原本なし、配置先のみ） | AgentDevFlow 本体リポジトリ専用スキル（DEC-001）。配布対象外 |
 
 Command は判定ロジックを Skill の参照先に委ねる。
-Command の Step 番号やファイルパスは Command 側で管理する。
+Command のステップ番号やファイルパスは Command 側で管理する。
 Script は決定的で単体テスト可能な処理に限定する。
 
 ### テンプレート配置
@@ -136,7 +136,7 @@ RU 削除は case-ready（内部 lifecycle 段階）の Definition 確定 + VERI
 | `created` | Issue 作成済み、作業前 | 構造的実行 |
 | `in_progress` | 実装中 | 構造的実行 |
 | `review` | PR 作成済み、レビュー中 | レビュー完了 |
-| `done` | 完了（post-run capture 含む） | レビュー完了 |
+| `done` | 完了（実行後の Capture 含む） | レビュー完了 |
 
 6 マイクロフェーズは説明用ラベルであり、状態管理モデルではない。
 AgentDevFlow は全体横断の状態遷移モデルを持たない。

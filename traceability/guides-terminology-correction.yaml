@@ -1,0 +1,23 @@
+component: guides-terminology-correction
+implementation:
+  docs/guides/diagnostics-and-maintenance.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-007
+    - REQ-094-010
+  docs/guides/glossary.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-007
+    - REQ-094-010
+  docs/guides/req-case-flow.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-007
+    - REQ-094-010
