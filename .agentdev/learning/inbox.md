@@ -148,3 +148,19 @@
 - **想定反映先**: repo-agentdev-integrity SKILL.md（実行契約のパス記載）、case-ready / case-open reference の checker 実行手順
 - **関連**: Case #3192、Definition PR #3195、.opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts
 - **タグ**: `#integrity` `#path` `#worktree`
+
+## .agentdev/learning/deferred.md の反映先候補 11 行が不在スキル agentdev-doc-writing を指したまま残留（反映先消滅・現行化または廃棄判定の要否）
+
+- **問題事象**: Case #3200（OU-002・語彙レジストリ不在 skill 行削除）の完了後、`.agentdev/learning/deferred.md` に不在スキル `agentdev-doc-writing` を反映先候補とする保留エントリ 11 行が残存している。反映先候補スキル自体が語彙レジストリから削除済みのため、これらのエントリの反映先が消滅している。
+- **発生局面**: case-close（PR #3208 本文の Findings / Capture 候補回収。Epic #3197）
+- **検知方法**: case-run DEL-3200-2 の TS-006 再検証（repo 全域 `agentdev-doc-writing` grep）で、`learning/deferred.md` 反映先候補 11 行が履歴記録として除外明示されたことの確認
+- **根本原因**: 過去の learning-promote が反映先候補として当時実在した agentdev-doc-writing を記録したが、その後の skill 廃止で反映先が消滅した。learning pipeline には反映先の実在性を再確認する機構がないため、消滅後のエントリが living pool に残留する
+- **自律対応内容**: PR #3208 本文の Capture 候補として learning inbox へ回収（本エントリ）。deferred.md の直接修正は learning-promote の責務のため行わない
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: learning-promote は deferred エントリの再評価時に反映先候補の実在性を確認し、消滅している場合は反映先の現行化または廃棄判定を行う。履歴記録としての除外明示（TS-006）と living pool の現行性は別問題として扱う
+- **再発条件**: skill 廃止時にその skill を反映先候補とする deferred エントリの棚卸しが行われない場合
+- **予防策候補**: skill 廃止系の Case で learning/deferred.md の該当反映先エントリ有無を capture 段階で確認する
+- **想定反映先**: learning-promote（deferred エントリの反映先実在性確認・現行化または廃棄判定）、learning pipeline 拡張候補
+- **関連**: Issue #3200、PR #3208、Epic #3197、.agentdev/learning/deferred.md
+- **タグ**: `#learning` `#deferred` `#stale-target`
