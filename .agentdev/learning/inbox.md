@@ -164,3 +164,35 @@
 - **想定反映先**: learning-promote（deferred エントリの反映先実在性確認・現行化または廃棄判定）、learning pipeline 拡張候補
 - **関連**: Issue #3200、PR #3208、Epic #3197、.agentdev/learning/deferred.md
 - **タグ**: `#learning` `#deferred` `#stale-target`
+
+## Windows 環境の bun は MSYS 形式パス（/c/...）を解決せず Module not found となる（スクリプト指定は Windows 形式パス C:/... を使用）
+
+- **問題事象**: case-run（DEL-3191-1・Case #3191）の verify スクリプト実行で、bun へ MSYS 形式パス（/c/... 形式）でスクリプトを指定したところ Module not found で失敗した。
+- **発生局面**: 実装検証（case-run 実行担当サブエージェント委譲の traceability scripts 実測。Case 専用 worktree）
+- **検知方法**: bun 応答の Module not found エラー
+- **根本原因**: Windows 環境の bun は MSYS 形式パスを解決しない。シェルが bash（MSYS）でも bun 自体のパス解決は Windows 形式を要求するため、シェルのパス形式と実行バイナリの受理形式は独立している
+- **自律対応内容**: スクリプト指定を Windows 形式パス（C:/...・forward slash）へ変更して再実行し、検証を完了
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: Windows + bash 環境で bun にパスを渡す全検証手順（checker 実行・bun test 等）で共通。bash の用語感覚で /c/... を渡さない
+- **再発条件**: Windows 環境で bun へ MSYS 形式パス（/c/...）を渡した場合
+- **予防策候補**: bun 実行手順のパス指定を Windows 形式（C:/...・forward slash）に統一する
+- **想定反映先**: case-run / case-close の検証実行 reference（bun 実行形態契約）、worktree-operations.md の checker 実行手順
+- **関連**: Case #3191、PR #3213、src/opencode/skills/agentdev-traceability/scripts/
+- **タグ**: `#bun` `#windows` `#path`
+
+## worktree 内の repo-agentdev-integrity は data/ 一部欠落のため checker は host repo root を cwd にして --root で対象 worktree を指定して起動する
+
+- **問題事象**: case-run（DEL-3191-1・Case #3191）で worktree 内の check_distribution_boundary_cli を worktree cwd で起動しようとしたところ、`data/distribution-targets.yaml` 等の一部ファイルが worktree 側に存在せず起動できなかった。
+- **発生局面**: 実装検証（case-run の配布依存境界 checker 実行。Case 専用 worktree .worktrees/3191-case）
+- **検知方法**: checker 起動時のファイル不在エラーと worktree 内 data/ の実在確認
+- **根本原因**: worktree の .opencode/skills/repo-agentdev-integrity/ には checker が要求する一部リソース（data/ 配下）が欠落しており、cwd を worktree とした起動では必要リソースが解決されない
+- **自律対応内容**: host repo root を cwd にして --root で worktree を指定する形で checker を起動し検証を完了（環境指示「配布物検証は host repo root から --root 指定」の具体例の補強）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree 内 checker 実行手順は「host repo root を cwd、対象を --root で指定」を標準形とする。integrity checker 系の実体パスは .opencode/skills/repo-agentdev-integrity/scripts/（本 inbox 既存エントリ参照）と併せて適用する
+- **再発条件**: worktree cwd で repo-agentdev-integrity の checker を起動した場合
+- **予防策候補**: checker 実行手順に「host repo root を cwd、対象を --root で指定」の起動形を明記する
+- **想定反映先**: repo-agentdev-integrity SKILL.md（実行契約）、agentdev-git-worktree reference worktree-operations.md の読取系 checker 実行手順
+- **関連**: Case #3191、PR #3213、.opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary_cli.ts
+- **タグ**: `#integrity` `#worktree` `#checker`
