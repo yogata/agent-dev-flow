@@ -281,7 +281,7 @@ Phase 0 では、checker ソース内にリテラル IR-NNN ID が現れるも�
 **Phase 1 での確認が必要な IR（リテラル参照なし、意味ベース対応の確認）**: IR-001..043（IR-011除く）、IR-045(catalog-only)、IR-047、IR-050..052、IR-060。
 これらは check 関数としては存在する可能性が高いが、Phase 0 時点では IR ID による追跡ができない。
 
-## 4. regression test coverage
+## 4. 回帰テスト網羅（regression test coverage）
 
 IR body の regression_test フィールド集計（59 件）:
 
