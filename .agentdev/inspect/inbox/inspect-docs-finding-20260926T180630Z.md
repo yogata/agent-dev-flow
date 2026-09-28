@@ -14,6 +14,7 @@
 - promote 済み: RQ-01,02,03,05,06,07,10,11,12 / DS-01,02,04 / DC-01,03,05 / GD-01 / DB-01 → promoted/ へ保存・本ファイルから削除
 - reject: DB-02（20260925 F-24 と完全重複・新情報ゼロ。F-24 が追跡継続）
 - defer 継続: 下記 14 件（次サイクル再評価）
+- 2026-09-29 実施（backlog-auto stage 2 inspect 系統、--auto なし）記載修正・再評価: RQ-08 は対象行が REQ-034 行再編で移動したため target を REQ-034-007 へ更新（defer 継続・自律確定）。RQ-13 の対象に行再編由来の欠番（REQ-034 008/009）と REQ-090 008 を追記。RQ-17 は REQ-090 Stage 1 完了宣言が git log・REQ-090 本文とも確認できないため defer 継続（ユーザー確認済み）。その他 12 件は再評価条件未充足のため defer 継続（自律確定）
 
 ## 検出事項リスト（defer 残置分）
 
@@ -29,9 +30,9 @@
 - **ng_classification**: pre-existing
 - **notes**: 要ヒューマンレビュー。REQ-014-011（所有者マトリックス行）が部分的に代替する可能性があり、「既存契約」の解釈次第で重大度変動
 
-#### RQ-08: REQ-034-008/009 の「Command Design を正とする」条項が正典優先順位と緊張
+#### RQ-08: REQ-034-007 の「Command Design を正とする」条項が正典優先順位と緊張（対象行は行再編で移動）
 - **category**: DRIFT（横断契約矛盾候補）
-- **target**: docs/requirements/REQ-034.md:26-27（REQ-034-008/009）
+- **target**: docs/requirements/REQ-034.md:25（REQ-034-007。旧 REQ-034-008/009 は行再編で消滅し規範は REQ-034-007 に吸収 — 2026-09-29 記載修正）
 - **evidence**: 「両者不一致時は Command Design を正とする」。REQ-001-020 と REQ-036-030 は「現行 REQ > 承認済み Decision > Design > guides」優先順位を正典化。起源は docs/designs/foundations/system.md:106（Workflow Architecture Inventory）
 - **severity**: medium / **confidence**: medium
 - **source_of_truth**: REQ-001-020、REQ-036-030
@@ -51,7 +52,7 @@
 
 #### RQ-13: 説明なき行欠番の集約（構造観察）
 - **category**: 構造観察（INFO）
-- **target**: REQ-001（029,036,037,045）、REQ-003（025,027）、REQ-006（110）、REQ-011（004）、REQ-046（004,005）
+- **target**: REQ-001（029,036,037,045）、REQ-003（025,027）、REQ-006（110）、REQ-011（004）、REQ-046（004,005）、REQ-034（008,009）、REQ-090（008）（2026-09-29 追記: REQ-034 008/009 は行再編による新規欠番、REQ-090 008 は 20260928 診断観測分）
 - **evidence**: 大口欠番（REQ-002 021-029/032、REQ-003 030-054、REQ-010 013-061）は Design/DEC 側で説明済みだが、上記の単発欠番は根拠が git 履歴のみ。行単位の廃止台帳がコーパスに存在せず、baseline ファントム引用の温床構造
 - **severity**: low / **confidence**: medium
 - **source_of_truth**: REQ-001-013（文書級の規定のみ。行級の対応物なし）

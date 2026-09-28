@@ -24,19 +24,6 @@
 
 ## 検出事項リスト（defer 残置分）
 
-### F-04: REQ-082.md:14 の移行経緯記述と phantom 範囲参照
-
-- id: F-04
-- category: MOVE／REQ参照ID整合性
-- target: docs/requirements/REQ-082.md:14
-- evidence: 「本 REQ は REQ-003 の審議契約群（REQ-003-030〜054）を 2026-09-15 のユーザー裁定により分離移動した…」。REQ-003 は現在 29 行で 030〜054 は全て不存在（機械確認済み）。REQ-001-014（現行本文は移行経緯を含まない）と緊張。シグナル 2（phantom 範囲参照 + 移行経緯残留）
-- severity: medium
-- confidence: medium
-- source_of_truth: 現行 REQ-003 の実行構成（29 行）を正として判定
-- recommended_route: req-define 再壁打ち候補（行番号 specifics の縮約）
-- ng_classification: pre-existing
-- notes: REQ-087-001 は例外採番 REQ（REQ-082）に「REQ 本文の該当行にユーザー裁定の記録」を義務付けるため、裁定記録自体の削除は不可。記録を残しつつ参照形式を現行体系へ整合させる方向
-
 ### F-05: REQ-008-059 が要件テーブル外の見出し行形式で HOW 詳細を含む【前回 finding F-12 と同一・継続】
 
 - id: F-05
@@ -101,19 +88,6 @@
 - recommended_route: intake（重複 ID の統合または分割意図の明示）
 - ng_classification: 今回修正対象（#3140 由来の直近変更）
 - notes: 複数行 ADF-COVERS 宣言が意図的な分割用途（工程群別）の可能性あり。REQ-036-028〜033 の implementation 宣言は診断並列化の実際の動作変更を伴うため正当な可能性
-
-### F-14: req-health-metrics AUTOGEN 計測日の鮮度逸脱（date rollover drift）
-
-- id: F-14
-- category: DRIFT（AUTOGEN 鮮度）
-- target: docs/designs/quality/req-health-metrics.md:150
-- evidence: 「計測日: 2026-09-24。」（AUTOGEN ブロック内、END 151 行目）— 当該ブロックを最終変更したコミット 39aa07f3 の committer date は 2026-09-25T13:29:34+09:00。check_integrity IR-061 NG と check_autogen_freshness CONTENT_CHANGE が同一不整合を検出
-- severity: medium
-- confidence: high（事実確認済み）
-- source_of_truth: index-auto-generation Design「AUTOGEN 計測日は generate_indexes の最終 commit の committer date から導出」
-- recommended_route: intake（generate_indexes 再生成による解消）
-- ng_classification: pre-existing（日次で発生し得る既知 drift 機構。autogen-freshness-gate Design 既知）
-- notes: 診断実行日との比較で日次検出され得る。既存 baseline-known 分類を維持
 
 ### F-15: REQ-036 の STEP-2 並列化受け入れ条件群（029-033）の関心混在
 
@@ -265,3 +239,4 @@
 - F-05 / F-07 はユーザー指示により defer 継続。その他の FID（F-04 / F-06 / F-08〜F-10 / F-13〜F-17 / F-19 / F-21〜F-25）はユーザー承認範囲外のため承認を新設せず defer（inbox 残置）
 - reject 0件
 - 旧 defer 残置分（20260901 / 20260914 の 2ファイル、計5件）は本 run では一切変更していない（原状維持）
+- 2026-09-29 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: F-04 は 20260928 RQ-26（REQ-082 phantom 範囲参照）へ併合 promote（対象同一・自律確定。RQ-26 と共に promoted/inspect-docs-promoted-20260928T145126Z.md へ保存、本ファイルから削除）。F-14 は解消確認のため reject・即時削除（自律確定）: req-health-metrics.md の計測日は 2026-09-28 へ再生成済み（現物実読）、20260928T145126Z 診断の check_autogen_freshness 0違反で解消を機械確認。日次 date rollover drift は autogen-freshness-gate Design の既知機構として管理下にあり独立 route を新設しない（却下理由は commit message に記録）。F-05/F-06/F-08〜F-10/F-15〜F-17/F-19/F-21〜F-25 は再評価条件未充足のため defer 継続（自律確定）
