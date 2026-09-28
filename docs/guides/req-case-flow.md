@@ -92,7 +92,7 @@ PR をマージし、Issue をクローズする内部 lifecycle 段階（case-a
 
 **入力**: PR + Issue
 
-**出力**: マージ済み + 記録追記済み + ブランチ削除
+**出力**: マージ済み + 記録追記済み + ローカルブランチ・worktree クリーンアップ（remote branch は deleteBranchOnMerge へ委譲）
 
 ### 完了前検証
 
