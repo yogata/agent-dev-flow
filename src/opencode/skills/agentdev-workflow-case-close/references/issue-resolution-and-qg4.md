@@ -77,7 +77,7 @@ Issue 本文の完了条件チェックボックスを最終評価・更新し�
 
 - **完了条件チェックボックス評価・更新は case-close の責務**（QG-4）。case-run、実行担当サブエージェント、外部実行バックエンドは完了条件チェックボックスを更新しない。case-close は case-run/ 実行担当サブエージェントとは**別コンテキスト**で、PR 作成後に独立して完了条件を再読込して最終完了判定する
 - **トレーサビリティ check の実行前提**: 下記の段階ゲートで check を実行する際は、`agentdev-traceability` SKILL.md「実行方法」節の実行前提に従う（`--req` は要件行IDの個別カンマ指定のみ受理し `..` 形式の範囲構文は非対応、`--root` は検証対象リポジトリのルート明示、宣言の走査対象は拡張子・除外ディレクトリの前提どおり）。前提を満たさない実行の結果は QG-4 の判定根拠に使わない
-- **QG-4 checker 実測手順（merge 直前 HEAD・evidence 化・baseline 登録漏れ検査。REQ-032-030）**: QG-4 の checker 実測（full integrity suite、個別 checker、IR 検査）は次の3要素を満たして実施する:
+- **QG-4 checker 実測手順（merge 直前 HEAD・evidence 化・baseline 登録漏れ検査）**: QG-4 の checker 実測（full integrity suite、個別 checker、IR 検査）は次の3要素を満たして実施する:
   1. **merge 直前 HEAD 実施**: checker 実測は、merge 直前の origin/main 取り込み済み branch HEAD で実施する（古い branch HEAD・分岐時点の baseline での実測結果を QG-4 判定根拠に使わない）
   2. **evidence 化**: 検出した新規 NG の出所が自 Case 変更であることを evidence として記録する（fail 由来分類: 既知欠陥・環境依存・当該変更起因の3分類。実行 HEAD・checker 種別・検出箇所を PR 本文等の検証記録へ残す）
   3. **baseline 登録漏れ検査**: provenance-tracked baseline（NG baseline）への登録漏れを検査する。自 Case 変更で解消済みの既存 NG が baseline に残存していないか、新規 NG が未登録のまま通過扱いになっていないかを確認する

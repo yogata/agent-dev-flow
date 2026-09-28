@@ -255,7 +255,7 @@ worktree 操作（実装、検証、証跡退避を含む）におけるファ�
 guard が書込みをブロックした場合、ブロックの解除・迂回（エンコーディング指定の変更、リダイレクト回避ハック等）で進めず、上記の標準手段へ切替する。
 ブロックを検知した edit の oldString がファイル実内容と不一致の場合は、ファイルを再読取して正確な内容で再試行する（本規定は guard の fail-closed 挙動自体を維持対象とする）。
 
-### 同一ファイルへの複数 edit の規律（REQ-053-042）
+### 同一ファイルへの複数 edit の規律
 
 同一ファイルへの複数の edit を適用する場合、次の規律に従う。
 
@@ -271,7 +271,7 @@ guard が書込みをブロックした場合、ブロックの解除・迂回�
 
 ### 退避ファイルの統一配置（.agentdev/tmp/）
 
-worktree 内で checker・検証コマンドを実行する際の退避ファイル（checker stdout / stderr の分離退避、検査入力 JSON 等の一時ファイル）は、**`.agentdev/tmp/`（worktree root 相対）へ作成する**（REQ-018-008）。配置の正本は「workspace 外書込みのブロック事例と切替（fail-closed 維持）」節の置き場所指針と本節である。
+worktree 内で checker・検証コマンドを実行する際の退避ファイル（checker stdout / stderr の分離退避、検査入力 JSON 等の一時ファイル）は、**`.agentdev/tmp/`（worktree root 相対）へ作成する**。配置の正本は「workspace 外書込みのブロック事例と切替（fail-closed 維持）」節の置き場所指針と本節である。
 
 - **配置先**: `.agentdev/tmp/`（worktree root 相対）。OS の一時ディレクトリ等 workspace 外へ出力しない
 - **後始末**: 検証完了後、退避ファイルは worktree remove 前に削除する。削除手順は case-close references `cleanup-and-capture.md` STEP-6-1 の「remove 前退避ファイル掃除」を参照する
@@ -365,7 +365,7 @@ worktree 内の未追跡ファイル（実行時作業領域配下の一時フ�
 未追跡ファイルのみを削除対象とする。
 未追跡ファイルが存在しない場合はエラーにせず続行。
 
-### 1.5 remove 前退避ファイル掃除（REQ-018-008）
+### 1.5 remove 前退避ファイル掃除
 
 `git worktree remove` の実行前に、worktree 内の退避ファイル（`.agentdev/tmp/`〔worktree root 相対〕配下の checker stdout / stderr 分離退避、検査入力 JSON 等の一時ファイル）を列挙し、削除する。
 
