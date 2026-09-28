@@ -1,6 +1,6 @@
 # 適用プロジェクトへの導入モデル
 
-<!-- ADF-COVERS(implementation): REQ-050-014, REQ-009-051, REQ-009-052, REQ-093-002, REQ-094-001, REQ-094-002, REQ-094-004, REQ-094-005, REQ-094-007, REQ-094-010 -->
+<!-- ADF-COVERS(implementation): REQ-050-014, REQ-009-051, REQ-009-052, REQ-093-002, REQ-094-001, REQ-094-002, REQ-094-004, REQ-094-005, REQ-094-010 -->
 
 AgentDevFlow を適用プロジェクトに導入する際のモデルを定義する（REQ-009）。
 

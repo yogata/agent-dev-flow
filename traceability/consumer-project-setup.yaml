@@ -9,7 +9,6 @@ implementation:
     - REQ-094-002
     - REQ-094-004
     - REQ-094-005
-    - REQ-094-007
     - REQ-094-010
 verification:
   docs/guides/consumer-project-setup.md:

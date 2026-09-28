@@ -1,4 +1,4 @@
-<!-- ADF-COVERS(implementation): REQ-008-010, REQ-008-011, REQ-094-001, REQ-094-002, REQ-094-004, REQ-094-005, REQ-094-007, REQ-094-010 -->
+<!-- ADF-COVERS(implementation): REQ-008-010, REQ-008-011, REQ-094-001, REQ-094-002, REQ-094-004, REQ-094-005, REQ-094-010 -->
 # 成果物、状態モデル
 
 AgentDevFlow を構成する成果物の種別、配置、ライフサイクルを説明する。
