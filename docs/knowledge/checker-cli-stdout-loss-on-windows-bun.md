@@ -18,9 +18,9 @@ stdout ロスと区別すべき隣接現象として、stdout 自体は取得で
 
 Bun.YAML に依存する checker は `node --experimental-strip-types` によるモジュール import 経路（標準経路）を利用できず、bun 直実行となるため process.exit による stdout flush 前終了でレポートが失われる。この場合は stdout を一時ファイルへ書き出した上で flush を保証してから出力し、実行後に一時ファイルを削除する `Bun.write(Bun.stdout)` による flush 保証ラッパー手順を例外経路として用いる（PR #2812 / Issue #2806）。
 
-bun CLI 経由の checker `--json` 出力が Windows で末尾破損（途中破損）し、JSON パース不能となる variant がある。この場合は human readable 出力へ切り替え、可能な場合は node 単独実行で再取得する（PR #2817 / Issue #2809）。
+bun CLI 経由の checker `--json` 出力が Windows で末尾破損（途中破損）し、JSON パース不能となる variant がある。この場合は人間可読出力へ切り替え、可能な場合は node 単独実行で再取得する（PR #2817 / Issue #2809）。
 
-これら例外経路の checker 実行契約 Design「安定実行経路」への補完は、req-define の変更影響分析による確定候補として本知識に記録する（知識文書更新と bundling しない）。
+これら例外経路の checker 実行契約 Design「安定実行経路」への補完は、req-define の変更影響分析による確定候補として本知識に記録する（知識文書更新と同一変更にまとめない）。
 
 ## 適用条件
 
@@ -45,7 +45,7 @@ bun CLI 経由の checker `--json` 出力が Windows で末尾破損（途中破
 - 対象 CLI（check_distribution_boundary_cli.ts）の `process.exit` 使用の実ファイル確認。
 - PR #2582（Issue #2561）: checker stdout が PowerShell パイプ経由で cp932 再解釈され JSON パースが失敗。`spawnSync` の `encoding: "utf8"` が回避策として有効なことを確認。
 - PR #2812（Issue #2806、case 2805 Wave 1 / case 2812、DEL-2806-1）: Bun.YAML 依存のため node import 経路が使えず、Bun.write(Bun.stdout) による flush 保証ラッパー（一時ファイル、実行後に削除）で対処した観測。同手順は当時の既存知識文書に明記されていなかった。
-- PR #2817（Issue #2809、case 2805 OU-004、DEL-2809-1）: bun CLI 経由の checker --json 出力が Windows で途中破損。human readable 出力 + node 単独実行へ切り替えて回避した観測（checker 実行契約の「stdout flush 前 exit」回避策の実例）。
+- PR #2817（Issue #2809、case 2805 OU-004、DEL-2809-1）: bun CLI 経由の checker --json 出力が Windows で途中破損。人間可読出力 + node 単独実行へ切り替えて回避した観測（checker 実行契約の「stdout flush 前 exit」回避策の実例）。
 - Case #3146（PR #3152）: `--json` stdout を機械解析した際、レポート書込みメッセージが JSON と連結して JSON.parse が失敗。事実修正根拠: check_integrity.ts L11352 の `console.error` 実読、git log -S "Report written to" が e32b9352（#611、2026-06-06）のみを示すことから、checker 側 stdout 連結説は現行実装と不整合であり、混入は呼出側の統合キャプチャ（推定）と整理した。
 
 ## 関連知識

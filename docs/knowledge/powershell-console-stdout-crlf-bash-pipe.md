@@ -17,12 +17,12 @@ PowerShell の `[Console]::WriteLine` は行末に CRLF を出力する。LF 前
 ## 適用条件
 
 - Windows 環境（win32）で PowerShell を使用し、その標準出力を bash 側へパイプ・連携する場合。
-- bash 側の受信処理が行指向（LF 前提のデコード、base64 -d、行単位の parse 等）である場合。
+- bash 側の受信処理が行指向（LF 前提のデコード、base64 -d、行単位のパース等）である場合。
 
 ## 適用対象
 
 - PowerShell から生成した文字列（base64 エンコード結果、環境変数列挙、JSON 行等）を bash の行指向ツールへ渡す全処理。
-- supervisor 環境向け credential 供給ブリッジ等の PowerShell・bash 混在連携（[supervisor-bridge-credential-supply.md](supervisor-bridge-credential-supply.md) の base64 ASCII stdout 回避の実例。本書は WriteLine CRLF の一般化記載を補う）。
+- Supervisor 環境向け credential 供給ブリッジ等の PowerShell・bash 混在連携（[supervisor-bridge-credential-supply.md](supervisor-bridge-credential-supply.md) の base64 ASCII stdout 回避の実例。本書は WriteLine CRLF の一般化記載を補う）。
 
 ## 根拠
 

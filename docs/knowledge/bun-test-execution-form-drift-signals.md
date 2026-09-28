@@ -18,7 +18,7 @@ bun test をスクリプト配置ディレクトリ等のリポジトリルー�
 
 正規の実行形態は「repo root 起 cwd + `./` 付き相対パス指定」に統一されており、契約は checker 実行契約 Design「bun test 実行形態契約（単独実行・ファイル単体指定を含む）」節が所有する。フル suite の 3 cwd 分割正規形（QG-4）は agentdev-quality-gates が正規所有する。
 
-bun test に限らず、bun による checker スクリプト単独実行にも同じ `./` prefix 適用が効く。`./` なし指定（`bun .opencode/...` 等）は checker 単独実行では Module not found となるため、checker 実行も `bun ./<相対パス>` 形式へ統一する。worktree 環境では `.opencode/skills/` 配下ジャンクションの未伝播による junction projection 挙動が加わる: checker 本体は projection 側解決で動作するため host（メインリポジトリ root）実体起点で起動し、bun test は worktree の実ファイルを読む。テストが読むツリーは probe test による事前確認で判別し、起動パスと読むツリーの対応を環境ラベルへ記録する。templates 系 checker の worktree 単独実行は skip され失敗 0 件の見かけ上の合格となるため、対応する test 実行で補完する（skip を合格扱いにしない）。
+bun test に限らず、bun による checker スクリプト単独実行にも同じ `./` プレフィックス適用が効く。`./` なし指定（`bun .opencode/...` 等）は checker 単独実行では Module not found となるため、checker 実行も `bun ./<相対パス>` 形式へ統一する。worktree 環境では `.opencode/skills/` 配下ジャンクションの未伝播による junction projection 挙動が加わる: checker 本体は projection 側解決で動作するため host（メインリポジトリ root）実体起点で起動し、bun test は worktree の実ファイルを読む。テストが読むツリーは probe test による事前確認で判別し、起動パスと読むツリーの対応を環境ラベルへ記録する。templates 系 checker の worktree 単独実行は skip され失敗 0 件の見かけ上の合格となるため、対応する test 実行で補完する（skip を合格扱いにしない）。
 
 ## 適用条件
 
@@ -26,7 +26,7 @@ bun test に限らず、bun による checker スクリプト単独実行にも�
 - bun test の fail が REPO_ROOT 解決系テストに集中し、環境依存 fail に見える場合。
 - bun test の実行結果が 0 件（no test files matched）となった場合。
 - worktree 環境で bun test の依存解決失敗（Cannot find package 等）が発生した場合。
-- bun による checker スクリプト単独実行を worktree または Windows 環境で行う場合（`./` prefix 適用と junction projection 挙動の確認）。
+- bun による checker スクリプト単独実行を worktree または Windows 環境で行う場合（`./` プレフィックス適用と junction projection 挙動の確認）。
 
 ## 適用対象
 

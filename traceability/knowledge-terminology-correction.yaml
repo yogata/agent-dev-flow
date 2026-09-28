@@ -1,0 +1,80 @@
+component: knowledge-terminology-correction
+implementation:
+  docs/knowledge/baseline-substitution-vocabulary-crosscheck.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-010
+  docs/knowledge/bun-offline-bundle-placement-independent-build.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-003
+    - REQ-094-004
+    - REQ-094-010
+  docs/knowledge/bun-test-execution-form-drift-signals.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-010
+  docs/knowledge/bun-test-junit-reporter-evidence.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-010
+  docs/knowledge/checker-cli-stdout-loss-on-windows-bun.md:
+    - REQ-094-001
+    - REQ-094-003
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-010
+  docs/knowledge/checker-fixture-import-share-adversarial-test-pattern.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-010
+  docs/knowledge/distribution-boundary-diff-normalized-matching.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-010
+  docs/knowledge/distribution-concrete-id-placement.md:
+    - REQ-094-001
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-010
+  docs/knowledge/expanded-readme-sync-command-index-constraint.md:
+    - REQ-094-001
+    - REQ-094-005
+    - REQ-094-010
+  docs/knowledge/external-dependency-major-version-compatibility.md:
+    - REQ-094-010
+  docs/knowledge/grep-zero-criteria-legacy-term-quotation.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-003
+    - REQ-094-004
+    - REQ-094-010
+  docs/knowledge/llm-body-verification-filesystem-truth.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-010
+  docs/knowledge/powershell-console-stdout-crlf-bash-pipe.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-003
+    - REQ-094-010
+  docs/knowledge/sdk-replacement-request-schema-contract-enumeration.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-010
+  docs/knowledge/windows-bun-test-spawn-timeout-classification.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-010
+  docs/knowledge/windows-git-bash-inline-content-corruption.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-010
+  docs/knowledge/windows-powershell-bulk-io-corruption.md:
+    - REQ-094-010

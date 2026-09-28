@@ -4,7 +4,7 @@ created: 2026-09-27
 updated: 2026-09-27
 ---
 
-# LLM 送信本文の識別子破損疑いは read-back 目視で断定せず filesystem 実在性と ID digit 突合で検証する
+# LLM 送信本文の識別子破損疑いは read-back 目視で断定せずファイルシステム実在性と ID 数字突合で検証する
 
 ## 知識内容
 
@@ -12,8 +12,8 @@ issue_create / issue_update / pr_create 等で長文 body を送信した後の 
 
 破損疑い時の標準手順は機械検証に置き換える:
 
-1. 本文から抽出したトークン（識別子・パス）の filesystem 実在性を fs.existsSync で照合する
-2. REQ/DEC/ACT 等の ID digit（数値）を本文と正規参照先で突合する（数値は文字列破損に対して耐性が高い）
+1. 本文から抽出したトークン（識別子・パス）のファイルシステム実在性を fs.existsSync で照合する
+2. REQ/DEC/ACT 等の ID 数字（数値）を本文と正規参照先で突合する（数値は文字列破損に対して耐性が高い）
 3. 検証スクリプト内の期待文字列も破損し得ることを前提に、正形はリポジトリ実ファイルから参照する
 
 issue-operation-safety.md の read-back 規則（Tool 検証済み成功の信頼）は循環検証問題をカバーしない（grep 実証）。read-back 目視の再実施は循環の再発である。
@@ -32,7 +32,7 @@ issue-operation-safety.md の read-back 規則（Tool 検証済み成功の信�
 
 ## 根拠
 
-- Case #3158（case-open STEP-2）: Root Case Issue 本文を issue_create → issue_update 後の read-back 目視で破損疑いが連発。issue_read read-back と gh CLI 本文取得の突合で「検証スクリプト側の破損による誤検出」と確認し、fs.existsSync + REQ/DEC/ACT ID digit 突合で本文健全と確定した（PR #3159、Issue #3158）。
+- Case #3158（case-open STEP-2）: Root Case Issue 本文を issue_create → issue_update 後の read-back 目視で破損疑いが連発。issue_read read-back と gh CLI 本文取得の突合で「検証スクリプト側の破損による誤検出」と確認し、fs.existsSync + REQ/DEC/ACT ID 数字突合で本文健全と確定した（PR #3159、Issue #3158）。
 
 ## 関連知識
 
