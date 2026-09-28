@@ -1,7 +1,7 @@
 # v3 -> v4 処遇一覧（crosswalk inventory）
 
 位置づけ: 本ファイルは v3-v4-crosswalk Design の references であり、現行 v3 成果物の
-v4 処遇の完全一覧（正本）を所有する。列 schema と運用規則は親 Design を参照。
+v4 処遇の完全一覧（正本）を所有する。列スキーマと運用規則は親 Design を参照。
 
 ## REQ（移行判定時点 53）
 

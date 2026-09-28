@@ -11,7 +11,7 @@ updated: "2026-09-13"
 ## 目的
 
 Learning pipeline（capture → promote）の共通知識。
-schema、分類基準、評価ディメンション、prune 方針を定義する。
+スキーマ、分類基準、評価ディメンション、prune 方針を定義する。
 
 ## 適用対象
 
@@ -20,10 +20,10 @@ schema、分類基準、評価ディメンション、prune 方針を定義す�
 
 ## 提供する判断、操作
 
-- inbox entry schema（13フィールド。見出しは `## YYYY-MM-DD: タイトル` 形式）。schema の詳細実体は `references/inbox-and-evaluation-schema.md` の Inbox Entry Schema が所有する
+- inbox entry スキーマ（13フィールド。見出しは `## YYYY-MM-DD: タイトル` 形式）。スキーマの詳細実体は `references/inbox-and-evaluation-schema.md` の Inbox Entry Schema が所有する
 - 問題クラス分類基準
 - 8軸評価ディメンション
-- evaluation-report schema
+- evaluation-report スキーマ
 - prune 方針（昇華時必須）
 - 処分区分（11処分区分 + duplicate）
 - artifact lifecycle（inbox → deferred → promoted）。`deferred.md` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である
@@ -45,7 +45,7 @@ learning-promote → backlog-review → RU → req-define の承認・要件化�
 ## 現在の動作
 
 - capture と promote の責務分界を明確化（capture は独立スキル `agentdev-learning-capture`）
-- promote が本スキルを参照して schema、基準を取得
+- promote が本スキルを参照してスキーマ、基準を取得
 - 既存対策優先（新規 X 化より既存 X へ反映）
 
 ## 対象外
@@ -58,7 +58,7 @@ learning-promote → backlog-review → RU → req-define の承認・要件化�
 
 - 分類の整合性
 - 8軸スコアの精度
-- schema 遵守
+- スキーマ遵守
 - prune ポリシーの適用（昇華時必須）
 
 ## See Also
@@ -138,4 +138,4 @@ ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundar
 
 - **semantic 担当**: learning evaluation（8 軸評価）
 - **deterministic 委譲先**: なし
-- **知識提供**: evaluation-report schema・prune 方針
+- **知識提供**: evaluation-report スキーマ・prune 方針

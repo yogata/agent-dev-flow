@@ -25,7 +25,7 @@ updated: 2026-07-27
 
 ### DO NOT USE FOR
 
-- extension schema の定義（基盤 Design `foundations/project-extensions.md` の責務）
+- extension スキーマの定義（基盤 Design `foundations/project-extensions.md` の責務）
 - extension 構造の診断、検査（`/repo/docs-check`、`/agentdev/inspect-skills`、`/agentdev/inspect-promote` の3層責務、DEC-006）
 - 配布 command/skill 本文の変更
 - project-local skill の実装（各適用プロジェクトの責務）
@@ -38,7 +38,7 @@ updated: 2026-07-27
 | 不在時の扱い | 対応 extension が存在しない場合は空 extension として扱い、標準動作で続行する |
 | 破損時の扱い | 対応 extension が破損している場合（YAML 構文エラー、必須 field 欠落等）はエラーを表示し、当該 extension を無視して標準動作で続行する（fail-open） |
 | 旧 kind 検出時の扱い | `kind: command-extension` / `kind: skill-extension` を検出した場合は migration-required として停止する（silent ignore しない） |
-| 未知 kind 検出時の扱い | 構文上有効だが `kind` が公式3値以外の場合は schema violation として停止する（fail-open しない） |
+| 未知 kind 検出時の扱い | 構文上有効だが `kind` が公式3値以外の場合はスキーマ違反として停止する（fail-open しない） |
 | 5セクション読み取り | context, rules, checks, acceptance_gates, must_not を読み取る |
 | 追加・拡張の扱い | extension の内容は配布 command/skill 本文の動作に追加され、既存動作を置き換えない |
 | 委譲対象抽出 | rules/checks の `skill:` フィールドから project-local skill 委譲対象を抽出する |
@@ -51,14 +51,14 @@ updated: 2026-07-27
 
 - extension は標準 command/skill の上書きではなく、追加・拡張のみ
 - 自分に対応する extension（1件）のみを読み、他 command/skill の extension は読まない
-- 破損 extension（malformed）で処理全体を停止しない。旧 kind は migration-required、未知 kind は schema violation として停止する
+- 破損 extension（malformed）で処理全体を停止しない。旧 kind は migration-required、未知 kind はスキーマ違反として停止する
 - 委譲先 project-local skill の中身には関与しない
 - rules/checks の初期契約では `action`, `required`, `fail_on` を採用しない。呼び出された skill は extension entry の `id`, `when`, `skill` および周辺文脈をもとに判断する
 - 配布 command/skill 本文にプロジェクト固有文書の具体参照を持たせない。プロジェクト固有参照は extension 経由でのみ与える
 
 ## 対象外
 
-- extension schema、配置、命名の定義（基盤 Design `foundations/project-extensions.md`）
+- extension スキーマ、配置、命名の定義（基盤 Design `foundations/project-extensions.md`）
 - extension 構造の診断（`/repo/docs-check`、`/agentdev/inspect-skills`、`/agentdev/inspect-promote` の3層、DEC-006）
 - project-local skill の実装（各適用プロジェクトの責務）
 - extension 自体の作成、編集（プロジェクト側の責務）
@@ -93,6 +93,6 @@ ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundar
 
 v4 が安定 API としないのは Skill 名 id binding のみであり、yaml スキーマと検査契約は従来どおり管理する。
 
-runtime での新規警告等は行わない。
+ランタイムでの新規警告等は行わない。
 
 internal-workflow-extension の使用が現時点で 0 件であることは廃止の根拠としない。

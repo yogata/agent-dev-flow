@@ -166,7 +166,7 @@ timeout や最大 round は実装詳細として設定可能とする。
 - 解決根拠: finding が閉じた場合の成立根拠または撤回根拠
 - duplicate 関係: 他 finding との重複、統合元、統合先の関係
 
-finding 状態は審議中の一時状態とし、新しい正規 artifact または永続 schema を導入しない。
+finding 状態は審議中の一時状態とし、新しい正規 artifact または永続スキーマを導入しない。
 具体的 field 名、保存形式、内部データ構造は配布スキルの実装詳細とする。
 
 ## 本質的争点と非本質的批判の判定
@@ -276,7 +276,7 @@ agentdev-traceability の coverage, impact, check を一般文書探索、構造
 ## adversarial-review caller integration 共通契約
 
 本節は REQ-015 が定める7コマンド（req-define、inspect-promote、intake-promote、learning-promote、backlog-review、case-open、case-run）および case-auto（停止伝播のみ、REQ-015-012）からの caller integration が共通に依拠する契約を正典として所有する（REQ-014-003）。
-caller integration 用の新規永続 schema を作成せず、本 Design が共通契約の正規所有者となる。
+caller integration 用の新規永続スキーマを作成せず、本 Design が共通契約の正規所有者となる。
 詳細パラメータ、入力フィールド構成、enum 値は本 Design の対象外とし、各 command Design（REQ-015）が個別呼出統合を所有する。
 
 ### 原則適用・skip 可能と QG/HITL 非代替

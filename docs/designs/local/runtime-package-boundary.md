@@ -97,7 +97,7 @@ scripts/ は skill junction の配下に位置し、skill の一部として配�
 vendored engine bundle（`src/opencode/plugins/agentdev-textlint-guard/vendor/textlint-engine.bundle.json`）の再生成手順では、build スクリプトに含まれる焼き付き絶対パスの検出・無害化自己検査を実行する。
 
 - 検出対象: kuromojin 既定 dicPath 用 `require.resolve` 由来の絶対パス等、ビルド環境由来の絶対パス（worktree パスを含む）
-- 挙動: 機械的に無害化可能な場合は無害化してから出力し、無害化できない場合は build を fail させる（焼き付きパスの混入を検知できることが目的。runtime は `KUROMOJIN_DIC_PATH` 固定経路で使用されるため実害はないが、検出手段がないとビルド時 worktree 削除後の `bun test` が環境依存 fail し、原因特定コストが残る）
+- 挙動: 機械的に無害化可能な場合は無害化してから出力し、無害化できない場合は build を fail させる（焼き付きパスの混入を検知できることが目的。ランタイムは `KUROMOJIN_DIC_PATH` 固定経路で使用されるため実害はないが、検出手段がないとビルド時 worktree 削除後の `bun test` が環境依存 fail し、原因特定コストが残る）
 - 自己検査の運用知識は [Bun offline bundle の配置場所独立性（資産同梱・相対解決・生成条件）](../../knowledge/bun-offline-bundle-placement-independent-build.md) と相互参照する
 
 ### Consumer（AgentDevFlow 導入済み）

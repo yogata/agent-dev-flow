@@ -55,7 +55,7 @@ updated: "2026-09-24"
   - 再合意済み Definition 変更: stage 1（case-revise → stage 2 case-ready）→ クリーンアップ検証ゲート → stage 3 case-run（インライン）→ stage 4 case-close
   - Issue番号/URL入力: Root Case が open なら case-ready から、ready/running/review なら case-run（インライン）→ case-close。再合意済み変更がある場合は case-revise から開始。再開時は起動時対象集合と各対象の正規状態から現在 stage を最も早い未収束 stage として再構成する（REQ-034-025）
   - artifact_actions は case-ready の Definition action 入力へ渡し、work_type 固定分岐には使用しない
-  - auto_gate preflight（auto_gate.auto_ready が false または未解決 item 残る場合は停止）
+  - auto_gate preflight（auto_gate.auto_ready が false または未解決項目が残る場合は停止）
 - 各工程の実行
   - 委譲工程（case-open / case-ready / case-revise / case-close）: 各コマンド委譲契約に従い実行担当サブエージェントとして起動。委譲起動不能時に delegation-unavailable 報告（REQ-002-003/004）
   - case-run（インライン実行）: case-auto が case-run の Workflow Skill（`agentdev-workflow-case-run`）を正規情報源として読み込み、準備/クリーンアップフェーズを自ら実行。実行担当サブエージェント委譲フェーズでは case-auto から直接実行担当サブエージェントへ委譲（委譲起点の折りたたみ/002）。adapter skill（agentdev-case-run-execution-adapter）を case-auto が読み込む
@@ -208,7 +208,7 @@ stage 3 の runtime 制御ループは case-auto が所有し、次の契約に�
 - Wave 収束と依存充足: Wave 収束（全子 Issue の実行結果確定、未処理・実行中・状態不明なし）と後続 Wave の依存充足（意味的依存条件の成立、必要な統合・マージの完了を含む）を区別し、次 Wave の開始は両方の成立を条件とする（REQ-034-012、REQ-035-016、REQ-035-017）。blocked、failed、delegation-unavailable は収束には該当し得るが依存充足とはみなさない
 - 重複の実行時検出: stage 3 の委譲前に同一 Wave 内の子 Issue 間で変更対象ファイル集合の重複を検出し、一時直列化・変更対象の調整・merge 順序・衝突解消担当の判断に用いる。変更対象集合が取得不能な子 Issue を含む場合は比較を省略せず検出不能として報告する（REQ-034-043、REQ-035-012）
 - Wave 表現: Wave 表現は子 Issue 数の上限を持たない（Epic サイズ上限のみ適用）。runtime 上の batch や一時直列化を Wave 分割として永続化しない（DEC-041）
-- 並列維持（REQ-034-028、REQ-034-044、DEC-042）: 並列実行は必須であり、実行環境由来の障害（background task の消失、親 run の中断、provider failure 等）を理由とする同期逐次実行（順次フォールバック）への切替を行わない。並列起動が当該 stage の起動可能対象集合に対して1件も成立しない場合は、直列化で完了を装わず停止理由「並列起動不能」（原因の断定を含まない）と再開可能性を報告して停止する。再開時は REQ-034-025 の再開契約および REQ-034-041（再開時の active task 計上、同一 Issue の二重起動防止）に従うことを条件に、durable state（Issue、PR、RU、draft、bg task 状態、worktree の git 状態）を照合して未完了かつ再試行可能な対象のみを特定し、起動間隔契約（最初の委譲は直ちに開始、以降の委譲起動ごとに間隔を置く、同一ツール呼び出し一括ブロックでの複数起動を行わない、前 task の完了待ちを起動の条件にしない）に従う staggered background fan-out で並列再委譲し、並列性の回復を resume の反復で追求する（反復に回数上限を設けない）。REQ-034-029 の状態別回復（親ループによる代行回復を含む）および REQ-034-030 のコンフリクト解消再委譲は本条の対象外とし各既存契約に従う
+- 並列維持（REQ-034-028、REQ-034-044、DEC-042）: 並列実行は必須であり、実行環境由来の障害（background task の消失、親 run の中断、プロバイダー障害等）を理由とする同期逐次実行（順次フォールバック）への切替を行わない。並列起動が当該 stage の起動可能対象集合に対して1件も成立しない場合は、直列化で完了を装わず停止理由「並列起動不能」（原因の断定を含まない）と再開可能性を報告して停止する。再開時は REQ-034-025 の再開契約および REQ-034-041（再開時の active task 計上、同一 Issue の二重起動防止）に従うことを条件に、durable state（Issue、PR、RU、draft、bg task 状態、worktree の git 状態）を照合して未完了かつ再試行可能な対象のみを特定し、起動間隔契約（最初の委譲は直ちに開始、以降の委譲起動ごとに間隔を置く、同一ツール呼び出し一括ブロックでの複数起動を行わない、前 task の完了待ちを起動の条件にしない）に従う staggered background fan-out で並列再委譲し、並列性の回復を resume の反復で追求する（反復に回数上限を設けない）。REQ-034-029 の状態別回復（親ループによる代行回復を含む）および REQ-034-030 のコンフリクト解消再委譲は本条の対象外とし各既存契約に従う
 
 ### blocked 部分停止、ready 継続判定フロー
 
@@ -426,7 +426,7 @@ Phase 0 の枝PR に含まれるコミット構成運用を規定する。
 
 - 委譲工程の result が blocked / failed の場合（当該工程で自走停止、ユーザー判断待ち）。
 - 委譲起動不能時（delegation-unavailable 報告、当該工程を停止）。
-- auto_gate preflight の未解決 item 残存時（`auto_gate.auto_ready` が false または未解決 item が残る場合は停止）。
+- auto_gate preflight の未解決項目の残存時（`auto_gate.auto_ready` が false または未解決項目が残る場合は停止）。
 - 停止条件（11項目の停止条件いずれか）検出時（実行停止、停止時タイミング情報を追記）。新しい意味判断では Root Case に `resume_command: req-define` を記録する。
 - user-decision-required（上位合意矛盾、新規ユーザー判断事項）検出時（自走を停止しユーザーへ判断を求める）。
 

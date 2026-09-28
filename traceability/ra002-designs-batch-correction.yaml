@@ -1,0 +1,44 @@
+component: ra002-designs-batch-correction
+implementation:
+  docs/designs/authoring/vocabulary-registry.md:
+    - REQ-094-002
+    - REQ-094-003
+    - REQ-094-006
+  docs/designs/authoring/command-file-format.md:
+    - REQ-094-001
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-010
+    - REQ-094-011
+  docs/designs/foundations/references/concrete-abstraction.md:
+    - REQ-094-001
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-010
+    - REQ-094-011
+  docs/designs/foundations/v3-v4-crosswalk.md:
+    - REQ-094-001
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-010
+    - REQ-094-011
+  docs/designs/skills/agentdev-doc-diagnostics/references/perspective-registry.md:
+    - REQ-094-001
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-010
+    - REQ-094-011
+verification:
+  src/opencode/plugins/agentdev-textlint-guard/lib/rules.ts:
+    - REQ-094-001
+    - REQ-094-002
+  src/opencode/plugins/agentdev-textlint-guard/lib/terminology.ts:
+    - REQ-094-003
+    - REQ-094-004
+  src/opencode/plugins/agentdev-textlint-guard/lib/results.ts:
+    - REQ-094-005
+  .opencode/skills/repo-agentdev-integrity/scripts/check_design_frontmatter.ts:
+    - REQ-094-006
+    - REQ-094-010
+  .opencode/skills/repo-agentdev-integrity/scripts/check_content_corruption.ts:
+    - REQ-094-011

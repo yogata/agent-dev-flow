@@ -16,18 +16,18 @@ updated: "2026-09-26"
 
 本 command は requirements-driven entry point である（要求入口 2 つの一方）。
 
-自然言語による機能要求、bug report、エラー・ログ・障害事象、外部課題、RU、設計・調査メモ、診断由来 finding を入力として、要件を壁打ちにより整理、定義し、構造化 `draft-data` 形式の要件 doc（`.agentdev/drafts/req-draft-{topic-slug}.md`）を生成する。標準経路の次段は case-auto である。
+自然言語による機能要求、バグレポート、エラー・ログ・障害事象、外部課題、RU、設計・調査メモ、診断由来 finding を入力として、要件を壁打ちにより整理、定義し、構造化 `draft-data` 形式の要件 doc（`.agentdev/drafts/req-draft-{topic-slug}.md`）を生成する。標準経路の次段は case-auto である。
 壁打ちフェーズで使用。
 
 ## 承認・HITL 境界
 
 - 壁打ち対話そのものが主要 HITL である（要件の深掘り、合意形成をユーザーとの対話で行う、REQ-004）。
-- auto_gate の未解決 item 解消方策は壁打ちで合意する（解消時は `auto_ready: true` へ更新。ユーザーが明示的に false を選択した場合は `conflict_resolutions` に記録して継続する）。
+- auto_gate の未解決項目の解消方策は壁打ちで合意する（解消時は `auto_ready: true` へ更新。ユーザーが明示的に false を選択した場合は `conflict_resolutions` に記録して継続する）。
 - 生成した要件doc は提示のみとし、承認は求めない（後続の case-auto へそのまま渡す）。Definition の保存は case-ready / case-revise の内部責務で実行する
 
 ## 入力
 
-- ユーザーの自然言語による機能要求、bug report の説明
+- ユーザーの自然言語による機能要求、バグレポートの説明
 - GitHub Issue URL（既存Issueの場合）
 - エラー・ログ・障害事象（エラー・障害入力の評価経路: 現象理解、原因分析、期待状態、影響分析、要求化の必要性を順に評価し REQ/Decision/Design への接続可否を判定する。評価経路の実行は work_type の値に依存しない。REQ-004-054/055）
 - 外部課題（外部課題管理システムのチケット、障害報告書等）
@@ -94,7 +94,7 @@ updated: "2026-09-26"
   - 実装スコープシグナル確認
 - ドラフト保存（`.agentdev/drafts/req-draft-{topic-slug}.md`）
   - 実装詳細の分離
-  - auto_gate完了ゲート（auto_gate.auto_ready:false または未解決 item 残存時、stop_reasons を提示し解消方策を壁打ちで合意）。解消時は auto_ready:true に更新。ユーザーが明示的に false 選択時は conflict_resolutions に記録し継続。未解決のままの場合は壁打ちへ差し戻し
+  - auto_gate完了ゲート（auto_gate.auto_ready:false または未解決項目の残存時、stop_reasons を提示し解消方策を壁打ちで合意）。解消時は auto_ready:true に更新。ユーザーが明示的に false 選択時は conflict_resolutions に記録し継続。未解決のままの場合は壁打ちへ差し戻し
 - 要件doc確認（ユーザー提示のみ、承認は求めない）
   - 複数RU受付、統合/分離判定、出力生成、Epic規模検出、Wave候補記録、OU 構造検証
 - 完了報告（work_type 別テンプレート選択）
@@ -330,7 +330,7 @@ default branch 最新化後の evidence 再確認は consumer（case-open）の�
 ## draft-data review_dispositions フィールドスキーマ
 
 要件定義で `review_dispositions` を出力する場合のシリアライズ形式を定義する。
-schema の正規所有先は [artifact-contracts.md](../responsibilities/artifact-contracts.md)「review_dispositions 構造」節である。
+スキーマの正規所有先は [artifact-contracts.md](../responsibilities/artifact-contracts.md)「review_dispositions 構造」節である。
 本節は req-define 固有の出力形式を規定する。
 
 ### review_dispositions 項目構造
@@ -341,7 +341,7 @@ schema の正規所有先は [artifact-contracts.md](../responsibilities/artifac
 |------|------|------|------|
 | id | string | 必須 | `RD-NNN` 形式（NNN は連番） |
 | source_ru | string | optional | 単一の元 RU-ID（RU 入力でない場合は省略可） |
-| source_item | string | 必須 | 単一の元 item 識別子（RU 内の要件行 ID 等。複数指定不可） |
+| source_item | string | 必須 | 単一の元項目識別子（RU 内の要件行 ID 等。複数指定不可） |
 | disposition | enum | 必須 | `covered` / `partially_covered` / `rejected` / `not_applicable`。必要に応じて `superseded` / `stale_target` を追加 |
 | reason_code | string | 必須 | 判断理由のコード |
 | reason | string | 必須 | 人間可読の判断理由本文 |
@@ -513,7 +513,7 @@ req-define は、既存の明示的な対応関係（`agentdev-traceability` の
 
 ## 停止状態
 
-- auto_gate 完了ゲートで未解決 item が残る場合（stop_reasons を提示して解消方策を壁打ちで合意する。未解決のままの場合は壁打ちへ差し戻し、要件doc を確定させない）。
+- auto_gate 完了ゲートで未解決項目が残る場合（stop_reasons を提示して解消方策を壁打ちで合意する。未解決のままの場合は壁打ちへ差し戻し、要件doc を確定させない）。
 - tentative_classification の最終確定バリデーションで7値違反、フィールド欠落を検出した場合（確定を停止し、理由を提示、または backlog-review への差し戻しを提示する）。
 - 前工程からの引き継ぎ判定（`agentdev_handoff: true`）検出時（要件展開を開始せず停止する）。
 - adversarial-review 審議で unresolved な本質的争点が残る場合（最初の副作用（要件doc 保存）へ進まず停止する）。

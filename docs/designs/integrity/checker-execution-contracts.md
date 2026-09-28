@@ -39,7 +39,7 @@ checker の新規実装・修正時に適用するパターンマッチと網羅
 - 行全体マッチの統一: 検出パターンは行全体（`^...$` 相当）とのマッチで設計し、部分一致による誤検出を構造的に防ぐ
 - 列挙ベース網羅検査と件数整合の二重確認: 対象集合の走査は列挙ベース（例: `Get-ChildItem -Recurse` + `-LiteralPath`、`fs.readdirSync` 再帰）で行い、列挙件数と期待件数の整合を突合する二重確認を持つ
 - 階層 ID 検索の3点設計: 階層 ID（`REQ-NNN-NNN` 等）の検索は (1) 単独出現、(2) 行 ID としての先頭出現、(3) 前置一致除外（長い ID への部分一致を検出としない）の3点を満たす設計とする
-- 宣言的データの silent skip 禁止: 宣言的データ（YAML）の読み込みで schema 不適合・未知キーを検出した場合、黙って読み飛ばさずエラーまたは警告として報告する。当該契約は契約テストで固定する
+- 宣言的データの silent skip 禁止: 宣言的データ（YAML）の読み込みでスキーマ不適合・未知キーを検出した場合、黙って読み飛ばさずエラーまたは警告として報告する。当該契約は契約テストで固定する
 
 既存 checker のマッチ実装の一括変更は要求しない。本規約は新規実装・修正時の標準として適用する。
 
@@ -67,7 +67,7 @@ checker の新規実装・修正時に適用するパターンマッチと網羅
 
 検出用の宣言的データ YAML（retired-artifact-registry、command-format-rules、delegation-contract-patterns、
 distribution-targets、obsolete-path-map、obsolete-vocabulary-map、skill-projection-manifest）は、
-正となる schema を Design が所有する。各 YAML は検出用ビューであり、
+正となるスキーマを Design が所有する。各 YAML は検出用ビューであり、
 正規契約の情報源とはしない。
 YAML と正 Design の不一致は検査で検出対象とする。
 

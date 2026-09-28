@@ -215,7 +215,7 @@ detector 不在、部分実装、test 不在、到達不能、finding 未接続�
 
 ## finding-baseline 分類（retired REQ-028-009/010 から移管、TS-014）
 
-`baseline_status` を IR schema から分離し、finding 側の状態として定義する。
+`baseline_status` を IR スキーマから分離し、finding 側の状態として定義する。
 IR は finding-baseline 分類を持たず、finding が生成される時に finding 側で new/known/resolved を判定する。
 
 | finding-baseline 状態 | 内容 |
@@ -375,7 +375,7 @@ cap は純減方向のみ更新可能とし、増加は `--raise-warning-cap` �
 IR-055 warning のうち意味検証済みの正当な warning（例: accepted-adr-only-citation 等の正当引用）は、恒久免除レジストリ `baselines/exemptions.json`（IR-059 由来の先行設計を全カテゴリ共通の機構として実装）へ登録することで、baseline（未解決債務）とは区別して恒久免除表示にする。
 
 - entry は `rule_id`・accepted な `rationale_ref`・`review_status` を必須とする（schema version 2）。`rationale_ref` の契約は rule 別に定義する（IR-059 は従来どおり docs/adr/**〔将来復活時〕、一般化分は現存する正当性根拠パス〔該当 Decision・Design〕を許容）
-- loader は schema 違反の entry を fail として扱う
+- loader はスキーマ違反の entry を fail として扱う
 - 免除された warning は恒久免除表示となり、baseline（未解決債務）の count に含めない。これにより「正当は免除・不正は純減」の分離を機械保証し、baseline は債務追跡に専念させる
 - 免除対象警告が ng-baseline.json の bucket を持つ場合は同時に prune し、恒久免除と baseline-known demote の二重適用を生じさせない
 - entry match 条件: `rule_id` は check 名と一致させ、`file`・`evidence` を指定した場合は観測された warning の file/evidence との同一性一致を必須とする。`file`・`evidence` が null の entry は当該 check 名に一致する警告の全体免除を意味する
@@ -431,7 +431,7 @@ check_extensions の NG baseline 運用は共用 ng-baseline（additions manifes
 
 REQ-028 の RETIRE に伴い、次の恒常契約の移管を受入れる（詳細な実行規則は checker-execution-contracts Design が所有する）。
 
-- 検出用の宣言的データ YAML は Design が正となる schema を持ち、YAML は検出用ビューとして扱うこと
+- 検出用の宣言的データ YAML は Design が正となるスキーマを持ち、YAML は検出用ビューとして扱うこと
 - detector 実装は IR 識別子に基づく命名規約を持ち、IR から detector 実装への機械的逆引きが可能であること
 
 ### NG baseline エントリの現行維持

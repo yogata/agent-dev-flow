@@ -22,7 +22,7 @@ updated: "2026-09-17"
 ## 対応関係データの取得と正規化
 
 - 対応関係データの正規情報源は、リポジトリ top-level `traceability/` 配下の component / package 単位 sidecar（`traceability/<component-slug>.yaml`）と検証スコープポリシー（`traceability/policy.yaml`）、および producer-only artifact に許容された inline declaration とする
-- sidecar と policy.yaml の schema は ADF v4 Traceability モデル（foundations/v4-traceability-model.md）が所有する。本 skill は sidecar を読み込み、component、artifact パス、role、要件行 ID の組を論理的な対応関係へ正規化する。本 skill は ADF 自身の個別 REQ と個別成果物との対応データを保持しない
+- sidecar と policy.yaml のスキーマは ADF v4 Traceability モデル（foundations/v4-traceability-model.md）が所有する。本 skill は sidecar を読み込み、component、artifact パス、role、要件行 ID の組を論理的な対応関係へ正規化する。本 skill は ADF 自身の個別 REQ と個別成果物との対応データを保持しない
 - inline declaration は `ADF-COVERS(<role>): <REQ-ID>{, <REQ-ID>}*` 形式（role は decision / design / implementation / verification、REQ-ID は `REQ-{NNNN}-{MMM}` 形式の要件行ID）とし、producer-only artifact の各ファイル種別のコメント記法（Markdown は HTML コメント、TypeScript は `//` 等）の内部に1行で記述する。マーカー文字列 `ADF-COVERS(...)` 自体はファイル種別に依存しない。consumer distribution closure（src/opencode/**）に含まれる成果物では使用しない
 - sidecar と inline declaration は同一の論理的な対応関係へ正規化され、coverage、impact、check から同一に扱われる。同一論理関係の不整合な重複は check が検出する
 - 解析は行単位のパターン照合で行い、意味推定を行わない。存在しない要件IDへの参照は check が検出する
@@ -59,12 +59,12 @@ updated: "2026-09-17"
 - Design 対応の欠落（現行要件行で0件。全現行要件行が計上対象）
 - 実装対応の欠落（現行要件行で0件。全現行要件行が計上対象）
 - 検証対応の欠落（検証スコープポリシーが required と判定する現行要件行で0件。Decision 対応の欠落は計上しない）
-- 検証スコープポリシーの不正（`traceability/policy.yaml` の schema 違反、default 値不正、optional 列挙の要件行 ID 形式違反、存在しない要件行の列挙、policy 読取不能）
+- 検証スコープポリシーの不正（`traceability/policy.yaml` のスキーマ違反、default 値不正、optional 列挙の要件行 ID 形式違反、存在しない要件行の列挙、policy 読取不能）
 - 同一論理関係の不整合な重複（同一 artifact パス × role × 要件行 ID の組み合わせが sidecar と inline declaration の間、または同一情報源内で矛盾する状態）
 
 検証スコープポリシーは `traceability/policy.yaml` から解決する。
 policy.yaml が存在しない場合、全現行要件行を検証対応 required として扱う（未指定 = required の安全側既定）。
-policy.yaml が読取不能または schema 不適合の場合、検証対応の要否判定を不能として当該検査を不合格にする（完全性判定不能を合格として扱わない）。
+policy.yaml が読取不能またはスキーマ不適合の場合、検証対応の要否判定を不能として当該検査を不合格にする（完全性判定不能を合格として扱わない）。
 Decision 対応の欠落は不合格としない。
 
 ## advisory 能力と品質ゲートとしての check の境界
@@ -77,7 +77,7 @@ Decision 対応の欠落は不合格としない。
 ## 実装構成
 
 - 標準実装は `traceability/` 配下の sidecar・policy.yaml と、正規成果物（docs/requirements/、docs/designs/、実装・検証成果物）を直接走査する。`.agentdev/graph/` 等の派生 Graph を必須入力・必須生成物としない
-- sidecar および policy.yaml の読み込みは決定的な YAML 解析で行い、schema 不適合・未知キーを黙って読み飛ばさない（checker 実行契約 Design の宣言的データの silent skip 禁止と同一規定）
+- sidecar および policy.yaml の読み込みは決定的な YAML 解析で行い、スキーマ不適合・未知キーを黙って読み飛ばさない（checker 実行契約 Design の宣言的データの silent skip 禁止と同一規定）
 - 将来、直接走査が実運用上の問題として観測された場合、coverage、impact、check の外部契約を変えずにキャッシュまたは索引を追加できる構造とする
 - OpenFastTrace、Eclipse Capra、専用グラフDBを標準実行依存として導入しない
 
