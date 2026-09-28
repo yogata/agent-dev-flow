@@ -1,0 +1,188 @@
+component: decisions-terminology-batch
+implementation:
+  docs/decisions/DEC-001.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/decisions/DEC-002.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/decisions/DEC-003.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/decisions/DEC-005.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/decisions/DEC-006.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/decisions/DEC-007.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/decisions/DEC-009.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/decisions/DEC-010.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/decisions/DEC-011.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/decisions/DEC-012.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/decisions/DEC-013.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/decisions/DEC-014.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/decisions/DEC-016.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/decisions/DEC-023.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/decisions/DEC-024.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/decisions/DEC-026.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/decisions/DEC-027.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/decisions/DEC-040.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/decisions/DEC-041.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/decisions/DEC-043.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/decisions/DEC-045.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/decisions/DEC-046.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+verification:
+  .opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-003
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
