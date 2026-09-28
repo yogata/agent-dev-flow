@@ -12,14 +12,14 @@ Supervisor（Hermes 等、spawn する子プロセスから provider 資格情�
 
 機構は次のとおりである。
 
-1. `ocenv` は powershell.exe -NoProfile から .NET `RegistryKey.GetValue` により HKCU\Environment（Windows User スコープ）の変数を列挙し、現在の環境で未設定の変数のみを自身の環境へ export して指定コマンドを exec する。既設定の変数は値を確認せず保持する（Supervisor や shell 設定が与えた値が優先される）。Machine スコープは読まない（システム既定の環境合成は OS が行う）。
+1. `ocenv` は powershell.exe -NoProfile から .NET `RegistryKey.GetValue` により HKCU\Environment（Windows User スコープ）の変数を列挙し、現在の環境で未設定の変数のみを自身の環境へ export して指定コマンドを exec する。既設定の変数は値を確認せず保持する（Supervisor やシェル設定が与えた値が優先される）。Machine スコープは読まない（システム既定の環境合成は OS が行う）。
 2. `opencode` bridge shim は opencode コマンド解決を横取りし、`exec` で同一ディレクトリの `ocenv` 経由により opencode 本体を起動する。起動先の本体パスは調整点（`OPENCODE_BODY` 変数、既定 `$HOME/.bun/bin/opencode`）として明示する。
 3. 導入環境では正本配置物を PATH 上の優先ディレクトリ（実証済みは `~/bin` 先頭配置）へ置き、Supervisor の spawn コンテキストで `opencode` の解決先が shim になることで、scrub された環境でも credential が供給される。
 
 ocenv の供給範囲と注意:
 
 - 供給範囲は「現在の環境で未設定の HKCU\Environment 変数の全て」であり、CLOUDFLARE_ACCOUNT_ID、CLOUDFLARE_API_TOKEN のような Jev 関連の credential クラスに限定しない。Jev 現行 credential 以外の credential（provider API key、トークン等）を User スコープに正本化すれば、同じ機構で供給される。
-- 変数を追加する場合の注意: HKCU\Environment は当該ユーザーの全プロセスから読めるため、格納できるのは「ユーザー自身の権限境界で保護される値」である。Machine スコープへ置くと全ユーザーへ公開されるため credential の格納先としては使わない。供給範囲を特定の変数に絞りたい環境では、ocenv を fork して allowlist（許可変数名のリスト）で列挙結果を絞る実装を記録的代替として採れる（正本の既定は全未設定変数の供給であり、allowlist 化は導入環境側の判断である）。
+- 変数を追加する場合の注意: HKCU\Environment は当該ユーザーの全プロセスから読めるため、格納できるのは「ユーザー自身の権限境界で保護される値」である。Machine スコープへ置くと全ユーザーへ公開されるため credential の格納先としては使わない。供給範囲を特定の変数に絞りたい環境では、ocenv をフォークして allowlist（許可変数名のリスト）で列挙結果を絞る実装を記録的代替として採れる（正本の既定は全未設定変数の供給であり、allowlist 化は導入環境側の判断である）。
 - REG_EXPAND_SZ の展開の扱い: 列挙は `RegistryValueOptions.None` で値を取得し、REG_EXPAND_SZ 値の `%VAR%` 参照は展開して供給する。これは Windows がプロセス起動時にユーザー環境を合成する際の展開挙動と同等である。展開前の生文字列は供給しない。`%VAR%` を含む値を正本化する場合は展開後の値が供給される点を踏まえる。
 - 空文字列が設定された変数の扱い: レジストリ側の値が空文字列の場合も「設定あり」として供給する（空文字列は unset と区別される）。現在の環境で空文字列が設定済みの変数は既設定扱いとし、レジストリ値で上書きしない（POSIX では空文字列の環境変数は設定済みである）。
 - 列挙失敗時は fail-closed である（対象コマンドを実行せず終了コード 1）。部分的な環境での実行による静かな `not_configured` 劣化を避けるためである。列挙結果はディスクへ書かず、1エントリ = 1 base64 行のプロセス間通信で受け渡し、生の credential 値は stdout に出力しない。

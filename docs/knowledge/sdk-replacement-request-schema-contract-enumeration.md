@@ -4,18 +4,18 @@ created: 2026-09-28
 updated: 2026-09-28
 ---
 
-# SDK 置換系変更では置換対象 SDK が担っていた契約（request schema・認証・エラー形式）の列挙と公式一次情報源からの取得確認を実装前工程として前置する
+# SDK 置換系変更では置換対象 SDK が担っていた契約（リクエストスキーマ・認証・エラー形式）の列挙と公式一次情報源からの取得確認を実装前工程として前置する
 
 ## 知識内容
 
-評価・推論系 SDK の依存を撤去して fetch 直呼び出しへ置換する変更（provider 置換・依存削減系）では、SDK が暗黙に担っていた request schema 知識が置換時点で消失する。置換後の実装が公式 schema の確認なしに書かれると、SDK 依存時代には存在しなかった request schema エラー（HTTP 400 等）が実 gateway 実測で初めて顕在化する。SDK 置換系変更の実装前工程として、次を前置する:
+評価・推論系 SDK の依存を撤去して fetch 直呼び出しへ置換する変更（provider 置換・依存削減系）では、SDK が暗黙に担っていたリクエストスキーマ知識が置換時点で消失する。置換後の実装が公式スキーマの確認なしに書かれると、SDK 依存時代には存在しなかったリクエストスキーマエラー（HTTP 400 等）が実 gateway 実測で初めて顕在化する。SDK 置換系変更の実装前工程として、次を前置する:
 
-1. **置換対象 SDK が担っていた契約の列挙**: request schema・認証（credential 供給経路・ヘッダ構成）・エラー形式（ステータスコードと error body の構造）を、置換前に列挙して変更計画に明記する
-2. **公式一次情報源からの取得確認**: 接続先モデルの request schema を公式カタログ・OpenAPI 等の一次情報源から取得・確認する。エラーメッセージや推測からの schema 復元を標準としない
+1. **置換対象 SDK が担っていた契約の列挙**: リクエストスキーマ・認証（credential 供給経路・ヘッダ構成）・エラー形式（ステータスコードとエラーボディの構造）を、置換前に列挙して変更計画に明記する
+2. **公式一次情報源からの取得確認**: 接続先モデルのリクエストスキーマを公式カタログ・OpenAPI 等の一次情報源から取得・確認する。エラーメッセージや推測からのスキーマ復元を標準としない
 
 ### Cloudflare /ai/run の model-in-path 制約（実測）
 
-Cloudflare AI Gateway の `/ai/run/{model}` 形式（model-in-path 継続）は Workers AI の `@cf/` モデル専用であり、第三者モデル（`author/model` 形式）には path ルートが存在しない。公式の `/ai/run` は body の `{ model, input }` でモデルと入力を渡す。実測では `typesafe/jev` を model-in-path で呼び出すと HTTP 400 `code 7000 "No route for that URI"` で失敗した（Case #3183、失敗観測 20260927T112354Z-6677）。公式カタログ（developers.cloudflare.com の model ページ配下 schema-input.json / schema-output.json）の取得・確認で request / response の物理 mapping を修正し、再実測で解消した（観測 20260927T113606Z-6056、commit 58a0fad7）。
+Cloudflare AI Gateway の `/ai/run/{model}` 形式（model-in-path 継続）は Workers AI の `@cf/` モデル専用であり、第三者モデル（`author/model` 形式）にはパスルートが存在しない。公式の `/ai/run` は body の `{ model, input }` でモデルと入力を渡す。実測では `typesafe/jev` を model-in-path で呼び出すと HTTP 400 `code 7000 "No route for that URI"` で失敗した（Case #3183、失敗観測 20260927T112354Z-6677）。公式カタログ（developers.cloudflare.com の model ページ配下 schema-input.json / schema-output.json）の取得・確認でリクエスト/レスポンスの物理マッピングを修正し、再実測で解消した（観測 20260927T113606Z-6056、commit 58a0fad7）。
 
 ## 適用条件
 
@@ -29,7 +29,7 @@ Cloudflare AI Gateway の `/ai/run/{model}` 形式（model-in-path 継続）は 
 
 ## 根拠
 
-- Case #3183（case-run TS-010 実 gateway 検証、PR #3185）: 評価 SDK（`ai` / `@ai-sdk/gateway`）依存を撤去して fetch 直呼び出しに置換した変更で、Cloudflare `/ai/run/{model}` の model-in-path が `typesafe/jev` に対して HTTP 400 code 7000 "No route for that URI" で失敗（失敗観測 20260927T112354Z-6677・TS-010 on_failure 発火）。model-in-path は `@cf/` モデル専用で第三者モデルは body 渡しが正という実測の確定に至った。公式カタログ取得・確認で物理 mapping を修正し再実測成功
+- Case #3183（case-run TS-010 実 gateway 検証、PR #3185）: 評価 SDK（`ai` / `@ai-sdk/gateway`）依存を撤去して fetch 直呼び出しに置換した変更で、Cloudflare `/ai/run/{model}` の model-in-path が `typesafe/jev` に対して HTTP 400 code 7000 "No route for that URI" で失敗（失敗観測 20260927T112354Z-6677・TS-010 on_failure 発火）。model-in-path は `@cf/` モデル専用で第三者モデルはボディ渡しが正という実測の確定に至った。公式カタログ取得・確認で物理マッピングを修正し再実測成功
 - DEC-046（Jev 実行基盤の Cloudflare AI Gateway への完全置換）
 
 ## 関連知識
@@ -43,4 +43,4 @@ Cloudflare AI Gateway の `/ai/run/{model}` 形式（model-in-path 継続）は 
 
 | 種別 | パス | 変更内容 |
 |------|------|----------|
-| 配布skill reference | provider 置換系 Case の case-run 実装手順（関連 reference） | SDK 置換時の前置確認手順（契約列挙・公式 schema 取得確認）の追加候補 |
+| 配布skill reference | provider 置換系 Case の case-run 実装手順（関連 reference） | SDK 置換時の前置確認手順（契約列挙・公式スキーマ取得確認）の追加候補 |

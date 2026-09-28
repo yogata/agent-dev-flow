@@ -8,7 +8,7 @@ updated: 2026-09-15
 
 ## 知識内容
 
-Windows で integrity suite をフル実行すると、サブプロセス起動（spawn）を伴うテストが bun test の既定 5 秒 timeout で失敗することがある。stdout 途切れによる JSON parse error を含む環境 fail に見えるが、本質は spawn コストに対する timeout 不足である。取り扱いは次のとおりである。
+Windows で integrity suite をフル実行すると、サブプロセス起動（spawn）を伴うテストが bun test の既定 5 秒 timeout で失敗することがある。stdout 途切れによる JSON パースエラーを含む環境 fail に見えるが、本質は spawn コストに対する timeout 不足である。取り扱いは次のとおりである。
 
 1. 対象テストを `bun test --timeout 120000` 等の十分な timeout で単独再実行する。
 2. pass 結果と「環境由来」の根拠（既定 timeout での fail → 延長単独再実行での pass）を QG-4 記録として残す。
@@ -46,7 +46,7 @@ timeout 延長・単独再実行で確定できない環境起因が疑われる
 
 ## 関連知識
 
-- [checker CLI の stdout 証跡が Windows + bun で失われる問題と安定実行経路](checker-cli-stdout-loss-on-windows-bun.md)（stdout ロスは別現象。JSON parse error に見える fail の切り分けで関連）。
+- [checker CLI の stdout 証跡が Windows + bun で失われる問題と安定実行経路](checker-cli-stdout-loss-on-windows-bun.md)（stdout ロスは別現象。JSON パースエラーに見える fail の切り分けで関連）。
 - [Windows PowerShell の一括読み書きによる UTF-8 ファイル破壊リスク](windows-powershell-bulk-io-corruption.md)（Windows 環境の検証系知識）。
 - [bun test の fail 証跡は junit reporter で構造化取得する](bun-test-junit-reporter-evidence.md)（fail の証跡取得・差分分離手法）。
 - [bun test 実行形態逸脱の検知条件と判別観点](bun-test-execution-form-drift-signals.md)（実行形態逸脱（repo root 外 cwd・`./` なしパス指定）由来の fail 判別。timeout 由来との切り分け）。
