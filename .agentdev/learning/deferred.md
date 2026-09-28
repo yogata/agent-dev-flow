@@ -257,6 +257,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **再発条件**: 機械横断置換を伴う PR で、`mechanical-replacement-rules.md` Step 3-4（再 grep 0 件確認）を省略して完了宣言した場合。
 - **予防策候補**: (a) case-close QG-4 の test strategy 処理完了確認に「機械横断置換を伴う PR は再 grep 0 件確認結果を Findings に記録すること」を検査項目として追加する、(b) `mechanical-replacement-rules.md` Step 3-4 を case-run の test-fix ループに組み込み PR 本文に自動記録する仕組みを設ける。
 - **想定反映先**: `agentdev-quality-gates`（QG-4 検査項目拡充）、`agentdev-doc-writing`（`mechanical-replacement-rules.md` Step 3-4 の case-run 連動）
+- **反映先備考（2026-09-28 learning-promote）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。現行化または廃棄判定は次回再評価で確定
 - **関連**: Issue #1162, PR #1163, PR #1122, 既知 L-012（再 grep 0 件確認）を補強する追加事例、REQ-0153、commit 465d9047、`src/opencode/skills/agentdev-doc-writing/references/mechanical-replacement-rules.md`
 - **タグ**: `#inspect-docs` `#機械横断修正` `#完了宣言` `#再grep確認` `#宣言不一致`
 - **移動日**: 2026-06-27
@@ -336,6 +337,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **横展開観点**: REQ/SPEC でデータスキーマを定義する全要件。特に YAML/JSON 等の階層構造を持つファイル形式では、フィールドの「所有者（file/entry/別ノード）」を明示しないと実装者間の解釈が分かれる。
 - **再発条件**: (a) REQ でスキーマ要件を「各エントリは ... を持つ」形式で記述し、所有者階層を明示しない場合、(b) 実装者が REQ を一次ソースとして読み、実装パターン（既存類似ファイル等）を参照せずにスキーマを設計した場合。
 - **予防策候補**: (a) REQ/SPEC でスキーマ要件を記述する際、フィールド所有者（file top-level / 各 entry / 別ノード）を明示する表記規約を設ける、(b) agentdev-req-analysis / agentdev-doc-writing skill に「スキーマ要件は所有者階層を明示する」チェック項目を追加、(c) REQ-0156-011 を別 Issue で修正。
+- **反映先備考（2026-09-28 learning-promote）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。現行化または廃棄判定は次回再評価で確定
 - **想定反映先**: (a) REQ-0156-011 文言（別 Issue で修正候補）、(b) `src/opencode/skills/agentdev-req-analysis/`、`src/opencode/skills/agentdev-doc-writing/`（スキーマ要件の表記規約）、(c) `docs/specs/integrity/obsolete-path-map.yaml` ヘッダ（本 PR で対応済み、参照例）。
 - **関連**: Issue #1359、PR #1360（case-auto Draft 2 OU-003 FINAL、squash merge 562148cf）。REQ-0156-010/011/012、IR-057、`docs/specs/integrity/obsolete-path-map.yaml`。実行日時 2026-07-02。
 - **タグ**: `#req-wording` `#schema-ambiguity` `#field-ownership` `#req-0156` `#integrity` `#learning-candidate`
@@ -666,6 +668,7 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **再発条件**: SPEC 起票時に用語統一を意識しない場合。Phase 1 commit 起票時の揺れが SPEC merge 後も残存し得る。
 - **予防策候補**: (a) SPEC 起票時の用語統一チェックの強化、(b) inspect-docs への用語揺れ検出パターン追加の検討
 - **想定反映先**: `inspect-docs` command（用語揺れ検出パターン）、`agentdev-doc-writing` skill（SPEC 起票時チェック強化）
+- **反映先備考（2026-09-28 learning-promote）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。現行化または廃棄判定は次回再評価で確定
 - **関連**: PR #1749, Issue #1742, Epic #1736, REQ-0108-285, `docs/specs/skills/spec-health-metrics.md`, commit 0192019c
 - **タグ**: `#terminology` `#表記揺れ` `#spec-health-metrics` `#横断確認` `#spec-authoring`
 - **移動日**: 2026-07-23
@@ -1057,6 +1060,7 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **再発条件**: 300行近辺の既存 reference に目次有無を確認せず節を追記する場合
 - **予防策候補**: 追加編集時に当該 reference の行数と目次有無を事前確認する
 - **想定反映先**: agentdev-doc-writing の機械置換手順（mechanical-replacement-rules.md）へ事前確認段階として反映する候補
+- **反映先備考（2026-09-28 learning-promote）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。現行化または廃棄判定は次回再評価で確定
 - **関連**: PR #2397、Issue #2387、Epic #2378 Wave 3 case-close
 - **タグ**: `#ag005` `#lint-skills` `#toc`
 
@@ -1075,6 +1079,7 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **再発条件**: 同一仕様の文字列操作 API を持つ別処理系へ引数意味を確認せず移植する場合
 - **予防策候補**: 機械置換スクリプト移植時に引数意味の照合を事前確認に含める
 - **想定反映先**: agentdev-doc-writing の機械置換手順（mechanical-replacement-rules.md）へ移植時事前確認として反映する候補
+- **反映先備考（2026-09-28 learning-promote）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。現行化または廃棄判定は次回再評価で確定
 - **関連**: PR #2398、Issue #2388、Epic #2378 Wave 4 case-close
 - **タグ**: `#mechanical-replacement` `#porting` `#three-stage-procedure`
 
@@ -1363,6 +1368,7 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **再発条件**: 訳語表未登録の技術用語が配布物に存在する状態で REQ-053-004 走査を実施した場合
 - **予防策候補**: 訳語表への追補（根拠と推奨訳を明記した登録）により走査の再現性を向上
 - **想定反映先**: docs/designs/responsibilities/document-type-responsibilities.md（訳語表）、agentdev-doc-writing の査読観点
+- **反映先備考（2026-09-28 learning-promote）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。現行化または廃棄判定は次回再評価で確定
 - **関連**: PR #2478 本文「Findings / Capture候補」learning 1 件（回収元: https://github.com/yogata/agent-dev-flow/pull/2478 ）
 - **タグ**: `#req053` `#訳語表` `#英字混在` `#走査再現性`
 
@@ -1435,6 +1441,7 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **再発条件**: 参照される見出し語を変更した際に参照元ファイルの語彙追随確認を行わなかった場合
 - **予防策候補**: 用語変更 Case の検証手順に「参照先用語の横断確認」を前置条件として組み込む（変更対象外ファイルを含む）
 - **想定反映先**: REQ-053 の走査手順、agentdev-workflow-case-run の配布物改修系 Case の検証手順、agentdev-doc-writing の査読観点
+- **反映先備考（2026-09-28 learning-promote）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。現行化または廃棄判定は次回再評価で確定
 - **関連**: PR #2484 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2484 ）
 - **タグ**: `#見出し語` `#参照整合` `#用語変更`
 
@@ -1453,6 +1460,7 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **再発条件**: 訳語表未登録の複合技術語を配布物側で先に訳語化した場合
 - **予防策候補**: 訳語候補の訳語表への先行登録（根拠と推奨訳を明記）を配布物の訳語化の前置条件とする
 - **想定反映先**: docs/designs/responsibilities/document-type-responsibilities.md（訳語表）、agentdev-doc-writing の査読観点
+- **反映先備考（2026-09-28 learning-promote）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。現行化または廃棄判定は次回再評価で確定
 - **関連**: PR #2484 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2484 ）
 - **タグ**: `#訳語表` `#用語政策` `#docs配布物用語差`
 
@@ -1698,6 +1706,7 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **再現条件**: docs 本文に plain な REQ-NNN-NNN（存在しない行 ID）を記録した場合
 - **予防策**: 旧行 ID 等の歴史参照は code span で記録する執筆規約を明文化する
 - **横展開候補**: agentdev-doc-writing（執筆規範）、learning-promote で判定
+- **反映先備考（2026-09-28 learning-promote）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。現行化または廃棄判定は次回再評価で確定
 - **関連**: PR #2612 本文 Findings セクションからの capture 回収（case-close STEP-6）
 - **タグ**: #integrity #ir067 #docs-check #case-run #verification
 
@@ -2520,5 +2529,146 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **関連**: Case #3171、PR #3174、commit 76e676bc、src/opencode/tools/agentdev-jev/observation.ts
 - **タグ**: `#validation-bypass` `#score-discretization` `#code-review` `#jev`
 - **移動日**: 2026-09-27
+
+---
+
+
+## draft artifact_actions の target_area「### 対象外」は REQ 現行構造（## 適用範囲配下ネスト）へのセクション名参照として解釈する
+
+- **問題事象**: REQ-092 update（Case #3192）の draft ACT-REQ-003 content が「### 対象外」見出し + フラット bullet 形式で書かれており、現行 REQ 標準構造（「## 適用範囲」配下の「- **対象外**:」ネストリスト）と乖離していた。content を全文そのまま置換すると REQ 構造が崩れ他 REQ と不整合になる。
+- **発生局面**: case-open lifecycle STEP-4 の Definition 変更（docs/requirements/REQ-092.md 対象外節更新）
+- **検知方法**: 現行 REQ-092.md と draft content の構造比較（要件行・文言は一致、見出し階層のみ乖離）
+- **根本原因**: draft content は合意済み文言の正であり文書構造の正ではない。target_area は適用先セクションの特定子であり、現行 REQ の実際の見出し階層とは一致しない
+- **自律対応内容**: 現行構造（## 適用範囲配下ネスト）を保持したまま第1項の文言を draft content 通りに per-line 置換で適用した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: REQ update 系 Case では draft artifact_actions の content は文言の正、構造は現行 REQ 標準を正として読む。target_area は「適用先セクションの特定子」として解釈する
+- **再発条件**: REQ update 系 Case で draft content が見出し形式を含む場合
+- **予防策候補**: req-define 側で target_area 記法と content 形式の関係（文言の正 / 構造は現行標準）を明文化するかを検討
+- **想定反映先**: req-define の draft 生成規約（該当箇所があれば）
+- **関連**: Root Case Issue #3192
+- **タグ**: `#req-update` `#draft-format`
+- **移動日**: 2026-09-28
+- **処分判定**: deferred（2026-09-28 評価。producer 側突合手順（draft-generation.md L39）は既存。適用側解釈規則は再発時に再評価）
+
+---
+
+## REQ 新規作成時の docs/README.md 件数言及行は generate_indexes.ts の自動更新対象外（req-range-staleness が検出する）
+
+- **問題事象**: case-open（Root Case #3214、Definition PR #3215）で REQ-094 新規作成後に generate_indexes.ts を実行したが、docs/README.md 本文の「現行要件は56件である」行は AUTOGEN ブロック外のため更新されず、check_integrity の req-range-staleness が新規 unmanaged NG 1 件を検出した。
+- **発生局面**: Definition 変更（case-open STEP-4 索引再生成後の checker 実測）
+- **検知方法**: check_integrity --profile source の req-range-staleness NG（docs/README.md states 56 active REQs but actual count is 57）
+- **根本原因**: generate_indexes.ts は AUTOGEN ブロック（id=readme-req-summary-count 等）のみ更新し、本文中の手動記述（「現行要件はN件である」等の件数言及行）は対象外
+- **自律対応内容**: docs/README.md 本文行を 57 件へ修正し、check_integrity 再実測で新規 unmanaged NG 0 件を確認
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: REQ/Decision/Design の件数や一覧を本文で言及する手動記述は索引再生成の追随対象外。REQ 新規作成・廃止を含む Definition PR では generate_indexes 実行後に req-range-staleness を含む check_integrity 実測が必須
+- **再発条件**: REQ ファイルを新規作成・廃止する Definition PR で generate_indexes.ts 実行のみで check_integrity を省略した場合
+- **予防策候補**: Definition PR の期待値確定手順（REQ 行変更時の check_integrity・check_autogen_freshness 実測）を case-open STEP-4 手順2.5 後の必須実測として維持する（本件はその手順どおりの実測で検出・修正完了）
+- **想定反映先**: case-open workflow skill reference（definition-pr-and-idempotency.md 手順2.5 の checker 実測の意図説明）
+- **関連**: Root Case #3214、PR #3215、docs/README.md、src/opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts
+- **タグ**: `#integrity` `#autogen` `#req-staleness`
+- **移動日**: 2026-09-28
+- **処分判定**: deferred（2026-09-28 評価。既存手順（手順2.5＋check_integrity 実測）どおり機械検出済み。AUTOGEN ブロック外手動記述の知識として維持）
+
+---
+
+## トレーサビリティ対応宣言は「未宣言の artifact のみ」を新規 sidecar に集約し、既存宣言持ち artifact は該当情報源へ追加する
+
+- **問題事象**: case-run（REQ-094 Wave 2 横断是正バッチ）で、修正対象ファイルを新規 sidecar に一括列挙したところ、既存 sidecar 宣言済みファイル・inline 宣言済みファイルと重複し duplicate-inconsistencies を検出した（PR #3226・#3228・#3230 の対応宣言作業）。
+- **発生局面**: トレーサビリティ対応宣言作成（case-run STEP-S5 対応宣言、Epic #3216 Wave 2）
+- **検知方法**: agentdev-traceability check の duplicate-inconsistencies（同一 artifact × role × 要件行の複数情報源矛盾）
+- **根本原因**: artifact パス × role の対応宣言が複数情報源（既存 sidecar / inline ADF-COVERS 宣言）に分かれる状態で、新規 sidecar に全修正対象を一括列挙すると既存宣言と重複する
+- **自律対応内容**: 新規 sidecar は「未宣言の artifact のみ」に集約し、既存宣言持ち artifact は該当情報源（既存 sidecar または inline 宣言）へ追加して再検査 9/9 pass を確認（本手順込みで解消済み）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 対応宣言追加前には component / sidecar 対応一覧の事前確認を行う（agentdev-traceability sidecar-and-policy.md の手順）。inline 宣言が使用中の文書には inline 優先規則（producer 側）で集約する
+- **再発条件**: 修正対象ファイル一覧をそのまま新規 sidecar に列挙した場合
+- **予防策候補**: 対応宣言作成前に既存宣言（sidecar・inline）の走査を必須化する（coverage --artifact または rg での ADF-COVERS 宣言事前確認）
+- **想定反映先**: agentdev-traceability 側への操作知識追記候補（PR #3226 本文 Findings 記録）
+- **関連**: Epic #3216、PR #3226・#3228・#3230、traceability/src-opencode-correction.yaml、traceability/decisions-terminology-batch.yaml
+- **タグ**: `#traceability` `#adf-covers` `#duplicate-inconsistencies`
+- **移動日**: 2026-09-28
+- **処分判定**: deferred（2026-09-28 評価。恒久配置先設計（同クラスのエントリ19）と併せ次回横断是正・REQ-094-012 適用時に再評価）
+
+---
+
+## check_distribution_boundary --profile link は worktree 内で projection 未実体化により必ず zero-targets になる（違反ではない）
+
+- **問題事象**: case-run 委譲内 agent が worktree 内で check_distribution_boundary --profile link を実行し、zero-targets（projection 未実体化）を「違反」と誤認するリスクがあった（PR #3226 の case-run 記録）。
+- **発生局面**: 配布依存境界 gate 実行（case-run STEP-S5・Epic #3216 Wave 2-6 src バッチ）
+- **検知方法**: PR 本文検証差分の記録（実際には既存 reference のフォールバック手順に従い host main root projection で実行して回避済み）
+- **根本原因**: worktree では .opencode/plugins の junction 未伝播により projection が実体化されず、--profile link の検査対象が 0 件になる。環境差を違反と区別しないと誤停止・誤合格が起きる
+- **自律対応内容**: 既存運用手順どおり host main root projection で実行し、環境ラベル（実行環境=main root 実体、検査対象=main root projection、junction 伝播状態）を記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree 内 gate 実行では環境ラベル（実行環境・junction 伝播状態・検査対象 root）の記録が誤判定防止の要。zero-targets は違反ではなく環境差として解釈する
+- **再発条件**: worktree 内で --profile link を初回実行した委譲 agent が zero-targets を違反判定した場合
+- **予防策候補**: 委譲 prompt の前置観点として「worktree 内 --profile link は必ず zero-targets」を明示する
+- **想定反映先**: workflow-case-run delegation-and-result・reference-resolution reference（PR #3226 本文 Findings 記録の追記候補）
+- **関連**: Epic #3216、PR #3226、check_distribution_boundary.ts
+- **タグ**: `#distribution-boundary` `#worktree` `#gate`
+- **移動日**: 2026-09-28
+- **処分判定**: deferred（2026-09-28 評価。既存 fallback 手順（delegation-and-result.md L102）どおり回避済み。委譲 prompt 前置観点の明示は再発時に再評価）
+
+---
+
+## docs 配下の過去文書には異言語混入が残存し得る（DEC-012 の「区別 없ければ」を是正）
+
+- **問題事象**: case-run（REQ-094 Wave 2-3 docs/decisions バッチ）で、DEC-012 に韓国語混入「区別 없ければ」を発見し「区別がなければ」へ是正した（PR #3228）。UTF-8/LF の破壊は検出していない。
+- **発生局面**: TS-001 抽出・是正（Epic #3216 Wave 2-3）
+- **検知方法**: docs/decisions 配下の機械抽出（一般英単語・異言語候補の走査）
+- **根本原因**: 過去の編集で混入した異言語は日本語・英語いずれにも該当しないため、英単語混在のみを対象とする検査では捕捉されない
+- **自律対応内容**: 「区別がなければ」へ意味保持是正済み（PR #3228 マージ済み）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 文書品質の機械検査は英単語混在・CJK 破損に加えて第三言語混入も観点に含め得る（REQ-053-039 の機械検査対象拡大ではない個別是正の範囲）
+- **再発条件**: 異言語 IME の誤変換・貼り付け混入が行われた文書を横断走査した場合
+- **予防策候補**: 横断走査時にハングル等の非想定文字クラスの検出を走査観点に追加する（検査基盤変更は別検討）
+- **想定反映先**: なし（本エントリで記録）
+- **関連**: Epic #3216、PR #3228、docs/decisions/DEC-012.md
+- **タグ**: `#docs-integrity` `#decisions` `#encoding`
+- **移動日**: 2026-09-28
+- **処分判定**: deferred（2026-09-28 評価。近縁: 2026-07-20「SPEC 本文への中国語文字混入」（検査基盤不在の同根）— 統合候補。検査基盤変更は別検討）
+
+---
+
+## prh 固定置換辞書への実測済み語の登録は DEC-028 限定例外の実測立証を別途行う（schema・retry の語例が確定済み）
+
+- **問題事象**: case-run（REQ-094 Wave 2）で schema→スキーマ、retry→再試行等の固定置換可語（訳語表⑤）の語例が横断是正の実測で確定したが、prh 固定置換辞書への新語登録は DEC-028 の限定例外（文脈非依存性・誤検出ゼロの実測立証）を要するため本 Wave スコープ外として残置した（PR #3229・#3227 記録）。
+- **発生局面**: Wave 2 横断是正（Epic #3216）後の辞書運用判断
+- **検知方法**: PR 本文 Findings / Capture候補 の記録（#3229・#3227）
+- **根本原因**: Wave 1 で prh 辞書を空辞書で納品する契約（実測立証なき登録を行わない運用）のため、実測はあるが立証手続き（誤検出ゼロ実測）が未実施
+- **自律対応内容**: 登録は行わず capture として記録（本エントリ）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: DEC-028 の運用（変更なし）
+- **横展開観点**: 横断是正で確定した語例は語彙レジストリ（vocabulary-registry.md、accepted）への追記候補でもある（PR #3227 Design確定候補 記録。accepted Design への内容追記は別 Case 対象）
+- **再発条件**: 固定置換可語の語例が確定した後、立証手続きなしに prh 辞書へ登録する場合
+- **予防策候補**: prh 新語登録は「文脈非依存性判定 + 誤検出ゼロ実測」の2手続きを経てから行う
+- **想定反映先**: なし（本エントリで記録）
+- **関連**: Epic #3216、PR #3227・#3229、DEC-028、.agentdev/config/plugins/agentdev-textlint-guard-prh.yml、docs/designs/authoring/vocabulary-registry.md
+- **タグ**: `#prh` `#vocabulary` `#dec-028`
+- **移動日**: 2026-09-28
+- **処分判定**: deferred（2026-09-28 評価。DEC-028 限定例外運用どおりの遵守記録。語彙レジストリ追記は別 Case 対象）
+
+---
+
+## 横断是正バッチの REQ-094 系 implementation 宣言の恒久配置先の設計が未決（inline 宣言使用中の文書への対応宣言の正規化）
+
+- **問題事象**: case-run（REQ-094 Wave 2-2 docs/designs バッチ）で、REQ-094-001/004/005/010/011 の implementation を是正済み文書へ個別宣言する構成が、既存 inline ADF-COVERS 宣言との単一情報源契約（duplicate-inconsistencies）により sidecar では宣言不可だった。本バッチでは inline 宣言を持たない 4件のみ sidecar 宣言し、残り 30件の適用事実は PR 本文検証差分を正とした（PR #3229 記録）。
+- **発生局面**: 対応宣言作成（Epic #3216 Wave 2）
+- **検知方法**: traceability check の duplicate-inconsistencies と sidecar/inline 宣言の集合矛盾
+- **根本原因**: inline 宣言（producer 側優先）と sidecar の役割分担が REQ-094 系の横断是正適用体（多数の既存文書への適用事実の宣言）に対して定義されていない
+- **自律対応内容**: inline 宣言を持たない文書のみ sidecar 宣言、残りは PR 本文検証差分を正として記録（現行解消。恒久配置先は未決）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（設計検討事項として残置）
+- **横展開観点**: 今後の新規 Markdown に対する REQ-094 適用（REQ-094-012）では、適用事実の宣言方式（inline 追記 vs sidecar 集約 vs PR 検証差分）を事前に決めておく必要がある
+- **再発条件**: 次回横断是正・新規文書への REQ-094 適用時
+- **予防策候補**: REQ-094 系 implementation 宣言の恒久配置先を別 Case（req-define / case-open 系）で設計する
+- **想定反映先**: なし（設計検討事項）
+- **関連**: Epic #3216、PR #3229、traceability/ra002-designs-batch-correction.yaml、v4-traceability-model Design
+- **タグ**: `#traceability` `#req-094` `#sidecar`
+- **移動日**: 2026-09-28
+- **処分判定**: deferred（2026-09-28 評価。REQ-094 系 implementation 宣言の恒久配置先設計は req-define/case 系で確定。再評価条件: 次回横断是正・新規文書への REQ-094 適用時）
 
 ---
