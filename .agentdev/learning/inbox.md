@@ -228,3 +228,83 @@
 - **想定反映先**: case-open workflow skill reference（definition-pr-and-idempotency.md 手順2.5 の checker 実測の意図説明）
 - **関連**: Root Case #3214、PR #3215、docs/README.md、src/opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts
 - **タグ**: `#integrity` `#autogen` `#req-staleness`
+
+## トレーサビリティ対応宣言は「未宣言の artifact のみ」を新規 sidecar に集約し、既存宣言持ち artifact は該当情報源へ追加する
+
+- **問題事象**: case-run（REQ-094 Wave 2 横断是正バッチ）で、修正対象ファイルを新規 sidecar に一括列挙したところ、既存 sidecar 宣言済みファイル・inline 宣言済みファイルと重複し duplicate-inconsistencies を検出した（PR #3226・#3228・#3230 の対応宣言作業）。
+- **発生局面**: トレーサビリティ対応宣言作成（case-run STEP-S5 対応宣言、Epic #3216 Wave 2）
+- **検知方法**: agentdev-traceability check の duplicate-inconsistencies（同一 artifact × role × 要件行の複数情報源矛盾）
+- **根本原因**: artifact パス × role の対応宣言が複数情報源（既存 sidecar / inline ADF-COVERS 宣言）に分かれる状態で、新規 sidecar に全修正対象を一括列挙すると既存宣言と重複する
+- **自律対応内容**: 新規 sidecar は「未宣言の artifact のみ」に集約し、既存宣言持ち artifact は該当情報源（既存 sidecar または inline 宣言）へ追加して再検査 9/9 pass を確認（本手順込みで解消済み）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 対応宣言追加前には component / sidecar 対応一覧の事前確認を行う（agentdev-traceability sidecar-and-policy.md の手順）。inline 宣言が使用中の文書には inline 優先規則（producer 側）で集約する
+- **再発条件**: 修正対象ファイル一覧をそのまま新規 sidecar に列挙した場合
+- **予防策候補**: 対応宣言作成前に既存宣言（sidecar・inline）の走査を必須化する（coverage --artifact または rg での ADF-COVERS 宣言事前確認）
+- **想定反映先**: agentdev-traceability 側への操作知識追記候補（PR #3226 本文 Findings 記録）
+- **関連**: Epic #3216、PR #3226・#3228・#3230、traceability/src-opencode-correction.yaml、traceability/decisions-terminology-batch.yaml
+- **タグ**: `#traceability` `#adf-covers` `#duplicate-inconsistencies`
+
+## check_distribution_boundary --profile link は worktree 内で projection 未実体化により必ず zero-targets になる（違反ではない）
+
+- **問題事象**: case-run 委譲内 agent が worktree 内で check_distribution_boundary --profile link を実行し、zero-targets（projection 未実体化）を「違反」と誤認するリスクがあった（PR #3226 の case-run 記録）。
+- **発生局面**: 配布依存境界 gate 実行（case-run STEP-S5・Epic #3216 Wave 2-6 src バッチ）
+- **検知方法**: PR 本文検証差分の記録（実際には既存 reference のフォールバック手順に従い host main root projection で実行して回避済み）
+- **根本原因**: worktree では .opencode/plugins の junction 未伝播により projection が実体化されず、--profile link の検査対象が 0 件になる。環境差を違反と区別しないと誤停止・誤合格が起きる
+- **自律対応内容**: 既存運用手順どおり host main root projection で実行し、環境ラベル（実行環境=main root 実体、検査対象=main root projection、junction 伝播状態）を記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree 内 gate 実行では環境ラベル（実行環境・junction 伝播状態・検査対象 root）の記録が誤判定防止の要。zero-targets は違反ではなく環境差として解釈する
+- **再発条件**: worktree 内で --profile link を初回実行した委譲 agent が zero-targets を違反判定した場合
+- **予防策候補**: 委譲 prompt の前置観点として「worktree 内 --profile link は必ず zero-targets」を明示する
+- **想定反映先**: workflow-case-run delegation-and-result・reference-resolution reference（PR #3226 本文 Findings 記録の追記候補）
+- **関連**: Epic #3216、PR #3226、check_distribution_boundary.ts
+- **タグ**: `#distribution-boundary` `#worktree` `#gate`
+
+## docs 配下の過去文書には異言語混入が残存し得る（DEC-012 の「区別 없ければ」を是正）
+
+- **問題事象**: case-run（REQ-094 Wave 2-3 docs/decisions バッチ）で、DEC-012 に韓国語混入「区別 없ければ」を発見し「区別がなければ」へ是正した（PR #3228）。UTF-8/LF の破壊は検出していない。
+- **発生局面**: TS-001 抽出・是正（Epic #3216 Wave 2-3）
+- **検知方法**: docs/decisions 配下の機械抽出（一般英単語・異言語候補の走査）
+- **根本原因**: 過去の編集で混入した異言語は日本語・英語いずれにも該当しないため、英単語混在のみを対象とする検査では捕捉されない
+- **自律対応内容**: 「区別がなければ」へ意味保持是正済み（PR #3228 マージ済み）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 文書品質の機械検査は英単語混在・CJK 破損に加えて第三言語混入も観点に含め得る（REQ-053-039 の機械検査対象拡大ではない個別是正の範囲）
+- **再発条件**: 異言語 IME の誤変換・貼り付け混入が行われた文書を横断走査した場合
+- **予防策候補**: 横断走査時にハングル等の非想定文字クラスの検出を走査観点に追加する（検査基盤変更は別検討）
+- **想定反映先**: なし（本エントリで記録）
+- **関連**: Epic #3216、PR #3228、docs/decisions/DEC-012.md
+- **タグ**: `#docs-integrity` `#decisions` `#encoding`
+
+## prh 固定置換辞書への実測済み語の登録は DEC-028 限定例外の実測立証を別途行う（schema・retry の語例が確定済み）
+
+- **問題事象**: case-run（REQ-094 Wave 2）で schema→スキーマ、retry→再試行等の固定置換可語（訳語表⑤）の語例が横断是正の実測で確定したが、prh 固定置換辞書への新語登録は DEC-028 の限定例外（文脈非依存性・誤検出ゼロの実測立証）を要するため本 Wave スコープ外として残置した（PR #3229・#3227 記録）。
+- **発生局面**: Wave 2 横断是正（Epic #3216）後の辞書運用判断
+- **検知方法**: PR 本文 Findings / Capture候補 の記録（#3229・#3227）
+- **根本原因**: Wave 1 で prh 辞書を空辞書で納品する契約（実測立証なき登録を行わない運用）のため、実測はあるが立証手続き（誤検出ゼロ実測）が未実施
+- **自律対応内容**: 登録は行わず capture として記録（本エントリ）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: DEC-028 の運用（変更なし）
+- **横展開観点**: 横断是正で確定した語例は語彙レジストリ（vocabulary-registry.md、accepted）への追記候補でもある（PR #3227 Design確定候補 記録。accepted Design への内容追記は別 Case 対象）
+- **再発条件**: 固定置換可語の語例が確定した後、立証手続きなしに prh 辞書へ登録する場合
+- **予防策候補**: prh 新語登録は「文脈非依存性判定 + 誤検出ゼロ実測」の2手続きを経てから行う
+- **想定反映先**: なし（本エントリで記録）
+- **関連**: Epic #3216、PR #3227・#3229、DEC-028、.agentdev/config/plugins/agentdev-textlint-guard-prh.yml、docs/designs/authoring/vocabulary-registry.md
+- **タグ**: `#prh` `#vocabulary` `#dec-028`
+
+## 横断是正バッチの REQ-094 系 implementation 宣言の恒久配置先の設計が未決（inline 宣言使用中の文書への対応宣言の正規化）
+
+- **問題事象**: case-run（REQ-094 Wave 2-2 docs/designs バッチ）で、REQ-094-001/004/005/010/011 の implementation を是正済み文書へ個別宣言する構成が、既存 inline ADF-COVERS 宣言との単一情報源契約（duplicate-inconsistencies）により sidecar では宣言不可だった。本バッチでは inline 宣言を持たない 4件のみ sidecar 宣言し、残り 30件の適用事実は PR 本文検証差分を正とした（PR #3229 記録）。
+- **発生局面**: 対応宣言作成（Epic #3216 Wave 2）
+- **検知方法**: traceability check の duplicate-inconsistencies と sidecar/inline 宣言の集合矛盾
+- **根本原因**: inline 宣言（producer 側優先）と sidecar の役割分担が REQ-094 系の横断是正適用体（多数の既存文書への適用事実の宣言）に対して定義されていない
+- **自律対応内容**: inline 宣言を持たない文書のみ sidecar 宣言、残りは PR 本文検証差分を正として記録（現行解消。恒久配置先は未決）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（設計検討事項として残置）
+- **横展開観点**: 今後の新規 Markdown に対する REQ-094 適用（REQ-094-012）では、適用事実の宣言方式（inline 追記 vs sidecar 集約 vs PR 検証差分）を事前に決めておく必要がある
+- **再発条件**: 次回横断是正・新規文書への REQ-094 適用時
+- **予防策候補**: REQ-094 系 implementation 宣言の恒久配置先を別 Case（req-define / case-open 系）で設計する
+- **想定反映先**: なし（設計検討事項）
+- **関連**: Epic #3216、PR #3229、traceability/ra002-designs-batch-correction.yaml、v4-traceability-model Design
+- **タグ**: `#traceability` `#req-094` `#sidecar`
