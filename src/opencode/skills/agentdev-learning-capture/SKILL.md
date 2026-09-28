@@ -80,7 +80,7 @@ learning は「改善提案そのもの」ではなく「改善提案へ昇華�
 | 条件 | 読む reference |
 |---|---|
 | 13フィールド形式の基準テンプレートの取得、各フィールドの記述レベルガイドラインが必要な場合 | [references/capture-entry-template.md](references/capture-entry-template.md) |
-| 主な捕捉対象カテゴリの具体例、学び抽出から通知までの手順実例（シナリオ1/2）、Tips、pipeline 全体像（capture → promote）が必要な場合 | [references/example.md](references/example.md) |
+| 主な捕捉対象カテゴリの具体例、学び抽出から通知までの手順実例（シナリオ1/2）、ヒント、pipeline 全体像（capture → promote）が必要な場合 | [references/example.md](references/example.md) |
 
 ## See Also
 

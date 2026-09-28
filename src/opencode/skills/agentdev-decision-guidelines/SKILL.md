@@ -37,7 +37,7 @@ description: Evaluates whether architectural decisions require a Decision record
 1. **仕様変更のみ**: 技術的決定を含まない仕様の変更、追加、整理
 2. **command動作仕様**: コマンドの入力、出力、振る舞いの定義
 3. **workflow定義**: ワークフローの状態遷移、フェーズ定義、パイプライン定義
-4. **命名規約、directory規約**: ファイル、ディレクトリの命名規則
+4. **命名規約、ディレクトリ規約**: ファイル、ディレクトリの命名規則
 5. **artifact contract変更**: REQ/Decision/Design等の文書形式、frontmatter規約の変更
 6. **運用ルール**: 運用手順、レビュープロセスの変更
 7. **template変更**: テンプレート形式、セクション構成の変更

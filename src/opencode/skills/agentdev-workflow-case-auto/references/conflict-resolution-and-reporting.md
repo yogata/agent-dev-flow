@@ -36,7 +36,7 @@ Level 2 コンフリクト文脈付きインライン case-run 再実行、Level
 
 ### Result
 
-- コンフリクト解消（Level 2 or 3 で解消時）→ STEP-3 へ戻り再マージ
+- コンフリクト解消（Level 2 または 3 で解消時）→ STEP-3 へ戻り再マージ
 - 解消不能時（Level 3 失敗）→ STEP-4 停止経路（停止条件 (8)）
 
 ### Evidence

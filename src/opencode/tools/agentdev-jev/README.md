@@ -8,7 +8,7 @@ Jev 先行評価 Custom Tool `agentdev_jev` の本体（REQ-{NNNN}、DEC-{NNN}�
 
 | operation | 内容 |
 |---|---|
-| `evaluate` | 閉じた判断入力への Jev 先行評価。質問ごとの結果・候別別確率分布・provider が返した confidence（evaluation 単位。返さない場合は返さない）・inputTokens（provider が返す場合）・機械的処理時間を返す。失敗は構造化失敗（not_configured、timeout、rate_limited、server_error、network_error、response_invalid）。自動 retry なし。evaluator 成功後・呼出元 Workflow が reasoning model へ進む前に、当該評価の観測（1 semantic evaluation = 1 observation、1 JSON）を `.agentdev/jev-observations/` へ永続化し、実際の呼出し開始後の失敗は失敗観測を永続化する。未設定（not_configured）と評価入力の事前検証失敗では観測を生成しない。永続化失敗は評価結果と独立した warning（fail-open） |
+| `evaluate` | 閉じた判断入力への Jev 先行評価。質問ごとの結果・候別別確率分布・provider が返した confidence（evaluation 単位。返さない場合は返さない）・inputTokens（provider が返す場合）・機械的処理時間を返す。失敗は構造化失敗（not_configured、timeout、rate_limited、server_error、network_error、response_invalid）。自動再試行なし。evaluator 成功後・呼出元 Workflow が reasoning model へ進む前に、当該評価の観測（1 semantic evaluation = 1 observation、1 JSON）を `.agentdev/jev-observations/` へ永続化し、実際の呼出し開始後の失敗は失敗観測を永続化する。未設定（not_configured）と評価入力の事前検証失敗では観測を生成しない。永続化失敗は評価結果と独立した warning（fail-open） |
 | `observation_write` | evaluator 成功観測（`observationId` で特定）の同一 JSON へ reasoning model の最終判断結果（final result）を追記する。追記入力は最終判断結果のみ（schemaVersion と finalResult）を受け付け、evaluator 返却結果との1対1対応と差異条件を検証する。evaluator 返却結果と最終判断が異なる場合のみ差異理由分類（evaluation_input_defect / semantic_disagreement / deterministic_override / unknown）を保持する。追記は冪等で重複 JSON を生成しない。失敗観測・存在しない観測 ID・現行契約外の観測（履歴観測を含む）への追記は拒否する |
 
 ## 観測の永続化と最終判断の反映

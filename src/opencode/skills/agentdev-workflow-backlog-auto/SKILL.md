@@ -38,7 +38,7 @@ backlog-auto workflow は次の6 STEP で構成する。
 | STEP-3 | stage 2: 昇格3系統実行 | stage 1 正常終了 | 系統別実行結果（正常完了 / 対象なし終了 / blocked / failed / 未完了） | [references/stage-execution.md](references/stage-execution.md) |
 | STEP-4 | 合流判定（fan-in） | 3系統の結果受領 | backlog-review 開始可否の判定 | [references/fan-in-and-reporting.md](references/fan-in-and-reporting.md) |
 | STEP-5 | stage 3: backlog-review 実行 | 合流判定が開始可 | RU 生成、成功成果物削除（backlog-review 公開契約どおり） | [references/fan-in-and-reporting.md](references/fan-in-and-reporting.md) |
-| STEP-6 | 完了報告 | 全工程完了 or 停止 | 工程別結果、停止理由、再開コマンド提示を含む実行結果報告 | [references/fan-in-and-reporting.md](references/fan-in-and-reporting.md) |
+| STEP-6 | 完了報告 | 全工程完了 または 停止 | 工程別結果、停止理由、再開コマンド提示を含む実行結果報告 | [references/fan-in-and-reporting.md](references/fan-in-and-reporting.md) |
 
 ### STEP 間の依存と分岐
 

@@ -24,7 +24,7 @@
 
 要件doc に `agentdev_handoff: true` が含まれる場合、リポジトリ種別に応じて分岐（詳細は `agentdev-workflow-lifecycle` runtime-package-boundary 参照）。
 
-- **self-hosting リポジトリ**（ジャンクション or 実ディレクトリ）: 履歴メタデータとして処理を継続
+- **self-hosting リポジトリ**（ジャンクション または 実ディレクトリ）: 履歴メタデータとして処理を継続
 - **consumer リポジトリ**（コピー配置等）: Root Case を作成せず停止し agent-dev-flow repository への手動取り込み対象として報告
 
 ### 工程間構造化文脈の初期文脈利用

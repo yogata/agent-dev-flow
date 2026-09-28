@@ -19,7 +19,7 @@
 // ADF-COVERS(implementation): REQ-087-002, REQ-087-003
 // ADF-COVERS(implementation): REQ-087-004
 // ADF-COVERS(verification): REQ-087-002
-// ADF-COVERS(verification): REQ-094-006, REQ-094-010, REQ-094-011
+// ADF-COVERS(verification): REQ-094-001, REQ-094-002, REQ-094-003, REQ-094-004, REQ-094-005, REQ-094-006, REQ-094-010, REQ-094-011
 import {
   EXIT_OK,
   EXIT_NG,

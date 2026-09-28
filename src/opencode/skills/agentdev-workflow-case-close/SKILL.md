@@ -40,10 +40,10 @@ Epic Wave クローズは STEP-1 のルーティングで分岐し、E1〜E6 と
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
-| STEP-1 | Issue 番号解決・ルーティング | Issue 番号受領 | 単一 Issue クローズ or Epic Wave クローズのルート確定 | [references/issue-resolution-and-qg4.md](references/issue-resolution-and-qg4.md) |
+| STEP-1 | Issue 番号解決・ルーティング | Issue 番号受領 | 単一 Issue クローズ または Epic Wave クローズのルート確定 | [references/issue-resolution-and-qg4.md](references/issue-resolution-and-qg4.md) |
 | STEP-2 | QG-4 達成判定 | ルート確定（単一 Issue） | 完了条件チェックボックス評価・更新、観点8 評価スコープ確定 | [references/issue-resolution-and-qg4.md](references/issue-resolution-and-qg4.md) |
 | STEP-3 | docs 検証・Design 確定（配布依存境界 最終 gate 含む） | QG-4 合格 | targeted docs guard、IR-{NNN} check_extensions.ts、配布依存境界 最終 gate、full integrity suite 実行（bun test 実行形態契約）、Design 状態評価（棚卸し制：PR 本文申告候補の統合を含む全件評価）・Design status 昇格 | [references/docs-and-design-promotion.md](references/docs-and-design-promotion.md) |
-| STEP-4 | PR マージ・コンフリクト解消 | docs 検証合格（配布依存境界 最終 gate 含む） | マージ済みPR（squash merge 先は main）、HEAD commit hash 記録、コンフリクト Level 1 解消 or case-auto エスカレーション | [references/pr-merge-and-conflict.md](references/pr-merge-and-conflict.md) |
+| STEP-4 | PR マージ・コンフリクト解消 | docs 検証合格（配布依存境界 最終 gate 含む） | マージ済みPR（squash merge 先は main）、HEAD commit hash 記録、コンフリクト Level 1 解消 または case-auto エスカレーション | [references/pr-merge-and-conflict.md](references/pr-merge-and-conflict.md) |
 | STEP-5 | Post-merge・Issue クローズ | PR マージ完了 | CI 通過確認、Issue 本文更新、Issue close | [references/cleanup-and-capture.md](references/cleanup-and-capture.md) |
 | STEP-6 | クリーンアップ・Capture 回収・永続化 | Issue クローズ完了 | worktree/ローカルブランチ削除、親Epic 自動クローズ、実行前同期、Capture 回収、学び検知、`.agentdev/` 永続化、tmp/ 残存確認、完了報告 | [references/cleanup-and-capture.md](references/cleanup-and-capture.md) |
 | STEP-E1〜E6 | Epic Wave クローズ（E4-1 配布依存境界 最終 gate 含む） | Epic Issue 番号受領、ステータス追跡テーブル存在 | 現在 Wave の子Issue 一括マージ・クローズ（E4-1 gate 違反子Issue は `blocked` でマージ対象外）、Design 状態評価の Wave 内集約（E4-3、直列集約段で一元評価）、Epic status table 更新、当該 Wave スコープの一時成果物残留確認（E6-1、残留時は完了扱いにしない）、最終 Wave 判定 | [references/epic-wave-close.md](references/epic-wave-close.md) |

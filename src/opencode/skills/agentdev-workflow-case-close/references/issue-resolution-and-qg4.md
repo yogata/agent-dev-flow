@@ -38,7 +38,7 @@ Issue 番号を解決し、単一 Issue クローズと Epic Wave クローズ�
 
 ### Result
 
-- 処理ルート確定（単一 Issue クローズ or Epic Wave クローズ）
+- 処理ルート確定（単一 Issue クローズ または Epic Wave クローズ）
 - 単一 Issue クローズ時: 重複ファイルチェック結果
 
 ### Evidence
@@ -79,7 +79,7 @@ Issue 本文の完了条件チェックボックスを最終評価・更新し�
 - **トレーサビリティ check の実行前提**: 下記の段階ゲートで check を実行する際は、`agentdev-traceability` SKILL.md「実行方法」節の実行前提に従う（`--req` は要件行IDの個別カンマ指定のみ受理し `..` 形式の範囲構文は非対応、`--root` は検証対象リポジトリのルート明示、宣言の走査対象は拡張子・除外ディレクトリの前提どおり）。前提を満たさない実行の結果は QG-4 の判定根拠に使わない
 - **検証対応の3完全性ゲート（完了阻止）**: 完了条件チェックボックスの評価とは別に、対象要件行（当該 Case の Issue 本文が対象とする要件行）の Design 対応、implementation 対応、verification 対応（policy が required と判定する要件行）の完全性を判定する。対象要件行に Design 対応、implementation 対応、または required 行の verification 対応の欠落が残る場合、当該 Case を**完了として扱わない**（チェックボックスが全て checked でも完了扱いにしない）。`agentdev-traceability` の check（`--req` で対象要件行に限定、`missing-design` / `missing-implementation` / `missing-verification` の findings を該当行の完了阻止条件として扱う）で機械的に導出する。check が正常に完全性を判定できなかった場合（check 実行不能、検査対象の取得不能等）は対応完全性の合格として扱わず、検査不能の旨を報告してマージに進まない（fail-closed）。**policy が optional と明示した要件行の verification 対応欠落は完全性違反に含めない**。Decision 対応の欠落は完了阻止条件に含めない。判定の所有は本 Workflow Skill が保持し、command 定義へ複製しない。ゲート停止の状態は REQ ファイル、トレーサビリティポリシー、対応宣言という durable state から再構成可能である。実行の詳細は SKILL.md「トレーサビリティ能力の利用（QG-4 独立再検査）」参照
 - **worktree root 起点の完全性判定時の再実行（誤差し戻し防止）**: traceability check を worktree root 起点で実行して検出対象の完全性が確定できない場合、main 側 root で check を再実行し、トレーサビリティポリシー登録 commit の時系列（ブランチ分岐の前後）を確認してから完了阻止を判断する。durable state 上で解消済みの対象行を本変更起因の失敗と誤判定しない。再実行は読取系 check の実行のみで行い、GitHub I/O・Tool 操作契約は変更しない
-- **PR 対象範囲 vs 全体 評価スコープ判定（QG-4 観点8）**: unchecked 完了条件を達成判定する前に、各完了条件の評価スコープ（PR 対象範囲 or 全体）を QG-4 観点8「PR 対象範囲 vs 全体 判定マトリクス」に従い決定する（境界ケース #1532 由来）
+- **PR 対象範囲 vs 全体 評価スコープ判定（QG-4 観点8）**: unchecked 完了条件を達成判定する前に、各完了条件の評価スコープ（PR 対象範囲 または 全体）を QG-4 観点8「PR 対象範囲 vs 全体 判定マトリクス」に従い決定する（境界ケース #1532 由来）
 - 手順、再 grep/再検査/再計測、事後確認（再読込 VERIFY）、未達項目残存時の停止（完了条件評価専任責務）、test strategy 処理完了確認（未処理項目が残る場合は構造化エラーで停止）の詳細は `agentdev-quality-gates` の QG-4 を参照
 - PR 存在確認
 - **verify-only closure の QG-4 達成判定（SSoT コメント参照）**: verify-only closure（PR も carrier commit も存在しない Issue 完了）では、case-run が記録した SSoT コメント（Issue コメント）の実行コマンド列と検証結果を判定根拠として参照する。PR が存在しないため PR 本文の検証差分セクションは存在せず、SSoT コメントが検証証跡の恒久記録の正となる。SSoT コメントから次の3点を確認する:
