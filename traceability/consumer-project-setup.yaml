@@ -5,6 +5,11 @@ implementation:
     - REQ-009-051
     - REQ-009-052
     - REQ-093-002
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-005
+    - REQ-094-010
 verification:
   docs/guides/consumer-project-setup.md:
     - REQ-093-002

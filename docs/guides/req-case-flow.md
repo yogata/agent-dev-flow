@@ -136,8 +136,8 @@ v4（DEC-033）では内部 lifecycle 段階（case-open → case-ready → case
 ### 自走対象
 
 リポジトリにファイルとして残る変更に限定する。
-GitHub Issue / PR / comment / merge / close、docs / REQ / Decision / Design / command reference / guide の更新を含む。
-migration ファイル、IaC ファイルの作成、修正も対象。
+GitHub Issue / PR / コメント / マージ / クローズ、docs / REQ / Decision / Design / コマンドリファレンス / ガイドの更新を含む。
+マイグレーションファイル、IaC ファイルの作成、修正も対象。
 
 
 ### 自走対象外

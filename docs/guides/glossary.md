@@ -98,5 +98,5 @@ GitHub Issue/PR を使わない個人利用環境向けの AgentDevFlow 利用�
 | consumer-generated | ローカル版 OpenCode を導入するリポジトリ種別。`.opencode/tools/agentdev-gh/`（Custom Tool `agentdev_gh` の実行ディレクトリ）が `src/opencode-local/agentdev-gh/`（Local 実装）への link として解決されることで判定される（Design `runtime-package-boundary.md`） |
 | `src/opencode-local/` | ローカル版 link 先原本領域。AgentDevFlow 本体リポジトリに配置され、`README.md` と `agentdev-gh/` のみを保持する。IR-047 でディレクトリ構成を検証 |
 | link mode | ローカル版導入方式。`.opencode/` 配下を src 配下へ接続し、原本をそのまま利用する。`agentdev-gh` だけを `src/opencode-local/agentdev-gh/` から差し替える |
-| link target 確認 | ローカル版 link 設定前に `.opencode/` 配下の各 path が意図した link target へ解決されることを確認する安全機構。意図した target 以外へ解決される場合は link 設定を停止する |
+| link target 確認 | ローカル版 link 設定前に `.opencode/` 配下の各パスが意図した link target へ解決されることを確認する安全機構。意図しない link target へ解決される場合は link 設定を停止する |
 | Local backend | ローカル版 OpenCode のバックエンド区分。GitHub backend（GitHub Issue/PR を使う通常運用）との差分として Design `v4-lifecycle-state-machine.md` で定義される。SSoT は GitHub Issue/PR ではなくローカルIssue（`.agentdev/issues/issue-{NNNN}.md`）となる |

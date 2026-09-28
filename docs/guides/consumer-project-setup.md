@@ -1,6 +1,6 @@
 # 適用プロジェクトへの導入モデル
 
-<!-- ADF-COVERS(implementation): REQ-050-014, REQ-009-051, REQ-009-052, REQ-093-002 -->
+<!-- ADF-COVERS(implementation): REQ-050-014, REQ-009-051, REQ-009-052, REQ-093-002, REQ-094-001, REQ-094-002, REQ-094-004, REQ-094-005, REQ-094-010 -->
 
 AgentDevFlow を適用プロジェクトに導入する際のモデルを定義する（REQ-009）。
 
@@ -88,7 +88,7 @@ Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentde
 
 - **link による接続**: command/skill を生成せず、`.opencode/` 配下を src 配下へ link で接続する
 - **agentdev_gh 実装の差し替え**: agentdev-gh 以外は通常版と同じ `src/opencode/` 配下へ接続する。Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけを `src/opencode-local/agentdev-gh/` へ接続する（REQ-011-006）
-- **link target 確認**: link 設定前に `.opencode/` 配下の各 path が意図した link target へ解決されることを確認し、意図しない target の場合は link 設定を停止する
+- **link target 確認**: link 設定前に `.opencode/` 配下の各パスが意図した link target へ解決されることを確認し、意図しない link target の場合は link 設定を停止する
 - **リポジトリ管理対象外**: link により接続された `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/` はリポジトリ管理対象外
 - **リポジトリ管理対象**: `.agentdev/issues/` 配下のローカルIssueは Issue/PR 相当の永続情報としてリポジトリ管理対象（REQ-009-026）
 - **更新方式**: unlink / relink により行う。`.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を全削除して作り直す方式は採らない
@@ -159,7 +159,7 @@ install スクリプトは provisioning（clone、fetch、reset）も network ac
 | Git サブモジュール | ⚠️ | 検討可能 | 複雑性が増す |
 | プラグイン/npm/package | ❌ | 将来対応 | 将来の選択肢 |
 
-> 「source ZIP によるチェックアウト供給」と「release archive projection」（REQ-029 が別途定義する配布と検証の投影）は別の概念である（DEC-014）。
+> 「ソース ZIP によるチェックアウト供給」と「release archive projection」（REQ-029 が別途定義する配布と検証の投影）は別の概念である（DEC-014）。
 > ZIP 展開による provisioning は手動 copy インストールに該当せず、install 手段は link mode に限定される。
 
 ### ジャンクションによるインストール（推奨）
@@ -240,7 +240,7 @@ case-auto 等の本格実行に入る前に、軽量な読み取り操作（`iss
 ### 更新手順
 
 更新は provisioning 形式に従う（REQ-009-049）。
-install の apply は冪等であり、再実行で junction 構成を変化させない。
+install の apply は冪等であり、再実行でジャンクション構成を変化させない。
 
 ```powershell
 # git clone 環境: agent-dev-flow の最新を取得

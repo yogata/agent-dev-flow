@@ -115,9 +115,9 @@ integrity 検査は検査範囲に応じて3層に分かれる。
 
 ### 達成記録先と記録規約
 
-達成状況の記録先、false positive の扱い、文書変更時の記録規約は基準文書が所有する。
+達成状況の記録先、誤検出（false positive）の扱い、文書変更時の記録規約は基準文書が所有する。
 規約の内容は Update Notes セクション不使用と、変更履歴の frontmatter `updated` による追跡である。
-文書フォーマット規約は [patterns.md](../designs/foundations/patterns.md)、IR エントリの false positive の扱いは [整合性ルールカタログ](../designs/integrity/integrity-rule-catalog.md) を参照する。
+文書フォーマット規約は [patterns.md](../designs/foundations/patterns.md)、IR エントリの誤検出の扱いは [整合性ルールカタログ](../designs/integrity/integrity-rule-catalog.md) を参照する。
 
 ## 整合性の考え方
 

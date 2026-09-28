@@ -11,6 +11,10 @@ implementation:
   docs/guides/supervisor-credential-bridge.md:
     - REQ-091-003
     - REQ-091-005
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-010
   docs/README.md:
     - REQ-091-003
   docs/guides/README.md:
