@@ -19,7 +19,7 @@ docs/knowledge/ はプロジェクト知識（プロジェクト固有の再利�
 
 ## 現在の知識文書
 
-19件。
+20件。
 
 - [windows-powershell-bulk-io-corruption.md](windows-powershell-bulk-io-corruption.md)
 - [checker-cli-stdout-loss-on-windows-bun.md](checker-cli-stdout-loss-on-windows-bun.md)
@@ -40,6 +40,7 @@ docs/knowledge/ はプロジェクト知識（プロジェクト固有の再利�
 - [windows-git-bash-inline-content-corruption.md](windows-git-bash-inline-content-corruption.md)
 - [sdk-replacement-request-schema-contract-enumeration.md](sdk-replacement-request-schema-contract-enumeration.md)
 - [distribution-boundary-diff-normalized-matching.md](distribution-boundary-diff-normalized-matching.md)
+- [worktree-preexisting-violation-main-crosscheck.md](worktree-preexisting-violation-main-crosscheck.md)
 
 知識文書は learning から昇華されて成長する（REQ-056）。
 登録経路と承認条件は REQ-056 を参照する。
