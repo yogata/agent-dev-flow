@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260928T163829Z-cc5b",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0129 agentdev_gh role/kind/labels 受理対応表のREQ帰属判断",
+  "sourceRevision": "05a27087aa2628d87e759b58364dc59858e1b82d",
+  "durationMs": 34437,
+  "inputTokens": 1589,
+  "inputs": {
+    "requestDigest": "a0845be4505fe1d617b4d84dad6b7a2ceaeaf33a6575a8ec27723c00418e644b",
+    "references": [
+      {
+        "digest": "3772ad916408147630a9ec66cc2fccec0607d6198a7515bda9ecae2fae758e54",
+        "label": "RU-0129",
+        "path": ".agentdev/backlog/req-units/RU-0129.md"
+      },
+      {
+        "digest": "7dfdff54b453b3e97a29a8f1c95c28d0af3e5144a5e024e209b110152899da96",
+        "label": "REQ-049",
+        "path": "docs/requirements/REQ-049.md"
+      },
+      {
+        "digest": "aa70cdd4eb2b81afb5c44dc496ebd4d1a7e481a4d89f06988258808e600c5e36",
+        "label": "REQ-092",
+        "path": "docs/requirements/REQ-092.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1_attribution",
+      "questionForm": "choice",
+      "value": "新規 REQ を create（agentdev_gh 起票・読取操作の呼出側規律として新設）",
+      "probabilityDistribution": {
+        "REQ-049 へ append（追跡Issue操作の呼出側規律として新規要件行を追加）": 0.05,
+        "REQ-092 へ update（適用範囲を issue_create・読取補完へ拡張する意味変更）": 0.31,
+        "新規 REQ を create（agentdev_gh 起票・読取操作の呼出側規律として新設）": 0.43,
+        "REQ操作なし（既存REQ行で足りるため実現面のみ: skill reference への追記のみ）": 0.21
+      }
+    },
+    {
+      "questionId": "q2_confirmation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.36,
+        "false": 0.64
+      }
+    }
+  ],
+  "confidence": 0.23,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1_attribution",
+        "value": "新規 REQ を create（agentdev_gh 起票・読取操作の呼出側規律として新設）"
+      },
+      {
+        "questionId": "q2_confirmation",
+        "value": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260928T163756Z-3534",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0131 同一ファイル複数 edit 規律のREQ帰属判断",
+  "sourceRevision": "05a27087aa2628d87e759b58364dc59858e1b82d",
+  "durationMs": 1392,
+  "inputTokens": 1292,
+  "inputs": {
+    "requestDigest": "429632b9d788f0f9214c25e3cf67294b9e849de74ee4ec94f9fca1d117c2ec54",
+    "references": [
+      {
+        "digest": "cff1d60f92af2c0c4b24f08da9c9e6e1f482160b0328df10fa3e9a7035d9b3dc",
+        "label": "RU-0131",
+        "path": ".agentdev/backlog/req-units/RU-0131.md"
+      },
+      {
+        "digest": "9f89c0da20f20ec515d36c4feeb5cf8c4dfb4a22bc813e306c33a3f4800a5fcf",
+        "label": "REQ-053",
+        "path": "docs/requirements/REQ-053.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1_attribution",
+      "questionForm": "choice",
+      "value": "REQ-053 へ append（編集適用規律の新規要件行として追加）",
+      "probabilityDistribution": {
+        "REQ-053 へ append（編集適用規律の新規要件行として追加）": 0.53,
+        "REQ-053-041 行を update（既存行を拡張して同一行に統合）": 0.07,
+        "REQ操作なし（実現面のみ: AGENTS.md・skill reference への追記のみ）": 0.4
+      }
+    },
+    {
+      "questionId": "q2_confirmation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.27,
+        "false": 0.73
+      }
+    }
+  ],
+  "confidence": 0.29,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1_attribution",
+        "value": "REQ-053 へ append（編集適用規律の新規要件行として追加）"
+      },
+      {
+        "questionId": "q2_confirmation",
+        "value": false
+      }
+    ]
+  }
+}

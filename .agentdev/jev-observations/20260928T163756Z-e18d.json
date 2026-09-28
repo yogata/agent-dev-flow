@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260928T163756Z-e18d",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0130 退避ファイル後始末規律のREQ帰属判断",
+  "sourceRevision": "05a27087aa2628d87e759b58364dc59858e1b82d",
+  "durationMs": 1480,
+  "inputTokens": 1437,
+  "inputs": {
+    "requestDigest": "9964a2b81cbb9319fa27a0b7f1e220ff02aad29b4ccbb354306ae62bd4407ac9",
+    "references": [
+      {
+        "digest": "5af2e235054f3e3543aeb85ea4013584fb40216b1b8baa0b74c31fb5e409943f",
+        "label": "RU-0130",
+        "path": ".agentdev/backlog/req-units/RU-0130.md"
+      },
+      {
+        "digest": "ae5b5486bde244c4a53019cfc10c8368e8330dd53b4c5d624df945f88587f10f",
+        "label": "REQ-018",
+        "path": "docs/requirements/REQ-018.md"
+      },
+      {
+        "digest": "60b3df10d200969fd60c869f95724d4d15ebab4be6a9f2daa035e56c98820c35",
+        "label": "REQ-032",
+        "path": "docs/requirements/REQ-032.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1_attribution",
+      "questionForm": "choice",
+      "value": "新規 REQ を create",
+      "probabilityDistribution": {
+        "REQ-018 へ append（worktree 構造的制約の新規要件行として追加）": 0.29000000000000004,
+        "REQ-032 へ append（case-close クリーンアップ手順の新規要件行として追加）": 0.12000000000000001,
+        "新規 REQ を create": 0.5100000000000001,
+        "REQ操作なし（実現面のみ: reference への追記のみ）": 0.08000000000000002
+      }
+    },
+    {
+      "questionId": "q2_confirmation",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.56,
+        "false": 0.43999999999999995
+      }
+    }
+  ],
+  "confidence": 0.34,
+  "finalResult": {
+    "results": [
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "q1_attribution",
+        "value": "REQ-018 へ append（worktree 構造的制約の新規要件行として追加）"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "q2_confirmation",
+        "value": false
+      }
+    ]
+  }
+}

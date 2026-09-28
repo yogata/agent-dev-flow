@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260928T163848Z-1b16",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0132 case-ready STEP-7 git rm ステージ割り込み対策のREQ帰属判断",
+  "sourceRevision": "05a27087aa2628d87e759b58364dc59858e1b82d",
+  "durationMs": 18931,
+  "inputTokens": 1337,
+  "inputs": {
+    "requestDigest": "b1cd5ffa969e927fb521934e09d097fa2320f20b77025cfa87c90c43608231f4",
+    "references": [
+      {
+        "digest": "af88ad582b86f0029456c020596b0e0049676a5bb64c29406f8696a4266e14e8",
+        "label": "RU-0132",
+        "path": ".agentdev/backlog/req-units/RU-0132.md"
+      },
+      {
+        "digest": "e5971ba7319c60e7d26660f2ba5609afa025b3e2930976cd85925c640c6ad60e",
+        "label": "REQ-061",
+        "path": "docs/requirements/REQ-061.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1_attribution",
+      "questionForm": "choice",
+      "value": "REQ-061 へ append（STEP-7 削除・commit 手順の新規要件行として追加）",
+      "probabilityDistribution": {
+        "REQ-061 へ append（STEP-7 削除・commit 手順の新規要件行として追加）": 0.97,
+        "REQ操作なし（実現面のみ: reference 手順への追記のみ。既存の git-common-procedures 手順3 参照で足りる）": 0.02,
+        "新規 REQ を create": 0.01
+      }
+    },
+    {
+      "questionId": "q2_confirmation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.16,
+        "false": 0.84
+      }
+    }
+  ],
+  "confidence": 0.96,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1_attribution",
+        "value": "REQ-061 へ append（STEP-7 削除・commit 手順の新規要件行として追加）"
+      },
+      {
+        "questionId": "q2_confirmation",
+        "value": false
+      }
+    ]
+  }
+}

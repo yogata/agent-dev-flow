@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260928T163830Z-6b30",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0141 REQ frontmatter updated 鮮度規約のREQ帰属判断",
+  "sourceRevision": "05a27087aa2628d87e759b58364dc59858e1b82d",
+  "durationMs": 223,
+  "inputTokens": 1368,
+  "inputs": {
+    "requestDigest": "a4344ef227d1d7e0d4a3690b716d45f73a6e918ea72239deb7ec69b6be470e76",
+    "references": [
+      {
+        "digest": "f490cd2df3f55b4fcb2dc4f4e51b0ebba0a14ffdd2bbb52321d13e99730f47c0",
+        "label": "RU-0141",
+        "path": ".agentdev/backlog/req-units/RU-0141.md"
+      },
+      {
+        "digest": "cbfa498f85e7e84591bbbf661ce4e4e4397b0fdab9f2e646253764e73b143987",
+        "label": "REQ-010",
+        "path": "docs/requirements/REQ-010.md"
+      },
+      {
+        "digest": "344f185450a3508ba976c857daf90a363b0d658c882bfa343ae5609b90a58248",
+        "label": "patterns",
+        "path": "docs/designs/foundations/patterns.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1_placement",
+      "questionForm": "choice",
+      "value": "patterns.md Design update のみ（REQ 行は不要）",
+      "probabilityDistribution": {
+        "patterns.md Design update のみ（REQ 行は不要）": 0.99,
+        "REQ-010 append ＋ patterns.md Design update（機械検査義務を REQ 行化）": 0,
+        "REQ-001 append ＋ patterns.md Design update（文書体系要件として REQ 行化）": 0.01,
+        "REQ操作なし・Design操作なし（31ファイル是正のみ）": 0
+      }
+    },
+    {
+      "questionId": "q2_checker",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.61,
+        "false": 0.39
+      }
+    },
+    {
+      "questionId": "q3_confirmation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.34,
+        "false": 0.6599999999999999
+      }
+    }
+  ],
+  "confidence": 0.99,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1_placement",
+        "value": "patterns.md Design update のみ（REQ 行は不要）"
+      },
+      {
+        "questionId": "q2_checker",
+        "value": true
+      },
+      {
+        "questionId": "q3_confirmation",
+        "value": false
+      }
+    ]
+  }
+}
