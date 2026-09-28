@@ -1,0 +1,14 @@
+# ADF プロジェクト用語 prh 辞書（本プロジェクト固有の固定置換語）。
+# 語彙管理の3層分担（document-type-responsibilities.md 用語政策節）における
+# 「prh 機械辞書」層。固定置換可と判定された語のみを登録する。
+# 判定根拠（7区別軸データ・由来参照）は
+# .opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md
+# 「用語選択基準の区別軸データ（REQ-094-008）」節を正とする。
+# 登録前提は DEC-028 の限定例外（文脈非依存性と誤検出ゼロの実測立証）。
+# 配布物 rules/default-prh.yml は言語違反クラスに限定し、本辞書へは登録しない。
+# 検出は散文（Str 節点）のみに適用され、inline code と fenced code は対象外。
+# 単語境界は regex 形式で指定する（複数形・大文字始まりの固有複合名を除外）。
+# 登録語は現在 0 件（2026-09-28 case-revise 再合意: retry・schema は誤検出実測
+# 〔hard 205件〕により不登録。prh 新語登録は Wave 2 横断是正の実測後に別途実施）。
+version: 1
+rules: []

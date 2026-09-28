@@ -1,0 +1,6 @@
+component: vocabulary-management
+implementation:
+  .opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md:
+    - REQ-094-008
+  .agentdev/config/plugins/agentdev-textlint-guard-prh.yml:
+    - REQ-094-009
