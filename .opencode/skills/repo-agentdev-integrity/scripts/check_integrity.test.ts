@@ -5921,10 +5921,12 @@ describe("readme-decision-summary-table IR-061 (Case #3166, RA-005, TS-005)", ()
 
 
 // ─── IR-072 req-updated-freshness (REQ-010-068) ───────────────────────────────
-// Fixture kinds: 正常例 (updated = 最終 commit 日), 違反例 (updated 進行忘れ),
+// Fixture kinds: 正常例 (updated = 最終内容変更 commit 日), 違反例 (updated 進行忘れ),
 // 境界例 (untracked 履歴不在は突合対象外),
 // 許容例 (README / retired / 4桁旧番号帯は対象外),
-// 再現例 (REQ 本文修正 commit で updated 進行忘れした実在パターンの strict 検出)。
+// 再現例 (REQ 本文修正 commit で updated 進行忘れした実在パターンの strict 検出),
+// frontmatter のみ変更例 (REQ-935/936: metadata のみ変更 commit は内容変更から除外、
+// 除外後の真の内容変更 commit 日と updated が乖離する場合は strict 検出を維持)。
 
 const IR072_ROOT = join(TEMP_ROOT, "ir072");
 
@@ -5955,13 +5957,14 @@ function ir072WriteReq(
   id: string,
   updated: string,
   bodyMarker: string,
+  title = `IR-072 fixture ${id}`,
 ): void {
   writeFileSync(
     join(root, "docs", "requirements", `${id}.md`),
     [
       "---",
       `id: ${id}`,
-      `title: IR-072 fixture ${id}`,
+      `title: ${title}`,
       "created: 2025-01-15",
       `updated: ${updated}`,
       "---",
@@ -6007,6 +6010,38 @@ function buildIr072Fixture(root: string): void {
 
   ir072WriteReq(root, "REQ-932", "2025-01-15", "v2 body updated without bump");
   ir072CommitAll(root, "ir072 fixture commit 3", "2025-03-02T10:00:00+09:00");
+
+  ir072WriteReq(root, "REQ-935", "2025-05-01", "v1 body");
+  ir072CommitAll(root, "ir072 fixture commit 4", "2025-05-01T10:00:00+09:00");
+
+  ir072WriteReq(
+    root,
+    "REQ-935",
+    "2025-05-01",
+    "v1 body",
+    "IR-072 fixture REQ-935 (title revised)",
+  );
+  ir072CommitAll(
+    root,
+    "ir072 fixture commit 5 (frontmatter-only)",
+    "2025-06-01T10:00:00+09:00",
+  );
+
+  ir072WriteReq(root, "REQ-936", "2025-07-01", "v1 body");
+  ir072CommitAll(root, "ir072 fixture commit 6", "2025-07-01T10:00:00+09:00");
+
+  ir072WriteReq(
+    root,
+    "REQ-936",
+    "2025-04-01",
+    "v1 body",
+    "IR-072 fixture REQ-936 (metadata revised)",
+  );
+  ir072CommitAll(
+    root,
+    "ir072 fixture commit 7 (frontmatter-only)",
+    "2025-08-01T10:00:00+09:00",
+  );
 
   ir072WriteReq(root, "REQ-933", "2025-03-02", "untracked (excluded)");
   copyScripts(root);
@@ -6085,5 +6120,22 @@ describe("IR-072 req-updated-freshness (REQ-010-068)", () => {
     const stale = collected.ng.find((f) => f.file.includes("REQ-932"));
     expect(stale).toBeDefined();
     expect(stale?.findingLevel).toBe("strict");
+  });
+
+  it("does not treat frontmatter-only commits as content changes (frontmatter のみ変更除外)", () => {
+    const collected = ir072Collect(IR072_ROOT);
+    expect(
+      collected.ng.filter((f) => f.file.includes("REQ-935")),
+    ).toHaveLength(0);
+  });
+
+  it("compares updated against the true content-change commit after frontmatter-only commits (乖離は検出継続)", () => {
+    const collected = ir072Collect(IR072_ROOT);
+    const stale = collected.ng.find((f) => f.file.includes("REQ-936"));
+    expect(stale).toBeDefined();
+    expect(stale?.findingLevel).toBe("strict");
+    expect(stale?.evidence).toContain("updated: 2025-04-01");
+    expect(stale?.evidence).toContain("2025-07-01");
+    expect(stale?.evidence).not.toContain("2025-08-01");
   });
 });

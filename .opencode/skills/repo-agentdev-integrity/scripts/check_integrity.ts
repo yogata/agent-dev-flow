@@ -10974,11 +10974,70 @@ function checkIntegrityRuleRelatedReqExistence(root: string): CheckResult[] {
 //（patterns.md「REQ frontmatter 規約」）の機械検査（patterns.md に明文化済み）。
 // 日付の導出基準は author date とする。squash merge による committer date 置換
 //（AUTOGEN 鮮度 gate の既知 drift 機構）の影響を受けないためである。
+// frontmatter（updated 等 metadata）のみの変更 commit は内容変更ではない
+//（TS-015 pass_criteria）ため、最終 commit の採用時に除外する。これにより
+// REQ frontmatter updated の機械的是正 commit（metadata のみの変更）が最終 commit
+// となる複数日跨ぎの Case で、updated と last commit author date が乖離する
+// false positive（IR-072 既知限界）を検出側で吸収する。
 // git 情報が取得不能な環境（archive 展開等の git 履歴不在ツリー）では info で
 // skip する（検査対象が原理的に不在であり、既知 NG の info スキップ IR-069 と同一
 // 扱い）。updated 欠落・非日付形式は required-fields / IR-002 相当の別ルール対象。
 // 検査対象は現行 3 桁帯 REQ ファイルのみ（README.md、retired/、4 桁旧番号帯は対象外）。
 const IR072_REQ_FILENAME_RE = /^REQ-(\d{3})\.md$/;
+
+// commit が当該ファイルの frontmatter（1 行目 --- から次の --- 行まで）のみを
+// 変更しているかを判定する。変更 hunk（--unified=0）の old 側行範囲が全て、
+// 変更前バージョンの frontmatter 終了行以内に収まる場合に frontmatter のみ変更
+// とみなす。root commit・frontmatter 不在・diff 取得失敗は保守的に内容変更扱い
+// （除外しない）とする。
+function ir072IsFrontmatterOnlyCommit(root: string, relPath: string, sha: string): boolean {
+  const { execFileSync } = require("child_process") as typeof import("child_process");
+  let before: string;
+  try {
+    before = execFileSync(
+      "git",
+      ["show", `${sha}^:${relPath}`],
+      { cwd: root, encoding: "utf-8", windowsHide: true },
+    ) as string;
+  } catch {
+    return false; // root commit・新規ファイルは内容変更扱い
+  }
+  const beforeLines = before.split(/\r?\n/);
+  let fmEnd = -1;
+  if (beforeLines[0] === "---") {
+    for (let i = 1; i < beforeLines.length; i++) {
+      if (beforeLines[i] === "---") {
+        fmEnd = i + 1; // 1-origin の frontmatter 終了行
+        break;
+      }
+    }
+  }
+  if (fmEnd === -1) return false; // frontmatter 不在は内容変更扱い
+  let diff: string;
+  try {
+    diff = execFileSync(
+      "git",
+      ["diff", "--unified=0", `${sha}^`, sha, "--", relPath],
+      { cwd: root, encoding: "utf-8", windowsHide: true },
+    ) as string;
+  } catch {
+    return false; // diff 取得失敗は保守的に内容変更扱い
+  }
+  if (diff.trim() === "") return true; // 実質無変更は frontmatter のみ変更扱い
+  const hunkRe = /^@@ -(\d+)(?:,(\d+))? \+\d+(?:,\d+)? @@/gm;
+  let sawHunk = false;
+  let m: RegExpExecArray | null;
+  while ((m = hunkRe.exec(diff)) !== null) {
+    sawHunk = true;
+    const oldStart = Number(m[1]);
+    const oldCount = m[2] !== undefined ? Number(m[2]) : 1;
+    // oldCount=0（純追加）のとき hunk の oldStart は挿入位置の直前行を指すため、
+    // 挿入が frontmatter 内に収まるかは oldStart+1 行の帰属で判定する
+    const lastTouched = oldCount > 0 ? oldStart + oldCount - 1 : oldStart + 1;
+    if (lastTouched > fmEnd) return false; // frontmatter を跨ぐ・超える変更は内容変更
+  }
+  return sawHunk; // hunk 解析不能（バイナリ等）は保守的に内容変更扱い
+}
 
 function checkReqUpdatedFreshness(root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -11018,21 +11077,28 @@ function checkReqUpdatedFreshness(root: string): CheckResult[] {
     const m = updated.match(/^(\d{4}-\d{2}-\d{2})/);
     if (!m) continue;
     const updatedDate = m[1];
+    const relPath = path.relative(root, fullPath).replace(/\\/g, "/");
     let lastCommitDate: string | null = null;
     try {
       const out = execFileSync(
         "git",
-        [
-          "log",
-          "-1",
-          "--format=%as",
-          "--",
-          path.relative(root, fullPath).replace(/\\/g, "/"),
-        ],
+        ["log", "--format=%H %as", "--", relPath],
         { cwd: root, encoding: "utf-8", windowsHide: true },
       ) as string;
-      const trimmed = out.trim();
-      if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) lastCommitDate = trimmed;
+      for (const line of out.split("\n")) {
+        const trimmed = line.trim();
+        if (trimmed === "") continue;
+        const sp = trimmed.indexOf(" ");
+        if (sp === -1) continue;
+        const sha = trimmed.slice(0, sp);
+        const date = trimmed.slice(sp + 1);
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
+        // frontmatter のみの変更 commit（metadata 進行等）は内容変更ではないため、
+        // 最終内容変更 commit の採用から除外する（TS-015 pass_criteria）
+        if (ir072IsFrontmatterOnlyCommit(root, relPath, sha)) continue;
+        lastCommitDate = date;
+        break;
+      }
     } catch {
       gitUnavailable = true;
     }
@@ -11045,12 +11111,12 @@ function checkReqUpdatedFreshness(root: string): CheckResult[] {
         ng(
           "ReqFreshness",
           "req-updated-freshness",
-          `frontmatter updated (${updatedDate}) does not match the last commit date (${lastCommitDate}) for ${file}: REQ 変更時に frontmatter updated を変更日へ進行させる（patterns.md REQ frontmatter 規約、IR-072）`,
+          `frontmatter updated (${updatedDate}) does not match the last content-change commit date (${lastCommitDate}) for ${file}: REQ 変更時に frontmatter updated を変更日へ進行させる（patterns.md REQ frontmatter 規約、IR-072）`,
           resolveRelative(fullPath, root),
           undefined,
           {
-            evidence: `updated: ${updatedDate}, last commit (author date): ${lastCommitDate}`,
-            expected: `frontmatter updated must equal the last content-change commit date (author date)`,
+            evidence: `updated: ${updatedDate}, last content-change commit (author date): ${lastCommitDate}`,
+            expected: `frontmatter updated must equal the last content-change commit date (author date; frontmatter-only commits are excluded)`,
             route: "intake",
             finding_category: "document-drift",
             finding_level: "strict",
@@ -11074,7 +11140,7 @@ function checkReqUpdatedFreshness(root: string): CheckResult[] {
       ok(
         "ReqFreshness",
         "req-updated-freshness",
-        `IR-072 req-updated-freshness: ${checkedCount} REQ files checked against last commit dates, 0 mismatches`,
+        `IR-072 req-updated-freshness: ${checkedCount} REQ files checked against last content-change commit dates (frontmatter-only commits excluded), 0 mismatches`,
       ),
     );
   }
