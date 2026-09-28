@@ -8,7 +8,7 @@ Jev 先行評価は最終判断者ではなく、後段の reasoning model 推�
 
 | operation | 内容 |
 |---|---|
-| `evaluate` | 閉じた判断入力への Jev 先行評価。質問ごとの結果・候別別確率分布・provider が返した confidence（evaluation 単位。返さない場合は返さない）・inputTokens（provider が返す場合）・機械的処理時間を返す。失敗は構造化失敗（not_configured、timeout、rate_limited、server_error、network_error、response_invalid）。自動 retry なし。evaluator 成功後・呼出元 Workflow が reasoning model へ進む前に、当該評価の観測（1 semantic evaluation = 1 observation、1 JSON）を `.agentdev/jev-observations/` へ永続化し、実際の呼出し開始後の失敗は失敗観測を永続化する。未設定と評価入力の事前検証失敗では観測を生成しない。永続化失敗は評価結果と独立した warning（fail-open） |
+| `evaluate` | 閉じた判断入力への Jev 先行評価。質問ごとの結果・候別別確率分布・provider が返した confidence（evaluation 単位。返さない場合は返さない）・inputTokens（provider が返す場合）・機械的処理時間を返す。失敗は構造化失敗（not_configured、timeout、rate_limited、server_error、network_error、response_invalid）。自動再試行なし。evaluator 成功後・呼出元 Workflow が reasoning model へ進む前に、当該評価の観測（1 semantic evaluation = 1 observation、1 JSON）を `.agentdev/jev-observations/` へ永続化し、実際の呼出し開始後の失敗は失敗観測を永続化する。未設定と評価入力の事前検証失敗では観測を生成しない。永続化失敗は評価結果と独立した warning（fail-open） |
 | `observation_write` | evaluator 成功観測（`observationId` で特定）の同一 JSON へ reasoning model の最終判断結果（final result）を追記する（冪等・重複 JSON なし）。追記入力は最終判断結果のみを受け付け、evaluator 返却結果と異なる場合のみ差異理由分類を保持する。失敗観測・存在しない観測 ID・現行契約外の観測への追記は拒否する |
 
 ## 観測の永続化と最終判断の反映
@@ -21,7 +21,7 @@ evaluate は evaluator 成功後の時点で観測（1 semantic evaluation = 1 o
 
 - 利用可否: `CLOUDFLARE_ACCOUNT_ID` と `CLOUDFLARE_API_TOKEN` 環境変数の設定有無で決まる（feature flag・opt-in 手続きは不要）
 - 未設定時: API を呼び出さず構造化失敗（not_configured）を返し、観測を生成しない。呼出し元 Workflow は従来 LLM 経路のみで完了させる
-- API 障害時: 自動 retry せず構造化失敗を返し、失敗観測に失敗分類と最小 diagnostic が記録される。呼出し元 Workflow は即座に従来 LLM 経路へ fallback する
+- API 障害時: 自動再試行せず構造化失敗を返し、失敗観測に失敗分類と最小 diagnostic が記録される。呼出し元 Workflow は即座に従来 LLM 経路へ fallback する
 - 観測書込み失敗時: Workflow の成否と独立（完了報告で識別可能な warning として扱うのは呼出し元の責務）。evaluate 内部の観測永続化失敗は評価結果の返却と独立した warning とし、評価結果を失わない（fail-open。rollback・再実行・擬似再生成なし）
 - 評価言語: 日本語（state、instructions、criteria、判断の意味）
 - 責務境界: Tool は機械処理のみ。判断の意味・基準・Jev 呼出し位置・最終判断は所有しない（REQ-{NNNN}-{NNN}）

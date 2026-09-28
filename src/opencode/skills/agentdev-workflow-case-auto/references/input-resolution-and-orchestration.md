@@ -13,7 +13,7 @@
 
 ### Purpose
 
-実行開始時刻を記録し、入力モード（Issue番号/URL 入力 or 要件doc入力）を確定する。
+実行開始時刻を記録し、入力モード（Issue番号/URL 入力 または 要件doc入力）を確定する。
 
 ### Input Resolution
 
@@ -41,7 +41,7 @@ STEP-8（停止時報告）・STEP-8（完了報告）での所要時間算出�
 
 ### Result
 
-- 入力モード確定（Issue番号/URL入力 or 要件doc入力）
+- 入力モード確定（Issue番号/URL入力 または 要件doc入力）
 - `case_auto_started_at` 記録
 
 ### Evidence
