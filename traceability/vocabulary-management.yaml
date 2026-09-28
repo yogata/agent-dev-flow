@@ -7,17 +7,35 @@ implementation:
   .agentdev/config/plugins/agentdev-textlint-guard-prh.yml:
     - REQ-094-009
 verification:
+  # Issue #3218（docs/requirements バッチ横断是正）で REQ-094-001〜005 を追加。
+  # textlint 共通基盤は REQ-094-001 の表層品質側面の恒常検査と、REQ-094-003/004 の
+  # 固定置換可語（prh 辞書登録語）の検出・置換提案経路を恒常的に提供する。
   src/opencode/plugins/agentdev-textlint-guard/plugin.ts:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-003
+    - REQ-094-004
+    - REQ-094-005
     - REQ-094-007
     - REQ-094-008
     - REQ-094-009
     - REQ-094-012
   src/opencode/plugins/agentdev-textlint-guard/gate.ts:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-003
+    - REQ-094-004
+    - REQ-094-005
     - REQ-094-007
     - REQ-094-008
     - REQ-094-009
     - REQ-094-012
   src/opencode/plugins/agentdev-textlint-guard/lib/inspect.ts:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-003
+    - REQ-094-004
+    - REQ-094-005
     - REQ-094-007
     - REQ-094-008
     - REQ-094-009

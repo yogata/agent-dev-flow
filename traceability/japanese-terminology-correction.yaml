@@ -1,0 +1,160 @@
+component: japanese-terminology-correction
+# Issue #3218（Wave 2-1: REQ-094 RA-002 docs/requirements バッチ横断是正）。
+# 本バッチで REQ-094-001〜006 の用語選択基準を適用して個別是正した
+# docs/requirements 配下の 23 ファイルを、各ファイルに適用した基準行へ対応付ける。
+# 010 は本バッチの確認対象適用（docs/requirements 配下 71 件を走査し、retired は
+# 履歴保持文字列を不変のまま是正対象語のみ処理）、011 は意味保持前提の是正の適用。
+implementation:
+  docs/requirements/REQ-003.md:
+    - REQ-094-001
+    - REQ-094-003
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/requirements/REQ-005.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/requirements/REQ-007.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-003
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/requirements/REQ-008.md:
+    - REQ-094-002
+    - REQ-094-003
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/requirements/REQ-009.md:
+    - REQ-094-002
+    - REQ-094-003
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/requirements/REQ-011.md:
+    - REQ-094-002
+    - REQ-094-003
+    - REQ-094-004
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/requirements/REQ-014.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-003
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/requirements/REQ-015.md:
+    - REQ-094-002
+    - REQ-094-003
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/requirements/REQ-017.md:
+    - REQ-094-002
+    - REQ-094-003
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/requirements/REQ-018.md:
+    - REQ-094-002
+    - REQ-094-003
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/requirements/REQ-021.md:
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/requirements/REQ-029.md:
+    - REQ-094-002
+    - REQ-094-003
+    - REQ-094-004
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/requirements/REQ-034.md:
+    - REQ-094-002
+    - REQ-094-003
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/requirements/REQ-036.md:
+    - REQ-094-002
+    - REQ-094-003
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/requirements/REQ-048.md:
+    - REQ-094-002
+    - REQ-094-003
+    - REQ-094-004
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/requirements/REQ-051.md:
+    - REQ-094-001
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/requirements/REQ-055.md:
+    - REQ-094-001
+    - REQ-094-003
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/requirements/REQ-058.md:
+    - REQ-094-003
+    - REQ-094-005
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/requirements/REQ-060.md:
+    - REQ-094-001
+    - REQ-094-003
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/requirements/REQ-082.md:
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-003
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/requirements/REQ-090.md:
+    - REQ-094-002
+    - REQ-094-003
+    - REQ-094-004
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+  docs/requirements/retired/REQ-026.md:
+    - REQ-094-003
+    - REQ-094-005
+    - REQ-094-010
+    - REQ-094-011
+  docs/requirements/retired/REQ-057.md:
+    - REQ-094-003
+    - REQ-094-005
+    - REQ-094-010
+    - REQ-094-011
+# verification role の対応は既存情報源に集約:
+# - textlint 共通基盤（gate.ts・plugin.ts・lib/inspect.ts）は
+#   traceability/vocabulary-management.yaml（REQ-094-001〜005 を追加済み）
+# - check_integrity（docs-check）の REQ-094-006/010/011 は check_integrity.ts 本体の
+#   inline ADF-COVERS(verification) 宣言（参照整合・frontmatter 検査で機械契約破壊を恒常検出、
+#   retired を機械検査対象外とする運用の実装、決定的破損検査による文字化け恒常検出）
