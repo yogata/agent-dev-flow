@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-010-002, REQ-010-003, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-066, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008
+// ADF-COVERS(verification): REQ-010-002, REQ-010-003, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-066, REQ-010-068, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008
 // ADF-COVERS(verification): REQ-087-002, REQ-087-003
 // ADF-COVERS(verification): REQ-087-004
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
@@ -5919,3 +5919,171 @@ describe("readme-decision-summary-table IR-061 (Case #3166, RA-005, TS-005)", ()
 });
 
 
+
+// ─── IR-072 req-updated-freshness (REQ-010-068) ───────────────────────────────
+// Fixture kinds: 正常例 (updated = 最終 commit 日), 違反例 (updated 進行忘れ),
+// 境界例 (untracked 履歴不在は突合対象外),
+// 許容例 (README / retired / 4桁旧番号帯は対象外),
+// 再現例 (REQ 本文修正 commit で updated 進行忘れした実在パターンの strict 検出)。
+
+const IR072_ROOT = join(TEMP_ROOT, "ir072");
+
+function ir072Git(root: string, args: string[], env?: Record<string, string>): void {
+  const proc = Bun.spawnSync(["git", ...args], {
+    cwd: root,
+    env: env ? { ...process.env, ...env } : process.env,
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  if (proc.exitCode !== 0) {
+    throw new Error(
+      `git ${args.join(" ")} failed: ${proc.stderr?.toString("utf-8") ?? ""}`,
+    );
+  }
+}
+
+function ir072CommitAll(root: string, message: string, isoDate: string): void {
+  ir072Git(root, ["add", "-A"]);
+  ir072Git(root, ["commit", "--allow-empty", "-m", message], {
+    GIT_AUTHOR_DATE: isoDate,
+    GIT_COMMITTER_DATE: isoDate,
+  });
+}
+
+function ir072WriteReq(
+  root: string,
+  id: string,
+  updated: string,
+  bodyMarker: string,
+): void {
+  writeFileSync(
+    join(root, "docs", "requirements", `${id}.md`),
+    [
+      "---",
+      `id: ${id}`,
+      `title: IR-072 fixture ${id}`,
+      "created: 2025-01-15",
+      `updated: ${updated}`,
+      "---",
+      "",
+      "## 要件",
+      "",
+      `| ${id}-001 | fixture ${bodyMarker} |`,
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+}
+
+function buildIr072Fixture(root: string): void {
+  mkdirp(join(root, "docs", "requirements", "retired"));
+  writeFileSync(join(root, "docs", "requirements", "README.md"), "# Requirements\n", "utf-8");
+
+  ir072WriteReq(root, "REQ-932", "2025-01-15", "v1 body");
+  ir072WriteReq(root, "REQ-0001", "2025-01-15", "legacy band (excluded)");
+  writeFileSync(
+    join(root, "docs", "requirements", "retired", "REQ-934.md"),
+    [
+      "---",
+      "id: REQ-934",
+      "title: IR-072 retired fixture",
+      "created: 2025-01-15",
+      "updated: 2025-01-15",
+      "---",
+      "",
+      "Retired body.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  ir072Git(root, ["init"]);
+  ir072Git(root, ["config", "user.name", "ir072-fixture"]);
+  ir072Git(root, ["config", "user.email", "ir072-fixture@example.invalid"]);
+  ir072CommitAll(root, "ir072 fixture commit 1", "2025-01-15T10:00:00+09:00");
+
+  ir072WriteReq(root, "REQ-931", "2025-03-01", "fresh req");
+  ir072CommitAll(root, "ir072 fixture commit 2", "2025-03-01T10:00:00+09:00");
+
+  ir072WriteReq(root, "REQ-932", "2025-01-15", "v2 body updated without bump");
+  ir072CommitAll(root, "ir072 fixture commit 3", "2025-03-02T10:00:00+09:00");
+
+  ir072WriteReq(root, "REQ-933", "2025-03-02", "untracked (excluded)");
+  copyScripts(root);
+}
+
+function ir072Collect(root: string): {
+  ng: { file: string; evidence: string; level: string; findingLevel?: string }[];
+  infos: string[];
+} {
+  const r = runScript(root, ["--json"]);
+  const parsed = JSON.parse(r.stdout);
+  const fresh = (parsed.results as {
+    category: string;
+    check: string;
+    level: string;
+    file?: string;
+    evidence?: string;
+    message: string;
+    finding_level?: string;
+  }[]).filter((res) => res.category === "ReqFreshness");
+  return {
+    ng: fresh
+      .filter((res) => res.level === "ng")
+      .map((res) => ({
+        file: res.file ?? "",
+        evidence: res.evidence ?? "",
+        level: res.level,
+        findingLevel: res.finding_level,
+      })),
+    infos: fresh.filter((res) => res.level === "info").map((res) => res.message),
+  };
+}
+
+describe("IR-072 req-updated-freshness (REQ-010-068)", () => {
+  beforeAll(() => {
+    mkdirp(IR072_ROOT);
+    buildIr072Fixture(IR072_ROOT);
+  });
+
+  it("passes REQ files whose updated matches the last commit date (正常例)", () => {
+    const collected = ir072Collect(IR072_ROOT);
+    expect(
+      collected.ng.filter((f) => f.file.includes("REQ-931")),
+    ).toHaveLength(0);
+  });
+
+  it("detects a stale updated left behind by a later content change (違反例)", () => {
+    const collected = ir072Collect(IR072_ROOT);
+    const stale = collected.ng.find((f) => f.file.includes("REQ-932"));
+    expect(stale).toBeDefined();
+    expect(stale?.evidence).toContain("updated: 2025-01-15");
+    expect(stale?.evidence).toContain("2025-03-02");
+  });
+
+  it("excludes untracked REQ files lacking commit history (境界例)", () => {
+    const collected = ir072Collect(IR072_ROOT);
+    expect(
+      collected.ng.filter((f) => f.file.includes("REQ-933")),
+    ).toHaveLength(0);
+  });
+
+  it("exempts README, retired, and legacy 4-digit band (許容例)", () => {
+    const collected = ir072Collect(IR072_ROOT);
+    expect(
+      collected.ng.filter(
+        (f) =>
+          f.file.includes("README") ||
+          f.file.includes("retired") ||
+          f.file.includes("REQ-0001"),
+      ),
+    ).toHaveLength(0);
+  });
+
+  it("reproduces the updated-bump-missed pattern as strict ng (再現例)", () => {
+    const collected = ir072Collect(IR072_ROOT);
+    const stale = collected.ng.find((f) => f.file.includes("REQ-932"));
+    expect(stale).toBeDefined();
+    expect(stale?.findingLevel).toBe("strict");
+  });
+});

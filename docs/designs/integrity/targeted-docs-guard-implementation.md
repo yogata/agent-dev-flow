@@ -103,6 +103,7 @@ case-run プロファイル固有の追加ルールとして `full_docs_check_re
 appliesTo は `docs/designs/**`, `docs/requirements/**`, `docs/decisions/**`, `docs/guides/**`, `docs/knowledge/**`, `traceability/**`, `AGENTS.md`, `README.md` 等、docs 配下・トレーサビリティ配下および文書整合性に関連するファイルを対象とする。`docs/knowledge/**` と traceability（`traceability/**`）の appliesTo 追加を主方式とし、checker 実装（check_changed_docs.ts の case-run プロファイル appliesTo）の更新と同時に適用する。
 case-run プロファイルの対象範囲は、case-run で変更され得る docs 領域と traceability 領域を単一プロファイルで網羅し、REQ-010-077 の「対象範囲網羅 or 代替検査指定明記」を恒常充足する（CR-001 裁定。対象拡大を主方式とする判断）。`docs/knowledge/**`・traceability を含む case-run 変更で `files_checked` 空（TARGET-EMPTY）を恒常運用として発生させないこと。選定基準は、fail-closed 意味論の維持、検査見逃しゼロ、false-clean の発生なしである。
 
+<!-- ADF-COVERS(design): REQ-010-077 -->
 <!-- ADF-COVERS(implementation): REQ-010-077 -->
 選定の適用結果（REQ-010-077、case 実行 RA-001 による確定 → CR-001 再裁定）: 主方式を appliesTo 対象拡大（`docs/knowledge/**`・traceability 追加）とし、guard 対象外領域を含む実行単位での代替検査指定の運用を併記して明記する。
 `docs/knowledge/**`・traceability 変更は appliesTo 対象内のため case-run プロファイル単独実行で検査される。appliesTo 対象外の領域を含む実行単位では、代替検査として docs-check profile（`--workflow docs-check --files <変更ファイル群>`。appliesTo: true 全件）を `--files` 明示指定で実行する運用を併記する。

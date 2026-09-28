@@ -135,6 +135,26 @@ closed 等の広範囲な population を実測する場合は、`search` なし�
 - `issue_update` は `role` を受理しない。`role`、`kind`、`trackingState` の新規設定は `issue_create` 専用である。`issue_update` で `labels` を省略した場合は追跡軸の現行値が維持される
 - `invalid-input`（`unknown-field`）の構造化失敗は同一引数で再試行せず、不正な引数を修正してから再実行する
 
+## 操作・role 別の受理フィールド対応表
+
+`agentdev_gh` の受理フィールドは操作・role 別に異なる。呼び出し側は本対応表で受理可否を確認してから呼び出す（正本は `agentdev-issue-tracking` SKILL.md「論理スキーマ（要約）」節と Tool 操作契約 REQ-011-033。物理ラベル写像の機械適用は Tool 内実装 REQ-049-008 の責務であり、本表は呼出側の運用規律のみを扱う）。
+
+| フィールド | issue_create | issue_update | issue_list | 備考 |
+|---|---|---|---|---|
+| `role` | 受理（tracking / case） | **不受理**（unknown-field 失敗） | 受理（絞り込み論理軸） | role の設定は起票時のみ。既存 Issue の role は変更しない |
+| `kind` | `role: tracking` のとき受理 | **不受理**（`kind requires role 'tracking'` 失敗） | 受理（tracking 軸絞り込み） | `role: case`（Case Issue）では kind は不受理 |
+| `trackingState` | `role: tracking` のとき受理 | 受理（非終端状態のみ） | 受理（tracking 軸絞り込み） | Case Issue（role: case）には適用されない |
+| `labels` | 必須（空配列も明示） | 省略時は追跡軸ラベル維持 | tracking 論理軸写像入力専用 | Case Issue の work_type（maintenance 等）は起票時に通常ラベル（物理ラベル）として `labels` へ指定する |
+| `role` と `kind` の同時指定 | tracking のとき可 | 不可 | 可（tracking 軸） | `role: case` と `kind` の同時指定は起票失敗の代表例である |
+
+## gh CLI 読取補完の規律（ラベルなし列挙＋タイトル・本文確認）
+
+gh CLI による読取補完は、**ラベルフィルタなしの列挙**と**タイトル・本文確認**で行う。Case Issue は `case` ラベルを持たないため、`gh issue list --label case` 等のラベルフィルタは恒常的に 0 件帰着する。
+
+- **ラベルなし列挙**: `gh issue list --state <state> --search <絞り込みキー> --json number,title` の形式で列挙する。Case Issue の絞り込みに `--label` を使用しない。絞り込みキーは search トークンの選択性指針に従う
+- **タイトル・本文確認**: 列挙結果から目的の対象を特定した後は、`gh issue view <number>` または `agentdev_gh` の `issue_read` でタイトル・本文を取得して確認する。番号の近さ・部分一致だけでは対象を確定しない
+- **gh CLI は読取専用**: gh CLI による補完は読み取りに限定し、GitHub 書込みを代替しない（既存の禁止事項どおり）
+
 ## Issue 作成後の内容反映確認
 
 `agentdev_gh` の issue_create 操作実行後、Issue番号を取得し、本文が正しく反映されたかを確認する。
@@ -236,6 +256,14 @@ Issue 作成手続き/ `agentdev_gh` の issue_update 操作を使用する場�
 4. 検証失敗時は3段階リトライ（同一内容リトライ → 内容再生成 → 停止、ユーザー報告）に従う。
 リトライ上限到達時は自動的な代替手段を実行せず、ユーザーに差分内容、試行段階、リトライ回数を報告して停止する。
 5. 実行完了後、一時ファイルを削除する。
+
+## クローズ済み Issue 本文の履歴保持と補記方針
+
+クローズ済み Case Issue 本文は履歴記録として保持し、本文の事実誤記に対する訂正（issue_update による本文書換え）を行わない。誤記は対応記録コメントによる補記で対応する。
+
+- **履歴保持**: クローズ済み Issue 本文は、完了時点の実行契約・レビュー判断・結果の記録である。クローズ後の issue_update による本文訂正を行わない（後続 Case が参照する出所が移動しないことを維持する。REQ-049-020）
+- **補記で対応**: 誤記（パス・番号・日付の事実誤記等）を発見した場合は、当該 Issue へのコメントで「誤記の指摘と正しい値」を補記する。本文を書き換えず、補記コメントが出力の正となる
+- **補記の記載内容**: 補記コメントには対象箇所、誤記の内容、正しい値、補記の根拠を記録する。形式は Issue 操作の安全性手順（コメント SSoT 構造）に従う
 
 ## 禁止事項
 

@@ -297,6 +297,7 @@ bun test ./.opencode/plugins/ ./scripts/ >stdout-3.log 2>stderr-3.log
 
 - **Bun 依存 checker の実行経路**: integrity 検査の checker スクリプトを bun test の枠組み外で個別実行する場合は、Bun ランタイム API（Bun.YAML 等）に依存する checker を bun 経路で実行する。実行経路の使い分けの正契約は checker 実行契約 Design（checker 実行契約と検出基盤規則）「安定実行経路」節が所有する
 
+- **timeout 明示指定（REQ-060-007）**: bun test フル suite 全体実行を含む検証の実行指示は、実行 timeout を明示指定する。全体実行の実測所要時間は既定 timeout を超え得るため、**300〜600 秒の指定を標準**とする。timeout 未指定（既定値での打ち切り）で全体実行を打ち切った結果を fail 証跡として扱わない
 - **件数突合**: 各実行結果の「Ran N tests across M files」の N/M 件数突合を行う。bun test はテスト結果サマリー（`Ran N tests across M files` 等の件数サマリー）を stderr へ出力するため、突合の根拠は stderr 側の退避ファイルとする。直前実績と比較して件数が急減していないかの妥当性を検証する（固定値の期待値化は行わない）
 - **証跡の stdout・stderr 分離併退避（`2>` 常時付与）**: 各分割実行の証跡は stdout と stderr を分離してファイルへ併退避する。bun test は fail の詳細に加えて件数サマリーを stderr へ出力するため、stderr リダイレクト（`2>`）の付与を常時明示し、stdout のみの退避では「fail 由来分類」に必要な情報と件数突合の根拠が失われる。PowerShell コンソール上の表示出力はコンソールコードページによる再解釈を含むため証跡として扱わず、退避ファイルをもって証跡とする
 - **カレントディレクトトリビアな実行の禁止**: 対象スイートには cwd 依存テストが混在するため、`bun test` 単体等での実行で正規形を代替しない
@@ -375,6 +376,14 @@ baseline 系 durable state（baseline commit、baseline 期待値・許容リス
 7. pre-existing fail の baseline 再現確認の記録: pre-existing と分類した fail がある場合、ワークツリー変更ゼロの baseline commit で同一テストを再実行した同一 fail 再現確認の記録が存在すること。baseline 再現確認は detached worktree による baseline 比較（`agentdev-git-worktree` worktree-operations「git stash 運用手順（一時退避）」の detached worktree 標準手順、stash を使わない）で実施したことが記録から確認できること。単独→フル再実行の証拠順序と同一環境件数比較の実施は「fail 由来分類」節の証跡手順に従う
 
 いずれかの記録が欠落する場合、由来不明の fail が残存する場合、未登録の既知欠陥を合格の根拠にする場合は fail とする。
+
+## QG-4 checker 実測手順（merge 直前 HEAD・evidence 化・baseline 登録漏れ検査）
+
+QG-4 で個別 checker（full integrity suite 以外の integrity checker、IR 検査）を実測する場合、REQ-032-030 に従い次の3要素を満たして実施する。
+
+1. **merge 直前 HEAD 実施**: checker 実測は、merge 直前の origin/main 取り込み済み branch HEAD で実施する。古い branch HEAD・分岐時点の baseline での実測結果を QG-4 の判定根拠に使わない。実行 HEAD（branch 名と commit hash）を実行記録へ残す
+2. **evidence 化**: 検出した新規 NG の出所が自 Case 変更であることを evidence として記録する。fail 由来分類（既知欠陥・環境依存・当該変更起因）を付与し、実行 HEAD・checker 種別・検出箇所を PR 本文等の検証記録へ残す
+3. **baseline 登録漏れ検査**: provenance-tracked baseline（NG baseline）への登録漏れを検査する。自 Case 変更で解消済みの既存 NG が baseline に残存していないか（stale baseline entry）、新規 NG が未登録のまま通過扱いになっていないかを確認する。stale entry を検出した場合は case-close の baseline 更新手順へ引き継ぐ
 
 ## pass/ fail 基準
 

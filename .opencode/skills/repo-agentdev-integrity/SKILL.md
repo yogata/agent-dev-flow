@@ -184,6 +184,8 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 
 ## worktree 検査実行手順（targeted docs guard、check_changed_docs.ts）
 
+**実体配置の実態**: 本 skill（`repo-agentdev-integrity`）の実体は `.opencode/skills/repo-agentdev-integrity/` 配下に git tracked で配置されている repo-local 実体である。`src/opencode/` 配下の配布 skill（`agentdev-*`）が junction で `.opencode/skills/` へ投影されるのとは異なり、本 skill は junction を介さない。このため worktree にも git 管理対象の実体としてそのまま投影され、worktree 内から直接起動できる（gitignore 対象の `node_modules` は未伝播のため、bun test 実行の環境前提に従い依存整備を前置する。実行起点の標準は host repo root 起点＋`--root` 指定。`agentdev-git-worktree` references `worktree-operations.md`「main root 実体 + --root 指定による読取系 checker 実行手順」参照）。
+
 worktree を検査対象とする場合は、host 側配置の本 skill（メインリポジトリの `.opencode/skills/repo-agentdev-integrity/`）を起点として起動し、検査対象 worktree の絶対パスを `--root` で明示指定する。worktree への検査 skill 複製と配置先起点の起動は標準としない。
 
 - **検査対象 root の明示**: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts --workflow <workflow> --root <worktree 絶対パス> <変更ファイル指定> --json`。配置先起点の誤リポジトリ検査は検査見逃しとして扱う

@@ -5,9 +5,9 @@
 // ADF-COVERS(verification): REQ-006-105, REQ-006-106, REQ-006-107, REQ-006-109, REQ-006-111
 // ADF-COVERS(verification): REQ-008-050
 // ADF-COVERS(verification): REQ-009-018, REQ-009-019, REQ-009-020
-// ADF-COVERS(implementation): REQ-010-002, REQ-010-003, REQ-010-005, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-064, REQ-010-066, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008, REQ-051-009
+// ADF-COVERS(implementation): REQ-010-002, REQ-010-003, REQ-010-005, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-064, REQ-010-066, REQ-010-070, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008, REQ-051-009
 // ADF-COVERS(verification): REQ-010-009
-// ADF-COVERS(verification): REQ-010-072, REQ-010-073
+// ADF-COVERS(verification): REQ-010-068, REQ-010-072, REQ-010-073
 // ADF-COVERS(implementation): REQ-010-072, REQ-010-073
 // ADF-COVERS(verification): REQ-011-002, REQ-011-008, REQ-011-014
 // ADF-COVERS(implementation): REQ-018-003, REQ-018-004
@@ -10967,6 +10967,120 @@ function checkIntegrityRuleRelatedReqExistence(root: string): CheckResult[] {
   return results;
 }
 
+// ─── IR-072: req-updated-freshness (REQ-010-068 準拠の新規検査クラス) ──────────
+// 現行 REQ ファイル（docs/requirements/REQ-NNN.md）の frontmatter updated と、
+// 当該ファイルの最終内容変更 commit の日付（author date、%as）を突合する。
+// REQ 本文を変更する際は frontmatter updated を変更日へ進行させる規約
+//（patterns.md「REQ frontmatter 規約」）の機械検査（patterns.md に明文化済み）。
+// 日付の導出基準は author date とする。squash merge による committer date 置換
+//（AUTOGEN 鮮度 gate の既知 drift 機構）の影響を受けないためである。
+// git 情報が取得不能な環境（archive 展開等の git 履歴不在ツリー）では info で
+// skip する（検査対象が原理的に不在であり、既知 NG の info スキップ IR-069 と同一
+// 扱い）。updated 欠落・非日付形式は required-fields / IR-002 相当の別ルール対象。
+// 検査対象は現行 3 桁帯 REQ ファイルのみ（README.md、retired/、4 桁旧番号帯は対象外）。
+const IR072_REQ_FILENAME_RE = /^REQ-(\d{3})\.md$/;
+
+function checkReqUpdatedFreshness(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const reqDir = path.join(root, "docs", "requirements");
+  if (!fs.existsSync(reqDir)) {
+    results.push(
+      info(
+        "ReqFreshness",
+        "req-updated-freshness",
+        "No requirements directory; IR-072 skipped",
+      ),
+    );
+    return results;
+  }
+  const reqFiles = listFiles(reqDir).filter((f) => IR072_REQ_FILENAME_RE.test(f));
+  if (reqFiles.length === 0) {
+    results.push(
+      info(
+        "ReqFreshness",
+        "req-updated-freshness",
+        "No current REQ files found; IR-072 skipped",
+      ),
+    );
+    return results;
+  }
+  const { execFileSync } = require("child_process") as typeof import("child_process");
+  let gitUnavailable = false;
+  let checkedCount = 0;
+  let mismatchCount = 0;
+  for (const file of reqFiles) {
+    const fullPath = path.join(reqDir, file);
+    const content = readText(fullPath);
+    if (!content) continue;
+    const fm = parseFrontmatter(content);
+    const updated = fm ? fm["updated"] : undefined;
+    if (typeof updated !== "string" || updated === "") continue;
+    const m = updated.match(/^(\d{4}-\d{2}-\d{2})/);
+    if (!m) continue;
+    const updatedDate = m[1];
+    let lastCommitDate: string | null = null;
+    try {
+      const out = execFileSync(
+        "git",
+        [
+          "log",
+          "-1",
+          "--format=%as",
+          "--",
+          path.relative(root, fullPath).replace(/\\/g, "/"),
+        ],
+        { cwd: root, encoding: "utf-8", windowsHide: true },
+      ) as string;
+      const trimmed = out.trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) lastCommitDate = trimmed;
+    } catch {
+      gitUnavailable = true;
+    }
+    if (gitUnavailable) break;
+    if (lastCommitDate === null) continue; // untracked（履歴不在）は突合対象外
+    checkedCount++;
+    if (lastCommitDate !== updatedDate) {
+      mismatchCount++;
+      results.push(
+        ng(
+          "ReqFreshness",
+          "req-updated-freshness",
+          `frontmatter updated (${updatedDate}) does not match the last commit date (${lastCommitDate}) for ${file}: REQ 変更時に frontmatter updated を変更日へ進行させる（patterns.md REQ frontmatter 規約、IR-072）`,
+          resolveRelative(fullPath, root),
+          undefined,
+          {
+            evidence: `updated: ${updatedDate}, last commit (author date): ${lastCommitDate}`,
+            expected: `frontmatter updated must equal the last content-change commit date (author date)`,
+            route: "intake",
+            finding_category: "document-drift",
+            finding_level: "strict",
+          },
+        ),
+      );
+    }
+  }
+  if (gitUnavailable) {
+    results.push(
+      info(
+        "ReqFreshness",
+        "req-updated-freshness",
+        "git history unavailable (not a git working tree or no commits); IR-072 skipped",
+      ),
+    );
+    return results;
+  }
+  if (mismatchCount === 0) {
+    results.push(
+      ok(
+        "ReqFreshness",
+        "req-updated-freshness",
+        `IR-072 req-updated-freshness: ${checkedCount} REQ files checked against last commit dates, 0 mismatches`,
+      ),
+    );
+  }
+  return results;
+}
+
 // ─── repo-local Plugin 自己ホスト投影対称性検査（runtime-package-boundary.md） ───
 
 // depth-1 loader shim の固定内容テンプレート。scripts/self-sync.ps1 の
@@ -11476,6 +11590,7 @@ async function main(): Promise<void> {
     ...checkSkillProjectionManifest(root), // IR-068 (Issue #2383 (d), inspect F-01)
     ...checkReqNumberGapRecorded(root), // IR-069 (REQ-087-002/003, Case #2917)
     ...checkIntegrityRuleRelatedReqExistence(root), // IR-071 (REQ-051-009)
+    ...checkReqUpdatedFreshness(root), // IR-072 (REQ-010-068 準拠、patterns.md REQ frontmatter 規約)
     ...checkRepoLocalPluginProjectionSymmetry(root), // repo-local Plugin 投影対称性検査（runtime-package-boundary.md、Issue #2787）
   ];
 

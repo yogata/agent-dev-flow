@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-010-005, REQ-010-012
+// ADF-COVERS(verification): REQ-010-005, REQ-010-012, REQ-010-077
 /**
  * check_changed_docs.test.ts - Regression test for Targeted Docs Guard.
  *
@@ -1321,5 +1321,146 @@ describe("Issue #2783 TS-002: 親 Design + references 配下の同時変更 → 
     expect(parsed.files_checked).toContain("docs/designs/integrity/ref-guard.md");
     expect(parsed.files_checked).toContain("docs/designs/integrity/ref-guard/references/extra.md");
     expect(parsed.design_readme_update_required).toBe(true);
+  });
+});
+// ─── Case #3233 TS-017: case-run profile appliesTo 対象拡大（CR-001 主方式） ───
+// docs/knowledge/** と traceability/** を case-run profile の appliesTo へ追加。
+// docs/knowledge・traceability を含む case-run 変更で files_checked 空
+//（TARGET-EMPTY）を恒常運用として発生させないこと（REQ-010-077）。
+// Fixture kinds: 正常例 (knowledge 文書が files_checked に含まれる),
+// 違反例 (TARGET-EMPTY の回帰防止: knowledge 変更が検出されない場合),
+// 境界例 (traceability sidecar・ネスト knowledge も対象),
+// 許容例 (knowledge README 列挙整合は check_knowledge_docs.ts 正規担当で誤検出なし),
+// 再現例 (knowledge + traceability 混在指定でも TARGET-EMPTY 不発生)。
+
+describe("Case #3233 TS-017: case-run profile covers docs/knowledge and traceability (REQ-010-077)", () => {
+  it("includes docs/knowledge changes in files_checked (正常例)", () => {
+    const root = join(TEMP_ROOT, "ts017-knowledge");
+    mkdirp(root);
+    setupGitFixture(root);
+    mkdirp(join(root, "docs", "knowledge"));
+    writeFileSync(
+      join(root, "docs", "knowledge", "ts017-fixture.md"),
+      "# ts017 fixture knowledge\n\nbody.\n",
+      "utf-8",
+    );
+    copyScripts(root);
+    const r = runScript(root, [
+      "--workflow", "case-run",
+      "--files", "docs/knowledge/ts017-fixture.md",
+      "--json",
+    ]);
+    expect(r.exitCode).toBe(0);
+    const parsed = JSON.parse(r.stdout);
+    expect(parsed.files_checked).toContain("docs/knowledge/ts017-fixture.md");
+  });
+
+  it("does not report TARGET-EMPTY for knowledge-only changes (違反例: 回帰防止)", () => {
+    const root = join(TEMP_ROOT, "ts017-knowledge-empty");
+    mkdirp(root);
+    setupGitFixture(root);
+    mkdirp(join(root, "docs", "knowledge"));
+    writeFileSync(
+      join(root, "docs", "knowledge", "ts017-empty-fixture.md"),
+      "# fixture\n\nbody.\n",
+      "utf-8",
+    );
+    copyScripts(root);
+    const r = runScript(root, [
+      "--workflow", "case-run",
+      "--files", "docs/knowledge/ts017-empty-fixture.md",
+      "--json",
+    ]);
+    const parsed = JSON.parse(r.stdout);
+    const targetEmpty = (parsed.failures as { rule_id: string }[]).filter(
+      (f) => f.rule_id === "TARGET-EMPTY",
+    );
+    expect(targetEmpty).toHaveLength(0);
+    expect(parsed.files_checked.length).toBeGreaterThan(0);
+  });
+
+  it("includes traceability sidecar and nested knowledge paths (境界例)", () => {
+    const root = join(TEMP_ROOT, "ts017-traceability");
+    mkdirp(root);
+    setupGitFixture(root);
+    mkdirp(join(root, "traceability"));
+    mkdirp(join(root, "docs", "knowledge", "nested"));
+    writeFileSync(
+      join(root, "traceability", "REQ-0001.yaml"),
+      "schema_version: 1\n",
+      "utf-8",
+    );
+    writeFileSync(
+      join(root, "docs", "knowledge", "nested", "deep-fixture.md"),
+      "# deep fixture\n",
+      "utf-8",
+    );
+    copyScripts(root);
+    const r2 = runScript(root, [
+      "--workflow", "case-run",
+      "--files", "traceability/REQ-0001.yaml", "docs/knowledge/nested/deep-fixture.md",
+      "--json",
+    ]);
+    expect(r2.exitCode).toBe(0);
+    const parsed2 = JSON.parse(r2.stdout);
+    expect(parsed2.files_checked).toContain("traceability/REQ-0001.yaml");
+    expect(parsed2.files_checked).toContain("docs/knowledge/nested/deep-fixture.md");
+  });
+
+  it("does not misreport knowledge README enumeration as checker failure (許容例)", () => {
+    const root = join(TEMP_ROOT, "ts017-knowledge-readme");
+    mkdirp(root);
+    setupGitFixture(root);
+    mkdirp(join(root, "docs", "knowledge"));
+    writeFileSync(
+      join(root, "docs", "knowledge", "README.md"),
+      "# Knowledge\n\n- [ts017 kb](ts017-kb.md)\n",
+      "utf-8",
+    );
+    writeFileSync(
+      join(root, "docs", "knowledge", "ts017-kb.md"),
+      "# ts017 kb\n\n- 背景: fixture\n",
+      "utf-8",
+    );
+    copyScripts(root);
+    const r = runScript(root, [
+      "--workflow", "case-run",
+      "--files", "docs/knowledge/README.md",
+      "--json",
+    ]);
+    expect(r.exitCode).toBe(0);
+    const parsed = JSON.parse(r.stdout);
+    expect(parsed.files_checked).toContain("docs/knowledge/README.md");
+  });
+
+  it("covers knowledge + traceability mixed change sets without TARGET-EMPTY (再現例)", () => {
+    const root = join(TEMP_ROOT, "ts017-mixed");
+    mkdirp(root);
+    setupGitFixture(root);
+    mkdirp(join(root, "docs", "knowledge"));
+    mkdirp(join(root, "traceability"));
+    writeFileSync(
+      join(root, "docs", "knowledge", "mixed-fixture.md"),
+      "# mixed fixture\n",
+      "utf-8",
+    );
+    writeFileSync(
+      join(root, "traceability", "REQ-0002.yaml"),
+      "schema_version: 1\n",
+      "utf-8",
+    );
+    copyScripts(root);
+    const r = runScript(root, [
+      "--workflow", "case-run",
+      "--files", "docs/knowledge/mixed-fixture.md", "traceability/REQ-0002.yaml",
+      "--json",
+    ]);
+    const parsed = JSON.parse(r.stdout);
+    const targetEmpty = (parsed.failures as { rule_id: string }[]).filter(
+      (f) => f.rule_id === "TARGET-EMPTY",
+    );
+    expect(targetEmpty).toHaveLength(0);
+    expect(parsed.files_checked).toContain("docs/knowledge/mixed-fixture.md");
+    expect(parsed.files_checked).toContain("traceability/REQ-0002.yaml");
   });
 });
