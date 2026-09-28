@@ -6,10 +6,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 56件、廃止済み: 14件
+現行 REQ: 57件、廃止済み: 14件
 <!-- AUTOGEN:END -->
 
-現行要件は56件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
+現行要件は57件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
 REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）による意図的予約欠番であり、実体は存在しない（[採番管理](designs/foundations/numbering-policy.md) 参照）。
 REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却枠であり、意図的予約欠番として維持する。
 REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全 revert）由来の廃止識別子であり、再利用しない。次の新規 REQ 番号は採番時点で REQ 実ファイル一覧と既知欠番レジストリから決定的採番スクリプト（alloc-req-number.ts）により決定する（[採番管理](designs/foundations/numbering-policy.md) 参照）。
@@ -74,6 +74,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [REQ-091](requirements/REQ-091.md) | Supervisor 環境向け credential 供給ブリッジの正本管理 |
 | [REQ-092](requirements/REQ-092.md) | agentdev_gh issue_list 運用規律と labels 論理値専用の文書整備 |
 | [REQ-093](requirements/REQ-093.md) | agentdev_gh 起動環境障害の予防・診断・回復の恒久化 |
+| [REQ-094](requirements/REQ-094.md) | ADF の Markdown 日本語表現および用語選択基準 |
 <!-- AUTOGEN:END -->
 
 - [要件インデックス](requirements/README.md)
