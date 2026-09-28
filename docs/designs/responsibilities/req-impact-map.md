@@ -2,7 +2,7 @@
 title: REQ 影響マップ
 status: accepted
 created: 2026-08-20
-updated: 2026-09-27
+updated: 2026-09-29
 ---
 
 # REQ 影響マップ
@@ -16,7 +16,7 @@ updated: 2026-09-27
 本ファイルと `rule-ownership.md` は逆方向の対応表であるため、以下の場合に両ファイルの同期更新が必要:
 
 - 新規 IR 追加時: 両ファイルの対応行列を同期更新する
-- IR の物理削除時（AG-008、REQ-028-008）: 両ファイルで対応行を削除し、本ファイルの `## Retired cross-references` 節へ交叉参照を再配置する
+- IR の物理削除時（AG-008、retired REQ-028-008 由来、現行の IR 登録モデルは DEC-013）: 両ファイルで対応行を削除し、本ファイルの `## Retired cross-references` 節へ交叉参照を再配置する
 - canonical owner 変更時: 両ファイルで参照先を更新する
 - 新規 REQ 追加、廃止時: 本ファイルの対応行を追加、削除し、影響先ルールドメインと rule-ownership.md の整合を確認する
 

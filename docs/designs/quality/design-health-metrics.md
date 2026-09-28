@@ -2,14 +2,14 @@
 title: Design 健全性メトリクス
 status: accepted
 created: 2026-06-26
-updated: 2026-09-27
+updated: 2026-09-29
 ---
 <!-- ADF-COVERS(implementation): REQ-001-027 -->
 
 # Design 健全性メトリクス
 
 Design の肥大化、関心ズレ、放置を定量的に検出するための閾値を定義する。
-req-health-metrics.md と対となる Design 健全性の定量メトリクスであり、REQ/Design 健全性の双方向メトリクスを構成する（v2:REQ-0155-001, REQ-001-007）。
+req-health-metrics.md と対となる Design 健全性の定量メトリクスであり、REQ/Design 健全性の双方向メトリクスを構成する（v2:REQ-0155-001 由来、現行は REQ-001-007）。
 
 ## 適用範囲
 

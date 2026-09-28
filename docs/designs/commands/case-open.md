@@ -2,7 +2,7 @@
 title: case-open Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-26"
+updated: "2026-09-29"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-004, REQ-030-005, REQ-030-006, REQ-030-007, REQ-030-008, REQ-030-009, REQ-030-010, REQ-030-011, REQ-030-015 -->
@@ -175,8 +175,8 @@ case-open が使用する検査ツール（[integrity-contracts.md](../integrity
 - Definition Amendment PR の作成（case-revise の責務）
 - GitHub I/O の Tool 操作契約（Custom Tool `agentdev_gh`）経由の省略。Root Case 作成、Definition PR 作成は Tool 操作契約経由で行い、Tool 内 VERIFY を迂回する直接実行を行わないこと
 - Root Case 本文、PR 本文の文字列変数での持ち回り、親エージェントによる本文再構成の禁止
-- スイープ操作（`git add -A` / `git add .` / `git commit -a` / `git checkout .` / `git reset --hard` / `git stash` 等）の実行（v2:REQ-0137-001）
-- 明示パス指定以外のステージ、コミット（v2:REQ-0137-002/005）
+- スイープ操作（`git add -A` / `git add .` / `git commit -a` / `git checkout .` / `git reset --hard` / `git stash` 等）の実行（v2:REQ-0137-001 由来、現行の並行作業隔離と 1-writer 検知規律は REQ-030-017）
+- 明示パス指定以外のステージ、コミット（v2:REQ-0137-002/005 由来、現行は REQ-030-017）
 - intake / learning capture パイプライン自体の操作（保存は agentdev-learning-capture / agentdev-intake-pipeline 委譲内で行い、case-open 自身は直接変更しない）
 
 ## 検証観点

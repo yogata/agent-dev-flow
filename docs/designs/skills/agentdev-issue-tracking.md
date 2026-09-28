@@ -2,10 +2,10 @@
 title: `agentdev-issue-tracking` Design
 status: accepted
 created: 2026-08-23
-updated: 2026-09-26
+updated: 2026-09-29
 ---
 <!-- ADF-COVERS(implementation): REQ-049-001, REQ-049-002, REQ-049-003, REQ-049-005, REQ-049-006, REQ-049-007, REQ-049-008, REQ-049-012, REQ-049-013, REQ-049-014, REQ-049-017, REQ-049-018 -->
-<!-- ADF-COVERS(design): REQ-092-001, REQ-092-002, REQ-092-004, REQ-093-001 -->
+<!-- ADF-COVERS(design): REQ-092-001, REQ-092-002, REQ-092-004, REQ-093-001, REQ-095-001, REQ-095-002, REQ-049-020 -->
 
 # `agentdev-issue-tracking` Design
 

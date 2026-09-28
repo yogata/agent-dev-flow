@@ -2,7 +2,7 @@
 title: Custom Tool 操作契約
 status: accepted
 created: 2026-08-24
-updated: 2026-09-27
+updated: 2026-09-29
 ---
 <!-- ADF-COVERS(design): REQ-090-001, REQ-090-002, REQ-090-003, REQ-090-004, REQ-090-009, REQ-090-010, REQ-090-011, REQ-090-012, REQ-090-013, REQ-090-014, REQ-090-015, REQ-090-016, REQ-090-017, REQ-090-018, REQ-090-019, REQ-090-020, REQ-090-021, REQ-090-022, REQ-090-023, REQ-092-003, REQ-011-033 -->
 <!-- ADF-COVERS(design): REQ-009-051, REQ-052-013, REQ-093-002, REQ-093-003 -->
@@ -86,7 +86,7 @@ GitHub版 / Local版等価性:
 - 永続化契約（中断耐性）: evaluate は evaluator 成功後・呼出元 Workflow が reasoning model へ進む前に、当該評価の一次観測の永続化を試みる。永続化成功後の中断でも一次観測が失われない。永続化自体の失敗は観測保存失敗契約（fail-open）に従う。観測の保存のみに失敗した場合、Workflow の正規処理結果を維持し、rollback・再実行・擬似再生成を行わず、識別可能な warning を構造化情報として呼出元へ返す（REQ-090-013）。
 - deterministic 境界: モデル推論なしで一意に導出できる事実・判定は semantic evaluation の対象外とする。境界判定は「モデル推論なしで一意に導出できること」を機械判定基準として Workflow / Capability Skill が行い、境界判定そのものを Jev へ渡さない。境界の適用は判断単位の構成時（評価入力の組み立て時）を原則とし、評価後に判明した deterministic な確定は差異理由 deterministic_override として処理する。機械的に確定した結果は必要に応じて後続の semantic evaluation の state として利用できる。deterministic に確定した結果を Jev で再判定させる二重確認を原則として行わない。境界判定が確定できない場合は semantic evaluation の対象として扱う（REQ-090-018）。
 - 評価指標（集計・分析時）: 観測に基づく Jev と最終判断の関係の集計は、正解（ground truth）を設定することを前提とせず、単純一致率を Jev の精度として扱わず raw agreement と semantic agreement を分離して行う（agreement は Jev と最終判断の対称な一致指標であり、最終判断を正解として Jev を採点する枠組みを採らない）。semantic agreement の母集団から差異理由が evaluation_input_defect と deterministic_override の judgment（質問単位）を除外し、semantic 不一致は semantic_disagreement と unknown に分類して数える。集計粒度は全体値に加えて原則 workflow × evaluationKind 単位とする。指標名は Jev accuracy ではなく Jev–final agreement とする。集計は観測の一次事実からの分析時の導出であり、観測保存時に新規 field を追加する要件としない（REQ-090-020）。
-- 書込先: 書込先 root は Tool が内部解決し、呼出側から指定できない。worktree コンテキストの委譲実行から呼び出された場合も main リポジトリ側 `.agentdev/jev-observations/` に帰着する（実測: 20260923T133911Z-6859）。この振る舞いは worktree コンテキストに依存しない。機構記述（cwd 相対解説等）は契約文言に含めず、観測可能契約のみを規定する（実装は物理実装の自由度とする）。
+- 書込先: 書込先 root は Tool が内部解決し、呼出側から指定できない。worktree コンテキストの委譲実行から呼び出された場合も main リポジトリ側 `.agentdev/jev-observations/` に帰着する（実測観測: `.agentdev/jev-observations/20260923T133911Z-6859.json`）。この振る舞いは worktree コンテキストに依存しない。機構記述（cwd 相対解説等）は契約文言に含めず、観測可能契約のみを規定する（実装は物理実装の自由度とする）。
 - 旧派生状態の除去: recordState、outcome、llmTreatment、unchanged/corrected、finalizedBy、direct-finalization marker、fallback reason、not_configured/invalid_input observation を正規観測契約から除去する（REQ-090-017）。既存の v1 観測（1 Workflow 実行 = 1 JSON、部分レコード/完成レコード形式）は履歴として保持し、migration・変換・読み取り互換を要求しない。v1 観測を新契約の現行 observation として解釈しない。
 - 操作構成の自由度: operation カタログ（evaluate、観測の永続化と final result 反映の操作分割の有無）、観測 JSON の field 名、filename、完了状態の物理表現は実装設計時の自由度とし、本節の意味契約（一次事実、evaluation 単位 confidence、中断耐性、fail-open）を変更しない範囲で定める。provider 返却の score 値から定義済み scale level への正規化の写像方法も、連続値を canonical result として残さない限りにおいて実装設計時の自由度とする（REQ-090-014）。
 - 配布境界: ADF 汎用の Tool として配布対象とする（REQ-052-006）。正式名称 `agentdev_jev`、物理配置 Tool 本体 `src/opencode/tools/agentdev-jev/`、Cloudflare adapter パッケージ（`src/opencode/tools/agentdev-jev/` 配下。Cloudflare AI Gateway 接続。物理ディレクトリ名は repository 規約に従う。評価 SDK・HTTP 依存はこの adapter パッケージに閉じる）、Plugin 登録配線 `src/opencode/plugins/agentdev-jev-tool/`。

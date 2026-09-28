@@ -158,7 +158,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-048 | generated_by 識別子整合性 | REQ-009-011, REQ-009-012, REQ-009-013 | runtime-package-boundary.md |
 | IR-049 | Command file format violation | v2:REQ-0143, REQ-010 | command-file-format.md, integrity-contracts.md |
 | IR-050 | load_skills command 誤指定検出 | v2:REQ-0140-027, REQ-010-010 | integrity-contracts.md, document-type-responsibilities.md |
-| IR-051 | 実行主体の skill 表記誤認検出 | v2:REQ-0140-027, REQ-010-010 | integrity-contracts.md, document-type-responsibilities.md |
+| IR-051 | 実行主体の skill 表記誤認検出 | v2:REQ-0140-027（由来、現行の文書品質契約は REQ-053）, REQ-010-010 | integrity-contracts.md, document-type-responsibilities.md |
 | IR-052 | 完了条件 grep パターン設計（REQ-010-011） | REQ-010-011 | integrity-contracts.md, v4-quality-gate-model.md |
 | IR-053 | gh 直接記述検出 | REQ-011 | integrity-rule-catalog.md, integrity-contracts.md, ../../responsibilities/custom-tool-contracts.md |
 | IR-054 | draft Design 放置検出 | REQ-001-002 | integrity-rule-catalog.md, integrity-contracts.md |
