@@ -308,3 +308,19 @@
 - **想定反映先**: なし（設計検討事項）
 - **関連**: Epic #3216、PR #3229、traceability/ra002-designs-batch-correction.yaml、v4-traceability-model Design
 - **タグ**: `#traceability` `#req-094` `#sidecar`
+
+## checker 実行時の stdout/stderr 退避ファイルは worktree remove の拒否要因になる（STEP-6-1 前に退避先を含めて掃除）
+
+- **問題事象**: case-close（Issue #3231・REQ-094 Wave 3）で worktree（.worktrees/3231-feature）内の checker（check_distribution_boundary.ts）を検証コマンドの stdout 証跡退避形式（`2>` による stderr 分離退避）で実行した際、退避ファイル err-distb.log が worktree 内に untracked で残存した。STEP-6-1 の `git worktree remove` が「contains modified or untracked files, use --force」で拒否され、退避ファイル削除後の再実行が必要になった（--force 不使用で解消）。
+- **発生局面**: case-close STEP-3（docs 検証の worktree 内 checker 実行）→ STEP-6-1（worktree 削除）
+- **検知方法**: git worktree remove の拒否応答（untracked files 検出）
+- **根本原因**: 退避ファイルは実行直後の結果確認に使用したが、その後の cleanup 対象から漏れた。STEP-6-6 の tmp/ 残存確認は .agentdev/tmp/ 配下が対象であり、worktree 内の作業ディレクトリ直下に作成した退避ファイルを網羅しない
+- **自律対応内容**: 残存退避ファイルを削除してから worktree remove・branch 削除を再実行（--force 不使用で解消）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree 内で checker・bun test を `> ` `2>` 退避付きで実行する工程は、STEP-6-1 の worktree remove 前に「当該実行が作成した退避ファイルの列挙と削除」を実施する
+- **再発条件**: worktree 内で stdout/stderr 退避ファイルを作成した検証実行の後、worktree remove を行う場合
+- **予防策候補**: 退避ファイルは作成時から .agentdev/tmp/ 配下（worktree root 相対）に置くか、worktree remove 前の cleanup 手順へ退避ファイル掃除を明記する
+- **想定反映先**: agentdev-workflow-case-close references（STEP-6-1・STEP-6-6 の退避ファイル取扱い）への補完要求
+- **関連**: Issue #3231、.worktrees/3231-feature、checker 実行契約（stdout 証跡退避形式）
+- **タグ**: `#case-close` `#worktree-remove` `#evidence-file`
