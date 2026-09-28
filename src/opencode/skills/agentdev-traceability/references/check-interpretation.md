@@ -50,6 +50,15 @@ missing 系検出項目（`missing-design` / `missing-implementation` / `missing
 - corpus 債務方針: v4 移行期間の corpus 計数（missing-design・missing-implementation の既知債務）は診断指標として数値追跡し、是正評価は full validation（第13段）で行う。corpus 計数は lifecycle gate を阻害しない（v4-traceability-model Design「corpus 債務方針」節）
 - check を `--root` 指定のみで実行した場合の missing 系計数は corpus completeness（corpus 全体）の診断指標である。lifecycle gate の完全性判定は `--req` で対象要件行へ限定した実行で導出する（fail-closed）
 
+## inline 宣言の役割タグと coverage 役割解釈の関係
+
+成果物本文に埋め込まれる inline 宣言の役割タグ（design、implementation、verification の役割名を丸括弧で付与した宣言形式）は、coverage / check の4役割（decision / design / implementation / verification）と対応して解釈される。
+
+- **役割タグ → 役割の対応**: design 役割タグ付き inline 宣言は design 役割の対応関係、implementation 役割タグ付きは implementation 役割、verification 役割タグ付きは verification 役割として coverage の役割付き対応関係に帰属する。coverage `--req` の出力（`relations`、`counts`）では、inline 宣言由来の対応はこの役割で分類されて返る
+- **decision 役割に対応するタグは inline 宣言に通常存在しない**: Decision 対応は対応完全性規則の任意役割であり、Decision 文書からの対応付けは sidecar 側の `decision` セクションまたは Design 文書内の Decision 参照から解釈される（inline タグの欠如は decision 対応の欠落を意味しない。Decision 対応はどの検出項目にも計上されない）
+- **coverage 実装の役割解釈仕様は現状正**: 本節は現行 coverage 実装の解釈を説明するものであり、実装仕様の変更を要求しない。coverage は advisory・fail-open であり、対応完全性の完了条件判定は check の責務（本reference「completeness の 2 層解釈」節）
+- **タグ形式の正本**: inline 宣言の書式と配置規約の正は ADF v4 Traceability モデル Design（v4-traceability-model）と `agentdev-traceability` Design である。形式違反は check の `malformed-declarations` として検出される
+
 ## coverage の利用方法
 
 coverage は対応する対応関係を問い合わせる能力であり、補助的（advisory）な能力として fail-open で運用する。

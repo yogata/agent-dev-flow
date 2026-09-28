@@ -1,1 +1,7 @@
 component: agentdev-learning-pipeline
+implementation:
+  src/opencode/skills/agentdev-learning-pipeline/references/disposition-and-artifact-schema.md:
+    - REQ-038-007
+verification:
+  src/opencode/skills/agentdev-learning-pipeline/references/disposition-and-artifact-schema.md:
+    - REQ-038-007

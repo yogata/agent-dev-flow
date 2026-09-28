@@ -18,6 +18,10 @@ implementation:
     - REQ-031-029
     - REQ-031-030
     - REQ-031-032
+    - REQ-060-007
+verification:
+  src/opencode/skills/agentdev-workflow-case-run/references/delegation-and-result.md:
+    - REQ-060-007
     - REQ-061-034
   src/opencode/skills/agentdev-workflow-case-run/references/single.md:
     - REQ-014-016

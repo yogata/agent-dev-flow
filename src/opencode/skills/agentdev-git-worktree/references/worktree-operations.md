@@ -184,6 +184,14 @@ skip せずに検査が必要な場合は構造系テスト fallback（commands_
 
 ### main root 実体 + --root 指定による読取系 checker 実行手順
 
+**前置確認（.opencode 状態の実測）**: checker 起動前に worktree 内の `.opencode/` の実在構成を実測して確認する。worktree 内では `.opencode/skills/` に git 管理対象の repo 検査基盤実体（`repo-` プレフィックス検査基盤の skill）のみが存在し、`agentdev-*` junction は伝播しない。この前置確認は、main root 実体側起動へ切替すべき対象（junction 系 skill scripts・plugins 系 gate）を事前に特定するために行う。
+
+```bash
+# worktree 内 .opencode/skills の実在構成確認（git 管理対象実体と junction の区別）
+ls .opencode/skills/
+ls .opencode/plugins/ 2>/dev/null || echo "(plugins junction 未伝播)"
+```
+
 junction 系 skill scripts および plugins 系 gate を用いる検査で、skip せずに実行する必要がある読取系 check は、main root 実体から `--root <worktree root>` 指定（必要に応じ `--files` 併用）で実行できる。
 worktree 内から `.opencode/skills/agentdev-*` 配下の script を直接実行すると junction 未伝播により Module not found で失敗するため、script の起動パスを main root 実体側へ置き、検査対象だけを worktree へ向ける。
 
@@ -191,9 +199,9 @@ worktree 内から `.opencode/skills/agentdev-*` 配下の script を直接実�
 
 手順:
 
-1. main root（メインリポジトリルート）を cwd として、script 実体を `bun <path>` 形式で起動する
+1. **host repo root（メインリポジトリルート）を cwd として**、script 実体を `bun <path>` 形式で起動する。cwd は `git rev-parse --show-toplevel` が `.worktrees/` を含まない main root を返す位置（実行担当サブエージェントの host repo root）である
 2. 検査対象の worktree root を `--root <worktree root>` で指定する（絶対パスを推奨。相対パスは実行時のカレントディレクトリ基準で解決される）
-3. `--root` のパス形式は forward slash 形式に統一する（例: `C:/Users/.../.worktrees/{N}-{type}`）。bash は引用符なしの Windows 形式パス（backslash）を escape 解釈して backslash を落とすため、引数段階でパスが破損する。破損した root は存在しない root として扱われ、checker の fail-closed 契約により検査対象が見かけ上全件 missing となる恐れがある
+3. `--root` のパス形式は **forward slash 形式の Windows 形式パス（`C:/Users/...` 形式）に統一する**。**MSYS 形式パス（`/c/Users/...`）は禁止する** — MSYS 形式は Windows プログラム側のパス解決で実在しない root として扱われ、checker の fail-closed 契約により検査対象が見かけ上全件 missing となる。bash は引用符なしの Windows 形式パス（backslash）を escape 解釈して backslash を落とすため、引数段階でパスが破損する。破損した root は存在しない root として扱われ、checker の fail-closed 契約により検査対象が見かけ上全件 missing となる恐れがある
 4. 変更ファイル限定検査では `--files` を併用する（`--files` と `--base-ref` は排他。worktree 上のコミット前検証では untracked ファイルを含む `--files` による明示指定を標準とする。`--files` は checker の workflow profile の対象に一致するファイルを指定する。docs/** 変更を含まない PR では `--workflow case-run` の gate がスキップ対象となるため、文書品質の targeted 検査は `--workflow docs-check`（全ファイル対象）で行う）
 
 実行手順例（代表検査。`<worktree 絶対パス>` は検査対象 worktree の root に置換する）:
@@ -247,11 +255,26 @@ worktree 操作（実装、検証、証跡退避を含む）におけるファ�
 guard が書込みをブロックした場合、ブロックの解除・迂回（エンコーディング指定の変更、リダイレクト回避ハック等）で進めず、上記の標準手段へ切替する。
 ブロックを検知した edit の oldString がファイル実内容と不一致の場合は、ファイルを再読取して正確な内容で再試行する（本規定は guard の fail-closed 挙動自体を維持対象とする）。
 
+### 同一ファイルへの複数 edit の規律
+
+同一ファイルへの複数の edit を適用する場合、次の規律に従う。
+
+- **相互非依存または順次実行**: 複数 edit の oldString は互いに重複・干渉しない選択（相互非依存）とするか、結果に依存する後続 edit は先行 edit の完了後に順次実行する。先行 edit が後続 edit の oldString 範囲と重なる場合、並列想定の oldString 組立では stale な内容に基づく誤置換の可能性があるため順次実行する
+- **guard ブロック後の oldString 再組立**: 書込み guard によるブロック（fail-closed 拒否）後は、`grep` 等の実取得でファイルの現在状態を確認してから oldString を組み立てて再適用する。直前の古い読取キャッシュに基づく oldString の再試行をしない
+- **解除・迂回の禁止**: guard の解除・迂回を行わない（fail-closed の維持）
+
 ### workspace 外書込みのブロック事例と切替（fail-closed 維持）
 
 - **ブロック事例**: 検査入力 JSON 等の一時ファイルを OS の一時ディレクトリ等、workspace の外へ出力しようとした操作は、workspace 外書込み guard によりブロックされ得る。guard は fail-closed で動作し、ブロックされた操作自体は成功しない
 - **標準手段への切替**: ブロックされた場合は、一時ファイルの置き場所を workspace 外から project root 内（リポジトリ配下の実行時作業領域）へ変更する。置き場所指針は横断依存検査エンジンの scripts README（`agentdev-workflow-case-open` scripts「検査入力 JSON」）を参照する。書込み手段自体は「標準手段（guard ブロック時の切替先）」のとおりとする
 - **別 API 経路による迂回の不採用**: guard にブロックされた操作を、別の API・ツール経路（リダイレクト先の変更、出力手段の差し替え等）で workspace 外へ迂回書込みしない。guard の fail-closed 動作自体を維持対象とし、迂回ではなく置き場所の変更（標準手段切替）で対処する
+
+### 退避ファイルの統一配置（.agentdev/tmp/）
+
+worktree 内で checker・検証コマンドを実行する際の退避ファイル（checker stdout / stderr の分離退避、検査入力 JSON 等の一時ファイル）は、**`.agentdev/tmp/`（worktree root 相対）へ作成する**。配置の正本は「workspace 外書込みのブロック事例と切替（fail-closed 維持）」節の置き場所指針と本節である。
+
+- **配置先**: `.agentdev/tmp/`（worktree root 相対）。OS の一時ディレクトリ等 workspace 外へ出力しない
+- **後始末**: 検証完了後、退避ファイルは worktree remove 前に削除する。削除手順は case-close references `cleanup-and-capture.md` STEP-6-1 の「remove 前退避ファイル掃除」を参照する
 
 git 出力のエンコーディング処理の詳細は `git-common-procedures.md`「Windows git 出力のエンコーディング処理」を参照する。
 
@@ -341,6 +364,14 @@ worktree 内の未追跡ファイル（実行時作業領域配下の一時フ�
 **重要**: 追跡済みファイル（ドメイン状態を含む可能性あり）は削除禁止。
 未追跡ファイルのみを削除対象とする。
 未追跡ファイルが存在しない場合はエラーにせず続行。
+
+### 1.5 remove 前退避ファイル掃除
+
+`git worktree remove` の実行前に、worktree 内の退避ファイル（`.agentdev/tmp/`〔worktree root 相対〕配下の checker stdout / stderr 分離退避、検査入力 JSON 等の一時ファイル）を列挙し、削除する。
+
+1. **列挙**: `ls .agentdev/tmp/`（worktree root 相対）で退避ファイルを列挙し、件数を記録する
+2. **削除**: 列挙した退避ファイルを削除する。ドメイン状態（`.agentdev/` 配下の tmp/ 以外）は削除対象外とする
+3. **--force 不使用の維持**: worktree remove は `--force` を付けずに実行する（現行運用の維持）。未コミット変更・未掃除の退避ファイルが残っている場合は remove が失敗するため、失敗時に退避ファイルの残存を再確認して掃除してから再試行する
 
 ### 2. worktreeの削除
 

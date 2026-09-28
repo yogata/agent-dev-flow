@@ -14,6 +14,7 @@ AgentDevFlow を編集するエージェント向けのリポジトリガイド�
 - Windows 環境で PowerShell 標準 cmdlet（Get-Content / Set-Content）経由の既存 UTF-8（BOM なし）/LF ファイル一括読み書きは避けること。cp932 解釈や CRLF 書き出しによりファイルを破壊し得るため、標準手段は edit ツール、node の readFileSync/writeFileSync、[System.IO.File] の明示エンコーディング指定とする。詳細は `docs/knowledge/windows-powershell-bulk-io-corruption.md` を参照すること。
 - Windows 環境で PowerShell のリダイレクト演算子（`>` / `>>` / `*>`）やパイプによるファイル出力も、cp932 再符号化による UTF-8 破損の対象である。証跡退避を含むファイル出力は上記の標準手段で行うこと。詳細は `docs/knowledge/windows-powershell-bulk-io-corruption.md` を参照すること。
 - worktree 操作（実装、検証、証跡退避を含む）中の書込み guard 運用指針は `src/opencode/skills/agentdev-git-worktree/references/worktree-operations.md`「書込み guard 運用指針」節を参照すること。guard による書込みブロックは fail-closed として維持し、ブロック解除・迂回ではなく標準手段へ切替する。
+- 同一ファイルへの複数 edit は、相互非依存の oldString 選択または順次実行に限定する。書込み guard によるブロック（fail-closed 拒否）後は、grep 等の実取得でファイルの現在状態を確認してから oldString を組み立てて再適用する。guard の解除・迂回を行わない。詳細は `src/opencode/skills/agentdev-git-worktree/references/worktree-operations.md`「同一ファイルへの複数 edit の規律」節を参照すること。
 
 ## ハーネス選定
 

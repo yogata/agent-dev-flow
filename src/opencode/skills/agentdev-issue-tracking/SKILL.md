@@ -73,6 +73,12 @@ description: 追跡Issue（課題、ToDo、アイデア、リスク等の未解�
 2. **read-back 確認**: 書き込み系操作（`issue_create`、`issue_update`、`comment_create`、`issue_close`、`issue_reopen` 等）の成功応答は Tool 内部の読み戻し検証済みである。呼出側は成功応答をもって反映確認として扱い、機械的な同一内容の再読込を重複実行しない（状態遷移の意味確認など、読み取りに独立の目的がある場合はこの限りでない）
 3. **論理値指定**: role、kind、trackingState は Tool 操作契約の論理値で指定する。物理ラベル名を呼出側から指定しない（物理ラベル写像は Tool 内実装の責務）
 
+### 操作・role 別の受理フィールド対応表と gh 読取補完規律への参照
+
+操作別の受理フィールド差異（`role` は issue_create / issue_list 専用、`kind` は `role: tracking` 専用で `role: case` では不受理、Case Issue の work_type は物理ラベルを `labels` へ指定）は、受理フィールド対応表として安全手続き側の `agentdev-issue-management` references `issue-operation-safety.md`「操作・role 別の受理フィールド対応表」節へ集約する。呼出側はその対応表から受理可否を確認する。
+
+gh CLI による読取補完（Case Issue は `case` ラベルを持たないためラベルフィルタが機能しない）は、ラベルなし列挙＋タイトル・本文確認の規律で行う。正は同 reference「gh CLI 読取補完の規律（ラベルなし列挙＋タイトル・本文確認）」節である。
+
 ### verification-incomplete 復帰手順（fail-closed）
 
 書き込み操作の読み戻し検証に失敗した場合、Tool は検証失敗として成功を返さない（fail-closed）。呼出側は verification-incomplete を成功扱いせず、次の順で復帰する。
