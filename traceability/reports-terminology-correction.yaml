@@ -1,0 +1,8 @@
+component: reports-terminology-correction
+implementation:
+  docs/reports/integrity/audits/classification-20260811.md:
+    - REQ-094-002
+    - REQ-094-010
+  docs/reports/integrity/baselines/pre-audit-baseline-20260811.md:
+    - REQ-094-007
+    - REQ-094-010

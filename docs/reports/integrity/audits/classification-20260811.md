@@ -348,7 +348,7 @@ targeted docs guard（`check_changed_docs.ts --workflow case-run --base-ref orig
 
 ### 9.3 代替解釈（複数妥当な解釈を持つ IR）
 
-本 Phase 2 は task 指示「最も保守的な解釈（現状維持寄り）」を採用した。
+本 Phase 2 はタスク指示「最も保守的な解釈（現状維持寄り）」を採用した。
 代替案を以下に記録し、Phase 3 以降での再評価材料とする。
 
 | IR | 採用判定 | 代替案 | 代替案の根拠 |
