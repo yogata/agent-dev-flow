@@ -1,0 +1,24 @@
+component: vocabulary-management
+implementation:
+  .opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md:
+    - REQ-094-007
+    - REQ-094-008
+    - REQ-094-012
+  .agentdev/config/plugins/agentdev-textlint-guard-prh.yml:
+    - REQ-094-009
+verification:
+  src/opencode/plugins/agentdev-textlint-guard/plugin.ts:
+    - REQ-094-007
+    - REQ-094-008
+    - REQ-094-009
+    - REQ-094-012
+  src/opencode/plugins/agentdev-textlint-guard/gate.ts:
+    - REQ-094-007
+    - REQ-094-008
+    - REQ-094-009
+    - REQ-094-012
+  src/opencode/plugins/agentdev-textlint-guard/lib/inspect.ts:
+    - REQ-094-007
+    - REQ-094-008
+    - REQ-094-009
+    - REQ-094-012
