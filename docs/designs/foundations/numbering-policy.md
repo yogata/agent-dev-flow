@@ -38,7 +38,7 @@ AgentDevFlow 配布物が前提する採番の不変条件を宣言し、各所�
 欠番が存在する場合でも欠番を埋めず、最大番号をもって決定する。
 
 採番の判断は人間または LLM が行わず、`agentdev-req-file-manager/scripts/`（REQ、複合 ID）と `agentdev-decision-file-manager/scripts/`（Decision）が提供する決定的スクリプト（`alloc-req-number.ts`、`alloc-decision-number.ts`、`alloc-composite-id.ts`）が機械的に確定する（design-principles.md 第5節）。
-Definition 保存 / Design 保存内部責務（case-ready / case-revise）は当該スクリプトを bash 経由で呼び出す。
+Definition 系保存工程（case-open の Definition Package 編成時における proposed Decision の採番・作成、case-ready / case-revise における Definition 保存・Design 保存）は当該スクリプトを bash 経由で呼び出す。case-ready の Decision 受理評価（accepted 遷移）は採番・作成と区別される。
 
 分割・付け替えに伴う採番のみの付け替えでは、ユーザー裁定による番号指定を例外として許容する。例外採番は REQ 本文の該当行にユーザー裁定の記録を伴い、指定番号が既知欠番と重複する場合も欠番を消費せず、欠番は意図的予約として維持する（REQ-082 採番の前例: 2026-09-15 ユーザー裁定）。決定的採番スクリプトによる新規採番は既定経路であり続ける。
 
