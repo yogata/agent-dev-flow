@@ -1,0 +1,305 @@
+# inspect-docs finding 20260929T170714Z
+
+- 実行日時: 2026-09-30T02:07 JST（backlog-auto stage 1 として実行）
+- 診断体制: STEP-2 意味診断は3診断担当への並列委譲（REQ 体系 / Design / Decision・guides・README、いずれも読取専用）+ 親の fan-in 統合（6観点網羅確認・横断矛盾判定・重複排除・既知 defer 照合を実施、矛盾・重複なし）
+- 前回診断: 20260928T145126Z。今回の対象差分は 9/28〜9/30 の正規 PR 群（602b8601 運用規律整備・4dafa2e0 RA-002・bd666243 REQ-090 純化・d0c02fe0 Jev 実装・adc84579 textlint vendor 除外ほか）
+
+## サマリ
+
+- スキャン対象: docs/requirements/ 58現行 + retired 14 / docs/decisions/ 46 DEC（DEC-018 欠番）+ README / docs/designs/ 178 / docs/guides/ 13 / ルート README.md + THIRD-PARTY-NOTICES.md / 配布物（src/opencode/ commands 13 + skills 50）
+- 機械的検査（STEP-2-0 候補収集）: check_integrity 0 新規 unmanaged NG、AUTOGEN 鮮度 0、command 形式 OK、extensions 0、配布境界 0、Design frontmatter 0、knowledge 構造 0、決定的破損 0、BOM/CRLF-LF 混在 0、存在しない command 参照 0（廃止コマンド移行案内は意図的記載）
+- 検出事項: 19件（新規候補）
+  - REQ 体系: 7件 / Design: 2件 / Decision・guides・README: 10件
+  - severity: high 0件 / medium 9件 / low 10件
+  - 推奨 route: docs-check 10件 / intake 5件 / defer 4件
+- 既知 defer 残置分: 19項目の状況更新（すべて残存、うち1項目は部分解消、1項目は移動先で残存）—「既知 defer 項目の状況更新」節参照
+
+## 検出事項リスト
+
+source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides。
+
+### REQ 体系（新規 7件）
+
+#### RQ-01: REQ-021-030 — 移行作業手順が要件行を占有
+- category: MOVE（文書分類: 作業履歴・内部アルゴリズム残留）
+- target: `docs/requirements/REQ-021.md:39`
+- evidence: 「配布物本体に残存するADF-COVERS宣言の除去は、producer側対応とtraceability sidecarのcoverageを、implementation役割・producer側パスの役割フィルタで突合してから行う。除去後はrole別coverage不変と新規missing-implementation 0件を確認し…」— 除去作業（移行）の手順・突合アルゴリズム・確認条件が行の主文意。
+- severity: medium（REQ/Design 境界違反シグナルだが安定契約例外候補〔配布 strip 安全手順〕のため medium に低下）
+- confidence: medium
+- source_of_truth: REQ-001-014（現行文書の本文は移行経緯を含まない）、REQ-004-009（作業手段は要件行の対象外）
+- recommended_route: docs-check（手順詳細は case-run 側 skill/Design へ移送し、REQ 行は恒久不変条件のみ残す案）
+- ng_classification: pre-existing（97953f3e 由来）
+- notes: 要ヒューマンレビュー（安定契約読みの可能性）
+
+#### RQ-02: REQ-053-041/042 — 編集手段規律の関心混在と他文書重複
+- category: SPLIT + DUPLICATE（文書分類併記）
+- target: `docs/requirements/REQ-053.md:57-58`
+- evidence: 041「既存UTF-8（BOMなし）/LFファイルの編集ではPowerShell標準cmdletやリダイレクトによる一括読み書きを避け、edit、node readFileSync/writeFileSync…を用いること」/ 042「…oldString 選択または順次実行に限定…grep 等の実取得でファイルの現在状態を確認…」— ツール固有の編集 I/O 手順が要件行を占有。REQ-053 の目的（文章表層品質の決定的検査）とは別関心。同内容が AGENTS.md 行動規範・agentdev-git-worktree skill reference・knowledge 文書に重複記述。
+- severity: medium（安全境界の安定契約例外候補のため high から低下）
+- confidence: medium
+- source_of_truth: REQ-053.md:8-11（目的節）
+- recommended_route: docs-check
+- ng_classification: pre-existing
+- notes: REQ 行を知識文書の ADF-COVERS アンカーとする意図（REQ-056 経由）の可能性があり、その場合は文言の HOW 密度のみが是正対象
+
+#### RQ-03: REQ-090-018/019/024 — 同一規範の行間重複
+- category: DUPLICATE（同一 REQ 内）
+- target: `docs/requirements/REQ-090.md:32,33,38`
+- evidence: 019「当該評価入力だけで判断可能な形に閉じて構成」≡ 024-(5)「与えられた入力だけで判断できること」、018 末尾と 024 末尾が「決定的処理として確定できないという理由のみで対象にしない」でほぼ逐語重複など3組。
+- severity: low
+- confidence: medium
+- source_of_truth: REQ-047（規則所有権の一方向化・正規所有者一意化）の趣旨
+- recommended_route: docs-check（024 を適格条件の正本とし、018/019 は参照に置換する案）
+- ng_classification: 今回修正対象候補（024 は前回診断後の PR #3240 で追加。重複の一部は既存行由来のため要ヒューマンレビュー）
+- notes: 024 を自己完結的チェックリストとする意図的重複の可能性が高い
+
+#### RQ-04: REQ-061-040 — git コマンド形式詳細の要件行残留
+- category: MOVE（文書分類: CLI 詳細の抽象化漏れ）
+- target: `docs/requirements/REQ-061.md:59`
+- evidence: 「明示パス指定の commit（git commit -m "..." -- <path>、--only pathspec 形式）と同一ステップで完結させること（Form Zero）。commit 実行前に git status --short でステージ全体を確認し…」— git フラグ・形式レベルの HOW が行を占有。
+- severity: low
+- confidence: medium
+- source_of_truth: Design 分離基準（CLI 詳細の抽象化漏れ）
+- recommended_route: defer
+- ng_classification: 今回修正対象候補（602b8601 追加行。要ヒューマンレビュー）
+- notes: 「Form Zero」はステージ混入防御の安全境界の安定契約候補。同型既許容行（REQ-030-017、REQ-007-011、REQ-092-003）とパターン単位で統一判断が望ましい
+
+#### RQ-05: REQ-060-007 — 規範化された数値パラメータ
+- category: 文書分類（実装パラメータ残留）
+- target: `docs/requirements/REQ-060.md:22`
+- evidence: 「実行 timeout を明示指定すること（…300〜600 秒の指定を標準とする）」— 数値範囲が「標準とする」として規範化。
+- severity: low
+- confidence: low-medium
+- source_of_truth: Design 分離基準（実装パラメータ残留）
+- recommended_route: defer
+- ng_classification: 今回修正対象候補（602b8601 追加行。要ヒューマンレビュー）
+- notes: REQ-060 自体が「実行形態の統一」を REQ で所有する意図的設計との緊張
+
+#### RQ-06: REQ-095-001/002 — Tool 入力契約・CLI 詳細の再記述
+- category: MOVE + DUPLICATE（文書分類）
+- target: `docs/requirements/REQ-095.md:12,19-20`
+- evidence: 001 括弧内「role は issue_create/issue_list 専用、kind は role 'tracking' 専用…」は REQ-011-033/REQ-049-008 が所有する Tool 入力契約の再記述。002「ラベルなし列挙＋タイトル・本文確認…」は gh CLI 手順詳細。目的節に「kind requires role 'tracking'」というエラーメッセージ文言も存在。
+- severity: low
+- confidence: medium
+- source_of_truth: REQ-095.md:14 自身の所有権宣言（Tool 入力契約は REQ-011-033、本 REQ は呼出側の運用規律のみ）
+- recommended_route: defer（既知 defer REQ-092-003 と同型・同時処置が自然）
+- ng_classification: 今回修正対象候補（602b8601 追加 REQ。要ヒューマンレビュー）
+- notes: 「運用文書から参照できること」形式自体は REQ-092 で確立済みの形式
+
+#### RQ-07: REQ-092 ↔ REQ-095 — MERGE 候補
+- category: MERGE
+- target: `docs/requirements/REQ-092.md:24-27`、`docs/requirements/REQ-095.md:19-20`
+- evidence: 両 REQ とも (a) 同じ目的（agentdev_gh 呼出側の安全運用規律を運用文書へ明記）、(b) 同じ対象成果物（配布 skill reference issue-operation-safety.md）、(c) 同じ command（agentdev_gh）。REQ-093 は起動環境障害という別軸で明確に区別済み。
+- severity: medium
+- confidence: medium
+- source_of_truth: req-structure-review MERGE 観点のシグナル定義（(a)(b)(c) に該当）
+- recommended_route: intake（統合判断は req-define 壁打ち対象）
+- ng_classification: pre-existing（REQ-095 は 602b8601 由来 — 要ヒューマンレビュー）
+- notes: 事故単位の小粒度 REQ 分離が意図的設計の可能性
+
+### Design（新規 2件）
+
+#### DS-01: Custom Tool 操作契約 Design に実測観測への言及が残存
+- category: 文書分類（document-model 責務マトリックス違反: 実測値・観測記録の Design 混入）
+- target: `docs/designs/responsibilities/custom-tool-contracts.md:89`
+- evidence: 「書込先 root は Tool が内部解決し…main リポジトリ側 `.agentdev/jev-observations/` に帰着する（実測観測: `.agentdev/jev-observations/20260923T133911Z-6859.json`）」— 特定観測ファイルへの実測参照が Design 本文に残存。同 Design 内の他の契約は実測ファイル名を引用しない観測可能契約のみで記述しており表現不統一。
+- severity: low
+- confidence: medium
+- source_of_truth: document-model.md:41（Design は監査結果・評価結果・実測値を記述しない。REQ-001-003）、同 :425（実測スナップショットの Design 混入禁止）
+- recommended_route: intake（特定観測ファイル名を除去し観測契約の一般表現へ寄せる、または Report 参照へ置換する文書修正候補）
+- ng_classification: pre-existing（2026-09-29 の Jev 純化 PR #3240 で当該行が触れた後に残存）
+- notes: 契約挙動の根拠としての最小言及という弁護も可能
+
+#### DS-02: document-model.md のドメインディレクトリ表が実在 Design 構成に対して陳腐化
+- category: 横断契約矛盾（Design README と document-model の表の整合性欠落。DRIFT 的陳腐化）
+- target: `docs/designs/foundations/document-model.md:553-560`
+- evidence: foundations/ 行は8件列挙に対し実在は16エントリ（v4 系8ファイル、v3-v4-crosswalk がすべて未列挙）。integrity/ 行は5件列挙に対し実在は15エントリ（checker-execution-contracts 等 未列挙）。local/ 行は2件列挙に対し実在4件。quality/ 行のみ実在と一致。
+- severity: medium
+- confidence: medium
+- source_of_truth: docs/designs/README.md「Design status 追跡情報源」（全 Design の単一追跡情報源）、document-model.md:547-548（ドメイン体系化規範の正、REQ-001-001）
+- recommended_route: intake（表の列挙を実在へ更新するか代表例示へ文言明示する文書更新案）
+- ng_classification: pre-existing
+- notes: 表が網羅リストか代表列挙かが文言上明言なし。foundations/ 行のみ v4 群が全欠落で quality/ 行は完全一致する点から更新漏れと解するのが自然
+
+### Decision / guides / README（新規 10件）
+
+#### GR-01: docs/README.md の DEC-040 索引注記が現行の部分置換状態と不一致
+- category: README 索引の現行性
+- target: `docs/README.md`（Decision 索引 AUTOGEN ブロック内 DEC-040 行）
+- evidence: 同行は「superseded by DEC-044〔決定4 部分置換。決定1〜3は維持〕」と記載。DEC-040.md:6 の supersede_note は「決定4 は DEC-044 が置換。決定2 は DEC-046 が置換。決定1・3は維持」であり、docs/decisions/README.md:56 もこちらを反映。docs/README.md のみ決定2 置換（DEC-046）が欠落し、読者は決定2〔旧 provider: Vercel〕を現行と誤読し得る。
+- severity: medium
+- confidence: medium
+- source_of_truth: docs/decisions/DEC-040.md frontmatter（SSoT）
+- recommended_route: docs-check（AUTOGEN 注記の生成ソース〔後継側 relations reason と推定〕の調査・修正を含む）
+- ng_classification: pre-existing
+- notes: 注記出所（DEC-044.md:14 の reason 由来と推定）の特定までは未検証
+
+#### GR-02: 部分置換の記録様式が Decision 間で非一貫（DEC-028 vs DEC-040）
+- category: Decision 意味整合（規則ギャップ）
+- target: `docs/decisions/DEC-028.md:4-6,42` / `docs/decisions/DEC-040.md:4-6,25-26,37,39`
+- evidence: 同じ「部分置換」でも DEC-028 は status: accepted 継続 + frontmatter supersede_note のみ（本文42行の置換対象条項は本文内無注記）。DEC-040 は status: superseded + 本文冒頭注記 + インラインマーカー。DEC-040 の superseded_by は DEC-044 のみで、決定2 を置換する DEC-046 は supersede_note のみに記録。decision-lifecycle.md:45-46 は部分置換時の status 付与基準（accepted 継続 vs superseded 化）を規定しない。
+- severity: medium
+- confidence: medium
+- source_of_truth: decision-lifecycle.md:45-46、v4-lifecycle-state-machine.md（status 値域の一般化契約）
+- recommended_route: intake（契約の明確化を要する規則ギャップ。文書整備で足りるなら docs-check）
+- ng_classification: pre-existing
+- notes: DEC-047 が DEC-028 の accepted 継続を明示宣言しており意図的差異の可能性はあるが、判断基準の明文がない
+
+#### GR-03: accepted Decision が superseded 済み DEC-015 を「有効のまま保持」と現在形で記述
+- category: Decision 意味整合（superseded の現行扱い）
+- target: `docs/decisions/DEC-032.md:28`、`docs/decisions/DEC-039.md:50`
+- evidence: DEC-032:28「（DEC-015 本体は v3 として有効のまま保持する）」、DEC-039:50「v3 保持: DEC-015（…）および DEC-004（…）の本体は v3 として有効のまま保持する。置換の実行は後続 Sequence 段階が所有する。」— DEC-015 は 2026-09-18 以降 superseded 実行済み（DEC-015.md:4-5、superseded_by: DEC-036）。
+- severity: medium
+- confidence: high（git・frontmatter で事実確定）
+- source_of_truth: docs/decisions/DEC-015.md frontmatter status
+- recommended_route: docs-check
+- ng_classification: pre-existing（v4 Sequence の予定記述が陳腐化）
+- notes: DEC-038:43 の同型記述は対象が DEC-011（現行 accepted）のため問題なし
+
+#### GR-04: ガイドの v2 ADR 物理削除範囲が git 実績・Decision 索引と不一致
+- category: guides 歴史事実の文書間不一致
+- target: `docs/guides/diagnostics-and-maintenance.md:49`
+- evidence: 「（v2:ADR-0001〜0099 帯は 2026-07-20 に物理削除済み）」— git 実績では 2026-07-20（commit 527ed5f7）に削除されたのは docs/adr/retired/ADR-0001〜0023 の23ファイルのみ。ADR-0024〜0099 は全履歴に存在実績なし。tag v2.11.0 ツリーも ADR-0101〜0139 のみ。docs/decisions/README.md:307 は「v2:ADR-0001〜0023」と正しく記載。
+- severity: low
+- confidence: high（git 履歴・tag ツリーで検証済み）
+- source_of_truth: docs/decisions/README.md:307 + git 履歴
+- recommended_route: docs-check
+- ng_classification: pre-existing
+- notes: 「0100 未満の番号帯全体の不在」を述べた寛容的解釈の余地はあるが表記統一が必要
+
+#### GR-05: 案内層ガイドへの日付・Case 番号付き観測記録の混在
+- category: guides（Report 混入）
+- target: `docs/guides/supervisor-credential-bridge.md:115`
+- evidence: 「実測記録（2026-09-28、Case #3190 実行時）: 本ガイドと配布物（src/opencode/ 配下）の旧変数名の言及は 0 件であり…」— 監査・観測記録がガイド本文に埋め込まれている。
+- severity: low
+- confidence: medium
+- source_of_truth: docs/README.md「Report」節（監査・評価・観測記録は docs/reports/ へ分離）、guides/README.md:3-5（案内層）
+- recommended_route: docs-check（Report または knowledge への移動とガイド側は導線化）
+- ng_classification: pre-existing
+- notes: 再検証手順の一部として運用価値があり、全文移動ではなく要約+導線化が適切かもしれない
+
+#### GR-06: 「全体横断の状態遷移モデルを持たない」記述が v4 状態機械と矛盾
+- category: guides（正規 Design と矛盾する現在形記述）
+- target: `docs/guides/artifacts-and-state.md:141-143`
+- evidence: 「6 マイクロフェーズは説明用ラベルであり、状態管理モデルではない。AgentDevFlow は全体横断の状態遷移モデルを持たない。」— accepted Design v4-lifecycle-state-machine.md（二層状態モデル・階層合成・内部 lifecycle 対応）および DEC-033（内部 lifecycle）が正確に全体横断の状態モデルを定義する。
+- severity: medium
+- confidence: medium
+- source_of_truth: v4-lifecycle-state-machine.md、DEC-033
+- recommended_route: docs-check
+- ng_classification: pre-existing
+- notes: 「docs の進行管理に限定した意図的表現」（直後の「各コマンドの入出力契約とディレクトリ配置が実際の状態表現」）との解釈も可能。GUIDE-6 と同ファイルのため統合是正候補
+
+#### GR-07: guides/README.md が案内層ガイドを「正」と表記
+- category: guides（README 索引の案内層原則違反）
+- target: `docs/guides/README.md:52`
+- evidence: 成果物・状態モデル行の説明「（状態モデル制約、`.agentdev/` の位置づけの正）」。同一ファイル 3-5 行は「基準は各 REQ/Decision/Design ファイルであり、ガイドは基準への導線を提供する」と宣言。`.agentdev/` の位置づけの正は .agentdev/README.md（domain state）および REQ-001/REQ-002/DEC-001。
+- severity: low
+- confidence: medium
+- source_of_truth: guides/README.md:3-5、docs/designs/README.md 文書間関係節（Guides は規範的権限を持たない）
+- recommended_route: docs-check
+- ng_classification: pre-existing
+- notes: 「探すならまずここ」程度の意味の可能性があり軽微。GR-06/GUIDE-6 と合わせた一括是正が効率的
+
+#### GR-08: consumer 導入ガイドに DEC-047 の導入時依存生成の記載なし（追随漏れ候補）
+- category: guides（新契約への導線追随漏れ）
+- target: `docs/guides/consumer-project-setup.md`（全文 grep で vendor / bun install / build:engine の言及 0 件）
+- evidence: DEC-047.md:46「consumer 導入には導入時の依存再生成手順（ネットワーク取得を含む）が必要になる」。ルート README には 2026-09-29 追加の「開発者セットアップ（textlint 依存の生成）」節があるが、適用プロジェクト導入の案内文書には当該前提の導線がない。
+- severity: low
+- confidence: medium
+- source_of_truth: DEC-047 決定2・結果と影響、REQ-053-033
+- recommended_route: docs-check
+- ng_classification: 今回修正対象候補（DEC-047 フォローアップ。要ヒューマンレビュー）
+- notes: 手順の正は plugin README「導入時の依存生成手順」（実在確認済み）が所有し、実行時は fail-closed 案内で補償される設計のため、導線欠如が許容範囲かは要判断。優先度低
+
+#### GR-09: numbering-policy.md の採番実行主体列挙と Definition PR 内採番前例の関係
+- category: Design 領域（採番政策の現行性）
+- target: `docs/designs/foundations/numbering-policy.md:40-41`
+- evidence: 「Definition 保存 / Design 保存内部責務（case-ready / case-revise）は当該スクリプトを bash 経由で呼び出す」— 実行契約前例（DEC-046: Case #3183/PR #3184、DEC-047: Case #3236/PR #3237）では proposed Decision は Definition PR 編成時（case-open 工程側）に採番・作成されている。既存 intake item 2026-09-29-3236-decision-numbering-timing-wording.md が同主題を記録するが、その対象候補に numbering-policy.md は含まれない。
+- severity: medium
+- confidence: medium
+- source_of_truth: 上記 intake item、REQ-061-020/061-039
+- recommended_route: intake（既存 inbox item への対象追加候補）
+- ng_classification: pre-existing
+- notes: 「（case-ready / case-revise）」が例示か網羅かで重大度が変わる
+
+#### GR-10: DEC-031 の superseded DEC-002 への relates-to が既知「類推3件」と同パターン
+- category: Decision 意味整合（類推参照の追加候補）
+- target: `docs/decisions/DEC-031.md:13-14`
+- evidence: relations reason「プロセス・実装責務分離におけるソース・プロジェクション分離の位置づけ」— DEC-002 は superseded（by DEC-036、DEC-031 と同日 2026-09-18 成立）。既知の類推3件（DEC-016/019/027）と同じ形状。
+- severity: low
+- confidence: low
+- source_of_truth: DEC-002.md:4-5
+- recommended_route: defer（既知 defer 項目「類推参照」の拡張として扱うのが自然）
+- ng_classification: pre-existing
+- notes: 置換と同日成立のため当時は現行だった可能性が高く、意図的歴史参照とも解せる
+
+## 既知 defer 項目の状況更新（前回診断の defer 残置分）
+
+| 項目 | 状況 | 証拠 |
+|---|---|---|
+| REQ-038-006（2フェーズ読込の内部アルゴリズム混入） | 残存 | REQ-038.md:24 |
+| REQ-050-016（スコープ外関心＋実装パラメータ） | 部分解消 | 固定数値は排除済み（REQ-050.md:36）。skill description 予算方針という別関心の在置は残存 |
+| REQ-008-059（表外見出し節＋HOW 詳細） | 残存 | REQ-008.md:80-88 |
+| REQ-036-029〜033（STEP-2 並列化受入条件） | 残存 | REQ-036.md:47-51（032/033 は変更時測定設計） |
+| REQ-036-002（移行記述・スキーマ操作） | 残存 | REQ-036.md:21 |
+| REQ-036-022（スキーマ操作記述） | 残存 | REQ-036.md:40 |
+| REQ-048（移行履歴 / Legacy Baseline 所有） | 残存 | REQ-048.md:18-20、:40 |
+| REQ-087-004（実装詳細参照・安定契約例外候補） | 残存 | REQ-087.md:19 |
+| REQ-092-003（実装詳細参照・安定契約例外候補） | 残存 | REQ-092.md:26 |
+| REQ-012/REQ-021（TIM 検証結果格納規範の二重規定） | 残存 | REQ-012.md:32、REQ-021.md:28 |
+| v4-collaboration-loop Design の先送り記録 | 残存 | v4-collaboration-loop.md:70（明示ラベル付き。同 :89 の Issue B 参照は REQ-090 適用範囲宣言と整合し新規対象外） |
+| inspect-docs Design の ADF-COVERS 宣言 ID 重複 | 残存 | docs/designs/commands/inspect-docs.md:9-10（REQ-036-001/006/008/010 が2行に重複） |
+| DEC-010 が superseded DEC-002 を現在形で「維持する」 | 残存 | DEC-010.md:35-36 |
+| DEC-022 が superseded DEC-015 決定4 を部分修正前提とする | 残存 | DEC-022.md:47-48、:86 |
+| DEC-018 欠番が採番管理に明記されない | 残存 | numbering-policy.md:57-66 は REQ 欠番のみ。docs/decisions/README.md にも明記なし（numbering-policy.md:55 に反する） |
+| accepted Decision による superseded Decision への類推参照（3件） | 残存 | DEC-016.md:38、DEC-019.md:37、DEC-027.md:48（+類似候補 GR-10） |
+| GUIDE-6（状態モデル制約が frontmatter 状態管理と矛盾） | 残存（移動） | guides/README.md からは消滅。実体は artifacts-and-state.md:145-153 へ移動し :149/:151 が Design/Decision frontmatter status 管理と矛盾 |
+| command-selection 補足節の規範的記述 | 残存 | command-selection.md:46-56 |
+| IR-044 ルール本文の作業履歴残存 | 残存 | IR-044…detection.md:40、:64-65、:72、:79（:78 が追記様式として PR 番号記録を自己規定し、意図的記録と残存が混在） |
+
+## 6観点網羅確認（REQ 体系担当 fan-in 後）
+
+- SPLIT: 候補あり（RQ-02）。行数シグナル（REQ-001/008/004/009）は req-health-metrics 管理値と一致の既知管理状態
+- MERGE: 候補あり（RQ-07）
+- MOVE: 候補あり（RQ-01、RQ-04、RQ-06 + 既知 defer 残存群）
+- DUPLICATE: 候補あり（RQ-03、RQ-02 の一部 + 既知 defer REQ-012/021）
+- RETIRE: クリーン（全58 REQ が現行表に索引済み、retired 14 件と二重存在なし。消極証拠に基づく判断）
+- DRIFT: クリーン（優先領域の重点照合: REQ-090↔agentdev_jev 公開契約、REQ-095/092↔agentdev_gh 公開契約、REQ-036-029/030↔本診断委譲の構成、いずれも一致）
+
+## docs-check route 候補（STEP-3-2）
+
+- docs/README.md Decision 索引 AUTOGEN 注記の生成ロジック（後継側 relations reason に由来する注記が前任の最新 supersede_note を反映しない問題。GR-01）
+- document-model.md ドメインディレクトリ表の実在 Design 突合（または AUTOGEN 化・代表例示への文言明示。DS-02）
+- superseded Decision を「有効のまま保持」とする現在形記述の陳腐化検出（機械化は困難だが横断 grep「有効のまま保持」+ status 突合の候補。GR-03）
+- 文書間の歴史事実（削除範囲等）の表記統一（GR-04。低価値）
+
+## 未処理成果物の確認（存在報告のみ、処理は後段 workflow の責務）
+
+- `.agentdev/intake/inbox/`: 4件（2026-09-27〜09-29、#3233/#3236 系）
+- `.agentdev/learning/inbox.md`: 未処理エントリ 4件
+- `.agentdev/inspect/inbox/`: 既存検出事項 6件（前回診断分、本ファイルとあわせ inspect-promote の対象）
+- `.agentdev/backlog/req-units/`: RU-0136.md 1件
+- 各 promoted/: 0件（intake / learning / inspect とも空）
+
+## 推奨アクション
+
+- docs-check route 10件（RQ-01、RQ-02、RQ-03、GR-01、GR-03、GR-04、GR-05、GR-06、GR-07、GR-08）: 文書整備系の是正候補。inspect-promote での分類時に docs-check / intake へ振り分け
+- intake route 5件（RQ-07、DS-01、DS-02、GR-02、GR-09）: 統合判断・規則ギャップ・文書更新案。GR-09 は既存 intake item（2026-09-29-3236）への対象追加候補
+- defer route 4件（RQ-04、RQ-05、RQ-06、GR-10）: 安定契約例外候補・低確実性。パターン単位の統一判断待ち
+- req-define 入力案: 2件（RQ-07 の MERGE 統合判断、GR-02 の部分置換規則の明確化）
+- 既知 defer 19項目は原状継続（状況更新のみ。新規起票せず）
+
+## 対象外（Out of Scope）
+
+- 機械的検査クリーン項目（check_integrity / AUTOGEN / command 形式 / extensions / 配布境界 / Design frontmatter / knowledge 構造 / 決定的破損 / BOM・改行コード / command 参照実在）の再報告
+- 既知 defer 残置分の新規起票（状況更新のみ実施）
+- intake / learning / RU の処理（intake-promote、learning-promote、backlog-review の責務）
+- 配布物（command/skill）本文の詳細診断（inspect-skills の責務。STEP-3-1 の構文・エンコーディング・参照検査は実施済みでクリーン）
+- 診断担当が候補化しなかった観察メモ（REQ-090-006↔026 の緊張、checker-execution-contracts.md:143 の判断履歴引用、runtime-package-boundary.md:459 の日時記録、textlint-quality-runtime.md:105 の実績件数、明示的先送り宣言群、REQ-051-009 の配置、REQ-044-005 の費消可能性）— 本ファイルの審議記録として参照可能
+- 文章表層品質（textlint 共通基盤の責務）
+
+## 参照
+
+- 診断担当: REQ 体系 / Design / Decision・guides・README の3並列委譲（読取専用、file:line 根拠付き戻り値）
+- 機械的検査スクリプト: repo-agentdev-integrity（check_integrity --profile source、check_autogen_freshness、check_command_format、check_extensions、check_distribution_boundary、check_design_frontmatter、check_knowledge_docs、check_content_corruption）
+- source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides
