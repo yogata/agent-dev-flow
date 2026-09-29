@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は36件、提案中の Decision は1件である。
+現行の承認済み Decision は37件、提案中の Decision は0件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -60,7 +60,7 @@
 | DEC-044 | Semantic Evaluation 観測契約の一次事実中心再設計と基本判断経路への復帰 | accepted | 2026-09-26 |
 | DEC-045 | リモートブランチ削除の GitHub 自動削除への委譲と deleteBranchOnMerge 設定前提の必須化 | accepted | 2026-09-27 |
 | DEC-046 | Jev 実行基盤の Cloudflare AI Gateway への完全置換 | accepted | 2026-09-27 |
-| DEC-047 | textlint 依存実体の版固定情報解決への転換 | proposed | 2026-09-29 |
+| DEC-047 | textlint 依存実体の版固定情報解決への転換 | accepted | 2026-09-29 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -109,12 +109,12 @@
 - [DEC-044](DEC-044.md)（Semantic Evaluation 観測契約の一次事実中心再設計と基本判断経路への復帰）
 - [DEC-045](DEC-045.md)（リモートブランチ削除の GitHub 自動削除への委譲と deleteBranchOnMerge 設定前提の必須化）
 - [DEC-046](DEC-046.md)（Jev 実行基盤の Cloudflare AI Gateway への完全置換）
+- [DEC-047](DEC-047.md)（textlint 依存実体の版固定情報解決への転換）
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
-- [DEC-047](DEC-047.md)（textlint 依存実体の版固定情報解決への転換）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
