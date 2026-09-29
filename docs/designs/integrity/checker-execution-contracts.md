@@ -188,6 +188,8 @@ command/skill の記述品質を所有し、worktree 汎用手順は `agentdev-g
 
 - Bun ランタイム API（Bun.YAML 等）に依存する checker は bun 経由（`bun run`）で実行する。node の安定実行経路は Bun ランタイム API に依存しない checker に適用され、依存する checker には適用されない
 
+IR-072 の PR 期間判定は author date（git log %as）を基準とする。採用理由: 対象期間の実施として意味があるのは変更が書かれた日付（author date）であり、マージ時刻や rebase による commit 日付の付け替えの影響を受けないためである。既知限界: 複数日にまたがって作成された PR では author date が期間境界を跨ぎ得るため、境界日付の取り扱い（含む/含まない）は checker 出力の解釈時に注意を要する。
+
 ### worktree 環境での checker 実行 fallback（junction 未伝播時の SoT 直参照）
 
 worktree 環境で .opencode/skills/* junction を前提とする検査（docs/designs 側リンク検査、
