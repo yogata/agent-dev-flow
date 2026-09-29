@@ -122,6 +122,13 @@ $RepoLocalPluginNames = @('agentdev-distribution-boundary-guard')
 $LocalModeRedirectToolRel = 'tools\agentdev-gh'
 $LocalModeLocalSourceDirName = 'agentdev-gh'
 
+# textlint guard plugin の導入時生成依存（vendor 成果物）。版固定情報（package.json +
+# bun.lock）のみが配布され、vendor 実体は導入時に利用者が生成する（REQ-029-012）。
+# 欠落（部分生成状態を含む）検知時に fail-closed で停止し導入手順を案内する。
+# 導入系スクリプトは依存の生成もネットワーク取得も行わない（DEC-016）。
+$TextlintGuardBundleRel = 'plugins\agentdev-textlint-guard\vendor\textlint-engine.bundle.json'
+$TextlintGuardDictRel = 'plugins\agentdev-textlint-guard\vendor\kuromoji-dict'
+
 # --- Helper Functions ---
 
 function Invoke-InstallWizard {
@@ -342,6 +349,74 @@ function New-PluginLoaderShimContent {
     )
 }
 
+function Test-TextlintVendorReady {
+    <#
+    .SYNOPSIS
+        textlint guard plugin の導入時生成依存（vendor 成果物）が完全に存在するか検査する。
+        engine bundle と kuromoji 辞書の両方が必須であり、部分生成状態（bundle のみ存在し
+        辞書が欠損 等）は欠落として扱う。
+    #>
+    $bundlePath = Join-Path $SourceDir $TextlintGuardBundleRel
+    if (-not (Test-Path -LiteralPath $bundlePath)) { return $false }
+    $dictDir = Join-Path $SourceDir $TextlintGuardDictRel
+    if (-not (Test-Path -LiteralPath $dictDir)) { return $false }
+    $dictFiles = @(Get-ChildItem -LiteralPath $dictDir -File -Filter '*.dat.gz' -ErrorAction SilentlyContinue)
+    return ($dictFiles.Count -gt 0)
+}
+
+function Show-TextlintVendorGuidance {
+    <#
+    .SYNOPSIS
+        vendor 成果物の欠落検知時の導入手順案内を表示する（依存の生成とネットワーク取得は
+        本スクリプトが行わない。利用者が plugin package 配下で実行する）。
+    #>
+    $pluginPackageRel = ($TextlintGuardBundleRel -split '\\')[0..1] -join '/'
+    Write-Host "[ERROR] textlint guard plugin の依存成果物（vendor）が未生成または不完全です（$pluginPackageRel/vendor/）"
+    Write-Host "導入手順: plugin package 配下（$PluginDir/$pluginPackageRel/）で次の順に実行してください（bun install はネットワーク取得を含みます）:"
+    Write-Host '  1. bun install'
+    Write-Host '  2. bun run build:engine'
+    Write-Host 'その後、本スクリプトを再実行してください。導入系スクリプトは依存の生成とネットワーク取得を行いません。'
+}
+
+function Test-TextlintBundleVersionsMatchPin {
+    <#
+    .SYNOPSIS
+        生成済み engine bundle に埋め込まれた依存版と、plugin package の版固定情報
+        （bun.lock pin）の乖離（版乖離）を検査する。一致する場合は $true、乖離または
+        検査不能（bundle 未生成等）を返す。検査不能の理由を第二戻り値で返す。
+    #>
+    $bundlePath = Join-Path $SourceDir $TextlintGuardBundleRel
+    $pluginPackageDir = Split-Path (Split-Path $bundlePath -Parent) -Parent
+    $pkgJsonPath = Join-Path $pluginPackageDir 'package.json'
+    $lockPath = Join-Path $pluginPackageDir 'bun.lock'
+    if (-not (Test-Path -LiteralPath $pkgJsonPath) -or -not (Test-Path -LiteralPath $lockPath)) {
+        return $false, 'version pin metadata (package.json / bun.lock) missing'
+    }
+    try {
+        $bundleEnvelope = [System.IO.File]::ReadAllText($bundlePath) | ConvertFrom-Json
+        $pkg = [System.IO.File]::ReadAllText($pkgJsonPath) | ConvertFrom-Json
+        $lockText = [System.IO.File]::ReadAllText($lockPath)
+    } catch {
+        return $false, "failed to read plugin package metadata ($($_.Exception.Message))"
+    }
+    foreach ($prop in $pkg.dependencies.PSObject.Properties) {
+        $name = $prop.Name
+        $embedded = $bundleEnvelope.versions.$name
+        if ($null -eq $embedded) {
+            return $false, "bundle versions missing dependency: $name"
+        }
+        $pattern = '"?' + [regex]::Escape($name) + '@([0-9][^"\s,)]*)"?'
+        $m = [regex]::Match($lockText, $pattern)
+        if (-not $m.Success) {
+            return $false, "cannot find pinned version of $name in bun.lock"
+        }
+        if ($embedded -ne $m.Groups[1].Value) {
+            return $false, "version divergence: $name (bundle $embedded vs bun.lock pin $($m.Groups[1].Value))"
+        }
+    }
+    return $true, ''
+}
+
 # --- Checkout Guidance (AG-002/REQ-009-047) ---
 
 # 案内文言・既定 URL 定数は consumer-opencode-common.ps1 の共有定義を使用する（RU-0014、AG-020）。
@@ -381,6 +456,14 @@ if (-not $Mode) {
 # ZIP 展開チェックアウト（.git なし）も正規の配置形態として扱う（AG-003/REQ-009-048）。
 if (-not (Test-Path -LiteralPath $SourceDir)) {
     Invoke-PluginCheckoutGuidance
+}
+
+# textlint guard 依存成果物の前置確認（check モード以外は欠落・部分生成状態で
+# fail-closed 停止し導入手順を案内する。check は乖離報告として扱う）
+if ($Mode -ne 'check' -and -not (Test-TextlintVendorReady)) {
+    Write-Host '=== textlint guard 依存生成の前置確認 ==='
+    Show-TextlintVendorGuidance
+    exit 1
 }
 
 # LocalMode requires the local redirect target (Local 実装 Tool) to exist
@@ -466,6 +549,24 @@ if ($Mode -eq 'check') {
             $divergences++
         } else {
             Write-Host "[OK] Local redirect source exists: $PluginDir/src/opencode-local/$LocalModeLocalSourceDirName/"
+        }
+    }
+
+    # 2c. textlint guard plugin dependency（導入時生成依存）: vendor 完全性と版乖離。
+    # 欠落（部分生成状態を含む）は乖離として報告し、導入手順を案内する。
+    if (-not (Test-TextlintVendorReady)) {
+        Write-Host "[DIVERGENCE] textlint guard plugin dependency (vendor) missing or incomplete: $TextlintGuardBundleRel / $TextlintGuardDictRel"
+        Show-TextlintVendorGuidance
+        $divergences++
+    } else {
+        Write-Host "[OK] textlint guard plugin dependency (vendor) exists"
+        $pinState, $pinDetail = Test-TextlintBundleVersionsMatchPin
+        if (-not $pinState) {
+            Write-Host "[DIVERGENCE] textlint guard plugin dependency version divergence: $pinDetail"
+            Write-Host '再生成手順: plugin package 配下で bun install && bun run build:engine を実行してください。'
+            $divergences++
+        } else {
+            Write-Host '[OK] textlint guard plugin dependency versions match the bun.lock pins'
         }
     }
 

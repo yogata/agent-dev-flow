@@ -15,7 +15,7 @@ Plugin と最終検査は同一の共通基盤（`lib/`）を呼び出す。プ�
 | `lib/config.ts` | 設定読込みと検証（固定パス `.agentdev/config/plugins/agentdev-textlint-guard.yaml`、`version: 1` + `additional_targets` 文字列配列のみ。設定なしは標準対象だけの正常状態。hook ごとに mtime で変更検知し再起動なしに反映） |
 | `lib/targets.ts` | 対象解決（標準対象 `docs/**` 配下の `.md` + 追加対象の加算。ルート外参照は拒否） |
 | `lib/rules.ts` | 規則構成（プリセットのフラット化、規則ごとの severity、prh 標準辞書とプロジェクト辞書の追加合成） |
-| `lib/engine-bundle.ts` | 配布前解決済み依存（vendored engine bundle と同條 kuromoji 辞書）の読込み |
+| `lib/engine-bundle.ts` | 依存成果物（導入時に再生成した engine bundle と kuromoji 辞書）の読込み。vendor 欠落の検知時に依存生成手順の案内を含むエラーを返す |
 | `lib/inspect.ts` | 文章検査（両入口の共通判定点） |
 | `lib/results.ts` | 結果整形（対象パス、行・列、rule ID、該当箇所、replacement / guidance、拒否と助言の区別） |
 | `lib/reconstruct.ts` | 完成予定全文の再構成（write / edit / apply_patch の現行 OpenCode 入力形式に固定） |
@@ -47,9 +47,23 @@ additional_targets:
 
 プロジェクト固有用語は prh 形式の辞書として隣接慣行パス `.agentdev/config/plugins/agentdev-textlint-guard-prh.yml` から接続する。辞書は標準規則構成へ追加合成され、標準規則や標準対象を無効化しない。辞書の妥当性は prh 規則自身が検証し、読込み不能・型不正は検査不能として全書込み操作を拒否する（fail-closed）。
 
-## 依存と配布（オフライン導入）
+## 依存と配布（版固定情報配布・導入時解決）
 
-依存は配布前に解決した成果物として供給する。`vendor/textlint-engine.bundle.json` は `bun run build:engine`（`build/build-engine.ts`）が生成する、kernel・Markdown plugin・採用規則を単一 ESM に束ねた base64 エンベロープである。導入系スクリプト（install / self-sync / archive / release）はネットワーク取得を行わず、本 bundle が clone、ソース ZIP、archive、release archive、self-sync の全経路で追加操作なしに動作する（node_modules は不要）。
+依存は版固定情報（`package.json` と `bun.lock`）のみを配布し、導入時に利用者が依存成果物を生成する（`vendor/textlint-engine.bundle.json` と `vendor/kuromoji-dict/` は git 管理対象外・配布物非同梱）。依存の生成手順は plugin package 配下（導入形態ごとの実行場所は「導入時の依存生成手順」を参照）で次の順に実行する。
+
+```bash
+bun install && bun run build:engine
+```
+
+`bun run build:engine`（`build/build-engine.ts`）が kernel・Markdown plugin・採用規則を単一 ESM に束ねた base64 エンベロープ（`vendor/textlint-engine.bundle.json`）と kuromoji 辞書（`vendor/kuromoji-dict/`）を生成する。導入系スクリプト（install / self-sync / archive / release）はネットワーク取得を行わず、vendor 成果物（engine bundle と kuromoji 辞書の両方。部分生成状態を含む）の欠落を検知した場合に fail-closed で停止し上記手順を案内する。依存生成の完了後は空キャッシュ・ネットワーク遮断下でも追加操作なしに動作する（node_modules は不要）。third-party 成果物とライセンス種別はリポジトリルートの `THIRD-PARTY-NOTICES.md` が宣言する。
+
+## 導入時の依存生成手順
+
+| 導入形態 | 実行場所 |
+|---|---|
+| checkout 版 consumer 導入（`install.ps1`、`self-sync.ps1`） | `.agentdev-plugin/src/opencode/plugins/agentdev-textlint-guard/`（checkout 配下の plugin package） |
+| release archive 導入（archive 版 `install.ps1`） | 導入先に配置された `.opencode/plugins/agentdev-textlint-guard/` |
+| 本体リポジトリ（self-hosting） | `src/opencode/plugins/agentdev-textlint-guard/` |
 
 ## 最終検査の実行
 
@@ -62,7 +76,10 @@ bun run src/opencode/plugins/agentdev-textlint-guard/gate.ts --root .           
 
 ## テスト実行
 
+vendor 成果物（`vendor/textlint-engine.bundle.json`、`vendor/kuromoji-dict/`）が未生成の場合は、テスト実行の前置として plugin package 配下で `bun install && bun run build:engine` を実行する（`bun.lock` と `tests/engine-bundle.test.ts` の固定版リテラルで生成物の版を検証する）。
+
 ```bash
+bun install && bun run build:engine   # 前置（vendor 成果物の生成）
 bun test        # cwd: src/opencode/plugins/agentdev-textlint-guard
 ```
 

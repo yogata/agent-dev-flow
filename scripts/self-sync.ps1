@@ -271,6 +271,49 @@ function New-PluginLoaderShimContent {
     )
 }
 
+function Get-PluginPackagesWithUnresolvedVendor {
+    <#
+    .SYNOPSIS
+        依存を導入時生成する plugin package（package.json に dependencies を持つ）のうち、
+        依存実体（vendor 成果物。engine bundle と kuromoji 辞書）が未生成または不完全な
+        もの（部分生成状態を含む）を列挙して返す。版固定情報（package.json + bun.lock）
+        のみが配布され、vendor 実体は導入時に利用者が生成する。依存の生成とネットワーク
+        取得は本スクリプトが行わない（DEC-016）。plugin package は汎用列挙し、特定の
+        package 名を本スクリプトへ直書きしない。
+    #>
+    $incomplete = [System.Collections.Generic.List[string]]::new()
+    $pluginsSource = Join-Path $SourceDir 'plugins'
+    if (-not (Test-Path -LiteralPath $pluginsSource)) { return $incomplete }
+    Get-ChildItem -LiteralPath $pluginsSource -Directory -Filter 'agentdev-*' | ForEach-Object {
+        $pkgJsonPath = Join-Path $_.FullName 'package.json'
+        if (-not (Test-Path -LiteralPath $pkgJsonPath)) { return }
+        $pkgJson = [System.IO.File]::ReadAllText($pkgJsonPath) | ConvertFrom-Json
+        if (-not $pkgJson.dependencies) { return }
+        $vendorDir = Join-Path $_.FullName 'vendor'
+        $bundlePath = Join-Path $vendorDir 'textlint-engine.bundle.json'
+        $dictDir = Join-Path $vendorDir 'kuromoji-dict'
+        $vendorReady = (Test-Path -LiteralPath $bundlePath) -and
+            (Test-Path -LiteralPath $dictDir) -and
+            (@(Get-ChildItem -LiteralPath $dictDir -File -Filter '*.dat.gz' -ErrorAction SilentlyContinue).Count -gt 0)
+        if (-not $vendorReady) { $incomplete.Add($_.Name) }
+    }
+    return $incomplete
+}
+
+function Show-PluginVendorGuidance {
+    <#
+    .SYNOPSIS
+        依存実体（vendor 成果物）の欠落検知時の導入手順案内を表示する（依存の生成と
+        ネットワーク取得は本スクリプトが行わない。利用者が plugin package 配下で実行する）。
+    #>
+    param([string[]]$IncompletePackages)
+    Write-Host "[ERROR] 依存実体（vendor）が未生成または不完全な plugin package があります: $($IncompletePackages -join ', ')"
+    Write-Host '導入手順: 各 plugin package 配下で次の順に実行してください（bun install はネットワーク取得を含みます）:'
+    Write-Host '  1. bun install'
+    Write-Host '  2. bun run build:engine'
+    Write-Host 'その後、本スクリプトを再実行してください。導入系スクリプトは依存の生成とネットワーク取得を行いません。'
+}
+
 # --- Main ---
 
 # 本体リポジトリ外（src/opencode が存在しない）での実行を検出して停止（REQ-009-041）
@@ -282,6 +325,15 @@ if (-not $Mode) {
 }
 
 $targets = Get-SelectiveJunctionTargets
+
+# 依存を導入時生成する plugin package の vendor 完全性の前置確認（check モード以外は
+# 欠落・部分生成状態で fail-closed 停止し導入手順を案内する。check は乖離報告として扱う）
+$incompleteVendorPackages = @(Get-PluginPackagesWithUnresolvedVendor)
+if ($Mode -ne 'check' -and $incompleteVendorPackages.Count -gt 0) {
+    Write-Host '=== plugin 依存生成の前置確認 ==='
+    Show-PluginVendorGuidance -IncompletePackages $incompleteVendorPackages
+    exit 1
+}
 
 # ============================================================
 # CHECK MODE
@@ -314,6 +366,17 @@ if ($Mode -eq 'check') {
         } else {
             Write-Host "[OK] .opencode/$parentRel is a real directory"
         }
+    }
+
+    # 2b. plugin 依存実体（導入時生成依存）: vendor 完全性。
+    # 欠落（部分生成状態を含む）は乖離として報告し、導入手順を案内する。
+    $checkIncompleteVendor = @(Get-PluginPackagesWithUnresolvedVendor)
+    if ($checkIncompleteVendor.Count -gt 0) {
+        Write-Host "[DIVERGENCE] plugin package dependency (vendor) missing or incomplete: $($checkIncompleteVendor -join ', ')"
+        Show-PluginVendorGuidance -IncompletePackages $checkIncompleteVendor
+        $divergences++
+    } else {
+        Write-Host '[OK] plugin package dependencies (vendor) exist'
     }
 
     # 3. Check each expected junction

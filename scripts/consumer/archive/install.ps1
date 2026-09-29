@@ -16,6 +16,9 @@ param(
 #   0  success (every file placed, content matches)
 #   4  destination already has a file with different content (do not overwrite)
 #   5  required directory creation failed / source missing
+#   6  textlint guard plugin dependency (vendor) missing or incomplete at the
+#      target (run the resolution steps: bun install && bun run build:engine
+#      under the installed plugin package, then re-run this installer)
 
 $ErrorActionPreference = "Stop"
 $Source = [System.IO.Path]::GetFullPath($Source)
@@ -122,6 +125,27 @@ foreach ($kind in @("tools", "plugins")) {
             $dst = Join-Path $kindDst $rel
             Place-File -SrcFile $f.FullName -DstFile $dst
         }
+    }
+}
+
+# textlint guard plugin の導入時生成依存（vendor 成果物）の完全性検査。版固定情報
+# （package.json + bun.lock）のみが配布され、vendor 実体は導入時に利用者が生成する。
+# 配置先で vendor が不完全な場合（部分生成状態を含む）、fail-closed で停止し導入手順を
+# 案内する。本 installer は依存の生成もネットワーク取得も行わない。
+$textlintGuardDir = Join-Path $Target "plugins\agentdev-textlint-guard"
+if (Test-Path -LiteralPath $textlintGuardDir) {
+    $vendorBundle = Join-Path $textlintGuardDir "vendor\textlint-engine.bundle.json"
+    $vendorDict = Join-Path $textlintGuardDir "vendor\kuromoji-dict"
+    $vendorReady = (Test-Path -LiteralPath $vendorBundle) -and
+        (Test-Path -LiteralPath $vendorDict) -and
+        (@(Get-ChildItem -LiteralPath $vendorDict -File -Filter '*.dat.gz' -ErrorAction SilentlyContinue).Count -gt 0)
+    if (-not $vendorReady) {
+        Write-Host "install-from-archive: textlint guard plugin dependency (vendor) missing or incomplete (exit 6): $vendorBundle / $vendorDict" -ForegroundColor Red
+        Write-Host "導入手順: plugin package 配下（$textlintGuardDir）で次の順に実行してください（bun install はネットワーク取得を含みます）:"
+        Write-Host '  1. bun install'
+        Write-Host '  2. bun run build:engine'
+        Write-Host 'その後、本 installer を再実行してください。installer は依存の生成とネットワーク取得を行いません。'
+        exit 6
     }
 }
 
