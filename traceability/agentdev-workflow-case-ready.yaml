@@ -67,10 +67,19 @@ implementation:
     - REQ-090-012
     - REQ-090-018
     - REQ-090-019
+    - REQ-090-024
+    - REQ-090-025
+    - REQ-090-026
+    - REQ-090-027
+    - REQ-090-029
   src/opencode/skills/agentdev-workflow-case-ready/references/readiness-and-cleanup.md:
     - REQ-061-035
     - REQ-061-040
 verification:
+  src/opencode/skills/agentdev-workflow-case-ready/references/execution-structure.md:
+    - REQ-090-024
+    - REQ-090-027
+    - REQ-090-029
   src/opencode/skills/agentdev-workflow-case-ready/references/readiness-and-cleanup.md:
     - REQ-061-034
     - REQ-061-035
