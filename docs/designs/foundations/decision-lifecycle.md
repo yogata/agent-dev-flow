@@ -46,6 +46,17 @@ Decision 間の意味的関係を追跡可能とする（REQ-001-062、AG-005）
 `supersedes` 関係を宣言された前任 Decision は、`superseded_by` frontmatter で後継 Decision を指す。
 `reaffirms` は原本 Decision の status を変更せず、意味的承認の再確認のみを記録する。
 
+#### 部分置換の記録様式
+
+部分置換（後継 Decision が前任の一部決定のみを置換する場合）の記録様式を次の4点で定める。
+
+1. **status 付与基準**: 部分置換では前任の `status: superseded` への遷移を行わず status を維持する。status 遷移は全決定の置換に限る。
+2. **superseded_by は主後継のみ**: `superseded_by` frontmatter は主後継（置換の中核となる Decision）のみを指す。部分後継は `supersede_note` に記録する。
+3. **supersede_note の必須内容**: `supersede_note` には置換対象（どの決定を誰が置換するか）と維持対象（どの決定が維持されるか）を明記する。
+4. **本文冒頭注記**: `status: superseded` に遷移した Decision は本文冒頭に置換注記（blockquote 形式）を付すことを標準とする。ただし frontmatter（`superseded_by`・`supersede_note`）で置換構造が機械判別できる場合、本文冒頭注記の欠落は違反としない。部分置換で status を維持する場合は本文冒頭注記を必須としない。
+
+記載例: DEC-028（部分置換・accepted 維持・`supersede_note` による部分後継記録）、DEC-040（決定4 のみ置換後、全体として superseded・本文冒頭注記）。既存の DEC-028・DEC-040 の記録は本規則と整合するため、遡及書換えの対象としない。
+
 ### frontmatter relations フィールド仕様
 
 Decision frontmatter の `relations` フィールドで関係を宣言する。
