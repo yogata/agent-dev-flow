@@ -10,6 +10,8 @@ updated: 2026-09-29
 <!-- ADF-COVERS(implementation): REQ-011-006 -->
 <!-- ADF-COVERS(implementation): REQ-050-001, REQ-050-002, REQ-050-003, REQ-050-004, REQ-050-005, REQ-050-006, REQ-050-007, REQ-050-008, REQ-050-010, REQ-050-013 -->
 <!-- ADF-COVERS(implementation): REQ-052-007（scripts/consumer/archive/install.ps1、scripts/install.ps1 の宣言を docs 正規配置先へ移管） -->
+<!-- ADF-COVERS(implementation): REQ-029-012, REQ-029-013（textlint guard 依存実体の版固定情報解決と 3rd-party 依存の通知） -->
+<!-- ADF-COVERS(design): REQ-029-012, REQ-029-013（本体リポジトリ sync 節と 3rd-party 依存の通知小節が design 実体） -->
 <!-- 注: install/self-sync 各 ps1（scripts/）は走査対象拡張子外のため、導入器実装行の宣言は本 Design（正規仕様所有者）へ配置。実装実体は scripts/install.ps1、scripts/self-sync.ps1（内部処理は scripts/consumer/、scripts/self/ 配下） -->
 <!-- ADF-COVERS(design): REQ-002-047 -->
 <!-- ADF-COVERS(design): REQ-050-009 -->
@@ -94,11 +96,19 @@ scripts/ は skill junction の配下に位置し、skill の一部として配�
 
 **vendored bundle 再生成時の焼き付き絶対パス自己検査**:
 
-vendored engine bundle（`src/opencode/plugins/agentdev-textlint-guard/vendor/textlint-engine.bundle.json`）の再生成手順では、build スクリプトに含まれる焼き付き絶対パスの検出・無害化自己検査を実行する。
+vendored engine bundle（`vendor/textlint-engine.bundle.json`、`vendor/kuromoji-dict/`）は git 管理対象外（plugin package の `.gitignore` で除外）とし、ローカル環境および導入先で `bun install && bun run build:engine` により再生成する（REQ-029-012）。
+再生成手順では、build スクリプトに含まれる焼き付き絶対パスの検出・無害化自己検査を実行する（検出対象、挙動、fail 条件は現行契約を維持）。
+導入系スクリプト（install / self-sync / archive installer / release archive 生成）は vendor 成果物の欠落（engine bundle と kuromoji 辞書ファイル群の両方。部分生成状態〔bundle のみ存在し辞書が欠損〕を含む）を検知した場合に fail-closed で停止し、導入手順（`bun install && bun run build:engine`）を案内する。スクリプト自身は生成もネットワーク取得も行わない（DEC-016 維持）。
 
 - 検出対象: kuromojin 既定 dicPath 用 `require.resolve` 由来の絶対パス等、ビルド環境由来の絶対パス（worktree パスを含む）
 - 挙動: 機械的に無害化可能な場合は無害化してから出力し、無害化できない場合は build を fail させる（焼き付きパスの混入を検知できることが目的。ランタイムは `KUROMOJIN_DIC_PATH` 固定経路で使用されるため実害はないが、検出手段がないとビルド時 worktree 削除後の `bun test` が環境依存 fail し、原因特定コストが残る）
 - 自己検査の運用知識は [Bun offline bundle の配置場所独立性（資産同梱・相対解決・生成条件）](../../knowledge/bun-offline-bundle-placement-independent-build.md) と相互参照する
+
+**3rd-party 依存の通知**:
+
+配布成果物が依存する third-party 製成果物とライセンス種別を宣言する THIRD-PARTY-NOTICES.md を repo root に保持する（REQ-029-013）。
+様式は表形式（成果物名・版・ライセンス種別・配布形態〔版固定情報のみ/導入時解決〕・出所）とし、対象は textlint guard の直接依存5パッケージ + kuromoji + mecab-ipadic 辞書の計7成果物とする。推移的依存を含めない範囲設定の根拠（実体非再配布により直接依存と特別ライセンス成果物の宣言で足りる）を文書冒頭に記す。
+版欄は時点記録とし、依存更新（bun.lock 変更）時に追従更新する。release archive は本通知文書を同梱する。
 
 ### Consumer（AgentDevFlow 導入済み）
 

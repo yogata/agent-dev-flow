@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は36件、提案中の Decision は0件である。
+現行の承認済み Decision は36件、提案中の Decision は1件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -60,6 +60,7 @@
 | DEC-044 | Semantic Evaluation 観測契約の一次事実中心再設計と基本判断経路への復帰 | accepted | 2026-09-26 |
 | DEC-045 | リモートブランチ削除の GitHub 自動削除への委譲と deleteBranchOnMerge 設定前提の必須化 | accepted | 2026-09-27 |
 | DEC-046 | Jev 実行基盤の Cloudflare AI Gateway への完全置換 | accepted | 2026-09-27 |
+| DEC-047 | textlint 依存実体の版固定情報解決への転換 | proposed | 2026-09-29 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -113,6 +114,7 @@
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
+- [DEC-047](DEC-047.md)（textlint 依存実体の版固定情報解決への転換）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -260,6 +262,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-044 | [REQ-090](../requirements/REQ-090.md), [REQ-091](../requirements/REQ-091.md) | - |
 | DEC-045 | [REQ-032](../requirements/REQ-032.md), [REQ-009](../requirements/REQ-009.md), [REQ-030](../requirements/REQ-030.md) | - |
 | DEC-046 | [REQ-090](../requirements/REQ-090.md), [REQ-091](../requirements/REQ-091.md) | - |
+| DEC-047 | [REQ-029](../requirements/REQ-029.md), [REQ-053](../requirements/REQ-053.md) | - |
 <!-- AUTOGEN:END -->
 
 ## 過去版の履歴基盤

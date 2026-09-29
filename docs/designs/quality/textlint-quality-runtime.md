@@ -2,9 +2,10 @@
 title: textlint 品質基盤
 status: accepted
 created: 2026-09-09
-updated: 2026-09-11
+updated: 2026-09-29
 ---
-<!-- ADF-COVERS(implementation): REQ-053-024, REQ-053-025, REQ-053-026, REQ-053-027, REQ-053-028, REQ-053-029, REQ-053-030, REQ-053-031, REQ-053-032, REQ-053-033, REQ-053-034, REQ-053-035, REQ-053-036, REQ-053-037, REQ-053-038, REQ-010-075 -->
+<!-- ADF-COVERS(implementation): REQ-053-024, REQ-053-025, REQ-053-026, REQ-053-027, REQ-053-028, REQ-053-029, REQ-053-030, REQ-053-031, REQ-053-032, REQ-053-033, REQ-053-034, REQ-053-035, REQ-053-036, REQ-053-037, REQ-053-038, REQ-010-075, REQ-029-012 -->
+<!-- ADF-COVERS(design): REQ-053-033, REQ-029-012（依存と配布節が版固定情報配布・導入時生成の design 実体） -->
 
 # textlint 品質基盤
 
@@ -89,12 +90,11 @@ pre-write と最終検査は同一全文、同一パス、同一設定および�
 
 consumer 配布 package は src/opencode/plugins/agentdev-textlint-guard/ に置く。
 既存の動的投影と depth-1 loader shim の契約を利用し、repo-local 除外リストへ追加しない。
-lockfile で本体と規則の版を固定する。
-依存は配布前に解決した成果物として供給し、install と self-sync にネットワーク取得を追加しない。
-node_modules を除外する既存アーカイブだけでは依存充足と見なさない。
-clone またはソース ZIP 由来の導入、release archive の導入、本体同期の各経路に利用可能な依存成果物を含める。
-具体的な bundle 方式と内部配置は実現側が上記保証の範囲で選択する。
-配布形態を問わず、空のキャッシュとネットワーク遮断下で Plugin と最終検査が追加操作なしに起動することを検証する。
+依存の版は lockfile（bun.lock）で固定し、配布物は版固定情報（package.json と bun.lock）のみを含む（REQ-029-012）。
+依存実体（vendored engine bundle と同梱辞書）は git 管理対象外とし、導入時に利用者が bun install と build:engine で再生成する。
+導入系スクリプトは vendor 成果物（engine bundle と kuromoji 辞書の両方）の欠落を検知した場合に fail-closed で停止し導入手順を案内する（生成もネットワーク取得も行わない）。
+配布物が依存する third-party 成果物とライセンス種別は THIRD-PARTY-NOTICES.md（repo root）が宣言する。
+依存成果物の導入時生成が完了した後、空のキャッシュとネットワーク遮断下で Plugin と最終検査が追加操作なしに起動することを検証する（offline 保証は導入時解決完了後の実行時に適用される）。
 
 ## 規則校正と移行検証
 
