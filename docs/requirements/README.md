@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下58件を第一参照先とする。
+現在の要件判断では、以下57件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -44,7 +44,6 @@
 | [REQ-041](REQ-041.md) | backlog 一括整理コマンド（backlog-auto）実行契約 |
 | [REQ-044](REQ-044.md) | 標準API委譲の状態制約 |
 | [REQ-045](REQ-045.md) | 現行成果物体系の整合性網羅監査 |
-| [REQ-046](REQ-046.md) | 横断正規化後の不変条件 |
 | [REQ-047](REQ-047.md) | 規則所有権の一方向化 |
 | [REQ-048](REQ-048.md) | ADF 実行観測と統制縮小評価 |
 | [REQ-049](REQ-049.md) | 追跡Issue管理機構 |
@@ -90,6 +89,7 @@
 | [REQ-040](retired/REQ-040.md) | トレーサビリティ高位問い合わせ（Trace Query） |
 | [REQ-042](retired/REQ-042.md) | Case統合先とブランチモデル |
 | [REQ-043](retired/REQ-043.md) | 評価ブランチ実証ワークフロー |
+| [REQ-046](retired/REQ-046.md) | 横断正規化後の不変条件 |
 | [REQ-057](retired/REQ-057.md) | docs corpus 整合・現行化バッチ |
 <!-- AUTOGEN:END -->
 
