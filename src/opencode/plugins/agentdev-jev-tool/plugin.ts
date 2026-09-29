@@ -181,7 +181,14 @@ export const REQUEST_PROPERTY_SCHEMA = {
     "One semantic evaluation = one observation: evaluate persists the observation (one JSON) under " +
     ".agentdev/jev-observations/ right after the evaluator succeeds (and a failure observation when the call " +
     "fails after starting; no observation for not_configured or input validation failures), and observation_write " +
-    "appends the reasoning model's final judgment to an evaluator-success observation.",
+    "appends the reasoning model's final judgment to an evaluator-success observation. " +
+    "Conditional evaluation trigger control: the caller generates a follow-up semantic evaluation only when the " +
+    "parent judgment's final confirmed result satisfies the trigger condition (a Jev prior result of the parent " +
+    "judgment alone never triggers it); when the condition is not met the caller composes neither the follow-up " +
+    "questions nor any observation. Observation identifier stability: continuing the same semantic judgment keeps " +
+    "workflow, evaluationKind, and questionId; changed meaning or merged judgments require new questionIds; " +
+    "version differences are distinguished by sourceRevision and requestDigest; existing observations are never " +
+    "migrated, rewritten, or re-keyed.",
   properties: {
     operation: {
       type: "string",
@@ -240,7 +247,15 @@ export function createAgentdevJevToolDefinition(deps: {
       "starting; not_configured and input validation failures generate no observation. observation_write appends " +
       "the reasoning model's final judgment to an evaluator-success observation. Observation persistence failures " +
       "stay an independent warning on the evaluation result (fail-open) and observation writes are independent of " +
-      "workflow success.",
+      "workflow success. Conditional evaluation trigger control: the caller generates a follow-up semantic " +
+      "evaluation only when the parent judgment's final confirmed result satisfies the trigger condition (a Jev " +
+      "prior result of the parent judgment alone never triggers it); when the condition is not met the caller " +
+      "composes neither the follow-up questions nor any observation, so this tool generates an observation only " +
+      "when it is actually invoked. Observation identifier stability: continuing the same semantic judgment keeps " +
+      "the workflow, evaluationKind, and questionId identifiers; when the judgment subject, result space, or " +
+      "criteria changes meaning (or judgments are merged) new questionIds are required; input and contract " +
+      "version differences are distinguished by sourceRevision and requestDigest; existing observations are never " +
+      "migrated, rewritten, or re-keyed.",
     args: {
       request: REQUEST_PROPERTY_SCHEMA,
     },

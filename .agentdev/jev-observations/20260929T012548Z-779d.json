@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260929T012548Z-779d",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0156（textlint vendored 配布廃止・方式B1）の既存REQ照合: THIRD-PARTY-NOTICES 新設と 3rd-party 依存実体配布非同梱契約の帰属判断",
+  "sourceRevision": "RU-0156 (2026-09-29, agentdev_handoff: true)",
+  "durationMs": 5714,
+  "inputTokens": 2647,
+  "inputs": {
+    "requestDigest": "c72a9d6a262594d9c57dc7cfeab02769f42f55b463a8c35eaa21a9292493b820",
+    "references": [
+      {
+        "digest": "8c74797c879cc3725854ac2220a7d8305d28cd441cb8d1cb21f75f62f81595af",
+        "label": "RU-0156",
+        "path": ".agentdev/backlog/req-units/RU-0156.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-notices-attribution",
+      "questionForm": "choice",
+      "value": "REQ-002 へ APPEND（third-party 成果物の配布非同梱・版固定情報のみ配布・通知文書保持を新規行として追加。third-party Skill 第三区分〔REQ-002-042〜044〕に隣接）",
+      "probabilityDistribution": {
+        "REQ-002 へ APPEND（third-party 成果物の配布非同梱・版固定情報のみ配布・通知文書保持を新規行として追加。third-party Skill 第三区分〔REQ-002-042〜044〕に隣接）": 0.92,
+        "REQ-053 へ APPEND（文章品質契約 REQ にライセンス通知文書の新規行として追加）": 0.06,
+        "REQ-053-033 UPDATE 文言に集約（新規行を立てず、検査の導入先可用性の改定文言に依存実体非同梱と通知を内包）": 0,
+        "REQ 操作なし（REQ 行を追加・改定せず Design・実装側のみで扱う）": 0.02
+      }
+    },
+    {
+      "questionId": "q2-matching-confidence",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.45,
+        "false": 0.55
+      }
+    }
+  ],
+  "confidence": 0.89,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-notices-attribution",
+        "value": "REQ-002 へ APPEND（third-party 成果物の配布非同梱・版固定情報のみ配布・通知文書保持を新規行として追加。third-party Skill 第三区分〔REQ-002-042〜044〕に隣接）"
+      },
+      {
+        "questionId": "q2-matching-confidence",
+        "value": false
+      }
+    ]
+  }
+}

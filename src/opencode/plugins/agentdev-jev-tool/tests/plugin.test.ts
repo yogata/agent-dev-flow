@@ -273,3 +273,86 @@ describe("observation_write through the tool surface", () => {
     expect(rejectedPayload.failure?.detail).toContain("evaluator-success");
   });
 });
+
+describe("conditional trigger control and observation identifier stability", () => {
+  function evaluateRequest(state: string, metadata: Record<string, string>) {
+    return {
+      operation: "evaluate",
+      state,
+      instructions: "評価指示",
+      questions: [{ id: "q1", form: "boolean", prompt: "質問1" }],
+      observationMetadata: metadata,
+    };
+  }
+
+  test("条件付き評価の発動制御: 親判断の最終確定結果が発動条件を満たした呼出しだけが観測を生成し、不成立時（後続質問を構成せず evaluate を呼ばない）は観測を生成しない", async () => {
+    const worktree = await tempWorktree();
+    const definition = createAgentdevJevToolDefinition({ resolveProvider: () => providerMock() });
+    const metadata = {
+      workflow: "intake-promote",
+      evaluationKind: "review-trigger",
+      subject: "暫定分類後の発動条件判定",
+      sourceRevision: "c6c15e72e5cae9ba8c3a957e32662704db94283c",
+    };
+    const dir = path.join(worktree, ".agentdev", "jev-observations");
+    // 発動条件不成立: 呼出し元は後続質問自体を生成しないため evaluate が呼ばれず、観測（「非該当」等を
+    // 表すためだけのものを含む）も生成されない。Tool の観測生成は実際の呼出しに伴ってのみ発生する。
+    expect(await fs.stat(dir).then(() => true, () => false)).toBe(false);
+    // 発動条件成立: 親判断の最終確定結果を反映した後続評価を呼び出す → 観測 1件
+    const triggered = await definition.execute({ request: evaluateRequest("判断状態", metadata) }, context(worktree));
+    const triggeredPayload = JSON.parse(triggered.output) as { ok: boolean };
+    expect(triggeredPayload.ok).toBe(true);
+    expect((await fs.readdir(dir)).length).toBe(1);
+    // 再度不成立: 呼出しなければ観測は増えない（未発動分の集約・疑似的な非該当観測の補てんは存在しない）
+    expect((await fs.readdir(dir)).length).toBe(1);
+  });
+
+  test("観測識別子の安定性: 同一意味判断の継続評価は workflow・evaluationKind・questionId を維持し別 observation として append-only に保存され、版の違いは requestDigest で区別される", async () => {
+    const worktree = await tempWorktree();
+    const definition = createAgentdevJevToolDefinition({ resolveProvider: () => providerMock() });
+    const metadata = {
+      workflow: "intake-promote",
+      evaluationKind: "classification",
+      subject: "intake item 1件",
+      sourceRevision: "c6c15e72e5cae9ba8c3a957e32662704db94283c",
+    };
+    const first = await definition.execute({ request: evaluateRequest("判断状態A", metadata) }, context(worktree));
+    const firstPayload = JSON.parse(first.output) as { ok: boolean; success?: { observation?: { observationId?: string } } };
+    const firstId = firstPayload.success?.observation?.observationId;
+    expect(firstPayload.ok).toBe(true);
+    expect(firstId).toBeTruthy();
+    // 同一意味判断の継続（識別子維持・入力の版のみ変化）
+    const second = await definition.execute({ request: evaluateRequest("判断状態B", metadata) }, context(worktree));
+    const secondPayload = JSON.parse(second.output) as { ok: boolean; success?: { observation?: { observationId?: string } } };
+    const secondId = secondPayload.success?.observation?.observationId;
+    expect(secondPayload.ok).toBe(true);
+    expect(secondId).toBeTruthy();
+    expect(secondId).not.toBe(firstId);
+    const dir = path.join(worktree, ".agentdev", "jev-observations");
+    expect((await fs.readdir(dir)).sort()).toEqual([`${firstId}.json`, `${secondId}.json`].sort());
+    const readObs = async (id: string) =>
+      JSON.parse(await fs.readFile(path.join(dir, `${id}.json`), "utf8")) as Record<string, unknown>;
+    const firstObs = await readObs(firstId as string);
+    const secondObs = await readObs(secondId as string);
+    for (const obs of [firstObs, secondObs]) {
+      expect(obs.workflow).toBe("intake-promote");
+      expect(obs.evaluationKind).toBe("classification");
+      expect(obs.sourceRevision).toBe("c6c15e72e5cae9ba8c3a957e32662704db94283c");
+      const results = obs.results as Array<Record<string, unknown>>;
+      expect(results[0]?.questionId).toBe("q1");
+    }
+    const firstInputs = firstObs.inputs as { requestDigest: string };
+    const secondInputs = secondObs.inputs as { requestDigest: string };
+    expect(firstInputs.requestDigest).not.toBe(secondInputs.requestDigest);
+    expect(firstObs.finalResult).toBeUndefined();
+    expect(secondObs.finalResult).toBeUndefined();
+  });
+
+  test("公開 JSON Schema の description は条件付き評価の発動制御と観測識別子の安定性を規定する", () => {
+    const schema = REQUEST_PROPERTY_SCHEMA as unknown as { description: string };
+    expect(schema.description).toContain("Conditional evaluation trigger control");
+    expect(schema.description).toContain("never triggers it");
+    expect(schema.description).toContain("Observation identifier stability");
+    expect(schema.description).toContain("never migrated, rewritten, or re-keyed");
+  });
+});

@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260929T012730Z-5c41",
+  "workflow": "req-define",
+  "evaluationKind": "requirement-development-classification",
+  "subject": "RU-0156（textlint vendored 配布廃止・方式B1）の要件展開: 導入時生成手順と vendor 欠落検知の正規帰属（REQ行/Design行/realization）判断",
+  "sourceRevision": "RU-0156 (2026-09-29, agentdev_handoff: true)",
+  "durationMs": 659,
+  "inputTokens": 1981,
+  "inputs": {
+    "requestDigest": "2d0e40e147a8e9a7ea471534611377d55ae9ab0631f66c7eb4e0b8f91a7306c8",
+    "references": [
+      {
+        "digest": "8c74797c879cc3725854ac2220a7d8305d28cd441cb8d1cb21f75f62f81595af",
+        "label": "RU-0156",
+        "path": ".agentdev/backlog/req-units/RU-0156.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q3-generation-procedure-attribution",
+      "questionForm": "choice",
+      "value": "REQ 行に手順の成果契約（導入時の依存成果物生成手順で利用可能になること）を記載し、具体的手順（コマンド列・焼き付きパス検査・辞書同梱）は Design へ分離する",
+      "probabilityDistribution": {
+        "REQ 行に手順の成果契約（導入時の依存成果物生成手順で利用可能になること）を記載し、具体的手順（コマンド列・焼き付きパス検査・辞書同梱）は Design へ分離する": 1,
+        "REQ 行に具体的手順（コマンド列を含む）まで記載する（Design への分離なし）": 0,
+        "REQ 行にも Design にも手順を書かず、実現面（realization_actions）のみで扱う": 0
+      }
+    },
+    {
+      "questionId": "q4-design-separation",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.74,
+        "false": 0.26
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q3-generation-procedure-attribution",
+        "value": "REQ 行に手順の成果契約（導入時の依存成果物生成手順で利用可能になること）を記載し、具体的手順（コマンド列・焼き付きパス検査・辞書同梱）は Design へ分離する"
+      },
+      {
+        "questionId": "q4-design-separation",
+        "value": true
+      }
+    ]
+  }
+}

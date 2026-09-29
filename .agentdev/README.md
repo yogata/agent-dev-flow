@@ -22,9 +22,9 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-001�
 | `inspect/promoted/*.md` | promoted artifact（採用済み・RU化対象） | `inspect-promote` | `backlog-review` | `backlog-review` による RU 化成功後に削除 |
 | `inspect/promoted/auto-promote-log.md` | `--auto` 実行ログ（append-only） | `inspect-promote`(--auto) | ユーザー参照・revoke 手順 | 永続（トレーサビリティ） |
 | `issues/issue-*.md` | ローカルIssue（追跡Issue / Case Issue。ローカル版のみ） | `/agentdev/issue`、case-open/run/close（Tool 操作契約経由） | `/agentdev/issue`、`/agentdev/req-define`（実行確定時の要件化経路） | なし（永続。Issue/PR 相当の永続情報として git 管理対象、REQ-009-026） |
-| `jev-observations/*.json` | Jev 先行評価の観測（1 semantic evaluation = 1 observation）。書込先 root は Custom Tool `agentdev_jev` が内部解決し呼出側から指定できず、worktree コンテキストの委譲実行からも main リポジトリ側 `.agentdev/jev-observations/` に帰着する（実測 20260923T133911Z-6859） | 6系統 Workflow（learning-promote、req-define、case-ready〔Epic/Wave 構成判断〕、intake-promote、inspect-promote、backlog-review。Custom Tool `agentdev_jev` の evaluate による観測永続化と observation_write による最終判断反映経由） | Jev 有効性評価（Issue B）、DEC-027 観測ループ、将来の置換判断（Issue C）の根拠 | 永続（git 管理対象の観測 domain state。正規状態と混在しない。削除条件は設定しない。REQ-090-006） |
+| `jev-observations/*.json` | Jev 先行評価の観測（1 semantic evaluation = 1 observation）。書込先 root は Custom Tool `agentdev_jev` が内部解決し呼出側から指定できず、worktree コンテキストの委譲実行からも main リポジトリ側 `.agentdev/jev-observations/` に帰着する（実測 20260923T133911Z-6859） | 6系統 Workflow（learning-promote、req-define、case-ready〔Epic/Wave 構成判断〕、intake-promote、inspect-promote、backlog-review。Custom Tool `agentdev_jev` の evaluate による観測永続化と observation_write による最終判断反映経由）。適用対象は閉じた意味評価として適格な判断に限り（REQ-090-004、REQ-090-024）、親判断の最終確定結果が発動条件を満たさない後続評価の観測は生成しない（REQ-090-025） | Jev 有効性評価（Issue B）、DEC-027 観測ループ、将来の置換判断（Issue C）の根拠 | 永続（git 管理対象の観測 domain state。正規状態と混在しない。削除条件は設定しない。REQ-090-006） |
 
-<!-- ADF-COVERS(implementation): REQ-090-006 -->
+<!-- ADF-COVERS(implementation): REQ-090-004, REQ-090-006, REQ-090-025 -->
 
 ## .agentdev/ の性質
 

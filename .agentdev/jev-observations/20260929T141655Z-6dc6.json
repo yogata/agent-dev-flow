@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260929T141655Z-6dc6",
+  "workflow": "learning-promote",
+  "evaluationKind": "adversarial-review-trigger",
+  "subject": "learning-promote 発動条件判定の代表例（Case #3239 TS-008）",
+  "sourceRevision": "bd666243da7a06cf1b45e1f309866433c0a230b0",
+  "durationMs": 1324,
+  "inputTokens": 775,
+  "inputs": {
+    "requestDigest": "a71f4ce5beec67255eb5f4cc1e6e2984afb132e584ef22895cc56fbe3c979094",
+    "references": [
+      {
+        "label": "learning-promote reference（判断単位定義）",
+        "path": "src/opencode/skills/agentdev-workflow-learning-promote/references/analysis-and-review.md",
+        "digest": "37ca1f31416a69d7eea0faf4ae2317e5a894062c5fe1cf6c4dab0d1dbe6f2589"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "review-trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.97,
+        "false": 0.030000000000000027
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "review-trigger",
+        "value": true
+      }
+    ]
+  }
+}

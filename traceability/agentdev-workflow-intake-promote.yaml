@@ -5,3 +5,15 @@ implementation:
     - REQ-090-012
     - REQ-090-018
     - REQ-090-019
+    - REQ-090-024
+    - REQ-090-025
+    - REQ-090-026
+    - REQ-090-027
+    - REQ-090-028
+    - REQ-090-029
+verification:
+  src/opencode/skills/agentdev-workflow-intake-promote/references/classification-and-review.md:
+    - REQ-090-024
+    - REQ-090-027
+    - REQ-090-028
+    - REQ-090-029
