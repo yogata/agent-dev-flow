@@ -178,7 +178,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
-
 ---
 
 ### L-006: 並列機械的テキスト置換 OU の Wave 実行で文字レベルマージが必要になる
@@ -200,7 +199,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（文字レベルマージツール未標準化・出現1件。専用ツール整備が前提）
 
 ---
-
 
 ---
 
@@ -631,7 +629,6 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **処分判定**: deferred（learning-promote 2026-07-22 評価。詳細は evaluation-report.md 参照）
 
 ---
-
 
 ---
 
@@ -1936,7 +1933,6 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 
 ---
 
-
 ---
 
 ## 2026-09-14 case 2796 Wave 1 / case 2797（PR #2801）: bun test フル suite の直前実績比較の制約
@@ -1948,7 +1944,6 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **処分判定**: deferred（出現1件。base 件数比較の代替手段は候補止まり）
 
 ---
-
 
 ---
 
@@ -1972,7 +1967,6 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **処分判定**: deferred（出現1件。委譲プロンプト規約への反映は再発時に再評価）
 
 ---
-
 
 ---
 
@@ -2339,7 +2333,6 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 
 ---
 
-
 ---
 
 ---
@@ -2365,7 +2358,6 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **移動日**: 2026-09-24
 
 ---
-
 
 ---
 
@@ -2433,7 +2425,6 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **追記（2026-09-27 amendment・A-2）**: 2026-09-27 に3回目の再発（並行 case-open 2セッションで全操作が gh exited with 66 で持続失敗・Root Case 2件が blocked 停止）。inbox 側2件の観測は本エントリと duplicate 判定で統合（症状・回復経路・予防策が一致）。予防策候補の反映先文書（docs/guides/consumer-project-setup.md 等）への反映は 2026-09-27 時点で未実施
 
 ---
-
 
 ---
 
@@ -2531,7 +2522,6 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **移動日**: 2026-09-27
 
 ---
-
 
 ## draft artifact_actions の target_area「### 対象外」は REQ 現行構造（## 適用範囲配下ネスト）へのセクション名参照として解釈する
 
@@ -2670,5 +2660,23 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **タグ**: `#traceability` `#req-094` `#sidecar`
 - **移動日**: 2026-09-28
 - **処分判定**: deferred（2026-09-28 評価。REQ-094 系 implementation 宣言の恒久配置先設計は req-define/case 系で確定。再評価条件: 次回横断是正・新規文書への REQ-094 適用時）
+
+---
+## 2026-09-29 Case #3233（case-close Capture 回収・PR #3235 本文 learning 候補）
+
+- bun test フル suite の実測 197.77〜235.88 秒（integrity suite 2600 台・Windows・依存整備なし）は REQ-060-007 の timeout 300〜600 秒標準の妥当性を実測裏付けした。既定 120 秒では打ち切りとなる実測値
+- worktree 内の配布物編集では distribution boundary（concrete-id）と IR-055（runtime-unresolved-reference）の両 gate が語彙制約を課す。REQ 行 ID の対応関係は traceability sidecar へ集約する運用が実効的（PR #3235 で 9 sidecar 更新・1 sidecar 新規作成）
+
+- **移動日**: 2026-09-30
+- **処分判定**: deferred（2026-09-30 評価。e1: REQ-060-007 実測裏付けの観測記録・標準側の変更要求なし。e2: sidecar 集約運用の定着観測・統合候補: sidecar 集約エントリ〔2026-09-28 移動分〕と次回統合判断〔review A-1〕。再評価条件: timeout 標準見直し議論時・横断是正での sidecar 運用課題再発時）
+
+---
+## 2026-09-29 Case #3233（case-close 工程内検知）
+
+- git 履歴依存 checker（IR-072 等）の実測結果は commit 前 working tree と commit 後 HEAD で変化し得る（updated 進行 commit が自身を last content-change と判定する構造）。検証記録には実測局面（commit 前後）の明示が必要で、QG-4 checker 実測手順の merge 直前 HEAD 実施規定（REQ-032-030）がこの乖離を検出した実例。checker 側は frontmatter のみ commit 除外で恒久対応済み（e7f1f639）
+- case-close の Design 状態評価による Design 本体への経緯追記は merge 前に PR へ含める必要がある。merge 後の追記は反映経路が intake 回収に限定される（本 Case で intake 化: `.agentdev/intake/inbox/2026-09-29-3233-checker-execution-contracts-lifecycle-notes.md`）
+
+- **移動日**: 2026-09-30
+- **処分判定**: deferred（2026-09-30 評価。e3: checker 恒久対応済み（e7f1f639）の知見記録・intake item 2026-09-29-3233-checker-execution-contracts-lifecycle-notes.md 候選2 と重複〔backlog-review 合流判定対象・review A-3〕。e4: 近縁 deferred「Design accepted 同一PR原則」エントリとの統合候補〔review A-2〕。再評価条件: 対応 Design の経緯追記運用変更時）
 
 ---
