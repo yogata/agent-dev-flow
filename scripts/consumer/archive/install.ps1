@@ -128,23 +128,31 @@ foreach ($kind in @("tools", "plugins")) {
     }
 }
 
-# textlint guard plugin の導入時生成依存（vendor 成果物）の完全性検査。版固定情報
-# （package.json + bun.lock）のみが配布され、vendor 実体は導入時に利用者が生成する。
-# 配置先で vendor が不完全な場合（部分生成状態を含む）、fail-closed で停止し導入手順を
-# 案内する。本 installer は依存の生成もネットワーク取得も行わない。
+# textlint guard plugin dependency (vendor) completeness check. The archive
+# ships only the version pin metadata (package.json + bun.lock); vendor
+# artifacts are generated at install time by the user. When the placed plugin
+# is incomplete (including a partially generated state), this installer stops
+# fail-closed and guides the resolution steps. The installer itself performs
+# no generation and no network fetching. Keep the messages ASCII-only: this
+# installer also runs under Windows PowerShell 5.1 (spawned by
+# package-release-archive.ps1), which decodes BOM-less UTF-8 as ANSI and
+# would corrupt multi-byte guidance text.
 $textlintGuardDir = Join-Path $Target "plugins\agentdev-textlint-guard"
 if (Test-Path -LiteralPath $textlintGuardDir) {
     $vendorBundle = Join-Path $textlintGuardDir "vendor\textlint-engine.bundle.json"
     $vendorDict = Join-Path $textlintGuardDir "vendor\kuromoji-dict"
-    $vendorReady = (Test-Path -LiteralPath $vendorBundle) -and
-        (Test-Path -LiteralPath $vendorDict) -and
-        (@(Get-ChildItem -LiteralPath $vendorDict -File -Filter '*.dat.gz' -ErrorAction SilentlyContinue).Count -gt 0)
-    if (-not $vendorReady) {
+    $hasBundle = Test-Path -LiteralPath $vendorBundle
+    $hasDict = Test-Path -LiteralPath $vendorDict
+    $dictCount = 0
+    if ($hasDict) {
+        $dictCount = @(Get-ChildItem -LiteralPath $vendorDict -File -Filter '*.dat.gz' -ErrorAction SilentlyContinue).Count
+    }
+    if (-not ($hasBundle -and $hasDict -and ($dictCount -gt 0))) {
         Write-Host "install-from-archive: textlint guard plugin dependency (vendor) missing or incomplete (exit 6): $vendorBundle / $vendorDict" -ForegroundColor Red
-        Write-Host "導入手順: plugin package 配下（$textlintGuardDir）で次の順に実行してください（bun install はネットワーク取得を含みます）:"
+        Write-Host "How to resolve: run the following in the installed plugin package directory ($textlintGuardDir) in this order (bun install performs network fetching):"
         Write-Host '  1. bun install'
         Write-Host '  2. bun run build:engine'
-        Write-Host 'その後、本 installer を再実行してください。installer は依存の生成とネットワーク取得を行いません。'
+        Write-Host 'Then re-run this installer. The installer performs no dependency generation and no network fetching.'
         exit 6
     }
 }

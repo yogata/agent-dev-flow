@@ -109,7 +109,7 @@ worktree へは git 管理外の実体（`node_modules`、`.opencode/skills/` �
 1. **SoT パス起点実行**: 構造系テスト、整合性検査、スキル参照等の実行は source 側ツリー（SoT パス）を起点とする。背景と手順は「source 側ツリー直接参照（SoT パス）」を参照する
 2. **src 側のみ編集**: 編集対象は git 管理対象の source 側ツリー（`src/` 配下）に限定する。配置先（`.opencode/`）配下の投影実体は git 管理外であり、編集しても main へ反映されず、install による再生成で失われる。gitignore 対象ファイルを参照・編集する場合の扱いは「gitignore 対象ファイル受け渡し不可」を参照する
 3. **依存整備**: `node_modules` は gitignore 対象のため worktree へ未伝播である。bun test・tsc 型検証の実行前に依存整備を前置する。整備手段（対象ディレクトリでの `bun install`、または main 側 `node_modules` への junction 作成。検証後は junction エントリのみを削除し、参照先の main 側 `node_modules` は破壊しない）の詳細は「bun test 実行の環境前提」を参照する
-4. **textlint guard plugin 依存成果物の再生成**: `agentdev-textlint-guard` plugin の依存実体（`vendor/textlint-engine.bundle.json`、`vendor/kuromoji-dict/`）は版固定情報（`package.json` + `bun.lock`）のみが git 管理対象であり、worktree へは未伝播である。plugin のテスト実行（`tests/engine-bundle.test.ts` を含む）、最終検査（gate.ts）、worktree 内実体からの textlint 文章表層検査の前に、plugin package 配下（`src/opencode/plugins/agentdev-textlint-guard/`）で `bun install && bun run build:engine` を実行して依存成果物を再生成する。再生成はネットワーク取得（bun install）を含む。導入系スクリプトは vendor 欠落を検知した場合に fail-closed で停止し本手順を案内する
+4. **textlint guard plugin 依存成果物の再生成**: `agentdev-textlint-guard` plugin の依存実体（`vendor/textlint-engine.bundle.json`、`vendor/kuromoji-dict/`）は版固定情報（`package.json` + `bun.lock`）のみが git 管理対象であり、worktree へは未伝播である。plugin のテスト実行（`tests/engine-bundle.test.ts` を含む）、最終検査（gate.ts）、worktree 内実体からの textlint 文章表層検査の前に、plugin package 配下で `bun install && bun run build:engine` を実行して依存成果物を再生成する（plugin package の配置場所は plugin README「導入時の依存生成手順」の実行場所表を参照する）。再生成はネットワーク取得（bun install）を含む。導入系スクリプトは vendor 欠落を検知した場合に fail-closed で停止し本手順を案内する
 
 ### isInsideWorktree 適用
 

@@ -349,13 +349,24 @@ function New-PluginLoaderShimContent {
     )
 }
 
+function Test-TextlintGuardPluginPresent {
+    <#
+    .SYNOPSIS
+        チェックアウトが textlint guard plugin package を含むか判定する。
+        plugin を含まないチェックアウトは vendor 検査の対象外とする。
+    #>
+    return Test-Path -LiteralPath (Join-Path $SourceDir 'plugins\agentdev-textlint-guard')
+}
+
 function Test-TextlintVendorReady {
     <#
     .SYNOPSIS
         textlint guard plugin の導入時生成依存（vendor 成果物）が完全に存在するか検査する。
         engine bundle と kuromoji 辞書の両方が必須であり、部分生成状態（bundle のみ存在し
-        辞書が欠損 等）は欠落として扱う。
+        辞書が欠損 等）は欠落として扱う。plugin package を含まないチェックアウトは
+        検査対象外（$true）とする。
     #>
+    if (-not (Test-TextlintGuardPluginPresent)) { return $true }
     $bundlePath = Join-Path $SourceDir $TextlintGuardBundleRel
     if (-not (Test-Path -LiteralPath $bundlePath)) { return $false }
     $dictDir = Join-Path $SourceDir $TextlintGuardDictRel
@@ -553,20 +564,23 @@ if ($Mode -eq 'check') {
     }
 
     # 2c. textlint guard plugin dependency（導入時生成依存）: vendor 完全性と版乖離。
-    # 欠落（部分生成状態を含む）は乖離として報告し、導入手順を案内する。
-    if (-not (Test-TextlintVendorReady)) {
-        Write-Host "[DIVERGENCE] textlint guard plugin dependency (vendor) missing or incomplete: $TextlintGuardBundleRel / $TextlintGuardDictRel"
-        Show-TextlintVendorGuidance
-        $divergences++
-    } else {
-        Write-Host "[OK] textlint guard plugin dependency (vendor) exists"
-        $pinState, $pinDetail = Test-TextlintBundleVersionsMatchPin
-        if (-not $pinState) {
-            Write-Host "[DIVERGENCE] textlint guard plugin dependency version divergence: $pinDetail"
-            Write-Host '再生成手順: plugin package 配下で bun install && bun run build:engine を実行してください。'
+    # plugin package を含むチェックアウトのみ対象。欠落（部分生成状態を含む）は乖離
+    # として報告し、導入手順を案内する。
+    if (Test-TextlintGuardPluginPresent) {
+        if (-not (Test-TextlintVendorReady)) {
+            Write-Host "[DIVERGENCE] textlint guard plugin dependency (vendor) missing or incomplete: $TextlintGuardBundleRel / $TextlintGuardDictRel"
+            Show-TextlintVendorGuidance
             $divergences++
         } else {
-            Write-Host '[OK] textlint guard plugin dependency versions match the bun.lock pins'
+            Write-Host "[OK] textlint guard plugin dependency (vendor) exists"
+            $pinState, $pinDetail = Test-TextlintBundleVersionsMatchPin
+            if (-not $pinState) {
+                Write-Host "[DIVERGENCE] textlint guard plugin dependency version divergence: $pinDetail"
+                Write-Host '再生成手順: plugin package 配下で bun install && bun run build:engine を実行してください。'
+                $divergences++
+            } else {
+                Write-Host '[OK] textlint guard plugin dependency versions match the bun.lock pins'
+            }
         }
     }
 

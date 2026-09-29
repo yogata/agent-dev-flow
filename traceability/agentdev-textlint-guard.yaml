@@ -3,8 +3,6 @@ implementation:
   README-INSTALL.md:
     - REQ-029-012
     - REQ-053-033
-  README.md:
-    - REQ-053-033
   THIRD-PARTY-NOTICES.md:
     - REQ-029-013
   scripts/consumer/archive/install.ps1:
@@ -98,10 +96,6 @@ implementation:
     - REQ-053-030
     - REQ-053-031
 verification:
-  scripts/self/release/textlint-guard-distribution.test.ts:
-    - REQ-029-012
-    - REQ-029-013
-    - REQ-053-033
   src/opencode/plugins/agentdev-textlint-guard/tests/config.test.ts:
     - REQ-053-025
     - REQ-053-027
