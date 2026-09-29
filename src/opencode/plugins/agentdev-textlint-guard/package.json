@@ -2,7 +2,7 @@
   "name": "agentdev-textlint-guard",
   "version": "0.1.0",
   "private": true,
-  "description": "agentdev-textlint-guard Plugin. Common textlint execution core (project resolution, config loading, target resolution, rule composition, lint execution, result formatting) with a pre-write tool.execute.before hook (write/edit/apply_patch) and a standalone final-gate entry. Dependencies are resolved before distribution and shipped as a vendored engine bundle (no network at install).",
+  "description": "agentdev-textlint-guard Plugin. Common textlint execution core (project resolution, config loading, target resolution, rule composition, lint execution, result formatting) with a pre-write tool.execute.before hook (write/edit/apply_patch) and a standalone final-gate entry. Dependencies are shipped as pin metadata (package.json + bun.lock) and resolved at install time by running bun install && bun run build:engine; install scripts detect missing vendor artifacts and guide the resolution steps without generating or fetching anything themselves.",
   "type": "module",
   "scripts": {
     "test": "bun test",

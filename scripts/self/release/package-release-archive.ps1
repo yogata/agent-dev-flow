@@ -11,9 +11,14 @@ param()
 #     src/opencode/commands/agentdev/**.md
 #     src/opencode/skills/agentdev-*/**
 #     src/opencode/tools/agentdev-*/**        (Custom Tool distribution type)
-#     src/opencode/plugins/agentdev-*/**      (Plugin / Hook distribution type)
+#     src/opencode/plugins/agentdev-*/**      (Plugin / Hook distribution type,
+#                                              EXCLUDING vendor/ — the textlint
+#                                              guard dependency artifacts are
+#                                              resolved at install time from the
+#                                              shipped version pin metadata)
 #     scripts/install.ps1            (projected from scripts/consumer/archive/install.ps1)
 #     README-INSTALL.md
+#     THIRD-PARTY-NOTICES.md         (third-party dependency and license notices)
 # Junctions are resolved to real file content so the archive is self-contained.
 #
 # REQ-050-010: the archive-dedicated installer original is kept at
@@ -49,14 +54,17 @@ param()
 # Exit codes (every failure path cleans up staging before exiting):
 #   0  success (final archive published via atomic no-clobber hard link,
 #               path printed to stdout)
-#   2  required source dir or file missing (host-side pre-condition)
+#   2  required source dir or file missing (host-side pre-condition; includes
+#      THIRD-PARTY-NOTICES.md missing at repo root — the archive must carry the
+#      third-party notices, fail-closed)
 #   3  pre-existing final archive collision (never overwritten)
 #   6  archive projection boundary check failed (src/opencode/ or extras)
 #   7  archive-installed projection boundary check failed
 #   8  trusted host boundary checker or publish helper missing (fail-closed,
 #      Oracle finding 6)
 #   9  archive expansion, installer invocation, install-into-target
-#      verification, or atomic publish failed after staging
+#      verification, version pin metadata missing in the staged plugin, or
+#      atomic publish failed after staging
 
 $ErrorActionPreference = "Stop"
 
@@ -78,6 +86,9 @@ $srcSkills = Join-Path $repoRoot "src\opencode\skills"
 # archive under the projection name scripts/install.ps1.
 $installScript = Join-Path $repoRoot "scripts\consumer\archive\install.ps1"
 $readmeInstall = Join-Path $repoRoot "README-INSTALL.md"
+# THIRD-PARTY-NOTICES.md は release archive の必須同梱物（依存実体を含まない配布の
+# third-party 通知。欠落時は fail-closed）。
+$thirdPartyNotices = Join-Path $repoRoot "THIRD-PARTY-NOTICES.md"
 
 if (-not (Test-Path -LiteralPath $srcCommands)) {
     Fail-Exit 2 "package-release-archive: required source directory missing: $srcCommands"
@@ -87,6 +98,9 @@ if (-not (Test-Path -LiteralPath $srcSkills)) {
 }
 if (-not (Test-Path -LiteralPath $installScript)) {
     Fail-Exit 2 "package-release-archive: trusted archive installer original missing: $installScript (scripts/consumer/archive/install.ps1, REQ-050-010)"
+}
+if (-not (Test-Path -LiteralPath $thirdPartyNotices)) {
+    Fail-Exit 2 "package-release-archive: THIRD-PARTY-NOTICES.md missing at repo root: $thirdPartyNotices (the archive must carry the third-party dependency notices; fail-closed)"
 }
 
 # Trusted host checker (NOT the candidate copy inside the archive). Per
@@ -204,6 +218,25 @@ try {
     Get-ChildItem -LiteralPath $stageSrcOpencode -Recurse -Directory -Filter "node_modules" -ErrorAction SilentlyContinue |
         Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
+    # vendor/ も配布アーカイブに含めない（textlint guard の導入時生成依存。版固定情報
+    # （package.json + bun.lock）のみを配布し、導入先で bun install && bun run build:engine
+    # により再生成する）。
+    Get-ChildItem -LiteralPath $stageSrcOpencode -Recurse -Directory -Filter "vendor" -ErrorAction SilentlyContinue |
+        Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+
+    # 版固定情報の staging 存在検証（fail-closed）: textlint guard plugin package が
+    # staged される場合、依存を導入時生成できる版固定情報（package.json + bun.lock）が
+    # 欠けていると archive から依存解決が不能になるため、staging 後に必須検査する。
+    $stagedTextlintGuard = Join-Path $stageSrcOpencode "plugins\agentdev-textlint-guard"
+    if (Test-Path -LiteralPath $stagedTextlintGuard) {
+        foreach ($pinFile in @("package.json", "bun.lock")) {
+            if (-not (Test-Path -LiteralPath (Join-Path $stagedTextlintGuard $pinFile))) {
+                Cleanup-Stage
+                Fail-Exit 9 "package-release-archive: version pin metadata missing in the staged textlint guard plugin: $stagedTextlintGuard\$pinFile (the archive must carry package.json and bun.lock; fail-closed)"
+            }
+        }
+    }
+
     # The archive-dedicated installer travels inside the archive under the
     # projection name scripts/install.ps1 (REQ-050-010). The checkout
     # consumer entry (repository scripts/install.ps1) is a DIFFERENT
@@ -218,6 +251,9 @@ try {
         Write-Warning "package-release-archive: README-INSTALL.md missing at repo root; archive will omit it."
     }
 
+    # THIRD-PARTY-NOTICES.md は必須同梱（前提検査で存在済み。欠落時は fail-closed 済み）。
+    Copy-Item -LiteralPath $thirdPartyNotices -Destination (Join-Path $stageArchiveRoot "THIRD-PARTY-NOTICES.md") -Force
+
     # Pre-publication boundary inspection #1: staged src/opencode/ tree.
     Write-Host "package-release-archive: running archive projection boundary check on staged src/opencode/"
     & bun run $boundaryChecker --profile archive $stageArchiveRoot --json 2>&1 | Out-Host
@@ -229,9 +265,9 @@ try {
     # Pre-publication boundary inspection #2: archive EXTRAS. The host
     # checker's archive profile walks src/opencode/{commands/agentdev,
     # skills/agentdev-*}/** only, so it would
-    # silently skip README-INSTALL.md and the archive edition of
-    # scripts/install.ps1. Build an auxiliary scan root with those files
-    # placed under src/opencode/commands/agentdev/ and re-invoke the same
+    # silently skip README-INSTALL.md, THIRD-PARTY-NOTICES.md and the archive
+    # edition of scripts/install.ps1. Build an auxiliary scan root with those
+    # files placed under src/opencode/commands/agentdev/ and re-invoke the same
     # checker there.
     $extrasScanCommands = Join-Path $extrasScanRoot "src\opencode\commands\agentdev"
     New-Item -ItemType Directory -Path $extrasScanCommands -Force | Out-Null
@@ -239,7 +275,8 @@ try {
     if ($readmePresent) {
         Copy-Item -LiteralPath (Join-Path $stageArchiveRoot "README-INSTALL.md") -Destination (Join-Path $extrasScanCommands "README-INSTALL.md") -Force
     }
-    Write-Host "package-release-archive: running archive projection boundary check on archive extras (README-INSTALL.md, scripts/install.ps1 archive edition)"
+    Copy-Item -LiteralPath (Join-Path $stageArchiveRoot "THIRD-PARTY-NOTICES.md") -Destination (Join-Path $extrasScanCommands "THIRD-PARTY-NOTICES.md") -Force
+    Write-Host "package-release-archive: running archive projection boundary check on archive extras (README-INSTALL.md, THIRD-PARTY-NOTICES.md, scripts/install.ps1 archive edition)"
     & bun run $boundaryChecker --profile archive $extrasScanRoot --json 2>&1 | Out-Host
     if ($LASTEXITCODE -ne 0) {
         Cleanup-Stage

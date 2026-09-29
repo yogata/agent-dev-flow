@@ -1,15 +1,26 @@
 // Behavioral distribution tests for the agentdev-textlint-guard plugin
-// package (REQ-053-033 offline distribution + REQ-052-007 plugin projection).
+// package (REQ-053-033 install-time resolution + REQ-029-012/013 dependency
+// boundary + REQ-052-007 plugin projection).
 //
-// Covers the TS-009 distribution contract for the new plugin:
+// Covers the distribution contract under the version-pin-only distribution
+// model (vendor artifacts are NOT shipped):
 //   - consumer install (git-clone style and source-ZIP style checkouts)
-//     projects plugins/agentdev-textlint-guard with a depth-1 loader shim,
-//     and the vendored engine bundle travels with the projection
-//   - archive install (scripts/consumer/archive/install.ps1 copy mode)
-//     places the plugin as real files with the generated shim
-//   - the final gate runs from every projection WITHOUT node_modules and
-//     without network package fetching (dependencies are pre-resolved and
-//     shipped as vendor/textlint-engine.bundle.json)
+//     projects plugins/agentdev-textlint-guard with a depth-1 loader shim, and
+//     the install fails closed when the install-time dependency artifacts
+//     (vendor/) are missing or partially generated, guiding the resolution
+//     steps (bun install && bun run build:engine) without generating or
+//     fetching anything itself
+//   - archive install (scripts/consumer/archive/install.ps1 copy mode) behaves
+//     the same: exit 6 with resolution guidance until vendor/ is complete
+//   - after the resolution steps are run (bun install -> build:engine ->
+//     node_modules removed; bun install performs network fetching — this is
+//     the documented install-time resolution), the final gate runs from every
+//     projection WITHOUT node_modules and with an empty package cache
+//   - install.ps1 -Mode check reports version divergence between the
+//     generated bundle and the bun.lock pins
+//   - release archive staging excludes vendor/, carries
+//     THIRD-PARTY-NOTICES.md and the version pin metadata (package.json +
+//     bun.lock), and fails closed when the pin metadata is missing
 //   - install/self-sync generic enumeration covers the new plugin with no
 //     special-case branching and no repo-local exclusion entry
 
@@ -22,6 +33,7 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import { execFileSync, spawnSync } from "child_process";
+import { invalidateEngineCache, loadEngine } from "../../../src/opencode/plugins/agentdev-textlint-guard/lib/engine-bundle.ts";
 
 const REPO_ROOT = path.resolve(import.meta.dir, "..", "..", "..");
 const INSTALL_PS1 = path.join(REPO_ROOT, "scripts", "install.ps1");
@@ -41,27 +53,62 @@ function rmrf(p: string): void {
 }
 
 function copyTree(src: string, dst: string, skip: (rel: string) => boolean = () => false): void {
-  fs.mkdirSync(dst, { recursive: true });
-  for (const ent of fs.readdirSync(src, { withFileTypes: true })) {
-    const s = path.join(src, ent.name);
-    const d = path.join(dst, ent.name);
-    if (ent.isDirectory()) {
-      if (ent.name === "node_modules") continue;
-      copyTree(s, d, skip);
-    } else if (ent.isFile()) {
-      const rel = path.relative(src, s);
-      if (skip(rel)) continue;
-      fs.copyFileSync(s, d);
+  // rel は copyTree 起点（plugin package root）からの相対パスで skip へ渡す
+  const root = src;
+  const walk = (dir: string, dest: string): void => {
+    fs.mkdirSync(dest, { recursive: true });
+    for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+      const s = path.join(dir, ent.name);
+      const d = path.join(dest, ent.name);
+      if (ent.isDirectory()) {
+        if (ent.name === "node_modules") continue;
+        // skip 対象のディレクトリ（tests/、vendor/ 等）はディレクトリ自体を作らない
+        const dirRel = path.relative(root, s);
+        if (skip(dirRel)) continue;
+        walk(s, d);
+      } else if (ent.isFile()) {
+        const rel = path.relative(root, s);
+        if (skip(rel)) continue;
+        fs.copyFileSync(s, d);
+      }
     }
-  }
+  };
+  walk(src, dst);
 }
 
-/** 実 plugin package を node_modules なしでフィクスチャへ配置する（オフライン導入の前提）。 */
+/** 実 plugin package を node_modules・vendor なしでフィクスチャへ配置する（版固定情報のみ配布の前提）。 */
 function placeRealPlugin(parentSrcOpencode: string): void {
   copyTree(PLUGIN_SOURCE_DIR, path.join(parentSrcOpencode, "plugins", "agentdev-textlint-guard"), (rel) => {
-    // テスト実行成果物は配布物に含めない
-    return rel.replaceAll("\\", "/").startsWith("tests/");
+    const norm = rel.replaceAll("\\", "/");
+    // テスト実行成果物と導入時生成依存（vendor）は配布物に含めない（ディレクトリ自体も含まない）
+    return (
+      norm === "tests" || norm.startsWith("tests/") || norm === "vendor" || norm.startsWith("vendor/")
+    );
   });
+}
+
+/**
+ * 導入手順（依存生成）を fixture の plugin package 配下で実行する。
+ * bun install はネットワーク取得を含む（導入時依存解決の検証構成として明示）。
+ * 依存生成後に node_modules を除去する（検証構成の明示項目）。
+ */
+function runDependencyResolution(pluginPackageDir: string): void {
+  execFileSync("bun", ["install"], { cwd: pluginPackageDir, stdio: "pipe", maxBuffer: 16 * 1024 * 1024 });
+  execFileSync("bun", ["run", "build:engine"], { cwd: pluginPackageDir, stdio: "pipe", maxBuffer: 16 * 1024 * 1024 });
+  rmrf(path.join(pluginPackageDir, "node_modules"));
+}
+
+/** vendor 成果物の完全状態（engine bundle + kuromoji 辞書）の存在を確認する。 */
+function expectVendorComplete(pluginPackageDir: string): void {
+  expect(fs.existsSync(path.join(pluginPackageDir, "vendor", "textlint-engine.bundle.json"))).toBe(true);
+  const dictFiles = fs.readdirSync(path.join(pluginPackageDir, "vendor", "kuromoji-dict"));
+  expect(dictFiles.length).toBeGreaterThan(0);
+}
+
+/** fail-closed 案内文言（導入手順の提示）を確認する。 */
+function expectVendorGuidance(text: string): void {
+  expect(text).toContain("bun install");
+  expect(text).toContain("bun run build:engine");
 }
 
 interface GateRun {
@@ -115,9 +162,9 @@ function expectShim(pluginsDir: string): void {
   );
 }
 
-describe("agentdev-textlint-guard distribution / consumer install (TS-009)", () => {
+describe("agentdev-textlint-guard distribution / consumer install (TS-005 / TS-006)", () => {
   function consumerScenario(label: string, gitCloneStyle: boolean): void {
-    test(`${label}: junction + shim + vendored bundle + offline final gate`, () => {
+    test(`${label}: vendor 欠落で fail-closed 停止と案内、導入手順後の offline gate`, () => {
       const root = fs.mkdtempSync(path.join(os.tmpdir(), `adftl-dist-${gitCloneStyle ? "git" : "zip"}-`));
       try {
         const srcOpencode = path.join(root, ".agentdev-plugin", "src", "opencode");
@@ -142,6 +189,23 @@ describe("agentdev-textlint-guard distribution / consumer install (TS-009)", () 
           execFileSync("git", ["commit", "-q", "-m", "plugin"], { cwd: plugin });
         }
 
+        const pluginCheckout = path.join(srcOpencode, "plugins", "agentdev-textlint-guard");
+        // 版固定情報は配布され、導入時生成依存（vendor）は未生成の前提
+        expect(fs.existsSync(path.join(pluginCheckout, "package.json"))).toBe(true);
+        expect(fs.existsSync(path.join(pluginCheckout, "bun.lock"))).toBe(true);
+        expect(fs.existsSync(path.join(pluginCheckout, "vendor"))).toBe(false);
+
+        // 依存未生成のまま install → fail-closed 停止と導入手順案内（配置は行われない）
+        const blockedApply = runPwsh(path.join(root, "scripts", "install.ps1"), ["-Mode", "apply"], root);
+        expect(blockedApply.exitCode).toBe(1);
+        expectVendorGuidance(blockedApply.stdout);
+        expect(fs.existsSync(path.join(root, ".opencode", "plugins", "agentdev-textlint-guard"))).toBe(false);
+
+        // 案内の導入手順を実行（bun install → build:engine → node_modules 除去。ネットワーク取得を含む）
+        runDependencyResolution(pluginCheckout);
+        expectVendorComplete(pluginCheckout);
+
+        // 再実行 → 成功（junction + shim）
         const apply = runPwsh(path.join(root, "scripts", "install.ps1"), ["-Mode", "apply"], root);
         expect(apply.exitCode).toBe(0);
 
@@ -154,6 +218,34 @@ describe("agentdev-textlint-guard distribution / consumer install (TS-009)", () 
 
         const check = runPwsh(path.join(root, "scripts", "install.ps1"), ["-Mode", "check"], root);
         expect(check.exitCode).toBe(0);
+        expect(check.stdout).toContain("textlint guard plugin dependency versions match the bun.lock pins");
+
+        // 部分生成状態（辞書欠損）でも fail-closed 停止する
+        const dictDir = path.join(pluginCheckout, "vendor", "kuromoji-dict");
+        const dictBackup = `${dictDir}.backup`;
+        fs.renameSync(dictDir, dictBackup);
+        try {
+          const partialApply = runPwsh(path.join(root, "scripts", "install.ps1"), ["-Mode", "apply"], root);
+          expect(partialApply.exitCode).toBe(1);
+          expectVendorGuidance(partialApply.stdout);
+        } finally {
+          fs.renameSync(dictBackup, dictDir);
+        }
+
+        // install.ps1 -Mode check が版乖離（bundle versions ≠ bun.lock pin）を報告に含める
+        const bundlePath = path.join(pluginCheckout, "vendor", "textlint-engine.bundle.json");
+        const bundleBackup = fs.readFileSync(bundlePath, "utf8");
+        try {
+          const envelope = JSON.parse(bundleBackup) as { versions: Record<string, string> };
+          const divergent = { ...envelope, versions: { ...envelope.versions } };
+          divergent.versions["@textlint/kernel"] = "0.0.0-divergent";
+          fs.writeFileSync(bundlePath, JSON.stringify(divergent), "utf8");
+          const checkDivergence = runPwsh(path.join(root, "scripts", "install.ps1"), ["-Mode", "check"], root);
+          expect(checkDivergence.exitCode).toBe(1);
+          expect(checkDivergence.stdout).toContain("version divergence");
+        } finally {
+          fs.writeFileSync(bundlePath, bundleBackup, "utf8");
+        }
 
         // オフライン最終検査（node_modules なし・空キャッシュ環境変数）
         assertNoNodeModules(root);
@@ -169,15 +261,15 @@ describe("agentdev-textlint-guard distribution / consumer install (TS-009)", () 
       } finally {
         rmrf(root);
       }
-    }, 300000);
+    }, 600000);
   }
 
   consumerScenario("git clone checkout", true);
   consumerScenario("source ZIP checkout (.git absent inside the plugin checkout)", false);
 });
 
-describe("agentdev-textlint-guard distribution / archive install (TS-009)", () => {
-  test("archive installer places plugin files + generated shim and the gate runs offline", () => {
+describe("agentdev-textlint-guard distribution / archive install (TS-005)", () => {
+  test("archive installer: vendor 欠落で exit 6 停止と案内、導入手順後の再実行成功と offline gate", () => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), "adftl-arc-"));
     try {
       const stageSrc = path.join(root, "archive", "src", "opencode");
@@ -188,7 +280,20 @@ describe("agentdev-textlint-guard distribution / archive install (TS-009)", () =
       placeRealPlugin(stageSrc);
 
       const target = path.join(root, "consumer", ".opencode");
-      const r = runPwsh(ARCHIVE_INSTALL_PS1, ["-Source", path.join(root, "archive", "src", "opencode"), "-Target", target, "-Mode", "copy"], root);
+      const installerArgs = ["-Source", path.join(root, "archive", "src", "opencode"), "-Target", target, "-Mode", "copy"];
+
+      // 依存未生成のまま installer → exit 6（fail-closed）と導入手順案内
+      const blocked = runPwsh(ARCHIVE_INSTALL_PS1, installerArgs, root);
+      expect(blocked.exitCode).toBe(6);
+      expectVendorGuidance(blocked.stdout);
+
+      // 案内の導入手順を配置先 plugin package 配下で実行（ネットワーク取得を含む）
+      const installedPlugin = path.join(target, "plugins", "agentdev-textlint-guard");
+      runDependencyResolution(installedPlugin);
+      expectVendorComplete(installedPlugin);
+
+      // 再実行 → 成功
+      const r = runPwsh(ARCHIVE_INSTALL_PS1, installerArgs, root);
       expect(r.exitCode).toBe(0);
 
       const pluginsDir = path.join(target, "plugins");
@@ -212,10 +317,32 @@ describe("agentdev-textlint-guard distribution / archive install (TS-009)", () =
     } finally {
       rmrf(root);
     }
-  }, 300000);
+  }, 600000);
 });
 
-describe("agentdev-textlint-guard distribution / generic enumeration contract (TS-009)", () => {
+describe("agentdev-textlint-guard engine-bundle error guidance (TS-005)", () => {
+  test("vendor 不在の loadEngine エラー detail に導入手順案内を含める", async () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "adftl-ebg-"));
+    try {
+      const pluginPackageDir = path.join(root, "plugin");
+      fs.mkdirSync(pluginPackageDir, { recursive: true });
+      // vendor が欠落した部分状態の代理（package.json のみ配置）
+      fs.writeFileSync(path.join(pluginPackageDir, "package.json"), "{}\n", "utf8");
+      invalidateEngineCache();
+      const result = await loadEngine(pluginPackageDir);
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.detail).toContain("cannot read the vendored engine bundle");
+      expect(result.detail).toContain("bun install");
+      expect(result.detail).toContain("bun run build:engine");
+      invalidateEngineCache();
+    } finally {
+      rmrf(root);
+    }
+  });
+});
+
+describe("agentdev-textlint-guard distribution / generic enumeration contract (TS-005)", () => {
   test("install.ps1 and package-release-archive.ps1 keep the plugin out of repo-local exclusions", () => {
     const install = fs.readFileSync(INSTALL_PS1, "utf8");
     const release = fs.readFileSync(
@@ -247,15 +374,26 @@ describe("agentdev-textlint-guard distribution / generic enumeration contract (T
     expect(sync).not.toContain("agentdev-textlint-guard");
   });
 
-  test("release archive packaging copies plugin files including the vendored bundle (node_modules stripped)", () => {
+  test("release archive staging excludes vendor/ and carries THIRD-PARTY-NOTICES.md + version pin metadata", () => {
     const release = fs.readFileSync(
       path.join(REPO_ROOT, "scripts", "self", "release", "package-release-archive.ps1"),
       "utf8",
     );
-    // Copy-Item -Recurse で plugin package 全体を stage へコピーし、
-    // node_modules だけが除去される（vendor/ は残る）
+    // Copy-Item -Recurse で plugin package 全体を stage へコピーした後、
+    // node_modules と導入時生成依存（vendor/）が staging から除去される
     expect(release).toMatch(/Filter "node_modules"/);
-    const vendorRel = "vendor/textlint-engine.bundle.json";
-    expect(fs.existsSync(path.join(PLUGIN_SOURCE_DIR, ...vendorRel.split("/")))).toBe(true);
+    expect(release).toMatch(/Filter "vendor"/);
+    // THIRD-PARTY-NOTICES.md を必須同梱する（repo root の通知文書。欠落時 fail-closed）
+    expect(fs.existsSync(path.join(REPO_ROOT, "THIRD-PARTY-NOTICES.md"))).toBe(true);
+    expect(release).toContain("THIRD-PARTY-NOTICES.md");
+    // 版固定情報（package.json + bun.lock）不在時の fail-closed 検査を含める
+    expect(release).toContain('foreach ($pinFile in @("package.json", "bun.lock"))');
+  });
+
+  test("install.ps1 -Mode check includes the vendor completeness and version divergence checks", () => {
+    const install = fs.readFileSync(INSTALL_PS1, "utf8");
+    expect(install).toContain("Test-TextlintVendorReady");
+    expect(install).toContain("Test-TextlintBundleVersionsMatchPin");
+    expect(install).toContain("version divergence");
   });
 });

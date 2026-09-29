@@ -16,6 +16,9 @@ param(
 #   0  success (every file placed, content matches)
 #   4  destination already has a file with different content (do not overwrite)
 #   5  required directory creation failed / source missing
+#   6  textlint guard plugin dependency (vendor) missing or incomplete at the
+#      target (run the resolution steps: bun install && bun run build:engine
+#      under the installed plugin package, then re-run this installer)
 
 $ErrorActionPreference = "Stop"
 $Source = [System.IO.Path]::GetFullPath($Source)
@@ -122,6 +125,35 @@ foreach ($kind in @("tools", "plugins")) {
             $dst = Join-Path $kindDst $rel
             Place-File -SrcFile $f.FullName -DstFile $dst
         }
+    }
+}
+
+# textlint guard plugin dependency (vendor) completeness check. The archive
+# ships only the version pin metadata (package.json + bun.lock); vendor
+# artifacts are generated at install time by the user. When the placed plugin
+# is incomplete (including a partially generated state), this installer stops
+# fail-closed and guides the resolution steps. The installer itself performs
+# no generation and no network fetching. Keep the messages ASCII-only: this
+# installer also runs under Windows PowerShell 5.1 (spawned by
+# package-release-archive.ps1), which decodes BOM-less UTF-8 as ANSI and
+# would corrupt multi-byte guidance text.
+$textlintGuardDir = Join-Path $Target "plugins\agentdev-textlint-guard"
+if (Test-Path -LiteralPath $textlintGuardDir) {
+    $vendorBundle = Join-Path $textlintGuardDir "vendor\textlint-engine.bundle.json"
+    $vendorDict = Join-Path $textlintGuardDir "vendor\kuromoji-dict"
+    $hasBundle = Test-Path -LiteralPath $vendorBundle
+    $hasDict = Test-Path -LiteralPath $vendorDict
+    $dictCount = 0
+    if ($hasDict) {
+        $dictCount = @(Get-ChildItem -LiteralPath $vendorDict -File -Filter '*.dat.gz' -ErrorAction SilentlyContinue).Count
+    }
+    if (-not ($hasBundle -and $hasDict -and ($dictCount -gt 0))) {
+        Write-Host "install-from-archive: textlint guard plugin dependency (vendor) missing or incomplete (exit 6): $vendorBundle / $vendorDict" -ForegroundColor Red
+        Write-Host "How to resolve: run the following in the installed plugin package directory ($textlintGuardDir) in this order (bun install performs network fetching):"
+        Write-Host '  1. bun install'
+        Write-Host '  2. bun run build:engine'
+        Write-Host 'Then re-run this installer. The installer performs no dependency generation and no network fetching.'
+        exit 6
     }
 }
 

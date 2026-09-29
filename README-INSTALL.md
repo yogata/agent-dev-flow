@@ -10,9 +10,12 @@ agentdev-release-<sha>/
   src/opencode/skills/agentdev-*/**/**
   scripts/install.ps1
   README-INSTALL.md
+  THIRD-PARTY-NOTICES.md
 ```
 
 `scripts/install.ps1`（archive 版 installer）は配布物を `.opencode/` 配下へ実ファイルとして配置する導入スクリプトである。archive は配布物の自己完結を保証し、展開先リポジトリの `src/opencode/` 状態に依存しない。archive 版は junction を作成しない archive 固有の導入契約を持つ（通常 checkout 版 `scripts/install.ps1` とは別の installation projection である）。
+
+third-party 依存の実体（`vendor/` 配下の engine bundle と kuromoji 辞書）は同梱しない。agentdev-textlint-guard plugin は版固定情報（`package.json` + `bun.lock`）のみを配布し、依存は導入時に生成する（THIRD-PARTY-NOTICES.md に依存とライセンス種別の通知を記載する）。
 
 ## 前提
 
@@ -38,6 +41,26 @@ $unpackedRoot = Join-Path $temp "agentdev-release-<sha>"
 
 導入完了後、`<unpackedRoot>/.opencode/commands/agentdev/` と `<unpackedRoot>/.opencode/skills/agentdev-*/` が実ファイルとして配置される。
 
+## 導入時の依存生成手順（agentdev-textlint-guard plugin）
+
+installer は配置先に依存実体（`vendor/` 配下の engine bundle と kuromoji 辞書）が不完全な場合、終了コード 6 で停止し、導入手順を案内する。案内に従い、plugin package 配下（`<unpackedRoot>/.opencode/plugins/agentdev-textlint-guard/`）で依存を生成してから installer を再実行する。
+
+```powershell
+# 依存生成（bun install はネットワーク取得を含む）
+Push-Location (Join-Path $unpackedRoot ".opencode\plugins\agentdev-textlint-guard")
+bun install
+bun run build:engine
+Pop-Location
+
+# installer 再実行（上記「導入手順」の 3 を再実行）
+& (Join-Path $unpackedRoot "scripts\install.ps1") `
+    -Source (Join-Path $unpackedRoot "src\opencode") `
+    -Target (Join-Path $unpackedRoot ".opencode") `
+    -Mode copy
+```
+
+依存生成の完了後、textlint 検査は空のパッケージキャッシュ・ネットワーク遮断下でも動作する（node_modules は不要）。
+
 ## 終了コード
 
 | コード | 意味 |
@@ -45,6 +68,7 @@ $unpackedRoot = Join-Path $temp "agentdev-release-<sha>"
 | 0      | 成功（全配置完了、内容一致） |
 | 4      | 配置先に既存ファイルがあり、内容が異なる（上書きせず停止） |
 | 5      | 必須ディレクトリの作成に失敗、または Source が存在しない |
+| 6      | textlint guard plugin の依存実体（vendor）が配置先に未生成または不完全（「導入時の依存生成手順」を実行してから再実行） |
 
 終了コード 4 の場合は、配置先を一旦退避するか削除してから再実行すること。
 

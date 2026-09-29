@@ -1,4 +1,4 @@
-<!-- ADF-COVERS(implementation): REQ-050-014, REQ-005-010 -->
+<!-- ADF-COVERS(implementation): REQ-050-014, REQ-005-010, REQ-053-033 -->
 # agent-dev-flow
 
 AgentDevFlow は AI エージェントによる開発ワークフローを支えるプラグインである。
@@ -15,6 +15,17 @@ AgentDevFlow は AI エージェントによる開発ワークフローを支え
 要求の継続的な蓄積・整理は `/agentdev/backlog-auto`（要求蓄積入口）から始め、生成された RU を req-define に渡す。
 `case-auto` は内部 lifecycle（case-open、case-ready、case-run、case-close、例外経路 case-revise）を駆動し、Definition の保存・確定と実行構造の確定もその内部責務として実行する。
 再合意済みの Definition 変更は req-define で再合意した後、`case-auto` が例外経路（case-revise → case-ready）を解決して反映する。
+
+## 開発者セットアップ（textlint 依存の生成）
+
+本リポジトリの `agentdev-textlint-guard` plugin は、third-party 依存の実体を git 管理と配布物に含めず、版固定情報（`package.json` + `bun.lock`）のみを管理する。plugin のテスト実行や最終検査の前に、plugin package 配下で依存成果物を生成する（依存とライセンス種別は [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) を参照）。
+
+```bash
+# 本体リポジトリの場合: src/opencode/plugins/agentdev-textlint-guard/ で実行
+bun install && bun run build:engine
+```
+
+依存実体（`vendor/` 配下）が未生成のまま導入系スクリプトや検査を実行すると、fail-closed で停止し上記手順が案内される。導入形態ごとの実行場所は plugin README「導入時の依存生成手順」を参照する。
 
 ## 主要導線
 

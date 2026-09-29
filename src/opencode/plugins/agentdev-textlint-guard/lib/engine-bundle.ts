@@ -1,13 +1,17 @@
-// agentdev-textlint-guard 共通実行基盤: 配布前解決済み依存（vendored engine bundle）の読込み。
+// agentdev-textlint-guard 共通実行基盤: 導入時に再生成した依存成果物（engine bundle）
+// の読込み。
 //
-// 依存は配布前に解決した成果物として供給する（導入系スクリプトはネットワーク取得を
-// 行わない）。本モジュールは package の node_modules に依存せず、コミット済みの
-// vendor/textlint-engine.bundle.json（base64 エンベロープで同梱した依存成果物）から
-// textlint 実行エンジンを data: URL import で読み込む。clone、ソース ZIP、archive、
-// release archive、self-sync の全経路で追加操作なしに動作する。
+// 依存は版固定情報（package.json と bun.lock）のみ配布され、導入時に利用者が再生成
+// する。本モジュールは package の node_modules に依存せず、vendor/textlint-engine.bundle.json
+// （base64 エンベロープで同梱した依存成果物）から textlint 実行エンジンを
+// blob: URL import で読み込む。依存生成手順（bun install && bun run build:engine、
+// plugin package 配下で実行）の完了後は、空キャッシュ・ネットワーク遮断下でも
+// 追加操作なしに動作する。
 //
 // bundle の生成は build/build-engine.ts（bun run build:engine）。版は package.json と
 // bun.lock で固定され、bundle に埋め込まれた versions で検証可能である。
+// vendor 成果物の欠落・部分生成状態を検知した場合、読込みは検査不能（fail-closed）
+// となり、エラー詳細に依存生成手順の案内を含める。
 
 import * as fs from "node:fs";
 import * as os from "node:os";
@@ -106,6 +110,16 @@ function ensureKuromojinDicPath(pluginDir?: string): void {
   process.env.KUROMOJIN_DIC_PATH = kuromojiDictPathFor(pluginDir);
 }
 
+/** vendor 成果物の欠落・部分生成時に読込み側が案内する依存生成手順（共通文言）。 */
+function regenerationGuidance(bundlePath: string): string {
+  return (
+    ` The vendored dependency artifacts are resolved at install time (not shipped). ` +
+    `Regenerate them by running "bun install && bun run build:engine" in the plugin package directory ` +
+    `(the directory containing package.json, expected vendor path: ${bundlePath}). ` +
+    `See the plugin README.md, section "依存と配布（版固定情報配布・導入時解決）" for per-route run locations.`
+  );
+}
+
 /** エンジンの読込み（module-level キャッシュ）。失敗は検査不能として呼出側で拒否する。 */
 export async function loadEngine(pluginDir?: string): Promise<EngineLoadResult> {
   if (loaded !== null) return { ok: true, engine: loaded };
@@ -117,7 +131,7 @@ export async function loadEngine(pluginDir?: string): Promise<EngineLoadResult> 
   } catch (e) {
     return {
       ok: false,
-      detail: `cannot read the vendored engine bundle (${bundlePath}): ${e instanceof Error ? e.message : String(e)}`,
+      detail: `cannot read the vendored engine bundle (${bundlePath}): ${e instanceof Error ? e.message : String(e)}${regenerationGuidance(bundlePath)}`,
     };
   }
   let envelope: unknown;
@@ -126,7 +140,7 @@ export async function loadEngine(pluginDir?: string): Promise<EngineLoadResult> 
   } catch (e) {
     return {
       ok: false,
-      detail: `vendored engine bundle is not valid JSON (${bundlePath}): ${e instanceof Error ? e.message : String(e)}`,
+      detail: `vendored engine bundle is not valid JSON (${bundlePath}): ${e instanceof Error ? e.message : String(e)}${regenerationGuidance(bundlePath)}`,
     };
   }
   const shape = envelope as { schema?: unknown; codeBase64?: unknown } | null;
@@ -137,7 +151,10 @@ export async function loadEngine(pluginDir?: string): Promise<EngineLoadResult> 
     typeof shape.codeBase64 !== "string" ||
     shape.codeBase64.length === 0
   ) {
-    return { ok: false, detail: `vendored engine bundle has an unexpected envelope shape (${bundlePath})` };
+    return {
+      ok: false,
+      detail: `vendored engine bundle has an unexpected envelope shape (${bundlePath})${regenerationGuidance(bundlePath)}`,
+    };
   }
   let mod: EngineBundleModule;
   try {

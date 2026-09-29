@@ -1,5 +1,23 @@
 component: agentdev-textlint-guard
 implementation:
+  README-INSTALL.md:
+    - REQ-029-012
+    - REQ-053-033
+  THIRD-PARTY-NOTICES.md:
+    - REQ-029-013
+  scripts/consumer/archive/install.ps1:
+    - REQ-029-012
+  scripts/install.ps1:
+    - REQ-029-012
+  scripts/self-sync.ps1:
+    - REQ-029-012
+  scripts/self/release/package-release-archive.ps1:
+    - REQ-029-012
+    - REQ-029-013
+  src/opencode/plugins/agentdev-textlint-guard/.gitignore:
+    - REQ-029-012
+  src/opencode/plugins/agentdev-textlint-guard/README.md:
+    - REQ-053-033
   src/opencode/plugins/agentdev-textlint-guard/gate.ts:
     - REQ-010-074
     - REQ-010-075
@@ -17,6 +35,7 @@ implementation:
     - REQ-053-030
   src/opencode/plugins/agentdev-textlint-guard/lib/engine-bundle.ts:
     - REQ-010-071
+    - REQ-029-012
     - REQ-053-033
     - REQ-053-034
   src/opencode/plugins/agentdev-textlint-guard/lib/inspect.ts:
@@ -62,6 +81,8 @@ implementation:
     - REQ-053-004
     - REQ-053-024
     - REQ-053-030
+  src/opencode/plugins/agentdev-textlint-guard/package.json:
+    - REQ-029-012
   src/opencode/plugins/agentdev-textlint-guard/plugin.ts:
     - REQ-052-002
     - REQ-052-004
@@ -82,6 +103,7 @@ verification:
     - REQ-053-030
   src/opencode/plugins/agentdev-textlint-guard/tests/engine-bundle.test.ts:
     - REQ-010-071
+    - REQ-029-012
     - REQ-053-033
     - REQ-053-034
     - REQ-053-037

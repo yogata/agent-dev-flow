@@ -109,6 +109,7 @@ worktree へは git 管理外の実体（`node_modules`、`.opencode/skills/` �
 1. **SoT パス起点実行**: 構造系テスト、整合性検査、スキル参照等の実行は source 側ツリー（SoT パス）を起点とする。背景と手順は「source 側ツリー直接参照（SoT パス）」を参照する
 2. **src 側のみ編集**: 編集対象は git 管理対象の source 側ツリー（`src/` 配下）に限定する。配置先（`.opencode/`）配下の投影実体は git 管理外であり、編集しても main へ反映されず、install による再生成で失われる。gitignore 対象ファイルを参照・編集する場合の扱いは「gitignore 対象ファイル受け渡し不可」を参照する
 3. **依存整備**: `node_modules` は gitignore 対象のため worktree へ未伝播である。bun test・tsc 型検証の実行前に依存整備を前置する。整備手段（対象ディレクトリでの `bun install`、または main 側 `node_modules` への junction 作成。検証後は junction エントリのみを削除し、参照先の main 側 `node_modules` は破壊しない）の詳細は「bun test 実行の環境前提」を参照する
+4. **textlint guard plugin 依存成果物の再生成**: `agentdev-textlint-guard` plugin の依存実体（`vendor/textlint-engine.bundle.json`、`vendor/kuromoji-dict/`）は版固定情報（`package.json` + `bun.lock`）のみが git 管理対象であり、worktree へは未伝播である。plugin のテスト実行（`tests/engine-bundle.test.ts` を含む）、最終検査（gate.ts）、worktree 内実体からの textlint 文章表層検査の前に、plugin package 配下で `bun install && bun run build:engine` を実行して依存成果物を再生成する（plugin package の配置場所は plugin README「導入時の依存生成手順」の実行場所表を参照する）。再生成はネットワーク取得（bun install）を含む。導入系スクリプトは vendor 欠落を検知した場合に fail-closed で停止し本手順を案内する
 
 ### isInsideWorktree 適用
 
@@ -161,6 +162,7 @@ bun test によるフル suite 実行は、次の環境前提を踏まえて実�
        - PowerShell の `Remove-Item` は環境・対象の内容により確認プロンプトが出ることがあり、手順転記では応答待ちの停止要因になる。補記であり正規手段ではない
 
   - **整備後の再実行手順**: 依存整備実施後、依存解決失敗で fail したテスト・型検証を同一 worktree で再実行し、当該 fail が解消したことを確認する。再実行結果には依存整備実施済みの旨を環境ラベル（依存パッケージ状態）へ記録し、整備前の fail と整備後の結果を混在させない
+  - **textlint guard plugin 依存成果物の前提**: plugin 配下のテスト（engine-bundle 系を含む）と最終検査は、plugin package 配下での依存成果物再生成（`bun install && bun run build:engine`。ネットワーク取得を含む）を前置する。`vendor/` 配下の依存成果物は版固定情報のみが git 管理対象のため worktree へ未伝播であり、欠落のまま実行すると導入系スクリプト・検査が fail-closed で停止する
   - **整備手段の選択基準（junction 作成と bun install の使い分け）**: 上記2手段は次の判断基準で使い分ける。判断根拠は検証記録の環境ラベルへ記録する
     - **node_modules 伝播状態の確認手順（手段選択の前置）**: 手段を選択する前に、次の2点を確認し、結果を環境ラベルへ記録する
       1. **main 側 `node_modules` の存否**: 対象ディレクトリの main 側実体（SoT パス）配下に `node_modules` が存在するかを確認する。存在しない場合は main 側未整備の状態である

@@ -136,6 +136,9 @@ function makeFakeRepo(): RepoPaths {
   fs.mkdirSync(path.join(root, "src", "opencode", "skills", "agentdev-probe"), { recursive: true });
   fs.writeFileSync(path.join(root, "src", "opencode", "skills", "agentdev-probe", "SKILL.md"), "# probe skill\n");
   fs.writeFileSync(path.join(root, "README-INSTALL.md"), "# Install\nConsumer install instructions.\n");
+  // THIRD-PARTY-NOTICES.md は release archive の必須同梱物（不在時 fail-closed、exit 2）。
+  // fake repo も必須同梱の前提を満たすよう配置する。
+  fs.writeFileSync(path.join(root, "THIRD-PARTY-NOTICES.md"), "# THIRD-PARTY-NOTICES\nProbe notices.\n");
 
   fs.copyFileSync(REAL_SCRIPT, path.join(root, "scripts", "self", "release", "package-release-archive.ps1"));
   fs.copyFileSync(REAL_INSTALLER, path.join(root, "scripts", "consumer", "archive", "install.ps1"));
