@@ -6,10 +6,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 58件、廃止済み: 14件
+現行 REQ: 57件、廃止済み: 15件
 <!-- AUTOGEN:END -->
 
-現行要件は58件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
+現行要件は57件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
 REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）による意図的予約欠番であり、実体は存在しない（[採番管理](designs/foundations/numbering-policy.md) 参照）。
 REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却枠であり、意図的予約欠番として維持する。
 REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全 revert）由来の廃止識別子であり、再利用しない。次の新規 REQ 番号は採番時点で REQ 実ファイル一覧と既知欠番レジストリから決定的採番スクリプト（alloc-req-number.ts）により決定する（[採番管理](designs/foundations/numbering-policy.md) 参照）。
@@ -50,7 +50,6 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [REQ-041](requirements/REQ-041.md) | backlog 一括整理コマンド（backlog-auto）実行契約 |
 | [REQ-044](requirements/REQ-044.md) | 標準API委譲の状態制約 |
 | [REQ-045](requirements/REQ-045.md) | 現行成果物体系の整合性網羅監査 |
-| [REQ-046](requirements/REQ-046.md) | 横断正規化後の不変条件 |
 | [REQ-047](requirements/REQ-047.md) | 規則所有権の一方向化 |
 | [REQ-048](requirements/REQ-048.md) | ADF 実行観測と統制縮小評価 |
 | [REQ-049](requirements/REQ-049.md) | 追跡Issue管理機構 |
