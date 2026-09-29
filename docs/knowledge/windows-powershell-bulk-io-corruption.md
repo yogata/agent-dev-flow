@@ -1,7 +1,7 @@
 ---
 title: Windows PowerShell の一括読み書きによる UTF-8 ファイル破壊リスク
 created: 2026-09-01
-updated: 2026-09-07
+updated: 2026-09-30
 ---
 
 # Windows PowerShell の一括読み書きによる UTF-8 ファイル破壊リスク
@@ -18,11 +18,14 @@ Windows 環境で PowerShell を既存ファイルへ使う場合、次の4系�
 標準回避手段: 既存 UTF-8/LF ファイルの一括読み書きには PowerShell 標準 cmdlet を使わず、edit ツール（per-line string replace）・node の readFileSync/writeFileSync・[System.IO.File] の明示エンコーディング指定を標準とする。Write ツールの全面上書きは新規ファイル作成に限定する。
 コンソール出力退避の標準手順: 外部コマンドの stdout 取得・退避では node の execFileSync/spawnSync に `encoding: "utf8"` を明示し、writeFileSync（utf8）と組み合わせるか、[System.IO.File] の明示エンコーディング指定を使う。PowerShell のパイプ・リダイレクト・Out-File 経由の退避はコンソール出力退避全般の標準手順から除外する。
 
+PS5.1 表示文言の ASCII 限定規律: Windows PowerShell 5.1（powershell.exe）は BOM なしスクリプトファイルを ANSI（cp932）として解釈するため、スクリプト内に埋め込んだ日本語の表示文言（ログ出力・プロンプト・エラーメッセージ等）は文字化けする。コンソールコードページの影響で出力側でも化け得る。PS5.1 向けに作成・編集するスクリプトへ埋め込む表示文言は ASCII に限定する。日本語を含むコンテンツはスクリプトへ埋め込まず、ファイルベース伝達（一時スクリプトファイル経由の node 実行等）または本書の標準手段で扱う。本規律は標準回避手段（edit ツール・node の readFileSync/writeFileSync・[System.IO.File] の明示エンコーディング指定）のファイル I/O 手段選択を置換するものではなく、スクリプト内リテラルの記述規律として追加する。
+
 ## 適用条件
 
 - Windows 環境（win32）で PowerShell（pwsh / Windows PowerShell）を使用する場合。
 - 対象ファイルが既存の UTF-8（BOM なし）・LF のファイルである場合（repo 標準の文字コード・行末）。
 - 一括読み書き（全面読込→全面書込、置換、リダイレクト、パイプ出力のファイル化）を行う場合。
+- Windows PowerShell 5.1（powershell.exe）で実行するスクリプトを作成・編集する場合（BOM なしスクリプトは ANSI（cp932）で解釈される。スクリプト内の埋め込み表示文言に ASCII 限定規律を適用する）。
 
 ## 適用対象
 
@@ -30,6 +33,7 @@ Windows 環境で PowerShell を既存ファイルへ使う場合、次の4系�
 - case-run 委譲手順（src/opencode/skills/agentdev-workflow-case-run/ の実行担当サブエージェントへの委譲手順。追記は別判断）。
 - checker stdout 退避（機械検査出力をファイルへ退避する場面。同じ破壊系統が適用される）。
 - gh CLI 等の外部ツール出力の退避（`gh pr view --json` 、`git show` 等の出力退避。PR #2595 の case-close capture 回収で同一系統を再確認）。
+- PS5.1 スクリプト内の埋め込み表示文言（ログ出力・プロンプト・エラーメッセージ等のリテラル。ASCII 限定規律の適用対象）。
 
 ## 根拠
 
@@ -37,6 +41,7 @@ Windows 環境で PowerShell を既存ファイルへ使う場合、次の4系�
 - PR #2595（Issue #2594）case-close capture 回収: `gh pr view --json body` を Out-File 退避した際の cp932 文字化け。node execFileSync（encoding utf8）+ writeFileSync（utf8）で回避。項3規定化の第4観測。
 - learning クラス2（git show パイプの cp932 デコード破壊。項4として記録）・クラス12（PowerShell パイプ/リダイレクト系の UTF-8 出力破壊。項3として規定化済み）。
 - AGENTS.md 既知事象（Write ツール全面上書きの cp932 化け実証済み）。
+- learning（Windows PowerShell 5.1 環境でスクリプト内に埋め込んだ日本語表示文言が cp932 解釈により文字化けした実運用観測。PS5.1 表示文言の ASCII 限定規律として本書へ記録）。
 
 ## 関連知識
 
