@@ -138,11 +138,14 @@
 
 ## トピック別ビュー
 
+> トピック別ビューは主要 Decision の選択掲載（話題ごとの導線）であり、全 Decision を網羅する一覧ではない。全 Decision の網羅一覧の正は、DEC 番号順の自動生成表（decision-baseline-table、decision-status 系 AUTOGEN ブロック）である。トピックへの掲載・非掲載はこの方針に従って判断する。
+
 ### 憲章・基本原則
 
 - [DEC-001](DEC-001.md)（AgentDevFlow 憲章、hard governance の限定、新規統制追加原則）
 - [DEC-009](DEC-009.md)（ADR から Decision への正規成果物モデル移行）
 - [DEC-010](DEC-010.md)（Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則）
+- [DEC-032](DEC-032.md)（ADF 責務の三層モデルと Project Contract の論理ビュー・情報寿命モデル）
 
 ### 配布基盤・ソースモデル
 
@@ -157,7 +160,9 @@
 - [DEC-017](DEC-017.md)（最小トレーサビリティモデルの採用と Artifact Graph の廃止、要件中心の最小 TIM と agentdev-traceability への置換）
 - [DEC-021](DEC-021.md)（scripts 公開入口の2本固定と安定契約、公開入口の構造境界と入口名の安定性）
 - [DEC-023](DEC-023.md)（third-party Skill の分離管理と取得機構の導入、第三区分所有境界と参照点集約）
-- [DEC-028](DEC-028.md)（文章表層品質の共通実行基盤、textlint 採用と書込み前・最終検査の共通化、DEC-001 決定3の限定後継）
+- [DEC-028](DEC-028.md)（文章表層品質の共通実行基盤、textlint 採用と書込み前・最終検査の共通化、DEC-001 決定3の限定後継、依存実体の配布供給条項は DEC-047 が部分後継）
+- [DEC-036](DEC-036.md)（意味 Skill と決定的実装の責務分離および Harness/Backend adapter 境界、DEC-015 の主後継・DEC-002 の v4 再定義）
+- [DEC-047](DEC-047.md)（textlint 依存実体の版固定情報解決への転換、DEC-028 の部分後継）
 
 ### ワークフロー・委譲契約
 
@@ -168,10 +173,24 @@
 - [DEC-019](DEC-019.md)（一般処理の標準API委譲とADF固有意味論の所有境界、YAML 構文解析・再帰ファイル探索・CLI 引数解析の標準 API 委譲）
 - [DEC-020](DEC-020.md)（GitHub Issue 共通管理単位の採用、追跡Issueと Case Issue の役割分離と論理スキーマ一元管理）
 - [DEC-024](DEC-024.md)（変更誘発境界リスク分析の導入と検証契約への投影、case-specific risk を品質プロセスの第一級入力とする原則）
+- [DEC-031](DEC-031.md)（ADF v4 Standard Operating Model の採用とプロセス・実装の責務分離、v4 の中核運用モデル）
+- [DEC-033](DEC-033.md)（ADF v4 公開運用モデル（UX 2入口収斂・内部 lifecycle・継続コラボレーションループ・学習昇格ガード）、DEC-029 の後継）
+- [DEC-034](DEC-034.md)（v4 の移行・release 標準境界、非破壊移行原則と self-hosting cutover）
+- [DEC-035](DEC-035.md)（v4 Quality / Verification / Evidence / Gate モデルへの分解、検査と証跡の品質境界）
+- [DEC-038](DEC-038.md)（ADF v4 durable state 配置と再構成の契約、状態権威と非原子調整原則、DEC-015 の補完後継）
+- [DEC-039](DEC-039.md)（ADF v4 authority・副作用統制と冪等・並行性モデル、DEC-015 の補完後継）
+- [DEC-040](DEC-040.md)（typesafe/Jev 先行評価の採用（Stage 1: 観測可能化）、superseded by DEC-044〔決定4 部分〕・決定2 は DEC-046 が置換・決定1・3は維持）
+- [DEC-041](DEC-041.md)（Wave 構成純度と実行並列上限の単一所有）
+- [DEC-042](DEC-042.md)（case-auto 最大並列維持と同期逐次フォールバック禁止）
+- [DEC-043](DEC-043.md)（case-ready 実行構造判断への Jev 最終判断採用（Stage 2: 閾値ルーティング）、superseded by DEC-044）
+- [DEC-044](DEC-044.md)（Semantic Evaluation 観測契約の一次事実中心再設計と基本判断経路への復帰、DEC-040・DEC-043 の後継）
+- [DEC-045](DEC-045.md)（リモートブランチ削除の GitHub 自動削除への委譲と deleteBranchOnMerge 設定前提の必須化）
+- [DEC-046](DEC-046.md)（Jev 実行基盤の Cloudflare AI Gateway への完全置換、DEC-040 決定2 の後継）
 
 ### 整合性・IR 体系
 
 - [DEC-013](DEC-013.md)（IR 登録モデルの簡素化、tombstone 廃止 + lifecycle/enforcement/baseline_status 除去）
+- [DEC-037](DEC-037.md)（Traceability の Change / Evidence 中心への再中心化、DEC-017・DEC-030 の後継）
 
 Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 
