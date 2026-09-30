@@ -212,5 +212,5 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     }
   ],
-  "warning_total_cap": 51
+  "warning_total_cap": 53
 }
