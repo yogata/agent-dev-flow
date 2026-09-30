@@ -107,6 +107,13 @@ worktree/ローカルブランチ削除、親Epic 自動クローズ判定、実
 `git pull --ff-only` 直前に、`agentdev-git-worktree` の「PR merge 前重複ファイルチェック」プロシージャを再実行する（L-013、PR #1128 由来、共有 main worktree で STEP-1-1 実行時点から STEP-6-3-1 実行までの間に並列セッションが加えた未コミット変更を検知するため）。
 重複ファイルを検出した場合、構造化エラーで停止しユーザーによる対応（stash/commit/checkout）を促すこと。
 
+**untracked 競合の安全解消手順（同一性証明成立時の限定経路）**: worktree 実行 Workflow が main リポジトリ側に git 管理対象ファイルを生成し、同一パスを PR 側で commit した場合、`git pull --ff-only` は当該パスを untracked 競合として失敗し得る。この場合、次の安全解消手順を同一性証明が成立したときに限り適用する。同一性が証明できない場合は前述のとおり構造化エラーで停止しユーザー対応を促す（既存の停止規定は維持する）。
+
+- **前提条件（同一性証明）**: `git cat-file` で origin/main 側の当該パスの blob を取得し、untracked 側ファイルとの sha256 比較によりバイト同一性を証明する
+- **同一性証明成立時のみ**: untracked 側ファイルを削除し、`git pull --ff-only` で復元する
+- **復元後の再確認**: 復元後に再度 hash を確認し、origin/main 側 blob と一致することを検証する
+- **同一性不証明時**: 構造化エラーによる停止を維持し、ユーザーによる対応（stash/commit/checkout）を促す。本手順は無条件の停止のみの運用を同一性証明の成立条件付きで狭めるものであり、停止規定自体を変更しない
+
 ##### STEP-6-3-2: 同期リスク事前検出・代替同期手順選択
 
 `git pull --ff-only` 直前に、`agentdev-git-worktree` の「git 同期リスク事前検出プロシージャ」に従い、worktree 状態（dirty tree）・並列実行による ref lock 競合・main 以外のブランチ占有の3リスク事前検出と代替同期手順選択を実行する。
