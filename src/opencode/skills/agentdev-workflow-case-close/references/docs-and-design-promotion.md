@@ -94,6 +94,14 @@ trigger 条件は detector の `--profile source` が分類する配布ソース
 - **検査エラーの扱い**: 読込不能、未分類エントリ、adapter 起動失敗は全て gate-not-passed として扱う。clean として通過させない。違反時はマージを停止しユーザー判断を仰ぐ
 - **検出結果の記録**: 検出事項（failures）は PR 本文の `## Findings / Capture候補` セクションに `### distribution-boundary` 小見出しで記録する（既に case-run command STEP-S5 で記録済みの場合は上書きせず、case-close で新たに検出された事項のみ追記）
 
+#### link profile の worktree 実行時の扱い
+
+link profile（`.opencode/**` 配下の link projection 走査）は、worktree 実行では構造的に検証不能である。worktree には `.opencode/skills/agentdev-*` の junction が伝播せず、scan 対象が 0 件になるためである。
+
+- **無効分類の記録**: worktree で link profile を実行した場合、その結果は無効分類として記録する。scan 対象 0 件の実行を clean 扱いや暗黙の検査省略として採用しない。実行環境ラベル（実行環境、junction 伝播状態）を実行記録へ付す
+- **main root での再実行採用**: case-close STEP-3 を main root で実行する時点で link profile を再実行し、その結果を採用する
+- **実行条件の正**: link profile の実行条件（main root 実行、worktree での無効実行可能性、環境ラベル判定）は `<integrity/checker-execution-contracts>` Design「link profile 実効実行要件」節が正であり、本 reference は case-close STEP-3 と checker 実行との手順接続のみを記述する（実行条件の二重定義をしない）
+
 #### full integrity suite 実行（bun test 実行形態契約）
 
 QG-4 の full integrity suite 合格基準により検証スイート全体（bun test 全件）を実行する場合、bun test 実行形態契約に従う。
