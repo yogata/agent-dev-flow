@@ -2,11 +2,11 @@
 title: intake-promote Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-20"
+updated: "2026-10-01"
 ---
 <!-- ADF-COVERS(implementation): REQ-015-006 -->
 <!-- ADF-COVERS(implementation): REQ-037-001, REQ-037-003, REQ-037-004, REQ-037-005 -->
-<!-- ADF-COVERS(implementation): REQ-003-055, REQ-003-056, REQ-037-003, REQ-037-004, REQ-037-005 -->
+<!-- ADF-COVERS(implementation): REQ-096-004, REQ-096-005, REQ-096-006, REQ-096-018, REQ-096-022, REQ-037-003, REQ-037-004, REQ-037-005 -->
 
 # intake-promote Design
 
@@ -98,18 +98,18 @@ intake-promote は change_nature と併せて、observed_evidence（根拠とな
 
 ## 自律確定の判定位置とHITLフォールバック（新規セクション）
 
-本節は intake-promote における自律確定の判定位置とHITLフォールバックの実行詳細を所有する。判断確定の境界は REQ-003-055 の共通原則に従い、詳細判定表は HITL 境界契約Design（v4-responsibility-boundaries）が集約所有する（本 Design と Workflow Skill は同一内容を重複保持しない）。
+本節は intake-promote における自律確定の判定位置とHITLフォールバックの実行詳細を所有する。判断確定の境界は REQ-096（ADF判断アーキテクチャ）の共通原則に従い、詳細判定表は v4-responsibility-boundaries Design（ADF判断アーキテクチャ詳細基準節）が集約所有する（本 Design と Workflow Skill は同一内容を重複保持しない）。
 
 ### classification〜review〜HITL〜persistence の各 STEP における自律確定判定の挿入位置
 
-- classification（フェーズ1、2）: 取得可能な根拠から採用・保留・却下を一意に確定できる項目は自律確定候補とする
+- classification（フェーズ1、2）: 取得可能な根拠から採用・保留・却下を正規契約からの導出または委譲された裁量の範囲で確定できる項目は自律確定候補とする
 - review（フェーズ2）: 自律確定候補のうち対論型レビューが必要な項目は review を経た後に確定する
 - HITL（フェーズ3）: ユーザー判断が必要な項目のみを HITL 対象とする（REQ-037-003）
 - persistence（フェーズ4、5）: 確定済み分類に従い自動実行する
 
 ### 部分自律確定の実行手順
 
-同一実行内に自律確定可能な項目とユーザー判断必要な項目が混在する場合、未決項目に依存しない項目を先行確定し、ユーザー判断必要な項目のみ HITL 対象とする（REQ-003-056）。
+同一実行内に自律確定可能な項目とユーザー判断必要な項目が混在する場合、未決項目に依存しない項目を先行確定し、ユーザー判断必要な項目のみ HITL 対象とする（REQ-096-005/006）。
 
 ### 自律確定項目の結果・主要根拠・HITL不要理由の報告形式
 

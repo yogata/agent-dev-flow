@@ -6,10 +6,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 57件、廃止済み: 15件
+現行 REQ: 58件、廃止済み: 15件
 <!-- AUTOGEN:END -->
 
-現行要件は57件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
+現行要件は58件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
 REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）による意図的予約欠番であり、実体は存在しない（[採番管理](designs/foundations/numbering-policy.md) 参照）。
 REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却枠であり、意図的予約欠番として維持する。
 REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全 revert）由来の廃止識別子であり、再利用しない。次の新規 REQ 番号は採番時点で REQ 実ファイル一覧と既知欠番レジストリから決定的採番スクリプト（alloc-req-number.ts）により決定する（[採番管理](designs/foundations/numbering-policy.md) 参照）。
@@ -75,6 +75,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [REQ-093](requirements/REQ-093.md) | agentdev_gh 起動環境障害の予防・診断・回復の恒久化 |
 | [REQ-094](requirements/REQ-094.md) | ADF の Markdown 日本語表現および用語選択基準 |
 | [REQ-095](requirements/REQ-095.md) | agentdev_gh 起票・読取操作の呼出側規律 |
+| [REQ-096](requirements/REQ-096.md) | ADF判断アーキテクチャ（判断方法・確定権限・人間判断境界） |
 <!-- AUTOGEN:END -->
 
 - [要件インデックス](requirements/README.md)
@@ -120,7 +121,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-033](decisions/DEC-033.md) | ADF v4 公開運用モデル（UX 2入口収斂・内部 lifecycle・継続コラボレーションループ・学習昇格ガード） |
 | [DEC-034](decisions/DEC-034.md) | v4 の移行・release 標準境界（非破壊移行原則・v4.0.0-rc.1 cutover・self-hosting） |
 | [DEC-035](decisions/DEC-035.md) | v4 Quality / Verification / Evidence / Gate モデルへの分解 |
-| [DEC-036](decisions/DEC-036.md) | 意味 Skill と決定的実装の責務分離および Harness/Backend adapter 境界 |
+| [DEC-036](decisions/DEC-036.md) | 意味 Skill と決定的実装の責務分離および Harness/Backend adapter 境界（superseded by DEC-048〔決定(1)（deterministic 処理／semantic 判断の二分法）は DEC-048 が部分置換。決定(2)（Harness/Backend adapter 境界）と決定(3)（Project Extensions の位置づけ）は本 Decision が維持する。semantic 6 項目・deterministic 11 項目の列挙の後継は foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節が所有する。〕） |
 | [DEC-037](decisions/DEC-037.md) | Traceability の Change / Evidence 中心への再中心化 |
 | [DEC-038](decisions/DEC-038.md) | ADF v4 durable state 配置と再構成の契約（状態権威・証跡分離・非原子調整原則） |
 | [DEC-039](decisions/DEC-039.md) | ADF v4 authority・副作用統制と冪等・並行性モデル |
@@ -132,6 +133,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-045](decisions/DEC-045.md) | リモートブランチ削除の GitHub 自動削除への委譲と deleteBranchOnMerge 設定前提の必須化 |
 | [DEC-046](decisions/DEC-046.md) | Jev 実行基盤の Cloudflare AI Gateway への完全置換 |
 | [DEC-047](decisions/DEC-047.md) | textlint 依存実体の版固定情報解決への転換 |
+| [DEC-048](decisions/DEC-048.md) | ADF判断アーキテクチャ: 判断方法・確定権限・人間判断境界の統一モデル |
 <!-- AUTOGEN:END -->
 
 ## 設計（Design）
