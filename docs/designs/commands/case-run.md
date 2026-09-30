@@ -234,18 +234,18 @@ PR 変更ファイル直接指定にも使用）、--base-ref = コミット済�
 両者は排他でなくいずれかの指定が必須、であり、CLI 表示（スクリプトヘッダコメント等）の
 正典からの drift（環境割当の逆転・排他表記の残存等）を本不変条件で検出・是正対象とする。
 
-## verification-only PR（実装差分なし、検証のみ）（v2:REQ-0158-002）
+## verification-only PR（実装差分なし、検証のみ）（v2:REQ-0158-002 由来、現行の SSoT は REQ-010-012）
 
 case-run は実行担当サブエージェント委譲の結果、実装差分0件・検証のみで完了する PR（**verification-only PR**）を生成する場合がある。
-本節は verification-only PR の判定条件、PR 本文の根拠欄記入規則、GitHub の空 PR 取り扱い、case-close への引継ぎ注意事项を定める。
-要件の SSoT は v2:REQ-0158-002。
+本節は verification-only PR の判定条件、PR 本文の根拠欄記入規則、GitHub の空 PR 取り扱い、case-close への引継ぎ注意事項を定める。
+要件の SSoT は REQ-010-012（保存工程と完了工程での変更ファイル限定検査と工程停止）。旧 v2:REQ-0158-002 由来。
 
 PR テンプレート（pr_desc.md）と Issue 本文構造は workflow-templates（[agentdev-workflow-templates.md](../skills/agentdev-workflow-templates.md)）の責務である。
 pr_desc.md への verify-only 根拠欄追加は workflow-templates Design の変更として位置付ける。
 
 ### 定義
 
-verification-only PR は以下を全て満たす PR とする（v2:REQ-0158-002）。
+verification-only PR は以下を全て満たす PR とする（REQ-010-012）。
 
 - PR の変更ファイル数が0件（pr_changed_files の変更ファイル一覧が空と確認される）
 - Issue の受け入れ基準が検証のみで充足された（既存実装・既存文書が要件を満たしており、追加実装を要しなかった）
@@ -265,12 +265,12 @@ GitHub は空 PR（変更ファイル0件）の squash merge を許可し、空 
 case-run は空 PR の作成・マージを GitHub の挙動に依存して実行する。
 squash merge で生成された空 commit は履歴に残り、pr_merge（squash merge）の通常フローに従う。
 
-### case-close 引継ぎ注意事项
+### case-close 引継ぎ注意事項
 
-verification-only PR は case-close の targeted docs guard で files_checked が空になるため、次の注意事项を case-close へ引き継ぐ。
+verification-only PR は case-close の targeted docs guard で files_checked が空になるため、次の注意事項を case-close へ引き継ぐ。
 
-- PR 本文の verify-only 根拠欄に「実装差分を含まない理由」「根拠成果物または commit」「検証対象」「検証結果」が記録されていること（[case-close.md](case-close.md)「verification-only PR の files_checked 空確認（v2:REQ-0158-002）」参照）
-- case-close は files_checked 空を検出した場合、v2:REQ-0158-002 に基づき verification-only 判定ステップを経て PASS 処理する（false-clean 3層防御との相互作用は case-close Design 参照）
+- PR 本文の verify-only 根拠欄に「実装差分を含まない理由」「根拠成果物または commit」「検証対象」「検証結果」が記録されていること（[case-close.md](case-close.md)「targeted docs guard」節の files_checked 空確認〔REQ-032-023 実装宣言〕参照）
+- case-close は files_checked 空を検出した場合、REQ-010-012 に基づき verification-only 判定ステップを経て PASS 処理する（false-clean 3層防御との相互作用は case-close Design 参照）
 - case-run 側は PR 作成までを責務とし、verification-only 判定自体は case-close が行う（単一書き手: case-close、REQ-011 完了条件チェックボックス専任責務）
 
 ## トレーサビリティ能力の利用
