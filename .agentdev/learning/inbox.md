@@ -28,3 +28,33 @@
 - **想定反映先**: issue-operation-safety.md 起動環境障害節の診断手順への gh CLI 単体対比実測の明記と、case-open 委譲前疎通確認の運用周知（REQ-093-002）
 - **関連**: src/opencode/skills/agentdev-issue-management/references/issue-operation-safety.md「起動環境障害の known-issues」節、docs/requirements/REQ-093.md、src/opencode/tools/agentdev-gh/runner-cli.ts failFromExec、同バッチ RU-0136 case-open の同一障害エントリ（本ファイル直前）
 - **タグ**: `#agentdev_gh` `#起動環境障害` `#case-open` `#blocked` `#冪等検出`
+
+## 2026-09-30 case-run（Case #3252・PR #3267 Findings 由来）: verify-only closure 候補の委譲前に RA 単位の実施状態を実測確認してから経路を選択すべき
+
+- **問題事象**: verify-only closure 前提の委譲コンテキスト（structured_context）が「実装済み・main merge 済み」と要約していたが、RA-001 は Definition PR #3255 に含まれず case-run 未実施だった。TS-001 初回検証で移管註不在を検出し fix-and-reverify（PR #3267）で解消。検証が RA の不在を確実に検出したため実害は回避されたが、委譲コンテキストの要約だけを信じて verify-only closure を選択していたなら未実装のままクローズし得た。
+- **発生局面**: case-run（実現面実装。Case #3252 DEL-CASE3252-RUN-1）
+- **検知方法**: TS-001 の検証（retired/REQ-013.md 実取得読取による移管註存在確認）
+- **根本原因**: 委譲側の structured_context 要約が会話記憶ベースの記述を含み、Issue 本文 SSoT（Execution Contract「RA-001 は case-run 担当で PR 外」）と突合していなかった
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（運用改善。intake item として 2026-09-30-3252-delegation-context-realization-state-mismatch.md に回収済み）
+- **横展開観点**: case-run に限らず、PR/carrier commit の不在・不在性の主張を含む委譲では、委譲前に RA（realization_actions）単位で Issue 本文・git log 実測を確認してから経路（実装系 / verify-only）を選択する。検証（TS）が不在検出の最後の防衛線であるため、TS の pass_criteria に「存在確認」を含める規約は維持する
+- **再発条件**: 委譲コンテキスト要約が実現面の実施状態を正確に反映せず、かつ検証項目が不在を検出しない場合
+- **予防策候補**: case-run 委譲 structured_context の「実装状態」記述は永続状態（Issue 本文・git log）からの実測に限定し、会話記憶からの要約を禁止する
+- **想定反映先**: case-auto orchestration stage 3（委譲 prompt 生成）の運用規約・agentdev-case-run-execution-adapter の実装状態判定参照
+- **関連**: PR #3267 本文「Findings / Capture候補」、Case #3252 Issue 本文 Execution Contract、同日 intake item（2026-09-30-3252-delegation-context-realization-state-mismatch.md）
+- **タグ**: `#case-run` `#verify-only-closure` `#委譲コンテキスト` `#fix-and-reverify`
+
+## 2026-09-30 case-close（Case #3252）: integrity checker の node --experimental-strip-types 実行が require 未定義で失敗する（bun run 経路への切替で解消）
+
+- **問題事象**: case-close STEP-3 docs 検証で、checker 実行契約（checker-execution-contracts.md）が「標準経路」と規定する node --experimental-strip-types による checker 実行が `ReferenceError: require is not defined in ES module scope` で失敗（check_changed_docs.ts:44・generate_indexes.ts:25 等。スクリプト本体は require を使用・Node 26.7.0 では ESM からの require 呼出し非対応）。bun run 経路（spawnSync による status/stdout 分離取得・fs.writeFileSync UTF-8 退避）へ切替して EXIT=0 で解消。
+- **発生局面**: case-close STEP-3 docs 検証（merge 後 main での targeted docs guard・check_autogen_freshness 実行）
+- **検知方法**: checker 実行の EXIT=1・stdout 空 → 退避ファイルの stderr 参照（ReferenceError 特定）
+- **根本原因**: checker 実行契約の「安定実行経路」節の標準経路記述（node --experimental-strip-types）と実機の実行環境（require 使用の TS スクリプト・bun 前提）との乖離
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（本 Case 対象外。既知の例外経路〔bun run CLI + stdout flush 考慮〕の範囲内で解消。契約文書側の更新要否は別途判断）
+- **横展開観点**: bun 前提の integrity scripts を node で起動すると require 未定義で失敗する。Windows + bun 環境では bun run 経路に切替し、stdout 証跡は spawnSync（status/stdout 分離取得）+ fs.writeFileSync（UTF-8 明示）で退避する（PowerShell リダイレクト禁止規約と整合）
+- **再発条件**: node --experimental-strip-types で require 使用の checker を実行した場合
+- **予防策候補**: checker 実行契約の標準経路記述に「bun 前提スクリプトへの node 実行は require 未定義で失敗する」旨の実機制約を追記する（対象ファイル: .opencode/skills/repo-agentdev-integrity 配布外のため docs/designs/integrity/checker-execution-contracts.md 側の判断）
+- **想定反映先**: checker-execution-contracts.md「安定実行経路」節、case-close/case-run STEP-3 の checker 実行手順
+- **関連**: docs/designs/integrity/checker-execution-contracts.md、Case #3252 case-close 対応記録コメント（検証差分・テスト結果に実行経路記録済み）
+- **タグ**: `#checker` `#bun` `#node` `#実行経路` `#case-close`
