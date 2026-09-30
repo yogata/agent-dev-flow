@@ -77,4 +77,4 @@ tag・branch の lifecycle role 別サブ表:
 
 ## 決定的実行・adapter 実行との接続
 
-状態遷移 predicate 評価・冪等キー照合・依存解決・Wave scheduling の決定的所有は DEC-036 の deterministic 項目分類に従う（本 Design は再列挙しない）。semantic 判断（要件解釈、block 判定、レビュー）は Skill が所有する。adapter execution（agent 起動、context、background execution、tool invocation の実行機構）は Harness/Backend adapter 境界（DEC-036）が所有し、本 Design の副作用分類・直列化単位は adapter 経由の実行にも適用される。
+状態遷移 predicate 評価・冪等キー照合・依存解決・Wave scheduling の決定的所有は決定的処理（判断方法3分類の正典: DEC-048、foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節）に従う（本 Design は再列挙しない）。意味判断（閉じた意味評価・開いた推論。要件解釈、block 判定、レビュー）は Skill が所有する。adapter execution（agent 起動、context、background execution、tool invocation の実行機構）は Harness/Backend adapter 境界（DEC-036 決定(2)）が所有し、本 Design の副作用分類・直列化単位は adapter 経由の実行にも適用される。

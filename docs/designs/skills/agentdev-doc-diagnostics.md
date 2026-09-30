@@ -158,8 +158,8 @@ docs 横断診断は本 skill が正規の所有者となる（REQ-036-013 の d
 
 ## v4 責務分類
 
-ADF v4 の責務分類の正典は DEC-036、foundations/v4-responsibility-boundaries Design である（正典一元化）。本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）は当該正典に基づく確定値の記録であり、分類語彙の正本は正典側が所有する。当初の分類確定の観測経緯は Root Case #3011（第8段 v4 Skill 再編 Case）を根拠参照として確認できる（Case は一時成果物であり正典ではない）。
+ADF v4 の責務分類の正典は DEC-048、foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節である（正典一元化）。本 Design の 3 区分（意味判断担当〔閉じた意味評価・開いた推論を所有〕/ 決定的処理委譲先 / 知識提供）は当該正典に基づく確定値の記録であり、分類語彙の正本は正典側が所有する。当初の分類確定の観測経緯は Root Case #3011（第8段 v4 Skill 再編 Case）を根拠参照として確認できる（Case は一時成果物であり正典ではない）。
 
-- **semantic 担当**: semantic classification（診断カテゴリ・ルーティング）
-- **deterministic 委譲先**: 検査実行は artifact-validation scripts・repo-local checker へ委譲
+- **意味判断担当**: semantic classification（診断カテゴリ・ルーティング）
+- **決定的処理委譲先**: 検査実行は artifact-validation scripts・repo-local checker へ委譲
 - **知識提供**: 共通証拠構造・finding 出力契約

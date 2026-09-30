@@ -94,7 +94,7 @@ Capability Skill は workflow STEP を所有しない。
 要件 1 は Workflow Skill との区別（REQ-002-018）を担保する。
 要件 2 は1Workflow で完結する能力を Workflow Skill 内 `references/` 配下へ配置する基準との区別を担保する。
 要件 3 は workflow 制御と混在しない単一責務境界を担保する。
-要件 3 への照合にあたり、当該能力が DEC-036 の semantic 6 項目（requirement analysis、architecture/design judgment、decomposition judgment、adversarial review、learning evaluation、semantic classification）のいずれにも該当しない場合、その能力は deterministic 側（script / Custom Tool）または知識提供層（[../foundations/v4-responsibility-boundaries.md](../foundations/v4-responsibility-boundaries.md)）への配置を検討する（新要件は設けない。分類の正典は DEC-036 と同 Design が所有する）。
+要件 3 への照合にあたり、当該能力が閉じた意味評価・開いた推論として所有すべき判断（判断方法3分類の正典: DEC-048、foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節）のいずれにも該当しない場合、その能力は決定的処理側（script / Custom Tool）または知識提供層（[../foundations/v4-responsibility-boundaries.md](../foundations/v4-responsibility-boundaries.md)）への配置を検討する（新要件は設けない。語彙の正典は DEC-048 と同 Design「v4 責務分類語彙の後継」節が所有する）。
 
 ### Capability Skill の配置と命名
 
@@ -147,7 +147,7 @@ Capability Skill と Workflow Skill は異なる責務境界・判断モデル�
 
 ### Workflow / Capability 機械分類規則
 
-deterministic checker（check_extensions.ts）が適用する Workflow Skill / Capability Skill の機械判定規則を次の分類表として正規所有する。
+決定的 checker（check_extensions.ts）が適用する Workflow Skill / Capability Skill の機械判定規則を次の分類表として正規所有する。
 checker 実装と本表は同一規則を反映し、乖離は検査で検出対象とする。
 
 | 判定要素 | Workflow Skill | Capability Skill |
@@ -161,7 +161,7 @@ checker 実装と本表は同一規則を反映し、乖離は検査で検出対
 
 ## 決定論的処理との責務接続（DEC-036）
 
-Command / Workflow Skill / Capability Skill の3層構造（DEC-010）を維持したまま、決定論的処理を次の責務分離で接続する（DEC-036、REQ-002-035）。semantic Skill と deterministic code の分類基準の列挙正典は DEC-036 と [../foundations/v4-responsibility-boundaries.md](../foundations/v4-responsibility-boundaries.md) が所有し、本節は再掲しない。
+Command / Workflow Skill / Capability Skill の3層構造（DEC-010）を維持したまま、決定的処理を次の責務分離で接続する（DEC-036、REQ-002-035）。意味判断 Skill と決定的処理 code の分類基準（判断方法3分類）の語彙正典は DEC-048 と [../foundations/v4-responsibility-boundaries.md](../foundations/v4-responsibility-boundaries.md)「v4 責務分類語彙の後継」節が所有し、本節は再掲しない。
 
 | 層 | 責務 |
 |---|---|

@@ -76,14 +76,14 @@ skill Design は提供する判断、USE FOR、DO NOT USE FOR、入力、出力�
 
 ## v4 責務分類
 
-ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における各 skill Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、各 Design の「v4 責務分類」節はその確定値を記録する。新規 skill Design は次の様式で本節を記述する。
+ADF v4 の責務分類（正典: DEC-048、foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節）における各 skill Design の 3 区分（意味判断担当〔閉じた意味評価・開いた推論を所有〕/ 決定的処理委譲先 / 知識提供）。語彙の正本は foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節であり、各 Design の「v4 責務分類」節はその確定値を記録する。新規 skill Design は次の様式で本節を記述する。
 
-- **semantic 担当**: semantic 6 項目の該当項目（0 件可）
-- **deterministic 委譲先**: deterministic 11 項目の該当処理と委譲先 script・Custom Tool の実名（委譲先未整備は「債務」と明記し、実在しない script 名を記載しない）
+- **意味判断担当**: 該当する判断単位（閉じた意味評価・開いた推論。0 件可）
+- **決定的処理委譲先**: 決定的処理として委譲する処理と委譲先 script・Custom Tool の実名（委譲先未整備は「債務」と明記し、実在しない script 名を記載しない）
 - **知識提供**: 判定基準・手続き・様式・選定規則など、一次情報として提供する知識
 
 テンプレート自身の区分は次のとおり。
 
-- **semantic 担当**: 0 件（雛形）
-- **deterministic 委譲先**: なし
+- **意味判断担当**: 0 件（雛形）
+- **決定的処理委譲先**: なし
 - **知識提供**: テンプレート様式

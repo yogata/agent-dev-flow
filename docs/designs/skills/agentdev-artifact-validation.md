@@ -92,8 +92,8 @@ REQ 固有 script は `agentdev-req-file-manager`、Decision 固有 script は `
 
 ## v4 責務分類
 
-ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+ADF v4 の責務分類（正典: DEC-048、foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節）における本 Design の 3 区分（意味判断担当〔閉じた意味評価・開いた推論を所有〕/ 決定的処理委譲先 / 知識提供）。語彙の正本は foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節であり、本節はその確定値を記録する。
 
-- **semantic 担当**: 0 件
-- **deterministic 委譲先**: validation → scripts/src/check-change-impact.ts・check-entry-existence.ts・check-frontmatter-consistency.ts
+- **意味判断担当**: 0 件
+- **決定的処理委譲先**: validation → scripts/src/check-change-impact.ts・check-entry-existence.ts・check-frontmatter-consistency.ts
 - **知識提供**: 公開検証契約（I/O・JSON 結果）
