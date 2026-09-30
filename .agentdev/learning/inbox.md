@@ -74,3 +74,18 @@
 - **想定反映先**: check_integrity.test.ts（timeout 値調整）、checker 実行契約と検出基盤規則 Design（実行時間観点の注記要否判断）
 - **関連**: Case #3248 case-close 対応記録コメント（full integrity suite 実測・fail 分類記録済み）
 - **タグ**: `#integrity` `#bun-test` `#timeout` `#環境依存` `#case-close`
+
+## 2026-09-30 case-run（Case #3243・PR #3272 Findings 由来）: worktree 環境での git stash pop 事故を防ぐ（一時状態切替は stash を使わず git show で）
+
+- **問題事象**: stash は refs/stash としてリポジトリ全体（全 worktree 共通）に保存されるため、worktree から `git stash pop` を実行すると他環境（main 等）で作成された stash を pop し得る。本件では worktree 内検証での `git stash push`（pathspec を worktree サブディレクトリから相対指定して失敗）に続く `git stash pop` が main 環境の stash「unrelated local changes before .agentdev persist」を pop し、AGENTS.md / REQ-0134.md / REQ-0141.md にコンフリクトを発生させた。stash entry は pop 失敗時に kept され損失はなかったが、復旧手順（HEAD への checkout + `git rm -f` による modify/delete 解消、stash entry の kept 維持）を要した。
+- **発生局面**: case-run（実現面検証。Case #3243 DEL-3243-1）
+- **検知方法**: git stash pop のコンフリクト出力（modify/delete 衝突）
+- **根本原因**: stash のリポジトリ全体共有性（worktree ローカルではなく refs/stash 共通）の理解不足と、pathspec 相対指定失敗後の pop 実行
+- **ユーザー確認有無**: なし（stash entry は kept 維持・データ損失なし）
+- **Decision/REQ/spec影響**: なし（運用改善）
+- **横展開観点**: worktree 内検証での一時状態切替は stash を使わず、単一ファイルの base 比較には `git show <ref>:<path>` による内容取得を推奨。baseline 系比較は detached worktree（stash 不使用）の標準手順（agentdev-git-worktree worktree-operations「git stash 運用手順（一時退避）」の detached worktree 標準手順）と整合
+- **再発条件**: worktree 内から git stash pop を実行した場合（他環境の stash entry が存在する場合）
+- **予防策候補**: worktree 内の検証手順（case-run / case-close の STEP 契約・reference）に「stash 不使用・git show による base 比較」の規定を明示する（agentdev-git-worktree の detached worktree 標準手順への統一誘導）
+- **想定反映先**: src/opencode/skills/agentdev-git-worktree/references/worktree-operations.md「git stash 運用手順（一時退避）」節、case-run / case-close の検証手順 reference
+- **関連**: PR #3272 本文「Findings / Capture候補」learning 項、docs/knowledge/windows-powershell-bulk-io-corruption.md（PowerShell 経由の証跡退避禁止規約と同時期に運用）
+- **タグ**: `#git` `#worktree` `#stash` `#case-run`
