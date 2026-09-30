@@ -89,3 +89,19 @@
 - **想定反映先**: src/opencode/skills/agentdev-git-worktree/references/worktree-operations.md「git stash 運用手順（一時退避）」節、case-run / case-close の検証手順 reference
 - **関連**: PR #3272 本文「Findings / Capture候補」learning 項、docs/knowledge/windows-powershell-bulk-io-corruption.md（PowerShell 経由の証跡退避禁止規約と同時期に運用）
 - **タグ**: `#git` `#worktree` `#stash` `#case-run`
+
+## 2026-09-30 case-open（RU-0147 再実行）: issue_list search トークンの正規化不一致で冪等検出が偽陰性（空の成功応答）になる
+
+- **問題事象**: agentdev_gh issue_list の search トークン `ru0147`（小文字・ハイフン無し結合形）が、既存 Root Case #3245（タイトル「case-open: RU-0147 untracked 競合の安全解消手順を case-close STEP-6-3-1 へ追記（REQ-032）」）に一致せず、state open/closed とも成功応答・空配列で帰着した。エラーではなく「不存在」の偽陰性であるため、このまま進めると 2 件目の Root Case を重複生成する危険があった。unfiltered issue_list（state=open、ラベル指定なし）で #3245 を検出し回復した。
+- **発生局面**: 運用（case-auto 内部 lifecycle case-open 再実行委譲。STEP-5 冪等検出の既存 Root Case 検出）
+- **検知方法**: 空結果を不存在の証拠とせず、状態フィルタ・ラベル指定なしの issue_list 全量取得で突合し直したところ #3245 を発見（成功応答の空配列と実体の不一致）
+- **根本原因**: GitHub search API（search/issues in:title）のトークン化は `RU-0147` を `ru` / `0147` 等に分割し、ハイフン無し結合形 `ru0147` とは一致しない。ハイフン・番号入り識別子を小文字結合形に正規化して search に渡すと偽陰性になる。なお同観測内で issue_list は `state: "all"` を受付ず open/closed 個別指定のみ有効（構造化失敗で即検知できるため被害は限定的）という契約差も確認
+- **自律対応内容**: search トークンの信頼を放棄し、open Issue 全量を issue_list で取得して case_ref 突合で冪等検出をやり直し、既存 Root Case #3245 を再利用判定（重複生成回避）。既存 Definition PR も `gh pr list --head definition/issue-3245` で 0 件確認し、不足分なしを確定
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（issue-operation-safety.md の search トークン選択性指針の適用事例の追補候補。新規 Decision/REQ 変更は不要）
+- **横展開観点**: 冪等キー語がハイフン入り識別子（RU-NNNN、REQ-NNNN 等）の場合、search は (1) ハイフン無し結合形、(2) トークン分割形（`0147` 等の番号部単独）、(3) topic_slug 等の別系統語の複数形で試行するか、母集団が小さい場合は unfiltered issue_list 突合へ切替する。空配列の成功応答は「不存在の証拠」ではなく「検索方式の証拠」として扱い、突合方式を変えて再確認してから不存在と判定する
+- **再発条件**: ハイフン・番号入り識別子（RU-NNNN 等）を小文字結合形に変換して issue_list search に渡し、既存 Issue のタイトルがトークン分割形（`RU-0147`）で表記されている場合
+- **予防策候補**: issue-operation-safety.md「issue_list の絞り込み規律と上限到達時 contingency」節に、ハイフン入り識別子の正規化形トークン不一致による偽陰性の注意と、空結果時の unfiltered 突合 fallback（母集団少数リポジトリで有効）を追記する
+- **想定反映先**: src/opencode/skills/agentdev-issue-management/references/issue-operation-safety.md「issue_list の絞り込み規律と上限到達時 contingency」節
+- **関連**: Case #3245（既存 Root Case。タイトルに RU-0147 を含む）、src/opencode/skills/agentdev-issue-management/references/issue-operation-safety.md 同節、Issue #3256 補足情報の冪等検出記録（topic_slug search で 0 件帰着の前例）
+- **タグ**: `#agentdev_gh` `#issue_list` `#冪等検出` `#search-token` `#case-open`
