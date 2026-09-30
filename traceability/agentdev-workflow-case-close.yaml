@@ -2,6 +2,7 @@ component: agentdev-workflow-case-close
 implementation:
   src/opencode/skills/agentdev-workflow-case-close/references/cleanup-and-capture.md:
     - REQ-018-008
+    - REQ-032-007
     - REQ-032-027
     - REQ-032-029
   src/opencode/skills/agentdev-workflow-case-close/references/docs-and-design-promotion.md:
