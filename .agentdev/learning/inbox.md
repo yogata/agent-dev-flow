@@ -133,3 +133,20 @@
 - **想定反映先**: docs/designs/responsibilities/custom-tool-contracts.md（agentdev_gh 操作契約の contingency）、REQ-093 関連診断 reference
 - **関連**: Case #3278（case-ready 段階で infra-transient 停止・payload 退避済み）、commit 97ee6a74（同種観測の learning）、PR #3279（merge 待ち・merge 可能状態 CLEAN 確認済み）
 - **タグ**: `#agentdev_gh` `#gh-exit-66` `#infra-transient` `#case-ready` `#冪等再開`
+
+## 2026-10-01 case-run（Case #3278 Epic #3280 Wave 1 #3281）: serve 全体の gh exit 66 劣化で write-proxy 実行経路が二重に遮断された観測
+
+- **問題クラス**: 外部依存障害（harness/Custom Tool 基盤の劣化サイクル）＋ 統制設計の相互作用
+- **問題事象**: case-run 委譲（DEL-3281-1）で実装・全検証（TS-004/TS-021/TS スライス、textlint 544件 0違反、traceability check、UTF-8、AUTOGEN）が完了し pr_create のみが残る状態で、実行担当サブエージェント・親（Supervisor）両コンテキストの agentdev_gh が同一 serve 起因の gh exit 66（stderr 空）で全呼出失敗（親4/4・子も失敗）。Supervisor write-proxy として手動 gh api --input での代行を試みたところ、リポジトリの agentdev-gh-write-guard が raw gh WRITE を構造的に阻止（fail-closed 設計・迂回禁止）。結果、GitHub 書き込み経路が「正規 Tool の劣化」と「代替手動経路の guard 遮断」の二重で遮断され、serve 再起動以外の回復手段が存在しないことが確定した
+- **発生局面**: case-run（case-auto orchestration stage 3・Epic Wave 1 子Issue の PR 作成段階）
+- **検知方法**: 親・子両 session での agentdev_gh 失敗（gh exit 66・stderr 空）＋ write-guard のブロック応答（"blocked a raw gh WRITE command"）＋ 環境分離実測（ユーザ shell から gh CLI 直接触発・node spawnSync・bun spawnSync はすべて exit 0 で正常。serve 外では再現せず、serve プロセス内部の child spawn 劣化に局在）
+- **根本原因**: serve プロセス内部の gh child spawn 劣化（gh.exe・認証・Bun・ローカル環境はすべて健全。全セッションが同一 serve を共有するため親子で同時失敗）。write-guard は仕様どおり動作（GitHub 副作用の Custom Tool 一元化の強制）であり、障害ではなく設計された境界
+- **自律対応内容**: 実行担当サブエージェントが worktree の .agentdev/tmp/ へ proxy request package（exact operation・PR title/body・事前条件・read-back 期待値）と PR 本文を永続化し result=blocked で引き渡し。Supervisor が同 package を .agentdev/drafts/proxy-request-case-run-3281.md へ byte-exact アセンブルして git 永続化（case-ready 段階の commit 319ee3c6 と同パターン）。serve 再起動後の resume は package の pr_create 1呼出で完了する状態を構築して停止
+- **ユーザー確認有無**: なし（infra-transient・運用上の前提不足として停止。HITL 該当なし）
+- **Decision/REQ/spec影響**: なし（write-guard の fail-closed 設計は維持。guard のブロックは迂回せず標準手段〔agentdev_gh〕への復帰待ちとして扱った）
+- **横展開観点**: serve 劣化中は親・子・委譲先の全 agentdev_gh が同時失敗するため、「子 → Supervisor write-proxy」の委譲だけでは回復しない（Supervisor の Tool も同一 serve 由来）。回復単位は serve 再起動。多段 pipeline の各段は gh 呼出を要するため、劣化検知時は早期に payload 永続化へ切替えて呼出を無駄に消費しない。また gh 呼出不要の作業（検証・本文作成・AUTOGEN）を先に完了させる委譲順序（本事例の実行担当の対応）が resume コストを最小化する
+- **再発条件**: serve が gh exit 66 劣化状態にある間に GitHub 副作用操作（pr_create 等）が必要になった場合
+- **予防策候補**: agentdev_gh の gh spawn 異常（exit 66・stderr 空）検出時の serve 内自動回復（gh spawn の内部 respawn）の導入検討、または REQ-093 診断手順への「serve 全体劣化の確認は親子両コンテキストでの失敗一致で判定する」追記候補
+- **想定反映先**: docs/designs/responsibilities/custom-tool-contracts.md（agentdev_gh 操作契約の contingency・gh spawn 異常時の扱い）、REQ-093 関連診断 reference
+- **関連**: Case #3278・Issue #3281（Epic #3280 Wave 1）・commit 319ee3c6（case-ready 段階の proxy package 永続化前例）・commit 97ee6a74 / e541536c（gh exit 66 劣化サイクルの先行観測）・.agentdev/drafts/proxy-request-case-run-3281.md（本件の永続化 payload）
+- **タグ**: `#agentdev_gh` `#gh-exit-66` `#write-guard` `#infra-transient` `#case-run` `#write-proxy`
