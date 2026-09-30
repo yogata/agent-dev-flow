@@ -121,3 +121,15 @@
 - **想定反映先**: src/opencode/skills/agentdev-issue-management/references/issue-operation-safety.md「issue_list の絞り込み規律と上限到達時 contingency」節
 - **関連**: Case #3245（既存 Root Case。タイトルに RU-0147 を含む）、src/opencode/skills/agentdev-issue-management/references/issue-operation-safety.md 同節、Issue #3256 補足情報の冪等検出記録（topic_slug search で 0 件帰着の前例）
 - **タグ**: `#agentdev_gh` `#issue_list` `#冪等検出` `#search-token` `#case-open`
+## 2026-10-01 gh exit 66 劣化が起動直後～2呼出以内に発生した観測（case-ready 段階・Case #3278）
+
+- **問題クラス**: 外部依存障害（harness/Custom Tool 基盤の劣化サイクル）
+- **観測内容**: case-auto case-ready 段階の委譲実行において、serve 起動直後（window 消化 ~2 呼出と報告された直後）の最初の agentdev_gh pr_read が gh exit 66（stderr 空・起動環境失敗）で失敗し、1回の契約再試行でも同様に失敗。case-open STEP-6 学び（commit 97ee6a74）の「serve 再起動後も約8呼出で再発する劣化サイクル」に対し、**再起動後の窓が想定より短い（~2 呼出程度で枯渇し得る）**ことを示す反証データ。多段 lifecycle の各段が gh 呼出を9〜10件必要とする場合、1 窓で完結しない設計は中断→冪等再開の繰返しが常態化する
+- **ユーザー確認有無**: なし（blocked 判定・infra-transient 分類で停止。HITL 該当なし）
+- **Decision/REQ/spec影響**: なし（運用観測。gh-direct-invocation 統制・手動 WRITE 禁止契約は維持）
+- **横展開観点**: stage 委譲側は gh 呼出数を事前に見積もり、窓枯渇を前提に「最も価値ある durable state 先行」（merge → Issue 生成 → 状態遷移の順）で呼出を順序付ける。payload の永続化（Issue 本文・resume plan をリポジトリ外恒久領域へ退避）により、中断後 resume は payload 再利用で再構成コストを最小化できる
+- **再発条件**: serve 再起動直後の agentdev_gh 呼出で gh exit 66 が発生した場合（劣化が呼出数でなく時間経過・プロセス状態に依存する可能性）
+- **予防策候補**: agentdev_gh 側の gh spawn プロセスプール再利用/再起動、または gh exit 66 検出時の serve 内自動回復（1回の内部 respawn）の導入検討。REQ-093 診断手順への「再起動直後でも発生し得る」追記候補
+- **想定反映先**: docs/designs/responsibilities/custom-tool-contracts.md（agentdev_gh 操作契約の contingency）、REQ-093 関連診断 reference
+- **関連**: Case #3278（case-ready 段階で infra-transient 停止・payload 退避済み）、commit 97ee6a74（同種観測の learning）、PR #3279（merge 待ち・merge 可能状態 CLEAN 確認済み）
+- **タグ**: `#agentdev_gh` `#gh-exit-66` `#infra-transient` `#case-ready` `#冪等再開`
