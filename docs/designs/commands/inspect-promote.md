@@ -2,11 +2,11 @@
 title: inspect-promote Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-20"
+updated: "2026-10-01"
 ---
 <!-- ADF-COVERS(implementation): REQ-015-005 -->
 <!-- ADF-COVERS(implementation): REQ-036-001, REQ-036-002, REQ-036-004, REQ-036-017, REQ-036-018, REQ-036-019, REQ-036-020, REQ-036-021, REQ-036-022 -->
-<!-- ADF-COVERS(implementation): REQ-003-055, REQ-003-056, REQ-036-004, REQ-036-017, REQ-036-018, REQ-036-019, REQ-036-020, REQ-036-021 -->
+<!-- ADF-COVERS(implementation): REQ-096-004, REQ-096-005, REQ-096-006, REQ-096-018, REQ-096-022, REQ-036-004, REQ-036-017, REQ-036-018, REQ-036-019, REQ-036-020, REQ-036-021 -->
 
 # inspect-promote Design
 
@@ -73,15 +73,15 @@ updated: "2026-09-20"
 
 ## 自律確定の判定位置とHITLフォールバック（新規セクション）
 
-本節は inspect-promote における自律確定の判定位置とHITLフォールバックの実行詳細を所有する。判断確定の境界は REQ-003-055 の共通原則に従い、詳細判定表は HITL 境界契約Design（v4-responsibility-boundaries）が集約所有する（本 Design と Workflow Skill は同一内容を重複保持しない）。
+本節は inspect-promote における自律確定の判定位置とHITLフォールバックの実行詳細を所有する。判断確定の境界は REQ-096（ADF判断アーキテクチャ）の共通原則に従い、詳細判定表は v4-responsibility-boundaries Design（ADF判断アーキテクチャ詳細基準節）が集約所有する（本 Design と Workflow Skill は同一内容を重複保持しない）。
 
 ### 分類・検証・adversarial-review 後の自律確定判定の挿入位置
 
-分類・検証を経て、必要な adversarial-review を実施した後、取得可能な根拠から promote / defer / reject を一意に確定できる検出事項はユーザー承認なしで確定する（REQ-036-018）。
+分類・検証を経て、必要な adversarial-review を実施した後、取得可能な根拠から promote / defer / reject を正規契約からの導出または委譲された裁量の範囲で確定できる検出事項はユーザー承認なしで確定する（REQ-036-018）。
 
 ### 部分自律確定の実行手順
 
-同一実行内に自律確定可能項目とユーザー判断必要項目が混在する場合、未決項目に依存しない項目を先行確定し、ユーザー判断必要項目のみ HITL 対象とする（REQ-003-056）。
+同一実行内に自律確定可能項目とユーザー判断必要項目が混在する場合、未決項目に依存しない項目を先行確定し、ユーザー判断必要項目のみ HITL 対象とする（REQ-096-005/006）。
 
 ### --auto fast path と通常経路の自律確定の区別
 
