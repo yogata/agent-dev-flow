@@ -112,7 +112,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-025](decisions/DEC-025.md) | プロジェクト知識を Capability Skill から分離し、独立した正規知識層として管理する |
 | [DEC-026](decisions/DEC-026.md) | 実現面変更方針の構造化ハンドオフ（realization_actions） |
 | [DEC-027](decisions/DEC-027.md) | 観測ベース統制縮小評価ループ |
-| [DEC-028](decisions/DEC-028.md) | 文章表層品質の共通実行基盤 |
+| [DEC-028](decisions/DEC-028.md) | 文章表層品質の共通実行基盤（superseded by DEC-047〔「配布前に依存を解決した成果物を供給し、導入先での追加パッケージ取得を必要としない」条項は DEC-047 が textlint guard 依存実体の配布供給の範囲で部分置換。DEC-016 維持宣言と他の決定は維持（status: accepted 維持）〕） |
 | [DEC-029](decisions/DEC-029.md) | 公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入（superseded by DEC-033） |
 | [DEC-030](decisions/DEC-030.md) | トレーサビリティ標準機能への一般化と producer / consumer 境界の確立（superseded by DEC-037） |
 | [DEC-031](decisions/DEC-031.md) | ADF v4 Standard Operating Model の採用とプロセス・実装の責務分離 |
@@ -124,7 +124,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-037](decisions/DEC-037.md) | Traceability の Change / Evidence 中心への再中心化 |
 | [DEC-038](decisions/DEC-038.md) | ADF v4 durable state 配置と再構成の契約（状態権威・証跡分離・非原子調整原則） |
 | [DEC-039](decisions/DEC-039.md) | ADF v4 authority・副作用統制と冪等・並行性モデル |
-| [DEC-040](decisions/DEC-040.md) | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化）（superseded by DEC-044〔決定4 部分置換。決定1〜3は維持〕） |
+| [DEC-040](decisions/DEC-040.md) | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化）（superseded by DEC-044〔決定4 は DEC-044 が置換。決定2 は DEC-046 が置換。決定1・3は維持〕） |
 | [DEC-041](decisions/DEC-041.md) | Wave 構成純度と実行並列上限の単一所有 |
 | [DEC-042](decisions/DEC-042.md) | case-auto 最大並列維持と同期逐次フォールバック禁止 |
 | [DEC-043](decisions/DEC-043.md) | case-ready 実行構造判断への Jev 最終判断採用（Stage 2: 閾値ルーティング）（superseded by DEC-044〔本 Decision の決定（Stage 2: 閾値ルーティングによる Jev 最終判断採用）は DEC-044（基本判断経路への復帰）が置換する〕） |

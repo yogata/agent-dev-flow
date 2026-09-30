@@ -88,7 +88,6 @@ import {
   README_REQ_SUMMARY_COUNT_BLOCK_ID,
   README_DECISION_SUMMARY_TABLE_BLOCK_ID,
   generateReadmeReqSummaryCount,
-  extractDocsReadmeDecisionNotes,
   generateDocsReadmeDecisionTable,
 } from "./generate_indexes.ts";
 import {
@@ -9006,16 +9005,14 @@ function checkIndexGenerationConsistency(root: string): CheckResult[] {
       },
     ];
     // AG-005: Decision 静的表の AUTOGEN 生成（index-auto-generation.md
-    // 「docs/README.md Decision 静的表の AUTOGEN 生成」「notes 記法抽出合成」）。
-    // notes は docs/README.md 現行静的表から抽出するため、検証は README 内容
-    // が存在する場合のみ行う（初回 AUTOGEN 化後の永続契約）。
+    // 「docs/README.md Decision 静的表の AUTOGEN 生成」rule 6 恒常規則）。
+    // 注記文言のデータ源は superseded_by と supersede_note の両 frontmatter
+    // フィールドである（docs/README.md 現行静的表からの手動 notes 抽出は行わない）。
     if (findAutogenBlocks(docsReadmeContent).some((b) => b.id === README_DECISION_SUMMARY_TABLE_BLOCK_ID)) {
-      const docsReadmeNotes = extractDocsReadmeDecisionNotes(docsReadmeContent);
       docsReadmeSpecs.push({
         blockId: README_DECISION_SUMMARY_TABLE_BLOCK_ID,
         expected: generateDocsReadmeDecisionTable(
           collectDecisionFiles(decisionsDir),
-          docsReadmeNotes,
         ),
         label: "readme-decision-summary-table",
       });

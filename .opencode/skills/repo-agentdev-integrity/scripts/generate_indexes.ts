@@ -942,54 +942,25 @@ export const README_DECISION_SUMMARY_TABLE_BLOCK_ID =
   "readme-decision-summary-table";
 
 /**
- * docs/README.md「## Decision」セクションの Decision 表 title セル内 notes 記法
- * （〔...〕部分置換詳細注記、U+3014/U+3015）を抽出する
- * （index-auto-generation.md「docs/README.md Decision 表の notes 記法抽出合成」）。
- * extractRelatedReqNotes と同様の見出しスコープ方式で、AUTOGEN ブロック囲みの
- * 有無に依存せず抽出する（初回 AUTOGEN 化時の手動注記喪失防止対応）。
- */
-export function extractDocsReadmeDecisionNotes(
-  readmeContent: string,
-): Record<string, string> {
-  const notes: Record<string, string> = {};
-  const lines = readmeContent.split("\n");
-  let inSection = false;
-  const notesRe = /〔([^〕]*)〕/;
-  for (const line of lines) {
-    if (/^##\s+/.test(line)) {
-      inSection = /^##\s+Decision\s*$/.test(line.trim());
-      continue;
-    }
-    if (!inSection) continue;
-    const rowMatch = line.match(/^\|\s*\[(DEC-\d+)\]\([^)]*\)\s*\|/);
-    if (!rowMatch) continue;
-    const cells = line.split("|").map((c) => c.trim());
-    if (cells.length < 3) continue;
-    const m = cells[2].match(notesRe);
-    if (m) notes[rowMatch[1]] = m[1];
-  }
-  return notes;
-}
-
-/**
  * docs/README.md Decision 静的表（readme-decision-summary-table）の生成本体。
- * 「superseded by DEC-XXX」括弧注記は frontmatter superseded_by から導出し、
- * notes 記法（docs/README.md title セル手動注記を優先、frontmatter supersede_note
- * がフォールバック）を括弧注記の一部として title 直後に合成する。
+ * 「superseded by DEC-XXX」括弧注記は index-auto-generation.md「docs/README.md
+ * Decision 静的表の AUTOGEN 生成」rule 6 の恒常規則に従う。
+ * 適用条件は `superseded_by` frontmatter を持つ全 DEC 行（status によらない）、
+ * 注記文言のデータ源は `superseded_by` と `supersede_note` の両 frontmatter
+ * フィールドである。`supersede_note` を持つ DEC 行は、その内容を notes 記法〔...〕の
+ * 部分置換詳細注記として title 直後に展開する。
  * 表上部の件数 caption は生成対象外の手動残置（AG-005 既知限界）。
  */
 export function generateDocsReadmeDecisionTable(
   decisions: DecisionInfo[],
-  notes: Record<string, string>,
 ): string[] {
   const lines: string[] = [];
   lines.push("| Decision | タイトル |");
   lines.push("|---|---|");
   for (const info of decisions) {
     let titleCell = sanitizeTableCell(info.title);
-    if (info.status === "superseded" && info.supersededBy) {
-      const note = notes[info.id] ?? info.supersedeNote ?? null;
-      const notePart = note ? `〔${note}〕` : "";
+    if (info.supersededBy) {
+      const notePart = info.supersedeNote ? `〔${info.supersedeNote}〕` : "";
       titleCell += `（superseded by ${info.supersededBy}${notePart}）`;
     }
     lines.push(`| [${info.id}](decisions/${info.relPath}) | ${titleCell} |`);
@@ -1602,11 +1573,6 @@ RELATED:
     );
     process.exit(EXIT_ERROR);
   }
-  // notes 記法抽出（AG-005）: title セル手動注記を優先し、frontmatter
-  // supersede_note はフォールバック（generateDocsReadmeDecisionTable 内）。
-  const docsReadmeDecisionNotes = extractDocsReadmeDecisionNotes(
-    docsReadmeOriginal,
-  );
   let docsReadmeUpdated = docsReadmeOriginal;
   const docsReadmeReplacements: Record<string, string[]> = {
     [README_REQ_SUMMARY_COUNT_BLOCK_ID]: readmeReqSummary,
@@ -1616,7 +1582,6 @@ RELATED:
     ),
     [README_DECISION_SUMMARY_TABLE_BLOCK_ID]: generateDocsReadmeDecisionTable(
       decisionInfos,
-      docsReadmeDecisionNotes,
     ),
   };
   for (const blockId of docsReadmeExpectedIds) {
@@ -1653,7 +1618,7 @@ RELATED:
       `[generate_indexes] req-health-metrics: ${reqMetrics.length} REQs (measure date ${reqMeasureDate})`,
     );
     console.log(
-      `[generate_indexes] docs/README.md: REQ summary active=${reqInfos.length} retired=${reqRetiredInfos.length}, table=${reqActiveTable.length - 2} rows, Decision table=${decisionInfos.length} rows (notes=${Object.keys(docsReadmeDecisionNotes).length})`,
+      `[generate_indexes] docs/README.md: REQ summary active=${reqInfos.length} retired=${reqRetiredInfos.length}, table=${reqActiveTable.length - 2} rows, Decision table=${decisionInfos.length} rows`,
     );
     for (const u of updates) {
       console.log(`[generate_indexes] WOULD UPDATE: ${u.file}`);

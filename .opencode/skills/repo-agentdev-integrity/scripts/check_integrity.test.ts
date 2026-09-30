@@ -5851,23 +5851,20 @@ function buildRa005Fixture(root: string, staleBody: boolean): void {
     "utf-8",
   );
 
-  const table = generateDocsReadmeDecisionTable(
-    [
-      {
-        id: "DEC-9001",
-        num: 9001,
-        title: "RA-005 fixture Decision",
-        status: "accepted",
-        created: "2026-09-27",
-        filename: "DEC-9001.md",
-        relPath: "DEC-9001.md",
-        relatedReqs: null,
-        supersededBy: null,
-        supersedeNote: null,
-      } as never,
-    ],
-    {},
-  );
+  const table = generateDocsReadmeDecisionTable([
+    {
+      id: "DEC-9001",
+      num: 9001,
+      title: "RA-005 fixture Decision",
+      status: "accepted",
+      created: "2026-09-27",
+      filename: "DEC-9001.md",
+      relPath: "DEC-9001.md",
+      relatedReqs: null,
+      supersededBy: null,
+      supersedeNote: null,
+    } as never,
+  ]);
   const body = staleBody
     ? [...table.slice(0, 2), "| [DEC-9999](decisions/DEC-9999.md) | stale row |"]
     : table;
