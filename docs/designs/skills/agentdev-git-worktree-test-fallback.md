@@ -57,10 +57,10 @@ main 等価再現の手順は次のとおりである。
 
 ## v4 責務分類
 
-ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+ADF v4 の責務分類（正典: DEC-048、foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節）における本 Design の 3 区分（意味判断担当〔閉じた意味評価・開いた推論を所有〕/ 決定的処理委譲先 / 知識提供）。語彙の正本は foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節であり、本節はその確定値を記録する。
 
-- **semantic 担当**: 0 件
-- **deterministic 委譲先**: path safety 契約（junction 未設定時 fallback・契約検証は repo-local test）
+- **意味判断担当**: 0 件
+- **決定的処理委譲先**: path safety 契約（junction 未設定時 fallback・契約検証は repo-local test）
 - **知識提供**: 構造的制約の明示
 
 本 Design に対応する配布 skill は存在しない（個別様式・AG-015）。本節は worktree 構造系テスト fallback 契約としての分類を記録する。

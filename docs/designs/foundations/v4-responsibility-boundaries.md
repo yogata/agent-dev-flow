@@ -1,5 +1,5 @@
 ---
-title: ADF v4 実装責務境界（semantic Skill / deterministic code / Harness adapter / Project Extensions）
+title: ADF v4 実装責務境界（意味判断 Skill / 決定的処理 code / Harness adapter / Project Extensions）
 status: accepted
 created: 2026-09-18
 updated: 2026-10-01
@@ -7,21 +7,21 @@ updated: 2026-10-01
 <!-- ADF-COVERS(implementation): REQ-003-021, REQ-003-022, REQ-003-023 -->
 <!-- ADF-COVERS(design): REQ-096-001, REQ-096-002, REQ-096-003, REQ-096-004, REQ-096-005, REQ-096-006, REQ-096-007, REQ-096-008, REQ-096-009, REQ-096-010, REQ-096-011, REQ-096-012, REQ-096-013, REQ-096-014, REQ-096-015, REQ-096-016, REQ-096-017, REQ-096-018, REQ-096-019, REQ-096-020, REQ-096-021, REQ-096-022, REQ-096-023, REQ-096-024, REQ-096-025, REQ-096-026, REQ-096-027, REQ-096-028, REQ-096-029, REQ-096-030 -->
 
-# ADF v4 実装責務境界（semantic Skill / deterministic code / Harness adapter / Project Extensions）
+# ADF v4 実装責務境界（意味判断 Skill / 決定的処理 code / Harness adapter / Project Extensions）
 
 位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）までは v3 を正とする。当該段階での置換実行をもって権威は本 Design へ移行する。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施する。
 
-## semantic / deterministic 責務境界
+## 意味判断・決定的処理の責務境界
 
-semantic 責務と deterministic 責務の分類基準と、現行 Skill の再分類判定基準。
+判断方法の分類基準（判断方法3分類: 決定的処理・閉じた意味評価・開いた推論。正典: DEC-048）と、現行 Skill の再分類判定基準。旧 DEC-036 決定(1) の semantic 6 項目・deterministic 11 項目列挙の後継と写像は本 Design「v4 責務分類語彙の後継」節が所有する。
 
-- semantic 責務（Skill が所有）: requirement analysis、architecture/design judgment、decomposition judgment、adversarial review、learning evaluation、semantic classification（6 項目）
-- deterministic 責務（code/script/tool が所有）: parsing、validation、ID 採番、状態遷移、dependency graph、Wave scheduling、path safety、traceability extraction、evidence aggregation、API I/O、file transformation（11 項目）
+- 意味判断（Skill が所有）: 閉じた意味評価・開いた推論として所有する判断。旧列挙 6 項目の写像は「v4 責務分類語彙の後継」節を参照
+- 決定的処理（code/script/tool が所有）: 入力と確定済み規則から一意に導出できる処理。旧列挙 11 項目の写像は「v4 責務分類語彙の後継」節を参照
 - Skill 数の削減自体を目的としない
 
 ## 知識提供層（3 区分の第3区分）
 
-semantic 6 項目にも deterministic 11 項目にも直接対応しない責務を「知識提供」層とする。判定基準・安全手続き・様式・選定規則などの知識を一次情報として提供し、workflow 制御も決定的処理の実行も所有しない。各 skill の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）への帰属は `designs/skills/` 各 Design の「v4 責務分類」節が記録する（分類語彙表は当該 Case の execution contract が確定する）。分類が確定しない項目は semantic 6 項目への該当性を優先して判定し、該当しない場合に知識提供層へ分類する。
+意味判断にも決定的処理にも直接対応しない責務を「知識提供」層とする。判定基準・安全手続き・様式・選定規則などの知識を一次情報として提供し、workflow 制御も決定的処理の実行も所有しない。各 skill の 3 区分（意味判断担当〔閉じた意味評価・開いた推論を所有〕/ 決定的処理委譲先 / 知識提供）への帰属は `designs/skills/` 各 Design の「v4 責務分類」節が記録する（語彙の正本は本 Design「v4 責務分類語彙の後継」節）。分類が確定しない項目は意味判断への該当性を優先して判定し、該当しない場合に知識提供層へ分類する。
 
 ## Harness / Backend adapter 境界
 

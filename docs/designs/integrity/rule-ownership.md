@@ -26,9 +26,9 @@ req-impact-map.md の配置の正本は `../responsibilities/req-impact-map.md` 
 
 対応関係の正規保存方式は、repository top-level の producer/project-side `traceability/` 配下の component / package 単位 sidecar である。ADF-COVERS（implementation / verification）は、producer-only artifact に対応関係を inline 保持する場合の表現形式とし、consumer distribution closure に含まれる成果物では使用しない。配布物（`src/opencode/commands/agentdev/**`、`src/opencode/skills/agentdev-*/**` 等の実行時配布 .md）には対応宣言を記述せず、当該成果物の対応関係は sidecar で保持する。docs 配下の正規成果物（command Design、skill Design 等のリポジトリ内部設計文書）と repo-local 実装（`.opencode/skills/repo-*` の scripts 等の配布対象外ファイル）は producer-only artifact であり、inline 宣言を保持できる。inline 宣言と sidecar は同じ論理的な対応関係へ正規化され、coverage / impact / check から同一に扱われる。本配置規則により、配布物の concrete ID 排除（配布境界 baseline）と producer-side traceability metadata の非混入（distribution purity）を両立する。
 
-## semantic / deterministic 分類注記（DEC-036）
+## 意味判断・決定的処理の分類注記（DEC-048）
 
-各ルールドメインの正規所有者の所在は、DEC-036 の責務分類（semantic 6 項目・deterministic 11 項目）に従って読む。判定基準・運用規則の意味契約は Design または Skill の知識（semantic 側）が、checker 実体・採番・整合検査・機械分類（check_extensions.ts deriveSkillClassification 等）の決定的処理は script / repo-local checker（deterministic 側）が所有する。正典は DEC-036 と `../foundations/v4-responsibility-boundaries.md`（知識提供層の定義を含む 3 区分）である。v4 分類軸を検査する新規 checker は現段階で作らない（第13段 full validation で再評価する）。
+各ルールドメインの正規所有者の所在は、判断方法3分類（決定的処理・閉じた意味評価・開いた推論。正典: DEC-048、`../foundations/v4-responsibility-boundaries.md`「v4 責務分類語彙の後継」節）に従って読む。判定基準・運用規則の意味契約は Design または Skill の知識（意味判断側）が、checker 実体・採番・整合検査・機械分類（check_extensions.ts deriveSkillClassification 等）の決定的処理は script / repo-local checker が所有する。v4 分類軸を検査する新規 checker は現段階で作らない（第13段 full validation で再評価する）。
 
 ## ルールドメイン一覧
 

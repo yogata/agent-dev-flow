@@ -125,8 +125,8 @@ pass_criteria が「存在」「変更」を検証する場合、対象に応じ
 
 ## v4 責務分類
 
-ADF v4 の責務分類（正典: DEC-036、foundations/v4-responsibility-boundaries Design）における本 Design の 3 区分（semantic 担当 / deterministic 委譲先 / 知識提供）。分類の正本は Root Case #3011 の分類語彙表であり、本節はその確定値を記録する。
+ADF v4 の責務分類（正典: DEC-048、foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節）における本 Design の 3 区分（意味判断担当〔閉じた意味評価・開いた推論を所有〕/ 決定的処理委譲先 / 知識提供）。語彙の正本は foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節であり、本節はその確定値を記録する。
 
-- **semantic 担当**: requirement analysis
-- **deterministic 委譲先**: なし
+- **意味判断担当**: requirement analysis
+- **決定的処理委譲先**: なし
 - **知識提供**: 要件品質基準・Decision 閾値判断

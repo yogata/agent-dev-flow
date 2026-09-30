@@ -153,7 +153,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [workflows/capture-boundaries.md](workflows/capture-boundaries.md) | accepted | キャプチャ境界 | intake / learning 境界、Split Rule、PR 本文永続チャネル |
 | [workflows/references/execution-unit-construction.md](workflows/references/execution-unit-construction.md) | accepted | execution_unit 構成アルゴリズム参照 | v4-standard-lifecycle（語彙）と case-ready Design（運用主体）から参照される連結成分アルゴリズム、3軸判断モデルの機械的判定手順 |
 | [workflows/v4-standard-lifecycle.md](workflows/v4-standard-lifecycle.md) | accepted | ADF v4 標準ライフサイクル | v4 標準ライフサイクルの定義（work_type/scale/Epic/Wave の語彙直交性、公開 UX 2入口収斂と内部 lifecycle への回収、req-define 入口の入力意味、継続コラボレーションループ） |
-| [workflows/v4-lifecycle-state-machine.md](workflows/v4-lifecycle-state-machine.md) | accepted | ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応） | v4 ライフサイクル状態機械の定義（durable state enum と runtime 実行状態の二層モデル、階層合成〔子=実状態、上位=導出投影〕、deterministic/semantic gate 分離、v3 command と内部状態遷移の対応表、v3 状態関連 Design の planned supersede 記録） |
+| [workflows/v4-lifecycle-state-machine.md](workflows/v4-lifecycle-state-machine.md) | accepted | ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応） | v4 ライフサイクル状態機械の定義（durable state enum と runtime 実行状態の二層モデル、階層合成〔子=実状態、上位=導出投影〕、決定的処理・意味判断の gate 分離、v3 command と内部状態遷移の対応表、v3 状態関連 Design の planned supersede 記録） |
 | [workflows/v4-collaboration-loop.md](workflows/v4-collaboration-loop.md) | accepted | ADF v4 継続コラボレーションループ | 循環の各段責務（Observe・Integrate 定義、実現手段対応表）、Learning 評価結果 7 系統、昇格ガード、.agentdev/ 状態領域の整合、v3 backlog-artifact-lifecycle Design からの吸収 |
 
 ### 基盤 Design 一覧（6 ドメイン配下）
@@ -179,7 +179,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | foundations/harness-separation-model.md | accepted | harness 分離モデル | 配布物と harness 実行制御の責務分離モデル。配布物の大多数を harness 非依存とし、依存具体を references/ へ集約 |
 | foundations/references/concrete-abstraction.md | accepted | 配布物具体参照の抽象化参照 | 配布物から harness 固有・実装固有の具体を抽象化する手順の参照。harness-separation-model.md、responsibility-boundary-purification.md から参照される |
 | foundations/v4-operating-model.md | accepted | ADF v4 Operating Model | v4 の目的・適用範囲・標準語彙・プロセス/実装分離原則、三層責務モデル（ADF Runtime / Standard Operating Model / Project Model）、Project Contract の論理ビュー、8 情報寿命モデル、中核文書モデル（REQ/Decision/Design/Implementation/Evidence）の定義 |
-| foundations/v4-responsibility-boundaries.md | accepted | ADF v4 実装責務境界 | semantic Skill / deterministic code / Harness adapter / Project Extensions の実装責務境界（semantic 6 項目・deterministic 11 項目の分類基準、OpenCode first-class reference harness、semantic extension point）の定義 |
+| foundations/v4-responsibility-boundaries.md | accepted | ADF v4 実装責務境界（意味判断 Skill / 決定的処理 code / Harness adapter / Project Extensions） | 意味判断 Skill / 決定的処理 code / Harness adapter / Project Extensions の実装責務境界（判断方法3分類〔決定的処理・閉じた意味評価・開いた推論〕の分類基準、OpenCode first-class reference harness、semantic extension point）の定義 |
 | foundations/v4-traceability-model.md | accepted | ADF v4 Traceability モデル | Change / Evidence 中心の Traceability モデル（4 問いへの回答能力、永続情報と導出可能情報の分離、global completeness の位置づけ）の定義 |
 | foundations/v3-v4-crosswalk.md | accepted | v3 -> v4 Concept / Artifact Crosswalk | v3 成果物の v4 での処遇の正規記録先（3 列 schema〔意味処遇・帰属・実行段階〕、処遇実行原則〔living tracking〕、段階割当規則、集約サマリ）。処遇の完全一覧は references/crosswalk-inventory.md が所有する（references/ は親 Design 行の備考欄で言及）。実際の置換・廃止は後続 v4 Implementation Sequence で実行 |
 | foundations/v4-migration-and-release.md | accepted | ADF v4 Migration と Release の標準境界 | 標準 migration pattern（非破壊移行原則）、RC tag 運用と cutover sequence、pilot migration と v4.0.0 final 条件、v3-baseline と rollback anchor、後続 v4 Implementation Sequence の定義 |
