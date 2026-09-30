@@ -29,6 +29,22 @@
 - **関連**: src/opencode/skills/agentdev-issue-management/references/issue-operation-safety.md「起動環境障害の known-issues」節、docs/requirements/REQ-093.md、src/opencode/tools/agentdev-gh/runner-cli.ts failFromExec、同バッチ RU-0136 case-open の同一障害エントリ（本ファイル直前）
 - **タグ**: `#agentdev_gh` `#起動環境障害` `#case-open` `#blocked` `#冪等検出`
 
+## 2026-10-01 case-open（Case #3278 / REQ-096 ADF判断アーキテクチャ）: gh exit 66 が serve 再起動後も約8呼出で再発する劣化サイクルの観測と、多段 lifecycle を跨ぐ冪等再実行の実効性
+
+- **問題事象**: 単一 Case の case-open（Root Case #3278 作成 → Definition PR #3279 作成）を3つの harness ウィンドウに跨いで実行したところ、gh exit 66（stderr 空・全操作対象）が serve 再起動による回復後も再発するサイクルを観測。window 1: issue_create ×2 失敗で blocked。window 2: 回復→issue_create/issue_update 成功後、issue_list（network error へ遷移）→再劣化で pr_create ×2 失敗。window 3: 回復→pr_create 成功→issue_update ×2 失敗。Supervisor 観測では plugin host が約8 gh spawn/serve 再起動で劣化するパターン。Tool 内 VERIFY（read-back）により実質1操作が2〜3 spawn を消費するため、実効呼出数はさらに少ない
+- **発生局面**: case-auto 内部 lifecycle case-open 委譲（STEP-2 issue_create、STEP-4 pr_create と直後の Definition PR 記載埋め戻し issue_update）
+- **検知方法**: agentdev_gh の構造化失敗応答（gh exit 66・stderr 空）と、gh CLI 単体実測（bash で auth/repo view/issue list/pr list すべて正常）による分離。failure detail の fallbacks フィールド（読取: canContinue true + gh CLI 手動実行 / 書込: fallbacks 空・canContinue false）で操作種別ごとの継続可否を機械的に判別
+- **根本原因**: harness（OpenCode plugin host）プロセス内の gh spawn 起動環境が呼出回数に依存して劣化する状態（REQ-093 既知事象の新パターン。前例〔RU-0136/0149〕は恒常的起動不能だったが、今回は「回復→約8呼出で再劣化」の反復サイクル）。harness 側責務であり ADF 配布物の修正対象ではない
+- **自律対応内容**: (1) 各ウィンドウで contract どおり同一操作 1 回再試行まで実施し、2 連続失敗で即 blocked（無駄な再試行をしない）。(2) 副作用操作の代替なし・fail-closed 契約を維持し手動 gh WRITE を行わない（write-guard も物理的にブロック）。(3) 各 blocked 時点で PR 残骸不在を head branch 検索で確認してから停止（重複生成予防）。(4) 再開時は永続化済み payload（`.agentdev/tmp/root-case-body.md`、`.agentdev/tmp/pr-body-3278.md`）で本文を再構成せず冪等再実行。(5) 横断依存検査エンジン等 gh 非依存タスクを blocked 報告前に完了させ、gh 再開後の残タスクを最小化
+- **ユーザー確認有無**: なし（blocked 報告と Supervisor による harness 再起動のみ）
+- **Decision/REQ/spec影響**: なし（REQ-093・issue-operation-safety.md 既知事象の適用範囲。劣化サイクルの定量観測は known-issues「観測 known-issues」節の蓄積候補）
+- **横展開観点**: (a) gh exit 66 は「恒常的障害」だけでなく「serve 再起動後も呼出数に比例して再発する劣化」の形をとり得る。長い workflow（Issue 作成 → docs 実装 → PR 作成 → 埋め戻し）では途中で再 blocked を前提にし、gh 呼出を契約必須分だけに絞る。（b) blocked 時に payload ファイル（Issue/PR 本文）を gitignore 済み一時領域へ保存しておくと、再開ウィンドウでの再構成コストがゼロになり、限られた gh 呼出予算を副作用操作に全振りできる。（c) Tool 内 VERIFY で 1 操作が複数 gh spawn を消費するため、呼出数ベースの予算見積りでは成功応答数ではなく spawn 数で数える。（d) gh 非依存の残タスク（横断依存検査エンジン、learning capture のファイル保存と git 永続化）は gh 予算枯渇後でも完了できるため、gh 依存タスクを先に確定させる順序が有効
+- **再発条件**: plugin host の gh spawn 起動環境が呼出数に依存して劣化する serve 状態で、複数 gh 操作を要する workflow を実行した場合
+- **予防策候補**: case-auto orchestrator が委譲前疎通確認に加え、workflow 内の gh 呼出を（1）冪等再実行可能な最小副作用単位に分割し（2）各副作用直後に durable state（Issue 本文埋め戻し、payload ファイル）を更新する手順の運用周知。劣化サイクルの定量（約8 spawn/serve）は harness 側観測として REQ-093 の観測 known-issues への蓄積候補
+- **想定反映先**: issue-operation-safety.md「観測 known-issues」節（劣化サイクルパターン）、REQ-093 の運用観測蓄積
+- **関連**: 本ファイル直上の RU-0136/RU-0149 エントリ（恒常的起動不能パターン）、Case #3278 実行記録（Root Case 本文補足情報「GitHub I/O 起動環境障害記録」・Definition PR #3279 本文テスト結果）、`.agentdev/tmp/root-case-body.md`・`.agentdev/tmp/pr-body-3278.md`（payload 保存実例）
+- **タグ**: `#agentdev_gh` `#起動環境障害` `#劣化サイクル` `#case-open` `#definition-pr` `#冪等再実行` `#payload永続化`
+
 ## 2026-09-30 case-run（Case #3252・PR #3267 Findings 由来）: verify-only closure 候補の委譲前に RA 単位の実施状態を実測確認してから経路を選択すべき
 
 - **問題事象**: verify-only closure 前提の委譲コンテキスト（structured_context）が「実装済み・main merge 済み」と要約していたが、RA-001 は Definition PR #3255 に含まれず case-run 未実施だった。TS-001 初回検証で移管註不在を検出し fix-and-reverify（PR #3267）で解消。検証が RA の不在を確実に検出したため実害は回避されたが、委譲コンテキストの要約だけを信じて verify-only closure を選択していたなら未実装のままクローズし得た。
