@@ -42,7 +42,6 @@ import {
   README_REQ_SUMMARY_TABLE_BLOCK_ID,
   README_REQ_SUMMARY_TABLE_GENERATOR,
   README_DECISION_SUMMARY_TABLE_BLOCK_ID,
-  extractDocsReadmeDecisionNotes,
   generateDocsReadmeDecisionTable,
 } from "./generate_indexes.ts";
 import { findRepoRoot } from "./cli_utils.ts";
@@ -693,52 +692,50 @@ describe("readme-decision-summary-table (AG-005, Case #3166)", () => {
     );
   });
 
-  it("extracts notes notation (U+3014/U+3015) from Decision section title cells", () => {
-    const readme = [
-      "## Decision",
-      "",
-      "| Decision | タイトル |",
-      "|---|---|",
-      "| [DEC-040](decisions/DEC-040.md) | t（superseded by DEC-044〔決定4 部分置換。決定1〜3は維持〕） |",
-      "| [DEC-043](decisions/DEC-043.md) | t（superseded by DEC-044） |",
-      "",
-      "## 設計（Design）",
-    ].join("\n");
-    const notes = extractDocsReadmeDecisionNotes(readme);
-    expect(notes).toEqual({ "DEC-040": "決定4 部分置換。決定1〜3は維持" });
-  });
-
   it("generates frontmatter-derived rows with superseded_by parenthesized annotation", () => {
-    const rows = generateDocsReadmeDecisionTable([dec({})], {});
+    const rows = generateDocsReadmeDecisionTable([dec({})]);
     expect(rows).toContain(
       "| [DEC-040](decisions/DEC-040.md) | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化）（superseded by DEC-044） |",
     );
   });
 
-  it("composes manual notes as part of the annotation (DEC-040 partial-replacement preservation)", () => {
-    const rows = generateDocsReadmeDecisionTable([dec({})], {
-      "DEC-040": "決定4 部分置換。決定1〜3は維持",
-    });
+  it("expands frontmatter supersede_note as notes-notation annotation (sole data source, DEC-040)", () => {
+    const rows = generateDocsReadmeDecisionTable([
+      dec({
+        supersedeNote:
+          "決定4 は DEC-044 が置換。決定2 は DEC-046 が置換。決定1・3は維持",
+      }),
+    ]);
     expect(rows).toContain(
-      "| [DEC-040](decisions/DEC-040.md) | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化）（superseded by DEC-044〔決定4 部分置換。決定1〜3は維持〕） |",
+      "| [DEC-040](decisions/DEC-040.md) | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化）（superseded by DEC-044〔決定4 は DEC-044 が置換。決定2 は DEC-046 が置換。決定1・3は維持〕） |",
     );
   });
 
-  it("falls back to frontmatter supersede_note when no manual notes exist", () => {
-    const rows = generateDocsReadmeDecisionTable(
-      [dec({ supersedeNote: "決定4 は DEC-044 が置換。決定1〜3は維持" })],
-      {},
+  it("derives annotation for accepted decisions with superseded_by (DEC-028, status-independent)", () => {
+    const rows = generateDocsReadmeDecisionTable([
+      dec({
+        id: "DEC-028",
+        num: 28,
+        title: "文章表層品質の共通実行基盤",
+        status: "accepted",
+        created: "2026-09-09",
+        filename: "DEC-028.md",
+        relPath: "DEC-028.md",
+        relatedReqs: ["REQ-053", "REQ-010", "REQ-036"],
+        supersededBy: "DEC-047",
+        supersedeNote:
+          "「配布前に依存を解決した成果物を供給し、導入先での追加パッケージ取得を必要としない」条項は DEC-047 が textlint guard 依存実体の配布供給の範囲で部分置換。DEC-016 維持宣言と他の決定は維持（status: accepted 維持）",
+      }),
+    ]);
+    expect(rows.join("\n")).toContain(
+      "文章表層品質の共通実行基盤（superseded by DEC-047〔「配布前に依存を解決した成果物を供給し、導入先での追加パッケージ取得を必要としない」条項は DEC-047 が textlint guard 依存実体の配布供給の範囲で部分置換。DEC-016 維持宣言と他の決定は維持（status: accepted 維持）〕）",
     );
-    expect(
-      rows.join("\n"),
-    ).toContain("（superseded by DEC-044〔決定4 は DEC-044 が置換。決定1〜3は維持〕）");
   });
 
-  it("skips annotation for non-superseded decisions", () => {
-    const rows = generateDocsReadmeDecisionTable(
-      [dec({ status: "accepted", supersededBy: null })],
-      {},
-    );
+  it("skips annotation for decisions without superseded_by", () => {
+    const rows = generateDocsReadmeDecisionTable([
+      dec({ status: "accepted", supersededBy: null }),
+    ]);
     expect(rows.join("\n")).not.toContain("superseded by");
   });
 });
