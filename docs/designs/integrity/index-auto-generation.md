@@ -7,6 +7,7 @@ updated: 2026-09-27
 <!-- ADF-COVERS(implementation): REQ-001-026, REQ-001-028 -->
 <!-- ADF-COVERS(implementation): REQ-010-011 -->
 <!-- ADF-COVERS(implementation): REQ-059-002, REQ-059-003 -->
+<!-- ADF-COVERS(design): REQ-059-002, REQ-059-003 -->
 
 # 索引類自動生成 Design
 
