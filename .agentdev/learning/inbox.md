@@ -58,3 +58,19 @@
 - **想定反映先**: checker-execution-contracts.md「安定実行経路」節、case-close/case-run STEP-3 の checker 実行手順
 - **関連**: docs/designs/integrity/checker-execution-contracts.md、Case #3252 case-close 対応記録コメント（検証差分・テスト結果に実行経路記録済み）
 - **タグ**: `#checker` `#bun` `#node` `#実行経路` `#case-close`
+
+## 2026-09-30 case-close（RU-0150）: full integrity suite の spawnSync 型回帰テスト 4 件がローカル環境で継続 timeout fail（checker 実測による検証内容本体の分離確認が必要）
+
+- **発生**: case-close STEP-3 の full integrity suite（`bun test ./.opencode/skills/repo-agentdev-integrity/scripts/`・timeout 600 秒明示指定・cwd main root）で check_integrity.test.ts 内の 4 test（IR-055 実修復回帰 ×2・NG21 N16/N17 ×2）がすべて `this test timed out after 15000ms` で fail。単独ファイル再実行でも同一 4 件が再現（flake ではない継続発生）。
+- **発生局面**: case-close STEP-3 docs 検証（merge 後 main での full integrity suite 実測）
+- **検知方法**: suite 実行結果の `(fail)` 行抽出 → 全 fail の所要時間が 15 秒台前後（[20844ms]/[16031ms]/[15031ms]/[15031ms]）で統一的な timeout シグネチャ → 単独再実行で再現確認 → 該当 checker（check_integrity.ts）の手動実測で分離
+- **切り分け**: 4 test はいずれも Bun.spawnSync で check_integrity.ts を実行して JSON 解析する構造で、checker 実体の手動実測（spawnSync による status/stdout 分離取得 + fs.writeFileSync UTF-8 明示退避）は 20.6 秒で正常完了。fail の直接原因はテスト側 timeout 値（15 秒）とローカル実行速度の不整合であり、checker の検出結果ではない（検証内容本体は合格: runtime-unresolved-reference 新規 0 件・baseline-known 40 ≤ 548・skill-category-gap ok・command-capture-duty 対象 absent）。
+- **回避**: fail 判定時に該当 checker を手動実測し検証内容本体を分離確認してから判定する。テスト fail をそのまま QG-4 不合格にせず、fail 由来分類（既知欠陥・環境依存・当該変更起因の3分類）を evidence 化する。本件の fail 分類は環境依存・当該変更起因なし。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（本 Case 対象外・REQ 行変更なし Case。テスト timeout 値の調整は別 Case 候補）
+- **横展開観点**: spawnSync 型回帰テストの timeout 値は実行環境速度に依存して不成立になり得る（checker 実測 20.6s vs timeout 15s）。timeout 値は checker 実測所要時間に対する余裕を持たせるか、実行時間の事前測定に基づいて設定する。また bun test 全体実行は実測 308 秒のため timeout 未指定の打ち切りは fail 証拠にならない（既存契約の 300-600 秒明示指定が必須であることを再確認）。
+- **再発条件**: check_integrity.test.ts 等の spawnSync + 固定 timeout テストをローカル環境で実行した場合（checker 実測所要時間が timeout 値を超える環境）
+- **予防策候補**: check_integrity.test.ts の IR-055 / NG21 回帰 4 test の timeout 値（15000ms）を checker 実測所要時間に見合う値へ引き上げる、または checker 実行をモックしない構成での環境速度計測に基づく timeout 設定（対象ファイル: .opencode/skills/repo-agentdev-integrity 配布外スクリプト・Case 化して対応）
+- **想定反映先**: check_integrity.test.ts（timeout 値調整）、checker 実行契約と検出基盤規則 Design（実行時間観点の注記要否判断）
+- **関連**: Case #3248 case-close 対応記録コメント（full integrity suite 実測・fail 分類記録済み）
+- **タグ**: `#integrity` `#bun-test` `#timeout` `#環境依存` `#case-close`
