@@ -55,8 +55,8 @@ Design frontmatter の `status`（`draft` / `accepted` の2値）を本スキル
 - **APPEND / UPDATE**: 既存 Design の `status` を変更しない。`accepted` 昇格は case-close の責務
 - 置換済み Design は現行 Design ツリーへ保持しない。置換時は旧 Design を現行ツリーから除外し、履歴は Git、Issue、Decision 等の既存履歴手段から確認する
 
-Design status を draft から accepted へ昇格する場合、Design 本体に見出し名 `## 対応記録` の標準形式セクションを設け、昇格日、評価契約根拠、対応 Case/PR、REQ との整合確認結果を記録する。
-昇格根拠の記録と見送り記録は同一対象で排他に管理する。既存 Design への遡及適用は行わず、新規の昇格案件から標準形式に従う。
+Design status を draft から accepted へ昇格する場合、昇格は Design status frontmatter と Design 管理インデックス（docs/designs/README.md の status 列）の状態更新のみを行い、Design 本文へ作業履歴・評価記録を追記しない。昇格評価の証跡（評価契機、評価根拠、対象 Case/PR、REQ との整合確認結果）は当該 Case の Issue への対応記録コメントに保存する。
+昇格根拠の記録と見送り記録は同一対象で排他に管理する（同一対象に両方を記録しない）。draft から accepted への状態遷移と Design 管理インデックスの status 列との整合維持要求は維持する。
 
 記録項目の詳細と見送り記録の保存チャネルは [references/design-lifecycle-application.md](references/design-lifecycle-application.md) 参照。
 

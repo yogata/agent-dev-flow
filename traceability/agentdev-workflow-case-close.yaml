@@ -7,6 +7,8 @@ implementation:
     - REQ-032-029
   src/opencode/skills/agentdev-workflow-case-close/references/docs-and-design-promotion.md:
     - REQ-021-030
+    - REQ-032-025
+    - REQ-032-026
     - REQ-032-030
     - REQ-060-007
     - REQ-096-012

@@ -36,7 +36,9 @@ frontmatter 完全性（4フィールド）:
 
 ## accepted 昇格時の対応記録
 
-Design status を draft から accepted へ昇格する場合、Design 本体に見出し名 `## 対応記録` の標準形式セクションを置き、次の4必須項目を記録する:
+Design status を draft から accepted へ昇格する場合、昇格は Design status frontmatter と Design 管理インデックス（docs/designs/README.md の status 列）の状態更新のみを行い、Design 本文へ作業履歴・評価記録を追記しない。
+
+昇格評価の証跡として次の4必須項目を当該 Case の Issue への対応記録コメントに保存する:
 
 - 昇格日
 - 評価契約根拠
@@ -44,8 +46,9 @@ Design status を draft から accepted へ昇格する場合、Design 本体に
 - REQ との整合確認結果
 
 昇格根拠の記録と見送り記録は同一対象で排他に管理する（同一対象に両方を記録しない）。
-標準形式は新規の昇格案件から適用する。既存 Design への遡及適用は行わない。
-見送り記録は既存の対応記録コメントおよび Design ファイル本体へ保存する。新規の一時成果物種別や新規ドメイン状態は作成しない。
+draft から accepted への状態遷移と Design 管理インデックスの status 列との整合維持要求は維持する。
+見送り記録は当該 Case の Issue への対応記録コメントに保存し、現在 Design 本文へ作業履歴として新規保存しない。新規の一時成果物種別や新規ドメイン状態は作成しない。再評価契機を持つ未解決の見送り事項は追跡Issue として育成できる。
+既存 Design 本文に残存する対応記録節の除去は純化処理の対象であり、本節は再生成防止の契約のみを所有する。
 
 ## 置換済み Design の扱い
 
