@@ -2,7 +2,7 @@
 title: サブエージェント委譲契約（v4）
 status: accepted
 created: 2026-09-20
-updated: "2026-09-20"
+updated: "2026-10-01"
 ---
 <!-- ADF-COVERS(implementation): REQ-002-033, REQ-002-034 -->
 <!-- ADF-COVERS(implementation): REQ-003-001, REQ-003-002, REQ-003-003, REQ-003-004, REQ-003-006, REQ-003-011, REQ-003-012, REQ-003-014, REQ-003-020 -->
@@ -182,7 +182,7 @@ case-auto は下位 command（case-run インライン実行、工程委譲）�
 | case-run 起源（result `blocked` + user-decision-required 分類） | decision_context を限定的親判断解決へ入力する。自律解決可能な場合は回答を case-run resume point へ返し、解決不能な場合は停止理由分類「上位合意矛盾」または「新規ユーザー判断事項」でユーザー停止する |
 | 工程委譲起源（既存 status + `parent_decision_required`） | decision_context を限定的親判断解決へ入力する。自律解決可能な場合は回答を当該工程の委譲起点へ返し、解決不能な場合は停止理由分類でユーザー停止する |
 
-**parent_decision_required の解決拡張**: case-auto は `parent_decision_required` へ列挙された unresolved 判断事項について、現行正規成果物から一意に回答可能なものを自律解決する（REQ-034-032）。
+**parent_decision_required の解決拡張**: case-auto は `parent_decision_required` へ列挙された unresolved 判断事項について、現行正規成果物（正規契約）から導出可能なものを自律解決する（REQ-034-032）。
 外部仕様・互換性・データ保持・セキュリティ・対象範囲・受け入れ条件を変更しない可逆的内部詳細は、既存契約で許容された範囲に限り作業仮定と根拠を明示して自走継続できる（REQ-034-033）。
 
 **resume point の拡張利用**: case-auto が decision_context を解決した場合、回答または作業仮定を下位 command へ返し、既存 resume point（REQ-006-114）から処理を継続する。
