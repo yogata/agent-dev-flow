@@ -11,11 +11,11 @@ Decision のライフサイクル規則の正規所有は Decision Lifecycle Des
 
 ## 受理評価
 
-評価対象の各 proposed Decision について受理可否を評価する。
+評価対象の各 proposed Decision について受理可否を評価する。この判断は判断方法として閉じた意味評価・開いた推論のいずれかと、確定権限として正規契約からの導出・委譲された裁量・人間に留保された判断のいずれかで判別する（REQ-{NNNN}、`<foundations/v4-responsibility-boundaries>` Design「ADF判断アーキテクチャ詳細基準」節）。
 
-- req-define での合意内容と現行 REQ・Design・実装の状態から受理可否を一意に確定できる場合、既存ライフサイクル規則と承認記録形式に従って accepted への状態遷移を実行してから処理を継続する
+- req-define での合意内容と現行 REQ・Design・実装の状態から受理可否を正規契約からの導出として確定できる場合、既存ライフサイクル規則と承認記録形式に従って accepted への状態遷移を実行してから処理を継続する
 - 状態遷移の実行は `agentdev-decision-file-manager` へ委譲する。case-ready 自身は Decision ファイルの保存手続きを実装しない
-- 一意に確定できない場合はユーザー判断を求めて停止する
+- 正規契約から導出できず、人間判断への引き上げ条件（REQ-{NNNN}-{NNN}、`<foundations/v4-responsibility-boundaries>` Design「人間判断への引き上げ条件」節。未解決規範矛盾、新しい目的・対象範囲・恒久規範の確定等）に該当する場合はユーザー判断を求めて停止する。一意の解でないこと、判断の難易度、確信度の低さだけを理由に停止しない（REQ-{NNNN}-{NNN}/{NNN}）
 - 受理不能、または判断情報が不足する場合は proposed のまま維持し、ready へ遷移せず停止理由を報告する
 
 ## 冪等

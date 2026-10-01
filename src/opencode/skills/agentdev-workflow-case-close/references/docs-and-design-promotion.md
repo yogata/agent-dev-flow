@@ -30,7 +30,7 @@ PR マージ前の docs 検証、拡張検査、配布依存境界 最終 gate �
 ### docs/ 検証
 
 機能追加固有の検証（REQ作成、インデックス記載、spec更新、Decision作成）および全 work_type 共通の関連ドキュメント整合性確認、README 索引整合性確認。
-不足時は警告表示してユーザー判断を仰ぐ。
+不足時は原因を分類して警告表示し（REQ-{NNNN}-{NNN}）、証拠不足は証拠再取得、docs 不備は docs 修正、人間判断への引き上げ条件（REQ-{NNNN}、`<foundations/v4-responsibility-boundaries>` Design「人間判断への引き上げ条件」節）に該当する場合のみユーザー判断へ。
 Design 状態評価（棚卸し制、STEP-3-2）を実行する。PR 本文の `## Design確定候補` セクションは補助入力である。
 
 **文書分類ポリシー適合確認**: document-model Design（extension 経由）の Document Classification Policy に基づき、最終ドキュメント状態が分類ポリシーに適合していることを確認する。
@@ -38,7 +38,7 @@ Design 状態評価（棚卸し制、STEP-3-2）を実行する。PR 本文の `
 ### STEP-3-1: close 時 Design/ commands/ skills 更新漏れの局所確認
 
 実装完了、PR マージ前に、Design 本文と実装の最終矛盾確認、command 定義の更新漏れ、skill 責務境界の変更漏れを確認。
-更新漏れ検出時は警告表示してユーザー判断。
+更新漏れ検出時は警告表示し、本工程の対象範囲内の修正を実行してから再確認する。対象範囲外の不備は正規所有工程への差し戻しを報告し、人間判断への引き上げ条件に該当する場合のみユーザー判断へ。
 局所予防の範囲で `/agentdev/inspect-docs` の全体意味レビューの代替ではない。
 
 #### extensions 整合性検査
@@ -50,7 +50,7 @@ Design 状態評価（棚卸し制、STEP-3-2）を実行する。PR 本文の `
 - `.opencode/skills/agentdev-*/references/**/*.md`
 - `.agentdev/extensions/**`
 
-違反時はマージを停止しユーザー判断を仰ぐ。
+違反時はマージを停止し、違反内容と原因分類を報告する。修正の実行は本検査が所有せず、正規所有工程（case-run 差し戻し後の修正）へ任せる。人間判断への引き上げ条件に該当する場合のみユーザー判断へ。
 
 #### targeted docs guard
 
@@ -91,7 +91,7 @@ trigger 条件は detector の `--profile source` が分類する配布ソース
 - **実行コマンド**: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_distribution_boundary.ts --profile source --json`
 - **検査対象**: PR HEAD の worktree（マージ前の実際の PR ブランチ内容）を検査する。現在の main 状態ではなく、PR で提案されている実際の変更内容を検査対象とする（Oracle finding 5: inspect PR head before merge）
 - **`--profile source`**: case-close は PR マージ前に実行され、配布ソース面を検査するため `source` を使用する（junction は原本への鏡像）
-- **検査エラーの扱い**: 読込不能、未分類エントリ、adapter 起動失敗は全て gate-not-passed として扱う。clean として通過させない。違反時はマージを停止しユーザー判断を仰ぐ
+- **検査エラーの扱い**: 読込不能、未分類エントリ、adapter 起動失敗は全て gate-not-passed として扱う。clean として通過させない。違反時はマージを停止し、違反内容と原因分類を報告する。修正は正規所有工程へ任せ、人間判断への引き上げ条件に該当する場合のみユーザー判断へ
 - **検出結果の記録**: 検出事項（failures）は PR 本文の `## Findings / Capture候補` セクションに `### distribution-boundary` 小見出しで記録する（既に case-run command STEP-S5 で記録済みの場合は上書きせず、case-close で新たに検出された事項のみ追記）
 
 #### link profile の worktree 実行時の扱い

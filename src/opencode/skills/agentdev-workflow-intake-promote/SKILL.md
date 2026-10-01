@@ -10,7 +10,7 @@ intake-promote command の workflow 実装本体である。
 classification → review → HITL → persistence → destructive handling の各段階を独立 resume point として構成する。
 
 intake-promote command は公開 interface（入出力契約・ガードレール・分類値契約）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
-各 item の分類確定は、横断契約Designの詳細判定表に基づき、取得可能な根拠から一意に確定できる item を自律確定し、ユーザー判断が必要な item のみを HITL 対象とする（後述「自律確定とHITL境界」）。
+各 item の分類確定は、横断契約Designの HITL 判断確定原則に基づき、取得可能な根拠から正規契約からの導出または委譲された裁量の範囲で確定できる item を自律確定し、人間判断への引き上げ条件（REQ-{NNNN}、`<foundations/v4-responsibility-boundaries>` Design「人間判断への引き上げ条件」節）に該当する item のみを HITL 対象とする（後述「自律確定とHITL境界」）。
 
 ## 入力
 
@@ -55,10 +55,10 @@ intake-promote workflow は次の6 STEP で構成する。
 
 ## 自律確定とHITL境界
 
-各 item の分類確定は、横断契約Design（extension 経由で解決）「promote系判断確定とHITL境界」節の詳細判定表（自律確定可能要件、HITL移送条件、判定と運用の共通規則）に基づいて行う。本スキルは詳細判定表を重複保持しない（DEC-{N}）。
+各 item の分類確定は、横断契約Design（extension 経由で解決）「HITL 判断確定原則」節（人間判断への引き上げ条件の完全な一覧と promote 系への適用）に基づいて行う。自律確定可否は一意性ではなく、正規契約からの導出または委譲された裁量の範囲かで判定する（REQ-{NNNN}-{NNN}）。本スキルは判定表を重複保持しない（DEC-{N}）。
 
 - **判定位置**（intake-promote command Design「自律確定の判定位置とHITLフォールバック」節）:
-  - classification（STEP-1）: 取得可能な根拠から採用・保留・却下を一意に確定できる item は自律確定候補とする
+  - classification（STEP-1）: 取得可能な根拠から採用・保留・却下を正規契約からの導出または委譲された裁量の範囲で確定できる item は自律確定候補とする
   - review（STEP-2）: 自律確定候補のうち対論型レビューが必要な item は review を経た後に確定する
   - HITL（STEP-3）: ユーザー判断が必要な item のみを HITL 対象とする（REQ-{NNNN}-{NNN}）
   - persistence（STEP-4、STEP-5）: 確定済み分類に従い自動実行する
@@ -115,7 +115,7 @@ HITL（STEP-3）の承認状態は単独では永続状態に記録されない�
 
 ## See Also
 
-- **`<foundations/v4-responsibility-boundaries>` Design**: HITL 判断確定原則の詳細判定表の集約所有者
+- **`<foundations/v4-responsibility-boundaries>` Design**: HITL 判断確定原則（人間判断への引き上げ条件）の集約所有者
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
 - **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **`<foundations/v4-durable-state-and-recovery>` Design**: 永続状態の優先順位、current STEP 再構成

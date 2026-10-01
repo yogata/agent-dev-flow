@@ -17,9 +17,9 @@ Definition PR lifecycle、canonical Definition の判定、backend 意味論の�
 
 ### 忠実性・整合性・品質検査（Definition PR あり）
 
-1. **忠実性確認**: req_draft の合意済み内容（agreed_items、operation_units、realization_actions、受入条件）と Definition PR の変更内容を突合し、req-define で合意済みの意味内容に対する忠実な投影であることを確認する
-2. **整合性検査**: REQ / Decision / Design の相互整合と frontmatter 整合を確認する。決定的検証は `agentdev-artifact-validation` の公開検証契約へ委譲する
-3. **品質検査**: Definition PR の CI 結果とリポジトリの品質検査結果を確認する
+1. **忠実性確認**: req_draft の合意済み内容（agreed_items、operation_units、realization_actions、受入条件）と Definition PR の変更内容を突合し、req-define で合意済みの意味内容に対する忠実な投影であることを確認する。判断方法: 閉じた意味評価（合意済み内容と変更内容の突合。事実・判断基準・結果空間〔忠実/非忠実〕は評価前に限定）。確定権限: 正規契約（合意済み内容）からの導出。新しい意味判断は行わない
+2. **整合性検査**: REQ / Decision / Design の相互整合と frontmatter 整合を確認する。決定的検証は `agentdev-artifact-validation` の公開検証契約へ委譲する。判断方法: 決定的処理（機械検証へ委譲）。確定権限: 正規契約からの導出
+3. **品質検査**: Definition PR の CI 結果とリポジトリの品質検査結果を確認する。判断方法: 決定的処理（機械的証拠の突合）。確定権限: 正規契約からの導出
 
 ### merge 前の isDraft 確認（STEP-1 の正規経路）
 

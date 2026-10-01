@@ -61,8 +61,8 @@
 | CI/test/lint 失敗 | (7)(8) |
 | branch 削除検出 | (9) |
 | 未コミット変更の帰属不明 | (10) |
-| 上位合意矛盾 | bounded parent decision resolution で decision_context が現行正規成果物間の矛盾に起因する場合 |
-| 新規ユーザー判断事項 | 同 decision_context が新しいユーザー価値判断・対象範囲変更・外部契約変更を必要とする場合。Root Case の `resume_command: req-define` を記録する |
+| 上位合意矛盾 | bounded parent decision resolution で decision_context が現行正規情報源間の矛盾に起因し、既存正規契約から導出できない場合。解決可能な不一致は権威優先で解消し、未解決規範矛盾は人間判断へ移行する（REQ-{NNNN}-{NNN}、DEC-{N} 決定(4)） |
+| 新規ユーザー判断事項 | 同 decision_context が人間判断への引き上げ条件（REQ-{NNNN}-{NNN}。新しい目的・価値・優先順位・対象範囲・外部契約・受け入れ条件・恒久規範、または既存正規契約だけでは解決不能な規範間優先関係の新規確定を要する場合）に該当する場合。Root Case の `resume_command: req-define` を記録する |
 | 並列起動不能（実行環境由来） | 停止条件11項目に対応しない独立停止事由。当該 stage の起動可能対象集合に対して背景起動が1件も成立しない場合。原因の断定を含まない。delegation-unavailable との弁別基準は case-auto Design「委譲起動不能時の扱い」節を参照。停止報告には起動試行履歴（試行回数、起動成立数、最終成功起動時刻）を含める |
 
 execution_unit 分割可能性があるにも関わらず case-open が停止した場合、「req-define 合意要件からの逸脱」ではなく「command 契約・実装不整合」として報告する（case-open の契約・実装不整合であり要件doc 側の問題ではない）。
@@ -162,10 +162,10 @@ default-on + skip policy と case-auto の自走性を両立し、ユーザー�
 
 | 分類 | 条件 | アクション |
 |---|---|---|
-| 自律解決 | decision_context が現行正規成果物（REQ、Decision、Design、Issue その他合意済み情報）から一意に回答可能 | ユーザー停止せず回答して下位 command を resume |
-| 作業仮定で継続 | 外部仕様・互換性・データ保持・セキュリティ・対象範囲・受け入れ条件を変更しない可逆的内部詳細 | 既存契約で許容された範囲に限り作業仮定と根拠を明示して自走継続 |
-| 上位合意矛盾 | decision_context が現行正規成果物間の矛盾に起因 | 当該矛盾そのものが finding の対象であり一方を勝手に採用せず停止（STEP-4 停止理由分類「上位合意矛盾」） |
-| 新規ユーザー判断事項 | 新しいユーザー価値判断、対象範囲変更、外部契約変更が必要 | 既存停止経路でユーザーへ返す（STEP-4 停止理由分類「新規ユーザー判断事項」） |
+| 自律解決 | decision_context が現行正規成果物（REQ、Decision、Design、Issue その他合意済み情報）から導出できる（確定権限: 正規契約からの導出。REQ-{NNNN}-{NNN}） | ユーザー停止せず回答して下位 command を resume |
+| 作業仮定で継続 | 外部仕様・互換性・データ保持・セキュリティ・対象範囲・受け入れ条件を変更しない可逆的内部詳細（確定権限: 委譲された裁量。REQ-{NNNN}-{NNN}/{NNN}） | 既存契約で許容された範囲に限り作業仮定と根拠を明示して自走継続 |
+| 上位合意矛盾 | decision_context が現行正規情報源間の矛盾に起因する場合。解決可能な不一致は権威優先で解消し、未解決規範矛盾は人間判断へ移行する（REQ-{NNNN}-{NNN}） | 当該矛盾そのものが finding の対象であり一方を勝手に採用せず停止（STEP-4 停止理由分類「上位合意矛盾」） |
+| 新規ユーザー判断事項 | 人間判断への引き上げ条件（REQ-{NNNN}-{NNN}。新しい目的・価値・優先順位・対象範囲・外部契約・受け入れ条件・恒久規範、または既存正規契約だけでは解決不能な規範間優先関係の新規確定）に該当 | 既存停止経路でユーザーへ返す（STEP-4 停止理由分類「新規ユーザー判断事項」） |
 
 - **resume**: 回答、根拠、作業仮定を下位 command へ返し、既存 resume point から処理を継続する。新規永続結果型は導入しない。adversarial-review 再実行要否は adversarial-review 側の再 review 契約に従い case-auto は独自判断しない
 - **中央集約 review engine とはならない**: case-auto は raw finding を解釈、採否、候補反映しない。下位 command が構造化した decision_context のみを解決対象とし、raw finding を case-auto へそのまま渡さない

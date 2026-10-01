@@ -115,7 +115,7 @@ Issue/ REQ/ Decision/ Design/ work plan のいずれかの記載内容を満た�
 
 - **pass**: `no-deviation`。実装は Issue/ REQ/ Decision/ Design/ work plan に整合。
 - **warn**: 軽微乖離のみ（`scope-creep` 等）。そのまま進行可能（乖離内容を実装記録に併記）。
-- **fail**: 重大乖離あり（`impl-bug`/ `spec-bug`）。ユーザー指示待機（自動修正禁止）。
+- **fail**: 重大乖離あり（`impl-bug`/ `spec-bug`）。失敗原因を分類して報告する（REQ-{NNNN}-{NNN}）。修正の実行は Gate が所有せず、impl-bug は case-run 修正ループ、spec-bug は case-revise 経路という正規所有工程へ任せる（REQ-{NNNN}-{NNN}）。人間判断へ移行するのは引き上げ条件に該当する場合のみ。
 
 ## 報告フォーマット
 
@@ -149,7 +149,7 @@ Issue/ REQ/ Decision/ Design/ work plan のいずれかの記載内容を満た�
 ### 重要事項
 
 自動ループバックはしない。
-エージェントが推奨アクションを提示し、ユーザーが決定する。
+エージェントが乖離分類と推奨アクションを提示し、修正の実行は正規所有工程（上記 mapping の対応経路。case-run 修正ループまたは case-revise）へ任せる（REQ-{NNNN}-{NNN}）。人間判断へ移行するのは引き上げ条件に該当する場合のみ。
 
 ## case-revise 連携
 
@@ -170,7 +170,7 @@ QG-3 は乖離の分類と推奨アクションの提示までを責務とし、
 QG-3 の検査をサブエージェントに委譲する場合:
 
 - サブエージェントは乖離候補、影響度候補、乖離タイプ候補、根拠のみを返す。
-- 親エージェントが pass/warn/fail を確定し、ユーザーへの報告と指示待機を行う。
+- 親エージェントが pass/warn/fail を確定し、判定結果・失敗原因分類・推奨アクションを報告する。fail 時は上記 mapping の正規所有工程への接続を含める（人間判断は引き上げ条件該当時のみ）。
 
 ## 責務境界
 

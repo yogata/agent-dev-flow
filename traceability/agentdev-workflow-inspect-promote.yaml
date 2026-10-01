@@ -1,5 +1,8 @@
 component: agentdev-workflow-inspect-promote
 implementation:
+  src/opencode/skills/agentdev-workflow-inspect-promote/SKILL.md:
+    - REQ-096-004
+    - REQ-096-018
   src/opencode/skills/agentdev-workflow-inspect-promote/references/auto-promote-and-review.md:
     - REQ-090-004
     - REQ-090-012
@@ -11,6 +14,14 @@ implementation:
     - REQ-090-027
     - REQ-090-028
     - REQ-090-029
+    - REQ-096-007
+    - REQ-096-008
+    - REQ-096-009
+    - REQ-096-023
+  src/opencode/skills/agentdev-workflow-inspect-promote/references/hitl-and-disposition.md:
+    - REQ-096-004
+    - REQ-096-018
+    - REQ-096-019
 verification:
   src/opencode/skills/agentdev-workflow-inspect-promote/references/auto-promote-and-review.md:
     - REQ-090-024

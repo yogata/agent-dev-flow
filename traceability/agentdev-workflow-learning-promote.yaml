@@ -1,5 +1,8 @@
 component: agentdev-workflow-learning-promote
 implementation:
+  src/opencode/skills/agentdev-workflow-learning-promote/SKILL.md:
+    - REQ-096-004
+    - REQ-096-018
   src/opencode/skills/agentdev-workflow-learning-promote/references/analysis-and-review.md:
     - REQ-038-006
     - REQ-038-007
@@ -14,6 +17,14 @@ implementation:
     - REQ-090-026
     - REQ-090-027
     - REQ-090-029
+    - REQ-096-007
+    - REQ-096-008
+    - REQ-096-009
+    - REQ-096-023
+  src/opencode/skills/agentdev-workflow-learning-promote/references/hitl-and-persistence.md:
+    - REQ-096-004
+    - REQ-096-018
+    - REQ-096-019
 verification:
   src/opencode/skills/agentdev-workflow-learning-promote/references/analysis-and-review.md:
     - REQ-038-007

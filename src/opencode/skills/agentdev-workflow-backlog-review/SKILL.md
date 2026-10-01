@@ -112,7 +112,7 @@ agentdev-traceability の coverage、impact、check を一般文書探索、構�
   REQ / Decision / Design 反映、ガードレール移管、Project Extension 接続、通常の Issue による修正等の具体的実現先へのルーティングは learning 由来を含めて行わず、システム変更を必要とするものは RU として req-define へ渡す。RU 以外への昇華を含む全処置はユーザー承認を経る。ADF リポジトリ外の project-local 資産（Project Extension の接続定義）は直接書き換えず、書き込み先の実行前提（git 管理境界）を明示した指示を完了報告に含める
 - **削除条件**: RU 生成が成功した採用済み成果物、docs/knowledge/ への知識文書保存に成功した採用済み成果物を削除する（当該成果物が RU に取り込まれ、RU ファイルの生成が確認できた場合、または知識文書の保存が確認できた場合）。RU 化・保存に失敗した成果物、矛盾により除外された成果物は残置する。docs/knowledge/ 知識の削除処置と判定された成果物のみ、ユーザーの明示承認を経た上で例外として削除する
 - **非更新対象**: `.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md`、`.agentdev/learning/deferred.md` を更新しない
-- **矛盾検出時**: ユーザーの指示を待ち、自動的に解決しない。矛盾する artifact を RU 化せずユーザーに確認する。矛盾しない artifact は通常通り RU 化する（partial success）
+- **矛盾検出時**: 正規情報源間の未解決規範矛盾に該当するため人間判断へ移行する（REQ-{NNNN}-{NNN}）。ユーザーの指示を待ち、自動的に解決しない。矛盾する artifact を RU 化せずユーザーに確認する。矛盾しない artifact は通常通り RU 化する（partial success）
 - **破壊的変更の明示承認**: 矛盾解消、要件仕様スコープ変更、大量成果物削除等は明示承認を維持する
 - **git 永続化**: 並列実行安全ステージングプロシージャに従い明示パスでステージする。生成した RU は `.agentdev/backlog/req-units/` 配下、保存・更新・置換・削除した知識文書は `docs/knowledge/` 配下、削除した採用済み成果物は `.agentdev/{intake,learning,inspect}/promoted/` 配下の各パスを `git add <path>`/ `git rm <path>` で明示的にステージする。`.agentdev/` 全体の一括 `git add` は禁止。commit message は `chore(agentdev): generate requirement units via backlog-review`。`git commit -- <paths>`（--only pathspec 形式）を実行し `git push` を行う。失敗時は構造化エラーメッセージを表示して停止する
 - **完了報告**: 全て成功時は `.opencode/commands/agentdev/templates/backlog-review/standard.md`、partial success（矛盾あり）時は `partial.md`、採用済み成果物なし時は `zero-promoted.md` に従う。RU 生成結果、知識文書保存結果、backlog 自体の処置結果（知識の削除、保留）、git 永続化結果を含め、次のコマンド（`/agentdev/req-define`）を提示する
