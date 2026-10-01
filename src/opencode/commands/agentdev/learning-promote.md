@@ -4,7 +4,7 @@ description: inbox.mdから正規化、分類、8軸評価、自律確定・HITL
 
 # 学びの正規化、評価、昇華判定と採用済み成果物生成
 
-`.agentdev/learning/inbox.md` の学びエントリを読み込み、正規化、問題クラス分類、8軸評価、知識としての保存適否（docs/knowledge/ 候補判定）、重複・陳腐化、保留要否等の learning 固有の評価、廃棄判定、既存対策確認、自律確定判定（一意に確定できる項目の自律確定）とユーザー判断が必要な項目のみの HITL 承認を経て採用済み成果物を生成する。
+`.agentdev/learning/inbox.md` の学びエントリを読み込み、正規化、問題クラス分類、8軸評価、知識としての保存適否（docs/knowledge/ 候補判定）、重複・陳腐化、保留要否等の learning 固有の評価、廃棄判定、既存対策確認、自律確定判定（正規契約からの導出または委譲された裁量の範囲で確定できる項目の自律確定）と人間に留保された判断が必要な項目のみの HITL 承認を経て採用済み成果物を生成する。
 実現先（Skill、Command、script 等の種別）を選ぶ分類・マッピングは行わず、req-define の変更影響・実現方法決定を先取りしない。
 
 **重要**: `.opencode/` への直接配置、直接反映は行わない。
@@ -37,7 +37,7 @@ description: inbox.mdから正規化、分類、8軸評価、自律確定・HITL
 - 主入力は `inbox.md` とし、raw learning item の再分類は行わない
 - learning-promote は反映先を直接変更せず、実現先（Skill、Command、script、checker、hook、Custom Tool 等）を選ぶ分類・マッピングを行わない。採用済み成果物は、問題、根拠、望ましい状態、制約、既存事実を req-define が既存 REQ / Decision / Design と実装を再調査して変更方針を確定できる自足的な情報として保持する
 - 学びは直接 REQ 化せず、恒久契約（REQ/Decision/Design）への昇華可能性を判定工程で評価し、昇華可能なもののみ `promoted/` へ出力する。昇華不能な知見は保留プール（`deferred.md`）で維持する
-- 一意に確定できる項目は自律確定し、ユーザー判断が必要な項目のみ HITL 対象とする。自律確定可否の詳細判定表は横断契約 Design「promote系判断確定とHITL境界」節が集約所有し、本コマンド定義と Workflow Skill は判定表を複製しない。自律確定はユーザー承認の擬制ではなく、deferred・未処理項目を自動削除しない安全境界は維持する
+- 正規契約からの導出または委譲された裁量の範囲で確定できる項目は自律確定し、人間に留保された判断が必要な項目のみ HITL 対象とする。自律確定可否の詳細判定（確定権限3分類〔正規契約からの導出・委譲された裁量・人間に留保された判断〕の判定表、人間判断への引き上げ条件）は v4-responsibility-boundaries Design（extension 経由で解決）「ADF判断アーキテクチャ詳細基準」節が集約所有し、本コマンド定義と Workflow Skill は判定表を複製しない。自律確定はユーザー承認の擬制ではなく、deferred・未処理項目を自動削除しない安全境界は維持する
 - adversarial-review は default-on（REQ-{NNNN}-{NNN}）: workflow の review STEP（発動条件判定 → review 呼出）を経て原則発動する。skip 条件（inbox.md 1件で重複確実、inbox.md 空）該当時は HITL へ従来フローを維持し、ユーザー明示要求時は skip 条件にかかわらず必ず発動する。共通契約（任意性、副作用禁止、再 review 条件、停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` Design（REQ-{NNNN}）が正規所有する
 
 ## ガードレール
@@ -45,7 +45,7 @@ description: inbox.mdから正規化、分類、8軸評価、自律確定・HITL
 否定規則は承認境界・state 破壊・書き込みスコープ等の硬い境界に限定する:
 
 - `.opencode/` 直接反映は行わない（採用済み成果物は `.agentdev/learning/promoted/` のみに生成）
-- ユーザー判断が必要な項目の判定、prune ともにユーザー承認なしには実行しない。一意に確定できる項目（横断契約 Design の詳細判定表に従う）はユーザー承認なしで自律確定する（`POL-promoted-artifact-requires-approval`）
+- 人間に留保された判断が必要な項目の判定、prune ともにユーザー承認なしには実行しない。正規契約からの導出または委譲された裁量の範囲で確定できる項目（v4-responsibility-boundaries Design「ADF判断アーキテクチャ詳細基準」節の判定表に従う）はユーザー承認なしで自律確定する（`POL-promoted-artifact-requires-approval`）
 - 旧昇格台帳等の管理用ファイルは生成しない
 - 破壊的変更（inbox.md 全体強制クリア、大量エントリ一括削除等）は判定確定の承認とは別に明示承認を維持する（REQ）。自律確定によっても迂回されない（`POL-destructive-change-explicit-approval`）
 
@@ -53,7 +53,7 @@ description: inbox.mdから正規化、分類、8軸評価、自律確定・HITL
 
 ユーザー確認ポイント、エラー処理表、各成果物のライフサイクルは `agentdev-learning-pipeline` を参照。主要項目のみ本節に抜粋する:
 
-- **HITL（判定確定）**: ユーザー判断が必要な項目の廃棄判定結果、8軸評価スコアの確認、修正、承認（判断の確定、REQ）。一意に確定できる項目はユーザー承認なしで自律確定し、HITL 対象としない（判断確定の境界は横断契約 Design「promote系判断確定とHITL境界」節の詳細判定表に従う）
+- **HITL（判定確定）**: 人間に留保された判断が必要な項目の廃棄判定結果、8軸評価スコアの確認、修正、承認（判断の確定、REQ）。正規契約からの導出または委譲された裁量の範囲で確定できる項目はユーザー承認なしで自律確定し、HITL 対象としない（判断確定の境界は v4-responsibility-boundaries Design「ADF判断アーキテクチャ詳細基準」節の判定表に従う）
 - **prune（永続化）**: prune は判定確定（自律確定またはユーザー承認）と同時に承認済みとみなし自動実行（REQ）。staged/rejected/duplicate の追加確認は不要
 - **inbox.md 不在**: エラー終了。「先に `agentdev-learning-capture` skill で学びを追加してください」
 - **git pull/push 失敗**: 構造化エラー表示して停止（push 失敗時は完了扱いにしない）

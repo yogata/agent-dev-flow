@@ -28,7 +28,7 @@ REQ/Decision/Design の保存は内部 lifecycle の case-ready（初回確定�
 | `/agentdev/backlog-review` | `promoted/` 成果物（intake/learning） | `RU-*.md` | `/agentdev/req-define` |
 | `/agentdev/inspect-docs` | docs全体の意味整合検出 | 検出事項 | `/agentdev/inspect-promote` → `/agentdev/backlog-review` |
 | `/agentdev/inspect-skills` | Command/Skill 参照妥当性検出 | 検出事項 | `/agentdev/inspect-promote` → `/agentdev/backlog-review` |
-| `/agentdev/inspect-promote` | 検出事項の分類、採用（`--auto` で高確信度の検出事項を intake/promoted/ へ自動投入） | 採用済み成果物 | `/agentdev/backlog-review` |
+| `/agentdev/inspect-promote` | 検出事項の分類、採用（`--auto` で自動 promote 対象カテゴリに合致する検出事項を intake/promoted/ へ自動投入） | 採用済み成果物 | `/agentdev/backlog-review` |
 
 ## 各コマンドの定義ファイル
 

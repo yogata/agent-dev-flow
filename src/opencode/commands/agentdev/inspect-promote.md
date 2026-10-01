@@ -5,12 +5,12 @@ description: 検出事項を分類、採用し、採用済み成果物として 
 # inspect-promote
 
 `.agentdev/inspect/inbox/` の検出事項を分類（promote/ defer/ reject）し、採用した検出事項を `.agentdev/inspect/promoted/` へ保存し、却下した検出事項は即時削除する（`archive/rejected/` 廃止）。
-明示的な `--auto` opt-in 時は、高確信度の検出事項を HITL を経ずに `.agentdev/intake/promoted/` へ自動投入し、intake/backlog パイプラインへ流入させる。
+明示的な `--auto` opt-in 時は、自動 promote 対象カテゴリに合致する検出事項を HITL を経ずに `.agentdev/intake/promoted/` へ自動投入し、intake/backlog パイプラインへ流入させる。
 
 ## 入力
 
 - `.agentdev/inspect/inbox/*.md`（検出事項ファイル群）
-- `--auto`（省略可能）: 高確信度検出事項の自動 promote を有効化する明示 opt-in。省略時は従来の手動分類フローのみ
+- `--auto`（省略可能）: 自動 promote 対象カテゴリに合致する検出事項の自動 promote を有効化する明示 opt-in。省略時は従来の手動分類フローのみ
 
 ## 出力
 
@@ -22,17 +22,17 @@ description: 検出事項を分類、採用し、採用済み成果物として 
 
 ## 自動 promote 対象カテゴリ
 
-`--auto` で自動 promote される高確信度カテゴリ、投入先、実行ログ、誤検知 revoke 手順の詳細は v4-responsibility-boundaries Design（extension 経由で解決）の「HITL 判断確定原則」節に原本を置く。
+`--auto` で自動 promote されるカテゴリ、投入先、実行ログ、誤検知 revoke 手順の詳細は v4-responsibility-boundaries Design（extension 経由で解決）の「ADF判断アーキテクチャ詳細基準」節に原本を置く。
 本コマンドはカテゴリ定義を重複保持しない。
 
 ## 自律確定と HITL フォールバック
 
-分類・検証と必要な adversarial-review を経て、取得可能な根拠から promote / defer / reject を一意に確定できる検出事項は、ユーザー承認なしで確定する。ユーザー判断が必要な検出事項のみ HITL 対象とする。
-同一実行内に両者が混在する場合、未決項目に依存しない項目を先行確定し、ユーザー判断が必要な検出事項のみを提示する。
-自律確定可否の詳細判定表は v4-responsibility-boundaries Design（extension 経由で解決）の「HITL 判断確定原則」節に原本を置き、本コマンドは判定表を重複保持しない。
+分類・検証と必要な adversarial-review を経て、promote / defer / reject の判断が正規契約からの導出または委譲された裁量の範囲で確定できる検出事項は、ユーザー承認なしで確定する。人間に留保された判断が必要な検出事項のみ HITL 対象とする。
+同一実行内に両者が混在する場合、未決項目に依存しない項目を先行確定し、人間に留保された判断が必要な検出事項のみを提示する。
+自律確定可否の詳細判定（確定権限3分類〔正規契約からの導出・委譲された裁量・人間に留保された判断〕の判定表、人間判断への引き上げ条件）は v4-responsibility-boundaries Design（extension 経由で解決）の「ADF判断アーキテクチャ詳細基準」節に原本を置き、本コマンドは判定表を重複保持しない。
 自律確定した検出事項の判定結果、主要根拠、HITL不要と判断した理由は完了報告で報告する（新規永続成果物を必須としない）。
 
-`--auto` 早期経路（fast path。高確信度カテゴリの事前定義による早期処理、明示 opt-in）と通常経路の自律確定（レビュー・検証を経た最終確認省略）は別概念である。通常の実行によって `--auto` を暗黙的に有効化しない。
+`--auto` 早期経路（fast path。自動 promote 対象カテゴリの事前定義による早期処理、明示 opt-in）と通常経路の自律確定（レビュー・検証を経た最終確認省略）は別概念である。通常の実行によって `--auto` を暗黙的に有効化しない。
 
 ## workflow
 
@@ -47,7 +47,7 @@ description: 検出事項を分類、採用し、採用済み成果物として 
 - reject された検出事項は即時削除し、reject 時の commit message に却下理由を含める（`archive/rejected/` への移動は廃止）
 - defer された検出事項は `.agentdev/inspect/inbox/` に残置する
 - docs-check ルール／検査データ追加候補は独立 route とせず、採用済み成果物の要件化方向または受け入れ条件に含める
-- `--auto` は自動 promote 対象カテゴリ（v4-responsibility-boundaries Design 参照、extension 経由）に合致する高確信度検出事項のみを投入し、意味判断、曖昧な分類、Decision 要否判断を含む検出事項は手動分類へ回す
+- `--auto` は自動 promote 対象カテゴリ（v4-responsibility-boundaries Design 参照、extension 経由）に合致する検出事項のみを投入し、カテゴリに合致しない検出事項（正規契約からの導出でも委譲された裁量の範囲でも確定できない判断を含むもの）は手動分類へ回す。手動分類の確定境界は「自律確定と HITL フォールバック」節の判定表に従う
 - `--auto` 実行の都度、投入対象、根拠を `.agentdev/inspect/promoted/auto-promote-log.md` に記録する（誤検知 revoke 手順は同 Design 参照）
 
 ## ガードレール
