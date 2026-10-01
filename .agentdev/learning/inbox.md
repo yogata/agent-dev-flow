@@ -279,3 +279,18 @@
 - **想定反映先**: src/opencode/plugins/agentdev-textlint-guard/README.md（依存生成手順の注意書き）
 - **関連**: PR #3308 本文「Findings / Capture候補」learning 項、Issue #3300 対応記録コメント（テスト結果の textlint gate 行）
 - **タグ**: `#textlint` `#plugin` `#worktree` `#build-engine` `#vendor` `#capture`
+
+## 2026-10-01 case-run（Case #3302・PR #3309 Findings 由来）: traceability missing-design の 3 段判定（既存起因確認 → 計上性格判定 → record-in-findings）
+
+- **問題事象**: traceability check の missing-design は `--req` 限定実行でも lifecycle gate 対象行外の既存要件行を指定すると fail として計上される。PR 前検査で missing 系 fail を検出した際に、そのまま lifecycle gate 不合格として扱うと既存債務を本 Case 起因と誤判定する
+- **発生局面**: case-run（Case #3302 DEL-3302-1）の PR 前検査、case-close（Case #3302）の QG-4 独立再検査でも同様に適用
+- **検知方法**: traceability check --req REQ-001-005,REQ-001-006 の実行結果（missing-design fail）と main HEAD との比較
+- **有効だった判定手順（3 段判定）**: (1) main HEAD との同値比較で既存起因を確認、(2) check-interpretation.md の 2 層解釈（lifecycle gate 対象行と corpus 診断指標）で計上性格を判定、(3) 解消が対象範囲拡大となる場合は record-in-findings
+- **ユーザー確認有無**: なし（既存債務の記録のみ）
+- **Decision/REQ/spec影響**: なし（運用手順の知見）
+- **横展開観点**: Epic Wave の子 Issue では REQ 参照が制約参照（対象要件行外）のケースがあり、missing 系 fail の計上性格判定を前置すると lifecycle gate の誤差し戻しを防げる
+- **再発条件**: lifecycle gate 対象行外の既存要件行を `--req` に指定して traceability check を実行し missing 系 fail が出た場合
+- **予防策候補**: check-interpretation.md に「既存要件行の --req 限定実行時の 3 段判定」手順を追記する候補
+- **想定反映先**: .opencode/skills/agentdev-traceability/references/check-interpretation.md、case-run/case-close の検証差分記録規約
+- **関連**: PR #3309 本文「Findings / Capture候補」learning 項、Issue #3302 対応記録コメント（検証差分）、.agentdev/intake/inbox/2026-10-01-3302-req001-005-006-design-coverage-debt.md
+- **タグ**: `#traceability` `#missing-design` `#corpus債務` `#lifecycle-gate` `#capture`
