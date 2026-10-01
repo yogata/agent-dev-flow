@@ -239,3 +239,13 @@
 - **想定反映先**: check_integrity.test.ts（timeout 値調整）、checker 実行契約と検出基盤規則 Design（実行時間観点の注記要否判断）
 - **関連**: 本ファイル内 RU-0150 entry（Case #3248 既知事象）、docs/knowledge/windows-bun-test-spawn-timeout-classification.md（対照実行手順）、Case #3289 case-close 対応記録（検証差分・fail 由来分類記録）
 - **タグ**: `#integrity` `#bun-test` `#timeout` `#配布物増加` `#baseline対照実行` `#case-close`
+
+
+## 2026-10-01 case-run/case-close（Root Case #3293 Wave 1）: 判断境界文言更新を含む配布物変更での契約テスト期待値同期と、docs guard profile 選定
+
+- **問題事象1**: 配布物（src/opencode/skills/**）の判断境界文言を REQ-096 語彙へ更新した際、repo 側契約テスト（case-ready-definition-readiness）が旧文言を verbatim pin しており QG-4 fail。case-run 差し戻し→期待値同期（1行）で解消。
+- **示唆1**: 文言更新を含む配布物変更では、同一変更セット内で pin テスト期待値の同期を予防確認する価値がある。
+- **問題事象2**: targeted docs guard の case-run workflow profile は src/opencode 配下を appliesTo とせず、--files 明示指定でも TARGET-EMPTY（strict fail）となる。src/opencode 配布物のみの変更では docs-check profile（appliesTo 広域）で実行するのが実態に合致する。
+- **問題事象3**: integrity suite のサブプロセス実行型回帰テスト（IR-055）はテスト側 15 秒タイムアウトを持ち、同一 HEAD・同一 canonical 形式で環境負荷により 0 fail ⇄ 4 fail が変動（main root 同一再現で確認）。タイムアウト値見直しまたは実行系分離が安定化方策。
+- **運用実績（REQ-093 補強）**: agentdev_gh exit 66 持続時の縮退運用（probe 1回 → write 持続確認 1回 → 書込み打ち止め → proxy payload 化 → 外部 Supervisor 回復パスで consume）が機能した。
+- 分類候補: learning（#3298/#3299 事例・PR #3306/#3307 Findings より）
