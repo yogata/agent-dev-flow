@@ -36,7 +36,7 @@ frontmatter 完全性（4フィールド）:
 
 ## accepted 昇格時の対応記録
 
-Design status を draft から accepted へ昇格する場合、昇格は Design status frontmatter と Design 管理インデックス（docs/designs/README.md の status 列）の状態更新のみを行い、Design 本文へ作業履歴・評価記録を追記しない。
+Design status を draft から accepted へ昇格する場合、昇格は Design status frontmatter と Design 管理インデックス（Design README 一覧の status 列）の状態更新のみを行い、Design 本文へ作業履歴・評価記録を追記しない。
 
 昇格評価の証跡として次の4必須項目を当該 Case の Issue への対応記録コメントに保存する:
 
