@@ -72,8 +72,7 @@ IR-NNN（個別 integrity rule）の `regression_test` フィールドは以下�
 各ルールの15フィールド詳細は [rules/](rules/) サブディレクトリの個別ファイル `IR-NNN-{slug}.md` を参照（v2:REQ-0155-007 局所物理分離、REQ-001-008）。
 catalog はスキーマ定義とインデックスを維持する。
 
-IR-059（distribution-reference-boundary）の canonical 参照は REQ-029 と `integrity/distribution-boundary.md` へ更新済みである。
-従来 REQ-002-021..026、032 に紐づいていた配布物参照境界の検出脈絡は MOVE 先（REQ-029-001..008）へ集約し、REQ-002-028、029、035 の作業由来品質検査参照は RETIRE 扱いとして catalog から除去した。
+IR-059（distribution-reference-boundary）の canonical 参照は REQ-029 と `integrity/distribution-boundary.md` である。配布物参照境界の検出脈絡は REQ-029-001..008 と `integrity/distribution-boundary.md` が所有する。
 
 IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 から `generate_indexes.ts` が自動生成する（SC-002 Phase C、IR-061）。
 直接編集は行わない。
@@ -178,7 +177,7 @@ IR エントリ一覧（IR-046 以降）は `generate_indexes.ts` が自動生�
 ### 新規 IR 候補（candidate state、新規 IR 登録 gate 前）
 
 以下は検出ルールの設計とカタログ候補エントリ整備のみを行い、実装（`check_integrity.ts` 等の検出ロジック）は対象外とする。
-retired REQ-028-012 由来の新規 IR 登録 gate（(a) 存在資格 gate、(b) hard governance 追加 gate）に従い確定する。
+新規 IR 登録 gate（(a) 存在資格 gate、(b) hard governance 追加 gate）に従い確定する。
 candidate 状態の IR は catalog への本エントリ追加を含まず、別途 Design または作業記録で管理する。
 
 | Field | 値 |
@@ -324,7 +323,7 @@ checkWorkflowStatusProhibition
 `repo-agentdev-integrity` SKILL.md が主体となり、以下を満たしてから追加する。
 
 1. **既存 NG への副作用評価**: 新ルールが既存ルールの誤検知を増加させないか。特に exemption 条件、baseline_status、severity 分類の整合性を確認する
-2. **catalog エントリ追加**: `integrity-rule-catalog.md` に12フィールド以上の IR エントリを追加する（DEC-013 適用後、field 数 ≥ 12）。新規 IR 登録 gate（retired REQ-028-012 由来 (a)/(b)）の確認を必須とする
+2. **catalog エントリ追加**: `integrity-rule-catalog.md` に12フィールド以上の IR エントリを追加する（DEC-013 適用後、field 数 ≥ 12）。新規 IR 登録 gate（(a)/(b)）の確認を必須とする
 3. **実装追加**: `check_integrity.ts` に検出関数を実装する。exemption 条件、false_positive_risk を実装に反映する
 4. **テストデータ更新**: `check_integrity.test.ts` の有効なテストデータ（valid fixture）が新ルールで NG とならないことを確認する（drift detection smoke test）
 5. **vocabulary-registry 同期**: 新ルールが語彙検出に関わる場合、`vocabulary-registry.md` を更新する

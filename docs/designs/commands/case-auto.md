@@ -158,14 +158,14 @@ case-auto は各工程の結果を次の4状態次元で保持し、集約報告
 完了報告（停止時フォーマットを含む）には上記4状態次元を工程別・action id 別・ライフサイクル事象別に列挙する。
 実行定義は Workflow Skill（`agentdev-workflow-case-auto`）の「結果状態の4次元集約（REQ-034-031）」および「結果状態の4次元報告（REQ-034-031）」を正とする。
 
-## 複数 execution_unit 並列 orchestration（REQ-006、v2:ADR-0129 / DEC-015 由来、現行の責務体制は DEC-036（DEC-038/039 が補完））
+## 複数 execution_unit 並列 orchestration（REQ-006、現行の責務体制は DEC-036（DEC-038/039 が補完））
 
 case-auto は case-open が生成した execution_unit 群（standard | epic の混在）を orchestration 対象とする（REQ-034-018）。
 従来の「単一 Epic の Wave 反復制御」を「複数 execution_unit 群反復制御」へ一般化する。
 case-auto は case-open の判定結果に従い case-run(#epic) / case-run(standard) を起動する（薄いオーケストレーター原則、Issue 階層決定・子 Issue 選択・Epic 化判定の委譲を維持）。
 Issue 階層決定、子 Issue 選択、Epic 化判定の判断ロジックは持たない。
 
-### 処理単位の一級概念化（DEC-015 由来、現行は DEC-036（DEC-038/039 が補完））
+### 処理単位の一級概念化（現行の責務体制は DEC-036（DEC-038/039 が補完））
 
 case-auto は処理単位を一級概念として扱う（REQ-034-035）。
 処理単位は少なくとも次の意味を持つ。

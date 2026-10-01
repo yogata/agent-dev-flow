@@ -372,7 +372,7 @@ cap は純減方向のみ更新可能とし、増加は `--raise-warning-cap` �
 
 ### 恒久免除レジストリ（baselines/exemptions.json）の運用
 
-IR-055 warning のうち意味検証済みの正当な warning（例: accepted-adr-only-citation 等の正当引用）は、恒久免除レジストリ `baselines/exemptions.json`（IR-059 由来の先行設計を全カテゴリ共通の機構として実装）へ登録することで、baseline（未解決債務）とは区別して恒久免除表示にする。
+IR-055 warning のうち意味検証済みの正当な warning（例: accepted-adr-only-citation 等の正当引用）は、恒久免除レジストリ `baselines/exemptions.json` へ登録することで、baseline（未解決債務）とは区別して恒久免除表示にする。
 
 - entry は `rule_id`・accepted な `rationale_ref`・`review_status` を必須とする（schema version 2）。`rationale_ref` の契約は rule 別に定義する（IR-059 は従来どおり docs/adr/**〔将来復活時〕、一般化分は現存する正当性根拠パス〔該当 Decision・Design〕を許容）
 - loader はスキーマ違反の entry を fail として扱う
@@ -505,8 +505,8 @@ docs-check は baseline 運用（IR-055）と path exemption（`IR055_EXEMPT_PAT
 |---|---|---|
 | 整合性ルール削除 | 該当 IR エントリを catalog から物理削除（AG-008、REQ-028-008）。交叉参照は `responsibilities/req-impact-map.md` の Retired cross-references 節へ再配置する | 実装も削除 |
 | 実装削除 | 該当 IR エントリを catalog から物理削除。実装のみ残置は8項目存在条件（retired REQ-028-001）違反のため認めない | - |
-| 実装復活 | 復活時は新規 IR 登録 gate（retired REQ-028-012 由来）を再適用する | - |
-| 新規ルール追加 | 新規 IR エントリを追加。新規 IR 登録 gate（retired REQ-028-012 由来 (a)/(b)）を必須とする | 実装追加 |
+| 実装復活 | 復活時は新規 IR 登録 gate を再適用する | - |
+| 新規ルール追加 | 新規 IR エントリを追加。新規 IR 登録 gate（(a)/(b)）を必須とする | 実装追加 |
 
 docs-check 項目役割範囲（バックエンド対象 vs skill 定義対象）、対象ファイル設計（`.md` のみ、正当使用例外）、NG ルール間依存関係マップの詳細は [integrity-rule-catalog.md](integrity-rule-catalog.md) 参照。
 

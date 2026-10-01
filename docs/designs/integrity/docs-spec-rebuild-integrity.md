@@ -75,10 +75,10 @@ BOM なし UTF-8 かつ単一の改行コードで構成されたファイルは
 
 ## REQ-002-028/029/035 RETIRE 後の正規根拠
 
-REQ-002-028 と REQ-002-029 が保有していた構文健全性検査と責務整合検査（移行・作業由来品質検査行）の正規根拠は、本 Design（docs-spec-rebuild-integrity.md）と `responsibilities/document-type-responsibilities.md`、`quality/req-health-metrics.md` の既存品質契約へ集約する。
+構文健全性検査と責務整合検査の正規根拠は、本 Design（docs-spec-rebuild-integrity.md）と `responsibilities/document-type-responsibilities.md`、`quality/req-health-metrics.md` の既存品質契約である。
 REQ-007 行は新設しない。
 
-REQ-002-035 が保有していた case-auto.md 段階解消（移行・作業由来品質検査行）の正規根拠は、Epic 完了条件と IR-059 検出へ集約する。
+case-auto.md 段階解消の正規根拠は、Epic 完了条件と IR-059 検出である。
 
 配布依存境界の意味モデルの正規所有者は `integrity/distribution-boundary.md` である。
 本 Design は意味モデルを再定義せず、同 Design を参照する。

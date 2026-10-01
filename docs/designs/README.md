@@ -149,7 +149,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | Design | status | タイトル | 責務 |
 |------|--------|---------|------|
 | [workflows/workflow-skill-model.md](workflows/workflow-skill-model.md) | accepted | Workflow Skill Model | Command / Workflow Skill / Capability Skill の責務、依存方向、1:N分割基準、配置契約。DEC-010 実装詳細 |
-| [workflows/v4-delegation-contracts.md](workflows/v4-delegation-contracts.md) | accepted | サブエージェント委譲契約（v4） | 委譲時最小契約、委譲種別 8 種、制約、実行主体分類、adversarial-review 接続、構造化文脈直列化契約。result 4 状態と authority は v4-lifecycle-state-machine / v4-runtime-execution-model 参照（旧 delegation-contracts.md から集約 supersede） |
+| [workflows/v4-delegation-contracts.md](workflows/v4-delegation-contracts.md) | accepted | サブエージェント委譲契約（v4） | 委譲時最小契約、委譲種別 8 種、制約、実行主体分類、adversarial-review 接続、構造化文脈直列化契約。result 4 状態と authority は v4-lifecycle-state-machine / v4-runtime-execution-model 参照 |
 | [workflows/capture-boundaries.md](workflows/capture-boundaries.md) | accepted | キャプチャ境界 | intake / learning 境界、Split Rule、PR 本文永続チャネル |
 | [workflows/references/execution-unit-construction.md](workflows/references/execution-unit-construction.md) | accepted | execution_unit 構成アルゴリズム参照 | v4-standard-lifecycle（語彙）と case-ready Design（運用主体）から参照される連結成分アルゴリズム、3軸判断モデルの機械的判定手順 |
 | [workflows/v4-standard-lifecycle.md](workflows/v4-standard-lifecycle.md) | accepted | ADF v4 標準ライフサイクル | v4 標準ライフサイクルの定義（work_type/scale/Epic/Wave の語彙直交性、公開 UX 2入口収斂と内部 lifecycle への回収、req-define 入口の入力意味、継続コラボレーションループ） |

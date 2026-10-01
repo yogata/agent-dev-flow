@@ -67,7 +67,7 @@ updated: "2026-09-29"
     - 回答は検証可能な形式（上限は数値または計算量の形、失敗挙動は fail-open / fail-closed のいずれか）を要求し、形式不定の回答や形式的な記述を許容しない。数値上限は既存の test strategy 数値閾値ガイドおよび pass_criteria 記述ガイドの規範に従う
     - 適用対象とした場合はその前提を要件docに記録する（適用外の場合の記録は強制しない）
     - 確定した受け入れ条件は既存の投影契約により test strategy（TS-NNN）へ直列化し、draft-data スキーマ、要件docテンプレート、QG、正規成果物種別を本件のために変更しない
-  - 分類ゲート（v2:REQ-0155-004 由来、現行の暫定分類契約は REQ-008。文書7分類モデルは document-model Design）の最終分類確定ステップ（変更後仕様 or 反映作業、REQ/Design 境界判定）。RU 入力の暫定分類（backlog-review が `tentative_classification` に付与）が存在する場合、`docs/designs/foundations/document-model.md` の文書7分類モデルに照らして最終分類を確定し暫定分類を上書きする。確定時のバリデーション（暫定分類の7値チェック、フィールド欠落時の停止、最終分類上書き値の7値チェック）は後述「tentative_classification 最終確定のバリデーション（v2:REQ-0155-008 由来、現行は REQ-008）」に定める
+  - 分類ゲート（暫定分類契約は REQ-008。文書7分類モデルは document-model Design）の最終分類確定ステップ（変更後仕様 or 反映作業、REQ/Design 境界判定）。RU 入力の暫定分類（backlog-review が `tentative_classification` に付与）が存在する場合、`docs/designs/foundations/document-model.md` の文書7分類モデルに照らして最終分類を確定し暫定分類を上書きする。確定時のバリデーション（暫定分類の7値チェック、フィールド欠落時の停止、最終分類上書き値の7値チェック）は後述「tentative_classification 最終確定のバリデーション（現行は REQ-008）」に定める
   - 文書分類妥当性検証（Design 分離基準違反残留検出）
     - Decision要否確認ゲート（`agentdev-architecture-advisory` 経由でアーキテクチャ助言サブエージェントへ委譲）
     - アーキテクチャ助言サブエージェントへの入力標準テンプレート使用 + 出力 4 ラベル構造要求（REQ-004-042）。ラベル構造は soft-contract（DEC-003）とし、分類権限は親が保持する
@@ -102,11 +102,11 @@ updated: "2026-09-29"
 req-define は Workflow Skill と手順番号を複製せず、公開目的、入力、成果物、許可される副作用、安全境界、承認境界、停止状態、必須順序、利用 skill 責務によって対応付ける（v2:REQ-0143-005）。
 詳細は `command-file-format.md`「command Design と command 定義の対応付け（v2:REQ-0143-005）」参照。
 
-### tentative_classification 最終確定のバリデーション（v2:REQ-0155-008 由来、現行は REQ-008）
+### tentative_classification 最終確定のバリデーション（現行は REQ-008）
 
 分類ゲート（最終分類確定ステップ）が backlog-review 付与の暫定分類（`tentative_classification`）を最終分類として確定（上書き）する際、以下を検証すること:
 
-1. 暫定分類が v2:REQ-0155-003 由来の7値（現行の文書7分類モデルは document-model Design、暫定分類契約は REQ-008）のいずれかであること。7値以外の場合、確定を停止し理由を提示すること
+1. 暫定分類が文書7分類モデルの7値（document-model Design。暫定分類契約は REQ-008）のいずれかであること。7値以外の場合、確定を停止し理由を提示すること
 2. フィールドが欠落している場合、暫定分類未付与として確定を停止し、backlog-review への差し戻しを提示すること
 3. 最終分類への上書き値も7値のいずれかであること
 
@@ -149,7 +149,7 @@ req-define は RU から引き継いだ分類根拠（`artifact-contracts.md`「
 
 ### tentative_classification との関係
 
-backlog-review が付与する `tentative_classification`（v2:REQ-0155-003 由来、現行の暫定分類契約は REQ-008 の7値）は暫定値であり、req-define が最終分類を上書きする。
+backlog-review が付与する `tentative_classification`（現行の暫定分類契約は REQ-008 の7値）は暫定値であり、req-define が最終分類を上書きする。
 最終分類確定時のバリデーション（7値チェック、フィールド欠落時の停止、上書き値の7値チェック）は前述「tentative_classification 最終確定のバリデーション」に従う。
 
 ### 壁打ち対話 構造的分析フレーム先行手順（REQ-004-034, REQ-004-035, REQ-004-036）

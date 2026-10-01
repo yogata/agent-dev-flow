@@ -101,7 +101,7 @@ data yaml の新設は、当該 yaml を読み込む消費者実装（checker �
 ## detector 命名規約
 
 detector 実装は IR 識別子に基づく命名規約（checkIR_NNN_ 関数接頭辞、@ir タグ等）を持ち、
-IR から detector 実装への機械的逆引きを可能にする。共用 detector を許容する場合（retired REQ-028-001 由来）も、
+IR から detector 実装への機械的逆引きを可能にする。共用 detector を許容する場合も、
 当該 IR への到達性を逆引き結果から追跡できることを維持する。
 
 ## 再帰ファイル探索と CLI 引数解析の標準API移行
@@ -132,7 +132,7 @@ case-close は REQ 行 append を伴う Definition 変更のマージ (squash me
 
 REQ 行 append を伴う工程（Definition 保存（case-ready / case-revise）の REQ 追記等）では、AUTOGEN 対象索引（docs/requirements/README.md、req-health-metrics.md 計測例等）の同 commit 再生成を前置として実行する（工程連動再生成前置）。本前置は、case-run 前置 gate の AUTOGEN 索引再生成 前置 gate（PR 対象ファイルに AUTOGEN 生成元文書の変更を含む場合に再生成を委譲へ先行して強制する）と工程側前置として整合し、REQ 行 append 後の鮮度検査（check_autogen_freshness）が exit 0 となることを期待値とする。
 
-AG-009(a)（Issue #2386 由来の既存対応計画 ID。本前置とは別の取り組み）の領域（REQ-010-059 gate 仕様およびその本体実装）は本前置の対象外であり、不変である。本前置は gate 仕様を変更せず、工程手順の前置としての整合注記を所有するに留まる。
+AG-009(a)（既存対応計画 ID。本前置とは別の取り組み）の領域（REQ-010-059 gate 仕様およびその本体実装）は本前置の対象外であり、不変である。本前置は gate 仕様を変更せず、工程手順の前置としての整合注記を所有するに留まる。
 
 ## 対象外
 

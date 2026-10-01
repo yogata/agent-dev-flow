@@ -12,7 +12,7 @@ updated: 2026-09-19
 
 位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）までは v3 を正とする。当該段階での置換実行をもって権威は本 Design へ移行する。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施する。
 
-本 Design は DEC-037（Traceability の Change / Evidence 中心への再中心化）の Design 実体である。v3 TIM Design（foundations/traceability-model.md）が正規所有したモデル要素、完全性規則、保存方式、直接走査、用語政策は本 Design が承継する（吸収節参照）。物理削除と権威移行の実行は crosswalk 第7段（OU-002）が担う。
+本 Design は DEC-037（Traceability の Change / Evidence 中心への再中心化）の Design 実体である。モデル要素、完全性規則、保存方式、直接走査、用語政策の所有対応は吸収節に定める。
 
 ## 4 問いへの回答能力
 
@@ -108,7 +108,7 @@ missing-design 942 件と missing-implementation 111 件（2026-09-19 時点の 
 
 ## traceability-model.md からの吸収節
 
-v3 TIM Design（foundations/traceability-model.md）の次の規定を本 Design が承継する。本節は権威移行の受皿であり、規定の再掲は行わない。
+本節は次の規定の所有対応を定める。規定の再掲は行わない。
 
 | 承継対象 | 承継先 |
 |---|---|

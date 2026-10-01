@@ -200,6 +200,6 @@ Issue/PR/コメント本文にリポジトリ内ファイル、ディレクト�
   存在確認・検証は agentdev-decision-file-manager、「明示承認記録が存在する」存在要件は
   document-model.md（現状維持）が所有する
 
-## Design status 昇格時の対応記録様式
+## Design status 昇格時の証跡保存
 
-Designをdraftからacceptedへ昇格する場合は、Design本体の「対応記録」節に昇格日、評価契約根拠、対応Case/PR、REQとの整合確認結果を記録する。見送り記録とは排他的に管理し、既存Designへ遡及適用しない。
+昇格時の状態更新と証跡保存先の契約は `skills/agentdev-design-file-manager.md` が所有する（昇格は状態更新のみ、証跡は当該 Case の Issue への対応記録コメント。REQ-001-015、REQ-032-025）。Design 本体への対応記録・見送り記録の新規保存は行わない。

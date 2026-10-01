@@ -10,7 +10,7 @@ updated: 2026-08-23
 | Field | Value |
 |-------|-------|
 | rule_id | IR-068 |
-| description | src 側スキル集合（配布原本・SSoT）と `.opencode/skills` 投影スキル集合の突合を検査データ化する。検査データ `data/skill-projection-manifest.yaml`（src/opencode/skills 列挙の検出ビュー）との不一致はデータ鮮度違反として、投影（junction）との不一致は投影乖離（投影欠落・stale junction）として検出する（Issue #2383 (d)、inspect F-01、REQ-010-070 由来の整備候補） |
+| description | src 側スキル集合（配布原本・SSoT）と `.opencode/skills` 投影スキル集合の突合を検査データ化する。検査データ `data/skill-projection-manifest.yaml`（src/opencode/skills 列挙の検出ビュー）との不一致はデータ鮮度違反として、投影（junction）との不一致は投影乖離（投影欠落・stale junction）として検出する（REQ-010-070 の整備候補） |
 | severity | strict（manifest ↔ src、投影突合ともに strict。manifest スキーマ警告は heuristic） |
 | category | document-drift（投影乖離の stale junction 側は obsolete-structure） |
 | detection_method | `check_integrity.ts`（`checkSkillProjectionManifest`）による3方向集合比較。(1) manifest ↔ src/opencode/skills ディレクトリ列挙（データ鮮度）、(2) src ↔ .opencode/skills 投影（junction 環境のみ）。投影比較は `.opencode/skills` に非 repo-* エントリが存在する場合のみ実施し、不在環境（git worktree、junction 未伝播、REQ-018）では info で skip する（worktree 誤検出防止、`isInsideWorktree` と同一の構造的制約に対する junction 実在検出による fallback）。投影エントリは解決可能（実体ディレクトリとして解決できる junction を含む）と解決不能（リンク先欠損の stale junction、ディレクトリ以外の混入物）に分類し、解決不能エントリは projection-broken として検出する（F-01 の stale junction 3 件はリンク先欠損のため listDirs 経由の集合比較には現れず、エントリ単位の解決判定で検出する） |
