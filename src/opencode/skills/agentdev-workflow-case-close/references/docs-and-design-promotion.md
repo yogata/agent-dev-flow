@@ -143,16 +143,16 @@ QG-4 の full integrity suite 合格基準により検証スイート全体（bu
 |---|---|---|
 | (a) case-close 内で Design 昇格 | 統合後の候補 Design の `status` が `draft`、STEP-3-1「Design 本文と実装の最終矛盾確認」により実装・検証との整合を確認済み | 対象 Design の `status` を `draft` → `accepted` に昇格し、Design 一覧表（Design README）の status 列を同時更新する（編集スコープ: プロジェクトの Design ファイル群） |
 | (b) Design 保存提案（case-revise 経由） | Design 確定候補が Design ファイル未保存 | 内部 lifecycle 段階 case-revise の再実行を提案し（case-ready の Design 保存内部責務で Design ファイルを保存）、case-close は完了させる |
-| (c) 見送り | 整合確認の結果、当該 Case で確定できないと判断 | 見送り理由と再評価契機を対応記録コメントの検証差分へ記録し、Design ファイル本体へ最小限の経緯記録を追記する。Design 本体への追記はライフサイクル経緯の最小記録に限り、設計内容としての未確定事項・将来計画・判断宣告の追記を含まない |
+| (c) 見送り | 整合確認の結果、当該 Case で確定できないと判断 | 見送り理由と再評価契機を当該 Case の Issue への対応記録コメント（検証差分節）へ記録し、現在 Design 本文へ作業履歴として新規保存しない。Design 本文へは対応記録・経緯記録を新規追記しない |
 
 - 見送り（評価実施・確定不可）と未評価（評価未実施）を区別して記録する
-- 新規の一時成果物種別・新規ドメイン状態は作らない（見送り記録は既存チャネル〔対応記録コメント、Design ファイル本体〕に保存する）
+- 新規の一時成果物種別・新規ドメイン状態は作らない（見送り記録は既存の履歴チャネル〔対応記録コメント〕に保存し、Design 本体へは新規保存しない）
 - **完了ゲート**: 統合後の全候補が (a) 昇格または (c) 見送りのいずれかの評価結果を持つことを case-close 完了条件に含める。評価結果のない候補（未評価）が残る場合は完了扱いにしない（停止または継続扱い）
 
 #### 冪等（再実行）
 
 - accepted 済み Design は棚卸し列挙の評価対象から除外する（重複する状態遷移・承認記録を生成しない）
-- 同一 Case 再実行では既存の見送り記録を評価結果として認定し、重複する見送り記録を生成しない
+- 同一 Case 再実行では対応記録コメントに保存された既存の見送り記録を評価結果として認定し、重複する見送り記録を生成しない
 
 Design status 昇格タイミング（draft → accepted）の詳細、frontmatter `status` と `updated` の更新、Design 確定候補処理の詳細は `agentdev-design-file-manager/references/design-lifecycle-application.md` を参照。
 
@@ -184,7 +184,7 @@ Design status 昇格タイミング（draft → accepted）の詳細、frontmatt
 
 ## Resume-Idempotency
 
-- 各検査は読取であり再実行可能。Design 昇格は frontmatter `status`（durable state）で判定し、`accepted` 済みの場合は再昇格しない。同一 Case 再実行では既存の見送り記録を評価結果として認定し、重複する見送り記録を生成しない
+- 各検査は読取であり再実行可能。Design 昇格は frontmatter `status`（durable state）で判定し、`accepted` 済みの場合は再昇格しない。同一 Case 再実行では対応記録コメントに保存された既存の見送り記録を評価結果として認定し、重複する見送り記録を生成しない
 
 ## resume point
 
