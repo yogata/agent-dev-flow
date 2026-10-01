@@ -16,7 +16,7 @@ inbox.md から正規化、分類、8軸評価、廃棄判定、既存対策確�
 `.opencode/` 直接反映は禁止。
 backlog-review 経由で RU 化する。
 
-**昇華可能性評価、無条件自動REQ化禁止（v2:REQ-0155-005 由来、現行の学習昇格契約は REQ-038 系）**: 各問題クラスについて恒久契約（REQ/Decision/Design）への昇華可能性を評価し、昇華可能な知見のみ `promoted/` へ出力する。
+**昇華可能性評価、無条件自動REQ化禁止（学習昇格契約は REQ-038 系）**: 各問題クラスについて恒久契約（REQ/Decision/Design）への昇華可能性を評価し、昇華可能な知見のみ `promoted/` へ出力する。
 無条件の自動REQ化は禁止し、学びは backlog-review → req-define → case-auto（内部 lifecycle の case-open / case-ready 段階）の昇華経路を経て初めて REQ 化される。
 昇華不能な知見は `deferred.md` の living pool で維持する。
 `deferred.md` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である。
@@ -71,7 +71,7 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
 
 ## 副作用
 
-- git commit/push: `.agentdev/learning/` 配下のみ（明示パスステージング。v2:REQ-0137-002/005 由来、現行の並行 Case git 規律は REQ-030-017）
+- git commit/push: `.agentdev/learning/` 配下のみ（明示パスステージング。並行 Case git 規律は REQ-030-017）
 - 実行前同期: `git pull --ff-only`
 - 昇華時 prune: 自動実行（REQ-003-006、staged/rejected/duplicate のみ。deferred/未処理は非対象 REQ-003-007）
 - `.opencode/` 直接反映: 禁止
@@ -87,7 +87,7 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
   - 問題クラス分類
   - 8軸評価
   - evaluation-report 生成
-  - 廃棄判定（11カテゴリ + duplicate）+ 昇華可能性評価（v2:REQ-0155-005 由来、現行は REQ-038 系）。無条件の自動REQ化を禁止し、昇華不能な知見は `deferred.md` の living pool で維持する
+  - 廃棄判定（11カテゴリ + duplicate）+ 昇華可能性評価（現行は REQ-038 系）。無条件の自動REQ化を禁止し、昇華不能な知見は `deferred.md` の living pool で維持する
   - 既存対策確認（既存対策優先、新規 X 化より既存 X へ反映）
   - 結果提示
   - ユーザー承認（判定、prune にユーザー承認必須）

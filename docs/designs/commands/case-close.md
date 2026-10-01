@@ -19,7 +19,7 @@ updated: "2026-09-29"
 
 # case-close Design
 
-位置づけ変更（v4、DEC-033）: 本 Design が定義する case-close は公開 command ではなく内部 lifecycle 段階である。公開 UX は要求入口（req-define、backlog-auto）と標準実行コマンド case-auto へ収斂しており、本段階は case-auto の orchestration から駆動される。本 Design は内部 lifecycle 段階の契約として継続して正規文書である（処遇の正本: v3-v4-crosswalk references/crosswalk-inventory.md）。
+本 Design が定義する case-close は公開 command ではなく内部 lifecycle 段階である。公開 UX は要求入口（req-define、backlog-auto）と標準実行コマンド case-auto へ収斂しており、本段階は case-auto の orchestration から駆動される。本 Design は内部 lifecycle 段階の契約を定める正規文書である。
 ## 目的
 
 PR をマージし、Case に記録を追記し、クローズ後に worktree とブランチを削除する。
@@ -52,7 +52,7 @@ case-run / 実行担当サブエージェント / 外部実行バックエンド
 ## 副作用
 
 - GitHub API: squash merge（Custom Tool `agentdev_gh` の pr_merge、リトライ最大5回、フォールバック手順あり）、Issue クローズ（Custom Tool `agentdev_gh` の issue_close、reason: completed）、Issue 本文更新（Custom Tool `agentdev_gh` の issue_update、VERIFY 付き）、mergeable 状態取得（Custom Tool `agentdev_gh` の pr_mergeable、squash merge 前の mergeable UNKNOWN ポーリング、REQ-031-017、最大60秒・10秒間隔）
-- git 操作: `git pull --ff-only`、`git fetch origin main:main`（非 main ブランチ占有時の代替同期、REQ-031-008）、`git add` / `git commit` / `git push`（`.agentdev/` 配下、明示パスステージング。v2:REQ-0137-002/005 由来、現行の並行 Case git 規律は REQ-030-017）
+- git 操作: `git pull --ff-only`、`git fetch origin main:main`（非 main ブランチ占有時の代替同期、REQ-031-008）、`git add` / `git commit` / `git push`（`.agentdev/` 配下、明示パスステージング。並行 Case git 規律は REQ-030-017）
 - worktree / ローカルブランチ削除: `agentdev-git-worktree` 手順に従う。リモートブランチ削除は GitHub の deleteBranchOnMerge 自動削除に委譲し case-close は実行しない（REQ-032-029、REQ-009-052）
 - capture 回収: PR 本文から intake / learning を分離回収し `.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md` へ保存
 - deviation capture（自工程）: case-close 実行中に実観測した deviation を agentdev-learning-capture skill または
@@ -142,7 +142,7 @@ Epic Issue 本文の `## 完了条件` セクションを読み込み、全完�
   - コンフリクト解消 rebase パス（REQ-003-001/002、REQ-031-003/025）（squash merge 失敗時）。squash merge がコンフリクトで失敗した場合、`git rebase` による機械的解消を試みる。rebase が自動解決した場合は再マージ（PR マージへ戻る）。rebase 自体がコンフリクトを発生した場合は実装変更を行わず case-auto へエスカレーションし停止する（コンフリクト解消モデル Level 1、`docs/designs/commands/case-auto.md` コンフリクト解消モデル Level 2/3 参照）
 - Post-merge テスト戦略検証（CI通過等の反映）
 - Issueクローズ（Custom Tool `agentdev_gh` の issue_close、reason: completed）
-- ローカルブランチ、worktree削除（`agentdev-git-worktree` 手順）。未コミット変更検出、共有作業ツリーでの `git checkout .` 禁止（v2:REQ-0137-001 由来、現行の 1-writer 検知規律は REQ-030-017）
+- ローカルブランチ、worktree削除（`agentdev-git-worktree` 手順）。未コミット変更検出、共有作業ツリーでの `git checkout .` 禁止（1-writer 検知規律は REQ-030-017）
 - 親Epic Issue更新（`agentdev-epic-tracker`、Epic 自動クローズ判定）
 - 実行前同期（`git pull --ff-only`、hash 検証）
   - git main 同期リスク事前検出、代替同期手順選択（REQ-031-008）（`git pull --ff-only` 直前に worktree 状態（dirty tree）・並列実行による ref lock 競合・非 main ブランチ占有の3リスクを事前検出。検出時に安全な代替同期手順（直列化待機、`git fetch origin main:main` による非チェックアウト同期）を選択。`agentdev-git-worktree` の git main 同期リスク事前検出プロシージャ参照）
@@ -234,7 +234,7 @@ JSON 出力は `workflow`、`files_checked`、`coupled_files_checked`、`failure
 - 学び有無のユーザー確認（エージェント自律）
 - intake と learning の混合単一成果物
 - 今回の完了条件未対応事項の intake への逃がし
-- 共有作業ツリーでの `git checkout .`（v2:REQ-0137-001 由来、現行は REQ-030-017。他セッション変更の無差別破壊）
+- 共有作業ツリーでの `git checkout .`（REQ-030-017。他セッション変更の無差別破壊）
 - 完了条件チェックボックス評価の他コマンド委譲（case-close 専任責務、`POL-completion-checkbox-single-writer`）
 - Design status 昇格の他コマンド委譲（case-close 責務、Definition 保存 / Design 保存内部責務は accepted を付与しない）
 - Epic Issue 本文ステータス追跡テーブルの他コマンド書き込み（case-close 単一書き手、`POL-epic-tracking-single-writer`）

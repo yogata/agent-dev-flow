@@ -9,6 +9,7 @@ updated: 2026-09-29
 <!-- ADF-COVERS(implementation): REQ-001-017, REQ-001-018, REQ-001-019 -->
 <!-- ADF-COVERS(implementation): REQ-001-066 -->
 <!-- ADF-COVERS(design): REQ-094-001, REQ-094-002, REQ-094-003, REQ-094-004, REQ-094-005, REQ-094-006, REQ-094-007, REQ-094-009, REQ-094-010, REQ-094-011 -->
+<!-- ADF-COVERS(design): REQ-001-003, REQ-001-014, REQ-001-015 -->
 
 # 文書種別責務、配置基準
 
@@ -20,7 +21,7 @@ updated: 2026-09-29
 > 両 Design の境界変更時は相互参照を更新し、同一関心の説明が重複・矛盾しない状態を維持する。
 
 docs/ 配下の文書（REQ/Decision/Design/guides/README）および AGENTS.md の日本語執筆における文書種別責務、配置基準、用語政策を示す。
-v2:REQ-0140（文書品質ゲート）由来、現行の文書品質契約は REQ-053（用語選択基準は REQ-094 系）である（retired v2:REQ）。
+文書品質契約は REQ-053（用語選択基準は REQ-094 系）である。
 配布 command/skill 本文のプロジェクト固有 Decision、REQ、Design 具体 ID、具体パス、固定 URL への非依存は REQ-029-003、REQ-029-004 が正規所有し、traceability 補完は extension 機構（`../foundations/project-extensions.md`）と協調する。
 意味境界の検出契約は `../integrity/distribution-boundary.md` を参照する。
 

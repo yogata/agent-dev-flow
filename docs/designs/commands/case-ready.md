@@ -11,7 +11,7 @@ updated: "2026-09-29"
 
 # case-ready Command Design
 
-位置づけ変更（v4、DEC-033）: 本 Design が定義する case-ready は公開 command ではなく内部 lifecycle 段階である。公開 UX は要求入口（req-define、backlog-auto）と標準実行コマンド case-auto へ収斂しており、本段階は case-auto の orchestration から駆動される。本 Design は内部 lifecycle 段階の契約として継続して正規文書である（処遇の正本: v3-v4-crosswalk references/crosswalk-inventory.md）。
+本 Design が定義する case-ready は公開 command ではなく内部 lifecycle 段階である。公開 UX は要求入口（req-define、backlog-auto）と標準実行コマンド case-auto へ収斂しており、本段階は case-auto の orchestration から駆動される。本 Design は内部 lifecycle 段階の契約を定める正規文書である。
 ## 目的
 
 case-ready の公開契約（入出力、副作用、安全性、承認境界、停止条件、順序契約）を定義する。case-ready は Definition の受入と実行準備完了への状態遷移を所有する主フローコマンドである（REQ-061）。
@@ -48,13 +48,9 @@ case-ready の公開契約（入出力、副作用、安全性、承認境界、
 
 再実行時は merge 済み Definition、既存 Child Issue、既存 Wave / 依存構造、Decision 受理記録を再利用し、不足分のみ処理する。merge は巻き戻さない。
 
-## 対応記録
-
-- 2026-09-15: status を draft から accepted へ昇格（REQ-032-025 の評価契約に従う棚卸し評価の結果）。昇格根拠: REQ-061 対応 Case #2809（closed）・PR #2817（merged）における実装・検証との整合確認に基づく昇格であること、および見送り記録が存在しないことを確認済み（RU-0015、Case #2848）。
-
 ## v3 epic-wave-model Design からの吸収
 
-v3 epic-wave-model Design が所有していた case-ready 構成判断基準、Wave 構成ルール、execution_unit 構成の依存ヒントと Wave 構成の重複前置検出契約（REQ-061-019、REQ-031-027、REQ-035-012）、前工程完了度3段階分類（REQ-003-011、REQ-003-012）は本 Design の規定へ吸収された。旧 Design は第5段で supersede とされ（物理削除は docs-chore OU-003）、対応関係の正本は v3-v4-crosswalk references/crosswalk-inventory.md が追跡する。
+本 Design は case-ready 構成判断基準、Wave 構成ルール、execution_unit 構成の依存ヒントと Wave 構成の重複前置検出契約（REQ-061-019、REQ-031-027、REQ-035-012）、前工程完了度3段階分類（REQ-003-011、REQ-003-012）を所有する。
 
 - Wave 構成ルール: 必須依存（意味的依存）で結合した連結成分を Epic 候補とし、技術的依存（L0-L3）は Wave 構成のための情報として連結成分計算から外す。Wave は Epic 内の子 Issue 間の意味的依存 DAG からのみ構成される Epic Issue 本文から読み取る内部構造であり、Epic サイズ上限のみを上限とし子 Issue 数の Wave 上限を持たない（REQ-035-006、REQ-061-010、REQ-061-038）。Wave 構成は同一の意味的依存関係入力から決定的に導出され、実行上限の数値に依存しない（DEC-041）。機械的判定手順は workflows/references/execution-unit-construction.md
 - 重複前置検出契約: 同一 Wave 内の子 Issue 間の変更対象ファイル重複の前置検出を Wave 構成時の情報収集として実施し、検出結果を実行・統合時の競合リスク情報として Epic Issue 本文・Wave 記録へ記録・引き渡す（REQ-061-019、REQ-035-012）。処置は変更対象分割・重複許容（衝突解消の担当とマージ順序の事前記録を含む）とし、Wave 分離を処置に含めない。ファイル重複のみを理由とした Wave 分離を行わず、検出不能の報告義務は維持する。依存ヒント（同一ファイル衝突の抑制ヒント）は競合リスク信号であり Wave 分離の判断材料としない。実行側の正規所有者表明は case-run Design 吸収節（REQ-031-027）

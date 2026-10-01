@@ -14,7 +14,7 @@ updated: "2026-09-29"
 
 # case-open Design
 
-位置づけ変更（v4、DEC-033）: 本 Design が定義する case-open は公開 command ではなく内部 lifecycle 段階である。公開 UX は要求入口（req-define、backlog-auto）と標準実行コマンド case-auto へ収斂しており、本段階は case-auto の orchestration から駆動される。本 Design は内部 lifecycle 段階の契約として継続して正規文書である（処遇の正本: v3-v4-crosswalk references/crosswalk-inventory.md）。
+本 Design が定義する case-open は公開 command ではなく内部 lifecycle 段階である。公開 UX は要求入口（req-define、backlog-auto）と標準実行コマンド case-auto へ収斂しており、本段階は case-auto の orchestration から駆動される。本 Design は内部 lifecycle 段階の契約を定める正規文書である。
 ## 目的
 
 合意済み要件doc をもとに Root Case（GitHub Issue）を確立し、Definition Package を生成して関連付ける。
@@ -175,8 +175,8 @@ case-open が使用する検査ツール（[integrity-contracts.md](../integrity
 - Definition Amendment PR の作成（case-revise の責務）
 - GitHub I/O の Tool 操作契約（Custom Tool `agentdev_gh`）経由の省略。Root Case 作成、Definition PR 作成は Tool 操作契約経由で行い、Tool 内 VERIFY を迂回する直接実行を行わないこと
 - Root Case 本文、PR 本文の文字列変数での持ち回り、親エージェントによる本文再構成の禁止
-- スイープ操作（`git add -A` / `git add .` / `git commit -a` / `git checkout .` / `git reset --hard` / `git stash` 等）の実行（v2:REQ-0137-001 由来、現行の並行作業隔離と 1-writer 検知規律は REQ-030-017）
-- 明示パス指定以外のステージ、コミット（v2:REQ-0137-002/005 由来、現行は REQ-030-017）
+- スイープ操作（`git add -A` / `git add .` / `git commit -a` / `git checkout .` / `git reset --hard` / `git stash` 等）の実行（並行作業隔離と 1-writer 検知規律は REQ-030-017）
+- 明示パス指定以外のステージ、コミット（REQ-030-017）
 - intake / learning capture パイプライン自体の操作（保存は agentdev-learning-capture / agentdev-intake-pipeline 委譲内で行い、case-open 自身は直接変更しない）
 
 ## 検証観点

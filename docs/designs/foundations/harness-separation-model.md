@@ -16,14 +16,12 @@ AgentDevFlow 配布物と harness 実行制御の責務分離モデルを定義�
 配布物は業務ワークフロー契約のみで完結し、harness 依存の具体を限定された場所へ集約する。
 本 Design は配布物が固定してはならない harness 委譲領域と、配布物が定義してよい範囲を現行契約として確定する。
 
-原本原則は DEC-001（AgentDevFlow 憲章）決定2（ADF が所有しない領域）に由来する。
-本 Design は決定2を Design として具体化し、配布成果物の責務境界（REQ-002）と協調して配布物の harness 非依存を担保する。
+原本原則の正は DEC-001（AgentDevFlow 憲章）決定2（ADF が所有しない領域）であり、本 Design は決定2を Design として具体化し、配布成果物の責務境界（REQ-002）と協調して配布物の harness 非依存を担保する。
 
 ## 配布物の harness 非依存性
 
 配布物（command、skill、Design、template、script）は次の harness 委譲領域を固定してはならない。
 本節の意味境界の正規所有者は REQ-029（REQ-029-007）および `integrity/distribution-boundary.md` である。
-本 Design は検出モデルの参照先をこれらへ更新済みであり、従来 REQ-002-021..026、032 へ分散していた参照は MOVE 先（REQ-029-001..008）へ、REQ-002-028/029/035 への作業由来品質検査参照は RETIRE 扱いへ集約済みである。
 
 - エージェント名
 - モデル名

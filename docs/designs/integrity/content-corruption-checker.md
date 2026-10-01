@@ -37,7 +37,7 @@ docs design 本文の追加により、docs corpus の表層品質を機械検�
 | `control-char` | 制御文字混入（`\t` `\n` `\r` を除く C0/C1 制御文字と DEL） | REQ-053-009 |
 | `invalid-unicode` | 不正な Unicode 文字（BOM、U+FFFD、noncharacters、私用領域、不可視整形文字） | REQ-053-009 |
 | `foreign-script` | 意図しない異言語文字（日本語・英語コーパス外の文字スクリプト） | REQ-053-009 |
-| `simplified-chinese` | 簡体字検出（簡体字↔日本語字形ペア辞書による決定的照合。RU-0144 由来） | REQ-053-009 |
+| `simplified-chinese` | 簡体字検出（簡体字↔日本語字形ペア辞書による決定的照合） | REQ-053-009 |
 | `stale-reference` | 既知形式の参照残骸（retired 配下パスへのリンク、`ADR-NNN` 旧形式、`REQ-0108-NNN` 旧ナンバリング） | REQ-053-010 |
 
 機械判定不能な項目（明らかな誤字等）は対象外であり、査読観点で扱う。

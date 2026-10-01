@@ -15,7 +15,7 @@ updated: "2026-09-24"
 
 # case-run Design
 
-位置づけ変更（v4、DEC-033）: 本 Design が定義する case-run は公開 command ではなく内部 lifecycle 段階である。公開 UX は要求入口（req-define、backlog-auto）と標準実行コマンド case-auto へ収斂しており、本段階は case-auto の orchestration から駆動される。case-auto によるインライン実行の内部段階である点を含む。本 Design は内部 lifecycle 段階の契約として継続して正規文書である（処遇の正本: v3-v4-crosswalk references/crosswalk-inventory.md）。
+本 Design が定義する case-run は公開 command ではなく内部 lifecycle 段階である。公開 UX は要求入口（req-define、backlog-auto）と標準実行コマンド case-auto へ収斂しており、本段階は case-auto の orchestration から駆動される。case-auto によるインライン実行の内部段階である点を含む。本 Design は内部 lifecycle 段階の契約を定める正規文書である。
 ## 目的
 
 与えられた単一 Issue を実行担当サブエージェントへ委譲し、result を処理する。case-run は常に単一 Issue を処理し、Epic や Wave を処理対象とする実行契約は case-auto の orchestration が単一所有する（REQ-031-006、REQ-031-015、DEC-041）。
@@ -234,11 +234,11 @@ PR 変更ファイル直接指定にも使用）、--base-ref = コミット済�
 両者は排他でなくいずれかの指定が必須、であり、CLI 表示（スクリプトヘッダコメント等）の
 正典からの drift（環境割当の逆転・排他表記の残存等）を本不変条件で検出・是正対象とする。
 
-## verification-only PR（実装差分なし、検証のみ）（v2:REQ-0158-002 由来、現行の SSoT は REQ-010-012）
+## verification-only PR（実装差分なし、検証のみ）
 
 case-run は実行担当サブエージェント委譲の結果、実装差分0件・検証のみで完了する PR（**verification-only PR**）を生成する場合がある。
 本節は verification-only PR の判定条件、PR 本文の根拠欄記入規則、GitHub の空 PR 取り扱い、case-close への引継ぎ注意事項を定める。
-要件の SSoT は REQ-010-012（保存工程と完了工程での変更ファイル限定検査と工程停止）。旧 v2:REQ-0158-002 由来。
+要件の SSoT は REQ-010-012（保存工程と完了工程での変更ファイル限定検査と工程停止）。
 
 PR テンプレート（pr_desc.md）と Issue 本文構造は workflow-templates（[agentdev-workflow-templates.md](../skills/agentdev-workflow-templates.md)）の責務である。
 pr_desc.md への verify-only 根拠欄追加は workflow-templates Design の変更として位置付ける。
@@ -396,7 +396,7 @@ case-run は Issue 本文の execution contract 必須セクション存在有�
 - 外部実行手段中間成果物の永続成果物扱い（REQ-003-007）
 - worktree 未作成時、メインリポジトリでの 実行担当サブエージェント起動（worktree precondition gate）
 - 実行担当サブエージェントへメインリポジトリパスを渡すこと（worktree root 相対パス指定）
-- Epic Wave 実行モード由来の Wave 処理の引き受け（1 Wave を超える処理、Wave 境界（PR マージ）、Wave 構成の読み取りと fan-out。Wave 実行制御は case-auto stage 3 が単一所有し、Wave 境界（PR マージ）は case-close へ委譲）
+- Epic Wave 実行モードの Wave 処理の引き受け（1 Wave を超える処理、Wave 境界（PR マージ）、Wave 構成の読み取りと fan-out。Wave 実行制御は case-auto stage 3 が単一所有し、Wave 境界（PR マージ）は case-close へ委譲）
 - スコープ拡大、intake 候選の `.agentdev/intake/inbox/` 直接変更、learning 候選と intake 候選の混在、`.agentdev/learning/inbox.md` 直接変更、Design確定候選と Findings の混在
 
 ## 検証観点
@@ -404,7 +404,7 @@ case-run は Issue 本文の execution contract 必須セクション存在有�
 - worktree precondition gate: worktree+ブランチ作成済みを検証（`git worktree list` + `git rev-parse --show-toplevel`）。検証失敗時は 実行担当サブエージェント起動禁止
 - 実行担当サブエージェント result 4状態（completed-pr / blocked / failed / delegation-unavailable）の取り扱い正確性
 - PR URL 受領の確実性（REQ-006-021 廃止に伴い PR URL フォールバック検索不使用）
-- Epic Wave 実行モード由来の Wave 単位処理の廃止（Wave 構成の読み取り、現在 Wave 判定、fan-out/fan-in、子 Issue 並列起動を行わない。REQ-031-015）、再開時の単一 Issue 冪等処理（REQ-031-016）
+- Epic Wave 実行モードの Wave 単位処理の不実施（Wave 構成の読み取り、現在 Wave 判定、fan-out/fan-in、子 Issue 並列起動を行わない。REQ-031-015）、再開時の単一 Issue 冪等処理（REQ-031-016）
 - 出力制約: PR 本文、commit message は verbatim で返す（成果物本文）
 
 ## case-auto 並列委譲モデル（REQ-034-027、REQ-031-015）

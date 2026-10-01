@@ -48,7 +48,7 @@ strict（参照切れは broken-reference として即時修正対象）
 | triage_action | 参照先実ファイルを作成する、または参照パスを修正する |
 | last_verified | 2026-08-16 |
 
-## 8項目存在条件の充足（retired REQ-028-012 由来 (a)、IR 存在資格 gate）
+## 8項目存在条件の充足（IR 存在資格 gate）
 
 1. canonical basis: REQ-010、`agentdev-skill-authoring.md`/`agentdev-command-authoring.md` の検証観点（参照先実ファイル存在確認。旧 REQ-028-012 は retired）
 2. invariant: skill/command reference のパス参照は実ファイルを指す

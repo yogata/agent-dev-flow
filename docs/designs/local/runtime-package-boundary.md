@@ -278,7 +278,7 @@ release archive 内では consumer が実行する公開入口として `scripts
 ## Tools / Plugins の配布・投影
 
 Custom Tool（src/opencode/tools/）と Plugin / Hook（src/opencode/plugins/）を正規配布種別として扱う
-（REQ-052）。原本と実行時投影は Command / Skill と同一の source・projection 原則に従い（この原則は DEC-002 由来、現行の責務体制は DEC-036。L458 参照）、
+（REQ-052）。原本と実行時投影は Command / Skill と同一の source・projection 原則に従い（現行の責務体制は DEC-036。L458 参照）、
 link mode の接続対象に含める。scripts/ 直下の公開入口は従来どおり2本に固定し、Tool / Plugin の追加によって
 新たな公開入口を作らない（REQ-050-001、REQ-052-008）。ディレクトリ構造の詳細は本 Design が所有する。
 
@@ -320,7 +320,7 @@ repo-local Plugin の自己ホスト投影対称性検査を機械検査契約�
 
 ## link mode 接続手順技術詳細
 
-`consumer-generated` リポジトリ種別における link mode 接続の技術詳細を明文化する（REQ-009 decision #2, #3, #6、v2:REQ-0150 由来、現行は REQ-009）。
+`consumer-generated` リポジトリ種別における link mode 接続の技術詳細を明文化する（REQ-009 decision #2, #3, #6）。
 
 ### local mode のリンク構成
 

@@ -62,7 +62,7 @@ REQ ファイルの作成、追記、更新を管理する知識ベースとし�
 ### REQ-ID 形式契約の一律性
 
 `alloc-composite-id.ts` が提供する複合ID（要件行ID）の抽出・認識関数は、REQ 番号の桁数として3桁（`REQ-001-NNN`）と4桁（`REQ-0011-NNN`）の両方を一貫して認識する。
-現行 REQ 群が3桁（REQ-001〜REQ-011）、旧 REQ 群（v2:REQ-0001〜0050）が4桁であった歴史的経緯に由来する。
+現行 REQ 群は3桁帯、retired の旧 REQ 群（v2:REQ-0001〜0050）は4桁帯である。
 
 関数間で正規表現の桁数契約を不一致させてはならない。
 `extractAllCompositeIds`、`extractCompositeIdNumbers`、`extractReqNumber`、`reqNumberFromFilename` は全て `(\d{3,4})` を用い、3桁と4桁を同一に扱う。
