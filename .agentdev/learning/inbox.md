@@ -294,3 +294,18 @@
 - **想定反映先**: .opencode/skills/agentdev-traceability/references/check-interpretation.md、case-run/case-close の検証差分記録規約
 - **関連**: PR #3309 本文「Findings / Capture候補」learning 項、Issue #3302 対応記録コメント（検証差分）、.agentdev/intake/inbox/2026-10-01-3302-req001-005-006-design-coverage-debt.md
 - **タグ**: `#traceability` `#missing-design` `#corpus債務` `#lifecycle-gate` `#capture`
+
+## 2026-10-01 case-run（Case #3303・SSoT コメント Findings 由来）: 旧語彙検索結果 0 件の縮約判定は 3 段判定で解釈する（語彙陳腐化と旧規則の区別・担当境界確定・構造化所有分担の扱い）
+
+- **問題事象**: verify-only closure の縮約判定（TS-007・AG-006）で、旧語彙検索の結果 0 件を「解消済み」と即断すると、実装側残存（実行時投影・検証の旧語彙）を見落とすか、逆に縮約対象外の残存を縮約対象と誤判定する。実際、PR #3305 intake の引き継ぎリストにあった case-run 系旧語彙（src/opencode/skills/**・anchor test 期待値）は docs/** には存在せず、縮約対象ではなく語彙同期対象（OU-0008 担当）と判定された
+- **発生局面**: case-run（縮約判定のインベントリ確定。Case #3303 DEL-3303-1。case-close STEP-6-4 学び検知で回収）
+- **検知方法**: AG-006 判定基準ごとのインベントリ列挙（探索パターン結果と REQ 本体実読・RA ownership_hints の突合）
+- **有効だった判定手順（3 段判定）**: (1) REQ 本体の現行語彙化を実読確認し（REQ-031-004 実読）、残存が「投影の語彙陳腐化」か「正規記述の旧規則」かを区別する、(2) RA の ownership_hints（docs/** vs src/opencode/**）で担当 OU を確定する、(3) 構造化された所有分担（2層所有宣言・委任の実体化）は重複ではなく所有者明確な記述として扱う
+- **ユーザー確認有無**: なし（縮約実施なし・変更 0 件。OU-0008 担当の記録のみ）
+- **Decision/REQ/spec影響**: なし（運用手順の知見）
+- **横展開観点**: 縮約・重複解消の判定では「探索パターンの結果 0 件」を正規記述の健全性の証拠と即断せず、正規記述側の語彙現行性実読 → 投影側の担当境界確定 → 構造化所有分担の扱い判定の順に進めると、縮約対象 0 件の判定根拠が機械検査（Guide 本文複製の行単位対照・traceability check・docs-check）付きで残る
+- **再発条件**: 正規記述の語彙現行化後に、実装投影・検証資産側へ旧語彙が残存する状態で縮約判定（AG 系インベントリ確定）を実行した場合
+- **予防策候補**: 縮約判定手続に 3 段判定の手順を明文化する候補（AG-006 判定基準の運用補助）
+- **想定反映先**: Issue #3304（OU-0008・RA-003 最終同期・case-run 系旧語彙の語彙同期）、AG-006 判定基準の運用
+- **関連**: SSoT コメント #3303#issuecomment-5932472480（TS-007 インベントリ確定・Findings 記録）、Issue #3304（OU-0008 担当）、本ファイル直上の #3302 missing-design 3 段判定エントリ（同型手続の先行記録）
+- **タグ**: `#縮約判定` `#語彙陳腐化` `#ownership_hints` `#AG-006` `#verify-only-closure` `#capture`
