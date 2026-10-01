@@ -109,4 +109,4 @@ commit message 例: `chore(agentdev): consume case-ready proxy request payload a
 - 3軸判断: Jev 20261001T075638Z-e211（Epic 0.94・依存強度 必須・一貫性 一貫）+ LLM 最終判断 = Epic。Jev 20261001T075727Z-df20（Wave1 並列可 0.95・重複許容 0.91・スコープ重複なし 0.79）+ LLM 最終判断 = 一致
 - 構成検証（決定的）: DAG 循環なし・依存 Wave 順序 OK・全割当 8/8・Epic サイズ 8 ≤ 10
 - オープン Issue: 自 Case #3293 のみ（スコープ重複候補 0 件）
-- main @ 3016eb18、Definition branch fork point 8c471d3e（無関係 chore 2件: fefa9d6f・3016eb18）
+- main 進行: Definition branch fork point 8c471d3e 以後、無関係 chore 2件（fefa9d6f・3016eb18）に加え PR #3295（78af8d72・REQ-097 third-party 成果物の運用前提と導入検知・Refs #3289）が case-ready 実行中に main へ merge 済み。78af8d72 の変更ファイル（README-INSTALL.md、docs/guides/glossary.md、scripts/**、src/opencode/plugins/agentdev-third-party-tool/**、src/opencode/tools/agentdev-third-party/**、src/third-party/skills.yaml、traceability/*.yaml 3件）は PR #3294 の 11 ファイルと重複 0 件で競合可能性なし（mergeable は UNKNOWN 表示だが overlap 0 を機械確認済み）。mergeable が CONFLICTING に変化した場合のみ case-auto コンフリクト解消手順に従い、Definition 内容は変更しない
