@@ -156,7 +156,7 @@ describe("Definition acceptance scenarios (TS-003)", () => {
   const doc = read(REF_DEF_REL);
 
   test("(a) agreed projection: merges without extra approval", () => {
-    expect(doc).toMatch(/新しい意味判断を必要としない（上記3検査が pass し、合意済み意味内容からの逸脱がない）場合、追加の人間承認を要求せず/);
+    expect(doc).toMatch(/人間に留保された判断（REQ-\{NNNN\}-\{NNN\}）の新規確定が不要で、既存の正規契約から導出できる解消と委譲された裁量の範囲内の判断である（上記3検査が pass し、合意済み意味内容からの逸脱がない）場合、追加の人間承認を要求せず/);
   });
 
   test("(b) no Definition PR (no-change case): proceeds without creating an empty PR", () => {
