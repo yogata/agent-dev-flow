@@ -26,6 +26,24 @@ source URL 形式判定（blob / raw / tree 変種の扱い）、取得トラン
 
 `acquire`（side-effect、fail-closed）。`dryRun: true` で実行せず計画（対象一覧、配置先、管理外衝突検出）を返す。
 
+## 一括実行面（CLI）
+
+OpenCode セッションを介さず同じ取得操作を実行する CLI を同 package 配下に持つ（`cli.ts`）。宣言の全件を一括取得するバッチ実行面であって、導入・同期手段には含まれない。
+
+```bash
+# リポジトリルートをカレントディレクトリとして実行する
+bun src/opencode/tools/agentdev-third-party/cli.ts --dry-run  # 取得計画の表示のみ（配置しない）
+bun src/opencode/tools/agentdev-third-party/cli.ts            # 宣言の全件を取得
+bun src/opencode/tools/agentdev-third-party/cli.ts yomiyasu   # 宣言の1件のみ取得
+```
+
+- 終了コードは取得成否に連動する（成功 0、失敗 1、引数解釈不能 2）
+- 実行面は Custom Tool と同一の取得機構（engine / acquisition / transport）を再利用する。取得結果は読み戻しで検証し、検証後の成功のみを返す（fail-closed）
+- runtime 依存は bun 組み込みのみで解決され、node_modules なし環境で動作する
+- 宣言ファイルの解決は Custom Tool と同一の2候補解決を使う。`src/third-party/skills.yaml` を優先し、不在時に `.agentdev/third-party/skills.yaml` へフォールバックする。両候補とも不在の場合は取得しない。作成先を案内して停止する
+
+consumer 環境での導入手順（`.agentdev/third-party/skills.yaml` の作成と CLI 実行）は `README-INSTALL.md` の third-party 節を参照。
+
 ## 非破壊と上書き保護
 
 - staging 取得 → staging 検証（読み戻し一致）→ 既存管理対象配置の backup → 配置 → 読み戻し VERIFY → backup 削除。いずれかの段階が失敗した場合、開始前状態へ復元する

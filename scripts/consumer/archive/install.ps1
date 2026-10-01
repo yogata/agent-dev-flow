@@ -19,6 +19,8 @@ param(
 #   6  textlint guard plugin dependency (vendor) missing or incomplete at the
 #      target (run the resolution steps: bun install && bun run build:engine
 #      under the installed plugin package, then re-run this installer)
+#   7  third-party skill declared but not placed under <Target>\skills\<name>\
+#      (run the acquisition CLI, then re-run this installer)
 
 $ErrorActionPreference = "Stop"
 $Source = [System.IO.Path]::GetFullPath($Source)
@@ -186,6 +188,72 @@ if (Test-Path -LiteralPath $pluginsSrcDir) {
                 exit 5
             }
         }
+    }
+}
+
+# Third-party Skill drift check: declared skills must be placed under
+# <Target>\skills\<name>\ (SKILL.md + provenance marker). The declaration file
+# resolves in 2 candidates under the target root: src\third-party\skills.yaml
+# first, then .agentdev\third-party\skills.yaml. Environments where neither
+# candidate exists skip the check (no third-party presupposition). Declared
+# skills without a placement stop the installer with exit 7 and guide the
+# acquisition CLI. No acquisition and no network access is performed here.
+# Keep the messages ASCII-only: this installer also runs under Windows
+# PowerShell 5.1. Three-path sync obligation: keep this check in sync with
+# scripts/install.ps1 and scripts/self-sync.ps1.
+$thirdPartyDeclCandidates = @("src\third-party\skills.yaml", ".agentdev\third-party\skills.yaml")
+$thirdPartyRoot = Split-Path -Parent $Target
+$thirdPartyDeclPath = $null
+foreach ($rel in $thirdPartyDeclCandidates) {
+    $candidate = Join-Path $thirdPartyRoot $rel
+    if (Test-Path -LiteralPath $candidate) { $thirdPartyDeclPath = $candidate; break }
+}
+if ($null -eq $thirdPartyDeclPath) {
+    Write-Host "install-from-archive: third-party skill declaration not found (src/third-party/skills.yaml or .agentdev/third-party/skills.yaml); third-party drift check skipped"
+} else {
+    Write-Host "install-from-archive: third-party skill drift check ($thirdPartyDeclPath)"
+    $thirdPartyMissing = @()
+    $inSkills = $false
+    foreach ($line in [System.IO.File]::ReadAllLines($thirdPartyDeclPath)) {
+        $t = $line.Trim()
+        if ($t.Length -eq 0 -or $t.StartsWith("#")) { continue }
+        if (-not $inSkills) {
+            if ($t -match "^skills:\s*(.*)$") {
+                $rest = $Matches[1].Trim()
+                if ($rest -eq "") { $inSkills = $true }
+                elseif ($rest -eq "[]") { break }
+                else {
+                    Write-Host "install-from-archive: unsupported skills value in declaration (exit 7): $rest" -ForegroundColor Red
+                    exit 7
+                }
+            } elseif (-not $t.StartsWith("schema_version:")) {
+                Write-Host "install-from-archive: unsupported declaration line (exit 7): $t" -ForegroundColor Red
+                exit 7
+            }
+            continue
+        }
+        if ($t.StartsWith("- name:")) {
+            $name = $t.Substring("- name:".Length).Trim().Trim('"', "'")
+            if ($name) {
+                $skillDir = Join-Path (Join-Path $Target "skills") $name
+                $hasSkillMd = Test-Path -LiteralPath (Join-Path $skillDir "SKILL.md")
+                $hasProvenance = Test-Path -LiteralPath (Join-Path $skillDir ".agentdev-third-party.json")
+                if ($hasSkillMd -and $hasProvenance) {
+                    Write-Host "install-from-archive: third-party skill placed: $name"
+                } else {
+                    Write-Host "install-from-archive: third-party skill declared but not placed (exit 7): $name ($skillDir)" -ForegroundColor Red
+                    $thirdPartyMissing += $name
+                }
+            }
+        } elseif (-not ($t.StartsWith("source:") -or $t.StartsWith("-"))) {
+            Write-Host "install-from-archive: unsupported declaration line (exit 7): $t" -ForegroundColor Red
+            exit 7
+        }
+    }
+    if ($thirdPartyMissing.Count -gt 0) {
+        Write-Host "How to resolve: run the acquisition CLI to place the declared third-party skills, then re-run this installer:"
+        Write-Host "  bun .opencode/tools/agentdev-third-party/cli.ts   (run in the directory containing .opencode/)"
+        exit 7
     }
 }
 

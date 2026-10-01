@@ -17,6 +17,7 @@ import {
   AGENTDEV_THIRD_PARTY_TOOL_NAME,
   buildTpToolEnv,
   createGitHubSourceFetcher,
+  resolveDeclarationPath,
   runAgentdevThirdPartyOperation,
 } from "../../tools/agentdev-third-party/index.ts";
 import type { SourceFetcher } from "../../tools/agentdev-third-party/index.ts";
@@ -51,7 +52,8 @@ const REQUEST_PROPERTY_SCHEMA = {
   type: "object",
   description:
     "Structured third-party Skill acquisition request. Acquires skills declared in " +
-    "src/third-party/skills.yaml into .opencode/skills/<name>/. " +
+    "src/third-party/skills.yaml (producer-managed) or .agentdev/third-party/skills.yaml " +
+    "(consumer-managed fallback) into .opencode/skills/<name>/. " +
     "Single SKILL.md sources are normalized to .opencode/skills/<name>/SKILL.md; " +
     "GitHub Skill directory sources are acquired recursively preserving the relative structure " +
     "(nothing outside the Skill directory is acquired). Existing unmanaged placements with the " +
@@ -80,7 +82,10 @@ const REQUEST_PROPERTY_SCHEMA = {
 
 /** 依存の注入点（テストは偽実装を差し込める）。 */
 export interface AgentdevThirdPartyToolDeps {
-  /** 宣言ファイルのパス解決。既定は worktree 配下の src/third-party/skills.yaml。 */
+  /**
+   * 宣言ファイルのパス解決。既定は2候補解決（src/third-party/skills.yaml を優先し、
+   * 不在時に .agentdev/third-party/skills.yaml へフォールバック。cli.ts と同一解決）。
+   */
   readonly resolveDeclarationPath?: (worktree: string) => string;
   /** 配置先ルート（.opencode/skills）の解決。既定は worktree 配下。 */
   readonly resolveSkillsRoot?: (worktree: string) => string;
@@ -110,7 +115,7 @@ export function createAgentdevThirdPartyToolDefinition(deps: AgentdevThirdPartyT
 
       const declarationPath = deps.resolveDeclarationPath
         ? deps.resolveDeclarationPath(context.worktree)
-        : path.join(context.worktree, "src", "third-party", "skills.yaml");
+        : resolveDeclarationPath(context.worktree);
       const skillsRoot = deps.resolveSkillsRoot
         ? deps.resolveSkillsRoot(context.worktree)
         : path.join(context.worktree, ".opencode", "skills");

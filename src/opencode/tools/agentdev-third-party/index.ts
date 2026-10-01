@@ -29,7 +29,7 @@ export async function runAgentdevThirdPartyOperation(
   return executeAcquire(env, rawRequest);
 }
 
-export { buildTpToolEnv, validateAcquireRequest, type TpPathProber, type TpToolEnv } from "./engine.ts";
+export { buildTpToolEnv, defaultTpPathProber, validateAcquireRequest, type TpPathProber, type TpToolEnv } from "./engine.ts";
 export { createGitHubSourceFetcher, type SourceFetcher, type GitHubFetcherEndpoints } from "./transport.ts";
 export type {
   AcquireReport,
@@ -44,4 +44,4 @@ export type {
 } from "./contracts.ts";
 export { PROVENANCE_FILENAME, classifyExisting } from "./acquisition.ts";
 export { resolveSourceUrl } from "./source-url.ts";
-export { parseDeclaration, validateSkillName } from "./declaration.ts";
+export { parseDeclaration, resolveDeclarationPath, validateSkillName } from "./declaration.ts";

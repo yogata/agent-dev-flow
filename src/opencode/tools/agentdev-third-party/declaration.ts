@@ -128,6 +128,37 @@ export function parseDeclaration(text: string): DeclarationResult {
   return { ok: true, skills };
 }
 
+import * as fs from "node:fs";
+import * as path from "node:path";
+
+/** 宣言ファイルの解決候補（優先順）: 本体管理 → consumer 管理。 */
+const DECLARATION_PATH_CANDIDATES: readonly (readonly string[])[] = [
+  ["src", "third-party", "skills.yaml"],
+  [".agentdev", "third-party", "skills.yaml"],
+];
+
+/**
+ * 宣言ファイルパスの2候補解決（Design third-party-skill-management
+ * 「宣言ファイルの配置と解決（2候補）」節）。
+ *
+ * worktree 配下で src/third-party/skills.yaml（本体管理）を優先し、不在時に
+ * .agentdev/third-party/skills.yaml（consumer 管理）へフォールバックする。
+ * 両候補とも不在の場合は consumer 管理候補のパスを返す（読込時に fail-closed
+ * で停止し、cli.ts が両候補の作成案内を表示する）。取得機構の全実行面
+ * （Custom Tool の既定解決と cli.ts）は本関数の同一解決を使用する。
+ */
+export function resolveDeclarationPath(worktree: string): string {
+  const candidates = DECLARATION_PATH_CANDIDATES.map((segments) =>
+    path.join(worktree, ...segments),
+  );
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
+  return candidates[candidates.length - 1] as string;
+}
+
 /** 宣言ファイルの読み込み。不存在・非 UTF-8・不正スキーマは失敗（fail-closed）。 */
 export async function loadDeclaration(declarationPath: string): Promise<DeclarationResult> {
   let file;
