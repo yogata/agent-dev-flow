@@ -249,3 +249,33 @@
 - **問題事象3**: integrity suite のサブプロセス実行型回帰テスト（IR-055）はテスト側 15 秒タイムアウトを持ち、同一 HEAD・同一 canonical 形式で環境負荷により 0 fail ⇄ 4 fail が変動（main root 同一再現で確認）。タイムアウト値見直しまたは実行系分離が安定化方策。
 - **運用実績（REQ-093 補強）**: agentdev_gh exit 66 持続時の縮退運用（probe 1回 → write 持続確認 1回 → 書込み打ち止め → proxy payload 化 → 外部 Supervisor 回復パスで consume）が機能した。
 - 分類候補: learning（#3298/#3299 事例・PR #3306/#3307 Findings より）
+
+## 2026-10-01 case-close（Case #3300・PR #3308 Findings 由来）: IR-072 NG（REQ-032.md updated 鮮度）は Wave 1 merge 起因の既存起因であり docs/requirements 変更を含まない Case では解消不能
+
+- **問題事象**: check_integrity の IR-072 NG（REQ-032.md frontmatter updated 2026-09-29 に対し最終内容変更 commit 日 2026-10-01）が現行 HEAD に存在。Wave 1（PR #3307）の merge 起因であり、docs/designs のみを変更する OU-0004（Issue #3300・PR #3308）では docs/requirements が対象外のため未処置となった
+- **発生局面**: case-run（docs/designs/** 現在形純化スイープ。Case #3300 DEL-3300-1）の docs-check で検出
+- **検知方法**: check_integrity.ts --root worktree の NG 4 件のうち、本 Issue 未変更ファイル（docs/requirements/REQ-032.md）の既存起因として分類
+- **根本原因**: REQ frontmatter updated の鮮度検査（IR-072）は REQ ファイルの最終内容変更日を追従するため、直前の merge で REQ ファイルが更新された直後の Case では波及検出される。当該 Case の変更対象外ファイルである場合、その Case 内では解消手段がない
+- **ユーザー確認有無**: なし（out-of-scope 記録のみ）
+- **Decision/REQ/spec影響**: なし（既存起因の out-of-scope 記録。OU-0008 TS-008 最終横断検証での解消候補）
+- **横展開観点**: Epic Wave 構成で Wave 間に REQ ファイル更新を含む merge が入る場合、後続の docs のみを変更する子 Issue の docs-check に IR-072 が既存起因として波及し得る。由来分類（Wave 起因・当該変更起因なし）を検証記録へ残し、Epic の最終横断検証を担当する子 Issue（OU-0008）へ引き継ぐのが安全
+- **再発条件**: REQ ファイル更新を含む merge の直後に、docs/requirements を対象外とする子 Issue の docs-check を実行した場合
+- **予防策候補**: Epic flow では REQ 鮮度系 IR の既存起因波及を想定し、最終 Wave 担当 Issue への既存起因引き継ぎを検証差分に明示する運用
+- **想定反映先**: Issue #3304（OU-0008・TS-008 最終横断検証）の既知 finding 現存確認、docs/designs/integrity/rules/IR-072-req-updated-freshness.md（false_positive_risk 記述の追補候補）
+- **関連**: PR #3308 本文「Findings / Capture候補」learning 項、PR #3307（Wave 1 merge・updated 進行の直接起因）、Issue #3300 対応記録コメント（検証差分）
+- **タグ**: `#integrity` `#IR-072` `#updated鮮度` `#epic-wave` `#既存起因` `#capture`
+
+## 2026-10-01 case-run（Case #3300・PR #3308 Findings 由来）: worktree の .opencode 側 plugin package で bun run build:engine を実行すると producer 側 vendor へ書き出すパス解決になる
+
+- **問題事象**: worktree の .opencode 側 plugin package（.opencode/plugins/agentdev-textlint-guard）で `bun run build:engine` を実行すると、build script が producer 側（src/opencode/plugins/agentdev-textlint-guard）の vendor へ kuromoji dict を書き出すパス解決になることを実測。src の追跡対象ファイルは不変のため git への影響はなかった
+- **発生局面**: case-run（textlint gate 実行前の依存再生成。Case #3300 DEL-3300-1）
+- **検知方法**: build:engine 実行後の書き出し先確認（src 側 vendor への書き出しを実測）
+- **根本原因**: worktree 側 .opencode/plugins は junction／投影領域であり、build script のパス解決が producer 側 src ツリーへ帰着する
+- **ユーザー確認有無**: なし（src 変更なしのため対応不要を確認）
+- **Decision/REQ/spec影響**: なし（運用上の注意の追補候補）
+- **横展開観点**: src 変更禁止の委譲では、host の vendor が既に存在することを確認してから plugin 依存生成を実行するのが安全。worktree 側 package での build:engine 実行は src 側への書き出し副作用を持ち得るため、実行前に対象パスを確認する
+- **再発条件**: worktree 内の .opencode 側 plugin package で依存生成系 script を実行した場合
+- **予防策候補**: plugin README「導入時の依存生成手順」に worktree 実行時の書き出し先注意を追記する候補（.opencode/skills/repo-agentdev-integrity 配布外のため docs 側判断）
+- **想定反映先**: src/opencode/plugins/agentdev-textlint-guard/README.md（依存生成手順の注意書き）
+- **関連**: PR #3308 本文「Findings / Capture候補」learning 項、Issue #3300 対応記録コメント（テスト結果の textlint gate 行）
+- **タグ**: `#textlint` `#plugin` `#worktree` `#build-engine` `#vendor` `#capture`
