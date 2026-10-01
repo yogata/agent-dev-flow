@@ -7,6 +7,7 @@ implementation:
     - REQ-094-006
     - REQ-094-010
     - REQ-094-011
+    - REQ-096-015
   src/opencode/plugins/agentdev-jev-tool/README.md:
     - REQ-094-001
     - REQ-094-002
