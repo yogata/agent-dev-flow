@@ -309,3 +309,18 @@
 - **想定反映先**: Issue #3304（OU-0008・RA-003 最終同期・case-run 系旧語彙の語彙同期）、AG-006 判定基準の運用
 - **関連**: SSoT コメント #3303#issuecomment-5932472480（TS-007 インベントリ確定・Findings 記録）、Issue #3304（OU-0008 担当）、本ファイル直上の #3302 missing-design 3 段判定エントリ（同型手続の先行記録）
 - **タグ**: `#縮約判定` `#語彙陳腐化` `#ownership_hints` `#AG-006` `#verify-only-closure` `#capture`
+
+## 2026-10-01 case-close（Case #3304・STEP-6-1 worktree クリーンアップ）: Windows で git worktree remove が Filename too long で部分失敗したら robocopy /MIR で残存ディレクトリを掃除する
+
+- **問題事象**: Windows 環境で `git worktree remove .worktrees/3304-case` が deep path（`src/opencode/skills/**` 配下の深いディレクトリ構造）により「error: failed to delete ... Filename too long」で失敗。worktree の git 登録（`.git/worktrees/` 管理ファイル）は解除されるが、ディレクトリ本体が部分残存する
+- **発生局面**: case-close STEP-6-1（worktree 削除。Case #3304 DEL-3304-CL1）
+- **検知方法**: `git worktree remove` のエラー出力と、削除後の `git worktree list` / `ls .worktrees/3304-case` の突合
+- **有効だった解決手順**: (1) `git -c core.longpaths=true worktree remove` は登録解除済みで無効（'is not a working tree'、longpaths はこの局面では効かなかった）、(2) 空ディレクトリを用意して `robocopy <空ディレクトリ> <残存worktree> /MIR` で mirror 削除（rc 0-7 は成功。EXTRA files 表示は削除対象の列挙で異常ではない）、(3) 削除後 `find -type f | wc -l` で 0 件を検証してから `rmdir` で空壳も除去
+- **ユーザー確認有無**: なし（機械的 cleanup のみ）
+- **Decision/REQ/spec影響**: なし（環境対処の知見）
+- **横展開観点**: Windows 環境の case-close STEP-6-1 では、deep path を含む worktree（src/opencode/skills/** 配下の構造を checkout したもの）で同様の部分失敗が再発し得る。skill の「remove 失敗時は残存退避ファイルを確認・掃除してから再試行」の掃除対象には long path 由来の部分残存も含まれる
+- **再発条件**: Windows + 260 文字超の deep path を含む未追跡生成物（node_modules、vendor 等）が残る worktree の削除
+- **予防策候補**: agentdev-git-worktree skill の worktree 削除手順に「Filename too long 時は robocopy /MIR で残存ディレクトリ掃除」の手順を追記する候補
+- **想定反映先**: src/opencode/skills/agentdev-git-worktree/references/worktree-operations.md（worktree 削除手順）
+- **関連**: git worktree remove 標準手順、Windows 環境のエンコーディング/パス防御知見（docs/knowledge/windows-powershell-bulk-io-corruption.md は I/O 系、本件は path 長系の別課題）
+- **タグ**: `#windows` `#long-path` `#robocopy` `#worktree-remove` `#cleanup` `#capture`
