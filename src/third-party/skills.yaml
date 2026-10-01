@@ -29,4 +29,6 @@ schema_version: "1.0"
 #   - name: example-skill
 #     source: https://example.com/example-skill/SKILL.md
 
-skills: []
+skills:
+  - name: yomiyasu
+    source: https://github.com/nanaism/yomiyasu/tree/30ee6041c328ce21d38a7963f667e079a93d7a12/skills/yomiyasu

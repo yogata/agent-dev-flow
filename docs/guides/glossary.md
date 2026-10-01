@@ -37,6 +37,7 @@ AgentDevFlow で使う用語の定義。
 | Report | 監査・評価・観測の事実記録。`docs/reports/**/*.md` に配置 |
 | README | ドキュメント入口、各ディレクトリの索引。`docs/README.md` 等 |
 | guides | 利用者向けの参照用読み物。`docs/guides/*.md` に配置 |
+| third-party 成果物 | ADF が製作していないが、配布成果物が依存し、宣言に基づいて導入時に ADF の管理下で配置・解決する成果物。Skill 形式（宣言の正は skills.yaml〔src/third-party/ または .agentdev/third-party/〕、取得機構による解決、配置先は `.opencode/skills/<name>/`）と package 形式（宣言の正は版固定情報〔依存宣言と lockfile〕、導入時生成による解決、配置先は plugin 配下の依存成果物領域）の2形態がある。環境ツール（bun、git、gh、OpenCode 自身等）は動作環境であって依存ではないため対象外。詳細は Design `third-party-skill-management.md` を参照 |
 | RU（Requirement Unit） | Intake/Learning の採用済み成果物を統合した構造化成果物。`.agentdev/backlog/req-units/RU-*.md` に配置 |
 | 採用済み成果物（promoted artifact） | backlog-review の入力となる整形済み成果物。Intake/Learning それぞれの `promoted/` に配置 |
 | 追跡Issue（tracking Issue） | 課題、ToDo、アイデア、リスク等の未解決事項の育成管理単位。GitHub Issue を共通管理単位とし、role: tracking として機械判定される。docs/ 配下の文書種別ではなく管理単位・永続状態として扱う（REQ-049）。操作は Tool 操作契約経由 |

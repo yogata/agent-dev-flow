@@ -10,6 +10,10 @@
 //     the current source enumeration (REQ-050-004)
 //   - tools/plugins projection: apply junctions the Custom Tool and
 //     Plugin / Hook distribution kinds into .opencode/ (REQ-052-007)
+//   - third-party skill drift detection: declared skills without a placement
+//     stop install.ps1 / self-sync.ps1 with exit 7 and guide the acquisition
+//     CLI; environments without a declaration file skip the check; the
+//     consumer archive installer skips it on copy as well
 //
 // The consumer layout is exercised in both checkout forms accepted by
 // REQ-050 / REQ-009: git clone style (.git present) and source ZIP style
@@ -17,6 +21,7 @@
 
 // ADF-COVERS(verification): REQ-050-004, REQ-050-005, REQ-050-006
 // ADF-COVERS(verification): REQ-052-007
+// ADF-COVERS(verification): REQ-097-002
 
 import { describe, expect, test } from "bun:test";
 import * as crypto from "crypto";
@@ -315,4 +320,145 @@ describe("scripts behavior / check capabilities (REQ-050-004)", () => {
       rmrf(zipRoot);
     }
   }, 180000);
+});
+
+// --- third-party skill drift detection fixtures ---
+
+function writeThirdPartyDeclaration(root: string, name: string): void {
+  const declDir = path.join(root, "src", "third-party");
+  fs.mkdirSync(declDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(declDir, "skills.yaml"),
+    [
+      'schema_version: "1.0"',
+      "skills:",
+      `  - name: ${name}`,
+      `    source: https://github.com/owner/repo/tree/0000000000000000000000000000000000000000/skills/${name}`,
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+}
+
+function placeThirdPartySkill(root: string, name: string): void {
+  const skillDir = path.join(root, ".opencode", "skills", name);
+  fs.mkdirSync(skillDir, { recursive: true });
+  fs.writeFileSync(path.join(skillDir, "SKILL.md"), "# third-party skill\n", "utf-8");
+  fs.writeFileSync(
+    path.join(skillDir, ".agentdev-third-party.json"),
+    `${JSON.stringify({
+      tool: "agentdev_third_party",
+      name,
+      source: "https://github.com/owner/repo/tree/0000000000000000000000000000000000000000/skills/x",
+      profile: "directory",
+      acquiredAt: "2026-10-01T00:00:00.000Z",
+    })}\n`,
+    "utf-8",
+  );
+}
+
+describe("scripts behavior / third-party skill drift detection", () => {
+  test("declaration absent: install.ps1 skips the drift check and completes", () => {
+    const root = makeConsumerRepo(false);
+    try {
+      const apply = runInstall(root, "apply");
+      expect(apply.exitCode).toBe(0);
+      expect(apply.stdout).toContain("third-party drift check skipped");
+      const check = runInstall(root, "check");
+      expect(check.exitCode).toBe(0);
+    } finally {
+      rmrf(root);
+    }
+  }, 180000);
+
+  test("declared and placed: install.ps1 reports no drift and passes", () => {
+    const root = makeConsumerRepo(false);
+    try {
+      writeThirdPartyDeclaration(root, "drift-ok-skill");
+      placeThirdPartySkill(root, "drift-ok-skill");
+      const apply = runInstall(root, "apply");
+      expect(apply.exitCode).toBe(0);
+      const check = runInstall(root, "check");
+      expect(check.exitCode).toBe(0);
+      expect(check.stdout).toContain("third-party Skill placed: drift-ok-skill");
+    } finally {
+      rmrf(root);
+    }
+  }, 180000);
+
+  test("declared but missing placement: install.ps1 check stops with exit 7 and guides the CLI", () => {
+    const root = makeConsumerRepo(false);
+    try {
+      writeThirdPartyDeclaration(root, "drift-missing-skill");
+      const check = runInstall(root, "check");
+      expect(check.exitCode).toBe(7);
+      expect(check.stdout).toContain("declared but not placed: drift-missing-skill");
+      expect(check.stdout).toContain("bun .opencode/tools/agentdev-third-party/cli.ts");
+    } finally {
+      rmrf(root);
+    }
+  }, 120000);
+
+  test("empty declaration (skills: []): install.ps1 reports no drift and passes", () => {
+    const root = makeConsumerRepo(false);
+    try {
+      const declDir = path.join(root, "src", "third-party");
+      fs.mkdirSync(declDir, { recursive: true });
+      fs.writeFileSync(path.join(declDir, "skills.yaml"), "schema_version: \"1.0\"\nskills: []\n", "utf-8");
+      const apply = runInstall(root, "apply");
+      expect(apply.exitCode).toBe(0);
+      const check = runInstall(root, "check");
+      expect(check.exitCode).toBe(0);
+    } finally {
+      rmrf(root);
+    }
+  }, 180000);
+
+  test("declared but missing placement: self-sync.ps1 check stops with exit 7 and guides the CLI", () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "adf-self-"));
+    try {
+      fs.mkdirSync(path.join(root, "scripts"), { recursive: true });
+      fs.copyFileSync(SELF_SYNC_PS1, path.join(root, "scripts", "self-sync.ps1"));
+      const skillSrc = path.join(root, "src", "opencode", "skills", "agentdev-x");
+      fs.mkdirSync(skillSrc, { recursive: true });
+      fs.writeFileSync(path.join(skillSrc, "SKILL.md"), "# x\n", "utf-8");
+      writeThirdPartyDeclaration(root, "drift-missing-skill");
+      const r = runPwsh(["-File", path.join(root, "scripts", "self-sync.ps1"), "-Mode", "check"], root);
+      expect(r.exitCode).toBe(7);
+      expect(r.stdout).toContain("declared but not placed: drift-missing-skill");
+      expect(r.stdout).toContain("bun src/opencode/tools/agentdev-third-party/cli.ts");
+    } finally {
+      rmrf(root);
+    }
+  }, 120000);
+
+  test("archive installer: declaration absent consumer env completes copy without drift stop", () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "adf-arch-"));
+    try {
+      const src = path.join(root, "src", "opencode");
+      fs.mkdirSync(path.join(src, "commands", "agentdev"), { recursive: true });
+      fs.mkdirSync(path.join(src, "skills", "agentdev-x"), { recursive: true });
+      fs.writeFileSync(path.join(src, "commands", "agentdev", "case-run.md"), "# case-run\n", "utf-8");
+      fs.writeFileSync(path.join(src, "skills", "agentdev-x", "SKILL.md"), "# x\n", "utf-8");
+      const target = path.join(root, ".opencode");
+      const r = runPwsh(
+        [
+          "-File",
+          path.join(REPO_ROOT, "scripts", "consumer", "archive", "install.ps1"),
+          "-Source",
+          src,
+          "-Target",
+          target,
+          "-Mode",
+          "copy",
+        ],
+        root,
+      );
+      expect(r.exitCode).toBe(0);
+      expect(r.stdout).toContain("third-party drift check skipped");
+      expect(fs.existsSync(path.join(target, "skills", "agentdev-x", "SKILL.md"))).toBe(true);
+    } finally {
+      rmrf(root);
+    }
+  }, 120000);
 });

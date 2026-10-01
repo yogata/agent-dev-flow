@@ -428,6 +428,86 @@ function Test-TextlintBundleVersionsMatchPin {
     return $true, ''
 }
 
+# --- Third-party Skill drift detection ---
+
+# 宣言ファイル（src/third-party/skills.yaml、不在時は .agentdev/third-party/skills.yaml
+# の2候補解決）と .opencode/skills/<name>/ の配置（SKILL.md と provenance マーカー）の
+# 突合。宣言ファイルが解決できない環境は検査対象外として正常扱いし、宣言済みで配置が
+# 欠落する場合は ERROR 停止（終了コード 7）して取得機構 CLI を案内する。取得と
+# network access は本スクリプトが行わない。name 列挙の抽出に限定し、宣言の構文検証は
+# 取得機構のパーサーを正本とする。3経路同期契約: scripts/self-sync.ps1 と
+# scripts/consumer/archive/install.ps1 の同名検知と同期して維持すること。
+$ThirdPartyDeclRelCandidates = @('src\third-party\skills.yaml', '.agentdev\third-party\skills.yaml')
+$ThirdPartyProvenanceMarker = '.agentdev-third-party.json'
+$ThirdPartyDriftExitCode = 7
+
+function Get-ThirdPartyDeclaredNames {
+    <#
+    .SYNOPSIS
+        宣言ファイルから name 列挙を抽出する（最小 yaml 解析。name 列挙の抽出に限定）。
+    #>
+    param([string]$DeclarationPath)
+    $names = @()
+    $inSkills = $false
+    foreach ($line in [System.IO.File]::ReadAllLines($DeclarationPath)) {
+        $t = $line.Trim()
+        if ($t.Length -eq 0 -or $t.StartsWith('#')) { continue }
+        if (-not $inSkills) {
+            if ($t -match '^skills:\s*(.*)$') {
+                $rest = $Matches[1].Trim()
+                if ($rest -eq '') { $inSkills = $true }
+                elseif ($rest -eq '[]') { return @() }
+                else { throw "unsupported skills value in declaration: $rest" }
+            } elseif (-not $t.StartsWith('schema_version:')) {
+                throw "unsupported declaration line: $t"
+            }
+            continue
+        }
+        if ($t.StartsWith('- name:')) {
+            $name = $t.Substring('- name:'.Length).Trim().Trim('"', "'")
+            if ($name) { $names += $name }
+        } elseif (-not ($t.StartsWith('source:') -or $t.StartsWith('-'))) {
+            throw "unsupported declaration line: $t"
+        }
+    }
+    return $names
+}
+
+function Invoke-ThirdPartyDriftCheck {
+    <#
+    .SYNOPSIS
+        third-party Skill の drift 検知（宣言済みで配置欠落の ERROR 停止と案内）。
+    #>
+    param([string]$RootDir, [string]$SkillsRootDir, [string]$CliCommandHint)
+    $declarationPath = $null
+    foreach ($rel in $ThirdPartyDeclRelCandidates) {
+        $candidate = Join-Path $RootDir $rel
+        if (Test-Path -LiteralPath $candidate) { $declarationPath = $candidate; break }
+    }
+    if (-not $declarationPath) {
+        Write-Host '[INFO] third-party Skill declaration not found (src/third-party/skills.yaml or .agentdev/third-party/skills.yaml); third-party drift check skipped'
+        return
+    }
+    Write-Host "=== third-party Skill drift check ($declarationPath) ==="
+    $declaredNames = @(Get-ThirdPartyDeclaredNames -DeclarationPath $declarationPath)
+    $missing = @()
+    foreach ($name in $declaredNames) {
+        $skillDir = Join-Path $SkillsRootDir $name
+        $hasSkillMd = Test-Path -LiteralPath (Join-Path $skillDir 'SKILL.md')
+        $hasProvenance = Test-Path -LiteralPath (Join-Path $skillDir $ThirdPartyProvenanceMarker)
+        if ($hasSkillMd -and $hasProvenance) {
+            Write-Host "[OK] third-party Skill placed: $name"
+        } else {
+            Write-Host "[ERROR] third-party Skill declared but not placed: $name ($skillDir)"
+            $missing += $name
+        }
+    }
+    if ($missing.Count -gt 0) {
+        Write-Host "導入手順: 取得機構の CLI で third-party Skill を取得してください: $CliCommandHint"
+        exit $ThirdPartyDriftExitCode
+    }
+}
+
 # --- Checkout Guidance (AG-002/REQ-009-047) ---
 
 # 案内文言・既定 URL 定数は consumer-opencode-common.ps1 の共有定義を使用する（RU-0014、AG-020）。
@@ -476,6 +556,10 @@ if ($Mode -ne 'check' -and -not (Test-TextlintVendorReady)) {
     Show-TextlintVendorGuidance
     exit 1
 }
+
+# third-party Skill drift 検知（全モード共通。宣言済みで配置欠落は ERROR 停止し、
+# 宣言ファイルが解決できない環境は検査対象外として正常扱いする）
+Invoke-ThirdPartyDriftCheck -RootDir $RepoRoot -SkillsRootDir $SkillsDir -CliCommandHint 'bun .opencode/tools/agentdev-third-party/cli.ts'
 
 # LocalMode requires the local redirect target (Local 実装 Tool) to exist
 if ($LocalMode) {

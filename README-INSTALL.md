@@ -61,6 +61,43 @@ Pop-Location
 
 依存生成の完了後、textlint 検査は空のパッケージキャッシュ・ネットワーク遮断下でも動作する（node_modules は不要）。
 
+## third-party 成果物の導入（consumer）
+
+AgentDevFlow が依存する third-party 成果物には2つの形態がある。宣言の場所、解決手順、配置先、drift 検知の意味が形態ごとに異なる。
+
+| 形態 | 宣言の場所 | 解決手順 | 配置先 | drift 検知の意味 |
+|------|-----------|---------|--------|-----------------|
+| Skill 形式 | `src/third-party/skills.yaml`（本体管理）または `.agentdev/third-party/skills.yaml`（consumer 管理。本体管理が不在の環境で使う） | 取得機構（Custom Tool `agentdev_third_party` または同 package 内 CLI）が宣言に基づき取得 | `.opencode/skills/<name>/` | 宣言済みで配置が欠落する場合、導入系 installer が終了コード 7 で停止し取得手段を案内する |
+| package 形式 | plugin package 配下の `package.json` + `bun.lock`（版固定情報） | 導入時生成（`bun install` + `bun run build:engine`。前節の手順） | plugin 配下の依存成果物領域（`node_modules/`・`vendor/`） | 依存実体が未生成・不完全な場合、installer が終了コード 6 で停止し生成手順を案内する |
+
+環境ツール（bun、git、gh、OpenCode 自身）は動作環境にあたり、third-party 成果物の対象外です。
+
+### Skill 形式の導入手順（consumer）
+
+consumer リポジトリで third-party Skill を導入する手順は次の2段階で完結する。
+
+1. 宣言ファイルを `.agentdev/third-party/skills.yaml` として作成する
+
+   ```yaml
+   schema_version: "1.0"
+   skills:
+     - name: example-skill
+       source: https://github.com/<owner>/<repo>/tree/<commit-hash>/<skill-directory>
+   ```
+
+   `name` は kebab-case で記述する（`agentdev-` と `repo-` の接頭辞は使用できない）。`source` は commit hash 固定の GitHub URL で版固定を表現する（単一 SKILL.md を指す blob URL も指定できる）。
+
+2. 取得機構の CLI を実行する（リポジトリルートをカレントディレクトリとして実行する）
+
+   ```powershell
+   bun .opencode/tools/agentdev-third-party/cli.ts           # 宣言の全件を取得
+   bun .opencode/tools/agentdev-third-party/cli.ts --dry-run # 取得計画の表示のみ
+   ```
+
+CLI は取得結果を読み戻しで検証してから成功を返す（fail-closed）。宣言ファイルが両候補とも存在しない環境では、CLI は取得しない。作成先を案内して停止する。導入済み Skill の更新は CLI の再実行で行う。
+
+installer（`scripts/install.ps1`）は宣言済み Skill が `.opencode/skills/<name>/` へ配置済みであることを検査する。宣言済みで配置が欠落する場合は終了コード 7 で停止するため、上記の CLI を実行してから installer を再実行する。宣言ファイルが両候補とも存在しない環境では、この検査を飛ばして正常に完了する（third-party Skill の前提がない環境として扱う）。
+
 ## 終了コード
 
 | コード | 意味 |
@@ -69,6 +106,7 @@ Pop-Location
 | 4      | 配置先に既存ファイルがあり、内容が異なる（上書きせず停止） |
 | 5      | 必須ディレクトリの作成に失敗、または Source が存在しない |
 | 6      | textlint guard plugin の依存実体（vendor）が配置先に未生成または不完全（「導入時の依存生成手順」を実行してから再実行） |
+| 7      | third-party Skill（Skill 形式）が宣言済みで `.opencode/skills/<name>/` への配置が欠落（「third-party 成果物の導入」の CLI を実行してから再実行） |
 
 終了コード 4 の場合は、配置先を一旦退避するか削除してから再実行すること。
 

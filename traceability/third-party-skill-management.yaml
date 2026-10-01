@@ -1,0 +1,18 @@
+component: third-party-skill-management
+implementation:
+  src/opencode/plugins/agentdev-third-party-tool/plugin.ts:
+    - REQ-097-004
+  src/opencode/tools/agentdev-third-party/README.md:
+    - REQ-097-003
+  src/opencode/tools/agentdev-third-party/cli.ts:
+    - REQ-097-003
+  src/opencode/tools/agentdev-third-party/declaration.ts:
+    - REQ-097-004
+  src/third-party/skills.yaml:
+    - REQ-097-002
+verification:
+  README-INSTALL.md:
+    - REQ-097-001
+  src/opencode/tools/agentdev-third-party/tests/cli.test.ts:
+    - REQ-097-003
+    - REQ-097-004
