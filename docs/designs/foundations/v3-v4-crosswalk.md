@@ -9,8 +9,10 @@ updated: 2026-09-19
 
 位置づけ: 本 Design は v3 成果物の v4 での処遇の正規記録先である。処遇の完全一覧は
 references/crosswalk-inventory.md が所有し、本 Design は分類スキーマ、処遇実行原則、
-段階割当規則、集約サマリを所有する。実際の置換・廃止の実行は後続 v4 Implementation
-Sequence（v4-migration-and-release.md）の各段階で行う。
+段階割当規則、集約サマリを所有する。処遇未完了エントリ（living tracking 対象）は処遇記録として保持し、削除しない。
+他 Design による本 crosswalk の参照は、(a) 処遇未完了エントリの処遇記録としての参照と
+(b) 現行契約の正規所有を本 crosswalk に求める参照に分類する。(b) の参照は現在の正規所有者へ付け替え、
+(a) は処遇が完了するまで本 crosswalk を参照先として維持する。
 
 ## 分類スキーマ（3 列）
 
@@ -20,7 +22,7 @@ Sequence（v4-migration-and-release.md）の各段階で行う。
   （後継が確定した置換）/ retire（後継なしの廃止）
 - 帰属: Runtime / Standard Operating Model / semantic Skill / deterministic code/tool /
   Adapter / Project Extension / Project Model / ―（概念・複合）
-- 実行段階: 後続 v4 Implementation Sequence の段階番号（1〜17）。keep は ―
+- 実行段階: v4 実装 Sequence の段階番号。keep は ―
 
 従来の 9 分類軸は、意味処遇・帰属・機構置換の 3 次元を単一列へ混在させた表現であり、
 本スキーマへ再編成した。機構置換（旧第 9 軸）は意味処遇 supersede と置換先の備考で
@@ -28,22 +30,17 @@ Sequence（v4-migration-and-release.md）の各段階で行う。
 
 ## 処遇実行原則
 
-- RETIRE / supersede の実行は、当該 v4 置換の実装が着地する段階で行う。第3段は全処遇の
-  記録（planned）のみとし、RETIRE 実行を行わない
+- RETIRE / supersede の実行は、当該 v4 置換の実装が着地する段階で行う
 - 処遇は暫定（planned）として記録し、担当段階の要件確定時に confirmed、処遇実行完了時に
   executed へ遷移させる（living tracking）
 - 各段階の case-close は自段の担当行を confirmed 以上へ遷移させる。ドメイン一括行は
   個別判断が必要になった時点で個別行へ展開してよい
-- 第13段（full validation）で全行が executed であることを検証する
 
 ## 段階割当規則
 
-- 実行段階は v4-migration-and-release.md「後続 v4 Implementation Sequence」の段階番号
-  （1: Foundation、2: Runtime/lifecycle/state、3: REQ/Decision/Design implementation、
-  4: req-define/case-auto UX、5: work_type/scale/Epic/Wave、6: Quality、7: Traceability、
-  8: Skill restructuring、9: Loop、10: Extensions、11: adapters、12: migration
-  implementation、13: full validation、14: v4.0.0-rc.1、15: self-hosting + pilot、
-  16: RC fixes、17: v4.0.0）に準拠する。crosswalk 独自の段階番号を持たない
+- 実行段階は v4 実装 Sequence の段階番号に準拠する。crosswalk 独自の段階番号を持たない。
+  段階番号一覧と AgentDevFlow 本体再編（自己適用）の段階進行記録は判断記録（DEC-034）と
+  Git 履歴へ委ねる。処遇未完了エントリの割当済み段階番号は処遇記録として保持する
 
 ## 集約サマリ
 
@@ -52,5 +49,5 @@ Sequence（v4-migration-and-release.md）の各段階で行う。
 - Design（v3 側 accepted）: ドメイン別の内訳は inventory を正とする。状態系 9 件と traceability-model、quality-gates が supersede、検証基盤系は keep 中心
 - 実装資産: scripts/** は第8段、traceability/** は第7段、.agentdev/ 状態領域は第9段、配布物・プロジェクションは第12段
 
-件数は v3→v4 移行判定時点（第13段 full validation、2026-09-20）の確定値であり、本書は移行記録である。
+件数は v3→v4 移行判定時点の確定値であり、処遇記録として保持する。
 正確な内訳は references/crosswalk-inventory.md を正とする。

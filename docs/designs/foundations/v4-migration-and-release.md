@@ -7,7 +7,7 @@ updated: 2026-09-20
 
 # ADF v4 Migration と Release の標準境界
 
-位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）までは v3 を正とする。当該段階での置換実行をもって権威は本 Design へ移行する。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施する。
+位置づけ: 本 Design は ADF v4 の移行と release の標準境界である。移行アーキテクチャの原則（非破壊移行原則、RC cutover、pilot migration、v3-baseline と rollback anchor）は DEC-034 を正とする。
 
 ## 標準 migration pattern
 
@@ -47,7 +47,7 @@ target canonical paths への v4 state 構築は次の原則と構築順序で�
 
 - 移行中検査: 移行作業の各段階で実行する検査である。check_integrity 相当・traceability 相当・要件行対応の存在確認から構成する
 - 構築済み state と semantic inventory・mapping との整合を段階ごとに確認する
-- cutover 前検査: cutover 可否の前提となる feature complete 確認である。正規所有は後続 Sequence の full validation（第13段）であり、本 Design は移行側から見た接続のみを定義する
+- cutover 前検査: cutover 可否の前提となる feature complete 確認である。正規所有は本 Design「RC tag 運用と cutover sequence」の feature complete 条件リストと full validation であり、本 Design は移行側から見た接続のみを定義する
 - 移行中検査の結果は cutover 前検査の入力とし、移行中検査不合格の state を cutover 前検査へ進めない
 
 ### 配布物・プロジェクションの移行
@@ -75,35 +75,35 @@ v4.0.0-rc.N の annotated tag 運用（exact candidate commit、tag push、detac
 
 ### feature complete 条件リスト
 
-RC 成立条件（feature complete）は DEC-034 決定(3) の 15 項目とし、各項目に対応する実装段階と確認手段を持つ。確認手段は各段の Root Case Issue・Definition/実装 PR と crosswalk（v3-v4-crosswalk references/crosswalk-inventory.md）の executed 行への紐付けを基本とし、項目ごとの所有 Design・証跡は次表のとおりである。
+RC 成立条件（feature complete）は DEC-034 決定(3) の 15 項目とし、各項目に対応する確認手段を持つ。確認手段は各項目の所有 Design・証跡と crosswalk（v3-v4-crosswalk references/crosswalk-inventory.md）の executed 行への紐付けを基本とし、項目ごとの所有 Design・証跡は次表のとおりである。
 
-| # | 条件項目 | 実装段階 | 確認手段 |
-|---|---|---|---|
-| 1 | v4 model canonical 確定 | 第1〜3段（Foundation・Runtime・REQ/Decision/Design implementation） | 各段の Root Case Issue・Definition PR・crosswalk executed 行 |
-| 2 | Runtime | 第2段（二層状態機械・durable state・実行モデル） | v4-runtime-execution-model Design・crosswalk executed 行 |
-| 3 | 文書運用 | 第3段（REQ/Decision/Design 再編・受理） | 現行 REQ/Decision/Design の accepted 状態・crosswalk executed 行 |
-| 4 | req-define 相当入口 | 第4段（公開 UX 2 入口収斂） | v4-standard-lifecycle Design・crosswalk executed 行 |
-| 5 | case-auto 相当 orchestration | 第4段（内部 lifecycle 回収） | v4-standard-lifecycle Design・crosswalk executed 行 |
-| 6 | work_type/scale/Epic/Wave | 第5段（語彙直交性） | v4-standard-lifecycle Design・crosswalk executed 行 |
-| 7 | Collaboration Loop | 第9段（継続コラボレーションループ） | v4-collaboration-loop Design・crosswalk executed 行 |
-| 8 | Quality/Evidence/Gate | 第6段（Quality モデル） | v4-quality-gate-model Design・crosswalk executed 行 |
-| 9 | Traceability | 第7段（Change/Evidence 中心化） | v4-traceability-model Design・crosswalk executed 行 |
-| 10 | Skill 再編 | 第8段（semantic Skill / deterministic code 再分類） | 配布 Skill 構成（src/opencode/skills）・crosswalk executed 行 |
-| 11 | Extensions | 第10段（semantic extension point） | v4-responsibility-boundaries Design・crosswalk executed 行 |
-| 12 | adapter | 第11段（Harness/Backend adapter 境界） | v4-responsibility-boundaries Design・crosswalk executed 行 |
-| 13 | migration mechanism | 第12段（標準 migration pattern） | 本 Design「標準 migration pattern」節・crosswalk executed 行 |
-| 14 | automated validation | 第13段（full validation・本リストの全項目確認） | 本リスト全項目の確認記録・監査レポート（docs/reports/integrity/audits/） |
-| 15 | self-hosting 開始可能 | 第13段（readiness の確認。実行は cutover 後の self-hosting + pilot 段階が所有） | 本リスト項目 1〜14 の成立確認と bootstrap self-hosting readiness の確認 |
+| # | 条件項目 | 確認手段 |
+|---|---|---|
+| 1 | v4 model canonical 確定 | 現行 REQ/Decision/Design の accepted 状態・crosswalk executed 行 |
+| 2 | Runtime | v4-runtime-execution-model Design・crosswalk executed 行 |
+| 3 | 文書運用 | 現行 REQ/Decision/Design の accepted 状態・crosswalk executed 行 |
+| 4 | req-define 相当入口 | v4-standard-lifecycle Design・crosswalk executed 行 |
+| 5 | case-auto 相当 orchestration | v4-standard-lifecycle Design・crosswalk executed 行 |
+| 6 | work_type/scale/Epic/Wave | v4-standard-lifecycle Design・crosswalk executed 行 |
+| 7 | Collaboration Loop | v4-collaboration-loop Design・crosswalk executed 行 |
+| 8 | Quality/Evidence/Gate | v4-quality-gate-model Design・crosswalk executed 行 |
+| 9 | Traceability | v4-traceability-model Design・crosswalk executed 行 |
+| 10 | Skill 再編 | 配布 Skill 構成（src/opencode/skills）・crosswalk executed 行 |
+| 11 | Extensions | v4-responsibility-boundaries Design・crosswalk executed 行 |
+| 12 | adapter | v4-responsibility-boundaries Design・crosswalk executed 行 |
+| 13 | migration mechanism | 本 Design「標準 migration pattern」節・crosswalk executed 行 |
+| 14 | automated validation | 本リスト全項目の確認記録・監査レポート（docs/reports/integrity/audits/） |
+| 15 | self-hosting 開始可能 | 本リスト項目 1〜14 の成立確認と bootstrap self-hosting readiness の確認 |
 
-確認は full validation（第13段）で一括実施し、証跡は監査レポートと crosswalk executed 行に紐付ける。
+確認は full validation で一括実施し、証跡は監査レポートと crosswalk executed 行に紐付ける。
 
 ### cutover 実行手順
 
 cutover sequence（DEC-034 決定(2)）の実行手順。feature complete 確認と full validation 再確認を前置確認として実行し、正規 release line 統合から controller 切替までの 7 操作を read-back 検証とともに実行する。この時点で初めて main へ統合する（cutover までの main 不変の運用制約は本 sequence の正規工程をもって解禁される）。git 操作・tag・push・projection 適用は自走対象とし、GitHub 上の設定変更（default branch 切替・branch protection 等）は行わない（外部 SaaS 設定変更は自走対象外）。
 
-- 前置確認（cutover 直前の成立条件）: feature complete 15 項目（前節の対応表）・full validation 実施済み（第13段監査レポート）・crosswalk 全行 executed（第13段 case-close 成果）・main が cutover 直前状態（v3-baseline tag と同一 commit）・v4-dev と origin/v4-dev の同期・working tree clean。不成立の場合は blocked として報告し、cutover を開始しない
+- 前置確認（cutover 直前の成立条件）: feature complete 15 項目（前節の条件リスト）・full validation 実施済み（監査レポート）・crosswalk 全行 executed・main が cutover 直前状態（v3-baseline tag と同一 commit）・v4-dev と origin/v4-dev の同期・working tree clean。不成立の場合は blocked として報告し、cutover を開始しない
 - 実行操作は次の 7 工程とする
-  1. 正規 release line 統合: v4-dev から main への --no-ff merge とする（v3 から v4 への境界を merge commit として履歴に明示する。fast-forward は不可）。merge commit メッセージは「v4.0.0-rc.1 cutover: ADF v4 正規 release line 統合（v4-dev → main）」形式とし、本文に v3-baseline から v4-dev HEAD までの第1〜13段の経緯を要約する
+  1. 正規 release line 統合: v4-dev から main への --no-ff merge とする（v3 から v4 への境界を merge commit として履歴に明示する。fast-forward は不可）。merge commit メッセージは「v4.0.0-rc.1 cutover: ADF v4 正規 release line 統合（v4-dev → main）」形式とし、本文に v3-baseline から v4-dev HEAD までの移行経緯を要約する
   2. branch push: main を origin へ push する
   3. tag 作成: v4.0.0-rc.1 を annotated tag として merge 後の main HEAD（exact candidate commit）に付与する。tag message には DEC-034 決定(2) の境界宣言（controller cutover・full validation 済み candidate）を含む
   4. tag push: tag を origin へ push する。既存 tag（v3-baseline・vX.Y.Z）は一切移動しない
@@ -125,9 +125,8 @@ v4.0.0 final tag は次の Evidence に基づいてのみ付与する（DEC-034 
 
 - (a) self-hosting 成立: cutover 後の main repo で v4 コマンド群による開発が継続していること（本段の Evidence 記録による実証）
 - (b) pilot migration の Evidence: 検証 10 項目の判定記録（DEC-034 決定(3) の要求）
-- (c) RC fixes の完了: 第16段・rc.N 運用での修正サイクル
+- (c) RC fixes の完了: rc.N 運用での修正サイクル
 - (d) full validation の再実施: v4.0.0 tag 直前
-- v4.0.0 final の実行自体は第17段の範囲である（本段は定義と Evidence の蓄積まで）
 
 ### rc.N 運用
 
@@ -135,8 +134,7 @@ v4.0.0 final tag は次の Evidence に基づいてのみ付与する（DEC-034 
 - rc.N → rc.(N+1) は RC fixes の完了と再検証後に付与する
 - RC 期間の修正は main（v4）上の正規開発経路（要件 → Case）で行う
 - migration target は tag 明示とする（未タグ main を migration target としない）
-- rollback anchor は v3-baseline tag（不変）
-- RC fixes（第16段）の詳細運用は第16段が確定する
+- rollback anchor は v3-baseline tag（不変）とする
 
 ### self-hosting 開始手順
 
@@ -150,10 +148,6 @@ v4.0.0 final tag は次の Evidence に基づいてのみ付与する（DEC-034 
 
 v3-baseline tag の参照方法、rollback 手順の骨子、非 SemVer 命名（v3-baseline）の採用根拠（release tag 空間との分離、SemVer ツールの誤解析回避）。
 
-- v3-baseline は annotated tag として baseline 記録 commit（453a549f70edb1ca18b89b012ad5b8af6ee5d592、v3.4.0 と同一 commit）へ付与し、origin へ push 済みである
+- v3-baseline は annotated tag として baseline 記録 commit へ付与する（非 SemVer 命名の採用根拠: release tag 空間との分離、SemVer ツールの誤解析回避。付与済み tag の実体は Git tag と履歴を参照する）
 - 既存 tag（vX.Y.Z）は一切移動しない
-- 現行開発体制は v3 凍結・v4-dev branch 分離とし、旧世代からの定期同期は原則不要（緊急修正時は個別反映）とする
-
-## 後続 v4 Implementation Sequence
-
-Foundation -> Runtime/lifecycle/state -> REQ/Decision/Design implementation -> req-define/case-auto UX -> work_type/scale/Epic/Wave -> Quality -> Traceability -> Skill restructuring -> Loop -> Extensions -> adapters -> migration implementation -> full validation -> v4.0.0-rc.1 -> self-hosting + pilot -> RC fixes -> v4.0.0 の依存順序と調整原則（RC 前に migration と bootstrap self-hosting readiness を満たす）。
+- rollback anchor は v3-baseline tag（不変）とする

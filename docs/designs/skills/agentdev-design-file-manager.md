@@ -71,8 +71,8 @@ Design operation の公式 enum は `create` / `append` / `update` の3値であ
 正規入力（例: `### IR-044`）で回帰テストを維持する。
 この契約は `target_area` マッチング規則と `append` の anchor マッチング規則の双方に適用される。
 
-### accepted 昇格時の対応記録
-Design status を draft から accepted へ昇格する場合、Design 本体に `## 対応記録` セクションを置き、昇格日、評価契約根拠、対応 Case/PR、REQ との整合確認結果を記録する。昇格根拠の記録と見送り記録は排他に扱い、新規昇格案件から適用する。既存 Design への遡及適用は行わず、見送り記録は既存の対応記録コメントおよび Design ファイル本体へ保存する。
+### accepted 昇格時の証跡保存
+Design status を draft から accepted へ昇格する場合、昇格は Design status frontmatter と Design 管理インデックス（docs/designs/README.md の status 列）の状態更新のみを行い、Design 本文へ作業履歴・評価記録を追記しない（REQ-001-003、REQ-001-014、REQ-001-015）。昇格評価の証跡（評価契機、評価根拠、対象 Case/PR、REQ との整合確認結果）は当該 Case の Issue への対応記録コメントに保存する。draft から accepted への状態遷移と Design 管理インデックスの status 列との整合維持要求は維持する。既存 Design 本文の対応記録節の除去は純化の対象であり、本節は再生成防止の契約のみを所有する。
 
 ## 参照する references
 
