@@ -189,3 +189,53 @@
 - **想定反映先**: docs/designs/responsibilities/custom-tool-contracts.md（contingency 節）、agentdev-workflow-case-open / case-ready references（resume 手順）、REQ-093 関連 reference
 - **関連**: `.agentdev/drafts/proxy-request-case-open-third-party-presupposition.md`（resume payload）、definition/issue-pending @ f85216a0、commit 6598a633 / e541536c / 97ee6a74（同種観測）
 - **タグ**: `#agentdev_gh` `#gh-exit-66` `#infra-transient` `#case-open` `#durable-state-first` `#blocked`
+
+## 2026-10-01 case-run（Case #3289・PR #3295 Findings 由来）: traceability sidecar は artifact パス × role を単一情報源で保持する（新規 REQ 成果物が既存 sidecar 登録済みファイルに跨る場合の対処）
+
+- **問題クラス**: 検証基盤契約（トレーサビリティ sidecar の重複制約）
+- **問題事象**: トレーサビリティ check の初回実行で duplicate-inconsistencies 6件（新規 sidecar が既存 sidecar の artifact パス × role と重複。glossary / README-INSTALL / 3スクリプトの implementation、scripts-behavior.test.ts の verification）。REQ 行が異なっていても同一パス × role が複数 sidecar / inline に現れると fail する
+- **発生局面**: case-run（配布対象成果物のトレーサビリティ登録。Case #3289 DEL-3289-1）
+- **検知方法**: check.ts --req REQ-097-001〜004 の duplicate-inconsistencies findings
+- **根本原因**: traceability sidecar は artifact パス × role の組み合わせを単一情報源で保持する制約がある
+- **自律対応内容**: REQ-097 関係を既存 sidecar（agentdev-textlint-guard、guides-terminology-correction）へ統合し、test ファイルの verification は inline ADF-COVERS へ寄せて再検証で 0 件化（修正済みとして検証差分に記録。case-close 独立再検査でも 9/9 pass 0 fail を確認済み）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（sidecar 追加時の事前確認手順の再発防止知見）
+- **横展開観点**: 新規 REQ の成果物が既存 sidecar 登録済みのファイルに跨る場合、新規 sidecar を作らず既存 sidecar の当該パス × role へ REQ 行を追記するか、test ファイルのように producer 側であれば inline 宣言へ寄せる必要がある。sidecar 追加前に既存 sidecar のパス × role 登録状況を事前確認する
+- **再発条件**: 新規 sidecar を作成し、既に別 sidecar に implementation / verification 登録済みのファイルを登録した場合
+- **予防策候補**: sidecar 追加時の事前確認手順（重複パス × role の走査）を traceability の authoring 手順へ追記する候補
+- **想定反映先**: traceability sidecar の authoring 手順（agentdev-traceability SKILL または sidecar policy 手順）
+- **関連**: PR #3295 本文「Findings / Capture候補」learning 項、PR #3295 本文検証差分「トレーサビリティ check」行
+- **タグ**: `#traceability` `#sidecar` `#duplicate-inconsistencies` `#case-run` `#capture`
+
+## 2026-10-01 case-run（Case #3289・PR #3295 Findings 由来）: agentdev_gh pr_create / pr_read の gh exit 66 恒常失敗時に委譲手順定義の bash gh 例外手順で PR 作成を完遂した証跡
+
+- **問題クラス**: 外部依存障害（harness/Custom Tool 基盤の劣化）＋委譲手順の例外適用
+- **問題事象**: Custom Tool `agentdev_gh` の操作（pr_create 3回、pr_read 1回）が起動環境障害（gh exit 66・stderr 空）で恒常失敗した
+- **発生局面**: case-run（実装 PR #3295 作成。Case #3289 DEL-3289-1）
+- **検知方法**: agentdev_gh の構造化失敗応答（gh exit 66・stderr 空）と gh CLI 本体の健全性実測（auth・read 操作は成功）
+- **根本原因**: harness ツールプロセス側の起動環境障害（REQ-093 既知事象）
+- **自律対応内容**: 委譲手順に定められた例外手順（bash からの gh による PR 作成、body ファイル指定 + 読み戻し検証）へ切替し PR #3295 を作成。Tool 試行回数: 4回（pr_create 3回 + pr_read 1回、いずれも gh exit 66 / stderr 空）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（起動環境障害時の例外手順適用の証跡。後続観測〔Case #3278 Wave 1、本ファイル内」では write-guard が手動 gh WRITE を構造的に阻止する環境も存在するため、例外手順の可否は環境の guard 設定に依存する点に注意）
+- **横展開観点**: 例外手順の適用可否は (1) 委譲手順への定義有無、(2) 環境の write-guard 状態の両方で決まる。両条件を確認してから切替する
+- **再発条件**: serve 全体の gh exit 66 劣化中に PR 作成が必要になった場合
+- **予防策候補**: 委譲手順の例外手順定義に write-guard 状態の事前確認を追記する候補（REQ-093 予防策の継続）
+- **想定反映先**: agentdev-case-run-execution-adapter（例外手順定義）、REQ-093 関連 reference
+- **関連**: PR #3295 本文「Findings / Capture候補」delegation-tool-fallback 項、本ファイル内 Case #3278 Wave 1 entry（write-guard 遮断の先行観測）、Case #3278 case-ready 段階 entry（再起動直後の窓枯渇）
+- **タグ**: `#agentdev_gh` `#gh-exit-66` `#delegation-tool-fallback` `#case-run` `#capture`
+
+## 2026-10-01 case-close（Case #3289）: third-party 配布物追加により check_integrity spawn 系回帰 4 test が main root 正規形で新規 timeout 超過（baseline 対照実行で +3.7 秒増を定量）
+
+- **問題クラス**: 検証環境差（配布物増加に伴う checker 実行時間増加とテスト固定 timeout の不整合）
+- **観測内容**: case-close STEP-3 の full integrity suite（main root・REQ-060 正規形）で check_integrity.test.ts の IR-055 実修復回帰 ×2・NG21 N16/N17 ×2 の 4 test が `timed out after 15000ms` で fail。4 test はいずれも Bun.spawnSync で check_integrity.ts を REPO_ROOT 起動し JSON 解析する構造。checker 実測（timeout なし直接実行、spawnSync 分離取得 + UTF-8 明示退避）は 16.9 秒で正常完了し検証内容本体は合格（runtime-unresolved-reference 新規 0・baseline-known 40 ≤ 548・skill-category-gap ok・command-capture-duty absent）。baseline 対照実行（third-party マージ直前 main 3016eb18 を detached worktree で再現）では同一 4 test が 0 fail（checker 実測 13.2 秒）
+- **発生局面**: case-close STEP-3 docs 検証（merge 後 main での full integrity suite 実測。Case #3289）
+- **検知方法**: suite 実行結果の fail 抽出 → 4 件すべて ~15 秒台の timeout シグネチャ → checker 手動実測で検証内容本体を分離 → baseline 対照実行（docs/knowledge/windows-bun-test-spawn-timeout-classification.md の手順）で 13.2 秒 / 0 fail を確認
+- **根本原因**: 本 Case の配布物追加（tool package cli.ts 等・plugin・導入系3経路 drift 検知・skills.yaml 等）で checker 実行時間が 13.2 秒 → 16.9 秒（+3.7 秒）に増加し、既知事象（RU-0150、Case #3248）で指摘されたテスト側固定 timeout 15 秒の余裕を超過させた
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既知事象の追補。timeout 値調整は後続 Case 対象）
+- **横展開観点**: RU-0150 の分類（環境依存・当該変更起因なし）に対し、本観測は「配布物を増やす変更が checker 実行時間を増加させ、timeout 余裕を超過させ得る」ことを定量（+3.7 秒）で示す。配布物を追加する Case の case-close では full suite timeout 系 fail の由来分類に baseline 対照実行を併用するのが有効。timeout 値は checker 実測所要時間（現行 16.9 秒・更に増加する配布物追加を想定）に対する余裕を持たせて設定する
+- **再発条件**: 配布物を追加する Case 以降、main root 正規形で check_integrity.test.ts を実行した場合（checker 実測 > 15 秒の間継続）
+- **予防策候補**: check_integrity.test.ts の IR-055 / NG21 回帰 4 test の timeout 値（15000ms）を checker 実測所要時間に見合う値（例: 30〜60 秒）へ引き上げる（RU-0150 予防策候補の継続。Case 化して対応）
+- **想定反映先**: check_integrity.test.ts（timeout 値調整）、checker 実行契約と検出基盤規則 Design（実行時間観点の注記要否判断）
+- **関連**: 本ファイル内 RU-0150 entry（Case #3248 既知事象）、docs/knowledge/windows-bun-test-spawn-timeout-classification.md（対照実行手順）、Case #3289 case-close 対応記録（検証差分・fail 由来分類記録）
+- **タグ**: `#integrity` `#bun-test` `#timeout` `#配布物増加` `#baseline対照実行` `#case-close`
