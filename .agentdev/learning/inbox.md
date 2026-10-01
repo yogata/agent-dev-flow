@@ -176,3 +176,16 @@
 - **想定反映先**: docs/requirements/REQ-036.md（REQ-036-021）・docs/requirements/REQ-096.md（語彙許容文脈の明文化先）
 - **関連**: PR #3286 Findings・Issue #3282（RA-003）・Epic #3280 Wave 2
 - **タグ**: `#語彙現行性` `#REQ-096` `#RA-003` `#capture` `#Wave2`
+
+## 2026-10-01 gh exit 66 持続時に durable state 先行ステージングで再開コストを最小化できた（case-open 段階・third-party-presupposition）
+
+- **問題クラス**: 外部依存障害（harness/Custom Tool 基盤の劣化サイクル）＋運用改善の実証
+- **観測内容**: case-open 段階（冪等再開ラン・serve 再起動後）で agentdev_gh が初期 1 呼出（issue_list 成功）を除き全操作で gh exit 66（stderr 空・起動環境失敗）を持続。45s/90s/120s バックオフ再試行でも回復せず、blocked 対応へ切替した。blocked 判定後に GitHub I/O 非依存の工程を先に完了させる順序変更（durable state 先行）を実施した結果、(1) Definition branch 作成・REQ/Design 変更・索引再生成・checker 実測・commit（definition/issue-pending @ f85216a0）までを完了、(2) Root Case 本文候補・PR 本文候補・再開手順を proxy payload として `.agentdev/drafts/` へ永続化、(3) gh CLI 読取による冪等残骸確認（Issue 0件・definition/* branch なし）まで完了した状態で停止できた。resume 時の gh 呼出は issue_create → push → pr_create → issue_update の最小 4 呼出に圧縮される
+- **ユーザー確認有無**: なし（infra-transient blocked・HITL 該当なし）
+- **Decision/REQ/spec影響**: なし（REQ-083-005 write guard・REQ-011/052 Custom Tool 集約契約は維持。gh CLI は読取専用 contingency のみで使用）
+- **横展開観点**: 多段 lifecycle の各段は「gh 呼出を要する工程」と「要しない工程」を STEP 内で分離し、窓枯渇を前提に非依存工程を先行させる運用が有効。case-ready（Definition 受入検査はローカル検査中心）・case-run（実装・テストは非依存）でも同型の順序付けが可能。proxy payload の置場 `.agentdev/drafts/proxy-{stage}-{slug}-*.md` 先例（2319e3f9、e9b72e26）との整合も確認
+- **再発条件**: serve 再起動直後の窓が ~1〜2 呼出で枯渇し、以降の呼出が持続失敗する場合（e541536c の反証データと整合）
+- **予防策候補**: 各 workflow skill の STEP reference へ「gh 非依存工程の先行順序」と「blocked 時 proxy payload の標準配置」を明記する候補。agentdev_gh 側の spawn 失敗自動 respawn（REQ-093 予防策候補の継続）
+- **想定反映先**: docs/designs/responsibilities/custom-tool-contracts.md（contingency 節）、agentdev-workflow-case-open / case-ready references（resume 手順）、REQ-093 関連 reference
+- **関連**: `.agentdev/drafts/proxy-request-case-open-third-party-presupposition.md`（resume payload）、definition/issue-pending @ f85216a0、commit 6598a633 / e541536c / 97ee6a74（同種観測）
+- **タグ**: `#agentdev_gh` `#gh-exit-66` `#infra-transient` `#case-open` `#durable-state-first` `#blocked`
