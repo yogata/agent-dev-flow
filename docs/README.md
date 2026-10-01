@@ -3,6 +3,17 @@
 AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) と [憲章](guides/charter.md) を参照。
 現行の REQ/Decision は `REQ-NNN`、`DEC-NNN`（3桁ゼロ埋め）のIDを使用する。
 
+## 現在像への導線
+
+第4世代（v4）の現在像を定義する正規文書への導線は次のとおりである。
+
+- 憲章と責務境界: [DEC-001](decisions/DEC-001.md)、[憲章](guides/charter.md)
+- 三層責務と標準運用モデル: [REQ-088](requirements/REQ-088.md)、[ADF v4 Operating Model](designs/foundations/v4-operating-model.md)、[DEC-031](decisions/DEC-031.md)
+- Project Contract の論理ビューと再構成方法: [REQ-088](requirements/REQ-088.md)、[ADF v4 Operating Model](designs/foundations/v4-operating-model.md)「Project Contract の論理ビュー」節
+- 標準入口と標準実行: [クイックスタート](guides/quickstart.md)、[要件定義 → Case実行フロー](guides/req-case-flow.md)。req-define と backlog-auto が要求入口、case-auto が標準実行
+- 判断方法と確定権限の分離、人間判断境界: [REQ-096](requirements/REQ-096.md)、[DEC-048](decisions/DEC-048.md)
+- REQ / Decision / Design / Knowledge / Report / Guide の文書責務: [REQ-001](requirements/REQ-001.md)、[プロジェクトドキュメントと Design](guides/project-docs-and-specs.md)
+
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
