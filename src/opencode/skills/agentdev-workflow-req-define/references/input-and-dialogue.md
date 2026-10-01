@@ -43,7 +43,7 @@
 
 ### Completion Verification
 
-- 入力ソースが一意に確定し、RU 複数候補時は自動選択していないこと
+- 入力ソースが決定的処理として確定し、RU 複数候補時は自動選択していないこと
 
 ### Resume-Idempotency
 

@@ -20,6 +20,12 @@ implementation:
     - REQ-090-027
     - REQ-090-028
     - REQ-090-029
+    - REQ-096-002
+    - REQ-096-007
+    - REQ-096-008
+    - REQ-096-009
+    - REQ-096-023
+    - REQ-096-024
 verification:
   docs/designs/commands/req-define.md:
     - REQ-021-029

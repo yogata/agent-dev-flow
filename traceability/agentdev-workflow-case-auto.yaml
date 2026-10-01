@@ -3,3 +3,10 @@ implementation:
   src/opencode/skills/agentdev-workflow-case-auto/references/input-resolution-and-orchestration.md:
     - REQ-030-017
     - REQ-061-039
+  src/opencode/skills/agentdev-workflow-case-auto/references/stop-and-decision-resolution.md:
+    - REQ-096-001
+    - REQ-096-002
+    - REQ-096-004
+    - REQ-096-005
+    - REQ-096-012
+    - REQ-096-015

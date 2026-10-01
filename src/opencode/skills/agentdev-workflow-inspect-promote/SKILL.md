@@ -69,7 +69,7 @@ inspect-promote workflow は次の8 STEP で構成する。
 
 - 各 STEP の再開点は永続状態から再構成する（`<foundations/v4-durable-state-and-recovery>` Design の優先順位に従う）
 - **検出事項ごとの分類確定状態の再構成**: inbox に残存する検出事項は未確定（STEP-3 分類から再開）、`.agentdev/inspect/promoted/` に保存済みの検出事項は promote 確定（再保存しない）、auto-promote-log 記載済みかつ `.agentdev/intake/promoted/inspect-auto-*.md` 投入済みは自動 promote 確定（再投入しない）、inbox から削除済みは reject 確定（復元しない）、inbox 残置かつ処理実行済み報告があるものは defer 確定
-- **HITL 承認状態**: 承認は処理実行（STEP-7）の完了状態から逆算して再構成する。処理実行が済んでいない検出事項は未確定と扱い、確定（STEP-6 の自律確定判定と HITL 確定）から再開する。自律確定項目にユーザー承認は存在しないため、再開時は詳細判定表に従い再判定する
+- **HITL 承認状態**: 承認は処理実行（STEP-7）の完了状態から逆算して再構成する。処理実行が済んでいない検出事項は未確定と扱い、確定（STEP-6 の自律確定判定と HITL 確定）から再開する。自律確定項目にユーザー承認は存在しないため、再開時は判定基準に従い再判定する
 - 自然言語の前 STEP result のみに依存した再開を行わない
 
 ## 主要 Capability Skill 連携
@@ -83,7 +83,7 @@ inspect-promote workflow は次の8 STEP で構成する。
 
 ## 共通制約
 
-- **HITL 承認必須**: 自動 promote 対象（`--auto`）と自律確定対象（次節の詳細判定表に従う）を除き、ユーザーの明示的な承認なしに採用済み成果物を生成しない（`POL-promoted-artifact-requires-approval`）
+- **HITL 承認必須**: 自動 promote 対象（`--auto`）と自律確定対象（次節の判定基準に従う）を除き、ユーザーの明示的な承認なしに採用済み成果物を生成しない（`POL-promoted-artifact-requires-approval`）
 - **reject は即時削除**: `archive/rejected/` への移動は廃止。即時削除以外の取扱を禁止し、reject 時の commit message に却下理由を含める（command 不変条件）
 - **defer は inbox 残置**: defer となった検出事項を `.agentdev/inspect/inbox/` から移動しない（command 不変条件）
 - **`--auto` は明示 opt-in の場合のみ有効**: 省略時は自動 promote を一切行わない。自動 promote 対象は v4-responsibility-boundaries Design（extension 経由）が定義する高確信度カテゴリのみとし、意味判断、曖昧な分類、Decision 要否判断を含む検出事項は手動分類へ回す（command 不変条件）
@@ -92,9 +92,9 @@ inspect-promote workflow は次の8 STEP で構成する。
 
 ## 自律確定の判定位置とHITLフォールバック
 
-判断確定の境界は共通原則（REQ-{NNNN}-{NNN}）に従う。自律確定可否の詳細判定表（自律確定可能要件、HITL移送条件、判定と運用の共通規則）は横断契約Design（v4-responsibility-boundaries Design「HITL 判断確定原則」節、extension 経由で解決）が集約所有し、本スキルは判定表を重複保持しない（DEC-{N}）。
+判断確定の境界は共通原則（REQ-{NNNN}-{NNN}）に従う。自律確定可否の判定基準（人間判断への引き上げ条件の完全な一覧と promote 系への適用。REQ-{NNNN}-{NNN} により自律確定可否は一意性ではなく正規契約からの導出または委譲された裁量の範囲で判定する）は横断契約Design（v4-responsibility-boundaries Design「HITL 判断確定原則」節、extension 経由で解決）が集約所有し、本スキルは判定表を重複保持しない（DEC-{N}）。
 
-- **判定位置**: 分類・検証（STEP-3）と必要な adversarial-review（STEP-5）を経た後、取得可能な根拠から promote / defer / reject を一意に確定できる検出事項は、ユーザー承認なしで確定する（REQ-{NNNN}-{NNN}）
+- **判定位置**: 分類・検証（STEP-3）と必要な adversarial-review（STEP-5）を経た後、取得可能な根拠から promote / defer / reject を正規契約からの導出または委譲された裁量の範囲で確定できる検出事項は、ユーザー承認なしで確定する（REQ-{NNNN}-{NNN}）
 - **部分自律確定**: 同一実行内に自律確定可能項目とユーザー判断必要項目が混在する場合、未決項目に依存しない項目を先行確定し、ユーザー判断必要項目のみ HITL 対象とする（REQ-{NNNN}-{NNN}）
 - **`--auto` fast path との区別**: `--auto` fast path（高確信度カテゴリの事前定義による早期処理、明示 opt-in）と通常経路の自律確定（レビュー・検証を経た最終確認省略）は別概念とする。通常の実行によって `--auto` を暗黙的に有効化しない（REQ-{NNNN}-{NNN}）
 - **報告形式**: 判定結果、主要根拠、HITL不要と判断した理由は既存の分類結果と実行報告（STEP-8 完了報告）を優先利用して報告し、新規永続成果物を必須としない

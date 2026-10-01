@@ -50,7 +50,7 @@ STEP-8（停止時報告）・STEP-8（完了報告）での所要時間算出�
 
 ### Completion Verification
 
-- 入力モードが一意に確定していること（特定不可時は停止）
+- 入力モードが決定的処理として確定していること（特定不可時は停止）
 
 ### Resume-Idempotency
 
@@ -99,7 +99,7 @@ STEP-8（停止時報告）・STEP-8（完了報告）での所要時間算出�
 
 ### Completion Verification
 
-- 工程順序が一意に確定していること（auto_gate 不合格時は停止）
+- 工程順序が決定的処理として確定していること（auto_gate 不合格時は停止）
 
 ### Resume-Idempotency
 

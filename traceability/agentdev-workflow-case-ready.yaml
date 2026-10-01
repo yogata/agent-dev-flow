@@ -53,10 +53,19 @@ implementation:
     - REQ-061-033
     - REQ-083-001
     - REQ-083-003
+  src/opencode/skills/agentdev-workflow-case-ready/references/decision-acceptance.md:
+    - REQ-096-003
+    - REQ-096-004
+    - REQ-096-005
+    - REQ-096-006
+    - REQ-096-026
   src/opencode/skills/agentdev-workflow-case-ready/references/definition-acceptance.md:
     - REQ-061-032
     - REQ-061-033
     - REQ-083-001
+    - REQ-096-001
+    - REQ-096-002
+    - REQ-096-026
   src/opencode/skills/agentdev-workflow-case-ready/references/execution-structure.md:
     - REQ-035-012
     - REQ-035-018
@@ -72,6 +81,13 @@ implementation:
     - REQ-090-026
     - REQ-090-027
     - REQ-090-029
+    - REQ-096-002
+    - REQ-096-007
+    - REQ-096-008
+    - REQ-096-009
+    - REQ-096-016
+    - REQ-096-023
+    - REQ-096-026
   src/opencode/skills/agentdev-workflow-case-ready/references/readiness-and-cleanup.md:
     - REQ-061-035
     - REQ-061-040

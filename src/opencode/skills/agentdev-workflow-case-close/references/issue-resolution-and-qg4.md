@@ -47,7 +47,7 @@ Issue 番号を解決し、単一 Issue クローズと Epic Wave クローズ�
 
 ### Completion Verification
 
-- 処理ルートが一意に確定していること
+- 処理ルートが決定的処理として確定していること
 
 ### Resume-Idempotency
 
@@ -58,6 +58,7 @@ Issue 番号を解決し、単一 Issue クローズと Epic Wave クローズ�
 ### Purpose
 
 Issue 本文の完了条件チェックボックスを最終評価・更新し、達成判定（QG-4）を行う。
+完了条件の評価と状態遷移は、既存の完了条件・証拠からの導出として自律確定する（REQ-{NNNN}-{NNN}。確定権限: 正規契約からの導出）。最終工程であること自体を理由に人間承認を要求しない。修正が必要な場合は正規所有工程（case-run 差し戻し等）へ戻し、人間判断は引き上げ条件（REQ-{NNNN}、`<foundations/v4-responsibility-boundaries>` Design「人間判断への引き上げ条件」節）に該当する場合のみとする。
 
 ### Input Resolution
 

@@ -9,10 +9,15 @@ implementation:
     - REQ-021-030
     - REQ-032-030
     - REQ-060-007
+    - REQ-096-012
+    - REQ-096-013
   src/opencode/skills/agentdev-workflow-case-close/references/issue-resolution-and-qg4.md:
     - REQ-021-027
     - REQ-032-027
     - REQ-032-030
+    - REQ-096-001
+    - REQ-096-002
+    - REQ-096-017
 verification:
   src/opencode/skills/agentdev-workflow-case-close/references/issue-resolution-and-qg4.md:
     - REQ-032-030

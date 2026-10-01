@@ -6,7 +6,7 @@ description: "learning-promote command の workflow 実装本体。inbox.md エ�
 # learning-promote workflow スキル
 
 learning-promote command の workflow 実装本体である。
-`.agentdev/learning/inbox.md` の学びエントリを読み込み、正規化、問題クラス分類、8軸評価、廃棄判定、既存対策確認、自律確定判定（一意に確定できる項目の自律確定）とユーザー判断が必要な項目のみの HITL 承認を経て採用済み成果物を生成する制御構造を所有する。
+`.agentdev/learning/inbox.md` の学びエントリを読み込み、正規化、問題クラス分類、8軸評価、廃棄判定、既存対策確認、自律確定判定（正規契約からの導出または委譲された裁量の範囲で確定できる項目の自律確定）とユーザー判断が必要な項目のみの HITL 承認を経て採用済み成果物を生成する制御構造を所有する。
 `.opencode/` への直接配置、直接反映は行わない（反映ルート: promoted → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/case-auto`（内部 lifecycle））。
 
 learning-promote command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
@@ -98,7 +98,7 @@ STEP-3 の処分区分判定（7カテゴリ + duplicate）は learning-promote 
 
 - **無条件の自動REQ化禁止**: 学びを直接 REQ 化しない。恒久契約（REQ/Decision/Design）への昇華可能性を STEP-3 で評価し、昇華可能なもののみ `promoted/` へ出力する。学びは昇華（`promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/case-auto`（内部 lifecycle））を経て初めて REQ 化される
 - **保留プール維持**: 昇華不能な知見（deferred 判定、情報が断片的、出現回数が少ない等）は `deferred.md` の保留プールで維持し、REQ 化しない。`deferred.md` は deferred カテゴリのエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の保留プール（living pool）である（AG-{NNN}）。終端保管ではなく、次回実行時に再評価の対象となる
-- **自律確定と HITL フォールバック**: 問題クラス分類、8軸評価、廃棄判定、昇華可能性、既存対策との関係の評価（STEP-2〜STEP-4）を経て、取得可能な根拠で処置を一意に確定できる項目はユーザー承認なしで確定し、ユーザー判断が必要な項目のみ HITL 対象とする。自律確定はユーザー承認の擬制ではなく、モデルの自己申告による確信度や固定パーセンテージのみで可否を判定しない。自律確定可否の詳細判定表（自律確定可能要件、HITL移送条件、判定と運用の共通規則）は横断契約Design `<foundations/v4-responsibility-boundaries>`「HITL 判断確定原則」節が集約所有し、本スキルは判定表を複製しない（extension 経由で解決）。deferred・未処理項目を自動削除しない既存の安全境界は自律確定によって迂回しない。自律確定項目の証跡（判定結果、主要根拠、HITL 不要理由）は evaluation-report.md 等の既存成果物を優先利用し、新規永続成果物を必須としない
+- **自律確定と HITL フォールバック**: 問題クラス分類、8軸評価、廃棄判定、昇華可能性、既存対策との関係の評価（STEP-2〜STEP-4）を経て、取得可能な根拠で処置を正規契約からの導出または委譲された裁量の範囲で確定できる項目はユーザー承認なしで確定し、人間判断への引き上げ条件（REQ-{NNNN}、`<foundations/v4-responsibility-boundaries>` Design「人間判断への引き上げ条件」節）に該当する項目のみ HITL 対象とする（REQ-{NNNN}-{NNN}）。自律確定はユーザー承認の擬制ではなく、モデルの自己申告による確信度や固定パーセンテージのみで可否を判定しない。自律確定可否の判定基準（人間判断への引き上げ条件、promote 系への適用）は横断契約Design `<foundations/v4-responsibility-boundaries>`「HITL 判断確定原則」節が集約所有し、本スキルは判定表を複製しない（extension 経由で解決）。deferred・未処理項目を自動削除しない既存の安全境界は自律確定によって迂回しない。自律確定項目の証跡（判定結果、主要根拠、HITL 不要理由）は evaluation-report.md 等の既存成果物を優先利用し、新規永続成果物を必須としない
 - **prune 対象**: staged（採用済み成果物生成済み）/ rejected / duplicate のエントリのみ。deferred / 未処理のエントリは残す。staged エントリ除去時に採用済み成果物の「元learning item/ 根拠」セクションに証拠を保存する。STEP-5 の判定確定（自律確定またはユーザー承認）と同時に prune も承認済みとみなし、追加確認なしで削除する
 - **直接反映禁止**: 採用済み成果物は `.agentdev/learning/promoted/` のみに生成する。`.opencode/` 直接書込、`case-run` への直接受け渡しは禁止（`/agentdev/backlog-review` 経由のみ）
 - **evaluation-report.md**: 本 workflow が生成、管理する（外部コマンドの事前生成に依存しない）。毎回上書きされ長期履歴ではない

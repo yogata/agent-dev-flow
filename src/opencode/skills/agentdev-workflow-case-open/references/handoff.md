@@ -51,7 +51,7 @@
 
 ## Completion Verification
 
-- 処理の継続 / 停止が一意に確定していること
+- 処理の継続 / 停止が確定済み契約からの導出として確定していること
 
 ## Resume-Idempotency
 
