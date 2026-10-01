@@ -8,7 +8,7 @@ description: "case-auto command の workflow 実装本体。case-open → case-r
 case-auto command の workflow 実装本体である。
 要件doc または Issue番号から case-open → case-ready → case-run → case-close を順次自走し（req-define で再合意済みの Definition 変更がある場合は case-revise → case-ready → case-run → case-close の例外経路）、repo 内変更に限りマージまで完了する制御構造を所有する。
 orchestration stage モデル、クリーンアップ検証ゲート、Wave 反復制御、bounded parent decision resolution、コンフリクト解消 Level 2/3、停止理由分類、adversarial-review 由来の停止伝播を統合する。
-新しい意味判断が必要となった場合は blocked とし Root Case の resume_command: req-define で停止する（req-define の壁打ちを自動化しない）。
+人間に留保された判断（新しい目的・価値・優先順位・対象範囲・外部契約・受け入れ条件・恒久規範、または既存正規契約だけでは解決不能な規範間優先関係の新規確定を要する判断）が必要となった場合は blocked とし Root Case の resume_command: req-define で停止する（req-define の壁打ちを自動化しない）。
 
 case-auto command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する。
 
@@ -65,7 +65,7 @@ case-auto workflow は次の8 STEP で構成する。
 
 - 正常終了: 全工程完了（OU処理ループを含む全 OU 処理完了）時の完了報告まで
 - 一時ファイル残存: 正常終了の前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（STEP-8 で確認。一時ファイル cleanup 規定（workflow 側で生成した `.agentdev/tmp/` 一時ファイルは当該実行内で削除する。Custom Tool 内部の一時ファイルは Tool が操作ごとに自動削除する））
-- 停止終了: 11項目の停止条件いずれかの検出時（停止理由分類済み報告、新しい意味判断時は resume_command: req-define を記録）。bounded parent decision resolution での上位合意矛盾・新規ユーザー判断。adversarial-review 由来の user-decision-required。コンフリクト Level 3 失敗
+- 停止終了: 11項目の停止条件いずれかの検出時（停止理由分類済み報告、人間に留保された判断の新規確定時は resume_command: req-define を記録）。bounded parent decision resolution での上位合意矛盾・新規ユーザー判断。adversarial-review 由来の user-decision-required。コンフリクト Level 3 失敗
 - 委譲起動不能時: `delegation-unavailable` として報告（委譲工程のインライン実行への切替えは行わない）
 
 ## orchestration stage モデル（case-auto 実行契約）

@@ -11,7 +11,7 @@ case-revise workflow STEP-5 の実行詳細（SKILL.md「制御平面（STEP 一
 ## case-ready への引き継ぎ
 
 - case-revise 完了後の execution contract / execution structure 再確定は case-ready を経由する。case-revise は再確定を実行せず、Amendment PR（存在する場合）と影響再評価結果を引き継ぎ情報として case-ready へ渡す
-- case-ready は Definition Amendment PR を Definition PR 受入フロー（忠実性・整合性・品質検査、新しい意味判断が不要な場合の自動確定・merge）で受入する
+- case-ready は Definition Amendment PR を Definition PR 受入フロー（忠実性・整合性・品質検査、既存の正規契約からの導出または委譲された裁量の範囲内で自律確定できる場合の自動確定・merge）で受入する
 - case-revise 専用の Case 状態は追加しない（Case 状態モデルの正規所有は case-run 実行契約 REQ と Case実行オーケストレーション REQ の体系が担う）
 
 ## 完了報告
