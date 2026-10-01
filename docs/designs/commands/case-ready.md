@@ -6,6 +6,7 @@ updated: "2026-09-29"
 ---
 
 <!-- ADF-COVERS(design): REQ-021-024 -->
+<!-- ADF-COVERS(design): REQ-061-003 -->
 <!-- ADF-COVERS(design): REQ-061-010, REQ-061-019, REQ-061-038, REQ-061-023, REQ-061-029, REQ-061-030, REQ-061-033, REQ-061-034, REQ-061-035, REQ-061-039, REQ-061-040, REQ-035-012, REQ-035-018 -->
 
 # case-ready Command Design
@@ -23,7 +24,7 @@ case-ready の公開契約（入出力、副作用、安全性、承認境界、
 
 ## 内部構成
 
-- Definition 受入: Definition PR の忠実性確認（req-define 合意内容との投影検査）、整合性検査、品質検査、merge 前の Draft 状態確認（pr_read の isDraft、REQ-061-032）。新しい意味判断が不要な場合は追加承認なしで自動確定・merge。新しい Decision、意味変更、対象範囲拡大、意味的不整合の解消が必要な場合は停止し HITL とする
+- Definition 受入: Definition PR の忠実性確認（req-define 合意内容との投影検査）、整合性検査、品質検査、merge 前の Draft 状態確認（pr_read の isDraft、REQ-061-032）。人間に留保された判断（REQ-096-005）の新規確定が不要で、既存の正規契約から導出できる解消と委譲された裁量の範囲内の判断（作業仮定の明示を含む）である場合は追加承認なしで自動確定・merge。人間に留保された判断（REQ-096-005）を新規に確定する必要がある場合、または既存の安全境界が要求する操作承認を要する場合は停止し HITL とする（REQ-061-003）。人間判断への移送の判定は語の使用（新しい Decision、意味変更、対象範囲の確定、意味的な不整合の解消）だけで行わず、当該判断が REQ-096-005 の留保事項に該当するか否かで行う。判断の難易度、確信度、評価器間の不一致、結果状態、唯一解でないことだけを理由として人間判断へ移送しない（REQ-096-003、REQ-096-004、REQ-096-006）。停止理由は REQ-096-012 の原因分類へ対応させる。proposed Decision の受理評価は REQ-061-021 の導出ベース判定を維持する
 - overlap 突合（REQ-061-039）: Definition PR 受入は、draft の宣言変更ファイル集合（artifact_actions の target 集合）と pr_changed_files 実報告の差分検査（overlap 突合）を含む。スタック構造（PR が兄弟 Case の commit を含む）や宣言・実報告の乖離を検出した場合は警告し、隔離 worktree での差分再構成手順に従って救済する。実効 squash diff が自 Case 分に収まった場合もスタック検出の警告は省略しない（スタック底が最後 merge の場合に空 diff / 同一領域競合となるリスクのため）
 - 保存実体: REQ / Decision / Design の保存は req-file-manager、decision-file-manager、design-file-manager、artifact-validation へ委譲する。case-ready 自身は保存手続きを実装しない。REQ の保存では Design 対応が未成立の要件行が残っても保存を失敗させない（Design 対応の成立判定は ready 遷移ゲートの責務）
 - canonical 再取得: merge 後に canonical Definition を再取得し、traceability check を機械実行する（REQ-061-023）。check は inline declaration と top-level `traceability/` 配下の sidecar を同じ論理的な対応関係へ正規化した対応関係全体を検査対象とする。missing-design を検出した場合は case-open への差し戻し経路を扱う
@@ -37,11 +38,11 @@ case-ready の公開契約（入出力、副作用、安全性、承認境界、
 
 - 対象 Definition PR が GitHub Draft PR（isDraft: true）の場合（pr_merge を実行せず blocked で停止。draft 解除の自動実行や正規 Tool 外の操作による復旧は行わない。REQ-061-032）
 - Definition PR の CI / 品質検査失敗（ready 不遷移、既存 PR 保持で再実行可能）
-- 新しい意味判断が必要（HITL）
+- 人間に留保された判断（REQ-096-005）の新規確定が必要、または既存の安全境界が要求する操作承認を要する場合（HITL。REQ-061-003）
 - canonical Definition の要件行に Design 対応が 0 件の行が残る場合（missing-design 検出、ready 不遷移、case-open への差し戻し）
 - `traceability/policy.yaml` の不正を check が検出した場合（ready 不遷移。required 行の verification 対応欠落（missing-verification）は case-close の QG-4 最終完全性検査の対象であり、ready 不遷移条件に含めない）
 - 構成検証の上限超過または構成不備
-- proposed Decision の受理が一意に確定できない（proposed のまま ready 不遷移）
+- proposed Decision の受理が正規契約から導出できず受理評価を確定できない（proposed のまま ready 不遷移。REQ-061-021 の導出ベース判定を維持）
 
 ## 冪等性
 

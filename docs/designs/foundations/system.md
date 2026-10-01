@@ -156,9 +156,9 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 
 - **公開契約**: Root Case（Issue 番号または URL）+ 関連 req_draft / Definition PR → ready 状態の Root Case + 確定済み execution contract + 実行構造（Standard は Root Case 単一 execution unit、Epic は Child Issue と Wave / 依存構造）。Definition 確定境界の主フローコマンド（REQ-061）。
 - **主要処理段階**: Definition 受入（Definition PR の忠実性確認、整合性・品質検査、merge 前 Draft 状態確認（isDraft）、自動確定・merge と HITL 停止の分岐）→ REQ/Decision/Design 保存（Definition 保存 / Design 保存内部責務、Capability Skill 委譲）→ canonical Definition 再取得 → proposed Decision の受理評価と accepted 遷移 → execution contract 確定 → 実行構造確定（連結成分、3軸判断、単独根の Standard 化、構成検証、Wave ファイル重複前置検出）→ 検証対応要否ゲート → draft / RU 削除 → ready 遷移。
-- **分岐**: 新しい意味判断が不要（自動確定・merge）vs 必要（HITL 停止）、proposed Decision の受理可否（一意確定 vs HITL）、Standard vs Epic 構成、構成検証の上限超過・構成不備で停止。
+- **分岐**: 人間に留保された判断（REQ-096-005）の新規確定が不要で正規契約から導出できる解消と委譲された裁量の範囲内の判断（自動確定・merge）vs 必要（HITL 停止。REQ-061-003）、proposed Decision の受理可否（正規契約からの導出による確定 vs HITL。REQ-061-021）、Standard vs Epic 構成、構成検証の上限超過・構成不備で停止。
 - **副作用**: Definition PR の merge、`docs/requirements/**` / `docs/decisions/**` / `docs/designs/**` の保存（Capability Skill 委譲）、Decision の accepted 遷移、Child Issue / Wave 作成、draft / RU 削除、Root Case の ready 遷移。
-- **HITL**: 新しい Decision、意味変更、対象範囲拡大、意味的不整合の解消が必要な場合の停止、proposed Decision の受理が一意に確定できない場合の停止、構成検証失敗時の停止。
+- **HITL**: 人間に留保された判断（REQ-096-005）の新規確定が必要、または既存の安全境界が要求する操作承認を要する場合の停止（REQ-061-003。語の使用だけで移送を判定せず REQ-096-005 の留保事項該当性で判定する）、proposed Decision の受理が正規契約から導出できず確定できない場合の停止（REQ-061-021）、構成検証失敗時の停止。停止理由は REQ-096-012 の原因分類へ対応させる。
 - **並列性**: 実行構造確定の構成アルゴリズムは決定的。Epic 構成時の Child Issue 作成は構成確定後の一括作成。
 - **resume**: merge 済み Definition、既存 Child Issue、既存 Wave / 依存構造、Decision 受理記録を再利用し不足分のみ処理（べき等）。merge は巻き戻さない（REQ-061-004）。
 - **durable state**: canonical Definition（merge 済み REQ/Decision/Design）、execution contract（Issue 本文）、実行構造（Child Issue / Wave / 依存構造）、Decision 受理記録。
