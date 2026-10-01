@@ -150,3 +150,29 @@
 - **想定反映先**: docs/designs/responsibilities/custom-tool-contracts.md（agentdev_gh 操作契約の contingency・gh spawn 異常時の扱い）、REQ-093 関連診断 reference
 - **関連**: Case #3278・Issue #3281（Epic #3280 Wave 1）・commit 319ee3c6（case-ready 段階の proxy package 永続化前例）・commit 97ee6a74 / e541536c（gh exit 66 劣化サイクルの先行観測）・.agentdev/drafts/proxy-request-case-run-3281.md（本件の永続化 payload）
 - **タグ**: `#agentdev_gh` `#gh-exit-66` `#write-guard` `#infra-transient` `#case-run` `#write-proxy`
+
+## 2026-10-01 配布依存境界 link profile は worktree で zero-targets、host root では実行可能（Case #3278 Epic #3280 Wave 2 case-close）
+
+- **問題クラス**: 検証環境差（worktree 構造制約に起因する checker 実行可否の分岐）
+- **観測内容**: case-close Wave 2 境界クローズ（DEL-3280-3）の QG で、`check_distribution_boundary.ts --profile link` を PR head worktree（.worktrees/3284-docs）に対して実行すると `zero scan targets found for projection 'link'`（zero-targets:link・adapter-failure 分類・検査対象 0件）となる一方、メインリポジトリ root（host）では link profile が実行可能で failures 0（scanned 359・rules scanned 286）を記録した。source profile は worktree からでも実行可能（PR #3287/#3288 の両 head で failures 0 を case-close 側で再実行・追証）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（REQ-018 worktree fallback 契約〔source profile 代替〕の適用事例の追補候補）
+- **横展開観点**: worktree では .opencode/ 配布投影（junction）が未配置のため link profile は常に zero-targets になる。case-run/case-close で src/opencode/skills/**・commands/** 変更を含む PR を検証する場合、(1) worktree では source profile を実行して代替成立を記録し、(2) link profile は merge 後の host root での再実行を後続工程（Wave 3 最終 close 等）の検証手順として明示する。host root の link profile は merge 前は merge 前 src と投影の整合を示すにすぎないため、post-merge の投影 sync 後再実行が実質検査になる
+- **再発条件**: junction 非展開の worktree で link profile を実行した場合（環境構造由来のため再現性 100%）
+- **予防策候補**: checker 出力契約側で zero-targets:link を「検査不能（環境制約）」として明示し、source profile 代替運用の正当性を出力へ含めると、後続 Case の検証差分解釈が安定する（PR #3287 Findings の候補と同一趣旨）
+- **想定反映先**: .opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary*.ts（zero-targets 時の出力 guidance）・docs/designs/integrity/distribution-boundary.md（projection 分離の実行環境注記）
+- **関連**: PR #3287/#3288（配布依存境界 Findings 記載）・Issue #3284・Epic #3280 Wave 2
+- **タグ**: `#配布依存境界` `#link-profile` `#worktree` `#case-close` `#検証環境差`
+
+## 2026-10-01 REQ-036-021 の「高確信度」語彙は自動昇格 opt-in 条件（REQ-096-004 禁止対象の別文脈）として現行性確認を要する（Case #3278 Wave 2 #3282）
+
+- **問題クラス**: 語彙現行性（旧判断モデル語彙の別文脈残存の解釈分岐）
+- **観測内容**: RA-003 正典 REQ 行語彙移行（PR #3286）の Capture 回収で、REQ-036-021（inspect-promote の自動昇格 opt-in 条件）が「機械的に特定可能で移行先が一意に定まる高確信度」語彙を使用していることを検知した。REQ-096-004 が禁止するのは確信度を人間判断要求の根拠とすることであり、本行は自動化の許可条件（別文脈）のため対象外と判断したが、語彙の現行性観点で将来確認候補と記録する
+- **ユーザー確認有無**: なし（learning 記録のみ・対応実施はしない）
+- **Decision/REQ/spec影響**: なし（REQ-096-004 の禁止範囲解釈の適用事例。本行自体は対象外）
+- **横展開観点**: 旧語彙の一括置換では「同じ語彙でも文脈により禁止対象か許可対象かが分かれる」行の扱いが課題になる。語彙横断パスでは (1) 人間判断要求の根拠（禁止対象）、(2) 自動化の許可条件（要現行性確認）、(3) 禁じ手の明示的言及（対象外）を区別して処理する
+- **再発条件**: REQ-096 判定表語彙への移行後に、確信度語彙を許可条件として使う REQ 行が残存する場合
+- **予防策候補**: REQ-036-021 の条件語を判断方法・確定権限ベースの表現へ現行化するか、REQ-096 側で確信度語彙の許容文脈を明文化する候補
+- **想定反映先**: docs/requirements/REQ-036.md（REQ-036-021）・docs/requirements/REQ-096.md（語彙許容文脈の明文化先）
+- **関連**: PR #3286 Findings・Issue #3282（RA-003）・Epic #3280 Wave 2
+- **タグ**: `#語彙現行性` `#REQ-096` `#RA-003` `#capture` `#Wave2`
