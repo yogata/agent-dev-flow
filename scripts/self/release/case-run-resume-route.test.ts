@@ -10,8 +10,8 @@
 //     docs/requirements/REQ-031.md (changed rows 004 / 010 / 011)
 // as a permanent regression guard:
 //   - blocked transitions follow the Root Case resume_command canonical
-//     restart route (req-define for new semantic judgment, case-revise for
-//     re-agreed changes)
+//     restart route (req-define for newly confirming a human-reserved
+//     judgment, case-revise for re-agreed changes)
 //   - staleness check differences are reported (never rewritten alone into
 //     the Issue body) and block the run
 //   - docs changes in the PR trigger the docs consistency check whose
@@ -70,7 +70,7 @@ describe("case-run workflow skill pins the blocked resume route (REQ-031-004, RE
 
   test("in-scope impact is handled autonomously, scope changes are blocked", () => {
     expect(doc).toMatch(/既存 Issue scope 内で処理可能な内部実装上の影響は自律処理する/);
-    expect(doc).toMatch(/Issue scope、完了条件、REQ\/Decision\/Design、必須品質統制の追加変更が必要な場合は blocked とし、Root Case の resume_command による正規再開経路（新しい意味判断が必要な場合は req-define、再合意済みの場合は case-revise）に従う/);
+    expect(doc).toMatch(/Issue scope、完了条件、REQ\/Decision\/Design、必須品質統制の追加変更が必要な場合は blocked とし、Root Case の resume_command による正規再開経路（人間に留保された判断の新規確定が必要な場合は req-define、再合意済みの場合は case-revise）に従う/);
   });
 
   test("staleness difference is reported and blocked, Issue body never rewritten alone", () => {
@@ -83,7 +83,7 @@ describe("case-run workflow skill pins the same contracts", () => {
 
   test("common constraints own the blocked resume route (req-define / case-revise)", () => {
     expect(doc).toMatch(/blocked 正規再開経路/);
-    expect(doc).toMatch(/新しい意味判断が必要な場合は req-define、再合意済みの場合は case-revise/);
+    expect(doc).toMatch(/人間に留保された判断の新規確定が必要な場合は req-define、再合意済みの場合は case-revise/);
   });
 
   test("common constraints own the docs consistency linkage to case-close", () => {
@@ -101,7 +101,7 @@ describe("single workflow reference pins the operational details", () => {
 
   test("blocked transition reports via Issue comment and PR body, follows resume_command", () => {
     expect(doc).toMatch(/blocked 遷移と正規再開経路/);
-    expect(doc).toMatch(/case-run は Issue 本文を単独で書き換えず、Root Case の resume_command による正規再開経路（新しい意味判断が必要な場合は req-define、再合意済みの場合は case-revise）に従う/);
+    expect(doc).toMatch(/case-run は Issue 本文を単独で書き換えず、Root Case の resume_command による正規再開経路（人間に留保された判断の新規確定が必要な場合は req-define、再合意済みの場合は case-revise）に従う/);
   });
 
   test("STEP-S3-3 staleness check reports the difference and blocks", () => {
