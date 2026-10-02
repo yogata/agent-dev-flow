@@ -502,3 +502,32 @@
 - **想定反映先**: scripts/self/release/ 配下 PowerShell テストの編集手順、PowerShell 構文検査の運用
 - **関連**: PR #3330 本文「Findings / Capture候補」learning、Issue #3322
 - **タグ**: `#powershell` `#文字列補間` `#ParserError` `#capture`
+
+## 2026-10-02 case-close（Case #3316・PR #3332 Findings 由来）: 複数 Wave にまたがる構造移設では src テスト green でも scripts/self 配下の検査テストが旧構成前提として残る
+
+- **問題事象**: src 配下のテストが green でも、scripts/self 配下のリリース検査テスト（パス定数を独自に保持する群）が旧構成前提のまま残り、Wave 3 統合検証で旧正本パス 44 行等の修正対象としてまとめて検出された
+- **発生局面**: case-close（Case #3316・Epic #3316 Wave 3 Issue #3324 DEL-3324-1）の検証差分確認（PR #3332 検証差分の修正済み分類）
+- **検知方法**: TS-011 全スコープ残存検索（rg 3種。fixture 別の検索語バリエーション・区切り配列形式のパス結合を含む）
+- **ユーザー確認有無**: なし（PR #3332 内で修正して再検証済み: bun test src 878 pass / scripts 263 pass）
+- **Decision/REQ/spec影響**: なし（運用改善知見）
+- **横展開観点**: 移設系 Issue の完了条件には、src と scripts の双方を含む旧パス横断検索（検索語のバリエーションを含む）を入れると検出漏れを防げる
+- **再発条件**: 構造移設系 Issue で src 配下の検証のみで完了判定した場合
+- **予防策候補**: 移設系 work_type の test_strategy への「src + scripts 横断の旧パス検索」条項の追加候補
+- **想定反映先**: REQ-018（worktree 構造的制約とテスト fallback）、REQ-035（Epic と Wave 実行モデル）の test_strategy 規約
+- **関連**: PR #3332 本文「Findings / Capture候補」learning、Issue #3324、intake `2026-10-02-3332-release-archive-new-structure-pending.md`（未修正残存の追跡）
+- **タグ**: `#ts-011` `#旧パス検索` `#scripts-self` `#構造移設` `#capture`
+
+## 2026-10-02 case-close（Case #3316・PR #3332 Findings 由来）: 投影パスによる runner 差し替えは存在チェックだけでは能力欠落を検出できない
+
+- **問題事象**: 投影パスの runner-local.ts が「存在する」検査だけでは createLocalRunner export の不在（能力欠落）を検出できず、破損した Local 実装投影が GitHub 実装へ暗黙 fallback する欠陥が Wave 2 接続実装に残存していた
+- **発生局面**: case-close（Case #3316・Epic #3316 Wave 3 Issue #3324 DEL-3324-1）の TS-012 検出欠陥確認（PR #3332 で fail-closed 化修正済み: config-uninterpretable で構造化失敗）
+- **検知方法**: missing-capability.test.ts（欠落環境テスト）で暗黙 fallback 不発生を固定
+- **根本原因**: 存在チェックと能力検証の未分離
+- **ユーザー確認有無**: なし（修正済み）
+- **Decision/REQ/spec影響**: なし（既存契約〔検査不能を成功扱いしない〕の適用事例。Design multi-host-canonical-model「guard 編集解釈の分離」節の fail-closed 原則と同型）
+- **横展開観点**: 差し替え先の能力検証と、能力不足時の fail-closed 化（暗黙の別バックエンド差し替え禁止）を組み合わせる。同型の選択判定（投影検出 → 実装選択）を持つ実装に横展開可能
+- **再発条件**: 投影・プラグイン・代替実装の検出を存在チェックのみで行った場合
+- **予防策候補**: 選択判定テストには「存在するが能力不足」の欠落環境ケースを必ず含める
+- **想定反映先**: src/opencode/plugins/agentdev-gh-tool/plugin.ts・src/senpi/tools/agentdev-gh-tool/registration.ts（修正済み）、同型の接続系実装のテスト戦略
+- **関連**: PR #3332 本文「Findings / Capture候補」learning、Issue #3324、Epic #3316 Design 状態評価コメント（(b) 実現完了分類の根拠）
+- **タグ**: `#ts-012` `#fail-closed` `#runner-選択` `#投影` `#能力検証` `#capture`
