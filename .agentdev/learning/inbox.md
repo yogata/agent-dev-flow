@@ -367,3 +367,33 @@
 - **想定反映先**: src/opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts（散言行更新範囲の拡張要否判断）、docs/designs/integrity/index-auto-generation.md
 - **関連**: PR #3312（REQ-098 Definition PR で同様の手動更新を実施。PR 本文検証結果へ記録）、PR #3315（本 Case Definition PR）、check_integrity req-range-staleness
 - **タグ**: `#索引再生成` `#散言行` `#req-range-staleness` `#docs-readme` `#case-open` `#capture`
+
+## 2026-10-02 case-run（Case #3314・PR #3325 Findings 由来）: runner-local.ts の原子的書込み（rename）が Windows で EPERM により時々失敗し runner-local.test.ts の TS-008/TS-015 分が flaky になる
+
+- **問題事象**: `issue-0001.md.tmp` → `issue-0001.md` の rename が環境要因（アンチウイルス等の瞬間ロック）で EPERM となり、runner-local.test.ts の TS-008/TS-015 分が時々失敗する。src 構造移設（RA-001）の起因を否定するため、旧構成（main 側・同一コード）で 20 ラウンド 35連続コメント作成プローブを実施したところ 6/20 失敗、新構成で 5/20 失敗と同頻度であり、移設前から存在する環境起因 flaky と実証した
+- **発生局面**: case-run（実現面実装。Case #3314・Epic #3316 Wave 1 Issue #3317 DEL-3317-1）の bun test
+- **検知方法**: bun test の断続的失敗 → 移設起因否定的実証としての新旧構成対照プローブ（20 ラウンド）
+- **根本原因**: runner-local.ts の原子的書込み（rename）に対する Windows 環境の瞬間ロック（アンチウイルス等）。コード起因ではなく環境起因
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（runner-local.ts 実装修正は Issue #3317 スコープ外。対処は別 Case 候補）
+- **横展開観点**: flaky 失敗を検出した際、移設・リファクタリング系変更の差し戻し判断の前に「変更前構成での同頻度再現」を対照実行で確認すると、誤った fix-and-reverify の差し戻しを防げる。rename ベースの原子的書込みは Windows で環境ロックにより EPERM になり得る
+- **再発条件**: Windows 環境で runner-local.test.ts（rename ベースの原子的書込みを含む）を実行した場合
+- **予防策候補**: rename 失敗時の限定リトライ導入、または書込み順序の見直し（runner-local.ts 実装修正）
+- **想定反映先**: src/common/tools/agentdev-gh/local/runner-local.ts（移設後の正規配置。実装修正は別 Case 候補）
+- **関連**: PR #3325 本文「テスト結果」節・「検証差分」節（EPERM rename flaky 実証行）、Case #3316（Epic）、Issue #3317
+- **タグ**: `#windows` `#EPERM` `#rename` `#flaky` `#runner-local` `#capture`
+
+## 2026-10-02 case-run（Case #3314・PR #3325 Findings 由来）: ADF-COVERS 宣言行に全角括弧の説明を含めると以降の ID がパーサで解析されない
+
+- **問題事象**: `ADF-COVERS(implementation): REQ-009-015（説明）, REQ-099-008` の形式で宣言行に全角括弧の説明を含めると、REQ-099-008 以降の ID が coverage に現れず missing-implementation を誘発した
+- **発生局面**: case-run（実現面実装。Case #3314・Epic #3316 Wave 1 Issue #3317 DEL-3317-1）の traceability check --req 実行
+- **検知方法**: traceability check の missing-implementation findings（宣言済みのはずの REQ 行が coverage に不在）
+- **根本原因**: ADF-COVERS 宣言行パーサは ID 列挙のみを解析対象とし、全角括弧内を含む自由文説明は ID 列挙の終端として扱われる
+- **ユーザー確認有無**: なし（宣言書式修正で解消済み。修正済みとして検証差分に記録）
+- **Decision/REQ/spec影響**: なし（traceability check 実行時の実務知見。宣言書式規約の明文化候補）
+- **横展開観点**: 宣言行は ID 列挙のみに限定し、説明は sidecar・PR 本文へ書く。全角括弧・半角括弧を問わず自由文を ID 間に混在させると解析が途切れる
+- **再発条件**: ADF-COVERS 宣言行に括弧付き説明を含めて traceability check を実行した場合
+- **予防策候補**: ADF-COVERS 宣言の書式規約（ID 列挙のみ・説明は sidecar へ）を sidecar authoring 手順へ明記する候補
+- **想定反映先**: agentdev-traceability の sidecar authoring 手順（sidecar-and-policy.md）、case-run の PR 前検査手順
+- **関連**: PR #3325 本文「検証差分」節 traceability check 行、Issue #3317、traceability/multi-host-canonical-structure.yaml（本 PR で新設された sidecar）
+- **タグ**: `#traceability` `#ADF-COVERS` `#宣言書式` `#parser` `#case-run` `#capture`
