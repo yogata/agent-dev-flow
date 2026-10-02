@@ -30,6 +30,10 @@ implementation:
   src/common/guards/distribution-boundary/distribution-boundary-guard-env.ts:
     - REQ-099-013
     - REQ-099-014
+  docs/guides/multi-host-operations.md:
+    - REQ-099-003
+    - REQ-099-017
+    - REQ-099-018
 verification:
   src/common/guards/gh-write/tests/gh-command-detector.test.ts:
     - REQ-099-013
@@ -38,3 +42,7 @@ verification:
     - REQ-099-004
   src/senpi/skill-discovery/tests/senpi-skill-discovery.test.ts:
     - REQ-099-004
+  docs/guides/multi-host-operations.md:
+    - REQ-099-003
+    - REQ-099-017
+    - REQ-099-018
