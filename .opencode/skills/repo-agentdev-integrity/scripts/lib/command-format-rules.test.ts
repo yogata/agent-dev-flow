@@ -25,7 +25,7 @@ function findRepoRoot(startDir: string): string {
 describe("loadCommandFormatRules: canonical yaml loading (REQ-047-009)", () => {
   test("loads IR-028/029/030/031 signals from the canonical yaml", () => {
     const rules = loadCommandFormatRules(findRepoRoot(process.cwd()));
-    expect(rules.scanDirs).toContain("src/opencode/commands/agentdev");
+    expect(rules.scanDirs).toContain("src/common/commands/agentdev");
     expect(rules.scanDirs).toContain(".opencode/commands/repo");
     expect(rules.ir028ForbiddenHeading.test("### Step A: bad")).toBe(true);
     expect(rules.ir028ForbiddenHeading.test("### Step 1: ok")).toBe(false);

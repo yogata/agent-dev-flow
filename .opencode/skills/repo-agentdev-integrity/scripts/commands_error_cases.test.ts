@@ -39,12 +39,12 @@ function findRepoRoot(start: string): string {
 
 const REPO_ROOT = findRepoRoot(SCRIPT_DIR);
 // 配布時 (.opencode/commands/agentdev) を優先。worktree 環境で junction が無い場合は
-// ソースパス (src/opencode/commands/agentdev) へフォールバックして実コマンドを検査する。
+// ソースパス (src/common/commands/agentdev) へフォールバックして実コマンドを検査する。
 const RUNTIME_CMD_DIR = path.join(REPO_ROOT, ".opencode", "commands", "agentdev");
 const SOURCE_CMD_DIR = path.join(
   REPO_ROOT,
   "src",
-  "opencode",
+  "common",
   "commands",
   "agentdev",
 );
@@ -63,13 +63,13 @@ const RUNTIME_TEMPLATES_DIR = path.join(
 const SOURCE_TEMPLATES_DIR = path.join(
   REPO_ROOT,
   "src",
-  "opencode",
+  "common",
   "skills",
   "agentdev-workflow-templates",
   "templates",
 );
 // worktree junction 未設定環境では projection に agentdev-workflow-templates が
-// 存在しないため src/opencode/ へフォールバックする（templates_structure.test.ts と同一方式）。
+// 存在しないため src/common/ へフォールバックする（templates_structure.test.ts と同一方式）。
 const TEMPLATES_DIR = fs.existsSync(RUNTIME_TEMPLATES_DIR)
   ? RUNTIME_TEMPLATES_DIR
   : SOURCE_TEMPLATES_DIR;

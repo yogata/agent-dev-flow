@@ -8,9 +8,9 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { parseDeclarations } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/declarations.ts";
-import { scanCorpus } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/corpus.ts";
-import { runChecks } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/check.ts";
+import { parseDeclarations } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/declarations.ts";
+import { scanCorpus } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/corpus.ts";
+import { runChecks } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/check.ts";
 
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `trace-decls-${crypto.randomUUID().slice(0, 8)}`;
@@ -227,14 +227,14 @@ describe("対応宣言の解析", () => {
 });
 
 describe("配置と構造（REQ-012-043、REQ-012-050）", () => {
-  it("配布スキルが src/opencode/skills/agentdev-traceability/ に配置されている", async () => {
+  it("配布スキルが src/common/skills/agentdev-traceability/ に配置されている", async () => {
     const mod = await import(
-      "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/declarations.ts"
+      "../../../../../src/common/skills/agentdev-traceability/scripts/lib/declarations.ts"
     );
     const modulePath = import.meta.resolve(
-      "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/declarations.ts",
+      "../../../../../src/common/skills/agentdev-traceability/scripts/lib/declarations.ts",
     ).replaceAll("\\", "/");
-    expect(modulePath).toContain("src/opencode/skills/agentdev-traceability/scripts/lib/declarations.ts");
+    expect(modulePath).toContain("src/common/skills/agentdev-traceability/scripts/lib/declarations.ts");
     // artifact-graph を新しい標準機能名として引き継いでいない
     expect(modulePath).not.toContain("agentdev-artifact-graph");
     expect(typeof mod.parseDeclarations).toBe("function");
@@ -242,13 +242,13 @@ describe("配置と構造（REQ-012-043、REQ-012-050）", () => {
 
   it("解析コアが query/check から独立したモジュールとして分離されている（キャッシュ追加可能構造）", async () => {
     const mod = await import(
-      "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/declarations.ts"
+      "../../../../../src/common/skills/agentdev-traceability/scripts/lib/declarations.ts"
     );
     const exports = Object.keys(mod).sort();
     // 解析コアは解析のみを担い、走査・問い合わせ・検査の関数を持たない
     expect(exports).toEqual(["COVER_ROLES", "parseDeclarations"]);
     const query = await import(
-      "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/query.ts"
+      "../../../../../src/common/skills/agentdev-traceability/scripts/lib/query.ts"
     );
     expect(Object.keys(query).some((k) => k.toLowerCase().includes("declar"))).toBe(false);
   });

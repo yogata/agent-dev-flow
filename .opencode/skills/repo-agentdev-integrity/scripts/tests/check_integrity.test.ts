@@ -202,7 +202,7 @@ function buildValidFixture(root: string): void {
   const skillDir = join(root, ".opencode", "skills", "agentdev-test-skill");
   mkdirp(skillDir);
   writeFileSync(join(skillDir, "SKILL.md"), "# agentdev-test-skill\n", "utf-8");
-  const skillSrcDir = join(root, "src", "opencode", "skills", "agentdev-test-skill");
+  const skillSrcDir = join(root, "src", "common", "skills", "agentdev-test-skill");
   mkdirp(skillSrcDir);
   writeFileSync(join(skillSrcDir, "SKILL.md"), "# agentdev-test-skill\n", "utf-8");
 
@@ -215,7 +215,7 @@ function buildValidFixture(root: string): void {
   const wfTemplatesProjDir = join(root, ".opencode", "skills", "agentdev-workflow-templates");
   mkdirp(wfTemplatesProjDir);
   writeFileSync(join(wfTemplatesProjDir, "SKILL.md"), "# agentdev-workflow-templates\n", "utf-8");
-  const wfTemplatesSrcDir = join(root, "src", "opencode", "skills", "agentdev-workflow-templates");
+  const wfTemplatesSrcDir = join(root, "src", "common", "skills", "agentdev-workflow-templates");
   mkdirp(wfTemplatesSrcDir);
   writeFileSync(join(wfTemplatesSrcDir, "SKILL.md"), "# agentdev-workflow-templates\n", "utf-8");
 
@@ -299,13 +299,16 @@ function buildValidFixture(root: string): void {
     );
   }
 
-  const sourceCommandDir = join(root, "src", "opencode", "commands", "agentdev");
+  const sourceCommandDir = join(root, "src", "common", "commands", "agentdev");
   mkdirp(sourceCommandDir);
   for (const filename of readdirSync(cmdDir)) {
     if (filename.endsWith(".md")) {
       copyFileSync(join(cmdDir, filename), join(sourceCommandDir, filename));
     }
   }
+
+  // plugins canonical dir is a required source dir (DEC-049 host connection area)
+  mkdirp(join(root, "src", "opencode", "plugins"));
 
   writeFileSync(
     join(cmdDir, "README.md"),
@@ -325,11 +328,11 @@ function buildValidFixture(root: string): void {
     "utf-8",
   );
 
-  // capture-boundaries.md at canonical location (src/opencode/skills/agentdev-workflow-orchestration/references/)
+  // capture-boundaries.md at canonical location (src/common/skills/agentdev-workflow-orchestration/references/)
   const captureBoundariesDir = join(
     root,
     "src",
-    "opencode",
+    "common",
     "skills",
     "agentdev-workflow-orchestration",
     "references",

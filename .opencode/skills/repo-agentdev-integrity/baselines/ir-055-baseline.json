@@ -4,7 +4,7 @@
   "generated_at": "2026-09-28",
   "entries": [
     {
-      "file": "src/opencode/commands/agentdev/inspect-docs.md",
+      "file": "src/common/commands/agentdev/inspect-docs.md",
       "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 5,
@@ -12,7 +12,7 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
     {
-      "file": "src/opencode/commands/agentdev/inspect-docs.md",
+      "file": "src/common/commands/agentdev/inspect-docs.md",
       "pattern": "docs/guides/",
       "severity": "heuristic",
       "count": 1,
@@ -20,7 +20,7 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
     {
-      "file": "src/opencode/commands/agentdev/inspect-skills.md",
+      "file": "src/common/commands/agentdev/inspect-skills.md",
       "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 5,
@@ -28,7 +28,7 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
     {
-      "file": "src/opencode/commands/agentdev/inspect-skills.md",
+      "file": "src/common/commands/agentdev/inspect-skills.md",
       "pattern": "docs/guides/",
       "severity": "heuristic",
       "count": 1,
@@ -36,7 +36,7 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
     {
-      "file": "src/opencode/skills/agentdev-design-file-manager/SKILL.md",
+      "file": "src/common/skills/agentdev-design-file-manager/SKILL.md",
       "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 1,
@@ -44,7 +44,7 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
     {
-      "file": "src/opencode/skills/agentdev-design-file-manager/references/design-lifecycle-application.md",
+      "file": "src/common/skills/agentdev-design-file-manager/references/design-lifecycle-application.md",
       "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 1,
@@ -52,7 +52,7 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
     {
-      "file": "src/opencode/skills/agentdev-git-worktree/references/worktree-operations.md",
+      "file": "src/common/skills/agentdev-git-worktree/references/worktree-operations.md",
       "pattern": "repo-*",
       "severity": "strict",
       "count": 1,
@@ -60,7 +60,7 @@
       "reason": "意図的残存: Issue #3211（AG-006/AG-008 合意内容の反映）が worktree 操作中の書込み guard 運用指針節（:173 evidence 'repo-local'）に書いた正当な記述で、AGENTS.md 行動規範から正規参照される guard 運用の説明語。文言修正ではなく approved baseline 登録を選択（provenance: PR #3211 由来・Issue #3210 関連・2026-09-28 case-close Epic #3197 TS-001 実測時に approved 登録）"
     },
     {
-      "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
+      "file": "src/common/skills/agentdev-inspect-skills/SKILL.md",
       "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 1,
@@ -68,7 +68,7 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
     {
-      "file": "src/opencode/skills/agentdev-inspect-skills/references/spec-operation-contract-consistency.md",
+      "file": "src/common/skills/agentdev-inspect-skills/references/spec-operation-contract-consistency.md",
       "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 1,
@@ -76,7 +76,7 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
     {
-      "file": "src/opencode/skills/agentdev-learning-pipeline/references/disposition-and-artifact-schema.md",
+      "file": "src/common/skills/agentdev-learning-pipeline/references/disposition-and-artifact-schema.md",
       "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 3,
@@ -84,7 +84,7 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
     {
-      "file": "src/opencode/skills/agentdev-req-analysis/references/analysis-viewpoints.md",
+      "file": "src/common/skills/agentdev-req-analysis/references/analysis-viewpoints.md",
       "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 1,
@@ -92,7 +92,7 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
     {
-      "file": "src/opencode/skills/agentdev-req-analysis/references/investigation-scope-refinement.md",
+      "file": "src/common/skills/agentdev-req-analysis/references/investigation-scope-refinement.md",
       "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 1,
@@ -100,7 +100,7 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
     {
-      "file": "src/opencode/skills/agentdev-req-analysis/references/req-define-detailed-gates.md",
+      "file": "src/common/skills/agentdev-req-analysis/references/req-define-detailed-gates.md",
       "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 1,
@@ -108,7 +108,7 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
     {
-      "file": "src/opencode/skills/agentdev-req-file-manager/templates/doc_requirement.md",
+      "file": "src/common/skills/agentdev-req-file-manager/templates/doc_requirement.md",
       "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 1,
@@ -116,7 +116,7 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
     {
-      "file": "src/opencode/skills/agentdev-req-structure-diagnostics/references/req-structure-review.md",
+      "file": "src/common/skills/agentdev-req-structure-diagnostics/references/req-structure-review.md",
       "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 2,
@@ -124,7 +124,7 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
     {
-      "file": "src/opencode/skills/agentdev-req-structure-diagnostics/references/req-structure-review.md",
+      "file": "src/common/skills/agentdev-req-structure-diagnostics/references/req-structure-review.md",
       "pattern": "docs/guides/",
       "severity": "heuristic",
       "count": 1,
@@ -132,7 +132,7 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
     {
-      "file": "src/opencode/skills/agentdev-workflow-backlog-review/references/analysis-composition-and-review.md",
+      "file": "src/common/skills/agentdev-workflow-backlog-review/references/analysis-composition-and-review.md",
       "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 1,
@@ -140,7 +140,7 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
     {
-      "file": "src/opencode/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md",
+      "file": "src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md",
       "pattern": "repo-*",
       "severity": "strict",
       "count": 1,
@@ -148,7 +148,7 @@
       "reason": "意図的残存: Issue #3211 が case-open reference（:33 evidence 'repo-agentdev-integrity'）に書いた repo-local integrity checker skill への正規参照記述。Consumer 環境で未解決になる参照名の誤用ではなく運用上の意図的言及であり、文言修正（#3210 の成果物破壊）ではなく approved baseline 登録を選択（provenance: PR #3211 由来・Issue #3210 関連・2026-09-28 case-close Epic #3197 TS-001 実測時に approved 登録）"
     },
     {
-      "file": "src/opencode/skills/agentdev-workflow-case-ready/references/execution-structure.md",
+      "file": "src/common/skills/agentdev-workflow-case-ready/references/execution-structure.md",
       "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 1,
@@ -156,7 +156,7 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
     {
-      "file": "src/opencode/skills/agentdev-workflow-inspect-docs/references/scan-and-doc-diagnostics.md",
+      "file": "src/common/skills/agentdev-workflow-inspect-docs/references/scan-and-doc-diagnostics.md",
       "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 2,
@@ -164,7 +164,7 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
     {
-      "file": "src/opencode/skills/agentdev-workflow-inspect-docs/references/scan-and-doc-diagnostics.md",
+      "file": "src/common/skills/agentdev-workflow-inspect-docs/references/scan-and-doc-diagnostics.md",
       "pattern": "docs/guides/",
       "severity": "heuristic",
       "count": 2,
@@ -172,7 +172,7 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
     {
-      "file": "src/opencode/skills/agentdev-workflow-inspect-promote/references/auto-promote-and-review.md",
+      "file": "src/common/skills/agentdev-workflow-inspect-promote/references/auto-promote-and-review.md",
       "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 1,
@@ -180,7 +180,7 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
     {
-      "file": "src/opencode/skills/agentdev-workflow-intake-promote/references/classification-and-review.md",
+      "file": "src/common/skills/agentdev-workflow-intake-promote/references/classification-and-review.md",
       "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 1,
@@ -188,7 +188,7 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
     {
-      "file": "src/opencode/skills/agentdev-workflow-learning-promote/references/analysis-and-review.md",
+      "file": "src/common/skills/agentdev-workflow-learning-promote/references/analysis-and-review.md",
       "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 1,
@@ -196,7 +196,7 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
     {
-      "file": "src/opencode/skills/agentdev-workflow-req-define/references/requirement-development.md",
+      "file": "src/common/skills/agentdev-workflow-req-define/references/requirement-development.md",
       "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 1,
@@ -204,7 +204,7 @@
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
     },
     {
-      "file": "src/opencode/skills/agentdev-workflow-templates/templates/pr_desc.md",
+      "file": "src/common/skills/agentdev-workflow-templates/templates/pr_desc.md",
       "pattern": "docs/designs/",
       "severity": "heuristic",
       "count": 2,

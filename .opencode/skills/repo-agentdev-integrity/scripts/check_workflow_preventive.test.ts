@@ -88,19 +88,19 @@ must_not: []
 const DEFAULT_RULES_YAML = `schema_version: 1
 top_level_step_rules:
   scan_dirs:
-    - src/opencode/commands/agentdev
+    - src/common/commands/agentdev
   heading_regex: "^###\\\\s+Step\\\\s+(\\\\d+)(?:[〜-](\\\\d+))?\\\\s*:"
   forbidden_heading_regex: "^###\\\\s+Step\\\\s+[A-Za-z]"
 `;
 
 function buildFixture(dir: string, opts: FixtureOptions = {}): string {
   const root = fs.mkdtempSync(path.join(dir, "wf-prev-"));
-  const commandDir = path.join(root, "src/opencode/commands/agentdev");
+  const commandDir = path.join(root, "src/common/commands/agentdev");
   fs.mkdirSync(commandDir, { recursive: true });
   fs.writeFileSync(path.join(commandDir, "demo.md"), opts.commandBody ?? DEFAULT_COMMAND_BODY, "utf-8");
 
   if (opts.skillExists !== false) {
-    const skillDir = path.join(root, "src/opencode/skills/agentdev-workflow-demo");
+    const skillDir = path.join(root, "src/common/skills/agentdev-workflow-demo");
     fs.mkdirSync(skillDir, { recursive: true });
     fs.writeFileSync(path.join(skillDir, "SKILL.md"), opts.skillBody ?? DEFAULT_SKILL_BODY, "utf-8");
   }
@@ -246,7 +246,7 @@ describe("check 4: legacy-extension-residual", () => {
   test("abolition-declaration line is exempted", () => {
     const root = buildFixture(tmpBase, {
       extraDistributionFile: {
-        rel: "src/opencode/skills/agentdev-project-extensions/SKILL.md",
+        rel: "src/common/skills/agentdev-project-extensions/SKILL.md",
         content:
           "# project extensions\n\n旧配置 `.agentdev/extensions/commands/**` は廃止済みである。runtime は旧配置を後方互換で読まない。\n",
       },
@@ -259,7 +259,7 @@ describe("check 4: legacy-extension-residual", () => {
   test("detection fixture (*.test.ts) building the legacy path is exempted", () => {
     const root = buildFixture(tmpBase, {
       extraDistributionFile: {
-        rel: "src/opencode/skills/agentdev-sample-skill/scripts/tests/containment.test.ts",
+        rel: "src/common/skills/agentdev-sample-skill/scripts/tests/containment.test.ts",
         content:
           "test(\"containment\", () => {\n  const dir = join(root, \".agentdev/extensions/commands\");\n});\n",
       },

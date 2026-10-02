@@ -32,7 +32,7 @@ bun install && bun run build:engine
 | 対象 | リンク |
 |------|--------|
 | コマンドの選び方（入口表） | [コマンド選択](docs/guides/command-selection.md) |
-| コマンド一覧、入出力リファレンス | [コマンドリファレンス](src/opencode/commands/agentdev/README.md) |
+| コマンド一覧、入出力リファレンス | [コマンドリファレンス](src/common/commands/agentdev/README.md) |
 | ガイド入口 | [ガイド](docs/guides/README.md) |
 | 成果物、状態モデル | [成果物、状態モデル](docs/guides/artifacts-and-state.md) |
 | 用語集 | [用語集](docs/guides/glossary.md) |
@@ -40,6 +40,6 @@ bun install && bun run build:engine
 | 適用プロジェクトへの導入 | [Consumer Project 導入](docs/guides/consumer-project-setup.md) |
 
 配布コマンドの索引。
-詳細な選び方は上表の[コマンド選択](docs/guides/command-selection.md)、各コマンドの入出力は[コマンドリファレンス](src/opencode/commands/agentdev/README.md)を参照する。
+詳細な選び方は上表の[コマンド選択](docs/guides/command-selection.md)、各コマンドの入出力は[コマンドリファレンス](src/common/commands/agentdev/README.md)を参照する。
 
 `/agentdev/req-define`、`/agentdev/backlog-auto`、`/agentdev/case-auto`、`/agentdev/intake-capture`、`/agentdev/intake-from-github`、`/agentdev/intake-promote`、`/agentdev/learning-promote`、`/agentdev/backlog-review`、`/agentdev/inspect-docs`、`/agentdev/inspect-skills`、`/agentdev/inspect-promote`、`/agentdev/issue`、`/agentdev/third-party-sync`

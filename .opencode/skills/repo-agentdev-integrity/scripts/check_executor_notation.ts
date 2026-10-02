@@ -79,8 +79,8 @@ function isPlaceholderToken(s: string): boolean {
 
 function collectScanFiles(repoRoot: string): string[] {
   const dirs = [
-    path.join(repoRoot, "src", "opencode", "commands"),
-    path.join(repoRoot, "src", "opencode", "skills"),
+    path.join(repoRoot, "src", "common", "commands"),
+    path.join(repoRoot, "src", "common", "skills"),
     path.join(repoRoot, "docs", "specs"),
     path.join(repoRoot, "docs", "requirements"),
   ];
@@ -91,7 +91,7 @@ function collectScanFiles(repoRoot: string): string[] {
 
 function checkIr050(files: string[], repoRoot: string): ExecutorFinding[] {
   const findings: ExecutorFinding[] = [];
-  const skillsDir = path.join(repoRoot, "src", "opencode", "skills");
+  const skillsDir = path.join(repoRoot, "src", "common", "skills");
   const knownSkills = new Set<string>();
   if (fs.existsSync(skillsDir)) {
     for (const ent of fs.readdirSync(skillsDir, { withFileTypes: true }) as any[]) {
@@ -133,7 +133,7 @@ function checkIr050(files: string[], repoRoot: string): ExecutorFinding[] {
             file,
             line: i + 1,
             matched: skillName,
-            description: `load_skills value '${skillName}' does not match a known skill directory under src/opencode/skills/ (REQ-010-261).`,
+            description: `load_skills value '${skillName}' does not match a known skill directory under src/common/skills/ (REQ-010-261).`,
           });
         }
       }

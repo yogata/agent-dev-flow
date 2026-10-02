@@ -120,6 +120,20 @@ function isUnderTestsDir(file: string, repoRoot: string): boolean {
   return segments.slice(0, -1).includes("tests");
 }
 
+// Local-mode runner exclusion (file-discovery level): `tools/<name>/local/`
+// is the agentdev-gh Local runner area, explicitly excluded from the normal
+// sync/install distribution set (REQ-009-016, src/common README). It stays a
+// producer-internal region and is not a distribution text artifact, so its
+// producer-side metadata is not a distribution boundary violation.
+function isUnderToolsLocalDir(file: string, repoRoot: string): boolean {
+  const rel = normalizeFileForBaseline(file, repoRoot);
+  const segments = rel.split("/");
+  const toolsIdx = segments.indexOf("tools");
+  if (toolsIdx < 0) return false;
+  const localIdx = segments.indexOf("local", toolsIdx + 2);
+  return localIdx > toolsIdx + 1 && localIdx < segments.length - 1;
+}
+
 export function checkDistributionBoundary(
   repoRoot: string,
   projection: Projection = "source",
@@ -146,13 +160,16 @@ export function checkDistributionBoundary(
 
   const listing = collectTargets(repoRoot, projection);
 
-  // Apply the tests/ directory exclusion before any scanning or
-  // fail-closed reporting so tests/ content never reaches the detector.
+  // Apply the tests/ directory exclusion and the tools/**/local/ exclusion
+  // before any scanning or fail-closed reporting so excluded content never
+  // reaches the detector.
   const scanTextFiles = listing.textFiles.filter(
-    (file) => !isUnderTestsDir(file, repoRoot),
+    (file) =>
+      !isUnderTestsDir(file, repoRoot) && !isUnderToolsLocalDir(file, repoRoot),
   );
   const scanUnknownFiles = listing.unknownFiles.filter(
-    (file) => !isUnderTestsDir(file, repoRoot),
+    (file) =>
+      !isUnderTestsDir(file, repoRoot) && !isUnderToolsLocalDir(file, repoRoot),
   );
 
   // Unknown extension fail-closed: each unknown-ext file is reported as an

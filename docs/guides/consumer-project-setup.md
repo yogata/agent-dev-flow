@@ -235,7 +235,7 @@ $env:AGENTDEV_GH_REPO = "owner/name"   # 例: yogata/agent-dev-flow
 
 case-auto 等の本格実行に入る前に、軽量な読み取り操作（`issue_read` など）を1回実行し、構造化応答（`ok: true`）が返ることを確認する。疎通確認は投入の前置であり、`agentdev_gh` に依存する workflow の失敗を投入の前に検出するために行う。
 
-疎通確認や本格実行で `config-uninterpretable`、`operation-failed`（stderr 空の非ゼロ終了を含む）、`enforcement-crashed` が繰り返される場合は、起動環境障害の既知事象（known-issues）として [Issue 操作安全性手順](../../src/opencode/skills/agentdev-issue-management/references/issue-operation-safety.md) の「起動環境障害の known-issues」節で診断・回復・blocked 時の resume 手順を確認する。リポジトリ解決の設定手順は本節と Plugin の設定節が所有し、known-issues 節は障害発生後の診断・回復を所有する（重複しない）。
+疎通確認や本格実行で `config-uninterpretable`、`operation-failed`（stderr 空の非ゼロ終了を含む）、`enforcement-crashed` が繰り返される場合は、起動環境障害の既知事象（known-issues）として [Issue 操作安全性手順](../../src/common/skills/agentdev-issue-management/references/issue-operation-safety.md) の「起動環境障害の known-issues」節で診断・回復・blocked 時の resume 手順を確認する。リポジトリ解決の設定手順は本節と Plugin の設定節が所有し、known-issues 節は障害発生後の診断・回復を所有する（重複しない）。
 
 ### 更新手順
 

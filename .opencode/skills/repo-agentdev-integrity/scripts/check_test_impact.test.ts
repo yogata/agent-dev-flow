@@ -304,7 +304,7 @@ describe("check_test_impact.ts stale candidate detection (TS-004)", () => {
       "// docs/designs/integrity/impact-gate.md\nimport { describe, it } from \"bun:test\";\ndescribe(\"i\", () => { it(\"ok\", () => {}); });\n",
     );
     writeFile(
-      "src/opencode/skills/demo/scripts/node_modules/zod/lib/dep.test.ts",
+      "src/common/skills/demo/scripts/node_modules/zod/lib/dep.test.ts",
       "// dependency test that must not be scanned\nimport { describe, it } from \"bun:test\";\ndescribe(\"dep\", () => { it(\"ok\", () => {}); });\n",
     );
     commitAll("add Design, referencing test, and nested node_modules dependency test");

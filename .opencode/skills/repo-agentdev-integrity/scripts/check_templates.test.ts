@@ -360,7 +360,7 @@ describe("check_templates.ts", () => {
     const SKIP_SOURCE_TEMPLATES_DIR = path.join(
       SKIP_TEMP_ROOT,
       "src",
-      "opencode",
+      "common",
       "skills",
       "agentdev-workflow-templates",
       "templates",

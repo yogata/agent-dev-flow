@@ -14,7 +14,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 const COMMAND_DIRS = [
-  "src/opencode/commands/agentdev",
+  "src/common/commands/agentdev",
   ".opencode/commands/repo",
 ];
 
@@ -54,7 +54,7 @@ test("command files: no format violations", () => {
 
 // Unit tests for the checker itself
 
-const PUBLIC_CMD = "src/opencode/commands/agentdev/test.md";
+const PUBLIC_CMD = "src/common/commands/agentdev/test.md";
 const REPO_CMD = ".opencode/commands/repo/test.md";
 
 test("checkCommandFile detects ### Step headings in public commands", () => {

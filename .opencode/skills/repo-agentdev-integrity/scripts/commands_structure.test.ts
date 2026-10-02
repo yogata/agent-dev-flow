@@ -35,12 +35,12 @@ function findRepoRoot(start: string): string {
 
 const REPO_ROOT = findRepoRoot(SCRIPT_DIR);
 // 配布時 (.opencode/commands/agentdev) を優先。worktree 環境で junction が無い場合は
-// ソースパス (src/opencode/commands/agentdev) へフォールバックして実コマンドを検査する。
+// ソースパス (src/common/commands/agentdev) へフォールバックして実コマンドを検査する。
 const RUNTIME_CMD_DIR = path.join(REPO_ROOT, ".opencode", "commands", "agentdev");
 const SOURCE_CMD_DIR = path.join(
   REPO_ROOT,
   "src",
-  "opencode",
+  "common",
   "commands",
   "agentdev",
 );

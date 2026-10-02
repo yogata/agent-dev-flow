@@ -7,7 +7,7 @@
 // finding 差分の分類集合・表形式は REQ-048-014 のとおり REQ-048 の成立条件としない。本テストは
 // Design（agentdev-workflow-templates Design「実行識別情報・検証差分のテンプレートセクション形式」）が
 // 現行ベースラインとして宣言する現行セットとの一致のみを検査し、REQ-048-012 の実験契約に従う変更を妨げない。
-// テンプレートは src/opencode/（原本）を優先読込する（worktree は junction 未伝播、REQ-018-001 と同一 fallback 構成）。
+// テンプレートは src/common/（共通正本）を優先読込する（worktree は junction 未伝播、REQ-018-001 と同一 fallback 構成）。
 import { describe, it, expect } from "bun:test";
 import * as fs from "fs";
 import * as path from "path";
@@ -37,7 +37,7 @@ const PROJECTION_TEMPLATES_DIR = path.join(
 const SOURCE_TEMPLATES_DIR = path.join(
   REPO_ROOT,
   "src",
-  "opencode",
+  "common",
   "skills",
   "agentdev-workflow-templates",
   "templates",
@@ -45,7 +45,7 @@ const SOURCE_TEMPLATES_DIR = path.join(
 const TEMPLATES_DIR = fs.existsSync(PROJECTION_TEMPLATES_DIR)
   ? PROJECTION_TEMPLATES_DIR
   : SOURCE_TEMPLATES_DIR;
-const SOURCE_SKILLS_DIR = path.join(REPO_ROOT, "src", "opencode", "skills");
+const SOURCE_SKILLS_DIR = path.join(REPO_ROOT, "src", "common", "skills");
 
 // finding 差分の分類集合は REQ-048-014 のとおり REQ-048 の成立条件として固定しない。
 // 本定数は Design（agentdev-workflow-templates Design「実行識別情報・検証差分のテンプレートセクション形式」）

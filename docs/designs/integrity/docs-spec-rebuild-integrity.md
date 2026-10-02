@@ -8,7 +8,7 @@ updated: 2026-07-24
 # 配布物整合性検査ルール
 
 REQ-002-006 / REQ-002-007 の検査観点の詳細を配置する。
-配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）から内部管理 ID を除去した後の完了条件として、構文健全性、文意保持、責務整合を検査するための検出パターンと NG 分類を定義する。
+配布物（`src/common/commands/agentdev/`、`src/common/skills/agentdev-*/`）から内部管理 ID を除去した後の完了条件として、構文健全性、文意保持、責務整合を検査するための検出パターンと NG 分類を定義する。
 
 ## 検査バックエンド責務分担（check_integrity.ts vs inspect-* skills）
 

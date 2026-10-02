@@ -2,11 +2,11 @@
 // ADF-COVERS(verification): REQ-087-002, REQ-087-003
 // ADF-COVERS(verification): REQ-087-004
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
-import { mkdirSync, writeFileSync, copyFileSync, rmSync, existsSync, readFileSync, symlinkSync } from "fs";
+import { mkdirSync, writeFileSync, copyFileSync, rmSync, existsSync, readFileSync, readdirSync, cpSync, symlinkSync } from "fs";
 import { join } from "path";
 import { checkRepoLocalPluginProjectionSymmetry, extractKnownGapNumbers, loadKnownGapReqIds } from "./check_integrity.ts";
 import { generateDocsReadmeDecisionTable } from "./generate_indexes.ts";
-import { extractKnownGapNumbers as extractKnownGapNumbersAllocator } from "../../../../src/opencode/skills/agentdev-req-file-manager/scripts/src/alloc-req-number.ts";
+import { extractKnownGapNumbers as extractKnownGapNumbersAllocator } from "../../../../src/common/skills/agentdev-req-file-manager/scripts/src/alloc-req-number.ts";
 
 const SCRIPT_DIR = import.meta.dir;
 const SCRIPT_FILE = join(SCRIPT_DIR, "check_integrity.ts");
@@ -221,12 +221,12 @@ function buildValidFixture(root: string): void {
   writeFileSync(join(workflowTplSkillDir, "SKILL.md"), "---\nname: agentdev-workflow-templates\n---\n# agentdev-workflow-templates\n\n## USE FOR\n\n- templates\n", "utf-8");
 
   // Source-side skill dirs (source-projection-sync)
-  mkdirp(join(root, "src", "opencode", "skills", "agentdev-test-skill"));
-  mkdirp(join(root, "src", "opencode", "skills", "agentdev-workflow-templates"));
+  mkdirp(join(root, "src", "common", "skills", "agentdev-test-skill"));
+  mkdirp(join(root, "src", "common", "skills", "agentdev-workflow-templates"));
 
-  // WP-3 (Issue #1928): src/opencode/commands/agentdev and src/opencode/skills
+  // WP-3 (Issue #1928): src/common/commands/agentdev and src/common/skills
   // are required by checkSourceRequiredDirs.
-  const srcCmdDir = join(root, "src", "opencode", "commands", "agentdev");
+  const srcCmdDir = join(root, "src", "common", "commands", "agentdev");
   mkdirp(srcCmdDir);
   writeFileSync(join(srcCmdDir, "README.md"), "# agentdev commands\n", "utf-8");
 
@@ -329,7 +329,7 @@ function buildValidFixture(root: string): void {
   const captureBoundaryDir = join(
     root,
     "src",
-    "opencode",
+    "common",
     "skills",
     "agentdev-workflow-orchestration",
     "references",
@@ -386,6 +386,28 @@ function buildValidFixture(root: string): void {
   for (const [fname, content] of Object.entries(captureCmdDuties)) {
     writeFileSync(join(cmdDir, fname), content, "utf-8");
   }
+
+  // Mirror the projection into the canonical source tree so the source
+  // profile scan and the installed-profile projection comparison both see
+  // the same content (DEC-049: src/common/ + src/opencode/plugins).
+  const mirrorCommandDir = join(root, "src", "common", "commands", "agentdev");
+  mkdirp(mirrorCommandDir);
+  for (const filename of readdirSync(cmdDir)) {
+    if (filename.endsWith(".md")) {
+      copyFileSync(join(cmdDir, filename), join(mirrorCommandDir, filename));
+    }
+  }
+  mkdirp(join(root, "src", "common", "skills"));
+  for (const entry of readdirSync(join(root, ".opencode", "skills"), { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    if (!entry.name.startsWith("agentdev-") && entry.name !== "japanese-tech-writing") continue;
+    cpSync(
+      join(root, ".opencode", "skills", entry.name),
+      join(root, "src", "common", "skills", entry.name),
+      { recursive: true },
+    );
+  }
+  mkdirp(join(root, "src", "opencode", "plugins"));
 }
 
 function buildInvalidFixture(root: string): void {
@@ -1517,7 +1539,7 @@ function buildIr053Fixture(root: string): void {
   writeFileSync(join(root, "docs", "designs", "README.md"), "# Design\n", "utf-8");
 
   // True positive: direct gh invocation in prose (inline code span, NOT a code block).
-  const cmdDir = join(root, "src", "opencode", "commands", "agentdev");
+  const cmdDir = join(root, "src", "common", "commands", "agentdev");
   mkdirp(cmdDir);
   writeFileSync(
     join(cmdDir, "violation-cmd.md"),
@@ -1539,7 +1561,7 @@ function buildIr053Fixture(root: string): void {
   const sampleSkillDir = join(
     root,
     "src",
-    "opencode",
+    "common",
     "skills",
     "agentdev-sample-skill",
   );
@@ -1654,7 +1676,7 @@ function buildIr055Fixture(root: string): void {
   // DEC-NNN (current Decision convention) and ADR-NNNN (legacy residual).
   // REQ-025-002: IR-055 regex updated to DEC-\d{3} form.
   // REQ-025-004: residual ADR-NNNN detection must remain active after migration.
-  const cmdDir = join(root, "src", "opencode", "commands", "agentdev");
+  const cmdDir = join(root, "src", "common", "commands", "agentdev");
   mkdirp(cmdDir);
   writeFileSync(
     join(cmdDir, "violation-cmd.md"),
@@ -1673,7 +1695,8 @@ function buildIr055Fixture(root: string): void {
       "See ADR-0099 for legacy residual reference (REQ-025-004).",
       "See v2:ADR-0099 for historical reference (AG-010 exempt).",
       "See ADR-0099 for decision.",
-      "Source at src/opencode/commands/agentdev/violation-cmd.md.",
+      "Source at src/common/commands/agentdev/violation-cmd.md.",
+      "Legacy source at src/opencode/skills/agentdev-sample-skill/SKILL.md is obsolete.",
       "Repo-local at /repo/docs-check.",
       "Skill repo-agentdev-integrity handles checks.",
       "",
@@ -1685,7 +1708,7 @@ function buildIr055Fixture(root: string): void {
   const skillDir = join(
     root,
     "src",
-    "opencode",
+    "common",
     "skills",
     "agentdev-sample-skill",
   );
@@ -1736,7 +1759,7 @@ function buildIr055Fixture(root: string): void {
   const integRefDir = join(
     root,
     "src",
-    "opencode",
+    "common",
     "skills",
     "agentdev-sample-skill",
     "references",
@@ -1877,13 +1900,13 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
     expect(residualLines.length).toBeGreaterThanOrEqual(1);
   });
 
-  it("detects strict pattern src/opencode/", () => {
+  it("detects strict pattern obsolete src/opencode/{commands,skills,tools}/", () => {
     const r = runScript(IR055_ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
     const hits = parsed.results.filter(
       (res: { check: string; evidence?: string; pattern?: string }) =>
         res.check === "runtime-unresolved-reference" &&
-        res.evidence === "src/opencode/",
+        res.evidence === "src/opencode/skills/",
     );
     expect(hits.length).toBeGreaterThanOrEqual(1);
   });
@@ -2158,7 +2181,7 @@ function buildIr058Fixture(root: string): void {
 
   // Distribution skill that references a projection-only skill, a repo-* skill,
   // and a skills.yaml-declared third-party skill (IR-058 3-branch fixture).
-  const distSkillDir = join(root, "src", "opencode", "skills", "agentdev-sample");
+  const distSkillDir = join(root, "src", "common", "skills", "agentdev-sample");
   mkdirp(distSkillDir);
   writeFileSync(
     join(distSkillDir, "SKILL.md"),
@@ -2182,7 +2205,7 @@ function buildIr058Fixture(root: string): void {
     "utf-8",
   );
   // Also create a sibling agentdev-* dir so source-side enumeration works.
-  mkdirp(join(root, "src", "opencode", "skills", "agentdev-other"));
+  mkdirp(join(root, "src", "common", "skills", "agentdev-other"));
 
   // skills.yaml declaration (IR-058 branch 2 fixture): japanese-tech-writing is declared.
   const thirdPartyDir = join(root, "src", "third-party");
@@ -2294,7 +2317,7 @@ function buildIr058Fixture(root: string): void {
     ].join("\n"),
     "utf-8",
   );
-  const srcCmdDir = join(root, "src", "opencode", "commands", "agentdev");
+  const srcCmdDir = join(root, "src", "common", "commands", "agentdev");
   mkdirp(srcCmdDir);
   for (const fname of ["case-run.md", "case-close.md", "req-save.md", "case-open.md", "case-auto.md"]) {
     writeFileSync(
@@ -2310,7 +2333,7 @@ function buildIr058Fixture(root: string): void {
   writeFileSync(join(cmdDir, "case-auto.md"), "---\ndescription: case-auto\nagent: sisyphus\n---\n\nBody.\n", "utf-8");
 
   // workflow-orchestration capture-boundaries.md (referenced by capture boundary check).
-  const captureBoundaryDir = join(root, "src", "opencode", "skills", "agentdev-workflow-orchestration", "references");
+  const captureBoundaryDir = join(root, "src", "common", "skills", "agentdev-workflow-orchestration", "references");
   mkdirp(captureBoundaryDir);
   writeFileSync(
     join(captureBoundaryDir, "capture-boundaries.md"),
@@ -2323,7 +2346,7 @@ function buildIr058Fixture(root: string): void {
     "---\nname: agentdev-workflow-orchestration\n---\n# orchestration\n",
     "utf-8",
   );
-  mkdirp(join(root, "src", "opencode", "skills", "agentdev-workflow-orchestration"));
+  mkdirp(join(root, "src", "common", "skills", "agentdev-workflow-orchestration"));
   // workflow-templates skill in both source and projection (referenced by templates check).
   mkdirp(join(root, ".opencode", "skills", "agentdev-workflow-templates", "templates"));
   writeFileSync(
@@ -2349,7 +2372,7 @@ function buildIr058Fixture(root: string): void {
     ].join("\n"),
     "utf-8",
   );
-  mkdirp(join(root, "src", "opencode", "skills", "agentdev-workflow-templates"));
+  mkdirp(join(root, "src", "common", "skills", "agentdev-workflow-templates"));
 }
 
 describe("IR-058 distribution-untracked-skill-reference (REQ-0159-003)", () => {
@@ -2399,7 +2422,7 @@ describe("IR-058 distribution-untracked-skill-reference (REQ-0159-003)", () => {
     expect(ngResults.length).toBeGreaterThan(0);
     const promotionMessage = ngResults.find(
       (res: { message?: string }) =>
-        (res.message ?? "").includes("Promote to src/opencode/skills/") &&
+        (res.message ?? "").includes("Promote to src/common/skills/") &&
         (res.message ?? "").includes("ADR-0134"),
     );
     expect(promotionMessage).toBeDefined();
@@ -2866,7 +2889,7 @@ function buildPathNormFixture(
   const cmdDir =
     commandDirKind === "projection"
       ? join(root, ".opencode", "commands", "agentdev")
-      : join(root, "src", "opencode", "commands", "agentdev");
+      : join(root, "src", "common", "commands", "agentdev");
   mkdirp(cmdDir);
   // broken.md has no frontmatter → command-inventory NG whose bucket key `file`
   // is the command file path in the environment's own notation.
@@ -2887,7 +2910,7 @@ describe("NG baseline path bucket key normalization (Issue #2206, OU-0008)", () 
       {
         category: "Command",
         check: "command-inventory",
-        file: "src/opencode/commands/agentdev/broken.md",
+        file: "src/common/commands/agentdev/broken.md",
         evidence: null,
         count: 1,
         provenance: "legacy",
@@ -2946,15 +2969,15 @@ describe("NG baseline path bucket key normalization (Issue #2206, OU-0008)", () 
         (res.file ?? "").endsWith("broken.md"),
     );
     expect(inv.length).toBeGreaterThanOrEqual(1);
-    expect(inv[0].file).toBe("src/opencode/commands/agentdev/broken.md");
+    expect(inv[0].file).toBe("src/common/commands/agentdev/broken.md");
     expect(inv[0].level).toBe("info");
     expect(inv[0].message).toContain("[baseline-known]");
   });
 });
 
 // ─── IR-055 実修復回帰テスト（Issue #1782, OU-005, RU-0012） ──────────────
-// 配布物（src/opencode/commands/agentdev/**/*.md,
-// src/opencode/skills/agentdev-*/**/*.md）の runtime-unresolved-reference
+// 配布物（src/common/commands/agentdev/**/*.md,
+// src/common/skills/agentdev-*/**/*.md）の runtime-unresolved-reference
 // 既存未管理 NG を実修復した後の状態を保持することを検証する。
 // baseline 更新だけで未解決参照を info へ降格していないこと（REQ-0108-264
 // 段階導入の精神、Issue #1782 完了条件）を回帰テストとして固定する。
@@ -3086,11 +3109,11 @@ describe("WP-3 execution profiles (Issue #1928)", () => {
   let profileRoot: string;
 
   function writeSourceCmd(root: string, name: string, body: string): void {
-    const dir = join(root, "src", "opencode", "commands", "agentdev");
+    const dir = join(root, "src", "common", "commands", "agentdev");
     writeFile(join(dir, name), body);
   }
   function writeSourceSkill(root: string, skill: string, body: string): void {
-    const dir = join(root, "src", "opencode", "skills", skill);
+    const dir = join(root, "src", "common", "skills", skill);
     writeFile(join(dir, "SKILL.md"), body);
   }
   function writeProjectionCmd(root: string, name: string, body: string): void {
@@ -3121,6 +3144,7 @@ describe("WP-3 execution profiles (Issue #1928)", () => {
       "agentdev-demo",
       "---\nname: agentdev-demo\ndescription: demo skill\n---\n# agentdev-demo\n## USE FOR\n- x\n## DO NOT USE FOR\n- y\n",
     );
+    mkdirp(join(profileRoot, "src", "opencode", "plugins"));
 
     const designsDir = join(profileRoot, "docs", "designs");
     mkdirp(designsDir);
@@ -3298,7 +3322,7 @@ function buildIr063Fixture(root: string): void {
   mkdirp(join(root, "docs", "designs"));
   writeFileSync(join(root, "docs", "designs", "README.md"), "# Design\n", "utf-8");
 
-  const cmdDir = join(root, "src", "opencode", "commands", "agentdev");
+  const cmdDir = join(root, "src", "common", "commands", "agentdev");
   mkdirp(cmdDir);
 
   writeFileSync(
@@ -3311,7 +3335,7 @@ function buildIr063Fixture(root: string): void {
   const registryDir = join(
     root,
     "src",
-    "opencode",
+    "common",
     "skills",
     "agentdev-command-authoring",
     "references",
@@ -3372,7 +3396,7 @@ function buildIr063Fixture(root: string): void {
   );
 
   // 境界例: POL 参照も Gxx 表記も持たない配布 skill 本文
-  const skillDir = join(root, "src", "opencode", "skills", "agentdev-demo-skill");
+  const skillDir = join(root, "src", "common", "skills", "agentdev-demo-skill");
   mkdirp(skillDir);
   writeFileSync(
     join(skillDir, "SKILL.md"),
@@ -3500,7 +3524,7 @@ function buildIr064Fixture(root: string): void {
   mkdirp(join(root, "docs", "designs"));
   writeFileSync(join(root, "docs", "designs", "README.md"), "# Design\n", "utf-8");
 
-  const cmdDir = join(root, "src", "opencode", "commands", "agentdev");
+  const cmdDir = join(root, "src", "common", "commands", "agentdev");
   mkdirp(cmdDir);
   writeFileSync(
     join(cmdDir, "README.md"),
@@ -3532,7 +3556,7 @@ function buildIr064Fixture(root: string): void {
     "utf-8",
   );
 
-  const skillDir = join(root, "src", "opencode", "skills", "agentdev-fixture-skill");
+  const skillDir = join(root, "src", "common", "skills", "agentdev-fixture-skill");
   mkdirp(skillDir);
 
   // 違反例 + 再現例: bare TODO マーカー（strict）と裸 ID プレースホルダー（heuristic）
@@ -3562,7 +3586,7 @@ function buildIr064Fixture(root: string): void {
     "REQ-{NNNN} と TODO はテンプレート内では許容される。\n",
     "utf-8",
   );
-  const skillTplDir = join(root, "src", "opencode", "skills", "agentdev-fixture-skill", "templates");
+  const skillTplDir = join(root, "src", "common", "skills", "agentdev-fixture-skill", "templates");
   mkdirp(skillTplDir);
   writeFileSync(
     join(skillTplDir, "doc.md"),
@@ -3691,7 +3715,7 @@ function buildIr065Fixture(root: string): void {
   );
 
   // 違反例 + 再現例（F-001/F-003 相当）
-  const cmdDir = join(root, "src", "opencode", "commands", "agentdev");
+  const cmdDir = join(root, "src", "common", "commands", "agentdev");
   mkdirp(cmdDir);
   writeFileSync(
     join(cmdDir, "README.md"),
@@ -3735,7 +3759,7 @@ function buildIr065Fixture(root: string): void {
   );
 
   // 境界例: existence_probe — agentdev-artifact-graph が実在すれば語彙検出を skip
-  const probeSkillDir = join(root, "src", "opencode", "skills", "agentdev-artifact-graph");
+  const probeSkillDir = join(root, "src", "common", "skills", "agentdev-artifact-graph");
   mkdirp(probeSkillDir);
   writeFileSync(
     join(probeSkillDir, "SKILL.md"),
@@ -3869,14 +3893,14 @@ function buildIr065SpaceFixture(root: string): void {
   // buildIr065Fixture は existence_probe 境界例のため agentdev-artifact-graph を
   // 実在させる。スペースバリアント検出テストでは当該語彙を active 化するため
   // probe 先を除去する（probe-design.md は本 describe の filter 対象外）
-  rmSync(join(root, "src", "opencode", "skills", "agentdev-artifact-graph"), {
+  rmSync(join(root, "src", "common", "skills", "agentdev-artifact-graph"), {
     recursive: true,
     force: true,
   });
 
   // 違反例・再現例: 半角・全角スペース挿入バリアント（negation terms・行履歴
   // マーカーを含まない文面。正規化語彙の両バリアントと基本形を含める）
-  const cmdDir = join(root, "src", "opencode", "commands", "agentdev");
+  const cmdDir = join(root, "src", "common", "commands", "agentdev");
   writeFileSync(
     join(cmdDir, "space-variant-cmd.md"),
     [
@@ -4121,7 +4145,7 @@ const IR066EXT_ROOT = join(TEMP_ROOT, "ir066ext");
 function buildIr066ExtFixture(root: string): void {
   buildIr065Fixture(root);
 
-  const cmdDir = join(root, "src", "opencode", "commands", "agentdev");
+  const cmdDir = join(root, "src", "common", "commands", "agentdev");
   // 違反例 + 再現例（F-01 stale junction 旧称）
   writeFileSync(
     join(cmdDir, "retired-name-cmd.md"),
@@ -4465,7 +4489,7 @@ function buildIr068BaseFixture(root: string): void {
   writeFileSync(join(root, "docs", "designs", "README.md"), "# Design\n", "utf-8");
 
   for (const skill of ["agentdev-alpha-skill", "agentdev-beta-skill"]) {
-    const skillDir = join(root, "src", "opencode", "skills", skill);
+    const skillDir = join(root, "src", "common", "skills", skill);
     mkdirp(skillDir);
     writeFileSync(
       join(skillDir, "SKILL.md"),
@@ -4548,7 +4572,7 @@ describe("IR-068 skill-projection-manifest (Issue #2383 (d), inspect F-01)", () 
     mkdirp(root);
     buildIr068BaseFixture(root);
     // src に design-save 相当を追加（F-01: workflow-design-save 投影欠落）
-    const addedSkill = join(root, "src", "opencode", "skills", "agentdev-workflow-design-save");
+    const addedSkill = join(root, "src", "common", "skills", "agentdev-workflow-design-save");
     mkdirp(addedSkill);
     writeFileSync(
       join(addedSkill, "SKILL.md"),
@@ -5531,21 +5555,21 @@ function buildRa001Fixture(root: string): void {
   mkdirp(join(root, "docs", "designs"));
   writeFileSync(join(root, "docs", "designs", "README.md"), "# Design\n", "utf-8");
 
-  const exempt1Dir = join(root, "src", "opencode", "skills", "agentdev-issue-management", "references");
+  const exempt1Dir = join(root, "src", "common", "skills", "agentdev-issue-management", "references");
   mkdirp(exempt1Dir);
   writeFileSync(
     join(exempt1Dir, "issue-operation-safety.md"),
     "# 手順\n\n上限到達時は `gh issue list --search k` で補完する。\n",
     "utf-8",
   );
-  const exempt2Dir = join(root, "src", "opencode", "skills", "agentdev-workflow-case-open", "references");
+  const exempt2Dir = join(root, "src", "common", "skills", "agentdev-workflow-case-open", "references");
   mkdirp(exempt2Dir);
   writeFileSync(
     join(exempt2Dir, "definition-pr-and-idempotency.md"),
     "# 手順\n\ngh CLI による切替は読み取り専用（`gh pr view` 等）に限定する。\n",
     "utf-8",
   );
-  const nonExemptDir = join(root, "src", "opencode", "skills", "agentdev-ra-nonexempt");
+  const nonExemptDir = join(root, "src", "common", "skills", "agentdev-ra-nonexempt");
   mkdirp(nonExemptDir);
   writeFileSync(
     join(nonExemptDir, "SKILL.md"),
@@ -5589,11 +5613,11 @@ describe("IR-053 exemption paths + compensation (Case #3166, RA-001, TS-001)", (
   it("compensation: write-path gh literals are absent in both exempt files (live corpus)", () => {
     const WRITE_GH = /\bgh\s+(issue|pr)\s+(create|edit|comment|merge|close)\b/i;
     const exempt1 = readFileSync(
-      join(REPO_ROOT_FROM_SCRIPT_DIR, "src", "opencode", "skills", "agentdev-issue-management", "references", "issue-operation-safety.md"),
+      join(REPO_ROOT_FROM_SCRIPT_DIR, "src", "common", "skills", "agentdev-issue-management", "references", "issue-operation-safety.md"),
       "utf-8",
     );
     const exempt2 = readFileSync(
-      join(REPO_ROOT_FROM_SCRIPT_DIR, "src", "opencode", "skills", "agentdev-workflow-case-open", "references", "definition-pr-and-idempotency.md"),
+      join(REPO_ROOT_FROM_SCRIPT_DIR, "src", "common", "skills", "agentdev-workflow-case-open", "references", "definition-pr-and-idempotency.md"),
       "utf-8",
     );
     expect(WRITE_GH.test(exempt1)).toBe(false);
@@ -5625,7 +5649,7 @@ function buildRa003Fixture(root: string, warningTotalCap: number | null): void {
     join(root, ".opencode", "skills", "repo-agentdev-integrity", "references", "vocabulary-registry.md"),
   );
 
-  const skillDir = join(root, "src", "opencode", "skills", "agentdev-ra003");
+  const skillDir = join(root, "src", "common", "skills", "agentdev-ra003");
   mkdirp(skillDir);
   writeFileSync(
     join(skillDir, "SKILL.md"),

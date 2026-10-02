@@ -37,6 +37,7 @@ distribution は consumer 環境へ配布されるテキスト成果物の集合
 境界は Markdown 本文に限定しない（REQ-029-002）。
 配布対象のテキスト成果物（command 定義、skill 定義、template、script ソース、附属するテキスト形式の設定や README）すべてへ適用する。
 テキストと判定可能な成果物とバイナリと判定される成果物を決定的に区別し、判定不能なエントリは unclassified として gate-not-passed 扱いとする。
+検査対象の除外領域: 共通正本側 tests/ 配下（検出刺激用のサンプル文字列を含むテスト。Issue #2480）と、tools/<name>/local/ 配下（通常版の同期・インストールの配布対象から除外された Local 実装領域。REQ-009-016）は配布テキスト成果物の対象外とする。
 
 ## 配布物本文の記述規則
 
@@ -110,7 +111,7 @@ clean として通過させない（DEC-014 決定5）。
 
 次の 4 projection を分離して検査する。
 
-- source projection: src/opencode/ など原本領域。
+- source projection: 共通正本 src/common/（commands/skills/tools/guards）とホスト接続領域の plugin 正本 src/opencode/plugins/ など原本領域。
 - link projection: 通常の consumer リンクインストールで展開される配置先。
 - archive projection: release として具体化された配布アーカイブ。
 - archive-installed projection: archive を展開し install した状態。

@@ -610,7 +610,7 @@ describe("retired Decision restore handling (REQ-059-005)", () => {
 describe("doc_decision template related_reqs initial value (REQ-059-004)", () => {
   const repoRoot = findRepoRoot(import.meta.dir);
   const templateCandidates = [
-    path.join(repoRoot, "src", "opencode", "skills", "agentdev-decision-file-manager", "templates", "doc_decision.md"),
+    path.join(repoRoot, "src", "common", "skills", "agentdev-decision-file-manager", "templates", "doc_decision.md"),
     path.join(repoRoot, ".opencode", "skills", "agentdev-decision-file-manager", "templates", "doc_decision.md"),
   ];
   const templatePath = templateCandidates.find((p) => fs.existsSync(p));

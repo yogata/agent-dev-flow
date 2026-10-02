@@ -1108,11 +1108,11 @@ describe("checkScriptTemplateReferencePaths", () => {
     );
     expect(okResults.length).toBeGreaterThanOrEqual(1);
   });
-  it("worktree fallback scans src/opencode/skills and fires IR-062 when junction projection is absent (REQ-018-001, TS-002)", () => {
+  it("worktree fallback scans src/common/skills and fires IR-062 when junction projection is absent (REQ-018-001, TS-002)", () => {
     const root = join(TEMP_ROOT, "worktree-fallback-ir062");
     buildMinimalFixture(root);
     copyScripts(root);
-    const srcSkillsDir = join(root, "src", "opencode", "skills");
+    const srcSkillsDir = join(root, "src", "common", "skills");
     mkdirp(
       join(srcSkillsDir, "agentdev-doc-diagnostics", "references"),
     );
@@ -1155,7 +1155,7 @@ describe("checkScriptTemplateReferencePaths", () => {
       (r) => r.check === "skills-dir-fallback",
     );
     expect(fallbackInfo.length).toBe(1);
-    expect(fallbackInfo[0].message).toContain("src/opencode/skills");
+    expect(fallbackInfo[0].message).toContain("src/common/skills");
   });
   it("junction projection present keeps scanning .opencode/skills without fallback (REQ-018-001)", () => {
     const root = join(TEMP_ROOT, "junction-present-no-fallback");
@@ -1168,7 +1168,7 @@ describe("checkScriptTemplateReferencePaths", () => {
       "# agentdev-workflow-templates\n",
       "utf-8",
     );
-    const srcSkillsDir = join(root, "src", "opencode", "skills");
+    const srcSkillsDir = join(root, "src", "common", "skills");
     mkdirp(join(srcSkillsDir, "agentdev-doc-diagnostics", "references"));
     writeFileSync(
       join(

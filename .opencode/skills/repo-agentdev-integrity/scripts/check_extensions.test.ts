@@ -147,7 +147,7 @@ describe("extBaselineKey path normalization (Issue #2206, OU-0008)", () => {
     const source = extBaselineKey(
       "Extensions",
       "id-target-consistency",
-      "src/opencode/commands/agentdev/case-close.md",
+      "src/common/commands/agentdev/case-close.md",
       "same message",
     );
     expect(projection).toBe(source);
@@ -157,7 +157,7 @@ describe("extBaselineKey path normalization (Issue #2206, OU-0008)", () => {
     expect(
       extBaselineKey("Extensions", "check", ".opencode\\skills\\agentdev-x\\SKILL.md", null),
     ).toBe(
-      extBaselineKey("Extensions", "check", "src/opencode/skills/agentdev-x/SKILL.md", null),
+      extBaselineKey("Extensions", "check", "src/common/skills/agentdev-x/SKILL.md", null),
     );
     expect(extBaselineKey("Extensions", "check", null, "m")).toBe(
       "Extensions\tcheck\t\tm",
@@ -219,13 +219,13 @@ describe("shared ng-baseline demotion contract (Issue #2560, TS-004)", () => {
     );
   }
 
-  fs.mkdirSync(path.join(fixtureRoot, "src", "opencode", "commands", "agentdev"), { recursive: true });
+  fs.mkdirSync(path.join(fixtureRoot, "src", "common", "commands", "agentdev"), { recursive: true });
   fs.writeFileSync(
-    path.join(fixtureRoot, "src", "opencode", "commands", "agentdev", "demo.md"),
+    path.join(fixtureRoot, "src", "common", "commands", "agentdev", "demo.md"),
     "---\ndescription: fixture command\n---\n# demo\n",
     "utf-8",
   );
-  const skillDir = path.join(fixtureRoot, "src", "opencode", "skills", "agentdev-workflow-demo");
+  const skillDir = path.join(fixtureRoot, "src", "common", "skills", "agentdev-workflow-demo");
   fs.mkdirSync(skillDir, { recursive: true });
   fs.writeFileSync(
     path.join(skillDir, "SKILL.md"),

@@ -88,9 +88,9 @@ export interface PreventiveReport {
   };
 }
 
-const PUBLIC_COMMAND_DIR = "src/opencode/commands/agentdev";
-const DISTRIBUTION_SCAN_DIRS = ["src/opencode", "src/opencode-local"];
-const SKILLS_DIR = "src/opencode/skills";
+const PUBLIC_COMMAND_DIR = "src/common/commands/agentdev";
+const DISTRIBUTION_SCAN_DIRS = ["src/common", "src/opencode/plugins", "src/opencode-local"];
+const SKILLS_DIR = "src/common/skills";
 const EXTENSIONS_SKILLS_DIR = ".agentdev/extensions/skills";
 const EXTENSIONS_COMMANDS_DIR = ".agentdev/extensions/commands";
 const COMMAND_FORMAT_RULES_PATH = path.join(

@@ -32,8 +32,8 @@ required_envelope_prohibition:
     - "必須\\s+envelope.*delegation_type"
     - "必須\\s+envelope.*on_result"
   scan_targets:
-    - src/opencode/commands/agentdev
-    - src/opencode/skills
+    - src/common/commands/agentdev
+    - src/common/skills
   exemption_hints:
     # Discussion of the prohibition itself (e.g., this rule's own description)
     # is exempt.
@@ -54,8 +54,8 @@ lightweight_delegation_primary_prohibition:
     - "lightweight-delegation\\s+を主要パターン"
     - "primary\\s+pattern.*lightweight-delegation"
   scan_targets:
-    - src/opencode/commands/agentdev
-    - src/opencode/skills
+    - src/common/commands/agentdev
+    - src/common/skills
   exemption_hints:
     - "lightweight-delegation primary pattern 禁止"
     - "lightweight-delegation は主要パターンではない"

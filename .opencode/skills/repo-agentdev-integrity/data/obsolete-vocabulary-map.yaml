@@ -37,7 +37,8 @@ scope:
     - docs/requirements
     - docs/decisions
     - docs/guides
-    - src/opencode
+    - src/common
+    - src/opencode/plugins
     - .opencode/commands
     - .agentdev/extensions
   exclude:
@@ -49,7 +50,7 @@ scope:
     - .opencode/skills/repo-agentdev-integrity/data/
     - .opencode/skills/repo-agentdev-integrity/baselines/
     - .opencode/skills/repo-agentdev-integrity/SKILL.md
-    - src/opencode/commands/agentdev/templates/
+    - src/common/commands/agentdev/templates/
 
 # 履歴説明として語彙の言及が正当なファイル（検出基盤・正規契約上の言及）。
 # IR-057「例外登録（現行Decisionの履歴記載）」と同根の運用。
@@ -115,7 +116,7 @@ vocabulary:
     existence_probe: docs/adr
   - id: artifact-graph-name
     rule: IR-065
-    existence_probe: src/opencode/skills/agentdev-artifact-graph
+    existence_probe: src/common/skills/agentdev-artifact-graph
   - id: doc-map-name
     rule: IR-065
     existence_probe: docs/DOC-MAP.md
@@ -131,35 +132,35 @@ vocabulary:
     existence_probe: .agentdev/graph
   - id: agentdev-artifact-graph-skill
     rule: IR-066
-    existence_probe: src/opencode/skills/agentdev-artifact-graph
+    existence_probe: src/common/skills/agentdev-artifact-graph
   - id: check-graph-script
     rule: IR-066
-    existence_probe: src/opencode/skills/agentdev-artifact-graph
+    existence_probe: src/common/skills/agentdev-artifact-graph
   - id: agentdev-spec-compliance-skill
     rule: IR-066
-    existence_probe: src/opencode/skills/agentdev-spec-compliance
+    existence_probe: src/common/skills/agentdev-spec-compliance
   - id: agentdev-adr-guidelines-skill
     rule: IR-066
-    existence_probe: src/opencode/skills/agentdev-adr-guidelines
+    existence_probe: src/common/skills/agentdev-adr-guidelines
   - id: agentdev-adr-file-manager-skill
     rule: IR-066
-    existence_probe: src/opencode/skills/agentdev-adr-file-manager
+    existence_probe: src/common/skills/agentdev-adr-file-manager
   - id: agentdev-doc-map-skill
     rule: IR-066
-    existence_probe: src/opencode/skills/agentdev-doc-map
+    existence_probe: src/common/skills/agentdev-doc-map
   - id: agentdev-workflow-reporting-skill
     rule: IR-066
-    existence_probe: src/opencode/skills/agentdev-workflow-reporting
+    existence_probe: src/common/skills/agentdev-workflow-reporting
   # --- Issue #2383 (b): v1〜v4 監査観点再走査で採用した追加の廃止名称 ---
   - id: inspect-extensions-command
     rule: IR-066
-    existence_probe: src/opencode/commands/agentdev/inspect-extensions.md
+    existence_probe: src/common/commands/agentdev/inspect-extensions.md
   - id: agentdev-spec-file-manager-skill
     rule: IR-066
-    existence_probe: src/opencode/skills/agentdev-spec-file-manager
+    existence_probe: src/common/skills/agentdev-spec-file-manager
   - id: agentdev-workflow-spec-save-skill
     rule: IR-066
-    existence_probe: src/opencode/skills/agentdev-workflow-spec-save
+    existence_probe: src/common/skills/agentdev-workflow-spec-save
   # --- Issue #2480: distribution-boundary-guard Plugin のパッケージ正規化と
   # agentdev 命名統一（REQ-002-045）。旧名称・旧配置の並存禁止（AG-009）。
   # 旧名称と旧パス（.opencode/plugins/ 直下配置）の両方を 1 語彙で検出する
