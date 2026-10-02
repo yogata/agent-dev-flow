@@ -35,8 +35,9 @@ function Assert-ValidConsumerCwd {
         exit 1
     }
 
-    # 2. src/opencode/ 配下（原本領域）
-    if ($cwd -match '[\\/]src[\\/]opencode([\\/]|$)') {
+    # 2. src/ 配下の原本領域（src/common/、src/opencode/、src/senpi/、src/opencode-local/、
+    #    src/third-party/ の各原本領域。マルチホスト正本モデルの新構成を含む）
+    if ($cwd -match '[\\/]src[\\/](common|opencode|senpi|opencode-local|third-party)([\\/]|$)') {
         Write-Host "現在のフォルダ: $cwd。このフォルダは agent-dev-flow の原本領域です。AgentDevFlow をインストールしたいリポジトリの一番上のフォルダ（.git がある場所）で実行してください。"
         exit 1
     }
@@ -64,7 +65,7 @@ function Show-ConsumerCheckoutGuidance {
         チェックアウト配置先ディレクトリ名。
 
     .PARAMETER SourceDir
-        期待される src/opencode/ の絶対パス（期待される状態行の表示用）。
+        期待される正本パス（usable checkout 判定材料）の絶対パス（期待される状態行の表示用）。
 
     .PARAMETER CloneCommandLine
         方法1 に表示する git clone コマンド行（呼び出し元スクリプトで組み立てる）。
@@ -79,7 +80,7 @@ function Show-ConsumerCheckoutGuidance {
         [string[]]$ZipNoteLines = @()
     )
     $repoWebUrl = $ConsumerRepoUrl -replace '\.git$', ''
-    Write-Host "[ERROR] 利用可能なチェックアウトが見つかりません。usable checkout 判定（$PluginDir/src/opencode/ の存在）に失敗しました。"
+    Write-Host "[ERROR] 利用可能なチェックアウトが見つかりません。usable checkout 判定（$PluginDir/src/common/ の存在）に失敗しました。"
     Write-Host ''
     Write-Host 'このスクリプトは provisioning（clone、fetch、reset）と network access を行いません（REQ-009-046、DEC-016）。'
     Write-Host '以下のいずれかで agent-dev-flow のチェックアウトを用意してから再実行してください。'

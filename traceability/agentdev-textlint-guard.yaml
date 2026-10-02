@@ -6,15 +6,6 @@ implementation:
     - REQ-097-001
   THIRD-PARTY-NOTICES.md:
     - REQ-029-013
-  scripts/consumer/archive/install.ps1:
-    - REQ-029-012
-    - REQ-097-002
-  scripts/install.ps1:
-    - REQ-029-012
-    - REQ-097-002
-  scripts/self-sync.ps1:
-    - REQ-029-012
-    - REQ-097-002
   scripts/self/release/package-release-archive.ps1:
     - REQ-029-012
     - REQ-029-013
