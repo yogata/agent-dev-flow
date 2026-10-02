@@ -83,5 +83,5 @@ implementation:
     - REQ-098-012
     - REQ-098-013
     - REQ-098-014
-  src/opencode/skills/agentdev-project-extensions/scripts/lib/extension_state.ts:
+  src/common/skills/agentdev-project-extensions/scripts/lib/extension_state.ts:
     - REQ-098-011

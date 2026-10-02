@@ -2,8 +2,8 @@
 //
 // OpenCode の plugin 機構（.opencode/plugins/ 直下の depth-1 ファイルから読み込まれる）
 // 経由で、agentdev-jev Custom Tool をモデルへ公開する。Plugin は登録の配線のみを担い、
-// 操作契約・正規化・失敗の構造化・観測の形式検証は Tool 本体
-// （src/opencode/tools/agentdev-jev/）が所有する。
+// 操作契約・正規化・失敗の構造化・観測の形式検証は Tool engine
+// （src/common/tools/agentdev-jev/）が所有する。
 //
 // 公開スキーマは provider・SDK 非依存（REQ-{NNNN}-{NNN}）。provider 接続（現行 Cloudflare
 // adapter）は Tool 本体が動的解決し、credential（CLOUDFLARE_ACCOUNT_ID と
@@ -16,8 +16,8 @@
 import {
   AGENTDEV_JEV_PUBLIC_CONTRACTS,
   runAgentdevJevOperation,
-} from "../../tools/agentdev-jev/index.ts";
-import { validateFinalResultObservation } from "../../tools/agentdev-jev/observation.ts";
+} from "../../../common/tools/agentdev-jev/index.ts";
+import { validateFinalResultObservation } from "../../../common/tools/agentdev-jev/observation.ts";
 
 // OpenCode plugin plumbing 型（agentdev-gh-tool plugin と同一の構造的定義。依存ゼロを保つ）。
 

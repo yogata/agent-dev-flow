@@ -1,6 +1,6 @@
 component: agentdev-workflow-case-auto
 implementation:
-  src/opencode/skills/agentdev-workflow-case-auto/SKILL.md:
+  src/common/skills/agentdev-workflow-case-auto/SKILL.md:
     - REQ-034-032
     - REQ-094-001
     - REQ-094-002
@@ -8,10 +8,10 @@ implementation:
     - REQ-094-006
     - REQ-094-010
     - REQ-094-011
-  src/opencode/skills/agentdev-workflow-case-auto/references/input-resolution-and-orchestration.md:
+  src/common/skills/agentdev-workflow-case-auto/references/input-resolution-and-orchestration.md:
     - REQ-030-017
     - REQ-061-039
-  src/opencode/skills/agentdev-workflow-case-auto/references/stop-and-decision-resolution.md:
+  src/common/skills/agentdev-workflow-case-auto/references/stop-and-decision-resolution.md:
     - REQ-096-001
     - REQ-096-002
     - REQ-096-004

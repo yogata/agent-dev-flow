@@ -2,12 +2,12 @@
 //
 // OpenCode のプラグイン機構（.opencode/plugins/ 直下の depth-1 ファイルから読み込まれる）
 // 経由で、agentdev-gh Custom Tool をモデルに公開する。Plugin は登録の配線のみを担い、
-// 操作契約・fail-closed ゲート・VERIFY は Tool 本体（src/opencode/tools/agentdev-gh/）が所有する。
+// 操作契約・fail-closed ゲート・VERIFY は Tool engine（src/common/tools/agentdev-gh/）が所有する。
 //
 // 実行の差し替え（REQ-{NNNN}-{NNN} / DEC-{NNN}）:
 //   - 既定: GitHub 実装（runner-cli.ts）で gh CLI を実行する
 //   - ローカル版: 投影パス（.opencode/tools/agentdev-gh/runner-local.ts）に Local 実装が
-//     存在する場合（install -LocalMode により junction 先が src/opencode-local/agentdev-gh/
+//     存在する場合（install -LocalMode により junction 先が src/common/tools/agentdev-gh/local/
 //     に差し替わっている場合）は、それを動的に読み込んで差し替える。Workflow は差を認識しない
 //
 // args スキーマは zod を用いない（依存ゼロの構造的定義）。OpenCode の registry は
@@ -23,10 +23,10 @@ import { pathToFileURL } from "node:url";
 import {
   AGENTDEV_GH_PUBLIC_CONTRACTS,
   runAgentdevGhOperation,
-} from "../../tools/agentdev-gh/index.ts";
-import { createCliRunner } from "../../tools/agentdev-gh/runner-cli.ts";
-import { buildGhToolEnv } from "../../tools/agentdev-gh/engine.ts";
-import type { GhRunner } from "../../tools/agentdev-gh/runner.ts";
+} from "../../../common/tools/agentdev-gh/index.ts";
+import { createCliRunner } from "../../../common/tools/agentdev-gh/runner-cli.ts";
+import { buildGhToolEnv } from "../../../common/tools/agentdev-gh/engine.ts";
+import type { GhRunner } from "../../../common/tools/agentdev-gh/runner.ts";
 
 // OpenCode plugin plumbing 型（@opencode-ai/plugin 1.x と同じ形状。
 // 本 plugin が消費するフィールドのみ宣言する。依存ゼロを保つため直接 import しない）。

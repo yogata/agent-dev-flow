@@ -18,9 +18,9 @@ import {
   REQUEST_PROPERTY_SCHEMA,
   type ToolContext,
 } from "../plugin.ts";
-import type { GhRunner, GhRunnerReply, GhRunnerRequest } from "../../../tools/agentdev-gh/runner.ts";
-import { AGENTDEV_GH_OPERATION_SPECS } from "../../../tools/agentdev-gh/index.ts";
-import { GH_TOOL_OPERATIONS } from "../../../tools/agentdev-gh/contracts.ts";
+import type { GhRunner, GhRunnerReply, GhRunnerRequest } from "../../../../common/tools/agentdev-gh/runner.ts";
+import { AGENTDEV_GH_OPERATION_SPECS } from "../../../../common/tools/agentdev-gh/index.ts";
+import { GH_TOOL_OPERATIONS } from "../../../../common/tools/agentdev-gh/contracts.ts";
 
 function makeContext(worktree: string): ToolContext {
   return { sessionID: "s1", directory: worktree, worktree };
@@ -319,7 +319,7 @@ describe("ローカル版差し替え（投影パスの Local 実装検出）", 
     fs.writeFileSync(
       path.join(projectionDir, "runner-local.ts"),
       [
-        'import type { GhRunner } from "../../../../../../../src/opencode/tools/agentdev-gh/runner.ts";',
+        'import type { GhRunner } from "../../../../../../../src/common/tools/agentdev-gh/runner.ts";',
         "export function createLocalRunner(options: { issuesDir: string }): GhRunner {",
         "  return {",
         "    async run(request) {",

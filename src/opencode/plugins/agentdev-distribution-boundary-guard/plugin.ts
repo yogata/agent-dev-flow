@@ -6,7 +6,7 @@
 // apply_patch tools. When a write would introduce a producer-internal
 // reference (concrete ADR/REQ/DEC ID, concrete docs path, producer-repo
 // fixed URL, or any unclassified UPPER-DIGITS family) into a distributed
-// text artifact under src/opencode/{commands,skills}/**, the hook throws
+// text artifact under src/common/{commands,skills}/**, the hook throws
 // to block the write before it lands on disk.
 //
 // Stage B regression (PR #2092):
@@ -34,10 +34,11 @@
 //     loader detects it via readV1Plugin and skips the legacy iteration
 //     that would throw on this module's non-function exports.
 //
-// Evaluation logic lives in lib/distribution-boundary-guard-evaluators.ts;
-// argument parsing in lib/distribution-boundary-guard-parser.ts; full-file
-// reconstruction in lib/distribution-boundary-guard-reconstruction.ts; path
-// classification in lib/distribution-boundary-guard-paths.ts. This file
+// Evaluation logic (guard 共通判定) lives in
+// src/common/guards/distribution-boundary/distribution-boundary-guard-evaluators.ts;
+// argument parsing in distribution-boundary-guard-parser.ts; full-file
+// reconstruction in distribution-boundary-guard-reconstruction.ts; path
+// classification in distribution-boundary-guard-paths.ts. This file
 // owns the plugin shell, the GuardEnv, and the default-export wiring.
 
 import {
@@ -55,15 +56,15 @@ import {
   parseWriteArgs as parserParseWriteArgs,
   type ParsedApplyPatch,
   type ParsedEdit,
-} from "./lib/distribution-boundary-guard-parser.ts";
+} from "../../../common/guards/distribution-boundary/distribution-boundary-guard-parser.ts";
 import {
   classifyPath,
   classifyPathNoRoot,
   isDistributedPath,
   normalizePath,
   type PathClass,
-} from "./lib/distribution-boundary-guard-paths.ts";
-import type { FileReader } from "./lib/distribution-boundary-guard-reconstruction.ts";
+} from "../../../common/guards/distribution-boundary/distribution-boundary-guard-paths.ts";
+import type { FileReader } from "../../../common/guards/distribution-boundary/distribution-boundary-guard-reconstruction.ts";
 import {
   emptyOk,
   evaluateApplyPatchEnv as evaluatorsEvaluateApplyPatchEnv,
@@ -73,7 +74,7 @@ import {
   inspectionError,
   type GuardDetectionsResult,
   type PathClassifier,
-} from "./lib/distribution-boundary-guard-evaluators.ts";
+} from "../../../common/guards/distribution-boundary/distribution-boundary-guard-evaluators.ts";
 
 // OpenCode plugin plumbing types (mirror @opencode-ai/plugin 1.3.x).
 // Only the fields this plugin consumes are declared.
@@ -158,7 +159,7 @@ export function makeGuardEnv(opts: MakeGuardEnvOptions = {}): GuardEnv {
 // Public helper API (exported for unit tests)
 // ---------------------------------------------------------------------------
 
-export { type GuardDetectionsResult } from "./lib/distribution-boundary-guard-evaluators.ts";
+export { type GuardDetectionsResult } from "../../../common/guards/distribution-boundary/distribution-boundary-guard-evaluators.ts";
 
 export const SUPPORTED_TOOLS = ["write", "edit", "apply_patch"] as const;
 export type SupportedTool = (typeof SUPPORTED_TOOLS)[number];
@@ -175,7 +176,7 @@ function makeClassifier(projectRoot: string | null | undefined): PathClassifier 
 }
 
 export { classifyPath, classifyPathNoRoot, isDistributedPath, normalizePath, type PathClass };
-export { isApprovedTemporaryPath } from "./lib/distribution-boundary-guard-paths.ts";
+export { isApprovedTemporaryPath } from "../../../common/guards/distribution-boundary/distribution-boundary-guard-paths.ts";
 
 export const parseWriteArgs = parserParseWriteArgs;
 export const parseEditArgs = parserParseEditArgs;
@@ -188,7 +189,7 @@ export type {
   PatchEntry,
   PatchOpKind,
   ParsedPatch,
-} from "./lib/distribution-boundary-guard-parser.ts";
+} from "../../../common/guards/distribution-boundary/distribution-boundary-guard-parser.ts";
 export {
   reconstructEdit,
   reconstructAddFile,
@@ -197,7 +198,7 @@ export {
   safeRead,
   type FileReader,
   type ReconstructResult,
-} from "./lib/distribution-boundary-guard-reconstruction.ts";
+} from "../../../common/guards/distribution-boundary/distribution-boundary-guard-reconstruction.ts";
 
 // ---------------------------------------------------------------------------
 // Public evaluate API

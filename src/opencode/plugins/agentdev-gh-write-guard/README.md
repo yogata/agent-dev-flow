@@ -16,7 +16,7 @@ OpenCode の `tool.execute.before` フックでコマンド実行系ツール（
 | 強制処理自体が異常終了した | 検出器の例外を block へ変換 |
 | 必須検証が完了できない | 検査対象ツールでコマンド引数が検証不能なら block |
 
-パス解決不能系は本 Plugin の検査対象外（コマンド文字列検査はパス解決に依存しない）。Tool 側（`src/opencode/tools/agentdev-gh/`）の fail-closed テストが担保する。
+パス解決不能系は本 Plugin の検査対象外（コマンド文字列検査はパス解決に依存しない）。Tool 側（`src/common/tools/agentdev-gh/`）の fail-closed テストが担保する。
 
 ## 検出範囲
 

@@ -187,7 +187,7 @@ describe("final gate CLI 契約", () => {
 
 describe("corpus 適用（是正パターンでの二入口同一性と bypass 検出）", () => {
   const ADF_BODY_CONFIG =
-    "version: 1\nadditional_targets:\n  - src/opencode/commands/**/*.md\n  - src/opencode/skills/**/*.md\n";
+    "version: 1\nadditional_targets:\n  - src/common/commands/**/*.md\n  - src/common/skills/**/*.md\n";
   // corpus 校正で是正した実在パターンの是正前後の全文（docs 標準対象と skills 追加対象の両方）。
   const CORPUS_CASES = [
     {
@@ -196,12 +196,12 @@ describe("corpus 適用（是正パターンでの二入口同一性と bypass �
       after: "# 見出し\n\n- source-of-truth priority 遵守\n",
     },
     {
-      rel: "src/opencode/skills/agentdev-intake-pipeline/references/intake-promotion.md",
+      rel: "src/common/skills/agentdev-intake-pipeline/references/intake-promotion.md",
       before: "# 見出し\n\nreject 時の commit message に却下理由を含める（監査証跠の補強）。\n",
       after: "# 見出し\n\nreject 時の commit message に却下理由を含める（監査証跡の補強）。\n",
     },
     {
-      rel: "src/opencode/skills/agentdev-req-analysis/references/session-context-detection.md",
+      rel: "src/common/skills/agentdev-req-analysis/references/session-context-detection.md",
       before: "# 見出し\n\n推論結果を表示（**陈述形式、質問ではない**）。\n",
       after: "# 見出し\n\n推論結果を表示（**記述形式、質問ではない**）。\n",
     },

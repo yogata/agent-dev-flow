@@ -1,0 +1,29 @@
+component: multi-host-canonical-structure
+implementation:
+  src/common/README.md:
+    - REQ-099-001
+    - REQ-099-002
+    - REQ-002-007
+    - REQ-002-008
+    - REQ-002-047
+  src/opencode/README.md:
+    - REQ-099-002
+    - REQ-002-007
+    - REQ-002-045
+  src/senpi/README.md:
+    - REQ-099-002
+    - REQ-002-007
+  src/common/tools/agentdev-gh/local/README.md:
+    - REQ-009-015
+    - REQ-009-016
+    - REQ-009-020
+  src/common/guards/gh-write/gh-command-detector.ts:
+    - REQ-099-013
+    - REQ-099-014
+  src/common/guards/distribution-boundary/distribution-boundary-guard-paths.ts:
+    - REQ-099-013
+    - REQ-099-019
+verification:
+  src/common/guards/gh-write/tests/gh-command-detector.test.ts:
+    - REQ-099-013
+    - REQ-099-014

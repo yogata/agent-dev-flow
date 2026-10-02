@@ -2,7 +2,7 @@
 
 Custom Tool `agentdev_jev` を OpenCode の実行時へ登録する ADF 汎用 Plugin（REQ-{NNNN}、REQ-{NNN}、DEC-{NNN}）。
 
-Jev 先行評価は最終判断者ではなく、後段の reasoning model 推論への追加情報として扱う（Stage 1: 観測可能化）。Plugin は登録の配線のみを担い、操作契約・正規化・失敗の構造化・観測の形式検証は Tool 本体（`src/opencode/tools/agentdev-jev/`）が所有する。判断対象の意味、評価基準、Jev を呼ぶべき箇所、最終判断は Workflow / Capability Skill が所有する（REQ-{NNNN}-{NNN}）。
+Jev 先行評価は最終判断者ではなく、後段の reasoning model 推論への追加情報として扱う（Stage 1: 観測可能化）。Plugin は登録の配線のみを担い、操作契約・正規化・失敗の構造化・観測の形式検証は Tool 本体（`src/common/tools/agentdev-jev/`）が所有する。判断対象の意味、評価基準、Jev を呼ぶべき箇所、最終判断は Workflow / Capability Skill が所有する（REQ-{NNNN}-{NNN}）。
 
 ## 操作カタログ
 
@@ -17,7 +17,7 @@ evaluate は evaluator 成功後の時点で観測（1 semantic evaluation = 1 o
 
 ## 公開契約
 
-操作契約の正は Custom Tool 操作契約 Design「Jev 先行評価」節（extension 経由で解決）。公開契約は provider・SDK 非依存であり、provider 接続（現行 Cloudflare adapter）と外部 API 固有の名称・型・格納位置は adapter パッケージ（`src/opencode/tools/agentdev-jev/adapter-cloudflare/`）内部に隠蔽される（配布依存境界: REQ-{NNN}・DEC-{NNN} 決定2）。
+操作契約の正は Custom Tool 操作契約 Design「Jev 先行評価」節（extension 経由で解決）。公開契約は provider・SDK 非依存であり、provider 接続（現行 Cloudflare adapter）と外部 API 固有の名称・型・格納位置は adapter パッケージ（`src/common/tools/agentdev-jev/adapter-cloudflare/`）内部に隠蔽される（配布依存境界: REQ-{NNN}・DEC-{NNN} 決定2）。
 
 - 利用可否: `CLOUDFLARE_ACCOUNT_ID` と `CLOUDFLARE_API_TOKEN` 環境変数の設定有無で決まる（feature flag・opt-in 手続きは不要）
 - 未設定時: API を呼び出さず構造化失敗（not_configured）を返し、観測を生成しない。呼出し元 Workflow は従来 LLM 経路のみで完了させる

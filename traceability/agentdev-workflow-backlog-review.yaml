@@ -1,9 +1,9 @@
 component: agentdev-workflow-backlog-review
 implementation:
-  src/opencode/skills/agentdev-workflow-backlog-review/SKILL.md:
+  src/common/skills/agentdev-workflow-backlog-review/SKILL.md:
     - REQ-096-012
     - REQ-096-020
-  src/opencode/skills/agentdev-workflow-backlog-review/references/analysis-composition-and-review.md:
+  src/common/skills/agentdev-workflow-backlog-review/references/analysis-composition-and-review.md:
     - REQ-090-004
     - REQ-090-012
     - REQ-090-018
@@ -19,7 +19,7 @@ implementation:
     - REQ-096-020
     - REQ-096-023
 verification:
-  src/opencode/skills/agentdev-workflow-backlog-review/references/analysis-composition-and-review.md:
+  src/common/skills/agentdev-workflow-backlog-review/references/analysis-composition-and-review.md:
     - REQ-090-024
     - REQ-090-027
     - REQ-090-029

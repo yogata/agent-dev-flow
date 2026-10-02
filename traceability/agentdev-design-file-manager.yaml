@@ -1,9 +1,9 @@
 component: agentdev-design-file-manager
 implementation:
-  src/opencode/skills/agentdev-design-file-manager/SKILL.md:
+  src/common/skills/agentdev-design-file-manager/SKILL.md:
     - REQ-021-013
     - REQ-021-026
     - REQ-032-025
-  src/opencode/skills/agentdev-design-file-manager/references/design-lifecycle-application.md:
+  src/common/skills/agentdev-design-file-manager/references/design-lifecycle-application.md:
     - REQ-021-026
     - REQ-032-025

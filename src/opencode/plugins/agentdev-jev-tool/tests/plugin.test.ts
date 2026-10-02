@@ -10,8 +10,8 @@ import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
 import { createAgentdevJevToolDefinition, createAgentdevJevToolPlugin, REQUEST_PROPERTY_SCHEMA } from "../plugin.ts";
-import { validateFinalResultObservation } from "../../../tools/agentdev-jev/observation.ts";
-import type { JevProvider } from "../../../tools/agentdev-jev/provider.ts";
+import { validateFinalResultObservation } from "../../../../common/tools/agentdev-jev/observation.ts";
+import type { JevProvider } from "../../../../common/tools/agentdev-jev/provider.ts";
 
 function context(worktree: string) {
   return { sessionID: "s", directory: worktree, worktree } as Parameters<ReturnType<typeof createAgentdevJevToolDefinition>["execute"]>[1];
