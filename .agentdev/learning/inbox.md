@@ -116,3 +116,29 @@
 - **タグ**: #bash-pipeline #exit-code #checker-observation #case-open
 
 ---
+
+---
+
+## 2026-10-03: project extension 未読込 deviation の再発（OU-011/OU-012・2例目）
+
+- 問題クラス: workflow deviation（extension 読込漏れ）
+- 発生工程: case-open（case-auto 配下の並行委譲実行。Root Case #3340/#3352・Definition PR #3349/#3361）
+- 内容: OU-002（Case #3333）と同一パターンが並行委譲の別実行者でも再発。SKILL.md 制御平面（6 STEP）と references のみを読み、STEP-1 で project extension（.agentdev/extensions/skills/agentdev-workflow-case-open.yaml）を読込まず docs 編集と Issue/PR 投稿を実施した。PR 検証欄への yomiyasu 遡及適用記録（対象・実施結果・保持指摘理由の最小限記録）で回復した
+- 学び: 同型 deviation が 2 つの独立した委譲実行で再現しており、extension 未読込が並行委譲の構造的リスクであることを実証した。learning-promote の再発性評価に活用できる
+- 発見元: Case #3340・#3352（backlog-pool-20261003・OU-011/OU-012）実行時の自工程観測
+
+## 2026-10-03: yomiyasu lint の表行は構造保護で char_count 0 になる（セル抽出が必要）
+
+- 問題クラス: implementation error（検査対象の取りこぼし）
+- 発生工程: case-open STEP-6 yomiyasu 遡及適用（Case #3352・REQ-093-004 行検査）
+- 内容: REQ 行（Markdown 表行）を lint に渡すと char_count 0 で PASS 判定になる。lint の Markdown 構造保護前処理が表行を文字数計算対象外とするため、表行単体の検査は常に空判定になる
+- 学び: REQ 行等の表行を検査する場合は表セル本文を抽出して検査する。PASS 判定を「検査済み」と解釈すると、未検査のまま適用済み扱いになる
+- 発見元: Case #3352 実行時の自工程観測
+
+## 2026-10-03: bash pipe 経由の dollar-question は最後のコマンド（tail 等）の終了コードを見る
+
+- 問題クラス: implementation error（検証証跡の誤測）
+- 発生工程: case-open STEP-4 branch HEAD 実測（Case #3340・check_integrity 実行）
+- 内容: cmd --json を tail へ pipe した形で実行し、表示された EXIT=0 を誤読しかけた。実態は tail の終了コードであり checker 自体は exit 1（NG 4 件）。pipe なしの実行に切替して正しい終了コード EXIT=1 を確認し、証跡を訂正した
+- 学び: checker 終了コードを検証証跡に記録する場合は pipe を経由させず、リダイレクトで実行して終了コードを取得する。証跡の exit code は検証対象コマンドと同一プロセスから取得する
+- 発見元: Case #3340 実行時の自工程観測
