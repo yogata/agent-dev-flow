@@ -2,7 +2,7 @@
 title: 実行時パッケージ境界
 status: accepted
 created: 2026-08-20
-updated: 2026-09-29
+updated: 2026-10-02
 ---
 <!-- ADF-COVERS(implementation): REQ-002-007, REQ-002-008, REQ-002-011, REQ-002-019, REQ-002-020, REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-002, REQ-009-003, REQ-009-006, REQ-009-007, REQ-009-008, REQ-009-009, REQ-009-010, REQ-009-011, REQ-009-012, REQ-009-013, REQ-009-014, REQ-009-015, REQ-009-016, REQ-009-017, REQ-009-018, REQ-009-019, REQ-009-020, REQ-009-021, REQ-009-022, REQ-009-023, REQ-009-024, REQ-009-025, REQ-009-035, REQ-009-036, REQ-009-037, REQ-009-038, REQ-009-039, REQ-009-046, REQ-009-047, REQ-009-048, REQ-009-049 -->
@@ -465,9 +465,7 @@ wrong target 検出、再作成ロジックは LocalMode と通常版 install �
 
 ## v4 adapter 境界への接続
 
-実行時パッケージ境界（本 Design 既有の Tools / Plugins 配布・更新）は v4 の Harness/Backend adapter 境界（ADF v4 実装責務境界 Design・DEC-036）の配備層に属する。未使用 adapter を先回りして実装しない。
-
-定義の所有は v4-responsibility-boundaries にあり、本節は参照にとどめる。既存節は不変とする。
+本 Design が定義するリポジトリ種別、.opencode/ の意味、link mode、Tools / Plugins の配布・投影は、Harness/Backend adapter 境界（DEC-036）の下で維持される。link 元の正本は共通正本領域（src/common/）へ移行しており、src/opencode/ と src/senpi/ はホスト別接続領域として並列する。配備形態の正本は Decision「ADF 共通正本とホスト接続領域の分離」、配置契約と投影モデルの詳細はマルチホスト正本モデル Design（foundations/multi-host-canonical-model.md）が所有する。ローカル版 Custom Tool の原本は共通正本側の Tool engine 領域に整理され、OpenCode 領域（src/opencode/）への型・schema 参照を持たない（REQ-009-015/016）。
 
 ## 関連項目（See Also）
 

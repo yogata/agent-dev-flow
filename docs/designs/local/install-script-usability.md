@@ -2,7 +2,7 @@
 title: 導入スクリプトの使いやすさ詳細
 status: accepted
 created: 2026-08-02
-updated: 2026-09-03
+updated: 2026-10-02
 ---
 <!-- ADF-COVERS(implementation): REQ-009-001, REQ-009-003, REQ-009-004, REQ-009-005, REQ-009-040, REQ-009-041, REQ-009-042, REQ-009-043, REQ-009-044, REQ-009-046, REQ-009-047, REQ-009-048, REQ-009-049 -->
 <!-- ADF-COVERS(implementation): REQ-009-040, REQ-009-041, REQ-009-042, REQ-009-043, REQ-009-044 -->
@@ -14,6 +14,8 @@ updated: 2026-09-03
 install.ps1 -Mode check は旧状態確認専用スクリプト（check-consumer-opencode.ps1）の検査能力を包含する（REQ-050-004）。
 
 ## 対話ウィザード
+
+install.ps1 は引数なし起動時、対話ウィザードにより実行モード（check/dry-run/apply）と環境（通常版/ローカル版）に加え、配置対象ホスト（OpenCode のみ、Senpi のみ、両方）を問う。配置対象ホストの選択はマルチホスト正本モデル Design（foundations/multi-host-canonical-model.md）の投影モデルに従い、新規導入では両ホストへの配置を推奨し、既存導入の更新では現在の配置対象を維持して明示指定により変更する。ヘルプには dry-run/check/apply の3モードの違い、-LocalMode の判断基準に加え、配置対象ホスト選択の判断基準を明示する（REQ-009-040/042、REQ-099-010）。CLI 未導入でも配置は可能とし、配置検査と実行環境の診断を区別する（REQ-099-011）。
 
 ### scripts/install.ps1
 
