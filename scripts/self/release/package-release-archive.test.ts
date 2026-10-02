@@ -24,7 +24,7 @@ import { spawnSync } from "child_process";
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 const ARCHIVE_INSTALLER = path.join(REPO_ROOT, "scripts", "consumer", "archive", "install.ps1");
 const PACKAGE_ARCHIVE_PS1 = path.join(REPO_ROOT, "scripts", "self", "release", "package-release-archive.ps1");
-const ARCHIVE_README = path.join(REPO_ROOT, "scripts", "consumer", "archive", "README-INSTALL.md");
+const ARCHIVE_README = path.join(REPO_ROOT, "README-INSTALL.md");
 
 interface RunResult {
   readonly exitCode: number;
@@ -63,9 +63,9 @@ describe("package-release-archive canonical collection (REQ-099-020)", () => {
     expect(text).not.toContain('Join-Path $repoRoot "src\\opencode\\$kind"');
   });
 
-  test("install guide travels from the archive consumer area", () => {
+  test("archive-bundled install guide documents the canonical bundled layout", () => {
     const text = fs.readFileSync(PACKAGE_ARCHIVE_PS1, "utf-8");
-    expect(text).toContain('Join-Path $repoRoot "scripts\\consumer\\archive\\README-INSTALL.md"');
+    expect(text).toContain('Join-Path $repoRoot "README-INSTALL.md"');
     const readme = fs.readFileSync(ARCHIVE_README, "utf-8");
     expect(readme).toContain("src/common/commands/agentdev/**.md");
     expect(readme).toContain("src/common/tools/agentdev-*/**");

@@ -91,10 +91,10 @@ $srcSkills = Join-Path $repoRoot "src\common\skills"
 # Archive-dedicated installer ORIGINAL (REQ-050-010). Travels inside the
 # archive under the projection name scripts/install.ps1.
 $installScript = Join-Path $repoRoot "scripts\consumer\archive\install.ps1"
-# Archive-bundled install guide ORIGINAL. Lives next to the archive installer
-# original (scripts/consumer/archive/, REQ-099-020); travels inside the
-# archive as README-INSTALL.md.
-$readmeInstall = Join-Path $repoRoot "scripts\consumer\archive\README-INSTALL.md"
+# Archive-bundled install guide. The archive-bundled install guide travels
+# inside the archive as README-INSTALL.md (the trust-root manifest of the
+# trusted distribution gate requires it at the repository root, REQ-050-011).
+$readmeInstall = Join-Path $repoRoot "README-INSTALL.md"
 # THIRD-PARTY-NOTICES.md は release archive の必須同梱物（依存実体を含まない配布の
 # third-party 通知。欠落時は fail-closed）。
 $thirdPartyNotices = Join-Path $repoRoot "THIRD-PARTY-NOTICES.md"

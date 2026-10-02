@@ -76,9 +76,9 @@ function makeAdapter(blobs: Record<string, Uint8Array>): RawGitAdapter {
 describe("blob-loader / loadAndClassify text", () => {
   test("loads text blobs with UTF-8 content", () => {
     const adapter = makeAdapter({
-      "src/opencode/commands/agentdev/case-run.md": new TextEncoder().encode("# case-run\n"),
+      "src/common/commands/agentdev/case-run.md": new TextEncoder().encode("# case-run\n"),
     });
-    const r = loadAndClassify(adapter, FAKE_OID, [makeEntry("src/opencode/commands/agentdev/case-run.md")]);
+    const r = loadAndClassify(adapter, FAKE_OID, [makeEntry("src/common/commands/agentdev/case-run.md")]);
     expect(r.kind).toBe("ok");
     if (r.kind !== "ok") return;
     expect(r.blobs).toHaveLength(1);
@@ -102,10 +102,10 @@ describe("blob-loader / binary allowlist", () => {
   test("accepts allowlisted .lock binary", () => {
     const bytes = new Uint8Array([0x00, 0x01, 0x02]); // NUL → binary
     const adapter = makeAdapter({
-      "src/opencode/skills/agentdev-foo/scripts/bun.lock": bytes,
+      "src/common/skills/agentdev-foo/scripts/bun.lock": bytes,
     });
     const r = loadAndClassify(adapter, FAKE_OID, [
-      makeEntry("src/opencode/skills/agentdev-foo/scripts/bun.lock"),
+      makeEntry("src/common/skills/agentdev-foo/scripts/bun.lock"),
     ]);
     expect(r.kind).toBe("ok");
     if (r.kind !== "ok") return;
@@ -115,10 +115,10 @@ describe("blob-loader / binary allowlist", () => {
   test("accepts allowlisted .png binary", () => {
     const bytes = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x00]); // PNG header + NUL
     const adapter = makeAdapter({
-      "src/opencode/skills/agentdev-foo/assets/logo.png": bytes,
+      "src/common/skills/agentdev-foo/assets/logo.png": bytes,
     });
     const r = loadAndClassify(adapter, FAKE_OID, [
-      makeEntry("src/opencode/skills/agentdev-foo/assets/logo.png"),
+      makeEntry("src/common/skills/agentdev-foo/assets/logo.png"),
     ]);
     expect(r.kind).toBe("ok");
   });
@@ -128,10 +128,10 @@ describe("blob-loader / fail-closed on binary (parent defect #4)", () => {
   test("rejects NUL byte in .md shipped runtime entry", () => {
     const bytes = new Uint8Array([0x23, 0x00, 0x61]); // '#' NUL 'a'
     const adapter = makeAdapter({
-      "src/opencode/skills/agentdev-foo/SKILL.md": bytes,
+      "src/common/skills/agentdev-foo/SKILL.md": bytes,
     });
     const r = loadAndClassify(adapter, FAKE_OID, [
-      makeEntry("src/opencode/skills/agentdev-foo/SKILL.md"),
+      makeEntry("src/common/skills/agentdev-foo/SKILL.md"),
     ]);
     expect(r.kind).toBe("error");
     if (r.kind !== "error") return;
@@ -156,10 +156,10 @@ describe("blob-loader / fail-closed on binary (parent defect #4)", () => {
     // launcher must fail closed (unclassified new binary kind).
     const bytes = new Uint8Array([0x00, 0x01, 0x02, 0x03]);
     const adapter = makeAdapter({
-      "src/opencode/skills/agentdev-foo/assets/data.bin": bytes,
+      "src/common/skills/agentdev-foo/assets/data.bin": bytes,
     });
     const r = loadAndClassify(adapter, FAKE_OID, [
-      makeEntry("src/opencode/skills/agentdev-foo/assets/data.bin"),
+      makeEntry("src/common/skills/agentdev-foo/assets/data.bin"),
     ]);
     expect(r.kind).toBe("error");
     if (r.kind !== "error") return;

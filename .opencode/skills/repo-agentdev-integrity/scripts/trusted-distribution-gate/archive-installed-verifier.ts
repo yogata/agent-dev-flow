@@ -14,7 +14,7 @@
 //      could have tampered with the installer to lie about its output.
 //   3. Write the trusted installer into the temp dir.
 //   4. Execute it with array-form argv (no shell), pointing at the
-//      extracted archive's src/opencode tree as Source and a fresh temp
+//      extracted archive's src/ tree as Source and a fresh temp
 //      .opencode dir as Target.
 //   5. Walk the installed Target and compare every file's path+digest+size
 //      to the archive-installed manifest entries.
@@ -76,9 +76,9 @@ function verifyInDir(input: VerifyInstalledInput, work: string): VerifyInstalled
   if (!fs.existsSync(archiveRoot) || !fs.statSync(archiveRoot).isDirectory()) {
     return mismatch(`archive root '${input.archiveRootName}' not found in archive`);
   }
-  const sourceDir = path.join(archiveRoot, "src", "opencode");
+  const sourceDir = path.join(archiveRoot, "src");
   if (!fs.existsSync(sourceDir)) {
-    return mismatch(`archive src/opencode missing under ${input.archiveRootName}`);
+    return mismatch(`archive src/ missing under ${input.archiveRootName}`);
   }
 
   // Read trusted installer from BASE oid. The candidate may have tampered
@@ -107,7 +107,8 @@ function verifyInDir(input: VerifyInstalledInput, work: string): VerifyInstalled
   fs.mkdirSync(targetOpencode, { recursive: true });
 
   // Execute the trusted installer with array-form argv (no shell injection).
-  // The installer's contract: -Source <src/opencode> -Target <.opencode> -Mode copy.
+  // The installer's contract: -Source <src> -Target <.opencode> -Mode copy
+  // (the installer resolves the canonical layout under src/ itself).
   const args = [
     "-NoProfile",
     "-NonInteractive",

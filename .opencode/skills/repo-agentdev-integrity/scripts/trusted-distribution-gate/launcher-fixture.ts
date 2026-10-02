@@ -91,9 +91,9 @@ export function makeFixtureRepo(): string {
     execFileSync("git", ["config", "core.longpaths", "true"], { cwd: repo });
   }
 
-  writeFix(repo, "src/opencode/commands/agentdev/case-run.md", "# case-run\n");
-  writeFix(repo, "src/opencode/skills/agentdev-foo/SKILL.md", "# foo skill\n");
-  writeFix(repo, "src/opencode/skills/japanese-tech-writing/SKILL.md", "# jtw\n");
+  writeFix(repo, "src/common/commands/agentdev/case-run.md", "# case-run\n");
+  writeFix(repo, "src/common/skills/agentdev-foo/SKILL.md", "# foo skill\n");
+  writeFix(repo, "src/common/skills/japanese-tech-writing/SKILL.md", "# jtw\n");
   writeFix(repo, "scripts/install.ps1", "# install\n");
   writeFix(repo, "scripts/consumer/common.ps1", "# common\n");
   // scripts/consumer/archive/install.ps1 (archive-dedicated installer
@@ -112,7 +112,8 @@ export function makeFixtureRepo(): string {
       ")",
       "$ErrorActionPreference='Stop'",
       "function Place($src,$dst){ $p=Split-Path -Parent $dst; if(-not(Test-Path $p)){New-Item -ItemType Directory -Path $p -Force|Out-Null} Copy-Item -LiteralPath $src -Destination $dst -Force }",
-      "$cmds=Join-Path $Source 'commands\\agentdev'; $skills=Join-Path $Source 'skills'",
+      "$common=Join-Path $Source 'common'",
+      "$cmds=Join-Path $common 'commands\\agentdev'; $skills=Join-Path $common 'skills'",
       "$cDst=Join-Path $Target 'commands\\agentdev'; $sDst=Join-Path $Target 'skills'",
       "New-Item -ItemType Directory -Path $cDst -Force|Out-Null",
       "New-Item -ItemType Directory -Path $sDst -Force|Out-Null",

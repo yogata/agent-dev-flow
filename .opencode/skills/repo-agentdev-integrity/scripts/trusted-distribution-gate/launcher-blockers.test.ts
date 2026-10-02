@@ -105,9 +105,9 @@ describe("launcher / publish-after-verify ordering (parent blocker #1, #8)", () 
       if (process.platform === "win32") {
         execFileSync("git", ["config", "core.longpaths", "true"], { cwd: repo });
       }
-      writeFix(repo, "src/opencode/commands/agentdev/case-run.md", "# case-run\n");
-      writeFix(repo, "src/opencode/skills/agentdev-foo/SKILL.md", "# foo\n");
-      writeFix(repo, "src/opencode/skills/japanese-tech-writing/SKILL.md", "# jtw\n");
+      writeFix(repo, "src/common/commands/agentdev/case-run.md", "# case-run\n");
+      writeFix(repo, "src/common/skills/agentdev-foo/SKILL.md", "# foo\n");
+      writeFix(repo, "src/common/skills/japanese-tech-writing/SKILL.md", "# jtw\n");
       writeFix(repo, "scripts/install.ps1", "# install\n");
       writeFix(repo, "scripts/consumer/common.ps1", "# check\n");
       writeFix(repo, "README-INSTALL.md", "# readme\n");

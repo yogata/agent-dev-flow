@@ -103,7 +103,7 @@ interface RepoPaths {
   commandsDir: string;
   /** <root>/src/common/skills */
   skillsDir: string;
-  /** <root>/scripts/consumer/archive/README-INSTALL.md */
+  /** <root>/README-INSTALL.md */
   readmePath: string;
   /** <root>/dist */
   distDir: string;
@@ -135,8 +135,7 @@ function makeFakeRepo(): RepoPaths {
   fs.writeFileSync(path.join(root, "src", "common", "commands", "agentdev", "probe-cmd.md"), "# probe command\n");
   fs.mkdirSync(path.join(root, "src", "common", "skills", "agentdev-probe"), { recursive: true });
   fs.writeFileSync(path.join(root, "src", "common", "skills", "agentdev-probe", "SKILL.md"), "# probe skill\n");
-  fs.mkdirSync(path.join(root, "scripts", "consumer", "archive"), { recursive: true });
-  fs.writeFileSync(path.join(root, "scripts", "consumer", "archive", "README-INSTALL.md"), "# Install\nConsumer install instructions.\n");
+  fs.writeFileSync(path.join(root, "README-INSTALL.md"), "# Install\nConsumer install instructions.\n");
   // THIRD-PARTY-NOTICES.md は release archive の必須同梱物（不在時 fail-closed、exit 2）。
   // fake repo も必須同梱の前提を満たすよう配置する。
   fs.writeFileSync(path.join(root, "THIRD-PARTY-NOTICES.md"), "# THIRD-PARTY-NOTICES\nProbe notices.\n");
@@ -166,7 +165,7 @@ function makeFakeRepo(): RepoPaths {
     checkerPath: path.join(root, ".opencode", "skills", "repo-agentdev-integrity", "scripts", "check_distribution_boundary.ts"),
     commandsDir: path.join(root, "src", "common", "commands", "agentdev"),
     skillsDir: path.join(root, "src", "common", "skills"),
-    readmePath: path.join(root, "scripts", "consumer", "archive", "README-INSTALL.md"),
+    readmePath: path.join(root, "README-INSTALL.md"),
     distDir: path.join(root, "dist"),
     commitShort,
     finalZipPath: path.join(root, "dist", `agentdev-release-${commitShort}.zip`),

@@ -1,6 +1,6 @@
 component: agentdev-textlint-guard
 implementation:
-  scripts/consumer/archive/README-INSTALL.md:
+  README-INSTALL.md:
     - REQ-029-012
     - REQ-053-033
     - REQ-097-001
