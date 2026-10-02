@@ -32,7 +32,7 @@ import {
   reconstructUpdateFile,
   safeRead,
 } from "./distribution-boundary-guard-reconstruction.ts";
-import type { GuardEnv } from "../../../opencode/plugins/agentdev-distribution-boundary-guard/plugin.ts";
+import type { GuardEnv } from "./distribution-boundary-guard-env.ts";
 
 export type PathClassifier = (rawPath: string) => PathClass;
 

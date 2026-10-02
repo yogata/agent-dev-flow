@@ -27,6 +27,9 @@ implementation:
     - REQ-099-004
   src/senpi/skill-discovery/senpi-skill-discovery.ts:
     - REQ-099-004
+  src/common/guards/distribution-boundary/distribution-boundary-guard-env.ts:
+    - REQ-099-013
+    - REQ-099-014
 verification:
   src/common/guards/gh-write/tests/gh-command-detector.test.ts:
     - REQ-099-013

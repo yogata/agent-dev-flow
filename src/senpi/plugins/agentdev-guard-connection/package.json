@@ -1,0 +1,16 @@
+{
+  "name": "agentdev-guard-connection",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Senpi host guard connection. Interprets Senpi edit operations (write/edit/patch equivalents) and raw command write paths into the canonical guard common judgments (src/common/guards/). Host-specific edit semantics are localised in this interpretation layer; no side effects on rejection; uninterpretable inputs fail closed. Repo-local connection: excluded from consumer distribution and projected by the self-host sync.",
+  "type": "module",
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "@types/bun": "^1.3.0",
+    "@types/node": "^22.0.0"
+  }
+}

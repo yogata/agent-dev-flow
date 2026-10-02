@@ -16,8 +16,10 @@
  * orchestrator stays under the 250 pure-LOC ceiling.
  */
 
-import { expect, test, describe } from "bun:test";
+import { expect, test, describe, spyOn, afterEach } from "bun:test";
 import { tmpdir } from "node:os";
+import * as fs from "node:fs";
+import { join } from "node:path";
 import { DEFAULT_DETECTOR_CONFIG } from "../../../../../.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts";
 import {
   evaluateWriteContent,
@@ -1330,5 +1332,106 @@ describe("producer metadata enforcement (DEC-030 decision 5)", () => {
     );
     expect(enforceMode.ok).toBe(true);
     expect(enforceMode.detections.length).toBe(0);
+  });
+});
+
+// =============================================================================
+// TS-007 slice (guard edit operations): rejections have zero disk side
+// effects. For each edit path (write / edit / apply_patch), a rejected
+// invocation must not touch the filesystem: the plugin shell never calls fs
+// write APIs and pre-existing files keep their content. Raw command write
+// paths are covered by the agentdev-gh-write-guard tests; the Senpi guard
+// connection has its own slice (src/senpi/plugins/agentdev-guard-connection/).
+// =============================================================================
+
+describe("TS-007 slice: rejected edit operations leave the disk untouched", () => {
+  const writeSpies: ReturnType<typeof spyOn>[] = [];
+
+  afterEach(() => {
+    for (const spy of writeSpies) spy.mockRestore();
+    writeSpies.length = 0;
+  });
+
+  function spyOnFsWrites(): void {
+    for (const method of ["writeFileSync", "appendFileSync", "mkdirSync", "unlinkSync"] as const) {
+      writeSpies.push(spyOn(fs, method));
+    }
+  }
+
+  function makeHookInput(tool: string) {
+    return { tool, sessionID: "s", callID: "c" };
+  }
+
+  async function expectHookRejects(
+    worktree: string,
+    tool: string,
+    args: Record<string, unknown>,
+  ): Promise<void> {
+    const hooks = await pluginDefault.server({
+      worktree,
+      directory: worktree,
+      project: { worktree },
+    });
+    await expect(
+      hooks["tool.execute.before"]?.(makeHookInput(tool), { args }),
+    ).rejects.toThrow();
+  }
+
+  test("write: rejected invocation calls no fs write APIs and leaves files unchanged", async () => {
+    const root = fs.mkdtempSync(join(tmpdir(), "dist-boundary-ts007-"));
+    try {
+      const sentinel = join(root, "sentinel.md");
+      fs.writeFileSync(sentinel, "original", "utf-8");
+      spyOnFsWrites();
+
+      await expectHookRejects(root, "write", {
+        path: "src/common/skills/agentdev-foo/SKILL.md",
+        content: "See ADR-0135 for context.",
+      });
+
+      for (const spy of writeSpies) expect(spy).not.toHaveBeenCalled();
+      expect(fs.readFileSync(sentinel, "utf-8")).toBe("original");
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("edit: rejected invocation (unreadable current content) calls no fs write APIs", async () => {
+    const root = fs.mkdtempSync(join(tmpdir(), "dist-boundary-ts007-"));
+    try {
+      const sentinel = join(root, "sentinel.md");
+      fs.writeFileSync(sentinel, "original", "utf-8");
+      spyOnFsWrites();
+
+      await expectHookRejects(root, "edit", {
+        path: "src/common/skills/agentdev-missing/SKILL.md",
+        oldString: "a",
+        newString: "b",
+      });
+
+      for (const spy of writeSpies) expect(spy).not.toHaveBeenCalled();
+      expect(fs.readFileSync(sentinel, "utf-8")).toBe("original");
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("apply_patch: rejected invocation calls no fs write APIs and leaves files unchanged", async () => {
+    const root = fs.mkdtempSync(join(tmpdir(), "dist-boundary-ts007-"));
+    try {
+      const sentinel = join(root, "sentinel.md");
+      fs.writeFileSync(sentinel, "original", "utf-8");
+      spyOnFsWrites();
+
+      await expectHookRejects(root, "apply_patch", {
+        patchText:
+          "*** Begin Patch\n*** Add File: src/common/skills/agentdev-foo/SKILL.md\n+ref docs/requirements/REQ-0149.md\n*** End Patch",
+      });
+
+      for (const spy of writeSpies) expect(spy).not.toHaveBeenCalled();
+      expect(fs.readFileSync(sentinel, "utf-8")).toBe("original");
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
   });
 });
