@@ -4,6 +4,10 @@ Senpi（OmO Native v5）ホスト向けの接続を配置する領域である�
 
 ## 配置内容
 
+| パス | 内容 |
+|---|---|
+| `skill-discovery/` | Skill 探索・読込接続。共通正本の Skill 探索契約（`src/common/skills/agentdev-skill-resolution/`）へ、Senpi 公開入口（`.senpi/skills/`）と指定 workspace の束縛を行う接続。解決規則は共通正本側に置き、本領域では重複実装しない |
+
 本領域は Wave 2 以降の接続系実行単位（Tool 接続、guard 接続、Skill 読込・workspace 解決、installer 投影）が順次配置する。配置される接続成果物は `src/opencode/` の対応する接続と同じ業務契約（`src/common/` 配下の共通正本）へ委譲する。
 
 ## 拘束条件
