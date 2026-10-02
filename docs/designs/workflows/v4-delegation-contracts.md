@@ -268,6 +268,13 @@ case-open は子 Issue 本文に「前工程完了度」属性を埋め込む。
 分類定義は [../commands/case-ready.md](../commands/case-ready.md)「v3 epic-wave-model Design からの吸収」節の「前工程完了度 3 分類」参照。
 subagent は当該属性に応じた振る舞い指針（検証のみでも acceptance criteria 順位検証は必須等）に従う（REQ-003-012）。
 
+## 委譲コンテキストの実現状態突合
+
+case-run 委譲時に上位工程（case-auto orchestration・委譲 prompt 生成側）が structured_context の
+「実装状態」要約を Issue 本文 SSoT・git log 実測と突合してから委譲することを規約とする。
+会話記憶のみから実施状態要約を生成しない。verify-only closure 前提の誤発火（PR なしクローズによる
+未実装完了扱い）を防止する（Case #3252 実績に基づく）。
+
 ## See Also
 
 - [v4-lifecycle-state-machine.md](v4-lifecycle-state-machine.md)（result 4 状態・resume point の正）
