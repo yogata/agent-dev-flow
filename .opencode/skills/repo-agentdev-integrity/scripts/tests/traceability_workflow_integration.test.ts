@@ -219,8 +219,10 @@ describe("Workflow Skill 本文・extension の切替", () => {
     ".agentdev/extensions/skills/agentdev-workflow-case-ready.yaml",
     ".agentdev/extensions/skills/agentdev-workflow-case-open.yaml",
     ".agentdev/extensions/skills/agentdev-adversarial-review.yaml",
-  ])("traceability を利用しない工程の extension が rules を持たない: %s", (rel) => {
-    expect(read(rel).includes("rules: []")).toBe(true);
+  ])("traceability を利用しない工程の extension が traceability rule を持たない: %s", (rel) => {
+    // REQ-098 (Issue #3311) により case-ready/case-open は yomiyasu rule を持つため、
+    // 本テストの判定対象は traceability 委譲 rule の不在とする
+    expect(read(rel).includes("skill: agentdev-traceability")).toBe(false);
   });
 });
 

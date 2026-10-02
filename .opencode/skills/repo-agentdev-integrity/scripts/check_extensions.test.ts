@@ -31,12 +31,12 @@ describe("checkExtensions (integration against real repo)", () => {
   test("returns ok=true with migrated stats after the atomic cutover", () => {
     const report = checkExtensions(REPO_ROOT);
     expect(report.ok).toBe(true);
-    // Inventory (2026-09-16, Issue #2882): the live .agentdev/extensions/skills
-    // tree holds 16 workflow + 12 capability extensions. The 17th workflow
-    // extension added in 1904fff9 (Issue #2559) retired in 49f17d3e (Issue
-    // #2819: case-update/design-save/req-save out, case-ready/case-revise in;
-    // net -1). Stats follow the live .agentdev/extensions tree.
-    expect(report.stats.workflow_extensions).toBe(16);
+    // Inventory (2026-10-02, Issue #3311): the live .agentdev/extensions/skills
+    // tree holds 17 workflow + 12 capability extensions. The 16-entry inventory
+    // (2026-09-16, Issue #2882, after Issue #2819 retirement) gained
+    // agentdev-workflow-issue.yaml (Issue #3311, REQ-098). Stats follow the
+    // live .agentdev/extensions tree.
+    expect(report.stats.workflow_extensions).toBe(17);
     expect(report.stats.internal_workflow_extensions).toBe(0);
     expect(report.stats.capability_extensions).toBe(12);
     expect(report.stats.legacy_kind_files).toBe(0);
