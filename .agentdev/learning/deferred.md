@@ -1564,27 +1564,6 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **タグ**: `#junction` `#削除失敗` `#テスト注入`
 - **移動日**: 2026-09-03
 
-## 2026-09-04: worktree での git stash pathspec 失敗と誤 pop リスク
-
-- **問題事象**: worktree サブディレクトリで `git stash push -- <相対 pathspec>` が `:(prefix:...)` 解決エラーで失敗した。`;` 連結の後続 `git stash pop` が実行され、既存 stash の適用が conflict を起こし得た（本実行で発生・`git reset --merge` で復旧、既存 stash エントリは kept のまま未破壊）
-- **発生局面**: case-run 委譲（Epic #2553 Wave 2 / Issue #2555 / PR #2577、OU-002 実装時）
-- **検知方式**: stash push の失敗後も pop が走ったことで検知
-- **根本原因**: worktree 配下では相対 pathspec の `:(prefix:)` 解決が機能しないケースがあり `git stash push` が失敗する。`;` 連結は直前コマンドの失敗にかかわらず後続を実行するため、意図しない stash が pop される
-- **自律対応内容**: `git reset --merge` で conflict 状態を復旧。stash エントリは破壊しなかった
-- **ユーザー確認の有無**: なし
-- **ADR/REQ/spec影響**: なし（git 操作手順の教訓）
-- **横展開観点**: worktree 内で stash 系 git 操作を行う全 workflow（case-run / case-close / agentdev-git-worktree 連携）に共通
-- **再発条件**: worktree サブディレクトリでの stash push + pathspec 指定、かつ `;` 連結または失敗を無視する pop
-- **予防策候補**: stash 系は `&&` 連結する。pathspec は worktree root から指定する。`git stash push` の成功確認を pop の事前条件にする
-- **想定反映先**: agentdev-git-worktree skill の git 操作知識、または learning-promote での分類
-- **関連**: PR #2577 本文 Findings セクションからの capture 回収（case-close STEP-6）
-- **タグ**: #git #worktree #stash #case-run
-
-- **移動日**: 2026-09-07
-- **処分判定**: defer（C5: pwsh 連結・終了コード意味論。2026-09-07 evaluation-report 参照）
-
----
-
 ## 2026-09-04: gate 違和解消の exemption が並行 checker に波及せず、case-run の再検証範囲を超えて collateral が残存
 
 - **問題事象**: E4-1 配布依存境界 gate 違反（ADF-COVERS 宣言行 2 行の IR-059 concrete-id 誤検出）の解消として detector-level exemption を実装した PR で、同一宣言行が (1) 並行する IR-055 checker の新規 delta NG 2 件、(2) traceability check の malformed-declaration 1 件（回帰テストのフィクスチャ文字列）として検出され続けた。case-run の fix-and-reverify は違反していた gate の detector 再実行のみで、sibling checker の再実行を行わなかったため、collateral は case-close の独立再検査で初めて検出された
@@ -2196,25 +2175,6 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 
 ---
 
-## 2026-09-18: Definition 変更（Wave 1 docs 更新）により既存テストの期待文言が陳腐化し、実装 Wave で先行 fail が混入する
-
-- **問題事象**: traceability_workflow_integration.test.ts の REQ-021-015/022 割り当て文言検査が Wave 1（Definition PR #2937）の docs 更新により陳腐化しており、本 PR 変更前から fail していた。本 PR で docs 現行文言へ期待を更新して解消。
-- **発生局面**: case-run Wave 2-1（Case #2936。PR #2948）。
-- **検知方法**: worktree bun test 実行での本 PR 変更外テストの fail。
-- **根本原因**: docs（正規文言）を期待値とするテストは docs 変更と同一変更単位で更新されないと陳腐化する。Definition PR（docs 変更）ではテスト更新が行われない運用。
-- **自律対応内容**: 本 PR の変更対象テストとして docs 現行文言へ期待更新（traceability_* テストは本 Issue の変更対象）。
-- **ユーザー確認の有無**: なし。
-- **Decision/REQ/spec影響**: なし。
-- **横展開観点**: docs 現行文言を期待値とする文言検証テスト全般で、Definition 変更のたびに同種の先行 fail が混入し得る。
-- **再発条件**: docs 文言を期待値とするテストが存在し、Definition PR がその文言を変更した場合。
-- **予防策候補**: Definition 変更時にテスト更新担当を明示する規約の検討（REQ-019 の影響範囲検出 gate の適用範囲確認）。
-- **想定反映先**: REQ-019 影響範囲検出 gate、case-open/case-ready の Definition 品質検査。
-- **関連**: Case #2936（Refs）、PR #2948（Refs）。
-- **タグ**: #definition-pr #test-staleness #docs-test-coupling
-- **移動日**: 2026-09-18
-
----
-
 ## 2026-09-18: 同一 Wave 並列 Issue 間の fixture・API 依存は worktree 単独では解決不能で、統合待ち検証の明記運用が要る
 
 - **問題事象**: (1) Wave 2-2 の TS-001 該当部が参照する declarations 側 fixture は Wave 2-1 の成果物であり worktree に存在せず、同等検証への置換と統合時確認を要した（PR #2946）。(2) Wave 2-4 は policy.yaml 解決置換（#2939）・policy 読取 kind 実装（#2940）後に合格するテスト 15 fail が worktree で残留し、統合待ちを PR 本文に明記して管理した（PR #2947）。
@@ -2272,27 +2232,6 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **処分判定**: deferred（2026-09-20 評価。単発・checker 実行契約 Design の bun run 規定と repo root package.json 不在の整合確認要。再評価条件: checker 契約の bun 経路更新時・bun 経路障害再発時）
 
 ---
-
----
-
-## 2026-09-19: check_integrity spawn 系テストの固定 timeout は環境性能差で flaky 化する
-
-- **問題事象**: case-run（Case #2979 OU-003）の bun test 分割 1 で、check_integrity spawn 系 4 テストが手動実行 ~5.1 秒（5120/5284/5174/5147ms 実測）に対し 5000ms 固定 timeout で失敗。baseline 環境では通過する環境性能差が原因。
-- **工程位置**: case-run（OU-003 実装、release fixture 追随 commit 23eb0e0d）
-- **検知方法**: bun test 分割 1 の fail（2 errors・タイミング失敗）
-- **根本原因**: spawn 系テストの timeout が実行環境の性能差を考慮しない固定値 5000ms である
-- **対応内容**: 検証内容不変で timeout 15000ms へ猶予（commit 23eb0e0d）。恒久的な timeout 設定方針（環境差考慮・猶予倍率の標準化）の見直しは未解決の intake 候補
-- **ユーザー確認の有無**: なし（タイミング猶予のみで検証内容不変）
-- **Decision/REQ/spec影響**: なし
-- **展開視点**: spawn を伴う回帰テストを worktree 等の非 baseline 環境で実行する場合、固定 timeout は flaky の常在要因になる
-- **再発条件**: 性能差のある環境で spawn 系固定 timeout テストを実行した場合
-- **予防策**: spawn 系テストの timeout は環境差を織り込んだ猶予値を設定する
-- **配布反映先**: repo-agentdev-integrity scripts（timeout 方針見直し）、learning-promote の評価対象
-- **関連**: Case #2979、Issue #2983（SSoT コメント判定根拠 4）、PR #2986（commit 23eb0e0d）
-- **タグ**: #case-run #flaky #timeout #spawn #環境差
-
-- **移動日**: 2026-09-20
-- **処分判定**: deferred（2026-09-20 評価。windows-bun-test-spawn-timeout-classification.md が由来分類・単独再実行手順を所有。再評価条件: spawn 系テスト新規作成時・timeout 設定方針の intake 処分確定時）
 
 ---
 
@@ -2678,5 +2617,152 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 
 - **移動日**: 2026-09-30
 - **処分判定**: deferred（2026-09-30 評価。e3: checker 恒久対応済み（e7f1f639）の知見記録・intake item 2026-09-29-3233-checker-execution-contracts-lifecycle-notes.md 候選2 と重複〔backlog-review 合流判定対象・review A-3〕。e4: 近縁 deferred「Design accepted 同一PR原則」エントリとの統合候補〔review A-2〕。再評価条件: 対応 Design の経緯追記運用変更時）
+
+---
+
+## 2026-10-01 配布依存境界 link profile は worktree で zero-targets、host root では実行可能（Case #3278 Epic #3280 Wave 2 case-close）
+
+- **問題クラス**: 検証環境差（worktree 構造制約に起因する checker 実行可否の分岐）
+- **観測内容**: case-close Wave 2 境界クローズ（DEL-3280-3）の QG で、`check_distribution_boundary.ts --profile link` を PR head worktree（.worktrees/3284-docs）に対して実行すると `zero scan targets found for projection 'link'`（zero-targets:link・adapter-failure 分類・検査対象 0件）となる一方、メインリポジトリ root（host）では link profile が実行可能で failures 0（scanned 359・rules scanned 286）を記録した。source profile は worktree からでも実行可能（PR #3287/#3288 の両 head で failures 0 を case-close 側で再実行・追証）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（REQ-018 worktree fallback 契約〔source profile 代替〕の適用事例の追補候補）
+- **横展開観点**: worktree では .opencode/ 配布投影（junction）が未配置のため link profile は常に zero-targets になる。case-run/case-close で src/opencode/skills/**・commands/** 変更を含む PR を検証する場合、(1) worktree では source profile を実行して代替成立を記録し、(2) link profile は merge 後の host root での再実行を後続工程（Wave 3 最終 close 等）の検証手順として明示する。host root の link profile は merge 前は merge 前 src と投影の整合を示すにすぎないため、post-merge の投影 sync 後再実行が実質検査になる
+- **再発条件**: junction 非展開の worktree で link profile を実行した場合（環境構造由来のため再現性 100%）
+- **予防策候補**: checker 出力契約側で zero-targets:link を「検査不能（環境制約）」として明示し、source profile 代替運用の正当性を出力へ含めると、後続 Case の検証差分解釈が安定する（PR #3287 Findings の候補と同一趣旨）
+- **想定反映先**: .opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary*.ts（zero-targets 時の出力 guidance）・docs/designs/integrity/distribution-boundary.md（projection 分離の実行環境注記）
+- **関連**: PR #3287/#3288（配布依存境界 Findings 記載）・Issue #3284・Epic #3280 Wave 2
+- **タグ**: `#配布依存境界` `#link-profile` `#worktree` `#case-close` `#検証環境差`
+- **移動日**: 2026-10-03
+- **処分判定**: deferred（2026-10-03 評価。出現 1 件・worktree 環境構造由来の観測。source profile 代替運用（REQ-018）の実績記録として保持。再評価条件: zero-targets:link の出力契約取り扱いが checker 側で課題化した時、または同種観測の再蓄積時）
+
+---
+
+## 2026-10-01 REQ-036-021 の「高確信度」語彙は自動昇格 opt-in 条件（REQ-096-004 禁止対象の別文脈）として現行性確認を要する（Case #3278 Wave 2 #3282）
+
+- **問題クラス**: 語彙現行性（旧判断モデル語彙の別文脈残存の解釈分岐）
+- **観測内容**: RA-003 正典 REQ 行語彙移行（PR #3286）の Capture 回収で、REQ-036-021（inspect-promote の自動昇格 opt-in 条件）が「機械的に特定可能で移行先が一意に定まる高確信度」語彙を使用していることを検知した。REQ-096-004 が禁止するのは確信度を人間判断要求の根拠とすることであり、本行は自動化の許可条件（別文脈）のため対象外と判断したが、語彙の現行性観点で将来確認候補と記録する
+- **ユーザー確認有無**: なし（learning 記録のみ・対応実施はしない）
+- **Decision/REQ/spec影響**: なし（REQ-096-004 の禁止範囲解釈の適用事例。本行自体は対象外）
+- **横展開観点**: 旧語彙の一括置換では「同じ語彙でも文脈により禁止対象か許可対象かが分かれる」行の扱いが課題になる。語彙横断パスでは (1) 人間判断要求の根拠（禁止対象）、(2) 自動化の許可条件（要現行性確認）、(3) 禁じ手の明示的言及（対象外）を区別して処理する
+- **再発条件**: REQ-096 判定表語彙への移行後に、確信度語彙を許可条件として使う REQ 行が残存する場合
+- **予防策候補**: REQ-036-021 の条件語を判断方法・確定権限ベースの表現へ現行化するか、REQ-096 側で確信度語彙の許容文脈を明文化する候補
+- **想定反映先**: docs/requirements/REQ-036.md（REQ-036-021）・docs/requirements/REQ-096.md（語彙許容文脈の明文化先）
+- **関連**: PR #3286 Findings・Issue #3282（RA-003）・Epic #3280 Wave 2
+- **タグ**: `#語彙現行性` `#REQ-096` `#RA-003` `#capture` `#Wave2`
+- **移動日**: 2026-10-03
+- **処分判定**: deferred（2026-10-03 評価。語彙現行性の確認候補・REQ-096 系語彙整理の進行待ち。再評価条件: REQ-036-021 の条件語現行化または REQ-096 側の語彙許容文脈明文化の案件化時）
+
+---
+
+## 2026-10-01 case-close（Case #3300・PR #3308 Findings 由来）: IR-072 NG（REQ-032.md updated 鮮度）は Wave 1 merge 起因の既存起因であり docs/requirements 変更を含まない Case では解消不能
+
+- **問題事象**: check_integrity の IR-072 NG（REQ-032.md frontmatter updated 2026-09-29 に対し最終内容変更 commit 日 2026-10-01）が現行 HEAD に存在。Wave 1（PR #3307）の merge 起因であり、docs/designs のみを変更する OU-0004（Issue #3300・PR #3308）では docs/requirements が対象外のため未処置となった
+- **発生局面**: case-run（docs/designs/** 現在形純化スイープ。Case #3300 DEL-3300-1）の docs-check で検出
+- **検知方法**: check_integrity.ts --root worktree の NG 4 件のうち、本 Issue 未変更ファイル（docs/requirements/REQ-032.md）の既存起因として分類
+- **根本原因**: REQ frontmatter updated の鮮度検査（IR-072）は REQ ファイルの最終内容変更日を追従するため、直前の merge で REQ ファイルが更新された直後の Case では波及検出される。当該 Case の変更対象外ファイルである場合、その Case 内では解消手段がない
+- **ユーザー確認有無**: なし（out-of-scope 記録のみ）
+- **Decision/REQ/spec影響**: なし（既存起因の out-of-scope 記録。OU-0008 TS-008 最終横断検証での解消候補）
+- **横展開観点**: Epic Wave 構成で Wave 間に REQ ファイル更新を含む merge が入る場合、後続の docs のみを変更する子 Issue の docs-check に IR-072 が既存起因として波及し得る。由来分類（Wave 起因・当該変更起因なし）を検証記録へ残し、Epic の最終横断検証を担当する子 Issue（OU-0008）へ引き継ぐのが安全
+- **再発条件**: REQ ファイル更新を含む merge の直後に、docs/requirements を対象外とする子 Issue の docs-check を実行した場合
+- **予防策候補**: Epic flow では REQ 鮮度系 IR の既存起因波及を想定し、最終 Wave 担当 Issue への既存起因引き継ぎを検証差分に明示する運用
+- **想定反映先**: Issue #3304（OU-0008・TS-008 最終横断検証）の既知 finding 現存確認、docs/designs/integrity/rules/IR-072-req-updated-freshness.md（false_positive_risk 記述の追補候補）
+- **関連**: PR #3308 本文「Findings / Capture候補」learning 項、PR #3307（Wave 1 merge・updated 進行の直接起因）、Issue #3300 対応記録コメント（検証差分）
+- **タグ**: `#integrity` `#IR-072` `#updated鮮度` `#epic-wave` `#既存起因` `#capture`
+- **移動日**: 2026-10-03
+- **処分判定**: deferred（2026-10-03 評価。IR-072 既存起因波及の運用観測 1 件・OU-0008 での解消確認待ち。再評価条件: Epic Wave 構成での同種波及再発時）
+
+---
+
+## 2026-10-01 case-run（Case #3300・PR #3308 Findings 由来）: worktree の .opencode 側 plugin package で bun run build:engine を実行すると producer 側 vendor へ書き出すパス解決になる
+
+- **問題事象**: worktree の .opencode 側 plugin package（.opencode/plugins/agentdev-textlint-guard）で `bun run build:engine` を実行すると、build script が producer 側（src/opencode/plugins/agentdev-textlint-guard）の vendor へ kuromoji dict を書き出すパス解決になることを実測。src の追跡対象ファイルは不変のため git への影響はなかった
+- **発生局面**: case-run（textlint gate 実行前の依存再生成。Case #3300 DEL-3300-1）
+- **検知方法**: build:engine 実行後の書き出し先確認（src 側 vendor への書き出しを実測）
+- **根本原因**: worktree 側 .opencode/plugins は junction／投影領域であり、build script のパス解決が producer 側 src ツリーへ帰着する
+- **ユーザー確認有無**: なし（src 変更なしのため対応不要を確認）
+- **Decision/REQ/spec影響**: なし（運用上の注意の追補候補）
+- **横展開観点**: src 変更禁止の委譲では、host の vendor が既に存在することを確認してから plugin 依存生成を実行するのが安全。worktree 側 package での build:engine 実行は src 側への書き出し副作用を持ち得るため、実行前に対象パスを確認する
+- **再発条件**: worktree 内の .opencode 側 plugin package で依存生成系 script を実行した場合
+- **予防策候補**: plugin README「導入時の依存生成手順」に worktree 実行時の書き出し先注意を追記する候補（.opencode/skills/repo-agentdev-integrity 配布外のため docs 側判断）
+- **想定反映先**: src/opencode/plugins/agentdev-textlint-guard/README.md（依存生成手順の注意書き）
+- **関連**: PR #3308 本文「Findings / Capture候補」learning 項、Issue #3300 対応記録コメント（テスト結果の textlint gate 行）
+- **タグ**: `#textlint` `#plugin` `#worktree` `#build-engine` `#vendor` `#capture`
+- **移動日**: 2026-10-03
+- **処分判定**: deferred（2026-10-03 評価。worktree 側 build:engine の書き出し先注意 1 件・README 追記の要件性は低く観測継続。再評価条件: 同種書き出し副作用の再観測時）
+
+---
+
+## 2026-10-01 case-run（Case #3303・SSoT コメント Findings 由来）: 旧語彙検索結果 0 件の縮約判定は 3 段判定で解釈する（語彙陳腐化と旧規則の区別・担当境界確定・構造化所有分担の扱い）
+
+- **問題事象**: verify-only closure の縮約判定（TS-007・AG-006）で、旧語彙検索の結果 0 件を「解消済み」と即断すると、実装側残存（実行時投影・検証の旧語彙）を見落とすか、逆に縮約対象外の残存を縮約対象と誤判定する。実際、PR #3305 intake の引き継ぎリストにあった case-run 系旧語彙（src/opencode/skills/**・anchor test 期待値）は docs/** には存在せず、縮約対象ではなく語彙同期対象（OU-0008 担当）と判定された
+- **発生局面**: case-run（縮約判定のインベントリ確定。Case #3303 DEL-3303-1。case-close STEP-6-4 学び検知で回収）
+- **検知方法**: AG-006 判定基準ごとのインベントリ列挙（探索パターン結果と REQ 本体実読・RA ownership_hints の突合）
+- **有効だった判定手順（3 段判定）**: (1) REQ 本体の現行語彙化を実読確認し（REQ-031-004 実読）、残存が「投影の語彙陳腐化」か「正規記述の旧規則」かを区別する、(2) RA の ownership_hints（docs/** vs src/opencode/**）で担当 OU を確定する、(3) 構造化された所有分担（2層所有宣言・委任の実体化）は重複ではなく所有者明確な記述として扱う
+- **ユーザー確認有無**: なし（縮約実施なし・変更 0 件。OU-0008 担当の記録のみ）
+- **Decision/REQ/spec影響**: なし（運用手順の知見）
+- **横展開観点**: 縮約・重複解消の判定では「探索パターンの結果 0 件」を正規記述の健全性の証拠と即断せず、正規記述側の語彙現行性実読 → 投影側の担当境界確定 → 構造化所有分担の扱い判定の順に進めると、縮約対象 0 件の判定根拠が機械検査（Guide 本文複製の行単位対照・traceability check・docs-check）付きで残る
+- **再発条件**: 正規記述の語彙現行化後に、実装投影・検証資産側へ旧語彙が残存する状態で縮約判定（AG 系インベントリ確定）を実行した場合
+- **予防策候補**: 縮約判定手続に 3 段判定の手順を明文化する候補（AG-006 判定基準の運用補助）
+- **想定反映先**: Issue #3304（OU-0008・RA-003 最終同期・case-run 系旧語彙の語彙同期）、AG-006 判定基準の運用
+- **関連**: SSoT コメント #3303#issuecomment-5932472480（TS-007 インベントリ確定・Findings 記録）、Issue #3304（OU-0008 担当）、本ファイル直上の #3302 missing-design 3 段判定エントリ（同型手続の先行記録）
+- **タグ**: `#縮約判定` `#語彙陳腐化` `#ownership_hints` `#AG-006` `#verify-only-closure` `#capture`
+- **移動日**: 2026-10-03
+- **処分判定**: deferred（2026-10-03 評価。縮約判定 3 段判定の運用知見・missing-design 3 段判定（existing-measure-update-missing-design-three-step として promoted）との統合判断待ち。再評価条件: AG-006 運用手順の明文化案件化時）
+
+---
+
+## 2026-10-02 case-run（Case #3316・PR #3326 Findings 由来）: multi-line path.join fixture への文字列一括置換は構文破損を生みやすい
+
+- **問題事象**: `"src",` `"opencode",` `"skills",` を別行に分けた path.join fixture への一括置換で `"common",,`・`"    skills"` 型の構文破損を生んだ
+- **発生局面**: case-run（実現面実装。Case #3316・Epic #3316 Wave 1 Issue #3318 DEL-3318-1・RA-005）の fixture の新構成対応
+- **検知方法**: 置換後の bun test 実行で構文エラーとして検出
+- **根本原因**: 文字列一括置換は multi-line に展開された呼び出しの行構造を保存しないため、行をまたぐ fixture 編集でカンマ・インデントが破損する
+- **ユーザー確認有無**: なし（置換後の bun test 構文実行で fixture ファイルを全実行して検出・修正済み）
+- **Decision/REQ/spec影響**: なし（fixture 編集の実務手順）
+- **横展開観点**: multi-line 呼び出しを含む fixture のパス一括置換では、置換後に当該 fixture を全実行（構文実行）してから次工程へ進む。行単位の置換結果を目検ではなく実行で確認する
+- **再発条件**: path.join 等の multi-line 展開 fixture に対する文字列一括置換を実施した場合
+- **予防策候補**: 一括置換系の変更後には対象 fixture 全実行を必須ステップとする候補
+- **想定反映先**: .opencode/skills/repo-agentdev-integrity 配下テスト fixture の編集手順
+- **関連**: PR #3326 本文「Findings / Capture候補」learning 2 項目目、Issue #3318
+- **タグ**: `#fixture` `#一括置換` `#構文破損` `#path.join` `#case-run` `#capture`
+- **移動日**: 2026-10-03
+- **処分判定**: deferred（2026-10-03 評価。一括置換構文破損の実務知見・project-knowledge-structure-migration-followup（promoted）の「移設後 fixture 全実行」手順に包含される。独立成果物化は出現 1 回のため見送り。再評価条件: 同種構文破損の再発時）
+
+---
+
+## 2026-10-02 case-run（Case #3316・PR #3327 Findings 由来）: lint_skills AG-005 description aggregate budget が既存 49 skills の時点で超過傾向（17931 chars > 17500 上限）
+
+- **問題事象**: description aggregate budget（17500 chars 上限）が Wave 1 完了時点で既存 49 skills 合計 17931 chars と超過傾向にあり、新規 skill 追加で AG-005 傾向管理 warning が発生（fail ではない）
+- **発生局面**: case-run（Case #3316・Epic #3316 Wave 2 Issue #3321 DEL-3321-1）の lint_skills 実行
+- **検知方法**: lint_skills の AG-005 warning 表示
+- **対応内容**: 本 PR の新規 skill（agentdev-skill-resolution）の description は 348 chars に圧縮済み（寄与最小化）
+- **ユーザー確認有無**: なし（warning の記録のみ）
+- **Decision/REQ/spec影響**: なし（budget 運用の判断は後続 Case 対象）
+- **横展開観点**: Skill 追加系 Wave の継続で warning 常態化が予想される。budget 再設定（上限値の見直し）または frontmatter description 圧縮の運用が必要になる可能性
+- **再発条件**: Skill 追加を含む変更で description 合計が上限付近のまま増加する場合
+- **予防策候補**: AG-005 budget の再設定、または新規 Skill の description 圧縮運用の明文化
+- **想定反映先**: lint_skills.ts（AG-005 budget 設定）、Skill 追加系 Case の実行契約
+- **関連**: PR #3327 本文「Findings / Capture候補」learning 2、Issue #3321
+- **タグ**: `#lint_skills` `#AG-005` `#description-budget` `#skill` `#capture`
+- **移動日**: 2026-10-03
+- **処分判定**: deferred（2026-10-03 評価。AG-005 budget 超過傾向の観測記録・budget 再設定判断は後続 Case 対象。再評価条件: warning 常態化または budget 見直し案件化時）
+
+---
+
+## 2026-10-02 case-run（Case #3316・PR #3330 Findings 由来）: PowerShell 文字列補間で変数名直後の `:` は `${t}:${rel}` 形式が必要（ParserError 知見）
+
+- **問題事象**: PowerShell 文字列補間で `"$t:$rel"` と書くと `$t:` を drive 修飾（scope 記法）と解釈して `ParserError`（「':' の後に有効な変数キー」）となる。連結部を含む補間は `${t}:${rel}` 形式が必要
+- **発生局面**: case-run（実現面実装。Case #3316・Epic #3316 Wave 2 Issue #3322 DEL-3322-1）の installer-host-projection.Tests.ps1 ダイジェスト生成
+- **検知方法**: PowerShell 構文検査（Parser 検査）で初回検出
+- **ユーザー確認有無**: なし（書式修正で解消済み）
+- **Decision/REQ/spec影響**: なし（実務知見）
+- **横展開観点**: PowerShell で変数名の直後に `:` が続く補間文字列は `${変数名}:` 形式へ避難する。Parser 検査を CI 前段に入れておくと構文系の初回検出が速い
+- **再発条件**: PowerShell 文字列補間で変数名直後に `:` を書いた場合
+- **予防策候補**: PowerShell 系テスト作成手順への補間書式注意の追記候補
+- **想定反映先**: scripts/self/release/ 配下 PowerShell テストの編集手順、PowerShell 構文検査の運用
+- **関連**: PR #3330 本文「Findings / Capture候補」learning、Issue #3322
+- **タグ**: `#powershell` `#文字列補間` `#ParserError` `#capture`
+- **移動日**: 2026-10-03
+- **処分判定**: deferred（2026-10-03 評価。PowerShell 補間書式の実務知見 1 件・本プロジェクトでの再発観測 1 回。再評価条件: PowerShell 系テスト追加時の再観測時）
 
 ---
