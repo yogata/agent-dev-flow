@@ -30,7 +30,7 @@ ADF-COVERS 宣言の形式（role・参照形式）は traceability の正規契
 
 ## 適用対象
 
-- `src/opencode/skills/` 配下の配布物全般。
+- `src/common/skills/` 配下の配布物全般。
 - docs/ 配下の正規成果物（REQ/Decision/Design 本体）、非配布ファイルは対象外（concrete-id 検査の適用外）。
 
 ## 根拠

@@ -35,9 +35,9 @@ function Assert-ValidConsumerCwd {
         exit 1
     }
 
-    # 2. src/ 配下の原本領域（src/common/、src/opencode/、src/senpi/、src/opencode-local/、
+    # 2. src/ 配下の原本領域（src/common/、src/opencode/、src/senpi/、
     #    src/third-party/ の各原本領域。マルチホスト正本モデルの新構成を含む）
-    if ($cwd -match '[\\/]src[\\/](common|opencode|senpi|opencode-local|third-party)([\\/]|$)') {
+    if ($cwd -match '[\\/]src[\\/](common|opencode|senpi|third-party)([\\/]|$)') {
         Write-Host "現在のフォルダ: $cwd。このフォルダは agent-dev-flow の原本領域です。AgentDevFlow をインストールしたいリポジトリの一番上のフォルダ（.git がある場所）で実行してください。"
         exit 1
     }

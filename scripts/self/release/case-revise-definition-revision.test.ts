@@ -4,9 +4,9 @@
 //   - the case-revise workflow skill (workflow implementation body; the public
 //     command definition was removed by Case #2981 / DEC-033 and case-auto
 //     drives case-revise as an internal lifecycle stage):
-//     src/opencode/skills/agentdev-workflow-case-revise/ (SKILL.md + references)
+//     src/common/skills/agentdev-workflow-case-revise/ (SKILL.md + references)
 //   - the case-revise templates:
-//     src/opencode/skills/agentdev-workflow-templates/templates/case-revise/
+//     src/common/skills/agentdev-workflow-templates/templates/case-revise/
 //   - the requirements:
 //     docs/requirements/REQ-062.md (all requirement rows)
 //     docs/requirements/retired/REQ-033.md (retired successor routing)
@@ -30,17 +30,17 @@ import * as path from "path";
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 
-const SKILL_REL = "src/opencode/skills/agentdev-workflow-case-revise/SKILL.md";
+const SKILL_REL = "src/common/skills/agentdev-workflow-case-revise/SKILL.md";
 const REF_REV_REL =
-  "src/opencode/skills/agentdev-workflow-case-revise/references/definition-revision.md";
+  "src/common/skills/agentdev-workflow-case-revise/references/definition-revision.md";
 const REF_IMPACT_REL =
-  "src/opencode/skills/agentdev-workflow-case-revise/references/impact-reassessment.md";
+  "src/common/skills/agentdev-workflow-case-revise/references/impact-reassessment.md";
 const REF_HANDOFF_REL =
-  "src/opencode/skills/agentdev-workflow-case-revise/references/handoff-and-update.md";
+  "src/common/skills/agentdev-workflow-case-revise/references/handoff-and-update.md";
 const TPL_PR_REL =
-  "src/opencode/skills/agentdev-workflow-templates/templates/case-revise/amendment-pr.md";
+  "src/common/skills/agentdev-workflow-templates/templates/case-revise/amendment-pr.md";
 const TPL_REPORT_REL =
-  "src/opencode/skills/agentdev-workflow-templates/templates/case-revise/root-case-report.md";
+  "src/common/skills/agentdev-workflow-templates/templates/case-revise/root-case-report.md";
 const REQ_062_REL = "docs/requirements/REQ-062.md";
 const REQ_033_RET_REL = "docs/requirements/retired/REQ-033.md";
 const CASE_REVISE_DESIGN_REL = "docs/designs/commands/case-revise.md";

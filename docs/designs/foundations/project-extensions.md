@@ -15,7 +15,7 @@ updated: 2026-10-02
 
 ## 背景、目的
 
-AgentDevFlow 配布 command/skill 本文（src/opencode/commands/**, src/opencode/skills/**）は、AgentDevFlow 本体固有の Decision/REQ/Design への具体参照を持つと、利用先プロジェクトで解決不能な参照が混入する。
+AgentDevFlow 配布 command/skill 本文（src/common/commands/**, src/common/skills/**）は、AgentDevFlow 本体固有の Decision/REQ/Design への具体参照を持つと、利用先プロジェクトで解決不能な参照が混入する。
 
 project extensions 機構は、プロジェクト固有の追加・拡張を配布コードから分離し、プロジェクト別に与える。
 実装本文はプロジェクト非依存・単体利用可能とし、Decision/REQ/Design の具体ID、具体パス、固定URLを持たない。

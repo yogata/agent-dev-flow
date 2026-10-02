@@ -2,7 +2,7 @@
 // flow (REQ-017-017, TS-006, Issue #2547; updated for the REQ-030 state
 // transition refactor, Issue #2808). Pins the chain between:
 //   - the req-draft template (realization_actions source section):
-//     src/opencode/commands/agentdev/templates/req-define/req-draft.md
+//     src/common/commands/agentdev/templates/req-define/req-draft.md
 //   - the case-open workflow skill (handoff contract): case-open holds
 //     realization_actions as a Definition Package constituent and does not
 //     finalize the execution contract (REQ-030-003, REQ-030-008)
@@ -32,17 +32,17 @@ import * as path from "path";
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 
 const DRAFT_TEMPLATE_REL =
-  "src/opencode/commands/agentdev/templates/req-define/req-draft.md";
+  "src/common/commands/agentdev/templates/req-define/req-draft.md";
 const CASE_OPEN_SKILL_REL =
-  "src/opencode/skills/agentdev-workflow-case-open/SKILL.md";
+  "src/common/skills/agentdev-workflow-case-open/SKILL.md";
 const CASE_OPEN_REF_REL =
-  "src/opencode/skills/agentdev-workflow-case-open/references/root-case-and-definition-package.md";
+  "src/common/skills/agentdev-workflow-case-open/references/root-case-and-definition-package.md";
 const CASE_RUN_ADAPTER_REL =
-  "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md";
+  "src/common/skills/agentdev-case-run-execution-adapter/SKILL.md";
 const CHILD_TEMPLATE_REL =
-  "src/opencode/skills/agentdev-workflow-templates/templates/issue_desc_child.md";
+  "src/common/skills/agentdev-workflow-templates/templates/issue_desc_child.md";
 const EPIC_TEMPLATE_REL =
-  "src/opencode/skills/agentdev-workflow-templates/templates/issue_desc_epic.md";
+  "src/common/skills/agentdev-workflow-templates/templates/issue_desc_epic.md";
 const REQ_REL = "docs/requirements/REQ-017.md";
 
 /** Projection target section name shared by commands and both Issue templates. */

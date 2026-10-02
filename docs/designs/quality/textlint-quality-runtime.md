@@ -45,7 +45,7 @@ node_modules が加算設定で再包含されないことを確認するテス�
 設定は hook ごとに変更を検知する。
 修復または変更の後の次回操作から再起動なしに反映する。
 
-ADF 本体の追加設定は src/opencode/commands/**/*.md、src/opencode/skills/**/*.md、src/opencode/plugins/**/README.md、src/opencode/tools/**/README.md、src/opencode-local/**/*.md とする。
+ADF 本体の追加設定は src/common/commands/**/*.md、src/common/skills/**/*.md、src/opencode/plugins/**/README.md、src/opencode/tools/**/README.md、src/common/tools/agentdev-gh/local/**/*.md とする。
 この違いを Plugin 内のリポジトリ判定分岐や Skill extension に書かない方針は維持する。
 
 ## 規則構成と用語

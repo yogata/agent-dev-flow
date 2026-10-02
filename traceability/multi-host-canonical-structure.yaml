@@ -34,7 +34,10 @@ implementation:
     - REQ-099-003
     - REQ-099-017
     - REQ-099-018
-verification:
+  docs/reports/req-099-wave3-verification.md:
+    - REQ-099-007
+    - REQ-099-016
+  verification:
   src/common/guards/gh-write/tests/gh-command-detector.test.ts:
     - REQ-099-013
     - REQ-099-014
@@ -46,3 +49,17 @@ verification:
     - REQ-099-003
     - REQ-099-017
     - REQ-099-018
+  src/opencode/plugins/agentdev-gh-tool/tests/four-combination.test.ts:
+    - REQ-099-007
+  src/senpi/tools/agentdev-gh-tool/tests/four-combination.test.ts:
+    - REQ-099-007
+  src/common/tools/agentdev-gh/local/tests/existing-asset-compat.test.ts:
+    - REQ-099-008
+    - REQ-099-009
+  src/opencode/plugins/agentdev-gh-tool/tests/missing-capability.test.ts:
+    - REQ-099-015
+  src/senpi/tools/agentdev-gh-tool/tests/missing-capability.test.ts:
+    - REQ-099-015
+  src/common/skills/agentdev-workflow-case-run/scripts/tests/process-conformance.test.ts:
+    - REQ-099-015
+    - REQ-099-016

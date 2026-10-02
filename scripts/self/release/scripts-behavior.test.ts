@@ -85,7 +85,7 @@ function digestTree(root: string): Map<string, string> {
  *   <root>/.agentdev-plugin/src/common/{commands/agentdev,skills/...,tools/...}
  *   <root>/.agentdev-plugin/src/opencode/plugins/...  (OpenCode host connection)
  *   <root>/.agentdev-plugin/src/senpi/                (Senpi host connection: placement contract)
- *   <root>/.agentdev-plugin/src/opencode-local/agentdev-gh  (localSource only)
+ *   <root>/.agentdev-plugin/src/common/tools/agentdev-gh/local  (localSource only)
  *   <root>/scripts/{install.ps1,consumer/common.ps1}
  */
 function makeConsumerRepo(zipCheckout: boolean, localSource = false): string {
@@ -104,8 +104,8 @@ function makeConsumerRepo(zipCheckout: boolean, localSource = false): string {
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "senpi", "README.md"), "# src/senpi/ (Senpi host connection area)\n");
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "senpi", "connection-demo", "connection.ts"), "// senpi connection\n");
   if (localSource) {
-    fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode-local", "agentdev-gh"), { recursive: true });
-    fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode-local", "agentdev-gh", "runner-local.ts"), "// local runner\n");
+    fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "common", "tools", "agentdev-gh", "local"), { recursive: true });
+    fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "common", "tools", "agentdev-gh", "local", "runner-local.ts"), "// local runner\n");
   }
 
   fs.mkdirSync(path.join(root, "scripts", "consumer"), { recursive: true });

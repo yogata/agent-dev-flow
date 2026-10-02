@@ -19,7 +19,7 @@ AgentDevFlow が管理する command 定義ファイルの Markdown 構成標準
 
 ## 適用範囲
 
-- **対象**: `src/opencode/commands/agentdev/*.md`（AgentDevFlow 配布 command 原本）、`.opencode/commands/repo/*.md`（repo-local command）
+- **対象**: `src/common/commands/agentdev/*.md`（AgentDevFlow 配布 command 原本）、`.opencode/commands/repo/*.md`（repo-local command）
 - **対象外**: AgentDevFlow 適用プロジェクト（consumer project）の独自 command
 
 ## frontmatter 標準形式

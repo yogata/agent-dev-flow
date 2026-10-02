@@ -217,7 +217,7 @@ SKILL.md の節構成は以下の役割分担に従う。
 **禁止パターン**: 概要節に機能節と同じ内容の詳細説明を含め、機能節で再説明する重複構造。
 SKILL.md 査読時（`agentdev-inspect-skills`）に概要節と機能節の重複を検出し、概要節を簡潔な導入へ縮退するよう指示する。
 
-**適用対象**: `src/opencode/skills/agentdev-*/SKILL.md`（配布 agentdev-* skill 全件）。
+**適用対象**: `src/common/skills/agentdev-*/SKILL.md`（配布 agentdev-* skill 全件）。
 件数は固定値を埋め込まず、実ディレクトリ構成により動的に追従する（旧「全27ファイル」等の固定件数は構成変更時に陳腐化するため廃止）。
 
 ### SKILL.md 原本節フォーマット（REFERENCE関係）

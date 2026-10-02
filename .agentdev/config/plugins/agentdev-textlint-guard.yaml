@@ -7,4 +7,3 @@ additional_targets:
   - src/common/skills/**/*.md
   - src/opencode/plugins/**/README.md
   - src/common/tools/**/README.md
-  - src/opencode-local/**/*.md

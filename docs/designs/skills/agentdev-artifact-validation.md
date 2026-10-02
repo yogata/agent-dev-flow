@@ -53,7 +53,7 @@ REQ、Decision、Design 固有の内容判断を行わず、決定的検証の�
 
 ## 現在の動作
 
-- 所有 script（`check-frontmatter-consistency.ts`、`check-entry-existence.ts`、`check-change-impact.ts`）は `src/opencode/skills/agentdev-artifact-validation/scripts/` 配下に配置する
+- 所有 script（`check-frontmatter-consistency.ts`、`check-entry-existence.ts`、`check-change-impact.ts`）は `src/common/skills/agentdev-artifact-validation/scripts/` 配下に配置する
 - script は決定的（純粋関数）、テスト可能（`tests/*.test.ts`）とする
 - I/O は argv/stdin で入力を受け取り、stdout で JSON 結果を返す
 - 利用側の保存内部責務および skill（`agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-design-file-manager` 等）は内部 script パスを直接参照せず、本 skill の公開検証契約へ委譲する

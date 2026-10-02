@@ -15,12 +15,12 @@ updated: "2026-09-19"
 
 | 成果物 | Canonical Owner | Source Location | Runtime Location | 責務 |
 |----------|----------------|-----------------|------------------|------|
-| Command 定義 | `src/opencode/commands/agentdev/` | 原本優先 | `.opencode/commands/agentdev/` | ユーザー向け入口、入出力、ガードレール、高レベル Steps |
-| Skill 定義 | `src/opencode/skills/` | 原本優先 | `.opencode/skills/` | 再利用可能な判断基準、ドメイン知識 |
-| Skill References | `src/opencode/skills/*/references/` | 原本優先 | `.opencode/skills/*/references/` | 段階的開示（progressive disclosure）の詳細 |
-| Skill Scripts | `src/opencode/skills/*/scripts/` | 原本優先 | `.opencode/skills/*/scripts/` | 決定的でテスト可能な実行ロジック |
-| Command Template | `src/opencode/commands/agentdev/templates/` | 原本優先 | `.opencode/commands/agentdev/templates/` | 完了報告の出力構造。Issue/PR 本文の出力構造は `agentdev-workflow-templates` skill 配下（artifact-contracts.md 参照） |
-| Skill Template | `src/opencode/skills/*/templates/` | 原本優先 | `.opencode/skills/*/templates/` | ドキュメント生成テンプレート |
+| Command 定義 | `src/common/commands/agentdev/` | 原本優先 | `.opencode/commands/agentdev/` | ユーザー向け入口、入出力、ガードレール、高レベル Steps |
+| Skill 定義 | `src/common/skills/` | 原本優先 | `.opencode/skills/` | 再利用可能な判断基準、ドメイン知識 |
+| Skill References | `src/common/skills/*/references/` | 原本優先 | `.opencode/skills/*/references/` | 段階的開示（progressive disclosure）の詳細 |
+| Skill Scripts | `src/common/skills/*/scripts/` | 原本優先 | `.opencode/skills/*/scripts/` | 決定的でテスト可能な実行ロジック |
+| Command Template | `src/common/commands/agentdev/templates/` | 原本優先 | `.opencode/commands/agentdev/templates/` | 完了報告の出力構造。Issue/PR 本文の出力構造は `agentdev-workflow-templates` skill 配下（artifact-contracts.md 参照） |
+| Skill Template | `src/common/skills/*/templates/` | 原本優先 | `.opencode/skills/*/templates/` | ドキュメント生成テンプレート |
 | REQ | `docs/requirements/REQ-*.md` | - | - | 要件定義（基準） |
 | Decision | `docs/decisions/DEC-*.md` | - | - | 意思決定記録（基準） |
 | Design | `docs/designs/**/*.md` | - | - | 現在設計（リポジトリ内部）。commands/skills/workflows の3層と基盤6ドメイン（foundations/responsibilities/quality/integrity/local/authoring）で構成 |

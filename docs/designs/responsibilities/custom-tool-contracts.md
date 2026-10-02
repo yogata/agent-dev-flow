@@ -126,4 +126,4 @@ GitHub I/O の操作契約、VERIFY、失敗時動作、環境依存隠蔽、ロ
 
 旧 Design が実装対応宣言の対象としていた各行（REQ-011-001、REQ-011-002、REQ-011-003、REQ-011-005、REQ-011-008、REQ-011-009、REQ-011-013、REQ-011-014、REQ-011-015）の被覆を本 Design が引き継ぎ、本 Design の実装対応宣言へ上記の各行を追記した。
 
-ローカル版の正規原本は `src/opencode-local/agentdev-gh/` とし、通常版 `src/opencode/tools/agentdev-gh/` と同一の `agentdev-gh` 名で対応させる。
+ローカル版の正規原本は `src/common/tools/agentdev-gh/local/` とし、通常版 `src/common/tools/agentdev-gh/` と同一の `agentdev-gh` 名で対応させる。

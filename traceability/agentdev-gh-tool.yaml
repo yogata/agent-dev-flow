@@ -5,6 +5,7 @@ implementation:
     - REQ-083-001
     - REQ-052-013
     - REQ-099-005
+    - REQ-099-015
   src/opencode/plugins/agentdev-gh-tool/README.md:
     - REQ-093-002
 verification:

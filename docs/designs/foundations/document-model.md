@@ -369,7 +369,7 @@ accepted Decision は意味的に不変とする（REQ-001-056〜060）。
 
 | 用語 | 意味 | パス例 |
 |---|---|---|
-| **原本 (source)** | 編集対象の一次ソース | `src/opencode/commands/agentdev/*.md`、`src/opencode/skills/agentdev-*/` |
+| **原本 (source)** | 編集対象の一次ソース | `src/common/commands/agentdev/*.md`、`src/common/skills/agentdev-*/` |
 | **配置先 (projection)** | 実行時環境への投影先 | `.opencode/commands/agentdev/*.md`、`.opencode/skills/agentdev-*/` |
 
 **投影方向**: 原本 → 配置先 のみ（逆方向の投影は行わない）。

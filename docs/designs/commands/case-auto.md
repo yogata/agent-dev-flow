@@ -96,7 +96,7 @@ context 管理:
 
 ## 所有関係と委譲
 
-- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、command 定義（`src/opencode/commands/agentdev/case-auto.md`）はその実行時投影である（DEC-010）。
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、command 定義（`src/common/commands/agentdev/case-auto.md`）はその実行時投影である（DEC-010）。
 - workflow 実装本体（orchestration stage モデル、Wave 反復制御、停止理由分類、reference 構成）は Workflow Skill（`agentdev-workflow-case-auto`）が所有し、本 Design はこれらを複製しない。各工程の output_contract（工程別契約表）も Workflow Skill が所有する。
 - case-run（インライン実行）の workflow 実装本体は case-run の Workflow Skill（`agentdev-workflow-case-run`）が所有する（case-run は常に単一 Issue 実行。Wave 実行制御は case-auto stage 3 が所有するため epic-wave 実行契約は本 Design 側へ集約される）。
 - Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
@@ -407,7 +407,7 @@ Phase 0 の枝PR に含まれるコミット構成運用を規定する。
 
 **対象ディレクトリ**:
 
-- 成果物変更: `docs/`、`src/opencode/`、`src/opencode-local/` 等、配布対象の永続状態
+- 成果物変更: `docs/`、`src/opencode/`、`src/common/tools/agentdev-gh/local/` 等、配布対象の永続状態
 - ドメイン state 更新: `.agentdev/` 配下（intake、learning、drafts、cases 等のケース固有の一時状態）
 
 **2分割運用の理由**:

@@ -6,6 +6,7 @@ implementation:
     - REQ-099-005
     - REQ-099-006
     - REQ-099-009
+    - REQ-099-015
   src/senpi/tools/agentdev-jev-tool/registration.ts:
     - REQ-099-005
   src/senpi/tools/agentdev-third-party-tool/registration.ts:

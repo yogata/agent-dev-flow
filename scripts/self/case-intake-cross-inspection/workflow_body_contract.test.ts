@@ -12,31 +12,31 @@ import * as path from "node:path";
 
 const REPO_ROOT = path.resolve(import.meta.dir, "..", "..", "..");
 const CASE_OPEN_SKILL = path.join(
-  REPO_ROOT, "src", "opencode", "skills", "agentdev-workflow-case-open", "SKILL.md",
+  REPO_ROOT, "src", "common", "skills", "agentdev-workflow-case-open", "SKILL.md",
 );
 const CASE_OPEN_STEP5_REF = path.join(
   REPO_ROOT,
-  "src", "opencode", "skills", "agentdev-workflow-case-open", "references",
+  "src", "common", "skills", "agentdev-workflow-case-open", "references",
   "definition-pr-and-idempotency.md",
 );
 const CASE_READY_SKILL = path.join(
-  REPO_ROOT, "src", "opencode", "skills", "agentdev-workflow-case-ready", "SKILL.md",
+  REPO_ROOT, "src", "common", "skills", "agentdev-workflow-case-ready", "SKILL.md",
 );
 const CASE_READY_GATE_REF = path.join(
   REPO_ROOT,
-  "src", "opencode", "skills", "agentdev-workflow-case-ready", "references",
+  "src", "common", "skills", "agentdev-workflow-case-ready", "references",
   "readiness-and-cleanup.md",
 );
 const SHARED_ENGINE_ENTRY = path.join(
   REPO_ROOT,
-  "src", "opencode", "skills", "agentdev-workflow-case-open", "scripts", "src",
+  "src", "common", "skills", "agentdev-workflow-case-open", "scripts", "src",
   "inspect_cross_dependencies.ts",
 );
 const ENGINE_TREE = path.join(
-  REPO_ROOT, "src", "opencode", "skills", "agentdev-workflow-case-open", "scripts",
+  REPO_ROOT, "src", "common", "skills", "agentdev-workflow-case-open", "scripts",
 );
 const CASE_READY_SKILL_DIR = path.join(
-  REPO_ROOT, "src", "opencode", "skills", "agentdev-workflow-case-ready",
+  REPO_ROOT, "src", "common", "skills", "agentdev-workflow-case-ready",
 );
 const CASE_OPEN_SIDECAR = path.join(
   REPO_ROOT, "traceability", "agentdev-workflow-case-open.yaml",

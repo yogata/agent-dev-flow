@@ -32,15 +32,15 @@ import * as path from "path";
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 
 const CASE_RUN_SKILL_REL =
-  "src/opencode/skills/agentdev-workflow-case-run/SKILL.md";
+  "src/common/skills/agentdev-workflow-case-run/SKILL.md";
 const CASE_RUN_DELEGATION_REL =
-  "src/opencode/skills/agentdev-workflow-case-run/references/delegation-and-result.md";
+  "src/common/skills/agentdev-workflow-case-run/references/delegation-and-result.md";
 const CASE_AUTO_SKILL_REL =
-  "src/opencode/skills/agentdev-workflow-case-auto/SKILL.md";
+  "src/common/skills/agentdev-workflow-case-auto/SKILL.md";
 const CASE_AUTO_ORCH_REL =
-  "src/opencode/skills/agentdev-workflow-case-auto/references/input-resolution-and-orchestration.md";
+  "src/common/skills/agentdev-workflow-case-auto/references/input-resolution-and-orchestration.md";
 const CASE_READY_STRUCT_REL =
-  "src/opencode/skills/agentdev-workflow-case-ready/references/execution-structure.md";
+  "src/common/skills/agentdev-workflow-case-ready/references/execution-structure.md";
 
 function read(rel: string): string {
   return readFileSync(path.join(REPO_ROOT, rel), "utf-8");
