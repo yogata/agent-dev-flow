@@ -2,7 +2,7 @@
 title: third-party Skill 管理 Design
 status: accepted
 created: 2026-08-30
-updated: "2026-10-01"
+updated: "2026-10-03"
 ---
 
 <!-- ADF-COVERS(design): REQ-097-001, REQ-097-002, REQ-097-003, REQ-097-004 -->
@@ -78,8 +78,8 @@ third-party 成果物 = ADF が製作していないが、配布成果物が依�
 
 ## 一括実行面（cli.ts）
 
-- 配置: src/opencode/tools/agentdev-third-party/cli.ts（tool package の構成物。scripts/ 直下ではない）
-- 実行形式: bun src/opencode/tools/agentdev-third-party/cli.ts [--dry-run] [name]
+- 配置: src/common/tools/agentdev-third-party/cli.ts（tool package の構成物。scripts/ 直下ではない）
+- 実行形式: bun src/common/tools/agentdev-third-party/cli.ts [--dry-run] [name]
 - 中身は引数解き + runAgentdevThirdPartyOperation 呼び出しのみ。engine/acquisition/transport は全部既存再利用する
 - 終了コードは取得成否に連動する。dry-run は計画表示のみで配置しない
 - 入口の位置づけ: cli.ts は scripts 公開入口（REQ-050-001、DEC-021）に該当しない取得機構のバッチ実行面であり、この種の入口は本 CLI 1件に限定する。network access は取得機構の正規能力（Custom Tool と同じ transport）であって導入系スクリプトの network access 禁止（REQ-009-046）の適用対象外（DEC-047 決定2の利用者実行の依存解決手順と同型）
