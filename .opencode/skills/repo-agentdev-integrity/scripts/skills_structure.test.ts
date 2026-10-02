@@ -10,7 +10,7 @@ function findRepoRoot(start: string): string {
   let dir = path.resolve(start);
   for (let i = 0; i < 20; i++) {
     if (fs.existsSync(path.join(dir, ".opencode"))) return dir;
-    if (fs.existsSync(path.join(dir, "src", "opencode"))) return dir;
+    if (fs.existsSync(path.join(dir, "src", "common"))) return dir;
     const parent = path.dirname(dir);
     if (parent === dir) break;
     dir = parent;
@@ -19,7 +19,7 @@ function findRepoRoot(start: string): string {
 }
 const REPO_ROOT = findRepoRoot(SCRIPT_DIR);
 const PROJECTION_SKILLS_DIR = path.join(REPO_ROOT, ".opencode", "skills");
-const SOURCE_SKILLS_DIR = path.join(REPO_ROOT, "src", "opencode", "skills");
+const SOURCE_SKILLS_DIR = path.join(REPO_ROOT, "src", "common", "skills");
 const SKILL_PROJECTION_MANIFEST_PATH = path.join(
   REPO_ROOT,
   ".opencode",
@@ -28,7 +28,7 @@ const SKILL_PROJECTION_MANIFEST_PATH = path.join(
   "data",
   "skill-projection-manifest.yaml",
 );
-// worktree junction 未設定環境では projection に配布スキルが存在しないため src/opencode/ へ fallback する（REQ-018-001）。
+// worktree junction 未設定環境では projection に配布スキルが存在しないため src/common/ へ fallback する（REQ-018-001）。
 const SKILLS_DIR = fs.existsSync(path.join(PROJECTION_SKILLS_DIR, "agentdev-workflow-templates"))
   ? PROJECTION_SKILLS_DIR
   : SOURCE_SKILLS_DIR;
@@ -213,8 +213,8 @@ describe("REQ-018-003 / REQ-018-004: third-party tolerated placements (INSPECTIO
       expect(adfSkillDirs.includes(name)).toBe(false);
     }
   });
-  it("third-party declared placements are never promoted into src/opencode/skills", () => {
-    // third-party Skill は src/opencode/skills/ 配下へ昇格配置されない
+  it("third-party declared placements are never promoted into src/common/skills", () => {
+    // third-party Skill は src/common/skills/ 配下へ昇格配置されない
     // （docs/designs/local/third-party-skill-management.md）。この配置構造により、
     // worktree fallback 環境（junction 未伝播）でも third-party 起源の検出差分が
     // fail に計上されない（REQ-018-004 の環境差扱いの基盤）。

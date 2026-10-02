@@ -68,7 +68,7 @@ function findingsOf(report: CorruptionReport, ruleId: CorruptionRuleId) {
   return report.findings.filter((f) => f.rule_id === ruleId);
 }
 
-const SKILL = "src/opencode/skills/agentdev-fixture/SKILL.md";
+const SKILL = "src/common/skills/agentdev-fixture/SKILL.md";
 
 describe("正常例（REQ-010-068 normal case）", () => {
   test("a fully valid distributed-style document yields no findings", () => {
@@ -104,7 +104,7 @@ describe("正常例（REQ-010-068 normal case）", () => {
       "|---|---|",
       "| `単` | `独` |",
     ].join("\n");
-    withFixture({ [SKILL]: normal, "src/opencode/skills/agentdev-fixture/README.md": "# Fixture README\n" }, (root) => {
+    withFixture({ [SKILL]: normal, "src/common/skills/agentdev-fixture/README.md": "# Fixture README\n" }, (root) => {
       const report = checkContentCorruption(root);
       expect(report.ok).toBe(true);
       expect(report.findings).toEqual([]);
@@ -305,7 +305,7 @@ describe("許容例（REQ-010-068 allowed-usage enumeration）", () => {
     withFixture(
       {
         [SKILL]: cyrillic,
-        "src/opencode/skills/agentdev-other/SKILL.md": cyrillic,
+        "src/common/skills/agentdev-other/SKILL.md": cyrillic,
       },
       (root) => {
         const originalLength = ALLOWED_USAGE.length;

@@ -13,9 +13,9 @@
 import { afterAll, describe, expect, it } from "bun:test";
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { scanCorpus } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/corpus.ts";
-import { runChecks } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/check.ts";
-import { resolveVerificationPolicyFromRoot } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/verification_scope.ts";
+import { scanCorpus } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/corpus.ts";
+import { runChecks } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/check.ts";
+import { resolveVerificationPolicyFromRoot } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/verification_scope.ts";
 
 const REPO_ROOT = join(import.meta.dir, "..", "..", "..", "..", "..");
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
@@ -328,19 +328,19 @@ describe("段階ゲートの工程契約文言（3 Workflow Skill）", () => {
     // req-save 系（SKILL、references、Design）は Issue #2810（DEC-029）で廃止済みのため検査対象から除去した。
     // Definition 保存工程の割り当て先は REQ-021 側の更新（後続工程）で対応する。
     {
-      file: "src/opencode/skills/agentdev-workflow-case-open/SKILL.md",
+      file: "src/common/skills/agentdev-workflow-case-open/SKILL.md",
       // REQ-030 縮小後: case-open は Design 対応が未成立でも Root Case 確立を妨げない（REQ-021-024）。
       // Design 対応の成立判定（トレーサビリティ完全性ゲート）は case-ready が所有する。
       phrases: ["対象要件行に Design 対応が未成立でも Root Case の確立を妨げない"],
     },
     {
-      file: "src/opencode/skills/agentdev-workflow-case-close/SKILL.md",
+      file: "src/common/skills/agentdev-workflow-case-close/SKILL.md",
       phrases: [
         "policy が optional と明示した要件行の verification 対応欠落は完全性違反に含めない",
       ],
     },
     {
-      file: "src/opencode/skills/agentdev-workflow-case-close/references/issue-resolution-and-qg4.md",
+      file: "src/common/skills/agentdev-workflow-case-close/references/issue-resolution-and-qg4.md",
       phrases: [
         "検証対応の3完全性ゲート（完了阻止）",
         "完了として扱わない",

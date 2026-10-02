@@ -28,15 +28,15 @@ const SWITCH_TARGET_FILES: readonly string[] = [
   "docs/designs/commands/backlog-review.md",
   "docs/designs/skills/agentdev-doc-diagnostics.md",
   "docs/designs/skills/agentdev-adversarial-review.md",
-  "src/opencode/skills/agentdev-workflow-req-define/SKILL.md",
-  "src/opencode/skills/agentdev-workflow-case-open/SKILL.md",
-  "src/opencode/skills/agentdev-workflow-case-run/SKILL.md",
-  "src/opencode/skills/agentdev-workflow-case-close/SKILL.md",
-  "src/opencode/skills/agentdev-workflow-inspect-docs/SKILL.md",
-  "src/opencode/skills/agentdev-workflow-inspect-skills/SKILL.md",
-  "src/opencode/skills/agentdev-workflow-backlog-review/SKILL.md",
-  "src/opencode/skills/agentdev-adversarial-review/SKILL.md",
-  "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
+  "src/common/skills/agentdev-workflow-req-define/SKILL.md",
+  "src/common/skills/agentdev-workflow-case-open/SKILL.md",
+  "src/common/skills/agentdev-workflow-case-run/SKILL.md",
+  "src/common/skills/agentdev-workflow-case-close/SKILL.md",
+  "src/common/skills/agentdev-workflow-inspect-docs/SKILL.md",
+  "src/common/skills/agentdev-workflow-inspect-skills/SKILL.md",
+  "src/common/skills/agentdev-workflow-backlog-review/SKILL.md",
+  "src/common/skills/agentdev-adversarial-review/SKILL.md",
+  "src/common/skills/agentdev-case-run-execution-adapter/SKILL.md",
   ".agentdev/extensions/skills/agentdev-workflow-req-define.yaml",
   ".agentdev/extensions/skills/agentdev-workflow-case-open.yaml",
   ".agentdev/extensions/skills/agentdev-workflow-case-run.yaml",
@@ -51,10 +51,10 @@ const DIAGNOSTIC_REVIEW_FILES: readonly string[] = [
   "docs/designs/commands/backlog-review.md",
   "docs/designs/skills/agentdev-doc-diagnostics.md",
   "docs/designs/skills/agentdev-adversarial-review.md",
-  "src/opencode/skills/agentdev-workflow-inspect-docs/SKILL.md",
-  "src/opencode/skills/agentdev-workflow-inspect-skills/SKILL.md",
-  "src/opencode/skills/agentdev-workflow-backlog-review/SKILL.md",
-  "src/opencode/skills/agentdev-adversarial-review/SKILL.md",
+  "src/common/skills/agentdev-workflow-inspect-docs/SKILL.md",
+  "src/common/skills/agentdev-workflow-inspect-skills/SKILL.md",
+  "src/common/skills/agentdev-workflow-backlog-review/SKILL.md",
+  "src/common/skills/agentdev-adversarial-review/SKILL.md",
 ];
 
 const LEGACY_PATTERNS: readonly RegExp[] = [
@@ -190,19 +190,19 @@ describe("REQ-021-011〜022 の割り当て文言の存在", () => {
 
 describe("Workflow Skill 本文・extension の切替", () => {
   it.each([
-    "src/opencode/skills/agentdev-workflow-req-define/SKILL.md",
-    "src/opencode/skills/agentdev-workflow-case-open/SKILL.md",
-    "src/opencode/skills/agentdev-workflow-case-run/SKILL.md",
-    "src/opencode/skills/agentdev-workflow-case-close/SKILL.md",
+    "src/common/skills/agentdev-workflow-req-define/SKILL.md",
+    "src/common/skills/agentdev-workflow-case-open/SKILL.md",
+    "src/common/skills/agentdev-workflow-case-run/SKILL.md",
+    "src/common/skills/agentdev-workflow-case-close/SKILL.md",
   ])("Workflow Skill がトレーサビリティ能力の利用節を持つ: %s", (rel) => {
     expect(read(rel).includes("## トレーサビリティ能力の利用")).toBe(true);
   });
 
   it.each([
-    "src/opencode/skills/agentdev-workflow-inspect-docs/SKILL.md",
-    "src/opencode/skills/agentdev-workflow-inspect-skills/SKILL.md",
-    "src/opencode/skills/agentdev-workflow-backlog-review/SKILL.md",
-    "src/opencode/skills/agentdev-adversarial-review/SKILL.md",
+    "src/common/skills/agentdev-workflow-inspect-docs/SKILL.md",
+    "src/common/skills/agentdev-workflow-inspect-skills/SKILL.md",
+    "src/common/skills/agentdev-workflow-backlog-review/SKILL.md",
+    "src/common/skills/agentdev-adversarial-review/SKILL.md",
   ])("診断・レビュー系 Workflow Skill が独立探索手段の節を持つ: %s", (rel) => {
     expect(read(rel).includes("## 候補探索（独立探索手段）")).toBe(true);
   });
@@ -227,11 +227,11 @@ describe("Workflow Skill 本文・extension の切替", () => {
 });
 
 describe("case-ready トレーサビリティ完全性ゲート契約（REQ-061-023、CR-009、TS-009）", () => {
-  const CASE_READY_SKILL = "src/opencode/skills/agentdev-workflow-case-ready/SKILL.md";
+  const CASE_READY_SKILL = "src/common/skills/agentdev-workflow-case-ready/SKILL.md";
   const CASE_READY_GATE_REF =
-    "src/opencode/skills/agentdev-workflow-case-ready/references/readiness-and-cleanup.md";
+    "src/common/skills/agentdev-workflow-case-ready/references/readiness-and-cleanup.md";
   const CASE_READY_DEF_REF =
-    "src/opencode/skills/agentdev-workflow-case-ready/references/definition-acceptance.md";
+    "src/common/skills/agentdev-workflow-case-ready/references/definition-acceptance.md";
 
   it("case-ready 本文が Design 対応 1 件以上とポリシー有効性を ready 遷移の必要条件として記述する", () => {
     const skill = read(CASE_READY_SKILL);
@@ -260,26 +260,26 @@ describe("case-ready トレーサビリティ完全性ゲート契約（REQ-061-
 
 describe("REQ 保存・Root Case 確立の対応不在非阻害（REQ-021-012、REQ-021-024、TS-010）", () => {
   it("case-open 本文が Design 対応未成立でも Root Case 確立を妨げないことを記述する", () => {
-    const skill = read("src/opencode/skills/agentdev-workflow-case-open/SKILL.md");
+    const skill = read("src/common/skills/agentdev-workflow-case-open/SKILL.md");
     expect(skill.includes("Design 対応が未成立でも Root Case の確立を妨げない")).toBe(true);
     expect(skill.includes("Design 対応の成立判定（トレーサビリティ完全性ゲート）は case-ready が所有する")).toBe(true);
   });
 
   it("req-define 本文が対応作成除外と保存非阻害を記述する（REQ-021-012）", () => {
-    const skill = read("src/opencode/skills/agentdev-workflow-req-define/SKILL.md");
+    const skill = read("src/common/skills/agentdev-workflow-req-define/SKILL.md");
     expect(skill.includes("Design 対応、実装対応、検証対応のいずれかを作成する責務を持たない")).toBe(true);
     expect(skill.includes("対応が存在しないことを理由に保存を失敗させない")).toBe(true);
   });
 
   it("req-define 本文が policy 登録記録と未登録非阻害を記述する（REQ-021-023）", () => {
-    const skill = read("src/opencode/skills/agentdev-workflow-req-define/SKILL.md");
+    const skill = read("src/common/skills/agentdev-workflow-req-define/SKILL.md");
     expect(skill.includes("トレーサビリティポリシーへ明示登録されているかを保存結果に記録できる")).toBe(true);
     expect(skill.includes("未登録（検証対応必須扱い）であることを理由として保存を失敗させない")).toBe(true);
   });
 });
 
 describe("case-close QG-4 の3完全性再検査（REQ-021-018、REQ-021-025、REQ-021-027、TS-011）", () => {
-  const CASE_CLOSE_SKILL = "src/opencode/skills/agentdev-workflow-case-close/SKILL.md";
+  const CASE_CLOSE_SKILL = "src/common/skills/agentdev-workflow-case-close/SKILL.md";
 
   it("QG-4 が Design・implementation・required 行 verification の3完全性を独立再検査する", () => {
     const skill = read(CASE_CLOSE_SKILL);
@@ -306,14 +306,14 @@ describe("case-close QG-4 の3完全性再検査（REQ-021-018、REQ-021-025、R
 
 describe("case-run cleanup 判定の producer 側パス認定（REQ-021-015、RA-009）", () => {
   it("単一 Issue 実行の cleanup 判定が producer 側パス認定と表現形式非区別を記述する", () => {
-    const content = read("src/opencode/skills/agentdev-workflow-case-run/references/single.md");
+    const content = read("src/common/skills/agentdev-workflow-case-run/references/single.md");
     expect(content.includes("implementation 役割かつ producer 側パス")).toBe(true);
     expect(content.includes("対応関係の表現形式を区別せず")).toBe(true);
     expect(content.includes("docs/ パスフィルタ")).toBe(false);
   });
 
   it("case-run SKILL.md が対応宣言の作成先を配布境界で決定することを記述する", () => {
-    const skill = read("src/opencode/skills/agentdev-workflow-case-run/SKILL.md");
+    const skill = read("src/common/skills/agentdev-workflow-case-run/SKILL.md");
     expect(skill.includes("consumer distribution closure")).toBe(true);
     expect(skill.includes("component / package 単位 sidecar")).toBe(true);
     expect(skill.includes("inline `ADF-COVERS` 宣言または sidecar")).toBe(true);
@@ -322,7 +322,7 @@ describe("case-run cleanup 判定の producer 側パス認定（REQ-021-015、RA
 
 describe("case-run PR 前 check 契約の9検出項目（REQ-021-016、RA-009）", () => {
   it("adapter 本文が9検出項目を列挙し Decision 欠落を非計上とする", () => {
-    const content = read("src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md");
+    const content = read("src/common/skills/agentdev-case-run-execution-adapter/SKILL.md");
     for (const kind of [
       "malformed-declarations",
       "unknown-roles",
@@ -342,12 +342,12 @@ describe("case-run PR 前 check 契約の9検出項目（REQ-021-016、RA-009）
 
 describe("workflow スキル本文スコープの旧語彙残存なし（TS-014、AC-21）", () => {
   const WORKFLOW_BODY_ROOTS: readonly string[] = [
-    "src/opencode/skills/agentdev-workflow-case-run",
-    "src/opencode/skills/agentdev-workflow-case-close",
-    "src/opencode/skills/agentdev-workflow-case-ready",
-    "src/opencode/skills/agentdev-workflow-case-open",
-    "src/opencode/skills/agentdev-workflow-req-define",
-    "src/opencode/skills/agentdev-case-run-execution-adapter",
+    "src/common/skills/agentdev-workflow-case-run",
+    "src/common/skills/agentdev-workflow-case-close",
+    "src/common/skills/agentdev-workflow-case-ready",
+    "src/common/skills/agentdev-workflow-case-open",
+    "src/common/skills/agentdev-workflow-req-define",
+    "src/common/skills/agentdev-case-run-execution-adapter",
   ];
   const LEGACY_BODY_PATTERNS: readonly RegExp[] = [
     /検証対応要否/,

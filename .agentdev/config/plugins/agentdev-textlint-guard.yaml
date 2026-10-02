@@ -3,8 +3,8 @@
 # プロジェクト用語辞書は隣接慣行パス agentdev-textlint-guard-prh.yml。
 version: 1
 additional_targets:
-  - src/opencode/commands/**/*.md
-  - src/opencode/skills/**/*.md
+  - src/common/commands/**/*.md
+  - src/common/skills/**/*.md
   - src/opencode/plugins/**/README.md
-  - src/opencode/tools/**/README.md
+  - src/common/tools/**/README.md
   - src/opencode-local/**/*.md

@@ -10,10 +10,10 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { scanCorpus } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/corpus.ts";
-import { runChecks } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/check.ts";
-import { coverageByRequirement, impactByArtifact } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/query.ts";
-import { POLICY_FILE_REL } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/corpus.ts";
+import { scanCorpus } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/corpus.ts";
+import { runChecks } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/check.ts";
+import { coverageByRequirement, impactByArtifact } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/query.ts";
+import { POLICY_FILE_REL } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/corpus.ts";
 
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `trace-sidecar-${crypto.randomUUID().slice(0, 8)}`;

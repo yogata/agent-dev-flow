@@ -70,7 +70,7 @@ function main(): void {
     const sourceTemplatesDir = path.join(
       repoRoot,
       "src",
-      "opencode",
+      "common",
       "skills",
       "agentdev-workflow-templates",
       "templates",

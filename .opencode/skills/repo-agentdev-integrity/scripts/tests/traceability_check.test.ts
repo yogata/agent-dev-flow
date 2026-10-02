@@ -8,11 +8,11 @@
 
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";import { join } from "node:path";
-import { locateEvidence, scanCorpus } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/corpus.ts";
-import { runChecks } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/check.ts";
-import { currentRequirementLineIds } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/requirements.ts";
-import { parseVerificationPolicy, resolveVerificationPolicyFromRoot } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/verification_scope.ts";
-import { parseSidecar } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/sidecar.ts";
+import { locateEvidence, scanCorpus } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/corpus.ts";
+import { runChecks } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/check.ts";
+import { currentRequirementLineIds } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/requirements.ts";
+import { parseVerificationPolicy, resolveVerificationPolicyFromRoot } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/verification_scope.ts";
+import { parseSidecar } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/sidecar.ts";
 
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `trace-chk-${crypto.randomUUID().slice(0, 8)}`;

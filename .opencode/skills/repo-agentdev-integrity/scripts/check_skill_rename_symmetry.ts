@@ -11,7 +11,7 @@
 //
 //   Rename-time checks (only when renames are declared via `--rename`):
 //     path-symmetry between the old and new names of each declared rename:
-//     `src/opencode/skills/{name}` and `docs/designs/skills/{name}.md` must
+//     `src/common/skills/{name}` and `docs/designs/skills/{name}.md` must
 //     move together. Same-name Skill Design existence is NOT a constant
 //     invariant (Workflow Skills may have no dedicated same-name Design).
 //     Maintained exceptions: a `superseded` Design without its skill dir is
@@ -62,7 +62,7 @@ export interface SymmetryOptions {
   renames?: RenamePair[];
 }
 
-const DISTRIBUTION_SKILLS_PARENT = "src/opencode/skills";
+const DISTRIBUTION_SKILLS_PARENT = "src/common/skills";
 const DESIGNS_SKILLS_DIR = "docs/designs/skills";
 const TEMPLATE_DESIGN = "_template.md";
 
@@ -450,7 +450,7 @@ ARGUMENTS:
 
 CHECKS:
   frontmatter-id   constant: SKILL.md name == dir, Design title token == filename stem
-  path-symmetry    rename-time only (--rename): src/opencode/skills/{name} and
+  path-symmetry    rename-time only (--rename): src/common/skills/{name} and
                    docs/designs/skills/{name}.md move together (same-name Skill
                    Design existence is not a constant invariant)
 

@@ -3,9 +3,9 @@
 // repo レベル契約テスト（Issue #2725 TS-007、Issue #2735 RA-002 で追加対象拡張）。
 // - ADR 本体（agent-dev-flow リポジトリ）の追加対象設定が
 //   .agentdev/config/plugins/agentdev-textlint-guard.yaml に存在し、
-//   Plugin の実際の設定 loader で解釈して src/opencode/commands/**/*.md、
-//   src/opencode/skills/**/*.md、src/opencode/plugins/**/README.md、
-//   src/opencode/tools/**/README.md、src/opencode-local/**/*.md の加算だけを
+//   Plugin の実際の設定 loader で解釈して src/common/commands/**/*.md、
+//   src/common/skills/**/*.md、src/opencode/plugins/**/README.md、
+//   src/common/tools/**/README.md、src/opencode-local/**/*.md の加算だけを
 //   生成すること（AG-007）
 // - 追加対象設定が .agentdev/extensions/**（Skill Project Extensions）に
 //   存在しないこと（deterministic runtime Plugin の対象パス設定に使用しない）
@@ -61,10 +61,10 @@ describe("agentdev-textlint-guard ADR 本体設定（TS-007）", () => {
     if (!result.ok) return;
     expect(result.present).toBe(true);
     expect(result.config.additionalTargets).toEqual([
-      "src/opencode/commands/**/*.md",
-      "src/opencode/skills/**/*.md",
+      "src/common/commands/**/*.md",
+      "src/common/skills/**/*.md",
       "src/opencode/plugins/**/README.md",
-      "src/opencode/tools/**/README.md",
+      "src/common/tools/**/README.md",
       "src/opencode-local/**/*.md",
     ]);
   });
@@ -77,12 +77,12 @@ describe("agentdev-textlint-guard ADR 本体設定（TS-007）", () => {
     if (!configResult.ok) return;
     const targetsModule = await import(path.join(PLUGIN_DIR, "lib", "targets.ts"));
     const targets = targetsModule.enumerateTargetFiles(REPO_ROOT, configResult.config);
-    expect(targets.some((rel) => rel.replaceAll("\\", "/").startsWith("src/opencode/commands/"))).toBe(true);
-    expect(targets.some((rel) => rel.replaceAll("\\", "/").startsWith("src/opencode/skills/"))).toBe(true);
+    expect(targets.some((rel) => rel.replaceAll("\\", "/").startsWith("src/common/commands/"))).toBe(true);
+    expect(targets.some((rel) => rel.replaceAll("\\", "/").startsWith("src/common/skills/"))).toBe(true);
     expect(targets.some((rel) => rel.replaceAll("\\", "/").startsWith("docs/"))).toBe(true);
     // 追加対象の実在9ファイル（plugins README 4 + tools README 2 + opencode-local 3）が列挙される
     expect(targets.some((rel) => rel.replaceAll("\\", "/") === "src/opencode/plugins/agentdev-textlint-guard/README.md")).toBe(true);
-    expect(targets.some((rel) => rel.replaceAll("\\", "/") === "src/opencode/tools/agentdev-gh/README.md")).toBe(true);
+    expect(targets.some((rel) => rel.replaceAll("\\", "/") === "src/common/tools/agentdev-gh/README.md")).toBe(true);
     expect(targets.some((rel) => rel.replaceAll("\\", "/") === "src/opencode-local/README.md")).toBe(true);
     // node_modules 配下は依存成果物として列挙されない
     expect(targets.some((rel) => rel.replaceAll("\\", "/").includes("node_modules"))).toBe(false);

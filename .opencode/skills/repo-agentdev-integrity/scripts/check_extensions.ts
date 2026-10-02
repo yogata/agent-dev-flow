@@ -59,8 +59,8 @@
  *
  * Workflow Skill classification (deterministic):
  *   Workflow Skill  = agentdev-workflow-{X} for each existing command
- *                     src/opencode/commands/agentdev/{X}.md.
- *   Capability Skill = every other agentdev-* skill directory under src/opencode/skills,
+ *                     src/common/commands/agentdev/{X}.md.
+ *   Capability Skill = every other agentdev-* skill directory under src/common/skills,
  *                     including cross-cutting agentdev-workflow-* skills that have no
  *                     corresponding command (workflow-skill-model Design exception table).
  *
@@ -68,7 +68,7 @@
  * legacy x2 / malformed / no-implicit-propagation, plus unknown-kind) against disposable
  * fixtures and exits non-zero on any failure.
  *
- * Distribution reference boundary (direct refs in src/opencode/commands|skills)
+ * Distribution reference boundary (direct refs in src/common/commands|skills)
  * is handled by check_distribution_boundary.ts.
  */
 
@@ -79,14 +79,14 @@ const os = require("os") as typeof import("os");
 // Shared distribution-side state machine (Bun.YAML + Zod delegation,
 // REQ-044 / DEC-019). Relative import resolves identically in the main
 // checkout (junctioned skills) and in worktrees (junction not set up):
-// the src/opencode/ tree is the SoT in both environments (REQ-018).
+// the src/common/ tree is the SoT in both environments (REQ-018).
 import {
   NEW_EXTENSION_KINDS,
   LEGACY_EXTENSION_KINDS,
   parseExtensionYaml,
   resolveExtensionState,
   validateExtensionEntries,
-} from "../../../../src/opencode/skills/agentdev-project-extensions/scripts/lib/extension_state.ts";
+} from "../../../../src/common/skills/agentdev-project-extensions/scripts/lib/extension_state.ts";
 import { globWalkRel } from "./lib/glob_walk.ts";
 
 // Re-export the shared contract under the historical module surface so
@@ -95,7 +95,7 @@ export { NEW_EXTENSION_KINDS, LEGACY_EXTENSION_KINDS, resolveExtensionState };
 export type {
   ExtensionKind,
   ExtensionResolution,
-} from "../../../../src/opencode/skills/agentdev-project-extensions/scripts/lib/extension_state.ts";
+} from "../../../../src/common/skills/agentdev-project-extensions/scripts/lib/extension_state.ts";
 
 export type FailureClassification =
   | "malformed"
@@ -135,8 +135,8 @@ export interface CheckReport {
   };
 }
 
-const PUBLIC_COMMAND_DIR = "src/opencode/commands/agentdev";
-const SKILLS_DIR = "src/opencode/skills";
+const PUBLIC_COMMAND_DIR = "src/common/commands/agentdev";
+const SKILLS_DIR = "src/common/skills";
 const REPO_LOCAL_SKILLS_DIR = ".opencode/skills";
 const EXTENSIONS_COMMANDS_DIR = ".agentdev/extensions/commands";
 const EXTENSIONS_SKILLS_DIR = ".agentdev/extensions/skills";
@@ -210,12 +210,12 @@ interface ExtensionsNgBaselineAdditionsManifest {
 
 // OU-0008 (Issue #2206): パス bucket key の環境依存対策（Design integrity-contracts
 // 「baseline entry 運用契約」第2点）。check_integrity.ts と同じ正規化で
-// `.opencode/...` 表記と `src/opencode/...` 表記を相対パス基準へ統一する。
+// `.opencode/...` 表記と `src/common/...` 表記を相対パス基準へ統一する。
 function normalizeExtBaselineFilePath(file: string | null): string {
   if (!file) return "";
   const unified = file.replace(/\\/g, "/").replace(/^\.\//, "");
   return unified.startsWith(".opencode/")
-    ? unified.replace(/^\.opencode\//, "src/opencode/")
+    ? unified.replace(/^\.opencode\//, "src/common/")
     : unified;
 }
 
@@ -332,7 +332,7 @@ function applyExtensionsNgBaseline(
   const baselineIndex = new Map<string, { count: number; provenance: string }>();
   for (const entry of baseline.entries) {
     const key = extBaselineKey(entry.category, entry.check, entry.file, entry.evidence);
-    // `.opencode/` 表記 entry と `src/opencode/` 表記 entry が正規化で同一
+    // `.opencode/` 表記 entry と `src/common/` 表記 entry が正規化で同一
     // bucket へ衝突する場合（OU-0008）、同一論理 NG の環境別観測として
     // count の大きい方を採用する。
     const prev = baselineIndex.get(key);
@@ -611,8 +611,8 @@ export interface SkillClassification {
 
 /**
  * Deterministic Workflow/Capability classification.
- * Workflow Skill  = agentdev-workflow-{X} where src/opencode/commands/agentdev/{X}.md exists.
- * Capability Skill = every other agentdev-* skill directory under src/opencode/skills
+ * Workflow Skill  = agentdev-workflow-{X} where src/common/commands/agentdev/{X}.md exists.
+ * Capability Skill = every other agentdev-* skill directory under src/common/skills
  * (including cross-cutting agentdev-workflow-* skills without a corresponding command).
  * Paths are resolved against repoRoot when given, process.cwd() otherwise
  * (cwd-independent: REQ-018 worktree test fallback).

@@ -43,7 +43,7 @@ describe("classifyLine - concrete-id detection", () => {
     const d = classifyLine({
       text: "Read ADR-0135 first, then REQ-0023.",
       lineNumber: 1,
-      filePath: "src/opencode/commands/agentdev/sample.md",
+      filePath: "src/common/commands/agentdev/sample.md",
       projection: "source",
     });
     const ids = d.filter((x) => x.category === "concrete-id");
@@ -59,7 +59,7 @@ describe("classifyLine - concrete-id detection", () => {
     const d = classifyLine({
       text: "Pattern: ADR-{NNNN} and REQ-{NNNN} are templates.",
       lineNumber: 1,
-      filePath: "src/opencode/commands/agentdev/sample.md",
+      filePath: "src/common/commands/agentdev/sample.md",
       projection: "source",
     });
     const ids = d.filter((x) => x.category === "concrete-id");
@@ -70,7 +70,7 @@ describe("classifyLine - concrete-id detection", () => {
     const d = classifyLine({
       text: "Glob pattern docs/requirements/REQ-*.md is allowed.",
       lineNumber: 1,
-      filePath: "src/opencode/commands/agentdev/sample.md",
+      filePath: "src/common/commands/agentdev/sample.md",
       projection: "source",
     });
     const ids = d.filter((x) => x.category === "concrete-id");
@@ -84,7 +84,7 @@ describe("classifyLine - concrete-id detection", () => {
     const d = classifyLine({
       text: "REQ-0023-001 is a subitem reference.",
       lineNumber: 1,
-      filePath: "src/opencode/commands/agentdev/sample.md",
+      filePath: "src/common/commands/agentdev/sample.md",
       projection: "source",
     });
     // Implementation note: detector MAY flag REQ-0023 portion; consumer decides.
@@ -101,7 +101,7 @@ describe("classifyLine - concrete-path detection", () => {
     const d = classifyLine({
       text: "See docs/requirements/REQ-0149.md for detail.",
       lineNumber: 1,
-      filePath: "src/opencode/commands/agentdev/sample.md",
+      filePath: "src/common/commands/agentdev/sample.md",
       projection: "source",
     });
     const paths = d.filter((x) => x.category === "concrete-path");
@@ -114,7 +114,7 @@ describe("classifyLine - concrete-path detection", () => {
     const d = classifyLine({
       text: "See docs/adr/README.md for the index.",
       lineNumber: 1,
-      filePath: "src/opencode/commands/agentdev/sample.md",
+      filePath: "src/common/commands/agentdev/sample.md",
       projection: "source",
     });
     const paths = d.filter((x) => x.category === "concrete-path");
@@ -125,7 +125,7 @@ describe("classifyLine - concrete-path detection", () => {
     const d = classifyLine({
       text: "Template: docs/specs/<domain>/<spec>.md is allowed.",
       lineNumber: 1,
-      filePath: "src/opencode/commands/agentdev/sample.md",
+      filePath: "src/common/commands/agentdev/sample.md",
       projection: "source",
     });
     const paths = d.filter((x) => x.category === "concrete-path");
@@ -136,7 +136,7 @@ describe("classifyLine - concrete-path detection", () => {
     const d = classifyLine({
       text: "Glob: docs/specs/** is fine.",
       lineNumber: 1,
-      filePath: "src/opencode/commands/agentdev/sample.md",
+      filePath: "src/common/commands/agentdev/sample.md",
       projection: "source",
     });
     const paths = d.filter((x) => x.category === "concrete-path");
@@ -149,7 +149,7 @@ describe("classifyLine - fixed-url detection", () => {
     const d = classifyLine({
       text: "Bad: <https://github.com/yogata/agent-dev-flow/blob/main/docs/specs/foo.md>",
       lineNumber: 1,
-      filePath: "src/opencode/commands/agentdev/sample.md",
+      filePath: "src/common/commands/agentdev/sample.md",
       projection: "source",
     });
     const urls = d.filter((x) => x.category === "fixed-url");
@@ -161,7 +161,7 @@ describe("classifyLine - fixed-url detection", () => {
     const d = classifyLine({
       text: "Bad: raw.githubusercontent.com/yogata/agent-dev-flow/main/docs/requirements/x.md",
       lineNumber: 1,
-      filePath: "src/opencode/commands/agentdev/sample.md",
+      filePath: "src/common/commands/agentdev/sample.md",
       projection: "source",
     });
     const urls = d.filter((x) => x.category === "fixed-url");
@@ -172,7 +172,7 @@ describe("classifyLine - fixed-url detection", () => {
     const d = classifyLine({
       text: "See https://github.com/sst/opencode/blob/main/packages/plugin/src/index.ts for API",
       lineNumber: 1,
-      filePath: "src/opencode/commands/agentdev/sample.md",
+      filePath: "src/common/commands/agentdev/sample.md",
       projection: "source",
     });
     const urls = d.filter((x) => x.category === "fixed-url");
@@ -186,7 +186,7 @@ describe("classifyLine - fixed-url detection", () => {
     const d = classifyLine({
       text: "ref raw.githubusercontent.com/yogata/agent-dev-flow/main/scripts/foo.ps1",
       lineNumber: 1,
-      filePath: "src/opencode/commands/agentdev/sample.md",
+      filePath: "src/common/commands/agentdev/sample.md",
       projection: "source",
     });
     const urls = d.filter((x) => x.category === "fixed-url");
@@ -200,7 +200,7 @@ describe("classifyLine - generic-or-template allowance", () => {
     const d = classifyLine({
       text: "Use docs/specs/{NNNN} for SPEC references.",
       lineNumber: 1,
-      filePath: "src/opencode/commands/agentdev/sample.md",
+      filePath: "src/common/commands/agentdev/sample.md",
       projection: "source",
     });
     expect(d.length).toBe(0);
@@ -216,7 +216,7 @@ describe("classifyContent - file-level aggregation", () => {
       "See docs/requirements/REQ-0149.md for detail.",
       "Pattern docs/specs/<x>.md is allowed.",
     ].join("\n");
-    const d = classifyContent(content, "src/opencode/commands/agentdev/sample.md", "source");
+    const d = classifyContent(content, "src/common/commands/agentdev/sample.md", "source");
     // Line 4 contains both a concrete-id (REQ-0149) and a concrete-path
     // (docs/requirements/REQ-0149.md). Both are emitted independently, mirroring
     // the legacy checker behavior so the adapter remains a drop-in replacement.
@@ -384,7 +384,7 @@ describe("DEC-NNN detection (Oracle finding 3)", () => {
     const d = classifyLine({
       text: "per DEC-014 decision 2",
       lineNumber: 1,
-      filePath: "src/opencode/commands/agentdev/sample.md",
+      filePath: "src/common/commands/agentdev/sample.md",
       projection: "source",
     });
     const ids = d.filter((x) => x.category === "concrete-id");
@@ -546,7 +546,7 @@ describe("Stage B regression: arbitrary producer-internal ID families", () => {
       {
         text: "See OU-3 for the plan.",
         lineNumber: 1,
-        filePath: "src/opencode/commands/agentdev/sample.md",
+        filePath: "src/common/commands/agentdev/sample.md",
         projection: "source",
       },
       DEFAULT_DETECTOR_CONFIG,
@@ -994,7 +994,7 @@ describe("Stage B regression: distributed workflow control labels (STEP/QG) allo
       {
         text: "- STEP-1 で Epic Issue と判定（ステータス追跡テーブル存在）",
         lineNumber: 1,
-        filePath: "src/opencode/skills/agentdev-workflow-case-close/references/epic-wave-close.md",
+        filePath: "src/common/skills/agentdev-workflow-case-close/references/epic-wave-close.md",
         projection: "source",
       },
       DEFAULT_DETECTOR_CONFIG,
@@ -1007,7 +1007,7 @@ describe("Stage B regression: distributed workflow control labels (STEP/QG) allo
       {
         text: "QG-4 観点8 に基づく評価スコープ切替",
         lineNumber: 1,
-        filePath: "src/opencode/skills/agentdev-workflow-case-close/references/epic-wave-close.md",
+        filePath: "src/common/skills/agentdev-workflow-case-close/references/epic-wave-close.md",
         projection: "source",
       },
       DEFAULT_DETECTOR_CONFIG,
@@ -1024,7 +1024,7 @@ describe("Stage B regression: distributed workflow control labels (STEP/QG) allo
     ].join("\n");
     const d = classifyContentConfig(
       content,
-      "src/opencode/skills/agentdev-workflow-case-close/references/epic-wave-close.md",
+      "src/common/skills/agentdev-workflow-case-close/references/epic-wave-close.md",
       "source",
       DEFAULT_DETECTOR_CONFIG,
     );
@@ -1044,7 +1044,7 @@ describe("Stage B regression: distributed workflow control labels (STEP/QG) allo
       {
         text: "配布依存境界の最終 gate（STEP-E4-0、single-Issue STEP-3 Step 3-1 と同一）",
         lineNumber: 1,
-        filePath: "src/opencode/skills/agentdev-workflow-case-close/references/epic-wave-close.md",
+        filePath: "src/common/skills/agentdev-workflow-case-close/references/epic-wave-close.md",
         projection: "source",
       },
       DEFAULT_DETECTOR_CONFIG,
@@ -1273,7 +1273,7 @@ describe("producer metadata detection signal (DEC-030 decision 5)", () => {
       {
         text: "<!-- ADF-COVERS(implementation): REQ-029-003 -->",
         lineNumber: 6,
-        filePath: "src/opencode/skills/agentdev-doc-writing/SKILL.md",
+        filePath: "src/common/skills/agentdev-doc-writing/SKILL.md",
         projection: "source",
       },
       REPORT_CONFIG,
@@ -1387,7 +1387,7 @@ describe("producer metadata detection signal (DEC-030 decision 5)", () => {
       {
         text: "This implements REQ-029-003 for doc-writing reviews.",
         lineNumber: 1,
-        filePath: "src/opencode/skills/agentdev-doc-writing/SKILL.md",
+        filePath: "src/common/skills/agentdev-doc-writing/SKILL.md",
         projection: "source",
       },
       DEFAULT_DETECTOR_CONFIG,
@@ -1446,7 +1446,7 @@ describe("producer metadata detection signal (DEC-030 decision 5)", () => {
     ].join("\n");
     const reportMode = classifyContentConfig(
       content,
-      "src/opencode/skills/agentdev-fixture-skill/SKILL.md",
+      "src/common/skills/agentdev-fixture-skill/SKILL.md",
       "source",
       REPORT_CONFIG,
     );
@@ -1457,7 +1457,7 @@ describe("producer metadata detection signal (DEC-030 decision 5)", () => {
 
     const enforced = classifyContentConfig(
       content,
-      "src/opencode/skills/agentdev-fixture-skill/SKILL.md",
+      "src/common/skills/agentdev-fixture-skill/SKILL.md",
       "source",
       { ...DEFAULT_DETECTOR_CONFIG, producer_metadata_enforcement: "enforce" },
     );
@@ -1467,7 +1467,7 @@ describe("producer metadata detection signal (DEC-030 decision 5)", () => {
 
   test("link projection content carries the same marker signal (clean state, no conversion step)", () => {
     const content = "restored skill body\n<!-- ADF-COVERS(implementation): REQ-001-001 -->\n";
-    const source = classifyContent(content, "src/opencode/skills/x/SKILL.md", "source");
+    const source = classifyContent(content, "src/common/skills/x/SKILL.md", "source");
     const link = classifyContent(content, ".opencode/skills/x/SKILL.md", "link");
     expect(source.filter((x) => x.category === "producer-metadata").length).toBe(1);
     expect(link.filter((x) => x.category === "producer-metadata").length).toBe(1);
@@ -1481,7 +1481,7 @@ describe("producer metadata detection signal (DEC-030 decision 5)", () => {
     ].join("\n");
     const d = classifyContentConfig(
       content,
-      "src/opencode/skills/agentdev-doc-writing/SKILL.md",
+      "src/common/skills/agentdev-doc-writing/SKILL.md",
       "source",
       REPORT_CONFIG,
     );
@@ -1507,7 +1507,7 @@ describe("distribution-boundary-fs junction / symlink traversal (REQ-029-006)", 
 
   function makeTempRepo(): string {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), "dist-boundary-fs-"));
-    const skillSrc = path.join(root, "src", "opencode", "skills", "agentdev-demo");
+    const skillSrc = path.join(root, "src", "common", "skills", "agentdev-demo");
     fs.mkdirSync(path.join(skillSrc, "references"), { recursive: true });
     fs.writeFileSync(
       path.join(skillSrc, "SKILL.md"),
@@ -1525,7 +1525,7 @@ describe("distribution-boundary-fs junction / symlink traversal (REQ-029-006)", 
   }
 
   function createSkillJunction(root: string, linkName: string): boolean {
-    const target = path.join(root, "src", "opencode", "skills", "agentdev-demo");
+    const target = path.join(root, "src", "common", "skills", "agentdev-demo");
     const linkPath = path.join(root, ".opencode", "skills", linkName);
     try {
       const kind = process.platform === "win32" ? "junction" : "dir";
@@ -1556,7 +1556,7 @@ describe("distribution-boundary-fs junction / symlink traversal (REQ-029-006)", 
         ),
       ).toBe(true);
       // Link projection must not leak the junction target's real (src) path.
-      expect(normalized.some((f) => f.includes("/src/opencode/"))).toBe(false);
+      expect(normalized.some((f) => f.includes("/src/common/"))).toBe(false);
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }
@@ -1592,7 +1592,7 @@ describe("distribution-boundary-fs junction / symlink traversal (REQ-029-006)", 
         .map((f) => f.replace(/\\/g, "/"));
       const link = collectTargets(root, "link").textFiles
         .map((f) => f.replace(/\\/g, "/"));
-      expect(src.some((f) => f.endsWith("src/opencode/skills/agentdev-demo/SKILL.md"))).toBe(true);
+      expect(src.some((f) => f.endsWith("src/common/skills/agentdev-demo/SKILL.md"))).toBe(true);
       expect(link.some((f) => f.endsWith(".opencode/skills/agentdev-demo/SKILL.md"))).toBe(true);
       // Profile distinction: path prefixes differ while logical content matches.
       expect(src.length).toBe(link.length);

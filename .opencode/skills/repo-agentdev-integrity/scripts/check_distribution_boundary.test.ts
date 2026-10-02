@@ -39,7 +39,7 @@ beforeAll(() => {
 
   // Public command body with each violation category.
   writeFile(
-    "src/opencode/commands/agentdev/sample.md",
+    "src/common/commands/agentdev/sample.md",
     [
       "# sample command",
       "",
@@ -56,7 +56,7 @@ beforeAll(() => {
 
   // Public skill body, all-clean.
   writeFile(
-    "src/opencode/skills/agentdev-foo/SKILL.md",
+    "src/common/skills/agentdev-foo/SKILL.md",
     [
       "# foo skill",
       "",
@@ -69,13 +69,13 @@ beforeAll(() => {
 
   // Non-agentdev skill should be ignored even if it has refs.
   writeFile(
-    "src/opencode/skills/other-skill/SKILL.md",
+    "src/common/skills/other-skill/SKILL.md",
     "Ignore: ADR-9999 and docs/adr/ADR-9999.md\n",
   );
 
   // README.md under commands should still be scanned (it is in commands/).
   writeFile(
-    "src/opencode/commands/agentdev/README.md",
+    "src/common/commands/agentdev/README.md",
     "# commands index\nNo concrete refs here.\n",
   );
 
@@ -94,6 +94,17 @@ beforeAll(() => {
     ].join("\n"),
   );
 
+  // tools/<name>/local/: producer-internal Local runner area excluded from
+  // the distribution set (REQ-009-016); its producer metadata is out of scope.
+  writeFile(
+    "src/common/tools/agentdev-gh/local/runner-local.ts",
+    [
+      "// agentdev-gh Custom Tool の Local 実現（GhRunner）。",
+      "// ADF-COVERS(implementation): REQ-011-024",
+      "",
+    ].join("\n"),
+  );
+
   // TS-012 deliberate contamination fixtures (REQ-029-010): inline
   // declaration, traceability sidecar, and policy-style files carrying
   // producer-side traceability metadata inside the consumer distribution
@@ -101,7 +112,7 @@ beforeAll(() => {
   // role or path filter; the gate failure decision is deferred to the Wave 4
   // enforcement switch.
   writeFile(
-    "src/opencode/skills/agentdev-foo/references/contaminated-inline.md",
+    "src/common/skills/agentdev-foo/references/contaminated-inline.md",
     [
       "# contaminated reference",
       "",
@@ -110,7 +121,7 @@ beforeAll(() => {
     ].join("\n"),
   );
   writeFile(
-    "src/opencode/skills/agentdev-foo/traceability/covers-sidecar.md",
+    "src/common/skills/agentdev-foo/traceability/covers-sidecar.md",
     [
       "# traceability sidecar",
       "",
@@ -119,7 +130,7 @@ beforeAll(() => {
     ].join("\n"),
   );
   writeFile(
-    "src/opencode/skills/agentdev-foo/traceability/policy.md",
+    "src/common/skills/agentdev-foo/traceability/policy.md",
     [
       "# traceability policy",
       "",
@@ -203,6 +214,14 @@ describe("checkDistributionBoundary", () => {
     );
     expect(testsHits.length).toBe(0);
   });
+
+  test("excludes tools/<name>/local/ producer-internal area from violation scanning (REQ-009-016)", () => {
+    const report = checkDistributionBoundary(TMP_ROOT);
+    const localHits = report.failures.filter((f) =>
+      f.file.replace(/\\/g, "/").includes("tools/agentdev-gh/local/"),
+    );
+    expect(localHits.length).toBe(0);
+  });
 });
 
 describe("producer-side traceability metadata detection (DEC-030 decision 5)", () => {
@@ -272,7 +291,7 @@ describe("baseline build / save / load", () => {
     );
     expect(idEntry).toBeDefined();
     expect(idEntry!.count).toBe(1);
-    expect(idEntry!.file).toBe("src/opencode/commands/agentdev/sample.md");
+    expect(idEntry!.file).toBe("src/common/commands/agentdev/sample.md");
 
     const totalCount = baseline.entries.reduce((s, e) => s + e.count, 0);
     expect(totalCount).toBe(report.failures.length);
@@ -322,7 +341,7 @@ describe("computeDelta", () => {
     const baseline = buildBaseline(report, TMP_ROOT, "snapshot");
     const newFailure = {
       category: "concrete-id" as const,
-      file: path.join(TMP_ROOT, "src/opencode/commands/agentdev/sample.md"),
+      file: path.join(TMP_ROOT, "src/common/commands/agentdev/sample.md"),
       line: 99,
       snippet: "Newly introduced REQ-1234 reference",
       matched: "REQ-1234",
@@ -355,7 +374,7 @@ describe("computeDelta", () => {
   test("delta counts overshoot within the same signature as new violations", () => {
     const report = checkDistributionBoundary(TMP_ROOT);
     const baseline = buildBaseline(report, TMP_ROOT, "snapshot");
-    const sameFile = path.join(TMP_ROOT, "src/opencode/commands/agentdev/sample.md");
+    const sameFile = path.join(TMP_ROOT, "src/common/commands/agentdev/sample.md");
     const extra = {
       category: "concrete-id" as const,
       file: sameFile,
@@ -383,17 +402,17 @@ describe("checkDistributionBoundary: strict UTF-8 enforcement (no silent replace
 
   beforeAll(() => {
     fs.rmSync(STRICT_ROOT, { recursive: true, force: true });
-    fs.mkdirSync(path.join(STRICT_ROOT, "src", "opencode", "commands", "agentdev"), {
+    fs.mkdirSync(path.join(STRICT_ROOT, "src", "common", "commands", "agentdev"), {
       recursive: true,
     });
     // Invalid UTF-8: 0xFF is never valid in UTF-8.
     fs.writeFileSync(
-      path.join(STRICT_ROOT, "src", "opencode", "commands", "agentdev", "bad.md"),
+      path.join(STRICT_ROOT, "src", "common", "commands", "agentdev", "bad.md"),
       Buffer.from([0x68, 0xff, 0x69, 0x0a]),
     );
     // NUL byte.
     fs.writeFileSync(
-      path.join(STRICT_ROOT, "src", "opencode", "commands", "agentdev", "nul.md"),
+      path.join(STRICT_ROOT, "src", "common", "commands", "agentdev", "nul.md"),
       Buffer.from([0x68, 0x00, 0x69, 0x0a]),
     );
   });
@@ -430,12 +449,12 @@ describe("checkDistributionBoundary: unknown extension fails closed", () => {
 
   beforeAll(() => {
     fs.rmSync(UNKNOWN_ROOT, { recursive: true, force: true });
-    fs.mkdirSync(path.join(UNKNOWN_ROOT, "src", "opencode", "commands", "agentdev"), {
+    fs.mkdirSync(path.join(UNKNOWN_ROOT, "src", "common", "commands", "agentdev"), {
       recursive: true,
     });
     // Unknown extension that is neither text nor binary.
     fs.writeFileSync(
-      path.join(UNKNOWN_ROOT, "src", "opencode", "commands", "agentdev", "blob.xyz"),
+      path.join(UNKNOWN_ROOT, "src", "common", "commands", "agentdev", "blob.xyz"),
       "ADR-9999 reference inside\n",
     );
   });
@@ -464,11 +483,11 @@ describe("checkDistributionBoundary: mandatory repository_identity", () => {
   beforeAll(() => {
     fs.rmSync(EMPTY_IDENTITY_ROOT, { recursive: true, force: true });
     fs.mkdirSync(
-      path.join(EMPTY_IDENTITY_ROOT, "src", "opencode", "commands", "agentdev"),
+      path.join(EMPTY_IDENTITY_ROOT, "src", "common", "commands", "agentdev"),
       { recursive: true },
     );
     fs.writeFileSync(
-      path.join(EMPTY_IDENTITY_ROOT, "src", "opencode", "commands", "agentdev", "ok.md"),
+      path.join(EMPTY_IDENTITY_ROOT, "src", "common", "commands", "agentdev", "ok.md"),
       "no violations here\n",
     );
   });
@@ -500,11 +519,11 @@ describe("checkDistributionBoundary: GITHUB.COM host detection (integration)", (
 
   beforeAll(() => {
     fs.rmSync(UPPER_ROOT, { recursive: true, force: true });
-    fs.mkdirSync(path.join(UPPER_ROOT, "src", "opencode", "commands", "agentdev"), {
+    fs.mkdirSync(path.join(UPPER_ROOT, "src", "common", "commands", "agentdev"), {
       recursive: true,
     });
     fs.writeFileSync(
-      path.join(UPPER_ROOT, "src", "opencode", "commands", "agentdev", "upper.md"),
+      path.join(UPPER_ROOT, "src", "common", "commands", "agentdev", "upper.md"),
       "Bad: <https://GITHUB.COM/yogata/agent-dev-flow/blob/main/docs/foo.md>\n",
     );
   });

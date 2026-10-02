@@ -32,7 +32,7 @@ function findRepoRoot(start: string): string {
   let dir = path.resolve(start);
   for (let i = 0; i < 20; i++) {
     if (fs.existsSync(path.join(dir, ".opencode"))) return dir;
-    if (fs.existsSync(path.join(dir, "src", "opencode"))) return dir;
+    if (fs.existsSync(path.join(dir, "src", "common"))) return dir;
     const parent = path.dirname(dir);
     if (parent === dir) break;
     dir = parent;
@@ -42,10 +42,10 @@ function findRepoRoot(start: string): string {
 
 const REPO_ROOT = findRepoRoot(SCRIPT_DIR);
 const PROJECTION_CMD_DIR = path.join(REPO_ROOT, ".opencode", "commands", "agentdev");
-const SOURCE_CMD_DIR = path.join(REPO_ROOT, "src", "opencode", "commands", "agentdev");
+const SOURCE_CMD_DIR = path.join(REPO_ROOT, "src", "common", "commands", "agentdev");
 const CMD_DIR = fs.existsSync(PROJECTION_CMD_DIR) ? PROJECTION_CMD_DIR : SOURCE_CMD_DIR;
 const PROJECTION_SKILLS_DIR = path.join(REPO_ROOT, ".opencode", "skills");
-const SOURCE_SKILLS_DIR = path.join(REPO_ROOT, "src", "opencode", "skills");
+const SOURCE_SKILLS_DIR = path.join(REPO_ROOT, "src", "common", "skills");
 const SKILLS_DIR = fs.existsSync(path.join(PROJECTION_SKILLS_DIR, "agentdev-workflow-templates"))
   ? PROJECTION_SKILLS_DIR
   : SOURCE_SKILLS_DIR;
@@ -632,7 +632,7 @@ describe("TS-009: エンコーディング不整合検出", () => {
     expect(findings.length).toBe(0);
   });
 
-  it("実配布物: src/opencode 配下の Markdown に BOM と CRLF/LF 混在は存在しない", () => {
+  it("実配布物: src/common 配下の Markdown に BOM と CRLF/LF 混在は存在しない", () => {
     const srcRoot = path.join(REPO_ROOT, "src", "opencode");
     if (!fs.existsSync(srcRoot)) return;
     const mdFiles = collectMarkdownFiles(srcRoot);
@@ -648,7 +648,7 @@ describe("TS-009: エンコーディング不整合検出", () => {
   it("契約: 再帰スキャンは node_modules 系ディレクトリを除外する", () => {
     // checker 実行契約 SPEC「検出対象除外規定」: node_modules 系 git 管理外
     // ディレクトリはスキャン対象から除外する。main 作業ディレクトリでは
-    // src/opencode/skills/*/scripts/node_modules/ 配下の依存パッケージ README
+    // src/common/skills/*/scripts/node_modules/ 配下の依存パッケージ README
     // （CRLF/LF 混在）が恒常 fail の原因となるため、除外を契約テストで固定する。
     const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ts009-node-modules-"));
     try {

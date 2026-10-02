@@ -18,11 +18,11 @@ import { join } from "node:path";
 import {
   DEFAULT_EXCLUDE_DIRS,
   scanCorpus,
-} from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/corpus.ts";
-import { parseDeclarations } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/declarations.ts";
-import { coverageByRequirement, impactByArtifact } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/query.ts";
-import { runChecks } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/check.ts";
-import { currentRequirementLineIds } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/requirements.ts";
+} from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/corpus.ts";
+import { parseDeclarations } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/declarations.ts";
+import { coverageByRequirement, impactByArtifact } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/query.ts";
+import { runChecks } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/check.ts";
+import { currentRequirementLineIds } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/requirements.ts";
 import { findRepoRoot } from "../cli_utils.ts";
 
 const SCRIPT_DIR = import.meta.dir;
@@ -30,7 +30,7 @@ const REPO_ROOT = findRepoRoot(SCRIPT_DIR);
 const SKILL_SCRIPTS = join(
   REPO_ROOT,
   "src",
-  "opencode",
+  "common",
   "skills",
   "agentdev-traceability",
   "scripts",
@@ -186,7 +186,7 @@ describe("REQ-012-043〜050 の対応宣言の完全性（OU-002 完了条件6�
   );
 
   // 宣言コーパスは tim_declarations_contract.test.ts と同一（docs + repo-integrity scripts）。
-  // 配布物（src/opencode/skills/agentdev-traceability/）は concrete 要件行ID を持たないため
+  // 配布物（src/common/skills/agentdev-traceability/）は concrete 要件行ID を持たないため
   // （配布依存境界、DEC-014）、実装対応は agentdev-traceability Design が、検証対応は
   // repo-local の traceability_*.test.ts が保持する。
   function corpusDeclarations() {

@@ -13,10 +13,14 @@
 //
 // Projection semantics (source/link/archive/archive-installed) per
 // docs/designs/integrity/distribution-boundary.md "projection の分離":
-//   - source/archive        -> src/opencode/**
+//   - source/archive        -> src/common/{commands,skills,tools}/** +
+//                              src/opencode/plugins/**
 //   - link/archive-installed-> .opencode/**
-// Both projections enumerate the same logical content (consumer install
-// copies src/opencode/** -> .opencode/**); the directory choice reflects
+// The canonical content lives under src/common/ (host-agnostic canonical
+// tree, DEC-049); host-specific plugin/hook sources stay in their host
+// connection area (src/opencode/plugins). Both projections enumerate the
+// same logical content (consumer install copies the canonical tree and the
+// host connection area into .opencode/**); the directory choice reflects
 // where the scanner must look for that projection.
 
 import * as path from "path";
@@ -29,9 +33,9 @@ import {
 } from "./distribution-boundary.ts";
 import type { BoundaryFailure } from "./distribution-boundary-types.ts";
 
-export const PUBLIC_COMMAND_DIR = "src/opencode/commands/agentdev";
-export const PUBLIC_SKILLS_PARENT = "src/opencode/skills";
-export const PUBLIC_TOOLS_PARENT = "src/opencode/tools";
+export const PUBLIC_COMMAND_DIR = "src/common/commands/agentdev";
+export const PUBLIC_SKILLS_PARENT = "src/common/skills";
+export const PUBLIC_TOOLS_PARENT = "src/common/tools";
 export const PUBLIC_PLUGINS_PARENT = "src/opencode/plugins";
 
 // ADF-COVERS(implementation): REQ-052-006, REQ-052-007, REQ-029-006

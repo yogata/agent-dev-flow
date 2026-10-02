@@ -8,7 +8,7 @@
 // 識別情報欠落時は N/A 記録で workflow を停止しないこと（REQ-048-004、REQ-048-005）を検証する。
 // adf_* field 集合の全体固定は REQ-048-014 のとおり REQ-048 の成立条件としない。本テストは
 // REQ-048-001 が要求する相関の成立に必要な key のみを検査し、REQ-048-012 の実験契約に従う変更を妨げない。
-// テンプレートは src/opencode/（原本）を優先読込する（worktree は junction 未伝播、REQ-018-001 と同一 fallback 構成）。
+// テンプレートは src/common/（共通正本）を優先読込する（worktree は junction 未伝播、REQ-018-001 と同一 fallback 構成）。
 import { describe, it, expect } from "bun:test";
 import * as fs from "fs";
 import * as path from "path";
@@ -38,7 +38,7 @@ const PROJECTION_TEMPLATES_DIR = path.join(
 const SOURCE_TEMPLATES_DIR = path.join(
   REPO_ROOT,
   "src",
-  "opencode",
+  "common",
   "skills",
   "agentdev-workflow-templates",
   "templates",
@@ -46,7 +46,7 @@ const SOURCE_TEMPLATES_DIR = path.join(
 const TEMPLATES_DIR = fs.existsSync(PROJECTION_TEMPLATES_DIR)
   ? PROJECTION_TEMPLATES_DIR
   : SOURCE_TEMPLATES_DIR;
-const SOURCE_SKILLS_DIR = path.join(REPO_ROOT, "src", "opencode", "skills");
+const SOURCE_SKILLS_DIR = path.join(REPO_ROOT, "src", "common", "skills");
 
 const ISSUE_TEMPLATES = [
   "issue_desc_feature.md",

@@ -241,12 +241,13 @@ function resolveRelative(fullPath: string, root: string): string {
   return path.relative(root, fullPath).replace(/\\/g, "/");
 }
 
-// v2:REQ-0108-189: Fall back to src/opencode/ (原本) when runtime projection doesn't exist
+// v2:REQ-0108-189: Fall back to the canonical tree (src/common/, plugins stay
+// under src/opencode/plugins) when runtime projection doesn't exist (DEC-049).
 function resolvePathWithFallback(runtimePath: string): string {
   if (fs.existsSync(runtimePath)) return runtimePath;
   const sourcePath = runtimePath
-    .replace(/\.opencode[\\/]/, "src/opencode/")
-    .replace(/\.opencode\\/, "src/opencode/");
+    .replace(/\.opencode[\\/]plugins[\\/]/, "src/opencode/plugins/")
+    .replace(/\.opencode[\\/]/, "src/common/");
   if (sourcePath !== runtimePath && fs.existsSync(sourcePath)) return sourcePath;
   return runtimePath;
 }
@@ -3781,7 +3782,9 @@ function resolveReferencePath(
     if (!fs.existsSync(runtimePath)) {
       const srcPath = path.join(
         root,
-        refPath.replace(/^\.opencode\//, "src/opencode/"),
+        refPath
+          .replace(/^\.opencode\/plugins\//, "src/opencode/plugins/")
+          .replace(/^\.opencode\//, "src/common/"),
       );
       if (fs.existsSync(srcPath)) return srcPath;
     }
@@ -3792,7 +3795,7 @@ function resolveReferencePath(
     if (!fs.existsSync(runtimePath)) {
       const srcSkillsDir = skillsDir.replace(
         /[\\/]\.opencode[\\/]skills$/,
-        path.sep + "src" + path.sep + "opencode" + path.sep + "skills",
+        path.sep + "src" + path.sep + "common" + path.sep + "skills",
       );
       const srcPath = path.join(srcSkillsDir, refPath);
       if (fs.existsSync(srcPath)) return srcPath;
@@ -3801,9 +3804,9 @@ function resolveReferencePath(
   }
   const relSource = resolveRelative(sourceFilePath, root);
   const skillsPrefix = ".opencode/skills/";
-  // REQ-018-001 worktree fallback: source files under src/opencode/skills/ (SoT)
+  // REQ-018-001 worktree fallback: source files under src/common/skills/ (SoT)
   // resolve skill-relative refs against the same skillsDir as projection files.
-  const srcSkillsPrefix = "src/opencode/skills/";
+  const srcSkillsPrefix = "src/common/skills/";
   const sourcePrefix = relSource.startsWith(skillsPrefix)
     ? skillsPrefix
     : relSource.startsWith(srcSkillsPrefix)
@@ -5208,7 +5211,7 @@ function checkTemplatePathIntegrity(
 
     for (const ref of uniqueRefs) {
       if (isGlobPattern(ref)) continue;
-      // v2:REQ-0108-189: Fall back to src/opencode/ when runtime projection doesn't exist
+      // v2:REQ-0108-189: Fall back to src/common/ when runtime projection doesn't exist (DEC-049)
       const resolvedPath = resolvePathWithFallback(
         path.join(root, ref.replace(/\//g, path.sep)),
       );
@@ -5238,7 +5241,7 @@ function checkTemplatePathIntegrity(
     const fm = parseFrontmatter(content);
     if (fm && fm["template_path"]) {
       const templatePath = String(fm["template_path"]);
-      // v2:REQ-0108-189: Fall back to src/opencode/ when runtime projection doesn't exist
+      // v2:REQ-0108-189: Fall back to src/common/ when runtime projection doesn't exist (DEC-049)
       const resolvedFmPath = resolvePathWithFallback(
         path.join(root, templatePath.replace(/\//g, path.sep)),
       );
@@ -5298,13 +5301,13 @@ function isInsideWorktree(root: string): boolean {
 // worktree では .opencode/skills/* junction が未伝播のため投影側に配布スキルが不在
 // （repo-local skill のみ残存）。代表 skill（agentdev-workflow-templates、
 // skills_structure.test.ts と同一判定）の不在を junction（投影ディレクトリ）不在と
-// みなし、検査 root 直下の src/opencode/skills（同一チェックアウト内 SoT）へ解決する。
+// みなし、検査 root 直下の src/common/skills（同一チェックアウト内 SoT）へ解決する。
 // path.join(root, ...) 由来の置換のみのため、メインリポジトリ作業コピー側への解決
 // （誤リポジトリ検査・REQ-031-025）は構造的に発生しない。
 interface SkillsDirResolution {
   /** 走査に使用する skills ディレクトリ（fallback 後） */
   dir: string;
-  /** junction（投影ディレクトリ）が不在で src/opencode/skills へ fallback したか */
+  /** junction（投影ディレクトリ）が不在で src/common/skills へ fallback したか */
   usedFallback: boolean;
 }
 
@@ -5317,7 +5320,7 @@ function resolveSkillsDirWithFallback(root: string): SkillsDirResolution {
   if (fs.existsSync(representativeSkill)) {
     return { dir: projectionDir, usedFallback: false };
   }
-  const sourceDir = path.join(root, "src", "opencode", "skills");
+  const sourceDir = path.join(root, "src", "common", "skills");
   if (fs.existsSync(sourceDir)) {
     return { dir: sourceDir, usedFallback: true };
   }
@@ -5357,9 +5360,9 @@ function checkSourceProjectionConsistency(root: string): CheckResult[] {
     return results;
   }
 
-  // Commands: src/opencode/commands/ ↔ .opencode/commands/
+  // Commands: src/common/commands/ ↔ .opencode/commands/
   const projectionCmdDir = path.join(root, ".opencode", "commands", "agentdev");
-  const sourceCmdDir = path.join(root, "src", "opencode", "commands", "agentdev");
+  const sourceCmdDir = path.join(root, "src", "common", "commands", "agentdev");
 
   if (fs.existsSync(sourceCmdDir) && fs.existsSync(projectionCmdDir)) {
     const sourceFiles = new Set(
@@ -5396,9 +5399,9 @@ function checkSourceProjectionConsistency(root: string): CheckResult[] {
     }
   }
 
-  // Skills: src/opencode/skills/ ↔ .opencode/skills/
+  // Skills: src/common/skills/ ↔ .opencode/skills/
   const projectionSkillsDir = path.join(root, ".opencode", "skills");
-  const sourceSkillsDir = path.join(root, "src", "opencode", "skills");
+  const sourceSkillsDir = path.join(root, "src", "common", "skills");
 
   if (fs.existsSync(sourceSkillsDir) && fs.existsSync(projectionSkillsDir)) {
     const sourceSkillDirs = new Set(listDirs(sourceSkillsDir));
@@ -5408,10 +5411,10 @@ function checkSourceProjectionConsistency(root: string): CheckResult[] {
       (d) => !projectionSkillDirs.has(d),
     );
     // repo-* skills are repo-local and projection-only (v2:ADR-0020): they
-    // intentionally have no src/opencode/skills/ counterpart and are excluded
+    // intentionally have no src/common/skills/ counterpart and are excluded
     // from selective-junction sync (sync-self-opencode.ps1 RepoLocalSkillPrefix).
     // Other projection-only skills referenced by distribution must be promoted
-    // to src/opencode/skills/ (v2:ADR-0134/v2:REQ-0159-001); detection is handled by
+    // to src/common/skills/ (v2:ADR-0134/v2:REQ-0159-001); detection is handled by
     // checkDistributionUntrackedSkillReference (IR-058).
     const extraSkills = [...projectionSkillDirs].filter(
       (d) =>
@@ -5455,12 +5458,12 @@ function checkSourceProjectionConsistency(root: string): CheckResult[] {
 
 // Distribution roots whose .md content is scanned for skill name references.
 const IR058_DISTRIBUTION_DIRS = [
-  "src/opencode/commands/agentdev",
-  "src/opencode/skills",
+  "src/common/commands/agentdev",
+  "src/common/skills",
 ] as const;
 
 // Patterns that count as a reference to skill <name>:
-//   - path reference: `.opencode/skills/<name>` or `src/opencode/skills/<name>`
+//   - path reference: `.opencode/skills/<name>` or `src/common/skills/<name>`
 //   - backtick-quoted: `` `<name>` ``
 //   - Japanese prose: `<name> スキル` / `<name>スキル`
 //   - load_skills literal: `load_skills` value containing `<name>`
@@ -5472,7 +5475,7 @@ function buildIr058ReferencePattern(skillName: string): RegExp {
       escaped +
       "(?=[/\\s\"'`]|$)" +
       "|" +
-      "src/opencode/skills/" +
+      "src/common/skills/" +
       escaped +
       "(?=[/\\s\"'`]|$)" +
       "|" +
@@ -5544,7 +5547,7 @@ function checkDistributionUntrackedSkillReference(root: string): CheckResult[] {
   const results: CheckResult[] = [];
 
   const projectionSkillsDir = path.join(root, ".opencode", "skills");
-  const sourceSkillsDir = path.join(root, "src", "opencode", "skills");
+  const sourceSkillsDir = path.join(root, "src", "common", "skills");
 
   if (!fs.existsSync(projectionSkillsDir) || !fs.existsSync(sourceSkillsDir)) {
     return results;
@@ -5553,7 +5556,7 @@ function checkDistributionUntrackedSkillReference(root: string): CheckResult[] {
   const sourceSkillDirs = new Set(listDirs(sourceSkillsDir));
   const projectionSkillDirs = listDirs(projectionSkillsDir);
 
-  // Projection-only skill names: exist in .opencode/skills/ but not in src/opencode/skills/.
+  // Projection-only skill names: exist in .opencode/skills/ but not in src/common/skills/.
   // Branch 1 (IR-058 3-branch judgment): repo-* prefix is repo-local by design
   // (v2:ADR-0106 / v2:REQ-0159-002) and excluded as before.
   const projectionOnlySkills = projectionSkillDirs.filter(
@@ -5634,12 +5637,12 @@ function checkDistributionUntrackedSkillReference(root: string): CheckResult[] {
         ng(
           "Inventory",
           "distribution-untracked-skill-reference",
-          `Skill '${skillName}' is referenced by distribution (${evidence!.file}:${evidence!.line}) but exists only in .opencode/skills/ and is not declared in src/third-party/skills.yaml. Promote to src/opencode/skills/ or register it in src/third-party/skills.yaml (v2:ADR-0134/v2:REQ-0159-001).`,
+          `Skill '${skillName}' is referenced by distribution (${evidence!.file}:${evidence!.line}) but exists only in .opencode/skills/ and is not declared in src/third-party/skills.yaml. Promote to src/common/skills/ or register it in src/third-party/skills.yaml (v2:ADR-0134/v2:REQ-0159-001).`,
           undefined,
           undefined,
           {
             evidence: `${evidence!.file}:${evidence!.line}: ${evidence!.text}`,
-            expected: `src/opencode/skills/${skillName}/ or src/third-party/skills.yaml declaration of '${skillName}'`,
+            expected: `src/common/skills/${skillName}/ or src/third-party/skills.yaml declaration of '${skillName}'`,
             route: determineRoute("integrity-rule-gap", 1),
           },
         ),
@@ -5792,8 +5795,9 @@ function readRealPath(filePath: string): string | null {
 
 // §7.3/§7.4: source dirs the installed profile cannot run without.
 const INSTALLED_REQUIRED_SOURCE_DIRS = [
-  "src/opencode/commands/agentdev",
-  "src/opencode/skills",
+  "src/common/commands/agentdev",
+  "src/common/skills",
+  "src/opencode/plugins",
 ];
 
 const PROJECTION_ONLY_EXEMPT_PREFIX = "repo-";
@@ -5837,9 +5841,9 @@ function checkSourceRequiredDirs(root: string): CheckResult[] {
 function checkInstalledProjection(root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const projectionCmdDir = path.join(root, ".opencode", "commands", "agentdev");
-  const sourceCmdDir = path.join(root, "src", "opencode", "commands", "agentdev");
+  const sourceCmdDir = path.join(root, "src", "common", "commands", "agentdev");
   const projectionSkillsDir = path.join(root, ".opencode", "skills");
-  const sourceSkillsDir = path.join(root, "src", "opencode", "skills");
+  const sourceSkillsDir = path.join(root, "src", "common", "skills");
 
   for (const rel of INSTALLED_REQUIRED_SOURCE_DIRS) {
     const abs = path.join(root, ...rel.split("/"));
@@ -5901,7 +5905,7 @@ function checkInstalledProjection(root: string): CheckResult[] {
               undefined,
               {
                 evidence: f,
-                expected: "projection must mirror src/opencode/commands/agentdev/",
+                expected: "projection must mirror src/common/commands/agentdev/",
                 route: determineRoute("broken-reference", 1),
               },
             ),
@@ -5963,7 +5967,7 @@ function checkInstalledProjection(root: string): CheckResult[] {
               undefined,
               {
                 evidence: d,
-                expected: "projection must mirror src/opencode/skills/",
+                expected: "projection must mirror src/common/skills/",
                 route: determineRoute("broken-reference", 1),
               },
             ),
@@ -6663,7 +6667,7 @@ function checkCaptureBoundaryReference(root: string): CheckResult[] {
   const runtimePath = path.join(
     root,
     "src",
-    "opencode",
+    "common",
     "skills",
     "agentdev-workflow-orchestration",
     "references",
@@ -6866,8 +6870,8 @@ function checkSisyphusJuniorUlwLoopMisclassification(root: string): CheckResult[
     path.join(root, "docs"),
     path.join(root, ".opencode", "skills"),
     path.join(root, ".opencode", "commands"),
-    path.join(root, "src", "opencode", "skills"),
-    path.join(root, "src", "opencode", "commands"),
+    path.join(root, "src", "common", "skills"),
+    path.join(root, "src", "common", "commands"),
   ];
 
   const mdFiles: string[] = [];
@@ -7151,8 +7155,8 @@ function checkReqDesignBoundaryViolation(root: string): CheckResult[] {
 // invocations embedded in command/skill definitions. Direct gh CLI usage bypasses
 // the agentdev_gh Custom Tool (REQ-011-001) and must route through it.
 // Scan targets (v2:REQ-0152-001):
-//   src/opencode/commands/agentdev/*.md
-//   src/opencode/skills/agentdev-*/**/*.md
+//   src/common/commands/agentdev/*.md
+//   src/common/skills/agentdev-*/**/*.md
 // Code-block contents are exempt (example/pattern description, v2:REQ-0108-254).
 // The former agentdev-gh-cli skill owned the permitted-file exemption; the skill was
 // retired by the GitHub I/O migration (REQ-011-001) and no exemption path remains.
@@ -7166,11 +7170,11 @@ const IR053_GH_DIRECT_PATTERN =
 // both references document the gh read-only fallback when issue_list hits the
 // safe page limit; write-path gh remains prohibited (compensation test).
 // Each file is registered in both projection spellings (`.opencode/` in the
-// main junction environment, `src/opencode/` in worktree fallback), mirroring
+// main junction environment, `src/common/` in worktree fallback), mirroring
 // the ng-baseline bucket key normalization (OU-0008).
 const IR053_EXEMPT_PATHS: RegExp[] = [
-  /^(?:src\/opencode|\.opencode)\/skills\/agentdev-issue-management\/references\/issue-operation-safety\.md$/,
-  /^(?:src\/opencode|\.opencode)\/skills\/agentdev-workflow-case-open\/references\/definition-pr-and-idempotency\.md$/,
+  /^(?:src\/common|\.opencode)\/skills\/agentdev-issue-management\/references\/issue-operation-safety\.md$/,
+  /^(?:src\/common|\.opencode)\/skills\/agentdev-workflow-case-open\/references\/definition-pr-and-idempotency\.md$/,
 ];
 
 export function walkMarkdown(dirPath: string, acc: string[]): void {
@@ -7182,7 +7186,7 @@ export function walkMarkdown(dirPath: string, acc: string[]): void {
 }
 
 function collectAgentdevSkillMarkdown(skillRoot: string): string[] {
-  // Walk src/opencode/skills/agentdev-*/**/*.md recursively.
+  // Walk src/common/skills/agentdev-*/**/*.md recursively.
   const collected: string[] = [];
   if (!fs.existsSync(skillRoot)) return collected;
   for (const dir of listDirs(skillRoot)) {
@@ -7195,8 +7199,8 @@ function collectAgentdevSkillMarkdown(skillRoot: string): string[] {
 function checkGhDirectInvocation(root: string): CheckResult[] {
   const results: CheckResult[] = [];
 
-  const commandDir = path.join(root, "src", "opencode", "commands", "agentdev");
-  const skillRoot = path.join(root, "src", "opencode", "skills");
+  const commandDir = path.join(root, "src", "common", "commands", "agentdev");
+  const skillRoot = path.join(root, "src", "common", "skills");
 
   const targets: string[] = [];
   if (fs.existsSync(commandDir)) {
@@ -7323,13 +7327,13 @@ function checkDraftSpecStaleness(designsDir: string, root: string): CheckResult[
 }
 
 // ===== IR-055: runtime-unresolved-reference (v2:REQ-0108-263, v2:REQ-0108-264) =====
-// Detects references in distribution files (src/opencode/commands/agentdev/**/*.md,
-// src/opencode/skills/agentdev-*/**/*.md) that cannot be resolved in consumer
-// environments: REQ/Decision IDs, src/opencode/ paths, docs/designs/, docs/guides/,
+// Detects references in distribution files (src/common/commands/agentdev/**/*.md,
+// src/common/skills/agentdev-*/**/*.md) that cannot be resolved in consumer
+// environments: REQ/Decision IDs, obsolete src/opencode/{commands,skills,tools} paths, docs/designs/, docs/guides/,
 // /repo/*, repo-*, main-repo GitHub URLs, line-number-qualified internal refs.
 // Severity per Design docs/designs/integrity/rules/IR-055-runtime-unresolved-reference.md:
 //   strict:    REQ-NNNN, REQ-NNNN-NNN, DEC-NNN (current), ADR-NNNN (residual),
-//              src/opencode/, /repo/*, repo-*
+//              obsolete src/opencode/{commands,skills,tools}/, /repo/*, repo-*
 //   heuristic: docs/designs/, docs/guides/, main-repo GitHub URL, file.md#L<N>
 // DEC-009 (Decision migration): DEC-NNN is the current canonical form. Legacy
 // ADR-NNNN references are flagged as residual (migration leftover).
@@ -7347,7 +7351,7 @@ const IR055_STRICT_PATTERNS: ReadonlyArray<{ name: string; pattern: RegExp }> = 
   { name: "REQ-NNNN", pattern: /\bREQ-\d{3,4}(?!-\d)\b/g },
   { name: "DEC-NNN", pattern: /\bDEC-\d{3}\b/g },
   { name: "ADR-NNNN", pattern: /\bADR-\d{3,4}\b/g },
-  { name: "src/opencode/", pattern: /\bsrc\/opencode\//g },
+  { name: "obsolete src/opencode/{commands,skills,tools}/", pattern: /\bsrc\/opencode\/(?:commands|skills|tools)\//g },
   { name: "/repo/", pattern: /\/repo\//g },
   { name: "repo-*", pattern: /\brepo-[a-z][a-z0-9-]*/g },
 ];
@@ -7462,8 +7466,8 @@ interface Ir055RawViolation {
 }
 
 function collectIr055Violations(root: string): Ir055RawViolation[] {
-  const commandDir = path.join(root, "src", "opencode", "commands", "agentdev");
-  const skillRoot = path.join(root, "src", "opencode", "skills");
+  const commandDir = path.join(root, "src", "common", "commands", "agentdev");
+  const skillRoot = path.join(root, "src", "common", "skills");
 
   const targets: string[] = [];
   if (fs.existsSync(commandDir)) {
@@ -7949,14 +7953,14 @@ interface NgBaselineReport {
 // OU-0008 (Issue #2206): パス bucket key の環境依存対策（Design integrity-contracts
 // 「baseline entry 運用契約」第2点）。main 環境（junction projection 実在）は
 // `.opencode/...` 表記、worktree 環境（junction 未伝播、§7.3 fallback）は
-// `src/opencode/...` 表記で同一ファイルを報告するため、bucket key 比較時のみ
+// `src/common/...` 表記で同一ファイルを報告するため、bucket key 比較時のみ
 // 表記を正規化して相対パス基準へ統一する。bucket key 仕様自体
 // （category/check/file/evidence の4組）は維持する。
 function normalizeNgBaselineFilePath(file: string | null): string {
   if (!file) return "";
   const unified = file.replace(/\\/g, "/").replace(/^\.\//, "");
   return unified.startsWith(".opencode/")
-    ? unified.replace(/^\.opencode\//, "src/opencode/")
+    ? unified.replace(/^\.opencode\//, "src/common/")
     : unified;
 }
 
@@ -8118,7 +8122,7 @@ function applyNgBaseline(
   for (const entry of baseline.entries) {
     const key = ngBaselineKey(entry.category, entry.check, entry.file, entry.evidence);
     // OU-0008 (Issue #2206): 正規化により `.opencode/` 表記 entry と
-    // `src/opencode/` 表記 entry が同一 bucket へ衝突する場合、両者は同一論理 NG の
+    // `src/common/` 表記 entry が同一 bucket へ衝突する場合、両者は同一論理 NG の
     // 環境別観測であるため count の大きい方（通常は同数）を採用する。
     const prev = baselineIndex.get(key);
     if (!prev || entry.count > prev.count) {
@@ -9413,7 +9417,7 @@ function checkSkillSeeAlsoReference(skillsDir: string, root: string): CheckResul
     while ((m = seeAlsoPattern.exec(seeAlsoSection)) !== null) {
       const refName = m[1];
       if (!refName.startsWith("agentdev-")) continue;
-      // REQ-018: worktree（junction 未伝播）環境の誤検出防止。原本 src/opencode/skills/ への
+      // REQ-018: worktree（junction 未伝播）環境の誤検出防止。原本 src/common/skills/ への
       // fallback 存在判定（v2:REQ-0108-189 と同一規則）。
       const refDir = resolvePathWithFallback(path.join(skillsDir, refName));
       if (!fs.existsSync(refDir)) {
@@ -9443,7 +9447,7 @@ function checkSkillSeeAlsoReference(skillsDir: string, root: string): CheckResul
 
 // 共通ポリシー意味識別子 registry（定義の実体）。
 const POLICY_REGISTRY_REL_PATH =
-  "src/opencode/skills/agentdev-command-authoring/references/common-policy-identifiers.md";
+  "src/common/skills/agentdev-command-authoring/references/common-policy-identifiers.md";
 // registry 定義行様式: `- **POL-xxx**: 説明`
 const POLICY_DEF_LINE_RE = /^[-*]\s+\*\*(POL-[a-z0-9]+(?:-[a-z0-9]+)*)\*\*/;
 // 本文参照（コードスパン表記を含む POL- トークン全体）
@@ -9452,8 +9456,8 @@ const POLICY_REF_RE = /\bPOL-[a-z0-9]+(?:-[a-z0-9]+)*\b/g;
 const RESIDUAL_GXX_RE = /\bG\d{2}\b/g;
 // 検査対象の配布物ルート（command（templates/ 含む）、skill、template を含む .md 全体）
 const IR063_DISTRIBUTION_DIRS = [
-  "src/opencode/commands/agentdev",
-  "src/opencode/skills",
+  "src/common/commands/agentdev",
+  "src/common/skills",
 ] as const;
 
 function policyNg(
@@ -9484,7 +9488,7 @@ function checkCommonPolicyIdentifierInvariant(root: string): CheckResult[] {
     const registryOwnerSkillDir = path.join(
       root,
       "src",
-      "opencode",
+      "common",
       "skills",
       "agentdev-command-authoring",
     );
@@ -9495,7 +9499,7 @@ function checkCommonPolicyIdentifierInvariant(root: string): CheckResult[] {
           undefined,
           `Common policy identifier registry missing: ${POLICY_REGISTRY_REL_PATH} not found (REQ-051-005, IR-063)`,
           "registry-missing",
-          "registry file exists at src/opencode/skills/agentdev-command-authoring/references/",
+          "registry file exists at src/common/skills/agentdev-command-authoring/references/",
         ),
       );
     }
@@ -9614,8 +9618,8 @@ const IR064_ID_PLACEHOLDER_RE =
 
 function isIr064TemplatePath(relPath: string): boolean {
   return (
-    relPath.startsWith("src/opencode/commands/agentdev/templates/") ||
-    /^src\/opencode\/skills\/[^/]+\/templates\//.test(relPath) ||
+    relPath.startsWith("src/common/commands/agentdev/templates/") ||
+    /^src\/common\/skills\/[^/]+\/templates\//.test(relPath) ||
     /(^|\/)_template\.md$/.test(relPath)
   );
 }
@@ -9643,7 +9647,7 @@ function isIr064InsideQuoteBracket(line: string, matchIndex: number): boolean {
 
 function collectDistributionMarkdown(root: string): string[] {
   const targets: string[] = [];
-  const commandDir = path.join(root, "src", "opencode", "commands", "agentdev");
+  const commandDir = path.join(root, "src", "common", "commands", "agentdev");
   if (fs.existsSync(commandDir)) {
     targets.push(
       ...globWalkRel(commandDir, { extensions: [".md"] }).map((rel) =>
@@ -9651,7 +9655,7 @@ function collectDistributionMarkdown(root: string): string[] {
       ),
     );
   }
-  const skillRoot = path.join(root, "src", "opencode", "skills");
+  const skillRoot = path.join(root, "src", "common", "skills");
   if (fs.existsSync(skillRoot)) {
     for (const dir of listDirs(skillRoot)) {
       if (!dir.startsWith("agentdev-")) continue;
@@ -10287,7 +10291,7 @@ function checkReferencedReqRowExistence(root: string): CheckResult[] {
     "docs/requirements",
     "docs/decisions",
     "docs/guides",
-    "src/opencode",
+    "src/common",
     ".opencode/commands",
     ".agentdev/extensions",
   ]) {
@@ -10305,7 +10309,7 @@ function checkReferencedReqRowExistence(root: string): CheckResult[] {
     "docs/requirements/retired/",
     "docs/decisions/retired/",
     "docs/reports/",
-    "src/opencode/commands/agentdev/templates/",
+    "src/common/commands/agentdev/templates/",
   ];
 
   let violationCount = 0;
@@ -10365,7 +10369,7 @@ function checkReferencedReqRowExistence(root: string): CheckResult[] {
 
 // ─── IR-068: skill-projection-manifest (Issue #2383 (d)、inspect F-01) ────────
 // src 側スキル集合（配布原本・SSoT）と .opencode 投影スキル集合の突合を検査データ化する。
-// 検査データ data/skill-projection-manifest.yaml は src/opencode/skills/ 列挙の検出ビュー
+// 検査データ data/skill-projection-manifest.yaml は src/common/skills/ 列挙の検出ビュー
 // であり、manifest ↔ src の不一致はデータ鮮度 NG として検出する（宣言的データの
 // silent skip 禁止、checker-execution-contracts Design）。
 // 投影突合は junction 環境（.opencode/skills に非 repo-* ディレクトリが存在する場合）のみ
@@ -10487,14 +10491,14 @@ function checkSkillProjectionManifest(root: string): CheckResult[] {
       ),
     );
   }
-  const sourceSkillsDir = path.join(root, "src", "opencode", "skills");
+  const sourceSkillsDir = path.join(root, "src", "common", "skills");
   if (!manifestSkills || !fs.existsSync(sourceSkillsDir)) {
     results.push(
       info(
         "SkillProjection",
         "skill-projection-manifest",
         manifestSkills
-          ? `src/opencode/skills not found; IR-068 skipped`
+          ? `src/common/skills not found; IR-068 skipped`
           : `${IR068_MANIFEST_REL} not found; IR-068 skipped`,
       ),
     );
@@ -10512,12 +10516,12 @@ function checkSkillProjectionManifest(root: string): CheckResult[] {
         ng(
           "SkillProjection",
           "skill-projection-manifest",
-          `Manifest declares skill '${name}' but src/opencode/skills does not contain it (IR-068)`,
+          `Manifest declares skill '${name}' but src/common/skills does not contain it (IR-068)`,
           IR068_MANIFEST_REL,
           undefined,
           {
             evidence: `manifest-only:${name}`,
-            expected: `remove '${name}' from the manifest or add src/opencode/skills/${name}/`,
+            expected: `remove '${name}' from the manifest or add src/common/skills/${name}/`,
             route: "intake",
             finding_category: "document-drift",
             finding_level: "strict",
@@ -10533,7 +10537,7 @@ function checkSkillProjectionManifest(root: string): CheckResult[] {
         ng(
           "SkillProjection",
           "skill-projection-manifest",
-          `Skill '${name}' exists in src/opencode/skills but is missing from ${IR068_MANIFEST_REL} (IR-068)`,
+          `Skill '${name}' exists in src/common/skills but is missing from ${IR068_MANIFEST_REL} (IR-068)`,
           IR068_MANIFEST_REL,
           undefined,
           {
@@ -10567,7 +10571,7 @@ function checkSkillProjectionManifest(root: string): CheckResult[] {
           ng(
             "SkillProjection",
             "skill-projection-manifest",
-            `Skill '${name}' exists in src/opencode/skills but is missing from .opencode/skills projection (IR-068)`,
+            `Skill '${name}' exists in src/common/skills but is missing from .opencode/skills projection (IR-068)`,
             undefined,
             undefined,
             {
@@ -10607,7 +10611,7 @@ function checkSkillProjectionManifest(root: string): CheckResult[] {
           ng(
             "SkillProjection",
             "skill-projection-manifest",
-            `Skill '${name}' exists in .opencode/skills projection but not in src/opencode/skills (stale junction, IR-068)`,
+            `Skill '${name}' exists in .opencode/skills projection but not in src/common/skills (stale junction, IR-068)`,
             undefined,
             undefined,
             {
@@ -11511,7 +11515,7 @@ async function main(): Promise<void> {
   const projectionSkillsDir = path.join(root, ".opencode", "skills");
   const skillsDirResolution = resolveSkillsDirWithFallback(root);
   const skillsDir = skillsDirResolution.dir;
-  // §7.3 (source): fallback `.opencode/` → `src/opencode/` preserves the
+  // §7.3 (source): fallback `.opencode/` → `src/common/` preserves the
   // legacy behavior so worktrees and existing callers see no regression.
   // §7.4 (installed): inspect the projection directly. Source fallback would
   // hide projection gaps, which is exactly what this profile must detect.
@@ -11664,7 +11668,7 @@ async function main(): Promise<void> {
       info(
         "Inventory",
         "skills-dir-fallback",
-        `Junction projection absent: scanning ${resolveRelative(skillsDir, root)} (SoT src/opencode/skills) instead of .opencode/skills (REQ-018-001, environment=${isInsideWorktree(root) ? "worktree" : "main"}/junction=absent-skills-dir-fallback)`,
+        `Junction projection absent: scanning ${resolveRelative(skillsDir, root)} (SoT src/common/skills) instead of .opencode/skills (REQ-018-001, environment=${isInsideWorktree(root) ? "worktree" : "main"}/junction=absent-skills-dir-fallback)`,
       ),
     );
   }

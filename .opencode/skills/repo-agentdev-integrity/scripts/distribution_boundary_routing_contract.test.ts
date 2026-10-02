@@ -54,7 +54,7 @@ const REPO_ROOT = findRepoRoot(SCRIPT_DIR);
 function resolveWorkflowPath(relAfterOpencode: string): string {
   const projection = path.join(REPO_ROOT, ".opencode", relAfterOpencode);
   if (fs.existsSync(projection)) return projection;
-  const source = path.join(REPO_ROOT, "src", "opencode", relAfterOpencode);
+  const source = path.join(REPO_ROOT, "src", "common", relAfterOpencode);
   return source;
 }
 
@@ -312,7 +312,7 @@ describe("distribution-boundary final gate routing contract", () => {
         {
           text: "<!-- ADF-COVERS(implementation): REQ-029-010 -->",
           lineNumber: 1,
-          filePath: "src/opencode/skills/agentdev-fixture/SKILL.md",
+          filePath: "src/common/skills/agentdev-fixture/SKILL.md",
           projection: "source",
         },
         DEFAULT_DETECTOR_CONFIG,
@@ -327,7 +327,7 @@ describe("distribution-boundary final gate routing contract", () => {
         {
           text: "<!-- ADF-COVERS(implementation): REQ-029-010 -->",
           lineNumber: 1,
-          filePath: "src/opencode/skills/agentdev-fixture/SKILL.md",
+          filePath: "src/common/skills/agentdev-fixture/SKILL.md",
           projection: "source",
         },
         DEFAULT_DETECTOR_CONFIG,

@@ -2,8 +2,8 @@
 // check_content_corruption.ts
 //
 // Deterministic content corruption checker (REQ-010-071). Scans the bodies of
-// distributed commands (src/opencode/commands/agentdev/**) and distributed
-// skills (src/opencode/skills/**) for mechanically detectable corruption:
+// distributed commands (src/common/commands/agentdev/**) and distributed
+// skills (src/common/skills/**) for mechanically detectable corruption:
 //
 //   - heading-hierarchy:  heading level jumps (e.g. h1 -> h3)
 //   - unclosed-code-block: odd number of fenced code block markers
@@ -94,8 +94,8 @@ export function listMarkdownRecursive(dir: string): string[] {
 
 function collectScanFiles(repoRoot: string): string[] {
   const dirs = [
-    path.join(repoRoot, "src", "opencode", "commands", "agentdev"),
-    path.join(repoRoot, "src", "opencode", "skills"),
+    path.join(repoRoot, "src", "common", "commands", "agentdev"),
+    path.join(repoRoot, "src", "common", "skills"),
     path.join(repoRoot, "docs", "designs"),
   ];
   const out: string[] = [];

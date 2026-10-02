@@ -49,7 +49,7 @@ function buildFixtureRepo(
 ): string {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "adf-rename-sym-"));
   for (const s of skills) {
-    const dir = path.join(root, "src", "opencode", "skills", s.name);
+    const dir = path.join(root, "src", "common", "skills", s.name);
     fs.mkdirSync(dir, { recursive: true });
     const nameField = s.frontmatterName ?? s.name;
     fs.writeFileSync(
@@ -373,7 +373,7 @@ describe("checkSkillRenameSymmetry (integration against real repo)", () => {
     const report = checkSkillRenameSymmetry(REPO_ROOT);
     expect(report.stats.path_symmetry_violations).toBe(0);
 
-    const skillsParent = path.join(REPO_ROOT, "src", "opencode", "skills");
+    const skillsParent = path.join(REPO_ROOT, "src", "common", "skills");
     const designsDir = path.join(REPO_ROOT, "docs", "designs", "skills");
     const workflowSkillsWithoutDesign = fs
       .readdirSync(skillsParent)

@@ -95,7 +95,7 @@ function extractSeeAlsoReferences(content: string): string[] {
 // 検証不通過 (hard): description 1024 超過 / 単体 600 超過 / USE FOR 二重保持 /
 //   description 内マーカー語・内部 ID / 簡潔トリガー項欠落（AG-004、command-bound
 //   Workflow Skill のみ肯定検証）/ 300 行超 references の目次欠落。
-// warn: 集約予算（平均 350×N、N = src/opencode/skills 配下の SKILL.md 実ファイル数）。
+// warn: 集約予算（平均 350×N、N = src/common/skills 配下の SKILL.md 実ファイル数）。
 //
 // Pre-existing violations known at introduction are grandfathered via
 // baselines/lint-skills-baseline.json using the same delta-aware semantics as
@@ -122,11 +122,11 @@ const TOC_ANCHOR_RE = /\]\(#/g;
 const TOC_ANCHOR_MIN_LINKS = 5;
 
 function listCommandBoundWorkflowSkills(repoRoot: string): Set<string> {
-  // Workflow Skill = agentdev-workflow-{X} where src/opencode/commands/agentdev/{X}.md
+  // Workflow Skill = agentdev-workflow-{X} where src/common/commands/agentdev/{X}.md
   // exists（deriveSkillClassification と同一の決定的分類。CLI 直依存を避けるため
   // lint_skills 内では同導出を維持する）。
   const bound = new Set<string>();
-  const cmdDir = path.join(repoRoot, "src", "opencode", "commands", "agentdev");
+  const cmdDir = path.join(repoRoot, "src", "common", "commands", "agentdev");
   if (!fs.existsSync(cmdDir)) return bound;
   for (const f of fs.readdirSync(cmdDir)) {
     if (!f.endsWith(".md") || f === "README.md") continue;
@@ -731,8 +731,8 @@ function main(): void {
     explicitRoot: options.root,
   });
   const projectionSkillsDir = path.join(repoRoot, ".opencode", "skills");
-  const sourceSkillsDir = path.join(repoRoot, "src", "opencode", "skills");
-  // worktree junction 未設定環境では projection に配布スキルが存在しないため src/opencode/ へ
+  const sourceSkillsDir = path.join(repoRoot, "src", "common", "skills");
+  // worktree junction 未設定環境では projection に配布スキルが存在しないため src/common/ へ
   // fallback する（REQ-018-001。skills_structure.test.ts と同一の sentinel 基準）。
   // sentinel・src とも無い環境（テスト fixture）は projection を維持する。
   const skillsDir = fs.existsSync(
@@ -768,7 +768,7 @@ function main(): void {
     allResults.push(...results);
   }
 
-  // AG-005 は配布 SoT（src/opencode/skills）を対象に測定する（N = SKILL.md 実ファイル数、
+  // AG-005 は配布 SoT（src/common/skills）を対象に測定する（N = SKILL.md 実ファイル数、
   // RU-0018 層1）。projection スキャンと対象が乖離する環境（main repo junction 有無）で
   // も同一結果となるよう、src が存在する場合は src を、無い場合は fixture の skillsDir
   // を用いる。

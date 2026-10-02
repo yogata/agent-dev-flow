@@ -98,7 +98,7 @@ function buildTestImpactFixture(): string {
     ".opencode/skills/demo/x.test.ts": "x",
     "node_modules/d.test.ts": "d",
     // 任意階層の node_modules 配下も除外する（Issue #2383 (c)、PR 2357 観測の依存テスト混入）
-    "src/opencode/skills/demo/scripts/node_modules/zod/lib/n.test.ts": "n",
+    "src/common/skills/demo/scripts/node_modules/zod/lib/n.test.ts": "n",
     ".worktrees/e.test.ts": "e",
     ".git/f.test.ts": "f",
     "docs/requirements/retired/g.test.ts": "g",

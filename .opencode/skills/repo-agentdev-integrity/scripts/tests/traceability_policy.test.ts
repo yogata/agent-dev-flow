@@ -10,13 +10,13 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { scanCorpus } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/corpus.ts";
-import { runChecks } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/check.ts";
+import { scanCorpus } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/corpus.ts";
+import { runChecks } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/check.ts";
 import {
   DEFAULT_POLICY_FILE,
   parseVerificationPolicy,
   resolveVerificationPolicyFromRoot,
-} from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/verification_scope.ts";
+} from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/verification_scope.ts";
 import { findRepoRoot } from "../cli_utils.ts";
 
 const SCRIPT_DIR = import.meta.dir;
@@ -24,7 +24,7 @@ const REPO_ROOT = findRepoRoot(SCRIPT_DIR);
 const CHECK_CLI = join(
   REPO_ROOT,
   "src",
-  "opencode",
+  "common",
   "skills",
   "agentdev-traceability",
   "scripts",
@@ -258,7 +258,7 @@ describe("旧カタログ機構の不在（RA-002）", () => {
     const libDir = join(
       REPO_ROOT,
       "src",
-      "opencode",
+      "common",
       "skills",
       "agentdev-traceability",
       "scripts",
@@ -275,7 +275,7 @@ describe("旧カタログ機構の不在（RA-002）", () => {
       join(
         REPO_ROOT,
         "src",
-        "opencode",
+        "common",
         "skills",
         "agentdev-traceability",
         "scripts",

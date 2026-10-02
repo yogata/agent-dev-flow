@@ -16,13 +16,13 @@ import * as path from "node:path";
 import {
   AGENTDEV_GH_OPERATION_SPECS,
   runAgentdevGhOperation,
-} from "../../../../../src/opencode/tools/agentdev-gh/index.ts";
-import { buildGhToolEnv, type GhToolEnv } from "../../../../../src/opencode/tools/agentdev-gh/engine.ts";
+} from "../../../../../src/common/tools/agentdev-gh/index.ts";
+import { buildGhToolEnv, type GhToolEnv } from "../../../../../src/common/tools/agentdev-gh/engine.ts";
 import {
   GH_TOOL_OPERATIONS,
   GH_TOOL_OPERATION_CATALOG,
-} from "../../../../../src/opencode/tools/agentdev-gh/contracts.ts";
-import type { GhRunner, GhRunnerReply, GhRunnerRequest } from "../../../../../src/opencode/tools/agentdev-gh/runner.ts";
+} from "../../../../../src/common/tools/agentdev-gh/contracts.ts";
+import type { GhRunner, GhRunnerReply, GhRunnerRequest } from "../../../../../src/common/tools/agentdev-gh/runner.ts";
 import {
   buildTrackingLabels,
   deriveKind,
@@ -35,7 +35,7 @@ import {
   TRACKING_KINDS,
   TRACKING_ROLE_LABEL,
   TRACKING_STATES,
-} from "../../../../../src/opencode/tools/agentdev-gh/tracking-schema.ts";
+} from "../../../../../src/common/tools/agentdev-gh/tracking-schema.ts";
 import {
   createLocalRunner,
   validateLocalIssue,
@@ -604,7 +604,7 @@ describe("ローカルIssueの role 条件付きスキーマ（単一採番空�
 
 describe("上位層の Tool 操作契約経由（直接読み書きなし）", () => {
   const DIST_ROOTS = [
-    path.join("src", "opencode", "skills"),
+    path.join("src", "common", "skills"),
     path.join("src", "opencode", "commands"),
   ];
   const FORBIDDEN = [
@@ -642,7 +642,7 @@ describe("上位層の Tool 操作契約経由（直接読み書きなし）", (
 
   it("追跡Issue操作入口の SKILL と command が自然言語操作種別を網羅する", () => {
     const workflow = fs.readFileSync(
-      path.join("src", "opencode", "skills", "agentdev-workflow-issue", "SKILL.md"),
+      path.join("src", "common", "skills", "agentdev-workflow-issue", "SKILL.md"),
       "utf8",
     );
     for (const op of [
@@ -663,7 +663,7 @@ describe("上位層の Tool 操作契約経由（直接読み書きなし）", (
       }
     }
     const command = fs.readFileSync(
-      path.join("src", "opencode", "commands", "agentdev", "issue.md"),
+      path.join("src", "common", "commands", "agentdev", "issue.md"),
       "utf8",
     );
     for (const op of ["起票", "検索", "参照", "更新", "保留", "再評価", "解決", "反映確認", "クローズ", "再オープン"]) {
@@ -675,13 +675,13 @@ describe("上位層の Tool 操作契約経由（直接読み書きなし）", (
 
   it("GitHub 実装詳細の把握をユーザーに要求せず、リポジトリ内課題ファイルを作成しない境界が明示される", () => {
     const command = fs.readFileSync(
-      path.join("src", "opencode", "commands", "agentdev", "issue.md"),
+      path.join("src", "common", "commands", "agentdev", "issue.md"),
       "utf8",
     );
     expect(command).toContain("ラベル名等の操作文法や GitHub 実装詳細をユーザーに要求しない");
     expect(command).toContain("リポジトリ内に課題ファイルを作成し、commit しない");
     const capability = fs.readFileSync(
-      path.join("src", "opencode", "skills", "agentdev-issue-tracking", "SKILL.md"),
+      path.join("src", "common", "skills", "agentdev-issue-tracking", "SKILL.md"),
       "utf8",
     );
     expect(capability).toContain("サブコマンド、ラベル名、Issue Type、Field 名等の GitHub 実装詳細の把握をユーザーに要求しない");
@@ -689,7 +689,7 @@ describe("上位層の Tool 操作契約経由（直接読み書きなし）", (
 
   it("起票時の事前解決・重複回避・代理確定禁止とコメント正規履歴が定義される", () => {
     const capability = fs.readFileSync(
-      path.join("src", "opencode", "skills", "agentdev-issue-tracking", "SKILL.md"),
+      path.join("src", "common", "skills", "agentdev-issue-tracking", "SKILL.md"),
       "utf8",
     );
     expect(capability).toContain("事前解決の試行");

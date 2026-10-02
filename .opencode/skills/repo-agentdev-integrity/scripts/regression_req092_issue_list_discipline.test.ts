@@ -8,7 +8,7 @@ const REPO_ROOT = join(SCRIPT_DIR, "..", "..", "..", "..");
 const SAFETY_DOC = join(
   REPO_ROOT,
   "src",
-  "opencode",
+  "common",
   "skills",
   "agentdev-issue-management",
   "references",

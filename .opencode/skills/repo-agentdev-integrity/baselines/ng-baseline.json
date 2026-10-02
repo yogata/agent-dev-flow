@@ -60,7 +60,7 @@
     {
       "category": "CanonicalConflict",
       "check": "gh-direct-invocation",
-      "file": "src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md",
+      "file": "src/common/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md",
       "evidence": "gh pr view",
       "count": 1,
       "provenance": "legacy",
@@ -159,7 +159,7 @@
     {
       "category": "CaptureBoundary",
       "check": "command-capture-duty",
-      "file": "src/opencode/commands/agentdev/req-save.md",
+      "file": "src/common/commands/agentdev/req-save.md",
       "evidence": null,
       "count": 1,
       "provenance": "legacy",
@@ -1554,7 +1554,7 @@
     {
       "category": "ObsoleteVocabulary",
       "check": "obsolete-vocabulary-current-use",
-      "file": "src/opencode/skills/agentdev-doc-writing/references/rewrite-patterns.md",
+      "file": "src/common/skills/agentdev-doc-writing/references/rewrite-patterns.md",
       "evidence": "req-adr-kind-enumeration:REQ/ADR/",
       "count": 1,
       "provenance": "issue-2372-ir065-initial-baseline",
@@ -1860,7 +1860,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114",
       "count": 30,
       "provenance": "legacy",
@@ -1869,7 +1869,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-064",
       "count": 2,
       "provenance": "legacy",
@@ -1878,7 +1878,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-053",
       "count": 1,
       "provenance": "legacy",
@@ -1887,7 +1887,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0130-026",
       "count": 2,
       "provenance": "legacy",
@@ -1896,7 +1896,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0148-014",
       "count": 1,
       "provenance": "legacy",
@@ -1905,7 +1905,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0130",
       "count": 2,
       "provenance": "legacy",
@@ -1914,7 +1914,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0148",
       "count": 3,
       "provenance": "legacy",
@@ -1923,7 +1923,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-065",
       "count": 2,
       "provenance": "legacy",
@@ -1932,7 +1932,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-067",
       "count": 1,
       "provenance": "legacy",
@@ -1941,7 +1941,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-066",
       "count": 1,
       "provenance": "legacy",
@@ -1950,7 +1950,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-088",
       "count": 1,
       "provenance": "legacy",
@@ -1959,7 +1959,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-093",
       "count": 1,
       "provenance": "legacy",
@@ -1968,7 +1968,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-060",
       "count": 1,
       "provenance": "legacy",
@@ -1977,7 +1977,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0162-003",
       "count": 2,
       "provenance": "legacy",
@@ -1986,7 +1986,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0162",
       "count": 5,
       "provenance": "legacy",
@@ -1995,7 +1995,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0162-002",
       "count": 2,
       "provenance": "legacy",
@@ -2004,7 +2004,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-073",
       "count": 2,
       "provenance": "legacy",
@@ -2013,7 +2013,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-098",
       "count": 1,
       "provenance": "legacy",
@@ -2022,7 +2022,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0162-004",
       "count": 1,
       "provenance": "legacy",
@@ -2031,7 +2031,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0163",
       "count": 7,
       "provenance": "legacy",
@@ -2040,7 +2040,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0163-001",
       "count": 3,
       "provenance": "legacy",
@@ -2049,7 +2049,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0163-002",
       "count": 2,
       "provenance": "legacy",
@@ -2058,7 +2058,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0163-003",
       "count": 1,
       "provenance": "legacy",
@@ -2067,7 +2067,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-102",
       "count": 4,
       "provenance": "legacy",
@@ -2076,7 +2076,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "ADR-0138",
       "count": 4,
       "provenance": "legacy",
@@ -2085,7 +2085,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0151-006",
       "count": 2,
       "provenance": "legacy",
@@ -2094,7 +2094,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0151",
       "count": 10,
       "provenance": "legacy",
@@ -2103,7 +2103,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "ADR-0132",
       "count": 2,
       "provenance": "legacy",
@@ -2112,7 +2112,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-082",
       "count": 1,
       "provenance": "legacy",
@@ -2121,7 +2121,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0151-008",
       "count": 1,
       "provenance": "legacy",
@@ -2130,7 +2130,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-049",
       "count": 1,
       "provenance": "legacy",
@@ -2139,7 +2139,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-100",
       "count": 2,
       "provenance": "legacy",
@@ -2148,7 +2148,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0151-001",
       "count": 1,
       "provenance": "legacy",
@@ -2157,7 +2157,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0151-002",
       "count": 1,
       "provenance": "legacy",
@@ -2166,7 +2166,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-095",
       "count": 1,
       "provenance": "legacy",
@@ -2175,7 +2175,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0151-003",
       "count": 2,
       "provenance": "legacy",
@@ -2184,7 +2184,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0148-015",
       "count": 2,
       "provenance": "legacy",
@@ -2193,7 +2193,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0151-004",
       "count": 1,
       "provenance": "legacy",
@@ -2202,7 +2202,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0151-005",
       "count": 1,
       "provenance": "legacy",
@@ -2211,7 +2211,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "ADR-0137",
       "count": 1,
       "provenance": "legacy",
@@ -2220,7 +2220,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-097",
       "count": 1,
       "provenance": "legacy",
@@ -2229,7 +2229,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-085",
       "count": 1,
       "provenance": "legacy",
@@ -2238,7 +2238,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-106",
       "count": 1,
       "provenance": "legacy",
@@ -2247,7 +2247,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-105",
       "count": 1,
       "provenance": "legacy",
@@ -2256,7 +2256,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-104",
       "count": 1,
       "provenance": "legacy",
@@ -2265,7 +2265,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-101",
       "count": 1,
       "provenance": "legacy",
@@ -2274,7 +2274,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "file": "src/common/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-107",
       "count": 1,
       "provenance": "legacy",
@@ -2283,7 +2283,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-open.md",
+      "file": "src/common/commands/agentdev/case-open.md",
       "evidence": "REQ-0132-025",
       "count": 1,
       "provenance": "legacy",
@@ -2292,7 +2292,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-open.md",
+      "file": "src/common/commands/agentdev/case-open.md",
       "evidence": "REQ-0132",
       "count": 1,
       "provenance": "legacy",
@@ -2301,7 +2301,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-run.md",
+      "file": "src/common/commands/agentdev/case-run.md",
       "evidence": "REQ-0162-002",
       "count": 2,
       "provenance": "legacy",
@@ -2310,7 +2310,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/commands/agentdev/case-run.md",
+      "file": "src/common/commands/agentdev/case-run.md",
       "evidence": "REQ-0162",
       "count": 2,
       "provenance": "legacy",
@@ -2319,7 +2319,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-adr-file-manager/SKILL.md",
+      "file": "src/common/skills/agentdev-adr-file-manager/SKILL.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -2328,7 +2328,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-adr-file-manager/SKILL.md",
+      "file": "src/common/skills/agentdev-adr-file-manager/SKILL.md",
       "evidence": "REQ-0112-048",
       "count": 2,
       "provenance": "legacy",
@@ -2337,7 +2337,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-adr-file-manager/SKILL.md",
+      "file": "src/common/skills/agentdev-adr-file-manager/SKILL.md",
       "evidence": "REQ-0112",
       "count": 2,
       "provenance": "legacy",
@@ -2346,7 +2346,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-adr-guidelines/SKILL.md",
+      "file": "src/common/skills/agentdev-adr-guidelines/SKILL.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -2355,7 +2355,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-architecture-advisory/references/architecture-review-delegation.md",
+      "file": "src/common/skills/agentdev-architecture-advisory/references/architecture-review-delegation.md",
       "evidence": "REQ-0162-002",
       "count": 2,
       "provenance": "legacy",
@@ -2364,7 +2364,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-architecture-advisory/references/architecture-review-delegation.md",
+      "file": "src/common/skills/agentdev-architecture-advisory/references/architecture-review-delegation.md",
       "evidence": "REQ-0162",
       "count": 2,
       "provenance": "legacy",
@@ -2373,7 +2373,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-architecture-advisory/references/architecture-review-delegation.md",
+      "file": "src/common/skills/agentdev-architecture-advisory/references/architecture-review-delegation.md",
       "evidence": "ADR-0136",
       "count": 1,
       "provenance": "legacy",
@@ -2382,7 +2382,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-backlog-integration/SKILL.md",
+      "file": "src/common/skills/agentdev-backlog-integration/SKILL.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -2391,7 +2391,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
+      "file": "src/common/skills/agentdev-case-run-execution-adapter/SKILL.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -2400,7 +2400,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
+      "file": "src/common/skills/agentdev-case-run-execution-adapter/SKILL.md",
       "evidence": "REQ-0162-002",
       "count": 3,
       "provenance": "legacy",
@@ -2409,7 +2409,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
+      "file": "src/common/skills/agentdev-case-run-execution-adapter/SKILL.md",
       "evidence": "REQ-0162",
       "count": 4,
       "provenance": "legacy",
@@ -2418,7 +2418,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
+      "file": "src/common/skills/agentdev-case-run-execution-adapter/SKILL.md",
       "evidence": "REQ-0162-004",
       "count": 1,
       "provenance": "legacy",
@@ -2427,7 +2427,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
+      "file": "src/common/skills/agentdev-case-run-execution-adapter/SKILL.md",
       "evidence": "REQ-0163",
       "count": 5,
       "provenance": "legacy",
@@ -2436,7 +2436,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
+      "file": "src/common/skills/agentdev-case-run-execution-adapter/SKILL.md",
       "evidence": "REQ-0163-001",
       "count": 2,
       "provenance": "legacy",
@@ -2445,7 +2445,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
+      "file": "src/common/skills/agentdev-case-run-execution-adapter/SKILL.md",
       "evidence": "REQ-0163-002",
       "count": 1,
       "provenance": "legacy",
@@ -2454,7 +2454,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
+      "file": "src/common/skills/agentdev-case-run-execution-adapter/SKILL.md",
       "evidence": "REQ-0163-003",
       "count": 1,
       "provenance": "legacy",
@@ -2463,7 +2463,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
+      "file": "src/common/skills/agentdev-case-run-execution-adapter/SKILL.md",
       "evidence": "REQ-0149-012",
       "count": 1,
       "provenance": "legacy",
@@ -2472,7 +2472,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
+      "file": "src/common/skills/agentdev-case-run-execution-adapter/SKILL.md",
       "evidence": "REQ-0149",
       "count": 1,
       "provenance": "legacy",
@@ -2481,7 +2481,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/references/harness-delegation.md",
+      "file": "src/common/skills/agentdev-case-run-execution-adapter/references/harness-delegation.md",
       "evidence": "REQ-0162-002",
       "count": 1,
       "provenance": "legacy",
@@ -2490,7 +2490,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/references/harness-delegation.md",
+      "file": "src/common/skills/agentdev-case-run-execution-adapter/references/harness-delegation.md",
       "evidence": "REQ-0162",
       "count": 2,
       "provenance": "legacy",
@@ -2499,7 +2499,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/references/harness-delegation.md",
+      "file": "src/common/skills/agentdev-case-run-execution-adapter/references/harness-delegation.md",
       "evidence": "REQ-0162-004",
       "count": 1,
       "provenance": "legacy",
@@ -2508,7 +2508,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-command-authoring/SKILL.md",
+      "file": "src/common/skills/agentdev-command-authoring/SKILL.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -2517,7 +2517,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-command-creator/SKILL.md",
+      "file": "src/common/skills/agentdev-command-creator/SKILL.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -2526,7 +2526,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-conventional-commits/SKILL.md",
+      "file": "src/common/skills/agentdev-conventional-commits/SKILL.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -2535,7 +2535,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-doc-map/SKILL.md",
+      "file": "src/common/skills/agentdev-doc-map/SKILL.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -2544,7 +2544,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md",
+      "file": "src/common/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md",
       "evidence": "REQ-0140-033",
       "count": 5,
       "provenance": "legacy",
@@ -2553,7 +2553,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md",
+      "file": "src/common/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md",
       "evidence": "REQ-0140",
       "count": 12,
       "provenance": "legacy",
@@ -2562,7 +2562,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md",
+      "file": "src/common/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md",
       "evidence": "REQ-0140-026",
       "count": 1,
       "provenance": "legacy",
@@ -2571,7 +2571,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md",
+      "file": "src/common/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md",
       "evidence": "REQ-0140-034",
       "count": 4,
       "provenance": "legacy",
@@ -2580,7 +2580,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md",
+      "file": "src/common/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md",
       "evidence": "repo-local",
       "count": 1,
       "provenance": "legacy",
@@ -2589,7 +2589,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md",
+      "file": "src/common/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md",
       "evidence": "REQ-0140-035",
       "count": 1,
       "provenance": "legacy",
@@ -2598,7 +2598,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md",
+      "file": "src/common/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md",
       "evidence": "REQ-0140-036",
       "count": 1,
       "provenance": "legacy",
@@ -2607,7 +2607,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-epic-tracker/SKILL.md",
+      "file": "src/common/skills/agentdev-epic-tracker/SKILL.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -2616,7 +2616,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-git-worktree/SKILL.md",
+      "file": "src/common/skills/agentdev-git-worktree/SKILL.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -2625,7 +2625,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
+      "file": "src/common/skills/agentdev-inspect-skills/SKILL.md",
       "evidence": "docs/designs/",
       "count": 2,
       "provenance": "legacy",
@@ -2634,7 +2634,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
+      "file": "src/common/skills/agentdev-inspect-skills/SKILL.md",
       "evidence": "src/opencode/",
       "count": 2,
       "provenance": "legacy",
@@ -2643,7 +2643,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
+      "file": "src/common/skills/agentdev-inspect-skills/SKILL.md",
       "evidence": "REQ-0125-003",
       "count": 6,
       "provenance": "legacy",
@@ -2652,7 +2652,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
+      "file": "src/common/skills/agentdev-inspect-skills/SKILL.md",
       "evidence": "REQ-0119-034",
       "count": 3,
       "provenance": "legacy",
@@ -2661,7 +2661,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
+      "file": "src/common/skills/agentdev-inspect-skills/SKILL.md",
       "evidence": "REQ-0125",
       "count": 6,
       "provenance": "legacy",
@@ -2670,7 +2670,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
+      "file": "src/common/skills/agentdev-inspect-skills/SKILL.md",
       "evidence": "REQ-0119",
       "count": 4,
       "provenance": "legacy",
@@ -2679,7 +2679,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
+      "file": "src/common/skills/agentdev-inspect-skills/SKILL.md",
       "evidence": "REQ-0119-033",
       "count": 2,
       "provenance": "legacy",
@@ -2688,7 +2688,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
+      "file": "src/common/skills/agentdev-inspect-skills/SKILL.md",
       "evidence": "REQ-0125-005",
       "count": 1,
       "provenance": "legacy",
@@ -2697,7 +2697,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
+      "file": "src/common/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
       "evidence": "REQ-0119-033",
       "count": 7,
       "provenance": "legacy",
@@ -2706,7 +2706,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
+      "file": "src/common/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
       "evidence": "REQ-0119-034",
       "count": 8,
       "provenance": "legacy",
@@ -2715,7 +2715,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
+      "file": "src/common/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
       "evidence": "REQ-0119",
       "count": 17,
       "provenance": "legacy",
@@ -2724,7 +2724,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
+      "file": "src/common/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
       "evidence": "REQ-0125-003",
       "count": 7,
       "provenance": "legacy",
@@ -2733,7 +2733,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
+      "file": "src/common/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
       "evidence": "REQ-0125-004",
       "count": 1,
       "provenance": "legacy",
@@ -2742,7 +2742,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
+      "file": "src/common/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
       "evidence": "REQ-0125",
       "count": 10,
       "provenance": "legacy",
@@ -2751,7 +2751,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
+      "file": "src/common/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
       "evidence": "ADR-0107",
       "count": 2,
       "provenance": "legacy",
@@ -2760,7 +2760,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
+      "file": "src/common/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
       "evidence": "src/opencode/",
       "count": 2,
       "provenance": "legacy",
@@ -2769,7 +2769,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
+      "file": "src/common/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
       "evidence": "REQ-0125-005",
       "count": 2,
       "provenance": "legacy",
@@ -2778,7 +2778,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
+      "file": "src/common/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
       "evidence": "REQ-0119-035",
       "count": 1,
       "provenance": "legacy",
@@ -2787,7 +2787,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
+      "file": "src/common/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
       "evidence": "REQ-0119-036",
       "count": 1,
       "provenance": "legacy",
@@ -2796,7 +2796,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-intake-pipeline/SKILL.md",
+      "file": "src/common/skills/agentdev-intake-pipeline/SKILL.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -2805,7 +2805,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-issue-management/SKILL.md",
+      "file": "src/common/skills/agentdev-issue-management/SKILL.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -2814,7 +2814,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-issue-management/references/issue-operation-safety.md",
+      "file": "src/common/skills/agentdev-issue-management/references/issue-operation-safety.md",
       "evidence": "REQ-0132-024",
       "count": 1,
       "provenance": "legacy",
@@ -2823,7 +2823,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-learning-capture/SKILL.md",
+      "file": "src/common/skills/agentdev-learning-capture/SKILL.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -2832,7 +2832,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-learning-pipeline/SKILL.md",
+      "file": "src/common/skills/agentdev-learning-pipeline/SKILL.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -2841,7 +2841,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-project-extensions/SKILL.md",
+      "file": "src/common/skills/agentdev-project-extensions/SKILL.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -2850,7 +2850,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-project-extensions/SKILL.md",
+      "file": "src/common/skills/agentdev-project-extensions/SKILL.md",
       "evidence": "REQ-0147-001",
       "count": 5,
       "provenance": "legacy",
@@ -2859,7 +2859,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-project-extensions/SKILL.md",
+      "file": "src/common/skills/agentdev-project-extensions/SKILL.md",
       "evidence": "REQ-0147",
       "count": 5,
       "provenance": "legacy",
@@ -2868,7 +2868,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-project-extensions/SKILL.md",
+      "file": "src/common/skills/agentdev-project-extensions/SKILL.md",
       "evidence": "REQ-0119-034",
       "count": 5,
       "provenance": "legacy",
@@ -2877,7 +2877,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-project-extensions/SKILL.md",
+      "file": "src/common/skills/agentdev-project-extensions/SKILL.md",
       "evidence": "REQ-0119",
       "count": 5,
       "provenance": "legacy",
@@ -2886,7 +2886,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-quality-gates/SKILL.md",
+      "file": "src/common/skills/agentdev-quality-gates/SKILL.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -2895,7 +2895,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md",
+      "file": "src/common/skills/agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md",
       "evidence": "REQ-0131-031",
       "count": 2,
       "provenance": "legacy",
@@ -2904,7 +2904,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md",
+      "file": "src/common/skills/agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md",
       "evidence": "REQ-0131",
       "count": 2,
       "provenance": "legacy",
@@ -2913,7 +2913,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md",
+      "file": "src/common/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md",
       "evidence": "REQ-0146-015",
       "count": 3,
       "provenance": "legacy",
@@ -2922,7 +2922,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md",
+      "file": "src/common/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md",
       "evidence": "src/opencode/",
       "count": 1,
       "provenance": "legacy",
@@ -2931,7 +2931,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md",
+      "file": "src/common/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md",
       "evidence": "REQ-0146-011",
       "count": 4,
       "provenance": "legacy",
@@ -2940,7 +2940,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md",
+      "file": "src/common/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md",
       "evidence": "REQ-0146",
       "count": 6,
       "provenance": "legacy",
@@ -2949,7 +2949,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-req-analysis/SKILL.md",
+      "file": "src/common/skills/agentdev-req-analysis/SKILL.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -2958,7 +2958,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-req-analysis/references/investigation-scope-refinement.md",
+      "file": "src/common/skills/agentdev-req-analysis/references/investigation-scope-refinement.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -2967,7 +2967,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-req-analysis/references/test-strategy-numeric-threshold-guide.md",
+      "file": "src/common/skills/agentdev-req-analysis/references/test-strategy-numeric-threshold-guide.md",
       "evidence": "REQ-0131-031",
       "count": 2,
       "provenance": "legacy",
@@ -2976,7 +2976,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-req-analysis/references/test-strategy-numeric-threshold-guide.md",
+      "file": "src/common/skills/agentdev-req-analysis/references/test-strategy-numeric-threshold-guide.md",
       "evidence": "REQ-0131",
       "count": 2,
       "provenance": "legacy",
@@ -2985,7 +2985,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-req-analysis/references/test-strategy-numeric-threshold-guide.md",
+      "file": "src/common/skills/agentdev-req-analysis/references/test-strategy-numeric-threshold-guide.md",
       "evidence": "src/opencode/",
       "count": 1,
       "provenance": "legacy",
@@ -2994,7 +2994,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-req-file-manager/SKILL.md",
+      "file": "src/common/skills/agentdev-req-file-manager/SKILL.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -3003,7 +3003,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-req-file-manager/references/create-append-update-flow.md",
+      "file": "src/common/skills/agentdev-req-file-manager/references/create-append-update-flow.md",
       "evidence": "REQ-0113-010",
       "count": 1,
       "provenance": "legacy",
@@ -3012,7 +3012,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-req-file-manager/references/create-append-update-flow.md",
+      "file": "src/common/skills/agentdev-req-file-manager/references/create-append-update-flow.md",
       "evidence": "REQ-0113",
       "count": 1,
       "provenance": "legacy",
@@ -3021,7 +3021,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-req-file-manager/references/matching-and-merge.md",
+      "file": "src/common/skills/agentdev-req-file-manager/references/matching-and-merge.md",
       "evidence": "REQ-0113-010",
       "count": 1,
       "provenance": "legacy",
@@ -3030,7 +3030,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-req-file-manager/references/matching-and-merge.md",
+      "file": "src/common/skills/agentdev-req-file-manager/references/matching-and-merge.md",
       "evidence": "REQ-0113",
       "count": 1,
       "provenance": "legacy",
@@ -3039,7 +3039,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-req-file-manager/references/numbering-and-validation.md",
+      "file": "src/common/skills/agentdev-req-file-manager/references/numbering-and-validation.md",
       "evidence": "REQ-0113-010",
       "count": 1,
       "provenance": "legacy",
@@ -3048,7 +3048,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-req-file-manager/references/numbering-and-validation.md",
+      "file": "src/common/skills/agentdev-req-file-manager/references/numbering-and-validation.md",
       "evidence": "REQ-0113",
       "count": 1,
       "provenance": "legacy",
@@ -3057,7 +3057,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-req-file-manager/references/numbering-and-validation.md",
+      "file": "src/common/skills/agentdev-req-file-manager/references/numbering-and-validation.md",
       "evidence": "src/opencode/",
       "count": 1,
       "provenance": "legacy",
@@ -3066,7 +3066,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-req-structure-diagnostics/SKILL.md",
+      "file": "src/common/skills/agentdev-req-structure-diagnostics/SKILL.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -3075,7 +3075,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-skill-authoring/SKILL.md",
+      "file": "src/common/skills/agentdev-skill-authoring/SKILL.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -3084,7 +3084,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-skill-authoring/SKILL.md",
+      "file": "src/common/skills/agentdev-skill-authoring/SKILL.md",
       "evidence": "REQ-0113-010",
       "count": 2,
       "provenance": "legacy",
@@ -3093,7 +3093,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-skill-authoring/SKILL.md",
+      "file": "src/common/skills/agentdev-skill-authoring/SKILL.md",
       "evidence": "REQ-0113",
       "count": 2,
       "provenance": "legacy",
@@ -3102,7 +3102,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-skill-authoring/references/design-principles.md",
+      "file": "src/common/skills/agentdev-skill-authoring/references/design-principles.md",
       "evidence": "REQ-0113-010",
       "count": 2,
       "provenance": "legacy",
@@ -3111,7 +3111,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-skill-authoring/references/design-principles.md",
+      "file": "src/common/skills/agentdev-skill-authoring/references/design-principles.md",
       "evidence": "REQ-0113",
       "count": 2,
       "provenance": "legacy",
@@ -3120,7 +3120,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-skill-authoring/references/development-workflow.md",
+      "file": "src/common/skills/agentdev-skill-authoring/references/development-workflow.md",
       "evidence": "REQ-0113-010",
       "count": 1,
       "provenance": "legacy",
@@ -3129,7 +3129,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-skill-authoring/references/development-workflow.md",
+      "file": "src/common/skills/agentdev-skill-authoring/references/development-workflow.md",
       "evidence": "REQ-0113",
       "count": 1,
       "provenance": "legacy",
@@ -3138,7 +3138,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-skill-authoring/references/review-protocol.md",
+      "file": "src/common/skills/agentdev-skill-authoring/references/review-protocol.md",
       "evidence": "REQ-0113-010",
       "count": 1,
       "provenance": "legacy",
@@ -3147,7 +3147,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-skill-authoring/references/review-protocol.md",
+      "file": "src/common/skills/agentdev-skill-authoring/references/review-protocol.md",
       "evidence": "REQ-0113",
       "count": 1,
       "provenance": "legacy",
@@ -3156,7 +3156,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-skill-authoring/references/review-protocol.md",
+      "file": "src/common/skills/agentdev-skill-authoring/references/review-protocol.md",
       "evidence": "src/opencode/",
       "count": 1,
       "provenance": "legacy",
@@ -3165,7 +3165,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-workflow-lifecycle/SKILL.md",
+      "file": "src/common/skills/agentdev-workflow-lifecycle/SKILL.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -3174,7 +3174,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-workflow-orchestration/SKILL.md",
+      "file": "src/common/skills/agentdev-workflow-orchestration/SKILL.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -3183,7 +3183,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-workflow-orchestration/references/capture-boundaries.md",
+      "file": "src/common/skills/agentdev-workflow-orchestration/references/capture-boundaries.md",
       "evidence": "REQ-0163-002",
       "count": 2,
       "provenance": "legacy",
@@ -3192,7 +3192,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-workflow-orchestration/references/capture-boundaries.md",
+      "file": "src/common/skills/agentdev-workflow-orchestration/references/capture-boundaries.md",
       "evidence": "REQ-0163",
       "count": 3,
       "provenance": "legacy",
@@ -3201,7 +3201,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-workflow-orchestration/references/capture-boundaries.md",
+      "file": "src/common/skills/agentdev-workflow-orchestration/references/capture-boundaries.md",
       "evidence": "REQ-0163-001",
       "count": 1,
       "provenance": "legacy",
@@ -3210,7 +3210,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-workflow-orchestration/references/capture-boundaries.md",
+      "file": "src/common/skills/agentdev-workflow-orchestration/references/capture-boundaries.md",
       "evidence": "REQ-0149-012",
       "count": 1,
       "provenance": "legacy",
@@ -3219,7 +3219,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-workflow-orchestration/references/capture-boundaries.md",
+      "file": "src/common/skills/agentdev-workflow-orchestration/references/capture-boundaries.md",
       "evidence": "REQ-0149",
       "count": 1,
       "provenance": "legacy",
@@ -3228,7 +3228,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-workflow-routing/SKILL.md",
+      "file": "src/common/skills/agentdev-workflow-routing/SKILL.md",
       "evidence": "docs/designs/",
       "count": 1,
       "provenance": "legacy",
@@ -3237,7 +3237,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-workflow-templates/SKILL.md",
+      "file": "src/common/skills/agentdev-workflow-templates/SKILL.md",
       "evidence": "REQ-0132-025",
       "count": 1,
       "provenance": "legacy",
@@ -3246,7 +3246,7 @@
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
-      "file": "src/opencode/skills/agentdev-workflow-templates/SKILL.md",
+      "file": "src/common/skills/agentdev-workflow-templates/SKILL.md",
       "evidence": "REQ-0132",
       "count": 1,
       "provenance": "legacy",
@@ -3327,7 +3327,7 @@
     {
       "category": "UnresolvedPlaceholder",
       "check": "unresolved-placeholder",
-      "file": "src/opencode/skills/agentdev-adversarial-review/SKILL.md",
+      "file": "src/common/skills/agentdev-adversarial-review/SKILL.md",
       "evidence": "id-placeholder:REQ-{NNNN}",
       "count": 11,
       "provenance": "issue-2372-ir064-initial-baseline",
@@ -3336,7 +3336,7 @@
     {
       "category": "UnresolvedPlaceholder",
       "check": "unresolved-placeholder",
-      "file": "src/opencode/skills/agentdev-backlog-integration/SKILL.md",
+      "file": "src/common/skills/agentdev-backlog-integration/SKILL.md",
       "evidence": "id-placeholder:REQ-{NNNN}",
       "count": 11,
       "provenance": "issue-2372-ir064-initial-baseline",
@@ -3345,7 +3345,7 @@
     {
       "category": "UnresolvedPlaceholder",
       "check": "unresolved-placeholder",
-      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
+      "file": "src/common/skills/agentdev-case-run-execution-adapter/SKILL.md",
       "evidence": "id-placeholder:REQ-{NNNN}",
       "count": 11,
       "provenance": "issue-2372-ir064-initial-baseline",
@@ -3354,7 +3354,7 @@
     {
       "category": "UnresolvedPlaceholder",
       "check": "unresolved-placeholder",
-      "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
+      "file": "src/common/skills/agentdev-inspect-skills/SKILL.md",
       "evidence": "id-placeholder:IR-{NNN}",
       "count": 2,
       "provenance": "issue-2372-ir064-initial-baseline",
@@ -3363,7 +3363,7 @@
     {
       "category": "UnresolvedPlaceholder",
       "check": "unresolved-placeholder",
-      "file": "src/opencode/skills/agentdev-intake-pipeline/SKILL.md",
+      "file": "src/common/skills/agentdev-intake-pipeline/SKILL.md",
       "evidence": "id-placeholder:REQ-{NNNN}",
       "count": 4,
       "provenance": "issue-2372-ir064-initial-baseline",
@@ -3372,7 +3372,7 @@
     {
       "category": "UnresolvedPlaceholder",
       "check": "unresolved-placeholder",
-      "file": "src/opencode/skills/agentdev-req-analysis/references/pass-criteria-writing-guide.md",
+      "file": "src/common/skills/agentdev-req-analysis/references/pass-criteria-writing-guide.md",
       "evidence": "id-placeholder:REQ-{NNNN}",
       "count": 5,
       "provenance": "issue-2372-ir064-initial-baseline",
@@ -3381,7 +3381,7 @@
     {
       "category": "UnresolvedPlaceholder",
       "check": "unresolved-placeholder",
-      "file": "src/opencode/skills/agentdev-req-analysis/references/test-strategy-numeric-threshold-guide.md",
+      "file": "src/common/skills/agentdev-req-analysis/references/test-strategy-numeric-threshold-guide.md",
       "evidence": "id-placeholder:TS-{NNN}",
       "count": 2,
       "provenance": "issue-2372-ir064-initial-baseline",
@@ -3390,7 +3390,7 @@
     {
       "category": "UnresolvedPlaceholder",
       "check": "unresolved-placeholder",
-      "file": "src/opencode/skills/agentdev-workflow-case-close/SKILL.md",
+      "file": "src/common/skills/agentdev-workflow-case-close/SKILL.md",
       "evidence": "id-placeholder:IR-{NNN}",
       "count": 1,
       "provenance": "issue-2372-ir064-initial-baseline",
@@ -3399,7 +3399,7 @@
     {
       "category": "UnresolvedPlaceholder",
       "check": "unresolved-placeholder",
-      "file": "src/opencode/skills/agentdev-workflow-case-run/SKILL.md",
+      "file": "src/common/skills/agentdev-workflow-case-run/SKILL.md",
       "evidence": "id-placeholder:DEC-{N}",
       "count": 1,
       "provenance": "issue-2372-ir064-initial-baseline",

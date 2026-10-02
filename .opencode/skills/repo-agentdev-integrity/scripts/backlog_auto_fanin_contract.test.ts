@@ -35,7 +35,7 @@ const REPO_ROOT = findRepoRoot(SCRIPT_DIR);
 function resolveSkillFile(...segments: string[]): string {
   const projection = path.join(REPO_ROOT, ".opencode", "skills", ...segments);
   if (fs.existsSync(projection)) return projection;
-  return path.join(REPO_ROOT, "src", "opencode", "skills", ...segments);
+  return path.join(REPO_ROOT, "src", "common", "skills", ...segments);
 }
 
 const SPEC_PATH = path.join(

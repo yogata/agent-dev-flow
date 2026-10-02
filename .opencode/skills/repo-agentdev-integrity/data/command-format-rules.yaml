@@ -33,7 +33,7 @@ top_level_step_rules:
     Top-level Step headings must be integer-based. Heading forms that mix
     alphabet letters or non-integer tokens at the top level are forbidden.
   scan_dirs:
-    - src/opencode/commands/agentdev
+    - src/common/commands/agentdev
     - .opencode/commands/repo
   heading_regex: "^###\\s+Step\\s+(\\d+)(?:[〜-](\\d+))?\\s*:"
   forbidden_heading_regex: "^###\\s+Step\\s+[A-Za-z]"

@@ -103,7 +103,7 @@ interface SrcEnvOptions {
 }
 
 // AG-005 (Issue #2179) fixture environment: distribution SoT layout with
-// src/opencode/skills fixtures and src/opencode/commands/agentdev command
+// src/common/skills fixtures and src/common/commands/agentdev command
 // stubs (workflow trigger binding source). The projection .opencode/skills
 // stays empty so the main scan falls back to src (same sentinel rule as the
 // worktree junction-absent case).
@@ -129,7 +129,7 @@ function setupSrcEnv(
 
   fs.mkdirSync(path.join(tempDir, ".opencode", "skills"), { recursive: true });
 
-  const srcSkillsDir = path.join(tempDir, "src", "opencode", "skills");
+  const srcSkillsDir = path.join(tempDir, "src", "common", "skills");
   for (const fixture of options.skills) {
     const skillDir = path.join(srcSkillsDir, fixture.name);
     fs.mkdirSync(skillDir, { recursive: true });
@@ -143,7 +143,7 @@ function setupSrcEnv(
     fs.writeFileSync(path.join(refsDir, "big.md"), contents);
   }
 
-  const cmdDir = path.join(tempDir, "src", "opencode", "commands", "agentdev");
+  const cmdDir = path.join(tempDir, "src", "common", "commands", "agentdev");
   fs.mkdirSync(cmdDir, { recursive: true });
   for (const cmd of options.commands) {
     fs.writeFileSync(path.join(cmdDir, `${cmd}.md`), `# ${cmd}\n`);
@@ -449,14 +449,14 @@ describe("lint_skills.ts", () => {
 
     beforeAll(() => {
       // worktree 環境の模倣: projection に sentinel が無く（junction 未伝播）、
-      // src/opencode/skills に配布スキルがある。scanner は src/ へ fallback する。
+      // src/common/skills に配布スキルがある。scanner は src/ へ fallback する。
       fallbackEnv = setupTempEnv([
         { name: "agentdev-projection-only", content: VALID_SKILL_MD },
       ]);
       const srcSkillsDir = path.join(
         fallbackEnv.tempDir,
         "src",
-        "opencode",
+        "common",
         "skills",
       );
       const srcSkillDir = path.join(srcSkillsDir, "agentdev-src-skill");
@@ -468,7 +468,7 @@ describe("lint_skills.ts", () => {
       tempDirs.push(fallbackEnv.tempDir);
     });
 
-    it("scans src/opencode/skills when projection lacks the sentinel skill", async () => {
+    it("scans src/common/skills when projection lacks the sentinel skill", async () => {
       const result = await runScript(fallbackEnv.scriptPath, ["--dry-run"]);
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain("agentdev-src-skill");
@@ -590,7 +590,7 @@ describe("lint_skills.ts", () => {
       const tocRefDir = path.join(
         agEnv.tempDir,
         "src",
-        "opencode",
+        "common",
         "skills",
         "agentdev-ag-toc",
         "references",

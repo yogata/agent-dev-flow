@@ -8,8 +8,8 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { scanCorpus } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/corpus.ts";
-import { coverageByArtifact, coverageByRequirement } from "../../../../../src/opencode/skills/agentdev-traceability/scripts/lib/query.ts";
+import { scanCorpus } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/corpus.ts";
+import { coverageByArtifact, coverageByRequirement } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/query.ts";
 
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `trace-cov-${crypto.randomUUID().slice(0, 8)}`;
