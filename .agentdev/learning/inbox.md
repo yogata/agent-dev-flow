@@ -81,6 +81,24 @@
 
 ---
 
+## 2026-10-03: draft target_design パスが実在パスと不一致（ドメイン誤記）でも合意済み宣言として流れ、case-open 実測で発見・実在パスへ解決した
+
+- **問題事象**: draft AG-015（OU-014）の target_design は `docs/designs/responsibilities/checker-execution-contracts.md` を指定するが、実在パスは `docs/designs/integrity/checker-execution-contracts.md`（docs/designs/README.md integrity 表の正規 Design）。responsibilities 配下に同 slug のファイルは存在しない。パス誤記のまま req-define の合意済み artifact_actions（ACT-DESIGN-009）に含まれていた
+- **発生局面**: case-open STEP-2/3 対象ファイル実測（Root Case #3355・Definition Package 生成時）
+- **検知方法**: 対象ファイルの read（File not found）と docs/designs/README.md Design インデックス integrity 表の slug 実測
+- **根本原因**: draft 構成側（req-define の artifact_actions 構成）で target_design パスを実在検証せずに合意へ含めた。ドメイン配置の記憶依存（responsibilities と integrity の混同）
+- **自律対応内容**: 実在パス（integrity 配下）へ解決して ACT-DESIGN-009 を適用し、所在補正を Root Case #3355 本文と Definition PR #3359 本文へ記録
+- **ユーザー確認の有無**: なし（実在パスが一意に解決でき、合意内容〔Design slug checker-execution-contracts・operation append・節内容〕は不変のため）
+- **Decision/REQ/spec影響**: なし（適用先パスの補正のみ）
+- **横展開観点**: artifact_actions の target 系パス（target_req・target_design）は、合意済み宣言として扱う前に実在検証（実ファイル存在確認・Design インデックス表 slug 突合）を前置すべき。case-open 側は対象ファイル読取の実測で検知できるが、合意時点で防げる検証は上流（req-define）が担うのが早い
+- **再発条件**: draft 構成者がドメイン配置を記憶ベースで指定し、実在検証を経ずに合意へ含める場合
+- **予防策候補**: req-define の artifact_actions 構成時に target_design パス実在確認ステップを追加する候補（learning-promote での評価・backlog-review 側への反映判断）
+- **想定反映先**: learning-promote 評価、req-define / backlog-review の target 検証追加判断
+- **関連**: Root Case #3355・Definition PR #3359・draft req-draft-backlog-pool-20261003（AG-015・ACT-DESIGN-009・OU-014）
+- **タグ**: #draft-path-mismatch #target-design #case-open
+
+---
+
 ## 2026-10-03: bash パイプ経由 checker 実行の echo "exit=$?" はパイプ最終コマンドの終了コードを返す
 
 - **問題事象**: case-open STEP-4 の PR 作成前 checker 実測（Case #3337・OU-007）で `bun check_autogen_freshness.ts 2>&1 | tail -10; echo "exit=$?"` を実行し、checker が exit=1（鮮度違反 1 件）を返したにもかかわらず `exit=0` を観測して合格と解釈しかけた
