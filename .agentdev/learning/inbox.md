@@ -427,3 +427,78 @@
 - **想定反映先**: .opencode/skills/repo-agentdev-integrity 配下テスト fixture の編集手順
 - **関連**: PR #3326 本文「Findings / Capture候補」learning 2 項目目、Issue #3318
 - **タグ**: `#fixture` `#一括置換` `#構文破損` `#path.join` `#case-run` `#capture`
+
+## 2026-10-02 case-run（Case #3316・PR #3327 Findings 由来）: third-party-sync-contract.test.ts の旧正本参照が pre-existing fail として残存（Wave 1 共通正本化の追随漏れ）
+
+- **問題事象**: `src/common/skills/agentdev-workflow-third-party-sync/scripts/tests/third-party-sync-contract.test.ts` の参照パスが Wave 1 で移動済みの旧 command 正本（`src/opencode/commands/agentdev/`）を指したまま ENOENT で fail（`bun test ./src/common/skills/` で 1 fail）。base 9466c587 で同一再現を確認済みの pre-existing
+- **発生局面**: case-run（実現面実装。Case #3316・Epic #3316 Wave 2 Issue #3321 DEL-3321-1）の回帰検証
+- **検知方法**: `bun test ./src/common/skills/` 実行結果（102 pass / 1 fail）と base での同一再現確認
+- **根本原因**: Wave 1 の共通正本化で command 正本が `src/common/commands/agentdev/` へ移動したが、src/common 配下の test ファイル内部のパス参照が追随していなかった。本 Issue の変更対象成果物の範囲外のため未修正
+- **ユーザー確認有無**: なし（pre-existing の記録のみ）
+- **Decision/REQ/spec影響**: なし（既存起因・後続 Case 対象）
+- **横展開観点**: 構造移設系変更では test ファイル内部のパス参照（fixture・期待値・対象パス）の追随漏れが pre-existing fail として残る。参照切れ検出（RA-005 の検査基盤）が src/common 配下の test ファイル内部パス参照も検出対象に含める候補
+- **再発条件**: 正本移設を伴う構造変更の後、移設対象外の test ファイル内部で旧パス参照が残る場合
+- **予防策候補**: 検査基盤の参照切れ検出対象への src/common 配下 test 内部パス参照の追加
+- **想定反映先**: 検査基盤（RA-005・check_reference_paths 系）の検出範囲拡張判断、third-party-sync-contract.test.ts の修正 Case
+- **関連**: PR #3327 本文「Findings / Capture候補」learning 1、Issue #3321
+- **タグ**: `#stale参照` `#参照切れ` `#pre-existing-fail` `#src-common` `#case-run` `#capture`
+
+## 2026-10-02 case-run（Case #3316・PR #3327 Findings 由来）: lint_skills AG-005 description aggregate budget が既存 49 skills の時点で超過傾向（17931 chars > 17500 上限）
+
+- **問題事象**: description aggregate budget（17500 chars 上限）が Wave 1 完了時点で既存 49 skills 合計 17931 chars と超過傾向にあり、新規 skill 追加で AG-005 傾向管理 warning が発生（fail ではない）
+- **発生局面**: case-run（Case #3316・Epic #3316 Wave 2 Issue #3321 DEL-3321-1）の lint_skills 実行
+- **検知方法**: lint_skills の AG-005 warning 表示
+- **対応内容**: 本 PR の新規 skill（agentdev-skill-resolution）の description は 348 chars に圧縮済み（寄与最小化）
+- **ユーザー確認有無**: なし（warning の記録のみ）
+- **Decision/REQ/spec影響**: なし（budget 運用の判断は後続 Case 対象）
+- **横展開観点**: Skill 追加系 Wave の継続で warning 常態化が予想される。budget 再設定（上限値の見直し）または frontmatter description 圧縮の運用が必要になる可能性
+- **再発条件**: Skill 追加を含む変更で description 合計が上限付近のまま増加する場合
+- **予防策候補**: AG-005 budget の再設定、または新規 Skill の description 圧縮運用の明文化
+- **想定反映先**: lint_skills.ts（AG-005 budget 設定）、Skill 追加系 Case の実行契約
+- **関連**: PR #3327 本文「Findings / Capture候補」learning 2、Issue #3321
+- **タグ**: `#lint_skills` `#AG-005` `#description-budget` `#skill` `#capture`
+
+## 2026-10-02 case-run（Case #3316・PR #3328 Findings 由来）: agentdev-textlint-guard のテスト 2 件が main でも失敗する pre-existing（追加対象設定とテスト期待の不整合疑い）
+
+- **問題事象**: `agentdev-textlint-guard` のテスト 2 件（「ADF 本体の追加対象設定で commands / skills の Markdown が検査対象になる」系）が main（merge eecb5b03 以降の現行 main HEAD 9466c587）でも同一内容で失敗する pre-existing 状態（128 pass / 2 fail）
+- **発生局面**: case-run（実現面実装。Case #3316・Epic #3316 Wave 2 Issue #3320 DEL-3320-1）の回帰検証
+- **検知方法**: bun test 実行結果と main での同一再現確認（本件変更と無関係の既出として分類）
+- **根本原因（疑い）**: `.agentdev/config/plugins/agentdev-textlint-guard.yaml`（追加対象）の解決とテスト期待の不整合
+- **ユーザー確認有無**: なし（本件の変更対象外のため既出として記録）
+- **Decision/REQ/spec影響**: なし（既存起因・後続 Case 対象）
+- **横展開観点**: plugin config（追加対象 glob 設定）の変更と plugin テスト期待値の同期漏れは pre-existing fail として潜む。config 変更を含む Case では plugin テストの期待値同期を予防確認する
+- **再発条件**: `.agentdev/config/plugins/` の追加対象設定と plugin テスト期待が不整合のまま実行した場合
+- **予防策候補**: plugin config 変更時のテスト期待値同期の予防確認手順
+- **想定反映先**: src/opencode/plugins/agentdev-textlint-guard/tests/（期待値修正 Case）、plugin config 運用手順
+- **関連**: PR #3328 本文「Findings / Capture候補」learning、Issue #3320
+- **タグ**: `#textlint` `#pre-existing-fail` `#plugin-config` `#テスト期待値` `#capture`
+
+## 2026-10-02 case-run（Case #3316・PR #3329 Findings 由来）: Windows rename EPERM は bun test 並行実行でのみ再現する（Promise.all 模倣で再現特定・bounded retry で対処）
+
+- **問題事象**: Windows における原子的書込み（tmp ファイル → 既存ファイルへの renameSync 置換）は、直前の書込みハンドル解放や検索インデクサの一時保持で非決定的に EPERM / EACCES を返す。単体実行では再現せず bun test の並行実行でのみ flaky になる
+- **発生局面**: case-run（実現面実装。Case #3316・Epic #3316 Wave 2 Issue #3319 DEL-3319-1）の bun test
+- **検知方法**: bun test の断続的失敗 → 複数テスト相当の並行実行模倣（Promise.all）で再現特定
+- **根本原因**: OS 固有の rename 挙動（テストの欠陥ではなく環境挙動）
+- **自律対応内容**: `src/common/tools/agentdev-gh/local/runner-local.ts` の原子的書込みを bounded retry（指数バックオフ、最大約150ms）で修正し再検証合格（修正済みとして検証差分に記録）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（Wave 1 Issue #3317 で別 Case 候補として記録された対応を本件で実施）
+- **横展開観点**: 並行実行で flaky なテストは「テストの欠陥」ではなく「OS 固有の rename 挙動」起因の可能性を先に疑う価値がある。再現には Promise.all による並行実行模倣が有効。Wave 1 の先行観測（対照プローブで環境起因と実証）と本件の bounded retry 対応で一連の対処が完結
+- **再発条件**: Windows 環境で rename ベースの原子的書込みを並行実行コンテキストで行った場合
+- **予防策候補**: rename ベース原子的書込みへの bounded retry 適用（本件で実施済み。同型の新規書込み実装時の適用）
+- **想定反映先**: src/common/tools/agentdev-gh/local/runner-local.ts（bounded retry 適用済み）、同型実装の新規 Case
+- **関連**: PR #3329 本文「Findings / Capture候補」learning、Issue #3319、本ファイル 2026-10-02 runner-local EPERM flaky エントリ（Wave 1 Issue #3317・PR #3325 の先行観測）
+- **タグ**: `#windows` `#EPERM` `#rename` `#flaky` `#bounded-retry` `#case-run` `#capture`
+
+## 2026-10-02 case-run（Case #3316・PR #3330 Findings 由来）: PowerShell 文字列補間で変数名直後の `:` は `${t}:${rel}` 形式が必要（ParserError 知見）
+
+- **問題事象**: PowerShell 文字列補間で `"$t:$rel"` と書くと `$t:` を drive 修飾（scope 記法）と解釈して `ParserError`（「':' の後に有効な変数キー」）となる。連結部を含む補間は `${t}:${rel}` 形式が必要
+- **発生局面**: case-run（実現面実装。Case #3316・Epic #3316 Wave 2 Issue #3322 DEL-3322-1）の installer-host-projection.Tests.ps1 ダイジェスト生成
+- **検知方法**: PowerShell 構文検査（Parser 検査）で初回検出
+- **ユーザー確認有無**: なし（書式修正で解消済み）
+- **Decision/REQ/spec影響**: なし（実務知見）
+- **横展開観点**: PowerShell で変数名の直後に `:` が続く補間文字列は `${変数名}:` 形式へ避難する。Parser 検査を CI 前段に入れておくと構文系の初回検出が速い
+- **再発条件**: PowerShell 文字列補間で変数名直後に `:` を書いた場合
+- **予防策候補**: PowerShell 系テスト作成手順への補間書式注意の追記候補
+- **想定反映先**: scripts/self/release/ 配下 PowerShell テストの編集手順、PowerShell 構文検査の運用
+- **関連**: PR #3330 本文「Findings / Capture候補」learning、Issue #3322
+- **タグ**: `#powershell` `#文字列補間` `#ParserError` `#capture`
