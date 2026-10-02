@@ -167,12 +167,20 @@ describe("agentdev-textlint-guard distribution / consumer install (TS-005 / TS-0
     test(`${label}: vendor 欠落で fail-closed 停止と案内、導入手順後の offline gate`, () => {
       const root = fs.mkdtempSync(path.join(os.tmpdir(), `adftl-dist-${gitCloneStyle ? "git" : "zip"}-`));
       try {
+        // マルチホスト正本モデルの最小フィクスチャ: 共通正本 src/common/（commands/tools の
+        // 投影元・usable checkout 判定材料）+ OpenCode 接続領域 src/opencode/（plugins）+
+        // Senpi 接続領域 src/senpi/（配置対象ホスト既定 both の投影元）
+        const srcCommon = path.join(root, ".agentdev-plugin", "src", "common");
         const srcOpencode = path.join(root, ".agentdev-plugin", "src", "opencode");
-        fs.mkdirSync(path.join(srcOpencode, "commands", "agentdev"), { recursive: true });
-        fs.writeFileSync(path.join(srcOpencode, "commands", "agentdev", "case-run.md"), "# case-run\n", "utf8");
+        const srcSenpi = path.join(root, ".agentdev-plugin", "src", "senpi");
+        fs.mkdirSync(path.join(srcCommon, "commands", "agentdev"), { recursive: true });
+        fs.writeFileSync(path.join(srcCommon, "commands", "agentdev", "case-run.md"), "# case-run\n", "utf8");
         // check モードは .opencode/tools の存在を期待するため既存テストと同じ最小 tools エントリを置く
-        fs.mkdirSync(path.join(srcOpencode, "tools", "agentdev-gh"), { recursive: true });
-        fs.writeFileSync(path.join(srcOpencode, "tools", "agentdev-gh", "index.ts"), "// tool\n", "utf8");
+        fs.mkdirSync(path.join(srcCommon, "tools", "agentdev-gh"), { recursive: true });
+        fs.writeFileSync(path.join(srcCommon, "tools", "agentdev-gh", "index.ts"), "// tool\n", "utf8");
+        fs.mkdirSync(path.join(srcSenpi, "connection-demo"), { recursive: true });
+        fs.writeFileSync(path.join(srcSenpi, "connection-demo", "connection.ts"), "// senpi connection\n", "utf8");
+        fs.writeFileSync(path.join(srcSenpi, "README.md"), "# src/senpi/ (Senpi host connection area)\n", "utf8");
         placeRealPlugin(srcOpencode);
         fs.mkdirSync(path.join(root, "scripts", "consumer"), { recursive: true });
         fs.copyFileSync(INSTALL_PS1, path.join(root, "scripts", "install.ps1"));

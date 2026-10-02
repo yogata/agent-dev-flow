@@ -110,17 +110,20 @@ function New-TestJunction {
 function New-SourceTree {
     <#
     .SYNOPSIS
-        正本（src/opencode）に ADF 管理対象（4 配布種別）を構築する。
+        正本（マルチホスト正本モデル: src/common/ 共通正本 + src/opencode/ OpenCode
+        接続領域 + src/senpi/ Senpi 接続領域）に ADF 管理対象を構築する。
     #>
-    param([string]$SourceDir)
-    New-Item -ItemType Directory -Path (Join-Path $SourceDir 'commands\agentdev') -Force | Out-Null
-    New-Item -ItemType Directory -Path (Join-Path $SourceDir 'skills\agentdev-testskill') -Force | Out-Null
-    New-Item -ItemType Directory -Path (Join-Path $SourceDir 'tools\agentdev-testtool') -Force | Out-Null
-    New-Item -ItemType Directory -Path (Join-Path $SourceDir 'plugins\agentdev-testplugin') -Force | Out-Null
-    Set-Content -LiteralPath (Join-Path $SourceDir 'commands\agentdev\test.md') -Value '# test'
-    Set-Content -LiteralPath (Join-Path $SourceDir 'skills\agentdev-testskill\SKILL.md') -Value '# skill'
-    Set-Content -LiteralPath (Join-Path $SourceDir 'tools\agentdev-testtool\index.ts') -Value '// tool'
-    Set-Content -LiteralPath (Join-Path $SourceDir 'plugins\agentdev-testplugin\plugin.ts') -Value '// plugin'
+    param([string]$CommonSourceDir, [string]$OpencodeSourceDir, [string]$SenpiSourceDir)
+    New-Item -ItemType Directory -Path (Join-Path $CommonSourceDir 'commands\agentdev') -Force | Out-Null
+    New-Item -ItemType Directory -Path (Join-Path $CommonSourceDir 'skills\agentdev-testskill') -Force | Out-Null
+    New-Item -ItemType Directory -Path (Join-Path $CommonSourceDir 'tools\agentdev-testtool') -Force | Out-Null
+    New-Item -ItemType Directory -Path (Join-Path $OpencodeSourceDir 'plugins\agentdev-testplugin') -Force | Out-Null
+    New-Item -ItemType Directory -Path (Join-Path $SenpiSourceDir 'connection-demo') -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $CommonSourceDir 'commands\agentdev\test.md') -Value '# test'
+    Set-Content -LiteralPath (Join-Path $CommonSourceDir 'skills\agentdev-testskill\SKILL.md') -Value '# skill'
+    Set-Content -LiteralPath (Join-Path $CommonSourceDir 'tools\agentdev-testtool\index.ts') -Value '// tool'
+    Set-Content -LiteralPath (Join-Path $OpencodeSourceDir 'plugins\agentdev-testplugin\plugin.ts') -Value '// plugin'
+    Set-Content -LiteralPath (Join-Path $SenpiSourceDir 'connection-demo\connection.ts') -Value '// senpi connection'
 }
 
 function New-ConsumerRepo {
@@ -130,7 +133,7 @@ function New-ConsumerRepo {
         install.ps1 の cwd 安全化（.git 要求）のため git init する。
     #>
     $root = New-TempRepo 'adf-stale-consumer'
-    New-SourceTree -SourceDir (Join-Path $root '.agentdev-plugin\src\opencode')
+    New-SourceTree -CommonSourceDir (Join-Path $root '.agentdev-plugin\src\common') -OpencodeSourceDir (Join-Path $root '.agentdev-plugin\src\opencode') -SenpiSourceDir (Join-Path $root '.agentdev-plugin\src\senpi')
     New-Item -ItemType Directory -Path (Join-Path $root 'scripts\consumer') -Force | Out-Null
     Copy-Item -LiteralPath $InstallScript -Destination (Join-Path $root 'scripts\install.ps1')
     Copy-Item -LiteralPath (Join-Path $RepoRoot 'scripts\consumer\common.ps1') -Destination (Join-Path $root 'scripts\consumer\common.ps1')
@@ -142,10 +145,11 @@ function New-ConsumerRepo {
 function New-SelfRepo {
     <#
     .SYNOPSIS
-        self-hosting 型一時リポジトリを構築する（src/opencode 正本 + scripts/self-sync.ps1）。
+        self-hosting 型一時リポジトリを構築する（src/common + src/opencode + src/senpi
+        正本 + scripts/self-sync.ps1）。
     #>
     $root = New-TempRepo 'adf-stale-self'
-    New-SourceTree -SourceDir (Join-Path $root 'src\opencode')
+    New-SourceTree -CommonSourceDir (Join-Path $root 'src\common') -OpencodeSourceDir (Join-Path $root 'src\opencode') -SenpiSourceDir (Join-Path $root 'src\senpi')
     New-Item -ItemType Directory -Path (Join-Path $root 'scripts') -Force | Out-Null
     Copy-Item -LiteralPath $SelfSyncScript -Destination (Join-Path $root 'scripts\self-sync.ps1')
     return $root
@@ -161,7 +165,7 @@ function Invoke-Ts001Consumer {
     $root = New-ConsumerRepo
     try {
         $projSkill = Join-Path $root '.opencode\skills\agentdev-testskill'
-        $srcSkill = Join-Path $root '.agentdev-plugin\src\opencode\skills\agentdev-testskill'
+        $srcSkill = Join-Path $root '.agentdev-plugin\src\common\skills\agentdev-testskill'
 
         $apply = Invoke-EntryScript -ScriptPath $InstallScript -Mode 'apply' -Cwd $root
         Assert-True 'TS-001 apply succeeds' ($apply.ExitCode -eq 0) $apply.Output
@@ -204,7 +208,7 @@ function Invoke-Ts001SelfSync {
         # 必ず一時リポジトリ内のコピーを実行する（本体の worktree を同期対象にしない）。
         $entry = Join-Path $root 'scripts\self-sync.ps1'
         $projSkill = Join-Path $root '.opencode\skills\agentdev-testskill'
-        $srcSkill = Join-Path $root 'src\opencode\skills\agentdev-testskill'
+        $srcSkill = Join-Path $root 'src\common\skills\agentdev-testskill'
 
         $apply = Invoke-EntryScript -ScriptPath $entry -Mode 'apply' -Cwd $root
         Assert-True 'TS-001 apply succeeds (self-sync)' ($apply.ExitCode -eq 0) $apply.Output
@@ -406,7 +410,7 @@ function Invoke-Ts004Consumer {
         for ($i = 1; $i -le 3; $i++) {
             New-TestJunction `
                 -LinkPath (Join-Path $root ".opencode\skills\agentdev-gone$i") `
-                -TargetPath (Join-Path $root ".agentdev-plugin\src\opencode\skills\agentdev-gone$i")
+                -TargetPath (Join-Path $root ".agentdev-plugin\src\common\skills\agentdev-gone$i")
         }
 
         $apply2 = Invoke-EntryScript -ScriptPath $InstallScript -Mode 'apply' -Cwd $root
@@ -434,7 +438,7 @@ function Invoke-Ts004Consumer {
         Assert-True 'TS-004(3) apply succeeds' ($apply.ExitCode -eq 0) $apply.Output
 
         # 正本から skill と plugin を削除し、配置先に stale junction（2件）と stale shim（1件）を残す
-        Remove-Item -LiteralPath (Join-Path $root2 '.agentdev-plugin\src\opencode\skills\agentdev-testskill') -Recurse -Force
+        Remove-Item -LiteralPath (Join-Path $root2 '.agentdev-plugin\src\common\skills\agentdev-testskill') -Recurse -Force
         Remove-Item -LiteralPath (Join-Path $root2 '.agentdev-plugin\src\opencode\plugins\agentdev-testplugin') -Recurse -Force
 
         $shimPath = Join-Path $root2 '.opencode\plugins\agentdev-testplugin.ts'
@@ -483,7 +487,7 @@ function Invoke-Ts004SelfSync {
         for ($i = 1; $i -le 3; $i++) {
             New-TestJunction `
                 -LinkPath (Join-Path $root ".opencode\skills\agentdev-gone$i") `
-                -TargetPath (Join-Path $root "src\opencode\skills\agentdev-gone$i")
+                -TargetPath (Join-Path $root "src\common\skills\agentdev-gone$i")
         }
 
         $apply2 = Invoke-EntryScript -ScriptPath $entry -Mode 'apply' -Cwd $root
@@ -510,7 +514,7 @@ function Invoke-Ts004SelfSync {
         $apply = Invoke-EntryScript -ScriptPath $entry -Mode 'apply' -Cwd $root2
         Assert-True 'TS-004 self(3) apply succeeds' ($apply.ExitCode -eq 0) $apply.Output
 
-        Remove-Item -LiteralPath (Join-Path $root2 'src\opencode\skills\agentdev-testskill') -Recurse -Force
+        Remove-Item -LiteralPath (Join-Path $root2 'src\common\skills\agentdev-testskill') -Recurse -Force
         Remove-Item -LiteralPath (Join-Path $root2 'src\opencode\plugins\agentdev-testplugin') -Recurse -Force
 
         $shimPath = Join-Path $root2 '.opencode\plugins\agentdev-testplugin.ts'
@@ -547,9 +551,9 @@ function Invoke-Ts005 {
     $req058 = Get-Content -LiteralPath $Req058Path -Raw
     $req009 = Get-Content -LiteralPath $Req009Path -Raw
 
-    # REQ-050-001〜015 の番号連続（欠番・重複なし）
+    # REQ-050-001〜016 の番号連続（欠番・重複なし）
     $ids050 = [regex]::Matches($req050, '\|\s*(REQ-050-\d{3})\s*\|') | ForEach-Object { $_.Groups[1].Value }
-    $expected050 = @(1..15 | ForEach-Object { 'REQ-050-{0:D3}' -f $_ })
+    $expected050 = @(1..16 | ForEach-Object { 'REQ-050-{0:D3}' -f $_ })
     $missing050 = @($expected050 | Where-Object { $_ -notin $ids050 })
     Assert-True 'TS-005 REQ-050-001..015 are consecutive without gaps or duplicates' `
         (($ids050.Count -eq $expected050.Count) -and ($missing050.Count -eq 0)) "found: $($ids050 -join ', ')"

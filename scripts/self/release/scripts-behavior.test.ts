@@ -80,24 +80,29 @@ function digestTree(root: string): Map<string, string> {
 }
 
 /**
- * Minimal consumer fixture mirroring the real layout:
- *   <root>/.git                       (present unless zipCheckout)
- *   <root>/.agentdev-plugin/src/opencode/{commands/agentdev,skills/...}
+ * Minimal consumer fixture mirroring the multi-host canonical layout:
+ *   <root>/.git                                      (present unless zipCheckout)
+ *   <root>/.agentdev-plugin/src/common/{commands/agentdev,skills/...,tools/...}
+ *   <root>/.agentdev-plugin/src/opencode/plugins/...  (OpenCode host connection)
+ *   <root>/.agentdev-plugin/src/senpi/                (Senpi host connection: placement contract)
  *   <root>/.agentdev-plugin/src/opencode-local/agentdev-gh  (localSource only)
  *   <root>/scripts/{install.ps1,consumer/common.ps1}
  */
 function makeConsumerRepo(zipCheckout: boolean, localSource = false): string {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), zipCheckout ? "adf-zip-" : "adf-git-"));
-  fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode", "commands", "agentdev"), { recursive: true });
-  fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode", "skills", "agentdev-workflow-case-run"), { recursive: true });
-  fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode", "tools", "agentdev-gh"), { recursive: true });
+  fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "common", "commands", "agentdev"), { recursive: true });
+  fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "common", "skills", "agentdev-workflow-case-run"), { recursive: true });
+  fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "common", "tools", "agentdev-gh"), { recursive: true });
   fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode", "plugins", "agentdev-gh-write-guard"), { recursive: true });
   fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode", "plugins", "agentdev-gh-tool"), { recursive: true });
-  fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode", "commands", "agentdev", "case-run.md"), "# case-run\n");
-  fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode", "skills", "agentdev-workflow-case-run", "SKILL.md"), "# case-run skill\n");
-  fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode", "tools", "agentdev-gh", "index.ts"), "// agentdev-gh tool\n");
+  fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "senpi", "connection-demo"), { recursive: true });
+  fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "common", "commands", "agentdev", "case-run.md"), "# case-run\n");
+  fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "common", "skills", "agentdev-workflow-case-run", "SKILL.md"), "# case-run skill\n");
+  fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "common", "tools", "agentdev-gh", "index.ts"), "// agentdev-gh tool\n");
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode", "plugins", "agentdev-gh-write-guard", "plugin.ts"), "// agentdev-gh-write-guard plugin\n");
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode", "plugins", "agentdev-gh-tool", "plugin.ts"), "// agentdev-gh-tool plugin\n");
+  fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "senpi", "README.md"), "# src/senpi/ (Senpi host connection area)\n");
+  fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "senpi", "connection-demo", "connection.ts"), "// senpi connection\n");
   if (localSource) {
     fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode-local", "agentdev-gh"), { recursive: true });
     fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode-local", "agentdev-gh", "runner-local.ts"), "// local runner\n");
@@ -419,9 +424,9 @@ describe("scripts behavior / third-party skill drift detection", () => {
     try {
       fs.mkdirSync(path.join(root, "scripts"), { recursive: true });
       fs.copyFileSync(SELF_SYNC_PS1, path.join(root, "scripts", "self-sync.ps1"));
-      const skillSrc = path.join(root, "src", "opencode", "skills", "agentdev-x");
-      fs.mkdirSync(skillSrc, { recursive: true });
-      fs.writeFileSync(path.join(skillSrc, "SKILL.md"), "# x\n", "utf-8");
+      fs.mkdirSync(path.join(root, "src", "common", "skills", "agentdev-x"), { recursive: true });
+      fs.mkdirSync(path.join(root, "src", "opencode", "plugins"), { recursive: true });
+      fs.writeFileSync(path.join(root, "src", "common", "skills", "agentdev-x", "SKILL.md"), "# x\n", "utf-8");
       writeThirdPartyDeclaration(root, "drift-missing-skill");
       const r = runPwsh(["-File", path.join(root, "scripts", "self-sync.ps1"), "-Mode", "check"], root);
       expect(r.exitCode).toBe(7);

@@ -1,0 +1,24 @@
+component: installer-host-projection
+implementation:
+  scripts/install.ps1:
+    - REQ-099-010
+    - REQ-099-011
+    - REQ-099-012
+    - REQ-009-040
+    - REQ-009-042
+    - REQ-029-012
+    - REQ-097-002
+  scripts/self-sync.ps1:
+    - REQ-099-010
+    - REQ-099-011
+    - REQ-099-012
+    - REQ-029-012
+    - REQ-097-002
+  scripts/consumer/archive/install.ps1:
+    - REQ-029-012
+    - REQ-097-002
+verification:
+  scripts/self/release/installer-host-projection.Tests.ps1:
+    - REQ-099-010
+    - REQ-099-011
+    - REQ-099-012
