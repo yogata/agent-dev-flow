@@ -2,7 +2,7 @@
 title: 索引類自動生成 Design
 status: accepted
 created: 2026-07-19
-updated: 2026-09-27
+updated: 2026-10-03
 ---
 <!-- ADF-COVERS(implementation): REQ-001-026, REQ-001-028 -->
 <!-- ADF-COVERS(implementation): REQ-010-011 -->
@@ -33,8 +33,17 @@ README 群、索引類、件数表明を実ファイルの frontmatter から再
 | `docs/designs/README.md`のDesign一覧・status列 | 現行実装に従う混合管理 | Design frontmatterと人手管理列 |
 | integrity rule catalogとrule ownershipのAUTOGENブロック | 自動生成 | 個別IR文書 |
 | REQ/Designメトリクス計測例 | 自動生成 | 対象文書の計測結果 |
+| `docs/README.md`・`docs/requirements/README.md` 等の散文言 REQ 件数記述（AUTOGEN ブロック外の自然文） | 人手管理（検出誘導付き） | 人手更新。REQ 新設・廃止時の乖離は `check_integrity.ts` の req-range-staleness（IR-042）が検出し、triage 案内文が手動更新を強制 |
 
 管理区分を変更する場合は、本Design、生成実装、検査実装を同時に整合させる。
+
+### 散文言 REQ 件数記述の扱い（手動更新強制）
+
+`docs/README.md`（「現行要件はN件である。」等）と `docs/requirements/README.md`（「現在の要件判断では、以下N件を第一参照先とする。」等）の AUTOGEN ブロック外の自然文に含まれる REQ 件数表記は、本 Design の自動生成対象とせず人手管理領域とする。
+
+- generate_indexes.ts への組み込み（パターン限定の機械置換）は行わない。prose 文面のパターン固定は REQ-094 の文章表現品質基準と矛盾するためである
+- REQ 新設・廃止時に AUTOGEN 行（`readme-req-summary-count` 等）と散文言の件数が乖離した場合、`check_integrity.ts` の req-range-staleness（IR-042）が NG を検出し、その triage 案内文（固定表記を実際の REQ ファイル数に更新）が手動更新を強制する
+- この構造により、REQ 新設時に AUTOGEN 行と散文言が同時に更新されるか、検出による案内で手動更新が強制される（Case #3312/#3315/#3314 で再発した REQ 件数乖離の構造的防止）
 ## 生成規則
 
 ### 件数表明
