@@ -146,7 +146,6 @@ IR エントリ一覧（IR-046 以降）は `generate_indexes.ts` が自動生�
 
 <!-- AUTOGEN:BEGIN:id=catalog-ir-entries-post-045 -->
 - [IR-046: consumer-generated リポジトリ種別誤検知防止](rules/IR-046-consumer-generated-repo-type-fp-prevention.md)
-- [IR-047: src/opencode-local/ link 先原本領域ディレクトリ構成](rules/IR-047-src-opencode-local-link-origin-dir-structure.md)
 - [IR-048: generated_by 識別子整合性](rules/IR-048-generated-by-identifier-integrity.md)
 - [IR-049: Command file format violation](rules/IR-049-command-file-format-violation.md)
 - [IR-050: load_skills command 誤指定検出](rules/IR-050-load-skills-command-mis-specification.md)
