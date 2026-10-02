@@ -142,3 +142,11 @@
 - 内容: cmd --json を tail へ pipe した形で実行し、表示された EXIT=0 を誤読しかけた。実態は tail の終了コードであり checker 自体は exit 1（NG 4 件）。pipe なしの実行に切替して正しい終了コード EXIT=1 を確認し、証跡を訂正した
 - 学び: checker 終了コードを検証証跡に記録する場合は pipe を経由させず、リダイレクトで実行して終了コードを取得する。証跡の exit code は検証対象コマンドと同一プロセスから取得する
 - 発見元: Case #3340 実行時の自工程観測
+
+## 2026-10-03: issue_list の labels フィルタは role・バッチ識別に使えない（case ラベル付与の不揃い）
+
+- 問題クラス: workflow deviation（検出手段の信頼性）
+- 発生工程: case-open STEP-5 冪等確認・横断依存検査の未クローズ Case 群取得（Case #3364・OU-003）
+- 内容: 未クローズ Case 群を labels=["case"] で取得したところ、role=case のオープン Case 18件のうち「case」ラベル付きは #3333・#3337 の2件のみ返却され16件が欠落した。物理ラベル付与が兄弟 Case 間で不揃いであり、labels フィルタの空配列に近い応答を Case 存在の絞り込み根拠にすると重複生成や検出漏れを招く。search なしの unfiltered 一覧（state: open）で全件を取得して回復した
+- 学び: issue_list の labels は論理値（role 等）の物理写像の結果であり、role・投入バッチの識別には state と unfiltered 一覧＋タイトル解析を使う。「空配列の成功応答は不存在の証拠としない」原則（REQ-092 系・AG-016）は search トークンだけでなく labels フィルタにも適用される
+- 発見元: Case #3364（backlog-pool-20261003・OU-003）実行時の自工程観測
