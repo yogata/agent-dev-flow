@@ -50,6 +50,41 @@
       "evidence": "DEC-043",
       "rationale_ref": "docs/designs/integrity/index-auto-generation.md",
       "review_status": "accepted"
+    },
+    {
+      "rule_id": "skill-use-for-boundary",
+      "file": ".opencode/skills/explainer/SKILL.md",
+      "evidence": "explainer",
+      "rationale_ref": "docs/designs/local/third-party-skill-management.md",
+      "review_status": "accepted"
+    },
+    {
+      "rule_id": "skill-use-for-boundary",
+      "file": ".opencode/skills/explainer-book/SKILL.md",
+      "evidence": "explainer-book",
+      "rationale_ref": "docs/designs/local/third-party-skill-management.md",
+      "review_status": "accepted"
+    },
+    {
+      "rule_id": "skill-use-for-boundary",
+      "file": ".opencode/skills/first-reader/SKILL.md",
+      "evidence": "first-reader",
+      "rationale_ref": "docs/designs/local/third-party-skill-management.md",
+      "review_status": "accepted"
+    },
+    {
+      "rule_id": "skill-use-for-boundary",
+      "file": ".opencode/skills/yomiyasu/SKILL.md",
+      "evidence": "yomiyasu",
+      "rationale_ref": "docs/designs/local/third-party-skill-management.md",
+      "review_status": "accepted"
+    },
+    {
+      "rule_id": "gh-direct-invocation",
+      "file": "src/common/skills/agentdev-git-worktree/references/worktree-operations.md",
+      "evidence": "gh pr view",
+      "rationale_ref": "docs/designs/integrity/rules/IR-053-gh-direct-invocation-detection.md",
+      "review_status": "accepted"
     }
   ]
 }

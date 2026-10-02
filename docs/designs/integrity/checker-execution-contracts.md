@@ -2,7 +2,7 @@
 title: checker 実行契約と検出基盤規則
 status: accepted
 created: 2026-08-15
-updated: 2026-09-17
+updated: 2026-10-03
 ---
 <!-- ADF-COVERS(implementation): REQ-002-035 -->
 <!-- ADF-COVERS(implementation): REQ-010-062 -->
@@ -13,6 +13,7 @@ updated: 2026-09-17
 <!-- ADF-COVERS(implementation): REQ-060-006 -->
 <!-- ADF-COVERS(design): REQ-060-001, REQ-060-002, REQ-060-003, REQ-060-007 -->
 <!-- ADF-COVERS(design): REQ-010-078, REQ-010-079 -->
+<!-- ADF-COVERS(implementation): REQ-010-078, REQ-010-079 -->
 
 # checker 実行契約と検出基盤規則
 
@@ -134,6 +135,22 @@ case-close は REQ 行 append を伴う Definition 変更のマージ (squash me
 REQ 行 append を伴う工程（Definition 保存（case-ready / case-revise）の REQ 追記等）では、AUTOGEN 対象索引（docs/requirements/README.md、req-health-metrics.md 計測例等）の同 commit 再生成を前置として実行する（工程連動再生成前置）。本前置は、case-run 前置 gate の AUTOGEN 索引再生成 前置 gate（PR 対象ファイルに AUTOGEN 生成元文書の変更を含む場合に再生成を委譲へ先行して強制する）と工程側前置として整合し、REQ 行 append 後の鮮度検査（check_autogen_freshness）が exit 0 となることを期待値とする。
 
 AG-009(a)（既存対応計画 ID。本前置とは別の取り組み）の領域（REQ-010-059 gate 仕様およびその本体実装）は本前置の対象外であり、不変である。本前置は gate 仕様を変更せず、工程手順の前置としての整合注記を所有するに留まる。
+
+## 手動管理の索引一覧と実ファイル配置の整合（docs-check 検査対象）
+
+docs-check は、手動管理の索引一覧（docs/README.md ガイド一覧を含む）と実ファイル配置の整合を検査対象とする（REQ-010-078、REQ-010-079）。
+
+- docs/README.md のガイド一覧は docs/guides/ 配下の実ガイドファイル一覧と一致すること（一覧と実ファイルの差分なし）
+- docs/knowledge/README.md「現在の知識文書」一覧は docs/knowledge/ 配下の実知識文書一覧と一致し、件数表記は実ファイル数と一致すること
+- knowledge README 列挙整合の正規検査経路は check_knowledge_docs.ts とし、docs/README.md ガイド一覧等の手動管理索引は README 突合系検査の組合せで整合を検査する。手動管理の一覧更新漏れ（実ファイルの追加・削除に対する一覧の追随漏れ）は本整合検査の検出対象とする
+
+## IR-055 warning 総数 ratchet と baseline provenance の実行契約
+
+IR-055 warning 総数 ratchet（ir-055-baseline.json の warning_total_cap 比較）の実行面の契約を次のとおり確定する。baseline 運用の正規所有は integrity-contracts.md とし、本節は実行面のみを所有する。
+
+- warning 総数が warning_total_cap を超過した場合は、明細再取得（check_integrity.ts 実行による実測）で起因を特定してから処置する。起因の分類は true positive（当該箇所の是正）と baseline-known（provenance 付き baseline または恒久免除レジストリ baselines/exemptions.json への追加）の2系統とする
+- warning_total_cap の引上げは --raise-warning-cap 明示フラグ経由のみ許容する。無条件の cap 引上げを禁止する。baseline 値（entries の count）は check_integrity.ts 実行の実測値に更新し、cap 値を実測に併せ替えない
+- baseline エントリおよび恒久免除レジストリへの追加は、provenance（起因の由来、正当化の参照先 rationale_ref、適用日）付きでのみ許容する。無条件 baseline 追加を禁止する
 
 ## 対象外
 
