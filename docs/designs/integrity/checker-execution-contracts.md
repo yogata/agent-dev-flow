@@ -246,6 +246,14 @@ agentdev-quality-gates が正規所有する。本節はその所有権を変更
 
 docs/designs/** のDesign frontmatterは `title` / `status` / `created` / `updated` を必須キーとして機械検査する。キー欠落、`updated` 値のキー名欠落、値形式不正を検出し、既存のKnowledge frontmatter必須キー検査と同じ検出基準で整合性ルールカタログへ登録する。
 
+## 実行系の実機制約（node/bun）
+
+checker 系スクリプトは bun 前提で記述されており、node 実行系（node --experimental-strip-types 等）での実行は
+require is not defined で失敗する。安定実行経路は bun run を使用する（Case #3252 実績）。
+spawnSync 型テストの固定 timeout は検査対象規模の増加（third-party 配布物追加等）で超過し得るため、
+実測分布に基づく値（30〜60秒）を設定し、baseline 対照実行（main と PR head の同条件比較）を
+環境起因切り分けの標準手順とする。
+
 ## See Also
 
 - integrity-contracts.md（スクリプト契約、NG baseline 運用、除外設定の文書化要件）
