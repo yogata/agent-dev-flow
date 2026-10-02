@@ -38,17 +38,16 @@
 // src/common/guards/distribution-boundary/distribution-boundary-guard-evaluators.ts;
 // argument parsing in distribution-boundary-guard-parser.ts; full-file
 // reconstruction in distribution-boundary-guard-reconstruction.ts; path
-// classification in distribution-boundary-guard-paths.ts. This file
-// owns the plugin shell, the GuardEnv, and the default-export wiring.
+// classification in distribution-boundary-guard-paths.ts; the GuardEnv
+// (guard environment) lives in distribution-boundary-guard-env.ts and is
+// re-exported below. This file owns the plugin shell and the default-export
+// wiring.
 
 import {
-  DEFAULT_DETECTOR_CONFIG,
   DEFAULT_REPOSITORY_IDENTITY,
-  type DetectorConfig,
   type Projection,
   type RepositoryIdentity,
 } from "../../../../.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts";
-import * as fs from "fs";
 import {
   parseApplyPatchArgs as parserParseApplyPatchArgs,
   parseApplyPatchText,
@@ -64,7 +63,6 @@ import {
   normalizePath,
   type PathClass,
 } from "../../../common/guards/distribution-boundary/distribution-boundary-guard-paths.ts";
-import type { FileReader } from "../../../common/guards/distribution-boundary/distribution-boundary-guard-reconstruction.ts";
 import {
   emptyOk,
   evaluateApplyPatchEnv as evaluatorsEvaluateApplyPatchEnv,
@@ -107,53 +105,19 @@ export type PluginServer = (input: PluginInput) => Promise<PluginHooks>;
 
 // ---------------------------------------------------------------------------
 // Guard environment
+//
+// The guard environment (GuardEnv, makeGuardEnv) is owned by the canonical
+// guard side (src/common/guards/distribution-boundary/) and re-exported here
+// for plugin consumers and tests. The plugin shell does not define it locally
+// (host-connection side must not own the canonical guard environment).
 // ---------------------------------------------------------------------------
+
+import { makeGuardEnv, type GuardEnv, type MakeGuardEnvOptions } from "../../../common/guards/distribution-boundary/distribution-boundary-guard-env.ts";
+
+export { makeGuardEnv, type GuardEnv, type MakeGuardEnvOptions } from "../../../common/guards/distribution-boundary/distribution-boundary-guard-env.ts";
 
 export const DEFAULT_PLUGIN_REPOSITORY_IDENTITY: RepositoryIdentity =
   DEFAULT_REPOSITORY_IDENTITY;
-
-export interface GuardEnv {
-  readonly detector_config: DetectorConfig;
-  readonly readFile: FileReader;
-  readonly projection: Projection;
-}
-
-export interface MakeGuardEnvOptions {
-  readonly repository_identity?: RepositoryIdentity;
-  readonly producer_internal_id_prefixes?: readonly string[];
-  readonly distributed_workflow_control_prefixes?: readonly string[];
-  readonly readFile?: FileReader;
-  projection?: Projection;
-}
-
-function defaultReadFile(path: string): string | null {
-  try {
-    return fs.readFileSync(path, "utf-8");
-  } catch {
-    return null;
-  }
-}
-
-export function makeGuardEnv(opts: MakeGuardEnvOptions = {}): GuardEnv {
-  const identity = opts.repository_identity ?? DEFAULT_REPOSITORY_IDENTITY;
-  const producerPrefixes =
-    opts.producer_internal_id_prefixes ??
-    DEFAULT_DETECTOR_CONFIG.producer_internal_id_prefixes;
-  const workflowPrefixes =
-    opts.distributed_workflow_control_prefixes ??
-    DEFAULT_DETECTOR_CONFIG.distributed_workflow_control_prefixes;
-  return {
-    detector_config: {
-      repository_identity: identity,
-      producer_internal_id_prefixes: producerPrefixes,
-      distributed_workflow_control_prefixes: workflowPrefixes,
-      producer_metadata_enforcement:
-        DEFAULT_DETECTOR_CONFIG.producer_metadata_enforcement,
-    },
-    readFile: opts.readFile ?? defaultReadFile,
-    projection: opts.projection ?? "source",
-  };
-}
 
 // ---------------------------------------------------------------------------
 // Public helper API (exported for unit tests)
