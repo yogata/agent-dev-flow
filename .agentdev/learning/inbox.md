@@ -67,3 +67,16 @@
 - **タグ**: #extension-timing #yomiyasu #workflow-deviation #case-open
 
 ---
+## 2026-10-03: REQ 行変更 Definition PR の索引再生成は REQ commit 後に実行する（計測日導出の関係）
+
+- **問題事象**: REQ-099-020 行追加（docs/requirements/REQ-099.md・frontmatter updated 進行）の Definition 変更で、REQ commit 前に generate_indexes.ts を実行して req-health-metrics.md を再生成すると、req-metrics-measurement-example の計測日が REQ 群の commit 前日付（2026-10-02）のまま確定する。REQ commit 後の check_integrity で req-updated-freshness（IR-072・updated 2026-10-03 vs 最終内容変更 commit 2026-10-02）と index-generation-consistency（IR-061/SC-002・計測日不一致）が NG として残る
+- **発生局面**: case-open STEP-4 検査期待値確定（Case #3334・OU-004・PR #3351）
+- **検知方法**: check_integrity の req-updated-freshness と index-generation-consistency の NG、check_autogen_freshness の [CONTENT_CHANGE]（block_id=req-metrics-measurement-example）
+- **根本原因**: generate_indexes の req-metrics 計測日（deriveReqMetricsMeasureDate）は REQ 群の最終 content-change commit（git log %cI）から導出される設計（IR-061 日次再検出の構造的解消）。REQ 行変更を commit する前に派生物を再生成すると、計算基準の commit がまだ存在せず派生物が古い計測日のまま確定する
+- **自律対応内容**: REQ 変更 commit（d8df3022）後に generate_indexes.ts を再実行して req-health-metrics.md の計測日を再生成し、同一 PR へ追加 commit（294b3fc4）で含めた。再実行後は check_autogen_freshness 検出鮮度違反 0 件・REQ-099 関連 NG 0 件
+- **横展開観点**: case-open references（definition-pr-and-idempotency.md 手順 2.5）の「索引再生成後に checker の結果を取得」は REQ commit 後の再生成を含意するが、commit 前後の実行順序は明文化されていない。REQ 行変更を伴う Definition PR では常に本手順順序が効く
+- **予防策候補**: 手順 2.5 へ「REQ 行変更を commit した後に索引再生成を実行し、再生成された派生物を同一 PR へ含める」の明示追補候補（intake 候補としても成立）
+- **関連**: Case #3334・PR #3351・draft req-draft-backlog-pool-20261003（AG-004・ACT-REQ-002）
+- **タグ**: #index-regeneration #measurement-date #case-open
+
+---
