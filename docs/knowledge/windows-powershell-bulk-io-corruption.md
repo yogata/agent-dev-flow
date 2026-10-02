@@ -30,7 +30,7 @@ PS5.1 表示文言の ASCII 限定規律: Windows PowerShell 5.1（powershell.ex
 ## 適用対象
 
 - AGENTS.md ガイドレール（行動規範。PowerShell cmdlet 系の破壊リスク規定として追記対象）。
-- case-run 委譲手順（src/opencode/skills/agentdev-workflow-case-run/ の実行担当サブエージェントへの委譲手順。追記は別判断）。
+- case-run 委譲手順（src/common/skills/agentdev-workflow-case-run/ の実行担当サブエージェントへの委譲手順。追記は別判断）。
 - checker stdout 退避（機械検査出力をファイルへ退避する場面。同じ破壊系統が適用される）。
 - gh CLI 等の外部ツール出力の退避（`gh pr view --json` 、`git show` 等の出力退避。PR #2595 の case-close capture 回収で同一系統を再確認）。
 - PS5.1 スクリプト内の埋め込み表示文言（ログ出力・プロンプト・エラーメッセージ等のリテラル。ASCII 限定規律の適用対象）。

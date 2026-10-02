@@ -12,8 +12,8 @@
 import { describe, expect, test } from "bun:test";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { inspectCrossDependencies } from "../../../src/opencode/skills/agentdev-workflow-case-open/scripts/lib/cross_dependency_engine.ts";
-import type { CrossDependencyInspectionInput } from "../../../src/opencode/skills/agentdev-workflow-case-open/scripts/lib/cross_dependency_types.ts";
+import { inspectCrossDependencies } from "../../../src/common/skills/agentdev-workflow-case-open/scripts/lib/cross_dependency_engine.ts";
+import type { CrossDependencyInspectionInput } from "../../../src/common/skills/agentdev-workflow-case-open/scripts/lib/cross_dependency_types.ts";
 
 const FIXTURE_DIR = path.join(import.meta.dir, "fixtures", "batch-2026-09-15");
 
@@ -84,7 +84,7 @@ describe("TS-005: 2026-09-15 の 20 Case バッチ再現", () => {
     const inputPath = path.join(FIXTURE_DIR, "cases.json");
     const result = Bun.spawnSync([
       process.execPath,
-      "./src/opencode/skills/agentdev-workflow-case-open/scripts/src/inspect_cross_dependencies.ts",
+      "./src/common/skills/agentdev-workflow-case-open/scripts/src/inspect_cross_dependencies.ts",
       "--input",
       inputPath,
       "--root",

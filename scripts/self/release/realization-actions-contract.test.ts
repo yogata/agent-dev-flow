@@ -1,7 +1,7 @@
 // Contract alignment test for the realization_actions schema (REQ-008-060,
 // DEC-026). Pins the 3-way contract between:
 //   - the req-draft template:
-//     src/opencode/commands/agentdev/templates/req-define/req-draft.md
+//     src/common/commands/agentdev/templates/req-define/req-draft.md
 //   - the schema owner:
 //     docs/designs/responsibilities/artifact-contracts.md
 //     ("### realization_actions 構造" section)
@@ -28,7 +28,7 @@ import * as path from "path";
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 
 const TEMPLATE_REL =
-  "src/opencode/commands/agentdev/templates/req-define/req-draft.md";
+  "src/common/commands/agentdev/templates/req-define/req-draft.md";
 const CONTRACTS_REL = "docs/designs/responsibilities/artifact-contracts.md";
 const DOC_MODEL_REL = "docs/designs/foundations/document-model.md";
 

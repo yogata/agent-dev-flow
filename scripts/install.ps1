@@ -41,7 +41,7 @@
     - .opencode/skills/repo-*/      = real directories (repo-local only)
 
     -LocalMode redirects the agentdev-gh Custom Tool implementation to the local source:
-    - tools/agentdev-gh/         = junction -> .agentdev-plugin/src/opencode-local/agentdev-gh/
+    - tools/agentdev-gh/         = junction -> .agentdev-plugin/src/common/tools/agentdev-gh/local/
       (Local implementation of the same operation contract, REQ-011-006 / DEC-004)
     All other agentdev-* artifacts still link to the canonical sources as normal.
     Requires the OpenCode placement target (it redirects an .opencode/ projection).
@@ -71,9 +71,9 @@
 
 .PARAMETER LocalMode
     Switch. When set, the agentdev-gh Custom Tool implementation (.opencode/tools/agentdev-gh/)
-    is junctioned to src/opencode-local/agentdev-gh/ instead of
-    src/opencode/tools/agentdev-gh/. All other agentdev-* command/skill/tool/plugin
-    junctions target src/opencode/ as normal.
+    is junctioned to src/common/tools/agentdev-gh/local/ (runner-local.ts) instead of
+    the GitHub implementation. All other agentdev-* command/skill/tool junctions
+    target src/common/ and plugin junctions target src/opencode/ as normal.
 
     判断基準: GitHub Issue/PR を使わずローカルIssue（.agentdev/issues/）で運用する環境
     （ローカル版 OpenCode）では -LocalMode を指定する。
@@ -134,11 +134,11 @@ $PluginPath = Join-Path $RepoRoot $PluginDir
 # - src/common/      = host-independent canonical source (commands, skills, tools engines)
 # - src/opencode/    = OpenCode host connection area (plugin/hook originals, REQ-002-045)
 # - src/senpi/       = Senpi host connection area (placement contract; see src/senpi/README.md)
-# - src/opencode-local/ = Local-mode link originals (REQ-011-006 / DEC-004)
+# - src/common/tools/agentdev-gh/local/ = Local implementation of the gh Custom Tool (REQ-009-020)
 $CommonSourceDir = Join-Path $PluginPath 'src\common'
 $OpencodeHostSourceDir = Join-Path $PluginPath 'src\opencode'
 $SenpiHostSourceDir = Join-Path $PluginPath 'src\senpi'
-$LocalSourceDir = Join-Path $PluginPath 'src\opencode-local'
+$LocalSourceDir = Join-Path $PluginPath 'src\common\tools\agentdev-gh\local'
 # Legacy single-canonical source (pre multi-host layout). Kept only so that
 # junctions placed by older ADF versions stay recognizable as ADF-managed
 # artifacts during updates of existing consumers (REQ-099-012).
@@ -169,9 +169,8 @@ $RepoLocalSkillPrefix = 'repo-'
 $RepoLocalPluginNames = @('agentdev-distribution-boundary-guard')
 
 # In LocalMode the agentdev-gh Custom Tool implementation is redirected from
-# src/opencode-local/ (REQ-011-006, DEC-004).
+# src/common/tools/agentdev-gh/local/ (REQ-009-020).
 $LocalModeRedirectToolRel = 'tools\agentdev-gh'
-$LocalModeLocalSourceDirName = 'agentdev-gh'
 
 # textlint guard plugin の導入時生成依存（vendor 成果物）。版固定情報（package.json +
 # bun.lock）のみが配布され、vendor 実体は導入時に利用者が生成する（REQ-029-012）。
@@ -410,8 +409,8 @@ function Get-TargetSourcePath {
         Resolve the absolute source path backing a projection relative path.
         OpenCode targets back to the canonical sources (src/common/ for
         commands/skills/tools, src/opencode/ for plugins). In LocalMode,
-        tools\agentdev-gh is redirected to src/opencode-local/agentdev-gh/
-        (REQ-011-006, DEC-004). Senpi targets back to src/senpi/<subdir>.
+        tools\agentdev-gh is redirected to src/common/tools/agentdev-gh/local/
+        (REQ-009-020). Senpi targets back to src/senpi/<subdir>.
     #>
     param([string]$RelPath)
     $senpiRel = Resolve-SenpiTargetRel -TargetEntry $RelPath
@@ -419,7 +418,7 @@ function Get-TargetSourcePath {
         return Join-Path $SenpiHostSourceDir $senpiRel
     }
     if ($LocalMode -and $RelPath -eq $LocalModeRedirectToolRel) {
-        return Join-Path $LocalSourceDir $LocalModeLocalSourceDirName
+        return $LocalSourceDir
     }
     if ($RelPath -like 'plugins\*') {
         return Join-Path $OpencodeHostSourceDir $RelPath
@@ -455,7 +454,7 @@ function Test-ManagedProjectionJunction {
     # 旧単一正本候補（旧構成 consumer の管理物確定用。REQ-099-012 更新互換）
     $expectedSources += (Join-Path $LegacyUnifiedSourceDir $JunctionRel)
     if ($JunctionRel -eq $LocalModeRedirectToolRel) {
-        $expectedSources += (Join-Path $LocalSourceDir $LocalModeLocalSourceDirName)
+        $expectedSources += ($LocalSourceDir)
     }
     foreach ($target in $targetList) {
         $resolved = $null
@@ -871,9 +870,9 @@ Invoke-ThirdPartyDriftCheck -RootDir $RepoRoot -SkillsRootDir $SkillsDir -CliCom
 
 # LocalMode requires the local redirect target (Local 実装 Tool) to exist
 if ($LocalMode) {
-    $localRedirectSource = Join-Path $LocalSourceDir $LocalModeLocalSourceDirName
+    $localRedirectSource = $LocalSourceDir
     if (-not (Test-Path -LiteralPath (Join-Path $localRedirectSource 'runner-local.ts'))) {
-        Write-Error "[ERROR] LocalMode redirect source not found: $localRedirectSource (runner-local.ts). Ensure $PluginDir contains agent-dev-flow checkout with src/opencode-local/."
+        Write-Error "[ERROR] LocalMode redirect source not found: $localRedirectSource (runner-local.ts). Ensure $PluginDir contains agent-dev-flow checkout with src/common/tools/agentdev-gh/local/."
         exit 1
     }
 }
@@ -889,10 +888,10 @@ if ($Mode -eq 'check') {
 
     # Link mode 判定（REQ-050-004 継承能力）: -LocalMode 指定時は指定構成を期待値とする。
     # 未指定時は tools\agentdev-gh のリンク先から link mode を自動検出して報告する
-    # （local: src/opencode-local/ へ解決される場合、consumer-generated と判定）。
+    # （local: src/common/tools/agentdev-gh/local/ へ解決される場合、consumer-generated と判定）。
     $DetectedLocalMode = $false
     $ghToolProjection = Join-Path $ProjectionDir $LocalModeRedirectToolRel
-    $ghToolLocalSource = Join-Path $LocalSourceDir $LocalModeLocalSourceDirName
+    $ghToolLocalSource = $LocalSourceDir
     if (Test-Junction -Path $ghToolProjection) {
         $ghToolTarget = Get-JunctionTarget -Path $ghToolProjection
         if ($ghToolTarget -and (Test-Path -LiteralPath $ghToolTarget) -and
@@ -903,7 +902,7 @@ if ($Mode -eq 'check') {
     }
     $ExpectedLocalMode = if ($LocalMode) { $true } else { $DetectedLocalMode }
     if ($ExpectedLocalMode) {
-        Write-Host '[INFO] Link mode: local (consumer-generated) — tools/agentdev-gh -> src/opencode-local/agentdev-gh/'
+        Write-Host '[INFO] Link mode: local (consumer-generated) — tools/agentdev-gh -> src/common/tools/agentdev-gh/local/'
     } else {
         Write-Host '[INFO] Link mode: normal (consumer-with-agentdev) — tools/agentdev-gh -> src/opencode/tools/agentdev-gh/'
     }
@@ -970,10 +969,10 @@ if ($Mode -eq 'check') {
     # 3. Local redirect source (local mode only)
     if ($ExpectedLocalMode) {
         if (-not (Test-Path -LiteralPath (Join-Path $ghToolLocalSource 'runner-local.ts'))) {
-            Write-Host "[DIVERGENCE] Local redirect source not found: $PluginDir/src/opencode-local/$LocalModeLocalSourceDirName/"
+            Write-Host "[DIVERGENCE] Local redirect source not found: $PluginDir/src/common/tools/agentdev-gh/local/"
             $divergences++
         } else {
-            Write-Host "[OK] Local redirect source exists: $PluginDir/src/opencode-local/$LocalModeLocalSourceDirName/"
+            Write-Host "[OK] Local redirect source exists: $PluginDir/src/common/tools/agentdev-gh/local/"
         }
     }
 
@@ -1068,7 +1067,7 @@ if ($Mode -eq 'check') {
             $divergences++
         } elseif (Test-Junction -Path $targetPath) {
             $expectedSource = if ($ExpectedLocalMode -and $relPath -eq $LocalModeRedirectToolRel) {
-                Join-Path $LocalSourceDir $LocalModeLocalSourceDirName
+                $LocalSourceDir
             } else {
                 Get-TargetSourcePath -RelPath $relPath
             }
@@ -1177,7 +1176,7 @@ if ($Mode -eq 'check') {
 if ($Mode -eq 'dry-run') {
     Write-Host '=== Consumer Install Dry Run ==='
     if ($LocalMode) {
-        Write-Host '[INFO] LocalMode: tools/agentdev-gh redirects to src/opencode-local/agentdev-gh/'
+        Write-Host '[INFO] LocalMode: tools/agentdev-gh redirects to src/common/tools/agentdev-gh/local/'
     }
 
     # Projection root status (.opencode/ for OpenCode, .senpi/ for Senpi)
@@ -1309,7 +1308,7 @@ if ($Mode -eq 'dry-run') {
 if ($Mode -eq 'apply') {
     Write-Host '=== Consumer Install: applying junctions ==='
     if ($LocalMode) {
-        Write-Host '[INFO] LocalMode: tools/agentdev-gh redirects to src/opencode-local/agentdev-gh/'
+        Write-Host '[INFO] LocalMode: tools/agentdev-gh redirects to src/common/tools/agentdev-gh/local/'
     }
 
     # Step 1: Ensure projection roots are real directories (.opencode/ for OpenCode, .senpi/ for Senpi)

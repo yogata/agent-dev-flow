@@ -98,8 +98,8 @@ Capability Skill は workflow STEP を所有しない。
 
 ### Capability Skill の配置と命名
 
-- **配置**: `src/opencode/skills/agentdev-*/` 配下（REQ-002-008、REQ-002-019）
-- **原本と投影**: 原本は `src/opencode/skills/`、実行時投影先は `.opencode/skills/`（REQ-002-007。現行の責務体制は DEC-036）
+- **配置**: `src/common/skills/agentdev-*/` 配下（REQ-002-008、REQ-002-019）
+- **原本と投影**: 原本は `src/common/skills/`、実行時投影先は `.opencode/skills/`（REQ-002-007。現行の責務体制は DEC-036）
 - **命名**: `agentdev-{機能領域名}` 形式を推奨する。`agentdev-workflow-*` プレフィックスは歴史的経緯で Capability Skill にも残存する（後述「workflow-* プレフィックスを持つ Capability Skill 的スキル」）。Workflow/Capability 区別は命名ではなく本節の判定基準に基づく。新規作成は機能領域名（`req-*`、`spec-*`、`intake-*`、`learning-*`、`git-*`、`gh-*`、`quality-gates` 等）を推奨する
 
 ### Capability Skill の参照契約（過剰共通 reference 化の回避）

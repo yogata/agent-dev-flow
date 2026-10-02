@@ -316,7 +316,7 @@ case-run が使用する検査ツール（[integrity-contracts.md](../integrity/
 
 - check_changed_docs.ts（--workflow case-run）: PR 対象ファイルに docs/** 変更を含む場合、委譲前に実行（[docs/** 変更時の targeted docs guard（REQ-031-011）](#docs-変更時の-targeted-docs-guardREQ-031-011) 参照）
 - check_integrity.ts（全体監査）: PR 対象ファイルに docs/** 変更を含む case では commit 前に full 実行し、base 既知違反と新規違反を分離して新規違反 0 件を確認する（「docs 変更を含む case での commit 前 full check_integrity 工程」参照）
-- check_extensions.ts（IR-056）: `src/opencode/commands/agentdev/**/*.md`, `src/opencode/skills/agentdev-*/SKILL.md`, `src/opencode/skills/agentdev-*/references/**/*.md`, `.agentdev/extensions/**` のいずれかを変更した場合に実行
+- check_extensions.ts（IR-056）: `src/common/commands/agentdev/**/*.md`, `src/common/skills/agentdev-*/SKILL.md`, `src/common/skills/agentdev-*/references/**/*.md`, `.agentdev/extensions/**` のいずれかを変更した場合に実行
 - test_strategy: Issue 完了条件検証（REQ-031-008/030）
 
 case-run は check_integrity.ts（全体監査）を、docs 変更を含む case での commit 前検査として条件付きで使用する（base 既知違反と新規違反の分離、新規違反 0 件確認）。targeted docs guard（PR 単位の targeted 検査）は維持する。docs 変更を含まない case での全体監査は /repo/docs-check の責務である。
@@ -458,7 +458,7 @@ case-run 委譲内で作成する commit の構成運用を規定する。
 
 **対象ディレクトリ**:
 
-- 成果物変更: `docs/`、`src/opencode/`、`src/opencode-local/` 等、配布対象の永続状態
+- 成果物変更: `docs/`、`src/opencode/`、`src/common/tools/agentdev-gh/local/` 等、配布対象の永続状態
 - ドメイン state 更新: `.agentdev/` 配下（intake、learning、drafts、cases 等のケース固有の一時状態）
 
 **2分割運用の理由**:

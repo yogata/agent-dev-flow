@@ -8,11 +8,11 @@
 
 import { describe, expect, test } from "bun:test";
 import * as path from "node:path";
-import { inspectCrossDependencies } from "../../../src/opencode/skills/agentdev-workflow-case-open/scripts/lib/cross_dependency_engine.ts";
+import { inspectCrossDependencies } from "../../../src/common/skills/agentdev-workflow-case-open/scripts/lib/cross_dependency_engine.ts";
 import type {
   CrossDependencyInspectionInput,
   CrossDependencyInspectionReport,
-} from "../../../src/opencode/skills/agentdev-workflow-case-open/scripts/lib/cross_dependency_types.ts";
+} from "../../../src/common/skills/agentdev-workflow-case-open/scripts/lib/cross_dependency_types.ts";
 
 const MARKER = ["ADF", "-", "COVERS"].join("");
 
@@ -626,7 +626,7 @@ describe("CLI（実行形態・REQ-060 準拠はバッチ fixture テストで�
   test("入力形式エラー時は終了コード 1 で stderr に報告する", () => {
     const result = Bun.spawnSync([
       process.execPath,
-      path.join("src", "opencode", "skills", "agentdev-workflow-case-open", "scripts", "src", "inspect_cross_dependencies.ts"),
+      path.join("src", "common", "skills", "agentdev-workflow-case-open", "scripts", "src", "inspect_cross_dependencies.ts"),
     ], {
       cwd: path.resolve(import.meta.dir, "..", "..", ".."),
       stdout: "pipe",

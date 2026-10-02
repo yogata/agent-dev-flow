@@ -250,7 +250,7 @@ describe("corpus 適用（是正パターンでの二入口同一性と bypass �
 
   test("是正前パターンの外部書込み（bypass）を最終検査が検出する", async () => {
     const root = makeAdfProject();
-    const abs = path.join(root, "src", "opencode", "skills", "agentdev-x", "references", "leaked.md");
+    const abs = path.join(root, "src", "common", "skills", "agentdev-x", "references", "leaked.md");
     fs.mkdirSync(path.dirname(abs), { recursive: true });
     fs.writeFileSync(abs, CORPUS_CASES[0]?.before ?? VIOLATING, "utf8");
     const gate = await runFinalGate(["--root", root]);

@@ -59,6 +59,11 @@ function createDefaultRunner(
       if (typeof mod.createLocalRunner === "function") {
         return mod.createLocalRunner({ issuesDir: path.join(worktree, ".agentdev", "issues") });
       }
+      // 破損した Local 実装投影は GitHub 実装へ暗黙 fallback させず fail-closed する（必須能力不足の暗黙吸収禁止）。
+      throw new Error(
+        `the Local runner projection at ${LOCAL_RUNNER_PROJECTION} exists but does not export createLocalRunner; ` +
+          `the Local backend selection is broken and must not silently fall back to the GitHub implementation`,
+      );
     }
     return createCliRunner({ repo, tempDir: os.tmpdir() });
   };
@@ -84,9 +89,15 @@ export function createAgentdevGhSenpiRegistration(deps: AgentdevGhSenpiDeps = {}
       return { error: `cannot resolve the target repository (set AGENTDEV_GH_REPO=owner/name or run inside a gh repo)` };
     }
     const create = deps.createRunner ?? createDefaultRunner(deps.detectLocalRunner ?? defaultDetectLocalRunner);
-    cachedRunner = await create(worktree, repo);
+    let runner: GhRunner;
+    try {
+      runner = await create(worktree, repo);
+    } catch (e) {
+      return { error: e instanceof Error ? e.message : String(e) };
+    }
+    cachedRunner = runner;
     cachedRepo = repo;
-    return cachedRunner;
+    return runner;
   }
 
   return {

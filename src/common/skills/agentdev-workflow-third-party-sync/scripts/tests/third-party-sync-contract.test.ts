@@ -7,7 +7,7 @@ import { join, dirname } from "node:path";
 
 const skillDir = join(import.meta.dir, "..", "..");
 const repoRoot = join(import.meta.dir, "..", "..", "..", "..", "..", "..");
-const commandPath = join(repoRoot, "src", "opencode", "commands", "agentdev", "third-party-sync.md");
+const commandPath = join(repoRoot, "src", "common", "commands", "agentdev", "third-party-sync.md");
 const skillPath = join(skillDir, "SKILL.md");
 
 const command = readFileSync(commandPath, "utf8");

@@ -4,9 +4,9 @@
 //   - the case-ready workflow skill (workflow implementation body; the public
 //     command definition was removed by Case #2981 / DEC-033 and case-auto
 //     drives case-ready as an internal lifecycle stage):
-//     src/opencode/skills/agentdev-workflow-case-ready/ (SKILL.md + references)
+//     src/common/skills/agentdev-workflow-case-ready/ (SKILL.md + references)
 //   - the case-ready templates:
-//     src/opencode/skills/agentdev-workflow-templates/templates/case-ready/
+//     src/common/skills/agentdev-workflow-templates/templates/case-ready/
 //   - the requirements:
 //     docs/requirements/REQ-061.md (all requirement rows)
 //     docs/requirements/REQ-035.md (Root/Child SSoT separation, Standard
@@ -30,21 +30,21 @@ import * as path from "path";
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 
-const SKILL_REL = "src/opencode/skills/agentdev-workflow-case-ready/SKILL.md";
+const SKILL_REL = "src/common/skills/agentdev-workflow-case-ready/SKILL.md";
 const REF_DEF_REL =
-  "src/opencode/skills/agentdev-workflow-case-ready/references/definition-acceptance.md";
+  "src/common/skills/agentdev-workflow-case-ready/references/definition-acceptance.md";
 const REF_DEC_REL =
-  "src/opencode/skills/agentdev-workflow-case-ready/references/decision-acceptance.md";
+  "src/common/skills/agentdev-workflow-case-ready/references/decision-acceptance.md";
 const REF_EC_REL =
-  "src/opencode/skills/agentdev-workflow-case-ready/references/execution-contract.md";
+  "src/common/skills/agentdev-workflow-case-ready/references/execution-contract.md";
 const REF_STRUCT_REL =
-  "src/opencode/skills/agentdev-workflow-case-ready/references/execution-structure.md";
+  "src/common/skills/agentdev-workflow-case-ready/references/execution-structure.md";
 const REF_READY_REL =
-  "src/opencode/skills/agentdev-workflow-case-ready/references/readiness-and-cleanup.md";
+  "src/common/skills/agentdev-workflow-case-ready/references/readiness-and-cleanup.md";
 const TPL_ROOT_REL =
-  "src/opencode/skills/agentdev-workflow-templates/templates/case-ready/root-case.md";
+  "src/common/skills/agentdev-workflow-templates/templates/case-ready/root-case.md";
 const TPL_REPORT_REL =
-  "src/opencode/skills/agentdev-workflow-templates/templates/case-ready/root-case-report.md";
+  "src/common/skills/agentdev-workflow-templates/templates/case-ready/root-case-report.md";
 const REQ_061_REL = "docs/requirements/REQ-061.md";
 const REQ_035_REL = "docs/requirements/REQ-035.md";
 const CASE_READY_DESIGN_REL = "docs/designs/commands/case-ready.md";

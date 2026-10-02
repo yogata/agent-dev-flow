@@ -18,10 +18,10 @@ Command / Skill / Template / Script の入出力契約と依存方向を定義�
 
 | 種別 | 配置先 | 責務 | 入力 | 出力 |
 |---|---|---|---|---|
-| Command | src/opencode/commands/agentdev/（実行時: .opencode/commands/agentdev/） | 利用者向け入口、入力契約、最終出力、利用者から見える重大な副作用・確認境界、Workflow Skill への委譲 | ユーザー起動、GitHub Issue | PR、Issue 更新、完了報告 |
-| Skill | src/opencode/skills/（実行時: .opencode/skills/） | 再利用可能な判断基準、ドメイン知識 | Command からの参照 | 判断結果の参照提供 |
-| Template | src/opencode/skills/*/templates/ または src/opencode/commands/agentdev/templates/（実行時: .opencode/ 経由） | 出力構造とプレースホルダー | 変数バインド | Issue/PR 本文、コメント |
-| Script | src/opencode/skills/*/scripts/（実行時: .opencode/ 経由） | 決定的でテスト可能な解析・変換・検証・生成ロジック | コマンドライン引数 | 標準出力（JSON/Markdown） |
+| Command | src/common/commands/agentdev/（実行時: .opencode/commands/agentdev/） | 利用者向け入口、入力契約、最終出力、利用者から見える重大な副作用・確認境界、Workflow Skill への委譲 | ユーザー起動、GitHub Issue | PR、Issue 更新、完了報告 |
+| Skill | src/common/skills/（実行時: .opencode/skills/） | 再利用可能な判断基準、ドメイン知識 | Command からの参照 | 判断結果の参照提供 |
+| Template | src/common/skills/*/templates/ または src/common/commands/agentdev/templates/（実行時: .opencode/ 経由） | 出力構造とプレースホルダー | 変数バインド | Issue/PR 本文、コメント |
+| Script | src/common/skills/*/scripts/（実行時: .opencode/ 経由） | 決定的でテスト可能な解析・変換・検証・生成ロジック | コマンドライン引数 | 標準出力（JSON/Markdown） |
 | Custom Tool | src/opencode/tools/（実行時: .opencode/tools/ 経由。詳細構造は Design が所有） | Git / GitHub 等への構造化された副作用操作。操作契約（入力、出力、保証、失敗時）を公開し、文字コード・シェル・一時ファイル等の実装詳細を隠蔽 | 構造化引数 | 構造化結果（検証成功のみ成功） |
 | Plugin / Hook | src/opencode/plugins/（実行時: .opencode/ 経由。詳細構造は Design が所有） | モデル遵守判断に委ねない実行前の拒否・強制、正規経路の迂回防止 | ツール実行イベント | 許可・拒否判定 |
 | リポジトリローカル Command | .opencode/commands/repo/（原本なし） | 本体リポジトリ専用入口（REQ-001） | ユーザー起動 | レポート、成果物 |
@@ -411,9 +411,9 @@ case-open は `realization_actions` を Issue / Epic の execution contract へ�
 `review_dispositions` は req-define が壁打ち過程で記録した採否判断（covered、rejected 等）を後続工程へ引き継ぐ optional な soft-contract である（DEC-003）。
 
 - **所有先**: 本節（`artifact-contracts.md`「req_draft 出力構造」節）が `review_dispositions` のスキーマを正規所有する
-- **producer**: req-define（`docs/designs/commands/req-define.md`、`src/opencode/commands/agentdev/req-define.md`、`src/opencode/commands/agentdev/templates/req-define/req-draft.md`）
-- **consumer**: case-open workflow（`src/opencode/skills/agentdev-workflow-case-open/SKILL.md`）
-- **Issue 本文永続化先**: workflow-templates（`docs/designs/skills/agentdev-workflow-templates.md`、`src/opencode/skills/agentdev-workflow-templates/SKILL.md`、Issue 本文テンプレート群）が Issue 本文の「レビュー判断」セクション構造を正規所有する
+- **producer**: req-define（`docs/designs/commands/req-define.md`、`src/common/commands/agentdev/req-define.md`、`src/common/commands/agentdev/templates/req-define/req-draft.md`）
+- **consumer**: case-open workflow（`src/common/skills/agentdev-workflow-case-open/SKILL.md`）
+- **Issue 本文永続化先**: workflow-templates（`docs/designs/skills/agentdev-workflow-templates.md`、`src/common/skills/agentdev-workflow-templates/SKILL.md`、Issue 本文テンプレート群）が Issue 本文の「レビュー判断」セクション構造を正規所有する
 
 #### 各エントリの field 構成
 

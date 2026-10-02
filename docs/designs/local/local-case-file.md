@@ -15,7 +15,7 @@ updated: 2026-09-08
 > ローカル版 OpenCode 導入先リポジトリで運用されるローカルIssueの共通スキーマ、role 条件付きスキーマ、採番、見出しを定義する。
 > 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（REQ-001）。
 > REQ-009 の詳細仕様を正とする。role、kind、状態の意味論は agentdev-issue-tracking Design を正とし、本 Design は物理表現の写像に徹する。
-> ローカルIssue仕様の正本は本 Design であり、`src/opencode-local/agentdev-gh/case-schema/` 配下の定義は操作用定義（正本ではない）とする。
+> ローカルIssue仕様の正本は本 Design であり、`src/common/tools/agentdev-gh/local/case-schema/` 配下の定義は操作用定義（正本ではない）とする。
 
 ## 目的
 
@@ -171,14 +171,14 @@ PR 系操作の対象解決（拡張）:
 - case 系 workflow の作業ログ追記は comment_create 経由とし、issue_update による本文全体置換の際はコメントエントリ構造を保持して round-trip する
 
 共通メタデータ表へ `comment_seq`（数値、任意、コメント採番の最高水位標）を追加する。
-`src/opencode-local/agentdev-gh/case-schema/` の機械可読定義（case-file.md、headings.yaml 等）を
+`src/common/tools/agentdev-gh/local/case-schema/` の機械可読定義（case-file.md、headings.yaml 等）を
 本拡張へ合わせて更新する。
 
 ## role ごとの必須項目・状態値・許可操作の検証
 
 ローカル版 Tool 実装は、role ごとの必須メタデータ、status 値域、許可操作を機械検証する。Case 固有セクション（PR 相当セクション、マージ結果）を role: tracking の必須項目としない。
 
-case-schema 機械可読定義の更新方針: `src/opencode-local/agentdev-gh/case-schema/rules/` の機械可読定義（frontmatter.yaml、status.yaml、labels.yaml、headings.yaml）を共通メタデータと role 条件付きスキーマへ拡張する。role ごとの値域・必須項目を定義へ反映し、本 Design と矛盾しないことを検証する。
+case-schema 機械可読定義の更新方針: `src/common/tools/agentdev-gh/local/case-schema/rules/` の機械可読定義（frontmatter.yaml、status.yaml、labels.yaml、headings.yaml）を共通メタデータと role 条件付きスキーマへ拡張する。role ごとの値域・必須項目を定義へ反映し、本 Design と矛盾しないことを検証する。
 
 ## GitHub Issue / PR 置換対応表
 

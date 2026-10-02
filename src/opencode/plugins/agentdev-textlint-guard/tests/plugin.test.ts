@@ -251,13 +251,13 @@ describe("ADF 本体の追加対象と特例分岐禁止（TS-007）", () => {
     fs.writeFileSync(configAbs, ADF_BODY_CONFIG, "utf8");
     await expectBlocked(
       "write",
-      { filePath: path.join(root, "src", "opencode", "commands", "agentdev", "c.md"), content: VIOLATING },
+      { filePath: path.join(root, "src", "common", "commands", "agentdev", "c.md"), content: VIOLATING },
       root,
     );
     await expectBlocked(
       "edit",
       {
-        filePath: path.join(root, "src", "opencode", "skills", "agentdev-x", "SKILL.md"),
+        filePath: path.join(root, "src", "common", "skills", "agentdev-x", "SKILL.md"),
         oldString: "正常。",
         newString: "半角カナ\uFF71混入。",
       },

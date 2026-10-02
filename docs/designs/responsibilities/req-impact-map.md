@@ -61,7 +61,7 @@ updated: 2026-09-29
 | REQ-008 | 構造化 req_draft 契約 | IR-016 | ドメイン状態 |
 | REQ-003 | 外部エージェント統合契約 | IR-006, IR-024 | commands, skills |
 | v2:REQ-0140 | 文書品質ゲート | IR-013 | docs, Design, document-type-responsibilities.md |
-| REQ-009 | ローカル版 OpenCode 導入方式とローカルIssue運用 | IR-016, IR-046, IR-047, IR-048 | src/opencode-local/, .opencode/commands/agentdev/, .opencode/skills/agentdev-*/, .agentdev/issues/, Design, guides |
+| REQ-009 | ローカル版 OpenCode 導入方式とローカルIssue運用 | IR-016, IR-046, IR-047, IR-048 | src/common/tools/agentdev-gh/local/, .opencode/commands/agentdev/, .opencode/skills/agentdev-*/, .agentdev/issues/, Design, guides |
 | REQ-002 | 配布物ID除去後の文意保持、構文健全性、責務整合 | IR-016 | docs, Design, docs-spec-rebuild-integrity.md |
 | v2:REQ-0143 | Command 定義ファイルフォーマット標準化 | IR-049 | commands, command-file-format.md |
 | REQ-010 | docs-check/integrity 運用是正 | IR-016, IR-052 | integrity scripts, docs-check, Design |

@@ -12,7 +12,7 @@
 // 分類検証には使えない。distribution-boundary-guard-paths.ts 参照）。
 
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
-import * as fs from "fs";
+import * as fs from "node:fs";
 import { join } from "node:path";
 import { makeGuardEnv, type GuardEnv } from "../../../../common/guards/distribution-boundary/distribution-boundary-guard-env.ts";
 import {

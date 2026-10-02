@@ -18,8 +18,8 @@ checker 実装と回帰テストは本 Design の契約を実装・固定する�
 
 ### 走査対象
 
-- 配布 command 本文: `src/opencode/commands/agentdev/**/*.md`
-- 配布 skill 本文: `src/opencode/skills/**/*.md`
+- 配布 command 本文: `src/common/commands/agentdev/**/*.md`
+- 配布 skill 本文: `src/common/skills/**/*.md`
 - docs design 本文: `docs/designs/**/*.md`
 
 REQ-010-071 が要求する docs-check 実行時の「配布 command・skill 全体」への適用をこの走査範囲で満たす。

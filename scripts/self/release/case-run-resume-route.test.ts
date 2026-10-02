@@ -5,7 +5,7 @@
 //   - the case-run workflow skill (workflow implementation body; the public
 //     command definition was removed by Case #2981 / DEC-033 and case-auto
 //     drives case-run as an internal lifecycle stage):
-//     src/opencode/skills/agentdev-workflow-case-run/ (SKILL.md + references)
+//     src/common/skills/agentdev-workflow-case-run/ (SKILL.md + references)
 //   - the requirements:
 //     docs/requirements/REQ-031.md (changed rows 004 / 010 / 011)
 // as a permanent regression guard:
@@ -25,8 +25,8 @@ import * as path from "path";
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 
-const SKILL_REL = "src/opencode/skills/agentdev-workflow-case-run/SKILL.md";
-const REF_SINGLE_REL = "src/opencode/skills/agentdev-workflow-case-run/references/single.md";
+const SKILL_REL = "src/common/skills/agentdev-workflow-case-run/SKILL.md";
+const REF_SINGLE_REL = "src/common/skills/agentdev-workflow-case-run/references/single.md";
 const REQ_031_REL = "docs/requirements/REQ-031.md";
 
 function read(rel: string): string {
