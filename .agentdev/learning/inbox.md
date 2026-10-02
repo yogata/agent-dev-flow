@@ -397,3 +397,33 @@
 - **想定反映先**: agentdev-traceability の sidecar authoring 手順（sidecar-and-policy.md）、case-run の PR 前検査手順
 - **関連**: PR #3325 本文「検証差分」節 traceability check 行、Issue #3317、traceability/multi-host-canonical-structure.yaml（本 PR で新設された sidecar）
 - **タグ**: `#traceability` `#ADF-COVERS` `#宣言書式` `#parser` `#case-run` `#capture`
+
+## 2026-10-02 case-run（Case #3316・PR #3326 Findings 由来）: 検査基盤の走査先変更は baseline・除外定義・文言の 3 点セットで同時実施する
+
+- **問題事象**: source 走査を新構成（src/common/）へ変えると「検出可能になった本物の違反」が一斉に出る（local/ 配布対象外 19 hits、IR-055 新規 34、warning-cap 超過、lint_skills 予算超過）
+- **発生局面**: case-run（実現面実装。Case #3316・Epic #3316 Wave 1 Issue #3318 DEL-3318-1・RA-005）の checker 走査先更新
+- **検知方法**: checker 変更後の実行で新規 hits・NG が複数系統同時に発生し、base との差分解釈が難航
+- **根本原因**: 走査先の変更が検出領域を変えるため、旧構成前提の baseline entry・除外定義・checker 文言・expected が新領域に追随していない
+- **ユーザー確認有無**: なし（baseline 追随〔approved provenance 保持の機械的パス書換〕・除外定義追加・文言追随の 3 点セットで解消済み）
+- **Decision/REQ/spec影響**: なし（検査基盤の実務手順。baseline の approved provenance / reason は保持し file パスのみ機械的追随する方式を採用）
+- **横展開観点**: 走査先を変える checker 変更では、baseline 追随、配布対象外領域の除外定義、checker 文言・expected の追随を同時に実施する。片方だけの対応は base との差分解釈を難航させ、新規違反の正当性判定を妨げる
+- **再発条件**: checker の走査先・走査パターンを変更して既存 baseline・除外定義が旧前提のまま実行した場合
+- **予防策候補**: checker 変更時の変更チェックリスト（baseline / 除外定義 / 文言 / 対テスト）を checker 実行契約へ追記する候補
+- **想定反映先**: .opencode/skills/repo-agentdev-integrity の checker 変更手順、IR-055 / NG baseline の追随手順
+- **関連**: PR #3326 本文「検証差分」節 1・2・8 行、「Findings / Capture候補」learning 1 項目目、Issue #3318
+- **タグ**: `#checker` `#baseline` `#走査先変更` `#除外定義` `#case-run` `#capture`
+
+## 2026-10-02 case-run（Case #3316・PR #3326 Findings 由来）: multi-line path.join fixture への文字列一括置換は構文破損を生みやすい
+
+- **問題事象**: `"src",` `"opencode",` `"skills",` を別行に分けた path.join fixture への一括置換で `"common",,`・`"    skills"` 型の構文破損を生んだ
+- **発生局面**: case-run（実現面実装。Case #3316・Epic #3316 Wave 1 Issue #3318 DEL-3318-1・RA-005）の fixture の新構成対応
+- **検知方法**: 置換後の bun test 実行で構文エラーとして検出
+- **根本原因**: 文字列一括置換は multi-line に展開された呼び出しの行構造を保存しないため、行をまたぐ fixture 編集でカンマ・インデントが破損する
+- **ユーザー確認有無**: なし（置換後の bun test 構文実行で fixture ファイルを全実行して検出・修正済み）
+- **Decision/REQ/spec影響**: なし（fixture 編集の実務手順）
+- **横展開観点**: multi-line 呼び出しを含む fixture のパス一括置換では、置換後に当該 fixture を全実行（構文実行）してから次工程へ進む。行単位の置換結果を目検ではなく実行で確認する
+- **再発条件**: path.join 等の multi-line 展開 fixture に対する文字列一括置換を実施した場合
+- **予防策候補**: 一括置換系の変更後には対象 fixture 全実行を必須ステップとする候補
+- **想定反映先**: .opencode/skills/repo-agentdev-integrity 配下テスト fixture の編集手順
+- **関連**: PR #3326 本文「Findings / Capture候補」learning 2 項目目、Issue #3318
+- **タグ**: `#fixture` `#一括置換` `#構文破損` `#path.join` `#case-run` `#capture`
