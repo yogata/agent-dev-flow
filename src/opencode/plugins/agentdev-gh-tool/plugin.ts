@@ -18,7 +18,6 @@
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { spawnSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 import {
   AGENTDEV_GH_PUBLIC_CONTRACTS,
@@ -26,7 +25,19 @@ import {
 } from "../../../common/tools/agentdev-gh/index.ts";
 import { createCliRunner } from "../../../common/tools/agentdev-gh/runner-cli.ts";
 import { buildGhToolEnv } from "../../../common/tools/agentdev-gh/engine.ts";
+// host 非依存の公開スキーマ・リポジトリ解決は Tool engine 領域の正本を参照する（ホスト別複製を持たない）。
+import { AGENTDEV_GH_REQUEST_PROPERTY_SCHEMA as REQUEST_PROPERTY_SCHEMA } from "../../../common/tools/agentdev-gh/public-schema.ts";
+import {
+  defaultResolveRepo,
+  REPO_ENV,
+  type RepoResolution,
+  type RepoResolveDiagnostics,
+} from "../../../common/tools/agentdev-gh/repo-resolution.ts";
 import type { GhRunner } from "../../../common/tools/agentdev-gh/runner.ts";
+
+// 公開名・公開型は旧 plugin 定義名のまま維持（既存の参照・テスト互換）。
+export { AGENTDEV_GH_REQUEST_PROPERTY_SCHEMA as REQUEST_PROPERTY_SCHEMA } from "../../../common/tools/agentdev-gh/public-schema.ts";
+export type { RepoResolution, RepoResolveDiagnostics } from "../../../common/tools/agentdev-gh/repo-resolution.ts";
 
 // OpenCode plugin plumbing 型（@opencode-ai/plugin 1.x と同じ形状。
 // 本 plugin が消費するフィールドのみ宣言する。依存ゼロを保つため直接 import しない）。
@@ -54,98 +65,6 @@ export type ToolResultObject = {
   readonly metadata?: Record<string, unknown>;
 };
 
-/** 操作要求の公開スキーマ（JSON Schema）。正の契約は Tool の contracts.ts が所有する。 */
-export const REQUEST_PROPERTY_SCHEMA = {
-  type: "object",
-  description:
-    "Structured GitHub issue/PR operation request. See the agentdev_gh operation contract " +
-    "(issue_create, issue_read, issue_update, issue_close, pr_create, pr_read, pr_merge, pr_changed_files, " +
-    "pr_mergeable, pr_update, issue_list, issue_reopen, comment_create, comment_list, comment_update, " +
-    "comment_delete). " +
-    "Tracking-issue operations expose logical values (role, kind, trackingState); physical label mapping " +
-    "is applied inside the tool. Comments are a shared logical resource of issues and pull requests, " +
-    "identified by commentId (public type: string). Side-effect operations are verified by read-back " +
-    "before success is returned (fail-closed).",
-  properties: {
-    operation: {
-      type: "string",
-      enum: [
-        "issue_create",
-        "issue_read",
-        "issue_update",
-        "issue_close",
-        "pr_create",
-        "pr_read",
-        "pr_merge",
-        "pr_changed_files",
-        "pr_mergeable",
-        "pr_update",
-        "issue_list",
-        "issue_reopen",
-        "comment_create",
-        "comment_list",
-        "comment_update",
-        "comment_delete",
-      ],
-      description: "Operation name from the agentdev_gh operation catalog.",
-    },
-    number: {
-      type: "integer",
-      minimum: 1,
-      description:
-        "Issue/PR (or local issue) number. comment_create/comment_list use the parent issue or PR number.",
-    },
-    commentId: {
-      type: "string",
-      description: "Comment identifier for comment_update / comment_delete (public type: string).",
-    },
-    title: { type: "string", description: "Title for issue_create / issue_update / pr_create / pr_update." },
-    body: {
-      type: "string",
-      description:
-        "Markdown body for write operations (issues, PRs, comments).",
-    },
-    labels: {
-      type: "array",
-      items: { type: "string" },
-      description:
-        "Labels accepted by issue_create, issue_update, and issue_list; required for issue_create. Tracking-axis labels are managed by the tool.",
-    },
-    role: {
-      type: "string",
-      enum: ["tracking", "case"],
-      description: "Logical issue role for issue_create / issue_list.",
-    },
-    kind: {
-      type: "string",
-      enum: ["problem", "idea", "task", "risk"],
-      description: "Logical tracking-issue kind for issue_create / issue_update / issue_list.",
-    },
-    trackingState: {
-      type: "string",
-      enum: ["created", "in-discussion", "on-hold", "ready", "resolved", "closed"],
-      description:
-        "Logical tracking-issue state. issue_update accepts non-terminal states only; issue_list accepts all.",
-    },
-    state: {
-      type: "string",
-      enum: ["open", "closed"],
-      description: "Open/closed filter for issue_list.",
-    },
-    search: {
-      type: "string",
-      description:
-        "Server-side title search for issue_list; pushed to the GitHub search API (search/issues, in:title, tokenized match — not a substring filter).",
-    },
-    reason: { type: "string", enum: ["completed", "not_planned"], description: "Close reason for issue_close." },
-    base: { type: "string", description: "Base branch for pr_create." },
-    head: { type: "string", description: "Head branch for pr_create." },
-    method: { type: "string", enum: ["merge", "squash", "rebase"], description: "Merge method for pr_merge." },
-  },
-  required: ["operation"],
-  additionalProperties: false,
-} as const;
-
 /** 依存の注入点（テストは偽実装を差し込める）。 */
 export interface AgentdevGhToolDeps {
   /** リポジトリ（owner/name）の解決。失敗時は null。既定は gh repo view と環境変数。診断情報付き失敗は RepoResolution で返す。 */
@@ -165,67 +84,7 @@ export type RepoResolveDiagnostics = {
   readonly ghStderrSummary: string;
 };
 
-/** リポジトリ解決の結果。解決順（環境変数 → gh repo view）は変更しない。 */
-export type RepoResolution =
-  | { readonly repo: string }
-  | { readonly repo: null; readonly diagnostics: RepoResolveDiagnostics };
-
-const REPO_ENV = "AGENTDEV_GH_REPO";
-const REPO_PATTERN = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
 const LOCAL_RUNNER_PROJECTION = path.join(".opencode", "tools", "agentdev-gh", "runner-local.ts");
-
-/** 外部コマンド出力の要因要約（最初の非空行、200文字で切詰め）。 */
-function summarizeCause(text: unknown): string {
-  if (typeof text !== "string") return "(unavailable)";
-  const firstLine = text
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .find((line) => line !== "");
-  if (firstLine === undefined) return "(empty)";
-  return firstLine.length > 200 ? `${firstLine.slice(0, 200)}...` : firstLine;
-}
-
-function resolveRepoFromGh(worktree: string): {
-  repo: string | null;
-  exitCode: number | null;
-  cause: string;
-} {
-  const r = spawnSync("gh", ["repo", "view", "--json", "nameWithOwner", "-q", ".nameWithOwner"], {
-    encoding: "utf8",
-    cwd: worktree,
-    maxBuffer: 1024 * 1024,
-  });
-  const cause = r.error !== undefined ? summarizeCause(r.error.message) : summarizeCause(r.stderr);
-  if (r.status !== 0 || typeof r.stdout !== "string") {
-    return { repo: null, exitCode: r.status, cause };
-  }
-  const repo = r.stdout.trim();
-  if (!REPO_PATTERN.test(repo)) {
-    return { repo: null, exitCode: r.status, cause: `unexpected output: ${summarizeCause(r.stdout)}` };
-  }
-  return { repo, exitCode: r.status, cause };
-}
-
-function defaultResolveRepo(worktree: string): RepoResolution {
-  const fromEnv = process.env[REPO_ENV];
-  if (fromEnv !== undefined && REPO_PATTERN.test(fromEnv)) {
-    return { repo: fromEnv };
-  }
-  const envMean =
-    fromEnv === undefined
-      ? `${REPO_ENV} environment variable (not set)`
-      : `${REPO_ENV} environment variable (set but invalid format)`;
-  const gh = resolveRepoFromGh(worktree);
-  if (gh.repo !== null) return { repo: gh.repo };
-  return {
-    repo: null,
-    diagnostics: {
-      attemptedMeans: [envMean, "gh repo view"],
-      ghExitCode: gh.exitCode,
-      ghStderrSummary: gh.cause,
-    },
-  };
-}
 
 async function defaultCreateRunner(worktree: string, repo: string): Promise<GhRunner> {
   const localPath = path.join(worktree, LOCAL_RUNNER_PROJECTION);

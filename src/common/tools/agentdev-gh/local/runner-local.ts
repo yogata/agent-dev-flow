@@ -178,6 +178,34 @@ function issueFileName(number: number): string {
   return `${ISSUE_FILE_PREFIX}${String(number).padStart(4, "0")}${ISSUE_FILE_SUFFIX}`;
 }
 
+/**
+ * Windows では既存ファイルの置換を伴う rename が、直前の書込みハンドル解放や
+ * 検索インデクサ等の一時的な保持で非決定的に EPERM / EACCES になる。
+ * 短期の bounded retry（指数バックオフ、最大約150ms）で吸収する。
+ * リトライ不能な失敗は初回エラーをそのまま伝播する。
+ */
+function renameReplacingFile(from: string, to: string): void {
+  const backoffMs = [0, 10, 20, 40, 80];
+  let lastError: unknown = null;
+  for (const wait of backoffMs) {
+    if (wait > 0) sleepSync(wait);
+    try {
+      fs.renameSync(from, to);
+      return;
+    } catch (e) {
+      const code = (e as { code?: string }).code;
+      if (code !== "EPERM" && code !== "EACCES") throw e;
+      lastError = e;
+    }
+  }
+  throw lastError;
+}
+
+/** 同期スリープ（メインスレッドを待機させる。retry 経路のみで使用）。 */
+function sleepSync(ms: number): void {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+}
+
 function parseIssueNumber(fileName: string): number | null {
   if (!fileName.startsWith(ISSUE_FILE_PREFIX) || !fileName.endsWith(ISSUE_FILE_SUFFIX)) return null;
   const digits = fileName.slice(ISSUE_FILE_PREFIX.length, -ISSUE_FILE_SUFFIX.length);
@@ -481,7 +509,7 @@ export class LocalRunner implements GhRunner {
     const tmp = path.join(this.issuesDir, `${issueFileName(number)}.tmp`);
     fs.writeFileSync(tmp, toLf(raw), "utf8");
     try {
-      fs.renameSync(tmp, target);
+      renameReplacingFile(tmp, target);
     } catch (e) {
       fs.rmSync(tmp, { force: true });
       throw e;

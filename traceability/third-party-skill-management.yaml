@@ -2,6 +2,7 @@ component: third-party-skill-management
 implementation:
   src/opencode/plugins/agentdev-third-party-tool/plugin.ts:
     - REQ-097-004
+    - REQ-099-005
   src/common/tools/agentdev-third-party/README.md:
     - REQ-097-003
   src/common/tools/agentdev-third-party/cli.ts:
