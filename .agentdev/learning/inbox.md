@@ -324,3 +324,18 @@
 - **想定反映先**: src/opencode/skills/agentdev-git-worktree/references/worktree-operations.md（worktree 削除手順）
 - **関連**: git worktree remove 標準手順、Windows 環境のエンコーディング/パス防御知見（docs/knowledge/windows-powershell-bulk-io-corruption.md は I/O 系、本件は path 長系の別課題）
 - **タグ**: `#windows` `#long-path` `#robocopy` `#worktree-remove` `#cleanup` `#capture`
+
+## 2026-10-02 case-open（Case #3311・STEP-4 検査期待値実測）: Windows の bash から traceability scripts へ --root を渡すとき MSYS 形式パス（/c/...）は静かに空走査になり missing-design が偽 fail で出る
+
+- **問題事象**: Windows（Git Bash）で `bun .../check.ts --root "$(pwd)/.worktrees/3311-definition"` を実行すると、$(pwd) が MSYS 独自形式 `/c/Users/...` を返し、bun/node の readdirSync が解決できず walkFiles の catch で空列挙になる。check は `--req` 指定行を completenessScope として列挙するため、走査が空のまま missing-design/implementation/verification が全行 fail で出る。coverage --artifact も実在ファイルに対して file-not-found を返す。SKILL.md は相対パス指定（`--root .`）の事故像を警告するが、絶対パスでも MSYS /c/... 形式は同様に静かに誤動作する
+- **発生局面**: case-open STEP-4（missing-design 0 件ゲートの branch HEAD 実測。Case #3311）
+- **検知方法**: design 宣言追記済みなのに check missing-design が全行 fail になる矛盾と、coverage --artifact の file-not-found（実在ファイルで返る）の突合
+- **有効だった解決手順**: --root に Windows 形式の絶対パス（`C:/Users/...`）を直接指定して再実行する。bash からは `cygpath -m` 等で Windows 形式へ変換する
+- **ユーザー確認有無**: なし（再実行で解決）
+- **Decision/REQ/spec影響**: なし（実行手順の知見）
+- **横展開観点**: agentdev-traceability SKILL.md「実行前提（共通）」の事故像は相対パスのみ明記。Windows 環境では「絶対パスでも MSYS 形式は NG、Windows 形式を指定」が同格の事故像。check が静かに偽 fail を出すため、宣言追記済みの Definition 変更を誤って構成へ戻しかねない
+- **再発条件**: Windows + Git Bash 環境で traceability scripts（coverage/impact/check）の --root に $(pwd) 展開を含むパスを渡した場合
+- **予防策候補**: agentdev-traceability SKILL.md の実行前提に「Windows では Windows 形式絶対パスを指定。MSYS /c/... 形式は静かに空走査になる」を追記する候補
+- **想定反映先**: .opencode/skills/agentdev-traceability/SKILL.md（実行前提（共通）節）
+- **関連**: REQ-018（worktree 構造的制約とテスト fallback）、agentdev-git-worktree-test-fallback
+- **タグ**: `#windows` `#msys-path` `#traceability` `#silent-empty-scan` `#capture`
