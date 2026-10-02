@@ -339,3 +339,16 @@
 - **想定反映先**: .opencode/skills/agentdev-traceability/SKILL.md（実行前提（共通）節）
 - **関連**: REQ-018（worktree 構造的制約とテスト fallback）、agentdev-git-worktree-test-fallback
 - **タグ**: `#windows` `#msys-path` `#traceability` `#silent-empty-scan` `#capture`
+
+## 2026-10-02 case-close（Case #3311）: extension yaml 変更と integrity テスト期待値の暗黙依存は REQ-019 gate で捕捉されず、case-close STEP-3 の full suite で初検出となる
+
+- **問題クラス**: 検出漏れ（宣言的データ変更とテスト期待値の暗黙依存が REQ-019 gate の検出機構の外にある）
+- **観測内容**: REQ-098 の実装（.agentdev/extensions/skills/** への yomiyasu rule 追加と agentdev-workflow-issue.yaml 新規作成）で integrity suite 3 test が fail した（check_extensions.test.ts の inventory ハードコード workflow_extensions 16→17、traceability_workflow_integration.test.ts の case-open/case-ready に対する `rules: []` 文字列判定）。case-run は TS-001〜007 で完結する test strategy のため full integrity suite を実行しておらず、REQ-019 gate（check_test_impact.ts）も Design 文書への文字列参照（Design パス・basename・REQ/DEC ID）が検出契機のため、extension yaml とテスト期待値の暗黙依存を捕捉しなかった。case-close STEP-3 の full integrity suite 実行が 3 fail を初検出し、main 側同テスト（91 pass / 0 fail）の対照実行で「当該変更起因・期待値陳腐化」と由来分類し、REQ-019 処置契約「case-close 前の確認」経路で期待値を現行化した（commit aab0688e）
+- **ユーザー確認有無**: なし（REQ-019 処置契約内の正規経路）
+- **Decision/REQ/spec影響**: なし（REQ-019 の検出機構と処置契約は現行どおり機能した。検出漏れの構造は既知機構の適用範囲外）
+- **横展開観点**: REQ-019 gate は「Design 文書を文字列参照するテスト」しか陳腐化候補にできない。宣言的データ（extension yaml、traceability sidecar、data/*.yaml 等）の変更がテスト期待値へ波及する類型は gate の外にあるため、(1) この類型の変更を含む Case では case-run でも影響テストを rg で探索して期待値同期する、(2) case-close STEP-3 の full integrity suite はこの類型の最後の防衛線であるため省略しない、の2点が実務上の防御になる。テスト側が inventory 数や構造文字列をハードコードする実装は、宣言的データの追加・変更で陳腐化しやすい
+- **再発条件**: .agentdev/extensions/** や traceability/** 等の宣言的データを追加・変更し、かつ当該データの統計・構造をハードコードする integrity テストが存在する場合
+- **予防策候補**: check_test_impact.ts の検出契機に「宣言的データ（extensions、traceability、data）への参照を持つテスト」を加える拡張候補、または extension 変更を含む Case の test strategy へ integrity suite 実行を含める運用検討（REQ-019 または case-run STEP 契約側の判断）
+- **想定反映先**: check_test_impact.ts（検出契機拡張の要否判断）、case-run STEP 契約の docs 検証項目、REQ-019 関連 Design
+- **関連**: Case #3311 case-close 対応記録コメント（3 fail の由来分類と現行化を記録）、REQ-019（テスト影響範囲検出 gate）、docs/designs/integrity/test-impact-detection-gate.md
+- **タグ**: `#integrity` `#extension-yaml` `#テスト期待値` `#REQ-019` `#case-close` `#capture`
