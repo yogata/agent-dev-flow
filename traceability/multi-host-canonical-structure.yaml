@@ -37,7 +37,7 @@ implementation:
   docs/reports/req-099-wave3-verification.md:
     - REQ-099-007
     - REQ-099-016
-  verification:
+verification:
   src/common/guards/gh-write/tests/gh-command-detector.test.ts:
     - REQ-099-013
     - REQ-099-014
