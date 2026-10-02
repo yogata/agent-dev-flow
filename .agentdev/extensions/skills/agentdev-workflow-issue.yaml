@@ -1,21 +1,9 @@
-# ADF-COVERS(implementation): REQ-098-001, REQ-098-002, REQ-098-003, REQ-098-004, REQ-098-006, REQ-098-007, REQ-098-008, REQ-098-009, REQ-098-012, REQ-098-013
+# ADF-COVERS(implementation): REQ-098-001, REQ-098-003, REQ-098-004, REQ-098-005, REQ-098-006, REQ-098-007, REQ-098-008, REQ-098-009, REQ-098-012, REQ-098-013
 version: 1
 kind: workflow-extension
-id: agentdev-workflow-case-revise
+id: agentdev-workflow-issue
 
-context:
-  - id: case-ready-design
-    paths:
-      - "docs/designs/commands/case-ready.md"
-    purpose: Definition Amendment の保存・確定境界の確認
-  - id: v4-lifecycle-state-machine
-    paths:
-      - "docs/designs/workflows/v4-lifecycle-state-machine.md"
-    purpose: 再合意済み変更後の case-ready 接続の確認
-  - id: case-revise-spec
-    paths:
-      - "docs/designs/commands/case-revise.md"
-    purpose: case-revise 固有の実行契約と停止境界の確認
+context: []
 
 rules:
   - id: yomiyasu-application-before-write
@@ -34,10 +22,11 @@ rules:
 
       記録は既存 PR 検証欄等へ対象・実施結果・保持した指摘理由を最小限残し、記録のためだけの再帰的コメント投稿や追加永続管理を作らない
 
-      再合意済み Definition 変更（Amendment PR・Case 関連 Issue 本文更新）への適用を含む
+      追跡Issue の起票・更新・クローズ・再オープン・経過コメントの文章が対象
     skill: yomiyasu
+
 checks: []
-acceptance_gates:
-  - 再合意済み Definition 変更が Amendment として既存 Root Case に関連付けられていること
-  - case-revise 完了後に case-ready が再確定工程として実行可能であること
+
+acceptance_gates: []
+
 must_not: []
