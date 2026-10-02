@@ -8,6 +8,7 @@ implementation:
     - REQ-090-019
     - REQ-090-025
     - REQ-090-026
+    - REQ-099-005
 verification:
   src/opencode/plugins/agentdev-jev-tool/tests/plugin.test.ts:
     - REQ-090-002

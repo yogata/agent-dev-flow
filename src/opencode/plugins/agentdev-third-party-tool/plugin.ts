@@ -21,6 +21,8 @@ import {
   runAgentdevThirdPartyOperation,
 } from "../../../common/tools/agentdev-third-party/index.ts";
 import type { SourceFetcher } from "../../../common/tools/agentdev-third-party/index.ts";
+// host 非依存の公開スキーマは Tool engine 領域の正本を参照する（ホスト別複製を持たない）。
+import { AGENTDEV_THIRD_PARTY_REQUEST_PROPERTY_SCHEMA as REQUEST_PROPERTY_SCHEMA } from "../../../common/tools/agentdev-third-party/public-schema.ts";
 
 // OpenCode plugin plumbing 型（本 plugin が消費するフィールドのみ宣言する）。
 
@@ -46,39 +48,6 @@ export type ToolResultObject = {
   readonly output: string;
   readonly metadata?: Record<string, unknown>;
 };
-
-/** 操作要求の公開スキーマ（JSON Schema）。正の契約は Tool の contracts.ts が所有する。 */
-const REQUEST_PROPERTY_SCHEMA = {
-  type: "object",
-  description:
-    "Structured third-party Skill acquisition request. Acquires skills declared in " +
-    "src/third-party/skills.yaml (producer-managed) or .agentdev/third-party/skills.yaml " +
-    "(consumer-managed fallback) into .opencode/skills/<name>/. " +
-    "Single SKILL.md sources are normalized to .opencode/skills/<name>/SKILL.md; " +
-    "GitHub Skill directory sources are acquired recursively preserving the relative structure " +
-    "(nothing outside the Skill directory is acquired). Existing unmanaged placements with the " +
-    "same name are never overwritten (refused, not skipped). The placement is verified by " +
-    "read-back before success is returned; verification failures never return success (fail-closed). " +
-    "On failure the pre-acquisition state is restored and the failure causes are reported.",
-  properties: {
-    operation: {
-      type: "string",
-      enum: ["acquire"],
-      description: "Operation name from the agentdev_third_party operation catalog.",
-    },
-    skill: {
-      type: "string",
-      description: "Target skill name from the declaration. Omit to acquire all declared skills.",
-    },
-    dryRun: {
-      type: "boolean",
-      description:
-        "When true, no acquisition runs; returns the plan (targets, placement paths, unmanaged conflicts).",
-    },
-  },
-  required: ["operation"],
-  additionalProperties: false,
-} as const;
 
 /** 依存の注入点（テストは偽実装を差し込める）。 */
 export interface AgentdevThirdPartyToolDeps {

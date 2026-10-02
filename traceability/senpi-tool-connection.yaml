@@ -1,0 +1,34 @@
+component: senpi-tool-connection
+implementation:
+  src/senpi/tools/tool-registration.ts:
+    - REQ-099-002
+  src/senpi/tools/agentdev-gh-tool/registration.ts:
+    - REQ-099-005
+    - REQ-099-006
+    - REQ-099-009
+  src/senpi/tools/agentdev-jev-tool/registration.ts:
+    - REQ-099-005
+  src/senpi/tools/agentdev-third-party-tool/registration.ts:
+    - REQ-099-005
+  src/common/tools/agentdev-gh/public-schema.ts:
+    - REQ-009-015
+    - REQ-099-005
+  src/common/tools/agentdev-gh/repo-resolution.ts:
+    - REQ-099-005
+  src/common/tools/agentdev-jev/public-schema.ts:
+    - REQ-009-015
+    - REQ-099-005
+  src/common/tools/agentdev-third-party/public-schema.ts:
+    - REQ-009-015
+    - REQ-099-005
+verification:
+  src/senpi/tools/agentdev-gh-tool/tests/registration.test.ts:
+    - REQ-099-005
+    - REQ-099-006
+  src/senpi/tools/agentdev-jev-tool/tests/registration.test.ts:
+    - REQ-099-005
+  src/senpi/tools/agentdev-third-party-tool/tests/registration.test.ts:
+    - REQ-099-005
+  src/senpi/tools/tests/structure.test.ts:
+    - REQ-099-002
+    - REQ-099-006
