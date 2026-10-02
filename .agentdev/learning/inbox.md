@@ -5,6 +5,15 @@
 
 ---
 
+## 2026-10-03 case-open（OU-002・Case #3333）yomiyasu 適用順序違反
+
+- 問題クラス: workflow deviation（工程順序違反）
+- 発生工程: case-open（case-auto 配下の並行委譲実行。Root Case #3333・Definition PR #3343）
+- 内容: case-open の project extension（`.agentdev/extensions/skills/agentdev-workflow-case-open.yaml` の yomiyasu-application-before-write ルール・REQ-098）は docs 編集前と agentdev_gh 書込み前の yomiyasu 読込・lint 確認を要求するが、委譲実行者は workflow SKILL.md の制御平面（6 STEP）のみを根拠に進行し、Design 編集と Issue/PR 投稿後に extension ルールを発見した。遡及適用（3 対象へ lint 実行・保持理由を PR 検証欄へ記録）で回復したが、書込み前適用の契約に反した
+- 学び: workflow 委譲実行時は制御平面（SKILL.md/references）に加え、project extension（`.agentdev/extensions/skills/<workflow>.yaml`）を STEP-1 の入力解決時に読み込むべき。SKILL.md の Capability Skill 連携節に `agentdev-project-extensions` が列挙されていても、docs 編集・GitHub 書込みといった具体的な適用契機は extension 側 rules にしか書かれておらず、extension 未読込のまま進むと fail-open 性質上、適用漏れが silently 継続する
+- 提案: case-open の STEP reference（root-case-and-definition-package.md の STEP-2 前の手順等）へ「STEP-1 で project extension を読み込み rules の適用契機を確認する」明示の追加候補（intake 候補としても成立）
+- 発見元: Case #3333（backlog-pool-20261003・OU-002）実行時の自工程観測
+
 ## 2026-10-03: REQ-032 frontmatter updated 乖離は case-open 実測時点で既に解消済みだった（RU 実測時点との時間差陳腐化）
 
 - **問題事象**: draft AG-005（RU-20261003-05・base 95d32719 実測）は REQ-032.md frontmatter updated（2026-09-29）≠ 最終内容変更コミット日（2026-10-01）の乖離を想定したが、case-open 実測では 7f163676（#3310）で updated 修正済みで一致しており、ACT-REQ-005 は実変更なし判定になった
