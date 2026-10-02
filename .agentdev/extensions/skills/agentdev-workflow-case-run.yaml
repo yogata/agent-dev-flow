@@ -1,3 +1,4 @@
+# ADF-COVERS(implementation): REQ-098-001, REQ-098-002, REQ-098-003, REQ-098-004, REQ-098-006, REQ-098-007, REQ-098-008, REQ-098-009, REQ-098-012, REQ-098-013
 version: 1
 kind: workflow-extension
 id: agentdev-workflow-case-run
@@ -17,6 +18,24 @@ rules:
   - id: traceability-check-before-pr
     when: 対象要件の対応関係確認と PR 作成前の対応宣言整合性検査（check）を実施するとき。利用不能時は README 索引、正規成果物の直接読取、rg 等の独立探索手段で続行する
     skill: agentdev-traceability
+  - id: yomiyasu-application-before-write
+    when: >-
+      docs/** 日本語文章を変更する場合: 編集前に yomiyasu を読み込み、内容変更が揃った後に変更文章と周辺文脈を推敲し、同梱 lint（.opencode/skills/yomiyasu/scripts/yomiyasu_lint.py を環境で利用可能な Python コマンド〔python3 に固定しない〕で標準入力により実行し、検査専用の本文ファイルを新規保存しない）を実行して指摘を確認する。各 edit ごと・既存文書全体の一括推敲は不要
+
+      GitHub 文章（Issue/PR タイトル・本文、説明・レビュー・完了コメント。委譲先能力スキル〔agentdev-issue-management、agentdev-workflow-templates、agentdev-epic-tracker、agentdev-quality-gates、agentdev-case-run-execution-adapter〕経由の書込みを含む）は agentdev_gh へ渡す前に推敲する。本文は lint・指摘確認後、タイトルは本文向け文長・箇条書き比率を合否条件にしない。書込み後 VERIFY は維持
+
+      更新は変更文章と周辺文脈を対象とし、他者の文章・引用・ログを無断でリライトしない。ラベル・状態・チェックボックスのみの変更は再推敲不要
+
+      要件の必須性・条件・責任主体・数値・否定条件を保持し、識別子・リンク・コード・引用・固定テンプレート・表構造・AUTOGEN 部分を保護する。既存用語辞書・文書契約を優先し、機械的な箇条書き削減・否定対比の肯定化を適用しない
+
+      適用済みは推敲・lint・指摘確認までを指す（修正不要の確認を含む）。警告ゼロ・スコア閾値・--strict を要求せず、lint の通常終了コード 0 を指摘なし・推敲済みの証明として扱わない。正当な用語への指摘は理由を記録して保持できる。修正試行は最大 2 回
+
+      yomiyasu 未導入・lint 実行失敗の場合は対象文章の提出・投稿・マージを停止する。適用確認は最後の文章変更後に行い、親セッションの読込事実のみで委譲先の適用を省略しない
+
+      記録は既存 PR 検証欄等へ対象・実施結果・保持した指摘理由を最小限残し、記録のためだけの再帰的コメント投稿や追加永続管理を作らない
+
+      実装に伴う docs 変更への適用と、実行担当サブエージェント委譲への適用義務の引継ぎを含む
+    skill: yomiyasu
 
 checks: []
 
