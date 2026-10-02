@@ -1,7 +1,7 @@
 # v3 -> v4 処遇一覧（crosswalk inventory）
 
 位置づけ: 本ファイルは v3-v4-crosswalk Design の references であり、現行 v3 成果物の
-v4 処遇の完全一覧（正本）を所有する。列スキーマと運用規則は親 Design を参照。
+v4 処遇の完全一覧（原本）を所有する。列スキーマと運用規則は親 Design を参照。
 
 ## REQ（移行判定時点 53）
 
@@ -76,7 +76,7 @@ v4 処遇の完全一覧（正本）を所有する。列スキーマと運用�
 | DEC-007 | keep | ― | ― | executed | superseded by DEC-017（履歴維持） |
 | DEC-008 | keep | ― | ― | executed | bounded parent decision resolution は維持。第13段 full validation で維持確認 2026-09-20（Case #3036） |
 | DEC-009 | keep | ― | ― | executed | Decision モデル移行は維持。第13段 full validation で維持確認 2026-09-20（Case #3036） |
-| DEC-010 | redefine | semantic Skill | 8 | executed | 責務 3 層分化の v4 Skill 再編での再定義。第8段実行 2026-09-20（Case #3011、Definition merge 21434202、実装 merge eac6a5e9/b1207a0f/733eb40d/b0738869、fan-in fix 1befae99）。redefine（正本参照更新） |
+| DEC-010 | redefine | semantic Skill | 8 | executed | 責務 3 層分化の v4 Skill 再編での再定義。第8段実行 2026-09-20（Case #3011、Definition merge 21434202、実装 merge eac6a5e9/b1207a0f/733eb40d/b0738869、fan-in fix 1befae99）。redefine（原本参照更新） |
 | DEC-011 | keep | ― | ― | executed | STEP resume point は維持。第13段 full validation で維持確認 2026-09-20（Case #3036） |
 | DEC-012 | redefine | Project Extension | 10 | executed | Extension の v4 semantic extension point 化。第10段実行 2026-09-20（Case #3029、Definition PR #3030 merge c08b741f・確定 496d2897・verify-only closure〔実装 PR なし〕）。redefine（relations 2 件追記と承認記録・決定本文不変・status: accepted 維持） |
 | DEC-013 | keep | ― | ― | executed | IR 登録モデル簡素化は維持。第13段 full validation で維持確認 2026-09-20（Case #3036） |

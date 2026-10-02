@@ -62,7 +62,7 @@
 | DEC-046 | Jev 実行基盤の Cloudflare AI Gateway への完全置換 | accepted | 2026-09-27 |
 | DEC-047 | textlint 依存実体の版固定情報解決への転換 | accepted | 2026-09-29 |
 | DEC-048 | ADF判断アーキテクチャ: 判断方法・確定権限・人間判断境界の統一モデル | accepted | 2026-10-01 |
-| DEC-049 | ADF 共通正本とホスト接続領域の分離によるマルチホスト配布モデル | accepted | 2026-10-02 |
+| DEC-049 | ADF 共通原本とホスト接続領域の分離によるマルチホスト配布モデル | accepted | 2026-10-02 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -113,7 +113,7 @@
 - [DEC-046](DEC-046.md)（Jev 実行基盤の Cloudflare AI Gateway への完全置換）
 - [DEC-047](DEC-047.md)（textlint 依存実体の版固定情報解決への転換）
 - [DEC-048](DEC-048.md)（ADF判断アーキテクチャ: 判断方法・確定権限・人間判断境界の統一モデル）
-- [DEC-049](DEC-049.md)（ADF 共通正本とホスト接続領域の分離によるマルチホスト配布モデル）
+- [DEC-049](DEC-049.md)（ADF 共通原本とホスト接続領域の分離によるマルチホスト配布モデル）
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）

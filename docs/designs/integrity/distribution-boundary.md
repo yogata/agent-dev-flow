@@ -37,7 +37,7 @@ distribution は consumer 環境へ配布されるテキスト成果物の集合
 境界は Markdown 本文に限定しない（REQ-029-002）。
 配布対象のテキスト成果物（command 定義、skill 定義、template、script ソース、附属するテキスト形式の設定や README）すべてへ適用する。
 テキストと判定可能な成果物とバイナリと判定される成果物を決定的に区別し、判定不能なエントリは unclassified として gate-not-passed 扱いとする。
-検査対象の除外領域: 共通正本側 tests/ 配下（検出刺激用のサンプル文字列を含むテスト。Issue #2480）と、tools/<name>/local/ 配下（通常版の同期・インストールの配布対象から除外された Local 実装領域。REQ-009-016）は配布テキスト成果物の対象外とする。
+検査対象の除外領域: 共通原本側 tests/ 配下（検出刺激用のサンプル文字列を含むテスト。Issue #2480）と、tools/<name>/local/ 配下（通常版の同期・インストールの配布対象から除外された Local 実装領域。REQ-009-016）は配布テキスト成果物の対象外とする。
 
 ## 配布物本文の記述規則
 
@@ -111,7 +111,7 @@ clean として通過させない（DEC-014 決定5）。
 
 次の 4 projection を分離して検査する。
 
-- source projection: 共通正本 src/common/（commands/skills/tools/guards）とホスト接続領域の plugin 正本 src/opencode/plugins/ など原本領域。
+- source projection: 共通原本 src/common/（commands/skills/tools/guards）とホスト接続領域の plugin 原本 src/opencode/plugins/ など原本領域。
 - link projection: 通常の consumer リンクインストールで展開される配置先。
 - archive projection: release として具体化された配布アーカイブ。
 - archive-installed projection: archive を展開し install した状態。
@@ -146,7 +146,7 @@ Epic 実装はこれに従う。
 関数署名、実装コード、内部データ表現は実装詳細として本節に含めない。
 
 - 共有 module: 副作用なし（side-effect-free）の canonical detector module は repo-agentdev-integrity 配下が所有する。想定モジュールパスは `.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts`。既存の checker はこの共有 module への adapter となる。
-- repo-local plugin: 正本は `src/opencode/plugins/agentdev-distribution-boundary-guard/` 配下（package.json に repo-local 配布除外の判定根拠を含む）。利用側は self-sync 投影（`.opencode/plugins/agentdev-distribution-boundary-guard/` junction + depth-1 loader shim `agentdev-distribution-boundary-guard.ts`）。
+- repo-local plugin: 原本は `src/opencode/plugins/agentdev-distribution-boundary-guard/` 配下（package.json に repo-local 配布除外の判定根拠を含む）。利用側は self-sync 投影（`.opencode/plugins/agentdev-distribution-boundary-guard/` junction + depth-1 loader shim `agentdev-distribution-boundary-guard.ts`）。
 - plugin からの相対 import は、移動後に想定モジュールパス（canonical detector `.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts`）へ src 配下から .opencode 配下への逆向き参照になる（REQ-018 テスト fallback 観点）。
 - 旧名称・旧パス（distribution-boundary-guard、`.opencode/plugins/distribution-boundary-guard.ts`）を obsolete-vocabulary-map.yaml（IR-066）へ登録し、並存禁止を機械検出可能にする方針とする。
 - 事前書き込み gate: OpenCode の `tool.execute.before` フック（サポート対象は `edit`、`write`、`apply_patch`）で構成する。adapter は prospective content を評価し、違反または検査エラー時に書き込みを block する。

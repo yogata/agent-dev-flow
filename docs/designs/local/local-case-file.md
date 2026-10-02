@@ -15,7 +15,7 @@ updated: 2026-09-08
 > ローカル版 OpenCode 導入先リポジトリで運用されるローカルIssueの共通スキーマ、role 条件付きスキーマ、採番、見出しを定義する。
 > 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（REQ-001）。
 > REQ-009 の詳細仕様を正とする。role、kind、状態の意味論は agentdev-issue-tracking Design を正とし、本 Design は物理表現の写像に徹する。
-> ローカルIssue仕様の正本は本 Design であり、`src/common/tools/agentdev-gh/local/case-schema/` 配下の定義は操作用定義（正本ではない）とする。
+> ローカルIssue仕様の原本は本 Design であり、`src/common/tools/agentdev-gh/local/case-schema/` 配下の定義は操作用定義（原本ではない）とする。
 
 ## 目的
 

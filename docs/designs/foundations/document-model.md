@@ -361,7 +361,7 @@ accepted Decision は意味的に不変とする（REQ-001-056〜060）。
 ### 分類判断ツリーの配置
 
 新規文書作成時の分類判断フロー（分類判断ツリー）は執筆時配置判定に属するため、`../responsibilities/document-type-responsibilities.md`「新規文書作成時の分類判断ツリー」を参照。
-本 Design は文書種別の基準境界（責務マトリックス、各文書種別の記述対象）を正本として保持し、執筆時の判定手順は document-type-responsibilities.md 側に寄せている。
+本 Design は文書種別の基準境界（責務マトリックス、各文書種別の記述対象）を原本として保持し、執筆時の判定手順は document-type-responsibilities.md 側に寄せている。
 
 ### 文書間投影規則 <!-- REQ-001 -->
 
@@ -498,7 +498,7 @@ Design の基本frontmatter（`title`、`status`、`created`、`updated`）は p
 
 ### 用語: 原本、配置先 <!-- REQ-001 -->
 
-原本 (source) と配置先 (projection) の用語定義、投影方向、編集原則は「文書間投影規則」セクションを正本とする。
+原本 (source) と配置先 (projection) の用語定義、投影方向、編集原則は「文書間投影規則」セクションを原本とする。
 本セクションでは再掲しない（intra-file 重複解消）。
 
 ## 文書7分類モデル

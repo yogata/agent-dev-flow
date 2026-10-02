@@ -156,7 +156,7 @@ verification-only PR 判定と PASS 処理の振る舞い（v2:REQ-0158-002 よ�
 ## report 契約
 
 report JSON の必須フィールド一覧、`failure` オブジェクトの構造、`files_checked` 空時の警告仕様は [references/targeted-docs-guard-implementation-details.md](references/targeted-docs-guard-implementation-details.md) report フィールド一覧節へ分離した。
-TargetedDocsReport 型契約の正本は [integrity-contracts.md](integrity-contracts.md) TargetedDocsReport 型契約節である。
+TargetedDocsReport 型契約の原本は [integrity-contracts.md](integrity-contracts.md) TargetedDocsReport 型契約節である。
 
 ## files_checked 空時の警告
 

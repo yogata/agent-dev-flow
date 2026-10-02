@@ -14,7 +14,7 @@ worktree junction 未設定環境でのテスト実行保証と、worktree 固�
 
 ## fallback 対象
 
-- 構造系テスト（commands_e2e、skills_structure、templates_structure 等）は worktree junction 未設定時に共通正本（src/common/）への fallback で実行する（REQ-018-001）
+- 構造系テスト（commands_e2e、skills_structure、templates_structure 等）は worktree junction 未設定時に共通原本（src/common/）への fallback で実行する（REQ-018-001）
 - worktree の独立 working tree に起因する構造的制約を次のとおり取り扱う
   - gitignore 対象ファイル受け渡し不可（必要に応じて `git add -f` を使用）
   - junction 依存 checker は junction 未設定時に skip する
@@ -29,7 +29,7 @@ worktree・実行形態の環境差（junction 未伝播、node_modules 未伝�
 main 等価再現の手順は次のとおりである。
 
 - 一時 junction: worktree 側へ main の `.opencode/` 等価の junction を一時設定して再実行する
-- src 側代替経路: `--profile source` 等の実行プロファイルで共通正本（src/common/）側の資産を直接参照して再実行する
+- src 側代替経路: `--profile source` 等の実行プロファイルで共通原本（src/common/）側の資産を直接参照して再実行する
 - 依存再導入: `bun install --cwd` で当該ツリーの node_modules を再設定して再実行する
 
 本手順は ir035 worktree 誤検出、check_extensions の cwd 依存・順序依存・worktree junction 失敗等、6件の反復観測クラスに根拠する。
@@ -40,8 +40,8 @@ main 等価再現の手順は次のとおりである。
 `.opencode/skills/` 配下の junction セットは、src 側の skill 追加・削除の後に再構築されるまで次の状態に陥り得る。
 状態の判定は次のとおり行う。
 
-- 未構築: 共通正本 `src/common/skills/` 配下に存在する skill 名に対応する junction が `.opencode/skills/` 配下に存在しない
-- stale 残存: `.opencode/skills/` 配下に存在する junction のリンク先が存在しない（共通正本 src/common/skills/ 側で削除済みの skill 名に対応する junction が残存する）
+- 未構築: 共通原本 `src/common/skills/` 配下に存在する skill 名に対応する junction が `.opencode/skills/` 配下に存在しない
+- stale 残存: `.opencode/skills/` 配下に存在する junction のリンク先が存在しない（共通原本 src/common/skills/ 側で削除済みの skill 名に対応する junction が残存する）
 
 未構築・stale 残存のいずれも、当該環境での skills_structure 系テストを環境依存 fail にし、N/M 件数突合と QG-4 判定にノイズを与える。
 帰属確認手順で環境起因と判定された fail のうち、本節の状態判定に該当するものは、検査側の修正ではなく次の修復を先に実施する。
@@ -57,7 +57,7 @@ main 等価再現の手順は次のとおりである。
 
 ## v4 責務分類
 
-ADF v4 の責務分類（正典: DEC-048、foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節）における本 Design の 3 区分（意味判断担当〔閉じた意味評価・開いた推論を所有〕/ 決定的処理委譲先 / 知識提供）。語彙の正本は foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節であり、本節はその確定値を記録する。
+ADF v4 の責務分類（正典: DEC-048、foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節）における本 Design の 3 区分（意味判断担当〔閉じた意味評価・開いた推論を所有〕/ 決定的処理委譲先 / 知識提供）。語彙の原本は foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節であり、本節はその確定値を記録する。
 
 - **意味判断担当**: 0 件
 - **決定的処理委譲先**: path safety 契約（junction 未設定時 fallback・契約検証は repo-local test）

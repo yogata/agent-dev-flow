@@ -74,7 +74,7 @@ check_changed_docs.ts の report JSON に含まれる全フィールドを列挙
 
 `failure` オブジェクトのフィールド: `rule_id`、`severity`、`file`、`line`、`message`、`expected`。
 
-TargetedDocsReport 型契約の正本は `docs/designs/integrity/integrity-contracts.md` TargetedDocsReport 型契約節である。
+TargetedDocsReport 型契約の原本は `docs/designs/integrity/integrity-contracts.md` TargetedDocsReport 型契約節である。
 本表は実装参照用途のフィールド一覧である。
 
 ## 旧Design直下配置前提の除去（完了済み）

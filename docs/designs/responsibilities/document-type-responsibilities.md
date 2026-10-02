@@ -14,7 +14,7 @@ updated: 2026-09-29
 # 文書種別責務、配置基準
 
 > **他 Design との役割分担**: 本 Design と `../foundations/document-model.md` は補完関係にある。
-> 文書種別の基準境界（REQ/Decision/Design/guides の役割定義、ライフサイクル、優先順位、参照規則、投影方向、Design内部論理区分、文書7分類、局所物理分離、ドメイン別体系化規範）は `../foundations/document-model.md` の正本を参照する。
+> 文書種別の基準境界（REQ/Decision/Design/guides の役割定義、ライフサイクル、優先順位、参照規則、投影方向、Design内部論理区分、文書7分類、局所物理分離、ドメイン別体系化規範）は `../foundations/document-model.md` の原本を参照する。
 > 本 Design は文書種別配置の執筆時判定基準、実行主体分類、要件行書き方、SKILL構造、用語政策を扱う。
 > 共通文書モデル規約（frontmatter、ID 体系、命名規則、URL 参照形式、共通フォーマット規約）は `../foundations/patterns.md` を参照する。
 > 新規ファイル分割は行わず、既存2ファイル（本 Design と document-model.md）間の重複削除で運用する。
@@ -33,7 +33,7 @@ docs/ 配下の文書（REQ/Decision/Design/guides/README）および AGENTS.md 
 
 ## 文書種別の基準境界（参照）
 
-REQ/Decision/Design/guides の役割定義、記述対象、記述対象外の基準境界は `../foundations/document-model.md` の「責務マトリックス」「文書分類ポリシー」を正本とする。
+REQ/Decision/Design/guides の役割定義、記述対象、記述対象外の基準境界は `../foundations/document-model.md` の「責務マトリックス」「文書分類ポリシー」を原本とする。
 本 Design は基準境界を再定義せず、執筆時の配置判定のみを扱う。
 
 README は agent-dev-flow リポジトリの構成要素（identity、参照先リンク、最小限のクイックスタート）であり、索引構成として扱う。コマンド選択の入口表は `docs/guides/command-selection.md` が一元所有する。README は REQ/Decision/Design/guide と並ぶ基準境界対象ではなく README.md の構造要件に従う。

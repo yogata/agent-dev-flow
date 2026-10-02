@@ -37,7 +37,7 @@ VERIFY であり、gh 自体の呼出し品質は REQ-093 領域）。OpenCode×
 ## TS-004 既存ローカルIssue資産互換（REQ-099-008、REQ-099-009）
 
 `docs/designs/local/local-case-file.md` と `case-schema/rules/*.yaml` の現行スキーマに
-準拠した代表資産を fixture とし、単一の Local 実装（両ホスト接続の共通正本）で検証した。
+準拠した代表資産を fixture とし、単一の Local 実装（両ホスト接続の共通原本）で検証した。
 
 | 観点 | 検証内容 | 結果 |
 |---|---|---|
@@ -46,7 +46,7 @@ VERIFY であり、gh 自体の呼出し品質は REQ-093 領域）。OpenCode×
 | 状態写像の逸脱 0 件 | tracking 6 状態（created/in-discussion/on-hold/ready/resolved/closed）の導出と GitHub 三段写像（open/closed）が全状態で一致 | pass |
 | PR 系状態写像 | case 資産（status: review）の pr_mergeable が MERGEABLE を導出 | pass |
 | スキーマ違反の fail-closed | status 値域外の資産は読み取りを失敗させ、変換で直さない | pass |
-| ホスト別重複の不在 | 採番・状態写像・読み書きは共通 engine（`src/common/tools/agentdev-gh/local/runner-local.ts`）が単一所有。TS-003 の両ホスト投影検出テストが同一正本からの構築を固定 | pass |
+| ホスト別重複の不在 | 採番・状態写像・読み書きは共通 engine（`src/common/tools/agentdev-gh/local/runner-local.ts`）が単一所有。TS-003 の両ホスト投影検出テストが同一原本からの構築を固定 | pass |
 
 補足: 本リポジトリ（ADF 自己ホスト環境）の `.agentdev/issues/` には既存ローカルIssue資産が
 実在しないため、代表資産は共通スキーマ Design と機械可読 rules から構成した。旧形式コメント
@@ -97,9 +97,9 @@ rg -n "\.opencode/tools|\.senpi/tools" src/ docs/ scripts/ *.md
 
 | 分類 | 内容 | 処置 |
 |---|---|---|
-| src/ 配下のコード・テスト参照 | scripts/self 配下の検査テスト 8 ファイル（旧正本パスをパス定数として保持、実行時に ENOENT）、case-intake-cross-inspection 3 ファイル（区切り配列形式パス）、third-party-sync 契約テスト、textlint-guard テスト 2 ファイル、guard-connection テスト（bare import） | 本 PR 内で新正本パスへ更新し検証済み（bun test src 878 pass / scripts 263 pass） |
+| src/ 配下のコード・テスト参照 | scripts/self 配下の検査テスト 8 ファイル（旧原本パスをパス定数として保持、実行時に ENOENT）、case-intake-cross-inspection 3 ファイル（区切り配列形式パス）、third-party-sync 契約テスト、textlint-guard テスト 2 ファイル、guard-connection テスト（bare import） | 本 PR 内で新原本パスへ更新し検証済み（bun test src 878 pass / scripts 263 pass） |
 | installer の旧 Local 実装参照 | `scripts/install.ps1`（LocalMode リンク先 `src/opencode-local`、実体不存在）、`scripts/consumer/common.ps1`、`scripts-behavior.test.ts` fixture | 本 PR 内で `src/common/tools/agentdev-gh/local/` へ更新し、実 fixture 統合テストで検証済み（17 pass） |
-| docs 記述の現行化 | docs/designs、docs/knowledge、AGENTS.md の現行記述としての旧正本パス（artifact-responsibilities、document-model、workflow-skill-model、custom-tool-contracts、local-case-file 等のパス文字列） | パス文字列を同値置換で現行化（文意不変）。yomiyasu 同梱 lint 全件 exit 0 を確認 |
+| docs 記述の現行化 | docs/designs、docs/knowledge、AGENTS.md の現行記述としての旧原本パス（artifact-responsibilities、document-model、workflow-skill-model、custom-tool-contracts、local-case-file 等のパス文字列） | パス文字列を同値置換で現行化（文意不変）。yomiyasu 同梱 lint 全件 exit 0 を確認 |
 | 歴史記録・移行記述（参照行として除外） | DEC-004（当時の名称である旨を明記）、DEC-007（superseded 済み決定記録）、docs/requirements/retired 配下、backticks-identifier-threshold の過去事象記述、checker-fixture 知識の過去注記 | 変更しない（Decision と retired REQ は決定記録・歴史記録であり遡及改変しない） |
 | 旧 archive 構造一式（本 PR で修正せず記録） | `scripts/self/release/package-release-archive.ps1`（src/opencode 前提の収集・boundary check）、`scripts/consumer/archive/install.ps1`、`README-INSTALL.md` の同梱内容、`docs/designs/integrity/integrity-contracts.md` の archive レイアウト節 | release archive の新構造（src/common + src/opencode + src/senpi + src/third-party）対応は収集対象と boundary check の再設計を伴うため、Findings / Capture候補 へ記録 |
 | Design 文書の旧構成セクション（本 PR で修正せず記録） | `docs/designs/local/runtime-package-boundary.md`（REQ-009 時代の接続構成を大量保持）、`docs/designs/local/third-party-skill-management.md`（旧 skill-projection-manifest 時代の記述） | 文書全体の現行化は意味判断を伴うため Findings へ記録 |

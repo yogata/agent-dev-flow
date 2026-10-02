@@ -64,7 +64,7 @@
 | [REQ-087](REQ-087.md) | 採番例外の記録と REQ 番号ギャップ検査 |
 | [REQ-088](REQ-088.md) | ADF v4 基盤要件（三層責務・情報寿命・Project Contract・中核文書モデル） |
 | [REQ-090](REQ-090.md) | Jev 先行評価の実運用組込み（Stage 1: 観測可能化） |
-| [REQ-091](REQ-091.md) | Supervisor 環境向け credential 供給ブリッジの正本管理 |
+| [REQ-091](REQ-091.md) | Supervisor 環境向け credential 供給ブリッジの原本管理 |
 | [REQ-092](REQ-092.md) | agentdev_gh issue_list 呼出側運用規律（labels は追跡Issue論理軸の物理マッピング入力専用） |
 | [REQ-093](REQ-093.md) | agentdev_gh 起動環境障害の予防・診断・回復の恒久化 |
 | [REQ-094](REQ-094.md) | ADF の Markdown 日本語表現および用語選択基準 |
@@ -72,7 +72,7 @@
 | [REQ-096](REQ-096.md) | ADF判断アーキテクチャ（判断方法・確定権限・人間判断境界） |
 | [REQ-097](REQ-097.md) | third-party 成果物の運用前提と導入検知 |
 | [REQ-098](REQ-098.md) | yomiyasu 推敲の工程必須化（docs 変更と GitHub 書込み文章） |
-| [REQ-099](REQ-099.md) | ADF 共通正本とホスト接続領域の分離によるマルチホスト併存利用 |
+| [REQ-099](REQ-099.md) | ADF 共通原本とホスト接続領域の分離によるマルチホスト併存利用 |
 <!-- AUTOGEN:END -->
 
 ## 廃止済み要件

@@ -1,21 +1,21 @@
 # マルチホスト運用ガイド（OpenCode と Senpi の併存利用）
 
 OpenCode と Senpi（OmO Native v5）を併存利用するための運用手順をまとめたガイドである。
-構造の正はマルチホスト正本モデル Design（[マルチホスト正本モデル](../designs/foundations/multi-host-canonical-model.md)）、意思決定の正は [DEC-049](../decisions/DEC-049.md)、成果の正は [REQ-099](../requirements/REQ-099.md) とする。本ガイドは基準を複製せず、手順と判断材料へ導く。
+構造の正はマルチホスト原本モデル Design（[マルチホスト原本モデル](../designs/foundations/multi-host-canonical-model.md)）、意思決定の正は [DEC-049](../decisions/DEC-049.md)、成果の正は [REQ-099](../requirements/REQ-099.md) とする。本ガイドは基準を複製せず、手順と判断材料へ導く。
 
 ## 構造の全体像
 
-AgentDevFlow は共通正本とホスト別接続領域に分かれる。
+AgentDevFlow は共通原本とホスト別接続領域に分かれる。
 
 | 領域 | パス | 内容 |
 |---|---|---|
-| 共通正本 | `src/common/` | 業務契約・本文（commands、skills）、template、Tool engine、guard 共通判定 |
-| OpenCode 接続 | `src/opencode/` | OpenCode 用 plugin/hook の正本、Tool 登録配線、guard 接続 |
+| 共通原本 | `src/common/` | 業務契約・本文（commands、skills）、template、Tool engine、guard 共通判定 |
+| OpenCode 接続 | `src/opencode/` | OpenCode 用 plugin/hook の原本、Tool 登録配線、guard 接続 |
 | Senpi 接続 | `src/senpi/` | Senpi 用 Tool 登録単位、Skill 探索接続、guard 接続 |
 
-導入時の投影は installer が行う。OpenCode 配置対象では `.opencode/` 配下の commands、skills、tools、plugins が共通正本へのジャンクションになる。Senpi 配置対象では `.senpi/` 直下へ `src/senpi/` 配下の各サブディレクトリが個別ジャンクションとして投影される。投影の選択と切替手順は [Consumer Project 導入](consumer-project-setup.md) を参照する。
+導入時の投影は installer が行う。OpenCode 配置対象では `.opencode/` 配下の commands、skills、tools、plugins が共通原本へのジャンクションになる。Senpi 配置対象では `.senpi/` 直下へ `src/senpi/` 配下の各サブディレクトリが個別ジャンクションとして投影される。投影の選択と切替手順は [Consumer Project 導入](consumer-project-setup.md) を参照する。
 
-両ホストの公開入口は同じ共通正本を参照する。ホスト別の業務手順のコピーは存在せず、共通正本への編集が両ホストへ反映される。
+両ホストの公開入口は同じ共通原本を参照する。ホスト別の業務手順のコピーは存在せず、共通原本への編集が両ホストへ反映される。
 
 ## 対応を確認した組合せ
 
@@ -86,9 +86,9 @@ AgentDevFlow は共通正本とホスト別接続領域に分かれる。
 両ホストで業務名と引数の意味を維持する（REQ-099-003、REQ-002-009）。名前空間と呼出し構文の表記は次のとおり異なる。
 
 - OpenCode: `/agentdev/<業務名>`。slash command である。`.opencode/commands/agentdev/` に投影された command 本文が Workflow Skill へ委譲する
-- Senpi: `agentdev-workflow-<業務名>`。skill 名である。Skill 探索接続が Senpi 公開入口 `.senpi/skills/` を優先し、共通正本 `src/common/skills/` へ fallback する
+- Senpi: `agentdev-workflow-<業務名>`。skill 名である。Skill 探索接続が Senpi 公開入口 `.senpi/skills/` を優先し、共通原本 `src/common/skills/` へ fallback する
 
-引数の意味は command 本文と Workflow Skill 本文が共通正本の単一原本であるため、両ホストで同一である。Custom Tool の引数も host 非依存の公開スキーマ（`src/common/tools/agentdev-*/public-schema.ts`）を共通参照する。
+引数の意味は command 本文と Workflow Skill 本文が共通原本の単一原本であるため、両ホストで同一である。Custom Tool の引数も host 非依存の公開スキーマ（`src/common/tools/agentdev-*/public-schema.ts`）を共通参照する。
 
 全公開 command の対応表を次に示す（2026-10-02 時点、13件）。
 
@@ -117,7 +117,7 @@ case-open、case-ready、case-run、case-close、case-revise は内部 lifecycle
 1. `src/common/commands/agentdev/*.md`（README を除く）を列挙し、command 数を数える
 2. 各 command 本文の workflow 節から委譲先の Workflow Skill 名（`agentdev-workflow-*`）を読み取る
 3. 委譲先の `src/common/skills/<skill名>/SKILL.md` が存在することを確認する
-4. OpenCode 側は installer の管理列挙に `commands\agentdev` が含まれることを確認する。これで `.opencode/commands/agentdev/` が共通正本への junction として解決される
+4. OpenCode 側は installer の管理列挙に `commands\agentdev` が含まれることを確認する。これで `.opencode/commands/agentdev/` が共通原本への junction として解決される
 5. Senpi 側は Skill 探索接続（`src/senpi/skill-discovery/`）の探索契約で委譲先 skill が解決されることを確認する。契約は公開入口優先、canonical fallback の順である
 6. 表の行数が列挙数と一致し、各行の到達先が上記の確認結果と一致していれば一致と判定する。不一致があれば表を修正する
 
@@ -126,7 +126,7 @@ case-open、case-ready、case-run、case-close、case-revise は内部 lifecycle
 ## 関連文書
 
 - [Consumer Project 導入](consumer-project-setup.md): 導入手順、配置対象ホストの選択と切替、`.gitignore` 推奨設定
-- [マルチホスト正本モデル](../designs/foundations/multi-host-canonical-model.md): 共通正本とホスト別接続の配置契約
+- [マルチホスト原本モデル](../designs/foundations/multi-host-canonical-model.md): 共通原本とホスト別接続の配置契約
 - [DEC-049](../decisions/DEC-049.md): マルチホスト配布モデルの意思決定
 - [REQ-099](../requirements/REQ-099.md): マルチホスト併存利用の要件
 - [durable state と再構成](../designs/foundations/v4-durable-state-and-recovery.md): 永続状態の権威と再構成の契約

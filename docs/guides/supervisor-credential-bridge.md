@@ -2,7 +2,7 @@
 
 Supervisor（Hermes 等、spawn する子プロセスから provider 資格情報を削除する実行環境）から dispatch された opencode 実行でも、実行側が自身の起動コンテキストで Windows User スコープ環境変数（CLOUDFLARE_ACCOUNT_ID、CLOUDFLARE_API_TOKEN 等）を取得できるようにするブリッジ道具の導入手順である（REQ-091）。
 
-道具の正本は agent-dev-flow リポジトリの `scripts/self/supervisor-bridge/` 配下（`ocenv` と `opencode` bridge shim）であり、機構の詳細は [知識文書](../knowledge/supervisor-bridge-credential-supply.md) を参照する。
+道具の原本は agent-dev-flow リポジトリの `scripts/self/supervisor-bridge/` 配下（`ocenv` と `opencode` bridge shim）であり、機構の詳細は [知識文書](../knowledge/supervisor-bridge-credential-supply.md) を参照する。
 
 ## 前提
 
@@ -12,7 +12,7 @@ Supervisor（Hermes 等、spawn する子プロセスから provider 資格情�
 
 ## インストール
 
-正本配置物（`scripts/self/supervisor-bridge/` 配下の `ocenv` と `opencode`）を、PATH 上の優先ディレクトリへ配置する。両ファイルは同じディレクトリへ置く（shim は自身と同じディレクトリの `ocenv` を起動する）。
+原本配置物（`scripts/self/supervisor-bridge/` 配下の `ocenv` と `opencode`）を、PATH 上の優先ディレクトリへ配置する。両ファイルは同じディレクトリへ置く（shim は自身と同じディレクトリの `ocenv` を起動する）。
 
 実証済みの構成は `~/bin` を PATH の先頭に置く構成である。Supervisor の spawn コンテキストでも解決される優先配置になる。
 
@@ -28,7 +28,7 @@ chmod +x ~/bin/ocenv ~/bin/opencode
 export PATH="$HOME/bin:$PATH"
 ```
 
-リポジトリの `scripts/` 直下には配置しない（REQ-050 の公開入口境界。内部道具は `scripts/self/` 配下のみで正本管理する）。
+リポジトリの `scripts/` 直下には配置しない（REQ-050 の公開入口境界。内部道具は `scripts/self/` 配下のみで原本管理する）。
 
 ## opencode 本体パスの調整
 
