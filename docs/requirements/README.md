@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下59件を第一参照先とする。
+現在の要件判断では、以下60件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -71,6 +71,7 @@
 | [REQ-095](REQ-095.md) | agentdev_gh 起票・読取操作の呼出側規律 |
 | [REQ-096](REQ-096.md) | ADF判断アーキテクチャ（判断方法・確定権限・人間判断境界） |
 | [REQ-097](REQ-097.md) | third-party 成果物の運用前提と導入検知 |
+| [REQ-098](REQ-098.md) | yomiyasu 推敲の工程必須化（docs 変更と GitHub 書込み文章） |
 <!-- AUTOGEN:END -->
 
 ## 廃止済み要件
