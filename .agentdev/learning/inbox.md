@@ -49,3 +49,21 @@
 - **タグ**: #phantom-citation #ng-baseline #check-integrity #ir-067
 
 ---
+
+## 2026-10-03: 並行 case-open 委譲で project extension rules（yomiyasu 適用前提）の読込が STEP-5 まで後ろ倒しになり GitHub 文章投稿後の遡及 lint になった
+
+- **問題事象**: case-open 委譲実行（OU-006・Case #3335）で document-model.md の Definition 変更・Root Case 本文・Definition PR 本文を agentdev_gh へ渡す前に、project extension（.agentdev/extensions/skills/agentdev-workflow-case-open.yaml）の rule「yomiyasu-application-before-write」（編集前読込・投稿前推敲・lint）を読み込んでいなかった。STEP-5 時点で extension 読込（fail-open）を行い、投稿済み本文の遡及 lint になった。指摘は WARN のみ（key-value 構造行・識別子列挙・テンプレート規定記法 ✅/❌ 由来）で、修正不要の確認を含む適用で完結
+- **発生局面**: case-open（Root Case 本文・Definition 変更・PR 本文の作成と投稿）
+- **検知方法**: STEP-5 冪等確認前の project-extensions 読込で rules セクションを確認した際、対象文章が既に投稿済みであることに気づいた
+- **根本原因**: extensions 読込を worktree 作成・本文組み立て・issue_create/pr_create の後に配置した。extension rules は書込み前プロシージャの前置要素であるが、委譲実行の手順上明示的な前置ステップがなかった
+- **自律対応内容**: 投稿後に Issue #3335・PR #3348 本文と宣言行の遡及 lint を実行し、指摘の性格（key-value 構造行・識別子列挙・テンプレート規定記法）を分類して保持判断を記録（修正試行不要の確認を含む適用）。PR #3348 本文へ適用記録を追記
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（rule の適用結果は達成。適用タイミングの過程偏差のみで成果物品質への影響なし）
+- **横展開観点**: 並行 case-open・case-run の委譲実行では、worktree 作成や本文組み立ての前に extensions 読込を実施する。rules（when 条件付き skill 適用）は STEP-2 の本文候補生成・STEP-4 の PR 本文生成の前置要素
+- **再発条件**: extensions 読込を後段 STEP に置いた委譲実行で、書込み対象文章を先に生成・投稿する場合
+- **予防策候補**: workflow skill（case-open 等）の STEP reference に「STEP-2 前に project-extensions 読込を前置する」手順を明示する。または委譲 prompt 生成側で extensions 読込を前置指示に含める
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/root-case-and-definition-package.md（STEP-2 前置手順）、agentdev-project-extensions の読込タイミング規約
+- **関連**: Root Case #3335・Definition PR #3348・.agentdev/extensions/skills/agentdev-workflow-case-open.yaml
+- **タグ**: #extension-timing #yomiyasu #workflow-deviation #case-open
+
+---
