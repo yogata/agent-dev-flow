@@ -219,6 +219,7 @@ const SIMPLIFIED_CHINESE_PAIRS: ReadonlyArray<{
   { simplified: "\u5B9E", japanese: "\u5B9F" }, // 实 -> 実 (RU-0144: 实行 x30)
   { simplified: "\u6001", japanese: "\u72B6" }, // 态 -> 状 (RU-0144: 状态)
   { simplified: "\u4E49", japanese: "\u610F" }, // 义 -> 意 (RU-0144: 含义)
+  { simplified: "\u9879", japanese: "\u9805" }, // 项 -> 項 (Case #3243: 「项」混入 3 箇所が検出漏れ・手動是正済み, RU-20261003-11)
 ];
 
 const SIMPLIFIED_CHINESE_RE = new RegExp(
