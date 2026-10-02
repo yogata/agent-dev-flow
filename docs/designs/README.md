@@ -177,7 +177,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | foundations/design-principles.md | accepted | 設計原則 | アーキテクチャ設計原則 |
 | foundations/project-extensions.md | accepted | Project Extensions | 実行時プロジェクト固有追加・拡張機構（`.agentdev/extensions/**`）、extension schema、実行時読み込み契約、project-local skill 委譲、配布物具体参照禁止（REQ-002） |
 | foundations/harness-separation-model.md | accepted | harness 分離モデル | 配布物と harness 実行制御の責務分離モデル。配布物の大多数を harness 非依存とし、依存具体を references/ へ集約 |
-| foundations/multi-host-canonical-model.md | draft | マルチホスト正本モデル（共通正本とホスト別接続の分離） | 共通正本（src/common/）とホスト別接続領域（src/opencode/、src/senpi/）の配置契約、投影モデルと installer 対象選択、バックエンド×ホスト接続構成、guard 編集解釈の分離（REQ-099） |
+| foundations/multi-host-canonical-model.md | accepted | マルチホスト正本モデル（共通正本とホスト別接続の分離） | 共通正本（src/common/）とホスト別接続領域（src/opencode/、src/senpi/）の配置契約、投影モデルと installer 対象選択、バックエンド×ホスト接続構成、guard 編集解釈の分離（REQ-099） |
 | foundations/references/concrete-abstraction.md | accepted | 配布物具体参照の抽象化参照 | 配布物から harness 固有・実装固有の具体を抽象化する手順の参照。harness-separation-model.md、responsibility-boundary-purification.md から参照される |
 | foundations/v4-operating-model.md | accepted | ADF v4 Operating Model | v4 の目的・適用範囲・標準語彙・プロセス/実装分離原則、三層責務モデル（ADF Runtime / Standard Operating Model / Project Model）、Project Contract の論理ビュー、8 情報寿命モデル、中核文書モデル（REQ/Decision/Design/Implementation/Evidence）の定義 |
 | foundations/v4-responsibility-boundaries.md | accepted | ADF v4 実装責務境界（意味判断 Skill / 決定的処理 code / Harness adapter / Project Extensions） | 意味判断 Skill / 決定的処理 code / Harness adapter / Project Extensions の実装責務境界（判断方法3分類〔決定的処理・閉じた意味評価・開いた推論〕の分類基準、OpenCode first-class reference harness、semantic extension point）の定義 |

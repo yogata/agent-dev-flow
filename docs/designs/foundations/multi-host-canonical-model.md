@@ -1,6 +1,6 @@
 ---
 title: マルチホスト正本モデル（共通正本とホスト別接続の分離）
-status: draft
+status: accepted
 created: 2026-10-02
 updated: 2026-10-02
 ---
