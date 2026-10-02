@@ -352,3 +352,18 @@
 - **想定反映先**: check_test_impact.ts（検出契機拡張の要否判断）、case-run STEP 契約の docs 検証項目、REQ-019 関連 Design
 - **関連**: Case #3311 case-close 対応記録コメント（3 fail の由来分類と現行化を記録）、REQ-019（テスト影響範囲検出 gate）、docs/designs/integrity/test-impact-detection-gate.md
 - **タグ**: `#integrity` `#extension-yaml` `#テスト期待値` `#REQ-019` `#case-close` `#capture`
+
+## 2026-10-02 case-open（Case #3314・STEP-4 検査期待値実測）: generate_indexes.ts は docs/README.md の REQ 件数散言行を更新せず、REQ 新設の Definition PR では AUTOGEN count 更新後に散言行の手動修正が必要になる
+
+- **問題事象**: REQ-099 新設の Definition PR で generate_indexes.ts を実行すると AUTOGEN ブロック（readme-req-summary-count）は 60→61 へ自動更新されるが、非 AUTOGEN の散言行「現行要件は60件である。」は更新されず、check_integrity の req-range-staleness が新規 NG として出る。REQ-098 の Definition PR（#3312）でも同様に 59→60 の手動更新が必要で、REQ 新設 Case で2回連続発生
+- **発生局面**: case-open STEP-4（索引再生成と検査期待値確定。Case #3314）
+- **検知方法**: check_integrity の req-range-staleness NG（「docs/README.md states 60 active REQs but actual count is 61」）と、AUTOGEN count が 61 に更新済みという乖離の突合
+- **有効だった解決手順**: docs/README.md の散言行を手動で 60→61 へ edit してから commit する。AUTOGEN count 更新を generate_indexes に任せて散言行を放置すると req-range-staleness が残る
+- **ユーザー確認有無**: なし（機械的検出と既存前例〔#3312 PR 本文記録〕に基づく対応）
+- **Decision/REQ/spec影響**: なし（既存 checker と索引機構は現行どおり機能。手順補完の知見）
+- **横展開観点**: REQ 新設・RETIRE を伴う Definition PR では、generate_indexes.ts 実行後に docs/README.md 散言行（現行要件はN件である）の手動確認・更新が必須。Decision 新設（DEC）は Decision インデックス集計が AUTOGEN のため散言行の手動更新は不要（docs/README.md の Decision 部は集計を decisions/README.md へ委譲）
+- **再発条件**: REQ 実ファイルを新設・retire する Definition 変更で docs/README.md の散言行が手動管理のまま残る場合
+- **予防策候補**: generate_indexes.ts の更新範囲へ docs/README.md 散言行の REQ 件数記述を加える候補、または req-range-staleness checker の案内文へ散言行の更新指示を明記する候補
+- **想定反映先**: src/opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts（散言行更新範囲の拡張要否判断）、docs/designs/integrity/index-auto-generation.md
+- **関連**: PR #3312（REQ-098 Definition PR で同様の手動更新を実施。PR 本文検証結果へ記録）、PR #3315（本 Case Definition PR）、check_integrity req-range-staleness
+- **タグ**: `#索引再生成` `#散言行` `#req-range-staleness` `#docs-readme` `#case-open` `#capture`
