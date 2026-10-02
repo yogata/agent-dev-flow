@@ -17,7 +17,7 @@ import {
   detectGhWriteCommand,
   formatBlockReason,
   type GhWriteVerdict,
-} from "./lib/gh-command-detector.ts";
+} from "../../../common/guards/gh-write/gh-command-detector.ts";
 import {
   interpretGuardConfigFromEnv,
   type GuardConfig,

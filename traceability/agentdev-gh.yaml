@@ -1,14 +1,14 @@
 component: agentdev-gh
 implementation:
-  src/opencode/tools/agentdev-gh/contracts.ts:
+  src/common/tools/agentdev-gh/contracts.ts:
     - REQ-011-022
     - REQ-011-030
     - REQ-083-001
     - REQ-083-004
-  src/opencode/tools/agentdev-gh/engine.ts:
+  src/common/tools/agentdev-gh/engine.ts:
     - REQ-011-028
     - REQ-011-029
-  src/opencode/tools/agentdev-gh/runner-cli.ts:
+  src/common/tools/agentdev-gh/runner-cli.ts:
     - REQ-011-025
     - REQ-011-026
     - REQ-011-027
@@ -17,24 +17,24 @@ implementation:
     - REQ-011-033
     - REQ-083-001
     - REQ-093-003
-  src/opencode/tools/agentdev-gh/specs-issue.ts:
+  src/common/tools/agentdev-gh/specs-issue.ts:
     - REQ-011-022
     - REQ-011-025
     - REQ-011-026
-  src/opencode/tools/agentdev-gh/specs-pr.ts:
+  src/common/tools/agentdev-gh/specs-pr.ts:
     - REQ-011-030
     - REQ-083-001
     - REQ-083-005
 verification:
-  src/opencode/tools/agentdev-gh/tests/contracts.test.ts:
+  src/common/tools/agentdev-gh/tests/contracts.test.ts:
     - REQ-011-022
     - REQ-011-023
-  src/opencode/tools/agentdev-gh/tests/engine-fail-closed.test.ts:
+  src/common/tools/agentdev-gh/tests/engine-fail-closed.test.ts:
     - REQ-011-023
     - REQ-011-025
     - REQ-011-028
     - REQ-011-029
-  src/opencode/tools/agentdev-gh/tests/runner-cli.test.ts:
+  src/common/tools/agentdev-gh/tests/runner-cli.test.ts:
     - REQ-011-025
     - REQ-011-026
     - REQ-011-027

@@ -59,7 +59,7 @@ describe("shouldInspectTool - tool allowlist", () => {
 describe("evaluateWriteContent - write tool gate", () => {
   test("blocks write introducing concrete ID", () => {
     const r = evaluateWriteContent(
-      "src/opencode/commands/agentdev/sample.md",
+      "src/common/commands/agentdev/sample.md",
       "# title\nSee ADR-0135 for context.\n",
     );
     expect(r.ok).toBe(false);
@@ -70,7 +70,7 @@ describe("evaluateWriteContent - write tool gate", () => {
   });
   test("blocks write introducing concrete docs path", () => {
     const r = evaluateWriteContent(
-      "src/opencode/skills/agentdev-foo/SKILL.md",
+      "src/common/skills/agentdev-foo/SKILL.md",
       "ref docs/requirements/REQ-0149.md",
     );
     expect(r.ok).toBe(false);
@@ -84,21 +84,21 @@ describe("evaluateWriteContent - write tool gate", () => {
   });
   test("blocks write introducing producer-internal docs URL", () => {
     const r = evaluateWriteContent(
-      "src/opencode/commands/agentdev/sample.md",
+      "src/common/commands/agentdev/sample.md",
       "see https://github.com/yogata/agent-dev-flow/blob/main/docs/designs/foo.md",
     );
     expect(r.ok).toBe(false);
   });
   test("allows write with template placeholders only", () => {
     const r = evaluateWriteContent(
-      "src/opencode/commands/agentdev/sample.md",
+      "src/common/commands/agentdev/sample.md",
       "template: docs/designs/<domain>/<spec>.md is fine. ADR-{NNNN} also fine.",
     );
     expect(r.ok).toBe(true);
   });
   test("allows write with no references", () => {
     const r = evaluateWriteContent(
-      "src/opencode/commands/agentdev/sample.md",
+      "src/common/commands/agentdev/sample.md",
       "# plain command\nbody\n",
     );
     expect(r.ok).toBe(true);
@@ -119,7 +119,7 @@ describe("evaluateWriteContent - write tool gate", () => {
 describe("evaluateEdit - edit tool gate", () => {
   test("blocks edit whose newString introduces a concrete ID", () => {
     const r = evaluateEdit({
-      filePath: "src/opencode/commands/agentdev/sample.md",
+      filePath: "src/common/commands/agentdev/sample.md",
       currentContent: "# title\nbody\n",
       oldString: "body",
       newString: "ref ADR-0135 here",
@@ -131,7 +131,7 @@ describe("evaluateEdit - edit tool gate", () => {
   });
   test("allows edit whose newString is clean", () => {
     const r = evaluateEdit({
-      filePath: "src/opencode/commands/agentdev/sample.md",
+      filePath: "src/common/commands/agentdev/sample.md",
       currentContent: "ref ADR-0135 here",
       oldString: "ADR-0135",
       newString: "REQ-{NNNN}",
@@ -152,7 +152,7 @@ describe("evaluateEdit - edit tool gate", () => {
   });
   test("replaceAll flag does not change classification of newString", () => {
     const r = evaluateEdit({
-      filePath: "src/opencode/commands/agentdev/sample.md",
+      filePath: "src/common/commands/agentdev/sample.md",
       currentContent: "a\na\n",
       oldString: "a",
       newString: "ADR-0001",
@@ -165,7 +165,7 @@ describe("evaluateEdit - edit tool gate", () => {
     // Edit that splits a reference across old and new content:
     // currentContent has "docs/adr/" and edit adds "DEC-014.md"
     const r = evaluateEdit({
-      filePath: "src/opencode/commands/agentdev/sample.md",
+      filePath: "src/common/commands/agentdev/sample.md",
       currentContent: "see docs/adr/",
       oldString: "docs/adr/",
       newString: "docs/adr/DEC-014.md",
@@ -179,7 +179,7 @@ describe("evaluateEdit - edit tool gate", () => {
 
   test("fails closed when oldString not found (Oracle finding 4)", () => {
     const r = evaluateEdit({
-      filePath: "src/opencode/commands/agentdev/sample.md",
+      filePath: "src/common/commands/agentdev/sample.md",
       currentContent: "existing content",
       oldString: "not present",
       newString: "clean content",
@@ -192,7 +192,7 @@ describe("evaluateEdit - edit tool gate", () => {
 
   test("normalizes Windows backslash paths (Oracle finding 4)", () => {
     const r = evaluateEdit({
-      filePath: "src\\opencode\\commands\\agentdev\\sample.md",
+      filePath: "src\\common\\commands\\agentdev\\sample.md",
       currentContent: "body",
       oldString: "body",
       newString: "ref ADR-0001",
@@ -205,7 +205,7 @@ describe("evaluateApplyPatch - apply_patch tool gate", () => {
   test("blocks Add File introducing a concrete ID", () => {
     const patchText = [
       "*** Begin Patch",
-      "*** Add File: src/opencode/commands/agentdev/new.md",
+      "*** Add File: src/common/commands/agentdev/new.md",
       "+# new",
       "+ref ADR-0135",
       "*** End Patch",
@@ -225,11 +225,11 @@ describe("evaluateApplyPatch - apply_patch tool gate", () => {
     const currentContent = "title\n";
     const env = makeGuardEnv({
       readFile: (p: string) =>
-        p === "src/opencode/commands/agentdev/sample.md" ? currentContent : null,
+        p === "src/common/commands/agentdev/sample.md" ? currentContent : null,
     });
     const patchText = [
       "*** Begin Patch",
-      "*** Update File: src/opencode/commands/agentdev/sample.md",
+      "*** Update File: src/common/commands/agentdev/sample.md",
       "@@ ctx",
       " title",
       "+ref docs/requirements/REQ-0149.md",
@@ -248,7 +248,7 @@ describe("evaluateApplyPatch - apply_patch tool gate", () => {
   test("allows Add File with clean content", () => {
     const patchText = [
       "*** Begin Patch",
-      "*** Add File: src/opencode/commands/agentdev/new.md",
+      "*** Add File: src/common/commands/agentdev/new.md",
       "+# clean",
       "+template docs/designs/<x>.md allowed",
       "*** End Patch",
@@ -263,11 +263,11 @@ describe("evaluateApplyPatch - apply_patch tool gate", () => {
     const currentContent = "ref ADR-0135\n";
     const env = makeGuardEnv({
       readFile: (p: string) =>
-        p === "src/opencode/commands/agentdev/sample.md" ? currentContent : null,
+        p === "src/common/commands/agentdev/sample.md" ? currentContent : null,
     });
     const patchText = [
       "*** Begin Patch",
-      "*** Update File: src/opencode/commands/agentdev/sample.md",
+      "*** Update File: src/common/commands/agentdev/sample.md",
       "@@ ctx",
       "-ref ADR-0135",
       "+clean line",
@@ -307,7 +307,7 @@ describe("formatBlockMessage - error message", () => {
         {
           text: "x",
           line: 1,
-          file: "src/opencode/commands/agentdev/sample.md",
+          file: "src/common/commands/agentdev/sample.md",
           projection: "source",
           classification: "producer-internal",
           matched: "ADR-0135",
@@ -328,11 +328,11 @@ describe("formatBlockMessage - error message", () => {
 // =============================================================================
 
 describe("Stage B regression: distributed path coverage", () => {
-  test("src/opencode/commands/agentdev/ is distributed", () => {
-    expect(isDistributedPath("src/opencode/commands/agentdev/foo.md")).toBe(true);
+  test("src/common/commands/agentdev/ is distributed", () => {
+    expect(isDistributedPath("src/common/commands/agentdev/foo.md")).toBe(true);
   });
-  test("src/opencode/skills/agentdev-* is distributed", () => {
-    expect(isDistributedPath("src/opencode/skills/agentdev-foo/SKILL.md")).toBe(true);
+  test("src/common/skills/agentdev-* is distributed", () => {
+    expect(isDistributedPath("src/common/skills/agentdev-foo/SKILL.md")).toBe(true);
   });
   test("non-distributed paths are skipped", () => {
     expect(isDistributedPath("docs/designs/foo.md")).toBe(false);
@@ -341,7 +341,7 @@ describe("Stage B regression: distributed path coverage", () => {
   });
   test("Windows backslash distributed path matches case-insensitively", () => {
     expect(
-      isDistributedPath("SRC\\OpenCode\\Commands\\AgentDev\\sample.md"),
+      isDistributedPath("SRC\\Common\\Commands\\AgentDev\\sample.md"),
     ).toBe(true);
   });
 });
@@ -349,12 +349,12 @@ describe("Stage B regression: distributed path coverage", () => {
 describe("Stage B regression: typed argument parsing", () => {
   test("parseWriteArgs extracts filePath and content as strings", () => {
     const r = parseWriteArgs({
-      filePath: "src/opencode/commands/agentdev/x.md",
+      filePath: "src/common/commands/agentdev/x.md",
       content: "ADR-0001",
     });
     expect(r).not.toBeNull();
     if (r) {
-      expect(r.filePath).toBe("src/opencode/commands/agentdev/x.md");
+      expect(r.filePath).toBe("src/common/commands/agentdev/x.md");
       expect(r.content).toBe("ADR-0001");
     }
   });
@@ -408,7 +408,7 @@ describe("Stage B regression: edit read failure must fail closed", () => {
     });
     const r = evaluateEditEnv(
       {
-        filePath: "src/opencode/commands/agentdev/sample.md",
+        filePath: "src/common/commands/agentdev/sample.md",
         oldString: "x",
         newString: "ADR-0001",
         replaceAll: false,
@@ -428,7 +428,7 @@ describe("Stage B regression: edit read failure must fail closed", () => {
     });
     const r = evaluateEditEnv(
       {
-        filePath: "src/opencode/commands/agentdev/sample.md",
+        filePath: "src/common/commands/agentdev/sample.md",
         oldString: "x",
         newString: "ADR-0001",
         replaceAll: false,
@@ -447,7 +447,7 @@ describe("Stage B regression: apply_patch Add/Update/Move full-file reconstructi
     const env = makeGuardEnv();
     const patch = [
       "*** Begin Patch",
-      "*** Add File: src/opencode/commands/agentdev/new.md",
+      "*** Add File: src/common/commands/agentdev/new.md",
       "+ref ADR-0001",
       "*** End Patch",
     ].join("\n");
@@ -461,12 +461,12 @@ describe("Stage B regression: apply_patch Add/Update/Move full-file reconstructi
   test("Update File: classify reconstructed full content (current + additions)", () => {
     const env = makeGuardEnv({
       readFile: (p: string) =>
-        p === "src/opencode/commands/agentdev/sample.md" ? "title\nbody\n" : null,
+        p === "src/common/commands/agentdev/sample.md" ? "title\nbody\n" : null,
     });
     // OpenCode apply_patch Update format: space prefix = context, `-` = remove, `+` = add.
     const patch = [
       "*** Begin Patch",
-      "*** Update File: src/opencode/commands/agentdev/sample.md",
+      "*** Update File: src/common/commands/agentdev/sample.md",
       "@@ ctx",
       " title",
       "+ref ADR-0001",
@@ -482,11 +482,11 @@ describe("Stage B regression: apply_patch Add/Update/Move full-file reconstructi
   test("Update File: existing content + addition combines to form a violation", () => {
     const env = makeGuardEnv({
       readFile: (p: string) =>
-        p === "src/opencode/commands/agentdev/sample.md" ? "see docs/adr/\n" : null,
+        p === "src/common/commands/agentdev/sample.md" ? "see docs/adr/\n" : null,
     });
     const patch = [
       "*** Begin Patch",
-      "*** Update File: src/opencode/commands/agentdev/sample.md",
+      "*** Update File: src/common/commands/agentdev/sample.md",
       "@@ ctx",
       " see docs/adr/",
       "-",
@@ -500,14 +500,14 @@ describe("Stage B regression: apply_patch Add/Update/Move full-file reconstructi
   test("Move File: source content is inspected at the destination distributed path", () => {
     const env = makeGuardEnv({
       readFile: (p: string) =>
-        p === "src/opencode/skills/agentdev-old/SKILL.md"
+        p === "src/common/skills/agentdev-old/SKILL.md"
           ? "# old skill\nref ADR-9999 here\n"
           : null,
     });
     const patch = [
       "*** Begin Patch",
-      "*** Update File: src/opencode/skills/agentdev-old/SKILL.md",
-      "*** Move to: src/opencode/skills/agentdev-new/SKILL.md",
+      "*** Update File: src/common/skills/agentdev-old/SKILL.md",
+      "*** Move to: src/common/skills/agentdev-new/SKILL.md",
       "*** End Patch",
     ].join("\n");
     const r = evaluateApplyPatchEnv(parseApplyPatchArgs({ patchText: patch })!, env);
@@ -523,8 +523,8 @@ describe("Stage B regression: apply_patch Add/Update/Move full-file reconstructi
     });
     const patch = [
       "*** Begin Patch",
-      "*** Update File: src/opencode/skills/agentdev-old/SKILL.md",
-      "*** Move to: src/opencode/skills/agentdev-new/SKILL.md",
+      "*** Update File: src/common/skills/agentdev-old/SKILL.md",
+      "*** Move to: src/common/skills/agentdev-new/SKILL.md",
       "*** End Patch",
     ].join("\n");
     const r = evaluateApplyPatchEnv(parseApplyPatchArgs({ patchText: patch })!, env);
@@ -540,7 +540,7 @@ describe("Stage B regression: apply_patch Add/Update/Move full-file reconstructi
     });
     const patch = [
       "*** Begin Patch",
-      "*** Update File: src/opencode/commands/agentdev/sample.md",
+      "*** Update File: src/common/commands/agentdev/sample.md",
       "@@ ctx",
       "+ref ADR-0001",
       "*** End Patch",
@@ -627,7 +627,7 @@ describe("Stage B regression: repository identity at boundary", () => {
   test("producer-repo URL at non-docs path is blocked (path-content-independent)", () => {
     const env = makeGuardEnv();
     const r = evaluateWriteContentEnv(
-      "src/opencode/commands/agentdev/x.md",
+      "src/common/commands/agentdev/x.md",
       "ref https://github.com/yogata/agent-dev-flow/blob/main/scripts/install.ps1",
       env,
     );
@@ -636,7 +636,7 @@ describe("Stage B regression: repository identity at boundary", () => {
   test("external-repo URL is allowed (not silently blocked, not silently passed as violation)", () => {
     const env = makeGuardEnv();
     const r = evaluateWriteContentEnv(
-      "src/opencode/commands/agentdev/x.md",
+      "src/common/commands/agentdev/x.md",
       "ref https://github.com/sst/opencode/blob/main/packages/plugin/src/index.ts",
       env,
     );
@@ -650,13 +650,13 @@ describe("Stage B regression: repository identity at boundary", () => {
       },
     });
     const r = evaluateWriteContentEnv(
-      "src/opencode/commands/agentdev/x.md",
+      "src/common/commands/agentdev/x.md",
       "ref https://github.com/yogata/agent-dev-flow/blob/main/docs/x.md",
       env,
     );
     expect(r.ok).toBe(true);
     const r2 = evaluateWriteContentEnv(
-      "src/opencode/commands/agentdev/x.md",
+      "src/common/commands/agentdev/x.md",
       "ref https://github.com/myorg/myrepo/blob/develop/scripts/install.ps1",
       env,
     );
@@ -668,7 +668,7 @@ describe("Stage B regression: unclassified IDs do not silently pass", () => {
   test("write introducing OU-1 fails closed (not in default producer set)", () => {
     const env = makeGuardEnv();
     const r = evaluateWriteContentEnv(
-      "src/opencode/commands/agentdev/x.md",
+      "src/common/commands/agentdev/x.md",
       "see OU-1",
       env,
     );
@@ -680,7 +680,7 @@ describe("Stage B regression: unclassified IDs do not silently pass", () => {
   test("write introducing a known producer ID is a violation (not inspection-error)", () => {
     const env = makeGuardEnv();
     const r = evaluateWriteContentEnv(
-      "src/opencode/commands/agentdev/x.md",
+      "src/common/commands/agentdev/x.md",
       "see ADR-0001",
       env,
     );
@@ -710,7 +710,7 @@ describe("Stage B regression: unclassified IDs do not silently pass", () => {
 
 describe("Stage B round 2: classifyPath resolves absolute paths under worktree", () => {
   test("absolute POSIX path under root, distributed suffix", () => {
-    expect(classifyPath("/home/me/proj/src/opencode/commands/agentdev/x.md", "/home/me/proj")).toBe("distributed");
+    expect(classifyPath("/home/me/proj/src/common/commands/agentdev/x.md", "/home/me/proj")).toBe("distributed");
   });
   test("absolute POSIX path under root, non-distributed suffix", () => {
     expect(classifyPath("/home/me/proj/README.md", "/home/me/proj")).toBe("non-distributed");
@@ -721,7 +721,7 @@ describe("Stage B round 2: classifyPath resolves absolute paths under worktree",
   test("absolute POSIX path with .. that resolves to non-distributed suffix", () => {
     expect(
       classifyPath(
-        "/home/me/proj/src/opencode/commands/agentdev/../../../etc/passwd",
+        "/home/me/proj/src/common/commands/agentdev/../../../etc/passwd",
         "/home/me/proj",
       ),
     ).toBe("non-distributed");
@@ -740,7 +740,7 @@ describe("Stage B round 2: classifyPath resolves absolute paths under worktree",
   test("absolute Windows path under root (backslashes)", () => {
     expect(
       classifyPath(
-        "C:\\Users\\me\\proj\\src\\opencode\\commands\\agentdev\\x.md",
+        "C:\\Users\\me\\proj\\src\\common\\commands\\agentdev\\x.md",
         "C:/Users/me/proj",
       ),
     ).toBe("distributed");
@@ -748,7 +748,7 @@ describe("Stage B round 2: classifyPath resolves absolute paths under worktree",
   test("absolute Windows path under root (forward slashes)", () => {
     expect(
       classifyPath(
-        "C:/Users/me/proj/src/opencode/skills/agentdev-foo/SKILL.md",
+        "C:/Users/me/proj/src/common/skills/agentdev-foo/SKILL.md",
         "C:\\Users\\me\\proj",
       ),
     ).toBe("distributed");
@@ -759,7 +759,7 @@ describe("Stage B round 2: classifyPath resolves absolute paths under worktree",
   test("drive letter case-insensitive", () => {
     expect(
       classifyPath(
-        "c:/Users/me/proj/src/opencode/commands/agentdev/x.md",
+        "c:/Users/me/proj/src/common/commands/agentdev/x.md",
         "C:/Users/me/proj",
       ),
     ).toBe("distributed");
@@ -770,21 +770,21 @@ describe("Stage B round 2: classifyPath resolves absolute paths under worktree",
   test("relative path with .. that resolves back into a distributed path", () => {
     expect(
       classifyPath(
-        "src/opencode/skills/agentdev-foo/sub/../../agentdev-bar/SKILL.md",
+        "src/common/skills/agentdev-foo/sub/../../agentdev-bar/SKILL.md",
         "/home/me/proj",
       ),
     ).toBe("distributed");
   });
   test("relative path with .. that resolves to a non-distributed path", () => {
     expect(
-      classifyPath("src/opencode/commands/agentdev/../../../etc/passwd", "/home/me/proj"),
+      classifyPath("src/common/commands/agentdev/../../../etc/passwd", "/home/me/proj"),
     ).toBe("non-distributed");
   });
   test("empty projectRoot: absolute paths fail closed", () => {
-    expect(classifyPathNoRoot("/home/me/proj/src/opencode/commands/agentdev/x.md")).toBe("outside-root");
+    expect(classifyPathNoRoot("/home/me/proj/src/common/commands/agentdev/x.md")).toBe("outside-root");
   });
   test("empty projectRoot: relative distributed paths still distribute", () => {
-    expect(classifyPathNoRoot("src/opencode/commands/agentdev/x.md")).toBe("distributed");
+    expect(classifyPathNoRoot("src/common/commands/agentdev/x.md")).toBe("distributed");
   });
 });
 
@@ -792,7 +792,7 @@ describe("Stage B round 2: evaluate*Env threads projectRoot", () => {
   test("evaluateWriteContentEnv detects absolute path under worktree", () => {
     const env = makeGuardEnv();
     const r = evaluateWriteContentEnv(
-      "/home/me/proj/src/opencode/commands/agentdev/x.md",
+      "/home/me/proj/src/common/commands/agentdev/x.md",
       "ref ADR-0001",
       env,
       "/home/me/proj",
@@ -818,7 +818,7 @@ describe("Stage B round 2: evaluate*Env threads projectRoot", () => {
   test("evaluateWriteContentEnv Windows backslash absolute under worktree", () => {
     const env = makeGuardEnv();
     const r = evaluateWriteContentEnv(
-      "C:\\proj\\src\\opencode\\commands\\agentdev\\x.md",
+      "C:\\proj\\src\\common\\commands\\agentdev\\x.md",
       "ref ADR-0001",
       env,
       "C:/proj",
@@ -828,7 +828,7 @@ describe("Stage B round 2: evaluate*Env threads projectRoot", () => {
   test("evaluateWriteContentEnv legacy no-projectRoot: absolute fails closed", () => {
     const env = makeGuardEnv();
     const r = evaluateWriteContentEnv(
-      "/home/me/proj/src/opencode/commands/agentdev/x.md",
+      "/home/me/proj/src/common/commands/agentdev/x.md",
       "ref ADR-0001",
       env,
     );
@@ -841,10 +841,10 @@ describe("Stage B round 2: evaluate*Env threads projectRoot", () => {
 
 describe("Stage B round 2: parser reads OpenCode field name `path`", () => {
   test("parseWriteArgs reads `path` (canonical OpenCode field)", () => {
-    const r = parseWriteArgs({ path: "src/opencode/commands/agentdev/x.md", content: "ADR-0001" });
+    const r = parseWriteArgs({ path: "src/common/commands/agentdev/x.md", content: "ADR-0001" });
     expect(r).not.toBeNull();
     if (r) {
-      expect(r.filePath).toBe("src/opencode/commands/agentdev/x.md");
+      expect(r.filePath).toBe("src/common/commands/agentdev/x.md");
       expect(r.content).toBe("ADR-0001");
     }
   });
@@ -930,7 +930,7 @@ describe("Stage B round 2: plugin shell fail-closes on malformed args", () => {
   test("write to distributed path with violation throws", async () => {
     const r = await runHook(
       "write",
-      { path: "src/opencode/commands/agentdev/x.md", content: "ref ADR-0001" },
+      { path: "src/common/commands/agentdev/x.md", content: "ref ADR-0001" },
       "/home/me/proj",
     );
     expect(r.threw).toBe(true);
@@ -941,7 +941,7 @@ describe("Stage B round 2: plugin shell fail-closes on malformed args", () => {
     const r = await runHook(
       "write",
       {
-        path: "/home/me/proj/src/opencode/commands/agentdev/x.md",
+        path: "/home/me/proj/src/common/commands/agentdev/x.md",
         content: "ref ADR-0001",
       },
       "/home/me/proj",
@@ -1006,12 +1006,12 @@ describe("Stage B round 2: apply_patch Move + Update body reconstructs destinati
     // -> violation.
     const env = makeGuardEnv({
       readFile: (p: string) =>
-        p === "src/opencode/skills/agentdev-old/SKILL.md" ? "# clean source\n" : null,
+        p === "src/common/skills/agentdev-old/SKILL.md" ? "# clean source\n" : null,
     });
     const patch = [
       "*** Begin Patch",
-      "*** Update File: src/opencode/skills/agentdev-old/SKILL.md",
-      "*** Move to: src/opencode/skills/agentdev-new/SKILL.md",
+      "*** Update File: src/common/skills/agentdev-old/SKILL.md",
+      "*** Move to: src/common/skills/agentdev-new/SKILL.md",
       "@@ ctx",
       " # clean source",
       "+ref ADR-0001",
@@ -1027,12 +1027,12 @@ describe("Stage B round 2: apply_patch Move + Update body reconstructs destinati
   test("Move with empty body inspects source at destination (existing behavior preserved)", () => {
     const env = makeGuardEnv({
       readFile: (p: string) =>
-        p === "src/opencode/skills/agentdev-old/SKILL.md" ? "# old\nref ADR-9999 here\n" : null,
+        p === "src/common/skills/agentdev-old/SKILL.md" ? "# old\nref ADR-9999 here\n" : null,
     });
     const patch = [
       "*** Begin Patch",
-      "*** Update File: src/opencode/skills/agentdev-old/SKILL.md",
-      "*** Move to: src/opencode/skills/agentdev-new/SKILL.md",
+      "*** Update File: src/common/skills/agentdev-old/SKILL.md",
+      "*** Move to: src/common/skills/agentdev-new/SKILL.md",
       "*** End Patch",
     ].join("\n");
     const r = evaluateApplyPatchEnv(parseApplyPatchArgs({ patchText: patch })!, env);
@@ -1048,14 +1048,14 @@ describe("Stage B round 2: apply_patch Move + Update body reconstructs destinati
     // violation.
     const env = makeGuardEnv({
       readFile: (p: string) =>
-        p === "src/opencode/skills/agentdev-old/SKILL.md"
+        p === "src/common/skills/agentdev-old/SKILL.md"
           ? "# old\nref ADR-9999 here\n"
           : null,
     });
     const patch = [
       "*** Begin Patch",
-      "*** Update File: src/opencode/skills/agentdev-old/SKILL.md",
-      "*** Move to: src/opencode/skills/agentdev-new/SKILL.md",
+      "*** Update File: src/common/skills/agentdev-old/SKILL.md",
+      "*** Move to: src/common/skills/agentdev-new/SKILL.md",
       "@@ ctx",
       " # old",
       "-ref ADR-9999 here",
@@ -1072,7 +1072,7 @@ describe("Stage B round 2: apply_patch Move + Update body reconstructs destinati
     });
     const patch = [
       "*** Begin Patch",
-      "*** Update File: src/opencode/skills/agentdev-old/SKILL.md",
+      "*** Update File: src/common/skills/agentdev-old/SKILL.md",
       "*** Move to: /etc/passwd",
       "*** End Patch",
     ].join("\n");
@@ -1090,11 +1090,11 @@ describe("Stage B round 2: apply_patch Move + Update body reconstructs destinati
   test("Move to non-distributed destination passes (no inspection)", () => {
     const env = makeGuardEnv({
       readFile: (p: string) =>
-        p === "src/opencode/skills/agentdev-old/SKILL.md" ? "ref ADR-0001\n" : null,
+        p === "src/common/skills/agentdev-old/SKILL.md" ? "ref ADR-0001\n" : null,
     });
     const patch = [
       "*** Begin Patch",
-      "*** Update File: src/opencode/skills/agentdev-old/SKILL.md",
+      "*** Update File: src/common/skills/agentdev-old/SKILL.md",
       "*** Move to: docs/notes.md",
       "*** End Patch",
     ].join("\n");
@@ -1139,7 +1139,7 @@ describe("Stage B round 3: distributed-workflow-control prefixes preserved by ma
   test("STEP-1 in distributed content is allowed (no Detection)", () => {
     const env = makeGuardEnv();
     const r = evaluateWriteContentEnv(
-      "src/opencode/commands/agentdev/x.md",
+      "src/common/commands/agentdev/x.md",
       "- STEP-1 で Epic Issue と判定",
       env,
     );
@@ -1149,7 +1149,7 @@ describe("Stage B round 3: distributed-workflow-control prefixes preserved by ma
   test("QG-4 in distributed content is allowed (no Detection)", () => {
     const env = makeGuardEnv();
     const r = evaluateWriteContentEnv(
-      "src/opencode/commands/agentdev/x.md",
+      "src/common/commands/agentdev/x.md",
       "QG-4 観点8 に基づく評価スコープ切替",
       env,
     );
@@ -1160,7 +1160,7 @@ describe("Stage B round 3: distributed-workflow-control prefixes preserved by ma
     const env = makeGuardEnv();
     for (const n of ["STEP-1", "STEP-2", "STEP-3", "STEP-4", "STEP-5", "STEP-6"]) {
       const r = evaluateWriteContentEnv(
-        "src/opencode/commands/agentdev/x.md",
+        "src/common/commands/agentdev/x.md",
         `次: ${n}`,
         env,
       );
@@ -1171,7 +1171,7 @@ describe("Stage B round 3: distributed-workflow-control prefixes preserved by ma
   test("OU-1 still fails closed (not in producer set, not in distributed-control set)", () => {
     const env = makeGuardEnv();
     const r = evaluateWriteContentEnv(
-      "src/opencode/commands/agentdev/x.md",
+      "src/common/commands/agentdev/x.md",
       "see OU-1",
       env,
     );
@@ -1184,7 +1184,7 @@ describe("Stage B round 3: distributed-workflow-control prefixes preserved by ma
   test("producer-internal ADR-0001 still flagged as violation (not relaxed)", () => {
     const env = makeGuardEnv();
     const r = evaluateWriteContentEnv(
-      "src/opencode/commands/agentdev/x.md",
+      "src/common/commands/agentdev/x.md",
       "see ADR-0001",
       env,
     );
@@ -1199,7 +1199,7 @@ describe("Stage B round 3: distributed-workflow-control prefixes preserved by ma
       distributed_workflow_control_prefixes: ["STEP", "QG", "WP"],
     });
     const r = evaluateWriteContentEnv(
-      "src/opencode/commands/agentdev/x.md",
+      "src/common/commands/agentdev/x.md",
       "see WP-3",
       env,
     );
@@ -1212,14 +1212,14 @@ describe("Stage B round 3: distributed-workflow-control prefixes preserved by ma
     });
     // STEP-1 still allowed
     const stepR = evaluateWriteContentEnv(
-      "src/opencode/commands/agentdev/x.md",
+      "src/common/commands/agentdev/x.md",
       "STEP-1 ok",
       env,
     );
     expect(stepR.ok).toBe(true);
     // IR-0001 now flagged as producer-internal violation
     const irR = evaluateWriteContentEnv(
-      "src/opencode/commands/agentdev/x.md",
+      "src/common/commands/agentdev/x.md",
       "see IR-0001",
       env,
     );
@@ -1229,7 +1229,7 @@ describe("Stage B round 3: distributed-workflow-control prefixes preserved by ma
     }
     // ADR-0001 is now unclassified (not in IR set) -> fail closed
     const adrR = evaluateWriteContentEnv(
-      "src/opencode/commands/agentdev/x.md",
+      "src/common/commands/agentdev/x.md",
       "see ADR-0001",
       env,
     );
@@ -1275,7 +1275,7 @@ describe("producer metadata enforcement (DEC-030 decision 5)", () => {
 
   test("report mode observes the inline declaration without blocking", () => {
     const r = evaluateWriteContentEnv(
-      "src/opencode/skills/agentdev-foo/SKILL.md",
+      "src/common/skills/agentdev-foo/SKILL.md",
       contaminated,
       REPORT_ENV,
     );
@@ -1288,7 +1288,7 @@ describe("producer metadata enforcement (DEC-030 decision 5)", () => {
 
   test("enforce mode blocks the same write as a violation", () => {
     const r = evaluateWriteContentEnv(
-      "src/opencode/skills/agentdev-foo/SKILL.md",
+      "src/common/skills/agentdev-foo/SKILL.md",
       contaminated,
       ENFORCE_ENV,
     );
@@ -1303,7 +1303,7 @@ describe("producer metadata enforcement (DEC-030 decision 5)", () => {
 
   test("enforce mode no longer skips id extraction on declaration lines", () => {
     const r = evaluateWriteContentEnv(
-      "src/opencode/skills/agentdev-foo/SKILL.md",
+      "src/common/skills/agentdev-foo/SKILL.md",
       contaminated,
       ENFORCE_ENV,
     );
@@ -1318,13 +1318,13 @@ describe("producer metadata enforcement (DEC-030 decision 5)", () => {
   test("clean content passes in both modes", () => {
     const clean = "# title\nGeneralized body with no concrete references.\n";
     const reportMode = evaluateWriteContent(
-      "src/opencode/skills/agentdev-foo/SKILL.md",
+      "src/common/skills/agentdev-foo/SKILL.md",
       clean,
     );
     expect(reportMode.ok).toBe(true);
     expect(reportMode.detections.length).toBe(0);
     const enforceMode = evaluateWriteContentEnv(
-      "src/opencode/skills/agentdev-foo/SKILL.md",
+      "src/common/skills/agentdev-foo/SKILL.md",
       clean,
       ENFORCE_ENV,
     );

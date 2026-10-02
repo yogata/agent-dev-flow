@@ -1,0 +1,565 @@
+# Worktree 作成、削除、ブランチ操作の詳細手順
+
+## 目次
+
+- [作成手順](#作成手順)
+- [worktree 内判定ヘルパー](#worktree-内判定ヘルパー)
+- [worktree 標準運用ガイド](#worktree-標準運用ガイド)
+- [worktree 構造的制約（agentdev-git-worktree-test-fallback Design）](#worktree-構造的制約agentdev-git-worktree-test-fallback-design)
+- [bun test 実行の環境前提](#bun-test-実行の環境前提)
+- [書込み guard 運用指針（Windows エンコーディング破壊回避の集約）](#書込み-guard-運用指針windows-エンコーディング破壊回避の集約)
+- [git stash 運用手順（一時退避）](#git-stash-運用手順一時退避)
+- [削除手順](#削除手順)
+- [ツール実行規約](#ツール実行規約)
+- [Merge Conflict 対応パターン](#merge-conflict-対応パターン)
+
+## 作成手順
+
+### 1. worktree 作成元
+
+worktree の作成元は main（以下 `origin/main`）である。
+worktree の作成元、PR の base、rebase・同期基準、鮮度確認、squash merge 先、Epic 後続 Wave の作業起点は main を参照する。
+
+作成元の検出（従来どおり）:
+
+```bash
+git remote show origin | grep 'HEAD branch' | sed 's/.*: //'
+```
+
+検出結果を `origin/main` として使用。
+デフォルトは `main`。
+ローカルのベースブランチは古くなっている可能性があるため、常にリモートの最新状態を起点とする。
+
+### 2. worktree作成コマンド
+
+```bash
+git worktree add ".worktrees/{N}-{type}" -b "{type}/issue-{N}" origin/main
+```
+
+### 3. 重要事項
+
+- **worktreeプレフィクス必須**: ファイルパスには `.worktrees/{N}-{type}/` を含めること
+ - 正: `<repo-root>/.worktrees/516-fix/src/components/App.tsx`
+ - 正: `.worktrees/516-fix/src/components/App.tsx`
+ - 誤: `src/components/App.tsx`（メインリポジトリのファイルを誤編集リスク）
+- Windows環境: パスにスペースが含まれる可能性があるためダブルクォート必須
+- 作成後: `git worktree list` で正しく追加されたことを検証
+
+### 4. 既存worktree衝突時の対応
+
+| 状況 | 対応 |
+|------|------|
+| 同名worktree既存 | 既存worktreeを再利用（作成コマンド実行しない） |
+| ブランチのみ既存 | `git worktree add ".worktrees/{N}-{type}" "{type}/issue-{N}"` |
+| ダーティなworktree | 削除禁止。未コミット変更時はエラー停止 |
+
+## worktree 内判定ヘルパー
+
+現在 worktree 内にいるか（メインリポジトリで作業していないか）を判定する検証ヘルパー手順。
+case-run の precondition gate（STEP-S3 前置 gate 群）および実行担当サブエージェントの自己検証から参照される。
+2つの検証を組合せて判定する。
+
+### 1. 検証コマンド
+
+**検証A**: `git worktree list` で当該 worktree が登録されていることの確認
+
+```bash
+git worktree list
+```
+
+出力に当該 Issue の worktree（`.worktrees/{N}-{type}`）が含まれることを確認する。
+
+**検証B**: `git rev-parse --show-toplevel` で現在の作業ディレクトリのルートがメインリポジトリルートと**一致しない**ことの確認
+
+```bash
+# worktree 内で実行
+git rev-parse --show-toplevel
+```
+
+この結果がメインリポジトリルート（`.worktrees/` を含まないパス）と**一致しない**ことを確認する。
+一致する場合はメインリポジトリにいる（worktree 内ではない）。
+
+### 2. 判定基準
+
+| 検証A（worktree list 登録） | 検証B（toplevel ≠ メインルート） | 判定 |
+|---|---|---|
+| 当該 worktree あり | 一致しない（worktree 内） | ✅ worktree 内にいる（隔離されている） |
+| 当該 worktree あり | 一致する（メインルート） | ❌ メインリポジトリにいる（隔離されていない） |
+| 当該 worktree なし | - | ❌ worktree 未作成 |
+
+### 3. 適用箇所
+
+- **case-run STEP-S3（precondition gate）**: 実行担当サブエージェント起動前に本ヘルパーで検証し、worktree 内にいない場合は起動を停止して当該 STEP へ戻る
+- **実行担当サブエージェントの自己検証**: 実装作業開始前に本ヘルパーで worktree 内にいることを自己検証する（詳細は `agentdev-case-run-execution-adapter` 参照）
+
+## worktree 標準運用ガイド
+
+worktree 環境の運用落とし穴に対する標準運用ガイド（L-003, L-008, L-009, L-013、PR #1036/#1099/#1128 由来）。
+
+### source 側ツリー直接参照（SoT パス）
+
+worktree 内では `.opencode/skills/` の junction が再作成されないため、junction 切断時に `.opencode/` 経由参照が失敗する。
+整合性検査、スキル参照は、配置先（`.opencode/`）ではなく source 側ツリー（SoT パス）を直接参照すること。
+
+### git 管理外実体の未投影に起因する運用
+
+worktree へは git 管理外の実体（`node_modules`、`.opencode/skills/` の junction 等）が投影されない。
+このため、worktree 内では次の3運用を守る。
+
+1. **SoT パス起点実行**: 構造系テスト、整合性検査、スキル参照等の実行は source 側ツリー（SoT パス）を起点とする。背景と手順は「source 側ツリー直接参照（SoT パス）」を参照する
+2. **src 側のみ編集**: 編集対象は git 管理対象の source 側ツリー（`src/` 配下）に限定する。配置先（`.opencode/`）配下の投影実体は git 管理外であり、編集しても main へ反映されず、install による再生成で失われる。gitignore 対象ファイルを参照・編集する場合の扱いは「gitignore 対象ファイル受け渡し不可」を参照する
+3. **依存整備**: `node_modules` は gitignore 対象のため worktree へ未伝播である。bun test・tsc 型検証の実行前に依存整備を前置する。整備手段（対象ディレクトリでの `bun install`、または main 側 `node_modules` への junction 作成。検証後は junction エントリのみを削除し、参照先の main 側 `node_modules` は破壊しない）の詳細は「bun test 実行の環境前提」を参照する
+4. **textlint guard plugin 依存成果物の再生成**: `agentdev-textlint-guard` plugin の依存実体（`vendor/textlint-engine.bundle.json`、`vendor/kuromoji-dict/`）は版固定情報（`package.json` + `bun.lock`）のみが git 管理対象であり、worktree へは未伝播である。plugin のテスト実行（`tests/engine-bundle.test.ts` を含む）、最終検査（gate.ts）、worktree 内実体からの textlint 文章表層検査の前に、plugin package 配下で `bun install && bun run build:engine` を実行して依存成果物を再生成する（plugin package の配置場所は plugin README「導入時の依存生成手順」の実行場所表を参照する）。再生成はネットワーク取得（bun install）を含む。導入系スクリプトは vendor 欠落を検知した場合に fail-closed で停止し本手順を案内する
+
+### isInsideWorktree 適用
+
+`isInsideWorktree` で worktree 実行を判定し、junction 依存検査（`checkSourceProjectionConsistency` 等）に適用すること。
+worktree 内で junction が再作成されない場合の偽陽性を防止するためである。
+
+### isInsideWorktree 適用範囲の拡張候補
+
+`checkSourceProjectionConsistency` 以外の junction 依存検査に対する `isInsideWorktree` 適用を評価対象として明記すること。
+junction 依存の整合性検査全般に worktree 実行判定を拡張する候補を個別に評価し、偽陽性の発生する検査から順次適用する。
+
+## worktree 構造的制約（agentdev-git-worktree-test-fallback Design）
+
+worktree は独立した working tree を持つため、本体リポジトリ直下を前提とする検査が worktree 内では成立しない事象がある。
+次の構造的制約を前提として運用する。
+
+### gitignore 対象ファイル受け渡し不可
+
+worktree は独立した working tree であるため、メインリポジトリで `.gitignore` 対象となっているファイル（`.opencode/skills/agentdev-*/` ジャンクション配下、`.agentdev-plugin/` 等）は worktree 側へ受け渡しできない。
+worktree 内で当該ファイルを参照する検査は失敗する。
+
+worktree 内で gitignore 対象ファイルを参照・編集する必要がある場合は、`git add -f` で強制追加して worktree の working tree に存在させるか、source 側ツリー（SoT パス）へ fallback して参照する。
+
+### bun test 実行の環境前提
+
+bun test によるフル suite 実行は、次の環境前提を踏まえて実行する。
+フル suite の実行形態（3 cwd 分割実行・./ prefix・環境ラベル）の正規形は `agentdev-quality-gates`（QG-4 bun test フル suite 正規形）が品質統制側として所有する。
+
+- worktree は独立した working tree のため、gitignore 対象の `node_modules` は worktree へ未伝播である。bun test（フル suite 正規形、bun test 単独実行の別を問わない）および tsc 型検証の実行前に依存整備を前置する。未実施の場合、integrity suite の一部テスト・tsc 型検証が依存解決失敗で fail する。依存整備の対象ディレクトリ集合と前置の実行形態は正規形（`agentdev-quality-gates` QG-4 の依存パッケージ前置）を参照する。worktree における依存整備前提は次のとおり:
+  - **対象ディレクトリ集合**: Project Extensions の scripts ディレクトリ（source 側ツリー配下。zod 等の依存解決。integrity suite からの相対 import 参照の前提を含む）と、本体リポジトリ専用の整合性検査 skill の scripts ディレクトリ（配置先配下の worktree 実体。`typescript`・`@types/bun`・`@types/node` の依存解決）の両方。片方のみ整備した場合、未整備側を参照するテスト・型検証が依存解決失敗で fail する
+  - **tsc 型検証の型解決前提**: tsc 型検証（`tsc --noEmit`）を含む場合は、対象パッケージでの `bun install` により `@types/bun` 等の型定義と `typescript` を復元済みであること。node_modules 未整備の状態では tsc の型解決が失敗する
+  - **依存整備の正規手段（フル suite 正規形を含む全 bun test 実行形態で共通）**: 依存解決が必要な場合は、次のいずれかの手段で整備する（QG-4 の依存パッケージ前置と同じ許容手段・適用範囲）
+    1. main 側の当該 scripts ディレクトリ配下の `node_modules` への junction を worktree 側に作成する。検証後に junction を削除する（junction エントリのみの削除とし、参照先の main 側 `node_modules` は破壊しない）
+    2. worktree の当該 skill ディレクトリで `bun install` を実行し、worktree 内に `node_modules` を生成する
+
+       junction 作成・削除の手順例（node 経由で bash から転記可能。main root で実行し、`{N}-{type}` は対象 worktree 名に置換、`<main root 絶対パス>` はメインリポジトリルートの絶対パスに置換する。パスは forward slash 形式で与える）:
+
+       ```bash
+       # 作成（node fs.symlinkSync、junction 型。リンク先（target）・作成先（dest）とも絶対パス指定）
+       node -e "const fs=require('fs'); fs.symlinkSync('<main root 絶対パス>/src/common/skills/agentdev-project-extensions/scripts/node_modules', '<main root 絶対パス>/.worktrees/{N}-{type}/src/common/skills/agentdev-project-extensions/scripts/node_modules', 'junction')"
+       # 検証後の削除（junction エントリのみ。node fs.rmdirSync が正規手段。参照先の main 側 node_modules は破壊しない）
+       node -e "const fs=require('fs'); fs.rmdirSync('<main root 絶対パス>/.worktrees/{N}-{type}/src/common/skills/agentdev-project-extensions/scripts/node_modules')"
+       ```
+
+       処理系差の注意:
+
+       - 作成は絶対パス指定を前提とする。node fs.symlinkSync の相対 target は cwd ではなく dest（作成先）ディレクトリ基準で解決される。cmd `mklink /J` は target を cwd 基準で解決するため、その cwd 相対指定をそのまま fs.symlinkSync へ転記すると意図しない場所へ junction が張られる
+       - 削除の正規手段は node fs.rmdirSync。junction エントリのみを削除し、参照先実体を破壊しない
+       - Git Bash の `rmdir` は junction を空でないディレクトリとして扱い削除を拒否する。補記であり正規手段ではない
+       - PowerShell の `Remove-Item` は環境・対象の内容により確認プロンプトが出ることがあり、手順転記では応答待ちの停止要因になる。補記であり正規手段ではない
+
+  - **整備後の再実行手順**: 依存整備実施後、依存解決失敗で fail したテスト・型検証を同一 worktree で再実行し、当該 fail が解消したことを確認する。再実行結果には依存整備実施済みの旨を環境ラベル（依存パッケージ状態）へ記録し、整備前の fail と整備後の結果を混在させない
+  - **textlint guard plugin 依存成果物の前提**: plugin 配下のテスト（engine-bundle 系を含む）と最終検査は、plugin package 配下での依存成果物再生成（`bun install && bun run build:engine`。ネットワーク取得を含む）を前置する。`vendor/` 配下の依存成果物は版固定情報のみが git 管理対象のため worktree へ未伝播であり、欠落のまま実行すると導入系スクリプト・検査が fail-closed で停止する
+  - **整備手段の選択基準（junction 作成と bun install の使い分け）**: 上記2手段は次の判断基準で使い分ける。判断根拠は検証記録の環境ラベルへ記録する
+    - **node_modules 伝播状態の確認手順（手段選択の前置）**: 手段を選択する前に、次の2点を確認し、結果を環境ラベルへ記録する
+      1. **main 側 `node_modules` の存否**: 対象ディレクトリの main 側実体（SoT パス）配下に `node_modules` が存在するかを確認する。存在しない場合は main 側未整備の状態である
+      2. **worktree 側 junction の成立有無**: worktree 側の当該パスに `node_modules`（junction）が既に存在し、参照先が main 側の `node_modules` へ向いているかを確認する（worktree への伝播は発生しないため、基本は「未成立」が初期状態）
+    - **main 側 `node_modules` 不在時の一意決定**: main 側の当該ディレクトリ配下に `node_modules` が存在しない場合、junction 作成は参照先不在で成立しないため、worktree 内での `bun install` が唯一の確定的な整備手段となる。この条件下では junction 選択肢は採らず、`bun install` を実行する（判断に迷う余地なし）
+    - **`bun install` を選択する**: (a) worktree 内で `package.json`・`bun.lock` を変更する Case（依存定義の変更を伴う実装）。(b) 検証結果の再現性が依存状態そのものに依存する検証（依存状態を実験条件の一部として扱う場合）。junction 経由では依存実体が main 側の現在状態に依存し、main 側の整備操作が worktree 側の検証結果へ干渉するため、この条件では junction を使わない
+    - **junction 作成を選択する**: (a) 依存定義の変更がなく、main 側の整備済み依存と同一の状態で足りる一時的な検証。(b) 検証後に worktree へ `node_modules` 実体を残したくない場合（junction エントリ削除のみでクリーンアップが完結し、gitignore 対象の実体が worktree に残留しない）。(c) `bun install` による復元時間を要しない速い前置が有利な場合
+    - **共通制約**: いずれの手段でも、選択根拠と依存パッケージ状態を環境ラベルとして検証記録に残す。整備手段の切替（junction → bun install 等）を行った場合は切替後の結果を正とし、切替前の結果を再利用しない
+  - **package rename 時の bun.lock 確認**: package rename を伴う変更で `bun install` を実行した場合は、bun.lock の root workspace name が新パッケージ名へ追従していることを確認する（確認手順は runtime-package-boundary Design「本体リポジトリ sync」節参照）
+- worktree の `.opencode/` 配下では commands と skills の junction のみが伝播し、plugins および repo-local 実体は worktree 側に存在しない（無言欠落）。junction を前提とする構造系テストは source パス（SoT パス）へ切り替えるか、main root 実体から `--root <worktree root>` を指定した読取専用実行で補完する。QG-4「3 cwd 分割実行」の分割③（plugins）の環境差と補完時の記録要件は `agentdev-quality-gates` references `qg-4-final-acceptance.md`「worktree での分割③ 対象欠落の環境差」を参照する
+- worktree の構造上の理由でテストスイートが実行できない場合は、メインリポジトリからの読取専用実行でエビデンスを採取できる。この場合は実行環境（worktree または main、junction 伝播状態、依存パッケージ状態）を環境ラベルとして検証記録に明記し、fail 全件の由来分類（既知欠陥・環境依存・当該変更起因）を行う
+- **旧 baseline と並行 main merge 追随差の注意**: worktree 作成元の分岐点 baseline 以降に origin/main へ他 Case の merge が入った場合、baseline 系 durable state（baseline commit、baseline 期待値・許容リスト等）は現行 main より古い状態で検証が行われる。この追随差により、当該変更と無関係なテストが baseline の陳腐化で疑似 fail することがある。検証開始前に `git fetch origin` 後の main 鮮度確認（本リポジトリ「main の鮮度確認」参照）で追随差の有無を確認し、追随差下の疑似 fail については `agentdev-quality-gates` QG-4「fail 由来分類」節の baseline 追随差3点対照手順（単独再実行・分岐点 main root 再現・現行 baseline 差し替え再実行（検証後に旧状態へ復元））で由来分類する。疑似 fail を当該変更起因と誤分類しないこと
+
+### junction 依存 checker の skip 挙動
+
+`.opencode/skills/agentdev-*` ジャンクションは worktree へ伝播しない。
+このため junction の存在を前提とする checker（`checkSourceProjectionConsistency` 等）は worktree 内で偽陽性を発生させる。
+
+junction 依存 checker は worktree 実行時（`isInsideWorktree` 判定で worktree 内と判定された場合）に skip する。
+skip せずに検査が必要な場合は構造系テスト fallback（commands_e2e / skills_structure / templates_structure の source パス切替）を適用する。
+
+### main root 実体 + --root 指定による読取系 checker 実行手順
+
+**前置確認（.opencode 状態の実測）**: checker 起動前に worktree 内の `.opencode/` の実在構成を実測して確認する。worktree 内では `.opencode/skills/` に git 管理対象の repo 検査基盤実体（`repo-` プレフィックス検査基盤の skill）のみが存在し、`agentdev-*` junction は伝播しない。この前置確認は、main root 実体側起動へ切替すべき対象（junction 系 skill scripts・plugins 系 gate）を事前に特定するために行う。
+
+```bash
+# worktree 内 .opencode/skills の実在構成確認（git 管理対象実体と junction の区別）
+ls .opencode/skills/
+ls .opencode/plugins/ 2>/dev/null || echo "(plugins junction 未伝播)"
+```
+
+junction 系 skill scripts および plugins 系 gate を用いる検査で、skip せずに実行する必要がある読取系 check は、main root 実体から `--root <worktree root>` 指定（必要に応じ `--files` 併用）で実行できる。
+worktree 内から `.opencode/skills/agentdev-*` 配下の script を直接実行すると junction 未伝播により Module not found で失敗するため、script の起動パスを main root 実体側へ置き、検査対象だけを worktree へ向ける。
+
+`.opencode/plugins/` 配下の junction も worktree へ未伝播である。textlint final gate（`agentdev-textlint-guard` plugin）も同様に、配布投影実体を直接起動せず、src 側原本の main root 実体から起動する。実在引数は `--root <project-root>` と `--json` であり、`--files` は受け付けない。そのため gate は検査対象 root 全体に対して実行し、変更ファイル限定が必要な場合は `--files` 併用に対応する checker 側の gate で行う。
+
+手順:
+
+1. **host repo root（メインリポジトリルート）を cwd として**、script 実体を `bun <path>` 形式で起動する。cwd は `git rev-parse --show-toplevel` が `.worktrees/` を含まない main root を返す位置（実行担当サブエージェントの host repo root）である
+2. 検査対象の worktree root を `--root <worktree root>` で指定する（絶対パスを推奨。相対パスは実行時のカレントディレクトリ基準で解決される）
+3. `--root` のパス形式は **forward slash 形式の Windows 形式パス（`C:/Users/...` 形式）に統一する**。**MSYS 形式パス（`/c/Users/...`）は禁止する** — MSYS 形式は Windows プログラム側のパス解決で実在しない root として扱われ、checker の fail-closed 契約により検査対象が見かけ上全件 missing となる。bash は引用符なしの Windows 形式パス（backslash）を escape 解釈して backslash を落とすため、引数段階でパスが破損する。破損した root は存在しない root として扱われ、checker の fail-closed 契約により検査対象が見かけ上全件 missing となる恐れがある
+4. 変更ファイル限定検査では `--files` を併用する（`--files` と `--base-ref` は排他。worktree 上のコミット前検証では untracked ファイルを含む `--files` による明示指定を標準とする。`--files` は checker の workflow profile の対象に一致するファイルを指定する。docs/** 変更を含まない PR では `--workflow case-run` の gate がスキップ対象となるため、文書品質の targeted 検査は `--workflow docs-check`（全ファイル対象）で行う）
+
+実行手順例（代表検査。`<worktree 絶対パス>` は検査対象 worktree の root に置換する）:
+
+```bash
+# targeted docs guard（--root 対応、--files 併用）
+bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts --workflow case-run --root <worktree 絶対パス> --files src/common/skills/agentdev-git-worktree/references/worktree-operations.md --json
+
+# traceability check（--root 必須。--req は対象要件行 ID のカンマ区切り個別指定のみ。.. 範囲構文は非対応）
+bun .opencode/skills/agentdev-traceability/scripts/src/check.ts --root <worktree 絶対パス> --req REQ-{NNNN}-{MMM}
+
+# textlint final gate（plugins 系 gate。src 側原本の main root 実体から起動し、検査対象 root に worktree を指定。対応引数は --root と --json）
+bun run src/opencode/plugins/agentdev-textlint-guard/gate.ts --root <worktree 絶対パス>
+
+# 契約テスト（配布物の構造様式を固定する *.test.ts。--root を取らないため main root 実体側の状態が検査対象になる）
+bun test ./.opencode/skills/repo-agentdev-integrity/scripts/skills_structure.test.ts
+```
+
+制約:
+
+- **読取系 check の実行のみに限定**: main 側 root での実行は読取系 check の実行のみに限定する。書込み・状態変更を伴う操作（索引再生成、auto-fix 等）を main root 実体から実行しない
+- **結果混在禁止**: worktree 内検査結果と main root 実体からの検査結果を混在させない。実行記録には環境ラベル（実行環境: main root 実体、検査対象: `--root` 指定の worktree root、ブランチ名・HEAD hash、junction 伝播状態）を付す。環境ラベルの記録運用は「bun test 実行の環境前提」に従う
+- **検査対象状態の明示**: `--root` を取らない契約テストを main root 実体から実行した場合、検査対象は main root 実体側の状態であり、worktree 内の未マージ変更は含まれない。worktree 内の変更を検査する契約テストは構造系テスト fallback（前節参照）を用いる
+
+QG-4 の traceability check における main 側 root 再実行の前提手順との相互参照は、`agentdev-quality-gates` references `qg-4-final-acceptance.md`「traceability check の横断 durable state 前提手順」を参照する。
+
+## 書込み guard 運用指針（Windows エンコーディング破壊回避の集約）
+
+worktree 操作（実装、検証、証跡退避を含む）におけるファイル書込みは、Windows 環境のエンコーディング破壊回避 guard の対象である。
+本節は worktree 操作文脈での運用指針を集約する。規範の正は AGENTS.md 行動規範と `docs/knowledge/windows-powershell-bulk-io-corruption.md` とし、本節はそれらを worktree 操作から参照できるようにした集約点である。
+
+### guard が書込みをブロックする操作（worktree 内で実行禁止）
+
+- PowerShell 標準 cmdlet（`Get-Content` / `Set-Content` / `Out-File`）経由の既存 UTF-8（BOM なし）/LF ファイルの一括読み書き（cp932 解釈・CRLF 書き出しによる破壊）
+- PowerShell のリダイレクト演算子（`>` / `>>` / `*>`）やパイプによるファイル出力（checker stdout・gh CLI 出力等の証跡退避を含む）
+- Write ツールによる既存 UTF-8（BOM なし）ファイルの全面上書き（新規ファイル作成に限定する）
+
+### 標準手段（guard ブロック時の切替先）
+
+- 既存ファイルの部分編集: edit ツール（per-line string replace）
+- プログラム経由の一括読み書き: node の `readFileSync` / `writeFileSync`（エンコーディング明示）または `[System.IO.File]` の明示エンコーディング指定
+- 証跡退避（checker CLI stdout、gh CLI 出力等）: `spawnSync` + `fs.writeFileSync`（UTF-8 明示）
+- shell inline・heredoc に起因するコンテンツ破損の回避（2技法）:
+  - (a) 一時スクリプトファイル経由の実行: 正規表現リテラル等を含む解析コード、日本語を含む長大なコンテンツの書き出しは、project root 内の一時スクリプトファイルへ配置して実行し、検査後に削除する（ファイルベース伝達）
+  - (b) PowerShell 単一引用符ヒアドキュメント: `node -e` と単一引用符ヒアドキュメントの組合せは、bash の escape 解釈・heredoc 打ち切りを経由しない素通し可能な代替技法である
+
+(a) と (b) の使い分け: 標準は (a) の一時スクリプトファイル経由であり、単発の短い解析等で一時ファイル作成が過剰になる場面を (b) の代替対象とする。2機構（argv escape 解釈による文字列変質、heredoc stdin の中途打ち切り）とその別個の検知方法、および本集約との相互参照は `docs/knowledge/windows-git-bash-inline-content-corruption.md` を参照する。両技法は shell inline を一律禁止する過剰一般化ではなく、破損機構に応じた切替手段である。guard の fail-closed 維持と、ブロック時は解除・迂回ではなく標準手段へ切替する原則は本節全体で維持する
+
+### fail-closed の維持
+
+guard が書込みをブロックした場合、ブロックの解除・迂回（エンコーディング指定の変更、リダイレクト回避ハック等）で進めず、上記の標準手段へ切替する。
+ブロックを検知した edit の oldString がファイル実内容と不一致の場合は、ファイルを再読取して正確な内容で再試行する（本規定は guard の fail-closed 挙動自体を維持対象とする）。
+
+### 同一ファイルへの複数 edit の規律
+
+同一ファイルへの複数の edit を適用する場合、次の規律に従う。
+
+- **相互非依存または順次実行**: 複数 edit の oldString は互いに重複・干渉しない選択（相互非依存）とするか、結果に依存する後続 edit は先行 edit の完了後に順次実行する。先行 edit が後続 edit の oldString 範囲と重なる場合、並列想定の oldString 組立では stale な内容に基づく誤置換の可能性があるため順次実行する
+- **guard ブロック後の oldString 再組立**: 書込み guard によるブロック（fail-closed 拒否）後は、`grep` 等の実取得でファイルの現在状態を確認してから oldString を組み立てて再適用する。直前の古い読取キャッシュに基づく oldString の再試行をしない
+- **解除・迂回の禁止**: guard の解除・迂回を行わない（fail-closed の維持）
+
+並行委譲（複数サブエージェント実行）を検出した場合は、上記の規律に加えて次の協調規律に従う。本拡張は上記の既存規律（相互非依存の oldString 選択または順次実行、guard ブロック時の標準手段切替）を並行委譲場面へ拡張するものであり、既存規律を置換しない。
+
+- **durable state の帰属確認を先に行う**: 編集に着手する前に、対象ファイルへの既存の変更が自委譲の durable state（draft 等）に帰属するものかを確認する。他委譲に帰属する変更へ重ねて編集しない
+- **同一ファイルへの編集は回避して担当を一方へ寄せる**: 複数の委譲が同一ファイルを編集対象としていることを検出した場合は、当該ファイルへの編集を一方へ寄せ、他方は当該ファイルへの編集に着手しない
+- **guard 拒否後は実取得で oldString を組み立て直す**: 並行実行中は他方の編集によりファイル内容が変化し得るため、guard 拒否後は `grep` 等の実取得で現在状態を確認して oldString を組み立て直して再適用する。guard の解除・迂回は行わない（fail-closed の維持）
+
+### コマンドリテラル誤検出の事例と標準検証構成
+
+- **誤検出事例**: 読取のみを意図したコマンドの文字列リテラルが、WRITE 系 guard の判定に抵触して誤検出された事例がある（例: `gh pr view` 等の READ 系コマンドを確認する検証コードや出力処理において、`rule=gh pr WRITE` 等のコマンド文字列を対象とする WRITE 系 guard の判定パターンに、コマンド文字列自体が一致してブロック対象と誤判定された）
+- **標準検証構成**: コマンド実行結果の検証は、出力の自然言語解釈に依存する構成ではなく、コマンド出力から regex で対象値を抽出し、期待する定数との比較で判定する構成（regex 抽出＋定数比較）を標準とする。機械比較により判定を決定化し、guard 誤検出や曖昧判定が発生した場合も判定根拠の再現を可能にする
+- **誤検出時の扱い**: guard の判定にコマンドリテラルが誤検出した場合も、guard の解除・迂回は行わない（fail-closed の維持）。検証対象の値そのものは本項の標準検証構成（regex 抽出＋定数比較）で取得し、guard 判定の入力と検証対象の分離で対処する
+
+### workspace 外書込みのブロック事例と切替（fail-closed 維持）
+
+- **ブロック事例**: 検査入力 JSON 等の一時ファイルを OS の一時ディレクトリ等、workspace の外へ出力しようとした操作は、workspace 外書込み guard によりブロックされ得る。guard は fail-closed で動作し、ブロックされた操作自体は成功しない
+- **標準手段への切替**: ブロックされた場合は、一時ファイルの置き場所を workspace 外から project root 内（リポジトリ配下の実行時作業領域）へ変更する。置き場所指針は横断依存検査エンジンの scripts README（`agentdev-workflow-case-open` scripts「検査入力 JSON」）を参照する。書込み手段自体は「標準手段（guard ブロック時の切替先）」のとおりとする
+- **別 API 経路による迂回の不採用**: guard にブロックされた操作を、別の API・ツール経路（リダイレクト先の変更、出力手段の差し替え等）で workspace 外へ迂回書込みしない。guard の fail-closed 動作自体を維持対象とし、迂回ではなく置き場所の変更（標準手段切替）で対処する
+
+### 退避ファイルの統一配置（.agentdev/tmp/）
+
+worktree 内で checker・検証コマンドを実行する際の退避ファイル（checker stdout / stderr の分離退避、検査入力 JSON 等の一時ファイル）は、**`.agentdev/tmp/`（worktree root 相対）へ作成する**。配置の正本は「workspace 外書込みのブロック事例と切替（fail-closed 維持）」節の置き場所指針と本節である。
+
+- **配置先**: `.agentdev/tmp/`（worktree root 相対）。OS の一時ディレクトリ等 workspace 外へ出力しない
+- **後始末**: 検証完了後、退避ファイルは worktree remove 前に削除する。削除手順は case-close references `cleanup-and-capture.md` STEP-6-1 の「remove 前退避ファイル掃除」を参照する
+
+git 出力のエンコーディング処理の詳細は `git-common-procedures.md`「Windows git 出力のエンコーディング処理」を参照する。
+
+## git stash 運用手順（一時退避）
+
+worktree での検証における一時退避の標準手順と、やむ得ない stash 利用時の規則を定める。
+stash スタックはリポジトリ全体で共有され、複数 worktree 並列環境では他セッションの退避内容と混在する。
+本手順はその混在に起因する障害の再発防止として定めた（関連Issue/PRは履歴参照）。
+
+### 1. detached worktree による baseline 比較（標準手順）
+
+worktree 検証で一時退避が必要な場合、`git stash` を使わない。
+検証対象 worktree の working tree を変更せず、baseline commit 上の detached worktree で検証を実行して結果を比較する。
+
+**手順**:
+
+1. baseline commit を確定する: 検証対象 worktree の `HEAD`（PR 差分の検証では `origin/main`）
+2. baseline 用の detached worktree を作成する: `git worktree add --detach ".worktrees/baseline-verify" {baseline_commit}`
+3. detached worktree 内で検証（checker、test 等）を実行する
+4. 検証対象 worktree と detached worktree の検証結果を比較し、失敗が本次変更起因か既存起因かを判定する
+5. detached worktree を削除する: `git worktree remove ".worktrees/baseline-verify"`
+
+baseline 用 worktree は Issue 用の命名規則（`.worktrees/{N}-{type}`）の対象外の一時領域である。
+検証完了時に必ず削除し、削除時のエラーハンドリングは「削除手順」に従う。
+並列セッションで同時実行する場合はパスが衝突しないよう一意な接尾辞を付ける。
+
+**理由**: `git stash` は working tree と stash スタックを変更する。
+detached worktree は検証対象の working tree を変更せず、stash スタックも消費しないため、並列セッションへ影響しない。
+
+### 2. やむ得ない stash 利用時の規則
+
+detached worktree による代替が成立しない場合に限り、`git stash` の利用を認める。
+利用時は以下の2規則を守る。
+
+**規則1: `@{}` 引数の引用符必須**
+
+`stash@{N}` 形式の引数は、シェルの解釈により意図しない引数へ変わる（bash のブレース展開で `stash@{0}` が `stash@0` となる、PowerShell で `@{...}` がハッシュリテラルとして解析される等）。
+`stash@{N}` を含む引数は必ず引用符で囲む。
+
+```bash
+# 正
+git stash pop 'stash@{0}'
+git stash show --name-only 'stash@{1}'
+
+# 誤（シェルが @{} を解釈する）
+git stash pop stash@{0}
+```
+
+**規則2: `-u` 使用時の除外 pathspec**
+
+`git stash push -u` は未追跡ファイルを退避対象に巻き込む。
+ドメイン状態（`.agentdev/` 配下）や実行時作業領域を退避対象から除外するため、除外 pathspec を指定する。
+
+```bash
+git stash push -u -- . ':(exclude).agentdev/**'
+```
+
+除外対象は実行環境に応じて追加する（ビルド成果物等）。
+
+共有作業ツリー（main worktree）では、`git stash` を含むスイープ操作は並列実行安全ステージングプロシージャ（`references/git-common-procedures.md` 手順 3）の禁止対象である。
+
+### 3. 複数 worktree 環境での stash 往復前確認
+
+stash スタックはリポジトリ全体で共有される。
+自セッションの stash 以外に、他 worktree、他セッションの stash が同一スタックに混在し得る。
+
+stash の退避（push）と復元（pop、apply）を往復する前に、以下を確認する。
+
+1. `git stash list` で既存エントリを確認する
+2. 復元対象エントリが自セッションのものであることを確認する: `git stash show --name-only 'stash@{0}'`
+3. 自セッション以外のエントリが混在する場合、スタック先頭を暗黙に復元する `pop` を使わず、引用符付きの index で自セッションのエントリを明示して `git stash apply 'stash@{N}'` で復元する
+
+他セッションの stash エントリの削除（`git stash drop`）、スタック全体のクリア（`git stash clear`）は行わない。
+
+## 削除手順
+
+**追跡済みファイル削除禁止**: クリーンアップ操作中は追跡済みファイルを削除してはならない。
+削除対象は未追跡ファイルのみ（実行時作業領域配下の一時ファイル、ビルド成果物等）。
+
+### 1. 未追跡ファイルのクリーンアップ
+
+worktree 内の未追跡ファイル（実行時作業領域配下の一時ファイル、ビルド成果物等）が `git worktree remove` エラーの原因になるため削除:
+
+**Windows**: `git -C ".worktrees/{N}-{type}" clean -fd`
+**POSIX**: `git -C ".worktrees/{N}-{type}" clean -fd`
+
+**重要**: 追跡済みファイル（ドメイン状態を含む可能性あり）は削除禁止。
+未追跡ファイルのみを削除対象とする。
+未追跡ファイルが存在しない場合はエラーにせず続行。
+
+### 1.5 remove 前退避ファイル掃除
+
+`git worktree remove` の実行前に、worktree 内の退避ファイル（`.agentdev/tmp/`〔worktree root 相対〕配下の checker stdout / stderr 分離退避、検査入力 JSON 等の一時ファイル）を列挙し、削除する。
+
+1. **列挙**: `ls .agentdev/tmp/`（worktree root 相対）で退避ファイルを列挙し、件数を記録する
+2. **削除**: 列挙した退避ファイルを削除する。ドメイン状態（`.agentdev/` 配下の tmp/ 以外）は削除対象外とする
+3. **--force 不使用の維持**: worktree remove は `--force` を付けずに実行する（現行運用の維持）。未コミット変更・未掃除の退避ファイルが残っている場合は remove が失敗するため、失敗時に退避ファイルの残存を再確認して掃除してから再試行する
+
+### 2. worktreeの削除
+
+```bash
+git worktree remove ".worktrees/{N}-{type}"
+```
+
+**削除前のシェル cwd ハンドル解放**: 永続シェルセッションの `workdir` が削除対象 worktree パス（またはその配下）を指している場合、cwd ハンドルがディレクトリを掴んだままとなり、`git worktree remove` の成功後も空ディレクトリが残留する（Windows 環境で顕著）。
+削除を実行する前に、削除操作に使用するセッションの `workdir` をリポジトリルート（`.worktrees/` を含まないパス）へ変更し、当該 worktree パスに対する cwd ハンドルを解放してから削除を実行する。
+
+**解放不能時の削除完了判定**: 削除実行セッション以外のシェルセッションが worktree パスを `workdir` に使用しており解放できない場合、ディレクトリの物理削除を断念し、git 管理状態のみで削除完了を判定する。
+削除完了の判定基準は次の2点である。
+
+1. `git worktree list` の出力から当該 worktree が消滅していること
+2. 当該 worktree のローカルブランチ（`{type}/issue-{N}`）が削除されていること
+
+上記を満たす場合は削除完了として扱う。
+worktree パスの空ディレクトリが残留している場合は、残留ディレクトリの警告を記録する（例: `WARN: worktree directory remains at {path}: cwd handle held by another session. Git-managed state is clean.`）。
+残留ディレクトリの実削除は、当該セッション終了後またはハンドル解放後の手動削除に委ねる。
+本完了判定は `git worktree remove` 自体の失敗リトライ（後述の Permission denied 時のリトライ）を代替するものではなく、コマンド成功後にディレクトリが残留した場合の完了判定にのみ適用する。
+
+**Permission denied 時のリトライ**: ファイルハンドル解放待ちのため短い待機を挟んでリトライ。
+最大3回。
+リトライ条件は "Permission denied" を含む場合のみ。
+上限到達時は警告表示して停止。
+
+**リトライ前の復元**: リトライ時、worktree 内に変更された追跡済みファイルがある場合は `git checkout .` を実行して追跡済みファイルをクリーンな状態に復元してから再試行する。
+
+### 3. クリーンアップ
+
+```bash
+git worktree prune
+```
+
+成功時: `git worktree remove` 正常終了後の管理情報のクリーンアップ。
+
+失敗時: `git worktree remove` がすべてのリトライ後に失敗した場合のフォールバッククリーンアップ。
+`prune` は無効な worktree 管理情報のみを削除し、worktree ディレクトリ自体は削除しない。
+
+#### Windows + ジャンクション環境の削除フォールバック
+
+**エラーパターン**: Windows + ジャンクション環境で `git worktree remove` が `Not a directory` を含むエラーで失敗する場合。
+
+**原因**: ジャンクションの reparse point により、git 内部の削除処理がディレクトリを正しく辿れないことがある。
+
+**適用条件**: `git worktree remove` が上記エラーで失敗した場合のみ。
+通常の削除成功時は実行しない。
+
+**手順**:
+1. worktree 管理情報を更新: `git worktree prune`
+2. ジャンクションディレクトリを手動削除: `Remove-Item -LiteralPath "{worktree_path}" -Recurse -Force` または `rmdir /s /q "{worktree_path}"`（`rmdir /s /q` は cmd 専用構文で Git Bash からは転記不能。bash から実行する場合は node fs.rmSync の再帰削除 `fs.rmSync('{worktree_path}', { recursive: true, force: true })` へ置き換える）
+3. ローカルブランチを削除: `git branch -d {branch_name}`（必要時のみ `-D`）
+
+**注意**: `install.ps1` が作成するジャンクション link 経由の worktree で発生する Windows 固有の挙動。
+背景: worktree ジャンクション削除フォールバック要件（関連Issue/PRは履歴参照）。
+
+#### MAX_PATH 起因の部分削除残存時のフォールバック
+
+**エラーパターン**: `git worktree remove` が MAX_PATH（Windows のパス長上限）等により失敗し、worktree ディレクトリが部分削除されたまま残留する場合。
+
+**適用条件**: `git worktree remove`（通常経路・Permission denied 時のリトライ含む）が失敗し、worktree ディレクトリが残留している場合のみ。通常の削除成功時は実行しない。
+
+**手順**（順序厳守）:
+1. worktree 管理情報を更新: `git worktree prune`
+2. 残存ディレクトリを削除: node の `fs.rmSync('{worktree_path}', { recursive: true, force: true })`。部分削除残存のディレクトリにはパス長上限に達する深いネストが残留し得るため、削除手段は PowerShell `Remove-Item -Recurse` ではなくパス長制限の影響を受けない node の再帰削除を標準とする
+3. ディレクトリの消滅を確認: `ls` 等で当該パスの消滅を確認する
+4. worktree ブランチを削除: `git branch -d {branch_name}`。ブランチ削除は必ず消滅確認後の最後に行う（消滅確認前にブランチを削除しない）
+
+**注意**: 本節は部分削除残存（MAX_PATH 等起因）のフォールバックであり、ジャンクション起因の `Not a directory` エラー（前節参照）とは適用条件が異なる。
+
+### 4. ローカルブランチの削除
+
+削除対象はローカルブランチに限定される。
+PR マージ後のリモートブランチは GitHub の deleteBranchOnMerge 設定による自動削除に委譲され、本手順では実行しない。
+
+```bash
+git branch -d "{type}/issue-{N}"
+```
+
+**squash merge 後の条件付き `-D` 許可**:
+1. PR が `state: MERGED` と確認できること
+2. 呼び出し元が squash merge 済みを明示的に判定していること
+3. 条件を満たさない場合は `-D` 実行せず警告表示して停止
+
+## ツール実行規約
+
+- worktree 内で作業する場合、`workdir` パラメータに worktree パスを指定する
+- `cd` によるディレクトリ移動は行わない
+- Edit/Write ツールでもパスに `.worktrees/{N}-{type}/` を含める
+
+## git 操作の前置確認（operation in progress・commit 前 branch 確認）
+
+既存の個別操作前確認（stash 往復前の worktree 状態確認、merge 前の clean 確認、push 前の branch 確認）に先立つ共通の前置確認を行う。これらは既存確認の置換ではなく、次の段階として適用する。
+
+### operation in progress の確認
+
+1. 操作開始前に長形式の `git status` を実行し、rebase、merge、cherry-pick、revert 等の operation in progress が表示されないことを確認する
+2. 表示された場合は `git status --porcelain` でも状態を確認し、操作の性質に応じて abort または完了により解除する。解除後に長形式の `git status` を再実行し、進行中操作が消滅したことを確認してから次へ進む
+
+### commit 前の current branch 確認
+
+main への永続化を含む commit の直前に `git branch --show-current` を実行し、current branch が `main` であることを確認する。`main` 以外の場合は main で直接 commit せず、対象 worktree を用いる手順へ切り替える。
+
+この共通前置確認の後も、stash 往復前確認・merge 前 clean 確認・push 前 branch 確認はそれぞれの操作段階で引き続き実施する。
+
+## Merge Conflict 対応パターン
+
+### worktree内でmerge conflictが発生した場合の対応手順
+
+#### 1. conflict検出時の即座停止ルール
+
+worktree内で以下のいずれかの操作でconflictが検出された場合、即座に処理を停止しユーザーに報告する:
+- `git pull --ff-only` 実行時
+- `git merge` 実行時
+- `git rebase` 実行時
+
+停止時は以下の情報を報告:
+- 発生した操作（例: `git pull --ff-only`）
+- conflictが発生したファイル一覧
+- worktreeパス
+
+```markdown
+## Merge Conflict 検出エラー
+
+**操作**: {operation}
+**worktree**: {worktree_path}
+**停止理由**: merge conflictが発生したため、安全に操作を継続できません
+**対象ファイル**: {conflicted_files}
+**ユーザーアクション**: 手動でconflictを解決してください
+```
+
+#### 2. conflict markersの確認手順
+
+conflict markers（`<<<<<<<`, `=======`, `>>>>>>>`）が含まれるファイルを確認:
+
+```bash
+git diff --name-only --diff-filter=U
+```
+
+または
+
+```bash
+git status --short | grep '^UU'
+```
+
+#### 3. 手動解決またはabort手順
+
+**オプションA: 手動解決**
+1. conflictファイルを手動で編集し、conflict markersを削除
+2. 解決したファイルをstage: `git add {resolved_file}`
+3. commit: `git commit -m "Resolve merge conflicts"`
+4. 解決確認: `git status` でclean状態を確認
+
+**オプションB: 操作の中止（abort）**
+- mergeの場合: `git merge --abort`
+- rebaseの場合: `git rebase --abort`
+
+abort後、worktreeを元の状態に復元し、ユーザーに対応を依頼する。
+
+#### 4. 解決後のcommit手順
+
+conflictを手動解決した場合:
+1. 変更をstage: `git add -u`
+2. commit: `git commit -m "Resolve merge conflicts"`
+3. 必要に応じてpush: `git push`
+
+rebase中にconflictを解決した場合:
+1. 変更をstage: `git add -u`
+2. rebase継続: `git rebase --continue`
+3. rebase完了後push: `git push --force-with-lease`（必要に応じて）
+
+**rebase 解消編集の永続化確認（境界跨ぎ編集の取り込み確認）**:
+- rebase の解消編集は `git rebase --continue` の前に `git add` で stage 確定する。stage 前に `--continue` を実行すると解消編集が rebase 完了後の状態に取り込まれず、squash merge 内容から欠落する事故（main 破壊と fix コミットの誘発）の原因となる
+- squash merge の実行前に worktree が clean であることを確認する（`git status` で変更・stage 残存なしを確認）
+
+**重要**: force pushは慎重に実行すること。
+リモートの変更を上書きするリスクがあるため、事前に確認が必要。

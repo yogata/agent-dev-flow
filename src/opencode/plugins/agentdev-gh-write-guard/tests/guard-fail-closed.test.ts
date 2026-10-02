@@ -6,7 +6,7 @@
 
 
 import { describe, expect, test } from "bun:test";
-import { detectGhWriteCommand } from "../lib/gh-command-detector.ts";
+import { detectGhWriteCommand } from "../../../../common/guards/gh-write/gh-command-detector.ts";
 import {
   GUARD_CONFIG_ENV,
   interpretGuardConfig,

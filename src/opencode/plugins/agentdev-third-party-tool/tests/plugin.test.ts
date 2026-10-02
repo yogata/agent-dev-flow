@@ -9,8 +9,8 @@ import {
   createAgentdevThirdPartyToolDefinition,
   createAgentdevThirdPartyToolPlugin,
 } from "../plugin.ts";
-import { createGitHubSourceFetcher } from "../../../tools/agentdev-third-party/index.ts";
-import { startMockGitHubSource, type MockSourceServer } from "../../../tools/agentdev-third-party/tests/mock-source.ts";
+import { createGitHubSourceFetcher } from "../../../../common/tools/agentdev-third-party/index.ts";
+import { startMockGitHubSource, type MockSourceServer } from "../../../../common/tools/agentdev-third-party/tests/mock-source.ts";
 
 let testRoot: string;
 let worktree: string;

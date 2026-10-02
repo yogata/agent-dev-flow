@@ -1,8 +1,8 @@
 component: agentdev-git-worktree
 implementation:
-  src/opencode/skills/agentdev-git-worktree/references/git-common-procedures.md:
+  src/common/skills/agentdev-git-worktree/references/git-common-procedures.md:
     - REQ-032-029
-  src/opencode/skills/agentdev-git-worktree/references/worktree-operations.md:
+  src/common/skills/agentdev-git-worktree/references/worktree-operations.md:
     - REQ-007-012
     - REQ-018-005
     - REQ-018-006
@@ -12,7 +12,7 @@ implementation:
     - REQ-032-029
     - REQ-053-042
 verification:
-  src/opencode/skills/agentdev-git-worktree/references/worktree-operations.md:
+  src/common/skills/agentdev-git-worktree/references/worktree-operations.md:
     - REQ-018-005
     - REQ-018-007
     - REQ-018-008

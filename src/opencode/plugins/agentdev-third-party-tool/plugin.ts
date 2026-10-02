@@ -4,7 +4,7 @@
 // OpenCode のプラグイン機構（.opencode/plugins/ 直下の depth-1 ファイルから
 // 読み込まれる）経由で、third-party Skill 取得 Custom Tool をモデルに公開する。
 // Plugin は登録の配線のみを担い、操作契約・非破壊配置・fail-closed ゲート・
-// VERIFY は Tool 本体（src/opencode/tools/agentdev-third-party/）が所有する。
+// VERIFY は Tool engine（src/common/tools/agentdev-third-party/）が所有する。
 //
 // args スキーマは zod を用いない（依存ゼロの構造的定義）。入力の検証は
 // Tool 本体（runAgentdevThirdPartyOperation）が操作契約で厳密に行う。
@@ -19,8 +19,8 @@ import {
   createGitHubSourceFetcher,
   resolveDeclarationPath,
   runAgentdevThirdPartyOperation,
-} from "../../tools/agentdev-third-party/index.ts";
-import type { SourceFetcher } from "../../tools/agentdev-third-party/index.ts";
+} from "../../../common/tools/agentdev-third-party/index.ts";
+import type { SourceFetcher } from "../../../common/tools/agentdev-third-party/index.ts";
 
 // OpenCode plugin plumbing 型（本 plugin が消費するフィールドのみ宣言する）。
 

@@ -1,9 +1,9 @@
 component: agentdev-workflow-intake-promote
 implementation:
-  src/opencode/skills/agentdev-workflow-intake-promote/SKILL.md:
+  src/common/skills/agentdev-workflow-intake-promote/SKILL.md:
     - REQ-096-004
     - REQ-096-018
-  src/opencode/skills/agentdev-workflow-intake-promote/references/classification-and-review.md:
+  src/common/skills/agentdev-workflow-intake-promote/references/classification-and-review.md:
     - REQ-090-004
     - REQ-090-012
     - REQ-090-018
@@ -20,11 +20,11 @@ implementation:
     - REQ-096-009
     - REQ-096-018
     - REQ-096-023
-  src/opencode/skills/agentdev-workflow-intake-promote/references/hitl-persistence-and-destructive.md:
+  src/common/skills/agentdev-workflow-intake-promote/references/hitl-persistence-and-destructive.md:
     - REQ-096-004
     - REQ-096-018
 verification:
-  src/opencode/skills/agentdev-workflow-intake-promote/references/classification-and-review.md:
+  src/common/skills/agentdev-workflow-intake-promote/references/classification-and-review.md:
     - REQ-090-024
     - REQ-090-027
     - REQ-090-028

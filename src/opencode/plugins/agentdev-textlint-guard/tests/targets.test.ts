@@ -126,16 +126,16 @@ describe("enumerateTargetFiles（最終検査の全件列挙）", () => {
       "docs/sub/b.md",
       "docs/c.txt",
       "notes/n.md",
-      "src/opencode/skills/s.md",
+      "src/common/skills/s.md",
       "other/o.md",
     ]);
-    const config: GuardConfig = { additionalTargets: ["notes/**/*.md", "src/opencode/skills/**/*.md"] };
+    const config: GuardConfig = { additionalTargets: ["notes/**/*.md", "src/common/skills/**/*.md"] };
     const targets = enumerateTargetFiles(root, config);
     expect(targets).toEqual([
       "docs/a.md",
       "docs/sub/b.md",
       "notes/n.md",
-      "src/opencode/skills/s.md",
+      "src/common/skills/s.md",
     ]);
   });
 

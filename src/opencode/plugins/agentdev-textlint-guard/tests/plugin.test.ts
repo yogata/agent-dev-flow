@@ -242,10 +242,10 @@ describe("設定の fail-closed と再読込み", () => {
 });
 
 describe("ADF 本体の追加対象と特例分岐禁止（TS-007）", () => {
-  const ADF_BODY_CONFIG = "version: 1\nadditional_targets:\n  - src/opencode/commands/**/*.md\n  - src/opencode/skills/**/*.md\n";
+  const ADF_BODY_CONFIG = "version: 1\nadditional_targets:\n  - src/common/commands/**/*.md\n  - src/common/skills/**/*.md\n";
 
   test("ADF 本体と同じ追加対象設定で commands / skills の Markdown が検査対象になる", async () => {
-    const root = makeProject({ "src/opencode/skills/agentdev-x/SKILL.md": "# s\n\n正常。\n" });
+    const root = makeProject({ "src/common/skills/agentdev-x/SKILL.md": "# s\n\n正常。\n" });
     const configAbs = configPathFor(root);
     fs.mkdirSync(path.dirname(configAbs), { recursive: true });
     fs.writeFileSync(configAbs, ADF_BODY_CONFIG, "utf8");

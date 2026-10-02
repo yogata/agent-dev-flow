@@ -2,7 +2,7 @@
 
 Custom Tool `agentdev_third_party`（third-party Skill 取得）を OpenCode の実行時へ登録する ADF 汎用 Plugin（Custom Tool と Plugin/Hook の配布種別、登録機構の正は Design `docs/designs/responsibilities/custom-tool-contracts.md` 参照）。
 
-Plugin は登録の配線のみを担う。操作契約（入力、出力、保証、失敗時の意味）、非破壊配置、fail-closed 実行ゲート、VERIFY（読み戻し照合）は Tool 本体（`src/opencode/tools/agentdev-third-party/`）が所有する。
+Plugin は登録の配線のみを担う。操作契約（入力、出力、保証、失敗時の意味）、非破壊配置、fail-closed 実行ゲート、VERIFY（読み戻し照合）は Tool 本体（`src/common/tools/agentdev-third-party/`）が所有する。
 
 ## 仕組み
 

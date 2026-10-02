@@ -1,5 +1,5 @@
 component: agentdev-issue-tracking
 implementation:
-  src/opencode/skills/agentdev-issue-tracking/SKILL.md:
+  src/common/skills/agentdev-issue-tracking/SKILL.md:
     - REQ-095-001
     - REQ-095-002

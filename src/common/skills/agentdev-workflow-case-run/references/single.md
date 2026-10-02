@@ -1,0 +1,278 @@
+# single workflow: 単一 Issue 実行（single）
+
+
+> 本 reference は `agentdev-workflow-case-run` SKILL.md の workflow 詳細である。
+> STEP-S1〜S3（フェーズ判定から前置 gate 群まで）と STEP-S6（クリーンアップ・完了報告）を所有する。
+> STEP-S4/S5 は [references/delegation-and-result.md](delegation-and-result.md) を参照。
+> STEP-S4 の委譲では、adversarial-review の発動条件を含む実行契約は Issue 本文を正とする。Issue 本文が非発動を記す場合、その契約に従い非発動とし、非発動の判定理由と代替自己反証（却下案・緩和策・unresolved なしの確認）を PR 本文へ必須記録する。
+
+## 目次
+
+- STEP-S1: フェーズ判定・再開ポイント検出
+- STEP-S2: Issue 抽出・確認・判定
+- STEP-S3: Worktree 作成・ブランチ準備・前置 gate 群
+- 配布物本体 ADF-COVERS 宣言の除去可否判定（cleanup 判定）
+- verify-only closure の検証実行と SSoT コメント記録
+- STEP-S6: worktree クリーンアップ確認・完了報告
+
+## STEP-S1: フェーズ判定・再開ポイント検出
+
+### Purpose
+
+単一 Issue 実行を確定し、durable state から再開フェーズを判定する。
+
+### Input Resolution
+
+1. SSoT 再構成: Issue 本文（`agentdev_gh` issue_read）
+2. identifier 保持: Issue番号（ユーザー入力またはセッション内会話）
+3. 最小 scalar: なし
+4. runtime artifact: なし（会話コンテキストのみに依存しない）
+
+### Preconditions
+
+- case-run command から Issue番号または URL が渡されている
+
+### Procedure
+
+`agentdev-workflow-orchestration` に従い再開フェーズを判定する（Issue番号解決、引数パース、妥当性確認、実行パス分岐、成果物チェックの詳細は同 skill 参照）。
+再開が必要なフェーズをユーザーに通知する（準備フェーズから開始する場合は省略）。
+case-run は常に単一 Issue を処理する。Epic Issue 入力経由での Wave 構成の読み取り、現在 Wave 判定、fan-out/fan-in、子 Issue 並列起動は行わない。Epic Issue の指定時も case-auto 経由の正規呼出へ限定し、Epic 再指定時の次 Wave 処理を引き受けない（Epic 全体の進行管理・未完了 Wave の処理は case-auto が所有する）。
+
+**前工程からの引き継ぎ停止判定**: Issue 本文、要件doc本文に `agentdev_handoff: true` が含まれる場合、リポジトリ種別に応じて分岐する（詳細は `agentdev-workflow-lifecycle` runtime-package-boundary 参照）。
+self-hosting リポジトリでは履歴メタデータとして通常の case workflow を実施、consumer リポジトリでは実装を開始せず停止し agent-dev-flow repository への手動取り込み対象として報告する。
+
+### Result
+
+- 単一 Issue 実行モード確定、再開フェーズ判定結果、引き継ぎ停止判定結果
+
+### Evidence
+
+- Issue 本文読取結果、再開フェーズ判定の根拠
+
+### Completion Verification
+
+- Issue番号が解決済みであり、単一 Issue 実行モードが確定していること
+
+### Resume-Idempotency
+
+- 再実行時は同じ durable state（Issue 本文、worktree・PR の存在）から同一のモード分岐・フェーズ判定に到達する。判定に副作用を持たない
+
+## STEP-S2: Issue 抽出・確認・判定
+
+### Purpose
+
+対象 Issue の実行に必要な情報を抽出し、実行契約の消費境界を適用する。
+
+### Input Resolution
+
+1. SSoT 再構成: Issue 本文（要件doc、受け入れ基準、execution contract セクション）、`docs/decisions/README.md` と関連 Decision 本文
+2. identifier 保持: Issue番号
+3. 最小 scalar: なし
+4. runtime artifact: なし
+
+### Preconditions
+
+- STEP-S1 で single 実行モードが確定している
+
+### Procedure
+
+- Issue本文から要件docと受け入れ基準を抽出する（べき等性: worktree とブランチが既に存在する場合、STEP-S3 の作成処理をスキップする）。`agentdev-req-analysis` のチェックボックス品質基準で検証する
+- 関連Decision特定: `docs/decisions/README.md` を読み込み、関連Decisionがあれば個別に読み込み、実装がDecisionの決定事項に矛盾しないことを確認する
+- work_type 判定: `agentdev-workflow-lifecycle` に従い bugfix/feature/maintenance/docs_chore を判定する（scale は全 work_type に standard/large を設定可、workflow_route は Definition 構成から都度導出し保存しない）
+- **作業起点・PR base**: worktree の作成元と PR の base は main を参照する
+- **工程間構造化文脈の初期文脈利用**: 前工程（case-open、case-auto 等）から構造化文脈が引き継がれている場合、前工程で確定した事項を初期文脈として利用し、同じ情報をゼロから探索、再構築することを原則としない。独立検証、鮮度確認、矛盾検出、正規成果物との整合確認を目的とする再確認は維持する。手動起動等で構造化文脈が引き継がれていない場合は、durable state（Issue 本文、要件doc、REQ/Decision/Design）から入力解決を行う（形式と制約は `agentdev-workflow-lifecycle` スキルの工程間構造化文脈引き継ぎ参照）
+- **execution contract 消費境界**: 完了条件、test strategy、必須品質統制を実行契約として扱う。不足・曖昧さ・矛盾・実現不能を検出した場合は自律補完せず blocked とする。test strategy を新規設計せず記録済み項目を実行する。必須品質統制の適用要否を再判断しない。work_type/scale/Issue structure を再分類して実行契約を変更しない
+  - runtime-only 判断の維持: worktree 状態確認、QG-3 前置 staleness check、実 diff 検査、実装結果・test 実行結果は case-run の安全検査として維持する
+  - blocked 遷移と正規再開経路: 完了条件の不足・曖昧さ・矛盾・実現不能、scope-affecting impact candidate の発見、関連 Decision への適合確認で新たな拘束の必要性検出、必須品質統制の追加変更必要性、Issue metadata・構造・実態の矛盾検出時は blocked とし、差異・判断事項を Issue コメントと PR 本文へ報告する。case-run は Issue 本文を単独で書き換えず、Root Case の resume_command による正規再開経路（人間に留保された判断の新規確定が必要な場合は req-define、再合意済みの場合は case-revise）に従う
+  - 新旧 Issue 互換運用: execution contract 必須セクション（Execution Contract セクション、必須品質統制セクション）存在有無で新旧 Issue を識別する（presence-based 判定）。必須セクション不存在の legacy Issue は、新契約項目欠落のみを理由に一律 blocked にしない
+  - work_type/scale 確認の縮約: work_type 確認は再分類ではなく metadata 整合確認へ縮約して維持する
+
+### Result
+
+- 要件doc・受け入れ基準抽出済み、関連Decision確認済み、work_type metadata 整合確認済み、execution contract 消費境界適用済み
+
+### Evidence
+
+- Issue 本文読取結果、関連Decision 一覧、消費境界判定結果（blocked 時はその理由）
+
+### Completion Verification
+
+- 抽出情報が Issue 本文と一致し、実行契約の消費原則適用判断が記録されていること
+
+### Resume-Idempotency
+
+- Issue 本文からの抽出は読取のみで副作用を持たない。再実行時は同一の抽出結果になる
+
+## STEP-S3: Worktree 作成・ブランチ準備・前置 gate 群
+
+### Purpose
+
+実行担当サブエージェント起動前の隔離環境を整え、前置 gate 群を合格させる。
+
+### Input Resolution
+
+1. SSoT 再構成: 対象 Issue 本文（変更対象ファイル等）、Epic Issue 本文（STEP-S3-1 親Epic ステータス更新時）
+2. identifier 保持: Issue番号、ブランチ名（自動生成または指定）
+3. 最小 scalar: L2 タイムスタンプ（本 Step 開始・終了時刻、JST）
+4. runtime artifact: なし
+
+### Preconditions
+
+- STEP-S2 完了（Issue 判定済み）
+
+### Procedure
+
+- **Worktree 作成・ブランチ準備**: `agentdev-git-worktree` に従って実行する。作成元は main を明示的に指定する。べき等チェック: worktree 既存時は作成をスキップする。Epic の後続 Wave での再開時（PR merge 後）は worktree 作成前に `git fetch origin` を実行し main の鮮度を確認する（同期基準・鮮度確認も main を参照。Epic 後続 Wave の作業起点も main を参照する）
+- **L2 タイムスタンプ計測**: 本 Step の開始時刻・終了時刻（JST）を記録し、worktree 設定時間を計測する（完了報告の L2 内訳に含める）
+- **STEP-S3-1 親Epic ステータス更新**: `agentdev-epic-tracker` 参照
+- **STEP-S3-2 worktree precondition gate**: `agentdev-git-worktree` の「worktree 内判定ヘルパー」に従い、当該 Issue の worktree+ブランチが作成済みであり、現在 worktree 内にいることを検証する。検証失敗時（worktree 未作成、メインリポジトリにいる）は実行担当サブエージェントを起動せず停止し、STEP-S3 へ戻るようユーザーに報告する
+- **STEP-S3-3 QG-3 前置 staleness check**: `agentdev-quality-gates` の「case-run 前置 staleness check」に従い、ファイルパス現行存在確認、検査結果件数再計測、差異検出時の引き渡し・差異報告を実行する。差異検出時は Issue 本文を単独で書き換えず、差異を報告して blocked とし、Root Case の resume_command による正規再開経路に従う。本検査は QG-3 本体（委譲先が実施する PR 作成直前ゲート）とは独立した前置検査であり、QG-3 deviation 分類運用、QG-3 本体実施要否には影響しない
+- **STEP-S3-4 docs/** 変更時の targeted docs guard: PR 対象ファイルに docs/** 変更を含む場合、委譲前に targeted docs guard を行う。検査 skill は host 側配置を起点として起動し、検査対象 worktree の絶対パスを `--root`（相当の repoRoot 明示指定）で指定する（配置先起点の誤リポジトリ検査は検査見逃しとして扱う。`bun run .opencode/skills/<integrity-detector-skill>/scripts/check_changed_docs.ts --workflow case-run --root <worktree 絶対パス> ... --json`）。モード使い分けの標準は `--base-ref` によるコミット済み差分ベースの検出はコミット後・push 前の実行に限定、コミット前の worktree 上での検証は untracked ファイルを含む `--files` による明示指定（列挙手段: `git status --porcelain` と `git diff` の和集合、または `git ls-files -m -o --exclude-standard` 相当）。本検査は読み取り専用であり worktree 分離原則（POL-worktree-isolation）を壊さず、`files_checked` が空の場合は検査見逃しとして FAILURE に扱う。PowerShell で `--files` に複数パスを渡す場合は配列変数経由または個別渡しとし、引用符まとめ渡しは使用しない。docs/** 変更を含まない PR ではスキップする。検出結果（failures の strict severity）は PR 本文の `## Findings / Capture候補` に `### docs-integrity` 小見出しで記録する（実行担当サブエージェント責務）。docs/knowledge/README.md を変更する Case では、targeted docs guard（docs/knowledge/** を検査対象外とする）に加えて、knowledge README 列挙整合の検査として `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_knowledge_docs.ts --root <worktree 絶対パス> --json` を host（メインリポジトリ root）起点＋`--root` の既定形式で実行する（check_knowledge_docs.ts は `--root` による worktree 指定に対応する）。検出時は修正して再実行し、実行結果を検証記録へ残す
+- **STEP-S3-5 配布依存境界の事前委譲 gate**: PR 対象ファイルに `src/common/{commands,skills}/**` 変更を含む場合、委譲前に事前 gate を必須実行する（オプション扱いは廃止）。本 gate と STEP-S5 の最終 gate（実装後）は重畳する検査経路であり、事前 gate を実施しても最終 gate を省略しない。事前 gate は次の2点を検証する
+  - 反映経路の確認: 配布物の変更が src 側（原本パス `src/common/{commands,skills}/**`）に位置することを確認する。`.opencode/` 投影パスへの直接変更を検出した場合は違反として扱う（配布物の変更は原本経由のみ許容）
+  - ベースライン取得: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_distribution_boundary.ts --profile source --json` を委譲前時点（base 状態）の worktree で実行し、base の違反ベースラインを取得する。ベースラインは委譲プロンプトに引き渡し、委譲先が最終 gate の違反を当該変更起因と既存起因に判別する入力とする
+  - 違反を検出した場合は委譲プロンプトで実行担当サブエージェントに引き渡す。src/common 変更を含まない PR ではスキップする
+- **STEP-S3-6 AUTOGEN 索引再生成 前置 gate**: PR 対象ファイルに AUTOGEN 生成元文書（REQ 実ファイル、Decision 実ファイル、Design 実ファイル群。件数・一覧・status 別ビュー・行数計測の AUTOGEN ブロック生成元。生成元の具体的なパス構成は対象リポジトリの integrity 検査 skill の定義に従う）の変更を含む場合、AUTOGEN 索引の再生成を委譲に先行して強制する
+  - 検出: worktree の git diff（main との比較）で AUTOGEN 生成元文書の変更（本文行数変更、rename、status 変更を含む）の有無を判定する。worktree 作成直後で diff が空の場合は Issue 本文の対象範囲・変更対象成果物の計画対象で判定する
+  - 強制内容: 検出時は委譲プロンプトに「実装完了前に AUTOGEN 索引再生成を実行し、再生成結果を PR 対象に含める」ことを必須指示として引き渡す（任意手順として扱わない）。再生成コマンドは `bun run .opencode/skills/<integrity-detector-skill>/scripts/generate_indexes.ts`（worktree 内で実行）
+  - 目的: SPEC 行数変更に伴う索引陳腐化を実装後の整合性検査で検出して停止する事態（PR #2253 の E5b 停止）の再発防止であり、索引再生成を前段の必須手順に位置付ける
+  - AUTOGEN 生成元文書を含まない PR ではスキップする
+
+**case-run が使用する検査ツール**（integrity 契約 Design「Workflow × 使用ツールマトリックス」参照）: check_changed_docs.ts（--workflow case-run、docs/** 変更を含む場合に委譲前に実行）、check_knowledge_docs.ts（--root <worktree 絶対パス>、docs/knowledge/README.md 変更を含む場合に委譲前に実行。targeted docs guard が docs/knowledge/** を対象外とするため knowledge README 列挙整合の正規担当）、check_extensions.ts（`.opencode/commands/agentdev/**/*.md`、`.opencode/skills/agentdev-*/SKILL.md`、`.opencode/skills/agentdev-*/references/**/*.md`、`.agentdev/extensions/**` のいずれかを変更した場合に実行）、check_distribution_boundary.ts（--profile source / --profile link、STEP-S3-5 で base ベースライン取得、STEP-S5 で実装後の src 側原本面と .opencode 投影面を検査）、generate_indexes.ts（AUTOGEN 索引再生成、STEP-S3-6 の必須指示に基づき委譲内で実行）、test_strategy（Issue 完了条件検証）
+
+**checker コマンドの実行経路（安定実行経路）**: stdout 証跡（機械可読レポート）を要する checker の実行は、モジュール import 経由（`node --experimental-strip-types`）を標準経路とする。bun run 等の CLI 経由で実行する場合は、Windows + bun 環境で process.exit の終了タイミングにより stdout レポートが失われることがあるため、process.exit 前に stdout の flush を保証する終了手順を例外経路として用いる。契約は checker 実行契約（checker 実行契約と検出基盤規則 Design）「安定実行経路」節を参照する。
+
+**checker コマンドの stdout 退避形式**: 上記 checker コマンドは exit code が意味を持つコマンド（非ゼロ exit = 違反検出等の観測対象）であるため、実行と stdout 取得は 検証コマンドの stdout 証跡退避形式（`spawnSync` による status/ stdout 分離取得 + `fs.writeFileSync` の UTF‑8 明示書き出し）。
+非ゼロ exit 時も JSON レポート（stdout）を Evidence として保持し、`>` リダイレクトや PowerShell 変数格納で退避しない。
+
+### Result
+
+- worktree+ブランチ作成済み（べき等）、前置 gate 群の判定結果、L2 タイムスタンプ記録済み
+
+### Evidence
+
+- worktree・ブランチの存在確認結果、各 gate の実行結果（JSON 等）、L2 タイムスタンプ
+
+### Completion Verification
+
+- STEP-S3-2 precondition gate が合格していること（不合格の場合は次 STEP へ進まない）
+
+### Resume-Idempotency
+
+- worktree・ブランチ既存時は作成をスキップする。gate 群は再実行可能であり、同一 worktree 状態に対して同一判定を返す
+
+## 配布物本体 ADF-COVERS 宣言の除去可否判定（cleanup 判定）
+
+実行担当サブエージェントが委譲内の実装作業（STEP-S4）で配布物本体に残存する ADF-COVERS 宣言の除去を扱う場合、配布物本体の ADF-COVERS 宣言は producer 側のトレーサビリティ metadata であり、対応関係の移行先（docs 配下の正規成果物の inline 宣言、または repository top-level の `traceability/` 配下の sidecar）が成立していることを条件に除去する。
+
+- 除去可否判定の coverage 突合では、coverage 出力から implementation 役割かつ producer 側パス（docs/ 配下の正規成果物の inline 宣言、または repository top-level の `traceability/` 配下 sidecar の登録分）の対応関係を集約済み実装対応として認定する。coverage は sidecar と inline declaration を同じ論理的な対応関係として返すため、突合は対応関係の表現形式を区別せずに行う。役割フィルタの適用は必須であり、design 役割・verification 役割の対応関係は集約済み実装対応として扱わない
+- 対象要件について implementation 役割かつ producer 側パスの対応が確認できない配布物本体の宣言は除去可と判定せず、対応関係の移行先（sidecar または producer 側正規成果物）を成立させた上で除去する
+- 除去を実行した場合は、除去後に traceability check を実行し、implementation 対応の対応関係が維持されていること（新規 missing-implementation 0 件）を後置検査として確認する
+- coverage は役割付き対応関係を全件返却するため、役割とパスの解釈は呼出側の責務で行う（agentdev-traceability の運用規約参照）
+
+## verify-only closure の検証実行と SSoT コメント記録
+
+### Purpose
+
+verify-only closure（PR も carrier commit も存在しない Issue 完了。検証のみで完了する maintenance case を含む）では、変更が存在しないため commit 前3検査の発火条件（配布物変更を含む case）が成立しない。この場合でも検証完了の恒久証跡を残すため、3検査と integrity suite を通常 case と同水準で実行し、その実行証跡を SSoT コメント（Issue コメント）へ記録する。正規原本は case-run command Design「verify-only closure の検証実行と SSoT コメント記録工程」節であり、本工程はその実行時手順である。
+
+### Preconditions
+
+- STEP-S5 で result 処理が完了している（verify-only closure では PR を作成しない）
+
+### Procedure
+
+1. **verify-only closure の判定**: execution contract で検証のみと事前確定された case、または実行の結果変更不要が確定した case のいずれかを正規の判定点とする。判定根拠を Issue コメント（SSoT コメント）に残す
+2. **3検査の実行**: 配布依存境界検査（check_distribution_boundary.ts）、runtime-unresolved-reference 検査（check_extensions.ts 経由の integrity 検査）、traceability 検査（宣言整合）を通常 case と同一の手順・同一の水準（base 既知違反と新規違反の分離突合、新規違反 0 件確認、件数突合）で実行する。checker コマンドの実行経路と stdout 退避形式は STEP-S5「checker コマンドの実行経路（安定実行経路）」「checker コマンドの stdout 退避形式」（delegation-and-result.md）と同一契約に従う
+3. **integrity suite の実行**: full integrity suite（bun test 全件）を実行し、「Ran N tests across M files」の N/M 件数突合と直前実績との件数急減なし確認を行う（case-close STEP-3 の合格基準と同水準）
+4. **SSoT コメントへの記録**: 実行コマンド列（実行 cwd、実行形態を含み、そのまま再実行手順として機能する形式）と結果（3検査の new_delta 0・新規違反 0 件、integrity suite の pass/fail 件数）を Issue コメント（Custom Tool `agentdev_gh` の comment_create）へ記録する。verify-only closure では PR が存在しないため PR 本文を記録先に使わない
+5. **carrier commit 不作成**: 検証完了のために carrier commit を作成しない（case 2769 で確立した作業仮定の継承。「検証完了のために carrier commit を作成する」代替案は Design 節で却下済み）
+6. **チャネル分離**: SSoT コメントは検証証跡チャネルであり、capture（intake/learning 候補）チャネルではない。capture 引き継ぎの PR 本文限定原則（既存契約）は変更しない。検証中に発見した本筋外の検出事項は既存の intake 起票経路で扱う
+
+### Result
+
+- 検証完了（3検査と integrity suite の実行結果確認済み）、SSoT コメント記録済み
+
+### Evidence
+
+- SSoT コメント（Issue コメント）: 判定根拠、実行コマンド列と検証結果
+
+### Completion Verification
+
+- SSoT コメントに判定根拠、再実行可能な実行コマンド列（実行 cwd・実行形態を含む）、検証結果が記録されていること
+
+### Resume-Idempotency
+
+- 3検査と integrity suite は読取検査であり再実行可能。SSoT コメントの記録有無で本工程の完了を判定し、記録済みの場合は重複記録しない
+
+## STEP-S6: worktree クリーンアップ確認・完了報告
+
+### Purpose
+
+委譲 result を受領した後の worktree 状態を確認し、L2 内訳を含む完了報告を出力する。
+
+### Input Resolution
+
+1. SSoT 再構成: 委譲 result（PR URL、Issue コメント）、worktree の git status
+2. identifier 保持: Issue番号、PR番号
+3. 最小 scalar: L2 タイムスタンプ（本 Step 開始・終了時刻、JST）
+4. runtime artifact: なし
+
+### Preconditions
+
+- STEP-S5 で result 処理完了（completed-pr 時は最終 gate 合格後）
+
+### Procedure
+
+- 未コミット変更あり: 報告してユーザーの指示に従う。自動的な破棄、コミットは行わない
+- 未コミット変更なし: 完了報告へ。runtime workspace のクリーンアップは harness 側の責務であり（charter 原則、harness 分離モデル Design 参照）、case-run は関与しない
+- **tmp/ 残存確認**: 当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないことを確認する。残存時は workflow 側 cleanup 規定（当該実行内での削除）に従って処理し、残存ファイルと対応結果を完了報告に明示する
+- 完了報告 template に従って出力する（実行担当サブエージェント result 状態、PR番号を含める）。verify-only closure 時は PR番号の代わりに SSoT コメント（検証証跡）の記録済み確認を含める
+- 本 Step（worktree クリーンアップ）の開始時刻・終了時刻（JST）を記録し、worktree クリーンアップ時間を計測する。完了報告に L2 タイムスタンプ内訳（worktree 設定時間、実行担当サブエージェント実行時間、worktree クリーンアップ時間）を含める
+
+### Result
+
+- worktree 状態・tmp/ 残存確認結果、完了報告（result 状態、PR番号、L2 内訳）
+
+### Evidence
+
+- git status 結果、tmp/ 残存確認結果、完了報告出力
+
+### Completion Verification
+
+- 完了報告に result 状態と L2 内訳が含まれていること
+- 当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（残存時は対応結果を報告済みであること）
+
+### Resume-Idempotency
+
+- 報告のみの STEP であり副作用を持たない。再実行時は最新の git status と result から再構成する
+
+## 関連 STEP
+
+- 前: STEP-S5（delegation-and-result.md）
+- 次: なし（workflow 終了）
+
+## 関連 Capability Skill
+
+- `agentdev-git-worktree`: worktree 作成、worktree 内判定ヘルパー
+- `agentdev-epic-tracker`: 親Epic ステータス更新
+- `agentdev-quality-gates`: QG-3 前置 staleness check
+- `agentdev-workflow-orchestration`: 再開フェーズ判定
+- `agentdev-req-analysis`: チェックボックス品質基準
+
+## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
+
+- ガードレール（全ファイル操作は worktree 内で実行、`POL-worktree-isolation`）
+- ガードレール・不変条件（STEP-S3 precondition gate、worktree root 相対パス引き渡し）
+- ガードレール・不変条件（QG-3 前置 staleness check、差異検出時の引き渡しと差異報告、blocked 遷移と Root Case の resume_command 正規再開経路）
+
+## 関連ガイドライン
+
+- **テスト戦略（TS）標準手順**: 関数削除を伴う Issue の test strategy には、削除対象関数の全使用箇所 grep 確認手順を含める（L-014、PR #1140 / #1139 Epic #1138 由来。詳細は `agentdev-req-analysis` 参照）
+- **Windows PowerShell 外部 CLI 出力のエンコーディング防御**: 検証・比較系タスク（Issue 本文読取、検証結果の文字列突合、stdout 退避等）で PowerShell 経由の gh / git 出力を扱う場合の防御手順（Issue #2634 の4障害事例由来）。PowerShell はネイティブコマンド（gh、git）の UTF-8 出力をコンソールコードページ（cp932）でデコードするため、パイプ・変数キャプチャ・リダイレクト経由の文字列処理で mojibake と静かな情報欠落が発生する:
+  - (1) Issue/PR 書き込み系: gh CLI 書き込み操作（Issue 本文更新等の body-file 渡し）では UTF-8 ファイル文字化けが発生した事例があるため、UTF-8 (BOM なし) JSON ファイル渡しと読み戻し検証が Tool 実装の内側に隠蔽された Custom Tool `agentdev_gh` 経路へ標準化済みである。Issue/PR 操作は Custom Tool `agentdev_gh` を標準とし、gh 書き込み系の直接実行は行わない。書き込み後の検証は Tool の VERIFY 手順（読み戻し検証）で行う
+  - (2) gh 読み取り系: `--jq` は複数行文字列を正しく扱えない事例がある（実際の文字数より大幅に少なく取得される）。`--json` 全体取得 + `ConvertFrom-Json` パースへ標準化する。`--jq` は単一行フィールドに限定し、取得結果の文字数突合 VERIFY を必須とする
+  - (3) 退避・書き戻し: stdout 直接パイプ・変数キャプチャで多バイト文字列を受け取らない。UTF-8 明示のファイル退避（`Out-File -Encoding utf8`）→ Read ツール参照に置き換える。書き戻しは JSON payload + `gh api --input` に統一する
+  - (4) git 出力解析: `[Console]::OutputEncoding` の UTF-8 設定に加え、生バイト系コマンド（`git grep` 等の件数カウント）によるクロスチェックを行う。Windows 環境での git 出力処理の詳細は `agentdev-git-worktree` の「Windows git 出力のエンコーディング処理」（`references/git-common-procedures.md`）を参照する
+  - **静かな欠落の運用指針**: エンコーディング破損と情報欠落は例外を投げず、部分的な成功として通過する。検証・比較系タスクでは、取得文字数と件数の突合を検証手順に含め、欠落の疑義を検証結果に残す
+- **エラー処理**: エラー発生時の対応は `agentdev-workflow-orchestration` に従う。result が blocked/failed の場合、Issue コメント（SSoT）を参照して停止理由、再開ポイントをユーザーに報告する
