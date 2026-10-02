@@ -7,8 +7,10 @@ param(
 
 # archive 専用 installer 原本。release archive 内では scripts/install.ps1 の名で
 # 配置される（package-release-archive.ps1 が投影名を付与する）。
-# WP-{N} (Issue #1928) §7.5.2: install the unpacked release archive's src/opencode/
-# tree into the projection directory (.opencode/) as real files.
+# WP-{N} (Issue #1928) §7.5.2: install the unpacked release archive's src/
+# tree (canonical layout, REQ-{NNNN}-{NNN}: src/common/ canonical +
+# src/opencode/plugins/ host connection area) into the projection directory
+# (.opencode/) as real files.
 # Junctions are NOT created; release archives must be junction-free.
 # 対応宣言（ADF-COVERS）の正規配置先は docs 配下の正規成果物である。
 #
@@ -64,8 +66,13 @@ if (-not (Test-Path -LiteralPath $Source)) {
     exit 5
 }
 
-$commandsSrc = Join-Path $Source "commands\agentdev"
-$skillsSrc = Join-Path $Source "skills"
+# Canonical archive layout: $Source is the archive's src/ directory.
+# Commands/skills and Custom Tools come from the canonical tree (src/common/);
+# Plugins/Hooks come from the OpenCode host connection area (src/opencode/).
+$commonSrc = Join-Path $Source "common"
+$opencodeSrc = Join-Path $Source "opencode"
+$commandsSrc = Join-Path $commonSrc "commands\agentdev"
+$skillsSrc = Join-Path $commonSrc "skills"
 
 if (-not (Test-Path -LiteralPath $commandsSrc)) {
     Write-Host "install-from-archive: required source directory missing: $commandsSrc" -ForegroundColor Red
@@ -82,7 +89,7 @@ $skillsDst = Join-Path $Target "skills"
 Ensure-Directory -Path $commandsDst
 Ensure-Directory -Path $skillsDst
 
-# Commands: copy every file under src/opencode/commands/agentdev/
+# Commands: copy every file under src/common/commands/agentdev/
 $commandFiles = Get-ChildItem -LiteralPath $commandsSrc -Recurse -File
 foreach ($f in $commandFiles) {
     $rel = $f.FullName.Substring($commandsSrc.Length).TrimStart('\', '/')
@@ -103,8 +110,10 @@ foreach ($skillDir in $skillDirs) {
     }
 }
 
-# Custom Tools / Plugins (agentdev-* distribution types, REQ-{NNNN}). Optional
-# kinds: archives without a kind directory simply skip it.
+# Custom Tools / Plugins (agentdev-* distribution types, REQ-{NNNN}). Custom
+# Tools are canonical (src/common/tools/); Plugins/Hooks stay in the OpenCode
+# host connection area (src/opencode/plugins/). Optional kinds: archives
+# without a kind directory simply skip it.
 # Repo-local Plugin (agentdev-distribution-boundary-guard, REQ-{NNNN}-{NNN} /
 # REQ-{NNNN}-{NNN}) is excluded from consumer projection. SYNC OBLIGATION
 # (runtime-package-boundary Design「repo-local Plugin の配布・投影契約」):
@@ -112,8 +121,12 @@ foreach ($skillDir in $skillDirs) {
 # scripts/install.ps1, scripts/self/release/package-release-archive.ps1,
 # this file. self-sync.ps1 must NOT exclude it (self-host projection is kept).
 $repoLocalPluginNames = @("agentdev-distribution-boundary-guard")
-foreach ($kind in @("tools", "plugins")) {
-    $kindSrc = Join-Path $Source $kind
+foreach ($kindSpec in @(
+    @{ Kind = "tools";   Src = (Join-Path $commonSrc "tools") },
+    @{ Kind = "plugins"; Src = (Join-Path $opencodeSrc "plugins") }
+)) {
+    $kind = $kindSpec.Kind
+    $kindSrc = $kindSpec.Src
     if (-not (Test-Path -LiteralPath $kindSrc)) { continue }
     $kindDst = Join-Path $Target $kind
     $kindDirs = Get-ChildItem -LiteralPath $kindSrc -Directory | Where-Object {
@@ -163,7 +176,7 @@ if (Test-Path -LiteralPath $textlintGuardDir) {
 # plugin files only at .opencode/plugins/ depth 1, so each directory-style
 # plugin package also needs a depth-1 re-export shim. Release archives must
 # stay junction-free; the shim is a generated real file.
-$pluginsSrcDir = Join-Path $Source "plugins"
+$pluginsSrcDir = Join-Path $opencodeSrc "plugins"
 if (Test-Path -LiteralPath $pluginsSrcDir) {
     $pluginPackages = Get-ChildItem -LiteralPath $pluginsSrcDir -Directory | Where-Object {
         $_.Name -like "agentdev-*" -and $_.Name -notin $repoLocalPluginNames

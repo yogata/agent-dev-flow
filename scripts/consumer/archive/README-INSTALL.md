@@ -1,19 +1,21 @@
 # AgentDevFlow Release Archive — Install Guide
 
-この README は release archive（`agentdev-release-<sha>.zip`）を受け取った利用者向けの導入手順書である。archive には AgentDevFlow 配布物（command / skill / reference / template / script）が実ファイルとして格納されており、Windows junction や Unix symlink に依存しない。
+この README は release archive（`agentdev-release-<sha>.zip`）を受け取った利用者向けの導入手順書である。archive には AgentDevFlow 配布物（command / skill / reference / template / script）が実ファイルとして格納されており、Windows junction や Unix symlink に依存しない。archive はマルチホスト正本モデル（共通正本 `src/common/` とホスト接続領域 `src/opencode/`）の構成で生成される。
 
 ## 同梱内容
 
 ```
 agentdev-release-<sha>/
-  src/opencode/commands/agentdev/**.md
-  src/opencode/skills/agentdev-*/**/**
+  src/common/commands/agentdev/**.md
+  src/common/skills/agentdev-*/**
+  src/common/tools/agentdev-*/**
+  src/opencode/plugins/agentdev-*/**
   scripts/install.ps1
   README-INSTALL.md
   THIRD-PARTY-NOTICES.md
 ```
 
-`scripts/install.ps1`（archive 版 installer）は配布物を `.opencode/` 配下へ実ファイルとして配置する導入スクリプトである。archive は配布物の自己完結を保証し、展開先リポジトリの `src/opencode/` 状態に依存しない。archive 版は junction を作成しない archive 固有の導入契約を持つ（通常 checkout 版 `scripts/install.ps1` とは別の installation projection である）。
+`scripts/install.ps1`（archive 版 installer）は archive 内の `src/` ツリー（共通正本 `src/common/` と OpenCode 接続領域 `src/opencode/plugins/`）を `.opencode/` 配下へ実ファイルとして配置する導入スクリプトである。archive は配布物の自己完結を保証し、展開先リポジトリの `src/` 状態に依存しない。archive 版は junction を作成しない archive 固有の導入契約を持つ（通常 checkout 版 `scripts/install.ps1` とは別の installation projection である）。
 
 third-party 依存の実体（`vendor/` 配下の engine bundle と kuromoji 辞書）は同梱しない。agentdev-textlint-guard plugin は版固定情報（`package.json` + `bun.lock`）のみを配布し、依存は導入時に生成する（THIRD-PARTY-NOTICES.md に依存とライセンス種別の通知を記載する）。
 
@@ -34,7 +36,7 @@ $unpackedRoot = Join-Path $temp "agentdev-release-<sha>"
 
 # 3. scripts/install.ps1（archive 版 installer）を実行
 & (Join-Path $unpackedRoot "scripts\install.ps1") `
-    -Source (Join-Path $unpackedRoot "src\opencode") `
+    -Source (Join-Path $unpackedRoot "src") `
     -Target (Join-Path $unpackedRoot ".opencode") `
     -Mode copy
 ```
@@ -54,7 +56,7 @@ Pop-Location
 
 # installer 再実行（上記「導入手順」の 3 を再実行）
 & (Join-Path $unpackedRoot "scripts\install.ps1") `
-    -Source (Join-Path $unpackedRoot "src\opencode") `
+    -Source (Join-Path $unpackedRoot "src") `
     -Target (Join-Path $unpackedRoot ".opencode") `
     -Mode copy
 ```

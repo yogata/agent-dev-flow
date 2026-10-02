@@ -40,6 +40,16 @@ const DISTRIBUTION_TARGETS_REL_PATH = path.join(
   "distribution-targets.yaml",
 );
 
+// Fallback resolution for projections that are not the producer repository
+// (archive stage / extras-scan / archive-installed roots carry no checker
+// data): the canonical definition resolves from this checker's own placement
+// (same host-side file). Missing at both candidates stays fail-closed.
+const DISTRIBUTION_TARGETS_LOCAL_PATH = path.join(
+  path.dirname(path.dirname(path.dirname(import.meta.path))),
+  "data",
+  "distribution-targets.yaml",
+);
+
 export interface DistributionTargets {
   /** IR-046: self-hosting-only content markers forbidden in distributed content. */
   readonly ir046Markers: readonly string[];
@@ -95,12 +105,24 @@ function parseYamlCanonical(text: string): unknown {
   return parseMinimalYaml(text);
 }
 
-export function loadDistributionTargets(repoRoot: string): DistributionTargets {
-  const yamlPath = path.join(repoRoot, DISTRIBUTION_TARGETS_REL_PATH);
-  let text: string;
-  try {
-    text = fs.readFileSync(yamlPath, "utf-8");
-  } catch {
+export function loadDistributionTargets(
+  repoRoot: string,
+  localOverridePath: string = DISTRIBUTION_TARGETS_LOCAL_PATH,
+): DistributionTargets {
+  const candidates = [
+    path.join(repoRoot, DISTRIBUTION_TARGETS_REL_PATH),
+    localOverridePath,
+  ];
+  let text: string | null = null;
+  for (const yamlPath of candidates) {
+    try {
+      text = fs.readFileSync(yamlPath, "utf-8");
+      break;
+    } catch {
+      // try the next candidate; missing at all candidates stays fail-closed.
+    }
+  }
+  if (text === null) {
     throw new Error(
       `fail-closed: distribution targets file is missing (${DISTRIBUTION_TARGETS_REL_PATH})`,
     );

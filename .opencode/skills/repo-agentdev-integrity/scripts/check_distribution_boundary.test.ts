@@ -721,9 +721,18 @@ describe("loadDistributionTargets: canonical yaml loading (REQ-047-009)", () => 
     expect(targets.ir048Prefix.length).toBeGreaterThan(0);
   });
 
-  test("fails closed when the yaml is missing", () => {
+  test("resolves from the checker placement for non-producer projection roots", () => {
+    const targets = loadDistributionTargets("/nonexistent-repo-root-for-projection");
+    expect(Array.isArray(targets.ir046Markers)).toBe(true);
+    expect(targets.ir046Markers.length).toBeGreaterThan(0);
+  });
+
+  test("fails closed when the yaml is missing at both the repo root and the checker placement", () => {
     expect(() =>
-      loadDistributionTargets("/nonexistent-repo-root-for-ts006"),
+      loadDistributionTargets(
+        "/nonexistent-repo-root-for-ts006",
+        "/nonexistent-checker-placement-data/distribution-targets.yaml",
+      ),
     ).toThrow(/fail-closed.*distribution targets file is missing/i);
   });
 });

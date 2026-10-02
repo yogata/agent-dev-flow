@@ -12,7 +12,7 @@ implementation:
   src/third-party/skills.yaml:
     - REQ-097-002
 verification:
-  README-INSTALL.md:
+  scripts/consumer/archive/README-INSTALL.md:
     - REQ-097-001
   src/common/tools/agentdev-third-party/tests/cli.test.ts:
     - REQ-097-003

@@ -17,7 +17,7 @@
 | @textlint-ja/textlint-rule-preset-ai-writing | 1.7.0 | MIT | 版固定情報のみ（導入時解決） | npm registry（package.json 依存宣言 + bun.lock pin） |
 | textlint-rule-preset-ja-technical-writing | 12.0.2 | MIT | 版固定情報のみ（導入時解決） | npm registry（package.json 依存宣言 + bun.lock pin） |
 | textlint-rule-prh | 6.1.0 | MIT | 版固定情報のみ（導入時解決） | npm registry（package.json 依存宣言 + bun.lock pin） |
-| kuromoji | 0.1.2 | Apache-2.0 | 版固定情報のみ（導入時解決。LICENSE-2.0.txt の同梱条件は依存実体を再配布しないため本リポジトリでは発生しない。導入先で生成した実体を第三者へ再配布する場合は該当ライセンスの条件に従う） | npm registry（直接依存 5 パッケージの形態素解析に必要な依存。bun.lock pin） |
+| kuromoji | 0.1.2 | Apache-2.0 | 版固定情報のみ（導入時解決。Apache License 2.0 原文テキストの同梱条件は依存実体を再配布しないため本リポジトリでは発生しない。導入先で生成した実体を第三者へ再配布する場合は該当ライセンスの条件に従う） | npm registry（直接依存 5 パッケージの形態素解析に必要な依存。bun.lock pin） |
 | mecab-ipadic 辞書 | 2.7.0（kuromoji 0.1.2 同梱辞書） | mecab-ipadic 独自ライセンス（著作権表示の複製物包含を要求） | 版固定情報のみ（導入時解決。`bun run build:engine` が node_modules の kuromoji 同梱辞書から `vendor/kuromoji-dict/` へ複製する。導入先での利用が想定範囲であり、実体を第三者へ再配布する場合は著作権表示の複製物包含等の条件に従う） | kuromoji 0.1.2 package 同梱の dict/（基礎辞書は IPA 公開の mecab-ipadic） |
 
 ## 更新の手順
