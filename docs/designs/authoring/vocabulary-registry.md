@@ -2,7 +2,7 @@
 title: 語彙レジストリ
 status: accepted
 created: 2026-08-20
-updated: 2026-09-29
+updated: 2026-10-03
 ---
 
 <!-- ADF-COVERS(design): REQ-094-008, REQ-094-012 -->
@@ -27,9 +27,13 @@ AgentDevFlow 管理下の文書で使用する正規語彙と旧語彙の対照�
 | 基盤 Design（本ファイル） | `docs/designs/authoring/vocabulary-registry.md` | 語彙レジストリの配置基準、連携契約、IR-045 移管状態、IR-050/IR-051/IR-044 協調契約を所有する |
 
 repo-agentdev-integrity は repo-local スキル（配布対象外）であるため src 側配置と投射の対象外であり、実体対照表は `.opencode/skills/repo-agentdev-integrity/references/` 直下を正とする。本 Design 内の他節が引用する実体対照表のパスもすべてこの .opencode 実体を指す。
-配布物に含まれる語彙レジストリ（将来追加される場合）は `src/opencode/` 配下に配置し `.opencode/` へ投射する（現行の責務体制は DEC-036）。
+配布物に含まれる語彙レジストリ（将来追加される場合）は共通正本を `src/common/` 配下に配置し、ホスト別接続領域経由で投影する（配備形態の正は DEC-049）。
 
 「実現面」語彙の正典は REQ-004-037 変更後の本文であり、Design（vocabulary-registry を含む）は正典を参照する。Design 側に語彙の定義本文を複製しない。
+
+### 契約用語の正規登録
+
+複合語「本質的争点」「本質的な指摘事項」を契約用語として正規登録する（user 承認済み方針、Epic #3316 issuecomment-5949254117）。両複合語は対論型レビュー（adversarial-review）契約における正当使用語であり、「本質的」単独用法の中立化掃除の対象から除外する。
 
 ### 用語選択基準の区別軸契約
 
