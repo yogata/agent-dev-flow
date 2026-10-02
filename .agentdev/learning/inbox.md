@@ -80,3 +80,21 @@
 - **タグ**: #index-regeneration #measurement-date #case-open
 
 ---
+
+## 2026-10-03: bash パイプ経由 checker 実行の echo "exit=$?" はパイプ最終コマンドの終了コードを返す
+
+- **問題事象**: case-open STEP-4 の PR 作成前 checker 実測（Case #3337・OU-007）で `bun check_autogen_freshness.ts 2>&1 | tail -10; echo "exit=$?"` を実行し、checker が exit=1（鮮度違反 1 件）を返したにもかかわらず `exit=0` を観測して合格と解釈しかけた
+- **発生局面**: case-open STEP-4 検査期待値の branch HEAD 実測（Case #3337・OU-007・PR #3358）
+- **検知方法**: 再実行（パイプなし・出力ファイル退避後に tail）で exit=1 を確認し、初回読みの誤りを検知
+- **根本原因**: `cmd | tail; echo $?` の `$?` はパイプの最終コマンド（tail）の終了コードであり checker 自体の終了コードではない
+- **自律対応内容**: 終了コードの取得をパイプなし実行（標準出力をファイル退避後に tail 参照）へ切替し、checker 終了コードを正しく取得して再判定した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（checker 終了コード契約は現行どおり。観測方法の誤り）
+- **横展開観点**: checker の終了コード契約（check 系は fail ありで 2・実行エラーで 1・合格 0）を bash パイプ経由の `echo $?` で観測する手順は全 checker 共通で誤観測を生む。references の checker 実測手順はパイプなし実行または PIPESTATUS を前提とすべき
+- **再発条件**: bash パイプ経由で checker を実行し `echo $?` で終了コードを確認する場合
+- **予防策候補**: checker 実測手順を含む reference（case-open references/definition-pr-and-idempotency.md 等）に「終了コードはパイプなし実行または PIPESTATUS で取得する」注記の追補候補（intake 候補としても成立）
+- **想定反映先**: learning-promote での評価・必要なら references の checker 実測手順追補
+- **関連**: Case #3337・PR #3358
+- **タグ**: #bash-pipeline #exit-code #checker-observation #case-open
+
+---
