@@ -1,17 +1,20 @@
 // ADF-COVERS(implementation): REQ-010-008
 // ADF-COVERS(implementation): REQ-019-001, REQ-019-002
+// ADF-COVERS(implementation): REQ-019-003
 /**
  * check_test_impact.ts — Test impact detection gate (REQ-019).
  *
  * リファクタリング PR で Design 変更に連動する周辺テストの陳腐化を検出する。
  * 変更 Design ファイルを抽出し、当該 Design を参照するテストファイルのうち
  * 同一 PR で未変更のものを「陳腐化候補」として報告する。
+ * REQ-019-003 追加契機: 宣言的データ・config（extension yaml、plugin 追加対象設定、
+ * 判断境界文言、配布物文言）を期待値に持つテストの同期漏れを検出対象に含める。
  *
  * 処理層 (5層):
  *   1. changed file resolver    — --files / --base-ref から変更ファイルを特定
- *   2. spec change classifier   — 変更ファイルを Design/REQ/ADR 変更へ分類
+ *   2. spec change classifier   — 変更ファイルを Design/REQ/ADR 変更と宣言的データ・config 変更へ分類
  *   3. test file discovery       — test-glob で走査対象テストファイルを発見
- *   4. reference scanner         — 各テストファイルから Design 参照を抽出
+ *   4. reference scanner         — 各テストファイルから Design 参照と宣言的データ参照を抽出
  *   5. staleness evaluator       — 参照テストが同一 PR で変更されたか評価
  *
  * CLI 詳細は docs/designs/integrity/test-impact-detection-gate.md「チェッカー実装契約」節参照。
@@ -38,6 +41,18 @@ const Design_PATH_PATTERNS = [
   /^docs\/designs\/.*\.md$/,
   /^docs\/requirements\/REQ-.*\.md$/,
   /^docs\/decisions\/DEC-.*\.md$/,
+];
+
+// 宣言的データ・config のパス分類（REQ-019-003）。この配下を期待値に持つテストの
+// 同期漏れを検出契機に含める。区分対応:
+// - extension yaml: Project Extensions 宣言（.agentdev/extensions/**）
+// - plugin 追加対象設定: textlint guard plugin の追加対象設定 yaml（.agentdev/config/plugins/**）
+// - 判断境界文言・配布物文言: prh 辞書（agentdev-textlint-guard rules/**）
+// docs 系（Design_PATH_PATTERNS）と重複する場合は Design を優先する。
+const DECLARATIVE_PATH_PATTERNS = [
+  /^\.agentdev\/extensions\/.*\.ya?ml$/,
+  /^\.agentdev\/config\/plugins\/.*\.ya?ml$/,
+  /^src\/opencode\/plugins\/agentdev-textlint-guard\/rules\/.*\.ya?ml$/,
 ];
 
 // 走査除外ディレクトリ。SCAN_EXCLUDE_DIRS は相対パス先頭一致、
@@ -74,6 +89,7 @@ const ADR_ID_PATTERN = /\b(ADR-\d{3})\b/g;
 
 type SpecLifecycle = "added" | "deleted" | "renamed" | "modified" | "unknown";
 type ReferenceKind = "full-path" | "basename" | "req-id" | "adr-id";
+type SpecCategory = "design" | "declarative";
 
 interface TestImpactFinding {
   spec_path: string;
@@ -87,9 +103,11 @@ interface TestImpactFinding {
 interface TestImpactReport {
   base_ref: string | null;
   files_declared: string[];
-  spec_changes: string[];
+  spec_changes: string[];        // Design 変更一覧（既存契約を維持）
+  declarative_changes: string[]; // 宣言的データ・config 変更一覧（REQ-019-003 追加）
   tests_scanned: number;
   stale_candidates: TestImpactFinding[];
+  declarative_stale_candidates: TestImpactFinding[];
   warnings: string[];
 }
 
@@ -200,12 +218,17 @@ function isSpecPath(relPath: string): boolean {
   return Design_PATH_PATTERNS.some((p) => p.test(relPath));
 }
 
+function isDeclarativePath(relPath: string): boolean {
+  return DECLARATIVE_PATH_PATTERNS.some((p) => p.test(relPath));
+}
+
 interface SpecChange {
   relPath: string;
   lifecycle: SpecLifecycle;
   basename: string;
   reqIds: string[]; // 変更 Design から抽出した REQ-NNN（REQ ファイル自身の ID 等）
   adrIds: string[]; // 変更 Design から抽出した ADR-NNN
+  category: SpecCategory; // design = docs 系（既存契約）、declarative = 宣言的データ・config（REQ-019-003）
 }
 
 function gitNameStatus(
@@ -240,7 +263,8 @@ function classifySpecChanges(
   const result: SpecChange[] = [];
   for (const absPath of changedFiles) {
     const rel = path.relative(root, absPath).replace(/\\/g, "/");
-    if (!isSpecPath(rel)) continue;
+    const isDesign = isSpecPath(rel);
+    if (!isDesign && !isDeclarativePath(rel)) continue;
     const status = gitNameStatus(root, rel, baseRef);
     let lifecycle: SpecLifecycle = "unknown";
     if (status.status === "A") lifecycle = "added";
@@ -262,6 +286,7 @@ function classifySpecChanges(
       basename: path.basename(rel),
       reqIds,
       adrIds,
+      category: isDesign ? "design" : "declarative",
     });
   }
   return result;
@@ -484,36 +509,68 @@ function evaluateStaleness(
   specChanges: SpecChange[],
   testFiles: string[],
   changedRelFiles: Set<string>,
-): { findings: TestImpactFinding[]; warnings: string[] } {
+): {
+  findings: TestImpactFinding[];
+  declarativeFindings: TestImpactFinding[];
+  warnings: string[];
+} {
   const findings: TestImpactFinding[] = [];
+  const declarativeFindings: TestImpactFinding[] = [];
   const warnings: string[] = [];
-  let totalReferenceHits = 0;
+  let designReferenceHits = 0;
+  let declarativeReferenceHits = 0;
   const lifecycleByPath = new Map<string, SpecLifecycle>();
-  for (const sc of specChanges) lifecycleByPath.set(sc.relPath, sc.lifecycle);
+  const categoryByPath = new Map<string, SpecCategory>();
+  for (const sc of specChanges) {
+    lifecycleByPath.set(sc.relPath, sc.lifecycle);
+    categoryByPath.set(sc.relPath, sc.category);
+  }
   for (const testAbs of testFiles) {
     const hits = findReferencesInTest(root, testAbs, specChanges);
-    totalReferenceHits += hits.length;
     const testRel = path.relative(root, testAbs).replace(/\\/g, "/");
-    // 同一 PR で変更済みのテストは陳腐化候補から除外
-    if (changedRelFiles.has(testRel)) continue;
+    // 同一 PR で変更済みのテストは陳腐化候補から除外（参照ヒット件数は集計に含める）
+    if (changedRelFiles.has(testRel)) {
+      designReferenceHits += hits.filter(
+        (h) => categoryByPath.get(h.spec_rel_path) !== "declarative",
+      ).length;
+      declarativeReferenceHits += hits.filter(
+        (h) => categoryByPath.get(h.spec_rel_path) === "declarative",
+      ).length;
+      continue;
+    }
     for (const hit of hits) {
-      findings.push({
+      const finding: TestImpactFinding = {
         spec_path: hit.spec_rel_path,
         spec_lifecycle: lifecycleByPath.get(hit.spec_rel_path) ?? "unknown",
         test_path: hit.test_path,
         reference_kind: hit.reference_kind,
         reference_snippet: hit.reference_snippet,
         reference_line: hit.reference_line,
-      });
+      };
+      if (categoryByPath.get(hit.spec_rel_path) === "declarative") {
+        declarativeReferenceHits++;
+        declarativeFindings.push(finding);
+      } else {
+        designReferenceHits++;
+        findings.push(finding);
+      }
     }
   }
-  // silent pass 回避: Design 変更あり、かつ参照ヒット 0 件の場合は警告
-  if (specChanges.length > 0 && totalReferenceHits === 0 && testFiles.length > 0) {
+  // silent pass 回避: Design 変更あり、かつ Design 参照ヒット 0 件の場合は警告
+  const designChanges = specChanges.filter((sc) => sc.category === "design");
+  if (designChanges.length > 0 && designReferenceHits === 0 && testFiles.length > 0) {
     warnings.push(
-      `Design 変更 ${specChanges.length} 件を検出したが、走査したテストファイルから参照を検出できなかった。test-glob の設定、参照形式、除外ディレクトリを確認すること。`,
+      `Design 変更 ${designChanges.length} 件を検出したが、走査したテストファイルから Design 参照を検出できなかった。test-glob の設定、参照形式、除外ディレクトリを確認すること。`,
     );
   }
-  return { findings, warnings };
+  // silent pass 回避（REQ-019-003）: 宣言的データ・config 変更あり、かつ参照ヒット 0 件の場合は警告
+  const declarativeChanges = specChanges.filter((sc) => sc.category === "declarative");
+  if (declarativeChanges.length > 0 && declarativeReferenceHits === 0 && testFiles.length > 0) {
+    warnings.push(
+      `宣言的データ・config 変更 ${declarativeChanges.length} 件を検出したが、走査したテストファイルから宣言的データ参照を検出できなかった。test-glob の設定、参照形式、除外ディレクトリを確認すること。`,
+    );
+  }
+  return { findings, declarativeFindings, warnings };
 }
 
 // ─── Reporter ───────────────────────────────────────────────────────────────
@@ -528,9 +585,18 @@ function emitText(report: TestImpactReport): void {
   console.log(`files_declared: ${report.files_declared.length}`);
   console.log(`spec_changes: ${report.spec_changes.length}`);
   for (const s of report.spec_changes) console.log(`  ${s}`);
+  console.log(`declarative_changes: ${report.declarative_changes.length}`);
+  for (const s of report.declarative_changes) console.log(`  ${s}`);
   console.log(`tests_scanned: ${report.tests_scanned}`);
   console.log(`stale_candidates: ${report.stale_candidates.length}`);
   for (const f of report.stale_candidates) {
+    console.log(
+      `  [${f.reference_kind}] ${f.test_path}:${f.reference_line} -> ${f.spec_path} (${f.spec_lifecycle})`,
+    );
+    console.log(`    ${f.reference_snippet}`);
+  }
+  console.log(`declarative_stale_candidates: ${report.declarative_stale_candidates.length}`);
+  for (const f of report.declarative_stale_candidates) {
     console.log(
       `  [${f.reference_kind}] ${f.test_path}:${f.reference_line} -> ${f.spec_path} (${f.spec_lifecycle})`,
     );
@@ -577,7 +643,7 @@ function main(): void {
   const specChanges = classifySpecChanges(root, changedFiles, parsed.baseRef);
   const testFiles = discoverTestFiles(root, parsed.testGlob);
 
-  const { findings, warnings } = evaluateStaleness(
+  const { findings, declarativeFindings, warnings } = evaluateStaleness(
     root,
     specChanges,
     testFiles,
@@ -587,9 +653,15 @@ function main(): void {
   const report: TestImpactReport = {
     base_ref: parsed.baseRef,
     files_declared: parsed.files,
-    spec_changes: specChanges.map((s) => s.relPath),
+    spec_changes: specChanges
+      .filter((s) => s.category === "design")
+      .map((s) => s.relPath),
+    declarative_changes: specChanges
+      .filter((s) => s.category === "declarative")
+      .map((s) => s.relPath),
     tests_scanned: testFiles.length,
     stale_candidates: findings,
+    declarative_stale_candidates: declarativeFindings,
     warnings,
   };
 

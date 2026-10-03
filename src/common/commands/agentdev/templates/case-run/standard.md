@@ -7,6 +7,7 @@
  - 現在の状態: レビュー待ち
 - 検出事項/ 取り込み候補: {count}件（{該当なしの場合は「該当なし」}）
 検証結果: ✅ OK
+integrity suite 実行: {実行済み・合格/ 宣言的データ・config 変更を含まないため該当なし}
 git 永続化: 該当なし
 次の工程: レビュー通過後、case-close（case-auto 内部 lifecycle）
 
