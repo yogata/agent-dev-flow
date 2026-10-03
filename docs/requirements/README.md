@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下61件を第一参照先とする。
+現在の要件判断では、以下62件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -73,6 +73,7 @@
 | [REQ-097](REQ-097.md) | third-party 成果物の運用前提と導入検知 |
 | [REQ-098](REQ-098.md) | yomiyasu 推敲の工程必須化（docs 変更と GitHub 書込み文章） |
 | [REQ-099](REQ-099.md) | ADF 共通原本とホスト接続領域の分離によるマルチホスト併存利用 |
+| [REQ-100](REQ-100.md) | ADF が起票する Issue タイトルの記述規則 |
 <!-- AUTOGEN:END -->
 
 ## 廃止済み要件
