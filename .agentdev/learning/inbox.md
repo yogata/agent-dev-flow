@@ -511,3 +511,19 @@
 - **想定反映先**: learning-promote での評価。case-open references/definition-pr-and-idempotency.md の checker 実測手順注記候補
 - **関連**: Root Case #3407・Definition PR #3408、check_integrity.ts（REQ freshness 系検査）
 - **タグ**: `#check-integrity` `#stderr` `#json-parsing` `#checker-observation`
+
+## 2026-10-04: .agentdev 配下の git 管理対象 domain state が untracked のまま工程間で残留し、Form Zero（git rm + 明示パス commit）が成立しない
+
+- **問題事象**: case-ready STEP-7 の draft 削除時に `.agentdev/drafts/req-draft-issue-contract-simplification.md` が untracked（REQ-061-040 は `git rm` + 明示パス commit 同一ステップを正規形とする）であり、git rm を適用できず物理削除のみとなった。同じく `.agentdev/jev-observations/` 62 ファイルも untracked 残留（REQ-090-006 は観測を git 管理対象の domain state と定義）。`.gitignore` は両者を除外していない（管理対象であることの裏取り済み）
+- **発生局面**: case-ready STEP-7 draft / RU 削除（Root Case #3407・PR #3408）
+- **検知方法**: `git check-ignore`（exit 1 = 管理対象）と `git status --short` の `??` 表示の突合
+- **根本原因**: domain state を保存する工程（req-define の draft 保存、各 workflow の Jev evaluate による観測永続化）が保存時に git 永続化まで完了せず、untracked のまま次工程へ引き継いでいる
+- **自律対応内容**: draft は git 管理外のため物理削除（rm）で完了（git 永続化対象 0 件を検証記録へ記録）。deviation 自体を本 entry として learning capture（明示パス commit）
+- **ユーザー確認有無**: なし（実観測事実の記録。保存側工程の規律変更はしない）
+- **Decision/REQ/spec影響**: なし（REQ-090-006・REQ-061-040 の現行契約は維持。運用の永続化漏れの記録）
+- **横展開観点**: draft・jev-observations・promoted 等の保存 workflow 全般で同様の untracked 残留が生じ得る。blocked/failed 中断時は draft 保持が正なので、残留自体が即違反ではないが、成功時の削除契約が git rm を前提とする点で永続化と削除の対が崩れる
+- **再発条件**: 保存系 workflow が git commit を伴わずに domain state を保存した状態で、後続工程の Form Zero 削除・同期確認が実行される場合
+- **予防策候補**: 保存系 workflow への「保存と同時の明示パス commit」規律追加、または次工程入口での untracked domain state 検出（learning-promote / intake-promote 等の STEP での `git status --short` 確認）の追加候補
+- **想定反映先**: learning-promote での評価。req-define・case-open references の保存手順、agentdev_jev 観測永続化の手順注記候補
+- **関連**: Root Case #3407・PR #3408、.agentdev/README.md 状態表（drafts・jev-observations は git 管理対象）、REQ-061-040・REQ-090-006
+- **タグ**: `#untracked` `#form-zero` `#git-persistence` `#domain-state`
