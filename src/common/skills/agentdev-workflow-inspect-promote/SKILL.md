@@ -7,7 +7,7 @@ description: "inspect-promote command の workflow 実装本体。検出事項�
 
 inspect-promote command の workflow 実装本体である。
 `.agentdev/inspect/inbox/` の検出事項を分類（promote/defer/reject）し、採用した検出事項を `.agentdev/inspect/promoted/` へ保存、却下した検出事項を即時削除、見送りを inbox に残置する。
-`--auto` 明示 opt-in 時は高確信度検出事項を `.agentdev/intake/promoted/` へ自動投入する。
+`--auto` 明示 opt-in 時は自動 promote 対象カテゴリに合致する検出事項を `.agentdev/intake/promoted/` へ自動投入する。
 finding disposition を STEP resume point として所有する。
 
 inspect-promote command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
@@ -15,7 +15,7 @@ inspect-promote command は公開 interface（入出力契約・ガードレー�
 ## 入力
 
 - `.agentdev/inspect/inbox/*.md`（検出事項ファイル群）
-- `--auto`（省略可能）: 高確信度検出事項の自動 promote を有効化する明示 opt-in。省略時は従来の手動分類フローのみ
+- `--auto`（省略可能）: 自動 promote 対象カテゴリに合致する検出事項の自動 promote を有効化する明示 opt-in。省略時は従来の手動分類フローのみ
 
 ## 出力
 
@@ -86,7 +86,7 @@ inspect-promote workflow は次の8 STEP で構成する。
 - **HITL 承認必須**: 自動 promote 対象（`--auto`）と自律確定対象（次節の判定基準に従う）を除き、ユーザーの明示的な承認なしに採用済み成果物を生成しない（`POL-promoted-artifact-requires-approval`）
 - **reject は即時削除**: `archive/rejected/` への移動は廃止。即時削除以外の取扱を禁止し、reject 時の commit message に却下理由を含める（command 不変条件）
 - **defer は inbox 残置**: defer となった検出事項を `.agentdev/inspect/inbox/` から移動しない（command 不変条件）
-- **`--auto` は明示 opt-in の場合のみ有効**: 省略時は自動 promote を一切行わない。自動 promote 対象は v4-responsibility-boundaries Design（extension 経由）が定義する高確信度カテゴリのみとし、意味判断、曖昧な分類、Decision 要否判断を含む検出事項は手動分類へ回す（command 不変条件）
+- **`--auto` は明示 opt-in の場合のみ有効**: 省略時は自動 promote を一切行わない。自動 promote 対象は v4-responsibility-boundaries Design（extension 経由）が定義する自動 promote 対象カテゴリに合致する検出事項のみとし、意味判断、曖昧な分類、Decision 要否判断を含む検出事項は手動分類へ回す（command 不変条件）
 - **実行ログ**: `--auto` 実行の都度、投入対象、根拠を `.agentdev/inspect/promoted/auto-promote-log.md` に記録する（command 不変条件）
 - **adversarial-review は任意助言手段**: 必須工程、QG、承認ゲート、統制ゲートとして導入しない。呼出失敗時は silent skip を禁止し、従来フロー（HITL 確定）を維持する
 
@@ -96,7 +96,7 @@ inspect-promote workflow は次の8 STEP で構成する。
 
 - **判定位置**: 分類・検証（STEP-3）と必要な adversarial-review（STEP-5）を経た後、取得可能な根拠から promote / defer / reject を正規契約からの導出または委譲された裁量の範囲で確定できる検出事項は、ユーザー承認なしで確定する（REQ-{NNNN}-{NNN}）
 - **部分自律確定**: 同一実行内に自律確定可能項目とユーザー判断必要項目が混在する場合、未決項目に依存しない項目を先行確定し、ユーザー判断必要項目のみ HITL 対象とする（REQ-{NNNN}-{NNN}）
-- **`--auto` fast path との区別**: `--auto` fast path（高確信度カテゴリの事前定義による早期処理、明示 opt-in）と通常経路の自律確定（レビュー・検証を経た最終確認省略）は別概念とする。通常の実行によって `--auto` を暗黙的に有効化しない（REQ-{NNNN}-{NNN}）
+- **`--auto` fast path との区別**: `--auto` fast path（自動 promote 対象カテゴリの事前定義による早期処理、明示 opt-in）と通常経路の自律確定（レビュー・検証を経た最終確認省略）は別概念とする。通常の実行によって `--auto` を暗黙的に有効化しない（REQ-{NNNN}-{NNN}）
 - **報告形式**: 判定結果、主要根拠、HITL不要と判断した理由は既存の分類結果と実行報告（STEP-8 完了報告）を優先利用して報告し、新規永続成果物を必須としない
 
 ## 終了条件（termination）
