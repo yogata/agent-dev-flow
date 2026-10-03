@@ -156,7 +156,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [workflows/v4-lifecycle-state-machine.md](workflows/v4-lifecycle-state-machine.md) | accepted | ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応） | v4 ライフサイクル状態機械の定義（durable state enum と runtime 実行状態の二層モデル、階層合成〔子=実状態、上位=導出投影〕、決定的処理・意味判断の gate 分離、v3 command と内部状態遷移の対応表、v3 状態関連 Design の planned supersede 記録） |
 | [workflows/v4-collaboration-loop.md](workflows/v4-collaboration-loop.md) | accepted | ADF v4 継続コラボレーションループ | 循環の各段責務（Observe・Integrate 定義、実現手段対応表）、Learning 評価結果 7 系統、昇格ガード、.agentdev/ 状態領域の整合、v3 backlog-artifact-lifecycle Design からの吸収 |
 | [workflows/issue-title-policy.md](workflows/issue-title-policy.md) | accepted | Issue タイトル記述規則 | ADF が起票する Issue タイトルの具体書式の単一参照点（役割別書式判定表、主題原則、Wave 投影、除外情報、付与と更新の場面、生成例） |
-| [workflows/issue-lifecycle-records.md](workflows/issue-lifecycle-records.md) | draft | Case Issue 工程記録モデル | Case Issue 本文・コメント・Case Epic の工程記録の物理様式と運用プロトコルの正（本文構成、進行状態写像、記録契機、記録コメント項目、部分成功回復、Epic 反映と per-Epic 排他制御）。REQ-101 の design 対応 |
+| [workflows/issue-lifecycle-records.md](workflows/issue-lifecycle-records.md) | accepted | Case Issue 工程記録モデル | Case Issue 本文・コメント・Case Epic の工程記録の物理様式と運用プロトコルの正（本文構成、進行状態写像、記録契機、記録コメント項目、部分成功回復、Epic 反映と per-Epic 排他制御）。REQ-101 の design 対応 |
 
 ### 基盤 Design 一覧（6 ドメイン配下）
 

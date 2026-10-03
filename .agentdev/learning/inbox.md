@@ -447,3 +447,35 @@
 - **想定反映先**: case-close references/docs-and-design-promotion.md の bun test 実行形態契約周辺、bun 系スクリプト実行手順の cwd・依存前提注記
 - **関連**: Case #3391・PR #3402 Findings / learning、既出の bun x tsc cwd 規律エントリ（package 配下 cwd）
 - **タグ**: `#worktree` `#node_modules` `#bun-install` `#rerun`
+
+## 2026-10-03: 同一概念を複数モジュールで別識別子実装すると静的破棄が silently 起きる（識別子の型共有か語彙一致機械検査を併設）
+
+- **問題事象**: applyReflectEntry が語彙外行を含むブロックを applied=true で返し、既存エントリを削除した本文を適用していた。複数モジュール（record-comments.ts / records-report.ts / epic-reflect.ts）が同一概念（記録契機）を別識別子（start/handoff/halt と start/handover/stop 系）で実装していたことが原因
+- **発生局面**: case-run（Case #3391・Wave 2 #3399・TS-006 横断検証の F-1 検出）
+- **検知方法**: epic-reflect CLI を fixture 駆動した実経路確認でエントリ破棄を再現、rg による語彙横断照合で3経路分岐を特定
+- **根本原因**: 識別子がモジュールごとに独立定義され、語彙差異が実行時まで検出されない。epic-reflect 側は語彙外値を parse 失敗として静かに破棄した
+- **自律対応内容**: 語彙を record-comments.ts RECORD_KINDS 側へ統一（実体の多い側へ寄せ、テンプレート実体ファイル名と直結）、epic-reflect.ts / records-report.ts / SKILL.md / coordination.md を追従、CLI へ語彙検証・applyReflectEntry へ語彙外行検出時の applied=false 防御を追加、「記録契機語彙の3経路一致」回帰テストを新設
+- **ユーザー確認の有無**: なし（Issue 対象範囲内の修正）
+- **REQ/Decision/Design影響**: REQ-101-005 の Design 委譲事項として issue-lifecycle-records Design へ識別子・写像規則の確定値を追記（確定の履行）
+- **横展開観点**: 識別子を複数モジュールで共有する場合は型による共有（同一モジュールからの export）または語彙一致の機械検査を併設するのが有効。別実装したまま放置すると applied=true の静的破棄が silently 継続する
+- **再発条件**: 同一概念の識別子を複数モジュールで独立定義し、語彙差異を検出する機械検査がない場合
+- **予防策候補**: 識別子定義の単一モジュール集約（export 共有）または語彙一致テストの必須化
+- **想定反映先**: learning-promote での評価。REQ-101 系・共通識別子を扱う workflow skill 実装手順への横展開候補
+- **関連**: Case #3391・PR #3406（F-1 修正記録、記録契機語彙の3経路一致テスト）・issuecomment-5969313754
+- **タグ**: `#identifier-consistency` `#silent-data-loss` `#regression-test` `#multi-module`
+
+## 2026-10-03: 列位置前提の正規表現置換はテーブル形式追加時に既存列を破壊する（ヘッダー列名で判別する）
+
+- **問題事象**: tracking-table.ts の replaceChildStatus が旧4列形式（ステータス列=最終列）を前提とした正規表現で新4列形式（# / Issue / ステータス / 内容）の内容列まで置換対象に含め、内容列を破壊した
+- **発生局面**: case-run（Case #3391・Wave 2 #3399・TS-006 横断検証の F-2 検出）
+- **検知方法**: epic-reflect CLI fixture 駆動で新4列形式の内容列破壊を再現
+- **根本原因**: 列位置（最終列がステータス）を暗黙前提とした正規表現。新形式は列数が同じ4列のため列数では判別できず、ヘッダー列名（ステータス列位置）での判別が必要
+- **自律対応内容**: テーブルヘッダーからステータス列位置を特定する実装へ変更し、内容列を保持。closing の内容列保持の回帰テストを追加
+- **ユーザー確認の有無**: なし（Issue 対象範囲内の修正）
+- **REQ/Decision/Design影響**: なし
+- **横展開観点**: 列位置前提の正規表現置換は、テーブル形式の追加・変更時に既存列を破壊する類型の不備である。形式が複数存在するデータの列操作はヘッダー列名を情報源にする
+- **再発条件**: テーブル形式の複数世代が共存するデータへ列位置前提の置換を実行する場合
+- **予防策候補**: 列特定はヘッダー列名起点で行い、複数形式世代の共存を前提とした回帰テストを併設
+- **想定反映先**: learning-promote での評価。Epic 追跡テーブル等の構造化データ操作スクリプト実装手順への横展開候補
+- **関連**: Case #3391・PR #3406（F-2 修正記録）・agentdev-epic-tracker tracking-table.ts
+- **タグ**: `#regex-replacement` `#table-format` `#column-position` `#regression-test`

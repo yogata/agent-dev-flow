@@ -1,6 +1,6 @@
 ---
 title: Case Issue 工程記録モデル（issue-lifecycle-records）
-status: draft
+status: accepted
 created: 2026-10-03
 updated: 2026-10-03
 ---
