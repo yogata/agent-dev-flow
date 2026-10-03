@@ -6,6 +6,7 @@ updated: 2026-09-19
 ---
 <!-- ADF-COVERS(implementation): REQ-007-002, REQ-007-003, REQ-007-005, REQ-017-003 -->
 <!-- ADF-COVERS(implementation): REQ-048-001, REQ-048-002, REQ-048-008, REQ-048-016, REQ-014-016 -->
+<!-- ADF-COVERS(implementation): REQ-100-005, REQ-100-008 -->
 
 # `agentdev-workflow-templates` Design
 
@@ -50,6 +51,7 @@ agentdev 系コマンドで使用する Issue/PR 本文、コメントテンプ�
 - `<!-- 【必須】 -->` マーカー付きセクションは省略不可
 - `<!-- 【任意】 -->` マーカー付きセクションは省略可能
 - 変数に該当するデータがない場合は「該当なし」と記載
+- 本文テンプレートは Issue 本文の構造のみを規定し、Issue タイトルを規定しない。テンプレート例・変数値にタイトル書式を複製せず、起票時のタイトル書式と付与・更新の場面は `workflows/issue-title-policy` Design（Issue タイトル記述規則）を参照する。Epic 分解テーブルの内容列（子 Issue タイトルの転記先）も同 Design「Wave 投影」節の書式に従う
 - PR テンプレート（pr_desc.md）は verify-only PR の根拠欄を含む。根拠欄には種別 verify-only、実装差分を含まない理由、根拠成果物または commit、検証対象、検証結果を記入する。根拠は姉妹実装 PR だけでなく、実装 PR、先行 commit、main 反映済み commit、既存成果物、検証のみで完結する理由を許容する。case-run は verify-only PR 作成時に当該欄を埋め、case-close と QG-4 は当該欄を完了条件の証拠ソースとして読む（[case-run.md](../commands/case-run.md)「verification-only PR（実装差分なし、検証のみ）（v2:REQ-0158-002）」、[case-close.md](../commands/case-close.md)「verification-only PR の files_checked 空確認（v2:REQ-0158-002）」参照）
 - PR テンプレート（pr_desc.md）の関連Issueセクションは、マージ時の Issue 自動クローズを抑止し、case-close 工程の明示クローズ契約と整合する `Refs: #$ISSUE_NUMBER` 形式である
 

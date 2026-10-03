@@ -3,3 +3,13 @@ implementation:
   src/common/skills/agentdev-issue-tracking/SKILL.md:
     - REQ-095-001
     - REQ-095-002
+    - REQ-100-001
+    - REQ-100-002
+    - REQ-100-003
+    - REQ-100-006
+verification:
+  src/common/skills/agentdev-issue-tracking/SKILL.md:
+    - REQ-100-001
+    - REQ-100-002
+    - REQ-100-003
+    - REQ-100-006

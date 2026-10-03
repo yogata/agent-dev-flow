@@ -68,6 +68,8 @@ base 移動判定（STEP-4-1）の導入は、本手順の mergeable UNKNOWN ポ
 
 **PR タイトルの事前変更**: pr_merge 操作は squash コミットタイトルを制御できない。マージ実行前に `agentdev_gh` の issue_update 操作で PR タイトルを Conventional Commits 形式 + (Refs #N) 形式へ変更する。squash コミットタイトル経由で auto-close キーワードが解釈されることによる Issue の意図しないクローズを回避するため、タイトル変更は pr_merge 実行の前に行う。
 
+**Issue タイトル不変との区別**: 本変更は Pull Request のタイトルに対する操作であり、対象 Case Issue のタイトル変更ではない。case-run / case-close では状態の進行・停止・完了のみでは Issue タイトルを変更しない（`<workflows/issue-title-policy>` Design「付与と更新の場面」節参照。更新理由は誤記・曖昧さの修正、合意済み対象・目的の変更、役割 / Wave 構成の確定または変更に限定される）。
+
 **merge 前 branch HEAD commit message 確認（前置・常時確認）**: PR タイトルの制御に加え、branch HEAD の commit message に auto-close キーワード（fixes、closes、resolves 等）と Issue 番号の近接が残存する場合も、マージ経由で意図しない Issue クローズが発生し得る。マージ実行前に branch HEAD の commit message を確認する。確認は疑わしい場合に限定せず常時実施を安全側の既定とする（PR タイトル変更の完了で本確認を省略しない）。キーワードと Issue 番号の近接を検出した場合の処置は次のとおり:
 
 - commit message を修正（当該コミットの message 再作成）または rebase で書き換えてから、マージを再試行する

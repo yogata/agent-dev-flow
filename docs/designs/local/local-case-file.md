@@ -2,10 +2,11 @@
 title: ローカルIssue共通スキーマ
 status: accepted
 created: 2026-06-20
-updated: 2026-09-08
+updated: 2026-10-03
 ---
 <!-- ADF-COVERS(implementation): REQ-009-014, REQ-009-026, REQ-009-027, REQ-009-028, REQ-009-029, REQ-009-030, REQ-009-031, REQ-009-032, REQ-009-033, REQ-009-034, REQ-009-037, REQ-009-039 -->
 <!-- ADF-COVERS(implementation): REQ-011-007 -->
+<!-- ADF-COVERS(implementation): REQ-100-001 -->
 
 # ローカルIssue共通スキーマ
 
@@ -38,7 +39,7 @@ GitHub Issue / PR を使わない個人利用環境（ローカル版 OpenCode�
 | フィールド | 型 | 必須/任意 | 値域、制約 |
 |---|---|---|---|
 | `id` | 文字列 | 必須 | `issue-{NNNN}` 形式。ファイル名 `issue-{NNNN}.md` と一致すること |
-| `title` | 文字列 | 必須 | 自由記述。Issue の概要を簡潔に表す日本語または英語 |
+| `title` | 文字列 | 必須 | 自由記述。Issue の概要を簡潔に表す日本語または英語。書式は Issue タイトル記述規則（`workflows/issue-title-policy` Design）に従い、GitHub 版の起票経路と同一の役割別書式を適用する。本 Design は書式を複製しない |
 | `role` | 文字列（enum） | 必須 | `tracking` / `case`。role の意味論は agentdev-issue-tracking Design が所有する |
 | `status` | 文字列（enum） | 必須 | role ごとの値域（後述）から選択される |
 | `created_at` | 文字列（日時） | 必須 | ISO 8601 形式（例: `2026-06-20T21:39:00+09:00`） |

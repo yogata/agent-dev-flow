@@ -89,6 +89,9 @@ implementation:
     - REQ-096-016
     - REQ-096-023
     - REQ-096-026
+    - REQ-100-001
+    - REQ-100-004
+    - REQ-100-006
   src/common/skills/agentdev-workflow-case-ready/references/readiness-and-cleanup.md:
     - REQ-061-035
     - REQ-061-040
@@ -97,6 +100,9 @@ verification:
     - REQ-090-024
     - REQ-090-027
     - REQ-090-029
+    - REQ-100-001
+    - REQ-100-004
+    - REQ-100-006
   src/common/skills/agentdev-workflow-case-ready/references/readiness-and-cleanup.md:
     - REQ-061-034
     - REQ-061-035

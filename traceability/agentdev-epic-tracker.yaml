@@ -1,0 +1,4 @@
+component: agentdev-epic-tracker
+implementation:
+  src/common/skills/agentdev-epic-tracker/references/regex-and-merge-conflict.md:
+    - REQ-100-004

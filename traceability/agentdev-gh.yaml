@@ -25,7 +25,11 @@ implementation:
     - REQ-011-030
     - REQ-083-001
     - REQ-083-005
+  src/common/tools/agentdev-gh/local/case-schema/case-file.md:
+    - REQ-100-001
 verification:
+  src/common/tools/agentdev-gh/local/case-schema/case-file.md:
+    - REQ-100-001
   src/common/tools/agentdev-gh/tests/contracts.test.ts:
     - REQ-011-022
     - REQ-011-023

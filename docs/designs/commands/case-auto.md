@@ -2,9 +2,10 @@
 title: case-auto Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-29"
+updated: "2026-10-03"
 ---
 <!-- ADF-COVERS(implementation): REQ-015-012 -->
+<!-- ADF-COVERS(implementation): REQ-100-004 -->
 <!-- ADF-COVERS(implementation): REQ-034-001, REQ-034-002, REQ-034-003, REQ-034-004, REQ-034-005, REQ-034-006, REQ-034-007, REQ-034-010, REQ-034-011, REQ-034-012, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-017, REQ-034-018, REQ-034-019, REQ-034-020, REQ-034-021, REQ-034-022, REQ-034-023, REQ-034-024, REQ-034-025, REQ-034-026, REQ-034-027, REQ-034-028, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-033, REQ-034-034, REQ-034-035, REQ-034-036, REQ-034-037, REQ-034-038, REQ-034-039, REQ-034-040, REQ-034-041, REQ-034-042, REQ-034-043, REQ-034-044, REQ-034-045, REQ-035-016, REQ-035-017 -->
 <!-- ADF-COVERS(design): REQ-034-002, REQ-034-003, REQ-034-004, REQ-034-005, REQ-034-006, REQ-034-007, REQ-034-010, REQ-034-011, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-017, REQ-034-018, REQ-034-020, REQ-034-021, REQ-034-023, REQ-034-024, REQ-034-026, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-033, REQ-034-034, REQ-034-035, REQ-034-036, REQ-034-037, REQ-034-038 -->
 <!-- ADF-COVERS(design): REQ-034-012, REQ-034-022, REQ-034-025, REQ-034-027, REQ-034-028, REQ-034-040, REQ-034-041, REQ-034-042, REQ-034-043, REQ-034-044, REQ-034-045, REQ-035-016, REQ-035-017 -->
@@ -342,7 +343,7 @@ case-auto 親ループが当該 worktree で回復処理を代行する。
 
 1. `git rebase origin/main` で最新の main へ追従する（必要時）。rebase で解消できないコンフリクトは v2:ADR-0132 のコンフリクト解消モデル Level 2/3 へ委譲する
 2. `git push` でリモートへ反映する
-3. PR 作成を代行する。PR の base branch、タイトル、本文は子 task の Issue に紐づく情報（Issue 番号、Issue タイトル、受け入れ条件、work_type）から生成する
+3. PR 作成を代行する。PR の base branch、タイトル、本文は子 task の Issue に紐づく情報（Issue 番号、Issue タイトル、受け入れ条件、work_type）から生成する。子 task の Issue タイトルは Issue タイトル記述規則（`workflows/issue-title-policy` Design）適用済みの表示用タイトルである。PR タイトル自体は Conventional Commits 形式であり Issue タイトル記述規則 Design の対象外であるため、生成時に書式を複製せず Issue タイトルを入力として参照する
 4. 作成した PR 番号を子 task の result に `completed-pr` として記録する
 5. 通常の case-close フローへ合流させる
 

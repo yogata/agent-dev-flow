@@ -23,7 +23,7 @@ GitHub Issue / PR を使わない個人利用環境（ローカル版 OpenCode�
 | フィールド | 型 | 必須/任意 | 値域、制約 |
 |---|---|---|---|
 | `id` | 文字列 | 必須 | `issue-{NNNN}` 形式。ファイル名 `issue-{NNNN}.md` と一致 |
-| `title` | 文字列 | 必須 | 自由記述。Issue の概要を簡潔に表す日本語または英語 |
+| `title` | 文字列 | 必須 | 自由記述。Issue の概要を簡潔に表す日本語または英語。書式は Issue タイトル記述規則（`workflows/issue-title-policy` Design）に従い、GitHub 版と同一の役割別書式をローカル版起票でも適用する。本スキーマは書式を複製しない |
 | `role` | 文字列（enum） | 必須 | `tracking` / `case`。role の意味論は agentdev-issue-tracking Design が所有 |
 | `status` | 文字列（enum） | 必須 | role ごとの値域（`rules/status.yaml`）から選択 |
 | `created_at` | 文字列（日時） | 必須 | ISO 8601 形式 |
