@@ -79,6 +79,10 @@ case-open がサブエージェントへ本文生成を委譲する接続点（S
 Issue 本文、タイトルを書き込む操作（issue_create、issue_update、comment_create）は、次の標準呼出形式に従う。
 本節は実測された呼出制約の手順化であり、Tool 操作契約の引数定義と併せて読む。
 
+### タイトル書込みの書式参照
+
+- issue_create、issue_update の title 引数で Issue タイトルを書き込む際は、Issue の役割に応じた書式（`<workflows/issue-title-policy>` Design〔Issue タイトル記述規則〕を参照。追跡Issueは Tracking 接頭辞書式）に従う。本手順は書式を複製せず、書式の具体と付与・更新の場面は同 Design を参照する
+
 ### 本文・タイトルの二重引用符回避
 
 - 本文・タイトルは二重引用符を含めない。引用を表す箇所はバッククォート引用に統一する

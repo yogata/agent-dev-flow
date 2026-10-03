@@ -94,6 +94,7 @@ case-open は、上流工程（req-define）で確定した対象要件を実行
 - **Decision 非遷移**: 新規 Decision は proposed のままとし、accepted への状態遷移を実行しない
 - **横断依存検査の警告非阻止**: STEP-5 の横断依存検査は警告の提示のみを行い、Root Case の確立を自動阻止しない。検出源の取得不能時は比較を省略せず検出不能として報告する。警告時の判断は投入者（HITL）への選択肢提示により行い、case-auto 配下では decision_context による親判断解決へ委譲する
 - **実行識別情報の記録**: Root Case 本文に実行識別情報セクション（対象 Case、実行単位、前工程で確定した事項）を構造化形式で記録する。形式は `agentdev-workflow-templates` の実行識別情報セクション規約に従う。機械的解析は同セクションの key-value 行を正とし、自由文中の ID に依存しない。識別情報の一部が取得不能でも停止せず「N/A」を記録する。作成時点で番号が確定しない自己参照値は Issue 作成後に埋め戻す。既存 Issue への遡及適用は行わない
+- **Root Case タイトル**: Root Case の起票時のタイトル書式は `<workflows/issue-title-policy>` Design（Issue タイトル記述規則）を参照する（Root Case は Case 接頭辞書式。合意済みの対象・目的から主題を生成する）。本スキルは書式を複製しない
 - **本文 verbatim**: Root Case 本文、PR 本文は Custom Tool `agentdev_gh` の操作引数としてそのまま渡す（文字コード・一時ファイルの実装詳細は Tool 内部）（`POL-gh-io-delegation`）
 
 ## See Also

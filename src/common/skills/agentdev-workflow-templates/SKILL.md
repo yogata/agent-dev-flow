@@ -213,6 +213,8 @@ Root Case 本文は work_type によらず同一テンプレートを使用す�
 work_type は Definition Package の属性として記録し、ラベル付与と Definition PR の実変更判定（bugfix 等の実変更なし Case では PR 不作成）に用いる。
 work_type 判定基準と固有ルールは `agentdev-workflow-lifecycle` を参照する。
 
+本文テンプレートは Issue 本文の構造のみを規定し、Issue タイトルを規定しない。テンプレート例・変数値にタイトル書式を複製せず、起票時のタイトル書式と付与・更新の場面は `<workflows/issue-title-policy>` Design（Issue タイトル記述規則）を参照する。
+
 ### Issueクローズ時のテンプレート選定（case-close）
 
 | 条件 | コメントテンプレート |

@@ -36,11 +36,12 @@ GitHub Issue/PR を使用するリポジトリ種別のみ実施する。GitHub 
 Root Case 本文候補の生成は preflight 設定検証の通過後に行う（最初の GitHub Issue 作成前に本検証を完了させる）。
 
 1. Root Case 本文候補を生成する。本文は要件doc の合意済み入力を投影し、機能要件、非機能要件、制約、対象外、受け入れ条件を新規に作成しない。テンプレートは `agentdev-workflow-templates` の選定ルールに従う（Root Case 用テンプレート、【必須】セクション完備）
-2. 実行識別情報セクションを `agentdev-workflow-templates` の規約に従い記録する
-3. `review_dispositions` が存在する場合は転記規則に従い「レビュー判断」セクションへ転記する
-4. 曖昧性が残らず Root Case を確立できる場合にのみ、`agentdev_gh` の issue_create で Root Case を作成する（VERIFY）
-5. ラベルは `agentdev-workflow-lifecycle` の work_type 判定に従い付与する
-6. Root Case 確立後の状態は open とし、実装開始を許可しない
+2. Root Case のタイトルは合意済みの対象・目的から主題を生成し、`<workflows/issue-title-policy>` Design（Issue タイトル記述規則）の役割別書式に従う（Root Case は Case 接頭辞書式。書式の具体と主題原則は同 Design を参照し、本手順では複製しない）
+3. 実行識別情報セクションを `agentdev-workflow-templates` の規約に従い記録する
+4. `review_dispositions` が存在する場合は転記規則に従い「レビュー判断」セクションへ転記する
+5. 曖昧性が残らず Root Case を確立できる場合にのみ、`agentdev_gh` の issue_create で Root Case を作成する（VERIFY）
+6. ラベルは `agentdev-workflow-lifecycle` の work_type 判定に従い付与する
+7. Root Case 確立後の状態は open とし、実装開始を許可しない
 
 ### STEP-3: Definition Package 生成と関連付け
 

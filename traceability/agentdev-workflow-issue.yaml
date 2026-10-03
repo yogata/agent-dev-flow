@@ -1,0 +1,9 @@
+component: agentdev-workflow-issue
+implementation:
+  src/common/skills/agentdev-workflow-issue/SKILL.md:
+    - REQ-100-001
+    - REQ-100-006
+verification:
+  src/common/skills/agentdev-workflow-issue/SKILL.md:
+    - REQ-100-001
+    - REQ-100-006

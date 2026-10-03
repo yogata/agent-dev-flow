@@ -20,6 +20,9 @@ implementation:
     - REQ-096-001
     - REQ-096-002
     - REQ-096-017
+  src/common/skills/agentdev-workflow-case-close/references/pr-merge-and-conflict.md:
+    - REQ-100-006
+    - REQ-100-007
 verification:
   src/common/skills/agentdev-workflow-case-close/references/issue-resolution-and-qg4.md:
     - REQ-032-030
@@ -28,6 +31,10 @@ verification:
     - REQ-060-007
   src/common/skills/agentdev-workflow-case-close/references/pr-merge-and-conflict.md:
     - REQ-032-029
+    - REQ-100-006
+    - REQ-100-007
+    - REQ-100-006
+    - REQ-100-007
   src/common/skills/agentdev-workflow-case-close/SKILL.md:
     - REQ-006-112
     - REQ-006-114

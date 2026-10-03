@@ -41,7 +41,8 @@ REQ-{req_number}
 ## 分解
 <!-- 【必須】 -->
 
-<!-- 分解テーブル正規形（agentdev-epic-tracker 新4列形式と整合）: 「#」列は {wave}-{seq} 形式（例: 1-1）、Issue 列は #N のみ（OU ID 等の付記は内容列へ）、ステータス初期値は pending -->
+<!-- 分解テーブル正規形（agentdev-epic-tracker 新4列形式と整合）: 「#」列は {wave}-{seq} 形式（例: 1-1）、Issue 列は #N のみ（OU ID 等の付記は内容列へ）、ステータス初期値は pending。
+内容列へ転記する子 Issue タイトルは子 Issue 作成時点の書式に従い、所属 Wave を先頭に置く Wave 付き Task 接頭辞書式とする。書式の具体は workflows/issue-title-policy Design（Issue タイトル記述規則）「Wave 投影」節を参照し、テンプレートは書式を複製しない。Epic 本文の Wave テーブルと子 Issue タイトルの一致を維持し、正規の構成変更で所属 Wave が変わった場合はタイトルを同期する -->
 | # | Issue | ステータス | 内容 |
 |---|-------|-----------|------|
 | {wave}-{seq} | #{child_issue} | pending | {child_1_title} |

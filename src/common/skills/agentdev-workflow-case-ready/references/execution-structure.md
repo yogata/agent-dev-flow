@@ -16,6 +16,7 @@ OU / Epic / Wave / Issue 階層の語彙意味の正規所有は v4-standard-lif
 - Child Issue を作成し、Root Case に Wave / 依存構造を確定する
 - Epic Issue 本文に構成推論の根拠を記録する
 - Epic Issue 本文の Wave テーブルに各子 Issue の実行方法（並列、直列）を技術的依存関係に基づいて明記する
+- Issue タイトルは `<workflows/issue-title-policy>` Design（Issue タイトル記述規則）に従う。Epic 確定時は Root Case の接頭辞を Epic 接頭辞へ更新し、子 Issue には所属 Wave を先頭に置いた Wave 付き Task 接頭辞書式を付与する。書式の具体と Wave 投影・構成変更時の同期の規則は同 Design「役割別書式」「Wave 投影」節を参照する（本手順では書式を複製しない）。Epic 本文の Wave テーブルと子 Issue タイトルの一致を維持する
 - Wave 構成時に同一 Wave 候補の子 Issue 間で変更対象ファイル集合の重複をファイル単位で前置検出し、検出結果を実行・統合時の競合リスク情報（一時直列化・変更対象の調整・merge 順序・rebase・衝突解消担当の判断に利用）として Epic Issue 本文・Wave 記録へ記録・引き渡す。重複時の処置は変更対象分割・重複許容（衝突解消の担当とマージ順序の事前記録を含む）とし、ファイル重複のみを理由とした Wave 分離を処置に含めない。依存ヒント（同一ファイル衝突の抑制ヒント）は競合リスク信号であり Wave 分離の判断材料としない。成果の成立順序への依存（一方が作成する成果を他方が利用する等）が確認された場合は、それを意味的依存として Wave 構成に反映する。比較対象の変更対象集合が取得不能またはファイル粒度に展開不能な子 Issue がある場合は比較を省略せず検出不能として報告し、無重複扱いしない
 - 既存オープン Issue とのスコープ重複を検知し、重複する子 Issue 生成をスキップまたはユーザー確認する
 - 初期 status は原則 pending とする
@@ -46,7 +47,7 @@ OU / Epic / Wave / Issue 階層の語彙意味の正規所有は v4-standard-lif
 ## Child Issue 本文の構成
 
 - 子 Issue 本文は単独自足の execution contract 要件を満たす（対象範囲、関連 REQ / Decision / Design、変更対象成果物、実現方針、完了条件、test strategy）
-- Epic Issue 本文、子 Issue 本文のテンプレート選定は `agentdev-workflow-templates` の選定ルールに従う（Epic Issue 本文、子 Issue 本文テンプレート）
+- Epic Issue 本文、子 Issue 本文のテンプレート選定は `agentdev-workflow-templates` の選定ルールに従う（Epic Issue 本文、子 Issue 本文テンプレート）。本文テンプレートは Issue タイトルを規定せず、子 Issue タイトルの書式は `<workflows/issue-title-policy>` Design に従う
 - 実行識別情報セクション（対象 Case、実行単位）を含める。形式は `agentdev-workflow-templates` の実行識別情報セクション規約に従う
 - Issue 作成は Custom Tool `agentdev_gh` の issue_create 経由で行う。Parent 行で Root Case（Epic flow では親 Epic Issue）を参照する
 - 本文はファイル経由で扱い、Markdown 行構造を保持する

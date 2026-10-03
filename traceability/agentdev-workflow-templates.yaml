@@ -1,1 +1,12 @@
 component: agentdev-workflow-templates
+implementation:
+  src/common/skills/agentdev-workflow-templates/SKILL.md:
+    - REQ-100-001
+    - REQ-100-005
+    - REQ-100-008
+  src/common/skills/agentdev-workflow-templates/templates/issue_desc_epic.md:
+    - REQ-100-004
+verification:
+  src/common/skills/agentdev-workflow-templates/SKILL.md:
+    - REQ-100-005
+    - REQ-100-008
