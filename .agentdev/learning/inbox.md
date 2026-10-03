@@ -150,3 +150,11 @@
 - 内容: 未クローズ Case 群を labels=["case"] で取得したところ、role=case のオープン Case 18件のうち「case」ラベル付きは #3333・#3337 の2件のみ返却され16件が欠落した。物理ラベル付与が兄弟 Case 間で不揃いであり、labels フィルタの空配列に近い応答を Case 存在の絞り込み根拠にすると重複生成や検出漏れを招く。search なしの unfiltered 一覧（state: open）で全件を取得して回復した
 - 学び: issue_list の labels は論理値（role 等）の物理写像の結果であり、role・投入バッチの識別には state と unfiltered 一覧＋タイトル解析を使う。「空配列の成功応答は不存在の証拠としない」原則（REQ-092 系・AG-016）は search トークンだけでなく labels フィルタにも適用される
 - 発見元: Case #3364（backlog-pool-20261003・OU-003）実行時の自工程観測
+
+## 2026-10-03: 対応関係の既存 inline 宣言がある Design への sidecar 登録は duplicate-inconsistencies を招く
+
+- 問題クラス: implementation error（対応関係の登録先誤り・検出後に判断変更で回避）
+- 発生工程: case-run RA-005（Case #3336・REQ-061-021 design 対応登録）
+- 内容: REQ-061-021 の design 対応を traceability sidecar（traceability/agentdev-workflow-case-ready.yaml）へ design セクション新設で登録したところ、case-ready.md の既存 inline 宣言 15件と ID 集合不一致で duplicate-inconsistencies fail。inline 宣言への追加に登録判断を変更して sidecar 登録を取り消し、traceability check 全 pass で解消
+- 学び: 同一論理関係（artifact パス × role）を複数情報源が保持する場合、情報源ごとの要件行 ID 集合一致が契約（duplicate-inconsistencies 検出基準）のため、既存 inline 宣言がある Design への対応関係追加は inline 宣言へ追加する。既存宣言の sidecar 集約（移管）は本 Case 対象範囲の拡大となるため不採用
+- 発見元: Case #3336（backlog-pool-20261003・OU-005）実行時の自工程観測
