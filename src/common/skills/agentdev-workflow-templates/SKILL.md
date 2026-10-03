@@ -29,8 +29,43 @@ agentdev系コマンドで使用するIssue/PR本文、コメントテンプレ�
 | `issue_comment_review_ng.md` | レビューNG記録 | - | レビューNG時コメント |
 | `issue_comment_feature_implementation.md` | 実装記録 | case-close | PRマージ後コメント (機能追加) |
 | `issue_comment_bug_record.md` | 対応記録 | case-close | PRマージ後コメント (バグ修正、軽微変更/リファクタリング、保守作業/ドキュメント、雑務) |
+| `issue_comment_record_start.md` | 工程記録（着手） | case-run | 実装着手の事実を報告された時 |
+| `issue_comment_record_handoff.md` | 工程記録（引き渡し） | case-run / case-close | 工程の移行（実装完了から完了判定への引き渡し等） |
+| `issue_comment_record_hold.md` | 工程記録（停止） | case-run | 確定した停止を報告された時点（途中報告を含む） |
+| `issue_comment_record_resume.md` | 工程記録（再開） | case-run | 再開条件の充足確認と最新条件の引き渡し時 |
+| `issue_comment_record_decision_change.md` | 工程記録（判断変更） | case-run | 確定した判断変更・判断待ちを報告された時点 |
+| `issue_comment_record_completion.md` | 工程記録（完了） | case-close | QG-4 合格後のクローズ契機 |
 
 コメントテンプレートの本文は Read tool で読み込んで変数置換し、Custom Tool `agentdev_gh` の comment_create 操作で投稿する。テンプレートファイル名 `issue_comment_*.md` は用途識別子であり、Tool 操作名を指さない。
+
+### 工程記録コメントテンプレート（Case Issue 記録契機）
+
+Case Issue の工程記録（記録様式の正は workflows/issue-lifecycle-records Design）を投稿する際の記録種別別テンプレート。取りまとめ（実行担当の報告を受けた進行側工程）が投稿する。
+
+#### 記録契機とテンプレートの対応
+
+| 記録契機 | テンプレート | 投稿主体 | 種別別必須項目 |
+|---|---|---|---|
+| 着手 | `issue_comment_record_start.md` | case-run | なし（基本項目のみ） |
+| 引き渡し | `issue_comment_record_handoff.md` | case-run | 残作業と受取役割 |
+| 停止 | `issue_comment_record_hold.md` | case-run | 再開条件 |
+| 再開 | `issue_comment_record_resume.md` | case-run | 最新条件参照 |
+| 判断変更 | `issue_comment_record_decision_change.md` | case-run | 撤回対象 |
+| 完了 | `issue_comment_record_completion.md` | case-close | 判定根拠 |
+
+#### 基本項目と選定ルール
+
+- 記録コメントの基本項目は 記録種別、対象工程、事実・結果、理由・根拠、次の行動、関連合意・成果物 とする。「理由・根拠」「関連合意・成果物」は非該当時に省略でき、必須項目は該当データがない場合も「該当なし」を記載しセクション自体は残す
+- 種別別必須項目は上表のとおり。完了には判定根拠が必須であり、検証詳細自体は重複記載せず成果物を参照する
+- 委譲要求（委譲起動）は実着手と同一視せず、着手記録は実装着手の事実を報告された時点で行う。工程終了を待たない途中報告（確定した停止・判断待ち）は停止・判断変更テンプレートで記録できる
+- 投稿主体: 実行担当は報告のみを行い、記録コメントの投稿と本文現在地・結果セクションの更新は取りまとめが実行する。実行の申告だけで完了扱いにしない
+- 投稿前の必須項目検証は記録コメント検証スクリプト（`agentdev-workflow-case-run/scripts/record-comments.ts`、決定的処理）で行う。検証不備の本文は投稿しない
+- 既存の対応記録コメントテンプレート（`issue_comment_feature_implementation.md`、`issue_comment_bug_record.md`）と共存する。対応記録コメントは work_type 別の詳細対応記録と検証差分セクションの置き場所であり、完了記録コメントとの間で検証詳細を重複記載しない
+
+#### セクション仕様
+
+- 各テンプレートは基本セクションに種別別必須セクションを追加した構造とし、セクション見出しは `## ` 直下で統一する
+- `<!-- 【必須】 -->` マーカー付きセクションは省略不可。種別別必須セクションの本文が空または「該当なし」の場合は検証不備として投稿を抑止する
 
 ### case-open テンプレート（Root Case 用）
 

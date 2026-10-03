@@ -89,6 +89,7 @@ Epic Issue 入力時も case-run 自身の Wave 構成の読み取り、現在 W
 - `agentdev-quality-gates`: QG-3 前置の鮮度検出、QG-4 bun test フル suite 正規形（機械受理基準）
 - Custom Tool `agentdev_gh`: Issue 本文読取等の I/O 操作
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
+- `agentdev-workflow-templates`: 工程記録コメントテンプレート（記録種別別6種）の選定と様式
 - `agentdev-traceability`: トレーサビリティ能力（coverage、check。委譲内の対応関係確認と PR 作成前検査。fail-open）
 - integrity checker skill（リポジトリ固有・配布対象外）: check_changed_docs.ts（targeted docs guard）、check_extensions.ts（IR-{NNN}）、check_distribution_boundary.ts（配布依存境界、source / link 両 profile）、generate_indexes.ts（AUTOGEN 索引再生成）
 
@@ -106,6 +107,17 @@ case-run の実行担当（委譲内サブエージェント）は、対象要�
 - トレーサビリティ能力を利用して新規の依存関係、実行構成、Wave 構成、実行順序を設計しない。依存関係と実行構成の決定責務は上流工程（case-open の execution_unit 構成）が所有し、Wave 実行制御（共有 active Issue task 枠、Wave 収束と依存充足の gate）は case-auto orchestration stage 3 が所有する
 - agentdev-traceability の不在、実行失敗、空結果、候補過多だけを理由として workflow を停止しない（fail-open）。README 索引、正規成果物の直接読取、`rg` 等の独立探索手段で継続し、正規成果物そのものの異常とトレーサビリティ機能側の異常を区別する
 
+## 工程記録の取りまとめ反映（記録契機）
+
+case-run は記録契機に応じて、実行担当の報告を受けた取りまとめとして Case Issue の記録コメント投稿と本文現在地更新を実行する（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}。記録コメント様式の正は `workflows/issue-lifecycle-records` Design、テンプレート投影と選定は `agentdev-workflow-templates`）。
+
+- **記録契機**: 着手、引き渡し、停止、再開、判断変更、完了の6種とする。内部の全手順、全ツール実行、思考、定期投稿を記録契機に追加しない。短い複数の変化はまとめて記録でき、停止の通知を遅らせない
+- **委譲要求と実着手の区別**: STEP-S4 の委譲起動（委譲要求）は着手記録の契機としない。実行担当から実装着手の事実を報告された時点で着手記録する
+- **工程終了を待たない途中報告**: 実行担当からの途中報告（確定した停止・判断待ち・判断変更影響）は result 確定を待たず、受領時点で対応する記録契機の反映（停止等の記録コメント投稿と本文現在地の待機更新）を行う。途中報告は result 契約（4状態）の最終確定値を代替しない
+- **反映経路**: 記録コメントは記録種別に応じた工程記録コメントテンプレート（`agentdev-workflow-templates` 選定）を用い、Custom Tool `agentdev_gh` の comment_create で投稿する。本文現在地更新は Custom Tool `agentdev_gh` の issue_update で行う。投稿・更新の本文は事前に記録コメント検証スクリプト（scripts/record-comments.ts、決定的処理。種別別必須項目検証、現在地・結果セクション構築と既存本文への適用を提供）で検査し、検証不備の本文を投稿しない（fail-closed）。Custom Tool の操作契約（VERIFY つき fail-closed）は変更しない
+- **Epic 反映待ちの読取規律**: Epic 本文への反映が完了するまでの間は、子 Issue 本文の現在地が最新の情報として読み取れる状態を維持する（Epic 本文の書込みは case-close 単一書き手。case-run は書込まない）
+- **完了契機**: 完了記録（記録種別=完了）と本文結果セクション更新は case-close が判定主体として担当する（本スキル「共通制約」参照）。case-run は完了判定を行わず、実装完了から完了判定への移行を引き渡し種別で記録する
+
 ## 共通制約
 
 - **スコープ**: 単一 Issue のみを処理する。Epic や Wave を処理対象とする実行契約は廃止されており、Wave 実行制御は case-auto orchestration stage 3 が単一所有する。Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）は扱わない。Epic 再指定時の次 Wave 処理も引き受けない（Epic 全体の進行管理は case-auto が所有）
@@ -117,6 +129,7 @@ case-run の実行担当（委譲内サブエージェント）は、対象要�
 - **blocked 正規再開経路**: 実装中に新たな変更影響候補を発見した場合、既存 Issue scope 内で処理可能な内部実装上の影響は自律処理する。Issue scope、完了条件、REQ/Decision/Design、必須品質統制の追加変更が必要な場合は blocked とし、Root Case の resume_command による正規再開経路（人間に留保された判断の新規確定が必要な場合は req-define、再合意済みの場合は case-revise）に従う。staleness check で差異を検出した場合も Issue 本文を単独で書き換えず、差異を報告して blocked とし同一の正規再開経路に従う
 - **docs 整合性検査連携**: PR 対象ファイルに docs 変更を含む場合は docs 整合性検査を実行し、結果を PR 本文に記録して case-close へ連携する。検査対象 root の誤解決（配置先起点の誤リポジトリ検査）は検査見逃しとして扱う
 - **完了条件チェックボックス**: case-run、実行担当サブエージェントは完了条件チェックボックスを更新しない（case-close QG-4 の責務）
+- **工程記録の取りまとめ反映**: 委譲 result 受領時・途中報告受領時は「工程記録の取りまとめ反映（記録契機）」節に従い、記録コメント投稿と本文現在地更新を実行する（手順詳細は references/delegation-and-result.md）
 - **Findings / Design確定候補**: 実行担当サブエージェントが PR 本文の `## Findings / Capture候補` と `## Design確定候補` に記録する（別セクション、混在させない）。case-run の capture 責務は記録のみ
 - **外部実行ハーネスの中間成果物**: plan artifact 等を AgentDevFlow の永続成果物として扱わず、最終結果は PR URL で受領する
 - **L2 タイムスタンプ**: worktree 設定、実行担当サブエージェント実行、worktree クリーンアップの各開始・終了時刻（JST）を計測し、完了報告の L2 内訳に含める（case-auto の L1 内訳の入力）
