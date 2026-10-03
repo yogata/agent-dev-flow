@@ -61,7 +61,7 @@ updated: 2026-07-26
 | `docs/guides/glossary.md` | 用語集。廃止語彙の歴史的識別子値を定義する語彙参照文書 |
 | `retired/` 配下 | 履歴参照領域 |
 | テスト fixture（`*.test.ts` 等） | 検査ロジックのテストデータは検出対象外 |
-| `local/runtime-package-boundary.md` | link mode の現行契約と廃止済み生成方式の境界を定義する正本文書であり、廃止語彙を歴史的経緯として記載する正当なファイル（REQ-009-028/029） |
+| `local/runtime-package-boundary.md` | link mode の現行契約と廃止済み生成方式の境界を定義する原本文書であり、廃止語彙を歴史的経緯として記載する正当なファイル（REQ-009-028/029） |
 | `IR-046`、`IR-048` ルールファイル | 廃止識別子（`generated_by: local-opencode-transform`）を検出対象とする整合性ルール。検出対象語彙をルール定義として参照する正当なファイル |
 | `REQ-009` | link mode 移行に伴う廃止確定を定義する REQ。廃止対象資産のパス、語彙を要件文として記載する正当なファイル |
 | `v2:REQ-0158` | IR-057 検出を定義していた旧 REQ（retired）。検出対象語彙一覧、検出仕様を要件文として記載する正当なファイル（現在は `docs/requirements/retired/v2:REQ-0158.md` へ移動） |

@@ -37,13 +37,13 @@ AgentDevFlow の実行時パッケージ境界を定義し、本体リポジト�
 
 | Type ID | 名称 | 説明 | `.opencode/` の意味 | 典型例 |
 |---------|------|------|---------------------|--------|
-| `self-hosting` | AgentDevFlow 本体開発リポジトリ | 原本と配置先が同一リポジトリに存在 | 実行時配置先（ジャンクション → `src/common/`〔共通正本。plugin は `src/opencode/plugins/`〕） | `agent-dev-flow` |
+| `self-hosting` | AgentDevFlow 本体開発リポジトリ | 原本と配置先が同一リポジトリに存在 | 実行時配置先（ジャンクション → `src/common/`〔共通原本。plugin は `src/opencode/plugins/`〕） | `agent-dev-flow` |
 | `consumer-with-agentdev` | AgentDevFlow 導入製品リポジトリ | AgentDevFlow 提供 skill/command を利用 | プロジェクトローカルカスタマイズ入口 + AgentDevFlow 実行時位置 | 各種製品開発リポジトリ |
 | `consumer-local` | 非 AgentDevFlow OpenCode プロジェクト | 独自 command/skill のみ | プロジェクトローカルカスタマイズ専用 | 実験的リポジトリ |
 | `consumer-generated` | ローカル版 OpenCode 導入リポジトリ | ローカル版 OpenCode を導入する利用側リポジトリ | link mode による AgentDevFlow 実行時位置（Custom Tool `agentdev_gh` の実行ディレクトリのみ `src/common/tools/agentdev-gh/local/` から接続） | 個人利用環境のローカルリポジトリ |
 
 `consumer-generated` はローカル版 OpenCode を link mode で導入する利用側リポジトリである（REQ-009, REQ-009, REQ-009）。
-`.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を共通正本 `src/common/` 配下へ接続し、Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけを `src/common/tools/agentdev-gh/local/`（Local 実装）へ接続する。
+`.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を共通原本 `src/common/` 配下へ接続し、Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけを `src/common/tools/agentdev-gh/local/`（Local 実装）へ接続する。
 詳細は本 Design の「link mode 接続手順技術詳細」を参照。
 
 ### リポジトリ種別判定基準
@@ -68,11 +68,11 @@ AgentDevFlow の実行時パッケージ境界を定義し、本体リポジト�
   plugins/agentdev-*/            → junction → src/opencode/plugins/agentdev-*/ (per plugin)
   .gitignore                     → real file (manually managed)
   (opencode runtime files)       → sessions, config, etc. managed by opencode itself
-src/common/                      → 共通正本（commands、skills、tools engine、guards）
-src/opencode/                    → OpenCode 接続領域（plugin/hook 正本、ホスト固有接続）
+src/common/                      → 共通原本（commands、skills、tools engine、guards）
+src/opencode/                    → OpenCode 接続領域（plugin/hook 原本、ホスト固有接続）
 ```
 
-- 原本編集は `src/common/`（共通正本）と `src/opencode/`（OpenCode 接続領域〔plugin/hook 等〕）で実施
+- 原本編集は `src/common/`（共通原本）と `src/opencode/`（OpenCode 接続領域〔plugin/hook 等〕）で実施
 - `.opencode/` は実ディレクトリとして動作（全体ジャンクションではない）
 - `scripts/self-sync.ps1` が `commands/agentdev/`、`skills/agentdev-*/`、`tools/agentdev-*/`、`plugins/agentdev-*/` を個別ジャンクションとして管理
 - ジャンクション対象は `agentdev-*` グロブで動的列挙（ハードコードなし）
@@ -149,7 +149,7 @@ vendored engine bundle（`vendor/textlint-engine.bundle.json`、`vendor/kuromoji
   issues/                 → ローカルIssue（Issue / PR 相当の永続情報）
 ```
 
-- `.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を共通正本 `src/common/` 配下へ接続する（REQ-009 decision #2）
+- `.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を共通原本 `src/common/` 配下へ接続する（REQ-009 decision #2）
 - Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけを `src/common/tools/agentdev-gh/local/` へ接続する（REQ-009 decision #3、REQ-011-006）
 - link target が意図した target 以外へ解決される場合は link 設定を停止する（REQ-009-010, REQ-009 decision #6）
 - `.opencode/commands/`, `.opencode/skills/`, `.opencode/` 配下ひな形は link により git 管理対象外（REQ-009-008, REQ-009 decision #1）
@@ -241,7 +241,7 @@ self-hosting 向けの `scripts/self-sync.ps1` と consumer 向けの `scripts/i
 
 | Mode | 動作 |
 |------|------|
-| `apply` | 正本（`src/common/`〔共通正本〕・`src/opencode/`〔plugin 正本〕） → `.opencode/` の同期実行 |
+| `apply` | 原本（`src/common/`〔共通原本〕・`src/opencode/`〔plugin 原本〕） → `.opencode/` の同期実行 |
 | `check` | 乖離検出（終了コードで判定）。同期対象を変更しない |
 | `dry-run` | 変更予測（実行なし）。同期対象を変更しない |
 
@@ -253,15 +253,15 @@ Consumer では `scripts/install.ps1` が AgentDevFlow 本体から提供され�
 
 ### stale 管理投影物の削除境界
 
-正本から除外・削除された ADF 管理対象投影物（stale 管理投影物）の削除は、ADF 管理境界の内部で完結する（REQ-058）。
+原本から除外・削除された ADF 管理対象投影物（stale 管理投影物）の削除は、ADF 管理境界の内部で完結する（REQ-058）。
 
-- 削除対象は、ADF が管理する投影物として配置したもののうち、正本から削除されたもの、および配布・投影対象から明示的に除外されたことにより管理対象から外れたものとする
+- 削除対象は、ADF が管理する投影物として配置したもののうち、原本から削除されたもの、および配布・投影対象から明示的に除外されたことにより管理対象から外れたものとする
 - `repo-local` prefix の成果物、利用者が独自に作成した `.opencode/` 配下の成果物、その他 ADF が管理していない成果物は、名前や配置場所が近似しているだけでは削除対象にしない
 - ADF 管理物かどうかを確定できない成果物は自動削除せず、既存契約に従って非破壊的に扱う
-- Plugin loader shim 等、ADF が生成・管理し正本側の対象消滅によって不要となる生成物の stale 削除は既存契約を維持し、上記の削除境界と矛盾させない。repo-local 配布除外と自己ホスト投影の非対称（「Tools / Plugins の配布・投影」参照）は本削除境界で変えない
+- Plugin loader shim 等、ADF が生成・管理し原本側の対象消滅によって不要となる生成物の stale 削除は既存契約を維持し、上記の削除境界と矛盾させない。repo-local 配布除外と自己ホスト投影の非対称（「Tools / Plugins の配布・投影」参照）は本削除境界で変えない
 - archive installer（junction 方式ではない）は本削除契約の直接対象外とし、同等の収束契約が必要かどうかの評価を本契約の実装対象に含めない
 
-stale 管理投影物の確定は次の機械的基準で行う: (1) 正本相対でターゲットパスが一致すること、(2) LocalMode リダイレクト先を包含判定に含めること、(3) broken junction は reparse data の参照先で判定すること。管理物と判定できない junction は削除せず非破壊に [INFO] 報告する。
+stale 管理投影物の確定は次の機械的基準で行う: (1) 原本相対でターゲットパスが一致すること、(2) LocalMode リダイレクト先を包含判定に含めること、(3) broken junction は reparse data の参照先で判定すること。管理物と判定できない junction は削除せず非破壊に [INFO] 報告する。
 
 ## scripts 公開入口と内部配置
 
@@ -280,7 +280,7 @@ release archive 内では consumer が実行する公開入口として `scripts
 
 ## Tools / Plugins の配布・投影
 
-Custom Tool（正本: src/common/tools/〔Tool engine〕）と Plugin / Hook（正本: src/opencode/plugins/〔OpenCode 接続領域〕）を正規配布種別として扱う
+Custom Tool（原本: src/common/tools/〔Tool engine〕）と Plugin / Hook（原本: src/opencode/plugins/〔OpenCode 接続領域〕）を正規配布種別として扱う
 （REQ-052）。原本と実行時投影は Command / Skill と同一の source・projection 原則に従い（配備形態の正は DEC-049）、
 link mode の接続対象に含める。scripts/ 直下の公開入口は従来どおり2本に固定し、Tool / Plugin の追加によって
 新たな公開入口を作らない（REQ-050-001、REQ-052-008）。ディレクトリ構造の詳細は本 Design が所有する。
@@ -289,11 +289,11 @@ link mode の接続対象に含める。scripts/ 直下の公開入口は従来�
 
 repo-local Plugin（REQ-002-045）の配布・投影については次のとおりである。
 
-- repo-local Plugin の正本配置原則は `src/opencode/plugins/<agentdev-name>/` 配下である。consumer 配布系全経路（`scripts/install.ps1`、`scripts/consumer/` 配下の archive installer、`scripts/self/release/package-release-archive.ps1`）は repo-local 配布除外を実装し、3ファイルの列挙条件を同期する義務を持つ。
+- repo-local Plugin の原本配置原則は `src/opencode/plugins/<agentdev-name>/` 配下である。consumer 配布系全経路（`scripts/install.ps1`、`scripts/consumer/` 配下の archive installer、`scripts/self/release/package-release-archive.ps1`）は repo-local 配布除外を実装し、3ファイルの列挙条件を同期する義務を持つ。
 - `scripts/self-sync.ps1` は repo-local Plugin を除外しない（自己ホスト投影を維持する）。理由は、consumer 配布と自己ホスト投影が非対称であるためである。repo-local Plugin は REQ-052-006 により consumer への配布対象外である一方、自己ホスト環境では Plugin を利用可能にする必要がある。自己ホスト投影は canonical チェックアウト内部の source → projection 構成（`.opencode/plugins/` への junction と depth-1 loader shim 生成）であり、consumer への配布ではないため、配布除外機構の適用対象外である。
 - 除外機構の実現方式は明示的除外リスト等とする。REQ-002-011 の repo-* prefix 方式を plugin に採用しない（shim 名が repo-*.ts になり、stale shim 検出フィルタ等の波及修正が増えるため）。
 
-配布境界 checker の repo-local モデル: 配布境界 checker は consumer 配布系と自己ホスト投影の非対称（上記のとおり）を repo-local モデルとして前提とする。detector の列挙条件（除外対象の検出箇所一覧）は repo-local Plugin の正本配置原則（`src/opencode/plugins/<agentdev-name>/`）と同期を維持し、列挙の乖離が観測された場合は個別特例の追加ではなく検査側の一般化で解消する方針とする。
+配布境界 checker の repo-local モデル: 配布境界 checker は consumer 配布系と自己ホスト投影の非対称（上記のとおり）を repo-local モデルとして前提とする。detector の列挙条件（除外対象の検出箇所一覧）は repo-local Plugin の原本配置原則（`src/opencode/plugins/<agentdev-name>/`）と同期を維持し、列挙の乖離が観測された場合は個別特例の追加ではなく検査側の一般化で解消する方針とする。
 - 将来 repo-local Plugin が複数化した時点で、マーカー方式（package.json マーカーフィールド等）への拡張条件を判断する。
 
 outside-root 判定は、ワークスペース外の書き込みを原則ブロック（fail-closed）しつつ、事前承認済みディレクトリ（OS 標準 TEMP 等、実行環境が提供する一時領域）への書き込みを例外として許可する。例外はパス個別の特例列挙ではなく、承認済み一時領域カテゴリとして判定基準に組み込む（一般化: ru-batch-20260903 方針、本 Design が所有）。
@@ -301,7 +301,7 @@ outside-root 判定は、ワークスペース外の書き込みを原則ブロ�
 ### 自己ホスト投影対称性検査の機械検査契約
 
 repo-local Plugin の自己ホスト投影対称性検査を機械検査契約として追加する。
-- 検査対象: 正本（src/opencode/plugins/agentdev-textlint-guard/ 配下の投影対象構造）と自己ホスト投影（.opencode/plugins/ 配下）の対称性（投影欠落・余剰・shim 内容不一致）
+- 検査対象: 原本（src/opencode/plugins/agentdev-textlint-guard/ 配下の投影対象構造）と自己ホスト投影（.opencode/plugins/ 配下）の対称性（投影欠落・余剰・shim 内容不一致）
 - 検出扱い: 対称性破れは [DIVERGENCE] 相当の検出として docs-check 系検査結果に報告する
 - 対称性の契約参照: 本 Design の投影契約、plugin README の配布宣言、self-sync.ps1 の動的列挙の 3 点
 - 投影の再同期（self-sync.ps1 再実行）は環境操作であり、検出時の対応は環境操作として完了報告等に実行指示を含める運用とする（検査自体は repo 内で完結する）
@@ -333,8 +333,8 @@ repo-local Plugin の自己ホスト投影対称性検査を機械検査契約�
 | `skills/agentdev-*/` | `src/common/skills/agentdev-*/` | 通常版と同一接続先（REQ-009 decision #2） |
 | `tools/agentdev-gh/` | `src/common/tools/agentdev-gh/local/` | local mode のみ差し替え接続先（Local 実装）。Custom Tool `agentdev_gh` の実行ディレクトリ（REQ-009 decision #3, REQ-011-006） |
 
-agentdev-gh 以外は通常版と同一の共通正本 `src/common/` 配下へ接続し、Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）のみ `src/common/tools/agentdev-gh/local/`（Local 実装）へ接続することでローカル版環境を構成する。
-Local 実装の原本は共通正本側（src/common/tools/agentdev-gh/local/）であり、ローカル版は共通正本を変更しない（REQ-009-015/016）。
+agentdev-gh 以外は通常版と同一の共通原本 `src/common/` 配下へ接続し、Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）のみ `src/common/tools/agentdev-gh/local/`（Local 実装）へ接続することでローカル版環境を構成する。
+Local 実装の原本は共通原本側（src/common/tools/agentdev-gh/local/）であり、ローカル版は共通原本を変更しない（REQ-009-015/016）。
 
 ### ローカル I/O パッケージ契約
 
@@ -346,7 +346,7 @@ Local 実装の原本は共通正本側（src/common/tools/agentdev-gh/local/）
 
 `case-schema/` はローカル I/O の操作用定義として当該パッケージに含める。
 
-ローカルIssueのスキーマ正本は [ローカルIssue共通スキーマ](local-case-file.md) とし、ローカル I/O パッケージは正本を再定義しない。
+ローカルIssueのスキーマ原本は [ローカルIssue共通スキーマ](local-case-file.md) とし、ローカル I/O パッケージは原本を再定義しない。
 
 ローカル版のための汎用バックエンド抽象化、`src/opencode-local/skills/`、ローカル版 command、ローカル版 template は作成しない。
 
@@ -356,7 +356,7 @@ Local 実装の原本は共通正本側（src/common/tools/agentdev-gh/local/）
 
 | パラメータ | リンク構成 |
 |-----------|-----------|
-| `-LocalMode` 未指定（既定） | 通常版: 全 agentdev command/skill/tool を共通正本 `src/common/` 配下へ接続（plugin は `src/opencode/plugins/` 配下） |
+| `-LocalMode` 未指定（既定） | 通常版: 全 agentdev command/skill/tool を共通原本 `src/common/` 配下へ接続（plugin は `src/opencode/plugins/` 配下） |
 | `-LocalMode` 指定時 | local mode: `tools/agentdev-gh/`（Custom Tool `agentdev_gh` の実行ディレクトリ）のみ `src/common/tools/agentdev-gh/local/` へ接続、それ以外は通常版に同じ |
 
 `-Mode`（dry-run / check / apply）は `-LocalMode` の有無にかかわらず従来通り動作し、チェックアウト検証と junction 設定の各フェーズで適用される。
@@ -366,12 +366,12 @@ Local 実装の原本は共通正本側（src/common/tools/agentdev-gh/local/）
 ### scripts/install.ps1 -Mode check の local mode リンク状態検出条件
 
 `scripts/install.ps1 -Mode check` は `.opencode/tools/agentdev-gh/` が `src/common/tools/agentdev-gh/local/` への link として解決される場合、リポジトリ種別を `consumer-generated` として検出、報告する（リポジトリ種別判定基準表参照）。
-通常版のリンク構成（`tools/agentdev-gh/` も共通正本 `src/common/` 配下へ接続）との違いを当該 link target で識別する。
+通常版のリンク構成（`tools/agentdev-gh/` も共通原本 `src/common/` 配下へ接続）との違いを当該 link target で識別する。
 
 ### チェックアウト検証（usable checkout 判定）
 
 `scripts/install.ps1`（-Mode apply / check / dry-run）は、agent-dev-flow チェックアウトの検証を git リポジトリ性必須判定ではなく usable checkout 判定で行う。
-判定基準はチェックアウト配置先（既定 `.agentdev-plugin/`）配下に共通正本 `src/common/` が存在することであり、`.git` の存在を必須としない（REQ-009-047、REQ-009-048）。
+判定基準はチェックアウト配置先（既定 `.agentdev-plugin/`）配下に共通原本 `src/common/` が存在することであり、`.git` の存在を必須としない（REQ-009-047、REQ-009-048）。
 
 チェックアウトが検出できない場合（チェックアウト配置先に `src/common/` が存在しない場合を含む）、エラー停止し、clone コマンド例とソースアーカイブ取得手順を案内表示する。
 provisioning を代行実行しない。
@@ -406,7 +406,7 @@ link target が意図した target 以外へ解決される場合は link 設定
 | ジャンクション以外のパス | パスが存在するがジャンクションでない | エラー停止 | エラーとして報告 |
 
 意図した src 配下は LocalMode の有無により切り替わる。
-通常版は共通正本 `src/common/` 配下（plugin は `src/opencode/plugins/` 配下）、LocalMode 指定時は `agentdev-gh` のみ `src/common/tools/agentdev-gh/local/`、それ以外は通常版に同じである（REQ-009 decision #2, #3）。
+通常版は共通原本 `src/common/` 配下（plugin は `src/opencode/plugins/` 配下）、LocalMode 指定時は `agentdev-gh` のみ `src/common/tools/agentdev-gh/local/`、それ以外は通常版に同じである（REQ-009 decision #2, #3）。
 
 wrong target は「ジャンクション自体は存在するが、意図した接続先へ接続されていない、または接続先が解決不能」な状態である。
 PR #1120 により、従来の「ジャンクションが存在すれば正常とみなす」判定から、`Resolve-Path` により実際の解決先と期待される src 配下を比較して意図した target か確認する判定へ拡張された。
@@ -434,7 +434,7 @@ wrong target 検出、再作成ロジックは LocalMode と通常版 install �
 
 `.opencode/skills/` 配下は既定で `.gitignore` により git 管理対象外である。
 配布物（`src/common/commands/`, `src/common/skills/`）が `.opencode/skills/` 配下のスキルを参照する場合、新規 clone 環境でスキルが不在になり配布物の自己完結性（self-contained）が崩れる。
-配布物が依存するスキルは共通正本 `src/common/skills/` へ昇格（配布物化）し、repo-local 専用スキルと明確に境界を分ける（v2:ADR-0134）。
+配布物が依存するスキルは共通原本 `src/common/skills/` へ昇格（配布物化）し、repo-local 専用スキルと明確に境界を分ける（v2:ADR-0134）。
 
 ### 昇格基準
 
@@ -468,7 +468,7 @@ wrong target 検出、再作成ロジックは LocalMode と通常版 install �
 
 ## v4 adapter 境界への接続
 
-本 Design が定義するリポジトリ種別、.opencode/ の意味、link mode、Tools / Plugins の配布・投影は、Harness/Backend adapter 境界（DEC-036）の下で維持される。link 元の正本は共通正本領域（src/common/）へ移行しており、src/opencode/ と src/senpi/ はホスト別接続領域として並列する。配備形態の正本は Decision「ADF 共通正本とホスト接続領域の分離」、配置契約と投影モデルの詳細はマルチホスト正本モデル Design（foundations/multi-host-canonical-model.md）が所有する。ローカル版 Custom Tool の原本は共通正本側の Tool engine 領域に整理され、OpenCode 領域（src/opencode/）への型・schema 参照を持たない（REQ-009-015/016）。
+本 Design が定義するリポジトリ種別、.opencode/ の意味、link mode、Tools / Plugins の配布・投影は、Harness/Backend adapter 境界（DEC-036）の下で維持される。link 元の原本は共通原本領域（src/common/）へ移行しており、src/opencode/ と src/senpi/ はホスト別接続領域として並列する。配備形態の原本は Decision「ADF 共通原本とホスト接続領域の分離」、配置契約と投影モデルの詳細はマルチホスト原本モデル Design（foundations/multi-host-canonical-model.md）が所有する。ローカル版 Custom Tool の原本は共通原本側の Tool engine 領域に整理され、OpenCode 領域（src/opencode/）への型・schema 参照を持たない（REQ-009-015/016）。
 
 ## 関連項目（See Also）
 

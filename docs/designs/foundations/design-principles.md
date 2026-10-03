@@ -8,7 +8,7 @@ updated: 2026-09-19
 # 設計原則
 
 > **Design と Decision の境界（REQ-001-043/044/050）**: 本 Design は現行仕様として機能する分類表、導出表（work_type / scale / workflow_route 等）、適用基準を扱う。
-> 判断理由、歴史的経緯、設計意図、トレードオフ説明の正本は以下の Decision 群を参照すること（新規 Decision は作成しない、既存 Decision で覆えない内容は本 Design の範囲外として報告）。
+> 判断理由、歴史的経緯、設計意図、トレードオフ説明の原本は以下の Decision 群を参照すること（新規 Decision は作成しない、既存 Decision で覆えない内容は本 Design の範囲外として報告）。
 > - REQ-001（文書種別責務境界、記述対象境界）
 > - REQ-001（実行時配布物と執筆時関心の分離）
 > - REQ-001（Skill references Design 分離基準）

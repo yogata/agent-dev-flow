@@ -19,8 +19,8 @@ updated: "2026-09-20"
 - canonical owner 変更時: 両ファイルで参照先を更新する
 - 新規 REQ 追加、廃止時: 本ファイルの対応行を追加、削除し、`req-impact-map.md` で影響先ルールドメインの整合を確認する
 
-req-impact-map.md の配置の正本は `../responsibilities/req-impact-map.md` 冒頭の配置記述であり、本ファイルはそこへの参照導線を保持する。`responsibilities/` 残置を現行配置として維持する。
-本節では関係整理のみを扱い、配置判断の正本を当該ファイルへ集約する。
+req-impact-map.md の配置の原本は `../responsibilities/req-impact-map.md` 冒頭の配置記述であり、本ファイルはそこへの参照導線を保持する。`responsibilities/` 残置を現行配置として維持する。
+本節では関係整理のみを扱い、配置判断の原本を当該ファイルへ集約する。
 
 ## 配布物対応宣言（ADF-COVERS）の配置規則
 

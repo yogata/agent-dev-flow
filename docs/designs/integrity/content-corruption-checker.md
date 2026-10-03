@@ -139,7 +139,7 @@ CJK 統合漢字は `foreign-script` の対象外としつつ、簡体字専用�
 現行配布 corpus には異言語文字・不可視文字・制御文字が存在しないことを導入時の実走査（配布物 230 ファイル、findings 0 件）で確認済みである。
 
 Case #3166（RA-007）で docs/designs 走査対象追加に伴い、実 corpus から file×rule 単位の許容例 7 エントリを登録した。
-rationale はいずれも例示由来（検出ルール自体が破損形・異字形を例として列挙する Design / ルール定義の記述）であり、正本は checker 実装の `ALLOWED_USAGE` 配列（file×rule・rationale 完備）とする:
+rationale はいずれも例示由来（検出ルール自体が破損形・異字形を例として列挙する Design / ルール定義の記述）であり、原本は checker 実装の `ALLOWED_USAGE` 配列（file×rule・rationale 完備）とする:
 
 - docs/designs/integrity/content-corruption-checker.md × simplified-chinese: 簡体字検出シグナル自体が簡体字形（状态・含义等）を実例として列挙する Design 記述
 - docs/designs/integrity/content-corruption-checker.md × broken-code-span: inline backtick ラン検出ルールの記述がバッククォート1文字の形式を例示する Design 記述

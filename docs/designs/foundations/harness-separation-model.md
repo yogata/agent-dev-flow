@@ -107,9 +107,9 @@ bg task API、実行エージェント選定、実行担当サブエージェン
 
 本 Design が定める配布物の harness 非依存性と実行結果契約は、v4 において Harness/Backend adapter 境界（ADF v4 実装責務境界 Design「Harness / Backend adapter 境界」節・DEC-036）の下で維持される。
 
-OpenCode を first-class reference harness と位置づける。他 harness へのアダプターは必要になった時点で追加し、未使用の Harness/Backend adapter を先回りして実装しない。Senpi（OmO Native v5）接続はこの契機に従って追加された最初の追加ホスト接続であり、共通正本とホスト別接続領域の分離（src/common/、src/opencode/、src/senpi/）として具現化する。配備形態（正本配置・投影モデル）の正本は Decision「ADF 共通正本とホスト接続領域の分離」およびマルチホスト正本モデル Design が所有し、責務境界（semantic contract と実行機構の分離）と adapter 追加契機は DEC-036 のまま維持する。
+OpenCode を first-class reference harness と位置づける。他 harness へのアダプターは必要になった時点で追加し、未使用の Harness/Backend adapter を先回りして実装しない。Senpi（OmO Native v5）接続はこの契機に従って追加された最初の追加ホスト接続であり、共通原本とホスト別接続領域の分離（src/common/、src/opencode/、src/senpi/）として具現化する。配備形態（原本配置・投影モデル）の原本は Decision「ADF 共通原本とホスト接続領域の分離」およびマルチホスト原本モデル Design が所有し、責務境界（semantic contract と実行機構の分離）と adapter 追加契機は DEC-036 のまま維持する。
 
-tools/（agentdev-gh・agentdev-third-party）と plugins/（tool 登録配線・guard 3 本）はこの境界の OpenCode 側実装例である（engine 部は共通正本へ、登録・配線は src/opencode/ 側へ配置する）。いずれも配布物の harness 非依存原則（本 Design 既有）に従い、Senpi 側の接続も同一原則に従う。
+tools/（agentdev-gh・agentdev-third-party）と plugins/（tool 登録配線・guard 3 本）はこの境界の OpenCode 側実装例である（engine 部は共通原本へ、登録・配線は src/opencode/ 側へ配置する）。いずれも配布物の harness 非依存原則（本 Design 既有）に従い、Senpi 側の接続も同一原則に従う。
 
 定義の所有は v4-responsibility-boundaries と DEC-036 にあり、本節は参照にとどまる。既存節は不変とする。
 

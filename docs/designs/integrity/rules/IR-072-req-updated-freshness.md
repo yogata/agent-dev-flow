@@ -52,5 +52,5 @@ updated: 2026-09-29
 ## See Also
 
 - [integrity-rule-catalog.md](../integrity-rule-catalog.md)
-- [../../foundations/patterns.md](../../foundations/patterns.md)（updated 進行規約の正本）
+- [../../foundations/patterns.md](../../foundations/patterns.md)（updated 進行規約の原本）
 - [IR-069-req-number-gap-recorded.md](IR-069-req-number-gap-recorded.md)（対象不在時 info スキップの前例）

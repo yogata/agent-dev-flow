@@ -9,7 +9,7 @@ updated: 2026-09-29
 
 > **位置づけと rule-ownership.md との関係**: 本ファイルは **REQ → 影響するルール/アーティファクト** の対応表である。
 > `../integrity/rule-ownership.md`（**ルールドメイン → canonical REQ/Design**）と逆方向の対応マップであり、両者は補完関係にある。
-> 配置の正本は本ファイル（`docs/designs/responsibilities/req-impact-map.md`）であり、`responsibilities/` 残置を現行配置として確定する。他文書（rule-ownership.md 等）は本行への参照導線として整合する。
+> 配置の原本は本ファイル（`docs/designs/responsibilities/req-impact-map.md`）であり、`responsibilities/` 残置を現行配置として確定する。他文書（rule-ownership.md 等）は本行への参照導線として整合する。
 
 ## 同期更新が必要なケース
 

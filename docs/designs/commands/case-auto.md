@@ -547,7 +547,7 @@ HITL 境界の変更ではなく、既存停止経路（REQ-034-022）の分類�
 
 ## v3 epic-wave-model Design からの吸収
 
-v3 epic-wave-model Design が所有していた orchestration stage モデル、ドラフト間並列実行モデル（REQ-034-025〜029）、execution_unit 並列 orchestration、case-auto 停止条件と停止理由分類のうち case-auto 実行側の運用契約は本 Design の規定へ吸収された。旧 Design は第5段で supersede とされ（物理削除は docs-chore OU-003）、対応関係の正本は v3-v4-crosswalk references/crosswalk-inventory.md が追跡する。
+v3 epic-wave-model Design が所有していた orchestration stage モデル、ドラフト間並列実行モデル（REQ-034-025〜029）、execution_unit 並列 orchestration、case-auto 停止条件と停止理由分類のうち case-auto 実行側の運用契約は本 Design の規定へ吸収された。旧 Design は第5段で supersede とされ（物理削除は docs-chore OU-003）、対応関係の原本は v3-v4-crosswalk references/crosswalk-inventory.md が追跡する。
 
 - orchestration stage: case-auto 内部工程を stage として構成し、ドラフト間並列実行は stage 3 で共有 active Issue task 枠（REQ-034-027、起動間隔 10 秒。Epic・Wave・Standard を横断する単一所有枠、DEC-041）とする
 - ドラフト間並列実行モデル: 複数 draft（OU 群）を依存グラフから解析し、並列実行可能性に基づいて同時起動する。直列化の単位は v4-runtime-execution-model「直列化単位表」に従う

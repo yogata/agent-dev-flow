@@ -14,7 +14,7 @@ updated: "2026-10-01"
 
 ## 位置づけ
 
-本 Design は ADF v4 の委譲契約の正本である。v4 ライフサイクル状態機械（[v4-lifecycle-state-machine.md](v4-lifecycle-state-machine.md)）と v4 Runtime 実行モデル（[../foundations/v4-runtime-execution-model.md](../foundations/v4-runtime-execution-model.md)）の下位契約として、委譲時の最小契約と制約を所有する。result 4 状態の正は v4-lifecycle-state-machine へ、authority・副作用・冪等・並行性の正は v4-runtime-execution-model へ、それぞれ参照により接続し二重管理しない。
+本 Design は ADF v4 の委譲契約の原本である。v4 ライフサイクル状態機械（[v4-lifecycle-state-machine.md](v4-lifecycle-state-machine.md)）と v4 Runtime 実行モデル（[../foundations/v4-runtime-execution-model.md](../foundations/v4-runtime-execution-model.md)）の下位契約として、委譲時の最小契約と制約を所有する。result 4 状態の正は v4-lifecycle-state-machine へ、authority・副作用・冪等・並行性の正は v4-runtime-execution-model へ、それぞれ参照により接続し二重管理しない。
 
 初期適用対象、manager-orchestrator と軽量委譲の分離表、case-auto 並列委譲モデル拡張、責務分界表に相当する契約は各工程 Design と REQ-034 が所有し、本 Design は搬送しない。
 

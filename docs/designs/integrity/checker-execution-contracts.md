@@ -97,7 +97,7 @@ data yaml の新設は、当該 yaml を読み込む消費者実装（checker �
 
 ### 宣言的データ読込原則
 
-検査対象の定義データ（検査ルール・配布対象一覧等）は宣言的データファイル（yaml）を正本とし、checker は定義をコード内に複製せず正本を読み込んで検査を実行する。正本欠損時は検査を実行せず fail-closed で停止する。command-format-rules.yaml・distribution-targets.yaml は本原則の適用対象とする（読込統合: ru-batch-20260903）。
+検査対象の定義データ（検査ルール・配布対象一覧等）は宣言的データファイル（yaml）を原本とし、checker は定義をコード内に複製せず原本を読み込んで検査を実行する。原本欠損時は検査を実行せず fail-closed で停止する。command-format-rules.yaml・distribution-targets.yaml は本原則の適用対象とする（読込統合: ru-batch-20260903）。
 
 ## detector 命名規約
 

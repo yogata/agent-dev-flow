@@ -81,7 +81,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [REQ-087](requirements/REQ-087.md) | 採番例外の記録と REQ 番号ギャップ検査 |
 | [REQ-088](requirements/REQ-088.md) | ADF v4 基盤要件（三層責務・情報寿命・Project Contract・中核文書モデル） |
 | [REQ-090](requirements/REQ-090.md) | Jev 先行評価の実運用組込み（Stage 1: 観測可能化） |
-| [REQ-091](requirements/REQ-091.md) | Supervisor 環境向け credential 供給ブリッジの正本管理 |
+| [REQ-091](requirements/REQ-091.md) | Supervisor 環境向け credential 供給ブリッジの原本管理 |
 | [REQ-092](requirements/REQ-092.md) | agentdev_gh issue_list 呼出側運用規律（labels は追跡Issue論理軸の物理マッピング入力専用） |
 | [REQ-093](requirements/REQ-093.md) | agentdev_gh 起動環境障害の予防・診断・回復の恒久化 |
 | [REQ-094](requirements/REQ-094.md) | ADF の Markdown 日本語表現および用語選択基準 |
@@ -89,7 +89,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [REQ-096](requirements/REQ-096.md) | ADF判断アーキテクチャ（判断方法・確定権限・人間判断境界） |
 | [REQ-097](requirements/REQ-097.md) | third-party 成果物の運用前提と導入検知 |
 | [REQ-098](requirements/REQ-098.md) | yomiyasu 推敲の工程必須化（docs 変更と GitHub 書込み文章） |
-| [REQ-099](requirements/REQ-099.md) | ADF 共通正本とホスト接続領域の分離によるマルチホスト併存利用 |
+| [REQ-099](requirements/REQ-099.md) | ADF 共通原本とホスト接続領域の分離によるマルチホスト併存利用 |
 <!-- AUTOGEN:END -->
 
 - [要件インデックス](requirements/README.md)
@@ -135,7 +135,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-033](decisions/DEC-033.md) | ADF v4 公開運用モデル（UX 2入口収斂・内部 lifecycle・継続コラボレーションループ・学習昇格ガード） |
 | [DEC-034](decisions/DEC-034.md) | v4 の移行・release 標準境界（非破壊移行原則・v4.0.0-rc.1 cutover・self-hosting） |
 | [DEC-035](decisions/DEC-035.md) | v4 Quality / Verification / Evidence / Gate モデルへの分解 |
-| [DEC-036](decisions/DEC-036.md) | 意味 Skill と決定的実装の責務分離および Harness/Backend adapter 境界（superseded by DEC-048〔決定(1)（deterministic 処理／semantic 判断の二分法）は DEC-048 が部分置換。決定(2)（Harness/Backend adapter 境界）のうち配備形態（正本配置・投影モデル）に関する部分は DEC-049（ADF 共通正本とホスト接続領域の分離）が部分置換する。責務境界（semantic contract と実行機構の分離）、adapter 追加契機、決定(3)（Project Extensions の位置づけ）は本 Decision が維持する（status: accepted 維持）。semantic 6 項目・deterministic 11 項目の列挙の後継は foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節が所有する。〕） |
+| [DEC-036](decisions/DEC-036.md) | 意味 Skill と決定的実装の責務分離および Harness/Backend adapter 境界（superseded by DEC-048〔決定(1)（deterministic 処理／semantic 判断の二分法）は DEC-048 が部分置換。決定(2)（Harness/Backend adapter 境界）のうち配備形態（原本配置・投影モデル）に関する部分は DEC-049（ADF 共通原本とホスト接続領域の分離）が部分置換する。責務境界（semantic contract と実行機構の分離）、adapter 追加契機、決定(3)（Project Extensions の位置づけ）は本 Decision が維持する（status: accepted 維持）。semantic 6 項目・deterministic 11 項目の列挙の後継は foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節が所有する。〕） |
 | [DEC-037](decisions/DEC-037.md) | Traceability の Change / Evidence 中心への再中心化 |
 | [DEC-038](decisions/DEC-038.md) | ADF v4 durable state 配置と再構成の契約（状態権威・証跡分離・非原子調整原則） |
 | [DEC-039](decisions/DEC-039.md) | ADF v4 authority・副作用統制と冪等・並行性モデル |
@@ -148,7 +148,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-046](decisions/DEC-046.md) | Jev 実行基盤の Cloudflare AI Gateway への完全置換 |
 | [DEC-047](decisions/DEC-047.md) | textlint 依存実体の版固定情報解決への転換 |
 | [DEC-048](decisions/DEC-048.md) | ADF判断アーキテクチャ: 判断方法・確定権限・人間判断境界の統一モデル |
-| [DEC-049](decisions/DEC-049.md) | ADF 共通正本とホスト接続領域の分離によるマルチホスト配布モデル |
+| [DEC-049](decisions/DEC-049.md) | ADF 共通原本とホスト接続領域の分離によるマルチホスト配布モデル |
 <!-- AUTOGEN:END -->
 
 ## 設計（Design）

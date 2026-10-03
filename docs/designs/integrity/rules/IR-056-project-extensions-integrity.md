@@ -8,7 +8,7 @@ updated: 2026-08-20
 # IR-056: project-extensions-integrity
 
 Project Extensionsのschema、配置、ID、参照path、委譲先skill、上書き意図、旧機構残存を検査する。
-本IR文書を検知詳細、exemption、severity、false-positive条件の正本とする。
+本IR文書を検知詳細、exemption、severity、false-positive条件の原本とする。
 
 | Field | Value |
 |---|---|

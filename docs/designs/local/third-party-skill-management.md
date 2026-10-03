@@ -91,7 +91,7 @@ third-party 成果物 = ADF が製作していないが、配布成果物が依�
 - 検査内容: 宣言ファイルの name 列挙と .opencode/skills/<name>/ の配置（SKILL.md + provenance マーカー）の突合
 - 宣言済みで配置欠落: ERROR 停止（終了コード分離）+ cli.ts の1行案内。textlint vendor 検知・案内（Test-TextlintVendorReady / Show-TextlintVendorGuidance）と同型・同体裁
 - 宣言ファイルが解決できない環境（2候補とも不在）: 検査対象外として正常扱いする（third-party Skill 前提が当該環境にないものとする）
-- 宣言読込: 既存 declaration パーサーの利用を基本とする。PowerShell からの呼び出しが困難な場合は PS 内蔵の最小 yaml 解析でよい——ただし name 列挙の抽出に限定し、構文検証は取得機構のパーサーを正本とする（二重実装の drift を防ぐ）。fail-closed は維持する
+- 宣言読込: 既存 declaration パーサーの利用を基本とする。PowerShell からの呼び出しが困難な場合は PS 内蔵の最小 yaml 解析でよい——ただし name 列挙の抽出に限定し、構文検証は取得機構のパーサーを原本とする（二重実装の drift を防ぐ）。fail-closed は維持する
 - package 形式側は既存 textlint vendor 検知がそのまま担当する（二重実装しない）
 
 ## Design で確定する実装判断

@@ -8,7 +8,7 @@ updated: 2026-08-20
 # IR-059: distribution-reference-boundary
 
 配布テキスト成果物に含まれるプロジェクト固有の具体ID、具体パス、固定URLを検出する。
-本IR文書を検知パターン、exemption、severity、false-positive条件の正本とする。
+本IR文書を検知パターン、exemption、severity、false-positive条件の原本とする。
 意味モデルと検出パイプラインの正規参照先は `distribution-boundary.md` である。
 
 | Field | Value |

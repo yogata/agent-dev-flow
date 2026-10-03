@@ -10,7 +10,7 @@ updated: 2026-09-29
 
 # 文書フォーマット規約
 
-> **正本としての位置づけ**: 本 Design が共通文書モデル規約（frontmatter、ID 体系、命名規則、URL 参照形式、共通フォーマット規約）の正本である。
+> **原本としての位置づけ**: 本 Design が共通文書モデル規約（frontmatter、ID 体系、命名規則、URL 参照形式、共通フォーマット規約）の原本である。
 
 ## コマンド frontmatter 規約
 
@@ -184,8 +184,8 @@ Issue/PR/コメント本文にリポジトリ内ファイル、ディレクト�
 - Definition 保存内部責務（case-ready / case-revise）が Decision 作成時に要件doc（draft-data）の関連情報から保存し、
   既存 Decision への付与はバックフィル（一括付与）による
 - 本規約は patterns.md が Decision frontmatter 規約を持たない現状の解消を兼ねる
-  （共通文書モデル規約の正本としての配置。decision-lifecycle Design は意味境界・関係・粒度・
-  健全性に特化し、形式規約の正本とはしない）
+  （共通文書モデル規約の原本としての配置。decision-lifecycle Design は意味境界・関係・粒度・
+  健全性に特化し、形式規約の原本とはしない）
 
 ### 承認記録セクション形式（正規所有）
 
@@ -196,7 +196,7 @@ Issue/PR/コメント本文にリポジトリ内ファイル、ディレクト�
   またはユーザー承認の旨）を記載する
 - 本形式は DEC-008 / DEC-015（superseded by DEC-036/038/039）/ DEC-019〜027 / DEC-028 の昇格実績で採用された慣行の
   正規化である。遷移の実行主体（case-open、確認手続きによる一括昇格）を問わず同一形式を用いる
-- 形式の正本は本 Design（patterns.md）、テンプレート実体は doc_decision.md、
+- 形式の原本は本 Design（patterns.md）、テンプレート実体は doc_decision.md、
   存在確認・検証は agentdev-decision-file-manager、「明示承認記録が存在する」存在要件は
   document-model.md（現状維持）が所有する
 

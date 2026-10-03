@@ -180,7 +180,7 @@ change_nature が `new_user_requirement` または `external_contract_change` �
 サブエージェント委譲は、Command の詳細手順を増やさず、探索、検査、分類、候補抽出を独立した文脈へ分離するために使用する。
 親エージェントは最終判断と副作用を保持し、サブエージェントは判断材料だけを返す（v2:ADR-0112, REQ-003）。
 
-委譲時最小契約（inputs、side_effect_boundary、output_contract、capture_handoff）、delegation_type 8 種、委譲制約、実行主体分類表、adversarial-review 接続、構造化文脈直列化契約の正本は [workflows/v4-delegation-contracts.md](../workflows/v4-delegation-contracts.md) が所有する。本 Design は配布成果物種別の入出力・依存方向の参照導線に留まり、委譲契約の詳細を再掲しない。
+委譲時最小契約（inputs、side_effect_boundary、output_contract、capture_handoff）、delegation_type 8 種、委譲制約、実行主体分類表、adversarial-review 接続、構造化文脈直列化契約の原本は [workflows/v4-delegation-contracts.md](../workflows/v4-delegation-contracts.md) が所有する。本 Design は配布成果物種別の入出力・依存方向の参照導線に留まり、委譲契約の詳細を再掲しない。
 
 ## テンプレート配置契約
 
