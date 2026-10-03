@@ -166,3 +166,19 @@
 - 内容: 安定実行経路（`node --experimental-strip-types` のモジュール import 経由）で check_changed_docs.ts を実行したところ `ReferenceError: require is not defined`（require 残存のため node 非対応）。check_distribution_boundary.ts は同経路で動作する（checker 実行契約「ESM 互換性要件」対応済み）。bun 経由で実行し直して合格を確認
 - 学び: 安定実行経路を checker 実行前に適用する際は、当該 checker の require 残存有無を事前確認する。node 非対応 checker は bun 経由へ切替して実行する。同種の実測として traceability check.ts（Bun.YAML 依存）も node では `Bun is not defined` で YAML 解析失敗（Case #3337 case-close 実測・bun 経由で合格）
 - 発見元: PR #3377 Findings/learning（Case #3340）＋ case-close 実行時の自工程観測（Case #3337）
+
+## 2026-10-03: IR-055 warning 総数 ratchet の計数対象の構成は checker 実測対照でしか確定できない
+
+- 問題クラス: workflow deviation（検査指標の構成理解の難しさ）
+- 発生工程: case-run RA-009 IR-055 warning 総数 ratchet 解消（Case #3338・OU-008）
+- 内容: warning total（demote 前・exemptions 適用後の総数）57 > cap 53 の解消において、内訳（baseline-known 40件・exemption 対象 10件・true positive 2件・skill-use-for-boundary 4件・gh-direct-invocation 1件）は checker 実行の実測対照（base と変更後の同条件比較）でしか確定できなかった。baseline-known 40件は demote 対象として実測確認まで実施
+- 学び: ratchet 計数対象の構成理解は integrity-contracts.md 側の明文化が望ましい（checker-execution-contracts.md の本 PR 追記で実行面は補完済み）。ratchet 系指標の対応では内訳明細の実測対照を最初に取得する
+- 発見元: PR #3378 Findings/learning（Case #3338・backlog-pool-20261003・OU-008）
+
+## 2026-10-03: third-party 取得機構経由の配置は IR-068 登録と exemptions 登録の 2 段構成が必要
+
+- 問題クラス: implementation error（検出器の観測対象の複層性）
+- 発生工程: case-run RA-009 SkillProjection 不整合解消（Case #3338・OU-008）
+- 内容: third-party 取得機構経由で配置された git 管理外 real-dir（explainer/explainer-book/first-reader/yomiyasu）は checker 上 stale junction として検出される。IR-068 の third_party_skills 登録（INSPECTION-TOLERATED）と skill-use-for-boundary の exemptions 登録（provenance 付き）を併用する 2 段構成で解消した
+- 学び: third-party 配置の投影整合は 1 つの登録では完結しない。投影整合検査（IR-068 manifest 登録）と使用境界検査（skill-use-for-boundary exemptions）の双方に登録が必要である旨を実測で確認
+- 発見元: PR #3378 Findings/learning（Case #3338・backlog-pool-20261003・OU-008）
