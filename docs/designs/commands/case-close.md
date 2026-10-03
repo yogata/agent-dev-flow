@@ -24,12 +24,12 @@ updated: "2026-09-29"
 
 PR をマージし、Case に記録を追記し、クローズ後に worktree とブランチを削除する。
 レビュー完了フェーズ。
-Epic Issue番号入力時は現在 Wave の PR作成済み子Issue を一括マージ、クローズし、Epic status table を更新する（Epic Wave クローズ）。
+Epic Issue番号入力時は現在 Wave の PR作成済み子Issue を一括マージ、クローズし、Epic 本文の実行構成表を更新する（Epic Wave クローズ）。
 
-**完了条件チェックボックスの評価、更新は case-close の専任責務**（REQ-011）。
+**完了条件チェックボックスの評価、更新は case-close の専任責務**（REQ-032-001）。
 case-run / 実行担当サブエージェント / 外部実行バックエンドは完了条件チェックボックスを更新しない。
 
-**Epic Issue 本文ステータス追跡テーブルの更新は case-close のみが実施する**（v2:ADR-0125 単一書き手制約）。
+**Epic Issue 本文（実行構成表）への書き込みは per-Epic の単一書き手による排他制御の下で実施する**（DEC-039、REQ-035-001）。
 
 **責務境界（REQ-003-007）**: 完了処理 + マージ時コンフリクトの機械的解消（rebase のみ、解消不能時は即エスカレーション、実装変更は行わない）。
 コンフリクト解消の実装変更、オーケストレーション級判断（マージ順序変更、blocked 単位の隔離）は case-auto の責務（`docs/designs/commands/case-auto.md` コンフリクト解消モデル Level 2/3 参照）。
@@ -85,23 +85,23 @@ worktree を削除する前に、未追跡ファイルだけを対象とする c
 ### 入力判定
 
 - Issue番号解決: ユーザー入力またはセッション内会話から取得。Tool 操作契約（Custom Tool `agentdev_gh`）で本文取得
-  - Epic Issue 判定（ステータス追跡テーブル存在確認）。存在時は Epic Wave クローズへ分岐
+  - Epic Issue 判定（実行構成表の存在確認）。存在時は Epic Wave クローズへ分岐
 
-### Epic Wave クローズ（REQ-030-011/022/023/027）
+### Epic Wave クローズ（REQ-032-015〜022）
 
-- Epic Issue 本文読込（ステータス追跡テーブル（新4列/旧4列形式）を解析）
-- 現在 Wave 特定（`running` ステータスの子Issue が属する Wave）。`running` がない場合は Wave 番号昇順で最も若い未完了 Wave
-- PR作成済み子Issue 特定（現在 Wave 内の `running` 子Issue）
+- Epic Issue 本文読込（実行構成表（`| Wave | Issue | 前提 | 状態 |`）を解析）
+- 現在 Wave 特定（実行構成の未完了状態（pending / blocked / failed）の子 Issue が属する Wave のうち Wave 番号昇順で最も若い Wave。未完了がいない場合は次 Wave）
+- PR作成済み子Issue 特定（現在 Wave 内の PR 作成済み子 Issue）
 - 各子Issue のクローズ処理を準並列化する（REQ-032-015）
   - 並列実行: PR情報取得、PR変更ファイル取得、Issue本文読取、PR本文読取、完了条件チェック事前評価、capture候補抽出、Design確定候補確認、worktree/branch削除前チェック
-  - 直列集約: squash merge、main pull&hash確認、Epic本文ステータス追跡テーブル更新、.agentdev永続化commit&push、ローカル branch/worktree 最終削除
+  - 直列集約: squash merge、main pull&hash確認、Epic 実行構成の状態更新、.agentdev永続化commit&push、ローカル branch/worktree 最終削除
   - rebase による機械的コンフリクト解消は停止条件外（REQ-003-006 Level1）。解消不能時は case-auto へエスカレーション（REQ-031-004、REQ-003-002 Level2/3）
-- Epic status table 更新（単一書き手: case-close、v2:ADR-0125）（`running` → `completed ([PR#N](URL))` に更新）
+- Epic 実行構成の状態更新（per-Epic の単一書き手による排他制御（DEC-039、REQ-035-001））。状態列は4値のみ（`pending` → `completed` 等）。PR 番号・URL は状態列に付記せず、子 Issue の結果と PR 自体から取得する
 
 ### Epic Issue 完了条件チェックボックス最終評価・更新
 
-Epic status table 更新の後、最終 Wave 判定の前に実施する。
-Epic Issue 本文の `## 完了条件` セクションを読み込み、全完了条件を QG-4 に従い評価・更新する（REQ-011 完了条件チェックボックス評価の case-close 専任責務、Epic Wave 経路への明示適用、`POL-completion-checkbox-single-writer`）。
+Epic 実行構成の状態更新の後、最終 Wave 判定の前に実施する。
+Epic Issue 本文の `## 完了条件` セクションを読み込み、全完了条件を QG-4 に従い評価・更新する（完了条件チェックボックス評価の case-close 専任責務（REQ-032-001）、Epic Wave 経路への明示適用、`POL-completion-checkbox-single-writer`）。達成済み判定は条件と証拠の照合による（REQ-032-001）。
 
 #### 評価対象スコープ（QG-4 観点8）
 
@@ -123,8 +123,8 @@ Epic Issue 本文の `## 完了条件` セクションを読み込み、全完�
 
 停止時の出力には以下を含める:
 - 残存する未達完了条件の一覧
-- 対応する子Issue のステータス（completed / blocked / failed）
-- 再開コマンド候補
+- 対応する子Issue の状態（completed / blocked / failed）
+- 再開は Root Case 指定である旨（工程別の再開コマンドは提示しない）
 
 - 最終 Wave 判定（全子Issue completed なら Epic クローズ）。それ以外は残 Wave 通知
 
@@ -140,7 +140,7 @@ Epic Issue 本文の `## 完了条件` セクションを読み込み、全完�
   - squash merge 前の mergeable UNKNOWN ポーリング（REQ-031-017）（Custom Tool `agentdev_gh` の pr_mergeable で mergeable 状態を取得し、UNKNOWN の場合は最大60秒・10秒間隔でポーリング待機。上限超過時はマージ中止・構造化エラー停止。CONFLICTING 遷移時はコンフリクト解消 rebase パスへ分岐）
   - Squash merge 後のローカル先行 commit 検出、処理（REQ-003-005）（`git log origin/{branch}..HEAD --oneline` で検出、内容重複確認後に `git reset --hard origin/{branch}` で reset（`agentdev-git-worktree` の squash merge 後分岐ハンドリング手順参照））
   - コンフリクト解消 rebase パス（REQ-003-001/002、REQ-031-003/025）（squash merge 失敗時）。squash merge がコンフリクトで失敗した場合、`git rebase` による機械的解消を試みる。rebase が自動解決した場合は再マージ（PR マージへ戻る）。rebase 自体がコンフリクトを発生した場合は実装変更を行わず case-auto へエスカレーションし停止する（コンフリクト解消モデル Level 1、`docs/designs/commands/case-auto.md` コンフリクト解消モデル Level 2/3 参照）
-- Post-merge テスト戦略検証（CI通過等の反映）
+- Post-merge 完了条件検証項目の反映確認（CI 通過等）
 - Issueクローズ（Custom Tool `agentdev_gh` の issue_close、reason: completed）
 - ローカルブランチ、worktree削除（`agentdev-git-worktree` 手順）。未コミット変更検出、共有作業ツリーでの `git checkout .` 禁止（1-writer 検知規律は REQ-030-017）
 - 親Epic Issue更新（`agentdev-epic-tracker`、Epic 自動クローズ判定）

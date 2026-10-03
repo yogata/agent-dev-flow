@@ -50,11 +50,7 @@ GitHub Issue / PR を使わない個人利用環境（ローカル版 OpenCode�
 
 ### role: case の条件付きフィールド
 
-role: case のローカルIssueは次の条件付きフィールドを持つ:
-
-| フィールド | 型 | 必須/任意 | 値域、制約 |
-|---|---|---|---|
-| `resume_command` | 文字列または空 | 条件付き必須 | status が `blocked` の場合のみ値を持つ。`req-define` / `case-revise` / `case-ready` / `case-run` / `case-close` のいずれか。通常状態への遷移時にクリアする（REQ-006 参照） |
+role: case のローカルIssueは工程別の再開入口フィールドを持たない。`resume_command` を廃止する。再開入口は Root Case 指定に共通化し、経路解決は Root Case の正規状態、Epic 実行構成、既存成果物、実行の生存状況の照合で行う（REQ-006-114）。
 
 ### YAML 前書きに含めないフィールド
 
@@ -77,38 +73,30 @@ Case 実行の物理表現。旧ローカル Case ファイルの構造を引き
 
 ### status 値域（role: case）
 
+Root Case の正規状態は実行継続、完了、中止を識別できる最小構成とする。
+
 | status | 意味 | 終端状態 |
 |---|---|---|
-| `open` | Root Case 確立済み、Definition / execution contract 未確定、実行不可 | いいえ |
-| `ready` | canonical Definition と execution contract が確定し実行可能 | いいえ |
-| `running` | 実行中 | いいえ |
-| `blocked` | 継続条件不足（resume_command を保持） | いいえ |
-| `review` | 実装完了、最終受入対象 | いいえ |
+| `active` | 実行継続中（Root Case 確立から実行完了・中止確定まで。確定・準備・実行中・停止待機を含む） | いいえ |
 | `closed` | 完了 | はい |
 | `cancelled` | 中止 | はい |
 
-`closed` と `cancelled` は終端状態とし、終端状態からの遷移は定義しない。
+`closed` と `cancelled` は終端状態とし、終端状態からの遷移は定義しない。blocked、failed は子 Issue の状態として Epic 実行構成が所有し、Root Case の status 値として重複保持しない。停止・待機の理由はコメント（停止理由）で表現する。
 
 ### 状態遷移表（role: case）
 
 | 操作 | 変更前 status | 変更後 status |
 |---|---|---|
-| ローカル版 `case-open` | （新規作成） | `open` |
-| ローカル版 `case-ready` 成功 | `open` / `blocked` | `ready` |
-| ローカル版 `case-run` 開始 | `ready` / `blocked` | `running` |
-| ローカル版 `case-run` 完了 | `running` | `review` |
-| ローカル版 `case-run` 停止 | `running` | `blocked`（resume_command 記録） |
-| ローカル版 `case-close` 停止 | `review` | `blocked`（resume_command 記録） |
-| ローカル版 `case-close` 再開 | `blocked` | `review` |
-| ローカル版 `case-close` 完了 | `review` | `closed` |
-| 明示中止 | `open` / `ready` / `running` / `blocked` / `review` | `cancelled` |
+| ローカル版 `case-open` | （新規作成） | `active` |
+| ローカル版 `case-ready` / `case-run` / `case-close` の各処理 | `active` | `active`（継続） |
+| ローカル版 `case-close` 完了 | `active` | `closed` |
+| 明示中止 | `active` | `cancelled` |
 
 再開経路と禁止遷移:
 
-- `case-run` 開始は `ready` からのみ許可する（`blocked` からの直接 `running` 遷移は、resume_command が指す正規再開経路（req-define / case-revise / case-ready）を経由して `ready` に復帰した後に行う）
-- `blocked` からの再開は resume_command の指す先（`req-define` / `case-revise` / `case-ready` / `case-run` / `case-close`）を正規入口とし、推測による再開を行わない
-- `blocked` から `closed` への直接遷移は禁止する。`blocked` から `closed` に至る場合は `review` を経由する
-- 通常状態への遷移時に `resume_command` をクリアする
+- 再開入口は Root Case 指定に共通とし、工程別の resume_command を使用しない。経路解決は Root Case の正規状態、Epic 実行構成、既存成果物（ローカル Git 上の取り込み結果、draft、RU）、実行の生存状況の照合で行う
+- 終端状態（`closed` / `cancelled`）からの遷移は定義しない（reopen を拒否する）
+- 実行契約の確定（case-ready）を経ない実装開始を行わない（REQ-017）
 
 ### labels 値域（role: case）
 
@@ -116,25 +104,24 @@ Case 実行の物理表現。旧ローカル Case ファイルの構造を引き
 
 ### 本文構成（role: case）
 
-Case ファイル本文は以下のセクション見出しを保持できる。`Design確定候補` と `Findings / Capture候補` は必須とする（GitHub 版で PR 本文が担っていた引き継ぎ情報の代替であり、case-close への引き継ぎ経路を失わせないため）。
+Case ファイル本文は Case Issue 本文構造（目的、対象範囲・対象外（対象要件、主な変更対象、対象外を含む）、実現方針（条件付き）、実行構成（Epic Root のみ）、完了条件、進行状況、結果（条件付き））に対応するセクション見出しを保持できる。`Design確定候補` と `Findings / Capture候補` は必須とする（GitHub 版で PR 本文が担っていた引き継ぎ情報の代替であり、case-close への引き継ぎ経路を失わせないため）。
 
 | # | 見出し | 必須/任意 | 役割 |
 |---|---|---|---|
-| 1 | `## 入力` | 任意 | Case の入力情報（REQ パス、要件 doc パス、参照 Issue 等） |
-| 2 | `## 背景` | 任意 | Case の背景説明 |
-| 3 | `## 問題` | 任意 | Case が解決する問題 |
-| 4 | `## 目的` | 任意 | Case の目的 |
-| 5 | `## 対象範囲` | 任意 | Case の対象範囲 |
-| 6 | `## 対象外` | 任意 | Case の対象外 |
-| 7 | `## 受け入れ条件` | 任意 | Case の受け入れ条件 |
-| 8 | `## 作業ログ` | 任意 | 作業の進行ログ。GitHub Issue コメント相当の内容を記録 |
+| 1 | `## 目的` | 任意 | Case の目的 |
+| 2 | `## 対象範囲・対象外` | 任意 | 対象要件、主な変更対象、対象外 |
+| 3 | `## 実現方針` | 任意 | 再判断してはならない合意がある場合のみ（非常設） |
+| 4 | `## 実行構成` | 任意 | Epic Root のみ（`| Wave | Issue | 前提 | 状態 |` の表） |
+| 5 | `## 完了条件` | 任意 | 条件・検証方法・合格条件のチェックボックス形式 |
+| 6 | `## 進行状況` | 任意 | 正規状態と開始・終了日時 |
+| 7 | `## 結果` | 任意 | 完了・中止確定時のみ（非常設）。成果物と必要な残件 |
+| 8 | `## 作業ログ` | 任意 | 判断理由・証拠となる記録 |
 | 9 | `## マージ前確認` | 任意 | マージ前確認事項。GitHub PR 本文の引き継ぎ情報の一部 |
 | 10 | `## Design確定候補` | **必須** | Design 確定候補。GitHub PR 本文が担っていた引き継ぎ情報の代替 |
 | 11 | `## Findings / Capture候補` | **必須** | Findings / Capture候補。下位に `### intake` と `### learning` サブ見出しを持つ |
 | 12 | `## マージ結果` | 任意 | ローカル Git 上の取り込み結果。ブランチ情報は本セクションに記録する |
 | 13 | `## 残課題` | 任意 | 残課題、フォローアップ項目 |
-| 14 | `## 完了判定` | 任意 | 完了判定結果 |
-| 15 | （自由拡張） | 任意 | 上記以外のセクションは必要に応じて追加可能 |
+| 14 | （自由拡張） | 任意 | 上記以外のセクションは必要に応じて追加可能 |
 
 ### closed_at の値条件（role: case）
 

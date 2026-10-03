@@ -23,10 +23,11 @@ ADF が起票する Issue タイトルの具体書式を所有する単一参照
 |---|---|---|
 | 実行構造確定前の Root Case / Standard Case | `Case: 主題` | case-open が Root Case を起票する時点 |
 | Epic として確定した管理 Issue（Root Case） | `Epic: 主題` | case-ready が Epic 構成を確定した時点（`Case:` から更新） |
-| Epic 配下の子 Issue | `[Wave N] Task: 主題` | case-ready が子 Issue を作成する時点（N = 所属 Epic 内の確定済み Wave 番号） |
+| Epic 配下の子 Issue | `Wave-N: 主題` | case-ready が子 Issue を作成する時点（N = 所属 Epic 内の確定済み Wave 番号） |
 | 追跡Issue（role: tracking） | `Tracking: 主題` | 追跡Issue起票経路（/agentdev/issue、各 workflow の起票） |
 
-- `Task:` は子 Issue の表示上の接頭辞であり、追跡Issueの kind: task ではない
+- 子 Issue の書式に `Task:` を使用しない
+- `Wave-N` の N は所属表示であり、実行制御の正ではない。所属の正は Epic の実行構成が所有する。タイトル解析から実行順序を決定しない
 - 実運用に別 Epic が存在する経路もこの表の役割に沿って命名する（Root Case と別 Epic の統合は本 Design の対象外）
 - 適用は GitHub・ローカル版（agentdev_gh local）の両起票経路に及ぶ。ローカル版 case file の title フィールドも同一の書式に従う
 
@@ -45,12 +46,11 @@ ADF が起票する Issue タイトルの具体書式を所有する単一参照
 
 ## Wave 投影
 
-- 子 Issue には確定済みの所属 Wave を先頭に置き `[Wave N] Task: 主題` に統一する
-- Wave 番号は所属 Epic 内でのみ有効。同じ Wave 内の順序・並列可否・開始条件は Epic 本文が所有する
+- 子 Issue には確定済みの所属 Wave を先頭に置き `Wave-N: 主題` に統一する
+- Wave 番号は所属 Epic 内でのみ有効。同じ Wave 内の順序・並列可否・開始条件は Epic の実行構成が所有する
+- 所属の正は Epic の実行構成であり、タイトルは所属の表示である。正規の構成変更で所属 Wave が変わる場合はタイトルを同期する（Epic 実行構成と子 Issue タイトルの一致）
 - 独立 Case を同じ case-auto 起動という理由だけで Wave 化しない
 - 実行枠の都合による一時分割・待機・再開は番号変更の理由にしない
-- 正規の構成変更で所属 Wave が変わる場合はタイトルを同期する（Epic 本文の Wave テーブルと子 Issue タイトルの一致）
-- Epic 分解テーブル（{child_title} 列）へ転記する子 Issue タイトルも付与時点の書式に従う
 
 ## タイトルから除く情報
 
@@ -59,7 +59,7 @@ ADF が起票する Issue タイトルの具体書式を所有する単一参照
 ## 付与と更新の場面
 
 - case-open: 合意済みの対象・目的から `Case: 主題` を生成する
-- case-ready: 確定構造に沿って Root Case の接頭辞を更新し（Epic 確定時 `Epic: 主題` へ）、子 Issue へ `[Wave N] Task: 主題` を付与する。既存の構造契約に従い、タイトル規則のために構造を変更しない
+- case-ready: 確定構造に沿って Root Case の接頭辞を更新し（Epic 確定時 `Epic: 主題` へ）、子 Issue へ `Wave-N: 主題` を付与する。既存の構造契約に従い、タイトル規則のために構造を変更しない
 - case-run / case-close: 状態の進行・停止・完了だけではタイトルを変更しない。case-close の PR タイトル事前変更は PR に対する操作であり、Issue タイトル不変と区別する
 - 追跡Issue起票・更新: 確認された主題に基づき `Tracking: 主題` を生成する
 - 再構成（case-ready / case-revise）: 所属 Wave が変わる正規の構成変更時にのみ子 Issue タイトルを同期する
@@ -72,7 +72,7 @@ ADF が起票する Issue タイトルの具体書式を所有する単一参照
 
 - `Case: 再開時に既存Issueを再利用し重複作成を防ぐ`
 - `Epic: ADFをOpenCodeとSenpiで共通利用できる構成へ移行する`
-- `[Wave 2] Task: インストーラーを両ホストの配置に対応させる`
+- `Wave-2: インストーラーを両ホストの配置に対応させる`
 - `Tracking: 再開後に同じ変更のIssueが重複作成される`
 - `Tracking: 出力ログの文字化けの原因を調査する`（未確定原因の断定を避ける例）
 

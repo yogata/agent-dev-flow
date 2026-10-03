@@ -55,88 +55,32 @@ agentdev 系コマンドで使用する Issue/PR 本文、コメントテンプ�
 - PR テンプレート（pr_desc.md）は verify-only PR の根拠欄を含む。根拠欄には種別 verify-only、実装差分を含まない理由、根拠成果物または commit、検証対象、検証結果を記入する。根拠は姉妹実装 PR だけでなく、実装 PR、先行 commit、main 反映済み commit、既存成果物、検証のみで完結する理由を許容する。case-run は verify-only PR 作成時に当該欄を埋め、case-close と QG-4 は当該欄を完了条件の証拠ソースとして読む（[case-run.md](../commands/case-run.md)「verification-only PR（実装差分なし、検証のみ）（v2:REQ-0158-002）」、[case-close.md](../commands/case-close.md)「verification-only PR の files_checked 空確認（v2:REQ-0158-002）」参照）
 - PR テンプレート（pr_desc.md）の関連Issueセクションは、マージ時の Issue 自動クローズを抑止し、case-close 工程の明示クローズ契約と整合する `Refs: #$ISSUE_NUMBER` 形式である
 
-## review_dispositions 証跡セクション（AG-002、AG-005、AG-009、AG-011）
+## review_dispositions の消費
 
-case-open が draft-data の `review_dispositions` を読み取り、Issue 本文の「レビュー判断」セクションへ恒久証跡として転記する。
-本 Design が当該セクションの構造を正規所有する（AG-002）。
+Root Case 本文のレビュー判断セクションへの review_dispositions 全件転記を行わない。
 
-### 対象テンプレート
+- 採用内容（accepted disposition）は実行契約の該当章（対象範囲、実現方針、完了条件の検証方法）へ反映する
+- 必要な採否理由（後から判断根拠を確認する必要があるもの）だけをコメントへ残す
+- review_dispositions の構造（id、disposition、reason_code、reason、evidence）の正は既存の正規所有先（artifact-contracts Design「req_draft 出力構造」節）のままとし、本変更でスキーマを変更しない。Issue 本文へ転記用の同型セクションを定義しない
 
-| テンプレート | work_type | セクション内容 |
-|---|---|---|
-| `issue_desc_feature.md` | feature | 全 disposition 明細 |
-| `issue_desc_bug.md` | bugfix | 全 disposition 明細 |
-| `issue_desc_epic.md` | feature (Epic) | 全 disposition 明細 |
-| `issue_desc_child.md` | feature (Epic child) | 親 Epic Issue 参照のみ（明細重複転記なし） |
+## 完了条件検証項目の記述ガイドライン（AG-006）
 
-### セクション仕様
-
-「レビュー判断」セクションは `<!-- 【必須】 -->` マーカー付きの必須セクションとする。
-feature、bug、epic テンプレートでは転記対象 disposition がない場合「該当なし」と記載する。
-child テンプレートでは「該当なし」を使用せず、親 Epic Issue 参照のみを記載する。
-
-各 disposition 明細は以下の要素を持つ:
-
-| 要素 | 内容 |
-|---|---|
-| id | `RD-NNN` |
-| disposition | `covered` / `partially_covered` / `rejected` / `not_applicable` / `superseded` / `stale_target` |
-| reason_code | 判断理由のコード |
-| reason | 人間可読の判断理由 |
-| evidence.path | 根拠ファイルパス |
-| evidence.section | 根拠セクション |
-| evidence.checked_at_commit | 確認 commit SHA（case-open が再確認後に記録） |
-
-### 配置規則
-
-- feature、bug、epic テンプレート: 「テスト戦略」セクション（epic は「完了条件」セクション）の直後、「補足情報」セクションの前に配置する
-- child テンプレート: 「テスト戦略」セクションの直後、「補足情報」セクションの前に配置する
-
-evidence 記録規約（prune 後耐久識別子の併記）: evidence.path には promote 済み成果物等の削除可能性が
-あるパスを記録する場合、path 単独に依存せず、prune 後も識別可能な代替識別子（RU 番号、learning タイトル、
-関連 Case 番号）を併記する。併記により、backlog-review の prune 記録（成功成果物削除の記録）との突合で
-当該 path の不在が prune 済みか欠落かを判別できる。遡及書換えは行わず、本規約は適用後の新規記録から
-効力を持つ。backlog-review 側の prune 記録形式との突合手順は backlog-review の手順資料が所有する。
-
-### child 固定内容（AG-009）
-
-child テンプレートの「レビュー判断」セクションは親 Epic Issue 参照のみを記載する。
-disposition 明細の重複転記は行わない。
-「該当なし」も使用しない。
-全 disposition は Epic Issue 本体へ転記済みである。
-
-### 転記規則（AG-011）
-
-転記規則の詳細は [case-open.md](../commands/case-open.md)「review_dispositions の消費と証跡転記」節参照。
-単一 Standard Issue は全 disposition を当該 Issue へ、Epic flow は Epic Issue へ全 disposition を、複数 Standard Issue は各 Issue の OU 関連 disposition を当該 Issue へ、ドラフト全体の disposition をルート Issue へ転記する。
-
-## test strategy 記述ガイドライン（AG-006）
-
-issue_desc_*.md テンプレートの「テスト戦略」セクションに記述する pass_criteria は QG-4 評価で REQ content と照合される。
-記述品質のばらつきが QG-4 時に顕在化するため、以下を共通ガイドラインとして正規所有する。
+完了条件チェックボックスの検証項目（3要素構造: 条件 / 検証方法 / 合格条件）に記述する合格条件（pass_criteria）は QG-4 評価で REQ content と照合される。Issue 本文に独立したテスト戦略セクションを生成しない（REQ-017-003）。
 
 ### 共通 pass_criteria のリスクと REQ 個別期待値推奨
 
 複数 REQ へまたがる共通の pass_criteria を起票する場合、各 REQ の pipeline stage（promote 系、review 系等）の違いを吸収せず、単一の文字列一致を要求すると QG-4 評価時に REQ content と pass_criteria 期待値が食い違う。
-Issue #1760 QG-4 で REQ-0129-012 を含む完了条件が REQ content と文字列一致せず、意味合致評価で処理された実績がある。
-共通化は避け、REQ 単位の個別期待値を pass_criteria へ記述することを推奨する。
+共通化は避け、REQ 単位の個別期待値を合格条件へ記述することを推奨する。
 
 ### 変更対象外 REQ 検証の正しい表現
 
 「変更対象外 REQ の変更がないこと」を検証する場合は「存在しないこと」と書かず「diff がないこと」として表現する。
-実在する REQ を「存在しないこと」と記述すると検証意図と検証方法がずれる。
-Issue #1760 TS-003 で「REQ-0147-010 が存在しないこと」と誤表現し、REQ-0147-010 は存在する（変更なし）ため正しい検証意図は「変更されていないこと」だった。
-
-### 存在確認の使用条件
-
-「存在しないこと」は新規作成禁止（例: 「REQ-0164 が存在しないこと」等の未作成確認）の場合のみ使用する。
-既存 REQ への変更有無の検証には使用しない。
+実在する REQ を「存在しないこと」と記述すると検証意図と検証方法がずれる。既存 REQ への変更有無の検証に「存在しないこと」を使用しない。「存在しないこと」は新規作成禁止の未作成確認の場合のみ使用する。
 
 ### テンプレートへのガイド反映
 
-feature、bug、child の各 issue_desc テンプレートは「テスト戦略」セクションへ本ガイドラインの要点を HTML コメントとして埋め込む。
-起票者が pass_criteria を記述する際に参照できるようにする。
-epic テンプレートは「テスト戦略」セクションを持たないため対象外とする。
+feature、bug、child の各 issue_desc テンプレートは完了条件セクションへ本ガイドラインの要点を HTML コメントとして埋め込み、記述者が合格条件を記述する際に参照できるようにする。
+epic テンプレートは完了条件の評価対象が子 Issue の結果であるため、個別の検証項目記述の対象外とする。
 
 ### 構造変更 PR の完了条件と契約テスト期待値
 
@@ -146,14 +90,22 @@ epic テンプレートは「テスト戦略」セクションを持たないた
 
 ## execution contract セクション（Issue template 拡張）
 
-feature Issue、child Issue テンプレートに execution contract セクションを追加する。
-このセクションの存在が presence-based 判定の識別子となる（AG-012、REQ-017-014）。
+execution contract を独立した Issue 本文物項目として生成しない。実行契約の要素は本文基本構造の各章へ分布させる:
 
-### 追加セクション構成
+- 変更対象成果物 → 対象範囲の主な変更対象（実行単位が所有する機械比較可能な宣言。最終変更ファイル一覧と区別し、実差分の正は Git 差分）
+- 必須品質統制 → 完了条件の検証方法・合格条件への統合（テスト戦略・必須品質統制の別章を設けない。artifact-quality-control-routing Design の能力キーに基づく検証を case-ready が完了条件へ展開する）
+- 関連 Decision 拘束条件 → 実現方針（再判断不可の合意がある場合）または完了条件の検証方法
+- scope-affecting impact candidate → 対象範囲（case-open が事前探索した候補の反映）
+- adversarial-review 発動契約（任意）→ 廃止（ユーザー明示指定の専用保存・伝播を行わない。REQ-015-002）
 
-Issue 本文に次のセクションを必須とする（新規作成時）。
+### 対象範囲表記の正規形
 
-```markdown
+Issue 本文の対象範囲にローカル版（src/opencode-local 配下等）の references パスを記載する際は、配置領域の接頭辞（src/opencode-local/）を明示し、配布物（.opencode/）の同名パスと区別できる表記を正規形とする（維持）。
+
+### 形式の唯一性
+
+変更後の形式を唯一の現行形式とする。presence-based 判定（Execution Contract セクションの存在有無による新旧 Issue 識別）、旧形式テンプレートの維持・移行、旧形式を一律 blocked としない運用、見出し・スキーマ版による新旧判別を行わない。新形式内の章読み取りと Issue 構造の判別は、新旧併存のための形式判定とは区別する。
+
 ## Execution Contract
 
 ### 変更対象成果物
@@ -191,22 +143,23 @@ issue_desc_bug.md、issue_desc_epic.md は bugfix/maintenance/docs_chore また�
 execution contract セクションの付加を検討するが必須とはしない（work_type により
 execution contract 責務が軽量なため）。
 
-## テンプレート正規形（Parent 配置・Epic 追跡テーブル）
+## テンプレート正規形（Parent 配置・Epic 実行構成）
 
 Epic Issue・子 Issue テンプレートの次の正規形を本 Design が正規所有する。
-テンプレートコメント（issue_desc_child.md / issue_desc_epic.md）と agentdev-epic-tracker references は本正規形の実装ビューであり、乖離しない。
+テンプレート（issue_desc_child.md / issue_desc_epic.md）と agentdev-epic-tracker references は本正規形の実装ビューであり、乖離しない。
 
 ### Parent 配置の正規形
 
-- 子 Issue 本文の先頭行に `Parent: #N`（N = 親 Epic Issue 番号）を配置する
-- 配置は case-open がテンプレート適用時に行う。agentdev-epic-tracker は本形式を親 Epic 検出の正規パターンとする
-- 旧形式（「## 親Issue」セクション配置、#2092 以前の運用）は移行期間の後方互換として受容するが、新規 Issue では使用しない
+- 子 Issue 本文の先頭行に `親Epic: #N`（N = 親 Epic Issue 番号）を配置する
+- 配置は case-ready がテンプレート適用時に行う。agentdev-epic-tracker は本形式を親 Epic 検出の正規パターンとする
+- 新規 Issue では旧形式（`Parent: #N`、「## 親Issue」セクション配置）を使用しない。旧形式を恒久的に読み続ける互換層を残さない
 
-### Epic 分解テーブルの正規形
+### Epic 実行構成の正規形
 
-- 分解テーブル（Epic 本文の子 Issue 一覧）は `| {wave}-{seq} | #{child_issue} | {status} | {child_title} |` 形式とする（agentdev-epic-tracker 新4列形式と整合）
-- 行 ID は `{wave}-{seq}` 形式（例: `1-1`）。Issue 列は `#N` のみ（OU ID の接尾は内容欄へ置く）
-- ステータス初期値は `pending`（更新は agentdev-epic-tracker が単一書き手として行う）
+- 実行構成（Epic 本文の子 Issue、Wave、意味的依存、子状態）は一つの表 `| Wave | Issue | 前提 | 状態 |` 形式で保持する（Wave = 所属 Wave 番号、Issue = `#N`、前提 = 意味的依存（依存先 Issue。なしは `-`）、状態 = 子状態4値）
+- 実行構成は Issue 本文に一つだけ存在し、分解表と実行順序表の二重保持を行わない
+- 状態の初期値は `pending`（更新は取りまとめ（case-close と工程記録の取りまとめ）が per-Epic の単一書き手として行う）
+- 状態は pending / completed / blocked / failed の4値のみとし、ready、running、Wave 状態、状態別件数を Issue 本文へ保存しない。PR 番号・URL は状態列に付記せず、子 Issue の結果・PR 自体から取得する
 - テンプレート選定規則は本 Design が、Wave 構成（wave 番号の付番）は case-ready Design「v3 epic-wave-model Design からの吸収」節（Wave 構成ルール）がそれぞれ所有する責務分担を維持する
 
 ## 対象外
@@ -247,35 +200,38 @@ references セクションに列挙された backlog 系テンプレート2フ�
 
 ## 実行識別情報・検証差分のテンプレートセクション形式
 
-Issue テンプレートと PR テンプレートに、実行識別情報と検証差分を構造化して記録するセクションを定義する。
+実行識別情報を独立した Issue 本文物項目として生成しない。
 
-- Issue テンプレート: 対象 Case、実行単位を記録する識別情報セクション
-- PR テンプレート: 対象 Case、実行単位、委譲単位識別子を記録する識別情報セクション
-- PR テンプレート: 検証種別、検証結果、finding 差分を記録する検証差分セクション
-
-検証差分セクションは、case-run の PR 本文 Findings セクション（intake / learning 小見出し）を置換せず、
-これと共存する（REQ-031-012 準拠）。
-
-本セクション形式は新規作成の Issue / PR に適用し、既存 Issue / PR へ遡及適用しない（REQ-017-013 準拠）。
-
-現在の識別情報 field 集合と検証差分の分類・表形式（8列）は現行ベースラインであり、REQ-048-008、
-REQ-048-014 のとおり REQ-048 の成立条件として固定しない。形式の変更は REQ-048-012 の実験契約に従い、
-後続工程の incremental value 比較可能性（REQ-048-008）を Guardrail として行う。
-
-対応記録コメントテンプレート（issue_comment_bug_record.md 系）には adversarial-review 判定欄のセクションを新設する（REQ-014-016）。
-判定値は発動または非発動とし、非発動の場合は発動契約非該当の理由を必須記録する。
-既存記録への遡及適用はせず、新規作成の対応記録から適用する。
-
+- Issue 番号、PR 番号、親Epic 参照、Epic 実行構成の対応関係があれば、実行単位・委譲単位・Case・GitHub Issue・PR・ADF 成果物は最小限の識別子で相関できる。識別子間の対応は Issue 構造と PR から再構成し、本文へ一覧化しない
+- 検証差分（検証実行の対象範囲と結果）は完了条件の検証方法・合格条件とコメント・PR 本文の証拠から参照する。独立した実行識別情報セクション、検証差分セクションを設けない
+- 監査値（test 件数・検出件数等）には計測基準（基準 commit または時点）を併記する（REQ-017-018 維持）。記録先は完了条件の検証方法に付随する証拠とする
 
 ## Case Issue 工程記録テンプレート
 
-Case Issue の工程記録（REQ-101、workflows/issue-lifecycle-records Design）をテンプレートへ投影する規約を定める。
+Case Issue 本文の工程記録テンプレート（issue_desc_feature.md、issue_desc_child.md、issue_desc_epic.md）は次の様式に従う。
 
-- Case Issue 本文テンプレート（issue_desc 系）への現在地・結果セクションの追加規約。セクション構成の正は workflows/issue-lifecycle-records Design が所有し、本 Design はテンプレート実体（src/common/commands/agentdev/templates/issue_desc_*.md）への投影・選定規則を定める
-- 記録コメントテンプレート（記録種別別: 着手、引き渡し、停止、再開、判断変更、完了）の新設規約と選定ルール、必須項目（停止=再開条件、判断変更=撤回対象、引き渡し=残作業・受取役割、完了=判定根拠）のテンプレート反映
-- 既存テンプレート（execution contract セクション、実行識別情報セクション、review_dispositions 証跡セクション）との共存構造と適用順
-- Case Epic テンプレートの子状態集約・全体条件評価セクションの規約（書き込み主体・時機は更新後の REQ-035-001 と agentdev-epic-tracker Design の契約に従う旨の参照）
+### 本文構造
 
+- Standard Case / Child Issue: 目的、対象範囲・対象外、実現方針（再判断してはならない合意がある場合のみ。非常設）、完了条件、進行状況、結果（完了・中止確定時のみ。非常設）
+- Epic Root: 上記に実行構成（`| Wave | Issue | 前提 | 状態 |` の一つの表）を加える
+- Child Issue の本文冒頭行は `親Epic: #N`
+
+### 完了条件
+
+各項目をチェックボックス形式（`- [ ] 条件（検証方法: ...、合格条件: ...）`）で保持し、必要な品質検証を統合する。達成状態の確定（`[ ]` → `[x]`）は case-close だけが行う（REQ-032-001）。
+
+### 進行状況
+
+- Standard Case / Epic Root: 正規状態（実行継続 / 完了 / 中止）と開始日時・終了日時のみ
+- Child Issue: 開始日時・終了日時のみ（状態は Epic 実行構成が所有）
+
+### 結果
+
+完了・中止確定時にのみ作成する。成果物（PR リンク等）と必要な残件を記載し、終了状態を重複保存しない。
+
+### コメント
+
+停止・失敗の理由、重要な判断変更、検証のみで完了する Issue の証拠、非自明なレビュー判断のみを記録対象とする（issue_comment_record_hold.md、issue_comment_record_decision_change.md、検証証拠用テンプレートを残存させ、着手・引き渡し・再開用テンプレートの使用を廃止する）。
 
 ## v4 責務分類
 

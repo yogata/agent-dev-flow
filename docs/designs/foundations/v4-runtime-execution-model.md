@@ -38,7 +38,7 @@ tag・branch の lifecycle role 別サブ表:
 | 直列化単位 | 対象 | 単位 |
 |---|---|---|
 | merge/push | 統合 branch への merge・push | リポジトリ単位 |
-| Epic Issue 本文 | ステータス追跡テーブル等の更新 | per-Epic 単一書き手 |
+| Epic Issue 本文 | 実行構成表等の更新 | per-Epic 単一書き手 |
 | 採番割当 | REQ/Decision/IR 等の ID 採番 | グローバル |
 | AUTOGEN 索引再生成 | README 索引・件数の再生成 | グローバル |
 | worktree/git index | worktree 内の git 操作・index 競合 | worktree 単位（隔離または直列化） |

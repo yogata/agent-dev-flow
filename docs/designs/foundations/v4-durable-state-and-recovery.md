@@ -72,4 +72,4 @@ input-resolution-and-durable-state、step-reference-contract 等、v3 関連 Des
 
 ## ADF 実行識別情報の記録契約
 
-workflow-contracts Design から迁移した契約（REQ-048-001〜005 被覆）。実行単位・委譲単位・Case・GitHub Issue・PR・ADF 成果物を最小限の識別子で相関可能とする。機械検出可能識別子（Issue 番号、PR 番号、adf_case、DEL-{N}-{n} 形式の SSoT コメントヘッダ等）を優先する。harness 生履歴は読取専用の補助情報とし、harness 内部識別子を正規状態としない。既存情報から導出できる対応付け情報を優先し、新しい必須 field の追加判断は DEC-001 決定4 に従う。adf_* field 系の縮小は導出可能性監査に基づく。
+workflow-contracts Design から迁移した契約（REQ-048-001〜005 被覆）。実行単位・委譲単位・Case・GitHub Issue・PR・ADF 成果物を最小限の識別子で相関可能とする。実行識別情報を独立した Issue 本文物項目として生成しない。機械検出可能識別子（Issue 番号、PR 番号、adf_case、DEL-{N}-{n} 形式の SSoT コメントヘッダ等）を優先し、識別子間の対応は Issue 構造（親Epic 参照、Epic 実行構成、対象範囲の対象要件）と PR から再構成する。harness 生履歴は読取専用の補助情報とし、harness 内部識別子を正規状態としない。既存情報から導出できる対応付け情報を優先し、新しい必須 field の追加判断は DEC-001 決定4 に従う。adf_* field 系の縮小は導出可能性監査に基づく。PR への関係の正と取得方法は一つに定め、Case の作業ブランチ（head branch）に紐づく PR の検索を唯一の正規取得経路とする。Issue 本文への PR 番号保存による第二の取得経路を作らない。

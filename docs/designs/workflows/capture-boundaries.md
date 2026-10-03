@@ -113,13 +113,12 @@ command は `intake-capture` 等の他 command を呼び出さない。
 git 永続化（commit、push）は呼出元 command が担う。
 Skill は候補生成と file 書き込みまでを担い、commit 実行は委譲しない。
 
-### Epic Issue 単一書き手制約（case-close 経由）
+### Epic Issue 単一書き手制約
 
-Epic Issue 本文（ステータス追跡テーブル）の更新は `case-close(#epic)` のみが行う（REQ-030-011、`docs/designs/foundations/v4-runtime-execution-model.md`「直列化単位表」（per-Epic 単一書き手）参照）。
+Epic Issue 本文（実行構成表）の書き込みは per-Epic の単一書き手として排他制御される（REQ-035-001、`docs/designs/foundations/v4-runtime-execution-model.md`「直列化単位表」参照）。書き込みを実施するのは case-close(#epic) と case-auto stage 3 の統合処理（case-close 相当）であり、同一の排他制御の下で実行する。
 
-- `case-run(#epic)` は Epic Issue 本文を読み取るのみで書き込まない
-- `case-auto` 自身は Epic Issue を更新せず、case-close 経由で更新する
-- 複数 execution_unit 並列実行時も per-Epic-Issue-body の単一書き手が維持される（REQ-030-011）
+- `case-run` は Epic Issue 本文を読み取るのみで書き込まない
+- 複数 execution_unit 並列実行時も per-Epic-Issue-body の単一書き手が維持される
 
 ### 完了報告（Capture結果）
 

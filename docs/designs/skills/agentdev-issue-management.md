@@ -15,15 +15,15 @@ GitHub Issue の作成、更新、リンク、確認を安全に行うための�
 ## 適用対象
 
 - case-open、case-ready、case-revise、case-close、/agentdev/issue での Issue 操作後の VERIFY 手順
-- Parent/Child リンク確認（`Parent: #{N}` パターン検証）
-- Epic ステータス追跡テーブル更新の安全手順
+- Parent/Child リンク確認（`親Epic: #{N}` パターン検証）
+- Epic 実行構成表更新の安全手順
 - 追跡Issueと Case Issue の関連参照の整合確認
 
 ## 提供する判断、操作
 
 - Issue 操作の安全性手順（各書き込み操作ごとに個別 VERIFY。Tool は VERIFY を完了してから成功を返す）
 - Parent/Child リンク確認（正規表現パターン）
-- Epic テーブル更新手順
+- Epic 実行構成表更新手順
 - Issue 本文生成（REQ 読解、テンプレート充足検査、完了条件候補抽出）
 - 子 Issue 作成、Epic Issue 本文更新の前後比較
 
@@ -34,8 +34,8 @@ GitHub Issue の作成、更新、リンク、確認を安全に行うための�
 ## 現在の動作
 
 - 各書き込み操作ごとに個別に読み戻し検証（VERIFY）を実行する。VERIFY は Tool 操作契約内で完結する
-- 子 Issue 本文先頭行に `Parent: #{epic_number}` を必ず含める（Epic/child 専用形式）
-- 全子 Issue 作成完了後に Epic 本文ステータス追跡テーブルを更新する（部分更新禁止）
+- 子 Issue 本文先頭行に `親Epic: #{epic_number}` を必ず含める（Epic/child 専用形式）
+- 全子 Issue 作成完了後に Epic 本文の実行構成表を更新する（部分更新禁止）
 
 ## 委譲接続点と本文受け渡し
 

@@ -557,12 +557,11 @@ review の finding は Decision判断、要件doc生成の成果物へ反映可�
 ### 発動条件判定 Step（REQ-015-001、REQ-015-002、REQ-015-003）
 
 発動条件判定と review 呼出を分離する（REQ-015-001）。
-発動条件判定 Step は default-on 原則（REQ-015-002）と skip 条件（REQ-015-003）を評価する。
+発動条件判定 Step は default-on 原則（REQ-015-002、REQ-014-013）と skip 条件（REQ-015-003）を評価する。
 
-- **default-on（原則実行）**: req-define は adversarial-review を原則実行する（REQ-015-002）。ユーザー明示指定は通常発動の必須条件ではなく、review 対象の意味的決定（要件展開、Decision要否判定、Scale判断）が存在する場合に発動する。
-- **skip 条件**: 次のいずれかに該当する場合、adversarial-review を省略して従来フロー（review を挿入せずドラフト保存へ進む）を継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
-  - Scale が L0（独立、自明）で Decision判断対象が存在せず、review 対象となる意味的決定が存在しない場合
-- **ユーザー明示指定時の必須実行**: ユーザーが req-define 実行中に adversarial-review の実施を明示的に指定した場合、skip 条件の該当にかかわらず必ず発動する（REQ-015-002）。
+- **default-on（原則実行）**: req-define は adversarial-review を原則実行する。要件候補に意味的決定（Scale 判断、Decision 判断、要件doc の意味内容確定）が存在する場合に発動する。
+- **skip 条件**: Scale が L0 で Decision 対象がなく、意味的決定を含まない場合、adversarial-review を省略してドラフト保存へ進める（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
+- **明示指定時の取扱い**: ユーザーが review の実施を明示的に指示した場合は、通常のユーザー指示としてその場で実行する。専用の検出、専用フラグ、draft・Issue 本文への専用保存、後工程への専用伝播、skip 条件の専用上書き処理を持たない（REQ-015-002）。
 
 ### review 呼出 Step（REQ-015-001）
 
