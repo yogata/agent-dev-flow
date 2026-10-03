@@ -206,3 +206,11 @@
 - 内容: `git cherry origin/main <branch>` が 2 件とも `+`（patch 非等価）を返した。branch が 2 コミット構成の場合、squash merge 後の合算コミットと個別コミットの patch-id は一致しない。変更ファイル範囲の限定（e642dfcf..branch の diff 対象が本 Case ファイルのみ）と、本 Case 変更ファイルの branch HEAD 内容 = origin/main HEAD 内容（`git diff origin/main <branch> -- <files>` が空）で内容含みを判定してから `-D` 削除した
 - 学び: squash merge 済み判定は git cherry の patch-id 等価に依存せず、単一コミット構成でのみ一次判定に使う。複数コミット構成では「branch 変更範囲の限定確認 + 変更ファイルの内容一致（diff 空）」で判定する
 - 発見元: Case #3355 case-close 実行時の自工程観測
+
+## 2026-10-03: traceability duplicate-inconsistencies は同一 artifact パス × role の sidecar 間配置重複を REQ ID 相違でも検出する
+
+- 問題クラス: implementation error（sidecar 対応関係の配置重複）
+- 発生工程: case-run RA-019 sidecar 再編（Case #3360・OU-016・backlog-pool-20261003）
+- 内容: check の duplicate-inconsistencies は「同一 artifact パス × role」単位で複数 sidecar 間の配置重複を検出し、対応する要件行 ID が相違していても fail になる（Case #3360 実測: case-auto.md × implementation が agentdev-workflow-case-auto.yaml と japanese-prose-correction.yaml の双方に存在し、REQ ID 相違にもかかわらず検出された。agentdev-workflow-case-auto.yaml 側の case-auto.md エントリ撤去により同実装内で解消）
+- 学び: sidecar 間での対応関係の移動・分離は、同一パス × role の単一情報源性を保って行う必要がある。REQ-012-058 の事前突合手順（パス×role 単位）はこの実測性格と一致する
+- 発見元: PR #3382 Findings/learning（Case #3360・backlog-pool-20261003・OU-016）
