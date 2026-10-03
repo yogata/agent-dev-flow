@@ -2,9 +2,10 @@
 title: `agentdev-epic-tracker` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-19
+updated: 2026-10-03
 ---
 <!-- ADF-COVERS(implementation): REQ-035-003, REQ-035-004 -->
+<!-- ADF-COVERS(design): REQ-035-001 -->
 
 # `agentdev-epic-tracker` Design
 
@@ -34,8 +35,10 @@ updated: 2026-09-19
 
 - 新4列形式と旧4列形式の両方をサポート
 - `⏭スキップ` は採用しない（前提未達は `pending` のまま選択対象外、REQ-031-009）
-- `ready` / `running` は case-run(#epic) の内部状態であり永続状態には書き込まれない
-- 永続状態に書き込まれるのは `pending` → `completed` / `blocked` / `failed` の遷移のみ（case-close が単一書き手、v2:ADR-0125）
+- `ready` / `running` は case-run(#epic) の内部状態であり永続状態には書き込まれない。この取扱いは Case Issue 工程記録の取りまとめ反映とは独立に維持する（実行制御上の内部状態は従来どおり、進行状態の表示は workflows/issue-lifecycle-records Design の写像規則による）
+- 永続状態への書き込み遷移は `pending` → `completed` / `blocked` / `failed` の遷移に加え、Case Issue 工程記録の取りまとめによる記録契機に応じた反映（着手、停止、再開、判断変更等の子状態集約・全体条件評価の更新）を含む（REQ-035-001）
+- 書き手は case-close に限定せず、case-close と工程記録の取りまとめが per-Epic の単一書き手（排他制御・局所直列化）の下で書き込む（v2:ADR-0125 の単一書き手原則は維持）
+- 取りまとめ反映の記録様式（セクション構成・進行状態表記）は workflows/issue-lifecycle-records Design の Epic セクション様式に従う
 
 ## 対象外
 
