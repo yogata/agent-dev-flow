@@ -12,11 +12,12 @@ updated: 2026-09-19
 
 ## work_type / scale / Epic / Wave の v4 意味モデル
 
-各語彙の責務定義と直交性（work_type は route 直接決定から分離、scale は work_type 非限定、Epic は協調管理、Wave は実行スケジューリング）、大規模 bugfix 等の表現、v3 の work_type+scale -> workflow_route 結合からの分離。
+各語彙の責務定義と直交性（work_type は Issue 正規契約から除外、scale は構成判断のみ、Epic は協調管理、Wave は実行スケジューリング）、大規模 bugfix 等の表現、v3 の work_type+scale -> workflow_route 結合からの分離。
 
-- work_type: 変更の性質。workflow route を直接決定する責務から分離する。Decision の必要性だけを理由に work_type を別種へ変換しない
-- scale: 変更・実行・協調の規模。特定 work_type に限定しない
-- Epic: 複数 execution unit の協調管理が必要な変更
+- work_type: 変更の性質。Issue 本文の正規契約項目とせず、人間の検索・整理のための任意ラベル（物理ラベル運用）としてのみ扱う。req-define は完了報告種別選定のための内部値として用いる。Decision の必要性だけを理由に work_type を別種へ変換しない
+- scale: 変更・実行・協調の規模。実行構成の判断に必要な場合だけ用い、構成確定後に保存しない。特定 work_type に限定しない
+- Standard / Epic / Child / Wave 所属は実際の Issue 構造から取得する
+- Epic: 複数 execution unit の協調管理が必要な変更。子 Issue、Wave、意味的依存、子状態は Epic の実行構成（一つの表）が所有する
 - Wave: Epic 内の依存関係と並列実行可能性を表す実行スケジューリング単位
 - 大規模 bugfix 等も scale/Epic/Wave の対象になり得る。用語名は、意味モデルの一貫性を改善する明確な理由がある場合のみ見直してよい（その場合も概念責務を失わない）
 

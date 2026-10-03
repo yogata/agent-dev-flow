@@ -31,7 +31,7 @@ case-run から実行担当サブエージェントへの委譲契約を以下�
 - **adapter skill**: AgentDevFlow 側の case-run 実行 adapter skill（`agentdev-case-run-execution-adapter`）を指定する。adapter skill は委譲契約、result 契約、worktree 隔離等の case-run 固有知識を提供する。adapter skill 経由で委譲を起動する。
 - **委譲 prompt**: 実行 command を prompt 内に含めて委譲する。実行担当サブエージェントは prompt 内で指定された command を起動する。command の具体名は AGENTS.md および references/<harness>.md 参照。
 - **実行主体分類**: 委譲 prompt 内で実行される command は skill ではなく command である。`load_skills` には command 名を指定せず、adapter skill 名を指定する。
-- **test strategy 項目の test-fix ループ（REQ-031-008/030）**: Issue 本文のテスト戦略セクションに test strategy 項目（3要素構造: verification / pass_criteria / on_failure）が含まれる場合、委譲契約は各項目の検証、不合格時の処置（実装修正して再検証、または Findings 記録）、全項目処理までの反復を実行担当サブエージェントに要求する。詳細な責務は adapter skill（`agentdev-case-run-execution-adapter`）が定義する。
+- **完了条件の検証項目の test-fix ループ（REQ-031-008/030）**: 完了条件に検証項目（3要素構造: verification / pass_criteria / on_failure）が含まれる場合、委譲契約は各項目の検証、不合格時の処置（実装修正して再検証、または Findings 記録）、全項目処理までの反復を実行担当サブエージェントに要求する。詳細な責務は adapter skill（`agentdev-case-run-execution-adapter`）が定義する。
 
 ## 承認・HITL 境界
 
@@ -185,7 +185,7 @@ case-run は実装作業開始前に QG-3 本体とは独立した前置検査�
 差異を検出した場合、case-run は以下を実施する:
 
 1. PR 本文の `## Findings / Capture候補` セクションに `### stale-reference` 小見出しで差異内容（対象パス、Issue 本文記載値、現行値）を記録する
-2. blocked として報告し、Root Case の resume_command による正規再開経路に従う（REQ-031-010）。Issue 本文の参照パス・件数の更新が必要な場合は case-ready / case-revise 経由で実施する
+2. blocked として報告し、Root Case 指定による正規再開経路に従う（REQ-031-010）。Issue 本文の参照パス・件数の更新が必要な場合は case-ready / case-revise 経由で実施する
 3. case-run 単独では Issue 本文を書き換えない（Issue 本文更新は case-ready / case-revise の責務）
 
 ### QG-3 本体との関係
@@ -219,20 +219,7 @@ case-run プロファイル固有の追加ルールとして full_docs_check_rec
 ### 検出結果の記録と連携
 
 - 検出結果（failures の strict severity）は PR 本文の `## Findings / Capture候補` セクションに `### docs-integrity` 小見出しで記録する
-- blocked として報告し、Root Case の resume_command による正規再開経路に従う（case-run 単独では Issue 本文を書き換えない、REQ-031-010 準拠）
-
-<!-- ADF-COVERS(implementation): REQ-031-025 -->
-<!-- ADF-COVERS(implementation): REQ-031-026 -->
-本 Design の docs 整合性検査手順（worktree に対する検査 skill 起点指定、コミット後 push 前限定の
-差分検出、コミット前の明示ファイル列挙）が REQ-031-025、REQ-031-026 を実装する。
-
-<!-- ADF-COVERS(design): REQ-031-034 -->
-targeted docs guard の CLI 表示（usage・ヘッダコメントを含む）は正典契約（REQ-031-026 および
-targeted-docs-guard-implementation Design）と矛盾しない（REQ-031-034）。本 Design が定める CLI 契約は
---files = コミット前（worktree 上での検証等）の標準モード（untracked 含む明示ファイル列挙、main 環境の
-PR 変更ファイル直接指定にも使用）、--base-ref = コミット済み差分（コミット後・push 前限定）、
-両者は排他でなくいずれかの指定が必須、であり、CLI 表示（スクリプトヘッダコメント等）の
-正典からの drift（環境割当の逆転・排他表記の残存等）を本不変条件で検出・是正対象とする。
+- blocked として報告し、Root Case 指定による正規再開経路に従う（case-run 単独では Issue 本文を書き換えない、REQ-031-010 準拠）
 
 ## verification-only PR（実装差分なし、検証のみ）
 
@@ -325,19 +312,18 @@ case-run は check_integrity.ts（全体監査）を、docs 変更を含む case
 
 ## execution contract 消費境界（新規セクション）
 
-case-run は REQ-017 に定義される execution contract を消費境界として扱う。
+case-run は REQ-017 に定義される実行契約（対象範囲、実現方針、完了条件）を消費境界として扱う。
 
 ### 契約消費原則
 
-- case-run は Issue に確定済みの完了条件、test strategy、必須品質統制を実行契約として扱う
+- case-run は Issue に確定済みの対象範囲、実現方針、完了条件（検証方法・合格条件を含む）を実行契約として扱う
 - 完了条件の不足、曖昧さ、矛盾、実現不能を検出した場合は自律補完せず blocked とする
-- test strategy を新規設計せず、記録済み項目を実行する
-- 必須品質統制の適用要否を再判断せず、記録済み test strategy を実行する
-- work_type/scale/Issue structure を再分類して実行契約を変更しない
+- 完了条件の検証方法を新規設計せず、記録済み項目を実行する
+- 必須品質検証の適用要否を再判断せず、完了条件へ統合済みの検証を実行する
 
 ### runtime-only 判断の維持
 
-次は case-run の安全検査として維持し、execution contract 確定へ移管しない。
+次は case-run の安全検査として維持し、実行契約確定へ移管しない。
 - worktree 状態確認（REQ-031-002）
 - QG-3 前置 staleness check（REQ-031-009）
 - 実 diff 検査
@@ -345,37 +331,28 @@ case-run は REQ-017 に定義される execution contract を消費境界とし
 
 ### blocked 遷移と Issue 更新の取扱い
 
-次の場合、case-run は blocked とし、blocker 詳細を Issue コメントへ SSoT として記録する（Issue 本文更新は case-ready / case-revise の責務、Root Case の resume_command による正規再開経路に従う）。
+次の場合、case-run は blocked とし、blocker 詳細を Issue コメントへ SSoT として記録する（Issue 本文更新は case-ready / case-revise の責務、再開は Root Case 指定による正規再開経路に従う）。
 - 完了条件の不足、曖昧さ、矛盾、実現不能の検出
 - scope-affecting impact candidate の発見（既存 scope 内を超える変更が必要）
 - 関連 Decision への適合確認で新たな拘束 Decision の必要性が判明した場合
-- 必須品質統制の追加変更が必要な場合
+- 完了条件の検証に必要な品質検査の追加変更が必要な場合
 - Issue metadata、構造、実態の矛盾検出時
 - 本質的な指摘事項の一般化した修正範囲が Issue の対象範囲、完了条件、受け入れ条件、REQ、Decision、Design、必須品質条件の変更を必要とする場合（REQ-031-019）
+
+### 完了条件チェックボックスの非更新
+
+case-run および実行担当サブエージェントは検証結果と証拠を報告し、完了条件チェックボックスを更新しない。達成済み項目の確定（`[ ]` → `[x]`）は case-close だけが条件と証拠を照合して行う（REQ-032-001）。
 
 ### 結果状態遷移と検証証拠
 
 結果状態は result 契約の既存4状態（completed-pr / blocked / failed / delegation-unavailable）を維持したまま、本質的な指摘事項の扱いを次のように適用する。
 
 - 本質的な指摘事項が未解消の場合、Findings 等への記録だけを理由として completed-pr にしない。Issue の対象範囲内で修正可能な場合は修正および欠陥類型単位の検証が成功した後にのみ completed-pr を許可する（REQ-031-022）。
-- Issue / REQ / Decision / Design / 必須品質条件の変更が必要な場合は blocked とする（REQ-031-019）。
+- Issue / REQ / Decision / Design / 完了条件の品質検査の変更が必要な場合は blocked とする（REQ-031-019）。
 - 利用可能な情報を十分に調査しても安全な修正範囲を正当化できる根本原因または欠陥類型を確立できない場合は、局所的な推測修正によって completed-pr へ進まず failed とする（REQ-031-023）。
 - 本質的な指摘事項を欠陥類型単位で修正して completed-pr とする場合、対象となった本質的な指摘事項、特定した根本原因または欠陥類型、採用した修正範囲、実施した欠陥類型単位の検証、検証結果の5点を、既存の PR 本文または品質ゲート完了報告から確認できるようにする。新しい正規成果物種別を追加しない（REQ-007-005）。
 
 修正単位の整理、検証対象選定、同一根本原因の再分類を含む欠陥類型単位の修正・検証契約の詳細は `agentdev-case-run-execution-adapter` Design「欠陥類型を修正単位とする契約」節を正とする。
-
-### 新旧 Issue 互換運用
-
-case-run は Issue 本文の execution contract 必須セクション存在有無により新旧 Issue
-を識別する（presence-based 判定）。
-- 必須セクション存在: 新契約 Issue として扱い、上記契約消費原則を適用
-- 必須セクション不存在: legacy Issue として扱い、新契約項目欠落のみを理由に
-  一律 blocked にしない（AG-010、REQ-017-013）
-
-### work_type/scale 確認の縮約
-
-現状の準備フェーズ work_type 確認ステップは、再分類ではなく metadata 整合確認へ
-縮約して維持する（AG-008、REQ-017-011）。
 
 ## 作業用 worktree 作成元と PR base（REQ-031-024 の実行詳細）
 
@@ -476,7 +453,7 @@ case-run 委譲内で作成する commit の構成運用を規定する。
 
 ## 停止状態
 
-- result が blocked の場合（回答可能な blocker。詳細は Issue コメント SSoT。ユーザー判断待ちとして停止、Root Case の resume_command 再開経路）。
+- result が blocked の場合（回答可能な blocker。詳細は Issue コメント SSoT。ユーザー判断待ちとして停止、Root Case 指定による正規再開経路）。
 - result が failed の場合（repository context で回答不能な blocker。詳細は Issue コメント SSoT）。
 - result が delegation-unavailable の場合（実行未試行のため Issue を `pending` に戻す、REQ-002-004）。
 - 前工程からの引き継ぎ停止判定（`agentdev_handoff: true`）検出時（実装開始せず停止する）。

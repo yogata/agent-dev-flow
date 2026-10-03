@@ -28,7 +28,7 @@ updated: "2026-10-03"
 
 ## 入力
 
-- Issue番号（数値）または Issue URL（Root Case の状態と resume_command から通常経路と例外経路を解決して自走する。resume_command が case-revise を指す場合は再合意済み Definition 変更の例外経路として case-revise → case-ready を駆動する。REQ-034-039）
+- Issue番号（数値）または Issue URL（Root Case を指定する。Root Case の正規状態、Epic 実行構成、既存成果物（Definition PR、Definition Amendment PR、実装 PR 等）、実行の生存状況から通常経路と例外経路を解決して自走する。再合意済み Definition 変更（canonical Definition に実変更あり）の場合は例外経路として case-revise → case-ready を駆動する。REQ-034-039）
 - 要件doc（引数なし時は `.agentdev/drafts/req-draft-*.md` 全件処理がデフォルト / 明示パス指定 / セッション指定キーワードによるセッション内要件doc参照（暗黙判断廃止、構造化 `draft-data` 形式: REQ-008, DEC-003））
 
 ## 出力
@@ -57,7 +57,7 @@ updated: "2026-10-03"
 - 工程分岐（work_type 固定分岐ではなく入力状態と artifact_actions による動的判定）
   - 要件doc入力: stage 1 case-open（例外経路時は case-revise）→ stage 2 case-ready → クリーンアップ検証ゲート（stage 2 対象群収束後・stage 3 開始前）→ stage 3 case-run（インライン）→ stage 4 case-close。stage 1 の収束条件には全対象確立後の横断依存検査の実施を含める（並列 case-open によって兄弟対象をタイミング依存で欠落させない。実現手順は Workflow Skill references）（REQ-034-025、RU 方向4の Design 受け皿）
   - 再合意済み Definition 変更: stage 1（case-revise → stage 2 case-ready）→ クリーンアップ検証ゲート → stage 3 case-run（インライン）→ stage 4 case-close
-  - Issue番号/URL入力: Root Case が open なら case-ready から、ready/running/review なら case-run（インライン）→ case-close。再合意済み変更がある場合は case-revise から開始。再開時は起動時対象集合と各対象の正規状態から現在 stage を最も早い未収束 stage として再構成する（REQ-034-025）
+  - Issue番号/URL入力: Root Case の正規状態、Epic 実行構成、既存成果物から現在 stage を最も早い未収束 stage として再構成する（REQ-034-025、REQ-006-114）。再合意済み変更がある場合は case-revise から開始する
   - artifact_actions は case-ready の Definition action 入力へ渡し、work_type 固定分岐には使用しない
   - auto_gate preflight（auto_gate.auto_ready が false または未解決項目が残る場合は停止）
 - 各工程の実行
@@ -65,15 +65,15 @@ updated: "2026-10-03"
   - case-run（インライン実行）: case-auto が case-run の Workflow Skill（`agentdev-workflow-case-run`）を正規情報源として読み込み、準備/クリーンアップフェーズを自ら実行。実行担当サブエージェント委譲フェーズでは case-auto から直接実行担当サブエージェントへ委譲（委譲起点の折りたたみ/002）。adapter skill（agentdev-case-run-execution-adapter）を case-auto が読み込む
   - 結果状態の4次元集約（REQ-034-031）: 各工程の output_contract から (1) 工程結果 pass/warn/fail、(2) artifact_action 適用結果 applied/skipped/failed/no-op、(3) 定義適用工程完了状態、(4) OU ライフサイクル完了状態を収集し混同なく保持する。集約規則の詳細は後述「結果状態の4次元集約（REQ-034-031）」セクション
 - Wave 反復制御（Epic Issue 指定時）
-  - case-auto が Epic Issue 番号を記録。Epic Issue 本文から Wave 構成、各子Issue ステータスを読み取る（読み取りのみ、Epic Issue 本文の書き込みは case-close の責務）
-  - case-auto が現在 Wave の ready 子Issue を認識し、Epic・Wave・Standard Issue を横断する共有 active Issue task 枠（REQ-034-027。上限・空き枠補充・起動間隔 10 秒は後述「runtime 制御契約」節と v4-runtime-execution-model「runtime 制御ループ」節参照）で各子Issue へインライン case-run を実行。各子Issue の実行担当サブエージェントへ case-auto から直接委譲
+  - case-auto が Epic Issue 番号を記録。Epic Issue 本文の実行構成から Wave 構成、各子Issue 状態を読み取る（読み取りのみ。Epic Issue 本文の書き込みは case-close 相当の統合処理の責務）
+  - case-auto が現在 Wave の未着手（pending）子Issue を認識し、Epic・Wave・Standard Issue を横断する共有 active Issue task 枠（REQ-034-027。上限・空き枠補充・起動間隔 10 秒は後述「runtime 制御契約」節と v4-runtime-execution-model「runtime 制御ループ」節参照）で各子Issue へインライン case-run を実行。各子Issue の実行担当サブエージェントへ case-auto から直接委譲
   - case-run は単一 Issue 実行に専念し（REQ-031-015）、Wave 内子Issue の並列起動・fan-out/fan-in の制御は case-auto の orchestration が単一所有する（DEC-041）。case-run(#epic) 由来の独立実行枠は存在しない
   - 現 Wave の全子Issue の完了（completed-pr / blocked / failed / delegation-unavailable）を待機し、現 Wave の収束（REQ-035-016）を確認する
   - completed-pr の子Issue がある場合、case-close(#epic) 相当の統合処理を Wave 反復を進行させる stage 3 内部処理として実施（統合処理は active Issue task の実行枠を消費しないが共有書き込みの直列化点として扱う。REQ-034-042）
   - 次 Wave の開始は現 Wave の収束（REQ-035-016）と後続 Wave の意味的依存条件の充足（必要な統合・マージの完了を含む。REQ-035-017）の両方を確認してから行う（REQ-034-012）
 - 工程間の状態引き継ぎ（Issue番号、PR番号、RU ファイルパス、capture 対象情報を最終工程まで保持）
 - 複数REQ対応（case-ready の確定結果から複数 REQ doc または scale:large 検出時、確定済みの Issue 構造に従う）
-- 停止条件の検出（停止時タイミング情報の追記。11項目の停止条件いずれかを検出時、実行停止。人間に留保された判断（REQ-096-005）の新規確定では Root Case に `resume_command: req-define` を記録）
+- 停止条件の検出（停止時タイミング情報の追記。11項目の停止条件いずれかを検出時、実行停止。人間に留保された判断（REQ-096-005）の新規確定では Root Case へ req-define 再合意を要旨とする報告をコメントへ記録する）
 - 完了報告（タイミング情報追記。インライン実行の適用を記録。結果状態の4次元報告（REQ-034-031）を含める）
 
 ### 委譲起動不能時の扱い（REQ-031-029、REQ-034-028/044）
@@ -432,7 +432,7 @@ Phase 0 の枝PR に含まれるコミット構成運用を規定する。
 - 委譲工程の result が blocked / failed の場合（当該工程で自走停止、ユーザー判断待ち）。
 - 委譲起動不能時（delegation-unavailable 報告、当該工程を停止）。
 - auto_gate preflight の未解決項目の残存時（`auto_gate.auto_ready` が false または未解決項目が残る場合は停止）。
-- 停止条件（11項目の停止条件いずれか）検出時（実行停止、停止時タイミング情報を追記）。人間に留保された判断（REQ-096-005）の新規確定では Root Case に `resume_command: req-define` を記録する。
+- 停止条件（11項目の停止条件いずれか）検出時（実行停止、停止時タイミング情報を追記）。人間に留保された判断（REQ-096-005）の新規確定では、req-define での再合意が必要である旨を要旨として報告する（再開入口は Root Case 指定であり、工程別の resume_command を Root Case に記録しない）。
 - user-decision-required（上位合意矛盾、新規ユーザー判断事項）検出時（自走を停止しユーザーへ判断を求める）。
 
 ## See Also
@@ -511,7 +511,7 @@ default-on + skip policy（REQ-014-013、REQ-015-002）により各 caller comma
 ### 解決範囲
 
 case-auto は下位 command から受領した decision_context について、当該判断事項が既存正規契約（REQ、Decision、Design、Issue その他合意済み情報）から導出できる場合、または case-auto の工程進行・実行調整に委譲された裁量（REQ-096-015）の範囲内にある場合は、ユーザー停止せず回答して下位 command を resume させる（REQ-034-032、DEC-008 決定1）。
-判断の難易度、確信度、評価器間の不一致、結果状態、唯一解でないことは人間判断の発動根拠としない（REQ-096-004）。人間に留保された判断（REQ-096-005）と既存安全境界が要求する操作承認は既存の停止経路（blocked、resume_command: req-define）に従う。
+判断の難易度、確信度、評価器間の不一致、結果状態、唯一解でないことは人間判断の発動根拠としない（REQ-096-004）。人間に留保された判断（REQ-096-005）と既存安全境界が要求する操作承認は既存の停止経路（blocked、req-define での再合意を要旨とする報告）に従う。
 DEC-008 は歴史的判断記録として参照を維持し、本 Design の現行境界は REQ-096 / DEC-048 を正とする。
 
 | 解決可否 | 条件 | case-auto の挙動 |

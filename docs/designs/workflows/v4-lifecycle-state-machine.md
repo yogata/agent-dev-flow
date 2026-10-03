@@ -23,10 +23,10 @@ v4 ライフサイクル状態は、durable state enum（永続状態）と runt
 
 ## 階層合成（子 = 実状態、上位 = 導出投影）
 
-- 子 Issue 状態（pending/completed/blocked/failed/delegation-unavailable の永続系）を実状態とする
+- 子 Issue 状態（pending / completed / blocked / failed の4値）を実状態とし、Epic 本文の実行構成が所有する（delegation-unavailable は result 契約の分類であり永続状態に含めない。実行未試行として pending へ戻す）
 - Wave 状態は保存せず、Wave 内子Issue 状態から導出する
-- Epic 状態・Root Case の実行状況は、子Issue 群・Wave 群からの進捗集約関数による導出投影とする
-- 並列 Wave で子状態が混在する Case（一部 Wave 完了・他 Wave 未着手等）は、Root 状態を単一 enum 値でなく合成状態（子状態群の組）として表現する
+- Root Case の正規状態は単一の3値（実行継続中 / 完了 / 中止）とし、進行状況には正規状態と開始・終了日時のみを記録する（REQ-006-112）。子状態群の組による合成状態を Root 状態として保存せず、子状態は Epic 実行構成のみが保持する（物理表現の写像: 実行継続中=active、完了=closed、中止=cancelled）
+- 実行継続中の判定、完了と中止の確定は各 lifecycle 段階の契約（case-open / case-ready / case-run / case-close Design）に従い、本節は値域と所有を定義する
 
 ## 状態と遷移の定義体系
 
@@ -45,7 +45,7 @@ v4 ライフサイクル状態は、durable state enum（永続状態）と runt
 
 - Definition PR の isDraft 異常: 正規 lifecycle 外の例外状態として扱い、検出時に blocked へ遷移する
 - delegation-unavailable の後方遷移: 実行未試行として子Issue を pending へ戻す後方遷移とする。試行の有無は runtime 制御ループ側の属性で区別する
-- blocked の resume: resume は状態遷移ではなく入口関数とし、resume_command 属性（req-define/case-revise/case-ready/case-run/case-close）を持つ。blocked から closed への直接遷移は禁止する（v3 local 契約の継承）
+- blocked の resume: resume は Root Case 指定の入口関数とし、工程別の resume_command 属性を持たない。経路解決は Root Case の正規状態、Epic 実行構成、既存成果物（Definition PR、Amendment PR、実装 PR）、実行の生存状況の照合で行う。blocked から closed への直接遷移は禁止する
 - user-decision-required: case-run result enum の状態ではなく、既存結果に付随する停止理由分類として維持する（REQ-014-012 準拠）
 - 再試行カウンタ（コンフリクト解消 Level 2/3 の試行回数）と外部状態ポーリング（mergeable UNKNOWN 等）は状態機械の遷移 predicate ではなく runtime 制御ループとして区別し、ADF v4 Runtime 実行モデル Design 側に位置づける
 

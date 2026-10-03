@@ -59,7 +59,7 @@ canonical Definition に実変更がある場合のみ Definition PR を作成�
 各段階の詳細手順は Workflow Skill（`agentdev-workflow-case-open`）が正規情報源である。
 
 - STEP-1 引き継ぎ判定（`agentdev_handoff: true` 検出時はリポジトリ種別に応じ継続または停止）
-- STEP-2 Root Case 確立（Root Case 本文候補生成、実行識別情報セクション付与、review_dispositions 転記、GitHub Issue 作成。状態 open、実装開始不許可）
+- STEP-2 Root Case 確立（Root Case 本文候補生成、GitHub Issue 作成。正規状態は実行継続中、実装開始不許可）
 - STEP-3 Definition Package 生成・Root Case 関連付け（REQ-030-003）
 - STEP-4 実変更判定と Definition PR 作成（実変更時のみ、Case 単位 1 件。REQ-030-002）
 - STEP-5 冪等再実行確認（既存 Root Case・既存 Definition PR の再利用、重複生成禁止、不足分のみ処理。REQ-030-010）と横断依存検査（draft の artifact_actions と未クローズ Case 群の変更対象成果物の機械的比較、同一パス重複時の警告提示。REQ-030-012〜014）
@@ -112,33 +112,19 @@ case-ready の lifecycle gate completeness（fail-closed）で停止し得る（
 発生余地がある）。missing-design 0 件ゲートが増分ベース（新規行のみ）であることへの予防手順として
 位置づける。
 
-## review_dispositions の消費と証跡転記
+## review_dispositions の消費
 
-case-open は `review_dispositions` を読み取り、Root Case 本文「レビュー判断」セクションへ恒久証跡として転記する。
-
-### 転記規則
-
-- 全 disposition を Root Case 本文へ転記する（Case 単位）。
-- Epic Issue / 子 Issue への転記は case-ready が Epic 構成確定後に実行する（case-open は転記しない）。
-
-### レビュー判断セクションへの転記形式
-
-転記先の Root Case 本文「レビュー判断」セクションの構造は workflow-templates Design（`docs/designs/skills/agentdev-workflow-templates.md`「review_dispositions 証跡セクション」節）が正規所有する。
-各 disposition は id、disposition、reason_code、reason、evidence（path、section、checked_at_commit）を記載する。
-
-### 後方互換（AG-001）
+case-open は draft の `review_dispositions` を読み取り、採用済みの内容が artifact_actions へ反映されていることを確認する。Root Case 本文への全件転記と「レビュー判断」セクションを生成しない。判断理由の記録が必要な採否（reject とその理由等）のみ、必要に応じて Issue コメントへ残す。
 
 `review_dispositions` を持たない旧ドラフトを case-open は入力として拒否しない（DEC-003 準拠）。
-「レビュー判断」セクションへ「該当なし」と記載する。
 
 ## Case Issue 本文の元追跡Issue参照形式
 
-Case Issue（Root Case を含む）の本文冒頭には、req-define 経由で要件化された元追跡Issueへの参照を `Tracking: #N` 形式で記録する（REQ-049-005「追跡Issueと生成された Case Issue の関係は後から追跡できること」の実現手段）。
+追跡Issueから生成 Case への参照を関係追跡の正とし、Case Issue（Root Case を含む）の本文に元追跡Issueへの逆参照を記録しない（REQ-049-005「追跡Issueと生成された Case Issue の関係は後から追跡できること」の一方向実現）。
 
-- **記載形式**: 本文冒頭ブロックに `Tracking: #N` を1行で記載する。複数の元追跡Issueがある場合は `Tracking: #N, #M` のようにカンマ区切りで列挙する
-- **Parent: #N との区別**: `Parent: #N` は Epic Issue と子 Issue の階層関係（Epic/child 専用）を表す形式であり、元追跡Issueへの参照には使用しない。両形式は別用途である
-- **記載対象**: 追跡Issueから要件化された Case Issue のテンプレートで元追跡Issueが判明している場合に記載する。追跡Issueを起源としない通常の Case Issue には記載しない
-- **追跡Issue側との対応**: 追跡Issue側の本文標準構造（関連 Case Issue への参照セクション）との双方向参照として保持する。論理スキーマ（role、kind、状態、本文標準構造を含む）の正は agentdev-issue-tracking Design が一元管理し、本節は Case Issue 本文側の記載形式のみを所有する
+- **記載しない形式**: Case Issue 本文冒頭の `Tracking: #N` 行を記録しない。旧形式の当該行を新規 Issue で生成せず、旧形式を恒久的に読み続ける互換層を残さない
+- **追跡Issue側との対応**: 追跡Issue側の本文標準構造（関連 Case Issue への参照セクション）のみに関係を保持する。論理スキーマの正は agentdev-issue-tracking Design が一元管理し、本節は Case Issue 側の非記載のみを定める
+- **`親Epic: #N` との区別**: `親Epic: #N` は Epic Issue と子 Issue の階層関係を表す形式であり、元追跡Issue参照の用途には使用しない
 
 ## トレーサビリティ能力の利用
 
@@ -210,11 +196,11 @@ REQ-030 への縮小に伴い、かつて case-open が構成していた execut
 ### 発動条件判定 Step（REQ-015-001、REQ-015-002、REQ-015-003）
 
 発動条件判定と review 呼出を分離する（REQ-015-001）。
-発動条件判定 Step は default-on 原則（REQ-015-002、REQ-014-013）と skip 条件（REQ-015-003、REQ-014-014）を評価する。
+発動条件判定 Step は default-on 原則（REQ-015-002、REQ-014-013）と skip 条件（REQ-015-003）を評価する。
 
-- **default-on（原則実行）**: case-open は adversarial-review を原則実行する。ユーザー明示指定は通常発動の必須条件ではなく、Root Case 本文候補、Definition Package 構成案のいずれかに意味的決定が存在する場合に発動する。
+- **default-on（原則実行）**: case-open は adversarial-review を原則実行する。Root Case 本文候補、Definition Package 構成案のいずれかに意味的決定が存在する場合に発動する。
 - **skip 条件**: Root Case 本文候補が合意済み入力（draft-data）の機械的投影のみで新しい意味的決定を含まない場合、adversarial-review を省略して Root Case 作成へ進める（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
-- **ユーザー明示指定時の必須実行**: ユーザーが case-open 実行中に adversarial-review の実施を明示的に指定した場合、skip 条件の該当にかかわらず必ず発動する（REQ-015-002）。
+- **明示指定時の取扱い**: ユーザーが review の実施を明示的に指示した場合は、通常のユーザー指示としてその場で実行する。専用の検出、専用フラグ、Issue 本文への専用保存、後工程への専用伝播、skip 条件の専用上書き処理を持たない（REQ-015-002）。
 
 ### review 呼出 Step（REQ-015-001）
 

@@ -61,20 +61,19 @@ authoring Skill/Design がそれぞれ担当する。
 1. case-open は合意済み要件doc の artifact_actions から変更予定成果物を抽出する
 2. 各成果物の artifact type を判定する
 3. 上記対応表から必須品質能力キーを導出する
-4. 各能力キーについて、test strategy 項目を生成する
-   （verification: 当該能力によるレビュー、pass_criteria: 対象基準に未解決違反がない、
-    on_failure: fix-and-reverify）
-5. 生成した test strategy 項目を Issue 本文の test strategy セクションへ投影する
-6. QG-2 は Issue 作成前に test strategy 上の必須品質能力の充足を検証する
+4. 各能力キーについて、完了条件の検証項目を生成する
+   （検証方法: 当該能力によるレビュー、合格条件: 対象基準に未解決違反がない、
+    項目固有の処置: fix-and-reverify）
+5. 生成した検証項目を Issue 本文の完了条件（チェックボックス形式）へ投影する
+6. QG-2 は Issue 作成前に完了条件上の必須品質能力の充足を検証する
 
 ## QG-2 投影契約
 
 QG-2 投影契約は v4 Quality モデル（docs/designs/quality/v4-quality-gate-model.md）における Gate（execution structure 確定時の Acceptance Coverage）への投影である。必須品質能力キーの対応表は Verification Obligation の導出材料、本 Design の合成規則は Obligation への artifact type と case-specific risk の供給経路として機能する。
 
 QG-2（agentdev-quality-gates）は次を検証する。
-(a) 変更予定成果物から導出される全ての必須品質能力が test strategy へ反映されていること
-(b) 各 test strategy 項目が3要素（verification、pass_criteria、on_failure）を持つこと
-    （REQ-008-048）
+(a) 変更予定成果物から導出される全ての必須品質能力が完了条件（検証項目）へ反映されていること
+(b) 完了条件の各項目が検証方法と合格条件を持ち、達成状態（チェックボックス）と区別されていること
 (c) 完了条件が成果状態であり、必須能力の呼出自体が完了状態とされていないこと
 
 ## 他 Design との関係
