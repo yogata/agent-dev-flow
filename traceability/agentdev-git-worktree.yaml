@@ -8,6 +8,7 @@ implementation:
     - REQ-018-006
     - REQ-018-007
     - REQ-018-008
+    - REQ-018-009
     - REQ-029-012
     - REQ-032-029
     - REQ-053-042
@@ -16,4 +17,5 @@ verification:
     - REQ-018-005
     - REQ-018-007
     - REQ-018-008
+    - REQ-018-009
     - REQ-053-042
