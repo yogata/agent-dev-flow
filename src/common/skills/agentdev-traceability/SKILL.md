@@ -93,6 +93,7 @@ check の9種検査: `malformed-declarations`（sidecar および inline declara
 
 - `--req` は要件行ID（`REQ-{NNNN}-{MMM}`）の個別カンマ指定のみを受理する。`..` 形式の範囲構文は範囲展開されずリテラルの reqId として扱われ、完全性検査の対象限定が空振りして未検査の行が pass に見える。対象行は1つずつ列挙すること
 - worktree を検証対象とする場合、および scripts ディレクトリを cwd に起動した場合も、`--root` は検証対象リポジトリのルート明示を維持する（相対パス指定の事故像は上記のとおり）
+- Windows 実行環境では `--root` に Windows 形式の絶対パスを指定する（`C:/Users/...` 形式の forward slash 記法を推奨）。MSYS 形式（`/c/Users/...`）は Windows プログラム側のパス解決で実在しない root として扱われ、fail-closed 契約により検査対象が見かけ上全件欠落するため使用しない。bash から引用符なしの backslash 形式を渡すと escape 解釈により backslash が落ちてパスが破損するため、引用符付きの backslash 形式または forward slash 形式で渡す
 - 宣言の走査対象は拡張子 `.md` / `.ts` のファイルのみであり、除外ディレクトリ（一覧は「I/O 契約（共通）」参照。`.agentdev/` 等）配下に配置した宣言は計上されない
 
 ```bash

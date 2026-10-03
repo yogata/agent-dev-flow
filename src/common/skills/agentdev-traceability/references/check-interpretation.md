@@ -37,6 +37,22 @@ check は `src/check.ts` を `--root <repo-root>` 付きで実行する。出力
 - 検証スコープポリシーが存在しない場合、全現行要件行が `missing-verification` の計上対象になる（安全側既定）。これは検査の誤動作ではなく規定の挙動である。任意行として扱いたい要件行は policy へ明示登録する
 - findings の解消は対応関係データの修正のみで行い、要件そのものや検査基準を改変しない
 
+## --req 限定実行時の検出結果計上性格判定（3段判定）
+
+check を `--req` で対象要件行へ限定した実行では、検出された finding の計上性格を次の3段で判定する。3段判定は、限定実行の結果を対象要件行の判定（lifecycle gate 判定）と corpus 既存状態へ正しく振り分けるための運用手順であり、check の検出条件・判定・計上自体を変更しない。
+
+| 段 | 判定内容 | 扱い方 |
+|---|---|---|
+| 1. 対象帰属 | finding の reqId が `--req` で指定した対象要件行集合に含まれる（対象行の missing 系欠落、対象行に関係する宣言不備・重複等） | 対象要件行への計上として扱う。lifecycle gate 判定の対象であり、fail-closed で処理する（対象範囲内で解消するか blocked まで維持） |
+| 2. 対象外既出 | finding が対象要件行集合外の既存状態に由来する（対象外要件行の既知債務、対象外パスの既存不備等）。限定実行の走査範囲で観測された既出の検出 | 対象要件行への計上としない。既出として検証記録に残し、是正は所管の Case または corpus 債務方針（本 reference「completeness の 2 層解釈」参照）で扱う。対象要件行の判定を不合格にしない |
+| 3. 検査不能 | 実行不能・読取不能・前提崩れ（`--root` の解決失敗、policy 読取不能、検査対象の見かけ上の全件欠落等） | 計上性格の判定以前に完全性判定不能である。合格として扱わない（fail-closed）。実行前提を修正して再実行する |
+
+判定手順:
+
+1. finding に reqId が付与されている場合、その reqId が `--req` 対象集合に含まれるかを確認する。含まれれば段1、含まれなければ段2
+2. 検査自体が成立していない形跡（実行エラー、policy 読取不能、検査対象の見かけ上の全件欠落）がある場合は段1・段2の判定を行わず段3として扱う
+3. 段判定の結果は、段と判定根拠を伴って検証記録へ残す
+
 ## completeness の 2 層解釈（lifecycle gate と corpus）
 
 missing 系検出項目（`missing-design` / `missing-implementation` / `missing-verification`）の完全性は、ADF v4 Traceability モデル Design（v4-traceability-model、docs/designs/<foundations/v4-traceability-model>.md）「completeness の 2 層」節の定義に従い、次の2層で解釈する。

@@ -20,7 +20,7 @@ docs/knowledge/ はプロジェクト知識（プロジェクト固有の再利�
 
 ## 現在の知識文書
 
-23件。
+24件。
 
 - [windows-powershell-bulk-io-corruption.md](windows-powershell-bulk-io-corruption.md)
 - [checker-cli-stdout-loss-on-windows-bun.md](checker-cli-stdout-loss-on-windows-bun.md)
@@ -45,6 +45,7 @@ docs/knowledge/ はプロジェクト知識（プロジェクト固有の再利�
 - [windows-rename-eperm-diagnosis-and-bounded-retry.md](windows-rename-eperm-diagnosis-and-bounded-retry.md)
 - [structure-migration-followup-checklist.md](structure-migration-followup-checklist.md)
 - [recursive-copy-root-relative-skip.md](recursive-copy-root-relative-skip.md)
+- [windows-checker-msys-path-argument.md](windows-checker-msys-path-argument.md)
 
 知識文書は learning から昇華されて成長する（REQ-056）。
 登録経路と承認条件は REQ-056 を参照する。
