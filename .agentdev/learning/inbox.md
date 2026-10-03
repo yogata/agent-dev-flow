@@ -190,3 +190,19 @@
 - 内容: LongPathsEnabled 有効環境（HKLM SYSTEM CurrentControlSet Control FileSystem LongPathsEnabled = 0x1）では `rmdir /s /q` が深いネスト（445 文字パス）でも成功し、Filename too long 部分失敗が再現しない。robocopy /MIR 手順の再現検証は深いネスト作成後 robocopy を直接実行する構成で実測値（rc 2・残存 0 件・rmdir rc 0）を取得した
 - 学び: Windows パス長制限起因の手順検証は環境設定（LongPathsEnabled）で挙動が変わる。再現検証は「手順の対象となる失敗状態を作ってから手順を実行する」構成で実測し、環境ラベルを実測根拠へ付記する
 - 発見元: PR #3379 Findings/learning（Case #3363・backlog-pool-20261003・OU-017）
+
+## 2026-10-03: git worktree remove の Filename too long 部分失敗は robocopy /MIR 手順で解消できる（実用実績）
+
+- 問題クラス: workflow deviation（削除部分失敗・運用文書手順の実用化）
+- 発生工程: case-close STEP-6-1 worktree 削除（Case #3355・.worktrees/3355-maintenance・node_modules 深いネスト）
+- 内容: `git worktree remove` が「Filename too long」で部分失敗（705 ファイル・144 ディレクトリ残存・worktree 登録は除去済み）。REQ-018-009 の robocopy /MIR フォールバック手順（空ディレクトリ→残存ディレクトリの方向明示・rc 0-7 成功・残存 0 件検証後に rmdir・prune）を実行して rc 2 で全削除・rmdir 成功・prune 完了
+- 学び: worktree-operations.md の robocopy 手順は実務で機能する（手順整備 Case #3363 の同日実用実績）。node_modules 配下の深いネストを含む worktree 削除では最初から remove 失敗を想定し、失敗時に robocopy 手順へ即座に切り替える
+- 発見元: Case #3355 case-close 実行時の自工程観測
+
+## 2026-10-03: branch が複数コミット構成だと git cherry による squash merge 判定が非等価になる（内容含み判定に切替）
+
+- 問題クラス: workflow deviation（squash merge 済み判定手段の前提差）
+- 発生工程: case-close STEP-6-1 branch -D 前の squash merge 済み確認（Case #3355・branch 2 コミット構成）
+- 内容: `git cherry origin/main <branch>` が 2 件とも `+`（patch 非等価）を返した。branch が 2 コミット構成の場合、squash merge 後の合算コミットと個別コミットの patch-id は一致しない。変更ファイル範囲の限定（e642dfcf..branch の diff 対象が本 Case ファイルのみ）と、本 Case 変更ファイルの branch HEAD 内容 = origin/main HEAD 内容（`git diff origin/main <branch> -- <files>` が空）で内容含みを判定してから `-D` 削除した
+- 学び: squash merge 済み判定は git cherry の patch-id 等価に依存せず、単一コミット構成でのみ一次判定に使う。複数コミット構成では「branch 変更範囲の限定確認 + 変更ファイルの内容一致（diff 空）」で判定する
+- 発見元: Case #3355 case-close 実行時の自工程観測
