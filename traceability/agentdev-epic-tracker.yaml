@@ -1,4 +1,21 @@
 component: agentdev-epic-tracker
 implementation:
+  src/common/skills/agentdev-epic-tracker/SKILL.md:
+    - REQ-101-001
+    - REQ-101-014
+    - REQ-035-001
+  src/common/skills/agentdev-epic-tracker/references/epic-reflect-coordination.md:
+    - REQ-101-001
+    - REQ-101-014
+    - REQ-035-001
+  src/common/skills/agentdev-epic-tracker/scripts/lib/tracking-table.ts:
+    - REQ-035-001
+  src/common/skills/agentdev-epic-tracker/scripts/lib/epic-reflect.ts:
+    - REQ-101-001
+    - REQ-101-014
+    - REQ-035-001
+  src/common/skills/agentdev-epic-tracker/scripts/src/reflect.ts:
+    - REQ-101-014
+    - REQ-035-001
   src/common/skills/agentdev-epic-tracker/references/regex-and-merge-conflict.md:
     - REQ-100-004

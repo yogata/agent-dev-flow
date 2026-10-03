@@ -112,7 +112,7 @@ case-run 側の事前検査とは独立に実施する。検証手段との対�
 
 - **完了条件チェックボックス評価・更新は case-close の専任責務**: case-run/ driver/ 外部実行バックエンドは更新しない。case-close は別コンテキストで Issue 本文を再読込し、PR 本文を capture 入力源として最終完了判定する
 - **工程記録の完了契機反映**: QG-4 合格後のクローズ契機で、判定主体として完了記録（記録種別=完了、判定根拠必須）を記録コメントとして投稿し、本文結果セクション（成果物、最終判定と根拠、残件の扱い）を更新する。検証詳細は成果物（PR 本文、対応記録コメント）を参照し、本文・コメント・PR 本文へ重複して記載しない。反映は記録コメント検証スクリプト（`agentdev-workflow-case-run/scripts/record-comments.ts`、決定的処理。種別別必須項目検証、結果セクション構築と既存本文への適用）による事前検査を経由し、Custom Tool `agentdev_gh` の comment_create / issue_update で行う。実行の申告だけで完了扱いにしない（実行担当は報告、case-close は完了条件と証拠を照合する）。手順詳細は references/cleanup-and-capture.md の STEP-5 参照
-- **Epic Issue 本文ステータス追跡テーブルの更新は case-close 単一書き手**: case-run は読み取りのみ、case-auto は Wave 反復制御のみで直接書き込まない（last-write-wins 競合防止）
+- **Epic Issue 本文ステータス追跡テーブルの更新は case-close 単一書き手**: case-run は読み取りのみ、case-auto は Wave 反復制御のみで直接書き込まない（last-write-wins 競合防止）。Case Issue 工程記録の取りまとめによる記録契機別の Epic 反映（子状態集約・全体条件評価）は、case-close と同一の per-Epic 排他制御・局所直列化の下で Epic Issue 本文へ書き込む（手順の正は `agentdev-epic-tracker`）。E5 の closing 書き込みは直列化区間内での最新取得→マージ→更新により行い、取りまとめ反映の集約セクションを消去しない
 - **Capture 境界**: intake/ learning を別々の成果物として扱い、PR 本文のみを capture 入力源とする（一時会話コンテキスト不入力）
 - **検証差分の記録**: case-close が実施した各検証（QG-4 完了条件評価、docs 検証・配布依存境界 最終 gate、トレーサビリティ独立再検査等）について、検証種別、検証結果、finding 差分（新規、修正済み、既出、撤回、無効の5分類）を対応記録コメントへ記録する。形式は `agentdev-workflow-templates` の検証差分セクション規約（PR テンプレート形式と同一のテーブル）に従い、前段階（case-run）の PR 本文検証差分セクションの記録との差分で finding を分類し、工程間の比較ができる。対論型レビューの審議中 finding 状態の追跡と品質ゲート完了報告の修正証跡の所有境界を変更しない
 - **統合先基準（squash merge 先・同期基準）**: squash merge 先、ブランチ同期の対象は main とする。QG-4 は Issue 完了条件の最終判定として意味を変更しない

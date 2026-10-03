@@ -2,6 +2,7 @@ component: agentdev-workflow-case-auto
 implementation:
   src/common/skills/agentdev-workflow-case-auto/SKILL.md:
     - REQ-034-032
+    - REQ-035-001
     - REQ-094-001
     - REQ-094-002
     - REQ-094-004

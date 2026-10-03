@@ -110,7 +110,7 @@ case-auto workflow は次の8 STEP で構成する。
 - `agentdev-workflow-orchestration`: orchestration 詳細プロトコル、bg task 破棄検知・状態別回復、capture 境界、Subagent 委譲プロトコル、停止理由分類詳細、コンフリクト解消 Level 2/3 詳細
 - `agentdev-case-run-execution-adapter`: case-run 委譲契約（インライン実行時）
 - `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ、コンフリクト解消 rebase パス（Level 1 は case-close、Level 2/3 は本 workflow）
-- `agentdev-epic-tracker`: Epic Issue 本文ステータス追跡テーブル（case-auto は読取のみ、書き込みは case-close 単一書き手）
+- `agentdev-epic-tracker`: Epic Issue 本文ステータス追跡テーブルの読取、および Case Issue 工程記録の取りまとめによる記録契機別 Epic 反映の書き込み（書き込みは closing 書き込み〔case-close〕と同一の per-Epic 排他制御・局所直列化の下で実施、手順の正は `agentdev-epic-tracker`）
 - `agentdev-workflow-lifecycle`: 引き継ぎ停止判定
 - Custom Tool `agentdev_gh`: GitHub Issue/PR/comment/merge/close I/O
 - `agentdev-project-extensions`: project extension 読込
@@ -120,7 +120,7 @@ case-auto workflow は次の8 STEP で構成する。
 ## 共通制約
 
 - **自走境界（ガードレール: 自走対象外・remote branch 削除限定、ほか不変条件）**: repo にファイルとして残る変更のみ自走対象。DB migration 実行、deploy/apply、クラウドリソース操作、外部SaaS 設定変更、課金、権限、認証情報、repo外実データ操作、通知送信は対象外
-- **委譲・参照制約（command 不変条件、ガードレール: Epic Issue 本文書き込み禁止）**: 各工程は対応するコマンド定義を authoritative source として実行（case-auto 定義内再実装回避）。case-run はインライン実行（標準動作）。Epic Issue 本文書き込みは case-close 単一書き手（case-auto は読取のみ、`POL-epic-tracking-single-writer`）。case-auto は Issue 階層決定ロジックを持たない、Epic / Wave / Issue 構成は case-ready の確定結果に従う（command 不変条件）
+- **委譲・参照制約（command 不変条件、ガードレール: Epic Issue 本文書き込み禁止〔Wave 反復制御としての直接書込み〕）**: 各工程は対応するコマンド定義を authoritative source として実行（case-auto 定義内再実装回避）。case-run はインライン実行（標準動作）。Wave 反復制御としての Epic Issue 本文書き込みは行わず（case-auto は読取のみ、`POL-epic-tracking-single-writer`）、Case Issue 工程記録の取りまとめによる記録契機別 Epic 反映のみ、closing 書き込み〔case-close〕と同一の per-Epic 排他制御・局所直列化の下で書き込む（手順の正は `agentdev-epic-tracker`）。case-auto は Issue 階層決定ロジックを持たない、Epic / Wave / Issue 構成は case-ready の確定結果に従う（command 不変条件）
 - **5件文脈の区別**: (1) case-auto stage 3 共有 active Issue task 数（上限 5。1 active task = 1 Issue への実装実行委譲。Epic・Wave・Standard Issue を横断して単一所有）、(2) execution_unit 全体並列（上限なし）。混同しない。case-run 独自の Wave 内子 Issue 並列枠は廃止済みであり第3の文脈として存在しない
 - **OU処理ループ**: Standard flow の case-close（stage 4）完了後に未処理 OU が残存する場合は次 OU の処理を STEP-3 から開始（全 OU 処理完了時のみ全体完了報告）。起動時対象集合は case-ready が確定した全 execution_unit であり、OU の必須依存は stage 内の直列化要因である（case-auto 実行契約）。必須依存で結合した execution_unit 群は順次（stage 内局所直列化）、必須依存のない execution_unit 群は並列で処理し、OU 逐次処理は orchestration stage モデルを置き換えない
 - **取りまとめ経路の決定的部分**: 停止時集約報告（完了済み/進行中/未実行/観測不能 + 再開に必要な次コマンド）、反映計画（記録契機 × 反映面〔本文・コメント・Epic〕ごとの部分成功区別）、部分成功照合（読み戻し確認）、不足分再試行計画、未反映回復計画は、本スキル配下の実行コード `scripts/src/records-report.ts` の決定的関数で生成する（詳細は STEP-8 reference「取りまとめ経路」節）。全関数は入力として与えられた現行観測のみに依存するため、再開時は durable state から再構成した最新観測を与え、停止時の集約を再利用しない。本モジュールは I/O を行わず、GitHub I/O は Custom Tool 経由で実行し、記録契機での本文・コメント更新、Epic 反映の書込み経路、失敗注入を伴う回復規律の実行は各正規所有に属する（取りまとめ経路は書込み経路への入力を生成する接合点である）
