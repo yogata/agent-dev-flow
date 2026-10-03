@@ -107,7 +107,7 @@ describe("protected-paths / isProtectedPath", () => {
       direct_paths: ["scripts/self/release/trusted-distribution-gate.ps1"],
       import_paths: [],
     };
-    expect(isProtectedPath("src/opencode/commands/agentdev/case-run.md", set)).toBe(false);
+    expect(isProtectedPath("src/common/commands/agentdev/case-run.md", set)).toBe(false);
   });
 
   test("returns true for a transitive import path", () => {

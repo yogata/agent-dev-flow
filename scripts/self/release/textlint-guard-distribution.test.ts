@@ -77,8 +77,8 @@ function copyTree(src: string, dst: string, skip: (rel: string) => boolean = () 
 }
 
 /** 実 plugin package を node_modules・vendor なしでフィクスチャへ配置する（版固定情報のみ配布の前提）。 */
-function placeRealPlugin(parentSrcOpencode: string): void {
-  copyTree(PLUGIN_SOURCE_DIR, path.join(parentSrcOpencode, "plugins", "agentdev-textlint-guard"), (rel) => {
+function placeRealPlugin(parentPluginsDir: string): void {
+  copyTree(PLUGIN_SOURCE_DIR, path.join(parentPluginsDir, "agentdev-textlint-guard"), (rel) => {
     const norm = rel.replaceAll("\\", "/");
     // テスト実行成果物と導入時生成依存（vendor）は配布物に含めない（ディレクトリ自体も含まない）
     return (
@@ -181,7 +181,7 @@ describe("agentdev-textlint-guard distribution / consumer install (TS-005 / TS-0
         fs.mkdirSync(path.join(srcSenpi, "connection-demo"), { recursive: true });
         fs.writeFileSync(path.join(srcSenpi, "connection-demo", "connection.ts"), "// senpi connection\n", "utf8");
         fs.writeFileSync(path.join(srcSenpi, "README.md"), "# src/senpi/ (Senpi host connection area)\n", "utf8");
-        placeRealPlugin(srcOpencode);
+        placeRealPlugin(path.join(srcOpencode, "plugins"));
         fs.mkdirSync(path.join(root, "scripts", "consumer"), { recursive: true });
         fs.copyFileSync(INSTALL_PS1, path.join(root, "scripts", "install.ps1"));
         fs.copyFileSync(path.join(REPO_ROOT, "scripts", "consumer", "common.ps1"), path.join(root, "scripts", "consumer", "common.ps1"));
@@ -280,15 +280,18 @@ describe("agentdev-textlint-guard distribution / archive install (TS-005)", () =
   test("archive installer: vendor 欠落で exit 6 停止と案内、導入手順後の再実行成功と offline gate", () => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), "adftl-arc-"));
     try {
-      const stageSrc = path.join(root, "archive", "src", "opencode");
-      fs.mkdirSync(path.join(stageSrc, "commands", "agentdev"), { recursive: true });
-      fs.writeFileSync(path.join(stageSrc, "commands", "agentdev", "case-run.md"), "# case-run\n", "utf8");
-      fs.mkdirSync(path.join(stageSrc, "skills", "agentdev-workflow-case-run"), { recursive: true });
-      fs.writeFileSync(path.join(stageSrc, "skills", "agentdev-workflow-case-run", "SKILL.md"), "# case-run\n", "utf8");
-      placeRealPlugin(stageSrc);
+      // DEC-049 canonical archive layout: commands/skills under src/common/,
+      // plugins under src/opencode/plugins/.
+      const stageSrc = path.join(root, "archive", "src");
+      fs.mkdirSync(path.join(stageSrc, "common", "commands", "agentdev"), { recursive: true });
+      fs.writeFileSync(path.join(stageSrc, "common", "commands", "agentdev", "case-run.md"), "# case-run\n", "utf8");
+      fs.mkdirSync(path.join(stageSrc, "common", "skills", "agentdev-workflow-case-run"), { recursive: true });
+      fs.writeFileSync(path.join(stageSrc, "common", "skills", "agentdev-workflow-case-run", "SKILL.md"), "# case-run\n", "utf8");
+      fs.mkdirSync(path.join(stageSrc, "opencode", "plugins"), { recursive: true });
+      placeRealPlugin(path.join(stageSrc, "opencode", "plugins"));
 
       const target = path.join(root, "consumer", ".opencode");
-      const installerArgs = ["-Source", path.join(root, "archive", "src", "opencode"), "-Target", target, "-Mode", "copy"];
+      const installerArgs = ["-Source", stageSrc, "-Target", target, "-Mode", "copy"];
 
       // 依存未生成のまま installer → exit 6（fail-closed）と導入手順案内
       const blocked = runPwsh(ARCHIVE_INSTALL_PS1, installerArgs, root);

@@ -28,7 +28,7 @@ describe("git-blob-reader / batched reads integration", () => {
       const entries = listTreeEntries(adapter, assertGitOid(head), "candidate");
       const interesting = entries
         .map((e) => e.path)
-        .filter((p) => p.startsWith("src/opencode/") || p.startsWith("scripts/install-") || p.startsWith("scripts/check-"))
+        .filter((p) => p.startsWith("src/common/") || p.startsWith("src/opencode/plugins/") || p.startsWith("scripts/install-") || p.startsWith("scripts/check-"))
         .slice(0, 5);
       expect(interesting.length).toBeGreaterThan(0);
       const requests = interesting.map((p) => `${head}:${p}`);

@@ -4,10 +4,10 @@
 // §58-67:
 //
 //   source           — every tracked regular file under
-//                      src/opencode/commands/agentdev/**,
-//                      src/opencode/skills/agentdev-*/**,
-//                      src/opencode/skills/japanese-tech-writing/**,
-//                      src/opencode/tools/agentdev-*/**,
+//                      src/common/commands/agentdev/**,
+//                      src/common/skills/agentdev-*/**,
+//                      src/common/skills/japanese-tech-writing/**,
+//                      src/common/tools/agentdev-*/**,
 //                      src/opencode/plugins/agentdev-/**
 //                      (including tests, fixtures, README, package.json,
 //                      tsconfig, lockfiles, and metadata — none excluded)
@@ -59,10 +59,10 @@ export interface ManifestEntryInput {
 // ---------------------------------------------------------------------------
 
 const RUNTIME_PREFIXES: readonly string[] = [
-  "src/opencode/commands/agentdev/",
-  "src/opencode/skills/agentdev-",
-  "src/opencode/skills/japanese-tech-writing/",
-  "src/opencode/tools/agentdev-",
+  "src/common/commands/agentdev/",
+  "src/common/skills/agentdev-",
+  "src/common/skills/japanese-tech-writing/",
+  "src/common/tools/agentdev-",
   "src/opencode/plugins/agentdev-",
 ];
 
@@ -76,6 +76,8 @@ const ARCHIVE_EXTRA_REQUIRED: readonly string[] = [
   // archive it is placed under the projection name scripts/install.ps1 by
   // the packager; the manifest tracks the repository original path.
   "scripts/consumer/archive/install.ps1",
+  // Archive-bundled install guide. The manifest tracks the repository root
+  // original; the packager bundles it as README-INSTALL.md at archive root.
   "README-INSTALL.md",
 ];
 
@@ -177,16 +179,27 @@ export function buildSourceManifest(
   return { projection: "source", entries };
 }
 
+// Canonical runtime sources map to their .opencode/** link paths by dropping
+// the canonical root segment: src/common/{commands,skills,tools} and
+// src/opencode/plugins project 1:1 under .opencode/ (DEC-049 layout).
+const RUNTIME_LINK_PREFIXES: ReadonlyArray<readonly [string, string]> = [
+  ["src/common/commands/agentdev/", ".opencode/commands/agentdev/"],
+  ["src/common/skills/", ".opencode/skills/"],
+  ["src/common/tools/", ".opencode/tools/"],
+  ["src/opencode/plugins/", ".opencode/plugins/"],
+];
+
 /**
  * Map a source-runtime path to its .opencode/** link path. Throws if the
  * input is not a runtime path (defensive — the caller filters upstream).
  */
 export function mapRuntimeToLinkPath(runtimePath: string): string {
-  const prefix = RUNTIME_PREFIXES.find((p) => runtimePath.startsWith(p));
-  if (!prefix) {
-    throw new ManifestError("link", `not a runtime path: ${runtimePath}`);
+  for (const [sourcePrefix, linkPrefix] of RUNTIME_LINK_PREFIXES) {
+    if (runtimePath.startsWith(sourcePrefix)) {
+      return linkPrefix + runtimePath.substring(sourcePrefix.length);
+    }
   }
-  return ".opencode/" + runtimePath.substring("src/opencode/".length);
+  throw new ManifestError("link", `not a runtime path: ${runtimePath}`);
 }
 
 export function buildLinkManifest(

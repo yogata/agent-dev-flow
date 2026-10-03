@@ -6,11 +6,12 @@ param()
 # ADF-COVERS(implementation): REQ-052-007
 #
 # WP-3 (Issue #1928) §7.5.1: build a junction-free release archive from the
-# repo's src/opencode/ source tree. The archive contains:
+# repo's multi-host canonical source tree (DEC-049: src/common/ canonical +
+# host connection areas, REQ-099-020). The archive contains:
 #   agentdev-release-<sha>/
-#     src/opencode/commands/agentdev/**.md
-#     src/opencode/skills/agentdev-*/**
-#     src/opencode/tools/agentdev-*/**        (Custom Tool distribution type)
+#     src/common/commands/agentdev/**.md
+#     src/common/skills/agentdev-*/**
+#     src/common/tools/agentdev-*/**          (Custom Tool distribution type)
 #     src/opencode/plugins/agentdev-*/**      (Plugin / Hook distribution type,
 #                                              EXCLUDING vendor/ — the textlint
 #                                              guard dependency artifacts are
@@ -33,9 +34,10 @@ param()
 # canonical distribution-boundary adapter (the trusted host checker at
 # .opencode/skills/repo-agentdev-integrity/, NOT the candidate copy that
 # travels inside the archive):
-#   1. archive projection on the staged src/opencode/ content
+#   1. archive projection on the staged src/common/ + src/opencode/plugins
+#      content
 #   2. archive projection on the archive EXTRAS (README-INSTALL.md,
-#      scripts/install.ps1 archive edition) — these live outside src/opencode/
+#      scripts/install.ps1 archive edition) — these live outside src/common/
 #      so the host checker's archive profile would otherwise skip them
 #   3. archive-installed projection on the extracted+installed content
 # The final archive is published by an atomic no-clobber HARD LINK after
@@ -58,7 +60,8 @@ param()
 #      THIRD-PARTY-NOTICES.md missing at repo root — the archive must carry the
 #      third-party notices, fail-closed)
 #   3  pre-existing final archive collision (never overwritten)
-#   6  archive projection boundary check failed (src/opencode/ or extras)
+#   6  archive projection boundary check failed (src/common/ + host
+#      connection area, or extras)
 #   7  archive-installed projection boundary check failed
 #   8  trusted host boundary checker or publish helper missing (fail-closed,
 #      Oracle finding 6)
@@ -80,11 +83,17 @@ function Fail-Exit {
 # scripts/self/release/ -> repo root is three levels up.
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
 
-$srcCommands = Join-Path $repoRoot "src\opencode\commands\agentdev"
-$srcSkills = Join-Path $repoRoot "src\opencode\skills"
+# Canonical sources (DEC-049, REQ-099-020): commands/skills and Custom Tools
+# live under the host-independent canonical tree src/common/; Plugins/Hooks
+# stay in the OpenCode host connection area (src/opencode/plugins).
+$srcCommands = Join-Path $repoRoot "src\common\commands\agentdev"
+$srcSkills = Join-Path $repoRoot "src\common\skills"
 # Archive-dedicated installer ORIGINAL (REQ-050-010). Travels inside the
 # archive under the projection name scripts/install.ps1.
 $installScript = Join-Path $repoRoot "scripts\consumer\archive\install.ps1"
+# Archive-bundled install guide. The archive-bundled install guide travels
+# inside the archive as README-INSTALL.md (the trust-root manifest of the
+# trusted distribution gate requires it at the repository root, REQ-050-011).
 $readmeInstall = Join-Path $repoRoot "README-INSTALL.md"
 # THIRD-PARTY-NOTICES.md は release archive の必須同梱物（依存実体を含まない配布の
 # third-party 通知。欠落時は fail-closed）。
@@ -165,10 +174,13 @@ function Cleanup-Stage {
 }
 
 try {
-    # Stage directory layout under <stageBase>/<archiveName>/
+    # Stage directory layout under <stageBase>/<archiveName>/ (DEC-049
+    # canonical layout: src/common/ canonical + host connection areas).
+    $stageSrc = Join-Path $stageArchiveRoot "src"
+    $stageSrcCommon = Join-Path $stageArchiveRoot "src\common"
     $stageSrcOpencode = Join-Path $stageArchiveRoot "src\opencode"
-    $stageCommands = Join-Path $stageSrcOpencode "commands\agentdev"
-    $stageSkills = Join-Path $stageSrcOpencode "skills"
+    $stageCommands = Join-Path $stageSrcCommon "commands\agentdev"
+    $stageSkills = Join-Path $stageSrcCommon "skills"
     $stageScripts = Join-Path $stageArchiveRoot "scripts"
 
     New-Item -ItemType Directory -Path $stageCommands -Force | Out-Null
@@ -189,7 +201,8 @@ try {
     }
 
     # Custom Tools / Plugins (agentdev-* distribution types, REQ-052):
-    # staged under src/opencode/{tools,plugins}/ like skills. Optional at
+    # Custom Tools are canonical (src/common/tools/); Plugins/Hooks stay in
+    # the OpenCode host connection area (src/opencode/plugins/). Optional at
     # this stage — repos without these kinds simply skip them.
     # Repo-local Plugin (agentdev-distribution-boundary-guard, REQ-052-006 /
     # REQ-002-045) is excluded from consumer distribution. SYNC OBLIGATION
@@ -198,10 +211,14 @@ try {
     # scripts/install.ps1, scripts/consumer/archive/install.ps1, this file.
     # self-sync.ps1 must NOT exclude it (self-host projection is kept).
     $repoLocalPluginNames = @("agentdev-distribution-boundary-guard")
-    foreach ($kind in @("tools", "plugins")) {
-        $kindSource = Join-Path $repoRoot "src\opencode\$kind"
+    foreach ($kindSpec in @(
+        @{ Kind = "tools";   Source = (Join-Path $repoRoot "src\common\tools");      Stage = (Join-Path $stageSrcCommon "tools") },
+        @{ Kind = "plugins"; Source = (Join-Path $repoRoot "src\opencode\plugins"); Stage = (Join-Path $stageSrcOpencode "plugins") }
+    )) {
+        $kind = $kindSpec.Kind
+        $kindSource = $kindSpec.Source
         if (-not (Test-Path -LiteralPath $kindSource)) { continue }
-        $stageKindDir = Join-Path $stageSrcOpencode $kind
+        $stageKindDir = $kindSpec.Stage
         New-Item -ItemType Directory -Path $stageKindDir -Force | Out-Null
         $kindDirs = Get-ChildItem -LiteralPath $kindSource -Directory | Where-Object {
             $_.Name -like "agentdev-*" -and
@@ -215,13 +232,13 @@ try {
     }
 
     # node_modules は配布アーカイブに含めない (サイズ増大・consumer側のnpm installで解決)
-    Get-ChildItem -LiteralPath $stageSrcOpencode -Recurse -Directory -Filter "node_modules" -ErrorAction SilentlyContinue |
+    Get-ChildItem -LiteralPath $stageSrc -Recurse -Directory -Filter "node_modules" -ErrorAction SilentlyContinue |
         Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
     # vendor/ も配布アーカイブに含めない（textlint guard の導入時生成依存。版固定情報
     # （package.json + bun.lock）のみを配布し、導入先で bun install && bun run build:engine
     # により再生成する）。
-    Get-ChildItem -LiteralPath $stageSrcOpencode -Recurse -Directory -Filter "vendor" -ErrorAction SilentlyContinue |
+    Get-ChildItem -LiteralPath $stageSrc -Recurse -Directory -Filter "vendor" -ErrorAction SilentlyContinue |
         Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
     # 版固定情報の staging 存在検証（fail-closed）: textlint guard plugin package が
@@ -254,8 +271,9 @@ try {
     # THIRD-PARTY-NOTICES.md は必須同梱（前提検査で存在済み。欠落時は fail-closed 済み）。
     Copy-Item -LiteralPath $thirdPartyNotices -Destination (Join-Path $stageArchiveRoot "THIRD-PARTY-NOTICES.md") -Force
 
-    # Pre-publication boundary inspection #1: staged src/opencode/ tree.
-    Write-Host "package-release-archive: running archive projection boundary check on staged src/opencode/"
+    # Pre-publication boundary inspection #1: staged canonical tree
+    # (src/common/ + src/opencode/plugins/, DEC-049 layout).
+    Write-Host "package-release-archive: running archive projection boundary check on staged src/common/ + src/opencode/plugins"
     & bun run $boundaryChecker --profile archive $stageArchiveRoot --json 2>&1 | Out-Host
     if ($LASTEXITCODE -ne 0) {
         Cleanup-Stage
@@ -263,13 +281,13 @@ try {
     }
 
     # Pre-publication boundary inspection #2: archive EXTRAS. The host
-    # checker's archive profile walks src/opencode/{commands/agentdev,
-    # skills/agentdev-*}/** only, so it would
-    # silently skip README-INSTALL.md, THIRD-PARTY-NOTICES.md and the archive
-    # edition of scripts/install.ps1. Build an auxiliary scan root with those
-    # files placed under src/opencode/commands/agentdev/ and re-invoke the same
-    # checker there.
-    $extrasScanCommands = Join-Path $extrasScanRoot "src\opencode\commands\agentdev"
+    # checker's archive profile walks src/common/{commands/agentdev,
+    # skills/agentdev-*, tools/agentdev-*}/** and src/opencode/plugins/**, so
+    # it would silently skip README-INSTALL.md, THIRD-PARTY-NOTICES.md and
+    # the archive edition of scripts/install.ps1. Build an auxiliary scan
+    # root with those files placed under src/common/commands/agentdev/ and
+    # re-invoke the same checker there.
+    $extrasScanCommands = Join-Path $extrasScanRoot "src\common\commands\agentdev"
     New-Item -ItemType Directory -Path $extrasScanCommands -Force | Out-Null
     Copy-Item -LiteralPath (Join-Path $stageScripts "install.ps1") -Destination (Join-Path $extrasScanCommands "install.ps1.archive-extra.ps1") -Force
     if ($readmePresent) {
@@ -302,7 +320,9 @@ try {
         Fail-Exit 9 "package-release-archive: archive extraction produced no root directory"
     }
     $extractedRootPath = $extractedRoot.FullName
-    $installedSrc = Join-Path $extractedRootPath "src\opencode"
+    # The archive-edition installer resolves the canonical layout under src/
+    # (src/common/ + src/opencode/plugins/, DEC-049) itself.
+    $installedSrc = Join-Path $extractedRootPath "src"
     $installedTarget = Join-Path $installedRoot ".opencode"
     # Verify the candidate archive CONTAINS the archive edition installer
     # (scripts/install.ps1) as an artifact. Presence is required; the file
@@ -312,6 +332,23 @@ try {
     if (-not (Test-Path -LiteralPath $installFromArchive)) {
         Cleanup-Stage
         Fail-Exit 9 "package-release-archive: scripts/install.ps1 (archive edition) missing from extracted archive: $installFromArchive"
+    }
+    # Stage B vendor pre-provisioning (verification environment only): the
+    # staged plugin ships version pin metadata only (vendor/ excluded from
+    # the archive) and the trusted installer enforces vendor completeness at
+    # the installed projection. Provision the release runner's locally
+    # generated vendor artifacts (when present) into the extracted plugin so
+    # the Stage B install simulates a consumer that already completed the
+    # README resolution steps (bun install && bun run build:engine). This is
+    # a local copy of already-generated artifacts; no dependency generation
+    # and no network fetching is performed. Environments without the local
+    # vendor still stop fail-closed with the installer's guidance.
+    $extractedTextlintGuard = Join-Path $installedSrc "opencode\plugins\agentdev-textlint-guard"
+    $hostVendor = Join-Path $repoRoot "src\opencode\plugins\agentdev-textlint-guard\vendor"
+    if ((Test-Path -LiteralPath $extractedTextlintGuard) -and (Test-Path -LiteralPath $hostVendor)) {
+        $dstVendor = Join-Path $extractedTextlintGuard "vendor"
+        New-Item -ItemType Directory -Path $dstVendor -Force | Out-Null
+        Copy-Item -Path (Join-Path $hostVendor "*") -Destination $dstVendor -Recurse -Force
     }
     # Run the TRUSTED host installer original ($installScript at the release
     # runner's working tree, scripts/consumer/archive/install.ps1) against

@@ -645,7 +645,7 @@ if ($Mode -ne 'check' -and $incompleteVendorPackages.Count -gt 0) {
 
 # third-party Skill drift 検知（全モード共通。宣言済みで配置欠落は ERROR 停止し、
 # 宣言ファイルが解決できない環境は検査対象外として正常扱いする）
-Invoke-ThirdPartyDriftCheck -RootDir $RepoRoot -SkillsRootDir $SkillsDir -CliCommandHint 'bun src/opencode/tools/agentdev-third-party/cli.ts'
+Invoke-ThirdPartyDriftCheck -RootDir $RepoRoot -SkillsRootDir $SkillsDir -CliCommandHint 'bun src/common/tools/agentdev-third-party/cli.ts'
 
 # ============================================================
 # CHECK MODE

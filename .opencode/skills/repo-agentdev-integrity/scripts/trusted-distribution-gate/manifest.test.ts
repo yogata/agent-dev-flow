@@ -31,25 +31,25 @@ function entry(path: string, sha: string, size: number): ManifestEntryInput {
 
 describe("manifest / isRequiredRuntimePath", () => {
   test("accepts commands/agentdev/**", () => {
-    expect(isRequiredRuntimePath("src/opencode/commands/agentdev/case-run.md")).toBe(true);
-    expect(isRequiredRuntimePath("src/opencode/commands/agentdev/sub/x.md")).toBe(true);
+    expect(isRequiredRuntimePath("src/common/commands/agentdev/case-run.md")).toBe(true);
+    expect(isRequiredRuntimePath("src/common/commands/agentdev/sub/x.md")).toBe(true);
   });
   test("accepts skills/agentdev-*/**", () => {
-    expect(isRequiredRuntimePath("src/opencode/skills/agentdev-foo/SKILL.md")).toBe(true);
-    expect(isRequiredRuntimePath("src/opencode/skills/agentdev-bar/references/x.md")).toBe(true);
+    expect(isRequiredRuntimePath("src/common/skills/agentdev-foo/SKILL.md")).toBe(true);
+    expect(isRequiredRuntimePath("src/common/skills/agentdev-bar/references/x.md")).toBe(true);
   });
   test("accepts skills/japanese-tech-writing/**", () => {
-    expect(isRequiredRuntimePath("src/opencode/skills/japanese-tech-writing/SKILL.md")).toBe(true);
+    expect(isRequiredRuntimePath("src/common/skills/japanese-tech-writing/SKILL.md")).toBe(true);
   });
   test("accepts tools/agentdev-*/** and plugins/agentdev-*/** (REQ-052 distribution kinds)", () => {
-    expect(isRequiredRuntimePath("src/opencode/tools/agentdev-gh/index.ts")).toBe(true);
-    expect(isRequiredRuntimePath("src/opencode/tools/agentdev-gh/tests/engine-fail-closed.test.ts")).toBe(true);
+    expect(isRequiredRuntimePath("src/common/tools/agentdev-gh/index.ts")).toBe(true);
+    expect(isRequiredRuntimePath("src/common/tools/agentdev-gh/tests/engine-fail-closed.test.ts")).toBe(true);
     expect(isRequiredRuntimePath("src/opencode/plugins/agentdev-gh-write-guard/plugin.ts")).toBe(true);
     expect(isRequiredRuntimePath("src/opencode/plugins/agentdev-gh-write-guard/lib/guard-config.ts")).toBe(true);
   });
   test("rejects unrelated commands", () => {
     expect(isRequiredRuntimePath("src/opencode/commands/repo/x.md")).toBe(false);
-    expect(isRequiredRuntimePath("src/opencode/commands/agentdev-other/x.md")).toBe(false);
+    expect(isRequiredRuntimePath("src/common/commands/agentdev-other/x.md")).toBe(false);
   });
   test("rejects unrelated skills", () => {
     expect(isRequiredRuntimePath("src/opencode/skills/repo-integrity/SKILL.md")).toBe(false);
@@ -59,7 +59,7 @@ describe("manifest / isRequiredRuntimePath", () => {
     expect(isRequiredRuntimePath("src/opencode/plugins/local-guard/plugin.ts")).toBe(false);
   });
   test("includes tests, fixtures, README, package.json, tsconfig, lockfiles, and metadata", () => {
-    expect(isRequiredRuntimePath("src/opencode/skills/agentdev-foo/scripts/x.test.ts")).toBe(true);
+    expect(isRequiredRuntimePath("src/common/skills/agentdev-foo/scripts/x.test.ts")).toBe(true);
   });
 });
 
@@ -76,8 +76,8 @@ describe("manifest / isRequiredBootstrapPath", () => {
 
 describe("manifest / classifySourceSubset", () => {
   test("runtime for src/opencode/** paths", () => {
-    expect(classifySourceSubset("src/opencode/commands/agentdev/x.md")).toBe("runtime");
-    expect(classifySourceSubset("src/opencode/skills/agentdev-foo/SKILL.md")).toBe("runtime");
+    expect(classifySourceSubset("src/common/commands/agentdev/x.md")).toBe("runtime");
+    expect(classifySourceSubset("src/common/skills/agentdev-foo/SKILL.md")).toBe("runtime");
   });
   test("bootstrap for the public entry and its dependency module", () => {
     expect(classifySourceSubset("scripts/install.ps1")).toBe("bootstrap");
@@ -96,9 +96,9 @@ describe("manifest / classifySourceSubset", () => {
 describe("manifest / buildSourceManifest", () => {
   test("includes runtime + bootstrap entries", () => {
     const inputs: ManifestEntryInput[] = [
-      entry("src/opencode/commands/agentdev/case-run.md", "a".repeat(64), 10),
-      entry("src/opencode/skills/agentdev-foo/SKILL.md", "b".repeat(64), 20),
-      entry("src/opencode/skills/japanese-tech-writing/SKILL.md", "c".repeat(64), 30),
+      entry("src/common/commands/agentdev/case-run.md", "a".repeat(64), 10),
+      entry("src/common/skills/agentdev-foo/SKILL.md", "b".repeat(64), 20),
+      entry("src/common/skills/japanese-tech-writing/SKILL.md", "c".repeat(64), 30),
       entry("scripts/install.ps1", "d".repeat(64), 40),
       entry("scripts/consumer/common.ps1", "e".repeat(64), 50),
       entry("README.md", "f".repeat(64), 60),
@@ -108,9 +108,9 @@ describe("manifest / buildSourceManifest", () => {
     expect(m.entries.map((e) => e.path).sort()).toEqual([
       "scripts/consumer/common.ps1",
       "scripts/install.ps1",
-      "src/opencode/commands/agentdev/case-run.md",
-      "src/opencode/skills/agentdev-foo/SKILL.md",
-      "src/opencode/skills/japanese-tech-writing/SKILL.md",
+      "src/common/commands/agentdev/case-run.md",
+      "src/common/skills/agentdev-foo/SKILL.md",
+      "src/common/skills/japanese-tech-writing/SKILL.md",
     ]);
   });
 
@@ -120,7 +120,7 @@ describe("manifest / buildSourceManifest", () => {
 
   test("rejects invalid sha256", () => {
     const inputs: ManifestEntryInput[] = [
-      entry("src/opencode/skills/agentdev-foo/SKILL.md", "short", 1),
+      entry("src/common/skills/agentdev-foo/SKILL.md", "short", 1),
     ];
     expect(() => buildSourceManifest(inputs)).toThrow();
   });
@@ -129,10 +129,10 @@ describe("manifest / buildSourceManifest", () => {
 describe("manifest / buildLinkManifest", () => {
   test("maps source runtime entries to .opencode/** with identical digests", () => {
     const runtime = [
-      entry("src/opencode/commands/agentdev/case-run.md", "a".repeat(64), 10),
-      entry("src/opencode/skills/agentdev-foo/SKILL.md", "b".repeat(64), 20),
-      entry("src/opencode/skills/japanese-tech-writing/SKILL.md", "c".repeat(64), 30),
-      entry("src/opencode/tools/agentdev-gh/index.ts", "0".repeat(64), 15),
+      entry("src/common/commands/agentdev/case-run.md", "a".repeat(64), 10),
+      entry("src/common/skills/agentdev-foo/SKILL.md", "b".repeat(64), 20),
+      entry("src/common/skills/japanese-tech-writing/SKILL.md", "c".repeat(64), 30),
+      entry("src/common/tools/agentdev-gh/index.ts", "0".repeat(64), 15),
       entry("src/opencode/plugins/agentdev-gh-write-guard/plugin.ts", "1".repeat(64), 25),
     ];
     const m = buildLinkManifest(runtime);
@@ -154,8 +154,8 @@ describe("manifest / buildLinkManifest", () => {
 describe("manifest / buildArchiveManifest", () => {
   test("archive = source-runtime + archive installer original + README-INSTALL.md", () => {
     const runtime = [
-      entry("src/opencode/commands/agentdev/case-run.md", "a".repeat(64), 10),
-      entry("src/opencode/skills/agentdev-foo/SKILL.md", "b".repeat(64), 20),
+      entry("src/common/commands/agentdev/case-run.md", "a".repeat(64), 10),
+      entry("src/common/skills/agentdev-foo/SKILL.md", "b".repeat(64), 20),
     ];
     const extras: ManifestEntryInput[] = [
       entry("scripts/consumer/archive/install.ps1", "d".repeat(64), 40),
@@ -165,14 +165,14 @@ describe("manifest / buildArchiveManifest", () => {
     expect(m.entries.map((e) => e.path).sort()).toEqual([
       "README-INSTALL.md",
       "scripts/consumer/archive/install.ps1",
-      "src/opencode/commands/agentdev/case-run.md",
-      "src/opencode/skills/agentdev-foo/SKILL.md",
+      "src/common/commands/agentdev/case-run.md",
+      "src/common/skills/agentdev-foo/SKILL.md",
     ]);
   });
 
   test("rejects when the archive installer original is missing", () => {
     const runtime = [
-      entry("src/opencode/commands/agentdev/case-run.md", "a".repeat(64), 10),
+      entry("src/common/commands/agentdev/case-run.md", "a".repeat(64), 10),
     ];
     expect(() => buildArchiveManifest(runtime, [])).toThrow();
   });
@@ -181,8 +181,8 @@ describe("manifest / buildArchiveManifest", () => {
 describe("manifest / buildArchiveInstalledManifest", () => {
   test("maps source runtime entries to .opencode/** deterministically", () => {
     const runtime = [
-      entry("src/opencode/commands/agentdev/case-run.md", "a".repeat(64), 10),
-      entry("src/opencode/skills/agentdev-foo/SKILL.md", "b".repeat(64), 20),
+      entry("src/common/commands/agentdev/case-run.md", "a".repeat(64), 10),
+      entry("src/common/skills/agentdev-foo/SKILL.md", "b".repeat(64), 20),
     ];
     const m = buildArchiveInstalledManifest(runtime);
     expect(m.entries.map((e) => e.path).sort()).toEqual([
@@ -195,7 +195,7 @@ describe("manifest / buildArchiveInstalledManifest", () => {
     // Previous implementation returned buildLinkManifest() whose projection
     // label was 'link'. Manifest identity MUST match its constructor name.
     const runtime = [
-      entry("src/opencode/commands/agentdev/case-run.md", "a".repeat(64), 10),
+      entry("src/common/commands/agentdev/case-run.md", "a".repeat(64), 10),
     ];
     const m = buildArchiveInstalledManifest(runtime);
     expect(m.projection).toBe("archive-installed");

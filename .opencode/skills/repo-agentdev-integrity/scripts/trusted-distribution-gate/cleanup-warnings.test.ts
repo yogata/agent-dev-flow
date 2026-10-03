@@ -61,9 +61,9 @@ describe("cleanup warning preservation / per-call injected remover", () => {
       const REPO_ROOT = path.resolve(__dirname, "..", "..", "..", "..", "..");
       const trustRel = ".opencode/skills/repo-agentdev-integrity/scripts/trusted-distribution-gate";
       const trustAbs = path.join(REPO_ROOT, trustRel);
-      writeFix(repo, "src/opencode/commands/agentdev/case-run.md", "# case-run\n");
-      writeFix(repo, "src/opencode/skills/agentdev-foo/SKILL.md", "# foo\n");
-      writeFix(repo, "src/opencode/skills/japanese-tech-writing/SKILL.md", "# jtw\n");
+      writeFix(repo, "src/common/commands/agentdev/case-run.md", "# case-run\n");
+      writeFix(repo, "src/common/skills/agentdev-foo/SKILL.md", "# foo\n");
+      writeFix(repo, "src/common/skills/japanese-tech-writing/SKILL.md", "# jtw\n");
       writeFix(repo, "scripts/install.ps1", "# install\n");
       writeFix(repo, "scripts/consumer/common.ps1", "# check\n");
       writeFix(repo, "README-INSTALL.md", "# readme\n");
@@ -126,9 +126,9 @@ describe("launcher / both-missing protected bootstrap scripts in seed mode", () 
     execFileSync("git", ["config", "user.email", "t@t"], { cwd: repo });
     execFileSync("git", ["config", "user.name", "t"], { cwd: repo });
     if (process.platform === "win32") execFileSync("git", ["config", "core.longpaths", "true"], { cwd: repo });
-    writeFix(repo, "src/opencode/commands/agentdev/case-run.md", "# case-run\n");
-    writeFix(repo, "src/opencode/skills/agentdev-foo/SKILL.md", "# foo\n");
-    writeFix(repo, "src/opencode/skills/japanese-tech-writing/SKILL.md", "# jtw\n");
+    writeFix(repo, "src/common/commands/agentdev/case-run.md", "# case-run\n");
+    writeFix(repo, "src/common/skills/agentdev-foo/SKILL.md", "# foo\n");
+    writeFix(repo, "src/common/skills/japanese-tech-writing/SKILL.md", "# jtw\n");
     writeFix(repo, "README-INSTALL.md", "# readme\n");
     writeFix(repo, "scripts/self/release/package-release-archive.ps1", "# placeholder\n");
     writeFix(repo, "scripts/consumer/archive/install.ps1", [

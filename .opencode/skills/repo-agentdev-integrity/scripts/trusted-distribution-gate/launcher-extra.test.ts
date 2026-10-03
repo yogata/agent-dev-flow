@@ -34,7 +34,7 @@ describe("launcher / boundary violation", () => {
       const base = headOid(repo);
       const candidate = commitTweak(
         repo,
-        "src/opencode/skills/agentdev-foo/SKILL.md",
+        "src/common/skills/agentdev-foo/SKILL.md",
         "# foo skill references ADR-9999 which is a violation\n",
       );
       expect(runLauncher(baseOpts(repo, base, candidate, "out-boundary")).exit_code).toBe(4);
@@ -49,7 +49,7 @@ describe("launcher / boundary violation", () => {
       const base = headOid(repo);
       const candidate = commitTweak(
         repo,
-        "src/opencode/skills/agentdev-foo/SKILL.md",
+        "src/common/skills/agentdev-foo/SKILL.md",
         "# foo skill references JIRA-123 unknown family\n",
       );
       expect(runLauncher(baseOpts(repo, base, candidate, "out-unclassified")).exit_code).toBe(7);

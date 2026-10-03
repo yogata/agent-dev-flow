@@ -7,6 +7,7 @@ updated: 2026-09-14
 <!-- ADF-COVERS(implementation): REQ-010-006 -->
 <!-- ADF-COVERS(implementation): REQ-036-022 -->
 <!-- ADF-COVERS(implementation): REQ-007-010 -->
+<!-- ADF-COVERS(implementation): REQ-099-020 -->
 
 # 整合性契約
 
@@ -554,7 +555,7 @@ bun run check_integrity.ts --profile release --archive <zip-path>
 
 ### source profile
 
-原本（`src/opencode/`、docs、repo-local checker/tests）を直接検査する。
+原本（`src/common/`、`src/opencode/`（ホスト接続領域）、docs、repo-local checker/tests）を直接検査する。
 
 - `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*` が存在しないことを NG にしない（worktree 等）
 - 原本ディレクトリや必須ファイルが欠落している場合は NG
@@ -563,7 +564,7 @@ bun run check_integrity.ts --profile release --archive <zip-path>
 
 ### installed profile
 
-原本（`src/opencode/`）と配置先（`.opencode/`）を比較し、配置漏れを検出する。
+原本（`src/common/` と `src/opencode/`（ホスト接続領域））と配置先（`.opencode/`）を比較し、配置漏れを検出する。
 
 - `cmdDir` を `.opencode/commands/agentdev` へ直接解決し、原本 fallback を無効化する
 - 次を NG として報告する: `projection_missing`（原本に有て配置先に無い）、`projection_extra`（配置先に有て原本に無い、`repo-*` repo-local skill は除く）、`content_mismatch`（原本と配置先で内容が異なる）、`broken_junction`（配置先の junction/symlink が解決不能）、`missing_required_dir`（原本必須ディレクトリ欠落）
@@ -578,7 +579,7 @@ archive は配布物の自己完結を保証するが、checker（`repo-agentdev
 処理順序:
 
 1. `--archive` で指定された ZIP を一時ディレクトリ `<temp>` へ展開する
-2. `<temp>/<root>/scripts/install.ps1 -Source <temp>/<root>/src/opencode -Target <temp>/<root>/.opencode -Mode copy` を実行する（archive 版 installer。原本は `scripts/consumer/archive/install.ps1` で、archive 内では投影名 `scripts/install.ps1` として配置される）
+2. `<temp>/<root>/scripts/install.ps1 -Source <temp>/<root>/src -Target <temp>/<root>/.opencode -Mode copy` を実行する（archive 版 installer。原本は `scripts/consumer/archive/install.ps1` で、archive 内では投影名 `scripts/install.ps1` として配置される）
 3. host 側 checker を `--profile installed --root <temp>/<root> --json` で起動し、installed profile を実行する
 4. archive は docs/ を含まないため、exit code は `InstalledProfile` カテゴリ（projection_missing/extra/content_mismatch/broken_junction/missing_required_dir）の結果のみで判定する。全文結果は report へ転送する
 5. 成功・失敗の双方で `<temp>` を削除する（cleanup 失敗は warning、exit code は変えない）
@@ -588,9 +589,9 @@ install 後も配置先が欠落する場合は NG とする。
 
 ### archive 生成・導入コマンド（§7.5.1, §7.5.2）
 
-archive 生成: `scripts/self/release/package-release-archive.ps1`（原本 `src/opencode/` 配下を junction 解決済み実ファイルとして ZIP へ格納）。
+archive 生成: `scripts/self/release/package-release-archive.ps1`（原本 `src/common/` と `src/opencode/`（ホスト接続領域）配下を junction 解決済み実ファイルとして ZIP へ格納）。
 出力は `dist/agentdev-release-<commit-short>.zip`。
-archive 内レイアウトは `agentdev-release-<sha>/` ルートの下に `src/opencode/commands/agentdev/**`、`src/opencode/skills/agentdev-*/**`、`scripts/install.ps1`（archive 版。原本 `scripts/consumer/archive/install.ps1` を投影名 `scripts/install.ps1` として格納）、`README-INSTALL.md` を格納する。third-party Skill の本体は release archive へ含めず、利用者環境では宣言（skills.yaml）と取得機構経由で配置する（REQ-002-043、third-party-skill-management Design）。
+archive 内レイアウトは `agentdev-release-<sha>/` ルートの下に `src/common/commands/agentdev/**`、`src/common/skills/agentdev-*/**`、`src/common/tools/agentdev-*/**`（Custom Tool 配布種別）、`src/opencode/plugins/agentdev-*/**`（Plugin / Hook 配布種別）、`scripts/install.ps1`（archive 版。原本 `scripts/consumer/archive/install.ps1` を投影名 `scripts/install.ps1` として格納）、`README-INSTALL.md`（原本 `scripts/consumer/archive/README-INSTALL.md`）を格納する。third-party Skill の本体は release archive へ含めず、利用者環境では宣言（skills.yaml）と取得機構経由で配置する（REQ-002-043、third-party-skill-management Design）。
 
 | 実行結果 | exit code |
 |---|---|
@@ -598,7 +599,7 @@ archive 内レイアウトは `agentdev-release-<sha>/` ルートの下に `src/
 | 原本欠落・必須ファイル不在 | 2 |
 | 既存 dist 上書き検出（`-Force` 無し） | 3 |
 
-archive 展開・install: archive 版 `scripts/install.ps1 -Source <src/opencode> -Target <.opencode> -Mode copy` が実ファイルを `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/` 配下へ配置する（原本は `scripts/consumer/archive/install.ps1`）。third-party Skill の配置は本 install の対象外であり、third-party 取得機構（skills.yaml 宣言に基づく取得）が `.opencode/skills/<name>/` へ配置する（REQ-002-043）。
+archive 展開・install: archive 版 `scripts/install.ps1 -Source <src> -Target <.opencode> -Mode copy` が実ファイルを `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`、`.opencode/tools/agentdev-*/`、`.opencode/plugins/agentdev-*/` 配下へ配置する（原本は `scripts/consumer/archive/install.ps1`）。third-party Skill の配置は本 install の対象外であり、third-party 取得機構（skills.yaml 宣言に基づく取得）が `.opencode/skills/<name>/` へ配置する（REQ-002-043）。
 junction は作成しない。
 
 | 実行結果 | exit code |

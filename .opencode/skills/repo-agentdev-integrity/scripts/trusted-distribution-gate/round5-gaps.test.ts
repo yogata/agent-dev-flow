@@ -140,7 +140,7 @@ describe("buildSourceManifest / required bootstrap scripts", () => {
   test("throws when scripts/install.ps1 is missing", () => {
     const inputs = [
       entry("scripts/consumer/common.ps1", SHA, 10),
-      entry("src/opencode/skills/agentdev-foo/SKILL.md", SHA, 10),
+      entry("src/common/skills/agentdev-foo/SKILL.md", SHA, 10),
     ];
     expect(() => buildSourceManifest(inputs)).toThrow(/scripts\/install\.ps1/);
   });
@@ -148,14 +148,14 @@ describe("buildSourceManifest / required bootstrap scripts", () => {
   test("throws when scripts/consumer/common.ps1 is missing", () => {
     const inputs = [
       entry("scripts/install.ps1", SHA, 10),
-      entry("src/opencode/skills/agentdev-foo/SKILL.md", SHA, 10),
+      entry("src/common/skills/agentdev-foo/SKILL.md", SHA, 10),
     ];
     expect(() => buildSourceManifest(inputs)).toThrow(/scripts\/consumer\/common\.ps1/);
   });
 
   test("throws when both bootstrap scripts are missing", () => {
     const inputs = [
-      entry("src/opencode/skills/agentdev-foo/SKILL.md", SHA, 10),
+      entry("src/common/skills/agentdev-foo/SKILL.md", SHA, 10),
     ];
     expect(() => buildSourceManifest(inputs)).toThrow();
   });
@@ -164,7 +164,7 @@ describe("buildSourceManifest / required bootstrap scripts", () => {
     const inputs = [
       entry("scripts/install.ps1", SHA, 10),
       entry("scripts/consumer/common.ps1", SHA, 10),
-      entry("src/opencode/skills/agentdev-foo/SKILL.md", SHA, 10),
+      entry("src/common/skills/agentdev-foo/SKILL.md", SHA, 10),
     ];
     const m = buildSourceManifest(inputs);
     expect(m.entries.length).toBe(3);

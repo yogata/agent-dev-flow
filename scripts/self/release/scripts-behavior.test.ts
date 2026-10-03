@@ -431,7 +431,7 @@ describe("scripts behavior / third-party skill drift detection", () => {
       const r = runPwsh(["-File", path.join(root, "scripts", "self-sync.ps1"), "-Mode", "check"], root);
       expect(r.exitCode).toBe(7);
       expect(r.stdout).toContain("declared but not placed: drift-missing-skill");
-      expect(r.stdout).toContain("bun src/opencode/tools/agentdev-third-party/cli.ts");
+      expect(r.stdout).toContain("bun src/common/tools/agentdev-third-party/cli.ts");
     } finally {
       rmrf(root);
     }
@@ -440,11 +440,13 @@ describe("scripts behavior / third-party skill drift detection", () => {
   test("archive installer: declaration absent consumer env completes copy without drift stop", () => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), "adf-arch-"));
     try {
-      const src = path.join(root, "src", "opencode");
-      fs.mkdirSync(path.join(src, "commands", "agentdev"), { recursive: true });
-      fs.mkdirSync(path.join(src, "skills", "agentdev-x"), { recursive: true });
-      fs.writeFileSync(path.join(src, "commands", "agentdev", "case-run.md"), "# case-run\n", "utf-8");
-      fs.writeFileSync(path.join(src, "skills", "agentdev-x", "SKILL.md"), "# x\n", "utf-8");
+      // DEC-049 canonical archive layout: commands/skills under src/common/,
+      // plugins under src/opencode/plugins/ (REQ-099-020).
+      const src = path.join(root, "src");
+      fs.mkdirSync(path.join(src, "common", "commands", "agentdev"), { recursive: true });
+      fs.mkdirSync(path.join(src, "common", "skills", "agentdev-x"), { recursive: true });
+      fs.writeFileSync(path.join(src, "common", "commands", "agentdev", "case-run.md"), "# case-run\n", "utf-8");
+      fs.writeFileSync(path.join(src, "common", "skills", "agentdev-x", "SKILL.md"), "# x\n", "utf-8");
       const target = path.join(root, ".opencode");
       const r = runPwsh(
         [

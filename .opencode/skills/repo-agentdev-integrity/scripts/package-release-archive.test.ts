@@ -40,15 +40,15 @@ const REAL_PUBLISHER = path.join(REPO_ROOT, "scripts", "self", "release", "publi
 // the regression harness must NOT depend on it. This stub honours the same
 // CLI contract the script uses (`bun run <checker> --profile <p> <root>
 // --json`) and mirrors the real checker's NARROW scan paths:
-//   - profile=archive: scans <root>/src/opencode/commands/agentdev/** and
-//     <root>/src/opencode/skills/(agentdev-*|japanese-tech-writing)/**
+//   - profile=archive: scans <root>/src/common/commands/agentdev/** and
+//     <root>/src/common/skills/(agentdev-*|japanese-tech-writing)/**
 //   - profile=archive-installed: scans <root>/.opencode/commands/agentdev/**
 //     and <root>/.opencode/skills/(agentdev-*|japanese-tech-writing)/**
 //
 // Mirroring the narrow scan is essential: a broad "scan everything" stub
 // would mask the regression where the script forgets to scan archive extras
 // (README-INSTALL.md, scripts/install.ps1 archive edition) that live outside
-// src/opencode/. A failure is recorded when any scanned file contains the
+// src/common/. A failure is recorded when any scanned file contains the
 // literal VIOLATION-MARKER-REQ-9999 or an inline producer-side traceability
 // declaration marker (distribution purity, DEC-030 decision 5: no exemptions,
 // no strip reliance).
@@ -62,8 +62,8 @@ for(let i=0;i<a.length;i++){
   else if(a[i]&&!a[i].startsWith("--")){root=a[i];}
 }
 function isPub(d){return d.startsWith("agentdev-")||d==="japanese-tech-writing";}
-function scanCmd(root){const c=p.join(root,(profile==="archive"?"src/opencode":".opencode"),"commands","agentdev");walk(c);}
-function scanSkills(root){const s=p.join(root,(profile==="archive"?"src/opencode":".opencode"),"skills");if(!fs.existsSync(s))return;for(const e of fs.readdirSync(s,{withFileTypes:true})){if(e.isDirectory()&&isPub(e.name))walk(p.join(s,e.name));}}
+function scanCmd(root){const c=p.join(root,(profile==="archive"?"src/common":".opencode"),"commands","agentdev");walk(c);}
+function scanSkills(root){const s=p.join(root,(profile==="archive"?"src/common":".opencode"),"skills");if(!fs.existsSync(s))return;for(const e of fs.readdirSync(s,{withFileTypes:true})){if(e.isDirectory()&&isPub(e.name))walk(p.join(s,e.name));}}
 function walk(d){
   if(!fs.existsSync(d))return;
   for(const e of fs.readdirSync(d,{withFileTypes:true})){
@@ -99,9 +99,9 @@ interface RepoPaths {
   installerPath: string;
   /** <root>/.opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary.ts */
   checkerPath: string;
-  /** <root>/src/opencode/commands/agentdev */
+  /** <root>/src/common/commands/agentdev */
   commandsDir: string;
-  /** <root>/src/opencode/skills */
+  /** <root>/src/common/skills */
   skillsDir: string;
   /** <root>/README-INSTALL.md */
   readmePath: string;
@@ -128,13 +128,13 @@ function makeFakeRepo(): RepoPaths {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "pkg-rel-"));
   fs.mkdirSync(path.join(root, "scripts", "self", "release"), { recursive: true });
   fs.mkdirSync(path.join(root, "scripts", "consumer", "archive"), { recursive: true });
-  fs.mkdirSync(path.join(root, "src", "opencode", "commands", "agentdev"), { recursive: true });
-  fs.mkdirSync(path.join(root, "src", "opencode", "skills"), { recursive: true });
+  fs.mkdirSync(path.join(root, "src", "common", "commands", "agentdev"), { recursive: true });
+  fs.mkdirSync(path.join(root, "src", "common", "skills"), { recursive: true });
   fs.mkdirSync(path.join(root, ".opencode", "skills", "repo-agentdev-integrity", "scripts"), { recursive: true });
 
-  fs.writeFileSync(path.join(root, "src", "opencode", "commands", "agentdev", "probe-cmd.md"), "# probe command\n");
-  fs.mkdirSync(path.join(root, "src", "opencode", "skills", "agentdev-probe"), { recursive: true });
-  fs.writeFileSync(path.join(root, "src", "opencode", "skills", "agentdev-probe", "SKILL.md"), "# probe skill\n");
+  fs.writeFileSync(path.join(root, "src", "common", "commands", "agentdev", "probe-cmd.md"), "# probe command\n");
+  fs.mkdirSync(path.join(root, "src", "common", "skills", "agentdev-probe"), { recursive: true });
+  fs.writeFileSync(path.join(root, "src", "common", "skills", "agentdev-probe", "SKILL.md"), "# probe skill\n");
   fs.writeFileSync(path.join(root, "README-INSTALL.md"), "# Install\nConsumer install instructions.\n");
   // THIRD-PARTY-NOTICES.md は release archive の必須同梱物（不在時 fail-closed、exit 2）。
   // fake repo も必須同梱の前提を満たすよう配置する。
@@ -163,8 +163,8 @@ function makeFakeRepo(): RepoPaths {
     scriptPath: path.join(root, "scripts", "self", "release", "package-release-archive.ps1"),
     installerPath: path.join(root, "scripts", "consumer", "archive", "install.ps1"),
     checkerPath: path.join(root, ".opencode", "skills", "repo-agentdev-integrity", "scripts", "check_distribution_boundary.ts"),
-    commandsDir: path.join(root, "src", "opencode", "commands", "agentdev"),
-    skillsDir: path.join(root, "src", "opencode", "skills"),
+    commandsDir: path.join(root, "src", "common", "commands", "agentdev"),
+    skillsDir: path.join(root, "src", "common", "skills"),
     readmePath: path.join(root, "README-INSTALL.md"),
     distDir: path.join(root, "dist"),
     commitShort,
@@ -245,10 +245,10 @@ describe("package-release-archive.ps1 / happy path", () => {
 });
 
 describe("package-release-archive.ps1 / tools and plugins staging (REQ-052-007)", () => {
-  test("archives src/opencode/{tools,plugins}/agentdev-*/** without node_modules and without repo-local entries", () => {
+  test("archives src/common/tools and src/opencode/plugins agentdev-*/** without node_modules and without repo-local entries", () => {
     const repo = makeFakeRepo();
     try {
-      const toolDir = path.join(repo.root, "src", "opencode", "tools", "agentdev-probe");
+      const toolDir = path.join(repo.root, "src", "common", "tools", "agentdev-probe");
       const pluginDir = path.join(repo.root, "src", "opencode", "plugins", "agentdev-probe-guard");
       fs.mkdirSync(toolDir, { recursive: true });
       fs.writeFileSync(path.join(toolDir, "index.ts"), "// probe tool\n");
@@ -256,8 +256,8 @@ describe("package-release-archive.ps1 / tools and plugins staging (REQ-052-007)"
       fs.writeFileSync(path.join(toolDir, "node_modules", "dep", "dep.js"), "// dependency\n");
       fs.mkdirSync(pluginDir, { recursive: true });
       fs.writeFileSync(path.join(pluginDir, "plugin.ts"), "// probe plugin\n");
-      fs.mkdirSync(path.join(repo.root, "src", "opencode", "tools", "local-only"), { recursive: true });
-      fs.writeFileSync(path.join(repo.root, "src", "opencode", "tools", "local-only", "x.ts"), "// repo-local\n");
+      fs.mkdirSync(path.join(repo.root, "src", "common", "tools", "local-only"), { recursive: true });
+      fs.writeFileSync(path.join(repo.root, "src", "common", "tools", "local-only", "x.ts"), "// repo-local\n");
 
       const res = runScript(repo);
       expect(res.exitCode).toBe(0);
@@ -273,10 +273,10 @@ describe("package-release-archive.ps1 / tools and plugins staging (REQ-052-007)"
       expect(expand.status).toBe(0);
       const rel = (p: string): string =>
         path.join(extracted, `agentdev-release-${repo.commitShort}`, p);
-      expect(fs.existsSync(rel(path.join("src", "opencode", "tools", "agentdev-probe", "index.ts")))).toBe(true);
+      expect(fs.existsSync(rel(path.join("src", "common", "tools", "agentdev-probe", "index.ts")))).toBe(true);
       expect(fs.existsSync(rel(path.join("src", "opencode", "plugins", "agentdev-probe-guard", "plugin.ts")))).toBe(true);
-      expect(fs.existsSync(rel(path.join("src", "opencode", "tools", "agentdev-probe", "node_modules")))).toBe(false);
-      expect(fs.existsSync(rel(path.join("src", "opencode", "tools", "local-only")))).toBe(false);
+      expect(fs.existsSync(rel(path.join("src", "common", "tools", "agentdev-probe", "node_modules")))).toBe(false);
+      expect(fs.existsSync(rel(path.join("src", "common", "tools", "local-only")))).toBe(false);
     } finally {
       rmrf(repo.root);
     }
@@ -344,7 +344,7 @@ describe("package-release-archive.ps1 / producer traceability metadata purity (T
       fs.writeFileSync(path.join(traceDir, "policy.yaml"), "verification:\n  default: required\n  optional: []\n");
       fs.writeFileSync(
         path.join(traceDir, "probe-component.yaml"),
-        "component: probe-component\nimplementation:\n  src/opencode/commands/agentdev/probe-cmd.md:\n    - REQ-9999-001\n",
+        "component: probe-component\nimplementation:\n  src/common/commands/agentdev/probe-cmd.md:\n    - REQ-9999-001\n",
       );
       execFileSync("git", ["add", "."], { cwd: repo.root, env: gitEnv() });
       execFileSync("git", ["commit", "-q", "-m", "traceability-data"], { cwd: repo.root, env: gitEnv() });
@@ -381,7 +381,7 @@ describe("package-release-archive.ps1 / archive extras boundary violation", () =
   test("scanner catches violations in README-INSTALL.md and the archive installer (exit 6)", () => {
     const repo = makeFakeRepo();
     try {
-      // Violation in README-INSTALL.md (an archive extra, not under src/opencode/).
+      // Violation in README-INSTALL.md (an archive extra, not under src/common/).
       fs.writeFileSync(
         repo.readmePath,
         "Install instructions leak VIOLATION-MARKER-REQ-9999 in README.\n",
