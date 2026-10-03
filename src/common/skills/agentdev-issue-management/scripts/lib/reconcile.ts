@@ -1,8 +1,8 @@
 // 取りまとめ経路の agentdev_gh 呼出側における更新失敗回復・読み戻し規律の決定的実装。
 // 部分成功（コメントのみ成功、本文のみ成功、Epic のみ未反映）の区別、読み戻し突合による
 // 不足分特定、冪等キーによる重複投稿・重複実行防止、更新回復用ローカル記録の境界検証を
-// 純関数として所有する。正本要件は docs/requirements/REQ-101.md（要件行レベルの対応は
-// repository top-level の traceability/ sidecar が正であり、本ファイルへ concrete ID を
+// 純関数として所有する。正本要件は Case Issue 工程記録モデルの REQ 文書（要件行レベルの
+// 対応は repository top-level の traceability/ sidecar が正であり、本ファイルへ要件行 ID を
 // 直書きしない）。GitHub I/O は runner.ts のアダプタ注入で行い、本モジュールは純関数に限定する。
 
 import { createHash } from "node:crypto";
