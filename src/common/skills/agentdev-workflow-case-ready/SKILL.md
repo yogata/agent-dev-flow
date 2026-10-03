@@ -21,7 +21,7 @@ case-ready command は公開 interface（入出力契約・ガードレール）
 ## 出力
 
 - ready 状態の Root Case
-- 確定済み execution contract（Root Case 本文へ確定。対象範囲、変更対象成果物、関連 REQ / Decision / Design、完了条件、test strategy、必須品質統制、scope-affecting impact candidate、review 発動契約、work_type / scale / Issue structure）
+- 確定済み実行契約（Root Case 本文へ確定。実行契約の要素は本文基本構造の各章へ分布させる: 対象範囲・対象外〔対象要件、主な変更対象、scope-affecting impact candidate を含む〕、実現方針〔条件付き章。再判断不可の合意済み事項と関連 Decision 拘束条件〕、完了条件〔検証方法・合格条件へ必須品質統制と test strategy を統合〕。実行識別情報・テスト戦略・必須品質統制・review 発動契約等の独立章は生成しない）
 - 実行構造（Standard は Root Case 自身を単一 execution unit。Epic は Child Issue と Wave / 依存構造、Epic Issue 本文へ構成推論の根拠を記録）
 - 完了報告（case-ready 完了報告テンプレート）
 
@@ -31,7 +31,7 @@ case-ready command は公開 interface（入出力契約・ガードレール）
 - Decision ファイルの proposed から accepted への状態遷移（`agentdev-decision-file-manager` 委譲）
 - draft / RU の削除（成功時のみ。blocked、failed、中断時は保持）
 - deviation capture 保存: 自工程で実観測した deviation を `agentdev-learning-capture` skill または `agentdev-intake-pipeline` へ委譲し、capture 境界 Design の Split Rule に従い `.agentdev/intake/` または `.agentdev/learning/` へ保存する。git 永続化は明示パス指定（並列実行安全ステージング）で行う
-- 行わない副作用: Epic Issue 本文のステータス追跡テーブル更新（単一書き手は case-close）、実装実行、完了条件チェックボックスの評価と更新
+- 行わない副作用: Epic Issue 本文の実行構成表更新（単一書き手は case-close）、実装実行、完了条件チェックボックスの評価と更新
 
 ## 制御平面（STEP 一覧）
 
@@ -78,7 +78,7 @@ case-ready workflow は次の7 STEP で構成する。
 - `agentdev-req-file-manager` / `agentdev-decision-file-manager` / `agentdev-design-file-manager`: REQ / Decision / Design の保存実体の委譲先。case-ready 自身は保存手続きを実装しない
 - `agentdev-artifact-validation`: REQ / Decision frontmatter id↔filename 整合、README entry 存在、変更範囲検証の公開検証契約
 - `agentdev-issue-management`: Issue 操作の安全手続き、Parent / Child Issue 間リンク確認、Issue 更新時の前後内容比較
-- `agentdev-workflow-templates`: Issue 本文 / 完了報告テンプレート選定、実行識別情報セクション形式
+- `agentdev-workflow-templates`: Issue 本文 / 完了報告テンプレート選定（Issue 本文テンプレートは新形式。実行識別情報セクションは PR テンプレートのみ）
 - `agentdev-workflow-lifecycle`: work_type 判定、ラベル付与、Standard / Epic 判定の lifecycle 基準
 - `agentdev-workflow-orchestration`: capture 境界の Split Rule、deviation capture 委譲
 - `agentdev-traceability`: coverage / check による対応関係の整合確認、Design 対応・トレーサビリティポリシー有効性のゲート判定
@@ -104,7 +104,7 @@ case-ready はトレーサビリティ完全性ゲートで、対象要件行の
 - **execution contract 投影**: 機能要件、非機能要件、制約、対象外、受け入れ条件は新規作成せず合意済み Definition を投影する。runtime-only 判断（worktree 状態、staleness、実 diff、実装結果、test 実行結果）は事前確定せず case-run の安全検査として維持する
 - **Standard / Epic 確定**: 連結成分（必須依存のみをエッジ）と依存強度、Epic サイズ、機能的一貫性の3軸で自律生成する。単独根は Epic 化せず Standard flow とする。無関係な operation_unit 群を単一 Epic へ機械的に集約しない
 - **Decision 受理の冪等**: 再実行時、既に accepted へ遷移済みの Decision に対して重複する状態遷移や承認記録を生成しない
-- **実行識別情報の記録**: Root Case 本文の実行識別情報セクション（実行単位）を case-ready で確定した値へ更新する。形式は `agentdev-workflow-templates` の実行識別情報セクション規約に従う。取得不能な場合は「N/A」を記録し workflow を停止しない
+- **realization_actions の投影（REQ-017-017）**: draft-data の realization_actions は、Root Case 本文の実現方針（条件付き章。再判断不可の合意済み事項のみを記載し、該当がない場合は章を常設しない）と完了条件の検証方法・合格条件へ投影する。realization_actions の内部属性一式（concern、responsibility 等の構造化一覧）は転記せず、合意済み内容を本文の該当章へ分布させる。case-ready 成功後は case-run が Issue 本文だけで変更責務、変更意図、検証方針を取得できる
 - **本文 verbatim**: Root Case 本文、Issue 本文は Custom Tool `agentdev_gh` の操作引数としてそのまま渡す（文字コード・一時ファイルの実装詳細は Tool 内部）（`POL-gh-io-delegation`）
 - **Issue 本文のファイル経由扱い**: 長文本文は一時ファイル経由で構成し、Markdown 行構造（LF、セクション間空行、インデント）を保持する
 
@@ -114,7 +114,7 @@ case-ready はトレーサビリティ完全性ゲートで、対象要件行の
 - **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **case-open / case-ready Design**: Definition Package、Definition PR lifecycle、canonical Definition 判定、冪等キー
 - **`<workflows/v4-standard-lifecycle>` Design**: work_type / scale / Epic / Wave の v4 意味モデル（OU / Epic / Wave / Issue 階層の語彙）
-- **`<workflows/issue-title-policy>` Design**: Epic 確定時の Root Case 接頭辞更新と子 Issue タイトル（Wave 付き Task 接頭辞）の書式の単一参照点
+- **`<workflows/issue-title-policy>` Design**: Epic 確定時の Root Case 接頭辞更新（`Epic: 主題`）と子 Issue タイトル（`Wave-N: 主題`。`Task:` 接頭辞は廃止）の書式の単一参照点
 - **case-open / case-ready Design**: execution_unit 構成（連結成分・3軸判断の機械的判定手順を含む）と Wave 構成・Wave 重複前置検出
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **case-ready command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

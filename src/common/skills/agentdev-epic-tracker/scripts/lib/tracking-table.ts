@@ -1,10 +1,12 @@
-// Epic status tracking table parsing and per-row status replacement.
+// Epic 実行構成表（`| Wave | Issue | 前提 | 状態 |`）の解析と行単位の状態置換。
 //
-// Parses the 4-column status tracking tables written by case-open
-// (new format: # / Issue / ステータス / 内容, legacy format: # / Issue /
-// タイトル / ステータス) and provides idempotent, row-scoped replacement
-// used by both the closing write path (case-close) and the coordination
-// reflect write path (工程記録の取りまとめ).
+// Parses the single execution-structure table per Epic body and provides
+// idempotent, row-scoped replacement used by both the closing write path
+// (case-close) and the coordination reflect write path (工程記録の取りまとめ).
+// 旧4列形式（# / Issue / ステータス / 内容、# / Issue / タイトル / ステータス）の
+// 後方互換検出は行わない（新形式を唯一の現行形式とする）。
+// 状態列は子状態4値のみ。PR 番号・URL は状態列に付記せず、子 Issue の結果・
+// PR 自体から取得する。
 //
 // Pure functions only: no fs, no network. Callers own the read/write of the
 // Epic Issue body (latest fetch -> merge -> update happens outside, then the
@@ -24,65 +26,29 @@ export function isTerminalStatus(status: string): boolean {
 
 export interface ParsedStatusCell {
   status: PersistedStatus;
-  prNumber?: number;
-  prUrl?: string;
 }
 
-/** Parse a status cell such as `pending`, `blocked`, or
- * `completed ([PR#100](https://...))`. Unknown values return null. */
+/** Parse a status cell (pending / completed / blocked / failed の4値のみ).
+ * Unknown values return null. */
 export function parseStatusCell(cell: string): ParsedStatusCell | null {
-  const trimmed = cell.trim();
-  const simple = trimmed.match(/^(pending|completed|blocked|failed)$/);
-  if (simple) return { status: simple[1] as PersistedStatus };
-  const withPr = trimmed.match(/^completed \(\[PR#(\d+)\]\(([^)]+)\)\)$/);
-  if (withPr) {
-    return {
-      status: "completed",
-      prNumber: Number(withPr[1]),
-      prUrl: withPr[2],
-    };
-  }
-  return null;
+  const simple = cell.trim().match(/^(pending|completed|blocked|failed)$/);
+  if (!simple) return null;
+  return { status: simple[1] as PersistedStatus };
 }
+
+/** 実行構成表のヘッダ行。本文に高々一つ存在する。 */
+export const EXECUTION_TABLE_HEADER = "| Wave | Issue | 前提 | 状態 |";
 
 interface LocatedRow {
   lineIndex: number;
   /** The row split by `|` (cells[0] and cells[length-1] are empty strings). */
   cells: string[];
-  /** Index of the status cell in `cells`; -1 when the status cell is unknown. */
+  /** Index of the status cell in `cells`（最後の実質列）。 */
   statusIndex: number;
 }
 
 function rowPattern(childIssue: number): RegExp {
-  return new RegExp(
-    `^\\|\\s*\\d+(?:-\\d+)?\\s*\\|\\s*#${childIssue}(?:\\s[^|]*)?\\|`,
-  );
-}
-
-/**
- * Resolve the status cell index of a row from the header of the table the
- * row belongs to (nearest header line above the row). The new 4-column
- * format (# / Issue / ステータス / 内容) keeps the status in column 3, the
- * legacy format (# / Issue / タイトル / ステータス) in the last column.
- * Rows without a readable header fall back to the last column (legacy).
- */
-function statusIndexOf(
-  lines: string[],
-  rowLineIndex: number,
-  cells: string[],
-): number {
-  const last = cells.length - 2;
-  if (last < 1) return -1;
-  let statusIndex = last;
-  for (let i = rowLineIndex; i >= 0; i--) {
-    if (/^\|\s*#\s*\|/.test(lines[i] ?? "")) {
-      const headerCells = (lines[i] ?? "").split("|").map((c) => c.trim());
-      const st = headerCells.indexOf("ステータス");
-      if (st > 0) statusIndex = st;
-      break;
-    }
-  }
-  return parseStatusCell(cells[statusIndex] ?? "") ? statusIndex : -1;
+  return new RegExp(`^\\|\\s*\\d+\\s*\\|\\s*#${childIssue}\\s*\\|`);
 }
 
 function locateRow(body: string, childIssue: number): LocatedRow | null {
@@ -90,21 +56,22 @@ function locateRow(body: string, childIssue: number): LocatedRow | null {
   const p = rowPattern(childIssue);
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i] ?? "";
-    const m = line.match(p);
-    if (!m) continue;
+    if (!p.test(line)) continue;
     const cells = line.split("|");
-    return { lineIndex: i, cells, statusIndex: statusIndexOf(lines, i, cells) };
+    const statusIndex = cells.length - 2;
+    if (statusIndex < 1) return null;
+    return { lineIndex: i, cells, statusIndex };
   }
   return null;
 }
 
-/** Find the tracking-table row of a child issue (null when absent). */
+/** Find the execution-structure table row of a child issue (null when absent). */
 export function findChildRow(
   body: string,
   childIssue: number,
 ): { lineIndex: number; childIssue: number; statusCell: string } | null {
   const row = locateRow(body, childIssue);
-  if (!row || row.statusIndex < 0) return null;
+  if (!row) return null;
   return {
     lineIndex: row.lineIndex,
     childIssue,
@@ -118,7 +85,7 @@ export function readChildStatus(
   childIssue: number,
 ): ParsedStatusCell | null {
   const row = locateRow(body, childIssue);
-  if (!row || row.statusIndex < 0) return null;
+  if (!row) return null;
   return parseStatusCell(row.cells[row.statusIndex] ?? "");
 }
 
@@ -126,7 +93,7 @@ export function readChildStatus(
  * Replace the status cell of a child row with `statusText`.
  * Returns null when the row or its status cell is unknown. Only the status
  * cell of the matched row is rewritten; every other cell and line is
- * preserved verbatim (including the content column of the new format).
+ * preserved verbatim (including the 前提 column).
  */
 export function replaceChildStatus(
   body: string,
@@ -134,7 +101,7 @@ export function replaceChildStatus(
   statusText: string,
 ): string | null {
   const row = locateRow(body, childIssue);
-  if (!row || row.statusIndex < 0) return null;
+  if (!row) return null;
   const lines = body.split("\n");
   const cells = row.cells.slice();
   cells[row.statusIndex] = ` ${statusText} `;
@@ -148,20 +115,18 @@ export interface ChildTerminalCounts {
   byStatus: Record<string, number>;
 }
 
-/** Count persisted statuses across all tracking-table child rows. */
+/** Count persisted statuses across all execution-structure table child rows. */
 export function countChildStatuses(body: string): ChildTerminalCounts {
   const lines = body.split("\n");
-  const rowLinePattern =
-    /^\|\s*\d+(?:-\d+)?\s*\|\s*#\d+(?:\s[^|]*)?\|/;
+  const rowLinePattern = /^\|\s*\d+\s*\|\s*#\d+\s*\|/;
   const byStatus: Record<string, number> = {};
   let totalRows = 0;
   let terminalRows = 0;
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i] ?? "";
+  for (const line of lines) {
     if (!rowLinePattern.test(line)) continue;
     const cells = line.split("|");
-    const statusIndex = statusIndexOf(lines, i, cells);
-    if (statusIndex < 0) continue;
+    const statusIndex = cells.length - 2;
+    if (statusIndex < 1) continue;
     const parsed = parseStatusCell(cells[statusIndex] ?? "");
     if (!parsed) continue;
     totalRows++;

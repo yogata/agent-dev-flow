@@ -247,7 +247,7 @@ case-open の判定結果に従う。
 - `agentdev-workflow-orchestration`: orchestration 詳細プロトコル、bg task 破棄検知・状態別回復、Subagent 委譲プロトコル、capture 境界
 - `agentdev-case-run-execution-adapter`: case-run 委譲契約（インライン実行時）
 - `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ
-- `agentdev-epic-tracker`: Epic Issue 本文ステータス追跡テーブルの読取、および Case Issue 工程記録の取りまとめによる記録契機別 Epic 反映の書き込み（per-Epic 排他制御・局所直列化の下で closing 書き込み〔case-close〕と直列化。詳細は同スキル references/epic-reflect-coordination.md）
+- `agentdev-epic-tracker`: Epic Issue 本文実行構成表の読取、および Case Issue 工程記録の取りまとめによる記録契機別 Epic 反映の書き込み（per-Epic 排他制御・局所直列化の下で closing 書き込み〔case-close〕と直列化。詳細は同スキル references/epic-reflect-coordination.md）
 - Custom Tool `agentdev_gh`: GitHub Issue/PR/comment/merge/close I/O
 - `agentdev-project-extensions`: project extension 読込
 
@@ -259,7 +259,7 @@ case-open の判定結果に従う。
 - 不変条件（case-auto は Issue 階層決定ロジックを持たない、複数 REQ doc または scale:large の場合は case-open のルールに委譲）
 - 不変条件（case-open / case-ready から後工程への状態引き継ぎ時、複数 REQ doc の保存結果をフィルタリングまたは再評価しない）
 - 不変条件（Epic Wave 実行時、Wave 反復制御、現在 Wave の ready 子Issue 選択、stage 3 共有 active Issue task 枠（上限 5）による空き枠補充・状態管理・再開時二重起動防止・Wave 収束と依存充足の両条件 gate・委譲前重複実行時検出 を直接担当、case-run(#epic) への委譲は行わない（legacy 経路は廃止済み）、各子Issue ごとにインライン case-run、Wave 境界のクローズは case-close(#epic) に委譲）
-- ガードレール（case-auto は独自の操作単位ステータス追跡を持たない、Epic Issue のステータス追跡テーブルを使用、Epic Issue 本文の書き込みは case-close 単一書き手、case-auto は読み取るのみ）
+- ガードレール（case-auto は独自の操作単位ステータス追跡を持たない、Epic Issue の実行構成表を使用、Epic Issue 本文の書き込みは case-close 単一書き手、case-auto は読み取るのみ）
 - 不変条件（case-auto は操作単位キューの管理・制御のみを担い、OU 本文の抽出・変換・REQ 操作解釈を行わない）
 - 不変条件（case-auto は orchestration pre-reader として case-open 前のみ req_draft を読み込み、case-ready 成功後は invalid post-case reader として req_draft を読まない、case-ready 成功後の停止・再開・完了処理は Issue と Epic だけで成立、クリーンアップ検証ゲートは stage 2（case-ready）の対象群収束後・stage 3 開始前に実行し評価対象を stage 2 を正常完了した対象に限定、独自の OU 状態管理を持たない）
 - 不変条件（OU 間依存は queue dependency として扱い、依存関係があるだけでは Epic Issue 化しない）

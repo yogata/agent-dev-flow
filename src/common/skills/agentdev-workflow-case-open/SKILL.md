@@ -67,7 +67,7 @@ case-open workflow は次の6 STEP で構成する。
 本スキルは次の Capability Skill を名レベルで参照する。
 
 - `agentdev-issue-management`: Issue 操作の安全手続き、テンプレート充足、委譲接続点
-- `agentdev-workflow-templates`: Issue/PR/コメントテンプレート選定、実行識別情報セクション形式、レビュー判断セクション形式
+- `agentdev-workflow-templates`: Issue/PR/コメントテンプレート選定（Issue 本文テンプレートは新形式〔目的・対象範囲・対象外・完了条件・進行状況〕。実行識別情報セクションは PR テンプレートのみ）
 - `agentdev-workflow-lifecycle`: 引き継ぎ停止判定（runtime-package-boundary）、work_type 判定、ラベル付与
 - Custom Tool `agentdev_gh`: GitHub I/O 境界（issue_create、pr_create、comment_create。VERIFY は Tool 内部）
 - `agentdev-adversarial-review`: case-open の review 呼出
@@ -87,13 +87,14 @@ case-open は、上流工程（req-define）で確定した対象要件を実行
 ## 共通制約
 
 - **draft-data 入力**: 本スキルは構造化 `draft-data` を入力として読み取る。機能要件、非機能要件、制約、対象外、受け入れ条件は新規に作成せず合意済み入力を反映する。`conflict_resolutions` に記録済みの衝突は再確認しない
+- **Definition Package の非本文化**: Definition Package を独立した Issue 本文物項目として生成しない（REQ-030-003）。Root Case への関連付けと所在は canonical 成果物関係（Definition PR、case-ready の canonical 再取得経路）から相関する
 - **Root Case 状態**: Root Case 確立後の状態は open とし、実装開始を許可しない。ready への遷移は case-ready が実行する
 - **Definition PR**: canonical Definition に実変更がある場合のみ、Case 単位で 1 件の Definition PR を作成する。実変更判定不能時は作成せず停止する。冪等キーは case-open / case-ready Design に従う
 - **トレーサビリティポリシー追随確認**: REQ 行追加を伴う Definition Package 生成時は、トレーサビリティポリシー（検証対応を任意とする要件行の明示登録）更新の追随要否を工程上明示し、必要な policy エントリ追加を Definition Package の構成要素として含める。policy 編集は当該要件行の変更と同一の Definition 変更として扱い、Definition PR 経由以外の適用経路を取らない（対象要件行、STEP-3）
 - **design 対応事前確認（STEP-2 / STEP-3）**: Definition Package の生成・転記は、対象要件行のうち既存行の意味変更を含む場合、`agentdev-traceability` の coverage --req による当該行の design 対応有無の事前確認を実施する。design 対応が欠落する意味変更行を検出した場合は、当該行の design 対応を artifact_actions（artifact: design）へ組込んだ上で合意を完了する。事前確認を省略した Case は case-ready の lifecycle gate completeness（fail-closed）で停止し得る（missing-design 0 件ゲートが増分ベース〔新規行のみ〕であることへの予防手順）。正規所有は case-open Design「意味変更行の design 対応事前確認」節、詳細手順は references/root-case-and-definition-package.md
 - **Decision 非遷移**: 新規 Decision は proposed のままとし、accepted への状態遷移を実行しない
 - **横断依存検査の警告非阻止**: STEP-5 の横断依存検査は警告の提示のみを行い、Root Case の確立を自動阻止しない。検出源の取得不能時は比較を省略せず検出不能として報告する。警告時の判断は投入者（HITL）への選択肢提示により行い、case-auto 配下では decision_context による親判断解決へ委譲する
-- **実行識別情報の記録**: Root Case 本文に実行識別情報セクション（対象 Case、実行単位、前工程で確定した事項）を構造化形式で記録する。形式は `agentdev-workflow-templates` の実行識別情報セクション規約に従う。機械的解析は同セクションの key-value 行を正とし、自由文中の ID に依存しない。識別情報の一部が取得不能でも停止せず「N/A」を記録する。作成時点で番号が確定しない自己参照値は Issue 作成後に埋め戻す。既存 Issue への遡及適用は行わない
+- **実行識別情報の非記録（Issue 本文）**: Issue 本文には実行識別情報セクションを設けない（agentdev-workflow-templates Design「実行識別情報・検証差分のテンプレートセクション形式」節）。Case・実行単位・前工程確定事項は Definition Package・Definition PR・canonical 成果物関係から相関でき、本文へ一覧化しない。実行識別情報セクションは PR テンプレートのみが持つ
 - **Root Case タイトル**: Root Case の起票時のタイトル書式は `<workflows/issue-title-policy>` Design（Issue タイトル記述規則）を参照する（Root Case は Case 接頭辞書式。合意済みの対象・目的から主題を生成する）。本スキルは書式を複製しない
 - **本文 verbatim**: Root Case 本文、PR 本文は Custom Tool `agentdev_gh` の操作引数としてそのまま渡す（文字コード・一時ファイルの実装詳細は Tool 内部）（`POL-gh-io-delegation`）
 

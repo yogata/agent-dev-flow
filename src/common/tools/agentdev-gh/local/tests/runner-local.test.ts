@@ -51,7 +51,7 @@ function baseFm(overrides: Partial<LocalIssueFrontmatter>): LocalIssueFrontmatte
     id: "issue-0001",
     title: "件名",
     role: "case",
-    status: "open",
+    status: "active",
     created_at: "2026-08-25T00:00:00Z",
     updated_at: "2026-08-25T00:00:00Z",
     closed_at: "",
@@ -78,7 +78,7 @@ describe("LocalRunner: ローカルIssueの作成と採番", () => {
     expect(raw).toContain("id: issue-0001");
     expect(raw).toContain('title: "件名"');
     expect(raw).toContain("role: case");
-    expect(raw).toContain("status: open");
+    expect(raw).toContain("status: active");
     expect(raw).toContain('closed_at: ""');
     expect(raw).toContain("labels: [feature]");
     expect(raw).toContain("## 目的");
@@ -163,9 +163,9 @@ describe("LocalRunner: role 条件付きスキーマの機械検証", () => {
   });
 
   test("case の status と labels は case 値域から選択される", () => {
-    expect(validateLocalIssue(baseFm({ status: "review", labels: ["epic"] }), "issue-0001.md").valid).toBe(true);
+    expect(validateLocalIssue(baseFm({ status: "active", labels: ["epic"] }), "issue-0001.md").valid).toBe(true);
     expect(validateLocalIssue(baseFm({ status: "created", labels: [] }), "issue-0001.md").valid).toBe(false);
-    expect(validateLocalIssue(baseFm({ status: "open", labels: ["risk"] }), "issue-0001.md").valid).toBe(false);
+    expect(validateLocalIssue(baseFm({ status: "running", labels: ["risk"] }), "issue-0001.md").valid).toBe(false);
   });
 
   test("closed_at は role ごとの終端状態でのみ値を持つ", () => {
@@ -182,7 +182,7 @@ describe("LocalRunner: role 条件付きスキーマの機械検証", () => {
     expect(
       validateLocalIssue(baseFm({ status: "cancelled", closed_at: "2026-08-25T00:00:00Z" }), "issue-0001.md").valid,
     ).toBe(true);
-    expect(validateLocalIssue(baseFm({ status: "review", closed_at: "x" }), "issue-0001.md").valid).toBe(false);
+    expect(validateLocalIssue(baseFm({ status: "active", closed_at: "x" }), "issue-0001.md").valid).toBe(false);
   });
 
   test("id は issue-{NNNN} 形式でファイル名と一致する", () => {
@@ -243,16 +243,15 @@ describe("LocalRunner: issue_read / issue_update / issue_list", () => {
     const current = await run(issuesDir, { operation: "issue_read", args: { number: 1 } });
     expect(current.ok).toBe(true);
     const raw = (current.ok ? current.payload as Record<string, unknown> : {}).body as string;
-    const next = raw.replace("status: open", "status: running").replace(
-      'updated_at: "',
-      'updated_at: "',
-    );
+    const next = raw
+      .replace("status: active", "status: cancelled")
+      .replace('closed_at: ""', 'closed_at: "2026-08-25T01:00:00Z"');
     const updated = await run(issuesDir, {
       operation: "issue_update",
       args: { number: 1, body: next },
     });
     expect(updated.ok).toBe(true);
-    expect(readIssueFile(issuesDir, 1)).toContain("status: running");
+    expect(readIssueFile(issuesDir, 1)).toContain("status: cancelled");
 
     const invalid = next.replace("role: case", "role: tracking");
     const rejected = await run(issuesDir, {
@@ -925,19 +924,16 @@ describe("LocalRunner: PR 系操作の role: case 限定", () => {
     fs.rmSync(issuesDir, { recursive: true, force: true });
   });
 
-  test("失敗時の取り込み結果と status: blocked は issue_update 全文反映で記録できる", async () => {
+  test("失敗時の取り込み結果は issue_update 全文反映で記録できる（status は実行継続のまま維持）", async () => {
     const issuesDir = makeIssuesDir();
     await run(issuesDir, { operation: "issue_create", args: { title: "Case", body: "b", labels: [], role: "case" } });
     const current = await run(issuesDir, { operation: "issue_read", args: { number: 1 } });
     const raw = (current.ok ? current.payload as Record<string, unknown> : {}).body as string;
-    const withFail = `${raw.replace(/\n+$/, "")}\n\n## マージ結果\n\n- 操作: ローカル取り込み\n- 実行日時: 2026-08-25T00:00:00Z\n- 結果: FAIL\n`.replace(
-      "status: open",
-      "status: blocked",
-    );
+    const withFail = `${raw.replace(/\n+$/, "")}\n\n## マージ結果\n\n- 操作: ローカル取り込み\n- 実行日時: 2026-08-25T00:00:00Z\n- 結果: FAIL\n`;
     const updated = await run(issuesDir, { operation: "issue_update", args: { number: 1, body: withFail } });
     expect(updated.ok).toBe(true);
     const after = readIssueFile(issuesDir, 1);
-    expect(after).toContain("status: blocked");
+    expect(after).toContain("status: active");
     expect(after).toContain("結果: FAIL");
     fs.rmSync(issuesDir, { recursive: true, force: true });
   });

@@ -22,4 +22,4 @@ case-ready 完了
   - 保存結果: {成功/失敗（理由）}
 検証結果: OK
 git 永続化: {該当なし/ ✅ OK（commit {hash}, push 済み, HEAD = origin/main 同期確認OK）}
-次の段階: case-auto が内部 lifecycle で case-run へ継続（Root Case は ready。実装実行は case-run 段階が実行する。blocked 時は Root Case の resume_command による再開）
+次の段階: case-auto が内部 lifecycle で case-run へ継続（Root Case は ready。実装実行は case-run 段階が実行する。blocked 時は Root Case 指定による再開〔経路解決は Root Case の正規状態、Epic 実行構成、既存成果物、実行の生存状況の照合で行う〕）

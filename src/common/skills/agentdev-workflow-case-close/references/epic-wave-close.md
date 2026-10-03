@@ -1,44 +1,44 @@
 # STEP-E1〜E6: Epic Wave クローズ（epic-wave-close）
 
 > 本 reference は `agentdev-workflow-case-close` SKILL.md の制御平面（STEP 一覧）STEP-E1〜E6 詳細である。
-> Epic Issue 番号入力時（ステータス追跡テーブル存在時）の現在 Wave の一括クローズ、Epic status table 更新、最終 Wave 判定を提供する。
+> Epic Issue 番号入力時（実行構成表存在時）の現在 Wave の一括クローズ、Epic 実行構成表の子状態更新、最終 Wave 判定を提供する。
 
 ## Purpose
 
-Epic Issue 番号入力時（ステータス追跡テーブル存在時）に現在 Wave の子Issue を一括マージ・クローズし、Epic status table を更新、最終 Wave 判定を行う。
+Epic Issue 番号入力時（実行構成表存在時）に現在 Wave の子Issue を一括マージ・クローズし、Epic 実行構成表の子状態を更新、最終 Wave 判定を行う。
 
 ## Input Resolution
 
-1. SSoT 再構成: Epic Issue 本文（ステータス追跡テーブル）、現在 Wave の子Issue 本文・PR 本文群
+1. SSoT 再構成: Epic Issue 本文（実行構成表）、現在 Wave の子Issue 本文・PR 本文群
 2. identifier 保持: Epic Issue番号、子Issue番号群、PR番号群
 3. 最小 scalar: なし
 4. runtime artifact: なし
 
 ## Preconditions
 
-- STEP-1 で Epic Issue と判定（ステータス追跡テーブル存在）
+- STEP-1 で Epic Issue と判定（実行構成表存在）
 
 ## Result
 
 - 現在 Wave の全子Issue マージ、クローズ完了（E4-1 最終 gate 違反子Issue は `blocked` としてマージ対象外、Epic status table へ反映）
 - Design 状態評価（棚卸し制）の Wave 内集約評価完了（E4-3。統合後の全候補が昇格または見送りの評価結果を持つ、または 0 件確認を記録）
-- Epic status table 更新完了（単一書き手 case-close のみ）
+- Epic 実行構成表の子状態更新完了（単一書き手 case-close のみ）
 - Epic Issue 完了条件チェックボックス最終評価・更新（QG-4 観点8、中間 Wave vs 最終 Wave 評価スコープ切替）
 - 当該 Wave スコープの一時成果物残留確認結果（残留時は当該 Wave を完了扱いにしない）
 - 最終 Wave 判定結果（Epic クローズ または 残 Wave 通知）
 
 ## Procedure
 
-現在 Wave の PR 作成済み子Issue を一括マージ、クローズし、Epic status table を更新する。
+現在 Wave の PR 作成済み子Issue を一括マージ、クローズし、Epic 実行構成表の子状態を更新する。
 最終 Wave 判定後に Epic Issue クローズ または 残 Wave 通知を行う。
 
-### E1: Epic Issue 本文読込・ステータス追跡テーブル解析
+### E1: Epic Issue 本文読込・実行構成表解析
 
-Epic Issue 本文を読み込み、ステータス追跡テーブル（`agentdev-epic-tracker` の新4列/旧4列形式）を解析。
+Epic Issue 本文を読み込み、実行構成表（`agentdev-epic-tracker` の実行構成表（`| Wave | Issue | 前提 | 状態 |`））を解析。
 
 ### E2: 現在 Wave 特定
 
-ステータス追跡テーブルから現在 Wave（`running` 状態の子Issue を含む Wave）を特定。
+実行構成表から現在 Wave（完了処理対象の子Issue を含む Wave）を特定。
 
 ### E3: PR 作成済み子Issue 特定
 
@@ -85,9 +85,9 @@ gate 違反子Issue は本シーケンスの対象外とする。
 - 統合後の候補が 0 件の場合は 0 件確認を記録して Design 状態評価を正常完了する
 - 評価結果のない候補（未評価）が残る場合、当該 Wave を完了扱いにしない（STEP-3 と同一の完了ゲート）
 
-### E5: Epic Issue 本文更新（Epic status table 更新、完了条件チェックボックス評価、単一書き手 case-close のみ）
+### E5: Epic Issue 本文更新（Epic 実行構成表の子状態更新、完了条件チェックボックス評価、単一書き手 case-close のみ）
 
-Epic Issue 本文のステータス追跡テーブルを更新。
+Epic Issue 本文の実行構成表を更新。
 **単一書き手制約**: case-close のみが実施（case-run は読み取りのみ、case-auto は Wave 反復制御のみで直接書き込まない、last-write-wins 競合防止）。
 
 **取りまとめ反映との直列化（per-Epic 単一書き手）**: Case Issue 工程記録の取りまとめによる記録契機別の Epic 反映（子状態集約セクション `agentdev:epic-reflect`、全体条件評価セクション `agentdev:epic-overall`）は、本 closing 書き込みと同一の per-Epic 排他制御・局所直列化の下で直列化される（手順と様式の正は `agentdev-epic-tracker`、詳細は `references/epic-reflect-coordination.md`）。E5 の更新は直列化区間内での最新取得→マージ→更新により、該当子の追跡テーブル行のみを変更し、取りまとめ反映の集約セクションと他の子の状態を消去しない。既に終了状態の行は上書きしない（べき等性）。
@@ -126,26 +126,26 @@ QG-4 観点8 に基づく評価スコープ切替（中間 Wave vs 最終 Wave�
 
 ## Evidence
 
-- Epic Issue 本文読取結果、E4-1 最終 gate の JSON 結果（子Issue 別）、E4-3 Design 状態評価の棚卸し列挙結果・統合結果・全件評価結果（Wave 内一元評価）、マージ・クローズ結果、Epic status table 更新の VERIFY 結果、一時成果物残留確認結果、最終 Wave 判定根拠
+- Epic Issue 本文読取結果、E4-1 最終 gate の JSON 結果（子Issue 別）、E4-3 Design 状態評価の棚卸し列挙結果・統合結果・全件評価結果（Wave 内一元評価）、マージ・クローズ結果、Epic 実行構成表の子状態更新の VERIFY 結果、一時成果物残留確認結果、最終 Wave 判定根拠
 
 ## Completion Verification
 
-- E4-2 対象が E4-1 合格子Issue のみであること。`blocked`/`failed` を `completed` に上書きしていないこと。Epic status table 更新後の再読込 VERIFY が合格であること
+- E4-2 対象が E4-1 合格子Issue のみであること。`blocked`/`failed` を `completed` に上書きしていないこと。Epic 実行構成表の子状態更新後の再読込 VERIFY が合格であること
 - E4-3 で単一 Issue ルート（STEP-3）と同一の棚卸し・全件評価ゲートを適用済みであること。同一 draft Design が複数子Issue から列挙された場合は直列集約段で一元評価済みであり、二重評価・見送り記録の二重生成がないこと。評価結果のない候補が残る場合に当該 Wave を完了扱いにしていないこと
 - 当該 Wave スコープの一時成果物（draft、RU、検出事項等）の残留と当該実行で `.agentdev/tmp/` に作成した一時ファイルの残存を E6-1 で確認済みであり、残留時は当該 Wave を完了扱いしていないこと
 
 ## Resume-Idempotency
 
-- Epic Issue 本文のステータス追跡テーブル（durable state、case-close 単一書き手）で子Issue のマージ・クローズ進捗を再構成する。処理済み子Issue の再マージを行わない
+- Epic Issue 本文の実行構成表（durable state、case-close 単一書き手）で子Issue のマージ・クローズ進捗を再構成する。処理済み子Issue の再マージを行わない
 
 ## resume point
 
-- Epic Issue 本文、ステータス追跡テーブル解析状態
+- Epic Issue 本文、実行構成表解析状態
 - 現在 Wave 特定状態
 - PR 作成済み子Issue 一覧、各子Issue の E4-1 最終 gate 結果（合格 / 違反 / スキップ）
 - 各子Issue のマージ・クローズ・評価状態（E4-2 対象は E4-1 合格子Issue のみ）
 - E4-3 Design 状態評価の棚卸し列挙結果（子Issue 別）、Wave 内統合後の候補一覧、各候補の評価結果（昇格 / 見送り）、0 件確認の有無
-- Epic status table 更新状態、Epic Issue 完了条件チェックボックス評価状態
+- Epic 実行構成表の子状態更新状態、Epic Issue 完了条件チェックボックス評価状態
 - 当該 Wave スコープの一時成果物残留確認状態（E6-1）
 - 最終 Wave 判定結果
 
@@ -168,6 +168,6 @@ QG-4 観点8 に基づく評価スコープ切替（中間 Wave vs 最終 Wave�
 
 - ガードレール（Epic 自動クローズは全子Issue が CLOSED の場合のみ）
 - ガードレール・不変条件（未達チェックボックスが残る場合の構造化エラー停止、チェックボックス更新後の再読込 VERIFY 必須、完了条件チェックボックス評価・更新は case-close 専任責務）
-- ガードレール・不変条件（Epic Issue 本文ステータス追跡テーブルの更新は case-close 単一書き手、case-run は読み取りのみ、case-auto は直接書き込まない、Epic Wave クローズは現在 Wave の `running` 子Issue のみ対象、`blocked`/ `failed` を `completed` に上書きしない、べき等性、`POL-epic-tracking-single-writer`）
+- ガードレール・不変条件（Epic Issue 本文実行構成表の更新は case-close 単一書き手、case-run は読み取りのみ、case-auto は直接書き込まない、Epic Wave クローズは現在 Wave の完了処理対象子Issue のみ対象、`blocked`/ `failed` を `completed` に上書きしない、べき等性、`POL-epic-tracking-single-writer`）
 - E4-1 gate 違反子Issue は `blocked` へ遷移し E4-2 マージ並列シーケンスの対象外、`completed` へ上書きしない（べき等性、Epic テーブル単一書き手制約に準拠）
 - 不変条件（E6-1 は当該 Wave スコープの一時成果物（draft、RU、検出事項等）残留と当該実行で `.agentdev/tmp/` に作成した一時ファイルの残存を確認し、残留時は当該 Wave を完了扱いにしない）

@@ -27,12 +27,16 @@ implementation:
     - REQ-101-006
     - REQ-101-007
     - REQ-101-014
+    - REQ-101-015
+    - REQ-101-016
 verification:
   src/common/skills/agentdev-workflow-case-run/scripts/tests/record-comments.test.ts:
     - REQ-101-006
     - REQ-101-007
     - REQ-101-008
     - REQ-101-014
+    - REQ-101-015
+    - REQ-101-016
   src/common/skills/agentdev-workflow-case-run/references/delegation-and-result.md:
     - REQ-060-007
     - REQ-061-034

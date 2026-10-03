@@ -86,7 +86,7 @@ case-run（内部 lifecycle 段階）が QG-1〜QG-3（ローカル検証、CI �
 
 | 旧セクション | 移行先 |
 |---|---|
-| Epic（複数 execution unit の協調管理）、Epic 自動クローズ、Epic ステータス追跡 | [commands/case-close.md](../commands/case-close.md)（Epic Wave クローズ・Epic ステータス追跡）+ [v4-runtime-execution-model.md](v4-runtime-execution-model.md)（per-Epic 単一書き手）+ [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（階層合成導出投影） |
+| Epic（複数 execution unit の協調管理）、Epic 自動クローズ、Epic 実行構成表の子状態更新 | [commands/case-close.md](../commands/case-close.md)（Epic Wave クローズ・Epic 実行構成表の子状態更新）+ [v4-runtime-execution-model.md](v4-runtime-execution-model.md)（per-Epic 単一書き手）+ [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（階層合成導出投影） |
 | 自律修正ループ（Self-Healing Loop） | Workflow Skill `agentdev-workflow-orchestration`（実装本体）・[commands/case-run.md](../commands/case-run.md)（契約 Design） |
 | case-close 達成判定プロトコル | Workflow Skill `agentdev-workflow-case-close`（実装本体）・[commands/case-close.md](../commands/case-close.md)（契約 Design） |
 | Post-Run Capture（実行後キャプチャ） | [workflows/capture-boundaries.md](../workflows/capture-boundaries.md) |
@@ -188,8 +188,8 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **副作用**: GitHub Issue 作成・コメント追加（Custom Tool `agentdev_gh` 操作契約、Tool 内 VERIFY 付き）、draft/RU の `git rm` + commit + 即時 push（Form Zero）。`.agentdev/` 配下の capture 成果物保存（委譲）。REQ/Decision/Design ファイル編集は禁止。
 - **HITL**: adversarial-review 由来の unresolved 判断事項、preflight 失敗時の停止、QG-2 fail 時の req-define 差し戻し、execution contract EC-6 scope-affecting impact の確認、Capture結果 小節の保存報告。
 - **並列性**: STEP-5 子Issue 作成の並列化（最大5件。Issue 実行とは別責務の実行安全値であり、stage 3 の共有 active Issue task 枠とは区別する〔REQ-061-010、DEC-041〕）。Epic Issue 作成・Wave 1 配置・ステータステーブル更新は親が直列集約。
-- **resume**: Issue番号（Standard）、Epic Issue番号 + ステータス追跡テーブル、OU の `result` フィールド（作成 Issue/Epic 番号の書き戻し）、draft/RU 削除残存検証（STEP-6）。
-- **durable state**: GitHub Issue 本文（要件doc 埋め込み、execution contract 必須セクション、EC-7 adversarial-review 発動契約永続化）、Epic Issue ステータス追跡テーブル、Issue 番号、draft/RU 削除状態。
+- **resume**: Issue番号（Standard）、Epic Issue番号 + 実行構成表、OU の `result` フィールド（作成 Issue/Epic 番号の書き戻し）、draft/RU 削除残存検証（STEP-6）。
+- **durable state**: GitHub Issue 本文（要件doc 埋め込み、対象範囲・実現方針・完了条件の各章）、Epic Issue 実行構成表、Issue 番号、draft/RU 削除状態。
 - **Harness依存**: GitHub I/O（Custom Tool `agentdev_gh` 経由）、subagent 起動（REQ 読解・テンプレート充足・完了条件抽出、adversarial-review）、並列実行安全ステージング、拡張読込。
 - **Capability依存**: `agentdev-issue-management`、`agentdev-epic-tracker`、`agentdev-workflow-templates`、`agentdev-workflow-lifecycle`、`agentdev-quality-gates`（QG-2）、`agentdev-git-worktree`、`agentdev-req-file-manager`（RU削除）、`agentdev-project-extensions`、`agentdev-adversarial-review`、`agentdev-learning-capture`/`agentdev-intake-pipeline`（deviation capture 委譲）。
 - **内部workflow候補**: execution_unit 構成workflow（STEP-3 連結成分アルゴリズム + 3軸判断）、Issue作成workflow（STEP-5、Epic flow / Standard flow）、execution contract 確定workflow（STEP-2、EC-1〜EC-8）、draft/RU 削除クリーンアップworkflow（STEP-6 + Form Zero）。EC-2 必須品質統制導出と EC-6 scope-affecting impact 探索は Capability Skill 候補。

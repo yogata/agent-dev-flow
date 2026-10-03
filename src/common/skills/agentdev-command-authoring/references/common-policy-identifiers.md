@@ -18,7 +18,7 @@
 - **POL-promoted-artifact-requires-approval**: ユーザーの明示的な承認なしに採用済み成果物（promoted artifact）を生成しない。詳細判定表（横断契約Design 参照）に従い自律確定条件が満たされたと根拠から一意に確定できる対象のみ、承認なしの生成を許容する
 - **POL-completion-checkbox-single-writer**: Issue 完了条件チェックボックスの評価・更新は case-close QG-4 の専任責務である。case-run、実行担当サブエージェント、その他のコマンドは完了条件チェックボックスを更新しない
 - **POL-worktree-isolation**: case 実行中のファイル編集は case-run から引き渡された worktree root（`.worktrees/{N}-{type}/`）配下に限定する。メインリポジトリや他 worktree のパスを編集しない
-- **POL-epic-tracking-single-writer**: 親 Epic Issue 本文のステータス追跡テーブルの書き込みは case-close の単一書き手に限定する。case-run は読み取りのみ、case-auto は Wave 反復制御のみを行い、直接書き込まない
+- **POL-epic-tracking-single-writer**: 親 Epic Issue 本文の実行構成表（子状態列）の書き込みは case-close の単一書き手に限定する。case-run は読み取りのみ、case-auto は Wave 反復制御のみを行い、直接書き込まない
 
 ## See Also
 

@@ -1,20 +1,21 @@
 // Case Issue 工程記録の取りまとめ実行経路向け決定的処理。
 //
-// 記録契機（着手、引き渡し、停止、再開、判断変更、完了）と記録コメントの
-// 対応、種別別必須項目の検証、Case Issue 本文の現在地・結果セクションの
-// 構築と適用を提供する。
+// 記録契機（停止、判断変更、検証証拠）と記録コメントの対応、種別別必須項目の
+// 検証、Case Issue 本文の進行状況・結果セクションの構築と適用を提供する。
+// 着手・引き渡し・再開を契機とするコメント生成は廃止した（workflows/
+// issue-lifecycle-records Design「コメント種別と実装語彙」節）。表示用の
+// 進行状態4値の写像も廃止し、進行状況は正規状態と開始・終了日時で表現する。
 // 判定主体（case-close 等）が完了条件と証拠を照合する意味判断は本モジュール
 // の対象外であり、本モジュールは呼び出し側が持つ事実・根拠の構造化と検査
 // （決定的処理）のみを担う。Custom Tool `agentdev_gh` の操作契約は変更しない。
 
 import { join } from "node:path";
 
-// 記録契機（6種）。委譲要求は着手と同一視しないため、委譲起動は記録契機に含めない。
+// 記録契機（3種）。着手・引き渡し・再開は記録契機から削除した。
+// 完了（completion）は検証のみで完了する Issue の証拠を記録する契機であり、
+// 完了判定自体は case-close が完了条件と証拠の照合で行う（コメントへ転記しない）。
 export const RECORD_KINDS = [
-  "start",
-  "handoff",
   "hold",
-  "resume",
   "decision_change",
   "completion",
 ] as const;
@@ -23,12 +24,9 @@ export type RecordKind = (typeof RECORD_KINDS)[number];
 
 // 記録種別の表示名。
 export const RECORD_KIND_LABELS: Record<RecordKind, string> = {
-  start: "着手",
-  handoff: "引き渡し",
   hold: "停止",
-  resume: "再開",
   decision_change: "判断変更",
-  completion: "完了",
+  completion: "検証証拠",
 };
 
 // 記録コメントの基本項目。
@@ -41,14 +39,10 @@ export const RECORD_BASE_SECTIONS = [
   "関連合意・成果物",
 ] as const;
 
-// 種別別必須セクション。停止=再開条件、判断変更=撤回対象、引き渡し=残作業と受取役割、
-// 完了=判定根拠。再開は停止コメントに記録された再開条件の充足と最新条件の引き渡しを
-// 証跡化するため最新条件参照を必須とする。
+// 種別別必須セクション。停止=再開条件、判断変更=撤回対象、
+// 検証証拠=判定根拠（検証詳細は成果物を参照し重複記載しない）。
 export const KIND_REQUIRED_SECTIONS: Record<RecordKind, readonly string[]> = {
-  start: [],
-  handoff: ["残作業と受取役割"],
   hold: ["再開条件"],
-  resume: ["最新条件参照"],
   decision_change: ["撤回対象"],
   completion: ["判定根拠"],
 };
@@ -64,25 +58,6 @@ const TEMPLATE_ROOT = join(
 
 export function recordTemplatePath(kind: RecordKind): string {
   return join(TEMPLATE_ROOT, `issue_comment_record_${kind}.md`);
-}
-
-// 進行状態4値（表示）。記録契機からの写像であり、第二の進行管理を構成しない。
-export const PROGRESS_STATES = ["未着手", "実行中", "待機", "終了"] as const;
-
-export type ProgressState = (typeof PROGRESS_STATES)[number];
-
-export function mapRecordKindToProgressState(kind: RecordKind): ProgressState {
-  switch (kind) {
-    case "start":
-    case "handoff":
-    case "resume":
-    case "decision_change":
-      return "実行中";
-    case "hold":
-      return "待機";
-    case "completion":
-      return "終了";
-  }
 }
 
 // 本文から見出し（`## {heading}`）セクションの本文を抽出する。
@@ -170,43 +145,52 @@ export function validateRecordComment(kind: RecordKind, body: string): RecordCom
   return { ok: violations.length === 0, violations };
 }
 
-export interface CurrentLocationInput {
-  phase: string;
-  progressState: ProgressState;
-  nextAction: string;
-  ownerRole: string;
-  holdReason?: string;
-  latestRecordRef?: string;
+// Case Issue 本文の進行状況セクションの正規状態値（Root Case）。
+// 値域の正は v4-lifecycle-state-machine Design（ローカル版 case status と同一
+// トークン）。blocked・failed は子 Issue の状態として Epic 実行構成が所有し、
+// Root Case の正規状態としては保持しない。
+export type CanonicalCaseState = "active" | "completed" | "cancelled";
+
+export const CANONICAL_STATE_LABELS: Record<CanonicalCaseState, string> = {
+  active: "実行継続中（active）",
+  completed: "完了（closed）",
+  cancelled: "中止（cancelled）",
+};
+
+export interface ProgressSectionInput {
+  /** Root Case（Standard Case / Epic Root）の正規状態。Child では指定しない（日時のみ）。 */
+  canonicalState?: CanonicalCaseState;
+  startDate: string;
+  endDate: string;
 }
 
-// Case Issue 本文の現在地セクションを構築する。
-export function buildCurrentLocationSection(input: CurrentLocationInput): string {
-  return [
-    "## 現在地",
-    "",
-    `- 工程: ${input.phase}`,
-    `- 進行状態: ${input.progressState}`,
-    `- 次の行動: ${input.nextAction}`,
-    `- 担当役割: ${input.ownerRole}`,
-    `- 停止・待機理由: ${input.holdReason ?? "該当なし"}`,
-    `- 最新記録参照: ${input.latestRecordRef ?? "該当なし"}`,
-    "",
-  ].join("\n");
+// Case Issue 本文の進行状況セクションを構築する。
+// Root Case は正規状態と開始・終了日時のみ、Child は開始・終了日時のみを保持する
+// （workflows/issue-lifecycle-records Design「正規状態と日時」節）。case-run は
+// 完了条件チェックボックスを更新しない。
+export function buildProgressSection(input: ProgressSectionInput): string {
+  const lines: string[] = ["## 進行状況", ""];
+  if (input.canonicalState !== undefined) {
+    lines.push(`- 正規状態: ${CANONICAL_STATE_LABELS[input.canonicalState]}`);
+  }
+  lines.push(`- 開始日時: ${input.startDate}`);
+  lines.push(`- 終了日時: ${input.endDate}`);
+  lines.push("");
+  return lines.join("\n");
 }
 
 export interface ResultSectionInput {
   deliverables: string;
-  finalJudgmentAndBasis: string;
   remainingItems: string;
 }
 
-// Case Issue 本文の結果セクションを構築する（完了契機）。
+// Case Issue 本文の結果セクションを構築する（完了・中止確定時のみ作成）。
+// 終了状態は進行状況の正規状態が正であり、本セクションでは重複保存しない。
 export function buildResultSection(input: ResultSectionInput): string {
   return [
     "## 結果",
     "",
     `- 成果物: ${input.deliverables}`,
-    `- 最終判定と根拠: ${input.finalJudgmentAndBasis}`,
     `- 残件の扱い: ${input.remainingItems}`,
     "",
   ].join("\n");

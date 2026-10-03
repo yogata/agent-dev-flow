@@ -71,10 +71,7 @@ const KNOWN_TEMPLATE_FILES = [
   "issue_comment_feature_technical.md",
   "issue_comment_record_completion.md",
   "issue_comment_record_decision_change.md",
-  "issue_comment_record_handoff.md",
   "issue_comment_record_hold.md",
-  "issue_comment_record_resume.md",
-  "issue_comment_record_start.md",
   "issue_comment_review_ng.md",
   "issue_desc_bug.md",
   "issue_desc_child.md",
@@ -164,9 +161,11 @@ describe("REQ-048-001/002: 検証差分セクションの機械判別可能性�
     expect(
       design.includes("## 実行識別情報・検証差分のテンプレートセクション形式"),
     ).toBe(true);
-    expect(design.includes("現行ベースライン")).toBe(true);
-    expect(design.includes("固定しない")).toBe(true);
-    expect(design.includes("REQ-048-012")).toBe(true);
+    // Issue 本文には検証差分セクションを設けず、検証差分は PR 本文の証拠から参照する
+    // （Design「実行識別情報・検証差分のテンプレートセクション形式」節の現行宣言）。
+    expect(
+      design.includes("独立した実行識別情報セクション、検証差分セクションを設けない"),
+    ).toBe(true);
   });
 
   it("セクション規約コメントは finding 差分分類と初回検証の全 finding 新規扱いを規定する", () => {

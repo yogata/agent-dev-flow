@@ -63,9 +63,9 @@ describe("aggregateUnits", () => {
 describe("buildStopReport", () => {
   const baseContext = {
     stopReason: "CI/test/lint 失敗（self-healing 不能）",
-    resumeCommand: "case-auto #301（case-run から再開）",
-    resumePoint: "case-run 再開ポイント（実装フェーズ、durable state から再構成）",
-    latestRecordRef: "Case Issue #301 本文 現在地 + 停止コメント",
+    nextCommand: "case-auto #301（case-run から再開）",
+    resumeBasis: "case-run 再開ポイント（実装フェーズ、durable state から再構成）",
+    latestRecordRef: "Case Issue #301 本文 進行状況 + 停止コメント",
   };
 
   test("完了済み/進行中/未実行の各委譲単位と次コマンドを報告に含める", () => {
@@ -79,8 +79,8 @@ describe("buildStopReport", () => {
     expect(report.summaryLine).toContain("進行中 1 件");
     expect(report.summaryLine).toContain("未実行 1 件");
     expect(report.summaryLine).toContain("観測不能 0 件");
-    expect(report.resumeLine).toContain(baseContext.resumeCommand);
-    expect(report.resumeLine).toContain(baseContext.resumePoint);
+    expect(report.nextCommandLine).toContain(baseContext.nextCommand);
+    expect(report.nextCommandLine).toContain(baseContext.resumeBasis);
     expect(report.presenceLines.some((l) => l.includes(baseContext.stopReason))).toBe(true);
     expect(report.presenceLines.some((l) => l.includes(baseContext.latestRecordRef))).toBe(true);
   });
@@ -100,7 +100,7 @@ describe("buildStopReport", () => {
     expect(report.unitLines.join("\n")).toContain("blocked（後続不能確定）");
   });
 
-  test("タイミング情報を指定した場合のみ現在地要素に含める", () => {
+  test("タイミング情報を指定した場合のみ進行状況要素に含める", () => {
     const units: UnitRecord[] = [];
     const without = buildStopReport(units, baseContext);
     expect(without.presenceLines.some((l) => l.startsWith("タイミング情報"))).toBe(false);
@@ -108,7 +108,7 @@ describe("buildStopReport", () => {
     expect(withTiming.presenceLines.some((l) => l.includes("経過 90分"))).toBe(true);
   });
 
-  test("formatStopReport が集約・次コマンド・現在地の3セクションを含む Markdown を生成する", () => {
+  test("formatStopReport が集約・次コマンド・進行状況の3セクションを含む Markdown を生成する", () => {
     const units: UnitRecord[] = [
       { target: "#101", stage: 3, status: "completed", outcome: "pass" },
       { target: "#102", stage: 3, status: "active" },
@@ -117,7 +117,7 @@ describe("buildStopReport", () => {
     const text = formatStopReport(buildStopReport(units, baseContext));
     expect(text).toContain("### 停止時集約");
     expect(text).toContain("### 次コマンド");
-    expect(text).toContain("### 現在地");
+    expect(text).toContain("### 進行状況");
     expect(text).toContain("#101（stage 3）: 完了済み");
     expect(text).toContain("#102（stage 3）: 進行中");
     expect(text).toContain("#103（stage 3）: 未実行");
@@ -154,9 +154,9 @@ describe("再開時の最新条件参照", () => {
     ];
     const context = {
       stopReason: "停止理由（テスト用）",
-      resumeCommand: "case-auto #401",
-      resumePoint: "case-run 再開ポイント",
-      latestRecordRef: "Case Issue #401 本文 現在地",
+      nextCommand: "case-auto #401",
+      resumeBasis: "case-run 再開ポイント",
+      latestRecordRef: "Case Issue #401 本文 進行状況",
     };
     const a = formatStopReport(buildStopReport(units, context));
     const b = formatStopReport(buildStopReport(units, context));
@@ -337,9 +337,9 @@ describe("buildRecoveryPlan", () => {
       { targets, sent: [key], readback: { [key]: "missing" } },
       {
         outcomeFinalized: false,
-        contentSummaries: { [key]: "現在地セクションの更新（stage 3 停止時）" },
+        contentSummaries: { [key]: "進行状況セクションの更新（stage 3 停止時）" },
       },
     );
-    expect(recovery.recoveries[0]?.contentSummary).toBe("現在地セクションの更新（stage 3 停止時）");
+    expect(recovery.recoveries[0]?.contentSummary).toBe("進行状況セクションの更新（stage 3 停止時）");
   });
 });

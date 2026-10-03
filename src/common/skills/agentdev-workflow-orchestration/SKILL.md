@@ -10,7 +10,7 @@ case-run コマンドの状態機械、サブエージェントプロトコル�
 ## 状態機械
 
 case-run は常に単一 Issue を処理する（委譲は単一 Issue あたり1件。Epic・Wave を処理対象とする実行契約は廃止され、Wave 実行制御は case-auto の orchestration stage 3 が単一所有する）。Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）は扱わない（Wave 構成生成は case-open、Wave 境界クローズは case-close の責務）。
-Epic 全体の進行は case-auto が orchestration stage 3 の共有 active Issue task 枠で子 Issue へインライン case-run を反復制御する形で担い、Wave 内の子Issue 選択、実行並列制御は case-auto stage 3 が、Wave 境界クローズ、Epic Issue 本文ステータス追跡テーブル更新は case-close(#epic) が担う（単一書き手: v4-runtime-execution-model Design「直列化単位表」）。
+Epic 全体の進行は case-auto が orchestration stage 3 の共有 active Issue task 枠で子 Issue へインライン case-run を反復制御する形で担い、Wave 内の子Issue 選択、実行並列制御は case-auto stage 3 が、Wave 境界クローズ、Epic Issue 本文実行構成表の子状態更新は case-close(#epic) が担う（単一書き手: v4-runtime-execution-model Design「直列化単位表」）。
 
 ### case-run internal lifecycle フェーズ構成
 
@@ -98,4 +98,4 @@ command 本文内で case-run を参照する場合はこちらを使用。
 ## See Also
 
 - **agentdev-workflow-lifecycle**: work_type 判定基準、フェーズ定義
-- **agentdev-epic-tracker**: Epic ステータス追跡プロトコル
+- **agentdev-epic-tracker**: Epic 実行構成表の子状態更新プロトコル

@@ -67,7 +67,7 @@ const HEADINGS_BEFORE_WORKLOG = [HEADING_MERGE_CHECK, HEADING_DESIGN_CANDIDATES,
 const PR_BODY_SECTIONS = [HEADING_MERGE_CHECK, HEADING_DESIGN_CANDIDATES, HEADING_FINDINGS];
 const PR_TITLE_PREFIX = "### PR title: ";
 
-const CASE_NON_TERMINAL_STATUSES = ["open", "running", "blocked", "review"] as const;
+const CASE_NON_TERMINAL_STATUSES = ["active"] as const;
 const CASE_TERMINAL_STATUSES = ["closed", "cancelled"] as const;
 const CASE_STATUS_VALUES = [...CASE_NON_TERMINAL_STATUSES, ...CASE_TERMINAL_STATUSES] as const;
 const CASE_LABEL_VALUES = ["feature", "bugfix", "maintenance", "docs", "refactor", "chore", "epic"] as const;
@@ -581,7 +581,10 @@ export class LocalRunner implements GhRunner {
   }
 
   private mergeableOf(parsed: ParsedIssue): "MERGEABLE" | "CONFLICTING" | "UNKNOWN" {
-    return parsed.fm.status === "review" ? "MERGEABLE" : "UNKNOWN";
+    // role: case の status は active / closed / cancelled の3値。実行継続中（active）で
+    // PR 相当セクション（マージ前確認）が存在する場合のみマージ可能と判定する。
+    const hasMergeCheck = parsed.raw.split("\n").some((l) => l.trim() === HEADING_MERGE_CHECK);
+    return parsed.fm.status === "active" && hasMergeCheck ? "MERGEABLE" : "UNKNOWN";
   }
 
   /** PR タイトル行の正統一: 最後の マージ前確認 セクション内の PR タイトル行のみを正とする。 */
@@ -664,7 +667,7 @@ export class LocalRunner implements GhRunner {
     const finalLabels = role === "tracking" && kind !== null ? [kind] : labels;
     const number = this.nextIssueNumber();
     const timestamp = isoNow(this.now);
-    const initialStatus = role === "tracking" ? "created" : "open";
+    const initialStatus = role === "tracking" ? "created" : "active";
     const fm: LocalIssueFrontmatter = {
       id: `${ISSUE_FILE_PREFIX}${String(number).padStart(4, "0")}`,
       title,

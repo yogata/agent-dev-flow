@@ -131,7 +131,7 @@ v4（DEC-033）では内部 lifecycle 段階（case-open → case-ready → case
 入力要件docの `draft-data` を読み取り、工程を実行する。`artifact_actions` は case-ready の入力として渡す:
 
 - case-open → case-ready → case-run → case-close（いずれも内部 lifecycle 段階）
-- 再合意済み Definition 変更時は case-revise → case-ready → case-run → case-close（例外経路。case-auto が resume_command から解決）
+- 再合意済み Definition 変更時は case-revise → case-ready → case-run → case-close（例外経路。case-auto が Root Case の正規状態、Epic 実行構成、既存成果物、実行の生存状況の照合から解決）
 
 ### 自走対象
 
@@ -150,4 +150,4 @@ DB マイグレーションの実行、deploy/apply、クラウドリソース�
 
 case-auto の停止条件と停止理由分類の正は REQ-034（case-auto 実行契約）が所有する。
 
-停止時は `/agentdev/case-auto` へ Root Case を指定して再開する（resume_command に基づく）。
+停止時は `/agentdev/case-auto` へ Root Case を指定して再開する（Root Case 指定の経路解決に基づく。工程別の resume_command は廃止済み）。

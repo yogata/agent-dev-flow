@@ -1,10 +1,12 @@
 // Coordination reflect engine: record-trigger based Epic reflection,
 // per-Epic exclusive serialization, and lost-update prevention.
 //
-// The coordination write path (工程記録の取りまとめ) reflects child progress
-// per record trigger (start / handoff / hold / resume / decision_change /
-// completion) into the Epic Issue body, serialized with the closing write
-// path (case-close) under the per-Epic single-writer contract.
+// The coordination write path (工程記録の取りまとめ) reflects child status
+// per record trigger (hold / decision_change / completion) into the Epic
+// Issue body, serialized with the closing write path (case-close) under the
+// per-Epic single-writer contract. 廃止記録契機（着手 start / 引き渡し handoff /
+// 再開 resume）の反映経路は削除済みであり、再試行は継続条件成立と旧実行終了
+// 確認のうえ resetChildToPending で pending へ戻す（completed からの戻しは禁止）。
 //
 // Record trigger identifiers are the single vocabulary shared with the
 // coordination comment path (record-comments.ts in agentdev-workflow-case-run
@@ -21,8 +23,8 @@
 // alter the rendered Epic body:
 //
 //   <!-- agentdev:epic-reflect begin -->
-//   <!-- reflect child=42 trigger=hold phase=case-run state=waiting reason="waiting for CI" next="retry" -->
-//   <!-- reflect child=43 trigger=completion phase=case-run state=ended ended=completed pr=100 -->
+//   <!-- reflect child=42 trigger=hold status=blocked reason="waiting for CI" next="retry" -->
+//   <!-- reflect child=43 trigger=completion status=completed basis="QG-4 合格" -->
 //   <!-- agentdev:epic-reflect end -->
 //
 //   <!-- agentdev:epic-overall begin -->
@@ -32,7 +34,6 @@
 // Pure logic only: no fs, no network, no wall clock.
 
 import {
-  type ParsedStatusCell,
   type PersistedStatus,
   isTerminalStatus,
   readChildStatus,
@@ -40,48 +41,27 @@ import {
 } from "./tracking-table.ts";
 
 // ---------------------------------------------------------------------------
-// Record triggers and progress state (engineering-record vocabulary)
+// Record triggers (engineering-record vocabulary, shared with record-comments.ts)
 // ---------------------------------------------------------------------------
 
 export const RECORD_TRIGGERS = [
-  "start",
-  "handoff",
   "hold",
-  "resume",
   "decision_change",
   "completion",
 ] as const;
 
 export type RecordTrigger = (typeof RECORD_TRIGGERS)[number];
 
-export const PROGRESS_STATES = [
-  "not-started",
-  "running",
-  "waiting",
-  "ended",
-] as const;
-
-export type ProgressState = (typeof PROGRESS_STATES)[number];
-
-export type EndedKind = "completed" | "aborted";
-
 export interface ReflectEntry {
   childIssue: number;
   trigger: RecordTrigger;
-  /** 工程 identifier (e.g. "case-run"). */
-  phase: string;
-  state: ProgressState;
-  /** Required when state is "ended". */
-  endedKind?: EndedKind;
-  /** Required when state is "waiting" (hold). */
-  waitingReason?: string;
+  /** Epic 実行構成表の子状態（pending / completed / blocked / failed）。 */
+  status: PersistedStatus;
+  /** 停止理由・判断変更の撤回対象等（trigger = hold / decision_change）。 */
+  reason?: string;
   nextAction?: string;
-  owner?: string;
-  latestRecordRef?: string;
-  /** Completion judgment basis (record trigger = completion). */
-  resultBasis?: string;
-  prNumber?: number;
-  prUrl?: string;
+  /** 検証証拠・完了確定の根拠（trigger = completion）。 */
+  basis?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -96,17 +76,11 @@ function renderEntryFields(entry: ReflectEntry): string {
   const fields: string[] = [
     `child=${entry.childIssue}`,
     `trigger=${entry.trigger}`,
-    `phase=${quoteValue(entry.phase)}`,
-    `state=${entry.state}`,
+    `status=${entry.status}`,
   ];
-  if (entry.endedKind) fields.push(`ended=${entry.endedKind}`);
-  if (entry.waitingReason) fields.push(`reason=${quoteValue(entry.waitingReason)}`);
+  if (entry.reason) fields.push(`reason=${quoteValue(entry.reason)}`);
   if (entry.nextAction) fields.push(`next=${quoteValue(entry.nextAction)}`);
-  if (entry.owner) fields.push(`owner=${quoteValue(entry.owner)}`);
-  if (entry.latestRecordRef) fields.push(`ref=${quoteValue(entry.latestRecordRef)}`);
-  if (entry.resultBasis) fields.push(`basis=${quoteValue(entry.resultBasis)}`);
-  if (entry.prNumber !== undefined) fields.push(`pr=${entry.prNumber}`);
-  if (entry.prUrl) fields.push(`prUrl=${quoteValue(entry.prUrl)}`);
+  if (entry.basis) fields.push(`basis=${quoteValue(entry.basis)}`);
   return fields.join(" ");
 }
 
@@ -128,27 +102,21 @@ export function parseReflectLine(line: string): ReflectEntry | null {
   }
   const childIssue = Number(fields.get("child"));
   const trigger = fields.get("trigger");
-  const state = fields.get("state");
+  const status = fields.get("status");
   if (!Number.isInteger(childIssue) || childIssue <= 0) return null;
   if (!trigger || !(RECORD_TRIGGERS as readonly string[]).includes(trigger)) {
     return null;
   }
-  if (!state || !(PROGRESS_STATES as readonly string[]).includes(state)) {
+  if (!status || !(["pending", "completed", "blocked", "failed"] as readonly string[]).includes(status)) {
     return null;
   }
   return {
     childIssue,
     trigger: trigger as RecordTrigger,
-    phase: fields.get("phase") ?? "",
-    state: state as ProgressState,
-    endedKind: fields.get("ended") as EndedKind | undefined,
-    waitingReason: fields.get("reason"),
+    status: status as PersistedStatus,
+    reason: fields.get("reason"),
     nextAction: fields.get("next"),
-    owner: fields.get("owner"),
-    latestRecordRef: fields.get("ref"),
-    resultBasis: fields.get("basis"),
-    prNumber: fields.has("pr") ? Number(fields.get("pr")) : undefined,
-    prUrl: fields.get("prUrl"),
+    basis: fields.get("basis"),
   };
 }
 
@@ -173,7 +141,7 @@ export interface ReflectApplyResult {
   body: string;
   applied: boolean;
   /** Non-empty when the existing block contains reflect lines whose trigger or
-   * state is outside the vocabulary. The body is returned unchanged and the
+   * status is outside the vocabulary. The body is returned unchanged and the
    * caller must not write it (the dropped lines would be a lost update). */
   unparseableLines?: string[];
 }
@@ -235,6 +203,7 @@ export function applyReflectEntry(
 /**
  * Closing write path: set the persisted terminal status of a child row.
  * Idempotent: a row already in a terminal state is never overwritten.
+ * 状態列は子状態4値のみ（PR 番号・URL は付記しない）。
  */
 export interface ClosingApplyResult {
   body: string;
@@ -245,7 +214,7 @@ export interface ClosingApplyResult {
 export function applyClosingStatus(
   latestBody: string,
   childIssue: number,
-  target: ParsedStatusCell,
+  status: PersistedStatus,
 ): ClosingApplyResult {
   const current = readChildStatus(latestBody, childIssue);
   if (!current) {
@@ -254,13 +223,39 @@ export function applyClosingStatus(
   if (isTerminalStatus(current.status)) {
     return { body: latestBody, applied: false, skipped: "already-terminal" };
   }
-  let cell: string;
-  if (target.status === "completed" && target.prNumber !== undefined) {
-    cell = `completed ([PR#${target.prNumber}](${target.prUrl ?? ""}))`;
-  } else {
-    cell = target.status;
+  const next = replaceChildStatus(latestBody, childIssue, status);
+  if (next === null) {
+    return { body: latestBody, applied: false, skipped: "row-missing" };
   }
-  const next = replaceChildStatus(latestBody, childIssue, cell);
+  return { body: next, applied: true, skipped: null };
+}
+
+/**
+ * 再試行 pending 戻し（blocked / failed は未完了）。
+ * 継続条件の成立と旧実行の終了確認は呼び出し側の判断であり、本関数は
+ * 決定的な状態書込みのみを行う。completed は終端であり pending へ戻さない。
+ */
+export interface ResetToPendingResult {
+  body: string;
+  applied: boolean;
+  skipped: "row-missing" | "terminal-completed" | null;
+}
+
+export function resetChildToPending(
+  latestBody: string,
+  childIssue: number,
+): ResetToPendingResult {
+  const current = readChildStatus(latestBody, childIssue);
+  if (!current) {
+    return { body: latestBody, applied: false, skipped: "row-missing" };
+  }
+  if (current.status === "completed") {
+    return { body: latestBody, applied: false, skipped: "terminal-completed" };
+  }
+  if (current.status === "pending") {
+    return { body: latestBody, applied: true, skipped: null };
+  }
+  const next = replaceChildStatus(latestBody, childIssue, "pending");
   if (next === null) {
     return { body: latestBody, applied: false, skipped: "row-missing" };
   }
@@ -293,9 +288,9 @@ export interface OverallCriterionInput {
 }
 
 export interface OverallEvaluationInput {
-  /** All child issues of the Epic (tracking-table rows). */
+  /** All child issues of the Epic (execution-structure table rows). */
   childIssues: number[];
-  /** Latest status per child issue (from the tracking table). */
+  /** Latest status per child issue (from the execution-structure table). */
   childStatuses: Record<number, PersistedStatus | undefined>;
   /** Overall completion criteria with their latest evaluation. */
   evaluatedCriteria: OverallCriterionInput[];

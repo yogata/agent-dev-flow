@@ -471,7 +471,7 @@ case-run 委譲内で作成する commit の構成運用を規定する。
 - `agentdev-git-worktree` skill（worktree 作成、precondition gate）
 - `agentdev-workflow-lifecycle` skill（work_type 判定）
 - `agentdev-req-analysis` skill（チェックボックス品質基準）
-- `agentdev-epic-tracker` skill（ステータス追跡テーブル）
+- `agentdev-epic-tracker` skill（実行構成表の読取と子状態更新）
 - REQ-006（case-run / 実装パイプライン）
 - REQ-003（外部エージェント統合契約）
 - REQ-011（case-auto 最大自走モード）

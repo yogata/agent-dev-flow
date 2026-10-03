@@ -30,7 +30,7 @@ case-revise command は公開 interface（入出力契約・ガードレール�
 
 - Definition Amendment PR の作成（実変更がある場合のみ。Custom Tool `agentdev_gh` 経由。VERIFY は Tool 内部）
 - 影響再評価対象 Issue の本文更新・マーキング（影響があるもののみ。`agentdev-workflow-templates` のテンプレート構造維持規約に従う）
-- 行わない副作用: Epic Issue 本文のステータス追跡テーブル更新（単一書き手は case-close）、execution contract / execution structure の再確定（case-ready）、Case 状態モデルの新設・拡張、実装実行、完了条件チェックボックスの評価と更新
+- 行わない副作用: Epic Issue 本文の実行構成表更新（単一書き手は case-close）、execution contract / execution structure の再確定（case-ready）、Case 状態モデルの新設・拡張、実装実行、完了条件チェックボックスの評価と更新
 
 ## 制御平面（STEP 一覧）
 
@@ -52,7 +52,7 @@ case-revise workflow は次の5 STEP で構成する。
 - **未合意分岐（STEP-1）**: 再合意済みでない変更の反映要求は受け付けず、req-define へ差し戻して停止する
 - **実変更なし分岐（STEP-2）**: canonical Definition との差分が空の場合は Amendment PR を作成せず、execution contract / execution structure の再確定を case-ready へ引き継ぐ（空の Amendment PR を作る経路は存在しない。case-revise 専用の Case 状態は追加しない）
 - **冪等分岐（STEP-2）**: 同じ再合意内容に対応する既存 Definition Amendment PR を検出した場合は再利用し、STEP-3 を省略して STEP-4 へ進む（重複生成しない）
-- **影響なし分岐（STEP-4）**: 影響なしと確認できた完了済み Issue は巻き戻さず、完了状態のまま維持する。影響しない進行中の作業は停止せず継続し、通常の現在地更新のみで対応する（目的・対象範囲・完了条件は変更しない）
+- **影響なし分岐（STEP-4）**: 影響なしと確認できた完了済み Issue は巻き戻さず、完了状態のまま維持する。影響しない進行中の作業は停止せず継続し、通常の進行状況更新のみで対応する（目的・対象範囲・完了条件は変更しない）
 
 ### 再開プロトコル（resume protocol）
 
@@ -89,7 +89,7 @@ case-revise workflow は次の5 STEP で構成する。
 
 ## 共通制約
 
-- **合意変更の受領確認（記録・受領・適用の区別）**: 合意変更は記録、受領、実行への適用を区別して扱う。記録は req-define の合意記録と判断変更時の記録コメント（撤回対象を必須項目とする）、受領は STEP-1 の受入確認と STEP-4 の影響対象特定（継続・停止・再実行の判断を含む）、適用は STEP-5 の Case 関連 Issue 本文更新と影響対象の作業担当への最新条件引き渡しである。引き渡し後、作業担当による作業への適用方針の報告を確認するまで case-ready 引き継ぎへ進まない。影響しない作業を一律停止せず、通常の現在地更新によって目的・対象範囲・完了条件を変更しない
+- **合意変更の受領確認（記録・受領・適用の区別）**: 合意変更は記録、受領、実行への適用を区別して扱う。記録は req-define の合意記録と判断変更時の記録コメント（撤回対象を必須項目とする）、受領は STEP-1 の受入確認と STEP-4 の影響対象特定（継続・停止・再実行の判断を含む）、適用は STEP-5 の Case 関連 Issue 本文更新と影響対象の作業担当への最新条件引き渡しである。引き渡し後、作業担当による作業への適用方針の報告を確認するまで case-ready 引き継ぎへ進まない。影響しない作業を一律停止せず、通常の進行状況更新によって目的・対象範囲・完了条件を変更しない
 - **意味判断の非所有**: 新しい要求、Decision、対象範囲を自身では決定しない。再合意済みでない変更の反映要求は req-define へ差し戻す
 - **Amendment PR の冪等**: 同じ再合意内容に対応する既存 Definition Amendment PR を重複生成しない（冪等キーは case-open / case-ready Design が所有）。既存 PR を検出した場合は再利用する
 - **中断済み成果物の再利用**: 中断済み成果物を原則として巻き戻さず、既存成果物を再利用して正しい最終状態へ収束する

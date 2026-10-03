@@ -11,13 +11,13 @@ updated: 2026-10-03
 
 ## 目的
 
-親 Epic Issue のステータス追跡テーブル（`pending` / `ready` / `running` / `completed` / `blocked` / `failed`）を更新する知識ベース。
+親 Epic Issue の実行構成表（`| Wave | Issue | 前提 | 状態 |`、子状態4値 `pending` / `completed` / `blocked` / `failed`）を更新する知識ベース。
 
 ## 適用対象
 
-- case-auto（子 Issue 選択時の `running` 更新、Wave 反復制御時の進行状況読取）
-- case-close（`completed` 更新、Epic 自動クローズ判定）
-- case-open（Epic Issue 本文ステータス追跡テーブル初期生成）
+- case-close（`completed` / `blocked` / `failed` 更新、Epic 自動クローズ判定）
+- case-auto（取りまとめ反映の書き込み、Wave 反復制御時の実行構成表読取）
+- case-open（Epic Issue 本文実行構成表初期生成）
 
 ## 提供する判断、操作
 
@@ -28,7 +28,7 @@ updated: 2026-10-03
 
 ## 参照する references
 
-- なし（SKILL.md 本文に集約、`agentdev-workflow-lifecycle`、`docs/designs/commands/case-close.md`（Epic Wave クローズ・Epic ステータス追跡テーブル）、`docs/designs/foundations/v4-runtime-execution-model.md`（per-Epic 単一書き手）参照）
+- なし（SKILL.md 本文に集約、`agentdev-workflow-lifecycle`、`docs/designs/commands/case-close.md`（Epic Wave クローズ・Epic 実行構成表の子状態更新）、`docs/designs/foundations/v4-runtime-execution-model.md`（per-Epic 単一書き手）参照）
 
 ## 現在の動作
 
@@ -65,4 +65,4 @@ ADF v4 の責務分類（正典: DEC-048、foundations/v4-responsibility-boundar
 
 - **意味判断担当**: 0 件
 - **決定的処理委譲先**: API I/O → Custom Tool agentdev_gh
-- **知識提供**: Epic テーブル更新手順・Parent: #N 検証
+- **知識提供**: Epic 実行構成表の更新手順・親Epic: #N 検証

@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-auto
-description: "case-auto command の workflow 実装本体。case-open → case-ready → case-run → case-close（例外経路: case-revise → case-ready → case-run → case-close）の自走 orchestration、orchestration stage モデル、クリーンアップ検証ゲート、Wave 反復制御（stage 3 共有 active Issue task 枠・空き枠補充・状態管理・再開時二重起動防止・Wave 収束と依存充足の両条件 gate・委譲前重複実行時検出）、bounded parent decision resolution、コンフリクト解消 Level 2/3、停止理由分類、adversarial-review 由来の停止伝播、resume_command: req-define 停止、結果集約を所有する。USE FOR: case-auto 実行時の workflow 制御（入力解決・工程分岐・orchestration・停止検出・停止理由分類）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "case-auto command の workflow 実装本体。case-open → case-ready → case-run → case-close（例外経路: case-revise → case-ready → case-run → case-close）の自走 orchestration、orchestration stage モデル、クリーンアップ検証ゲート、Wave 反復制御（stage 3 共有 active Issue task 枠・空き枠補充・状態管理・再開時二重起動防止・Wave 収束と依存充足の両条件 gate・委譲前重複実行時検出）、bounded parent decision resolution、コンフリクト解消 Level 2/3、停止理由分類、adversarial-review 由来の停止伝播、Root Case 指定の再開入口（req-define）での停止、結果集約を所有する。USE FOR: case-auto 実行時の workflow 制御（入力解決・工程分岐・orchestration・停止検出・停止理由分類）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # case-auto workflow スキル
@@ -8,7 +8,7 @@ description: "case-auto command の workflow 実装本体。case-open → case-r
 case-auto command の workflow 実装本体である。
 要件doc または Issue番号から case-open → case-ready → case-run → case-close を順次自走し（req-define で再合意済みの Definition 変更がある場合は case-revise → case-ready → case-run → case-close の例外経路）、repo 内変更に限りマージまで完了する制御構造を所有する。
 orchestration stage モデル、クリーンアップ検証ゲート、Wave 反復制御、bounded parent decision resolution、コンフリクト解消 Level 2/3、停止理由分類、adversarial-review 由来の停止伝播を統合する。
-人間に留保された判断（新しい目的・価値・優先順位・対象範囲・外部契約・受け入れ条件・恒久規範、または既存正規契約だけでは解決不能な規範間優先関係の新規確定を要する判断）が必要となった場合は blocked とし Root Case の resume_command: req-define で停止する（req-define の壁打ちを自動化しない）。
+人間に留保された判断（新しい目的・価値・優先順位・対象範囲・外部契約・受け入れ条件・恒久規範、または既存正規契約だけでは解決不能な規範間優先関係の新規確定を要する判断）が必要となった場合は blocked とし、Root Case 指定の正規再開経路で req-define を再開入口として停止報告する（req-define の壁打ちを自動化しない）。
 
 case-auto command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する。
 
@@ -41,7 +41,7 @@ case-auto workflow は次の8 STEP で構成する。
 | STEP-1 | 入力解決・開始時刻記録 | case-auto 起動 | 入力モード確定、`case_auto_started_at` 記録 | [references/input-resolution-and-orchestration.md](references/input-resolution-and-orchestration.md) |
 | STEP-2 | 工程分岐（継続工程確定） | 入力解決完了 | 工程順序確定（通常経路 / 例外経路 / Issue 再開、auto_gate preflight） | [references/input-resolution-and-orchestration.md](references/input-resolution-and-orchestration.md) |
 | STEP-3 | orchestration 実行 | 工程順序確定 | 各工程の実行結果、stage モデル適用、クリーンアップ検証ゲート、Wave 反復、bg task 状態管理 | [references/input-resolution-and-orchestration.md](references/input-resolution-and-orchestration.md) |
-| STEP-4 | 停止条件検出・停止理由分類 | 各工程の結果受領 | 停止判定（11項目）、停止理由分類（7軸＋上位合意矛盾/新規ユーザー判断）、resume_command 記録 | [references/stop-and-decision-resolution.md](references/stop-and-decision-resolution.md) |
+| STEP-4 | 停止条件検出・停止理由分類 | 各工程の結果受領 | 停止判定（11項目）、停止理由分類（7軸＋上位合意矛盾/新規ユーザー判断）、再開入口の報告（Root Case 指定） | [references/stop-and-decision-resolution.md](references/stop-and-decision-resolution.md) |
 | STEP-5 | adversarial-review 由来の停止伝播 | user-decision-required + decision_context 受領 | 当該 execution_unit の自走停止、ユーザー判断待機 | [references/stop-and-decision-resolution.md](references/stop-and-decision-resolution.md) |
 | STEP-6 | bounded parent decision resolution | decision_context 受領 | 自律解決 / 作業仮定 / 上位合意矛盾停止 / 新規ユーザー判断停止 | [references/stop-and-decision-resolution.md](references/stop-and-decision-resolution.md) |
 | STEP-7 | コンフリクト解消 Level 2/3 | case-close から Level 1 失敗エスカレーション受領 | インライン case-run 再実行（最大2回）、オーケストレーション級判断、解消 または 停止 | [references/conflict-resolution-and-reporting.md](references/conflict-resolution-and-reporting.md) |
@@ -57,7 +57,7 @@ case-auto workflow は次の8 STEP で構成する。
 
 ### 再開プロトコル（resume protocol）
 
-- 再開点は永続状態から再構成する: `case_auto_started_at` と L1 工程別タイムスタンプ、Issue/PR の存在と番号、Epic Issue 本文のステータス追跡テーブル（Wave 進行）、draft の有無（case-open 完了前のみ pre-reader）、各工程の完了結果、Root Case の状態（open / ready / running / blocked / review / closed）と resume_command
+- 再開点は永続状態から再構成する: `case_auto_started_at` と L1 工程別タイムスタンプ、Issue/PR の存在と番号、Epic Issue 本文の実行構成表（Wave 進行）、draft の有無（case-open 完了前のみ pre-reader）、各工程の完了結果、Root Case の正規状態（active / closed / cancelled）
 - 現在 stage は stage cursor を新たな正規状態として保存せず、起動時対象集合と各対象の正規状態（Issue / PR / Case 等）から最も早い未収束 stage として再構成する。完了済み対象を再実行せず、同一対象だけを後続 stage へ先行させない。起動時対象集合の安定識別子は中断再開に必要な期間に限りローカル一時実行状態として保持し、draft / RU の削除によって対象を実行中の対象集合から消失させない。正規成果物から再構成できる情報を別の正規状態として重複管理しない（case-auto Design「ドラフト間並列実行モデル」）
 - 停止時報告に再開点と再開可能な次コマンドを明示し、会話コンテキストの記憶に依存しない。case-ready 成功後の再開は Issue と Epic だけで成立させる（orchestration pre-reader 契約）
 
@@ -65,7 +65,7 @@ case-auto workflow は次の8 STEP で構成する。
 
 - 正常終了: 全工程完了（OU処理ループを含む全 OU 処理完了）時の完了報告まで
 - 一時ファイル残存: 正常終了の前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（STEP-8 で確認。一時ファイル cleanup 規定（workflow 側で生成した `.agentdev/tmp/` 一時ファイルは当該実行内で削除する。Custom Tool 内部の一時ファイルは Tool が操作ごとに自動削除する））
-- 停止終了: 11項目の停止条件いずれかの検出時（停止理由分類済み報告、人間に留保された判断の新規確定時は resume_command: req-define を記録）。bounded parent decision resolution での上位合意矛盾・新規ユーザー判断。adversarial-review 由来の user-decision-required。コンフリクト Level 3 失敗
+- 停止終了: 11項目の停止条件いずれかの検出時（停止理由分類済み報告、人間に留保された判断の新規確定時は Root Case 指定の再開入口（req-define）を報告）。bounded parent decision resolution での上位合意矛盾・新規ユーザー判断。adversarial-review 由来の user-decision-required。コンフリクト Level 3 失敗
 - 委譲起動不能時: `delegation-unavailable` として報告（委譲工程のインライン実行への切替えは行わない）
 
 ## orchestration stage モデル（case-auto 実行契約）
@@ -110,7 +110,7 @@ case-auto workflow は次の8 STEP で構成する。
 - `agentdev-workflow-orchestration`: orchestration 詳細プロトコル、bg task 破棄検知・状態別回復、capture 境界、Subagent 委譲プロトコル、停止理由分類詳細、コンフリクト解消 Level 2/3 詳細
 - `agentdev-case-run-execution-adapter`: case-run 委譲契約（インライン実行時）
 - `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ、コンフリクト解消 rebase パス（Level 1 は case-close、Level 2/3 は本 workflow）
-- `agentdev-epic-tracker`: Epic Issue 本文ステータス追跡テーブルの読取、および Case Issue 工程記録の取りまとめによる記録契機別 Epic 反映の書き込み（書き込みは closing 書き込み〔case-close〕と同一の per-Epic 排他制御・局所直列化の下で実施、手順の正は `agentdev-epic-tracker`）
+- `agentdev-epic-tracker`: Epic Issue 本文実行構成表の読取、および Case Issue 工程記録の取りまとめによる記録契機別 Epic 反映の書き込み（書き込みは closing 書き込み〔case-close〕と同一の per-Epic 排他制御・局所直列化の下で実施、手順の正は `agentdev-epic-tracker`）
 - `agentdev-workflow-lifecycle`: 引き継ぎ停止判定
 - Custom Tool `agentdev_gh`: GitHub Issue/PR/comment/merge/close I/O
 - `agentdev-project-extensions`: project extension 読込

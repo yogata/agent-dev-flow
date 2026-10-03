@@ -28,9 +28,9 @@ GitHub 実装の engine 領域（`src/common/tools/agentdev-gh/`）から本デ�
 | `issue_reopen` | tracking の `closed` → `in-discussion` + `closed_at` クリア。case は終端状態からの遷移なしとして拒否 |
 | `pr_create` | 最新の role: case ローカルIssueへ `## マージ前確認` セクション追記（`### PR title: {title}` + 本文）。操作契約上 pr_create は番号を持たないため |
 | `pr_read` | 最後の `## マージ前確認` から title を抽出し、body として論理 PR 本文（`## マージ前確認` / `## Design確定候補` / `## Findings / Capture候補` の3セクションの定義順直列化）を返す。state は `## マージ結果` 記録済み → `merged`、それ以外は status から写像 |
-| `pr_merge` | `## マージ結果` へ記録（操作、実行日時、結果 `PASS`）。GitHub PR 取り込みは実行しない。失敗・未完了時の `status: blocked` への更新は `issue_update`（本文全文反映）で構成する |
+| `pr_merge` | `## マージ結果` へ記録（操作、実行日時、結果 `PASS`）。GitHub PR 取り込みは実行しない。失敗・未完了時は理由を `## 残課題` へ記録し、`status` は実行継続（`active`）のまま維持する |
 | `pr_changed_files` | 空配列（ローカルに変更ファイル一覧は不存在。Git worktree の実状態が正） |
-| `pr_mergeable` | `status: review` → `MERGEABLE`、それ以外 → `UNKNOWN` |
+| `pr_mergeable` | `status: active` かつ `## マージ結果` 未記録（マージ前確認セクションあり）→ `MERGEABLE`、それ以外 → `UNKNOWN` |
 | `pr_update` | role: case の最後の `## マージ前確認` を対象に、PR タイトル行と本文の3論理セクションを項目単位で更新し、読み戻しで検証 |
 | `comment_create`、`comment_list`、`comment_update`、`comment_delete` | role に応じたコメント相当セクション（tracking: `## 検討経過`、case: `## 作業ログ`）を `c{NN}` 形式で操作。公開 commentId は `issue-{NNNN}-c{NN}`、採番水位は frontmatter の `comment_seq` で管理 |
 

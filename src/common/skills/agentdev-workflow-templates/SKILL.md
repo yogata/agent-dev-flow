@@ -13,12 +13,14 @@ agentdev系コマンドで使用するIssue/PR本文、コメントテンプレ�
 
 ### Issue本文テンプレート
 
-| テンプレート | 用途 | 対象コマンド | work_type |
-|---|---|---|---|
-| `issue_desc_feature.md` | 機能追加、変更 | case-open | feature |
-| `issue_desc_bug.md` | バグ修正 | case-open | bugfix |
-| `issue_desc_epic.md` | Epic Issue本文 | case-ready | feature (Epic) |
-| `issue_desc_child.md` | 子Issue本文 | case-ready | feature (Epic) |
+Issue 本文テンプレートは本文基本構造（目的、対象範囲・対象外、実現方針（条件付き）、完了条件、進行状況、結果（条件付き））を規定する。Epic Root は実行構成（`| Wave | Issue | 前提 | 状態 |` の一表）を加える。子 Issue 本文の冒頭行は `親Epic: #N` とする。様式の正は `workflows/issue-lifecycle-records` Design（Case Issue 工程記録モデル）であり、本スキルはテンプレート投影のセクション形式を提供する。本文テンプレートは Issue タイトルを規定せず、タイトル書式は `workflows/issue-title-policy` Design を参照する。
+
+| テンプレート | 用途 | 対象コマンド |
+|---|---|---|
+| `issue_desc_feature.md` | Standard Case 本文（機能追加・変更） | case-open |
+| `issue_desc_bug.md` | Standard Case 本文（バグ修正） | case-open |
+| `issue_desc_epic.md` | Epic Root 本文（実行構成一表を含む） | case-ready |
+| `issue_desc_child.md` | 子 Issue 本文（冒頭 `親Epic: #N`） | case-ready |
 
 ### コメントテンプレート
 
@@ -29,12 +31,11 @@ agentdev系コマンドで使用するIssue/PR本文、コメントテンプレ�
 | `issue_comment_review_ng.md` | レビューNG記録 | - | レビューNG時コメント |
 | `issue_comment_feature_implementation.md` | 実装記録 | case-close | PRマージ後コメント (機能追加) |
 | `issue_comment_bug_record.md` | 対応記録 | case-close | PRマージ後コメント (バグ修正、軽微変更/リファクタリング、保守作業/ドキュメント、雑務) |
-| `issue_comment_record_start.md` | 工程記録（着手） | case-run | 実装着手の事実を報告された時 |
-| `issue_comment_record_handoff.md` | 工程記録（引き渡し） | case-run / case-close | 工程の移行（実装完了から完了判定への引き渡し等） |
 | `issue_comment_record_hold.md` | 工程記録（停止） | case-run | 確定した停止を報告された時点（途中報告を含む） |
-| `issue_comment_record_resume.md` | 工程記録（再開） | case-run | 再開条件の充足確認と最新条件の引き渡し時 |
 | `issue_comment_record_decision_change.md` | 工程記録（判断変更） | case-run | 確定した判断変更・判断待ちを報告された時点 |
-| `issue_comment_record_completion.md` | 工程記録（完了） | case-close | QG-4 合格後のクローズ契機 |
+| `issue_comment_record_completion.md` | 工程記録（検証証拠） | case-run / case-close | 検証のみで完了する Issue の証拠を記録する時 |
+
+着手・引き渡し・再開を契機とするコメントは生成せず、対応するテンプレート実体は廃止した。記録対象の正は `workflows/issue-lifecycle-records` Design「コメント種別と実装語彙」節である。
 
 コメントテンプレートの本文は Read tool で読み込んで変数置換し、Custom Tool `agentdev_gh` の comment_create 操作で投稿する。テンプレートファイル名 `issue_comment_*.md` は用途識別子であり、Tool 操作名を指さない。
 
@@ -46,21 +47,19 @@ Case Issue の工程記録（記録様式の正は workflows/issue-lifecycle-rec
 
 | 記録契機 | テンプレート | 投稿主体 | 種別別必須項目 |
 |---|---|---|---|
-| 着手 | `issue_comment_record_start.md` | case-run | なし（基本項目のみ） |
-| 引き渡し | `issue_comment_record_handoff.md` | case-run | 残作業と受取役割 |
 | 停止 | `issue_comment_record_hold.md` | case-run | 再開条件 |
-| 再開 | `issue_comment_record_resume.md` | case-run | 最新条件参照 |
 | 判断変更 | `issue_comment_record_decision_change.md` | case-run | 撤回対象 |
-| 完了 | `issue_comment_record_completion.md` | case-close | 判定根拠 |
+| 検証証拠 | `issue_comment_record_completion.md` | case-run / case-close | 判定根拠 |
+
+着手・引き渡し・再開は記録契機ではない。これらの契機でコメントを生成せず、進行状況の開始日時（初回実着手）と本文・PR で工程移行を表現する。
 
 #### 基本項目と選定ルール
 
 - 記録コメントの基本項目は 記録種別、対象工程、事実・結果、理由・根拠、次の行動、関連合意・成果物 とする。「理由・根拠」「関連合意・成果物」は非該当時に省略でき、必須項目は該当データがない場合も「該当なし」を記載しセクション自体は残す
-- 種別別必須項目は上表のとおり。完了には判定根拠が必須であり、検証詳細自体は重複記載せず成果物を参照する
-- 委譲要求（委譲起動）は実着手と同一視せず、着手記録は実装着手の事実を報告された時点で行う。工程終了を待たない途中報告（確定した停止・判断待ち）は停止・判断変更テンプレートで記録できる
-- 投稿主体: 実行担当は報告のみを行い、記録コメントの投稿と本文現在地・結果セクションの更新は取りまとめが実行する。実行の申告だけで完了扱いにしない
+- 種別別必須項目は上表のとおり。検証証拠には判定根拠が必須であり、検証詳細自体は重複記載せず成果物を参照する
+- 投稿主体: 実行担当は報告のみを行い、記録コメントの投稿と本文進行状況・結果セクションの更新は取りまとめが実行する。実行の申告だけで完了扱いにしない
 - 投稿前の必須項目検証は記録コメント検証スクリプト（`agentdev-workflow-case-run/scripts/record-comments.ts`、決定的処理）で行う。検証不備の本文は投稿しない
-- 既存の対応記録コメントテンプレート（`issue_comment_feature_implementation.md`、`issue_comment_bug_record.md`）と共存する。対応記録コメントは work_type 別の詳細対応記録と検証差分セクションの置き場所であり、完了記録コメントとの間で検証詳細を重複記載しない
+- 既存の対応記録コメントテンプレート（`issue_comment_feature_implementation.md`、`issue_comment_bug_record.md`）と共存する。対応記録コメントは work_type 別の詳細対応記録と検証差分セクションの置き場所であり、検証証拠コメントとの間で検証詳細を重複記載しない
 
 #### セクション仕様
 
@@ -78,7 +77,7 @@ Case Issue の工程記録（記録様式の正は workflows/issue-lifecycle-rec
 
 | テンプレート | 用途 | 対象コマンド | 適用対象 |
 |---|---|---|---|
-| `templates/case-ready/root-case.md` | Root Case Issue 本文（execution contract 確定と ready 遷移で更新する構造） | case-ready | 全 Case |
+| `templates/case-ready/root-case.md` | Root Case Issue 本文（実現方針と完了条件を case-ready が確定して更新する構造） | case-ready | 全 Case |
 | `templates/case-ready/root-case-report.md` | Root Case 完了報告 | case-ready | 全 Case |
 
 ### case-revise テンプレート
@@ -108,22 +107,17 @@ Case Issue の工程記録（記録様式の正は workflows/issue-lifecycle-rec
 | Findings/ Intake候補 | 【必須】 | case-run で発見した本筋外 Finding（intake候補、learning候補）を記録。各項目に発見元、内容、分類（intake/learning）を含める | 「該当なし」 |
 | Design確定候補 | 【任意】 | case-run/ driver が実装時に発見した Design レベルの詳細（schema、enum、判定表、内部アルゴリズム等）。`Findings / Capture候補` とは別セクション。case-close STEP-3 の Design 状態評価（棚卸し制）への補助入力となる（棚卸し列挙が正、申告の不在で棚卸しは省略されない） | セクションごと省略 |
 
-### 実行識別情報セクション（Issue/PR テンプレート共通形式）
+### 実行識別情報セクション（PR テンプレート形式）
 
-Issue 本文テンプレートと PR 本文テンプレートに、ADF 実行の識別情報を構造化して記録する「実行識別情報」セクションを定義する。
+PR 本文テンプレートに、ADF 実行の識別情報を構造化して記録する「実行識別情報」セクションを定義する。
+Issue 本文には本セクションを設けない（実行単位・委譲単位・Case・GitHub Issue・PR・ADF 成果物は Issue 番号、親Epic 参照、実行構成表、Refs 行等の canonical 成果物関係から相関でき、本文へ一覧化しない）。
 記録先割当と意味集合は v4-durable-state-and-recovery Design「ADF 実行識別情報の記録契約」節が正規所有し、本スキルはテンプレートセクション形式を提供する。
 
 #### 対象テンプレートと記録内容
 
 | テンプレート | 記録する識別情報 |
 |---|---|
-| `templates/case-open/root-case.md` | 対象 Case（Root Case 自身）、実行単位（case-ready で確定。取得不能時は N/A） |
-| `templates/case-ready/root-case.md` | 対象 Case、実行単位（case-ready が確定した値） |
 | `templates/case-revise/amendment-pr.md` | 対象 Case、実行単位 |
-| `issue_desc_feature.md` | 対象 Case、実行単位 |
-| `issue_desc_bug.md` | 対象 Case、実行単位 |
-| `issue_desc_epic.md` | 対象 Case、実行単位 |
-| `issue_desc_child.md` | 対象 Case、実行単位 |
 | `pr_desc.md` | 対象 Case、実行単位、委譲単位識別子 |
 
 #### セクション仕様
@@ -148,9 +142,8 @@ Issue 本文テンプレートと PR 本文テンプレートに、ADF 実行の
 
 #### 配置規則と適用範囲
 
-- Issue テンプレートでは「概要」セクション（bug テンプレートでは「説明」セクション）の直後に配置する
 - PR テンプレートでは「概要」セクションの直後に配置する
-- 本セクションは新規作成の Issue / PR にのみ適用し、既存 Issue / PR への遡及適用は行わない
+- 本セクションは新規作成の PR にのみ適用し、既存 PR への遡及適用は行わない
 
 ### 検証差分セクション（PR テンプレート形式）
 
@@ -199,60 +192,37 @@ PR 本文テンプレートに、検証の構造化記録を行う「検証差�
 
 - PR テンプレートでは「品質メトリクス」セクションの直後、「Findings/ Capture候補」セクションの前に配置する
 
-### review_dispositions 証跡セクション（Issue本文テンプレート）
+### review_dispositions の消費（Issue 本文への転記廃止）
 
-case-open が draft-data の `review_dispositions` を読み取り、Issue 本文の「レビュー判断」セクションへ恒久証跡として転記する（AG-{NNN}、AG-{NNN}）。
+case-open / case-ready は draft-data の `review_dispositions` を Issue 本文へ全件転記しない。
 
-#### 対象テンプレートと内容
+- 採用内容（accepted disposition）は実行契約の該当章（対象範囲、実現方針、完了条件の検証方法）へ反映する
+- 必要な採否理由（後から判断根拠を確認する必要があるもの）だけをコメントへ残す
+- review_dispositions の構造（id、disposition、reason_code、reason、evidence）の正は既存の正規所有先（artifact-contracts Design「req_draft 出力構造」節）のままとし、本変更でスキーマを変更しない。Issue 本文へ転記用の同型セクションを定義しない
 
-| テンプレート | 適用対象 | セクション内容 |
-|---|---|---|
-| `templates/case-open/root-case.md` | Root Case（case-open） | 全 disposition 明細（`<!-- 【必須】 -->`） |
+### Case Issue 工程記録テンプレート（進行状況・結果セクション）
 
-Epic Issue / 子 Issue 本文への転記は case-ready が Epic 構成確定後に実行し、そのテンプレート規約は case-ready 配布物が定める。case-open は Epic / 子 Issue への転記を行わない。
-
-#### セクション仕様
-
-「レビュー判断」セクションは `<!-- 【必須】 -->` マーカー付きの必須セクションとする。
-root-case テンプレートでは転記対象 disposition がない場合「該当なし」と記載する。
-
-各 disposition 明細は id（`RD-NNN`）、disposition、reason_code、reason、evidence（path、section、checked_at_commit）を記載する。
-`checked_at_commit` は case-open が default branch 最新化後に再確認した commit SHA を記録する。
-
-#### 配置規則
-
-root-case テンプレートでは「Case 状態と次工程」セクションの直後、「補足情報（オプション）」セクションの前に配置する。
-
-#### 転記規則
-
-- case-open は全 disposition を Root Case 本文「レビュー判断」セクションへ転記する
-- Epic Issue / 子 Issue への転記は case-ready が Epic 構成確定後に実行する。case-open は重複転記しない
-
-### Case Issue 工程記録テンプレート（現在地・結果セクション）
-
-Case Issue 本文テンプレートに、工程記録の「現在地」「結果」セクションを定義する。
+Case Issue 本文テンプレートに、工程記録の「進行状況」「結果」セクションを定義する。
 セクション名・順序・項目様式の正は `workflows/issue-lifecycle-records` Design（Case Issue 工程記録モデル）であり、本節はテンプレート投影のセクション形式を提供する。
 
 #### 対象テンプレートと配置
 
-| テンプレート | 追加セクション | 配置 |
+| テンプレート | 常設セクション | 条件付きセクション |
 |---|---|---|
-| `templates/case-open/root-case.md` | 現在地、結果 | 「レビュー判断」セクションの直後、「補足情報（オプション）」セクションの前 |
-| `templates/case-ready/root-case.md` | 現在地、結果 | 「レビュー判断」セクションの直後、「補足情報（オプション）」セクションの前 |
-| `issue_desc_feature.md` | 現在地、結果 | 「レビュー判断」セクションの直後、「補足情報（オプション）」セクションの前 |
-| `issue_desc_bug.md` | 現在地、結果 | 「レビュー判断」セクションの直後、「補足情報（オプション）」セクションの前 |
-| `issue_desc_epic.md` | 現在地、結果 | 「レビュー判断」セクションの直後、「補足情報」セクションの前 |
-| `issue_desc_child.md` | 現在地、結果 | 「レビュー判断」セクションの直後、「補足情報」セクションの前 |
+| `templates/case-open/root-case.md` | 目的、対象範囲・対象外、完了条件、進行状況 | 実現方針、結果（該当時のみ追加。章を常設しない） |
+| `templates/case-ready/root-case.md` | 目的、対象範囲・対象外、完了条件、進行状況 | 実現方針、結果（該当時のみ追加。章を常設しない） |
+| `issue_desc_feature.md` / `issue_desc_bug.md` | 目的、対象範囲・対象外、完了条件、進行状況 | 実現方針、結果（該当時のみ追加） |
+| `issue_desc_epic.md` | 目的、対象範囲・対象外、実行構成、完了条件、進行状況 | 実現方針、結果（該当時のみ追加） |
+| `issue_desc_child.md` | 親Epic: #N（冒頭行）、目的、対象範囲・対象外、完了条件、進行状況 | 実現方針、結果（該当時のみ追加） |
 
 #### セクション仕様
 
-- セクション見出しは「現在地」「結果」とし、`<!-- 【必須】 -->` マーカー付きの必須セクションとする
-- 「現在地」は 工程、進行状態、次の行動、担当役割、停止・待機理由、最新記録参照 を key-value 行（`- {key}: {value}`）で保持する
-- 「結果」は 成果物、最終判定と根拠、残件の扱い を key-value 行で保持する
-- 進行状態は 未着手 / 実行中 / 待機 / 終了 の4値で表示し、待機には理由と次の行動を、終了には完了・中止の区別を付す。進行状態は正規状態と記録契機から写像される表示であり、独立した進行管理を構成しない。Root Case テンプレートでは「Case 状態と次工程」セクションの状態が正規状態となる
-- 担当役割は 実行担当 / 取りまとめ / 判定主体 の3種から記録する
-- 現在地は記録契機（着手、引き渡し、停止、再開、判断変更、完了）に応じて case-auto 等の進行スキルとコードが更新する
-- 完了判定は case-close 等の判定主体が完了条件と証拠を照合して確定し、実行の申告だけで完了扱いとしない
+- セクション見出しは「進行状況」「結果」とし、進行状況は `<!-- 【必須】 -->` マーカー付きの必須セクションとする。結果は完了・中止確定時にのみ作成する非常設セクションであり、起票時の本文には含めない
+- 「進行状況」は 正規状態（Root Case のみ。実行継続中（active）/ 完了（closed）/ 中止（cancelled））と 開始日時・終了日時 を key-value 行（`- {key}: {value}`）で保持する。Child Issue は開始日時・終了日時のみを保持する（子状態は親 Epic の実行構成表が所有する）
+- 表示用の進行状態4値、現在工程、担当役割、次の行動、最新記録参照、停止・待機理由は保存しない
+- 「結果」は 成果物 と 残件の扱い を key-value 行で保持する。終了状態は進行状況の正規状態が正であり、重複保存しない
+- 開始日時は初めて実装または検証に実着手した時刻（case-run で設定）であり、停止・再開で上書きしない。終了日時は Root Case は完了または中止確定時、Child は completed 確定時にのみ設定する
+- 完了判定は case-close 等の判定主体が完了条件と証拠を照合して確定し、実行の申告だけで完了扱いにしない。case-run は完了条件チェックボックスを更新しない
 - 本セクションは新規作成 Issue にのみ適用し、既存 Issue への遡及適用は行わない
 
 ### テンプレートパス
