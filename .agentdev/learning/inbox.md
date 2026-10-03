@@ -254,6 +254,7 @@
 - 内容: worktree で `bun test ./.opencode/skills/repo-agentdev-integrity/scripts/` を実行すると、src/opencode-local/（ローカル版導入時の環境生成物・junction）が未伝播のため textlint_guard_project_config.test.ts の 2 fail と issue_tracking_list.test.ts の 1 error が再現する
 - 学び: main root で同一テストを実行して同結果を確認することで環境依存と由来分類できる（本 Case で実施済み。再発時の由来分類手順として参照可能）
 - 発見元: PR #3390 Findings / learning（Case #3388）
+- 再観測: Case #3391 Wave 1（PR #3405）でも同 3 fail / 1 error（textlint_guard_project_config 2件・issue_tracking_list 1件、src/opencode-local 不在由来）を worktree・main root の両方で再現し pre-existing と由来分類。opencode-local 領域が存在しない環境でのテスト skip または fallback の要否の検討候補を追記（発見元: PR #3405 Findings / learning）
 
 ## 2026-10-03: git push が credential helper（GCM）の対話待ちでハングする（push 限定で credential.helper を gh auth git-credential へ上書きして解消）
 
@@ -270,3 +271,147 @@
 - **想定反映先**: docs/knowledge/ 配下の Windows 環境 git 関連知識。必要なら agentdev-workflow-case-open reference「PR 作成前の head branch push」への contingency 追記
 - **関連**: Case #3391・Definition PR #3392、gh auth status、definition-pr-and-idempotency.md「PR 作成前の head branch push」
 - **タグ**: `#windows` `#git` `#credential` `#gh-cli` `#push-hang`
+
+## 2026-10-03: worktree 環境で skills_structure.test.ts の See Also 参照検査が projection 不全で 4 件 fail する（main では pass）
+
+- **問題事象**: worktree 内で skills_structure.test.ts を実行すると、参照先スキル（agentdev-req-file-manager、agentdev-decision-file-manager）の projection が worktree に存在しないため See Also 参照検査が 4 件 fail する。main repo では同種 fail なし（同実行で 1 fail のみ、本変更と無関係な third-party 既存問題）
+- **発生局面**: case-run bun test 関連回帰（Case #3391 Wave 1・PR #3401・worktree root cwd）
+- **検知方法**: bun test の fail 出力と main root 再実行との比較
+- **根本原因**: REQ-018 系の worktree テスト fallback は templates 配置には存在するが See Also 参照検査には存在せず、worktree の projection 欠損を検出側が吸収していない
+- **自律対応内容**: 環境差の誤検出として検証差分に記録し、main root での同種 fail なしを確認して完了扱いの根拠とした
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（既存 fallback 契約の適用範囲の認識差）
+- **横展開観点**: worktree で See Also 参照検査を含む構造検査を実行する全工程（case-run 検証・case-close 再検証）で環境差 fail が回帰判定を難読化し得る
+- **再発条件**: worktree root cwd で See Also 参照検査を含む構造検査を実行し、参照先スキルの projection が worktree に存在しない場合
+- **予防策候補**: See Also 参照検査への worktree fallback 追加（REQ-018 系と同様）または worktree 実行時の無効分類記録契約（link profile の扱いと同型）
+- **想定反映先**: repo-agentdev-integrity の skills_structure.test.ts、または checker 実行契約の worktree 実行時扱い
+- **関連**: Case #3391・PR #3401 検証差分（無効列の worktree 実行時 fail 4 件）
+- **タグ**: `#worktree` `#skills-structure` `#see-also` `#environment-diff`
+
+## 2026-10-03: MSYS bash 経由の cmd //c mklink /J は引数が渡らず対話プロンプトで終了する（junction 作成は node fs.symlinkSync が確実）
+
+- **問題事象**: worktree 内での node_modules junction 作成に MSYS bash から `cmd //c mklink /J` を実行すると引数が渡らず対話プロンプトで終了する。`MSYS2_ARG_CONV_EXCL='*' cmd /c 'mklink /J ...'` の形式では動作する。node の fs.symlinkSync（type: junction、絶対パス target）で実行するのが確実
+- **発生局面**: check_templates 実走行検証のための worktree junction 作成（Case #3391 Wave 1・PR #3401 と PR #3403 の両方で観測）
+- **検知方法**: mklink 実行後に対話プロンプト待ちで終了し junction が作成されないことの確認
+- **根本原因**: MSYS bash のパス変換と引数変換が cmd /c mklink の引数解釈と干渉する（ARG_CONV_EXCL 未指定時）
+- **自律対応内容**: node fs.symlinkSync（type: junction）または MSYS2_ARG_CONV_EXCL='*' 付き cmd 実行へ切替して解消
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし
+- **横展開観点**: worktree 検査で node_modules junction を作る全工程（check_templates 実走行・bun test 実行準備）で同様の失敗が生じ得る
+- **再発条件**: MSYS bash 経由で cmd /c mklink を実行する場合
+- **予防策候補**: worktree 運用指針の junction 作成手順へ node fs.symlinkSync を標準として明記
+- **想定反映先**: agentdev-git-worktree references worktree-operations.md（検査用 junction 作成手順があれば）
+- **関連**: Case #3391・PR #3401 Findings / learning、PR #3403 Findings / capture 候補
+- **タグ**: `#windows` `#msys` `#junction` `#bun-test`
+
+## 2026-10-03: worktree 内の bun test が repoRoot 計算で main repo root の SKILL.md を読み、worktree 側編集の検証漏れが生じ得る
+
+- **問題事象**: worktree 内の bun test で既存 process-conformance.test.ts の repoRoot 計算（import.meta.dir から8階層上）は worktree 実行時に main repo root を解決し、main 側の SKILL.md を読み取って green になる。worktree 内テストが古い main 内容で合格し、worktree 側編集の検証漏れにつながり得る
+- **発生局面**: case-run 回帰テスト作成（scripts/tests 配下の repoRoot 解決診断。Case #3391 Wave 1・PR #3404）
+- **検知方法**: worktree 実行時の repoRoot 解決先の診断
+- **根本原因**: repoRoot 計算が import.meta.dir からの固定階層上昇で main root に到達する設計のため、worktree 分離を前提としていない
+- **自律対応内容**: worktree 構造系テスト fallback 契約（REQ-018 系）の意図と一致する設計か、期待値参照先の誤りかの確認候補として learning 化
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（既存契約の解釈確認候補）
+- **横展開観点**: import.meta.dir 基準の repoRoot 解決を持つテスト全般が worktree で main 内容を読み得る
+- **再発条件**: worktree 内で repoRoot を固定階層上昇で解決するテストを実行する場合
+- **予防策候補**: repoRoot 解決の worktree 対応（worktree root を優先する解決規律）または期待値参照先の明示化
+- **想定反映先**: scripts/tests 配下の repoRoot 解決実装、REQ-018 系 worktree fallback 契約の確認
+- **関連**: Case #3391・PR #3404 Findings / learning
+- **タグ**: `#worktree` `#bun-test` `#repoot-resolve` `#false-green`
+
+## 2026-10-03: worktree 内で repo-agentdev-integrity scripts が node_modules 同梱により直接実行可能（main root に依存生成物がなくても動く）
+
+- **問題事象**: `.opencode/skills/repo-agentdev-integrity/scripts/` には node_modules が同梱され、main repo root に node_modules・package.json が存在しない環境でも worktree root から `bun .opencode/skills/repo-agentdev-integrity/scripts/check_content_corruption.ts` 等が直接実行できる
+- **発生局面**: case-run 検証環境構築（Case #3391 Wave 1・PR #3400）
+- **検知方法**: worktree root からの checker 直接実行の成功
+- **根本原因**: 検査スクリプト配置先に依存実体が同梱されている構成（依存生成を要しない実行形態）
+- **自律対応内容**: worktree 内検証の実行形態として本構成を活用し、PR 本文へ実行形態の知見を記録
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし
+- **横展開観点**: worktree 内検証の実行形態の標準化候補（main root の依存生成状態に依存しない検証経路）
+- **再発条件**: なし（有用な構成知見。問題ではなく実行形態の知見として記録）
+- **予防策候補**: なし（worktree 検証手順の標準として採用候補）
+- **想定反映先**: checker 実行契約の worktree 実行手順、worktree 検証の標準手順
+- **関連**: Case #3391・PR #3400 Findings / learning
+- **タグ**: `#worktree` `#checker` `#bun` `#node_modules`
+
+## 2026-10-03: traceability sidecar の同一 artifact × role 重複は duplicate-inconsistencies として検出され component 側への単一情報源統合が必要
+
+- **問題事象**: 同一 artifact × role の対応宣言を複数 component 側 sidecar が持つと traceability check の duplicate-inconsistencies が検出される。component 側（正規所有 component の sidecar）へ寄せて単一情報源に統合する必要がある
+- **発生局面**: case-run traceability check 修正（Case #3391 Wave 1・PR #3400。conflict-resolution-and-reporting.md の REQ-094 系宣言が agentdev-workflow-case-auto.yaml と japanese-prose-correction.yaml で重複）
+- **検知方法**: traceability check の duplicate-inconsistencies findings
+- **根本原因**: sidecar 追加時に既存 sidecar の同一 artifact 宣言を確認しない運用
+- **自律対応内容**: REQ-094 系既存宣言を単一情報源（component 側）へ統合し再検証で合格
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（sidecar 運用規律の明確化）
+- **横展開観点**: sidecar を追加・編集する全工程（REQ 新設・実装対応登録）で同様の重複が生じ得る
+- **再発条件**: 複数 component にまたがる artifact の対応宣言を sidecar に追加する場合
+- **予防策候補**: sidecar 追加時の事前確認観点（同一 artifact × role の既存宣言検索）を手順へ明記
+- **想定反映先**: agentdev-traceability の sidecar 作成手順、または PR テンプレートの必須品質統制
+- **関連**: Case #3391・PR #3400 Findings / learning・検証差分（修正済み 1 件）
+- **タグ**: `#traceability` `#sidecar` `#duplicate` `#single-source`
+
+## 2026-10-03: bun x tsc は package 配下の cwd で実行する必要がある（worktree root からだと tsconfig が解決されず help を表示する。bun test とは逆の cwd 規律）
+
+- **問題事象**: `bun x tsc --noEmit` を worktree root から実行すると tsconfig が解決されず help を表示する。bun test は worktree root（./ 付き相対パス指定）から実行する規律と逆であり、bun 系スクリプトの実行 cwd を混同しやすい
+- **発生局面**: case-run typecheck（Case #3391 Wave 1・PR #3402。scripts package 配下）
+- **検知方法**: tsc 実行結果が help 表示になることの確認
+- **根本原因**: tsc は cwd 直下の tsconfig を解決するため、package 配下への cwd 移動が必要（bun test のディレクトリ指定方式と異なる）
+- **自律対応内容**: package 配下の cwd で再実行して解消。cwd 規律の混同しやすさを learning 化
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし
+- **横展開観点**: scripts package を持つスキル領域（agentdev-issue-management、agentdev-workflow-case-auto 等）での typecheck 実行手順に共通
+- **再発条件**: worktree root から bun x tsc を実行する場合
+- **予防策候補**: テスト実行形態知識（bun test は ./ 付き相対パス・tsc は package 配下 cwd）の補記
+- **想定反映先**: checker 実行契約の typecheck 実行手順、QG 実行手順の cwd 規律注記
+- **関連**: Case #3391・PR #3402 Findings / learning
+- **タグ**: `#bun` `#tsc` `#cwd` `#typecheck`
+
+## 2026-10-03: textlint guard 系の vendor 未生成 worktree では bun test の pre-existing fail 39 件が回帰判定を難読化する
+
+- **問題事象**: `bun install && bun run build:engine` を実行しない worktree では bun test 全回帰に pre-existing fail 39 件（textlint guard 系の vendor 未生成起因が主体）が継続発生し、当該変更起因の fail の切り分けが難読化される
+- **発生局面**: case-run bun test 全回帰（Case #3391 Wave 1・PR #3403。stash による変更前 baseline 42 fail と同系統で本変更起因の新規 fail なしを確認）
+- **検知方法**: bun test 全回帰の fail 出力と baseline 実測（stash 前後比較）の照合
+- **根本原因**: worktree は plugin package 配下の依存成果物（vendor/）を生成しない構成のため、textlint guard 依存テストが fail する（README の依存生成手順は main root での実行を案内し worktree 手順は未整備）
+- **自律対応内容**: baseline 実測で本変更起因 0 件を確認して回帰判定。test 環境整備を capture 候補として記録
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし
+- **横展開観点**: worktree で bun test 全回帰を実行する全工程（case-run 検証・case-close QG-4）で fail 切り分けコストが恒常的に発生
+- **再発条件**: textlint guard の依存成果物未生成の worktree で bun test 全回帰を実行する場合
+- **予防策候補**: worktree 用の依存生成手順の整備（bun install && bun run build:engine の worktree 実行ガイド）または vendor 未生成時の skip/fallback 判定の明示
+- **想定反映先**: README「開発者セットアップ」の worktree 手順追記、QG 実行手順の環境ラベル注記
+- **関連**: Case #3391・PR #3403 Findings、PR #3405 品質メトリクス（main HEAD で同一再現の既存環境差）
+- **タグ**: `#worktree` `#textlint` `#vendor` `#bun-test` `#baseline`
+
+## 2026-10-03: case-run 側で配布依存境界 checker の記録が PR 検証差分に欠落した子 Issue が case-close E4-1 で初検出され blocked になった
+
+- **問題事象**: Case #3391 Wave 1 の #3397（PR #3402）で、PR 本文の検証差分に check_distribution_boundary の記録が存在せず、case-close E4-1 最終 gate（--profile source）で concrete-id 4 件 / concrete-path 2 件を初検出した。E4-1 違反により当該子 Issue は Wave 1 マージ対象外（blocked）となり、Wave 2 前提（Wave 1 全完了）が不充足になった
+- **発生局面**: case-close(#epic) Epic #3391 Wave 1 境界クローズ（E4-1 配布依存境界 最終 gate）
+- **検知方法**: E4-1 gate の PR HEAD 実行（非ゼロ exit・failures 6 件。main baseline 0 hits で本変更起因と確定）
+- **根本原因**: 配布物（SKILL.md・scripts/lib・references）への concrete ID 混入を case-run STEP-S5 事前 gate で検出・記録していない（checker 実行自体が行われたか記録から判断不能）
+- **自律対応内容**: E4-1 契約どおり PR #3402 をマージ対象外とし、PR 本文 `### distribution-boundary` へ検出内容を記録、Issue #3397 へ差し戻し報告コメント、Epic ステータス追跡テーブルへ blocked 記録
+- **ユーザー確認の有無**: なし（E4-1 契約の機械的適用）
+- **REQ/Decision/Design影響**: なし（配布依存境界 Design の最終 gate 基底どおりの動作）
+- **横展開観点**: case-run STEP-S5 の事前 gate が省略・漏れでも最終 gate で停止する二重構造は機能した。ただし case-run 段での検出があれば Wave 境界での blocked と Wave 2 前提崩れ（case-run 差し戻しの追加ラウンド）を避けられた
+- **再発条件**: case-run 側で配布物に concrete ID を含む実装を行い、check_distribution_boundary を実行・記録せずに PR を作成する場合
+- **予防策候補**: case-run STEP-S5 の checker 実行記録を PR 本文品質メトリクス表の必須行とする（記録欠落自体を検査する形）。または PR テンプレートの品質メトリクス表へ配布依存境界行を必須追加
+- **想定反映先**: case-run command STEP-S5 手順、PR テンプレート（agentdev-workflow-templates）
+- **関連**: Case #3391・PR #3402（### distribution-boundary 記録）・Issue #3397 差し戻し報告コメント
+- **タグ**: `#distribution-boundary` `#gate` `#case-run-records` `#wave-boundary`
+
+## 2026-10-03: Epic の事前記録マージ順序を守った場合の Wave 1 rebase コンフリクトはすべて sidecar・本文追記の相互非競合和集合で解消できた
+
+- **問題事象**: Epic #3391 Wave 1 の 5 PR マージで 3 件の CONFLICTING が発生したが、すべて traceability sidecar または SKILL.md 共通制約への別箇所追記の衝突であり、両側追記を保持する和集合解消（実装内容変更なし）で Level 1 rebase を完結できた
+- **発生局面**: case-close(#epic) Wave 1 マージ（#3394・#3398・#3396 の rebase。Epic 競合リスク情報の記録順序 case-close 重複 #3394→#3396・case-auto 重複 #3395→#3398→#3396 は守られた）
+- **検知方法**: 各マージ直前の pr_mergeable 再確認（UNKNOWN ポーリング後の CONFLICTING 遷移）
+- **根本原因**: 重複許容（同一 SKILL.md の節単位追記）を Wave 構成で採用したため、先にマージした側の行追記と後続側の同一行編集がコンテキスト競合する。Epic の「後続側が rebase で整合させる」契約どおり後続側 rebase で解消
+- **自律対応内容**: 3 件とも rebase コンフリクトを両保持で解消（traceability/agentdev-workflow-templates.yaml、traceability/agentdev-workflow-case-auto.yaml、case-close SKILL.md 共通制約 2 bullet）。merge 後 main HEAD で配布依存境界 gate 再実行（ok、0 hits）を確認
+- **ユーザー確認の有無**: なし（Level 1 機械的解消の範囲内）
+- **REQ/Decision/Design影響**: なし
+- **横展開観点**: 重複許容の Wave 構成では sidecar・本文追記の同型コンフリクトが Wave 境界で定型的に発生し得る。和集合解消が機械的に可能な形（独立 bullet・独立エントリの追記）に実装を収めることが Level 1 完結の条件
+- **再発条件**: 同一 SKILL.md の同一リスト・同一 sidecar セクションへ複数子 Issue が追記する Wave 構成の場合
+- **予防策候補**: 重複許容時の実装ガイド（追記位置を独立 bullet に保つ、sidecar へは component 別 sidecar に分離）を Epic 構成の競合リスク情報へ追記
+- **想定反映先**: case-ready の Wave 構成（競合リスク情報の処置記述）、agentdev-workflow-case-auto のコンフリクト解消 Level 1 手順
+- **関連**: Case #3391・PR #3404/#3405/#3403 のコンフリクト解消記録コメント
+- **タグ**: `#epic-wave` `#rebase` `#level1` `#sidecar` `#merge-order`
