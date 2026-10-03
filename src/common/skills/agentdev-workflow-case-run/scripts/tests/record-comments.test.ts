@@ -1,28 +1,21 @@
-// 工程記録の取りまとめ反映経路（記録契機6種・記録コメント基本項目と種別別必須項目・
-// 本文現在地・結果セクション構築）の回帰検証。
-//
-// TS-001 担当分（文書面・機能面）: 記録契機6種のテンプレート対応、完了=判定根拠、
-// 本文結果セクション（成果物、最終判定と根拠、残件の扱い）の構築。
-// TS-003 担当分: blocked 停止→再開シナリオの記録経路接続（停止コメントの再開条件、
-// 再開コメントの最新条件参照）。
-// 実基盤での実経路確認（実 Issue での着手コメント投稿・本文更新）は Wave 1 マージ後の
-// 横断確認 Issue が実施する。本テストは経路組み込みの実装と実行可能な検証を対象とする。
+// 記録契機（停止、判断変更、検証証拠）と記録コメントテンプレートの対応、
+// 投稿前 fail-closed 検証、Case Issue 本文の進行状況・結果セクション構築の検査。
+// 廃止記録契機（着手、引き渡し、再開）のテンプレート実体と生成経路の不存在も検査する。
+// 記録様式の正は workflows/issue-lifecycle-records Design（Case Issue 工程記録モデル）。
 
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
-  KIND_REQUIRED_SECTIONS,
-  PROGRESS_STATES,
-  RECORD_KINDS,
-  RECORD_KIND_LABELS,
-  applySection,
-  buildCurrentLocationSection,
+  buildProgressSection,
   buildResultSection,
   extractSectionBody,
-  mapRecordKindToProgressState,
+  KIND_REQUIRED_SECTIONS,
+  RECORD_KIND_LABELS,
+  RECORD_KINDS,
   recordTemplatePath,
   validateRecordComment,
+  applySection,
 } from "../record-comments.ts";
 
 const repoRoot = join(import.meta.dir, "..", "..", "..", "..", "..", "..");
@@ -35,24 +28,16 @@ function templateBody(kind: (typeof RECORD_KINDS)[number]): string {
   return readFileSync(recordTemplatePath(kind), "utf8");
 }
 
-describe("記録契機6種と記録コメントテンプレートの対応", () => {
-  test("記録契機は着手、引き渡し、停止、再開、判断変更、完了の6種を保持する", () => {
-    expect([...RECORD_KINDS]).toEqual([
-      "start",
-      "handoff",
-      "hold",
-      "resume",
-      "decision_change",
-      "completion",
-    ]);
-    expect(Object.values(RECORD_KIND_LABELS)).toEqual([
-      "着手",
-      "引き渡し",
-      "停止",
-      "再開",
-      "判断変更",
-      "完了",
-    ]);
+describe("記録契機3種と記録コメントテンプレートの対応", () => {
+  test("記録契機は停止、判断変更、検証証拠の3種を保持する", () => {
+    expect([...RECORD_KINDS]).toEqual(["hold", "decision_change", "completion"]);
+    expect(Object.values(RECORD_KIND_LABELS)).toEqual(["停止", "判断変更", "検証証拠"]);
+  });
+
+  test("廃止記録契機（着手、引き渡し、再開）は記録契機に含まれない", () => {
+    expect(RECORD_KINDS).not.toContain("start");
+    expect(RECORD_KINDS).not.toContain("handoff");
+    expect(RECORD_KINDS).not.toContain("resume");
   });
 
   test("各記録契機に対応するテンプレート実体が存在し、記録種別を表示する", () => {
@@ -63,11 +48,14 @@ describe("記録契機6種と記録コメントテンプレートの対応", () 
     }
   });
 
+  test("廃止記録契機のテンプレート実体は存在しない", () => {
+    for (const kind of ["start", "handoff", "resume"] as const) {
+      expect(() => templateBody(kind)).toThrow();
+    }
+  });
+
   test("種別別必須項目が契約どおり割り当てられている", () => {
-    expect(KIND_REQUIRED_SECTIONS.start).toEqual([]);
-    expect(KIND_REQUIRED_SECTIONS.handoff).toEqual(["残作業と受取役割"]);
     expect(KIND_REQUIRED_SECTIONS.hold).toEqual(["再開条件"]);
-    expect(KIND_REQUIRED_SECTIONS.resume).toEqual(["最新条件参照"]);
     expect(KIND_REQUIRED_SECTIONS.decision_change).toEqual(["撤回対象"]);
     expect(KIND_REQUIRED_SECTIONS.completion).toEqual(["判定根拠"]);
   });
@@ -147,99 +135,112 @@ describe("記録コメントの必須項目検証（投稿前 fail-closed）", (
       "",
       "blocked を受領",
       "",
+      "## 理由・根拠",
+      "",
+      "外部副作用の承認待ち",
+      "",
+      "## 次の行動",
+      "",
+      "承認後に再試行判断",
+      "",
+      "## 関連合意・成果物",
+      "",
+      "Issue #42 の停止コメント",
+      "",
+      "## 再開条件",
+      "",
+      "外部副作用の承認取得",
+      "",
+    ].join("\n");
+    expect(validateRecordComment("hold", holdBody)).toEqual({ ok: true, violations: [] });
+
+    const decisionBody = [
+      "# 工程記録（判断変更）",
+      "",
+      "## 記録種別",
+      "",
+      "判断変更",
+      "",
+      "## 対象工程",
+      "",
+      "case-run",
+      "",
+      "## 事実・結果",
+      "",
+      "実現方針の一部を撤回",
+      "",
+      "## 次の行動",
+      "",
+      "新方針での実装継続",
+      "",
+      "## 撤回対象",
+      "",
+      "旧方針の該当行",
+      "",
+    ].join("\n");
+    expect(validateRecordComment("decision_change", decisionBody)).toEqual({ ok: true, violations: [] });
+
+    const verificationBody = [
+      "# 工程記録（検証証拠）",
+      "",
+      "## 記録種別",
+      "",
+      "検証証拠",
+      "",
+      "## 対象工程",
+      "",
+      "case-run",
+      "",
+      "## 事実・結果",
+      "",
+      "検証のみで完了する Issue の検証を実施",
+      "",
+      "## 次の行動",
+      "",
+      "なし",
+      "",
+      "## 判定根拠",
+      "",
+      "検証結果が完了条件を満たす（検証記録: PR 本文）",
+      "",
+    ].join("\n");
+    expect(validateRecordComment("completion", verificationBody)).toEqual({ ok: true, violations: [] });
+  });
+
+  test("記録種別がテンプレート種別と不一致の本文は検証不備になる", () => {
+    const mismatchBody = [
+      "# 工程記録（停止）",
+      "",
+      "## 記録種別",
+      "",
+      "判断変更",
+      "",
+      "## 対象工程",
+      "",
+      "case-run",
+      "",
+      "## 事実・結果",
+      "",
+      "blocked を受領",
+      "",
       "## 次の行動",
       "",
       "再開判断",
       "",
       "## 再開条件",
       "",
-      "ユーザー判断の合意後に再委譲する",
+      "外部副作用の承認取得",
       "",
     ].join("\n");
-    expect(validateRecordComment("hold", holdBody)).toEqual({ ok: true, violations: [] });
-  });
-
-  test("記録種別がテンプレート種別と不一致の本文は検証不備になる", () => {
-    const body = [
-      "## 記録種別",
-      "",
-      "着手",
-      "",
-      "## 対象工程",
-      "",
-      "case-run",
-      "",
-      "## 事実・結果",
-      "",
-      "完了",
-      "",
-      "## 次の行動",
-      "",
-      "なし",
-      "",
-      "## 判定根拠",
-      "",
-      "QG-4 合格",
-      "",
-    ].join("\n");
-    const result = validateRecordComment("completion", body);
+    const result = validateRecordComment("hold", mismatchBody);
     expect(result.ok).toBe(false);
-    expect(result.violations.join("\n")).toContain("完了");
+    expect(result.violations.join("\n")).toContain("記録種別");
   });
 
   test("非該当項目の省略（理由・根拠、関連合意・成果物）は検証不備にしない", () => {
-    const startBody = [
-      "## 記録種別",
-      "",
-      "着手",
-      "",
-      "## 対象工程",
-      "",
-      "case-run",
-      "",
-      "## 事実・結果",
-      "",
-      "実装着手を報告",
-      "",
-      "## 次の行動",
-      "",
-      "実装継続",
-      "",
-    ].join("\n");
-    expect(validateRecordComment("start", startBody)).toEqual({ ok: true, violations: [] });
-  });
-
-  test("完了の判定根拠が空の場合は検証不備になる", () => {
-    const body = [
-      "## 記録種別",
-      "",
-      "完了",
-      "",
-      "## 対象工程",
-      "",
-      "case-close",
-      "",
-      "## 事実・結果",
-      "",
-      "完了",
-      "",
-      "## 次の行動",
-      "",
-      "なし",
-      "",
-      "## 判定根拠",
-      "",
-      "",
-    ].join("\n");
-    const result = validateRecordComment("completion", body);
-    expect(result.ok).toBe(false);
-    expect(result.violations.join("\n")).toContain("判定根拠");
-  });
-});
-
-describe("blocked 停止→再開シナリオの記録経路接続（TS-003 担当分）", () => {
-  test("停止コメント（再開条件つき）の検証を通過し、現在地は待機になる", () => {
     const holdBody = [
+      "# 工程記録（停止）",
+      "",
       "## 記録種別",
       "",
       "停止",
@@ -250,7 +251,7 @@ describe("blocked 停止→再開シナリオの記録経路接続（TS-003 担�
       "",
       "## 事実・結果",
       "",
-      "blocker を受領して停止",
+      "blocked を受領",
       "",
       "## 次の行動",
       "",
@@ -258,18 +259,19 @@ describe("blocked 停止→再開シナリオの記録経路接続（TS-003 担�
       "",
       "## 再開条件",
       "",
-      "再合意済み Definition の受領後",
+      "外部副作用の承認取得",
       "",
     ].join("\n");
-    expect(validateRecordComment("hold", holdBody).ok).toBe(true);
-    expect(mapRecordKindToProgressState("hold")).toBe("待機");
+    expect(validateRecordComment("hold", holdBody)).toEqual({ ok: true, violations: [] });
   });
 
-  test("再開コメントは最新条件参照を必須とし、現在地は実行中に復帰する", () => {
-    const resumeWithoutLatest = [
+  test("検証証拠の判定根拠が空の場合は検証不備になる", () => {
+    const noBasis = [
+      "# 工程記録（検証証拠）",
+      "",
       "## 記録種別",
       "",
-      "再開",
+      "検証証拠",
       "",
       "## 対象工程",
       "",
@@ -277,145 +279,151 @@ describe("blocked 停止→再開シナリオの記録経路接続（TS-003 担�
       "",
       "## 事実・結果",
       "",
-      "再開条件を充足して再委譲",
+      "検証を実施",
       "",
       "## 次の行動",
       "",
-      "作業再開",
+      "なし",
+      "",
+      "## 判定根拠",
+      "",
+      "該当なし",
       "",
     ].join("\n");
-    expect(validateRecordComment("resume", resumeWithoutLatest).ok).toBe(false);
-
-    const resumeBody = `${resumeWithoutLatest}## 最新条件参照\n\n再合意済み Definition（Amendment PR #NNN）\n\n`;
-    expect(validateRecordComment("resume", resumeBody).ok).toBe(true);
-    expect(mapRecordKindToProgressState("resume")).toBe("実行中");
+    const result = validateRecordComment("completion", noBasis);
+    expect(result.ok).toBe(false);
+    expect(result.violations.join("\n")).toContain("判定根拠");
   });
 });
 
-describe("本文現在地・結果セクションの構築と適用", () => {
-  test("現在地セクションは工程、進行状態、次の行動、担当役割、停止・待機理由、最新記録参照を含む", () => {
-    const section = buildCurrentLocationSection({
-      phase: "case-run（委譲実行）",
-      progressState: "待機",
-      nextAction: "再開判断",
-      ownerRole: "取りまとめ（case-run）",
-      holdReason: "blocker 受領",
-      latestRecordRef: "工程記録（停止）コメント",
+describe("本文進行状況・結果セクションの構築と適用", () => {
+  test("進行状況セクション（Root Case）は正規状態と開始・終了日時のみを含む", () => {
+    const section = buildProgressSection({
+      canonicalState: "active",
+      startDate: "2026-10-04 05:25 JST",
+      endDate: "N/A",
     });
-    expect(section).toContain("## 現在地");
-    expect(section).toContain("- 工程: case-run（委譲実行）");
-    expect(section).toContain("- 進行状態: 待機");
-    expect(section).toContain("- 次の行動: 再開判断");
-    expect(section).toContain("- 担当役割: 取りまとめ（case-run）");
-    expect(section).toContain("- 停止・待機理由: blocker 受領");
-    expect(section).toContain("- 最新記録参照: 工程記録（停止）コメント");
+    expect(section).toContain("## 進行状況");
+    expect(section).toContain("- 正規状態: 実行継続中（active）");
+    expect(section).toContain("- 開始日時: 2026-10-04 05:25 JST");
+    expect(section).toContain("- 終了日時: N/A");
+    expect(section).not.toContain("- 工程:");
+    expect(section).not.toContain("- 進行状態:");
+    expect(section).not.toContain("- 担当役割:");
+    expect(section).not.toContain("- 次の行動:");
+    expect(section).not.toContain("- 最新記録参照:");
+    expect(section).not.toContain("- 停止・待機理由:");
   });
 
-  test("進行状態写像は記録契機から4値へ導出される", () => {
-    expect([...PROGRESS_STATES]).toEqual(["未着手", "実行中", "待機", "終了"]);
-    expect(mapRecordKindToProgressState("start")).toBe("実行中");
-    expect(mapRecordKindToProgressState("handoff")).toBe("実行中");
-    expect(mapRecordKindToProgressState("hold")).toBe("待機");
-    expect(mapRecordKindToProgressState("resume")).toBe("実行中");
-    expect(mapRecordKindToProgressState("decision_change")).toBe("実行中");
-    expect(mapRecordKindToProgressState("completion")).toBe("終了");
+  test("進行状況セクション（Child）は開始・終了日時のみで正規状態行を持たない", () => {
+    const section = buildProgressSection({
+      startDate: "2026-10-04 05:25 JST",
+      endDate: "N/A",
+    });
+    expect(section).toContain("## 進行状況");
+    expect(section).toContain("- 開始日時: 2026-10-04 05:25 JST");
+    expect(section).toContain("- 終了日時: N/A");
+    expect(section).not.toContain("- 正規状態:");
   });
 
-  test("結果セクションは成果物、最終判定と根拠、残件の扱いを含む（完了契機）", () => {
+  test("正規状態ラベルは3値のみ（blocked・failed は Root Case の正規状態として保持しない）", () => {
+    const completed = buildProgressSection({ canonicalState: "completed", startDate: "x", endDate: "y" });
+    const cancelled = buildProgressSection({ canonicalState: "cancelled", startDate: "x", endDate: "y" });
+    expect(completed).toContain("完了（closed）");
+    expect(cancelled).toContain("中止（cancelled）");
+    expect(section_());
+    function section_(): string {
+      return buildProgressSection({ canonicalState: "active", startDate: "x", endDate: "y" });
+    }
+  });
+
+  test("結果セクションは成果物と残件の扱いを含む（完了・中止確定時のみ作成。終了状態は重複保存しない）", () => {
     const section = buildResultSection({
-      deliverables: "PR #NNN",
-      finalJudgmentAndBasis: "完了条件全項目を達成（QG-4 判定根拠は完了記録コメント参照）",
+      deliverables: "PR #100",
       remainingItems: "なし",
     });
     expect(section).toContain("## 結果");
-    expect(section).toContain("- 成果物: PR #NNN");
-    expect(section).toContain("- 最終判定と根拠: ");
+    expect(section).toContain("- 成果物: PR #100");
     expect(section).toContain("- 残件の扱い: なし");
+    expect(section).not.toContain("最終判定");
+    expect(section).not.toContain("正規状態");
   });
 
   test("applySection は同名セクションを置換し、既存セクションを保持する", () => {
     const existing = [
-      "## 完了条件",
+      "# Issue",
       "",
-      "- [x] 項目A",
+      "## 進行状況",
       "",
-      "## 現在地",
-      "",
-      "- 工程: case-run",
-      "- 進行状態: 実行中",
+      "- 正規状態: 実行継続中（active）",
+      "- 開始日時: N/A",
+      "- 終了日時: N/A",
       "",
       "## 補足情報",
       "",
-      "- 備考",
+      "備考",
       "",
     ].join("\n");
-    const updated = applySection(existing, buildCurrentLocationSection({
-      phase: "case-close",
-      progressState: "終了",
-      nextAction: "なし",
-      ownerRole: "判定主体（case-close）",
+    const next = applySection(existing, buildProgressSection({
+      canonicalState: "active",
+      startDate: "2026-10-04 05:25 JST",
+      endDate: "N/A",
     }));
-    expect(updated).toContain("- 進行状態: 終了");
-    expect(updated).not.toContain("- 進行状態: 実行中");
-    expect(updated).toContain("## 完了条件");
-    expect(updated).toContain("## 補足情報");
+    expect(next).toContain("- 開始日時: 2026-10-04 05:25 JST");
+    expect(next.match(/## 進行状況/g)?.length).toBe(1);
+    expect(next).toContain("## 補足情報");
+    expect(next).not.toContain("開始日時: N/A\n");
   });
 
   test("applySection は同名セクション不在時、補足情報セクションの直前に追加する", () => {
     const existing = [
-      "## 完了条件",
+      "# Issue",
       "",
-      "- [x] 項目A",
+      "## 目的",
+      "",
+      "内容",
       "",
       "## 補足情報",
       "",
-      "- 備考",
+      "備考",
       "",
     ].join("\n");
-    const updated = applySection(existing, buildResultSection({
-      deliverables: "PR #NNN",
-      finalJudgmentAndBasis: "達成",
-      remainingItems: "なし",
-    }));
-    const resultIndex = updated.indexOf("## 結果");
-    const supplementIndex = updated.indexOf("## 補足情報");
-    expect(resultIndex).toBeGreaterThan(0);
-    expect(supplementIndex).toBeGreaterThan(resultIndex);
-    expect(updated).toContain("## 完了条件");
+    const next = applySection(existing, buildResultSection({ deliverables: "PR #100", remainingItems: "なし" }));
+    const idxResult = next.indexOf("## 結果");
+    const idxSupplement = next.indexOf("## 補足情報");
+    expect(idxResult).toBeGreaterThanOrEqual(0);
+    expect(idxSupplement).toBeGreaterThan(idxResult);
   });
 });
 
 describe("工程記録の取りまとめ反映の規定（SKILL.md 構造照合）", () => {
-  test("case-run SKILL.md は記録契機、委譲要求と実着手の区別、途中報告の反映を規定する", () => {
-    expect(caseRunSkill).toContain("## 工程記録の取りまとめ反映（記録契機）");
-    expect(caseRunSkill).toContain("委譲要求と実着手の区別");
-    expect(caseRunSkill).toContain("工程終了を待たない途中報告");
-    expect(caseRunSkill).toContain("scripts/record-comments.ts");
-    expect(caseRunSkill).toContain("issue_update");
+  test("case-run SKILL.md は記録契機の縮小（着手・引き渡し・再開の廃止）と進行状況の新様式を規定する", () => {
+    expect(caseRunSkill).toContain("停止");
+    expect(caseRunSkill).toContain("判断変更");
+    expect(caseRunSkill).toContain("進行状況");
+    expect(caseRunSkill).toContain("着手");
+    expect(caseRunSkill).toContain("廃止");
+    expect(caseRunSkill).not.toContain("現在地");
   });
 
-  test("case-close SKILL.md は完了記録と本文結果セクション更新を規定する", () => {
-    expect(caseCloseSkill).toContain("工程記録の完了契機反映");
-    expect(caseCloseSkill).toContain("判定根拠必須");
-    expect(caseCloseSkill).toContain("成果物、最終判定と根拠、残件の扱い");
-    expect(caseCloseSkill).toContain("scripts/record-comments.ts");
+  test("case-close SKILL.md は完了確定と結果セクション更新を規定する", () => {
+    expect(caseCloseSkill).toContain("結果");
+    expect(caseCloseSkill).toContain("完了条件");
   });
 
-  test("adapter SKILL.md は実行担当の報告契約（事実・結果、停止、変更影響）と途中報告を規定する", () => {
-    expect(adapterSkill).toContain("## 実行担当の報告契約（記録契機向け）");
-    expect(adapterSkill).toContain("委譲要求と実着手の区別");
-    expect(adapterSkill).toContain("工程終了を待たない途中報告");
-    expect(adapterSkill).toContain("result 契約（4状態）の最終確定値を代替せず");
+  test("adapter SKILL.md は実行担当の報告契約（事実・結果、停止、変更影響）を規定する", () => {
+    expect(adapterSkill).toContain("blocked");
+    expect(adapterSkill).toContain("failed");
+    expect(adapterSkill).toContain("PR 本文");
   });
 
-  test("workflow-templates SKILL.md は記録契機とテンプレートの対応と選定ルールを規定する", () => {
-    expect(templatesSkill).toContain("issue_comment_record_start.md");
-    expect(templatesSkill).toContain("issue_comment_record_handoff.md");
+  test("workflow-templates SKILL.md は記録契機3種とテンプレートの対応と選定ルールを規定する", () => {
     expect(templatesSkill).toContain("issue_comment_record_hold.md");
-    expect(templatesSkill).toContain("issue_comment_record_resume.md");
     expect(templatesSkill).toContain("issue_comment_record_decision_change.md");
     expect(templatesSkill).toContain("issue_comment_record_completion.md");
-    expect(templatesSkill).toContain("委譲要求（委譲起動）は実着手と同一視せず");
-    expect(templatesSkill).toContain("scripts/record-comments.ts");
+    expect(templatesSkill).toContain("着手・引き渡し・再開");
+    expect(templatesSkill).not.toContain("issue_comment_record_start.md");
+    expect(templatesSkill).not.toContain("issue_comment_record_handoff.md");
+    expect(templatesSkill).not.toContain("issue_comment_record_resume.md");
   });
 });

@@ -11,7 +11,7 @@ Issue 番号を解決し、単一 Issue クローズと Epic Wave クローズ�
 
 ### Input Resolution
 
-1. SSoT 再構成: Issue 本文（ステータス追跡テーブル有無、`agentdev_gh` の issue_read 操作）
+1. SSoT 再構成: Issue 本文（実行構成表有無、`agentdev_gh` の issue_read 操作）
 2. identifier 保持: Issue番号（ユーザー入力またはセッション内会話）
 3. 最小 scalar: なし
 4. runtime artifact: なし
@@ -26,7 +26,7 @@ Issue 番号を解決し、単一 Issue クローズと Epic Wave クローズ�
 複数候補時は直近を優先して確認。
 検出不可時はユーザーに指定を求めて停止。
 
-**Epic Issue 判定**: 解決した Issue 番号の本文を `agentdev_gh` の issue_read 操作で取得し、ステータス追跡テーブル（`agentdev-epic-tracker` の新4列/旧4列形式）が存在するか確認。
+**Epic Issue 判定**: 解決した Issue 番号の本文を `agentdev_gh` の issue_read 操作で取得し、実行構成表（`agentdev-epic-tracker` の実行構成表（`| Wave | Issue | 前提 | 状態 |`））が存在するか確認。
 
 - **テーブル存在時**: **Epic Wave クローズ**（STEP-E1〜E6、[references/epic-wave-close.md](epic-wave-close.md)）へ分岐
 - **テーブル不存在時**: **単一 Issue クローズ**（STEP-1-1〜）へ進む（後方互換）
@@ -43,7 +43,7 @@ Issue 番号を解決し、単一 Issue クローズと Epic Wave クローズ�
 
 ### Evidence
 
-- Issue 番号の入手経路、Issue 本文読取結果、ステータス追跡テーブル有無の判定根拠、重複ファイルチェック結果
+- Issue 番号の入手経路、Issue 本文読取結果、実行構成表有無の判定根拠、重複ファイルチェック結果
 
 ### Completion Verification
 
@@ -130,7 +130,7 @@ Issue 本文の完了条件チェックボックスを最終評価・更新し�
 ## 関連 Capability Skill
 
 - Custom Tool `agentdev_gh`: Issue 本文読取
-- `agentdev-epic-tracker`: Epic Issue 判定、ステータス追跡テーブル形式
+- `agentdev-epic-tracker`: Epic Issue 判定、実行構成表形式
 - `agentdev-git-worktree`: 重複ファイルチェックプロシージャ
 - `agentdev-quality-gates`: QG-4 Final Acceptance Gate、観点8 判定マトリクス
 - `agentdev-traceability`: Design 対応・implementation 対応・required 行 verification 対応欠落行の導出（check。3完全性ゲートの完了阻止判定手段）

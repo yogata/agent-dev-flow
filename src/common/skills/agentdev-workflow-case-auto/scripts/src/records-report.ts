@@ -6,7 +6,7 @@
  * 各正規所有に属する。本モジュールはそれらの書込み経路への入力を決定的に生成する。
  *
  * - 停止時集約報告: 対象群を完了済み / 進行中 / 未実行 / 観測不能に分類し、
- *   再開に必要な次コマンドと現在地要素を含む報告構造を生成する
+ *   再開入口（Root Case 指定の次コマンド）と進行状況要素を含む報告構造を生成する
  *   （case-auto 実行契約の停止時報告要件、case-auto の取りまとめ責務）
  * - 反映計画: 記録契機ごとの反映対象を反映面（本文 / コメント / Epic）ごとに独立管理し、
  *   部分成功を区別する（case-auto の取りまとめ責務）
@@ -61,10 +61,10 @@ export interface StopAggregation {
 export interface StopContext {
   /** 停止理由分類（STEP-4 の分類値をそのまま透過する）。 */
   stopReason: string;
-  /** 再開に必要な次コマンド。 */
-  resumeCommand: string;
+  /** 再開に必要な次コマンド（Root Case 指定の再開入口。工程別 resume_command フィールドではない）。 */
+  nextCommand: string;
   /** 再開点（どの durable state から再開するか）。 */
-  resumePoint: string;
+  resumeBasis: string;
   /** 最新記録参照（停止時点で最新の記録位置）。 */
   latestRecordRef: string;
   /** タイミング情報（開始時刻・停止時刻・経過時間等。人間が読める形式のまま透過）。 */
@@ -79,8 +79,8 @@ export interface StopReport {
   /** 各対象の集約行（対象、stage、状態、確定結果）。 */
   unitLines: string[];
   /** 次コマンド行。 */
-  resumeLine: string;
-  /** 現在地要素の行群（停止理由、次の行動、最新記録参照、タイミング）。 */
+  nextCommandLine: string;
+  /** 進行状況要素の行群（停止理由、次の行動、最新記録参照、タイミング）。 */
   presenceLines: string[];
 }
 
@@ -142,15 +142,15 @@ export function buildStopReport(
     `未実行 ${aggregation.notStarted.length} 件 / 観測不能 ${aggregation.stateUnknown.length} 件`;
 
   const unitLines = units.map(formatUnitLine);
-  const resumeLine = `再開可能な次コマンド: ${context.resumeCommand}（再開点: ${context.resumePoint}）`;
+  const nextCommandLine = `再開入口の次コマンド: ${context.nextCommand}（再開点: ${context.resumeBasis}）`;
   const presenceLines = [
     `停止理由分類: ${context.stopReason}`,
-    `次の行動: ${context.resumeCommand} で再開（${context.resumePoint}）`,
+    `次の行動: ${context.nextCommand} で再開（${context.resumeBasis}）`,
     `最新記録参照: ${context.latestRecordRef}`,
     ...(context.timing === undefined ? [] : [`タイミング情報: ${context.timing}`]),
   ];
 
-  return { aggregation, summaryLine, unitLines, resumeLine, presenceLines };
+  return { aggregation, summaryLine, unitLines, nextCommandLine, presenceLines };
 }
 
 /** 停止時集約報告を記録コメントとして残せる Markdown 本文へ整形する。 */
@@ -159,8 +159,8 @@ export function formatStopReport(report: StopReport): string {
   if (report.unitLines.length > 0) {
     lines.push(...report.unitLines);
   }
-  lines.push("### 次コマンド", report.resumeLine);
-  lines.push("### 現在地", ...report.presenceLines);
+  lines.push("### 次コマンド", report.nextCommandLine);
+  lines.push("### 進行状況", ...report.presenceLines);
   return lines.join("\n");
 }
 
@@ -168,19 +168,18 @@ export function formatStopReport(report: StopReport): string {
 // 反映計画・部分成功照合・回復計画
 // ---------------------------------------------------------------------------
 
-/** 記録契機。識別子は record-comments.ts の RECORD_KINDS（start / handoff / hold / resume / decision_change / completion）と共通語彙。 */
+/**
+ * 記録契機。識別子は record-comments.ts の RECORD_KINDS
+ * （hold / decision_change / completion）と共通語彙。
+ * 着手・引き渡し・再開は記録契機から削除済み（着手は進行状況の開始日時、
+ * 引き渡しと再開は本文・PR で工程移行を表現する）。
+ */
 export type RecordOccasion =
-  /** 着手。 */
-  | "start"
-  /** 引き渡し。 */
-  | "handoff"
   /** 停止。 */
   | "hold"
-  /** 再開。 */
-  | "resume"
   /** 判断変更。 */
   | "decision_change"
-  /** 完了。 */
+  /** 検証証拠（検証のみで完了する Issue の証拠）。 */
   | "completion";
 
 /** 反映面（Case Issue 本文 / Case Issue コメント / Epic 本文）。 */

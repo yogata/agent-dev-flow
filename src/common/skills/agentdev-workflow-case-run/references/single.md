@@ -83,7 +83,7 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 - **工程間構造化文脈の初期文脈利用**: 前工程（case-open、case-auto 等）から構造化文脈が引き継がれている場合、前工程で確定した事項を初期文脈として利用し、同じ情報をゼロから探索、再構築することを原則としない。独立検証、鮮度確認、矛盾検出、正規成果物との整合確認を目的とする再確認は維持する。手動起動等で構造化文脈が引き継がれていない場合は、durable state（Issue 本文、要件doc、REQ/Decision/Design）から入力解決を行う（形式と制約は `agentdev-workflow-lifecycle` スキルの工程間構造化文脈引き継ぎ参照）
 - **execution contract 消費境界**: 完了条件、test strategy、必須品質統制を実行契約として扱う。不足・曖昧さ・矛盾・実現不能を検出した場合は自律補完せず blocked とする。test strategy を新規設計せず記録済み項目を実行する。必須品質統制の適用要否を再判断しない。work_type/scale/Issue structure を再分類して実行契約を変更しない
   - runtime-only 判断の維持: worktree 状態確認、QG-3 前置 staleness check、実 diff 検査、実装結果・test 実行結果は case-run の安全検査として維持する
-  - blocked 遷移と正規再開経路: 完了条件の不足・曖昧さ・矛盾・実現不能、scope-affecting impact candidate の発見、関連 Decision への適合確認で新たな拘束の必要性検出、必須品質統制の追加変更必要性、Issue metadata・構造・実態の矛盾検出時は blocked とし、差異・判断事項を Issue コメントと PR 本文へ報告する。case-run は Issue 本文を単独で書き換えず、Root Case の resume_command による正規再開経路（人間に留保された判断の新規確定が必要な場合は req-define、再合意済みの場合は case-revise）に従う
+  - blocked 遷移と正規再開経路: 完了条件の不足・曖昧さ・矛盾・実現不能、scope-affecting impact candidate の発見、関連 Decision への適合確認で新たな拘束の必要性検出、必須品質統制の追加変更必要性、Issue metadata・構造・実態の矛盾検出時は blocked とし、差異・判断事項を Issue コメントと PR 本文へ報告する。case-run は Issue 本文を単独で書き換えず、Root Case 指定による正規再開経路（経路解決は Root Case の正規状態、Epic 実行構成、既存成果物、実行の生存状況の照合で行う。人間に留保された判断の新規確定が必要な場合は req-define、再合意済みの場合は case-revise）に従う
   - 新旧 Issue 互換運用: execution contract 必須セクション（Execution Contract セクション、必須品質統制セクション）存在有無で新旧 Issue を識別する（presence-based 判定）。必須セクション不存在の legacy Issue は、新契約項目欠落のみを理由に一律 blocked にしない
   - work_type/scale 確認の縮約: work_type 確認は再分類ではなく metadata 整合確認へ縮約して維持する
 
@@ -111,7 +111,7 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 
 ### Input Resolution
 
-1. SSoT 再構成: 対象 Issue 本文（変更対象ファイル等）、Epic Issue 本文（STEP-S3-1 親Epic ステータス更新時）
+1. SSoT 再構成: 対象 Issue 本文（変更対象ファイル等）、Epic Issue 本文（STEP-S3-1 親Epic 実行構成表の子状態更新時）
 2. identifier 保持: Issue番号、ブランチ名（自動生成または指定）
 3. 最小 scalar: L2 タイムスタンプ（本 Step 開始・終了時刻、JST）
 4. runtime artifact: なし
@@ -124,9 +124,9 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 
 - **Worktree 作成・ブランチ準備**: `agentdev-git-worktree` に従って実行する。作成元は main を明示的に指定する。べき等チェック: worktree 既存時は作成をスキップする。Epic の後続 Wave での再開時（PR merge 後）は worktree 作成前に `git fetch origin` を実行し main の鮮度を確認する（同期基準・鮮度確認も main を参照。Epic 後続 Wave の作業起点も main を参照する）
 - **L2 タイムスタンプ計測**: 本 Step の開始時刻・終了時刻（JST）を記録し、worktree 設定時間を計測する（完了報告の L2 内訳に含める）
-- **STEP-S3-1 親Epic ステータス更新**: `agentdev-epic-tracker` 参照
+- **STEP-S3-1 親Epic 実行構成表の子状態更新**: `agentdev-epic-tracker` 参照
 - **STEP-S3-2 worktree precondition gate**: `agentdev-git-worktree` の「worktree 内判定ヘルパー」に従い、当該 Issue の worktree+ブランチが作成済みであり、現在 worktree 内にいることを検証する。検証失敗時（worktree 未作成、メインリポジトリにいる）は実行担当サブエージェントを起動せず停止し、STEP-S3 へ戻るようユーザーに報告する
-- **STEP-S3-3 QG-3 前置 staleness check**: `agentdev-quality-gates` の「case-run 前置 staleness check」に従い、ファイルパス現行存在確認、検査結果件数再計測、差異検出時の引き渡し・差異報告を実行する。差異検出時は Issue 本文を単独で書き換えず、差異を報告して blocked とし、Root Case の resume_command による正規再開経路に従う。本検査は QG-3 本体（委譲先が実施する PR 作成直前ゲート）とは独立した前置検査であり、QG-3 deviation 分類運用、QG-3 本体実施要否には影響しない
+- **STEP-S3-3 QG-3 前置 staleness check**: `agentdev-quality-gates` の「case-run 前置 staleness check」に従い、ファイルパス現行存在確認、検査結果件数再計測、差異検出時の引き渡し・差異報告を実行する。差異検出時は Issue 本文を単独で書き換えず、差異を報告して blocked とし、Root Case 指定による正規再開経路に従う。本検査は QG-3 本体（委譲先が実施する PR 作成直前ゲート）とは独立した前置検査であり、QG-3 deviation 分類運用、QG-3 本体実施要否には影響しない
 - **STEP-S3-4 docs/** 変更時の targeted docs guard: PR 対象ファイルに docs/** 変更を含む場合、委譲前に targeted docs guard を行う。検査 skill は host 側配置を起点として起動し、検査対象 worktree の絶対パスを `--root`（相当の repoRoot 明示指定）で指定する（配置先起点の誤リポジトリ検査は検査見逃しとして扱う。`bun run .opencode/skills/<integrity-detector-skill>/scripts/check_changed_docs.ts --workflow case-run --root <worktree 絶対パス> ... --json`）。モード使い分けの標準は `--base-ref` によるコミット済み差分ベースの検出はコミット後・push 前の実行に限定、コミット前の worktree 上での検証は untracked ファイルを含む `--files` による明示指定（列挙手段: `git status --porcelain` と `git diff` の和集合、または `git ls-files -m -o --exclude-standard` 相当）。本検査は読み取り専用であり worktree 分離原則（POL-worktree-isolation）を壊さず、`files_checked` が空の場合は検査見逃しとして FAILURE に扱う。PowerShell で `--files` に複数パスを渡す場合は配列変数経由または個別渡しとし、引用符まとめ渡しは使用しない。docs/** 変更を含まない PR ではスキップする。検出結果（failures の strict severity）は PR 本文の `## Findings / Capture候補` に `### docs-integrity` 小見出しで記録する（実行担当サブエージェント責務）。docs/knowledge/README.md を変更する Case では、targeted docs guard（docs/knowledge/** を検査対象外とする）に加えて、knowledge README 列挙整合の検査として `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_knowledge_docs.ts --root <worktree 絶対パス> --json` を host（メインリポジトリ root）起点＋`--root` の既定形式で実行する（check_knowledge_docs.ts は `--root` による worktree 指定に対応する）。検出時は修正して再実行し、実行結果を検証記録へ残す
 - **STEP-S3-5 配布依存境界の事前委譲 gate**: PR 対象ファイルに `src/common/{commands,skills}/**` 変更を含む場合、委譲前に事前 gate を必須実行する（オプション扱いは廃止）。本 gate と STEP-S5 の最終 gate（実装後）は重畳する検査経路であり、事前 gate を実施しても最終 gate を省略しない。事前 gate は次の2点を検証する
   - 反映経路の確認: 配布物の変更が src 側（原本パス `src/common/{commands,skills}/**`）に位置することを確認する。`.opencode/` 投影パスへの直接変更を検出した場合は違反として扱う（配布物の変更は原本経由のみ許容）
@@ -255,7 +255,7 @@ verify-only closure（PR も carrier commit も存在しない Issue 完了。�
 ## 関連 Capability Skill
 
 - `agentdev-git-worktree`: worktree 作成、worktree 内判定ヘルパー
-- `agentdev-epic-tracker`: 親Epic ステータス更新
+- `agentdev-epic-tracker`: 親Epic 実行構成表の子状態更新
 - `agentdev-quality-gates`: QG-3 前置 staleness check
 - `agentdev-workflow-orchestration`: 再開フェーズ判定
 - `agentdev-req-analysis`: チェックボックス品質基準
@@ -264,7 +264,7 @@ verify-only closure（PR も carrier commit も存在しない Issue 完了。�
 
 - ガードレール（全ファイル操作は worktree 内で実行、`POL-worktree-isolation`）
 - ガードレール・不変条件（STEP-S3 precondition gate、worktree root 相対パス引き渡し）
-- ガードレール・不変条件（QG-3 前置 staleness check、差異検出時の引き渡しと差異報告、blocked 遷移と Root Case の resume_command 正規再開経路）
+- ガードレール・不変条件（QG-3 前置 staleness check、差異検出時の引き渡しと差異報告、blocked 遷移と Root Case 指定の正規再開経路）
 
 ## 関連ガイドライン
 

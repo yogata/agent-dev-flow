@@ -5,7 +5,7 @@
 | 条件 | 推論結果 |
 | ---- | -------- |
 | レビュー結果に「仕様バグ」が含まれる | `/agentdev/case-auto` による再開（内部 lifecycle 経路: case-revise → case-ready → case-run） |
-| レビュー結果に「実装バグ」が含まれる | `/agentdev/case-auto` による再開（内部 lifecycle 段階 case-run、Root Case の resume_command。レビューNGコメントは Issue コメントへ記録） |
+| レビュー結果に「実装バグ」が含まれる | `/agentdev/case-auto` による再開（内部 lifecycle 段階 case-run、Root Case 指定による再開。レビューNGコメントは Issue コメントへ記録） |
 | レビュー結果に「スコープ外逸脱」が含まれる | `/agentdev/case-auto` による再開（内部 lifecycle 経路: case-revise → case-ready → 不要実装削除 → case-run） |
 | レビュー結果がOK | `/agentdev/case-auto` 内部 lifecycle 段階 case-close |
 
@@ -16,7 +16,7 @@
 | ラベル/本文 | 判定 | 説明 |
 | ---------- | ---- | ---- |
 | `epic` ラベルが付いている | Epic Issue | 親Issueとして機能し、複数の子Issueを持つ |
-| 本文に `Parent: #{N}` が含まれる | Child Issue | 親Epic Issue #N の子Issue |
+| 本文に `親Epic: #{N}` が含まれる | Child Issue | 親Epic Issue #N の子Issue |
 
 ### Epic Issue作成後の推論ルール
 

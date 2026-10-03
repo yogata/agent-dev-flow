@@ -237,7 +237,7 @@ JSON 出力は `workflow`、`files_checked`、`coupled_files_checked`、`failure
 - 共有作業ツリーでの `git checkout .`（REQ-030-017。他セッション変更の無差別破壊）
 - 完了条件チェックボックス評価の他コマンド委譲（case-close 専任責務、`POL-completion-checkbox-single-writer`）
 - Design status 昇格の他コマンド委譲（case-close 責務、Definition 保存 / Design 保存内部責務は accepted を付与しない）
-- Epic Issue 本文ステータス追跡テーブルの他コマンド書き込み（case-close 単一書き手、`POL-epic-tracking-single-writer`）
+- Epic Issue 本文実行構成表の子状態更新の他コマンド書き込み（case-close 単一書き手、`POL-epic-tracking-single-writer`）
 
 ## 検証観点
 
@@ -311,7 +311,7 @@ PR 本文読取記述、design-lifecycle-application.md の旧昇格条件文言
 - `agentdev-workflow-case-close` skill（workflow 実装本体（単一 Issue クローズ、Epic Wave クローズ））
 - `agentdev-quality-gates` skill（QG-4）
 - `agentdev-git-worktree` skill（worktree、ブランチ削除）
-- `agentdev-epic-tracker` skill（ステータス追跡テーブル）
+- `agentdev-epic-tracker` skill（実行構成表の子状態更新）
 - `agentdev-learning-capture` skill（学びの検知）
 - `agentdev-learning-pipeline` skill（deferred.md ルール）
 - `agentdev-workflow-orchestration` skill（Capture 境界、達成判定プロトコル）

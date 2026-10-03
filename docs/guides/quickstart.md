@@ -25,7 +25,7 @@
 ## 既存 GitHub Issue から実行する場合
 
 既存 Root Case（GitHub Issue）を入力にする場合も `/agentdev/case-auto` へ Issue番号・URL を指定する。
-Root Case の状態と resume_command から通常経路と例外経路が解決される。
+Root Case 指定により、Root Case の正規状態、Epic 実行構成、既存成果物、実行の生存状況の照合で通常経路と例外経路が解決される。
 
 ## 各コマンドの概要
 

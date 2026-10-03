@@ -59,7 +59,7 @@ Level 2 コンフリクト文脈付きインライン case-run 再実行、Level
 
 ### Input Resolution
 
-1. SSoT 再構成: 各工程の完了結果、Epic Issue 本文ステータス追跡テーブル（読取のみ）、L1 工程別タイムスタンプ
+1. SSoT 再構成: 各工程の完了結果、Epic Issue 本文実行構成表（読取のみ）、L1 工程別タイムスタンプ
 2. identifier 保持: Issue番号、PR番号、OU ID
 3. 最小 scalar: 開始時刻・終了時刻・所要時間
 4. runtime artifact: なし
@@ -71,16 +71,16 @@ Level 2 コンフリクト文脈付きインライン case-run 再実行、Level
 ### Procedure
 
 最終工程（case-close 委譲）の完了報告をそのまま出力する。
-Epic Issue を伴う Wave 反復実行時は、完了・blocked・failed 子Issue 一覧を含める（Epic Issue 本文ステータス追跡テーブルから読み取り、case-auto は書き込まない、`POL-epic-tracking-single-writer`）。
+Epic Issue を伴う Wave 反復実行時は、完了・blocked・failed 子Issue 一覧を含める（Epic Issue 本文実行構成表から読み取り、case-auto は書き込まない、`POL-epic-tracking-single-writer`）。
 停止時は完了済み OU・進行中 OU・未実行 OU・再開可能な次コマンドを報告する（様式と生成経路は「停止時集約報告」節）。
 
 #### 停止時集約報告（取りまとめ経路）
 
-case-auto 実行契約の停止時報告要件（完了済み、進行中、未実行の各委譲単位と再開に必要な次コマンドの報告）は、本スキル配下の実行コード `scripts/src/records-report.ts` の決定的関数で生成し、停止報告（STEP-4 の停止理由分類、resume_command）と一体で出力する。
+case-auto 実行契約の停止時報告要件（完了済み、進行中、未実行の各委譲単位と再開に必要な次コマンドの報告）は、本スキル配下の実行コード `scripts/src/records-report.ts` の決定的関数で生成し、停止報告（STEP-4 の停止理由分類、再開入口〔Root Case 指定の次コマンド〕）と一体で出力する。
 
 - **集約**: 対象群を完了済み / 進行中 / 未実行に分類する。観測不能な対象は進行中に含めず「観測不能」として明示する（観測不能を進行中と断定しない）。後続不能確定（blocked / failed / delegation-unavailable）の対象は完了済みに含めず、確定結果を対象行に明示する
 - **次コマンド**: 再開に必要な次コマンドと再開点（どの durable state から再開するか）を報告に含める
-- **現在地要素**: 停止理由分類、次の行動、最新記録参照、タイミング情報を含める。様式は Case Issue 工程記録モデルの現在地項目（工程、進行状態、次の行動、停止・待機理由、最新記録参照）と整合させる
+- **進行状況要素**: 停止理由分類、次の行動、最新記録参照、タイミング情報を含める。様式は Case Issue 工程記録モデルの進行状況項目（正規状態、開始日時、終了日時。Child は開始日時・終了日時のみ）と整合させる
 - **生成経路**: `aggregateUnits` / `buildStopReport` / `formatStopReport`（集約、報告構造、Markdown 整形）。出力は停止時の記録コメント（再開条件を必須項目として含む）として残し、会話コンテキストの記憶に依存しない
 - **再開時の最新条件**: 集約関数は入力として与えられた現行観測のみに依存する。再開時は durable state（Issue/PR、Epic Issue 本文、L1 タイムスタンプ、対象別・stage 別観測証跡）から再構成した最新観測を与え、停止時の集約を再利用して旧条件で継続しない
 
@@ -133,7 +133,7 @@ Standard flow の case-close（stage 4）完了後に未処理 OU が残存す�
 
 ### Completion Verification
 
-- warn を pass へ変換せず集約していること。Phase 0 成功と OU 完了を別々に報告していること。Epic Issue 本文のステータス追跡テーブルから読み取りのみで書き込んでいないこと（Epic テーブル単一書き手制約）。当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（残存時は対応結果を報告済みであること）。停止時は完了済み/進行中/未実行が集約され、次コマンドが報告されていること。観測不能対象が観測不能として明示されていること。反映面ごとに部分成功が区別され、読み戻し未確認対象が再試行対象に含まれていないこと（重複投稿防止）。成果の確定と記録・終了処理の完了が区別して報告されていること
+- warn を pass へ変換せず集約していること。Phase 0 成功と OU 完了を別々に報告していること。Epic Issue 本文の実行構成表から読み取りのみで書き込んでいないこと（Epic テーブル単一書き手制約）。当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（残存時は対応結果を報告済みであること）。停止時は完了済み/進行中/未実行が集約され、次コマンドが報告されていること。観測不能対象が観測不能として明示されていること。反映面ごとに部分成功が区別され、読み戻し未確認対象が再試行対象に含まれていないこと（重複投稿防止）。成果の確定と記録・終了処理の完了が区別して報告されていること
 
 ### Resume-Idempotency
 
@@ -155,7 +155,7 @@ Standard flow の case-close（stage 4）完了後に未処理 OU が残存す�
 - `agentdev-workflow-orchestration`: コンフリクト解消 Level 2/3 詳細、オーケストレーション級判断、停止条件の段階化、bg task 破棄検知時の回復
 - `agentdev-case-run-execution-adapter`: Level 2 インライン case-run 再実行時の委譲契約
 - `agentdev-git-worktree`: コンフリクト解消 rebase パス補助、並列実行安全ステージング
-- `agentdev-epic-tracker`: Epic Issue 本文ステータス追跡テーブル（読取のみ、Epic テーブル単一書き手制約）
+- `agentdev-epic-tracker`: Epic Issue 本文実行構成表（読取のみ、Epic テーブル単一書き手制約）
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 

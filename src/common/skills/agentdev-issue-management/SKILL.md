@@ -1,6 +1,6 @@
 ---
 name: agentdev-issue-management
-description: GitHub Issue の作成・更新・リンク・確認の安全手順を提供する運用 skill（手続きのみを提供し判断基準は持たない）。USE FOR: Issue 操作の安全手順、操作後の VERIFY 手順、Parent/Child Issue 間リンク確認（Parent: #N パターン検証）、Epic ステータス追跡テーブル更新の安全手順、Issue 更新時の前後内容比較、取りまとめ反映の部分成功区別・読み戻し再試行・重複防止（更新失敗回復の実行経路組み込み）。DO NOT USE FOR: Epic/child Issue の作成順序判断、Issue 本文テンプレート選定、gh CLI のエンコーディング対策。
+description: GitHub Issue の作成・更新・リンク・確認の安全手順を提供する運用 skill（手続きのみを提供し判断基準は持たない）。USE FOR: Issue 操作の安全手順、操作後の VERIFY 手順、親Epic/子 Issue 間リンク確認（親Epic: #N パターン検証）、Epic 実行構成表の子状態更新の安全手順、Issue 更新時の前後内容比較、取りまとめ反映の部分成功区別・読み戻し再試行・重複防止（更新失敗回復の実行経路組み込み）。DO NOT USE FOR: Epic/child Issue の作成順序判断、Issue 本文テンプレート選定、gh CLI のエンコーディング対策。
 ---
 
 # `agentdev-issue-management`
@@ -12,7 +12,7 @@ Custom Tool `agentdev_gh`（書き込みは Tool 内部の読み戻し検証で�
 
 | コマンド | 本スキルの利用目的 |
 |----------|-------------------|
-| `case-open` | Issue 作成後の VERIFY、Parent/Child リンク確認、Epic ステータス追跡テーブル更新の安全手順 |
+| `case-open` | Issue 作成後の VERIFY、親Epic/子 Issue リンク確認、Epic 実行構成表の生成・子状態更新の安全手順 |
 | `case-close` | Issue 本文更新時の前後内容比較、コメント追記後の VERIFY、Parent Issue 本文更新の安全手順、取りまとめ反映の部分成功区別・読み戻し再試行 |
 | `case-revise` | 再合意済み Definition 変更の Issue 関連付け、コメント追加後の通常検証、前後内容比較 |
 

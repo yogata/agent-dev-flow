@@ -81,7 +81,7 @@ const ROW_ANCHORS: Array<[string, string, RegExp]> = [
   ["REQ-061-010", REF_STRUCT_REL, /Epic サイズ上限を実行安全境界として遵守/],
   ["REQ-061-011", REF_STRUCT_REL, /無関係な operation_unit 群を単一 Epic へ機械的に集約しない/],
   ["REQ-061-012", REF_STRUCT_REL, /構成推論の根拠を記録/],
-  ["REQ-061-013", REF_STRUCT_REL, /実行方法（並列、直列）を技術的依存関係に基づいて明記/],
+  ["REQ-061-013", REF_STRUCT_REL, /実行構成表（\`| Wave \| Issue \| 前提 \| 状態 \|\` の一表）に各子 Issue の所属 Wave と意味的依存（前提列）を技術的依存関係に基づいて明記/],
   ["REQ-061-014", REF_STRUCT_REL, /スコープ重複を検知/],
   ["REQ-061-015", REF_STRUCT_REL, /識別子中心とし/],
   ["REQ-061-016", REF_STRUCT_REL, /最新状態を再確認/],
@@ -237,7 +237,7 @@ describe("SSoT separation (TS-010)", () => {
   });
 
   test("distribution artifact declares Root orchestration / Child execution SSoT", () => {
-    expect(structDoc).toMatch(/Root Case を Case 全体、Definition 参照、対象範囲、全体制約、Issue 分解、Wave \/ 依存関係、全体進捗の orchestration SSoT/);
+    expect(structDoc).toMatch(/Root Case を Case 全体、Definition 参照、対象範囲、全体制約、実行構成（実行構成表の一表。分解表と実行順序表の二重保持を行わない）、Wave \/ 依存関係、全体進捗の orchestration SSoT/);
     expect(structDoc).toMatch(/各 Child Issue を各 case-run が消費する execution contract の execution SSoT/);
     expect(structDoc).toMatch(/親 Root Case の自由記述に依存せず/);
   });
@@ -256,6 +256,15 @@ describe("case-ready templates carry required sections", () => {
 
   test("root-case template holds the required sections", () => {
     for (const section of [
+      "## 目的",
+      "## 対象範囲・対象外",
+      "## 完了条件",
+      "## 進行状況",
+    ]) {
+      expect(rootDoc).toContain(section);
+    }
+    // 廃止章を生成しない構造であること（Issue #3407 新形式）
+    for (const abolished of [
       "## 概要",
       "## 実行識別情報",
       "## 対象 REQ",
@@ -264,25 +273,25 @@ describe("case-ready templates carry required sections", () => {
       "## Case 状態と次工程",
       "## レビュー判断",
     ]) {
-      expect(rootDoc).toContain(section);
+      expect(rootDoc).not.toContain(abolished);
     }
   });
 
-  test("root-case template Execution Contract section enumerates the settled elements", () => {
-    const ec = extractHeadingSection(rootDoc, "## Execution Contract");
+  test("root-case template 対象範囲・対象外 section enumerates the settled elements", () => {
+    const scope = extractHeadingSection(rootDoc, "## 対象範囲・対象外");
     for (const key of [
-      "対象範囲",
-      "変更対象成果物",
-      "関連 REQ / Decision / Design",
-      "完了条件",
-      "テスト戦略",
-      "必須品質統制",
+      "対象要件",
+      "主な変更対象",
       "scope-affecting impact candidate",
-      "review 発動契約",
-      "work_type / scale / Issue structure",
+      "対象外",
     ]) {
-      expect(ec).toContain(key);
+      expect(scope).toContain(key);
     }
+    // 完了条件セクションが検証方法・合格条件へ必須品質統制を統合する旨を保持する
+    const criteria = extractHeadingSection(rootDoc, "## 完了条件");
+    expect(criteria).toContain("必須品質統制");
+    expect(criteria).toContain("検証方法");
+    expect(criteria).toContain("合格条件");
   });
 
   test("report template records the Definition PR outcome and the gate", () => {
@@ -307,13 +316,13 @@ describe("requirement anchors (canonical REQ files)", () => {
   test("REQ-061-027 enumerates the no-duplicate generation targets", () => {
     const row = doc061.split(/\r?\n/).find((l) => l.startsWith("| REQ-061-027 |"));
     expect(row).toBeDefined();
-    expect(row!).toContain("Root Case、Definition PR、Child Issue、Wave / 依存関係、Decision の受理記録を重複生成しない");
+    expect(row!).toContain("Root Case、Definition PR、Child Issue、実行構成、Decision の受理記録を重複生成しない");
   });
 
   test("REQ-061-028 requires no ready transition on CI failure", () => {
     const row = doc061.split(/\r?\n/).find((l) => l.startsWith("| REQ-061-028 |"));
     expect(row).toBeDefined();
-    expect(row!).toContain("ready へ遷移せず");
+    expect(row!).toContain("実行準備完了とせず");
     expect(row!).toContain("既存 PR を保持");
   });
 });

@@ -9,7 +9,8 @@
 // Usage:
 //   bun run reflect.ts reflect --epic-body <file> --report '<json>'
 //   bun run reflect.ts closing --epic-body <file> --child <N> \
-//       --status <completed|blocked|failed> [--pr <N>] [--pr-url <url>]
+//       --status <pending|completed|blocked|failed>
+//   bun run reflect.ts reset --epic-body <file> --child <N>
 //   bun run reflect.ts overall --epic-body <file> --evaluation '<json>' \
 //       --child-issues '42,43,44'
 //   (--report / --evaluation also accept --report-file / --evaluation-file)
@@ -20,11 +21,11 @@
 
 import { readFileSync } from "node:fs";
 import {
-  PROGRESS_STATES,
   RECORD_TRIGGERS,
   applyClosingStatus,
   applyReflectEntry,
   evaluateOverallCompletion,
+  resetChildToPending,
   upsertOverallEvaluation,
   type ClosingApplyResult,
   type OverallCriterionInput,
@@ -36,6 +37,13 @@ import {
   readChildStatus,
   type PersistedStatus,
 } from "../lib/tracking-table.ts";
+
+const PERSISTED_STATUS_VALUES: readonly PersistedStatus[] = [
+  "pending",
+  "completed",
+  "blocked",
+  "failed",
+];
 
 interface CliResult {
   ok: boolean;
@@ -90,26 +98,24 @@ function parseReflectReport(raw: unknown): ReflectEntry {
   if (!Number.isInteger(childIssue) || childIssue <= 0) {
     fail(["--report.childIssue must be a positive integer"]);
   }
+  const status = r.status;
+  if (
+    typeof status !== "string" ||
+    !(PERSISTED_STATUS_VALUES as readonly string[]).includes(status)
+  ) {
+    fail([`--report.status must be one of ${PERSISTED_STATUS_VALUES.join(", ")}`]);
+  }
   const entry: ReflectEntry = {
     childIssue,
     trigger: r.trigger as ReflectEntry["trigger"],
-    phase: String(r.phase ?? ""),
-    state: r.state as ReflectEntry["state"],
+    status: status as PersistedStatus,
   };
   if (!(RECORD_TRIGGERS as readonly string[]).includes(entry.trigger)) {
     fail([`--report.trigger must be one of ${RECORD_TRIGGERS.join(", ")}`]);
   }
-  if (!(PROGRESS_STATES as readonly string[]).includes(entry.state)) {
-    fail([`--report.state must be one of ${PROGRESS_STATES.join(", ")}`]);
-  }
-  if (r.endedKind !== undefined) entry.endedKind = r.endedKind as ReflectEntry["endedKind"];
-  if (r.waitingReason !== undefined) entry.waitingReason = String(r.waitingReason);
+  if (r.reason !== undefined) entry.reason = String(r.reason);
   if (r.nextAction !== undefined) entry.nextAction = String(r.nextAction);
-  if (r.owner !== undefined) entry.owner = String(r.owner);
-  if (r.latestRecordRef !== undefined) entry.latestRecordRef = String(r.latestRecordRef);
-  if (r.resultBasis !== undefined) entry.resultBasis = String(r.resultBasis);
-  if (r.prNumber !== undefined) entry.prNumber = Number(r.prNumber);
-  if (r.prUrl !== undefined) entry.prUrl = String(r.prUrl);
+  if (r.basis !== undefined) entry.basis = String(r.basis);
   return entry;
 }
 
@@ -122,8 +128,6 @@ const KNOWN_OPTIONS = new Set([
   "child-issues",
   "child",
   "status",
-  "pr",
-  "pr-url",
 ]);
 
 interface ParsedArgs {
@@ -178,15 +182,34 @@ function main(): void {
     if (!Number.isInteger(child) || child <= 0) {
       fail(["--child must be a positive integer"]);
     }
-    if (status !== "completed" && status !== "blocked" && status !== "failed") {
-      fail(["--status must be completed | blocked | failed"]);
+    if (
+      typeof status !== "string" ||
+      !(PERSISTED_STATUS_VALUES as readonly string[]).includes(status)
+    ) {
+      fail([`--status must be one of ${PERSISTED_STATUS_VALUES.join(", ")}`]);
     }
-    const prRaw = args.values.pr !== undefined ? Number(args.values.pr) : undefined;
-    const result: ClosingApplyResult = applyClosingStatus(body, child, {
-      status: status as PersistedStatus,
-      prNumber: prRaw !== undefined && !Number.isNaN(prRaw) ? prRaw : undefined,
-      prUrl: args.values["pr-url"],
-    });
+    const result: ClosingApplyResult = applyClosingStatus(
+      body,
+      child,
+      status as PersistedStatus,
+    );
+    const payload: CliResult = {
+      ok: result.skipped !== "row-missing",
+      body: result.body,
+      applied: result.applied,
+      skipped: result.skipped,
+    };
+    console.log(JSON.stringify(payload, null, 2));
+    if (result.skipped === "row-missing") process.exit(1);
+    return;
+  }
+  if (mode === "reset") {
+    const body = readBody(args.values["epic-body"]);
+    const child = Number(args.values.child);
+    if (!Number.isInteger(child) || child <= 0) {
+      fail(["--child must be a positive integer"]);
+    }
+    const result = resetChildToPending(body, child);
     const payload: CliResult = {
       ok: result.skipped !== "row-missing",
       body: result.body,

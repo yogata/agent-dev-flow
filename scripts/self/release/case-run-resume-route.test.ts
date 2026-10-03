@@ -9,9 +9,11 @@
 //   - the requirements:
 //     docs/requirements/REQ-031.md (changed rows 004 / 010 / 011)
 // as a permanent regression guard:
-//   - blocked transitions follow the Root Case resume_command canonical
-//     restart route (req-define for newly confirming a human-reserved
-//     judgment, case-revise for re-agreed changes)
+//   - blocked transitions follow the Root Case-specified canonical restart
+//     route (route resolution by the Root Case canonical state, Epic execution
+//     structure, existing artifacts, and execution liveness; req-define for
+//     newly confirming a human-reserved judgment, case-revise for re-agreed
+//     changes). The per-stage resume_command field is abolished.
 //   - staleness check differences are reported (never rewritten alone into
 //     the Issue body) and block the run
 //   - docs changes in the PR trigger the docs consistency check whose
@@ -43,17 +45,17 @@ function reqRow(markdown: string, reqId: string): string {
 describe("canonical requirement rows exist", () => {
   const doc = read(REQ_031_REL);
 
-  test("REQ-031-004 pins the blocked resume route with case-revise", () => {
+  test("REQ-031-004 pins the blocked resume route with the Root Case-specified restart route", () => {
     const row = reqRow(doc, "REQ-031-004");
-    expect(row).toContain("resume_command");
+    expect(row).toContain("Root Case 指定による正規再開経路");
     expect(row).toContain("req-define");
-    expect(row).toContain("case-revise");
+    expect(row).toContain("case-auto の例外経路");
   });
 
   test("REQ-031-010 forbids sole rewrite of the Issue body on staleness difference", () => {
     const row = reqRow(doc, "REQ-031-010");
     expect(row).toContain("Issue 本文を単独で書き換えず");
-    expect(row).toContain("resume_command");
+    expect(row).toContain("Root Case 指定による正規再開経路");
   });
 
   test("REQ-031-011 requires docs consistency check recording for docs changes", () => {
@@ -70,7 +72,7 @@ describe("case-run workflow skill pins the blocked resume route (REQ-031-004, RE
 
   test("in-scope impact is handled autonomously, scope changes are blocked", () => {
     expect(doc).toMatch(/既存 Issue scope 内で処理可能な内部実装上の影響は自律処理する/);
-    expect(doc).toMatch(/Issue scope、完了条件、REQ\/Decision\/Design、必須品質統制の追加変更が必要な場合は blocked とし、Root Case の resume_command による正規再開経路（人間に留保された判断の新規確定が必要な場合は req-define、再合意済みの場合は case-revise）に従う/);
+    expect(doc).toMatch(/Issue scope、完了条件、REQ\/Decision\/Design、必須品質統制の追加変更が必要な場合は blocked とし、Root Case 指定による正規再開経路（経路解決は Root Case の正規状態、Epic 実行構成、既存成果物、実行の生存状況の照合で行う。人間に留保された判断の新規確定が必要な場合は req-define、再合意済みの場合は case-revise）に従う/);
   });
 
   test("staleness difference is reported and blocked, Issue body never rewritten alone", () => {
@@ -99,13 +101,13 @@ describe("case-run workflow skill pins the same contracts", () => {
 describe("single workflow reference pins the operational details", () => {
   const doc = read(REF_SINGLE_REL);
 
-  test("blocked transition reports via Issue comment and PR body, follows resume_command", () => {
+  test("blocked transition reports via Issue comment and PR body, follows the Root Case-specified restart route", () => {
     expect(doc).toMatch(/blocked 遷移と正規再開経路/);
-    expect(doc).toMatch(/case-run は Issue 本文を単独で書き換えず、Root Case の resume_command による正規再開経路（人間に留保された判断の新規確定が必要な場合は req-define、再合意済みの場合は case-revise）に従う/);
+    expect(doc).toMatch(/case-run は Issue 本文を単独で書き換えず、Root Case 指定による正規再開経路（経路解決は Root Case の正規状態、Epic 実行構成、既存成果物、実行の生存状況の照合で行う。人間に留保された判断の新規確定が必要な場合は req-define、再合意済みの場合は case-revise）に従う/);
   });
 
   test("STEP-S3-3 staleness check reports the difference and blocks", () => {
-    expect(doc).toMatch(/差異検出時は Issue 本文を単独で書き換えず、差異を報告して blocked とし、Root Case の resume_command による正規再開経路に従う/);
+    expect(doc).toMatch(/差異検出時は Issue 本文を単独で書き換えず、差異を報告して blocked とし、Root Case 指定による正規再開経路に従う/);
   });
 
   test("docs consistency check result is recorded for the case-close handoff", () => {

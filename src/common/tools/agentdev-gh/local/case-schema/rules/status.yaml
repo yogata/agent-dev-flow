@@ -19,7 +19,7 @@ role_conditional_status:
     description: "追跡Issue 6 状態（起票、検討中、保留、実行準備完了、解決済み、クローズ済み）"
   case:
     enum_ref: "#case_status_enum"
-    description: "Case 実行 6 状態（旧ローカル Case ファイルから継承）"
+    description: "Case 実行 3 状態（実行継続中 / 完了 / 中止）"
 
 # role: tracking の status 値域
 tracking_status_enum:
@@ -74,18 +74,12 @@ tracking_transitions:
     note: "クローズ済みからの再検討"
 
 # role: case の status 値域
+# Root Case の正規状態は実行継続、完了、中止を識別できる最小構成。
+# blocked・failed は子 Issue の状態として Epic 実行構成が所有し、
+# Root Case の status 値としては重複保持しない。
 case_status_enum:
-  open:
-    description: "Case オープン済み、作業前"
-    terminal: false
-  running:
-    description: "作業中"
-    terminal: false
-  blocked:
-    description: "停止中（障害、未解決事項あり）"
-    terminal: false
-  review:
-    description: "作業完了、レビュー対象"
+  active:
+    description: "実行継続中（Root Case 確立から実行完了・中止確定まで。確定・準備・実行中・停止待機を含む）"
     terminal: false
   closed:
     description: "完了"
@@ -106,59 +100,36 @@ terminal_states:
 case_transitions:
   - operation: "ローカル版 case-open"
     from: "(新規作成)"
-    to: "open"
-  - operation: "ローカル版 case-run 開始"
-    from: "open"
-    to: "running"
-  - operation: "ローカル版 case-run 開始（再開）"
-    from: "blocked"
-    to: "running"
-  - operation: "ローカル版 case-run 完了"
-    from: "running"
-    to: "review"
-  - operation: "ローカル版 case-run 停止"
-    from: "running"
-    to: "blocked"
-  - operation: "ローカル版 case-close 停止"
-    from: "review"
-    to: "blocked"
-  - operation: "ローカル版 case-close 再開"
-    from: "blocked"
-    to: "review"
+    to: "active"
+  - operation: "ローカル版 case-ready / case-run / case-close の各処理"
+    from: "active"
+    to: "active"
+    note: "継続。停止・待機の理由はコメント（停止理由）で表現する"
   - operation: "ローカル版 case-close 完了"
-    from: "review"
+    from: "active"
     to: "closed"
-  - operation: "ローカル版 case-close 取り込み失敗・未完了"
-    from: "review"
-    to: "blocked"
-    note: "マージ結果セクションに失敗・未完了を記録し status を blocked へ更新する"
   - operation: "明示中止"
-    from: "open | running | blocked | review"
+    from: "active"
     to: "cancelled"
 
 # 再開経路（role: case）
+# 再開入口は Root Case 指定に共通とし、工程別の resume_command を使用しない。
+# 経路解決は Root Case の正規状態、Epic 実行構成、既存成果物
+# （ローカル Git 上の取り込み結果、draft、RU）、実行の生存状況の照合で行う。
 recovery_paths:
-  case_run:
-    description: "ローカル版 case-run 停止後の再開経路"
+  root_case_resume:
+    description: "Root Case 指定による再開（経路解決は durable state の照合。resume_command は廃止）"
     path:
-      - "blocked"
-      - "running"
-      - "review"
-  case_close:
-    description: "ローカル版 case-close 停止後の再開経路"
-    path:
-      - "blocked"
-      - "review"
-      - "closed"
+      - "active"
 
 # 禁止遷移（role: case）
 forbidden_transitions:
-  - from: "blocked"
-    to: "closed"
-    reason: "blocked から closed への直接遷移は禁止。review を経由する"
+  - from: "active"
+    to: "active 以外の非終端（3値では該当なし）"
+    reason: "role: case の非終端状態は active のみ。実行契約の確定（case-ready）を経ない実装開始を行わない"
   - from: "closed"
     to: "*"
-    reason: "終端状態からの遷移は定義しない（issue_reopen の対象外）"
+    reason: "終端状態からの遷移は定義しない（reopen を拒否する）"
   - from: "cancelled"
     to: "*"
-    reason: "終端状態からの遷移は定義しない（issue_reopen の対象外）"
+    reason: "終端状態からの遷移は定義しない（reopen を拒否する）"

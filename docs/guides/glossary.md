@@ -71,10 +71,10 @@ AgentDevFlow で使う用語の定義。
 
 | 用語 | 定義 |
 |------|------|
-| Epic | 複数 execution unit の協調管理が必要な変更。Epic Issue が実行順序の SSoT となる（v4-standard-lifecycle.md、REQ-035） |
+| Epic | 複数 execution unit の協調管理が必要な変更。Epic Issue 本文の実行構成表が依存と実行構成の SSoT となる（v4-standard-lifecycle.md、REQ-035） |
 | Wave | Epic 内の依存関係と並列実行可能性を表す実行スケジューリング単位。Epic Issue 本文から読み取る内部構造である（REQ-035-006） |
 | Epic 自動クローズ | 全子 Issue 完了時に親 Epic を自動的にクローズする仕組み |
-| ステータス追跡テーブル | Epic 本文内の子 Issue 進捗管理表（未着手/進行中/完了/対処不要/スキップ）。⏭スキップは実行状態ライフサイクルの終了状態ではなく、前提条件未達等で Epic 統率者が実行前に設定する追跡テーブル上の値である（REQ-035-004） |
+| 実行構成表 | Epic 本文内の実行構成の一表（`| Wave | Issue | 前提 | 状態 |`）。子状態は pending/completed/blocked/failed の4値のみ。⏭スキップは採用せず、前提未達の Issue は pending のまま選択対象外である（REQ-035-004） |
 
 ## ツール、スキル
 

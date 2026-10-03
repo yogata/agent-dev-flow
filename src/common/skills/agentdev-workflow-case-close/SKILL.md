@@ -9,7 +9,7 @@ description: "内部 lifecycle 段階 case-close の workflow 実装本体。PR 
 case-close command の workflow 実装本体である。
 PR マージから Issue クローズ、Capture 回収、ドメイン状態永続化、完了報告までの制御構造、QG-4 最終完了判定ゲート（完了条件チェックボックス評価・更新）、Design 状態評価（棚卸し制、draft → accepted 昇格）、Epic Wave クローズ（E1〜E6、単一書き手）を所有する。
 squash merge 先は main とし、同期時のリスク事前検出を行う。
-Case 状態モデルでは review から closed への遷移を担い、停止時は blocked へ遷移して resume_command（case-close）を記録する。再開時は resume_command に従い review へ復帰してから未完了 STEP を続行する。
+Case 状態モデルでは active から closed への遷移を担い、停止時は Root Case 指定の再開入口（case-close）を停止報告へ記録する（Root Case の status は実行継続のまま active を維持する。失敗・未完了はマージ結果等の記録で表現する）。再開時は Root Case 指定による経路解決（正規状態、実行構成、既存成果物、実行の生存状況の照合）に従い未完了 STEP を続行する。
 
 case-close command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 
@@ -21,7 +21,7 @@ case-close command は公開 interface（入出力契約・ガードレール）
 ## 出力
 
 - **単一 Issue クローズ時**: マージ済みPR、クローズ済みCase、削除済みローカルブランチ、worktree
-- **Epic Wave クローズ時**: 現在 Wave の全子Issue マージ、クローズ、Epic status table 更新、最終 Wave 判定結果（Epic クローズ または 残 Wave 通知）
+- **Epic Wave クローズ時**: 現在 Wave の全子Issue マージ、クローズ、Epic 実行構成表の子状態更新、最終 Wave 判定結果（Epic クローズ または 残 Wave 通知）
 
 ## 副作用
 
@@ -46,12 +46,12 @@ Epic Wave クローズは STEP-1 のルーティングで分岐し、E1〜E6 と
 | STEP-4 | PR マージ・コンフリクト解消 | docs 検証合格（配布依存境界 最終 gate 含む） | マージ済みPR（squash merge 先は main）、HEAD commit hash 記録、コンフリクト Level 1 解消 または case-auto エスカレーション | [references/pr-merge-and-conflict.md](references/pr-merge-and-conflict.md) |
 | STEP-5 | Post-merge・Issue クローズ | PR マージ完了 | CI 通過確認、Issue 本文更新、Issue close | [references/cleanup-and-capture.md](references/cleanup-and-capture.md) |
 | STEP-6 | クリーンアップ・Capture 回収・永続化 | Issue クローズ完了 | worktree/ローカルブランチ削除、親Epic 自動クローズ、実行前同期、Capture 回収、学び検知、`.agentdev/` 永続化、tmp/ 残存確認、完了報告 | [references/cleanup-and-capture.md](references/cleanup-and-capture.md) |
-| STEP-E1〜E6 | Epic Wave クローズ（E4-1 配布依存境界 最終 gate 含む） | Epic Issue 番号受領、ステータス追跡テーブル存在 | 現在 Wave の子Issue 一括マージ・クローズ（E4-1 gate 違反子Issue は `blocked` でマージ対象外）、Design 状態評価の Wave 内集約（E4-3、直列集約段で一元評価）、Epic status table 更新、当該 Wave スコープの一時成果物残留確認（E6-1、残留時は完了扱いにしない）、最終 Wave 判定 | [references/epic-wave-close.md](references/epic-wave-close.md) |
+| STEP-E1〜E6 | Epic Wave クローズ（E4-1 配布依存境界 最終 gate 含む） | Epic Issue 番号受領、実行構成表存在 | 現在 Wave の子Issue 一括マージ・クローズ（E4-1 gate 違反子Issue は `blocked` でマージ対象外）、Design 状態評価の Wave 内集約（E4-3、直列集約段で一元評価）、Epic 実行構成表の子状態更新、当該 Wave スコープの一時成果物残留確認（E6-1、残留時は完了扱いにしない）、最終 Wave 判定 | [references/epic-wave-close.md](references/epic-wave-close.md) |
 
 ### STEP 間の依存と分岐
 
 - **単一 Issue クローズ**: STEP-1（単一 ルート）→ STEP-2 → STEP-3（配布依存境界 最終 gate 含む）→ STEP-4 → STEP-5 → STEP-6
-- **Epic Wave クローズ**: STEP-1（Epic ルート、ステータス追跡テーブル存在時）→ STEP-E1〜E6（E4 内で配布依存境界 最終 gate を各子Issue に適用、single-Issue STEP-3-1 と同一 detector）
+- **Epic Wave クローズ**: STEP-1（Epic ルート、実行構成表存在時）→ STEP-E1〜E6（E4 内で配布依存境界 最終 gate を各子Issue に適用、single-Issue STEP-3-1 と同一 detector）
 - **コンフリクトエスカレーション**: STEP-4 で Level 1 rebase 失敗時、case-auto Level 2/3 エスカレーションへ（本 workflow の対象外）
 - **PR なし特例フロー（docs_chore、main 直接 push 済み）**: STEP-1（特例ルート）→ STEP-2 → STEP-3 → STEP-5 → STEP-6。PR 関連処理（STEP-4、STEP-5 の CI 通過確認等 PR 依存部分）は N/A とし、既存 commit を最終成果物として QG-4（STEP-2）は直接 commit 内容で検証する。適用条件と実装系 feature/fix への適用除外は case-close command の特例フローセクションを正とする
 - **verify-only closure（PR も carrier commit も存在しない Issue 完了）**: 単一 Issue クローズのルート分岐に従い、STEP-2 QG-4 達成判定の判定根拠を case-run が記録した SSoT コメント（Issue コメント）から参照する。docs_chore 特例フロー（main 直接 commit が存在する PR なし完了）は直接 commit 内容で QG-4 を検証するため、verify-only closure とは判定根拠が異なる。SSoT コメント参照手順と不在時の完了抑止は [references/issue-resolution-and-qg4.md](references/issue-resolution-and-qg4.md) の STEP-2 を参照する
@@ -66,7 +66,7 @@ gate 違反時は両ルートとも PR マージを停止する。
 
 - 再開点は永続状態から再構成する: Issue 本文の完了条件チェックボックス状態、PR の mergeable/マージ済み状態、HEAD commit hash、Design `status` frontmatter、worktree・ローカルブランチの存在、Capture 回収済みファイルの存在
 - 各 STEP の再実行はべき等であり、マージ済み PR への再マージ、更新済みチェックボックスの再評価を発生させない
-- 停止終了時は Case を blocked へ遷移させ、resume_command（case-close）を記録する。再開時は resume_command に従い review へ復帰してから未完了 STEP を続行する。review または closed へ遷移した時点で resume_command をクリアする。closed は終端状態であり、blocked から closed への直接遷移は行わない（review を経由する）
+- 停止終了時は Root Case 指定の再開入口（case-close）を停止報告へ記録する（Root Case の status は実行継続のまま active を維持する。ローカル版では失敗・未完了を `## 残課題` に記録する）。再開時は Root Case 指定による経路解決に従い未完了 STEP を続行する。closed は終端状態であり、終端からの遷移は行わない
 
 ### 終了条件（termination）
 
@@ -82,7 +82,7 @@ gate 違反時は両ルートとも PR マージを停止する。
 - `agentdev-quality-gates`: QG-4 Final Acceptance Gate、観点8 PR対象範囲 vs 全体 判定マトリクス
 - Custom Tool `agentdev_gh`: PR merge / pr_mergeable（UNKNOWN ポーリングは workflow 側）/ Issue close
 - `agentdev-git-worktree`: 重複ファイルチェック、squash merge 後分岐ハンドリング、コンフリクト解消 rebase パス、worktree 削除、実行前同期リスク検出
-- `agentdev-epic-tracker`: Epic Issue 本文ステータス追跡テーブル、E1〜E6 詳細、子Issue 状態 enum、Epic 自動クローズ判定
+- `agentdev-epic-tracker`: Epic Issue 本文実行構成表、E1〜E6 詳細、子Issue 状態 enum、Epic 自動クローズ判定
 - `agentdev-design-file-manager`: Design status 昇格（draft → accepted）、design-lifecycle-application
 - `agentdev-workflow-templates`: 対応記録コメント、完了報告テンプレート、工程記録コメントテンプレート（記録種別別6種）の選定と様式
 - `agentdev-workflow-case-run`: 記録コメント検証スクリプト（`agentdev-workflow-case-run/scripts/record-comments.ts`。工程記録の事前検査・セクション構築の決定的処理。完了契機の反映で利用）
@@ -112,7 +112,7 @@ case-run 側の事前検査とは独立に実施する。検証手段との対�
 
 - **完了条件チェックボックス評価・更新は case-close の専任責務**: case-run/ driver/ 外部実行バックエンドは更新しない。case-close は別コンテキストで Issue 本文を再読込し、PR 本文を capture 入力源として最終完了判定する
 - **工程記録の完了契機反映**: QG-4 合格後のクローズ契機で、判定主体として完了記録（記録種別=完了、判定根拠必須）を記録コメントとして投稿し、本文結果セクション（成果物、最終判定と根拠、残件の扱い）を更新する。検証詳細は成果物（PR 本文、対応記録コメント）を参照し、本文・コメント・PR 本文へ重複して記載しない。反映は記録コメント検証スクリプト（`agentdev-workflow-case-run/scripts/record-comments.ts`、決定的処理。種別別必須項目検証、結果セクション構築と既存本文への適用）による事前検査を経由し、Custom Tool `agentdev_gh` の comment_create / issue_update で行う。実行の申告だけで完了扱いにしない（実行担当は報告、case-close は完了条件と証拠を照合する）。手順詳細は references/cleanup-and-capture.md の STEP-5 参照
-- **Epic Issue 本文ステータス追跡テーブルの更新は case-close 単一書き手**: case-run は読み取りのみ、case-auto は Wave 反復制御のみで直接書き込まない（last-write-wins 競合防止）。Case Issue 工程記録の取りまとめによる記録契機別の Epic 反映（子状態集約・全体条件評価）は、case-close と同一の per-Epic 排他制御・局所直列化の下で Epic Issue 本文へ書き込む（手順の正は `agentdev-epic-tracker`）。E5 の closing 書き込みは直列化区間内での最新取得→マージ→更新により行い、取りまとめ反映の集約セクションを消去しない
+- **Epic Issue 本文実行構成表の更新は case-close 単一書き手**: case-run は読み取りのみ、case-auto は Wave 反復制御のみで直接書き込まない（last-write-wins 競合防止）。Case Issue 工程記録の取りまとめによる記録契機別の Epic 反映（子状態集約・全体条件評価）は、case-close と同一の per-Epic 排他制御・局所直列化の下で Epic Issue 本文へ書き込む（手順の正は `agentdev-epic-tracker`）。E5 の closing 書き込みは直列化区間内での最新取得→マージ→更新により行い、取りまとめ反映の集約セクションを消去しない
 - **Capture 境界**: intake/ learning を別々の成果物として扱い、PR 本文のみを capture 入力源とする（一時会話コンテキスト不入力）
 - **検証差分の記録**: case-close が実施した各検証（QG-4 完了条件評価、docs 検証・配布依存境界 最終 gate、トレーサビリティ独立再検査等）について、検証種別、検証結果、finding 差分（新規、修正済み、既出、撤回、無効の5分類）を対応記録コメントへ記録する。形式は `agentdev-workflow-templates` の検証差分セクション規約（PR テンプレート形式と同一のテーブル）に従い、前段階（case-run）の PR 本文検証差分セクションの記録との差分で finding を分類し、工程間の比較ができる。対論型レビューの審議中 finding 状態の追跡と品質ゲート完了報告の修正証跡の所有境界を変更しない
 - **統合先基準（squash merge 先・同期基準）**: squash merge 先、ブランチ同期の対象は main とする。QG-4 は Issue 完了条件の最終判定として意味を変更しない

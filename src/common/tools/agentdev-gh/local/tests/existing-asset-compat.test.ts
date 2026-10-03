@@ -109,10 +109,10 @@ describe("TS-004 既存資産の読み書き（追加変換なし）", () => {
     fs.rmSync(issuesDir, { recursive: true, force: true });
   });
 
-  test("現行スキーマの case 資産は PR 系状態写像（status: review → MERGEABLE）を維持する", async () => {
+  test("現行スキーマの case 資産は PR 系状態写像（status: active かつマージ結果未記録 → MERGEABLE）を維持する", async () => {
     const issuesDir = makeIssuesDir();
     const original = [
-      fmText({ id: "issue-0012", title: "既存Case", role: "case", status: "review", labels: ["feature"] }),
+      fmText({ id: "issue-0012", title: "既存Case", role: "case", status: "active", labels: ["feature"] }),
       "",
       "## 目的",
       "",

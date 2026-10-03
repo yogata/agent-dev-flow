@@ -1,146 +1,59 @@
 ---
 name: Child Issue Description
-about: Epic配下の子Issue本文テンプレート
-labels: enhancement, feature
+about: Epic 配下の子 Issue 本文テンプレート
+labels: enhancement
 ---
 
-Parent: #{epic_number}
+親Epic: #{epic_number}
 
-<!-- Parent 配置正規形: 子Issue 本文の先頭行に Parent: #N を配置する（agentdev-epic-tracker 親Epic検出、case-open 不変条件と整合）。旧「## 親Issue」セクション内配置（先行実績 #2092 形式等）は移行措置として後方互換で検出する -->
-
-<!-- Tracking 行配置正規形: 追跡Issueから要件化された Case Issue は、本文冒頭ブロックに `Tracking: #N` を1行で記載する（複数の元追跡Issueがある場合は `Tracking: #N, #M` 形式。Parent: #N は Epic 階層関係専用であり Tracking 行と別形式・併存可。case-open Design「Case Issue 本文の元追跡Issue参照形式」節参照）。追跡Issueを起源としない通常の Case Issue には Tracking 行を記載しない（元追跡Issueが判明している場合のみ case-open が記載する） -->
-
-## 概要
+## 目的
 <!-- 【必須】 -->
 
-{summary}
+[対象と達成する変更（何をどの状態へ持ち込むか）]
 
-## 実行識別情報
+## 対象範囲・対象外
 <!-- 【必須】 -->
 
-<!-- 実行識別情報: v4-durable-state-and-recovery Design「ADF 実行識別情報の記録契約」節に基づく構造化識別情報セクション。
-機械的解析は本セクション内の adf_ 接頭辞付き key-value 行を正とし、自由文中に偶然出現する ID に依存しない。
-harness 側識別子は取得可能な場合の付加情報に限定し、必須契約としない。
-識別情報の一部が取得不能な場合は「N/A」と記録し、workflow を停止しない。
-本セクションは新規作成 Issue のみに適用し、既存 Issue への遡及適用は行わない -->
-- adf_case: （対象 Case の Issue 番号。#N 形式。親 Epic Issue の番号）
-- adf_execution_unit: （実行単位の flow 種別。standard。親 Epic Issue は本文冒頭の Parent 行から判別し、対象 Issue 番号は本子 Issue の番号を正として導出する）
-- adf_harness_ref: （任意。harness 側識別子（OpenCode session ID 等）。取得可能な場合のみ記載し、省略できる）
+### 対象要件
+<!-- 合意済みの要件とその範囲。REQ ファイルの存在を必須としない -->
 
-## 対象範囲
-<!-- 【必須】 -->
+- [対象要件を記述]
 
-{scope}
+### 主な変更対象
+<!-- 当該実行単位が所有する機械比較可能な宣言。最終変更ファイル一覧と区別し、実差分の正は Git 差分 -->
 
-## REQ参照
-<!-- 【必須】 -->
+- [変更対象成果物と対象パスを記述]
 
-REQ-{req_number}
-
-## 提案内容
-<!-- 【必須】 -->
-
-{solution}
+### 対象外
+- [対象外の事項。該当がない場合は「該当なし」]
 
 ## 完了条件
 <!-- 【必須】 -->
 
-<!-- 完了条件: Issue完了判定に使用する条件。テスト戦略は「どう検証するか」、完了条件は「何を満たせば完了か」を定義 -->
-<!-- 構造変更（command、skill、template の構造様式変更）を伴う場合、当該構造を固定する契約テストの期待値更新を完了条件へ明示的に含める -->
-- [ ] [完了条件を記述（「何を満たせば完了か」をチェックボックスで定義）]
-
-## テスト戦略
-<!-- 【必須】 -->
-
-<!-- テスト戦略: case-open が draft-data の test_strategy を各項目の3要素構造（verification/pass_criteria/on_failure）で埋め込む -->
-<!-- pass_criteria 記述ガイド（AG-{NNN}）:
-  - 共通 pass_criteria は複数 REQ の pipeline stage 違いで QG-{N} 食い違いを生むため、REQ 単位の個別期待値を推奨
+<!-- 完了条件: 各項目を条件、検証方法、合格条件のチェックボックス形式で保持する。
+必要な品質検証を完了条件へ統合し、テスト戦略・必須品質統制等の別章を設けない。
+不合格、証拠不足、検証不能、未処理は未達とする。達成状態の確定（[ ] → [x]）は case-close だけが行う。
+pass_criteria 記述ガイド:
+  - 共通 pass_criteria は複数 REQ の pipeline stage 違いで QG 食い違いを生むため、REQ 単位の個別期待値を推奨
   - 「変更対象外 REQ の変更がないこと」は「diff がないこと」として表現し、「存在しないこと」とは書かない
-  - 「存在しないこと」は新規作成禁止（例: REQ-NNNN が存在しないこと）の場合のみ使用。既存 REQ の変更有無検証には使用しない
-  - 構造変更を伴う場合は、当該構造を固定する契約テストの期待値更新を pass_criteria の検証対象に含める
-  - 詳細は agentdev-workflow-templates Design「test strategy 記述ガイドライン」参照 -->
-- id: TS-{NNN}
- target_item: [検証対象]
- verification: |
- [検証手順]
- pass_criteria: |
- [合格基準]
-  on_failure: |
- [不合格時の処置]
+  - 「存在しないこと」は新規作成禁止の場合のみ使用。既存 REQ の変更有無検証には使用しない
+  - 構造変更（command、skill、template の構造様式変更）を伴う場合、当該構造を固定する契約テストの期待値更新を検証対象に含める
+  - 詳細は agentdev-workflow-templates Design「完了条件検証項目の記述ガイドライン」参照 -->
 
-## Execution Contract
+- [ ] [条件（検証方法: ...、合格条件: ...）]
+
+## 進行状況
 <!-- 【必須】 -->
 
-<!-- Execution Contract: REQ-{NNNN} Issue Execution Contract。
-case-open が新規 Issue 作成時に付与する必須セクション。
-本セクションの存在有無が presence-based 判定の識別子となる（AG-{NNN}、REQ-{NNNN}-{NNN}）。
-case-run は本セクション存在有無で新旧 Issue を識別する -->
-### 統合先
-- （Case に割り当てられた統合先ブランチ。main）
+<!-- 進行状況: Case Issue 工程記録モデル（workflows/issue-lifecycle-records Design）に基づく工程記録セクション。
+Child Issue は開始・終了日時のみを保持する（子状態は親 Epic の実行構成表が所有する）。
+開始日時は初めて実装または検証に実着手した時刻であり、停止・再開で上書きしない。
+終了日時は completed 確定時のみ設定する。 -->
 
-### 変更対象成果物
-- （artifact type と対象パスのリスト）
-
-### 必須品質統制
-- （artifact-quality-control-routing Design に基づく能力キーと検証項目）
-
-### 関連 ADR 拘束条件
-- （該当 ADR と完了条件/test strategy への反映）
-
-### scope-affecting impact candidate
-- （case-open が事前探索した候補）
-
-### 実現面の変更方針（realization_actions 由来）
-<!-- 【必須】 -->
-
-<!-- 実現面の変更方針: case-open が draft-data の realization_actions を本セクションへ投影する（実現面投影契約）。
-req-define が確定した実現面の変更方針（正規所有責務、変更すべき実現面、変更意図、検証との対応）を失わず本文へ永続化する。
-case-open 成功後は case-run が Issue 本文だけで変更責務、変更意図、検証方針を取得できる。
-case-run は本セクションを既確定契約として消費し、実現責務・変更意図・検証方針を再決定せず、範囲内の内部実装方針だけを決定する。
-投影対象がない場合は「該当なし」と記載する -->
-
-- （RA-{NNN} ごとに: concern、responsibility、ownership_hints、intent、verification_refs、source_items を記録）
-
-### adversarial-review 発動契約（任意）
-- （ユーザー明示指定時のみ記録）
-
-## レビュー判断
-<!-- 【必須】 -->
-
-<!-- レビュー判断: 本 Issue のレビュー判断は親 Epic Issue の「レビュー判断」セクションを参照。
-disposition 明細の重複転記は行わない。
-「該当なし」は使用しない -->
-本 Issue のレビュー判断は親 Epic Issue #{epic_number} の「レビュー判断」セクションを参照すること。
-
-## 現在地
-<!-- 【必須】 -->
-
-<!-- 現在地: Case Issue 工程記録モデル（workflows/issue-lifecycle-records Design）に基づく工程記録セクション。
-工程、進行状態、次の行動、担当役割、停止・待機理由、最新記録参照を読み取れる内容を保持する。
-進行状態は 未着手 / 実行中 / 待機 / 終了 の4値で表示し、待機には理由と次の行動を、終了には完了・中止の区別を付す。
-進行状態は正規状態と記録契機から写像される表示であり、独立して更新・判断される第二の進行管理を構成しない。
-着手以降、記録契機（着手、引き渡し、停止、再開、判断変更、完了）に応じて case-auto 等の進行スキルとコードが更新する。
-本セクションは新規作成 Issue のみに適用し、既存 Issue への遡及適用は行わない -->
-
-- 工程: case-ready
-- 進行状態: 未着手
-- 次の行動: [次に実行する行動]
-- 担当役割: [実行担当 / 取りまとめ / 判定主体のいずれか]
-- 停止・待機理由: 該当なし
-- 最新記録参照: 該当なし
-
-## 結果
-<!-- 【必須】 -->
-
-<!-- 結果: Case Issue 工程記録モデル（workflows/issue-lifecycle-records Design）に基づく工程記録セクション。
-成果物、最終判定とその根拠、残件の扱いを読み取れる内容を保持する。
-完了判定は case-close 等の判定主体が完了条件と証拠を照合して確定し、実行の申告だけで完了扱いとしない -->
-
-- 成果物: 該当なし
-- 最終判定と根拠: 該当なし
-- 残件の扱い: 該当なし
+- 開始日時: N/A（case-run での初回実装・検証着手時に設定）
+- 終了日時: N/A
 
 ## 補足情報
 <!-- 【任意】 -->
 
-{additional_context}
+[その他の情報]

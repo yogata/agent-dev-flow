@@ -48,7 +48,7 @@ case-open がサブエージェントへ本文生成を委譲する接続点で�
 
 ## case-open Design との連動
 
-Case Issue 本文から元追跡Issueへの参照形式は、Epic/child 専用の `Parent: #N` 形式とは別形式として case-open Design 側で定義する。本 Design は参照形式の定義を所有せず、定義された形式のリンク整合確認のみを担う。
+Case Issue 本文から元追跡Issueへの参照形式は、Epic/child 専用の `親Epic: #N` 形式とは別形式として case-open Design 側で定義する。本 Design は参照形式の定義を所有せず、定義された形式のリンク整合確認のみを担う。
 
 ## 対象外
 

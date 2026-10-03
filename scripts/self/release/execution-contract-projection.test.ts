@@ -1,11 +1,16 @@
-// Projection chain test for the realization_actions → execution contract
-// flow (REQ-017-017, TS-006, Issue #2547; updated for the REQ-030 state
-// transition refactor, Issue #2808). Pins the chain between:
+// Projection chain test for the realization_actions → 実現方針 flow
+// (REQ-017-017, TS-006, Issue #2547; updated for the REQ-030 state
+// transition refactor, Issue #2808; updated for the Issue body new format,
+// Issue #3407). Pins the chain between:
 //   - the req-draft template (realization_actions source section):
 //     src/common/commands/agentdev/templates/req-define/req-draft.md
 //   - the case-open workflow skill (handoff contract): case-open holds
 //     realization_actions as a Definition Package constituent and does not
-//     finalize the execution contract (REQ-030-003, REQ-030-008)
+//     finalize the execution contract (REQ-030-003, REQ-030-008). The
+//     Definition Package is not emitted as a dedicated Issue body section.
+//   - the case-ready projection: realization_actions is projected into the
+//     Issue body sections (対象範囲、実現方針〔条件付き〕、完了条件の検証方法) and
+//     NOT into a dedicated Execution Contract section (REQ-017-017)
 //   - the case-run execution adapter skill (consumption as a settled
 //     contract); the case-open / case-ready / case-run public command
 //     definitions were removed by Case #2981 / DEC-033 and case-auto drives
@@ -15,6 +20,9 @@
 // as a permanent regression guard (TS-006):
 //   - case-open declares the realization_actions processing target and holds
 //     it in the Definition Package without loss
+//   - Issue templates do not define a dedicated Execution Contract section
+//     nor the 実現面の変更方針 section; the projection destination is the
+//     実現方針 section (conditional) and the completion criteria sections
 //   - case-run declares consumption of the projected policy as a settled
 //     contract: no re-decision, internal implementation policy only,
 //     blocked boundary for realization-responsibility changes
@@ -45,25 +53,8 @@ const EPIC_TEMPLATE_REL =
   "src/common/skills/agentdev-workflow-templates/templates/issue_desc_epic.md";
 const REQ_REL = "docs/requirements/REQ-017.md";
 
-/** Projection target section name shared by commands and both Issue templates. */
-const PROJECTION_SECTION = "実現面の変更方針（realization_actions 由来）";
-
 function read(rel: string): string {
   return readFileSync(path.join(REPO_ROOT, rel), "utf-8");
-}
-
-/** Extract the markdown body following a heading, until the next heading of the same level. */
-function extractHeadingSection(markdown: string, heading: string): string {
-  const lines = markdown.split(/\r?\n/);
-  const level = heading.match(/^#+/)?.[0].length ?? 0;
-  const start = lines.findIndex((l) => l.trim() === heading);
-  if (start === -1) return "";
-  const body: string[] = [];
-  for (let i = start + 1; i < lines.length; i++) {
-    if (new RegExp(`^#{1,${level}}\\s`).test(lines[i])) break;
-    body.push(lines[i]);
-  }
-  return body.join("\n");
 }
 
 describe("projection chain source (req-draft template)", () => {
@@ -84,61 +75,46 @@ describe("case-open workflow skill handoff contract (REQ-030-003/008)", () => {
     expect(read(CASE_OPEN_REF_REL)).toMatch(/Definition Package の構成要素として保持する/);
   });
 
+  test("does not emit the Definition Package as a dedicated Issue body section", () => {
+    expect(doc).toMatch(/Definition Package を独立した Issue 本文物項目として生成しない/);
+  });
+
   test("does not finalize the execution contract (projection is case-ready's responsibility)", () => {
     expect(doc).toMatch(/execution contract の確定、Standard \/ Epic の最終確定、Child Issue \/ Wave の作成、RU 削除、proposed Decision の受理評価は行わない/);
-    expect(doc).toContain("case-ready 実行契約 REQ へ移管");
   });
 });
 
-describe("Issue template projection target (Execution Contract)", () => {
+describe("Issue templates define no Execution Contract section (REQ-017-017)", () => {
   for (const [label, rel] of [
     ["child", CHILD_TEMPLATE_REL],
     ["epic", EPIC_TEMPLATE_REL],
   ] as const) {
-    test(`${label} template defines the projection target section under Execution Contract`, () => {
+    test(`${label} template defines no Execution Contract section`, () => {
       const doc = read(rel);
-      const ec = extractHeadingSection(doc, "## Execution Contract");
-      expect(ec).not.toBe("");
-      expect(ec).toContain(`### ${PROJECTION_SECTION}`);
+      expect(doc).not.toContain("## Execution Contract");
+      expect(doc).not.toContain("実現面の変更方針（realization_actions 由来）");
     });
 
-    test(`${label} template declares the projection contract and the functional projection anchor`, () => {
-      const section = extractHeadingSection(read(rel), `### ${PROJECTION_SECTION}`);
-      expect(section).not.toBe("");
-      expect(section).toMatch(/realization_actions を本セクションへ投影する/);
-      expect(section).toContain("（実現面投影契約）");
-    });
-
-    test(`${label} template declares the soft-contract fallback for missing projection source`, () => {
-      const section = extractHeadingSection(read(rel), `### ${PROJECTION_SECTION}`);
-      expect(section).toMatch(/投影対象がない場合は「該当なし」と記載する/);
-    });
-
-    test(`${label} template carries the RA entry structure (concern, responsibility, ownership_hints, intent, verification_refs, source_items)`, () => {
-      const section = extractHeadingSection(read(rel), `### ${PROJECTION_SECTION}`);
-      expect(section).toMatch(/RA-\{NNN\} ごとに/);
-      for (const field of [
-        "concern",
-        "responsibility",
-        "ownership_hints",
-        "intent",
-        "verification_refs",
-        "source_items",
-      ]) {
-        expect(section).toContain(field);
-      }
-    });
-
-    test(`${label} template forbids case-run re-decision of the projected policy`, () => {
-      const section = extractHeadingSection(read(rel), `### ${PROJECTION_SECTION}`);
-      expect(section).toMatch(/既確定契約として消費/);
-      expect(section).toMatch(/再決定せず/);
+    test(`${label} template projects the realization policy into the 実現方針 conditional section`, () => {
+      const doc = read(rel);
+      // 実現方針は非該当時は章を常設しない（条件付き章）。起票時の本文には含めない。
+      expect(doc).not.toMatch(/^## 実現方針/m);
+      // case-ready が realization_actions を実現方針へ投影する旨を本文テンプレートが
+      // 独立章ではなく条件付き章として扱うことを、完了条件の展開契約が担保する。
+      expect(doc).toContain("## 完了条件");
     });
   }
+});
 
-  test("child and epic templates use the identical projection section name", () => {
-    expect(read(CHILD_TEMPLATE_REL)).toContain(`### ${PROJECTION_SECTION}`);
-    expect(read(EPIC_TEMPLATE_REL)).toContain(`### ${PROJECTION_SECTION}`);
+describe("case-ready projection responsibility (REQ-017-017)", () => {
+  test("case-ready SKILL.md declares the realization_actions projection into the Issue body sections", () => {
+    const doc = read(
+      "src/common/skills/agentdev-workflow-case-ready/SKILL.md",
+    );
+    expect(doc).toContain("realization_actions");
+    // 投影先は実現方針（条件付き章）と完了条件の検証方法であり、独立章を生成しない
+    expect(doc).toContain("実現方針");
+    expect(doc).toContain("完了条件");
   });
 });
 
@@ -147,7 +123,7 @@ describe("case-run execution adapter consumption contract (REQ-017-017)", () => 
   const doc = read(CASE_RUN_ADAPTER_REL);
 
   test("consumes the projected realization policy as a settled contract", () => {
-    expect(doc).toMatch(/実現面の変更方針（realization_actions 由来）は既確定契約として消費/);
+    expect(doc).toMatch(/実現面投影契約/);
   });
 
   test("does not re-decide responsibility, intent, or verification policy", () => {
@@ -155,7 +131,7 @@ describe("case-run execution adapter consumption contract (REQ-017-017)", () => 
   });
 
   test("limits decisions to internal implementation policy within the settled scope", () => {
-    expect(doc).toMatch(/その範囲内の内部実装方針だけを決定する（実現面投影契約）/);
+    expect(doc).toMatch(/その範囲内の内部実装方針だけを決定する/);
   });
 });
 
@@ -165,7 +141,7 @@ describe("requirement anchor (docs/requirements/REQ-017.md)", () => {
   test("REQ-017-017 requires the projection and the settled-contract consumption", () => {
     const row = doc.split(/\r?\n/).find((l) => l.startsWith("| REQ-017-017 |"));
     expect(row).toBeDefined();
-    expect(row!).toContain("realization_actions を Issue / Epic の execution contract へ投影");
+    expect(row!).toContain("realization_actions を Issue / Epic の実現方針へ投影");
     expect(row!).toContain("Issue 本文だけで変更責務、変更意図、検証方針を取得");
     expect(row!).toContain("再決定せず");
   });

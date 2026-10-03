@@ -65,11 +65,11 @@ stage 再構成規則の正本は case-auto Design「ドラフト間並列実行
 | draft / RU の存在 | stage 1 または stage 2 未収束。Root Case Issue 未確立なら stage 1 未完了、確立済みなら stage 1 完了・stage 2 未完了と組み合わせ判定 |
 | Root Case Issue state（open / ready / running / review / closed） | stage 2 収束後の stage 進行判定（ready → stage 2 収束済み、running / review → stage 3 進行中または完了、closed → stage 4 収束済み候補） |
 | PR の存在と状態 | stage 3 完了判定（PR 作成済み）と stage 4 完了判定（PR merged） |
-| Epic Issue ステータス追跡テーブル | Epic execution_unit の場合、Wave 反復の進行度と stage 3 内部処理の完了判定に使用（case-auto は読取のみ、単一書き手は case-close） |
+| Epic Issue 実行構成表 | Epic execution_unit の場合、Wave 反復の進行度と stage 3 内部処理の完了判定に使用（case-auto は読取のみ、単一書き手は case-close） |
 
 - draft / RU 存在 → stage 1 / stage 2 の未収束判定に使用。draft / RU の存在だけでは stage 1 と stage 2 を区別できないため、Root Case Issue の有無と state を組み合わせる
 - Issue state と PR 存在 → stage 2〜4 の各 stage 完了判定に使用。Issue state、PR 番号、merge 状態は durable state（Issue 本文・GitHub 状態）から再取得する
-- Epic Issue ステータス追跡テーブル → Epic execution_unit の stage 3 完了判定（全子Issue 終端と Epic Issue 状態。既存 Epic/Wave workflow の完了状態基準に従い、内部ロジックを複製しない）
+- Epic Issue 実行構成表 → Epic execution_unit の stage 3 完了判定（全子Issue 終端子状態と全体条件評価。既存 Epic/Wave workflow の完了状態基準に従い、内部ロジックを複製しない）
 - これらの証跡から対象の stage 進行度を一意に判定できない場合は、当該対象を再実行せず blocked として報告する（安全側規則）。判定不能対象を根拠に完了済み対象を巻き戻さない
 
 ### stage 1 / 2 / 4 並列委譲の bg task 破棄回復（適用範囲拡張）

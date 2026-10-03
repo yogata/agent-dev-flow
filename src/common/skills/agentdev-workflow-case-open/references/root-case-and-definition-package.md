@@ -37,8 +37,8 @@ Root Case 本文候補の生成は preflight 設定検証の通過後に行う�
 
 1. Root Case 本文候補を生成する。本文は要件doc の合意済み入力を投影し、機能要件、非機能要件、制約、対象外、受け入れ条件を新規に作成しない。テンプレートは `agentdev-workflow-templates` の選定ルールに従う（Root Case 用テンプレート、【必須】セクション完備）
 2. Root Case のタイトルは合意済みの対象・目的から主題を生成し、`<workflows/issue-title-policy>` Design（Issue タイトル記述規則）の役割別書式に従う（Root Case は Case 接頭辞書式。書式の具体と主題原則は同 Design を参照し、本手順では複製しない）
-3. 実行識別情報セクションを `agentdev-workflow-templates` の規約に従い記録する
-4. `review_dispositions` が存在する場合は転記規則に従い「レビュー判断」セクションへ転記する
+3. 実行識別情報セクションを本文へ記録しない（Issue 本文には実行識別情報セクションを設けない。`agentdev-workflow-templates` Design「実行識別情報・検証差分のテンプレートセクション形式」節）
+4. `review_dispositions` は本文へ全件転記しない。採用内容（accepted disposition）は本文の該当章（対象範囲、実現方針、完了条件の検証方法）へ反映し、必要な採否理由だけをコメントへ残す
 5. 曖昧性が残らず Root Case を確立できる場合にのみ、`agentdev_gh` の issue_create で Root Case を作成する（VERIFY）
 6. ラベルは `agentdev-workflow-lifecycle` の work_type 判定に従い付与する
 7. Root Case 確立後の状態は open とし、実装開始を許可しない
@@ -51,7 +51,7 @@ Root Case 本文候補の生成は preflight 設定検証の通過後に行う�
 4. 意味変更行の design 対応事前確認: 対象要件行のうち既存行の意味変更を含む場合、`agentdev-traceability` の coverage --req による当該行の design 対応有無の事前確認を実施する。design 対応が欠落する意味変更行を検出した場合は、当該行の design 対応を artifact_actions（artifact: design）へ組込んだ上で合意を完了する。事前確認を省略した Case は case-ready の lifecycle gate completeness（fail-closed）で停止し得る（missing-design 既知債務の範囲で発生余地がある）。missing-design 0 件ゲート（上記3）が増分ベース〔新規行のみ〕であることへの予防手順として位置づける（正規所有は case-open Design「意味変更行の design 対応事前確認」節）
 5. Issue 構成案に物理削除を伴う docs-chore OU が含まれる場合、当該 OU の対象範囲に extensions、templates 等の実行時設定からの参照を明示的に含める。削除対象の参照先を事前確認し、OU 分割時は他 OU・実行時設定からの参照責務に隙間がないか検査する（原本は `<workflows/references/execution-unit-construction>` Design「docs-chore OUの削除起因参照追随」節。根拠事例: E6-2〔Epic #2984 コメント記録〕、Case #2979）。checkExtensions 等の fan-in 事後検査は維持する
 6. `realization_actions` は Definition Package の構成要素として保持する（構造化ハンドオフ: DEC-{N}）。case-open が execution contract を確定しない
-7. 生成した Definition Package を Root Case に関連付ける（Root Case 本文の Definition Package セクションへ所在を記録する）
+7. 生成した Definition Package を Root Case に関連付ける（Definition Package を独立した Issue 本文物項目として生成しない〔Issue Execution Contract REQ 条項、case-open 実行契約 REQ〕。所在は Definition PR と case-ready の canonical 再取得経路から相関する）
 8. Definition Package の構成、索引・補助メタデータの具体形式は case-open / case-ready Design の管理下とする
 
 ### 並行 case-open の作業隔離

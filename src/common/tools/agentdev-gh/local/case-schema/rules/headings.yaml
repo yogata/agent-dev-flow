@@ -45,35 +45,37 @@ case_comment_entries:
   prelude_migration: "見出しのない既存作業ログ本文を最初のコメント c01 として束ねる"
 
 # role: case の本文セクション一覧
+# 本文構成の正は docs/designs/local/local-case-file.md「本文構成（role: case）」。
+# 実現方針・結果は条件付き（非常設。該当時のみ章を設ける）。
 case_headings:
   - number: 1
-    heading: "## 入力"
-    required: false
-    role: "Case の入力情報（REQ パス、要件 doc パス、参照 Issue 等）"
-  - number: 2
-    heading: "## 背景"
-    required: false
-    role: "Case の背景説明"
-  - number: 3
-    heading: "## 問題"
-    required: false
-    role: "Case が解決する問題"
-  - number: 4
     heading: "## 目的"
     required: false
     role: "Case の目的"
+  - number: 2
+    heading: "## 対象範囲・対象外"
+    required: false
+    role: "対象要件、主な変更対象、対象外"
+  - number: 3
+    heading: "## 実現方針"
+    required: false
+    role: "再判断してはならない合意がある場合のみ（非常設。章を常設しない）"
+  - number: 4
+    heading: "## 実行構成"
+    required: false
+    role: "Epic Root のみ。| Wave | Issue | 前提 | 状態 | の一表（子状態4値）"
   - number: 5
-    heading: "## 対象範囲"
+    heading: "## 完了条件"
     required: false
-    role: "Case の対象範囲"
+    role: "条件・検証方法・合格条件のチェックボックス形式。テスト戦略・必須品質統制の別章は設けない"
   - number: 6
-    heading: "## 対象外"
+    heading: "## 進行状況"
     required: false
-    role: "Case の対象外"
+    role: "正規状態（Root Case のみ）と開始・終了日時。Child は開始・終了日時のみ"
   - number: 7
-    heading: "## 受け入れ条件"
+    heading: "## 結果"
     required: false
-    role: "Case の受け入れ条件"
+    role: "完了・中止確定時のみ（非常設。章を常設しない）。成果物と必要な残件"
   - number: 8
     heading: "## 作業ログ"
     required: false
@@ -104,10 +106,6 @@ case_headings:
     required: false
     role: "残課題、フォローアップ項目"
   - number: 14
-    heading: "## 完了判定"
-    required: false
-    role: "完了判定結果"
-  - number: 15
     heading: "（自由拡張）"
     required: false
     role: "上記以外のセクションは必要に応じて追加可能"

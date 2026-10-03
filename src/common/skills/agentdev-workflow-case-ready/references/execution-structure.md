@@ -15,8 +15,8 @@ OU / Epic / Wave / Issue 階層の語彙意味の正規所有は v4-standard-lif
 
 - Child Issue を作成し、Root Case に Wave / 依存構造を確定する
 - Epic Issue 本文に構成推論の根拠を記録する
-- Epic Issue 本文の Wave テーブルに各子 Issue の実行方法（並列、直列）を技術的依存関係に基づいて明記する
-- Issue タイトルは `<workflows/issue-title-policy>` Design（Issue タイトル記述規則）に従う。Epic 確定時は Root Case の接頭辞を Epic 接頭辞へ更新し、子 Issue には所属 Wave を先頭に置いた Wave 付き Task 接頭辞書式を付与する。書式の具体と Wave 投影・構成変更時の同期の規則は同 Design「役割別書式」「Wave 投影」節を参照する（本手順では書式を複製しない）。Epic 本文の Wave テーブルと子 Issue タイトルの一致を維持する
+- Epic Issue 本文の実行構成表（`| Wave | Issue | 前提 | 状態 |` の一表）に各子 Issue の所属 Wave と意味的依存（前提列）を技術的依存関係に基づいて明記する
+- Issue タイトルは `<workflows/issue-title-policy>` Design（Issue タイトル記述規則）に従う。Epic 確定時は Root Case の接頭辞を `Epic:` へ更新し、子 Issue には `Wave-N: 主題` 書式を付与する（`Task:` 接頭辞は廃止）。書式の具体と Wave 投影・構成変更時の同期の規則は同 Design「役割別書式」「Wave 投影」節を参照する（本手順では書式を複製しない）。Epic 本文の実行構成表と子 Issue タイトルの一致を維持する
 - Wave 構成時に同一 Wave 候補の子 Issue 間で変更対象ファイル集合の重複をファイル単位で前置検出し、検出結果を実行・統合時の競合リスク情報（一時直列化・変更対象の調整・merge 順序・rebase・衝突解消担当の判断に利用）として Epic Issue 本文・Wave 記録へ記録・引き渡す。重複時の処置は変更対象分割・重複許容（衝突解消の担当とマージ順序の事前記録を含む）とし、ファイル重複のみを理由とした Wave 分離を処置に含めない。依存ヒント（同一ファイル衝突の抑制ヒント）は競合リスク信号であり Wave 分離の判断材料としない。成果の成立順序への依存（一方が作成する成果を他方が利用する等）が確認された場合は、それを意味的依存として Wave 構成に反映する。比較対象の変更対象集合が取得不能またはファイル粒度に展開不能な子 Issue がある場合は比較を省略せず検出不能として報告し、無重複扱いしない
 - 既存オープン Issue とのスコープ重複を検知し、重複する子 Issue 生成をスキップまたはユーザー確認する
 - 初期 status は原則 pending とする
@@ -28,14 +28,14 @@ OU / Epic / Wave / Issue 階層の語彙意味の正規所有は v4-standard-lif
 
 ## SSoT 分離
 
-- Epic Case では Root Case を Case 全体、Definition 参照、対象範囲、全体制約、Issue 分解、Wave / 依存関係、全体進捗の orchestration SSoT とする
+- Epic Case では Root Case を Case 全体、Definition 参照、対象範囲、全体制約、実行構成（実行構成表の一表。分解表と実行順序表の二重保持を行わない）、Wave / 依存関係、全体進捗の orchestration SSoT とする
 - 各 Child Issue を各 case-run が消費する execution contract の execution SSoT とし、親 Root Case の自由記述に依存せず、その Issue 単独で対象範囲、関連 REQ / Decision / Design、変更対象成果物、実現方針、完了条件、test strategy を取得できる自足構成にする
 - 完了条件と事前状態の記載は識別子中心とし、変動しやすい実測値スナップショットは補助値とする
 - 完了条件を Issue 本文に展開する前に最新状態を再確認し、差異がある場合は最新状態を優先する
 
 ## review_dispositions の Epic / 子 Issue への転記
 
-- draft-data の review_dispositions を、Epic 構成確定後に Epic Issue / 子 Issue 本文の「レビュー判断」セクションへ転記する
+- draft-data の review_dispositions は Epic Issue / 子 Issue 本文へ転記しない。採用内容は子 Issue 本文の該当章（対象範囲、実現方針、完了条件の検証方法）へ反映し、必要な採否理由だけをコメントへ残す
 - 転記対象 disposition がない場合は「該当なし」と記載する。Root Case への転記は case-open が完了しており、重複転記しない
 
 ## 構成検証（GitHub Issue 作成前）
@@ -48,7 +48,7 @@ OU / Epic / Wave / Issue 階層の語彙意味の正規所有は v4-standard-lif
 
 - 子 Issue 本文は単独自足の execution contract 要件を満たす（対象範囲、関連 REQ / Decision / Design、変更対象成果物、実現方針、完了条件、test strategy）
 - Epic Issue 本文、子 Issue 本文のテンプレート選定は `agentdev-workflow-templates` の選定ルールに従う（Epic Issue 本文、子 Issue 本文テンプレート）。本文テンプレートは Issue タイトルを規定せず、子 Issue タイトルの書式は `<workflows/issue-title-policy>` Design に従う
-- 実行識別情報セクション（対象 Case、実行単位）を含める。形式は `agentdev-workflow-templates` の実行識別情報セクション規約に従う
+- 実行識別情報セクションを本文へ含めない（Issue 本文には実行識別情報セクションを設けない。Case・実行単位は 親Epic: #N 参照と実行構成表から相関する）
 - Issue 作成は Custom Tool `agentdev_gh` の issue_create 経由で行う。Parent 行で Root Case（Epic flow では親 Epic Issue）を参照する
 - 本文はファイル経由で扱い、Markdown 行構造を保持する
 

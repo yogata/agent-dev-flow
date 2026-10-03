@@ -68,7 +68,7 @@ worktree/ローカルブランチ削除、親Epic 自動クローズ判定、実
 
 ### Input Resolution
 
-1. SSoT 再構成: PR 本文（`## Findings / Capture候補`）、Epic Issue 本文（`Parent: #{N}`、子Issue 状態）、git 状態
+1. SSoT 再構成: PR 本文（`## Findings / Capture候補`）、Epic Issue 本文（実行構成表、子Issue 状態）、git 状態
 2. identifier 保持: Issue番号、親Epic 番号
 3. 最小 scalar: なし
 4. runtime artifact: なし
@@ -100,7 +100,7 @@ worktree/ローカルブランチ削除、親Epic 自動クローズ判定、実
 
 `agentdev-epic-tracker` スキル参照。
 
-- **Issue 本文から Parent Issue 番号を特定**: `Parent: #{N}` パターン
+- **Issue 本文から親Epic Issue 番号を特定**: `親Epic: #{N}` パターン
 - **Parent なし** → スキップ
 - **ステータストラッキング表を更新** → `agentdev_gh` issue_update（読み戻し検証済み）
 - **子Issue 状態事前取得**: `agentdev_gh` の issue_read 操作で全子Issue の OPEN/CLOSED 状態を一覧取得しログ出力

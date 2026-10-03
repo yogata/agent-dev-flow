@@ -86,10 +86,10 @@ class FixtureGh implements ReflectIo {
 const CHILD_ISSUE = 4001;
 const EPIC_ISSUE = 4000;
 
-const INITIAL_BODY = "## 現在地\n\n- 初期本文\n";
-const CHILD_BODY = "## 現在地\n\n- 工程: case-run\n- 進行状態: 実行中\n";
+const INITIAL_BODY = "## 進行状況\n\n- 初期本文\n";
+const CHILD_BODY = "## 進行状況\n\n- 正規状態: 実行継続中（active）\n- 開始日時: 2026-10-04 05:25 JST\n- 終了日時: N/A\n";
 const CHILD_COMMENT = "停止: 検証失敗のため。再開条件: 修正後の再検証。\n";
-const EPIC_BODY_AFTER = "| Issue | 状態 |\n|---|---|\n| #4001 | 実行中 |\n";
+const EPIC_BODY_AFTER = "| Wave | Issue | 前提 | 状態 |\n|---|---|---|---|\n| 1 | #4001 | - | pending |\n";
 
 function makePlan(): ReflectPlan {
   return {

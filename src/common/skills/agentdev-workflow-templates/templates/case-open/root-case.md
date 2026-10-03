@@ -1,95 +1,52 @@
 ---
-name: Root Case
-about: Case の Root Issue（case-open が作成する）
+name: Root Case (case-open)
+about: Root Case 本文（case-open が起票する。case-ready が実現方針と完了条件を確定して更新する）
 labels: enhancement
 ---
 
-<!-- Tracking 行配置正規形: 追跡Issueから要件化された Case Issue は、本文冒頭ブロックに `Tracking: #N` を1行で記載する（複数の元追跡Issueがある場合は `Tracking: #N, #M` 形式。case-open Design「Case Issue 本文の元追跡Issue参照形式」節参照）。追跡Issueを起源としない通常の Case Issue には Tracking 行を記載しない（元追跡Issueが判明している場合のみ case-open が記載する） -->
-
-## 概要
+## 目的
 <!-- 【必須】 -->
 
-[合意済み要件の要約。機能要件、非機能要件、制約、対象外、受け入れ条件は新規に作成せず合意済み入力を反映する]
+[合意済み要件の対象と達成する変更（何をどの状態へ持ち込むか）]
 
-## 実行識別情報
+## 対象範囲・対象外
 <!-- 【必須】 -->
 
-<!-- 実行識別情報: v4-durable-state-and-recovery Design「ADF 実行識別情報の記録契約」節に基づく構造化識別情報セクション。
-機械的解析は本セクション内の adf_ 接頭辞付き key-value 行を正とし、自由文中に偶然出現する ID に依存しない。
-harness 側識別子は取得可能な場合の付加情報に限定し、必須契約としない。
-識別情報の一部が取得不能な場合は「N/A」と記録し、workflow を停止しない。
-本セクションは新規作成 Issue のみに適用し、既存 Issue への遡及適用は行わない -->
-- adf_case: （本 Issue 自身の番号。#N 形式。Root Case 自身）
-- adf_execution_unit: N/A（実行構成未確定。case-ready が execution contract 確定後に確定する）
-- adf_harness_ref: （任意。harness 側識別子（OpenCode session ID 等）。取得可能な場合のみ記載し、省略できる）
+### 対象要件
+<!-- 合意済みの要件とその範囲。REQ ファイルの存在を必須としない -->
 
-## 対象 REQ
+- [対象要件を記述]
+
+### 主な変更対象
+<!-- case-open が事前探索した変更影響候補（scope-affecting impact candidate）を含めて記述する -->
+
+- [変更対象成果物と対象パスを記述]
+
+### 対象外
+- [対象外の事項。該当がない場合は「該当なし」]
+
+## 完了条件
 <!-- 【必須】 -->
 
-<!-- case-open は Root Case を確立する際に対象 REQ 番号を埋め込む -->
-- REQ-{NNN}: [要件タイトル]
+<!-- case-ready が canonical Definition 確定後に展開する。
+必須品質統制は検証方法・合格条件へ統合し、テスト戦略・必須品質統制の別章を設けない。
+関連 Decision の拘束条件は実現方針または検証方法へ反映する。
+達成状態の確定（[ ] → [x]）は case-close だけが行う -->
+- [ ] [case-ready が確定した条件（検証方法: ...、合格条件: ...）]
 
-## Definition Package
+## 進行状況
 <!-- 【必須】 -->
 
-<!-- Definition Package: case-open が壁打ち済み内容から生成し Root Case に関連付ける。
-構成は case-open / case-ready Design に従う（要件行、Decision、Design、Issue 構成案、受入条件一式）。
-realization_actions は構成要素として保持する（構造化ハンドオフ）。case-open は execution contract を確定しない -->
-- 要件行: [REQ 変更後本文または所在]
-- Decision: [関連 Decision 一覧（新規 Decision は proposed のまま維持）]
-- Design: [関連 Design 一覧]
-- Issue 構成案: [operation_units / case_open_hints 由来の構成案]
-- 受入条件一式: [合意済み入力の受け入れ条件]
-- realization_actions: [実現面の変更方針]
+<!-- 進行状況: Case Issue 工程記録モデル（workflows/issue-lifecycle-records Design）に基づく工程記録セクション。
+正規状態と開始・終了日時のみを保持する。表示用の進行状態4値、現在工程、担当役割、次の行動、最新記録参照は保存しない。
+開始日時は初めて実装または検証に実着手した時刻であり、停止・再開で上書きしない。
+終了日時は完了または中止確定時のみ設定する。 -->
 
-## Case 状態と次工程
-<!-- 【必須】 -->
+- 正規状態: 実行継続中（active）
+- 開始日時: N/A（case-run での初回実装・検証着手時に設定）
+- 終了日時: N/A
 
-<!-- Root Case 確立後の状態は open とし、実装開始を許可しない。
-execution contract 確定、Standard / Epic 最終確定、Child Issue / Wave 作成は case-ready が実行する。
-Definition PR は canonical Definition に実変更がある場合のみ作成する -->
-- 状態: open
-- Definition PR: [作成済み: PR番号 / 不作成（実変更なし）]
-- 次工程: `case-ready`
-
-## レビュー判断
-<!-- 【必須】 -->
-
-<!-- レビュー判断: case-open が draft-data の review_dispositions を読み取り、採否判断（covered / rejected 等）を恒久証跡として転記する。転記対象がない場合は「該当なし」と記載する -->
-[review_dispositions の転記内容。
-各 disposition は id、disposition、reason_code、reason、evidence（path、section、checked_at_commit）を記載する。
-該当なしの場合は「該当なし」]
-
-## 現在地
-<!-- 【必須】 -->
-
-<!-- 現在地: Case Issue 工程記録モデル（workflows/issue-lifecycle-records Design）に基づく工程記録セクション。
-工程、進行状態、次の行動、担当役割、停止・待機理由、最新記録参照を読み取れる内容を保持する。
-進行状態は 未着手 / 実行中 / 待機 / 終了 の4値で表示し、待機には理由と次の行動を、終了には完了・中止の区別を付す。
-進行状態は正規状態と記録契機から写像される表示であり、独立して更新・判断される第二の進行管理を構成しない。
-Root Case では進行状態は「Case 状態と次工程」セクションの状態と記録契機から写像される。
-着手以降、記録契機（着手、引き渡し、停止、再開、判断変更、完了）に応じて case-auto 等の進行スキルとコードが更新する。
-本セクションは新規作成 Issue のみに適用し、既存 Issue への遡及適用は行わない -->
-
-- 工程: case-open
-- 進行状態: 未着手
-- 次の行動: [次に実行する行動]
-- 担当役割: [実行担当 / 取りまとめ / 判定主体のいずれか]
-- 停止・待機理由: 該当なし
-- 最新記録参照: 該当なし
-
-## 結果
-<!-- 【必須】 -->
-
-<!-- 結果: Case Issue 工程記録モデル（workflows/issue-lifecycle-records Design）に基づく工程記録セクション。
-成果物、最終判定とその根拠、残件の扱いを読み取れる内容を保持する。
-完了判定は case-close 等の判定主体が完了条件と証拠を照合して確定し、実行の申告だけで完了扱いとしない -->
-
-- 成果物: 該当なし
-- 最終判定と根拠: 該当なし
-- 残件の扱い: 該当なし
-
-## 補足情報（オプション）
+## 補足情報
 <!-- 【任意】 -->
 
 [その他の情報]
