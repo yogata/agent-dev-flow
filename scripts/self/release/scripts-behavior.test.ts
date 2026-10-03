@@ -29,6 +29,7 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import { execFileSync, spawnSync } from "child_process";
+import { createAgentdevGhToolDefinition } from "../../../src/opencode/plugins/agentdev-gh-tool/plugin.ts";
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 const INSTALL_PS1 = path.join(REPO_ROOT, "scripts", "install.ps1");
@@ -462,6 +463,68 @@ describe("scripts behavior / third-party skill drift detection", () => {
       expect(r.exitCode).toBe(0);
       expect(r.stdout).toContain("third-party drift check skipped");
       expect(fs.existsSync(path.join(target, "skills", "agentdev-x", "SKILL.md"))).toBe(true);
+    } finally {
+      rmrf(root);
+    }
+  }, 120000);
+});
+
+// --- LocalMode runner selection: missing-environment cases (RA-018, Case #3369) ---
+// 存在チェックと能力検証の分離（横断原則、multi-host-canonical-model Design）:
+// installer の LocalMode 選択は存在チェックのみを持ち、対象欠落時は復旧手順付きで
+// fail-closed 停止する。能力確認は別の実行時検査であり、GitHub 実装への暗黙
+// fallback を行わない。
+describe("scripts behavior / LocalMode runner selection missing-environment cases (RA-018, Case #3369)", () => {
+  test("target absent: apply -LocalMode stops fail-closed before any change and check stops with the recovery hint", () => {
+    const root = makeConsumerRepo(false, true);
+    try {
+      fs.rmSync(
+        path.join(root, ".agentdev-plugin", "src", "common", "tools", "agentdev-gh", "local", "runner-local.ts"),
+      );
+
+      const before = digestTree(path.join(root, ".opencode"));
+      const apply = runInstall(root, "apply", ["-LocalMode"]);
+      expect(apply.exitCode).toBe(1);
+      expect(apply.stderr).toContain("LocalMode redirect source not found");
+      expect(apply.stderr).toContain("src/common/tools/agentdev-gh/local/");
+      const after = digestTree(path.join(root, ".opencode"));
+      expect(after).toEqual(before);
+
+      const check = runInstall(root, "check", ["-LocalMode"]);
+      expect(check.exitCode).toBe(1);
+      expect(check.stderr).toContain("LocalMode redirect source not found");
+    } finally {
+      rmrf(root);
+    }
+  }, 120000);
+
+  test("target present but capability-deficient: selection checks existence only and runtime capability verification fails closed without silent fallback", async () => {
+    const root = makeConsumerRepo(false, true);
+    try {
+      fs.writeFileSync(
+        path.join(root, ".agentdev-plugin", "src", "common", "tools", "agentdev-gh", "local", "runner-local.ts"),
+        "export const broken = true;\n",
+        "utf-8",
+      );
+      const apply = runInstall(root, "apply", ["-LocalMode"]);
+      expect(apply.exitCode).toBe(0);
+      expect(
+        fs.existsSync(path.join(root, ".opencode", "tools", "agentdev-gh", "runner-local.ts")),
+      ).toBe(true);
+
+      const def = createAgentdevGhToolDefinition({ resolveRepo: () => "local/issues" });
+      const result = await def.execute(
+        { request: { operation: "issue_read", number: 1 } },
+        { sessionID: "test", directory: root, worktree: root },
+      );
+      const parsed = JSON.parse(result.output) as {
+        ok: boolean;
+        failure: { kind: string; detail: string };
+      };
+      expect(parsed.ok).toBe(false);
+      expect(parsed.failure.kind).toBe("config-uninterpretable");
+      expect(parsed.failure.detail).toContain("must not silently fall back to the GitHub implementation");
+      expect(result.metadata?.ok).toBe(false);
     } finally {
       rmrf(root);
     }
