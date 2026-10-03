@@ -21,8 +21,8 @@ AgentDevFlow を構成する成果物の種別、配置、ライフサイクル�
 
 | 成果物 | 格納先 | 役割 |
 |--------|--------|------|
-| Command | `src/opencode/commands/agentdev/`（実行時: `.opencode/commands/agentdev/`） | 実行手順の一次参照（ステップ番号、入出力契約） |
-| Skill | `src/opencode/skills/agentdev-*`（実行時: `.opencode/skills/agentdev-*`） | 判定基準、共通知識、宣言的ルールの一次参照 |
+| Command | `src/common/commands/agentdev/`（実行時: `.opencode/commands/agentdev/`） | 実行手順の一次参照（ステップ番号、入出力契約） |
+| Skill | `src/common/skills/agentdev-*`（実行時: `.opencode/skills/agentdev-*`） | 判定基準、共通知識、宣言的ルールの一次参照 |
 | Template | Skill 配下 `templates/` | Issue/PR 本文の出力構造とプレースホルダー |
 | Script | Skill 配下 `scripts/` | ガードレール、検査、補助処理の実行可能ロジック |
 | リポジトリ専用 Command | `.opencode/commands/repo/`（原本なし、配置先のみ） | AgentDevFlow 本体リポジトリ専用コマンド（DEC-001）。配布対象外 |
@@ -60,14 +60,15 @@ requirements/REQ-{NNN}.md     # 要件定義（基準）
     inbox.md deferred.md evaluation-report.md promoted/
   backlog/req-units/RU-*.md      # Requirement Unit
   integrity/                     # 整合性検証レポート
-.opencode/                        # 実行時の配置先（ジャンクション → src/opencode/）
+.opencode/                        # 実行時の配置先（ジャンクション → src/common/ + src/opencode/）
   commands/agentdev/             # Command 定義（AgentDevFlow 配布対象）
   commands/repo/                 # AgentDevFlow 本体リポジトリ専用コマンド（DEC-001、配布対象外）
   skills/agentdev-*/             # Skill 定義（AgentDevFlow 配布対象）
   skills/repo-*/                 # AgentDevFlow 本体リポジトリ専用スキル（DEC-001、配布対象外）
-src/opencode/                     # 原本（正規の定義ファイル）
+src/common/                       # 共通原本（正規の定義ファイル、DEC-049）
   commands/agentdev/             # Command 原本
   skills/agentdev-*/             # Skill 原本
+src/opencode/                     # OpenCode 接続領域（OpenCode 用 plugin/hook の原本、Tool 登録配線、guard 接続）
 scripts/
   self-sync.ps1                  # AgentDevFlow 本体リポジトリ用同期スクリプト（self-hosting 向け公開入口）
   install.ps1                    # 適用プロジェクト用公開入口（install・check・dry-run）
@@ -79,19 +80,20 @@ scripts/
 
 ```
 .agentdev-plugin/                # agent-dev-flow の git clone 先（適用プロジェクト専用）
-  src/opencode/                  # 原本（clone 内）
+  src/common/                    # 共通原本（clone 内、DEC-049）
     commands/agentdev/           # Command 原本
     skills/agentdev-*/           # Skill 原本
+  src/opencode/                  # OpenCode 接続領域（clone 内）
 .agentdev/
   intake/                        # Intake パイプラインのドメイン状態
     inbox/ promoted/
   learning/                      # Learning パイプラインのドメイン状態
   backlog/req-units/RU-*.md      # Requirement Unit
   integrity/                     # 整合性検証レポート
-.opencode/                       # 実行時の配置先（ジャンクション → .agentdev-plugin/src/opencode/）
-  commands/agentdev/             # ジャンクション → .agentdev-plugin/src/opencode/commands/agentdev/
+.opencode/                       # 実行時の配置先（ジャンクション → .agentdev-plugin/src/common/ + src/opencode/）
+  commands/agentdev/             # ジャンクション → .agentdev-plugin/src/common/commands/agentdev/
   commands/{local}/              # プロジェクト独自コマンド（実ディレクトリ）
-  skills/agentdev-*/             # ジャンクション → .agentdev-plugin/src/opencode/skills/agentdev-*/
+  skills/agentdev-*/             # ジャンクション → .agentdev-plugin/src/common/skills/agentdev-*/
   skills/{local}-*/              # プロジェクト独自スキル（実ディレクトリ）
 scripts/
   install.ps1                    # 適用プロジェクト用公開入口（install・check・dry-run）
