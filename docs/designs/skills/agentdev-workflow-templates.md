@@ -2,7 +2,7 @@
 title: `agentdev-workflow-templates` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-19
+updated: 2026-10-03
 ---
 <!-- ADF-COVERS(implementation): REQ-007-002, REQ-007-003, REQ-007-005, REQ-017-003 -->
 <!-- ADF-COVERS(implementation): REQ-048-001, REQ-048-002, REQ-048-008, REQ-048-016, REQ-014-016 -->
@@ -265,6 +265,16 @@ REQ-048-014 のとおり REQ-048 の成立条件として固定しない。形�
 対応記録コメントテンプレート（issue_comment_bug_record.md 系）には adversarial-review 判定欄のセクションを新設する（REQ-014-016）。
 判定値は発動または非発動とし、非発動の場合は発動契約非該当の理由を必須記録する。
 既存記録への遡及適用はせず、新規作成の対応記録から適用する。
+
+
+## Case Issue 工程記録テンプレート
+
+Case Issue の工程記録（REQ-101、workflows/issue-lifecycle-records Design）をテンプレートへ投影する規約を定める。
+
+- Case Issue 本文テンプレート（issue_desc 系）への現在地・結果セクションの追加規約。セクション構成の正は workflows/issue-lifecycle-records Design が所有し、本 Design はテンプレート実体（src/common/commands/agentdev/templates/issue_desc_*.md）への投影・選定規則を定める
+- 記録コメントテンプレート（記録種別別: 着手、引き渡し、停止、再開、判断変更、完了）の新設規約と選定ルール、必須項目（停止=再開条件、判断変更=撤回対象、引き渡し=残作業・受取役割、完了=判定根拠）のテンプレート反映
+- 既存テンプレート（execution contract セクション、実行識別情報セクション、review_dispositions 証跡セクション）との共存構造と適用順
+- Case Epic テンプレートの子状態集約・全体条件評価セクションの規約（書き込み主体・時機は更新後の REQ-035-001 と agentdev-epic-tracker Design の契約に従う旨の参照）
 
 
 ## v4 責務分類
