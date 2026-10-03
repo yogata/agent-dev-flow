@@ -4953,7 +4953,7 @@ function checkReqRangeStaleness(root: string): CheckResult[] {
                 undefined,
                 {
                   evidence: match,
-                  expected: `REQ range should end at ${lastId}`,
+                  expected: `REQ range should end at ${lastId}; also manually update prose REQ counts (AUTOGEN-uncovered natural sentences, e.g. docs/README.md 「現行要件はN件である」) to the new count`,
                   route: "intake",
                 },
               ),
@@ -4980,7 +4980,7 @@ function checkReqRangeStaleness(root: string): CheckResult[] {
             undefined,
             {
               evidence: countMatch[0],
-              expected: `${actualCount} active REQs`,
+              expected: `${actualCount} active REQs; also manually update prose REQ counts (AUTOGEN-uncovered natural sentences, e.g. docs/README.md 「現行要件はN件である」) to ${actualCount}`,
               route: "intake",
             },
           ),
