@@ -44,6 +44,7 @@ updated: 2026-09-29
 13. **ローカル版追跡Issueの labels 値域**: ローカル版 role: tracking の `labels` は kind 4値（`problem`、`idea`、`task`、`risk`）からちょうど 1 つを持つ（機械検証）。追加ラベルは許容しない（role ごとの値域検証の実効性のため）
 14. **Comment 更新・削除の利用規律（新規）**: comment_update と comment_delete は Comment を管理する汎用操作として Tool に提供される。追跡Issueの検討経過コメントへの適用は、時系列履歴の整合を損なわない範囲（誤記修正、機密情報の除去、重複の統合、直前誤投稿の訂正等）に限る。適用可否の判断規律の正は agentdev-issue-tracking Capability Skill の操作知識が単一参照点として所有し、操作能力を利用する workflow はこれに従う。本項は検討経過コメントが正規の時系列履歴である要件（REQ-049-012）との整合境界を定める
 15. **issue_list の labels 引数の規律（物理写像の入力方向）**: issue_list 操作の labels 引数は、追跡Issue論理軸（role、kind、trackingState）の物理マッピング入力専用である。Case Issue は role: case と機械判定される（物理ラベルなしを含む）ため、Case 物理ラベル名（enhancement、bug、docs 等の通常ラベル）を labels 引数へ指定した絞り込みは Case Issue を 0 件帰着させるか無効となる。Case Issue の絞り込みは labels 引数を使用せず、search 引数（冪等キー語、REQ 番号、topic_slug 等の絞り込みキー）と state の組み合わせで行う。closed 等の広範 filter を search なしで実行すると、累積 population により完全一覧契約の安全上の上限へ到達し operation-failed となる。操作手順面の適用形は agentdev-issue-management の issue-operation-safety.md が定める
+16. **件名（title）の書式**: 件名の文字列書式（役割別接頭辞・主題原則）の正は workflows/issue-title-policy Design が単一参照点として所有する。本 Design は件名を論理スキーマ項目として保持し、書式を複製して定義しない
 
 ## v4 責務分類
 
