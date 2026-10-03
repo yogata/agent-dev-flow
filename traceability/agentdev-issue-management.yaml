@@ -7,11 +7,13 @@ implementation:
     - REQ-092-003
     - REQ-092-004
     - REQ-093-001
+    - REQ-093-004
     - REQ-095-001
     - REQ-095-002
 verification:
   src/common/skills/agentdev-issue-management/references/issue-operation-safety.md:
     - REQ-049-020
     - REQ-093-001
+    - REQ-093-004
     - REQ-095-001
     - REQ-095-002
