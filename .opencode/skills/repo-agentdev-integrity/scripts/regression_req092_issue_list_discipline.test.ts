@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-092-001, REQ-092-002, REQ-092-003, REQ-092-004
+// ADF-COVERS(verification): REQ-092-001, REQ-092-002, REQ-092-003, REQ-092-004, REQ-092-005
 import { describe, expect, it } from "bun:test";
 import { readFileSync } from "fs";
 import { join } from "path";
@@ -52,5 +52,17 @@ describe("regression_req092: issue_list 運用規律の文書整備", () => {
     expect(safetyDoc).toContain("state: open 限定の適用境界");
     expect(safetyDoc).toContain("冪等検出（重複生成の防止）を目的とする検索に限定");
     expect(safetyDoc).toContain("参照後続検索");
+  });
+
+  it("REQ-092-005: server-side search 偽陰性の呼出側規律（トークン正規化不一致・空配列不存在証拠禁止・unfiltered fallback）が存在する", () => {
+    expect(safetyDoc).toContain("server-side search の偽陰性に対する呼出側規律");
+    expect(safetyDoc).toContain(
+      "ハイフン入り識別子等のトークン正規化不一致による偽陰性の可能性を考慮する",
+    );
+    expect(safetyDoc).toContain("ハイフンを区切りとしたトークンへ分割された正規化形で解釈される");
+    expect(safetyDoc).toContain("空配列成功応答は不存在の証拠としない");
+    expect(safetyDoc).toContain("対象の不存在を保証しない");
+    expect(safetyDoc).toContain("unfiltered fallback（フィルタを外した一覧取得での再確認）");
+    expect(safetyDoc).toContain("フィルタを外した一覧取得での再確認を行う");
   });
 });
