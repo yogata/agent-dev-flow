@@ -214,3 +214,19 @@
 - 内容: check の duplicate-inconsistencies は「同一 artifact パス × role」単位で複数 sidecar 間の配置重複を検出し、対応する要件行 ID が相違していても fail になる（Case #3360 実測: case-auto.md × implementation が agentdev-workflow-case-auto.yaml と japanese-prose-correction.yaml の双方に存在し、REQ ID 相違にもかかわらず検出された。agentdev-workflow-case-auto.yaml 側の case-auto.md エントリ撤去により同実装内で解消）
 - 学び: sidecar 間での対応関係の移動・分離は、同一パス × role の単一情報源性を保って行う必要がある。REQ-012-058 の事前突合手順（パス×role 単位）はこの実測性格と一致する
 - 発見元: PR #3382 Findings/learning（Case #3360・backlog-pool-20261003・OU-016）
+
+## 2026-10-03: 合意入力時点の pre-existing fail は case-run 実行時点で解消済みの可能性がある（現行 HEAD での再実測を期待値修正の前提にする）
+
+- 問題クラス: workflow deviation（合意済み入力の陳腐化・期待値修正対象の不存在）
+- 発生工程: case-run RA-011（Case #3342・OU-013・backlog-pool-20261003）
+- 内容: Root Case #3342 合意入力（AG-014）時点で観測された textlint guard テスト 2 件の pre-existing fail は、現行 main HEAD（e642dfcf）の依存生成済み環境で 130 pass / 0 fail を実測し存在しない（worktree・main root 実体の両方で実測）。期待値修正の実施対象なし。解消を担った並行 Case の merge は本実測からは特定していない
+- 学び: 合意入力に記録された pre-existing fail は、実行時点の現行 HEAD で依存生成済み環境を再実測してから期待値修正の要否を判断する。解消済みの場合は Findings へ「実施対象なし」を記録し、修正を実行しない
+- 発見元: PR #3383 Findings/learning（Case #3342・backlog-pool-20261003・OU-013）
+
+## 2026-10-03: spawnSync 型 timeout 境界の環境変動が suite fail 由来分類を複雑化させる
+
+- 問題クラス: 環境依存（timeout 境界の変動・既知問題の影響範囲確認）
+- 発生工程: case-run RA-011 full integrity suite 実測（Case #3342・OU-013・backlog-pool-20261003）
+- 内容: IR-055×2・NG21 N16×1 が単独 suite 内でも 15000ms timeout で fail（15047〜15266ms 実測）。RA-012（#3355）の timeout 引上げ修正対象として既に管理されているが、timeout 境界の環境変動が suite の fail 由来分類を複雑化させる
+- 学び: spawnSync 型回帰テストの timeout 設定を変更する Case は、check_integrity.test.ts 内 timeout 値（15000ms）も影響範囲に含まれているかの確認を推奨（RA-012・#3355 の影響範囲確認事項）
+- 発見元: PR #3383 Findings/learning（Case #3342・backlog-pool-20261003・OU-013）
