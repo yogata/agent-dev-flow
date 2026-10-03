@@ -436,9 +436,31 @@ describe("簡体字検出（simplified-chinese, RU-0144 signal, Case #3166 RA-00
     );
   });
 
+  test("detects 项 in the Japanese corpus (Case #3243, RU-20261003-11)", () => {
+    withFixture(
+      { [SKILL]: "# タイトル\n\n項目一覧を出力する。项目が混入。\n" },
+      (root) => {
+        const findings = findingsOf(checkContentCorruption(root), "simplified-chinese");
+        expect(findings.length).toBe(1);
+        expect(findings[0].matched).toBe("\u9879");
+        expect(findings[0].description).toContain("U+9879");
+        expect(findings[0].description).toContain("項");
+      },
+    );
+  });
+
   test("does not flag legitimate Japanese glyphs (実行/状態/意味)", () => {
     withFixture(
       { [SKILL]: "# タイトル\n\n検証を実行する。実行と状態と意味は正当。\n" },
+      (root) => {
+        expect(findingsOf(checkContentCorruption(root), "simplified-chinese").length).toBe(0);
+      },
+    );
+  });
+
+  test("does not flag the legitimate Japanese glyph 項 (U+9805)", () => {
+    withFixture(
+      { [SKILL]: "# タイトル\n\n項目一覧を出力する。すべての項は正当な字形。\n" },
       (root) => {
         expect(findingsOf(checkContentCorruption(root), "simplified-chinese").length).toBe(0);
       },
