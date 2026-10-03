@@ -479,3 +479,35 @@
 - **想定反映先**: learning-promote での評価。Epic 追跡テーブル等の構造化データ操作スクリプト実装手順への横展開候補
 - **関連**: Case #3391・PR #3406（F-2 修正記録）・agentdev-epic-tracker tracking-table.ts
 - **タグ**: `#regex-replacement` `#table-format` `#column-position` `#regression-test`
+
+## 2026-10-04: bash heredoc 経由のスクリプト書込みはバックスラッシュが転送層で消費される（バックスラッシュなし実装で回避）
+
+- **問題事象**: case-open STEP-4 の artifact_actions 一括適用のため、Write ツールで workspace 外 temp へ JS スクリプトを書込もうとすると書込み guard（fail-closed）で block され、bash heredoc（quoted 'EOF'）で temp へ書込んだところ、JS 正規表現リテラルのバックスラッシュ（`\d`、`\\`、`\s`）が転送層で消費され SyntaxError が 2 回発生した。quoted heredoc でもバックスラッシュは保護されない
+- **発生局面**: case-open STEP-4 artifact_actions 適用スクリプト作成（Root Case #3407・Definition PR #3408）
+- **検知方法**: node 実行時の SyntaxError（Invalid regular expression / Unmatched ')'）で破損位置が特定された
+- **根本原因**: harness の bash コマンド転送層が heredoc 内容のバックスラッシュをエスケープ解釈して除去する。shell エスケープではなく転送層の処理のため quoted heredoc でも防げない
+- **自律対応内容**: 正規表現とエスケープシーケンスを一切使わない純文字列処理実装（String.fromCharCode(13)、文字クラス内バックスラッシュなし正規表現、行配列走査による見出し発見）へ書き直し、dry-run 検証後に適用して 75 actions 全件成功
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（worktree 操作の書込み guard 指針は維持。temp 書込みは pre-approved dir への bash 標準手段）
+- **横展開観点**: heredoc でスクリプト・設定ファイルを書込む全工程（検査スクリプト・一時ツール作成）で同様の破損が生じ得る。バックスラッシュを含む内容は heredoc に書かない
+- **再発条件**: bash heredoc 経由でバックスラッシュを含むファイル内容を書込む場合
+- **予防策候補**: heredoc 書込み対象はバックスラッシュフリー実装にする。または base64 等の中間エンコード経由で転送する
+- **想定反映先**: learning-promote での評価。worktree-operations.md「shell inline・heredoc に起因するコンテンツ破損の回避」への追補候補
+- **関連**: Root Case #3407・Definition PR #3408、docs/knowledge/windows-git-bash-inline-content-corruption.md（同系知識）
+- **タグ**: `#heredoc` `#backslash` `#script-write` `#content-corruption`
+
+## 2026-10-04: check_integrity は既存 REQ 作成 commit の `sha^:path` 参照で git fatal を stderr へ出すが JSON 出力は有効（stderr 分離取得が必要）
+
+- **問題事象**: case-open STEP-4 の commit 後 checker 実測で `bun check_integrity.ts --json 2>&1` を実行すると、REQ-088/094/095 の作成 commit（a098b0f1 等）に対する `fatal: path ... exists on disk, but not in '<sha>^'` が stderr に複数行出力され、stdout JSON と結合して JSON パースが失敗した。2>&1 をやめて分離取得すると同 fatal が出続けても checker は exit 1 で有効な JSON を返し、NG 計上（summary）は正常に読めた
+- **発生局面**: case-open STEP-4 検査期待値の commit 後実測（Root Case #3407・Definition PR #3408）
+- **検知方法**: JSON パースエラー（Unexpected token 't'、fatal メッセージが先頭に混入）
+- **根本原因**: checker 内部の REQ 履歴 diff 取得が REQ 新規作成 commit の親（`sha^`）を参照し、git が fatal を stderr へ出す。checker 自体は続行して JSON を stdout へ出力する。`2>&1` による結合が原因
+- **自律対応内容**: stderr を別ファイルへ退避する分離取得へ切替し、fatal は環境条件の出力として記録しつつ JSON 実測値を正常取得した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（checker 終了コード・JSON 契約は現行どおり。観測方法の誤り）
+- **横展開観点**: check_integrity の実測を JSON で取得する全工程（case-open/case-run/case-close・IR-055 実測）で同様の stdout 汚染が生じ得る。REQ 新規作成直後の repo では特に発生しやすい
+- **再発条件**: REQ 作成 commit の親参照が fatal になる状態で `2>&1` により checker 出力を結合取得する場合
+- **予防策候補**: checker JSON 実測手順は stderr 分離取得（標準出力をファイル退避・stderr は別ファイルまたは /dev/null）を標準とする注記の追補候補（intake 候補としても成立）
+- **想定反映先**: learning-promote での評価。case-open references/definition-pr-and-idempotency.md の checker 実測手順注記候補
+- **関連**: Root Case #3407・Definition PR #3408、check_integrity.ts（REQ freshness 系検査）
+- **タグ**: `#check-integrity` `#stderr` `#json-parsing` `#checker-observation`
