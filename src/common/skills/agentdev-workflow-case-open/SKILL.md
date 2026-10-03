@@ -87,7 +87,7 @@ case-open は、上流工程（req-define）で確定した対象要件を実行
 ## 共通制約
 
 - **draft-data 入力**: 本スキルは構造化 `draft-data` を入力として読み取る。機能要件、非機能要件、制約、対象外、受け入れ条件は新規に作成せず合意済み入力を反映する。`conflict_resolutions` に記録済みの衝突は再確認しない
-- **Definition Package の非本文化**: Definition Package を独立した Issue 本文物項目として生成しない（REQ-030-003）。Root Case への関連付けと所在は canonical 成果物関係（Definition PR、case-ready の canonical 再取得経路）から相関する
+- **Definition Package の非本文化**: Definition Package を独立した Issue 本文物項目として生成しない（Issue Execution Contract REQ「Definition Package を独立した Issue 本文物項目として生成しない」条項。case-open 実行契約 REQ）。Root Case への関連付けと所在は canonical 成果物関係（Definition PR、case-ready の canonical 再取得経路）から相関する
 - **Root Case 状態**: Root Case 確立後の状態は open とし、実装開始を許可しない。ready への遷移は case-ready が実行する
 - **Definition PR**: canonical Definition に実変更がある場合のみ、Case 単位で 1 件の Definition PR を作成する。実変更判定不能時は作成せず停止する。冪等キーは case-open / case-ready Design に従う
 - **トレーサビリティポリシー追随確認**: REQ 行追加を伴う Definition Package 生成時は、トレーサビリティポリシー（検証対応を任意とする要件行の明示登録）更新の追随要否を工程上明示し、必要な policy エントリ追加を Definition Package の構成要素として含める。policy 編集は当該要件行の変更と同一の Definition 変更として扱い、Definition PR 経由以外の適用経路を取らない（対象要件行、STEP-3）

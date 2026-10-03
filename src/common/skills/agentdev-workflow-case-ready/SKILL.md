@@ -104,7 +104,7 @@ case-ready はトレーサビリティ完全性ゲートで、対象要件行の
 - **execution contract 投影**: 機能要件、非機能要件、制約、対象外、受け入れ条件は新規作成せず合意済み Definition を投影する。runtime-only 判断（worktree 状態、staleness、実 diff、実装結果、test 実行結果）は事前確定せず case-run の安全検査として維持する
 - **Standard / Epic 確定**: 連結成分（必須依存のみをエッジ）と依存強度、Epic サイズ、機能的一貫性の3軸で自律生成する。単独根は Epic 化せず Standard flow とする。無関係な operation_unit 群を単一 Epic へ機械的に集約しない
 - **Decision 受理の冪等**: 再実行時、既に accepted へ遷移済みの Decision に対して重複する状態遷移や承認記録を生成しない
-- **realization_actions の投影（REQ-017-017）**: draft-data の realization_actions は、Root Case 本文の実現方針（条件付き章。再判断不可の合意済み事項のみを記載し、該当がない場合は章を常設しない）と完了条件の検証方法・合格条件へ投影する。realization_actions の内部属性一式（concern、responsibility 等の構造化一覧）は転記せず、合意済み内容を本文の該当章へ分布させる。case-ready 成功後は case-run が Issue 本文だけで変更責務、変更意図、検証方針を取得できる
+- **realization_actions の投影（Issue Execution Contract REQ「realization_actions の投影」条項）**: draft-data の realization_actions は、Root Case 本文の実現方針（条件付き章。再判断不可の合意済み事項のみを記載し、該当がない場合は章を常設しない）と完了条件の検証方法・合格条件へ投影する。realization_actions の内部属性一式（concern、responsibility 等の構造化一覧）は転記せず、合意済み内容を本文の該当章へ分布させる。case-ready 成功後は case-run が Issue 本文だけで変更責務、変更意図、検証方針を取得できる
 - **本文 verbatim**: Root Case 本文、Issue 本文は Custom Tool `agentdev_gh` の操作引数としてそのまま渡す（文字コード・一時ファイルの実装詳細は Tool 内部）（`POL-gh-io-delegation`）
 - **Issue 本文のファイル経由扱い**: 長文本文は一時ファイル経由で構成し、Markdown 行構造（LF、セクション間空行、インデント）を保持する
 
