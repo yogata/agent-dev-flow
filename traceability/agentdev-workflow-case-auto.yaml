@@ -15,6 +15,7 @@ implementation:
     - REQ-034-021
     - REQ-101-008
     - REQ-101-011
+    - REQ-101-012
   src/common/skills/agentdev-workflow-case-auto/references/conflict-resolution-and-reporting.md:
     - REQ-034-021
     - REQ-094-001
@@ -41,5 +42,6 @@ verification:
     - REQ-034-021
     - REQ-101-008
     - REQ-101-011
+    - REQ-101-012
   .opencode/skills/repo-agentdev-integrity/scripts/agreement_change_acknowledgment.test.ts:
     - REQ-101-009

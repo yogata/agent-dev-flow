@@ -1,6 +1,6 @@
 ---
 name: agentdev-epic-tracker
-description: "Updates parent Epic Issue status tracking tables (case-close single-writer) and reflects coordination progress per record triggers under the per-Epic exclusive write gate. USE FOR: case-close Epic status writes (pending→completed/blocked/failed), coordination reflect writes per record trigger (start/handover/halt/resume/decision-change/completion), per-Epic serialization between closing and coordination writes, lost-update prevention via latest-fetch/merge/update, overall completion evaluation. DO NOT USE FOR: creating Epics, non-Epic Issues, general Issue operations."
+description: "Updates parent Epic Issue status tracking tables (case-close single-writer) and reflects coordination progress per record triggers under the per-Epic exclusive write gate. USE FOR: case-close Epic status writes (pending→completed/blocked/failed), coordination reflect writes per record trigger (start/handoff/hold/resume/decision_change/completion), per-Epic serialization between closing and coordination writes, lost-update prevention via latest-fetch/merge/update, overall completion evaluation. DO NOT USE FOR: creating Epics, non-Epic Issues, general Issue operations."
 ---
 
 # Epic 状態追跡（Epic Status Tracker）
@@ -56,10 +56,10 @@ Epic自動クローズ判定では `completed` を終了状態として扱う（
 | 記録契機 | 反映内容 |
 |---|---|
 | `start`（着手） | 当該子の集約エントリを進行状態 `running` で追加/更新（委譲要求と実着手を同一視しない） |
-| `handover`（引き渡し） | 残作業と受取役割（`next`、`owner`）を集約エントリへ反映 |
-| `halt`（停止） | 進行状態 `waiting` と再開条件（`reason`、`next`）を反映。工程終了を待たない |
+| `handoff`（引き渡し） | 残作業と受取役割（`next`、`owner`）を集約エントリへ反映 |
+| `hold`（停止） | 進行状態 `waiting` と再開条件（`reason`、`next`）を反映。工程終了を待たない |
 | `resume`（再開） | 進行状態 `running` へ復帰し、待機理由を解消 |
-| `decision-change`（判断変更） | 撤回対象と適用方針（`reason`、`next`）を反映 |
+| `decision_change`（判断変更） | 撤回対象と適用方針（`reason`、`next`）を反映 |
 | `completion`（完了） | 進行状態 `ended` と終了区分・判定根拠（`ended`、`basis`、`pr`）を反映。追跡テーブル行の終了状態書き込みは closing 書き込み（case-close）が行う |
 
 反映の様式:

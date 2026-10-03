@@ -2,9 +2,15 @@
 // per-Epic exclusive serialization, and lost-update prevention.
 //
 // The coordination write path (工程記録の取りまとめ) reflects child progress
-// per record trigger (start / handover / halt / resume / decision-change /
+// per record trigger (start / handoff / hold / resume / decision_change /
 // completion) into the Epic Issue body, serialized with the closing write
 // path (case-close) under the per-Epic single-writer contract.
+//
+// Record trigger identifiers are the single vocabulary shared with the
+// coordination comment path (record-comments.ts in agentdev-workflow-case-run
+// and the issue_comment_record_* templates). parseReflectLine rejects values
+// outside RECORD_TRIGGERS so that a vocabulary mismatch can never silently
+// drop an existing entry.
 //
 // Lost-update prevention contract: every write goes through
 // latest-fetch -> merge -> update. The merge functions in this module never
@@ -15,7 +21,7 @@
 // alter the rendered Epic body:
 //
 //   <!-- agentdev:epic-reflect begin -->
-//   <!-- reflect child=42 trigger=halt phase=case-run state=waiting reason="waiting for CI" next="retry" -->
+//   <!-- reflect child=42 trigger=hold phase=case-run state=waiting reason="waiting for CI" next="retry" -->
 //   <!-- reflect child=43 trigger=completion phase=case-run state=ended ended=completed pr=100 -->
 //   <!-- agentdev:epic-reflect end -->
 //
@@ -39,10 +45,10 @@ import {
 
 export const RECORD_TRIGGERS = [
   "start",
-  "handover",
-  "halt",
+  "handoff",
+  "hold",
   "resume",
-  "decision-change",
+  "decision_change",
   "completion",
 ] as const;
 
@@ -67,7 +73,7 @@ export interface ReflectEntry {
   state: ProgressState;
   /** Required when state is "ended". */
   endedKind?: EndedKind;
-  /** Required when state is "waiting" (halt). */
+  /** Required when state is "waiting" (hold). */
   waitingReason?: string;
   nextAction?: string;
   owner?: string;
@@ -166,6 +172,25 @@ export function parseReflectBlock(body: string): ReflectEntry[] {
 export interface ReflectApplyResult {
   body: string;
   applied: boolean;
+  /** Non-empty when the existing block contains reflect lines whose trigger or
+   * state is outside the vocabulary. The body is returned unchanged and the
+   * caller must not write it (the dropped lines would be a lost update). */
+  unparseableLines?: string[];
+}
+
+function collectUnparseableReflectLines(latestBody: string): string[] {
+  const lines = latestBody.split("\n");
+  const begin = lines.indexOf(REFLECT_BLOCK_BEGIN);
+  const end = lines.indexOf(REFLECT_BLOCK_END);
+  const unparseable: string[] = [];
+  if (begin === -1 || end === -1 || end < begin) return unparseable;
+  for (let i = begin + 1; i < end; i++) {
+    const line = lines[i] ?? "";
+    if (line.trim().startsWith("<!-- reflect ") && parseReflectLine(line) === null) {
+      unparseable.push(line);
+    }
+  }
+  return unparseable;
 }
 
 /**
@@ -180,6 +205,10 @@ export function applyReflectEntry(
   latestBody: string,
   entry: ReflectEntry,
 ): ReflectApplyResult {
+  const unparseableLines = collectUnparseableReflectLines(latestBody);
+  if (unparseableLines.length > 0) {
+    return { body: latestBody, applied: false, unparseableLines };
+  }
   const lines = latestBody.split("\n");
   const existing = parseReflectBlock(latestBody);
   const kept = existing.filter((e) => e.childIssue !== entry.childIssue);
