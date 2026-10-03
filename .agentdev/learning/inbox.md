@@ -254,3 +254,19 @@
 - 内容: worktree で `bun test ./.opencode/skills/repo-agentdev-integrity/scripts/` を実行すると、src/opencode-local/（ローカル版導入時の環境生成物・junction）が未伝播のため textlint_guard_project_config.test.ts の 2 fail と issue_tracking_list.test.ts の 1 error が再現する
 - 学び: main root で同一テストを実行して同結果を確認することで環境依存と由来分類できる（本 Case で実施済み。再発時の由来分類手順として参照可能）
 - 発見元: PR #3390 Findings / learning（Case #3388）
+
+## 2026-10-03: git push が credential helper（GCM）の対話待ちでハングする（push 限定で credential.helper を gh auth git-credential へ上書きして解消）
+
+- **問題事象**: case-open STEP-4 の head branch push（git push -u origin definition/issue-3391）が credential helper 起動（git credential-helper-selector get → GCM）後にプロンプトなしでハングし、90〜300 秒の timeout で 3 回失敗した。remote 照会（git ls-remote）と gh CLI 操作（agentdev_gh の issue/pr 操作）は正常に動作していた
+- **発生局面**: 実装（case-open STEP-4 head branch push。Case #3391・Definition PR #3392）
+- **検知方法**: bash 実行の timeout 超過。GIT_TRACE=1 GIT_TRACE_PACKET=1 の観察で credential helper 起動後に出力が停止することを確認
+- **根本原因**: credential.helper=manager（Git Credential Manager）がヘッドレス環境で対話 UI 待ちになり、GIT_TERMINAL_PROMPT=0・GCM_INTERACTIVE=never を環境変数で渡しても GCM 自体の待ちが解除されない
+- **自律対応内容**: push コマンド単位で `git -c credential.helper= -c "credential.helper=!gh auth git-credential" push ...` と上書きし、gh CLI の keyring トークン（gh auth status で github.com 認証済みを事前確認）で push に成功。push 出力で refspec（definition/issue-3391 -> definition/issue-3391）と upstream 設定を確認済み。恒久設定への変更は行っていない
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（definition-pr-and-idempotency の push 前段手順契約〔push 出力で refspec 確認〕は充足。GitHub I/O 正規経路（agentdev_gh）の迂回ではない。git push は bash 実行 Harness 依存の前段手順）
+- **横展開観点**: head branch push・capture 成果物の git 永続化 push 等の全 git push 経路（case-run・case-close・learning-capture・intake-pipeline）で同様のハングが生じ得る。gh auth git-credential への上書きは push 限定の回避手段であり、実行前に gh auth status で認証済みアカウントを確認する
+- **再発条件**: credential.helper=manager（GCM）が有効で、トークンが GCM 側に保存されていない・UI 表示不能なヘッドレス環境で git push する場合
+- **予防策候補**: ヘッドレス環境の workflow では push 失敗（timeout）時の再試行手順に credential.helper を gh auth git-credential へ上書きする方法を含める。恒久対応は環境設定（GCM へのトークン登録または credential.helper 変更）であり個々の Case では行わない
+- **想定反映先**: docs/knowledge/ 配下の Windows 環境 git 関連知識。必要なら agentdev-workflow-case-open reference「PR 作成前の head branch push」への contingency 追記
+- **関連**: Case #3391・Definition PR #3392、gh auth status、definition-pr-and-idempotency.md「PR 作成前の head branch push」
+- **タグ**: `#windows` `#git` `#credential` `#gh-cli` `#push-hang`
