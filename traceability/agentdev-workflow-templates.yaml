@@ -4,9 +4,39 @@ implementation:
     - REQ-100-001
     - REQ-100-005
     - REQ-100-008
+    - REQ-101-002
+    - REQ-101-003
+    - REQ-101-004
+  src/common/skills/agentdev-workflow-templates/templates/case-open/root-case.md:
+    - REQ-101-002
+    - REQ-101-003
+    - REQ-101-004
+  src/common/skills/agentdev-workflow-templates/templates/case-ready/root-case.md:
+    - REQ-101-002
+    - REQ-101-003
+    - REQ-101-004
+  src/common/skills/agentdev-workflow-templates/templates/issue_desc_bug.md:
+    - REQ-101-002
+    - REQ-101-003
+    - REQ-101-004
+  src/common/skills/agentdev-workflow-templates/templates/issue_desc_child.md:
+    - REQ-101-002
+    - REQ-101-003
+    - REQ-101-004
   src/common/skills/agentdev-workflow-templates/templates/issue_desc_epic.md:
     - REQ-100-004
+    - REQ-101-002
+    - REQ-101-003
+    - REQ-101-004
+  src/common/skills/agentdev-workflow-templates/templates/issue_desc_feature.md:
+    - REQ-101-002
+    - REQ-101-003
+    - REQ-101-004
 verification:
   src/common/skills/agentdev-workflow-templates/SKILL.md:
     - REQ-100-005
     - REQ-100-008
+  src/common/skills/agentdev-workflow-templates/tests/case-issue-records-sections.test.ts:
+    - REQ-101-002
+    - REQ-101-003
+    - REQ-101-004
