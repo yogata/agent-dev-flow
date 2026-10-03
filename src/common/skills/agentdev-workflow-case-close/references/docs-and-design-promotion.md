@@ -107,6 +107,8 @@ link profile（`.opencode/**` 配下の link projection 走査）は、worktree 
 QG-4 の full integrity suite 合格基準により検証スイート全体（bun test 全件）を実行する場合、bun test 実行形態契約に従う。
 3 cwd 分割実行、依存パッケージ前置、環境ラベルを含む正規形契約の本体は `agentdev-quality-gates/references/qg-4-final-acceptance.md` を参照。
 
+**full suite 実行の省略禁止**: STEP-3 では full integrity suite（bun test 全件）実行を省略しない。対象 Case が宣言的データ・config（extension yaml、plugin 追加対象設定、判断境界文言、配布物文言）を期待値に持つテストへ影響する変更を含む場合を含め、検証スイート全体の実行を個別 checker の部分実行で代替しない。
+
 - **実行コマンド**: `bun test ./.opencode/skills/<integrity-detector-skill>/scripts/`。`./` prefix 付きで対象ディレクトリを明示指定する（必須ステップ）
 - **timeout 明示指定**: bun test フル suite 全体実行を含む検証の実行指示は、実行 timeout を明示指定する。全体実行の実測所要時間は既定 timeout を超え得るため、**300〜600 秒の指定を標準**とする。timeout 未指定（既定値での打ち切り）で全体実行を打ち切った結果を fail 証跡として扱わない
 - **N/M 件数突合**: 実行結果の「Ran N tests across M files」の N/M 件数突合を実施する（必須ステップ）。直前実績と比較して件数が急減していないかの妥当性を検証する。固定値の期待値化は行わない

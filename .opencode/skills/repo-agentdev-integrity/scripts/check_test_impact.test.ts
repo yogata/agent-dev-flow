@@ -1,5 +1,6 @@
 // ADF-COVERS(verification): REQ-010-008
 // ADF-COVERS(verification): REQ-019-001, REQ-019-002
+// ADF-COVERS(verification): REQ-019-003
 /**
  * check_test_impact.test.ts — Test impact detection gate regression test.
  *
@@ -9,6 +10,8 @@
  *   - stale candidate detection: test references changed Design, test not in PR changes → finding
  *   - updated test suppression: test references changed Design, test in PR changes → no finding
  *   - REQ-ID reference detection: REQ-NNN reference triggers when REQ file changes
+ *   - declarative data reference detection (REQ-019-003): test references changed
+ *     declarative data / config, test not in PR changes → declarative_stale_candidates finding
  *   - silent-pass warning: Design changed but no test references → warning
  *   - CLI contract: --help, required flags, JSON output schema
  *
@@ -347,13 +350,105 @@ describe("check_test_impact.ts stale candidate detection (TS-004)", () => {
     expect(report).toHaveProperty("base_ref");
     expect(report).toHaveProperty("files_declared");
     expect(report).toHaveProperty("spec_changes");
+    expect(report).toHaveProperty("declarative_changes");
     expect(report).toHaveProperty("tests_scanned");
     expect(report).toHaveProperty("stale_candidates");
+    expect(report).toHaveProperty("declarative_stale_candidates");
     expect(report).toHaveProperty("warnings");
     expect(Array.isArray(report.spec_changes)).toBe(true);
+    expect(Array.isArray(report.declarative_changes)).toBe(true);
     expect(Array.isArray(report.stale_candidates)).toBe(true);
+    expect(Array.isArray(report.declarative_stale_candidates)).toBe(true);
     expect(Array.isArray(report.warnings)).toBe(true);
     expect(typeof report.tests_scanned).toBe("number");
+
+    execSync(`git checkout -q main`, { cwd: TEMP_ROOT });
+    execSync(`git branch -q -D ${branch}`, { cwd: TEMP_ROOT });
+  });
+});
+
+describe("check_test_impact.ts declarative data reference detection (REQ-019-003, TS-014)", () => {
+  it("detects stale test referencing changed extension yaml and not updated in same PR", () => {
+    // Setup: main に extension yaml（宣言的データ）と参照テストを用意 → branch で yaml のみ変更
+    execSync(`git checkout -q main`, { cwd: TEMP_ROOT });
+    writeFile(
+      ".agentdev/extensions/skills/agentdev-demo.yaml",
+      "name: demo\nversion: 1\n",
+    );
+    writeFile(
+      "src/scripts/demo-ext.test.ts",
+      [
+        'import { describe, it, expect } from "bun:test";',
+        "// .agentdev/extensions/skills/agentdev-demo.yaml を期待値に持つテスト",
+        'describe("demo-ext", () => { it("ok", () => { expect(1).toBe(1); }); });',
+        "",
+      ].join("\n"),
+    );
+    commitAll("add demo extension yaml and its test on main");
+    const branch = "test-declarative-detection";
+    execSync(`git checkout -q -b ${branch}`, { cwd: TEMP_ROOT });
+    // branch 側で宣言的データのみ変更（test は更新しない）
+    writeFile(
+      ".agentdev/extensions/skills/agentdev-demo.yaml",
+      "name: demo\nversion: 2\n",
+    );
+    commitAll("revise demo extension yaml only");
+
+    const r = runScript(TEMP_ROOT, ["--base-ref", "main", "--json"]);
+    expect(r.exitCode).toBe(0);
+    const report = JSON.parse(r.stdout);
+    // 宣言的データ変更は declarative_changes へ分類（spec_changes の既存契約を維持）
+    expect(report.declarative_changes).toContain(
+      ".agentdev/extensions/skills/agentdev-demo.yaml",
+    );
+    expect(report.spec_changes).not.toContain(
+      ".agentdev/extensions/skills/agentdev-demo.yaml",
+    );
+    // 参照テストは同一 PR で未変更 → 同期漏れ候補として検出
+    const stale = report.declarative_stale_candidates.find(
+      (f: any) => f.test_path === "src/scripts/demo-ext.test.ts",
+    );
+    expect(stale).toBeDefined();
+    expect(stale.reference_kind).toBe("full-path");
+    expect(stale.spec_path).toBe(".agentdev/extensions/skills/agentdev-demo.yaml");
+    // Design 契約の既存フィールドには混入しない
+    expect(
+      report.stale_candidates.find(
+        (f: any) => f.test_path === "src/scripts/demo-ext.test.ts",
+      ),
+    ).toBeUndefined();
+
+    execSync(`git checkout -q main`, { cwd: TEMP_ROOT });
+    execSync(`git branch -q -D ${branch}`, { cwd: TEMP_ROOT });
+  });
+
+  it("suppresses declarative finding when referencing test is updated in same PR", () => {
+    const branch = "test-declarative-suppression";
+    execSync(`git checkout -q -b ${branch}`, { cwd: TEMP_ROOT });
+    // 宣言的データと参照テストを同 PR で変更
+    writeFile(
+      ".agentdev/extensions/skills/agentdev-updated.yaml",
+      "name: updated\nversion: 2\n",
+    );
+    writeFile(
+      "src/scripts/updated-ext.test.ts",
+      [
+        'import { describe, it, expect } from "bun:test";',
+        "// .agentdev/extensions/skills/agentdev-updated.yaml 参照",
+        'describe("updated-ext", () => { it("ok", () => {}); });',
+        "",
+      ].join("\n"),
+    );
+    commitAll("update extension yaml and referencing test in same PR");
+
+    const r = runScript(TEMP_ROOT, ["--base-ref", "main", "--json"]);
+    expect(r.exitCode).toBe(0);
+    const report = JSON.parse(r.stdout);
+    // 参照テストは同一 PR で変更済みのため declarative_stale_candidates に含まれない
+    const stale = report.declarative_stale_candidates.find(
+      (f: any) => f.test_path === "src/scripts/updated-ext.test.ts",
+    );
+    expect(stale).toBeUndefined();
 
     execSync(`git checkout -q main`, { cwd: TEMP_ROOT });
     execSync(`git branch -q -D ${branch}`, { cwd: TEMP_ROOT });
