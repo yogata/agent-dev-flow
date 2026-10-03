@@ -13,6 +13,19 @@ implementation:
     - REQ-095-002
     - REQ-100-001
     - REQ-100-006
+    - REQ-101-011
+    - REQ-101-013
+  src/common/skills/agentdev-issue-management/scripts/lib/reconcile.ts:
+    - REQ-101-011
+    - REQ-101-013
+  src/common/skills/agentdev-issue-management/scripts/lib/runner.ts:
+    - REQ-101-011
+  src/common/skills/agentdev-issue-management/scripts/src/reconcile.ts:
+    - REQ-101-011
+    - REQ-101-013
+  src/common/skills/agentdev-issue-management/SKILL.md:
+    - REQ-101-011
+    - REQ-101-013
 verification:
   src/common/skills/agentdev-issue-management/references/issue-operation-safety.md:
     - REQ-049-020
@@ -22,3 +35,6 @@ verification:
     - REQ-095-002
     - REQ-100-001
     - REQ-100-006
+  src/common/skills/agentdev-issue-management/scripts/tests/reconcile.test.ts:
+    - REQ-101-011
+    - REQ-101-013

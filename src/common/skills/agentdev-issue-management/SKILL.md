@@ -1,6 +1,6 @@
 ---
 name: agentdev-issue-management
-description: GitHub Issue の作成・更新・リンク・確認の安全手順を提供する運用 skill（手続きのみを提供し判断基準は持たない）。USE FOR: Issue 操作の安全手順、操作後の VERIFY 手順、Parent/Child Issue 間リンク確認（Parent: #N パターン検証）、Epic ステータス追跡テーブル更新の安全手順、Issue 更新時の前後内容比較。DO NOT USE FOR: Epic/child Issue の作成順序判断、Issue 本文テンプレート選定、gh CLI のエンコーディング対策。
+description: GitHub Issue の作成・更新・リンク・確認の安全手順を提供する運用 skill（手続きのみを提供し判断基準は持たない）。USE FOR: Issue 操作の安全手順、操作後の VERIFY 手順、Parent/Child Issue 間リンク確認（Parent: #N パターン検証）、Epic ステータス追跡テーブル更新の安全手順、Issue 更新時の前後内容比較、取りまとめ反映の部分成功区別・読み戻し再試行・重複防止（更新失敗回復の実行経路組み込み）。DO NOT USE FOR: Epic/child Issue の作成順序判断、Issue 本文テンプレート選定、gh CLI のエンコーディング対策。
 ---
 
 # `agentdev-issue-management`
@@ -13,14 +13,14 @@ Custom Tool `agentdev_gh`（書き込みは Tool 内部の読み戻し検証で�
 | コマンド | 本スキルの利用目的 |
 |----------|-------------------|
 | `case-open` | Issue 作成後の VERIFY、Parent/Child リンク確認、Epic ステータス追跡テーブル更新の安全手順 |
-| `case-close` | Issue 本文更新時の前後内容比較、コメント追記後の VERIFY、Parent Issue 本文更新の安全手順 |
+| `case-close` | Issue 本文更新時の前後内容比較、コメント追記後の VERIFY、Parent Issue 本文更新の安全手順、取りまとめ反映の部分成功区別・読み戻し再試行 |
 | `case-revise` | 再合意済み Definition 変更の Issue 関連付け、コメント追加後の通常検証、前後内容比較 |
 
 ## 参考文献
 
 | トピック | 参照先 |
 |----------|--------|
-| Issue 操作の安全性手順（標準呼出形式、作成後確認、Parent/Child リンク確認、Epic テーブル更新、前後内容比較、VERIFY 連携、禁止事項） | `references/issue-operation-safety.md` |
+| Issue 操作の安全性手順（標準呼出形式、作成後確認、Parent/Child リンク確認、Epic テーブル更新、前後内容比較、VERIFY 連携、禁止事項、取りまとめ反映の部分成功区別と読み戻し再試行） | `references/issue-operation-safety.md` |
 
 ## 動作指針
 
@@ -28,6 +28,8 @@ Custom Tool `agentdev_gh`（書き込みは Tool 内部の読み戻し検証で�
 - Issue 操作特有の安全性要件（リンク確認、テーブル整合性、前後比較、プレースホルダー残存検証）を本スキルが補完する。
 - issue_create、issue_update、comment_create の呼出は「`agentdev_gh` 標準呼出形式」（本文・タイトルの二重引用符回避、labels 引数の明示）に従う。
 - 各書き込み操作（作成、更新、コメント追加）ごとに個別に VERIFY を実行すること（一括検証は不可）。
+- 取りまとめ経路での複数対象の反映（本文・コメント・Epic テーブル等）では、部分成功（コメントのみ成功、本文のみ成功、Epic のみ未反映）を成功扱いにしない。操作単位の冪等キーを伴う反映計画を作成し、読み戻し突合で不足分を特定してから再試行し、反映済みの対象を再書込みしない（「取りまとめ反映の部分成功区別と読み戻し再試行」節。突合の決定的実装は `scripts/` 配下の reconcile CLI が所有する）。
+- 更新回復用のローカル記録（未反映分の保持）は未反映内容と識別情報に限定し、第二の作業定義・恒久状態源として扱わない（正本要件は Case Issue 工程記録モデルの REQ 文書。要件行レベルの対応は repository top-level の traceability/ sidecar が正）。
 
 ## Issue 本文の記載粒度ガイドライン
 
@@ -45,6 +47,7 @@ Issue 本文では、変動しやすい実測値ではなく、作業対象を�
 
 - Custom Tool `agentdev_gh`（GitHub I/O 操作。エンコーディング、一時ファイル運用、読み戻し検証は Tool 内部。検証失敗時のリトライ判断は呼び出し側。）
 - `agentdev-workflow-templates`（Issue 本文の構造、テンプレート（`issue_desc_feature.md`, `issue_desc_bug.md`, `issue_desc_epic.md`, `issue_desc_child.md`）、コメントテンプレート、完了報告テンプレート、リポジトリ参照リンク規約。）
+- `scripts/`（取りまとめ反映の読み戻し突合・重複防止・回復記録生成の決定的実装。reflect-reconcile CLI。純関数 + argv 入力 + stdout JSON 出力）
 
 ## 禁止事項
 
