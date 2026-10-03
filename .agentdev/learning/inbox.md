@@ -230,3 +230,27 @@
 - 内容: IR-055×2・NG21 N16×1 が単独 suite 内でも 15000ms timeout で fail（15047〜15266ms 実測）。RA-012（#3355）の timeout 引上げ修正対象として既に管理されているが、timeout 境界の環境変動が suite の fail 由来分類を複雑化させる
 - 学び: spawnSync 型回帰テストの timeout 設定を変更する Case は、check_integrity.test.ts 内 timeout 値（15000ms）も影響範囲に含まれているかの確認を推奨（RA-012・#3355 の影響範囲確認事項）
 - 発見元: PR #3383 Findings/learning（Case #3342・backlog-pool-20261003・OU-013）
+
+## 2026-10-03: yomiyasu lint 実行経路は Windows 環境で extension rule の標準入力規定と破損回避指針が緊張する（ファイル引数＋検査後削除で代替実施）
+
+- **問題事象**: case-open STEP-4 の REQ-098 推敲 lint で、project extension rule「yomiyasu-application-before-write」（`.agentdev/extensions/skills/agentdev-workflow-case-open.yaml`）は「同梱 lint を標準入力により実行し、検査専用の本文ファイルを新規保存しない」を規定する。一方、Windows + bash 環境では日本語本文を標準入力（heredoc・inline）へ渡すと escape 解釈・heredoc 打ち切りによるコンテンツ破損の既知リスクがあり、guard 指針（worktree-operations.md「shell inline・heredoc に起因するコンテンツ破損の回避」）はファイルベース伝達を標準手段としており、両規定が緊張する
+- **発生局面**: case-open（Root Case 本文・Definition PR 本文の推敲 lint。Case #3388・Definition PR #3389）
+- **検知方法**: case-open STEP-4 実行中、extension rules 読込時に標準入力実行規定と guard 指針の矛盾に気づいた（手動確認）
+- **根本原因**: extension rule が POSIX 標準入力前提で記述され、Windows 環境の shell inline 破損回避指針との整合が未定義である
+- **自律対応内容**: 破損リスクのある標準入力実行を避け、guard 安全な経路（Write ツールによる検査専用本文ファイルの新規作成〔.agentdev/integrity/reports/ 配下・非永続領域〕＋ lint のファイル引数実行＋検査後削除）で Root Case 本文と PR 本文の lint を実行した。指摘は保持条件該当（excess_list・unnatural_halfwidth_space）のみで修正試行 0 回。入力ファイルは検査後に削除し残留なしを確認済み
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（REQ-098 の推敲・lint 確認義務は充足。extension rule 自体の改訂は未実施）
+- **横展開観点**: Windows 環境で yomiyasu lint を実行する他工程（case-run の PR 本文・case-close の対応記録等）も同一の緊張に直面し得る
+- **再発条件**: Windows + bash 環境で extension rule の標準入力実行規定に従い、heredoc 等で日本語本文を標準入力へ渡そうとした場合
+- **予防策候補**: extension rule へ Windows 環境の代替経路（ファイルベース伝達＋検査後削除・非永続領域）を明記する。または worktree 指針の標準手段（(a) 一時スクリプトファイル経由）から extension rule を参照させ、破損回避指針を優先する整合を定める
+- **想定反映先**: `.agentdev/extensions/skills/agentdev-workflow-case-open.yaml`（rules）。該当 rule を持つ workflow extension 群の横断確認
+- **関連**: Case #3388・Definition PR #3389、agentdev-git-worktree reference「shell inline・heredoc に起因するコンテンツ破損の回避」、`docs/knowledge/windows-git-bash-inline-content-corruption.md`
+- **タグ**: `#windows` `#encoding` `#lint実行経路` `#extension-rules`
+
+## 2026-10-03: worktree で bun test 分割1 実行時の src/opencode-local 未伝播起因 fail は main root での同結果実行で由来分類できる
+
+- 問題クラス: 環境依存（worktree の junction 未伝播・fail 由来分類手順）
+- 発生工程: case-run bun test 分割1（Case #3388・PR #3390・worktree root cwd）
+- 内容: worktree で `bun test ./.opencode/skills/repo-agentdev-integrity/scripts/` を実行すると、src/opencode-local/（ローカル版導入時の環境生成物・junction）が未伝播のため textlint_guard_project_config.test.ts の 2 fail と issue_tracking_list.test.ts の 1 error が再現する
+- 学び: main root で同一テストを実行して同結果を確認することで環境依存と由来分類できる（本 Case で実施済み。再発時の由来分類手順として参照可能）
+- 発見元: PR #3390 Findings / learning（Case #3388）
