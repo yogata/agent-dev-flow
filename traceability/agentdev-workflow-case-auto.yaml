@@ -8,6 +8,22 @@ implementation:
     - REQ-094-006
     - REQ-094-010
     - REQ-094-011
+    - REQ-101-008
+    - REQ-101-011
+  src/common/skills/agentdev-workflow-case-auto/scripts/src/records-report.ts:
+    - REQ-034-021
+    - REQ-101-008
+    - REQ-101-011
+  src/common/skills/agentdev-workflow-case-auto/references/conflict-resolution-and-reporting.md:
+    - REQ-034-021
+    - REQ-094-001
+    - REQ-094-002
+    - REQ-094-004
+    - REQ-094-006
+    - REQ-094-010
+    - REQ-094-011
+    - REQ-101-008
+    - REQ-101-011
   src/common/skills/agentdev-workflow-case-auto/references/input-resolution-and-orchestration.md:
     - REQ-030-017
     - REQ-061-039
@@ -18,3 +34,8 @@ implementation:
     - REQ-096-005
     - REQ-096-012
     - REQ-096-015
+verification:
+  src/common/skills/agentdev-workflow-case-auto/scripts/tests/records-report.test.ts:
+    - REQ-034-021
+    - REQ-101-008
+    - REQ-101-011
