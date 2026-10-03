@@ -25,7 +25,7 @@
 # （docs/designs/local/third-party-skill-management.md）。
 
 schema_version: 1
-generated_at: 2026-09-15
+generated_at: 2026-10-03
 
 skills:
   - agentdev-adversarial-review
@@ -54,6 +54,7 @@ skills:
   - agentdev-req-file-manager
   - agentdev-req-structure-diagnostics
   - agentdev-skill-authoring
+  - agentdev-skill-resolution
   - agentdev-traceability
   - agentdev-workflow-backlog-auto
   - agentdev-workflow-backlog-review
@@ -78,4 +79,8 @@ skills:
   - agentdev-workflow-templates
   - agentdev-workflow-third-party-sync
 
-third_party_skills: []
+third_party_skills:
+  - explainer
+  - explainer-book
+  - first-reader
+  - yomiyasu

@@ -263,6 +263,7 @@ Report は Design インデックスの管理対象外である（`designs/READM
 - [成果物・状態モデル](guides/artifacts-and-state.md)
 - [プロジェクトドキュメントと Design](guides/project-docs-and-specs.md)
 - [Consumer Project 導入](guides/consumer-project-setup.md)
+- [マルチホスト運用](guides/multi-host-operations.md)
 - [トラブルシューティング](guides/troubleshooting.md)
 - [Supervisor 環境向け opencode credential 供給ブリッジ導入](guides/supervisor-credential-bridge.md)
 - [用語集](guides/glossary.md)
