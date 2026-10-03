@@ -1,0 +1,14 @@
+{
+  "name": "agentdev-issue-management-scripts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Deterministic update reconciliation for the agentdev_gh call path: partial-success classification, read-back matching, idempotent-key duplicate prevention, and bounded recovery records. Pure functions, argv input, stdout JSON output.",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "@types/bun": "^1.3.0"
+  }
+}
