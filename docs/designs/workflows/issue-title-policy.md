@@ -1,6 +1,6 @@
 ---
 title: Issue タイトル記述規則（issue-title-policy）
-status: draft
+status: accepted
 created: 2026-10-03
 updated: 2026-10-03
 ---
