@@ -527,3 +527,53 @@
 - **想定反映先**: learning-promote での評価。req-define・case-open references の保存手順、agentdev_jev 観測永続化の手順注記候補
 - **関連**: Root Case #3407・PR #3408、.agentdev/README.md 状態表（drafts・jev-observations は git 管理対象）、REQ-061-040・REQ-090-006
 - **タグ**: `#untracked` `#form-zero` `#git-persistence` `#domain-state`
+
+---
+
+## 2026-10-04: 破壊的な構造様式変更では src テスト green のみならず integrity suite・scripts/self の pin 型テスト群が必ず追随漏れを生む
+
+- **問題事象**: bun test 分割①初回実行時、旧契約を検査するテストの期待値が 44 件 fail した。検査基盤（integrity suite・scripts/self）では「3点セット（baseline・除外定義・検査文言）」に加えて「配布物文言 pin 型テスト（配布物の規律文言を expect するテスト群）」が旧契約の正を pin しており、破壊的な構造様式変更では pin 型テスト群が追随漏れを生む
+- **発生局面**: case-run 分割①③ 実行（Root Case #3407・PR #3409）
+- **検知方法**: bun test 分割①の fail 由来分類（3点対照〔単独再実行・分岐点 main root 再現・baseline 差し替え不要〕）
+- **根本原因**: structure-migration-followup-checklist.md の 3点セット指針が pin 型テスト群を明示対象に含めていなかった
+- **自律対応内容**: 旧契約期待値テスト 42 件を新契約へ同一変更で更新し 0 件を確認（PR #3409 本文の検証差分に記録）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（検査基盤の期待値更新は同一変更の範囲内）
+- **横展開観点**: 構造様式変更の Case では、src テスト green のみで追随完了を判定せず、integrity suite・scripts/self の pin 型テスト群の追随を bun test 3 分割の全 green（当該変更起因 fail 0 件）で判定する。3点セット指針の pin 型テスト群への拡張が learning-promote の評価候補
+- **再発条件**: 配布物の規律文言・章構造・状態値等を expect する pin 型テストが存在する状態で、当該文言・構造を破壊的に変更する Case を実行する場合
+- **予防策候補**: structure-migration-followup-checklist.md への「pin 型テスト群の期待値更新」追補候補（intake 候補としても成立）
+- **想定反映先**: learning-promote での評価。docs/knowledge/structure-migration-followup-checklist.md の指針拡張候補
+- **関連**: Root Case #3407・PR #3409（bun test 分割①初回 44 fail → 修正後 0・当該変更起因）・structure-migration-followup-checklist.md
+- **タグ**: `#pin-tests` `#structure-migration` `#integrity-suite` `#3-point-set`
+
+## 2026-10-04: 配布依存境界 最終 gate の concrete-id 検出は Design の REQ 行 ID の配布物直書きを正確に検出し、節名参照への置換で feedback loop が完結する
+
+- **問題事象**: なし（機能した検出の記録）。配布依存境界 最終 gate の concrete-id 検出が「Design の REQ 行 ID（REQ-NNN-NNN 形式）を配布物本文へ直書きした」箇所を正確に検出した（初回 3 件）
+- **発生局面**: case-run 配布依存境界 最終 gate 実行（Root Case #3407・PR #3409）
+- **検知方法**: check_distribution_boundary.ts --profile source の concrete_id_hits
+- **根本原因**: （検出が正だった事例）配布物本文への REQ 行 ID 直書きは配布依存境界違反であり、節名参照（「〜REQ 条項」表記）への置換で解消すべき
+- **自律対応内容**: concrete ID 除去・節名参照置換で 3 件を解消し、違反 0 件を確認（commit 471fc59d）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（detector の検出契約は現行どおり。検出→修正の feedback loop が機能した事例の記録）
+- **横展開観点**: 配布物本文を書く工程（workflow skill の本文更新等）では REQ 行 ID の直書きを避け節名参照を使う。detector がこの規律を機械的に担保していることを確認できた
+- **再発条件**: 配布対象 skill/command の本文に REQ 行 ID を引用する場合
+- **予防策候補**: 配布物本文の執筆規約として「節名参照」を明示する注記候補（learning-promote 評価候補）
+- **想定反映先**: learning-promote での評価
+- **関連**: Root Case #3407・PR #3409・commit 471fc59d、check_distribution_boundary.ts（IR-059）
+- **タグ**: `#distribution-boundary` `#concrete-id` `#feedback-loop` `#ir-059`
+
+## 2026-10-04: main root での bun test は path 深さ依存テストの fail を観測する（worktree では green・main root では fail する逆転を含む）
+
+- **問題事象**: merge 後 main root での bun test 正規形再実行で、worktree 実行時には観測されなかった fail 2 種が出た。(1) process-conformance.test.ts（PR #3332 由来）が import.meta.dir から 8 段遡りの repoRoot 計算で main root（8 段）では ENOENT・.worktrees/<slug>（9 段）でのみ正しく解決し worktree では green。(2) skills_structure.test.ts の「projection-only placements」テストが main root の project-local skill 存在（explainer 等 5 件）で fail し、junction 未伝播の worktree では fail-open で pass
+- **発生局面**: case-close STEP-5 の merge 後 main root bun test 正規形（Root Case #3407・PR #3409）
+- **検知方法**: bun test 3 分割の worktree 実行（①2650・②244・③591）と main root 実行（①2661・②237・③591）の N/M 件数差と fail 内訳の照合。テスト未変更（git diff 9dcf2665..a6870104 空）と projection-only 集合不変による baseline 同一条件の決定的判定
+- **根本原因**: baseline 既存テストの repoRoot 計算（import.meta.dir 固定段数）と走査前提（junction 実在環境）が .worktrees/<slug> 構造に依存し、main root の実行環境差として現れる
+- **自律対応内容**: 4 fail を base 既知・main root 環境依存として由来分類し検証証拠コメント（Issue #3407 comment 5974678572）へ evidence 化。当該変更起因 0 件の判定は維持
+- **ユーザー確認有無**: なし（分類の機械的確定は diff 空 + 環境同一で成立）
+- **Decision/REQ/spec影響**: なし（bun test 実行形態契約は維持。baseline 既知欠陥の記録）
+- **横展開観点**: QG-4 の bun test 実測を worktree だけでなく merge 後 main root でも実行すると、worktree 構造に依存したテストの fail が観測される。main root 実測を case-close の標準とする現行契約は、この種の base 既知欠陥を機械的に可視化する。fail 由来分類（base 既知・環境依存・当該変更起因）の evidence 化が効く
+- **再発条件**: .worktrees/<slug> 深さを前提にした repoRoot 計算や projection 走査前提のテストが存在する状態で、main root で bun test 正規形を実行する場合
+- **予防策候補**: repoRoot 計算の訂正（process-conformance の段数・skills_structure の project-local skill 許容リスト）は後続 Case の対応対象候補（intake 候補としても成立）
+- **想定反映先**: learning-promote での評価。後続 Case での baseline 既知欠陥修正の根拠
+- **関連**: Root Case #3407・PR #3409・merge commit a6870104、process-conformance.test.ts・skills_structure.test.ts（PR #3332 由来）・検証証拠コメント（Issue #3407 comment 5974678572）
+- **タグ**: `#bun-test` `#path-depth` `#main-root` `#worktree-divergence` `#base-known`
