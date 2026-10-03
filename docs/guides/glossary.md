@@ -80,11 +80,11 @@ AgentDevFlow で使う用語の定義。
 
 | 用語 | 定義 |
 |------|------|
-| Command | 実行手順の一次参照。原本は `src/opencode/commands/agentdev/`、配置先は `.opencode/commands/agentdev/` に配置 |
-| Skill | 判定基準、共通知識、宣言的ルールの一次参照。原本は `src/opencode/skills/agentdev-*`、配置先は `.opencode/skills/agentdev-*` に配置 |
+| Command | 実行手順の一次参照。原本は `src/common/commands/agentdev/`、配置先は `.opencode/commands/agentdev/` に配置 |
+| Skill | 判定基準、共通知識、宣言的ルールの一次参照。原本は `src/common/skills/agentdev-*`、配置先は `.opencode/skills/agentdev-*` に配置 |
 | Template | Issue/PR 本文の出力構造。Skill 配下 `templates/` に配置 |
 | Script | ガードレール、検査、補助処理の実行可能ロジック。Skill 配下 `scripts/` に配置 |
-| 原本（source） | `src/opencode/` 配下の正規の定義ファイル。AgentDevFlow 本体の command/skill/template はここに配置される |
+| 原本（source） | `src/common/` 配下の正規の定義ファイル（共通原本）。AgentDevFlow 本体の command/skill/template はここに配置され、ホスト別接続領域（`src/opencode/`、`src/senpi/`）は各ホスト用の接続定義を配置する |
 | 配置先（projection） | `.opencode/` 配下の実行時の配布先。AgentDevFlow 本体リポジトリではジャンクション/symlink による投影先、適用プロジェクトではインストールスクリプトによる配置先 |
 
 ## ローカル版 OpenCode
