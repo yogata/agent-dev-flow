@@ -158,3 +158,11 @@
 - 内容: REQ-061-021 の design 対応を traceability sidecar（traceability/agentdev-workflow-case-ready.yaml）へ design セクション新設で登録したところ、case-ready.md の既存 inline 宣言 15件と ID 集合不一致で duplicate-inconsistencies fail。inline 宣言への追加に登録判断を変更して sidecar 登録を取り消し、traceability check 全 pass で解消
 - 学び: 同一論理関係（artifact パス × role）を複数情報源が保持する場合、情報源ごとの要件行 ID 集合一致が契約（duplicate-inconsistencies 検出基準）のため、既存 inline 宣言がある Design への対応関係追加は inline 宣言へ追加する。既存宣言の sidecar 集約（移管）は本 Case 対象範囲の拡大となるため不採用
 - 発見元: Case #3336（backlog-pool-20261003・OU-005）実行時の自工程観測
+
+## 2026-10-03: checker 実行経路の ESM 互換性は checker 個別に異なる（node 非対応 checker は bun 経由で実行）
+
+- 問題クラス: workflow deviation（実行経路の個別差・事前確認要）
+- 発生工程: case-run TS-012 検証（Case #3340・OU-011）の check_changed_docs.ts 実行
+- 内容: 安定実行経路（`node --experimental-strip-types` のモジュール import 経由）で check_changed_docs.ts を実行したところ `ReferenceError: require is not defined`（require 残存のため node 非対応）。check_distribution_boundary.ts は同経路で動作する（checker 実行契約「ESM 互換性要件」対応済み）。bun 経由で実行し直して合格を確認
+- 学び: 安定実行経路を checker 実行前に適用する際は、当該 checker の require 残存有無を事前確認する。node 非対応 checker は bun 経由へ切替して実行する。同種の実測として traceability check.ts（Bun.YAML 依存）も node では `Bun is not defined` で YAML 解析失敗（Case #3337 case-close 実測・bun 経由で合格）
+- 発見元: PR #3377 Findings/learning（Case #3340）＋ case-close 実行時の自工程観測（Case #3337）
