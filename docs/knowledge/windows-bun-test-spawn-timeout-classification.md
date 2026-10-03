@@ -1,7 +1,7 @@
 ---
 title: Windows + bun test の spawn timeout 由来分類と単独再実行手順
 created: 2026-09-11
-updated: 2026-09-15
+updated: 2026-10-03
 ---
 
 # Windows + bun test の spawn timeout 由来分類と単独再実行手順
@@ -14,8 +14,18 @@ Windows で integrity suite をフル実行すると、サブプロセス起動�
 2. pass 結果と「環境由来」の根拠（既定 timeout での fail → 延長単独再実行での pass）を QG-4 記録として残す。
 3. 延長後も fail が残る場合は環境由来と扱わず、変更起因性を再評価する。timeout 延長だけで fail を無条件に環境由来と扱わない。
 4. テスト削除や timeout 無制限化は根拠なく行わない。
+5. テストへ固定 timeout を設定する場合は実測分布に基づく値とし、恒久遅延化（根拠のない過大値への引上げ・無制限化）はしない。CI とローカルで同一値を用いる。
 
 timeout 延長・単独再実行で確定できない環境起因が疑われる fail（フル suite 実行時のみ fail する等、suite 全体の負荷が要因の場合）は、main HEAD（PR 変更未適用・working tree clean）で同一テストを再実行する対照実行で再現を確認する。再現する場合は環境起因として記録し、再現しない fail は変更起因として再評価する（環境由来と無条件に扱わない）。環境由来と判定した記録には、対照実行の実行条件（HEAD、working tree 状態、負荷状況）を含める。
+
+### baseline 対照実行の標準手順
+
+対照実行（main HEAD と PR head の同条件比較）は次の手順で実行する。
+
+1. **baseline の確保**: 検証対象 working tree を変更せず、detached worktree で baseline（main HEAD・PR 変更未適用・working tree clean）を確保する（`git worktree add --detach`。手順は [QG-4 baseline の detached worktree 再現手順](qg4-baseline-detached-worktree-reproduction.md) を参照）。
+2. **同条件比較**: main HEAD と PR head の双方で、同一テストを同一コマンド・同一実行形態（repo root 起 cwd・`./` 付きパス指定・同一 timeout 値）で実行する。実行条件の差分は記録へ明示する。
+3. **実測時間と検証内容本体の分離**: テストの実測実行時間（既定 timeout・単独再実行・対照実行の各値）と、テストが検証する性質（検証内容本体）を分けて記録する。timeout 由来 fail の由来分類は実測時間の分布を根拠とし、検証内容本体の合否判定と混同しない。
+4. **実行条件の記録**: 双方の HEAD hash、working tree 状態、負荷状況、実測時間を由来分類記録へ含める。記録した結果は前項の判定原則（再現 → 環境起因、非再現 → 変更起因再評価）と PR head 結果併記の入力になる。
 
 対照実行の前提確認として、baseline（main root）は mid-Epic で次子 Issue の manifest 未反映・stale junction 状態により stale になり得るため絶対視しない。対照実行で再現した fail については PR HEAD（worktree）での同一テスト結果を併記し、「main 環境固有で PR HEAD では pass」の環境起因（無効分類）と「baseline で再現する pre-existing」を区別する（前提確認は由来分類の追加条件であり、既存の安全側規定の免除ではない）。
 
@@ -43,6 +53,7 @@ timeout 延長・単独再実行で確定できない環境起因が疑われる
 - inbox 2026-09-12: spawnSync 回帰テスト 4 件が 5 秒タイムアウト fail、main HEAD で再現確認し環境起因と判定（Issue #1782/#2245 由来）。フル suite 時のみ fail する環境依存 staging テストを基底 commit 再現比較で pre-existing 分離した前例（deferred 2026-09-05）と同根の手順を対照実行として統合した（発生3件相当）。
 - PR #2817（Issue #2809、case 2805 OU-004、DEL-2809-1）: main root での対照実行が worktree（PR HEAD）より 4 件多い fail を出した観測（mid-Epic の main root が次子 Issue の manifest 未反映 / stale junction 状態が原因。同一テストは PR HEAD worktree では pass）。
 - PR #2818（Issue #2810、case 2805 OU-005、DEL-2810-1）: integrity suite が OU-006 専属の `.agentdev/extensions/**` を横断検査し、旧参照残存で本変更側 suite が失敗。専属領域は修正せず Finding として記録し、横断検査 fail を後続 OU 専属の計画的依存として由来分類した観測。
+- Case #3355（OU-014、RA-012、2026-10-03）: check_integrity.test.ts の spawnSync 型回帰テスト 4 件の固定 timeout 15000ms が spawn コストに対し不足し得るため、実測分布に基づき 60000ms へ引上げした（CI とローカルで同一値・恒久遅延化しない範囲）。併せて対照実行（main と PR head の同条件比較）を「baseline 対照実行の標準手順」節として整理した。
 
 ## 関連知識
 
