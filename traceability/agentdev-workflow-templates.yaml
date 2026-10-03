@@ -7,6 +7,8 @@ implementation:
     - REQ-101-002
     - REQ-101-003
     - REQ-101-004
+    - REQ-101-006
+    - REQ-101-007
   src/common/skills/agentdev-workflow-templates/templates/case-open/root-case.md:
     - REQ-101-002
     - REQ-101-003
@@ -32,6 +34,24 @@ implementation:
     - REQ-101-002
     - REQ-101-003
     - REQ-101-004
+  src/common/skills/agentdev-workflow-templates/templates/issue_comment_record_start.md:
+    - REQ-101-006
+    - REQ-101-007
+  src/common/skills/agentdev-workflow-templates/templates/issue_comment_record_handoff.md:
+    - REQ-101-006
+    - REQ-101-007
+  src/common/skills/agentdev-workflow-templates/templates/issue_comment_record_hold.md:
+    - REQ-101-006
+    - REQ-101-007
+  src/common/skills/agentdev-workflow-templates/templates/issue_comment_record_resume.md:
+    - REQ-101-006
+    - REQ-101-007
+  src/common/skills/agentdev-workflow-templates/templates/issue_comment_record_decision_change.md:
+    - REQ-101-006
+    - REQ-101-007
+  src/common/skills/agentdev-workflow-templates/templates/issue_comment_record_completion.md:
+    - REQ-101-006
+    - REQ-101-007
 verification:
   src/common/skills/agentdev-workflow-templates/SKILL.md:
     - REQ-100-005

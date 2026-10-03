@@ -4,6 +4,8 @@ implementation:
     - REQ-031-029
     - REQ-031-030
     - REQ-031-032
+    - REQ-101-006
+    - REQ-101-008
   src/common/skills/agentdev-case-run-execution-adapter/references/adversarial-review-integration.md:
     - REQ-014-016
   src/common/skills/agentdev-case-run-execution-adapter/references/harness-delegation.md:

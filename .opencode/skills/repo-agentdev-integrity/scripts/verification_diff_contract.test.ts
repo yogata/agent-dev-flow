@@ -62,11 +62,19 @@ const FINDING_DIFF_CLASSES = [
 
 // テンプレートディレクトリ直下の既存テンプレート構成。
 // 検証差分の記録先として新規テンプレート種別を新設しないことを固定する（REQ-048-016）。
+// issue_comment_record_*.md は Case Issue 工程記録（記録契機別）テンプレートであり、
+// 検証差分セクションを持たないため記録先の拡大には当たらない。
 const KNOWN_TEMPLATE_FILES = [
   "issue_comment_bug_analysis.md",
   "issue_comment_bug_record.md",
   "issue_comment_feature_implementation.md",
   "issue_comment_feature_technical.md",
+  "issue_comment_record_completion.md",
+  "issue_comment_record_decision_change.md",
+  "issue_comment_record_handoff.md",
+  "issue_comment_record_hold.md",
+  "issue_comment_record_resume.md",
+  "issue_comment_record_start.md",
   "issue_comment_review_ng.md",
   "issue_desc_bug.md",
   "issue_desc_child.md",

@@ -5,6 +5,9 @@ implementation:
     - REQ-032-007
     - REQ-032-027
     - REQ-032-029
+    - REQ-101-006
+    - REQ-101-007
+    - REQ-101-014
   src/common/skills/agentdev-workflow-case-close/references/docs-and-design-promotion.md:
     - REQ-021-030
     - REQ-032-025
@@ -41,3 +44,6 @@ verification:
     - REQ-021-027
     - REQ-032-027
     - REQ-032-029
+    - REQ-101-006
+    - REQ-101-007
+    - REQ-101-014

@@ -36,6 +36,7 @@
 - **重複解消方針の参照と検出不能報告**: 委譲 prompt で、対象 Issue に関連する重複解消方針（変更対象分割・重複許容時の衝突解消の担当とマージ順序。Epic Issue 本文・Wave 記録に記録された競合リスク情報）を参照して実行することを実行担当サブエージェントへ指示する。同一 Wave 内の変更対象ファイル重複の実行時検出は case-auto の stage 3 実行制御が所有するため、case-run 委譲内では重複の新規検出・解消方針の新規決定を行わず、事前記録された方針に従う。変更対象集合が取得不能な場合は比較を省略せず検出不能として報告する
 - **ADF-COVERS 宣言付与の正の義務**: 委譲 prompt で、対象 work_type で対応宣言を要求する実装成果物（実装対応を伴う成果物）に、実装対応役割の対応宣言を付与することを実行担当サブエージェントの正の義務として指示する。case-run は宣言の欠落を委譲先側の受動的修正対象ではなく、委譲時から要求される能動的な付与義務として委譲指針上で義務付ける。宣言が付与されていることの確認は、case-ready の Definition 品質検査が行う同一の確認（対象 work_type で対応宣言を要求する実装成果物への宣言付与確認）と同一対象・同一基準の要求であり、両要求は無矛盾である。宣言欠落が case-ready 品質検査で検出される前に委譲先が宣言を付与していない状態で PR を作成することを防止する。対応宣言の付与対象と宣言形式の正規所有はトレーサビリティ標準配布スキル（agentdev-traceability）とその参照先 Design が所有する
 - **配布物対応宣言の作成先規約の予防観点引き渡し**: 委譲 prompt で、新規配布物（配布 command、skill、template、runtime script 等の consumer distribution closure 対象成果物）の作成を含む委譲には、配布物本文の記述規則を作成時の予防観点として引き渡す。引き渡す規約は「配布物の本文・コメントへ producer 側トレーサビリティ metadata（inline ADF-COVERS 宣言、要件行 ID、Decision ID 等の concrete ID）を直書きせず、対応関係は repository top-level の `traceability/` 配下 sidecar へ登録する」という作成先規約である。作成時予防と事後検知（配布依存境界 checker の source profile 検査等）は両面運用であり、予防観点の引き渡しは検知機構の代替にも検知機構の変更にもしない。配布物を作成しない委譲（producer 側文書の変更のみ等）では、対応宣言の作成先は成果物の配布境界で決定する既存規約（producer 側成果物は inline 宣言または sidecar のいずれか）に従い、この引き渡しを適用しない。本項目と ADF-COVERS 宣言付与の正の義務は同一対象・無矛盾であり、付与義務が対応関係を「付与する」ことを要求するのに対し、本項目は配布対象成果物の場合の宣言の「作成先」を委譲 context へ規約として引き渡す。記述規則と両面運用契約の正規所有は配布依存境界 Design（「配布物本文の記述規則」「事前書き込み gate と最終 gate の契約」の各節）が所有し、本 reference は再定義しない
+- **実行担当の報告要素と途中報告の引き渡し**: 委譲 prompt で、実行担当は事実・結果、停止（再開条件を含む）、判断変更の影響対象を報告すること、委譲要求（委譲起動）は実着手と同一視されないため実装着手の事実を報告すること、工程終了（result 確定）を待たず確定した停止・判断待ちを途中報告できることを指示する（報告契約は `agentdev-case-run-execution-adapter` 参照）。取りまとめ側の記録反映は本 reference STEP-S5「工程記録の取りまとめ反映」参照
 - **L2 タイムスタンプ計測**: 委譲起動直前・直後に壁時計タイムスタンプ（JST）を記録し、実行担当サブエージェント実行時間を計測する。併せて STEP-S3（worktree 設置）と STEP-S6（クリーンアップ）の開始・終了時刻を記録する
 - 委譲プロンプト、前置 gate 結果の引き渡し（staleness check 差異、配布依存境界の違反ベースライン、AUTOGEN 索引再生成の必須指示）、test strategy 項目の test-fix ループ、実行担当サブエージェントの責務（目標分解、各 criterion に observable evidence を要求、品質ゲートの実行、test-fix ループ）、委譲起動失敗・異常終了時の扱い（即 `failed` とせず実装完了・検証未完了として扱う）の詳細は `agentdev-case-run-execution-adapter` スキルを参照
 - **bun test フル suite 正規形**: test strategy の検証で bun test フル suite を実行する場合、正規形（3 cwd 分割実行・./ prefix・環境ラベル）に従う。正規形の規定は `agentdev-quality-gates`（QG-4 bun test フル suite 正規形）を正とする。3分割は integrity suite、src 側 skill script テスト、repo ルート系 guard テストで構成し、各実行の cwd はリポジトリルート（worktree root または main root）に統一する。**bun test 全体実行の実行指示は timeout を明示指定する（300〜600 秒を標準とする。全体実行の実測所要時間が既定 timeout を超えるため）**。実行担当サブエージェントは PR 本文に各分割実行の実行 cwd・起動コマンド形式・timeout 指定値・環境ラベル（worktree または main、junction 伝播状態、依存パッケージ状態）と fail 全件の由来分類（既知欠陥・環境依存・当該変更起因）を記録する。当該記録はフル suite 受理判断の機械受理基準（`agentdev-quality-gates` QG-4 の bun test フル suite 正規形・機械受理基準）を満たす形式で記録する。受理判断は記録の機械的検証により行われ、手動判断（記録を伴わない裁量判断）で代替しない。テスト環境前提（worktree の node_modules 未伝播と `bun install` 前置、main からの読取専用実行）は `agentdev-git-worktree` の worktree 構造的制約を参照する。起動コマンド（`<integrity-detector-skill>` は対象リポジトリの integrity 検査 skill 名に解決する）:
@@ -94,6 +95,14 @@
   - **failed**: repository context で回答不能な blocker。詳細本文は Issue コメントに構造化して記録済み。エラー処理に従い停止、ユーザー報告
   - **delegation-unavailable**: 実行インフラが委譲を起動できなかった状態。実行未試行のため `pending` に戻す
 - **infra-transient 分類（停止報告への付随。result enum への追加なし）**: ツール基盤（harness・Custom Tool 実行環境）の故障に起因する停止は、Case 失敗（blocked / failed）と区別して infra-transient（ツール基盤故障）分類として停止報告へ付随させ、停止報告に回復経路（supervisor 等による harness 再起動による回復の見込みと durable state からの冪等再開）を含める。判定条件（単一ツール恒常失敗・プロセス生存・再試行無効・他経路正常の4条件同時成立）の正規所有は case-auto Design「停止理由分類」節である。infra-transient は result 契約（4状態）の第5状態ではなく、既存の停止報告に付随する停止理由分類である。harness 側の修正（fresh process 分離・自動再初期化）は本リポジトリの対象外とする
+- **工程記録の取りまとめ反映（result 受領時・途中報告受領時）**: 委譲 result と途中報告（確定した停止・判断待ち）の受領内容から記録契機を判定し、記録コメント投稿と本文現在地更新を実行する。実行担当の報告（事実・結果、停止〔再開条件〕、判断変更影響）を反映の入力とし、case-run 本体は報告を解釈して記録へ構造化する。対応は次のとおり:
+  - **着手**: 実行担当から実装着手の事実を報告された時点で着手記録（委譲要求〔STEP-S4 の委譲起動〕は着手記録の契機としない）
+  - **停止**: result blocked / failed / delegation-unavailable 受領時、および途中報告で確定した停止を受領した時点。停止コメントには再開条件を必須記録する。停止の通知を遅らせない
+  - **再開**: 再委譲・継続指示で作業を再開させるとき。停止コメントに記録された再開条件の充足確認と、最新条件（停止後に更新された合意・Definition）の引き渡しを再開記録に含める
+  - **判断変更**: 合意変更（Definition Amendment 受領等）を記録するとき。撤回対象（撤回される合意・判断の範囲）を必須記録し、記録・受領と実行への適用を区別する。影響しない作業を一律停止しない
+  - **引き渡し**: 実装完了（completed-pr）から完了判定（case-close）への工程移行を引き渡し種別で記録し、残作業と受取役割（完了判定は case-close）を必須記録する
+  - **完了**: case-close（判定主体）が担当する。case-run は完了記録を行わない（実行の申告だけで完了扱いにしない）
+  - 反映手順: 記録コメントは記録種別に応じた工程記録コメントテンプレート（`agentdev-workflow-templates` 選定）を用い、投稿前に記録コメント検証スクリプト（scripts/record-comments.ts、決定的処理。基本項目と種別別必須項目の検証）で検査する（fail-closed）。本文現在地更新は同スクリプトの現在地セクション構築と既存本文への適用で本文を組み立て、Custom Tool `agentdev_gh` の comment_create / issue_update で実行する。投稿・更新の成否確認（読み戻し検証）は Tool VERIFY に委任する（部分成功時の再試行は既存の Tool 操作契約に従う）。Epic 本文への反映は本 STEP では行わない（case-close 単一書き手）
 - **L2 タイムスタンプ受け渡し**: result 状態（completed-pr/blocked/failed）にかかわらず、STEP-S3（worktree 設定）、STEP-S4（実行担当サブエージェント実行）で計測した L2 タイムスタンプを result に含める。case-auto は本 L2 内訳を case-run 委譲の L1 壁時計時間の内訳として読み取る
 - **STEP-S5-1: 配布依存境界の最終変更経路 gate（実装後、command 公開順序の STEP-S5 に対応）**: result が `completed-pr` の場合、STEP-S6 に進む前に、実装後の実際の worktree HEAD に対して最終 gate を行う（実装担当サブエージェントが追加した変更も含めて検査する）。本 gate は src 側（原本）と .opencode 側（投影）の双方反映検証を必須とする
   - 実行条件: result が `completed-pr` であり、PR 対象ファイルに `src/common/{commands,skills}/**` 変更を含む場合。当該変更を含まない PR（docs のみ等）ではスキップする
@@ -108,6 +117,7 @@
 ### Result
 
 - result 処理結果（4状態別）、最終 gate 判定（合格 / 違反停止 / スキップ）、L2 受け渡し
+- 工程記録反映結果（記録契機判定、記録コメント投稿・本文現在地更新の実施。検証スクリプトによる事前検査結果を含む）
 
 ### Evidence
 
