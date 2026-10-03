@@ -1,0 +1,4 @@
+component: traceability-sidecar-governance
+implementation:
+  traceability/japanese-prose-correction.yaml:
+    - REQ-012-059

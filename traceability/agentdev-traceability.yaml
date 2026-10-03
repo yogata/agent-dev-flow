@@ -3,7 +3,12 @@ implementation:
   src/common/skills/agentdev-traceability/SKILL.md:
     - REQ-012-052
     - REQ-012-057
+    - REQ-012-058
     - REQ-029-011
+  src/common/skills/agentdev-traceability/references/check-interpretation.md:
+    - REQ-012-058
+  src/common/skills/agentdev-traceability/references/sidecar-and-policy.md:
+    - REQ-012-058
   src/common/skills/agentdev-traceability/scripts/lib/check.ts:
     - REQ-012-056
   src/common/skills/agentdev-traceability/scripts/lib/corpus.ts:
@@ -24,4 +29,6 @@ implementation:
     - REQ-096-031
 verification:
   src/common/skills/agentdev-traceability/scripts/src/check.ts:
+    - REQ-012-058
+    - REQ-012-059
     - REQ-096-031
