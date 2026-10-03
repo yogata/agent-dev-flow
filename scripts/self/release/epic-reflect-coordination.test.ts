@@ -28,6 +28,8 @@ import {
   createEpicWriteGate,
   evaluateOverallCompletion,
   parseReflectBlock,
+  RECORD_TRIGGERS,
+  REFLECT_BLOCK_BEGIN,
   renderOverallLine,
   upsertOverallEvaluation,
   type ReflectEntry,
@@ -105,10 +107,10 @@ describe("TS-005 Epic 子状態集約の完了順序非依存（lost update な�
       body = applyReflectEntry(
         body,
         child % 2 === 0
-          ? entry({ childIssue: child, trigger: "halt", state: "waiting", waitingReason: `CI 失敗 #${child}` })
+          ? entry({ childIssue: child, trigger: "hold", state: "waiting", waitingReason: `CI 失敗 #${child}` })
           : entry({ childIssue: child, trigger: "start", state: "running" }),
       ).body;
-      // another trigger for the same child (halt then resume / start then completion)
+      // another trigger for the same child (hold then resume / start then completion)
       body = applyReflectEntry(
         body,
         child % 2 === 0
@@ -130,7 +132,7 @@ describe("TS-005 Epic 子状態集約の完了順序非依存（lost update な�
   test("後続更新が先行更新を上書き消去しない（他子のエントリ保持）", () => {
     let body = epicBodyFixture();
     body = applyReflectEntry(body, entry({ childIssue: 41, trigger: "completion", state: "ended", endedKind: "completed", prNumber: 941 })).body;
-    body = applyReflectEntry(body, entry({ childIssue: 42, trigger: "halt", state: "waiting", waitingReason: "判断待ち" })).body;
+    body = applyReflectEntry(body, entry({ childIssue: 42, trigger: "hold", state: "waiting", waitingReason: "判断待ち" })).body;
     const entries = parseReflectBlock(body);
     expect(entries).toHaveLength(2);
     const e41 = entries.find((e) => e.childIssue === 41);
@@ -152,7 +154,7 @@ describe("TS-005 Epic 子状態集約の完了順序非依存（lost update な�
 
   test("同一子の再反映は置換であり、最古の本文を書き戻さない", () => {
     let body = epicBodyFixture();
-    body = applyReflectEntry(body, entry({ childIssue: 43, trigger: "halt", state: "waiting", waitingReason: "旧理由" })).body;
+    body = applyReflectEntry(body, entry({ childIssue: 43, trigger: "hold", state: "waiting", waitingReason: "旧理由" })).body;
     body = applyReflectEntry(body, entry({ childIssue: 43, trigger: "resume", state: "running" })).body;
     const entries = parseReflectBlock(body);
     expect(entries).toHaveLength(1);
@@ -190,6 +192,38 @@ describe("closing 書き込みと取りまとめ反映の共存（per-Epic 単�
     expect(again.applied).toBe(false);
     expect(again.skipped).toBe("already-terminal");
     expect(readChildStatus(body, 44)?.status).toBe("blocked");
+  });
+
+  test("closing 書き込みは新4列形式の内容列を保持する（status 列のみ置換）", () => {
+    const closing = applyClosingStatus(epicBodyFixture(), 41, {
+      status: "completed",
+      prNumber: 900,
+      prUrl: "https://example.test/pr/900",
+    });
+    expect(closing.applied).toBe(true);
+    const row = closing.body.split("\n").find((l) => l.includes("| #41 |")) ?? "";
+    expect(row).toBe(
+      "| 1-1 | #41 | completed ([PR#900](https://example.test/pr/900)) | 子Issue 41 の概要 |",
+    );
+  });
+
+  test("記録契機の英語識別子はコメント検証経路と Epic 反映経路で同一語彙", async () => {
+    const { RECORD_KINDS } = await import(
+      "../../../src/common/skills/agentdev-workflow-case-run/scripts/record-comments.ts"
+    );
+    expect([...RECORD_TRIGGERS]).toEqual([...RECORD_KINDS]);
+  });
+
+  test("語彙外の reflect 行が既存ブロックにあれば適用せず本文を変更しない（静的破棄の防止）", () => {
+    let body = applyReflectEntry(epicBodyFixture(), entry({ childIssue: 42, trigger: "start", state: "running" })).body;
+    const unparseableLine = "<!-- reflect child=41 trigger=halt phase=case-run state=waiting -->";
+    body = body.replace(REFLECT_BLOCK_BEGIN, [REFLECT_BLOCK_BEGIN, unparseableLine].join("\n"));
+    const result = applyReflectEntry(body, entry({ childIssue: 41, trigger: "hold", state: "waiting", waitingReason: "CI" }));
+    expect(result.applied).toBe(false);
+    expect(result.unparseableLines).toEqual([unparseableLine]);
+    expect(result.body).toBe(body);
+    const kept = parseReflectBlock(result.body);
+    expect(kept.map((e) => e.childIssue)).toEqual([42]);
   });
 
   test("mergeChildStatus: 終了状態は非終了状態に劣らず、既存終了状態は降格しない", async () => {
@@ -252,7 +286,7 @@ describe("per-Epic 直列化 gate（closing と取りまとめの局所直列化
     const coordWrite = async () => {
       // fetch the LATEST body inside the critical section
       const latest = persistedBody;
-      persistedBody = applyReflectEntry(latest, entry({ childIssue: 42, trigger: "halt", state: "waiting", waitingReason: "CI" })).body;
+      persistedBody = applyReflectEntry(latest, entry({ childIssue: 42, trigger: "hold", state: "waiting", waitingReason: "CI" })).body;
     };
     const closingWrite = async () => {
       const latest = persistedBody;
@@ -358,10 +392,10 @@ describe("配布物の規律文言 pin", () => {
     const skill = read(EPIC_TRACKER_SKILL_REL);
     expect(skill).toContain("取りまとめによる記録契機別 Epic 反映");
     expect(skill).toContain("start");
-    expect(skill).toContain("handover");
-    expect(skill).toContain("halt");
+    expect(skill).toContain("handoff");
+    expect(skill).toContain("hold");
     expect(skill).toContain("resume");
-    expect(skill).toContain("decision-change");
+    expect(skill).toContain("decision_change");
     expect(skill).toContain("completion");
     expect(skill).toContain("per-Epic 単一書き手");
     expect(skill).toContain("最新取得 → マージ → 更新");
@@ -422,7 +456,7 @@ describe("CLI（scripts/src/reflect.ts）の決定性", () => {
       "--epic-body",
       "@BODY@",
       "--report",
-      JSON.stringify({ childIssue: 42, trigger: "halt", phase: "case-run", state: "waiting", waitingReason: "CI 失敗", nextAction: "修正後に再実行" }),
+      JSON.stringify({ childIssue: 42, trigger: "hold", phase: "case-run", state: "waiting", waitingReason: "CI 失敗", nextAction: "修正後に再実行" }),
     ];
     const a = runCli(args, epicBodyFixture());
     const b = runCli(args, epicBodyFixture());

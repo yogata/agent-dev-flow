@@ -47,30 +47,53 @@ export function parseStatusCell(cell: string): ParsedStatusCell | null {
 
 interface LocatedRow {
   lineIndex: number;
-  beforeStatus: string;
-  statusCell: string;
-  afterStatus: string;
+  /** The row split by `|` (cells[0] and cells[length-1] are empty strings). */
+  cells: string[];
+  /** Index of the status cell in `cells`; -1 when the status cell is unknown. */
+  statusIndex: number;
 }
 
 function rowPattern(childIssue: number): RegExp {
   return new RegExp(
-    `^(\\|\\s*\\d+(?:-\\d+)?\\s*\\|\\s*#${childIssue}(?:\\s[^|]*)?\\|)(.*)(\\|)\\s*$`,
+    `^\\|\\s*\\d+(?:-\\d+)?\\s*\\|\\s*#${childIssue}(?:\\s[^|]*)?\\|`,
   );
+}
+
+/**
+ * Resolve the status cell index of a row from the header of the table the
+ * row belongs to (nearest header line above the row). The new 4-column
+ * format (# / Issue / ステータス / 内容) keeps the status in column 3, the
+ * legacy format (# / Issue / タイトル / ステータス) in the last column.
+ * Rows without a readable header fall back to the last column (legacy).
+ */
+function statusIndexOf(
+  lines: string[],
+  rowLineIndex: number,
+  cells: string[],
+): number {
+  const last = cells.length - 2;
+  if (last < 1) return -1;
+  let statusIndex = last;
+  for (let i = rowLineIndex; i >= 0; i--) {
+    if (/^\|\s*#\s*\|/.test(lines[i] ?? "")) {
+      const headerCells = (lines[i] ?? "").split("|").map((c) => c.trim());
+      const st = headerCells.indexOf("ステータス");
+      if (st > 0) statusIndex = st;
+      break;
+    }
+  }
+  return parseStatusCell(cells[statusIndex] ?? "") ? statusIndex : -1;
 }
 
 function locateRow(body: string, childIssue: number): LocatedRow | null {
   const lines = body.split("\n");
   const p = rowPattern(childIssue);
   for (let i = 0; i < lines.length; i++) {
-    const m = lines[i].match(p);
-    if (m) {
-      return {
-        lineIndex: i,
-        beforeStatus: m[1],
-        statusCell: m[2],
-        afterStatus: m[3],
-      };
-    }
+    const line = lines[i] ?? "";
+    const m = line.match(p);
+    if (!m) continue;
+    const cells = line.split("|");
+    return { lineIndex: i, cells, statusIndex: statusIndexOf(lines, i, cells) };
   }
   return null;
 }
@@ -81,26 +104,12 @@ export function findChildRow(
   childIssue: number,
 ): { lineIndex: number; childIssue: number; statusCell: string } | null {
   const row = locateRow(body, childIssue);
-  if (!row) return null;
+  if (!row || row.statusIndex < 0) return null;
   return {
     lineIndex: row.lineIndex,
     childIssue,
-    statusCell: row.statusCell,
+    statusCell: (row.cells[row.statusIndex] ?? "").trim(),
   };
-}
-
-function statusFromCell(statusCell: string): ParsedStatusCell | null {
-  const cells = statusCell
-    .split("|")
-    .map((c) => c.trim())
-    .filter((c) => c.length > 0);
-  // The status value is the last table cell of the row (new format has no
-  // title column; legacy format has one before it).
-  for (let i = cells.length - 1; i >= 0; i--) {
-    const parsed = parseStatusCell(cells[i]);
-    if (parsed) return parsed;
-  }
-  return null;
 }
 
 /** Read the persisted status of a child row (null when row/value unknown). */
@@ -109,14 +118,15 @@ export function readChildStatus(
   childIssue: number,
 ): ParsedStatusCell | null {
   const row = locateRow(body, childIssue);
-  if (!row) return null;
-  return statusFromCell(row.statusCell);
+  if (!row || row.statusIndex < 0) return null;
+  return parseStatusCell(row.cells[row.statusIndex] ?? "");
 }
 
 /**
  * Replace the status cell of a child row with `statusText`.
- * Returns null when the row does not exist. Only the status cell of the
- * matched row is rewritten; every other line is preserved verbatim.
+ * Returns null when the row or its status cell is unknown. Only the status
+ * cell of the matched row is rewritten; every other cell and line is
+ * preserved verbatim (including the content column of the new format).
  */
 export function replaceChildStatus(
   body: string,
@@ -124,10 +134,11 @@ export function replaceChildStatus(
   statusText: string,
 ): string | null {
   const row = locateRow(body, childIssue);
-  if (!row) return null;
+  if (!row || row.statusIndex < 0) return null;
   const lines = body.split("\n");
-  lines[row.lineIndex] =
-    `${row.beforeStatus} ${statusText} ${row.afterStatus}`;
+  const cells = row.cells.slice();
+  cells[row.statusIndex] = ` ${statusText} `;
+  lines[row.lineIndex] = cells.join("|");
   return lines.join("\n");
 }
 
@@ -140,15 +151,18 @@ export interface ChildTerminalCounts {
 /** Count persisted statuses across all tracking-table child rows. */
 export function countChildStatuses(body: string): ChildTerminalCounts {
   const lines = body.split("\n");
-  const linePattern =
-    /^\|\s*\d+(?:-\d+)?\s*\|\s*#\d+(?:\s[^|]*)?\|(.*)\|\s*$/;
+  const rowLinePattern =
+    /^\|\s*\d+(?:-\d+)?\s*\|\s*#\d+(?:\s[^|]*)?\|/;
   const byStatus: Record<string, number> = {};
   let totalRows = 0;
   let terminalRows = 0;
-  for (const line of lines) {
-    const m = line.match(linePattern);
-    if (!m) continue;
-    const parsed = statusFromCell(m[1]);
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] ?? "";
+    if (!rowLinePattern.test(line)) continue;
+    const cells = line.split("|");
+    const statusIndex = statusIndexOf(lines, i, cells);
+    if (statusIndex < 0) continue;
+    const parsed = parseStatusCell(cells[statusIndex] ?? "");
     if (!parsed) continue;
     totalRows++;
     byStatus[parsed.status] = (byStatus[parsed.status] ?? 0) + 1;

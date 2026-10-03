@@ -168,18 +168,18 @@ export function formatStopReport(report: StopReport): string {
 // 反映計画・部分成功照合・回復計画
 // ---------------------------------------------------------------------------
 
-/** 記録契機。 */
+/** 記録契機。識別子は record-comments.ts の RECORD_KINDS（start / handoff / hold / resume / decision_change / completion）と共通語彙。 */
 export type RecordOccasion =
   /** 着手。 */
   | "start"
   /** 引き渡し。 */
-  | "handover"
+  | "handoff"
   /** 停止。 */
-  | "stop"
+  | "hold"
   /** 再開。 */
   | "resume"
   /** 判断変更。 */
-  | "decision-change"
+  | "decision_change"
   /** 完了。 */
   | "completion";
 

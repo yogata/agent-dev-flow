@@ -20,6 +20,8 @@
 
 import { readFileSync } from "node:fs";
 import {
+  PROGRESS_STATES,
+  RECORD_TRIGGERS,
   applyClosingStatus,
   applyReflectEntry,
   evaluateOverallCompletion,
@@ -94,6 +96,12 @@ function parseReflectReport(raw: unknown): ReflectEntry {
     phase: String(r.phase ?? ""),
     state: r.state as ReflectEntry["state"],
   };
+  if (!(RECORD_TRIGGERS as readonly string[]).includes(entry.trigger)) {
+    fail([`--report.trigger must be one of ${RECORD_TRIGGERS.join(", ")}`]);
+  }
+  if (!(PROGRESS_STATES as readonly string[]).includes(entry.state)) {
+    fail([`--report.state must be one of ${PROGRESS_STATES.join(", ")}`]);
+  }
   if (r.endedKind !== undefined) entry.endedKind = r.endedKind as ReflectEntry["endedKind"];
   if (r.waitingReason !== undefined) entry.waitingReason = String(r.waitingReason);
   if (r.nextAction !== undefined) entry.nextAction = String(r.nextAction);

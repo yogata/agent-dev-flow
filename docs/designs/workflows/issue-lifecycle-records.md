@@ -29,6 +29,46 @@ updated: 2026-10-03
 - 追跡Issue側の同型原則（REQ-049-012、agentdev-issue-tracking Design）との並行関係（本文=現在状態・コメント=時系列の共通原則、role 分離に基づく別スキーマ）
 - 取りまとめによる記録契機ごとの Epic 反映の記録様式（子状態集約・全体条件評価の更新形式）と、agentdev-epic-tracker Design 更新後の書き込み契約（per-Epic 単一書き手の下での取りまとめ書き込みと closing 書き込みの直列化）との接続。Epic 反映の完了までの間の子 Issue 本文現在地の読み取り規律（読み取り優先は Epic 反映責務の代替でない旨を含む）
 
+## 識別子と写像規則（確定値）
+
+前節の確定事項のうち、REQ-101-005 が本 Design への確定を委ねる識別子と写像規則、および REQ-101-006 の記録契機6種に対応する英語識別子を確定する。
+
+### 記録契機の英語識別子
+
+記録契機6種の英語識別子は次のとおりとし、報告受領から反映までの全経路で同一語彙を用いる。
+
+| 記録契機 | 英語識別子 | 記録コメントテンプレート実体 |
+|---|---|---|
+| 着手 | `start` | `issue_comment_record_start.md` |
+| 引き渡し | `handoff` | `issue_comment_record_handoff.md` |
+| 停止 | `hold` | `issue_comment_record_hold.md` |
+| 再開 | `resume` | `issue_comment_record_resume.md` |
+| 判断変更 | `decision_change` | `issue_comment_record_decision_change.md` |
+| 完了 | `completion` | `issue_comment_record_completion.md` |
+
+検証スクリプト（`agentdev-workflow-case-run/scripts/record-comments.ts` の `RECORD_KINDS`）、Epic 反映エンジン（`agentdev-epic-tracker/scripts/lib/epic-reflect.ts` の `RECORD_TRIGGERS`）、case-auto の反映計画（`agentdev-workflow-case-auto/scripts/src/records-report.ts` の `RecordOccasion`）はこの語彙を共有する。いずれかが語彙から外れると反映経路上で値が解釈できなくなるため、識別子の変更は3者を同一の変更で行う。
+
+### 進行状態4値の英語識別子と写像規則
+
+表示上の進行状態4値（REQ-101-005）の英語識別子は `not-started`（未着手）、`running`（実行中）、`waiting`（待機）、`ended`（終了）とする。終了の内部区分は `completed`（完了）と `aborted`（中止）とする。
+
+記録契機から進行状態への写像は次のとおりとする。
+
+| 記録契機 | 写像後の進行状態 |
+|---|---|
+| `start`、`resume` | `running` |
+| `handoff`、`decision_change` | `running`（Case Issue 本文の現在地。Epic 集約エントリでは進行状態の変化を伴わない反映として既存値を維持する） |
+| `hold` | `waiting` |
+| `completion` | `ended`（内部区分 `completed` または `aborted` を併記） |
+
+実装上の写像の正は `record-comments.ts` の `mapRecordKindToProgressState`（Case Issue 本文の現在地表示用）と `epic-reflect-coordination.md` の記録契機別反映内容表（Epic 集約エントリ用）であり、本表に矛盾しない。Case Issue 本文の現在地は常に4値を記載するため、進行状態の変化を伴わない契機でも `running` を維持して更新する。
+
+進行状態は Root Case ライフサイクル状態（REQ-006-112）等の正規状態と記録契機から写像（導出）される表示であり、独立して更新・判断される第二の進行管理を構成しない（REQ-101-005）。
+
+### Epic 反映様式の実体参照点
+
+取りまとめによる記録契機ごとの Epic 反映（子状態集約セクション `agentdev:epic-reflect`、全体条件評価セクション `agentdev:epic-overall`）の物理ブロック様式、反映手順、closing 書き込みとの直列化手順の実体は `agentdev-epic-tracker` SKILL.md の reference（`references/epic-reflect-coordination.md`）とする。本 Design は識別子と写像規則の正であり、同 reference は本節の識別子に従う Epic 反映の実体手順を所有する。
+
 ## 対象外
 
 - execution contract の確定と消費（REQ-017）

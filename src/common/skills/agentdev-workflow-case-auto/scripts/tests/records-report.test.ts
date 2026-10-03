@@ -177,8 +177,8 @@ const t = (occasion: ApplyTarget["occasion"], face: ApplyTarget["face"], destina
 describe("planApply", () => {
   test("部分成功（コメントのみ成功・本文のみ失敗）を区別する", () => {
     const targets = [
-      t("stop", "comment", "#401"),
-      t("stop", "body", "#401"),
+      t("hold", "comment", "#401"),
+      t("hold", "body", "#401"),
     ];
     const commentKey = applyTargetKey(targets[0]!);
     const bodyKey = applyTargetKey(targets[1]!);
@@ -192,7 +192,7 @@ describe("planApply", () => {
   });
 
   test("読み戻し結果に存在しないキーは読み戻し未確認として扱う", () => {
-    const targets = [t("stop", "comment", "#402")];
+    const targets = [t("hold", "comment", "#402")];
     const plan = planApply({
       targets,
       sent: [applyTargetKey(targets[0]!)],
@@ -204,9 +204,9 @@ describe("planApply", () => {
 
   test("読み戻しで不足が確認された対象のみを再試行対象にする", () => {
     const targets = [
-      t("stop", "comment", "#401"),
-      t("stop", "body", "#401"),
-      t("stop", "comment", "#402"),
+      t("hold", "comment", "#401"),
+      t("hold", "body", "#401"),
+      t("hold", "comment", "#402"),
     ];
     const plan = planApply({
       targets,
@@ -228,8 +228,8 @@ describe("planApply", () => {
 
   test("読み戻し未確認の対象を再試行対象に含めない（重複投稿防止）", () => {
     const targets = [
-      t("stop", "comment", "#403"),
-      t("stop", "body", "#403"),
+      t("hold", "comment", "#403"),
+      t("hold", "body", "#403"),
     ];
     const plan = planApply({
       targets,
@@ -242,7 +242,7 @@ describe("planApply", () => {
   });
 
   test("読み戻し確認後に不足が確定した対象が再試行対象へ移る", () => {
-    const targets = [t("stop", "comment", "#404")];
+    const targets = [t("hold", "comment", "#404")];
     const key = applyTargetKey(targets[0]!);
     // 1回目: 送信済み・読み戻し未確認 → verifyFirst（再送しない）
     const first = planApply({ targets, sent: [key] });
@@ -280,8 +280,8 @@ describe("planApply", () => {
 describe("buildRecoveryPlan", () => {
   test("未反映対象と識別情報から回復計画を生成する", () => {
     const targets = [
-      t("stop", "comment", "#501"),
-      t("stop", "body", "#501"),
+      t("hold", "comment", "#501"),
+      t("hold", "body", "#501"),
     ];
     const commentKey = applyTargetKey(targets[0]!);
     const bodyKey = applyTargetKey(targets[1]!);
@@ -300,7 +300,7 @@ describe("buildRecoveryPlan", () => {
   });
 
   test("読み戻し未確認対象を再送せず確認対象として回復計画に含める", () => {
-    const targets = [t("stop", "comment", "#502")];
+    const targets = [t("hold", "comment", "#502")];
     const key = applyTargetKey(targets[0]!);
     const recovery = buildRecoveryPlan({ targets, sent: [key] }, { outcomeFinalized: false });
     expect(recovery.recoveries).toHaveLength(1);
@@ -331,7 +331,7 @@ describe("buildRecoveryPlan", () => {
   });
 
   test("未反映内容の要約を外部指定できる（回復用記録は未反映内容と識別情報に限定）", () => {
-    const targets = [t("stop", "body", "#505")];
+    const targets = [t("hold", "body", "#505")];
     const key = applyTargetKey(targets[0]!);
     const recovery = buildRecoveryPlan(
       { targets, sent: [key], readback: { [key]: "missing" } },

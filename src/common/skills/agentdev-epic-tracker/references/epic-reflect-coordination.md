@@ -30,10 +30,10 @@ Epic Issue 本文への書き込みは2系統であり、同一の per-Epic 排�
 | 記録契機 | 進行状態 | 必須項目 | 集約エントリへの反映 |
 |---|---|---|---|
 | `start`（着手） | `running` | 工程 | `trigger=start state=running`。委譲要求を実着手と同一視しない（実着手の事実が確認できた時点で反映） |
-| `handover`（引き渡し） | 変化なし | 残作業、受取役割 | `trigger=handover`、`next=<残作業>`、`owner=<受取役割>` |
-| `halt`（停止） | `waiting` | 再開条件、次の行動 | `trigger=halt state=waiting`、`reason=<待機理由>`、`next=<再開条件・次の行動>`。観測不能な場合は停止と断定せず観測不能である旨を明示 |
+| `handoff`（引き渡し） | 変化なし | 残作業、受取役割 | `trigger=handoff`、`next=<残作業>`、`owner=<受取役割>` |
+| `hold`（停止） | `waiting` | 再開条件、次の行動 | `trigger=hold state=waiting`、`reason=<待機理由>`、`next=<再開条件・次の行動>`。観測不能な場合は停止と断定せず観測不能である旨を明示 |
 | `resume`（再開） | `running` | なし | `trigger=resume state=running`、待機理由の解消 |
-| `decision-change`（判断変更） | 変化なし | 撤回対象、適用方針 | `trigger=decision-change`、`reason=<撤回対象>`、`next=<適用方針>` |
+| `decision_change`（判断変更） | 変化なし | 撤回対象、適用方針 | `trigger=decision_change`、`reason=<撤回対象>`、`next=<適用方針>` |
 | `completion`（完了） | `ended` | 判定根拠 | `trigger=completion state=ended`、`ended=completed|aborted`、`basis=<判定根拠>`、`pr=<PR番号>`。追跡テーブル行の終了状態は closing 書き込み（case-close）が書き込む |
 
 ## 集約セクション様式
@@ -42,7 +42,7 @@ Epic Issue 本文への書き込みは2系統であり、同一の per-Epic 排�
 
 ```markdown
 <!-- agentdev:epic-reflect begin -->
-<!-- reflect child=42 trigger=halt phase=case-run state=waiting reason="CI 失敗" next="修正後に再実行" -->
+<!-- reflect child=42 trigger=hold phase=case-run state=waiting reason="CI 失敗" next="修正後に再実行" -->
 <!-- reflect child=43 trigger=completion phase=case-run state=ended ended=completed pr=100 basis="QG-4 合格" -->
 <!-- reflect child=44 trigger=start phase=case-run state=running -->
 <!-- agentdev:epic-reflect end -->
@@ -103,7 +103,7 @@ Epic の全体完了判定は子Issueの完了と区別して記録する。
 ```bash
 # 取りまとめ反映（記録契機 1件のマージ）
 bun run src/common/skills/agentdev-epic-tracker/scripts/src/reflect.ts reflect \
-  --epic-body <latest-body.md> --report '{"childIssue":42,"trigger":"halt","phase":"case-run","state":"waiting","waitingReason":"CI 失敗","nextAction":"修正後に再実行"}'
+  --epic-body <latest-body.md> --report '{"childIssue":42,"trigger":"hold","phase":"case-run","state":"waiting","waitingReason":"CI 失敗","nextAction":"修正後に再実行"}'
 
 # closing 書き込み（終了状態のべき等置換）
 bun run src/common/skills/agentdev-epic-tracker/scripts/src/reflect.ts closing \
