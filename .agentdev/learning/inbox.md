@@ -415,3 +415,35 @@
 - **想定反映先**: case-ready の Wave 構成（競合リスク情報の処置記述）、agentdev-workflow-case-auto のコンフリクト解消 Level 1 手順
 - **関連**: Case #3391・PR #3404/#3405/#3403 のコンフリクト解消記録コメント
 - **タグ**: `#epic-wave` `#rebase` `#level1` `#sidecar` `#merge-order`
+
+## 2026-10-03: E4-1 配布依存境界 gate 違反の解消は配布物本文の名称参照化と sidecar 集約で完結した（case-run 差し戻し → 再マージ）
+
+- **問題事象**: E4-1 gate 違反（concrete-id 4 件 / concrete-path 2 件）で blocked だった #3397（PR #3402）の解消。違反 6 件を配布物本文（SKILL.md、scripts/lib/reconcile.ts、references/issue-operation-safety.md）から除去し名称参照（Case Issue 工程記録モデルの REQ 文書、Custom Tool 操作契約 Design、Epic Issue ステータス追跡テーブル更新節の単一書き手制約）へ変更、対応関係は traceability/agentdev-issue-management.yaml（REQ-101-011 / REQ-101-013 宣言は変更なしで維持）へ集約
+- **発生局面**: case-run 差し戻し対応（fix commit cc3bb90f）→ case-close(#epic) Wave 1 追加クローズ（Case #3391・PR #3402 再マージ 42d57d1e）
+- **検知方法**: E4-1 gate 再実行（check_distribution_boundary.ts --profile source、PR HEAD cc3bb90f。ok: true、scanned 367、concrete_id 0 / concrete_path 0 / fixed_url 0 / producer_metadata 0、failures 0）
+- **根本原因**: 配布 skill 本文に正本文書の concrete ID / concrete path を記述した（対応関係の正は traceability sidecar。本文が持つべきは名称参照のみ）
+- **自律対応内容**: gate 違反 6 件解消 → PR HEAD 更新 → E4-1 再実行合格 → squash merge → QG-4 判定（4 達成 / 2 未達維持・#3399 割当て）で completed クローズ → Epic ステータス追跡テーブル blocked→completed 更新。テスト回帰（fixture 失敗注入 11 pass、skills_structure 465 pass）・typecheck・traceability check の期待値更新は不要だった（本文参照形式の変更がコード・テスト・sidecar に波及しない構成）
+- **ユーザー確認の有無**: なし（機械的 gate・QG 判定の範囲内）
+- **REQ/Decision/Design影響**: なし（配布依存境界 Design の解消パターンどおりの動作）
+- **横展開観点**: 違反の解消パターン「本文から concrete ID / path を除去、参照性質の記述は名称参照のみ、対応関係は sidecar へ集約」で標準化可能。blocked 解消は Wave 1 追加クローズ（単一子 Issue の再マージと Epic テーブル 1 行更新）として Epic 全体の Wave 反復を乱さず完結できた。検出側の学びは既出エントリ（case-run 側で checker 記録欠落が E4-1 初検出 → blocked）を参照
+- **再発条件**: 配布物本文に新規参照を追記する実装を行う場合（解消側の予防対象）
+- **予防策候補**: 配布物本文への参照追記時は名称参照とし、ID / path レベルの対応は sidecar に書く規律を PR 作成時の確認観点へ
+- **想定反映先**: agentdev-issue-management の規定（SKILL.md・issue-operation-safety.md に規律追記済み）、配布依存境界 Design の解消パターン例示
+- **関連**: Case #3391・PR #3402（### distribution-boundary 解消記録）・Issue #3397 QG-4 判定コメント（https://github.com/yogata/agent-dev-flow/issues/3397#issuecomment-5968851030）
+- **タグ**: `#distribution-boundary` `#gate` `#blocked-recovery` `#name-reference` `#sidecar`
+
+## 2026-10-03: worktree 再作成（差し戻し後）では gitignore 対象の node_modules が復元されず bun x tsc が依存解決失敗になる（bun install 事前実行が必要）
+
+- **問題事象**: 差し戻し対応で worktree を再作成したところ、gitignore 対象の node_modules が復元されず bun x tsc が依存解決失敗になった。worktree 再作成後の再検証では bun install の事前実行が必要
+- **発生局面**: case-run 差し戻し対応後の再検証（Case #3391・PR #3402・.worktrees/3397-feature 再作成）
+- **検知方法**: bun x tsc 実行時の依存解決失敗
+- **根本原因**: node_modules は gitignore 対象のため worktree 間・再作成間で引き継がれない（scripts package 配下の依存が空のまま検証を実行すると失敗する）
+- **自律対応内容**: bun install を事前実行して依存を復元してから再検証し合格
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし
+- **横展開観点**: worktree 再作成を伴う全再検証（blocked 差し戻し対応、再マージ前の gate 再実行、QG 再検証）で同様の依存欠落が生じ得る。bun test 実行形態契約と同じ前置きの位置
+- **再発条件**: gitignore で node_modules を除外する構成で worktree を削除・再作成して検証を実行する場合
+- **予防策候補**: worktree 再作成後の検証手順の前置きとして bun install を明記（bun test 実行形態知識への補記候補。PR #3402 Findings / learning と同型）
+- **想定反映先**: case-close references/docs-and-design-promotion.md の bun test 実行形態契約周辺、bun 系スクリプト実行手順の cwd・依存前提注記
+- **関連**: Case #3391・PR #3402 Findings / learning、既出の bun x tsc cwd 規律エントリ（package 配下 cwd）
+- **タグ**: `#worktree` `#node_modules` `#bun-install` `#rerun`
