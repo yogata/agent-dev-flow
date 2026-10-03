@@ -182,3 +182,11 @@
 - 内容: third-party 取得機構経由で配置された git 管理外 real-dir（explainer/explainer-book/first-reader/yomiyasu）は checker 上 stale junction として検出される。IR-068 の third_party_skills 登録（INSPECTION-TOLERATED）と skill-use-for-boundary の exemptions 登録（provenance 付き）を併用する 2 段構成で解消した
 - 学び: third-party 配置の投影整合は 1 つの登録では完結しない。投影整合検査（IR-068 manifest 登録）と使用境界検査（skill-use-for-boundary exemptions）の双方に登録が必要である旨を実測で確認
 - 発見元: PR #3378 Findings/learning（Case #3338・backlog-pool-20261003・OU-008）
+
+## 2026-10-03: LongPathsEnabled 有効環境では Filename too long 部分失敗が再現しない（robocopy 手順の検証構成）
+
+- 問題クラス: workflow deviation（環境差による再現不能・代替検証構成）
+- 発生工程: case-run RA-016 TS-018 robocopy /MIR 手順の再現検証（Case #3363・OU-017）
+- 内容: LongPathsEnabled 有効環境（HKLM SYSTEM CurrentControlSet Control FileSystem LongPathsEnabled = 0x1）では `rmdir /s /q` が深いネスト（445 文字パス）でも成功し、Filename too long 部分失敗が再現しない。robocopy /MIR 手順の再現検証は深いネスト作成後 robocopy を直接実行する構成で実測値（rc 2・残存 0 件・rmdir rc 0）を取得した
+- 学び: Windows パス長制限起因の手順検証は環境設定（LongPathsEnabled）で挙動が変わる。再現検証は「手順の対象となる失敗状態を作ってから手順を実行する」構成で実測し、環境ラベルを実測根拠へ付記する
+- 発見元: PR #3379 Findings/learning（Case #3363・backlog-pool-20261003・OU-017）
