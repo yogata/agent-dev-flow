@@ -21,3 +21,7 @@ implementation:
     - REQ-021-030
   traceability/policy.yaml:
     - REQ-002-048
+    - REQ-096-031
+verification:
+  src/common/skills/agentdev-traceability/scripts/src/check.ts:
+    - REQ-096-031
