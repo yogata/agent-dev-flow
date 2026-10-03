@@ -8,6 +8,13 @@ case-revise workflow STEP-5 の実行詳細（SKILL.md「制御平面（STEP 一
 - 更新時は作成時のテンプレート構造と必須セクションを維持する。Markdown 行構造（LF、セクション間空行、インデント）の byte 単位保持を含む（`agentdev-workflow-templates` のテンプレート構造維持規約、`agentdev-issue-management` の Issue 更新時の前後内容比較に従う）
 - 更新前後の内容比較を行い、必須セクションの欠落を防ぐ。テンプレートの【必須】セクションの完備を確認してから更新する
 
+## 最新条件の引き渡しと適用方針報告の確認
+
+- STEP-4 で影響対象と判定した Issue の作業担当へ、Definition 変更の最新条件を引き渡す。引き渡しは Case 関連 Issue 本文の更新（変更の参照先、影響範囲、継続・停止・再実行の処置判断、再開条件）を通じて行い、作業担当が Issue 本文を読めば旧条件に基づかず再開できることを基準とする
+- 引き渡し後、作業担当による当該作業への適用方針の報告を確認する。適用方針の報告は、変更をどの工程・成果物へ適用するかと、影響しない部分を現行の現在地更新のまま継続するかを含む
+- 適用方針の報告が確認できるまで case-ready 引き継ぎへ進まない。報告が得られない対象がある場合は、確認待ちとして停止理由と再開条件を完了報告へ記録する（一律停止はせず、影響のない対象の進行は止めない）
+- 適用方針の報告確認は、影響対象と判定した Issue をもつ作業担当ごとに行い、確認結果を完了報告に含める
+
 ## case-ready への引き継ぎ
 
 - case-revise 完了後の execution contract / execution structure 再確定は case-ready を経由する。case-revise は再確定を実行せず、Amendment PR（存在する場合）と影響再評価結果を引き継ぎ情報として case-ready へ渡す
@@ -17,7 +24,8 @@ case-revise workflow STEP-5 の実行詳細（SKILL.md「制御平面（STEP 一
 ## 完了報告
 
 - 完了報告は case-revise 完了報告テンプレート（`agentdev-workflow-templates` 選定ルール）に従う
-- 完了報告には Definition Amendment PR の有無（作成 / 再利用 / 不作成）、影響再評価の結果（影響あり Issue 一覧、影響なし確認済み完了済み Issue の維持）、case-ready 引き継ぎの状態を含める
+- 完了報告には Definition Amendment PR の有無（作成 / 再利用 / 不作成）、影響再評価の結果（影響あり Issue 一覧、影響なし確認済み完了済み Issue の維持、影響対象ごとの継続・停止・再実行の判断）、最新条件の引き渡しと適用方針報告の確認結果、case-ready 引き継ぎの状態を含める
+- 途中で確定した判断変更（影響対象の処置判断の確定、影響しない対象の継続判断等）があった場合は、判断変更の記録契機として撤回対象を必須項目に含む記録コメントを Case Issue へ残す（記録コメントの様式は `agentdev-workflow-templates` に従う）
 - 実行識別情報セクションの形式は `agentdev-workflow-templates` の実行識別情報セクション規約に従う。取得不能な場合は「N/A」を記録し workflow を停止しない
 
 ## deviation capture

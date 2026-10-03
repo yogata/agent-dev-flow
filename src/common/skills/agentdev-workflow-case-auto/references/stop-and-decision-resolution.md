@@ -175,6 +175,19 @@ default-on + skip policy と case-auto の自走性を両立し、ユーザー�
 - **resume**: 回答、根拠、作業仮定を下位 command へ返し、既存 resume point から処理を継続する。新規永続結果型は導入しない。adversarial-review 再実行要否は adversarial-review 側の再 review 契約に従い case-auto は独自判断しない
 - **中央集約 review engine とはならない**: case-auto は raw finding を解釈、採否、候補反映しない。下位 command が構造化した decision_context のみを解決対象とし、raw finding を case-auto へそのまま渡さない
 
+#### 判断変更時の受領確認（記録・受領・適用の区別）
+
+自律解決・作業仮定で継続の分類は、既存判断を解決結果で置き換える判断変更である。判断変更を次の3区別で扱い、混同しない。
+
+| 区別 | 内容 |
+|---|---|
+| 記録 | 判断変更の記録契機として撤回対象（置き換え前の判断）を必須項目に含む記録コメントを当該 Case Issue へ残す（記録コメントの様式は `agentdev-workflow-templates` に従う） |
+| 受領 | 変更が及ぶ影響対象を特定し、継続・停止・再実行の処置を対象ごとに判断し、最新条件（回答・根拠・作業仮定）を作業担当へ引き渡す |
+| 適用 | 作業担当による当該作業への適用方針の報告を確認し、確認結果を進行記録へ反映する |
+
+- 影響しない対象を一律停止せず、通常の現在地更新で対応する。現在地の更新によって目的・対象範囲・完了条件を変更しない
+- Definition 変更（再合意済み）の受領確認経路の本体は case-revise workflow が所有する。case-auto は例外経路解決で case-revise の結果を受領し、判断変更に該当する解決結果のみ本節の経路を適用する
+
 ### Result
 
 - 自律解決時: 回答・根拠・作業仮定を下位 command へ返し resume
@@ -183,14 +196,15 @@ default-on + skip policy と case-auto の自走性を両立し、ユーザー�
 ### Evidence
 
 - decision_context の分類（自律解決/作業仮定/上位合意矛盾/新規ユーザー判断）、回答と根拠（自律解決時）、作業仮定の明示（作業仮定継続時）
+- 判断変更時: 撤回対象を含む記録コメント、影響対象ごとの処置判断、最新条件の引き渡し、適用方針報告の確認結果
 
 ### Completion Verification
 
-- 分類が4分類のいずれかであり、作業仮定で継続時に仮定と根拠が明示されていること。raw finding を解決対象にしていないこと
+- 分類が4分類のいずれかであり、作業仮定で継続時に仮定と根拠が明示されていること。raw finding を解決対象にしていないこと。判断変更時は撤回対象を含む記録が残り、影響しない対象が停止されていないこと
 
 ### Resume-Idempotency
 
-- 回答・根拠・作業仮定を下位 command へ返し既存 resume point（durable state）から継続する。新規永続結果型は導入しないため再実行は冪等
+- 回答・根拠・作業仮定を下位 command へ返し既存 resume point（durable state）から継続する。新規永続結果型は導入しないため再実行は冪等。判断変更時は記録コメントと影響対象の処置判断を永続状態として再開時に再読み取りする
 
 ## resume point
 
@@ -198,6 +212,7 @@ default-on + skip policy と case-auto の自走性を両立し、ユーザー�
 - 停止理由分類（9軸のいずれか）
 - adversarial-review 由来の user-decision-required 受領状態、decision_context、resume point
 - bounded parent decision resolution 判定結果（自律解決/作業仮定/上位合意矛盾/新規ユーザー判断）
+- 判断変更時の受領確認状態（記録コメント・影響対象の処置判断・最新条件の引き渡し・適用方針報告の確認）
 
 ## 関連 STEP
 
