@@ -34,8 +34,11 @@ implementation:
     - REQ-096-005
     - REQ-096-012
     - REQ-096-015
+    - REQ-101-009
 verification:
   src/common/skills/agentdev-workflow-case-auto/scripts/tests/records-report.test.ts:
     - REQ-034-021
     - REQ-101-008
     - REQ-101-011
+  .opencode/skills/repo-agentdev-integrity/scripts/agreement_change_acknowledgment.test.ts:
+    - REQ-101-009
