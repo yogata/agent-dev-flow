@@ -2,7 +2,7 @@
 title: "IR-066: legacy-path-removed-name"
 status: accepted
 created: 2026-08-22
-updated: 2026-08-22
+updated: 2026-10-05
 ---
 
 # IR-066: legacy-path-removed-name
@@ -13,13 +13,13 @@ updated: 2026-08-22
 | description | 現行参照として残る旧パスおよび削除済み名称を検出する。対象は `docs/specs/` パス、`.agentdev/graph/` パス、`agentdev-artifact-graph`、`check_graph`、廃止スキル名（`agentdev-spec-compliance`、`agentdev-adr-guidelines`、`agentdev-adr-file-manager`、`agentdev-doc-map`、`agentdev-workflow-reporting`）（REQ-010-067）。Issue #2383 (b) v1〜v4 監査観点再走査の採用分として旧 command 名 `inspect-extensions`（DEC-006 で廃止）と旧スキル名 `agentdev-spec-file-manager`、`agentdev-workflow-spec-save`（SPEC→Design 再定義、Issue #2349 で改称）を追加 |
 | severity | heuristic |
 | category | obsolete-structure |
-| detection_method | `check_integrity.ts` による行単位走査。検出パターンはスクリプト内 `IR066_VOCAB_PATTERNS` 定数、許容条件の運用データは `data/obsolete-vocabulary-map.yaml` が宣言する。IR-065 と同一の走査・許容基盤を共有する |
-| affected_artifacts | [docs/designs/**, docs/requirements/*.md, docs/decisions/*.md, docs/guides/*.md, src/opencode/**, .opencode/commands/**, .agentdev/extensions/**]（詳細は yaml scope） |
+| detection_method | `check_integrity.ts` による行単位走査。検出パターンはスクリプト内 `IR066_VOCAB_PATTERNS` 定数、許容条件の運用データは `data/obsolete-vocabulary-map.yaml` が宣言する。IR-065 と同一の走査・許容基盤を共有する。docs/designs 本文における旧パス現在形宣言検出: docs/designs/**/*.md の本文で `src/opencode/commands/` または `src/opencode/skills/` を原本・正規位置・検査対象として現在形で列挙する行を検出する（免除: code span 内の語彙言及、`src/opencode/plugins/` 等ホスト接続領域の現存パス言及、歴史言及〔v2: プレフィックス・旧構造の説明・Decision/Design の supersede 注記内〕、IR-055 の検出パターン語彙としての言及） |
+| affected_artifacts | [docs/designs/**, docs/requirements/*.md, docs/decisions/*.md, docs/guides/*.md, src/common/**, .opencode/commands/**, .agentdev/extensions/**]（詳細は yaml scope） |
 | related_req | [REQ-010-067, REQ-010-068, REQ-010-070] |
 | related_design | [../integrity-rule-catalog.md, data/obsolete-vocabulary-map.yaml] |
 | gate_level | full-audit |
 | false_positive_risk | 低〜中。IR-065 と同一の許容条件（履歴マーカー、superseded Decision、否定文脈、existence_probe、exemption_files）を適用する。廃止スキル名の検出は REQ-0108-262（検出パターン縮小）で除外された語彙のうち Wave 1 監査が fail 実在を確認した語彙に限定する。追加採用語彙（inspect-extensions 等 3 種）は v1〜v4 再走査で現行参照残存 0 件を確認した上で採用しており、DEC-006（inspect-extensions 廃止の移行記録）は exemption_files に登録する |
-| regression_test | `check_integrity.test.ts` describe "IR-065/IR-066 obsolete-vocabulary & legacy-path" および describe "IR-066 vocabulary extension (Issue #2383 (b) resweep adoption)"。正常例・違反例・境界例・許容例・再現例（F-01 stale junction 旧称）の 5 種 fixture |
+| regression_test | `check_integrity.test.ts` describe "IR-065/IR-066 obsolete-vocabulary & legacy-path" および describe "IR-066 vocabulary extension (Issue #2383 (b) resweep adoption)"。正常例・違反例・境界例・許容例・再現例（F-01 stale junction 旧称）の 5 種 fixture。docs/designs 旧パス現在形宣言検出の5種 fixture（正常例・違反例・境界例〔ホスト接続領域言及〕・許容例〔code span・歴史言及〕・再現例〔RU-20261005 sweep 由来〕）を追加 |
 | finding_route | intake |
 | triage_action | 新規検出は現行参照（実在パス・現行スキル名）への置換または履歴注記化。導入時点の既知違反は 0 件（baseline 空、追加採用語彙も 0 件） |
 | last_verified | 2026-08-22 |
@@ -34,6 +34,7 @@ updated: 2026-08-22
 | 4 | 廃止スキル名（`agentdev-spec-compliance` 等 5 種）が現行の委譲先・参照先として使用されないこと | heuristic fail |
 | 5 | 廃止 command 名 `inspect-extensions`（DEC-006）が現行の委譲先として使用されないこと | heuristic fail |
 | 6 | 旧スキル名 `agentdev-spec-file-manager`、`agentdev-workflow-spec-save`（Issue #2349 改称前）が現行参照として使用されないこと | heuristic fail |
+| 7 | docs/designs 本文の旧パス現在形宣言（`src/opencode/commands/`・`src/opencode/skills/` を原本・正規位置として現在形で列挙する行。免除対象外）が 0 件であること | heuristic fail |
 
 ## 廃止語彙と REQ-0108-262 との関係
 
@@ -45,7 +46,7 @@ Wave 1 監査の取りこぼし 2 件（監査観点 V1 `（ADR）` 注記、V4 
 
 ## exemption（許容条件）
 
-IR-065 と同一（`data/obsolete-vocabulary-map.yaml` が宣言）。existence_probe により、語彙に対応する実体（例: `src/opencode/skills/agentdev-spec-compliance/`）が実在する場合は当該語彙の検出を skip する。DEC-006.md（inspect-extensions 廃止と責務移管の移行記録）は exemption_files に追加した。
+IR-065 と同一（`data/obsolete-vocabulary-map.yaml` が宣言）。existence_probe により、語彙に対応する実体（例: `src/common/skills/agentdev-spec-compliance/`）が実在する場合は当該語彙の検出を skip する。DEC-006.md（inspect-extensions 廃止と責務移管の移行記録）は exemption_files に追加した。
 
 ## baseline 運用
 

@@ -2,7 +2,7 @@
 title: case-ready Design
 status: accepted
 created: 2026-09-14
-updated: "2026-10-04"
+updated: "2026-10-05"
 ---
 
 <!-- ADF-COVERS(design): REQ-021-024 -->
@@ -63,7 +63,7 @@ Decision受理評価でstatusをacceptedへ遷移させる際は、承認記録�
 
 ## 受け入れ義務の実行構成への投影完全性（REQ-061-041/042、REQ-017-021〜023、RU-20261004-08）
 
-Definition 受入と実行構成確定における受け入れ義務保存の実行時投影（直前セクションの直後に配置）。
+Definition 受入と実行構成確定における受け入れ義務保存の実行時投影。
 
 - Definition PR 受入の忠実性確認は、req-define での最新合意内容との照合を含む。必須受け入れ義務の欠落・縮小・反転を検出した場合は merge しない。
 - 実行契約・実行構成の確定時、対象要件行と受け入れ義務が各実行単位（Standard Case では対象 Case、Epic では各 Child 実行単位または Epic 横断最終検証義務）のいずれかに対応付けられていることを確認する。対応先のない義務が存在する場合は投影不完全として実行準備完了（ready 遷移）としない。

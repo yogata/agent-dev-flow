@@ -2,7 +2,7 @@
 title: "IR-063: common-policy-identifier-invariant"
 status: accepted
 created: 2026-08-22
-updated: 2026-09-02
+updated: 2026-10-05
 ---
 
 # IR-063: common-policy-identifier-invariant
@@ -14,7 +14,7 @@ updated: 2026-09-02
 | severity | strict |
 | category | document-drift |
 | detection_method | `check_integrity.ts` による registry 定義行抽出（`^[-*]\s+\*\*(POL-[a-z0-9-]+)\*\*`）と配布物本文抽出（`\bPOL-[a-z0-9-]+\b`、`\bG\d{2}\b`）の突合。未定義参照（evidence `undefined-reference:POL-*`）、重複定義（`duplicate-definition:POL-*`）、registry 外定義（`definition-outside-registry:POL-*`）、廃止済み Gxx 表記残存（`residual-gxx:Gxx`）を検出する |
-| affected_artifacts | [src/opencode/commands/agentdev/**, src/opencode/skills/agentdev-*/**] |
+| affected_artifacts | [src/common/commands/agentdev/**, src/common/skills/agentdev-*/**] |
 | related_req | [REQ-051-005, REQ-051-006, REQ-010-064, REQ-010-068] |
 | related_design | [../integrity-rule-catalog.md, ../../authoring/command-file-format.md] |
 | gate_level | full-audit |
@@ -35,7 +35,7 @@ updated: 2026-09-02
 
 ## 対象範囲
 
-検査対象は配布物（`src/opencode/commands/agentdev/**`（templates/ 含む）、`src/opencode/skills/agentdev-*/**` の .md 全体）である。repo-local command（`.opencode/commands/repo/`）は配布対象外のため機械検査の対象外とする。
+検査対象は配布物（`src/common/commands/agentdev/**`（templates/ 含む）、`src/common/skills/agentdev-*/**` の .md 全体）である。repo-local command（`.opencode/commands/repo/`）は配布対象外のため機械検査の対象外とする。
 
 ガードレール識別体系の規約（Command 固有境界の ID 不要、共通ポリシーの意味識別子、正規所有先への移管）は `authoring/command-file-format` Design「ガードレール識別体系」が所有し、識別子の定義実体は `agentdev-command-authoring` の共通ポリシー意味識別子 registry（`common-policy-identifiers.md`）が保持する。本ルールは検出意味論のみを所有する。
 

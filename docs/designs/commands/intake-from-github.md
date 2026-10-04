@@ -2,7 +2,7 @@
 title: intake-from-github Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-20"
+updated: "2026-10-05"
 ---
 <!-- ADF-COVERS(implementation): REQ-037-001, REQ-037-004, REQ-037-006, REQ-037-007 -->
 
@@ -53,7 +53,7 @@ updated: "2026-09-20"
 
 ## 所有関係と委譲
 
-- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、command 定義（`src/opencode/commands/agentdev/intake-from-github.md`）はその実行時投影である（DEC-010）。
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、command 定義（共通原本 `src/common/commands/agentdev/intake-from-github.md`。実行時投影先は `.opencode/commands/agentdev/`）はその実行時投影である（DEC-010、配備形態は DEC-049）。
 - workflow 実装本体（抽出アルゴリズムの実行手順、工程構成、reference 構成）は Workflow Skill（`agentdev-workflow-intake-from-github`）が所有し、本 Design はこれらを複製しない。本 workflow は capture-only 型であり、STEP model の対象外である（REQ-027-003）。resume point、export、import を持たず、工程は逐次実行、中断時は先頭から再実行する。
 - Workflow Skill の単独起動防止（soft guard）は Workflow Skill description の DO NOT USE FOR トリガーにより実効する（command 定義本文に soft guard 宣言節を持たない構成である）。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。

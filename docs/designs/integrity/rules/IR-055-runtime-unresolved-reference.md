@@ -2,7 +2,7 @@
 title: "IR-055: runtime-unresolved-reference（配布物内の導入先未解決参照検出）"
 status: accepted
 created: 2026-08-20
-updated: 2026-09-24
+updated: 2026-10-05
 ---
 
 # IR-055: runtime-unresolved-reference（配布物内の導入先未解決参照検出）
@@ -10,11 +10,11 @@ updated: 2026-09-24
 | Field | Value |
 |-------|-------|
 | rule_id | IR-055 |
-| description | 配布物（`src/opencode/commands/agentdev/**/*.md`、`src/opencode/skills/agentdev-*/**/*.md`、`references/` 配下、`SKILL.md` 含む）内の導入先未解決参照（REQ/Decision ID、`src/opencode/`、`docs/designs/`、`docs/guides/`、`/repo/*`、`repo-*`、本体 docs URL、line number 付き内部参照）を機械的パターンマッチングで検出すること。REQ-029-003 で既に要件化された「配布成果物は producer 内部成果物への具体参照に依存しない」原則の機械検出であり、意味的診断（文意保持・構文健全性・責務整合）は対象外（3層検出構造: [integrity-contracts.md](../integrity-contracts.md)）。Decision ID は現行 `DEC-\d{3}` 命名を検出する。旧 `ADR-\d{4}` 参照は Decision 移行漏れ（residual）として検出する（DEC-009 AG-016）。履歴参照 `v2:ADR-\d{4}` は AG-010 保護対象であり検出対象外 |
+| description | 配布物（`src/common/commands/agentdev/**/*.md`、`src/common/skills/agentdev-*/**/*.md`、`references/` 配下、`SKILL.md` 含む）内の導入先未解決参照（REQ/Decision ID、`src/opencode/`、`docs/designs/`、`docs/guides/`、`/repo/*`、`repo-*`、本体 docs URL、line number 付き内部参照）を機械的パターンマッチングで検出すること。REQ-029-003 で既に要件化された「配布成果物は producer 内部成果物への具体参照に依存しない」原則の機械検出であり、意味的診断（文意保持・構文健全性・責務整合）は対象外（3層検出構造: [integrity-contracts.md](../integrity-contracts.md)）。Decision ID は現行 `DEC-\d{3}` 命名を検出する。旧 `ADR-\d{4}` 参照は Decision 移行漏れ（residual）として検出する（DEC-009 AG-016）。履歴参照 `v2:ADR-\d{4}` は AG-010 保護対象であり検出対象外 |
 | severity | strict（REQ/Decision ID、`src/opencode/`、`/repo/*`、`repo-*`）、heuristic または observation（`docs/designs/`、`docs/guides/`、本体 docs URL、line number 付き参照）。パターンごとの分類は後述「IR-055 検出パターンと severity」参照 |
 | category | broken-reference |
 | detection_method | 正規表現パターンマッチング（walkMarkdown / collectAgentdevSkillMarkdown による走査）。Decision ID は `DEC-\d{3}`、旧形式 residual は `ADR-\d{4}` を検出。code block 内部、template placeholder（`{xxx}`）、vocabulary-registry.md / integrity-rule-catalog.md / rules/IR-055-*.md 自身等の正当使用例外パスは exemption 対象とする。`v2:ADR-\d{4}` は履歴参照保護（AG-010）のため `v2:` prefix ありは検出対象外 |
-| affected_artifacts | [src/opencode/commands/agentdev/**/*.md, src/opencode/skills/agentdev-*/**/*.md, src/opencode/skills/agentdev-*/references/**/*.md, src/opencode/skills/agentdev-*/SKILL.md] |
+| affected_artifacts | [src/common/commands/agentdev/**/*.md, src/common/skills/agentdev-*/**/*.md, src/common/skills/agentdev-*/references/**/*.md, src/common/skills/agentdev-*/SKILL.md] |
 | related_req | [REQ-029-003] |
 | related_design | [integrity-rule-catalog.md, integrity-contracts.md] |
 | gate_level | full-audit, delta-guard, impact-guard |

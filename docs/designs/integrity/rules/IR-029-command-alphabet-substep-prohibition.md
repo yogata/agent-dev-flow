@@ -2,7 +2,7 @@
 title: "IR-029: Command 英字サブステップ禁止"
 status: accepted
 created: 2026-08-20
-updated: "2026-09-19"
+updated: "2026-10-05"
 ---
 
 # IR-029: Command 英字サブステップ禁止
@@ -13,7 +13,7 @@ updated: "2026-09-19"
 | description | Command の Step 見出し、参照に `10a` / `11c` などの英字サブステップが残存せず、必要なサブステップは `N-M` 形式で表記されていること |
 | severity | strict |
 | category | obsolete-structure |
-| detection_method | `src/opencode/commands/agentdev/*.md` を対象に Step 文脈の `[0-9][a-z]` を検出し、N-M 形式への統一を確認 |
+| detection_method | `src/common/commands/agentdev/*.md` を対象に Step 文脈の `[0-9][a-z]` を検出し、N-M 形式への統一を確認 |
 | affected_artifacts | [commands, command projection, integrity rules] |
 | related_req | -（要件行レベルの正規所有者なし。サブステップ様式の正規契約は command-file-format.md が所有） |
 | related_design | [../../authoring/command-file-format.md, artifact-contracts.md, v4-responsibility-boundaries.md] |

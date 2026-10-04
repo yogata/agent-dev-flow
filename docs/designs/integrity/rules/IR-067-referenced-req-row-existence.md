@@ -2,7 +2,7 @@
 title: "IR-067: referenced-req-row-existence"
 status: accepted
 created: 2026-08-22
-updated: 2026-09-17
+updated: 2026-10-05
 ---
 
 # IR-067: referenced-req-row-existence
@@ -13,8 +13,8 @@ updated: 2026-09-17
 | description | docs 本文が引用する階層 REQ 行 ID（`REQ-NNN-NNN`、現行3桁番号帯）の実在性を機械検査する。引用先の行 ID が docs/requirements の要件行テーブルに存在しない場合（ファントム引用: 未コミット草案番号の引用残存、要件分割前の旧行 ID 残存）に検出する。テンプレート・例示のプレースホルダー（`REQ-010-NNN`、`REQ-{NNNN}-{NNN}` 等の非数字形式）は正規表現上マッチせず誤検出しない（REQ-010-065 許容条件準拠、REQ-010-069） |
 | severity | strict |
 | category | document-drift |
-| detection_method | `check_integrity.ts`（`checkReferencedReqRowExistence`）による走査。(1) `docs/requirements/*.md` と `retired/*.md` の表行（`\|` 先頭行）から行 ID インデックスを構築、(2) docs 本文（docs/designs、docs/requirements、docs/decisions、docs/guides、src/opencode、.opencode/commands、.agentdev/extensions、ルート README.md、docs/README.md）の引用を突合する。階層 ID 検索の3点設計（checker-execution-contracts Design）: v2: プレフィックス許容、表行先頭出現を実在の正とする、前置一致除外（旧4桁番号帯 `REQ-NNNN-NNN` は検出対象外） |
-| affected_artifacts | [docs/designs/**, docs/requirements/*.md, docs/decisions/*.md, docs/guides/*.md, src/opencode/**, .opencode/commands/**, .agentdev/extensions/**, README.md, docs/README.md] |
+| detection_method | `check_integrity.ts`（`checkReferencedReqRowExistence`）による走査。(1) `docs/requirements/*.md` と `retired/*.md` の表行（`\|` 先頭行）から行 ID インデックスを構築、(2) docs 本文（docs/designs、docs/requirements、docs/decisions、docs/guides、src/common、.opencode/commands、.agentdev/extensions、ルート README.md、docs/README.md）の引用を突合する。階層 ID 検索の3点設計（checker-execution-contracts Design）: v2: プレフィックス許容、表行先頭出現を実在の正とする、前置一致除外（旧4桁番号帯 `REQ-NNNN-NNN` は検出対象外） |
+| affected_artifacts | [docs/designs/**, docs/requirements/*.md, docs/decisions/*.md, docs/guides/*.md, src/common/**, .opencode/commands/**, .agentdev/extensions/**, README.md, docs/README.md] |
 | related_req | [REQ-010-069, REQ-010-065, REQ-010-068] |
 | related_design | [../integrity-rule-catalog.md, ../checker-execution-contracts.md] |
 | gate_level | full-audit |
@@ -40,7 +40,7 @@ updated: 2026-09-17
 | `v2:REQ-NNN-NNN` プレフィックス付き | 歴史識別子（旧番号帯の正規参照形式） |
 | `REQ-010-NNN`、`REQ-{NNNN}-{NNN}` 等の非数字形式 | プレースホルダー様式例示（REQ-010-065 許容条件。正規表現上マッチしない） |
 | code span / fenced code block 内 | 様式例示 |
-| `_template.md`、`src/opencode/commands/agentdev/templates/`、`src/opencode/skills/*/templates/` | テンプレート領域 |
+| `_template.md`、`src/common/commands/agentdev/templates/`、`src/common/skills/*/templates/` | テンプレート領域 |
 | `docs/designs/integrity/rules/IR-*.md` | 例示用 ID を含む自己参照的資料（v2:REQ-0145-015、他検出関数と同一） |
 | AUTOGEN ブロック内の行 | 機械生成領域（checker-execution-contracts 検出対象除外規定） |
 | `docs/requirements/retired/`、`docs/decisions/retired/`、`docs/reports/` | 履歴領域 |

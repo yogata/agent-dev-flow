@@ -2,7 +2,7 @@
 title: req-define Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-29"
+updated: "2026-10-05"
 ---
 <!-- ADF-COVERS(implementation): REQ-008-018, REQ-008-019, REQ-008-020, REQ-008-021, REQ-008-023, REQ-008-024, REQ-008-025, REQ-008-026, REQ-008-027, REQ-008-028, REQ-008-029, REQ-008-030, REQ-008-031, REQ-008-034, REQ-008-035, REQ-008-038, REQ-008-039, REQ-008-040, REQ-008-042, REQ-008-043, REQ-008-044, REQ-008-045, REQ-008-046, REQ-008-050, REQ-008-051, REQ-008-054, REQ-008-058 -->
 <!-- ADF-COVERS(design): REQ-008-061, REQ-008-062 -->
@@ -192,7 +192,7 @@ backlog-review が付与する `tentative_classification`（現行の暫定分�
 
 #### agentdev-req-analysis SKILL 連携
 
-上記手順の詳細（質問運用ルール、分析フレーム選択基準）は `agentdev-req-analysis` SKILL（`src/opencode/skills/agentdev-req-analysis/SKILL.md`）の「質問運用ルール」「要件分析観点」セクションに反映する。
+上記手順の詳細（質問運用ルール、分析フレーム選択基準）は `agentdev-req-analysis` SKILL（共通原本 `src/common/skills/agentdev-req-analysis/SKILL.md`。実行時投影先は `.opencode/skills/agentdev-req-analysis/`）の「質問運用ルール」「要件分析観点」セクションに反映する。
 本 Design は手順の要件を定義し、SKILL は実装詳細を定義する（原本src→配置先.opencode の文書間投影規則に準拠）。
 
 ### 記述単位・寿命の判定項目追加
@@ -482,7 +482,7 @@ auto_gate:
 
 ## 所有関係と委譲
 
-- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、command 定義（`src/opencode/commands/agentdev/req-define.md`）はその実行時投影である（DEC-010）。
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、command 定義（共通原本 `src/common/commands/agentdev/req-define.md`。実行時投影先は `.opencode/commands/agentdev/`）はその実行時投影である（DEC-010、配備形態は DEC-049）。
 - workflow 実装本体（STEP 構成、resume protocol、reference 構成）は Workflow Skill（`agentdev-workflow-req-define`）が所有し、本 Design はこれらを複製しない。
 - Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
