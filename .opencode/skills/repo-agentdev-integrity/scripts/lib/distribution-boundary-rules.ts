@@ -15,7 +15,9 @@
 // ReferenceError used to surface as a "not valid YAML" warning). Both paths
 // share the same single load site and the same fail-closed error messages.
 // Self-host detectable concerns implemented here; consumer-environment
-// specific detection is delegated to install-consumer-opencode.ps1.
+// specific detection is delegated to scripts/install.ps1 (current entry
+// point; the legacy installer name install-consumer-opencode.ps1 is kept
+// only as a retired-name detection vocabulary in data/distribution-targets.yaml).
 //
 // Split out of check_distribution_boundary.ts so rule logic lives in a
 // focused module consumed by the orchestrator.
