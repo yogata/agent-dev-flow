@@ -1,0 +1,11 @@
+component: git-noninteractive-auth
+implementation:
+  docs/knowledge/git-noninteractive-auth.md:
+    - REQ-102-001
+    - REQ-102-002
+    - REQ-102-003
+    - REQ-102-004
+verification:
+  docs/knowledge/git-noninteractive-auth.md:
+    - REQ-102-001
+    - REQ-102-004

@@ -15,6 +15,9 @@ implementation:
     - REQ-100-006
     - REQ-101-011
     - REQ-101-013
+    - REQ-102-001
+    - REQ-102-002
+    - REQ-102-004
   src/common/skills/agentdev-issue-management/scripts/lib/reconcile.ts:
     - REQ-101-011
     - REQ-101-013
