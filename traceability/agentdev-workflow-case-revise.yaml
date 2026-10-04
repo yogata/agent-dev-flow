@@ -19,11 +19,20 @@ implementation:
   src/common/skills/agentdev-workflow-case-revise/references/definition-revision.md:
     - REQ-083-001
     - REQ-101-009
+    - REQ-101-017
   src/common/skills/agentdev-workflow-case-revise/references/handoff-and-update.md:
     - REQ-062-006
     - REQ-101-009
+    - REQ-101-017
+    - REQ-101-019
   src/common/skills/agentdev-workflow-case-revise/references/impact-reassessment.md:
     - REQ-101-009
+    - REQ-101-018
+    - REQ-101-019
 verification:
   .opencode/skills/repo-agentdev-integrity/scripts/agreement_change_acknowledgment.test.ts:
     - REQ-101-009
+  .opencode/skills/repo-agentdev-integrity/scripts/agreement_change_freshness.test.ts:
+    - REQ-101-017
+    - REQ-101-018
+    - REQ-101-019
