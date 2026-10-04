@@ -689,3 +689,19 @@
 - **想定反映先**: learning-promote での評価。integrity 基盤のテスト repoRoot 解決規約の追補候補
 - **関連**: Root Case #3420・PR #3422・bun test 正規形「3 cwd 分割実行」節・baseline 再現確認（cc3420-baseline.json 証跡）
 - **タグ**: `#bun-test` `#worktree-depth` `#repo-root-resolution` `#pre-existing` `#fail-origin-classification`
+
+## 2026-10-04: case-open 委譲指示の cleanup 権限記述が現行契約と乖離していた。draft/RU 削除は case-ready 所有（REQ-030-007）
+
+- **問題事象**: orchestration からの case-open 委譲 prompt に「On success: perform the workflow's own cleanup criteria for draft and source RU (case-open owns RU removal on success)」の指示が含まれたが、現行契約では case-open は draft / RU を削除しない（agentdev-workflow-case-open SKILL.md「行わない副作用」、capture-and-completion.md STEP-6-2、REQ-030-007。削除は case-ready が実行する）
+- **発生局面**: case-open 委譲実行（Root Case #3424・Definition PR #3426・RU-20261004-07）
+- **検知方法**: workflow skill 読込時に capture-and-completion.md の「draft / RU は削除しない」記述と委譲指示の直接突合
+- **根本原因**: 委譲 prompt 生成側が case-open の cleanup 権限を旧設計または誤記として宣言しており、workflow 契約の正（case-ready 所有）を反映していない
+- **自律対応内容**: workflow 契約を正として draft（.agentdev/drafts/req-draft-deletebranchonmerge-warning.md）と source RU（.agentdev/backlog/req-units/RU-20261004-07.md）を保持し、削除を実行しなかった。完了報告へ保持を記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（REQ-030-007 現行契約の遵守）
+- **横展開観点**: 委譲 prompt の指示は workflow skill 契約と突合し、矛盾する指示は契約側を正として扱う。兄弟 Case の委譲にも同一文言が含まれる可能性がある
+- **再発条件**: orchestration 側が workflow 契約と乖離した cleanup 権限を委譲 prompt に埋め込む場合
+- **予防策候補**: case-open 委譲 prompt テンプレートから「case-open owns RU removal」相当の文言除去、workflow 契約の委譲指示面への投影確認候補
+- **想定反映先**: learning-promote での評価。orchestration 委譲指示の契約整合確認候補
+- **関連**: Root Case #3424・PR #3426・REQ-030-007・agentdev-workflow-case-open capture-and-completion.md
+- **タグ**: `#case-open` `#ru-removal` `#contract-drift` `#delegation-instruction` `#case-ready`
