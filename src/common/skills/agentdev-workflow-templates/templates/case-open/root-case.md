@@ -38,15 +38,10 @@ labels: enhancement
 <!-- 【必須】 -->
 
 <!-- 進行状況: Case Issue 工程記録モデル（workflows/issue-lifecycle-records Design）に基づく工程記録セクション。
-正規状態と開始・終了日時のみを保持する。表示用の進行状態4値、現在工程、担当役割、次の行動、最新記録参照は保存しない。
+正規状態（open、ready、running、blocked、review、closed、cancelled の7値域。値の正は workflows/v4-lifecycle-state-machine Design）と開始・終了日時のみを保持する。表示用の進行状態4値、現在工程、担当役割、次の行動、最新記録参照は保存しない。
 開始日時は初めて実装または検証に実着手した時刻であり、停止・再開で上書きしない。
 終了日時は完了または中止確定時のみ設定する。 -->
 
-- 正規状態: 実行継続中（active）
+- 正規状態: open
 - 開始日時: N/A（case-run での初回実装・検証着手時に設定）
 - 終了日時: N/A
-
-## 補足情報
-<!-- 【任意】 -->
-
-[その他の情報]

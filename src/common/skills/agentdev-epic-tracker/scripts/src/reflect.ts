@@ -1,19 +1,22 @@
-// CLI entry for the coordination reflect engine.
+// CLI entry for the Epic reflection engine.
 //
 // Deterministic write-path helper: reads the LATEST Epic Issue body from a
-// file, applies one coordination/closing/overall update to what was read,
-// and writes the merged body to stdout as JSON. Callers (workflow agent or
-// script) own the GitHub I/O and the per-Epic exclusive serialization; this
-// tool never performs network writes.
+// file, applies one closing/reset update to what was read, or evaluates the
+// overall completion, and writes the result to stdout as JSON. Callers
+// (workflow agent or script) own the GitHub I/O and the per-Epic exclusive
+// serialization; this tool never performs network writes.
+//
+// Epic 本文への書き込みは実行構成の状態反映（closing / reset）に限定される。
+// overall モードは評価結果を返すのみで本文を書き換えない（評価の記録先は
+// 正規の完了条件チェックの確定と証拠であり、Epic 本文への中間投影を保存しない）。
 //
 // Usage:
-//   bun run reflect.ts reflect --epic-body <file> --report '<json>'
 //   bun run reflect.ts closing --epic-body <file> --child <N> \
 //       --status <pending|completed|blocked|failed>
 //   bun run reflect.ts reset --epic-body <file> --child <N>
 //   bun run reflect.ts overall --epic-body <file> --evaluation '<json>' \
 //       --child-issues '42,43,44'
-//   (--report / --evaluation also accept --report-file / --evaluation-file)
+//   (--evaluation also accepts --evaluation-file)
 //
 // Output (stdout, single JSON object):
 //   { "ok": true, "body": "<merged body>", "applied": true, "skipped": null }
@@ -21,17 +24,12 @@
 
 import { readFileSync } from "node:fs";
 import {
-  RECORD_TRIGGERS,
   applyClosingStatus,
-  applyReflectEntry,
   evaluateOverallCompletion,
   resetChildToPending,
-  upsertOverallEvaluation,
   type ClosingApplyResult,
   type OverallCriterionInput,
   type OverallEvaluation,
-  type ReflectApplyResult,
-  type ReflectEntry,
 } from "../lib/epic-reflect.ts";
 import {
   readChildStatus,
@@ -89,40 +87,8 @@ function readJson(
   }
 }
 
-function parseReflectReport(raw: unknown): ReflectEntry {
-  if (typeof raw !== "object" || raw === null) {
-    fail(["--report must be a JSON object"]);
-  }
-  const r = raw as Record<string, unknown>;
-  const childIssue = Number(r.childIssue);
-  if (!Number.isInteger(childIssue) || childIssue <= 0) {
-    fail(["--report.childIssue must be a positive integer"]);
-  }
-  const status = r.status;
-  if (
-    typeof status !== "string" ||
-    !(PERSISTED_STATUS_VALUES as readonly string[]).includes(status)
-  ) {
-    fail([`--report.status must be one of ${PERSISTED_STATUS_VALUES.join(", ")}`]);
-  }
-  const entry: ReflectEntry = {
-    childIssue,
-    trigger: r.trigger as ReflectEntry["trigger"],
-    status: status as PersistedStatus,
-  };
-  if (!(RECORD_TRIGGERS as readonly string[]).includes(entry.trigger)) {
-    fail([`--report.trigger must be one of ${RECORD_TRIGGERS.join(", ")}`]);
-  }
-  if (r.reason !== undefined) entry.reason = String(r.reason);
-  if (r.nextAction !== undefined) entry.nextAction = String(r.nextAction);
-  if (r.basis !== undefined) entry.basis = String(r.basis);
-  return entry;
-}
-
 const KNOWN_OPTIONS = new Set([
   "epic-body",
-  "report",
-  "report-file",
   "evaluation",
   "evaluation-file",
   "child-issues",
@@ -161,20 +127,6 @@ function parseCliArgs(argv: string[]): ParsedArgs {
 function main(): void {
   const { mode, values } = parseCliArgs(process.argv.slice(2));
   const args = { values };
-  if (mode === "reflect") {
-    const body = readBody(args.values["epic-body"]);
-    const raw = readJson(args.values.report, args.values["report-file"], "report");
-    const entry = parseReflectReport(raw);
-    const result: ReflectApplyResult = applyReflectEntry(body, entry);
-    const payload: CliResult = {
-      ok: true,
-      body: result.body,
-      applied: result.applied,
-      skipped: null,
-    };
-    console.log(JSON.stringify(payload, null, 2));
-    return;
-  }
   if (mode === "closing") {
     const body = readBody(args.values["epic-body"]);
     const child = Number(args.values.child);
@@ -260,18 +212,17 @@ function main(): void {
       childStatuses,
       evaluatedCriteria,
     });
-    const nextBody = upsertOverallEvaluation(body, evaluation);
     const payload: CliResult = {
       ok: true,
-      body: nextBody,
-      applied: true,
+      body,
+      applied: false,
       skipped: null,
       evaluation,
     };
     console.log(JSON.stringify(payload, null, 2));
     return;
   }
-  fail([`unknown mode: ${String(mode)} (expected reflect | closing | overall)`]);
+  fail([`unknown mode: ${String(mode)} (expected closing | reset | overall)`]);
 }
 
 main();

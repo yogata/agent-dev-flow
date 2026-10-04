@@ -27,6 +27,7 @@ implementation:
     - REQ-007-014
     - REQ-007-015
   src/common/skills/agentdev-workflow-case-run/scripts/record-comments.ts:
+    - REQ-006-112
     - REQ-101-006
     - REQ-101-007
     - REQ-101-014

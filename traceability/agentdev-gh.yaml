@@ -27,6 +27,8 @@ implementation:
     - REQ-083-005
   src/common/tools/agentdev-gh/local/case-schema/case-file.md:
     - REQ-100-001
+  src/common/tools/agentdev-gh/local/case-schema/rules/status.yaml:
+    - REQ-006-112
 verification:
   src/common/tools/agentdev-gh/local/case-schema/case-file.md:
     - REQ-100-001

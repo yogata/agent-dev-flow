@@ -70,7 +70,7 @@ pipeline 各層を構成する 4 成果物の役割、性格、command 間の振
 - Decision 候補分類の前に `agentdev-decision-guidelines` の除外基準（禁止条件フィルタリングゲート）を必須適用する
 - `case-run` への直接受け渡しは禁止（`backlog-review` → `req-define` を経由すること）
 - **learning-promote は反映先を直接変更しない**: learning 固有の評価責務（学習価値、問題クラス、8軸評価、change_nature、再発条件、docs/knowledge/ 候補判定、重複・陳腐化、保留要否）を維持し、Skill、Command、script 等の具体的な実現先を選ぶ分類・マッピングは行わない。採用済み成果物は、問題、根拠、望ましい状態、制約、既存事実を req-define が変更方針を確定できる自足的な情報として保持する（REQ）
-- **adversarial-review は任意助言手段（learning-promote、REQ）**: ユーザー明示要求時のみ Step 8-R1（発動条件判定）→ Step 8-R2（review 呼出）を経て発動する。明示要求がない場合は Phase 5 へ従来フローを維持する（REQ-{NNNN}-{NNN}/{NNN}）。共通 caller integration 契約（任意性、副作用禁止、再 review 条件、停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` Design（REQ-{NNNN}）が正規所有する。本 skill は learning-promote 固有の候補判断、呼出タイミング、evaluation-report 反映、Step 6 戻しループの実装詳細のみを提供する
+- **adversarial-review は原則発動の助言手段（learning-promote、REQ）**: default-on で Step 8-R1（発動条件判定）→ Step 8-R2（review 呼出）を経て発動する。skip 条件該当時は Phase 5 へ従来フローを維持する（REQ-{NNNN}-{NNN}/{NNN}）。ユーザーが review の実施を明示的に指示した場合は通常のユーザー指示としてその場で実行し、専用の検出・フラグ・保存・伝播・skip 条件の専用上書き処理を持たない。共通 caller integration 契約（任意性、副作用禁止、再 review 条件、停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` Design（REQ-{NNNN}）が正規所有する。本 skill は learning-promote 固有の候補判断、呼出タイミング、evaluation-report 反映、Step 6 戻しループの実装詳細のみを提供する
 
 ## 主要な判断順序
 

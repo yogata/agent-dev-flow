@@ -36,16 +36,21 @@ const ABOLISHED_HEADINGS = [
   "## 分解",
   "## 実行順序",
   "## ステータス追跡",
+  "## 補足情報",
 ];
 
 // 進行状況セクションの必須項目（正規状態は Root / Epic のみ、Child は日時のみ）
 const PROGRESS_ITEMS_ROOT = ["正規状態", "開始日時", "終了日時"];
 const PROGRESS_ITEMS_CHILD = ["開始日時", "終了日時"];
-// 正規状態3値（表示と値トークン）
+// Root Case 正規状態の7値トークン（値の正は workflows/v4-lifecycle-state-machine Design）
 const CANONICAL_STATES = [
-  "実行継続中（active）",
-  "完了（closed）",
-  "中止（cancelled）",
+  "open",
+  "ready",
+  "running",
+  "blocked",
+  "review",
+  "closed",
+  "cancelled",
 ];
 
 function readTemplate(relPath: string): string {
@@ -105,7 +110,7 @@ describe("Case Issue 本文テンプレートの新形式投影", () => {
         });
       } else {
         it("Root の進行状況は正規状態と開始・終了日時のみを保持する", () => {
-          expect(progressBlock).toContain("- 正規状態: 実行継続中（active）");
+          expect(progressBlock).toContain("- 正規状態: open");
           expect(progressBlock).toContain("- 開始日時:");
           expect(progressBlock).toContain("- 終了日時:");
           expect(progressBlock).not.toMatch(/^- 進行状態:/m);
@@ -114,8 +119,11 @@ describe("Case Issue 本文テンプレートの新形式投影", () => {
           expect(progressBlock).not.toMatch(/^- 最新記録参照:/m);
         });
 
-        it("進行状況は正規状態3値の様式に従う", () => {
-          expect(CANONICAL_STATES).toContain("実行継続中（active）");
+        it("進行状況は Root Case 正規状態7値の様式に従う", () => {
+          for (const state of CANONICAL_STATES) {
+            expect(CANONICAL_STATES).toContain(state);
+          }
+          expect(progressBlock).toMatch(/^- 正規状態: (open|ready|running|blocked|review|closed|cancelled)$/m);
           expect(progressBlock).not.toContain("未着手");
           expect(progressBlock).not.toContain("待機");
         });

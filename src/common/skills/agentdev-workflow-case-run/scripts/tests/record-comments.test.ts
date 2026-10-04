@@ -299,12 +299,12 @@ describe("記録コメントの必須項目検証（投稿前 fail-closed）", (
 describe("本文進行状況・結果セクションの構築と適用", () => {
   test("進行状況セクション（Root Case）は正規状態と開始・終了日時のみを含む", () => {
     const section = buildProgressSection({
-      canonicalState: "active",
+      canonicalState: "running",
       startDate: "2026-10-04 05:25 JST",
       endDate: "N/A",
     });
     expect(section).toContain("## 進行状況");
-    expect(section).toContain("- 正規状態: 実行継続中（active）");
+    expect(section).toContain("- 正規状態: running");
     expect(section).toContain("- 開始日時: 2026-10-04 05:25 JST");
     expect(section).toContain("- 終了日時: N/A");
     expect(section).not.toContain("- 工程:");
@@ -326,15 +326,15 @@ describe("本文進行状況・結果セクションの構築と適用", () => {
     expect(section).not.toContain("- 正規状態:");
   });
 
-  test("正規状態ラベルは3値のみ（blocked・failed は Root Case の正規状態として保持しない）", () => {
-    const completed = buildProgressSection({ canonicalState: "completed", startDate: "x", endDate: "y" });
-    const cancelled = buildProgressSection({ canonicalState: "cancelled", startDate: "x", endDate: "y" });
-    expect(completed).toContain("完了（closed）");
-    expect(cancelled).toContain("中止（cancelled）");
-    expect(section_());
-    function section_(): string {
-      return buildProgressSection({ canonicalState: "active", startDate: "x", endDate: "y" });
+  test("正規状態は7値トークンをそのまま出力する（status.yaml と単一トークン体系、終端=closed）", () => {
+    const states = ["open", "ready", "running", "blocked", "review", "closed", "cancelled"] as const;
+    for (const state of states) {
+      const section = buildProgressSection({ canonicalState: state, startDate: "x", endDate: "y" });
+      expect(section).toContain(`- 正規状態: ${state}`);
     }
+    const completed = buildProgressSection({ canonicalState: "closed", startDate: "x", endDate: "y" });
+    expect(completed).toContain("- 正規状態: closed");
+    expect(completed).not.toContain("完了（closed）");
   });
 
   test("結果セクションは成果物と残件の扱いを含む（完了・中止確定時のみ作成。終了状態は重複保存しない）", () => {
@@ -355,27 +355,27 @@ describe("本文進行状況・結果セクションの構築と適用", () => {
       "",
       "## 進行状況",
       "",
-      "- 正規状態: 実行継続中（active）",
+      "- 正規状態: open",
       "- 開始日時: N/A",
       "- 終了日時: N/A",
       "",
-      "## 補足情報",
+      "## 作業ログ",
       "",
       "備考",
       "",
     ].join("\n");
     const next = applySection(existing, buildProgressSection({
-      canonicalState: "active",
+      canonicalState: "running",
       startDate: "2026-10-04 05:25 JST",
       endDate: "N/A",
     }));
     expect(next).toContain("- 開始日時: 2026-10-04 05:25 JST");
     expect(next.match(/## 進行状況/g)?.length).toBe(1);
-    expect(next).toContain("## 補足情報");
+    expect(next).toContain("## 作業ログ");
     expect(next).not.toContain("開始日時: N/A\n");
   });
 
-  test("applySection は同名セクション不在時、補足情報セクションの直前に追加する", () => {
+  test("applySection は同名セクション不在時、本文末尾へ追加する", () => {
     const existing = [
       "# Issue",
       "",
@@ -383,16 +383,20 @@ describe("本文進行状況・結果セクションの構築と適用", () => {
       "",
       "内容",
       "",
-      "## 補足情報",
+      "## 作業ログ",
       "",
       "備考",
       "",
     ].join("\n");
-    const next = applySection(existing, buildResultSection({ deliverables: "PR #100", remainingItems: "なし" }));
-    const idxResult = next.indexOf("## 結果");
-    const idxSupplement = next.indexOf("## 補足情報");
-    expect(idxResult).toBeGreaterThanOrEqual(0);
-    expect(idxSupplement).toBeGreaterThan(idxResult);
+    const next = applySection(existing, buildProgressSection({
+      canonicalState: "running",
+      startDate: "2026-10-04 05:25 JST",
+      endDate: "N/A",
+    }));
+    expect(next).toContain("## 進行状況");
+    const idxProgress = next.indexOf("## 進行状況");
+    expect(idxProgress).toBeGreaterThan(next.indexOf("## 作業ログ"));
+    expect(next.trimEnd().endsWith("- 終了日時: N/A")).toBe(true);
   });
 });
 

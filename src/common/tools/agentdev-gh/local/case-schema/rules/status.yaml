@@ -6,7 +6,9 @@
 # role ごとの status 値域・終端状態・状態遷移を定義する。
 # role: tracking の 6 状態と三段写像（GitHub open/closed、Tool issue_close reason
 # の対応）の意味論の正は agentdev-issue-tracking Design が所有する。
-# 本ファイルは docs/designs/local/local-case-file.md と矛盾してはならない。
+# role: case の 7 状態の正は REQ-006-112 と workflows/v4-lifecycle-state-machine
+# Design、物理表現（状態遷移表・禁止遷移）は docs/designs/local/local-case-file.md が
+# 所有する。本ファイルは docs/designs/local/local-case-file.md と矛盾してはならない。
 
 schema_version: "2.0"
 target: ".agentdev/issues/issue-{NNNN}.md の status フィールド"
@@ -19,7 +21,7 @@ role_conditional_status:
     description: "追跡Issue 6 状態（起票、検討中、保留、実行準備完了、解決済み、クローズ済み）"
   case:
     enum_ref: "#case_status_enum"
-    description: "Case 実行 3 状態（実行継続中 / 完了 / 中止）"
+    description: "Case 実行 7 状態（open / ready / running / blocked / review / closed / cancelled）"
 
 # role: tracking の status 値域
 tracking_status_enum:
@@ -74,12 +76,26 @@ tracking_transitions:
     note: "クローズ済みからの再検討"
 
 # role: case の status 値域
-# Root Case の正規状態は実行継続、完了、中止を識別できる最小構成。
-# blocked・failed は子 Issue の状態として Epic 実行構成が所有し、
-# Root Case の status 値としては重複保持しない。
+# Root Case の正規状態の値域は open、ready、running、blocked、review、closed、
+# cancelled の7値（REQ-006-112）。各値の意味は docs/designs/local/local-case-file.md
+# の値域表（REQ-006-112 変更前原文に従う）を正とする。
+# Epic 実行構成が所有する子 Issue の blocked、failed を Root の status 値へ
+# 重複コピーしない（REQ-035-004）。Root 固有の継続条件不足は blocked で表す。
 case_status_enum:
-  active:
-    description: "実行継続中（Root Case 確立から実行完了・中止確定まで。確定・準備・実行中・停止待機を含む）"
+  open:
+    description: "Root Case 確立済み、Definition / execution contract 未確定、実行不可"
+    terminal: false
+  ready:
+    description: "canonical Definition と execution contract が確定し実行可能"
+    terminal: false
+  running:
+    description: "実行中"
+    terminal: false
+  blocked:
+    description: "継続条件不足（停止・待機の理由はコメント（停止理由）で表現する）"
+    terminal: false
+  review:
+    description: "実装完了、最終受入対象"
     terminal: false
   closed:
     description: "完了"
@@ -97,19 +113,34 @@ terminal_states:
     - cancelled
 
 # role: case の状態遷移表
+# docs/designs/local/local-case-file.md「状態遷移表（role: case）」と一致させる。
 case_transitions:
   - operation: "ローカル版 case-open"
     from: "(新規作成)"
-    to: "active"
-  - operation: "ローカル版 case-ready / case-run / case-close の各処理"
-    from: "active"
-    to: "active"
-    note: "継続。停止・待機の理由はコメント（停止理由）で表現する"
+    to: "open"
+  - operation: "ローカル版 case-ready 成功"
+    from: "open | blocked"
+    to: "ready"
+  - operation: "ローカル版 case-run 開始"
+    from: "ready | blocked"
+    to: "running"
+  - operation: "ローカル版 case-run 完了"
+    from: "running"
+    to: "review"
+  - operation: "ローカル版 case-run 停止"
+    from: "running"
+    to: "blocked"
+  - operation: "ローカル版 case-close 停止"
+    from: "review"
+    to: "blocked"
+  - operation: "ローカル版 case-close 再開"
+    from: "blocked"
+    to: "review"
   - operation: "ローカル版 case-close 完了"
-    from: "active"
+    from: "review"
     to: "closed"
   - operation: "明示中止"
-    from: "active"
+    from: "open | ready | running | blocked | review"
     to: "cancelled"
 
 # 再開経路（role: case）
@@ -120,13 +151,20 @@ recovery_paths:
   root_case_resume:
     description: "Root Case 指定による再開（経路解決は durable state の照合。resume_command は廃止）"
     path:
-      - "active"
+      - "open"
+      - "ready"
+      - "running"
+      - "blocked"
+      - "review"
 
 # 禁止遷移（role: case）
 forbidden_transitions:
-  - from: "active"
-    to: "active 以外の非終端（3値では該当なし）"
-    reason: "role: case の非終端状態は active のみ。実行契約の確定（case-ready）を経ない実装開始を行わない"
+  - from: "open"
+    to: "running"
+    reason: "実行契約の確定（case-ready）を経ない実装開始を行わない（running へは ready / blocked から遷移する）"
+  - from: "blocked"
+    to: "closed"
+    reason: "blocked から closed への直接遷移は禁止。review を経由する"
   - from: "closed"
     to: "*"
     reason: "終端状態からの遷移は定義しない（reopen を拒否する）"

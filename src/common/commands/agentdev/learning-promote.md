@@ -38,7 +38,7 @@ description: inbox.mdから正規化、分類、8軸評価、自律確定・HITL
 - learning-promote は反映先を直接変更せず、実現先（Skill、Command、script、checker、hook、Custom Tool 等）を選ぶ分類・マッピングを行わない。採用済み成果物は、問題、根拠、望ましい状態、制約、既存事実を req-define が既存 REQ / Decision / Design と実装を再調査して変更方針を確定できる自足的な情報として保持する
 - 学びは直接 REQ 化せず、恒久契約（REQ/Decision/Design）への昇華可能性を判定工程で評価し、昇華可能なもののみ `promoted/` へ出力する。昇華不能な知見は保留プール（`deferred.md`）で維持する
 - 正規契約からの導出または委譲された裁量の範囲で確定できる項目は自律確定し、人間に留保された判断が必要な項目のみ HITL 対象とする。自律確定可否の詳細判定（確定権限3分類〔正規契約からの導出・委譲された裁量・人間に留保された判断〕の判定表、人間判断への引き上げ条件）は v4-responsibility-boundaries Design（extension 経由で解決）「ADF判断アーキテクチャ詳細基準」節が集約所有し、本コマンド定義と Workflow Skill は判定表を複製しない。自律確定はユーザー承認の擬制ではなく、deferred・未処理項目を自動削除しない安全境界は維持する
-- adversarial-review は default-on（REQ-{NNNN}-{NNN}）: workflow の review STEP（発動条件判定 → review 呼出）を経て原則発動する。skip 条件（inbox.md 1件で重複確実、inbox.md 空）該当時は HITL へ従来フローを維持し、ユーザー明示要求時は skip 条件にかかわらず必ず発動する。共通契約（任意性、副作用禁止、再 review 条件、停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` Design（REQ-{NNNN}）が正規所有する
+- adversarial-review は default-on（REQ-{NNNN}-{NNN}）: workflow の review STEP（発動条件判定 → review 呼出）を経て原則発動する。skip 条件（inbox.md 1件で重複確実、inbox.md 空）該当時は HITL へ従来フローを維持する。ユーザーが review の実施を明示的に指示した場合は通常のユーザー指示としてその場で実行し、専用の検出・フラグ・保存・伝播・skip 条件の専用上書き処理を持たない。共通契約（任意性、副作用禁止、再 review 条件、停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` Design（REQ-{NNNN}）が正規所有する
 
 ## ガードレール
 

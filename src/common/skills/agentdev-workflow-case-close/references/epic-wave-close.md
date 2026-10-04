@@ -90,7 +90,7 @@ gate 違反子Issue は本シーケンスの対象外とする。
 Epic Issue 本文の実行構成表を更新。
 **単一書き手制約**: case-close のみが実施（case-run は読み取りのみ、case-auto は Wave 反復制御のみで直接書き込まない、last-write-wins 競合防止）。
 
-**取りまとめ反映との直列化（per-Epic 単一書き手）**: Case Issue 工程記録の取りまとめによる記録契機別の Epic 反映（子状態集約セクション `agentdev:epic-reflect`、全体条件評価セクション `agentdev:epic-overall`）は、本 closing 書き込みと同一の per-Epic 排他制御・局所直列化の下で直列化される（手順と様式の正は `agentdev-epic-tracker`、詳細は `references/epic-reflect-coordination.md`）。E5 の更新は直列化区間内での最新取得→マージ→更新により、該当子の追跡テーブル行のみを変更し、取りまとめ反映の集約セクションと他の子の状態を消去しない。既に終了状態の行は上書きしない（べき等性）。
+**取りまとめ反映との直列化（per-Epic 単一書き手）**: Case Issue 工程記録の取りまとめによる記録契機別の Epic 反映（実行構成表の子状態列への状態反映）は、本 closing 書き込みと同一の per-Epic 排他制御・局所直列化の下で直列化される（手順と様式の正は `agentdev-epic-tracker`、詳細は `references/epic-reflect-coordination.md`）。E5 の更新は直列化区間内での最新取得→マージ→更新により、該当子の追跡テーブル行のみを変更し、他の子の状態を消去しない。既に終了状態の行は上書きしない（べき等性）。
 
 #### E5-1: Epic Issue 完了条件チェックボックス最終評価・更新
 

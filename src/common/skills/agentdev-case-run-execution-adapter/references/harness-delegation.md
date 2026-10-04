@@ -135,7 +135,7 @@ workflow_phase: case-run（実装実行）
 execution_unit: Issue #N（単一 Issue 実行。委譲単位識別子: <委譲単位識別子>）
 resolved_context:
   - 要件定義、Design は保存済み（正規情報源: 対象 REQ ファイル、Design ファイル）
-  - 前工程完了度: 完全完了（Issue 本文「## 補足情報」参照）
+  - 前工程で確定した事項: Definition 確定済み（正規情報源: 対象 REQ ファイル、Design ファイル）
 open_items:
   - なし（実行中に発生した場合は停止条件に従い blocked として報告）
 canonical_references:
@@ -244,7 +244,7 @@ structured_context の生成（委譲 prompt 構築）は、次の抽出制約�
 - 正典から導出可能な補助情報（対象一覧・操作サマリ等）を委譲 prompt へ含める場合、当該補助情報は正典と機械突合可能な形式（対象ファイル、対象 REQ、対象成果物パス等を正典から機械的に列挙できる形）で記述する。委譲 prompt 生成時に正典と突合し、不一致を検出した場合は当該補助情報を委譲 prompt から除去するか、正典に一致する内容へ置換してから委譲を開始する（抽出制約の正典導出補助情報への拡張）。
 - 委譲を受けた実行側（実行担当サブエージェント）は、補助情報と正典の不一致を検出した場合、正典を優先し、補助情報を根拠とした対象判断・本文更新・実行継続を行わない。不一致の検出自体を親（case-run）へ報告する。
 - 委譲指示と Issue 本文の作業内容が乖離した過去事例（Issue #2566、Issue #2562）と同種の乖離は、上記の抽出制約と突合検査により契約上禁止となる。
-- 委譲 prompt 生成時、structured_context の「実装状態」要約（resolved_context の前工程完了度・実装結果を含む実現状態の記述）は、Issue 本文 SSoT・git log 実測と突合してから委譲する。会話記憶のみから実施状態要約を生成しない。verify-only closure 前提の誤発火（PR なしクローズによる未実装完了扱い）を防止する。原本規約は `<workflows/v4-delegation-contracts>` Design「委譲コンテキストの実現状態突合」節である。
+- 委譲 prompt 生成時、structured_context の「実装状態」要約（resolved_context の前工程で確定した事項・実装結果を含む実現状態の記述）は、Issue 本文 SSoT・git log 実測と突合してから委譲する。会話記憶のみから実施状態要約を生成しない。verify-only closure 前提の誤発火（PR なしクローズによる未実装完了扱い）を防止する。原本規約は `<workflows/v4-delegation-contracts>` Design「委譲コンテキストの実現状態突合」節である。
 
 ## 委譲プロンプト雛形（委譲契約必須テンプレート）
 

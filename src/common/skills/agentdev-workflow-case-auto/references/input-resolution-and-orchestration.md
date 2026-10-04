@@ -256,7 +256,7 @@ case-open の判定結果に従う。
 - `agentdev-workflow-orchestration`: orchestration 詳細プロトコル、bg task 破棄検知・状態別回復、Subagent 委譲プロトコル、capture 境界
 - `agentdev-case-run-execution-adapter`: case-run 委譲契約（インライン実行時）
 - `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ
-- `agentdev-epic-tracker`: Epic Issue 本文実行構成表の読取、および Case Issue 工程記録の取りまとめによる記録契機別 Epic 反映の書き込み（per-Epic 排他制御・局所直列化の下で closing 書き込み〔case-close〕と直列化。詳細は同スキル references/epic-reflect-coordination.md）
+- `agentdev-epic-tracker`: Epic Issue 本文実行構成表の読取、および Case Issue 工程記録の取りまとめによる記録契機別の実行構成表状態反映の書き込み（per-Epic 排他制御・局所直列化の下で closing 書き込み〔case-close〕と直列化。詳細は同スキル references/epic-reflect-coordination.md）
 - Custom Tool `agentdev_gh`: GitHub Issue/PR/comment/merge/close I/O
 - `agentdev-project-extensions`: project extension 読込
 

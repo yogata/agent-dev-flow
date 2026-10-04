@@ -159,7 +159,7 @@ RU 構成案の意味的決定を adversarial-review で検証し、accepted fin
 ユーザー明示指定は通常発動の必須条件ではない。
 skip 条件（RU 構成要素が1件のみで統合・分割判定不要、depends_on 解決不要、矛盾検出対象が存在しない）該当時は省略して従来フロー（STEP-5 以降）を継続する。
 skip 判断のためだけの新規 HITL、承認点は追加しない。
-ユーザー明示指定時は skip 条件の該当にかかわらず必ず発動する
+ユーザーが review の実施を明示的に指示した場合は通常のユーザー指示としてその場で実行する（専用の検出・フラグ・保存・伝播・skip 条件の専用上書き処理を持たない）
 2. **review 呼出**: 発動と判定された場合のみ `agentdev-adversarial-review` を起動する。
 審議対象は RU 構成案（統合・分割判定結果、depends_on 解決結果、暫定分類付与結果）。
 呼出契約、返却契約、副作用境界は `agentdev-adversarial-review` と v4-delegation-contracts Design（`semantic_review`、書き込み禁止型）を正とする

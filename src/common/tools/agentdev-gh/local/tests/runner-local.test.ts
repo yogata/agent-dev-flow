@@ -51,7 +51,7 @@ function baseFm(overrides: Partial<LocalIssueFrontmatter>): LocalIssueFrontmatte
     id: "issue-0001",
     title: "件名",
     role: "case",
-    status: "active",
+    status: "open",
     created_at: "2026-08-25T00:00:00Z",
     updated_at: "2026-08-25T00:00:00Z",
     closed_at: "",
@@ -78,7 +78,7 @@ describe("LocalRunner: ローカルIssueの作成と採番", () => {
     expect(raw).toContain("id: issue-0001");
     expect(raw).toContain('title: "件名"');
     expect(raw).toContain("role: case");
-    expect(raw).toContain("status: active");
+    expect(raw).toContain("status: open");
     expect(raw).toContain('closed_at: ""');
     expect(raw).toContain("labels: [feature]");
     expect(raw).toContain("## 目的");
@@ -163,7 +163,7 @@ describe("LocalRunner: role 条件付きスキーマの機械検証", () => {
   });
 
   test("case の status と labels は case 値域から選択される", () => {
-    expect(validateLocalIssue(baseFm({ status: "active", labels: ["epic"] }), "issue-0001.md").valid).toBe(true);
+    expect(validateLocalIssue(baseFm({ status: "open", labels: ["epic"] }), "issue-0001.md").valid).toBe(true);
     expect(validateLocalIssue(baseFm({ status: "created", labels: [] }), "issue-0001.md").valid).toBe(false);
     expect(validateLocalIssue(baseFm({ status: "running", labels: ["risk"] }), "issue-0001.md").valid).toBe(false);
   });
@@ -182,7 +182,7 @@ describe("LocalRunner: role 条件付きスキーマの機械検証", () => {
     expect(
       validateLocalIssue(baseFm({ status: "cancelled", closed_at: "2026-08-25T00:00:00Z" }), "issue-0001.md").valid,
     ).toBe(true);
-    expect(validateLocalIssue(baseFm({ status: "active", closed_at: "x" }), "issue-0001.md").valid).toBe(false);
+    expect(validateLocalIssue(baseFm({ status: "open", closed_at: "x" }), "issue-0001.md").valid).toBe(false);
   });
 
   test("id は issue-{NNNN} 形式でファイル名と一致する", () => {
@@ -244,7 +244,7 @@ describe("LocalRunner: issue_read / issue_update / issue_list", () => {
     expect(current.ok).toBe(true);
     const raw = (current.ok ? current.payload as Record<string, unknown> : {}).body as string;
     const next = raw
-      .replace("status: active", "status: cancelled")
+      .replace("status: open", "status: cancelled")
       .replace('closed_at: ""', 'closed_at: "2026-08-25T01:00:00Z"');
     const updated = await run(issuesDir, {
       operation: "issue_update",
@@ -933,7 +933,7 @@ describe("LocalRunner: PR 系操作の role: case 限定", () => {
     const updated = await run(issuesDir, { operation: "issue_update", args: { number: 1, body: withFail } });
     expect(updated.ok).toBe(true);
     const after = readIssueFile(issuesDir, 1);
-    expect(after).toContain("status: active");
+    expect(after).toContain("status: open");
     expect(after).toContain("結果: FAIL");
     fs.rmSync(issuesDir, { recursive: true, force: true });
   });
