@@ -94,6 +94,17 @@ third-party 成果物 = ADF が製作していないが、配布成果物が依�
 - 宣言読込: 既存 declaration パーサーの利用を基本とする。PowerShell からの呼び出しが困難な場合は PS 内蔵の最小 yaml 解析でよい——ただし name 列挙の抽出に限定し、構文検証は取得機構のパーサーを原本とする（二重実装の drift を防ぐ）。fail-closed は維持する
 - package 形式側は既存 textlint vendor 検知がそのまま担当する（二重実装しない）
 
+### ホスト別の取得先と欠落検査・復旧案内
+
+外部Skillの取得先はホストごとに解決される。OpenCode は `.opencode/skills/<name>/` に正規化される。
+Senpi は宣言ファイル解決（src/third-party/skills.yaml 優先、.agentdev/third-party/skills.yaml
+フォールバック）とともに Senpi 向け skillsRoot への配置解決が実装される
+（src/senpi/tools/agentdev-third-party-tool/）。drift 検知（導入系3経路）は OpenCode 配置に
+加えて Senpi skillsRoot の存在確認を検査対象に含め、欠落時の復旧案内は third-party-sync
+コマンド（cli.ts の1行案内）をホスト別に案内する。検証済み対応範囲と版の実値・組合せは
+ガイド（consumer-project-setup.md・multi-host-operations.md）が所有する。
+片ホストの実証を両ホストの全工程保証へ拡張しない。
+
 ## Design で確定する実装判断
 
 - source URL 形式判定規則: GitHub blob/raw/tree URL 等の変種の扱いを確定する

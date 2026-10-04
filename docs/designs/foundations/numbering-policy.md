@@ -6,8 +6,9 @@ updated: 2026-09-23
 ---
 <!-- ADF-COVERS(implementation): REQ-001-008, REQ-001-009, REQ-001-013, REQ-001-042 -->
 <!-- ADF-COVERS(implementation): REQ-004-003 -->
-<!-- ADF-COVERS(implementation): REQ-087-001 -->
-<!-- ADF-COVERS(design): REQ-087-004 -->
+<!-- ADF-COVERS(implementation): REQ-001-070 -->
+<!-- ADF-COVERS(design): REQ-001-070 -->
+<!-- ADF-COVERS(design): REQ-010-070 -->
 
 # 採番管理 Design
 
@@ -63,6 +64,9 @@ numbering-policy は欠番の存在宣言のみを担い、交叉参照データ
 REQ の既知欠番: REQ-063〜REQ-081 の 19 連番は、REQ-082 採番（2026-09-15 ユーザー裁定）に伴う意図的予約欠番である。requirements/README.md と docs/README.md で「欠番」として明記し、実体不在と整合する。
 REQ-084〜REQ-086 は、共有予約枠（REQ-083〜REQ-096）の未使用・返却枠として維持される意図的予約欠番である（IR-069、REQ-088 採番に伴う枠解消時の記録）。
 REQ-089: J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全 revert）。廃止識別子であるため再利用しない。次の新規 REQ 番号は採番時点で REQ 実ファイル一覧と本節の既知欠番レジストリから決定的採番スクリプト（alloc-req-number.ts）により決定する。
+REQ-092: 2026-10 責任境界整理により廃止（保証は REQ-095・REQ-011-033/029 へ統合、使用手順は issue-operation-safety.md へ分離）
+REQ-093: 2026-10 責任境界整理により廃止（種別契約行は REQ-052-014/015 へ統合）
+REQ-087: 2026-10 責任境界整理により廃止（裁定記録義務は REQ-001-070、ギャップ検査・レジストリ単一情報源は REQ-010-070 へ統合）
 決定的採番スクリプト（`alloc-req-number.ts`）は本節の既知欠番を欠番レジストリとして読み込み、現行ファイル群の最大番号が既知欠番を下回る場合も既知欠番を埋めない。
 
 ### 採番ミスの是正
