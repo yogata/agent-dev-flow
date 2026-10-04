@@ -39,6 +39,8 @@ command の具体名、起動手段は AGENTS.md および references/<harness>.
 - PR URL を SSoT として返却（REQ-006-021 廃止に伴い PR URL フォールバック検索不使用）
 - 各ツール呼び出しは120秒 timeout で保護
 - runtime workspace（実行監査トレイル等）の構造、配置は harness の責務であり、配布 Design は関与しない（REQ-002-002）
+- 実行担当サブエージェントは検証証跡（標準出力、標準エラー、終了コード、版、検査範囲、実行環境）を PR 本文の検証差分セクション（verify-only closure では SSoT コメント）へ保持する。証跡の必須要素と再実行条件の正は agentdev-quality-gates Design「QG-4 検証証拠の再利用と再実行条件」が所有し、本 Design は保持経路のみを定義する（REQ-007-014/015）
+- Result 契約（最小契約）は維持する。検証証跡の保持は result 4状態の拡張ではなく PR 本文・Issue コメントの永続チャネル経由で行う
 
 ## 対象外
 

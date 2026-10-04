@@ -5,6 +5,7 @@ created: 2026-06-21
 updated: 2026-09-05
 ---
 <!-- ADF-COVERS(implementation): REQ-018-002 -->
+<!-- ADF-COVERS(design): REQ-102-001, REQ-102-002, REQ-102-003, REQ-102-004 -->
 <!-- ADF-COVERS(design): REQ-018-009（worktree クリーンアップの削除部分失敗時代替掃除手順の設計記録面。運用文書への手順追記は references/worktree-operations.md が実装として保持） -->
 
 # `agentdev-git-worktree` Design
@@ -41,6 +42,14 @@ Issue 番号に基づいて安全かつ一貫性のある方法で git worktree 
 - 明示パス指定（`git add <path>` / `git rm <path>`）+ `git commit -- <paths>`（--only pathspec 形式）でステージ、コミット
 - draft / RU の削除は同一ステップで即時ステージ、コミットし未ステージ残存を許さない（Form Zero、v2:REQ-0137-003/006）
 - worktree remove で Permission denied 時は停止（リトライは定義に従う）
+
+## Git 操作の認証失敗検出と実行環境側認証規律との接続
+
+Git 操作（ドメイン状態永続化の push を含む）の認証規律の正規所有者は実行環境側の設定・起動規律（AGENTS.md「ハーネス選定」および docs/knowledge/ の実行環境知識文書）であり、配布 skill と本 Design は具体的な認証コマンドを直書きしない。
+
+- references/git-common-procedures.md「2. ドメイン状態永続化」の push 失敗時の構造化エラーには、認証起因（認証失敗、対話要求、タイムアウト）の分類を含める。認証起因と判定した場合は必要な処置と再開条件を報告し、認証条件を変更しない同一条件での長時間待機を無条件に再試行しない
+- 認証方式は環境側で非対話実行可能な正規の経路から選定する。当環境での採用実績は知識文書に記録し、唯一の方式として固定しない
+- 資格情報の値を解析証拠やログへ出力しない（REQ-091-005 と同じ規律）
 
 ## worktree 作成元の main 基準
 
