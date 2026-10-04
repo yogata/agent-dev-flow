@@ -817,3 +817,35 @@
 - **想定反映先**: learning-promote での評価
 - **関連**: PR #3439・Case #3432・Epic #3425 Wave 3
 - **タグ**: `#windows` `#utf8` `#bulk-edit`
+
+## 2026-10-04: bun test 1.3.6 のパスフィルタはサブストリングマッチで存在しないパス指定が類似パスを実行対象に選択し得る
+
+- **問題事象**: bun test 1.3.6 のパスフィルタはサブストリングマッチのため、worktree で存在しない `./.opencode/plugins/` を指定すると `src/opencode/plugins/`（サブストリング一致）を実行対象に選択し得る。意図したディレクトリ境界と異なる実行範囲になり得る
+- **発生局面**: case-run 委譲での Wave 4 一括検証の bun test 分割③実行（Case #3433・Epic #3425 Wave 4、SSoT コメント issues/3433#issuecomment-5979282051）
+- **検知方法**: worktree での実行結果サマリー件数（17 test files 中 16 files / 293 tests）と対象ディレクトリ構造確認の突合で、実行対象が原本側 `src/opencode/plugins/` に置換されていたことを判別
+- **根本原因**: bun test のパスフィルタが完全パス照合でなくサブストリング照合であるため、存在しないパス指定が静かに別対象へ解決される
+- **自律対応内容**: 分割③は plugins 分割の実質実施（原本側での検証）として 0 fail を確認し、実施範囲の判別可能な記録（サマリー件数 + 対象ディレクトリ構造確認）を SSoT コメントへ残した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree 環境での bun test 実行は実施範囲の判別可能な記録（サマリー件数 + 対象ディレクトリ構造確認）を要求すべき。REQ-060 checker 実行契約の実行形態記録との整合
+- **再発条件**: worktree で `.opencode/` 配下のテストを実行する場合（junction 未伝播で実パスが不在のとき）
+- **予防策候補**: bun test 実行コマンドのパス指定は存在確認を前置する、または実行後にテストファイル数の突合を記録する
+- **想定反映先**: learning-promote での評価
+- **関連**: Case #3433・Epic #3425 Wave 4（issues/3433#issuecomment-5979282051）
+- **タグ**: `#bun-test` `#path-filter` `#worktree`
+
+## 2026-10-04: integrity suite 分割①の pre-existing fail 4件 + error 1件は baseline 既存債務として残存
+
+- **問題事象**: `bun test ./.opencode/skills/repo-agentdev-integrity/scripts/` で 2646 pass / 4 fail / 1 error。fail 4件 + error 1件は全件 pre-existing（textlint TS-007 2件: `src/opencode-local` 未伝播の環境依存、TIM コーパス 1件: REQ-053-017 旧行 ID 参照の docs/reports 残骸、issue_tracking_list 1件: runner-local.ts 未伝播の環境依存）
+- **発生局面**: case-run 委譲での Wave 4 一括検証の integrity suite 分割①実行（Case #3433・Epic #3425 Wave 4、SSoT コメント issues/3433#issuecomment-5979282051）
+- **検知方法**: worktree HEAD 3eecc802 = origin/main HEAD = preflight baseline で git status 変更ゼロの同一条件実行により、全 fail が baseline 既存と判別（変更由来 0、不明 0 の由来分類）
+- **根本原因**: git 管理外ローカル生成物（`src/opencode-local`）の worktree 未伝播による環境依存 fail 2系統と、docs/reports 歴史記録の旧行 ID 参照残骸 1件
+- **自律対応内容**: baseline 既存債務として本 Case 対象外を確定し、由来分類付きで SSoT コメントへ記録（別途解消要）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 環境依存 fail の分類には「worktree HEAD = origin/main HEAD = preflight baseline の同一性 + git status 変更ゼロ」による既存/新規の区別根拠が有効
+- **再発条件**: worktree 環境での integrity suite 実行（`src/opencode-local` 未伝播環境）・docs/reports 歴史記録が残る間
+- **予防策候補**: `src/opencode-local` 依存テストの環境依存分離、docs/reports の旧行 ID 参照の清掃候補（intake 回収と併せて learning-promote で評価）
+- **想定反映先**: learning-promote での評価
+- **関連**: Case #3433・Epic #3425 Wave 4（issues/3433#issuecomment-5979282051）
+- **タグ**: `#integrity-suite` `#pre-existing` `#worktree`
