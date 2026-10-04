@@ -721,3 +721,35 @@
 - **想定反映先**: learning-promote での評価。req-define / case-open 間の行番号引き継ぎ規律の追補候補
 - **関連**: Root Case #3425・Definition PR #3428・RU-20261004-06・REQ-001-070・REQ-010-070・numbering-policy 欠番レジストリ
 - **タグ**: `#req-numbering` `#draft-stale-numbering` `#max-plus-one` `#case-open` `#req-define`
+
+## 2026-10-04: 配布依存境界 gate の base ベースライン比較は failures 数一致を判定基準にし、scanned 差を不合格根拠にしない
+
+- **問題事象**: gate の scanned_files 数が working tree の状態差（main 側 junction 投影の走査差等）で変動し、件数差の単独を不合格根拠にすると誤判定し得る
+- **発生局面**: case-run / case-close の配布依存境界 最終 gate（--profile source）結果比較（PR #3436・Case #3429・Epic #3425 Wave 1）
+- **検知方法**: PR 本文検証差分の gate 比較記録（scanned 380 vs baseline 381、rules 層 303 一致）
+- **根本原因**: 走査対象数は環境差の影響を受け、違反検出（failures）とは独立に変動する
+- **自律対応内容**: failures 数の一致（0/0）と rules 層 303 件の一致を判定根拠に使用し、scanned 差を不合格根拠にしなかった
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: gate 比較運用の判定基準を件数差単独にしない（failures 一致 + 分類層の一致を併用）
+- **再発条件**: gate 結果の環境差比較を scanned 件数のみで行う場合
+- **予防策候補**: gate 比較の判定基準明文化（failures 一致 + 分類層件数の一致）
+- **想定反映先**: learning-promote での評価
+- **関連**: PR #3436・Case #3429・Epic #3425 Wave 1
+- **タグ**: `#distribution-boundary` `#gate-baseline` `#comparison`
+
+## 2026-10-04: producer worktree では配布依存境界 link gate が構造的に zero-targets になる（final gates 要求時は検証差分へ無効分類で明示）
+
+- **問題事象**: src/common/** 正本ツリーのみの producer worktree には link projection（consumer 導入配置）が存在せず、link profile gate が常に zero-targets で fail-closed になる
+- **発生局面**: case-run 委譲で final gates (source + link) を要求された実行（PR #3434・Case #3430・Epic #3425 Wave 1）
+- **検知方法**: link profile gate の scan 対象 0 件検出（adapter は fail-closed 動作どおり）
+- **根本原因**: worktree には .opencode/** の junction が伝播せず scan 対象が 0 件になる構造
+- **自律対応内容**: link gate を無効分類（構造的不在）として検証差分へ記録し、clean 扱いや暗黙の検査省略にしなかった
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree 実行で link gate 要求を受けた場合、検証差分への明示と main root での再実行採用が運用として必要
+- **再発条件**: producer worktree で link profile gate を実行する場合
+- **予防策候補**: 委譲指示側で link gate の main root 再実行条件を明示
+- **想定反映先**: learning-promote での評価
+- **関連**: PR #3434・Case #3430・Epic #3425 Wave 1
+- **タグ**: `#distribution-boundary` `#link-gate` `#worktree`
