@@ -44,7 +44,7 @@ GitHub Issue / PR を使わない個人利用環境（ローカル版 OpenCode�
 id: issue-0042
 title: "ユーザー認証機能を追加"
 role: case
-status: active
+status: open
 created_at: "2026-06-20T21:39:00+09:00"
 updated_at: "2026-06-20T22:05:00+09:00"
 closed_at: ""
@@ -61,7 +61,7 @@ labels: [feature]
 
 ## role: case の条件付きスキーマ（Case Issue）
 
-- `status` 値域: `active`、`closed`、`cancelled`（実行継続中 / 完了 / 中止の3値。blocked・failed は子 Issue の状態として Epic 実行構成が所有する。状態遷移表は `rules/status.yaml` 参照）
+- `status` 値域: `open`、`ready`、`running`、`blocked`、`review`、`closed`、`cancelled`（Root Case 正規状態の7値。closed と cancelled は終端。Epic 実行構成が所有する子 Issue の blocked、failed を Root の status 値へ重複コピーしない。状態遷移表は `rules/status.yaml` 参照）
 - `labels` 値域: `feature`、`bugfix`、`maintenance`、`docs`、`refactor`、`chore`、`epic`
 - 本文構成: 目的、対象範囲・対象外、実現方針（条件付き）、実行構成（Epic Root のみ）、完了条件、進行状況、結果（条件付き）を標準とし、`## Design確定候補` と `## Findings / Capture候補` は必須（GitHub 版で PR 本文が担っていた引き継ぎ情報の代替。`rules/headings.yaml` 参照）
 - `## マージ結果`: ローカル Git 上の取り込み結果（実行した操作、コミットハッシュ、実行日時、結果 `PASS` / `FAIL`）。失敗・未完了時は理由を `## 残課題` へ記録する（status は実行継続のまま case-close 完了判定で確定する）

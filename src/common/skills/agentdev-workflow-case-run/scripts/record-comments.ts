@@ -146,16 +146,18 @@ export function validateRecordComment(kind: RecordKind, body: string): RecordCom
 }
 
 // Case Issue 本文の進行状況セクションの正規状態値（Root Case）。
-// 値域の正は v4-lifecycle-state-machine Design（ローカル版 case status と同一
-// トークン）。blocked・failed は子 Issue の状態として Epic 実行構成が所有し、
-// Root Case の正規状態としては保持しない。
-export type CanonicalCaseState = "active" | "completed" | "cancelled";
-
-export const CANONICAL_STATE_LABELS: Record<CanonicalCaseState, string> = {
-  active: "実行継続中（active）",
-  completed: "完了（closed）",
-  cancelled: "中止（cancelled）",
-};
+// 値域とトークンの正は v4-lifecycle-state-machine Design（ローカル版 case status
+// rules/status.yaml と同一の7値トークン、終端 = closed）。blocked・failed は
+// 子 Issue の状態として Epic 実行構成が所有するが、Root 自身の継続条件不足は
+// Root 固有の blocked で表す（子状態の重複コピー禁止とは区別する）。
+export type CanonicalCaseState =
+  | "open"
+  | "ready"
+  | "running"
+  | "blocked"
+  | "review"
+  | "closed"
+  | "cancelled";
 
 export interface ProgressSectionInput {
   /** Root Case（Standard Case / Epic Root）の正規状態。Child では指定しない（日時のみ）。 */
@@ -171,7 +173,7 @@ export interface ProgressSectionInput {
 export function buildProgressSection(input: ProgressSectionInput): string {
   const lines: string[] = ["## 進行状況", ""];
   if (input.canonicalState !== undefined) {
-    lines.push(`- 正規状態: ${CANONICAL_STATE_LABELS[input.canonicalState]}`);
+    lines.push(`- 正規状態: ${input.canonicalState}`);
   }
   lines.push(`- 開始日時: ${input.startDate}`);
   lines.push(`- 終了日時: ${input.endDate}`);
@@ -197,8 +199,7 @@ export function buildResultSection(input: ResultSectionInput): string {
 }
 
 // 既存本文へセクションを適用する。同名セクションが存在する場合は置換、
-// 存在しない場合は「補足情報」で始まる見出しセクションの直前に挿入し、
-// それも存在しない場合は本文末尾へ追加する。既存セクションの順序と内容は保持する。
+// 存在しない場合は本文末尾へ追加する。既存セクションの順序と内容は保持する。
 export function applySection(existingBody: string, sectionMarkdown: string): string {
   const heading = sectionMarkdown.split("\n", 1)[0]?.replace(/^##\s*/, "").trim() ?? "";
   const lines = existingBody.replace(/\n+$/, "\n").split("\n");
@@ -215,13 +216,6 @@ export function applySection(existingBody: string, sectionMarkdown: string): str
     }
     const before = lines.slice(0, startIndex).join("\n").replace(/\n+$/, "");
     const after = lines.slice(endIndex).join("\n");
-    return `${before}\n${sectionMarkdown.replace(/\n+$/, "\n")}${after.startsWith("\n") ? after : `\n${after}`}`;
-  }
-
-  const supplementIndex = lines.findIndex((line) => line.startsWith("## 補足情報"));
-  if (supplementIndex >= 0) {
-    const before = lines.slice(0, supplementIndex).join("\n").replace(/\n+$/, "");
-    const after = lines.slice(supplementIndex).join("\n");
     return `${before}\n${sectionMarkdown.replace(/\n+$/, "\n")}${after.startsWith("\n") ? after : `\n${after}`}`;
   }
 

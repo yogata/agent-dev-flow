@@ -1,22 +1,26 @@
 // ADF-COVERS(verification): REQ-101-001, REQ-101-010, REQ-101-014, REQ-035-001, REQ-035-019, REQ-035-020
 //
-// Decisive regression verification for the coordination reflect write path
+// Decisive regression verification for the coordination write path
 // (REQ-101: Case Issue 工程記録モデル / REQ-035: per-Epic single writer):
-//   - TS-005 (1) completion-order independence: parallel child completion in
-//     different orders converges to the same Epic aggregate (lost update
-//     free, latest-fetch -> merge -> update discipline).
-//   - TS-005 (2) overall completion is recorded with its evaluation basis and
-//     is distinct from child completion: all children terminal without an
-//     overall-criteria evaluation does NOT mark the Epic complete.
+//   - Epic 本文への書き込みは実行構成の状態反映と全体条件評価の更新に限定され、
+//     隠し HTML コメントブロック等の第二の恒常的状態台帳を保持しない。
+//   - completion-order independence: 終端子状態の優先規律（mergeChildStatus）と
+//     closing 書き込みの冪等性により、完了順序に依存しない実行構成表の収束を
+//     検証する（latest-fetch -> merge -> update discipline）。
+//   - overall completion is evaluated from the execution-structure table and
+//     the overall criteria, and is distinct from child completion: all
+//     children terminal without an overall-criteria evaluation does NOT mark
+//     the Epic complete. 中間投影を Epic 本文へ保存する経路はない。
 //   - per-Epic exclusive serialization: closing writes (case-close) and
 //     coordination writes share one gate and never interleave.
 //   - closing writes are idempotent and never overwrite terminal rows.
 //     The status column holds the child status 4 values only (no PR annotation).
 //   - retry pending reset: blocked/failed return to pending; completed is
 //     never reset (REQ-035-020).
-//   - CLI (scripts/src/reflect.ts) is deterministic on identical input.
+//   - CLI (scripts/src/reflect.ts) is deterministic on identical input and
+//     never rewrites the body in the overall evaluation mode.
 //
-// The tests drive the actual reflect engine shipped in the distribution
+// The tests drive the actual engine shipped in the distribution
 // (src/common/skills/agentdev-epic-tracker/scripts/lib) and pin the
 // canonical wording of the coordination reference.
 
@@ -27,16 +31,11 @@ import { join } from "node:path";
 import * as path from "path";
 import {
   applyClosingStatus,
-  applyReflectEntry,
   createEpicWriteGate,
   evaluateOverallCompletion,
-  parseReflectBlock,
+  mergeChildStatus,
   RECORD_TRIGGERS,
-  REFLECT_BLOCK_BEGIN,
-  renderOverallLine,
   resetChildToPending,
-  upsertOverallEvaluation,
-  type ReflectEntry,
 } from "../../../src/common/skills/agentdev-epic-tracker/scripts/lib/epic-reflect.ts";
 import {
   countChildStatuses,
@@ -89,43 +88,29 @@ function epicBodyFixture(): string {
   ].join("\n");
 }
 
-function entry(partial: Partial<ReflectEntry> & { childIssue: number }): ReflectEntry {
-  return {
-    trigger: "completion",
-    status: "completed",
-    ...partial,
-  };
-}
-
 // ---------------------------------------------------------------------------
-// TS-005 (1): completion-order independence / lost update prevention
+// TS-005: completion-order independence / lost update prevention
 // ---------------------------------------------------------------------------
 
-describe("TS-005 Epic 子状態集約の完了順序非依存（lost update なし）", () => {
-  // Sequential merge of one coordination report stream onto the LATEST body
+describe("TS-005 Epic 子状態反映の完了順序非依存（lost update なし）", () => {
+  // Sequential merge of one closing-write stream onto the LATEST body
   // (the discipline every real write path follows: read latest, merge, write).
   function runStream(order: number[]): string {
     let body = epicBodyFixture();
     for (const child of order) {
-      // coordination reflect write for one record trigger
-      body = applyReflectEntry(
-        body,
-        child % 2 === 0
-          ? entry({ childIssue: child, trigger: "hold", status: "blocked", reason: `CI 失敗 #${child}`, nextAction: "修正後に再試行" })
-          : entry({ childIssue: child, trigger: "decision_change", status: "pending", reason: "実現方針の一部撤回", nextAction: "新方針で継続" }),
-      ).body;
-      // another trigger for the same child (hold then completion)
-      body = applyReflectEntry(
-        body,
-        child % 2 === 0
-          ? entry({ childIssue: child, trigger: "completion", status: "completed", basis: `検証合格 #${child}` })
-          : entry({ childIssue: child, trigger: "completion", status: "completed", basis: `QG-4 合格 #${child}` }),
-      ).body;
+      // coordination status reflection for one record trigger (hold)
+      if (child % 2 === 0) {
+        const current = readChildStatus(body, child)?.status;
+        const merged = mergeChildStatus(current ?? "pending", "blocked");
+        body = replaceChildStatus(body, child, merged)!;
+      }
+      // completion lands via the closing write path
+      body = applyClosingStatus(body, child, "completed").body;
     }
     return body;
   }
 
-  test("異なる完了順序で最終集約が同一（順序非依存）", () => {
+  test("異なる完了順序で最終実行構成表が同一（順序非依存）", () => {
     const forward = runStream([...CHILDREN]);
     const reverse = runStream([...CHILDREN].reverse());
     const shuffled = runStream([44, 41, 46, 42, 45, 43]);
@@ -133,36 +118,20 @@ describe("TS-005 Epic 子状態集約の完了順序非依存（lost update な�
     expect(shuffled).toBe(forward);
   });
 
-  test("後続更新が先行更新を上書き消去しない（他子のエントリ保持）", () => {
+  test("後続更新が先行更新を上書き消去しない（他子の行保持）", () => {
     let body = epicBodyFixture();
-    body = applyReflectEntry(body, entry({ childIssue: 41, trigger: "completion", status: "completed", basis: "QG-4 合格" })).body;
-    body = applyReflectEntry(body, entry({ childIssue: 42, trigger: "hold", status: "blocked", reason: "判断待ち" })).body;
-    const entries = parseReflectBlock(body);
-    expect(entries).toHaveLength(2);
-    const e41 = entries.find((e) => e.childIssue === 41);
-    const e42 = entries.find((e) => e.childIssue === 42);
-    expect(e41?.status).toBe("completed");
-    expect(e41?.basis).toBe("QG-4 合格");
-    expect(e42?.status).toBe("blocked");
-    expect(e42?.reason).toBe("判断待ち");
+    body = applyClosingStatus(body, 41, "completed").body;
+    body = applyClosingStatus(body, 42, "blocked").body;
+    expect(readChildStatus(body, 41)?.status).toBe("completed");
+    expect(readChildStatus(body, 42)?.status).toBe("blocked");
+    expect(readChildStatus(body, 43)?.status).toBe("pending");
   });
 
-  test("集約エントリは子Issue番号昇順へ正規化される", () => {
-    let body = epicBodyFixture();
-    body = applyReflectEntry(body, entry({ childIssue: 45, trigger: "hold", status: "blocked", reason: "r" })).body;
-    body = applyReflectEntry(body, entry({ childIssue: 42, trigger: "hold", status: "blocked", reason: "r" })).body;
-    body = applyReflectEntry(body, entry({ childIssue: 44, trigger: "hold", status: "blocked", reason: "r" })).body;
-    const entries = parseReflectBlock(body);
-    expect(entries.map((e) => e.childIssue)).toEqual([42, 44, 45]);
-  });
-
-  test("同一子の再反映は置換であり、最古の本文を書き戻さない", () => {
-    let body = epicBodyFixture();
-    body = applyReflectEntry(body, entry({ childIssue: 43, trigger: "hold", status: "blocked", reason: "旧理由" })).body;
-    body = applyReflectEntry(body, entry({ childIssue: 43, trigger: "completion", status: "completed", basis: "検証合格" })).body;
-    const entries = parseReflectBlock(body);
-    expect(entries).toHaveLength(1);
-    expect(entries[0].status).toBe("completed");
+  test("mergeChildStatus による終端優先で完了順序に依存しない収束をする", () => {
+    expect(mergeChildStatus("pending", "blocked")).toBe("blocked");
+    expect(mergeChildStatus("blocked", "completed")).toBe("blocked");
+    expect(mergeChildStatus("completed", "pending")).toBe("completed");
+    expect(mergeChildStatus("pending", "pending")).toBe("pending");
   });
 });
 
@@ -171,17 +140,16 @@ describe("TS-005 Epic 子状態集約の完了順序非依存（lost update な�
 // ---------------------------------------------------------------------------
 
 describe("closing 書き込みと取りまとめ反映の共存（per-Epic 単一書き手）", () => {
-  test("closing 書き込みは該当子の行のみを変更し集約セクションを消去しない", () => {
+  test("取りまとめの状態反映は該当子の行のみを変更し既存セクションを消去しない", () => {
     let body = epicBodyFixture();
-    body = applyReflectEntry(body, entry({ childIssue: 42, trigger: "completion", status: "completed", basis: "QG-4 合格" })).body;
-    const before = parseReflectBlock(body);
-    const closing = applyClosingStatus(body, 42, "completed");
+    body = applyClosingStatus(body, 42, "completed").body;
+    const beforeAfterTable = body.split("## 完了条件")[1];
+    const closing = applyClosingStatus(body, 43, "completed");
     expect(closing.applied).toBe(true);
-    // reflect block survives the closing write verbatim
-    expect(parseReflectBlock(closing.body)).toEqual(before);
+    expect(closing.body.split("## 完了条件")[1]).toBe(beforeAfterTable);
     expect(readChildStatus(closing.body, 42)?.status).toBe("completed");
     // unrelated rows untouched
-    expect(readChildStatus(closing.body, 43)?.status).toBe("pending");
+    expect(readChildStatus(closing.body, 44)?.status).toBe("pending");
   });
 
   test("closing 書き込みはべき等であり終端子状態を上書きしない（REQ-035-020）", () => {
@@ -209,18 +177,6 @@ describe("closing 書き込みと取りまとめ反映の共存（per-Epic 単�
     expect([...RECORD_TRIGGERS]).toEqual([...RECORD_KINDS]);
   });
 
-  test("語彙外の reflect 行が既存ブロックにあれば適用せず本文を変更しない（静的破棄の防止）", () => {
-    let body = applyReflectEntry(epicBodyFixture(), entry({ childIssue: 42, trigger: "hold", status: "blocked", reason: "CI" })).body;
-    const unparseableLine = "<!-- reflect child=41 trigger=resume status=blocked -->";
-    body = body.replace(REFLECT_BLOCK_BEGIN, [REFLECT_BLOCK_BEGIN, unparseableLine].join("\n"));
-    const result = applyReflectEntry(body, entry({ childIssue: 41, trigger: "hold", status: "blocked", reason: "CI" }));
-    expect(result.applied).toBe(false);
-    expect(result.unparseableLines).toEqual([unparseableLine]);
-    expect(result.body).toBe(body);
-    const kept = parseReflectBlock(result.body);
-    expect(kept.map((e) => e.childIssue)).toEqual([42]);
-  });
-
   test("mergeChildStatus: 終端子状態は非終端に劣らず、既存終端子状態は降格しない", async () => {
     const { mergeChildStatus } = await import(
       "../../../src/common/skills/agentdev-epic-tracker/scripts/lib/epic-reflect.ts"
@@ -235,6 +191,18 @@ describe("closing 書き込みと取りまとめ反映の共存（per-Epic 単�
     const result = applyClosingStatus(epicBodyFixture(), 999, "failed");
     expect(result.applied).toBe(false);
     expect(result.skipped).toBe("row-missing");
+  });
+
+  test("Epic 本文へ隠し永続ブロック等の第二の台帳を書き込む経路はない（実行構成表行のみ変化）", () => {
+    const before = epicBodyFixture();
+    let body = epicBodyFixture();
+    body = applyClosingStatus(body, 42, "completed").body;
+    body = applyClosingStatus(body, 43, "blocked").body;
+    body = resetChildToPending(body, 43).body;
+    // 状態反映で変化するのは実行構成表の子状態列のみ。行集合・セクション構造は不変
+    const beforeLines = before.split("\n").filter((l) => !/\| \d+ \| #\d+/.test(l));
+    const afterLines = body.split("\n").filter((l) => !/\| \d+ \| #\d+/.test(l));
+    expect(afterLines).toEqual(beforeLines);
   });
 });
 
@@ -307,7 +275,9 @@ describe("per-Epic 直列化 gate（closing と取りまとめの局所直列化
     const coordWrite = async () => {
       // fetch the LATEST body inside the critical section
       const latest = persistedBody;
-      persistedBody = applyReflectEntry(latest, entry({ childIssue: 42, trigger: "hold", status: "blocked", reason: "CI" })).body;
+      const current = readChildStatus(latest, 42)?.status;
+      const merged = mergeChildStatus(current ?? "pending", "blocked");
+      persistedBody = replaceChildStatus(latest, 42, merged)!;
     };
     const closingWrite = async () => {
       const latest = persistedBody;
@@ -317,11 +287,36 @@ describe("per-Epic 直列化 gate（closing と取りまとめの局所直列化
     await gate.runExclusive("E", closingWrite);
 
     // both writes survived (no lost update)
-    const entries = parseReflectBlock(persistedBody);
-    expect(entries.map((e) => e.childIssue)).toContain(42);
+    expect(readChildStatus(persistedBody, 42)?.status).toBe("blocked");
     expect(readChildStatus(persistedBody, 43)?.status).toBe("completed");
-    // and the coordination entry for 42 was not erased by the closing write
-    expect(entries.find((e) => e.childIssue === 42)?.status).toBe("blocked");
+  });
+
+  test("部分失敗（書込未反映）の読み戻し再試行で不足分が回復する", async () => {
+    const gate = createEpicWriteGate();
+    let persistedBody = epicBodyFixture();
+
+    const reflectOne = async () => {
+      // gate 内の最新取得 → マージ（書込は gate 内で行う。失敗時は persistedBody に反映しない）
+      const latest = persistedBody;
+      const current = readChildStatus(latest, 42)?.status;
+      const merged = mergeChildStatus(current ?? "pending", "blocked");
+      const next = replaceChildStatus(latest, 42, merged)!;
+      // first attempt fails to land (simulated: write lost)
+      return next;
+    };
+
+    // first attempt: merge succeeded but the write did not land
+    await gate.runExclusive("E", async () => {
+      await reflectOne();
+    });
+    expect(readChildStatus(persistedBody, 42)?.status).toBe("pending");
+
+    // retry: re-acquire the gate, re-fetch the latest body, re-apply, then land
+    await gate.runExclusive("E", async () => {
+      const next = await reflectOne();
+      persistedBody = next;
+    });
+    expect(readChildStatus(persistedBody, 42)?.status).toBe("blocked");
   });
 });
 
@@ -329,7 +324,7 @@ describe("per-Epic 直列化 gate（closing と取りまとめの局所直列化
 // TS-005 (2): overall completion vs child completion
 // ---------------------------------------------------------------------------
 
-describe("TS-005 全体完了判定（子完了と区別・評価根拠付き記録）", () => {
+describe("TS-005 全体完了判定（子完了と区別・評価根拠付き評価）", () => {
   test("全子完了でも全体条件未評価なら全体完了にならない", () => {
     let body = epicBodyFixture();
     for (const c of CHILDREN) {
@@ -376,31 +371,28 @@ describe("TS-005 全体完了判定（子完了と区別・評価根拠付き記
     expect(evaluation.basis).toContain("overallCompleted=true");
   });
 
-  test("全体評価レコードは Epic 本文へ記録され子完了のみの状態では完了扱いにならない", () => {
+  test("全体条件評価の結果は Epic 本文へ保存する経路を持たず（評価は完了条件チェックの確定と証拠で扱う）、子完了のみの状態では完了扱いにならない", () => {
     let body = epicBodyFixture();
     // all children terminal (closing writes done)
     for (const c of CHILDREN) {
       body = applyClosingStatus(body, c, "completed").body;
     }
-    // criteria NOT evaluated yet -> recorded evaluation says not completed
+    // criteria NOT evaluated yet -> evaluation says not completed
     const evalNotYet = evaluateOverallCompletion({
       childIssues: CHILDREN,
       childStatuses: Object.fromEntries(CHILDREN.map((c) => [c, "completed" as const])),
       evaluatedCriteria: [],
     });
-    body = upsertOverallEvaluation(body, evalNotYet);
-    expect(body).toContain("<!-- agentdev:epic-overall begin -->");
-    expect(renderOverallLine(evalNotYet)).toContain("completed=false");
-    // later, criteria evaluated and met -> overall completion recorded
+    expect(evalNotYet.overallCompleted).toBe(false);
+    // criteria evaluated and met
     const evalDone = evaluateOverallCompletion({
       childIssues: CHILDREN,
       childStatuses: Object.fromEntries(CHILDREN.map((c) => [c, "completed" as const])),
       evaluatedCriteria: [{ criterion: "全Wave完了", met: true, basis: "収束済み" }],
     });
-    body = upsertOverallEvaluation(body, evalDone);
-    expect(body.match(/agentdev:epic-overall begin/g)).toHaveLength(1);
-    expect(renderOverallLine(evalDone)).toContain("completed=true");
-    expect(body).toContain("収束済み");
+    expect(evalDone.overallCompleted).toBe(true);
+    // 評価経路は本文を書き換えない（中間投影の Epic 本文への恒常保存はしない）
+    expect(body).toBe(epicBodyFixture().replace(/\| pending \|/g, "| completed |"));
   });
 });
 
@@ -420,6 +412,10 @@ describe("配布物の規律文言 pin", () => {
     expect(skill).toContain("最新取得 → マージ → 更新");
     expect(skill).toContain("全体条件評価（子完了と全体完了の区別）");
     expect(skill).toContain("再試行の pending 戻し");
+    // 隠し永続ブロックは廃止（実行構成表が子状態の唯一の保存先）
+    expect(skill).not.toContain("agentdev:epic-reflect");
+    expect(skill).not.toContain("agentdev:epic-overall");
+    expect(skill).toContain("Epic 本文への書き込みは実行構成の状態反映と全体条件評価の更新に限定される");
   });
 
   test("coordination reference に反映手順・直列化手順・部分成功回復がある", () => {
@@ -427,22 +423,22 @@ describe("配布物の規律文言 pin", () => {
     expect(ref).toContain("直列化手順");
     expect(ref).toContain("最新取得→マージ→更新の規律");
     expect(ref).toContain("部分成功の区別と読み戻し再試行");
-    expect(ref).toContain("全体条件評価の記録");
+    expect(ref).toContain("全体条件評価");
     expect(ref).toContain("再試行の pending 戻し");
-    expect(ref).toContain("agentdev:epic-reflect begin");
-    expect(ref).toContain("agentdev:epic-overall begin");
+    expect(ref).not.toContain("agentdev:epic-reflect");
+    expect(ref).not.toContain("agentdev:epic-overall");
+    expect(ref).toContain("Epic 本文への書き込みは実行構成の状態反映と全体条件評価の更新に限定され");
   });
 
   test("case-close は closing 書き込みと取りまとめ反映の直列化を宣言する", () => {
     expect(read(CASE_CLOSE_SKILL_REL)).toContain("同一の per-Epic 排他制御・局所直列化");
     const epicRef = read(CASE_CLOSE_EPIC_REL);
     expect(epicRef).toContain("取りまとめ反映との直列化");
-    expect(epicRef).toContain("集約セクションと他の子の状態を消去しない");
+    expect(epicRef).toContain("他の子の状態を消去しない");
   });
 
   test("case-auto は取りまとめ反映を per-Epic 排他制御の下で宣言する", () => {
     const skill = read(CASE_AUTO_SKILL_REL);
-    expect(skill).toContain("取りまとめによる記録契機別 Epic 反映");
     expect(skill).toContain("per-Epic 排他制御・局所直列化");
   });
 });
@@ -471,24 +467,14 @@ describe("CLI（scripts/src/reflect.ts）の決定性", () => {
     }
   }
 
-  test("reflect: 同一入力で同一出力（決定的）", () => {
-    const args = [
-      "reflect",
-      "--epic-body",
-      "@BODY@",
-      "--report",
-      JSON.stringify({ childIssue: 42, trigger: "hold", status: "blocked", reason: "CI 失敗", nextAction: "修正後に再実行" }),
-    ];
+  test("closing: 同一入力で同一出力（決定的）", () => {
+    const args = ["closing", "--epic-body", "@BODY@", "--child", "42", "--status", "blocked"];
     const a = runCli(args, epicBodyFixture());
     const b = runCli(args, epicBodyFixture());
     expect(a.json.ok).toBe(true);
     expect(b.json.ok).toBe(true);
     expect(a.json.body).toBe(b.json.body);
-    const body = a.json.body as string;
-    const entries = parseReflectBlock(body);
-    expect(entries).toHaveLength(1);
-    expect(entries[0].reason).toBe("CI 失敗");
-    expect(entries[0].status).toBe("blocked");
+    expect(a.json.body as string).toContain("| 1 | #42 | - | blocked |");
   });
 
   test("closing: べき等置換と既存終端子状態の保護（子状態4値のみ）", () => {
@@ -523,7 +509,7 @@ describe("CLI（scripts/src/reflect.ts）の決定性", () => {
     expect(rejected.json.skipped).toBe("terminal-completed");
   });
 
-  test("overall: 子完了のみでは completed=false を記録", () => {
+  test("overall: 子完了のみでは completed=false を評価し、本文を書き換えない", () => {
     let body = epicBodyFixture();
     for (const c of CHILDREN) {
       body = applyClosingStatus(body, c, "completed").body;
@@ -543,6 +529,8 @@ describe("CLI（scripts/src/reflect.ts）の決定性", () => {
     expect(result.json.ok).toBe(true);
     const evaluation = result.json.evaluation as Record<string, unknown>;
     expect(evaluation.overallCompleted).toBe(false);
-    expect(result.json.body as string).toContain("agentdev:epic-overall begin");
+    // 評価モードは本文を書き換えない（中間投影の Epic 本文への恒常保存はしない）
+    expect(result.json.body as string).toBe(body);
+    expect(result.json.applied).toBe(false);
   });
 });

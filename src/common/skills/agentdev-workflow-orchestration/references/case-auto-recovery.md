@@ -108,5 +108,5 @@ Design と command 本文が更新済みであることを前提とし、本 ref
 - Design case-auto「子 task 中断回復パス」: 状態分類と各状態の回復手順の正
 - command case-auto「子 task bg task 破棄検知時の回復」: 実行指示
 - [capture-boundaries.md](capture-boundaries.md): キャプチャ境界、委譲可否 probe と Inability 記録
-- [subagent-protocol.md](subagent-protocol.md): サブエージェント編集安全プロトコル、前工程完了度に応じた振る舞い指針
+- [subagent-protocol.md](subagent-protocol.md): サブエージェント編集安全プロトコル
 - [self-healing-and-errors.md](self-healing-and-errors.md): 自律修正ループ、CI 対応ループ、エラー回復

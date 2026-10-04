@@ -30,7 +30,7 @@ intake-from-github と intake-promote コマンドの知識ベースである。
 |---|---|---|
 | 挿入位置 | REQ-{NNNN}-{NNN} | Step 4（暫定分類生成）完了後、Step 5（ユーザ提示）開始前 |
 | 発動条件判定 / review 呼出 Step 分離 | REQ-{NNNN}-{NNN} | 発動条件判定 Step と review 呼出 Step を独立手順として分離 |
-| ユーザー明示指定時の発動 | REQ-{NNNN}-{NNN} | ユーザー明示指定時は必ず発動 |
+| default-on と skip 条件 | REQ-{NNNN}-{NNN} | 原則発動。skip 条件（重複確実等）該当時は省略して従来フローを継続。ユーザー明示指示は通常の指示としてその場で実行する（専用の検出・フラグ・保存・伝播を持たない） |
 | 条件非該当時の従来フロー維持 | REQ-{NNNN}-{NNN} | 条件非該当時は従来フローを維持 |
 
 挿入境界、発動条件、戻り先は intake-promote command Design「adversarial-review 挿入境界（intake-promote）」節が正であり、共通契約（任意性、副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱い）は adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-{NNNN}）が正とする。

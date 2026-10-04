@@ -31,7 +31,7 @@ Root Case 本文候補と Definition Package 構成案を確定した後、**最
 case-open は adversarial-review を**原則実行する**（default-on）。
 
 - **skip 条件**: Root Case 本文候補が合意済み入力（draft-data）の機械的投影のみで、新しい意味的決定を含まない場合、省略して STEP-2 の Root Case 作成へ進む
-- **ユーザー明示指定時**: skip 条件にかかわらず必ず発動する
+- **ユーザー明示指示時**: ユーザーが review の実施を明示的に指示した場合は通常のユーザー指示としてその場で実行する（専用の検出・フラグ・保存・伝播・skip 条件の専用上書き処理を持たない）
 - **skip 判断のためだけの新規 HITL、承認点は追加しない**
 
 ### review 呼出

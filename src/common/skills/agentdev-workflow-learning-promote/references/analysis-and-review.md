@@ -167,7 +167,7 @@ evaluation-report.md を adversarial-review で検証し、accepted finding を�
 evaluation-report.md 反映済み、skip 条件非該当。
 skip 条件は inbox.md エントリが1件のみで既存対策との重複が確実（新規性なし、廃棄判定確定）、または inbox.md 空。
 skip 判断のためだけの新規 HITL、承認点は追加しない
-2. **ユーザー明示指定時**: skip 条件の該当にかかわらず必ず発動する。ただし evaluation-report.md 反映済みは引き続き必須とする
+2. **ユーザー明示指示時**: ユーザーが review の実施を明示的に指示した場合は通常のユーザー指示としてその場で実行する（専用の検出・フラグ・保存・伝播・skip 条件の専用上書き処理を持たない）。ただし evaluation-report.md 反映済みは引き続き必須とする
 3. **review 呼出**: 発動と判定された場合のみ `agentdev-adversarial-review` を起動する。
 review 対象は evaluation-report.md のみとする（正規化結果、問題クラス分類、8軸評価スコア、廃棄判定、既存対策照合結果）。
 inbox → deferred 移動、prune、commit/push 等の不可逆処理は未実行であることを確認する

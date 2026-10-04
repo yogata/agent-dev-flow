@@ -14,7 +14,6 @@ canonical Definition 確定後に、次の要素を execution contract として
 - test strategy（verification / pass_criteria / on_failure の3要素）
 - 必須 artifact-specific quality control
 - scope-affecting impact candidate
-- ユーザー明示 review 発動契約
 - work_type / scale / Issue structure
 
 ## 投影の制約
@@ -22,6 +21,7 @@ canonical Definition 確定後に、次の要素を execution contract として
 - 機能要件、非機能要件、制約、対象外、受け入れ条件は新規作成せず、合意済み Definition（req_draft と canonical Definition）を execution contract の各要素へ投影する
 - work_type / scale / Issue structure の判定基準と固有ルールは `agentdev-workflow-lifecycle` を参照する
 - 完了条件は成果状態を記録し、Skill 呼出自体を完了状態として扱わない（利用者要求である場合を除く）
+- ユーザー明示 review 発動契約を Issue 本文の正規契約として確定しない（adversarial-review の発動は default-on と各経路の skip 条件が正であり、Issue 本文への専用保存経路を持たない）
 
 ## test strategy への反映
 
@@ -40,11 +40,6 @@ canonical Definition 確定後に、次の要素を execution contract として
 - req_draft の realization_actions（実現面の変更方針）を Issue / Epic の execution contract へ投影する
 - case-ready 成功後は case-run が Issue 本文だけで変更責務、変更意図、検証方針を取得できるようにする
 - realization_actions は新しい execution contract として再確定せず、合意済み内容をそのまま投影する
-
-## review 発動契約の永続化
-
-- ユーザー明示指定による adversarial-review 発動契約を Issue 本文へ永続化する
-- 発動契約の指定がない場合はその旨を記録する。case-run 側が一時会話コンテキストのみを根拠に新規発動契約を追加しない前提を、ここで確定する
 
 ## runtime-only 判断の除外
 

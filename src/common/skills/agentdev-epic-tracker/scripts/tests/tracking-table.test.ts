@@ -15,15 +15,10 @@ import {
 } from "../lib/tracking-table.ts";
 import {
   applyClosingStatus,
-  applyReflectEntry,
   createEpicWriteGate,
   mergeChildStatus,
-  parseReflectLine,
-  parseReflectBlock,
   RECORD_TRIGGERS,
-  renderReflectLine,
   resetChildToPending,
-  type ReflectEntry,
 } from "../lib/epic-reflect.ts";
 
 const EPIC_BODY = [
@@ -108,39 +103,6 @@ describe("実行構成表の解析（tracking-table）", () => {
 describe("記録契機別反映（epic-reflect）", () => {
   test("記録契機は停止、判断変更、検証証拠の3種（着手・引き渡し・再開は含まない）", () => {
     expect([...RECORD_TRIGGERS]).toEqual(["hold", "decision_change", "completion"]);
-  });
-
-  test("reflect 行は子状態4値と共通語彙の trigger を検証する", () => {
-    const entry: ReflectEntry = {
-      childIssue: 1002,
-      trigger: "hold",
-      status: "blocked",
-      reason: "CI 失敗",
-      nextAction: "修正後に再試行",
-    };
-    const line = renderReflectLine(entry);
-    expect(line).toContain("trigger=hold");
-    expect(line).toContain("status=blocked");
-    expect(parseReflectLine(line)?.status).toBe("blocked");
-    expect(parseReflectLine("<!-- reflect child=1002 trigger=resume status=blocked -->")).toBeNull();
-    expect(parseReflectLine("<!-- reflect child=1002 trigger=hold state=waiting -->")).toBeNull();
-  });
-
-  test("反映は該当子のエントリのみ更新し、子 Issue 番号昇順へ正規化する", () => {
-    const body1 = applyReflectEntry(EPIC_BODY, {
-      childIssue: 1003,
-      trigger: "completion",
-      status: "completed",
-      basis: "QG-4 合格",
-    }).body;
-    const body2 = applyReflectEntry(body1, {
-      childIssue: 1002,
-      trigger: "hold",
-      status: "blocked",
-      reason: "CI 失敗",
-    }).body;
-    const entries = parseReflectBlock(body2);
-    expect(entries.map((e) => e.childIssue)).toEqual([1002, 1003]);
   });
 
   test("closing 書き込みは終端子状態を上書きせず、blocked/failed からの completed 上書きも行わない", () => {
