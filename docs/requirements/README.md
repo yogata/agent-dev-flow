@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下64件を第一参照先とする。
+現在の要件判断では、以下61件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -61,12 +61,9 @@
 | [REQ-062](REQ-062.md) | case-revise 実行契約 |
 | [REQ-082](REQ-082.md) | 対論型レビュー審議契約 |
 | [REQ-083](REQ-083.md) | Definition PR の状態契約（通常 Pull Request・ブランチ命名・用語・正規操作完結） |
-| [REQ-087](REQ-087.md) | 採番例外の記録と REQ 番号ギャップ検査 |
 | [REQ-088](REQ-088.md) | ADF v4 基盤要件（三層責務・情報寿命・Project Contract・中核文書モデル） |
 | [REQ-090](REQ-090.md) | Jev 先行評価の実運用組込み（Stage 1: 観測可能化） |
 | [REQ-091](REQ-091.md) | Supervisor 環境向け credential 供給ブリッジの原本管理 |
-| [REQ-092](REQ-092.md) | agentdev_gh issue_list 呼出側運用規律（labels は追跡Issue論理軸の物理マッピング入力専用） |
-| [REQ-093](REQ-093.md) | agentdev_gh 起動環境障害の予防・診断・回復の恒久化 |
 | [REQ-094](REQ-094.md) | ADF の Markdown 日本語表現および用語選択基準 |
 | [REQ-095](REQ-095.md) | agentdev_gh 起票・読取操作の呼出側規律 |
 | [REQ-096](REQ-096.md) | ADF判断アーキテクチャ（判断方法・確定権限・人間判断境界） |
@@ -98,6 +95,9 @@
 | [REQ-043](retired/REQ-043.md) | 評価ブランチ実証ワークフロー |
 | [REQ-046](retired/REQ-046.md) | 横断正規化後の不変条件 |
 | [REQ-057](retired/REQ-057.md) | docs corpus 整合・現行化バッチ |
+| [REQ-087](retired/REQ-087.md) | 採番例外の記録と REQ 番号ギャップ検査 |
+| [REQ-092](retired/REQ-092.md) | agentdev_gh issue_list 呼出側運用規律（labels は追跡Issue論理軸の物理マッピング入力専用） |
+| [REQ-093](retired/REQ-093.md) | agentdev_gh 起動環境障害の予防・診断・回復の恒久化 |
 <!-- AUTOGEN:END -->
 
 ## 基準構造
