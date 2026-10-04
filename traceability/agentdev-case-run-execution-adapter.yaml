@@ -1,6 +1,8 @@
 component: agentdev-case-run-execution-adapter
 implementation:
   src/common/skills/agentdev-case-run-execution-adapter/SKILL.md:
+    - REQ-007-014
+    - REQ-007-015
     - REQ-031-029
     - REQ-031-030
     - REQ-031-032
@@ -9,6 +11,8 @@ implementation:
   src/common/skills/agentdev-case-run-execution-adapter/references/adversarial-review-integration.md:
     - REQ-014-016
   src/common/skills/agentdev-case-run-execution-adapter/references/harness-delegation.md:
+    - REQ-007-014
+    - REQ-007-015
     - REQ-017-019
     - REQ-017-020
     - REQ-031-032

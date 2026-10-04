@@ -185,7 +185,7 @@ verify-only closure（PR も carrier commit も存在しない Issue 完了。�
 1. **verify-only closure の判定**: execution contract で検証のみと事前確定された case、または実行の結果変更不要が確定した case のいずれかを正規の判定点とする。判定根拠を Issue コメント（SSoT コメント）に残す
 2. **3検査の実行**: 配布依存境界検査（check_distribution_boundary.ts）、runtime-unresolved-reference 検査（check_extensions.ts 経由の integrity 検査）、traceability 検査（宣言整合）を通常 case と同一の手順・同一の水準（base 既知違反と新規違反の分離突合、新規違反 0 件確認、件数突合）で実行する。checker コマンドの実行経路と stdout 退避形式は STEP-S5「checker コマンドの実行経路（安定実行経路）」「checker コマンドの stdout 退避形式」（delegation-and-result.md）と同一契約に従う
 3. **integrity suite の実行**: full integrity suite（bun test 全件）を実行し、「Ran N tests across M files」の N/M 件数突合と直前実績との件数急減なし確認を行う（case-close STEP-3 の合格基準と同水準）
-4. **SSoT コメントへの記録**: 実行コマンド列（実行 cwd、実行形態を含み、そのまま再実行手順として機能する形式）と結果（3検査の new_delta 0・新規違反 0 件、integrity suite の pass/fail 件数）を Issue コメント（Custom Tool `agentdev_gh` の comment_create）へ記録する。verify-only closure では PR が存在しないため PR 本文を記録先に使わない
+4. **SSoT コメントへの記録**: 実行コマンド列（実行 cwd、実行形態を含み、そのまま再実行手順として機能する形式）と結果（3検査の new_delta 0・新規違反 0 件、integrity suite の pass/fail 件数）に加え、検証証跡の必須要素（標準出力・標準エラーの退避先、終了コード、実行した正規ランナーの版、検査範囲、環境ラベル3要素）を Issue コメント（Custom Tool `agentdev_gh` の comment_create）へ記録する。証跡の必須要素と再実行条件の正は `agentdev-quality-gates` スキル Design「QG-4 検証証拠の再利用と再実行条件」節が所有し、本工程は SSoT コメント経由の記録経路を扱う。非ゼロ終了・timeout 打ち切り・切断した検証結果は成功へ変換せず、検証コマンド自体の終了コードを記録する。verify-only closure では PR が存在しないため PR 本文を記録先に使わない
 5. **carrier commit 不作成**: 検証完了のために carrier commit を作成しない（case 2769 で確立した作業仮定の継承。「検証完了のために carrier commit を作成する」代替案は Design 節で却下済み）
 6. **チャネル分離**: SSoT コメントは検証証跡チャネルであり、capture（intake/learning 候補）チャネルではない。capture 引き継ぎの PR 本文限定原則（既存契約）は変更しない。検証中に発見した本筋外の検出事項は既存の intake 起票経路で扱う
 
@@ -195,11 +195,11 @@ verify-only closure（PR も carrier commit も存在しない Issue 完了。�
 
 ### Evidence
 
-- SSoT コメント（Issue コメント）: 判定根拠、実行コマンド列と検証結果
+- SSoT コメント（Issue コメント）: 判定根拠、実行コマンド列、検証結果、検証証跡の必須要素（退避先、終了コード、版、検査範囲、環境ラベル3要素）
 
 ### Completion Verification
 
-- SSoT コメントに判定根拠、再実行可能な実行コマンド列（実行 cwd・実行形態を含む）、検証結果が記録されていること
+- SSoT コメントに判定根拠、再実行可能な実行コマンド列（実行 cwd・実行形態を含む）、検証結果、検証証跡の必須要素（標準出力・標準エラーの退避先、終了コード、版、検査範囲、環境ラベル3要素）が記録されていること
 
 ### Resume-Idempotency
 
