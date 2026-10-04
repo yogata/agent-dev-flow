@@ -32,7 +32,7 @@ repo-local checker（`.opencode/skills/repo-*` 配下）は自己完結実行が
 ## 根拠
 
 - PR #3075 case-run（Case #3063・Issue #3069・DEL-3069-3、commit e4264eb9）で実装・機械検証された実例に基づく
-- 実例: `.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts` の `extractKnownGapNumbers`（既知欠番レジストリ免除、REQ-087-004）。抽出形式は採番スクリプト `alloc-req-number.ts` の同名関数と文字列レベルで同一であり、欠番レジストリの単一情報源は numbering-policy.md（動的読込）を維持する。単一情報源維持コメントと対決テスト言及は同スクリプト L560 付近に実在（backlog-review 実行時に現物確認済み）
+- 実例: `.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts` の `extractKnownGapNumbers`（既知欠番レジストリ免除、REQ-010-070。旧 REQ-087-004 は本行の廃止時に移管）。抽出形式は採番スクリプト `alloc-req-number.ts` の同名関数と文字列レベルで同一であり、欠番レジストリの単一情報源は numbering-policy.md（動的読込）を維持する。単一情報源維持コメントと対決テスト言及は同スクリプト L560 付近に実在（backlog-review 実行時に現物確認済み）
 - 対決テスト: `.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts` の「loads the same gap set as alloc-req-number.ts from the real numbering-policy（単一情報源）」（L5166 付近）。実リポジトリ numbering-policy + 合成 policy 6パターンで両リーダー出力の同値性を機械検証する
 - 注記: 本知識の整備元である learning promoted 成果物は `src/opencode/skills/repo-agentdev-integrity/` を実装面のパスとして記載したが、src 側に repo-agentdev-integrity は実在せず、実体は `.opencode/skills/repo-agentdev-integrity/` 配下である
 

@@ -147,7 +147,7 @@ describe("CliRunner: 引数組み立ての環境依存隠蔽", () => {
   });
 });
 
-describe("CliRunner: 環境起因失敗の識別 detail（REQ-093-003 / TS-003）", () => {
+describe("CliRunner: 環境起因失敗の識別 detail（REQ-052-014 / TS-003）", () => {
   test("(b) gh 実行失敗（終了コード 66・stderr 空）は operation-failed で環境起因示唆を detail に含む", async () => {
     const { exec } = fakeExec(() => ({ status: 66, stdout: "", stderr: "" }));
     const reply = await run(exec, makeTempDir(), { operation: "issue_read", args: { number: 5 } });

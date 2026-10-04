@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-053-029, REQ-053-030, REQ-053-004
+// ADF-COVERS(verification): REQ-053-004
 // agentdev-textlint-guard の ADR 本体 project-local 設定と特例分岐禁止の
 // repo レベル契約テスト（Issue #2725 TS-007、Issue #2735 RA-002 で追加対象拡張）。
 // - ADR 本体（agent-dev-flow リポジトリ）の追加対象設定が

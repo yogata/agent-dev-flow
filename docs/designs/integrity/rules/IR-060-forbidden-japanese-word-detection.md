@@ -19,7 +19,7 @@ updated: 2026-09-09
 | category | document-drift |
 | detection_method | `src/opencode/plugins/agentdev-textlint-guard/rules/default-prh.yml` の prh 規則による完全一致検出。textlint の Markdown parser が backticks 内、fenced code block 内、frontmatter を散文から除外する |
 | affected_artifacts | [docs/**/*.md（docs/requirements/retired/, docs/decisions/retired/ を除く）, src/opencode/{commands,skills}/**/*.md] |
-| related_req | [REQ-053-007, REQ-053-035, REQ-036-023, REQ-010-071] |
+| related_req | [REQ-053-001, REQ-053-035, REQ-036-023, REQ-010-071] |
 | related_design | [../../quality/textlint-quality-runtime.md, ../../responsibilities/document-type-responsibilities.md, ../integrity-rule-catalog.md] |
 | gate_level | delta-guard |
 | false_positive_risk | prh の Markdown 構造除外によりコード値と frontmatter を検出しない。文脈で推奨訳が変わる語と lifecycle / artifact-integrity 語彙は本規則へ追加しない |

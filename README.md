@@ -1,4 +1,4 @@
-<!-- ADF-COVERS(implementation): REQ-050-014, REQ-005-010, REQ-053-033 -->
+<!-- ADF-COVERS(implementation): REQ-050-014, REQ-005-010, REQ-029-012 -->
 # agent-dev-flow
 
 AgentDevFlow は AI エージェントによる開発ワークフローを支えるプラグインである。

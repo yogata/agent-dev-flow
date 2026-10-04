@@ -4,7 +4,7 @@ implementation:
     - REQ-050-014
     - REQ-009-051
     - REQ-009-052
-    - REQ-093-002
+    - REQ-052-015
     - REQ-094-001
     - REQ-094-002
     - REQ-094-004
@@ -15,4 +15,4 @@ implementation:
     - REQ-099-012
 verification:
   docs/guides/consumer-project-setup.md:
-    - REQ-093-002
+    - REQ-052-015

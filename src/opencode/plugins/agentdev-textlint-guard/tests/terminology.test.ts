@@ -6,7 +6,8 @@
 // - 辞書なしでも標準規則は有効（REQ-053-024）
 // - 辞書の追加合成で標準規則・標準対象を無効化できない（辞書経路に無効化手段がない。
 //   設定経路の無効化禁止は config.test.ts / targets.test.ts / plugin.test.ts が検査）
-// - 辞書の追加・削除は再起動なしで次回検査から反映される（REQ-053-030）
+// - 辞書の追加・削除は再起動なしで次回検査から反映される（textlint-quality-runtime.md が
+//   所有する設定反映の実行詳細。行 ID 参照は REQ-053 手段分離で Design 側へ移管済み）
 // - 読込み不能な辞書は検査不能として fail-closed（対象外ファイルへの操作も含め拒否は
 //   plugin 側の guardOperation 経由で検査）
 
@@ -145,7 +146,7 @@ describe("プロジェクト用語の検出と構造除外（TS-002）", () => {
     expect(prepared.composition.prhRulePaths[0]).toBe(path.join(pluginDir, "rules", "default-prh.yml"));
   });
 
-  test("辞書の追加と削除は再起動なしで次回検査に反映される（REQ-053-030）", async () => {
+  test("辞書の追加と削除は再起動なしで次回検査に反映される（textlint-quality-runtime.md 設定反映の実行詳細）", async () => {
     const root = makeProject();
     const without = await prepareInspection(root);
     expect(without.ok).toBe(true);

@@ -1,4 +1,4 @@
-# ADF-COVERS(implementation): REQ-098-001, REQ-098-002, REQ-098-003, REQ-098-004, REQ-098-006, REQ-098-007, REQ-098-008, REQ-098-009, REQ-098-012, REQ-098-013
+# ADF-COVERS(implementation): REQ-098-001, REQ-098-002, REQ-098-003, REQ-098-004, REQ-098-006, REQ-098-008
 version: 1
 kind: workflow-extension
 id: agentdev-workflow-case-open

@@ -2,15 +2,12 @@ component: agentdev-issue-management
 implementation:
   src/common/skills/agentdev-issue-management/references/issue-operation-safety.md:
     - REQ-049-020
-    - REQ-092-001
-    - REQ-092-002
-    - REQ-092-003
-    - REQ-092-004
-    - REQ-092-005
-    - REQ-093-001
-    - REQ-093-004
+    - REQ-011-033
+    - REQ-052-014
+    - REQ-052-015
     - REQ-095-001
     - REQ-095-002
+    - REQ-095-003
     - REQ-100-001
     - REQ-100-006
     - REQ-101-011
@@ -32,8 +29,8 @@ implementation:
 verification:
   src/common/skills/agentdev-issue-management/references/issue-operation-safety.md:
     - REQ-049-020
-    - REQ-093-001
-    - REQ-093-004
+    - REQ-052-014
+    - REQ-052-015
     - REQ-095-001
     - REQ-095-002
     - REQ-100-001

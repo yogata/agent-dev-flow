@@ -1,6 +1,5 @@
 // ADF-COVERS(verification): REQ-010-002, REQ-010-003, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-066, REQ-010-068, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008
-// ADF-COVERS(verification): REQ-087-002, REQ-087-003
-// ADF-COVERS(verification): REQ-087-004
+// ADF-COVERS(verification): REQ-010-070
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
 import { mkdirSync, writeFileSync, copyFileSync, rmSync, existsSync, readFileSync, readdirSync, cpSync, symlinkSync } from "fs";
 import { join } from "path";
@@ -15,7 +14,7 @@ const GEN_INDEXES_FILE = join(SCRIPT_DIR, "generate_indexes.ts");
 const HISTORY_EXEMPTION_FILE = join(SCRIPT_DIR, "ir057_history_exemption.ts");
 const CURRENT_REFS_FILE = join(SCRIPT_DIR, "current_refs.ts");
 const GLOB_WALK_FILE = join(SCRIPT_DIR, "lib", "glob_walk.ts");
-// REQ-087-004 対決テスト用: 正（採番スクリプト）側のリーダーと実リポジトリ numbering-policy。
+// REQ-010-070 対決テスト用: 正（採番スクリプト）側のリーダーと実リポジトリ numbering-policy。
 const REPO_ROOT_FROM_SCRIPT_DIR = join(SCRIPT_DIR, "..", "..", "..", "..");
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `integrity-test-${crypto.randomUUID().slice(0, 8)}`;
@@ -4738,7 +4737,7 @@ describe("IR-068 skill-projection-manifest (Issue #2383 (d), inspect F-01)", () 
   });
 });
 
-// ─── IR-069 req-number-gap-recorded (REQ-087-002/003, Case #2917) ─────────────
+// ─── IR-069 req-number-gap-recorded (REQ-010-070, Case #2917) ─────────────
 // Fixture kinds: 正常例 (帯中欠番の両 README 明記), 違反例 (無記録欠番・陳腐化範囲明記),
 // 境界例 (AUTOGEN 内のみの明記・4桁帯混在), 許容例 (retired 番号・末尾予約枠・文脈言及),
 // 再現例 (RU-0034: 帯中予約欠番の無記録 + 末尾予約枠の過渡帯)。
@@ -4815,7 +4814,7 @@ function ir069Results(root: string): {
   return { ng: of("ng"), info: of("info"), ok: of("ok") };
 }
 
-describe("IR-069 req-number-gap-recorded (REQ-087-002/003, Case #2917)", () => {
+describe("IR-069 req-number-gap-recorded (REQ-010-070, Case #2917)", () => {
   it("passes when mid-band gaps are annotated in both READMEs (正常例)", () => {
     const root = join(IR069_ROOT, "ok");
     mkdirp(root);
@@ -5151,7 +5150,7 @@ describe("broken-req-ref range-span exemption (v2:REQ-0108-194, Case #2917)", ()
   });
 });
 
-// ─── broken-req-ref / adr-req-crossref 既知欠番レジストリ免除 (REQ-087-004, Issue #3069) ───
+// ─── broken-req-ref / adr-req-crossref 既知欠番レジストリ免除 (REQ-010-070, Issue #3069) ───
 // numbering-policy.md「既知の欠番」節の行頭 REQ-NNN: エントリへの参照は合格扱いとする。
 // 読込形式は alloc-req-number.ts extractKnownGapNumbers と同一（欠番レジストリの
 // 単一情報源は numbering-policy.md。checker 側に第二のレジストリは作らない）。
@@ -5272,7 +5271,7 @@ function runGapFixture(root: string): {
   return { brokenEvidence, crossrefMessages };
 }
 
-describe("known-gap registry exemption (REQ-087-004, Issue #3069)", () => {
+describe("known-gap registry exemption (REQ-010-070, Issue #3069)", () => {
   it("exempts known gap REQ-089 references in guides and ADR (Case #3056 再現・許容例)", () => {
     const root = join(GAP_ROOT, "known-gap-pass");
     mkdirp(root);
@@ -5538,7 +5537,7 @@ describe("repo-local Plugin projection symmetry (Issue #2787)", () => {
 
 // ─── Case #3166: IR-053 exemption paths + compensation (RA-001, TS-001) ───────
 // The two registered read-only contingency references (Custom Tool 契約 Design
-// 「迂回防止」, REQ-092-003) must be skipped, non-exempt paths must stay
+// 「迂回防止」, REQ-095-003) must be skipped, non-exempt paths must stay
 // detected, and the live exempt files must not contain write-path gh literals.
 const RA001_ROOT = join(TEMP_ROOT, "ra001");
 

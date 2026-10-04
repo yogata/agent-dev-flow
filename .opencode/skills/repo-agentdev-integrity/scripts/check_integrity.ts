@@ -16,9 +16,8 @@
 // ADF-COVERS(verification): REQ-037-008, REQ-037-010
 // ADF-COVERS(implementation): REQ-059-003
 // ADF-COVERS(verification): REQ-059-002, REQ-059-003
-// ADF-COVERS(implementation): REQ-087-002, REQ-087-003
-// ADF-COVERS(implementation): REQ-087-004
-// ADF-COVERS(verification): REQ-087-002
+// ADF-COVERS(implementation): REQ-010-070
+// ADF-COVERS(verification): REQ-010-070
 // ADF-COVERS(verification): REQ-094-001, REQ-094-002, REQ-094-003, REQ-094-004, REQ-094-005, REQ-094-006, REQ-094-010, REQ-094-011
 import {
   EXIT_OK,
@@ -557,9 +556,9 @@ function isIntegrityRuleDescriptionFile(relPath: string): boolean {
   return /docs\/designs\/integrity\/rules\/IR-\d+/.test(relPath);
 }
 
-// REQ-087-004: 既知欠番レジストリ（numbering-policy.md「既知の欠番」節の行頭
+// REQ-010-070: 既知欠番レジストリ（numbering-policy.md「既知の欠番」節の行頭
 // `REQ-NNN:` エントリ）への参照は broken-req-ref / adr-req-crossref の合格扱い
-// （REQ-087-002 の欠番明記義務の履行が偽陽性 NG を強制しない。Case #3056 偽陽性
+// （REQ-010-070 の欠番明記義務の履行が偽陽性 NG を強制しない。Case #3056 偽陽性
 // 3件解消）。抽出形式は採番スクリプト alloc-req-number.ts の extractKnownGapNumbers
 // と同一であり、欠番レジストリの単一情報源（numbering-policy.md）を維持する。
 // checker 側で第二のレジストリ・別形式の読込は作らない。同一性は
@@ -615,7 +614,7 @@ function checkAdrReqCrossReference(
   root: string,
 ): CheckResult[] {
   const results: CheckResult[] = [];
-  // REQ-087-004: known REQ gap references (numbering-policy registry) are valid.
+  // REQ-010-070: known REQ gap references (numbering-policy registry) are valid.
   const knownGapReqIds = loadKnownGapReqIds(root);
   const reqFiles = listFiles(reqDir).filter((f) => f.startsWith("REQ-"));
   const adrFiles = listFiles(adrDir).filter((f) => f.startsWith("ADR-"));
@@ -695,7 +694,7 @@ function checkAdrReqCrossReference(
     if (!content) continue;
     const uniqueRefs = extractCurrentReqRefs(content);
     for (const ref of uniqueRefs) {
-      // REQ-087-004: skip known REQ gap references
+      // REQ-010-070: skip known REQ gap references
       if (knownGapReqIds.has(ref)) continue;
       // v2:REQ-0108-074: active or retired existence check
       if (!allReqIds.has(ref)) {
@@ -716,7 +715,7 @@ function checkAdrReqCrossReference(
     if (!content) continue;
     const uniqueRefs = extractCurrentReqRefs(content);
     for (const ref of uniqueRefs) {
-      // REQ-087-004: skip known REQ gap references
+      // REQ-010-070: skip known REQ gap references
       if (knownGapReqIds.has(ref)) continue;
       if (!allReqIds.has(ref)) {
         results.push(
@@ -1660,7 +1659,7 @@ function checkLinkIntegrity(root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const allFiles = collectAllArtifactPaths(root);
   const brokenRefCount = new Map<string, number>();
-  // REQ-087-004: known REQ gap references (numbering-policy registry) are valid.
+  // REQ-010-070: known REQ gap references (numbering-policy registry) are valid.
   const knownGapReqIds = loadKnownGapReqIds(root);
 
   for (const filePath of allFiles) {
@@ -1757,7 +1756,7 @@ function checkLinkIntegrity(root: string): CheckResult[] {
       // band endpoints, not individual requirement rows. Only refs whose every
       // occurrence sits inside a range span are exempt; bare occurrences still flag.
       if (isRefOnlyInsideRangeSpan(contentLines, ref)) continue;
-      // REQ-087-004: skip known REQ gap references
+      // REQ-010-070: skip known REQ gap references
       if (knownGapReqIds.has(ref)) continue;
       const activePath = path.join(root, "docs", "requirements", `${ref}.md`);
       const retiredPath = path.join(
@@ -7166,7 +7165,7 @@ const IR053_GH_DIRECT_PATTERN =
   /\bgh\s+(issue|pr)\s+(create|edit|view|comment|merge|close|list|status)\b/i;
 
 // Exemption paths (repo-root-relative, forward-slash normalized). Read-only
-// contingency allowance per Custom Tool 契約 Design「迂回防止」（REQ-092-003）:
+// contingency allowance per Custom Tool 契約 Design「迂回防止」（REQ-095-003）:
 // both references document the gh read-only fallback when issue_list hits the
 // safe page limit; write-path gh remains prohibited (compensation test).
 // Each file is registered in both projection spellings (`.opencode/` in the
@@ -10662,13 +10661,13 @@ function checkSkillProjectionManifest(root: string): CheckResult[] {
   return results;
 }
 
-// ─── IR-069: req-number-gap-recorded (REQ-087-002/003, Case #2917) ────────────
+// ─── IR-069: req-number-gap-recorded (REQ-010-070, Case #2917) ────────────
 // REQ 番号（3桁帯 REQ-001〜REQ-999）の実体（active + retired）から欠番を算出し、
 // docs/requirements/README.md と docs/README.md の両「欠番」明記（AUTOGEN 外の
 // 本文行での REQ-NNN 単体または REQ-NNN〜REQ-NNN 範囲）と突合する。
 // 検出対象は「無記録の欠番」: 最大採番番号の直前に位置する末尾予約枠（並行 Case の
 // 共有予約・採番返却の過渡帯。REQ-083〜096 共有予約枠運用参照）を除く欠番は、
-// 両 README での明記を必須とする（numbering-policy「既知の欠番」、REQ-087-002）。
+// 両 README での明記を必須とする（numbering-policy「既知の欠番」、REQ-010-070）。
 const IR069_REQ_FILE_RE = /^REQ-(\d{3})\.md$/;
 const IR069_RANGE_RE = /REQ-(\d{3})\s*[〜~]\s*REQ-(\d{3})/g;
 const IR069_SINGLE_RE = /REQ-(\d{3})/g;
@@ -10755,7 +10754,7 @@ function checkReqNumberGapRecorded(root: string): CheckResult[] {
       info(
         "ReqNumbering",
         "req-number-gap-recorded",
-        "No 3-digit REQ files found; IR-069 skipped (REQ-087-002/003)",
+        "No 3-digit REQ files found; IR-069 skipped (REQ-010-070)",
       ),
     );
     return results;
@@ -10802,7 +10801,7 @@ function checkReqNumberGapRecorded(root: string): CheckResult[] {
         ng(
           "ReqNumbering",
           "req-number-gap-recorded",
-          `Gap ${formatIr069Run(run)} has no REQ file but is not annotated as 欠番 in ${rel} (REQ-087-002, IR-069)`,
+          `Gap ${formatIr069Run(run)} has no REQ file but is not annotated as 欠番 in ${rel} (REQ-010-070, IR-069)`,
           rel,
           undefined,
           {
@@ -10862,7 +10861,7 @@ function checkReqNumberGapRecorded(root: string): CheckResult[] {
       ok(
         "ReqNumbering",
         "req-number-gap-recorded",
-        `IR-069 req-number-gap-recorded: ${existing.size} REQ numbers in band 001-${String(max).padStart(3, "0")}, ${requiredGaps.length} recorded gap numbers, ${reservationWindow.length} reservation-window numbers tolerated (REQ-087-002/003)`,
+        `IR-069 req-number-gap-recorded: ${existing.size} REQ numbers in band 001-${String(max).padStart(3, "0")}, ${requiredGaps.length} recorded gap numbers, ${reservationWindow.length} reservation-window numbers tolerated (REQ-010-070)`,
       ),
     );
   }
@@ -11655,7 +11654,7 @@ async function main(): Promise<void> {
     ...checkObsoleteVocabulary(root), // IR-065/IR-066 (REQ-010-066/067, Issue #2372)
     ...checkReferencedReqRowExistence(root), // IR-067 (REQ-010-069, Issue #2383 (a))
     ...checkSkillProjectionManifest(root), // IR-068 (Issue #2383 (d), inspect F-01)
-    ...checkReqNumberGapRecorded(root), // IR-069 (REQ-087-002/003, Case #2917)
+    ...checkReqNumberGapRecorded(root), // IR-069 (REQ-010-070, Case #2917)
     ...checkIntegrityRuleRelatedReqExistence(root), // IR-071 (REQ-051-009)
     ...checkReqUpdatedFreshness(root), // IR-072 (REQ-010-068 準拠、patterns.md REQ frontmatter 規約)
     ...checkRepoLocalPluginProjectionSymmetry(root), // repo-local Plugin 投影対称性検査（runtime-package-boundary.md、Issue #2787）

@@ -103,9 +103,9 @@ Workflow は GitHub 版と Local 版の差を認識しない。
 Plugin / Hook（tool.execute.before 等）により、生 gh WRITE 等の正規経路迂回を検出・拒否できる。
 禁止範囲（読み取り系の許容等を含む）は本 Design が所有する。
 
-読み取り系の許容: agentdev_gh の読み取り操作が operation-failed（安全ページ上限到達等）で継続不能になった場合の contingency として、読み取り専用 gh CLI の手動実行（gh issue list --search 等、読取形式に限定）を許容する。書込み系（作成・更新・クローズ・merge・comment）の直接実行は許容しない。この許容に基づき、配布 reference（agentdev-issue-management/references/issue-operation-safety.md、agentdev-workflow-case-open/references/definition-pr-and-idempotency.md）における読取系 gh 直記述は IR-053 の例外パス（IR053_EXEMPT_PATHS）として登録する（REQ-092-003 の contingency 原則に基づく）。
+読み取り系の許容: agentdev_gh の読み取り操作が operation-failed（安全ページ上限到達等）で継続不能になった場合の contingency として、読み取り専用 gh CLI の手動実行（gh issue list --search 等、読取形式に限定）を許容する。書込み系（作成・更新・クローズ・merge・comment）の直接実行は許容しない。この許容に基づき、配布 reference（agentdev-issue-management/references/issue-operation-safety.md、agentdev-workflow-case-open/references/definition-pr-and-idempotency.md）における読取系 gh 直記述は IR-053 の例外パス（IR053_EXEMPT_PATHS）として登録する（REQ-095-003 の contingency 原則に基づく）。
 
-respawn 検討（起動環境障害の contingency）: 起動環境障害（harness 内 spawnSync 失敗等）の劣化サイクル再発により、障害の持続で時間窓が枯渇する場合、読み取り系 gh CLI の手動実行に加えて、harness 再起動（respawn）による起動環境の再読込を contingency として検討対象とする。respawn の実行契機は劣化サイクルの定量観測（再発までの呼出数・再発局面）が根拠となり、respawn 後は軽量な読み取り操作での疎通確認を前置する。実行契機の判定基準と疎通確認の手順、および respawn で解消しない場合の縮退運用パターン（委譲前疎通確認・最小副作用単位分割と durable state 先行・write-proxy payload の標準配置・gh exit 66 恒常失敗時の bash gh 例外手順と証跡様式）は、配布 reference（agentdev-issue-management/references/issue-operation-safety.md）の「劣化サイクルの定量観測と縮退運用パターン」節が所有する。本 Design は contingency としての位置づけ（respawn は正規経路 `agentdev_gh` への復帰を前提とした検討対象であり、正規経路の代替としないこと）を記録する（REQ-093-004）。
+respawn 検討（起動環境障害の contingency）: 起動環境障害（harness 内 spawnSync 失敗等）の劣化サイクル再発により、障害の持続で時間窓が枯渇する場合、読み取り系 gh CLI の手動実行に加えて、harness 再起動（respawn）による起動環境の再読込を contingency として検討対象とする。respawn の実行契機は劣化サイクルの定量観測（再発までの呼出数・再発局面）が根拠となり、respawn 後は軽量な読み取り操作での疎通確認を前置する。実行契機の判定基準と疎通確認の手順、および respawn で解消しない場合の縮退運用パターン（委譲前疎通確認・最小副作用単位分割と durable state 先行・write-proxy payload の標準配置・gh exit 66 恒常失敗時の bash gh 例外手順と証跡様式）は、配布 reference（agentdev-issue-management/references/issue-operation-safety.md）の「劣化サイクルの定量観測と縮退運用パターン」節が所有する。本 Design は contingency としての位置づけ（respawn は正規経路 `agentdev_gh` への復帰を前提とした検討対象であり、正規経路の代替としないこと）を記録する（REQ-052-015）。
 
 Plugin / Hook の設定契約:
 

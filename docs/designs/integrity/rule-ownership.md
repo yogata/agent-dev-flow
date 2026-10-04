@@ -166,7 +166,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-057 | obsolete-spec-path-after-domain-split | REQ-001-006, REQ-009-004, REQ-036-012 | ../integrity/integrity-rule-catalog.md, obsolete-path-map.yaml, ../local/runtime-package-boundary.md |
 | IR-058 | distribution-untracked-skill-reference | REQ-002-001, REQ-002-002, REQ-002-003 | ../integrity/integrity-rule-catalog.md, ../local/runtime-package-boundary.md |
 | IR-059 | distribution-reference-boundary | REQ-029 | `distribution-boundary.md`, `foundations/project-extensions.md`, `integrity-rule-catalog.md` |
-| IR-060 | forbidden Japanese word detection | REQ-053-007, REQ-053-035, REQ-036-023, REQ-010-071 | ../../quality/textlint-quality-runtime.md, ../../responsibilities/document-type-responsibilities.md, ../integrity-rule-catalog.md |
+| IR-060 | forbidden Japanese word detection | REQ-053-001, REQ-053-035, REQ-036-023, REQ-010-071 | ../../quality/textlint-quality-runtime.md, ../../responsibilities/document-type-responsibilities.md, ../integrity-rule-catalog.md |
 | IR-061 | 索引類自動生成整合性 | - | - |
 | IR-062 | skill/command パス参照実在 | REQ-010 | integrity-contracts.md, agentdev-skill-authoring.md, agentdev-command-authoring.md |
 | IR-063 | common-policy-identifier-invariant | REQ-051-005, REQ-051-006, REQ-010-064, REQ-010-068 | ../integrity-rule-catalog.md, ../../authoring/command-file-format.md |
@@ -175,7 +175,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-066 | legacy-path-removed-name | REQ-010-067, REQ-010-068, REQ-010-070 | ../integrity-rule-catalog.md, data/obsolete-vocabulary-map.yaml |
 | IR-067 | referenced-req-row-existence | REQ-010-069, REQ-010-065, REQ-010-068 | ../integrity-rule-catalog.md, ../checker-execution-contracts.md |
 | IR-068 | skill-projection-manifest | REQ-010-068, REQ-018-002 | ../../local/runtime-package-boundary.md, ../checker-execution-contracts.md, ../integrity-rule-catalog.md |
-| IR-069 | req-number-gap-recorded | REQ-087-002, REQ-087-003, REQ-010-068, REQ-010-070 | ../integrity-rule-catalog.md, ../../foundations/numbering-policy.md, ../checker-execution-contracts.md |
+| IR-069 | req-number-gap-recorded | REQ-010-068, REQ-010-070 | ../integrity-rule-catalog.md, ../../foundations/numbering-policy.md, ../checker-execution-contracts.md |
 | IR-070 | design-frontmatter-required-keys | REQ-010-062, REQ-010-068, REQ-010-070 | ../checker-execution-contracts.md, ../integrity-rule-catalog.md, ../../foundations/patterns.md |
 | IR-071 | integrity-rule-related-req-existence | REQ-051-009 | ../integrity-rule-catalog.md, ../checker-execution-contracts.md |
 | IR-072 | req-updated-freshness | REQ-010-068 | ../integrity-rule-catalog.md, ../../foundations/patterns.md, ../checker-execution-contracts.md |
