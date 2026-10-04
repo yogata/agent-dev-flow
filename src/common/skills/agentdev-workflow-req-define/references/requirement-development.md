@@ -70,6 +70,8 @@
 詳細ゲート、委譲接続点は `agentdev-req-analysis` の各 Phase を参照。
 
 - **変更影響候補抽出**: 変更影響候補を抽出しドラフトに保持する。RU からの対象領域キーワード抽出、glob/grep での関連 REQ/Decision/Design 事前特定、サブエージェント調査委譲への調査優先対象リスト（ヒント）構築、実ファイル完全列挙の維持（詳細は `agentdev-req-analysis`「調査スコープ洗練手順」参照）
+- **調査委譲の全文抽出・引き継ぎ規律**: 調査対象ファイルの全文は既存の機械的手段で取得し、モデルに逐語再生成させない。取得物への参照と、モデルによる判断・要約を分ける。取得物は後続担当が実際に読める形で委譲先へ引き継ぎ、取得不能、切断、文字化けを完全な抽出として扱わない。引き渡し形式の詳細は `agentdev-req-analysis`「サブエージェント調査委譲スコープ絞り込み」参照
+- **調査委譲の並列化と待機規律**: 独立した調査・評価だけ並列化する。調査結果を入力とする評価（分類ゲート群、Decision要否確認等）は、入力となる調査結果の確定を待って開始する。抽出・書込み等の前提が満たせない状態を、対象なし、成功、評価不要として扱わない
 - **分類ゲート（REQ 最終分類確定）**: 各要件行候補を「変更後仕様」/「反映作業」に分類する。REQ/Design 境界判定を行い Design 保存対象を `artifact_actions`（`artifact: design`）に分離する。RU 暫定分類（`tentative_classification`）があれば document-model Design（extension 経由）の文書7分類モデルへ照らして最終分類を確定し上書きする
 - **design 対応事前確認**: 変更対象のうち既存 REQ 行の意味変更を含む場合、`agentdev-traceability` の coverage --req により当該行の design 対応有無を事前確認する。design 対応が欠落する意味変更行を検出した場合は、当該行の design 対応を `artifact_actions`（`artifact: design`）へ組込む。本確認は STEP-6 の生成手順（draft-generation.md の design 対応事前確認）へ引き継がれる前段の確認であり、後段の case-ready lifecycle gate completeness（fail-closed）での停止を予防する位置づけである（正規所有は case-open Design「意味変更行の design 対応事前確認」節）
 - **文書分類妥当性検証**: REQ 要件行に Design 分離基準違反残留がないか検出する。検出時は Design 保存対象へ移送する（安定契約例外は対象外）
@@ -89,7 +91,7 @@
 
 ### Completion Verification
 
-- 全要件行候補の分類が確定し、Design 分離基準違反残留が0件であること。5観点境界の確認が実施済みであり、導出済み case-specific risk が test strategy へ投影済みであること（投影完全性は QG-1 が検査）。test strategy 項目が全て3要素を持つこと。検索系検証（rg 等）を含む test strategy 項目がある場合、網羅範囲と修正対象列挙の一致確認が実施済みであること。既存行の意味変更を含む場合、design 対応事前確認（coverage --req 実査・欠落時 artifact_actions 組込み）が実施済みであること
+- 全要件行候補の分類が確定し、Design 分離基準違反残留が0件であること。5観点境界の確認が実施済みであり、導出済み case-specific risk が test strategy へ投影済みであること（投影完全性は QG-1 が検査）。test strategy 項目が全て3要素を持つこと。検索系検証（rg 等）を含む test strategy 項目がある場合、網羅範囲と修正対象列挙の一致確認が実施済みであること。既存行の意味変更を含む場合、design 対応事前確認（coverage --req 実査・欠落時 artifact_actions 組込み）が実施済みであること。サブエージェント調査委譲を実施した場合、全文抽出が機械的手段によるものであり、取得物が委譲先へ引き継がれていること
 
 ### Resume-Idempotency
 
@@ -155,6 +157,8 @@
 - 不変条件（変更誘発境界リスク分析の省略禁止。リスク導出規則不在時は ADF core の一般規則のみで 5観点境界分析を実行する）
 - 不変条件（case-specific risk の test strategy 投影。投影完全性の検査は QG-1 が担い、本工程は投影の実施のみを行う）
 - 不変条件（test strategy 定義時の検証手段の質基準適用。質基準の正本は `agentdev-req-analysis` の analysis-viewpoints reference、完了時点の証跡契約を正規所有する要件群が正規所有するため複製しない）
+- 不変条件（調査対象全文の機械的抽出、モデル逐語再生成の禁止、取得物の引き継ぎ。手段の具体は実行基盤側に委譲）
+- 不変条件（独立した調査・評価だけの並列化。調査結果を入力とする評価の依存待機）
 
 ## Jev 先行評価の逐次経路（REQ-{NNNN}、DEC-{NNN}）
 

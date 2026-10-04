@@ -125,6 +125,8 @@ STEP-6 の構造化 `draft-data` 形式（`# draft-data` fenced YAML block）で
 後続工程の分岐は `artifact_actions` の存在で決定する（`artifact: req`/`adr` → REQ 保存、`artifact: design` → Design 保存。いずれも case-ready / case-revise の Definition 保存内部責務で実行）。
 `summary` 等の人間可読セクションは補助的であり下流処理の正として扱われない。
 
+保存は実行基盤が提供する安全な書込み手段を優先して行い、長大なシェル入力による切断を避ける（手段の具体は実行基盤側の操作規律に委譲）。書込み後は保存ファイルを読み戻し、`# draft-data` fenced YAML block の閉包、全 fields の到達、文字化けの有無を確認して内容の完結性を検証する。切断、欠落、文字化けを検出した場合は完全な保存として扱わず、書込みをやり直す。
+
 各副ステップ（実装詳細の分離、auto_gate 完了ゲート、未確定内容の auto_ready 抑止）の詳細、stop_reasons 記録形式、代表 fixture、引用誤検知除外パターンは req-define command Design（extension 経由）「未確定内容の auto_ready 抑止」節、および `agentdev-req-analysis` の req-define detailed gates を参照。
 
 ### Result
@@ -137,7 +139,7 @@ STEP-6 の構造化 `draft-data` 形式（`# draft-data` fenced YAML block）で
 
 ### Completion Verification
 
-- ファイルが存在し、draft-data 形式として読み戻し可能であること
+- ファイルが存在し、draft-data 形式として読み戻し可能であること。読み戻しによる完結性確認（切断・欠落・文字化けなし）が実施済みであること
 
 ### Resume-Idempotency
 
@@ -242,3 +244,4 @@ work_type・scale に応じた種別の完了報告を出力する。
 - 不変条件（チェックボックスは測可能で一意）
 - 不変条件（要件doc構造は req-draft.md テンプレート準拠）
 - 不変条件（work_type 判定参照、Issue 階層非決定、operation_units 出力）
+- 不変条件（ドラフト保存の安全な書込み手段優先、読み戻しによる完結性確認。手段の具体は実行基盤側に委譲）

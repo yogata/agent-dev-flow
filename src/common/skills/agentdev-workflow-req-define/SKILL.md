@@ -102,6 +102,7 @@ req-define workflow は次の11 STEP で構成する。
 - **draft-data 形式**: 出力は構造化 `draft-data`（`# draft-data` fenced YAML block）。`operation_units` を出力し、`execution_groups` は出力しない。`workflow_route` は派生値として保存しない（後続工程の分岐は `artifact_actions` の存在で決定）
 - **Issue 階層非決定**: req-define は Issue 階層を決定しない。`depends_on` は case-open の execution_unit 構成が使用する依存情報であり、最終 Issue 構成は case-open が決定する
 - **session由来RU 消費契約**: 正規原本（一時成果物ライフサイクル要件 + artifact-contracts Design）へ委譲し、本スキルで再定義しない
+- **機械抽出・安全な書込みの規律**: 調査対象の全文は既存の機械的手段で抽出し、モデルに逐語再生成させない。取得物は後続担当が実際に読める形で引き継ぐ。ドラフト保存は実行基盤が提供する安全な書込み手段を優先し、書込み後に読み戻しで完結性を確認する。独立した調査・評価だけ並列化し、調査結果を入力とする評価は確定を待つ。手段の具体（ツール名、シェル、起動 API）は実行基盤側の操作規律に委譲し、固定しない
 
 ## See Also
 
