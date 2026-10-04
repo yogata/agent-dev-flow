@@ -641,3 +641,51 @@
 - **想定反映先**: learning-promote での評価。case-open STEP-3 意味変更行 design 対応事前確認手順の追補候補
 - **関連**: Root Case #3420・PR #3421・traceability check/coverage 実測（0f2579a0）
 - **タグ**: `#coverage-req` `#missing-design` `#traceability` `#declaration-follow-up` `#case-open`
+
+## 2026-10-04: traceability check --root に MSYS 形式パス（/c/...）を渡すと解決失敗し宣言走査が空になる。Windows は C:/... 形式必須
+
+- **問題事象**: bun で traceability check を実行する際、--root に bash の $(pwd)（MSYS 形式 `/c/...`）を渡すと root 解決が失敗し、宣言走査が空になって全 missing-* が誤 fail する。Windows 環境では --root にフォワードスラッシュ Windows パス（`C:/Users/...`）を渡す必要がある（main root で同コマンドが pass する対比から特定）
+- **発生局面**: case-close STEP-2 traceability check --req 独立再検査（Root Case #3420・PR #3422・merge 直前 HEAD 3eb5f152）
+- **検知方法**: --root を MSYS 形式で渡した実行が全 missing-* fail、同一コマンドを C:/ 形式に変えて実行すると 9/9 pass した対比
+- **根本原因**: Windows プログラム側のパス解決は MSYS 形式を実在しない root として扱い、fail-closed 契約により検査対象が見かけ上全件欠落する。agentdev-traceability SKILL.md「実行方法」節に既定済みの前提
+- **自律対応内容**: C:/ 形式の絶対パス（forward slash 記法）で --root を指定し直して 9/9 pass を取得。本学びを inbox.md へ記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（SKILL.md 既定前提の運用適合）
+- **横展開観点**: --root を受け取る checker（check_changed_docs.ts --root、check_autogen_freshness.ts --root、check_distribution_boundary.ts の repoRoot 引数等）でも同一の Windows パス形式規律が適用される
+- **再発条件**: Windows の bash から checker を起動し、--root にシェルの pwd 展開値（/c/...）をそのまま渡す場合
+- **予防策候補**: checker 起動手順で --root を絶対パス直書き（C:/ 形式）に統一する候補
+- **想定反映先**: learning-promote での評価。checker 実行契約 Windows パス規律の追補候補
+- **関連**: Root Case #3420・PR #3422・agentdev-traceability SKILL.md「実行方法」節
+- **タグ**: `#traceability` `#windows-path` `#msys` `#fail-closed` `#checker-execution`
+
+## 2026-10-04: bun test 3 cwd 分割の分割②は src/common/tools/ のテストを含まない。tools 配下テストは単独実行形態での補完実行が必要
+
+- **問題事象**: bun test 3 cwd 分割正規形の分割②（`./src/common/skills/`）は src/common/tools/ 配下のテスト（runner-local 等 43 tests/2 files）を含まない。tools 配下テストは分割①〜③の和集合に入らず、単独実行形態契約（repo root 起・./ 付きパス指定）での補完実行が必要
+- **発生局面**: case-run bun test full suite（Root Case #3420・PR #3422・DEL-3420-1）
+- **検知方法**: 分割②の実行対象一覧に tools 配下テストが含まれないことを確認
+- **根本原因**: 3 cwd 分割の対象ディレクトリ集合（integrity scripts・src/common/skills・plugins + scripts）に src/common/tools が含まれない配置構造
+- **自律対応内容**: `bun test ./src/common/tools/` を単独実行形態契約で補完実行し、0 fail を確認して記録。case-close のマージ後 main root 再実測でも同じ補完を再現（313 tests/15 files 0 fail）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（bun test 実行形態契約の単独実行補完運用の継続）
+- **横展開観点**: フル suite の網羅確認は「3 分割 + 未収録配置の個別実行」の和集合で行う。件数突合で網羅性を検証する際は tools 等の未収録配置の有無を確認する
+- **再発条件**: 3 cwd 分割だけで和集合の網羅を暗黙前提にして、未収録配置のテストを実行対象から漏らす場合
+- **予防策候補**: 分割実行の網羅確認手順に未収録配置（tools 等）の列挙確認を追加する候補
+- **想定反映先**: learning-promote での評価。bun test 正規形（REQ-060 系）の網羅確認追補候補
+- **関連**: Root Case #3420・PR #3422・qg-4-final-acceptance.md「3 cwd 分割実行」節
+- **タグ**: `#bun-test` `#full-suite` `#coverage-gap` `#tools-tests` `#execution-contract`
+
+## 2026-10-04: worktree 深度前提の repoRoot 計算を持つテストは main root 実行で ENOENT で fail する。process-conformance.test.ts を既知欠陥として分離
+
+- **問題事象**: case-run 分割②では worktree（repo root から 2 階層深い `.worktrees/3420-case`）の 8 階層 `..` の repoRoot 計算が偶然 repo root に到達して pass するが、マージ後 main root で同一テスト（process-conformance.test.ts）を実行すると repoRoot が 2 階層上（C:/Users/ogatay）に解決され、SKILL.md の readFileSync が ENOENT で fail する。同ファイルの 7 tests がロード error で未実行となり、分割② の件数が worktree 242 から main root 235 に減る
+- **発生局面**: case-close STEP-2 マージ後 main root での bun test フル suite 再実測（Root Case #3420・PR #3422・squash commit a15f55df）
+- **検知方法**: 分割② status=1・fail 行の ENOENT パス（C:\\Users\\ogatay\\src\\...）と件数突合（242 → 235・差 7 = 同ファイル未実行分）から特定
+- **根本原因**: テストコードが worktree 構造（ディレクトリ深度）に結合した repoRoot 計算（`join(import.meta.dir, "..", ×8)`）を持つ。worktree でのみ正しく機能する構造依存の実装
+- **自律対応内容**: baseline a544dae0 で同一テストを単独再実行して同一 fail を再現確認し（pre-existing・環境依存と由来分類）、当該変更起因 0 件として QG-4 判定から分離。intake 分離記録はせず本 learning と対応記録コメントの検証差分に記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既知欠陥の分離記録。修正は本 Case 対象外）
+- **横展開観点**: import.meta.dir からの相対 `..` 階層数で repo root を求めるテストは worktree 深度に結合する。main root と worktree の両方で実行される検証では、git 依存（git rev-parse）か、階層数を固定しない探索で repo root を解決する必要がある
+- **再発条件**: worktree 実行で作成・検証した相対階層数の repoRoot 計算を main root（または別深度の worktree）で実行する場合
+- **予防策候補**: テスト内 repoRoot 解決は git 依存解決に統一する候補（src/common/skills/agentdev-workflow-case-run/scripts/tests/process-conformance.test.ts の repoRoot 計算修正候補）
+- **想定反映先**: learning-promote での評価。integrity 基盤のテスト repoRoot 解決規約の追補候補
+- **関連**: Root Case #3420・PR #3422・bun test 正規形「3 cwd 分割実行」節・baseline 再現確認（cc3420-baseline.json 証跡）
+- **タグ**: `#bun-test` `#worktree-depth` `#repo-root-resolution` `#pre-existing` `#fail-origin-classification`
