@@ -51,8 +51,19 @@ Root Case 本文候補の生成は preflight 設定検証の警告報告後に�
 4. 意味変更行の design 対応事前確認: 対象要件行のうち既存行の意味変更を含む場合、`agentdev-traceability` の coverage --req による当該行の design 対応有無の事前確認を実施する。design 対応が欠落する意味変更行を検出した場合は、当該行の design 対応を artifact_actions（artifact: design）へ組込んだ上で合意を完了する。事前確認を省略した Case は case-ready の lifecycle gate completeness（fail-closed）で停止し得る（missing-design 既知債務の範囲で発生余地がある）。missing-design 0 件ゲート（上記3）が増分ベース〔新規行のみ〕であることへの予防手順として位置づける（正規所有は case-open Design「意味変更行の design 対応事前確認」節）
 5. Issue 構成案に物理削除を伴う docs-chore OU が含まれる場合、当該 OU の対象範囲に extensions、templates 等の実行時設定からの参照を明示的に含める。削除対象の参照先を事前確認し、OU 分割時は他 OU・実行時設定からの参照責務に隙間がないか検査する（原本は `<workflows/references/execution-unit-construction>` Design「docs-chore OUの削除起因参照追随」節。根拠事例: E6-2〔Epic #2984 コメント記録〕、Case #2979）。checkExtensions 等の fan-in 事後検査は維持する
 6. `realization_actions` は Definition Package の構成要素として保持する（構造化ハンドオフ: DEC-{N}）。case-open が execution contract を確定しない
+6.5. 受け入れ義務の忠実性照合を実施する: 合意済み入力の必須受け入れ義務との照合を下記「受け入れ義務の忠実性照合（STEP-3 実行時）」節の手順で実施する。抑止条件（欠落・縮小・反転の検出）と投影不完全の処置を完了するまで手順 7 へ進まない
 7. 生成した Definition Package を Root Case に関連付ける（Definition Package を独立した Issue 本文物項目として生成しない〔Issue Execution Contract REQ 条項、case-open 実行契約 REQ〕。所在は Definition PR と case-ready の canonical 再取得経路から相関する）
 8. Definition Package の構成、索引・補助メタデータの具体形式は case-open / case-ready Design の管理下とする
+
+### 受け入れ義務の忠実性照合（STEP-3 実行時）
+
+正規所有は case-open Design「受け入れ義務保存の投影」節であり、本節は STEP-3 の実行手順を提供する。
+
+1. **照合対象の確定**: 合意済み入力（最新の RU・要件doc）から必須受け入れ義務（目的、対象範囲、禁止、対象外、受け入れ条件、必須検証義務）を列挙する。照合の起点は投影後の成果物ではなく最新の合意済み入力とする
+2. **忠実性照合（最新の合意済み入力起点）**: 列挙した各義務について、Definition Package（Root Case 本文候補を含む投影後成果物）の対応する記載を確認する。投影後の成果物だけの自己整合確認（Package 内項目の整合確認）を忠実性確認の代替としない。欠落（義務に対応する記載がない）、縮小（義務の評価範囲・対象範囲が合意済み入力より狭い）、反転（義務と逆の意味の記載）を検出した場合は Root Case の確定・実行へ進まず、Definition Package の構成へ戻して該当箇所を修正する
+3. **義務対応の意味保持確認**: 各義務の対応先について、対応先の存在確認に留まらず元の義務の意味、評価範囲、禁止事項が保持されていることを確認する
+4. **投影不完全の処置**: どこにも対応しない受け入れ義務を検出した場合は、非該当（not applicable）として扱わず投影不完全として処置する。Definition Package の構成へ戻して対応先を追加し、対応先のない義務を残したまま手順 7 以降へ進まない
+5. **下流検証基準への確定**: 必要情報と確認根拠を Definition Package へ保持した後、当該成果物を下流の検証基準とする
 
 ### 並行 case-open の作業隔離
 
@@ -66,10 +77,12 @@ Root Case 本文候補の生成は preflight 設定検証の警告報告後に�
 
 - Root Case GitHub Issue 作成済み（対象 REQ 番号埋め込み、状態 open）
 - Definition Package 生成済み、Root Case 関連付け済み
+- 受け入れ義務の忠実性照合結果（欠落・縮小・反転の有無、投影不完全の有無と処置）
 
 ## Evidence
 
 - Root Case Issue 番号、本文生成根拠、Definition Package の構成要素と関連付け状態
+- 受け入れ義務の忠実性照合の実行証跡（照合対象の義務列挙、最新の合意済み入力起点の照合結果、検出時は抑止と構成差し戻し・投影不完全処置の記録）
 
 ## Completion Verification
 
@@ -80,6 +93,7 @@ Root Case 本文候補の生成は preflight 設定検証の警告報告後に�
 - REQ 行変更を伴う場合は Design の ADF-COVERS 宣言追随要否の確認（必要な宣言の Definition 包含）が行われていること
 - 既存行の意味変更を含む場合は、coverage --req による design 対応有無の事前確認が実施され、design 対応が欠落する意味変更行の artifact_actions（artifact: design）への組込み（または欠落行なしの確認記録）が行われていること
 - 物理削除を伴う docs-chore OU を含む場合は、当該 OU の対象範囲への実行時設定参照の明示包含が確認されていること
+- 受け入れ義務の忠実性照合が投影後成果物の自己整合ではなく最新の合意済み入力起点で実施されていること。欠落・縮小・反転検出時に Root Case の確定・実行を抑止して構成へ戻した記録があること。対応先のない義務が投影不完全として処置され（非該当扱いではなく）、下流検証基準の確定まで完了していること
 - 並行 case-open 実行時に、Definition 変更作業が Case 専用 worktree かつ origin/main HEAD 起点の独立 branch で行われ、1-writer 侵害の検知手順が実行されていること
 - 状態が open であり実装開始が許可されていないこと
 
