@@ -849,3 +849,19 @@
 - **想定反映先**: learning-promote での評価
 - **関連**: Case #3433・Epic #3425 Wave 4（issues/3433#issuecomment-5979282051）
 - **タグ**: `#integrity-suite` `#pre-existing` `#worktree`
+
+## 2026-10-04: 配布依存境界 link profile gate の worktree 実行は junction 投影構成が実務経路
+
+- **問題事象**: worktree 単独では link 投影（`.opencode/` 配下の agentdev-* 投影）が存在せず zero-targets の adapter-failure で link profile gate が実行不能になる
+- **発生局面**: case-run 委譲の配布依存境界 最終 gate（link profile）実行（Case 3423・PR 3435 検証差分 link profile 行）
+- **検知方法**: worktree 単独での link profile 実行が zero-targets の adapter-failure になることの確認
+- **根本原因**: junction 投影領域 `.opencode/` は git 非追跡で worktree に伝播しないため、link 走査対象が 0 件になる
+- **自律対応内容**: temp 領域に worktree の src/common（commands、skills、tools）と src/opencode/plugins への junction 投影を構成（bun の `fs.symlinkSync(..., 'junction')`）、投影ルートを repoRoot として `--profile link` を実行し ok=true failures 0 を確認
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: src/common 配下の変更を含む case-run の link profile gate 実行手順として junction 投影構成の標準化候補（checker 実行契約の link profile 実効実行要件との整合）
+- **再発条件**: worktree で link profile gate を実行する場合（全 case-run）
+- **予防策候補**: link profile gate の実行手順に junction 投影構成の前置を明記、zero-targets を無効分類として扱う運用の徹底
+- **想定反映先**: learning-promote での評価
+- **関連**: Case 3423（PR 3435 検証差分 link profile 行）
+- **タグ**: `#link-profile` `#junction` `#worktree`
