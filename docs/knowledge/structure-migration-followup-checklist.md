@@ -1,7 +1,7 @@
 ---
 title: 構造移設の追随漏れ防止（3点セット同時変更・横断旧パス検索・全層テスト実行）
 created: 2026-10-03
-updated: 2026-10-03
+updated: 2026-10-05
 ---
 
 ## 知識内容
@@ -33,3 +33,19 @@ src/opencode から src/common への構造移設・原本移設では、移設�
 - Case #3316（PR #3326 Findings）: baseline・除外定義・文言の 3 点セット要変更
 - Case #3316（PR #3327 Findings）: third-party-sync-contract.test.ts の旧原本参照 pre-existing fail
 - Case #3316（PR #3332 Findings）: scripts/self 配下検査テストの旧構成前提残存
+
+## 適用対象
+
+- パス構造の移設・原本移設を伴う Case（Epic Wave 構成を含む）の完了判定と追随確認
+- 検査基盤（baseline・除外定義・検査文言）の走査先を変更する変更単位の受け入れ判定
+- src テスト・scripts 配下テスト・checker 実装の追随確認を伴う全 Case
+
+## 根拠
+
+- 出典 3 件（Case #3316・PR #3326/#3327/#3332）の連続実証: 単一層の更新では追随漏れが残り、src テストの green は追随完了の証拠にならない
+- pin 型テスト群の期待値更新観点・bun test と typecheck の併用観点は要件化経路（req-define）での追加候補として記録されている（backlog-review 2026-10-05・RU-0014）
+
+## 関連知識
+
+- [bun-test-execution-form-drift-signals.md](bun-test-execution-form-drift-signals.md)（bun test 実行形態逸脱の検知。全層テスト実行の実行形態側）
+- [windows-git-bash-inline-content-corruption.md](windows-git-bash-inline-content-corruption.md)（bash 経由でのスクリプト・文言伝達の破損回避）

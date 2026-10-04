@@ -1,7 +1,7 @@
 ---
 title: Git 操作の非対話認証の設定規律と失敗検出（実行環境側）
 created: 2026-10-04
-updated: 2026-10-04
+updated: 2026-10-05
 ---
 
 # Git 操作の非対話認証の設定規律と失敗検出（実行環境側）
@@ -34,6 +34,14 @@ Git 操作（ドメイン状態永続化の push を含む）は、対話認証�
 - 認証条件を変更しない同一条件での長時間待機を無条件に再試行しない。認証方式を変更して再試行する場合は、変更内容と結果を識別できる形で記録する。
 - 資格情報の値（トークン、パスワード等）を解析証拠やログへ出力しない。非対話化は既存の安全な資格情報管理手段の利用であり、認証・アクセス制御の回避ではない。
 
+### push が credential helper 起動後の timeout で失敗する場合の contingency
+
+GCM 有効・トークンが GCM 側に未保存・UI 表示不能なヘッドレス環境では、`git push`（head branch push 等）が credential helper 起動後にプロンプトなしでハングし、90〜300 秒の timeout で失敗することがある（`GIT_TERMINAL_PROMPT=0`・`GCM_INTERACTIVE=never` でも待ちが解除されない）。この場合は `git -c credential.helper= -c "credential.helper=!gh auth git-credential" push ...` のコマンド単位上書きで gh CLI の keyring トークンを使用する。実行前に `gh auth status` で認証済みを確認し、push 出力で refspec と upstream 設定を確認する。恒久設定（gitconfig）の変更は個々の Case では行わない。
+
+### 認証検証の模擬は認証必須操作で行う
+
+public リポジトリへの ls-remote は無効 credential でも匿名読取が成功するため、認証検証にならない。認証経路の確認模擬は push 等の認証必須操作で実施する。匿名読取の成功を認証成立の証拠として扱わない。
+
 ### 秘密値不在の検証手順
 
 本知識文書、AGENTS.md「ハーネス選定」の参照行、workflow 側の差分（`git-common-procedures.md`、`issue-operation-safety.md`）は credential 本体（秘密値）を含まない。作成・更新した成果物のファイル集合を対象に、credential 本体を示す文字列パターン（`ghp_` / `gho_` / `ghs_` / `github_pat_` 等の GitHub token プレフィックス、`sk-` 等の provider key プレフィックス、`AKIA` 等の cloud key プレフィックス、base64 風の 40 字以上の長列、高エントロピーなランダム文字列）で検索し 0 件を確認する。コマンド名（`gh auth git-credential` 等の方式名）、変数名（`credential.https://github.com.helper` 等の設定キー名）、手順の記述は対象外である。credential 値そのものを検証の手がかりに使う場合は、値を出力せず行の存在確認に限定する。
@@ -56,6 +64,8 @@ Git 操作（ドメイン状態永続化の push を含む）は、対話認証�
 - git-worktree Design（`docs/designs/skills/agentdev-git-worktree.md`）「Git 操作の認証失敗検出と実行環境側認証規律との接続」節。認証規律の正規所有者が実行環境側であることを規定する。
 - Issue #3414（Wave-1: Git 非対話認証規律を実行環境側へ配置し失敗検出を接続する）。
 - 当環境の実測（2026-10-04）: `git config --show-origin --get-all credential.helper` による helper 設定確認、`gh auth status` による認証状態確認（keyring、https）、実 workflow の push 完了実績。
+- Case #3391・Definition PR #3392（2026-10-05 追記）: push が GCM 起動後 3 回 timeout 失敗 → credential.helper コマンド単位上書きで push 成功・refspec 確認。
+- PR #3418（Issue #3414・DEL-3414-1）（2026-10-05 追記）: ls-remote の匿名読取成功により認証検証にならない事象の観測（認証必須操作での模擬の必要性）。
 
 ## 関連知識
 

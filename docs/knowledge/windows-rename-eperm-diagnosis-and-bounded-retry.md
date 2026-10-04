@@ -1,7 +1,7 @@
 ---
 title: Windows rename EPERM の診断手法（対照プローブ・並行模倣）と bounded retry 対策
 created: 2026-10-03
-updated: 2026-10-03
+updated: 2026-10-05
 ---
 
 ## 知識内容
@@ -33,3 +33,19 @@ Windows における原子的書込み（tmp ファイル → 既存ファイル
 
 - Case #3314（PR #3325 Findings）: 対照プローブによる環境起因実証
 - Case #3316（PR #3329 Findings）: Promise.all 模倣による再現特定と bounded retry 対処
+
+## 適用対象
+
+- Windows 環境で rename ベースの原子的書込みを実装・検証するコード（checker・tool engine の script 等）
+- bun test 並行実行で非決定的 EPERM / EACCES が観測されるテスト資産の診断と対策
+- 並行実行でのみ再現する flaky テストの診断全般
+
+## 根拠
+
+- 出典 2 件（Case #3314・PR #3325、Case #3316・PR #3329）の実証: 単体実行で再現しないため「テストの欠陥」と誤分類されやすい環境起因の競合を、対照プローブと並行模倣で切り分けた
+- bounded retry 実装の実在（src/common/tools/agentdev-gh/local/runner-local.ts）
+
+## 関連知識
+
+- [windows-bun-test-spawn-timeout-classification.md](windows-bun-test-spawn-timeout-classification.md)（spawn timeout 由来 fail との切り分け・対照実行手順）
+- [windows-powershell-bulk-io-corruption.md](windows-powershell-bulk-io-corruption.md)（Windows 環境のファイル I/O 系知見）
