@@ -577,3 +577,51 @@
 - **想定反映先**: learning-promote での評価。後続 Case での baseline 既知欠陥修正の根拠
 - **関連**: Root Case #3407・PR #3409・merge commit a6870104、process-conformance.test.ts・skills_structure.test.ts（PR #3332 由来）・検証証拠コメント（Issue #3407 comment 5974678572）
 - **タグ**: `#bun-test` `#path-depth` `#main-root` `#worktree-divergence` `#base-known`
+
+## 2026-10-04: worktree 内で依存生成を伴う checker 実行時は Git Bash $(pwd) の POSIX パスと bun --root の組合せに注意し、対象 0 件の合格を検査不能と区別する
+
+- **問題事象**: worktree 内で依存生成（bun install + bun run build:engine）を伴う checker（agentdev-textlint-guard gate.ts 等）を実行する場合、Git Bash の `$(pwd)` は POSIX 形式パス（`/c/...`）を返すため bun スクリプトの `--root` には Windows 形式の絶対パスを明示する必要がある。POSIX パスを渡すと対象解決が空振りして「0 inspected で PASS」になる
+- **発生局面**: case-run QA review 文章表層品質 最終検査（textlint gate）の worktree 実行（Root Case #3410・PR #3417・Issue #3412）
+- **検知方法**: PR #3417 本文検証差分の textlint gate 行（PASS 561ファイル検査・hard violations 0）と Findings / Capture候補の intake 記録
+- **根本原因**: Git Bash 環境の `$(pwd)` と bun スクリプト（Windows 形式 path 解決）の間のパス形式ミスマッチ。対象解決 0 件が成功扱いになる fail-open の穴
+- **自律対応内容**: 本 learning 記録。checker 実行は実体対象が検査されたことを確認してから合格扱いとする運用を維持
+- **ユーザー確認有無**: なし（PR 本文記録の回収）
+- **Decision/REQ/spec影響**: なし（現行運用規律の確認と記録）
+- **横展開観点**: bun 系 checker の `--root` 受け渡しでは Windows 形式絶対パスを明示する。検査対象 0 件の合格を「検査不能」と区別しないと fail-open の穴になる（intake 候補としても分離記録済み）
+- **再発条件**: worktree 内で依存生成を伴う checker を Git Bash から `$(pwd)` 展開のパスで起動する場合
+- **予防策候補**: checker 実行手順の `--root` 指定に Windows 形式絶対パス明示を追記する候補
+- **想定反映先**: learning-promote での評価。agentdev-textlint-guard 実行手順の追補候補
+- **関連**: Root Case #3410・PR #3417・Issue #3412（TS-002 実行時並列性検証の worktree 実行）
+- **タグ**: `#git-bash` `#posix-path` `#bun` `#fail-open` `#textlint-gate`
+
+## 2026-10-04: integrity suite の pre-existing fail 3件+error 1件は src/opencode-local/ 削除にテスト側期待が追随していない陳腐化
+
+- **問題事象**: integrity suite（bun test 分割①）の既知 pre-existing fail 3件 + error 1件（textlint_guard_project_config.test.ts 2件・issue_tracking_list.test.ts 1件）は `src/opencode-local/` 削除（commit eecb5b03）にテスト側期待が追随していない陳腐化である。textlint_guard_project_config.test.ts の期待対象 `src/opencode-local/README.md` は削除済みで HEAD に不在、issue_tracking_list.test.ts は `src/opencode-local/agentdev-gh/runner-local.ts` の module 不在で error
+- **発生局面**: case-run bun test full suite・分割①の fail 由来分類（baseline 再現確認付き・Root Case #3410・PR #3419・Issue #3413）
+- **検知方法**: baseline 5d94dd7c の detached worktree で同一テスト再実行し、fail 3件 + error 1件の全件が baseline で再現することを確認（stash 不使用・検証後 worktree 削除済み）
+- **根本原因**: `src/opencode-local/` 削除（eecb5b03）時にテスト側の期待値・import が追随更新されていない
+- **自律対応内容**: 本筋 Case の対象範囲外のため修正せず、pre-existing 分類の根拠を baseline 再現確認で確定して PR 本文に記録。修正（テスト側の追随更新）は別途提案
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（未登録既知欠陥の合格根拠使用なし・由来分類の evidence 化のみ）
+- **横展開観点**: ディレクトリ削除を伴う変更では integrity suite・scripts/self の pin 型テスト群の追随を bun test 3 分割で確認する。テスト側期待の陳腐化は baseline 再現確認で由来分類できる
+- **再発条件**: テストが実在を期待するパスを削除する変更を実行する場合
+- **予防策候補**: テスト側の追随更新を後続 Case で実施する（textlint_guard_project_config.test.ts・issue_tracking_list.test.ts）
+- **想定反映先**: learning-promote での評価。後続 Case の baseline 既知欠陥修正の根拠
+- **関連**: Root Case #3410・PR #3419・Issue #3413・commit eecb5b03（src/opencode-local/ 削除）・baseline 5d94dd7c
+- **タグ**: `#integrity-suite` `#pre-existing-fail` `#stale-test` `#baseline-reproduction`
+
+## 2026-10-04: worktree での bun test 分割③は plugins junction 未伝播により plugins 分割が未実施となる。環境差を実行記録へ明示記録する運用を継続する
+
+- **問題事象**: worktree での bun test 分割③（repo ルート系 guard テスト）は plugins junction 未伝播により plugins 分割が未実施となる。未実行対象を実行済みとして扱わず `./scripts/` のみ実施として記録
+- **発生局面**: case-run bun test full suite・分割③（Root Case #3410・PR #3419・Issue #3413）
+- **検知方法**: worktree の `.opencode/skills/` junction 未伝播（plugins dir 不在確認済み）と PR 本文への明示記録
+- **根本原因**: worktree 構造上の junction 未伝播（既知の環境差。checker 実行契約「link profile の worktree 実行時の扱い」と同種）
+- **自律対応内容**: PR 本文へ環境差（junction 未伝播・plugins 分割未実施）を明示記録。既存契約のとおり環境差を実行記録から判別可能に扱った
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（bun test 実行形態契約の環境ラベル記録は現行どおり）
+- **横展開観点**: worktree 実行で構造的に検証不能な対象は未実施であることを明示記録し、実行済みと扱わない運用が継続する点を learning として記録
+- **再発条件**: worktree 内で plugins 領域を走査対象に含むテスト・検査を実行する場合
+- **予防策候補**: 特になし（現行の明示記録運用の継続）
+- **想定反映先**: learning-promote での評価
+- **関連**: Root Case #3410・PR #3419・Issue #3413・checker 実行契約「link profile の worktree 実行時の扱い」
+- **タグ**: `#worktree` `#junction` `#bun-test` `#environment-label` `#explicit-recording`
