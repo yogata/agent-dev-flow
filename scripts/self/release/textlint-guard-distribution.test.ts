@@ -1,5 +1,5 @@
 // Behavioral distribution tests for the agentdev-textlint-guard plugin
-// package (REQ-053-033 install-time resolution + REQ-029-012/013 dependency
+// package (REQ-029-012 install-time resolution + REQ-029-012/013 dependency
 // boundary + REQ-052-007 plugin projection).
 //
 // Covers the distribution contract under the version-pin-only distribution
@@ -24,7 +24,7 @@
 //   - install/self-sync generic enumeration covers the new plugin with no
 //     special-case branching and no repo-local exclusion entry
 
-// ADF-COVERS(verification): REQ-053-025, REQ-053-033, REQ-053-034
+// ADF-COVERS(verification): REQ-053-025
 // ADF-COVERS(verification): REQ-052-006, REQ-052-007
 // ADF-COVERS(verification): REQ-050-002, REQ-050-004
 

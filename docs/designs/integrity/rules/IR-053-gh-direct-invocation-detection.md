@@ -18,7 +18,7 @@ updated: 2026-09-08
 | related_req | [REQ-011] |
 | related_design | [integrity-rule-catalog.md, integrity-contracts.md, ../../responsibilities/custom-tool-contracts.md] |
 | gate_level | full-audit, delta-guard |
-| false_positive_risk | 中。Custom Tool `agentdev_gh` の操作契約参照を除外しないと、正規の I/O 実装を違反として検出する。読取系 contingency 手順のリテラルは例外登録済み（REQ-092-003・READ_CONTINGENCY 契約に基づく）。 |
+| false_positive_risk | 中。Custom Tool `agentdev_gh` の操作契約参照を除外しないと、正規の I/O 実装を違反として検出する。読取系 contingency 手順のリテラルは例外登録済み（REQ-095-003 の contingency 原則・READ_CONTINGENCY 契約に基づく）。 |
 | regression_test | gh 直接呼出しを含む fixture を検出し、Tool 操作契約参照を検出しない検証を実施する。 |
 | finding_route | intake |
 | triage_action | 検出箇所を Custom Tool `agentdev_gh` の操作契約への委譲へ置き換える。例外パス運用（追加は迂回防止節の許容範囲に従う）を適用する。 |

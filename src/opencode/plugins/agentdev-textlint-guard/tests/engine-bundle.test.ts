@@ -37,7 +37,7 @@ describe("vendored engine bundle（配布前解決済み依存）", () => {
     for (const key of ["preset-ja-technical-writing", "preset-ai-writing", "prh"]) {
       expect(engine.ruleModules[key]).toBeDefined();
     }
-    // lockfile 固定版の埋め込み検証（REQ-053-034）
+    // lockfile 固定版の埋め込み検証（REQ-029-012）
     expect(engine.versions["@textlint/kernel"]).toBe("14.8.4");
     expect(engine.versions["textlint-rule-preset-ja-technical-writing"]).toBe("12.0.2");
     expect(engine.versions["@textlint-ja/textlint-rule-preset-ai-writing"]).toBe("1.7.0");

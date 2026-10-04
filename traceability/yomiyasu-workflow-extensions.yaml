@@ -6,11 +6,7 @@ implementation:
     - REQ-098-003
     - REQ-098-004
     - REQ-098-006
-    - REQ-098-007
     - REQ-098-008
-    - REQ-098-009
-    - REQ-098-012
-    - REQ-098-013
     - REQ-098-014
   .agentdev/extensions/skills/agentdev-workflow-case-ready.yaml:
     - REQ-098-001
@@ -18,11 +14,7 @@ implementation:
     - REQ-098-003
     - REQ-098-004
     - REQ-098-006
-    - REQ-098-007
     - REQ-098-008
-    - REQ-098-009
-    - REQ-098-012
-    - REQ-098-013
     - REQ-098-014
   .agentdev/extensions/skills/agentdev-workflow-case-run.yaml:
     - REQ-098-001
@@ -30,11 +22,7 @@ implementation:
     - REQ-098-003
     - REQ-098-004
     - REQ-098-006
-    - REQ-098-007
     - REQ-098-008
-    - REQ-098-009
-    - REQ-098-012
-    - REQ-098-013
     - REQ-098-014
   .agentdev/extensions/skills/agentdev-workflow-case-close.yaml:
     - REQ-098-001
@@ -42,11 +30,7 @@ implementation:
     - REQ-098-003
     - REQ-098-004
     - REQ-098-006
-    - REQ-098-007
     - REQ-098-008
-    - REQ-098-009
-    - REQ-098-012
-    - REQ-098-013
     - REQ-098-014
   .agentdev/extensions/skills/agentdev-workflow-case-revise.yaml:
     - REQ-098-001
@@ -54,11 +38,7 @@ implementation:
     - REQ-098-003
     - REQ-098-004
     - REQ-098-006
-    - REQ-098-007
     - REQ-098-008
-    - REQ-098-009
-    - REQ-098-012
-    - REQ-098-013
     - REQ-098-014
   .agentdev/extensions/skills/agentdev-workflow-case-auto.yaml:
     - REQ-098-001
@@ -66,10 +46,7 @@ implementation:
     - REQ-098-004
     - REQ-098-005
     - REQ-098-006
-    - REQ-098-007
     - REQ-098-008
-    - REQ-098-009
-    - REQ-098-013
     - REQ-098-014
   .agentdev/extensions/skills/agentdev-workflow-issue.yaml:
     - REQ-098-001
@@ -77,11 +54,7 @@ implementation:
     - REQ-098-004
     - REQ-098-005
     - REQ-098-006
-    - REQ-098-007
     - REQ-098-008
-    - REQ-098-009
-    - REQ-098-012
-    - REQ-098-013
     - REQ-098-014
   src/common/skills/agentdev-project-extensions/scripts/lib/extension_state.ts:
     - REQ-098-011

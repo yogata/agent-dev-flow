@@ -15,8 +15,8 @@ implementation:
     - REQ-011-029
     - REQ-011-030
     - REQ-011-033
+    - REQ-052-014
     - REQ-083-001
-    - REQ-093-003
   src/common/tools/agentdev-gh/specs-issue.ts:
     - REQ-011-022
     - REQ-011-025
@@ -47,4 +47,4 @@ verification:
     - REQ-011-029
     - REQ-011-030
     - REQ-011-033
-    - REQ-093-003
+    - REQ-052-014
