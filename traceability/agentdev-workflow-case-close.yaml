@@ -14,6 +14,7 @@ implementation:
     - REQ-032-025
     - REQ-032-026
     - REQ-032-030
+    - REQ-032-031
     - REQ-060-007
     - REQ-096-012
     - REQ-096-013
@@ -21,15 +22,42 @@ implementation:
     - REQ-021-027
     - REQ-032-027
     - REQ-032-030
+    - REQ-032-031
+    - REQ-032-032
+    - REQ-032-033
+    - REQ-032-034
+    - REQ-032-035
+    - REQ-032-036
+    - REQ-032-037
+    - REQ-032-038
     - REQ-096-001
     - REQ-096-002
     - REQ-096-017
+  src/common/skills/agentdev-workflow-case-close/references/epic-wave-close.md:
+    - REQ-035-001
+    - REQ-032-038
+  src/common/skills/agentdev-workflow-case-close/scripts/src/final-acceptance.ts:
+    - REQ-032-031
+    - REQ-032-032
+    - REQ-032-033
+    - REQ-032-034
+    - REQ-032-035
+    - REQ-032-036
+    - REQ-032-037
+    - REQ-032-038
   src/common/skills/agentdev-workflow-case-close/references/pr-merge-and-conflict.md:
     - REQ-100-006
     - REQ-100-007
-  src/common/skills/agentdev-workflow-case-close/references/epic-wave-close.md:
-    - REQ-035-001
 verification:
+  src/common/skills/agentdev-workflow-case-close/scripts/tests/final-acceptance.test.ts:
+    - REQ-032-031
+    - REQ-032-032
+    - REQ-032-033
+    - REQ-032-034
+    - REQ-032-035
+    - REQ-032-036
+    - REQ-032-037
+    - REQ-032-038
   src/common/skills/agentdev-workflow-case-close/references/issue-resolution-and-qg4.md:
     - REQ-032-030
   src/common/skills/agentdev-workflow-case-close/references/docs-and-design-promotion.md:
