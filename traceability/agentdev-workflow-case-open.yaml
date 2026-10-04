@@ -24,10 +24,13 @@ implementation:
   src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md:
     - REQ-083-001
     - REQ-030-017
+    - REQ-030-021
   src/common/skills/agentdev-workflow-case-open/references/root-case-and-definition-package.md:
     - REQ-030-015
     - REQ-030-017
     - REQ-030-018
+    - REQ-030-019
+    - REQ-030-020
     - REQ-100-001
     - REQ-100-002
     - REQ-100-003
