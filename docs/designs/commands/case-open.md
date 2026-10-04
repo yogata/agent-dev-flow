@@ -2,7 +2,7 @@
 title: case-open Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-29"
+updated: "2026-10-04"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-004, REQ-030-005, REQ-030-006, REQ-030-007, REQ-030-008, REQ-030-009, REQ-030-010, REQ-030-011, REQ-030-015 -->
@@ -11,6 +11,7 @@ updated: "2026-09-29"
 <!-- ADF-COVERS(implementation): REQ-035-006, REQ-035-008 -->
 <!-- ADF-COVERS(implementation): REQ-049-005 -->
 <!-- ADF-COVERS(design): REQ-030-014, REQ-030-017, REQ-030-018 -->
+<!-- ADF-COVERS(design): REQ-030-019, REQ-030-020, REQ-030-021 -->
 
 # case-open Design
 
@@ -237,6 +238,16 @@ review の結果、Root Case 本文候補、Definition Package 構成案のい�
 
 本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、v4-delegation-contracts Design「adversarial-review との委譲契約接続」節、v4-lifecycle-state-machine Design との間で意味の重複、矛盾を生じない。
 case-open command 固有の挿入境界（発動条件、挿入構造、変更影響別再実行ルール、順序）のみを本節が所有し、共通 caller integration 契約、adversarial-review 自身の振る舞い契約、再 review 条件と停止条件の詳細は各正規所有者 Design を正とする。
+
+## 受け入れ義務保存の投影（REQ-030-019〜021、RU-20261004-08）
+
+Definition Package 生成・確定における受け入れ義務保存の実行時投影。
+
+- Definition Package の生成時、合意済み入力（RU・要件doc）の必須受け入れ義務（目的、対象範囲、禁止、対象外、受け入れ条件、必須検証義務）について、投影後の成果物だけの自己整合確認ではなく、最新の合意済み入力との照合で忠実性と投影完全性を確認する。欠落・縮小・反転を検出した場合は Root Case の確定・実行へ進まない。
+- 義務対応の確認は対応先の存在確認に留まらず、元の義務の意味、評価範囲、禁止事項の保持を確認する。対応先のない義務は非該当（not applicable）として扱わず、投影不完全として処置する。
+- 必要情報と確認根拠を Definition Package へ保持した後は、当該成果物を下流の検証基準とする。
+- Definition 確定後に投影不備が判明した場合は、消費済み入力で実行契約を非公式に補完せず、正規の訂正経路（req-define 再合意を経る case-revise 等）での修復へ差し戻す。
+- 偽陽性回帰シナリオ「元の合意から正規契約への投影に欠落・反転があるが、投影後の契約と実装・検査が自己整合していることを理由に通過する」を、実経路に接続した決定的回帰試験で拒否する。
 
 ## See Also
 

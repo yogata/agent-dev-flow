@@ -2,7 +2,7 @@
 title: case-auto Design
 status: accepted
 created: 2026-06-21
-updated: "2026-10-03"
+updated: "2026-10-04"
 ---
 <!-- ADF-COVERS(implementation): REQ-015-012 -->
 <!-- ADF-COVERS(implementation): REQ-100-004 -->
@@ -12,6 +12,7 @@ updated: "2026-10-03"
 <!-- ADF-COVERS(design): REQ-031-029, REQ-031-030 -->
 <!-- ADF-COVERS(verification): REQ-034-037, REQ-034-038 -->
 <!-- ADF-COVERS(implementation): REQ-003-017, REQ-003-018, REQ-006-108, REQ-034-002, REQ-034-003, REQ-034-007, REQ-034-010, REQ-034-011, REQ-034-012, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-018, REQ-034-019, REQ-034-020, REQ-034-021, REQ-034-022, REQ-034-023, REQ-034-024, REQ-034-025, REQ-034-026, REQ-034-027, REQ-034-028, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-034, REQ-034-035, REQ-034-036 -->
+<!-- ADF-COVERS(design): REQ-101-017, REQ-032-038 -->
 
 # case-auto Design
 
@@ -443,6 +444,15 @@ Phase 0 の枝PR に含まれるコミット構成運用を規定する。
 - auto_gate preflight の未解決項目の残存時（`auto_gate.auto_ready` が false または未解決項目が残る場合は停止）。
 - 停止条件（11項目の停止条件いずれか）検出時（実行停止、停止時タイミング情報を追記）。人間に留保された判断（REQ-096-005）の新規確定では、req-define での再合意が必要である旨を要旨として報告する（再開入口は Root Case 指定であり、工程別の resume_command を Root Case に記録しない）。
 - user-decision-required（上位合意矛盾、新規ユーザー判断事項）検出時（自走を停止しユーザーへ判断を求める）。
+
+## 旧契約実行の抑止と進行・終了制御への判定接続（REQ-101-017、REQ-032-038、RU-20261004-08）
+
+orchestration における受け入れ義務保存の実行時投影。
+
+- orchestration の dispatch 入口で、影響する合意変更が下流消費成果物へ反映され読み戻しが確認されるまで、旧実行契約に基づく新規 dispatch を行わない。
+- 子 Issue の完了は当該子が負う必須完了条件で判定する。親に残る横断義務の未完了だけを理由に、条件を満たした子 Issue の終了を禁止しない。親の横断義務は Wave 収束・Epic/Root の最終終了時に評価する（Wave 収束と依存充足の両条件 gate への接続）。
+- 子からの義務投影不完全・検証不能の申告は停止伝播として扱い、完了伝播を阻止する。必須条件の未達・未証明を Gate 全体の warn 等で通過させない。
+- 誤完了拒否判定が、実際の進行・終了を許可する同じ経路で機能することを回帰試験で確認する（模擬判定のみの検証で達成としない）。
 
 ## See Also
 

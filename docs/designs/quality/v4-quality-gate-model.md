@@ -2,10 +2,11 @@
 title: ADF v4 Quality / Verification / Evidence / Gate モデル
 status: accepted
 created: 2026-09-18
-updated: 2026-09-19
+updated: 2026-10-04
 ---
 
 <!-- ADF-COVERS(implementation): REQ-003-013, REQ-007-006, REQ-007-007, REQ-007-008, REQ-007-009, REQ-054-003 -->
+<!-- ADF-COVERS(design): REQ-061-042, REQ-017-021, REQ-017-022, REQ-032-031, REQ-032-032, REQ-032-033, REQ-032-034, REQ-032-035, REQ-032-036, REQ-032-037, REQ-032-038, REQ-096-032, REQ-096-033, REQ-096-034, REQ-101-017, REQ-101-018, REQ-101-019 -->
 
 # ADF v4 Quality / Verification / Evidence / Gate モデル
 
@@ -99,6 +100,16 @@ v3 quality/quality-gates.md は本 Design により supersede される。本 De
 full integrity suite 受入れ基準・bun test 正規形・機械受理基準の正規形は、skill Design（skills/agentdev-quality-gates.md および references）が原本として保持する（REQ-060 が指定）。本 Design は意味契約と権威ポインタのみを所有し、実行詳細の二重管理を行わない。
 
 Gate 群の列挙と体系変更は本 Design（quality ドメイン）が所有する。Standard Operating Model（v4-standard-lifecycle）は work_type / scale / Epic / Wave の語彙と lifecycle 遷移を所有し、Gate の定義本体は本 Design に帰属する。
+
+## QG-2 / QG-4 の受け入れ義務保存拡張（RU-20261004-08）
+
+QG-2 / QG-4 の Verification Obligation への受け入れ義務保存の拡張。新しい Gate、結果状態は追加しない。
+
+- QG-2（Acceptance Coverage）の Verification Obligation に、完了条件・acceptance criteria の測定可能性に加え、受け入れ義務の投影完全性（対応先のない義務の不存在）、評価範囲、検証義務を確定可能かの確認を含める（REQ-061-042、REQ-017-021/022）。
+- QG-4（Final Acceptance）の Verification Obligation に、正規契約からの検証義務の独立導出または照合、証拠・既判定の鮮度確認、条件単位評価と既存 Gate 結果・Issue 状態の分離、実際の進行・終了経路への判定接続、証拠の意味対応、N/A 根拠確認、全称・不存在条件の反例探索、非循環証拠、偽陽性・偽陰性双方の防止を含める（REQ-032-031〜038、REQ-096-032/033、REQ-101-017〜019）。
+- 完了条件単位の評価区分（pass / fail / blocked / not applicable）は完了条件単位の評価であり、Gate の判定値（pass / warn / fail / partial）への写像は正規所有契約（判定値と遷移接続）が定める。必須条件の未達・未証明を Gate 全体の warn で通過させない。
+- QG-4 の評価は case-run が提示した検査対象、期待結果、除外条件、合格申告をそのまま最終基準として利用しない。実装結果から検証基準を逆算せず、正規契約側から検証義務を形成する。
+- 検証義務導出の判断方法は REQ-096 の3分類（決定的処理、閉じた意味評価、開いた推論）に従い、単純な全ツリー検索等の単一手段をすべての検証義務へ一般化しない。
 
 ## Verifier 分類
 
