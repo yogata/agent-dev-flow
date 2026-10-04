@@ -32,6 +32,13 @@ Project Contract は、新しい単一巨大文書ではなく、AI が新しい
 - 各要素について canonical owner、更新契機、寿命を定義する
 - AI による再構成手順: 新規 session は上記要素の canonical owner から現在契約を再構成し、単一巨大文書に依存しない
 
+### ADF共通保証と本体Project契約の層帰属
+
+Project Contractは、ADFが配布物全体へ提供する共通保証と、agent-dev-flow本体リポジトリ固有の要求・方針・知識・拡張を区別して記述する。
+共通保証に属する契約は配布物・利用先一般に適用され、本体Project固有の契約は本体リポジトリとその整備工程に限定される。
+本体固有契約を利用先一般の保証へ逆流させない。
+各Project契約記述は、どちらの層に帰属するかを明示して運用される。
+
 ## 情報寿命モデル
 
 8 寿命（ADF lifetime、Project lifetime、Architecture lifetime、Requirement lifetime、Change/Case lifetime、Runtime lifetime、reusable Knowledge、未評価 Observation）の定義、各寿命の artifact 種別と canonical owner と昇格条件、Learning/Observation の無条件 REQ 昇格禁止の昇格ガード。
