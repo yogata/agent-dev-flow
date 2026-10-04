@@ -26,12 +26,14 @@ describe("regression_req092: issue_list 運用規律の文書整備", () => {
     expect(safetyDoc).toContain("広範 filter を `search` なしで実行すると");
   });
 
-  it("REQ-092-002: labels 引数の tracking 論理値専用を明記し、Design 物理写像表の補記と無矛盾である", () => {
-    expect(safetyDoc).toContain("物理マッピング入力専用");
-    expect(safetyDoc).toContain("0 件帰着または無効となる");
+  it("REQ-092-002: labels 引数の tracking 論理値専用規律と受理能力（クライアント再フィルタ）の区別を明記し、Design 物理写像表の補記と無矛盾である", () => {
+    expect(safetyDoc).toContain("物理マッピング入力に用いる");
+    expect(safetyDoc).toContain("0 件帰着や無効にはならない");
+    expect(safetyDoc).toContain("クライアント再フィルタ");
+    expect(safetyDoc).toContain("使用規律の解禁を意味せず");
     expect(safetyDoc).toContain("`search` 引数と state の組み合わせで行う");
     expect(trackingDesign).toContain("issue_list の labels 引数の規律（物理写像の入力方向）");
-    expect(trackingDesign).toContain("0 件帰着させるか無効となる");
+    expect(trackingDesign).toContain("受理能力としては通常ラベル（enhancement、bug 等）による絞り込みも有効（クライアント再フィルタ）");
   });
 
   it("REQ-092-003: 上限到達時 contingency 手順が参照可能で、Tool 正規経路第一を明記する", () => {
@@ -54,11 +56,10 @@ describe("regression_req092: issue_list 運用規律の文書整備", () => {
     expect(safetyDoc).toContain("参照後続検索");
   });
 
-  it("REQ-092-005: server-side search 偽陰性の呼出側規律（トークン正規化不一致・空配列不存在証拠禁止・unfiltered fallback）が存在する", () => {
+  it("REQ-092-005: server-side search 偽陰性の呼出側規律（in:title 限定・トークン正規化不一致・空配列不存在証拠禁止・unfiltered fallback）が存在する", () => {
     expect(safetyDoc).toContain("server-side search の偽陰性に対する呼出側規律");
-    expect(safetyDoc).toContain(
-      "ハイフン入り識別子等のトークン正規化不一致による偽陰性の可能性を考慮する",
-    );
+    expect(safetyDoc).toContain("タイトル検索限定（`in:title`）の tokenized 照合であり、本文検索ではない");
+    expect(safetyDoc).toContain("`in:title` 限定の仕様による構造的な除外");
     expect(safetyDoc).toContain("ハイフンを区切りとしたトークンへ分割された正規化形で解釈される");
     expect(safetyDoc).toContain("空配列成功応答は不存在の証拠としない");
     expect(safetyDoc).toContain("対象の不存在を保証しない");

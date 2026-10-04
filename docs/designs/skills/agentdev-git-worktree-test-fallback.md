@@ -46,7 +46,7 @@ main 等価再現の手順は次のとおりである。
 未構築・stale 残存のいずれも、当該環境での skills_structure 系テストを環境依存 fail にし、N/M 件数突合と QG-4 判定にノイズを与える。
 帰属確認手順で環境起因と判定された fail のうち、本節の状態判定に該当するものは、検査側の修正ではなく次の修復を先に実施する。
 
-修復は junction セットの再構築（`install-consumer-opencode.ps1 -Mode apply` の再実行）によって行う。
+修復は junction セットの再構築（`scripts/install.ps1 -Mode apply` の再実行）によって行う。
 `.opencode/skills/*` は gitignore 対象の局所運用タスクであり、修復は PR 成果外として実施する。
 
 ## 関連
