@@ -17,6 +17,7 @@ import {
 import { join } from "node:path";
 import {
   DEFAULT_EXCLUDE_DIRS,
+  HISTORY_EXCLUDED_DIRS,
   scanCorpus,
 } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/corpus.ts";
 import { parseDeclarations } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/declarations.ts";
@@ -160,6 +161,15 @@ describe("旧公開API・旧 Graph 生成物への非依存（AC-009、AC-010、
     expect(DEFAULT_EXCLUDE_DIRS).toContain(".agentdev");
     expect(DEFAULT_EXCLUDE_DIRS).toContain(".worktrees");
     expect(DEFAULT_EXCLUDE_DIRS).toContain("node_modules");
+  });
+
+  it("docs/reports 配下（履歴参照領域）を走査対象から除外する", () => {
+    writeFixture("docs/reports/audit-2026-01.md", [decl("implementation", "REQ-910-001")]);
+    writeFixture("docs/designs/current.md", [decl("implementation", "REQ-910-001")]);
+    const scan = scanCorpus(ROOT);
+    expect(scan.declarations.every((d) => !d.file.startsWith("docs/reports/"))).toBe(true);
+    expect(scan.declarations.some((d) => d.file === "docs/designs/current.md")).toBe(true);
+    expect(HISTORY_EXCLUDED_DIRS).toContain("docs/reports");
   });
 
   it("シンボリックリンク・ジャンクション配下を走査しない", () => {

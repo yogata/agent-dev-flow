@@ -24,6 +24,10 @@
 
 ### STEP-2: Root Case 確立
 
+#### project extension rules 読込の前置（STEP-2 冒頭）
+
+Root Case 確立の操作に先立ち、対象リポジトリの project extension rules（`.agentdev/extensions/skills/agentdev-workflow-case-open.yaml` の `rules`。`agentdev-project-extensions` の読み込み契約に従う）を読み込み、本 STEP 以降の各手順へ適用する。rules は合意済み入力の解釈と手順への追加制約であり、既存の正規契約を置換しない。rules 不在時（extension 未配備）は既定手順のみで継続する（rules の不在を検出失敗として扱わない）。
+
 #### preflight 設定検証（Root Case 確立の preflight）
 
 GitHub Issue/PR を使用するリポジトリ種別のみ実施する。GitHub Issue/PR を使用しないローカル版では本検証をスキップする。
@@ -44,6 +48,14 @@ Root Case 本文候補の生成は preflight 設定検証の警告報告後に�
 7. Root Case 確立後の状態は open とし、実装開始を許可しない
 
 ### STEP-3: Definition Package 生成と関連付け
+
+#### artifact_actions 適用前検証（STEP-3 実行時）
+
+要件doc の `artifact_actions` を Definition Package の構成要素へ適用する前に、次の3点を検証する。検証で不整合を検出した場合は当該操作を確定させず、差異内容を Definition Package 構成案へ記録してから後続手順へ進む。
+
+1. **採番衝突**: 新規採番（REQ 番号、Decision 番号、要件行 ID、Child Issue 番号等）が既存採番・既知欠番と衝突しないことを、採番管理 Design（`docs/designs/foundations/numbering-policy.md`）の現行規則と実ファイル一覧・既知欠番レジストリで確認する。衝突する採番は決定的採番スクリプトまたは現行規則に従い再採番する
+2. **パス実在**: `artifact_actions` が宣言する対象成果物パスを確認する。update / append 対象は実在の確認を行い、不在パスはパス誤記・配置移動の疑いとして確定させず宣言側の是正（req-define 再合意）へ差し戻す（req-define 側の target_design 実パス実在確認〔3点一致照合・不在パス不採用〕と同一基準）。create 対象は親ディレクトリの実在と既存ファイルとの上書き衝突がないことを確認する
+3. **再実測**: 適用判断の入力値（既存行の意味変更判定、既存文書の表列構造・見出し構造、coverage による design 対応有無等）は保存済みの計測値を再利用せず、適用時点の実ファイル・実ツールから再実測する。Definition PR 作成側の期待値確定前の branch HEAD 実測（definition-pr-and-idempotency.md）と同一の実測主義に従う
 
 1. 要件行（REQ 変更後本文）、Decision、Design、Issue 構成案（`operation_units`、`case_open_hints` 由来）、受入条件一式を Case 単位で集約し Definition Package を生成する
 2. REQ 行追加を伴う Definition Package 生成時、トレーサビリティポリシー更新の追随要否を確認する。REQ 行の新設・追記を含む場合は、当該行のトレーサビリティポリシー（検証対応を任意とする要件行の明示登録）への追随要否を確認し、必要な policy エントリ追加を Definition Package の構成要素として含める。policy 編集は当該要件行の変更と同一の Definition 変更として扱うため Definition PR 経由以外の適用経路を取らない（直接 main へ適用しない）。policy 登録が不要と判断した場合は、その判断理由を Definition Package 構成案に記録する

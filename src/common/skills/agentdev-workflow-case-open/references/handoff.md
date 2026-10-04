@@ -41,6 +41,15 @@
 - **Issue 節単位**: Issue 本文の節（【必須】セクション等）ごとに、必要節の生成・更新が完了しているかを照合する
 - **未完了分のみの検出**: 未完了の instruction・節のみを処理対象として検出し、完了済み部分の再生成を行わない（ファイル単位の近似照合で部分完了を見逃さない）
 
+### 入口の untracked domain state 検出と先行明示パス commit（git 実行権限を持つ実行環境のみ）
+
+case-open が消費する domain state（要件doc draft〔`.agentdev/drafts/`〕、RU〔`.agentdev/backlog/req-units/`〕、Jev 観測〔`.agentdev/jev-observations/`〕）のうち、git 未追跡（untracked）のファイルを入口（STEP-1）で検出し、Root Case の作成・削除操作に先立って明示パス commit する。後続工程（case-ready の cleanup gate、case-close の Epic 反映等）が untracked 状態の domain state を消失させないための規律であり、case-ready による draft / RU 削除（Form Zero 削除）との対を形成する。
+
+1. **gitignore 状態の事前確認**: `.agentdev/` 配下の gitignore 状態を `git check-ignore` 等で事前確認する。gitignore 対象（非永続領域〔`.agentdev/integrity/reports/` 等〕）のファイルは commit 対象から除外する
+2. **untracked 分の検出**: `git status --porcelain` で上記対象ディレクトリ配下の untracked ファイルを検出する（明示パス検査。スイープ操作や `.agentdev/` 全体の一括ステージを行わない）
+3. **先行明示パス commit**: 検出した untracked domain state を、Root Case の作成・削除操作より先に `git add <明示パス>` → commit → push する（並列実行安全ステージングプロシージャ準拠。対象外ディレクトリ・対象外ファイルを含めない）。git 実行権限を持たない実行環境では本手順を実施せず、検出結果と実施不在を報告へ含める
+4. **記録**: 検出結果（検出件数、commit 対象パス、gitignore 除外分、commit hash）を Evidence へ記録する
+
 ## Result
 
 - 引き継ぎ停止判定（self-hosting vs consumer）が完了し、継続または停止が確定

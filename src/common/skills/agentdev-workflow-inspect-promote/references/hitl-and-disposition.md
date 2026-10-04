@@ -37,9 +37,9 @@
 - **Input Resolution**: STEP-7 の配置確定状態（`git diff --name-only` で `.agentdev/inspect/` および `.agentdev/intake/` 配下の変更を確認）
 - **Preconditions**: STEP-7 完了
 - **Procedure**:
-  1. `git diff --name-only` で `.agentdev/inspect/` および `.agentdev/intake/` 配下の変更を確認する（auto-promote の intake/promoted/ 投入、promoted/ への保存、reject に伴う inbox 削除、auto-promote-log 更新を含む）
+  1. `git diff --name-only` で `.agentdev/inspect/` 配下、`.agentdev/intake/` 配下、および `.agentdev/jev-observations/` 配下（本 workflow の Jev 先行評価で生成された観測 domain state）の変更を確認する（auto-promote の intake/promoted/ 投入、promoted/ への保存、reject に伴う inbox 削除、auto-promote-log 更新を含む）
   2. **変更なし時**: commit/push せず「変更なし」と報告する
-  3. **変更あり時**: `git add` は `.agentdev/inspect/` と `.agentdev/intake/` のみ対象とする。
+  3. **変更あり時**: `git add` は `.agentdev/inspect/`、`.agentdev/intake/`、`.agentdev/jev-observations/` のみ対象とする。
 commit message は `chore(agentdev): promote inspect findings`（reject を含む場合は却下理由を含める）。
 `git push` を実行する。
 push 失敗時は共通 template（`.opencode/commands/agentdev/templates/common/git-error-messages.md`）の該当形式で表示して停止する（完了扱いにしない）

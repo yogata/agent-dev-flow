@@ -119,8 +119,8 @@
 2. 保留 item は `.agentdev/intake/inbox/` に残す
 3. 却下 item は即時削除する（`.agentdev/intake/archive/rejected/` への移動は廃止）
 4. `git pull --ff-only` を実行する。失敗時は構造化エラーメッセージを表示して停止する（自動解消しない）
-5. `git diff --name-only` で `.agentdev/intake/` 配下の変更ファイルを確認する。変更なしの場合は commit/push せず完了報告で「変更なし」と報告する
-6. `git add` は `.agentdev/intake/` 配下の変更ファイルのみを対象とする（明示パス指定）
+5. `git diff --name-only` で `.agentdev/intake/` 配下と `.agentdev/jev-observations/` 配下（本 workflow の Jev 先行評価で生成された観測 domain state）の変更ファイルを確認する。変更なしの場合は commit/push せず完了報告で「変更なし」と報告する
+6. `git add` は `.agentdev/intake/` 配下と `.agentdev/jev-observations/` 配下の変更ファイルのみを対象とする（明示パス指定）
 7. commit message は `chore(agentdev): review and promote intake items`（Conventional Commits 形式）。reject item を含む場合は当該 item の却下理由を commit message に含める（監査証跡の補強）
 8. `git push` を実行する。push 失敗時は構造化エラーメッセージを表示し、完了扱いにしない
 

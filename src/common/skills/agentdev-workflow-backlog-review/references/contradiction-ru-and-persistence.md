@@ -128,7 +128,7 @@ RU 化に失敗した成果物、矛盾により除外された成果物は残�
 1. `git diff --name-only` で `.agentdev/` 配下と `docs/knowledge/` 配下の変更を確認する
 2. 変更なし時は commit/push せず完了報告で「変更なし」と報告する
 3. 変更あり時、並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い明示パスでステージする。
-生成した RU は `.agentdev/backlog/req-units/` 配下、保存・更新・置換・削除した知識文書は `docs/knowledge/` 配下、削除した採用済み成果物は `.agentdev/{intake,learning,inspect}/promoted/` 配下の各パスを `git add <path>`/ `git rm <path>` で明示的にステージする。
+生成した RU は `.agentdev/backlog/req-units/` 配下、保存・更新・置換・削除した知識文書は `docs/knowledge/` 配下、削除した採用済み成果物は `.agentdev/{intake,learning,inspect}/promoted/` 配下、本 workflow の Jev 先行評価で生成された観測 domain state は `.agentdev/jev-observations/` 配下の各パスを `git add <path>`/ `git rm <path>` で明示的にステージする。
 `.agentdev/` 全体の一括 `git add` は禁止
 4. commit message は `chore(agentdev): generate requirement units via backlog-review` とする
 5. `git commit -- <paths>`（--only pathspec 形式）を実行し、`git push` を行う。失敗時は構造化エラーメッセージを表示して停止する

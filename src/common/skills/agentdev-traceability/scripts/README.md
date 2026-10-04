@@ -41,7 +41,7 @@ scripts/
 
 - `--req` は要件行ID（`REQ-{NNNN}-{MMM}`）の個別カンマ指定のみを受理する。`..` 形式の範囲構文は範囲展開されずリテラルの reqId として扱われるため、check の完全性検査（`missing-design` / `missing-implementation` / `missing-verification`）の対象限定が空振りし、未検査の行が存在しないかのような結果を返す。対象行は1つずつ列挙すること
 - 本 README のコマンド例は scripts ディレクトリを cwd に起動することを前提とする。worktree を検証対象とする場合は `--root` にその worktree のルートを明示する（相対パス指定の注意は前段のとおり）
-- inline 宣言の走査対象は拡張子 `.md` / `.ts` のファイルのみで、除外ディレクトリは `.git`、`.agentdev`、`.agentdev-plugin`、`.worktrees`、`node_modules`。除外ディレクトリ配下や対象拡張子以外のファイルに配置した宣言は計上されない
+- inline 宣言の走査対象は拡張子 `.md` / `.ts` のファイルのみで、除外ディレクトリは `.git`、`.agentdev`、`.agentdev-plugin`、`.worktrees`、`node_modules`。除外ディレクトリ配下や対象拡張子以外のファイルに配置した宣言は計上されない。`docs/reports/` 配下（監査・評価・観測の Report。履歴参照領域）も走査対象から除外する（checker 実行契約 Design「検出対象除外規定」の列挙に従う）
 - sidecar の走査対象は top-level `traceability/` 配下の `.yaml` / `.yml`（`policy.yaml` を除く）。sidecar が参照する成果物はリポジトリ相対パスで存在確認される（checker 実行契約 Design の走査対象方針）
 
 ```bash

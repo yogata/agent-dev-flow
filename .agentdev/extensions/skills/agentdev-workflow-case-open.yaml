@@ -27,7 +27,7 @@ context:
 rules:
   - id: yomiyasu-application-before-write
     when: >-
-      docs/** 日本語文章を変更する場合: 編集前に yomiyasu を読み込み、内容変更が揃った後に変更文章と周辺文脈を推敲し、同梱 lint（.opencode/skills/yomiyasu/scripts/yomiyasu_lint.py を環境で利用可能な Python コマンド〔python3 に固定しない〕で標準入力により実行し、検査専用の本文ファイルを新規保存しない）を実行して指摘を確認する。各 edit ごと・既存文書全体の一括推敲は不要
+      docs/** 日本語文章を変更する場合: 編集前に yomiyasu を読み込み、内容変更が揃った後に変更文章と周辺文脈を推敲し、同梱 lint（.opencode/skills/yomiyasu/scripts/yomiyasu_lint.py を環境で利用可能な Python コマンド〔python3 に固定しない〕で標準入力により実行し、検査専用の本文ファイルを新規保存しない。Windows 環境で標準入力による実行が不可の場合の代替経路は、検査専用本文ファイルを非永続領域に新規作成し lint のファイル引数実行を行い検査後に削除する）を実行して指摘を確認する。各 edit ごと・既存文書全体の一括推敲は不要
 
       GitHub 文章（Issue/PR タイトル・本文、説明・レビュー・完了コメント。委譲先能力スキル〔agentdev-issue-management、agentdev-workflow-templates、agentdev-epic-tracker、agentdev-quality-gates、agentdev-case-run-execution-adapter〕経由の書込みを含む）は agentdev_gh へ渡す前に推敲する。本文は lint・指摘確認後、タイトルは本文向け文長・箇条書き比率を合否条件にしない。書込み後 VERIFY は維持
 

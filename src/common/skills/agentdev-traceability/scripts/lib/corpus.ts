@@ -8,6 +8,9 @@
 //   （policy.yaml は検証スコープポリシーであり verification_scope.ts が正規所有するため
 //   sidecar 走査から除外する。checker 実行契約 Design の traceability corpus 走査対象方針）
 // - `.agentdev/graph/` 等の派生 Graph を必須入力・必須生成物としない
+// - docs/reports/ 配下（監査・評価・観測の Report。履歴参照領域）は走査対象から除外する
+//   （checker 実行契約 Design「検出対象除外規定」の列挙に従う対象ファイル単位の除外。
+//   Report 文書内の REQ 行 ID 参照は歴史記録として対応関係管理対象外）
 // - シンボリックリンク・ジャンクションのディレクトリは降下しない
 // - 列挙順は名前順で決定的とし、相対パスはフォワードスラッシュで返す
 // - 読取に失敗したファイルは読取不能ファイルとして報告する（evidence-unavailable 検査の入力）。
@@ -31,10 +34,12 @@ export const DEFAULT_EXCLUDE_DIRS = [
   ".worktrees",
   "node_modules",
 ] as const;
+export const HISTORY_EXCLUDED_DIRS = ["docs/reports"] as const;
 
 export interface ScanOptions {
   readonly extensions?: readonly string[];
   readonly excludeDirs?: readonly string[];
+  readonly excludeDirPrefixes?: readonly string[];
 }
 
 export interface SidecarMissingArtifact {
@@ -59,11 +64,18 @@ function toForwardSlash(value: string): string {
   return value.replaceAll("\\", "/");
 }
 
+function isExcludedDirPrefix(rel: string, excludeDirPrefixes: readonly string[]): boolean {
+  return excludeDirPrefixes.some(
+    (prefix) => rel === prefix || rel.startsWith(`${prefix}/`),
+  );
+}
+
 function walkFiles(
   rootDir: string,
   relDir: string,
   extensions: readonly string[],
   excludeDirs: ReadonlySet<string>,
+  excludeDirPrefixes: readonly string[],
   out: string[],
 ): void {
   let entries;
@@ -78,7 +90,8 @@ function walkFiles(
       // junction / symlink ディレクトリは降下しない（isDirectory はリンク先を追従した結果のため isSymbolicLink で除外）
       if (entry.isSymbolicLink()) continue;
       if (excludeDirs.has(entry.name)) continue;
-      walkFiles(rootDir, rel, extensions, excludeDirs, out);
+      if (isExcludedDirPrefix(rel, excludeDirPrefixes)) continue;
+      walkFiles(rootDir, rel, extensions, excludeDirs, excludeDirPrefixes, out);
       continue;
     }
     if (!entry.isFile()) continue;
@@ -94,12 +107,14 @@ export function enumerateCorpusFiles(
 ): readonly string[] {
   const extensions = options.extensions ?? DEFAULT_SCAN_EXTENSIONS;
   const excludeDirs = new Set(options.excludeDirs ?? DEFAULT_EXCLUDE_DIRS);
+  const excludeDirPrefixes = options.excludeDirPrefixes ?? HISTORY_EXCLUDED_DIRS;
   const out: string[] = [];
   walkFiles(
     root.replaceAll("\\", "/").replace(/\/$/, ""),
     "",
     extensions,
     excludeDirs,
+    excludeDirPrefixes,
     out,
   );
   return out.sort();
@@ -112,6 +127,7 @@ function enumerateSidecarFiles(root: string): readonly string[] {
     TRACEABILITY_DIR,
     SIDECAR_SCAN_EXTENSIONS,
     new Set(DEFAULT_EXCLUDE_DIRS),
+    HISTORY_EXCLUDED_DIRS,
     out,
   );
   return out.sort();
