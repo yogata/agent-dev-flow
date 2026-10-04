@@ -17,9 +17,23 @@ Definition PR lifecycle、canonical Definition の判定、backend 意味論の�
 
 ### 忠実性・整合性・品質検査（Definition PR あり）
 
-1. **忠実性確認**: req_draft の合意済み内容（agreed_items、operation_units、realization_actions、受入条件）と Definition PR の変更内容を突合し、req-define で合意済みの意味内容に対する忠実な投影であることを確認する。判断方法: 閉じた意味評価（合意済み内容と変更内容の突合。事実・判断基準・結果空間〔忠実/非忠実〕は評価前に限定）。確定権限: 正規契約（合意済み内容）からの導出。人間に留保された判断（REQ-{NNNN}-{NNN}）を新規に確定しない
+1. **忠実性確認**: req-define での最新合意内容（req_draft の合意済み内容〔agreed_items、operation_units、realization_actions、受入条件〕。req_draft は取得時点の最新の合意記録であり、case-revise 由来の再合意があれば反映後の内容を照合基準とする）と Definition PR の変更内容を突合し、req-define で合意済みの意味内容に対する忠実な投影であることを確認する。判断方法: 閉じた意味評価（合意済み内容と変更内容の突合。事実・判断基準・結果空間〔忠実/非忠実〕は評価前に限定）。確定権限: 正規契約（合意済み内容）からの導出。人間に留保された判断（REQ-{NNNN}-{NNN}）を新規に確定しない
 2. **整合性検査**: REQ / Decision / Design の相互整合と frontmatter 整合を確認する。決定的検証は `agentdev-artifact-validation` の公開検証契約へ委譲する。判断方法: 決定的処理（機械検証へ委譲）。確定権限: 正規契約からの導出
 3. **品質検査**: Definition PR の CI 結果とリポジトリの品質検査結果を確認する。判断方法: 決定的処理（機械的証拠の突合）。確定権限: 正規契約からの導出
+
+### 必須受け入れ義務の照合と merge 抑止（忠実性確認の必須要素）
+
+忠実性確認では、req-define での最新合意内容との照合により、必須受け入れ義務の投影状態を検証する。検証対象は次の3分類である。
+
+- **欠落**: 合意済みの必須受け入れ義務が Definition PR の変更内容へ投影されていない
+- **縮小**: 義務の評価範囲、対象範囲、禁止事項が合意内容より狭められている
+- **反転**: 義務の要求方向が合意内容と逆に投影されている
+
+検出時の処置:
+
+- 必須受け入れ義務の欠落、縮小、反転のいずれかを検出した場合は Definition PR を merge しない。検出を warning 化して merge を継続する経路は存在しない
+- 停止理由には検出分類（欠落・縮小・反転）、該当する受け入れ義務、Definition PR 内の該当箇所を記録する
+- 復帰経路: 投影側の誤りの場合は Definition 側の修正を、合意自体の変更が必要な場合は req-define での再合意（既存 Case への反映は case-revise → case-ready）を行った後、case-ready を再実行する（既存 PR を再利用する）
 
 ### merge 前の isDraft 確認（STEP-1 の正規経路）
 
@@ -31,7 +45,7 @@ merge 実行前に、Custom Tool `agentdev_gh` の pr_read で対象 PR の isDr
 
 ### 確定判定と merge
 
-- merge 前の isDraft 確認（上記）で isDraft: false を確認した後、人間に留保された判断（REQ-{NNNN}-{NNN}）の新規確定が不要で、既存の正規契約から導出できる解消と委譲された裁量の範囲内の判断である（上記3検査が pass し、合意済み意味内容からの逸脱がない）場合、追加の人間承認を要求せず Definition PR を merge する
+- merge 前の isDraft 確認（上記）で isDraft: false を確認した後、人間に留保された判断（REQ-{NNNN}-{NNN}）の新規確定が不要で、既存の正規契約から導出できる解消と委譲された裁量の範囲内の判断である（上記3検査が pass し、必須受け入れ義務の欠落・縮小・反転を含む合意済み意味内容からの逸脱がない）場合、追加の人間承認を要求せず Definition PR を merge する
 - merge は Case 単位の Definition PR（Definition / Amendment のいずれか）に対して実行する
 
 ### HITL 停止条件
