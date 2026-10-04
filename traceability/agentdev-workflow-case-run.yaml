@@ -15,6 +15,8 @@ implementation:
     - REQ-101-014
   src/common/skills/agentdev-workflow-case-run/references/delegation-and-result.md:
     - REQ-014-016
+    - REQ-017-022
+    - REQ-017-023
     - REQ-031-027
     - REQ-031-028
     - REQ-031-029
@@ -26,6 +28,8 @@ implementation:
   src/common/skills/agentdev-workflow-case-run/references/single.md:
     - REQ-007-014
     - REQ-007-015
+    - REQ-017-021
+    - REQ-017-022
   src/common/skills/agentdev-workflow-case-run/scripts/record-comments.ts:
     - REQ-006-112
     - REQ-101-006
