@@ -2,12 +2,13 @@
 title: 文書モデル
 status: accepted
 created: 2026-08-20
-updated: "2026-09-24"
+updated: "2026-10-05"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-001, REQ-001-002, REQ-001-003, REQ-001-004, REQ-001-005, REQ-001-006, REQ-001-007, REQ-001-020, REQ-001-035, REQ-001-038, REQ-001-039, REQ-001-040, REQ-001-041, REQ-001-052, REQ-056-001 -->
 <!-- ADF-COVERS(implementation): REQ-001-066, REQ-001-067, REQ-001-068 -->
 <!-- ADF-COVERS(implementation): REQ-049-019 -->
 <!-- ADF-COVERS(design): REQ-001-005, REQ-001-006, REQ-034-019 -->
+<!-- ADF-COVERS(design): REQ-001-067, REQ-001-068, REQ-056-001 -->
 
 # 文書モデル
 
@@ -89,6 +90,9 @@ REQ 文書の各セクションが保持すべき内容の契約（REQ-004-006, 
 
 REQは成立すべき成果・制約・安定した外部契約のみを所有し、Designは合意要求を具体化するモデル・詳細仕様・実現方式を所有する。
 Designへ独立した新要求を追加しない（手段の独自要件化の禁止）。
+
+
+本節および「具体名を含む公開契約のREQ適格と手段分離の補強」節の分類規則（文書分類モデル8原則）の正規所有は本 Design（document-model.md）である。上位の恒久契約は REQ-001-067（設計詳細の分離）・REQ-001-068（安定契約の例外）・REQ-056（Knowledge の非規範限定）が保持し、両節はこれらの要件行を具体化する分類規則として本 Design が所有する（REQ 行の新設は行わない）。document-type-responsibilities.md・v4-operating-model.md・command Design（req-define）の関連記述は各自の適用文脈での展開であり、配布 skill references 側の相当記述は投影である。
 
 ### Design 分離基準
 
