@@ -25,3 +25,18 @@ case-revise workflow STEP-1〜STEP-3 の実行詳細（SKILL.md「制御平面�
 - PR 作成は Case 単位で同一再合意内容に対応するものを重複生成しない。作成前に既存 PR の再検索を実行し、検出時は新規作成を取りやめて再利用へ切り替える
 - REQ / Decision / Design 変更の保存実体は `agentdev-req-file-manager` / `agentdev-decision-file-manager` / `agentdev-design-file-manager` へ委譲する（case-revise は意味判断せず、合意済み内容を投影する）
 - 変更範囲は `agentdev-artifact-validation` の公開検証契約で検査する（frontmatter id↔filename 整合、README entry 存在、変更範囲検証）
+
+## 合意変更の 5 段階区別管理
+
+合意変更は「変更の記録」「影響対象への変更到達」「下流消費成果物への反映」「消費担当による最新条件の受領」「反映後成果物の読み戻し確認」の 5 段階を区別して扱う。本節は STEP-1 の「記録・受領・適用の区別」を置き換えず、各段階を実行 STEP へ対応付けて段階間の混同を防ぐ。
+
+| 段階 | 意味 | 担い手・実施位置 |
+|---|---|---|
+| 変更の記録 | 再合意内容を合意記録として残すこと | req-define の合意記録（req_draft の合意内容、Root Case 本文の Definition Package / Execution Contract）。STEP-1 の受入確認は記録との対比消費であり、記録の再作成は行わない |
+| 影響対象への変更到達 | 変更内容を影響を受ける対象へ届けること | STEP-4 の影響再評価と再評価要否マーキング、STEP-5 の Case 関連 Issue 本文更新（変更の参照先、影響範囲、処置判断、再開条件） |
+| 下流消費成果物への反映 | 変更内容を消費される成果物の正本へ反映すること | STEP-3 の Definition Amendment PR（REQ / Decision / Design への保存）、STEP-5 の Case 関連 Issue 本文更新 |
+| 消費担当による最新条件の受領 | 作業担当が最新条件を受け取り、適用方針を報告すること | STEP-5 の最新条件引き渡しと作業担当による適用方針報告の確認（報告確認まで case-ready 引き継ぎへ進まない） |
+| 反映後成果物の読み戻し確認 | 反映後の成果物を読み戻し、変更内容が反映されていることを確認すること | STEP-5 の読み戻し確認（`handoff-and-update.md`「反映後成果物の読み戻し確認と旧契約抑止」節） |
+
+- 各段階は他の段階の完了をもって代替しない。記録済み・受領済みであっても、到達・反映・読み戻し確認が未完了であれば合意変更の反映は完了していない
+- 5 段階の未完了段階が残る場合は case-ready 引き継ぎへ進まず、未完了段階の完了を完了報告に記録する
