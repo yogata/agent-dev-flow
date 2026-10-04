@@ -156,6 +156,12 @@ Epic Issue 本文の `## 完了条件` セクションを読み込み、全完�
 - 配布物変更を含む case の3検査結果確認: case-close の最終 gate で配布物変更を含む case を検証する場合、配布依存境界・IR-055・traceability の3検査の実行結果（case-run での commit 前実行記録）を確認する。case-run で3検査が実行されていない配布物変更を検出した場合は、検査を実行して新規違反 0 件を確認してからマージに進む。base 既知違反と新規違反の分離突合を省略せず、baseline 既知違反の無断削除・隠蔽を受け入れない
 - tmp 残存確認: 単一 Issue ルートの正常終了を前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないことをクリーンアップ工程で確認する。Epic Wave ルートでは、当該 Wave スコープの一時成果物（draft、RU、検出事項等の未消化ドメイン状態）の残留と `.agentdev/tmp/` 一時ファイルの残存がないことを確認し、残留時は当該 Wave を完了扱いにしない
 
+#### 保存済み検証証跡の解析と再実行条件の適用
+
+- 検証結果の件数、失敗明細、サマリーの表示変更は、保存済み証跡（退避ファイル、PR 本文検証差分セクション、SSoT コメント）から行う。同一情報の取得だけを目的とした full suite や checker の再実行をしない（REQ-007-014）
+- 再実行の正当理由（変更後検証、環境変更、失敗由来分類、非決定的失敗の再現確認、必須独立検査、証跡欠落）と証跡の必須要素の正は agentdev-quality-gates Design「QG-4 検証証拠の再利用と再実行条件」が所有し、本 Design は再規定しない
+- close の最終検証（full integrity suite、配布物変更を含む case の3検査結果確認、QG-4 checker 実測）は origin/main 取り込み済み・マージ直前の branch HEAD で実行する既存契約を維持し、case-run の保存結果だけによる省略を行わない。verify-only closure の SSoT コメント参照判定も維持する
+
 #### verify-only closure の QG-4 達成判定（SSoT コメント参照）
 
 verify-only closure（PR も carrier commit も存在しない Issue 完了）の QG-4 達成判定では、

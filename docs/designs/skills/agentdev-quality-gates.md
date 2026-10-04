@@ -5,6 +5,7 @@ created: 2026-06-21
 updated: 2026-09-19
 ---
 <!-- ADF-COVERS(implementation): REQ-007-001, REQ-007-003, REQ-007-004, REQ-007-005, REQ-060-005 -->
+<!-- ADF-COVERS(design): REQ-007-014, REQ-007-015 -->
 
 # `agentdev-quality-gates` Design
 
@@ -95,6 +96,17 @@ QG-4 の識別子中心評価の構造は維持する（固定値期待値化に
 case-close / docs-check の full suite 実行手順と PR 本文テンプレート（Test Strategy 結果欄）への記録欄追加は case 実施側の適用とする。
 
 QG-4 final acceptance の変更ファイル突合検証における I/O 操作の表記契約は、Custom Tool `agentdev_gh` 操作契約（pr_changed_files 経由の取得）に準拠する。生 gh CLI コマンド表記は配布 reference（references/qg-4-final-acceptance.md）にのみ現存し得るため、当該表記の置換は配布側 realization で実施し、本 Design は表記契約の確認として対応する。検証内容（PR 変更ファイルの取得と files_checked / Issue 本文との突合）は現行どおり維持する。
+
+## QG-4 検証証拠の再利用と再実行条件
+
+検証・検査の実行と、その結果の表示・解析を分離する。実行手順の正規形は `agentdev-quality-gates` スキルの references/qg-4-final-acceptance.md が所有し、本 Design は品質統制側の契約を所有する（REQ-007-014/015）。
+
+- 検証証跡は標準出力、標準エラー、終了コード、版、検査範囲、実行環境を保持する。保持先は既存の証跡チャネル（退避ファイル、PR 本文検証差分セクション、SSoT コメント）とし、新しい証跡基盤を追加しない
+- 件数、失敗明細、サマリーの表示変更は保存済み証跡から行い、同一情報の取得だけを目的としたテスト・検査の再実行をしない
+- 再実行は正当理由に該当する場合のみ実行する。正当理由は変更後検証、環境変更、失敗由来分類、非決定的失敗の再現確認、必須独立検査、証跡欠落とする
+- 保存出力の欠落、切断、タイムアウト、検査範囲欠落は完全な合格証拠として扱わない。既存の timeout 打ち切り扱い（fail 証跡としない）、件数突合、PowerShell コンソール表示を証跡扱いしない規律を維持する
+- QG-4 機械受理基準の記録対象に終了コード、版、検査範囲を追加する
+- 必須の版境界における再検証、close の最終検証（origin/main 取り込み済み・マージ直前の branch HEAD での実行）、QG-4 独立再検査、full suite 実行の省略禁止は維持する。同一版でも必要な再現確認・独立検査を拒否しない。裸の bun test 一発（対象ディレクトリを明示指定しない単体実行）で正規の全体網羅検証を代替しない
 
 ## 対象外
 
