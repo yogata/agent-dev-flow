@@ -17,10 +17,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 64件、廃止済み: 15件
+現行 REQ: 61件、廃止済み: 18件
 <!-- AUTOGEN:END -->
 
-現行要件は64件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
+現行要件は61件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
 REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）による意図的予約欠番であり、実体は存在しない（[採番管理](designs/foundations/numbering-policy.md) 参照）。
 REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却枠であり、意図的予約欠番として維持する。
 REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全 revert）由来の廃止識別子であり、再利用しない。次の新規 REQ 番号は採番時点で REQ 実ファイル一覧と既知欠番レジストリから決定的採番スクリプト（alloc-req-number.ts）により決定する（[採番管理](designs/foundations/numbering-policy.md) 参照）。
@@ -78,12 +78,9 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [REQ-062](requirements/REQ-062.md) | case-revise 実行契約 |
 | [REQ-082](requirements/REQ-082.md) | 対論型レビュー審議契約 |
 | [REQ-083](requirements/REQ-083.md) | Definition PR の状態契約（通常 Pull Request・ブランチ命名・用語・正規操作完結） |
-| [REQ-087](requirements/REQ-087.md) | 採番例外の記録と REQ 番号ギャップ検査 |
 | [REQ-088](requirements/REQ-088.md) | ADF v4 基盤要件（三層責務・情報寿命・Project Contract・中核文書モデル） |
 | [REQ-090](requirements/REQ-090.md) | Jev 先行評価の実運用組込み（Stage 1: 観測可能化） |
 | [REQ-091](requirements/REQ-091.md) | Supervisor 環境向け credential 供給ブリッジの原本管理 |
-| [REQ-092](requirements/REQ-092.md) | agentdev_gh issue_list 呼出側運用規律（labels は追跡Issue論理軸の物理マッピング入力専用） |
-| [REQ-093](requirements/REQ-093.md) | agentdev_gh 起動環境障害の予防・診断・回復の恒久化 |
 | [REQ-094](requirements/REQ-094.md) | ADF の Markdown 日本語表現および用語選択基準 |
 | [REQ-095](requirements/REQ-095.md) | agentdev_gh 起票・読取操作の呼出側規律 |
 | [REQ-096](requirements/REQ-096.md) | ADF判断アーキテクチャ（判断方法・確定権限・人間判断境界） |
