@@ -945,3 +945,51 @@
 - **想定反映先**: learning-promote での評価、各 workflow references 編集手順への前置ステップ追加判断
 - **関連**: Case #3443・PR #3449、scripts/self/release/case-ready-definition-readiness.test.ts
 - **タグ**: `#anchor-test` `#docs-文言期待テスト` `#grep事前検出` `#case-ready`
+
+## 2026-10-04: 無関係 REQ 系の checker fail は対照検証（main root で同 fail 確認）により変更起因から分離する
+
+- **問題事象**: traceability check の unknown-req-refs（REQ-053-017〜020、docs/reports 配下）が対象 REQ とは無関係に fail し、当該変更起因か既知違反かの切り分けが必要だった
+- **発生局面**: case-run 検証・case-close QG-4 独立再検査（Epic #3440 Wave 2、Case #3444・PR #3450）
+- **検知方法**: traceability check の fail findings
+- **根本原因**: checker の findings には対象変更と無関係な既知違反が混在し得るため、fail が即ち自変更起因と解釈すると誤差し戻しになる
+- **自律対応内容**: base（main root・80c04928）で同一 check を再実行して同 fail を確認し、「既知違反・対象範囲外」として無修正で既出記録（変更起因分離）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 対象 REQ と異なる REQ 系の fail を無修正で既出記録する判断根拠（対照検証）は、他の checker 横断検査（integrity suite 等）でも同一手順で使える
+- **再発条件**: 全体走査系 checker で対象外の既知 NG が findings に混入する場合
+- **予防策候補**: baseline 登録済み既知 NG の findings 分離表示候補
+- **想定反映先**: learning-promote での評価、checker 実行手順の fail 由来分類手順
+- **関連**: Case #3444・PR #3450、traceability check unknown-req-refs、docs/reports/req-053-*.md
+- **タグ**: `#traceability` `#unknown-req-refs` `#対照検証` `#fail由来分類`
+
+## 2026-10-04: worktree の node_modules 未伝播でも bun:test + fs/path のみに依存するテストは bun install 前置なしで動作する
+
+- **問題事象**: worktree は .opencode/skills/agentdev-* の junction が未伝播で node_modules も整備されておらず、worktree 内新規テストの実行環境が自明でなかった
+- **発生局面**: case-run 検証（Epic #3440 Wave 2、Case #3445・PR #3451、新規テスト agreement_change_freshness.test.ts）
+- **検知方法**: worktree 直下での bun test 実行実測（22 tests / 30 expect、exit 0）
+- **根本原因**: bun 1.3.6 は bun:test と fs/path といった標準モジュールのみに依存するテストを外部依存なしで実行できるため、依存整備が不要だった
+- **自律対応内容**: bun install 前置なしでテスト実行し合格。読むツリーのみの構造 pin テストでは依存整備を省略できると実証
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree 委譲実行でのテスト追加時、依存が bun:test + 標準モジュールのみなら依存整備ステップを省略できる（外部依存を持ち込むテストには適用不可）
+- **再発条件**: worktree 内で新規テストを追加して実行する場合
+- **予防策候補**: テスト新規作成時の依存最小化指針（bun:test + fs/path 範囲）候補
+- **想定反映先**: learning-promote での評価、case-run 委譲手順のテスト実行前置判断
+- **関連**: Case #3445・PR #3451、.opencode/skills/repo-agentdev-integrity/scripts/agreement_change_freshness.test.ts
+- **タグ**: `#bun-test` `#worktree` `#node_modules未伝播` `#構造pinテスト`
+
+## 2026-10-04: traceability check の --req 指定時も unknown-req-refs 等の形式検査系 findings は全体スキャンで出力される
+
+- **問題事象**: --req で対象要件行を限定しても unknown-req-refs（REQ-053 系 16 findings）が全件出力され、対象範囲内/外の判別を毎回必要とした
+- **発生局面**: case-close 独立再検査（Epic #3440 Wave 2、Case #3446・PR #3452）
+- **検知方法**: check.ts --req REQ-096-032,REQ-096-033,REQ-096-034 実行結果の findings 内訳（missing-* は対象限定・unknown-req-refs は全体）
+- **根本原因**: --req は missing-* の完全性検査対象の限定であり、形式検査系（unknown-req-refs 等）は既存側 findings として全件出力される仕様
+- **自律対応内容**: baseline 再現確認（base 80c04928 で同 check を再実行し 16 findings identical）により pre-existing と分類して対象範囲外として記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: --req 付き traceability check の結果解釈では completeness findings と形式検査系 findings を区別して読む。REQ-053 系の解消判断は intake として回収済み（PR #3451 由来 item）
+- **再発条件**: --req 付き check 実行時に docs/reports 等の既存 unknown-req-refs が残存している場合
+- **予防策候補**: unknown-req-refs の baseline 登録・分離表示候補
+- **想定反映先**: learning-promote での評価、traceability check 実行手順の結果解釈手順
+- **関連**: Case #3446・PR #3452、Case #3442 の同主題 learning エントリ（unknown-req-refs 既出 16 件の継続）、Case #3445 由来 intake item
+- **タグ**: `#traceability` `#unknown-req-refs` `#--req限定` `#pre-existing`
