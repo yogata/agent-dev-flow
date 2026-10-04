@@ -705,3 +705,19 @@
 - **想定反映先**: learning-promote での評価。orchestration 委譲指示の契約整合確認候補
 - **関連**: Root Case #3424・PR #3426・REQ-030-007・agentdev-workflow-case-open capture-and-completion.md
 - **タグ**: `#case-open` `#ru-removal` `#contract-drift` `#delegation-instruction` `#case-ready`
+
+## 2026-10-04: req-define ドラフトの新設行番号指定が現行 main の既存行と衝突していた。max+1 採番で割当て（REQ-001-070/REQ-010-070）
+
+- **問題事象**: ドラフト req-draft-existing-req-guarantee-realignment.md の artifact_actions が新設行を REQ-001-069 / REQ-010-069 として指定したが、case-open 実行時点の canonical main で REQ-001-069 は既存行、REQ-010-069 も既存行であり、そのまま適用すると既存行の上書き・欠番整合破壊になる
+- **発生局面**: case-open Definition PR 適用（Root Case #3425・Definition PR #3428・RU-20261004-06）
+- **検知方法**: artifact_actions 適用前の対象 REQ ファイル実取得（REQ-001.md / REQ-010.md の要件表末尾行確認）
+- **根本原因**: req-define 壁打ち時の行番号指定がドラフト作成時点の最新 main の採番状態を反映していない（max+1 前提の行番号が陳腐化）
+- **自律対応内容**: 採番規則（最大番号+1）に従い REQ-001-070 / REQ-010-070 として割当て、行本文は合意内容をそのまま使用。ドラフト内部の相互参照（REQ-087 廃止本文・numbering-policy 欠番レジストリエントリ内の REQ-001-069/REQ-010-069 表記）も割当て番号へ同期。traceability/policy.yaml の REQ-010-070 先行登録と一致することを確認し PR 本文 決定事項 へ記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（REQ-087-002 相当の採番規則と numbering-policy の現行契約に従う機械的割当て）
+- **横展開観点**: ドラフトの REQ 行 ID 指定は「内容の合意」であり「採番の確定」ではない。適用側は canonical main 実取得での採番衝突検査を前置すべき
+- **再発条件**: ドラフト作成から case-open 実行までの間に同一 REQ ファイルへ行追加が入る場合（並行 Case でも発生し得る）
+- **予防策候補**: case-open の artifact_actions 適用手順に新設行番号の採番衝突検査（対象 REQ ファイル末尾行との突合）追加候補
+- **想定反映先**: learning-promote での評価。req-define / case-open 間の行番号引き継ぎ規律の追補候補
+- **関連**: Root Case #3425・Definition PR #3428・RU-20261004-06・REQ-001-070・REQ-010-070・numbering-policy 欠番レジストリ
+- **タグ**: `#req-numbering` `#draft-stale-numbering` `#max-plus-one` `#case-open` `#req-define`
