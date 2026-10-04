@@ -39,7 +39,7 @@ updated: 2026-10-03
 
 ### 正規状態と日時
 
-- Standard Case と Epic Root の正規状態は実行継続、完了、中止を識別できる最小構成とし、状態値は v4-lifecycle-state-machine Design が正である。blocked、failed は子 Issue の状態として Epic 実行構成が所有し、Root Case の正規状態として重複保持しない
+- Standard Case と Epic Root の正規状態は open、ready、running、blocked、review、closed、cancelled の7値とし（REQ-006-112）、状態値は v4-lifecycle-state-machine Design が正である。Epic 実行構成が所有する子 Issue の blocked、failed を Root Case の正規状態として重複保持しない（子状態の重複コピー禁止、REQ-035-004）。この規律は Root 自身の継続条件不足を blocked で表すことを禁じるものではない（子状態の重複コピー禁止と Root 固有の blocked は別の規律である）
 - 開始日時は初めて実装または検証に実着手した時刻（委譲要求や Issue 作成時刻ではない。Epic は配下の初回実着手）とし、停止・再開で上書きしない。終了日時は Standard Case と Epic Root は完了または中止確定時、Child は completed 確定時にのみ設定する
 - 実作業時間、試行ごとの日時管理を別に保存しない。日時から得られるのは停止時間を含む経過時間である
 

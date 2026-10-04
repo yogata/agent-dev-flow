@@ -494,7 +494,7 @@ case-run の adapter 委譲内統合は他の6呼出元（req-define、inspect-p
 | 段階 | 対応処理 | 役割 |
 |---|---|---|
 | 委譲 | case-run 実行担当サブエージェント起動 | adapter skill 経由で委譲を起動し、委譲 prompt 内で実行 command を指定する。実装方針の生成、review、結果反映は委譲内へ委ねる |
-| 発動条件判定 | adapter 委譲内（実装方針形成完了後、最初の実装変更前） | ユーザー明示指定の有無を実行担当サブエージェントが判定する |
+| 発動条件判定 | adapter 委譲内（実装方針形成完了後、最初の実装変更前） | skip 条件の該当を実行担当サブエージェントが判定する |
 | review 呼出 | adapter 委譲内（発動条件該当時、最初の実装変更前） | 実行担当サブエージェントが adversarial-review を起動し、実装方針を審議対象へ渡す |
 | 結果反映 | adapter 委譲内（review 完了後、最初の実装変更前） | accepted finding を実装方針へ反映する。反映後、意味内容変更時は必要な既存検証を再実行する |
 | result 返却 | case-run 実行担当サブエージェント result 処理 | result 契約（completed-pr / blocked / failed / delegation-unavailable）で case-run 本体へ返却 |
@@ -531,7 +531,6 @@ case-run は adversarial-review を原則実行する（default-on、REQ-015-002
 case-run 本体は発動条件の有無を判定、伝達しない。
 
 - **skip 条件**: adapter 委譲内で実装方針が自明（既確定 Design の機械的反映、単一ファイル編集等）で、実装方針の意味的決定（関数配置、命名、データ構造選択）が存在しない場合、adversarial-review を省略して従来フローを継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
-- **ユーザー明示指定時の必須実行**: ユーザーが case-run 実行中（adapter 委譲前）に adversarial-review の実施を明示的に指定した場合、skip 条件の該当にかかわらず必ず発動する（REQ-015-002）。
 
 ### 従来フロー維持（REQ-015-003）
 

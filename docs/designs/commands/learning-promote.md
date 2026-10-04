@@ -180,12 +180,11 @@ learning-promote は adversarial-review を原則実行する（default-on、REQ
 - 判定対象（正規化済エントリ、問題クラス分類、8軸評価、廃棄判定、既存対策照合結果）が evaluation-report.md へ反映済みであること
 - skip 条件（後述）に該当しないこと
 
-#### skip 条件とユーザー明示指定（REQ-015-002、REQ-015-003）
+#### skip 条件（REQ-015-002、REQ-015-003）
 
 - **skip 条件**: 次のいずれかに該当する場合、adversarial-review を省略して従来フローを継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
   - inbox.md エントリが1件のみで既存対策との重複が確実（新規性なし、廃棄判定確定）の場合
   - inbox.md 空（処理対象なし、inbox スキャンで終了）の場合
-- **ユーザー明示指定時の必須実行**: ユーザーが review を明示的に要求した場合、skip 条件の該当にかかわらず必ず発動する（REQ-015-002）。ただし判定対象が evaluation-report.md へ反映済みであることは引き続き必須とする。
 
 adversarial-review を新規必須工程、QG、承認ゲートとして扱わない。
 skip 条件該当時は従来フローを維持する（REQ-015-003）。

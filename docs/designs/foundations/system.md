@@ -268,7 +268,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 
 - **公開契約**: `.agentdev/intake/inbox/*.md` + ユーザーコンテキスト → `.agentdev/intake/promoted/*.md`（採用）+ 分類結果レポート。review/分類/整形を行い Issue 作成はしない。
 - **主要処理段階**: STEP-1 classification（inbox 確認・intake item 読込・review/評価・暫定分類提示・自律確定候補判定）→ STEP-2 review（adversarial-review、発動条件判定 / review 呼出）→ STEP-3 HITL（ユーザー確認・分類承認、分類確定後 自動実行 REQ）→ STEP-4 persistence（採用 item 整形・promoted 保存）→ STEP-5 destructive handling（振り分け・inbox 削除・実行前同期・commit/push）→ STEP-6 完了報告。
-- **分岐**: inbox 空、分類3値（採用/保留/却下）、adversarial-review skip（1件で自明/inbox空）、ユーザー明示指定時の必須発動、破壊的変更の明示承認維持（`POL-destructive-change-explicit-approval`）、`accepted/` 廃止、採用 item の inbox 削除/reject item の即時削除。
+- **分岐**: inbox 空、分類3値（採用/保留/却下）、adversarial-review skip（1件で自明/inbox空）、破壊的変更の明示承認維持（`POL-destructive-change-explicit-approval`）、`accepted/` 廃止、採用 item の inbox 削除/reject item の即時削除。
 - **副作用**: `.agentdev/intake/promoted/` 保存、採用 item の inbox 元ファイル削除、reject item の即時削除（commit message に却下理由）、`.agentdev/intake/` 配下 commit/push。Issue 作成・backlog-review 自動起動はしない。
 - **HITL**: STEP-3 ユーザー確認（分類確定、採用済み成果物生成の明示承認・分類結果の提示・分類未確定時の自動進行禁止）、破壊的変更の別承認（`POL-destructive-change-explicit-approval`）、adversarial-review unresolved 判断事項。
 - **並列性**: 持たない（対話的 review、親エージェントが集約）。
@@ -296,7 +296,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 
 - **公開契約**: `.agentdev/{intake,learning,inspect}/promoted/*.md` → `.agentdev/backlog/req-units/RU-*.md` + 成功成果物削除。ユーザー承認後に RU を生成（承認は RU 作成承認を兼ねる）。
 - **主要処理段階**: STEP-1 実行前同期・成果物検出（引数なし/あり）→ STEP-2 分析・暫定分類付与 → STEP-3 統合/分割判定+depends_on依存解決 → STEP-4 review（adversarial-review、発動条件判定 / review 呼出）→ STEP-5 HITL（ユーザー承認、RU 生成承認を兼ねる）→ STEP-6 矛盾検出+追加判断 → STEP-7 RU生成（session由来RU含む）+成功成果物削除 → STEP-8 Git永続化・完了報告。
-- **分岐**: 成果物0件（正常終了）、引数指定、統合/分割判定、depends_on 依存解決、矛盾検出（partial success）、session由来RU（二段階承認）、adversarial-review skip（RU構成要素1件）、ユーザー明示指定時必須発動、矛盾なしの単一承認（REQ-015-008）。
+- **分岐**: 成果物0件（正常終了）、引数指定、統合/分割判定、depends_on 依存解決、矛盾検出（partial success）、session由来RU（二段階承認）、adversarial-review skip（RU構成要素1件）、矛盾なしの単一承認（REQ-015-008）。
 - **副作用**: `.agentdev/backlog/req-units/RU-*.md` 生成、成功成果物の削除、`.agentdev/` 配下 commit/push（明示パス、`chore(agentdev): generate requirement units via backlog-review`）。REQ ファイル保存、Issue 作成、inbox・deferred 更新は禁止。矛盾の自動解決はしない。
 - **HITL**: STEP-5 ユーザー承認（構成案、RU 生成承認を兼ねる）、STEP-6 矛盾検出時の追加判断（partial success、矛盾なければ単一承認）、adversarial-review unresolved 判断事項。
 - **並列性**: 持たない（対話的 review、親エージェントが集約）。
@@ -352,7 +352,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 
 - **公開契約**: `.agentdev/inspect/inbox/*.md` + `--auto`（省略可） → `.agentdev/inspect/promoted/*.md`（手動 promote）/ `.agentdev/intake/promoted/inspect-auto-*.md`（`--auto` 時）/ `auto-promote-log.md`（append-only）。分類・採用を行い Issue 作成はしない。
 - **主要処理段階**: STEP-1 実行前同期 → STEP-2 inboxスキャン → STEP-3 検出事項分類（暫定分類 promote/defer/reject）→ STEP-4 自動 promote（`--auto` opt-in 時、fast path）→ STEP-5 adversarial-review（発動条件判定 / review 呼出）→ STEP-6 確定（自律確定判定と HITL 確定）→ STEP-7 処理実行（promote / reject 即時削除 / defer 残置）→ STEP-8 完了報告・永続化（commit/push）。
-- **分岐**: inbox 空（終了）、`--auto` opt-in 有無（fast path vs 手動分類）、自動 promote 対象カテゴリ（安定契約例外・否定文脈除外）、adversarial-review skip（`--auto` 経路/手動0件）、ユーザー明示指定時必須発動、reject 即時削除（`archive/rejected/` 廃止）、defer 残置、ユーザー全件 defer、promote/defer/reject/intake-or-learning 送付推奨。
+- **分岐**: inbox 空（終了）、`--auto` opt-in 有無（fast path vs 手動分類）、自動 promote 対象カテゴリ（安定契約例外・否定文脈除外）、adversarial-review skip（`--auto` 経路/手動0件）、reject 即時削除（`archive/rejected/` 廃止）、defer 残置、ユーザー全件 defer、promote/defer/reject/intake-or-learning 送付推奨。
 - **副作用**: `.agentdev/inspect/promoted/*.md` 保存、`.agentdev/intake/promoted/inspect-auto-*.md` 投入（`--auto`）、`.agentdev/inspect/promoted/auto-promote-log.md` 更新（append-only）、promote inbox 削除、reject 即時削除（commit message に却下理由）、defer 残置、`.agentdev/inspect/`+`.agentdev/intake/` 配下 commit/push（`chore(agentdev): promote inspect findings`）。
 - **HITL**: STEP-6 HITL 確定（手動分類対象、`--auto` 対象外）、adversarial-review unresolved 判断事項。
 - **並列性**: 持たない（対話的 review、`--auto` fast path は一括処理）。

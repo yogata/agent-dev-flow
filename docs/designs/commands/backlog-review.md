@@ -218,7 +218,6 @@ backlog-review は adversarial-review を原則実行する（default-on、REQ-0
 
 - **skip 条件**: 次のいずれかに該当する場合、adversarial-review を省略して従来フロー（矛盾検出以降）を継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
   - RU 構成要素が1件のみ（統合・分割判定不要、depends_on 解決不要）で矛盾検出対象が存在しない場合
-- **ユーザー明示指定時の必須実行**: ユーザーが backlog-review 実行中に adversarial-review の実施を明示的に指定した場合、skip 条件の該当にかかわらず必ず発動する（REQ-015-002）。
 
 ### 従来フロー維持（REQ-015-003）
 

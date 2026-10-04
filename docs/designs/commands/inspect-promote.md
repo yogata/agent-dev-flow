@@ -173,7 +173,6 @@ inspect-promote は adversarial-review を原則実行する（default-on、REQ-
 - **skip 条件**: 次のいずれかに該当する場合、adversarial-review を省略して従来フロー（HITL 確定）を継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
   - `--auto` 経路（fast path、REQ-015-005 既存の迂回条件）の場合
   - 手動分類対象の検出事項が0件（inbox 空、全件 fast path 完了）の場合
-- **ユーザー明示指定時の必須実行**: ユーザーが本コマンド起動時に adversarial-review を明示的に要求した場合、skip 条件の該当にかかわらず必ず発動する（REQ-015-002）。ただし review 対象（手動分類対象）が存在しない場合は発動しない。
 
 ### review 呼出 Step（REQ-015-001）
 
@@ -186,12 +185,6 @@ review 呼出 Step は review 対象（手動分類対象の検出事項、暫�
 - finding 反映で暫定分類の意味内容が変更された場合、検出事項分類へ戻し再分類する。再 review 条件と停止条件4点は adversarial-review Design に従う（REQ-014-007/008）
 - unresolved な本質的争点が残る場合、HITL 確定へ進まず、ユーザー判断事項として停止する（REQ-014-009）。ただし adversarial-review 自体を恒久的な統制ゲートとしない
 - 呼出失敗時は silent skip を禁止し、利用不能を報告した上で HITL 確定の従来フローを維持する（REQ-014-010）
-
-### ユーザー明示指定時の必須実行（REQ-015-002）
-
-ユーザーが inspect-promote 起動時に adversarial-review を明示的に要求した場合、skip 条件（`--auto` 経路、review 対象なし）の該当にかかわらず必ず発動する。
-明示要求はコマンド起動時の引数、対話中の指示、または Workflow Skill extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-promote.yaml`）の `rules` により表明される。
-review 対象（手動分類対象の検出事項）が存在しない場合は発動しない。
 
 ### 条件非該当時の従来フロー維持（REQ-015-003）
 
