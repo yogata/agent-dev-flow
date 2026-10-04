@@ -753,3 +753,35 @@
 - **想定反映先**: learning-promote での評価
 - **関連**: PR #3434・Case #3430・Epic #3425 Wave 1
 - **タグ**: `#distribution-boundary` `#link-gate` `#worktree`
+
+## 2026-10-04: IR-055 baseline 再生成（--update-ir055-baseline）は既存 approved エントリの provenance を喪失させる
+
+- **問題事象**: updateIr055Baseline は現状違反から baseline を作り直すため、解消済み approved エントリの provenance（classification/reason、Issue #3211 由来の判断記録等）が消える
+- **発生局面**: case-run 委譲での IR-055 warning 総数 ratchet 解消（PR #3438・Case #3431・Epic #3425 Wave 2）
+- **検知方法**: baseline 再生成で approved エントリが失われることを確認し、git restore で HEAD 版へ復元
+- **根本原因**: baseline 再生成コマンドが現状違反のスナップショットを全量として書き出し、既存エントリの判断記録を保全しない
+- **自律対応内容**: baseline 全量再生成を避け、cap のみ手動更新（1行差分、--update-warning-cap --raise-warning-cap の明示フラグ経由）で対処。approved エントリの provenance を保持
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: baseline 更新手順では既存 provenance の保全確認を前置すべき（cap 更新と全量再生成を使い分ける）
+- **再発条件**: IR-055 baseline 再生成を cap 更新目的で実行する場合
+- **予防策候補**: baseline 更新手順の provenance 保全規律（再生成実行前の approved エントリ確認）
+- **想定反映先**: learning-promote での評価
+- **関連**: PR #3438・Case #3431・Epic #3425 Wave 2
+- **タグ**: `#ir-055` `#baseline` `#provenance`
+
+## 2026-10-04: check_integrity freshness checker 内部の git コマンドが再作成履歴ファイルで fatal を出す（pre-existing）
+
+- **問題事象**: `fatal: path 'docs/requirements/REQ-088.md' exists on disk, but not in 'a098b0f1^'`（REQ-088 が git history で再作成された履歴由来）。検査結果の破綻はないが fatal ログが出る
+- **発生局面**: case-run 委譲での docs-check 整合性検査（check_integrity --profile source）実行（PR #3438・Case #3431・Epic #3425 Wave 2）
+- **検知方法**: freshness checker 実行時の git コマンド stderr で fatal 出力を観測
+- **根本原因**: checker の git 前提に「ファイルが初回 commit から存在する」暗黙前提があり、history 上で削除→再作成されたファイルで前提が崩れる
+- **自律対応内容**: 検査結果への実害がないことを確認の上、既出の pre-existing として記録（本変更では不修正）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: checker 内部 git 前提の堅牢化候補（履歴再作成ファイルの取扱い明示）
+- **再発条件**: git history で削除→再作成されたファイルを freshness checker が処理する場合
+- **予防策候補**: freshness checker の git コマンドに履歴再作成ファイル用の分岐またはエラー抑止を追加
+- **想定反映先**: learning-promote での評価
+- **関連**: PR #3438・Case #3431・Epic #3425 Wave 2
+- **タグ**: `#check-integrity` `#freshness` `#git-precondition`
