@@ -25,7 +25,7 @@ GitHub Issue の作成、更新、リンク、確認を安全に行うための�
   - gh の終了コード
   - stderr の空・非空
   - spawnSync エラー種別（起動不能時に出力される）
-2. `gh auth status` で gh CLI の認証状態を確認する。未認証の場合は `gh auth login` で認証する。
+2. `gh auth status` で gh CLI の認証状態を確認する。未認証の場合は `gh auth login` で認証する。`gh auth login` は gh CLI の API 認証を設定する対話的な案内であり、実行環境側で人間が行う操作に位置づける（本手順の案内を削除・変更しない）。一方、Git 操作（push を含むドメイン状態永続化）の認証は非対話経路で設定済みであることを前提とし、その設定手順と認証方式の選定規律は実行環境側が正規所有する（AGENTS.md「ハーネス選定」の非対話認証参照行と実行環境知識文書 `docs/knowledge/git-noninteractive-auth.md`）。Git 操作の認証失敗・対話要求・タイムアウトの検出と報告は `agentdev-git-worktree` のドメイン状態永続化プロシージャ（`references/git-common-procedures.md`「2. ドメイン状態永続化」の push 失敗時の認証起因分類）に従う。資格情報の値を解析証拠やログへ出力しない。
 3. `gh repo view --json nameWithOwner` を手動実行し、gh CLI 単体でのリポジトリ解決可否を切り分ける。
 
 ### 回復手段（harness 再起動）

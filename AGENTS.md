@@ -1,4 +1,4 @@
-<!-- ADF-COVERS(implementation): REQ-053-041 -->
+<!-- ADF-COVERS(implementation): REQ-053-041, REQ-102-001, REQ-102-002, REQ-102-003, REQ-102-004 -->
 # AGENTS.md
 
 AgentDevFlow を編集するエージェント向けのリポジトリガイドレール。
@@ -19,3 +19,4 @@ AgentDevFlow を編集するエージェント向けのリポジトリガイド�
 ## ハーネス選定
 
 - oh-my-openagent を導入済み
+- Git 操作（push を含む）の認証は非対話経路で設定済みであり、対話認証の待機なしに対象の Git 操作が完了する。認証失敗、対話要求、タイムアウトを検出した場合は、待機を反復せず失敗、必要な処置、再開条件を報告する。資格情報の値を解析証拠やログへ出力しない。設定手順と当環境の認証経路実績は `docs/knowledge/git-noninteractive-auth.md` を参照すること。
