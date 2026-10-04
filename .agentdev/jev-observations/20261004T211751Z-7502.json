@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261004T211751Z-7502",
+  "workflow": "case-ready",
+  "evaluationKind": "wave-structure-determination",
+  "subject": "Root Case #3457 の Wave 構成判断（親判断: Epic 確定済み）",
+  "sourceRevision": "4389c49f",
+  "durationMs": 666,
+  "inputTokens": 1269,
+  "inputs": {
+    "requestDigest": "2d08b7f93ed3d06f1416a6e2e6bd6848e89072307109a2636730a7745cd0fba5",
+    "references": [
+      {
+        "digest": "06ba2b954a4e1f20ad341d075adf3d16b494ff0abe12289c2e503f798332fb59",
+        "label": "req_draft",
+        "path": ".agentdev/drafts/req-draft-integrity-debts-and-execution-quality-consolidation.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-parallel-feasibility",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.06,
+        "false": 0.94
+      }
+    },
+    {
+      "questionId": "q2-overlap-disposition",
+      "questionForm": "choice",
+      "value": "重複許容",
+      "probabilityDistribution": {
+        "変更対象分割": 0.07,
+        "重複許容": 0.93
+      }
+    }
+  ],
+  "confidence": 0.85,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-parallel-feasibility",
+        "value": false
+      },
+      {
+        "questionId": "q2-overlap-disposition",
+        "value": "重複許容"
+      }
+    ]
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261004T211249Z-12d1",
+  "workflow": "agentdev-workflow-case-ready",
+  "evaluationKind": "standard-epic-determination",
+  "subject": "Case #3457 実行構造の Standard/Epic 帰属と3軸水準",
+  "sourceRevision": "4389c49f25f3fe2004bd1d2ba35f73712b821c5f",
+  "durationMs": 1130,
+  "inputTokens": 2104,
+  "inputs": {
+    "requestDigest": "eac8af529420f97eddf829a4d34714a616336a3150ec1b8aafff9fb42692851c",
+    "references": [
+      {
+        "label": "req-draft",
+        "path": ".agentdev/drafts/req-draft-integrity-debts-and-execution-quality-consolidation.md",
+        "digest": "06ba2b954a4e1f20ad341d075adf3d16b494ff0abe12209c2e503f798332fb59"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-attribution",
+      "questionForm": "choice",
+      "value": "Epic",
+      "probabilityDistribution": {
+        "Standard": 0.03,
+        "Epic": 0.97
+      }
+    },
+    {
+      "questionId": "q2-dependency-strength",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "関連": 0.42,
+        "弱": 0.57,
+        "必須": 0.01
+      }
+    },
+    {
+      "questionId": "q3-functional-coherence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "分散": 0,
+        "部分的": 0.06,
+        "一貫": 0.94
+      }
+    }
+  ],
+  "confidence": 0.94,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-attribution",
+        "value": "Epic"
+      },
+      {
+        "questionId": "q2-dependency-strength",
+        "value": 1
+      },
+      {
+        "questionId": "q3-functional-coherence",
+        "value": 2
+      }
+    ]
+  }
+}
