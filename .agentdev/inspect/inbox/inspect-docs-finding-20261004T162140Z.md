@@ -40,7 +40,7 @@ source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides�
 - confidence: high
 - source_of_truth: REQ-099（共通原本とホスト接続領域の分離）、DEC-049、multi-host-canonical-model.md
 - recommended_route: intake（DEC-010 部分置換の req-define 壁打ち対象）
-- ng_classification: pre-existing（src/opencode 原本主張の矛盾化は今回窗口内の DEC-049 受理由來）
+- ng_classification: pre-existing（src/opencode 原本主張の矛盾化は今回対象期間内の DEC-049 受理由来）
 - notes: DEC-032:28・DEC-039:53 の「superseded 実行済み」明示パターンが修正の参照形
 
 #### GR-11: intake-learning-backlog-flow.md が Learning 13項目形式を参照なしで列挙
@@ -67,7 +67,7 @@ source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides�
 - confidence: high（実装コードと fs 状態の双方で検証済み）
 - source_of_truth: REQ-099、DEC-049、multi-host-canonical-model.md:19-29
 - recommended_route: docs-check（パス追随 sweep の機械化）+ intake（IR ルール affected_artifacts 一括是正の要件化）
-- ng_classification: 今回修正対象（再構成 43f4d392/54c54db9 で実装と一部 Design のみ追随し残りが取り残された。IR-053/059 は窗口内変更ファイルなのに旧パスのまま）
+- ng_classification: 今回修正対象（再構成 43f4d392/54c54db9 で実装と一部 Design のみ追随し残りが取り残された。IR-053/059 は対象期間内変更ファイルなのに旧パスのまま）
 - notes: 免除判定: backlogs-identifier-threshold.md:26（PR 事故履歴）、concrete-abstraction.md:50-52（検出記録の引用例）、IR-066:48（語彙例）は歴史・例示。agentdev-quality-gates.md:80 の `src/opencode/skills/agentdev-project-extensions/scripts` は現存パスのため適合。DC-02（DEC-010）は Decision 側の同根問題として別件
 
 #### DS-02: bd6d1fa4「文書分類モデル8原則」の REQ アンカー不在
@@ -81,10 +81,10 @@ source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides�
 - ng_classification: 要ヒューマンレビュー（CR-002 の意図的 REQ 非操作判断あり）
 - notes: 一貫性検査の結果、矛盾なし。ミラー 3 ファイル（diagnostic-categories.md、save-procedure.md、requirement-development.md）も整合
 
-#### DS-03: 窗口内変更 Design の frontmatter `updated` 未進行 3件
+#### DS-03: 対象期間内変更 Design の frontmatter `updated` 未進行 3件
 - category: DRIFT（metadata 鮮度）
 - target: `docs/designs/skills/agentdev-git-worktree.md`（updated: 2026-09-05）、`docs/designs/skills/agentdev-quality-gates.md`（2026-09-19）、`docs/designs/quality/req-health-metrics.md`（2026-09-24）
-- evidence: 3文件とも本文は edeb841d/082bb32a（2026-10-04）で節・表追加済み。patterns.md:77 は Design frontmatter `updated` を最終更新日と定義。対照的に 082bb32a は case-* Design 群の updated を 2026-10-04 へ正しく進行させており運用が不均質。IR-072 は REQ ファイルのみ対象で Design は機械検査未カバー。
+- evidence: 3ファイルとも本文は edeb841d/082bb32a（2026-10-04）で節・表追加済み。patterns.md:77 は Design frontmatter `updated` を最終更新日と定義。対照的に 082bb32a は case-* Design 群の updated を 2026-10-04 へ正しく進行させており運用が不均質。IR-072 は REQ ファイルのみ対象で Design は機械検査未カバー。
 - severity: low
 - confidence: high
 - source_of_truth: foundations/patterns.md Design frontmatter 規約
@@ -116,7 +116,7 @@ source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides�
 #### RQ-01: REQ-101 行番号 005 の無記録欠落
 - category: 参照整合（採番管理）
 - target: `docs/requirements/REQ-101.md:21-22`（REQ-101-004 → REQ-101-006）
-- evidence: 行連番が 004→006 と飛び、005 が存在しない。リポジトリ全体で REQ-101-005 への参照なし（grep 確認）。移管記録・欠番注記もなし。REQ-101 は 2026-10-03/04 新設のため今回窗口内。numbering-policy の採番是正規定上、中間欠落は「飛び越し」採番ミスに相当（意図的行削除の Case 記録があれば例外）。
+- evidence: 行連番が 004→006 と飛び、005 が存在しない。リポジトリ全体で REQ-101-005 への参照なし（grep 確認）。移管記録・欠番注記もなし。REQ-101 は 2026-10-03/04 新設のため今回対象期間内。numbering-policy の採番是正規定上、中間欠落は「飛び越し」採番ミスに相当（意図的行削除の Case 記録があれば例外）。
 - severity: low
 - confidence: medium
 - source_of_truth: numbering-policy.md（採番規則）
