@@ -44,6 +44,15 @@ OU / Epic / Wave / Issue 階層の語彙意味の正規所有は v4-standard-lif
 - 上限超過または構成不備を検出した場合は停止する（Issue を作成しない）
 - 検証項目: Epic サイズ上限、必須依存（意味的依存 DAG 整合）の維持、全 operation_unit の Wave 割当完了。「Wave 同時実行上限」の検査項目は Wave 構成純度の原則により存在しない
 
+## 受け入れ義務の実行構成への到達確認と投影不完全時の抑止
+
+実行構造確定時に、execution contract 確定時の受け入れ義務対応付け（execution contract 確定の対応付け節）が、実際に構成された実行単位へ到達していることを確認する。
+
+- 対応付けた各受け入れ義務について、対応先の実行単位（Standard Case では対象 Case、Epic では対応する Child Issue または Epic Issue 本文）へ義務の検証義務と検証手段が記録されていることを確認する
+- 子実行単位へ未投影の義務は、Epic 横断最終検証義務として Epic Issue 本文へ保持する。保持されず対応先もない義務は投影不完全である
+- **投影不完全時の抑止**: 対応先のない義務が存在する場合は実行構造確定を成立させず、実行準備完了（ready 遷移）へ遷移しない。ready 遷移手順そのものは readiness-and-cleanup（STEP-6）が所有し、実行準備条件の「実行構造確定」が本確認の成立を要求する。未対応義務の一覧と停止理由を報告し、対応付けの解消（子実行単位への投影追加、Epic 横断最終検証義務としての保持、または Definition 側修正のための case-open 差し戻し）後に再実行する
+- 本確認は構成検証（GitHub Issue 作成前）の前提条件であり、投影不完全の解消前に Child Issue を作成しない
+
 ## Child Issue 本文の構成
 
 - 子 Issue 本文は単独自足の execution contract 要件を満たす（対象範囲、関連 REQ / Decision / Design、変更対象成果物、実現方針、完了条件、test strategy）
