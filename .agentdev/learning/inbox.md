@@ -993,3 +993,35 @@
 - **想定反映先**: learning-promote での評価、traceability check 実行手順の結果解釈手順
 - **関連**: Case #3446・PR #3452、Case #3442 の同主題 learning エントリ（unknown-req-refs 既出 16 件の継続）、Case #3445 由来 intake item
 - **タグ**: `#traceability` `#unknown-req-refs` `#--req限定` `#pre-existing`
+
+## 2026-10-05: case-auto scripts の既存テスト records-report.test.ts に RecordOccasion 型不整合の tsc --noEmit error が残存する（bun test は pass）
+
+- **問題事象**: case-auto scripts の records-report.test.ts:262 に RecordOccasion 型不整合（`"resume"` が型から削除済み）による tsc --noEmit error が残存する。bun test 実行は pass するためテスト実行系には影響しない
+- **発生局面**: case-run DEL-3447-1 typecheck（Case #3447・PR #3453・worktree package 単位 bun install 後）
+- **検知方法**: package 配下 cwd での bun x tsc --noEmit（case-auto scripts で exit 2・error 1 件）
+- **根本原因**: Wave-2 追加ファイルの型とテスト期待値の追随漏れ。bun test は型検査を行わないため実行系では顕在化しない
+- **自律対応内容**: 本 Case 対象範囲外のため修正せず PR #3453 Findings/learning へ記録。package 単位の tsc --noEmit を実行する環境（typecheck job 等）では既存 fail として現れる。後続の追跡 Issue 起票等の判断は case-close に委ねる
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: bun test の pass は型整合を保証しない。scripts package を持つ skill 領域で tsc --noEmit を別途実行する CI・ゲートがある場合、テスト pass でも型 error が別途計上される
+- **再発条件**: 型定義の変更（union 削除等）後に当該型を参照するテストを修正せず merge する場合
+- **予防策候補**: scripts package の typecheck を bun test と併せて QG・CI で実行する手順化候補
+- **想定反映先**: learning-promote での評価、後続追跡 Issue 起票判断、typecheck 実行手順
+- **関連**: Case #3447・PR #3453、Case #3445（Wave-2・records-report.test.ts 追加）
+- **タグ**: `#tsc` `#type-error` `#pre-existing` `#bun-test`
+
+## 2026-10-05: check_integrity の frontmatter updated ドリフトは分岐点以降の他 Case merge 起因で発生し provenance-tracked baseline 登録が必要
+
+- **問題事象**: check_integrity の frontmatter updated ドリフト（REQ 16 ファイル）が分岐点以降の他 Case merge で生じた既存ドリフトとして残存する（worktree 19 件 = main root 19 件の同数確認。自 Case 変更ファイルとは非交差）
+- **発生局面**: case-run DEL-3447-1 integrity 実測（Case #3447・PR #3453）
+- **検知方法**: check_integrity --root <worktree> と main root baseline の同数比較（19 件一致）
+- **根本原因**: 他 Case の REQ 行 merge が frontmatter updated を進行させるが、baseline への provenance 登録が merge 側で行われない構造
+- **自律対応内容**: baseline 更新は case-close の baseline 更新手順へ引き継ぐ前提で本 Case 対象範囲外として記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: REQ 行変更を伴う Case merge では frontmatter updated ドリフトが後続 worktree 実測で pre-existing として繰り返し観測される。baseline 登録の引き継ぎが規約上どの工程の責務かの明確化候補
+- **再発条件**: REQ 行 merge 後に frontmatter updated 修正を含まず baseline 未登録のまま後続 Case が分岐する場合
+- **予防策候補**: REQ 行 merge 側（case-close baseline 更新手順）での frontmatter updated 修正または baseline 登録の自動化候補
+- **想定反映先**: learning-promote での評価、case-close baseline 更新手順の確認
+- **関連**: Case #3447・PR #3453、Epic #3440 Wave 1/2 クローズでの同型判定（REQ-053 系 unknown-req-refs 16 件と同様の pre-existing 分類）
+- **タグ**: `#check-integrity` `#frontmatter` `#baseline` `#pre-existing`
