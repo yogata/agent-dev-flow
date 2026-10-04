@@ -29,11 +29,11 @@
 GitHub Issue/PR を使用するリポジトリ種別のみ実施する。GitHub Issue/PR を使用しないローカル版では本検証をスキップする。
 
 1. 読取専用の repo meta 照会（`gh repo view --json deleteBranchOnMerge` を正規手段）で GitHub repo 設定 deleteBranchOnMerge が true であることを検証する。Custom Tool `agentdev_gh` の操作カタログは拡張しない（読取専用 repo meta 照会はローカル環境確認〔gh auth status と同格〕扱いの bash 実行 Harness 依存。agentdev-gh Local 実装への影響なし）
-2. 設定が true でない場合は「設定無効」として blocked 停止する
-3. 照会自体が失敗する場合（gh 認証不良・ネットワーク不調等）は「検証不能」として blocked 停止する。検証不能のまま後続 STEP へ進む経路は存在しない（fail-closed）
-4. 両者を停止理由として区別報告する
+2. 設定が true でない場合は「設定無効」として警告報告する
+3. 照会自体が失敗する場合（gh 認証不良・ネットワーク不調等）は「設定照会不能」として警告報告する
+4. 両者を区別した警告として報告し、当該設定理由だけでは case-open を blocked に停止しない。設定照会不能は実操作の安全性の証明ではない。実操作の認証・権限・必要な読取・書込み等の成立を確認できない場合は、既存の安全契約（agentdev_gh の config-uninterpretable fail-closed、実操作失敗時の警告と停止）に従って停止する
 
-Root Case 本文候補の生成は preflight 設定検証の通過後に行う（最初の GitHub Issue 作成前に本検証を完了させる）。
+Root Case 本文候補の生成は preflight 設定検証の警告報告後に行う（最初の GitHub Issue 作成前に本検証を完了させる。設定理由による blocked 通過条件は撤廃済み）。
 
 1. Root Case 本文候補を生成する。本文は要件doc の合意済み入力を投影し、機能要件、非機能要件、制約、対象外、受け入れ条件を新規に作成しない。テンプレートは `agentdev-workflow-templates` の選定ルールに従う（Root Case 用テンプレート、【必須】セクション完備）
 2. Root Case のタイトルは合意済みの対象・目的から主題を生成し、`<workflows/issue-title-policy>` Design（Issue タイトル記述規則）の役割別書式に従う（Root Case は Case 接頭辞書式。書式の具体と主題原則は同 Design を参照し、本手順では複製しない）
@@ -73,7 +73,7 @@ Root Case 本文候補の生成は preflight 設定検証の通過後に行う�
 
 ## Completion Verification
 
-- GitHub Issue/PR を使用するリポジトリ種別では、preflight 設定検証が実施済みであり（設定無効・検証不能時は blocked 停止済みであり後続処理へ進んでいないこと）、ローカル版ではスキップされていること
+- GitHub Issue/PR を使用するリポジトリ種別では、preflight 設定検証が実施済みであり（設定無効・設定照会不能時は区別した警告が報告済みであり、設定理由だけでは後続処理を停止していないこと。実操作の安全性確認不能時は既存の安全契約に従って停止済みであること）、ローカル版ではスキップされていること
 - Root Case 本文に対象 REQ 番号が埋め込まれていること
 - Definition Package が Root Case に関連付けられ、構成要素が揃っていること
 - REQ 行追加を伴う場合はトレーサビリティポリシー追随要否の確認（必要エントリの Definition 包含、または不要判断の記録）が行われていること
@@ -89,7 +89,7 @@ Root Case 本文候補の生成は preflight 設定検証の通過後に行う�
 
 ## resume point
 
-- preflight 設定検証の実施状態（GitHub Issue/PR 使用リポジトリ種別。blocked 停止からの再開時は再照会する）
+- preflight 設定検証の実施状態（GitHub Issue/PR 使用リポジトリ種別。警告報告済みの再確認時は再照会する）
 - Root Case Issue 番号と作成状態、Definition Package の生成・関連付け状態
 
 ## 関連 STEP

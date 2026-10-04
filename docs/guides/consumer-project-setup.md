@@ -222,6 +222,8 @@ git clone https://github.com/yogata/agent-dev-flow.git .agentdev-plugin
 GitHub Issue/PR を使用するリポジトリ種別では、GitHub repo 設定 `deleteBranchOnMerge=true` を必須の導入条件とする。対象は本体リポジトリ（self-hosting）と適用プロジェクト（consumer-with-agentdev）に限られる。
 PR マージ後のリモートブランチ削除は GitHub の自動削除に委譲され、workflow 側のクリーンアップ（case-close）はローカルブランチ・worktree に限定される。
 
+case-open の preflight では、設定が true でない場合と設定を確認できない場合を区別した警告（設定無効 / 設定照会不能）が報告されるが、その理由だけで Case 開始は停止しない。設定が true でない場合、PR マージ後のリモートブランチは自動削除されず残存する。設定を確認できない場合、自動削除が機能していることを確認できないまま Case が実行される。本設定の必須導入条件は変わらないため、導入時に設定と確認を完了させること。
+
 設定手順を次に示す（いずれかの方法で設定する）。
 
 ```powershell
@@ -363,7 +365,7 @@ Custom Tool（`.opencode/tools/agentdev-*/`）と Plugin / Hook（`.opencode/plu
 
 1. `.agentdev-plugin/` に agent-dev-flow のチェックアウトを用意する（git clone またはソース ZIP 展開）
 2. `./.agentdev-plugin/scripts/install.ps1 -Mode apply` を実行（対話ウィザードで配置対象ホストを問われる。新規導入では両ホストが推奨。省略時も `both` が適用される）
-3. GitHub repo 設定 `deleteBranchOnMerge=true` を設定し、確認コマンドで `true` を確認する（上記「GitHub repo 設定 deleteBranchOnMerge（必須導入条件）」参照）
+3. GitHub repo 設定 `deleteBranchOnMerge=true` を設定し、確認コマンドで `true` を確認する（上記「GitHub repo 設定 deleteBranchOnMerge（必須導入条件）」参照。設定が無効・照会不能の場合も Case 開始は停止しないが、リモートブランチの自動削除が機能しない・確認できない運用上の帰結は同節に記載する）
 4. `./.agentdev-plugin/scripts/install.ps1 -Mode check` で動作確認（配置検査と実行環境診断が区別されて報告される）
 5. `.agentdev/` ディレクトリが存在することを確認（Intake/Learning 用）
 6. `.gitignore` に推奨エントリを追加（Senpi 選択時は `.senpi/` を含める）
