@@ -44,7 +44,7 @@ canonical Definition に実変更がある場合のみ Definition PR を作成�
 
 ## 副作用
 
-- preflight 設定検証（Root Case 確立の preflight。GitHub Issue/PR を使用するリポジトリ種別のみ。REQ-030-018）: 読取専用の repo meta 照会（`gh repo view --json deleteBranchOnMerge` を正規手段）で GitHub repo 設定 deleteBranchOnMerge が true であることを検証する。Custom Tool `agentdev_gh` の操作カタログは拡張しない（読取専用 repo meta 照会はローカル環境確認〔gh auth status と同格〕扱いの bash 実行 Harness 依存。agentdev-gh Local 実装への影響なし）。設定が true でない場合は「設定無効」として blocked 停止、照会自体が失敗する場合（gh 認証不良・ネットワーク不調等）は「検証不能」として blocked 停止（fail-closed、DEC-039 決定6）。両者を停止理由として区別報告する（DEC-014 決定5 の検査エラー/violation 区別先例に整合）。GitHub Issue/PR を使用しないローカル版では本検証をスキップする（REQ-009-031/034/039 整合）
+- preflight 設定検証（Root Case 確立の preflight。GitHub Issue/PR を使用するリポジトリ種別のみ。REQ-030-018）: 読取専用の repo meta 照会（`gh repo view --json deleteBranchOnMerge` を正規手段）で GitHub repo 設定 deleteBranchOnMerge が true であることを検証する。Custom Tool `agentdev_gh` の操作カタログは拡張しない（読取専用 repo meta 照会はローカル環境確認〔gh auth status と同格〕扱いの bash 実行 Harness 依存。agentdev-gh Local 実装への影響なし）。preflight の deleteBranchOnMerge 設定確認は、true でない場合と確認できない場合を区別した警告（設定無効 / 設定照会不能）として報告し、当該設定理由だけでは blocked 停止しない（部分置換後の DEC-045 を参照）。設定照会不能は実操作の安全性の証明ではなく、実操作の認証・権限・必要な読取・書込み等の成立を確認できない場合は既存の安全契約（agentdev_gh の config-uninterpretable fail-closed、実操作失敗時の停止）に従って停止する。Root Case 本文候補の生成は設定警告の報告後に実行する（blocked 通過条件の撤廃）。GitHub Issue/PR を使用しないローカル版では本検証をスキップする（REQ-009-031/034/039 整合）
 - GitHub I/O: Root Case 作成、Definition PR 作成（Custom Tool `agentdev_gh` 操作契約。Tool 内 VERIFY 付き）
 - deviation capture: case-open 実行中に実観測した deviation を agentdev-learning-capture skill または
   agentdev-intake-pipeline（自動capture向け item 生成操作）へ委譲して保存する（REQ-030-011）。

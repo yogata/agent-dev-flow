@@ -147,11 +147,12 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-042](decisions/DEC-042.md) | case-auto 最大並列維持と同期逐次フォールバック禁止 |
 | [DEC-043](decisions/DEC-043.md) | case-ready 実行構造判断への Jev 最終判断採用（Stage 2: 閾値ルーティング）（superseded by DEC-044〔本 Decision の決定（Stage 2: 閾値ルーティングによる Jev 最終判断採用）は DEC-044（基本判断経路への復帰）が置換する〕） |
 | [DEC-044](decisions/DEC-044.md) | Semantic Evaluation 観測契約の一次事実中心再設計と基本判断経路への復帰 |
-| [DEC-045](decisions/DEC-045.md) | リモートブランチ削除の GitHub 自動削除への委譲と deleteBranchOnMerge 設定前提の必須化 |
+| [DEC-045](decisions/DEC-045.md) | リモートブランチ削除の GitHub 自動削除への委譲と deleteBranchOnMerge 設定前提の必須化（superseded by DEC-050〔|〕） |
 | [DEC-046](decisions/DEC-046.md) | Jev 実行基盤の Cloudflare AI Gateway への完全置換 |
 | [DEC-047](decisions/DEC-047.md) | textlint 依存実体の版固定情報解決への転換 |
 | [DEC-048](decisions/DEC-048.md) | ADF判断アーキテクチャ: 判断方法・確定権限・人間判断境界の統一モデル |
 | [DEC-049](decisions/DEC-049.md) | ADF 共通原本とホスト接続領域の分離によるマルチホスト配布モデル |
+| [DEC-050](decisions/DEC-050.md) | deleteBranchOnMerge 設定不備の警告化と操作安全性停止の維持 |
 <!-- AUTOGEN:END -->
 
 ## 設計（Design）
