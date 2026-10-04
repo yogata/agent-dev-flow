@@ -13,8 +13,12 @@ implementation:
     - REQ-096-011
     - REQ-096-012
     - REQ-096-013
+    - REQ-096-033
+    - REQ-096-034
   src/common/skills/agentdev-quality-gates/references/qg-1-definition-integrity.md:
     - REQ-096-013
+  src/common/skills/agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md:
+    - REQ-096-032
   src/common/skills/agentdev-quality-gates/references/qg-3-implementation-deviation.md:
     - REQ-096-012
     - REQ-096-013
@@ -32,6 +36,8 @@ implementation:
     - REQ-096-012
     - REQ-096-013
     - REQ-096-017
+    - REQ-096-032
+    - REQ-096-033
   docs/knowledge/qg4-baseline-detached-worktree-reproduction.md:
     - REQ-007-013
 verification:
