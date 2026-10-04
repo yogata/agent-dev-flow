@@ -16,8 +16,10 @@ CREATE 対象 REQ の要件テーブルに、既存成果物への反映作業�
 
 ## 文書分類適合確認
 
-REQ / Decision 保存前に、対象ドキュメントの種別が document-model Design の Document Classification Policy に適合していることを確認する。
+REQ / Decision 保存前に、対象ドキュメントの種別が document-model Design（extension 経由で参照）の Document Classification Policy に適合していることを確認する。
 適合しない場合は保存を停止し、理由を報告する。
+適合確認はファイル全体ではなく記述単位で行う。単一ファイルが複数の関心を持つ場合、所有範囲、拘束の必要性、文書種別、寿命を記述単位で判定し、ファイル単位の判定結果は記述単位判定の集約として導出する。
+既存の文書種別責務（Knowledge の環境知識・作業記録、guide の手順、Report 等の非規範情報）に整合する記述は、分類不能を理由に REQ へ誘導しない。規範を成立させる必要がある場合のみ REQ 経路を採る。
 
 ## REQ ファイル操作
 
