@@ -8,10 +8,29 @@
 // 工程契約の適合確認を対象とする。
 
 import { describe, expect, test } from "bun:test";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 
-const repoRoot = join(import.meta.dir, "..", "..", "..", "..", "..", "..", "..", "..");
+// repoRoot 解決は import.meta.dir からの固定階層上昇を用いない。
+// main root と worktree（.worktrees/{N}-{type}/ 配下）ではテストファイルから
+// repoRoot までの階層数が異なるため、固定階層上昇は環境依存になり
+// 片方の環境でだけ green/false fail を生む。上位方向へ repoRoot 特徴
+// （AGENTS.md と src/common を伴う階層）を探索する階層数非固定の探索とする。
+function resolveRepoRoot(fromDir: string): string {
+  let current = fromDir;
+  for (;;) {
+    if (existsSync(join(current, "AGENTS.md")) && existsSync(join(current, "src", "common"))) {
+      return current;
+    }
+    const parent = dirname(current);
+    if (parent === current) {
+      throw new Error(`repoRoot not found from ${fromDir} (AGENTS.md + src/common traversal exhausted)`);
+    }
+    current = parent;
+  }
+}
+
+const repoRoot = resolveRepoRoot(import.meta.dir);
 const caseRunSkill = readFileSync(join(repoRoot, "src", "common", "skills", "agentdev-workflow-case-run", "SKILL.md"), "utf8");
 const caseAutoSkill = readFileSync(join(repoRoot, "src", "common", "skills", "agentdev-workflow-case-auto", "SKILL.md"), "utf8");
 const adapterSkill = readFileSync(join(repoRoot, "src", "common", "skills", "agentdev-case-run-execution-adapter", "SKILL.md"), "utf8");

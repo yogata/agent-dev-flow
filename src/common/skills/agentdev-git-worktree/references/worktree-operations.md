@@ -246,11 +246,12 @@ worktree 操作（実装、検証、証跡退避を含む）におけるファ�
 - 既存ファイルの部分編集: edit ツール（per-line string replace）
 - プログラム経由の一括読み書き: node の `readFileSync` / `writeFileSync`（エンコーディング明示）または `[System.IO.File]` の明示エンコーディング指定
 - 証跡退避（checker CLI stdout、gh CLI 出力等）: `spawnSync` + `fs.writeFileSync`（UTF-8 明示）
-- shell inline・heredoc に起因するコンテンツ破損の回避（2技法）:
+- shell inline・heredoc に起因するコンテンツ破損の回避（3技法）:
   - (a) 一時スクリプトファイル経由の実行: 正規表現リテラル等を含む解析コード、日本語を含む長大なコンテンツの書き出しは、project root 内の一時スクリプトファイルへ配置して実行し、検査後に削除する（ファイルベース伝達）
   - (b) PowerShell 単一引用符ヒアドキュメント: `node -e` と単一引用符ヒアドキュメントの組合せは、bash の escape 解釈・heredoc 打ち切りを経由しない素通し可能な代替技法である
+  - (c) バックスラッシュフリー実装・中間エンコード経由の伝達: quoted heredoc（`<<'EOF'`）でもバックスラッシュは転送層で保護されない（第3機構: 転送層でバックスラッシュが消費され、書き出し結果から欠落する）。バックスラッシュを含むスクリプト・設定ファイルは heredoc 経由で書き込まず、バックスラッシュフリー実装（`String.fromCharCode(13)` 等のコードポイント生成、文字クラス内バックスラッシュなし正規表現、行配列走査）または base64 等の中間エンコード経由で伝達する
 
-(a) と (b) の使い分け: 標準は (a) の一時スクリプトファイル経由であり、単発の短い解析等で一時ファイル作成が過剰になる場面を (b) の代替対象とする。2機構（argv escape 解釈による文字列変質、heredoc stdin の中途打ち切り）とその別個の検知方法、および本集約との相互参照は `docs/knowledge/windows-git-bash-inline-content-corruption.md` を参照する。両技法は shell inline を一律禁止する過剰一般化ではなく、破損機構に応じた切替手段である。guard の fail-closed 維持と、ブロック時は解除・迂回ではなく標準手段へ切替する原則は本節全体で維持する
+(a) と (b) と (c) の使い分け: 標準は (a) の一時スクリプトファイル経由であり、単発の短い解析等で一時ファイル作成が過剰になる場面を (b) の代替対象とする。バックスラッシュを含む内容は (c) の対象であり、quoted heredoc に頼らずバックスラッシュフリー実装または中間エンコードで伝達する。2機構（argv escape 解釈による文字列変質、heredoc stdin の中途打ち切り）と第3機構（quoted heredoc 経由のバックスラッシュ消費）の別個の検知方法、および本集約との相互参照は `docs/knowledge/windows-git-bash-inline-content-corruption.md` を参照する。各技法は shell inline を一律禁止する過剰一般化ではなく、破損機構に応じた切替手段である。guard の fail-closed 維持と、ブロック時は解除・迂回ではなく標準手段へ切替する原則は本節全体で維持する
 
 ### fail-closed の維持
 
@@ -483,7 +484,9 @@ git branch -d "{type}/issue-{N}"
 
 **squash merge 後の条件付き `-D` 許可**:
 1. PR が `state: MERGED` と確認できること
-2. 呼び出し元が squash merge 済みを明示的に判定していること
+2. 呼び出し元が squash merge 済みを明示的に判定していること。判定手順は branch 構成で使い分ける（再判断不可。単一の手順に寄せない）:
+   - **単一コミット構成**（branch が main から 1 コミット先行する構成）: `git cherry` を一次判定に使う。`git cherry origin/main {branch}` の出力が空（branch 側コミットの変更がすべて main 側に取り込み済み）であれば squash merge 済みと判定する
+   - **複数コミット構成**（branch が main から複数コミット先行する構成）: squash merge はコミットハッシュを作り替えるため `git cherry` では検出できない。まず `git log --oneline origin/main..{branch}` で branch 側変更範囲が当該 PR の対象範囲に限定されていることを確認し（限定確認）、次に `git diff origin/main {branch}` が空であること（branch 先端の内容が main 先端と変更ファイル単位で一致）をもって squash merge 済みと判定する
 3. 条件を満たさない場合は `-D` 実行せず警告表示して停止
 
 ## ツール実行規約

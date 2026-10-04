@@ -225,9 +225,13 @@ describe("REQ-018-003 / REQ-018-004: third-party tolerated placements (INSPECTIO
   it("projection-only placements without third-party declaration remain inspected", () => {
     // projection 走査環境（junction 実在）でのみ projection-only エントリが現れる。
     // worktree fallback 環境では走査対象が src 由来のみのため検証対象が空になり pass する（fail-open）。
+    // third-party 宣言済み（INSPECTION-TOLERATED）の projection-only 配置は検査許容であり
+    // fail に計上されない（manifest third_party_skills 宣言、REQ-018-003）。
+    // 宣言なしの project-local 配置のみ ADF スキル構造契約検査の対象に残る。
     for (const name of skillDirs) {
       if (fs.existsSync(path.join(SOURCE_SKILLS_DIR, name))) continue;
-      expect(toleratedThirdPartySkills.has(name)).toBe(false);
+      if (toleratedThirdPartySkills.has(name)) continue;
+      expect(adfSkillDirs.includes(name)).toBe(true);
     }
   });
 });
