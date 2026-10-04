@@ -16,8 +16,11 @@ implementation:
     - REQ-101-008
     - REQ-101-011
     - REQ-101-012
+  src/common/skills/agentdev-workflow-case-auto/scripts/src/wave-gate.ts:
+    - REQ-032-038
   src/common/skills/agentdev-workflow-case-auto/references/conflict-resolution-and-reporting.md:
     - REQ-034-021
+    - REQ-032-038
     - REQ-094-001
     - REQ-094-002
     - REQ-094-004
@@ -28,8 +31,10 @@ implementation:
     - REQ-101-011
   src/common/skills/agentdev-workflow-case-auto/references/input-resolution-and-orchestration.md:
     - REQ-030-017
+    - REQ-032-038
     - REQ-061-039
   src/common/skills/agentdev-workflow-case-auto/references/stop-and-decision-resolution.md:
+    - REQ-032-038
     - REQ-096-001
     - REQ-096-002
     - REQ-096-004
@@ -43,5 +48,7 @@ verification:
     - REQ-101-008
     - REQ-101-011
     - REQ-101-012
+  src/common/skills/agentdev-workflow-case-auto/scripts/tests/wave-gate.test.ts:
+    - REQ-032-038
   .opencode/skills/repo-agentdev-integrity/scripts/agreement_change_acknowledgment.test.ts:
     - REQ-101-009
