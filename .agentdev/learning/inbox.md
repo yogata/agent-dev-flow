@@ -897,3 +897,19 @@
 - **想定反映先**: learning-promote での評価
 - **関連**: Case #3424（PR #3437 Findings learning 2件目）
 - **タグ**: `#distribution-boundary` `#baseline` `#checker`
+
+## 2026-10-04: case-open の Root Case 本文を GitHub 書込み前に yomiyasu 推敲せず投稿した
+
+- **問題事象**: case-open 工程（Case #3440）で Root Case Issue 本文を agentdev_gh issue_create へ渡す前に、REQ-098-003 と project extension rule（yomiyasu-application-before-write: GitHub 書込み文章の提出前推敲・lint）を適用せず投稿した。yomiyasu の読込は後続の Design 追加文章編集時に初めて実施した
+- **発生局面**: 実装（case-auto 内部 lifecycle case-open の STEP-2 Root Case 確立）
+- **検知方法**: Definition 文章編集の前に REQ-098-002 を根拠に project extension（.agentdev/extensions/skills/agentdev-workflow-case-open.yaml）の rules を読み込んだ時点で、Root Case 本文への適用漏れを確認
+- **根本原因**: case-open Workflow Skill の STEP-2 手順列は REQ-098 適用を直接列挙せず extension rule 依存であり、extension の rules 読込契機が docs 編集直前（STEP-4 前提）に配置される。初回 GitHub 書込み（Root Case 作成）が rules 読込より先行する工程構成のため適用漏れが構造的に発生し得る
+- **自律対応内容**: 投稿済み Root Case 本文を yomiyasu 観点で遡及確認し、修正対象（適用除外カテゴリ外の指摘）が検出されないため issue_update による遡及編集は実施しない判断を記録。以後の全 GitHub 書込み（RD-001 採否コメント、Definition PR #3441 本文）は yomiyasu 読込後の推敲・lint・指摘確認を経て投稿した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（REQ-098-003 の運用徹底候補。既存契約の変更不要）
+- **横展開観点**: GitHub 書込みを持つ他の workflow（case-ready/case-close/case-revise 等）でも、extension rules 読込を工程冒頭の前置ステップとして明示する価値
+- **再発条件**: extension rules の読込契機が初回 GitHub 書込みより後ろに配置される工程構成（case-open STEP-2 の Issue 作成が STEP-4 の docs 編集より先行する構成）の場合
+- **予防策候補**: workflow skill の STEP 手順列へ「project extension rules 読込を最初の GitHub 書込みより前に配置」する前置ステップの明示、または REQ-098 適用確認を preflight 設定検証と同列の工程前置へ組込み
+- **想定反映先**: learning-promote での評価
+- **関連**: Case #3440（Root Case 本文、Definition PR #3441）、.agentdev/extensions/skills/agentdev-workflow-case-open.yaml、REQ-098-002/003/004
+- **タグ**: `#req-098` `#yomiyasu` `#github-io` `#workflow-deviation`
