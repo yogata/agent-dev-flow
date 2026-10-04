@@ -1,4 +1,8 @@
-# inspect-docs finding 20261004T162140Z
+# inspect-docs finding 20261004T162140Z（defer 残置分）
+
+> 本ファイルは inspect-promote（2026-10-05 実施、/agentdev/backlog-auto stage 2 inspect 系統経由、--auto なし）の分類確定後、defer となった検出事項のみを残置する。promote 採用分（8件: DC-01、DC-02、DS-01〜DS-05、RQ-01）は `.agentdev/inspect/promoted/finding-20261004-*.md` へ保存済み（うち DS-02 は 2026-10-05 ユーザー事前承認〔HITL〕、他7件は自律確定）。reject 0件（新規分）。既知 defer 子処分（解消確認 reject 6件のセクション削除）は各元ファイル側で実施。
+>
+> - GR-11: ガイドが learning 13項目形式を正規所有者への参照なしで列挙。参照 1 行追記で解消する軽微件（採否・時期は次サイクル判断）
 
 - 実行日時: 2026-10-05T01:21 JST（backlog-auto stage 1 として実行）
 - 診断体制: STEP-2 意味診断は3診断担当への並列委譲（REQ 体系 / Design / Decision・guides・README、いずれも読取専用）+ 親の fan-in 統合（6観点網羅確認・横断矛盾判定・重複排除・既知 defer・既出 intake item 照合を実施、担当間矛盾なし、REQ-102:24 は REQ/Design 両担当から重複候補として返り 1 件へ統合）
@@ -15,33 +19,11 @@
 - 既出 intake item 照合（新規起票せず状況確認のみ）: 6系統（後述）。intake inbox 21件中、本診断の機械的候補の大半が 10-03/10-04 の docs-check/case-close capture で既に捕捉済み
 - 既知 defer 残置分: 31項目の状況更新（解消 6 / 実質解消 2 / 部分解消 2 / 残存 21）—「既知 defer 項目の状況更新」節参照
 
-## 検出事項リスト
+## 検出事項リスト（defer 残置分）
 
 source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides。
 
-### Decision・guides・README（新規 3件）
-
-#### DC-01: docs/README.md Decision 索引の DEC-045 supersede_note 破損（`〔|〕`）と decisions/README.md との不整合
-- category: README索引（AUTOGEN 生成不備）
-- target: `docs/README.md:147`
-- evidence: 「リモートブランチ削除の GitHub 自動削除への委譲と deleteBranchOnMerge 設定前提の必須化（superseded by DEC-050〔|〕）」— supersede_note が空の括弧+縦棒として破損レンダリング。直近 DEC-043 行（:145）は note 全文を正常表示しており、DEC-045 のみ生成が失敗。DEC-045 frontmatter は superseded_by: DEC-050 + 部分置換 note（status: accepted 維持）を持つが、decisions/README.md の DEC-045 行は注記なしで両索引が不整合。DEC-050 昇格（7844db56）由来の回帰。
-- severity: medium
-- confidence: high
-- source_of_truth: DEC-045 frontmatter（SSoT は正しい）
-- recommended_route: docs-check（AUTOGEN 生成器の空 note レンダリング修正 + 再生成）
-- ng_classification: 今回修正対象
-- notes: 前回促進済み GR-01（supersede_note 索引鮮度）の修正は DEC-040/043 で実効確認済み。本件は新規発生分
-
-#### DC-02: DEC-010 本文が廃止済み DEC-002 の現在形維持宣言と廃構造パスを現行宣言として保持（既知 defer のエスカレーション）
-- category: Decision意味整合（現行 REQ との正面矛盾）
-- target: `docs/decisions/DEC-010.md:35-36`
-- evidence: 「DEC-002（ソース・プロジェクション分離）を維持する。新 Workflow Skill / Capability Skill は src/opencode/skills/ を原本とする。」— (a) DEC-002 は superseded（by DEC-036）、(b) 「src/opencode/skills/ を原本とする」は REQ-099/DEC-049 受理（共通正本は src/common）により現行構造と矛盾。accepted Decision の本文が現行 REQ（REQ-099）より下位の主張を現在形で維持する状態に変化したため、既知 defer（前回 low〜medium 扱い）から矛盾度が上昇。
-- severity: high
-- confidence: high
-- source_of_truth: REQ-099（共通原本とホスト接続領域の分離）、DEC-049、multi-host-canonical-model.md
-- recommended_route: intake（DEC-010 部分置換の req-define 壁打ち対象）
-- ng_classification: pre-existing（src/opencode 原本主張の矛盾化は今回対象期間内の DEC-049 受理由来）
-- notes: DEC-032:28・DEC-039:53 の「superseded 実行済み」明示パターンが修正の参照形
+### guides（defer 残置 1件）
 
 #### GR-11: intake-learning-backlog-flow.md が Learning 13項目形式を参照なしで列挙
 - category: guides（正規所有者の内容複製）
@@ -52,76 +34,6 @@ source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides�
 - source_of_truth: agentdev-learning-capture スキル（learning 系 Design）
 - recommended_route: defer（正への参照 1 行追記で解消）
 - ng_classification: 新規（軽微）
-
-### Design（新規 5件）
-
-#### DS-01: REQ-099/DEC-049 再構成後の src/opencode 旧パス参照クラスタ（Design↔実装 DRIFT）
-- category: 参照整合/DRIFT（検査範囲契約・投影元定義の実態乖離）
-- target: docs/designs/ 配下クラスタ（下記）
-- evidence: 実装の真実は check_integrity.ts が `.opencode → src/common` 解決（243-249行）・`IR058_DISTRIBUTION_DIRS = ["src/common/commands/agentdev", "src/common/skills", ...]`（5459-5465行）。src/opencode/commands/ は存在せず、src/opencode/skills/ は 5 件のみ（src/common/skills は 50 件）。一方 Design 側が現在形で旧ルートを宣言する:
-  - integrity ルール文書: IR-028:16、IR-029:16、IR-049:13、IR-053:16-17、IR-055:13/17、IR-058:13/16/17/24/43、IR-059:21、IR-062:78、IR-063:17/38、IR-064:13/17/38、IR-067:43、IR-068:17（detection_method/affected_artifacts/検査対象）
-  - integrity 本体: integrity-rule-catalog.md:189、prose-quality-sentinel-checks.md:22-24、targeted-docs-guard-implementation.md:112/202/209
-  - command Design 定型文「command 定義（`src/opencode/commands/agentdev/*.md`）はその実行時投影」: req-define.md:485、learning-promote.md:104、intake-promote.md:89、intake-from-github.md:56、intake-capture.md:52、inspect-skills.md:25-26/68、inspect-promote.md:64、_template.md:66 ほか計10件
-  - req-define.md:195（実在しない `src/opencode/skills/agentdev-req-analysis/SKILL.md` を正規位置として参照）、skill Design agentdev-skill-authoring.md:44
-- severity: high（IR ルール群の検査対象契約が現行構造と矛盾し、文書通りに走査すると対象を取り逃す）
-- confidence: high（実装コードと fs 状態の双方で検証済み）
-- source_of_truth: REQ-099、DEC-049、multi-host-canonical-model.md:19-29
-- recommended_route: docs-check（パス追随 sweep の機械化）+ intake（IR ルール affected_artifacts 一括是正の要件化）
-- ng_classification: 今回修正対象（再構成 43f4d392/54c54db9 で実装と一部 Design のみ追随し残りが取り残された。IR-053/059 は対象期間内変更ファイルなのに旧パスのまま）
-- notes: 免除判定: backlogs-identifier-threshold.md:26（PR 事故履歴）、concrete-abstraction.md:50-52（検出記録の引用例）、IR-066:48（語彙例）は歴史・例示。agentdev-quality-gates.md:80 の `src/opencode/skills/agentdev-project-extensions/scripts` は現存パスのため適合。DC-02（DEC-010）は Decision 側の同根問題として別件
-
-#### DS-02: bd6d1fa4「文書分類モデル8原則」の REQ アンカー不在
-- category: REQ代替（恒久契約性の高い規範の帰属問題）
-- target: document-model.md（記述単位判定の原則・具体名を含む公開契約のREQ適格と手段分離の補強・二つの6処置の工程差の明示）、document-type-responsibilities.md（分類判断ツリー最終到達項目の限定・SKILL原本節フォーマット）、v4-operating-model.md（ADF共通保証と本体Project契約の層帰属）、commands/req-define.md（記述単位・寿命の判定項目追加）
-- evidence: 追記規範文は REQ 行アンカーを持たない（例: document-model.md「Designへ独立した新要求を追加しない（手段の独自要件化の禁止）」「弱い要求をKnowledgeへ退避させる記述を、分離先として選択してはならない」）。commit 本文は「REQ操作なし（CR-002）」と明記。416b5ee5 による配布 skill 参照 3 ファイルへのミラー含め追記文間の相互矛盾は検出されず（document-model.md 基盤とも整合）。
-- severity: medium
-- confidence: medium
-- source_of_truth: REQ-001（文書体系）。矛盾ではなく帰属の判断問題
-- recommended_route: intake（恒久契約を REQ-001 系へ要件化するか req-define で再壁打ち）
-- ng_classification: 要ヒューマンレビュー（CR-002 の意図的 REQ 非操作判断あり）
-- notes: 一貫性検査の結果、矛盾なし。ミラー 3 ファイル（diagnostic-categories.md、save-procedure.md、requirement-development.md）も整合
-
-#### DS-03: 対象期間内変更 Design の frontmatter `updated` 未進行 3件
-- category: DRIFT（metadata 鮮度）
-- target: `docs/designs/skills/agentdev-git-worktree.md`（updated: 2026-09-05）、`docs/designs/skills/agentdev-quality-gates.md`（2026-09-19）、`docs/designs/quality/req-health-metrics.md`（2026-09-24）
-- evidence: 3ファイルとも本文は edeb841d/082bb32a（2026-10-04）で節・表追加済み。patterns.md:77 は Design frontmatter `updated` を最終更新日と定義。対照的に 082bb32a は case-* Design 群の updated を 2026-10-04 へ正しく進行させており運用が不均質。IR-072 は REQ ファイルのみ対象で Design は機械検査未カバー。
-- severity: low
-- confidence: high
-- source_of_truth: foundations/patterns.md Design frontmatter 規約
-- recommended_route: docs-check（metadata 是正 + Design 拡張の検査規則候補）
-- ng_classification: 今回修正対象
-
-#### DS-04: Design 本文への執筆工程メタ記述残置
-- category: other（執筆残渣）
-- target: `docs/designs/commands/case-ready.md:66`、`docs/designs/commands/case-revise.md:40`
-- evidence: 「…実行時投影（直前セクションの直後に配置）。」「…実行時投影（冪等性セクションの直後に配置）。」— 配置位置指示は執筆時の作業指示であり読者に対する契約内容を持たない（082bb32a で導入）。
-- severity: low
-- confidence: high
-- source_of_truth: Design 記述様式（document-type-responsibilities）
-- recommended_route: docs-check（括弧句除去）
-- ng_classification: 今回修正対象
-
-#### DS-05: issue-lifecycle-records.md の完了済み変更指示の現在形残置
-- category: DRIFT（作業指示残置）
-- target: `docs/designs/workflows/issue-lifecycle-records.md:37`
-- evidence: 「検証スクリプト（record-comments.ts）、Epic 反映エンジン（epic-reflect.ts）、反映計画（records-report.ts）は、コメント生成契機の縮小に追随して start / handoff / resume 系の生成・反映経路を削除する。」— 実装は 9a8933fb（2026-10-03）で完了済み（record-comments.ts 現況に start/handoff/resume 生成経路なし、grep 確認）。同節の残存語彙契約（hold/decision_change/検証証拠の三者共有）は現行契約として有効。
-- severity: low
-- confidence: medium-high
-- source_of_truth: 実装（src/common/skills/agentdev-workflow-case-run/scripts/record-comments.ts 現況）
-- recommended_route: docs-check（現行形の記述に是正）
-- ng_classification: 今回修正対象
-
-### REQ 体系（新規 1件）
-
-#### RQ-01: REQ-101 行番号 005 の無記録欠落
-- category: 参照整合（採番管理）
-- target: `docs/requirements/REQ-101.md:21-22`（REQ-101-004 → REQ-101-006）
-- evidence: 行連番が 004→006 と飛び、005 が存在しない。リポジトリ全体で REQ-101-005 への参照なし（grep 確認）。移管記録・欠番注記もなし。REQ-101 は 2026-10-03/04 新設のため今回対象期間内。numbering-policy の採番是正規定上、中間欠落は「飛び越し」採番ミスに相当（意図的行削除の Case 記録があれば例外）。
-- severity: low
-- confidence: medium
-- source_of_truth: numbering-policy.md（採番規則）
-- recommended_route: docs-check（採番確認後、行 ID 振替えまたは欠番記録）
-- ng_classification: 要ヒューマンレビュー（REQ-101 作成 Case の記録確認後に確定）
 
 ## 既出 intake item 照合（新規起票せず、補完情報のみ）
 
@@ -197,13 +109,11 @@ source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides�
 - 各 promoted/（intake / learning / inspect）: 0件
 - `.agentdev/drafts/`: 0件
 
-## 推奨アクション
+## 推奨アクション（defer 残置分）
 
-- docs-check route 6件（DC-01、DS-01 sweep 部分、DS-03、DS-04、DS-05、RQ-01〔採番確認後〕）+ 付帯（inspect-docs Design ADF-COVERS 行統合、REQ-036-002/022 正規化、GR-07「正」語彙、exemption パターン登録）
-- intake route 2件（DC-02: DEC-010 部分置換の壁打ち、DS-02: 8原則の恒久契約 REQ 化判断）+ 促進済み defer の継続（GR-05/06/08、command-selection 補足は既存 defer のまま次回判断）
-- defer route 1件（GR-11）+ 残存 defer 群は原状継続（状況更新のみ、新規起票せず）
-- req-define 入力案: 2件（DC-02 の DEC-010 部分置換、DS-02 の記述単位・層帰属・Knowledge 非規範限定の REQ-001 系要件化）
-- 要ヒューマンレビュー: RQ-01（REQ-101-005 の意図性）、REQ-010 旧 070 行の処置方針、DS-02（CR-002 判断）、GR-08（配置責務）
+- defer 1件（GR-11）は inbox 残置。次回以降の inspect サイクルで再評価（20260926 GD-03〔同一ファイルの基準参照欠落・defer 残置〕との合同修正候補）
+- 残存 defer 群は原状継続（状況更新のみ、新規起票せず）
+- promote 採用済み 8件は `.agentdev/inspect/promoted/finding-20261004-*.md` 参照
 
 ## 対象外（Out of Scope）
 
@@ -219,3 +129,7 @@ source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides�
 - 診断担当: REQ 体系 / Design / Decision・guides・README の3並列委譲（読取専用、file:line 根拠付き戻り値、親が fan-in 統合）
 - 機械的検査スクリプト: repo-agentdev-integrity（check_integrity --profile source、check_autogen_freshness、check_command_format、check_extensions、check_distribution_boundary、check_design_frontmatter、check_knowledge_docs、check_content_corruption、配布物 BOM/CRLF・command 参照実在の node 直接検査）
 - source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides
+
+## 処理記録
+
+- 2026-10-05 実施（backlog-auto stage 2 inspect 系統、--auto なし、親直列化スロット）: promote 8件（DC-01、DC-02〔20260925 F-08 併合〕、DS-01〜DS-05、RQ-01）→ promoted/finding-20261004-*.md へ保存・本ファイルから削除。うち DS-02 は 2026-10-05 ユーザー事前承認（HITL。承認は候補昇格のみに適用し、恒久契約の帰属判断〔REQ-001 系へ要件化するか〕は req-define 壁打ちが所有）、他7件は自律確定（Jev 先行評価は evaluator 成功・観測永続化のみ digest 桁数不足で失敗し警告報告済み。in-context adversarial review 実施・unresolved 0件）。GR-11 は defer 残置。既知 defer 子処分: 解消確認 reject 6件（REQ-053-041/042、REQ-060-007 数値帯、REQ-092↔REQ-095 MERGE、REQ-087-004/REQ-092-003〔F-23〕、REQ-050-016〔F-05〕、REQ-012/REQ-021 TIM〔F-10〕）は各元ファイルでセクション削除・却下理由は commit message に記載。IR-044 作業履歴（20260925 F-06）は本診断の状況更新表「解消（ルール再構成による）」主張に対し、現行 IR-044-req-spec-boundary-violation-detection.md の :40/:64-65/:72/:79 に #1335/#1109 の PR 番号記録・是正経緯記述が実存することを反証として確認したため defer 継続（状況更新表の stage-1 記録は診断履歴として保持し、現在証拠は F-06 側に追記）。REQ-048 Legacy Baseline（F-17）は部分解消のため defer 継続。その他の残存 defer 21項目は原状継続

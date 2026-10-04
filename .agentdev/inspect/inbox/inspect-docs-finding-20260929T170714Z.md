@@ -18,7 +18,7 @@
 
 source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides。
 
-### REQ 体系（defer 残置 7件）
+### REQ 体系（defer 残置 4件）
 
 #### RQ-01: REQ-021-030 — 移行作業手順が要件行を占有
 - category: MOVE（文書分類: 作業履歴・内部アルゴリズム残留）
@@ -30,17 +30,6 @@ source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides�
 - recommended_route: docs-check（手順詳細は case-run 側 skill/Design へ移送し、REQ 行は恒久不変条件のみ残す案）
 - ng_classification: pre-existing（97953f3e 由来）
 - notes: 要ヒューマンレビュー（安定契約読みの可能性）
-
-#### RQ-02: REQ-053-041/042 — 編集手段規律の関心混在と他文書重複
-- category: SPLIT + DUPLICATE（文書分類併記）
-- target: `docs/requirements/REQ-053.md:57-58`
-- evidence: 041「既存UTF-8（BOMなし）/LFファイルの編集ではPowerShell標準cmdletやリダイレクトによる一括読み書きを避け、edit、node readFileSync/writeFileSync…を用いること」/ 042「…oldString 選択または順次実行に限定…grep 等の実取得でファイルの現在状態を確認…」— ツール固有の編集 I/O 手順が要件行を占有。REQ-053 の目的（文章表層品質の決定的検査）とは別関心。同内容が AGENTS.md 行動規範・agentdev-git-worktree skill reference・knowledge 文書に重複記述。
-- severity: medium（安全境界の安定契約例外候補のため high から低下）
-- confidence: medium
-- source_of_truth: REQ-053.md:8-11（目的節）
-- recommended_route: docs-check
-- ng_classification: pre-existing
-- notes: REQ 行を知識文書の ADF-COVERS アンカーとする意図（REQ-056 経由）の可能性があり、その場合は文言の HOW 密度のみが是正対象
 
 #### RQ-03: REQ-090-018/019/024 — 同一規範の行間重複
 - category: DUPLICATE（同一 REQ 内）
@@ -64,17 +53,6 @@ source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides�
 - ng_classification: 今回修正対象候補（602b8601 追加行。要ヒューマンレビュー）
 - notes: 「Form Zero」はステージ混入防御の安全境界の安定契約候補。同型既許容行（REQ-030-017、REQ-007-011、REQ-092-003）とパターン単位で統一判断が望ましい
 
-#### RQ-05: REQ-060-007 — 規範化された数値パラメータ
-- category: 文書分類（実装パラメータ残留）
-- target: `docs/requirements/REQ-060.md:22`
-- evidence: 「実行 timeout を明示指定すること（…300〜600 秒の指定を標準とする）」— 数値範囲が「標準とする」として規範化。
-- severity: low
-- confidence: low-medium
-- source_of_truth: Design 分離基準（実装パラメータ残留）
-- recommended_route: defer
-- ng_classification: 今回修正対象候補（602b8601 追加行。要ヒューマンレビュー）
-- notes: REQ-060 自体が「実行形態の統一」を REQ で所有する意図的設計との緊張
-
 #### RQ-06: REQ-095-001/002 — Tool 入力契約・CLI 詳細の再記述
 - category: MOVE + DUPLICATE（文書分類）
 - target: `docs/requirements/REQ-095.md:12,19-20`
@@ -85,17 +63,6 @@ source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides�
 - recommended_route: defer（既知 defer REQ-092-003 と同型・同時処置が自然）
 - ng_classification: 今回修正対象候補（602b8601 追加 REQ。要ヒューマンレビュー）
 - notes: 「運用文書から参照できること」形式自体は REQ-092 で確立済みの形式
-
-#### RQ-07: REQ-092 ↔ REQ-095 — MERGE 候補
-- category: MERGE
-- target: `docs/requirements/REQ-092.md:24-27`、`docs/requirements/REQ-095.md:19-20`
-- evidence: 両 REQ とも (a) 同じ目的（agentdev_gh 呼出側の安全運用規律を運用文書へ明記）、(b) 同じ対象成果物（配布 skill reference issue-operation-safety.md）、(c) 同じ command（agentdev_gh）。REQ-093 は起動環境障害という別軸で明確に区別済み。
-- severity: medium
-- confidence: medium
-- source_of_truth: req-structure-review MERGE 観点のシグナル定義（(a)(b)(c) に該当）
-- recommended_route: intake（統合判断は req-define 壁打ち対象）
-- ng_classification: pre-existing（REQ-095 は 602b8601 由来 — 要ヒューマンレビュー）
-- notes: 事故単位の小粒度 REQ 分離が意図的設計の可能性
 
 ### Design（新規 2件）
 
@@ -228,3 +195,4 @@ source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides�
 ## 処理記録
 
 - 2026-09-30 実施（backlog-auto stage 2 inspect 系統、--auto なし）: promote 7件（GR-01/02/03/04/09・DS-01/02）→ promoted/inspect-docs-promoted-20260929T170714Z.md へ原状保存・本ファイルから削除。うち GR-03 は 20260929T165249Z DS-21 と、DS-01 は同 DS-23/24 と、GR-01 は同 DC-14 と対象統合。GR-09 は intake promoted 2026-09-29-3236-decision-numbering-timing-clarification.md への対象追加候補（numbering-policy.md:40-41）。defer 12件（RQ-01〜07〔RQ-05 は 165249Z RQ-34 と統合〕・GR-05〜08・GR-10）は本ファイルに残置。RQ-07 は REQ-095（2026-09-29 追加）の安定後に次回サイクルで MERGE 判断を再評価。GR-06/07 は既知 defer GUIDE-6（artifacts-and-state.md・同ファイル）との統合是正時に一括処理。HITL 承認: GR-02（2026-09-30 ユーザー承認）
+- 2026-10-05 実施（backlog-auto stage 2 inspect 系統、--auto なし、親直列化スロット）再評価: RQ-02 は解消確認により reject・即時削除（自律確定）: REQ-053-041/042 は手段分離編集で消滅（REQ-053 の行 ID は 040 まで・REQ-053-041/042 の出現 0 件を実確認。20260926 RQ-14 と同一対象で同日削除。親診断 20261004T162140Z の解消判定と一致、Jev 分類 reject 意見一致）。RQ-05 は解消確認により reject・即時削除（自律確定）: REQ-060.md:22 から 300〜600 秒の数値帯は除去済みで checker-execution-contracts.md への所有委譲を明記（20260929T165249Z RQ-34 と統合 defer だった対象。同ファイル側でも同日削除）。RQ-07 は解消確認により reject・即時削除（自律確定）: REQ-092 の retired 移管（retired/REQ-092.md で status: migrated を実確認）により MERGE 対象が消滅（親診断 20261004T162140Z の解消判定と一致、Jev 分類 reject 意見一致）。RQ-01/RQ-03/RQ-04/RQ-06/GR-05〜08/GR-10 は再評価条件未充足のため defer 継続（自律確定）。既知 defer 状況更新表の DEC-010 行は 20261004T162140Z DC-02（promote）へ昇格併合（20260925 F-08 系譜は DC-02 成果物側に保存）。却下理由の詳細は commit message に記録

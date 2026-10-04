@@ -5,14 +5,6 @@
 >
 > - F-10/F-12: 構造改善候補（DUPLICATE / MOVE）で採否が意味判断のため intake 送付候補
 
-### F-10: 検証実行結果を TIM に保存しない規範が REQ-012/REQ-021 に二重規定（軽度）
-- **category**: DUPLICATE
-- **target**: docs/requirements/REQ-012.md:29（REQ-012-035）対 docs/requirements/REQ-021.md:26（REQ-021-019）
-- **evidence**: 同一規範が表現違いで並存。両ファイルの責務分担構造（TIM 定義＝012／工程割当＝021）自体は妥当
-- **severity**: low / **confidence**: medium
-- **source_of_truth**: REQ-001-006（索引は本文を重複保持しない）の精神に基づく重複縮約候補。相互参照で緩和済み
-- **recommended_route**: 意味診断検出事項
-
 ### F-12: REQ-008-059 が要件テーブル外の見出しセクションとして定義され、内部アルゴリズム詳細を含む
 - **category**: MOVE／分類一貫性
 - **target**: docs/requirements/REQ-008.md:77-85。参照元 docs/designs/commands/req-define.md:381
@@ -52,3 +44,4 @@
 - 2026-09-23 実施（backlog-auto stage 2 inspect レーン、--auto なし、in-context 対論型レビュー）再評価: F-10/F-12 は新情報なく defer 継続（自律確定）: REQ-012-035（REQ-012.md:32）・REQ-021-019（REQ-021.md:28）・REQ-008-059 セクション（REQ-008.md:80、「TBD」「TODO」「未定」等 fixture 列挙と auto_gate 記録契約）とも内容不変を現物行の再読取で確認（stage 1 診断 20260923T050218Z の原状確認と一致）。DEC-041 新設・REQ-090 系（Jev Stage 1）の変更は両検出事項の対象領域外で、採否の意味判断条件に変化なし。Jev 先行評価（分類妥当 true、p=0.84）＋ adversarial-review（in-context・反証棄却・unresolved 1件〔GUIDE-1、本件とは別対象〕）実施済み
 - 2026-09-24 inspect-promote 再審議（in-context 審議、/agentdev/backlog-auto stage 2 inspect 系統経由、--auto なし）: F-10/F-12 は defer 継続（自律確定）: REQ-012.md:32 / REQ-021.md:28（F-10）、REQ-008.md L80 REQ-008-059（F-12）の現物を再読取で原状確認、採否の意味判断・移管先判断は残存、再評価条件に変化なし。Jev 先行評価＋ adversarial-review 実施済み（unresolved は DESIGN-4 のみで本ファイル対象外）。
 - 2026-09-29 実施（backlog-auto stage 2 inspect 系統）相互注記: F-12 は 20260925 F-05 と同一対象（REQ-008-059）であり、F-05 側の【前回 finding F-12 と同一・継続】注記に対応する相互参照を本側に追加。次回再評価時は両者を併せて判定すること
+- 2026-10-05 実施（backlog-auto stage 2 inspect 系統、--auto なし、親直列化スロット）再評価: F-10 は実質解消確認により reject・即時削除（自律確定）: REQ-012-030（REQ-012.md:27）で検証実行結果の分離所有が REQ-021 へ明示委譲され、REQ-012-035（REQ-012.md:32）と REQ-021-019（REQ-021.md:28）は相互参照付きの要約残留のみと判定（現物行実読。親診断 20261004T162140Z の実質解消判定と一致、Jev 分類 reject 意見一致）。残留は単行要約として許容し追跡終了。F-12 は新情報なく defer 継続（自律確定）。却下理由の詳細は commit message に記録

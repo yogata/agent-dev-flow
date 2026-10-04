@@ -15,10 +15,11 @@
 - reject: DB-02（20260925 F-24 と完全重複・新情報ゼロ。F-24 が追跡継続）
 - defer 継続: 下記 14 件（次サイクル再評価）
 - 2026-09-29 実施（backlog-auto stage 2 inspect 系統、--auto なし）記載修正・再評価: RQ-08 は対象行が REQ-034 行再編で移動したため target を REQ-034-007 へ更新（defer 継続・自律確定）。RQ-13 の対象に行再編由来の欠番（REQ-034 008/009）と REQ-090 008 を追記。RQ-17 は REQ-090 Stage 1 完了宣言が git log・REQ-090 本文とも確認できないため defer 継続（ユーザー確認済み）。その他 12 件は再評価条件未充足のため defer 継続（自律確定）
+- 2026-10-05 実施（backlog-auto stage 2 inspect 系統、--auto なし、親直列化スロット）再評価: RQ-14 は解消確認により reject・即時削除（自律確定）: REQ-053 の行 ID は 040 までで 041/042 は手段分離編集で消滅、REQ-053-041/042 の出現は 0 件を実確認（20260929T170714Z RQ-02 と同一対象。親診断 20261004T162140Z の解消判定と一致、Jev 分類 reject 意見一致）。RQ-04/RQ-08/RQ-09/RQ-13/RQ-15/RQ-16/DS-03/DC-02/DC-04/DC-06/DC-07/GD-02/GD-03 は再評価条件未充足のため defer 継続（自律確定）。却下理由の詳細は commit message に記録
 
 ## 検出事項リスト（defer 残置分）
 
-### REQ 体系（defer 残置 7件）
+### REQ 体系（defer 残置 6件）
 
 #### RQ-04: 「横断整合の恒常契約」の所有宣言に対する受け皿要件行が REQ-015 に存在しない
 - **category**: 現行/廃止/世代境界（世代間で孤立した要件）
@@ -57,15 +58,6 @@
 - **severity**: low / **confidence**: medium
 - **source_of_truth**: REQ-001-013（文書級の規定のみ。行級の対応物なし）
 - **recommended_route**: intake
-- **ng_classification**: pre-existing
-
-#### RQ-14: REQ-053-041 に Windows 編集運用手順（作業手順・実装手段）が要件行として存在
-- **category**: 文書分類一貫性（Design 分離基準違反: 作業手順の要件行化）
-- **target**: docs/requirements/REQ-053.md:57（REQ-053-041）
-- **evidence**: 「PowerShell 標準 cmdlet やリダイレクトによる一括読み書きを避け、edit、node readFileSync/writeFileSync…を用いること」。同一内容は AGENTS.md と docs/knowledge/windows-powershell-bulk-io-corruption.md が正本的に保持しており、文章品質契約（REQ-053）の主題とも無関係な実装手段指定
-- **severity**: medium / **confidence**: high
-- **source_of_truth**: REQ-001-002（作業手順は対象外）、REQ-056（知識層）
-- **recommended_route**: intake（MOVE/RETIRE 候補。知識層への重複正本でもある）
 - **ng_classification**: pre-existing
 
 #### RQ-15: REQ-090-011 に実装詳細（gateway スキーマ経路・検証手順）が要件行化

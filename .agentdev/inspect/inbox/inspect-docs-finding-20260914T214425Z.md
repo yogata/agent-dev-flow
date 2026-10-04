@@ -27,19 +27,6 @@
 - **ng_classification**: 今回修正対象（2026-09-13 `9100c169` 追加行）
 - **notes**: req-define入力案「REQ-038-006 の2フェーズ読込等の実装手段を Design へ移管し、要件行は突合スコープの非依存性とフォールバック契約に縮約する」
 
-### [REQ 構造] F-05: REQ-050-016 が REQ-050 の適用範囲外関心かつ実装パラメータを含む
-
-- **category**: SPLIT（+ MOVE 補助: 実装パラメータ残留）
-- **target**: docs/requirements/REQ-050.md:36（REQ-050-016）対 同ファイルの目的・適用範囲（scripts 公開入口境界）
-- **evidence**: (a) skill description 集約予算の縮約方針は REQ-050 の目的・適用範囲のいずれにも説明できない（REQ-001-041 違反）。(b) 「350 字 × 50 件相当」「lint_skills 検査契約（warning 発出）」等の内部数値・checker 参照が行を占有。計 2 シグナル以上
-- **severity**: medium-high / **confidence**: medium-high
-- **source_of_truth**: REQ-001-041（関心対象の総体として説明できること）・REQ-001-067（行数上限等は Design）。予算数値は lint_skills 検査契約・Design が正規所有先
-- **recommended_route**: SPLIT（独立関心として専用 REQ へ分割）+ 数値詳細は Design 参照へ縮約
-- **ng_classification**: 今回修正対象（2026-09-12 `1003eb4c` 追加行）
-- **notes**: req-define入力案「skill description 集約予算の運用方針を REQ-050 から切り出し、独立 REQ へ配置。予算数値の詳細は Design 参照とする」
-- **2026-09-18 審議注記**（inspect-promote 対論型レビュー）: learning 2026-09-18 に「lint-skills description 長 NG 2件（agentdev-workflow-case-ready 743 chars、case-revise 663 chars の 600 上限超過）+ aggregate budget warning が main @ c421a4b4 で恒常再現する pre-existing」という顕在化事象が記録された。予算制度の履行状況に疑問を投げかける観察だが、超過は warning であり lint_skills 検査契約どおりの動作であるため履行違反と即断できない。**SPLIT 採否の意味判断は不変で defer 継続**。ただし learning-promote 2026-09-18 が採用済み成果物 `design-candidate-autogen-staleness-prevention.md` の付帯記録として description 長の独立改善要求（一括短縮の別 Case 化候補）を昇格させており、**次回再評価では当該 learning 成果物の backlog-review 処置結果を再評価条件に含める**こと。
-- **2026-09-20 観察注記**（inspect-promote、stage 1 OBS-1）: lint_skills description 長は NG 1件（agentdev-workflow-case-open 629 chars のみ）に減少（case-ready/case-revise は短縮済み。aggregate budget warning は継続）。再評価条件の learning 成果物 `design-candidate-autogen-staleness-prevention` は `.agentdev/` 全域・`docs/knowledge/` ともに不在（backlog-review での RU 化・消費済みと推定）。恒久対策は `docs/designs/integrity/index-auto-generation.md`・`check_autogen_freshness`（鮮度違反 0）として稼働中。REQ-050-016 の行は原状（`docs/requirements/REQ-050.md:36`、「350 字 × 50 件相当」の内部数値も残存。現行スキル数 49 との軽微なずれを含む）。**SPLIT 採否の意味判断は不変のため defer 継続**。本観察は次回再評価の入力情報。
-
 ### [文書種別] GUIDE-6: 状態モデル制約が Design/Decision の frontmatter status 管理と冲突
 
 - **category**: guides 意味診断 / 横断契約矛盾
@@ -126,3 +113,4 @@
 - 2026-09-22 実施（backlog-auto run3 stage 2 inspect レーン、--auto なし、in-context 審議）再評価: F-04/F-05/GUIDE-6 は新情報なく defer 継続（自律確定）: REQ-038-006（REQ-038.md:25、2フェーズ読込の要件行混入）・REQ-050-016（REQ-050.md:36、「350 字 × 50 件相当」残存）・artifacts-and-state.md 状態モデル制約節（L145-153、「frontmatter や status フィールドによる状態管理は行わず」の一般化表現）とも内容不変を現物行の再読取で確認（run3 stage 1 診断 20260922T102316Z の原状確認と一致）。REQ-090 系（Jev Stage 1）の新設・REQ-090-011 追加はいずれの対象領域とも無関係で、採否の意味判断・文脈判断条件に変化なし。Jev 先行評価（defer、probability 1.0）＋ adversarial-review（in-context・反証棄却・unresolved 0件）実施済み
 - 2026-09-23 実施（backlog-auto stage 2 inspect レーン、--auto なし、in-context 対論型レビュー）再評価: F-04/F-05/GUIDE-6 は新情報なく defer 継続（自律確定）: REQ-038-006（REQ-038.md:25、2フェーズ読込の要件行混入）・REQ-050-016（REQ-050.md:36、「350 字 × 50 件相当」残存）・artifacts-and-state.md 状態モデル制約節（L145-153、「frontmatter や status フィールドによる状態管理は行わず」の一般化表現）とも内容不変を現物行の再読取で確認（stage 1 診断 20260923T050218Z の原状確認と一致）。F-05 の再評価条件（learning 成果物 `design-candidate-autogen-staleness-prevention` の backlog-review 処置結果）は 2026-09-20 注記どおり処置済みで変化なし。DEC-041 新設・REQ-090 系の変更は各対象領域外。Jev 先行評価（分類妥当 true、p=0.84）＋ adversarial-review（in-context・反証棄却・unresolved 1件〔GUIDE-1、本件とは別対象〕）実施済み
 - 2026-09-29 実施（backlog-auto stage 2 inspect 系統）相互注記: GUIDE-6 は 20260926 GD-02 と同一対象節（guides/artifacts-and-state.md 状態モデル制約節）であり、次回再評価時は両者を併せて判定すること
+- 2026-10-05 実施（backlog-auto stage 2 inspect 系統、--auto なし、親直列化スロット）再評価: F-05 は実質解消確認により reject・即時削除（自律確定）: REQ-050-016（REQ-050.md:36）は「本行は固定数値を記載しない」「予算算定は原本 Design の動的算式が所有」と明記済み（現物行実読。親診断 20261004T162140Z の実質解消判定と一致、Jev 分類 reject 意見一致）。SPLIT 判断の前提（適用範囲外関心+実装パラメータ）のうち実装パラメータ側は解消し、縮約方針の所有委譲も install-script-usability.md へ明示済み。description 長の履行状況は AG-005（lint_skills 既知・RU-0018 層1）で別管理。F-04/GUIDE-6 は新情報なく defer 継続（自律確定）。却下理由の詳細は commit message に記録

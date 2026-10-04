@@ -49,19 +49,7 @@
 - recommended_route: intake（是正履歴の docs/reports/ への分離）
 - ng_classification: pre-existing
 - notes: 「是正根拠 PR 番号を本欄へ追記」する運用自体が検査の安定契約として意図されている可能性があり、F-03 と一括で方針判断すべき
-
-### F-08: DEC-010 が superseded DEC-002 を現在形で「維持する」と記述
-
-- id: F-08
-- category: 横断契約矛盾（superseded 引用）
-- target: docs/decisions/DEC-010.md:35
-- evidence: 「DEC-002（ソース・プロジェクション分離）を維持する。」— 現在形の維持宣言。DEC-002 は DEC-036（v4 再定義）により superseded 済みで所有権移転
-- severity: medium
-- confidence: medium
-- source_of_truth: Decision の現行 status チェーン（DEC-036 が正の所有者）
-- recommended_route: intake（後継 DEC-036 への参照注記追加）
-- ng_classification: pre-existing
-- notes: Decision を受領時点の歴史記録として保持する立場を採るなら no-action の選択肢あり（ポリシー判断）
+- 2026-10-05 再評価注記: 親診断 20261004T162140Z の状況更新表は「解消（ルール再構成による）」と主張するが、現行 IR-044-req-spec-boundary-violation-detection.md の :40（適用例欄の #1335 出典）/:64-65（分類確定の #1335 出典）/:72（是正済み経緯の #1109 記述）/:79（#1335 是正経緯記述）に PR 番号記録・作業履歴が実存することを実読確認（20260929T170714Z 診断の行番号とも一致）。解消主張は現物と不一致のため defer 継続（親診断の状況更新表は診断履歴としてそのまま保持）
 
 ### F-09: DEC-022 が superseded DEC-015 決定4 を部分改定前提として参照
 
@@ -167,19 +155,6 @@
 - ng_classification: pre-existing
 - notes: 「先送り記録」ラベル付きで現行の不変性を同時宣言しており、先送り記録の正規配置先規約が存在しないため違反確定不能
 
-### F-23: REQ-087-004 / REQ-092-003 の実装詳細参照（安定契約例外候補）
-
-- id: F-23
-- category: MOVE（Design 分離・実装パラメータ残留）
-- target: docs/requirements/REQ-087.md:21（REQ-087-004）、docs/requirements/REQ-092.md:26（REQ-092-003）
-- evidence: REQ-087-004 が checker 名 `broken-req-ref`/`adr-req-crossref`、関数名 `extractKnownGapNumbers`、`alloc-req-number.ts` を要件行に埋め込み。REQ-092-003 が `gh issue list --search --json labels` の CLI 詳細を記述（req-structure-review「CLI 詳細の抽象化漏れ」高頻度パターン）
-- severity: low
-- confidence: low〜medium
-- source_of_truth: document-model Design Separation Criteria（安定契約例外候補として確信度調整）
-- recommended_route: intake（詳細値の Design/SKILL 正規所有への移動）
-- ng_classification: pre-existing
-- notes: 両行とも外部契約を要約し詳細を例示している側面があり安定契約例外候補。checker 名は検査体系の semi-stable 契約、REQ-087 は採番スクリプトとの単一情報源維持自体が要件主文
-
 ### F-24: scan-and-doc-diagnostics.md の docs/designs/, docs/guides/ 参照（IR-055 delta）
 
 - id: F-24
@@ -240,3 +215,4 @@
 - reject 0件
 - 旧 defer 残置分（20260901 / 20260914 の 2ファイル、計5件）は本 run では一切変更していない（原状維持）
 - 2026-09-29 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: F-04 は 20260928 RQ-26（REQ-082 phantom 範囲参照）へ併合 promote（対象同一・自律確定。RQ-26 と共に promoted/inspect-docs-promoted-20260928T145126Z.md へ保存、本ファイルから削除）。F-14 は解消確認のため reject・即時削除（自律確定）: req-health-metrics.md の計測日は 2026-09-28 へ再生成済み（現物実読）、20260928T145126Z 診断の check_autogen_freshness 0違反で解消を機械確認。日次 date rollover drift は autogen-freshness-gate Design の既知機構として管理下にあり独立 route を新設しない（却下理由は commit message に記録）。F-05/F-06/F-08〜F-10/F-15〜F-17/F-19/F-21〜F-25 は再評価条件未充足のため defer 継続（自律確定）
+- 2026-10-05 実施（backlog-auto stage 2 inspect 系統、--auto なし、親直列化スロット）再評価: F-23 は対象 REQ 2件とも retired 移管（REQ-087/REQ-092 とも retired/ で status: migrated を実確認）により解消確認 reject・即時削除（自律確定。親診断 20261004T162140Z の解消判定と一致、Jev 分類 reject 意見一致）。F-08 は 20261004T162140Z DC-02（DEC-010 現行矛盾・promote）への昇格併合のため本ファイルから削除（F-08 の論点〔Decision を受領時点の歴史記録として保持する立場 vs 後継 DEC への参照注記追加〕は DC-02 成果物側の系譜注記として保存）。F-06 は現行 IR-044 ファイルの PR 番号記録実存（:40/:64-65/:72/:79）を反証として defer 継続（上記 F-06 の 2026-10-05 再評価注記参照。親診断の解消主張は棄却したが同記録は保持）。F-17 は部分解消（REQ-048-015 で契約化・日付込み歴史記述残留）のため defer 継続（自律確定）。F-05/F-09/F-10/F-15/F-16/F-19/F-21/F-22/F-24/F-25 は再評価条件未充足のため defer 継続（自律確定）。却下理由の詳細は commit message に記録

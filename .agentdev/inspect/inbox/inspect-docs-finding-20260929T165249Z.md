@@ -11,16 +11,7 @@
 
 ## 検出事項リスト（defer 残置 8件）
 
-### REQ 体系（defer 残置 3件）
-
-#### RQ-34: REQ-060-007 が timeout 数値帯（実装パラメータ）を要件行に保持
-- **category**: 文書分類（Design 分離）
-- **target**: docs/requirements/REQ-060.md:22（REQ-060-007）
-- **evidence**: 「実行 timeout を明示指定すること（全体実行の実測所要時間が既定 timeout を超えるため、300〜600 秒の指定を標準とする）」。対照的に REQ-050-016（REQ-050.md:36）は「本行は固定数値を記載しない」と明記し、プロジェクト内記載方針と不整合
-- **severity**: low / **confidence**: medium（実測根拠付きの運用標準として REQ 性を保持する判断も可能）
-- **source_of_truth**: REQ-001-067 分離基準（REQ-001.md:79）+ REQ-050-016 の前例
-- **recommended_route**: req-define 再壁打ち（数値帯を checker 実行契約 Design へ移管し「timeout 明示指定の義務」のみへ縮約）
-- **ng_classification**: pre-existing
+### REQ 体系（defer 残置 2件）
 
 #### RQ-35: REQ-003-012 が result state enum の値列挙を要件行に保持
 - **category**: 文書分類（enum 値一覧）
@@ -137,3 +128,4 @@
 - 本ファイルは inspect-docs（backlog-auto stage 1）の検出事項出力である。分類・採用は `/agentdev/inspect-promote`（backlog-auto stage 2 inspect 系統）に委譲する
 - 機械的検査実行記録: check_integrity（report: .agentdev/integrity/reports/2026-09-29-integrity-report-9.md・非永続）、lint_skills（1 new unmanaged WARNING）、他 6スクリプト合格
 - 2026-09-30 実施（backlog-auto stage 2 inspect 系統、--auto なし）: promote 8件（RQ-31/32/33・DS-21/23/24・DC-14/15）→ promoted/inspect-docs-promoted-20260929T165249Z.md へ原状保存・本ファイルから削除。うち DS-21 は 20260929T170714Z GR-03 と、DS-24 は同 DS-01（DS-23 と同ファイル群）と、DC-14 は同 GR-01 と対象統合（backlog-review で束化判定）。defer 8件（RQ-34/35/36・DS-22/25・DC-13・GD-05・RM-02）は本ファイルに残置（RQ-34 は 170714Z RQ-05 と統合 defer。REQ-060-007 は同日 learning 評価で実測裏付け済み・変更要求なし）。HITL 承認: RQ-32・RQ-33（2026-09-30 ユーザー承認）
+- 2026-10-05 実施（backlog-auto stage 2 inspect 系統、--auto なし、親直列化スロット）再評価: RQ-34（REQ-060-007 の数値帯・20260929T170714Z RQ-05 と統合 defer だった対象）は解消確認により reject・即時削除（自律確定）: REQ-060.md:22 から 300〜600 秒の数値帯は除去され「timeout の標準値・上限値の所有は checker-execution-contracts.md『bun test 実行形態契約』節が所有する」と明記（現物行実読。親診断 20261004T162140Z の解消判定と一致、Jev 分類 reject 意見一致。対側の 170714Z RQ-05 も同日削除）。RQ-35/RQ-36/DS-22/DS-25/DC-13/GD-05/RM-02 は再評価条件未充足のため defer 継続（自律確定）。却下理由の詳細は commit message に記録
