@@ -6,6 +6,7 @@ updated: 2026-09-20
 ---
 <!-- ADF-COVERS(implementation): REQ-008-003, REQ-008-008, REQ-008-036, REQ-008-037 -->
 <!-- ADF-COVERS(implementation): REQ-005-001, REQ-005-025, REQ-005-026, REQ-005-027, REQ-005-028, REQ-035-004, REQ-035-005 -->
+<!-- ADF-COVERS(design): REQ-006-112 -->
 
 # ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応）
 
@@ -25,7 +26,7 @@ v4 ライフサイクル状態は、durable state enum（永続状態）と runt
 
 - 子 Issue 状態（pending / completed / blocked / failed の4値）を実状態とし、Epic 本文の実行構成が所有する（delegation-unavailable は result 契約の分類であり永続状態に含めない。実行未試行として pending へ戻す）
 - Wave 状態は保存せず、Wave 内子Issue 状態から導出する
-- Root Case の正規状態は単一の3値（実行継続中 / 完了 / 中止）とし、進行状況には正規状態と開始・終了日時のみを記録する（REQ-006-112）。子状態群の組による合成状態を Root 状態として保存せず、子状態は Epic 実行構成のみが保持する（物理表現の写像: 実行継続中=active、完了=closed、中止=cancelled）
+- Root Case の正規状態は open、ready、running、blocked、review、closed、cancelled の7値とし（REQ-006-112。closed=完了、cancelled=中止は終端状態）、進行状況には正規状態と開始・終了日時のみを記録する。子状態群の組による合成状態を Root 状態として保存せず、子状態は Epic 実行構成のみが保持する（物理表現の写像は backend 別の物理写像表で確定する）
 - 実行継続中の判定、完了と中止の確定は各 lifecycle 段階の契約（case-open / case-ready / case-run / case-close Design）に従い、本節は値域と所有を定義する
 
 ## 状態と遷移の定義体系
@@ -69,7 +70,7 @@ v4 ライフサイクル状態は、durable state enum（永続状態）と runt
 - Design status（draft/accepted、frontmatter 欠落時の暗黙 accepted 扱い）
 - Decision status（proposed/accepted/superseded/deprecated）
 - RU/採用済み成果物/draft lifecycle（draft -> Definition Package -> 削除/保持）
-- 子Issue 実行状態（永続系 5 状態）と case-run result 4 状態、verify-only closure
+- 子Issue 実行状態（永続系 4 状態）と case-run result 4 状態、verify-only closure
 
 統合対象外の関連状態空間として、追跡Issue 6 状態（created/in-discussion/on-hold/ready/resolved/closed）を挙げる。追跡Issue lifecycle は Case 実行ライフサイクルの外の独立状態空間であり、本機械の部分ビューに含めない。
 v3 backlog-artifact-lifecycle Design の RU/draft 状態・削除契約は本 Design の RU/採用済み成果物/draft lifecycle 部分ビュー定義へ承継された（承継分配の正は第9段 Root Case #3022。配置・権威の詳細は v4-durable-state-and-recovery Design 参照）。

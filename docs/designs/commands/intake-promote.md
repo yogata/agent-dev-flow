@@ -185,12 +185,10 @@ Workflow Skill は発動条件判定と review 呼出を独立した手順とし
 
 intake-promote は adversarial-review を原則実行する（default-on、REQ-015-002）。
 ユーザー明示指定は通常発動の必須条件ではなく、暫定分類の意味的決定が存在する場合に発動する。
-明示指定はコマンド起動時の引数、対話中の指示、または Workflow Skill extension（`.agentdev/extensions/skills/agentdev-workflow-intake-promote.yaml`）の `rules` により表明される。
 
 - **skip 条件**: 次のいずれかに該当する場合、adversarial-review を省略して従来フローを継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
   - inbox 項目が1件のみで暫定分類が自明（単一区分確定、意味的決定なし）の場合
   - inbox 空（inbox スキャンで終了）の場合
-- **ユーザー明示指定時の必須実行**: ユーザーが明示的に review を指定した場合、発動条件判定 Step は skip 条件の該当にかかわらず必ず「発動」と判定し、review 呼出 Step を実行する（REQ-015-002）。ただし review 対象（暫定分類）が存在しない場合は発動しない。
 
 ### 条件非該当時の従来フロー維持（REQ-015-003）
 

@@ -262,12 +262,6 @@ case-open は draft / RU 削除 commit を作成した直後に push する。
 case-run 引き継ぎ時の `git pull` 失敗を防止するため、削除 commit と Issue 作成の中間で作業ツリー状態を確定させる。
 `.agentdev/drafts/` 配下と `.agentdev/backlog/req-units/` 配下の削除はいずれも即時 push 対象とする。
 
-## 前工程完了度属性（REQ-003-011）
-
-case-open は子 Issue 本文に「前工程完了度」属性を埋め込む。
-分類定義は [../commands/case-ready.md](../commands/case-ready.md)「v3 epic-wave-model Design からの吸収」節の「前工程完了度 3 分類」参照。
-subagent は当該属性に応じた振る舞い指針（検証のみでも acceptance criteria 順位検証は必須等）に従う（REQ-003-012）。
-
 ## 委譲コンテキストの実現状態突合
 
 case-run 委譲時に上位工程（case-auto orchestration・委譲 prompt 生成側）が structured_context の

@@ -106,43 +106,6 @@ Issue 本文の対象範囲にローカル版（src/opencode-local 配下等）�
 
 変更後の形式を唯一の現行形式とする。presence-based 判定（Execution Contract セクションの存在有無による新旧 Issue 識別）、旧形式テンプレートの維持・移行、旧形式を一律 blocked としない運用、見出し・スキーマ版による新旧判別を行わない。新形式内の章読み取りと Issue 構造の判別は、新旧併存のための形式判定とは区別する。
 
-## Execution Contract
-
-### 変更対象成果物
-- （artifact type と対象パスのリスト）
-
-### 必須品質統制
-- （artifact-quality-control-routing Design に基づく能力キーと検証項目）
-- 監査値（bun test 件数・検出件数等）には計測基準（基準 commit または時点）を併記する
-
-### 関連 Decision 拘束条件
-- （該当 Decision と完了条件/test strategy への反映）
-
-### scope-affecting impact candidate
-- （case-open が事前探索した候補）
-
-### adversarial-review 発動契約（任意）
-- （ユーザー明示指定時のみ記録）
-```
-
-### 対象範囲表記の正規形
-
-Issue 本文の対象範囲にローカル版（src/opencode-local 配下等）の references パスを記載する際は、配置領域の接頭辞（src/opencode-local/）を明示し、配布物（.opencode/）の同名パスと区別できる表記を正規形とする。
-
-### presence-based 判定
-
-case-open は新規 Issue 作成時および case-ready / case-revise による新契約更新時に「Execution Contract」
-セクションを必ず付与する。
-case-run は当該セクションの存在有無により新旧 Issue を識別する。
-
-### legacy Issue テンプレート
-
-本変更以前の Issue テンプレートは廃止せず、履歴として維持する。既存の
-issue_desc_feature.md、issue_desc_child.md は新テンプレートへ移行する。
-issue_desc_bug.md、issue_desc_epic.md は bugfix/maintenance/docs_chore または backlog 由来であり、
-execution contract セクションの付加を検討するが必須とはしない（work_type により
-execution contract 責務が軽量なため）。
-
 ## テンプレート正規形（Parent 配置・Epic 実行構成）
 
 Epic Issue・子 Issue テンプレートの次の正規形を本 Design が正規所有する。
@@ -161,6 +124,7 @@ Epic Issue・子 Issue テンプレートの次の正規形を本 Design が正�
 - 状態の初期値は `pending`（更新は取りまとめ（case-close と工程記録の取りまとめ）が per-Epic の単一書き手として行う）
 - 状態は pending / completed / blocked / failed の4値のみとし、ready、running、Wave 状態、状態別件数を Issue 本文へ保存しない。PR 番号・URL は状態列に付記せず、子 Issue の結果・PR 自体から取得する
 - テンプレート選定規則は本 Design が、Wave 構成（wave 番号の付番）は case-ready Design「v3 epic-wave-model Design からの吸収」節（Wave 構成ルール）がそれぞれ所有する責務分担を維持する
+- Epic Root の本文に子 Issue の主な変更対象パスの固定欄を設けない（REQ-101-002）。主な変更対象は実行単位（Standard Case・各 Child Issue）が所有する宣言であり、Epic 横断の比較は必要時に Child 宣言を集約して行う
 
 ## 対象外
 
@@ -215,6 +179,7 @@ Case Issue 本文の工程記録テンプレート（issue_desc_feature.md、iss
 - Standard Case / Child Issue: 目的、対象範囲・対象外、実現方針（再判断してはならない合意がある場合のみ。非常設）、完了条件、進行状況、結果（完了・中止確定時のみ。非常設）
 - Epic Root: 上記に実行構成（`| Wave | Issue | 前提 | 状態 |` の一つの表）を加える
 - Child Issue の本文冒頭行は `親Epic: #N`
+- 本文構造に「補足情報」見出しを含めない。実行に必要な合意・制約は対象範囲・実現方針・完了条件等の正規位置へ反映する
 
 ### 完了条件
 
@@ -222,7 +187,7 @@ Case Issue 本文の工程記録テンプレート（issue_desc_feature.md、iss
 
 ### 進行状況
 
-- Standard Case / Epic Root: 正規状態（実行継続 / 完了 / 中止）と開始日時・終了日時のみ
+- Standard Case / Epic Root: 正規状態（open、ready、running、blocked、review、closed、cancelled の7値域。REQ-006-112）と開始日時・終了日時のみ
 - Child Issue: 開始日時・終了日時のみ（状態は Epic 実行構成が所有）
 
 ### 結果

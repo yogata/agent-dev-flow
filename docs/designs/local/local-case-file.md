@@ -73,29 +73,39 @@ Case 実行の物理表現。旧ローカル Case ファイルの構造を引き
 
 ### status 値域（role: case）
 
-Root Case の正規状態は実行継続、完了、中止を識別できる最小構成とする。
+Root Case の正規状態の値域は open、ready、running、blocked、review、closed、cancelled の7値とし、各値の意味は REQ-006-112 の変更前原文に従う（独自に再定義しない）。
 
 | status | 意味 | 終端状態 |
 |---|---|---|
-| `active` | 実行継続中（Root Case 確立から実行完了・中止確定まで。確定・準備・実行中・停止待機を含む） | いいえ |
+| `open` | Root Case 確立済み、Definition / execution contract 未確定、実行不可 | いいえ |
+| `ready` | canonical Definition と execution contract が確定し実行可能 | いいえ |
+| `running` | 実行中 | いいえ |
+| `blocked` | 継続条件不足 | いいえ |
+| `review` | 実装完了、最終受入対象 | いいえ |
 | `closed` | 完了 | はい |
 | `cancelled` | 中止 | はい |
 
-`closed` と `cancelled` は終端状態とし、終端状態からの遷移は定義しない。blocked、failed は子 Issue の状態として Epic 実行構成が所有し、Root Case の status 値として重複保持しない。停止・待機の理由はコメント（停止理由）で表現する。
+`closed` と `cancelled` は終端状態とし、終端状態からの遷移は定義しない（reopen を拒否する）。Epic 実行構成が所有する子 Issue の blocked、failed を Root の status 値へ重複コピーしない（子状態の重複保持禁止、REQ-035-004）。この規律は Root 自身の継続条件不足を `blocked` で表すことを禁じるものではない（子状態の重複コピー禁止と Root 固有の blocked は区別する）。停止・待機の理由はコメント（停止理由）で表現する。
 
 ### 状態遷移表（role: case）
 
 | 操作 | 変更前 status | 変更後 status |
 |---|---|---|
-| ローカル版 `case-open` | （新規作成） | `active` |
-| ローカル版 `case-ready` / `case-run` / `case-close` の各処理 | `active` | `active`（継続） |
-| ローカル版 `case-close` 完了 | `active` | `closed` |
-| 明示中止 | `active` | `cancelled` |
+| ローカル版 `case-open` | （新規作成） | `open` |
+| ローカル版 `case-ready` 成功 | `open` / `blocked` | `ready` |
+| ローカル版 `case-run` 開始 | `ready` / `blocked` | `running` |
+| ローカル版 `case-run` 完了 | `running` | `review` |
+| ローカル版 `case-run` 停止 | `running` | `blocked` |
+| ローカル版 `case-close` 停止 | `review` | `blocked` |
+| ローカル版 `case-close` 再開 | `blocked` | `review` |
+| ローカル版 `case-close` 完了 | `review` | `closed` |
+| 明示中止 | `open` / `ready` / `running` / `blocked` / `review` | `cancelled` |
 
 再開経路と禁止遷移:
 
-- 再開入口は Root Case 指定に共通とし、工程別の resume_command を使用しない。経路解決は Root Case の正規状態、Epic 実行構成、既存成果物（ローカル Git 上の取り込み結果、draft、RU）、実行の生存状況の照合で行う
+- 再開入口は Root Case 指定に共通とし、工程別の resume_command を使用しない。経路解決は Root Case の正規状態、Epic 実行構成、既存成果物（ローカル Git 上の取り込み結果、draft、RU）、実行の生存状況の照合で行う（REQ-006-114）
 - 終端状態（`closed` / `cancelled`）からの遷移は定義しない（reopen を拒否する）
+- `blocked` から `closed` への直接遷移は禁止する。`blocked` から `closed` に至る場合は `review` を経由する
 - 実行契約の確定（case-ready）を経ない実装開始を行わない（REQ-017）
 
 ### labels 値域（role: case）
