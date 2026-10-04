@@ -255,7 +255,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **再発条件**: 機械横断置換を伴う PR で、`mechanical-replacement-rules.md` Step 3-4（再 grep 0 件確認）を省略して完了宣言した場合。
 - **予防策候補**: (a) case-close QG-4 の test strategy 処理完了確認に「機械横断置換を伴う PR は再 grep 0 件確認結果を Findings に記録すること」を検査項目として追加する、(b) `mechanical-replacement-rules.md` Step 3-4 を case-run の test-fix ループに組み込み PR 本文に自動記録する仕組みを設ける。
 - **想定反映先**: `agentdev-quality-gates`（QG-4 検査項目拡充）、`agentdev-doc-writing`（`mechanical-replacement-rules.md` Step 3-4 の case-run 連動）
-- **反映先備考（2026-09-28 learning-promote）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。現行化または廃棄判定は次回再評価で確定
+- **反映先備考（2026-10-05 learning-promote 再評価）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。旧参照 REQ-0153 は現行 docs に不存在（grep 0 実測）のため参照しない。実測確認された現行の実在先は docs/knowledge/grep-zero-criteria-legacy-term-quotation.md、agentdev-quality-gates（qg-3-implementation-deviation.md・qg-4-final-acceptance.md）、agentdev-workflow-case-close issue-resolution-and-qg4.md。反映先候補はこれら実在先へ現行化した。機械置換規則（mechanical-replacement-rules.md）の現行所有先は未確認のため当該部分は不確実性を保持し、本エントリは deferred 継続とする
 - **関連**: Issue #1162, PR #1163, PR #1122, 既知 L-012（再 grep 0 件確認）を補強する追加事例、REQ-0153、commit 465d9047、`src/opencode/skills/agentdev-doc-writing/references/mechanical-replacement-rules.md`
 - **タグ**: `#inspect-docs` `#機械横断修正` `#完了宣言` `#再grep確認` `#宣言不一致`
 - **移動日**: 2026-06-27
@@ -335,7 +335,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **横展開観点**: REQ/SPEC でデータスキーマを定義する全要件。特に YAML/JSON 等の階層構造を持つファイル形式では、フィールドの「所有者（file/entry/別ノード）」を明示しないと実装者間の解釈が分かれる。
 - **再発条件**: (a) REQ でスキーマ要件を「各エントリは ... を持つ」形式で記述し、所有者階層を明示しない場合、(b) 実装者が REQ を一次ソースとして読み、実装パターン（既存類似ファイル等）を参照せずにスキーマを設計した場合。
 - **予防策候補**: (a) REQ/SPEC でスキーマ要件を記述する際、フィールド所有者（file top-level / 各 entry / 別ノード）を明示する表記規約を設ける、(b) agentdev-req-analysis / agentdev-doc-writing skill に「スキーマ要件は所有者階層を明示する」チェック項目を追加、(c) REQ-0156-011 を別 Issue で修正。
-- **反映先備考（2026-09-28 learning-promote）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。現行化または廃棄判定は次回再評価で確定
+- **反映先備考（2026-10-05 learning-promote 再評価）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。旧参照 REQ-0153 は現行 docs に不存在（grep 0 実測）のため参照しない。実測確認された現行の実在先は docs/knowledge/grep-zero-criteria-legacy-term-quotation.md、agentdev-quality-gates（qg-3-implementation-deviation.md・qg-4-final-acceptance.md）、agentdev-workflow-case-close issue-resolution-and-qg4.md。反映先候補はこれら実在先へ現行化した。機械置換規則（mechanical-replacement-rules.md）の現行所有先は未確認のため当該部分は不確実性を保持し、本エントリは deferred 継続とする
 - **想定反映先**: (a) REQ-0156-011 文言（別 Issue で修正候補）、(b) `src/opencode/skills/agentdev-req-analysis/`、`src/opencode/skills/agentdev-doc-writing/`（スキーマ要件の表記規約）、(c) `docs/specs/integrity/obsolete-path-map.yaml` ヘッダ（本 PR で対応済み、参照例）。
 - **関連**: Issue #1359、PR #1360（case-auto Draft 2 OU-003 FINAL、squash merge 562148cf）。REQ-0156-010/011/012、IR-057、`docs/specs/integrity/obsolete-path-map.yaml`。実行日時 2026-07-02。
 - **タグ**: `#req-wording` `#schema-ambiguity` `#field-ownership` `#req-0156` `#integrity` `#learning-candidate`
@@ -665,7 +665,7 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **再発条件**: SPEC 起票時に用語統一を意識しない場合。Phase 1 commit 起票時の揺れが SPEC merge 後も残存し得る。
 - **予防策候補**: (a) SPEC 起票時の用語統一チェックの強化、(b) inspect-docs への用語揺れ検出パターン追加の検討
 - **想定反映先**: `inspect-docs` command（用語揺れ検出パターン）、`agentdev-doc-writing` skill（SPEC 起票時チェック強化）
-- **反映先備考（2026-09-28 learning-promote）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。現行化または廃棄判定は次回再評価で確定
+- **反映先備考（2026-10-05 learning-promote 再評価）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。旧参照 REQ-0153 は現行 docs に不存在（grep 0 実測）のため参照しない。実測確認された現行の実在先は docs/knowledge/grep-zero-criteria-legacy-term-quotation.md、agentdev-quality-gates（qg-3-implementation-deviation.md・qg-4-final-acceptance.md）、agentdev-workflow-case-close issue-resolution-and-qg4.md。反映先候補はこれら実在先へ現行化した。機械置換規則（mechanical-replacement-rules.md）の現行所有先は未確認のため当該部分は不確実性を保持し、本エントリは deferred 継続とする
 - **関連**: PR #1749, Issue #1742, Epic #1736, REQ-0108-285, `docs/specs/skills/spec-health-metrics.md`, commit 0192019c
 - **タグ**: `#terminology` `#表記揺れ` `#spec-health-metrics` `#横断確認` `#spec-authoring`
 - **移動日**: 2026-07-23
@@ -1057,7 +1057,7 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **再発条件**: 300行近辺の既存 reference に目次有無を確認せず節を追記する場合
 - **予防策候補**: 追加編集時に当該 reference の行数と目次有無を事前確認する
 - **想定反映先**: agentdev-doc-writing の機械置換手順（mechanical-replacement-rules.md）へ事前確認段階として反映する候補
-- **反映先備考（2026-09-28 learning-promote）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。現行化または廃棄判定は次回再評価で確定
+- **反映先備考（2026-10-05 learning-promote 再評価）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。旧参照 REQ-0153 は現行 docs に不存在（grep 0 実測）のため参照しない。実測確認された現行の実在先は docs/knowledge/grep-zero-criteria-legacy-term-quotation.md、agentdev-quality-gates（qg-3-implementation-deviation.md・qg-4-final-acceptance.md）、agentdev-workflow-case-close issue-resolution-and-qg4.md。反映先候補はこれら実在先へ現行化した。機械置換規則（mechanical-replacement-rules.md）の現行所有先は未確認のため当該部分は不確実性を保持し、本エントリは deferred 継続とする
 - **関連**: PR #2397、Issue #2387、Epic #2378 Wave 3 case-close
 - **タグ**: `#ag005` `#lint-skills` `#toc`
 
@@ -1076,7 +1076,7 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **再発条件**: 同一仕様の文字列操作 API を持つ別処理系へ引数意味を確認せず移植する場合
 - **予防策候補**: 機械置換スクリプト移植時に引数意味の照合を事前確認に含める
 - **想定反映先**: agentdev-doc-writing の機械置換手順（mechanical-replacement-rules.md）へ移植時事前確認として反映する候補
-- **反映先備考（2026-09-28 learning-promote）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。現行化または廃棄判定は次回再評価で確定
+- **反映先備考（2026-10-05 learning-promote 再評価）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。旧参照 REQ-0153 は現行 docs に不存在（grep 0 実測）のため参照しない。実測確認された現行の実在先は docs/knowledge/grep-zero-criteria-legacy-term-quotation.md、agentdev-quality-gates（qg-3-implementation-deviation.md・qg-4-final-acceptance.md）、agentdev-workflow-case-close issue-resolution-and-qg4.md。反映先候補はこれら実在先へ現行化した。機械置換規則（mechanical-replacement-rules.md）の現行所有先は未確認のため当該部分は不確実性を保持し、本エントリは deferred 継続とする
 - **関連**: PR #2398、Issue #2388、Epic #2378 Wave 4 case-close
 - **タグ**: `#mechanical-replacement` `#porting` `#three-stage-procedure`
 
@@ -1365,7 +1365,7 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **再発条件**: 訳語表未登録の技術用語が配布物に存在する状態で REQ-053-004 走査を実施した場合
 - **予防策候補**: 訳語表への追補（根拠と推奨訳を明記した登録）により走査の再現性を向上
 - **想定反映先**: docs/designs/responsibilities/document-type-responsibilities.md（訳語表）、agentdev-doc-writing の査読観点
-- **反映先備考（2026-09-28 learning-promote）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。現行化または廃棄判定は次回再評価で確定
+- **反映先備考（2026-10-05 learning-promote 再評価）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。旧参照 REQ-0153 は現行 docs に不存在（grep 0 実測）のため参照しない。実測確認された現行の実在先は docs/knowledge/grep-zero-criteria-legacy-term-quotation.md、agentdev-quality-gates（qg-3-implementation-deviation.md・qg-4-final-acceptance.md）、agentdev-workflow-case-close issue-resolution-and-qg4.md。反映先候補はこれら実在先へ現行化した。機械置換規則（mechanical-replacement-rules.md）の現行所有先は未確認のため当該部分は不確実性を保持し、本エントリは deferred 継続とする
 - **関連**: PR #2478 本文「Findings / Capture候補」learning 1 件（回収元: https://github.com/yogata/agent-dev-flow/pull/2478 ）
 - **タグ**: `#req053` `#訳語表` `#英字混在` `#走査再現性`
 
@@ -1438,7 +1438,7 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **再発条件**: 参照される見出し語を変更した際に参照元ファイルの語彙追随確認を行わなかった場合
 - **予防策候補**: 用語変更 Case の検証手順に「参照先用語の横断確認」を前置条件として組み込む（変更対象外ファイルを含む）
 - **想定反映先**: REQ-053 の走査手順、agentdev-workflow-case-run の配布物改修系 Case の検証手順、agentdev-doc-writing の査読観点
-- **反映先備考（2026-09-28 learning-promote）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。現行化または廃棄判定は次回再評価で確定
+- **反映先備考（2026-10-05 learning-promote 再評価）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。旧参照 REQ-0153 は現行 docs に不存在（grep 0 実測）のため参照しない。実測確認された現行の実在先は docs/knowledge/grep-zero-criteria-legacy-term-quotation.md、agentdev-quality-gates（qg-3-implementation-deviation.md・qg-4-final-acceptance.md）、agentdev-workflow-case-close issue-resolution-and-qg4.md。反映先候補はこれら実在先へ現行化した。機械置換規則（mechanical-replacement-rules.md）の現行所有先は未確認のため当該部分は不確実性を保持し、本エントリは deferred 継続とする
 - **関連**: PR #2484 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2484 ）
 - **タグ**: `#見出し語` `#参照整合` `#用語変更`
 
@@ -1457,7 +1457,7 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **再発条件**: 訳語表未登録の複合技術語を配布物側で先に訳語化した場合
 - **予防策候補**: 訳語候補の訳語表への先行登録（根拠と推奨訳を明記）を配布物の訳語化の前置条件とする
 - **想定反映先**: docs/designs/responsibilities/document-type-responsibilities.md（訳語表）、agentdev-doc-writing の査読観点
-- **反映先備考（2026-09-28 learning-promote）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。現行化または廃棄判定は次回再評価で確定
+- **反映先備考（2026-10-05 learning-promote 再評価）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。旧参照 REQ-0153 は現行 docs に不存在（grep 0 実測）のため参照しない。実測確認された現行の実在先は docs/knowledge/grep-zero-criteria-legacy-term-quotation.md、agentdev-quality-gates（qg-3-implementation-deviation.md・qg-4-final-acceptance.md）、agentdev-workflow-case-close issue-resolution-and-qg4.md。反映先候補はこれら実在先へ現行化した。機械置換規則（mechanical-replacement-rules.md）の現行所有先は未確認のため当該部分は不確実性を保持し、本エントリは deferred 継続とする
 - **関連**: PR #2484 本文「Findings / Capture候補」learning（回収元: https://github.com/yogata/agent-dev-flow/pull/2484 ）
 - **タグ**: `#訳語表` `#用語政策` `#docs配布物用語差`
 
@@ -1682,7 +1682,7 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **再現条件**: docs 本文に plain な REQ-NNN-NNN（存在しない行 ID）を記録した場合
 - **予防策**: 旧行 ID 等の歴史参照は code span で記録する執筆規約を明文化する
 - **横展開候補**: agentdev-doc-writing（執筆規範）、learning-promote で判定
-- **反映先備考（2026-09-28 learning-promote）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。現行化または廃棄判定は次回再評価で確定
+- **反映先備考（2026-10-05 learning-promote 再評価）**: 反映先候補 agentdev-doc-writing は不在スキル（Case #3200 で語彙レジストリ削除済み）。旧参照 REQ-0153 は現行 docs に不存在（grep 0 実測）のため参照しない。実測確認された現行の実在先は docs/knowledge/grep-zero-criteria-legacy-term-quotation.md、agentdev-quality-gates（qg-3-implementation-deviation.md・qg-4-final-acceptance.md）、agentdev-workflow-case-close issue-resolution-and-qg4.md。反映先候補はこれら実在先へ現行化した。機械置換規則（mechanical-replacement-rules.md）の現行所有先は未確認のため当該部分は不確実性を保持し、本エントリは deferred 継続とする
 - **関連**: PR #2612 本文 Findings セクションからの capture 回収（case-close STEP-6）
 - **タグ**: #integrity #ir067 #docs-check #case-run #verification
 
@@ -2764,5 +2764,145 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **タグ**: `#powershell` `#文字列補間` `#ParserError` `#capture`
 - **移動日**: 2026-10-03
 - **処分判定**: deferred（2026-10-03 評価。PowerShell 補間書式の実務知見 1 件・本プロジェクトでの再発観測 1 回。再評価条件: PowerShell 系テスト追加時の再観測時）
+
+---
+
+## 2026-10-03: yomiyasu lint の表行は構造保護で char_count 0 になる（セル抽出が必要）
+
+- **問題事象**: REQ 行（Markdown 表行）を lint に渡すと char_count 0 で PASS 判定になる。lint の Markdown 構造保護前処理が表行を文字数計算対象外とするため、表行単体の検査は常に空判定になる
+- **発生局面**: case-open STEP-6 yomiyasu 遡及適用（Case #3352・REQ-093-004 行検査）
+- **検知方法**: 表行の lint 実行で char_count 0 が返ることの確認
+- **根本原因**: lint の Markdown 構造保護前処理が表行を計算対象外とする
+- **自律対応内容**: PASS 判定を「検査済み」と解釈せず、表セル本文の抽出検査を要する
+- **ユーザー確認有無**: なし
+- **REQ/Decision/Design影響**: なし
+- **横展開観点**: REQ 行等の表行を検査する全工程（yomiyasu 適用時）
+- **再発条件**: 表行を lint にそのまま渡して検査済み扱いにする場合
+- **予防策候補**: 表行検査は表セル本文を抽出して実施する手順化（yomiyasu skill 適用手順への追記候補）
+- **想定反映先**: yomiyasu skill の適用手順・lint 運用
+- **関連**: Case #3352 実行時の自工程観測
+- **タグ**: `#yomiyasu` `#lint` `#table-row` `#false-pass`
+- **移動日**: 2026-10-05
+- **処分判定**: deferred（2026-10-05 learning-promote。単発・lint 運用知見。再評価条件: yomiyasu 表行検査の再観測時）
+
+---
+
+## 2026-10-03: IR-055 warning 総数 ratchet の計数対象の構成は checker 実測対照でしか確定できない
+
+- **問題事象**: warning total（demote 前・exemptions 適用後の総数）57 > cap 53 の解消において、内訳（baseline-known 40件・exemption 対象 10件・true positive 2件・skill-use-for-boundary 4件・gh-direct-invocation 1件）は checker 実行の実測対照（base と変更後の同条件比較）でしか確定できなかった。baseline-known 40件は demote 対象として実測確認まで実施
+- **発生局面**: case-run RA-009 IR-055 warning 総数 ratchet 解消（Case #3338・OU-008）
+- **検知方法**: checker 実行レポートの内訳突合
+- **根本原因**: ratchet 計数対象の構成の理解が checker 実測対照を要する（integrity-contracts.md 側の明文化が望ましい。checker-execution-contracts.md の当該 PR 追記で実行面は補完済み）
+- **自律対応内容**: 内訳明細の実測対照を最初に取得してから解消を実施
+- **ユーザー確認有無**: なし
+- **REQ/Decision/Design影響**: なし
+- **横展開観点**: ratchet 系指標（warning 総数・NG 総数等）の対応全般
+- **再発条件**: ratchet 系指標の解消で内訳を実測対照せずに進める場合
+- **予防策候補**: ratchet 系指標の対応では内訳明細の実測対照を最初に取得する手順化・integrity-contracts.md 側の明文化候補
+- **想定反映先**: docs/designs/integrity/integrity-contracts.md（ratchet 計数対象の明文化）
+- **関連**: PR #3378 Findings/learning（Case #3338・backlog-pool-20261003・OU-008）
+- **タグ**: `#ir-055` `#ratchet` `#checker-observation` `#integrity-contracts`
+- **移動日**: 2026-10-05
+- **処分判定**: deferred（2026-10-05 learning-promote。単発・明文化候補の観察。再評価条件: ratchet 系指標対応の再観測時）
+
+---
+
+## 2026-10-03: third-party 取得機構経由の配置は IR-068 登録と exemptions 登録の 2 段構成が必要
+
+- **問題事象**: third-party 取得機構経由で配置された git 管理外 real-dir（explainer/explainer-book/first-reader/yomiyasu）は checker 上 stale junction として検出される
+- **発生局面**: case-run RA-009 SkillProjection 不整合解消（Case #3338・OU-008）
+- **検知方法**: checker の IR-068 検出
+- **根本原因**: 投影整合検査（IR-068 manifest）と使用境界検査（skill-use-for-boundary exemptions）の双方に登録が必要な複層構造
+- **自律対応内容**: IR-068 の third_party_skills 登録（INSPECTION-TOLERATED）と skill-use-for-boundary の exemptions 登録（provenance 付き）を併用する 2 段構成で解消
+- **ユーザー確認有無**: なし
+- **REQ/Decision/Design影響**: なし
+- **横展開観点**: third-party 配置の投影整合は 1 つの登録では完結しない
+- **再発条件**: third-party スキルを新規取得・配置して片方のみ登録する場合
+- **予防策候補**: third-party 配置時の 2 段登録（manifest + exemptions）の手順化
+- **想定反映先**: IR-068 運用・agentdev-workflow-third-party-sync 契約
+- **関連**: PR #3378 Findings/learning（Case #3338・OU-008）
+- **タグ**: `#ir-068` `#third-party` `#exemptions` `#skill-projection`
+- **移動日**: 2026-10-05
+- **処分判定**: deferred（2026-10-05 learning-promote。登録手順の知見・単発。再評価条件: third-party 配置の再観測時）
+
+---
+
+## 2026-10-03: Epic の事前記録マージ順序を守った場合の Wave 1 rebase コンフリクトは sidecar・本文追記の相互非競合和集合で解消できた
+
+- **問題事象**: Epic #3391 Wave 1 の 5 PR マージで 3 件の CONFLICTING が発生したが、すべて traceability sidecar または SKILL.md 共通制約への別箇所追記の衝突であり、両側追記を保持する和集合解消（実装内容変更なし）で Level 1 rebase を完結できた
+- **発生局面**: case-close(#epic) Wave 1 マージ（#3394・#3398・#3396 の rebase。Epic 競合リスク情報の記録順序は遵守）
+- **検知方法**: 各マージ直前の pr_mergeable 再確認（UNKNOWN ポーリング後の CONFLICTING 遷移）
+- **根本原因**: 重複許可（同一 SKILL.md の節単位追記）を Wave 構成で採用したため、先マージ側の行追記と後続側の同一行編集がコンテキスト競合する
+- **自律対応内容**: 3 件とも両保持で解消。merge 後 main HEAD で配布依存境界 gate 再実行（ok・0 hits）を確認
+- **ユーザー確認有無**: なし
+- **REQ/Decision/Design影響**: なし
+- **横展開観点**: 重複許可の Wave 構成では同型コンフリクトが定型的に発生し得る。和集合解消が機械的に可能な形（独立 bullet・独立エントリの追記）に実装を収めることが Level 1 完結の条件
+- **再発条件**: 同一 SKILL.md の同一リスト・同一 sidecar セクションへ複数子 Issue が追記する Wave 構成の場合
+- **予防策候補**: 重複許可時の実装ガイド（追記位置を独立 bullet に保つ、sidecar は component 別に分離）を Epic 構成の競合リスク情報へ追記
+- **想定反映先**: case-ready の Wave 構成（競合リスク情報の処置記述）、agentdev-workflow-case-auto のコンフリクト解消 Level 1 手順
+- **関連**: Case #3391・PR #3404/#3405/#3403 のコンフリクト解消記録コメント
+- **タグ**: `#epic-wave` `#rebase` `#level1` `#sidecar` `#merge-order`
+- **移動日**: 2026-10-05
+- **処分判定**: deferred（2026-10-05 learning-promote。Epic 構成ガイドの観察記録・単発。再評価条件: 重複許可 Wave 構成の再実施時）
+
+---
+
+## 2026-10-04: bun test 1.3.6 のパスフィルタはサブストリングマッチで存在しないパス指定が類似パスを実行対象に選択し得る
+
+- **問題事象**: bun test 1.3.6 のパスフィルタはサブストリングマッチのため、worktree で存在しない `./.opencode/plugins/` を指定すると `src/opencode/plugins/`（サブストリング一致）を実行対象に選択し得る。意図したディレクトリ境界と異なる実行範囲になり得る
+- **発生局面**: case-run 委譲での Wave 4 一括検証の bun test 分割③実行（Case #3433・issues/3433#issuecomment-5979282051）
+- **検知方法**: 実行結果サマリー件数（16 files / 293 tests）と対象ディレクトリ構造確認の突合
+- **根本原因**: bun test のパスフィルタが完全パス照合でなくサブストリング照合であるため、存在しないパス指定が静かに別対象へ解決される
+- **自律対応内容**: 分割③は plugins 分割の実質実施（原本側での検証）として 0 fail を確認、実施範囲の判別可能な記録（サマリー件数 + 対象ディレクトリ構造確認）を残した
+- **ユーザー確認有無**: なし
+- **REQ/Decision/Design影響**: なし
+- **横展開観点**: worktree 環境での bun test 実行は実施範囲の判別可能な記録を要求すべき（REQ-060 checker 実行契約の実行形態記録と整合）
+- **再発条件**: worktree で `.opencode/` 配下など junction 未伝播で実パス不在のパスを指定して実行する場合
+- **予防策候補**: bun test 実行コマンドのパス指定は存在確認を前置する、または実行後にテストファイル数の突合を記録する
+- **想定反映先**: bun test 実行形態契約（checker 実行契約系）
+- **関連**: Case #3433・Epic #3425 Wave 4
+- **タグ**: `#bun-test` `#path-filter` `#worktree` `#substring-match`
+- **移動日**: 2026-10-05
+- **処分判定**: deferred（2026-10-05 learning-promote。bun 実行形態の注意・単発。再評価条件: worktree での分割実行再観測時）
+
+---
+
+## 2026-10-04: realization_actions が reference 専列挙のとき SKILL.md 制御平面の重複記述が追随漏れになり得る
+
+- **問題事象**: 配布 skill の REQ 意味変更で realization_actions が reference ファイルのみを列挙していると、SKILL.md 制御平面（STEP 表・終了条件・停止理由）側の重複記述が追随漏れになり得る。本 Case では完了条件5の横断突合で case-open SKILL.md L42/L63 の旧停止条件（blocked）と旧用語（検証不能）の残存を検出し、同一 PR 内で修正した
+- **発生局面**: case-run 委譲の RA-001 実装と case-close STEP-2 完了条件5横断突合（Case #3424・PR #3437）
+- **検知方法**: reference（root-case-and-definition-package.md）と SKILL.md の同一概念記述の横断突合
+- **根本原因**: realization_actions の列挙対象が reference のみで、SKILL.md 側の重複記述が追随対象から漏れる構造
+- **自律対応内容**: SKILL.md の STEP-2 開始条件・終了条件の停止理由リスト・旧用語を同一 commit で修正
+- **ユーザー確認有無**: なし
+- **REQ/Decision/Design影響**: なし（文書整合性検査観点の拡充候補）
+- **横展開観点**: REQ 意味変更で「SKILL.md 重複記述の追随確認」を docs-check 系検査観点または case-run 完了条件横断突合に含める価値
+- **再発条件**: realization_actions が reference 専列挙の REQ 意味変更 Case（配布 skill 変更で構造上発生し得る）
+- **予防策候補**: case-run 事前検査または check_changed_docs に SKILL.md 制御平面と reference の同概念記述突合観点の追加
+- **想定反映先**: repo-agentdev-integrity の検査観点・case-run 完了条件横断突合
+- **関連**: Case #3424（PR #3437 検証差分 完了条件5行）
+- **タグ**: `#skill-md` `#realization-actions` `#doc-consistency` `#crosscheck`
+- **移動日**: 2026-10-05
+- **処分判定**: deferred（2026-10-05 learning-promote。検査観点追加候補・単発。再評価条件: 同型追随漏れの再観測時）
+
+---
+
+## 2026-10-03: LongPathsEnabled 有効環境では Filename too long 部分失敗が再現しない（robocopy 手順の検証構成）
+
+- **問題事象**: LongPathsEnabled 有効環境（HKLM SYSTEM CurrentControlSet Control FileSystem LongPathsEnabled = 0x1）では `rmdir /s /q` が深いネスト（445 文字パス）でも成功し、Filename too long 部分失敗が再現しない。robocopy /MIR 手順の再現検証は深いネスト作成後 robocopy を直接実行する構成で実測値（rc 2・残存 0 件・rmdir rc 0）を取得した
+- **発生局面**: case-run RA-016 TS-018 robocopy /MIR 手順の再現検証（Case #3363・OU-017）
+- **検知方法**: 環境設定値（LongPathsEnabled）の確認と再現実行の結果比較
+- **根本原因**: Windows パス長制限起因の手順検証は環境設定（LongPathsEnabled）で挙動が変わる
+- **自律対応内容**: 「手順の対象となる失敗状態を作ってから手順を実行する」構成で実測し、環境ラベルを実測根拠へ付記
+- **ユーザー確認有無**: なし
+- **REQ/Decision/Design影響**: なし
+- **横展開観点**: Windows パス長制限起因の手順検証全般。環境ラベルの実測根拠付記
+- **再発条件**: LongPathsEnabled 設定差のある環境で当該手順の再現検証を実施する場合
+- **予防策候補**: 再現検証は失敗状態作成後に手順を実行する構成で実測し、環境ラベルを付記する手順化
+- **想定反映先**: worktree-operations.md 検証構成注記（現行節に未記載のため deferred で知見保持）
+- **関連**: PR #3379 Findings/learning（Case #3363・backlog-pool-20261003・OU-017）
+- **タグ**: `#windows` `#long-paths` `#robocopy` `#verification-config` `#environment-label`
+- **移動日**: 2026-10-05
+- **処分判定**: deferred（2026-10-05 learning-promote。robocopy 手順本体は worktree-operations.md L459-468 がカバー（U8 と同一）だが検証構成の知見は未記載のため living pool で保持。再評価条件: robocopy 手順の検証構成再実施時）
 
 ---
