@@ -2,7 +2,7 @@
 title: checker 実行契約と検出基盤規則
 status: accepted
 created: 2026-08-15
-updated: 2026-10-03
+updated: 2026-10-05
 ---
 <!-- ADF-COVERS(implementation): REQ-002-035 -->
 <!-- ADF-COVERS(implementation): REQ-010-062 -->
@@ -64,6 +64,17 @@ checker の新規実装・修正時に適用するパターンマッチと網羅
 - em-dash 導入時のゲート方針: em-dash（—）を配布文書へ導入する場合は、意図しない異言語文字・記号の混入を検出する既存 checker の許容更新（導入対象の明示）を同一 PR で行うことを方針とする。checker 実装自体の変更は別 Case の責務であり、本 Design は方針のみを所有する
 - check_integrity の typecheck 対象外範囲: check_integrity（docs-check）の typecheck 対象は現行の対象範囲に限定し、配布 skill scripts 全体への対象拡張は行わない（対象拡張は本方針の対象外）。対象範囲の拡張判断は別途設計判断を要する
 - traceability corpus の走査対象方針: traceability corpus の一次走査対象は、リポジトリ top-level `traceability/` 配下の YAML ファイル（component / package 単位 sidecar、`policy.yaml`）とする。sidecar と policy.yaml は対応関係と検証スコープの正規情報源であり、拡張子 `.yaml` / `.yml` を走査対象へ追加する。inline declaration（producer-only artifact の ADF-COVERS 宣言行）の走査対象拡張子は現行の `.md`、`.ts` を維持する。inline declaration は producer-only serialization であり、対応関係の完全性判定は sidecar を正規情報源として行うため、inline 走査の拡張子制限が完全性判定を制限しない
+- docs/reports（履歴参照領域）: `docs/reports/` 配下（監査・評価・観測の Report）は履歴記録領域として各検出の対象から除外する。IR-067 の docs/reports 免除・REQ-053-039（歴史記録是正対象外）と同一の位置づけであり、traceability corpus の走査対象からも除外する。Report 文書内の REQ 行 ID 参照は歴史記録として対応関係管理対象外とする
+
+## baseline 退避物と BaselineFile の役割分離と合否判定基準
+
+baseline 退避物（checker 実行 stdout の退避。ok/failures/stats 形式）と delta 検査用 BaselineFile（entries 形式）は別役割である。退避物は比較証跡であり、BaselineFile は delta 検査の入力である。両者の形式非互換は欠陥ではなく役割差とする。
+
+合否判定基準:
+- 既知違反の合否は failures の一致（件数と内容）で判定する
+- 分類層（severity・bucket 別）の件数一致を確認する
+- scanned 件数差は環境差（走査環境・OS・junction 状態に由来）として不合格根拠にしない
+- BaselineFile の全量再生成は cap 更新（増分反映）と使い分け、全量再生成時は従来の approved provenance を引き継ぐことを確認する（provenance 保全）
 
 ## 宣言的データ YAML の schema 原則
 
@@ -212,14 +223,18 @@ IR-072 の PR 期間判定は author date（git log %as）を基準とする。�
 
 worktree 環境で .opencode/skills/* junction を前提とする検査（docs/designs 側リンク検査、
 IR-062 reference-path-existence を含む）を実行する場合、junction 未伝播時には検査対象パスを
-source パス（SoT パス = 検査 root（--root 指定の対象 worktree）直下の src/opencode/ 配下。
+source パス（SoT パス = 検査 root（--root 指定の対象 worktree）直下の src/common/ 配下。
 同一チェックアウト内）へ直参照 fallback して検査を実行する。
 メインリポジトリ作業コピー側の src/opencode へ解決することは誤解決（誤リポジトリ検査）として禁止する。
 
 - fallback 判定は junction（または投影ディレクトリ）の不在を検出した時点で行う
 - fallback で実行可能な検査は実行し、実行不能な既知 skip は環境差（REQ-018-004 の環境差扱い）として区別記録する
 - fallback を使用した検査では、実行環境（worktree / main、junction 伝播状態）を環境ラベルとして検証記録に明記する（REQ-018 の環境ラベル契約に従う）
+- worktree 単独実行で junction 依存検査が必要な場合は、temp 領域への junction 投影構成を前置手順として実施してから検査する（投影構成を作業 worktree へ適用しない）
+- fallback 経路で検査対象が 0 件（zero-targets）に解決された場合は、検査を実施していない無効分類として記録し、合格として扱わない
+- main root での再実行へ切替える条件（投影構成が不能・fallback で検査対象が空・結果の信頼性が確保できない場合）は main root 実体 + --root 明示指定による読取専用再実行とする
 - 本 fallback は REQ-018「junction を前提とする構造系テストは source パス（SoT パス）への fallback で実行される」規約の checker への適用であり、worktree 作成工程（junction 自動化）を変更しない
+- 環境差の由来分離・明示記録の運用は docs/knowledge/worktree-environment-fail-classification.md を参照する
 
 ### baseline 未整備環境での対照実行の実行契約
 
@@ -260,11 +275,23 @@ QG-4 フル suite 正規形（3 cwd 分割実行、正規ランナー構成確�
 agentdev-quality-gates が正規所有する。本節はその所有権を変更せず、単独実行・ファイル単体指定時の
 一般規約と正規形への参照を提供する。
 
+実行形態規律（集約）:
+
+- tsc（typecheck）は対象 package 配下を cwd として実行する
+- bun test は worktree root を cwd とし `./` 付きパス指定で実行する（既存正規形）
+- worktree 再作成後は bun install を前置する（依存パッケージの未伝播対策）
+- 分割実行②の対象で未収録の配置（tools 等）がないかを実行前に確認する
+- checker の ESM 互換性は個別差があるため、実行不能な checker は bun 経由（モジュール import）へ切替える
+
 ### タイムアウト値
 
 bun test 実行のタイムアウトは標準 300 秒、上限 600 秒とする。実測（2026-10 時点の主スイート）
 は 197〜235 秒であり、上限到達時は検査の分離実行を検討する。既定値・上限値の変更は本 Design の
 変更として扱う（REQ-060-007 の手段詳細の分離先。inspect finding RQ-34/RQ-05 の defer を引き継ぐ）。
+
+### bun test と typecheck の併用指針
+
+bun test の pass は型整合を保証しない。配布物（.ts・型定義を含む成果物）を変更する場合は、bun test に加えて typecheck（tsc --noEmit、対象 package 配下 cwd）を併用して型不整合の検出漏れを防ぐ。型定義変更を伴う変更では、当該変更と同一変更単位で型参照側の追随を確認する。併用指針の観点記録は docs/knowledge/structure-migration-followup-checklist.md が参照先である。
 
 ## Design frontmatter 必須キー検証観点
 

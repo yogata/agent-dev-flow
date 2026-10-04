@@ -2,7 +2,7 @@
 title: command Design テンプレート
 status: accepted
 created: 2026-06-21
-updated: 2026-07-24
+updated: 2026-10-05
 ---
 
 # command Design テンプレート
@@ -63,7 +63,7 @@ updated: YYYY-MM-DD
 
 ## command Design と command 定義の対応付け（v2:REQ-0143-005）
 
-command Design は command 定義ファイル（`src/opencode/commands/agentdev/*.md`）の Step 番号を複製せず、以下の軸で command 定義と対応付ける（v2:REQ-0143-005）。
+command Design は command 定義ファイル（共通原本 `src/common/commands/agentdev/*.md`。実行時投影先は `.opencode/commands/agentdev/`）の Step 番号を複製せず、以下の軸で command 定義と対応付ける（v2:REQ-0143-005、配備形態は DEC-049）。
 
 | 対応付け軸 | 記述内容 |
 |---|---|

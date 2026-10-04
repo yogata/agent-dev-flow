@@ -2,7 +2,7 @@
 title: 文書モデル
 status: accepted
 created: 2026-08-20
-updated: "2026-09-24"
+updated: "2026-10-05"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-001, REQ-001-002, REQ-001-003, REQ-001-004, REQ-001-005, REQ-001-006, REQ-001-007, REQ-001-020, REQ-001-035, REQ-001-038, REQ-001-039, REQ-001-040, REQ-001-041, REQ-001-052, REQ-056-001 -->
 <!-- ADF-COVERS(implementation): REQ-001-066, REQ-001-067, REQ-001-068 -->
@@ -399,7 +399,7 @@ accepted Decision は意味的に不変とする（REQ-001-056〜060）。
 | **配置先 (projection)** | 実行時環境への投影先 | `.opencode/commands/agentdev/*.md`、`.opencode/skills/agentdev-*/` |
 
 **投影方向**: 原本 → 配置先 のみ（逆方向の投影は行わない）。
-配置先での直接編集は禁止し、原本を変更後に同期スクリプトで配置先を更新する（現行の責務体制は DEC-036）。
+配置先での直接編集は禁止し、原本を変更後に同期スクリプトで配置先を更新する（配備形態〔共通原本・投影モデル〕の現行体制は DEC-049。旧: DEC-002→DEC-036）。
 
 ### 参照規則 <!-- REQ-001 -->
 

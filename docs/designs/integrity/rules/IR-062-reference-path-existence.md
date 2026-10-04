@@ -2,7 +2,7 @@
 title: skill/command パス参照実在
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-05
 ---
 
 # IR-062: skill/command パス参照実在
@@ -16,7 +16,7 @@ command 定義（`.opencode/commands/agentdev/*.md`）、skill の SKILL.md、�
 
 1. 対象ファイルからパス参照パターンを抽出する。コードブロック内部、glob（`*`）、`{...}`/`<...>` placeholder は対象外とする
 2. 抽出した参照を次の順で解決する:
-   - リポジトリルート相対（`.opencode/skills/...`、`.opencode/commands/...`）: 実投影パス → `src/opencode/` fallback
+   - リポジトリルート相対（`.opencode/skills/...`、`.opencode/commands/...`）: 実投影パス → `src/common/` fallback
    - skill 相対（`scripts/`、`templates/`、`references/` 先頭）: 自 skill ディレクトリ
    - 未解決の場合: 近接コンテキストの skill 名（前後5行）→ 全 skill 探索（command 定義と reference ファイルのみ適用）
 3. SKILL.md のみ、他 skill に実在する bare 参照を cross-skill NG として報告する（明示パスへの修正を促す）。reference ファイルは正当な他 skill 資産への言及があり得るため文脈解決で ok とする
@@ -75,5 +75,5 @@ strict（参照切れは broken-reference として即時修正対象）
 
 - 検出器: `.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts`（`checkScriptTemplateReferencePaths`）
 - 回帰テスト: `.opencode/skills/repo-agentdev-integrity/scripts/check_reference_paths.test.ts`
-- 実体化テンプレート: `src/opencode/skills/agentdev-workflow-templates/templates/case-open/`（standard.md、epic.md、multi-req-epic.md）
+- 実体化テンプレート: `src/common/skills/agentdev-workflow-templates/templates/case-open/`（standard.md、epic.md、multi-req-epic.md）
 - 関連 REQ: REQ-010（docs-check）。旧 REQ-028-012（新規 IR 登録 gate、retired）

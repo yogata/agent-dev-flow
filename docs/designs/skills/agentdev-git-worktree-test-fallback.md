@@ -2,7 +2,7 @@
 title: "`agentdev-git-worktree-test-fallback` Design"
 status: accepted
 created: "2026-08-09"
-updated: "2026-09-29"
+updated: "2026-10-05"
 ---
 <!-- ADF-COVERS(implementation): REQ-018-001, REQ-018-002 -->
 <!-- ADF-COVERS(design): REQ-018-005, REQ-018-006, REQ-018-007, REQ-018-008 -->
@@ -48,6 +48,10 @@ main 等価再現の手順は次のとおりである。
 
 修復は junction セットの再構築（`scripts/install.ps1 -Mode apply` の再実行）によって行う。
 `.opencode/skills/*` は gitignore 対象の局所運用タスクであり、修復は PR 成果外として実施する。
+
+### repoRoot 解決規律と環境差 fail の由来分類
+
+テストコードの repoRoot 解決に固定階層上昇（import.meta.dir からの相対上り）を使用しない。上位方向へ repoRoot 特徴ディレクトリ（AGENTS.md と src/common を伴う階層）を探索する階層数非固定の探索により、main root と worktree の両環境で同一コードが正しく解決されること。main root 正規形実行で環境起因の既知 fail が残る場合は、fail の由来分類（環境差・構造差・実装不具合の別）を記録して扱う。
 
 ## 関連
 

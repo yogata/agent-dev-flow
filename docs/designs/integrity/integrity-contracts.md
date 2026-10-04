@@ -2,12 +2,13 @@
 title: 整合性契約
 status: accepted
 created: 2026-08-20
-updated: 2026-09-14
+updated: 2026-10-05
 ---
 <!-- ADF-COVERS(implementation): REQ-010-006 -->
 <!-- ADF-COVERS(implementation): REQ-036-022 -->
 <!-- ADF-COVERS(implementation): REQ-007-010 -->
 <!-- ADF-COVERS(implementation): REQ-099-020 -->
+<!-- ADF-COVERS(design): REQ-010-080 -->
 
 # 整合性契約
 
@@ -428,6 +429,13 @@ check_extensions の NG baseline 運用は共用 ng-baseline（additions manifes
 
 既知残存違反の処置は次の統一選択基準で行う: (a) 意図的残存（検出器語彙・パターン定義内言及）は baseline 登録し根拠を注記する、(b) 実不備は個別修正する、(c) 検出器の誤検出は検出器調整で解消する。処置は baseline 登録・修正・調整のいずれかに分類記録され、未分類残存を許さない。
 
+baseline provenance 運用規約:
+
+- merge 側（case-close）での baseline 登録は provenance（由来 Issue/PR・登録根拠・登録日）を必ず伴わせる（REQ-010-079）
+- cap 更新（増分反映）と全量再生成を使い分け、全量再生成時に approved provenance が喪失しないことを確認する
+- frontmatter ドリフト検出分の baseline 未登録を残さない
+- 参照是正系の ACT（旧参照の現行化等）は、当該変更が既知違反の解消・新規発生のいずれに当たるかを確認し、baseline 要否（登録・解除）を判定してから完了する
+
 ### 宣言的データ YAML と detector の契約（REQ-028-015/016 移管受入れ）
 
 REQ-028 の RETIRE に伴い、次の恒常契約の移管を受入れる（詳細な実行規則は checker-execution-contracts Design が所有する）。
@@ -520,8 +528,8 @@ case-ready/case-revise（Definition 保存の内部責務）/case-run/case-close
 |---|---|---|---|---|
 | case-ready / case-revise | ✓（REQ/Decision/Design files） | — | — | — |
 | case-open | — | — | — | — |
-| case-run | ✓（docs/** 変更時、--workflow case-run） | ✓（src/opencode/{commands,skills}/** 変更時、IR-056） | — | ✓（Issue 完了条件検証） |
-| case-close | ✓（PR files、--workflow case-close） | ✓（src/opencode/{commands,skills}/** 変更時、IR-056） | — | ✓（QG-4 完了条件確認） |
+| case-run | ✓（docs/** 変更時、--workflow case-run） | ✓（src/common/{commands,skills}/** 変更時、IR-056） | — | ✓（Issue 完了条件検証） |
+| case-close | ✓（PR files、--workflow case-close） | ✓（src/common/{commands,skills}/** 変更時、IR-056） | — | ✓（QG-4 完了条件確認） |
 | req-define | — | — | ✓（全体監査、検証手順） | — |
 | /repo/docs-check | ✓ | ✓ | ✓（全体監査） | — |
 

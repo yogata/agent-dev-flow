@@ -2,7 +2,7 @@
 title: ルール所有権マトリックス
 status: accepted
 created: 2026-08-20
-updated: "2026-09-20"
+updated: "2026-10-05"
 ---
 
 # ルール所有権マトリックス
@@ -24,7 +24,7 @@ req-impact-map.md の配置の原本は `../responsibilities/req-impact-map.md` 
 
 ## 配布物対応宣言（ADF-COVERS）の配置規則
 
-対応関係の正規保存方式は、repository top-level の producer/project-side `traceability/` 配下の component / package 単位 sidecar である。ADF-COVERS（implementation / verification）は、producer-only artifact に対応関係を inline 保持する場合の表現形式とし、consumer distribution closure に含まれる成果物では使用しない。配布物（`src/opencode/commands/agentdev/**`、`src/opencode/skills/agentdev-*/**` 等の実行時配布 .md）には対応宣言を記述せず、当該成果物の対応関係は sidecar で保持する。docs 配下の正規成果物（command Design、skill Design 等のリポジトリ内部設計文書）と repo-local 実装（`.opencode/skills/repo-*` の scripts 等の配布対象外ファイル）は producer-only artifact であり、inline 宣言を保持できる。inline 宣言と sidecar は同じ論理的な対応関係へ正規化され、coverage / impact / check から同一に扱われる。本配置規則により、配布物の concrete ID 排除（配布境界 baseline）と producer-side traceability metadata の非混入（distribution purity）を両立する。
+対応関係の正規保存方式は、repository top-level の producer/project-side `traceability/` 配下の component / package 単位 sidecar である。ADF-COVERS（implementation / verification）は、producer-only artifact に対応関係を inline 保持する場合の表現形式とし、consumer distribution closure に含まれる成果物では使用しない。配布物（`src/common/commands/agentdev/**`、`src/common/skills/agentdev-*/**` 等の実行時配布 .md）には対応宣言を記述せず、当該成果物の対応関係は sidecar で保持する。docs 配下の正規成果物（command Design、skill Design 等のリポジトリ内部設計文書）と repo-local 実装（`.opencode/skills/repo-*` の scripts 等の配布対象外ファイル）は producer-only artifact であり、inline 宣言を保持できる。inline 宣言と sidecar は同じ論理的な対応関係へ正規化され、coverage / impact / check から同一に扱われる。本配置規則により、配布物の concrete ID 排除（配布境界 baseline）と producer-side traceability metadata の非混入（distribution purity）を両立する。
 
 ## 意味判断・決定的処理の分類注記（DEC-048）
 
@@ -45,7 +45,7 @@ req-impact-map.md の配置の原本は `../responsibilities/req-impact-map.md` 
 | 9 | Progressive disclosure | REQ-002 (035, 036) | - | SKILL.md 入口 + `references/` 詳細 |
 | 10 | 完了報告フォーマット | REQ-002 (046), v2:REQ-0107 (013, 022) | artifact-contracts.md | 種別（`variant`）別管理 |
 | 11 | 共通処理集約 | REQ-002 (040-043) | - | Git 同期等の共通化 |
-| 12 | Source/projection 分離 | REQ-002 (048-055) | system.md | `src/opencode/` 原本 + `.opencode/` 配置先 |
+| 12 | Source/projection 分離 | REQ-002 (048-055) | system.md | `src/common/` 共通原本 + `.opencode/` 配置先（配備形態は DEC-049） |
 | 13 | Integrity 検査カテゴリ | REQ-010 (001-012), REQ-036 (001-009) | integrity-contracts.md | 18 集合、strict/heuristic/observation |
 | 14 | Finding 分類 | REQ-036 (005, 006) | integrity-contracts.md | 6 カテゴリ + 経路 |
 | 15 | Frontmatter dev metadata 禁止 | REQ-036 (010-012) | integrity-contracts.md | dev メタデータ禁止 |

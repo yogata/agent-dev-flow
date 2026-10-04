@@ -2,7 +2,7 @@
 title: "IR-064: unresolved-placeholder"
 status: accepted
 created: 2026-08-22
-updated: 2026-08-22
+updated: 2026-10-05
 ---
 
 # IR-064: unresolved-placeholder
@@ -10,11 +10,11 @@ updated: 2026-08-22
 | Field | Value |
 |-------|-------|
 | rule_id | IR-064 |
-| description | 実行時配布対象（`src/opencode/commands/agentdev/**/*.md`、`src/opencode/skills/agentdev-*/**/*.md`）に残る未解決プレースホルダーを検出する。(a) TODO/FIXME/XXX/HACK の bare トークン（strict）、(b) ID 系プレースホルダー（`REQ-{NNNN}`、`DEC-{N}` 等）の本文裸出力（heuristic）。正規テンプレート内の意図的なプレースホルダーは対象種別と許容条件に従い誤検出しない（REQ-010-065） |
+| description | 実行時配布対象（`src/common/commands/agentdev/**/*.md`、`src/common/skills/agentdev-*/**/*.md`）に残る未解決プレースホルダーを検出する。(a) TODO/FIXME/XXX/HACK の bare トークン（strict）、(b) ID 系プレースホルダー（`REQ-{NNNN}`、`DEC-{N}` 等）の本文裸出力（heuristic）。正規テンプレート内の意図的なプレースホルダーは対象種別と許容条件に従い誤検出しない（REQ-010-065） |
 | severity | strict（TODO 系）/ heuristic（ID プレースホルダー裸出力） |
 | category | document-drift |
 | detection_method | `check_integrity.ts` による行単位走査。TODO 系は `\b(TODO\|FIXME\|XXX\|HACK)\b`、ID 系は `\b(?:REQ\|DEC\|ADR\|AG\|QG\|IR\|RU\|TS\|OU\|AC\|CR\|EC\|SC\|ACT\|DD\|DESIGN\|RD\|SPEC\|WS\|GMT)-\{[^}]*\}`（文書 ID 系接頭辞の限定列挙。Wave 1 監査観点V5 と同じ限定方針） |
-| affected_artifacts | [src/opencode/commands/agentdev/**/*.md, src/opencode/skills/agentdev-*/**/*.md] |
+| affected_artifacts | [src/common/commands/agentdev/**/*.md, src/common/skills/agentdev-*/**/*.md] |
 | related_req | [REQ-010-065, REQ-010-068] |
 | related_design | [../integrity-rule-catalog.md] |
 | gate_level | full-audit |
@@ -35,7 +35,7 @@ updated: 2026-08-22
 
 | 対象 | 理由 |
 |------|------|
-| `src/opencode/commands/agentdev/templates/`、`src/opencode/skills/*/templates/`、`_template.md` | 正規テンプレート内の意図的なプレースホルダー |
+| `src/common/commands/agentdev/templates/`、`src/common/skills/*/templates/`、`_template.md` | 正規テンプレート内の意図的なプレースホルダー |
 | code block（``` 囲み）内 | 例示・パターン説明 |
 | code span（backtick 囲み）内 | 様式例示（`` `REQ-{NNNN}` `` 等） |
 | 括弧（ASCII/全角）内 | 委譲注記様式（`（DEC-{N}、REQ-{NNNN}-{NNN}）`） |

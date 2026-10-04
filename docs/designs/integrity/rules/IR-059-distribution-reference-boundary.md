@@ -2,7 +2,7 @@
 title: "IR-059: distribution-reference-boundary"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-05
 ---
 
 # IR-059: distribution-reference-boundary
@@ -18,7 +18,7 @@ updated: 2026-08-20
 | severity | strict |
 | category | canonical-conflict |
 | detection_method | 具体ID、具体パス、固定URLのパターン検出と generic/template 許容、個別承認例外判定 |
-| affected_artifacts | `src/opencode/commands/**`, `src/opencode/skills/**`, template, script ソースなど配布対象テキスト成果物全般 |
+| affected_artifacts | `src/common/commands/**`, `src/common/skills/**`, template, script ソースなど配布対象テキスト成果物全般 |
 | related_req | REQ-029 |
 | related_design | `distribution-boundary.md`, `foundations/project-extensions.md`, `integrity-rule-catalog.md` |
 | gate_level | full-audit |

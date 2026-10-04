@@ -2,7 +2,7 @@
 title: 整合性ルールカタログ
 status: accepted
 created: 2026-08-20
-updated: 2026-09-24
+updated: 2026-10-05
 ---
 <!-- ADF-COVERS(implementation): REQ-010-009 -->
 <!-- ADF-COVERS(design): REQ-051-009 -->
@@ -186,7 +186,7 @@ candidate 状態の IR は catalog への本エントリ追加を含まず、別
 | severity | heuristic |
 | category | document-drift |
 | detection_method | retired REQ/Design ID リストをソースとした本文横断検索。活性 REQ/Design への言及は対象外。supersede 元への言及は文脈判定で finding 扱い |
-| affected_artifacts | `src/opencode/commands/**`, `src/opencode/skills/**`, `docs/guides/**` |
+| affected_artifacts | `src/common/commands/**`, `src/common/skills/**`, `docs/guides/**` |
 | related_req | REQ-010, REQ-010 |
 | related_design | `docs/designs/foundations/document-model.md`（Design ライフサイクル superseded） |
 | gate_level | full-audit |
@@ -224,7 +224,7 @@ AG-005 規則群（`lint_skills.ts`、RU-0018 / Issue #2179、PR #2184 で main 
 | USE FOR 重複保持 | hard | description と本文（USE FOR 節）の重複保持 |
 | 後続トリガー語（AG-004） | hard | command-bound Workflow Skill の description における「単独起動」等後続トリガー語の欠落・不適合（command-bound のみ厳密検査） |
 | references 目次欠落 | hard | 300 行超の references ファイルにおける目次（TOC）欠落 |
-| 集約予算 350 | warn | description 平均 350 文字予算超過（N = `src/opencode/skills` 配下 SKILL.md ファイル数） |
+| 集約予算 350 | warn | description 平均 350 文字予算超過（N = `src/common/skills` 配下 SKILL.md ファイル数） |
 
 正規所有者（Design が正、linter は検出ビュー）: `agentdev-skill-authoring` Design「skill 記述基準（層1〜3）」、`command-file-format` Design「機械検査対象」。
 

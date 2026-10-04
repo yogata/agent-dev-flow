@@ -2,7 +2,7 @@
 title: Case Issue 工程記録モデル（issue-lifecycle-records）
 status: accepted
 created: 2026-10-03
-updated: 2026-10-03
+updated: 2026-10-05
 ---
 <!-- ADF-COVERS(design): REQ-101-001, REQ-101-002, REQ-101-003, REQ-101-004, REQ-101-006, REQ-101-007, REQ-101-008, REQ-101-009, REQ-101-010, REQ-101-011, REQ-101-012, REQ-101-013, REQ-101-014, REQ-101-015, REQ-101-016 -->
 
@@ -34,7 +34,7 @@ updated: 2026-10-03
 ### コメント種別と実装語彙
 
 - コメントの記録対象は、停止・失敗の理由（hold 相当）、重要な判断変更（decision_change 相当）、検証のみで完了する Issue の証拠、非自明なレビュー判断に限定する。着手（start）、引き渡し（handoff）、再開（resume）を契機とするコメントを生成しない
-- 検証スクリプト（`agentdev-workflow-case-run/scripts/record-comments.ts`）、Epic 反映エンジン（`agentdev-epic-tracker/scripts/lib/epic-reflect.ts`）、反映計画（`agentdev-workflow-case-auto/scripts/src/records-report.ts`）は、コメント生成契機の縮小に追随して start / handoff / resume 系の生成・反映経路を削除する。残存種別（hold、decision_change、検証証拠）の語彙は現行の英語識別子を維持し、三者で共有する
+- 検証スクリプト（`agentdev-workflow-case-run/scripts/record-comments.ts`）、Epic 反映エンジン（`agentdev-epic-tracker/scripts/lib/epic-reflect.ts`）、反映計画（`agentdev-workflow-case-auto/scripts/src/records-report.ts`）は、コメント生成契機の縮小に追随して start / handoff / resume 系の生成・反映経路を削除済みである（実装 9a8933fb・2026-10-03）。残存種別（hold、decision_change、検証証拠）の語彙は現行の英語識別子を維持し、三者で共有する
 - 表示用の進行状態4値（not-started / running / waiting / ended）と記録契機からの写像表を廃止する。進行状況は正規状態と開始・終了日時で表現し、進行状態が独立して更新・判断される第二の進行管理を構成しない
 
 ### 正規状態と日時

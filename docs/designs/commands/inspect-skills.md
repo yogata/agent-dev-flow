@@ -2,7 +2,7 @@
 title: inspect-skills Design
 status: accepted
 created: 2026-06-21
-updated: "2026-09-20"
+updated: "2026-10-05"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-021 -->
@@ -22,8 +22,8 @@ Command→Skill 参照妥当性と Skill 構造を、検査対象を直接修正
 
 ## 入力
 
-- Command 定義ファイル群（`src/opencode/commands/`、`.opencode/commands/`）
-- Skill 定義ファイル群（`src/opencode/skills/`、`.opencode/skills/`）
+- Command 定義ファイル群（`src/common/commands/`、`.opencode/commands/`）
+- Skill 定義ファイル群（`src/common/skills/`、`.opencode/skills/`）
 - 必要に応じて関連する template / reference / script ファイル群
 
 ## 出力
@@ -65,7 +65,7 @@ Command→Skill 参照妥当性と Skill 構造を、検査対象を直接修正
 
 ## 所有関係と委譲
 
-- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、command 定義（`src/opencode/commands/agentdev/inspect-skills.md`）はその実行時投影である（DEC-010）。
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、command 定義（共通原本 `src/common/commands/agentdev/inspect-skills.md`。実行時投影先は `.opencode/commands/agentdev/`）はその実行時投影である（DEC-010、配備形態は DEC-049）。
 - workflow 実装本体（工程構成、各診断観点の詳細手順、reference 構成）は Workflow Skill（`agentdev-workflow-inspect-skills`）が所有し、本 Design はこれらを複製しない。本 workflow は read-only-diagnostic 型であり、STEP model の対象外である（REQ-027-003）。resume point、export、import を持たず、工程一覧のラベルは順序ラベルである。中断時は先頭から再実行する。
 - Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
