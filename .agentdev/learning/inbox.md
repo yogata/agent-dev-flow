@@ -785,3 +785,35 @@
 - **想定反映先**: learning-promote での評価
 - **関連**: PR #3438・Case #3431・Epic #3425 Wave 2
 - **タグ**: `#check-integrity` `#freshness` `#git-precondition`
+
+## 2026-10-04: traceability check の extensions yaml 走査経路は manual rg では検出しにくい（sidecar 経由の coverage 宣言）
+
+- **問題事象**: 行 ID 参照追随時に unknown-req-refs の検出源特定に手間取った。.agentdev/extensions 配下の ADF-COVERS 宣言は corpus.ts の inline 走査対象外（.agentdev 除外）だが、REQ-098 系は traceability/yomiyasu-workflow-extensions.yaml sidecar 経由で coverage 宣言が機械検査対象になる（check_integrity の phantom checker は extensions yaml を直接走査するため検出されるが、unknown-req-refs 側の検出源特定に手間取った）
+- **発生局面**: case-run 委譲での REQ-098 手段行系参照追随（PR #3439・Case #3432・Epic #3425 Wave 3）
+- **検知方法**: traceability check の unknown-req-refs findings と rg 手動検索の突合で sidecar 経由宣言 58行を補完検出
+- **根本原因**: sidecar ファイル名（yomiyasu-workflow-extensions 等）が component 名から予測しにくく、「extensions yaml 宣言の機械検査経路」と「traceability sidecar 経路」の2系統を参照者が意識していない
+- **自律対応内容**: 「REQ-NNN を含む traceability 配下 sidecar 全件」を rg 検索で網羅する手順で対処
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: REQ 行 ID 参照追随時の検索網羅手順（inline 宣言 + sidecar 全件 + extensions yaml）を手順化する価値
+- **再発条件**: extensions 側 ADF-COVERS 宣言を持つ機能（yomiyasu 等）の REQ 行を編集・移管する場合
+- **予防策候補**: 参照追随手順に「traceability 配下 sidecar の REQ-NNN 全件検索」を明示
+- **想定反映先**: learning-promote での評価
+- **関連**: PR #3439・Case #3432・Epic #3425 Wave 3
+- **タグ**: `#traceability` `#sidecar` `#extensions-yaml`
+
+## 2026-10-04: Windows で PowerShell cmdlet 経由の一括編集を行わず node readFileSync/writeFileSync を使った実績
+
+- **問題事象**: なし（予防的遵守の実績記録）。sidecar・extensions yaml の行単位除去（58行）を node スクリプトで実施し UTF-8/LF 破損なし
+- **発生局面**: case-run 委譲での traceability sidecar・extensions yaml の大量行除去（PR #3439・Case #3432・Epic #3425 Wave 3）
+- **検知方法**: AGENTS.md「Windows 環境で PowerShell 標準 cmdlet（Get-Content / Set-Content）経由の既存 UTF-8（BOM なし）/LF ファイル一括読み書きは避ける」規律の適用
+- **根本原因**: なし（cp932 再符号化・CRLF 書き出しリスクの既知事象への予防）
+- **自律対応内容**: node readFileSync/writeFileSync スクリプトで行単位編集を実施
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 大量行編集の標準手段として node スクリプト経由が機能した実績（docs/knowledge/windows-powershell-bulk-io-corruption.md の規律と整合）
+- **再発条件**: Windows 環境で UTF-8/LF ファイルを一括編集する場合
+- **予防策候補**: なし（既存規律の遵守実績として記録）
+- **想定反映先**: learning-promote での評価
+- **関連**: PR #3439・Case #3432・Epic #3425 Wave 3
+- **タグ**: `#windows` `#utf8` `#bulk-edit`
