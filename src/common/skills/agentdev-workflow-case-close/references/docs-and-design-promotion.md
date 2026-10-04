@@ -109,6 +109,8 @@ QG-4 の full integrity suite 合格基準により検証スイート全体（bu
 
 **full suite 実行の省略禁止**: STEP-3 では full integrity suite（bun test 全件）実行を省略しない。対象 Case が宣言的データ・config（extension yaml、plugin 追加対象設定、判断境界文言、配布物文言）を期待値に持つテストへ影響する変更を含む場合を含め、検証スイート全体の実行を個別 checker の部分実行で代替しない。
 
+**実行結果の解析と保存証跡の関係**: 実行済み full suite・checker の件数、失敗明細、サマリーの表示変更は、保存済み証跡（退避ファイル、PR 本文検証差分セクション、SSoT コメント）の読み戻しで行う。同一情報の取得だけを目的とした full suite や checker の再実行をしない。再実行の正当理由（変更後検証、環境変更、失敗由来分類、非決定的失敗の再現確認、必須独立検査、証跡欠落）と証跡の必須要素（標準出力、標準エラー、終了コード、版、検査範囲、実行環境）の正は `agentdev-quality-gates` スキル Design「QG-4 検証証拠の再利用と再実行条件」節が所有し、本 reference は再規定しない。close の最終検証（full integrity suite、配布物変更を含む case の3検査結果確認、QG-4 checker 実測）を origin/main 取り込み済み・マージ直前の branch HEAD で実行する既存契約は維持し、case-run の保存結果だけによる省略を行わない。保存出力の欠落、切断、タイムアウト、検査範囲欠落を完全な合格証拠として扱わない。
+
 - **実行コマンド**: `bun test ./.opencode/skills/<integrity-detector-skill>/scripts/`。`./` prefix 付きで対象ディレクトリを明示指定する（必須ステップ）
 - **timeout 明示指定**: bun test フル suite 全体実行を含む検証の実行指示は、実行 timeout を明示指定する。全体実行の実測所要時間は既定 timeout を超え得るため、**300〜600 秒の指定を標準**とする。timeout 未指定（既定値での打ち切り）で全体実行を打ち切った結果を fail 証跡として扱わない
 - **N/M 件数突合**: 実行結果の「Ran N tests across M files」の N/M 件数突合を実施する（必須ステップ）。直前実績と比較して件数が急減していないかの妥当性を検証する。固定値の期待値化は行わない

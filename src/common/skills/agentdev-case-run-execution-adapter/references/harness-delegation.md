@@ -64,6 +64,7 @@ case-run は実行担当サブエージェントを委譲起動する。
 PR 本文には Issue 番号（`Refs: #N`）と実行識別情報セクション（対象 Case、実行単位、委譲単位識別子。`agentdev-workflow-templates` の実行識別情報セクション規約参照）を含める。
 併せて検証差分セクション（実行工程、検証種別、検証結果、finding 差分の5分類: 新規、修正済み、既出、撤回、無効。`agentdev-workflow-templates` の検証差分セクション規約参照）を含める。
 実行担当サブエージェントは実施した各検証（test strategy 項目検証、bun test フル suite、配布依存境界 gate、targeted docs guard、トレーサビリティ check、品質ゲート等）ごとに検証差分セクションへ実行工程 case-run の行として記録する。
+各検証行には、実施した検証の観測証跡（標準出力・標準エラーの退避先、終了コード、版、検査範囲、実行環境のうち検証種別ごとに適用される必須要素）を含める。証跡の必須要素と再実行条件の正は `agentdev-quality-gates` スキル Design「QG-4 検証証拠の再利用と再実行条件」節が所有し、本 reference は記録経路（PR 本文検証差分セクション、verify-only closure では SSoT コメント）のみを扱う。非ゼロ終了・timeout 打ち切り・切断した検証結果は、表示用のパイプや後続処理の終了コードによって成功へ変換せず、検証コマンド自体の終了コードを記録する。
 委譲 prompt の委譲識別情報ブロック（`<delegation-ident>`）の委譲単位識別子を `adf_delegation` へ転記する。
 委譲 prompt 内 実行 command の品質ゲート（code review + QA review + gate review）を通過した PR のみが作成される。
 
