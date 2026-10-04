@@ -913,3 +913,35 @@
 - **想定反映先**: learning-promote での評価
 - **関連**: Case #3440（Root Case 本文、Definition PR #3441）、.agentdev/extensions/skills/agentdev-workflow-case-open.yaml、REQ-098-002/003/004
 - **タグ**: `#req-098` `#yomiyasu` `#github-io` `#workflow-deviation`
+
+## 2026-10-04: REQ-053 系 wave レポートの参照が REQ 行の廃止・移管時に追随していない可能性（unknown-req-refs 既出 16 件の継続）
+
+- **問題事象**: traceability check の unknown-req-refs が docs/reports/req-053-*.md の REQ-053 系参照（REQ-053-013〜038）で baseline 既存の fail を継続している（Case #3442・PR #3448 実測。case-run と case-close の両工程で全件一致を確認）。REQ 行の廃止・移管時に docs/reports 配下レポートの参照が追随していない可能性がある
+- **発生局面**: case-run 検証と case-close QG-4 独立再検査（Epic #3440 Wave 1）
+- **検知方法**: traceability check（--req 対象行限定）で対象行は pass だが corpus 系 unknown-req-refs が 16 件継続
+- **根本原因**: req-053 wave 系レポートが廃止済み REQ 行 ID を参照したまま残存している疑い（本委譲では対象範囲外のため未処置）
+- **自律対応内容**: 対象行と無関係の既出 finding として工程間比較で記録（新規 0 件を確認）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: REQ 行の廃止・移管を行う Case では、docs/reports 配下の過去レポート参照の追随確認をセットで行うべき。req-053 wave 系レポートの参照健常性は別途確認余地がある
+- **再発条件**: REQ 行廃止・移管時にレポート本文の参照更新を省略する場合
+- **予防策候補**: REQ 行廃止・移管の artifact_actions に「docs/reports 等の参照残存確認」を含める候補
+- **想定反映先**: learning-promote での評価、req-053 wave 系レポートの参照健常性確認
+- **関連**: Case #3442・PR #3448、traceability check unknown-req-refs、docs/reports/req-053-*.md
+- **タグ**: `#traceability` `#unknown-req-refs` `#retired-req` `#report-references`
+
+## 2026-10-04: docs 文言期待テスト（anchor テスト）の存在を refs 変更前に grep する手順価値
+
+- **問題事象**: case-ready references への意味的追記で既存文言を含む行を修正した際、scripts/self/release/case-ready-definition-readiness.test.ts の anchor テスト（docs 文言期待テスト）が fail した。fix-and-reverify で文言固定を追随更新して合格（Case #3443・PR #3449）
+- **発生局面**: 実装（Epic #3440 Wave 1、case-ready references の手順装備）
+- **検知方法**: bun test anchor テスト実行時の fail
+- **根本原因**: anchor テストの文言固定が配布物手順文書の当該行と結合しており、意味的に無関係な行修正でも fail する。refs 変更前に当該文言を参照するテストの存在確認が手順化されていなかった
+- **自律対応内容**: anchor テスト文言固定の追随更新（1回修正して再検証合格）。readiness-and-cleanup.md STEP-6 の Definition 品質検査として docs 文言期待テスト影響確認は手順化済みだが、委譲内では checker 実行前に grep での事前検出が有効だった
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 配布物 references（.md）を編集する全 Case（case-open/case-ready/case-run/case-revise/case-close の手順装備系）で同型 fail が生じ得る。refs 変更対象行の文言を期待値に持つテストの事前 grep で初回 fail を回避できる
+- **再発条件**: anchor テストが参照する文言を含む行を references で修正する場合
+- **予防策候補**: references 編集手順に「変更対象行の文言を grep し、期待値結合テストの有無を事前確認」の前置ステップ追加候補
+- **想定反映先**: learning-promote での評価、各 workflow references 編集手順への前置ステップ追加判断
+- **関連**: Case #3443・PR #3449、scripts/self/release/case-ready-definition-readiness.test.ts
+- **タグ**: `#anchor-test` `#docs-文言期待テスト` `#grep事前検出` `#case-ready`
