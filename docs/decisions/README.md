@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は39件、提案中の Decision は1件である。
+現行の承認済み Decision は40件、提案中の Decision は0件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -63,7 +63,7 @@
 | DEC-047 | textlint 依存実体の版固定情報解決への転換 | accepted | 2026-09-29 |
 | DEC-048 | ADF判断アーキテクチャ: 判断方法・確定権限・人間判断境界の統一モデル | accepted | 2026-10-01 |
 | DEC-049 | ADF 共通原本とホスト接続領域の分離によるマルチホスト配布モデル | accepted | 2026-10-02 |
-| DEC-050 | deleteBranchOnMerge 設定不備の警告化と操作安全性停止の維持 | proposed | 2026-10-04 |
+| DEC-050 | deleteBranchOnMerge 設定不備の警告化と操作安全性停止の維持 | accepted | 2026-10-04 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -115,12 +115,12 @@
 - [DEC-047](DEC-047.md)（textlint 依存実体の版固定情報解決への転換）
 - [DEC-048](DEC-048.md)（ADF判断アーキテクチャ: 判断方法・確定権限・人間判断境界の統一モデル）
 - [DEC-049](DEC-049.md)（ADF 共通原本とホスト接続領域の分離によるマルチホスト配布モデル）
+- [DEC-050](DEC-050.md)（deleteBranchOnMerge 設定不備の警告化と操作安全性停止の維持）
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
-- [DEC-050](DEC-050.md)（deleteBranchOnMerge 設定不備の警告化と操作安全性停止の維持）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
