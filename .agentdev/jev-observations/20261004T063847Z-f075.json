@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261004T063847Z-f075",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "3件のsession由来RU（文書分類モデル/RU-06責任境界整理/RU-07設定警告化）の既存REQ照合操作分類",
+  "sourceRevision": "workspace-main-64116eb7a735f26fd041f20333f2bcb518648166",
+  "durationMs": 991,
+  "inputTokens": 2552,
+  "inputs": {
+    "requestDigest": "6c0521cbe339f7cc9792bad11114cfa2655eaa785edaacfb3808b30f6cbe8e0e",
+    "references": [
+      {
+        "label": "RU-20261004-05",
+        "path": ".agentdev/backlog/req-units/RU-20261004-05.md",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      {
+        "label": "RU-20261004-06",
+        "path": ".agentdev/backlog/req-units/RU-20261004-06.md",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      {
+        "label": "RU-20261004-07",
+        "path": ".agentdev/backlog/req-units/RU-20261004-07.md",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-ru05-reqop",
+      "questionForm": "choice",
+      "value": "REQ操作なし（既存Design更新のみで対応可）",
+      "probabilityDistribution": {
+        "REQ操作なし（既存Design更新のみで対応可）": 1,
+        "REQ-001へのappend（記述単位判定の成果行追加）": 0,
+        "REQ-001のupdate（安定契約例外の改訂）": 0
+      }
+    },
+    {
+      "questionId": "q2-ru06-req092",
+      "questionForm": "choice",
+      "value": "保証を既存REQへ統合し使用手順を配布参照文書へ分離して廃止",
+      "probabilityDistribution": {
+        "保証を既存REQへ統合し使用手順を配布参照文書へ分離して廃止": 1,
+        "全行をDesignへ分離して廃止（REQ側への統合行なし）": 0,
+        "REQ維持（廃止せず行整理のみ）": 0
+      }
+    },
+    {
+      "questionId": "q3-ru06-req092-home",
+      "questionForm": "choice",
+      "value": "REQ-095（起票・読取操作の呼出側規律）",
+      "probabilityDistribution": {
+        "REQ-095（起票・読取操作の呼出側規律）": 0.99,
+        "REQ-011（I/O境界と外部連携手段: Tool操作契約）": 0.01,
+        "REQ-052（Custom Tool種別契約と配布境界）": 0
+      }
+    },
+    {
+      "questionId": "q4-ru06-req093",
+      "questionForm": "choice",
+      "value": "種別契約行を REQ-052 へ不足分を埋めて統合し廃止（004はDesign被覆確認のみ）",
+      "probabilityDistribution": {
+        "種別契約行を REQ-052 へ不足分を埋めて統合し廃止（004はDesign被覆確認のみ）": 0.99,
+        "REQ-093を維持し手段行のDesign分離のみ": 0.01,
+        "全行をDesign・運用文書へ分離して廃止": 0
+      }
+    },
+    {
+      "questionId": "q5-ru06-req087",
+      "questionForm": "choice",
+      "value": "裁定記録義務をREQ-001へ、ギャップ検査・レジストリ単一所有をREQ-010へ統合し廃止",
+      "probabilityDistribution": {
+        "裁定記録義務をREQ-001へ、ギャップ検査・レジストリ単一所有をREQ-010へ統合し廃止": 1,
+        "REQ-010のみへ全行統合し廃止": 0,
+        "REQ-087を維持（統合しない）": 0
+      }
+    },
+    {
+      "questionId": "q6-ru06-keep-noop",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.77,
+        "false": 0.22999999999999998
+      }
+    },
+    {
+      "questionId": "q7-ru07-req030",
+      "questionForm": "choice",
+      "value": "REQ-030-018 のupdate（blocked停止から区別警告への意味変更）",
+      "probabilityDistribution": {
+        "REQ-030-018 のupdate（blocked停止から区別警告への意味変更）": 1,
+        "REQ-030への新行append（blocked停止行は残置）": 0,
+        "REQ-009-052 のupdate（必須導入条件の変更）": 0
+      }
+    },
+    {
+      "questionId": "q8-confirm",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.9,
+        "false": 0.09999999999999998
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-ru05-reqop",
+        "value": "REQ操作なし（既存Design更新のみで対応可）"
+      },
+      {
+        "questionId": "q2-ru06-req092",
+        "value": "保証を既存REQへ統合し使用手順を配布参照文書へ分離して廃止"
+      },
+      {
+        "questionId": "q3-ru06-req092-home",
+        "value": "REQ-095（起票・読取操作の呼出側規律）"
+      },
+      {
+        "questionId": "q4-ru06-req093",
+        "value": "種別契約行を REQ-052 へ不足分を埋めて統合し廃止（004はDesign被覆確認のみ）"
+      },
+      {
+        "questionId": "q5-ru06-req087",
+        "value": "裁定記録義務をREQ-001へ、ギャップ検査・レジストリ単一所有をREQ-010へ統合し廃止"
+      },
+      {
+        "questionId": "q6-ru06-keep-noop",
+        "value": true
+      },
+      {
+        "questionId": "q7-ru07-req030",
+        "value": "REQ-030-018 のupdate（blocked停止から区別警告への意味変更）"
+      },
+      {
+        "questionId": "q8-confirm",
+        "value": true
+      }
+    ]
+  }
+}

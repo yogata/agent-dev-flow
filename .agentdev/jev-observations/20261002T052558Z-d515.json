@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261002T052558Z-d515",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0159 マルチホスト併存要件の既存REQ照合帰属",
+  "sourceRevision": "50c46920ba7caa777cdca64933ec91e04a7f8c4d",
+  "durationMs": 1431,
+  "inputTokens": 2359,
+  "inputs": {
+    "requestDigest": "3d6a4ec61152a99f7215ccc767329fc789447211ef6fe992917e9dfec6150a42",
+    "references": [
+      {
+        "label": "RU-0159",
+        "path": ".agentdev/backlog/req-units/RU-0159.md",
+        "digest": "f8ff99303d020aa07d81a7ca31b010ed5d5a495aac935019a3da9b84b442b69b"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "match-attribution",
+      "questionForm": "choice",
+      "value": "CREATE",
+      "probabilityDistribution": {
+        "CREATE": 1,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "match-confidence",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.22,
+        "false": 0.78
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "match-attribution",
+        "value": "CREATE"
+      },
+      {
+        "questionId": "match-confidence",
+        "value": false
+      }
+    ]
+  }
+}

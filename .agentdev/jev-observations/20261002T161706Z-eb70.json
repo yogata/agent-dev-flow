@@ -1,0 +1,276 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261002T161706Z-eb70",
+  "workflow": "backlog-auto/intake-promote",
+  "evaluationKind": "provisional-classification",
+  "subject": "intake inbox 18件の暫定分類（採用/保留/却下）",
+  "sourceRevision": "8c2681c5",
+  "durationMs": 620,
+  "inputTokens": 3902,
+  "inputs": {
+    "requestDigest": "7252a753f61a010e704faa5904133a07e369ee81495014fcfeda2c5e1730fa41"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "c1",
+      "questionForm": "choice",
+      "value": "却下",
+      "probabilityDistribution": {
+        "採用": 0,
+        "保留": 0.01,
+        "却下": 0.99
+      }
+    },
+    {
+      "questionId": "c2",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 1,
+        "保留": 0,
+        "却下": 0
+      }
+    },
+    {
+      "questionId": "c3",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.96,
+        "保留": 0.03,
+        "却下": 0.01
+      }
+    },
+    {
+      "questionId": "c4",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.87,
+        "保留": 0.02,
+        "却下": 0.11
+      }
+    },
+    {
+      "questionId": "c5",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.9,
+        "保留": 0.06,
+        "却下": 0.04
+      }
+    },
+    {
+      "questionId": "c6",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.96,
+        "保留": 0.03,
+        "却下": 0.01
+      }
+    },
+    {
+      "questionId": "c7",
+      "questionForm": "choice",
+      "value": "却下",
+      "probabilityDistribution": {
+        "採用": 0,
+        "保留": 0,
+        "却下": 1
+      }
+    },
+    {
+      "questionId": "c8",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.8,
+        "保留": 0.15,
+        "却下": 0.05
+      }
+    },
+    {
+      "questionId": "c9",
+      "questionForm": "choice",
+      "value": "却下",
+      "probabilityDistribution": {
+        "採用": 0.33,
+        "保留": 0.04,
+        "却下": 0.63
+      }
+    },
+    {
+      "questionId": "c10",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.61,
+        "保留": 0.37,
+        "却下": 0.02
+      }
+    },
+    {
+      "questionId": "c11",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.93,
+        "保留": 0.06,
+        "却下": 0.01
+      }
+    },
+    {
+      "questionId": "c12",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.99,
+        "保留": 0.01,
+        "却下": 0
+      }
+    },
+    {
+      "questionId": "c13",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.8,
+        "保留": 0.19,
+        "却下": 0.01
+      }
+    },
+    {
+      "questionId": "c14",
+      "questionForm": "choice",
+      "value": "却下",
+      "probabilityDistribution": {
+        "採用": 0.13,
+        "保留": 0.1,
+        "却下": 0.77
+      }
+    },
+    {
+      "questionId": "c15",
+      "questionForm": "choice",
+      "value": "却下",
+      "probabilityDistribution": {
+        "採用": 0.08,
+        "保留": 0.01,
+        "却下": 0.91
+      }
+    },
+    {
+      "questionId": "c16",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.84,
+        "保留": 0.01,
+        "却下": 0.15
+      }
+    },
+    {
+      "questionId": "c17",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.94,
+        "保留": 0.05,
+        "却下": 0.01
+      }
+    },
+    {
+      "questionId": "c18",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.7,
+        "保留": 0.25,
+        "却下": 0.05
+      }
+    }
+  ],
+  "confidence": 0.99,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "c1",
+        "value": "却下"
+      },
+      {
+        "questionId": "c2",
+        "value": "採用"
+      },
+      {
+        "questionId": "c3",
+        "value": "採用"
+      },
+      {
+        "questionId": "c4",
+        "value": "採用"
+      },
+      {
+        "questionId": "c5",
+        "value": "採用"
+      },
+      {
+        "questionId": "c6",
+        "value": "採用"
+      },
+      {
+        "questionId": "c7",
+        "value": "却下"
+      },
+      {
+        "questionId": "c8",
+        "value": "採用"
+      },
+      {
+        "questionId": "c9",
+        "value": "採用",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "c10",
+        "value": "採用"
+      },
+      {
+        "questionId": "c11",
+        "value": "採用"
+      },
+      {
+        "questionId": "c12",
+        "value": "採用"
+      },
+      {
+        "questionId": "c13",
+        "value": "採用"
+      },
+      {
+        "questionId": "c14",
+        "value": "却下"
+      },
+      {
+        "questionId": "c15",
+        "value": "却下"
+      },
+      {
+        "questionId": "c16",
+        "value": "採用"
+      },
+      {
+        "questionId": "c17",
+        "value": "採用"
+      },
+      {
+        "questionId": "c18",
+        "value": "採用"
+      }
+    ]
+  }
+}

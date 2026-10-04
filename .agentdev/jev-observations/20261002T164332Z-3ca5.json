@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261002T164332Z-3ca5",
+  "workflow": "backlog-review",
+  "evaluationKind": "depends-on-resolution",
+  "subject": "22 RU 構成案の depends_on 解決（依存なし全並行扱い）の並べ替え可能性検証",
+  "sourceRevision": "08ed1fc0",
+  "durationMs": 248,
+  "inputTokens": 793,
+  "inputs": {
+    "requestDigest": "df1fbfd13cd3c275d0de3f4127b6fba4848a392cf12d082e829131c2233ed6a7",
+    "references": []
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "deps-reorderable",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.9,
+        "false": 0.09999999999999998
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "deps-reorderable",
+        "value": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,181 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260929T171526Z-fe70",
+  "workflow": "learning-promote",
+  "evaluationKind": "disposal-determination",
+  "subject": "学習 10判定単位（1クラス+9単独）の処分区分（2026-09-30 backlog-auto stage 2）",
+  "sourceRevision": "e402ce44",
+  "durationMs": 624,
+  "inputTokens": 3053,
+  "inputs": {
+    "requestDigest": "4c186015b64f3f0f220a43af947c98e774ded5ebcf4940645f2df3983ecd9f23",
+    "references": [
+      {
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "label": "learning-inbox",
+        "path": ".agentdev/learning/inbox.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-d-unit1-e1",
+      "questionForm": "choice",
+      "value": "5 既存対策の更新",
+      "probabilityDistribution": {
+        "6 deferred": 0.27,
+        "1 恒久契約候補（REQ）": 0.02,
+        "5 既存対策の更新": 0.5,
+        "dup 既存カバー": 0.21
+      }
+    },
+    {
+      "questionId": "q-d-unit2-e2",
+      "questionForm": "choice",
+      "value": "6 deferred",
+      "probabilityDistribution": {
+        "6 deferred": 0.92,
+        "4 project knowledge": 0,
+        "5 既存対策の更新": 0.07,
+        "dup 既存カバー": 0.01
+      }
+    },
+    {
+      "questionId": "q-d-unit3-e3",
+      "questionForm": "choice",
+      "value": "6 deferred",
+      "probabilityDistribution": {
+        "6 deferred": 0.43,
+        "3 恒久契約候補（Design）": 0.04,
+        "5 既存対策の更新": 0.33,
+        "dup 既存カバー": 0.2
+      }
+    },
+    {
+      "questionId": "q-d-unit4-e4",
+      "questionForm": "choice",
+      "value": "6 deferred",
+      "probabilityDistribution": {
+        "6 deferred": 0.64,
+        "5 既存対策の更新": 0.12,
+        "3 恒久契約候補（Design）": 0.11,
+        "dup 既存カバー": 0.13
+      }
+    },
+    {
+      "questionId": "q-d-unit5-e5",
+      "questionForm": "choice",
+      "value": "4 project knowledge",
+      "probabilityDistribution": {
+        "4 project knowledge": 0.98,
+        "6 deferred": 0,
+        "3 恒久契約候補（Design）": 0.02,
+        "dup 既存カバー": 0
+      }
+    },
+    {
+      "questionId": "q-d-unit6-e6",
+      "questionForm": "choice",
+      "value": "5 既存対策の更新",
+      "probabilityDistribution": {
+        "5 既存対策の更新": 0.77,
+        "6 deferred": 0.07,
+        "3 恒久契約候補（Design）": 0.16,
+        "dup 既存カバー": 0
+      }
+    },
+    {
+      "questionId": "q-d-unit7-e8",
+      "questionForm": "choice",
+      "value": "dup 既存カバー",
+      "probabilityDistribution": {
+        "dup 既存カバー": 0.98,
+        "6 deferred": 0,
+        "5 既存対策の更新": 0.01,
+        "4 project knowledge": 0.01
+      }
+    },
+    {
+      "questionId": "q-d-unit8-e9",
+      "questionForm": "choice",
+      "value": "5 既存対策の更新",
+      "probabilityDistribution": {
+        "5 既存対策の更新": 0.81,
+        "6 deferred": 0.02,
+        "4 project knowledge": 0.16,
+        "dup 既存カバー": 0.01
+      }
+    },
+    {
+      "questionId": "q-d-unit9-e11",
+      "questionForm": "choice",
+      "value": "5 既存対策の更新",
+      "probabilityDistribution": {
+        "5 既存対策の更新": 0.8099999999999999,
+        "6 deferred": 0.04,
+        "4 project knowledge": 0.14,
+        "dup 既存カバー": 0.01
+      }
+    },
+    {
+      "questionId": "q-d-unit10-classA",
+      "questionForm": "choice",
+      "value": "5 既存対策の更新",
+      "probabilityDistribution": {
+        "5 既存対策の更新": 0.97,
+        "4 project knowledge": 0.02,
+        "6 deferred": 0,
+        "3 恒久契約候補（Design）": 0.01
+      }
+    }
+  ],
+  "confidence": 0.33,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-d-unit1-e1",
+        "value": "6 deferred",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q-d-unit2-e2",
+        "value": "6 deferred"
+      },
+      {
+        "questionId": "q-d-unit3-e3",
+        "value": "6 deferred"
+      },
+      {
+        "questionId": "q-d-unit4-e4",
+        "value": "6 deferred"
+      },
+      {
+        "questionId": "q-d-unit5-e5",
+        "value": "4 project knowledge"
+      },
+      {
+        "questionId": "q-d-unit6-e6",
+        "value": "5 既存対策の更新"
+      },
+      {
+        "questionId": "q-d-unit7-e8",
+        "value": "dup 既存カバー"
+      },
+      {
+        "questionId": "q-d-unit8-e9",
+        "value": "5 既存対策の更新"
+      },
+      {
+        "questionId": "q-d-unit9-e11",
+        "value": "5 既存対策の更新"
+      },
+      {
+        "questionId": "q-d-unit10-classA",
+        "value": "5 既存対策の更新"
+      }
+    ]
+  }
+}

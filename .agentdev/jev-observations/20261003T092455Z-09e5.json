@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261003T092455Z-09e5",
+  "workflow": "case-ready",
+  "evaluationKind": "standard-epic-attribution",
+  "subject": "Root Case #3391 実現面 RA-001〜007 の実行構造帰属（3軸判断）",
+  "sourceRevision": "e7c2626bf5220a0e4bb9ae71b42fc93f20e49dd2",
+  "durationMs": 1392,
+  "inputTokens": 2538,
+  "inputs": {
+    "requestDigest": "858d3acd6cd0cb1ec427b0db5a7faac2ded796acb5826efc2e69304b322d2818"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-3391-standard-epic-dep-strength",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "関連": 0.13,
+        "弱": 0.12,
+        "必須": 0.75
+      }
+    },
+    {
+      "questionId": "q-3391-standard-epic-cohesion",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "分散": 0,
+        "部分的": 0.01,
+        "一貫": 0.99
+      }
+    },
+    {
+      "questionId": "q-3391-standard-epic-attribution",
+      "questionForm": "choice",
+      "value": "Epic",
+      "probabilityDistribution": {
+        "Standard": 0,
+        "Epic": 1
+      }
+    }
+  ],
+  "confidence": 0.42,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-3391-standard-epic-dep-strength",
+        "value": 2
+      },
+      {
+        "questionId": "q-3391-standard-epic-cohesion",
+        "value": 2
+      },
+      {
+        "questionId": "q-3391-standard-epic-attribution",
+        "value": "Epic"
+      }
+    ]
+  }
+}

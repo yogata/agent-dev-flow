@@ -1,0 +1,662 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260929T172537Z-2824",
+  "workflow": "learning-promote",
+  "evaluationKind": "eight-axis-scoring",
+  "subject": "学習 10判定単位の 7軸スコアリング（2026-09-30 backlog-auto stage 2）",
+  "sourceRevision": "e402ce44",
+  "durationMs": 306,
+  "inputTokens": 6554,
+  "inputs": {
+    "requestDigest": "d261cafefeaa4358445d591d642823f0144435f8e3c4fdf0d86cb4120f24d9a0",
+    "references": [
+      {
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "label": "learning-inbox",
+        "path": ".agentdev/learning/inbox.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-a-uA-imp",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 軽微": 0.01,
+        "2 小": 0.09,
+        "3 中": 0.27,
+        "4 大": 0.6,
+        "5 致命的": 0.03
+      }
+    },
+    {
+      "questionId": "q-a-uA-spr",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1 固有": 0.08,
+        "2 限定": 0.79,
+        "3 中程度": 0.07,
+        "4 高い": 0.06,
+        "5 汎用": 0
+      }
+    },
+    {
+      "questionId": "q-a-uA-dst",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 不明": 0.12,
+        "2 曖昧": 0.12,
+        "3 概要あり": 0.15,
+        "4 明確": 0.57,
+        "5 自足的に整備済": 0.04
+      }
+    },
+    {
+      "questionId": "q-a-uA-aut",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1 困難": 0.01,
+        "2 低い": 0.58,
+        "3 可能": 0.36,
+        "4 容易": 0.05,
+        "5 即自動化可": 0
+      }
+    },
+    {
+      "questionId": "q-a-uA-kne",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 低い": 0.2,
+        "2 やや低い": 0.29,
+        "3 中程度": 0.07,
+        "4 高い": 0.23,
+        "5 非常に高い": 0.21
+      }
+    },
+    {
+      "questionId": "q-a-uA-rec",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 極低": 0.01,
+        "2 低い": 0.03,
+        "3 中程度": 0.04,
+        "4 高い": 0.45,
+        "5 ほぼ確実": 0.47
+      }
+    },
+    {
+      "questionId": "q-a-uA-roi",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 割高": 0.02,
+        "2 やや割高": 0.03,
+        "3 妥当": 0.04,
+        "4 良い": 0.31,
+        "5 非常に良い": 0.6
+      }
+    },
+    {
+      "questionId": "q-a-u1-imp",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "1 軽微": 0.8181818181818181,
+        "2 小": 0.1616161616161616,
+        "3 中": 0.0202020202020202,
+        "4 大": 0,
+        "5 致命的": 0
+      }
+    },
+    {
+      "questionId": "q-a-u1-spr",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1 固有": 0.5599999999999999,
+        "2 限定": 0.31,
+        "3 中程度": 0.06,
+        "4 高い": 0.05,
+        "5 汎用": 0.02
+      }
+    },
+    {
+      "questionId": "q-a-u1-dst",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 不明": 0,
+        "2 曖昧": 0.09,
+        "3 概要あり": 0.37,
+        "4 明確": 0.51,
+        "5 自足的に整備済": 0.03
+      }
+    },
+    {
+      "questionId": "q-a-u1-aut",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1 困難": 0.35,
+        "2 低い": 0.46,
+        "3 可能": 0.09,
+        "4 容易": 0.05,
+        "5 即自動化可": 0.05
+      }
+    },
+    {
+      "questionId": "q-a-u1-kne",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1 低い": 0.08,
+        "2 やや低い": 0.83,
+        "3 中程度": 0.07,
+        "4 高い": 0.02,
+        "5 非常に高い": 0
+      }
+    },
+    {
+      "questionId": "q-a-u1-rec",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1 極低": 0.62,
+        "2 低い": 0.25,
+        "3 中程度": 0.06,
+        "4 高い": 0.04,
+        "5 ほぼ確実": 0.03
+      }
+    },
+    {
+      "questionId": "q-a-u1-roi",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 割高": 0.09,
+        "2 やや割高": 0.07,
+        "3 妥当": 0.16,
+        "4 良い": 0.17,
+        "5 非常に良い": 0.51
+      }
+    },
+    {
+      "questionId": "q-a-u2-spr",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 固有": 0.02,
+        "2 限定": 0.23,
+        "3 中程度": 0.28,
+        "4 高い": 0.42,
+        "5 汎用": 0.05
+      }
+    },
+    {
+      "questionId": "q-a-u2-dst",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 不明": 0.01,
+        "2 曖昧": 0.37,
+        "3 概要あり": 0.61,
+        "4 明確": 0.01,
+        "5 自足的に整備済": 0
+      }
+    },
+    {
+      "questionId": "q-a-u2-rec",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 極低": 0.01,
+        "2 低い": 0.03,
+        "3 中程度": 0.14,
+        "4 高い": 0.68,
+        "5 ほぼ確実": 0.14
+      }
+    },
+    {
+      "questionId": "q-a-u3-spr",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 固有": 0.02,
+        "2 限定": 0.28,
+        "3 中程度": 0.35,
+        "4 高い": 0.32,
+        "5 汎用": 0.03
+      }
+    },
+    {
+      "questionId": "q-a-u3-dst",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 不明": 0.02,
+        "2 曖昧": 0.35,
+        "3 概要あり": 0.57,
+        "4 明確": 0.05,
+        "5 自足的に整備済": 0.01
+      }
+    },
+    {
+      "questionId": "q-a-u3-rec",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1 極低": 0.15,
+        "2 低い": 0.63,
+        "3 中程度": 0.13,
+        "4 高い": 0.08,
+        "5 ほぼ確実": 0.01
+      }
+    },
+    {
+      "questionId": "q-a-u4-spr",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 固有": 0.01,
+        "2 限定": 0.2,
+        "3 中程度": 0.19,
+        "4 高い": 0.55,
+        "5 汎用": 0.05
+      }
+    },
+    {
+      "questionId": "q-a-u4-dst",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 不明": 0,
+        "2 曖昧": 0.09,
+        "3 概要あり": 0.76,
+        "4 明確": 0.15,
+        "5 自足的に整備済": 0
+      }
+    },
+    {
+      "questionId": "q-a-u4-rec",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 極低": 0.010000000000000002,
+        "2 低い": 0.10000000000000002,
+        "3 中程度": 0.22000000000000003,
+        "4 高い": 0.5700000000000001,
+        "5 ほぼ確実": 0.10000000000000002
+      }
+    },
+    {
+      "questionId": "q-a-u5-imp",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 軽微": 0.01,
+        "2 小": 0.08,
+        "3 中": 0.41,
+        "4 大": 0.49,
+        "5 致命的": 0.01
+      }
+    },
+    {
+      "questionId": "q-a-u5-spr",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 固有": 0.02,
+        "2 限定": 0.09,
+        "3 中程度": 0.08,
+        "4 高い": 0.39,
+        "5 汎用": 0.42
+      }
+    },
+    {
+      "questionId": "q-a-u5-dst",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1 不明": 0.44,
+        "2 曖昧": 0.26,
+        "3 概要あり": 0.25,
+        "4 明確": 0.04,
+        "5 自足的に整備済": 0.01
+      }
+    },
+    {
+      "questionId": "q-a-u5-aut",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 困難": 0.02,
+        "2 低い": 0.04,
+        "3 可能": 0.14,
+        "4 容易": 0.48,
+        "5 即自動化可": 0.32
+      }
+    },
+    {
+      "questionId": "q-a-u5-kne",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1 低い": 0.35,
+        "2 やや低い": 0.41000000000000003,
+        "3 中程度": 0.16,
+        "4 高い": 0.07,
+        "5 非常に高い": 0.01
+      }
+    },
+    {
+      "questionId": "q-a-u5-rec",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 極低": 0.02,
+        "2 低い": 0.14,
+        "3 中程度": 0.36,
+        "4 高い": 0.46,
+        "5 ほぼ確実": 0.02
+      }
+    },
+    {
+      "questionId": "q-a-u5-roi",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 割高": 0.17,
+        "2 やや割高": 0.21,
+        "3 妥当": 0.25,
+        "4 良い": 0.26,
+        "5 非常に良い": 0.11
+      }
+    },
+    {
+      "questionId": "q-a-u6-imp",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 軽微": 0,
+        "2 小": 0,
+        "3 中": 0.02,
+        "4 大": 0.97,
+        "5 致命的": 0.01
+      }
+    },
+    {
+      "questionId": "q-a-u6-spr",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 固有": 0.03,
+        "2 限定": 0.18,
+        "3 中程度": 0.18,
+        "4 高い": 0.56,
+        "5 汎用": 0.05
+      }
+    },
+    {
+      "questionId": "q-a-u6-dst",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 不明": 0.01,
+        "2 曖昧": 0.1,
+        "3 概要あり": 0.38,
+        "4 明確": 0.5,
+        "5 自足的に整備済": 0.01
+      }
+    },
+    {
+      "questionId": "q-a-u6-aut",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 困難": 0.01,
+        "2 低い": 0.28,
+        "3 可能": 0.54,
+        "4 容易": 0.16,
+        "5 即自動化可": 0.01
+      }
+    },
+    {
+      "questionId": "q-a-u6-kne",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 低い": 0.02,
+        "2 やや低い": 0.24,
+        "3 中程度": 0.31,
+        "4 高い": 0.4,
+        "5 非常に高い": 0.03
+      }
+    },
+    {
+      "questionId": "q-a-u6-rec",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 極低": 0,
+        "2 低い": 0.04,
+        "3 中程度": 0.18,
+        "4 高い": 0.75,
+        "5 ほぼ確実": 0.03
+      }
+    },
+    {
+      "questionId": "q-a-u6-roi",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 割高": 0.01,
+        "2 やや割高": 0.02,
+        "3 妥当": 0.06,
+        "4 良い": 0.52,
+        "5 非常に良い": 0.39
+      }
+    },
+    {
+      "questionId": "q-a-u8-imp",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 軽微": 0.02,
+        "2 小": 0.1,
+        "3 中": 0.41,
+        "4 大": 0.46,
+        "5 致命的": 0.01
+      }
+    },
+    {
+      "questionId": "q-a-u8-dst",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 不明": 0,
+        "2 曖昧": 0,
+        "3 概要あり": 0,
+        "4 明確": 0.01,
+        "5 自足的に整備済": 0.99
+      }
+    },
+    {
+      "questionId": "q-a-u9-imp",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 軽微": 0.03,
+        "2 小": 0.27,
+        "3 中": 0.47,
+        "4 大": 0.22,
+        "5 致命的": 0.01
+      }
+    },
+    {
+      "questionId": "q-a-u9-spr",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 固有": 0.04,
+        "2 限定": 0.28,
+        "3 中程度": 0.23,
+        "4 高い": 0.4,
+        "5 汎用": 0.05
+      }
+    },
+    {
+      "questionId": "q-a-u9-dst",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 不明": 0.01,
+        "2 曖昧": 0.06,
+        "3 概要あり": 0.12,
+        "4 明確": 0.79,
+        "5 自足的に整備済": 0.02
+      }
+    },
+    {
+      "questionId": "q-a-u9-aut",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 困難": 0.04999999999999999,
+        "2 低い": 0.20999999999999994,
+        "3 可能": 0.33999999999999997,
+        "4 容易": 0.31999999999999995,
+        "5 即自動化可": 0.07999999999999999
+      }
+    },
+    {
+      "questionId": "q-a-u9-kne",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 低い": 0.04,
+        "2 やや低い": 0.37,
+        "3 中程度": 0.29,
+        "4 高い": 0.28,
+        "5 非常に高い": 0.02
+      }
+    },
+    {
+      "questionId": "q-a-u9-rec",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 極低": 0.03,
+        "2 低い": 0.13,
+        "3 中程度": 0.21,
+        "4 高い": 0.55,
+        "5 ほぼ確実": 0.08
+      }
+    },
+    {
+      "questionId": "q-a-u9-roi",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 割高": 0.04,
+        "2 やや割高": 0.1,
+        "3 妥当": 0.11,
+        "4 良い": 0.38,
+        "5 非常に良い": 0.37
+      }
+    },
+    {
+      "questionId": "q-a-u11-imp",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 軽微": 0,
+        "2 小": 0.02,
+        "3 中": 0.18,
+        "4 大": 0.77,
+        "5 致命的": 0.03
+      }
+    },
+    {
+      "questionId": "q-a-u11-spr",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1 固有": 0.19,
+        "2 限定": 0.65,
+        "3 中程度": 0.08,
+        "4 高い": 0.07,
+        "5 汎用": 0.01
+      }
+    },
+    {
+      "questionId": "q-a-u11-dst",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 不明": 0.01,
+        "2 曖昧": 0.07,
+        "3 概要あり": 0.31,
+        "4 明確": 0.6,
+        "5 自足的に整備済": 0.01
+      }
+    },
+    {
+      "questionId": "q-a-u11-aut",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 困難": 0.02,
+        "2 低い": 0.21,
+        "3 可能": 0.55,
+        "4 容易": 0.21,
+        "5 即自動化可": 0.01
+      }
+    },
+    {
+      "questionId": "q-a-u11-kne",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 低い": 0.02,
+        "2 やや低い": 0.27,
+        "3 中程度": 0.38,
+        "4 高い": 0.31,
+        "5 非常に高い": 0.02
+      }
+    },
+    {
+      "questionId": "q-a-u11-rec",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 極低": 0.02,
+        "2 低い": 0.04,
+        "3 中程度": 0.06,
+        "4 高い": 0.24,
+        "5 ほぼ確実": 0.64
+      }
+    },
+    {
+      "questionId": "q-a-u11-roi",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 割高": 0.01,
+        "2 やや割高": 0.02,
+        "3 妥当": 0.03,
+        "4 良い": 0.29,
+        "5 非常に良い": 0.65
+      }
+    }
+  ],
+  "confidence": 0.56
+}

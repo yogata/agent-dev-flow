@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261002T065729Z-e9f7",
+  "workflow": "case-ready",
+  "evaluationKind": "execution-structure-standard-epic",
+  "subject": "Root Case #3314 の実行構造 Standard/Epic 確定（実装単位 RA-001〜007）",
+  "sourceRevision": "e18f4eeb",
+  "durationMs": 1159,
+  "inputTokens": 1380,
+  "inputs": {
+    "requestDigest": "27b755c31002e0a8ee90ad3e1d6b1765382b0f998f35b4fd683d15d332fcf9fc",
+    "references": [
+      {
+        "digest": "26c3d94182c8d50f2b8eff7f1ccc42bdb563cdafde0ad55fa11faaf94b52d7fe",
+        "label": "req-draft",
+        "path": ".agentdev/drafts/req-draft-adf-opencode-senpi-coexistence.md"
+      },
+      {
+        "digest": "f8ff99303d020aa07d81a7ca31b010ed5d5a495aac935019a3da9b84b442b69b",
+        "label": "source-ru",
+        "path": ".agentdev/backlog/req-units/RU-0159.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "dependency-strength",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "関連": 0,
+        "弱": 0,
+        "必須": 1
+      }
+    },
+    {
+      "questionId": "functional-coherence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "分散": 0.01,
+        "部分的": 0.08,
+        "一貫": 0.91
+      }
+    },
+    {
+      "questionId": "standard-or-epic",
+      "questionForm": "choice",
+      "value": "Epic",
+      "probabilityDistribution": {
+        "Standard": 0.06,
+        "Epic": 0.94
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "dependency-strength",
+        "value": 2
+      },
+      {
+        "questionId": "functional-coherence",
+        "value": 2
+      },
+      {
+        "questionId": "standard-or-epic",
+        "value": "Epic"
+      }
+    ]
+  }
+}

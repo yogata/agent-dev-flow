@@ -1,0 +1,216 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261002T155352Z-9da3",
+  "workflow": "learning-promote",
+  "evaluationKind": "problem-classification",
+  "subject": "学習 inbox 36エントリの問題クラス分類（帰属境界10エントリ・2026-10-03 backlog-auto stage 2）",
+  "sourceRevision": "42817bdd",
+  "durationMs": 2194,
+  "inputTokens": 4177,
+  "inputs": {
+    "requestDigest": "114a8a1cbc46d9ee1977c9f2ce8d67f68cf69b98cdc43b697f93537606483d95",
+    "references": [
+      {
+        "label": "inbox",
+        "path": ".agentdev/learning/inbox.md",
+        "digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "evaluation-report",
+        "path": ".agentdev/learning/evaluation-report.md",
+        "digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-c-ru0147",
+      "questionForm": "choice",
+      "value": "単独（いずれのクラスとも根本原因を共有しない）",
+      "probabilityDistribution": {
+        "PC-1 gh spawn 起動環境劣化・障害": 0,
+        "PC-2 正本・宣言的データ変更とテスト期待値の同期漏れ": 0,
+        "PC-3 spawnSync 型テスト固定 timeout 超過": 0,
+        "PC-4 worktree git stash 事故": 0,
+        "PC-5 Windows rename EPERM flaky": 0,
+        "PC-6 構造移設の追随漏れ": 0,
+        "単独（いずれのクラスとも根本原因を共有しない）": 1
+      }
+    },
+    {
+      "questionId": "q-c-3289-exception",
+      "questionForm": "choice",
+      "value": "単独（いずれのクラスとも根本原因を共有しない）",
+      "probabilityDistribution": {
+        "PC-1 gh spawn 起動環境劣化・障害": 0.44,
+        "PC-2 正本・宣言的データ変更とテスト期待値の同期漏れ": 0,
+        "PC-3 spawnSync 型テスト固定 timeout 超過": 0,
+        "PC-4 worktree git stash 事故": 0,
+        "PC-5 Windows rename EPERM flaky": 0,
+        "PC-6 構造移設の追随漏れ": 0,
+        "単独（いずれのクラスとも根本原因を共有しない）": 0.56
+      }
+    },
+    {
+      "questionId": "q-c-3293-composite",
+      "questionForm": "choice",
+      "value": "PC-2 正本・宣言的データ変更とテスト期待値の同期漏れ",
+      "probabilityDistribution": {
+        "PC-1 gh spawn 起動環境劣化・障害": 0,
+        "PC-2 正本・宣言的データ変更とテスト期待値の同期漏れ": 0.8200000000000001,
+        "PC-3 spawnSync 型テスト固定 timeout 超過": 0.18,
+        "PC-4 worktree git stash 事故": 0,
+        "PC-5 Windows rename EPERM flaky": 0,
+        "PC-6 構造移設の追随漏れ": 0,
+        "単独（いずれのクラスとも根本原因を共有しない）": 0
+      }
+    },
+    {
+      "questionId": "q-c-3327-stale",
+      "questionForm": "choice",
+      "value": "PC-6 構造移設の追随漏れ",
+      "probabilityDistribution": {
+        "PC-1 gh spawn 起動環境劣化・障害": 0,
+        "PC-2 正本・宣言的データ変更とテスト期待値の同期漏れ": 0.09,
+        "PC-3 spawnSync 型テスト固定 timeout 超過": 0,
+        "PC-4 worktree git stash 事故": 0,
+        "PC-5 Windows rename EPERM flaky": 0,
+        "PC-6 構造移設の追随漏れ": 0.91,
+        "単独（いずれのクラスとも根本原因を共有しない）": 0
+      }
+    },
+    {
+      "questionId": "q-c-u11-robocopy",
+      "questionForm": "choice",
+      "value": "単独（いずれのクラスとも根本原因を共有しない）",
+      "probabilityDistribution": {
+        "PC-1 gh spawn 起動環境劣化・障害": 0,
+        "PC-2 正本・宣言的データ変更とテスト期待値の同期漏れ": 0,
+        "PC-3 spawnSync 型テスト固定 timeout 超過": 0,
+        "PC-4 worktree git stash 事故": 0.06,
+        "PC-5 Windows rename EPERM flaky": 0.01,
+        "PC-6 構造移設の追随漏れ": 0,
+        "単独（いずれのクラスとも根本原因を共有しない）": 0.93
+      }
+    },
+    {
+      "questionId": "q-c-3252-checker",
+      "questionForm": "choice",
+      "value": "単独（いずれのクラスとも根本原因を共有しない）",
+      "probabilityDistribution": {
+        "PC-1 gh spawn 起動環境劣化・障害": 0.01,
+        "PC-2 正本・宣言的データ変更とテスト期待値の同期漏れ": 0,
+        "PC-3 spawnSync 型テスト固定 timeout 超過": 0,
+        "PC-4 worktree git stash 事故": 0,
+        "PC-5 Windows rename EPERM flaky": 0,
+        "PC-6 構造移設の追随漏れ": 0,
+        "単独（いずれのクラスとも根本原因を共有しない）": 0.99
+      }
+    },
+    {
+      "questionId": "q-c-3326-replace",
+      "questionForm": "choice",
+      "value": "単独（いずれのクラスとも根本原因を共有しない）",
+      "probabilityDistribution": {
+        "PC-1 gh spawn 起動環境劣化・障害": 0,
+        "PC-2 正本・宣言的データ変更とテスト期待値の同期漏れ": 0.04,
+        "PC-3 spawnSync 型テスト固定 timeout 超過": 0,
+        "PC-4 worktree git stash 事故": 0,
+        "PC-5 Windows rename EPERM flaky": 0,
+        "PC-6 構造移設の追随漏れ": 0.26,
+        "単独（いずれのクラスとも根本原因を共有しない）": 0.7
+      }
+    },
+    {
+      "questionId": "q-c-ru0136",
+      "questionForm": "choice",
+      "value": "PC-1 gh spawn 起動環境劣化・障害",
+      "probabilityDistribution": {
+        "PC-1 gh spawn 起動環境劣化・障害": 1,
+        "PC-2 正本・宣言的データ変更とテスト期待値の同期漏れ": 0,
+        "PC-3 spawnSync 型テスト固定 timeout 超過": 0,
+        "PC-4 worktree git stash 事故": 0,
+        "PC-5 Windows rename EPERM flaky": 0,
+        "PC-6 構造移設の追随漏れ": 0,
+        "単独（いずれのクラスとも根本原因を共有しない）": 0
+      }
+    },
+    {
+      "questionId": "q-c-3311-yaml",
+      "questionForm": "choice",
+      "value": "PC-2 正本・宣言的データ変更とテスト期待値の同期漏れ",
+      "probabilityDistribution": {
+        "PC-1 gh spawn 起動環境劣化・障害": 0,
+        "PC-2 正本・宣言的データ変更とテスト期待値の同期漏れ": 1,
+        "PC-3 spawnSync 型テスト固定 timeout 超過": 0,
+        "PC-4 worktree git stash 事故": 0,
+        "PC-5 Windows rename EPERM flaky": 0,
+        "PC-6 構造移設の追随漏れ": 0,
+        "単独（いずれのクラスとも根本原因を共有しない）": 0
+      }
+    },
+    {
+      "questionId": "q-c-u17-runner",
+      "questionForm": "choice",
+      "value": "単独（いずれのクラスとも根本原因を共有しない）",
+      "probabilityDistribution": {
+        "PC-1 gh spawn 起動環境劣化・障害": 0,
+        "PC-2 正本・宣言的データ変更とテスト期待値の同期漏れ": 0,
+        "PC-3 spawnSync 型テスト固定 timeout 超過": 0,
+        "PC-4 worktree git stash 事故": 0,
+        "PC-5 Windows rename EPERM flaky": 0,
+        "PC-6 構造移設の追随漏れ": 0,
+        "単独（いずれのクラスとも根本原因を共有しない）": 1
+      }
+    }
+  ],
+  "confidence": 0.99,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-c-ru0147",
+        "value": "単独（いずれのクラスとも根本原因を共有しない）"
+      },
+      {
+        "questionId": "q-c-3289-exception",
+        "value": "PC-1 gh spawn 起動環境劣化・障害",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q-c-3293-composite",
+        "value": "PC-2 正本・宣言的データ変更とテスト期待値の同期漏れ"
+      },
+      {
+        "questionId": "q-c-3327-stale",
+        "value": "PC-6 構造移設の追随漏れ"
+      },
+      {
+        "questionId": "q-c-u11-robocopy",
+        "value": "単独（いずれのクラスとも根本原因を共有しない）"
+      },
+      {
+        "questionId": "q-c-3252-checker",
+        "value": "単独（いずれのクラスとも根本原因を共有しない）"
+      },
+      {
+        "questionId": "q-c-3326-replace",
+        "value": "単独（いずれのクラスとも根本原因を共有しない）"
+      },
+      {
+        "questionId": "q-c-ru0136",
+        "value": "PC-1 gh spawn 起動環境劣化・障害"
+      },
+      {
+        "questionId": "q-c-3311-yaml",
+        "value": "PC-2 正本・宣言的データ変更とテスト期待値の同期漏れ"
+      },
+      {
+        "questionId": "q-c-u17-runner",
+        "value": "単独（いずれのクラスとも根本原因を共有しない）"
+      }
+    ]
+  }
+}

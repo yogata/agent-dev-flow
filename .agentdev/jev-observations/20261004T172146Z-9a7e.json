@@ -1,0 +1,544 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261004T172146Z-9a7e",
+  "workflow": "backlog-review",
+  "evaluationKind": "tentative-classification",
+  "subject": "RU 構成案18件（RU-0001〜0018）の文書7分類モデル暫定分類（2026-10-05 backlog-auto stage 3・43成果物）",
+  "sourceRevision": "51525380dcc1fcce56571d493cc326e011e66421",
+  "durationMs": 996,
+  "inputTokens": 5286,
+  "inputs": {
+    "requestDigest": "69aeb5e682ef8b45a72fe2ce4b333669837a153fe1b6aa888c1a8c90ba84b78d",
+    "references": [
+      {
+        "label": "promoted-intake-freshness16",
+        "path": ".agentdev/intake/promoted/2026-10-04-req-updated-freshness-16-backlog.md",
+        "digest": "5f5c40a5d863c43379292baab4a2eb0e4fd32052c2a319a0d550995a5d2f891d"
+      },
+      {
+        "label": "promoted-inspect-design-frontmatter",
+        "path": ".agentdev/inspect/promoted/finding-20261004-design-frontmatter-updated-stale.md",
+        "digest": "3a489c78b5e944f1704aa2f6679a659d14284b2455aaaf3460f723da59b43cde"
+      },
+      {
+        "label": "promoted-intake-debts-consolidation",
+        "path": ".agentdev/intake/promoted/2026-10-03-known-integrity-debts-consolidation.md",
+        "digest": "5450a219e577e8093810e012c5123a751bdb024e40cca35b413c31f73c783baf"
+      },
+      {
+        "label": "promoted-intake-req003-055-phantom",
+        "path": ".agentdev/intake/promoted/2026-10-04-req003-055-phantom-preexisting-req096-migration.md",
+        "digest": "898684b08e29635eebcfcc621a4e9406e60cf0bea10c72353729c2267253ce93"
+      },
+      {
+        "label": "promoted-intake-dec036-seal",
+        "path": ".agentdev/intake/promoted/2026-10-04-dec036-authority-seal-deployment-context.md",
+        "digest": "f4d42368ff4b41c2d0b717690b45d1483f73fe3d8d07e9a243b2fe2c5383bf22"
+      },
+      {
+        "label": "promoted-intake-dist-boundary-stale",
+        "path": ".agentdev/intake/promoted/2026-10-04-distribution-boundary-stale-retired-installer-refs.md",
+        "digest": "5fe61905de836d914bd8c82ad3670fe3a44c24269900cae9b87ad29f222a9018"
+      },
+      {
+        "label": "promoted-intake-regression-req092",
+        "path": ".agentdev/intake/promoted/2026-10-04-regression-req092-test-filename-rename-candidate.md",
+        "digest": "2d1d12720c2fed66416db34bbdbbcdbb2cdf141f2767653d5363e320eb112c01"
+      },
+      {
+        "label": "promoted-inspect-legacy-src-cluster",
+        "path": ".agentdev/inspect/promoted/finding-20261004-legacy-src-opencode-path-cluster.md",
+        "digest": "48ce604654190db4b4d106d8e8d346c22a734cc5e5398e8d9373bc6307ed0a26"
+      },
+      {
+        "label": "promoted-inspect-dec010-stale",
+        "path": ".agentdev/inspect/promoted/finding-20261004-dec010-stale-src-opencode-claim.md",
+        "digest": "e0b91a7c58c1517c40550172d175e8793ee1a081f189460df363e228e32eee48"
+      },
+      {
+        "label": "promoted-intake-req018-002",
+        "path": ".agentdev/intake/promoted/2026-10-04-req018-002-design-sidecar-followup.md",
+        "digest": "9bf132b17f0e03f55ce41399a58ea9456e2386c462f2d850657d7a225fd56571"
+      },
+      {
+        "label": "promoted-intake-req099-001",
+        "path": ".agentdev/intake/promoted/2026-10-03-req099-001-verification-followup.md",
+        "digest": "10b3b9681bd72c8f5e1e65b68dd9ff039c36d581b684549070706bdcc6080a17"
+      },
+      {
+        "label": "promoted-inspect-req101-row005",
+        "path": ".agentdev/inspect/promoted/finding-20261004-req101-row005-gap.md",
+        "digest": "da0633892f84a4088e5f5b09c73269ab1983ccf6198a34cdaff8269a40056e1a"
+      },
+      {
+        "label": "promoted-intake-req010-070-dup",
+        "path": ".agentdev/intake/promoted/2026-10-04-req010-070-row-id-duplication.md",
+        "digest": "19173faeecc92d2745529e7554e76d25a0522beb319ee109ee3ed2b89c7a4ca9"
+      },
+      {
+        "label": "promoted-intake-traceability-docs-reports",
+        "path": ".agentdev/intake/promoted/2026-10-04-traceability-docs-reports-unknown-req-refs.md",
+        "digest": "d29aa33176ce15b8704722a851d14134e8217e15a56cc84dfadcae76fc981bec"
+      },
+      {
+        "label": "promoted-learning-traceability-interpretation",
+        "path": ".agentdev/learning/promoted/existing-measure-update-traceability-interpretation.md",
+        "digest": "5af5033308031b024fd8276b3a70bab9dfd4c75c4253e754520823ae4e7468af"
+      },
+      {
+        "label": "promoted-inspect-dec045-broken",
+        "path": ".agentdev/inspect/promoted/finding-20261004-dec045-supersede-note-broken.md",
+        "digest": "58cc1b7f75f541e45f49da39780b84da7693b5569cdfa4929249e55d2de67d46"
+      },
+      {
+        "label": "promoted-learning-extension-rules-prefetch",
+        "path": ".agentdev/learning/promoted/existing-measure-update-extension-rules-prefetch.md",
+        "digest": "a9a3d35f1ce52616b8fa581a839dbe933c7c5787fff4f1dd22c98f1ec5b42155"
+      },
+      {
+        "label": "promoted-learning-stale-input-reverification",
+        "path": ".agentdev/learning/promoted/existing-measure-update-stale-input-reverification.md",
+        "digest": "9d60fdfd730d2d7d1cf808754e337e67ad3cd16058a15bdf36d84904440887ef"
+      },
+      {
+        "label": "promoted-learning-index-regen-order",
+        "path": ".agentdev/learning/promoted/existing-measure-update-index-regen-order.md",
+        "digest": "0dbe48482d7c726ffacd64cda0e6153a078b917cd3df0a0a9d9a3e2815b27ce8"
+      },
+      {
+        "label": "promoted-learning-delegation-prompt-contract",
+        "path": ".agentdev/learning/promoted/existing-measure-update-delegation-prompt-contract.md",
+        "digest": "80805cb1d2f163b0daa7afdfbb97c478426cacb96f9c67433a73f730df40ec40"
+      },
+      {
+        "label": "promoted-learning-yomiyasu-windows-path",
+        "path": ".agentdev/learning/promoted/existing-measure-update-yomiyasu-windows-path.md",
+        "digest": "72ea01641c5ab258903f581053836016391edb969bc3ee0c7192ecc69f96079e"
+      },
+      {
+        "label": "promoted-learning-link-gate-worktree",
+        "path": ".agentdev/learning/promoted/existing-measure-update-link-gate-worktree.md",
+        "digest": "024dd6768b4fd22a3c1f7370595b1ba30a9eae98f8ef4c70a786da9e77787b6f"
+      },
+      {
+        "label": "promoted-learning-gate-baseline-comparison",
+        "path": ".agentdev/learning/promoted/existing-measure-update-gate-baseline-comparison.md",
+        "digest": "8bf2d5db4190574ba88cea863790b2fd0cf1764d26e7a8e7b2898959f32ec770"
+      },
+      {
+        "label": "promoted-learning-baseline-provenance",
+        "path": ".agentdev/learning/promoted/existing-measure-update-baseline-provenance.md",
+        "digest": "2a811c8a7963d75fa73a9715f01ebab408cbb1680d8c57675b02e0e63cbfe5ae"
+      },
+      {
+        "label": "promoted-learning-bun-execution-contracts",
+        "path": ".agentdev/learning/promoted/existing-measure-update-bun-execution-contracts.md",
+        "digest": "21511b500c597a8b5b784775616df450bcd90e7a657d47c3f9abf67d4232ff6f"
+      },
+      {
+        "label": "promoted-intake-textlint-gate-zero",
+        "path": ".agentdev/intake/promoted/2026-10-04-textlint-gate-worktree-root-path-zero-inspected-pass.md",
+        "digest": "ff681deef5b06df9113f479fefae3fc01ecbdd6e218e3959f8503af1df8a12d7"
+      },
+      {
+        "label": "promoted-learning-worktree-cleanup-verification",
+        "path": ".agentdev/learning/promoted/existing-measure-update-worktree-cleanup-verification.md",
+        "digest": "f0bb69400250564234d2640d1c867b116bd3f3004f9bb8a2efc95442c603b0df"
+      },
+      {
+        "label": "promoted-learning-reporoot-worktree-coupling",
+        "path": ".agentdev/learning/promoted/existing-measure-update-reporoot-worktree-coupling.md",
+        "digest": "cc56930868bbbfe1d5bcee787830a581d481d4f15431e470f8c15c3063b8a682"
+      },
+      {
+        "label": "promoted-learning-case-run-record-completeness",
+        "path": ".agentdev/learning/promoted/existing-measure-update-case-run-record-completeness.md",
+        "digest": "715b5dcafe71d5d0c877e1da8b5652a5187a17e0c5567d38ecb98e2a799ebaa2"
+      },
+      {
+        "label": "promoted-learning-form-zero-persistence",
+        "path": ".agentdev/learning/promoted/existing-measure-update-form-zero-persistence.md",
+        "digest": "595a915bfb3453ea0f7f0929373f0553b535be401aeabad8e6679661704f8c98"
+      },
+      {
+        "label": "promoted-learning-heredoc-backslash",
+        "path": ".agentdev/learning/promoted/existing-measure-update-heredoc-backslash.md",
+        "digest": "59669f9f276600442ce70038a9236d19f336d5ca9d6fdc8e7e4ce7833731dfd6"
+      },
+      {
+        "label": "promoted-learning-test-expectation-pin",
+        "path": ".agentdev/learning/promoted/existing-measure-update-test-expectation-pin-followup.md",
+        "digest": "dd249f020bff9675627f3d8633b240847134d79414c27e70fe6e9f0e5e6e32b8"
+      },
+      {
+        "label": "promoted-inspect-present-tense",
+        "path": ".agentdev/inspect/promoted/finding-20261004-completed-directive-present-tense.md",
+        "digest": "10056c2ab32a1b85f512610c3c6b78a6283447d9b6df73fd9ca37c0ed0194cfe"
+      },
+      {
+        "label": "promoted-inspect-authoring-meta-residue",
+        "path": ".agentdev/inspect/promoted/finding-20261004-authoring-meta-residue.md",
+        "digest": "54772487b729ab841645262ce2bdfa9d50b6c8f6d02f2968febf86a6df4d210c"
+      },
+      {
+        "label": "promoted-intake-troubleshooting-yomiyasu",
+        "path": ".agentdev/intake/promoted/2026-10-03-troubleshooting-yomiyasu-existing-notice.md",
+        "digest": "9825d545c2e49781765c8be9b483ac76608da3107e7af47265008c55cfc9ebec"
+      },
+      {
+        "label": "promoted-learning-structural-data-identifiers",
+        "path": ".agentdev/learning/promoted/design-candidate-structural-data-identifiers.md",
+        "digest": "c133d1f1630740a2fc213d88290bc2d7c9bb52917e858ca0efc00d80111d18bb"
+      },
+      {
+        "label": "promoted-inspect-8principles-anchor",
+        "path": ".agentdev/inspect/promoted/finding-20261004-document-model-8principles-req-anchor.md",
+        "digest": "a205347108d8daa86f5594d8d7061f9d7cc7cf84b2f79424099d64b79673b231"
+      },
+      {
+        "label": "document-model",
+        "path": "docs/designs/foundations/document-model.md",
+        "digest": "64789348333a97b719f828afc50a84a612a00973feb09f4b1c6583dee9206d97"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "tc-ru-0001",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.91,
+        "挙動Design": 0.06,
+        "カタログDesign": 0.02,
+        "guide": 0,
+        "learning維持": 0.01,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "tc-ru-0002",
+      "questionForm": "choice",
+      "value": "対象外",
+      "probabilityDistribution": {
+        "REQ": 0.17,
+        "挙動Design": 0.08,
+        "カタログDesign": 0.08,
+        "guide": 0.06,
+        "learning維持": 0.19,
+        "作業記録": 0.1,
+        "対象外": 0.32
+      }
+    },
+    {
+      "questionId": "tc-ru-0003",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0.08,
+        "挙動Design": 0.47000000000000003,
+        "カタログDesign": 0.09,
+        "guide": 0.02,
+        "learning維持": 0.1,
+        "作業記録": 0.02,
+        "対象外": 0.22
+      }
+    },
+    {
+      "questionId": "tc-ru-0004",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.62,
+        "挙動Design": 0.16,
+        "カタログDesign": 0.14,
+        "guide": 0.01,
+        "learning維持": 0.02,
+        "作業記録": 0.02,
+        "対象外": 0.03
+      }
+    },
+    {
+      "questionId": "tc-ru-0005",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.95,
+        "挙動Design": 0,
+        "カタログDesign": 0.02,
+        "guide": 0,
+        "learning維持": 0.01,
+        "作業記録": 0.01,
+        "対象外": 0.01
+      }
+    },
+    {
+      "questionId": "tc-ru-0006",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0.99,
+        "カタログDesign": 0,
+        "guide": 0.01,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "tc-ru-0007",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0.4999999999999999,
+        "カタログDesign": 0.06999999999999999,
+        "guide": 0.27999999999999997,
+        "learning維持": 0.04999999999999999,
+        "作業記録": 0.04999999999999999,
+        "対象外": 0.04999999999999999
+      }
+    },
+    {
+      "questionId": "tc-ru-0008",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 1,
+        "カタログDesign": 0,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "tc-ru-0009",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0.99,
+        "カタログDesign": 0.01,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "tc-ru-0010",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0.01,
+        "挙動Design": 0.95,
+        "カタログDesign": 0.01,
+        "guide": 0.02,
+        "learning維持": 0,
+        "作業記録": 0.01,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "tc-ru-0011",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0.01,
+        "挙動Design": 0.96,
+        "カタログDesign": 0,
+        "guide": 0.02,
+        "learning維持": 0,
+        "作業記録": 0.01,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "tc-ru-0012",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0.01,
+        "挙動Design": 0.86,
+        "カタログDesign": 0.01,
+        "guide": 0.08,
+        "learning維持": 0.02,
+        "作業記録": 0.02,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "tc-ru-0013",
+      "questionForm": "choice",
+      "value": "guide",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0.0404040404040404,
+        "カタログDesign": 0,
+        "guide": 0.9393939393939393,
+        "learning維持": 0.0101010101010101,
+        "作業記録": 0.0101010101010101,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "tc-ru-0014",
+      "questionForm": "choice",
+      "value": "guide",
+      "probabilityDistribution": {
+        "REQ": 0.01,
+        "挙動Design": 0.26,
+        "カタログDesign": 0.08,
+        "guide": 0.51,
+        "learning維持": 0.1,
+        "作業記録": 0.04,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "tc-ru-0015",
+      "questionForm": "choice",
+      "value": "guide",
+      "probabilityDistribution": {
+        "REQ": 0.009999999999999998,
+        "挙動Design": 0.33999999999999997,
+        "カタログDesign": 0.009999999999999998,
+        "guide": 0.45999999999999985,
+        "learning維持": 0.04999999999999999,
+        "作業記録": 0.019999999999999997,
+        "対象外": 0.10999999999999997
+      }
+    },
+    {
+      "questionId": "tc-ru-0016",
+      "questionForm": "choice",
+      "value": "guide",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0,
+        "カタログDesign": 0,
+        "guide": 1,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "tc-ru-0017",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.42,
+        "挙動Design": 0.38,
+        "カタログDesign": 0.11,
+        "guide": 0.01,
+        "learning維持": 0.04,
+        "作業記録": 0.01,
+        "対象外": 0.03
+      }
+    },
+    {
+      "questionId": "tc-ru-0018",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.41,
+        "挙動Design": 0.07,
+        "カタログDesign": 0.04,
+        "guide": 0.02,
+        "learning維持": 0.04,
+        "作業記録": 0.06,
+        "対象外": 0.36
+      }
+    }
+  ],
+  "confidence": 0.89,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "tc-ru-0001",
+        "value": "REQ"
+      },
+      {
+        "questionId": "tc-ru-0002",
+        "value": "挙動Design",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "tc-ru-0003",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "tc-ru-0004",
+        "value": "REQ"
+      },
+      {
+        "questionId": "tc-ru-0005",
+        "value": "REQ"
+      },
+      {
+        "questionId": "tc-ru-0006",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "tc-ru-0007",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "tc-ru-0008",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "tc-ru-0009",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "tc-ru-0010",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "tc-ru-0011",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "tc-ru-0012",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "tc-ru-0013",
+        "value": "挙動Design",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "tc-ru-0014",
+        "value": "挙動Design",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "tc-ru-0015",
+        "value": "挙動Design",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "tc-ru-0016",
+        "value": "guide"
+      },
+      {
+        "questionId": "tc-ru-0017",
+        "value": "カタログDesign",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "tc-ru-0018",
+        "value": "REQ"
+      }
+    ]
+  }
+}

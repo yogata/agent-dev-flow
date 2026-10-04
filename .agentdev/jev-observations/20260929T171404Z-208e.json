@@ -1,0 +1,184 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260929T171404Z-208e",
+  "workflow": "learning-promote",
+  "evaluationKind": "problem-classification",
+  "subject": "学習 inbox 11エントリの問題クラス分類（2026-09-30 backlog-auto stage 2）",
+  "sourceRevision": "e402ce44",
+  "durationMs": 1461,
+  "inputTokens": 2718,
+  "inputs": {
+    "requestDigest": "db066e42cb5fe418d7d7c9a1bad3a5adbda2e3636b8eb0249848033be4dd4aa4",
+    "references": [
+      {
+        "label": "learning-inbox",
+        "path": ".agentdev/learning/inbox.md",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-e1-buntest-timeout",
+      "questionForm": "choice",
+      "value": "単独（実測裏付け記録・他と根本原因を共有しない）",
+      "probabilityDistribution": {
+        "単独（実測裏付け記録・他と根本原因を共有しない）": 0.89,
+        "クラスA（Windows 固有制約）": 0,
+        "エントリ8（環境依存 fail 分類）と同一クラス": 0.11
+      }
+    },
+    {
+      "questionId": "q-e2-sidecar",
+      "questionForm": "choice",
+      "value": "単独（sidecar 集約運用）",
+      "probabilityDistribution": {
+        "単独（sidecar 集約運用）": 1,
+        "クラスA（Windows 固有制約）": 0,
+        "エントリ11（二重生成解消）と同一クラス": 0
+      }
+    },
+    {
+      "questionId": "q-e3-checker-phase",
+      "questionForm": "choice",
+      "value": "単独（検証記録の実測局面明示）",
+      "probabilityDistribution": {
+        "単独（検証記録の実測局面明示）": 0.85,
+        "エントリ8（base 再現確認の証跡化）と同一クラス（検証証跡の比較基準明示）": 0.15,
+        "クラスA（Windows 固有制約）": 0
+      }
+    },
+    {
+      "questionId": "q-e4-design-merge",
+      "questionForm": "choice",
+      "value": "単独（Design 変更の同一PR原則・merge 後経路制限）",
+      "probabilityDistribution": {
+        "単独（Design 変更の同一PR原則・merge 後経路制限）": 1,
+        "エントリ3（実測局面明示）と同一クラス": 0,
+        "クラスA（Windows 固有制約）": 0
+      }
+    },
+    {
+      "questionId": "q-e5-copytree",
+      "questionForm": "choice",
+      "value": "単独（再帰列挙のパス計算基準）",
+      "probabilityDistribution": {
+        "単独（再帰列挙のパス計算基準）": 1,
+        "クラスA（Windows 固有制約）": 0,
+        "エントリ10（worktree 削除失敗）と同一クラス": 0
+      }
+    },
+    {
+      "questionId": "q-e6-parallel-delegation",
+      "questionForm": "choice",
+      "value": "単独（並行委譲の帰属確認と協調規律）",
+      "probabilityDistribution": {
+        "単独（並行委譲の帰属確認と協調規律）": 0.99,
+        "エントリ11（worktree/main 二重生成）と同一クラス": 0.01,
+        "クラスA（Windows 固有制約）": 0
+      }
+    },
+    {
+      "questionId": "q-e7-ps51-ascii",
+      "questionForm": "choice",
+      "value": "クラスA（Windows 固有制約によるスクリプト破壊の回避）",
+      "probabilityDistribution": {
+        "クラスA（Windows 固有制約によるスクリプト破壊の回避）": 0.97,
+        "単独（スクリプト文言エンコーディング）": 0.03,
+        "エントリ9（guard 誤検出）と同一クラス": 0
+      }
+    },
+    {
+      "questionId": "q-e8-envfail-base",
+      "questionForm": "choice",
+      "value": "単独（fail 由来分類の対照実行証跡）",
+      "probabilityDistribution": {
+        "単独（fail 由来分類の対照実行証跡）": 0.88,
+        "エントリ3（実測局面明示）と同一クラス（検証証跡の比較基準明示）": 0.11,
+        "クラスA（Windows 固有制約）": 0.01
+      }
+    },
+    {
+      "questionId": "q-e9-guard-literal",
+      "questionForm": "choice",
+      "value": "単独（guard パターンマッチ誤検出と検証構造変更）",
+      "probabilityDistribution": {
+        "単独（guard パターンマッチ誤検出と検証構造変更）": 1,
+        "クラスA（Windows 固有制約）": 0,
+        "エントリ5（再帰列挙パス基準）と同一クラス": 0
+      }
+    },
+    {
+      "questionId": "q-e10-worktree-remove",
+      "questionForm": "choice",
+      "value": "クラスA（Windows 固有制約によるツール破壊の回避）",
+      "probabilityDistribution": {
+        "クラスA（Windows 固有制約によるツール破壊の回避）": 0.96,
+        "単独（worktree 削除失敗系）": 0.04,
+        "エントリ6（並行委譲競合）と同一クラス": 0
+      }
+    },
+    {
+      "questionId": "q-e11-jev-untracked",
+      "questionForm": "choice",
+      "value": "単独（二重生成状態の安全解消手順）",
+      "probabilityDistribution": {
+        "単独（二重生成状態の安全解消手順）": 0.97,
+        "エントリ6（並行委譲競合）と同一クラス": 0.03,
+        "クラスA（Windows 固有制約）": 0
+      }
+    }
+  ],
+  "confidence": 0.83,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-e1-buntest-timeout",
+        "value": "単独（実測裏付け記録・他と根本原因を共有しない）"
+      },
+      {
+        "questionId": "q-e2-sidecar",
+        "value": "単独（sidecar 集約運用）"
+      },
+      {
+        "questionId": "q-e3-checker-phase",
+        "value": "単独（検証記録の実測局面明示）"
+      },
+      {
+        "questionId": "q-e4-design-merge",
+        "value": "単独（Design 変更の同一PR原則・merge 後経路制限）"
+      },
+      {
+        "questionId": "q-e5-copytree",
+        "value": "単独（再帰列挙のパス計算基準）"
+      },
+      {
+        "questionId": "q-e6-parallel-delegation",
+        "value": "単独（並行委譲の帰属確認と協調規律）"
+      },
+      {
+        "questionId": "q-e7-ps51-ascii",
+        "value": "クラスA（Windows 固有制約によるスクリプト破壊の回避）"
+      },
+      {
+        "questionId": "q-e8-envfail-base",
+        "value": "単独（fail 由来分類の対照実行証跡）"
+      },
+      {
+        "questionId": "q-e9-guard-literal",
+        "value": "単独（guard パターンマッチ誤検出と検証構造変更）"
+      },
+      {
+        "questionId": "q-e10-worktree-remove",
+        "value": "クラスA（Windows 固有制約によるツール破壊の回避）"
+      },
+      {
+        "questionId": "q-e11-jev-untracked",
+        "value": "単独（二重生成状態の安全解消手順）"
+      }
+    ]
+  }
+}

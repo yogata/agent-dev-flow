@@ -1,0 +1,269 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260929T174213Z-a08b",
+  "workflow": "intake-promote",
+  "evaluationKind": "item-evaluation-and-classification",
+  "subject": "intake inbox 4 item の Review 観点評価と暫定分類",
+  "sourceRevision": "362e59d1702d92da19048640325710eb4cc786c1",
+  "durationMs": 991,
+  "inputTokens": 2801,
+  "inputs": {
+    "requestDigest": "69dd8fe8112735871774a765cad8cc81df7ccaf38157b09d37420221c0e9664b",
+    "references": [
+      {
+        "label": "item1",
+        "path": ".agentdev/intake/inbox/2026-09-27-3139-measurement-unverified-remainder.md",
+        "digest": "0b68ff8ec302e95fb68df3971e2cf4038336ed6ffce5f8477d398ebaeae258e6"
+      },
+      {
+        "label": "item2",
+        "path": ".agentdev/intake/inbox/2026-09-29-3233-checker-execution-contracts-lifecycle-notes.md",
+        "digest": "331d3ae5a7c47f1b60ae99d8ca7d6070a26da58fd20c04909cb964722d455134"
+      },
+      {
+        "label": "item3",
+        "path": ".agentdev/intake/inbox/2026-09-29-3236-decision-numbering-timing-wording.md",
+        "digest": "613089b5feb5818c62ad3c297f9f4a7a0ecc7682db1954d23d1c93c2e47f980c"
+      },
+      {
+        "label": "item4",
+        "path": ".agentdev/intake/inbox/2026-09-29-3236-distribution-link-profile-worktree-contract.md",
+        "digest": "331f7be7bc36c9e73dc10186ccfb07927b9da9c64156b8592c28c829c4bbf265"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "i1_validity",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.49,
+        "中": 0.49,
+        "高": 0.02
+      }
+    },
+    {
+      "questionId": "i1_impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.51,
+        "中": 0.47,
+        "高": 0.02
+      }
+    },
+    {
+      "questionId": "i1_urgency",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "低": 0.6,
+        "中": 0.39,
+        "高": 0.01
+      }
+    },
+    {
+      "questionId": "i2_validity",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.03,
+        "中": 0.94,
+        "高": 0.03
+      }
+    },
+    {
+      "questionId": "i2_impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.1,
+        "中": 0.89,
+        "高": 0.01
+      }
+    },
+    {
+      "questionId": "i2_urgency",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.25,
+        "中": 0.75,
+        "高": 0
+      }
+    },
+    {
+      "questionId": "i3_validity",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0,
+        "中": 0.06,
+        "高": 0.94
+      }
+    },
+    {
+      "questionId": "i3_impact",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0,
+        "中": 0.22,
+        "高": 0.78
+      }
+    },
+    {
+      "questionId": "i3_urgency",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.01,
+        "中": 0.56,
+        "高": 0.43
+      }
+    },
+    {
+      "questionId": "i4_validity",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0.01,
+        "中": 0.38,
+        "高": 0.61
+      }
+    },
+    {
+      "questionId": "i4_impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.02,
+        "中": 0.7,
+        "高": 0.28
+      }
+    },
+    {
+      "questionId": "i4_urgency",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.07,
+        "中": 0.8,
+        "高": 0.13
+      }
+    },
+    {
+      "questionId": "c1",
+      "questionForm": "choice",
+      "value": "保留",
+      "probabilityDistribution": {
+        "採用": 0.01,
+        "保留": 0.95,
+        "却下": 0.04
+      }
+    },
+    {
+      "questionId": "c2",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.95,
+        "保留": 0.02,
+        "却下": 0.03
+      }
+    },
+    {
+      "questionId": "c3",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 1,
+        "保留": 0,
+        "却下": 0
+      }
+    },
+    {
+      "questionId": "c4",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 1,
+        "保留": 0,
+        "却下": 0
+      }
+    }
+  ],
+  "confidence": 0.23,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "i1_validity",
+        "value": 1
+      },
+      {
+        "questionId": "i1_impact",
+        "value": 1
+      },
+      {
+        "questionId": "i1_urgency",
+        "value": 0
+      },
+      {
+        "questionId": "i2_validity",
+        "value": 1
+      },
+      {
+        "questionId": "i2_impact",
+        "value": 1
+      },
+      {
+        "questionId": "i2_urgency",
+        "value": 1
+      },
+      {
+        "questionId": "i3_validity",
+        "value": 2
+      },
+      {
+        "questionId": "i3_impact",
+        "value": 2
+      },
+      {
+        "questionId": "i3_urgency",
+        "value": 1
+      },
+      {
+        "questionId": "i4_validity",
+        "value": 2
+      },
+      {
+        "questionId": "i4_impact",
+        "value": 1
+      },
+      {
+        "questionId": "i4_urgency",
+        "value": 1
+      },
+      {
+        "questionId": "c1",
+        "value": "保留"
+      },
+      {
+        "questionId": "c2",
+        "value": "採用"
+      },
+      {
+        "questionId": "c3",
+        "value": "採用"
+      },
+      {
+        "questionId": "c4",
+        "value": "採用"
+      }
+    ]
+  }
+}

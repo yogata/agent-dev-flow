@@ -1,0 +1,484 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261002T155542Z-cd77",
+  "workflow": "learning-promote",
+  "evaluationKind": "axis-scoring",
+  "subject": "問題クラス PC-1/PC-2/PC-3/PC-5 の7軸スコアリング（2026-10-03 backlog-auto stage 2）",
+  "sourceRevision": "42817bdd",
+  "durationMs": 762,
+  "inputTokens": 4673,
+  "inputs": {
+    "requestDigest": "4c4e317f52ccf2f40e88d7e7d6bb16699f5159a7dafee99f09611d482f59ced7",
+    "references": [
+      {
+        "digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "label": "evaluation-report",
+        "path": ".agentdev/learning/evaluation-report.md"
+      },
+      {
+        "digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "label": "inbox",
+        "path": ".agentdev/learning/inbox.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "pc1-影響度",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 軽微: 検証や報告の手間のみ": 0,
+        "2 小: 局所的な手戻り": 0,
+        "3 中: 工程の差し戻しや追加検証を要す": 0,
+        "4 大: workflow 停止・主要機能不能": 1,
+        "5 致命的: データ損失・修正不能な破壊": 0
+      }
+    },
+    {
+      "questionId": "pc1-横展開性",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 固有: 本プロジェクトのみ": 0,
+        "2 限定: 特定環境・構成のみ": 0.44,
+        "3 中程度: 類似構成で発生し得る": 0.3,
+        "4 高い: 複数プロジェクト・文脈で発生": 0.23,
+        "5 汎用: 任意の環境で発生": 0.03
+      }
+    },
+    {
+      "questionId": "pc1-反映先明確度",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 不明: 反映先が特定できない": 0,
+        "2 曖昧: 系統のみ推定可": 0,
+        "3 概要あり: 対象領域は特定済": 0,
+        "4 明確: ファイル・節まで特定": 0.98,
+        "5 自足的に整備済: 引き渡し情報が完備": 0.02
+      }
+    },
+    {
+      "questionId": "pc1-自動化適性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 困難: 手順・判断が中心": 0,
+        "2 低い: 一部自動化可だが限定": 0.02,
+        "3 可能: 条件付きで自動化可": 0.12,
+        "4 容易: 既存枠組みで自動化可": 0.79,
+        "5 即自動化可": 0.07
+      }
+    },
+    {
+      "questionId": "pc1-再利用性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 低い": 0.02,
+        "2 やや低い": 0.13,
+        "3 中程度": 0.22,
+        "4 高い": 0.58,
+        "5 非常に高い": 0.05
+      }
+    },
+    {
+      "questionId": "pc1-再発可能性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 極低: 特殊条件のみ": 0,
+        "2 低い": 0,
+        "3 中程度": 0.01,
+        "4 高い: 条件が揃えば高頻度": 0.78,
+        "5 ほぼ確実: 運用で常態化": 0.21
+      }
+    },
+    {
+      "questionId": "pc1-費用対効果",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 割高": 0,
+        "2 やや割高": 0.01,
+        "3 妥当": 0.01,
+        "4 良い": 0.27,
+        "5 非常に良い": 0.71
+      }
+    },
+    {
+      "questionId": "pc2-影響度",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 軽微": 0.02,
+        "2 小": 0.26,
+        "3 中": 0.71,
+        "4 大": 0.01,
+        "5 致命的": 0
+      }
+    },
+    {
+      "questionId": "pc2-横展開性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 固有": 0,
+        "2 限定": 0.07,
+        "3 中程度": 0.22,
+        "4 高い": 0.67,
+        "5 汎用": 0.04
+      }
+    },
+    {
+      "questionId": "pc2-反映先明確度",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 不明": 0,
+        "2 曖昧": 0.01,
+        "3 概要あり": 0.06,
+        "4 明確": 0.91,
+        "5 自足的に整備済": 0.02
+      }
+    },
+    {
+      "questionId": "pc2-自動化適性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 困難": 0,
+        "2 低い": 0,
+        "3 可能": 0.38,
+        "4 容易": 0.61,
+        "5 即自動化可": 0.01
+      }
+    },
+    {
+      "questionId": "pc2-再利用性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 低い": 0,
+        "2 やや低い": 0.09,
+        "3 中程度": 0.26,
+        "4 高い": 0.63,
+        "5 非常に高い": 0.02
+      }
+    },
+    {
+      "questionId": "pc2-再発可能性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 極低": 0,
+        "2 低い": 0,
+        "3 中程度": 0,
+        "4 高い": 0.6900000000000001,
+        "5 ほぼ確実": 0.31
+      }
+    },
+    {
+      "questionId": "pc2-費用対効果",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 割高": 0,
+        "2 やや割高": 0,
+        "3 妥当": 0,
+        "4 良い": 0.62,
+        "5 非常に良い": 0.38
+      }
+    },
+    {
+      "questionId": "pc3-影響度",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 軽微": 0.02,
+        "2 小": 0.45,
+        "3 中": 0.52,
+        "4 大": 0.01,
+        "5 致命的": 0
+      }
+    },
+    {
+      "questionId": "pc3-横展開性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 固有": 0.02,
+        "2 限定": 0.06,
+        "3 中程度": 0.09,
+        "4 高い": 0.13,
+        "5 汎用": 0.7
+      }
+    },
+    {
+      "questionId": "pc3-反映先明確度",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 不明": 0,
+        "2 曖昧": 0,
+        "3 概要あり": 0,
+        "4 明確": 0.99,
+        "5 自足的に整備済": 0.01
+      }
+    },
+    {
+      "questionId": "pc3-自動化適性",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 困難": 0,
+        "2 低い": 0.12,
+        "3 可能": 0.64,
+        "4 容易": 0.23,
+        "5 即自動化可": 0.01
+      }
+    },
+    {
+      "questionId": "pc3-再利用性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 低い": 0,
+        "2 やや低い": 0.03,
+        "3 中程度": 0.24,
+        "4 高い": 0.7,
+        "5 非常に高い": 0.03
+      }
+    },
+    {
+      "questionId": "pc3-再発可能性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 極低": 0,
+        "2 低い": 0.01,
+        "3 中程度": 0.08,
+        "4 高い": 0.8,
+        "5 ほぼ確実": 0.11
+      }
+    },
+    {
+      "questionId": "pc3-費用対効果",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 割高": 0,
+        "2 やや割高": 0.17,
+        "3 妥当": 0.32,
+        "4 良い": 0.49,
+        "5 非常に良い": 0.02
+      }
+    },
+    {
+      "questionId": "pc5-影響度",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 軽微": 0,
+        "2 小": 0.37,
+        "3 中": 0.61,
+        "4 大": 0.02,
+        "5 致命的": 0
+      }
+    },
+    {
+      "questionId": "pc5-横展開性",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 固有": 0.009999999999999998,
+        "2 限定": 0.31999999999999995,
+        "3 中程度": 0.27999999999999997,
+        "4 高い": 0.27999999999999997,
+        "5 汎用": 0.10999999999999997
+      }
+    },
+    {
+      "questionId": "pc5-反映先明確度",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 不明": 0,
+        "2 曖昧": 0.01,
+        "3 概要あり": 0.08,
+        "4 明確": 0.76,
+        "5 自足的に整備済": 0.15
+      }
+    },
+    {
+      "questionId": "pc5-自動化適性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 困難": 0,
+        "2 低い": 0,
+        "3 可能": 0.03,
+        "4 容易": 0.81,
+        "5 即自動化可": 0.16
+      }
+    },
+    {
+      "questionId": "pc5-再利用性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 低い": 0.01,
+        "2 やや低い": 0.07,
+        "3 中程度": 0.19,
+        "4 高い": 0.65,
+        "5 非常に高い": 0.08
+      }
+    },
+    {
+      "questionId": "pc5-再発可能性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 極低": 0,
+        "2 低い": 0.06,
+        "3 中程度": 0.26,
+        "4 高い": 0.66,
+        "5 ほぼ確実": 0.02
+      }
+    },
+    {
+      "questionId": "pc5-費用対効果",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 割高": 0,
+        "2 やや割高": 0.01,
+        "3 妥当": 0.01,
+        "4 良い": 0.54,
+        "5 非常に良い": 0.44
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "pc1-影響度",
+        "value": 3
+      },
+      {
+        "questionId": "pc1-横展開性",
+        "value": 2
+      },
+      {
+        "questionId": "pc1-反映先明確度",
+        "value": 3
+      },
+      {
+        "questionId": "pc1-自動化適性",
+        "value": 3
+      },
+      {
+        "questionId": "pc1-再利用性",
+        "value": 3
+      },
+      {
+        "questionId": "pc1-再発可能性",
+        "value": 3
+      },
+      {
+        "questionId": "pc1-費用対効果",
+        "value": 4
+      },
+      {
+        "questionId": "pc2-影響度",
+        "value": 2
+      },
+      {
+        "questionId": "pc2-横展開性",
+        "value": 3
+      },
+      {
+        "questionId": "pc2-反映先明確度",
+        "value": 3
+      },
+      {
+        "questionId": "pc2-自動化適性",
+        "value": 3
+      },
+      {
+        "questionId": "pc2-再利用性",
+        "value": 3
+      },
+      {
+        "questionId": "pc2-再発可能性",
+        "value": 3
+      },
+      {
+        "questionId": "pc2-費用対効果",
+        "value": 3
+      },
+      {
+        "questionId": "pc3-影響度",
+        "value": 2
+      },
+      {
+        "questionId": "pc3-横展開性",
+        "value": 3
+      },
+      {
+        "questionId": "pc3-反映先明確度",
+        "value": 3
+      },
+      {
+        "questionId": "pc3-自動化適性",
+        "value": 2
+      },
+      {
+        "questionId": "pc3-再利用性",
+        "value": 3
+      },
+      {
+        "questionId": "pc3-再発可能性",
+        "value": 3
+      },
+      {
+        "questionId": "pc3-費用対効果",
+        "value": 2
+      },
+      {
+        "questionId": "pc5-影響度",
+        "value": 2
+      },
+      {
+        "questionId": "pc5-横展開性",
+        "value": 3,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "pc5-反映先明確度",
+        "value": 3
+      },
+      {
+        "questionId": "pc5-自動化適性",
+        "value": 3
+      },
+      {
+        "questionId": "pc5-再利用性",
+        "value": 3
+      },
+      {
+        "questionId": "pc5-再発可能性",
+        "value": 3
+      },
+      {
+        "questionId": "pc5-費用対効果",
+        "value": 3
+      }
+    ]
+  }
+}

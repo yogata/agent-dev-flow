@@ -1,0 +1,275 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260929T181141Z-4a0b",
+  "workflow": "backlog-review",
+  "evaluationKind": "tentative-classification",
+  "subject": "RU 構成案 13件の文書7分類モデルへの暫定分類",
+  "sourceRevision": "e0247cb7",
+  "durationMs": 1142,
+  "inputTokens": 3683,
+  "inputs": {
+    "requestDigest": "3e40561ed413754f1ba91ac72e110c4cc4d5b4a25771b01e5f81600c370934ab",
+    "references": [
+      {
+        "label": "learning promoted",
+        "path": ".agentdev/learning/promoted/",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      {
+        "label": "intake promoted",
+        "path": ".agentdev/intake/promoted/",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      {
+        "label": "inspect promoted",
+        "path": ".agentdev/inspect/promoted/",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "tc-ru0146",
+      "questionForm": "choice",
+      "value": "guide",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0.01,
+        "カタログDesign": 0,
+        "guide": 0.99,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "tc-ru0147",
+      "questionForm": "choice",
+      "value": "guide",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0.06,
+        "カタログDesign": 0,
+        "guide": 0.94,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "tc-ru0148",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 1,
+        "カタログDesign": 0,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "tc-ru0149",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0.04,
+        "挙動Design": 0.68,
+        "カタログDesign": 0.08,
+        "guide": 0.09,
+        "learning維持": 0.01,
+        "作業記録": 0.03,
+        "対象外": 0.07
+      }
+    },
+    {
+      "questionId": "tc-ru0150",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0.01,
+        "挙動Design": 0.98,
+        "カタログDesign": 0,
+        "guide": 0.01,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "tc-ru0151",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0.02,
+        "挙動Design": 0.35000000000000003,
+        "カタログDesign": 0.13,
+        "guide": 0.12,
+        "learning維持": 0.04,
+        "作業記録": 0.03,
+        "対象外": 0.31
+      }
+    },
+    {
+      "questionId": "tc-ru0152",
+      "questionForm": "choice",
+      "value": "カタログDesign",
+      "probabilityDistribution": {
+        "REQ": 0.01,
+        "挙動Design": 0.24,
+        "カタログDesign": 0.61,
+        "guide": 0.07,
+        "learning維持": 0.01,
+        "作業記録": 0.02,
+        "対象外": 0.04
+      }
+    },
+    {
+      "questionId": "tc-ru0153",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0.1,
+        "挙動Design": 0.79,
+        "カタログDesign": 0.04,
+        "guide": 0.03,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0.04
+      }
+    },
+    {
+      "questionId": "tc-ru0154",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0.01,
+        "挙動Design": 0.92,
+        "カタログDesign": 0.06,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0.01
+      }
+    },
+    {
+      "questionId": "tc-ru0155",
+      "questionForm": "choice",
+      "value": "カタログDesign",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0,
+        "カタログDesign": 1,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "tc-ru0156",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.98,
+        "挙動Design": 0,
+        "カタログDesign": 0.01,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0.01
+      }
+    },
+    {
+      "questionId": "tc-ru0157",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.78,
+        "挙動Design": 0.01,
+        "カタログDesign": 0.01,
+        "guide": 0,
+        "learning維持": 0.02,
+        "作業記録": 0.13,
+        "対象外": 0.05
+      }
+    },
+    {
+      "questionId": "tc-ru0158",
+      "questionForm": "choice",
+      "value": "対象外",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0,
+        "カタログDesign": 0.28,
+        "guide": 0.27,
+        "learning維持": 0.01,
+        "作業記録": 0.04,
+        "対象外": 0.4
+      }
+    }
+  ],
+  "confidence": 0.99,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "tc-ru0146",
+        "value": "guide"
+      },
+      {
+        "questionId": "tc-ru0147",
+        "value": "guide"
+      },
+      {
+        "questionId": "tc-ru0148",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "tc-ru0149",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "tc-ru0150",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "tc-ru0151",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "tc-ru0152",
+        "value": "カタログDesign"
+      },
+      {
+        "questionId": "tc-ru0153",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "tc-ru0154",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "tc-ru0155",
+        "value": "カタログDesign"
+      },
+      {
+        "questionId": "tc-ru0156",
+        "value": "REQ"
+      },
+      {
+        "questionId": "tc-ru0157",
+        "value": "REQ"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "tc-ru0158",
+        "value": "カタログDesign"
+      }
+    ]
+  }
+}

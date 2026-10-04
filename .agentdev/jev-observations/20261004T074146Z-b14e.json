@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261004T074146Z-b14e",
+  "workflow": "case-ready",
+  "evaluationKind": "scope-duplication-detection",
+  "subject": "Root Case #3424（deleteBranchOnMerge 設定不備警告化）の実行構造確定時のスコープ重複判定",
+  "sourceRevision": "0511d49f",
+  "durationMs": 286,
+  "inputTokens": 1475,
+  "inputs": {
+    "requestDigest": "2abec43e91b7d6798a34f7051294ce90cc55935687895f60de3406ca1801d99b"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-scope-overlap",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.11,
+        "false": 0.89
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-scope-overlap",
+        "value": false
+      }
+    ]
+  }
+}

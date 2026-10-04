@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260930T172003Z-76de",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "ADF判断アーキテクチャ再設計の横断判断モデルの正規契約帰属（CREATE/APPEND/UPDATE）",
+  "sourceRevision": "main@2026-10-01 (input digest 55a563e4)",
+  "durationMs": 7564,
+  "inputTokens": 2130,
+  "inputs": {
+    "requestDigest": "4ba074553d7b8e1c3606193c56309489f158913079f5c78b55c3baacc9050da4",
+    "references": [
+      {
+        "digest": "55a563e431320f85790cc901c3cd665c8b52df2323a21ac19b4189475a5654d3",
+        "label": "要件入力ファイル",
+        "path": "C:/Users/ogatay/work/hermes-vault/project-list/req-input-adf-judgment-architecture-redesign.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-cross-cutting-judgment-model-attribution",
+      "questionForm": "choice",
+      "value": "CREATE（新規REQファイル作成: ADF全体の判断方法・確定権限・人間判断境界を所有する新規横断REQ）",
+      "probabilityDistribution": {
+        "CREATE（新規REQファイル作成: ADF全体の判断方法・確定権限・人間判断境界を所有する新規横断REQ）": 0.99,
+        "APPEND（既存REQファイルへの要件行追加: 横断原則を既存REQの新規行として追加）": 0,
+        "UPDATE（既存REQ行の内容変更: 既存REQの現行行を修正して横断原則を織り込む）": 0,
+        "REQ操作なし（REQ保存不要: Decision/Designのみで対応）": 0.01
+      }
+    },
+    {
+      "questionId": "q2-matching-confidence",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.28,
+        "false": 0.72
+      }
+    }
+  ],
+  "confidence": 0.98,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-cross-cutting-judgment-model-attribution",
+        "value": "CREATE（新規REQファイル作成: ADF全体の判断方法・確定権限・人間判断境界を所有する新規横断REQ）"
+      },
+      {
+        "questionId": "q2-matching-confidence",
+        "value": false
+      }
+    ]
+  }
+}

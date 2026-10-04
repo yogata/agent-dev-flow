@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261004T163731Z-f0b0",
+  "workflow": "inspect-promote",
+  "evaluationKind": "adversarial-review-trigger",
+  "subject": "inspect-promote 検出事項（新規9件＋子処分8項目）の adversarial-review 発動条件",
+  "sourceRevision": "ad6e83412d54a8a9c241fd00a25db968d52da22c",
+  "durationMs": 592,
+  "inputTokens": 765,
+  "inputs": {
+    "requestDigest": "d42afc0bb6769a66cb545dd8b25d5e34ef2f90b4f9b0812b7b9c14984d4c3000",
+    "references": [
+      {
+        "digest": "eba7f76074e177dfbf955baace85874e4dee1ee3449fda8ad94d2b8a9da67cc7",
+        "label": "親分類対象の新規検出事項 20261004T162140Z",
+        "path": ".agentdev/inspect/inbox/inspect-docs-finding-20261004T162140Z.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.97,
+        "false": 0.030000000000000027
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-trigger",
+        "value": true
+      }
+    ]
+  }
+}

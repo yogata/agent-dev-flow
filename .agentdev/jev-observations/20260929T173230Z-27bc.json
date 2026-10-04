@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260929T173230Z-27bc",
+  "workflow": "learning-promote",
+  "evaluationKind": "sublimation",
+  "subject": "単独エントリ U1〜U11 の昇華可能性評価",
+  "sourceRevision": "2be595ea",
+  "durationMs": 610,
+  "inputTokens": 2114,
+  "inputs": {
+    "requestDigest": "5607359ce98c19067b1ef0d015209a3f0deaab4fa65ecfdc951ae99d6ee241b7",
+    "references": [
+      {
+        "digest": "59cf79faa7244aea03b3bd39f0c70fec051db766ce01cdfb4a931f157d985cbc",
+        "label": "learning-inbox",
+        "path": ".agentdev/learning/inbox.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "u1-sublimation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.06,
+        "false": 0.94
+      }
+    },
+    {
+      "questionId": "u2-sublimation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.07,
+        "false": 0.9299999999999999
+      }
+    },
+    {
+      "questionId": "u3-sublimation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.06,
+        "false": 0.94
+      }
+    },
+    {
+      "questionId": "u4-sublimation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.08,
+        "false": 0.92
+      }
+    },
+    {
+      "questionId": "u5-sublimation",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.93,
+        "false": 0.06999999999999995
+      }
+    },
+    {
+      "questionId": "u6-sublimation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.13,
+        "false": 0.87
+      }
+    },
+    {
+      "questionId": "u7-sublimation",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.89,
+        "false": 0.10999999999999999
+      }
+    },
+    {
+      "questionId": "u8-sublimation",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.9,
+        "false": 0.09999999999999998
+      }
+    },
+    {
+      "questionId": "u9-sublimation",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.9,
+        "false": 0.09999999999999998
+      }
+    },
+    {
+      "questionId": "u10-sublimation",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.88,
+        "false": 0.12
+      }
+    },
+    {
+      "questionId": "u11-sublimation",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.88,
+        "false": 0.12
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "u1-sublimation",
+        "value": false
+      },
+      {
+        "questionId": "u2-sublimation",
+        "value": false
+      },
+      {
+        "questionId": "u3-sublimation",
+        "value": false
+      },
+      {
+        "questionId": "u4-sublimation",
+        "value": false
+      },
+      {
+        "questionId": "u5-sublimation",
+        "value": true
+      },
+      {
+        "questionId": "u6-sublimation",
+        "value": false
+      },
+      {
+        "questionId": "u7-sublimation",
+        "value": true
+      },
+      {
+        "questionId": "u8-sublimation",
+        "value": true
+      },
+      {
+        "questionId": "u9-sublimation",
+        "value": true
+      },
+      {
+        "questionId": "u10-sublimation",
+        "value": true
+      },
+      {
+        "questionId": "u11-sublimation",
+        "value": true
+      }
+    ]
+  }
+}

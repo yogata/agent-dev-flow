@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260929T173230Z-4f5c",
+  "workflow": "learning-promote",
+  "evaluationKind": "adversarial-review-trigger",
+  "subject": "learning-promote STEP-4 adversarial-review 発動条件（2026-09-30 backlog-auto stage 2）",
+  "sourceRevision": "e402ce44",
+  "durationMs": 359,
+  "inputTokens": 767,
+  "inputs": {
+    "requestDigest": "6dd9517099dca6e029fd026aaa903d362551948304debef7e6270f664853168d",
+    "references": [
+      {
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "label": "evaluation-report",
+        "path": ".agentdev/learning/evaluation-report.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-r-trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.95,
+        "false": 0.050000000000000044
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-r-trigger",
+        "value": true
+      }
+    ]
+  }
+}

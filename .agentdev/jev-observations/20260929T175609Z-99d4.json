@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260929T175609Z-99d4",
+  "workflow": "inspect-promote",
+  "evaluationKind": "adversarial-review-trigger",
+  "subject": "検出事項28単位暫定分類（promote 11・defer 17）の adversarial-review 発動条件",
+  "sourceRevision": "2b4cbc33",
+  "durationMs": 243,
+  "inputTokens": 477,
+  "inputs": {
+    "requestDigest": "3426872b2eacc21b94fbfaa45288f1a6fa953fb4c9172c0aa07416fffafd0d2c"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "review_trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.83,
+        "false": 0.17000000000000004
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "review_trigger",
+        "value": true
+      }
+    ]
+  }
+}

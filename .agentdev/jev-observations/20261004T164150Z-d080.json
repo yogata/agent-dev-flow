@@ -1,0 +1,497 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261004T164150Z-d080",
+  "workflow": "learning-promote",
+  "evaluationKind": "axis-scoring-and-disposition",
+  "subject": "問題クラス PC-1/PC-5/PC-11 の7軸スコアリング、PC-2/PC-6/PC-11/U13/U16 の処分判定、PC-1/PC-11 の昇華可能性、adversarial-review 発動条件（2026-10-05 backlog-auto stage 2・71エントリ）",
+  "sourceRevision": "ad6e83412d54a8a9c241fd00a25db968d52da22c",
+  "durationMs": 769,
+  "inputTokens": 6802,
+  "inputs": {
+    "requestDigest": "a8041e6d29f965a1d1432572f0b23fa4ec33499a93c0c552deb12c18ea1af385",
+    "references": [
+      {
+        "label": "evaluation-report",
+        "path": ".agentdev/learning/evaluation-report.md",
+        "digest": "673bb45c0e83bf80d73d109aa99e52fbba043ed5e4b314271ad6f325f5d31222"
+      },
+      {
+        "label": "inbox",
+        "path": ".agentdev/learning/inbox.md",
+        "digest": "16f6934888c135943a90894c8d72f4e1008b1cd0a841954d10557923feca5c40"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "pc1-影響度",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1 軽微: 検証や報告の手間のみ": 0.41,
+        "2 小: 局所的な手戻り": 0.58,
+        "3 中: 工程の差し戻しや追加検証を要す": 0.01,
+        "4 大: workflow 停止・主要機能不能": 0,
+        "5 致命的: データ損失・修正不能な破壊": 0
+      }
+    },
+    {
+      "questionId": "pc1-横展開性",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1 固有: 本プロジェクトのみ": 0.04,
+        "2 限定: 特定環境・構成のみ": 0.58,
+        "3 中程度: 類似構成で発生し得る": 0.3,
+        "4 高い: 複数プロジェクト・文脈で発生": 0.07,
+        "5 汎用: 任意の環境で発生": 0.01
+      }
+    },
+    {
+      "questionId": "pc1-反映先明確度",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 不明: 反映先が特定できない": 0,
+        "2 曖昧: 系統のみ推定可": 0.01,
+        "3 概要あり: 対象領域は特定済": 0.04,
+        "4 明確: 反映先と変更内容が明確": 0.7,
+        "5 自足的に整備済": 0.25
+      }
+    },
+    {
+      "questionId": "pc1-自動化適性",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1 困難": 0.18,
+        "2 低い: 手順規約が主体": 0.8,
+        "3 可能: 部分自動化できる": 0.01,
+        "4 容易": 0.01,
+        "5 即自動化可": 0
+      }
+    },
+    {
+      "questionId": "pc1-固有知識再利用性",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 低い": 0.11,
+        "2 やや低い": 0.42,
+        "3 中程度": 0.3,
+        "4 高い": 0.15,
+        "5 非常に高い": 0.02
+      }
+    },
+    {
+      "questionId": "pc1-再発可能性",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 極低": 0.01,
+        "2 低い": 0,
+        "3 中程度": 0,
+        "4 高い": 0.14,
+        "5 ほぼ確実": 0.85
+      }
+    },
+    {
+      "questionId": "pc1-費用対効果",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 割高": 0.04000000000000001,
+        "2 やや割高": 0.11000000000000001,
+        "3 妥当": 0.35000000000000003,
+        "4 良い": 0.4,
+        "5 非常に良い": 0.10000000000000002
+      }
+    },
+    {
+      "questionId": "pc5-影響度",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 軽微: 検証や報告の手間のみ": 0,
+        "2 小: 局所的な手戻り": 0,
+        "3 中: 工程の差し戻しや追加検証を要す": 0.99,
+        "4 大: workflow 停止・主要機能不能": 0.01,
+        "5 致命的: データ損失・修正不能な破壊": 0
+      }
+    },
+    {
+      "questionId": "pc5-横展開性",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 固有: 本プロジェクトのみ": 0.09,
+        "2 限定: 特定環境・構成のみ": 0.19,
+        "3 中程度: 類似構成で発生し得る": 0.45999999999999996,
+        "4 高い: 複数プロジェクト・文脈で発生": 0.21,
+        "5 汎用: 任意の環境で発生": 0.05
+      }
+    },
+    {
+      "questionId": "pc5-反映先明確度",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 不明: 反映先が特定できない": 0.01,
+        "2 曖昧: 系統のみ推定可": 0.01,
+        "3 概要あり: 対象領域は特定済": 0.07,
+        "4 明確: 反映先と変更内容が明確": 0.88,
+        "5 自足的に整備済": 0.03
+      }
+    },
+    {
+      "questionId": "pc5-自動化適性",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 困難": 0.01,
+        "2 低い: 手順規約が主体": 0.09,
+        "3 可能: 部分自動化できる": 0.54,
+        "4 容易": 0.3,
+        "5 即自動化可": 0.06
+      }
+    },
+    {
+      "questionId": "pc5-固有知識再利用性",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 低い": 0.04,
+        "2 やや低い": 0.2,
+        "3 中程度": 0.31,
+        "4 高い": 0.39,
+        "5 非常に高い": 0.06
+      }
+    },
+    {
+      "questionId": "pc5-再発可能性",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 極低": 0,
+        "2 低い": 0,
+        "3 中程度": 0.01,
+        "4 高い": 0.27,
+        "5 ほぼ確実": 0.72
+      }
+    },
+    {
+      "questionId": "pc5-費用対効果",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 割高": 0.01,
+        "2 やや割高": 0.02,
+        "3 妥当": 0.26,
+        "4 良い": 0.58,
+        "5 非常に良い": 0.13
+      }
+    },
+    {
+      "questionId": "pc11-影響度",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 軽微: 検証や報告の手間のみ": 0,
+        "2 小: 局所的な手戻り": 0,
+        "3 中: 工程の差し戻しや追加検証を要す": 0.02,
+        "4 大: workflow 停止・主要機能不能": 0.05,
+        "5 致命的: データ損失・修正不能な破壊": 0.93
+      }
+    },
+    {
+      "questionId": "pc11-横展開性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 固有: 本プロジェクトのみ": 0.06,
+        "2 限定: 特定環境・構成のみ": 0.04,
+        "3 中程度: 類似構成で発生し得る": 0.34,
+        "4 高い: 複数プロジェクト・文脈で発生": 0.4,
+        "5 汎用: 任意の環境で発生": 0.16
+      }
+    },
+    {
+      "questionId": "pc11-反映先明確度",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 不明: 反映先が特定できない": 0.01,
+        "2 曖昧: 系統のみ推定可": 0.04,
+        "3 概要あり: 対象領域は特定済": 0.12,
+        "4 明確: 反映先と変更内容が明確": 0.8,
+        "5 自足的に整備済": 0.03
+      }
+    },
+    {
+      "questionId": "pc11-自動化適性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 困難": 0.01,
+        "2 低い: 手順規約が主体": 0,
+        "3 可能: 部分自動化できる": 0.07,
+        "4 容易": 0.42,
+        "5 即自動化可": 0.5
+      }
+    },
+    {
+      "questionId": "pc11-固有知識再利用性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 低い": 0.06,
+        "2 やや低い": 0.07,
+        "3 中程度": 0.07,
+        "4 高い": 0.38,
+        "5 非常に高い": 0.42
+      }
+    },
+    {
+      "questionId": "pc11-再発可能性",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 極低": 0.26,
+        "2 低い": 0.32,
+        "3 中程度": 0.1,
+        "4 高い": 0.21,
+        "5 ほぼ確実": 0.11
+      }
+    },
+    {
+      "questionId": "pc11-費用対効果",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 割高": 0.02,
+        "2 やや割高": 0.02,
+        "3 妥当": 0.11,
+        "4 良い": 0.27,
+        "5 非常に良い": 0.58
+      }
+    },
+    {
+      "questionId": "disp-pc6",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "duplicate": 0.99,
+        "5 既存対策の更新": 0.01,
+        "6 deferred": 0,
+        "4 project knowledge": 0,
+        "1 恒久契約候補（REQ）": 0,
+        "3 恒久契約候補（Design）": 0,
+        "2 恒久契約候補（Decision）": 0,
+        "7 rejected": 0
+      }
+    },
+    {
+      "questionId": "disp-pc11",
+      "questionForm": "choice",
+      "value": "3 恒久契約候補（Design）",
+      "probabilityDistribution": {
+        "3 恒久契約候補（Design）": 1,
+        "4 project knowledge": 0,
+        "5 既存対策の更新": 0,
+        "6 deferred": 0,
+        "duplicate": 0,
+        "1 恒久契約候補（REQ）": 0,
+        "2 恒久契約候補（Decision）": 0,
+        "7 rejected": 0
+      }
+    },
+    {
+      "questionId": "disp-pc2",
+      "questionForm": "choice",
+      "value": "4 project knowledge",
+      "probabilityDistribution": {
+        "4 project knowledge": 0.9400000000000001,
+        "5 既存対策の更新": 0.06,
+        "6 deferred": 0,
+        "duplicate": 0,
+        "3 恒久契約候補（Design）": 0
+      }
+    },
+    {
+      "questionId": "disp-u13-mklink",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "duplicate": 0.99,
+        "6 deferred": 0,
+        "5 既存対策の更新": 0.01,
+        "4 project knowledge": 0
+      }
+    },
+    {
+      "questionId": "disp-u16-heredoc",
+      "questionForm": "choice",
+      "value": "5 既存対策の更新",
+      "probabilityDistribution": {
+        "5 既存対策の更新": 1,
+        "6 deferred": 0,
+        "4 project knowledge": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "subl-pc1",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.83,
+        "false": 0.17000000000000004
+      }
+    },
+    {
+      "questionId": "subl-pc11",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.86,
+        "false": 0.14
+      }
+    },
+    {
+      "questionId": "adversarial-trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.94,
+        "false": 0.06000000000000005
+      }
+    }
+  ],
+  "confidence": 0.65,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "pc1-影響度",
+        "value": 1
+      },
+      {
+        "questionId": "pc1-横展開性",
+        "value": 2,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "pc1-反映先明確度",
+        "value": 3
+      },
+      {
+        "questionId": "pc1-自動化適性",
+        "value": 1
+      },
+      {
+        "questionId": "pc1-固有知識再利用性",
+        "value": 2
+      },
+      {
+        "questionId": "pc1-再発可能性",
+        "value": 4
+      },
+      {
+        "questionId": "pc1-費用対効果",
+        "value": 3,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "pc5-影響度",
+        "value": 2
+      },
+      {
+        "questionId": "pc5-横展開性",
+        "value": 2
+      },
+      {
+        "questionId": "pc5-反映先明確度",
+        "value": 3
+      },
+      {
+        "questionId": "pc5-自動化適性",
+        "value": 2
+      },
+      {
+        "questionId": "pc5-固有知識再利用性",
+        "value": 3,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "pc5-再発可能性",
+        "value": 4
+      },
+      {
+        "questionId": "pc5-費用対効果",
+        "value": 3
+      },
+      {
+        "questionId": "pc11-影響度",
+        "value": 4
+      },
+      {
+        "questionId": "pc11-横展開性",
+        "value": 3
+      },
+      {
+        "questionId": "pc11-反映先明確度",
+        "value": 3
+      },
+      {
+        "questionId": "pc11-自動化適性",
+        "value": 3
+      },
+      {
+        "questionId": "pc11-固有知識再利用性",
+        "value": 3
+      },
+      {
+        "questionId": "pc11-再発可能性",
+        "value": 2
+      },
+      {
+        "questionId": "pc11-費用対効果",
+        "value": 3
+      },
+      {
+        "questionId": "disp-pc6",
+        "value": "duplicate"
+      },
+      {
+        "questionId": "disp-pc11",
+        "value": "3 恒久契約候補（Design）"
+      },
+      {
+        "questionId": "disp-pc2",
+        "value": "4 project knowledge"
+      },
+      {
+        "questionId": "disp-u13-mklink",
+        "value": "duplicate"
+      },
+      {
+        "questionId": "disp-u16-heredoc",
+        "value": "5 既存対策の更新"
+      },
+      {
+        "questionId": "subl-pc1",
+        "value": true
+      },
+      {
+        "questionId": "subl-pc11",
+        "value": true
+      },
+      {
+        "questionId": "adversarial-trigger",
+        "value": true
+      }
+    ]
+  }
+}

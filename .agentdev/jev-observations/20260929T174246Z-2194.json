@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260929T174246Z-2194",
+  "workflow": "intake-promote",
+  "evaluationKind": "adversarial-review-trigger",
+  "subject": "intake inbox 4 item 暫定分類（採用3・保留1）の adversarial-review 発動条件",
+  "sourceRevision": "362e59d1702d92da19048640325710eb4cc786c1",
+  "durationMs": 272,
+  "inputTokens": 593,
+  "inputs": {
+    "requestDigest": "3cb4cef132082142960c30d0b2f25005e55747472be8fe480c4432d7aaf85102",
+    "references": [
+      {
+        "digest": "0b68ff8ec302e95fb68df3971e2cf4038336ed6ffce5f8477d398ebaeae258e6",
+        "label": "item1",
+        "path": ".agentdev/intake/inbox/2026-09-27-3139-measurement-unverified-remainder.md"
+      },
+      {
+        "digest": "331d3ae5a7c47f1b60ae99d8ca7d6070a26da58fd20c04909cb964722d455134",
+        "label": "item2",
+        "path": ".agentdev/intake/inbox/2026-09-29-3233-checker-execution-contracts-lifecycle-notes.md"
+      },
+      {
+        "digest": "613089b5feb5818c62ad3c297f9f4a7a0ecc7682db1954d23d1c93c2e47f980c",
+        "label": "item3",
+        "path": ".agentdev/intake/inbox/2026-09-29-3236-decision-numbering-timing-wording.md"
+      },
+      {
+        "digest": "331f7be7bc36c9e73dc10186ccfb07927b9da9c64156b8592c28c829c4bbf265",
+        "label": "item4",
+        "path": ".agentdev/intake/inbox/2026-09-29-3236-distribution-link-profile-worktree-contract.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "review_trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.86,
+        "false": 0.14
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "review_trigger",
+        "value": true
+      }
+    ]
+  }
+}

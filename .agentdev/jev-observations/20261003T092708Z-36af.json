@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261003T092708Z-36af",
+  "workflow": "case-ready",
+  "evaluationKind": "wave-composition",
+  "subject": "Root Case #3391 Epic 構成 Wave 1（RA-001〜006）の並列可否と重複時処置",
+  "sourceRevision": "e7c2626bf5220a0e4bb9ae71b42fc93f20e49dd2",
+  "durationMs": 634,
+  "inputTokens": 1794,
+  "inputs": {
+    "requestDigest": "6f0aa07bb284542590df516a682830a670ddf5bf172e1383ec337a9b2f038e05"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-3391-wave1-parallel",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.93,
+        "false": 0.06999999999999995
+      }
+    },
+    {
+      "questionId": "q-3391-wave1-duplication-disposition",
+      "questionForm": "choice",
+      "value": "変更対象分割",
+      "probabilityDistribution": {
+        "変更対象分割": 0.59,
+        "重複許容": 0.41
+      }
+    }
+  ],
+  "confidence": 0.18,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-3391-wave1-parallel",
+        "value": true
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "q-3391-wave1-duplication-disposition",
+        "value": "重複許容"
+      }
+    ]
+  }
+}

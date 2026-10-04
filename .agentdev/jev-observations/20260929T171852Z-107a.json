@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260929T171852Z-107a",
+  "workflow": "learning-promote",
+  "evaluationKind": "sublimation-possibility",
+  "subject": "学習 promote 候補5単位の昇華可能性（2026-09-30 backlog-auto stage 2）",
+  "sourceRevision": "e402ce44",
+  "durationMs": 918,
+  "inputTokens": 1442,
+  "inputs": {
+    "requestDigest": "91fe7f1978ddc9b8f77502e24a35828769afbd781b75d039343a89bc64b91792",
+    "references": [
+      {
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "label": "learning-inbox",
+        "path": ".agentdev/learning/inbox.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-s-classA",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.88,
+        "false": 0.12
+      }
+    },
+    {
+      "questionId": "q-s-e5",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.89,
+        "false": 0.10999999999999999
+      }
+    },
+    {
+      "questionId": "q-s-e6",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.57,
+        "false": 0.43000000000000005
+      }
+    },
+    {
+      "questionId": "q-s-e9",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.85,
+        "false": 0.15000000000000002
+      }
+    },
+    {
+      "questionId": "q-s-e11",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.85,
+        "false": 0.15000000000000002
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-s-classA",
+        "value": true
+      },
+      {
+        "questionId": "q-s-e5",
+        "value": true
+      },
+      {
+        "questionId": "q-s-e6",
+        "value": true
+      },
+      {
+        "questionId": "q-s-e9",
+        "value": true
+      },
+      {
+        "questionId": "q-s-e11",
+        "value": true
+      }
+    ]
+  }
+}

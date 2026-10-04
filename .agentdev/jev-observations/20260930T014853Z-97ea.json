@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260930T014853Z-97ea",
+  "workflow": "req-define",
+  "evaluationKind": "classification-gate",
+  "subject": "design対応宣言補強33行の最終分類・Design分離",
+  "sourceRevision": "repo-working-tree-2026-09-30（req-define は git コマンド実行禁止のため commit hash 不使用）",
+  "durationMs": 1122,
+  "inputTokens": 983,
+  "inputs": {
+    "requestDigest": "4aa1e051aab082647b5136f71dce6a7bf14f5bf16f437ef50c9f907c13ffb841",
+    "references": [
+      {
+        "label": "構造化要件入力",
+        "path": "req-input-adf-design-coverage-backfill.md（repo 外パス C:\\Users\\ogatay\\work\\hermes-vault\\project-list\\ 配下）",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-classification-attribution",
+      "questionForm": "choice",
+      "value": "Design行（docs/designs/ 配下の Design 成果物への操作として保存すべき）",
+      "probabilityDistribution": {
+        "REQ行（docs/requirements/ 配下の要件行として保存すべき）": 0,
+        "Design行（docs/designs/ 配下の Design 成果物への操作として保存すべき）": 1
+      }
+    },
+    {
+      "questionId": "q2-classification-separation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.05,
+        "false": 0.95
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-classification-attribution",
+        "value": "Design行（docs/designs/ 配下の Design 成果物への操作として保存すべき）"
+      },
+      {
+        "questionId": "q2-classification-separation",
+        "value": false
+      }
+    ]
+  }
+}

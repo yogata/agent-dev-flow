@@ -1,0 +1,495 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261004T164018Z-b2f5",
+  "workflow": "backlog-auto/intake-promote",
+  "evaluationKind": "item-evaluation",
+  "subject": "intake inbox 21件の item 評価（後半10件・3観点）",
+  "sourceRevision": "ad6e83412d54a8a9c241fd00a25db968d52da22c",
+  "durationMs": 229,
+  "inputTokens": 3802,
+  "inputs": {
+    "requestDigest": "aa9965c5884fdd3fe0778c942c9437e7e42e189fee142b594fd300fe2a672e25",
+    "references": [
+      {
+        "digest": "5530ab3fa472ff1f64dc3d5305a78834e7570e340dc96ca2b7144f82ed0e1940",
+        "label": "item12 REQ-003-055 phantom",
+        "path": ".agentdev/intake/inbox/2026-10-04-req003-055-phantom-preexisting-req096-migration.md"
+      },
+      {
+        "digest": "3d05d6ff62fe446d633f2308ab9291728424987d24c0fb1c343e0804ec7b0733",
+        "label": "item13 sidecar追随",
+        "path": ".agentdev/intake/inbox/2026-10-04-req095-003-req018-002-sidecar-followup.md"
+      },
+      {
+        "digest": "57e5a548495e0e92b9c3182b142e8b3db09afa995086311277b112b276a1bc01",
+        "label": "item14 freshness一括是正",
+        "path": ".agentdev/intake/inbox/2026-10-04-req-updated-freshness-16-backlog.md"
+      },
+      {
+        "digest": "df6c26cc86329e60493c26812d7c9e91465f20019613c47406f7cf3de6577d77",
+        "label": "item15 廃止REQ参照一覧",
+        "path": ".agentdev/intake/inbox/2026-10-04-retired-req087-092-093-wave3-remaining-refs-cleanup.md"
+      },
+      {
+        "digest": "1156a16929fcc1dac37e7eaebe2551962805b2f22267ce5b1181ee3bff6c882c",
+        "label": "item16 repo-localテスト参照",
+        "path": ".agentdev/intake/inbox/2026-10-04-retired-req092-repo-local-test-refs-cleanup.md"
+      },
+      {
+        "digest": "d3d3e4368b4522e5f6690aa0d4e36f9bf7098ee135351f667c9a5b313c8ce19a",
+        "label": "item17 gate 0件PASS",
+        "path": ".agentdev/intake/inbox/2026-10-04-textlint-gate-worktree-root-path-zero-inspected-pass.md"
+      },
+      {
+        "digest": "e18f4e99b9bdc275d379170f19de0ee650177fbfb7a227dae43b943e59c1138c",
+        "label": "item18 ADR設定欠陥",
+        "path": ".agentdev/intake/inbox/2026-10-04-textlint-guard-adr-config-known-defects.md"
+      },
+      {
+        "digest": "ff76b7633bf4afbd96c01abaea91a812d921e3f665fda6b4ac6e59efc47c1a0f",
+        "label": "item19 reports除外未実装",
+        "path": ".agentdev/intake/inbox/2026-10-04-traceability-check-docs-reports-exclusion-unimplemented.md"
+      },
+      {
+        "digest": "63612fce07e4a9c3065a08860b664ec918b1165329d466f709a8b33a7b3af750",
+        "label": "item20 reports unknown-refs",
+        "path": ".agentdev/intake/inbox/2026-10-04-traceability-unknown-req-refs-req053-docs-reports.md"
+      },
+      {
+        "digest": "84ec4b080ed7a040cf17d90ab12eb4dc04d8b7d5b8557e61adad40405f976949",
+        "label": "item21 unclosed fence",
+        "path": ".agentdev/intake/inbox/2026-10-04-workflow-templates-unclosed-code-block.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "i12-validity",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.03,
+        "中": 0.7,
+        "高": 0.27
+      }
+    },
+    {
+      "questionId": "i12-impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.21,
+        "中": 0.74,
+        "高": 0.05
+      }
+    },
+    {
+      "questionId": "i12-urgency",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.23,
+        "中": 0.75,
+        "高": 0.02
+      }
+    },
+    {
+      "questionId": "i13-validity",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0.01,
+        "中": 0.33,
+        "高": 0.66
+      }
+    },
+    {
+      "questionId": "i13-impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.18,
+        "中": 0.75,
+        "高": 0.07
+      }
+    },
+    {
+      "questionId": "i13-urgency",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.19000000000000003,
+        "中": 0.7200000000000001,
+        "高": 0.09000000000000001
+      }
+    },
+    {
+      "questionId": "i14-validity",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0.01,
+        "中": 0.4,
+        "高": 0.59
+      }
+    },
+    {
+      "questionId": "i14-impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.03,
+        "中": 0.72,
+        "高": 0.25
+      }
+    },
+    {
+      "questionId": "i14-urgency",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.03,
+        "中": 0.78,
+        "高": 0.19
+      }
+    },
+    {
+      "questionId": "i15-validity",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.29,
+        "中": 0.69,
+        "高": 0.02
+      }
+    },
+    {
+      "questionId": "i15-impact",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "低": 0.6,
+        "中": 0.39,
+        "高": 0.01
+      }
+    },
+    {
+      "questionId": "i15-urgency",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "低": 0.55,
+        "中": 0.44,
+        "高": 0.01
+      }
+    },
+    {
+      "questionId": "i16-validity",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "低": 0.84,
+        "中": 0.16,
+        "高": 0
+      }
+    },
+    {
+      "questionId": "i16-impact",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "低": 0.84,
+        "中": 0.15,
+        "高": 0.01
+      }
+    },
+    {
+      "questionId": "i16-urgency",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "低": 0.92,
+        "中": 0.08,
+        "高": 0
+      }
+    },
+    {
+      "questionId": "i17-validity",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.03,
+        "中": 0.66,
+        "高": 0.31
+      }
+    },
+    {
+      "questionId": "i17-impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.08,
+        "中": 0.78,
+        "高": 0.14
+      }
+    },
+    {
+      "questionId": "i17-urgency",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.12,
+        "中": 0.78,
+        "高": 0.1
+      }
+    },
+    {
+      "questionId": "i18-validity",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "低": 0.84,
+        "中": 0.15,
+        "高": 0.01
+      }
+    },
+    {
+      "questionId": "i18-impact",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "低": 0.82,
+        "中": 0.17,
+        "高": 0.01
+      }
+    },
+    {
+      "questionId": "i18-urgency",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "低": 0.87,
+        "中": 0.12,
+        "高": 0.01
+      }
+    },
+    {
+      "questionId": "i19-validity",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.03,
+        "中": 0.56,
+        "高": 0.41
+      }
+    },
+    {
+      "questionId": "i19-impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.04,
+        "中": 0.74,
+        "高": 0.22
+      }
+    },
+    {
+      "questionId": "i19-urgency",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.08,
+        "中": 0.74,
+        "高": 0.18
+      }
+    },
+    {
+      "questionId": "i20-validity",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.22,
+        "中": 0.68,
+        "高": 0.1
+      }
+    },
+    {
+      "questionId": "i20-impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.33,
+        "中": 0.63,
+        "高": 0.04
+      }
+    },
+    {
+      "questionId": "i20-urgency",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "低": 0.55,
+        "中": 0.44,
+        "高": 0.01
+      }
+    },
+    {
+      "questionId": "i21-validity",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "低": 0.96,
+        "中": 0.04,
+        "高": 0
+      }
+    },
+    {
+      "questionId": "i21-impact",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "低": 0.88,
+        "中": 0.11,
+        "高": 0.01
+      }
+    },
+    {
+      "questionId": "i21-urgency",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "低": 0.92,
+        "中": 0.07,
+        "高": 0.01
+      }
+    }
+  ],
+  "confidence": 0.54,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "i12-validity",
+        "value": 1
+      },
+      {
+        "questionId": "i12-impact",
+        "value": 1
+      },
+      {
+        "questionId": "i12-urgency",
+        "value": 1
+      },
+      {
+        "questionId": "i13-validity",
+        "value": 2
+      },
+      {
+        "questionId": "i13-impact",
+        "value": 1
+      },
+      {
+        "questionId": "i13-urgency",
+        "value": 1
+      },
+      {
+        "questionId": "i14-validity",
+        "value": 2
+      },
+      {
+        "questionId": "i14-impact",
+        "value": 1
+      },
+      {
+        "questionId": "i14-urgency",
+        "value": 1
+      },
+      {
+        "questionId": "i15-validity",
+        "value": 1
+      },
+      {
+        "questionId": "i15-impact",
+        "value": 0
+      },
+      {
+        "questionId": "i15-urgency",
+        "value": 0
+      },
+      {
+        "questionId": "i16-validity",
+        "value": 0
+      },
+      {
+        "questionId": "i16-impact",
+        "value": 0
+      },
+      {
+        "questionId": "i16-urgency",
+        "value": 0
+      },
+      {
+        "questionId": "i17-validity",
+        "value": 1
+      },
+      {
+        "questionId": "i17-impact",
+        "value": 1
+      },
+      {
+        "questionId": "i17-urgency",
+        "value": 1
+      },
+      {
+        "questionId": "i18-validity",
+        "value": 0
+      },
+      {
+        "questionId": "i18-impact",
+        "value": 0
+      },
+      {
+        "questionId": "i18-urgency",
+        "value": 0
+      },
+      {
+        "questionId": "i19-validity",
+        "value": 1
+      },
+      {
+        "questionId": "i19-impact",
+        "value": 1
+      },
+      {
+        "questionId": "i19-urgency",
+        "value": 1
+      },
+      {
+        "questionId": "i20-validity",
+        "value": 1
+      },
+      {
+        "questionId": "i20-impact",
+        "value": 1
+      },
+      {
+        "questionId": "i20-urgency",
+        "value": 0
+      },
+      {
+        "questionId": "i21-validity",
+        "value": 0
+      },
+      {
+        "questionId": "i21-impact",
+        "value": 0
+      },
+      {
+        "questionId": "i21-urgency",
+        "value": 0
+      }
+    ]
+  }
+}

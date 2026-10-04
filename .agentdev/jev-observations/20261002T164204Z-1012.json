@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261002T164204Z-1012",
+  "workflow": "backlog-review",
+  "evaluationKind": "knowledge-disposition",
+  "subject": "learning 由来知識保存候補 2 件（Windows rename EPERM・構造移設追随）の docs/knowledge/ 処置判定",
+  "sourceRevision": "08ed1fc0",
+  "durationMs": 701,
+  "inputTokens": 1233,
+  "inputs": {
+    "requestDigest": "a460ddb4ef3e4a224c9c70bd649802aabfe0318d97df13950b76dc00510f517b",
+    "references": [
+      {
+        "digest": "e85b175d1e6e243ab0124fdfb6c1d3ddfd2ce08fae4ac32ad0b46327efe105b0",
+        "label": "L11-windows-rename-eperm",
+        "path": ".agentdev/learning/promoted/project-knowledge-windows-rename-eperm-diagnosis.md"
+      },
+      {
+        "digest": "c5d7b31d45f58b4e91bec57093665fbf8fa479945a8555a05bf667ad0dc2e6bf",
+        "label": "L12-structure-migration",
+        "path": ".agentdev/learning/promoted/project-knowledge-structure-migration-followup.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "k1-disposition",
+      "questionForm": "choice",
+      "value": "保存",
+      "probabilityDistribution": {
+        "保存": 0.98,
+        "削除": 0,
+        "保留": 0.02
+      }
+    },
+    {
+      "questionId": "k1-operation",
+      "questionForm": "choice",
+      "value": "新規",
+      "probabilityDistribution": {
+        "新規": 1,
+        "更新": 0,
+        "置換": 0,
+        "削除": 0
+      }
+    },
+    {
+      "questionId": "k2-disposition",
+      "questionForm": "choice",
+      "value": "保留",
+      "probabilityDistribution": {
+        "保存": 0.24,
+        "削除": 0.25,
+        "保留": 0.51
+      }
+    },
+    {
+      "questionId": "k2-operation",
+      "questionForm": "choice",
+      "value": "新規",
+      "probabilityDistribution": {
+        "新規": 1,
+        "更新": 0,
+        "置換": 0,
+        "削除": 0
+      }
+    }
+  ],
+  "confidence": 0.96,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "k1-disposition",
+        "value": "保存"
+      },
+      {
+        "questionId": "k1-operation",
+        "value": "新規"
+      },
+      {
+        "questionId": "k2-disposition",
+        "value": "保存",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "k2-operation",
+        "value": "新規"
+      }
+    ]
+  }
+}

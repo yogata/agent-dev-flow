@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260930T173402Z-bc10",
+  "workflow": "req-define",
+  "evaluationKind": "final-classification-design-separation",
+  "subject": "横断判断モデル詳細資料（判別基準・判定表・対応表・閉包条件）のREQ行/Design行帰属",
+  "sourceRevision": "main@2026-10-01 (input digest 55a563e4)",
+  "durationMs": 957,
+  "inputTokens": 1754,
+  "inputs": {
+    "requestDigest": "ca9e002c87762fffb87d4d64b63a136ec1892507e310890da855b6727d53c5c2",
+    "references": [
+      {
+        "digest": "55a563e431320f85790cc901c3cd665c8b52df2323a21ac19b4189475a5654d3",
+        "label": "要件入力ファイル",
+        "path": "C:/Users/ogatay/work/hermes-vault/project-list/req-input-adf-judgment-architecture-redesign.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-detail-artifact-attribution",
+      "questionForm": "choice",
+      "value": "Design行・既存（既存Design docs/designs/foundations/v4-responsibility-boundaries.md へ集約追記する）",
+      "probabilityDistribution": {
+        "REQ行（新規横断REQ REQ-096の要件行として直接記載する）": 0,
+        "Design行・新規（新規Design docs/designs/foundations/judgment-architecture.md へ分離する）": 0.14,
+        "Design行・既存（既存Design docs/designs/foundations/v4-responsibility-boundaries.md へ集約追記する）": 0.86
+      }
+    },
+    {
+      "questionId": "q2-design-separation-necessity",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.95,
+        "false": 0.050000000000000044
+      }
+    }
+  ],
+  "confidence": 0.79,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-detail-artifact-attribution",
+        "value": "Design行・既存（既存Design docs/designs/foundations/v4-responsibility-boundaries.md へ集約追記する）"
+      },
+      {
+        "questionId": "q2-design-separation-necessity",
+        "value": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261004T172300Z-2c95",
+  "workflow": "backlog-review",
+  "evaluationKind": "knowledge-disposition-stage1",
+  "subject": "docs/knowledge/ 知識文書保存候補6系統（新規2・更新4）の処置候補判定（2026-10-05 backlog-auto stage 3）",
+  "sourceRevision": "51525380dcc1fcce56571d493cc326e011e66421",
+  "durationMs": 607,
+  "inputTokens": 2223,
+  "inputs": {
+    "requestDigest": "26caf71c70052d29eae70da1129a8ed716ee151f566548ea30c6067d3f580f6e",
+    "references": [
+      {
+        "digest": "2c360dffe5864c63e1ed0483927b3eae9fdb5cf83bfb0bb1add01c2962a838ec",
+        "label": "promoted-learning-windows-checker-observation",
+        "path": ".agentdev/learning/promoted/project-knowledge-windows-checker-observation.md"
+      },
+      {
+        "digest": "45e17446a44fd8fc13bc304714ef98aa4591ca0258055a1266d9b235100cfdba",
+        "label": "promoted-learning-worktree-env-fail-classification",
+        "path": ".agentdev/learning/promoted/project-knowledge-worktree-env-fail-classification.md"
+      },
+      {
+        "digest": "6f2c5ee8076af72333d516a24cbe1d662a6e396357c4a3de2b0204ef967f5f08",
+        "label": "promoted-learning-git-push-gcm-contingency",
+        "path": ".agentdev/learning/promoted/existing-measure-update-git-push-gcm-contingency.md"
+      },
+      {
+        "digest": "f65d53d3c00fa62d7dff4cab7392e307c95bba7b34292984e05357ef77e954b8",
+        "label": "promoted-intake-auth-mock",
+        "path": ".agentdev/intake/promoted/2026-10-04-auth-mock-requires-auth-required-operation.md"
+      },
+      {
+        "digest": "ca0eefca1ea3c8b91415df217566fc13d193fb5495fa9ad04a23cab14b0b9fab",
+        "label": "promoted-learning-spawn-timeout-followup",
+        "path": ".agentdev/learning/promoted/existing-measure-update-spawn-timeout-followup.md"
+      },
+      {
+        "digest": "c8aba55bfe3cb8520cee7f930f9514a6014f6921e5bfbd443cf615423114c878",
+        "label": "promoted-intake-knowledge-sections-missing",
+        "path": ".agentdev/intake/promoted/2026-10-04-knowledge-required-sections-missing.md"
+      },
+      {
+        "digest": "9e073ab15e30a52c27d338a22a03fbed7871c63847ed3e2f1e3f86f149e25309",
+        "label": "existing-knowledge-msys-path",
+        "path": "docs/knowledge/windows-checker-msys-path-argument.md"
+      },
+      {
+        "digest": "29436f309cf0c1c2065dba7b7da33b09594d4ae9d79cd63c58115aeee85317e1",
+        "label": "existing-knowledge-worktree-preexisting-crosscheck",
+        "path": "docs/knowledge/worktree-preexisting-violation-main-crosscheck.md"
+      },
+      {
+        "digest": "c502610770ee2ae9a10e1c64d83844474a8e73cb61420f5f0651ab6ad6e3769f",
+        "label": "existing-knowledge-qg4-baseline-reproduction",
+        "path": "docs/knowledge/qg4-baseline-detached-worktree-reproduction.md"
+      },
+      {
+        "digest": "57193aa8ab3886dbc002d37769c36ace3e429681a46f23c31c3d6bb21a33e249",
+        "label": "existing-knowledge-git-noninteractive-auth",
+        "path": "docs/knowledge/git-noninteractive-auth.md"
+      },
+      {
+        "digest": "f69abff4739eed0c808a5eb0a02359fd623dac3d145393cd089d364c70d5cca6",
+        "label": "existing-knowledge-spawn-timeout-classification",
+        "path": "docs/knowledge/windows-bun-test-spawn-timeout-classification.md"
+      },
+      {
+        "digest": "bfb9a2679f15838f6a3b7cd954fdf8794519f93cb39d33973c59a3ed3e2adf9f",
+        "label": "existing-knowledge-structure-migration-checklist",
+        "path": "docs/knowledge/structure-migration-followup-checklist.md"
+      },
+      {
+        "digest": "e591f93f4ca2a82923e01787177e61b817eb28cc013cafd89dc51e98082b01b8",
+        "label": "existing-knowledge-rename-eperm",
+        "path": "docs/knowledge/windows-rename-eperm-diagnosis-and-bounded-retry.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "kd1-windows-checker-observation",
+      "questionForm": "choice",
+      "value": "保存",
+      "probabilityDistribution": {
+        "保存": 0.95,
+        "削除": 0,
+        "保留": 0.05
+      }
+    },
+    {
+      "questionId": "kd1-worktree-env-fail-classification",
+      "questionForm": "choice",
+      "value": "保存",
+      "probabilityDistribution": {
+        "保存": 0.99,
+        "削除": 0,
+        "保留": 0.01
+      }
+    },
+    {
+      "questionId": "kd1-git-noninteractive-auth",
+      "questionForm": "choice",
+      "value": "保存",
+      "probabilityDistribution": {
+        "保存": 0.98,
+        "削除": 0,
+        "保留": 0.02
+      }
+    },
+    {
+      "questionId": "kd1-spawn-timeout-followup",
+      "questionForm": "choice",
+      "value": "保存",
+      "probabilityDistribution": {
+        "保存": 0.97,
+        "削除": 0,
+        "保留": 0.03
+      }
+    },
+    {
+      "questionId": "kd1-knowledge-sections-missing",
+      "questionForm": "choice",
+      "value": "保存",
+      "probabilityDistribution": {
+        "保存": 0.91,
+        "削除": 0.01,
+        "保留": 0.08
+      }
+    },
+    {
+      "questionId": "kd1-remaining-ru-sources",
+      "questionForm": "choice",
+      "value": "保留",
+      "probabilityDistribution": {
+        "保存": 0.01,
+        "削除": 0,
+        "保留": 0.99
+      }
+    }
+  ],
+  "confidence": 0.92,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "kd1-windows-checker-observation",
+        "value": "保存"
+      },
+      {
+        "questionId": "kd1-worktree-env-fail-classification",
+        "value": "保存"
+      },
+      {
+        "questionId": "kd1-git-noninteractive-auth",
+        "value": "保存"
+      },
+      {
+        "questionId": "kd1-spawn-timeout-followup",
+        "value": "保存"
+      },
+      {
+        "questionId": "kd1-knowledge-sections-missing",
+        "value": "保存"
+      },
+      {
+        "questionId": "kd1-remaining-ru-sources",
+        "value": "保留"
+      }
+    ]
+  }
+}

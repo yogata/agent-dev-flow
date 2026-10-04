@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260929T173655Z-b3fd",
+  "workflow": "learning-promote",
+  "evaluationKind": "review-trigger",
+  "subject": "adversarial-review 発動条件判定（inbox 11件・反映済み）",
+  "sourceRevision": "2be595ea",
+  "durationMs": 871,
+  "inputTokens": 791,
+  "inputs": {
+    "requestDigest": "7428613dc439a719a2b05fe8cb97c47a2ddfeae35bf0b8d466d15d10a99bfbdd",
+    "references": [
+      {
+        "digest": "59cf79faa7244aea03b3bd39f0c70fec051db766ce01cdfb4a931f157d985cbc",
+        "label": "learning-inbox",
+        "path": ".agentdev/learning/inbox.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "review-trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.91,
+        "false": 0.08999999999999997
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "review-trigger",
+        "value": true
+      }
+    ]
+  }
+}

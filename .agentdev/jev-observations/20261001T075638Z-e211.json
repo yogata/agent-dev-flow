@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261001T075638Z-e211",
+  "workflow": "case-ready",
+  "evaluationKind": "standard-epic-determination",
+  "subject": "Root Case #3293 docs-current-model-alignment-and-compression-foundation の実行構造（Standard/Epic 帰属・3軸判断）",
+  "sourceRevision": "92edf6ae",
+  "durationMs": 4420,
+  "inputTokens": 1954,
+  "inputs": {
+    "requestDigest": "05bd19c604704fc536d3ef6a2782473d12a8a4987074a62b8b9b957788430be1"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-std-epic-attribution",
+      "questionForm": "choice",
+      "value": "Epic（Root Case 配下に Child Issue 8件と Wave / 依存構造を作成する）",
+      "probabilityDistribution": {
+        "Epic（Root Case 配下に Child Issue 8件と Wave / 依存構造を作成する）": 0.94,
+        "Standard（Root Case 自身を単一 execution unit とする）": 0.06
+      }
+    },
+    {
+      "questionId": "q-dep-strength",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "関連 = 同じ領域だが実行依存なし": 0,
+        "弱 = 実行順序の推奨はあるが並列可": 0,
+        "必須 = 一方が他方なしでは成立しない": 1
+      }
+    },
+    {
+      "questionId": "q-func-cohesion",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "分散 = 共通主題なし": 0,
+        "部分的 = 関連するが単一主題ではない": 0,
+        "一貫 = 単一の機能的主題": 1
+      }
+    }
+  ],
+  "confidence": 0.88,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-std-epic-attribution",
+        "value": "Epic（Root Case 配下に Child Issue 8件と Wave / 依存構造を作成する）"
+      },
+      {
+        "questionId": "q-dep-strength",
+        "value": 2
+      },
+      {
+        "questionId": "q-func-cohesion",
+        "value": 2
+      }
+    ]
+  }
+}

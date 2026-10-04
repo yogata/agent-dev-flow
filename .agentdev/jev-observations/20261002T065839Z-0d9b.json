@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261002T065839Z-0d9b",
+  "workflow": "case-ready",
+  "evaluationKind": "wave-composition",
+  "subject": "Root Case #3314 の Wave 構成判断（Epic 確定後の条件付き判断）",
+  "sourceRevision": "e18f4eeb",
+  "durationMs": 554,
+  "inputTokens": 1241,
+  "inputs": {
+    "requestDigest": "8bc5cc09da2351f68924e018c18a722bd63122b7cdaf60a08b83e2810a668398",
+    "references": [
+      {
+        "digest": "26c3d94182c8d50f2b8eff7f1ccc42bdb563cdafde0ad55fa11faaf94b52d7fe",
+        "label": "req-draft",
+        "path": ".agentdev/drafts/req-draft-adf-opencode-senpi-coexistence.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "wave2-parallel",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.81,
+        "false": 0.18999999999999995
+      }
+    },
+    {
+      "questionId": "wave3-parallel",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.78,
+        "false": 0.21999999999999997
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "wave2-parallel",
+        "value": true
+      },
+      {
+        "questionId": "wave3-parallel",
+        "value": true
+      }
+    ]
+  }
+}

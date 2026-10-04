@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261004T063953Z-9b97",
+  "workflow": "req-define",
+  "evaluationKind": "final-classification-design-separation",
+  "subject": "3RU（05/06/07）の最終分類とDesign分離先・実現面分類",
+  "sourceRevision": "workspace-main-64116eb7a735f26fd041f20333f2bcb518648166",
+  "durationMs": 660,
+  "inputTokens": 2355,
+  "inputs": {
+    "requestDigest": "f1a47b21165c6fd70ff8a1be5c2e2b942a683f4cf66b884e4f41c5af8c73b831"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "d1-ru05-design-only",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.75,
+        "false": 0.25
+      }
+    },
+    {
+      "questionId": "d2-ru06-req060",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.65,
+        "false": 0.35
+      }
+    },
+    {
+      "questionId": "d3-ru06-req053",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.65,
+        "false": 0.35
+      }
+    },
+    {
+      "questionId": "d4-ru06-runtime-pkg",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.5,
+        "false": 0.5
+      }
+    },
+    {
+      "questionId": "d5-ru06-thirdparty",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.7,
+        "false": 0.30000000000000004
+      }
+    },
+    {
+      "questionId": "d6-realization-split",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.85,
+        "false": 0.15000000000000002
+      }
+    },
+    {
+      "questionId": "d7-ru07-split",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.72,
+        "false": 0.28
+      }
+    },
+    {
+      "questionId": "d8-test-strategy",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.38,
+        "false": 0.62
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "d1-ru05-design-only",
+        "value": true
+      },
+      {
+        "questionId": "d2-ru06-req060",
+        "value": true
+      },
+      {
+        "questionId": "d3-ru06-req053",
+        "value": true
+      },
+      {
+        "questionId": "d4-ru06-runtime-pkg",
+        "value": true
+      },
+      {
+        "questionId": "d5-ru06-thirdparty",
+        "value": true
+      },
+      {
+        "questionId": "d6-realization-split",
+        "value": true
+      },
+      {
+        "questionId": "d7-ru07-split",
+        "value": true
+      },
+      {
+        "questionId": "d8-test-strategy",
+        "value": true,
+        "differenceReason": "semantic_disagreement"
+      }
+    ]
+  }
+}

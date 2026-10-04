@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261004T172456Z-0754",
+  "workflow": "backlog-review",
+  "evaluationKind": "depends-on-reorderability",
+  "subject": "RU 構成案18件の depends_on 並べ替え可能性検証（RU-0001→[RU-0002,RU-0005] のみ・循環・未解決なし）（2026-10-05 backlog-auto stage 3）",
+  "sourceRevision": "51525380dcc1fcce56571d493cc326e011e66421",
+  "durationMs": 218,
+  "inputTokens": 926,
+  "inputs": {
+    "requestDigest": "7efeb5dee18d732b7e19098262f2de58cde612fae2f147684a79175840a26cf1",
+    "references": [
+      {
+        "digest": "5f5c40a5d863c43379292baab4a2eb0e4fd32052c2a319a0d550995a5d2f891d",
+        "label": "intake-freshness16",
+        "path": ".agentdev/intake/promoted/2026-10-04-req-updated-freshness-16-backlog.md"
+      },
+      {
+        "digest": "898684b08e29635eebcfcc621a4e9406e60cf0bea10c72353729c2267253ce93",
+        "label": "intake-req003-055-phantom",
+        "path": ".agentdev/intake/promoted/2026-10-04-req003-055-phantom-preexisting-req096-migration.md"
+      },
+      {
+        "digest": "19173faeecc92d2745529e7554e76d25a0522beb319ee109ee3ed2b89c7a4ca9",
+        "label": "intake-req010-070-dup",
+        "path": ".agentdev/intake/promoted/2026-10-04-req010-070-row-id-duplication.md"
+      },
+      {
+        "digest": "da0633892f84a4088e5f5b09c73269ab1983ccf6198a34cdaff8269a40056e1a",
+        "label": "inspect-req101-row005",
+        "path": ".agentdev/inspect/promoted/finding-20261004-req101-row005-gap.md"
+      }
+    ],
+    "snapshot": "depends_on 依存グラフ（RU 18件）: RU-0001 depends_on [RU-0002, RU-0005]（理由: 編集対象 REQ ファイル重複〔REQ-003=RU-0002 編集対象、REQ-010=RU-0005 編集対象〕で frontmatter updated の最終確定は本文変更確定後が自然なため）。RU-0002〜RU-0018 は依存なし。機械検出結果: 循環 0件、未解決参照 0件（RU-0002・RU-0005 は同一バッチ内に存在）。RU-0002 と RU-0005 の間に順序なし（並列実行可能）。"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "dep-reorderable",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.9,
+        "false": 0.09999999999999998
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "dep-reorderable",
+        "value": true
+      }
+    ]
+  }
+}

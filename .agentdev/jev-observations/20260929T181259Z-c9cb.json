@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260929T181259Z-c9cb",
+  "workflow": "backlog-review",
+  "evaluationKind": "integration-split",
+  "subject": "採用済み成果物 10件の RU 構成案 13件への統合・分割妥当性",
+  "sourceRevision": "e0247cb7",
+  "durationMs": 492,
+  "inputTokens": 2490,
+  "inputs": {
+    "requestDigest": "e62337ed4ba1f8a4deedb126574dfbefe38c0df9adca183d4e6078e11d9ab490",
+    "references": [
+      {
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "label": "promoted artifacts",
+        "path": ".agentdev/"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "cmp-l1",
+      "questionForm": "choice",
+      "value": "統合",
+      "probabilityDistribution": {
+        "統合": 1,
+        "分割": 0,
+        "1:1": 0
+      }
+    },
+    {
+      "questionId": "cmp-l3",
+      "questionForm": "choice",
+      "value": "統合",
+      "probabilityDistribution": {
+        "統合": 1,
+        "分割": 0,
+        "1:1": 0
+      }
+    },
+    {
+      "questionId": "cmp-l4",
+      "questionForm": "choice",
+      "value": "統合",
+      "probabilityDistribution": {
+        "統合": 1,
+        "分割": 0,
+        "1:1": 0
+      }
+    },
+    {
+      "questionId": "cmp-l5",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0,
+        "分割": 0,
+        "1:1": 1
+      }
+    },
+    {
+      "questionId": "cmp-i1",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0.02,
+        "分割": 0.02,
+        "1:1": 0.96
+      }
+    },
+    {
+      "questionId": "cmp-i2gr09",
+      "questionForm": "choice",
+      "value": "統合",
+      "probabilityDistribution": {
+        "統合": 0.98,
+        "分割": 0.01,
+        "1:1": 0.01
+      }
+    },
+    {
+      "questionId": "cmp-i3",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0.01,
+        "分割": 0,
+        "1:1": 0.99
+      }
+    },
+    {
+      "questionId": "cmp-inspect-b1",
+      "questionForm": "choice",
+      "value": "統合",
+      "probabilityDistribution": {
+        "統合": 1,
+        "分割": 0,
+        "1:1": 0
+      }
+    },
+    {
+      "questionId": "cmp-inspect-b2",
+      "questionForm": "choice",
+      "value": "統合",
+      "probabilityDistribution": {
+        "統合": 1,
+        "分割": 0,
+        "1:1": 0
+      }
+    },
+    {
+      "questionId": "cmp-inspect-rest",
+      "questionForm": "choice",
+      "value": "統合",
+      "probabilityDistribution": {
+        "統合": 0.89,
+        "分割": 0.03,
+        "1:1": 0.08
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "cmp-l1",
+        "value": "統合"
+      },
+      {
+        "questionId": "cmp-l3",
+        "value": "統合"
+      },
+      {
+        "questionId": "cmp-l4",
+        "value": "統合"
+      },
+      {
+        "questionId": "cmp-l5",
+        "value": "1:1"
+      },
+      {
+        "questionId": "cmp-i1",
+        "value": "1:1"
+      },
+      {
+        "questionId": "cmp-i2gr09",
+        "value": "統合"
+      },
+      {
+        "questionId": "cmp-i3",
+        "value": "1:1"
+      },
+      {
+        "questionId": "cmp-inspect-b1",
+        "value": "統合"
+      },
+      {
+        "questionId": "cmp-inspect-b2",
+        "value": "統合"
+      },
+      {
+        "questionId": "cmp-inspect-rest",
+        "value": "統合"
+      }
+    ]
+  }
+}

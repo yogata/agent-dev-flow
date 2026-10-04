@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261002T052812Z-3756",
+  "workflow": "req-define",
+  "evaluationKind": "requirement-expansion-classification",
+  "subject": "RU-0159 要件6項目の最終分類・Design分離",
+  "sourceRevision": "50c46920ba7caa777cdca64933ec91e04a7f8c4d",
+  "durationMs": 631,
+  "inputTokens": 2224,
+  "inputs": {
+    "requestDigest": "cec7d932df712c732eb54aedc894611b1ea524b38716a06cf2a607de87283c56",
+    "references": [
+      {
+        "digest": "f8ff99303d020aa07d81a7ca31b010ed5d5a495aac935019a3da9b84b442b69b",
+        "label": "RU-0159",
+        "path": ".agentdev/backlog/req-units/RU-0159.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "classification-attribution",
+      "questionForm": "choice",
+      "value": "REQ行+Design行（一部項目が成果定義と内部構造の両方を持つ）",
+      "probabilityDistribution": {
+        "REQ行のみ（全項目が成果定義）": 0,
+        "REQ行+Design行（一部項目が成果定義と内部構造の両方を持つ）": 1,
+        "Design行のみ（全項目が内部構造主題）": 0
+      }
+    },
+    {
+      "questionId": "design-separation",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.92,
+        "false": 0.07999999999999996
+      }
+    }
+  ],
+  "confidence": 0.99,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "classification-attribution",
+        "value": "REQ行+Design行（一部項目が成果定義と内部構造の両方を持つ）"
+      },
+      {
+        "questionId": "design-separation",
+        "value": true
+      }
+    ]
+  }
+}

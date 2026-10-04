@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261001T063253Z-04ce",
+  "workflow": "req-define",
+  "evaluationKind": "requirement-development-classification",
+  "subject": "RU-20261001-01 に係る保存対象候補の最終分類・Design 分離判定",
+  "sourceRevision": "baseline:agent-dev-flow-main-2026-10-01;worktree-read:2026-10-01;HEAD:8c471d3e",
+  "durationMs": 1041,
+  "inputTokens": 1290,
+  "inputs": {
+    "requestDigest": "f2d0449f5dcbb9a8f5e4cfc1e80099c31e102b54a425dd506ecd067ddd224f23",
+    "references": [
+      {
+        "digest": "d671d5755a58c68b7bff6cc7cc119246eedf710bec6bd7ac4eab54b079ea210b",
+        "label": "入力RU",
+        "path": ".agentdev/backlog/req-units/RU-20261001-01.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-final-classification",
+      "questionForm": "choice",
+      "value": "REQ行更新＋Design行保存の混在（純化・入口・実装投影は反映作業）",
+      "probabilityDistribution": {
+        "REQ行更新＋Design行保存の混在（純化・入口・実装投影は反映作業）": 1,
+        "REQ行更新のみ（Design分離・保存不要）": 0,
+        "全候補をDesign行へ分離（REQ行更新不要）": 0,
+        "新規REQ作成が必要": 0
+      }
+    },
+    {
+      "questionId": "q2-design-separation-necessity",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.23,
+        "false": 0.77
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-final-classification",
+        "value": "REQ行更新＋Design行保存の混在（純化・入口・実装投影は反映作業）"
+      },
+      {
+        "questionId": "q2-design-separation-necessity",
+        "value": false
+      }
+    ]
+  }
+}

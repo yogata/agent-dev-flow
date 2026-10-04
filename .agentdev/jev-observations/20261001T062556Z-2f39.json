@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261001T062556Z-2f39",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-20261001-01 に係る REQ-034-032／REQ-061-003／REQ-032-025 の既存REQ照合・操作分類",
+  "sourceRevision": "baseline:agent-dev-flow-main-2026-10-01;worktree-read:2026-10-01",
+  "durationMs": 1011,
+  "inputTokens": 1486,
+  "inputs": {
+    "requestDigest": "0822a9eb12cf27280d2a843c2ddad50888e170d1baafcd8741c7d5d86cbc0f67",
+    "references": [
+      {
+        "label": "入力RU",
+        "path": ".agentdev/backlog/req-units/RU-20261001-01.md",
+        "digest": "d671d5755a58c68b7bff6cc7cc119246eedf710bec6bd7ac4eab54b079ea210b"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-operation-classification",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 1,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "q2-matching-certainty",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.08,
+        "false": 0.92
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-operation-classification",
+        "value": "UPDATE"
+      },
+      {
+        "questionId": "q2-matching-certainty",
+        "value": false
+      }
+    ]
+  }
+}

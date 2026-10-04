@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260930T203635Z-6e81",
+  "workflow": "case-ready",
+  "evaluationKind": "wave-composition-parallelism",
+  "subject": "Case #3278 Wave 2 候補（OU-002/003/004）の並列可否",
+  "sourceRevision": "2016c03dbd0a831b232c57a5fe3f80aa51eb479a",
+  "durationMs": 371,
+  "inputTokens": 1063,
+  "inputs": {
+    "requestDigest": "46f47a44bb9eef86932b52d4986aef0f7d6bcdf21cd2f4a891adf6ac5e5b1c7a",
+    "references": [
+      {
+        "digest": "2c4c3b8d7a92be060ce334191332fd531bd4dbf83fc65f01cf9ad6169977b4b7",
+        "label": "draft-data（wave_hints・operation_units depends_on 原本）",
+        "path": ".agentdev/drafts/req-draft-adf-judgment-architecture-redesign.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-parallel-ok",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.93,
+        "false": 0.06999999999999995
+      }
+    },
+    {
+      "questionId": "q2-mandatory-dep-absence",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.95,
+        "false": 0.050000000000000044
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-parallel-ok",
+        "value": true
+      },
+      {
+        "questionId": "q2-mandatory-dep-absence",
+        "value": true
+      }
+    ]
+  }
+}

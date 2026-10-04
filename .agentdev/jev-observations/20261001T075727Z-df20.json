@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261001T075727Z-df20",
+  "workflow": "case-ready",
+  "evaluationKind": "wave-composition-and-scope-duplication",
+  "subject": "Root Case #3293 の Wave1 構成判断（並列可否・system.md 重複処置）とスコープ重複判定",
+  "sourceRevision": "92edf6ae",
+  "durationMs": 507,
+  "inputTokens": 1544,
+  "inputs": {
+    "requestDigest": "90f34656514147d8b775d4ba068d37d4b54b8c3b9b1bcfe111a3eb18e0a79ad5"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-wave1-parallel",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.95,
+        "false": 0.050000000000000044
+      }
+    },
+    {
+      "questionId": "q-overlap-disposition",
+      "questionForm": "choice",
+      "value": "重複許容（重複を許容し、衝突解消の担当とマージ順序の事前記録を含む）",
+      "probabilityDistribution": {
+        "変更対象分割（system.md の変更対象を OU 間で分割する）": 0.09,
+        "重複許容（重複を許容し、衝突解消の担当とマージ順序の事前記録を含む）": 0.91
+      }
+    },
+    {
+      "questionId": "q-scope-dup",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.21,
+        "false": 0.79
+      }
+    }
+  ],
+  "confidence": 0.81,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-wave1-parallel",
+        "value": true
+      },
+      {
+        "questionId": "q-overlap-disposition",
+        "value": "重複許容（重複を許容し、衝突解消の担当とマージ順序の事前記録を含む）"
+      },
+      {
+        "questionId": "q-scope-dup",
+        "value": false
+      }
+    ]
+  }
+}

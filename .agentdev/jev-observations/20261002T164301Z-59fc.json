@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261002T164301Z-59fc",
+  "workflow": "backlog-review",
+  "evaluationKind": "merge-split-decision",
+  "subject": "38成果物→22 RU 構成の統合（9グループ）・非統合（4候補）判定",
+  "sourceRevision": "08ed1fc0",
+  "durationMs": 476,
+  "inputTokens": 3133,
+  "inputs": {
+    "requestDigest": "2bb5b66011bc30b864c6ba1850daf37784d3e32113115cdca65e153aaabfe1c4",
+    "references": [
+      {
+        "digest": "142eb89725fea5e825f4b478953ecbcdaf80311830523c3a54df0db6ebc6e083",
+        "label": "ru01-語彙統合要素",
+        "path": ".agentdev/intake/promoted/2026-10-01-3280-inspect-promote-frontmatter-confidence-vocabulary.md"
+      },
+      {
+        "digest": "b2741a5b67b0ce6ce46b12f3bf90530c66f89e594de9f131710a4a38f8490b43",
+        "label": "ru03-旧構造統合要素",
+        "path": ".agentdev/intake/promoted/2026-10-02-3332-local-design-docs-modernization-pending.md"
+      },
+      {
+        "digest": "0351854befe05a9b03ee798cb95df6d4a9c264210c4a66b821649f7f21561703",
+        "label": "ru03-guides要素",
+        "path": ".agentdev/inspect/promoted/finding-20261002-guides-legacy-src-opencode-paths.md"
+      },
+      {
+        "digest": "9dd4e52fb659b7156c98ece0aa11c54134c89e5758b382d46ddc9ae4e3f46270",
+        "label": "ru09-integrity統合要素",
+        "path": ".agentdev/inspect/promoted/finding-20261002-ir-055-warning-cap-exceed.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "g-ru01",
+      "questionForm": "choice",
+      "value": "統合",
+      "probabilityDistribution": {
+        "統合": 0.86,
+        "分割": 0.13,
+        "1:1": 0.01
+      }
+    },
+    {
+      "questionId": "g-ru03",
+      "questionForm": "choice",
+      "value": "統合",
+      "probabilityDistribution": {
+        "統合": 0.77,
+        "分割": 0.22,
+        "1:1": 0.01
+      }
+    },
+    {
+      "questionId": "g-ru04",
+      "questionForm": "choice",
+      "value": "統合",
+      "probabilityDistribution": {
+        "統合": 0.76,
+        "分割": 0.21,
+        "1:1": 0.03
+      }
+    },
+    {
+      "questionId": "g-ru05",
+      "questionForm": "choice",
+      "value": "統合",
+      "probabilityDistribution": {
+        "統合": 0.85,
+        "分割": 0.11,
+        "1:1": 0.04
+      }
+    },
+    {
+      "questionId": "g-ru08",
+      "questionForm": "choice",
+      "value": "統合",
+      "probabilityDistribution": {
+        "統合": 0.6,
+        "分割": 0.37,
+        "1:1": 0.03
+      }
+    },
+    {
+      "questionId": "g-ru09",
+      "questionForm": "choice",
+      "value": "統合",
+      "probabilityDistribution": {
+        "統合": 0.65,
+        "分割": 0.33,
+        "1:1": 0.02
+      }
+    },
+    {
+      "questionId": "g-ru15",
+      "questionForm": "choice",
+      "value": "統合",
+      "probabilityDistribution": {
+        "統合": 0.89,
+        "分割": 0.1,
+        "1:1": 0.01
+      }
+    },
+    {
+      "questionId": "g-ru17",
+      "questionForm": "choice",
+      "value": "統合",
+      "probabilityDistribution": {
+        "統合": 0.79,
+        "分割": 0.19,
+        "1:1": 0.02
+      }
+    },
+    {
+      "questionId": "g-ru19",
+      "questionForm": "choice",
+      "value": "統合",
+      "probabilityDistribution": {
+        "統合": 0.77,
+        "分割": 0.21,
+        "1:1": 0.02
+      }
+    },
+    {
+      "questionId": "n-l1l5",
+      "questionForm": "choice",
+      "value": "分割",
+      "probabilityDistribution": {
+        "統合": 0.06,
+        "分割": 0.91,
+        "1:1": 0.03
+      }
+    },
+    {
+      "questionId": "n-debt",
+      "questionForm": "choice",
+      "value": "分割",
+      "probabilityDistribution": {
+        "統合": 0.11,
+        "分割": 0.87,
+        "1:1": 0.02
+      }
+    },
+    {
+      "questionId": "n-ru01ru02",
+      "questionForm": "choice",
+      "value": "分割",
+      "probabilityDistribution": {
+        "統合": 0.01,
+        "分割": 0.98,
+        "1:1": 0.01
+      }
+    },
+    {
+      "questionId": "n-guides-installer",
+      "questionForm": "choice",
+      "value": "分割",
+      "probabilityDistribution": {
+        "統合": 0.03,
+        "分割": 0.96,
+        "1:1": 0.01
+      }
+    }
+  ],
+  "confidence": 0.79,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "g-ru01",
+        "value": "統合"
+      },
+      {
+        "questionId": "g-ru03",
+        "value": "統合"
+      },
+      {
+        "questionId": "g-ru04",
+        "value": "統合"
+      },
+      {
+        "questionId": "g-ru05",
+        "value": "統合"
+      },
+      {
+        "questionId": "g-ru08",
+        "value": "統合"
+      },
+      {
+        "questionId": "g-ru09",
+        "value": "統合"
+      },
+      {
+        "questionId": "g-ru15",
+        "value": "統合"
+      },
+      {
+        "questionId": "g-ru17",
+        "value": "統合"
+      },
+      {
+        "questionId": "g-ru19",
+        "value": "統合"
+      },
+      {
+        "questionId": "n-l1l5",
+        "value": "分割"
+      },
+      {
+        "questionId": "n-debt",
+        "value": "分割"
+      },
+      {
+        "questionId": "n-ru01ru02",
+        "value": "分割"
+      },
+      {
+        "questionId": "n-guides-installer",
+        "value": "分割"
+      }
+    ]
+  }
+}

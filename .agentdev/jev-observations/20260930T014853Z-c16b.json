@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260930T014853Z-c16b",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "design対応宣言補強33行のREQ操作分類",
+  "sourceRevision": "repo-working-tree-2026-09-30（req-define は git コマンド実行禁止のため commit hash 不使用）",
+  "durationMs": 1209,
+  "inputTokens": 907,
+  "inputs": {
+    "requestDigest": "db385351327e8da5be687935ac8b282b4aa0d149b1099ae72879d6a0ef394c7a",
+    "references": [
+      {
+        "label": "構造化要件入力",
+        "path": "req-input-adf-design-coverage-backfill.md（repo 外パス C:\\Users\\ogatay\\work\\hermes-vault\\project-list\\ 配下）",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-matching-operation",
+      "questionForm": "choice",
+      "value": "REQ操作なし（REQ行の作成・追記・更新を一切含まない）",
+      "probabilityDistribution": {
+        "CREATE（新規REQ文書の作成を含む）": 0,
+        "APPEND（既存REQ文書への要件行追加を含む）": 0,
+        "UPDATE（既存REQ行の本文変更を含む）": 0,
+        "REQ操作なし（REQ行の作成・追記・更新を一切含まない）": 1
+      }
+    },
+    {
+      "questionId": "q2-matching-confidence",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.17,
+        "false": 0.83
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-matching-operation",
+        "value": "REQ操作なし（REQ行の作成・追記・更新を一切含まない）"
+      },
+      {
+        "questionId": "q2-matching-confidence",
+        "value": false
+      }
+    ]
+  }
+}

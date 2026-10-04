@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260930T203606Z-c76f",
+  "workflow": "case-ready",
+  "evaluationKind": "standard-or-epic-attribution",
+  "subject": "Case #3278 実行構成判断（operation_units OU-001〜004 の依存グラフと3軸判断）",
+  "sourceRevision": "2016c03dbd0a831b232c57a5fe3f80aa51eb479a",
+  "durationMs": 941,
+  "inputTokens": 1437,
+  "inputs": {
+    "requestDigest": "2b860c0b67d17e4ffcd37f249e5d09e6c67f9a6f3e9ccc4c1e4ae54de3f6def6",
+    "references": [
+      {
+        "digest": "2c4c3b8d7a92be060ce334191332fd531bd4dbf83fc65f01cf9ad6169977b4b7",
+        "label": "draft-data（operation_units・case_open_hints・realization_actions・test_strategy 原本）",
+        "path": ".agentdev/drafts/req-draft-adf-judgment-architecture-redesign.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-attribution",
+      "questionForm": "choice",
+      "value": "Epic（Child Issue と Wave / 依存構造を作成する）",
+      "probabilityDistribution": {
+        "Standard（Root Case 自身を単一 execution unit とし Child Issue を作成しない）": 0.19,
+        "Epic（Child Issue と Wave / 依存構造を作成する）": 0.81
+      }
+    },
+    {
+      "questionId": "q2-dependency-strength",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "関連（同じ領域だが実行依存なし）": 0,
+        "弱（実行順序の推奨はあるが並列可）": 0,
+        "必須（一方が他方なしでは成立しない）": 1
+      }
+    },
+    {
+      "questionId": "q3-functional-coherence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "分散（共通主題なし）": 0,
+        "部分的（関連するが単一主題ではない）": 0,
+        "一貫（単一の機能的主題）": 1
+      }
+    }
+  ],
+  "confidence": 0.61,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-attribution",
+        "value": "Epic（Child Issue と Wave / 依存構造を作成する）"
+      },
+      {
+        "questionId": "q2-dependency-strength",
+        "value": 2
+      },
+      {
+        "questionId": "q3-functional-coherence",
+        "value": 2
+      }
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261002T164410Z-5fca",
+  "workflow": "backlog-review",
+  "evaluationKind": "adversarial-review-trigger",
+  "subject": "backlog-review RU 構成案（38成果物→22 RU+knowledge 2件）の adversarial-review 発動条件",
+  "sourceRevision": "08ed1fc0",
+  "durationMs": 500,
+  "inputTokens": 805,
+  "inputs": {
+    "requestDigest": "be749327942ad3ad556b142d27692f787d5c402122f5ef962a140552b12f72d6",
+    "references": []
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.9,
+        "false": 0.09999999999999998
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "trigger",
+        "value": true
+      }
+    ]
+  }
+}

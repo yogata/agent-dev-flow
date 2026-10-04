@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261004T124154Z-5682",
+  "workflow": "case-ready",
+  "evaluationKind": "standard-epic-assignment",
+  "subject": "Root Case #3440 の operation_units 群（OU-001〜OU-006）の Standard/Epic 帰属判断",
+  "sourceRevision": "082bb32a",
+  "durationMs": 1372,
+  "inputTokens": 1537,
+  "inputs": {
+    "requestDigest": "7514251ec1b351e1bff5f84141cbdaf9ccc0657687928119007bc9866de45c85"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "assignment",
+      "questionForm": "choice",
+      "value": "Epic",
+      "probabilityDistribution": {
+        "Epic": 0.79,
+        "Standard": 0.21
+      }
+    },
+    {
+      "questionId": "dependency-strength",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "関連 = 同じ領域だが実行依存なし": 0,
+        "弱 = 実行順序の推奨はあるが並列可": 0,
+        "必須 = 一方が他方なしでは成立しない": 1
+      }
+    },
+    {
+      "questionId": "functional-coherence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "分散 = 共通主題なし": 0,
+        "部分的 = 関連するが単一主題ではない": 0.14,
+        "一貫 = 単一の機能的主題": 0.86
+      }
+    }
+  ],
+  "confidence": 0.58,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "assignment",
+        "value": "Epic"
+      },
+      {
+        "questionId": "dependency-strength",
+        "value": 2
+      },
+      {
+        "questionId": "functional-coherence",
+        "value": 2
+      }
+    ]
+  }
+}

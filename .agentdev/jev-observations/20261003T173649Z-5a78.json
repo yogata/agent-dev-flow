@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261003T173649Z-5a78",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "Issue契約簡素化要件の既存REQ照合（REQ-100/101/017/035＋消費側11REQの操作帰属）",
+  "sourceRevision": "workspace-2026-10-04 (req-define は git コマンド実行禁止のため commit SHA 取得せず)",
+  "durationMs": 1126,
+  "inputTokens": 3098,
+  "inputs": {
+    "requestDigest": "1b714bc30d6f6bc30836665b5497d5802cda0fff74ff4fb3d83f989bd1261fb2",
+    "references": [
+      {
+        "digest": "f4e8c4283bac827bd266b401a3252d9fa4e8b5bfa0688f774535e8b6bac20171",
+        "label": "合意済み入力ファイル",
+        "path": "C:/Users/ogatay/work/hermes-vault/project-list/req-input-issue-contract-simplification.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-req100",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0.92,
+        "REQ操作なし": 0.08
+      }
+    },
+    {
+      "questionId": "q2-req101",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 1,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "q3-req017",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0.99,
+        "REQ操作なし": 0.01
+      }
+    },
+    {
+      "questionId": "q4-req035",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 1,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "q5-consumers",
+      "questionForm": "choice",
+      "value": "個別UPDATE（意味変更行のみ更新）",
+      "probabilityDistribution": {
+        "個別UPDATE（意味変更行のみ更新）": 1,
+        "REQ操作なし（Design更新のみで対応）": 0,
+        "CREATE（新規REQへ統合）": 0,
+        "APPEND（他REQへ追加）": 0
+      }
+    },
+    {
+      "questionId": "q6-confirm",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.39,
+        "false": 0.61
+      }
+    }
+  ],
+  "confidence": 0.9,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-req100",
+        "value": "UPDATE"
+      },
+      {
+        "questionId": "q2-req101",
+        "value": "UPDATE"
+      },
+      {
+        "questionId": "q3-req017",
+        "value": "UPDATE"
+      },
+      {
+        "questionId": "q4-req035",
+        "value": "UPDATE"
+      },
+      {
+        "questionId": "q5-consumers",
+        "value": "個別UPDATE（意味変更行のみ更新）"
+      },
+      {
+        "questionId": "q6-confirm",
+        "value": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,339 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261002T172411Z-b56a",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "22 RU（RU-20261003-01〜22・RU-17+20統合で21単位）の既存REQ照合帰属",
+  "sourceRevision": "8bc0a0d9",
+  "durationMs": 1022,
+  "inputTokens": 3661,
+  "inputs": {
+    "requestDigest": "bd58e58b3c3bfa1aa455756cf95621f79650702deb00942528321e8b52c27e51",
+    "references": []
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "ru01",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0.98,
+        "REQ操作なし": 0.02
+      }
+    },
+    {
+      "questionId": "ru02",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1
+      }
+    },
+    {
+      "questionId": "ru03",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0.02,
+        "REQ操作なし": 0.98
+      }
+    },
+    {
+      "questionId": "ru04",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0.01,
+        "APPEND": 0.91,
+        "UPDATE": 0.02,
+        "REQ操作なし": 0.06
+      }
+    },
+    {
+      "questionId": "ru05",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0.78,
+        "REQ操作なし": 0.22
+      }
+    },
+    {
+      "questionId": "ru06",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0.07,
+        "UPDATE": 0.23,
+        "REQ操作なし": 0.7
+      }
+    },
+    {
+      "questionId": "ru07",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0.8,
+        "UPDATE": 0.15,
+        "REQ操作なし": 0.05
+      }
+    },
+    {
+      "questionId": "ru08",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0.79,
+        "UPDATE": 0.05,
+        "REQ操作なし": 0.16
+      }
+    },
+    {
+      "questionId": "ru09",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0.8400000000000001,
+        "UPDATE": 0.060000000000000005,
+        "REQ操作なし": 0.10000000000000002
+      }
+    },
+    {
+      "questionId": "ru10",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0.19,
+        "REQ操作なし": 0.81
+      }
+    },
+    {
+      "questionId": "ru11",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0.02,
+        "UPDATE": 0.05,
+        "REQ操作なし": 0.93
+      }
+    },
+    {
+      "questionId": "ru12",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0.16,
+        "UPDATE": 0.01,
+        "REQ操作なし": 0.83
+      }
+    },
+    {
+      "questionId": "ru13",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0.73,
+        "UPDATE": 0.03,
+        "REQ操作なし": 0.24
+      }
+    },
+    {
+      "questionId": "ru14",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0.71,
+        "UPDATE": 0.17,
+        "REQ操作なし": 0.12
+      }
+    },
+    {
+      "questionId": "ru15",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0.32,
+        "UPDATE": 0.17,
+        "REQ操作なし": 0.51
+      }
+    },
+    {
+      "questionId": "ru16",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0.67,
+        "UPDATE": 0.15,
+        "REQ操作なし": 0.18
+      }
+    },
+    {
+      "questionId": "ru17",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0.8,
+        "UPDATE": 0.12,
+        "REQ操作なし": 0.08
+      }
+    },
+    {
+      "questionId": "ru18",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0.87,
+        "UPDATE": 0.08,
+        "REQ操作なし": 0.05
+      }
+    },
+    {
+      "questionId": "ru19",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0.12,
+        "UPDATE": 0.16,
+        "REQ操作なし": 0.72
+      }
+    },
+    {
+      "questionId": "ru21",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0.01,
+        "APPEND": 0.25,
+        "UPDATE": 0.02,
+        "REQ操作なし": 0.72
+      }
+    },
+    {
+      "questionId": "ru22",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0.88,
+        "UPDATE": 0.04,
+        "REQ操作なし": 0.08
+      }
+    }
+  ],
+  "confidence": 0.97,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "ru01",
+        "value": "UPDATE"
+      },
+      {
+        "questionId": "ru02",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "ru03",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "ru04",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "ru05",
+        "value": "UPDATE"
+      },
+      {
+        "questionId": "ru06",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "ru07",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "ru08",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "ru09",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "ru10",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "ru11",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "ru12",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "ru13",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "ru14",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "ru15",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "ru16",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "ru17",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "ru18",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "ru19",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "ru21",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "ru22",
+        "value": "APPEND"
+      }
+    ]
+  }
+}

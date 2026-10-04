@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261004T074139Z-00d6",
+  "workflow": "case-ready",
+  "evaluationKind": "open-issue-scope-overlap",
+  "subject": "Case #3425 と未クローズ Case #3423/#3424 の対象範囲交差",
+  "sourceRevision": "343d4661",
+  "durationMs": 215,
+  "inputTokens": 1044,
+  "inputs": {
+    "requestDigest": "cc28db632d313f19051152104ef7868a610a205ac0dd7d635a3c7c5def33ce68"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-scope-overlap",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.11,
+        "false": 0.89
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-scope-overlap",
+        "value": false
+      }
+    ]
+  }
+}

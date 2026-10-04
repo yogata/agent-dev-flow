@@ -1,0 +1,424 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261004T164056Z-e67a",
+  "workflow": "backlog-auto/intake-promote",
+  "evaluationKind": "provisional-classification",
+  "subject": "intake inbox 21件の暫定分類（採用/保留/却下）",
+  "sourceRevision": "ad6e83412d54a8a9c241fd00a25db968d52da22c",
+  "durationMs": 761,
+  "inputTokens": 2585,
+  "inputs": {
+    "requestDigest": "81a4be4ccf6444c2e605c6507881f1b7758cb57f241bf6587a7482e545a9f432",
+    "references": [
+      {
+        "digest": "bc4d75af039a2128c1f2380d39e0ab8da98fbf39b9b2d72c37c5d52cea29e4e5",
+        "label": "item1",
+        "path": ".agentdev/intake/inbox/2026-10-03-dec036-authority-seal-deployment-context.md"
+      },
+      {
+        "digest": "f0fc6e3e2efe3f64775c5b7bdf2d50abe504671f1048a275448f7a046674ca5a",
+        "label": "item2",
+        "path": ".agentdev/intake/inbox/2026-10-03-knowledge-required-sections-missing.md"
+      },
+      {
+        "digest": "79f7dc4e5a3050bfd9f53c9a6ec55f4bbb9264a2a3af75cdda71acf1c107f3c4",
+        "label": "item3",
+        "path": ".agentdev/intake/inbox/2026-10-03-known-integrity-debts-phantom-reqfreshness-skillprojection.md"
+      },
+      {
+        "digest": "920eb5a79e2783c6ca5b3f2389c5833b4e5006ab1d3e2ff21b09c99c9c4065c0",
+        "label": "item4",
+        "path": ".agentdev/intake/inbox/2026-10-03-req099-implementation-verification-traceability-followup.md"
+      },
+      {
+        "digest": "5696d236669ae6a5045f4aca16501cb6c68aa558fec43218ce7d1fc4be3efbc3",
+        "label": "item5",
+        "path": ".agentdev/intake/inbox/2026-10-03-troubleshooting-yomiyasu-existing-notice.md"
+      },
+      {
+        "digest": "fad318a67330aa4f7b028bb941e6bd1ddc245e05cb05925fb1da2a84b7bb62e9",
+        "label": "item6",
+        "path": ".agentdev/intake/inbox/2026-10-04-auth-mock-requires-auth-required-operation.md"
+      },
+      {
+        "digest": "ad60d86ea2bb9feadf2eb7e50bd9ce9eaecc626991510c0cbcc293c3049f3086",
+        "label": "item7",
+        "path": ".agentdev/intake/inbox/2026-10-04-backlog-integration-docs-old-review-contract.md"
+      },
+      {
+        "digest": "e1638edc958bebca87088cfe7beccbaf429fc19a6a5d08d2be44c5df4d461b4c",
+        "label": "item8",
+        "path": ".agentdev/intake/inbox/2026-10-04-distribution-boundary-stale-retired-installer-refs.md"
+      },
+      {
+        "digest": "91bb08d02e020859a092d059d54c427bd452635c52f0a89438502c36b08c7d40",
+        "label": "item9",
+        "path": ".agentdev/intake/inbox/2026-10-04-issue-tracking-list-opencode-local-path.md"
+      },
+      {
+        "digest": "af59ddd7e350d02f4c165f5262af51f4961fed4a8d0f3b6683b79ff423687bfc",
+        "label": "item10",
+        "path": ".agentdev/intake/inbox/2026-10-04-issue-tracking-skill-req092-ref-already-resolved.md"
+      },
+      {
+        "digest": "89203756280a7ed497781e0bcca22f533dd08d872e0b5e05406b9ca0e1ac11a2",
+        "label": "item11",
+        "path": ".agentdev/intake/inbox/2026-10-04-regression-req092-test-filename-rename-candidate.md"
+      },
+      {
+        "digest": "5530ab3fa472ff1f64dc3d5305a78834e7570e340dc96ca2b7144f82ed0e1940",
+        "label": "item12",
+        "path": ".agentdev/intake/inbox/2026-10-04-req003-055-phantom-preexisting-req096-migration.md"
+      },
+      {
+        "digest": "3d05d6ff62fe446d633f2308ab9291728424987d24c0fb1c343e0804ec7b0733",
+        "label": "item13",
+        "path": ".agentdev/intake/inbox/2026-10-04-req095-003-req018-002-sidecar-followup.md"
+      },
+      {
+        "digest": "57e5a548495e0e92b9c3182b142e8b3db09afa995086311277b112b276a1bc01",
+        "label": "item14",
+        "path": ".agentdev/intake/inbox/2026-10-04-req-updated-freshness-16-backlog.md"
+      },
+      {
+        "digest": "df6c26cc86329e60493c26812d7c9e91465f20019613c47406f7cf3de6577d77",
+        "label": "item15",
+        "path": ".agentdev/intake/inbox/2026-10-04-retired-req087-092-093-wave3-remaining-refs-cleanup.md"
+      },
+      {
+        "digest": "1156a16929fcc1dac37e7eaebe2551962805b2f22267ce5b1181ee3bff6c882c",
+        "label": "item16",
+        "path": ".agentdev/intake/inbox/2026-10-04-retired-req092-repo-local-test-refs-cleanup.md"
+      },
+      {
+        "digest": "d3d3e4368b4522e5f6690aa0d4e36f9bf7098ee135351f667c9a5b313c8ce19a",
+        "label": "item17",
+        "path": ".agentdev/intake/inbox/2026-10-04-textlint-gate-worktree-root-path-zero-inspected-pass.md"
+      },
+      {
+        "digest": "e18f4e99b9bdc275d379170f19de0ee650177fbfb7a227dae43b943e59c1138c",
+        "label": "item18",
+        "path": ".agentdev/intake/inbox/2026-10-04-textlint-guard-adr-config-known-defects.md"
+      },
+      {
+        "digest": "ff76b7633bf4afbd96c01abaea91a812d921e3f665fda6b4ac6e59efc47c1a0f",
+        "label": "item19",
+        "path": ".agentdev/intake/inbox/2026-10-04-traceability-check-docs-reports-exclusion-unimplemented.md"
+      },
+      {
+        "digest": "63612fce07e4a9c3065a08860b664ec918b1165329d466f709a8b33a7b3af750",
+        "label": "item20",
+        "path": ".agentdev/intake/inbox/2026-10-04-traceability-unknown-req-refs-req053-docs-reports.md"
+      },
+      {
+        "digest": "84ec4b080ed7a040cf17d90ab12eb4dc04d8b7d5b8557e61adad40405f976949",
+        "label": "item21",
+        "path": ".agentdev/intake/inbox/2026-10-04-workflow-templates-unclosed-code-block.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "c1",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 1,
+        "保留": 0,
+        "却下": 0
+      }
+    },
+    {
+      "questionId": "c2",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 1,
+        "保留": 0,
+        "却下": 0
+      }
+    },
+    {
+      "questionId": "c3",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.98,
+        "保留": 0.01,
+        "却下": 0.01
+      }
+    },
+    {
+      "questionId": "c4",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.98,
+        "保留": 0.01,
+        "却下": 0.01
+      }
+    },
+    {
+      "questionId": "c5",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 1,
+        "保留": 0,
+        "却下": 0
+      }
+    },
+    {
+      "questionId": "c6",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 1,
+        "保留": 0,
+        "却下": 0
+      }
+    },
+    {
+      "questionId": "c7",
+      "questionForm": "choice",
+      "value": "却下",
+      "probabilityDistribution": {
+        "採用": 0,
+        "保留": 0,
+        "却下": 1
+      }
+    },
+    {
+      "questionId": "c8",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 1,
+        "保留": 0,
+        "却下": 0
+      }
+    },
+    {
+      "questionId": "c9",
+      "questionForm": "choice",
+      "value": "却下",
+      "probabilityDistribution": {
+        "採用": 0,
+        "保留": 0,
+        "却下": 1
+      }
+    },
+    {
+      "questionId": "c10",
+      "questionForm": "choice",
+      "value": "却下",
+      "probabilityDistribution": {
+        "採用": 0,
+        "保留": 0,
+        "却下": 1
+      }
+    },
+    {
+      "questionId": "c11",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.98,
+        "保留": 0,
+        "却下": 0.02
+      }
+    },
+    {
+      "questionId": "c12",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 1,
+        "保留": 0,
+        "却下": 0
+      }
+    },
+    {
+      "questionId": "c13",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.97,
+        "保留": 0.01,
+        "却下": 0.02
+      }
+    },
+    {
+      "questionId": "c14",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 1,
+        "保留": 0,
+        "却下": 0
+      }
+    },
+    {
+      "questionId": "c15",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.97,
+        "保留": 0.01,
+        "却下": 0.02
+      }
+    },
+    {
+      "questionId": "c16",
+      "questionForm": "choice",
+      "value": "却下",
+      "probabilityDistribution": {
+        "採用": 0.01,
+        "保留": 0,
+        "却下": 0.99
+      }
+    },
+    {
+      "questionId": "c17",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 1,
+        "保留": 0,
+        "却下": 0
+      }
+    },
+    {
+      "questionId": "c18",
+      "questionForm": "choice",
+      "value": "却下",
+      "probabilityDistribution": {
+        "採用": 0,
+        "保留": 0,
+        "却下": 1
+      }
+    },
+    {
+      "questionId": "c19",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 1,
+        "保留": 0,
+        "却下": 0
+      }
+    },
+    {
+      "questionId": "c20",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.98,
+        "保留": 0,
+        "却下": 0.02
+      }
+    },
+    {
+      "questionId": "c21",
+      "questionForm": "choice",
+      "value": "却下",
+      "probabilityDistribution": {
+        "採用": 0,
+        "保留": 0,
+        "却下": 1
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "c1",
+        "value": "採用"
+      },
+      {
+        "questionId": "c2",
+        "value": "採用"
+      },
+      {
+        "questionId": "c3",
+        "value": "採用"
+      },
+      {
+        "questionId": "c4",
+        "value": "採用"
+      },
+      {
+        "questionId": "c5",
+        "value": "採用"
+      },
+      {
+        "questionId": "c6",
+        "value": "採用"
+      },
+      {
+        "questionId": "c7",
+        "value": "却下"
+      },
+      {
+        "questionId": "c8",
+        "value": "採用"
+      },
+      {
+        "questionId": "c9",
+        "value": "却下"
+      },
+      {
+        "questionId": "c10",
+        "value": "却下"
+      },
+      {
+        "questionId": "c11",
+        "value": "採用"
+      },
+      {
+        "questionId": "c12",
+        "value": "採用"
+      },
+      {
+        "questionId": "c13",
+        "value": "採用"
+      },
+      {
+        "questionId": "c14",
+        "value": "採用"
+      },
+      {
+        "questionId": "c15",
+        "value": "採用"
+      },
+      {
+        "questionId": "c16",
+        "value": "却下"
+      },
+      {
+        "questionId": "c17",
+        "value": "採用"
+      },
+      {
+        "questionId": "c18",
+        "value": "却下"
+      },
+      {
+        "questionId": "c19",
+        "value": "採用"
+      },
+      {
+        "questionId": "c20",
+        "value": "採用"
+      },
+      {
+        "questionId": "c21",
+        "value": "却下"
+      }
+    ]
+  }
+}

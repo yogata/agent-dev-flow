@@ -1,0 +1,448 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261002T164028Z-3117",
+  "workflow": "backlog-review",
+  "evaluationKind": "tentative-classification",
+  "subject": "38採用済み成果物→22 RU 構成案の暫定分類（文書7分類モデル）",
+  "sourceRevision": "08ed1fc0",
+  "durationMs": 1002,
+  "inputTokens": 6132,
+  "inputs": {
+    "requestDigest": "cdc2d12e33f74de33aac9f08ab923cfb2f50ba253c3075bd5d90b9e3f28d22c1",
+    "references": [
+      {
+        "label": "intake-3280-語彙",
+        "path": ".agentdev/intake/promoted/2026-10-01-3280-inspect-promote-frontmatter-confidence-vocabulary.md",
+        "digest": "142eb89725fea5e825f4b478953ecbcdaf80311830523c3a54df0db6ebc6e083"
+      },
+      {
+        "label": "intake-3318-installer",
+        "path": ".agentdev/intake/promoted/2026-10-02-3318-wave1-remainder-installer-projection-and-archive-gates.md",
+        "digest": "3a875b83fc953c56d10a971e882a18d9d82a3bbc6ff2fac007a8c89b43dc85dd"
+      },
+      {
+        "label": "learning-windows-rename",
+        "path": ".agentdev/learning/promoted/project-knowledge-windows-rename-eperm-diagnosis.md",
+        "digest": "e85b175d1e6e243ab0124fdfb6c1d3ddfd2ce08fae4ac32ad0b46327efe105b0"
+      },
+      {
+        "label": "inspect-guides-legacy",
+        "path": ".agentdev/inspect/promoted/finding-20261002-guides-legacy-src-opencode-paths.md",
+        "digest": "0351854befe05a9b03ee798cb95df6d4a9c264210c4a66b821649f7f21561703"
+      },
+      {
+        "label": "inspect-ir055",
+        "path": ".agentdev/inspect/promoted/finding-20261002-ir-055-warning-cap-exceed.md",
+        "digest": "9dd4e52fb659b7156c98ece0aa11c54134c89e5758b382d46ddc9ae4e3f46270"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "ru01",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.78,
+        "挙動Design": 0,
+        "カタログDesign": 0.14,
+        "guide": 0.07,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0.01
+      }
+    },
+    {
+      "questionId": "ru02",
+      "questionForm": "choice",
+      "value": "カタログDesign",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0,
+        "カタログDesign": 1,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru03",
+      "questionForm": "choice",
+      "value": "guide",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0.04,
+        "カタログDesign": 0,
+        "guide": 0.96,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru04",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0.89,
+        "カタログDesign": 0.09,
+        "guide": 0.02,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru05",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.87,
+        "挙動Design": 0,
+        "カタログDesign": 0.11,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0.01,
+        "対象外": 0.01
+      }
+    },
+    {
+      "questionId": "ru06",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0.13,
+        "挙動Design": 0.76,
+        "カタログDesign": 0.08,
+        "guide": 0,
+        "learning維持": 0.01,
+        "作業記録": 0.01,
+        "対象外": 0.01
+      }
+    },
+    {
+      "questionId": "ru07",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.72,
+        "挙動Design": 0.24,
+        "カタログDesign": 0.01,
+        "guide": 0,
+        "learning維持": 0.01,
+        "作業記録": 0.02,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru08",
+      "questionForm": "choice",
+      "value": "guide",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0,
+        "カタログDesign": 0.11,
+        "guide": 0.89,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru09",
+      "questionForm": "choice",
+      "value": "カタログDesign",
+      "probabilityDistribution": {
+        "REQ": 0.01,
+        "挙動Design": 0.07,
+        "カタログDesign": 0.9,
+        "guide": 0,
+        "learning維持": 0.01,
+        "作業記録": 0.01,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru10",
+      "questionForm": "choice",
+      "value": "カタログDesign",
+      "probabilityDistribution": {
+        "REQ": 0.03,
+        "挙動Design": 0.01,
+        "カタログDesign": 0.84,
+        "guide": 0.07,
+        "learning維持": 0.01,
+        "作業記録": 0.02,
+        "対象外": 0.02
+      }
+    },
+    {
+      "questionId": "ru11",
+      "questionForm": "choice",
+      "value": "カタログDesign",
+      "probabilityDistribution": {
+        "REQ": 0.01,
+        "挙動Design": 0.07,
+        "カタログDesign": 0.89,
+        "guide": 0,
+        "learning維持": 0.02,
+        "作業記録": 0.01,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru12",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0.1,
+        "挙動Design": 0.77,
+        "カタログDesign": 0,
+        "guide": 0.09,
+        "learning維持": 0.02,
+        "作業記録": 0.02,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru13",
+      "questionForm": "choice",
+      "value": "guide",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0.01,
+        "カタログDesign": 0,
+        "guide": 0.43,
+        "learning維持": 0.29,
+        "作業記録": 0.27,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru14",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0.02,
+        "挙動Design": 0.97,
+        "カタログDesign": 0.01,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru15",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0.01,
+        "挙動Design": 0.78,
+        "カタログDesign": 0.01,
+        "guide": 0.17,
+        "learning維持": 0.02,
+        "作業記録": 0.01,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru16",
+      "questionForm": "choice",
+      "value": "guide",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0.01,
+        "カタログDesign": 0,
+        "guide": 0.97,
+        "learning維持": 0.02,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru17",
+      "questionForm": "choice",
+      "value": "guide",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0.01,
+        "カタログDesign": 0,
+        "guide": 0.99,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru18",
+      "questionForm": "choice",
+      "value": "guide",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0,
+        "カタログDesign": 0,
+        "guide": 1,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru19",
+      "questionForm": "choice",
+      "value": "guide",
+      "probabilityDistribution": {
+        "REQ": 0.05,
+        "挙動Design": 0.27,
+        "カタログDesign": 0.24,
+        "guide": 0.39,
+        "learning維持": 0.02,
+        "作業記録": 0.02,
+        "対象外": 0.01
+      }
+    },
+    {
+      "questionId": "ru20",
+      "questionForm": "choice",
+      "value": "guide",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0.0101010101010101,
+        "カタログDesign": 0,
+        "guide": 0.9393939393939393,
+        "learning維持": 0.050505050505050504,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru21",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0.01,
+        "挙動Design": 0.99,
+        "カタログDesign": 0,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru22",
+      "questionForm": "choice",
+      "value": "カタログDesign",
+      "probabilityDistribution": {
+        "REQ": 0.01,
+        "挙動Design": 0.01,
+        "カタログDesign": 0.98,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    }
+  ],
+  "confidence": 0.74,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "ru01",
+        "value": "REQ"
+      },
+      {
+        "questionId": "ru02",
+        "value": "カタログDesign"
+      },
+      {
+        "questionId": "ru03",
+        "value": "guide"
+      },
+      {
+        "questionId": "ru04",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "ru05",
+        "value": "REQ"
+      },
+      {
+        "questionId": "ru06",
+        "value": "REQ",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "ru07",
+        "value": "REQ"
+      },
+      {
+        "questionId": "ru08",
+        "value": "guide"
+      },
+      {
+        "questionId": "ru09",
+        "value": "カタログDesign"
+      },
+      {
+        "questionId": "ru10",
+        "value": "カタログDesign"
+      },
+      {
+        "questionId": "ru11",
+        "value": "カタログDesign"
+      },
+      {
+        "questionId": "ru12",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "ru13",
+        "value": "guide"
+      },
+      {
+        "questionId": "ru14",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "ru15",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "ru16",
+        "value": "guide"
+      },
+      {
+        "questionId": "ru17",
+        "value": "guide"
+      },
+      {
+        "questionId": "ru18",
+        "value": "guide"
+      },
+      {
+        "questionId": "ru19",
+        "value": "挙動Design",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "ru20",
+        "value": "guide"
+      },
+      {
+        "questionId": "ru21",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "ru22",
+        "value": "カタログDesign"
+      }
+    ]
+  }
+}

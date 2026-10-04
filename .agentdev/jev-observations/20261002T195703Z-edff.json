@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261002T195703Z-edff",
+  "workflow": "req-define",
+  "evaluationKind": "step3-existing-req-matching",
+  "subject": "Issueタイトル役割別書式規則の既存REQ照合（CREATE/APPEND/UPDATE帰属）",
+  "sourceRevision": "5395434db6735186445fc4cd2662facf21d5147c",
+  "durationMs": 1865,
+  "inputTokens": 1656,
+  "inputs": {
+    "requestDigest": "786b6e15e7abd0f79efe211d31faf1cebc1a5cfe9c969927515e6b25e67304b1",
+    "snapshot": "入力: hermes-vault/project-list/req-input-adf-issue-title-policy.md（2026-10-03版）。合意済み規則: Case:/Epic:/[Wave N] Task:/Tracking: 主題の4役割書式、主題原則、Wave投影、除外情報、工程別付与更新責任。実装方針: 単一参照点へ規則を集約し全呼出元から参照接続。既存REQのどの行もタイトル書式を所有しないことを実ファイル確認済み。"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "req-match-operation",
+      "questionForm": "choice",
+      "value": "CREATE: タイトル規則を所有する新規REQを作成する",
+      "probabilityDistribution": {
+        "CREATE: タイトル規則を所有する新規REQを作成する": 0.94,
+        "APPEND: 既存REQのいずれかにタイトル規則を追記する": 0.03,
+        "UPDATE: 既存REQ行の意味変更としてタイトル規則を反映する": 0,
+        "REQ操作なし: REQではなくDesignへの保存のみで完結する": 0.03
+      }
+    },
+    {
+      "questionId": "req-match-confidence",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.58,
+        "false": 0.42000000000000004
+      }
+    }
+  ],
+  "confidence": 0.92,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "req-match-operation",
+        "value": "CREATE: タイトル規則を所有する新規REQを作成する"
+      },
+      {
+        "questionId": "req-match-confidence",
+        "value": false,
+        "differenceReason": "semantic_disagreement"
+      }
+    ]
+  }
+}

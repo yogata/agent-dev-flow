@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261002T200518Z-9be6",
+  "workflow": "req-define",
+  "evaluationKind": "step4-final-classification-design-separation",
+  "subject": "Issueタイトル規則のREQ/Design配置構造（必須条件と具体書式の分離）",
+  "sourceRevision": "5395434db6735186445fc4cd2662facf21d5147c",
+  "durationMs": 1862,
+  "inputTokens": 1398,
+  "inputs": {
+    "requestDigest": "3c41bfeaf4528538304cc4bcb93a28d9b09770e80214964de39bc32d83a2cf49",
+    "snapshot": "合意済み規則: 4役割書式、主題原則、Wave投影、除外情報、工程別付与更新責任。適用範囲: GitHub・ローカル版両方（ユーザー確定済み）。実装方針: 単一参照点、既存機構再利用、新規Plugin/評価器/ワークフロー不作成。"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "classification-design-separation",
+      "questionForm": "choice",
+      "value": "REQに必須条件の要求行群 + 新規Designに具体書式（二層構造・新Designが単一参照点）",
+      "probabilityDistribution": {
+        "REQに必須条件の要求行群 + 新規Designに具体書式（二層構造・新Designが単一参照点）": 1,
+        "REQに全規則を要求行として記述しDesignは作らない": 0,
+        "Designのみに全規則を記録しREQ要求行は作らない": 0,
+        "REQ行は参照のみとし、書式定義は既存Design群（issue-tracking等）へ分散配置する": 0
+      }
+    },
+    {
+      "questionId": "separation-needed",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.75,
+        "false": 0.25
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "classification-design-separation",
+        "value": "REQに必須条件の要求行群 + 新規Designに具体書式（二層構造・新Designが単一参照点）"
+      },
+      {
+        "questionId": "separation-needed",
+        "value": true
+      }
+    ]
+  }
+}

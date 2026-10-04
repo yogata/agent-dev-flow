@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260929T181217Z-7fc9",
+  "workflow": "backlog-review",
+  "evaluationKind": "knowledge-disposition",
+  "subject": "learning 由来 knowledge 成果物の docs/knowledge/ 処置候補と操作種別",
+  "sourceRevision": "e0247cb7",
+  "durationMs": 225,
+  "inputTokens": 1084,
+  "inputs": {
+    "requestDigest": "46a754e814fe80a3f7917a24e45c529a1f874f48f294c3731223ea36f7dade92",
+    "references": [
+      {
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "label": "knowledge promoted artifact",
+        "path": ".agentdev/learning/promoted/knowledge-recursive-copy-root-relative-skip.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "kp-disposition",
+      "questionForm": "choice",
+      "value": "保存",
+      "probabilityDistribution": {
+        "保存": 0.98,
+        "削除": 0,
+        "保留": 0.02
+      }
+    },
+    {
+      "questionId": "kp-operation",
+      "questionForm": "choice",
+      "value": "新規",
+      "probabilityDistribution": {
+        "新規": 1,
+        "更新": 0,
+        "置換": 0,
+        "削除": 0
+      }
+    }
+  ],
+  "confidence": 0.96,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "kp-disposition",
+        "value": "保存"
+      },
+      {
+        "questionId": "kp-operation",
+        "value": "新規"
+      }
+    ]
+  }
+}

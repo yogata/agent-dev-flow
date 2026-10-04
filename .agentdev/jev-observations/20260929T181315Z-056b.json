@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260929T181315Z-056b",
+  "workflow": "backlog-review",
+  "evaluationKind": "depends-on-reorderability",
+  "subject": "RU 構成案 13件の depends_on 並べ替え可能性（1辺のみ）",
+  "sourceRevision": "e0247cb7",
+  "durationMs": 235,
+  "inputTokens": 681,
+  "inputs": {
+    "requestDigest": "4132169f24a12b78dc44622d5ad55fc2c545ff686a8035b0362af1aca9a74ae1",
+    "references": [
+      {
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "label": "RU composition plan",
+        "path": ".agentdev/backlog/req-units/"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "dep-reorderable",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.75,
+        "false": 0.25
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "dep-reorderable",
+        "value": true
+      }
+    ]
+  }
+}

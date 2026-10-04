@@ -1,0 +1,479 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260929T172244Z-485c",
+  "workflow": "learning-promote",
+  "evaluationKind": "axis-scoring",
+  "subject": "単独エントリ U1〜U4 の 7軸スコアリング",
+  "sourceRevision": "2be595ea",
+  "durationMs": 294,
+  "inputTokens": 4193,
+  "inputs": {
+    "requestDigest": "c888d4be2b298dfafc09eb249868bc0d665bcbd9a825cc25d3269103f1723b5f",
+    "references": [
+      {
+        "digest": "59cf79faa7244aea03b3bd39f0c70fec051db766ce01cdfb4a931f157d985cbc",
+        "label": "learning-inbox",
+        "path": ".agentdev/learning/inbox.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "u1-影響度",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "軽微": 0.69,
+        "小": 0.25,
+        "中": 0.05,
+        "大": 0.01,
+        "致命的": 0
+      }
+    },
+    {
+      "questionId": "u1-横展開性",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "固有": 0.43,
+        "限定": 0.35,
+        "中程度": 0.13,
+        "高い": 0.07,
+        "汎用": 0.02
+      }
+    },
+    {
+      "questionId": "u1-反映先明確度",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "不明": 0,
+        "曖昧": 0.03,
+        "概要あり": 0.19,
+        "明確": 0.66,
+        "自足的に整備済": 0.12
+      }
+    },
+    {
+      "questionId": "u1-自動化適性",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "困難": 0.21,
+        "低い": 0.22999999999999998,
+        "可能": 0.16,
+        "容易": 0.2,
+        "即自動化可": 0.2
+      }
+    },
+    {
+      "questionId": "u1-再利用性",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低い": 0.32000000000000006,
+        "やや低い": 0.5700000000000001,
+        "中程度": 0.09000000000000001,
+        "高い": 0.020000000000000004,
+        "非常に高い": 0
+      }
+    },
+    {
+      "questionId": "u1-再発可能性",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "極低": 0.48,
+        "低い": 0.16,
+        "中程度": 0.06,
+        "高い": 0.1,
+        "ほぼ確実": 0.2
+      }
+    },
+    {
+      "questionId": "u1-費用対効果",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "割高": 0.11,
+        "やや割高": 0.29,
+        "妥当": 0.22,
+        "良い": 0.18,
+        "非常に良い": 0.2
+      }
+    },
+    {
+      "questionId": "u2-影響度",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "軽微": 0.48,
+        "小": 0.47,
+        "中": 0.05,
+        "大": 0,
+        "致命的": 0
+      }
+    },
+    {
+      "questionId": "u2-横展開性",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "固有": 0.4,
+        "限定": 0.53,
+        "中程度": 0.04,
+        "高い": 0.03,
+        "汎用": 0
+      }
+    },
+    {
+      "questionId": "u2-反映先明確度",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "不明": 0,
+        "曖昧": 0.01,
+        "概要あり": 0.08,
+        "明確": 0.84,
+        "自足的に整備済": 0.07
+      }
+    },
+    {
+      "questionId": "u2-自動化適性",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "困難": 0.12,
+        "低い": 0.2,
+        "可能": 0.1,
+        "容易": 0.25,
+        "即自動化可": 0.33
+      }
+    },
+    {
+      "questionId": "u2-再利用性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "低い": 0.01,
+        "やや低い": 0.12,
+        "中程度": 0.25,
+        "高い": 0.59,
+        "非常に高い": 0.03
+      }
+    },
+    {
+      "questionId": "u2-再発可能性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "極低": 0.01,
+        "低い": 0.04,
+        "中程度": 0.12,
+        "高い": 0.66,
+        "ほぼ確実": 0.17
+      }
+    },
+    {
+      "questionId": "u2-費用対効果",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "割高": 0.05,
+        "やや割高": 0.38,
+        "妥当": 0.25,
+        "良い": 0.27,
+        "非常に良い": 0.05
+      }
+    },
+    {
+      "questionId": "u3-影響度",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "軽微": 0.01,
+        "小": 0.36,
+        "中": 0.58,
+        "大": 0.05,
+        "致命的": 0
+      }
+    },
+    {
+      "questionId": "u3-横展開性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "固有": 0,
+        "限定": 0.02,
+        "中程度": 0.06,
+        "高い": 0.61,
+        "汎用": 0.31
+      }
+    },
+    {
+      "questionId": "u3-反映先明確度",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "不明": 0,
+        "曖昧": 0.03,
+        "概要あり": 0.19,
+        "明確": 0.54,
+        "自足的に整備済": 0.24
+      }
+    },
+    {
+      "questionId": "u3-自動化適性",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "困難": 0.21,
+        "低い": 0.67,
+        "可能": 0.1,
+        "容易": 0.02,
+        "即自動化可": 0
+      }
+    },
+    {
+      "questionId": "u3-再利用性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "低い": 0.020000000000000004,
+        "やや低い": 0.08000000000000002,
+        "中程度": 0.21000000000000002,
+        "高い": 0.6000000000000001,
+        "非常に高い": 0.09000000000000001
+      }
+    },
+    {
+      "questionId": "u3-再発可能性",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "極低": 0.0101010101010101,
+        "低い": 0.5454545454545454,
+        "中程度": 0.3939393939393939,
+        "高い": 0.050505050505050504,
+        "ほぼ確実": 0
+      }
+    },
+    {
+      "questionId": "u3-費用対効果",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "割高": 0,
+        "やや割高": 0,
+        "妥当": 0.01,
+        "良い": 0.05,
+        "非常に良い": 0.94
+      }
+    },
+    {
+      "questionId": "u4-影響度",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "軽微": 0.09,
+        "小": 0.59,
+        "中": 0.27,
+        "大": 0.05,
+        "致命的": 0
+      }
+    },
+    {
+      "questionId": "u4-横展開性",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "固有": 0.22,
+        "限定": 0.51,
+        "中程度": 0.1,
+        "高い": 0.15,
+        "汎用": 0.02
+      }
+    },
+    {
+      "questionId": "u4-反映先明確度",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "不明": 0,
+        "曖昧": 0.01,
+        "概要あり": 0.05,
+        "明確": 0.7,
+        "自足的に整備済": 0.24
+      }
+    },
+    {
+      "questionId": "u4-自動化適性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "困難": 0.07,
+        "低い": 0.1,
+        "可能": 0.16,
+        "容易": 0.37,
+        "即自動化可": 0.3
+      }
+    },
+    {
+      "questionId": "u4-再利用性",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低い": 0.38,
+        "やや低い": 0.44,
+        "中程度": 0.08,
+        "高い": 0.09,
+        "非常に高い": 0.01
+      }
+    },
+    {
+      "questionId": "u4-再発可能性",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "極低": 0.17,
+        "低い": 0.61,
+        "中程度": 0.15,
+        "高い": 0.06,
+        "ほぼ確実": 0.01
+      }
+    },
+    {
+      "questionId": "u4-費用対効果",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "割高": 0.37,
+        "やや割高": 0.38,
+        "妥当": 0.1,
+        "良い": 0.09,
+        "非常に良い": 0.06
+      }
+    }
+  ],
+  "confidence": 0.69,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "u1-影響度",
+        "value": 0
+      },
+      {
+        "questionId": "u1-横展開性",
+        "value": 1
+      },
+      {
+        "questionId": "u1-反映先明確度",
+        "value": 3
+      },
+      {
+        "questionId": "u1-自動化適性",
+        "value": 2
+      },
+      {
+        "questionId": "u1-再利用性",
+        "value": 1
+      },
+      {
+        "questionId": "u1-再発可能性",
+        "value": 1
+      },
+      {
+        "questionId": "u1-費用対効果",
+        "value": 2
+      },
+      {
+        "questionId": "u2-影響度",
+        "value": 1
+      },
+      {
+        "questionId": "u2-横展開性",
+        "value": 1
+      },
+      {
+        "questionId": "u2-反映先明確度",
+        "value": 3
+      },
+      {
+        "questionId": "u2-自動化適性",
+        "value": 2
+      },
+      {
+        "questionId": "u2-再利用性",
+        "value": 3
+      },
+      {
+        "questionId": "u2-再発可能性",
+        "value": 3
+      },
+      {
+        "questionId": "u2-費用対効果",
+        "value": 2
+      },
+      {
+        "questionId": "u3-影響度",
+        "value": 2
+      },
+      {
+        "questionId": "u3-横展開性",
+        "value": 3
+      },
+      {
+        "questionId": "u3-反映先明確度",
+        "value": 3
+      },
+      {
+        "questionId": "u3-自動化適性",
+        "value": 1
+      },
+      {
+        "questionId": "u3-再利用性",
+        "value": 3
+      },
+      {
+        "questionId": "u3-再発可能性",
+        "value": 2
+      },
+      {
+        "questionId": "u3-費用対効果",
+        "differenceReason": "semantic_disagreement",
+        "value": 2
+      },
+      {
+        "questionId": "u4-影響度",
+        "value": 1
+      },
+      {
+        "questionId": "u4-横展開性",
+        "value": 1
+      },
+      {
+        "questionId": "u4-反映先明確度",
+        "value": 3
+      },
+      {
+        "questionId": "u4-自動化適性",
+        "value": 3
+      },
+      {
+        "questionId": "u4-再利用性",
+        "value": 1
+      },
+      {
+        "questionId": "u4-再発可能性",
+        "value": 1
+      },
+      {
+        "questionId": "u4-費用対効果",
+        "value": 1
+      }
+    ]
+  }
+}

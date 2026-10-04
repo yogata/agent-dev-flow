@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261003T200514Z-53e0",
+  "workflow": "req-define",
+  "evaluationKind": "step4-final-classification-design-separation",
+  "subject": "RU-20261004-01〜04 の最終分類（REQ行/Design行帰属）と Design 分離要否",
+  "sourceRevision": "d9bf5423",
+  "durationMs": 770,
+  "inputTokens": 3474,
+  "inputs": {
+    "requestDigest": "d1eae7b6e25c1f18270e909d3cfdde49cb0c1889b77d00b48ed842c19452f7da",
+    "references": [
+      {
+        "digest": "6b95f3c0eb4ac8ff70b1dbb943ed8a81fb77582211cd2ae5f9b3d184413c61bd",
+        "label": "RU-20261004-01",
+        "path": ".agentdev/backlog/req-units/RU-20261004-01.md"
+      },
+      {
+        "digest": "03aa53b565fc45c8853c527c06d8e0e366da41dddfcc0c7c63d9478822600fa8",
+        "label": "RU-20261004-02",
+        "path": ".agentdev/backlog/req-units/RU-20261004-02.md"
+      },
+      {
+        "digest": "2a1fbd57047c29afa64e32aa07ef4cd90bc05b1fd2a83da8b3c445bbaf65c86e",
+        "label": "RU-20261004-03",
+        "path": ".agentdev/backlog/req-units/RU-20261004-03.md"
+      },
+      {
+        "digest": "6181e84ea7d0f853c8a9919e3a773f237fecd436d77372b5eaab42e1434e7800",
+        "label": "RU-20261004-04",
+        "path": ".agentdev/backlog/req-units/RU-20261004-04.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "ru01-classification",
+      "questionForm": "choice",
+      "value": "Design行のみ",
+      "probabilityDistribution": {
+        "REQ行のみ": 0,
+        "Design行のみ": 0.99,
+        "REQ行とDesign行の両方": 0.01,
+        "いずれにも帰属させない": 0
+      }
+    },
+    {
+      "questionId": "ru02-classification",
+      "questionForm": "choice",
+      "value": "REQ行とDesign行の両方",
+      "probabilityDistribution": {
+        "REQ行のみ": 0.16,
+        "Design行のみ": 0.09,
+        "REQ行とDesign行の両方": 0.74,
+        "いずれにも帰属させない": 0.01
+      }
+    },
+    {
+      "questionId": "ru03-classification",
+      "questionForm": "choice",
+      "value": "REQ行とDesign行の両方",
+      "probabilityDistribution": {
+        "REQ行のみ": 0.23,
+        "Design行のみ": 0.21,
+        "REQ行とDesign行の両方": 0.54,
+        "いずれにも帰属させない": 0.02
+      }
+    },
+    {
+      "questionId": "ru04-classification",
+      "questionForm": "choice",
+      "value": "Design行のみ",
+      "probabilityDistribution": {
+        "REQ行のみ": 0.1,
+        "Design行のみ": 0.52,
+        "REQ行とDesign行の両方": 0.36,
+        "いずれにも帰属させない": 0.02
+      }
+    },
+    {
+      "questionId": "design-separation-needed",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.6,
+        "false": 0.4
+      }
+    }
+  ],
+  "confidence": 0.98,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "ru01-classification",
+        "value": "Design行のみ"
+      },
+      {
+        "questionId": "ru02-classification",
+        "value": "REQ行とDesign行の両方"
+      },
+      {
+        "questionId": "ru03-classification",
+        "value": "REQ行とDesign行の両方"
+      },
+      {
+        "questionId": "ru04-classification",
+        "value": "Design行のみ"
+      },
+      {
+        "questionId": "design-separation-needed",
+        "value": false,
+        "differenceReason": "semantic_disagreement"
+      }
+    ]
+  }
+}

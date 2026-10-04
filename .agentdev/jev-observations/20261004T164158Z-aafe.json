@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261004T164158Z-aafe",
+  "workflow": "backlog-auto/intake-promote",
+  "evaluationKind": "adversarial-review-trigger",
+  "subject": "intake inbox 21件 暫定分類（採用15・保留0・却下6）の adversarial-review 発動条件",
+  "sourceRevision": "ad6e83412d54a8a9c241fd00a25db968d52da22c",
+  "durationMs": 284,
+  "inputTokens": 986,
+  "inputs": {
+    "requestDigest": "a56aa40893f2e81164182f306214d56c56a5ffdf0a1483d912b0aa6541f16a62",
+    "references": [
+      {
+        "digest": "57e5a548495e0e92b9c3182b142e8b3db09afa995086311277b112b276a1bc01",
+        "label": "採用代表例 freshness一括是正",
+        "path": ".agentdev/intake/inbox/2026-10-04-req-updated-freshness-16-backlog.md"
+      },
+      {
+        "digest": "af59ddd7e350d02f4c165f5262af51f4961fed4a8d0f3b6683b79ff423687bfc",
+        "label": "却下代表例 REQ-092参照解消記録",
+        "path": ".agentdev/intake/inbox/2026-10-04-issue-tracking-skill-req092-ref-already-resolved.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "review_trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.95,
+        "false": 0.050000000000000044
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "review_trigger",
+        "value": true
+      }
+    ]
+  }
+}

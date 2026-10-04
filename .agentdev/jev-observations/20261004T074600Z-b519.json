@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261004T074600Z-b519",
+  "workflow": "case-ready",
+  "evaluationKind": "wave-composition",
+  "subject": "Case #3425 最終構成 Wave-1 内2子 Issue の並列可否",
+  "sourceRevision": "343d4661",
+  "durationMs": 1015,
+  "inputTokens": 1072,
+  "inputs": {
+    "requestDigest": "4df960ebcc5c8f6831ecafbc6b6146e6f17f0c88e656708a47f2e8ee95fb4b4f"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-wave1-parallel",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.96,
+        "false": 0.040000000000000036
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-wave1-parallel",
+        "value": true
+      }
+    ]
+  }
+}

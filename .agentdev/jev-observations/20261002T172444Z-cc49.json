@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261002T172444Z-cc49",
+  "workflow": "req-define",
+  "evaluationKind": "final-classification-design-separation",
+  "subject": "REQ 系 12対応の要件行内容の Design 分離要否",
+  "sourceRevision": "8bc0a0d9",
+  "durationMs": 261,
+  "inputTokens": 2224,
+  "inputs": {
+    "requestDigest": "632d5f3b1fa2557743ad9d163d1dfeccc5ccc6ba5ce6d22e4334a5937e84ce3e",
+    "references": []
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "sep-ru01",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.13,
+        "false": 0.87
+      }
+    },
+    {
+      "questionId": "sep-ru04",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.28,
+        "false": 0.72
+      }
+    },
+    {
+      "questionId": "sep-ru05",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.23,
+        "false": 0.77
+      }
+    },
+    {
+      "questionId": "sep-ru07",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.22,
+        "false": 0.78
+      }
+    },
+    {
+      "questionId": "sep-ru08",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.31,
+        "false": 0.69
+      }
+    },
+    {
+      "questionId": "sep-ru09",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.26,
+        "false": 0.74
+      }
+    },
+    {
+      "questionId": "sep-ru13",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.45,
+        "false": 0.55
+      }
+    },
+    {
+      "questionId": "sep-ru14",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.27,
+        "false": 0.73
+      }
+    },
+    {
+      "questionId": "sep-ru16",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.37,
+        "false": 0.63
+      }
+    },
+    {
+      "questionId": "sep-ru17",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.65,
+        "false": 0.35
+      }
+    },
+    {
+      "questionId": "sep-ru18",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.32,
+        "false": 0.6799999999999999
+      }
+    },
+    {
+      "questionId": "sep-ru22",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.34,
+        "false": 0.6599999999999999
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "sep-ru01",
+        "value": false
+      },
+      {
+        "questionId": "sep-ru04",
+        "value": false
+      },
+      {
+        "questionId": "sep-ru05",
+        "value": false
+      },
+      {
+        "questionId": "sep-ru07",
+        "value": false
+      },
+      {
+        "questionId": "sep-ru08",
+        "value": false
+      },
+      {
+        "questionId": "sep-ru09",
+        "value": false
+      },
+      {
+        "questionId": "sep-ru13",
+        "value": false
+      },
+      {
+        "questionId": "sep-ru14",
+        "value": false
+      },
+      {
+        "questionId": "sep-ru16",
+        "value": false
+      },
+      {
+        "questionId": "sep-ru17",
+        "value": false,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "sep-ru18",
+        "value": false
+      },
+      {
+        "questionId": "sep-ru22",
+        "value": false
+      }
+    ]
+  }
+}

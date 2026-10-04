@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20260929T172148Z-9039",
+  "workflow": "learning-promote",
+  "evaluationKind": "problem-class-assignment",
+  "subject": "learning inbox 11エントリの問題クラス分類（U1/U8 帰属判断）",
+  "sourceRevision": "2be595ea",
+  "durationMs": 817,
+  "inputTokens": 1674,
+  "inputs": {
+    "requestDigest": "92a091f354d2368296e040d4eb3d0e536b1a21d8d7937da0fb61d83df9087efc",
+    "references": [
+      {
+        "digest": "59cf79faa7244aea03b3bd39f0c70fec051db766ce01cdfb4a931f157d985cbc",
+        "label": "learning-inbox",
+        "path": ".agentdev/learning/inbox.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "u1-class",
+      "questionForm": "choice",
+      "value": "単独・未分類",
+      "probabilityDistribution": {
+        "同一問題クラス（U8と）": 0.01,
+        "単独・未分類": 0.99
+      }
+    },
+    {
+      "questionId": "u8-class",
+      "questionForm": "choice",
+      "value": "単独・未分類",
+      "probabilityDistribution": {
+        "同一問題クラス（U1と）": 0.01,
+        "単独・未分類": 0.99
+      }
+    }
+  ],
+  "confidence": 0.98,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "u1-class",
+        "value": "単独・未分類"
+      },
+      {
+        "questionId": "u8-class",
+        "value": "単独・未分類"
+      }
+    ]
+  }
+}

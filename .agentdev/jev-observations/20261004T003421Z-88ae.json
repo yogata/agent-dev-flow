@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261004T003421Z-88ae",
+  "workflow": "case-ready",
+  "evaluationKind": "wave-composition",
+  "subject": "Root Case #3410 の Wave 構成判断（並列可否）",
+  "sourceRevision": "edeb841d6b16d23308124f80f1503e8e26682506",
+  "durationMs": 241,
+  "inputTokens": 800,
+  "inputs": {
+    "requestDigest": "54f74f841390eedf71ea2348d891940087cbac19c5ffd4e4300e96da7cd17b36"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "wave-parallelizable",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.95,
+        "false": 0.050000000000000044
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "wave-parallelizable",
+        "value": true
+      }
+    ]
+  }
+}
