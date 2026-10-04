@@ -108,7 +108,7 @@ verification-incomplete（読み戻し検証失敗）時は、Tool は検証失�
 `issue_list` 操作を Issue 検索に使う場合、次の 2 規律を標準呼出形式に重ねて適用する。規律の正は `agentdev-issue-tracking` Design「確定事項」の物理写像表（issue_list の labels 引数の規律）であり、本節は安全手続き側の適用形を定める。
 
 - **search 併用必須**: `issue_list` を closed 等の広範 filter で実行する場合、`search` 引数（冪等キー語、REQ 番号、topic_slug 等の絞り込みキー）を必ず併用する。広範 filter を `search` なしで実行すると、closed Case 群等の累積 population の増加により、Tool 完全一覧契約の安全ページ上限へ構造的に到達して operation-failed となる
-- **labels 引数は tracking 論理値専用**: `labels` 引数は追跡Issue論理軸（role、kind、trackingState）の物理マッピング入力専用である。Case Issue は role: case と機械判定されるため、Case 物理ラベル名（enhancement、bug、docs 等の通常ラベル）を `labels` 引数へ指定した絞り込みは 0 件帰着または無効となる。Case Issue の絞り込みは `labels` 引数を使用せず、`search` 引数と state の組み合わせで行う
+- **labels 引数は tracking 論理値専用（規律と受理能力の区別）**: `labels` 引数は ADF 呼出側の使用規律として追跡Issue論理軸（role、kind、trackingState）の物理マッピング入力に用いる。Tool の受理能力としては、Case 物理ラベル名（enhancement、bug、docs 等の通常ラベル）を `labels` 引数へ指定した絞り込みも有効であり（クライアント再フィルタ）、0 件帰着や無効にはならない。Case Issue は role: case と機械判定されるため、通常ラベルでは Case Issue を論理軸で絞り込めない。受理能力の存在は ADF 呼出側の使用規律の解禁を意味せず、新たな拒否機構も設けられていない。Case Issue の絞り込みは `labels` 引数を使用せず、`search` 引数と state の組み合わせで行う
 
 ### search トークンの選択性指針
 
@@ -146,7 +146,9 @@ gh CLI は読取専用の確認に限り、GitHub 書込みを代替しない。
 
 ### server-side search の偽陰性に対する呼出側規律
 
-`issue_list` の server-side search 利用時は、ハイフン入り識別子等のトークン正規化不一致による偽陰性の可能性を考慮する。GitHub search は検索クエリをトークンへ正規化して一致判定するため、ハイフン入り識別子（REQ 番号等のハイフンを含む識別子）はハイフンを区切りとしたトークンへ分割された正規化形で解釈される。この正規化形の不一致により、本文に識別子が実在しても search で 0 件帰着する偽陰性が発生し得る。
+`issue_list` の server-side search はタイトル検索限定（`in:title`）の tokenized 照合であり、本文検索ではない。Tool は search/issues エンドポイントへ `in:title` qualifier 付きで推送する。このため、タイトルに識別子がなく本文にのみ実在する Issue は、トークン正規化とは無関係に search の一致対象から除外される。加えて、GitHub search は検索クエリをトークンへ正規化して一致判定するため、ハイフン入り識別子（REQ 番号等のハイフンを含む識別子）はハイフンを区切りとしたトークンへ分割された正規化形で解釈される。この正規化形の不一致により、タイトルに識別子が実在しても search で 0 件帰着する偽陰性が発生し得る。
+
+- **本文実在識別子は search の一致根拠にならない**: タイトルに識別子がなく本文にのみ実在する場合の 0 件帰着は、index 遅延等の一時的な偽陰性ではなく、`in:title` 限定の仕様による構造的な除外である。本文の識別子実在を確認する場合は `issue_read` の直接参照で本文を取得して照合する
 
 - **空配列成功応答は不存在の証拠としない**: `issue_list` の server-side search が成功応答で空配列を返しても、それを対象 Issue の不存在の証拠として扱わない。成功応答は検索条件に一致した件数が 0 であったことのみを示し、対象の不存在を保証しない
 - **unfiltered fallback（フィルタを外した一覧取得での再確認）**: 冪等検証（重複生成の防止等、不在確認を目的とする検証）では、フィルタを外した一覧取得での再確認を行う。`search` を外した `issue_list`（`state` 等の他の条件は維持）または `gh issue list` の読み取りで候補を列挙し、目的の識別子の実在・不在を実測で判定する。偽陰性疑いの対象が特定できる場合は「search 0 件帰着の二重確認」の `issue_read` 直接参照を先に用いる
@@ -157,7 +159,7 @@ closed 等の広範囲な population を実測する場合は、`search` なし�
 
 ### issue_update の引数制約
 
-- `issue_update` は `role` を受理しない。`role`、`kind`、`trackingState` の新規設定は `issue_create` 専用である。`issue_update` で `labels` を省略した場合は追跡軸の現行値が維持される
+- `issue_update` は `role` を受理しない（`unknown-field` 失敗）。`role` の設定は `issue_create` 専用であり、`issue_update` は tracking 操作として `kind` と非終端の `trackingState` を受理する。`trackingState` への終端値 `closed` の指定は失敗し、クローズは `issue_close` を使用する。`kind` と `trackingState` は追跡Issue（role: tracking）にのみ適用され、Case Issue への指定は失敗する。`issue_update` で `labels` を省略した場合は追跡軸の現行値が維持される
 - `invalid-input`（`unknown-field`）の構造化失敗は同一引数で再試行せず、不正な引数を修正してから再実行する
 
 ## 操作・role 別の受理フィールド対応表
@@ -167,10 +169,10 @@ closed 等の広範囲な population を実測する場合は、`search` なし�
 | フィールド | issue_create | issue_update | issue_list | 備考 |
 |---|---|---|---|---|
 | `role` | 受理（tracking / case） | **不受理**（unknown-field 失敗） | 受理（絞り込み論理軸） | role の設定は起票時のみ。既存 Issue の role は変更しない |
-| `kind` | `role: tracking` のとき受理 | **不受理**（`kind requires role 'tracking'` 失敗） | 受理（tracking 軸絞り込み） | `role: case`（Case Issue）では kind は不受理 |
-| `trackingState` | `role: tracking` のとき受理 | 受理（非終端状態のみ） | 受理（tracking 軸絞り込み） | Case Issue（role: case）には適用されない |
+| `kind` | `role: tracking` のとき受理（それ以外は `kind requires role 'tracking'` 失敗） | 受理（tracking 操作。Case Issue への適用は失敗） | 受理（tracking 軸絞り込み） | `role: case`（Case Issue）では kind は導出されない |
+| `trackingState` | **不受理**（unknown-field 失敗。起票時の状態指定は不可） | 受理（非終端状態のみ。終端値 `closed` は `issue_close` を使用） | 受理（tracking 軸絞り込み） | Case Issue（role: case）には適用されない |
 | `labels` | 必須（空配列も明示） | 省略時は追跡軸ラベル維持 | tracking 論理軸写像入力専用 | Case Issue の work_type（maintenance 等）は起票時に通常ラベル（物理ラベル）として `labels` へ指定する |
-| `role` と `kind` の同時指定 | tracking のとき可 | 不可 | 可（tracking 軸） | `role: case` と `kind` の同時指定は起票失敗の代表例である |
+| `role` と `kind` の同時指定 | tracking のとき可 | 不可（`role` が不受理のため） | 可（tracking 軸） | `role: case` と `kind` の同時指定は起票失敗の代表例である |
 
 ## gh CLI 読取補完の規律（ラベルなし列挙＋タイトル・本文確認）
 
