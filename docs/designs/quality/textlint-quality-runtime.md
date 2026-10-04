@@ -4,8 +4,8 @@ status: accepted
 created: 2026-09-09
 updated: 2026-09-29
 ---
-<!-- ADF-COVERS(implementation): REQ-053-024, REQ-053-025, REQ-053-026, REQ-053-027, REQ-053-028, REQ-053-029, REQ-053-030, REQ-053-031, REQ-053-032, REQ-053-033, REQ-053-034, REQ-053-035, REQ-053-036, REQ-053-037, REQ-053-038, REQ-010-075, REQ-029-012 -->
-<!-- ADF-COVERS(design): REQ-053-033, REQ-029-012（依存と配布節が版固定情報配布・導入時生成の design 実体） -->
+<!-- ADF-COVERS(implementation): REQ-053-024, REQ-053-025, REQ-053-026, REQ-053-027, REQ-053-028, REQ-053-031, REQ-053-032, REQ-053-035, REQ-053-036, REQ-010-075, REQ-029-012 -->
+<!-- ADF-COVERS(design): REQ-029-012（依存と配布節が版固定情報配布・導入時生成の design 実体） -->
 
 # textlint 品質基盤
 
@@ -118,4 +118,14 @@ prh 規則の options.rulePaths は実行環境の plugin dir 絶対パスを含
 標準辞書は plugin dir 相対へ、プロジェクト用語辞書はプロジェクトルート相対へ表現を統一し、区切りを / に揃え、配列を辞書順ソートする。
 rules は ruleId 辞書順にソートし、ruleId とキー辞書順正規化した canonical JSON(options) の行を改行で連結する。
 連結結果の末尾へ、prh 標準辞書内容の SHA-256、prh rulePaths 数、依存版一覧、拒否対象規則 ID の辞書順連結を改行で付与し、全体の SHA-256 を規則構成ハッシュとする。
+
+### REQ-053 から分離された実行詳細の受け皿
+
+textlint 技術選択の経緯と理由、依存供給（agentdev-textlint-guard Plugin の配布経路）、
+設定（prh 辞書・標準規則の構成）、版固定の方針、是正キャンペーン等の移行作業計画、
+Windows 環境の編集具体手順（PowerShell 標準 cmdlet・リダイレクトの再符号化リスクと標準手段）は
+本 Design が所有する。REQ-053 は恒常的な文書品質保証（正規参照点・書込み前検査・最終検査）のみを
+保持し、本節の実行詳細を参照する。REQ-053 から分離される各行の本文は、case 実行時に本節配下
+（または既存の対応節）へ移管して本文を充足する（宣言だけの被覆としない）。移行作業の進捗記録は
+作業記録（Report）へ、既知の環境知識は docs/knowledge/ へ配置する。
 計算結果の実測値は設計本文へ記録せず、版記録として実行記録へ保存する。

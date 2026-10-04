@@ -272,6 +272,19 @@ scripts/ 直下の公開入口と内部配置の構成（REQ-050-001、REQ-050-0
 - release 生成、信頼境界検証、self-hosting 保守処理、単体実行しない内部共通処理を scripts/ 直下に配置しない
 - 具体的な内部ファイル分割は、公開契約と依存境界を変えない範囲で実装時に調整できる
 
+### supervisor-bridge の配置と境界（REQ-091 design 被覆の本文）
+
+scripts/self/supervisor-bridge/ は、Supervisor 環境（Hermes 等、spawn する子プロセスから
+プロバイダー資格情報を削除する実行環境）向けの実行環境ブリッジ道具の原本配置である。
+ocenv（Windows User スコープ環境変数を現在の環境へ merge してコマンドを実行するラッパ）と
+opencode bridge shim（opencode コマンド解決を横取りして ocenv 経由で起動）を含む。
+導入マニュアル（docs/guides/）と知識文書（docs/knowledge/supervisor-bridge-credential-supply.md）が
+手順と失敗署名を所有する。release archive に supervisor-bridge/ は構造的に含まれない
+（配布範囲外・自己開発環境限定）。REQ-050-009 の内部配置列挙は本配置を含む。
+あわせて、REQ-044-004、REQ-050-007/008 の被覆宣言に対応する本文（能力比較の旧状態確認スクリプト
+との歴史的関係、旧入口廃止と互換ラッパー不設置、公開入口名に opencode を含めない命名方針）が
+本 Design 内の対応節で本文として存在することを確認する。
+
 ### archive 専用 installer 原本と release archive 投影
 
 repository 上では archive 専用 installer の原本を通常 consumer installer と分離して保持する（`scripts/consumer/archive/install.ps1`）。

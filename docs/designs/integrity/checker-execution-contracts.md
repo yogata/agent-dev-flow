@@ -260,6 +260,12 @@ QG-4 フル suite 正規形（3 cwd 分割実行、正規ランナー構成確�
 agentdev-quality-gates が正規所有する。本節はその所有権を変更せず、単独実行・ファイル単体指定時の
 一般規約と正規形への参照を提供する。
 
+### タイムアウト値
+
+bun test 実行のタイムアウトは標準 300 秒、上限 600 秒とする。実測（2026-10 時点の主スイート）
+は 197〜235 秒であり、上限到達時は検査の分離実行を検討する。既定値・上限値の変更は本 Design の
+変更として扱う（REQ-060-007 の手段詳細の分離先。inspect finding RQ-34/RQ-05 の defer を引き継ぐ）。
+
 ## Design frontmatter 必須キー検証観点
 
 docs/designs/** のDesign frontmatterは `title` / `status` / `created` / `updated` を必須キーとして機械検査する。キー欠落、`updated` 値のキー名欠落、値形式不正を検出し、既存のKnowledge frontmatter必須キー検査と同じ検出基準で整合性ルールカタログへ登録する。
