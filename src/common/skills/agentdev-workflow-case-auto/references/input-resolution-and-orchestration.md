@@ -163,6 +163,15 @@ stage 1（case-open）の収束条件には、全対象確立後の横断依存�
 並列起動時は委譲起動ごとに10秒の起動間隔を置き、同一Tool一括ブロックでの複数起動発行は行わない（v4-runtime-execution-model Design「runtime 制御ループ」節〔起動間隔・並列数制御〕）。起動間隔は stage 3（case-run インライン実行の実装実行委譲）に限らず stage 1（case-open / case-revise 委譲）・stage 2（case-ready 委譲）・stage 4（case-close 委譲）の並列委譲起動にも同一に適用する。
 bg task 破棄検知時の3状態回復は `agentdev-workflow-orchestration` 参照。
 
+#### stage 2・stage 4 の並列委譲起動と委譲指示の構築（case-ready・case-close）
+
+stage 2（case-ready）・stage 4（case-close）の委譲起動は、起動時対象集合のうち当該 stage で実行可能な各対象を独立した委譲として並行に構築・起動する（stage 内最大並列・直列化要因のみ局所直列化。前述 orchestration stage モデル）。委譲指示は case-auto Design「委譲指示の構築規律（case-ready・case-close の並列委譲起動）」節に従い構築する。
+
+1. 対象ごとに独立した委譲指示を構築し、委譲指示は対象全体の逐次実行を命じる文言を含めない。独立対象は並列起動し、必須依存で結合された対象群のみ局所的に順序づける
+2. stage 間の順序（前 stage 対象群の収束〔fan-in〕を待って次 stage を開始）と stage 内の対象間順序を混同しない（前述 orchestration stage モデル、OU処理順序）
+3. 競合する共有書込み（main への merge、push、採番、AUTOGEN 索引更新、同一 Epic Issue 本文更新等）は競合対象を特定した上で当該部分のみ局所直列化し、競合と無関係な対象の並列実行を妨げない（前述 orchestration stage モデルの局所直列化）
+4. 並列起動が当該 stage の起動可能対象集合に対して1件も成立しない場合は、逐次実行で完了を装わず停止理由「並列起動不能」（原因の断定を含まない）と再開可能性を報告して停止する（前述の並列実行必須条項）
+
 #### stage 3 runtime 制御契約（共有 active Issue task 枠）
 
 stage 3 の実行制御は case-auto が単一所有し、次の runtime 制御契約に従う（詳細は case-auto Design「runtime 制御契約」節と v4-runtime-execution-model Design「runtime 制御ループ」節）:
