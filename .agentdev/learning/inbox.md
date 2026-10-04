@@ -625,3 +625,19 @@
 - **想定反映先**: learning-promote での評価
 - **関連**: Root Case #3410・PR #3419・Issue #3413・checker 実行契約「link profile の worktree 実行時の扱い」
 - **タグ**: `#worktree` `#junction` `#bun-test` `#environment-label` `#explicit-recording`
+
+## 2026-10-04: coverage --req の複数行カンマ列挙では reqId ごとの design 宣言欠落が帰着で判別できず、missing-design 欠落の発見は check --req 併用が正
+
+- **問題事象**: 意味変更行の design 対応事前確認（coverage --req）で6行をカンマ列挙したところ、relations 全件（design 5件を含む）が帰着して「design 対応欠落行なし」と誤判定できた。実際は REQ-006-112 の design 宣言（ADF-COVERS(design)）が main の時点から欠落しており、check --req（missing-design ゲート）で初めて REQ-006-112 単独の欠落として検出された
+- **発生局面**: case-open STEP-3 design 対応事前確認 → STEP-4 missing-design 0 件ゲート（Root Case #3420・Definition PR #3421・commit 0f2579a0）
+- **検知方法**: check --req が REQ-006-112 の missing-design fail を報告（coverage はカンマ列挙の reqId 集合に紐づく関係全件のみを返し reqId ごとの design 有無を区別しなかった）
+- **根本原因**: coverage の事前確認を「複数行カンマ列挙での一括帰着確認」で済ませた。coverage は advisory・関係全件列挙であり、欠落行の特定は check の missing-design findings が正
+- **自律対応内容**: 宣言追随として v4-lifecycle-state-machine へ ADF-COVERS(design): REQ-006-112 を追加し missing-design 0 件へ解消。加えて coverage を reqId 単位（6回の単独実行）で再実行し全行の design 対応を実測帰着確認した
+- **ユーザー確認有無**: なし（REQ-030 契約内の宣言追随で解消・PR 本文へ既知債務の由来と解消を記録）
+- **Decision/REQ/spec影響**: なし（宣言追加のみ・本文変更なし）
+- **横展開観点**: coverage は「design 対応の実測帰着」用途で reqId 単位実行し、欠落行の発見は check --req の missing-design findings を正とする。カンマ列挙の帰着だけで欠落行なしと判断しない
+- **再発条件**: 複数の意味変更行を coverage --req のカンマ列挙で一括確認し、帰着した relations の件数だけで欠落判定する場合
+- **予防策候補**: design 対応事前確認手順に「check --req の併用（欠落行特定）と coverage は reqId 単位で実測帰着」を明記する候補
+- **想定反映先**: learning-promote での評価。case-open STEP-3 意味変更行 design 対応事前確認手順の追補候補
+- **関連**: Root Case #3420・PR #3421・traceability check/coverage 実測（0f2579a0）
+- **タグ**: `#coverage-req` `#missing-design` `#traceability` `#declaration-follow-up` `#case-open`
