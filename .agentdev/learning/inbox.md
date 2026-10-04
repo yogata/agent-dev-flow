@@ -865,3 +865,35 @@
 - **想定反映先**: learning-promote での評価
 - **関連**: Case 3423（PR 3435 検証差分 link profile 行）
 - **タグ**: `#link-profile` `#junction` `#worktree`
+
+## 2026-10-04: realization_actions が reference 専列挙のとき SKILL.md 制御平面の重複記述が追随漏れになり得る
+
+- **問題事象**: 配布 skill の REQ 意味変更で realization_actions が reference ファイルのみを列挙していると、SKILL.md 制御平面（STEP 表・終了条件・停止理由）側の重複記述が追随漏れになり得る。本 Case では完了条件5の横断突合で case-open SKILL.md L42/L63 の旧停止条件（blocked）と旧用語（検証不能）の残存を検出し、同一 PR 内で修正した
+- **発生局面**: case-run 委譲の RA-001 実装と case-close STEP-2 完了条件5横断突合（Case #3424・PR #3437 検証差分 完了条件5行）
+- **検知方法**: reference（root-case-and-definition-package.md）と SKILL.md の同一概念記述（preflight 設定検証の停止条件）の横断突合で旧用語・旧停止条件の残存を検出
+- **根本原因**: realization_actions の列挙対象が reference のみで、SKILL.md 側の重複記述が追随対象から漏れる構造
+- **自律対応内容**: SKILL.md の STEP-2 開始条件を「preflight 設定検証の実施と警告報告」へ、終了条件の停止理由リストを警告化と安全契約停止の注記へ修正し、旧用語を「設定照会不能」へ統一（PR #3437 同一 commit）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（文書整合性検査観点の拡充候補）
+- **横展開観点**: 今後の REQ 意味変更で「SKILL.md 重複記述の追随確認」を docs-check 系検査観点または case-run 完了条件横断突合に含める価値
+- **再発条件**: realization_actions が reference 専列挙の REQ 意味変更 Case（配布 skill 変更で構造上発生し得る）
+- **予防策候補**: case-run 事前検査または check_changed_docs に SKILL.md 制御平面と reference の同概念記述突合観点の追加
+- **想定反映先**: learning-promote での評価
+- **関連**: Case #3424（PR #3437 検証差分 完了条件5行・Findings learning 1件目）
+- **タグ**: `#skill-md` `#realization-actions` `#doc-consistency`
+
+## 2026-10-04: 配布依存境界 gate の baseline 退避物と delta 検査用 BaselineFile は形式非互換
+
+- **問題事象**: 配布依存境界 gate の baseline 退避物（ok/failures/stats 形式のスナップショット）を delta 検査用 BaselineFile（entries 形式）を期待する `check_distribution_boundary_cli.ts --delta` に渡すと cannot load baseline で拒否される
+- **発生局面**: case-run 委譲の配布依存境界 最終 gate（source profile）の baseline 比較（Case #3424・PR #3437 品質メトリクス・検証差分）
+- **検知方法**: baseline 退避物を --delta に渡した実行の cannot load baseline エラー
+- **根本原因**: baseline 退避物のスナップショット形式（ok/failures/stats）と delta 検査の BaselineFile（entries）の形式が非互換で、baseline 比較は gate レポート突合（ok / failures / 分類 hit）経路が現契約
+- **自律対応内容**: baseline 退避物の比較を gate レポート突合で実施（scanned 380 vs baseline 381 の走査対象差は分類違反なしとして確認）。delta 経路は使用しない
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: baseline 退避物と BaselineFile の役割分離（退避=比較証跡、BaselineFile=delta 入力）を checker 実行契約または配布依存境界 Design の運用注記に明記する価値
+- **再発条件**: 配布依存境界 gate の baseline 比較で退避物を --delta に渡す場合
+- **予防策候補**: --delta の入力形式のドキュメント化、退避物比較経路の明記
+- **想定反映先**: learning-promote での評価
+- **関連**: Case #3424（PR #3437 Findings learning 2件目）
+- **タグ**: `#distribution-boundary` `#baseline` `#checker`
