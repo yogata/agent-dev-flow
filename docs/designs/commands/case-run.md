@@ -2,7 +2,7 @@
 title: case-run Design
 status: accepted
 created: 2026-06-21
-updated: "2026-10-04"
+updated: "2026-10-05"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-015, REQ-021-016, REQ-021-017, REQ-021-019, REQ-021-020, REQ-021-022, REQ-035-002 -->
@@ -13,6 +13,7 @@ updated: "2026-10-04"
 <!-- ADF-COVERS(implementation): REQ-031-001, REQ-031-002, REQ-031-003, REQ-031-004, REQ-031-005, REQ-031-006, REQ-031-007, REQ-031-008, REQ-031-009, REQ-031-010, REQ-031-011, REQ-031-012, REQ-031-013, REQ-031-014, REQ-031-015, REQ-031-016, REQ-031-017, REQ-031-018, REQ-031-019, REQ-031-020, REQ-031-021, REQ-031-022, REQ-031-023, REQ-031-024 -->
 <!-- ADF-COVERS(implementation): REQ-007-001, REQ-007-002, REQ-007-003, REQ-007-004, REQ-007-005, REQ-031-001, REQ-031-002, REQ-031-003, REQ-031-004, REQ-031-005, REQ-031-006, REQ-031-009, REQ-031-010, REQ-031-011, REQ-031-012, REQ-031-015, REQ-031-016, REQ-031-017, REQ-031-018, REQ-031-019, REQ-031-020, REQ-031-021, REQ-031-022, REQ-031-023, REQ-031-024, REQ-035-011 -->
 <!-- ADF-COVERS(design): REQ-017-022 -->
+<!-- ADF-COVERS(design): REQ-053-047（case-run が使用する検査ツール節が textlint 用途選定入口接続の design 実体） -->
 
 # case-run Design
 
@@ -306,6 +307,7 @@ case-run が使用する検査ツール（[integrity-contracts.md](../integrity/
 - check_integrity.ts（全体監査）: PR 対象ファイルに docs/** 変更を含む case では commit 前に full 実行し、base 既知違反と新規違反を分離して新規違反 0 件を確認する（「docs 変更を含む case での commit 前 full check_integrity 工程」参照）
 - check_extensions.ts（IR-056）: `src/common/commands/agentdev/**/*.md`, `src/common/skills/agentdev-*/SKILL.md`, `src/common/skills/agentdev-*/references/**/*.md`, `.agentdev/extensions/**` のいずれかを変更した場合に実行
 - test_strategy: Issue 完了条件検証（REQ-031-008/030）
+- textlint 品質基盤（用途選択入口）: 文章品質検査の起動は、工程スクリプトが正規契約から用途（書込み前検査、通常最終検査、必須独立検査、結果表示）を決定的に選択して入口を起動し、完結した結果（用途、対象範囲、対象状態、完了状態、合否、実規則実行数と再利用数を含む）を受理して進行を判定する。LLM が毎回の検査範囲・目的・再利用可否を選択しない。同じ判定を各呼出元で再実装しない
 
 case-run は check_integrity.ts（全体監査）を、docs 変更を含む case での commit 前検査として条件付きで使用する（base 既知違反と新規違反の分離、新規違反 0 件確認）。targeted docs guard（PR 単位の targeted 検査）は維持する。docs 変更を含まない case での全体監査は /repo/docs-check の責務である。
 

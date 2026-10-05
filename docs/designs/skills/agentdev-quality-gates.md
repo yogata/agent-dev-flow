@@ -2,10 +2,11 @@
 title: `agentdev-quality-gates` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-10-04
+updated: 2026-10-05
 ---
 <!-- ADF-COVERS(implementation): REQ-007-001, REQ-007-003, REQ-007-004, REQ-007-005, REQ-060-005 -->
 <!-- ADF-COVERS(design): REQ-007-014, REQ-007-015 -->
+<!-- ADF-COVERS(design): REQ-053-045, REQ-053-047（QG-4 検証証拠の再利用と再実行条件節が検査基盤内部実行形態と工程証跡再実行条件の境界 design 実体） -->
 
 # `agentdev-quality-gates` Design
 
@@ -107,6 +108,7 @@ QG-4 final acceptance の変更ファイル突合検証における I/O 操作�
 - 保存出力の欠落、切断、タイムアウト、検査範囲欠落は完全な合格証拠として扱わない。既存の timeout 打ち切り扱い（fail 証跡としない）、件数突合、PowerShell コンソール表示を証跡扱いしない規律を維持する
 - QG-4 機械受理基準の記録対象に終了コード、版、検査範囲を追加する
 - 必須の版境界における再検証、close の最終検証（origin/main 取り込み済み・マージ直前の branch HEAD での実行）、QG-4 独立再検査、full suite 実行の省略禁止は維持する。同一版でも必要な再現確認・独立検査を拒否しない。裸の bun test 一発（対象ディレクトリを明示指定しない単体実行）で正規の全体網羅検証を代替しない
+- textlint 共通基盤のファイル単位結果再利用（同一性条件付きの規則実行省略）は検査基盤内部の実行形態であり、本節の検証証跡の再利用・再実行条件と区別する。QG-4 の必須独立再検査・close の最終検査の実行義務を緩和せず、工程証跡としての再実行条件は本節が所有する
 
 ## 対象外
 
