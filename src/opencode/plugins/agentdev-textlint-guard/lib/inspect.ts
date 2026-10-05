@@ -10,7 +10,14 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import type { GuardConfig, GuardConfigResult } from "./config.ts";
 import { formatConfigError, loadGuardConfig } from "./config.ts";
-import { loadEngine, type EngineLoadResult, type TextlintKernelLike } from "./engine-bundle.ts";
+import { loadEngine, type EngineBundleModule, type EngineLoadResult, type TextlintKernelLike } from "./engine-bundle.ts";
+import {
+  computeFileIdentityKey,
+  computeInspectionConditions,
+  type ComputeConditionsInput,
+  type InspectionConditionsResult,
+} from "./identity.ts";
+import { loadStoredFileResult, storeFileResult } from "./result-store.ts";
 import { composeRuleDescriptors, type RuleComposition } from "./rules.ts";
 import { discoverProjectPrh, formatProjectPrhError } from "./terminology.ts";
 import {
@@ -29,6 +36,8 @@ export interface InspectEnvironment {
   readonly loadEngineFn?: () => Promise<EngineLoadResult>;
   /** 規則合成（既定: composeRuleDescriptors）。テストで差し替え可能。 */
   readonly composeRules?: (engineResult: EngineLoadResult) => RuleComposition;
+  /** 検査条件の計算（既定: computeInspectionConditions）。テストで差し替え可能。 */
+  readonly computeConditions?: (input: ComputeConditionsInput) => InspectionConditionsResult;
   readonly pluginDir?: string;
 }
 
@@ -39,6 +48,7 @@ export type InspectPrepared =
       readonly kernel: TextlintKernelLike;
       readonly composition: RuleComposition;
       readonly markdownPlugin: unknown;
+      readonly engine: EngineBundleModule;
     }
   | { readonly ok: false; readonly detail: string };
 
@@ -70,6 +80,7 @@ export async function prepareInspection(root: string, env: InspectEnvironment = 
       kernel: new engineResult.engine.TextlintKernel(),
       composition,
       markdownPlugin: engineResult.engine.markdownPlugin,
+      engine: engineResult.engine,
     };
   } catch (e) {
     return {
@@ -152,6 +163,93 @@ function normalizeRange(
 export type InspectFilesOutcome =
   | { readonly ok: true; readonly outcome: InspectionOutcome }
   | { readonly ok: false; readonly detail: string };
+
+/** 検査準備結果と検査条件（同一性判定の入力）を保持する context。 */
+export interface PreparedInspectionContext {
+  readonly root: string;
+  readonly prepared: Extract<InspectPrepared, { readonly ok: true }>;
+  readonly conditions: InspectionConditionsResult;
+  /**
+   * 終了時照合用（REQ-053-046）: 開始時と同一手順で設定と検査条件を再計算する
+   * （検査中の辞書・規則・設定・依存成果物の変更を検知する）。
+   */
+  readonly recomputeSnapshotInputs: () => { config: GuardConfig; conditionsHash: string };
+}
+
+export type PrepareContextResult =
+  | { readonly ok: true; readonly context: PreparedInspectionContext }
+  | { readonly ok: false; readonly detail: string };
+
+/**
+ * prepareInspection + 検査条件の計算。エンジン・規則の準備に失敗した場合は
+ * 検査不能（fail-closed）、検査条件の計算に失敗した場合は conditions に
+ * trackable: false を保持して実検査のみで完結させる（再利用せず実検査する）。
+ */
+export async function prepareInspectionContext(root: string, env: InspectEnvironment = {}): Promise<PrepareContextResult> {
+  const prepared = await prepareInspection(root, env);
+  if (!prepared.ok) return { ok: false, detail: prepared.detail };
+  const conditionsInput: ComputeConditionsInput = {
+    root,
+    config: prepared.config,
+    composition: prepared.composition,
+    engine: prepared.engine,
+    ...(env.pluginDir !== undefined ? { pluginDir: env.pluginDir } : {}),
+  };
+  const loadConfig = env.loadConfig ?? loadGuardConfig;
+  const computeConditions = (): InspectionConditionsResult =>
+    env.computeConditions !== undefined ? env.computeConditions(conditionsInput) : computeInspectionConditions(conditionsInput);
+  const context: PreparedInspectionContext = {
+    root,
+    prepared,
+    conditions: computeConditions(),
+    recomputeSnapshotInputs: () => {
+      const configResult = loadConfig(root);
+      const recomputed = computeConditions();
+      return {
+        config: configResult.ok ? configResult.config : prepared.config,
+        conditionsHash: recomputed.trackable ? recomputed.conditionsHash : "untracked",
+      };
+    },
+  };
+  return { ok: true, context };
+}
+
+export interface ReuseAwareInspectOptions {
+  /** 保存済み結果の再利用（REQ-053-041。独立検査では false）。 */
+  readonly reuse: boolean;
+  /** 実検査結果の保存（REQ-053-043。正常完了した合格・不合格のみ保存される）。 */
+  readonly store: boolean;
+}
+
+export type InspectWithReuseResult =
+  | { readonly ok: true; readonly result: FileInspectionResult; readonly reused: boolean }
+  | { readonly ok: false; readonly detail: string };
+
+/**
+ * ファイル単位の検査（保存結果の再利用つき）。
+ * 対象全件の列挙と全文取得は毎回必須（REQ-053-032/041）であり、text は呼出側が
+ * 実ファイルから読んで渡す。同一性が機械検証できた対象だけ規則実行を省略し、
+ * 保存済みのファイル単位結果を再利用する。条件を追跡できない場合は再利用せず実検査する。
+ */
+export async function inspectFileWithReuse(
+  context: PreparedInspectionContext,
+  rootRelativePath: string,
+  text: string,
+  options: ReuseAwareInspectOptions,
+): Promise<InspectWithReuseResult> {
+  if (context.conditions.trackable && options.reuse) {
+    const key = computeFileIdentityKey(context.root, rootRelativePath, text, context.conditions.conditionsHash);
+    const stored = loadStoredFileResult(context.root, key, rootRelativePath);
+    if (stored !== null) return { ok: true, result: stored, reused: true };
+  }
+  const inspected = await inspectText(context.prepared, context.root, rootRelativePath, text);
+  if (!inspected.ok) return inspected;
+  if (options.store && context.conditions.trackable) {
+    const key = computeFileIdentityKey(context.root, rootRelativePath, text, context.conditions.conditionsHash);
+    storeFileResult(context.root, key, rootRelativePath, inspected.result);
+  }
+  return { ok: true, result: inspected.result, reused: false };
+}
 
 /** 最終検査: 対象全件（標準 + 追加）の実ファイル全文を検査する。検査不能は不合格。 */
 export async function inspectAllTargetFiles(root: string, env: InspectEnvironment = {}): Promise<InspectFilesOutcome> {

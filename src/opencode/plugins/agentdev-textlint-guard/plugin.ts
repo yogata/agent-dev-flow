@@ -18,7 +18,7 @@
 // 持たず、repo-local 除外にも登録しない。
 
 import { formatConfigError, loadGuardConfig, type GuardConfigResult } from "./lib/config.ts";
-import { prepareInspection, inspectText, type InspectPrepared } from "./lib/inspect.ts";
+import { inspectFileWithReuse, prepareInspectionContext } from "./lib/inspect.ts";
 import { resolveProjectRoot, toRootRelative } from "./lib/project.ts";
 import {
   reconstructApplyPatch,
@@ -124,17 +124,21 @@ export async function guardOperation(
   }
   if (targetWrites.length === 0) return null;
 
-  // 4) 検査（共通基盤）
-  let prepared: InspectPrepared;
+  // 4) 検査（共通基盤。書込み前検査も対象全件の列挙と全文取得を毎回行い、
+  //    同一性が機械検証できた対象だけ規則実行を省略して保存済み結果を再利用する
+  //    （textlint-quality-runtime.md「ファイル単位結果の再利用と同一性条件」節）。
+  //    再利用は同一入力に対する同一判定の再現であり、合格判断の継承ではない）
+  let prepared: Awaited<ReturnType<typeof prepareInspectionContext>>;
   try {
-    prepared = await prepareInspection(projectRoot);
+    prepared = await prepareInspectionContext(projectRoot);
   } catch (e) {
     return `agentdev-textlint-guard: inspection preparation crashed (${e instanceof Error ? e.message : String(e)}); blocked per fail-closed`;
   }
   if (!prepared.ok) return prepared.detail;
+  const context = prepared.context;
   const fileResults = [];
   for (const target of targetWrites) {
-    const result = await inspectText(prepared, projectRoot, target.rel, target.content);
+    const result = await inspectFileWithReuse(context, target.rel, target.content, { reuse: true, store: true });
     if (!result.ok) return result.detail;
     fileResults.push(result.result);
   }
