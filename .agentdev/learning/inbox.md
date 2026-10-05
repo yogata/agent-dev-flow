@@ -57,4 +57,38 @@
 - **関連**: Issue 3459、PR 3480（commit 78cf5df4・squash merge fecca28d）、Epic 3457、Definition PR 3458
 - **タグ**: `#req-renumbering` `#stale-reference` `#case-close` `#qg-4`
 
+---
 
+## トレーサビリティ対応宣言の inline・sidecar 二重宣言は集合完全一致契約で即検出されることの経験知
+
+- **問題事象**: Case 3457（Epic・Wave 1 子 Issue 3460）で traceability sidecar への対応宣言追加（REQ-018-002 design・REQ-099-001 verification）を sidecar 単独で行ったところ、同一論理関係（artifact × role）の inline ADF-COVERS 宣言との REQ 集合差分が duplicate-inconsistencies 2 件として即検出された。inline 側へ同一 REQ を追記して集合を完全一致させた後、check は pass した。
+- **発生局面**: 実装（case-run・sidecar/inline 対応宣言の追加）
+- **検知方法**: traceability check --req の中間再実行で duplicate-inconsistencies が fail として検出（PR 3478 本文検証差分セクションの中間行に記録）
+- **根本原因**: 同一 artifact × role に inline declaration と sidecar の両方が存在する場合、check は両情報源の REQ 集合完全一致を契約として要求する。sidecar への新規 REQ 追加だけでは既存 inline 宣言との集合差分が矛盾状態になる。
+- **自律対応内容**: inline 宣言行へ同一 REQ を追記し、inline と sidecar の集合を完全一致させた（traceability の inline declaration 優先規則に従い、sidecar 側の重複解消ではなく集合一致の方針）。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（traceability モデルの既存契約（duplicate-inconsistencies 検査・inline declaration 優先規則）の適用確認に留まる）
+- **横展開観点**: sidecar へ対応宣言を追加する場合は、同一 artifact × role に既存 inline ADF-COVERS 宣言が無いかを事前確認し、存在する場合は inline と sidecar の両側へ同一 REQ 集合を反映する。片側のみの追加で intermediate check を回さない場合は merge 前の最終 check で確実に fail する。
+- **再発条件**: inline 宣言が既存の artifact へ sidecar 経由で対応宣言を追加する変更
+- **予防策候補**: sidecar 編集手順に「同一 artifact × role の inline 宣言存在確認と集合一致反映」を前置する（agentdev-traceability の sidecar-and-policy 手順への反映候補）。
+- **想定反映先**: agentdev-traceability references/sidecar-and-policy.md の対応宣言追加手順
+- **関連**: Issue 3460、PR 3478（squash merge commit 83d48e86）、Epic 3457
+- **タグ**: `#traceability` `#sidecar` `#duplicate-inconsistencies` `#case-run`
+
+---
+
+## GitHub Issue 本文を決定的エンジンへ手書き転写する経路の転写誤字リスクと書き込み前照合の効用
+
+- **問題事象**: Case 3460 の case-close（Epic 実行構成表更新）で、issue_read で取得した Epic 3457 本文（約21KB）を決定的エンジン（reflect.ts closing）の入力ファイルへ手書き転写したところ、「実装面交差なし」を「実面交差なし」と脱字した。エンジン適用前の転写内容確認で検出・修正し、Epic 本文への誤った反映は発生しなかった。
+- **発生局面**: 運用（case-close STEP-6-2・Epic 実行構成表の per-Epic 単一書き手更新）。GitHub I/O を持たない決定的エンジンへ本文を渡す経路全般
+- **検知方法**: エンジン実行前の転写ファイル内容と issue_read 取得原文の照合（差分確認）
+- **根本原因**: agentdev_gh の操作引数は文字列で受け渡すため、長い本文を会話コンテキストからファイルや引数へ転写する工程が不可避で、この転写が人手同等の写経になり得る。既存の PowerShell bulk IO 腐敗知識は機構的符号化を対象としており、エージェント自身の転写ミスは対象外。
+- **自律対応内容**: 転写誤字をエンジン適用前に修正し、更新後本文の該当行を再確認してから issue_update に渡した。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 長文本文をエンジン入力や Tool 引数へ転写する場面（Epic 実行構成表更新、Issue 本文の結果セクション適用等）では、書き込み前に転写結果と取得原文の照合を1回挟む。特に本文中の技術用語（実装面、正規状態等）は一部欠落しても気づきにくい。
+- **再発条件**: GitHub Issue 本文の全文転写を伴う決定的エンジン適用または Tool 操作引数の組み立て
+- **予防策候補**: 転写後・書き込み前の原文照合を case-close の Epic 更新手順に明示する（agentdev-epic-tracker references の手順反映候補）。
+- **想定反映先**: agentdev-epic-tracker references/epic-reflect-coordination.md の最新取得→マージ→更新手順
+- **関連**: Issue 3460、Epic 3457、case-close（commit 83d48e86 のクローズ処理）
+- **タグ**: `#epic-tracker` `#transcription` `#case-close` `#deterministic-engine`
