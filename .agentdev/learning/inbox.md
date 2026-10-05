@@ -110,3 +110,39 @@
 - **想定反映先**: docs/designs/integrity/checker-execution-contracts.md、agentdev-quality-gates references/qg-4-final-acceptance.md
 - **関連**: Issue 3463、PR 3477（squash 763a05d5）、Epic 3457
 - **タグ**: `#worktree` `#verification` `#case-close`
+
+---
+
+## extension rule の一時ファイル指示が workspace 外書込み guard と競合する（project root 内一時領域への切替）
+
+- **問題事象**: Case 3484 の case-open（Root Case 本文候補の書込み前 lint）で、extension rule（agentdev-workflow-case-open.yaml の yomiyasu-application-before-write）が「検査専用本文ファイルを非永続領域〔一時ディレクトリ等のリポジトリ外〕に新規作成」を指示した一方、write ツールによる C:\WINDOWS\TEMP\opencode への書込みは workspace 外書込み guard により fail-closed ブロックされた。
+- **発生局面**: 運用（case-open STEP-2 の GitHub 書込み前 yomiyasu lint）
+- **検知方法**: write ツールの fail-closed ブロック（write targets a path outside the project root）
+- **根本原因**: extension rule の指示（リポジトリ外一時ディレクトリ）と workspace 外書込み guard（project root 外の書込み禁止）が同一工程内で競合する。正規配置契約（worktree-operations.md の .agentdev/tmp/ 統一配置、case-open scripts README の workspace 外 temp 禁止・project root 内限定）と extension rule の文言が不一致である。
+- **自律対応内容**: guard ブロック後に別 API 経路での迂回を行わず、bash ツール経由の heredoc による事前承認済み一時領域への検査専用本文ファイル作成へ切替した（bash リダイレクトは PowerShell cp932 再符号化の対象外）。検査後にファイルを削除した。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: extension rule が一時ファイル作成を指示する工程では、指示の置き場所が guard 契約（workspace 外禁止・project root 内限定・.agentdev/tmp/ 統一配置）と整合する文言になっているかを適用前に確認する。
+- **再発条件**: extension rule が「リポジトリ外」を含む一時ファイル置き場所を指示し、write ツールで実行する場合
+- **予防策候補**: extension yaml の指示文言を「project root 内の実行時作業領域（.agentdev/tmp/ 等の gitignore 対象領域）」へ整合させる（intake item として記録済み）。
+- **想定反映先**: .agentdev/extensions/skills/agentdev-workflow-case-open.yaml の rules 文言
+- **関連**: Issue 3484、worktree-operations.md「退避ファイルの統一配置（.agentdev/tmp/）」
+- **タグ**: `#writing-guard` `#extension-rules` `#case-open` `#yomiyasu`
+
+---
+
+## session由来RU の generation_actor 契約固定値と実測記録の差異は承認の読み替えでなく記録で解決する
+
+- **問題事象**: RU-0160（session由来）の generation_actor が supervisor と記録され、session由来RU 契約の固定値 req-define-parent と差異があった。配置許可を契約改訂の承認として扱わない旨の条件付きで case-open へ投入された。
+- **発生局面**: 運用（case-open STEP-1 前の引き継ぎ確認）
+- **検知方法**: 委譲 prompt の構造化文脈（制約・契約）と RU frontmatter の突合
+- **根本原因**: session由来RU の作成主体が supervisor の場合、契約固定値との差異が契約変更なしで後工程への解決指示として持ち越される運用になっている（正規契約は不変のため、差異の取り扱いが後工程責務として残る）。
+- **自律対応内容**: 配置許可を契約改訂の承認として扱わず、正規契約（固定値 req-define-parent）を変更せず、差異を既知差異として完了報告へ記録し後工程（case-ready）へ引き継いだ。RU 本体・draft への改変は行わなかった。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（正規契約は不変）
+- **横展開観点**: generation_actor 等の契約固定値と実測記録の差異は、後工程で「承認の読み替え」ではなく「既知差異の記録と契約不変の明示」で解決する。
+- **再発条件**: supervisor が session由来RU を作成・配置した後の後工程実行
+- **予防策候補**: session由来RU 契約に supervisor 作成時の記録値の扱い（差異許容と記録方法）を明文化する。
+- **想定反映先**: session由来RU 契約（artifact-contracts.md の RU 採番・記録規定系）
+- **関連**: RU-0160、Issue 3484
+- **タグ**: `#ru-contract` `#generation-actor` `#case-open`
