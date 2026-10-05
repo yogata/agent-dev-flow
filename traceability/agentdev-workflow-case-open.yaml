@@ -35,6 +35,9 @@ implementation:
     - REQ-100-002
     - REQ-100-003
     - REQ-100-006
+    - REQ-004-061
+  src/common/skills/agentdev-workflow-case-open/references/handoff.md:
+    - REQ-004-061
   src/common/skills/agentdev-workflow-case-open/scripts/lib/cross_dependency_engine.ts:
     - REQ-030-012
     - REQ-030-013
