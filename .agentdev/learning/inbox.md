@@ -200,3 +200,37 @@
 - **想定反映先**: case-ready workflow スキル（references/definition-acceptance.md の merge 前確認）、project-extensions 解決手順
 - **関連**: Issue #3484、PR #3487、.agentdev/extensions/skills/agentdev-workflow-case-ready.yaml
 - **タグ**: `#case-ready` `#acceptance-gate` `#project-extensions` `#yomiyasu`
+
+---
+
+## 単独実行契約を持つ確認テストにフル実行前提のアサーションを入れると選択実行で失敗する
+
+- **問題事象**: テストスイート内の計測・記録確認テストに「起動ログ非空」のアサーションを入れると、テスト名指定（`-t`）の選択実行で先行テスト不在により失敗する。フル実行でのみ成立する前提をアサーションに組み込むと、ファイル単体実行契約（選択実行でも成立する）を壊す
+- **発生局面**: 実装（Case #3484 の check_integrity.test.ts 結果共有構造の起動回数確認テスト実装中）
+- **検知方法**: 選択実行（`-t` 指定）での TS-002 単独実行確認中に当該テストが失敗
+- **根本原因**: 記録確認テストの検査対象を「ログの非空」（フル実行でのみ成立）にしたことで、共有ゲッターの遅延初期化が当該テスト内で完結しない選択実行経路で前提が崩れた
+- **自律対応内容**: アサーションを単独でも成立する条件（重複ゼロ）のみへ変更し、ログ非空確認を削除して再検証（フル実行 188 pass と選択実行 1 pass の両立を確認）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（テストスイート内部の実行形態。Design「check_integrity テストスイート内の結果共有契約」の単独選択実行契約と整合）
+- **横展開観点**: 単独実行契約を持つ確認テストは、フル実行時のみ意味を持つ前提のアサーションを避け、単独でも成立する条件のみを検査する。集合状態を確認するテストは、対象集合の構築をそのテスト自身の遅延初期化で完結させる
+- **再発条件**: 起動回数・ログ・カウンタ等の集合状態を確認するテストを、他テストの先行実行が存在する前提で書く場合
+- **予防策候補**: 記録確認系テストの合格条件を「単独実行で成立する不変条件（重複ゼロ等）」に限定する規約を Design 側の実行形態契約に明記する
+- **想定反映先**: checker 実行契約 Design「bun test 実行形態契約（単独実行・ファイル単体指定を含む）」節、integrity test suite の実装規約
+- **関連**: Issue #3484、PR #3491（merge 9ecdb0dd）、PR 本文 learning 候補
+- **タグ**: `#bun-test` `#テスト設計` `#選択実行` `#case-run`
+
+## tsc のヒストグラム対照は同一実行形態（tsconfig・target）で行わないと新規エラー判定が誤る
+
+- **問題事象**: case-close QG-4 の typecheck 独立再検査で、`bunx tsc --noEmit` に tsconfig・target を指定しない形（default target es5）で実行すると、変更前後でエラーコードヒストグラムが 1 件だけ不一致（TS2802 57→58、MapIterator spread）に見えた。package の型検査構成（target ES2022 の tsconfig 形）で同一対照を行うとヒストグラムは完全一致で新規 0 件だった
+- **発生局面**: 検証（case-close STEP-2/3 の merge 直前 HEAD での typecheck 独立再実測・baseline 対照。Issue #3484）
+- **検知方法**: baseline（f9029d91）への一時差し替え対照実行でのヒストグラム差分検出（+1 TS2802）
+- **根本原因**: default target(es5) の tsc は MapIterator 等のイテレータ spread に対して TS2802 を構造的に大量生成する（baseline でも 57 件）。実行形態が package の型検査構成と不一致なまま対照すると、実行形態固有の差分を「変更起因の新規エラー」と誤判定し得る
+- **自律対応内容**: package 設定と同一のオプション形（ES2022・types bun,node・strict 等）で HEAD と baseline を再対照し、ヒストグラム完全一致（新規 0 件）を確認。default target 形の差分は無効（実行形態アーティファクト）として検証差分へ記録し、判定から除外
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（QG-4 typecheck 検証の実行形態解釈。package 正規 typecheck〔-p tsconfig.distribution-boundary.json〕は exit 0 を維持）
+- **横展開観点**: tsc 変更前後対照は、変更前後で同一の実行形態（tsconfig・target・ファイル集合）を使う。実行形態が記録されていない typecheck 証跡は、ヒストグラム単独では再現比較不能なため、実行コマンド（オプション明示）を証跡へ残す
+- **再発条件**: tsconfig.json を持たない package 配下で tsc を明示ファイル指定・オプション指定なしで実行する場合（MapIterator、spread、import.meta 等の target 依存エラークラスを含む対象）
+- **予防策候補**: typecheck 検証記録への実行コマンド（オプション・target・対象ファイル）明記を検証差分セクションの標準項目化する。baseline 対照時の実行形態一致確認を前置項目化する
+- **想定反映先**: checker 実行契約 Design（tsc 実行形態）、agentdev-quality-gates QG-4 検証差分セクション規約
+- **関連**: Issue #3484、PR #3491（merge 9ecdb0dd）、.agentdev/learning/deferred.md の LSP timeout 時 tsc --noEmit 代替記録
+- **タグ**: `#typecheck` `#tsc` `#fail由来分類` `#case-close` `#qg-4`
