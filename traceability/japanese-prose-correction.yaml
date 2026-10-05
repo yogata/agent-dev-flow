@@ -56,7 +56,6 @@ implementation:
     - REQ-094-006
     - REQ-094-010
     - REQ-094-011
-    - REQ-004-061
     - REQ-004-060
     - REQ-004-061
   src/common/tools/agentdev-jev/README.md:
