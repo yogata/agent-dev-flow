@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261005T100438Z-60fb",
+  "workflow": "req-define",
+  "evaluationKind": "classification-design-separation",
+  "subject": "RU-20261005-01 の最終分類・Design 分離",
+  "sourceRevision": "36407badfe93538bd00a40fccb4f14f24e197634",
+  "durationMs": 614,
+  "inputTokens": 1190,
+  "inputs": {
+    "requestDigest": "c9c3e1219288e615066b64ce8eb919a7c6a8271f09305bed06d2cbc75835297e",
+    "references": [
+      {
+        "digest": "61cbec697e2e0a3f04c4a817b91aacdcdd5f338e9fc8c2e8fea1263446d88c52",
+        "label": "RU-20261005-01",
+        "path": ".agentdev/backlog/req-units/RU-20261005-01.md"
+      },
+      {
+        "digest": "05448824f69bd770451c4d6a74055c3bd03526b302413e27b3b0fb62b0b7bad5",
+        "label": "REQ-004",
+        "path": "docs/requirements/REQ-004.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-classification",
+      "questionForm": "choice",
+      "value": "REQ行が主体",
+      "probabilityDistribution": {
+        "REQ行が主体": 0.8600000000000001,
+        "Design行が主体": 0.060000000000000005,
+        "REQ行とDesign行の混合": 0.08000000000000002
+      }
+    },
+    {
+      "questionId": "q2-separation-needed",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.81,
+        "false": 0.18999999999999995
+      }
+    }
+  ],
+  "confidence": 0.79,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-classification",
+        "value": "REQ行が主体"
+      },
+      {
+        "questionId": "q2-separation-needed",
+        "value": true
+      }
+    ]
+  }
+}
