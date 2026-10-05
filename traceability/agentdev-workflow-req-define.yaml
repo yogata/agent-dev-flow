@@ -1,5 +1,23 @@
 component: agentdev-workflow-req-define
 implementation:
+  src/common/skills/agentdev-workflow-req-define/scripts/src/assemble-draft-section.ts:
+    - REQ-004-058
+    - REQ-004-059
+    - REQ-004-060
+    - REQ-004-062
+    - REQ-004-063
+  src/common/skills/agentdev-workflow-req-define/references/adversarial-review-integration.md:
+    - REQ-004-058
+  src/common/skills/agentdev-workflow-req-define/references/draft-generation.md:
+    - REQ-004-058
+    - REQ-004-059
+    - REQ-004-060
+  src/common/skills/agentdev-req-analysis/references/investigation-scope-refinement.md:
+    - REQ-004-056
+    - REQ-004-057
+  src/common/skills/agentdev-design-file-manager/references/target-area-matching.md:
+    - REQ-004-058
+    - REQ-004-061
   src/common/skills/agentdev-workflow-req-define/SKILL.md:
     - REQ-005-029
     - REQ-021-012
