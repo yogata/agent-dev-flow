@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-010-002, REQ-010-003, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-066, REQ-010-068, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008
+// ADF-COVERS(verification): REQ-010-002, REQ-010-003, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-066, REQ-010-068, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008, REQ-099-001
 // ADF-COVERS(verification): REQ-010-070
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
 import { mkdirSync, writeFileSync, copyFileSync, rmSync, existsSync, readFileSync, readdirSync, cpSync, symlinkSync } from "fs";
@@ -4263,6 +4263,206 @@ describe("IR-066 vocabulary extension (Issue #2383 (b) resweep adoption)", () =>
         (res.file ?? "").endsWith("docs/decisions/DEC-006.md"),
     );
     expect(violations.length).toBe(0);
+  });
+});
+
+// ─── IR-066 docs/designs 旧パス現在形宣言検出（REQ-010-067/068/080、Case #3457） ──
+// Fixture kinds: 正常例 (現行 canonical src/common のみ), 違反例 (src/opencode を
+// 原本・正規位置として現在形で列挙), 境界例 (ホスト接続領域 src/opencode/plugins
+// 言及), 許容例 (code span・歴史言及・否定文脈・superseded Design),
+// 再現例 (RU-20261005 sweep 由来: DEC-010 適用前の「src/opencode/skills/ を原本とする」)。
+
+const IR066DOCS_ROOT = join(TEMP_ROOT, "ir066docs");
+const IR066DOCS_OK_ROOT = join(TEMP_ROOT, "ir066docs-ok");
+
+function buildIr066DocsFixture(root: string, withViolations: boolean): void {
+  buildIr065Fixture(root);
+
+  const designsDir = join(root, "docs", "designs");
+
+  // 正常例: 現行 canonical（src/common）の宣言と投影先（ホスト接続領域）の現行記述のみ
+  writeFileSync(
+    join(designsDir, "legacy-decl-current.md"),
+    [
+      "# Current canonical declaration design",
+      "",
+      "新 Workflow Skill / Capability Skill の原本は共通正本 src/common/skills/ である。",
+      "",
+      "src/opencode/skills/ はホスト接続領域の投影先であり原本ではない。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  if (!withViolations) {
+    copyScripts(root);
+    return;
+  }
+
+  // 違反例: src/opencode/{commands,skills} を原本・正規位置として現在形で列挙
+  writeFileSync(
+    join(designsDir, "legacy-decl-violation.md"),
+    [
+      "# Legacy declaration violation design",
+      "",
+      "新 Workflow Skill / Capability Skill は src/opencode/skills/ を原本とする。",
+      "",
+      "コマンドの正規位置は src/opencode/commands/ である。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 境界例: ホスト接続領域（src/opencode/plugins/）の現存パス言及を含む行
+  writeFileSync(
+    join(designsDir, "legacy-decl-hostarea.md"),
+    [
+      "# Host connection area boundary design",
+      "",
+      "検査対象は src/opencode/plugins/ と src/opencode/skills/ 配下のホスト接続領域である。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 許容例: code span 内言及・歴史言及（移行前・v2: プレフィックス）・superseded Design
+  writeFileSync(
+    join(designsDir, "legacy-decl-allowed.md"),
+    [
+      "# Allowed mentions design",
+      "",
+      "投影側の物理位置 `src/opencode/skills/` は正規位置ではない。",
+      "",
+      "移行前の旧構造では src/opencode/skills/ を原本としていた。",
+      "",
+      "v2: 記述では src/opencode/commands/ を原本として扱う。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+  writeFileSync(
+    join(designsDir, "legacy-decl-superseded.md"),
+    [
+      "---",
+      "title: superseded design",
+      "status: superseded",
+      "---",
+      "",
+      "# Superseded design",
+      "",
+      "原本は src/opencode/skills/ である（本 Design は後継 Design へ置換済み）。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 再現例: RU-20261005 sweep 由来（DEC-010 適用前の本文。パスは継続行に現れる）
+  writeFileSync(
+    join(designsDir, "legacy-decl-reproduction.md"),
+    [
+      "# Reproduction design (RU-20261005 sweep)",
+      "",
+      "- DEC-002（ソース・プロジェクション分離）を維持する。新 Workflow Skill / Capability Skill は",
+      "  src/opencode/skills/ を原本とする。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  copyScripts(root);
+}
+
+describe("IR-066 docs/designs legacy-path current-tense declaration (REQ-010-067/080, Case #3457)", () => {
+  beforeAll(() => {
+    mkdirp(IR066DOCS_ROOT);
+    buildIr066DocsFixture(IR066DOCS_ROOT, true);
+    mkdirp(IR066DOCS_OK_ROOT);
+    buildIr066DocsFixture(IR066DOCS_OK_ROOT, false);
+  });
+
+  it("passes current canonical src/common declarations and projection mentions (正常例)", () => {
+    const r = runScript(IR066DOCS_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { category: string; check: string; file?: string }) =>
+        res.category === "LegacyPathName" &&
+        res.check === "docs-designs-legacy-path-declaration" &&
+        (res.file ?? "").includes("legacy-decl-current.md"),
+    );
+    expect(violations.length).toBe(0);
+  });
+
+  it("detects src/opencode declared as canonical origin/position in current tense (違反例)", () => {
+    const r = runScript(IR066DOCS_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const evidence = parsed.results
+      .filter(
+        (res: { category: string; check: string; file?: string }) =>
+          res.category === "LegacyPathName" &&
+          res.check === "docs-designs-legacy-path-declaration" &&
+          (res.file ?? "").includes("legacy-decl-violation.md"),
+      )
+      .map((res: { level: string; evidence?: string }) => `${res.level}:${res.evidence}`);
+    expect(evidence).toContain(
+      "warning:docs-designs-legacy-path-declaration:src/opencode/skills",
+    );
+    expect(evidence).toContain(
+      "warning:docs-designs-legacy-path-declaration:src/opencode/commands",
+    );
+  });
+
+  it("exempts host connection area path mentions on the same line (境界例)", () => {
+    const r = runScript(IR066DOCS_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { category: string; check: string; file?: string }) =>
+        res.category === "LegacyPathName" &&
+        res.check === "docs-designs-legacy-path-declaration" &&
+        (res.file ?? "").includes("legacy-decl-hostarea.md"),
+    );
+    expect(violations.length).toBe(0);
+  });
+
+  it("exempts code span mentions, historical mentions, and superseded designs (許容例)", () => {
+    const r = runScript(IR066DOCS_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { category: string; check: string; file?: string }) =>
+        res.category === "LegacyPathName" &&
+        res.check === "docs-designs-legacy-path-declaration" &&
+        ((res.file ?? "").includes("legacy-decl-allowed.md") ||
+          (res.file ?? "").includes("legacy-decl-superseded.md")),
+    );
+    expect(violations.length).toBe(0);
+  });
+
+  it("reproduces the RU-20261005 sweep finding (DEC-010 pre-fix canonical claim) (再現例)", () => {
+    const r = runScript(IR066DOCS_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const evidence = parsed.results
+      .filter(
+        (res: { category: string; check: string; file?: string }) =>
+          res.category === "LegacyPathName" &&
+          res.check === "docs-designs-legacy-path-declaration" &&
+          (res.file ?? "").includes("legacy-decl-reproduction.md"),
+      )
+      .map((res: { evidence?: string }) => res.evidence ?? "");
+    expect(evidence).toContain(
+      "docs-designs-legacy-path-declaration:src/opencode/skills",
+    );
+  });
+
+  it("reports the ok summary when no current-tense declarations remain (正常例: 0 件)", () => {
+    const r = runScript(IR066DOCS_OK_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const summary = parsed.results.find(
+      (res: { category: string; check: string }) =>
+        res.category === "LegacyPathName" &&
+        res.check === "docs-designs-legacy-path-declaration" &&
+        res.level === "ok",
+    );
+    expect(summary).toBeDefined();
+    expect(String(summary.message)).toContain("0 violations");
   });
 });
 

@@ -10224,6 +10224,93 @@ function checkObsoleteVocabulary(root: string): CheckResult[] {
   return results;
 }
 
+// ─── IR-066: docs/designs 旧パス現在形宣言検出（REQ-010-067/068/080、Case #3457） ──
+// docs/designs/**/*.md の本文で src/opencode/commands/ または src/opencode/skills/ を
+// 原本・正規位置・検査対象として現在形で列挙する行を検出する（IR-066 ルール Design
+// 検査項目7、ACT-DESIGN-033）。DEC-049 以降の原本は共通正本 src/common/skills/ であり、
+// src/opencode/ はホスト接続領域である。
+// 免除（ルール Design detection_method の宣言どおり）:
+//   - code span 内の語彙言及（isInsideCodeSpan）
+//   - src/opencode/plugins/ 等ホスト接続領域の現存パス言及（同一行言及で行単位免除）
+//   - 歴史言及: v2: プレフィックス、行レベル履歴マーカー、retired 系見出し配下、
+//     frontmatter status: superseded の Design（ファイル単位）・supersede 注記行
+//   - 否定文脈（〜ではない・〜しない・対象外等。IR-065/066 共通の否定文脈語彙と同一系譜）
+//   - IR-055 の検出パターン語彙としての言及（同一行の IR-055 言及）
+// 検出ルール説明文（docs/designs/integrity/rules/IR-*.md）は v2:REQ-0145-015 により
+// スコープ除外する。
+const IR066_DOCS_LEGACY_PATH_RE = /src\/opencode\/(commands|skills)(?=\/|\b)/;
+const IR066_CANONICAL_POSITION_RE = /原本|正規位置|正規情報源|正規配置|格納位置|検査対象/;
+const IR066_HOST_AREA_PATH_RE = /src\/opencode\/(plugins|agents|mcp|local)(?=\/|\b)/;
+const IR066_NEGATION_CONTEXT_RE =
+  /廃止|含めない|とせず|しないこと|生成しない|前提としない|対象外|撤去|residual|ではない|ではなく/;
+
+function isSupersededDesignDocument(content: string): boolean {
+  const statusMatch = content.match(/^status:\s*(\S+)/m);
+  return statusMatch !== null && statusMatch[1] === "superseded";
+}
+
+function checkDocsDesignsLegacyPathDeclarations(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const designsDir = path.join(root, "docs", "designs");
+  if (!fs.existsSync(designsDir)) return results;
+  const files: string[] = [];
+  walkAllFiles(designsDir, files);
+  const mdFiles = files.filter((f) => /\.md$/.test(f));
+  let violationCount = 0;
+  let scanned = 0;
+  for (const fullPath of mdFiles) {
+    const relPath = resolveRelative(fullPath, root);
+    if (isIntegrityRuleDescriptionFile(relPath)) continue;
+    scanned++;
+    const content = readText(fullPath);
+    if (!content) continue;
+    if (isSupersededDesignDocument(content)) continue;
+    const lines = content.split("\n");
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const m = line.match(IR066_DOCS_LEGACY_PATH_RE);
+      if (!m || m.index === undefined) continue;
+      if (isInsideCodeSpan(line, m.index)) continue;
+      if (line.includes("IR-055")) continue;
+      if (IR066_HOST_AREA_PATH_RE.test(line)) continue;
+      if (/(^|[\s(（])v2:/.test(line)) continue;
+      if (hasLineLevelHistoryMarker(line)) continue;
+      if (/supersed/i.test(line)) continue;
+      if (IR066_NEGATION_CONTEXT_RE.test(line)) continue;
+      if (isIr065UnderRetiredHeading(lines, i)) continue;
+      if (!IR066_CANONICAL_POSITION_RE.test(line)) continue;
+      violationCount++;
+      results.push(
+        warn(
+          "LegacyPathName",
+          "docs-designs-legacy-path-declaration",
+          `Legacy path '${m[0]}' declared as the canonical origin/position in current tense (IR-066, REQ-010-067/080)`,
+          relPath,
+          i + 1,
+          {
+            evidence: `docs-designs-legacy-path-declaration:${m[0]}`,
+            expected:
+              "declare src/common/ as the canonical origin (DEC-049) or mark the mention as historical",
+            route: "intake",
+            finding_category: "obsolete-structure",
+            finding_level: "heuristic",
+          },
+        ),
+      );
+    }
+  }
+  if (violationCount === 0) {
+    results.push(
+      ok(
+        "LegacyPathName",
+        "docs-designs-legacy-path-declaration",
+        `IR-066 docs/designs legacy-path current-tense declaration: ${scanned} files scanned, 0 violations (REQ-010-067/080)`,
+      ),
+    );
+  }
+  return results;
+}
+
 // ─── IR-067: referenced-req-row-existence (REQ-010-069, Issue #2383 (a)) ─────
 // docs 本文が引用する階層 REQ 行 ID（REQ-NNN-NNN）の実在性を機械検査する。
 // ファントム引用（未コミット草案番号の引用残存、要件分割前の旧行 ID 残存）を検出する。
@@ -10575,7 +10662,7 @@ function checkSkillProjectionManifest(root: string): CheckResult[] {
             undefined,
             {
               evidence: `projection-missing:${name}`,
-              expected: `rebuild junctions (install-consumer-opencode.ps1 -Mode apply) or create .opencode/skills/${name}`,
+              expected: `rebuild junctions (scripts/install.ps1 -Mode apply) or create .opencode/skills/${name}`,
               route: "intake",
               finding_category: "document-drift",
               finding_level: "strict",
@@ -10615,7 +10702,7 @@ function checkSkillProjectionManifest(root: string): CheckResult[] {
             undefined,
             {
               evidence: `projection-extra:${name}`,
-              expected: `remove the stale junction .opencode/skills/${name} (rebuild via install-consumer-opencode.ps1 -Mode apply)`,
+              expected: `remove the stale junction .opencode/skills/${name} (rebuild via scripts/install.ps1 -Mode apply)`,
               route: "intake",
               finding_category: "obsolete-structure",
               finding_level: "strict",
@@ -10637,7 +10724,7 @@ function checkSkillProjectionManifest(root: string): CheckResult[] {
           undefined,
           {
             evidence: `projection-broken:${name}`,
-            expected: `remove the stale junction .opencode/skills/${name} (rebuild via install-consumer-opencode.ps1 -Mode apply)`,
+            expected: `remove the stale junction .opencode/skills/${name} (rebuild via scripts/install.ps1 -Mode apply)`,
             route: "intake",
             finding_category: "obsolete-structure",
             finding_level: "strict",
@@ -11652,6 +11739,7 @@ async function main(): Promise<void> {
     ...checkCommonPolicyIdentifierInvariant(root), // IR-063 (REQ-051-005, REQ-010-064, Issue #2429)
     ...checkUnresolvedPlaceholder(root), // IR-064 (REQ-010-065, Issue #2372)
     ...checkObsoleteVocabulary(root), // IR-065/IR-066 (REQ-010-066/067, Issue #2372)
+    ...checkDocsDesignsLegacyPathDeclarations(root), // IR-066 docs/designs 現在形宣言 (REQ-010-067/080, Case #3457)
     ...checkReferencedReqRowExistence(root), // IR-067 (REQ-010-069, Issue #2383 (a))
     ...checkSkillProjectionManifest(root), // IR-068 (Issue #2383 (d), inspect F-01)
     ...checkReqNumberGapRecorded(root), // IR-069 (REQ-010-070, Case #2917)
