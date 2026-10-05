@@ -80,6 +80,7 @@
 - **変更誘発境界リスク分析**: `agentdev-req-analysis` の「変更誘発境界リスク分析」観点に従い、変更差分から dependency boundary、client/server boundary、execution boundary、build/runtime boundary、environment propagation boundary の 5観点境界について case-specific risk を導出する。project 固有のリスク導出規則を参照する場合、docs/knowledge/ を正規知識領域とし、利用可能なハーネスの探索能力を通じて関連知識を検索する（Project Knowledge の所有と workflow 利用の要件が正規所有する利用契約に従う）。知識が不在の場合は ADF core の一般規則のみで 5観点境界分析を実行する（分析を省略しない）。導出した case-specific risk は検証契約へ投影する。変換経路は change → risk → verification obligation → test strategy とし、投影先は test strategy、投影完全性の検査は QG-1（リスク→test strategy 投影完全性検査）が担う
 - **test strategy 定義**: 各合意項目（AG-*）の検証方法を test strategy として定義する。3要素構造（`verification` / `pass_criteria` / `on_failure`）を必須とし、`on_failure` を持たない検証項目は含めない。項目識別子は `TS-NNN`、`on_failure` アクション種別は `fix-and-reverify` / `record-in-findings` の2値。シリアライズ形式の詳細は req-define command Design（extension 経由）の draft-data test_strategy フィールドスキーマ参照。導出済み case-specific risk から検証義務（verification obligation）を導き、test strategy 項目へ投影する（change → risk → verification obligation → test strategy）。選択した検証手段の質は `agentdev-req-analysis` の「検証手段の質基準」観点（production-equivalent verification、正本は analysis-viewpoints reference）に従い判定する。完了時点の証跡契約を正規所有する要件群が正規所有するため、本工程では複製せず参照に留める
 - **検索系検証の網羅範囲・修正対象列挙一致確認**: test strategy 項目に検索系検証（rg 等）を定義する際、検証コマンドの網羅範囲（対象パス・パターン）と修正対象列挙（変更対象ファイル集合）の一致を確認する。See Also 等の参照行は修正対象ではないため、網羅範囲から除外するか、検索に含める場合は参照行を検出対象外とする扱いを明示する。本確認は既存の test strategy 定義義務（3要素構造、case-specific risk 投影、検証手段の質基準適用）への追加であり、既存手順を置換するものではない
+- **REQ 行廃止・移管時の参照残存確認**: REQ 行の廃止・他 REQ への移管・retired 化を伴う場合、廃止・移管対象の旧行 ID を指す参照の残存を機械的検索（rg 等）で確認し、結果と残存参照の処置を `artifact_actions` に記録する。検索範囲は docs/ 全体、repository top-level `traceability/` 配下の sidecar、`.agentdev/extensions/skills/*.yaml` の ADF-COVERS 宣言を含む網羅範囲とする。`docs/reports/` 配下は履歴記録領域として参照残存の検出対象から除外する（歴史記録は是正対象外。除外の正規根拠は checker 実行契約 Design「検出対象除外規定」）
 
 ### Result
 
@@ -91,7 +92,7 @@
 
 ### Completion Verification
 
-- 全要件行候補の分類が確定し、Design 分離基準違反残留が0件であること。5観点境界の確認が実施済みであり、導出済み case-specific risk が test strategy へ投影済みであること（投影完全性は QG-1 が検査）。test strategy 項目が全て3要素を持つこと。検索系検証（rg 等）を含む test strategy 項目がある場合、網羅範囲と修正対象列挙の一致確認が実施済みであること。既存行の意味変更を含む場合、design 対応事前確認（coverage --req 実査・欠落時 artifact_actions 組込み）が実施済みであること。サブエージェント調査委譲を実施した場合、全文抽出が機械的手段によるものであり、取得物が委譲先へ引き継がれていること
+- 全要件行候補の分類が確定し、Design 分離基準違反残留が0件であること。5観点境界の確認が実施済みであり、導出済み case-specific risk が test strategy へ投影済みであること（投影完全性は QG-1 が検査）。test strategy 項目が全て3要素を持つこと。検索系検証（rg 等）を含む test strategy 項目がある場合、網羅範囲と修正対象列挙の一致確認が実施済みであること。REQ 行の廃止・移管を伴う場合、旧行 ID を指す参照の残存確認（docs/・sidecar・extensions yaml 網羅。docs/reports/ は履歴記録領域として対象外）が実施済みであること。既存行の意味変更を含む場合、design 対応事前確認（coverage --req 実査・欠落時 artifact_actions 組込み）が実施済みであること。サブエージェント調査委譲を実施した場合、全文抽出が機械的手段によるものであり、取得物が委譲先へ引き継がれていること
 
 ### Resume-Idempotency
 

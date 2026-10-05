@@ -1,0 +1,14 @@
+# docs/reports 配下（履歴記録領域）の inline ADF-COVERS 宣言は traceability corpus の
+# 走査対象から除外された（checker 実行契約 Design「検出対象除外規定」、Issue #3461）。
+# 除外により非走査となった実装対応のうち、他に実装対応が存在しない要件行について
+# 同一論理関係（宣言原本は各 Report ファイル）を本 sidecar で保持する。
+component: reports-historical-declarations
+implementation:
+  docs/reports/req-048-correlation-derivability-audit.md:
+    - REQ-048-013
+  docs/reports/req-048-reanalysis-baseline.md:
+    - REQ-048-015
+  docs/reports/req-053-textlint-wave4-src-correction.md:
+    - REQ-053-002
+  docs/reports/req-053-textlint-wave5-final-verification.md:
+    - REQ-053-021

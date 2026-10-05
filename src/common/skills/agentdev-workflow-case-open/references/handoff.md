@@ -27,6 +27,15 @@
 - **self-hosting リポジトリ**（ジャンクション または 実ディレクトリ）: 履歴メタデータとして処理を継続
 - **consumer リポジトリ**（コピー配置等）: Root Case を作成せず停止し agent-dev-flow repository への手動取り込み対象として報告
 
+### 入口の untracked domain state 検出と先行明示パス commit
+
+case-open 入口（STEP-1）で、当該 Case が消費する untracked domain state を検出し、Root Case 作成・削除操作に先立って明示パス commit で永続化する。req-define は git コマンド実行禁止制約（req-define 実行契約）により draft・Jev 観測を保存時点で commit できないため、git 実行権限を持つ後続工程の入口が永続化の対を担う。draft/RU 削除は case-ready が git rm と明示パス commit を同一ステップで完結する Form Zero 契約で実行する。入口の先行 commit によりこの削除契約との対を担保する。
+
+1. **検出**: `git status --short` で `.agentdev/drafts/`（要件doc）、`.agentdev/backlog/req-units/`（RU）、`.agentdev/jev-observations/`（Jev 観測）の untracked 分を検出する。検出は当該 Case が消費する分（要件doc・引渡し対象 RU・関連 Jev 観測）に限定し、無関係な untracked ファイルを commit 対象に含めない
+2. **gitignore 状態の事前確認**: 検出したパスが git 管理対象であることを事前確認する（`.agentdev/integrity/reports/` 等の git 管理対象外パスは commit 対象としない）
+3. **先行明示パス commit**: 検出した untracked domain state を、Root Case 作成・削除操作（draft・RU の削除を含む後続の破壊的操作）に先立って、明示パス commit（`git add <path>` + `git commit -- <paths>`。スイープ操作〔`git add -A` 等〕禁止）で永続化する。commit は main 作業ディレクトリで実行する（domain state は main リポジトリ側 `.agentdev/` に帰着するため）
+4. **対の担保**: untracked のまま後続工程へ引き継ぐと、成功時の削除契約（保存と削除の対）が崩れ、Form Zero 削除（git rm + 明示パス commit）を適用できなくなる。入口 commit により削除操作の前提を確定させる
+
 ### 工程間構造化文脈の初期文脈利用
 
 前工程（req-define、case-auto 等）から構造化文脈が引き継がれている場合、前工程で確定した事項（保存済み REQ/Decision/Design の有無、確定済み成果物の状態等）を初期文脈として利用し、同じ情報をゼロから探索、再構築することを原則としない。
@@ -44,14 +53,17 @@
 ## Result
 
 - 引き継ぎ停止判定（self-hosting vs consumer）が完了し、継続または停止が確定
+- 入口の untracked domain state 検出結果と先行明示パス commit の実施結果（検出なしを含む）
 
 ## Evidence
 
 - 要件doc 読取結果、`agentdev_handoff` 判定根拠
+- `git status --short` による untracked domain state の検出結果、gitignore 状態の事前確認結果、先行明示パス commit の実行証跡（commit 対象パス・commit hash。検出なし時はその記録）
 
 ## Completion Verification
 
 - 処理の継続 / 停止が確定済み契約からの導出として確定していること
+- 入口で untracked domain state（draft・RU・jev-observations の消費対象分）の検出と gitignore 状態の事前確認が実施され、検出ありの場合は Root Case 作成・削除操作に先立つ先行明示パス commit が実施されていること（検出なし時はその記録があること）
 
 ## Resume-Idempotency
 
