@@ -11069,7 +11069,11 @@ function checkIntegrityRuleRelatedReqExistence(root: string): CheckResult[] {
 // git 情報が取得不能な環境（archive 展開等の git 履歴不在ツリー）では info で
 // skip する（検査対象が原理的に不在であり、既知 NG の info スキップ IR-069 と同一
 // 扱い）。updated 欠落・非日付形式は required-fields / IR-002 相当の別ルール対象。
-// 検査対象は現行 3 桁帯 REQ ファイルのみ（README.md、retired/、4 桁旧番号帯は対象外）。
+// 検査対象は現行 3 桁帯 REQ ファイル（README.md、retired/、4 桁旧番号帯は対象外）と、
+// Design ファイル（docs/designs/**/*.md。ACT-DESIGN-041 適用拡張）。Design も同一基準
+//（最終内容変更 commit の author date 突合、frontmatter のみの変更 commit の除外、
+// git 履歴不在時の info skip、untracked 対象外）で検査する。Design frontmatter 必須キー
+//（IR-070）との役割分担は維持する（updated 欠落は本ルールで計上しない）。
 const IR072_REQ_FILENAME_RE = /^REQ-(\d{3})\.md$/;
 
 // commit が当該ファイルの frontmatter（1 行目 --- から次の --- 行まで）のみを
@@ -11126,10 +11130,58 @@ function ir072IsFrontmatterOnlyCommit(root: string, relPath: string, sha: string
   return sawHunk; // hunk 解析不能（バイナリ等）は保守的に内容変更扱い
 }
 
+// IR-072 の 1 ファイル突合（REQ/ Design 共通、ACT-DESIGN-041）。
+// updated 欠落・非日付形式は counted=false（別ルール計上、二重計上しない）。
+// untracked（履歴不在）は counted=true / mismatch=null（突合対象外）。
+// git log の取得失敗のみ throw し、呼出側で git 履歴不在（info skip）へ集約する。
+function ir072CheckFileFreshness(
+  root: string,
+  fullPath: string,
+  execFileSync: typeof import("child_process").execFileSync,
+):
+  | { counted: false }
+  | { counted: true; mismatch: { updatedDate: string; lastCommitDate: string } | null } {
+  const content = readText(fullPath);
+  if (!content) return { counted: false };
+  const fm = parseFrontmatter(content);
+  const updated = fm ? fm["updated"] : undefined;
+  if (typeof updated !== "string" || updated === "") return { counted: false };
+  const m = updated.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (!m) return { counted: false };
+  const updatedDate = m[1];
+  const relPath = path.relative(root, fullPath).replace(/\\/g, "/");
+  const out = execFileSync(
+    "git",
+    ["log", "--format=%H %as", "--", relPath],
+    { cwd: root, encoding: "utf-8", windowsHide: true },
+  ) as string;
+  let lastCommitDate: string | null = null;
+  for (const line of out.split("\n")) {
+    const trimmed = line.trim();
+    if (trimmed === "") continue;
+    const sp = trimmed.indexOf(" ");
+    if (sp === -1) continue;
+    const sha = trimmed.slice(0, sp);
+    const date = trimmed.slice(sp + 1);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
+    if (ir072IsFrontmatterOnlyCommit(root, relPath, sha)) continue;
+    lastCommitDate = date;
+    break;
+  }
+  if (lastCommitDate === null) return { counted: true, mismatch: null };
+  return {
+    counted: true,
+    mismatch:
+      lastCommitDate !== updatedDate ? { updatedDate, lastCommitDate } : null,
+  };
+}
+
 function checkReqUpdatedFreshness(root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const reqDir = path.join(root, "docs", "requirements");
-  if (!fs.existsSync(reqDir)) {
+  const designsDir = path.join(root, "docs", "designs");
+  const designFiles = collectSpecMarkdownRecursively(designsDir);
+  if (!fs.existsSync(reqDir) && designFiles.length === 0) {
     results.push(
       info(
         "ReqFreshness",
@@ -11139,8 +11191,10 @@ function checkReqUpdatedFreshness(root: string): CheckResult[] {
     );
     return results;
   }
-  const reqFiles = listFiles(reqDir).filter((f) => IR072_REQ_FILENAME_RE.test(f));
-  if (reqFiles.length === 0) {
+  const reqFiles = fs.existsSync(reqDir)
+    ? listFiles(reqDir).filter((f) => IR072_REQ_FILENAME_RE.test(f))
+    : [];
+  if (reqFiles.length === 0 && designFiles.length === 0) {
     results.push(
       info(
         "ReqFreshness",
@@ -11153,56 +11207,62 @@ function checkReqUpdatedFreshness(root: string): CheckResult[] {
   const { execFileSync } = require("child_process") as typeof import("child_process");
   let gitUnavailable = false;
   let checkedCount = 0;
+  let designCheckedCount = 0;
   let mismatchCount = 0;
   for (const file of reqFiles) {
     const fullPath = path.join(reqDir, file);
-    const content = readText(fullPath);
-    if (!content) continue;
-    const fm = parseFrontmatter(content);
-    const updated = fm ? fm["updated"] : undefined;
-    if (typeof updated !== "string" || updated === "") continue;
-    const m = updated.match(/^(\d{4}-\d{2}-\d{2})/);
-    if (!m) continue;
-    const updatedDate = m[1];
-    const relPath = path.relative(root, fullPath).replace(/\\/g, "/");
-    let lastCommitDate: string | null = null;
+    let outcome: ReturnType<typeof ir072CheckFileFreshness>;
     try {
-      const out = execFileSync(
-        "git",
-        ["log", "--format=%H %as", "--", relPath],
-        { cwd: root, encoding: "utf-8", windowsHide: true },
-      ) as string;
-      for (const line of out.split("\n")) {
-        const trimmed = line.trim();
-        if (trimmed === "") continue;
-        const sp = trimmed.indexOf(" ");
-        if (sp === -1) continue;
-        const sha = trimmed.slice(0, sp);
-        const date = trimmed.slice(sp + 1);
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
-        // frontmatter のみの変更 commit（metadata 進行等）は内容変更ではないため、
-        // 最終内容変更 commit の採用から除外する（TS-015 pass_criteria）
-        if (ir072IsFrontmatterOnlyCommit(root, relPath, sha)) continue;
-        lastCommitDate = date;
-        break;
-      }
+      outcome = ir072CheckFileFreshness(root, fullPath, execFileSync);
     } catch {
       gitUnavailable = true;
+      break;
     }
-    if (gitUnavailable) break;
-    if (lastCommitDate === null) continue; // untracked（履歴不在）は突合対象外
+    if (!outcome.counted) continue;
     checkedCount++;
-    if (lastCommitDate !== updatedDate) {
+    if (outcome.mismatch) {
       mismatchCount++;
       results.push(
         ng(
           "ReqFreshness",
           "req-updated-freshness",
-          `frontmatter updated (${updatedDate}) does not match the last content-change commit date (${lastCommitDate}) for ${file}: REQ 変更時に frontmatter updated を変更日へ進行させる（patterns.md REQ frontmatter 規約、IR-072）`,
+          `frontmatter updated (${outcome.mismatch.updatedDate}) does not match the last content-change commit date (${outcome.mismatch.lastCommitDate}) for ${file}: REQ 変更時に frontmatter updated を変更日へ進行させる（patterns.md REQ frontmatter 規約、IR-072）`,
           resolveRelative(fullPath, root),
           undefined,
           {
-            evidence: `updated: ${updatedDate}, last content-change commit (author date): ${lastCommitDate}`,
+            evidence: `updated: ${outcome.mismatch.updatedDate}, last content-change commit (author date): ${outcome.mismatch.lastCommitDate}`,
+            expected: `frontmatter updated must equal the last content-change commit date (author date; frontmatter-only commits are excluded)`,
+            route: "intake",
+            finding_category: "document-drift",
+            finding_level: "strict",
+          },
+        ),
+      );
+    }
+  }
+  for (const fullPath of designFiles) {
+    if (gitUnavailable) break;
+    const relLabel = resolveRelative(fullPath, root);
+    let outcome: ReturnType<typeof ir072CheckFileFreshness>;
+    try {
+      outcome = ir072CheckFileFreshness(root, fullPath, execFileSync);
+    } catch {
+      gitUnavailable = true;
+      break;
+    }
+    if (!outcome.counted) continue;
+    designCheckedCount++;
+    if (outcome.mismatch) {
+      mismatchCount++;
+      results.push(
+        ng(
+          "ReqFreshness",
+          "req-updated-freshness",
+          `frontmatter updated (${outcome.mismatch.updatedDate}) does not match the last content-change commit date (${outcome.mismatch.lastCommitDate}) for ${relLabel}: Design 変更時に frontmatter updated を変更日へ進行させる（patterns.md Design frontmatter 形式、IR-072）`,
+          relLabel,
+          undefined,
+          {
+            evidence: `updated: ${outcome.mismatch.updatedDate}, last content-change commit (author date): ${outcome.mismatch.lastCommitDate}`,
             expected: `frontmatter updated must equal the last content-change commit date (author date; frontmatter-only commits are excluded)`,
             route: "intake",
             finding_category: "document-drift",
@@ -11227,7 +11287,7 @@ function checkReqUpdatedFreshness(root: string): CheckResult[] {
       ok(
         "ReqFreshness",
         "req-updated-freshness",
-        `IR-072 req-updated-freshness: ${checkedCount} REQ files checked against last content-change commit dates (frontmatter-only commits excluded), 0 mismatches`,
+        `IR-072 req-updated-freshness: ${checkedCount} REQ + ${designCheckedCount} Design files checked against last content-change commit dates (frontmatter-only commits excluded), 0 mismatches`,
       ),
     );
   }

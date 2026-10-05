@@ -2,7 +2,7 @@
 // ADF-COVERS(verification): REQ-010-070
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
 import { mkdirSync, writeFileSync, copyFileSync, rmSync, existsSync, readFileSync, readdirSync, cpSync, symlinkSync } from "fs";
-import { join } from "path";
+import { basename, dirname, join } from "path";
 import { checkRepoLocalPluginProjectionSymmetry, extractKnownGapNumbers, loadKnownGapReqIds } from "./check_integrity.ts";
 import { generateDocsReadmeDecisionTable } from "./generate_indexes.ts";
 import { extractKnownGapNumbers as extractKnownGapNumbersAllocator } from "../../../../src/common/skills/agentdev-req-file-manager/scripts/src/alloc-req-number.ts";
@@ -6147,6 +6147,9 @@ describe("readme-decision-summary-table IR-061 (Case #3166, RA-005, TS-005)", ()
 // 再現例 (REQ 本文修正 commit で updated 進行忘れした実在パターンの strict 検出),
 // frontmatter のみ変更例 (REQ-935/936: metadata のみ変更 commit は内容変更から除外、
 // 除外後の真の内容変更 commit 日と updated が乖離する場合は strict 検出を維持)。
+// Design 対象 fixture (ACT-DESIGN-041): 正常例 (DES-941)・違反例 (DES-942)・
+// 境界例 (DES-943: frontmatter のみ変更 commit は除外)・許容例 (DES-944: updated 欠落は
+// 別ルール計上)・再現例 (DES-945: 内容変更 commit で updated 進行忘れ) の 5 種。
 
 const IR072_ROOT = join(TEMP_ROOT, "ir072");
 
@@ -6196,6 +6199,34 @@ function ir072WriteReq(
     ].join("\n"),
     "utf-8",
   );
+}
+
+function ir072WriteDesign(
+  root: string,
+  relPath: string,
+  updated: string | null,
+  bodyMarker: string,
+  title: string,
+): void {
+  const full = join(root, "docs", "designs", relPath);
+  mkdirp(dirname(full));
+  const front = [
+    "---",
+    `id: ${basename(relPath, ".md")}`,
+    `title: ${title}`,
+    "status: accepted",
+    "created: 2025-09-01",
+  ];
+  if (updated !== null) front.push(`updated: ${updated}`);
+  front.push(
+    "---",
+    "",
+    `# ${basename(relPath, ".md")}`,
+    "",
+    `Design fixture body (${bodyMarker}).`,
+    "",
+  );
+  writeFileSync(full, front.join("\n"), "utf-8");
 }
 
 function buildIr072Fixture(root: string): void {
@@ -6262,6 +6293,75 @@ function buildIr072Fixture(root: string): void {
     "ir072 fixture commit 7 (frontmatter-only)",
     "2025-08-01T10:00:00+09:00",
   );
+
+  // Design 対象 fixture (ACT-DESIGN-041)。5 種の commit 履歴を構成する。
+  ir072WriteDesign(
+    root,
+    "DES-941.md",
+    "2025-09-01",
+    "normal (updated matches)",
+    "IR-072 design fixture DES-941 (normal)",
+  );
+  ir072WriteDesign(
+    root,
+    "rules/DES-942.md",
+    "2025-09-01",
+    "v1 body",
+    "IR-072 design fixture DES-942",
+  );
+  ir072WriteDesign(
+    root,
+    "DES-943.md",
+    "2025-09-01",
+    "v1 body",
+    "IR-072 design fixture DES-943",
+  );
+  ir072WriteDesign(
+    root,
+    "DES-944.md",
+    null,
+    "allowed (updated missing)",
+    "IR-072 design fixture DES-944",
+  );
+  ir072WriteDesign(
+    root,
+    "DES-945.md",
+    "2025-09-01",
+    "v1 body",
+    "IR-072 design fixture DES-945",
+  );
+  ir072CommitAll(root, "ir072 fixture design commit 1", "2025-09-01T10:00:00+09:00");
+
+  ir072WriteDesign(
+    root,
+    "rules/DES-942.md",
+    "2025-09-01",
+    "v2 body without bump",
+    "IR-072 design fixture DES-942",
+  );
+  ir072CommitAll(root, "ir072 fixture design commit 2", "2025-09-10T10:00:00+09:00");
+
+  ir072WriteDesign(
+    root,
+    "DES-943.md",
+    "2025-09-01",
+    "v1 body",
+    "IR-072 design fixture DES-943 (title revised)",
+  );
+  ir072CommitAll(
+    root,
+    "ir072 fixture design commit 3 (frontmatter-only)",
+    "2025-09-11T10:00:00+09:00",
+  );
+
+  ir072WriteDesign(
+    root,
+    "DES-945.md",
+    "2025-09-01",
+    "v2 body without bump",
+    "IR-072 design fixture DES-945",
+  );
+  ir072CommitAll(root, "ir072 fixture design commit 4", "2025-09-12T10:00:00+09:00");
 
   ir072WriteReq(root, "REQ-933", "2025-03-02", "untracked (excluded)");
   copyScripts(root);
@@ -6357,5 +6457,43 @@ describe("IR-072 req-updated-freshness (REQ-010-068)", () => {
     expect(stale?.evidence).toContain("updated: 2025-04-01");
     expect(stale?.evidence).toContain("2025-07-01");
     expect(stale?.evidence).not.toContain("2025-08-01");
+  });
+
+  it("passes Design files whose updated matches the last content-change commit date (Design 正常例)", () => {
+    const collected = ir072Collect(IR072_ROOT);
+    expect(
+      collected.ng.filter((f) => f.file.includes("DES-941")),
+    ).toHaveLength(0);
+  });
+
+  it("detects a stale updated left behind by a later Design content change (Design 違反例)", () => {
+    const collected = ir072Collect(IR072_ROOT);
+    const stale = collected.ng.find((f) => f.file.includes("DES-942"));
+    expect(stale).toBeDefined();
+    expect(stale?.findingLevel).toBe("strict");
+    expect(stale?.evidence).toContain("updated: 2025-09-01");
+    expect(stale?.evidence).toContain("2025-09-10");
+  });
+
+  it("excludes frontmatter-only commits on Design files from content changes (Design 境界例)", () => {
+    const collected = ir072Collect(IR072_ROOT);
+    const boundary = collected.ng.find((f) => f.file.includes("DES-943"));
+    expect(boundary).toBeUndefined();
+  });
+
+  it("skips Design files without updated instead of counting them (Design 許容例)", () => {
+    const collected = ir072Collect(IR072_ROOT);
+    expect(
+      collected.ng.filter((f) => f.file.includes("DES-944")),
+    ).toHaveLength(0);
+  });
+
+  it("reproduces the Design updated-bump-missed pattern as strict ng (Design 再現例)", () => {
+    const collected = ir072Collect(IR072_ROOT);
+    const stale = collected.ng.find((f) => f.file.includes("DES-945"));
+    expect(stale).toBeDefined();
+    expect(stale?.findingLevel).toBe("strict");
+    expect(stale?.evidence).toContain("updated: 2025-09-01");
+    expect(stale?.evidence).toContain("2025-09-12");
   });
 });
