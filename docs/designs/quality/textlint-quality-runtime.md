@@ -6,7 +6,7 @@ updated: 2026-10-05
 ---
 <!-- ADF-COVERS(implementation): REQ-053-024, REQ-053-025, REQ-053-026, REQ-053-027, REQ-053-028, REQ-053-031, REQ-053-032, REQ-053-035, REQ-053-036, REQ-010-075, REQ-029-012 -->
 <!-- ADF-COVERS(design): REQ-029-012（依存と配布節が版固定情報配布・導入時生成の design 実体） -->
-<!-- ADF-COVERS(design): REQ-053-041, REQ-053-042, REQ-053-043, REQ-053-044, REQ-053-045, REQ-053-046, REQ-053-047, REQ-053-048（最終検査節とファイル単位結果の再利用と同一性条件節が design 実体） -->
+<!-- ADF-COVERS(design): REQ-053-016, REQ-053-032, REQ-053-041, REQ-053-042, REQ-053-043, REQ-053-044, REQ-053-045, REQ-053-046, REQ-053-047, REQ-053-048（最終検査節とファイル単位結果の再利用と同一性条件節が design 実体） -->
 
 # textlint 品質基盤
 
