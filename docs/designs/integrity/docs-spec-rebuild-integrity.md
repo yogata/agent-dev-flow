@@ -2,7 +2,7 @@
 title: "配布物整合性検査ルール"
 status: accepted
 created: 2026-06-22
-updated: 2026-07-24
+updated: 2026-10-02
 ---
 
 # 配布物整合性検査ルール

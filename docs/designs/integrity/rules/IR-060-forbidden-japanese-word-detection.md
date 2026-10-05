@@ -2,7 +2,7 @@
 title: "IR-060: forbidden Japanese word detection"
 status: accepted
 created: 2026-08-20
-updated: 2026-09-09
+updated: 2026-10-04
 ---
 
 # IR-060: forbidden Japanese word detection

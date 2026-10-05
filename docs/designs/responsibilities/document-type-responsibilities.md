@@ -2,7 +2,7 @@
 title: 文書種別責務・配置基準
 status: accepted
 created: 2026-06-23
-updated: 2026-09-29
+updated: 2026-10-04
 ---
 <!-- ADF-COVERS(implementation): REQ-001-001, REQ-001-002, REQ-001-003, REQ-001-004, REQ-001-005, REQ-001-006, REQ-056-003 -->
 <!-- ADF-COVERS(implementation): REQ-094-003, REQ-094-005 -->

@@ -2,7 +2,7 @@
 title: Issue タイトル記述規則（issue-title-policy）
 status: accepted
 created: 2026-10-03
-updated: 2026-10-03
+updated: 2026-10-04
 ---
 <!-- ADF-COVERS(design): REQ-100-001, REQ-100-002, REQ-100-003, REQ-100-004, REQ-100-005, REQ-100-006, REQ-100-007, REQ-100-008 -->
 

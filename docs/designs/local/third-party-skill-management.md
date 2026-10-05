@@ -2,7 +2,7 @@
 title: third-party Skill 管理 Design
 status: accepted
 created: 2026-08-30
-updated: "2026-10-03"
+updated: "2026-10-05"
 ---
 
 <!-- ADF-COVERS(design): REQ-097-001, REQ-097-002, REQ-097-003, REQ-097-004 -->

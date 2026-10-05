@@ -2,7 +2,7 @@
 title: inspect-docs 診断観点レジストリ
 status: accepted
 created: 2026-09-10
-updated: 2026-09-10
+updated: 2026-10-02
 ---
 
 # inspect-docs 診断観点レジストリ

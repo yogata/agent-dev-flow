@@ -2,7 +2,7 @@
 title: "AUTOGEN ブロック鮮度検出 gate"
 status: accepted
 created: "2026-08-09"
-updated: "2026-09-20"
+updated: "2026-09-21"
 ---
 
 # AUTOGEN ブロック鮮度検出 gate

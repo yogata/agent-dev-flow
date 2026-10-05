@@ -2,7 +2,7 @@
 title: validator 分割基準
 status: accepted
 created: 2026-07-07
-updated: 2026-07-21
+updated: 2026-08-20
 ---
 
 # validator 分割基準

@@ -2,7 +2,7 @@
 title: "IR-042: hardcoded-req-count"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-09-04
 ---
 
 # IR-042: hardcoded-req-count

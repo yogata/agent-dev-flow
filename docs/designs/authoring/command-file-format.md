@@ -2,7 +2,7 @@
 title: "コマンドファイルフォーマット規約"
 status: accepted
 created: 2026-06-22
-updated: 2026-09-02
+updated: 2026-10-03
 ---
 
 # コマンドファイルフォーマット規約

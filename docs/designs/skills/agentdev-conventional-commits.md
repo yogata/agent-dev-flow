@@ -2,7 +2,7 @@
 title: `agentdev-conventional-commits` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-08
+updated: 2026-10-03
 ---
 <!-- ADF-COVERS(implementation): REQ-003-001 -->
 

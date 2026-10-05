@@ -2,7 +2,7 @@
 title: `agentdev-intake-pipeline` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-07-28
+updated: 2026-10-04
 ---
 <!-- ADF-COVERS(implementation): REQ-037-001, REQ-037-004, REQ-037-006, REQ-037-007, REQ-037-009 -->
 

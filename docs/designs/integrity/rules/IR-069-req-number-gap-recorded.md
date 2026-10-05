@@ -2,7 +2,7 @@
 title: "IR-069: req-number-gap-recorded"
 status: accepted
 created: 2026-09-17
-updated: 2026-09-17
+updated: 2026-10-04
 ---
 
 # IR-069: req-number-gap-recorded

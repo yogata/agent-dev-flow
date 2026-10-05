@@ -2,7 +2,7 @@
 title: ローカルIssue共通スキーマ
 status: accepted
 created: 2026-06-20
-updated: 2026-10-03
+updated: 2026-10-04
 ---
 <!-- ADF-COVERS(implementation): REQ-009-014, REQ-009-026, REQ-009-027, REQ-009-028, REQ-009-029, REQ-009-030, REQ-009-031, REQ-009-032, REQ-009-033, REQ-009-034, REQ-009-037, REQ-009-039 -->
 <!-- ADF-COVERS(implementation): REQ-011-007 -->

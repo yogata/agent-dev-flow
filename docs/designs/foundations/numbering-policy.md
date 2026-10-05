@@ -2,7 +2,7 @@
 title: 採番管理 Design
 status: accepted
 created: 2026-07-19
-updated: 2026-09-23
+updated: 2026-10-04
 ---
 <!-- ADF-COVERS(implementation): REQ-001-008, REQ-001-009, REQ-001-013, REQ-001-042 -->
 <!-- ADF-COVERS(implementation): REQ-004-003 -->

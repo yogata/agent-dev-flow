@@ -2,7 +2,7 @@
 title: 索引類自動生成整合性
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-08-22
 ---
 
 # IR-061: 索引類自動生成整合性

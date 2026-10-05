@@ -2,7 +2,7 @@
 title: `agentdev-epic-tracker` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-10-03
+updated: 2026-10-04
 ---
 <!-- ADF-COVERS(implementation): REQ-035-003, REQ-035-004 -->
 <!-- ADF-COVERS(design): REQ-035-001, REQ-035-019, REQ-035-020 -->

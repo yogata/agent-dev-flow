@@ -2,7 +2,7 @@
 title: `agentdev-issue-management` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-08
+updated: 2026-10-04
 ---
 <!-- ADF-COVERS(implementation): REQ-030-001, REQ-049-005 -->
 

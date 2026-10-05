@@ -2,7 +2,7 @@
 title: "テスト影響範囲検出 gate"
 status: accepted
 created: 2026-08-09
-updated: 2026-09-10
+updated: 2026-10-03
 ---
 <!-- ADF-COVERS(implementation): REQ-019-001, REQ-019-002 -->
 <!-- ADF-COVERS(design): REQ-019-003 -->

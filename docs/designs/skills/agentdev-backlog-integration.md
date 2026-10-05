@@ -2,7 +2,7 @@
 title: `agentdev-backlog-integration` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-20
+updated: 2026-10-04
 ---
 <!-- ADF-COVERS(implementation): REQ-004-016, REQ-004-017, REQ-039-001, REQ-039-002, REQ-039-003 -->
 

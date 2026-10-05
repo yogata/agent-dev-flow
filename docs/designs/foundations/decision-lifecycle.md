@@ -2,7 +2,7 @@
 title: Decision Lifecycle
 status: accepted
 created: 2026-08-10
-updated: "2026-09-19"
+updated: "2026-10-01"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-021, REQ-001-022, REQ-001-023, REQ-001-056, REQ-001-057, REQ-001-058, REQ-001-061, REQ-001-062, REQ-001-063, REQ-001-064 -->
 

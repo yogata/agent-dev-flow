@@ -2,7 +2,7 @@
 title: Design 健全性メトリクス
 status: accepted
 created: 2026-06-26
-updated: 2026-09-29
+updated: 2026-10-01
 ---
 <!-- ADF-COVERS(implementation): REQ-001-027 -->
 

@@ -2,7 +2,7 @@
 title: "IR-044: REQ/Design 境界違反検出"
 status: accepted
 created: 2026-08-20
-updated: 2026-09-02
+updated: 2026-09-26
 ---
 # IR-044: REQ/Design 境界違反検出
 

@@ -2,7 +2,7 @@
 title: "IR-038: Decision-index-consistency"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-08-22
 ---
 
 # IR-038: Decision-index-consistency

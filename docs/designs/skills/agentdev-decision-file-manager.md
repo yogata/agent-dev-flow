@@ -2,7 +2,7 @@
 title: `agentdev-decision-file-manager` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-10
+updated: 2026-10-03
 ---
 <!-- ADF-COVERS(implementation): REQ-001-056, REQ-001-057, REQ-001-058, REQ-001-059, REQ-001-060, REQ-004-044, REQ-004-045 -->
 <!-- ADF-COVERS(implementation): REQ-059-001 -->

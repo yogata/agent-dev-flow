@@ -2,7 +2,7 @@
 title: textlint 品質基盤
 status: accepted
 created: 2026-09-09
-updated: 2026-09-29
+updated: 2026-10-04
 ---
 <!-- ADF-COVERS(implementation): REQ-053-024, REQ-053-025, REQ-053-026, REQ-053-027, REQ-053-028, REQ-053-031, REQ-053-032, REQ-053-035, REQ-053-036, REQ-010-075, REQ-029-012 -->
 <!-- ADF-COVERS(design): REQ-029-012（依存と配布節が版固定情報配布・導入時生成の design 実体） -->
