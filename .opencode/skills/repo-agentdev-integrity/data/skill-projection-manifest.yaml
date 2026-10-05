@@ -3,13 +3,13 @@
 # IR-068 (Issue #2383 (d)、inspect F-01): src 側スキル集合と .opencode 投影スキル
 # 集合の突合検査（skill-projection-manifest）が使用する検出データ。
 #
-# 本 YAML は検出ビューであり、スキル集合の正規情報源は src/opencode/skills/ の
+# 本 YAML は検出ビューであり、スキル集合の正規情報源は src/common/skills/ の
 # ディレクトリ列挙である（宣言的データ YAML の schema 原則、
 # docs/designs/integrity/checker-execution-contracts.md）。
 # 投影（.opencode/skills junction）の契約は docs/designs/local/runtime-package-boundary.md
 # が正規所有する。
 #
-# 同期条件: src/opencode/skills/ へのスキル追加・削除・リネームは本マニフェストを
+# 同期条件: src/common/skills/ へのスキル追加・削除・リネームは本マニフェストを
 # 同一 PR で更新すること。manifest ↔ src の不一致は check_integrity.ts
 # （IR-068 skill-projection-manifest）が strict fail として検出する。
 # 投影比較は junction 環境（.opencode/skills に非 repo-* ディレクトリが存在する場合）
@@ -21,7 +21,7 @@
 # DEC-023 accepted、REQ-018-003）として扱われ、projection 突合と ADF スキル構造契約
 # 検査の fail に計上されない。許容は検出ノイズ抑制であり走査除外ではない。
 # 未宣言の third-party 起源配置は引き続き検出する。
-# third-party Skill は skills:（src/opencode/skills 列挙の検出ビュー）には登録しない
+# third-party Skill は skills:（src/common/skills 列挙の検出ビュー）には登録しない
 # （docs/designs/local/third-party-skill-management.md）。
 
 schema_version: 1
