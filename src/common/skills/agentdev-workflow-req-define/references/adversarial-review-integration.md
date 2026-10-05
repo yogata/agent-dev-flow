@@ -20,11 +20,16 @@
 ### Preconditions
 
 - STEP-7（Scale判断: feature）または work_type 判定（feature 以外）が完了しており、STEP-9（ドラフト保存）の前であること
+- 局所修正・追記を含む場合、draft-generation.md の構造・変更前提検査、決定的組立、差分・完結性検査が完了していること
 
 ### Procedure
 
+review に進む前に、ドラフトの構造検査、決定的組立、組立後の差分検査をこの順で完了する（詳細と戻り値契約は [draft-generation.md](draft-generation.md)「決定的な局所組立・検査」を参照）。その後に意味レビューを行い、accepted finding の反映後は構造検査・組立・差分検査を再実行してから意味を再評価する。検査証拠は入力ハッシュと検査範囲が同一の場合のみ再利用し、結果と戻り値を draft の証拠として保持する。
+
 req-define は adversarial-review を原則実行する（default-on）。
 発動条件判定と review 呼出を分離する。
+
+adversarial-review は構造・変更前提検査、組立、差分・完結性検査の後に行う意味レビューである。機械検査の成功で意味レビューを代替せず、指摘を反映した場合は影響する依存判断を再評価する。
 
 - **発動条件判定**: default-on で発動する。skip 条件（Scale=L0 で Decision判断対象なし、意味的決定なし）該当時は省略して従来フロー（review を挿入せず STEP-9 へ進む）を継続できる。ユーザーが review の実施を明示的に指示した場合は通常のユーザー指示としてその場で実行する（専用の検出・フラグ・保存・伝播・skip 条件の専用上書き処理を持たない）。skip 判断のためだけの新規 HITL、承認点は追加しない
 - **review 呼出**: 発動条件判定で発動と判定された場合、要件候補（draft-data、`agreed_items`、`artifact_actions`、Decision判断結果、Scale判断結果）を対象に adversarial-review を呼び出す。委譲契約は v4-delegation-contracts Design（extension 経由）「adversarial-review との委譲契約接続」節に従う

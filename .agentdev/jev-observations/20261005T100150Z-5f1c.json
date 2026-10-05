@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261005T100150Z-5f1c",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-20261005-01（調査引き継ぎと要件ドラフト生成・適用の効率化）の既存REQ照合",
+  "sourceRevision": "36407badfe93538bd00a40fccb4f14f24e197634",
+  "durationMs": 1218,
+  "inputTokens": 1365,
+  "inputs": {
+    "requestDigest": "8506261e384121f48b011675a83325574ec357c8b61a32702297c0d2b648b377",
+    "references": [
+      {
+        "digest": "61cbec697e2e0a3f04c4a817b91aacdcdd5f338e9fc8c2e8fea1263446d88c52",
+        "label": "RU-20261005-01",
+        "path": ".agentdev/backlog/req-units/RU-20261005-01.md"
+      },
+      {
+        "digest": "05448824f69bd770451c4d6a74055c3bd03526b302413e27b3b0fb62b0b7bad5",
+        "label": "REQ-004",
+        "path": "docs/requirements/REQ-004.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-operation",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0.24,
+        "APPEND": 0.58,
+        "UPDATE": 0.15,
+        "REQ操作なし": 0.03
+      }
+    },
+    {
+      "questionId": "q2-needs-more-confirmation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.43,
+        "false": 0.5700000000000001
+      }
+    }
+  ],
+  "confidence": 0.44,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-operation",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "q2-needs-more-confirmation",
+        "value": false
+      }
+    ]
+  }
+}

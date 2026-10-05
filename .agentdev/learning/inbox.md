@@ -110,3 +110,143 @@
 - **想定反映先**: docs/designs/integrity/checker-execution-contracts.md、agentdev-quality-gates references/qg-4-final-acceptance.md
 - **関連**: Issue 3463、PR 3477（squash 763a05d5）、Epic 3457
 - **タグ**: `#worktree` `#verification` `#case-close`
+
+---
+
+## extension rule の一時ファイル指示が workspace 外書込み guard と競合する（project root 内一時領域への切替）
+
+- **問題事象**: Case 3484 の case-open（Root Case 本文候補の書込み前 lint）で、extension rule（agentdev-workflow-case-open.yaml の yomiyasu-application-before-write）が「検査専用本文ファイルを非永続領域〔一時ディレクトリ等のリポジトリ外〕に新規作成」を指示した一方、write ツールによる C:\WINDOWS\TEMP\opencode への書込みは workspace 外書込み guard により fail-closed ブロックされた。
+- **発生局面**: 運用（case-open STEP-2 の GitHub 書込み前 yomiyasu lint）
+- **検知方法**: write ツールの fail-closed ブロック（write targets a path outside the project root）
+- **根本原因**: extension rule の指示（リポジトリ外一時ディレクトリ）と workspace 外書込み guard（project root 外の書込み禁止）が同一工程内で競合する。正規配置契約（worktree-operations.md の .agentdev/tmp/ 統一配置、case-open scripts README の workspace 外 temp 禁止・project root 内限定）と extension rule の文言が不一致である。
+- **自律対応内容**: guard ブロック後に別 API 経路での迂回を行わず、bash ツール経由の heredoc による事前承認済み一時領域への検査専用本文ファイル作成へ切替した（bash リダイレクトは PowerShell cp932 再符号化の対象外）。検査後にファイルを削除した。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: extension rule が一時ファイル作成を指示する工程では、指示の置き場所が guard 契約（workspace 外禁止・project root 内限定・.agentdev/tmp/ 統一配置）と整合する文言になっているかを適用前に確認する。
+- **再発条件**: extension rule が「リポジトリ外」を含む一時ファイル置き場所を指示し、write ツールで実行する場合
+- **予防策候補**: extension yaml の指示文言を「project root 内の実行時作業領域（.agentdev/tmp/ 等の gitignore 対象領域）」へ整合させる（intake item として記録済み）。
+- **想定反映先**: .agentdev/extensions/skills/agentdev-workflow-case-open.yaml の rules 文言
+- **関連**: Issue 3484、worktree-operations.md「退避ファイルの統一配置（.agentdev/tmp/）」
+- **タグ**: `#writing-guard` `#extension-rules` `#case-open` `#yomiyasu`
+
+---
+
+## session由来RU の generation_actor 契約固定値と実測記録の差異は承認の読み替えでなく記録で解決する
+
+- **問題事象**: RU-0160（session由来）の generation_actor が supervisor と記録され、session由来RU 契約の固定値 req-define-parent と差異があった。配置許可を契約改訂の承認として扱わない旨の条件付きで case-open へ投入された。
+- **発生局面**: 運用（case-open STEP-1 前の引き継ぎ確認）
+- **検知方法**: 委譲 prompt の構造化文脈（制約・契約）と RU frontmatter の突合
+- **根本原因**: session由来RU の作成主体が supervisor の場合、契約固定値との差異が契約変更なしで後工程への解決指示として持ち越される運用になっている（正規契約は不変のため、差異の取り扱いが後工程責務として残る）。
+- **自律対応内容**: 配置許可を契約改訂の承認として扱わず、正規契約（固定値 req-define-parent）を変更せず、差異を既知差異として完了報告へ記録し後工程（case-ready）へ引き継いだ。RU 本体・draft への改変は行わなかった。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（正規契約は不変）
+- **横展開観点**: generation_actor 等の契約固定値と実測記録の差異は、後工程で「承認の読み替え」ではなく「既知差異の記録と契約不変の明示」で解決する。
+- **再発条件**: supervisor が session由来RU を作成・配置した後の後工程実行
+- **予防策候補**: session由来RU 契約に supervisor 作成時の記録値の扱い（差異許容と記録方法）を明文化する。
+- **想定反映先**: session由来RU 契約（artifact-contracts.md の RU 採番・記録規定系）
+- **関連**: RU-0160、Issue 3484
+- **タグ**: `#ru-contract` `#generation-actor` `#case-open`
+
+---
+
+## artifact_actions の update content が target_area 節の現行内容を全含しない場合、節置換は合意外の既存内容を削除する
+
+- **問題事象**: draft（RU-0161 由来）の ACT-DESIGN-006 content が target_area「### repo-local Plugin の配布・投影契約」節の現行内容の一部（outside-root 判定段落）を含んでいなかった。content で節全体を置換すると、合意に含まれない既存内容が黙示的に削除される状態だった
+- **発生局面**: 運用（case-open STEP-3 の Definition 適用。Design target_area 置換）
+- **検知方法**: artifact_actions 適用前の target_area 節の実取得（read）と draft content の突合。節の現行内容のうち content に対応行のない段落を検出した
+- **根本原因**: draft 生成時（req-define）の update 操作の content が節の部分差分として作成され、操作種別（update = 節置換）との組合せで削除リスクが暗黙化していた。draft の reviewed 合意では target_area 置換の削除含意が明示されていなかった
+- **自律対応内容**: 節全体置換を避け、既存段落を保持した最小追加（textlint 関連 bullet のみの追加）へ適用方式を変更して削除を回避した。保持判断（合意外の既存段落の削除なし）を Definition PR 本文の完了条件へ記録した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存内容の保持は合意範囲内の忠実性確保）
+- **横展開観点**: artifact_actions の update 操作では、content が target_area 節の現行内容を全含しない限り、節置換は既存内容の削除を含意する。適用前に現行節と content の差分を必ず実取得して照合する。逆方向（content 側にだけある行の追加）と併せて diff 突合が素早い判定になる
+- **再発条件**: req-define が update 操作の content を部分差分として生成し、後続工程が target_area 置換を機械的に実行する場合
+- **予防策候補**: req-define の artifact_actions 生成契約へ「update 操作の content は target_area 節の現行内容を全含する、または削除対象行を明示する」の追加と、case-ready の適用前検証（手順 1.5）への節内容差分突合の明文化
+- **想定反映先**: artifact-contracts.md の req_draft 出力構造（artifact_actions 形式）、case-open Design（適用前検証）
+- **関連**: RU-0161、Issue #3486、PR #3489
+- **タグ**: `#draft-schema` `#target-area` `#artifact-actions` `#case-open`
+
+---
+
+## Definition PR の品質検査記録が coverage 対象外の既存行の missing-design を検出できず case-ready STEP-2 で表面化する事象
+
+- **問題事象**: Definition PR #3489 本文の品質検査記録が「traceability check: missing-design 0 件（対象: REQ-053-041〜048、REQ-053-016、REQ-053-032）」と記録していた一方、case-ready STEP-2 で merge 後 canonical（origin/main 7f278d81 の detached worktree）に対して同対象の check を機械実行したところ missing-design 2件（REQ-053-016、REQ-053-032）を検出した。coverage --req 実測でも REQ-053-016/032 の design role 対応は 0 relations（implementation 5件・verification 2件のみ）だった
+- **発生局面**: 運用（case-open STEP-3/4 の Definition Package 品質検査記録 → case-ready STEP-2 の canonical 再取得時 traceability check 機械実行）
+- **検知方法**: merge 後 canonical worktree での check 再実行（PR 記録との再現突合）。case-open worktree（.worktrees/3486-definition、HEAD c3208c1a）での同一コマンド再実行でも同一結果を再現し、実行環境差異ではなく corpus の実在状態の差異と確定した
+- **根本原因**: REQ-053-016/032 の design 対応宣言が sidecar（traceability/agentdev-textlint-guard.yaml。implementation/verification role のみで design role 不在）にも inline ADF-COVERS(design) にも存在しなかった。両行は既存行であり design 対応 0 件は merge 前から存在する状態で、本 Case が UPDATE 対象行として check 対象に含めたことで初めて機械検出された。PR 側の coverage --req 実行対象が新規行 041〜048 に限定され、coverage 実測記録「14 relations 全行 design 対応あり」が 016/032 の design 欠落を検出できず、CR-001 の「design 対応事前確認実施済み・対応存在・欠落なし」記録と corpus 実在が乖離したまま品質検査記録が確定した
+- **自律対応内容**: case-ready は STEP-2 差し戻し契約に従い ready へ遷移せず case-open へ差し戻して停止した（merge 巻き戻しは行わない。draft/RU 保持）。overlap 突合（横断依存検査警告: textlint-design-covers 共有領域）は REQ-053-016 の design 登録が実在しないことから実登録競合なしと確定した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（case-ready STEP-2 / STEP-6 の既存 missing-design ゲートの適用事例）
+- **横展開観点**: Definition PR の品質検査記録は check --req の対象行集合と coverage 実測の対象行集合を一致させ、UPDATE 対象の既存行を含める。既存行を UPDATE する Definition では「その行の design 対応が merge 前から成立しているか」を事前確認する。UPDATE は行を check 対象へ新規に引き込む行為であり、潜在欠落の表面化を Definition Package 構成の欠漏として扱う（case-open STEP-2 のトレーサビリティポリシー追随確認の対象）
+- **再発条件**: 既存 REQ 行を UPDATE 操作対象に含む Definition の case-open 生成・case-ready 受入。design 対応を持たない既存行が check 完全性検査の対象に加わる変更
+- **予防策候補**: case-open の Definition Package 生成時に UPDATE 対象行を coverage --req / check --req の機械実行対象へ含める。design 対応 0 件の既存行を UPDATE 対象にする場合は design 宣言追加を同一 Definition Package へ含める（case-ready STEP-2 ゲートの再発防止）
+- **想定反映先**: case-open Design（Definition Package 生成・品質検査の対象行集合規定）、agentdev-workflow-case-ready references/definition-acceptance.md（STEP-2 機械実行対象の明示）
+- **関連**: Issue #3486、PR #3489（merge 7f278d81）、REQ-053-016、REQ-053-032、traceability/agentdev-textlint-guard.yaml
+- **タグ**: `#traceability` `#missing-design` `#definition-acceptance` `#case-ready` `#case-open`
+
+---
+
+## Definition PR 受入ゲート（yomiyasu 適用記録）の突合が merge 後になった
+
+- **問題事象**: case-ready STEP-1 で Definition PR（#3487）の受入検査（忠実性・整合性・品質検査、isDraft 確認）を実施して merge した後、project-extensions の workflow-extension（case-ready）の acceptance_gates に「Definition PR 差分に docs/** 日本語文章変更を含む場合、yomiyasu 適用記録が PR 上に存在すること。不足時は merge 前差し戻し」があることを検知した。PR 本文・コメントに yomiyasu 適用記録が存在せず、受入ゲートの突合を経由しないまま merge が成立していた
+- **発生局面**: 運用（case-ready STEP-1 の Definition PR 受入）
+- **検知方法**: merge 後の STEP-6 検証ゲートで project-extensions の workflow-extension context を読み込んだ際の acceptance_gates 突合
+- **根本原因**: 受入検査の確認リストを STEP-1 reference（definition-acceptance.md）の3検査と isDraft 確認で構成し、merge 実行より前に project-extensions の acceptance_gates を読む前置確認が case-ready STEP-1 の手順に明示されていなかった。workflow-extension の読み込み位置が「検証ゲート横断依存検査の共有領域解決」のみに紐づいており、ゲート確認のタイミングが受入より後になっていた
+- **自律対応内容**: merge 後のため巻き戻さず、事後補完として対象 Design セクション本文を一時ファイルへ抽出して yomiyasu_lint.py を実行（通常終了コード 0、スコア 95/100、指摘 1 件は ACT-DESIGN-001 合意済み契約構造由来のため保持）、適用記録（対象・実施結果・保持した指摘理由）を PR #3487 へコメント追記して受入ゲートの記録要求を事後充足した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（extension の受入ゲート要求の充足。merge 収録内容の変更なし）
+- **横展開観点**: project-extensions の acceptance_gates は該当 workflow の受入・merge を伴う STEP（case-ready STEP-1 など）の前置確認項目に含める。workflow-extension の解決は共有領域解決だけでなく受入ゲート・rules の読み込み点でもある
+- **再発条件**: docs/** 日本語文章変更を含む Definition PR を case-ready が受入する場合（merge を実行する全 Case）
+- **予防策候補**: case-ready STEP-1 の merge 前確認手順へ「project-extensions の workflow-extension（case-ready）の acceptance_gates 突合」を前置項目として追加する
+- **想定反映先**: case-ready workflow スキル（references/definition-acceptance.md の merge 前確認）、project-extensions 解決手順
+- **関連**: Issue #3484、PR #3487、.agentdev/extensions/skills/agentdev-workflow-case-ready.yaml
+- **タグ**: `#case-ready` `#acceptance-gate` `#project-extensions` `#yomiyasu`
+
+---
+
+## 単独実行契約を持つ確認テストにフル実行前提のアサーションを入れると選択実行で失敗する
+
+- **問題事象**: テストスイート内の計測・記録確認テストに「起動ログ非空」のアサーションを入れると、テスト名指定（`-t`）の選択実行で先行テスト不在により失敗する。フル実行でのみ成立する前提をアサーションに組み込むと、ファイル単体実行契約（選択実行でも成立する）を壊す
+- **発生局面**: 実装（Case #3484 の check_integrity.test.ts 結果共有構造の起動回数確認テスト実装中）
+- **検知方法**: 選択実行（`-t` 指定）での TS-002 単独実行確認中に当該テストが失敗
+- **根本原因**: 記録確認テストの検査対象を「ログの非空」（フル実行でのみ成立）にしたことで、共有ゲッターの遅延初期化が当該テスト内で完結しない選択実行経路で前提が崩れた
+- **自律対応内容**: アサーションを単独でも成立する条件（重複ゼロ）のみへ変更し、ログ非空確認を削除して再検証（フル実行 188 pass と選択実行 1 pass の両立を確認）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（テストスイート内部の実行形態。Design「check_integrity テストスイート内の結果共有契約」の単独選択実行契約と整合）
+- **横展開観点**: 単独実行契約を持つ確認テストは、フル実行時のみ意味を持つ前提のアサーションを避け、単独でも成立する条件のみを検査する。集合状態を確認するテストは、対象集合の構築をそのテスト自身の遅延初期化で完結させる
+- **再発条件**: 起動回数・ログ・カウンタ等の集合状態を確認するテストを、他テストの先行実行が存在する前提で書く場合
+- **予防策候補**: 記録確認系テストの合格条件を「単独実行で成立する不変条件（重複ゼロ等）」に限定する規約を Design 側の実行形態契約に明記する
+- **想定反映先**: checker 実行契約 Design「bun test 実行形態契約（単独実行・ファイル単体指定を含む）」節、integrity test suite の実装規約
+- **関連**: Issue #3484、PR #3491（merge 9ecdb0dd）、PR 本文 learning 候補
+- **タグ**: `#bun-test` `#テスト設計` `#選択実行` `#case-run`
+
+## tsc のヒストグラム対照は同一実行形態（tsconfig・target）で行わないと新規エラー判定が誤る
+
+- **問題事象**: case-close QG-4 の typecheck 独立再検査で、`bunx tsc --noEmit` に tsconfig・target を指定しない形（default target es5）で実行すると、変更前後でエラーコードヒストグラムが 1 件だけ不一致（TS2802 57→58、MapIterator spread）に見えた。package の型検査構成（target ES2022 の tsconfig 形）で同一対照を行うとヒストグラムは完全一致で新規 0 件だった
+- **発生局面**: 検証（case-close STEP-2/3 の merge 直前 HEAD での typecheck 独立再実測・baseline 対照。Issue #3484）
+- **検知方法**: baseline（f9029d91）への一時差し替え対照実行でのヒストグラム差分検出（+1 TS2802）
+- **根本原因**: default target(es5) の tsc は MapIterator 等のイテレータ spread に対して TS2802 を構造的に大量生成する（baseline でも 57 件）。実行形態が package の型検査構成と不一致なまま対照すると、実行形態固有の差分を「変更起因の新規エラー」と誤判定し得る
+- **自律対応内容**: package 設定と同一のオプション形（ES2022・types bun,node・strict 等）で HEAD と baseline を再対照し、ヒストグラム完全一致（新規 0 件）を確認。default target 形の差分は無効（実行形態アーティファクト）として検証差分へ記録し、判定から除外
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（QG-4 typecheck 検証の実行形態解釈。package 正規 typecheck〔-p tsconfig.distribution-boundary.json〕は exit 0 を維持）
+- **横展開観点**: tsc 変更前後対照は、変更前後で同一の実行形態（tsconfig・target・ファイル集合）を使う。実行形態が記録されていない typecheck 証跡は、ヒストグラム単独では再現比較不能なため、実行コマンド（オプション明示）を証跡へ残す
+- **再発条件**: tsconfig.json を持たない package 配下で tsc を明示ファイル指定・オプション指定なしで実行する場合（MapIterator、spread、import.meta 等の target 依存エラークラスを含む対象）
+- **予防策候補**: typecheck 検証記録への実行コマンド（オプション・target・対象ファイル）明記を検証差分セクションの標準項目化する。baseline 対照時の実行形態一致確認を前置項目化する
+- **想定反映先**: checker 実行契約 Design（tsc 実行形態）、agentdev-quality-gates QG-4 検証差分セクション規約
+- **関連**: Issue #3484、PR #3491（merge 9ecdb0dd）、.agentdev/learning/deferred.md の LSP timeout 時 tsc --noEmit 代替記録
+- **タグ**: `#typecheck` `#tsc` `#fail由来分類` `#case-close` `#qg-4`
+
+## worktree の repo 全体 bun test 単一実行で textlint 一時 dictionary 競合疑いの fail が出る（正規形 3 分割実行では非再現）
+
+- **問題事象**: worktree での repo 全体 `bun test ./`（カレントディレクトリトリビアな単一実行）が vendor build 後も textlint tests 38 件が temp `check.dat.gz` ENOENT で失敗。textlint plugin suite 単体実行では 133/133 pass
+- **発生局面**: case-run の repository tests 実行（Case #3485、PR #3490）
+- **検知方法**: `bun test ./` 初回 1293 pass / 40 fail → vendor build 後再実行で 1295 pass / 38 fail 残存。単独 suite 実行では症状が出ないため一時 dictionary の並列/cleanup 競合を疑った
+- **根本原因**: 一時 dictionary（check.dat.gz）の並列実行/cleanup 競合が疑われるが原因確定は未実施
+- **自律対応内容**: case-close QG-4 で bun test フル suite 正規形（3 cwd 分割実行・依存パッケージ前置・stdout/stderr 分離退避・timeout 明示）で merge 直前 HEAD を再実測し 3595 tests / 0 fail を確認。単一実行形態の fail は正規形外の実行形態由来として扱い、textlint ENOENT は正規形下で非再現（無効分類）として検証差分へ記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: bun test フル suite 正規形（3 分割実行・`./` prefix・cwd 統一）を守れば textlint 一時 dictionary 競合は観測されない。カレントディレクトリトリビアな `bun test ./` 単一実行は正規形違反であり、その fail を fail 証拠として合格判定に使わない
+- **再発条件**: 同一 repo の worktree で正規形外の bun test 単一実行を行う場合（既に #3484 / #3486 でも同種の非正規形 fail 観測あり）
+- **予防策候補**: bun test フル suite 正規形（3 分割実行）の遵守確認を検証記録の前置項目化し、正規形外実行の fail を由来分類の対象外とする基準を検証差分セクション規約へ明記する
+- **想定反映先**: checker 実行契約 Design「bun test 実行形態契約」節、agentdev-quality-gates bun test フル suite 正規形（実行形態契約）
+- **関連**: Issue #3485、PR #3490（merge ada63ed1）、PR 本文 learning 候補、Issue #3484 / PR #3491 の learning（並行競合疑いの先行記録）
+- **タグ**: `#bun-test` `#textlint` `#worktree` `#fail由来分類` `#case-close` `#qg-4`

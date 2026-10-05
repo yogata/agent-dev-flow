@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261005T100150Z-c051",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0161（textlint最終検査の結果再利用・並列実行・工程判断スクリプト化）の既存REQ照合",
+  "sourceRevision": "36407badfe93538bd00a40fccb4f14f24e197634",
+  "durationMs": 1195,
+  "inputTokens": 1172,
+  "inputs": {
+    "requestDigest": "9ec8ccec17f2f22af24dff083e9c852c9eb4e36a28b3976b27928f7edae8d2af",
+    "references": [
+      {
+        "digest": "680e5c3e192a9db03397b696da1e236497782a499e7fe684eadbb705098f63f3",
+        "label": "RU-0161",
+        "path": ".agentdev/backlog/req-units/RU-0161.md"
+      },
+      {
+        "digest": "3c7f7fdfd96a19d06df6f959b26570072c8f299b0e0a0dea898071e3e6bcedf5",
+        "label": "REQ-053",
+        "path": "docs/requirements/REQ-053.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-operation",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0.01,
+        "APPEND": 0.91,
+        "UPDATE": 0.06,
+        "REQ操作なし": 0.02
+      }
+    },
+    {
+      "questionId": "q2-needs-more-confirmation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.12,
+        "false": 0.88
+      }
+    }
+  ],
+  "confidence": 0.88,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-operation",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "q2-needs-more-confirmation",
+        "value": false
+      }
+    ]
+  }
+}
