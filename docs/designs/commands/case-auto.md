@@ -2,7 +2,7 @@
 title: case-auto Design
 status: accepted
 created: 2026-06-21
-updated: "2026-10-04"
+updated: "2026-10-06"
 ---
 <!-- ADF-COVERS(implementation): REQ-015-012 -->
 <!-- ADF-COVERS(implementation): REQ-100-004 -->

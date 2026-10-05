@@ -2,7 +2,7 @@
 title: case-close Design
 status: accepted
 created: 2026-06-21
-updated: "2026-10-05"
+updated: "2026-10-06"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-018, REQ-021-019, REQ-021-022, REQ-021-025 -->

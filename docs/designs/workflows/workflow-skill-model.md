@@ -2,7 +2,7 @@
 title: Workflow Skill Model
 status: accepted
 created: 2026-08-10
-updated: 2026-10-03
+updated: 2026-10-06
 ---
 <!-- ADF-COVERS(implementation): REQ-002-001, REQ-002-002, REQ-002-003, REQ-002-004, REQ-002-017, REQ-002-018, REQ-002-034 -->
 <!-- ADF-COVERS(implementation): REQ-027-001, REQ-027-002, REQ-027-003 -->
