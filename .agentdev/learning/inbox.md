@@ -266,3 +266,19 @@
 - **想定反映先**: agentdev-git-worktree skill（worktree 削除手順の Windows 注意事項）
 - **関連**: Case #3486、PR #3493（merge 6cf02f4c）、AGENTS.md 行動規範（PowerShell 一括 IO 禁止・node fs API 標準手段）
 - **タグ**: `#windows` `#long-path` `#worktree` `#case-close`
+
+## agentdev_gh の全操作が gh exit 66（stderr 空）で失敗し、OpenCode ホスト側の対処が再開条件になる
+
+- **問題事象**: case-open（RU-0162 由来 draft、Root Case 未起票）で Custom Tool agentdev_gh の読み取り・書き込み全操作（issue_list〔同一操作の契約再試行 1 回を含む〕、issue_read、issue_create）が `gh exited with code 66; stderr is empty (non-zero exit with empty stderr may indicate a startup environment failure)` で一律失敗した。書込み操作は代替経路なし（fail-closed）のため Root Case 起票以降の全工程が停止した
+- **発生局面**: case-open STEP-5 冪等検出（読取）と STEP-2 Root Case 起票（書込み）。agentdev_gh 経由の GitHub I/O 全般
+- **検知方法**: Tool 応答の failure detail。セッション側の再現試験では同一の gh 呼出がすべて成功（bash の `gh api`、node spawnSync による `gh repo view`・`gh api`、cmd の `where gh` がいずれも status 0。gh 2.102.0 が PATH 上 `C:\Program Files\GitHub CLI\gh.exe` に存在し、AGENTDEV_GH_REPO・GH_TOKEN・GITHUB_TOKEN は未設定、`.opencode/tools/agentdev-gh/runner-local.ts` の Local 投影は不在で GitHub 実装側と確定）
+- **根本原因**: 未確定（OpenCode プロセス内 plugin ホストの spawn コンテキストに起因する環境差を推定。セッション側からは到達不能）。exit 66・stdout・stderr のいずれも空で、gh の認証失敗・API エラー・PATH 不在の通常の失敗様式（stderr 付き・exit 1/4・spawn ENOENT）のいずれとも一致しない
+- **自律対応内容**: 同一操作の再試行 1 回→別操作（issue_read）での疎通確認→gh CLI 読み取り専用 fallback 契約による冪等検出の完了（既存 Root Case・Definition PR なしを確認）まで実施し、書込みは issue_create の 1 回失敗で停止した（ループ retry 禁止の遵守。書込みの gh CLI 代替は契約禁止）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（Custom Tool 契約・fallback 区分の変更なし）
+- **横展開観点**: 同一の失敗様式（exit 66・空 stderr・全操作共通・セッション側 gh は正常）を検知した場合、同一操作の再試行は 1 回までとし、書込みは即時に停止して OpenCode ホスト側の対処（ホスト再起動による plugin 再初期化）を再開条件にする。読み取りのみの工程であれば gh CLI fallback 契約で継続できる
+- **再発条件**: OpenCode プラグインホストの spawn コンテキストで gh の起動が失敗する環境（同一ホストの全セッションで再現し得る）
+- **予防策候補**: OpenCode ホスト起動時の agentdev_gh 疎通確認（読取 1 操作の起動時確認）と、failure detail への再開手順（ホスト側対処の案内）追記
+- **想定反映先**: agentdev-gh README（失敗分類の診断ガイド）、docs/knowledge/（git 非対話認証知識の隣接領域）
+- **関連**: RU-0162 の case-open（blocked、Root Case 未起票）、入口 commit 96bdec73（draft・Jev 観測の先行永続化済み）
+- **タグ**: `#agentdev-gh` `#opencode` `#fail-closed` `#case-open` `#blocked`
