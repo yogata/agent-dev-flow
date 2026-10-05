@@ -164,3 +164,21 @@
 - **想定反映先**: artifact-contracts.md の req_draft 出力構造（artifact_actions 形式）、case-open Design（適用前検証）
 - **関連**: RU-0161、Issue #3486、PR #3489
 - **タグ**: `#draft-schema` `#target-area` `#artifact-actions` `#case-open`
+
+---
+
+## Definition PR 受入ゲート（yomiyasu 適用記録）の突合が merge 後になった
+
+- **問題事象**: case-ready STEP-1 で Definition PR（#3487）の受入検査（忠実性・整合性・品質検査、isDraft 確認）を実施して merge した後、project-extensions の workflow-extension（case-ready）の acceptance_gates に「Definition PR 差分に docs/** 日本語文章変更を含む場合、yomiyasu 適用記録が PR 上に存在すること。不足時は merge 前差し戻し」があることを検知した。PR 本文・コメントに yomiyasu 適用記録が存在せず、受入ゲートの突合を経由しないまま merge が成立していた
+- **発生局面**: 運用（case-ready STEP-1 の Definition PR 受入）
+- **検知方法**: merge 後の STEP-6 検証ゲートで project-extensions の workflow-extension context を読み込んだ際の acceptance_gates 突合
+- **根本原因**: 受入検査の確認リストを STEP-1 reference（definition-acceptance.md）の3検査と isDraft 確認で構成し、merge 実行より前に project-extensions の acceptance_gates を読む前置確認が case-ready STEP-1 の手順に明示されていなかった。workflow-extension の読み込み位置が「検証ゲート横断依存検査の共有領域解決」のみに紐づいており、ゲート確認のタイミングが受入より後になっていた
+- **自律対応内容**: merge 後のため巻き戻さず、事後補完として対象 Design セクション本文を一時ファイルへ抽出して yomiyasu_lint.py を実行（通常終了コード 0、スコア 95/100、指摘 1 件は ACT-DESIGN-001 合意済み契約構造由来のため保持）、適用記録（対象・実施結果・保持した指摘理由）を PR #3487 へコメント追記して受入ゲートの記録要求を事後充足した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（extension の受入ゲート要求の充足。merge 収録内容の変更なし）
+- **横展開観点**: project-extensions の acceptance_gates は該当 workflow の受入・merge を伴う STEP（case-ready STEP-1 など）の前置確認項目に含める。workflow-extension の解決は共有領域解決だけでなく受入ゲート・rules の読み込み点でもある
+- **再発条件**: docs/** 日本語文章変更を含む Definition PR を case-ready が受入する場合（merge を実行する全 Case）
+- **予防策候補**: case-ready STEP-1 の merge 前確認手順へ「project-extensions の workflow-extension（case-ready）の acceptance_gates 突合」を前置項目として追加する
+- **想定反映先**: case-ready workflow スキル（references/definition-acceptance.md の merge 前確認）、project-extensions 解決手順
+- **関連**: Issue #3484、PR #3487、.agentdev/extensions/skills/agentdev-workflow-case-ready.yaml
+- **タグ**: `#case-ready` `#acceptance-gate` `#project-extensions` `#yomiyasu`
