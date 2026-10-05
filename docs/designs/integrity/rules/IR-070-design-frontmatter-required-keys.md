@@ -2,7 +2,7 @@
 title: "IR-070: design-frontmatter-required-keys"
 status: accepted
 created: 2026-09-20
-updated: 2026-09-20
+updated: 2026-10-05
 ---
 
 # IR-070: design-frontmatter-required-keys
@@ -15,7 +15,7 @@ updated: 2026-09-20
 | category | document-drift |
 | detection_method | `check_design_frontmatter.ts`（repo-local 独立 checker）による走査。(1) `docs/designs/**/*.md` を `globWalkRel`（node:fs glob 共有ヘルパー）で列挙し、列挙件数と検査対象・対象外の件数整合を report に含める（二重確認）。(2) 除外規定（README.md、`references/` / `audits/` / `baselines/` 配下、`baseline_for` / `audit_for` 信号キー保持ファイル）を適用する。(3) frontmatter ブロック抽出と ISO 8601 日付妥当性は Knowledge frontmatter 検査（`check_knowledge_docs.ts`）と同一実装を import して用いる（REQ-010-062: 既存 checker 規則からの期待値導出）。(4) 必須キー（`title` / `status` / `created` / `updated`）の欠落・空値、クォート剥がし後の日付形式、status 値域、行頭空白付き必須キー行を検出する |
 | affected_artifacts | [docs/designs/**/*.md] |
-| related_req | [REQ-010-062, REQ-010-068, REQ-010-070] |
+| related_req | [REQ-010-062, REQ-010-068, REQ-010-080] |
 | related_design | [../checker-execution-contracts.md, ../integrity-rule-catalog.md, ../../foundations/patterns.md] |
 | gate_level | full-audit |
 | false_positive_risk | 低。検出対象は frontmatter 構造（機械的パターンマッチ）。`README.md`（Design インデックス）と `references/` 配下（親 Design の補助資料で Design 索引の独立行対象外）は Design 文書として独立管理されないため対象外（対象範囲判定は checker の `isExcludedDesignFile`）。YAML フロースカラーの引用符付き日付値（Design corpus の正規運用）は引用符を剥がした値で検査するため誤検出しない。`updated >= created` の順序比較は正典の検出列挙（キー欠落・キー名欠落・値形式不正）に含まれないため本ルールの検出対象外とする |

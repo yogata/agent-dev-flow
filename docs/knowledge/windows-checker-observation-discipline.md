@@ -13,7 +13,7 @@ Windows Git Bash 経由で checker・検証コマンドを実行・観測する�
 1. **終了コードの取得**: `cmd | tail; echo $?` の `$?` はパイプ最終コマンド（tail）の終了コードを返し、checker の exit 1 を exit 0 と誤読する。終了コードはパイプなし実行、または `PIPESTATUS`（bash）で取得する
 2. **stdout / stderr の分離取得**: `2>&1` による結合で stderr の git fatal（履歴再作成ファイル起因の `sha^:path` 参照エラー等）が JSON 先頭に混入しパース失敗する。stdout をファイル退避し、stderr は別ファイルへ分離取得する（統合キャプチャに起因する JSON パース失敗の詳細は [checker-cli-stdout-loss-on-windows-bun.md](checker-cli-stdout-loss-on-windows-bun.md) が所有する）
 3. **`--root` 系引数のパス形式**: `$(pwd)` 展開の MSYS 形式パス（`/c/...`）を渡すと対象解決が空振りする。Windows 形式絶対パス（`C:/...` forward slash 記法）を直書きする（MSYS 形式パスの破損機構と推奨記法の詳細は [windows-checker-msys-path-argument.md](windows-checker-msys-path-argument.md) が所有する）
-4. **検査対象 0 件の合格の区別**: 検査対象 0 件での PASS（0 inspected PASS 等）は検査不能であり品質確認として扱わない。検査対象件数を合格記録に含め、0 件を検出する
+4. **検査対象 0 件の合格の区別**: 検査対象 0 件での PASS（0 inspected PASS 等）は検査不能であり品質確認として扱わない。検査対象件数を合格記録に含め、0 件を検出する。実装側契約も 0 inspected を異常扱いとする方向へ統一されている（textlint gate は対象解決 0 件を不合格〔fail-closed〕とする。手順規律側の本項は観測者が 0 件を検出・記録することを要求し、実装側契約は gate 自身が 0 件を合格扱いにしないことで両面から fail-open を防止する）
 
 ## 適用条件
 

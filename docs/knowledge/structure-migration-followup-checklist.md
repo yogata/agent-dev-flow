@@ -11,6 +11,8 @@ src/opencode から src/common への構造移設・原本移設では、移設�
 1. **3点セット同時変更**: 検査基盤の走査先変更は (a) baseline 期待値、(b) 除外定義、(c) 検査文言・メッセージの 3 点を同時に変更する
 2. **横断旧パス検索**: 移設完了判定は src 配下に加え scripts 配下（scripts/self 等）を含む横断検索で旧パス残存 0 件を確認する。検索語はパス区切りのバリエーション（`src/opencode`・`src\\opencode`・`opencode/skills` 等）を網羅する（TS-011 の教訓を含む。主要な区切り形式 2-3 種に限定して実行コストとバランスを取ってもよい）
 3. **移設後の全層テスト実行**: src テストに加え scripts 配下テスト・fixture を含む全実行で追随を確認する
+4. **期待値更新観点（配布物 references 編集前の事前 grep）**: 配布物（src/common/skills/**、src/common/commands/**、templates 等）の references 本文を編集する前に、変更対象行の文言を grep し、期待値結合テスト（pin 型: 文言・節見出しの完全一致を期待値に持つテスト、anchor 型: 正規表現等で文言の一部を検証するテスト）の有無を事前確認する。検出されたテストは同一 PR で期待値を追随更新し、未追随の pin 型テストを残さない。事前確認の実施記録（検出 0 件確認または検出テスト一覧と追随更新の別）を検証記録へ残す。変更対象行の文言を grep して期待値結合テストの有無を事前確認する前置は、case-run（STEP-S3）と case-ready（execution contract 確定時の test strategy 投影）の手順から参照する
+5. **bun test と typecheck の併用観点**: bun test の pass は型整合を保証しないため、配布物（.ts・型定義を含む成果物）を変更する場合は bun test に加えて typecheck（tsc --noEmit、対象 package 配下を cwd）を併用して型不整合の検出漏れを防ぐ。併用指針の正は checker 実行契約 Design（checker 実行契約と検出基盤規則）「bun test と typecheck の併用指針」節であり、本項は観点の記録位置である
 
 ## 適用条件
 
@@ -22,6 +24,8 @@ src/opencode から src/common への構造移設・原本移設では、移設�
 1. 移設に伴い baseline・除外定義・検査文言を同一変更に含める
 2. src + scripts 横断で旧パス検索（区切り形式バリエーション含む）を行い残存 0 件を確認する
 3. src テスト・scripts 配下テスト・fixture の全層実行で追随を確認する
+4. 配布物 references 編集前に変更対象行の文言を grep し、期待値結合テスト（pin 型・anchor 型）の有無を事前確認する。検出されたテストは同一 PR で期待値を追随更新する
+5. 配布物の .ts・型定義を含む変更では bun test に typecheck（tsc --noEmit、対象 package 配下を cwd）を併用する
 
 ## 留意点
 
@@ -43,7 +47,7 @@ src/opencode から src/common への構造移設・原本移設では、移設�
 ## 根拠
 
 - 出典 3 件（Case #3316・PR #3326/#3327/#3332）の連続実証: 単一層の更新では追随漏れが残り、src テストの green は追随完了の証拠にならない
-- pin 型テスト群の期待値更新観点・bun test と typecheck の併用観点は要件化経路（req-define）での追加候補として記録されている（backlog-review 2026-10-05・RU-0014）
+- pin 型テスト群の期待値更新観点・bun test と typecheck の併用観点は backlog-review 2026-10-05（RU-0014）で記録され、Case #3462 で本チェックリストへ反映済み（知識内容 4・5 項、手順 4・5 項）
 
 ## 関連知識
 

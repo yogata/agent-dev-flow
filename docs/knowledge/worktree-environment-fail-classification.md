@@ -53,4 +53,4 @@ case-run/case-close の worktree 実行では、git 管理外の投影・生成�
 - [worktree-preexisting-violation-main-crosscheck.md](worktree-preexisting-violation-main-crosscheck.md)（main root 対照・突合の個別手順）
 - [qg4-baseline-detached-worktree-reproduction.md](qg4-baseline-detached-worktree-reproduction.md)（baseline detached worktree 再現・3点確認の個別手順）
 - [windows-bun-test-spawn-timeout-classification.md](windows-bun-test-spawn-timeout-classification.md)（timeout 由来 fail との切り分け・対照実行の標準手順）
-- checker 実行契約（docs/designs/integrity/checker-execution-contracts.md）worktree fallback 節（backlog-review 2026-10-05 時点では相互参照は本文書側のみ。Design 側への相互参照追記は要件化経路〔RU-0009〕での接続候補とする）
+- checker 実行契約（docs/designs/integrity/checker-execution-contracts.md）worktree fallback 節（Design 側 fallback 節も環境差の由来分離・明示記録の運用として本文書を参照しており、両方向の相互参照が成立している。qg-4-final-acceptance.md「bun test フル suite 正規形（実行形態契約）」節からも本項への参照が接続されている〔Case #3462〕）

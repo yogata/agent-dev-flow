@@ -16,6 +16,10 @@ import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "fs";
 import { join, relative } from "path";
 import { findRepoRoot } from "./cli_utils.ts";
+import {
+  DEFAULT_EXCLUDE_DIR_PATHS,
+  enumerateCorpusFiles,
+} from "../../../../src/common/skills/agentdev-traceability/scripts/lib/corpus.ts";
 
 const SCRIPT_DIR = import.meta.dir;
 const REPO_ROOT = findRepoRoot(SCRIPT_DIR);
@@ -155,7 +159,12 @@ function walkFiles(dir: string, exts: readonly string[], out: string[] = []): st
 }
 
 function corpusFiles(): string[] {
-  const docs = walkFiles(join(REPO_ROOT, "docs"), [".md"]);
+  const docs = enumerateCorpusFiles(REPO_ROOT, {
+    extensions: [".md"],
+    excludeDirPaths: DEFAULT_EXCLUDE_DIR_PATHS,
+  })
+    .filter((file) => file.startsWith("docs/"))
+    .map((file) => join(REPO_ROOT, file));
   const scripts = walkFiles(SCRIPT_DIR, [".ts"]);
   return [...docs, ...scripts];
 }

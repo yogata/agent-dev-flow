@@ -38,6 +38,7 @@ execution contract 確定時に、Definition の対象要件行と受け入れ�
 - document、Skill、Command の各変更に対し、それぞれ文書品質査読能力、Skill 品質査読能力、Command 品質能力に相当する必須検証を事前確定する。同一成果物が複数能力を必要とする場合は全て展開する
 - 関連 Decision の拘束条件を確定前に特定し、必要な制約を完了条件または test strategy へ反映する
 - 予定変更内容から事前判定可能な追加検証条件（関数削除時の全利用箇所検査等）を test strategy へ展開する
+- 配布物 references（`src/common/skills/**`、`src/common/commands/**`、templates 等）の本文編集を含む変更では、変更対象行の文言の事前 grep による期待値結合テスト（pin 型・anchor 型）の有無確認と、検出テストの同一 PR 追随更新を test strategy の検証項目へ展開する前置観点として反映する。bun test と typecheck の併用（.ts・型定義を含む変更での併用検証）も同様に反映する。観点の正は docs/knowledge/structure-migration-followup-checklist.md「期待値更新観点・bun test と typecheck の併用観点」と checker 実行契約 Design「bun test と typecheck の併用指針」節であり、本 STEP は test strategy への投影のみを扱う
 
 ## 検証義務と検証手段の区別記録
 

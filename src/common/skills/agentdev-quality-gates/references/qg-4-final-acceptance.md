@@ -331,6 +331,10 @@ bun test ./.opencode/plugins/ ./scripts/ >stdout-3.log 2>stderr-3.log
 
 - **worktree での分割③ 対象欠落の環境差**: worktree では `.opencode/plugins` の junction 未伝播により、分割③の対象（plugins）が実行対象から欠落し得る。この環境差を隠蔽せず、実行記録から実施範囲を判別できるように扱う。件数突合（「Ran N tests across M files」の N/M 件数）と環境ラベル（実行環境、junction 伝播状態）の双方から分割③の実施範囲（plugins 分割の実施・未実施の別）を判別可能に記録し、plugins 分割が未実施の場合は未実行対象を実行済みとして扱わない。plugins 分割を代替する検証手順（main root からの読取専用実行等）を運用する場合は、実在を確認した実行コマンド・手順のみを用い、実在確認していない CLI option を正規手順として固定しない
 
+- **worktree 環境での checker 実行 fallback（junction 投影構成前置・zero-targets 無効分類・main root 切替）**: worktree 環境で `.opencode/skills/*` junction を前提とする検査を実行する場合の fallback 手順（fallback 判定、temp 領域への junction 投影構成を前置手順として実施してから検査、投影構成を作業 worktree へ適用しない）と、fallback 経路で検査対象が 0 件（zero-targets）に解決された場合の無効分類（検査を実施していない無効実行として記録し、合格として扱わない）、main root での再実行へ切替える条件（投影構成不能・fallback で検査対象が空・結果の信頼性が確保できない場合に main root 実体 + `--root` 明示指定の読取専用再実行へ切替）は checker 実行契約 Design（checker 実行契約と検出基盤規則）「worktree 環境での checker 実行 fallback（junction 未伝播時の SoT 直参照）」節が正であり、本 reference は参照のみを行う（実行条件の二重定義をしない）
+
+- **環境差 fail の由来分離手順**: worktree 環境差に起因する fail・未実施の由来分離（main root 対照実行、baseline 再現、同一条件実行の3手段）と明示記録の運用は、docs/knowledge/worktree-environment-fail-classification.md を参照する。本節の「fail 由来分類」と併用する
+
 - **依存パッケージ前置**: フル suite 実行の前に、正規テストが参照する package 境界（後述の対象ディレクトリ集合の両方）ごとに、必要な依存が解決可能な状態であること。本前置は `bun install` の実施そのものではなく依存解決状態を要求する契約であり、依存解決済みの正規環境を `bun install` 未実施であることのみを理由に fail としない。依存整備の要否をリポジトリルートの package.json / node_modules の有無のみで判定しない。node_modules は gitignore 対象のため worktree へ未伝播であり、依存未解決のまま実行した場合は integrity suite・分割② の一部テストが依存解決失敗で fail する
 
   依存が未解決の場合の正規整備手段は次の2つであり、フル suite 正規形・bun test 単独実行の別を問わず同一の許容手段を適用する（`agentdev-git-worktree` の worktree 構造的制約と同じ許容手段・適用範囲）:
@@ -351,6 +355,7 @@ bun test ./.opencode/plugins/ ./scripts/ >stdout-3.log 2>stderr-3.log
 - **bun test 単独実行・ファイル単体指定の実行形態契約**: フル suite 正規形以外の bun test 実行（単独実行・ファイル単体指定を含む）の実行形態一般規約（repo root 起 cwd 統一、`./` 付きパス指定、逸脱時の検知条件）は、checker 実行契約 Design（checker 実行契約と検出基盤規則）「bun test 実行形態契約（単独実行・ファイル単体指定を含む）」節が所有する
 
 - **Bun 依存 checker の実行経路**: integrity 検査の checker スクリプトを bun test の枠組み外で個別実行する場合は、Bun ランタイム API（Bun.YAML 等）に依存する checker を bun 経路で実行する。実行経路の使い分けの正契約は checker 実行契約 Design（checker 実行契約と検出基盤規則）「安定実行経路」節が所有する
+- **実行形態規律（集約）の参照**: tsc（typecheck）は対象 package 配下を cwd として実行する、bun test は worktree root を cwd とし `./` 付きパス指定で実行する、worktree 再作成後は bun install を前置する（依存パッケージの未伝播対策）、分割実行②の対象で未収録の配置（tools 等）がないかを実行前に確認する、checker の ESM 互換性は個別差があるため実行不能な checker は bun 経由（モジュール import）へ切替える — の集約契約は checker 実行契約 Design「bun test 実行形態契約（単独実行・ファイル単体指定を含む）」節の「実行形態規律（集約）」が正であり、本 reference は参照のみを行う
 
 - **timeout 明示指定**: bun test フル suite 全体実行を含む検証の実行指示は、実行 timeout を明示指定する。全体実行の実測所要時間は既定 timeout を超え得るため、**300〜600 秒の指定を標準**とする。timeout 未指定（既定値での打ち切り）で全体実行を打ち切った結果を fail 証跡として扱わない
 - **件数突合**: 各実行結果の「Ran N tests across M files」の N/M 件数突合を行う。bun test はテスト結果サマリー（`Ran N tests across M files` 等の件数サマリー）を stderr へ出力するため、突合の根拠は stderr 側の退避ファイルとする。直前実績と比較して件数が急減していないかの妥当性を検証する（固定値の期待値化は行わない）

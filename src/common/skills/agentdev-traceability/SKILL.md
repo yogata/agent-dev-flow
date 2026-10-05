@@ -69,7 +69,7 @@ description: Requirement-artifact traceability (coverage, impact, check) resolvi
 | 入力 | argv（`--root`, `--req`, `--artifact`） |
 | 出力 | stdout に JSON |
 | エラー | 非ゼロ終了コード + stderr にエラーメッセージ（check は検査 fail ありで終了コード 2） |
-| 走査 | `--root` 配下の正規成果物を直接走査（拡張子 `.md` / `.ts`。`.git`、`.agentdev`、`.agentdev-plugin`、`.worktrees`、`node_modules` を除外） |
+| 走査 | `--root` 配下の正規成果物を直接走査（拡張子 `.md` / `.ts`。`.git`、`.agentdev`、`.agentdev-plugin`、`.worktrees`、`node_modules` を除外。`docs/reports/` 配下は履歴記録領域として除外〔checker 実行契約 Design「検出対象除外規定」〕） |
 
 ### 公開操作契約（スクリプト一覧）
 
