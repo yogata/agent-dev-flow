@@ -43,7 +43,7 @@ import {
   localStatusValues,
   localTerminalStatuses,
   type LocalIssueFrontmatter,
-} from "../../../../../src/opencode-local/agentdev-gh/runner-local.ts";
+} from "../../../../../src/common/tools/agentdev-gh/local/runner-local.ts";
 
 const TEMP_BASE = path.join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `issue-tracking-2437-${crypto.randomUUID().slice(0, 8)}`;
@@ -418,6 +418,7 @@ describe("ローカルIssueの role 条件付きスキーマ（単一採番空�
     expect([...localStatusValues("tracking")]).toHaveLength(6);
     expect([...localStatusValues("case")]).toEqual([
       "open",
+      "ready",
       "running",
       "blocked",
       "review",
@@ -605,7 +606,7 @@ describe("ローカルIssueの role 条件付きスキーマ（単一採番空�
 describe("上位層の Tool 操作契約経由（直接読み書きなし）", () => {
   const DIST_ROOTS = [
     path.join("src", "common", "skills"),
-    path.join("src", "opencode", "commands"),
+    path.join("src", "common", "commands"),
   ];
   const FORBIDDEN = [
     "agentdev-tracking-status/",
