@@ -609,6 +609,174 @@ function buildInvalidFixture(root: string): void {
 const VALID_ROOT = join(TEMP_ROOT, "valid");
 const INVALID_ROOT = join(TEMP_ROOT, "invalid");
 
+// ─── check_integrity 実行結果の共有構造（テストスイート内の結果共有契約） ─────
+// 同一ルート・同一実効引数・同一入力状態（固定データ・宣言的定義・baseline 等）の
+// 検査群は、検査器起動を1回に集約し、その結果を各条件ごとの明示的な結果変数で
+// 共有する。実行をまたぐ永続キャッシュや汎用キャッシュ基盤は作らない。
+// - 各ゲッターは遅延初期化する。選択実行時は当該テスト自身の呼出しで初期化が行われ、
+//   他テストの先行実行に依存しない（ファイル単体指定の実行契約維持）。
+// - loadCheckRun は起動失敗（exitCode=-1）と空の stdout を明確な失敗として投げる。
+//   空の結果や既定値で成功扱いにしない。JSON 解釈は各テストの既存確認が担う。
+// - 共有結果は各テストから参照のみを行い、書き換えて他の確認を汚染しない。
+// - 状態変更を伴う試験（baseline 更新・入力編集・引数差・出力形式差・レポート保存等）
+//   は共有結果へ混ぜず、runScript 直接起動で変更後に新しく検査する。
+// - 共有経由の起動は checkInvocationLog に記録する（同一テスト実行内のみの記録）。
+
+const checkInvocationLog: string[] = [];
+
+function loadCheckRun(cwd: string, args: string[]): RunResult {
+  checkInvocationLog.push(`${cwd} :: ${args.join(" ")}`);
+  const r = runScript(cwd, args);
+  if (r.exitCode === -1) {
+    throw new Error(
+      `check_integrity の起動に失敗しました (exitCode=-1): cwd=${cwd}, args=${args.join(" ")}`,
+    );
+  }
+  if (r.stdout.length === 0) {
+    throw new Error(
+      `check_integrity が空の結果を返しました（明確な失敗として扱う）: cwd=${cwd}, args=${args.join(" ")}`,
+    );
+  }
+  return r;
+}
+
+// 対象群: VALID_ROOT + ["--json"]（--json output schema、valid fixture、
+// Capture boundary の valid 系、--classification 省略確認）。
+let validJsonRun: RunResult | undefined;
+function getValidJsonRun(): RunResult {
+  if (validJsonRun === undefined) validJsonRun = loadCheckRun(VALID_ROOT, ["--json"]);
+  return validJsonRun;
+}
+
+// 対象群: INVALID_ROOT + ["--json"]（invalid fixture 検出群、Capture boundary の invalid 系）。
+let invalidJsonRun: RunResult | undefined;
+function getInvalidJsonRun(): RunResult {
+  if (invalidJsonRun === undefined) invalidJsonRun = loadCheckRun(INVALID_ROOT, ["--json"]);
+  return invalidJsonRun;
+}
+
+// 対象群: VALID_ROOT + ["--classification", "--json"]（Classification Policy 確認群）。
+let validClassificationJsonRun: RunResult | undefined;
+function getValidClassificationJsonRun(): RunResult {
+  if (validClassificationJsonRun === undefined) {
+    validClassificationJsonRun = loadCheckRun(VALID_ROOT, ["--classification", "--json"]);
+  }
+  return validClassificationJsonRun;
+}
+
+// 対象群: IR-044 fixture + ["--json"]（検出・exemption 確認群）。
+let ir044JsonRun: RunResult | undefined;
+function getIr044JsonRun(): RunResult {
+  if (ir044JsonRun === undefined) ir044JsonRun = loadCheckRun(IR044_ROOT, ["--json"]);
+  return ir044JsonRun;
+}
+
+// 対象群: IR-053 fixture + ["--json"]（検出・code block exemption 確認群）。
+let ir053JsonRun: RunResult | undefined;
+function getIr053JsonRun(): RunResult {
+  if (ir053JsonRun === undefined) ir053JsonRun = loadCheckRun(IR053_ROOT, ["--json"]);
+  return ir053JsonRun;
+}
+
+// 対象群: IR-055 fixture + ["--json"] の不変状態での検出・exemption・分類確認群。
+// baseline 再生成を伴う試験（状態変更試験）は対象外で、変更後に新しく検査する。
+let ir055InvariantJsonRun: RunResult | undefined;
+function getIr055InvariantJsonRun(): RunResult {
+  if (ir055InvariantJsonRun === undefined) ir055InvariantJsonRun = loadCheckRun(IR055_ROOT, ["--json"]);
+  return ir055InvariantJsonRun;
+}
+
+// 対象群: IR-058 fixture（skills.yaml あり）+ ["--json"]（検出・carve-out 確認群）。
+let ir058JsonRun: RunResult | undefined;
+function getIr058JsonRun(): RunResult {
+  if (ir058JsonRun === undefined) ir058JsonRun = loadCheckRun(IR058_ROOT, ["--json"]);
+  return ir058JsonRun;
+}
+
+// 対象群: NG baseline 初期状態（seed baseline 2 件）+ ["--json"] の集計・分類確認群
+// （TS-003 / TS-005）。--update-ng-baseline 実行後の再検査は状態変更後の新規検査として
+// runScript 直接起動を維持する。
+let ngbaselineInitialJsonRun: RunResult | undefined;
+function getNgbaselineInitialJsonRun(): RunResult {
+  if (ngbaselineInitialJsonRun === undefined) {
+    ngbaselineInitialJsonRun = loadCheckRun(NGBASELINE_ROOT, ["--json"]);
+  }
+  return ngbaselineInitialJsonRun;
+}
+
+// 対象群: 実リポジトリ回帰4確認（IR-055 実修復回帰2件、NG21 N16/N17 2件）。
+// 同一ルート（REPO_ROOT_FROM_SCRIPT_DIR）・同一実効引数（["--json"]）・同一入力状態
+// （実リポジトリ）を1回だけ検査する。
+let realRepoJsonRun: RunResult | undefined;
+function getRealRepoJsonRun(): RunResult {
+  if (realRepoJsonRun === undefined) realRepoJsonRun = loadCheckRun(REPO_ROOT_FROM_SCRIPT_DIR, ["--json"]);
+  return realRepoJsonRun;
+}
+
+// 対象群: IR-063 fixture + ["--json"]（正常例・違反例・許容例・再現例確認群）。
+let ir063JsonRun: RunResult | undefined;
+function getIr063JsonRun(): RunResult {
+  if (ir063JsonRun === undefined) ir063JsonRun = loadCheckRun(IR063_ROOT, ["--json"]);
+  return ir063JsonRun;
+}
+
+// 対象群: IR-064 fixture + ["--json"]（正常例・違反例・許容例・再現例確認群）。
+let ir064JsonRun: RunResult | undefined;
+function getIr064JsonRun(): RunResult {
+  if (ir064JsonRun === undefined) ir064JsonRun = loadCheckRun(IR064_ROOT, ["--json"]);
+  return ir064JsonRun;
+}
+
+// 対象群: IR-065 fixture + ["--json"]（検出・境界・許容・再現例確認群）。
+let ir065JsonRun: RunResult | undefined;
+function getIr065JsonRun(): RunResult {
+  if (ir065JsonRun === undefined) ir065JsonRun = loadCheckRun(IR065_ROOT, ["--json"]);
+  return ir065JsonRun;
+}
+
+// 対象群: IR-065 space-normalized fixture + ["--json"]（検出・報告・境界・許容例確認群）。
+let ir065SpaceJsonRun: RunResult | undefined;
+function getIr065SpaceJsonRun(): RunResult {
+  if (ir065SpaceJsonRun === undefined) ir065SpaceJsonRun = loadCheckRun(IR065_SPACE_ROOT, ["--json"]);
+  return ir065SpaceJsonRun;
+}
+
+// 対象群: IR-066 vocabulary extension fixture + ["--json"]（正常・違反・境界・許容例確認群）。
+let ir066ExtJsonRun: RunResult | undefined;
+function getIr066ExtJsonRun(): RunResult {
+  if (ir066ExtJsonRun === undefined) ir066ExtJsonRun = loadCheckRun(IR066EXT_ROOT, ["--json"]);
+  return ir066ExtJsonRun;
+}
+
+// 対象群: IR-066 docs legacy-path 違反 fixture + ["--json"]（正常・違反・境界・許容・
+// 再現例確認群）。正常 0 件 fixture（IR066DOCS_OK_ROOT）は入力が異なるため対象外。
+let ir066DocsJsonRun: RunResult | undefined;
+function getIr066DocsJsonRun(): RunResult {
+  if (ir066DocsJsonRun === undefined) ir066DocsJsonRun = loadCheckRun(IR066DOCS_ROOT, ["--json"]);
+  return ir066DocsJsonRun;
+}
+
+// 対象群: IR-067 fixture + ["--json"]（正常・違反・境界・許容・再現例確認群）。
+let ir067JsonRun: RunResult | undefined;
+function getIr067JsonRun(): RunResult {
+  if (ir067JsonRun === undefined) ir067JsonRun = loadCheckRun(IR067_ROOT, ["--json"]);
+  return ir067JsonRun;
+}
+
+// 対象群: IR-053 exemption paths（RA-001）fixture + ["--json"]（skip・検出継続確認群）。
+let ra001JsonRun: RunResult | undefined;
+function getRa001JsonRun(): RunResult {
+  if (ra001JsonRun === undefined) ra001JsonRun = loadCheckRun(RA001_ROOT, ["--json"]);
+  return ra001JsonRun;
+}
+
+// 対象群: IR-072 fixture（git 履歴 fixture）+ ["--json"] の freshness 確認群。
+let ir072JsonRun: RunResult | undefined;
+function getIr072JsonRun(): RunResult {
+  if (ir072JsonRun === undefined) ir072JsonRun = loadCheckRun(IR072_ROOT, ["--json"]);
+  return ir072JsonRun;
+}
+
 beforeAll(() => {
   mkdirp(VALID_ROOT);
   mkdirp(INVALID_ROOT);
@@ -651,7 +819,7 @@ describe("check_integrity.ts --dry-run", () => {
 
 describe("check_integrity.ts --json output schema", () => {
   it("produces valid JSON with expected top-level keys", () => {
-    const r = runScript(VALID_ROOT, ["--json"]);
+    const r = getValidJsonRun();
     const parsed = JSON.parse(r.stdout);
     expect(parsed).toHaveProperty("timestamp");
     expect(parsed).toHaveProperty("script");
@@ -674,18 +842,18 @@ describe("check_integrity.ts --json output schema", () => {
 //   本テストファイルの fixture が最新 check_integrity.ts ルールに追従することを検証する。
 describe("valid fixture (all checks pass or info-only)", () => {
   it("exits with code 0", () => {
-    const r = runScript(VALID_ROOT, ["--json"]);
+    const r = getValidJsonRun();
     expect(r.exitCode).toBe(0);
   });
 
   it("has zero ng results", () => {
-    const r = runScript(VALID_ROOT, ["--json"]);
+    const r = getValidJsonRun();
     const parsed = JSON.parse(r.stdout);
     expect(parsed.summary.ng).toBe(0);
   });
 
   it("REQ frontmatter-filename check passes", () => {
-    const r = runScript(VALID_ROOT, ["--json"]);
+    const r = getValidJsonRun();
     const parsed = JSON.parse(r.stdout);
     const check = parsed.results.find(
       (res: { check: string; category: string }) =>
@@ -696,7 +864,7 @@ describe("valid fixture (all checks pass or info-only)", () => {
   });
 
   it("REQ required-fields check passes", () => {
-    const r = runScript(VALID_ROOT, ["--json"]);
+    const r = getValidJsonRun();
     const parsed = JSON.parse(r.stdout);
     const check = parsed.results.find(
       (res: { check: string; category: string }) =>
@@ -707,7 +875,7 @@ describe("valid fixture (all checks pass or info-only)", () => {
   });
 
   it("REQ readme-index-sync check passes", () => {
-    const r = runScript(VALID_ROOT, ["--json"]);
+    const r = getValidJsonRun();
     const parsed = JSON.parse(r.stdout);
     const check = parsed.results.find(
       (res: { check: string; category: string }) =>
@@ -718,7 +886,7 @@ describe("valid fixture (all checks pass or info-only)", () => {
   });
 
   it("ADR cross-reference check passes", () => {
-    const r = runScript(VALID_ROOT, ["--json"]);
+    const r = getValidJsonRun();
     const parsed = JSON.parse(r.stdout);
     const check = parsed.results.find(
       (res: { check: string; category: string }) =>
@@ -729,7 +897,7 @@ describe("valid fixture (all checks pass or info-only)", () => {
   });
 
   it("designs existence check passes", () => {
-    const r = runScript(VALID_ROOT, ["--json"]);
+    const r = getValidJsonRun();
     const parsed = JSON.parse(r.stdout);
     const specResults = parsed.results.filter(
       (res: { category: string }) => res.category === "Designs",
@@ -743,18 +911,18 @@ describe("valid fixture (all checks pass or info-only)", () => {
 
 describe("invalid fixture detects violations", () => {
   it("exits with code 1 (NG)", () => {
-    const r = runScript(INVALID_ROOT, ["--json"]);
+    const r = getInvalidJsonRun();
     expect(r.exitCode).toBe(1);
   });
 
   it("has at least one ng result", () => {
-    const r = runScript(INVALID_ROOT, ["--json"]);
+    const r = getInvalidJsonRun();
     const parsed = JSON.parse(r.stdout);
     expect(parsed.summary.ng).toBeGreaterThan(0);
   });
 
   it("detects REQ id/filename mismatch (REQ-0002 has id REQ-9999)", () => {
-    const r = runScript(INVALID_ROOT, ["--json"]);
+    const r = getInvalidJsonRun();
     const parsed = JSON.parse(r.stdout);
     const mismatch = parsed.results.find(
       (res: { check: string; message: string }) =>
@@ -767,7 +935,7 @@ describe("invalid fixture detects violations", () => {
   });
 
   it("detects missing required fields (REQ-0003)", () => {
-    const r = runScript(INVALID_ROOT, ["--json"]);
+    const r = getInvalidJsonRun();
     const parsed = JSON.parse(r.stdout);
     const missingFields = parsed.results.find(
       (res: { check: string; message: string; file?: string }) =>
@@ -780,7 +948,7 @@ describe("invalid fixture detects violations", () => {
   });
 
   it("detects phantom README index entry (REQ-0099)", () => {
-    const r = runScript(INVALID_ROOT, ["--json"]);
+    const r = getInvalidJsonRun();
     const parsed = JSON.parse(r.stdout);
     const phantom = parsed.results.find(
       (res: { check: string; message: string }) =>
@@ -791,7 +959,7 @@ describe("invalid fixture detects violations", () => {
   });
 
   it("detects REQ file missing from README index", () => {
-    const r = runScript(INVALID_ROOT, ["--json"]);
+    const r = getInvalidJsonRun();
     const parsed = JSON.parse(r.stdout);
     const missing = parsed.results.find(
       (res: { check: string; message: string }) =>
@@ -804,7 +972,7 @@ describe("invalid fixture detects violations", () => {
   });
 
   it("detects ADR referencing non-existent REQ (REQ-0099)", () => {
-    const r = runScript(INVALID_ROOT, ["--json"]);
+    const r = getInvalidJsonRun();
     const parsed = JSON.parse(r.stdout);
     const badRef = parsed.results.find(
       (res: { check: string; message: string }) =>
@@ -815,7 +983,7 @@ describe("invalid fixture detects violations", () => {
   });
 
   it("detects missing design files", () => {
-    const r = runScript(INVALID_ROOT, ["--json"]);
+    const r = getInvalidJsonRun();
     const parsed = JSON.parse(r.stdout);
     const specNg = parsed.results.filter(
       (res: { category: string; level: string }) =>
@@ -825,7 +993,7 @@ describe("invalid fixture detects violations", () => {
   });
 
   it("detects command missing required frontmatter fields", () => {
-    const r = runScript(INVALID_ROOT, ["--json"]);
+    const r = getInvalidJsonRun();
     const parsed = JSON.parse(r.stdout);
     const badCmd = parsed.results.find(
       (res: { check: string; message: string; file?: string }) =>
@@ -841,14 +1009,14 @@ describe("invalid fixture detects violations", () => {
 // REQ-0108-197: Classification Policy test scenarios
 describe("Classification Policy (--classification flag)", () => {
   it("accepts --classification flag without error", () => {
-    const r = runScript(VALID_ROOT, ["--classification", "--json"]);
+    const r = getValidClassificationJsonRun();
     expect(r.exitCode).toBe(0);
     const parsed = JSON.parse(r.stdout);
     expect(parsed.summary).toBeDefined();
   });
 
   it("reports 6 document classifications when --classification is enabled", () => {
-    const r = runScript(VALID_ROOT, ["--classification", "--json"]);
+    const r = getValidClassificationJsonRun();
     const parsed = JSON.parse(r.stdout);
     const classificationCount = parsed.results.find(
       (res: { check: string; category: string }) =>
@@ -861,7 +1029,7 @@ describe("Classification Policy (--classification flag)", () => {
   });
 
   it("verifies report collection directory exists", () => {
-    const r = runScript(VALID_ROOT, ["--classification", "--json"]);
+    const r = getValidClassificationJsonRun();
     const parsed = JSON.parse(r.stdout);
     const reportCollection = parsed.results.find(
       (res: { check: string; category: string }) =>
@@ -872,7 +1040,7 @@ describe("Classification Policy (--classification flag)", () => {
   });
 
   it("verifies DOC-MAP classification instance exists", () => {
-    const r = runScript(VALID_ROOT, ["--classification", "--json"]);
+    const r = getValidClassificationJsonRun();
     const parsed = JSON.parse(r.stdout);
     const docmapCollection = parsed.results.find(
       (res: { check: string; category: string }) =>
@@ -884,7 +1052,7 @@ describe("Classification Policy (--classification flag)", () => {
   });
 
   it("does not run classification checks when --classification is omitted", () => {
-    const r = runScript(VALID_ROOT, ["--json"]);
+    const r = getValidJsonRun();
     const parsed = JSON.parse(r.stdout);
     const classificationResults = parsed.results.filter(
       (res: { category: string }) =>
@@ -905,7 +1073,7 @@ describe("Classification Policy structural verification", () => {
     const expectedClassifications = ["REQ", "Decision", "Design", "Guide", "Report", "DOC-MAP"];
     expect(expectedClassifications.length).toBe(6);
 
-    const r = runScript(VALID_ROOT, ["--classification", "--json"]);
+    const r = getValidClassificationJsonRun();
     const parsed = JSON.parse(r.stdout);
     const countResult = parsed.results.find(
       (res: { check: string; category: string }) =>
@@ -919,7 +1087,7 @@ describe("Classification Policy structural verification", () => {
   });
 
   it("retired ADR references use context-dependent rules", () => {
-    const r = runScript(VALID_ROOT, ["--classification", "--json"]);
+    const r = getValidClassificationJsonRun();
     const parsed = JSON.parse(r.stdout);
     const retiredAdrWarnings = parsed.results.filter(
       (res: { check: string; level: string }) =>
@@ -930,7 +1098,7 @@ describe("Classification Policy structural verification", () => {
 
   it("report documents found in docs/reports/", () => {
     const reportsDir = join(VALID_ROOT, "docs", "reports");
-    const r = runScript(VALID_ROOT, ["--classification", "--json"]);
+    const r = getValidClassificationJsonRun();
     const parsed = JSON.parse(r.stdout);
     const reportResult = parsed.results.find(
       (res: { check: string; category: string }) =>
@@ -944,7 +1112,7 @@ describe("Classification Policy structural verification", () => {
   });
 
   it("false positive suppression for workflow markers", () => {
-    const r = runScript(VALID_ROOT, ["--classification", "--json"]);
+    const r = getValidClassificationJsonRun();
     const parsed = JSON.parse(r.stdout);
     const classificationNg = parsed.results.filter(
       (res: { category: string; level: string }) =>
@@ -956,7 +1124,7 @@ describe("Classification Policy structural verification", () => {
 
 describe("Capture boundary checks", () => {
   it("valid fixture: capture-boundaries-existence check passes", () => {
-    const r = runScript(VALID_ROOT, ["--json"]);
+    const r = getValidJsonRun();
     const parsed = JSON.parse(r.stdout);
     const check = parsed.results.find(
       (res: { check: string; category: string }) =>
@@ -968,7 +1136,7 @@ describe("Capture boundary checks", () => {
   });
 
   it("valid fixture: pr-template-capture-section check passes", () => {
-    const r = runScript(VALID_ROOT, ["--json"]);
+    const r = getValidJsonRun();
     const parsed = JSON.parse(r.stdout);
     const check = parsed.results.find(
       (res: { check: string; category: string }) =>
@@ -982,7 +1150,7 @@ describe("Capture boundary checks", () => {
   it("valid fixture: command-capture-duty checks pass for the remaining specific-duty command (req-save)", () => {
     // Case #2981（DEC-033）: case-run / case-close は duties 表から除去済み（内部
     // lifecycle 段階化）。残る specific-duty command は req-save のみ。
-    const r = runScript(VALID_ROOT, ["--json"]);
+    const r = getValidJsonRun();
     const parsed = JSON.parse(r.stdout);
     const dutyOk = parsed.results.filter(
       (res: { check: string; category: string; level: string }) =>
@@ -994,7 +1162,7 @@ describe("Capture boundary checks", () => {
   });
 
   it("valid fixture: exempt commands (case-open, case-auto) are not checked even without capture-boundaries reference", () => {
-    const r = runScript(VALID_ROOT, ["--json"]);
+    const r = getValidJsonRun();
     const parsed = JSON.parse(r.stdout);
     const exemptResults = parsed.results.filter(
       (res: { check: string; category: string; message: string }) =>
@@ -1007,7 +1175,7 @@ describe("Capture boundary checks", () => {
   });
 
   it("valid fixture: the remaining specific-duty command (req-save) is checked and retired commands are not", () => {
-    const r = runScript(VALID_ROOT, ["--json"]);
+    const r = getValidJsonRun();
     const parsed = JSON.parse(r.stdout);
     const checkedCommands = ["req-save.md"];
     for (const cmd of checkedCommands) {
@@ -1033,7 +1201,7 @@ describe("Capture boundary checks", () => {
   });
 
   it("invalid fixture: capture-boundaries-existence detects missing file", () => {
-    const r = runScript(INVALID_ROOT, ["--json"]);
+    const r = getInvalidJsonRun();
     const parsed = JSON.parse(r.stdout);
     const check = parsed.results.find(
       (res: { check: string; category: string }) =>
@@ -1045,7 +1213,7 @@ describe("Capture boundary checks", () => {
   });
 
   it("invalid fixture: pr-template-capture-section detects old section name", () => {
-    const r = runScript(INVALID_ROOT, ["--json"]);
+    const r = getInvalidJsonRun();
     const parsed = JSON.parse(r.stdout);
     const check = parsed.results.find(
       (res: { check: string; category: string }) =>
@@ -1058,7 +1226,7 @@ describe("Capture boundary checks", () => {
   });
 
   it("invalid fixture: command-capture-duty detects missing reference", () => {
-    const r = runScript(INVALID_ROOT, ["--json"]);
+    const r = getInvalidJsonRun();
     const parsed = JSON.parse(r.stdout);
     const dutyNg = parsed.results.filter(
       (res: { check: string; category: string; level: string; message: string }) =>
@@ -1385,7 +1553,7 @@ describe("IR-044 req-spec-boundary-violation (REQ-0108-259)", () => {
   });
 
   it("detects true positive: Design detail without exemption (enum list)", () => {
-    const r = runScript(IR044_ROOT, ["--json"]);
+    const r = getIr044JsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { check: string; level: string; evidence?: string }) =>
@@ -1397,7 +1565,7 @@ describe("IR-044 req-spec-boundary-violation (REQ-0108-259)", () => {
   });
 
   it("detects true positive: Step number Design detail", () => {
-    const r = runScript(IR044_ROOT, ["--json"]);
+    const r = getIr044JsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { check: string; level: string; evidence?: string }) =>
@@ -1409,7 +1577,7 @@ describe("IR-044 req-spec-boundary-violation (REQ-0108-259)", () => {
   });
 
   it("detects true positive: 手順 N step-reference Design detail", () => {
-    const r = runScript(IR044_ROOT, ["--json"]);
+    const r = getIr044JsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { check: string; level: string; evidence?: string }) =>
@@ -1421,7 +1589,7 @@ describe("IR-044 req-spec-boundary-violation (REQ-0108-259)", () => {
   });
 
   it("does NOT flag META rule declaration line with Step 番号 word (REQ-0136-031 guard)", () => {
-    const r = runScript(IR044_ROOT, ["--json"]);
+    const r = getIr044JsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { check: string; level: string; evidence?: string }) =>
@@ -1433,7 +1601,7 @@ describe("IR-044 req-spec-boundary-violation (REQ-0108-259)", () => {
   });
 
   it("detects true positive: behavior predicate with count rule (REQ-0145-013 guard rejects exemption)", () => {
-    const r = runScript(IR044_ROOT, ["--json"]);
+    const r = getIr044JsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { check: string; level: string; evidence?: string }) =>
@@ -1445,7 +1613,7 @@ describe("IR-044 req-spec-boundary-violation (REQ-0108-259)", () => {
   });
 
   it("does NOT flag behavior predicate without count rule (REQ-0145-012 exemption)", () => {
-    const r = runScript(IR044_ROOT, ["--json"]);
+    const r = getIr044JsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { check: string; level: string; evidence?: string }) =>
@@ -1457,7 +1625,7 @@ describe("IR-044 req-spec-boundary-violation (REQ-0108-259)", () => {
   });
 
   it("does NOT flag META rule line with REQ/Design definitional structure (REQ-0145-012 META exemption)", () => {
-    const r = runScript(IR044_ROOT, ["--json"]);
+    const r = getIr044JsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { check: string; level: string; evidence?: string }) =>
@@ -1469,7 +1637,7 @@ describe("IR-044 req-spec-boundary-violation (REQ-0108-259)", () => {
   });
 
   it("does NOT flag META rule line with 切り出し/配置 declaration (REQ-0145-012 META exemption)", () => {
-    const r = runScript(IR044_ROOT, ["--json"]);
+    const r = getIr044JsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { check: string; level: string; evidence?: string }) =>
@@ -1481,7 +1649,7 @@ describe("IR-044 req-spec-boundary-violation (REQ-0108-259)", () => {
   });
 
   it("does NOT flag META rule line with 委譲 to Design/catalog (REQ-0145-012 META exemption)", () => {
-    const r = runScript(IR044_ROOT, ["--json"]);
+    const r = getIr044JsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { check: string; level: string; evidence?: string }) =>
@@ -1600,7 +1768,7 @@ describe("IR-053 gh-direct-invocation (REQ-0152-001/002)", () => {
   });
 
   it("detects direct gh invocation in prose (true positive)", () => {
-    const r = runScript(IR053_ROOT, ["--json"]);
+    const r = getIr053JsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { check: string; level: string; file?: string }) =>
@@ -1612,7 +1780,7 @@ describe("IR-053 gh-direct-invocation (REQ-0152-001/002)", () => {
   });
 
   it("exempts gh invocation inside fenced code blocks", () => {
-    const r = runScript(IR053_ROOT, ["--json"]);
+    const r = getIr053JsonRun();
     const parsed = JSON.parse(r.stdout);
     const inCodeBlock = parsed.results.filter(
       (res: { check: string; level: string; file?: string }) =>
@@ -1823,7 +1991,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
   });
 
   it("detects strict pattern REQ-NNNN in distribution command file", () => {
-    const r = runScript(IR055_ROOT, ["--json"]);
+    const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
     const hits = parsed.results.filter(
       (res: { check: string; evidence?: string; file?: string }) =>
@@ -1835,7 +2003,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
   });
 
   it("detects strict pattern REQ-NNNN-NNN (sub-item ID)", () => {
-    const r = runScript(IR055_ROOT, ["--json"]);
+    const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
     const hits = parsed.results.filter(
       (res: { check: string; evidence?: string; file?: string }) =>
@@ -1847,7 +2015,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
   });
 
   it("does not report the head token of a 3-digit line reference (OU-003, Issue #2559)", () => {
-    const r = runScript(IR055_ROOT, ["--json"]);
+    const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
     const hits = parsed.results.filter(
       (res: { check: string; evidence?: string }) =>
@@ -1858,7 +2026,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
   });
 
   it("detects strict pattern ADR-NNNN (residual after Decision migration, REQ-025-004)", () => {
-    const r = runScript(IR055_ROOT, ["--json"]);
+    const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
     const hits = parsed.results.filter(
       (res: { check: string; evidence?: string; file?: string }) =>
@@ -1870,7 +2038,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
   });
 
   it("detects strict pattern DEC-NNN (current Decision convention, REQ-025-002)", () => {
-    const r = runScript(IR055_ROOT, ["--json"]);
+    const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
     const hits = parsed.results.filter(
       (res: { check: string; evidence?: string; file?: string }) =>
@@ -1882,7 +2050,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
   });
 
   it("exempts v2:ADR-NNNN historical references (AG-010 protection)", () => {
-    const r = runScript(IR055_ROOT, ["--json"]);
+    const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
     const lineScanned = parsed.results.filter(
       (res: { check: string; evidence?: string; file?: string; line?: number }) =>
@@ -1900,7 +2068,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
   });
 
   it("detects strict pattern obsolete src/opencode/{commands,skills,tools}/", () => {
-    const r = runScript(IR055_ROOT, ["--json"]);
+    const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
     const hits = parsed.results.filter(
       (res: { check: string; evidence?: string; pattern?: string }) =>
@@ -1911,7 +2079,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
   });
 
   it("detects strict pattern /repo/", () => {
-    const r = runScript(IR055_ROOT, ["--json"]);
+    const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
     const hits = parsed.results.filter(
       (res: { check: string; evidence?: string }) =>
@@ -1922,7 +2090,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
   });
 
   it("detects strict pattern repo-* (repo-local skill reference)", () => {
-    const r = runScript(IR055_ROOT, ["--json"]);
+    const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
     const hits = parsed.results.filter(
       (res: { check: string; evidence?: string }) =>
@@ -1933,7 +2101,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
   });
 
   it("detects heuristic pattern docs/designs/", () => {
-    const r = runScript(IR055_ROOT, ["--json"]);
+    const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
     const hits = parsed.results.filter(
       (res: { check: string; evidence?: string }) =>
@@ -1944,7 +2112,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
   });
 
   it("detects heuristic pattern docs/guides/", () => {
-    const r = runScript(IR055_ROOT, ["--json"]);
+    const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
     const hits = parsed.results.filter(
       (res: { check: string; evidence?: string }) =>
@@ -1955,7 +2123,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
   });
 
   it("detects heuristic pattern main-repo GitHub URL", () => {
-    const r = runScript(IR055_ROOT, ["--json"]);
+    const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
     const hits = parsed.results.filter(
       (res: { check: string; evidence?: string }) =>
@@ -1966,7 +2134,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
   });
 
   it("detects heuristic pattern line-number ref (file.md#L<N>)", () => {
-    const r = runScript(IR055_ROOT, ["--json"]);
+    const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
     const hits = parsed.results.filter(
       (res: { check: string; evidence?: string }) =>
@@ -1977,7 +2145,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
   });
 
   it("classifies strict patterns with finding_level=strict", () => {
-    const r = runScript(IR055_ROOT, ["--json"]);
+    const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
     const strictHit = parsed.results.find(
       (res: { check: string; evidence?: string; finding_level?: string }) =>
@@ -1989,7 +2157,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
   });
 
   it("classifies heuristic patterns with finding_level=heuristic", () => {
-    const r = runScript(IR055_ROOT, ["--json"]);
+    const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
     const heuristicHit = parsed.results.find(
       (res: { check: string; evidence?: string; finding_level?: string }) =>
@@ -2001,7 +2169,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
   });
 
   it("emits all 5 report fields (file, line, evidence, expected, route) for violations", () => {
-    const r = runScript(IR055_ROOT, ["--json"]);
+    const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { check: string; level: string }) =>
@@ -2019,7 +2187,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
   });
 
   it("emits new (non-baseline) violations at warn/ng level (delta guard fail)", () => {
-    const r = runScript(IR055_ROOT, ["--json"]);
+    const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
     // No baseline file exists in this fixture → all violations are "new".
     const newViolations = parsed.results.filter(
@@ -2042,7 +2210,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
   });
 
   it("exempts REQ ID references inside fenced code blocks", () => {
-    const r = runScript(IR055_ROOT, ["--json"]);
+    const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
     const inCodeBlock = parsed.results.filter(
       (res: { check: string; evidence?: string; file?: string }) =>
@@ -2054,7 +2222,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
   });
 
   it("exempts template placeholder lines ({NNNN} style)", () => {
-    const r = runScript(IR055_ROOT, ["--json"]);
+    const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
     const placeholderHits = parsed.results.filter(
       (res: { check: string; file?: string }) =>
@@ -2065,7 +2233,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
   });
 
   it("reports concrete references on placeholder-bearing lines (CR-002 narrowing)", () => {
-    const r = runScript(IR055_ROOT, ["--json"]);
+    const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
     const hits = parsed.results.filter(
       (res: { check: string; evidence?: string; file?: string }) =>
@@ -2077,7 +2245,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
   });
 
   it("exempts placeholder-bearing path tokens (<...> and brace-set globs)", () => {
-    const r = runScript(IR055_ROOT, ["--json"]);
+    const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
     const hits = parsed.results.filter(
       (res: { check: string; evidence?: string; file?: string; line?: number }) =>
@@ -2090,7 +2258,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
   });
 
   it("keeps bare-glob references next to placeholder globs checked (CR-002 narrowing)", () => {
-    const r = runScript(IR055_ROOT, ["--json"]);
+    const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
     const hits = parsed.results.filter(
       (res: { check: string; evidence?: string; file?: string; line?: number }) =>
@@ -2103,7 +2271,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
   });
 
   it("exempts vocabulary-registry.md (legitimate pattern documentation)", () => {
-    const r = runScript(IR055_ROOT, ["--json"]);
+    const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
     const vocabHits = parsed.results.filter(
       (res: { check: string; file?: string }) =>
@@ -2122,6 +2290,7 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
     expect(proc.exitCode).toBe(0);
 
     // Re-run: all violations should now be baseline-known (info level).
+    // baseline 再生成後の状態変更後検査のため共有結果を参照せず新しく検査する。
     const r = runScript(IR055_ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
     const newViolations = parsed.results.filter(
@@ -2387,7 +2556,7 @@ describe("IR-058 distribution-untracked-skill-reference (REQ-0159-003)", () => {
   });
 
   it("detects projection-only skill referenced by distribution", () => {
-    const r = runScript(IR058_ROOT, ["--json"]);
+    const r = getIr058JsonRun();
     const parsed = JSON.parse(r.stdout);
     const ngResults = parsed.results.filter(
       (res: { check: string; level: string; message?: string }) =>
@@ -2399,7 +2568,7 @@ describe("IR-058 distribution-untracked-skill-reference (REQ-0159-003)", () => {
   });
 
   it("does not flag repo-* skills (ADR-0106 carve-out)", () => {
-    const r = runScript(IR058_ROOT, ["--json"]);
+    const r = getIr058JsonRun();
     const parsed = JSON.parse(r.stdout);
     const repoNgResults = parsed.results.filter(
       (res: { check: string; level: string; message?: string }) =>
@@ -2411,7 +2580,7 @@ describe("IR-058 distribution-untracked-skill-reference (REQ-0159-003)", () => {
   });
 
   it("includes src/ promotion guidance in NG message", () => {
-    const r = runScript(IR058_ROOT, ["--json"]);
+    const r = getIr058JsonRun();
     const parsed = JSON.parse(r.stdout);
     const ngResults = parsed.results.filter(
       (res: { check: string; level: string; message?: string }) =>
@@ -2428,7 +2597,7 @@ describe("IR-058 distribution-untracked-skill-reference (REQ-0159-003)", () => {
   });
 
   it("does not flag skills.yaml-declared projection-only skill (IR-058 branch 2)", () => {
-    const r = runScript(IR058_ROOT, ["--json"]);
+    const r = getIr058JsonRun();
     const parsed = JSON.parse(r.stdout);
     const declaredNg = parsed.results.filter(
       (res: { check: string; level: string; message?: string }) =>
@@ -2440,7 +2609,7 @@ describe("IR-058 distribution-untracked-skill-reference (REQ-0159-003)", () => {
   });
 
   it("reverse check: NG message includes skills.yaml declaration guidance (IR-058 branch 3)", () => {
-    const r = runScript(IR058_ROOT, ["--json"]);
+    const r = getIr058JsonRun();
     const parsed = JSON.parse(r.stdout);
     const ngResults = parsed.results.filter(
       (res: { check: string; level: string; message?: string }) =>
@@ -2664,7 +2833,7 @@ describe("NG baseline aggregation / provenance / classification (Issue #1780, RE
   });
 
   it("TS-003: separates baseline-known from new NG counts; only new NG drives non-zero exit", () => {
-    const r = runScript(NGBASELINE_ROOT, ["--json"]);
+    const r = getNgbaselineInitialJsonRun();
     expect(r.exitCode).not.toBe(0);
 
     const parsed = JSON.parse(r.stdout);
@@ -2699,7 +2868,7 @@ describe("NG baseline aggregation / provenance / classification (Issue #1780, RE
   });
 
   it("TS-005: report distinguishes baseline-known, approved additions, and new unmanaged NG", () => {
-    const r = runScript(NGBASELINE_ROOT, ["--json"]);
+    const r = getNgbaselineInitialJsonRun();
     // The 3-category summary is emitted on stderr.
     expect(r.stderr).toContain("baseline-known (demoted to info)");
     expect(r.stderr).toContain("approved additions (provenance-tracked");
@@ -2794,6 +2963,7 @@ describe("NG baseline aggregation / provenance / classification (Issue #1780, RE
     expect(absorbedOtherChecks.length).toBe(0);
 
     // Re-run: REQ-9003 is now demoted as an approved addition.
+    // baseline 更新後の状態変更後検査のため共有結果を参照せず新しく検査する。
     const r = runScript(NGBASELINE_ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
     const req9003After = parsed.results.find(
@@ -2982,17 +3152,12 @@ describe("NG baseline path bucket key normalization (Issue #2206, OU-0008)", () 
 // 段階導入の精神、Issue #1782 完了条件）を回帰テストとして固定する。
 
 describe("IR-055 runtime-unresolved-reference 実修復回帰 (Issue #1782)", () => {
-  // 実リポジトリルート: SCRIPT_DIR は
-  // <repo>/.opencode/skills/repo-agentdev-integrity/scripts なので4階層上。
-  const REPO_ROOT = join(SCRIPT_DIR, "..", "..", "..", "..");
-
   it("配布物に新規（delta from baseline）runtime-unresolved-reference 違反がないこと", () => {
-    const proc = Bun.spawnSync(
-      ["bun", "run", SCRIPT_FILE, "--json"],
-      { cwd: REPO_ROOT, stdout: "pipe", stderr: "pipe" },
-    );
-    expect(proc.exitCode).toBeDefined();
-    const stdout = proc.stdout?.toString("utf-8") ?? "";
+    // 実リポジトリ回帰4確認（本 describe 2件と NG21 2件）は同一入力条件のため
+    // getRealRepoJsonRun で起動を1回に集約した共有結果を参照する。
+    const r = getRealRepoJsonRun();
+    expect(r.exitCode).toBeDefined();
+    const stdout = r.stdout;
     expect(stdout.length).toBeGreaterThan(0);
 
     const parsed = JSON.parse(stdout) as {
@@ -3021,11 +3186,8 @@ describe("IR-055 runtime-unresolved-reference 実修復回帰 (Issue #1782)", ()
     // 配布物へ新たな導入先未解決参照が追加されたことを示す。
     // 修復後の状態: 548 baseline-known violations across 配布物。
     // 閾値は修復完了時の実績値（548）を上限とし、将来の削減を許容する。
-    const proc = Bun.spawnSync(
-      ["bun", "run", SCRIPT_FILE, "--json"],
-      { cwd: REPO_ROOT, stdout: "pipe", stderr: "pipe" },
-    );
-    const stdout = proc.stdout?.toString("utf-8") ?? "";
+    const r = getRealRepoJsonRun();
+    const stdout = r.stdout;
     const parsed = JSON.parse(stdout) as {
       results: Array<{ check: string; level: string }>;
     };
@@ -3048,15 +3210,11 @@ describe("IR-055 runtime-unresolved-reference 実修復回帰 (Issue #1782)", ()
 // gap/duty 違反を info へ降格していないことを回帰テストとして固定する。
 
 describe("NG21 N16/N17 是正回帰 (Issue #2245, OU-0009)", () => {
-  const REPO_ROOT = join(SCRIPT_DIR, "..", "..", "..", "..");
-
   it("N16: 'Skill rename 対称性' カテゴリが gap で ng/warning にならないこと（map + scriptFiles 登録）", () => {
-    const proc = Bun.spawnSync(["bun", "run", SCRIPT_FILE, "--json"], {
-      cwd: REPO_ROOT,
-      stdout: "pipe",
-      stderr: "pipe",
-    });
-    const stdout = proc.stdout?.toString("utf-8") ?? "";
+    // 実リポジトリ回帰4確認（IR-055 実修復回帰 describe 2件と本 describe 2件）の
+    // 共有結果を参照する（同一入力条件の1回検査に集約）。
+    const r = getRealRepoJsonRun();
+    const stdout = r.stdout;
     expect(stdout.length).toBeGreaterThan(0);
 
     const parsed = JSON.parse(stdout) as {
@@ -3081,12 +3239,8 @@ describe("NG21 N16/N17 是正回帰 (Issue #2245, OU-0009)", () => {
     // Case #2981（DEC-033）で case-close 公開 command 定義は削除された。capture 責務は
     // Workflow Skill（agentdev-workflow-case-close）側へ継承され、command-capture-duty
     // の duties 表から除去済みであること（NG21 是正回帰の継続保持）を検証する。
-    const proc = Bun.spawnSync(["bun", "run", SCRIPT_FILE, "--json"], {
-      cwd: REPO_ROOT,
-      stdout: "pipe",
-      stderr: "pipe",
-    });
-    const stdout = proc.stdout?.toString("utf-8") ?? "";
+    const r = getRealRepoJsonRun();
+    const stdout = r.stdout;
     const parsed = JSON.parse(stdout) as {
       results: Array<{ check: string; level: string; message?: string }>;
     };
@@ -3441,7 +3595,7 @@ describe("IR-063 common-policy-identifier-invariant (REQ-051-005, REQ-010-064, I
   });
 
   it("passes registered policy references and identifier-free files (正常例・境界例)", () => {
-    const r = runScript(IR063_ROOT, ["--json"]);
+    const r = getIr063JsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { category: string; level: string; file?: string }) =>
@@ -3454,7 +3608,7 @@ describe("IR-063 common-policy-identifier-invariant (REQ-051-005, REQ-010-064, I
   });
 
   it("detects undefined references, out-of-registry definitions, and duplicate definitions (違反例)", () => {
-    const r = runScript(IR063_ROOT, ["--json"]);
+    const r = getIr063JsonRun();
     const parsed = JSON.parse(r.stdout);
     const byEvidence = parsed.results
       .filter(
@@ -3471,7 +3625,7 @@ describe("IR-063 common-policy-identifier-invariant (REQ-051-005, REQ-010-064, I
   });
 
   it("accepts registry style examples without undefined-reference detection (許容例)", () => {
-    const r = runScript(IR063_ROOT, ["--json"]);
+    const r = getIr063JsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { category: string; level: string; evidence?: string; file?: string }) =>
@@ -3484,7 +3638,7 @@ describe("IR-063 common-policy-identifier-invariant (REQ-051-005, REQ-010-064, I
   });
 
   it("reproduces residual abolished Gxx notation in distribution (再現例)", () => {
-    const r = runScript(IR063_ROOT, ["--json"]);
+    const r = getIr063JsonRun();
     const parsed = JSON.parse(r.stdout);
     const byEvidence = parsed.results
       .filter(
@@ -3603,7 +3757,7 @@ describe("IR-064 unresolved-placeholder (REQ-010-065, Issue #2372)", () => {
   });
 
   it("does not flag code span, parentheses, quote-enumeration, or fenced blocks (正常例・境界例)", () => {
-    const r = runScript(IR064_ROOT, ["--json"]);
+    const r = getIr064JsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { category: string; file?: string }) =>
@@ -3614,7 +3768,7 @@ describe("IR-064 unresolved-placeholder (REQ-010-065, Issue #2372)", () => {
   });
 
   it("detects bare TODO-family marker as strict and bare ID placeholder as heuristic (違反例)", () => {
-    const r = runScript(IR064_ROOT, ["--json"]);
+    const r = getIr064JsonRun();
     const parsed = JSON.parse(r.stdout);
     const levels = parsed.results
       .filter(
@@ -3628,7 +3782,7 @@ describe("IR-064 unresolved-placeholder (REQ-010-065, Issue #2372)", () => {
   });
 
   it("exempts command templates/ and skill templates/ directories (許容例)", () => {
-    const r = runScript(IR064_ROOT, ["--json"]);
+    const r = getIr064JsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { category: string; file?: string }) =>
@@ -3640,7 +3794,7 @@ describe("IR-064 unresolved-placeholder (REQ-010-065, Issue #2372)", () => {
   });
 
   it("does not treat non-ID brace tokens like UTF-{N} as placeholders (再現例の誤検出防止)", () => {
-    const r = runScript(IR064_ROOT, ["--json"]);
+    const r = getIr064JsonRun();
     const parsed = JSON.parse(r.stdout);
     const utf = parsed.results.filter(
       (res: { category: string; evidence?: string }) =>
@@ -3799,7 +3953,7 @@ describe("IR-065/IR-066 obsolete-vocabulary & legacy-path (REQ-010-066/067, Issu
   });
 
   it("passes current vocabulary and v2:-prefixed historical identifiers (正常例・境界例)", () => {
-    const r = runScript(IR065_ROOT, ["--json"]);
+    const r = getIr065JsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { category: string; file?: string }) =>
@@ -3810,7 +3964,7 @@ describe("IR-065/IR-066 obsolete-vocabulary & legacy-path (REQ-010-066/067, Issu
   });
 
   it("detects (ADR) annotation as strict and legacy identifiers as heuristic (違反例)", () => {
-    const r = runScript(IR065_ROOT, ["--json"]);
+    const r = getIr065JsonRun();
     const parsed = JSON.parse(r.stdout);
     const found = parsed.results
       .filter(
@@ -3827,7 +3981,7 @@ describe("IR-065/IR-066 obsolete-vocabulary & legacy-path (REQ-010-066/067, Issu
   });
 
   it("exempts superseded decisions, line history markers, and negation contexts (許容例)", () => {
-    const r = runScript(IR065_ROOT, ["--json"]);
+    const r = getIr065JsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { category: string; file?: string }) =>
@@ -3839,7 +3993,7 @@ describe("IR-065/IR-066 obsolete-vocabulary & legacy-path (REQ-010-066/067, Issu
   });
 
   it("skips vocabulary whose existence_probe target exists (境界例: existence_probe)", () => {
-    const r = runScript(IR065_ROOT, ["--json"]);
+    const r = getIr065JsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { category: string; file?: string }) =>
@@ -3850,7 +4004,7 @@ describe("IR-065/IR-066 obsolete-vocabulary & legacy-path (REQ-010-066/067, Issu
   });
 
   it("reproduces Wave 2 F-001 ((ADR) annotation) and F-003 (agentdev-spec-compliance) residue (再現例)", () => {
-    const r = runScript(IR065_ROOT, ["--json"]);
+    const r = getIr065JsonRun();
     const parsed = JSON.parse(r.stdout);
     const adrAnnotation = parsed.results.filter(
       (res: { category: string; evidence?: string; level: string }) =>
@@ -3868,7 +4022,7 @@ describe("IR-065/IR-066 obsolete-vocabulary & legacy-path (REQ-010-066/067, Issu
   });
 
   it("reports no drift when the real yaml matches checker constants (正常例: 同期済み)", () => {
-    const r = runScript(IR065_ROOT, ["--json"]);
+    const r = getIr065JsonRun();
     const parsed = JSON.parse(r.stdout);
     const drift = parsed.results.filter(
       (res: { category: string; check: string }) =>
@@ -3994,7 +4148,7 @@ describe("IR-065 space-normalized matching (REQ-010-066, Issue #2742)", () => {
   });
 
   it("detects half-width and full-width space insertion variants of each normalized vocabulary (違反例・再現例)", () => {
-    const r = runScript(IR065_SPACE_ROOT, ["--json"]);
+    const r = getIr065SpaceJsonRun();
     const parsed = JSON.parse(r.stdout);
     const evidence = parsed.results
       .filter(
@@ -4015,7 +4169,7 @@ describe("IR-065 space-normalized matching (REQ-010-066, Issue #2742)", () => {
   });
 
   it("reports original line text evidence with original line numbers (報告は原文行)", () => {
-    const r = runScript(IR065_SPACE_ROOT, ["--json"]);
+    const r = getIr065SpaceJsonRun();
     const parsed = JSON.parse(r.stdout);
     const selfRef = parsed.results.filter(
       (res: { category: string; file?: string; evidence?: string }) =>
@@ -4028,7 +4182,7 @@ describe("IR-065 space-normalized matching (REQ-010-066, Issue #2742)", () => {
   });
 
   it("does not flag space-inserted v2: prefix, code spans, history markers, negation contexts, or retired headings (境界例・許容例)", () => {
-    const r = runScript(IR065_SPACE_ROOT, ["--json"]);
+    const r = getIr065SpaceJsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { category: string; file?: string }) =>
@@ -4040,7 +4194,7 @@ describe("IR-065 space-normalized matching (REQ-010-066, Issue #2742)", () => {
   });
 
   it("excludes vocabulary-quoting rule definition areas declared with reasons (許容例: 構造的除外領域)", () => {
-    const r = runScript(IR065_SPACE_ROOT, ["--json"]);
+    const r = getIr065SpaceJsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { category: string; file?: string }) =>
@@ -4212,7 +4366,7 @@ describe("IR-066 vocabulary extension (Issue #2383 (b) resweep adoption)", () =>
   });
 
   it("passes current command/skill names (正常例)", () => {
-    const r = runScript(IR066EXT_ROOT, ["--json"]);
+    const r = getIr066ExtJsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { category: string; file?: string }) =>
@@ -4223,7 +4377,7 @@ describe("IR-066 vocabulary extension (Issue #2383 (b) resweep adoption)", () =>
   });
 
   it("detects retired command and skill names as current references (違反例・再現例)", () => {
-    const r = runScript(IR066EXT_ROOT, ["--json"]);
+    const r = getIr066ExtJsonRun();
     const parsed = JSON.parse(r.stdout);
     const evidence = parsed.results
       .filter(
@@ -4244,7 +4398,7 @@ describe("IR-066 vocabulary extension (Issue #2383 (b) resweep adoption)", () =>
   });
 
   it("does not flag negation-context mentions (境界例)", () => {
-    const r = runScript(IR066EXT_ROOT, ["--json"]);
+    const r = getIr066ExtJsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { category: string; file?: string }) =>
@@ -4255,7 +4409,7 @@ describe("IR-066 vocabulary extension (Issue #2383 (b) resweep adoption)", () =>
   });
 
   it("exempts DEC-006 migration record via exemption_files (許容例)", () => {
-    const r = runScript(IR066EXT_ROOT, ["--json"]);
+    const r = getIr066ExtJsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { category: string; file?: string }) =>
@@ -4381,7 +4535,7 @@ describe("IR-066 docs/designs legacy-path current-tense declaration (REQ-010-067
   });
 
   it("passes current canonical src/common declarations and projection mentions (正常例)", () => {
-    const r = runScript(IR066DOCS_ROOT, ["--json"]);
+    const r = getIr066DocsJsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { category: string; check: string; file?: string }) =>
@@ -4393,7 +4547,7 @@ describe("IR-066 docs/designs legacy-path current-tense declaration (REQ-010-067
   });
 
   it("detects src/opencode declared as canonical origin/position in current tense (違反例)", () => {
-    const r = runScript(IR066DOCS_ROOT, ["--json"]);
+    const r = getIr066DocsJsonRun();
     const parsed = JSON.parse(r.stdout);
     const evidence = parsed.results
       .filter(
@@ -4412,7 +4566,7 @@ describe("IR-066 docs/designs legacy-path current-tense declaration (REQ-010-067
   });
 
   it("exempts host connection area path mentions on the same line (境界例)", () => {
-    const r = runScript(IR066DOCS_ROOT, ["--json"]);
+    const r = getIr066DocsJsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { category: string; check: string; file?: string }) =>
@@ -4424,7 +4578,7 @@ describe("IR-066 docs/designs legacy-path current-tense declaration (REQ-010-067
   });
 
   it("exempts code span mentions, historical mentions, and superseded designs (許容例)", () => {
-    const r = runScript(IR066DOCS_ROOT, ["--json"]);
+    const r = getIr066DocsJsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { category: string; check: string; file?: string }) =>
@@ -4437,7 +4591,7 @@ describe("IR-066 docs/designs legacy-path current-tense declaration (REQ-010-067
   });
 
   it("reproduces the RU-20261005 sweep finding (DEC-010 pre-fix canonical claim) (再現例)", () => {
-    const r = runScript(IR066DOCS_ROOT, ["--json"]);
+    const r = getIr066DocsJsonRun();
     const parsed = JSON.parse(r.stdout);
     const evidence = parsed.results
       .filter(
@@ -4591,7 +4745,7 @@ describe("IR-067 referenced-req-row-existence (REQ-010-069, Issue #2383 (a))", (
   });
 
   it("passes citations of existing requirement rows (正常例)", () => {
-    const r = runScript(IR067_ROOT, ["--json"]);
+    const r = getIr067JsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { category: string; file?: string }) =>
@@ -4602,7 +4756,7 @@ describe("IR-067 referenced-req-row-existence (REQ-010-069, Issue #2383 (a))", (
   });
 
   it("detects phantom row citations (違反例)", () => {
-    const r = runScript(IR067_ROOT, ["--json"]);
+    const r = getIr067JsonRun();
     const parsed = JSON.parse(r.stdout);
     const evidence = parsed.results
       .filter(
@@ -4617,7 +4771,7 @@ describe("IR-067 referenced-req-row-existence (REQ-010-069, Issue #2383 (a))", (
   });
 
   it("tolerates v2: prefix, placeholders, 4-digit legacy band, and code spans (境界例)", () => {
-    const r = runScript(IR067_ROOT, ["--json"]);
+    const r = getIr067JsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { category: string; file?: string }) =>
@@ -4628,7 +4782,7 @@ describe("IR-067 referenced-req-row-existence (REQ-010-069, Issue #2383 (a))", (
   });
 
   it("exempts templates, AUTOGEN blocks, and IR rule description files (許容例)", () => {
-    const r = runScript(IR067_ROOT, ["--json"]);
+    const r = getIr067JsonRun();
     const parsed = JSON.parse(r.stdout);
     const violations = parsed.results.filter(
       (res: { category: string; file?: string }) =>
@@ -4641,7 +4795,7 @@ describe("IR-067 referenced-req-row-existence (REQ-010-069, Issue #2383 (a))", (
   });
 
   it("reproduces the PR 2284 phantom citation pattern as strict ng (再現例)", () => {
-    const r = runScript(IR067_ROOT, ["--json"]);
+    const r = getIr067JsonRun();
     const parsed = JSON.parse(r.stdout);
     const phantom = parsed.results.find(
       (res: { category: string; level: string; evidence?: string; file?: string }) =>
@@ -5785,7 +5939,7 @@ describe("IR-053 exemption paths + compensation (Case #3166, RA-001, TS-001)", (
   });
 
   it("skips IR-053 warnings for the two registered read-only contingency paths", () => {
-    const r = runScript(RA001_ROOT, ["--json"]);
+    const r = getRa001JsonRun();
     const parsed = JSON.parse(r.stdout);
     const exemptWarnings = parsed.results.filter(
       (res: { check: string; level: string; file?: string }) =>
@@ -5798,7 +5952,7 @@ describe("IR-053 exemption paths + compensation (Case #3166, RA-001, TS-001)", (
   });
 
   it("keeps detecting direct gh invocations on non-exempt paths", () => {
-    const r = runScript(RA001_ROOT, ["--json"]);
+    const r = getRa001JsonRun();
     const parsed = JSON.parse(r.stdout);
     const nonExempt = parsed.results.filter(
       (res: { check: string; level: string; file?: string }) =>
@@ -6367,11 +6521,12 @@ function buildIr072Fixture(root: string): void {
   copyScripts(root);
 }
 
-function ir072Collect(root: string): {
+function ir072Collect(): {
   ng: { file: string; evidence: string; level: string; findingLevel?: string }[];
   infos: string[];
 } {
-  const r = runScript(root, ["--json"]);
+  // IR-072 fixture は不変固定データ（git 履歴）のため、12 確認の起動を1回に集約する。
+  const r = getIr072JsonRun();
   const parsed = JSON.parse(r.stdout);
   const fresh = (parsed.results as {
     category: string;
@@ -6402,14 +6557,14 @@ describe("IR-072 req-updated-freshness (REQ-010-068)", () => {
   });
 
   it("passes REQ files whose updated matches the last commit date (正常例)", () => {
-    const collected = ir072Collect(IR072_ROOT);
+    const collected = ir072Collect();
     expect(
       collected.ng.filter((f) => f.file.includes("REQ-931")),
     ).toHaveLength(0);
   });
 
   it("detects a stale updated left behind by a later content change (違反例)", () => {
-    const collected = ir072Collect(IR072_ROOT);
+    const collected = ir072Collect();
     const stale = collected.ng.find((f) => f.file.includes("REQ-932"));
     expect(stale).toBeDefined();
     expect(stale?.evidence).toContain("updated: 2025-01-15");
@@ -6417,14 +6572,14 @@ describe("IR-072 req-updated-freshness (REQ-010-068)", () => {
   });
 
   it("excludes untracked REQ files lacking commit history (境界例)", () => {
-    const collected = ir072Collect(IR072_ROOT);
+    const collected = ir072Collect();
     expect(
       collected.ng.filter((f) => f.file.includes("REQ-933")),
     ).toHaveLength(0);
   });
 
   it("exempts README, retired, and legacy 4-digit band (許容例)", () => {
-    const collected = ir072Collect(IR072_ROOT);
+    const collected = ir072Collect();
     expect(
       collected.ng.filter(
         (f) =>
@@ -6436,21 +6591,21 @@ describe("IR-072 req-updated-freshness (REQ-010-068)", () => {
   });
 
   it("reproduces the updated-bump-missed pattern as strict ng (再現例)", () => {
-    const collected = ir072Collect(IR072_ROOT);
+    const collected = ir072Collect();
     const stale = collected.ng.find((f) => f.file.includes("REQ-932"));
     expect(stale).toBeDefined();
     expect(stale?.findingLevel).toBe("strict");
   });
 
   it("does not treat frontmatter-only commits as content changes (frontmatter のみ変更除外)", () => {
-    const collected = ir072Collect(IR072_ROOT);
+    const collected = ir072Collect();
     expect(
       collected.ng.filter((f) => f.file.includes("REQ-935")),
     ).toHaveLength(0);
   });
 
   it("compares updated against the true content-change commit after frontmatter-only commits (乖離は検出継続)", () => {
-    const collected = ir072Collect(IR072_ROOT);
+    const collected = ir072Collect();
     const stale = collected.ng.find((f) => f.file.includes("REQ-936"));
     expect(stale).toBeDefined();
     expect(stale?.findingLevel).toBe("strict");
@@ -6460,14 +6615,14 @@ describe("IR-072 req-updated-freshness (REQ-010-068)", () => {
   });
 
   it("passes Design files whose updated matches the last content-change commit date (Design 正常例)", () => {
-    const collected = ir072Collect(IR072_ROOT);
+    const collected = ir072Collect();
     expect(
       collected.ng.filter((f) => f.file.includes("DES-941")),
     ).toHaveLength(0);
   });
 
   it("detects a stale updated left behind by a later Design content change (Design 違反例)", () => {
-    const collected = ir072Collect(IR072_ROOT);
+    const collected = ir072Collect();
     const stale = collected.ng.find((f) => f.file.includes("DES-942"));
     expect(stale).toBeDefined();
     expect(stale?.findingLevel).toBe("strict");
@@ -6476,24 +6631,39 @@ describe("IR-072 req-updated-freshness (REQ-010-068)", () => {
   });
 
   it("excludes frontmatter-only commits on Design files from content changes (Design 境界例)", () => {
-    const collected = ir072Collect(IR072_ROOT);
+    const collected = ir072Collect();
     const boundary = collected.ng.find((f) => f.file.includes("DES-943"));
     expect(boundary).toBeUndefined();
   });
 
   it("skips Design files without updated instead of counting them (Design 許容例)", () => {
-    const collected = ir072Collect(IR072_ROOT);
+    const collected = ir072Collect();
     expect(
       collected.ng.filter((f) => f.file.includes("DES-944")),
     ).toHaveLength(0);
   });
 
   it("reproduces the Design updated-bump-missed pattern as strict ng (Design 再現例)", () => {
-    const collected = ir072Collect(IR072_ROOT);
+    const collected = ir072Collect();
     const stale = collected.ng.find((f) => f.file.includes("DES-945"));
     expect(stale).toBeDefined();
     expect(stale?.findingLevel).toBe("strict");
     expect(stale?.evidence).toContain("updated: 2025-09-01");
     expect(stale?.evidence).toContain("2025-09-12");
+  });
+});
+
+// ─── 結果共有契約の起動回数確認（同一入力条件は1回に集約） ──────────────────
+// checkInvocationLog は共有経由の起動（loadCheckRun 経由）のみを記録する。状態変更後の
+// 再検査（baseline 更新テスト等）は runScript 直接起動のため記録対象外である。
+// 選択実行時はログが空になり、重複なしで合格する（単独実行契約を壊さない）。
+describe("check_integrity 共有結果の起動回数記録（同一入力条件は1回）", () => {
+  it("同一 root と実効引数の check_integrity 起動が重複して記録されないこと", () => {
+    const counts = new Map<string, number>();
+    for (const entry of checkInvocationLog) {
+      counts.set(entry, (counts.get(entry) ?? 0) + 1);
+    }
+    const duplicated = [...counts.entries()].filter(([, n]) => n > 1);
+    expect(duplicated).toEqual([]);
   });
 });
