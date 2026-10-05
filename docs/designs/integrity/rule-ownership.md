@@ -176,7 +176,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-067 | referenced-req-row-existence | REQ-010-069, REQ-010-065, REQ-010-068 | ../integrity-rule-catalog.md, ../checker-execution-contracts.md |
 | IR-068 | skill-projection-manifest | REQ-010-068, REQ-018-002 | ../../local/runtime-package-boundary.md, ../checker-execution-contracts.md, ../integrity-rule-catalog.md |
 | IR-069 | req-number-gap-recorded | REQ-010-068, REQ-010-070 | ../integrity-rule-catalog.md, ../../foundations/numbering-policy.md, ../checker-execution-contracts.md |
-| IR-070 | design-frontmatter-required-keys | REQ-010-062, REQ-010-068, REQ-010-070 | ../checker-execution-contracts.md, ../integrity-rule-catalog.md, ../../foundations/patterns.md |
+| IR-070 | design-frontmatter-required-keys | REQ-010-062, REQ-010-068, REQ-010-080 | ../checker-execution-contracts.md, ../integrity-rule-catalog.md, ../../foundations/patterns.md |
 | IR-071 | integrity-rule-related-req-existence | REQ-051-009 | ../integrity-rule-catalog.md, ../checker-execution-contracts.md |
 | IR-072 | req-updated-freshness | REQ-010-068 | ../integrity-rule-catalog.md, ../../foundations/patterns.md, ../checker-execution-contracts.md |
 <!-- AUTOGEN:END -->
