@@ -2,7 +2,7 @@
 title: 実行時パッケージ境界
 status: accepted
 created: 2026-08-20
-updated: 2026-10-04
+updated: 2026-10-05
 ---
 <!-- ADF-COVERS(implementation): REQ-002-007, REQ-002-008, REQ-002-011, REQ-002-019, REQ-002-020, REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-002, REQ-009-003, REQ-009-006, REQ-009-007, REQ-009-008, REQ-009-009, REQ-009-010, REQ-009-011, REQ-009-012, REQ-009-013, REQ-009-014, REQ-009-015, REQ-009-016, REQ-009-017, REQ-009-018, REQ-009-019, REQ-009-020, REQ-009-021, REQ-009-022, REQ-009-023, REQ-009-024, REQ-009-025, REQ-009-035, REQ-009-036, REQ-009-037, REQ-009-038, REQ-009-039, REQ-009-046, REQ-009-047, REQ-009-048, REQ-009-049 -->
@@ -16,6 +16,7 @@ updated: 2026-10-04
 <!-- ADF-COVERS(design): REQ-002-047 -->
 <!-- ADF-COVERS(design): REQ-050-009 -->
 <!-- ADF-COVERS(design): REQ-091-001, REQ-091-002, REQ-091-003, REQ-091-004, REQ-091-005 -->
+<!-- ADF-COVERS(design): REQ-053-044（repo-local Plugin の配布・投影契約節が保存済みファイル単位結果の配布・投影除外 design 実体） -->
 
 # 実行時パッケージ境界
 
@@ -305,6 +306,7 @@ repo-local Plugin（REQ-002-045）の配布・投影については次のとお�
 - repo-local Plugin の原本配置原則は `src/opencode/plugins/<agentdev-name>/` 配下である。consumer 配布系全経路（`scripts/install.ps1`、`scripts/consumer/` 配下の archive installer、`scripts/self/release/package-release-archive.ps1`）は repo-local 配布除外を実装し、3ファイルの列挙条件を同期する義務を持つ。
 - `scripts/self-sync.ps1` は repo-local Plugin を除外しない（自己ホスト投影を維持する）。理由は、consumer 配布と自己ホスト投影が非対称であるためである。repo-local Plugin は REQ-052-006 により consumer への配布対象外である一方、自己ホスト環境では Plugin を利用可能にする必要がある。自己ホスト投影は canonical チェックアウト内部の source → projection 構成（`.opencode/plugins/` への junction と depth-1 loader shim 生成）であり、consumer への配布ではないため、配布除外機構の適用対象外である。
 - 除外機構の実現方式は明示的除外リスト等とする。REQ-002-011 の repo-* prefix 方式を plugin に採用しない（shim 名が repo-*.ts になり、stale shim 検出フィルタ等の波及修正が増えるため）。
+- textlint 検査基盤の保存済みファイル単位結果（実行時データ）は配布対象外とし、投影・同期の対象にも含めない。保存先、容量上限、寿命は品質基盤 Design（textlint-quality-runtime.md「ファイル単位結果の再利用と同一性条件」節）が所有する。
 
 配布境界 checker の repo-local モデル: 配布境界 checker は consumer 配布系と自己ホスト投影の非対称（上記のとおり）を repo-local モデルとして前提とする。detector の列挙条件（除外対象の検出箇所一覧）は repo-local Plugin の原本配置原則（`src/opencode/plugins/<agentdev-name>/`）と同期を維持し、列挙の乖離が観測された場合は個別特例の追加ではなく検査側の一般化で解消する方針とする。
 - 将来 repo-local Plugin が複数化した時点で、マーカー方式（package.json マーカーフィールド等）への拡張条件を判断する。
