@@ -120,6 +120,13 @@ QG-4 の full integrity suite 合格基準により検証スイート全体（bu
 - **cwd 依存テスト混在スイートの運用注記**: 対象スイートには cwd 依存テストが混在するため、カレントディレクトトリビアな実行（`bun test` 単体等）で代替しない
 - **QG-4 checker 実測の実施時点**: full integrity suite および個別 checker の実測は、merge 直前の origin/main 取り込み済み branch HEAD で実施する。検出した新規 NG の出所が自 Case 変更であることを evidence として記録し、provenance-tracked baseline への登録漏れを検査する（詳細3要素は `agentdev-quality-gates` references `qg-4-final-acceptance.md`「QG-4 checker 実測手順（merge 直前 HEAD・evidence 化・baseline 登録漏れ検査）」節を参照）
 
+**baseline 更新手順の provenance 規約（参照是正系 ACT の baseline 要否確認を含む）**: 本工程で baseline（NG baseline・BaselineFile・恒久免除レジストリ）の更新が必要になった場合は、次の provenance 規約に従う。契約の正は checker 実行契約 Design「baseline 退避物と BaselineFile の役割分離と合否判定基準」節であり、本 reference は工程側の確認手順のみを扱う:
+
+- baseline エントリへの追加・更新は provenance（起因の由来、正当化の参照先 rationale_ref、適用日）付きでのみ行う。無条件追加をしない
+- BaselineFile の全量再生成は cap 更新（増分反映）と使い分け、全量再生成時は従来の approved provenance を引き継ぐことを確認する（provenance 保全）
+- 参照是正系 ACT（旧パス→新パスの参照切替、横断是正、走査先変更を含む）を含む変更では、本工程の checker 実行前に baseline 要否確認の前置を行う: 既存 baseline エントリの期待値・除外定義が当該変更の走査先パス・検出文言に依存するかを確認し、依存する場合は baseline 期待値・除外定義の追随更新を同一 PR で処置する。要否確認の実施記録（依存なし確認または更新実施の別）を Evidence へ残す
+- baseline の更新が必要な場合は正規所有工程（case-run 差し戻し後の修正等）へ任せる場合を除き、本工程の対象範囲内で provenance 付きで処置し、未登録・未更新のまま green 判定をしない
+
 ### STEP-3-2: Design 状態評価フロー（棚卸し制）
 
 対象 REQ に基づく draft Design 棚卸し列挙と、PR 本文の `## Design確定候補` セクション（case-run/ driver が記録）の申告候補を統合し、Design の確定、昇格を処理する。

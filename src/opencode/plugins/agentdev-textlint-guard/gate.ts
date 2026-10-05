@@ -7,7 +7,7 @@
 //
 // 使い方:
 //   bun run gate.ts [--root <project-root>] [--json]
-// 終了コード: 0 = 合格（拒否対象違反ゼロ）、1 = 不合格（違反あり or 検査不能）、2 = 引数エラー
+// 終了コード: 0 = 合格（拒否対象違反ゼロ）、1 = 不合格（違反あり、検査不能、または対象解決 0 件〔0 inspected〕）、2 = 引数エラー
 
 import { inspectAllTargetFiles } from "./lib/inspect.ts";
 import { formatOutcome, type InspectionOutcome } from "./lib/results.ts";
@@ -53,6 +53,25 @@ export async function runFinalGate(argv: readonly string[]): Promise<{ exitCode:
       output: parsed.json
         ? JSON.stringify({ ok: false, error: result.detail }, null, 2)
         : `${result.detail}\nfinal gate: FAIL (inspection could not complete)`,
+    };
+  }
+  // 対象解決 0 件（0 inspected）は異常扱いとする（fail-closed）。0 件は検査を
+  // 実施していない無効実行（ルート解決の空振り、除外の過剰適用等）を示すため、
+  // 検査不能と同様に不合格とする。
+  if (result.outcome.files.length === 0) {
+    return {
+      exitCode: 1,
+      output: parsed.json
+        ? JSON.stringify(
+            {
+              ok: false,
+              error: "0 target file(s) inspected; the target resolution must not resolve to zero targets (fail-closed)",
+              inspectedFiles: 0,
+            },
+            null,
+            2,
+          )
+        : "final gate: FAIL (0 target file(s) inspected — 対象解決 0 件は異常として扱い、合格としない)",
     };
   }
   if (result.outcome.hardCount > 0) {
