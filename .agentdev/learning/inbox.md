@@ -167,6 +167,24 @@
 
 ---
 
+## Definition PR の品質検査記録が coverage 対象外の既存行の missing-design を検出できず case-ready STEP-2 で表面化する事象
+
+- **問題事象**: Definition PR #3489 本文の品質検査記録が「traceability check: missing-design 0 件（対象: REQ-053-041〜048、REQ-053-016、REQ-053-032）」と記録していた一方、case-ready STEP-2 で merge 後 canonical（origin/main 7f278d81 の detached worktree）に対して同対象の check を機械実行したところ missing-design 2件（REQ-053-016、REQ-053-032）を検出した。coverage --req 実測でも REQ-053-016/032 の design role 対応は 0 relations（implementation 5件・verification 2件のみ）だった
+- **発生局面**: 運用（case-open STEP-3/4 の Definition Package 品質検査記録 → case-ready STEP-2 の canonical 再取得時 traceability check 機械実行）
+- **検知方法**: merge 後 canonical worktree での check 再実行（PR 記録との再現突合）。case-open worktree（.worktrees/3486-definition、HEAD c3208c1a）での同一コマンド再実行でも同一結果を再現し、実行環境差異ではなく corpus の実在状態の差異と確定した
+- **根本原因**: REQ-053-016/032 の design 対応宣言が sidecar（traceability/agentdev-textlint-guard.yaml。implementation/verification role のみで design role 不在）にも inline ADF-COVERS(design) にも存在しなかった。両行は既存行であり design 対応 0 件は merge 前から存在する状態で、本 Case が UPDATE 対象行として check 対象に含めたことで初めて機械検出された。PR 側の coverage --req 実行対象が新規行 041〜048 に限定され、coverage 実測記録「14 relations 全行 design 対応あり」が 016/032 の design 欠落を検出できず、CR-001 の「design 対応事前確認実施済み・対応存在・欠落なし」記録と corpus 実在が乖離したまま品質検査記録が確定した
+- **自律対応内容**: case-ready は STEP-2 差し戻し契約に従い ready へ遷移せず case-open へ差し戻して停止した（merge 巻き戻しは行わない。draft/RU 保持）。overlap 突合（横断依存検査警告: textlint-design-covers 共有領域）は REQ-053-016 の design 登録が実在しないことから実登録競合なしと確定した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（case-ready STEP-2 / STEP-6 の既存 missing-design ゲートの適用事例）
+- **横展開観点**: Definition PR の品質検査記録は check --req の対象行集合と coverage 実測の対象行集合を一致させ、UPDATE 対象の既存行を含める。既存行を UPDATE する Definition では「その行の design 対応が merge 前から成立しているか」を事前確認する。UPDATE は行を check 対象へ新規に引き込む行為であり、潜在欠落の表面化を Definition Package 構成の欠漏として扱う（case-open STEP-2 のトレーサビリティポリシー追随確認の対象）
+- **再発条件**: 既存 REQ 行を UPDATE 操作対象に含む Definition の case-open 生成・case-ready 受入。design 対応を持たない既存行が check 完全性検査の対象に加わる変更
+- **予防策候補**: case-open の Definition Package 生成時に UPDATE 対象行を coverage --req / check --req の機械実行対象へ含める。design 対応 0 件の既存行を UPDATE 対象にする場合は design 宣言追加を同一 Definition Package へ含める（case-ready STEP-2 ゲートの再発防止）
+- **想定反映先**: case-open Design（Definition Package 生成・品質検査の対象行集合規定）、agentdev-workflow-case-ready references/definition-acceptance.md（STEP-2 機械実行対象の明示）
+- **関連**: Issue #3486、PR #3489（merge 7f278d81）、REQ-053-016、REQ-053-032、traceability/agentdev-textlint-guard.yaml
+- **タグ**: `#traceability` `#missing-design` `#definition-acceptance` `#case-ready` `#case-open`
+
+---
+
 ## Definition PR 受入ゲート（yomiyasu 適用記録）の突合が merge 後になった
 
 - **問題事象**: case-ready STEP-1 で Definition PR（#3487）の受入検査（忠実性・整合性・品質検査、isDraft 確認）を実施して merge した後、project-extensions の workflow-extension（case-ready）の acceptance_gates に「Definition PR 差分に docs/** 日本語文章変更を含む場合、yomiyasu 適用記録が PR 上に存在すること。不足時は merge 前差し戻し」があることを検知した。PR 本文・コメントに yomiyasu 適用記録が存在せず、受入ゲートの突合を経由しないまま merge が成立していた
