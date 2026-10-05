@@ -21,3 +21,22 @@
 - **関連**: Epic #3457（コメント 5984571855）、子 Issue #3459〜#3465（正規）・#3466〜#3475（重複クローズ）、PR #3458、Jev 観測 20261004T211249Z-12d1 他5件、.agentdev/intake/inbox/2026-10-05-case-auto-double-dispatch-race.md
 - **タグ**: `#orchestration` `#race-condition` `#idempotency` `#case-ready`
 
+---
+
+## 並行実行時のbun testフル suiteで corpus 系テストが回転的に timeout fail する事象とその由来分類
+
+- **問題事象**: case-close（Root Case 3454）の QG-4 full integrity suite 分割①（2672テスト）で IR-071（7813ms）と known-gap registry exemption（5078ms）が bun test の既定 per-test timeout 5000ms を超えて fail した。直前の main root 実行（2683テスト）では別のテスト（bootstrap-report 7891ms、REQ-018-003 系）が同種の timeout fail しており、fail テストが実行ごとに入れ替わる回転性があった
+- **発生局面**: 運用（case-close STEP-3 の full suite 実行。同一 Windows マシンで複数 Case の実行が並走していた）
+- **検知方法**: stderr 退避ファイルの fail 一覧と「^ this test timed out after 5000ms.」行、直前実行の退避ログ（main root の stderr-1-main.log 等）との比較
+- **根本原因**: corpus 全体を走査する低速テストは単独実行でも数秒かかり、並行セッションが CPU と IO を占有すると 5000ms の閾値を超える。どのテストが閾値を超えるかは負荷次第で、実行ごとに fail が入れ替わる。テスト対象の内容とは無関係
+- **自律対応内容**: QG-4 の fail 由来分類証跡手順に従い、(1) 失敗テストファイルの単独再実行（check_integrity.test.ts は単独で176/176合格、状態依存を確認）、(2) baseline commit 9ae2d8e3 の detached worktree で内容起因4件（TS-007×2、TIM 対応宣言コーパス、issue_tracking_list）の同一再現を確認し pre-existing と分類、(3) baseline フル実行で timeout 不発生を確認し、timeout 2件を環境依存（負荷）と分類して由来不明0件で受理した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存の QG-4 fail 由来分類手順の適用事例）
+- **横展開観点**: フル suite で実行時間表示が5000ms 前後の低速テストが回転的に fail するときは、まず負荷依存 timeout を疑う。単独再実行で合格すれば内容起因ではない。main root に前回実行の退避ログが残っていれば比較のみで「前回も失敗」「前回は失敗していない」を即時判定できる
+- **再発条件**: 複数セッションでの bun test フル suite 並行実行。単独実行5秒超のテストの比率が高いほど発生しやすい
+- **予防策候補**: 低速テストへの bun test timeout オプション指定、corpus 系テスト側の per-test timeout 設計、timeout 検出時の fail 対象のみの再実行（既存証跡手順の位置づけ）
+- **想定反映先**: agentdev-quality-gates の QG-4 fail 由来分類節（分類事例の補遺）
+- **関連**: Issue 3454、PR 3481、対応記録コメント 5987025958（検証差分に分類の要約を記録）
+- **タグ**: `#bun-test` `#timeout` `#fail-origin-classification` `#case-close`
+
+
