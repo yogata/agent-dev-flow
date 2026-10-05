@@ -234,3 +234,19 @@
 - **想定反映先**: checker 実行契約 Design（tsc 実行形態）、agentdev-quality-gates QG-4 検証差分セクション規約
 - **関連**: Issue #3484、PR #3491（merge 9ecdb0dd）、.agentdev/learning/deferred.md の LSP timeout 時 tsc --noEmit 代替記録
 - **タグ**: `#typecheck` `#tsc` `#fail由来分類` `#case-close` `#qg-4`
+
+## worktree の repo 全体 bun test 単一実行で textlint 一時 dictionary 競合疑いの fail が出る（正規形 3 分割実行では非再現）
+
+- **問題事象**: worktree での repo 全体 `bun test ./`（カレントディレクトリトリビアな単一実行）が vendor build 後も textlint tests 38 件が temp `check.dat.gz` ENOENT で失敗。textlint plugin suite 単体実行では 133/133 pass
+- **発生局面**: case-run の repository tests 実行（Case #3485、PR #3490）
+- **検知方法**: `bun test ./` 初回 1293 pass / 40 fail → vendor build 後再実行で 1295 pass / 38 fail 残存。単独 suite 実行では症状が出ないため一時 dictionary の並列/cleanup 競合を疑った
+- **根本原因**: 一時 dictionary（check.dat.gz）の並列実行/cleanup 競合が疑われるが原因確定は未実施
+- **自律対応内容**: case-close QG-4 で bun test フル suite 正規形（3 cwd 分割実行・依存パッケージ前置・stdout/stderr 分離退避・timeout 明示）で merge 直前 HEAD を再実測し 3595 tests / 0 fail を確認。単一実行形態の fail は正規形外の実行形態由来として扱い、textlint ENOENT は正規形下で非再現（無効分類）として検証差分へ記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: bun test フル suite 正規形（3 分割実行・`./` prefix・cwd 統一）を守れば textlint 一時 dictionary 競合は観測されない。カレントディレクトリトリビアな `bun test ./` 単一実行は正規形違反であり、その fail を fail 証拠として合格判定に使わない
+- **再発条件**: 同一 repo の worktree で正規形外の bun test 単一実行を行う場合（既に #3484 / #3486 でも同種の非正規形 fail 観測あり）
+- **予防策候補**: bun test フル suite 正規形（3 分割実行）の遵守確認を検証記録の前置項目化し、正規形外実行の fail を由来分類の対象外とする基準を検証差分セクション規約へ明記する
+- **想定反映先**: checker 実行契約 Design「bun test 実行形態契約」節、agentdev-quality-gates bun test フル suite 正規形（実行形態契約）
+- **関連**: Issue #3485、PR #3490（merge ada63ed1）、PR 本文 learning 候補、Issue #3484 / PR #3491 の learning（並行競合疑いの先行記録）
+- **タグ**: `#bun-test` `#textlint` `#worktree` `#fail由来分類` `#case-close` `#qg-4`
