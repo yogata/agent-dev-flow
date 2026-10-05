@@ -104,9 +104,8 @@ export function kuromojiDictPathFor(pluginDir?: string): string {
   return path.join(path.dirname(bundlePathFor(pluginDir)), "kuromoji-dict");
 }
 
-/** kuromojin 辞書パスを同梱辞書へ固定（利用者明示指定は優先する）。 */
+/** kuromojin 辞書パスを同梱辞書へ固定（Design「依存と配布」節の固定契約。loadEngine の各呼出で再設定する）。 */
 function ensureKuromojinDicPath(pluginDir?: string): void {
-  if (process.env.KUROMOJIN_DIC_PATH !== undefined) return;
   process.env.KUROMOJIN_DIC_PATH = kuromojiDictPathFor(pluginDir);
 }
 
@@ -122,8 +121,10 @@ function regenerationGuidance(bundlePath: string): string {
 
 /** エンジンの読込み（module-level キャッシュ）。失敗は検査不能として呼出側で拒否する。 */
 export async function loadEngine(pluginDir?: string): Promise<EngineLoadResult> {
-  if (loaded !== null) return { ok: true, engine: loaded };
+  // cache hit 経路も含め、各呼出で辞書パスを当該 pluginDir の同梱辞書へ固定する
+  // （一時 pluginDir での load が環境変数を取り残し、辞書 load が旧一時パスで失敗する汚染を防ぐ）。
   ensureKuromojinDicPath(pluginDir);
+  if (loaded !== null) return { ok: true, engine: loaded };
   const bundlePath = bundlePathFor(pluginDir);
   let raw: string;
   try {
@@ -192,8 +193,7 @@ export function invalidateEngineCache(): void {
 /** 代替経路（一時ファイル import）。blob: URL import を利用できない実行基盤向け。テスト専用。 */
 export async function loadEngineViaTempFile(pluginDir: string): Promise<EngineLoadResult> {
   ensureKuromojinDicPath(pluginDir);
-  const bundlePath = bundlePathFor(pluginDir);
-  let code: string;
+  const bundlePath = bundlePathFor(pluginDir);  let code: string;
   try {
     const envelope = JSON.parse(fs.readFileSync(bundlePath, "utf8")) as { codeBase64?: unknown };
     if (typeof envelope.codeBase64 !== "string") throw new Error("missing codeBase64");

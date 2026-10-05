@@ -22,5 +22,5 @@
     "allowImportingTsExtensions": true,
     "noEmit": true
   },
-  "include": ["./*.ts", "./lib/*.ts", "./build/*.ts", "./tests/*.ts"]
+  "include": ["./*.ts", "./lib/*.ts", "./lib/workers/*.ts", "./build/*.ts", "./tests/*.ts"]
 }

@@ -65,14 +65,33 @@ bun install && bun run build:engine
 | release archive 導入（archive 版 `install.ps1`） | 導入先に配置された `.opencode/plugins/agentdev-textlint-guard/` |
 | 本体リポジトリ（self-hosting） | `src/opencode/plugins/agentdev-textlint-guard/` |
 
-## 最終検査の実行
+## 最終検査の実行（用途別入口）
 
 ```bash
 bun run .opencode/plugins/agentdev-textlint-guard/gate.ts --root <project-root>   # 導入先
 bun run src/opencode/plugins/agentdev-textlint-guard/gate.ts --root .             # 本体
 ```
 
-終了コード: `0` = 合格（拒否対象違反ゼロ）、`1` = 不合格（違反あり、検査不能、または対象解決 0 件〔0 inspected。検査を実施していない無効実行を合格としない〕）、`2` = 引数エラー。`--json` で構造化結果。
+用途は正規契約から決定的に選択される。`--purpose` で工程側の契約上の用途を指定する（既定は通常最終検査）。LLM が毎回の検査範囲・目的・再利用可否を選択せず、結果の受理と進行判定は plugin 側の共通関数（`lib/runs.ts` の `resolveInspectionPurpose` / `acceptForProgress`）が一元実装する。
+
+| 用途 | 意味 | 保存済み結果の再利用 |
+|---|---|---|
+| `final`（既定） | 通常最終検査。case-run / docs-check 等の docs 変更時検査 | 対象全件の列挙・全文取得と現在入力との照合を毎回行った上で、同一性が機械検証できた対象だけ規則実行を省略 |
+| `independent` | 必須独立検査。QG-4 独立再検査等、正規契約上の独立要求が存在する実行 | 利用しない（対象全件の規則を実行する） |
+| `display` | 結果表示。直近の実行結果を読み戻す | 検査を起動しない（進行判定には使えない） |
+
+書込み前検査（pre-write）は plugin hook 内部で固定であり、CLI 用途には含まれない。
+
+終了コード: `0` = 合格（拒否対象違反ゼロ、完了、開始終了時照合の一致）、`1` = 不合格（違反あり、検査不能、未完了〔照合の不一致を含む〕、または対象解決 0 件〔0 inspected。検査を実施していない無効実行を合格としない〕）、`2` = 引数エラー。`display` は検査を起動しないため常に `0`。`--json` で構造化結果（`run` フィールドに用途、対象範囲、対象状態、完了状態、合否、実規則実行数と再利用数を含む）。
+
+## 保存済みファイル単位結果（実行時データ）
+
+通常最終検査は正常に完了した合格・不合格の双方のファイル単位結果を `.agentdev/cache/agentdev-textlint-guard/` 配下に保存し、同一性が機械検証できた対象の規則実行を省略する。
+
+- 同一性の構成要素: 本文（内容 SHA256）、パス、有効な規則と設定、実際のエンジンと依存成果物、標準・プロジェクト辞書、結果正規化の版。更新時刻とサイズのみで本文同一性を判定せず、条件を追跡できない場合は再利用せず実検査する
+- 保存先はプロジェクト・worktree ごとに分離され、誤流用は同一性キーの不一致として検出される
+- 異常終了・読込み失敗・タイムアウト・不完全出力は保存・再利用せず、保存結果の欠落・破損・保存失敗時は実検査へ戻る（実検査不能なら合格としない）
+- 保存は再生成可能な内部データとして扱い、エントリ数上限を設ける。保存先は実行時データであり、配布・投影・同期の対象外である（`runtime-package-boundary.md`「repo-local Plugin の配布・投影契約」節）
 
 ## テスト実行
 

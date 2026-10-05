@@ -16,6 +16,7 @@
 .agentdev/integrity/reports/
 .agentdev/graph/
 .agentdev/tmp/
+.agentdev/cache/
 docs/reports/local/
 AGENTS.md
 outputs/
