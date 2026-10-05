@@ -51,6 +51,7 @@ Root Case 本文候補の生成は preflight 設定検証の警告報告後に�
 
 1. 要件行（REQ 変更後本文）、Decision、Design、Issue 構成案（`operation_units`、`case_open_hints` 由来）、受入条件一式を Case 単位で集約し Definition Package を生成する
 1.5. **artifact_actions 適用前検証**: draft/RU の実測時点と適用時点の間で並行 merge 等により合意入力が陳腐化している可能性があるため、Definition Package の docs への適用（書込み）前に次の3点を検証する。（1）採番衝突検査: REQ 行 ID・Decision 番号の採番（max+1 割当て等）後に、適用時点の現行コーパスとの既存 ID 突合により衝突 0 件を確認する。（2）target 系パス実在検証: `artifact_actions` の target 系パス（target_design 等）の実在とドメイン配置（designs/ 配下の適切なドメインディレクトリ）を確認する。（3）可変メタデータ再実測: frontmatter の `updated` 等の可変メタデータは draft/RU 実測時点の値を引き継がず、適用時点で再実測・確定する。いずれかの検証で差異を検出した場合は適用を中止して要件doc・RU へ差し戻し、非公式の補完を行わない
+1.6. **対象セクションの適用直前照合**: append / update を既存文書へ書き込む直前に、組立時に使用した対象セクション・anchor・旧文と適用先の現状を照合する。一致した場合のみ、既存の Definition 保存内部責務（case-ready / case-revise）を通じて適用する。不一致の場合は書込み前に停止し、差異を提示して影響する変更・判断を再確認する。古い本文で新しい編集を上書きしない。見出しは完全一致のみで照合する。正規契約は case-ready Design「Definition 適用直前の対象セクション照合」節が所有し、本手順は新しい適用経路を設けない
 2. REQ 行追加を伴う Definition Package 生成時、トレーサビリティポリシー更新の追随要否を確認する。REQ 行の新設・追記を含む場合は、当該行のトレーサビリティポリシー（検証対応を任意とする要件行の明示登録）への追随要否を確認し、必要な policy エントリ追加を Definition Package の構成要素として含める。policy 編集は当該要件行の変更と同一の Definition 変更として扱うため Definition PR 経由以外の適用経路を取らない（直接 main へ適用しない）。policy 登録が不要と判断した場合は、その判断理由を Definition Package 構成案に記録する
 3. REQ 行変更（新規行の追加・移管・廃止等）を伴う場合、対象 REQ 行をカバーする Design の ADF-COVERS 宣言（design、implementation 役割）の追随要否を確認する。宣言の追加・更新が必要な場合は Definition Package の構成要素として含める。Definition PR の作成前にトレーサビリティ check（`agentdev-traceability`）で当該 REQ 行の missing-design が 0 件であることを確認する（missing-design 0 件ゲート）
 4. 意味変更行の design 対応事前確認: 対象要件行のうち既存行の意味変更を含む場合、`agentdev-traceability` の coverage --req による当該行の design 対応有無の事前確認を実施する。design 対応が欠落する意味変更行を検出した場合は、当該行の design 対応を artifact_actions（artifact: design）へ組込んだ上で合意を完了する。事前確認を省略した Case は case-ready の lifecycle gate completeness（fail-closed）で停止し得る（missing-design 既知債務の範囲で発生余地がある）。missing-design 0 件ゲート（上記3）が増分ベース〔新規行のみ〕であることへの予防手順として位置づける（正規所有は case-open Design「意味変更行の design 対応事前確認」節）
@@ -62,6 +63,8 @@ Root Case 本文候補の生成は preflight 設定検証の警告報告後に�
 8. Definition Package の構成、索引・補助メタデータの具体形式は case-open / case-ready Design の管理下とする
 
 ### 受け入れ義務の忠実性照合（STEP-3 実行時）
+
+既存文書を更新する `artifact_actions` は、適用直前に現行原文の対象見出しと旧文を照合する。見出しは完全一致で一意に特定し、旧文の期待件数も一致した場合だけ既存の case-ready / case-revise Definition 保存内部責務で適用する。差異または曖昧性があれば書込みを中止して要件doc・RU へ差し戻し、新しい適用経路を設けない。
 
 正規所有は case-open Design「受け入れ義務保存の投影」節であり、本節は STEP-3 の実行手順を提供する。
 
@@ -95,6 +98,7 @@ Root Case 本文候補の生成は preflight 設定検証の警告報告後に�
 - GitHub Issue/PR を使用するリポジトリ種別では、preflight 設定検証が実施済みであり（設定無効・設定照会不能時は区別した警告が報告済みであり、設定理由だけでは後続処理を停止していないこと。実操作の安全性確認不能時は既存の安全契約に従って停止済みであること）、ローカル版ではスキップされていること
 - 最初の docs 編集・GitHub 書込み（Root Case 本文候補の生成を含む）の前に extension rules の前置読込が実施されていること
 - Definition Package の docs 適用前に artifact_actions 適用前検証（採番衝突検査・target 系パス実在検証・可変メタデータ再実測）が実施され、差異検出時は適用中止と要件doc・RU への差し戻しが行われていること
+- append / update の書込み直前に、組立時の対象セクション・anchor・旧文と適用先の現状が照合され、一致時のみ既存の Definition 保存内部責務で適用されていること。不一致時は書込み前に停止し、差異を提示して影響する判断を再確認していること
 - Root Case 本文に対象 REQ 番号が埋め込まれていること
 - Definition Package が Root Case に関連付けられ、構成要素が揃っていること
 - REQ 行追加を伴う場合はトレーサビリティポリシー追随要否の確認（必要エントリの Definition 包含、または不要判断の記録）が行われていること

@@ -38,12 +38,33 @@ STEP-5 の Decision禁止ゲート・STEP-4 の文書分類妥当性検証で分
 
 `artifact_actions` の `action` が append / update で対象ファイルが既存の場合、生成前に実ファイルを Read し、対象テーブルの表列構造（列数・列順）と追記先セクションの見出し構造を突合する。生成する行と content は突合した実ファイル構造に適合させる。本突合は既存の content 完全確定義務（target_area/content 形式）への追加であり、既存手順を置換するものではない。
 
+#### 局所修正・追記の決定的組立と検査
+
+意味が確定した `artifact_actions` の局所修正・追記本文は、固定スクリプト `scripts/src/assemble-draft-section.ts` を用いて原文から組み立てる。実行ごとに組立・検査スクリプトを生成しない。全面改稿または新規文書では従来どおりモデルが本文を生成できる。
+
+検査順序は「構造・変更前提の検査 → 組立 → 差分・完結性検査 → 意味レビュー（STEP-8） → 指摘反映と影響範囲の再評価」とする。組立前に対象見出しの完全一致・一意性、旧文の存在件数と期待件数、追記位置を確認する。不在・複数一致・件数不一致の場合は組み立てず、判断を要する差分として返す。見出し検索は `search-target-area.ts` と同じ正規化と完全一致規則に従う。
+
+成功時の戻り値は、所在（ファイル・見出し・行）、操作、成否、一致件数、置換件数、前後の検査結果、差分 hunk、および証拠（原文内容ハッシュ、検査範囲、操作条件、実行時刻）を中心とする。変更しない本文の再出力を既定にせず、必要に応じレビュー担当が原文と周辺文脈を直接取得する。失敗は `ok: false` と理由・検査結果で示し、非ゼロ終了として適用を抑止する。
+
+検査証拠は、対象内容・版、評価範囲、実行条件を識別できる形で draft-data または workflow の永続状態へ保持し、STEP 再開時にそこから再構成する。同一入力・同一原文・同一条件の証拠を読み直すだけなら検査を再実行しない。入力・原文・条件が変われば影響する検査と意味判断を再評価する。一時的な実行結果だけに依存して再開を成立させない。
+
 **design 対応事前確認**: 対象 REQ 行のうち既存行の意味変更を含む場合、`agentdev-traceability` の coverage --req により当該行の design 対応有無を事前確認する。design 対応が欠落する意味変更行を検出した場合は、当該行の design 対応を `artifact_actions`（`artifact: design`）へ組込んだ上で生成を完了する。事前確認を省略した draft を入力とする Case は後段の case-ready lifecycle gate completeness（fail-closed）で停止し得る（missing-design 0 件ゲートが増分ベース〔新規行のみ〕であることへの予防手順。正規所有は case-open Design「意味変更行の design 対応事前確認」節）。
 
 **finding 由来 draft の target_design 実パス実在確認**: finding 由来の draft で design 操作を `artifact_actions` へ転記する前に、`target_design` の宣言と実配置（docs/designs/{domain}/ 配下の実ファイル）の一致を実パス実在確認（grep による本文一意性確認を含む）で検証する。宣言と実配置が不一致の場合は、slug・該当行番号・文言の3点一致による機械的照合で実配置を正と判定し、不在パスを正として採用しない（配置移動済み文書を旧配置の domain で参照する finding の機械的転記による誤パス更新の防止。正規所有は req-define command Design「finding 由来 draft の target_design 実パス実在確認」節）。
 
 各副ステップ（定義完全性ゲート QG-1、operation_units 生成、depends_on/recommended_order 定義、artifact_actions 生成、target_area/content 形式、Design action 分類根拠出力、test_strategy 生成、review_dispositions 生成）の詳細、フィールドスキーマ、委譲接続点は `agentdev-req-analysis` の req-define detailed gates、および req-define command Design（extension 経由）の各フィールドスキーマを参照。
 `target_design`、`canonical_owner`、`on_failure`、`review_dispositions` の出力形式も同 Design を正とする。
+
+### 決定的な局所組立・検査
+
+意味判断はモデルが行い、合意済み変更を既存原文へ反映する操作と構造検査は配布スクリプト `scripts/src/assemble-draft-section.ts` が行う。既存本文の再生成で置き換えず、入力 JSON で `operation`（`replace` / `append`）、対象ファイル、完全一致する `target_area` または `anchor`、変更内容を指定する。
+
+1. 構造を検査し、対象見出しが一意であることを確認する。類似する見出しは選ばない
+2. replace は旧文の実在件数を `expected_old_count`（省略時1）と照合し、一致した場合だけ置換する。append は指定した一意な見出し節の末尾へ原文を保持して追記する
+3. 組立後に対象の一意性、旧文残存、差分行数を検査する。失敗時は書き込まず、`ok: false` と理由を返す
+4. 既定では書込みをせず、所在・操作・成否・一致件数・置換件数・検査結果・差分要約・証拠（入力ハッシュ、検査範囲、実行条件、時刻）を JSON で返す。明示的な `--write` の場合だけファイルへ書き込む
+
+組立・構造検査を先に完了させ、次に組立差分を確認し、その後に意味レビューを実施する。意味レビューで変更が生じた場合は、組立・差分検査を再実行してから意味を再評価する。組立結果・検査証拠は入力ハッシュと検査範囲が同一の場合に限り再利用し、意味レビューを機械検査の代替にしない。
 
 ### Result
 
