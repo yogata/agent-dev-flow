@@ -281,4 +281,5 @@ case-open の判定結果に従う。
 - 不変条件（case-auto の所有対象の限定。harness 実行機構との責務分界は harness 分離モデル Design 参照）
 - 不変条件（subagent 委譲時の category 選定、事務的手続きには `unspecified-high` を推奨、`writing` category は執筆作業のみに限定）
 - 不変条件（全ての subagent 委譲 prompt に MUST NOT DO セクションを必須、スコープ外作業を明示列挙）
+- 不変条件（委譲 prompt に cleanup 権限〔draft・RU の削除権限等〕や工程の責務範囲に関する記述を含める場合、生成時に当該権限記述を対象工程の現行契約（draft・RU の削除は case-ready が所有する等、case-open / case-ready 実行契約）と突合し、旧契約に基づく文言を含んだまま委譲しない。突合は委譲 prompt 生成側（case-auto orchestration）の責務である）
 - 不変条件（case-auto は orchestration stage 3 だけで case-run を並列起動し、stage 1・2・4 では case-run を並列起動しない。並列実行は必須であり、並列起動が当該 stage の起動可能対象集合に対して1件も成立しない場合は停止理由「並列起動不能」と再開可能性を報告して停止する）

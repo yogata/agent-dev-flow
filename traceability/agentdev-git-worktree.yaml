@@ -1,4 +1,12 @@
 component: agentdev-git-worktree
+design:
+  docs/designs/skills/agentdev-git-worktree.md:
+    - REQ-102-001
+    - REQ-102-002
+    - REQ-102-003
+    - REQ-102-004
+    - REQ-018-009
+    - REQ-018-002
 implementation:
   src/common/skills/agentdev-git-worktree/references/git-common-procedures.md:
     - REQ-032-029

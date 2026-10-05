@@ -3,6 +3,9 @@
 // - root 配下を再帰走査し、拡張子に合致する通常ファイルの宣言をその場で解決する
 // - inline declaration の走査対象は producer-only artifact の .md / .ts
 //   （checker 実行契約 Design の走査対象方針）
+// - `docs/reports/` 配下（監査・評価・観測の Report）は履歴記録領域として走査対象から
+//   除外する（checker 実行契約 Design「検出対象除外規定」の正規列挙に従う除外。
+//   Report 文書内の要件行 ID 参照は歴史記録として対応関係管理対象外）
 // - top-level traceability/ 配下の YAML（component / package 単位 sidecar）も
 //   走査対象とし、inline と同一の論理対応関係へ正規化して declarations に統合する
 //   （policy.yaml は検証スコープポリシーであり verification_scope.ts が正規所有するため
@@ -31,10 +34,12 @@ export const DEFAULT_EXCLUDE_DIRS = [
   ".worktrees",
   "node_modules",
 ] as const;
+export const DEFAULT_EXCLUDE_DIR_PATHS = ["docs/reports"] as const;
 
 export interface ScanOptions {
   readonly extensions?: readonly string[];
   readonly excludeDirs?: readonly string[];
+  readonly excludeDirPaths?: readonly string[];
 }
 
 export interface SidecarMissingArtifact {
@@ -64,6 +69,7 @@ function walkFiles(
   relDir: string,
   extensions: readonly string[],
   excludeDirs: ReadonlySet<string>,
+  excludeDirPaths: ReadonlySet<string>,
   out: string[],
 ): void {
   let entries;
@@ -78,7 +84,8 @@ function walkFiles(
       // junction / symlink ディレクトリは降下しない（isDirectory はリンク先を追従した結果のため isSymbolicLink で除外）
       if (entry.isSymbolicLink()) continue;
       if (excludeDirs.has(entry.name)) continue;
-      walkFiles(rootDir, rel, extensions, excludeDirs, out);
+      if (excludeDirPaths.has(rel)) continue;
+      walkFiles(rootDir, rel, extensions, excludeDirs, excludeDirPaths, out);
       continue;
     }
     if (!entry.isFile()) continue;
@@ -94,12 +101,14 @@ export function enumerateCorpusFiles(
 ): readonly string[] {
   const extensions = options.extensions ?? DEFAULT_SCAN_EXTENSIONS;
   const excludeDirs = new Set(options.excludeDirs ?? DEFAULT_EXCLUDE_DIRS);
+  const excludeDirPaths = new Set(options.excludeDirPaths ?? DEFAULT_EXCLUDE_DIR_PATHS);
   const out: string[] = [];
   walkFiles(
     root.replaceAll("\\", "/").replace(/\/$/, ""),
     "",
     extensions,
     excludeDirs,
+    excludeDirPaths,
     out,
   );
   return out.sort();
@@ -112,6 +121,7 @@ function enumerateSidecarFiles(root: string): readonly string[] {
     TRACEABILITY_DIR,
     SIDECAR_SCAN_EXTENSIONS,
     new Set(DEFAULT_EXCLUDE_DIRS),
+    new Set(DEFAULT_EXCLUDE_DIR_PATHS),
     out,
   );
   return out.sort();

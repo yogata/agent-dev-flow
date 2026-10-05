@@ -98,7 +98,7 @@ req-define workflow は次の11 STEP で構成する。
 ## 共通制約
 
 - **壁打ちフェーズのみ**: 実装コードを書かない。`.agentdev/drafts/**` のみ作成・編集を許可する
-- **参照専用入力**: ユーザーが明示した入力ファイル、RU、promoted 成果物は変更・削除しない。RU の削除は case-open 成功後に実行される
+- **参照専用入力**: ユーザーが明示した入力ファイル、RU、promoted 成果物は変更・削除しない。RU の削除は case-ready が draft と同一タイミング（case-ready 成功後）で実行する
 - **draft-data 形式**: 出力は構造化 `draft-data`（`# draft-data` fenced YAML block）。`operation_units` を出力し、`execution_groups` は出力しない。`workflow_route` は派生値として保存しない（後続工程の分岐は `artifact_actions` の存在で決定）
 - **Issue 階層非決定**: req-define は Issue 階層を決定しない。`depends_on` は case-open の execution_unit 構成が使用する依存情報であり、最終 Issue 構成は case-open が決定する
 - **session由来RU 消費契約**: 正規原本（一時成果物ライフサイクル要件 + artifact-contracts Design）へ委譲し、本スキルで再定義しない

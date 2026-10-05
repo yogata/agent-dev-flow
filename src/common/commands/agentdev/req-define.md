@@ -55,5 +55,5 @@ Case 確立後の Definition 変更も本コマンドで再合意し、再合意
 否定規則は破壊的操作・state 破壊等の硬い境界に限定する:
 
 - ファイル編集スコープは `.agentdev/drafts/**` のみ（他パスへの作成・編集は禁止）
-- ユーザーが明示した入力ファイルは参照専用とし、変更・削除を行わない。`.agentdev/backlog/req-units/RU-*.md` の削除は case-open 成功後に実施する
+- ユーザーが明示した入力ファイルは参照専用とし、変更・削除を行わない。`.agentdev/backlog/req-units/RU-*.md` の削除は case-ready が draft と同一タイミング（case-ready 成功後）で実行する
 - `git` コマンドは実行しない

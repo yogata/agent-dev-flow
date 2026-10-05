@@ -84,8 +84,8 @@
 deferred / 未処理のエントリは残す。
 staged エントリ除去時に採用済み成果物の「元learning item/ 根拠」セクションに証拠を保存する。
 追加確認なしで削除する（STEP-5 の判定確定と同時に承認済みとみなす）
-5. `git diff --name-only` で `.agentdev/learning/` 配下の変更を確認する。変更なし時は commit/push せず STEP-7 で「変更なし」と報告する
-6. 変更あり時、`git add` は `.agentdev/learning/` 配下のみを対象とする（明示パス指定、並列実行安全ステージングプロシージャ準拠）。
+5. `git diff --name-only` で `.agentdev/learning/` 配下の変更を、`git status --short` で `.agentdev/jev-observations/` の untracked 分（当該実行で生成した Jev 観測）を確認する。両方とも変更なし時は commit/push せず STEP-7 で「変更なし」と報告する
+6. 変更あり時、`git add` は `.agentdev/learning/` 配下と、当該実行で生成した `.agentdev/jev-observations/` の untracked 分（domain state の git 永続化対象。検出した観測ファイルのみ）を対象とする（明示パス指定、並列実行安全ステージングプロシージャ準拠）。
 `git commit -- <paths>`（--only pathspec 形式）でコミットする。
 `.agentdev/` 全体の一括スコープ、スイープ操作（`git add -A`/ `git add .` 等）は禁止
 7. commit message は `chore(agentdev): promote learning findings` とする
