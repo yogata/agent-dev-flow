@@ -82,8 +82,15 @@ export const RULE_OWNERSHIP_BLOCK_ID = "rule-ownership-ir-crossref";
 // ─── Frontmatter / body parser ──────────────────────────────────────────────
 
 /**
- * Markdown frontmatter をパースする（cli_utils/check_integrity と同等 logic）。
- * 戻り値は key→string|string[] の Map。frontmatter なしは null。
+ * Markdown frontmatter をパースする（cli_utils/check_integrity と同等 logic に
+ * 加えて YAML ブロックスカラ対応を持つ）。戻り値は key→string|string[] の Map。
+ * frontmatter なしは null。
+ *
+ * ブロックスカラ（`|`、`|-`、`|+`、`>`、`>-`、`>+`）は、キー行より深いインデントの
+ * 後続行を改行結合した 1 文字列として値に格納する（DEC frontmatter の
+ * supersede_note 等）。同等 logic の簡易パーサーがブロックスカラ指示子を
+ * リテラル値（"|"）として読み、注記レンダリングを破損させる（〔|〕出力）
+ * ことを防ぐ（index-auto-generation.md 注記形式契約・ACT-DESIGN-035）。
  */
 function parseFrontmatter(
   content: string,
@@ -95,6 +102,9 @@ function parseFrontmatter(
   const lines = yaml.split("\n");
   let currentKey: string | null = null;
   const currentArray: string[] = [];
+  let blockKey: string | null = null;
+  let blockIndent: number | null = null;
+  const blockLines: string[] = [];
 
   function flushArray() {
     if (currentKey !== null && currentArray.length > 0) {
@@ -104,8 +114,33 @@ function parseFrontmatter(
     currentArray.length = 0;
   }
 
+  function flushBlockScalar() {
+    if (blockKey !== null) {
+      result[blockKey] = blockLines.join("\n");
+    }
+    blockKey = null;
+    blockIndent = null;
+    blockLines.length = 0;
+  }
+
   for (const line of lines) {
     const trimmed = line.trim();
+
+    if (blockKey !== null) {
+      if (trimmed === "") {
+        blockLines.push("");
+        continue;
+      }
+      const indent = line.length - line.trimStart().length;
+      if (blockIndent === null) blockIndent = indent;
+      if (indent >= blockIndent) {
+        blockLines.push(line.slice(blockIndent));
+        continue;
+      }
+      // ブロックスカラ領域の終端（より浅いインデントの行）。通常パースへ続く。
+      flushBlockScalar();
+    }
+
     if (!trimmed || trimmed.startsWith("#")) continue;
 
     if (trimmed.startsWith("- ") && currentKey !== null) {
@@ -123,6 +158,11 @@ function parseFrontmatter(
     if (value === "") {
       currentKey = key;
       currentArray.length = 0;
+    } else if (/^[|>][+-]?$/.test(value)) {
+      // YAML ブロックスカラ開始。後続の深いインデント行を収集する。
+      blockKey = key;
+      blockIndent = null;
+      blockLines.length = 0;
     } else if (value.startsWith("[") && value.endsWith("]")) {
       result[key] = value
         .slice(1, -1)
@@ -134,6 +174,7 @@ function parseFrontmatter(
     }
   }
 
+  flushBlockScalar();
   flushArray();
   return result;
 }
@@ -665,6 +706,14 @@ export const DECISION_RETIRED_TABLE_BLOCK_ID = "decision-retired-table";
 // （index-auto-generation.md「Decision 関連REQ表の自動生成」）。
 export const DECISION_RELATED_REQ_TABLE_BLOCK_ID = "decision-related-req-table";
 
+export function normalizeSupersedeNote(
+  note: string | null,
+): string | null {
+  if (note === null) return null;
+  const normalized = note.replace(/\s+/g, " ").trim();
+  return normalized.length > 0 ? normalized : null;
+}
+
 /**
  * superseded Decision 行の部分置換注記サフィックス（index-auto-generation.md
  * 「現在稼働している自動生成契約」5「Decision frontmatter の supersede_note 由来の
@@ -675,13 +724,16 @@ export const DECISION_RELATED_REQ_TABLE_BLOCK_ID = "decision-related-req-table";
  * `〔superseded by DEC-MMM。<note>〕` 形式の注記文字列を返す。
  * status 表（decision-baseline-table）・superseded セクション（decision-status-superseded）
  * 間で同一注記文字列を出力する。
- * supersede_note 未宣言（全体置換等）の場合は null を返し、注記を付与しない。
+ * supersede_note 未宣言（全体置換等）、空値・空白のみの場合は null を返し、
+ * 注記を付与しない（空括弧・区切り文字のみの出力の禁止）。ブロックスカラ由来の
+ * 改行を含む内容は正規展開して 1 行注記とする。
  */
 export function formatSupersedeNoteSuffix(info: DecisionInfo): string | null {
   if (info.status !== "superseded") return null;
-  if (!info.supersedeNote) return null;
+  const note = normalizeSupersedeNote(info.supersedeNote);
+  if (note === null) return null;
   const by = info.supersededBy ? `superseded by ${info.supersededBy}。` : "";
-  return `〔${by}${info.supersedeNote}〕`;
+  return `〔${by}${note}〕`;
 }
 
 /**
@@ -960,7 +1012,8 @@ export function generateDocsReadmeDecisionTable(
   for (const info of decisions) {
     let titleCell = sanitizeTableCell(info.title);
     if (info.supersededBy) {
-      const notePart = info.supersedeNote ? `〔${info.supersedeNote}〕` : "";
+      const note = normalizeSupersedeNote(info.supersedeNote);
+      const notePart = note !== null ? `〔${sanitizeTableCell(note)}〕` : "";
       titleCell += `（superseded by ${info.supersededBy}${notePart}）`;
     }
     lines.push(`| [${info.id}](decisions/${info.relPath}) | ${titleCell} |`);
