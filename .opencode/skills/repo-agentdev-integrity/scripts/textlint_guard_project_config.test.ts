@@ -5,7 +5,7 @@
 //   .agentdev/config/plugins/agentdev-textlint-guard.yaml に存在し、
 //   Plugin の実際の設定 loader で解釈して src/common/commands/**/*.md、
 //   src/common/skills/**/*.md、src/opencode/plugins/**/README.md、
-//   src/common/tools/**/README.md、src/opencode-local/**/*.md の加算だけを
+//   src/common/tools/**/README.md の加算だけを
 //   生成すること（AG-007）
 // - 追加対象設定が .agentdev/extensions/**（Skill Project Extensions）に
 //   存在しないこと（deterministic runtime Plugin の対象パス設定に使用しない）
@@ -53,7 +53,7 @@ function walkFiles(root: string): string[] {
 }
 
 describe("agentdev-textlint-guard ADR 本体設定（TS-007）", () => {
-  it("Plugin の実際の設定 loader で ADR 本体設定が解釈され、追加対象は正規5 glob のみ", async () => {
+  it("Plugin の実際の設定 loader で ADR 本体設定が解釈され、追加対象は正規4 glob のみ", async () => {
     const configModule = await import(path.join(PLUGIN_DIR, "lib", "config.ts"));
     configModule.invalidateConfigCache();
     const result = configModule.loadGuardConfig(REPO_ROOT);
@@ -65,7 +65,6 @@ describe("agentdev-textlint-guard ADR 本体設定（TS-007）", () => {
       "src/common/skills/**/*.md",
       "src/opencode/plugins/**/README.md",
       "src/common/tools/**/README.md",
-      "src/opencode-local/**/*.md",
     ]);
   });
 
@@ -80,10 +79,9 @@ describe("agentdev-textlint-guard ADR 本体設定（TS-007）", () => {
     expect(targets.some((rel) => rel.replaceAll("\\", "/").startsWith("src/common/commands/"))).toBe(true);
     expect(targets.some((rel) => rel.replaceAll("\\", "/").startsWith("src/common/skills/"))).toBe(true);
     expect(targets.some((rel) => rel.replaceAll("\\", "/").startsWith("docs/"))).toBe(true);
-    // 追加対象の実在9ファイル（plugins README 4 + tools README 2 + opencode-local 3）が列挙される
+    // 追加対象の実在6ファイル（plugins README 4 + tools README 2）が列挙される
     expect(targets.some((rel) => rel.replaceAll("\\", "/") === "src/opencode/plugins/agentdev-textlint-guard/README.md")).toBe(true);
     expect(targets.some((rel) => rel.replaceAll("\\", "/") === "src/common/tools/agentdev-gh/README.md")).toBe(true);
-    expect(targets.some((rel) => rel.replaceAll("\\", "/") === "src/opencode-local/README.md")).toBe(true);
     // node_modules 配下は依存成果物として列挙されない
     expect(targets.some((rel) => rel.replaceAll("\\", "/").includes("node_modules"))).toBe(false);
   });

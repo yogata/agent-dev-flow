@@ -132,6 +132,34 @@ describe("bypass 検出（外部書込み）", () => {
   });
 });
 
+describe("対象解決 0 件の fail-closed（0 inspected は合格扱いにしない）", () => {
+  test("docs 配下に対象 .md が 1 件もないプロジェクトは不合格になる", async () => {
+    // 検査対象がゼロに解決された実行は検査を実施していない無効実行であり、
+    // 合格（exit 0）として扱わない（0 inspected PASS の fail-open を回帰防止する）。
+    const root = makeProject({ "README.md": CLEAN, "src/other.ts": "x" });
+    const gate = await runFinalGate(["--root", root]);
+    expect(gate.exitCode).toBe(1);
+  });
+
+  test("--json でも対象解決 0 件は ok: false と inspectedFiles: 0 を返す", async () => {
+    const root = makeProject({});
+    const gate = await runFinalGate(["--root", root, "--json"]);
+    expect(gate.exitCode).toBe(1);
+    const payload = JSON.parse(gate.output) as { ok: boolean; inspectedFiles: number };
+    expect(payload.ok).toBe(false);
+    expect(payload.inspectedFiles).toBe(0);
+  });
+
+  test("追加対象のみ指定で追加対象が 1 件も解決しない場合も不合格になる", async () => {
+    const root = makeProject({ "README.md": CLEAN });
+    const configAbs = configPathFor(root);
+    fs.mkdirSync(path.dirname(configAbs), { recursive: true });
+    fs.writeFileSync(configAbs, "version: 1\nadditional_targets:\n  - missing/**/*.md\n", "utf8");
+    const gate = await runFinalGate(["--root", root]);
+    expect(gate.exitCode).toBe(1);
+  });
+});
+
 describe("機構固定の既定除外と加算優先（最終検査入口、REQ-053-039）", () => {
   test("node_modules は加算でも対象外、歴史記録サブツリーは加算で再包含される", async () => {
     const root = makeProject({

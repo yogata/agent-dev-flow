@@ -72,7 +72,7 @@ bun run .opencode/plugins/agentdev-textlint-guard/gate.ts --root <project-root> 
 bun run src/opencode/plugins/agentdev-textlint-guard/gate.ts --root .             # 本体
 ```
 
-終了コード: `0` = 合格（拒否対象違反ゼロ）、`1` = 不合格（違反ありまたは検査不能）、`2` = 引数エラー。`--json` で構造化結果。
+終了コード: `0` = 合格（拒否対象違反ゼロ）、`1` = 不合格（違反あり、検査不能、または対象解決 0 件〔0 inspected。検査を実施していない無効実行を合格としない〕）、`2` = 引数エラー。`--json` で構造化結果。
 
 ## テスト実行
 
