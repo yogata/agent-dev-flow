@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261005T165045Z-a5ca",
+  "workflow": "req-define",
+  "evaluationKind": "classification-design-separation",
+  "subject": "RU-0162 の最終分類・Design 分離",
+  "sourceRevision": "9ca73db4e7ee3f1d62d2a3bac3ac8bb099f0f37f",
+  "durationMs": 1283,
+  "inputTokens": 2048,
+  "inputs": {
+    "requestDigest": "00b90fb92b617f82944dbf54c766ca1cd7db385feb23c6e20b69d6f616a1f9fa",
+    "references": [
+      {
+        "digest": "08dfb8ae0bfad8c028b438309f42a06472e0576984fc926a363b2c2d79041aaf",
+        "label": "RU-0162",
+        "path": ".agentdev/backlog/req-units/RU-0162.md"
+      },
+      {
+        "digest": "89790ac4349a81d4d139c7563e4e5035c794589817e1b60c6acb63339df40576",
+        "label": "case-auto-design",
+        "path": "docs/designs/commands/case-auto.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-hitl-queue-attribution",
+      "questionForm": "choice",
+      "value": "Design 行（command Design の承認・HITL 境界の更新・追記のみで、REQ 行変更不要）",
+      "probabilityDistribution": {
+        "Design 行（command Design の承認・HITL 境界の更新・追記のみで、REQ 行変更不要）": 0.84,
+        "REQ 行（既存REQ行の意味変更を要する）": 0.11,
+        "REQ 行と Design 行の両方": 0.05
+      }
+    },
+    {
+      "questionId": "q2-script-contract-attribution",
+      "questionForm": "choice",
+      "value": "Design 行（各工程 command Design への script 呼び出し契約セクション追記のみ）",
+      "probabilityDistribution": {
+        "Design 行（各工程 command Design への script 呼び出し契約セクション追記のみ）": 0.93,
+        "REQ 行（新規要件行として REQ へ記載する）": 0.01,
+        "REQ 行と Design 行の両方": 0.06
+      }
+    },
+    {
+      "questionId": "q3-separation-necessity",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.82,
+        "false": 0.18000000000000005
+      }
+    }
+  ],
+  "confidence": 0.75,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-hitl-queue-attribution",
+        "value": "Design 行（command Design の承認・HITL 境界の更新・追記のみで、REQ 行変更不要）"
+      },
+      {
+        "questionId": "q2-script-contract-attribution",
+        "value": "Design 行（各工程 command Design への script 呼び出し契約セクション追記のみ）"
+      },
+      {
+        "questionId": "q3-separation-necessity",
+        "value": true
+      }
+    ]
+  }
+}

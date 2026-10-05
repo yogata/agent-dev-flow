@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261005T165045Z-38b5",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0162（case-open/ready/close機械工程のスクリプト化とorchestration並列改善）の既存REQ照合",
+  "sourceRevision": "9ca73db4e7ee3f1d62d2a3bac3ac8bb099f0f37f",
+  "durationMs": 1320,
+  "inputTokens": 2401,
+  "inputs": {
+    "requestDigest": "dab2b2b576be248253d7975452cd2d4c47a17b9f0941dadf125c641b353d4362",
+    "references": [
+      {
+        "digest": "08dfb8ae0bfad8c028b438309f42a06472e0576984fc926a363b2c2d79041aaf",
+        "label": "RU-0162",
+        "path": ".agentdev/backlog/req-units/RU-0162.md"
+      },
+      {
+        "digest": "ab59f376e5761a172ffacbba0140e39b34a61d32183fa553b4295a4fd23e381f",
+        "label": "REQ-034",
+        "path": "docs/requirements/REQ-034.md"
+      },
+      {
+        "digest": "3fff66ea97045906ee5033f9bc73d2078127adafbd4f649ac955af5bdd99ce56",
+        "label": "REQ-035",
+        "path": "docs/requirements/REQ-035.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-scripting-attribution",
+      "questionForm": "choice",
+      "value": "APPEND（既存REQに行を追加する）",
+      "probabilityDistribution": {
+        "REQ操作なし（Design への追記・更新のみで対応する）": 0.37,
+        "CREATE（新規REQファイルを作成する）": 0.03,
+        "APPEND（既存REQに行を追加する）": 0.58,
+        "UPDATE（既存REQ行を意味変更する）": 0.02
+      }
+    },
+    {
+      "questionId": "q2-wave-barrier-attribution",
+      "questionForm": "choice",
+      "value": "UPDATE（既存REQ行を意味変更する）",
+      "probabilityDistribution": {
+        "REQ操作なし（Design への追記・更新のみで対応する）": 0.03,
+        "CREATE（新規REQファイルを作成する）": 0.01,
+        "APPEND（既存REQに行を追加する）": 0.01,
+        "UPDATE（既存REQ行を意味変更する）": 0.95
+      }
+    },
+    {
+      "questionId": "q3-matching-confidence",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.33,
+        "false": 0.6699999999999999
+      }
+    }
+  ],
+  "confidence": 0.43,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-scripting-attribution",
+        "value": "REQ操作なし（Design への追記・更新のみで対応する）",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q2-wave-barrier-attribution",
+        "value": "UPDATE（既存REQ行を意味変更する）"
+      },
+      {
+        "questionId": "q3-matching-confidence",
+        "value": false
+      }
+    ]
+  }
+}
