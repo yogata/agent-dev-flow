@@ -250,3 +250,19 @@
 - **想定反映先**: checker 実行契約 Design「bun test 実行形態契約」節、agentdev-quality-gates bun test フル suite 正規形（実行形態契約）
 - **関連**: Issue #3485、PR #3490（merge ada63ed1）、PR 本文 learning 候補、Issue #3484 / PR #3491 の learning（並行競合疑いの先行記録）
 - **タグ**: `#bun-test` `#textlint` `#worktree` `#fail由来分類` `#case-close` `#qg-4`
+
+## Windows で依存生成済み worktree の git worktree remove が Filename too long で失敗する（node fs.rmSync での回復手順）
+
+- **問題事象**: case-close STEP-6-1 の worktree 削除（Case #3486、plugin 依存生成済み〔bun install + build:engine 済み、node_modules と textlint vendor 辞書を含む〕）で `git worktree remove .worktrees/3486-case` が `error: failed to delete ... Filename too long` で失敗した。worktree list からは登録が外れるが `.worktrees/3486-case/` ディレクトリ実体が残存した。Git Bash の rm でも tmp 退避ログ等の一部パスが ENOENT として解決不能になり個別削除が不可だった
+- **発生局面**: 運用（case-close STEP-6-1 の worktree/branch 削除。依存生成を実施した Case のクローズ）
+- **検知方法**: git worktree remove の error 出力と、削除後の `ls .worktrees/` での残存ディレクトリ確認。worktree 登録（`git worktree list`）とディレクトリ実体の乖離を確認
+- **根本原因**: Windows MAX_PATH（260 文字）制限。textlint vendor の辞書ファイル（kuromoji の charset 表等の長いファイル名）と node_modules の深い階層が連結して 260 超に到達し、git worktree remove が OS の削除 API 経由で失敗する。clean tree（git 管理変更なし）でも ignore 対象の生成物ごとディレクトリを削除するため生成物の長パスが障害になる
+- **自律対応内容**: node の `fs.rmSync(root, { recursive: true, force: true, maxRetries: 3 })` で残存ディレクトリを削除した（node は Windows で拡張長パス解決を行うため成功）。その後 `git worktree prune` と branch `-D` で整合を確保。definition worktree（依存生成なし・clean）は git worktree remove が通常どおり成功
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存の worktree 削除手順への Windows 環境適用上の補足であり契約変更ではない）
+- **横展開観点**: 依存生成済み worktree のクローズでは worktree 登録とディレクトリ実体が乖離し得る（登録は外れる・実体は残る）。乖離を検知したら node fs.rmSync → worktree prune → branch 削除の順で回復する。PowerShell cmdlet の一括読み書きと同系統の Windows パス処理問題であり、node の fs API が標準回復手段
+- **再発条件**: Windows 環境で bun install・build:engine（vendor 生成）を実施した worktree を case-close STEP-6-1 で削除する場合
+- **予防策候補**: agentdev-git-worktree の worktree 削除手順へ「依存生成済み worktree での remove 失敗時の回復手順（node fs.rmSync → prune）」を補足として追加する候補（skill 変更は別 Case 対象として本記録に留める）
+- **想定反映先**: agentdev-git-worktree skill（worktree 削除手順の Windows 注意事項）
+- **関連**: Case #3486、PR #3493（merge 6cf02f4c）、AGENTS.md 行動規範（PowerShell 一括 IO 禁止・node fs API 標準手段）
+- **タグ**: `#windows` `#long-path` `#worktree` `#case-close`
