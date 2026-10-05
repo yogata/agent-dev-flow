@@ -146,3 +146,21 @@
 - **想定反映先**: session由来RU 契約（artifact-contracts.md の RU 採番・記録規定系）
 - **関連**: RU-0160、Issue 3484
 - **タグ**: `#ru-contract` `#generation-actor` `#case-open`
+
+---
+
+## artifact_actions の update content が target_area 節の現行内容を全含しない場合、節置換は合意外の既存内容を削除する
+
+- **問題事象**: draft（RU-0161 由来）の ACT-DESIGN-006 content が target_area「### repo-local Plugin の配布・投影契約」節の現行内容の一部（outside-root 判定段落）を含んでいなかった。content で節全体を置換すると、合意に含まれない既存内容が黙示的に削除される状態だった
+- **発生局面**: 運用（case-open STEP-3 の Definition 適用。Design target_area 置換）
+- **検知方法**: artifact_actions 適用前の target_area 節の実取得（read）と draft content の突合。節の現行内容のうち content に対応行のない段落を検出した
+- **根本原因**: draft 生成時（req-define）の update 操作の content が節の部分差分として作成され、操作種別（update = 節置換）との組合せで削除リスクが暗黙化していた。draft の reviewed 合意では target_area 置換の削除含意が明示されていなかった
+- **自律対応内容**: 節全体置換を避け、既存段落を保持した最小追加（textlint 関連 bullet のみの追加）へ適用方式を変更して削除を回避した。保持判断（合意外の既存段落の削除なし）を Definition PR 本文の完了条件へ記録した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存内容の保持は合意範囲内の忠実性確保）
+- **横展開観点**: artifact_actions の update 操作では、content が target_area 節の現行内容を全含しない限り、節置換は既存内容の削除を含意する。適用前に現行節と content の差分を必ず実取得して照合する。逆方向（content 側にだけある行の追加）と併せて diff 突合が素早い判定になる
+- **再発条件**: req-define が update 操作の content を部分差分として生成し、後続工程が target_area 置換を機械的に実行する場合
+- **予防策候補**: req-define の artifact_actions 生成契約へ「update 操作の content は target_area 節の現行内容を全含する、または削除対象行を明示する」の追加と、case-ready の適用前検証（手順 1.5）への節内容差分突合の明文化
+- **想定反映先**: artifact-contracts.md の req_draft 出力構造（artifact_actions 形式）、case-open Design（適用前検証）
+- **関連**: RU-0161、Issue #3486、PR #3489
+- **タグ**: `#draft-schema` `#target-area` `#artifact-actions` `#case-open`
