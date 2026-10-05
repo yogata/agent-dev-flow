@@ -92,3 +92,21 @@
 - **想定反映先**: agentdev-epic-tracker references/epic-reflect-coordination.md の最新取得→マージ→更新手順
 - **関連**: Issue 3460、Epic 3457、case-close（commit 83d48e86 のクローズ処理）
 - **タグ**: `#epic-tracker` `#transcription` `#case-close` `#deterministic-engine`
+
+---
+
+## main root での修正版テスト直接実行と非干渉契約の緊張（決定的再実行と post-merge 直接実行の分担で解消）
+
+- **問題事象**: Issue 3463 の完了条件の検証方法「該当テストを main root・worktree 両環境で実行」について、実行担当サブエージェントの非干渉契約（worktree root 配下でのみファイル編集）により、main root では修正版テストコードの直接実行ができない。case-run では「修正版ロジックを main root の正規配置パス・実データへ適用する決定的再実行」で代替した。
+- **発生局面**: case-run / case-close での両環境検証（worktree 検証の環境差是正。Issue 3463・PR 3477）
+- **検知方法**: 完了条件の検証方法と非干渉契約の突合
+- **根本原因**: main root 環境を要する検証方法と、実行担当の main root 編集禁止が衝突すると、検証方法の実施形態を実行ごとに場当たり的に決めることになる
+- **自律対応内容**: case-run 側は決定的再実行で代替し、case-close 工程で main を最新化した後の main root から正規 suite を直接実行して両環境 green を確定した（case-close は main root 編集を伴わない読取実行のため契約上の衝突なし）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（明文化候補の記録）
+- **横展開観点**: 「main root・worktree 両環境で実行」を検証方法に書く完了条件は、実施形態（case-run で決定的再実行、case-close で post-merge 直接実行）を工程ごとに明記すると解釈の揺れが消える
+- **再発条件**: 両環境実行を検証方法に持つ子 Issue の case-run / case-close
+- **予防策候補**: checker 実行契約 Design または qg-4 への「両環境検証の工程別実施形態」明記（RU/learning 議論対象）
+- **想定反映先**: docs/designs/integrity/checker-execution-contracts.md、agentdev-quality-gates references/qg-4-final-acceptance.md
+- **関連**: Issue 3463、PR 3477（squash 763a05d5）、Epic 3457
+- **タグ**: `#worktree` `#verification` `#case-close`
