@@ -1,18 +1,18 @@
-// agentdev-textlint-guard 共通実行基盤: SHA-256 ハッシュヘルパー。
+// agentdev-textlint-guard 共通実行基盤: SHA256 ハッシュヘルパー。
 //
-// ファイル単位結果の同一性判定（REQ-053-042）と規則構成ハッシュ
+// ファイル単位結果の同一性判定と規則構成ハッシュ
 // （textlint-quality-runtime.md「規則校正と移行検証」節）が共有する
-// 決定的ハッシュ手順。内容はすべて SHA-256（hex、64 文字）で表現する。
+// 決定的ハッシュ手順。内容はすべて SHA256（hex、64 文字）で表現する。
 
 import { createHash } from "node:crypto";
 import * as fs from "node:fs";
 
-/** 文字列の SHA-256（hex）。 */
+/** 文字列の SHA256（hex）。 */
 export function sha256Hex(text: string): string {
   return createHash("sha256").update(text, "utf8").digest("hex");
 }
 
-/** ファイル内容の SHA-256（hex）。読込み失敗は例外として呼出側へ伝播する。 */
+/** ファイル内容の SHA256（hex）。読込み失敗は例外として呼出側へ伝播する。 */
 export function sha256FileHex(filePath: string): string {
   return createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
 }

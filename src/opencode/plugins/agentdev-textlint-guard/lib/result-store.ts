@@ -1,4 +1,4 @@
-// agentdev-textlint-guard 共通実行基盤: ファイル単位結果の保存と読込み（REQ-053-043/044）。
+// agentdev-textlint-guard 共通実行基盤: ファイル単位結果の保存と読込み。
 //
 // - 再利用対象は正常に完了した合格・不合格の両方。異常終了、読込み失敗、タイムアウト、
 //   不完全出力は正常結果として保存しない（保存関数の呼出側が実検査成功結果のみ渡す）
@@ -40,7 +40,7 @@ function entryPathFor(root: string, key: string): string {
   return path.join(storeDirectoryFor(root), `${key}.json`);
 }
 
-/** キーは 64 文字 hex（SHA-256）であることを要求する（パスへの混入を防ぐ）。 */
+/** キーは 64 文字 hex（SHA256）であることを要求する（パスへの混入を防ぐ）。 */
 function isValidKey(key: string): boolean {
   return /^[0-9a-f]{64}$/.test(key);
 }
@@ -74,7 +74,7 @@ function isValidStoredRecord(value: unknown, expectedKey: string, expectedPath: 
 }
 
 /**
- * 実検査に成功した結果を保存する。保存の失敗は無視できる（REQ-053-043:
+ * 実検査に成功した結果を保存する。保存の失敗は無視できる（
  * 保存失敗時は実検査へ戻る。当該対象の実検査は既に完了しているため、
  * 保存の成否は検査結果の信頼性に影響しない）。成功時 true。
  */
@@ -112,7 +112,7 @@ export function storeFileResult(
 
 /**
  * 同一性キーに対応する保存済み結果を読む。欠落・破損・途中書込み・キー/パス不一致は
- * null を返し、呼出側は実検査へ戻す（REQ-053-043/044）。
+ * null を返し、呼出側は実検査へ戻す。
  */
 export function loadStoredFileResult(
   root: string,

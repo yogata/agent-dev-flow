@@ -170,7 +170,7 @@ export interface PreparedInspectionContext {
   readonly prepared: Extract<InspectPrepared, { readonly ok: true }>;
   readonly conditions: InspectionConditionsResult;
   /**
-   * 終了時照合用（REQ-053-046）: 開始時と同一手順で設定と検査条件を再計算する
+   * 終了時照合用: 開始時と同一手順で設定と検査条件を再計算する
    * （検査中の辞書・規則・設定・依存成果物の変更を検知する）。
    */
   readonly recomputeSnapshotInputs: () => { config: GuardConfig; conditionsHash: string };
@@ -215,9 +215,9 @@ export async function prepareInspectionContext(root: string, env: InspectEnviron
 }
 
 export interface ReuseAwareInspectOptions {
-  /** 保存済み結果の再利用（REQ-053-041。独立検査では false）。 */
+  /** 保存済み結果の再利用（独立検査では false）。 */
   readonly reuse: boolean;
-  /** 実検査結果の保存（REQ-053-043。正常完了した合格・不合格のみ保存される）。 */
+  /** 実検査結果の保存（正常完了した合格・不合格のみ保存される）。 */
   readonly store: boolean;
 }
 
@@ -227,7 +227,7 @@ export type InspectWithReuseResult =
 
 /**
  * ファイル単位の検査（保存結果の再利用つき）。
- * 対象全件の列挙と全文取得は毎回必須（REQ-053-032/041）であり、text は呼出側が
+ * 対象全件の列挙と全文取得は毎回必須であり、text は呼出側が
  * 実ファイルから読んで渡す。同一性が機械検証できた対象だけ規則実行を省略し、
  * 保存済みのファイル単位結果を再利用する。条件を追跡できない場合は再利用せず実検査する。
  */

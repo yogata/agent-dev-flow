@@ -1,12 +1,12 @@
-// agentdev-textlint-guard 共通実行基盤: ファイル単位結果の同一性判定（REQ-053-042）。
+// agentdev-textlint-guard 共通実行基盤: ファイル単位結果の同一性判定。
 //
 // 同一性の構成要素: 本文、パス、有効な規則と設定、実際のエンジンと依存成果物、
 // 標準・プロジェクト辞書と再帰的な間接依存、結果正規化の版。
-// 更新時刻とサイズは本文同一性の判定に使わない（本文は内容 SHA-256 で判定する）。
+// 更新時刻とサイズは本文同一性の判定に使わない（本文は内容 SHA256 で判定する）。
 // どれか1つでも条件を追跡できない場合は trackable: false を返し、呼出側は
-// 再利用せず実検査する（REQ-053-042 後段）。
+// 再利用せず実検査する。
 //
-// プロジェクト・worktree 間の誤流用防止（REQ-053-044）のため、同一性キーには
+// プロジェクト・worktree 間の誤流用防止のため、同一性キーには
 // プロジェクトルートの解決済み絶対パスを含める。worktree が異なればキーも異なる。
 //
 // 規則構成の同一性は既存の配置位置非依存の規則構成ハッシュ手順
@@ -14,8 +14,8 @@
 // - prh rulePaths は plugin dir 相対（標準辞書）/ プロジェクトルート相対（プロジェクト辞書）へ
 //   正規化し、区切りを / に揃え、配列を辞書順ソートする
 // - rules は ruleId 辞書順ソートし、ruleId と canonical JSON(options) の行を改行連結する
-// - 連結結果の末尾へ prh 標準辞書内容の SHA-256、prh rulePaths 数、依存版一覧、
-//   拒否対象規則 ID の辞書順連結を改行で付与し、全体の SHA-256 を規則構成ハッシュとする
+// - 連結結果の末尾へ prh 標準辞書内容の SHA256、prh rulePaths 数、依存版一覧、
+//   拒否対象規則 ID の辞書順連結を改行で付与し、全体の SHA256 を規則構成ハッシュとする
 
 import * as fs from "node:fs";
 import * as path from "node:path";
@@ -42,13 +42,13 @@ export interface InspectionConditions {
   readonly additionalTargets: readonly string[];
   /** 実際のエンジンと依存成果物（engine bundle と kuromoji 辞書の内容ハッシュ）。 */
   readonly engineArtifactsHash: string;
-  /** 標準 prh 辞書内容の SHA-256。 */
+  /** 標準 prh 辞書内容の SHA256。 */
   readonly standardPrhDictionaryHash: string;
-  /** プロジェクト用語辞書内容の SHA-256（不在は null）。 */
+  /** プロジェクト用語辞書内容の SHA256（不在は null）。 */
   readonly projectPrhDictionaryHash: string | null;
   /** 結果正規化の版。 */
   readonly resultNormalizationVersion: number;
-  /** 検査条件識別子（条件全体の SHA-256）。 */
+  /** 検査条件識別子（条件全体の SHA256）。 */
   readonly conditionsHash: string;
 }
 
@@ -180,7 +180,7 @@ export function normalizeRootKey(root: string): string {
 }
 
 /**
- * ファイル単位結果の同一性キー。本文（内容 SHA-256）、パス、検査条件、プロジェクト識別、
+ * ファイル単位結果の同一性キー。本文（内容 SHA256）、パス、検査条件、プロジェクト識別、
  * 結果正規化の版を含む。更新時刻とサイズは入力に含まない。
  */
 export function computeFileIdentityKey(

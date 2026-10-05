@@ -1,4 +1,4 @@
-// agentdev-textlint-guard 工程接続: 用途別入口と機械確認可能な結果（REQ-053-046/047）。
+// agentdev-textlint-guard 工程接続: 用途別入口と機械確認可能な結果。
 //
 // 検査の用途（書込み前検査、通常最終検査、必須独立検査、結果表示）は正規契約から
 // 決定的に選択され、LLM が毎回の検査範囲・目的・再利用可否を選択しない
@@ -9,17 +9,17 @@
 //
 // 結果は機械確認可能な形式（用途、対象範囲、対象状態、完了状態、合否、実規則実行数と
 // 再利用数）で返し、表示用結果と工程受理用結果を混同しない（display は検査を起動せず、
-// startedInspection: false を必ず含む。REQ-053-047 後段）。
+// startedInspection: false を必ず含む）。
 //
 // 用途決定の正規契約対応:
 // - pre-write-hook は plugin hook 内部で固定（書込み前検査）
 // - case-run / docs-check / case-close の最終検査は通常最終検査（final。case-close Design
 //   は「その内部で同一性が機械検証できた対象の規則実行省略が許容される」を明示）
 // - QG-4 独立再検査等、正規契約上の独立要求が存在する実行は必須独立検査
-//   （independent。REQ-053-045。requiresIndependentInspection で要求する）
+//   （independent。requiresIndependentInspection で要求する）
 // - 表示・解析のみは display（検査を起動したものとして扱わない）
 //
-// 開始・終了時照合（REQ-053-046）: 検査の開始時・終了時に対象集合、本文、検査条件を
+// 開始・終了時照合: 検査の開始時・終了時に対象集合、本文、検査条件を
 // 照合し、変化が生じた場合は未完了・未確定として工程の受理を拒否する。
 
 import * as fs from "node:fs";
@@ -50,7 +50,7 @@ export function resolveInspectionPurpose(context: EngineeringContext): Inspectio
   return "final";
 }
 
-/** 機械確認可能な検査実行結果（REQ-053-047）。 */
+/** 機械確認可能な検査実行結果。 */
 export interface InspectionRunResult {
   readonly schemaVersion: 1;
   readonly purpose: InspectionPurpose;
@@ -269,7 +269,7 @@ export async function runInspection(
     files.push(outcome.result);
   }
 
-  // 終了時照合: 対象集合、本文、検査条件を現在入力で再計算する（REQ-053-046）
+  // 終了時照合: 対象集合、本文、検査条件を現在入力で再計算する
   const endRead = readTargets(root, context.recomputeSnapshotInputs());
   const snapshotsMatched = endRead.ok && endRead.snapshot === startRead.snapshot;
   const hardCount = files.reduce((acc, f) => acc + f.hardCount, 0);
@@ -364,7 +364,7 @@ export function acceptForProgress(result: InspectionRunResult): ProgressDecision
   if (result.purpose === "display" || !result.startedInspection) {
     return {
       accepted: false,
-      reason: "a display result does not start an inspection and must not drive progress (REQ-053-047)",
+      reason: "a display result does not start an inspection and must not drive progress ",
     };
   }
   if (result.completion !== "completed") {
@@ -379,7 +379,7 @@ export function acceptForProgress(result: InspectionRunResult): ProgressDecision
   if (result.purpose === "independent" && result.ruleExecutions.reused > 0) {
     return {
       accepted: false,
-      reason: "an independent inspection must not reuse stored file results (REQ-053-045)",
+      reason: "an independent inspection must not reuse stored file results ",
     };
   }
   if (result.targetScope.count === 0) {
@@ -391,7 +391,7 @@ export function acceptForProgress(result: InspectionRunResult): ProgressDecision
   if (!result.ok) {
     return {
       accepted: false,
-      reason: `hard violations remain (${result.hardCount}); see the findings section (REQ-053-043: an unrunnable inspection must not pass)`,
+      reason: `hard violations remain (${result.hardCount}); see the findings section (an unrunnable inspection must not pass)`,
     };
   }
   return { accepted: true, reason: null };
