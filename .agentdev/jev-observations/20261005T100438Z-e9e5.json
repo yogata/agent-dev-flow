@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261005T100438Z-e9e5",
+  "workflow": "req-define",
+  "evaluationKind": "classification-design-separation",
+  "subject": "RU-0160 の最終分類・Design 分離",
+  "sourceRevision": "36407badfe93538bd00a40fccb4f14f24e197634",
+  "durationMs": 639,
+  "inputTokens": 1144,
+  "inputs": {
+    "requestDigest": "2e5c50850f6f217fba8f37914e1b83d40b9b1f413df1db88f5dc6508fd4519a3",
+    "references": [
+      {
+        "digest": "5f38a8fdb7666f3b96ab0f0a9523954461a56ae5b6cc06dcd8a10a8cb0c942cf",
+        "label": "RU-0160",
+        "path": ".agentdev/backlog/req-units/RU-0160.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-classification",
+      "questionForm": "choice",
+      "value": "Design行が主体",
+      "probabilityDistribution": {
+        "REQ行が主体": 0,
+        "Design行が主体": 1,
+        "REQ行とDesign行の混合": 0
+      }
+    },
+    {
+      "questionId": "q2-separation-needed",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.88,
+        "false": 0.12
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-classification",
+        "value": "Design行が主体"
+      },
+      {
+        "questionId": "q2-separation-needed",
+        "value": true
+      }
+    ]
+  }
+}

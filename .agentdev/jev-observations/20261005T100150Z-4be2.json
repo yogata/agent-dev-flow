@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261005T100150Z-4be2",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0160（repo-agentdev-integrity テストスイート重複実行削減）の既存REQ照合",
+  "sourceRevision": "36407badfe93538bd00a40fccb4f14f24e197634",
+  "durationMs": 1258,
+  "inputTokens": 1237,
+  "inputs": {
+    "requestDigest": "6d4db5bd9f584a12938ac2a6eb56c985e0449a7fb5321a82fa2d17eb78431132",
+    "references": [
+      {
+        "digest": "5f38a8fdb7666f3b96ab0f0a9523954461a56ae5b6cc06dcd8a10a8cb0c942cf",
+        "label": "RU-0160",
+        "path": ".agentdev/backlog/req-units/RU-0160.md"
+      },
+      {
+        "digest": "05448824f69bd770451c4d6a74055c3bd03526b302413e27b3b0fb62b0b7bad5",
+        "label": "REQ-004",
+        "path": "docs/requirements/REQ-004.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-operation",
+      "questionForm": "choice",
+      "value": "CREATE",
+      "probabilityDistribution": {
+        "CREATE": 0.79,
+        "APPEND": 0.15,
+        "UPDATE": 0.02,
+        "REQ操作なし": 0.04
+      }
+    },
+    {
+      "questionId": "q2-needs-more-confirmation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.44,
+        "false": 0.56
+      }
+    }
+  ],
+  "confidence": 0.73,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-operation",
+        "value": "REQ操作なし",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q2-needs-more-confirmation",
+        "value": false
+      }
+    ]
+  }
+}
