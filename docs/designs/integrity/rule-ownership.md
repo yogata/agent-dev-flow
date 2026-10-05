@@ -172,7 +172,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-063 | common-policy-identifier-invariant | REQ-051-005, REQ-051-006, REQ-010-064, REQ-010-068 | ../integrity-rule-catalog.md, ../../authoring/command-file-format.md |
 | IR-064 | unresolved-placeholder | REQ-010-065, REQ-010-068 | ../integrity-rule-catalog.md |
 | IR-065 | obsolete-vocabulary-current-use | REQ-010-066, REQ-010-068 | ../integrity-rule-catalog.md, data/obsolete-vocabulary-map.yaml |
-| IR-066 | legacy-path-removed-name | REQ-010-067, REQ-010-068, REQ-010-070 | ../integrity-rule-catalog.md, data/obsolete-vocabulary-map.yaml |
+| IR-066 | legacy-path-removed-name | REQ-010-067, REQ-010-068, REQ-010-080 | ../integrity-rule-catalog.md, data/obsolete-vocabulary-map.yaml |
 | IR-067 | referenced-req-row-existence | REQ-010-069, REQ-010-065, REQ-010-068 | ../integrity-rule-catalog.md, ../checker-execution-contracts.md |
 | IR-068 | skill-projection-manifest | REQ-010-068, REQ-018-002 | ../../local/runtime-package-boundary.md, ../checker-execution-contracts.md, ../integrity-rule-catalog.md |
 | IR-069 | req-number-gap-recorded | REQ-010-068, REQ-010-070 | ../integrity-rule-catalog.md, ../../foundations/numbering-policy.md, ../checker-execution-contracts.md |
