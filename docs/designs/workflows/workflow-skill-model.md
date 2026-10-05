@@ -75,6 +75,10 @@ case-run は単一 Issue 実行へ収斂した。Epic Wave 実行（epic-wave wo
 
 1:N 分割基準自体（制御構造の実質差異による分離）は維持され、本節は実例の記述を上記へ差し替えたものである。
 
+### workflow skill 本文における内蔵ツール使用規律（RU-0162）
+
+各 workflow skill の本文と references は、ファイル検索・内容検索・ディレクトリ列挙を bash 内蔵コマンド（grep、ls 等）で実行する指示を標準手順として含めず、実行基盤の内蔵ツール（ファイル検索、内容検索、読み取り）の使用を明記する。bash 実行が本来必要な処理（script 呼び出し、git 操作等）は本規律の対象外とする。機械工程の script 呼び出し契約（各 command Design の RU-0162 節）への移行後も、残余の探索・読取手順に本規律を適用する。
+
 ## Capability Skill 責務
 
 複数workflow で共通する能力を一次情報として所有する。

@@ -327,6 +327,14 @@ QG-4 最終完了判定における受け入れ義務保存の実行時投影。
 - 終了対象が負う必須完了条件に fail、blocked、未判定、未投影、証拠不足、検証不能、意味不一致、未解決反例が1件でも存在する場合は close せず、必須未達を Gate 全体の warn 等で通過させない。Epic では最終 Wave で親の横断義務を含む Epic 全体の完了条件を評価する。
 - 完了条件から根拠正規契約、検証義務、評価範囲、検証手段、取得した証拠と対象成果物の状態、除外根拠、判定までの主要関係を、既存証拠チャネル（Issue、PR、QG 結果、コメント等）から追跡可能に保持する。追跡不能な「独立検証済み」記録だけでは完全な最終受け入れ証拠としない。
 
+## 機械工程の script 呼び出し契約（RU-0162）
+
+case-close の機械工程（mergeable ポーリング、squash merge 前後のローカル状態検査、Epic 実行構成表の解析と状態更新、完了条件チェックボックス評価の機械的抽出、AUTOGEN 再生成差分検出、full integrity suite の起動と結果集約、worktree/branch クリーンアップ）は、工程別 script 1 回の呼び出しに束ねる。GitHub I/O（pr_merge、issue_close、Issue 本文更新）は Custom Tool agentdev_gh の境界を維持する。
+
+- 入力 JSON / 報告 JSON / 終了コードの契約、品質ゲートの script 内実行（省略禁止）、final-acceptance.ts・inspect_cross_dependencies.ts と同じ作り（共通基盤不作成）、意味判断（警告の重要度評価、Design 確定判断、未達判定の確定）のモデル担当は、case-open Design「機械工程の script 呼び出し契約（RU-0162）」節と同一の規律に従う
+- 報告 JSON にはマージ・検証・クリーンアップの各結果、差分、警告、提案するコメント本文を含める
+- workflow skill 参照文面は script 呼び出しと報告 JSON 解釈へ置き換えて短縮する
+
 ## See Also
 
 - [case-run.md](case-run.md)（前段コマンド）

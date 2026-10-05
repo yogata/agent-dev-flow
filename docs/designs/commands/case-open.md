@@ -68,6 +68,18 @@ canonical Definition に実変更がある場合のみ Definition PR を作成�
 
 adversarial-review は Root Case 本文候補と Definition Package 構成案確定後、Root Case 作成前に挿入する（「adversarial-review 挿入境界（case-open）」セクション参照）。
 
+### 機械工程の script 呼び出し契約（RU-0162）
+
+case-open STEP-4（実変更判定と Definition PR 作成）の機械工程（専用 worktree 作成、Definition branch 作成、REQ 行編集、generate_indexes、check_integrity、traceability check、明示パス指定 stage・commit まで）は、工程別 script 1 回の呼び出しに束ねる。script はローカル決定的処理のみを担当し、GitHub I/O（Issue/PR 作成・マージ・クローズ）は Custom Tool agentdev_gh の境界を維持し、script 内で直接実行しない。
+
+- 入力 JSON: 対象 draft パス、Root Case 識別子、Definition branch 名など所定の入力一式を渡す
+- 報告 JSON: 実行結果（各処理の成否）、差分、警告、提案する Issue/PR 本文を stdout へ返す。提案本文の採否と報告内容の意味レビューはモデルが担当する
+- 終了コード: 成功は 0、要判断・失敗は非 0 を区別する。script は処理を省略せず、失敗時は途中結果とともに非 0 で終了する
+- 既存の品質ゲート（check_integrity、traceability check、generate_indexes 差分検出）は script 内で実行し、省略しない
+- script の実装は inspect_cross_dependencies.ts と同じ作りに従い、共通基盤は作らない
+- 意味判断（停止判断、deviation 分類、adversarial review、警告の重要度評価）はモデルが担当し続け、script は機械的に確定した手順のみを実行する
+- workflow skill 参照文面（references/*.md）は、LLM が bash コマンドを逐次実行する指示から script 呼び出しと報告 JSON 解釈へ置き換えて短縮する
+
 ## 所有関係と委譲
 
 - public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、case-auto の orchestration による Workflow Skill load 時に本 Design が読み込まれる（DEC-010。第4段以降は command 定義の実行時投影ではなく直接読込）。
