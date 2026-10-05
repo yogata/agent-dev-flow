@@ -2,7 +2,7 @@
 title: `agentdev-skill-authoring` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-09
+updated: 2026-10-03
 ---
 <!-- ADF-COVERS(implementation): REQ-002-013, REQ-002-014, REQ-002-015, REQ-053-011 -->
 <!-- ADF-COVERS(verification): REQ-002-004 -->

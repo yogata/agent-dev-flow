@@ -2,7 +2,7 @@
 title: agentdev-adversarial-review Design
 status: accepted
 created: 2026-08-09
-updated: "2026-09-19"
+updated: "2026-10-04"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-021 -->

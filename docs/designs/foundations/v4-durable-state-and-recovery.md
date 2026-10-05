@@ -2,7 +2,7 @@
 title: ADF v4 durable state と再構成・恢復（配置表・権威移行・部分失敗調整）
 status: accepted
 created: 2026-09-19
-updated: 2026-09-22
+updated: 2026-10-04
 ---
 <!-- ADF-COVERS(design): REQ-090-006 -->
 <!-- ADF-COVERS(implementation): REQ-001-034, REQ-001-043, REQ-008-001, REQ-008-002, REQ-008-004, REQ-008-005, REQ-008-006, REQ-008-007, REQ-008-009, REQ-008-012, REQ-008-014 -->

@@ -2,7 +2,7 @@
 title: Targeted Docs Guard 実装詳細
 status: accepted
 created: 2026-07-15
-updated: 2026-09-29
+updated: 2026-10-03
 ---
 
 # Targeted Docs Guard 実装詳細

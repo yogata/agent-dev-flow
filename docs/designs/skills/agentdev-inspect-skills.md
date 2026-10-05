@@ -2,7 +2,7 @@
 title: `agentdev-inspect-skills` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-09-08
+updated: 2026-10-03
 ---
 <!-- ADF-COVERS(verification): REQ-005-014 -->
 <!-- ADF-COVERS(implementation): REQ-036-013, REQ-036-014, REQ-036-015, REQ-036-023 -->

@@ -2,7 +2,7 @@
 title: `agentdev-req-structure-diagnostics` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-10-03
 ---
 <!-- ADF-COVERS(verification): REQ-001-050, REQ-001-051, REQ-001-052 -->
 <!-- ADF-COVERS(implementation): REQ-036-007 -->

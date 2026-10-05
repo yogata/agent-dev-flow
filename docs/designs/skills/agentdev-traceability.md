@@ -2,7 +2,7 @@
 title: agentdev-traceability Design
 status: accepted
 created: "2026-08-21"
-updated: "2026-09-17"
+updated: "2026-10-03"
 ---
 
 <!-- ADF-COVERS(design): REQ-012-027, REQ-012-028, REQ-012-033, REQ-012-042, REQ-012-045, REQ-012-046, REQ-012-047, REQ-012-048, REQ-012-051, REQ-012-054, REQ-012-055 -->

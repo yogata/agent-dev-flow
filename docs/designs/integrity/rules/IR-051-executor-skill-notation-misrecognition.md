@@ -2,7 +2,7 @@
 title: "IR-051: 実行主体の skill 表記誤認検出"
 status: accepted
 created: 2026-08-20
-updated: 2026-09-29
+updated: 2026-10-01
 ---
 
 # IR-051: 実行主体の skill 表記誤認検出

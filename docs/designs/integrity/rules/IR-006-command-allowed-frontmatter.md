@@ -2,7 +2,7 @@
 title: "IR-006: Command frontmatter 許可フィールド"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-06
+updated: 2026-08-20
 ---
 
 # IR-006: Command frontmatter 許可フィールド

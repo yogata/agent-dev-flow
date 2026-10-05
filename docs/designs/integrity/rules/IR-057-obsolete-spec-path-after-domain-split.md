@@ -2,7 +2,7 @@
 title: "IR-057: obsolete-spec-path-after-domain-split"
 status: accepted
 created: 2026-08-20
-updated: 2026-07-26
+updated: 2026-10-03
 ---
 
 # IR-057: obsolete-spec-path-after-domain-split

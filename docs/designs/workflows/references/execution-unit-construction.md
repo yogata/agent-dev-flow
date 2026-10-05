@@ -2,7 +2,7 @@
 title: execution_unit 構成アルゴリズム参照
 status: accepted
 created: 2026-07-25
-updated: 2026-09-23
+updated: 2026-09-30
 ---
 <!-- ADF-COVERS(design): REQ-035-018 -->
 <!-- ADF-COVERS(implementation): REQ-030-007, REQ-030-008, REQ-030-009 -->

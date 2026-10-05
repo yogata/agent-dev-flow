@@ -2,7 +2,7 @@
 title: agentdev-design-file-manager Design
 status: accepted
 created: 2026-07-22
-updated: 2026-09-04
+updated: 2026-10-03
 ---
 
 <!-- ADF-COVERS(design): REQ-021-013, REQ-021-026 -->

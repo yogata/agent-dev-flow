@@ -2,7 +2,7 @@
 title: "backticks 識別子/一般名詞 判定閾値"
 status: accepted
 created: 2026-06-25
-updated: 2026-06-29
+updated: 2026-09-09
 ---
 
 # backticks 識別子/一般名詞 判定閾値

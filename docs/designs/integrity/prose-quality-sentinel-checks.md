@@ -2,7 +2,7 @@
 title: "既知不備センチネル検査"
 status: accepted
 created: "2026-09-03"
-updated: "2026-09-17"
+updated: "2026-10-04"
 ---
 
 <!-- ADF-COVERS(design): REQ-053-022 -->

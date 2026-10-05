@@ -2,7 +2,7 @@
 title: agentdev-artifact-validation Design
 status: accepted
 created: 2026-07-22
-updated: "2026-09-19"
+updated: "2026-10-03"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-042 -->
 

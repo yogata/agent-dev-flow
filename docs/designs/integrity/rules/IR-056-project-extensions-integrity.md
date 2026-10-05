@@ -2,7 +2,7 @@
 title: "IR-056: project-extensions-integrity"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-03
 ---
 
 # IR-056: project-extensions-integrity

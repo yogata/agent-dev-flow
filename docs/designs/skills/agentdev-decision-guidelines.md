@@ -2,7 +2,7 @@
 title: `agentdev-decision-guidelines` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-07-27
+updated: 2026-10-03
 ---
 <!-- ADF-COVERS(implementation): REQ-001-023, REQ-001-024 -->
 
