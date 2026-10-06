@@ -2,7 +2,7 @@
 title: 採番管理 Design
 status: accepted
 created: 2026-07-19
-updated: 2026-10-04
+updated: 2026-10-07
 ---
 <!-- ADF-COVERS(implementation): REQ-001-008, REQ-001-009, REQ-001-013, REQ-001-042 -->
 <!-- ADF-COVERS(implementation): REQ-004-003 -->
@@ -76,6 +76,18 @@ REQ-087: 2026-10 責任境界整理により廃止（裁定記録義務は REQ-0
 
 `docs/requirements/README.md`、`docs/decisions/README.md`、`docs/designs/integrity/integrity-rule-catalog.md` の各索引は実体と一致するよう、新規採番、廃止、是正の都度更新する。
 更新忘れを検出するための自動生成機構は `index-auto-generation.md` が定める。
+
+### 改番時の扱い
+
+既存識別子の改番（ユーザー裁定による例外採番、採番ミス是正に伴う付け替え）を行う場合は、次のスイープ対象を判定表に従って確認し、旧 ID 参照の残存を残さないこと。
+
+| スイープ対象 | 判定 | 検証方法 |
+|---|---|---|
+| 要件行 ID（REQ-{NNN}-{MMM}） | 改番対象の REQ が持つ全要件行 | 新 ID 付与後に旧 ID で docs/ 全体を検索 |
+| 本文散文中の行参照 | 他 REQ / Decision / Design / 運用文書の本文から旧 ID への言及 | 旧 ID の全文 grep（docs/reports/ は履歴記録として除外） |
+| クロス参照・索引 | README 索引、traceability sidecar、inline ADF-COVERS 宣言、.agentdev/extensions/skills/*.yaml | 各参照源の旧 ID 検索と新 ID 反映 |
+
+改番完了の判定は、旧 ID による全文検索（docs/ 全体 + traceability sidecar + .agentdev/extensions/skills/*.yaml、docs/reports/ は履歴記録として除外）が 0 件であることによる。
 
 ## 正規所有者と参照関係
 

@@ -2,13 +2,13 @@
 title: case-auto Design
 status: accepted
 created: 2026-06-21
-updated: "2026-10-06"
+updated: "2026-10-07"
 ---
 <!-- ADF-COVERS(implementation): REQ-015-012 -->
 <!-- ADF-COVERS(implementation): REQ-100-004 -->
 <!-- ADF-COVERS(implementation): REQ-034-001, REQ-034-002, REQ-034-003, REQ-034-004, REQ-034-005, REQ-034-006, REQ-034-007, REQ-034-010, REQ-034-011, REQ-034-012, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-017, REQ-034-018, REQ-034-019, REQ-034-020, REQ-034-021, REQ-034-022, REQ-034-023, REQ-034-024, REQ-034-025, REQ-034-026, REQ-034-027, REQ-034-028, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-033, REQ-034-034, REQ-034-035, REQ-034-036, REQ-034-037, REQ-034-038, REQ-034-039, REQ-034-040, REQ-034-041, REQ-034-042, REQ-034-043, REQ-034-044, REQ-034-045, REQ-035-016, REQ-035-017 -->
 <!-- ADF-COVERS(design): REQ-034-002, REQ-034-003, REQ-034-004, REQ-034-005, REQ-034-006, REQ-034-007, REQ-034-010, REQ-034-011, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-017, REQ-034-018, REQ-034-020, REQ-034-021, REQ-034-023, REQ-034-024, REQ-034-026, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-033, REQ-034-034, REQ-034-035, REQ-034-036, REQ-034-037, REQ-034-038 -->
-<!-- ADF-COVERS(design): REQ-034-012, REQ-034-022, REQ-034-025, REQ-034-027, REQ-034-028, REQ-034-040, REQ-034-041, REQ-034-042, REQ-034-043, REQ-034-044, REQ-034-045, REQ-034-046, REQ-035-016, REQ-035-017 -->
+<!-- ADF-COVERS(design): REQ-034-012, REQ-034-022, REQ-034-025, REQ-034-027, REQ-034-028, REQ-034-040, REQ-034-041, REQ-034-042, REQ-034-043, REQ-034-044, REQ-034-045, REQ-034-046, REQ-034-047, REQ-035-016, REQ-035-017 -->
 <!-- ADF-COVERS(design): REQ-031-029, REQ-031-030 -->
 <!-- ADF-COVERS(verification): REQ-034-037, REQ-034-038 -->
 <!-- ADF-COVERS(implementation): REQ-003-017, REQ-003-018, REQ-006-108, REQ-034-002, REQ-034-003, REQ-034-007, REQ-034-010, REQ-034-011, REQ-034-012, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-018, REQ-034-019, REQ-034-020, REQ-034-021, REQ-034-022, REQ-034-023, REQ-034-024, REQ-034-025, REQ-034-026, REQ-034-027, REQ-034-028, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-034, REQ-034-035, REQ-034-036 -->
@@ -262,6 +262,14 @@ OU 逐次処理（REQ-034-011）は、必須依存で結合した execution_unit
 - 対象固有ファイルは対象単位で並列実行可
 
 lock、queue、scheduler 方式は本 Design の範囲外とする（REQ-034-036）。
+
+#### 段階派遣の single-flight 保護（REQ-034-047）
+
+stage 3 の段階的派遣（case-ready 起動、子 Issue 起票を含む）は、同一 orchestration 対象（Epic / Wave 単位）ごとに single-flight とする。進行中の派遣が存在する場合、後行の派遣要求は新規派遣を行わず既存派遣の再利用（待機・合流）へ切り替える。
+
+- 進行中派遣の検出は、当該 orchestration 対象に紐付く Issue 状態・実行記録から判定する。lock / queue / scheduler 方式は範囲外（REQ-034-036）と同様に、本節は共有状態への書き込み順序と再利用の判断のみを規定し、新規の同期機構を導入しない
+- 子 Issue の新規作成は、作成前に既存オープン Issue の検索（重複検知）を前置し、既存 Issue の再利用を優先する（冪等性。Epic #3457 の二重派遣・子 Issue 重複事例の再発防止）
+- 二重派遣を検知した場合は、後行インスタンスが先行インスタンスの最終状態を確認してから是正（重複子 Issue の無力化・クローズ）し、先行結果の自動破棄を行わない
 
 ### 結果集約
 

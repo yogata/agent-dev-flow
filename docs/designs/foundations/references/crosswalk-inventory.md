@@ -40,7 +40,7 @@ v4 処遇の完全一覧（原本）を所有する。列スキーマと運用�
 | REQ-041 | redefine | ― | 9 | executed | backlog-auto のループ化。第9段実行 2026-09-20（Case #3022、Definition merge 1ca97324、実装 merge a74cd237/8ced4e4d、learning 6c439a00）。redefine（目的節接続・要件行文言不変）。no-op redefine 判断記録（第4段で要求入口化済みのため本段の目的節接続は実質変更なし・判断記録は Case #3022 本文） |
 | REQ-044 | keep | ― | ― | executed | 標準API委譲の原則は維持。第13段 full validation で維持確認 2026-09-20（Case #3036） |
 | REQ-045 | keep | ― | ― | executed | 網羅監査は第13段で実行。第13段実行 2026-09-20（Case #3036・設計PR #3037 merge cbb3a637・網羅監査レポート docs/reports/integrity/audits/req-045-consistency-audit-20260920.md を commit 12f048e5 で保存） |
-| REQ-046 | keep | ― | 13 | executed | 移行不変条件。第13段で retire 予約（v4 移行完了後に廃止判定）。第13段実行 2026-09-20（Case #3036・設計PR #3037 merge cbb3a637 で目的節へ retire 予約を追記・網羅監査レポート commit 12f048e5） |
+| REQ-046 | keep → retired | ― | 13 | executed | 移行不変条件。第13段で retire 予約（v4 移行完了後に廃止判定）。第13段実行 2026-09-20（Case #3036・設計PR #3037 merge cbb3a637 で目的節へ retire 予約を追記・網羅監査レポート commit 12f048e5）。その後 RETIRE 2026-10（2026-10 責任境界整理、retired/ へ移管） |
 | REQ-047 | redefine | deterministic code/tool | 8 | executed | 規則所有権の semantic/deterministic 再編。第8段実行 2026-09-20（Case #3011、Definition merge 21434202、実装 merge eac6a5e9/b1207a0f/733eb40d/b0738869、fan-in fix 1befae99）。redefine（目的節接続・要件行文言不変） |
 | REQ-048 | keep | ― | ― | executed | 観測評価ループは維持。第13段 full validation で維持確認 2026-09-20（Case #3036） |
 | REQ-049 | keep | ― | ― | executed | 追跡Issue管理は維持。第13段 full validation で維持確認 2026-09-20（Case #3036） |
@@ -59,7 +59,7 @@ v4 処遇の完全一覧（原本）を所有する。列スキーマと運用�
 | REQ-062 | redefine | ― | 4 | executed | case-revise 内部状態への回収。第4段実行 2026-09-19（Case #2979、merge 79dd12e6/3801398d/96202fdb/2e74d2c8/1e462085） |
 | REQ-082 | keep | ― | ― | executed | 審議契約は維持。第13段 full validation で維持確認 2026-09-20（Case #3036） |
 | REQ-083 | keep | ― | ― | executed | 設計PR状態契約は維持。第13段 full validation で維持確認 2026-09-20（Case #3036） |
-| REQ-087 | keep | ― | ― | executed | 採番例外記録は維持。第13段 full validation で維持確認 2026-09-20（Case #3036） |
+| REQ-087 | keep → retired | ― | ― | executed | 採番例外記録は維持。第13段 full validation で維持確認 2026-09-20（Case #3036）。その後 RETIRE 2026-10（2026-10 責任境界整理、retired/ へ移管・裁定記録義務は REQ-001-070、ギャップ検査・レジストリ単一情報源は REQ-010-070 へ統合） |
 | REQ-088 | create | ― | 3 | executed | 第3段新設（v4 基盤要件）。第3段実行（Case #2973、merge a098b0f1） |
 | retired 12 件（REQ-013、020、022〜026、028、033、040、042、043） | keep | ― | ― | executed | retired 維持・識別子再利用禁止 |
 

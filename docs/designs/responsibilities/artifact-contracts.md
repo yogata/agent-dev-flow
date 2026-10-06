@@ -2,7 +2,7 @@
 title: アーティファクト契約
 status: accepted
 created: 2026-08-20
-updated: "2026-10-05"
+updated: "2026-10-07"
 ---
 <!-- ADF-COVERS(implementation): REQ-002-005, REQ-002-006, REQ-002-016, REQ-002-034 -->
 
@@ -517,6 +517,15 @@ Design operation の公式 enum は `create` / `append` / `update` の3値とす
 - `status` は変更しないこと
 
 配置契約の実行詳細（`placement` 別挿入位置の算出、anchor マッチング規則）は `artifact-contracts.md`「append operation」と [agentdev-design-file-manager.md](../skills/agentdev-design-file-manager.md)「APPEND 操作」節が正規所有する。
+
+### 適用前検証（content 完全性と宣言集合一致）
+
+artifact_actions の適用（case-ready / case-revise の Definition 保存）に先立ち、次の 2 点を検証する（REQ-030-024）。
+
+1. content 完全性: update 系 operation の content は対象セクション・対象行の全文を含むこと。部分差分（差分片のみ）を content とした適用により、対象セクション内の既存記述が黙示的に削除されないことを確認する。
+2. 宣言集合一致: inline ADF-COVERS 宣言（配布物冒頭コメント）と traceability sidecar のロール付き関係宣言の集合が両方向で一致すること。inline のみに存在する宣言・sidecar のみに存在する宣言を差分として検出した場合、適用を中断して差分を報告する。
+
+この検証は case-open の Definition Package 生成時（適用直前照合）と case-ready の Definition 適用時に実行する。
 
 ## RU アーティファクト契約（session由来RU）
 
