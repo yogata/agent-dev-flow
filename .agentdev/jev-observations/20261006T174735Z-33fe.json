@@ -1,0 +1,474 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261006T174735Z-33fe",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "16 RU（RU-0164〜0179）の既存REQ照合操作分類",
+  "sourceRevision": "ccb117f894876c2a6bcdaa992dbdf01efbe67254",
+  "durationMs": 1485,
+  "inputTokens": 7566,
+  "inputs": {
+    "requestDigest": "e82799fbe460121ad639c7d7ee1ab14c5d842f17a3e52b92bfd0eb0617761493",
+    "snapshot": "判断入力は state に集約（RU 要旨・暫定分類・候補REQの既存行抜粋・操作種別定義）。原文は .agentdev/backlog/req-units/RU-0164.md〜RU-0179.md"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "ru0164-op",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 1,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "ru0164-confirm",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.09,
+        "false": 0.91
+      }
+    },
+    {
+      "questionId": "ru0165-op",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1
+      }
+    },
+    {
+      "questionId": "ru0165-confirm",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.05,
+        "false": 0.95
+      }
+    },
+    {
+      "questionId": "ru0166-op",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 1,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "ru0166-confirm",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.78,
+        "false": 0.21999999999999997
+      }
+    },
+    {
+      "questionId": "ru0167-op",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0.05,
+        "APPEND": 0.78,
+        "UPDATE": 0.14,
+        "REQ操作なし": 0.03
+      }
+    },
+    {
+      "questionId": "ru0167-confirm",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.18,
+        "false": 0.8200000000000001
+      }
+    },
+    {
+      "questionId": "ru0168-op",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0.01,
+        "APPEND": 0.32,
+        "UPDATE": 0.63,
+        "REQ操作なし": 0.04
+      }
+    },
+    {
+      "questionId": "ru0168-confirm",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.24,
+        "false": 0.76
+      }
+    },
+    {
+      "questionId": "ru0169-op",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0.28,
+        "UPDATE": 0.62,
+        "REQ操作なし": 0.1
+      }
+    },
+    {
+      "questionId": "ru0169-confirm",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.2,
+        "false": 0.8
+      }
+    },
+    {
+      "questionId": "ru0170-op",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0.01,
+        "APPEND": 0.63,
+        "UPDATE": 0.34,
+        "REQ操作なし": 0.02
+      }
+    },
+    {
+      "questionId": "ru0170-confirm",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.26,
+        "false": 0.74
+      }
+    },
+    {
+      "questionId": "ru0171-op",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0.01,
+        "APPEND": 0.39,
+        "UPDATE": 0.5,
+        "REQ操作なし": 0.1
+      }
+    },
+    {
+      "questionId": "ru0171-confirm",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.16,
+        "false": 0.84
+      }
+    },
+    {
+      "questionId": "ru0172-op",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0.02,
+        "APPEND": 0.8,
+        "UPDATE": 0.14,
+        "REQ操作なし": 0.04
+      }
+    },
+    {
+      "questionId": "ru0172-confirm",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.16,
+        "false": 0.84
+      }
+    },
+    {
+      "questionId": "ru0173-op",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0.01,
+        "APPEND": 0.41,
+        "UPDATE": 0.38,
+        "REQ操作なし": 0.2
+      }
+    },
+    {
+      "questionId": "ru0173-confirm",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.17,
+        "false": 0.83
+      }
+    },
+    {
+      "questionId": "ru0174-op",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0.01,
+        "APPEND": 0.03,
+        "UPDATE": 0.06,
+        "REQ操作なし": 0.9
+      }
+    },
+    {
+      "questionId": "ru0174-confirm",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.17,
+        "false": 0.83
+      }
+    },
+    {
+      "questionId": "ru0175-op",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0.97,
+        "REQ操作なし": 0.03
+      }
+    },
+    {
+      "questionId": "ru0175-confirm",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.72,
+        "false": 0.28
+      }
+    },
+    {
+      "questionId": "ru0176-op",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0.02,
+        "APPEND": 0.17,
+        "UPDATE": 0.22,
+        "REQ操作なし": 0.59
+      }
+    },
+    {
+      "questionId": "ru0176-confirm",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.22,
+        "false": 0.78
+      }
+    },
+    {
+      "questionId": "ru0177-op",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0.01,
+        "APPEND": 0.1,
+        "UPDATE": 0.09,
+        "REQ操作なし": 0.8
+      }
+    },
+    {
+      "questionId": "ru0177-confirm",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.3,
+        "false": 0.7
+      }
+    },
+    {
+      "questionId": "ru0178-op",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0.05,
+        "REQ操作なし": 0.95
+      }
+    },
+    {
+      "questionId": "ru0178-confirm",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.05,
+        "false": 0.95
+      }
+    },
+    {
+      "questionId": "ru0179-op",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0.04,
+        "REQ操作なし": 0.96
+      }
+    },
+    {
+      "questionId": "ru0179-confirm",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.09,
+        "false": 0.91
+      }
+    }
+  ],
+  "confidence": 0.99,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "ru0164-op",
+        "value": "UPDATE"
+      },
+      {
+        "questionId": "ru0164-confirm",
+        "value": false
+      },
+      {
+        "questionId": "ru0165-op",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "ru0165-confirm",
+        "value": false
+      },
+      {
+        "questionId": "ru0166-op",
+        "value": "UPDATE"
+      },
+      {
+        "questionId": "ru0166-confirm",
+        "value": true
+      },
+      {
+        "questionId": "ru0167-op",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "ru0167-confirm",
+        "value": false
+      },
+      {
+        "questionId": "ru0168-op",
+        "value": "UPDATE"
+      },
+      {
+        "questionId": "ru0168-confirm",
+        "value": false
+      },
+      {
+        "questionId": "ru0169-op",
+        "value": "UPDATE"
+      },
+      {
+        "questionId": "ru0169-confirm",
+        "value": false
+      },
+      {
+        "questionId": "ru0170-op",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "ru0170-confirm",
+        "value": false
+      },
+      {
+        "questionId": "ru0171-op",
+        "value": "APPEND",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "ru0171-confirm",
+        "value": false
+      },
+      {
+        "questionId": "ru0172-op",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "ru0172-confirm",
+        "value": false
+      },
+      {
+        "questionId": "ru0173-op",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "ru0173-confirm",
+        "value": false
+      },
+      {
+        "questionId": "ru0174-op",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "ru0174-confirm",
+        "value": false
+      },
+      {
+        "questionId": "ru0175-op",
+        "value": "UPDATE"
+      },
+      {
+        "questionId": "ru0175-confirm",
+        "value": true
+      },
+      {
+        "questionId": "ru0176-op",
+        "value": "APPEND",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "ru0176-confirm",
+        "value": false
+      },
+      {
+        "questionId": "ru0177-op",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "ru0177-confirm",
+        "value": false
+      },
+      {
+        "questionId": "ru0178-op",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "ru0178-confirm",
+        "value": false
+      },
+      {
+        "questionId": "ru0179-op",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "ru0179-confirm",
+        "value": false
+      }
+    ]
+  }
+}

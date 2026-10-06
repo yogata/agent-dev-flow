@@ -1,0 +1,472 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261006T174945Z-2990",
+  "workflow": "req-define",
+  "evaluationKind": "final-classification-design-separation",
+  "subject": "16 RU（RU-0164〜0179）の最終分類（REQ行/Design行/実現面）と Design 分離判断",
+  "sourceRevision": "ccb117f894876c2a6bcdaa992dbdf01efbe67254",
+  "durationMs": 707,
+  "inputTokens": 5665,
+  "inputs": {
+    "requestDigest": "84a8383fdfc13b62bf93918b9ee775e0d897c9d0c614762765b49a9ee5dc62c9",
+    "snapshot": "判断入力は state に集約（判断単位①の最終結果 + 各 RU の変更対象と候補配置先）"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "ru0164-cls",
+      "questionForm": "choice",
+      "value": "REQ行+Design行",
+      "probabilityDistribution": {
+        "REQ行のみ": 0.01,
+        "Design行のみ": 0,
+        "REQ行+Design行": 0.99,
+        "実現面のみ（REQ・Design 保存なし）": 0
+      }
+    },
+    {
+      "questionId": "ru0164-sep",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.6,
+        "false": 0.4
+      }
+    },
+    {
+      "questionId": "ru0165-cls",
+      "questionForm": "choice",
+      "value": "実現面のみ（REQ・Design 保存なし）",
+      "probabilityDistribution": {
+        "REQ行のみ": 0,
+        "Design行のみ": 0.01,
+        "REQ行+Design行": 0,
+        "実現面のみ（REQ・Design 保存なし）": 0.99
+      }
+    },
+    {
+      "questionId": "ru0165-sep",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.16,
+        "false": 0.84
+      }
+    },
+    {
+      "questionId": "ru0166-cls",
+      "questionForm": "choice",
+      "value": "REQ行のみ",
+      "probabilityDistribution": {
+        "REQ行のみ": 0.99,
+        "Design行のみ": 0,
+        "REQ行+Design行": 0.01,
+        "実現面のみ（REQ・Design 保存なし）": 0
+      }
+    },
+    {
+      "questionId": "ru0166-sep",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.08,
+        "false": 0.92
+      }
+    },
+    {
+      "questionId": "ru0167-cls",
+      "questionForm": "choice",
+      "value": "REQ行+Design行",
+      "probabilityDistribution": {
+        "REQ行のみ": 0.01,
+        "Design行のみ": 0.01,
+        "REQ行+Design行": 0.98,
+        "実現面のみ（REQ・Design 保存なし）": 0
+      }
+    },
+    {
+      "questionId": "ru0167-sep",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.7,
+        "false": 0.30000000000000004
+      }
+    },
+    {
+      "questionId": "ru0168-cls",
+      "questionForm": "choice",
+      "value": "REQ行のみ",
+      "probabilityDistribution": {
+        "REQ行のみ": 0.99,
+        "Design行のみ": 0,
+        "REQ行+Design行": 0,
+        "実現面のみ（REQ・Design 保存なし）": 0.01
+      }
+    },
+    {
+      "questionId": "ru0168-sep",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.23,
+        "false": 0.77
+      }
+    },
+    {
+      "questionId": "ru0169-cls",
+      "questionForm": "choice",
+      "value": "REQ行+Design行",
+      "probabilityDistribution": {
+        "REQ行のみ": 0,
+        "Design行のみ": 0,
+        "REQ行+Design行": 1,
+        "実現面のみ（REQ・Design 保存なし）": 0
+      }
+    },
+    {
+      "questionId": "ru0169-sep",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.56,
+        "false": 0.43999999999999995
+      }
+    },
+    {
+      "questionId": "ru0170-cls",
+      "questionForm": "choice",
+      "value": "REQ行+Design行",
+      "probabilityDistribution": {
+        "REQ行のみ": 0.01,
+        "Design行のみ": 0,
+        "REQ行+Design行": 0.99,
+        "実現面のみ（REQ・Design 保存なし）": 0
+      }
+    },
+    {
+      "questionId": "ru0170-sep",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.5,
+        "false": 0.5
+      }
+    },
+    {
+      "questionId": "ru0171-cls",
+      "questionForm": "choice",
+      "value": "REQ行のみ",
+      "probabilityDistribution": {
+        "REQ行のみ": 0.8,
+        "Design行のみ": 0.03,
+        "REQ行+Design行": 0.14,
+        "実現面のみ（REQ・Design 保存なし）": 0.03
+      }
+    },
+    {
+      "questionId": "ru0171-sep",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.22,
+        "false": 0.78
+      }
+    },
+    {
+      "questionId": "ru0172-cls",
+      "questionForm": "choice",
+      "value": "REQ行+Design行",
+      "probabilityDistribution": {
+        "REQ行のみ": 0.01,
+        "Design行のみ": 0.01,
+        "REQ行+Design行": 0.98,
+        "実現面のみ（REQ・Design 保存なし）": 0
+      }
+    },
+    {
+      "questionId": "ru0172-sep",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.68,
+        "false": 0.31999999999999995
+      }
+    },
+    {
+      "questionId": "ru0173-cls",
+      "questionForm": "choice",
+      "value": "REQ行+Design行",
+      "probabilityDistribution": {
+        "REQ行のみ": 0,
+        "Design行のみ": 0,
+        "REQ行+Design行": 1,
+        "実現面のみ（REQ・Design 保存なし）": 0
+      }
+    },
+    {
+      "questionId": "ru0173-sep",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.77,
+        "false": 0.22999999999999998
+      }
+    },
+    {
+      "questionId": "ru0174-cls",
+      "questionForm": "choice",
+      "value": "Design行のみ",
+      "probabilityDistribution": {
+        "REQ行のみ": 0,
+        "Design行のみ": 1,
+        "REQ行+Design行": 0,
+        "実現面のみ（REQ・Design 保存なし）": 0
+      }
+    },
+    {
+      "questionId": "ru0174-sep",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.51,
+        "false": 0.49
+      }
+    },
+    {
+      "questionId": "ru0175-cls",
+      "questionForm": "choice",
+      "value": "REQ行のみ",
+      "probabilityDistribution": {
+        "REQ行のみ": 0.87,
+        "Design行のみ": 0,
+        "REQ行+Design行": 0.07,
+        "実現面のみ（REQ・Design 保存なし）": 0.06
+      }
+    },
+    {
+      "questionId": "ru0175-sep",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.13,
+        "false": 0.87
+      }
+    },
+    {
+      "questionId": "ru0176-cls",
+      "questionForm": "choice",
+      "value": "REQ行のみ",
+      "probabilityDistribution": {
+        "REQ行のみ": 0.97,
+        "Design行のみ": 0,
+        "REQ行+Design行": 0.03,
+        "実現面のみ（REQ・Design 保存なし）": 0
+      }
+    },
+    {
+      "questionId": "ru0176-sep",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.22,
+        "false": 0.78
+      }
+    },
+    {
+      "questionId": "ru0177-cls",
+      "questionForm": "choice",
+      "value": "実現面のみ（REQ・Design 保存なし）",
+      "probabilityDistribution": {
+        "REQ行のみ": 0,
+        "Design行のみ": 0,
+        "REQ行+Design行": 0,
+        "実現面のみ（REQ・Design 保存なし）": 1
+      }
+    },
+    {
+      "questionId": "ru0177-sep",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.04,
+        "false": 0.96
+      }
+    },
+    {
+      "questionId": "ru0178-cls",
+      "questionForm": "choice",
+      "value": "Design行のみ",
+      "probabilityDistribution": {
+        "REQ行のみ": 0,
+        "Design行のみ": 1,
+        "REQ行+Design行": 0,
+        "実現面のみ（REQ・Design 保存なし）": 0
+      }
+    },
+    {
+      "questionId": "ru0178-sep",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.51,
+        "false": 0.49
+      }
+    },
+    {
+      "questionId": "ru0179-cls",
+      "questionForm": "choice",
+      "value": "実現面のみ（REQ・Design 保存なし）",
+      "probabilityDistribution": {
+        "REQ行のみ": 0,
+        "Design行のみ": 0,
+        "REQ行+Design行": 0,
+        "実現面のみ（REQ・Design 保存なし）": 1
+      }
+    },
+    {
+      "questionId": "ru0179-sep",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.07,
+        "false": 0.9299999999999999
+      }
+    }
+  ],
+  "confidence": 0.98,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "ru0164-cls",
+        "value": "REQ行+Design行"
+      },
+      {
+        "questionId": "ru0164-sep",
+        "value": true
+      },
+      {
+        "questionId": "ru0165-cls",
+        "value": "実現面のみ（REQ・Design 保存なし）"
+      },
+      {
+        "questionId": "ru0165-sep",
+        "value": false
+      },
+      {
+        "questionId": "ru0166-cls",
+        "value": "REQ行のみ"
+      },
+      {
+        "questionId": "ru0166-sep",
+        "value": false
+      },
+      {
+        "questionId": "ru0167-cls",
+        "value": "REQ行+Design行"
+      },
+      {
+        "questionId": "ru0167-sep",
+        "value": true
+      },
+      {
+        "questionId": "ru0168-cls",
+        "value": "REQ行のみ"
+      },
+      {
+        "questionId": "ru0168-sep",
+        "value": false
+      },
+      {
+        "questionId": "ru0169-cls",
+        "value": "REQ行+Design行"
+      },
+      {
+        "questionId": "ru0169-sep",
+        "value": true
+      },
+      {
+        "questionId": "ru0170-cls",
+        "value": "REQ行+Design行"
+      },
+      {
+        "questionId": "ru0170-sep",
+        "value": true
+      },
+      {
+        "questionId": "ru0171-cls",
+        "value": "REQ行のみ"
+      },
+      {
+        "questionId": "ru0171-sep",
+        "value": false
+      },
+      {
+        "questionId": "ru0172-cls",
+        "value": "REQ行+Design行"
+      },
+      {
+        "questionId": "ru0172-sep",
+        "value": true
+      },
+      {
+        "questionId": "ru0173-cls",
+        "value": "REQ行+Design行"
+      },
+      {
+        "questionId": "ru0173-sep",
+        "value": true
+      },
+      {
+        "questionId": "ru0174-cls",
+        "value": "Design行のみ"
+      },
+      {
+        "questionId": "ru0174-sep",
+        "value": true
+      },
+      {
+        "questionId": "ru0175-cls",
+        "value": "REQ行のみ"
+      },
+      {
+        "questionId": "ru0175-sep",
+        "value": false
+      },
+      {
+        "questionId": "ru0176-cls",
+        "value": "REQ行のみ"
+      },
+      {
+        "questionId": "ru0176-sep",
+        "value": false
+      },
+      {
+        "questionId": "ru0177-cls",
+        "value": "実現面のみ（REQ・Design 保存なし）"
+      },
+      {
+        "questionId": "ru0177-sep",
+        "value": false
+      },
+      {
+        "questionId": "ru0178-cls",
+        "value": "Design行のみ"
+      },
+      {
+        "questionId": "ru0178-sep",
+        "value": true
+      },
+      {
+        "questionId": "ru0179-cls",
+        "value": "実現面のみ（REQ・Design 保存なし）"
+      },
+      {
+        "questionId": "ru0179-sep",
+        "value": false
+      }
+    ]
+  }
+}

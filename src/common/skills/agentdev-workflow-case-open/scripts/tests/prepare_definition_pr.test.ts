@@ -142,9 +142,9 @@ describe("機械工程の実行（worktree・編集・品質ゲート・明示�
       "worktree-create",
       "definition-edit",
       "generate_indexes",
+      "stage-and-commit",
       "check_integrity",
       "traceability-check",
-      "stage-and-commit",
     ]);
     expect(report.result.exitCategory).toBe("success");
     expect(decideExitCode(report)).toBe(0);
@@ -194,8 +194,9 @@ describe("機械工程の実行（worktree・編集・品質ゲート・明示�
     expect(report.result.exitCategory).toBe("failure");
     expect(decideExitCode(report)).toBe(1);
     expect(report.warnings.join("\n")).toContain("check_integrity failed");
+    // commit 済み HEAD に対する検査のため、commit は実行された後に check_integrity が失敗する
     const commitCall = runner.calls.find((c) => c.command === "git" && c.args[0] === "commit");
-    expect(commitCall).toBeUndefined();
+    expect(commitCall).toBeDefined();
   });
 
   test("dry-run は編集の書込みと stage・commit を実行せず計画を報告する", () => {

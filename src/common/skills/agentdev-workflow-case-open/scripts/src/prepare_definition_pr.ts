@@ -338,41 +338,10 @@ export function runPrepareDefinitionPr(
     }
   }
 
-  if (input.checkIntegrityGate) {
-    const check = runSpec(runner, input.checkIntegrityGate);
-    steps.push({
-      name: "check_integrity",
-      status: check.exitCode === 0 ? "pass" : "fail",
-      detail: { exitCode: check.exitCode, stderrTail: check.exitCode === 0 ? "" : check.stderr.trim().slice(-400) },
-    });
-    if (check.exitCode !== 0) {
-      warnings.push("check_integrity failed");
-      return assembleReport(input.dryRun === true, steps, diff, warnings, proposal);
-    }
-  }
-
-  if (input.traceabilityGate) {
-    const check = runSpec(runner, input.traceabilityGate);
-    let summary = "";
-    if (check.exitCode === 0) {
-      try {
-        const parsed = JSON.parse(check.stdout) as { summary?: { pass?: number; fail?: number } };
-        summary = `pass=${parsed.summary?.pass ?? "?"} fail=${parsed.summary?.fail ?? "?"}`;
-      } catch {
-        summary = "report parse failed";
-      }
-    }
-    steps.push({
-      name: "traceability-check",
-      status: check.exitCode === 0 ? "pass" : "fail",
-      detail: { exitCode: check.exitCode, summary, reqIds: input.traceabilityReqIds ?? [] },
-    });
-    if (check.exitCode !== 0) {
-      warnings.push("traceability check failed");
-      return assembleReport(input.dryRun === true, steps, diff, warnings, proposal);
-    }
-  }
-
+  // check_integrity は stage-and-commit の後に実行する。frontmatter updated と git log author date の
+  // 突合型検査は未 commit 変更が含まれる working tree では構造的に不一致となるため、
+  // check_integrity と traceability-check は commit 済み HEAD に対して実行する。
+  // dry-run では commit が行われないため両ゲートを skip して警告に記録する。
   const changed = runner.run({ command: "git", args: ["status", "--porcelain"], cwd: worktreeCwd });
   const changedFiles = changed.stdout
     .split("\n")
@@ -387,6 +356,7 @@ export function runPrepareDefinitionPr(
       detail: { dryRun: true, plannedStagePaths: input.stagePaths, commitMessage: input.commitMessage },
     });
     warnings.push("dry-run: stage and commit were not executed");
+    warnings.push("dry-run: check_integrity and traceability-check run after commit; skipped in dry-run");
   } else {
     const add = runner.run({ command: "git", args: ["add", "--", ...input.stagePaths], cwd: worktreeCwd });
     if (add.exitCode !== 0) {
@@ -414,6 +384,41 @@ export function runPrepareDefinitionPr(
       return assembleReport(false, steps, diff, warnings, proposal);
     }
     diff.head = head;
+
+    if (input.checkIntegrityGate) {
+      const check = runSpec(runner, input.checkIntegrityGate);
+      steps.push({
+        name: "check_integrity",
+        status: check.exitCode === 0 ? "pass" : "fail",
+        detail: { exitCode: check.exitCode, stderrTail: check.exitCode === 0 ? "" : check.stderr.trim().slice(-400) },
+      });
+      if (check.exitCode !== 0) {
+        warnings.push("check_integrity failed");
+        return assembleReport(false, steps, diff, warnings, proposal);
+      }
+    }
+
+    if (input.traceabilityGate) {
+      const check = runSpec(runner, input.traceabilityGate);
+      let summary = "";
+      if (check.exitCode === 0) {
+        try {
+          const parsed = JSON.parse(check.stdout) as { summary?: { pass?: number; fail?: number } };
+          summary = `pass=${parsed.summary?.pass ?? "?"} fail=${parsed.summary?.fail ?? "?"}`;
+        } catch {
+          summary = "report parse failed";
+        }
+      }
+      steps.push({
+        name: "traceability-check",
+        status: check.exitCode === 0 ? "pass" : "fail",
+        detail: { exitCode: check.exitCode, summary, reqIds: input.traceabilityReqIds ?? [] },
+      });
+      if (check.exitCode !== 0) {
+        warnings.push("traceability check failed");
+        return assembleReport(false, steps, diff, warnings, proposal);
+      }
+    }
   }
 
   proposal.pr_title = `docs(definition): Definition 変更 (${input.rootCaseId})`;
