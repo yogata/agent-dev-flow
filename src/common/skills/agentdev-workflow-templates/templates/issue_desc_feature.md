@@ -1,7 +1,6 @@
 ---
 name: Standard Case Description
 about: Standard Case（Root Case・単一実行単位）の本文テンプレート
-labels: enhancement
 ---
 
 ## 目的
