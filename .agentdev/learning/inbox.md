@@ -447,3 +447,19 @@
 - **想定反映先**: agentdev-workflow-case-open references/definition-pr-and-idempotency.md（機械工程の script 呼び出し手順）、scripts/src/prepare_definition_pr.ts の入力契約注記
 - **関連**: Case #3500、PR #3502、既存 learning「worktree 内 .opencode は junction 伝播が部分的（checker・テスト走査対象集合）」、既存 intake「2026-10-06-defpr-script-check-integrity-precommit-ordering.md」（IR-072 pre-commit 順序の別問題。本件で再発を実観測し予測が実証された）
 - **タグ**: `#worktree` `#junction` `#case-open` `#prepare_definition_pr` `#gate-path`
+
+## design 宣言追加は sidecar 存在時 inline と同一集合を保つ（duplicate-inconsistencies 解消）
+
+- **問題事象**: case-open STEP-4 の Definition PR 品質ゲートで、新規 REQ 行（REQ-030-022）の design 対応宣言を inline ADF-COVERS(design) コメントへのみ追加したところ、traceability check の duplicate-inconsistencies が fail した（同一論理関係 docs/designs/skills/agentdev-git-worktree.md × design が inline と sidecar の複数情報源で集合不一致）
+- **発生局面**: 実装（case-open STEP-4 品質ゲート。Windows・worktree .worktrees/3501-definition）
+- **検知方法**: traceability check --req の fail findings（duplicate-inconsistencies。missing-design は pass のまま残る形）
+- **根本原因**: detectDuplicateInconsistencies は同一論理関係（artifact パス × role）を複数情報源が保持する場合、情報源ごとの要件行 ID 集合の一致を要求する。sidecar（traceability/agentdev-git-worktree.yaml）の design セクションが既存である component へ、inline のみへ新規行を追加したため集合がずれた
+- **自律対応内容**: 対照実行（main は pass）で集合差異が本 Case 起因と分離した後、sidecar design セクションへ REQ-030-022 を追加し inline 宣言も同一集合へ復元して解消（case-open Design の宣言追随標準宣言先 sidecar 契約と main の inline × sidecar 同一集合重複慣行の双方に整合）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: REQ 行を design 対応させる場合、宣言追加先の決定前に traceability/ 配下 sidecar の design セクション有無を確認する。sidecar が design 宣言を保持する component では、inline と sidecar の双方へ同一集合で追加する（片方のみの追加は duplicate-inconsistencies で fail する）
+- **再発条件**: sidecar design セクション保持 component への inline のみの design 宣言追加（または逆）
+- **予防策候補**: case-open STEP-3 の ADF-COVERS 宣言追随確認手順に「sidecar design セクション有無の事前確認と同一集合維持」を明記する
+- **想定反映先**: agentdev-workflow-case-open references/root-case-and-definition-package.md（STEP-3 手順 3・4 の宣言追随手順）
+- **関連**: Case #3501、PR #3503
+- **タグ**: `#traceability` `#design-declaration` `#sidecar` `#case-open`
