@@ -77,7 +77,7 @@ description: 追跡Issue（課題、ToDo、アイデア、リスク等の未解�
 
 操作別の受理フィールド差異（`role` は issue_create / issue_list 専用、`kind` は `role: tracking` 専用で `role: case` では不受理、Case Issue の work_type は物理ラベルを `labels` へ指定）は、受理フィールド対応表として安全手続き側の `agentdev-issue-management` references `issue-operation-safety.md`「操作・role 別の受理フィールド対応表」節へ集約する。呼出側はその対応表から受理可否を確認する。
 
-gh CLI による読取補完（Case Issue は `case` ラベルを持たないためラベルフィルタが機能しない）は、ラベルなし列挙＋タイトル・本文確認の規律で行う。正は同 reference「gh CLI 読取補完の規律（ラベルなし列挙＋タイトル・本文確認）」節である。
+gh CLI による読取補完（Case の正規識別に `case` ラベルを使用せず、ラベルフィルタの結果の完全性を保証しない）は、ラベルなし列挙＋タイトル・本文確認の規律で行う。正は同 reference「gh CLI 読取補完の規律（ラベルなし列挙＋タイトル・本文確認）」節である。
 
 ### verification-incomplete 復帰手順（fail-closed）
 

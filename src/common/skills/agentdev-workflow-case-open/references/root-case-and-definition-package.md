@@ -44,7 +44,7 @@ Root Case 本文候補の生成は preflight 設定検証の警告報告後に�
 3. 実行識別情報セクションを本文へ記録しない（Issue 本文には実行識別情報セクションを設けない。`agentdev-workflow-templates` Design「実行識別情報・検証差分のテンプレートセクション形式」節）
 4. `review_dispositions` は本文へ全件転記しない。採用内容（accepted disposition）は本文の該当章（対象範囲、実現方針、完了条件の検証方法）へ反映し、必要な採否理由だけをコメントへ残す
 5. 曖昧性が残らず Root Case を確立できる場合にのみ、`agentdev_gh` の issue_create で Root Case を作成する（VERIFY）
-6. ラベルは `agentdev-workflow-lifecycle` の work_type 判定に従い付与する
+6. 検索・整理用ラベル（work_type 等）の付与は任意である。付与義務と起票時の既定付与は設けない（REQ-005-005 の任意付与契約）。構造・役割ラベルの物理写像は Tool 内部の責務であり本手順の対象外である
 7. Root Case 確立後の状態は open とし、実装開始を許可しない
 
 ### STEP-3: Definition Package 生成と関連付け
