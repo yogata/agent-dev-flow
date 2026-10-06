@@ -2,7 +2,7 @@
 title: ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応）
 status: accepted
 created: 2026-09-19
-updated: 2026-10-04
+updated: 2026-10-06
 ---
 <!-- ADF-COVERS(implementation): REQ-008-003, REQ-008-008, REQ-008-036, REQ-008-037 -->
 <!-- ADF-COVERS(implementation): REQ-005-001, REQ-005-025, REQ-005-026, REQ-005-027, REQ-005-028, REQ-035-004, REQ-035-005 -->

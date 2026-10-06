@@ -2,7 +2,7 @@
 title: case-run Design
 status: accepted
 created: 2026-06-21
-updated: "2026-10-05"
+updated: "2026-10-06"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-015, REQ-021-016, REQ-021-017, REQ-021-019, REQ-021-020, REQ-021-022, REQ-035-002 -->
