@@ -140,6 +140,7 @@ export function checkDistributionBoundary(
   detectorConfig: DetectorConfig = DEFAULT_DETECTOR_CONFIG,
 ): BoundaryReport {
   const failures: BoundaryFailure[] = [];
+  const warnings: string[] = [];
   const stats = emptyStats();
 
   // Mandatory repository_identity at adapter boundary. An empty owner_slash_name
@@ -155,7 +156,7 @@ export function checkDistributionBoundary(
       snippet: "repository_identity.owner_slash_name is empty; producer is not pinned",
       matched: "missing-repository-identity",
     });
-    return { ok: false, failures, stats };
+    return { ok: false, failures, stats, warnings };
   }
 
   const listing = collectTargets(repoRoot, projection);
@@ -188,7 +189,15 @@ export function checkDistributionBoundary(
 
   // Zero targets is a gate error (missing/unreachable projection), not clean.
   // Evaluated on the unfiltered listing so a missing projection still fails.
+  // RA-004: the warnings-channel notice below is separate from the
+  // adapter-failure Detection (the sole gate-accounted invalid-run record) —
+  // warnings are never re-counted into failures, stats, or the exit code.
   if (listing.textFiles.length === 0 && listing.unknownFiles.length === 0) {
+    warnings.push(
+      `zero-targets pre-warning: scan targets resolved to 0 files for projection '${projection}' ` +
+        `— the scan did not run (invalid execution). Verify the inspected root (--root) and ` +
+        `the junction propagation state of the execution environment before adopting the result.`,
+    );
     failures.push({
       category: "adapter-failure",
       file: repoRoot,
@@ -236,6 +245,7 @@ export function checkDistributionBoundary(
     ok: failures.length === 0,
     failures,
     stats,
+    warnings,
   };
 }
 

@@ -26,6 +26,10 @@ const TMP_ROOT = path.join(
   process.cwd(),
   ".worktrees-tmp-test-distribution-boundary",
 );
+const EMPTY_ROOT = path.join(
+  process.cwd(),
+  ".worktrees-tmp-test-distribution-boundary-empty",
+);
 
 function writeFile(rel: string, content: string): void {
   const full = path.join(TMP_ROOT, rel);
@@ -142,6 +146,7 @@ beforeAll(() => {
 
 afterAll(() => {
   fs.rmSync(TMP_ROOT, { recursive: true, force: true });
+  fs.rmSync(EMPTY_ROOT, { recursive: true, force: true });
 });
 
 describe("checkDistributionBoundary", () => {
@@ -221,6 +226,31 @@ describe("checkDistributionBoundary", () => {
       f.file.replace(/\\/g, "/").includes("tools/agentdev-gh/local/"),
     );
     expect(localHits.length).toBe(0);
+  });
+});
+
+describe("zero-targets pre-warning channel (RA-004)", () => {
+  test("emits a zero-targets pre-warning separate from the invalid-run failure", () => {
+    fs.mkdirSync(EMPTY_ROOT, { recursive: true });
+    const report = checkDistributionBoundary(EMPTY_ROOT, "link");
+    // The adapter-failure stays the sole gate-accounted invalid-run record.
+    const zeroTargetFailure = report.failures.find(
+      (f) => f.matched === "zero-targets:link",
+    );
+    expect(zeroTargetFailure).toBeDefined();
+    expect(zeroTargetFailure!.category).toBe("adapter-failure");
+    expect(report.ok).toBe(false);
+    expect(report.warnings).toHaveLength(1);
+    const warning = report.warnings?.[0] ?? "";
+    expect(warning).toContain("zero-targets pre-warning");
+    expect(warning).toContain("'link'");
+    expect(warning).toContain("junction propagation state");
+    expect(report.failures.some((f) => f.snippet.includes("pre-warning"))).toBe(false);
+  });
+
+  test("keeps warnings empty for a populated scan", () => {
+    const report = checkDistributionBoundary(TMP_ROOT);
+    expect(report.warnings).toEqual([]);
   });
 });
 

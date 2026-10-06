@@ -21,7 +21,7 @@
 //   - idempotency key enumeration agreement between the REQ rows and the
 //     definition-readiness Design
 
-// ADF-COVERS(verification): REQ-061-001, REQ-061-002, REQ-061-003, REQ-061-004, REQ-061-005, REQ-061-006, REQ-061-007, REQ-061-008, REQ-061-009, REQ-061-010, REQ-061-011, REQ-061-012, REQ-061-013, REQ-061-014, REQ-061-015, REQ-061-016, REQ-061-017, REQ-061-018, REQ-061-019, REQ-061-020, REQ-061-021, REQ-061-022, REQ-061-023, REQ-061-024, REQ-061-025, REQ-061-026, REQ-061-027, REQ-061-028
+// ADF-COVERS(verification): REQ-061-001, REQ-061-002, REQ-061-003, REQ-061-004, REQ-061-005, REQ-061-006, REQ-061-007, REQ-061-008, REQ-061-009, REQ-061-010, REQ-061-011, REQ-061-012, REQ-061-013, REQ-061-014, REQ-061-015, REQ-061-016, REQ-061-017, REQ-061-018, REQ-061-019, REQ-061-020, REQ-061-021, REQ-061-022, REQ-061-023, REQ-061-024, REQ-061-025, REQ-061-026, REQ-061-027, REQ-061-028, REQ-061-044, REQ-061-045, REQ-061-046
 // ADF-COVERS(verification): REQ-035-013, REQ-035-014, REQ-035-015
 
 import { describe, expect, test } from "bun:test";
@@ -41,6 +41,8 @@ const REF_STRUCT_REL =
   "src/common/skills/agentdev-workflow-case-ready/references/execution-structure.md";
 const REF_READY_REL =
   "src/common/skills/agentdev-workflow-case-ready/references/readiness-and-cleanup.md";
+const REF_OPEN_PR_REL =
+  "src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md";
 const TPL_ROOT_REL =
   "src/common/skills/agentdev-workflow-templates/templates/case-ready/root-case.md";
 const TPL_REPORT_REL =
@@ -97,6 +99,9 @@ const ROW_ANCHORS: Array<[string, string, RegExp]> = [
   ["REQ-061-026", REF_READY_REL, /main ブランチの作業ディレクトリとリモートの同期を確認/],
   ["REQ-061-027", REF_READY_REL, /merge 済み Definition（設計PR）を再利用/],
   ["REQ-061-028", REF_DEF_REL, /ready へ遷移せず、既存 PR を保持/],
+  ["REQ-061-044", REF_DEF_REL, /merge 判定の前に当該 acceptance_gates の内容を確認する/],
+  ["REQ-061-045", REF_DEF_REL, /coverage 確認の対象は新規要件行のみではなく、既存要件行を含む/],
+  ["REQ-061-046", REF_DEF_REL, /frontmatter `updated` を再実測し、設計PR 差分と一致することを確認してから merge する/],
 ];
 
 describe("distribution artifacts exist", () => {
@@ -333,4 +338,27 @@ describe("row anchor matrix (REQ rows -> distribution artifact clauses)", () => 
       expect(read(rel)).toMatch(pattern);
     });
   }
+});
+
+describe("Definition merge-time re-measurement and machine-step order agreement", () => {
+  const openPrDoc = read(REF_OPEN_PR_REL);
+
+  test("case-open STEP-4 reference pins the frontmatter updated target-range identification procedure", () => {
+    expect(openPrDoc).toContain("frontmatter updated 再実測の対象範囲の特定");
+    expect(openPrDoc).toContain("merge 直前の branch HEAD（origin/main 取り込み済み）で対象範囲を再特定する");
+    expect(openPrDoc).toContain("未 commit 変更が残る working tree での代替実測を行わない");
+  });
+
+  test("machine-step procedure order matches the committed-HEAD execution order", () => {
+    expect(openPrDoc).toContain(
+      "明示パス指定 stage・commit、`check_integrity`、traceability check まで",
+    );
+    expect(openPrDoc).toContain("commit 済み HEAD に対して実行する");
+  });
+
+  test("case-open STEP-4 reference pins the worktree junction propagation pre-check", () => {
+    expect(openPrDoc).toContain("worktree 実行時の junction 伝播状態確認（機械工程の前置）");
+    expect(openPrDoc).toContain("main root 実体 + --root 指定による読取系 checker 実行手順」節の汎用手順に従い");
+    expect(openPrDoc).toContain("checker 側の zero-targets 事前警告を含む出力を確認してから結果を採用する");
+  });
 });

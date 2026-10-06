@@ -19,7 +19,7 @@
 
 1. **忠実性確認**: req-define での最新合意内容（req_draft の合意済み内容〔agreed_items、operation_units、realization_actions、受入条件〕。req_draft は取得時点の最新の合意記録であり、case-revise 由来の再合意があれば反映後の内容を照合基準とする）と設計PRの変更内容を突合し、req-define で合意済みの意味内容に対する忠実な投影であることを確認する。判断方法: 閉じた意味評価（合意済み内容と変更内容の突合。事実・判断基準・結果空間〔忠実/非忠実〕は評価前に限定）。確定権限: 正規契約（合意済み内容）からの導出。人間に留保された判断（REQ-{NNNN}-{NNN}）を新規に確定しない
 2. **整合性検査**: REQ / Decision / Design の相互整合と frontmatter 整合を確認する。決定的検証は `agentdev-artifact-validation` の公開検証契約へ委譲する。判断方法: 決定的処理（機械検証へ委譲）。確定権限: 正規契約からの導出
-3. **品質検査**: 設計PRの CI 結果とリポジトリの品質検査結果を確認する。判断方法: 決定的処理（機械的証拠の突合）。確定権限: 正規契約からの導出
+3. **品質検査**: 設計PRの CI 結果とリポジトリの品質検査結果を確認する。merge 直前には、branch HEAD（origin/main 取り込み済み）の状態で変更を伴う docs ファイル群の frontmatter `updated` を再実測し、設計PR 差分と一致することを確認してから merge する。再実測を省略した merge を行わず、未 commit 変更が残る working tree での代替実測も行わない。再実測対象範囲（変更を伴う docs ファイル群）の特定手順は case-open 側 reference（definition-pr-and-idempotency）「frontmatter updated 再実測の対象範囲の特定」節を参照する。判断方法: 決定的処理（機械的証拠の突合）。確定権限: 正規契約からの導出
 
 ### 必須受け入れ義務の照合と merge 抑止（忠実性確認の必須要素）
 
@@ -34,6 +34,14 @@
 - 必須受け入れ義務の欠落、縮小、反転のいずれかを検出した場合は設計PRを merge しない。検出を warning 化して merge を継続する経路は存在しない
 - 停止理由には検出分類（欠落・縮小・反転）、該当する受け入れ義務、設計PR内の該当箇所を記録する
 - 復帰経路: 投影側の誤りの場合は Definition 側の修正を、合意自体の変更が必要な場合は req-define での再合意（既存 Case への反映は case-revise → case-ready）を行った後、case-ready を再実行する（既存 PR を再利用する）
+
+### acceptance_gates 前置確認（merge 前の受入検査）
+
+workflow extension（`.agentdev/extensions/skills/*.yaml`）に acceptance_gates が宣言されている場合、merge 判定の前に当該 acceptance_gates の内容を確認する。
+
+- **前置確認の位置付け**: 本確認は merge 前の受入検査であり、merge 判定と接続する。確認を経ない merge を行わず、merge 後の確認で代替しない
+- **欠落・不備検出時**: acceptance_gates の確認で欠落・不備を検出した場合は設計PRを merge せず、CI 失敗時と同一の経路（既存 PR を保持したまま停止、修復後の case-ready 再実行）へ進む。検出を warning 化して merge を継続する経路は存在しない
+- **coverage 確認の既存要件行対象**: coverage 確認の対象は新規要件行のみではなく、既存要件行を含む。既存要件の検証行の退行（既存テスト・検証手段の喪失・除外）を、新規行の検証だけで合格とせず、退行を検出した場合は本前置確認の merge 抑止と同一に扱う
 
 ### merge 前の isDraft 確認（STEP-1 の正規経路）
 
