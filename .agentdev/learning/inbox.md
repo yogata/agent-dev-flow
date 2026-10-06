@@ -282,3 +282,37 @@
 - **想定反映先**: agentdev-gh README（失敗分類の診断ガイド）、docs/knowledge/（git 非対話認証知識の隣接領域）
 - **関連**: RU-0162 の case-open（blocked、Root Case 未起票）、入口 commit 96bdec73（draft・Jev 観測の先行永続化済み）
 - **タグ**: `#agentdev-gh` `#opencode` `#fail-closed` `#case-open` `#blocked`
+
+---
+
+## Definition 変更時の Design frontmatter updated 進行漏れが IR-072 で機械検出される（REQ 行は意識するが Design 側が漏れる）
+
+- **問題事象**: case-open STEP-4 の Definition 変更（Case #3494）で REQ 行の frontmatter updated は適用時点で再実測した一方、Design 6 ファイル（case-auto・case-close・case-open・case-ready・execution-adapter・workflow-skill-model）の frontmatter updated 進行を漏らした。check_integrity が req-updated-freshness（IR-072）6 件を new unmanaged NG として検出し exit 1 となった
+- **発生局面**: 運用（case-open STEP-3 の Definition Package 生成・STEP-4 の検査）
+- **検知方法**: check_integrity の new unmanaged NG delta 出力（7 new unmanaged NG → updated 進行で 6 件消滅）
+- **根本原因**: 可変メタデータ再実測（STEP-3 手順 1.5 の(3)）を REQ ファイルにのみ適用し、Design ファイルへの同一規律適用が漏れた。IR-072（Design 変更時に frontmatter updated を変更日へ進行）の検査対象に Design が含まれることを適用前に認識していなかった
+- **自律対応内容**: 6 Design ファイルの frontmatter updated を変更日へ進行し commit f7fe8db4 で解消。generate_indexes 再実行は no changes（索引は Design frontmatter を対象外とすることを冪等確認）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（IR-072 の適用事例）
+- **横展開観点**: 可変メタデータ再実測の対象は REQ だけでなく、変更する全 frontmatter 持ち文書（Design・Decision）に及ぶ。検査に先立つ適用前検証で「変更ファイル集合の frontmatter updated 一括確認」を挟むと検査ループを1回減らせる
+- **再発条件**: Design への append・update を含む Definition 変更を case-open で適用する場合
+- **予防策候補**: case-open STEP-3 の手順 1.5(3) に Design・Decision の frontmatter updated 再実測を明示する（reference 文言の補足候補）
+- **想定反映先**: agentdev-workflow-case-open references/root-case-and-definition-package.md（手順 1.5 の(3)）
+- **関連**: Case #3494、Definition PR #3495（commit f7fe8db4）、.agentdev/integrity/reports/ の check_integrity 初回実行
+- **タグ**: `#ir-072` `#frontmatter` `#case-open` `#definition`
+
+## agentdev_gh の API rate limit（HTTP 403）は読取の gh CLI 切替で継続できるが切替記録が必要
+
+- **問題事象**: case-open STEP-5 の冪等検出（issue_list）で agentdev_gh が GitHub API rate limit（`gh exited with code 1`、HTTP 403、scraping 警告付き）で2回連続失敗した。retryable: true の operation-failed として報告された
+- **発生局面**: 運用（case-open STEP-5 の冪等検出。GitHub I/O 読み取り操作）
+- **検知方法**: agentdev_gh 応答の failure detail（request ID・rate limit メッセージ）
+- **根本原因**: 同一ユーザーの GitHub API quota 消費（infra-transient。gh CLI fallback 契約の想定内失敗）
+- **自律対応内容**: 既存の切替手順（definition-pr-and-idempotency.md「GitHub I/O 失敗時の gh CLI 切替継続手順」）に従い、同一操作1回再試行 → 失敗確認 → gh CLI 読み取り専用検出（`gh issue list --state open --search "Case"`、`gh pr list`）へ切替し冪等検出を完了。切替理由（操作名・exit code・request ID）と検出結果を検証記録へ残し、検出基準は agentdev_gh と同一の冪等キーで解釈した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存 fallback 契約の適用事例）
+- **横展開観点**: rate limit による読取失敗は retryable 表示でも即時再試行は回復しない（quota 消費型）。切替手順の「同一操作1回再試行→切替」は quota 型失敗でも機能する。書込み操作は切替禁止のため、書込み工程で rate limit に到達した場合は停止して quota 回復を再開条件にする
+- **再発条件**: 大量の Issue/PR 操作を伴う Case の連続実行後の読取操作
+- **予防策候補**: case-open/case-ready の GitHub 読取操作に rate limit の影響を考慮した順序（書込みを先・冪等検出の読取を後）を検討する
+- **想定反映先**: definition-pr-and-idempotency.md 切替手順（適用事例の補遺）、agentdev-gh README の失敗分類
+- **関連**: Case #3494、Definition PR #3495、前回 learning「agentdev_gh の全操作が gh exit 66…」（同工程の別障害クラス）
+- **タグ**: `#agentdev-gh` `#rate-limit` `#fallback` `#case-open`
