@@ -9,6 +9,7 @@ implementation:
     - REQ-012-058
   src/common/skills/agentdev-traceability/references/sidecar-and-policy.md:
     - REQ-012-058
+    - REQ-030-024
   src/common/skills/agentdev-traceability/scripts/lib/check.ts:
     - REQ-012-056
   src/common/skills/agentdev-traceability/scripts/lib/corpus.ts:

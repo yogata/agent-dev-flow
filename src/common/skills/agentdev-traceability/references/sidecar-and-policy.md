@@ -103,3 +103,13 @@ verification:
 - 同一の論理関係（同一 artifact パス × role × 要件行 ID）を sidecar と inline declaration の双方へ記述してよい。整合しない重複は `duplicate-inconsistencies` として検出される
 - inline declaration から sidecar へ移行する場合、旧側の宣言を撤去してから新側を確定するなど、移行途中で論理関係が矛盾しないよう整理する
 - consumer distribution closure（配布対象の製品ソース）では inline declaration を使用しない。配布対象成果物の対応関係は sidecar で保持する
+
+### inline 宣言と sidecar の集合一致の適用前確認
+
+対応関係を更新する適用（artifact_actions の update 系操作を含む）の前に、inline ADF-COVERS 宣言と sidecar のロール付き関係宣言（artifact パス × role × 要件行 ID）の集合一致を、等集合要求の下で両方向の差分で確認する。
+
+1. **集合の列挙**: 対象 component の inline ADF-COVERS 宣言から抽出した論理関係の集合と、sidecar の該当 role 配下の論理関係の集合を列挙する
+2. **両方向の差分取得**: inline のみに存在する関係と sidecar のみに存在する関係を、両方向の差分として列挙する。一方向の比較だけを集合一致の根拠にしない
+3. **差分 0 件の確認後に適用する**: いずれかの方向で差分（片側逸脱）を検出した場合は適用を中断して報告し、inline または sidecar のいずれか一方への追加・撤去で集合を一致させてから適用する（双方への重複記述で解消する方向は取らない。優先方向は本スキル SKILL.md の inline declaration 優先規則に従う）
+
+本手順は適用前の予防的手順である。同一論理関係の不整合な重複を事後検知する check（`duplicate-inconsistencies`）の既存検出は維持され、本手順と両面運用で両立する（検出は既存機構、本手順は適用前の予防追加）。片側逸脱（一方の宣言のみに存在する論理関係）は重複（双方に存在する整合しない関係）とは区別され、`duplicate-inconsistencies` の検出対象外であるため、本手順がその適用前検出を担う。

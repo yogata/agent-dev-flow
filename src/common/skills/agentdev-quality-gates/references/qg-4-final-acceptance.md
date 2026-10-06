@@ -389,18 +389,20 @@ bun test ./.opencode/plugins/ ./scripts/ >stdout-3.log 2>stderr-3.log
 
 ### fail 由来分類
 
-フル suite の合格判定は、fail 全件の由来分類（変更由来 / pre-existing / 不明）と検証環境の記録を前提とする。
+フル suite の合格判定は、fail 全件の由来分類（変更由来 / pre-existing / 実行形態由来 / 不明）と検証環境の記録を前提とする。
 由来分類は fail が 1 件以上ある場合に全 fail へ必須とし、由来不明の fail を合格の根拠にしない。
 検証完了基準は由来不明 0 件である。
 pre-existing と分類する根拠は、ワークツリー変更ゼロの baseline commit で同一テストを再実行し、同一 fail が再現することの確認とする。
 remediation 開始後に作成した commit や base ブランチ比較のみを pre-existing の証拠として採用しない。
 由来判定の基準 commit は remediation 開始前の baseline commit とする。
-本節の3分類と agentdev-quality-gates Design 機械受理基準の分類語彙の対応は次のとおりとし、機械受理基準の判定は本節の3分類で行う。
+実行形態由来は、起動 cwd、ランナー、パス指定形式等の実行形態に起因する fail として分類し、実装由来（変更由来）と区別して記録する。実行形態由来と判定した fail は、当該実行結果を合格の根拠にせず、実行形態規律（checker 実行契約 Design「実行形態規律（集約）」節）へ適合させて再実行した結果を採用する。規律適合後の再実行でも fail が解消しない場合は、変更由来・pre-existing・不明のいずれかへ改めて由来分類する。実行形態由来の判定根拠は、環境ラベル（実行環境、junction 伝播状態、依存パッケージ状態）と起動コマンドの記録による。
+本節の4分類と agentdev-quality-gates Design 機械受理基準の分類語彙の対応は次のとおりとし、機械受理基準の判定は本節の4分類で行う。
 
 | 本節の分類 | 対応する Design 語彙 |
 |---|---|
 | 変更由来 | 当該変更起因 |
 | pre-existing | 既知欠陥、環境依存（baseline commit で再現する fail） |
+| 実行形態由来 | 語彙対応なし（本節で新設した分類。対応: 実行形態規律へ適合させて再実行し、その結果を採用） |
 | 不明 | いずれにも分類できない fail |
 
 証跡手順（fail 発見時にこの順序で実行し、記録を PR 本文の検証差分セクションへ残す）:
@@ -441,7 +443,7 @@ baseline 系 durable state（baseline commit、baseline 期待値・許容リス
 2. 正規形実行の記録: 3 cwd 分割それぞれの起動コマンド（`./` prefix 付き、cwd はリポジトリルート）の実行記録が存在すること
 3. 環境ラベルの記録: 環境ラベルの3要素（実行環境、junction 伝播状態、依存パッケージ状態）が記録されていること。採取手順は「環境ラベル」節のとおり
 4. 件数突合の記録: 各分割実行の「Ran N tests across M files」件数が記録されていること
-5. fail 全件の由来分類: fail が 0 件、または全 fail に由来分類（変更由来 / pre-existing / 不明）が付与され、由来不明が 0 件であること
+5. fail 全件の由来分類: fail が 0 件、または全 fail に由来分類（変更由来 / pre-existing / 実行形態由来 / 不明）が付与され、由来不明が 0 件であり、実行形態由来と分類した fail については実行形態規律へ適合させて再実行した結果の採用が記録されていること
 6. baseline 基準の明示: 由来判定が remediation 開始前の baseline commit 基準で行われたことが記録されていること
 7. pre-existing fail の baseline 再現確認の記録: pre-existing と分類した fail がある場合、ワークツリー変更ゼロの baseline commit で同一テストを再実行した同一 fail 再現確認の記録が存在すること。baseline 再現確認は detached worktree による baseline 比較（`agentdev-git-worktree` worktree-operations「git stash 運用手順（一時退避）」の detached worktree 標準手順、stash を使わない）で実施したことが記録から確認できること。単独→フル再実行の証拠順序と同一環境件数比較の実施は「fail 由来分類」節の証跡手順に従う
 8. 終了コードの記録: 各分割実行の終了コードが記録されていること。記録する終了コードは検証コマンド自体の終了コードであり、表示用のパイプや後続処理の終了コードへの変換を行わない。非ゼロ終了・timeout 打ち切り・切断した実行結果を pass 証拠として扱わない
