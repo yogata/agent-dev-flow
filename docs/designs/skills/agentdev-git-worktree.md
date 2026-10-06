@@ -5,7 +5,7 @@ created: 2026-06-21
 updated: 2026-10-06
 ---
 <!-- ADF-COVERS(implementation): REQ-018-002 -->
-<!-- ADF-COVERS(design): REQ-102-001, REQ-102-002, REQ-102-003, REQ-102-004, REQ-018-002 -->
+<!-- ADF-COVERS(design): REQ-102-001, REQ-102-002, REQ-102-003, REQ-102-004, REQ-018-002, REQ-030-022 -->
 <!-- ADF-COVERS(design): REQ-018-009（worktree クリーンアップの削除部分失敗時代替掃除手順の設計記録面。運用文書への手順追記は references/worktree-operations.md が実装として保持） -->
 
 # `agentdev-git-worktree` Design
