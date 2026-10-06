@@ -1,0 +1,276 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261006T165221Z-5a46",
+  "workflow": "backlog-auto/backlog-review",
+  "evaluationKind": "tentative-classification",
+  "subject": "RU構成案14件の暫定分類（文書7分類モデル）",
+  "sourceRevision": "6d3c9134",
+  "durationMs": 1464,
+  "inputTokens": 4487,
+  "inputs": {
+    "requestDigest": "32a2ddfac5702a6acb3b0a86cdd800448437c18d25bad97160e1d3a9340d989d",
+    "snapshot": "26採用済み成果物（intake7/learning11/inspect8）を14 RUへ構成。RU-A retired参照スイープ5成果物統合、RU-B DEC対称2件、RU-C REQ二重規範、RU-D single-flight、RU-E worktree手順3件統合、RU-F checker環境2件統合（成果物が統合必須を明記）、RU-G fail由来分類、RU-H 受入前置2件、RU-I 内容規律2件、RU-J IR-072運用×script工程2件統合、RU-K 改番スイープ、RU-L 表記統一採否、RU-M 委譲MUST DO、RU-N LF正規化。暫定分類案: A/B=カタログDesign、C/L=REQ、他11件=挙動Design"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "ru-a",
+      "questionForm": "choice",
+      "value": "カタログDesign",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0,
+        "カタログDesign": 1,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru-b",
+      "questionForm": "choice",
+      "value": "カタログDesign",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0,
+        "カタログDesign": 1,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru-c",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 1,
+        "挙動Design": 0,
+        "カタログDesign": 0,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru-d",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 1,
+        "カタログDesign": 0,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru-e",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 1,
+        "カタログDesign": 0,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru-f",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 1,
+        "カタログDesign": 0,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru-g",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 1,
+        "カタログDesign": 0,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru-h",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 1,
+        "カタログDesign": 0,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru-i",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 1,
+        "カタログDesign": 0,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru-j",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 1,
+        "カタログDesign": 0,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru-k",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0.020000000000000004,
+        "挙動Design": 0.8200000000000001,
+        "カタログDesign": 0.08000000000000002,
+        "guide": 0.08000000000000002,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru-l",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.99,
+        "挙動Design": 0.01,
+        "カタログDesign": 0,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru-m",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 1,
+        "カタログDesign": 0,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "ru-n",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 1,
+        "カタログDesign": 0,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "ru-a",
+        "value": "カタログDesign"
+      },
+      {
+        "questionId": "ru-b",
+        "value": "カタログDesign"
+      },
+      {
+        "questionId": "ru-c",
+        "value": "REQ"
+      },
+      {
+        "questionId": "ru-d",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "ru-e",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "ru-f",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "ru-g",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "ru-h",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "ru-i",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "ru-j",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "ru-k",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "ru-l",
+        "value": "REQ"
+      },
+      {
+        "questionId": "ru-m",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "ru-n",
+        "value": "挙動Design"
+      }
+    ]
+  }
+}

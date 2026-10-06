@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261006T165407Z-1661",
+  "workflow": "backlog-auto/backlog-review",
+  "evaluationKind": "knowledge-disposition-and-composition",
+  "subject": "知識文書処置2件・統合分割6バンドル・depends_on の判定",
+  "sourceRevision": "6d3c9134",
+  "durationMs": 1095,
+  "inputTokens": 3010,
+  "inputs": {
+    "requestDigest": "b3de33177ca39026d93d13993884e4e66dda7f921ae23fc4bd3949d7b271039a",
+    "snapshot": "26成果物→14 RU+2知識文書候補。K-1=temp残渣削除基準（新規候補、既存28知識ファイルにtemp系なし）、K-2=vendor空化（worktree-environment-fail-classification.md更新候補、:30に再生成手順既存）。統合バンドル6件、depends_on全空案"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "k1-temp-residue",
+      "questionForm": "choice",
+      "value": "保存（新規知識文書）",
+      "probabilityDistribution": {
+        "保存（新規知識文書）": 0.99,
+        "保存（既存知識文書の更新）": 0.01,
+        "削除": 0,
+        "保留": 0,
+        "RU化へ変更": 0
+      }
+    },
+    {
+      "questionId": "k2-vendor",
+      "questionForm": "choice",
+      "value": "保存（既存知識文書の更新）",
+      "probabilityDistribution": {
+        "保存（新規知識文書）": 0.02,
+        "保存（既存知識文書の更新）": 0.96,
+        "削除": 0,
+        "保留": 0.01,
+        "RU化へ変更": 0.01
+      }
+    },
+    {
+      "questionId": "bundle-a-retired",
+      "questionForm": "choice",
+      "value": "1:1分割（F-06を独立RU化）",
+      "probabilityDistribution": {
+        "N:1統合（案のまま）": 0.03,
+        "1:1分割（F-06を独立RU化）": 0.67,
+        "別の構成": 0.3
+      }
+    },
+    {
+      "questionId": "bundle-e-worktree-ops",
+      "questionForm": "choice",
+      "value": "1:1分割（配置規律とremove回復を別RU）",
+      "probabilityDistribution": {
+        "N:1統合（案のまま）": 0.24,
+        "1:1分割（配置規律とremove回復を別RU）": 0.59,
+        "別の構成": 0.17
+      }
+    },
+    {
+      "questionId": "bundle-f-checker-env",
+      "questionForm": "choice",
+      "value": "N:1統合（案のまま）",
+      "probabilityDistribution": {
+        "N:1統合（案のまま）": 0.96,
+        "1:1分割（環境ラベル系とlink profile前置を別RU）": 0.02,
+        "別の構成": 0.02
+      }
+    },
+    {
+      "questionId": "bundle-h-acceptance",
+      "questionForm": "choice",
+      "value": "N:1統合（案のまま）",
+      "probabilityDistribution": {
+        "N:1統合（案のまま）": 0.79,
+        "1:1分割（acceptance_gates前置とUPDATE行coverageを別RU）": 0.17,
+        "別の構成": 0.04
+      }
+    },
+    {
+      "questionId": "bundle-i-content",
+      "questionForm": "choice",
+      "value": "N:1統合（案のまま）",
+      "probabilityDistribution": {
+        "N:1統合（案のまま）": 0.63,
+        "1:1分割（artifact_actions全含とinline×sidecar一致を別RU）": 0.31,
+        "別の構成": 0.06
+      }
+    },
+    {
+      "questionId": "bundle-j-ir072",
+      "questionForm": "choice",
+      "value": "N:1統合（案のまま）",
+      "probabilityDistribution": {
+        "N:1統合（案のまま）": 0.78,
+        "1:1分割（手順明示とscript工程順序を別RU）": 0.17,
+        "別の構成": 0.05
+      }
+    },
+    {
+      "questionId": "depends-on-none",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.65,
+        "false": 0.35
+      }
+    }
+  ],
+  "confidence": 0.99,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "k1-temp-residue",
+        "value": "保存（新規知識文書）"
+      },
+      {
+        "questionId": "k2-vendor",
+        "value": "保存（既存知識文書の更新）"
+      },
+      {
+        "questionId": "bundle-a-retired",
+        "value": "1:1分割（F-06を独立RU化）"
+      },
+      {
+        "questionId": "bundle-e-worktree-ops",
+        "value": "1:1分割（配置規律とremove回復を別RU）"
+      },
+      {
+        "questionId": "bundle-f-checker-env",
+        "value": "N:1統合（案のまま）"
+      },
+      {
+        "questionId": "bundle-h-acceptance",
+        "value": "N:1統合（案のまま）"
+      },
+      {
+        "questionId": "bundle-i-content",
+        "value": "N:1統合（案のまま）"
+      },
+      {
+        "questionId": "bundle-j-ir072",
+        "value": "N:1統合（案のまま）"
+      },
+      {
+        "questionId": "depends-on-none",
+        "value": true
+      }
+    ]
+  }
+}

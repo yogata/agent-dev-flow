@@ -20,7 +20,7 @@ docs/knowledge/ はプロジェクト知識（プロジェクト固有の再利�
 
 ## 現在の知識文書
 
-27件。
+28件。
 
 - [windows-powershell-bulk-io-corruption.md](windows-powershell-bulk-io-corruption.md)
 - [checker-cli-stdout-loss-on-windows-bun.md](checker-cli-stdout-loss-on-windows-bun.md)
@@ -49,6 +49,7 @@ docs/knowledge/ はプロジェクト知識（プロジェクト固有の再利�
 - [git-noninteractive-auth.md](git-noninteractive-auth.md)
 - [windows-checker-observation-discipline.md](windows-checker-observation-discipline.md)
 - [worktree-environment-fail-classification.md](worktree-environment-fail-classification.md)
+- [temp-file-debug-residue-cleanup-criteria.md](temp-file-debug-residue-cleanup-criteria.md)
 
 知識文書は learning から昇華されて成長する（REQ-056）。
 登録経路と承認条件は REQ-056 を参照する。
