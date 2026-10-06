@@ -111,6 +111,52 @@ describe("完了条件チェックボックスの機械的抽出（評価はモ�
   });
 });
 
+describe("完了条件チェックボックスの CRLF 入力抽出（読取後の LF 正規化前置）", () => {
+  const lines = [
+    "# Issue",
+    "",
+    "- [ ] 未達条件 A",
+    "- [x] 達成条件 B",
+    "",
+    "- [ ] 空行を挟んだ未達条件 C",
+  ];
+
+  test("CRLF 改行の issueBodyPath 入力が LF 入力と同一の抽出結果になる", () => {
+    const lfReport = runCloseMechanicalSteps(
+      preMergeInput(),
+      fakeRunner({ issueBody: lines.join("\n") }),
+    );
+    const crlfReport = runCloseMechanicalSteps(
+      preMergeInput(),
+      fakeRunner({ issueBody: lines.join("\r\n") }),
+    );
+    expect(crlfReport.proposal.completion_checkboxes).toBe(
+      lfReport.proposal.completion_checkboxes,
+    );
+  });
+
+  test("CRLF 入力でも項目欠落・空行項目混入が発生しない", () => {
+    const report = runCloseMechanicalSteps(
+      preMergeInput(),
+      fakeRunner({ issueBody: lines.join("\r\n") }),
+    );
+    const extractionStep = report.result.steps.find(
+      (s) => s.name === "completion-checkbox-extraction",
+    );
+    expect(extractionStep?.detail).toEqual({ total: 3, checked: 1 });
+    const items = JSON.parse(report.proposal.completion_checkboxes) as {
+      text: string;
+      checked: boolean;
+    }[];
+    expect(items).toEqual([
+      { text: "未達条件 A", checked: false },
+      { text: "達成条件 B", checked: true },
+      { text: "空行を挟んだ未達条件 C", checked: false },
+    ]);
+    expect(items.every((item) => item.text.length > 0)).toBe(true);
+  });
+});
+
 describe("Epic 実行構成表の解析と現在 Wave 特定（投入順序に依存しない）", () => {
   const epicBody = [
     "## 実行構成",
