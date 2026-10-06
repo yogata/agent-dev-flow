@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261006T214042Z-fc94",
+  "workflow": "case-ready",
+  "evaluationKind": "execution-structure-attribution",
+  "subject": "Root Case #3507（16 RU 統合）の Standard / Epic 確定",
+  "sourceRevision": "ad22ea16",
+  "durationMs": 1100,
+  "inputTokens": 1513,
+  "inputs": {
+    "requestDigest": "8253a7181619a608896545653be8ace70c97c167d86b63a1bd93cbe43972302b"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "attribution",
+      "questionForm": "choice",
+      "value": "Epic",
+      "probabilityDistribution": {
+        "Epic": 0.7,
+        "Standard": 0.3
+      }
+    },
+    {
+      "questionId": "dependency-strength",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "関連": 0.36,
+        "弱": 0.59,
+        "必須": 0.05
+      }
+    },
+    {
+      "questionId": "functional-coherence",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "分散": 0.12,
+        "部分的": 0.54,
+        "一貫": 0.34
+      }
+    }
+  ],
+  "confidence": 0.4,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "attribution",
+        "value": "Epic"
+      },
+      {
+        "questionId": "dependency-strength",
+        "value": 1
+      },
+      {
+        "questionId": "functional-coherence",
+        "value": 1
+      }
+    ]
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261006T214140Z-080f",
+  "workflow": "case-ready",
+  "evaluationKind": "wave-structure-decision",
+  "subject": "Root Case #3507 の Wave 構成判断（並列可否と重複時処置）",
+  "sourceRevision": "ad22ea16",
+  "durationMs": 308,
+  "inputTokens": 1224,
+  "inputs": {
+    "requestDigest": "2abc42ba7cd6b8d95916818da142ccbcdbec5f3b915f1046a264fd4fa53f0c59"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "parallel-allowed",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.95,
+        "false": 0.050000000000000044
+      }
+    },
+    {
+      "questionId": "overlap-treatment",
+      "questionForm": "choice",
+      "value": "変更対象分割",
+      "probabilityDistribution": {
+        "変更対象分割": 0.75,
+        "重複許容": 0.25
+      }
+    }
+  ],
+  "confidence": 0.51,
+  "finalResult": {
+    "results": [
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "overlap-treatment",
+        "value": "重複許容"
+      },
+      {
+        "questionId": "parallel-allowed",
+        "value": true
+      }
+    ]
+  }
+}
