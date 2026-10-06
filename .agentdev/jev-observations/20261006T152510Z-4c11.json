@@ -1,0 +1,376 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261006T152510Z-4c11",
+  "workflow": "learning-promote",
+  "evaluationKind": "axis-scoring",
+  "subject": "問題クラス C5/C6/C7 の7軸スコアリング（2026-10-07 backlog-auto stage 2）",
+  "sourceRevision": "2ecdc2cad3c8a1c3f8fbb68973d0f90c146a8228",
+  "durationMs": 717,
+  "inputTokens": 3423,
+  "inputs": {
+    "requestDigest": "aedd92e0b6227c11757f1874dafb6171fbf165a266a3f23ec9adb728bbc7487c"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "c5-impact",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.21,
+        "3": 0.54,
+        "4": 0.24,
+        "5": 0
+      }
+    },
+    {
+      "questionId": "c5-spread",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.07,
+        "3": 0.18,
+        "4": 0.65,
+        "5": 0.09
+      }
+    },
+    {
+      "questionId": "c5-dest-clarity",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0.01,
+        "3": 0.08,
+        "4": 0.78,
+        "5": 0.13
+      }
+    },
+    {
+      "questionId": "c5-automation",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.09,
+        "3": 0.28,
+        "4": 0.58,
+        "5": 0.04
+      }
+    },
+    {
+      "questionId": "c5-reuse",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1": 0.05000000000000001,
+        "2": 0.18000000000000002,
+        "3": 0.21000000000000002,
+        "4": 0.44000000000000006,
+        "5": 0.12000000000000001
+      }
+    },
+    {
+      "questionId": "c5-recurrence",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0.01,
+        "3": 0.08,
+        "4": 0.8,
+        "5": 0.11
+      }
+    },
+    {
+      "questionId": "c5-cost-benefit",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.03,
+        "3": 0.16,
+        "4": 0.67,
+        "5": 0.13
+      }
+    },
+    {
+      "questionId": "c6-impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1": 0.04,
+        "2": 0.77,
+        "3": 0.18,
+        "4": 0.01,
+        "5": 0
+      }
+    },
+    {
+      "questionId": "c6-spread",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1": 0.03,
+        "2": 0.44,
+        "3": 0.28,
+        "4": 0.23,
+        "5": 0.02
+      }
+    },
+    {
+      "questionId": "c6-dest-clarity",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0.05,
+        "3": 0.25,
+        "4": 0.67,
+        "5": 0.03
+      }
+    },
+    {
+      "questionId": "c6-automation",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.09,
+        "3": 0.17,
+        "4": 0.63,
+        "5": 0.1
+      }
+    },
+    {
+      "questionId": "c6-reuse",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1": 0.04,
+        "2": 0.23,
+        "3": 0.19,
+        "4": 0.45,
+        "5": 0.09
+      }
+    },
+    {
+      "questionId": "c6-recurrence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.15,
+        "3": 0.24,
+        "4": 0.57,
+        "5": 0.03
+      }
+    },
+    {
+      "questionId": "c6-cost-benefit",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0.04,
+        "3": 0.22,
+        "4": 0.64,
+        "5": 0.1
+      }
+    },
+    {
+      "questionId": "c7-impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1": 0.02,
+        "2": 0.7,
+        "3": 0.26,
+        "4": 0.02,
+        "5": 0
+      }
+    },
+    {
+      "questionId": "c7-spread",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1": 0.05,
+        "2": 0.8,
+        "3": 0.1,
+        "4": 0.05,
+        "5": 0
+      }
+    },
+    {
+      "questionId": "c7-dest-clarity",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.04,
+        "3": 0.16,
+        "4": 0.73,
+        "5": 0.06
+      }
+    },
+    {
+      "questionId": "c7-automation",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1": 0.02,
+        "2": 0.27,
+        "3": 0.31,
+        "4": 0.38,
+        "5": 0.02
+      }
+    },
+    {
+      "questionId": "c7-reuse",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1": 0.06,
+        "2": 0.35,
+        "3": 0.18,
+        "4": 0.35,
+        "5": 0.06
+      }
+    },
+    {
+      "questionId": "c7-recurrence",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.09,
+        "3": 0.2,
+        "4": 0.66,
+        "5": 0.04
+      }
+    },
+    {
+      "questionId": "c7-cost-benefit",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.04,
+        "3": 0.23,
+        "4": 0.63,
+        "5": 0.09
+      }
+    }
+  ],
+  "confidence": 0.6,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "c5-impact",
+        "value": 3,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "c5-spread",
+        "value": 4,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "c5-dest-clarity",
+        "value": 4,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "c5-automation",
+        "value": 4,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "c5-reuse",
+        "value": 3,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "c5-recurrence",
+        "value": 4,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "c5-cost-benefit",
+        "value": 4,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "c6-impact",
+        "value": 2,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "c6-spread",
+        "value": 2
+      },
+      {
+        "questionId": "c6-dest-clarity",
+        "value": 4,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "c6-automation",
+        "value": 4,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "c6-reuse",
+        "value": 2
+      },
+      {
+        "questionId": "c6-recurrence",
+        "value": 3,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "c6-cost-benefit",
+        "value": 3
+      },
+      {
+        "questionId": "c7-impact",
+        "value": 2,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "c7-spread",
+        "value": 2,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "c7-dest-clarity",
+        "value": 4,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "c7-automation",
+        "value": 3,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "c7-reuse",
+        "value": 2
+      },
+      {
+        "questionId": "c7-recurrence",
+        "value": 4,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "c7-cost-benefit",
+        "value": 4,
+        "differenceReason": "semantic_disagreement"
+      }
+    ]
+  }
+}

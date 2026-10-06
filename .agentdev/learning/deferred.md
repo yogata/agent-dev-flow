@@ -2362,6 +2362,7 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **移動日**: 2026-09-25
 - **処分判定**: deferred（2026-09-25 ユーザーHITL承認。intake item が infra-transient 停止分類・回復経路・spawn 分離を先行処理するため promoted 生成はしない。learning 固有の残余知見〔前置死活チェック・durable checkpoint・無出力早期死亡の切り分け・fail-closed 契約の運用特性記録要否〕を living pool で維持。再評価条件: intake item の消化完了時・同種 gh spawn 故障の再発時）
 - **追記（2026-09-27 amendment・A-2）**: 2026-09-27 に3回目の再発（並行 case-open 2セッションで全操作が gh exited with 66 で持続失敗・Root Case 2件が blocked 停止）。inbox 側2件の観測は本エントリと duplicate 判定で統合（症状・回復経路・予防策が一致）。予防策候補の反映先文書（docs/guides/consumer-project-setup.md 等）への反映は 2026-09-27 時点で未実施
+- **追記（2026-10-07 duplicate 統合・4回目再発）**: 2026-10-06 に4回目の再発（agentdev_gh 全操作が gh exit 66・stderr 空で失敗、RU-0162 の case-open が blocked 停止）。inbox エントリ（2026-10-06 capture）を duplicate 判定で統合（症状・再発条件・予防策候補が一致。ホスト再起動による plugin 再初期化を再開条件として提唱）。予防策候補の反映は未実施のまま。4回再発のため、次回 learning-promote で本エントリ自体の知識文書化（docs/knowledge 候補: agentdev_gh 障害の再開手順・起動時疎通確認）を再評価する
 
 ---
 
@@ -2904,5 +2905,246 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **タグ**: `#windows` `#long-paths` `#robocopy` `#verification-config` `#environment-label`
 - **移動日**: 2026-10-05
 - **処分判定**: deferred（2026-10-05 learning-promote。robocopy 手順本体は worktree-operations.md L459-468 がカバー（U8 と同一）だが検証構成の知見は未記載のため living pool で保持。再評価条件: robocopy 手順の検証構成再実施時）
+
+---
+---
+
+## 段階委任の並行重複実行を検知し、正規実行を特定して是正する手順
+
+- **問題事象**: case-auto stage 2 の case-ready 段階委任（Root Case #3457）が2系統で並走した。後行実行が先行実行の merge・子 Issue・ready 状態を検知せず、子 Issue 10件を重複作成し、Epic 本文を実行構成表ごと上書きした（正規状態 ready が open へ後退）。後行実行は ready 遷移未到達で停滞した
+- **発生局面**: 運用（case-auto orchestration の段階委任。GitHub Issue 書込み・Jev 評価は専有 Git スロットの保護対象外）
+- **検知方法**: STEP-7 の git status で予定外の untracked Jev 観測ファイル 3件を発見し、観測 JSON の workflow/evaluationKind/sourceRevision とタイムスタンプを照合。続く issue_list で重複子 Issue 10件（#3466〜#3475）を検出し、Epic 本文の読み戻しで上書きを確認した
+- **根本原因**: 同一 Root Case×同一段階の委任が single-flight 保護なしに再派遣された。専有スロットが Git 操作（merge/push）のみを保護し、GitHub Issue 書込みと Jev 評価を保護していなかった。後行実行は冪等再実行契約（既存子 Issue の検知・再利用）を履行しなかった
+- **自律対応内容**: (1) 観測 ID・sourceRevision（merge 後 4389c49f）・子 Issue 作成順から後行を重複と特定し、先行（スロット付与・全タイムスタンプ先行）を正規とした。(2) Epic #3457 へ停止記録コメント（5984571855）を投稿し、本文を正規版（7子構成・正規状態 ready）へ復元、是正記録を構成推論の根拠へ追記した。(3) 重複子 #3466〜#3475 を not_planned でクローズした。(4) 後行の Jev 観測 3件は事実記録として削除・書換えせずそのまま commit した。(5) 本知見と具体的修正対象（orchestration の再派遣ガード）を Split Rule で分割保存した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（契約上の権威配分に変更なし。case-auto Design の派遣制御見直し候補は intake item 2026-10-05-case-auto-double-dispatch-race.md に分離済み）
+- **横展開観点**: 並行列挙で予告なく増える domain state ファイル（jev-observations 等）は並走実行の最初の信号。段階委任の成果物を書き込む前に、対象 Issue の読み戻しと自分の成果物の存続確認（自分が最後に書いた内容が現存するか）を行うことで lost update を早期検出できる
+- **再発条件**: 委譲先の応答が長時間に及んだ際に親がタイムアウト再派遣する、または複数経路から同一 Root Case の段階が同時に起動する場合。Git 操作以外の書込み（Issue・PR・観測）には専有スロットが効かない
+- **予防策候補**: 段階委任への single-flight 保護（同一 Root Case×同一段階の実行中再派遣禁止、または再派遣前に既存実行の成果物・観測を検知して再利用）、GitHub 書込み前の読み戻しによる楽観的競合検出、冪等再実行契約の機械検証
+- **想定反映先**: case-auto Design（派遣制御・停止理由分類）、agentdev-workflow-case-open/case-ready の冪等再実行手順（既存子 Issue 検知の前置）
+- **関連**: Epic #3457（コメント 5984571855）、子 Issue #3459〜#3465（正規）・#3466〜#3475（重複クローズ）、PR #3458、Jev 観測 20261004T211249Z-12d1 他5件、.agentdev/intake/inbox/2026-10-05-case-auto-double-dispatch-race.md
+- **タグ**: `#orchestration` `#race-condition` `#idempotency` `#case-ready`
+- **移動日**: 2026-10-07
+- **処分判定**: deferred（2026-10-07 自律確定。8軸合計 25/40。intake item 2026-10-05-case-auto-double-dispatch-race.md が要件化経路に並行存在し重複管理のため living pool で是正手順の経験知を保持）
+
+---
+
+## GitHub Issue 本文を決定的エンジンへ手書き転写する経路の転写誤字リスクと書き込み前照合の効用
+
+- **問題事象**: Case 3460 の case-close（Epic 実行構成表更新）で、issue_read で取得した Epic 3457 本文（約21KB）を決定的エンジン（reflect.ts closing）の入力ファイルへ手書き転写したところ、「実装面交差なし」を「実面交差なし」と脱字した。エンジン適用前の転写内容確認で検出・修正し、Epic 本文への誤った反映は発生しなかった。
+- **発生局面**: 運用（case-close STEP-6-2・Epic 実行構成表の per-Epic 単一書き手更新）。GitHub I/O を持たない決定的エンジンへ本文を渡す経路全般
+- **検知方法**: エンジン実行前の転写ファイル内容と issue_read 取得原文の照合（差分確認）
+- **根本原因**: agentdev_gh の操作引数は文字列で受け渡すため、長い本文を会話コンテキストからファイルや引数へ転写する工程が不可避で、この転写が人手同等の写経になり得る。既存の PowerShell bulk IO 腐敗知識は機構的符号化を対象としており、エージェント自身の転写ミスは対象外。
+- **自律対応内容**: 転写誤字をエンジン適用前に修正し、更新後本文の該当行を再確認してから issue_update に渡した。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 長文本文をエンジン入力や Tool 引数へ転写する場面（Epic 実行構成表更新、Issue 本文の結果セクション適用等）では、書き込み前に転写結果と取得原文の照合を1回挟む。特に本文中の技術用語（実装面、正規状態等）は一部欠落しても気づきにくい。
+- **再発条件**: GitHub Issue 本文の全文転写を伴う決定的エンジン適用または Tool 操作引数の組み立て
+- **予防策候補**: 転写後・書き込み前の原文照合を case-close の Epic 更新手順に明示する（agentdev-epic-tracker references の手順反映候補）。
+- **想定反映先**: agentdev-epic-tracker references/epic-reflect-coordination.md の最新取得→マージ→更新手順
+- **関連**: Issue 3460、Epic 3457、case-close（commit 83d48e86 のクローズ処理）
+- **タグ**: `#epic-tracker` `#transcription` `#case-close` `#deterministic-engine`
+- **移動日**: 2026-10-07
+- **処分判定**: deferred（2026-10-07 自律確定。8軸合計 20/40。単発・検出で回復済み）
+
+---
+
+## main root での修正版テスト直接実行と非干渉契約の緊張（決定的再実行と post-merge 直接実行の分担で解消）
+
+- **問題事象**: Issue 3463 の完了条件の検証方法「該当テストを main root・worktree 両環境で実行」について、実行担当サブエージェントの非干渉契約（worktree root 配下でのみファイル編集）により、main root では修正版テストコードの直接実行ができない。case-run では「修正版ロジックを main root の正規配置パス・実データへ適用する決定的再実行」で代替した。
+- **発生局面**: case-run / case-close での両環境検証（worktree 検証の環境差是正。Issue 3463・PR 3477）
+- **検知方法**: 完了条件の検証方法と非干渉契約の突合
+- **根本原因**: main root 環境を要する検証方法と、実行担当の main root 編集禁止が衝突すると、検証方法の実施形態を実行ごとに場当たり的に決めることになる
+- **自律対応内容**: case-run 側は決定的再実行で代替し、case-close 工程で main を最新化した後の main root から正規 suite を直接実行して両環境 green を確定した（case-close は main root 編集を伴わない読取実行のため契約上の衝突なし）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（明文化候補の記録）
+- **横展開観点**: 「main root・worktree 両環境で実行」を検証方法に書く完了条件は、実施形態（case-run で決定的再実行、case-close で post-merge 直接実行）を工程ごとに明記すると解釈の揺れが消える
+- **再発条件**: 両環境実行を検証方法に持つ子 Issue の case-run / case-close
+- **予防策候補**: checker 実行契約 Design または qg-4 への「両環境検証の工程別実施形態」明記（RU/learning 議論対象）
+- **想定反映先**: docs/designs/integrity/checker-execution-contracts.md、agentdev-quality-gates references/qg-4-final-acceptance.md
+- **関連**: Issue 3463、PR 3477（squash 763a05d5）、Epic 3457
+- **タグ**: `#worktree` `#verification` `#case-close`
+- **移動日**: 2026-10-07
+- **処分判定**: deferred（2026-10-07 自律確定。8軸合計 21/40。実施形態の明記候補は checker 実行契約 Design だが単発）
+
+---
+
+## extension rule の一時ファイル指示が workspace 外書込み guard と競合する（project root 内一時領域への切替）
+
+- **問題事象**: Case 3484 の case-open（Root Case 本文候補の書込み前 lint）で、extension rule（agentdev-workflow-case-open.yaml の yomiyasu-application-before-write）が「検査専用本文ファイルを非永続領域〔一時ディレクトリ等のリポジトリ外〕に新規作成」を指示した一方、write ツールによる C:\WINDOWS\TEMP\opencode への書込みは workspace 外書込み guard により fail-closed ブロックされた。
+- **発生局面**: 運用（case-open STEP-2 の GitHub 書込み前 yomiyasu lint）
+- **検知方法**: write ツールの fail-closed ブロック（write targets a path outside the project root）
+- **根本原因**: extension rule の指示（リポジトリ外一時ディレクトリ）と workspace 外書込み guard（project root 外の書込み禁止）が同一工程内で競合する。正規配置契約（worktree-operations.md の .agentdev/tmp/ 統一配置、case-open scripts README の workspace 外 temp 禁止・project root 内限定）と extension rule の文言が不一致である。
+- **自律対応内容**: guard ブロック後に別 API 経路での迂回を行わず、bash ツール経由の heredoc による事前承認済み一時領域への検査専用本文ファイル作成へ切替した（bash リダイレクトは PowerShell cp932 再符号化の対象外）。検査後にファイルを削除した。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: extension rule が一時ファイル作成を指示する工程では、指示の置き場所が guard 契約（workspace 外禁止・project root 内限定・.agentdev/tmp/ 統一配置）と整合する文言になっているかを適用前に確認する。
+- **再発条件**: extension rule が「リポジトリ外」を含む一時ファイル置き場所を指示し、write ツールで実行する場合
+- **予防策候補**: extension yaml の指示文言を「project root 内の実行時作業領域（.agentdev/tmp/ 等の gitignore 対象領域）」へ整合させる（intake item として記録済み）。
+- **想定反映先**: .agentdev/extensions/skills/agentdev-workflow-case-open.yaml の rules 文言
+- **関連**: Issue 3484、worktree-operations.md「退避ファイルの統一配置（.agentdev/tmp/）」
+- **タグ**: `#writing-guard` `#extension-rules` `#case-open` `#yomiyasu`
+- **移動日**: 2026-10-07
+- **処分判定**: deferred（2026-10-07 自律確定。8軸合計 20/40。intake item extension-rule-tempfile-guidance-guard-conflict が並行存在）
+
+---
+
+## session由来RU の generation_actor 契約固定値と実測記録の差異は承認の読み替えでなく記録で解決する
+
+- **問題事象**: RU-0160（session由来）の generation_actor が supervisor と記録され、session由来RU 契約の固定値 req-define-parent と差異があった。配置許可を契約改訂の承認として扱わない旨の条件付きで case-open へ投入された。
+- **発生局面**: 運用（case-open STEP-1 前の引き継ぎ確認）
+- **検知方法**: 委譲 prompt の構造化文脈（制約・契約）と RU frontmatter の突合
+- **根本原因**: session由来RU の作成主体が supervisor の場合、契約固定値との差異が契約変更なしで後工程への解決指示として持ち越される運用になっている（正規契約は不変のため、差異の取り扱いが後工程責務として残る）。
+- **自律対応内容**: 配置許可を契約改訂の承認として扱わず、正規契約（固定値 req-define-parent）を変更せず、差異を既知差異として完了報告へ記録し後工程（case-ready）へ引き継いだ。RU 本体・draft への改変は行わなかった。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（正規契約は不変）
+- **横展開観点**: generation_actor 等の契約固定値と実測記録の差異は、後工程で「承認の読み替え」ではなく「既知差異の記録と契約不変の明示」で解決する。
+- **再発条件**: supervisor が session由来RU を作成・配置した後の後工程実行
+- **予防策候補**: session由来RU 契約に supervisor 作成時の記録値の扱い（差異許容と記録方法）を明文化する。
+- **想定反映先**: session由来RU 契約（artifact-contracts.md の RU 採番・記録規定系）
+- **関連**: RU-0160、Issue 3484
+- **タグ**: `#ru-contract` `#generation-actor` `#case-open`
+- **移動日**: 2026-10-07
+- **処分判定**: deferred（2026-10-07 自律確定。8軸合計 21/40。supervisor 直接生成という非通常経路限定。3回目発生時に promote 再評価）
+
+---
+
+## 単独実行契約を持つ確認テストにフル実行前提のアサーションを入れると選択実行で失敗する
+
+- **問題事象**: テストスイート内の計測・記録確認テストに「起動ログ非空」のアサーションを入れると、テスト名指定（`-t`）の選択実行で先行テスト不在により失敗する。フル実行でのみ成立する前提をアサーションに組み込むと、ファイル単体実行契約（選択実行でも成立する）を壊す
+- **発生局面**: 実装（Case #3484 の check_integrity.test.ts 結果共有構造の起動回数確認テスト実装中）
+- **検知方法**: 選択実行（`-t` 指定）での TS-002 単独実行確認中に当該テストが失敗
+- **根本原因**: 記録確認テストの検査対象を「ログの非空」（フル実行でのみ成立）にしたことで、共有ゲッターの遅延初期化が当該テスト内で完結しない選択実行経路で前提が崩れた
+- **自律対応内容**: アサーションを単独でも成立する条件（重複ゼロ）のみへ変更し、ログ非空確認を削除して再検証（フル実行 188 pass と選択実行 1 pass の両立を確認）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（テストスイート内部の実行形態。Design「check_integrity テストスイート内の結果共有契約」の単独選択実行契約と整合）
+- **横展開観点**: 単独実行契約を持つ確認テストは、フル実行時のみ意味を持つ前提のアサーションを避け、単独でも成立する条件のみを検査する。集合状態を確認するテストは、対象集合の構築をそのテスト自身の遅延初期化で完結させる
+- **再発条件**: 起動回数・ログ・カウンタ等の集合状態を確認するテストを、他テストの先行実行が存在する前提で書く場合
+- **予防策候補**: 記録確認系テストの合格条件を「単独実行で成立する不変条件（重複ゼロ等）」に限定する規約を Design 側の実行形態契約に明記する
+- **想定反映先**: checker 実行契約 Design「bun test 実行形態契約（単独実行・ファイル単体指定を含む）」節、integrity test suite の実装規約
+- **関連**: Issue #3484、PR #3491（merge 9ecdb0dd）、PR 本文 learning 候補
+- **タグ**: `#bun-test` `#テスト設計` `#選択実行` `#case-run`
+- **移動日**: 2026-10-07
+- **処分判定**: deferred（2026-10-07 自律確定。8軸合計 21/40。テスト設計の知見は Jev problem-classification で C5 とは別単独と確定済み）
+
+---
+
+## agentdev_gh の API rate limit（HTTP 403）は読取の gh CLI 切替で継続できるが切替記録が必要
+
+- **問題事象**: case-open STEP-5 の冪等検出（issue_list）で agentdev_gh が GitHub API rate limit（`gh exited with code 1`、HTTP 403、scraping 警告付き）で2回連続失敗した。retryable: true の operation-failed として報告された
+- **発生局面**: 運用（case-open STEP-5 の冪等検出。GitHub I/O 読み取り操作）
+- **検知方法**: agentdev_gh 応答の failure detail（request ID・rate limit メッセージ）
+- **根本原因**: 同一ユーザーの GitHub API quota 消費（infra-transient。gh CLI fallback 契約の想定内失敗）
+- **自律対応内容**: 既存の切替手順（definition-pr-and-idempotency.md「GitHub I/O 失敗時の gh CLI 切替継続手順」）に従い、同一操作1回再試行 → 失敗確認 → gh CLI 読み取り専用検出（`gh issue list --state open --search "Case"`、`gh pr list`）へ切替し冪等検出を完了。切替理由（操作名・exit code・request ID）と検出結果を検証記録へ残し、検出基準は agentdev_gh と同一の冪等キーで解釈した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存 fallback 契約の適用事例）
+- **横展開観点**: rate limit による読取失敗は retryable 表示でも即時再試行は回復しない（quota 消費型）。切替手順の「同一操作1回再試行→切替」は quota 型失敗でも機能する。書込み操作は切替禁止のため、書込み工程で rate limit に到達した場合は停止して quota 回復を再開条件にする
+- **再発条件**: 大量の Issue/PR 操作を伴う Case の連続実行後の読取操作
+- **予防策候補**: case-open/case-ready の GitHub 読取操作に rate limit の影響を考慮した順序（書込みを先・冪等検出の読取を後）を検討する
+- **想定反映先**: definition-pr-and-idempotency.md 切替手順（適用事例の補遺）、agentdev-gh README の失敗分類
+- **関連**: Case #3494、Definition PR #3495、前回 learning「agentdev_gh の全操作が gh exit 66…」（同工程の別障害クラス）
+- **タグ**: `#agentdev-gh` `#rate-limit` `#fallback` `#case-open`
+- **移動日**: 2026-10-07
+- **処分判定**: deferred（2026-10-07 自律確定。8軸合計 19/40。既存切替手順の適用事例で補遺価値）
+
+---
+
+## spawnSync 既定 maxBuffer 1MB による大容量 stdout kill で script 報告が取りこぼされる
+
+- **問題事象**: Node/Bun の spawnSync は既定 maxBuffer 1MB。工程別 script の報告 JSON が大容量化すると stdout キャップ超過でプロセスが kill され、報告（実行結果・差分・警告・提案本文）を取りこぼす
+- **発生局面**: 実装（case-run、工程別 script の報告 JSON 設計と呼び出し側）
+- **検知方法**: spawnSync 呼び出し設計の実装中確認
+- **根本原因**: spawnSync の既定 maxBuffer が 1MB で、報告 JSON の容量上限が呼び出し側の意図と無関係に暗黙に決まる
+- **自律対応内容**: 報告 JSON は簡潔に保つ設計とし、大容量化する場合は script 呼び出し側で maxBuffer 明示指定（またはファイル経由の報告退避）を前提とする方針を記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（報告 JSON 4 要素契約は変更しない）
+- **横展開観点**: spawnSync 経由の script 呼び出しは stdout 容量上限を契約の一部として扱う
+- **再発条件**: 報告 JSON を大容量化する変更（全文連結、詳細ログ埋め込み等）
+- **予防策候補**: maxBuffer 明示指定または報告のファイル退避を script 呼び出し規約へ明記する
+- **想定反映先**: 工程別 script 呼び出し契約（case-open/ready/close Design）、checker stdout 退避形式
+- **関連**: Case #3494、PR #3496
+- **タグ**: `#spawnsync` `#maxbuffer` `#script-report`
+- **移動日**: 2026-10-07
+- **処分判定**: deferred（2026-10-07 自律確定。8軸合計 24/40。実害未観測の設計観測）
+
+---
+
+## git worktree list の区切り子と path.resolve の解釈差異で worktree 判定が偽陰性になる
+
+- **問題事象**: git worktree list の出すパス区切り子（環境依存）と path.resolve の解釈が食い違い、既存 worktree の存在判定が偽陰性（未作成扱い）になる
+- **発生局面**: 実装（case-open STEP-4 の worktree 作成判定）
+- **検知方法**: worktree 判定処理の単体テスト
+- **根本原因**: git 出力のパス区切り子が環境依存である一方、比較側で正規化せず path.resolve の結果と直接突合していた
+- **自律対応内容**: 判定処理でのパス正規化を実装し、区切り子差異を吸収
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（worktree 作成契約は変更しない）
+- **横展開観点**: git 出力パスと node パス API の比較は正規化を前置する
+- **再発条件**: Windows で git 出力パスを node パス API の結果と直接比較する処理
+- **予防策候補**: パス比較前の正規化を共通ヘルパー化する
+- **想定反映先**: agentdev-git-worktree scripts、worktree 判定処理
+- **関連**: Case #3494、PR #3496
+- **タグ**: `#git-worktree` `#path-normalize` `#windows`
+- **移動日**: 2026-10-07
+- **処分判定**: deferred（2026-10-07 自律確定。8軸合計 24/40。実装済み解消・共通ヘルパー化は将来課題）
+
+---
+
+## check_integrity 既存 warning がゲート exit code に写像され判定ノイズになる設計観測
+
+- **問題事象**: 既知の既存 warning が工程別 script の終了コードに写像され、ゲート判定（0 以外 exit = 失敗扱いの機械化）のノイズになる観測
+- **発生局面**: 実装（case-run、工程別 script の終了コード契約設計）
+- **検知方法**: check_integrity 実行記録と終了コードの突合
+- **根本原因**: 既知違反（baseline 登録済み・warning 相当）と新規違反の分離が終了コード写像に反映されていない
+- **自律対応内容**: base 既知違反と新規違反の分離突合を設計観点として記録（実装は baseline-aware strict pass の方針を踏襲）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（IR 検査の検出契約は変更しない）
+- **横展開観点**: ゲート化する checker は「既知分の warning 降格」と「新規分のみ fail 写像」の分離を設計に含める
+- **再発条件**: 既存 warning が常在する checker を exit code ベースのゲートへ組み込む変更
+- **予防策候補**: baseline-known 分の降格規約（check_extensions の baseline-aware strict pass と同様）を checker 全般のゲート設計指針へ明記
+- **想定反映先**: checker 実行契約 Design、check_integrity のゲート写像
+- **関連**: Case #3494、PR #3496、check_extensions.ts の baseline-aware strict pass 実装
+- **タグ**: `#check-integrity` `#baseline` `#exit-code`
+- **移動日**: 2026-10-07
+- **処分判定**: deferred（2026-10-07 自律確定。8軸合計 21/40。baseline-aware 降格規約の設計候補）
+
+---
+
+## 機械置換に伴う副次的な日本語整形は全体 regex でなく置換位置限定のマーカー方式で実装する
+
+- **問題事象**: 用語固定置換（「Definition PR」→「設計PR」等）の機械置換で、副次的な日本語整形（置換で生じた「日本語と英字の間の不自然な半角空白」の除去）を全体 regex で適用した初回実装が、置換対象外の既存の無関係な接続空白まで変更し、revert と再実装が発生した
+- **発生局面**: 実装（case-run 機械置換スクリプトの実装。Windows・worktree .worktrees/3500-chore）
+- **検知方法**: 置換 diff の行単位レビューで、置換対象語を含まない行の接続空白変更を確認
+- **根本原因**: 副次的整形の適用範囲を「置換が生じた位置」に限定する構造を持たず、全体へ regex を走らせた
+- **自律対応内容**: 置換位置に限定するマーカー方式へ再実装し、置換対象語を含む行のみへ整形を限定して再実行（diff で対象外行の非変更を確認）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 機械置換ツールに副次的な文字整形を組み込む場合、整形の適用位置は置換位置に限定して実装する（マーカー方式）。全体適用は既存テキストへの非意図変更を招き revert コストを生む
+- **再発条件**: 置換と同時に接続空白等の整形を全体 regex で適用する機械置換の実装
+- **予防策候補**: 機械置換実装時の適用位置限定（マーカー方式）を手順の確認事項として前置する
+- **想定反映先**: 機械置換を伴う委譲の手順（case-run 委譲要件の機械工程確認事項）
+- **関連**: Case #3500、PR #3505
+- **タグ**: `#mechanical-replace` `#scope-limiting` `#case-run`
+- **移動日**: 2026-10-07
+- **処分判定**: deferred（2026-10-07 自律確定。8軸合計 21/40。適用済み・規約化は委譲要件確認事項の候補）
+
+---
+
+## Windows 既存 UTF-8/LF ファイルへの一括機械変更は write 規律（node スクリプト・edit ツール per-line 置換）で破損なしに完結した
+
+- **問題事象**: （回避実績。問題は未発生）59 ファイル・221 行の用語機械置換（PR #3505）と 13 ファイル frontmatter 編集（fix PR #3506）という大規模な既存 UTF-8/LF ファイル一括変更を、Windows 環境の write 規律（node readFileSync/writeFileSync 統合スクリプト、edit ツール per-line 置換、PowerShell 標準 cmdlet・リダイレクト演算子の回避）に従って実施した結果、cp932 再符号化・CRLF 書き出し・文字化けを一切発生させずに完結した
+- **発生局面**: 実装・fix（case-run 機械置換と case-close fix 工程。Windows・worktree .worktrees/3500-chore）
+- **検知方法**: check_integrity の content-corruption クラス（決定的破損検査）と置換後 diff の行番号 1:1 検証で異常なしを確認
+- **根本原因**: （該当なし。規律の遵守で回避）
+- **自律対応内容**: PR #3505 は node 統合スクリプト（UTF-8 保持・行番号 1:1 維持）で機械置換し、fix PR #3506 は edit ツールの per-line string replace で frontmatter を編集した。いずれも PowerShell 標準 cmdlet（Get-Content/Set-Content）とリダイレクト演算子（`>`/`>>`）を経由しなかった
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（docs/knowledge/windows-powershell-bulk-io-corruption.md の規律適用実績）
+- **横展開観点**: Windows 環境で既存 UTF-8（BOM なし）ファイルを一括変更する機械工程は、PowerShell 標準 cmdlet・リダイレクト経由ではなく node スクリプト（大規模一括）または edit ツール per-line 置換（小規模・frontmatter 単位）を使う規律が、大規模置換と小規模修正の両方の規模で破損なしに機能することを実証した
+- **再発条件**: （回避対象）PowerShell 標準 cmdlet 経由の既存 UTF-8/LF ファイル一括読み書き
+- **予防策候補**: 規律の維持（新たな対策不要。適用実績の記録として保持）
+- **想定反映先**: なし（既存 knowledge 文書 windows-powershell-bulk-io-corruption.md への実績追記は learning-promote で判断）
+- **関連**: Case #3500、PR #3505、PR #3506、docs/knowledge/windows-powershell-bulk-io-corruption.md
+- **タグ**: `#windows` `#utf-8` `#write-guard-discipline` `#mechanical-replace`
+- **移動日**: 2026-10-07
+- **処分判定**: deferred（2026-10-07 自律確定。8軸合計 22/40。既存 knowledge 文書 windows-powershell-bulk-io-corruption.md が本体をカバー）
 
 ---

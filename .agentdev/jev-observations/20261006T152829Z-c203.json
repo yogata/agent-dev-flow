@@ -1,0 +1,165 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261006T152829Z-c203",
+  "workflow": "learning-promote",
+  "evaluationKind": "sublimation-possibility",
+  "subject": "promote 候補11単位の昇華可能性（2026-10-07 backlog-auto stage 2）",
+  "sourceRevision": "2ecdc2cad3c8a1c3f8fbb68973d0f90c146a8228",
+  "durationMs": 303,
+  "inputTokens": 2574,
+  "inputs": {
+    "requestDigest": "248225acc167a154a331fc520ddbf058d5f1bbea94a9e1882b18f35fe5ae973f"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "s1-c1",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.82,
+        "false": 0.18000000000000005
+      }
+    },
+    {
+      "questionId": "s2-c2",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.81,
+        "false": 0.18999999999999995
+      }
+    },
+    {
+      "questionId": "s3-c3",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.79,
+        "false": 0.20999999999999996
+      }
+    },
+    {
+      "questionId": "s4-c4",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.84,
+        "false": 0.16000000000000003
+      }
+    },
+    {
+      "questionId": "s5-c5",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.81,
+        "false": 0.18999999999999995
+      }
+    },
+    {
+      "questionId": "s6-c7",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.77,
+        "false": 0.22999999999999998
+      }
+    },
+    {
+      "questionId": "s7-u3",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.82,
+        "false": 0.18000000000000005
+      }
+    },
+    {
+      "questionId": "s8-u9",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.84,
+        "false": 0.16000000000000003
+      }
+    },
+    {
+      "questionId": "s9-u10",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.83,
+        "false": 0.17000000000000004
+      }
+    },
+    {
+      "questionId": "s10-u25",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.82,
+        "false": 0.18000000000000005
+      }
+    },
+    {
+      "questionId": "s11-u30",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.84,
+        "false": 0.16000000000000003
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "s1-c1",
+        "value": true
+      },
+      {
+        "questionId": "s2-c2",
+        "value": true
+      },
+      {
+        "questionId": "s3-c3",
+        "value": true
+      },
+      {
+        "questionId": "s4-c4",
+        "value": true
+      },
+      {
+        "questionId": "s5-c5",
+        "value": true
+      },
+      {
+        "questionId": "s6-c7",
+        "value": true
+      },
+      {
+        "questionId": "s7-u3",
+        "value": true
+      },
+      {
+        "questionId": "s8-u9",
+        "value": true
+      },
+      {
+        "questionId": "s9-u10",
+        "value": true
+      },
+      {
+        "questionId": "s10-u25",
+        "value": true
+      },
+      {
+        "questionId": "s11-u30",
+        "value": true
+      }
+    ]
+  }
+}

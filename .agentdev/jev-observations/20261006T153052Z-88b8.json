@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261006T153052Z-88b8",
+  "workflow": "learning-promote",
+  "evaluationKind": "adversarial-review-trigger",
+  "subject": "learning-promote STEP-4 adversarial-review 発動条件（2026-10-07 backlog-auto stage 2）",
+  "sourceRevision": "2ecdc2cad3c8a1c3f8fbb68973d0f90c146a8228",
+  "durationMs": 740,
+  "inputTokens": 696,
+  "inputs": {
+    "requestDigest": "38d6aee75fbc630da9890e621dea545b525e7e58066bf77c45d24a97bf52a518"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-review-trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.96,
+        "false": 0.040000000000000036
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-review-trigger",
+        "value": true
+      }
+    ]
+  }
+}

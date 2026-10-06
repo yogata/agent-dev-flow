@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261006T152753Z-4d26",
+  "workflow": "learning-promote",
+  "evaluationKind": "disposal-determination",
+  "subject": "処分区分の境界4単位（C3/C7/U3/U25・2026-10-07 backlog-auto stage 2）",
+  "sourceRevision": "2ecdc2cad3c8a1c3f8fbb68973d0f90c146a8228",
+  "durationMs": 720,
+  "inputTokens": 1941,
+  "inputs": {
+    "requestDigest": "943f9fd147ee44ba8463f7e8184c7a7ee3ff44133095f293f524be4472285167"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-c3-disposal",
+      "questionForm": "choice",
+      "value": "A=promote",
+      "probabilityDistribution": {
+        "A=promote": 0.85,
+        "B=deferred": 0.15
+      }
+    },
+    {
+      "questionId": "q2-c7-disposal",
+      "questionForm": "choice",
+      "value": "A=promote",
+      "probabilityDistribution": {
+        "A=promote": 0.92,
+        "B=deferred": 0.08
+      }
+    },
+    {
+      "questionId": "q3-u3-disposal",
+      "questionForm": "choice",
+      "value": "A=promote",
+      "probabilityDistribution": {
+        "A=promote": 0.6,
+        "B=deferred": 0.4
+      }
+    },
+    {
+      "questionId": "q4-u25-disposal",
+      "questionForm": "choice",
+      "value": "A=promote",
+      "probabilityDistribution": {
+        "A=promote": 0.75,
+        "B=deferred": 0.25
+      }
+    }
+  ],
+  "confidence": 0.69,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-c3-disposal",
+        "value": "A=promote"
+      },
+      {
+        "questionId": "q2-c7-disposal",
+        "value": "A=promote"
+      },
+      {
+        "questionId": "q3-u3-disposal",
+        "value": "A=promote"
+      },
+      {
+        "questionId": "q4-u25-disposal",
+        "value": "A=promote"
+      }
+    ]
+  }
+}
