@@ -40,3 +40,21 @@
 - **タグ**: `#execution-structure` `#case-ready` `#ordering-violation` `#structure-verification`
 
 ---
+
+## STEP-7 で draft 喪失・削除パス誤り・capture commit への削除ステージ混入の 3 連鎖ミスを発生させ回復した
+
+- **問題事象**: case-ready STEP-7 の実行で 3 件のミスが連鎖した。(1) main を origin/main へ同期する `git reset --hard origin/main` の実行前に、push 未の永続化 commit（a3cae627）で tracked になっていた req-draft の tracked 状態を確認せず、draft を working tree から喪失させた（退避 branch から復元して回復）。(2) 削除対象 RU の 0 埋め 4 桁表記（RU-0164）を padStart(3) で組み立て、機械工程 script を 2 回失敗させた。(3) script の git rm がステージ済みの状態（staged-entries-check が commit を止めた直後）で capture 永続化の git add を実行し、capture commit に RU 削除 16 件を混入させた（削除と commit の間に別操作を挟む Form Zero 違反）。未 push のうちに reset --soft で commit を解体し、明示パス指定で capture commit と削除 commit に分離して回復した
+- **発生局面**: 運用（case-ready STEP-7 draft/RU 削除と同期確認。Case #3507）
+- **検知方法**: (1) は script の git rm「did not match any files」fail で発覚。(2) は同じ fail の pathspec 表示で発覚。(3) は capture commit 出力の「16 files changed / delete mode 100644 RU-*」で発覚
+- **根本原因**: (1) 履歴操作（reset --hard）を履歴の現状把握（ローカル先行 commit が push 未であること・tracked ファイル差分）の確認なしに実行した。(2) 動的に組み立てる識別子の書式（4 桁）を既存実物で確認せず推定した。(3) 直前の失敗試行がステージを汚したままの状態であることを確認せず git add を実行した
+- **自律対応内容**: draft を退避 branch（3507-preapply-backup）から復元、padStart(4) で修正、reset --soft HEAD^ で混入 commit を解体し capture commit（4 files）と削除 commit（RU 16 件明示パス指定）に分離して回復。最終的に main 同期確認まで完了
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（実行上のミスと回復。契約変更なし）
+- **横展開観点**: 履歴操作の前には「この操作で消える tracked ファイルがないか」を git ls-files / status で確認する。失敗した機械工程 script の後にはステージ状態の汚染が残るため、次の git add / commit の前に必ず git status でステージ内容を確認する。識別子書式は対象ディレクトリの実ファイル名で確認する
+- **再発条件**: 未 push の commit が存在する main で hard reset を行う場合・機械工程 script 失敗直後に別目的の git add を行う場合・0 埋め桁数が混在する識別子を動的生成する場合
+- **予防策候補**: STEP-7 手順で「git rm 失敗時はステージ汚染の有無を status で確認してから次の操作へ進む」前置を明記する
+- **想定反映先**: agentdev-workflow-case-ready readiness-and-cleanup の draft/RU 削除手順、agentdev-git-worktree の worktree-operations（履歴操作の前置確認）
+- **関連**: Case #3507 case-ready 実行（Definition merge ad22ea16 後）
+- **タグ**: `#case-ready` `#cleanup` `#form-zero` `#git-reset` `#recovered`
+
+---
