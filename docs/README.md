@@ -150,6 +150,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-048](decisions/DEC-048.md) | ADF判断アーキテクチャ: 判断方法・確定権限・人間判断境界の統一モデル |
 | [DEC-049](decisions/DEC-049.md) | ADF 共通原本とホスト接続領域の分離によるマルチホスト配布モデル |
 | [DEC-050](decisions/DEC-050.md) | deleteBranchOnMerge 設定不備の警告化と操作安全性停止の維持 |
+| [DEC-051](decisions/DEC-051.md) | case-auto stage 3 のスロット型キューへの移行（Wave 収束前提の撤廃） |
 <!-- AUTOGEN:END -->
 
 ## 設計（Design）
