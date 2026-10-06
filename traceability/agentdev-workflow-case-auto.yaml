@@ -2,6 +2,7 @@ component: agentdev-workflow-case-auto
 implementation:
   src/common/skills/agentdev-workflow-case-auto/SKILL.md:
     - REQ-034-032
+    - REQ-034-047
     - REQ-035-001
     - REQ-094-001
     - REQ-094-002
@@ -39,6 +40,7 @@ implementation:
     - REQ-030-017
     - REQ-032-038
     - REQ-034-046
+    - REQ-034-047
     - REQ-061-039
   src/common/skills/agentdev-workflow-case-auto/references/stop-and-decision-resolution.md:
     - REQ-032-038
@@ -55,6 +57,8 @@ verification:
     - REQ-101-008
     - REQ-101-011
     - REQ-101-012
+  src/common/skills/agentdev-workflow-case-auto/scripts/tests/stage-dispatch-single-flight.test.ts:
+    - REQ-034-047
   src/common/skills/agentdev-workflow-case-auto/scripts/tests/wave-gate.test.ts:
     - REQ-032-038
   src/common/skills/agentdev-workflow-case-auto/scripts/tests/slot_queue.test.ts:
