@@ -1,0 +1,354 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261006T160616Z-28d0",
+  "workflow": "backlog-auto/intake-promote",
+  "evaluationKind": "item-evaluation",
+  "subject": "intake inbox 7件の item 評価（3観点）",
+  "sourceRevision": "c7e65b13b7c7e1b0789af22c9f1f1e55e3e9c2a9",
+  "durationMs": 1408,
+  "inputTokens": 2974,
+  "inputs": {
+    "requestDigest": "690582d2d976d873ef904664dc9aea621fa633c0b792d22237c35445259c5ae7",
+    "references": [
+      {
+        "label": "item1 case-auto重複派遣",
+        "path": ".agentdev/intake/inbox/2026-10-05-case-auto-double-dispatch-race.md",
+        "digest": "7c7c07512b67aaa792f77da19b5f5283d769cb40c8635333a1fb7f881abc3490"
+      },
+      {
+        "label": "item2 extension一時ファイル文言",
+        "path": ".agentdev/intake/inbox/2026-10-05-extension-rule-tempfile-guidance-guard-conflict.md",
+        "digest": "481b7b8fccc55f5a1041f2bc1d97315e91ade64a9d51019cc26a548e0834c66d"
+      },
+      {
+        "label": "item3 link profile zero-targets",
+        "path": ".agentdev/intake/inbox/2026-10-05-link-profile-worktree-projection-unpropagated.md",
+        "digest": "de3d537e53cac02c04d390759d8239f9c2fbb02547c1fa60719a910409d5e63e"
+      },
+      {
+        "label": "item4 temp残骸削除基準",
+        "path": ".agentdev/intake/inbox/2026-10-05-temp-debug-residue-cleanup-criteria.md",
+        "digest": "35d4c9036cf8eb6f18fea0bf6bcf5cbf13f09d51d70368cab7d4fa89e7067268"
+      },
+      {
+        "label": "item5 textlint vendor空化",
+        "path": ".agentdev/intake/inbox/2026-10-05-textlint-vendor-drift-worktree-split3.md",
+        "digest": "df1f73bac9281df17928fb249eb6a9a90c036d89b3ff2fcc7a270d56e58f95f3"
+      },
+      {
+        "label": "item6 AmendmentPR単体表記",
+        "path": ".agentdev/intake/inbox/2026-10-06-amendment-pr-standalone-notation-unification.md",
+        "digest": "e0c3fad37e4a33af273ff8becb315948d4b505251c894b9eb8924994827c4c43"
+      },
+      {
+        "label": "item7 defpr整合検査順序",
+        "path": ".agentdev/intake/inbox/2026-10-06-defpr-script-check-integrity-precommit-ordering.md",
+        "digest": "32415fd2f7f21795e4ea4911bea8547bd8643740e0e197baf49ff7dccaca3e28"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "i1-validity",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0,
+        "中": 0,
+        "高": 1
+      }
+    },
+    {
+      "questionId": "i1-impact",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0,
+        "中": 0.02,
+        "高": 0.98
+      }
+    },
+    {
+      "questionId": "i1-urgency",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0.01,
+        "中": 0.03,
+        "高": 0.96
+      }
+    },
+    {
+      "questionId": "i2-validity",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0.01,
+        "中": 0.48,
+        "高": 0.51
+      }
+    },
+    {
+      "questionId": "i2-impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.03,
+        "中": 0.79,
+        "高": 0.18
+      }
+    },
+    {
+      "questionId": "i2-urgency",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.03,
+        "中": 0.68,
+        "高": 0.29
+      }
+    },
+    {
+      "questionId": "i3-validity",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0,
+        "中": 0.34,
+        "高": 0.66
+      }
+    },
+    {
+      "questionId": "i3-impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0,
+        "中": 0.79,
+        "高": 0.21
+      }
+    },
+    {
+      "questionId": "i3-urgency",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0,
+        "中": 0.64,
+        "高": 0.36
+      }
+    },
+    {
+      "questionId": "i4-validity",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.41,
+        "中": 0.57,
+        "高": 0.02
+      }
+    },
+    {
+      "questionId": "i4-impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.46,
+        "中": 0.53,
+        "高": 0.01
+      }
+    },
+    {
+      "questionId": "i4-urgency",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "低": 0.81,
+        "中": 0.19,
+        "高": 0
+      }
+    },
+    {
+      "questionId": "i5-validity",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0,
+        "中": 0.22,
+        "高": 0.78
+      }
+    },
+    {
+      "questionId": "i5-impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.01,
+        "中": 0.54,
+        "高": 0.45
+      }
+    },
+    {
+      "questionId": "i5-urgency",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.01,
+        "中": 0.72,
+        "高": 0.27
+      }
+    },
+    {
+      "questionId": "i6-validity",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.28,
+        "中": 0.71,
+        "高": 0.01
+      }
+    },
+    {
+      "questionId": "i6-impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.33,
+        "中": 0.67,
+        "高": 0
+      }
+    },
+    {
+      "questionId": "i6-urgency",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.4,
+        "中": 0.6,
+        "高": 0
+      }
+    },
+    {
+      "questionId": "i7-validity",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0,
+        "中": 0.02,
+        "高": 0.98
+      }
+    },
+    {
+      "questionId": "i7-impact",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0,
+        "中": 0.24,
+        "高": 0.76
+      }
+    },
+    {
+      "questionId": "i7-urgency",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0,
+        "中": 0.05,
+        "高": 0.95
+      }
+    }
+  ],
+  "confidence": 0.99,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "i1-validity",
+        "value": 2
+      },
+      {
+        "questionId": "i1-impact",
+        "value": 2
+      },
+      {
+        "questionId": "i1-urgency",
+        "value": 2
+      },
+      {
+        "questionId": "i2-validity",
+        "value": 2
+      },
+      {
+        "questionId": "i2-impact",
+        "value": 1
+      },
+      {
+        "questionId": "i2-urgency",
+        "value": 1
+      },
+      {
+        "questionId": "i3-validity",
+        "value": 2
+      },
+      {
+        "questionId": "i3-impact",
+        "value": 1
+      },
+      {
+        "questionId": "i3-urgency",
+        "value": 1
+      },
+      {
+        "questionId": "i4-validity",
+        "value": 1
+      },
+      {
+        "questionId": "i4-impact",
+        "value": 1
+      },
+      {
+        "questionId": "i4-urgency",
+        "value": 0
+      },
+      {
+        "questionId": "i5-validity",
+        "value": 2
+      },
+      {
+        "questionId": "i5-impact",
+        "value": 1
+      },
+      {
+        "questionId": "i5-urgency",
+        "value": 1
+      },
+      {
+        "questionId": "i6-validity",
+        "value": 1
+      },
+      {
+        "questionId": "i6-impact",
+        "value": 1
+      },
+      {
+        "questionId": "i6-urgency",
+        "value": 1
+      },
+      {
+        "questionId": "i7-validity",
+        "value": 2
+      },
+      {
+        "questionId": "i7-impact",
+        "value": 2
+      },
+      {
+        "questionId": "i7-urgency",
+        "value": 2
+      }
+    ]
+  }
+}

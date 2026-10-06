@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261006T160702Z-ecff",
+  "workflow": "backlog-auto/intake-promote",
+  "evaluationKind": "provisional-classification",
+  "subject": "intake inbox 7件の暫定分類（採用/保留/却下）",
+  "sourceRevision": "c7e65b13b7c7e1b0789af22c9f1f1e55e3e9c2a9",
+  "durationMs": 263,
+  "inputTokens": 1746,
+  "inputs": {
+    "requestDigest": "ebf33cd2278d0e2358df04937d696ec446c51b314f512c58ae9b2929a8b48f49",
+    "references": [
+      {
+        "digest": "7c7c07512b67aaa792f77da19b5f5283d769cb40c8635333a1fb7f881abc3490",
+        "label": "item1 case-auto重複派遣",
+        "path": ".agentdev/intake/inbox/2026-10-05-case-auto-double-dispatch-race.md"
+      },
+      {
+        "digest": "481b7b8fccc55f5a1041f2bc1d97315e91ade64a9d51019cc26a548e0834c66d",
+        "label": "item2 extension一時ファイル文言",
+        "path": ".agentdev/intake/inbox/2026-10-05-extension-rule-tempfile-guidance-guard-conflict.md"
+      },
+      {
+        "digest": "de3d537e53cac02c04d390759d8239f9c2fbb02547c1fa60719a910409d5e63e",
+        "label": "item3 link profile zero-targets",
+        "path": ".agentdev/intake/inbox/2026-10-05-link-profile-worktree-projection-unpropagated.md"
+      },
+      {
+        "digest": "35d4c9036cf8eb6f18fea0bf6bcf5cbf13f09d51d70368cab7d4fa89e7067268",
+        "label": "item4 temp残骸削除基準",
+        "path": ".agentdev/intake/inbox/2026-10-05-temp-debug-residue-cleanup-criteria.md"
+      },
+      {
+        "digest": "df1f73bac9281df17928fb249eb6a9a90c036d89b3ff2fcc7a270d56e58f95f3",
+        "label": "item5 textlint vendor空化",
+        "path": ".agentdev/intake/inbox/2026-10-05-textlint-vendor-drift-worktree-split3.md"
+      },
+      {
+        "digest": "e0c3fad37e4a33af273ff8becb315948d4b505251c894b9eb8924994827c4c43",
+        "label": "item6 AmendmentPR単体表記",
+        "path": ".agentdev/intake/inbox/2026-10-06-amendment-pr-standalone-notation-unification.md"
+      },
+      {
+        "digest": "32415fd2f7f21795e4ea4911bea8547bd8643740e0e197baf49ff7dccaca3e28",
+        "label": "item7 defpr整合検査順序",
+        "path": ".agentdev/intake/inbox/2026-10-06-defpr-script-check-integrity-precommit-ordering.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "c1",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.98,
+        "保留": 0,
+        "却下": 0.02
+      }
+    },
+    {
+      "questionId": "c2",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 1,
+        "保留": 0,
+        "却下": 0
+      }
+    },
+    {
+      "questionId": "c3",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.93,
+        "保留": 0.04,
+        "却下": 0.03
+      }
+    },
+    {
+      "questionId": "c4",
+      "questionForm": "choice",
+      "value": "保留",
+      "probabilityDistribution": {
+        "採用": 0.26,
+        "保留": 0.73,
+        "却下": 0.01
+      }
+    },
+    {
+      "questionId": "c5",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.94,
+        "保留": 0.04,
+        "却下": 0.02
+      }
+    },
+    {
+      "questionId": "c6",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.99,
+        "保留": 0.01,
+        "却下": 0
+      }
+    },
+    {
+      "questionId": "c7",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 1,
+        "保留": 0,
+        "却下": 0
+      }
+    }
+  ],
+  "confidence": 0.97,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "c1",
+        "value": "採用"
+      },
+      {
+        "questionId": "c2",
+        "value": "採用"
+      },
+      {
+        "questionId": "c3",
+        "value": "採用"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "c4",
+        "value": "採用"
+      },
+      {
+        "questionId": "c5",
+        "value": "採用"
+      },
+      {
+        "questionId": "c6",
+        "value": "採用"
+      },
+      {
+        "questionId": "c7",
+        "value": "採用"
+      }
+    ]
+  }
+}
