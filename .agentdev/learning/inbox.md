@@ -348,3 +348,66 @@
 - **想定反映先**: agentdev-workflow-case-open references/definition-pr-and-idempotency.md（手順 2.5）、agentdev-workflow-case-ready references/definition-acceptance.md（品質検査の再実測）
 - **関連**: Case #3494、Definition PR #3495（commit 01ded1f5・d6a9c76a）、前回 learning「IR-072 frontmatter freshness 6 件」（同 IR の別発生経路）
 - **タグ**: `#ir-072` `#frontmatter` `#case-ready` `#definition-pr`
+## spawnSync 既定 maxBuffer 1MB による大容量 stdout kill で script 報告が取りこぼされる
+
+- **問題事象**: Node/Bun の spawnSync は既定 maxBuffer 1MB。工程別 script の報告 JSON が大容量化すると stdout キャップ超過でプロセスが kill され、報告（実行結果・差分・警告・提案本文）を取りこぼす
+- **発生局面**: 実装（case-run、工程別 script の報告 JSON 設計と呼び出し側）
+- **検知方法**: spawnSync 呼び出し設計の実装中確認
+- **根本原因**: spawnSync の既定 maxBuffer が 1MB で、報告 JSON の容量上限が呼び出し側の意図と無関係に暗黙に決まる
+- **自律対応内容**: 報告 JSON は簡潔に保つ設計とし、大容量化する場合は script 呼び出し側で maxBuffer 明示指定（またはファイル経由の報告退避）を前提とする方針を記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（報告 JSON 4 要素契約は変更しない）
+- **横展開観点**: spawnSync 経由の script 呼び出しは stdout 容量上限を契約の一部として扱う
+- **再発条件**: 報告 JSON を大容量化する変更（全文連結、詳細ログ埋め込み等）
+- **予防策候補**: maxBuffer 明示指定または報告のファイル退避を script 呼び出し規約へ明記する
+- **想定反映先**: 工程別 script 呼び出し契約（case-open/ready/close Design）、checker stdout 退避形式
+- **関連**: Case #3494、PR #3496
+- **タグ**: `#spawnsync` `#maxbuffer` `#script-report`
+
+## git worktree list の区切り子と path.resolve の解釈差異で worktree 判定が偽陰性になる
+
+- **問題事象**: git worktree list の出すパス区切り子（環境依存）と path.resolve の解釈が食い違い、既存 worktree の存在判定が偽陰性（未作成扱い）になる
+- **発生局面**: 実装（case-open STEP-4 の worktree 作成判定）
+- **検知方法**: worktree 判定処理の単体テスト
+- **根本原因**: git 出力のパス区切り子が環境依存である一方、比較側で正規化せず path.resolve の結果と直接突合していた
+- **自律対応内容**: 判定処理でのパス正規化を実装し、区切り子差異を吸収
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（worktree 作成契約は変更しない）
+- **横展開観点**: git 出力パスと node パス API の比較は正規化を前置する
+- **再発条件**: Windows で git 出力パスを node パス API の結果と直接比較する処理
+- **予防策候補**: パス比較前の正規化を共通ヘルパー化する
+- **想定反映先**: agentdev-git-worktree scripts、worktree 判定処理
+- **関連**: Case #3494、PR #3496
+- **タグ**: `#git-worktree` `#path-normalize` `#windows`
+
+## check_integrity 既存 warning がゲート exit code に写像され判定ノイズになる設計観測
+
+- **問題事象**: 既知の既存 warning が工程別 script の終了コードに写像され、ゲート判定（0 以外 exit = 失敗扱いの機械化）のノイズになる観測
+- **発生局面**: 実装（case-run、工程別 script の終了コード契約設計）
+- **検知方法**: check_integrity 実行記録と終了コードの突合
+- **根本原因**: 既知違反（baseline 登録済み・warning 相当）と新規違反の分離が終了コード写像に反映されていない
+- **自律対応内容**: base 既知違反と新規違反の分離突合を設計観点として記録（実装は baseline-aware strict pass の方針を踏襲）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（IR 検査の検出契約は変更しない）
+- **横展開観点**: ゲート化する checker は「既知分の warning 降格」と「新規分のみ fail 写像」の分離を設計に含める
+- **再発条件**: 既存 warning が常在する checker を exit code ベースのゲートへ組み込む変更
+- **予防策候補**: baseline-known 分の降格規約（check_extensions の baseline-aware strict pass と同様）を checker 全般のゲート設計指針へ明記
+- **想定反映先**: checker 実行契約 Design、check_integrity のゲート写像
+- **関連**: Case #3494、PR #3496、check_extensions.ts の baseline-aware strict pass 実装
+- **タグ**: `#check-integrity` `#baseline` `#exit-code`
+
+## worktree 側 .opencode の部分伝播で checker 実行件数が main root と乖離する（main root 対照実行で環境差と分類）
+
+- **問題事象**: worktree 内 .opencode は junction が部分的にしか伝播せず（本実行では repo-agentdev-integrity のみ等）、checker・テストの走査対象集合が worktree と main root で異なる。bun test plugins 分割は case-run 実績 293 pass（worktree 内 ./scripts/ のみ相当）→ case-close 実行 643 pass（main 側 plugins 実体を含む走査）に乖離、check_extensions は project-local skill 参照 warning 7 件が worktree 実行でだけ検出（main root 実行では 0 件）
+- **発生局面**: 運用（case-close STEP-3 の checker 実測。merge 直前 HEAD での full suite・checker 実行）
+- **検知方法**: bun test の N/M 件数突合（直前実績との比較）と main root 対照実行による分類
+- **根本原因**: worktree は junction 伝播が不完全で .opencode/plugins 等が不在。checker の走査対象集合が実行 root により変動する
+- **自律対応内容**: plugins 分割は main 側実体を明示指定して走査（PR 変更に plugins 配下は含まれず検査上等価）。check_extensions は main root 実行（違反 0 件）を正規結果として採用し、worktree 7 件 warning は junction 未伝播の環境差として Evidence に記録。link profile は規約どおり main root で実行
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（link profile 実行条件〔main root 実行・環境ラベル〕の plugins 分割・check_extensions への適用拡張）
+- **横展開観点**: worktree での checker・テスト実行は junction 伝播状態を実行環境ラベルとして記録し、件数乖離時は main root 対照実行で「環境差か本変更起因か」を分類してから合否判定する
+- **再発条件**: worktree root で .opencode 配下（junction 対象）を走査する checker・テスト実行
+- **予防策候補**: checker 実行記録への走査対象 root・junction 伝播状態の環境ラベル必須化（link profile の扱いを他 checker へ拡張）、bun test 分割ごとの実行 root 明示
+- **想定反映先**: checker 実行契約 Design（link profile 実効実行要件節の拡張候補）、case-close references docs-and-design-promotion.md、qg-4-final-acceptance.md
+- **関連**: Case #3494、PR #3496、既存 learning「worktree の repo 全体 bun test 単一実行で textlint 一時 dictionary 競合疑いの fail が出る」
+- **タグ**: `#worktree` `#junction` `#checker-environment` `#case-close`
