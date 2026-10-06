@@ -52,6 +52,12 @@ Definition 変更が docs 文言を期待するテスト（リポジトリ固有
 - blocked、failed、中断した場合は draft / RU を保持する
 - **Form Zero**: 削除（`git rm`）と明示パス指定 commit は script 内の同一工程で完結し、削除と commit の間に別操作（staging の追加変更、他ファイルの stage 等）を挟まない。削除対象は明示パス指定であり、スイープ操作（`git add -A` 等）は行わない。手順の参照先は `agentdev-git-worktree` references `git-common-procedures.md` 手順 3（既存のまま）である
 
+### 設計側 worktree・ローカル設計系ブランチの削除
+
+- 設計PR を merge した Case では、merge 完結後に draft / RU 削除と同一の lifecycle 位置で設計側 worktree（`.worktrees/{N}-definition`）とローカル設計系ブランチ（`definition/issue-{N}`）を削除する。削除手順は `agentdev-git-worktree` の手順（worktree 削除手順と、squash merge 後の条件付き `-D` 判定を含むローカルブランチ削除手順）に従う。遠隔の設計系ブランチは削除せず、GitHub の deleteBranchOnMerge 自動削除に委譲する
+- 実変更なしで設計PR が存在しない Case では、この削除も作成も行わない（draft / RU 削除のみ実行する）
+- 削除に失敗した場合は警告表示して停止する（残存対象と削除再実行の再開条件を報告する）
+
 ### main 同期確認
 
 - draft / RU 削除後に main ブランチの作業ディレクトリとリモートの同期を確認する

@@ -143,7 +143,7 @@ OU の統合・分割・REQ 操作分類・Issue 階層判定を再評価しな�
 各 orchestration stage は stage 内最大並列・stage 間全対象収束（fan-in）で進行し、対象ごとの縦切り pipeline としない。
 当該 stage に属する全対象が正常完了し、または当該実行において後続 stage へ進めないことが既存契約上確定した結果（blocked / failed / delegation-unavailable 等の後続不能確定）に収束するまで次 stage を開始せず（未実行・実行中・状態不明・再試行要否未確定対象の残存は収束済みとしない）、後続不能対象を後続 stage の対象から除外しその存在だけを理由として独立した他対象の進行を停止しない（case-auto 実行契約）。
 main への push、capture、commit、同一 Epic Issue 本文への更新等の競合する共有書き込みは、当該競合部分のみを必要な最小単位で局所的に直列化し、当該競合と無関係な対象の並列実行を妨げず、stage 全体を一括して扱う直列集約ポイントを設けない（case-auto 実行契約。共有資源カテゴリと直列化単位の運用表は case-auto Design「複数 execution_unit 並列 orchestration」節参照）。
-クリーンアップ検証ゲート（ドラフト残存、RU 残存の検証）を stage 2 の対象群収束後・stage 3 開始前に実行し、評価対象を stage 2 を正常完了した対象に限定する（case-auto 実行契約）。
+クリーンアップ検証ゲート（ドラフト残存、RU 残存の検証）を stage 2 の対象群収束後・stage 3 開始前に実行し、評価対象を stage 2 を正常完了した対象に限定する。stage 2 を正常完了した対象の設計側 worktree（`.worktrees/{N}-definition`）とローカル設計系ブランチ（`definition/issue-{N}`）の残存は 0 件であることを検証対象に含める。残存検出時は fail-closed で停止して残存対象と削除再実行の対応を報告する。stage 2 が正常完了していない対象について、既存 lifecycle 契約に従って保持された draft / RU は cleanup 違反としない（case-auto 実行契約）。
 scheduling 制約（最大同時起動数・起動間隔）による batch 分割を orchestration stage の分割として扱わない（case-auto Design「ドラフト間並列実行モデル」）。
 Epic execution_unit の Wave 間および最終 Wave の case-close(#epic) は Wave 反復を進行・完結させる stage 3 内部の状態遷移処理であり stage 4 の開始とみなさず、stage の分類は orchestration 上の位置づけにより行い command 名単独では分類しない（case-auto Design「ドラフト間並列実行モデル」）。
 並行して委譲起動する stage 1（case-open / case-revise）・stage 2（case-ready）の委譲先は、並行実行時の作業隔離規律（正規所有は case-open Design の並行 case-open 作業隔離規律節）と設計PR受入の overlap 突合（正規所有は case-ready Design「内部構成」節 overlap 突合）を各委譲先工程の実行手順として適用する。case-auto は委譲先工程の手順を再定義せず、委譲境界の整合のみを保持する（stage モデルの並列性と作業隔離・overlap 突合の機構分散は矛盾しない）。

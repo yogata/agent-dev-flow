@@ -9,6 +9,8 @@ design:
     - REQ-018-002
     - REQ-030-022
 implementation:
+  src/common/skills/agentdev-git-worktree/SKILL.md:
+    - REQ-030-022
   src/common/skills/agentdev-git-worktree/references/git-common-procedures.md:
     - REQ-032-029
     - REQ-102-002
@@ -22,6 +24,8 @@ implementation:
     - REQ-018-008
     - REQ-018-009
     - REQ-029-012
+    - REQ-030-022
+    - REQ-030-023
     - REQ-032-029
 verification:
   src/common/skills/agentdev-git-worktree/references/worktree-operations.md:

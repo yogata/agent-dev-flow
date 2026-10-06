@@ -36,6 +36,8 @@ git remote show origin | grep 'HEAD branch' | sed 's/.*: //'
 git worktree add ".worktrees/{N}-{type}" -b "{type}/issue-{N}" origin/main
 ```
 
+`{type}` の定義域は SKILL.md「`{type}` の定義」テーブルを正とする。設計側 worktree・ブランチ（type=`definition`、type=`definition-amend`）も同一の命名規則・作成元（origin/main）で作成する。
+
 ### 3. 重要事項
 
 - **worktreeプレフィクス必須**: ファイルパスには `.worktrees/{N}-{type}/` を含めること
@@ -365,6 +367,8 @@ stash の退避（push）と復元（pop、apply）を往復する前に、以�
 他セッションの stash エントリの削除（`git stash drop`）、スタック全体のクリア（`git stash clear`）は行わない。
 
 ## 削除手順
+
+設計側 worktree（`.worktrees/{N}-definition`）とローカル設計系ブランチ（`definition/issue-{N}`）の削除（case-ready が設計PR の merge を完結した後、draft / RU 削除と同一の lifecycle 位置で実行）も本手順に従う。削除対象はローカルに限定され、遠隔の設計系ブランチは削除せず、GitHub の deleteBranchOnMerge 自動削除に委譲する。
 
 **追跡済みファイル削除禁止**: クリーンアップ操作中は追跡済みファイルを削除してはならない。
 削除対象は未追跡ファイルのみ（実行時作業領域配下の一時ファイル、ビルド成果物等）。

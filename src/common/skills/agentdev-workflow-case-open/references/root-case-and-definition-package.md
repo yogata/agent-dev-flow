@@ -78,7 +78,7 @@ Root Case 本文候補の生成は preflight 設定検証の警告報告後に�
 
 並行して case-open を実行する場合、Definition 変更作業（branch 作成、ファイル編集）の起点で次の作業隔離手順を実行する。正規所有は case-open Design「並行 case-open の作業隔離規律」節であり、本節は STEP-2 / STEP-3 の実行手順を提供する。
 
-1. **Case 専用 worktree の前置**: Definition 変更作業は Case 専用 worktree（`.worktrees/{N}-definition`）で行う。共有 working tree での Definition 変更作業を行わない
+1. **Case 専用 worktree の前置**: Definition 変更作業は Case 専用 worktree（`.worktrees/{N}-definition`）で行う。設計側 worktree・設計系ブランチ（`definition/issue-{N}`）の作成手順は `agentdev-git-worktree` 標準手順（type=definition）に従い、本節は作成手順を複製しない。作業隔離要件（作成元 origin/main HEAD・スタック構造禁止・1-writer 侵害検知・merge-base 起点差分検査）は case-open Design「並行 case-open の作業隔離規律」節が所有を維持する。共有 working tree での Definition 変更作業を行わない
 2. **Definition branch の origin/main HEAD からの独立作成**: Definition branch は origin/main HEAD から独立して作成する（`git fetch origin` 後の origin/main HEAD を作成元とする）。兄弟 Case の Definition commit を含むスタック構造を作らない。branch 命名は既存規定に従い、本手順は branch 作成元と作業隔離のみを扱う
 3. **1-writer 前提侵害の検知と早期断念**: worktree 内の `git status` 確認により、in-scope 外の書込み混入（worktree 1-writer 前提の侵害）を検知した場合は直ちに停止する（早期断念）。検知した書込みを Definition 変更に含めない
 
