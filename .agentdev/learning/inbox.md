@@ -316,3 +316,35 @@
 - **想定反映先**: definition-pr-and-idempotency.md 切替手順（適用事例の補遺）、agentdev-gh README の失敗分類
 - **関連**: Case #3494、Definition PR #3495、前回 learning「agentdev_gh の全操作が gh exit 66…」（同工程の別障害クラス）
 - **タグ**: `#agentdev-gh` `#rate-limit` `#fallback` `#case-open`
+
+## Definition PR merge 時の workflow-extension acceptance_gates（yomiyasu 記録確認）を merge 前に実施せず記録不在のまま merge した
+
+- **問題事象**: case-ready STEP-1（Case #3494）で、workflow-extension の acceptance_gates 第3項（Definition PR の docs/** 日本語文章変更への yomiyasu 適用記録が PR 上に存在すること。不足時はマージを行わず差し戻すこと）の確認を merge 実行前に実施せず、記録不在のまま PR #3495 を merge した。merge 後の検証ゲート（STEP-6）で拡張 rules を読んだ時点で発覚した
+- **発生局面**: 運用（case-ready STEP-1 の Definition PR 受入・merge 判定）
+- **検知方法**: STEP-6 の project-extensions 共有領域解決（workflow-extension context 読込）で rules `yomiyasu-application-before-write` と acceptance_gates を読み、PR 本文・コメント（comment_list 空）に yomiyasu 記録がないことを照合
+- **根本原因**: Definition PR 受入の検査手順（忠実性・整合性・品質検査）をスキル reference 基準で実行し、project-extensions の acceptance_gates が merge 前確認の対象であることを受入手順の前置観点に組み込んでいなかった。case-open 側も PR 作成時に記録を付与していなかった
+- **自律対応内容**: merge 巻き戻し禁止（冪等原則）に従い、回復経路として merge 後 canonical の対象文章へ yomiyasu_lint.py を実行（DEC-051.md・REQ-034/035・Design 6 件。case-ready 追記分は指摘 0 件、変更節の指摘は英数字表記の半角空白のみで既存文書体系の標準表記として保持）、記録コメントを PR #3495 へ補完投稿（commentId 6006528395）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（acceptance_gates の回復適用）
+- **横展開観点**: workflow-extension の acceptance_gates・rules は case-open（PR 作成時）と case-ready（merge 前確認時）の両方が消費する前置観点。STEP-6 だけの読込では merge 判定に間に合わないため、STEP-1 の受入検査に project-extensions 拡張点の読込を前置する構造が望ましい
+- **再発条件**: docs/** の日本語文章変更を含む Definition PR を case-ready が merge する場合
+- **予防策候補**: case-ready STEP-1 の受入検査手順へ「merge 判定前の project-extensions rules・acceptance_gates 読込と yomiyasu 記録の確認」を明示する（reference 文言の補足候補）。case-open STEP-4 の PR 作成手順へ PR 本文への適用記録付与を明示する（前工程の予防）
+- **想定反映先**: agentdev-workflow-case-ready references/definition-acceptance.md（受入検査の前置観点）、agentdev-workflow-case-open references/definition-pr-and-idempotency.md（PR 本文記録欄）
+- **関連**: Case #3494、Definition PR #3495（merge commit d754ceec、記録コメント 6006528395）
+- **タグ**: `#yomiyasu` `#project-extensions` `#acceptance-gates` `#case-ready`
+
+## case-open の検証後 commit（索引最新化）で req-health-metrics の計測日が content change し IR-072 freshness NG が受入検査で新規発生した
+
+- **問題事象**: case-open が branch HEAD（01ded1f5）で check_integrity を実行し「本変更起因 NG 0 件」を PR 本文へ記録した後、索引最新化 commit（01ded1f5）が req-health-metrics.md の計測日（AUTOGEN 部分）を 2026-10-05 から 2026-10-06 へ content change させた。frontmatter updated が 2026-10-05 のままのため、case-ready STEP-1 の受入検査で req-updated-freshness（IR-072）new unmanaged NG 1 件が新規検出された。case-open の検証記録は実行時点で正しいが、検証後 commit により陳腐化した
+- **発生局面**: 運用（case-ready STEP-1 の品質検査。case-open STEP-4 の検証後 commit が原因）
+- **検知方法**: case-ready 受入検査の check_integrity 再実行（new unmanaged NG 2 件を検出し、main HEAD 対照実行で 1 件が本変更起因と切り分け）
+- **根本原因**: case-open が検証実行（checker 実測）と索引再生成 commit の順序を検証時点の期待値確定後に再配列し、再生成による content change 後に frontmatter updated の再実測を行わなかった。検証記録は checker 実行時点に紐づくため、最終 commit HEAD での再実測が受入側に必要である
+- **自律対応内容**: req-health-metrics.md の frontmatter updated を 2026-10-06 へ進行する修正 commit d6a9c76a を PR branch へ push し、check_integrity 再実行で本変更起因 NG 0 件を再確認してから merge した（merge 後 main でも再確認）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（IR-072 の適用事例）
+- **横展開観点**: Definition PR 受入側は PR 本文の検証記録を信頼せず、merge 直前の branch HEAD で品質ゲートを再実測する規律が有効だった（今回それで検出できた）。索引再生成を含む commit は文書 content change を伴うため、IR-072 の対象判定（frontmatter-only 除外の逆）を受入側でも意識する
+- **再発条件**: case-open が検証実行後に派生物を含む commit を追加する Definition PR
+- **予防策候補**: case-open STEP-4 の手順で索引再生成 commit を検証実行より前に完了させる（reference の手順 2.5 順序の補足候補）、case-ready STEP-1 の品質検査で branch HEAD 再実測を必須化する（今回の受入手順は実施済み。文言明示の補足候補）
+- **想定反映先**: agentdev-workflow-case-open references/definition-pr-and-idempotency.md（手順 2.5）、agentdev-workflow-case-ready references/definition-acceptance.md（品質検査の再実測）
+- **関連**: Case #3494、Definition PR #3495（commit 01ded1f5・d6a9c76a）、前回 learning「IR-072 frontmatter freshness 6 件」（同 IR の別発生経路）
+- **タグ**: `#ir-072` `#frontmatter` `#case-ready` `#definition-pr`
