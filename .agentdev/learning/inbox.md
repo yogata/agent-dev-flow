@@ -411,3 +411,21 @@
 - **想定反映先**: checker 実行契約 Design（link profile 実効実行要件節の拡張候補）、case-close references docs-and-design-promotion.md、qg-4-final-acceptance.md
 - **関連**: Case #3494、PR #3496、既存 learning「worktree の repo 全体 bun test 単一実行で textlint 一時 dictionary 競合疑いの fail が出る」
 - **タグ**: `#worktree` `#junction` `#checker-environment` `#case-close`
+
+---
+
+## 完了条件チェックボックスの機械抽出は CRLF 退避 body で 0 件になる（LF 正規化が前置）
+
+- **問題事象**: case-close STEP-2 の機械抽出（`close_mechanical_steps.ts` の `extractCompletionCheckboxes`）が、gh CLI（`gh issue view --json body --jq .body`）で退避した Issue body ファイルから checkbox を 1 件も抽出しなかった（total 0）。退避ファイルには checkbox 行が 8 件実在した
+- **発生局面**: 運用（case-close STEP-2 再開実行〔Case #3497〕の QG-4 再評価・機械抽出。Windows 環境）
+- **検知方法**: 報告 JSON の completion-checkbox-extraction step が `total: 0 / checked: 0`（step 自体は pass 判定）なのに対し、退避ファイルへの grep で checkbox 行 8 件を確認した不一致。抽出結果が 0 件でも step が fail にならないため、実データとの突合が検知の要だった
+- **根本原因**: gh の `--jq` 出力は GitHub 保存本文の `\r\n` をそのまま含む。抽出関数の行マッチ regex `(.*)$` は行末 `\r` を消費できず `^\s*-\s+\[([ xX])\]` 行が 1 件も一致しない。LF と CRLF の差は step の pass/fail に現れず total 0 としてのみ現れる
+- **自律対応内容**: 退避 body を LF 正規化（`\r\n` → `\n`）してから同関数を再実行し 8/8 を抽出した。script 本体は変更せず入力形式を是正（mergeable ポーリング等の他 step は全 pass 済みのため script 全体の再実行は省略）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（決定的関数の入力前提に関する運用注記。関数・script の変更はしていない）
+- **横展開観点**: gh CLI で取得した GitHub 本文を入力にする決定的処理は、行指向の regex・パーサへ渡す前に LF 正規化する。Windows 環境では PowerShell 経由に限らず gh 出力自体が CRLF を持ち得る
+- **再発条件**: Windows 環境で gh CLI の body 出力をそのままファイル退避し、行指向抽出へ入力する場合
+- **予防策候補**: `extractCompletionCheckboxes` 呼出前の LF 正規化前置、または抽出結果 total 0 かつ LF 正規化後の body に checkbox パターンが存在する場合の warn 報告
+- **想定反映先**: agentdev-workflow-case-close の機械工程手順（退避 body の LF 正規化前置）、close_mechanical_steps.ts の抽出入力契約注記
+- **関連**: Case #3497（完了記録コメント 6013794731、対応記録コメント 6013834126）、PR #3499
+- **タグ**: `#case-close` `#gh-cli` `#windows` `#line-ending` `#deterministic-extraction`
