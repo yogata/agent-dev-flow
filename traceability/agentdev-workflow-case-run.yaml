@@ -25,6 +25,7 @@ implementation:
     - REQ-060-007
     - REQ-101-006
     - REQ-101-014
+    - REQ-031-035
   src/common/skills/agentdev-workflow-case-run/references/single.md:
     - REQ-007-014
     - REQ-007-015
