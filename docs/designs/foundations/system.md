@@ -169,12 +169,12 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 ### case-revise（内部 lifecycle 例外経路段階）
 
 - **公開契約**: Root Case + req-define で再合意済みの Definition 変更差分（draft） → 設計修正PR（canonical Definition に実変更がある場合のみ）+ case-ready への引き継ぎ。例外経路の内部 lifecycle 段階（REQ-062）。
-- **主要処理段階**: 再合意済み差分の読込 → 実変更判定（canonical Definition との差分比較、実変更なしは Amendment PR を作らず case-ready へ移行）→ 設計修正PR作成 → 影響再評価（Definition 変更の影響がある Issue のみを再評価対象とし、影響なしと確認できた完了済み Issue は維持）→ case-ready 経由の execution contract / execution structure 再確定。
-- **分岐**: 実変更あり vs なし、既存 Amendment PR 検出（重複生成禁止、既存 PR 再利用）。
+- **主要処理段階**: 再合意済み差分の読込 → 実変更判定（canonical Definition との差分比較、実変更なしは Definition Amendment PR を作らず case-ready へ移行）→ 設計修正PR作成 → 影響再評価（Definition 変更の影響がある Issue のみを再評価対象とし、影響なしと確認できた完了済み Issue は維持）→ case-ready 経由の execution contract / execution structure 再確定。
+- **分岐**: 実変更あり vs なし、既存 Definition Amendment PR 検出（重複生成禁止、既存 PR 再利用）。
 - **副作用**: 設計修正PR作成、影響ある Issue の再評価マーキング、Case 関連 Issue 本文更新（作成時のテンプレート構造と必須セクション維持）。
 - **HITL**: 再合意済みでない変更の反映要求（req-define へ差し戻し）。
 - **並列性**: 持たない（単一 Case 単位）。
-- **resume**: 同じ再合意内容に対応する既存 Amendment PR を重複生成しない（べき等）。中断済み成果物は巻き戻さず既存成果物を再利用する。
+- **resume**: 同じ再合意内容に対応する既存 Definition Amendment PR を重複生成しない（べき等）。中断済み成果物は巻き戻さず既存成果物を再利用する。
 - **durable state**: 設計修正PR、Issue 再評価マーキング、Issue 本文。
 - **Harness依存**: GitHub I/O（Custom Tool `agentdev_gh` 経由）、拡張読込。
 - **Capability依存**: `agentdev-req-file-manager`、`agentdev-design-file-manager`、`agentdev-decision-file-manager`、`agentdev-artifact-validation`、`agentdev-project-extensions`。

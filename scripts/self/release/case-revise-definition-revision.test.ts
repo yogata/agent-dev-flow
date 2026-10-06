@@ -15,8 +15,8 @@
 // as a permanent regression guard:
 //   - every REQ row of the case-revise execution contract REQ is anchored to
 //     a distribution artifact clause that specifies the behavior
-//   - Amendment PR idempotency: no duplicate generation for the same
-//     re-agreed change, reuse of an existing Amendment PR
+//   - Definition Amendment PR idempotency: no duplicate generation for the same
+//     re-agreed change, reuse of an existing Definition Amendment PR
 //   - completed Issue protection: no rollback of completed Issues confirmed
 //     as unaffected
 //   - the idempotency enumeration agreement between the REQ rows and the
@@ -67,7 +67,7 @@ function extractHeadingSection(markdown: string, heading: string): string {
 const ROW_ANCHORS: Array<[string, string, RegExp]> = [
   ["REQ-062-001", SKILL_REL, /再合意済みの Definition 変更の既存 Case への反映/],
   ["REQ-062-002", REF_REV_REL, /新しい要求、Decision、対象範囲を生成しない/],
-  ["REQ-062-003", REF_REV_REL, /実変更なし（差分が空）: Amendment PR を作成せず/],
+  ["REQ-062-003", REF_REV_REL, /実変更なし（差分が空）: Definition Amendment PR を作成せず/],
   ["REQ-062-004", REF_IMPACT_REL, /影響なしと確認できた完了済み Issue は巻き戻さず/],
   ["REQ-062-005", REF_REV_REL, /重複生成しない/],
   ["REQ-062-006", REF_HANDOFF_REL, /execution contract \/ execution structure 再確定は case-ready を経由する/],
@@ -105,7 +105,7 @@ describe("case-revise workflow skill owns the semantic judgment boundary", () =>
 describe("case-revise workflow skill structure", () => {
   const doc = read(SKILL_REL);
 
-  test("owns revision acceptance, no-change detection, Amendment PR idempotency, impact reassessment, handoff as STEPs", () => {
+  test("owns revision acceptance, no-change detection, Definition Amendment PR idempotency, impact reassessment, handoff as STEPs", () => {
     for (const step of [
       "再合意内容の受入確認",
       "実変更判定と冪等検索",
@@ -121,9 +121,9 @@ describe("case-revise workflow skill structure", () => {
     expect(doc).toMatch(/同じ再合意内容に対応する既存設計修正PRを検出した場合は再利用し、STEP-3 を省略して STEP-4 へ進む（重複生成しない）/);
   });
 
-  test("declares the no-change branch (no empty Amendment PR)", () => {
+  test("declares the no-change branch (no empty Definition Amendment PR)", () => {
     expect(doc).toMatch(/実変更なし時は case-ready 引き継ぎへ/);
-    expect(doc).toMatch(/空の Amendment PR を作る経路は存在しない/);
+    expect(doc).toMatch(/空の Definition Amendment PR を作る経路は存在しない/);
   });
 
   test("adds no case-revise-specific case state", () => {
@@ -142,12 +142,12 @@ describe("Definition revision scenarios", () => {
     expect(doc).toMatch(/req_draft を再解釈・再設計せず、合意済み内容をそのまま後続 STEP へ投影する/);
   });
 
-  test("(c) existing Amendment PR is reused before creating a new one", () => {
+  test("(c) existing Definition Amendment PR is reused before creating a new one", () => {
     expect(doc).toMatch(/既存 PR を再利用し、STEP-3 を省略して STEP-4 へ進む（重複生成しない）/);
     expect(doc).toMatch(/作成前に既存 PR の再検索を実行し、検出時は新規作成を取りやめて再利用へ切り替える/);
   });
 
-  test("(d) Amendment PR is created as a normal Pull Request (REQ-083-001)", () => {
+  test("(d) Definition Amendment PR is created as a normal Pull Request (REQ-083-001)", () => {
     expect(doc).toMatch(
       /設計修正PRとして通常 Pull Request（GitHub Draft PR ではない）で作成する/,
     );
@@ -182,16 +182,16 @@ describe("Idempotency key enumeration agreement (TS-008)", () => {
     expect(designSection).not.toBe("");
   });
 
-  test("Amendment PR is covered by the Design idempotency section", () => {
+  test("Definition Amendment PR is covered by the Design idempotency section", () => {
     // REQ-062-005 forbids duplicate generation of the same re-agreed
-    // Amendment PR. The Design enumeration that owns the duplicate
-    // detection keys must name the Amendment PR.
-    expect(designSection).toContain("Amendment PR");
+    // Definition Amendment PR. The Design enumeration that owns the duplicate
+    // detection keys must name the Definition Amendment PR.
+    expect(designSection).toContain("Definition Amendment PR");
   });
 
-  test("Design contract pins the Amendment PR creation condition and no-rollback", () => {
+  test("Design contract pins the Definition Amendment PR creation condition and no-rollback", () => {
     const structure = extractHeadingSection(designDoc, "## 内部構成");
-    expect(structure).toMatch(/実変更がなければ Amendment PR を作成せず case-ready へ移行する/);
+    expect(structure).toMatch(/実変更がなければ Definition Amendment PR を作成せず case-ready へ移行する/);
     const idempotency = extractHeadingSection(designDoc, "## 冪等性");
     expect(idempotency).toMatch(/中断済み成果物は巻き戻さない/);
   });
@@ -243,7 +243,7 @@ describe("case-revise templates carry required sections", () => {
     expect(prDoc).toContain("影響なし確認済み（完了済み Issue の維持）");
   });
 
-  test("report template records Amendment PR idempotency outcomes", () => {
+  test("report template records Definition Amendment PR idempotency outcomes", () => {
     const report = read(TPL_REPORT_REL);
     expect(report).toMatch(/作成: #\{pr_N\} \/ 再利用（既存 PR: #\{pr_N\}）\/ 不作成（実変更なし、case-ready へ引き継ぎ）\}/);
     expect(report).toContain("影響なし確認済みの完了済み Issue は維持");
@@ -261,7 +261,7 @@ describe("requirement anchors (canonical REQ files)", () => {
     }
   });
 
-  test("REQ-062-005 forbids duplicate Amendment PR generation", () => {
+  test("REQ-062-005 forbids duplicate Definition Amendment PR generation", () => {
     const row = doc062.split(/\r?\n/).find((l) => l.startsWith("| REQ-062-005 |"));
     expect(row).toBeDefined();
     expect(row!).toContain("既存設計修正PRを重複生成しない");

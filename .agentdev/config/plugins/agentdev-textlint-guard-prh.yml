@@ -8,9 +8,12 @@
 # 配布物 rules/default-prh.yml は言語違反クラスに限定し、本辞書へは登録しない。
 # 検出は散文（Str 節点）のみに適用され、inline code と fenced code は対象外。
 # 単語境界は regex 形式で指定する（複数形・大文字始まりの固有複合名を除外）。
-# 登録語は現在 3 語（2026-10-06 Issue #3500: ADF 文書の正式名称統一。
+# 登録語は現在 4 語（2026-10-06 Issue #3500: ADF 文書の正式名称統一。
+# 2026-10-07 Issue #3517: 単体表記「Amendment PR」の検出規則を追加
+# 〔AG-012 完全形式「Definition Amendment PR」への表記統一。REQ-062-003 参照〕。
 # retry・schema は 2026-09-28 case-revise 再合意の誤検出実測〔hard 205件〕により不登録）。
-# 正式名称は REQ-083-003（設計PR・設計修正PR）と document-type-responsibilities.md
+# 正式名称は REQ-083-003（設計PR・設計修正PR）と REQ-062-003（Definition Amendment PR）、
+# document-type-responsibilities.md
 # 用語政策節「設計PR・設計修正PR・実装PR の語彙管理」を正とする。
 # 「Definition Amendment PR」を先に置換対象として解決させるため、より長い語を
 # 上位に配置する（prh の最長一致解決を補助する並び順）。
@@ -18,6 +21,8 @@ version: 1
 rules:
   - expected: 設計修正PR
     pattern: /Definition Amendment PR/
+  - expected: Definition Amendment PR
+    pattern: /(?<!Definition )Amendment PR/
   - expected: 設計PR
     pattern: /Definition PR/
   - expected: 実装PR

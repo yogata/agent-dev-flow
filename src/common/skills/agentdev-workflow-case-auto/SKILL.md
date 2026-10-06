@@ -102,7 +102,7 @@ case-auto workflow は次の8 STEP で構成する。
 
 - `agentdev-workflow-case-open`: case-open 工程（委譲起動、委譲先 subagent が権威情報源として読み込む）
 - `agentdev-workflow-case-ready`: case-ready 工程（同上。Definition 保存内部責務・execution contract 確定・ready 遷移を所有）
-- `agentdev-workflow-case-revise`: case-revise 工程（例外経路時のみ委譲起動。再合意済み Definition 変更の反映と Amendment PR 作成を所有）
+- `agentdev-workflow-case-revise`: case-revise 工程（例外経路時のみ委譲起動。再合意済み Definition 変更の反映と Definition Amendment PR 作成を所有）
 - `agentdev-workflow-case-run`: case-run 工程（case-auto 自身がインライン実行の読込主体として読み込む、起動手段は harness 分離モデル Design 参照）
 - `agentdev-workflow-case-close`: case-close 工程（委譲起動、委譲先 subagent が権威情報源として読み込む）
 
