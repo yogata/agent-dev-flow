@@ -1,0 +1,21 @@
+component: agentdev-adversarial-review
+design:
+  docs/designs/skills/agentdev-adversarial-review.md:
+    - REQ-014-001
+    - REQ-014-002
+    - REQ-014-003
+    - REQ-014-004
+    - REQ-014-005
+    - REQ-014-006
+    - REQ-014-007
+    - REQ-014-008
+    - REQ-014-009
+    - REQ-014-010
+    - REQ-014-011
+    - REQ-014-012
+    - REQ-014-013
+    - REQ-014-014
+    - REQ-014-015
+    - REQ-014-016
+    - REQ-015-002
+    - REQ-015-003
