@@ -23,8 +23,6 @@ REQ/Decision 操作 skill（`agentdev-req-file-manager`、`agentdev-decision-fil
 
 **USE FOR**:
 
-**USE FOR**:
-
 - Design ファイル（`docs/designs/**/*.md`）の作成、更新、配置先判断
 - `target_area` による Design 内セクション置換判断
 - Design ライフサイクル規則（`draft` / `accepted`）の適用と整合性確認
