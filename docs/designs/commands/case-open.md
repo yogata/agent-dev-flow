@@ -10,8 +10,10 @@ updated: "2026-10-06"
 <!-- ADF-COVERS(implementation): REQ-021-014, REQ-021-024 -->
 <!-- ADF-COVERS(implementation): REQ-035-006, REQ-035-008 -->
 <!-- ADF-COVERS(implementation): REQ-049-005 -->
+<!-- ADF-COVERS(implementation): REQ-083-002 -->
 <!-- ADF-COVERS(design): REQ-030-014, REQ-030-017, REQ-030-018 -->
 <!-- ADF-COVERS(design): REQ-030-019, REQ-030-020, REQ-030-021 -->
+<!-- ADF-COVERS(design): REQ-083-002, REQ-083-003 -->
 
 # case-open Design
 

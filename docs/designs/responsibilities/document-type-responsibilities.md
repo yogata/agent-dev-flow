@@ -2,7 +2,7 @@
 title: 文書種別責務・配置基準
 status: accepted
 created: 2026-06-23
-updated: 2026-10-04
+updated: 2026-10-06
 ---
 <!-- ADF-COVERS(implementation): REQ-001-001, REQ-001-002, REQ-001-003, REQ-001-004, REQ-001-005, REQ-001-006, REQ-056-003 -->
 <!-- ADF-COVERS(implementation): REQ-094-003, REQ-094-005 -->
@@ -326,6 +326,8 @@ ADF の正式なモデル名・成果物名（Decision、Design、Case、Epic、
 | prh 機械辞書 | プロジェクト用語辞書（`.agentdev/config/plugins/agentdev-textlint-guard-prh.yml`） | 固定置換可と判定された語のみ。配布物 default-prh.yml は言語違反クラスに限定 |
 
 prh 機械辞書への新語登録は、文脈非依存性と誤検出ゼロの実測立証を前提とする（DEC-028 の限定例外）。実測立証は case 実行側のフェーズで行う。
+
+設計PR・設計修正PR・実装PR の語彙管理: 「Definition PR」は「設計PR」へ、「Definition Amendment PR」は「設計修正PR」へ、「実装 PR」等の揺れは「実装PR」へ統一する。ブランチ名・worktree 名の識別子（definition/issue-{N} 等）と履歴成果物の旧表現は置換対象外とする。prh 固定置換として登録済みである。
 
 ### 関連参照
 
