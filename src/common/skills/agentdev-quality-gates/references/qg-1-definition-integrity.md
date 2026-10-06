@@ -15,7 +15,7 @@
 | Verifier | semantic（機械的検査を部分的に内包） |
 | Evidence | 検査ログ・draft 検証記録（機械的証拠・推論証拠） |
 
-- 対象遷移（v4 lifecycle deterministic gate predicate 接続点）: Definition 保存完了時（draft 保存・Definition PR 化前）
+- 対象遷移（v4 lifecycle deterministic gate predicate 接続点）: Definition 保存完了時（draft 保存・設計PR化前）
 - 判定値と Gate predicate の写像: `pass`/ `warn` で継続可、`fail` は遷移不可。写像の正規定義は v4-quality-gate-model Design「判定値と遷移接続」節と [common-gate-contract.md](common-gate-contract.md)「5 概念への写像」を参照する
 - 証拠分類の直交: 上表 Evidence の証拠分類（機械的/ 推論）は Evidence の属性であり、Verifier 分類（deterministic/ semantic）とは直交する。正規定義は v4-quality-gate-model Design「証拠種別と Verifier 分類の直交」節を参照する
 - v3 からの処遇: 保持（配置点を v4 遷移へ再錨定。同 Design「QG-1〜QG-4 個別処遇対応表」の QG-1 行）

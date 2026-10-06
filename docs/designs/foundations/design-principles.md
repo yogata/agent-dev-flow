@@ -35,7 +35,7 @@ work_type は変更の性質を表し、実行経路を直接決定する責務�
 
 **maintenance** はリファクタリング、保守作業向けの軽量処理である。
 **docs_chore** はドキュメント、雑務向けの軽量処理である。
-軽量性は work_type に固定された属性ではなく、Definition 構成（artifact_actions の構成、REQ 保存・Definition PR の有無等）で決まる。
+軽量性は work_type に固定された属性ではなく、Definition 構成（artifact_actions の構成、REQ 保存・設計PRの有無等）で決まる。
 
 ### 実行経路の導出（Definition 構成一次）
 
@@ -44,8 +44,8 @@ workflow_route（direct_case 等）は導出結果ラベルであり、work_type
 
 | Definition 構成（artifact_actions の有無等） | 典型的な work_type / scale | 導出結果ラベル | 実行の特徴 |
 |---|---|---|---|
-| REQ 保存なし・Definition PR なし（Issue 本文で要件管理） | bugfix、maintenance、docs_chore 等 | direct_case | req-define → case-auto。最小 Definition 構成での内部 lifecycle 実行 |
-| REQ 保存あり・Definition PR あり・Epic 構成なし | feature standard 等 | req_backed_case | req-define → case-auto。defining（Definition PR）→ ready → running → closing |
+| REQ 保存なし・設計PRなし（Issue 本文で要件管理） | bugfix、maintenance、docs_chore 等 | direct_case | req-define → case-auto。最小 Definition 構成での内部 lifecycle 実行 |
+| REQ 保存あり・設計PRあり・Epic 構成なし | feature standard 等 | req_backed_case | req-define → case-auto。defining（設計PR）→ ready → running → closing |
 | REQ 保存あり・Epic 構成あり | feature large、大規模 bugfix・maintenance 等 | epic_case | req-define → case-auto。Epic 構成と Wave スケジューリング付きの実行 |
 
 大規模 bugfix 等も scale/Epic/Wave の対象になり得る。work_type と scale は直交する（v4-standard-lifecycle Design）。

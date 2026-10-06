@@ -95,7 +95,7 @@ const ROW_ANCHORS: Array<[string, string, RegExp]> = [
   ["REQ-061-024", REF_READY_REL, /実行準備条件を満たした場合のみ Root Case を ready に遷移/],
   ["REQ-061-025", REF_READY_REL, /blocked、failed、中断した場合は draft \/ RU を保持する/],
   ["REQ-061-026", REF_READY_REL, /main ブランチの作業ディレクトリとリモートの同期を確認/],
-  ["REQ-061-027", REF_READY_REL, /merge 済み Definition（Definition PR）を再利用/],
+  ["REQ-061-027", REF_READY_REL, /merge 済み Definition（設計PR）を再利用/],
   ["REQ-061-028", REF_DEF_REL, /ready へ遷移せず、既存 PR を保持/],
 ];
 
@@ -131,7 +131,7 @@ describe("case-ready workflow skill structure", () => {
 
   test("owns Definition acceptance, EC finalization, Standard/Epic, gate, ready, cleanup, idempotency as STEPs", () => {
     for (const step of [
-      "Definition PR 受入",
+      "設計PR受入",
       "canonical 再取得",
       "Decision 受理評価",
       "execution contract 確定",
@@ -160,7 +160,7 @@ describe("Definition acceptance scenarios (TS-003)", () => {
   });
 
   test("(b) no Definition PR (no-change case): proceeds without creating an empty PR", () => {
-    expect(doc).toMatch(/空の Definition PR を作成する経路は存在しない/);
+    expect(doc).toMatch(/空の設計PRを作成する経路は存在しない/);
     expect(doc).toMatch(/現行 main の状態を canonical Definition として採用/);
   });
 
@@ -203,7 +203,7 @@ describe("Idempotency key enumeration agreement (TS-008)", () => {
 
   test("skill cleanup reference pins the reuse list and forbids duplicates", () => {
     for (const key of [
-      "merge 済み Definition（Definition PR）を再利用",
+      "merge 済み Definition（設計PR）を再利用",
       "既存 Child Issue を再利用",
       "既存 Wave / 依存構造を再利用",
       "Decision の受理記録（accepted 遷移済み）を再利用",
@@ -296,7 +296,7 @@ describe("case-ready templates carry required sections", () => {
 
   test("report template records the Definition PR outcome and the gate", () => {
     const report = read(TPL_REPORT_REL);
-    expect(report).toMatch(/Definition PR: \{merge 済み: #\{pr_N\}/);
+    expect(report).toMatch(/設計PR: \{merge 済み: #\{pr_N\}/);
     expect(report).toMatch(/不存在（実変更なし）\}/);
     expect(report).toMatch(/検証対応要否の最終ゲート/);
     expect(report).toContain("case-run");
@@ -316,7 +316,7 @@ describe("requirement anchors (canonical REQ files)", () => {
   test("REQ-061-027 enumerates the no-duplicate generation targets", () => {
     const row = doc061.split(/\r?\n/).find((l) => l.startsWith("| REQ-061-027 |"));
     expect(row).toBeDefined();
-    expect(row!).toContain("Root Case、Definition PR、Child Issue、実行構成、Decision の受理記録を重複生成しない");
+    expect(row!).toContain("Root Case、設計PR、Child Issue、実行構成、Decision の受理記録を重複生成しない");
   });
 
   test("REQ-061-028 requires no ready transition on CI failure", () => {

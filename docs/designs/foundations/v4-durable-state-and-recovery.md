@@ -52,7 +52,7 @@ REQ-001-034「状態保持領域内の作業用ドラフトは正規のドメイ
 
 | 論理状態 | 権威の移行 |
 |---|---|
-| Definition 内容 | draft ファイル（合意済み要件doc） -> Definition PR -> merge 後の v4-dev branch |
+| Definition 内容 | draft ファイル（合意済み要件doc） -> 設計PR -> merge 後の v4-dev branch |
 | Case 実行状態 | case-ready 完了後は Root Case Issue と Epic Issue が権威（draft は削除） |
 | 検証結果 | 実行時はローカル実行、確定時は SSoT コメント（証跡）として記録 |
 

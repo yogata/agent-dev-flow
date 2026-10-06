@@ -109,7 +109,7 @@ describe("case-revise workflow skill structure", () => {
     for (const step of [
       "再合意内容の受入確認",
       "実変更判定と冪等検索",
-      "Definition Amendment PR 作成",
+      "設計修正PR作成",
       "影響再評価",
       "Issue 本文更新と case-ready 引き継ぎ",
     ]) {
@@ -118,7 +118,7 @@ describe("case-revise workflow skill structure", () => {
   });
 
   test("declares the idempotency branch (reuse, no duplicates)", () => {
-    expect(doc).toMatch(/同じ再合意内容に対応する既存 Definition Amendment PR を検出した場合は再利用し、STEP-3 を省略して STEP-4 へ進む（重複生成しない）/);
+    expect(doc).toMatch(/同じ再合意内容に対応する既存設計修正PRを検出した場合は再利用し、STEP-3 を省略して STEP-4 へ進む（重複生成しない）/);
   });
 
   test("declares the no-change branch (no empty Amendment PR)", () => {
@@ -149,7 +149,7 @@ describe("Definition revision scenarios", () => {
 
   test("(d) Amendment PR is created as a normal Pull Request (REQ-083-001)", () => {
     expect(doc).toMatch(
-      /Definition Amendment PR として通常 Pull Request（GitHub Draft PR ではない）で作成する/,
+      /設計修正PRとして通常 Pull Request（GitHub Draft PR ではない）で作成する/,
     );
   });
 });
@@ -197,7 +197,7 @@ describe("Idempotency key enumeration agreement (TS-008)", () => {
   });
 
   test("skill pins the reuse list and forbids duplicates (same re-agreed change)", () => {
-    expect(read(SKILL_REL)).toMatch(/同じ再合意内容に対応する既存 Definition Amendment PR を重複生成しない/);
+    expect(read(SKILL_REL)).toMatch(/同じ再合意内容に対応する既存設計修正PRを重複生成しない/);
   });
 
   test("resume protocol reuses interrupted artifacts without rollback", () => {
@@ -264,7 +264,7 @@ describe("requirement anchors (canonical REQ files)", () => {
   test("REQ-062-005 forbids duplicate Amendment PR generation", () => {
     const row = doc062.split(/\r?\n/).find((l) => l.startsWith("| REQ-062-005 |"));
     expect(row).toBeDefined();
-    expect(row!).toContain("既存 Definition Amendment PR を重複生成しない");
+    expect(row!).toContain("既存設計修正PRを重複生成しない");
   });
 
   test("REQ-062-004 protects unaffected completed Issues", () => {

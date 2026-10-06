@@ -17,8 +17,8 @@ case-revise の公開契約を定義する。case-revise は req-define で再�
 ## 公開 interface
 
 - 入力: Root Case、req-define で再合意済みの差分（draft）
-- 出力: Definition Amendment PR（canonical Definition に実変更がある場合のみ）、case-ready への引き継ぎ
-- 副作用: Definition Amendment PR の作成、影響ある Issue の再評価マーキング
+- 出力: 設計修正PR（canonical Definition に実変更がある場合のみ）、case-ready への引き継ぎ
+- 副作用: 設計修正PRの作成、影響ある Issue の再評価マーキング
 
 ## 内部構成
 

@@ -1,13 +1,13 @@
 ---
 name: agentdev-workflow-case-open
-description: "case-open（内部 lifecycle 段階）の workflow 実装本体。Root Case 確立、Definition Package 生成と関連付け、実変更判定と Definition PR 作成（Case 単位 1 件）、冪等再実行、STEP-5 横断依存検査、deviation capture（Split Rule 分類）を所有する。USE FOR: case-open 実行時の workflow 制御（Root Case 確立・Definition Package 生成・実変更判定と Definition PR 作成・冪等再実行・横断依存検査・deviation capture）。DO NOT USE FOR: 単独起動（case-auto の内部 lifecycle orchestration から起動される内部段階である）、execution contract 確定・Standard / Epic 最終確定・Child Issue / Wave 作成・RU 削除・proposed Decision 受理評価（case-ready 側の責務）。"
+description: "case-open（内部 lifecycle 段階）の workflow 実装本体。Root Case 確立、Definition Package 生成と関連付け、実変更判定と設計PR作成（Case 単位 1 件）、冪等再実行、STEP-5 横断依存検査、deviation capture（Split Rule 分類）を所有する。USE FOR: case-open 実行時の workflow 制御（Root Case 確立・Definition Package 生成・実変更判定と設計PR作成・冪等再実行・横断依存検査・deviation capture）。DO NOT USE FOR: 単独起動（case-auto の内部 lifecycle orchestration から起動される内部段階である）、execution contract 確定・Standard / Epic 最終確定・Child Issue / Wave 作成・RU 削除・proposed Decision 受理評価（case-ready 側の責務）。"
 ---
 
 
 # case-open workflow スキル
 
 case-open command の workflow 実装本体である。
-合意済み要件doc（構造化 `draft-data`）から Root Case 確立、Definition Package 生成と Root Case 関連付け、実変更判定と Definition PR 作成、冪等再実行、deviation captureまでの制御構造を所有する。
+合意済み要件doc（構造化 `draft-data`）から Root Case 確立、Definition Package 生成と Root Case 関連付け、実変更判定と設計PR作成、冪等再実行、deviation captureまでの制御構造を所有する。
 execution contract の確定、Standard / Epic の最終確定、Child Issue / Wave の作成、RU 削除、proposed Decision の受理評価は行わない（case-ready 実行契約 REQ へ移管）。
 
 case-open command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}）。
@@ -20,12 +20,12 @@ case-open command は公開 interface（入出力契約・ガードレール）�
 
 - Root Case GitHub Issue。ラベル付き、対象 REQ 番号埋め込み、状態 open
 - Definition Package（要件doc から生成し Root Case に関連付ける。構成は case-open / case-ready Design。）
-- Definition PR（canonical Definition に実変更がある場合のみ。Case 単位で 1 件。）
+- 設計PR（canonical Definition に実変更がある場合のみ。Case 単位で 1 件。）
 - 完了報告（Root Case テンプレート）
 
 ## 副作用
 
-- Root Case 作成、Definition PR 作成（Custom Tool `agentdev_gh` 経由。VERIFY は Tool 内部）
+- Root Case 作成、設計PR作成（Custom Tool `agentdev_gh` 経由。VERIFY は Tool 内部）
 - deviation capture 保存: 自工程で実観測した deviation を `agentdev-learning-capture` skill または `agentdev-intake-pipeline` へ委譲し、capture 境界 Design の Split Rule に従い `.agentdev/intake/` または `.agentdev/learning/` へ保存する。git 永続化は明示パス指定（並列実行安全ステージング）で行う
 - 当該 Workflow Skill は worktree root 配下以外を編集しない（case-open command の worktree 隔離に従う）
 - 行わない副作用: draft / RU 削除、Decision ファイルの status 変更、execution contract 確定と Standard / Epic 最終確定と Child Issue / Wave 作成
@@ -34,28 +34,28 @@ case-open command は公開 interface（入出力契約・ガードレール）�
 
 case-open workflow は次の6 STEP で構成する。
 各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`<foundations/v4-durable-state-and-recovery>` Design）。
-会話コンテキストに依存せず、永続状態（draft-data、Root Case Issue、Definition PR）から再開点を再構成する。
+会話コンテキストに依存せず、永続状態（draft-data、Root Case Issue、設計PR）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
 | STEP-1 | 引き継ぎ判定 | 要件doc 受領 | 引き継ぎ停止判定完了（継続 / consumer 停止） | [references/handoff.md](references/handoff.md) |
 | STEP-2 | Root Case 確立 | STEP-1 継続確定 + adversarial-review 完了（skip 含む）+ preflight 設定検証の実施と警告報告（GitHub Issue/PR 使用リポジトリ種別。設定理由では停止しない） | Root Case GitHub Issue 作成済み（対象 REQ 番号埋め込み、状態 open） | [references/root-case-and-definition-package.md](references/root-case-and-definition-package.md) |
 | STEP-3 | Definition Package 生成 | Root Case 確立 | Definition Package 生成・Root Case 関連付け済み。REQ 行追加を伴う場合はトレーサビリティポリシー追随確認済み。既存行の意味変更を含む場合は design 対応事前確認（coverage --req 実査・欠落時 artifact_actions 組込み）実施済み | [references/root-case-and-definition-package.md](references/root-case-and-definition-package.md) |
-| STEP-4 | 実変更判定と Definition PR 作成 | Definition Package 確定 | 実変更時: Definition PR 作成済み（Case 単位 1 件。機械工程〔worktree 作成、REQ 行編集、generate_indexes、check_integrity、traceability check、明示パス指定 stage・commit〕は工程別 script `scripts/src/prepare_definition_pr.ts` 1 回の呼び出しで実行）。実変更なし: 作成しない | [references/definition-pr-and-idempotency.md](references/definition-pr-and-idempotency.md) |
-| STEP-5 | 冪等再実行確認 | STEP-4 完了 | 既存 Root Case・既存 Definition PR 再利用済み、重複生成なし、不足分のみ処理済み、横断依存検査実施済み（警告提示記録または検出不能報告） | [references/definition-pr-and-idempotency.md](references/definition-pr-and-idempotency.md) |
+| STEP-4 | 実変更判定と設計PR作成 | Definition Package 確定 | 実変更時: 設計PR作成済み（Case 単位 1 件。機械工程〔worktree 作成、REQ 行編集、generate_indexes、check_integrity、traceability check、明示パス指定 stage・commit〕は工程別 script `scripts/src/prepare_definition_pr.ts` 1 回の呼び出しで実行）。実変更なし: 作成しない | [references/definition-pr-and-idempotency.md](references/definition-pr-and-idempotency.md) |
+| STEP-5 | 冪等再実行確認 | STEP-4 完了 | 既存 Root Case・既存設計PR再利用済み、重複生成なし、不足分のみ処理済み、横断依存検査実施済み（警告提示記録または検出不能報告） | [references/definition-pr-and-idempotency.md](references/definition-pr-and-idempotency.md) |
 | STEP-6 | deviation capture・完了報告 | STEP-5 完了 | deviation 保存（Split Rule 分類）、完了報告出力 | [references/capture-and-completion.md](references/capture-and-completion.md) |
 
 ### STEP 間の依存と分岐
 
 - **基本順序**: STEP-1 → STEP-2 → STEP-3 → STEP-4 → STEP-5 → STEP-6
-- **実変更なし分岐**: STEP-4 で canonical Definition との差分が空と判定した場合、Definition PR を作成せず STEP-5 へ進む。空の PR を作成しない
-- **冪等分岐**: 再実行時、既存 Root Case または既存 Definition PR を検出した場合はそれを再利用し、不足分だけを処理する。2件目の Root Case、2件目の Definition PR を重複生成しない。STEP-5 の冪等検出（既存 Root Case・既存 Definition PR 検出、横断依存検査の未クローズ Case 群取得）で issue_list を使用する場合、search トークンは検索対象を実効的に絞り込める選択性を持つ語（冪等キー語、REQ 番号、topic_slug 等）を用い、同一バッチ兄弟 Case 本文に頻出する相互参照トークン（兄弟 Case の RU 番号等）を単独の絞り込み根拠にしない（`agentdev-issue-management` の issue-operation-safety.md「issue_list の絞り込み規律と上限到達時 contingency」節の search トークン選択性指針参照）
+- **実変更なし分岐**: STEP-4 で canonical Definition との差分が空と判定した場合、設計PRを作成せず STEP-5 へ進む。空の PR を作成しない
+- **冪等分岐**: 再実行時、既存 Root Case または既存設計PRを検出した場合はそれを再利用し、不足分だけを処理する。2件目の Root Case、2件目の設計PRを重複生成しない。STEP-5 の冪等検出（既存 Root Case・既存設計PR検出、横断依存検査の未クローズ Case 群取得）で issue_list を使用する場合、search トークンは検索対象を実効的に絞り込める選択性を持つ語（冪等キー語、REQ 番号、topic_slug 等）を用い、同一バッチ兄弟 Case 本文に頻出する相互参照トークン（兄弟 Case の RU 番号等）を単独の絞り込み根拠にしない（`agentdev-issue-management` の issue-operation-safety.md「issue_list の絞り込み規律と上限到達時 contingency」節の search トークン選択性指針参照）
 - **adversarial-review 挿入**: Root Case 本文候補と Definition Package 構成案確定後、STEP-2 の Root Case 作成（最初の GitHub Issue 作成）の前に挿入する。詳細は [references/adversarial-review-integration.md](references/adversarial-review-integration.md)
 
 ### 再開プロトコル（resume protocol）
 
-- 再開点は永続状態から再構成する: draft-data（`status`、`auto_gate`）、Root Case Issue の存在と状態、Definition PR の存在と状態、capture 成果物
-- 再実行時は冪等キー（case-open / case-ready Design）で既存 Root Case / 既存 Definition PR を検出し、会話コンテキストの記憶に依存せず再利用する
+- 再開点は永続状態から再構成する: draft-data（`status`、`auto_gate`）、Root Case Issue の存在と状態、設計PRの存在と状態、capture 成果物
+- 再実行時は冪等キー（case-open / case-ready Design）で既存 Root Case / 既存設計PRを検出し、会話コンテキストの記憶に依存せず再利用する
 
 ### 終了条件（termination）
 
@@ -88,14 +88,14 @@ case-open は、上流工程（req-define）で確定した対象要件を実行
 
 - **内蔵ツール使用規律**: ファイル検索・内容検索・ディレクトリ列挙は実行基盤の内蔵ツール（ファイル検索、内容検索、読み取り）を使用し、bash 内蔵コマンド（grep、ls 等）を標準手順としない。bash 実行が本来必要な処理（script 呼び出し、git 操作等）は本規律の対象外とする（workflow-skill-model Design「workflow skill 本文における内蔵ツール使用規律」節）
 - **draft-data 入力**: 本スキルは構造化 `draft-data` を入力として読み取る。機能要件、非機能要件、制約、対象外、受け入れ条件は新規に作成せず合意済み入力を反映する。`conflict_resolutions` に記録済みの衝突は再確認しない
-- **Definition Package の非本文化**: Definition Package を独立した Issue 本文物項目として生成しない（Issue Execution Contract REQ「Definition Package を独立した Issue 本文物項目として生成しない」条項。case-open 実行契約 REQ）。Root Case への関連付けと所在は canonical 成果物関係（Definition PR、case-ready の canonical 再取得経路）から相関する
+- **Definition Package の非本文化**: Definition Package を独立した Issue 本文物項目として生成しない（Issue Execution Contract REQ「Definition Package を独立した Issue 本文物項目として生成しない」条項。case-open 実行契約 REQ）。Root Case への関連付けと所在は canonical 成果物関係（設計PR、case-ready の canonical 再取得経路）から相関する
 - **Root Case 状態**: Root Case 確立後の状態は open とし、実装開始を許可しない。ready への遷移は case-ready が実行する
-- **Definition PR**: canonical Definition に実変更がある場合のみ、Case 単位で 1 件の Definition PR を作成する。実変更判定不能時は作成せず停止する。冪等キーは case-open / case-ready Design に従う
-- **トレーサビリティポリシー追随確認**: REQ 行追加を伴う Definition Package 生成時は、トレーサビリティポリシー（検証対応を任意とする要件行の明示登録）更新の追随要否を工程上明示し、必要な policy エントリ追加を Definition Package の構成要素として含める。policy 編集は当該要件行の変更と同一の Definition 変更として扱い、Definition PR 経由以外の適用経路を取らない（対象要件行、STEP-3）
+- **設計PR**: canonical Definition に実変更がある場合のみ、Case 単位で 1 件の設計PRを作成する。実変更判定不能時は作成せず停止する。冪等キーは case-open / case-ready Design に従う
+- **トレーサビリティポリシー追随確認**: REQ 行追加を伴う Definition Package 生成時は、トレーサビリティポリシー（検証対応を任意とする要件行の明示登録）更新の追随要否を工程上明示し、必要な policy エントリ追加を Definition Package の構成要素として含める。policy 編集は当該要件行の変更と同一の Definition 変更として扱い、設計PR経由以外の適用経路を取らない（対象要件行、STEP-3）
 - **design 対応事前確認（STEP-2 / STEP-3）**: Definition Package の生成・転記は、対象要件行のうち既存行の意味変更を含む場合、`agentdev-traceability` の coverage --req による当該行の design 対応有無の事前確認を実施する。design 対応が欠落する意味変更行を検出した場合は、当該行の design 対応を artifact_actions（artifact: design）へ組込んだ上で合意を完了する。事前確認を省略した Case は case-ready の lifecycle gate completeness（fail-closed）で停止し得る（missing-design 0 件ゲートが増分ベース〔新規行のみ〕であることへの予防手順）。正規所有は case-open Design「意味変更行の design 対応事前確認」節、詳細手順は references/root-case-and-definition-package.md
 - **Decision 非遷移**: 新規 Decision は proposed のままとし、accepted への状態遷移を実行しない
 - **横断依存検査の警告非阻止**: STEP-5 の横断依存検査は警告の提示のみを行い、Root Case の確立を自動阻止しない。検出源の取得不能時は比較を省略せず検出不能として報告する。警告時の判断は投入者（HITL）への選択肢提示により行い、case-auto 配下では decision_context による親判断解決へ委譲する
-- **実行識別情報の非記録（Issue 本文）**: Issue 本文には実行識別情報セクションを設けない（agentdev-workflow-templates Design「実行識別情報・検証差分のテンプレートセクション形式」節）。Case・実行単位・前工程確定事項は Definition Package・Definition PR・canonical 成果物関係から相関でき、本文へ一覧化しない。実行識別情報セクションは PR テンプレートのみが持つ
+- **実行識別情報の非記録（Issue 本文）**: Issue 本文には実行識別情報セクションを設けない（agentdev-workflow-templates Design「実行識別情報・検証差分のテンプレートセクション形式」節）。Case・実行単位・前工程確定事項は Definition Package・設計PR・canonical 成果物関係から相関でき、本文へ一覧化しない。実行識別情報セクションは PR テンプレートのみが持つ
 - **Root Case タイトル**: Root Case の起票時のタイトル書式は `<workflows/issue-title-policy>` Design（Issue タイトル記述規則）を参照する（Root Case は Case 接頭辞書式。合意済みの対象・目的から主題を生成する）。本スキルは書式を複製しない
 - **本文 verbatim**: Root Case 本文、PR 本文は Custom Tool `agentdev_gh` の操作引数としてそのまま渡す（文字コード・一時ファイルの実装詳細は Tool 内部）（`POL-gh-io-delegation`）
 
@@ -103,7 +103,7 @@ case-open は、上流工程（req-define）で確定した対象要件を実行
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
 - **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
-- **case-open / case-ready Design**: Definition Package 構成、Definition PR lifecycle、冪等キー
+- **case-open / case-ready Design**: Definition Package 構成、設計PR lifecycle、冪等キー
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
 - **case-open command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

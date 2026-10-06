@@ -245,7 +245,7 @@ verification-only PR は以下を全て満たす PR とする（REQ-010-012）�
 ### verify-only 根拠欄の記入規則
 
 case-run は verify-only PR 作成時に pr_desc.md の verify-only 根拠欄へ、実装差分を含まない理由、根拠成果物または commit、検証対象、検証結果を記入する。
-根拠は姉妹実装 PR だけでなく、実装 PR、先行 commit、main 反映済み commit、既存成果物、検証のみで完結する理由を許容する。
+根拠は姉妹実装PRだけでなく、実装PR、先行 commit、main 反映済み commit、既存成果物、検証のみで完結する理由を許容する。
 「実装内容」欄は空欄にせず、「実装差分なし」と理由を記録する。
 
 ### GitHub の空 PR 許容

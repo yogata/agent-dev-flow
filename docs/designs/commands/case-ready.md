@@ -20,14 +20,14 @@ case-ready の公開契約（入出力、副作用、安全性、承認境界、
 
 ## 公開 interface
 
-- 入力: Root Case（Issue 番号または URL）、関連する req_draft（存在する場合）、Definition PR（存在する場合）
+- 入力: Root Case（Issue 番号または URL）、関連する req_draft（存在する場合）、設計PR（存在する場合）
 - 出力: ready 状態の Root Case、確定済み execution contract、実行構造（Standard は Root Case 単一 execution unit、Epic は Child Issue と Wave / 依存構造）
-- 副作用: Definition PR の merge、REQ / Decision / Design の保存（Capability Skill 委譲）、Decision の accepted 遷移、Child Issue / Wave の作成、draft / RU の削除、Root Case の ready 遷移
+- 副作用: 設計PRの merge、REQ / Decision / Design の保存（Capability Skill 委譲）、Decision の accepted 遷移、Child Issue / Wave の作成、draft / RU の削除、Root Case の ready 遷移
 
 ## 内部構成
 
-- Definition 受入: Definition PR の忠実性確認（req-define 合意内容との投影検査）、整合性検査、品質検査、merge 前の Draft 状態確認（pr_read の isDraft、REQ-061-032）。人間に留保された判断（REQ-096-005）の新規確定が不要で、既存の正規契約から導出できる解消と委譲された裁量の範囲内の判断（作業仮定の明示を含む）である場合は追加承認なしで自動確定・merge。人間に留保された判断（REQ-096-005）を新規に確定する必要がある場合、または既存の安全境界が要求する操作承認を要する場合は停止し HITL とする（REQ-061-003）。人間判断への移送の判定は語の使用（新しい Decision、意味変更、対象範囲の確定、意味的な不整合の解消）だけで行わず、当該判断が REQ-096-005 の留保事項に該当するか否かで行う。判断の難易度、確信度、評価器間の不一致、結果状態、唯一解でないことだけを理由として人間判断へ移送しない（REQ-096-003、REQ-096-004、REQ-096-006）。停止理由は REQ-096-012 の原因分類へ対応させる。proposed Decision の受理評価は REQ-061-021 の導出ベース判定を維持する
-- overlap 突合（REQ-061-039）: Definition PR 受入は、draft の宣言変更ファイル集合（artifact_actions の target 集合）と pr_changed_files 実報告の差分検査（overlap 突合）を含む。スタック構造（PR が兄弟 Case の commit を含む）や宣言・実報告の乖離を検出した場合は警告し、隔離 worktree での差分再構成手順に従って救済する。実効 squash diff が自 Case 分に収まった場合もスタック検出の警告は省略しない（スタック底が最後 merge の場合に空 diff / 同一領域競合となるリスクのため）
+- Definition 受入: 設計PRの忠実性確認（req-define 合意内容との投影検査）、整合性検査、品質検査、merge 前の Draft 状態確認（pr_read の isDraft、REQ-061-032）。人間に留保された判断（REQ-096-005）の新規確定が不要で、既存の正規契約から導出できる解消と委譲された裁量の範囲内の判断（作業仮定の明示を含む）である場合は追加承認なしで自動確定・merge。人間に留保された判断（REQ-096-005）を新規に確定する必要がある場合、または既存の安全境界が要求する操作承認を要する場合は停止し HITL とする（REQ-061-003）。人間判断への移送の判定は語の使用（新しい Decision、意味変更、対象範囲の確定、意味的な不整合の解消）だけで行わず、当該判断が REQ-096-005 の留保事項に該当するか否かで行う。判断の難易度、確信度、評価器間の不一致、結果状態、唯一解でないことだけを理由として人間判断へ移送しない（REQ-096-003、REQ-096-004、REQ-096-006）。停止理由は REQ-096-012 の原因分類へ対応させる。proposed Decision の受理評価は REQ-061-021 の導出ベース判定を維持する
+- overlap 突合（REQ-061-039）: 設計PR受入は、draft の宣言変更ファイル集合（artifact_actions の target 集合）と pr_changed_files 実報告の差分検査（overlap 突合）を含む。スタック構造（PR が兄弟 Case の commit を含む）や宣言・実報告の乖離を検出した場合は警告し、隔離 worktree での差分再構成手順に従って救済する。実効 squash diff が自 Case 分に収まった場合もスタック検出の警告は省略しない（スタック底が最後 merge の場合に空 diff / 同一領域競合となるリスクのため）
 - 保存実体: REQ / Decision / Design の保存は req-file-manager、decision-file-manager、design-file-manager、artifact-validation へ委譲する。case-ready 自身は保存手続きを実装しない。REQ の保存では Design 対応が未成立の要件行が残っても保存を失敗させない（Design 対応の成立判定は ready 遷移ゲートの責務）
 - canonical 再取得: merge 後に canonical Definition を再取得し、traceability check を機械実行する（REQ-061-023）。check は inline declaration と top-level `traceability/` 配下の sidecar を同じ論理的な対応関係へ正規化した対応関係全体を検査対象とする。missing-design を検出した場合は case-open への差し戻し経路を扱う
 - Design 対応ゲート: 対象 Definition の要件行ごとに Design 対応が 1 件以上存在することを ready 遷移の必要条件とする（missing-design 残存時は ready へ遷移させない）。verification policy（`traceability/policy.yaml`）との整合も同一の check で検証し、verification policy の不正を検出した場合は ready へ遷移させない
@@ -39,8 +39,8 @@ case-ready の公開契約（入出力、副作用、安全性、承認境界、
 
 ## 停止条件
 
-- 対象 Definition PR が GitHub Draft PR（isDraft: true）の場合（pr_merge を実行せず blocked で停止。draft 解除の自動実行や正規 Tool 外の操作による復旧は行わない。REQ-061-032）
-- Definition PR の CI / 品質検査失敗（ready 不遷移、既存 PR 保持で再実行可能）
+- 対象設計PRが GitHub Draft PR（isDraft: true）の場合（pr_merge を実行せず blocked で停止。draft 解除の自動実行や正規 Tool 外の操作による復旧は行わない。REQ-061-032）
+- 設計PRの CI / 品質検査失敗（ready 不遷移、既存 PR 保持で再実行可能）
 - 人間に留保された判断（REQ-096-005）の新規確定が必要、または既存の安全境界が要求する操作承認を要する場合（HITL。REQ-061-003）
 - canonical Definition の要件行に Design 対応が 0 件の行が残る場合（missing-design 検出、ready 不遷移、case-open への差し戻し）
 - `traceability/policy.yaml` の不正を check が検出した場合（ready 不遷移。required 行の verification 対応欠落（missing-verification）は case-close の QG-4 最終完全性検査の対象であり、ready 不遷移条件に含めない）
@@ -66,7 +66,7 @@ Decision受理評価でstatusをacceptedへ遷移させる際は、承認記録�
 
 Definition 受入と実行構成確定における受け入れ義務保存の実行時投影。
 
-- Definition PR 受入の忠実性確認は、req-define での最新合意内容との照合を含む。必須受け入れ義務の欠落・縮小・反転を検出した場合は merge しない。
+- 設計PR受入の忠実性確認は、req-define での最新合意内容との照合を含む。必須受け入れ義務の欠落・縮小・反転を検出した場合は merge しない。
 - 実行契約・実行構成の確定時、対象要件行と受け入れ義務が各実行単位（Standard Case では対象 Case、Epic では各 Child 実行単位または Epic 横断最終検証義務）のいずれかに対応付けられていることを確認する。対応先のない義務が存在する場合は投影不完全として実行準備完了（ready 遷移）としない。
 - 完了条件は各条件について検証義務（何を証明するか、どの範囲で成立するか、いかなる反例で不合格か）と検証手段（具体的なテスト・コマンド等）を区別して Issue 本文へ確定する。
 - 実行契約を生成した合意の変更が発生し影響する場合は、当該実行契約への反映と読み戻し確認が成立するまで、旧実行契約に基づく新規 dispatch または最終受け入れを行わない。
@@ -81,7 +81,7 @@ Definition 保存内部責務（case-ready / case-revise）は、draft の artif
 
 ## 機械工程の script 呼び出し契約（RU-0162）
 
-case-ready の機械工程（Definition PR の忠実性・整合性・品質検査の実行、overlap 突合、AUTOGEN 対象 block の再生成差分検出、traceability check、merge 後の canonical 再取得、draft/RU 削除の git rm と明示パス指定 commit）は、工程別 script 1 回の呼び出しに束ねる。GitHub I/O（pr_read、pr_merge、Issue 本文更新）は Custom Tool agentdev_gh の境界を維持する。REQ/Decision/Design の保存実体（Capability Skill 委譲による保存手続き）は本 script の対象外とし、保存責務の委譲構造を変更しない。
+case-ready の機械工程（設計PRの忠実性・整合性・品質検査の実行、overlap 突合、AUTOGEN 対象 block の再生成差分検出、traceability check、merge 後の canonical 再取得、draft/RU 削除の git rm と明示パス指定 commit）は、工程別 script 1 回の呼び出しに束ねる。GitHub I/O（pr_read、pr_merge、Issue 本文更新）は Custom Tool agentdev_gh の境界を維持する。REQ/Decision/Design の保存実体（Capability Skill 委譲による保存手続き）は本 script の対象外とし、保存責務の委譲構造を変更しない。
 
 - 入力 JSON / 報告 JSON / 終了コードの契約、品質ゲートの script 内実行（省略禁止）、inspect_cross_dependencies.ts と同じ作り（共通基盤不作成）、意味判断のモデル担当は、case-open Design「機械工程の script 呼び出し契約（RU-0162）」節と同一の規律に従う
 - 報告 JSON には検査結果、再生成差分、警告、提案する Issue/PR 本文を含め、モデルは報告 JSON の意味レビューと agentdev_gh による I/O 実行のみを担う

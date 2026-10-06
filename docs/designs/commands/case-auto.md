@@ -33,7 +33,7 @@ orchestration 中の警告・確認・選択肢提示に由来する HITL questi
 
 ## 入力
 
-- Issue番号（数値）または Issue URL（Root Case を指定する。Root Case の正規状態、Epic 実行構成、既存成果物（Definition PR、Definition Amendment PR、実装 PR 等）、実行の生存状況から通常経路と例外経路を解決して自走する。再合意済み Definition 変更（canonical Definition に実変更あり）の場合は例外経路として case-revise → case-ready を駆動する。REQ-034-039）
+- Issue番号（数値）または Issue URL（Root Case を指定する。Root Case の正規状態、Epic 実行構成、既存成果物（設計PR、設計修正PR、実装PR等）、実行の生存状況から通常経路と例外経路を解決して自走する。再合意済み Definition 変更（canonical Definition に実変更あり）の場合は例外経路として case-revise → case-ready を駆動する。REQ-034-039）
 - 要件doc（引数なし時は `.agentdev/drafts/req-draft-*.md` 全件処理がデフォルト / 明示パス指定 / セッション指定キーワードによるセッション内要件doc参照（暗黙判断廃止、構造化 `draft-data` 形式: REQ-008, DEC-003））
 
 ## 出力

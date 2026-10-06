@@ -84,7 +84,7 @@ Case Issue の工程記録（記録様式の正は workflows/issue-lifecycle-rec
 
 | テンプレート | 用途 | 対象コマンド | 適用対象 |
 |---|---|---|---|
-| `templates/case-revise/amendment-pr.md` | Definition Amendment PR 本文（実変更がある場合のみ作成） | case-revise | 実変更がある Case |
+| `templates/case-revise/amendment-pr.md` | 設計修正PR本文（実変更がある場合のみ作成） | case-revise | 実変更がある Case |
 | `templates/case-revise/root-case-report.md` | Root Case 完了報告 | case-revise | 全 Case |
 
 ### PR本文テンプレート
@@ -242,7 +242,7 @@ Case Issue 本文テンプレートに、工程記録の「進行状況」「結
 | 全 work_type（Root Case） | `templates/case-open/root-case.md` |
 
 Root Case 本文は work_type によらず同一テンプレートを使用する。
-work_type は Definition Package の属性として記録し、ラベル付与と Definition PR の実変更判定（bugfix 等の実変更なし Case では PR 不作成）に用いる。
+work_type は Definition Package の属性として記録し、ラベル付与と設計PRの実変更判定（bugfix 等の実変更なし Case では PR 不作成）に用いる。
 work_type 判定基準と固有ルールは `agentdev-workflow-lifecycle` を参照する。
 
 本文テンプレートは Issue 本文の構造のみを規定し、Issue タイトルを規定しない。テンプレート例・変数値にタイトル書式を複製せず、起票時のタイトル書式と付与・更新の場面は `<workflows/issue-title-policy>` Design（Issue タイトル記述規則）を参照する。

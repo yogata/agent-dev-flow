@@ -278,7 +278,7 @@ frontmatter形式は`patterns.md`が所有する。
 |---|---|---|---|
 | `draft` | Design 保存（case-ready / case-revise の Capability Skill 委譲）で保存された未確定状態 | 境界違反等の確定Design向け検査対象外 | 新規Design保存時 |
 | `accepted` | 実装との整合確認を通過した現在設計 | 通常の整合性検査対象 | case-closeで確定時 |
-| `accepted`（モデル定義 Design） | v4 モデル定義を所有する Design は、当該モデル定義の合意確定（Definition PR merge・Decision 受理評価・検査合格）をもって accepted へ遷移する。実装との整合は各担当段階の準拠更新で維持する | 通常の整合性検査対象 | case-close（v4 モデル定義 Design はモデル合意確定時） |
+| `accepted`（モデル定義 Design） | v4 モデル定義を所有する Design は、当該モデル定義の合意確定（設計PR merge・Decision 受理評価・検査合格）をもって accepted へ遷移する。実装との整合は各担当段階の準拠更新で維持する | 通常の整合性検査対象 | case-close（v4 モデル定義 Design はモデル合意確定時） |
 
 - 新規Designは `draft` として作成され、確定時に `accepted` へ遷移する。`accepted` の付与は case-close の責務である
 - statusがない既存Designは後方互換のため`accepted`相当として扱う

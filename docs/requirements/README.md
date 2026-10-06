@@ -60,7 +60,7 @@
 | [REQ-061](REQ-061.md) | case-ready 実行契約 |
 | [REQ-062](REQ-062.md) | case-revise 実行契約 |
 | [REQ-082](REQ-082.md) | 対論型レビュー審議契約 |
-| [REQ-083](REQ-083.md) | Definition PR の状態契約（通常 Pull Request・ブランチ命名・用語・正規操作完結） |
+| [REQ-083](REQ-083.md) | 設計PRの状態契約（通常 Pull Request・ブランチ命名・用語・正規操作完結） |
 | [REQ-088](REQ-088.md) | ADF v4 基盤要件（三層責務・情報寿命・Project Contract・中核文書モデル） |
 | [REQ-090](REQ-090.md) | Jev 先行評価の実運用組込み（Stage 1: 観測可能化） |
 | [REQ-091](REQ-091.md) | Supervisor 環境向け credential 供給ブリッジの原本管理 |

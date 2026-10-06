@@ -7,6 +7,10 @@ implementation:
     - REQ-094-012
   .agentdev/config/plugins/agentdev-textlint-guard-prh.yml:
     - REQ-094-009
+    # Issue #3500（正式名称統一）: prh 機械辞書への固定置換登録
+    # （Definition PR→設計PR、Definition Amendment PR→設計修正PR、実装 PR→実装PR）の
+    # 実装対応。登録語の正規根拠は REQ-083-003（現行名称）と用語政策節の語彙管理。
+    - REQ-083-003
 verification:
   # Issue #3218（docs/requirements バッチ横断是正）で REQ-094-001〜005 を追加。
   # textlint 共通基盤は REQ-094-001 の表層品質側面の恒常検査と、REQ-094-003/004 の
