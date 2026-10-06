@@ -174,7 +174,7 @@ describe("反映後成果物の読み戻し確認と旧契約抑止（handoff-an
     expect(content).toContain("更新の投入と読み戻し確認を同一の操作として扱わず、読み戻しの結果で反映を判定する");
   });
 
-  it("Amendment PR 受入後の canonical Definition を読み戻す", () => {
+  it("Definition Amendment PR 受入後の canonical Definition を読み戻す", () => {
     expect(content).toContain("受入後の canonical Definition（merge 済み main の REQ / Decision / Design）を読み戻し、再合意内容が正本文書へ反映されていることを確認する");
   });
 

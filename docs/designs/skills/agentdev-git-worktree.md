@@ -24,7 +24,7 @@ Issue 番号に基づいて安全かつ一貫性のある方法で git worktree 
 
 ## 提供する判断、操作
 
-- 命名規則（worktree: `.worktrees/{N}-{type}`、branch: `{type}/issue-{N}`）。type 定義域は実装側 SKILL.md「`{type}` の定義」テーブルを正とし、設計側 worktree・ブランチの type として `definition`（case-open の設計PR 用）と `definition-amend`（case-revise の Amendment PR 用）を含める。作成元は origin/main（既存と同一）。設計系ブランチのリモート削除は行わず、GitHub の deleteBranchOnMerge 自動削除に委譲する既存規定を維持する
+- 命名規則（worktree: `.worktrees/{N}-{type}`、branch: `{type}/issue-{N}`）。type 定義域は実装側 SKILL.md「`{type}` の定義」テーブルを正とし、設計側 worktree・ブランチの type として `definition`（case-open の設計PR 用）と `definition-amend`（case-revise の Definition Amendment PR 用）を含める。作成元は origin/main（既存と同一）。設計系ブランチのリモート削除は行わず、GitHub の deleteBranchOnMerge 自動削除に委譲する既存規定を維持する
 - origin/main 鮮度確認（並列 Wave 実行時、PR merge 後再開時に worktree 作成前に `git fetch origin` を実行）
 - worktree 操作手順（作成、切り替え、削除、リトライ）
 - 並列実行安全ステージングプロシージャ（明示パス `git add <path>` + `git commit -- <paths>` の --only pathspec 形式、v2:REQ-0137-002/005）
