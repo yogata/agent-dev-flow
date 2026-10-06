@@ -1,17 +1,17 @@
-# STEP-4 / STEP-5: 実変更判定・Definition PR 作成と冪等再実行（definition-pr-and-idempotency）
+# STEP-4 / STEP-5: 実変更判定・設計PR作成と冪等再実行（definition-pr-and-idempotency）
 
 > 本 reference は `agentdev-workflow-case-open` SKILL.md の制御平面（STEP 一覧）STEP-4、STEP-5 詳細である。
 > SKILL.md は control plane として STEP 遷移を管理し、本 reference は両 STEP の実行詳細を提供する。
 
 ## Purpose
 
-canonical Definition との実変更を判定し、実変更がある場合のみ Definition PR を作成する。
-再実行時は既存 Root Case と既存 Definition PR を再利用し、不足分だけを処理して重複生成しない。
+canonical Definition との実変更を判定し、実変更がある場合のみ設計PRを作成する。
+再実行時は既存 Root Case と既存設計PRを再利用し、不足分だけを処理して重複生成しない。
 
 ## Input Resolution
 
 1. SSoT 再構成: Definition Package（STEP-3 生成）、canonical Definition（merge 済み main の docs 永続文書（REQ / Decision / Design）と Issue / Epic 構造の確定状態）
-2. identifier 保持: 対象 REQ 番号、Root Case Issue 番号、既存 Definition PR 番号
+2. identifier 保持: 対象 REQ 番号、Root Case Issue 番号、既存設計PR番号
 3. 最小 scalar: 実変更判定結果
 4. runtime artifact: canonical Definition との差分
 
@@ -22,7 +22,7 @@ canonical Definition との実変更を判定し、実変更がある場合の�
 
 ## Procedure
 
-### STEP-4: 実変更判定と Definition PR 作成
+### STEP-4: 実変更判定と設計PR作成
 
 #### 機械工程の script 呼び出し（prepare_definition_pr）
 
@@ -38,28 +38,28 @@ STEP-4 の機械工程（専用 worktree 作成、Definition branch 作成、REQ
 1. head branch push（前段）: `git push -u origin definition/issue-{N}` を実行し、push 出力で remote branch 名と upstream 設定が意図した先であることを確認する。pr_create は remote に存在する branch を head とするため、push を pr_create より手前に位置させる
 2. 並行 case-open 実行時は、PR 作成前に正規所有である case-open Design「並行 case-open の作業隔離規律」節の隔離検査（merge-base 起点 `git diff --stat "$MB" HEAD` による自 Case 差分検査、`git log --oneline "$MB"..HEAD` によるスタック構造判定、明示パス指定ステージ、1-writer 侵害検知時の早期断念）を実行する。origin/main 直指定の diff は merge-base 起点検査の代替にしない
 3. PR 作成は `agentdev_gh` の pr_create で行い、GitHub Draft PR ではない通常 Pull Request として作成する（draft 指定は公開契約に存在しない）。PR 本文は script の提案本文を意味レビューした上で verbatim で記録する。実変更判定: Definition Package と canonical Definition の比較で差分が空の場合は実変更なし → PR を作成せず STEP-5 へ進む。実変更のない Case（bugfix / maintenance / docs_chore 等）では作成しない
-4. REQ 行変更（新規行の追加・移管・廃止等）を伴う Definition PR では、PR 作成前に Design の ADF-COVERS 宣言の追随反映を確認し、トレーサビリティ check で当該 REQ 行の missing-design が 0 件であることを確認する（missing-design 0 件ゲート。coverage `--req` による実測帰着確認を併用する。coverage は advisory・fail-open であり、check の判定を代替しない）。**宣言形式は design 役割タグ付きの ADF-COVERS 宣言を標準とする**。missing-design が残る場合は既存 sidecar の `design` セクションへの追加を標準の宣言先とする。宣言追随が Definition に含まれておらず missing-design が 0 件でない場合は PR を作成せず、Definition Package の構成へ戻して宣言追随を確定する
+4. REQ 行変更（新規行の追加・移管・廃止等）を伴う設計PRでは、PR 作成前に Design の ADF-COVERS 宣言の追随反映を確認し、トレーサビリティ check で当該 REQ 行の missing-design が 0 件であることを確認する（missing-design 0 件ゲート。coverage `--req` による実測帰着確認を併用する。coverage は advisory・fail-open であり、check の判定を代替しない）。**宣言形式は design 役割タグ付きの ADF-COVERS 宣言を標準とする**。missing-design が残る場合は既存 sidecar の `design` セクションへの追加を標準の宣言先とする。宣言追随が Definition に含まれておらず missing-design が 0 件でない場合は PR を作成せず、Definition Package の構成へ戻して宣言追随を確定する
 
 ### 投影不備判明時の正規訂正経路差し戻し（Definition 確定後）
 
 正規所有は case-open Design「受け入れ義務保存の投影」節であり、本節は STEP-4 / STEP-5 の実行手順を提供する。Definition 確定後に投影不備（合意済み入力の必須受け入れ義務の欠落・縮小・反転、対応先のない義務の残存）が判明した場合に適用する。STEP-3 の受け入れ義務の忠実性照合（root-case-and-definition-package.md）を通過した Definition が対象になる。
 
 1. **非公式補完の禁止**: 判明した投影不備を消費済み入力で実行契約へ非公式に補完しない。実行手順・PR 本文・コメント等での義務の再定義、暗黙の補完、補いの記載を行わない
-2. **不備内容の記録**: 投影不備の内容（対象の義務、差異種別〔欠落・縮小・反転・対応先なし〕、判明した箇所と影響範囲）を検証記録（実行記録）と Definition PR に記録する
+2. **不備内容の記録**: 投影不備の内容（対象の義務、差異種別〔欠落・縮小・反転・対応先なし〕、判明した箇所と影響範囲）を検証記録（実行記録）と設計PRに記録する
 3. **正規の訂正経路への差し戻し**: 修復を正規の訂正経路（req-define 再合意を経る case-revise 等）へ差し戻す。case-open 側では Definition の確定済み内容を変更せず、差し戻し先と理由を検証記録へ残す
 
 ### STEP-5: 冪等再実行確認
 
-1. 冪等キー（case-open / case-ready Design）で既存成果物を検出する: 既存 Root Case、既存 Definition PR
-2. 検出した成果物を再利用し、重複生成しない。Root Case の重複は STEP-2 で、Definition PR の重複は STEP-4 で排除する
-3. 不足分だけを処理する: Root Case が存在し Definition PR が存在しない場合は STEP-4 の手順で PR のみ作成する。Root Case が存在しない場合は STEP-2 から実行する。両者とも存在する場合は新規生成を行わない
+1. 冪等キー（case-open / case-ready Design）で既存成果物を検出する: 既存 Root Case、既存設計PR
+2. 検出した成果物を再利用し、重複生成しない。Root Case の重複は STEP-2 で、設計PRの重複は STEP-4 で排除する
+3. 不足分だけを処理する: Root Case が存在し設計PRが存在しない場合は STEP-4 の手順で PR のみ作成する。Root Case が存在しない場合は STEP-2 から実行する。両者とも存在する場合は新規生成を行わない
 4. 再利用判定はファイル単位の存在確認で近似しない。同一ファイル内に複数の instruction・複数の Issue 節が混在する成果物（Root Case 本文、Definition Package 等）は、委譲 prompt の instruction 単位、Issue 本文の節単位（【必須】セクション等）で完了度を照合し、未完了の instruction・節のみを処理対象として検出する（ファイル単位の近似照合で部分完了を見逃さない）
 5. 重複生成がないことを確認し、結果を記録する
 6. 横断依存検査（後述）を実行し、警告の提示記録または検出不能報告を完了報告へ含める
 
 ### GitHub I/O 失敗時の gh CLI 切替継続手順（冪等検出）
 
-冪等検出（既存 Root Case、既存 Definition PR の検出）は `agentdev_gh` の読み取り操作（issue_list、issue_read、pr_read 等）に依存する。`agentdev_gh` の読み取り操作が失敗（Tool 異常、API エラー）し、冪等検出が完了できない場合、検出自体を放棄せず次の手順で継続する。
+冪等検出（既存 Root Case、既存設計PRの検出）は `agentdev_gh` の読み取り操作（issue_list、issue_read、pr_read 等）に依存する。`agentdev_gh` の読み取り操作が失敗（Tool 異常、API エラー）し、冪等検出が完了できない場合、検出自体を放棄せず次の手順で継続する。
 
 1. **切替判定**: 読み取り操作の失敗を検知した場合、同一操作を1回再試行する。再試行でも失敗する場合に gh CLI へ切替する（単発の timeout・一時的 API エラーで即切替しない）
 2. **切替範囲の限定**: gh CLI による切替は**読み取り専用の検出**（`gh issue list`、`gh issue view`、`gh pr list`、`gh pr view` 等）に限定する。書込み操作（作成、更新、クローズ、merge）を gh CLI で代替しない（GitHub I/O の正規経路は Custom Tool `agentdev_gh` に限定する契約を維持する）
@@ -86,7 +86,7 @@ STEP-4 の機械工程（専用 worktree 作成、Definition branch 作成、REQ
 ## Result
 
 - 実変更判定結果（実変更あり / なし）
-- Definition PR 作成結果（実変更時のみ。Case 単位 1 件）
+- 設計PR作成結果（実変更時のみ。Case 単位 1 件）
 - head branch push 結果（実変更時のみ。push 済み HEAD hash と remote branch 名、refspec 確認済み）
 - 並行 case-open 実行時の PR 作成前隔離検査結果（自 Case 差分のみの確認、スタック検出時は差分再構成救済の実施）
 - 冪等確認結果（既存成果物の再利用、重複生成なし、不足分のみ処理）
@@ -104,12 +104,12 @@ STEP-4 の機械工程（専用 worktree 作成、Definition branch 作成、REQ
 
 ## Completion Verification
 
-- 実変更がない Case について Definition PR が存在しないこと
-- 実変更がある Case について Definition PR が 1 件であること
+- 実変更がない Case について設計PRが存在しないこと
+- 実変更がある Case について設計PRが 1 件であること
 - 実変更がある Case について、pr_create の前段で head branch push が実行され、push 先 refspec の確認が記録されていること
 - REQ 行変更を伴う Case について、PR 作成前の missing-design 0 件ゲート確認が行われていること
 - 並行 case-open 実行時に、PR 作成前隔離検査（自 Case 差分のみ・明示パスステージ・1-writer 侵害検知時の早期断念）が実行されていること
-- 再実行時に Root Case と Definition PR の件数が増加しないこと
+- 再実行時に Root Case と設計PRの件数が増加しないこと
 - 再利用判定が instruction 単位・Issue 節単位の完了度照合に基づいていること（ファイル単位の近似照合で部分完了を完了扱いにしていないこと）
 - 横断依存検査が実行され、警告検出時は提示記録が、検出源取得不能時は検出不能報告が残っていること
 - Definition 確定後に投影不備が判明した場合、消費済み入力での非公式補完が行われておらず、不備内容の記録と正規の訂正経路（req-define 再合意を経る case-revise 等）への差し戻しが完了していること（未判明時は適用なし）

@@ -147,7 +147,7 @@ describe("証拠の追跡可能性保持（impact-reassessment.md）", () => {
 
   it("追跡は既存のコミット・契約変更記録・成果物への参照で行う", () => {
     expect(content).toContain("対象成果物の状態はコミット（commit hash、ブランチ、対象成果物のリビジョン）で");
-    expect(content).toContain("契約条件は契約変更記録（Definition Amendment PR、判断変更の記録コメント、Case 関連 Issue 本文の更新履歴）で");
+    expect(content).toContain("契約条件は契約変更記録（設計修正PR、判断変更の記録コメント、Case 関連 Issue 本文の更新履歴）で");
     expect(content).toContain("証拠自体は成果物への参照（検証記録・テスト・ログのパスと取得時の対象状態）で追跡可能にする");
   });
 

@@ -1,12 +1,12 @@
 ---
-name: Definition Amendment PR Description (case-revise)
-about: case-revise が作成する Definition Amendment PR 本文テンプレート
+name: 設計修正PR Description (case-revise)
+about: case-revise が作成する設計修正PR本文テンプレート
 ---
 
 ## 概要
 <!-- 【必須】 -->
 
-req-define で再合意済みの Definition 変更を Case #{N} へ反映する Definition Amendment PR。
+req-define で再合意済みの Definition 変更を Case #{N} へ反映する設計修正PR。
 
 ## 実行識別情報
 <!-- 【必須】 -->

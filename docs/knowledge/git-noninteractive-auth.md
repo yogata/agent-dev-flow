@@ -64,7 +64,7 @@ public リポジトリへの ls-remote は無効 credential でも匿名読取�
 - git-worktree Design（`docs/designs/skills/agentdev-git-worktree.md`）「Git 操作の認証失敗検出と実行環境側認証規律との接続」節。認証規律の正規所有者が実行環境側であることを規定する。
 - Issue #3414（Wave-1: Git 非対話認証規律を実行環境側へ配置し失敗検出を接続する）。
 - 当環境の実測（2026-10-04）: `git config --show-origin --get-all credential.helper` による helper 設定確認、`gh auth status` による認証状態確認（keyring、https）、実 workflow の push 完了実績。
-- Case #3391・Definition PR #3392（2026-10-05 追記）: push が GCM 起動後 3 回 timeout 失敗 → credential.helper コマンド単位上書きで push 成功・refspec 確認。
+- Case #3391・設計PR #3392（2026-10-05 追記）: push が GCM 起動後 3 回 timeout 失敗 → credential.helper コマンド単位上書きで push 成功・refspec 確認。
 - PR #3418（Issue #3414・DEL-3414-1）（2026-10-05 追記）: ls-remote の匿名読取成功により認証検証にならない事象の観測（認証必須操作での模擬の必要性）。
 
 ## 関連知識

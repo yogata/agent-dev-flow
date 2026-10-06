@@ -8,7 +8,7 @@ case-ready 完了
 完了段階: case-auto 内部 lifecycle case-ready
 対象: Root Case Issue #{N}（{日本語名称}）
 結果:
- - Definition PR: {merge 済み: #{pr_N}（追加承認なしで自動確定） / 不存在（実変更なし）}
+ - 設計PR: {merge 済み: #{pr_N}（追加承認なしで自動確定） / 不存在（実変更なし）}
  - canonical Definition を再取得し以降の処理基準に反映
  - Decision 受理評価: {accepted 遷移: DEC-{N}, ... / 評価対象なし}
  - execution contract を Root Case 本文へ確定

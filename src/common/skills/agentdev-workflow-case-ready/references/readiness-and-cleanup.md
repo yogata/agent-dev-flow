@@ -62,7 +62,7 @@ Definition 変更が docs 文言を期待するテスト（リポジトリ固有
 
 再実行時は不足分だけを処理する:
 
-- merge 済み Definition（Definition PR）を再利用し、merge を巻き戻さない
+- merge 済み Definition（設計PR）を再利用し、merge を巻き戻さない
 - 既存 Child Issue を再利用し、重複生成しない
 - 既存 Wave / 依存構造を再利用し、重複確定しない
 - Decision の受理記録（accepted 遷移済み）を再利用し、重複する状態遷移や承認記録を生成しない
@@ -71,7 +71,7 @@ Definition 変更が docs 文言を期待するテスト（リポジトリ固有
 
 ### GitHub I/O 失敗時の gh CLI 切替継続手順（冪等再実行の再利用検出）
 
-冪等再実行の再利用判定（merge 済み Definition PR、既存 Child Issue 等の検出）は `agentdev_gh` の読み取り操作に依存する。`agentdev_gh` の読み取り操作が失敗し、再利用検出が完了できない場合、次の手順で継続する。
+冪等再実行の再利用判定（merge 済み設計PR、既存 Child Issue 等の検出）は `agentdev_gh` の読み取り操作に依存する。`agentdev_gh` の読み取り操作が失敗し、再利用検出が完了できない場合、次の手順で継続する。
 
 1. **切替判定**: 読み取り操作の失敗を検知した場合、同一操作を1回再試行する。再試行でも失敗する場合に gh CLI へ切替する
 2. **切替範囲の限定**: gh CLI による切替は**読み取り専用の検出**に限定する。merge、Issue 更新、draft / RU 削除の git 永続化等の書込み操作を gh CLI で代替しない（GitHub I/O の正規経路は Custom Tool `agentdev_gh` に限定する契約を維持する）
@@ -81,6 +81,6 @@ Definition 変更が docs 文言を期待するテスト（リポジトリ固有
 
 ## 完了報告
 
-- case-ready 完了報告テンプレートに従い、結果（ready 遷移、execution contract 確定、実行構造、Definition PR merge の有無、横断依存検査結果（警告の提示記録または検出不能報告）、capture 結果）を報告する
+- case-ready 完了報告テンプレートに従い、結果（ready 遷移、execution contract 確定、実行構造、設計PR merge の有無、横断依存検査結果（警告の提示記録または検出不能報告）、capture 結果）を報告する
 - Capture結果: 自工程で実観測した deviation を capture 委譲した場合、保存した成果物のパス・分類・保存結果を含める
 - 停止時は停止理由の分類（HITL 判断事項、CI 失敗、構成不備、受理不能 Decision、missing-design / policy 不正残存、同期不一致、infra-transient（ツール基盤故障））と再開条件を報告する。infra-transient と分類した場合は、Case 失敗と区別して報告し、停止報告に回復経路（supervisor 等による harness 再起動による回復の見込みと durable state からの冪等再開）を含める。判定条件の正規所有は case-auto Design「停止理由分類」節である

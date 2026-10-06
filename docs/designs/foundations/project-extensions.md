@@ -242,7 +242,7 @@ extension 機構自体は追加・拡張・非上書き原則を維持して残�
 
 docs/** の変更文章と ADF が GitHub へ書き込む文章（Issue/PR のタイトル・本文、説明・レビュー・完了コメント）に対する yomiyasu 推敲の工程適用を、workflow extension への rules/checks/acceptance_gates 追記で表現する（REQ-098）。本節は REQ-098 の工程適用設計を所有する。機械検査である textlint 書込み前 guard（REQ-053）とは別系統の LLM 工程であり、guard を回避・解除しない。
 
-- 適用配置: case-open は Definition 文章の編集前読込と提出前の推敲・lint を担う。case-ready は Definition PR のマージ前に適用を確認し、不足時はマージせず対象文章の修正へ差し戻す。case-run は実装に伴う docs 変更へ適用し、case-close は実装 PR のマージ前に適用を確認して不足時は case-run へ差し戻す。case-revise を含む Definition 変更の例外経路も同じく定義する（REQ-098-002）。GitHub 書込みを持つ Workflow と実委譲先は、暗黙の伝播を仮定せず呼出経路ごとに適用定義を置く（REQ-098-005）
+- 適用配置: case-open は Definition 文章の編集前読込と提出前の推敲・lint を担う。case-ready は設計PRのマージ前に適用を確認し、不足時はマージせず対象文章の修正へ差し戻す。case-run は実装に伴う docs 変更へ適用し、case-close は実装PRのマージ前に適用を確認して不足時は case-run へ差し戻す。case-revise を含む Definition 変更の例外経路も同じく定義する（REQ-098-002）。GitHub 書込みを持つ Workflow と実委譲先は、暗黙の伝播を仮定せず呼出経路ごとに適用定義を置く（REQ-098-005）
 - extension 表現: 対象 workflow extension yaml の既存セクション（rules/checks/acceptance_gates）へ id、when、skill で追記する。schema 外フィールド（action、required、fail_on 等）を作らない。委譲先は project-local skill 委譲の既存契約に従い skill: yomiyasu を直接指定する。委譲先実在検査が .opencode/skills/yomiyasu を解決できることを deterministic checker で確認し、ラッパー Skill を追加しない
 - lint 実行: 同梱 lint スクリプト（.opencode/skills/yomiyasu/scripts/yomiyasu_lint.py）へ本文を標準入力で渡し、検査専用の本文ファイルを新規保存しない。Python 呼出コマンドは環境で実際に利用可能なもの（python または python3）を実行時に確認して使用し、python3 へ固定しない
 - 適用済みの判定: 編集前読込、内容変更が揃った後の推敲、lint 実行、指摘確認までを適用済みとし、修正不要という確認を含める。lint の通常の終了コード 0 を指摘なし・推敲済みの証明として扱わず、警告ゼロ・スコア閾値・--strict を合否条件にしない。文脈上正当な用語への指摘は理由を記録して保持し、修正試行は最大 2 回とする（適用の有無を判定できることの要求は REQ-098-008）

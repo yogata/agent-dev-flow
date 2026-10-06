@@ -50,8 +50,8 @@ workflow_route（direct_case 等）は work_type 固定分類ではなく、Defi
 
 | Definition 構成（artifact_actions の有無等） | 導出結果ラベル（workflow_route） | 実行経路（内部 lifecycle 段階） | 典型的な work_type / scale |
 |---|---|---|---|
-| REQ 保存なし・Definition PR なし（Issue 本文で要件管理） | direct_case | req-define → case-open → case-run → case-close | bugfix、maintenance、docs_chore 等 |
-| REQ 保存あり・Definition PR あり・Epic 構成なし | req_backed_case | req-define → case-open → case-ready → case-run → case-close | feature standard 等・Epic 構成なしの REQ 保存構成 |
+| REQ 保存なし・設計PRなし（Issue 本文で要件管理） | direct_case | req-define → case-open → case-run → case-close | bugfix、maintenance、docs_chore 等 |
+| REQ 保存あり・設計PRあり・Epic 構成なし | req_backed_case | req-define → case-open → case-ready → case-run → case-close | feature standard 等・Epic 構成なしの REQ 保存構成 |
 | REQ 保存あり・Epic 構成あり | epic_case | req-define → case-open → case-ready → case-run → case-close（OU/ 子Issue 構成） | feature large・大規模 bugfix・maintenance 等 |
 
 req-define は公開コマンド（`/agentdev/req-define`）である。case-* は内部 lifecycle 段階であり、起動入口は標準実行コマンド `/agentdev/case-auto` である。
