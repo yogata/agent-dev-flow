@@ -8,7 +8,7 @@ updated: "2026-10-06"
 <!-- ADF-COVERS(implementation): REQ-100-004 -->
 <!-- ADF-COVERS(implementation): REQ-034-001, REQ-034-002, REQ-034-003, REQ-034-004, REQ-034-005, REQ-034-006, REQ-034-007, REQ-034-010, REQ-034-011, REQ-034-012, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-017, REQ-034-018, REQ-034-019, REQ-034-020, REQ-034-021, REQ-034-022, REQ-034-023, REQ-034-024, REQ-034-025, REQ-034-026, REQ-034-027, REQ-034-028, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-033, REQ-034-034, REQ-034-035, REQ-034-036, REQ-034-037, REQ-034-038, REQ-034-039, REQ-034-040, REQ-034-041, REQ-034-042, REQ-034-043, REQ-034-044, REQ-034-045, REQ-035-016, REQ-035-017 -->
 <!-- ADF-COVERS(design): REQ-034-002, REQ-034-003, REQ-034-004, REQ-034-005, REQ-034-006, REQ-034-007, REQ-034-010, REQ-034-011, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-017, REQ-034-018, REQ-034-020, REQ-034-021, REQ-034-023, REQ-034-024, REQ-034-026, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-033, REQ-034-034, REQ-034-035, REQ-034-036, REQ-034-037, REQ-034-038 -->
-<!-- ADF-COVERS(design): REQ-034-012, REQ-034-022, REQ-034-025, REQ-034-027, REQ-034-028, REQ-034-040, REQ-034-041, REQ-034-042, REQ-034-043, REQ-034-044, REQ-034-045, REQ-035-016, REQ-035-017 -->
+<!-- ADF-COVERS(design): REQ-034-012, REQ-034-022, REQ-034-025, REQ-034-027, REQ-034-028, REQ-034-040, REQ-034-041, REQ-034-042, REQ-034-043, REQ-034-044, REQ-034-045, REQ-034-046, REQ-035-016, REQ-035-017 -->
 <!-- ADF-COVERS(design): REQ-031-029, REQ-031-030 -->
 <!-- ADF-COVERS(verification): REQ-034-037, REQ-034-038 -->
 <!-- ADF-COVERS(implementation): REQ-003-017, REQ-003-018, REQ-006-108, REQ-034-002, REQ-034-003, REQ-034-007, REQ-034-010, REQ-034-011, REQ-034-012, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-018, REQ-034-019, REQ-034-020, REQ-034-021, REQ-034-022, REQ-034-023, REQ-034-024, REQ-034-025, REQ-034-026, REQ-034-027, REQ-034-028, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-034, REQ-034-035, REQ-034-036 -->
@@ -137,7 +137,7 @@ context 管理:
 
 - 工程別委譲契約遵守: inputs に指定された情報のみを渡し、output_contract に指定された結果のみを受領
 - 親コンテキスト非累積: 各委譲の完了結果（Issue/PR番号、pass/warn/fail）のみを親コンテキストに保持
-- クリーンアップ検証ゲート（Standard / Epic Issue flow 双方）: stage 2 の対象群収束後・stage 3 開始前に評価する。stage 2 を正常完了した対象についてドラフトファイル、RU ファイルの残存がないこと。stage 2 が blocked / failed / 中断等で正常完了していない対象について、既存 lifecycle 契約に従って保持された draft / RU は cleanup 違反としない（REQ-034-020、REQ-034-025）
+- クリーンアップ検証ゲート（Standard / Epic Issue flow 双方）: stage 2 の対象群収束後・stage 3 開始前に評価する。stage 2 を正常完了した対象についてドラフトファイル、RU ファイルの残存がないこと。さらに設計側 worktree（`.worktrees/{N}-definition`）とローカル設計系ブランチ（`definition/issue-{N}`）の残存が 0 件であることを検証し、残存検出時は fail-closed で停止して残存対象と削除再実行の対応を報告する。stage 2 が blocked / failed / 中断等で正常完了していない対象について、既存 lifecycle 契約に従って保持された draft / RU は cleanup 違反としない（REQ-034-020、REQ-034-025）。設計側残存の検証契約は REQ-034-046 に従う
 - 出力制約: 成果物本文 verbatim、調査過程等は圧縮
 - タイミング情報: 開始時刻、終了時刻、所要時間を人間が読みやすい形式で報告（REQ-034-023/083）
 - 結果状態の4次元集約（REQ-034-031）: 後述「結果状態の4次元集約（REQ-034-031）」セクションの4状態次元と集約規則に従い、warn を pass へ変換しない

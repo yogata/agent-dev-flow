@@ -11,7 +11,7 @@ updated: "2026-10-06"
 <!-- ADF-COVERS(implementation): REQ-035-006, REQ-035-008 -->
 <!-- ADF-COVERS(implementation): REQ-049-005 -->
 <!-- ADF-COVERS(implementation): REQ-083-002 -->
-<!-- ADF-COVERS(design): REQ-030-014, REQ-030-017, REQ-030-018 -->
+<!-- ADF-COVERS(design): REQ-030-014, REQ-030-017, REQ-030-018, REQ-030-022 -->
 <!-- ADF-COVERS(design): REQ-030-019, REQ-030-020, REQ-030-021 -->
 <!-- ADF-COVERS(design): REQ-083-002, REQ-083-003 -->
 
@@ -100,7 +100,7 @@ case-open STEP-4（実変更判定と Definition PR 作成）の機械工程（�
 
 並行して case-open を実行する場合の作業隔離規律を Definition branch 作成・PR 作成の運用手順へ定める:
 
-- **Case 専用 worktree の前置**: 並行 case-open を実行する場合、各 Case は専用 worktree（`.worktrees/{N}-definition`）で作業する。共有 working tree での Definition 変更作業を行わない。
+- **Case 専用 worktree の前置**: 並行 case-open を実行する場合、各 Case は専用 worktree（`.worktrees/{N}-definition`）で作業する。作成手順は agentdev-git-worktree 標準手順（type=definition）に従い、本 Design は作成手順を複製しない。作業隔離要件（作成元 origin/main HEAD・スタック構造禁止・1-writer 侵害検知・merge-base 起点差分検査）の所有は本 Design が維持する。共有 working tree での Definition 変更作業を行わない。
 - **Definition branch の origin/main HEAD からの独立作成**: Definition branch は origin/main HEAD から独立して作成し、兄弟 Case の Definition commit を含むスタック構造を作らない。branch 命名（REQ-083）は既存規定のまま、本規律は branch 作成元と作業隔離を定める。
 - **PR 作成前の自 Case 差分検査**: PR 作成前に merge-base と diff --stat により差分が自 Case 分のみであることを検査する。兄弟 Case の commit を含むスタック構造を検出した場合は、隔離 worktree での差分再構成（origin/main HEAD からの branch 再作成と明示パスによる変更の再適用）で救済してから PR を作成する。
 - **明示パス指定ステージ**: ステージは明示パス指定で行い、スイープ操作（`git add -A` 等）は行わない。

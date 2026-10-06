@@ -9,7 +9,7 @@ updated: "2026-10-06"
 <!-- ADF-COVERS(design): REQ-004-061 -->
 <!-- ADF-COVERS(design): REQ-061-003 -->
 <!-- ADF-COVERS(design): REQ-061-010, REQ-061-019, REQ-061-021, REQ-061-038, REQ-061-023, REQ-061-029, REQ-061-030, REQ-061-033, REQ-061-034, REQ-061-035, REQ-061-039, REQ-061-040, REQ-035-012, REQ-035-018 -->
-<!-- ADF-COVERS(design): REQ-061-041, REQ-061-042, REQ-017-021, REQ-017-022, REQ-017-023 -->
+<!-- ADF-COVERS(design): REQ-061-041, REQ-061-042, REQ-017-021, REQ-017-022, REQ-017-023, REQ-061-043, REQ-030-023 -->
 
 # case-ready Command Design
 
@@ -35,7 +35,7 @@ case-ready の公開契約（入出力、副作用、安全性、承認境界、
 - 実行契約の確定: canonical Definition の確定後に、対象範囲（対象要件、主な変更対象、対象外）、関連 REQ/Decision/Design への必要な参照、実現方針（再判断してはならない合意がある場合のみ）、完了条件（条件、検証方法、合格条件、達成状態のチェックボックス形式と必要な品質検証の統合）を Issue 本文の対応する章へ確定する（REQ-017-001〜005）。work_type、scale、ユーザー明示 review 発動契約、Issue 構成の分類を Issue 本文の正規契約として確定しない
 - 実行構造確定: 連結成分、3軸判断、単独根の Standard 化、構成検証（Epic サイズ上限、意味的依存の維持〔DAG 整合〕、全 operation_unit の Wave 割当）、子 Issue 確定後の変更対象重複検出（詳細は本 Design「v3 epic-wave-model Design からの吸収」節）。Epic の実行構成（子 Issue、Wave、意味的依存、子状態）は一つの表（`| Wave | Issue | 前提 | 状態 |`）として確定する。Wave は意味的依存 DAG のみから構成され、Wave サイズに実行時並列数・同時実行上限を適用しない（DEC-041、REQ-061-010、REQ-061-038）
 - 横断依存検査: canonical Definition と未クローズ Case 群の同一パス重複・共有領域（トレーサビリティポリシー、sidecar 等）への登録重複需要の検出（警告+HITL 3選択肢、警告は ready 遷移判定を変更しない。REQ-061-029〜031）
-- クリーンアップ: 成功後に draft / RU を削除する（blocked / failed / 中断時は保持）
+- クリーンアップ: 成功後に draft / RU を削除する（blocked / failed / 中断時は保持）。設計PR を merge した Case では、merge 完結後に agentdev-git-worktree の手順に従い設計側 worktree（`.worktrees/{N}-definition`）を削除し、ローカル設計系ブランチ（`definition/issue-{N}`）を squash merge 後の条件付き -D 判定を経て削除する。実変更なし（設計PR 不在）の Case ではこの削除をスキップする。削除失敗時は警告表示して停止する
 
 ## 停止条件
 
