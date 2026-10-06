@@ -2,7 +2,7 @@
 title: `agentdev-case-run-execution-adapter` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-10-04
+updated: 2026-10-06
 ---
 <!-- ADF-COVERS(implementation): REQ-011-010, REQ-011-011, REQ-011-012, REQ-011-017, REQ-015-010, REQ-015-011, REQ-031-007, REQ-031-008 -->
 
@@ -160,3 +160,7 @@ ADF v4 の責務分類（正典: DEC-048、foundations/v4-responsibility-boundar
 - **意味判断担当**: 0 件
 - **決定的処理委譲先**: API I/O → Custom Tool agentdev_gh・実行基盤起動
 - **知識提供**: adapter 契約・result 4 状態接続
+
+## 委譲プロンプト雛形への必須契約要約の埋め込み（RU-0162）
+
+委譲プロンプト雛形（references/harness-delegation.md）には、委譲先が毎回参照資料を読み直さなくても済む程度の必須契約要約（result 4状態、3点ゲート、worktree 隔離、PR 本文・SSoT チャネルの必須セクション、禁止事項の要点）を埋め込む。要約は参照資料の正規契約を代替せず、参照先を明示した要約として雛形内に保持する。雛形の構造変更は委譲契約の意味を変更しない（REQ-003-020 の category 選定・禁止事項セクションの要件は維持する）。

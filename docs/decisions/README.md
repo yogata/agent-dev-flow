@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は40件、提案中の Decision は0件である。
+現行の承認済み Decision は40件、提案中の Decision は1件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -64,6 +64,7 @@
 | DEC-048 | ADF判断アーキテクチャ: 判断方法・確定権限・人間判断境界の統一モデル | accepted | 2026-10-01 |
 | DEC-049 | ADF 共通原本とホスト接続領域の分離によるマルチホスト配布モデル | accepted | 2026-10-02 |
 | DEC-050 | deleteBranchOnMerge 設定不備の警告化と操作安全性停止の維持 | accepted | 2026-10-04 |
+| DEC-051 | case-auto stage 3 のスロット型キューへの移行（Wave 収束前提の撤廃） | proposed | 2026-10-06 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -121,6 +122,7 @@
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
+- [DEC-051](DEC-051.md)（case-auto stage 3 のスロット型キューへの移行（Wave 収束前提の撤廃））
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -291,6 +293,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-048 | [REQ-096](../requirements/REQ-096.md) | - |
 | DEC-049 | [REQ-099](../requirements/REQ-099.md) | - |
 | DEC-050 | [REQ-030](../requirements/REQ-030.md), [REQ-009](../requirements/REQ-009.md), [REQ-032](../requirements/REQ-032.md) | - |
+| DEC-051 | [REQ-034](../requirements/REQ-034.md), [REQ-035](../requirements/REQ-035.md) | - |
 <!-- AUTOGEN:END -->
 
 ## 過去版の履歴基盤

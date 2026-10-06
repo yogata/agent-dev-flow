@@ -2,7 +2,7 @@
 title: case-ready Design
 status: accepted
 created: 2026-09-14
-updated: "2026-10-05"
+updated: "2026-10-06"
 ---
 
 <!-- ADF-COVERS(design): REQ-021-024 -->
@@ -78,3 +78,11 @@ Definition 保存内部責務（case-ready / case-revise）は、draft の artif
 - 一致する場合のみ適用する。不一致の場合は古い全文で新しい編集を上書きせず、差異を示して影響する変更・判断を再確認させる
 - 対象外のリポジトリ全体の版変更だけで全件を無効化しない。判断根拠となった契約（REQ・Design・Decision）の変更は本文一致とは別に再評価する
 - 見出しの一致判定は完全一致のみとし、前方一致で類似する別見出しを選ばない（target-area-matching の規律と一致）
+
+## 機械工程の script 呼び出し契約（RU-0162）
+
+case-ready の機械工程（Definition PR の忠実性・整合性・品質検査の実行、overlap 突合、AUTOGEN 対象 block の再生成差分検出、traceability check、merge 後の canonical 再取得、draft/RU 削除の git rm と明示パス指定 commit）は、工程別 script 1 回の呼び出しに束ねる。GitHub I/O（pr_read、pr_merge、Issue 本文更新）は Custom Tool agentdev_gh の境界を維持する。REQ/Decision/Design の保存実体（Capability Skill 委譲による保存手続き）は本 script の対象外とし、保存責務の委譲構造を変更しない。
+
+- 入力 JSON / 報告 JSON / 終了コードの契約、品質ゲートの script 内実行（省略禁止）、inspect_cross_dependencies.ts と同じ作り（共通基盤不作成）、意味判断のモデル担当は、case-open Design「機械工程の script 呼び出し契約（RU-0162）」節と同一の規律に従う
+- 報告 JSON には検査結果、再生成差分、警告、提案する Issue/PR 本文を含め、モデルは報告 JSON の意味レビューと agentdev_gh による I/O 実行のみを担う
+- workflow skill 参照文面は script 呼び出しと報告 JSON 解釈へ置き換えて短縮する
