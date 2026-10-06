@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-auto
-description: "case-auto command の workflow 実装本体。case-open → case-ready → case-run → case-close（例外経路: case-revise → case-ready → case-run → case-close）の自走 orchestration、orchestration stage モデル、クリーンアップ検証ゲート、Wave 反復制御（stage 3 共有 active Issue task 枠・空き枠補充・状態管理・再開時二重起動防止・Wave 収束と依存充足の両条件 gate・委譲前重複実行時検出）、bounded parent decision resolution、コンフリクト解消 Level 2/3、停止理由分類、adversarial-review 由来の停止伝播、Root Case 指定の再開入口（req-define）での停止、結果集約を所有する。USE FOR: case-auto 実行時の workflow 制御（入力解決・工程分岐・orchestration・停止検出・停止理由分類）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "case-auto command の workflow 実装本体。case-open → case-ready → case-run → case-close（例外経路: case-revise → case-ready → case-run → case-close）の自走 orchestration、orchestration stage モデル、クリーンアップ検証ゲート、stage 3 スロット型キュー制御（共有 active Issue task 枠・空き枠補充・状態管理・再開時二重起動防止・依存充足ゲート単独条件の完了即次投入・委譲前重複実行時検出）、HITL question のスキップ可能キュー、bounded parent decision resolution、コンフリクト解消 Level 2/3、停止理由分類、adversarial-review 由来の停止伝播、Root Case 指定の再開入口（req-define）での停止、結果集約を所有する。USE FOR: case-auto 実行時の workflow 制御（入力解決・工程分岐・orchestration・停止検出・停止理由分類）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # case-auto workflow スキル
@@ -83,11 +83,12 @@ case-auto workflow は次の8 STEP で構成する。
 - stage 3 の共有 active Issue task 数の上限は固定値（5、実行安全境界。1 active task = 1 Issue への実装実行委譲。Epic・Wave・Standard Issue・case-run 呼出しごとの独立実行枠を設けない）。並列実行は必須であり、実行環境由来の障害（background task の消失、親 run の中断、provider failure 等）を理由とする同期逐次実行（順次フォールバック）への切替を行わない。並列起動が当該 stage の起動可能対象集合に対して1件も成立しない場合は、直列化で完了を装わず停止理由「並列起動不能」（原因の断定を含まない）と再開可能性を報告して停止する（case-auto Design「runtime 制御契約」節）。並列起動時は委譲起動ごとに10秒の起動間隔を置き、同一Tool一括ブロックでの複数起動発行は行わない（v4-runtime-execution-model Design「runtime 制御ループ」節〔起動間隔・並列数制御〕）。起動間隔は stage 1（case-open / case-revise 委譲）・stage 2（case-ready 委譲）・stage 4（case-close 委譲）の並列委譲起動にも同一に適用する。scheduling 制約（最大同時起動数・起動間隔）による batch 分割を orchestration stage の分割として扱わない
 - stage 2（case-ready）・stage 4（case-close）の並列委譲起動にも stage 3 と同一の並列必須・同期逐次フォールバック禁止・並列起動不能停止を適用する（前述条項の並列実行必須は stage 3 に限定しない）。stage 2・stage 4 の委譲指示は case-auto Design「委譲指示の構築規律（case-ready・case-close の並列委譲起動）」節に従い構築し、独立した対象全体の逐次実行を命じず、stage 間の順序（stage 間 fan-in）と stage 内の対象間順序を混同しない
 - stage 3 の runtime 制御契約（詳細は case-auto Design「runtime 制御契約」節と v4-runtime-execution-model Design「runtime 制御ループ」節）:
-  - **空き枠補充**: active Issue task 数が上限未満の場合、各 Epic の現在 Wave と Standard Issue から開始条件を満たす Issue を横断して候補として認識し、実行上の安全条件を満たす候補がある限り補充する（横断補充は best-effort でなく必須）。最初に起動した全 task の完了を待つ固定 batch 方式を取らず、起動は実行進行中に継続する。起動間隔（10 秒）と局所的な競合回避の運用は維持する
+  - **空き枠補充**: active Issue task 数が上限未満の場合、各 Epic の依存充足済みの子 Issue（Wave の前後を前提としない）と Standard Issue から開始条件を満たす Issue を横断して候補として認識し、実行上の安全条件を満たす候補がある限り補充する（横断補充は best-effort でなく必須）。最初に起動した全 task の完了を待つ固定 batch 方式を取らず、起動は実行進行中に継続する。起動間隔（10 秒）と局所的な競合回避の運用は維持する
   - **状態管理**: Issue 実行の状態を pending、ready、active、実行結果確定で区別して管理する
   - **再開時の二重起動防止と上限超過防止**: 再開時は既存の active task を計上し、同一 Issue の二重起動と上限超過を防ぐ。状態不明の task は終了確認まで実行枠を解放せず、完了済み Issue を未完了に戻さない
   - **統合処理**: 統合処理（マージ・クローズ相当）は active Issue task の実行枠を消費しないが、共有書き込みの直列化点として扱う
-  - **Wave 収束と依存充足の両条件 gate**: Wave 収束（当該 Wave の全子 Issue の実行結果確定、未処理・実行中・状態不明なし）と後続 Wave の依存充足（意味的依存条件の成立、必要な統合・マージの完了を含む）を区別し、次 Wave の開始は両方の成立を条件とする。blocked、failed、delegation-unavailable は収束には該当し得るが依存充足とはみなさない
+  - **依存充足ゲートとスロット型キュー**: 子 Issue の開始は当該子 Issue に必要な全ての意味的依存条件の充足（必要な統合・マージの完了を含む）のみを条件とし、Wave 収束（全子 Issue の実行結果確定）を後続の子 Issue 開始の前提としない（完了即次投入のスロット型キュー）。blocked、failed、delegation-unavailable は依存充足とはみなさない。依存充足の判定は `scripts/src/wave-gate.ts` の `isDependencySatisfied`（依存先の完了判定は `canCompleteChild` の再利用）、投入計画は `scripts/src/slot_queue.ts` の `planSlotAdmissions` の決定的関数で行う（契約の正は case-auto Design「並列実行の判定」「runtime 制御契約」節。依存充足ゲート純関数の再利用であり、判定ロジックを新規作成しない）。Wave 構成は意味的依存 DAG から決定的に導出される実行構成の記録単位として維持する
+  - **HITL question のスキップ可能キュー**: orchestration 中の警告・確認・選択肢提示に由来する HITL question は、回答を要しない限りスキップ可能キューへ投入し、既定の安全側の挙動で進行し、stage 境界または完了報告で一括提示する（投入・取り出しは `scripts/src/hitl_queue.ts` の `enqueueSkippable` / `drainSkippableQueue`）。人間に留保された判断の新規確定と、既存の安全境界が要求する操作承認を要する停止はキューの対象外とし、従来どおりブロッキングする（既存の停止契約は変更しない。キュー対象外の判定は case-auto Design「承認・HITL 境界」「HITL question のスキップ可能キュー」節）
   - **委譲前重複実行時検出**: stage 3 の委譲前に同一 Wave 内の子 Issue 間で変更対象ファイル集合の重複を検出し、一時直列化・変更対象の調整・merge 順序・衝突解消担当の判断に用いる（case-ready の重複前置検出の判断記録を参照し、二重検査としない）。変更対象集合が取得不能な子 Issue を含む場合は比較を省略せず検出不能として報告する（無重複扱いしない）
   - **Wave 表現**: Wave 表現は子 Issue 数の上限を持たない（Epic サイズ上限のみ適用）。runtime 上の batch や一時直列化を Wave 分割として永続化しない
 - クリーンアップ検証ゲート（ドラフト残存、RU 残存の検証）を stage 2 の対象群収束後・stage 3 開始前に実行し、stage 2 を正常完了した対象について残存を検出した場合は停止する。stage 2 が blocked / failed / 中断等で正常完了していない対象について、既存 lifecycle 契約に従って保持された draft / RU を cleanup 違反として扱わない（case-auto 実行契約）
@@ -121,6 +122,7 @@ case-auto workflow は次の8 STEP で構成する。
 ## 共通制約
 
 - **自走境界（ガードレール: 自走対象外・remote branch 削除限定、ほか不変条件）**: repo にファイルとして残る変更のみ自走対象。DB migration 実行、deploy/apply、クラウドリソース操作、外部SaaS 設定変更、課金、権限、認証情報、repo外実データ操作、通知送信は対象外
+- **内蔵ツール使用規律**: ファイル検索・内容検索・ディレクトリ列挙は実行基盤の内蔵ツール（ファイル検索、内容検索、読み取り）を使用し、bash 内蔵コマンド（grep、ls 等）を標準手順としない。bash 実行が本来必要な処理（script 呼び出し、git 操作等）は本規律の対象外とする（workflow-skill-model Design「workflow skill 本文における内蔵ツール使用規律」節）
 - **委譲・参照制約（command 不変条件、ガードレール: Epic Issue 本文書き込み禁止〔Wave 反復制御としての直接書込み〕）**: 各工程は対応するコマンド定義を authoritative source として実行（case-auto 定義内再実装回避）。case-run はインライン実行（標準動作）。Wave 反復制御としての Epic Issue 本文書き込みは行わず（case-auto は読取のみ、`POL-epic-tracking-single-writer`）、Case Issue 工程記録の取りまとめによる記録契機別 Epic 反映のみ、closing 書き込み〔case-close〕と同一の per-Epic 排他制御・局所直列化の下で書き込む（手順の正は `agentdev-epic-tracker`）。case-auto は Issue 階層決定ロジックを持たない、Epic / Wave / Issue 構成は case-ready の確定結果に従う（command 不変条件）
 - **5件文脈の区別**: (1) case-auto stage 3 共有 active Issue task 数（上限 5。1 active task = 1 Issue への実装実行委譲。Epic・Wave・Standard Issue を横断して単一所有）、(2) execution_unit 全体並列（上限なし）。混同しない。case-run 独自の Wave 内子 Issue 並列枠は廃止済みであり第3の文脈として存在しない
 - **OU処理ループ**: Standard flow の case-close（stage 4）完了後に未処理 OU が残存する場合は次 OU の処理を STEP-3 から開始（全 OU 処理完了時のみ全体完了報告）。起動時対象集合は case-ready が確定した全 execution_unit であり、OU の必須依存は stage 内の直列化要因である（case-auto 実行契約）。必須依存で結合した execution_unit 群は順次（stage 内局所直列化）、必須依存のない execution_unit 群は並列で処理し、OU 逐次処理は orchestration stage モデルを置き換えない

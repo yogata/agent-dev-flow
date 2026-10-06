@@ -45,13 +45,12 @@ Definition 変更が docs 文言を期待するテスト（リポジトリ固有
 
 ## STEP-7: draft / RU 削除と同期確認
 
-### draft / RU 削除
+### draft / RU 削除（機械工程の script 呼び出し）
 
+- 削除（canonical 再取得後の draft / RU の `git rm` と明示パス指定 commit）は、工程別 script `scripts/src/accept_definition_checks.ts`（phase: canonical-and-cleanup、removalPaths に削除対象を指定）の呼び出しで実行する。script は fetch と ff-only merge による canonical 再取得、`git rm`、明示パス指定 commit を実行し、報告 JSON（実行結果・差分・警告・提案本文）を stdout へ返す。契約の正は case-ready Design「機械工程の script 呼び出し契約」節である
 - 成功後に draft（`.agentdev/drafts/req-draft-*.md`）と RU（`.agentdev/backlog/req-units/RU-*.md`）を削除する
 - blocked、failed、中断した場合は draft / RU を保持する
-- **Form Zero**: 削除（`git rm`）は、明示パス指定の commit（`git commit -m "..." -- <path>`、`--only` pathspec 形式）と**同一ステップで完結させる**。削除と commit の間に別操作（staging の追加変更、他ファイルの stage 等）を挟まない
-- **commit 前 git status --short 待機再確認**: commit 実行前に `git status --short` でステージ全体を確認する。自 Case 分（対象 draft / RU の削除 pathspec）以外のステージを検出した場合は commit を実行せず**待機して再確認する**（共有 working tree における並走 Case のステージ混入に対する被害側防御）。自 Case 分のみであることを確認した後に commit を実行する
-- 削除対象は明示パス指定で行い、スイープ操作（`git add -A` 等）は行わない。削除した成果物は明示パス指定で git 永続化する。手順の参照先は `agentdev-git-worktree` references `git-common-procedures.md` 手順 3（既存のまま）である
+- **Form Zero**: 削除（`git rm`）と明示パス指定 commit は script 内の同一工程で完結し、削除と commit の間に別操作（staging の追加変更、他ファイルの stage 等）を挟まない。削除対象は明示パス指定であり、スイープ操作（`git add -A` 等）は行わない。手順の参照先は `agentdev-git-worktree` references `git-common-procedures.md` 手順 3（既存のまま）である
 
 ### main 同期確認
 

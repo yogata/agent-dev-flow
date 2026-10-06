@@ -76,7 +76,7 @@ Issue 本文の完了条件チェックボックスを最終評価・更新し�
 達成判定、完了ゲート（QG-4）→ `agentdev-quality-gates` の QG-4（Final Acceptance Gate）に従い、Issue本文の完了条件チェックボックスを最終評価、更新する。
 判定基準、検査観点は `agentdev-quality-gates` の QG-4 を参照。
 
-- **完了条件チェックボックス評価・更新は case-close の責務**（QG-4）。case-run、実行担当サブエージェント、外部実行バックエンドは完了条件チェックボックスを更新しない。case-close は case-run/ 実行担当サブエージェントとは**別コンテキスト**で、PR 作成後に独立して完了条件を再読込して最終完了判定する
+- **完了条件チェックボックス評価・更新は case-close の責務**（QG-4）。case-run、実行担当サブエージェント、外部実行バックエンドは完了条件チェックボックスを更新しない。case-close は case-run/ 実行担当サブエージェントとは**別コンテキスト**で、PR 作成後に独立して完了条件を再読込して最終完了判定する。チェックボックス項目の機械的抽出（`- [ ]` / `- [x]` 行の一覧化と達成数の計上）は工程別 script `scripts/src/close_mechanical_steps.ts`（phase: pre-merge の completion-checkbox-extraction step）が実行し、抽出結果の評価・確定（未達判定、not applicable の根拠判定）はモデルが担当する
 - **トレーサビリティ check の実行前提**: 下記の段階ゲートで check を実行する際は、`agentdev-traceability` SKILL.md「実行方法」節の実行前提に従う（`--req` は要件行IDの個別カンマ指定のみ受理し `..` 形式の範囲構文は非対応、`--root` は検証対象リポジトリのルート明示、宣言の走査対象は拡張子・除外ディレクトリの前提どおり）。前提を満たさない実行の結果は QG-4 の判定根拠に使わない
 - **QG-4 checker 実測手順（merge 直前 HEAD・evidence 化・baseline 登録漏れ検査）**: QG-4 の checker 実測（full integrity suite、個別 checker、IR 検査）は次の3要素を満たして実施する:
   1. **merge 直前 HEAD 実施**: checker 実測は、merge 直前の origin/main 取り込み済み branch HEAD で実施する（古い branch HEAD・分岐時点の baseline での実測結果を QG-4 判定根拠に使わない）

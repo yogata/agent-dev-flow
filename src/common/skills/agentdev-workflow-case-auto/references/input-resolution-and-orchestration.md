@@ -177,16 +177,17 @@ stage 2（case-ready）・stage 4（case-close）の委譲起動は、起動時�
 stage 3 の実行制御は case-auto が単一所有し、次の runtime 制御契約に従う（詳細は case-auto Design「runtime 制御契約」節と v4-runtime-execution-model Design「runtime 制御ループ」節）:
 
 1. **共有 active 枠**: 1 active task は 1 Issue への実装実行委譲であり、Epic・Wave・Standard Issue を横断して active Issue task 数が上限（5）を超えない。Epic・Wave・Standard Issue・case-run 呼出しごとの独立実行枠を設けない
-2. **空き枠補充**: active Issue task 数が上限未満の場合、各 Epic の現在 Wave と Standard Issue から開始条件を満たす Issue を横断して候補として認識し、実行上の安全条件を満たす候補がある限り補充する（横断補充は best-effort でなく必須）。最初に起動した全 task の完了を待つ固定 batch 方式を取らず、起動は実行進行中に継続する
+2. **空き枠補充**: active Issue task 数が上限未満の場合、各 Epic の依存充足済みの子 Issue（Wave の前後を前提としない）と Standard Issue から開始条件を満たす Issue を横断して候補として認識し、実行上の安全条件を満たす候補がある限り補充する（横断補充は best-effort でなく必須）。最初に起動した全 task の完了を待つ固定 batch 方式を取らず、起動は実行進行中に継続する
 3. **状態管理**: Issue 実行の状態を pending、ready、active、実行結果確定で区別して管理する
 4. **再開**: 再開時は既存の active task を計上し、同一 Issue の二重起動と上限超過を防ぐ。状態不明の task は終了確認まで実行枠を解放せず、完了済み Issue を未完了に戻さない
 5. **統合処理**: 統合処理（マージ・クローズ相当）は active Issue task の実行枠を消費しないが、共有書き込みの直列化点として扱う
-6. **Wave 収束と依存充足**: Wave 収束（全子 Issue の実行結果確定、未処理・実行中・状態不明なし）と後続 Wave の依存充足（意味的依存条件の成立、必要な統合・マージの完了を含む）を区別し、次 Wave の開始は両方の成立を条件とする。blocked、failed、delegation-unavailable は収束には該当し得るが依存充足とはみなさない。両条件 gate の決定的判定（収束判定・次 Wave 開始可否）は `agentdev-workflow-case-auto` スキル配下の実行コード `scripts/src/wave-gate.ts` の決定的関数 `isWaveConverged` / `canStartNextWave` で行う
+6. **依存充足ゲートとスロット型キュー**: 子 Issue の開始は当該子 Issue に必要な全ての意味的依存条件の充足（必要な統合・マージの完了を含む）のみを条件とし、Wave 収束（全子 Issue の実行結果確定）を後続の子 Issue 開始の前提としない（完了即次投入のスロット型キュー）。blocked、failed、delegation-unavailable は依存充足とはみなさない。依存充足の決定的判定は `agentdev-workflow-case-auto` スキル配下の実行コード `scripts/src/wave-gate.ts` の決定的関数 `isDependencySatisfied`（依存先の完了判定は `canCompleteChild` の再利用。判定ロジックの新規作成を行わない）で行い、投入計画（空き枠補充・二重起動防止・依存関係のある Definition merge の排他維持を含む）は `scripts/src/slot_queue.ts` の決定的関数 `planSlotAdmissions` で行う。Wave 収束の判定 `isWaveConverged` は Wave 構成の記録単位としての進行評価と Epic/Root 終了側の判定に用い、投入開始の前提とはしない
 7. **子完了と親横断義務の分離**: 子 Issue の完了は当該子が負う必須完了条件の成立のみで判定し、親に残る横断義務の未完了を理由に条件を満たした子 Issue の終了を禁止しない。親の横断義務は Wave 収束・Epic/Root の最終終了時に評価する。子完了判定は `canCompleteChild`（親横断義務を入力に含まない）で行い、Epic/Root の最終終了判定は `canCloseEpic`（全子完了と親横断義務成立の両方を要求）で行う。同一モジュール `scripts/src/wave-gate.ts` の決定的関数であり、子の終了と親の終了が同じ経路の関数で分離判定される
 8. **dispatch 入口での旧実行契約抑止**: orchestration の dispatch 入口で、影響する合意変更が下流消費成果物へ反映され読み戻しが確認されるまで、旧実行契約に基づく新規 dispatch を行わない。各対象の dispatch 起動の前に合意変更の反映・読み戻し確認状態を照合し、未確認の場合は `canDispatchNewExecution`（`scripts/src/wave-gate.ts`）が拒否した対象を dispatch 対象から外し、停止報告に反映する
-9. **義務投影不完全・検証不能申告の停止伝播**: 子 Issue からの義務投影不完全・検証不能の申告は停止伝播として扱い、当該子の完了伝播を阻止する。申告子は `canCompleteChild` が完了を拒否し、`canStartNextWave` の blocker として次 Wave の開始も阻止する。必須条件の未達・未証明を Gate 全体の warn 等で通過させない
-7. **重複の実行時検出**: stage 3 の委譲前に同一 Wave 内の子 Issue 間で変更対象ファイル集合の重複を検出し、一時直列化・変更対象の調整・merge 順序・衝突解消担当の判断に用いる。case-ready の重複前置検出の判断記録（競合リスク情報）を参照し、二重検査としない。変更対象集合が取得不能な子 Issue を含む場合は比較を省略せず検出不能として報告する
-8. **Wave 表現**: Wave 表現は子 Issue 数の上限を持たない（Epic サイズ上限のみ適用）。runtime 上の batch や一時直列化を Wave 分割として永続化しない
+9. **義務投影不完全・検証不能申告の停止伝播**: 子 Issue からの義務投影不完全・検証不能の申告は停止伝播として扱い、当該子の完了伝播を阻止する。申告子は `canCompleteChild` が完了を拒否し、依存先である子の `isDependencySatisfied` の blocker として後続子 Issue の投入も阻止する。必須条件の未達・未証明を Gate 全体の warn 等で通過させない
+10. **HITL question のスキップ可能キュー**: orchestration 中の警告・確認・選択肢提示に由来する HITL question は、回答を要しない限りスキップ可能キューへ投入し、既定の安全側の挙動（警告の記録と継続、または当該対象のみの停止）で進行する。キューの内容は stage 境界または完了報告で一括提示する。投入・取り出しの決定的制御は `scripts/src/hitl_queue.ts` の `enqueueSkippable` / `drainSkippableQueue` で行う。人間に留保された判断の新規確定と、既存の安全境界が要求する操作承認を要する停止はキューの対象外とし、従来どおりブロッキングする（既存の停止契約は変更しない。キュー対象外の判定は case-auto Design「承認・HITL 境界」「HITL question のスキップ可能キュー」節）
+11. **重複の実行時検出**: stage 3 の委譲前に同一 Wave 内の子 Issue 間で変更対象ファイル集合の重複を検出し、一時直列化・変更対象の調整・merge 順序・衝突解消担当の判断に用いる。case-ready の重複前置検出の判断記録（競合リスク情報）を参照し、二重検査としない。変更対象集合が取得不能な子 Issue を含む場合は比較を省略せず検出不能として報告する
+12. **Wave 表現**: Wave 表現は子 Issue 数の上限を持たない（Epic サイズ上限のみ適用）。runtime 上の batch や一時直列化を Wave 分割として永続化しない
 
 #### Wave 反復制御（case-auto 直接制御、stage 3 内部処理）
 
@@ -195,8 +196,8 @@ Epic execution_unit の Wave 反復は orchestration stage 3 の内部状態遷�
 - Epic Issue 本文読み取りのみ（書き込みは case-close 単一書き手、`POL-epic-tracking-single-writer`）
 - 子Issue ごとのインライン case-run 実行は共有 active Issue task 枠（上限 5）で制御し、空き枠補充（横断必須・固定 batch 禁止）により起動を進行中に継続する（前述 stage 3 runtime 制御契約）
 - 委譲 → case-close(#epic)
-- 次 Wave 判定: Wave 収束と後続 Wave の依存充足の両条件 gate（前述 stage 3 runtime 制御契約 6〜9。収束判定 `isWaveConverged`、次 Wave 開始可否 `canStartNextWave`、子完了判定 `canCompleteChild`、義務投影不完全・検証不能申告の停止伝播を `scripts/src/wave-gate.ts` の決定的関数で行う）
-- blocked/ failed の扱い: 収束には該当し得るが依存充足とはみなさない
+- 投入判定: 依存充足ゲート単独条件のスロット型キュー（前述 stage 3 runtime 制御契約 6〜12。依存充足判定 `isDependencySatisfied`、投入計画 `planSlotAdmissions`、収束判定 `isWaveConverged`〔Wave 構成の記録単位としての進行評価〕、子完了判定 `canCompleteChild`、義務投影不完全・検証不能申告の停止伝播、HITL question のスキップ可能キューを `scripts/src/wave-gate.ts`、`scripts/src/slot_queue.ts`、`scripts/src/hitl_queue.ts` の決定的関数で行う）
+- blocked/ failed の扱い: Wave 収束には該当し得るが依存充足とはみなさない（当該対象を依存先に持つ子 Issue は投入しない）
 
 #### 工程間の状態引き継ぎ
 
@@ -270,7 +271,7 @@ case-open の判定結果に従う。
 - 不変条件（工程固有の詳細手順と case-auto 定義が矛盾する場合、工程固有処理は既存コマンド定義を優先）
 - 不変条件（case-auto は Issue 階層決定ロジックを持たない、複数 REQ doc または scale:large の場合は case-open のルールに委譲）
 - 不変条件（case-open / case-ready から後工程への状態引き継ぎ時、複数 REQ doc の保存結果をフィルタリングまたは再評価しない）
-- 不変条件（Epic Wave 実行時、Wave 反復制御、現在 Wave の ready 子Issue 選択、stage 3 共有 active Issue task 枠（上限 5）による空き枠補充・状態管理・再開時二重起動防止・Wave 収束と依存充足の両条件 gate・委譲前重複実行時検出 を直接担当、case-run(#epic) への委譲は行わない（legacy 経路は廃止済み）、各子Issue ごとにインライン case-run、Wave 境界のクローズは case-close(#epic) に委譲）
+- 不変条件（Epic Wave 実行時、Wave 反復制御、依存充足済みの子Issue 選択、stage 3 共有 active Issue task 枠（上限 5）による空き枠補充・状態管理・再開時二重起動防止・依存充足ゲート単独条件のスロット型キュー投入（Wave 収束前提の撤廃）・委譲前重複実行時検出 を直接担当、case-run(#epic) への委譲は行わない（legacy 経路は廃止済み）、各子Issue ごとにインライン case-run、Wave 境界のクローズは case-close(#epic) に委譲）
 - ガードレール（case-auto は独自の操作単位ステータス追跡を持たない、Epic Issue の実行構成表を使用、Epic Issue 本文の書き込みは case-close 単一書き手、case-auto は読み取るのみ）
 - 不変条件（case-auto は操作単位キューの管理・制御のみを担い、OU 本文の抽出・変換・REQ 操作解釈を行わない）
 - 不変条件（case-auto は orchestration pre-reader として case-open 前のみ req_draft を読み込み、case-ready 成功後は invalid post-case reader として req_draft を読まない、case-ready 成功後の停止・再開・完了処理は Issue と Epic だけで成立、クリーンアップ検証ゲートは stage 2（case-ready）の対象群収束後・stage 3 開始前に実行し評価対象を stage 2 を正常完了した対象に限定、独自の OU 状態管理を持たない）

@@ -41,7 +41,7 @@ case-open workflow は次の6 STEP で構成する。
 | STEP-1 | 引き継ぎ判定 | 要件doc 受領 | 引き継ぎ停止判定完了（継続 / consumer 停止） | [references/handoff.md](references/handoff.md) |
 | STEP-2 | Root Case 確立 | STEP-1 継続確定 + adversarial-review 完了（skip 含む）+ preflight 設定検証の実施と警告報告（GitHub Issue/PR 使用リポジトリ種別。設定理由では停止しない） | Root Case GitHub Issue 作成済み（対象 REQ 番号埋め込み、状態 open） | [references/root-case-and-definition-package.md](references/root-case-and-definition-package.md) |
 | STEP-3 | Definition Package 生成 | Root Case 確立 | Definition Package 生成・Root Case 関連付け済み。REQ 行追加を伴う場合はトレーサビリティポリシー追随確認済み。既存行の意味変更を含む場合は design 対応事前確認（coverage --req 実査・欠落時 artifact_actions 組込み）実施済み | [references/root-case-and-definition-package.md](references/root-case-and-definition-package.md) |
-| STEP-4 | 実変更判定と Definition PR 作成 | Definition Package 確定 | 実変更時: Definition PR 作成済み（Case 単位 1 件）。実変更なし: 作成しない | [references/definition-pr-and-idempotency.md](references/definition-pr-and-idempotency.md) |
+| STEP-4 | 実変更判定と Definition PR 作成 | Definition Package 確定 | 実変更時: Definition PR 作成済み（Case 単位 1 件。機械工程〔worktree 作成、REQ 行編集、generate_indexes、check_integrity、traceability check、明示パス指定 stage・commit〕は工程別 script `scripts/src/prepare_definition_pr.ts` 1 回の呼び出しで実行）。実変更なし: 作成しない | [references/definition-pr-and-idempotency.md](references/definition-pr-and-idempotency.md) |
 | STEP-5 | 冪等再実行確認 | STEP-4 完了 | 既存 Root Case・既存 Definition PR 再利用済み、重複生成なし、不足分のみ処理済み、横断依存検査実施済み（警告提示記録または検出不能報告） | [references/definition-pr-and-idempotency.md](references/definition-pr-and-idempotency.md) |
 | STEP-6 | deviation capture・完了報告 | STEP-5 完了 | deviation 保存（Split Rule 分類）、完了報告出力 | [references/capture-and-completion.md](references/capture-and-completion.md) |
 
@@ -86,6 +86,7 @@ case-open は、上流工程（req-define）で確定した対象要件を実行
 
 ## 共通制約
 
+- **内蔵ツール使用規律**: ファイル検索・内容検索・ディレクトリ列挙は実行基盤の内蔵ツール（ファイル検索、内容検索、読み取り）を使用し、bash 内蔵コマンド（grep、ls 等）を標準手順としない。bash 実行が本来必要な処理（script 呼び出し、git 操作等）は本規律の対象外とする（workflow-skill-model Design「workflow skill 本文における内蔵ツール使用規律」節）
 - **draft-data 入力**: 本スキルは構造化 `draft-data` を入力として読み取る。機能要件、非機能要件、制約、対象外、受け入れ条件は新規に作成せず合意済み入力を反映する。`conflict_resolutions` に記録済みの衝突は再確認しない
 - **Definition Package の非本文化**: Definition Package を独立した Issue 本文物項目として生成しない（Issue Execution Contract REQ「Definition Package を独立した Issue 本文物項目として生成しない」条項。case-open 実行契約 REQ）。Root Case への関連付けと所在は canonical 成果物関係（Definition PR、case-ready の canonical 再取得経路）から相関する
 - **Root Case 状態**: Root Case 確立後の状態は open とし、実装開始を許可しない。ready への遷移は case-ready が実行する

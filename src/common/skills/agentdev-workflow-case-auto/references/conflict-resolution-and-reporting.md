@@ -109,6 +109,7 @@ Case Issue 工程記録モデルの取りまとめ責務（本文・コメント
 完了報告には以下を含める（停止時フォーマットを含む）。
 
 - **停止理由分類**: STEP-4 経由、または adversarial-review 由来の user-decision-required
+- **HITL question の一括提示**: orchestration 中にスキップ可能キューへ投入された警告・確認・選択肢提示を、完了報告（または最後の stage 境界）で一括提示する。投入順を保持し、既定の安全側の挙動とともに提示する（取り出しは `scripts/src/hitl_queue.ts` の `drainSkippableQueue`）。人間に留保された判断の新規確定と、既存の安全境界が要求する操作承認を要する停止はキューに含めず、従来どおりブロッキング停止として報告する
 - **開始時刻・終了時刻・所要時間**: 人間が読みやすい形式
 - **工程別タイムスタンプ内訳（L1）**: case-open / case-ready / case-run / case-close（例外経路時は case-revise を含む）、スキップした工程は除外可、case-run の L2 内訳は case-run result から読み取って含める
 - **対象別・stage 別の開始/完了観測証跡**: 各 orchestration stage における対象別の開始/完了を観測可能にするため、L1 タイムスタンプを対象別拡張（対象識別子付きの開始/完了時刻）で記録するか、等価の bg task ID と Issue status 遷移記録（pending → running → completed / blocked / failed / pending 戻しの遷移）を保持する。並列実行が逐次処理へ退化していないこと、stage 間の全対象収束（fan-in）前に次 stage が先行開始していないことの判定、および完了報告の stage 別集約は、この観測証跡に基づいて行う

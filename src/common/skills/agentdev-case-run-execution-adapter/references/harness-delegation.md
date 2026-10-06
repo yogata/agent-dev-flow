@@ -263,6 +263,23 @@ structured_context の生成（委譲 prompt 構築）は、次の抽出制約�
 
 case-run は委譲プロンプト構築時に本テンプレート構造を維持し、実行担当サブエージェントからの result に含まれる回収項目を PR 本文に転記する。
 
+## 委譲契約必須要約（雛形埋め込み）
+
+委譲プロンプトには次の必須契約要約を埋め込む。委譲先が毎回参照資料を読み直さなくても済む程度の要約であり、正規契約の代替ではない。各項目の正規原本への参照先を明示し、委譲先は詳細判断時に参照先へ戻る。要約の記述が原本と矛盾して読める場合は常に原本を正とする。
+
+```markdown
+<delegation-contract-summary>
+- result 契約（4状態）: 実行完了時は completed-pr（PR番号/ PR URL を伴う）、回答可能な blocker は blocked、repository context で回答不能な blocker は failed、委譲起動不能は delegation-unavailable（実行未試行のため pending に戻す）。正: adapter skill「Result 契約（最小契約）」節
+- 3点ゲート: result に (1) 4状態のいずれか1状態、(2) 委譲内作業の commit hash、(3) PR URL の3点を必ず含める。要約で完結した completed-pr は 3点の代替にならない。正: adapter skill「委譲結果受領の最終ゲート（3点ゲート）」節
+- worktree 隔離: 引き渡された worktree root 配下でのみ作業する。メインリポジトリ・他 worktree でのファイル編集は禁止（検知時は直ちに停止し failed、詳細は Issue コメントに構造化記録）。実装開始前に worktree 内判定で自己検証する。正: adapter skill「worktree 隔離の遵守（禁止事項）」節
+- PR 本文の必須セクション: Refs（Issue 番号）、実行識別情報（adf_delegation へ委譲単位識別子を転記）、検証差分（実行工程 case-run の行ごとに観測証跡を記録）、Findings / Capture候補、Design確定候補。正: adapter skill「実行担当サブエージェントの責務」節、agentdev-workflow-templates の実行識別情報・検証差分セクション規約
+- SSoT チャネル: 成功（completed-pr）は PR 本文、blocked / failed は Issue コメント。一時 session 通信・ローカル変数・中間ファイルは SSoT ではない。正: adapter skill「Result 契約（最小契約）」節の SSoT 表
+- 禁止事項の要点: 完了条件チェックボックス更新（case-close 専任）、Issue 進行状況更新（取りまとめ専任）、raw gh CLI による GitHub 書込み（Custom Tool 経由）、配布物本文への concrete ID 直書き（対応関係は traceability/ sidecar へ）、`.agentdev/intake/` `.agentdev/learning/` の直接変更、生 gh WRITE 迂回、スイープ stage（`git add -A` 等）。正: 委譲 prompt の MUST NOT DO セクション、capture-boundaries reference
+</delegation-contract-summary>
+```
+
+委譲プロンプト構築者は本ブロックを雛形に含め、委譲先の実行 command・MUST NOT DO セクションと併記する。要約の省略（雛形構造からの除外）は委譲契約の必須テンプレート違反であり、MUST NOT DO 必須化（後述「委譲プロトコルと category 設計」節）と同一の必須水準で扱う。
+
 ## 委譲指示規律（canonical 参照は節名のみ・traceability sidecar への記録）
 
 委譲 prompt の構築者（case-run へ委譲する全場面）と委譲を受ける実行担当サブエージェントが、配布物本文・委譲 prompt・PR 本文・Issue コメントへ ID を書き込む際に従う指示規律。配布物本文への concrete ID 直書きが配布依存境界 checker の違反（consumer 環境で ID が解決不能となる設計制約）となり、既存違反の新規追加を誘発した実失敗に基づく予防規律である。「委譲プロトコルと category 設計」節の MUST NOT DO 必須化における予防観点の引き渡しを、独立した指示規律として拡充したものである。

@@ -34,11 +34,11 @@ Epic Issue 番号入力時（実行構成表存在時）に現在 Wave の子Iss
 
 ### E1: Epic Issue 本文読込・実行構成表解析
 
-Epic Issue 本文を読み込み、実行構成表（`agentdev-epic-tracker` の実行構成表（`| Wave | Issue | 前提 | 状態 |`））を解析。
+Epic Issue 本文を読み込み、実行構成表（`agentdev-epic-tracker` の実行構成表（`| Wave | Issue | 前提 | 状態 |`））を解析。解析・現在 Wave 特定・子状態更新適用の決定的部分は、工程別 script `scripts/src/close_mechanical_steps.ts`（phase: pre-merge、epicBodyPath と epicChildStatusUpdates を入力）の epic-table-analysis step が実行する（`agentdev-epic-tracker` 配下の実行構成表 engine を再利用）。Epic Issue 本文の書込みは E5 でモデルが agentdev_gh 経由で行う。
 
 ### E2: 現在 Wave 特定
 
-実行構成表から現在 Wave（完了処理対象の子Issue を含む Wave）を特定。
+実行構成表から現在 Wave（完了処理対象の子Issue を含む Wave）を特定。現在 Wave は実行構成表の永続状態（非終端行を含む最小 Wave）から決定的に導出し、スロット型キューの投入順序に依存しない（script の deriveCurrentWave）。
 
 ### E3: PR 作成済み子Issue 特定
 

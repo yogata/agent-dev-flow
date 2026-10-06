@@ -68,6 +68,11 @@ gate 違反時は両ルートとも PR マージを停止する。
 - 各 STEP の再実行はべき等であり、マージ済み PR への再マージ、更新済みチェックボックスの再評価を発生させない
 - 停止終了時は Root Case 指定の再開入口（case-close）を停止報告へ記録する（Root Case の status は実行継続のまま active を維持する。ローカル版では失敗・未完了を `## 残課題` に記録する）。再開時は Root Case 指定による経路解決に従い未完了 STEP を続行する。closed は終端状態であり、終端からの遷移は行わない
 
+### 機械工程の script 呼び出しと内蔵ツール使用規律
+
+- **機械工程の script 呼び出し**: mergeable ポーリング、squash merge 前後のローカル状態検査、Epic 実行構成表の解析と状態更新（解析・現在 Wave 特定・状態更新適用の決定的部分。Epic 本文書込みはモデルが agentdev_gh 経由で行う）、完了条件チェックボックス評価の機械的抽出（評価はモデルが担当）、AUTOGEN 再生成差分検出、full integrity suite の起動と結果集約、textlint 最終検査、worktree/branch クリーンアップは、工程別 script `scripts/src/close_mechanical_steps.ts`（phase: pre-merge / post-merge）の呼び出しで実行する。PR merge 本体（pr_merge）、Issue 本文更新、issue_close は Custom Tool `agentdev_gh` の境界を維持する（case-close Design「機械工程の script 呼び出し契約」節）。報告 JSON（実行結果・差分・警告・提案本文）の意味レビュー（警告の重要度評価、Design 確定判断、未達判定の確定）はモデルが担当する
+- **内蔵ツール使用規律**: ファイル検索・内容検索・ディレクトリ列挙は実行基盤の内蔵ツール（ファイル検索、内容検索、読み取り）を使用し、bash 内蔵コマンド（grep、ls 等）を標準手順としない。bash 実行が本来必要な処理（script 呼び出し、git 操作等）は本規律の対象外とする（workflow-skill-model Design「workflow skill 本文における内蔵ツール使用規律」節）
+
 ### 終了条件（termination）
 
 - 正常終了: 単一 Issue ルートはクリーンアップ・Capture 回収・永続化 STEP の完了報告まで。Epic Wave ルートは最終 Wave 判定（Epic クローズ または 残 Wave 通知）まで

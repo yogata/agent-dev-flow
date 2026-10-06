@@ -6,13 +6,15 @@
  *
  * - dispatch 入口での旧実行契約抑止: 影響する合意変更が下流消費成果物へ反映され
  *   読み戻しが確認されるまで、旧実行契約に基づく新規 dispatch を許可しない
- * - Wave 収束と依存充足の両条件 gate: 次 Wave の開始は両方の成立を条件とする。
- *   blocked / failed / delegation-unavailable は収束には該当し得るが依存充足とは
- *   みなさない
+ * - 依存充足ゲート: 子 Issue の開始（スロット型キューへの投入）は当該子に必要な
+ *   全ての意味的依存条件の充足（必要な統合・マージの完了を含む）のみを条件とし、
+ *   Wave 収束を前提としない。blocked / failed / delegation-unavailable は依存充足と
+ *   はみなさない。依存先の完了判定は canCompleteChild（既存純関数）の再利用で行い、
+ *   依存充足の判定ロジックを呼出側で新規作成しない
  * - 子完了と親横断義務の分離: 子 Issue の完了は当該子が負う必須完了条件のみで
  *   判定し、親に残る横断義務の未完了を理由に条件を満たした子の終了を禁止しない
  * - 義務投影不完全・検証不能申告の停止伝播: 当該申告がある子は完了伝播させず、
- *   次 Wave の開始・Epic の終了を阻止する
+ *   依存先からの依存充足・Epic の終了を阻止する
  * - Epic/Root の最終終了は全子完了と親横断義務成立の両方を条件とする
  *
  * 新しい結果状態・新しい品質ゲートを追加しない。判定値は既存の実行結果 4状態
@@ -88,7 +90,8 @@ export function canDispatchNewExecution(
  *
  * 全子 Issue が実行結果確定であり、未処理・実行中・状態不明が残らないことを
  * 収束とする。blocked / failed / delegation-unavailable の確定も収束には該当し
- * 得る（依存充足とはみなさない）。
+ * 得る（依存充足とはみなさない）。収束は Wave 構成の記録単位としての進行評価と
+ * Epic/Root 終了側の判定に用い、子 Issue の投入開始の前提とはしない。
  */
 export function isWaveConverged(
   children: readonly ChildExecutionRecord[],
@@ -96,42 +99,36 @@ export function isWaveConverged(
   return children.every((child) => child.status === "outcome-determined");
 }
 
-/** 次 Wave 開始 gate の入力。 */
-export interface NextWaveGateInput {
-  children: readonly ChildExecutionRecord[];
-  /** 後続 Wave の依存充足（意味的依存条件の成立、必要な統合・マージの完了を含む）。 */
-  dependencySatisfied: boolean;
+/** 依存充足ゲートの入力。 */
+export interface DependencyGateInput {
+  /**
+   * 投入対象の子 Issue が意味的依存を持つ依存先子 Issue 群の実行観測レコード。
+   * 必要な統合・マージの完了を含む全ての意味的依存条件の依存先を含める。
+   * 依存先がない（必須依存がない）場合は空配列。
+   */
+  dependencyProviders: readonly ChildExecutionRecord[];
 }
 
 /**
- * Wave 収束と依存充足の両条件 gate。
+ * 依存充足ゲート（スロット型キュー投入の依存充足判定）。
  *
- * 次 Wave の開始は両方の成立を条件とする。義務投影不完全・検証不能の申告が
- * 残る子がある場合は停止伝播として次 Wave の開始を阻止する（完了伝播を
- * 阻止する）。親横断義務の未完了は子の Wave 収束判定に含めず、依存充足の
- * 判断材料として扱わない（子完了と親横断義務の分離）。
+ * 子 Issue の開始は当該子 Issue に必要な全ての意味的依存条件の充足（必要な
+ * 統合・マージの完了を含む）のみを条件とし、Wave 収束（全子 Issue の実行結果
+ * 確定）を後続の子 Issue 開始の前提としない（完了即次投入のスロット型キュー）。
+ * 各依存先の完了判定は canCompleteChild（既存純関数）の再利用で行い、
+ * blocked / failed / delegation-unavailable は依存充足とはみなさない。
  */
-export function canStartNextWave(
-  input: NextWaveGateInput,
-): { allowed: boolean; blockers: string[] } {
+export function isDependencySatisfied(
+  input: DependencyGateInput,
+): { satisfied: boolean; blockers: string[] } {
   const blockers: string[] = [];
-
-  if (!isWaveConverged(input.children)) {
-    blockers.push("wave-not-converged");
+  for (const provider of input.dependencyProviders) {
+    const completion = canCompleteChild(provider);
+    if (!completion.allowed) {
+      blockers.push(`dependency-not-satisfied:${provider.issue}`);
+    }
   }
-  if (!input.dependencySatisfied) {
-    blockers.push("dependency-not-satisfied");
-  }
-  const defectChildren = input.children.filter(
-    (child) => child.obligationDefect !== undefined,
-  );
-  if (defectChildren.length > 0) {
-    blockers.push(
-      `obligation-defect-reported:${defectChildren.map((child) => child.issue).join(",")}`,
-    );
-  }
-
-  return { allowed: blockers.length === 0, blockers };
+  return { satisfied: blockers.length === 0, blockers };
 }
 
 /**
