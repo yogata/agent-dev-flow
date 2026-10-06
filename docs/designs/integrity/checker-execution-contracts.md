@@ -2,7 +2,7 @@
 title: checker 実行契約と検出基盤規則
 status: accepted
 created: 2026-08-15
-updated: 2026-10-05
+updated: 2026-10-07
 ---
 <!-- ADF-COVERS(implementation): REQ-002-035 -->
 <!-- ADF-COVERS(implementation): REQ-010-062 -->
@@ -11,7 +11,7 @@ updated: 2026-10-05
 <!-- ADF-COVERS(implementation): REQ-061-037 -->
 <!-- ADF-COVERS(design): REQ-061-037 -->
 <!-- ADF-COVERS(implementation): REQ-060-006 -->
-<!-- ADF-COVERS(design): REQ-060-001, REQ-060-002, REQ-060-003, REQ-060-007 -->
+<!-- ADF-COVERS(design): REQ-007-016, REQ-060-001, REQ-060-002, REQ-060-003, REQ-060-007 -->
 <!-- ADF-COVERS(design): REQ-010-078, REQ-010-079 -->
 <!-- ADF-COVERS(implementation): REQ-010-078, REQ-010-079 -->
 
@@ -275,7 +275,7 @@ QG-4 フル suite 正規形（3 cwd 分割実行、正規ランナー構成確�
 agentdev-quality-gates が正規所有する。本節はその所有権を変更せず、単独実行・ファイル単体指定時の
 一般規約と正規形への参照を提供する。
 
-実行形態規律（集約）:
+### 実行形態規律（集約）
 
 - tsc（typecheck）は対象 package 配下を cwd として実行する
 - bun test は worktree root を cwd とし `./` 付きパス指定で実行する（既存正規形）
@@ -283,6 +283,7 @@ agentdev-quality-gates が正規所有する。本節はその所有権を変更
 - 分割実行②の対象で未収録の配置（tools 等）がないかを実行前に確認する
 - checker の ESM 互換性は個別差があるため、実行不能な checker は bun 経由（モジュール import）へ切替える
 
+- 起動 cwd・ランナー・パス指定形式に起因する fail は実行形態由来として分類する（REQ-007-016）。実行形態由来の fail は実装由来（当該変更起因）と区別して記録し、本節の規律へ適合させて再実行した結果を採用する
 ### タイムアウト値
 
 bun test 実行のタイムアウトは標準 300 秒、上限 600 秒とする。実測（2026-10 時点の主スイート）

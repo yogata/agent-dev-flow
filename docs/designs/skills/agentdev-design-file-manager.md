@@ -2,7 +2,7 @@
 title: agentdev-design-file-manager Design
 status: accepted
 created: 2026-07-22
-updated: 2026-10-03
+updated: 2026-10-07
 ---
 
 <!-- ADF-COVERS(design): REQ-021-013, REQ-021-026 -->
@@ -23,10 +23,12 @@ REQ/Decision 操作 skill（`agentdev-req-file-manager`、`agentdev-decision-fil
 
 **USE FOR**:
 
+**USE FOR**:
+
 - Design ファイル（`docs/designs/**/*.md`）の作成、更新、配置先判断
 - `target_area` による Design 内セクション置換判断
 - Design ライフサイクル規則（`draft` / `accepted`）の適用と整合性確認
-- Design 固有 script（`search-target-area.ts` 等、将来追加）の選択と呼出契約
+- Design 固有 script（`search-target-area.ts`）の選択と呼出契約
 - `docs/designs/README.md` の Design 一覧表整合性確認
 
 **DO NOT USE FOR**:

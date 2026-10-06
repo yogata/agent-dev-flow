@@ -238,6 +238,9 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-036 | supersedes | DEC-002 | OpenCode ソース・プロジェクション分離の v4 再定義（配備形態として adapter 境界へ統合）を本 Decision の Harness/Backend adapter 境界が所有する |
 | DEC-038 | supersedes | DEC-015 | 補完後継。durable state 配置と再構成の契約への一般化 |
 | DEC-039 | supersedes | DEC-015 | 補完後継。authority・副作用統制と冪等・並行性モデルへの一般化 |
+| DEC-044 | supersedes | DEC-043 | case-ready 実行構造判断の Jev 最終判断採用（Stage 2: 閾値ルーティング）を撤回し、基本判断経路へ復帰。DEC-043 を完全置換 |
+| DEC-044 | supersedes | DEC-040 | 観測契約の一次事実中心再設計による決定4 の置換（決定2 は DEC-046 が置換、決定1・3は維持） |
+| DEC-051 | supersedes | DEC-041 | case-auto stage 3 のスロット型キュー移行による決定5（Wave 収束前提）の置換（決定1〜4は維持） |
 
 ## 関連 REQ
 

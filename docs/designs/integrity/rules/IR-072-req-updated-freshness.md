@@ -2,7 +2,7 @@
 title: "IR-072: req-updated-freshness"
 status: accepted
 created: 2026-09-29
-updated: 2026-10-05
+updated: 2026-10-07
 ---
 
 # IR-072: req-updated-freshness
@@ -33,6 +33,8 @@ updated: 2026-10-05
 | 1 | 現行 REQ ファイルの frontmatter `updated`（日付部分）が最終内容変更 commit（frontmatter のみの変更 commit を除外）の author date と一致すること | strict fail |
 | 2 | git 履歴取得不能環境では info スキップとすること（fail にしない） | 設計要件 |
 | 3 | updated 欠落・非日付形式は本ルールで計上せず別ルール（required-fields / IR-002 相当）に委ねること | 設計要件 |
+| 4 | Definition PR の merge 直前（case-ready 受入検査）には branch HEAD（origin/main 取り込み済み）に対して本検査を再実行すること（REQ-061-046）。再実測対象は変更を伴う docs ファイル群とする | 設計要件 |
+| 5 | 本検査を含む check_integrity は commit 済み HEAD に対して実行すること。未 commit 変更を含む working tree への実行は、git log 上の最終内容変更 commit に未 commit 変更が反映されず構造的に不一致となるため、検査結果を採用しない（prepare_definition_pr の工程順序: check_integrity は stage-and-commit の後に実行） | 設計要件 |
 
 ## exemption（許容条件）
 
