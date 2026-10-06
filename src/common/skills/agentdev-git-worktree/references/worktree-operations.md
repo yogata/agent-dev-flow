@@ -283,15 +283,23 @@ guard が書込みをブロックした場合、ブロックの解除・迂回�
 ### workspace 外書込みのブロック事例と切替（fail-closed 維持）
 
 - **ブロック事例**: 検査入力 JSON 等の一時ファイルを OS の一時ディレクトリ等、workspace の外へ出力しようとした操作は、workspace 外書込み guard によりブロックされ得る。guard は fail-closed で動作し、ブロックされた操作自体は成功しない
-- **標準手段への切替**: ブロックされた場合は、一時ファイルの置き場所を workspace 外から project root 内（リポジトリ配下の実行時作業領域）へ変更する。置き場所指針は横断依存検査エンジンの scripts README（`agentdev-workflow-case-open` scripts「検査入力 JSON」）を参照する。書込み手段自体は「標準手段（guard ブロック時の切替先）」のとおりとする
+- **標準手段への切替**: ブロックされた場合は、一時ファイルの置き場所を workspace 外から project root 内（リポジトリ配下の実行時作業領域）へ変更する。置き場所指針は横断依存検査エンジンの scripts README（`agentdev-workflow-case-open` scripts「検査入力 JSON」）と「退避ファイルの統一配置（.agentdev/tmp/）」節の分類規律に従う。書込み手段自体は「標準手段（guard ブロック時の切替先）」のとおりとする
 - **別 API 経路による迂回の不採用**: guard にブロックされた操作を、別の API・ツール経路（リダイレクト先の変更、出力手段の差し替え等）で workspace 外へ迂回書込みしない。guard の fail-closed 動作自体を維持対象とし、迂回ではなく置き場所の変更（標準手段切替）で対処する
 
 ### 退避ファイルの統一配置（.agentdev/tmp/）
 
-worktree 内で checker・検証コマンドを実行する際の退避ファイル（checker stdout / stderr の分離退避、検査入力 JSON 等の一時ファイル）は、**`.agentdev/tmp/`（worktree root 相対）へ作成する**。配置の正本は「workspace 外書込みのブロック事例と切替（fail-closed 維持）」節の置き場所指針と本節である。
+worktree 内で checker・検証コマンドを実行する際に作成する一時ファイルは、証跡性に応じて次の分類のいずれかに分類し、対応する配置先へ作成する。
+本節が配置規律の正であり、「workspace 外書込みのブロック事例と切替（fail-closed 維持）」節の切替指針は本節の分類規律に従う。
 
-- **配置先**: `.agentdev/tmp/`（worktree root 相対）。OS の一時ディレクトリ等 workspace 外へ出力しない
-- **後始末**: 検証完了後、退避ファイルは worktree remove 前に削除する。削除手順は case-close references `cleanup-and-capture.md` STEP-6-1 の「remove 前退避ファイル掃除」を参照する
+| 分類 | 対象 | 配置先 |
+|---|---|---|
+| (a) 検査専用本文ファイル | 検査後の即時削除が可能な検査入力の一時複製（Issue 本文の検査用複製等）。証跡として退避・保持しないもの | リポジトリ外の一時領域に作成できる。workspace 外書込み guard にブロックされた場合は「workspace 外書込みのブロック事例と切替（fail-closed 維持）」節の切替指針に従い、project root 内の実行時作業領域へ置き場所を変更する |
+| (b) 証跡性退避ファイル | checker stdout / stderr の分離退避等、検証証跡として退避が要求される一時ファイル | `.agentdev/tmp/`（worktree root 相対）。OS の一時ディレクトリ等 workspace 外へ出力しない |
+| (c) 恒久証跡 | 恒久証跡として保持が要求される検証レポート | `.agentdev/integrity/reports/`（恒久証跡チャネル） |
+
+- **(b) の適用範囲限定**: `.agentdev/tmp/` は worktree root 相対のパスであり、worktree 内で実行する検証の退避先である。main root 実体から `--root` 指定で実行する読取系 checker 等の退避は、実行環境の root 基準で解決するため main root 配下の `.agentdev/tmp/` を用いる。退避対象は (b) 分類のファイルに限定し、ドメイン状態（`.agentdev/` 配下の tmp/ 以外）を退避対象に含めない
+- **(c) と (b) の使い分け**: 検証完了後も恒久保持が要求される検証レポートは (c) の恒久証跡チャネルへ保存する。保持が要求されない証跡は (b) の退避ファイルであり、(c) へ保存しない。(c) の配置先は一時退避と別の恒久チャネルであり、後始末の対象外である
+- **後始末**: (a) は検査後に即時削除する。(b) は検証完了後、worktree remove 前に削除する。削除手順は case-close references `cleanup-and-capture.md` STEP-6-1 の「remove 前退避ファイル掃除」を参照する。(c) は保持対象であり削除しない
 
 git 出力のエンコーディング処理の詳細は `git-common-procedures.md`「Windows git 出力のエンコーディング処理」を参照する。
 
@@ -467,11 +475,13 @@ git worktree prune
 
 **適用条件**: 前節（MAX_PATH 起因の部分削除残存時のフォールバック）の node `fs.rmSync` による削除後も残存ディレクトリが消滅しない場合のみ。通常の削除成功時は実行しない。
 
+**LongPathsEnabled 有効環境では事象が再現しないこと（検証構成条件）**: 本エラー（`Filename too long`）の発生前提は、Windows の LongPathsEnabled（長いパスの有効化）が無効な環境である。LongPathsEnabled 有効環境では同一の深いネスト構成でも通常経路の削除が完結し、部分削除残存（本節の適用条件）は成立しない。適用判断の前置として `reg query "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v LongPathsEnabled` で設定値を確認し、有効環境（値 1）で部分削除残存が発生している場合はパス長制限起因の仮定が成立しないため、本節ではなくファイルハンドル保持等の別原因の確認へ切り替える
+
 **手順**（順序厳守・4ステップ）:
 1. mirror 元の空ディレクトリを作成し、方向を明示してミラー削除を実行する: `robocopy "{空ディレクトリ}" "{残存ディレクトリ}" /MIR`。第1引数が mirror 元（空ディレクトリ）、第2引数が mirror 先（残存ディレクトリ）であり、**空ディレクトリから残存ディレクトリへの方向**を守る。逆方向に実行すると残存内容が mirror 元へ複製される。mirror 元にはファイルを配置しない
 2. robocopy の終了コードを判定する: **0 から 7 を成功と見なす**（0=変更なし、1=コピーあり、2=余分ファイル・ディレクトリの削除あり〔本手順では mirror 削除により 2 が典型的〕、4=不一致検出等のビット合成）。8 以上は失敗。失敗時は出力を確認して原因を解消してから再実行する
 3. 残存ファイル 0 件検証後にディレクトリ本体を削除する: 同一引数の `robocopy` 再実行または再帰列挙で残存ファイル・ディレクトリが 0 件であることを確認してから、`rmdir "{残存ディレクトリ}"` でディレクトリを削除する（bash からは `cmd //c rmdir "{残存ディレクトリ}"`）。残存 0 件の確認前に `rmdir` を実行しない
-4. worktree 管理情報を更新: `git worktree prune`
+4. 残存 worktree の git 側登録を解除する: `git worktree prune`（実体ディレクトリが消滅した worktree の管理情報〔`.git/worktrees/` 配下の登録〕を解除する）
 
 **実測根拠（2026-10-03・LongPathsEnabled 有効環境）**: 空ディレクトリから 445 文字パスの深いネスト構成（6 ディレクトリ・1 ファイル）への `/MIR` 実行で終了コード 2、残存ファイル 0 件・ディレクトリ 0 件を検証、その後の `rmdir` は終了コード 0 で成功することを実測した。mirror 元の空ディレクトリは実行前後で空のまま維持された。
 
