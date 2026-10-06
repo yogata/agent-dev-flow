@@ -2,7 +2,7 @@
 title: ADF v4 Quality / Verification / Evidence / Gate モデル
 status: accepted
 created: 2026-09-18
-updated: 2026-10-04
+updated: 2026-10-06
 ---
 
 <!-- ADF-COVERS(implementation): REQ-003-013, REQ-007-006, REQ-007-007, REQ-007-008, REQ-007-009, REQ-054-003 -->

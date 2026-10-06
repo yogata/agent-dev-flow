@@ -2,7 +2,7 @@
 title: 設計原則
 status: accepted
 created: 2026-08-20
-updated: 2026-10-05
+updated: 2026-10-06
 ---
 
 # 設計原則
