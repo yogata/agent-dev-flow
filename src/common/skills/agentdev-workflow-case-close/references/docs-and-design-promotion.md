@@ -104,6 +104,14 @@ link profile（`.opencode/**` 配下の link projection 走査）は、worktree 
 - **main root での再実行採用**: case-close STEP-3 を main root で実行する時点で link profile を再実行し、その結果を採用する
 - **実行条件の正**: link profile の実行条件（main root 実行、worktree での無効実行可能性、環境ラベル判定）は `<integrity/checker-execution-contracts>` Design「link profile 実効実行要件」節が正であり、本 reference は case-close STEP-3 と checker 実行との手順接続のみを記述する（実行条件の二重定義をしない）
 
+#### worktree 実行時の junction 伝播状態確認（checker 実行の前置）
+
+case-close を worktree 環境で実行する場合、各 checker の実行前に worktree 内 `.opencode/` の実在構成を実測し、junction 伝播状態を確認する。
+
+1. worktree 内 `.opencode/skills/` の実在構成を実測する。git 管理対象の repo 検査基盤実体のみが存在し、`agentdev-*` junction は伝播しない（`.opencode/plugins/` の junction も未伝播）。確認結果は実行記録の環境ラベル（実行環境、junction 伝播状態、依存パッケージ状態）へ記録する
+2. junction 系 skill scripts および plugins 系 gate を用いる検査は、`agentdev-git-worktree` references（worktree 構造的制約）「main root 実体 + --root 指定による読取系 checker 実行手順」節の汎用手順に従い、main root 実体から `--root <worktree root>` 指定（必要に応じ `--files` 併用）で実行する
+3. 検査対象が 0 件に解決された実行を clean 扱いや暗黙の検査省略として採用しない。checker 側の zero-targets 事前警告を含む出力を確認してから結果を採用し、0 件解決時は上記の無効分類として記録する
+
 #### full integrity suite 実行（bun test 実行形態契約）
 
 QG-4 の full integrity suite 合格基準により検証スイート全体（bun test 全件）を実行する場合、bun test 実行形態契約に従う。

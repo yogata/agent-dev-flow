@@ -95,6 +95,12 @@ export function runCli(): void {
   const exemptionsPath = exemptionsIdx >= 0 ? args[exemptionsIdx + 1] : null;
 
   const rawReport = checkDistributionBoundary(repoRoot, projection);
+  const warnings = rawReport.warnings ?? [];
+  if (warnings.length > 0) {
+    for (const w of warnings) {
+      process.stderr.write(`warning: ${w}\n`);
+    }
+  }
   const exemptions = exemptionsPath ? loadExemptions(exemptionsPath) : null;
   const exemptionResult = applyExemptions(rawReport.failures, exemptions, repoRoot);
   const report: BoundaryReport = {
@@ -107,6 +113,7 @@ export function runCli(): void {
       fixed_url_hits: countCategory(exemptionResult.remaining, "fixed-url"),
       producer_metadata_hits: rawReport.stats.producer_metadata_hits,
     },
+    warnings,
   };
 
   if (saveBaselineIdx >= 0 && baselinePath) {
@@ -192,6 +199,12 @@ export function runCli(): void {
     process.stdout.write(`repoRoot: ${repoRoot}\n`);
     process.stdout.write(`ok: ${report.ok}\n`);
     process.stdout.write(`stats: ${JSON.stringify(report.stats, null, 2)}\n`);
+    if (warnings.length > 0) {
+      process.stdout.write(`warnings (${warnings.length}):\n`);
+      for (const w of warnings) {
+        process.stdout.write(`  ${w}\n`);
+      }
+    }
     process.stdout.write(`failures (${report.failures.length}):\n`);
     for (const f of report.failures) {
       process.stdout.write(

@@ -30,6 +30,15 @@ export interface BoundaryReport {
      */
     producer_metadata_hits: number;
   };
+  /**
+   * Pre-scan notice channel (RA-004): emitted when the resolved scan-target
+   * set is empty so adopters learn the scan did not execute before reading
+   * ok/failures. Separate from `failures` on purpose: the invalid-run
+   * adapter-failure Detection (`zero-targets:*`) stays the sole
+   * gate-accounted record, and warnings are never re-counted into it, into
+   * stats, or into the exit code.
+   */
+  warnings?: readonly string[];
 }
 
 export interface BaselineEntry {
