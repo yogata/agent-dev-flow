@@ -176,7 +176,7 @@ closed 等の広範囲な population を実測する場合は、`search` なし�
 
 ## gh CLI 読取補完の規律（ラベルなし列挙＋タイトル・本文確認）
 
-gh CLI による読取補完は、**ラベルフィルタなしの列挙**と**タイトル・本文確認**で行う。Case Issue は `case` ラベルを持たないため、`gh issue list --label case` 等のラベルフィルタは恒常的に 0 件帰着する。
+gh CLI による読取補完は、**ラベルフィルタなしの列挙**と**タイトル・本文確認**で行う。Case の正規識別に `case` ラベルを使用せず、`gh issue list --label case` 等のラベルフィルタの結果の完全性は保証されない。
 
 - **ラベルなし列挙**: `gh issue list --state <state> --search <絞り込みキー> --json number,title` の形式で列挙する。Case Issue の絞り込みに `--label` を使用しない。絞り込みキーは search トークンの選択性指針に従う
 - **タイトル・本文確認**: 列挙結果から目的の対象を特定した後は、`gh issue view <number>` または `agentdev_gh` の `issue_read` でタイトル・本文を取得して確認する。番号の近さ・部分一致だけでは対象を確定しない

@@ -1,7 +1,6 @@
 ---
 name: Root Case (case-ready)
 about: Root Case 本文（case-ready が実現方針と完了条件を確定し、ready 遷移で更新する構造）
-labels: enhancement
 ---
 
 ## 目的

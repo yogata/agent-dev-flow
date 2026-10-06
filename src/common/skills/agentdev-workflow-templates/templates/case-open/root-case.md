@@ -1,7 +1,6 @@
 ---
 name: Root Case (case-open)
 about: Root Case 本文（case-open が起票する。case-ready が実現方針と完了条件を確定して更新する）
-labels: enhancement
 ---
 
 ## 目的
