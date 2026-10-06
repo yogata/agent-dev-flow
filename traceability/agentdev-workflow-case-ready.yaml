@@ -100,6 +100,7 @@ implementation:
   src/common/skills/agentdev-workflow-case-ready/references/readiness-and-cleanup.md:
     - REQ-061-035
     - REQ-061-040
+    - REQ-061-043
 verification:
   src/common/skills/agentdev-workflow-case-ready/references/execution-structure.md:
     - REQ-090-024

@@ -22,8 +22,11 @@ GitHub Issue 番号に基づいて、安全かつ一貫性のある方法で git
 | `fix` | バグ修正、bug |
 | `refactor` | リファクタリング、保守作業 |
 | `chore` | ドキュメント、雑務 |
+| `definition` | case-open の設計PR 用（worktree: `.worktrees/{N}-definition`、branch: `definition/issue-{N}`） |
+| `definition-amend` | case-revise の設計修正PR 用 |
 
 work_type判定は `agentdev-workflow-lifecycle` を参照。
+`definition`・`definition-amend` の作成元は origin/main（既存と同一）であり、作成・削除の詳細手順は `references/worktree-operations.md` を参照する。設計系ブランチの遠隔削除は行わず、GitHub の deleteBranchOnMerge 自動削除に委譲する。
 
 ## main 基準の worktree 操作
 

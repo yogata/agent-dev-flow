@@ -38,6 +38,7 @@ implementation:
   src/common/skills/agentdev-workflow-case-auto/references/input-resolution-and-orchestration.md:
     - REQ-030-017
     - REQ-032-038
+    - REQ-034-046
     - REQ-061-039
   src/common/skills/agentdev-workflow-case-auto/references/stop-and-decision-resolution.md:
     - REQ-032-038
