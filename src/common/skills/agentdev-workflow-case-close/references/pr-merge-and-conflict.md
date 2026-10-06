@@ -48,16 +48,14 @@ git rev-parse origin/main
 
 base 移動の検出は squash merge を妨げない。squash merge 可否は STEP-4-2 の mergeStateStatus（CLEAN）基準で判断し、base 移動判定結果は Evidence に記録する。
 
-### STEP-4-2: squash merge 前の mergeable UNKNOWN ポーリング
+### STEP-4-2: squash merge 前の mergeable UNKNOWN ポーリング（機械工程の script 呼び出し）
 
-本書が所有する「squash merge 前の mergeable UNKNOWN ポーリング」手順（状態取得は `agentdev_gh` の pr_mergeable 操作。最大60秒、10秒間隔で再取得、待機中の CONFLICTING 遷移時は即時打ち切りコンフリクト解消パスへ、上限超過時は構造化エラーとして停止）に従い、次を実行する。
+mergeable UNKNOWN ポーリングと squash merge 前のローカル状態検査は、工程別 script `scripts/src/close_mechanical_steps.ts`（phase: pre-merge）の呼び出しで実行する。script は読み取り系 gh CLI サブコマンドによる mergeable 状態の取得ポーリング（既定 10 秒間隔・入力で間隔と上限を指定。CONFLICTING 遷移時は即時に要判断を返しコンフリクト解消パス〔STEP-4-5〕へ接続、上限超過時は警告付き要判断）と、worktree の未コミット変更検査・branch 確認、完了条件チェックボックスの機械的抽出、AUTOGEN 再生成差分検出、traceability check、full integrity suite、textlint 最終検査、Epic 実行構成表の解析を 1 回の呼び出しで実行し、報告 JSON（実行結果・差分・警告・提案本文）を stdout へ返す。ポーリング間隔・上限値は入力 JSON が所有する。報告 JSON の意味レビュー（コンフリクト解消への分岐判断、警告の重要度評価）と pr_merge 本体はモデルが `agentdev_gh` 経由で担当する。
 
-- 対象 PR の `mergeable` 状態事前確認
-- `UNKNOWN` ポーリング待機
-- 上限超過時の構造化エラー停止
+- 対象 PR の `mergeable` 状態事前確認（script の mergeable-polling step）
+- `UNKNOWN` ポーリング待機（script 内で実行）
+- 上限超過時の警告付き要判断（報告 JSON の warnings。モデルが停止判断を行う）
 - 待機中の `CONFLICTING` 遷移検出を自動分岐させ、コンフリクト解消パス（STEP-4-5）へ即時接続する
-
-ポーリング間隔・上限値は gh-cli 手続き側が所有する。
 
 **infra-transient 分類との区別**: mergeable ポーリング上限超過は GitHub 側の mergeability 再計算遅延であり、infra-transient（ツール基盤故障）ではない。一方、`agentdev_gh` 等のツール基盤自体の恒常失敗（単一ツール恒常失敗・プロセス生存・再試行無効・他経路正常の4条件同時成立。判定条件の正規所有は case-auto Design「停止理由分類」節）を検出した場合は、Case 失敗と区別して infra-transient（ツール基盤故障）分類として停止報告へ付随させ、停止報告に回復経路（supervisor 等による harness 再起動による回復の見込みと durable state からの冪等再開）を含める。infra-transient 分類は既存の停止経路（停止報告と再開入口〔Root Case 指定〕の記録）に付随する分類であり、状態遷移と result 形式を変更しない。harness 側の修正（fresh process 分離・自動再初期化）は本リポジトリの対象外とする。
 

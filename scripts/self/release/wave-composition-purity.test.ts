@@ -396,10 +396,10 @@ describe("TS-005 Wave convergence and dependency satisfaction are distinct", () 
     expect(dependencySatisfied([{ issue: "A1", state: "blocked" }])).toBe(false);
   });
 
-  test("next Wave requires both gates (distribution artifacts)", () => {
+  test("admission is dependency-satisfaction-only via the slot queue (distribution artifacts)", () => {
     const autoSkill = read(CASE_AUTO_SKILL_REL);
-    expect(autoSkill).toMatch(/Wave 収束と依存充足の両条件 gate/);
-    expect(autoSkill).toMatch(/blocked、failed、delegation-unavailable は収束には該当し得るが依存充足とはみなさない/);
+    expect(autoSkill).toMatch(/依存充足ゲートとスロット型キュー/);
+    expect(autoSkill).toMatch(/blocked、failed、delegation-unavailable は依存充足とはみなさない/);
   });
 });
 

@@ -100,6 +100,8 @@ case-ready はトレーサビリティ完全性ゲートで、対象要件行の
 
 ## 共通制約
 
+- **内蔵ツール使用規律**: ファイル検索・内容検索・ディレクトリ列挙は実行基盤の内蔵ツール（ファイル検索、内容検索、読み取り）を使用し、bash 内蔵コマンド（grep、ls 等）を標準手順としない。bash 実行が本来必要な処理（script 呼び出し、git 操作等）は本規律の対象外とする（workflow-skill-model Design「workflow skill 本文における内蔵ツール使用規律」節）
+- **機械工程の script 呼び出し**: 忠実性・整合性・品質検査、overlap 突合、AUTOGEN 再生成差分検出、traceability check（STEP-1 受入検査）、merge 後 canonical 再取得と draft/RU 削除の git rm・明示パス指定 commit（STEP-2 / STEP-7）は、工程別 script `scripts/src/accept_definition_checks.ts` の呼び出しで実行する（phase: acceptance-checks / canonical-and-cleanup）。報告 JSON（実行結果・差分・警告・提案本文）の意味レビューと agentdev_gh による I/O はモデルが担う（case-ready Design「機械工程の script 呼び出し契約」節）
 - **Definition 受入**: 忠実性確認（req-define 合意内容との投影検査）、整合性検査、品質検査を Definition PR 確定前に行う。merge 実行前に pr_read の isDraft 確認を行い、isDraft: true 時は pr_merge を実行せず blocked で停止する。人間に留保された判断（REQ-{NNNN}-{NNN}）の新規確定が不要で、既存の正規契約から導出できる解消と委譲された裁量の範囲内の判断である場合は追加承認なしで merge する。merge 後は canonical Definition を再取得し、merge を巻き戻さない
 - **execution contract 投影**: 機能要件、非機能要件、制約、対象外、受け入れ条件は新規作成せず合意済み Definition を投影する。runtime-only 判断（worktree 状態、staleness、実 diff、実装結果、test 実行結果）は事前確定せず case-run の安全検査として維持する
 - **Standard / Epic 確定**: 連結成分（必須依存のみをエッジ）と依存強度、Epic サイズ、機能的一貫性の3軸で自律生成する。単独根は Epic 化せず Standard flow とする。無関係な operation_unit 群を単一 Epic へ機械的に集約しない

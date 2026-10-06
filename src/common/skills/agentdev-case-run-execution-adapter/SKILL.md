@@ -217,6 +217,7 @@ STEP reference 8 要素は `<foundations/v4-durable-state-and-recovery>` Design 
 - 委譲起動方式の具体的な実装（実行担当サブエージェント起動、委譲 prompt 構築、evidence 確認、result 受領、timeout/ retry、category 設計）は `references/harness-delegation.md` 参照
 - 実行担当サブエージェントが利用不可の場合は委譲起動失敗として検知される（後述「委譲起動不能時の取扱い」および references/harness-delegation.md「委譲起動失敗、異常終了時事後処理」参照）
 - Issue 本文に req-define 壁打ち合意の実行計画方向性（参考情報）が含まれ得る。実行担当サブエージェントはこれを参考情報として扱い、束縛されない
+- **内蔵ツール使用規律**: 実行担当サブエージェントのファイル検索・内容検索・ディレクトリ列挙は実行基盤の内蔵ツール（ファイル検索、内容検索、読み取り）を使用し、bash 内蔵コマンド（grep、ls 等）を標準手順としない。bash 実行が本来必要な処理（script 呼び出し、git 操作等）と、機能不在・実行失敗時の fail-open 代替探索は本規律の対象外とする（workflow-skill-model Design「workflow skill 本文における内蔵ツール使用規律」節）
 
 ## 委譲起動不能時の取扱い
 

@@ -77,7 +77,7 @@ execution_unit 分割可能性があるにも関わらず case-open が停止し
 子 Issue からの義務投影不完全・検証不能の申告は停止伝播として扱い、完了伝播を阻止する。必須条件の未達・未証明を Gate 全体の warn 等で通過させない。
 
 - **受領**: 子 Issue の実行結果（result 4状態に付随する申告区分〔義務投影不完全 / 検証不能〕）または実行構成表・Case Issue 工程記録から申告を検出する
-- **完了伝播の阻止**: 申告子の完了処理（Issue クローズ、実行構成表 completed 反映）を行わない。申告子は `canCompleteChild` が完了を拒否し、`canStartNextWave` の blocker として次 Wave の開始も阻止する（判定関数は `agentdev-workflow-case-auto` スキル配下の実行コード `scripts/src/wave-gate.ts`。stage 3 runtime 制御契約 9 参照）
+- **完了伝播の阻止**: 申告子の完了処理（Issue クローズ、実行構成表 completed 反映）を行わない。申告子は `canCompleteChild` が完了を拒否し、依存先である子の `isDependencySatisfied` の blocker として後続子 Issue の投入も阻止する（判定関数は `agentdev-workflow-case-auto` スキル配下の実行コード `scripts/src/wave-gate.ts`。stage 3 runtime 制御契約参照）
 - **停止報告への反映**: 申告区分、対象子 Issue、再開条件（投影不完全の解消または検証方法の確定）を停止報告に含める。停止理由分類は既存軸（該当する場合は「req-define 合意要件からの逸脱」「command 契約・実装不整合」等）へ対応づけ、新規の分類軸を追加しない
 - **他対象への影響**: 申告子だけを停止伝播の対象とし、影響しない他対象の進行を一律停止しない（部分停止、STEP-3 Wave 反復制御）。影響しない証拠・判定の一律破棄・一律再実行も行わない
 
@@ -85,7 +85,7 @@ execution_unit 分割可能性があるにも関わらず case-open が停止し
 
 - 停止判定（11項目のいずれか）
 - 停止理由分類（10分類のいずれか）
-- 義務投影不完全・検証不能申告の受領状態と停止伝播の実施結果（申告子の完了伝播阻止、次 Wave 開始阻止）
+- 義務投影不完全・検証不能申告の受領状態と停止伝播の実施結果（申告子の完了伝播阻止、依存先とする後続子 Issue の投入阻止）
 - 停止時タイミング情報
 - 停止時集約報告の生成入力（durable state から再構成した現行観測。集約と次コマンド報告の生成は STEP-8 取りまとめ経路が実行する）
 

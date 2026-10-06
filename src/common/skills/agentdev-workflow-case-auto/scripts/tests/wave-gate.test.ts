@@ -31,7 +31,7 @@ import {
   canCloseEpic,
   canCompleteChild,
   canDispatchNewExecution,
-  canStartNextWave,
+  isDependencySatisfied,
   isWaveConverged,
   type ChildExecutionRecord,
 } from "../src/wave-gate";
@@ -83,7 +83,7 @@ describe("実経路接続の参照関係", () => {
     const orchestration = readReference("input-resolution-and-orchestration.md");
     expect(orchestration).toContain("scripts/src/wave-gate.ts");
     expect(orchestration).toContain("isWaveConverged");
-    expect(orchestration).toContain("canStartNextWave");
+    expect(orchestration).toContain("isDependencySatisfied");
     expect(orchestration).toContain("canCompleteChild");
     expect(orchestration).toContain("canCloseEpic");
     expect(orchestration).toContain("canDispatchNewExecution");
@@ -95,7 +95,7 @@ describe("実経路接続の参照関係", () => {
     const stop = readReference("stop-and-decision-resolution.md");
     expect(stop).toContain("義務投影不完全・検証不能申告の停止伝播");
     expect(stop).toContain("canCompleteChild");
-    expect(stop).toContain("canStartNextWave");
+    expect(stop).toContain("isDependencySatisfied");
     expect(stop).toContain("scripts/src/wave-gate.ts");
   });
 
@@ -171,10 +171,10 @@ describe("FN-1: 子完了と親横断義務の分離", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Wave 収束と依存充足の両条件 gate
+// 依存充足ゲート（スロット型キュー投入）
 // ---------------------------------------------------------------------------
 
-describe("Wave 収束と依存充足の両条件 gate", () => {
+describe("依存充足ゲート（スロット型キュー投入の依存充足判定）", () => {
   test("収束は全子の実行結果確定を要求し、未処理・実行中・状態不明を残さない", () => {
     expect(
       isWaveConverged([satisfiedChild("#1"), satisfiedChild("#2")]),
@@ -198,48 +198,82 @@ describe("Wave 収束と依存充足の両条件 gate", () => {
     ).toBe(false);
   });
 
-  test("次 Wave の開始は収束と依存充足の両方の成立を条件とする", () => {
-    const children = [satisfiedChild("#1"), satisfiedChild("#2")];
-
-    const both = canStartNextWave({ children, dependencySatisfied: true });
-    expect(both.allowed).toBe(true);
-
-    const noDependency = canStartNextWave({ children, dependencySatisfied: false });
-    expect(noDependency.allowed).toBe(false);
-    expect(noDependency.blockers).toContain("dependency-not-satisfied");
-
-    const notConverged = canStartNextWave({
-      children: [...children, { issue: "#6", status: "pending" }],
-      dependencySatisfied: true,
+  test("依存充足は依存先の完了のみを条件とし、無関係の子の未処理・実行中（非収束）を前提としない", () => {
+    // Wave 収束（全子の結果確定）が未達でも、依存先が完了していれば依存充足は成立する
+    // （完了即次投入のスロット型キュー。Wave 収束前提の撤廃）。
+    const result = isDependencySatisfied({
+      dependencyProviders: [satisfiedChild("#dep1"), satisfiedChild("#dep2")],
     });
-    expect(notConverged.allowed).toBe(false);
-    expect(notConverged.blockers).toContain("wave-not-converged");
+    expect(result.satisfied).toBe(true);
+    expect(result.blockers).toEqual([]);
   });
 
-  test("義務投影不完全・検証不能申告の残存は次 Wave の開始を阻止する（停止伝播）", () => {
-    const result = canStartNextWave({
-      children: [
-        satisfiedChild("#1"),
+  test("必須依存がない子は依存充足が直ちに成立する", () => {
+    const result = isDependencySatisfied({ dependencyProviders: [] });
+    expect(result.satisfied).toBe(true);
+  });
+
+  test("blocked / failed / delegation-unavailable の依存先は依存充足とはみなさない", () => {
+    for (const outcome of ["blocked", "failed", "delegation-unavailable"] as const) {
+      const result = isDependencySatisfied({
+        dependencyProviders: [
+          {
+            issue: "#dep-x",
+            status: "outcome-determined",
+            outcome,
+          },
+        ],
+      });
+      expect(result.satisfied).toBe(false);
+      expect(result.blockers).toContain("dependency-not-satisfied:#dep-x");
+    }
+  });
+
+  test("未完了・実行中・状態不明の依存先は依存充足しない", () => {
+    const pending = isDependencySatisfied({
+      dependencyProviders: [{ issue: "#dep-p", status: "pending" }],
+    });
+    expect(pending.satisfied).toBe(false);
+
+    const active = isDependencySatisfied({
+      dependencyProviders: [{ issue: "#dep-a", status: "active" }],
+    });
+    expect(active.satisfied).toBe(false);
+
+    const unknown = isDependencySatisfied({
+      dependencyProviders: [{ issue: "#dep-u", status: "state-unknown" }],
+    });
+    expect(unknown.satisfied).toBe(false);
+  });
+
+  test("義務投影不完全・検証不能申告の依存先は依存充足しない（停止伝播）", () => {
+    const incompleteProjection = isDependencySatisfied({
+      dependencyProviders: [
+        { ...satisfiedChild("#dep-d"), obligationDefect: "incomplete-projection" },
+      ],
+    });
+    expect(incompleteProjection.satisfied).toBe(false);
+
+    const unverifiable = isDependencySatisfied({
+      dependencyProviders: [
+        { ...satisfiedChild("#dep-v"), obligationDefect: "unverifiable-verdict" },
+      ],
+    });
+    expect(unverifiable.satisfied).toBe(false);
+  });
+
+  test("必須条件未達で完了した依存先は依存充足しない", () => {
+    const unmet = isDependencySatisfied({
+      dependencyProviders: [
         {
-          ...satisfiedChild("#2"),
-          obligationDefect: "incomplete-projection",
+          issue: "#dep-m",
+          status: "outcome-determined",
+          outcome: "pass",
+          ownRequiredConditionsMet: false,
         },
       ],
-      dependencySatisfied: true,
     });
-    expect(result.allowed).toBe(false);
-    expect(
-      result.blockers.some((b) => b.startsWith("obligation-defect-reported:#2")),
-    ).toBe(true);
-  });
-
-  test("親横断義務の未完了は Wave gate（子の収束・次 Wave 開始）を阻害しない", () => {
-    // 親横断義務は canStartNextWave の入力に存在しない（子の Wave gate から分離）。
-    const result = canStartNextWave({
-      children: [satisfiedChild("#1"), satisfiedChild("#2")],
-      dependencySatisfied: true,
-    });
-    expect(result.allowed).toBe(true);
+    expect(unmet.satisfied).toBe(false);
   });
 });
 

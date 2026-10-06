@@ -24,33 +24,21 @@ canonical Definition との実変更を判定し、実変更がある場合の�
 
 ### STEP-4: 実変更判定と Definition PR 作成
 
-#### 期待値確定前の branch HEAD 実測
+#### 機械工程の script 呼び出し（prepare_definition_pr）
 
-実変更がある Definition PR では、PR 本文へ検査期待値を記載する前に branch HEAD 全体を repo root 起点で実測する。REQ 行変更または Decision 変更を伴う場合は、手順 2.5 の索引再生成後に `check_integrity`、`check_autogen_freshness`、`agentdev-traceability` の結果を取得し、期待値を実測値から確定する。それ以外は索引再生成を前置せず、各 checker の結果を取得する。いずれかが実行不能または期待値確定不能の場合は PR を作成せず blocked として報告する。対象 checker の実装、終了契約、baseline は変更しない。既存の UTF-8 健全性・対象内容の出現回数などの文字列検証は実測の後に実行し、実測と文字列検証の両方を Definition PR の検証証跡へ記録する。
+STEP-4 の機械工程（専用 worktree 作成、Definition branch 作成、REQ 行編集、`generate_indexes`、`check_integrity`、traceability check、明示パス指定 stage・commit まで）は、工程別 script 1 回の呼び出しで実行する。実装は本スキル配下の `scripts/src/prepare_definition_pr.ts`。契約の正は case-open Design「機械工程の script 呼び出し契約」節である。
 
-1. 実変更判定: Definition Package と canonical Definition を比較する（case-open / case-ready Design）。差分が空の場合は実変更なし → PR を作成せず STEP-5 へ進む。実変更のない Case（bugfix / maintenance / docs_chore 等では作成しない）
-2. 実変更がある場合: 実変更を Case 単位で 1 件の Definition PR として集約し作成する。1 Case につき 2 件以上作成しない
-2.5. REQ 行変更または Decision 変更を伴う場合: REQ 行・Decision の変更を commit した後に `bun .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts` を実行し、索引・AUTOGEN 派生物を最新化する（索引再生成は変更 commit の後とする順序を守る。commit 前に再生成すると req-health-metrics 等の計測日が commit 前日付で確定し、鮮度検査に NG が残存し得るため）。再生成された派生物（`docs/README.md`、`docs/decisions/README.md`、`req-health-metrics.md`）は同一 PR に含める。実行結果と同一 PR への含入を Evidence に記録する。worktree で `.opencode/` 投影が利用できない場合は、main root 実体からの読取専用 checker 実行と混同せず、対象 branch の派生物へ書き込める source script を worktree 内で実行する
-3. REQ 行変更（新規行の追加・移管・廃止等）を伴う Definition PR では、PR 作成前に Design の ADF-COVERS 宣言の追随反映を確認し、トレーサビリティ check（`agentdev-traceability`）で当該 REQ 行の missing-design が 0 件であることを確認する（missing-design 0 件ゲート）。**宣言形式は design 役割タグ付きの ADF-COVERS 宣言を標準とする（既存 Design 文書への inline 宣言追記。トレーサビリティ宣言運用の標準に従う）**。missing-design が残る場合は既存 sidecar の `design` セクションへの追加を標準の宣言先とする。knowledge 文書は ADF-COVERS 宣言を持たないため宣言先として使用しない。宣言先の判断に先立つ req-define 側の design 対応事前確認は case-open Design「意味変更行の design 対応事前確認」節に従う。**missing-design 0 件ゲートの確認は check に加え、coverage `--req`（要件行 ID 個別カンマ指定。`..` 範囲構文非対応）で当該 REQ 行の design 対応が実測帰着することを確認する（coverage は advisory・fail-open であり、check の missing-design 0 件判定を代替しない実測確認として併用する。coverage 実行不能・空結果時は check の結果を正として継続する）**。宣言追随が Definition に含まれておらず missing-design が 0 件でない場合は PR を作成せず、Definition Package の構成へ戻して宣言追随を確定する
-4. head branch push（前段）: PR 作成の前に head branch を remote へ push する。`git push -u origin definition/issue-{N}` を実行し、push 先 refspec（remote branch 名と upstream 設定）が意図した先であることを push 出力で確認する。手順詳細は下記「PR 作成前の head branch push」参照
-5. PR 作成は `agentdev_gh` の pr_create で行い、GitHub Draft PR ではない通常 Pull Request として作成する（draft 指定は公開契約に存在しない。REQ-{NNNN}-{NNN}）。PR 本文は verbatim で記録する。並行 case-open 実行時は、PR 作成前に下記「並行 case-open の PR 作成前隔離検査」を実行し、検査を通過した場合のみ PR を作成する
+1. 入力 JSON を組みて script を 1 回呼び出す: `bun ./src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts --input <input.json>`。入力 JSON には worktree root、Definition branch 名、base ref、Root Case 識別子、Definition 編集内容（対象パス・旧文・新文の完全一致一意指定）、品質ゲート実行仕様（generate_indexes / check_integrity / traceability check。省略は入力検証で拒否される）、明示パス指定 stage 対象、commit message を含める
+2. 報告 JSON を解釈する。報告は実行結果（工程別 step の成否）、差分（変更ファイル・HEAD）、警告、提案する Issue/PR 本文の4要素を持つ。終了コードは成功 0、要判断 2、失敗 1。script は処理を省略せず、失敗時は途中結果とともに非 0 で終了する。空の結果や既定値で成功扱いにしない
+3. 提案本文と報告内容の意味レビューはモデルが担当する。警告の重要度評価、実変更判定の確定、PR 作成の可否判断はモデルが行う
+4. 冪等再実行: script は既存 worktree を検出した場合は期待 branch 上のとき再利用し、別 branch のとき失敗を返す。再実行時は編集旧文の不在（適用済み）を失敗として報告するため、再実行前に報告 JSON と git 状態から適用済みの工程を確認し、不足分のみを入力 JSON に含める
 
-#### PR 作成前の head branch push
+#### PR 作成（実変更がある場合）
 
-PR 作成（手順 5 の pr_create）の前段として、Definition 変更を含む head branch を remote へ push する。pr_create は remote に存在する branch を head とする PR 作成操作であり、未 push の branch で pr_create を実行すると失敗する（HTTP 422 由来の実失敗に基づく前段手順）。push を pr_create より手前に位置させる。
-
-1. push 対象 branch の確認: 作業 branch（`definition/issue-{N}` 形式）が HEAD であり、Definition 変更が commit 済みであることを確認する
-2. push の実行: `git push -u origin definition/issue-{N}` を実行する
-3. push 先 refspec の確認: push 出力で remote branch 名と upstream 設定（`origin/definition/issue-{N}`）が意図した先であることを確認する。refspec の省略・誤指定により意図しない branch へ push していないことを出力で検証する
-4. push 結果の記録: push 済み HEAD hash と remote branch 名を検証記録へ残す
-
-#### 並行 case-open の PR 作成前隔離検査
-
-並行して case-open を実行する場合、手順 4 の PR 作成前に次の隔離検査を実行する。正規所有は case-open Design の並行 case-open 作業隔離規律節であり、本節は STEP-4 の実行手順を提供する。
-
-1. **PR 作成前の自 Case 差分検査**: 差分は **merge-base 起点**で検査する。`MB=$(git merge-base origin/main HEAD)` で merge-base を取得し、`git diff --stat "$MB" HEAD`（merge-base と HEAD の間）により、差分が自 Case 分のみであることを検査する（case-open 実行契約の自 Case 差分検査と同一基準）。**merge-base と HEAD の間の commit 一覧（`git log --oneline "$MB"..HEAD`）を確認し、自 Case 分以外の commit が含まれていないかを判定する**（スタック構造判定）。兄弟 Case の commit を含むスタック構造を検出した場合は、隔離 worktree での差分再構成（origin/main HEAD からの branch 再作成と明示パスによる変更の再適用）で救済してから PR を作成する。**注意: origin/main 直指定の diff（`git diff origin/main HEAD` 等）は merge-base 起点の差分検査の代替にしない** — origin/main が自 branch 作成後に進行した場合、直指定 diff には他 Case の merge 差分が混入し、自 Case 分の切り分けができない。差分の範囲指定は常に merge-base（`"$MB"`) を起点とする
-2. **明示パス指定ステージ**: Definition 変更のステージは明示パス指定で行い、スイープ操作（`git add -A` 等）は行わない
-3. **1-writer 前提侵害の検知と早期断念**: `git status` により worktree 1-writer 前提の侵害（in-scope 外の書込み混入）を検知した場合は直ちに停止する（早期断念）。検知した書込みを Definition 変更・PR に含めない
+1. head branch push（前段）: `git push -u origin definition/issue-{N}` を実行し、push 出力で remote branch 名と upstream 設定が意図した先であることを確認する。pr_create は remote に存在する branch を head とするため、push を pr_create より手前に位置させる
+2. 並行 case-open 実行時は、PR 作成前に正規所有である case-open Design「並行 case-open の作業隔離規律」節の隔離検査（merge-base 起点 `git diff --stat "$MB" HEAD` による自 Case 差分検査、`git log --oneline "$MB"..HEAD` によるスタック構造判定、明示パス指定ステージ、1-writer 侵害検知時の早期断念）を実行する。origin/main 直指定の diff は merge-base 起点検査の代替にしない
+3. PR 作成は `agentdev_gh` の pr_create で行い、GitHub Draft PR ではない通常 Pull Request として作成する（draft 指定は公開契約に存在しない）。PR 本文は script の提案本文を意味レビューした上で verbatim で記録する。実変更判定: Definition Package と canonical Definition の比較で差分が空の場合は実変更なし → PR を作成せず STEP-5 へ進む。実変更のない Case（bugfix / maintenance / docs_chore 等）では作成しない
+4. REQ 行変更（新規行の追加・移管・廃止等）を伴う Definition PR では、PR 作成前に Design の ADF-COVERS 宣言の追随反映を確認し、トレーサビリティ check で当該 REQ 行の missing-design が 0 件であることを確認する（missing-design 0 件ゲート。coverage `--req` による実測帰着確認を併用する。coverage は advisory・fail-open であり、check の判定を代替しない）。**宣言形式は design 役割タグ付きの ADF-COVERS 宣言を標準とする**。missing-design が残る場合は既存 sidecar の `design` セクションへの追加を標準の宣言先とする。宣言追随が Definition に含まれておらず missing-design が 0 件でない場合は PR を作成せず、Definition Package の構成へ戻して宣言追随を確定する
 
 ### 投影不備判明時の正規訂正経路差し戻し（Definition 確定後）
 
