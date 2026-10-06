@@ -48,7 +48,11 @@ implementation:
   src/common/skills/agentdev-workflow-case-close/references/pr-merge-and-conflict.md:
     - REQ-100-006
     - REQ-100-007
+  src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts:
+    - REQ-032-019
 verification:
+  src/common/skills/agentdev-workflow-case-close/scripts/tests/close_mechanical_steps.test.ts:
+    - REQ-032-019
   src/common/skills/agentdev-workflow-case-close/scripts/tests/final-acceptance.test.ts:
     - REQ-032-031
     - REQ-032-032

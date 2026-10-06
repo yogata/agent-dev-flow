@@ -165,7 +165,11 @@ export function validateInput(value: unknown): CloseMechanicalInput {
   return input;
 }
 
-/** 完了条件チェックボックスの機械的抽出（評価はモデルが担当する）。 */
+/**
+ * 完了条件チェックボックスの機械的抽出（評価はモデルが担当する）。
+ * 入力契約は LF 正規化済みの本文であり、CRLF は呼び出し側が
+ * issueBodyPath 読取直後に LF へ正規化して渡す。
+ */
 export function extractCompletionCheckboxes(
   issueBody: string,
 ): { total: number; checked: number; items: readonly { text: string; checked: boolean }[] } {
@@ -323,7 +327,11 @@ export function runCloseMechanicalSteps(
     if (!branchOk) warnings.push("worktree is not on the expected branch");
 
     if (input.issueBodyPath) {
-      const extraction = extractCompletionCheckboxes(runner.readTextFile(input.issueBodyPath));
+      // CRLF→LF 正規化の前置。Windows CRLF 既定環境で issueBodyPath ファイルが
+      // CRLF で書き出されても checkbox 認識が欠落しないようにするため、
+      // 読取直後（checkbox 抽出前）のこの位置で入力契約を満たす。
+      const body = runner.readTextFile(input.issueBodyPath).replace(/\r\n/g, "\n");
+      const extraction = extractCompletionCheckboxes(body);
       steps.push({
         name: "completion-checkbox-extraction",
         status: "pass",
