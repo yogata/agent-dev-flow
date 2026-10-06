@@ -463,3 +463,57 @@
 - **想定反映先**: agentdev-workflow-case-open references/root-case-and-definition-package.md（STEP-3 手順 3・4 の宣言追随手順）
 - **関連**: Case #3501、PR #3503
 - **タグ**: `#traceability` `#design-declaration` `#sidecar` `#case-open`
+
+---
+
+## 機械置換に伴う副次的な日本語整形は全体 regex でなく置換位置限定のマーカー方式で実装する
+
+- **問題事象**: 用語固定置換（「Definition PR」→「設計PR」等）の機械置換で、副次的な日本語整形（置換で生じた「日本語と英字の間の不自然な半角空白」の除去）を全体 regex で適用した初回実装が、置換対象外の既存の無関係な接続空白まで変更し、revert と再実装が発生した
+- **発生局面**: 実装（case-run 機械置換スクリプトの実装。Windows・worktree .worktrees/3500-chore）
+- **検知方法**: 置換 diff の行単位レビューで、置換対象語を含まない行の接続空白変更を確認
+- **根本原因**: 副次的整形の適用範囲を「置換が生じた位置」に限定する構造を持たず、全体へ regex を走らせた
+- **自律対応内容**: 置換位置に限定するマーカー方式へ再実装し、置換対象語を含む行のみへ整形を限定して再実行（diff で対象外行の非変更を確認）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 機械置換ツールに副次的な文字整形を組み込む場合、整形の適用位置は置換位置に限定して実装する（マーカー方式）。全体適用は既存テキストへの非意図変更を招き revert コストを生む
+- **再発条件**: 置換と同時に接続空白等の整形を全体 regex で適用する機械置換の実装
+- **予防策候補**: 機械置換実装時の適用位置限定（マーカー方式）を手順の確認事項として前置する
+- **想定反映先**: 機械置換を伴う委譲の手順（case-run 委譲要件の機械工程確認事項）
+- **関連**: Case #3500、PR #3505
+- **タグ**: `#mechanical-replace` `#scope-limiting` `#case-run`
+
+---
+
+## Windows 既存 UTF-8/LF ファイルへの一括機械変更は write 規律（node スクリプト・edit ツール per-line 置換）で破損なしに完結した
+
+- **問題事象**: （回避実績。問題は未発生）59 ファイル・221 行の用語機械置換（PR #3505）と 13 ファイル frontmatter 編集（fix PR #3506）という大規模な既存 UTF-8/LF ファイル一括変更を、Windows 環境の write 規律（node readFileSync/writeFileSync 統合スクリプト、edit ツール per-line 置換、PowerShell 標準 cmdlet・リダイレクト演算子の回避）に従って実施した結果、cp932 再符号化・CRLF 書き出し・文字化けを一切発生させずに完結した
+- **発生局面**: 実装・fix（case-run 機械置換と case-close fix 工程。Windows・worktree .worktrees/3500-chore）
+- **検知方法**: check_integrity の content-corruption クラス（決定的破損検査）と置換後 diff の行番号 1:1 検証で異常なしを確認
+- **根本原因**: （該当なし。規律の遵守で回避）
+- **自律対応内容**: PR #3505 は node 統合スクリプト（UTF-8 保持・行番号 1:1 維持）で機械置換し、fix PR #3506 は edit ツールの per-line string replace で frontmatter を編集した。いずれも PowerShell 標準 cmdlet（Get-Content/Set-Content）とリダイレクト演算子（`>`/`>>`）を経由しなかった
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（docs/knowledge/windows-powershell-bulk-io-corruption.md の規律適用実績）
+- **横展開観点**: Windows 環境で既存 UTF-8（BOM なし）ファイルを一括変更する機械工程は、PowerShell 標準 cmdlet・リダイレクト経由ではなく node スクリプト（大規模一括）または edit ツール per-line 置換（小規模・frontmatter 単位）を使う規律が、大規模置換と小規模修正の両方の規模で破損なしに機能することを実証した
+- **再発条件**: （回避対象）PowerShell 標準 cmdlet 経由の既存 UTF-8/LF ファイル一括読み書き
+- **予防策候補**: 規律の維持（新たな対策不要。適用実績の記録として保持）
+- **想定反映先**: なし（既存 knowledge 文書 windows-powershell-bulk-io-corruption.md への実績追記は learning-promote で判断）
+- **関連**: Case #3500、PR #3505、PR #3506、docs/knowledge/windows-powershell-bulk-io-corruption.md
+- **タグ**: `#windows` `#utf-8` `#write-guard-discipline` `#mechanical-replace`
+
+---
+
+## docs 内容変更を伴う委譲には check_integrity 単独実行を MUST DO に含めるべき
+
+- **問題事象**: 実装 PR #3505（docs 内容変更 59 ファイル）の委譲要件に check_integrity 実行が含まれず、ReqFreshness NG 13 件（内容変更ファイルの frontmatter `updated` 未進行）が実装工程で検出されず、case-close のマージ後検査まで遅延して close が blocked となった（fix PR #3506 による是正が必要になった）
+- **発生局面**: 実装完了後の case-close STEP-4 マージ後整合検査（委譲単位 DEL-3500-2 → blocked、DEL-3500-3 で fix + 再実行）
+- **検知方法**: case-close マージ後の check_integrity（ReqFreshness・IR-072 の req-updated-freshness NG 13 件）
+- **根本原因**: docs 内容変更を伴う委譲の MUST DO 工程に check_integrity 単独実行が含まれておらず、内容変更に伴う frontmatter `updated` 進行漏れの検出が委譲要件外に置かれていた
+- **自律対応内容**: fix PR #3506（13 ファイルの frontmatter `updated` を 2026-10-06 へ進行する frontmatter-only commit）で是正し、check_integrity NG 0 を確認してクローズ
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: 委譲要件テンプレート（docs 内容変更を伴う委譲の MUST DO）への反映候補
+- **横展開観点**: 検出担当が委譲要件に含まれない場合、機械検査の実行漏れは下流工程（クローズ検査）まで遅延し、merge 後の fix（追加 PR・追加マージ）コストを生む。内容変更を伴う委譲では検査の実行を委譲要件側へ前置すべきである
+- **再発条件**: docs 内容変更（REQ/Design 本体・frontmatter を含む）を伴う委譲で check_integrity 実行を委譲要件に含めない場合
+- **予防策候補**: docs 内容変更を伴う委譲の MUST DO に check_integrity 単独実行（REQ-087 既知 warning 以外の NG 0 確認）を含める
+- **想定反映先**: 委譲要件テンプレート・case-run 委譲要件の確認事項（実装工程での検査前置）
+- **関連**: Case #3500、PR #3505（merge commit 9fbbbc4a）、PR #3506（merge commit cd14227e）、hold コメント 6018200373、既存 intake「2026-10-06-defpr-script-check-integrity-precommit-ordering.md」（IR-072 運用の別問題）
+- **タグ**: `#check-integrity` `#delegation-must-do` `#case-close` `#delayed-detection`
