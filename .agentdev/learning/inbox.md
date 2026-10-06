@@ -429,3 +429,21 @@
 - **想定反映先**: agentdev-workflow-case-close の機械工程手順（退避 body の LF 正規化前置）、close_mechanical_steps.ts の抽出入力契約注記
 - **関連**: Case #3497（完了記録コメント 6013794731、対応記録コメント 6013834126）、PR #3499
 - **タグ**: `#case-close` `#gh-cli` `#windows` `#line-ending` `#deterministic-extraction`
+
+---
+
+## prepare_definition_pr 入力 JSON の品質ゲートコマンドは worktree 実行時 src/common 同等パスを指定する（.opencode 投影非依存）
+
+- **問題事象**: case-open STEP-4 の prepare_definition_pr.ts 入力 JSON で traceabilityGate のコマンド引数を `./.opencode/skills/agentdev-traceability/scripts/src/check.ts` として組み立てたところ、worktree 内では `error: Module not found` で gate 実行が失敗した。worktree の `.opencode/skills/` には repo-agentdev-integrity のみ投影され、agentdev-traceability scripts は不在だった
+- **発生局面**: 実装（case-open STEP-4 機械工程の script 入力 JSON 組立と gate 実行。Windows・worktree `.worktrees/3500-definition`）
+- **検知方法**: script 内 gate 実行の Module not found エラー（報告 JSON への stderr 反映）と、worktree 内 `.opencode/skills/` の実在確認
+- **根本原因**: worktree は junction 伝播が不完全で `.opencode/skills/` 投影が skill 全体を含まない構造的制約（agentdev-git-worktree-test-fallback Design、scripts README の fallback 手順）を、入力 JSON 組立時に確認せず main 環境の `.opencode` パスをそのまま指定した
+- **自律対応内容**: git 管理対象のソース側同等パス（worktree 内 `src/common/skills/agentdev-traceability/scripts/src/check.ts`）を script 本体パスとして使用し、`--root` に worktree ルートを明示して worktree コーパスの検査として完結させた（走査対象 root と script 本体パスの分離）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（scripts README の fallback 手順の適用事例）
+- **横展開観点**: worktree で実行する機械工程 script の入力 JSON にゲートコマンドを記述する場合、script 本体パスは `.opencode` 投影（junction 依存）ではなく git 管理対象の `src/common/` 同等パスを指定し、検査対象 root（`--root` 等）だけを実行対象環境へ向ける。repo-agentdev-integrity scripts は worktree 内 `.opencode` 投影でも動作するが、traceability scripts は投影外であるため同一入力でも可否が分かれる
+- **再発条件**: worktree root で `.opencode/skills/` 配下の script を直接実行する gate 指定（agentdev-traceability 等、worktree 投影外 skill の scripts）
+- **予防策候補**: prepare_definition_pr.ts 入力 JSON 組立手順に worktree 実行時の gate パス規律（script 本体は src/common 同等パス・`--root` は実行対象 root）を前置する。または scripts README の fallback 手順を入力 JSON 組立時の確認事項へ明記する
+- **想定反映先**: agentdev-workflow-case-open references/definition-pr-and-idempotency.md（機械工程の script 呼び出し手順）、scripts/src/prepare_definition_pr.ts の入力契約注記
+- **関連**: Case #3500、PR #3502、既存 learning「worktree 内 .opencode は junction 伝播が部分的（checker・テスト走査対象集合）」、既存 intake「2026-10-06-defpr-script-check-integrity-precommit-ordering.md」（IR-072 pre-commit 順序の別問題。本件で再発を実観測し予測が実証された）
+- **タグ**: `#worktree` `#junction` `#case-open` `#prepare_definition_pr` `#gate-path`
