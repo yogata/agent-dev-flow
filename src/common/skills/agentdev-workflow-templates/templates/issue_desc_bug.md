@@ -1,7 +1,6 @@
 ---
 name: Standard Case Description (Bug)
 about: バグ修正 Case（Root Case・単一実行単位）の本文テンプレート
-labels: bug
 ---
 
 ## 目的

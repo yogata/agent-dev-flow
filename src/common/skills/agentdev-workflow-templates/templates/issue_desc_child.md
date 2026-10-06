@@ -1,7 +1,6 @@
 ---
 name: Child Issue Description
 about: Epic 配下の子 Issue 本文テンプレート
-labels: enhancement
 ---
 
 親Epic: #{epic_number}

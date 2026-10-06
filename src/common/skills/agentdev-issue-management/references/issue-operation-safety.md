@@ -171,7 +171,7 @@ closed 等の広範囲な population を実測する場合は、`search` なし�
 | `role` | 受理（tracking / case） | **不受理**（unknown-field 失敗） | 受理（絞り込み論理軸） | role の設定は起票時のみ。既存 Issue の role は変更しない |
 | `kind` | `role: tracking` のとき受理（それ以外は `kind requires role 'tracking'` 失敗） | 受理（tracking 操作。Case Issue への適用は失敗） | 受理（tracking 軸絞り込み） | `role: case`（Case Issue）では kind は導出されない |
 | `trackingState` | **不受理**（unknown-field 失敗。起票時の状態指定は不可） | 受理（非終端状態のみ。終端値 `closed` は `issue_close` を使用） | 受理（tracking 軸絞り込み） | Case Issue（role: case）には適用されない |
-| `labels` | 必須（空配列も明示） | 省略時は追跡軸ラベル維持 | tracking 論理軸写像入力専用 | Case Issue の work_type（maintenance 等）は起票時に通常ラベル（物理ラベル）として `labels` へ指定する |
+| `labels` | 必須（空配列も明示） | 省略時は追跡軸ラベル維持 | tracking 論理軸写像入力専用 | Case Issue の work_type（maintenance 等）を通常ラベル（物理ラベル）として `labels` へ指定できる運用は任意であり、付与義務と起票時の既定付与は設けない |
 | `role` と `kind` の同時指定 | tracking のとき可 | 不可（`role` が不受理のため） | 可（tracking 軸） | `role: case` と `kind` の同時指定は起票失敗の代表例である |
 
 ## gh CLI 読取補完の規律（ラベルなし列挙＋タイトル・本文確認）

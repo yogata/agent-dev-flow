@@ -1,7 +1,7 @@
 ---
 name: Epic Issue Description
 about: Epic（複数子 Issue を実行構成表で束ねる Root Case）本文テンプレート
-labels: enhancement, epic
+labels: epic
 ---
 
 ## 目的
