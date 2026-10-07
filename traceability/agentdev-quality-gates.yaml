@@ -15,6 +15,7 @@ implementation:
     - REQ-096-013
     - REQ-096-033
     - REQ-096-034
+    - REQ-103-024
   src/common/skills/agentdev-quality-gates/references/qg-1-definition-integrity.md:
     - REQ-096-013
   src/common/skills/agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md:
@@ -47,9 +48,15 @@ implementation:
     - REQ-096-017
     - REQ-096-032
     - REQ-096-033
+    - REQ-103-025
   docs/knowledge/qg4-baseline-detached-worktree-reproduction.md:
     - REQ-007-013
 verification:
+  docs/designs/quality/v4-quality-gate-model.md:
+    - REQ-103-018
+    - REQ-103-019
+    - REQ-103-024
+    - REQ-103-025
   docs/knowledge/qg4-baseline-detached-worktree-reproduction.md:
     - REQ-007-013
   src/common/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md:

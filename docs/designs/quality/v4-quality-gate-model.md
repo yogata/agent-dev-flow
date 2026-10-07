@@ -8,6 +8,7 @@ updated: 2026-10-07
 <!-- ADF-COVERS(implementation): REQ-003-013, REQ-007-006, REQ-007-007, REQ-007-008, REQ-007-009, REQ-054-003 -->
 <!-- ADF-COVERS(design): REQ-061-042, REQ-017-021, REQ-017-022, REQ-032-031, REQ-032-032, REQ-032-033, REQ-032-034, REQ-032-035, REQ-032-036, REQ-032-037, REQ-032-038, REQ-096-032, REQ-096-033, REQ-096-034, REQ-101-017, REQ-101-018, REQ-101-019 -->
 <!-- ADF-COVERS(design): REQ-103-018, REQ-103-019, REQ-103-029, REQ-103-031（REQ-103 の統制必要性・新規統制抑制・有限完了・最終検証判定の設計対応面） -->
+<!-- ADF-COVERS(implementation): REQ-103-018, REQ-103-019（統制種別必要性節と前置規律・検証体制の実装対応。統制の必要性説明の正規節を本 Design が所有する） -->
 
 # ADF v4 Quality / Verification / Evidence / Gate モデル
 
@@ -118,3 +119,30 @@ deterministic verifier と semantic verifier の分類、Evidence の保存契�
 
 - deterministic verifier は決定的処理として実行される検証であり、semantic verifier は閉じた意味評価または開いた推論を含む検証である。判断方法3分類の正典は DEC-048 と foundations/v4-responsibility-boundaries Design「判断方法3分類の判別基準」節であり、本分類は検証の実行方式の分類として判断方法3分類へ対応づく。旧 DEC-036 決定(1) の deterministic／semantic 二分法は判断方法の分類としては DEC-048 が置換済みであり、判断方法の分類として本分類（Verifier 分類）の語彙を使用しない
 - 必須の閉じた意味評価を検証とする semantic verifier が評価器障害（未設定、利用不能、timeout、rate limit、network error、provider error、応答検証失敗等）で成立しない場合、判定は未確定とし、LLM 推論へ fallback せず、partial（判定保留）として遷移不可を維持する（REQ-103-008、REQ-103-009。runtime 面の適用は v4-runtime-execution-model Design「判定未確定時の依存後続抑止」節）
+
+## 統制種別と必要性（REQ-103-018・019）
+
+REQ-103-018 が列挙する統制種別ごとの正規モデル上の必要性と、詳細契約の正規所有を定める。本節は統制種別の必要性説明の正規節であり、個別適用箇所の列挙を恒久管理しない（適用箇所の列挙は検証時に機械検索で行う。恒久台帳の新設禁止〔REQ-103-019〕に従う）。必要性説明を欠く統制は維持せず、本節へ追加する統制は必要性説明を同一変更で記録する。
+
+| 統制種別 | 正規モデル上の必要性 | 詳細契約の正規所有 |
+|---|---|---|
+| hard gate | 状態遷移を誤った前提で進行させない機械的拒否。モデルの遵守判断に委ねず、遷移・副作用の前に拒否する | 本 Design「5 概念の定義と責務」（Gate = 状態遷移 predicate）、v4-runtime-execution-model（authority 格子と直列化単位） |
+| fail-closed | 検査不能・異常・設定不備時に成功を偽装せず停止する。静かな成功による品質境界の崩壊を防ぐ | v4-runtime-execution-model「fail-closed 適用範囲」（書込み経路の統制点は fail-closed。助言的統合〔検査・診断系等〕のみ fail-open 許容） |
+| checker | 整合性検査の実行手段と検出基準を契約化し、検証の属人化と誤検出の反復を防止する | checker-execution-contracts（checker 共通実行契約、detector 命名規約）、integrity-contracts（深刻度分類） |
+| MUST NOT / 禁止規則 / must_not | 機械拒否に落とせない前提契約を規範として宣言し、checker・guard 実装の根拠を与える（LLM fallback 禁止、raw gh 書込み禁止、自動ループバック禁止、guard 迂回禁止等） | 各禁止を正規所有する REQ/Decision/Design（LLM fallback 禁止: v4-responsibility-boundaries「閉じた意味評価の障害時契約」、raw gh 書込み禁止: custom-tool-contracts「迂回防止」） |
+| adversarial-review | 本質的争点を人間判断へ引き上げる前に、複数視点の相互反証で争点解消を試みる。恒久統制ゲートではなく審議契約であり、skip 条件を契約として持つ | REQ-082、skills/agentdev-adversarial-review Design（3論理役割・動的レビュー戦略・read-only 境界） |
+| HITL | 人間に留保された判断（REQ-103-012）の確定を、判断確定のみに限定して工程へ接続する。作業実行の代行、運用介入の承認、評価器障害時の人間判断移行と混同しない | v4-responsibility-boundaries「HITL 判断確定原則」「人間判断への引き上げ条件」（評価器障害除外を含む） |
+| fallback | 障害時に正規の再実行・再開経路へ戻せること自体が要件である場合の代替経路のみを許し、判定方式の代替・無断の品質劣化経路を禁止する（LLM fallback 禁止、publish の copy/rename fallback 不導入） | v4-responsibility-boundaries「閉じた意味評価の障害時契約」、v4-runtime-execution-model「判定未確定時の依存後続抑止」、v4-durable-state-and-recovery「評価器復旧後の評価再開契約」 |
+| duplicated validation | 同一命題を正規工程として再判定することは禁止する（REQ-103-003）。一方、副作用の成功保証としての入力検証＋読戻し照合、列挙件数と期待件数の突合など、命題の異なる防御的な二重確認は区別して許容する | artifact-contracts（Custom Tool 操作契約の読戻し検証）、checker-execution-contracts「パターンマッチ・網羅検査設計の標準規約」（件数突合） |
+| state | 判断・進行・証跡の durable な保持と、復旧後の正規再開経路を契約化する。導出可能情報を恒久保持しない | v4-durable-state-and-recovery（5 分類と配置表、状態権威、部分失敗調整） |
+| ledger | 判断根拠の到達性を保つ追跡対象を限定して保持する。恒久台帳の新設は必要性が立証された場合に限り、今回限りの記録を恒久台帳化しない（REQ-103-017） | traceability policy と sidecar（agentdev-traceability）、checker-execution-contracts「IR-055 warning 総数 ratchet と baseline provenance の実行契約」（provenance 付き baseline） |
+| routing | artifact 種別から必要な品質能力を決定的に導出し、検査の適用漏れと過剰適用の双方を防ぐ | artifact-quality-control-routing（合成規則、能力キー定義、QG-2 投影契約） |
+| additional schema | 構造化された副作用操作の入出力を検証可能にする。soft contract の決定的に扱える部分（存在確認、型、列挙値、ID、参照関係）の機械処理を許容する（REQ-103-013）。schema 検証の全面禁止を意味しない | artifact-contracts（soft contract 再定義、req_draft 出力構造）、custom-tool-contracts（Custom Tool 操作契約） |
+
+### 統制追加の前置規律（REQ-103-018・019）
+
+統制の追加の前に、責務削減、契約縮小、重複除去、決定的導出、所有者統合、不要経路廃止のいずれかでの解消を優先する。本要件（REQ-103）の実現のためだけの中央 router、ledger、新規状態、新規 gate、新規 schema、新規 checker、恒久台帳を追加しない。統制を追加する場合は、当該統制を正規所有する Design への必要性説明の記録を同一変更で行い、本節の統制種別の必要性と矛盾しない根拠を示す。
+
+### 統制種別の検証体制（REQ-103-018・019 の検証方法）
+
+統制種別ごとの現行適用箇所の列挙は、Wave 実行時および横断検証時に機械検索（guards 配下の統制点、checker 実行入口、plugin/hook 登録、規範文書の禁止規則箇所、Custom Tool の検証処理）で行い、本節の必要性説明と突合する。検証のために恒久 checker、恒久台帳、新規 schema を新設しない（REQ-103-019）。検証の結果記録は当該 Case の検証記録（PR 本文の検証差分セクション）へ置き、恒久管理しない（REQ-103-017）。必要性を説明できない統制を検出した場合は、統制の除去・縮小を契約と実装の両面へ反映してから再突合する。
