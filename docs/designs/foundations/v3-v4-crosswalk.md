@@ -2,8 +2,10 @@
 title: v3 -> v4 Concept / Artifact Crosswalk
 status: accepted
 created: 2026-09-18
-updated: 2026-10-01
+updated: 2026-10-07
 ---
+
+<!-- ADF-COVERS(design): REQ-103-016, REQ-103-017（REQ-103 の現行規範処遇判定と反映完了の設計対応面） -->
 
 # v3 -> v4 Concept / Artifact Crosswalk
 

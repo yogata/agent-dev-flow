@@ -17,7 +17,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 61件、廃止済み: 18件
+現行 REQ: 62件、廃止済み: 18件
 <!-- AUTOGEN:END -->
 
 現行要件は61件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
@@ -90,6 +90,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [REQ-100](requirements/REQ-100.md) | ADF が起票する Issue タイトルの記述規則 |
 | [REQ-101](requirements/REQ-101.md) | Case Issue 工程記録モデル |
 | [REQ-102](requirements/REQ-102.md) | Git 操作の非対話認証 |
+| [REQ-103](requirements/REQ-103.md) | ADF v4 正規モデル再確定と現行規範の全面収束 |
 <!-- AUTOGEN:END -->
 
 - [要件インデックス](requirements/README.md)
