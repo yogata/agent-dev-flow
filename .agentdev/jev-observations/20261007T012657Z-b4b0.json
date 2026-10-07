@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261007T012657Z-b4b0",
+  "workflow": "req-define",
+  "evaluationKind": "final-classification-design-separation",
+  "subject": "RU-0180 合意項目（単一Wave前提・トポロジカルレベル割当定義・構成検査fail-closed・判断文言排除）の最終分類・Design 分離",
+  "sourceRevision": "RU-0180@2026-10-07T09:46:00+09:00",
+  "durationMs": 232,
+  "inputTokens": 2034,
+  "inputs": {
+    "requestDigest": "bcf44eefa9483425b5b9f08d46f2db3a0a1a8873e9e811b0cee0fd270d1e5089",
+    "references": [
+      {
+        "digest": "ecb70b8a143ef3723aa1bed56f4a6e8c4adcc6beb9969bec364d66688b022d68",
+        "label": "RU-0180",
+        "path": ".agentdev/backlog/req-units/RU-0180.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "artifact-attribution",
+      "questionForm": "choice",
+      "value": "REQ行とDesign行の両方（成果要件をREQ行で定義し、契約文言・機械的手順をDesign行で定義）",
+      "probabilityDistribution": {
+        "REQ行のみ": 0.21,
+        "Design行のみ": 0.01,
+        "REQ行とDesign行の両方（成果要件をREQ行で定義し、契約文言・機械的手順をDesign行で定義）": 0.78
+      }
+    },
+    {
+      "questionId": "separation-needed",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.8,
+        "false": 0.19999999999999996
+      }
+    }
+  ],
+  "confidence": 0.67,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "artifact-attribution",
+        "value": "REQ行とDesign行の両方（成果要件をREQ行で定義し、契約文言・機械的手順をDesign行で定義）"
+      },
+      {
+        "questionId": "separation-needed",
+        "value": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261007T012622Z-5ea2",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0180 Wave構成単一Wave前提・トポロジカルレベル割当・機械的強制の既存REQ照合",
+  "sourceRevision": "RU-0180@2026-10-07T09:46:00+09:00",
+  "durationMs": 1007,
+  "inputTokens": 2410,
+  "inputs": {
+    "requestDigest": "0e5e9e018d74361f8497d164b493c4829cfbb597ef58193864d2d564624eea36",
+    "references": [
+      {
+        "digest": "ecb70b8a143ef3723aa1bed56f4a6e8c4adcc6beb9969bec364d66688b022d68",
+        "label": "RU-0180",
+        "path": ".agentdev/backlog/req-units/RU-0180.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "attribution",
+      "questionForm": "choice",
+      "value": "APPEND（既存REQへの新規要件行追加）",
+      "probabilityDistribution": {
+        "CREATE（新規REQファイル）": 0.0202020202020202,
+        "APPEND（既存REQへの新規要件行追加）": 0.9393939393939393,
+        "UPDATE（既存REQ行の意味変更）": 0.0404040404040404,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "confirmation-needed",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.18,
+        "false": 0.8200000000000001
+      }
+    }
+  ],
+  "confidence": 0.91,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "attribution",
+        "value": "APPEND（既存REQへの新規要件行追加）"
+      },
+      {
+        "questionId": "confirmation-needed",
+        "value": false
+      }
+    ]
+  }
+}
