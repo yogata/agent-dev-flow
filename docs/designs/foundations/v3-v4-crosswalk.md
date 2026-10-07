@@ -23,7 +23,10 @@ references/crosswalk-inventory.md が所有し、本 Design は分類スキー�
 - 意味処遇: keep（v4 でも保持する）/ redefine（v4 で意味を再定義する）/ supersede
   （後継が確定した置換）/ retire（後継なしの廃止）
 - 帰属: Runtime / Standard Operating Model / semantic Skill / deterministic code/tool /
-  Adapter / Project Extension / Project Model / ―（概念・複合）
+  Adapter / Project Extension / Project Model / ―（概念・複合）。
+  「semantic Skill」「deterministic code/tool」は DEC-036 決定(1) 時点の帰属語彙であり、
+  処遇記録（crosswalk-inventory）の実行時点語彙を保持する（REQ-103-020）。現行語彙の後継は
+  v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節を参照する
 - 実行段階: v4 実装 Sequence の段階番号。keep は ―
 
 従来の 9 分類軸は、意味処遇・帰属・機構置換の 3 次元を単一列へ混在させた表現であり、

@@ -64,7 +64,7 @@ extension はフロントマタ（`version: 1`, `kind:`（公式3値: workflow-e
 推奨順は表または順序ラベルで保持する。Workflow Skill 側の STEP resume point（references/）はこの限りではない。
 repo-local command（`/repo/*`）は従来形式（`### Step N` 主手順）を維持する。
 
-正規形の確定に伴い、主手順を `### Step N` 見出しで表現することを公開 command へ要求する規定は現在存在しない（Issue #2373、REQ-047-006。監査 AUDIT-REQ-045-CONSISTENCY F-011 の内部矛盾解消）。
+正規形の確定に伴い、主手順を `### Step N` 見出しで表現することを公開 command へ要求する規定は現在存在しない（Issue #2373、REQ-047-006。監査 AUDIT-REQ-045-CONSISTENCY F-011〔REQ-045 は後継なしで retired・監査記録は docs/reports/ の履歴記録として保持〕の内部矛盾解消）。
 `### Step N` 様式自体は旧様式の残存・誤用検出対象として、後述の機械検査が扱う。
 
 ## ガードレール識別体系

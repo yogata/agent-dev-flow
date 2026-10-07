@@ -420,7 +420,7 @@ accepted Decision は意味的に不変とする（REQ-001-056〜060）。
 
 | 文書種別 | 状態遷移 | 備考 |
 |---|---|---|
-| REQ | created → active → superseded / partially superseded | APPEND/UPDATEで拡張する。現行 REQ は `docs/requirements/README.md`、旧世代の履歴資料は tag `v2.11.0` で参照する |
+| REQ | created → active → retired | APPEND/UPDATEで拡張する。廃止済み REQ は `docs/requirements/retired/` へ配置する。現行 REQ は `docs/requirements/README.md`、旧世代（v2:REQ-01XX）の履歴資料は tag `v2.11.0` で参照する |
 | Decision | proposed → accepted → superseded / deprecated | acceptedだけを現行判断の根拠とする |
 | Design | draft → accepted | 新規Designはdraftで作成され、確定時にacceptedへ遷移する。置換済みDesignは現行ツリーへ保持しない |
 | Guide | active → outdated → removed | 規範的権限を持たない |
