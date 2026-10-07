@@ -6,6 +6,7 @@ updated: "2026-10-08"
 ---
 <!-- ADF-COVERS(implementation): REQ-002-005, REQ-002-006, REQ-002-016, REQ-002-034 -->
 <!-- ADF-COVERS(design): REQ-103-013, REQ-103-024, REQ-103-025（REQ-103 の soft contract 再定義・実現物整合・入力忠実性の設計対応面） -->
+<!-- ADF-COVERS(implementation): REQ-103-013（REQ-103 の soft contract 再定義面。soft contract の定義（LLM 解釈必須・機械的処理回避・schema 全面禁止の理由として扱わない）を本 Design の契約節が構成実体として所有する。決定的処理可能部分の機械処理は各 Tool・checker・sidecar schema が分担） -->
 
 # アーティファクト契約
 

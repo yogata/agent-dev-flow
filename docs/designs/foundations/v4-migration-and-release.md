@@ -6,6 +6,7 @@ updated: 2026-10-08
 ---
 
 <!-- ADF-COVERS(design): REQ-103-026, REQ-103-028（REQ-103 の互換維持境界と baseline tag の設計対応面） -->
+<!-- ADF-COVERS(implementation): REQ-103-028（REQ-103 の baseline tag 運用契約面。「v3 baseline と rollback anchor」節が非 SemVer 命名・tag 不変・既存 tag 非移動の運用契約を構成実体として所有する。tag 実体 baseline-v4-canonical-convergence-20261007 = 72e04cadc4ff8fa00b6f484f421975c99a75b449 は file path を持たない git 成果物であり、存在・非移動・差分一意性の実測は TS-016 検証記録（docs/reports/req-103-ac-judgment-wave3.md）を参照） -->
 
 # ADF v4 Migration と Release の標準境界
 

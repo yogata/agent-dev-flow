@@ -1,0 +1,35 @@
+component: req-103-wave3-verification
+implementation:
+  # REQ-103-029/030/031 の実現面としての AC 判定・横断整合・実経路確認の完了記録。
+  # 判定記録は恒久台帳ではなく今回限りの記録であり、本委譲 DEL-3538-2 で最終版へ更新される。
+  # 有限な完了の実体は「今回限りの有限な作業の完了記録」であり、恒久管理はしない。
+  docs/reports/req-103-ac-judgment-wave3.md:
+    - REQ-103-029
+    - REQ-103-030
+    - REQ-103-031
+verification:
+  # policy.yaml で optional 登録した REQ-103 の行（一回限りの検証義務・恒常 checker 非設置）の
+  # 今回限り検証の記録として、判定記録が REQ-103-001〜007、010〜013、026〜031 の検証を実施する。
+  # 判定は AC-26 判定規則（REQ-103-031）に従い、各判定から台帳・実測・Issue/PR 履歴・
+  # ファイル所在へ到達できる。恒常的検証手段を持つ REQ-103-008/009 は
+  # agentdev-jev.yaml（tests/engine.test.ts・tests/index.test.ts）が検証手段を所有する。
+  docs/reports/req-103-ac-judgment-wave3.md:
+    - REQ-103-001
+    - REQ-103-002
+    - REQ-103-003
+    - REQ-103-004
+    - REQ-103-005
+    - REQ-103-006
+    - REQ-103-007
+    - REQ-103-008
+    - REQ-103-009
+    - REQ-103-010
+    - REQ-103-011
+    - REQ-103-012
+    - REQ-103-013
+    - REQ-103-026
+    - REQ-103-027
+    - REQ-103-028
+    - REQ-103-029
+    - REQ-103-030
+    - REQ-103-031

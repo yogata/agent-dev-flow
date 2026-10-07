@@ -57,4 +57,6 @@ references/crosswalk-inventory.md が所有し、本 Design は分類スキー�
 ## 検証スコープ（REQ-103-016/017）
 
 REQ-103-016（評価対象集合の全件処遇判定）と REQ-103-017（keep 以外の反映完了）は一回限り再評価の判定と反映の契約であり、恒常 checker を新設しない（REQ-103-019）。検証スコープポリシー（traceability/policy.yaml）で optional 登録し、各再評価実行時の検証計画（TS-010、TS-013 相当）で検証する。
+
+REQ-103-001〜007、010〜013、026〜031 の verification も一回限りの検証義務（TS-001〜TS-008、TS-015〜TS-017 相当の横断読解・全文検索・照合）であり、恒常 checker を新設しない（REQ-103-019・REQ-103-029）。検証スコープポリシーで optional 登録し、今回限りの検証記録（docs/reports/req-103-ac-judgment-wave3.md と各 Wave の PR 本文検証差分）で検証する。行ごとの実体確認と判定根拠は Case #3538 の実行台帳（作業中一時台帳、完了後削除）と判定記録へ記録する。例外として REQ-103-008（LLM fallback 禁止）と REQ-103-009（判定未確定の構造化記録・合格化不在）の verification は agentdev-jev Tool 実装の恒常テスト（src/common/tools/agentdev-jev/tests/engine.test.ts・tests/index.test.ts）が所有し、optional 登録しない。REQ-103-011 は恒常補助テスト（tests/index.test.ts の観測永続化耐性）を持つが TS-006 の 4 項目を全体として恒常検証しないため optional 登録する。
 REQ-103-020（歴史本文の保持）の verification は IR-015 が、REQ-103-021（誤認防止と到達性）の verification は IR-040 と IR-041 が retired 参照の恒久検出として所有する。
