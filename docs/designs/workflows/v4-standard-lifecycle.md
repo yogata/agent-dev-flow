@@ -43,3 +43,34 @@ Observe -> Intake/Learning -> Backlog -> req-define -> REQ/Decision/Design -> ca
 - Loop 詳細（循環の各段責務、Observe と Integrate の責務定義、Learning 評価結果 7 系統の詳細、昇格ガード、.agentdev/ 状態領域の整合、v3 backlog-artifact-lifecycle Design からの吸収）は v4-collaboration-loop Design が所有する
 - Observe = 検出と回収（inspect 系コマンドの検出、クローズ済み GitHub 成果物からの回収（intake-from-github）、case-close における PR 本文 Capture 回収）。新規コマンドを増設しない
 - Integrate = 検証結果の統合と正規成果物の確定（case-close における PR マージ、docs 確定、Close 処理）
+
+## 主要責務の正規所有者一覧（REQ-103-014）
+
+主要責務の正規所有者は次のとおり一意である。同一責務を複数工程が現行責務として所有しない。
+
+| 主要責務 | 正規所有者 | 契約所在 |
+|---|---|---|
+| Root Case 確立 | case-open | REQ-030、commands/case-open.md |
+| Definition 受入 | case-ready | REQ-061、commands/case-ready.md |
+| REQ/Decision/Design 保存 | case-ready / case-revise（Definition 保存内部責務。Capability Skill 委譲） | REQ-061、REQ-062、各 file-manager skill Design |
+| execution contract 確定 | case-ready | REQ-061 |
+| Standard / Epic 構成 | case-ready | REQ-061 |
+| Child Issue 構成 | case-ready | REQ-061 |
+| Wave / 依存 DAG | 構成確定: case-ready、実行制御: case-auto orchestration stage 3 | REQ-061、REQ-034、workflows/references/execution-unit-construction.md |
+| 実装実行 | case-run（実行担当サブエージェントへ委譲 1 件。委譲内の実装・検証・PR 作成は委譲側の実行） | REQ-031、skills/agentdev-case-run-execution-adapter.md |
+| Verification / QG | 各配置点の Gate（QG-1〜QG-4 と工程内 gate 群） | quality/v4-quality-gate-model.md |
+| merge / close | case-close | REQ-032、commands/case-close.md |
+| revise / resume | revise: case-revise、resume: case-auto（Root Case 指定入口） | REQ-062、REQ-034、v4-lifecycle-state-machine |
+
+## Wave、意味的依存、実行並列上限、競合情報の一意定義（REQ-103-015）
+
+4 概念を混同しない。各概念の正規責務と決定方法は次のとおり一意である。
+
+| 概念 | 定義 | 正規責務の所有 | 決定方法 |
+|---|---|---|---|
+| Wave | Epic 内の依存関係と並列実行可能性を表す実行スケジューリング単位 | Epic の実行構成表（一つの表）が所有 | 意味的依存 DAG からのトポロジカルレベル割当（決定的導出。最小性成立: 同一深さ同一 Wave） |
+| 意味的依存 | 子 Issue 間の成立順序の依存（必須依存のみを辺とする DAG） | Epic の実行構成表が所有 | 意味的依存関係の確定は判断（確定権限に従う）、確定後の依存グラフ・循環検出・Wave 構成導出は決定的処理（REQ-096-016） |
+| 実行並列上限 | 同時に active にできる Issue task 数の論理上限 | ADF 契約（数値の所有は case-auto Design。DEC-041、DEC-051） | 構成判断（確定済み契約からの導出）。harness の同時起動制限は adapter・実装制約であり論理上限の根拠としない |
+| 競合情報 | Wave 割当時の依存ヒント交差の決定的比較結果（重複許容・衝突リスクの情報） | Epic の実行構成確定時に生成し、case-run へ引き渡す | 交差検出は決定的比較。衝突時の解消判断（該当ファイルの最新取得・直列化・rebase）は実行担当の委譲された裁量 |
+
+Wave 状態は保存せず Wave 内子Issue 状態から導出する（v4-lifecycle-state-machine）。実行並列上限と Wave は別概念であり、並列上限は Wave 内実行と横断補充の両方に適用される実行安全境界である。競合情報は依存ヒント粒度の粗さに由来する実行・統合時のリスク情報であり、Wave 割当や依存関係の定義そのものではない。

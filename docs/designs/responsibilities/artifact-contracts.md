@@ -147,8 +147,10 @@ req-define は Design action の `artifact_actions` と `operation_units` へ分
 
 ### soft-contract 運用（DEC-003 準拠）
 
+- soft contract は、厳格な API schema や過剰な互換維持機構を要求しない契約特性として定義する（REQ-103-013）。soft contract を LLM 解釈必須の理由、機械的処理を避ける理由、schema validation の全面禁止の理由として扱わない
+- 存在確認、型、列挙値、ID、参照関係、明示的フィールド等の決定的に扱える部分は機械的に処理してよい（本節の分類根拠フィールドの欠落検出と `unknown` 既定値適用、REQ 拡張可否判定ルールの列挙値照合はこの適用である）
 - 分類根拠は soft-contract（DEC-003）として追加情報扱いとする
-- 厳格なスキーマ検証、JSON Schema、バリデータを導入しない
+- 厳格なスキーマ検証、JSON Schema、バリデータを導入しない（欠落・形式不備で後続工程を拒否しない契約特性であり、決定的に扱える部分の機械処理を禁止しない）
 - 欠落時は `unknown` 既定値で警告を出し、処理を継続する（後方互換）
 - 既存の採用済み成果物、RU、req_draft を欠落により拒否しない
 - 具体的なシリアライズ形式は各工程の成果物形式（RU frontmatter、draft-data YAML 等）に従う

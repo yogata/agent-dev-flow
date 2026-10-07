@@ -76,6 +76,16 @@ tag・branch の lifecycle role 別サブ表:
 
 書き込み経路の統制点は fail-closed とする。Custom Tool の書き込み操作（読戻し検証失敗時に成功を返さない）、書込み guard（ブロックを解除せず標準手段へ切替）を含む。助言的統合（検査・診断系、fail-open 許容の traceability 能力等）のみ例外として fail-open を許す。
 
+## 判定未確定時の依存後続抑止（REQ-103-009）
+
+必須の閉じた意味評価が評価器障害等で成立せず判定が未確定の間、当該判定に依存する後続の副作用および状態遷移を開始しない。
+
+- 判定未確定を fail または非該当へ変換して後続を進めない（判定不能の不合格化をしない）
+- 依存しない独立処理を一律に停止しない
+- 判定未確定の状態記録は証跡（記録）として行い、durable state enum の新値を追加しない（v4-lifecycle-state-machine の enum 値域を拡張しない）
+- 復旧後の再実行は v4-durable-state-and-recovery Design「評価器復旧後の評価再開契約」節に従う
+- 契約面の正は v4-responsibility-boundaries Design「閉じた意味評価の障害時契約」節が所有し、本節は runtime 面の適用を所有する
+
 ## 決定的実行・adapter 実行との接続
 
 状態遷移 predicate 評価・冪等キー照合・依存解決・Wave scheduling の決定的所有は決定的処理（判断方法3分類の正典: DEC-048、foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節）に従う（本 Design は再列挙しない）。意味判断（閉じた意味評価・開いた推論。要件解釈、block 判定、レビュー）は Skill が所有する。adapter execution（agent 起動、context、background execution、tool invocation の実行機構）は Harness/Backend adapter 境界（DEC-036 決定(2)）が所有し、本 Design の副作用分類・直列化単位は adapter 経由の実行にも適用される。

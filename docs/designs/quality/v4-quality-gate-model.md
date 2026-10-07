@@ -115,3 +115,6 @@ QG-2 / QG-4 の Verification Obligation への受け入れ義務保存の拡張�
 ## Verifier 分類
 
 deterministic verifier と semantic verifier の分類、Evidence の保存契約（永続/参照可能）。
+
+- deterministic verifier は決定的処理として実行される検証であり、semantic verifier は閉じた意味評価または開いた推論を含む検証である。判断方法3分類の正典は DEC-048 と foundations/v4-responsibility-boundaries Design「判断方法3分類の判別基準」節であり、本分類は検証の実行方式の分類として判断方法3分類へ対応づく。旧 DEC-036 決定(1) の deterministic／semantic 二分法は判断方法の分類としては DEC-048 が置換済みであり、判断方法の分類として本分類（Verifier 分類）の語彙を使用しない
+- 必須の閉じた意味評価を検証とする semantic verifier が評価器障害（未設定、利用不能、timeout、rate limit、network error、provider error、応答検証失敗等）で成立しない場合、判定は未確定とし、LLM 推論へ fallback せず、partial（判定保留）として遷移不可を維持する（REQ-103-008、REQ-103-009。runtime 面の適用は v4-runtime-execution-model Design「判定未確定時の依存後続抑止」節）
