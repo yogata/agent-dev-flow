@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261007T224758Z-39e9",
+  "workflow": "req-define",
+  "evaluationKind": "caller-path-trial-3538",
+  "subject": "既存REQ照合候補要件文（REQ-103-009 引用）のREQ要件行保存適否判断",
+  "sourceRevision": "8262d404",
+  "durationMs": 1765,
+  "inputTokens": 818,
+  "inputs": {
+    "requestDigest": "091f89f43ee9ad77d1b7d55291e73aeb4e05d8097bb967a134da539a8c5a01d9"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "cpt-r1",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.89,
+        "false": 0.10999999999999999
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "cpt-r1",
+        "value": true
+      }
+    ]
+  }
+}
