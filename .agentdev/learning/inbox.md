@@ -310,3 +310,75 @@
 - **タグ**: `#case-open` `#traceability` `#gate-granularity` `#prepare-definition-pr`
 
 ---
+
+## Windows git-bash 環境で cmd //c mklink /J がサイレント失敗する（bun -e fs.symlinkSync は確実に動作する）
+
+- **問題事象**: worktree の node_modules 未伝播時に `cmd //c mklink /J` で junction を作成したところ、標準出力にエラーを出さず junction が作成されないサイレント失敗が発生した（Case #3525）
+- **発生局面**: 実装（worktree での bun test フル suite 実行前置。Case #3525）
+- **検知方法**: lstatSync/realpathSync での junction 実在・参照先確認
+- **根本原因**: git-bash 経由の cmd 呼び出しでの mklink /J は環境によりエラーが握り潰される
+- **自律対応内容**: `bun -e "fs.symlinkSync(target, path, 'junction')"` へ切替え、作成後に realpathSync で参照先を検証
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存の junction 作成手順の実行経路選択の知見）
+- **横展開観点**: worktree node_modules 未伝播時の依存整備（junction 作成手順）に mklink 経路のサイレント失敗リスクを記録する価値
+- **再発条件**: git-bash 経由で mklink /J を実行する場合
+- **予防策候補**: junction 作成は bun -e fs.symlinkSync を標準とし、作成後に lstatSync で symlink 判定を検証する
+- **想定反映先**: worktree の依存整備手順（node_modules junction）
+- **関連**: Case #3525・PR #3527 の learning 第1項
+- **タグ**: `#windows` `#junction` `#mklink` `#worktree`
+
+---
+
+## scripts/self/release 配下のテストは公式 typecheck 対象範囲外であり distribution-boundary tsconfig 相当の strict 指定で既出 strict エラー 14 件が存在する
+
+- **問題事象**: scripts/self/release/wave-composition-purity.test.ts を distribution-boundary tsconfig と同一 strict 指定で typecheck すると、既存コード領域（L122-127・TS-001 系）に strict 系エラー（TS18047/18048/2532/2554）14 件が存在する。HEAD 版を同条件で実行した結果と同一集合・行オフセット対応で既存起因（Case #3525）
+- **発生局面**: 実装（QG-4 の typecheck 実行。Case #3525）
+- **検知方法**: tsc --noEmit（distribution-boundary tsconfig と同一 strict 指定）の実行
+- **根本原因**: scripts/self/release 配下は公式 typecheck 対象範囲外であり strict 指定での検査が未整備
+- **自律対応内容**: 新規型エラー 0（既出集合との一致）を確認して継続。型チェック対象範囲の整備は別案件候補として記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存の対象範囲設定の事実確認）
+- **横展開観点**: typecheck 対象範囲外のテストへ strict 指定で検査する場合、HEAD 版との同一集合比較で新規起因を分離する
+- **再発条件**: scripts/self/release 配下を strict 指定で typecheck する場合
+- **予防策候補**: 対象範囲の整備（tsconfig 追加または除外の明記）を別案件として検討
+- **想定反映先**: typecheck 対象範囲の整備案件（候補）
+- **関連**: Case #3525・PR #3527 の learning 第2項
+- **タグ**: `#typecheck` `#strict` `#test-scope`
+
+---
+
+## textlint 最終検査の gate fail は worktree と main HEAD の差分実行で本 Case 変更起因の新規 NG 0 件を証明して既知欠陥として分類できる
+
+- **問題事象**: case-close STEP-3 の textlint 最終検査（gate.ts --root worktree --purpose independent）が hard violations 40 件で fail した。検出は prh 訳語表（Definition PR → 設計PR 等）の既存文書 17 ファイルへの違反で、本 Case 変更ファイル 3 件は 1 件も含まない（Case #3525）
+- **発生局面**: 実装（case-close STEP-3 textlint-final-check gate。Case #3525）
+- **検知方法**: close_mechanical_steps.ts の textlint-final-check step fail（exit 1）と gate.ts 個別再実行の stdout JSON 突合
+- **根本原因**: gate は対象 root 全件の拒否対象違反ゼロを合格条件とするため、リポジトリ既存の prh 違反が worktree 指定実行でも検出される
+- **自律対応内容**: main HEAD 2b8bcd2 で同条件実行し同一 40 hard・同一 17 ファイルを確認。変更ファイルへの hard 違反 0 件と合わせて fail 由来分類「既知欠陥」を確定し、対応記録コメントの検証差分へ記録して継続
+- **ユーザー確認有無**: なし（fail 由来3分類〔既知欠陥・環境依存・当該変更起因〕の契約適用）
+- **Decision/REQ/spec影響**: なし（既存の checker 実測契約の適用）
+- **横展開観点**: 全件列挙型 gate が既存欠陥で fail する場合、同一条件の base HEAD 実行との差分で新規 NG 起因を分離する
+- **再発条件**: 既存文書に拒否対象違反が残存する状態で、worktree root 指定の textlint gate を実行する close
+- **予防策候補**: prh 訳語表違反 40 件の恒久対処（別途候補）。または textlint gate への baseline 機構の検討
+- **想定反映先**: case-close の textlint 最終検査運用、textlint prh 辞書整備案件（候補）
+- **関連**: Case #3525・PR #3527 merge commit f48f2d9a、対応記録コメント（検証差分）
+- **タグ**: `#textlint` `#known-defect` `#diff-execution` `#case-close`
+
+---
+
+## 長パスを含む worktree は git worktree remove が Filename too long で失敗するため node fs.rmSync で削除する
+
+- **問題事象**: textlint vendor・node_modules junction を含む worktree（3525-fix）の削除で `git worktree remove` が「Filename too long」で exit 255 失敗。worktree 登録は解除されたがディレクトリが残存した（Case #3525）
+- **発生局面**: 運用（case-close STEP-6-1 worktree 削除。Case #3525）
+- **検知方法**: git worktree remove のエラー出力と worktree list・ディレクトリ実在確認
+- **根本原因**: worktree 内の深いパス（検査ツール配下の依存物等）が Windows MAX_PATH を超過し git 内部の削除が失敗する
+- **自律対応内容**: `bun -e fs.rmSync(path, {recursive: true, force: true})` で残存ディレクトリを削除し、削除完了を確認（junction はリンク自体のみ削除され参照先は無傷）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存の削除手順の実行経路選択の知見。--force 不使用の原則は変更しない）
+- **横展開観点**: worktree remove の Filename too long 失敗時は、worktree list から登録解除を確認してから残存ディレクトリを node 側で削除する
+- **再発条件**: Windows 環境で深いパスの依存物を含む worktree を削除する場合
+- **予防策候補**: worktree-operations の削除手順へ「remove 失敗時の登録解除確認と node rmSync フォールバック」を明記する価値
+- **想定反映先**: agentdev-git-worktree references worktree-operations.md（削除失敗時の対処）
+- **関連**: Case #3525・merge commit f48f2d9a
+- **タグ**: `#worktree` `#windows` `#long-path` `#cleanup`
+
+---
