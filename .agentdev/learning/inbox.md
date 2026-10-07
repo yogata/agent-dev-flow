@@ -562,3 +562,21 @@
 - **タグ**: `#traceability` `#evidence-preservation` `#verification-diff` `#case-close` `#fail-classification`
 
 ---
+
+## close_mechanical_steps.ts の報告 JSON は gate の stdout/stderr 証跡を保持しないため件数突合系 gate は個別実行+退避で証跡を確保する
+
+- **問題事象**: case-close STEP-2/STEP-3 で close_mechanical_steps.ts（phase: pre-merge）を 1 回の呼び出しで全 gate を実行した結果、full-integrity-suite・textlint-final-check の step は exitCode のみを記録し、bun test の「Ran N tests across M files」や textlint hard findings の path:line:column:ruleId 集合といった stdout/stderr 証跡が破棄された。N/M 件数突合（必須ステップ）と textlint 両側集合比較（正規形）の証拠が script 実行だけでは残らない
+- **発生局面**: case-close STEP-2/STEP-3 の merge 直前 HEAD 検証（Case #3536・Epic #3530 Wave 2-4）
+- **検知方法**: script 報告 JSON の steps に件数・findings 集合が含まれないことを確認し、bun test ①②③ と textlint worktree/main を個別再実行して stdout/stderr を退避（C:/WINDOWS/TEMP/opencode/）して証跡を確保
+- **根本原因**: close_mechanical_steps.ts の runner は gate 実行結果を {exitCode} で集約する（stdout/stderr は textlint stderrTail 400 文字の例外を除き破棄）。証跡退避は呼出側の責務として script 契約に含まれない
+- **自律対応内容**: bun test ①（2717 pass / 110 files・case-run 実績と同一）②（349 / 25）③（653 pass / 1 fail / 39 files・#3535 実績と同一）を個別実行+分離退避で件数突合、textlint worktree/main を --json 退避して node -e で hard 集合突合（path:line:column:ruleId、新規 0・除去 0）を実施して Evidence 化した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（script 契約は変更しない。工程側の手順接続のみ）
+- **横展開観点**: close_mechanical_steps.ts を使う case-close では、件数突合・集合比較が必要な gate（full integrity suite・textlint）を script 外で個別実行+退避する。二重実行コストを避けるなら個別実行を主とし、script は mergeable ポーリング・checkbox 抽出・AUTOGEN 差分検出の実行に絞る運用も成立する。script の報告 JSON が証跡を保持する将来拡張が入るまでこの分割が現行の証跡成立手順
+- **再発条件**: close_mechanical_steps.ts 単独の gate 実行結果（exitCode のみ）を合格証拠として扱う運用
+- **予防策候補**: full integrity suite・textlint gate の実行証跡（stdout/stderr・終了コード・N/M 件数・集合）は script 実行と独立に個別退避することを case-close の検証差分記録の必須項目として明記する
+- **想定反映先**: case-close STEP-3「full integrity suite 実行」節の注記追加、close_mechanical_steps.ts の報告 JSON 拡張候補（gate 証跡保持）
+- **関連**: Case #3536・PR #3543・Case #3535 対応記録コメント（個別実行+退避の前例）
+- **タグ**: `#case-close` `#evidence-preservation` `#bun-test` `#textlint` `#close-mechanical-steps`
+
+---
