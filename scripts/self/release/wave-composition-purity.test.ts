@@ -18,12 +18,16 @@
 //     independent issues stay in the same Wave, order-of-completion
 //     dependencies become semantic (Wave split), undetectable sets are
 //     reported and never treated as duplicate-free.
+//   - TS-008 Wave minimality (REQ-061-047/048): the Wave assignment equals the
+//     topological level assignment (longest-path depth) of the semantic DAG; a
+//     0-edge DAG always composes into a single Wave; topic-based 3-Wave
+//     grouping and edge-preserving level-exceeding over-splits fail the check.
 //
 // The simulations are deterministic reference models (no randomness, no wall
 // clock); the distribution-artifact probes pin the canonical wording of the
 // case-run / case-auto / case-ready workflow skills.
 
-// ADF-COVERS(verification): REQ-034-027, REQ-034-040, REQ-034-041, REQ-034-042, REQ-034-043, REQ-035-012, REQ-035-016, REQ-035-017, REQ-035-018, REQ-061-010, REQ-061-019, REQ-061-038
+// ADF-COVERS(verification): REQ-034-027, REQ-034-040, REQ-034-041, REQ-034-042, REQ-034-043, REQ-035-012, REQ-035-016, REQ-035-017, REQ-035-018, REQ-061-010, REQ-061-019, REQ-061-038, REQ-061-047, REQ-061-048
 
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "fs";
@@ -481,5 +485,116 @@ describe("TS-007 duplication detection use (conflict risk, not Wave split)", () 
     expect(structDoc).toMatch(/検出不能として報告し、無重複扱いしない/);
     expect(structDoc).toMatch(/成果の成立順序への依存（一方が作成する成果を他方が利用する等）が確認された場合は、それを意味的依存として Wave 構成に反映する/);
     expect(autoOrch).toMatch(/変更対象集合が取得不能な子 Issue を含む場合は比較を省略せず検出不能として報告する/);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// TS-008 Wave minimality: assignment == topological level (REQ-061-047/048)
+// ---------------------------------------------------------------------------
+
+/**
+ * Topological level (longest-path depth) per issue: level 0 = no required
+ * deps, level(n) = 1 + max(level(dep)) otherwise. Throws on a dependency
+ * cycle (construction stops; no Wave assignment is made).
+ */
+function topologicalLevels(nodes: IssueId[], deps: DepGraph): Record<IssueId, number> {
+  const levels: Record<IssueId, number> = {};
+  const visit = (n: IssueId, path: IssueId[]): number => {
+    if (levels[n] !== undefined) return levels[n];
+    if (path.includes(n)) throw new Error("dependency cycle");
+    const ds = deps[n] ?? [];
+    const level = ds.length === 0
+      ? 0
+      : 1 + Math.max(...ds.map((d) => visit(d, [...path, n])));
+    levels[n] = level;
+    return level;
+  };
+  for (const n of nodes) visit(n, []);
+  return levels;
+}
+
+/**
+ * Minimality check (REQ-061-048): every issue's Wave index equals its
+ * topological level (longest-path depth). Any violation (0-edge multi-Wave
+ * splits, topic-based grouping, edge-preserving level-exceeding splits) is
+ * reported so the composition check can fail closed.
+ */
+function checkWaveMinimality(
+  waves: IssueId[][],
+  nodes: IssueId[],
+  deps: DepGraph,
+): { ok: boolean; violations: Array<{ issue: IssueId; wave: number; level: number }> } {
+  const levels = topologicalLevels(nodes, deps);
+  const waveOf = new Map<IssueId, number>();
+  waves.forEach((wave, index) => {
+    for (const issue of wave) waveOf.set(issue, index);
+  });
+  const violations: Array<{ issue: IssueId; wave: number; level: number }> = [];
+  for (const n of nodes) {
+    const wave = waveOf.get(n);
+    const level = levels[n];
+    if (wave === undefined || level === undefined) continue;
+    if (wave !== level) violations.push({ issue: n, wave, level });
+  }
+  return { ok: violations.length === 0, violations };
+}
+
+describe("TS-008 Wave assignment equals topological levels (minimality)", () => {
+  test("(a) 0-edge DAG composes into exactly one Wave and passes the check", () => {
+    const nodes = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
+    const deps: DepGraph = Object.fromEntries(nodes.map((n) => [n, []]));
+    const waves = computeWaves(nodes, deps);
+    expect(waves).toEqual([nodes]); // single Wave premise: 0 edges -> 1 Wave
+    expect(checkWaveMinimality(waves, nodes, deps).ok).toBe(true);
+  });
+
+  test("(b) dependent DAG: every Wave index exactly equals the longest-path depth", () => {
+    const nodes = ["api", "client", "plugin", "docs"];
+    const deps: DepGraph = {
+      api: [],
+      client: ["api"],
+      plugin: ["api"],
+      docs: ["client"],
+    };
+    const waves = computeWaves(nodes, deps);
+    expect(waves).toEqual([["api"], ["client", "plugin"], ["docs"]]);
+    const check = checkWaveMinimality(waves, nodes, deps);
+    expect(check.ok).toBe(true);
+    const levels = topologicalLevels(nodes, deps);
+    waves.forEach((wave, index) => {
+      for (const issue of wave) expect(levels[issue]).toBe(index);
+    });
+  });
+
+  test("(c) #3507-type: 9 child issues, 0 deps, topic-based 3-Wave composition fails", () => {
+    const nodes = ["i1", "i2", "i3", "i4", "i5", "i6", "i7", "i8", "i9"];
+    const deps: DepGraph = Object.fromEntries(nodes.map((n) => [n, []]));
+    const topicWaves: IssueId[][] = [
+      ["i1", "i2", "i3"],
+      ["i4", "i5", "i6"],
+      ["i7", "i8", "i9"],
+    ];
+    const check = checkWaveMinimality(topicWaves, nodes, deps);
+    expect(check.ok).toBe(false); // fail-closed detection
+    // Wave 1/2 issues sit below level 0; the 3 issues in Wave 0 are compliant.
+    expect(check.violations).toHaveLength(6);
+    expect(check.violations.every((v) => v.level === 0 && v.wave > 0)).toBe(true);
+  });
+
+  test("(d) edge-preserving level-exceeding over-split fails", () => {
+    const nodes = ["a1", "a2", "b1"];
+    const deps: DepGraph = { a1: [], a2: [], b1: ["a1", "a2"] };
+    // Edges preserved (b1 runs after both deps) but a2 is pushed past its level.
+    const overSplit: IssueId[][] = [["a1"], ["a2"], ["b1"]];
+    const check = checkWaveMinimality(overSplit, nodes, deps);
+    expect(check.ok).toBe(false);
+    expect(check.violations).toContainEqual({ issue: "a2", wave: 1, level: 0 });
+  });
+
+  test("distribution artifact pins the minimality check in the case-ready runbook", () => {
+    const structDoc = read(CASE_READY_STRUCT_REL);
+    expect(structDoc).toMatch(/Wave 割当とトポロジカルレベル割当（最小性）の一致/);
+    expect(structDoc).toMatch(/単一 Wave 前提とトポロジカルレベル割当として意味的依存 DAG から決定的に導出する/);
+    expect(structDoc).toMatch(/主題的近さ・ファイル重複・マージ順序の望ましさを Wave 分割理由としない/);
   });
 });
