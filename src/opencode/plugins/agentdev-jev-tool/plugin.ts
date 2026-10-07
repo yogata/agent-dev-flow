@@ -7,8 +7,8 @@
 //
 // 公開スキーマは provider・SDK 非依存（REQ-{NNNN}-{NNN}）。provider 接続（現行 Cloudflare
 // adapter）は Tool 本体が動的解決し、credential（CLOUDFLARE_ACCOUNT_ID と
-// CLOUDFLARE_API_TOKEN）未設定時は呼び出さず not_configured を返す。Jev 障害時も
-// Workflow は従来 LLM 経路で継続できる。
+// CLOUDFLARE_API_TOKEN）未設定時は呼び出さず not_configured を返す。Jev 障害時の
+// 判定・継続契約の正は Custom Tool 操作契約 Design「Jev 先行評価」節である。
 //
 // args スキーマは zod を用いない（依存ゼロの構造的定義）。入力の検証は
 // Tool 本体（runAgentdevJevOperation）が操作契約で厳密に行う。

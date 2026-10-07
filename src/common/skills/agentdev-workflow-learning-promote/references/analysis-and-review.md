@@ -207,8 +207,10 @@ inbox → deferred 移動、prune、commit/push 等の不可逆処理は未実�
 
 共通契約:
 
-- 利用可否は `CLOUDFLARE_ACCOUNT_ID` と `CLOUDFLARE_API_TOKEN` の設定有無で決まる（デフォルト有効、feature flag や opt-in 手続きは不要）。未設定時は API を呼び出さず構造化失敗（not_configured）を返し、観測を生成せず従来 LLM 経路のみで本 Workflow を完了する
-- Jev API 失敗（timeout、429、5xx、network error、response validation error）時は自動再試行せず即座に従来 LLM 経路へ fallback し、失敗観測に失敗分類と最小 diagnostic が記録される。正規状態を破損しない
+- 利用可否は `CLOUDFLARE_ACCOUNT_ID` と `CLOUDFLARE_API_TOKEN` の設定有無で決まる（デフォルト有効、feature flag や opt-in 手続きは不要）。未設定時は API を呼び出さず構造化失敗（not_configured）を返し、観測を生成しない
+- 評価器障害（not_configured、timeout、429、5xx、network error、response validation error 等）で評価が成立しない場合、LLM 推論へ fallback して判定を継続せず、当該判定を未確定として扱い、当該判定に依存する後続の副作用および状態遷移を開始しない。判定未確定を不合格または非該当へ変換せず、依存しない独立処理を一律に停止せず、評価器障害だけを理由に人間判断へ移行しない。判定未確定の停止（停止条件と再開条件を含む）を報告し、状態記録は証跡として残す。契約の正は v4-responsibility-boundaries Design「閉じた意味評価の障害時契約」節（runtime 面の適用は v4-runtime-execution-model Design「判定未確定時の依存後続抑止」節）
+- Jev API 失敗時は自動再試行せず、失敗観測に失敗分類と最小 diagnostic が記録される。正規状態を破損しない
+- 評価器復旧後は、正規の再実行・再開経路で評価を再実行する。再開前に入力・規則・成果物・証拠への変更影響を確認し、影響する古い判定を再利用せず、成功済み副作用を重複実行せず、影響しない証拠は再利用する。修復・再試行・設定等の運用介入を判定方式の代替または新規規範の確定と混同しない。再開契約の正は v4-durable-state-and-recovery Design「評価器復旧後の評価再開契約」節
 - 観測は 1 semantic evaluation = 1 observation（1 JSON）で `.agentdev/jev-observations/` に保存する。confidence は evaluation 単位の一次事実であり、provider が返した場合のみ保存する。質問単位への複製・確率分布からの代替生成を行わない。観測書込み失敗時は本 Workflow の success を維持し、完了報告に識別可能な warning を明示する。rollback・再実行・擬似再生成を行わない
 - 再構成可能な判断入力は判断入力全文を保存せず、評価リクエストの digest と参照で保持する。再構成不能な入力のみ最小 snapshot を渡す
 - 条件付き評価の発動制御（REQ-{NNNN}-{NNN}）: 親となる判断の結果によって後続判断の必要性が決まる場合、親判断の最終確定結果が発動条件を満たした場合だけ後続の意味評価を生成する。Jev による親判断の先行評価結果のみをもって後続評価を発動しない。発動条件が成立しない場合は後続質問自体を生成せず、後続の意味評価に対応する観測記録（非該当等を表すためだけのものを含む）も生成しない

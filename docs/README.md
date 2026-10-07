@@ -152,6 +152,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-049](decisions/DEC-049.md) | ADF 共通原本とホスト接続領域の分離によるマルチホスト配布モデル |
 | [DEC-050](decisions/DEC-050.md) | deleteBranchOnMerge 設定不備の警告化と操作安全性停止の維持 |
 | [DEC-051](decisions/DEC-051.md) | case-auto stage 3 のスロット型キューへの移行（Wave 収束前提の撤廃） |
+| [DEC-052](decisions/DEC-052.md) | Jev 評価器障害時の判定未確定と依存後続抑止への移行（DEC-044 決定3 の部分置換） |
 <!-- AUTOGEN:END -->
 
 ## 設計（Design）

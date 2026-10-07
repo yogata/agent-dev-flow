@@ -30,7 +30,7 @@ evaluate は evaluator 成功後の時点で、evaluator 返却結果・候補�
 
 ## provider 動的解決
 
-provider 実装は `adapter-cloudflare/` パッケージを動的に解決する（配布依存境界: 外部 API 固有処理と HTTP 依存は adapter パッケージに閉じる）。adapter が配布物に存在しない環境では `not_configured` として構造化失敗を返し、呼出し元 Workflow は従来 LLM 経路のみで継続できる。
+provider 実装は `adapter-cloudflare/` パッケージを動的に解決する（配布依存境界: 外部 API 固有処理と HTTP 依存は adapter パッケージに閉じる）。adapter が配布物に存在しない環境では `not_configured` として構造化失敗を返す。障害時の呼出し元 Workflow の判定・継続契約（fallback 禁止・判定未確定・依存後続抑止・復旧後の正規再開）の正は Custom Tool 操作契約 Design「Jev 先行評価」節である。
 
 ## テスト実行
 

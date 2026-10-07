@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261007T094047Z-418b",
+  "workflow": "case-run",
+  "evaluationKind": "jev-failure-path-verification",
+  "subject": "recovery path evaluate after not_configured",
+  "sourceRevision": "worktree-case-3533-pre-commit",
+  "durationMs": 795,
+  "inputTokens": 325,
+  "inputs": {
+    "requestDigest": "5a4524950ed2652021618ecfacf6037c85431bb363fd3b3032e79264503a47fd"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-ts006-recovery",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.57,
+        "false": 0.43000000000000005
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-ts006-recovery",
+        "value": true
+      }
+    ]
+  }
+}

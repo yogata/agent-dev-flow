@@ -20,8 +20,8 @@ evaluate は evaluator 成功後の時点で観測（1 semantic evaluation = 1 o
 操作契約の正は Custom Tool 操作契約 Design「Jev 先行評価」節（extension 経由で解決）。公開契約は provider・SDK 非依存であり、provider 接続（現行 Cloudflare adapter）と外部 API 固有の名称・型・格納位置は adapter パッケージ（`src/common/tools/agentdev-jev/adapter-cloudflare/`）内部に隠蔽される（配布依存境界: REQ-{NNN}・DEC-{NNN} 決定2）。
 
 - 利用可否: `CLOUDFLARE_ACCOUNT_ID` と `CLOUDFLARE_API_TOKEN` 環境変数の設定有無で決まる（feature flag・opt-in 手続きは不要）
-- 未設定時: API を呼び出さず構造化失敗（not_configured）を返し、観測を生成しない。呼出し元 Workflow は従来 LLM 経路のみで完了させる
-- API 障害時: 自動再試行せず構造化失敗を返し、失敗観測に失敗分類と最小 diagnostic が記録される。呼出し元 Workflow は即座に従来 LLM 経路へ fallback する
+- 未設定時: API を呼び出さず構造化失敗（not_configured）を返し、観測を生成しない
+- API 障害時: 自動再試行せず構造化失敗を返し、失敗観測に失敗分類と最小 diagnostic が記録される。障害時の判定・継続契約（fallback 禁止・判定未確定・依存後続抑止・復旧後の正規再開）の正は Custom Tool 操作契約 Design「Jev 先行評価」節
 - 観測書込み失敗時: Workflow の成否と独立（完了報告で識別可能な warning として扱うのは呼出し元の責務）。evaluate 内部の観測永続化失敗は評価結果の返却と独立した warning とし、評価結果を失わない（fail-open。rollback・再実行・擬似再生成なし）
 - 評価言語: 日本語（state、instructions、criteria、判断の意味）
 - 責務境界: Tool は機械処理のみ。判断の意味・基準・Jev 呼出し位置・最終判断は所有しない（REQ-{NNNN}-{NNN}）

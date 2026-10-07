@@ -12,8 +12,8 @@
 //     （final result）を追記する（evaluator 返却結果と異なる場合のみ差異理由分類を保持）
 //
 // provider 実装（Cloudflare adapter）は配布依存境界を守るため動的解決する
-// （adapter パッケージが存在しない環境では not_configured として構造化失敗を返し、
-// 呼出し元 Workflow は従来 LLM 経路のみで継続できる）。自動 retry は行わない。
+// （adapter パッケージが存在しない環境では not_configured として構造化失敗を返す。
+// 障害時の呼出し元 Workflow の判定・継続契約の正は操作契約 Design が所有する）。自動 retry は行わない。
 
 import type {
   JevEvaluateRequest,
