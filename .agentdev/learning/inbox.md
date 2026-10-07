@@ -508,3 +508,21 @@
 - **タグ**: `#textlint` `#evidence-preservation` `#verification-diff` `#case-close`
 
 ---
+
+## Wave 変更が回帰検査の pin 文言追随漏れを生む類型は Wave ごとに横断点検が必要
+
+- **問題事象**: Wave 2-2 merge 336095b6 が execution-structure.md の Wave 内重複前置検出語彙を「主な変更対象（宣言）の重複」へ変更した際、回帰検査 pin 文言の追随を wave-composition-purity.test.ts のみに限定して case-ready-definition-readiness.test.ts（REQ-061-019 pin 文言）が漏れた。bun test 分割③ が決定的 fail となり、Wave 2-3 case-close の full integrity suite で初検出された（Wave 2-2 case-close 実行時点では main が未マージのため検出不能）
+- **発生局面**: 先行 Wave 変更後の後続 Wave close 検証（full integrity suite。Case #3535・Epic #3530 Wave 2-3）
+- **検知方法**: bun test 分割③ の 1 fail と由来分類手順（baseline 72e04cad 静的突合で baseline では pass・main HEAD 086667c0 で単独再現・本変更非接触を機械確認）
+- **根本原因**: pin 文言（正規表現による正規文書の文言 pin）は、正規文書の語彙変更と同一 Wave で機械的に追随検出されない。Wave が同一構成内の複数回帰検査ファイルへ同種の pin 文言を持つ前提が、追随先列挙の手順として明文化されていない
+- **自律対応内容**: fail 由来分類を既知欠陥（先行 Wave 由来・本変更起因なし）として確定し、修正候補を intake inbox へ保存して後続 Wave へ引き継いだ。merge 実行自体は fail 由来が本変更外であることの機械根拠（baseline 静的突合 + main 単独再現 + 変更 diff 非接触突合）を検証差分に記録して継続した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: 候補あり（Wave 語彙変更時に pin 文言追随先を列挙する手順、または pin 文言を語彙の正規所有から機械導出する仕組みの検討）
+- **横展開観点**: 同一 Wave 構成での類似追随漏れ（PR #3541 Findings の IR-072 類型）と合わせ、Wave 3 横断検証（Issue 3538）で pin 文言・frontmatter 鮮度等の追随漏れを横断点検するのが望ましい。pin 文言を含む回帰検査が複数ファイルに分散している状態での語彙変更は、変更対象外領域の検査も壊し得る
+- **再発条件**: 正規文書語彙を pin する回帰検査が複数存在する状態での Wave 内語彙変更
+- **予防策候補**: Wave 完了条件に「pin 文言追随先の列挙確認」を追加、または pin 文言の機械導出（ REQ 宣言からの生成）
+- **想定反映先**: scripts/self/release/case-ready-definition-readiness.test.ts（修正自体は intake item）、Wave 3 横断検証（Issue 3538）の確認項目、bun test フル suite 正規形の fail 由来分類注記
+- **関連**: Case #3534・merge commit 336095b6・Case #3535・merge commit 27d7eb77・intake inbox 2026-10-07-case-3535-pin-regex-stale-case-ready-readiness.md
+- **タグ**: `#pin-regex` `#regression-test` `#wave-change` `#follow-up-lag` `#fail-classification`
+
+---
