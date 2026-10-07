@@ -144,7 +144,7 @@ describe("完了条件チェックボックスの CRLF 入力抽出（読取後�
       (s) => s.name === "completion-checkbox-extraction",
     );
     expect(extractionStep?.detail).toEqual({ total: 3, checked: 1 });
-    const items = JSON.parse(report.proposal.completion_checkboxes) as {
+    const items = JSON.parse(report.proposal.completion_checkboxes!) as {
       text: string;
       checked: boolean;
     }[];
