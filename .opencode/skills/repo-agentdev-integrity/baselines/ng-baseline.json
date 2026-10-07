@@ -1,7 +1,7 @@
 {
   "version": 1,
   "rule_id": "NG-BASELINE",
-  "generated_at": "2026-09-27",
+  "generated_at": "2026-10-07",
   "entries": [
     {
       "category": "ADR",
@@ -1667,6 +1667,15 @@
       "count": 1,
       "provenance": "environment-specific-worktree",
       "reason": "junction 未伝播環境（worktree）固有の projection 対称性検出差。main（junction 実在環境）では検出 0 件の環境差（REQ-018 環境差扱い）。実装欠陥ではなく検査環境差として正規管理する"
+    },
+    {
+      "category": "ReferencePath",
+      "check": "reference-path-existence",
+      "file": "src/common/skills/agentdev-workflow-case-ready/references/execution-structure.md",
+      "evidence": "scripts/self/release/wave-composition-purity.test.ts",
+      "count": 1,
+      "provenance": "issue-3527-commit-f48f2d9a-case-3530-definition-pr",
+      "reason": "f48f2d9a (#3527 merge) 由来の先行 NG。skill 参照ファイルからの repo-root scripts/ 参照は skill 相対解決では到達不能なため検出される。参照形式の是正は当該領域（RA-002、case-open Case #3530 の case-run 実行面）で実施する。Case #3530 の Definition PR ゲート通過のために provenance 付きで一時吸収する。"
     },
     {
       "category": "ReqCitation",
