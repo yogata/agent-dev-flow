@@ -18,6 +18,11 @@ implementation:
     - REQ-096-009
     - REQ-096-020
     - REQ-096-023
+    - REQ-103-007
+    - REQ-103-008
+    - REQ-103-009
+    - REQ-103-010
+    - REQ-103-011
 verification:
   src/common/skills/agentdev-workflow-backlog-review/references/analysis-composition-and-review.md:
     - REQ-090-024

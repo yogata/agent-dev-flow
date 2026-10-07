@@ -18,6 +18,11 @@ implementation:
     - REQ-096-008
     - REQ-096-009
     - REQ-096-023
+    - REQ-103-007
+    - REQ-103-008
+    - REQ-103-009
+    - REQ-103-010
+    - REQ-103-011
   src/common/skills/agentdev-workflow-inspect-promote/references/hitl-and-disposition.md:
     - REQ-096-004
     - REQ-096-018
