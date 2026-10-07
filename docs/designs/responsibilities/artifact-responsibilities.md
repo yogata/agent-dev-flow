@@ -2,10 +2,11 @@
 title: 成果物責任表
 status: accepted
 created: 2026-08-20
-updated: "2026-10-03"
+updated: "2026-10-07"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-053-040 -->
+<!-- ADF-COVERS(implementation): REQ-103-024 -->
 
 # 成果物責任表
 

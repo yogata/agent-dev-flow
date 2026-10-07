@@ -32,7 +32,7 @@ docs-check の finding のうち、意味判断が必要なもの（heuristic / 
 |-------------|----------|---------|
 | 新規要件・仕様変更が必要 | `/agentdev/req-define` | 意味レビューで判明した要件ギャップ・仕様矛盾の壁打ち入力 |
 | 要件変更が必要（実装済み） | RU 化 → `/agentdev/req-define` | REQ 変更を RU として backlog に登録し req-define で処理 |
-| 実装のみが逸脱している場合 | case workflow へ戻し | REQ / Design の変更は不要とし case-update / case-run で修正（REQ-0115-036） |
+| 実装のみが逸脱している場合 | case workflow へ戻し | REQ / Design の変更は不要とし case-run で修正（実装修正は case-run 契約） |
 | 再現可能な検査に落とせるもの | docs-check rule 追加 | 意味レビュー結果を機械的検査ルール / fixture に変換（REQ-0115-026） |
 | 再発防止の知見 | learning / backlog | `.agentdev/learning/inbox.md` または intake inbox へ保存 |
 
@@ -70,7 +70,7 @@ docs-check → docs-review → req/case/RU → docs-check rule 追加の feedbac
        │ finding route
        ├─→ /agentdev/req-define（新規要件・仕様変更）
        ├─→ RU 化（要件変更が必要）
-       ├─→ case-update / case-run（実装修正）
+       ├─→ case-run（実装修正）
        ├─→ learning / backlog（再発防止知見）
        └─→ docs-check rule 追加 ←────────────┐
               │                                │
