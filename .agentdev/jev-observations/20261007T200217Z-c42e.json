@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261007T200217Z-c42e",
+  "workflow": "req103-wave3-correction",
+  "evaluationKind": "realpath-experiment-b",
+  "subject": "REQ-103 障害時契約（未確定→依存後続抑止→復旧後再評価）の実経路検証用閉じた判断",
+  "sourceRevision": "4ce7fa0f",
+  "durationMs": 81,
+  "inputs": {
+    "requestDigest": "8913651abda46099ed14fb52d98a0b91a6651360675015400085d95e321ef74e"
+  },
+  "failure": {
+    "kind": "network_error",
+    "detail": "Error: gateway responded with HTTP 401: {\"result\":null,\"success\":false,\"errors\":[{\"code\":10000,\"message\":\"Authentication error\"}],\"messages\":[]}"
+  }
+}
