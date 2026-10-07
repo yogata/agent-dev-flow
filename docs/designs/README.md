@@ -209,7 +209,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | quality/req-health-metrics.md | accepted | REQ 健全性メトリクス | REQ 肥大化、関心ズレ検出の定量閾値 |
 | quality/design-health-metrics.md | accepted | Design 健全性メトリクス | Design 肥大化、放置、ドメイン分類適合の定量閾値 |
 | quality/textlint-quality-runtime.md | accepted | textlint 品質基盤 | 文章表層品質の共通実行基盤（プロジェクト解決、設定読込み、対象解決、規則構成、文章検査、結果整形）。書込み前検査と最終検査の共通化、Plugin と単独実行入口の2入口 |
-| quality/v4-quality-gate-model.md | accepted | ADF v4 Quality / Verification / Evidence / Gate モデル | Quality Policy / Verification Obligation / Verifier / Evidence / Gate の 5 概念分解、Gate = 状態遷移 predicate 契約、v4 standard lifecycle からの Gate 再導出手順、Verifier 分類の定義 |
+| quality/v4-quality-gate-model.md | accepted | ADF v4 Quality / Verification / Evidence / Gate モデル | Quality Policy / Verification Obligation / Verifier / Evidence / Gate の 5 概念分解、Gate = 状態遷移 predicate 契約、v4 standard lifecycle からの Gate 再導出手順、Verifier 分類の定義、統制種別必要性の正規節（REQ-103-018） |
 
 #### integrity/（整合性契約、ルール）
 
