@@ -484,7 +484,8 @@ describe("TS-007 duplication detection use (conflict risk, not Wave split)", () 
     expect(structDoc).toMatch(/ファイル重複のみを理由とした Wave 分離を処置に含めない/);
     expect(structDoc).toMatch(/検出不能として報告し、無重複扱いしない/);
     expect(structDoc).toMatch(/成果の成立順序への依存（一方が作成する成果を他方が利用する等）が確認された場合は、それを意味的依存として Wave 構成に反映する/);
-    expect(autoOrch).toMatch(/変更対象集合が取得不能な子 Issue を含む場合は比較を省略せず検出不能として報告する/);
+    expect(autoOrch).toMatch(/主な変更対象（子 Issue が実行単位として所有する宣言）の重複を検出し/);
+    expect(autoOrch).toMatch(/主な変更対象が取得不能な子 Issue を含む場合は比較を省略せず検出不能として報告する/);
   });
 });
 

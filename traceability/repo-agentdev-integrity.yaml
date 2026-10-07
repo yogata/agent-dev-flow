@@ -2,5 +2,7 @@ component: repo-agentdev-integrity
 implementation:
   .opencode/skills/repo-agentdev-integrity/baselines/exemptions.json:
     - REQ-010-079
+  .opencode/skills/repo-agentdev-integrity/baselines/ng-baseline.json:
+    - REQ-103-022
   .opencode/skills/repo-agentdev-integrity/data/skill-projection-manifest.yaml:
     - REQ-010-079
