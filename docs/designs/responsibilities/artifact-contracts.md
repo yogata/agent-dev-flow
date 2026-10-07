@@ -6,7 +6,6 @@ updated: "2026-10-08"
 ---
 <!-- ADF-COVERS(implementation): REQ-002-005, REQ-002-006, REQ-002-016, REQ-002-034 -->
 <!-- ADF-COVERS(design): REQ-103-013, REQ-103-024, REQ-103-025（REQ-103 の soft contract 再定義・実現物整合・入力忠実性の設計対応面） -->
-<!-- ADF-COVERS(implementation): REQ-103-013（REQ-103 soft contract 再定義の契約面実装。soft contract 成果物の決定的処理可能部分の機械処理を本 Design の契約と各 Tool・checker 実装が分担） -->
 
 # アーティファクト契約
 
