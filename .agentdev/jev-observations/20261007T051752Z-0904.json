@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261007T051752Z-0904",
+  "workflow": "req-define",
+  "evaluationKind": "requirement-classification-design-separation",
+  "subject": "session-supervisor 正規RU生成主体化の最終分類・Design分離",
+  "sourceRevision": "0b442b1edfc1c2323e4b5303be14b914cd4bc274",
+  "durationMs": 1387,
+  "inputTokens": 1404,
+  "inputs": {
+    "requestDigest": "b633dba7a6f5d526862a8ff72cd53841faa23291305792aecf68480a37f59fc3",
+    "references": [
+      {
+        "digest": "7d73422a62941b6d945b5d765bb92a061fa7e8daece4731170d6bf34a942f26d",
+        "label": "REQ-008 要件定義ファイル",
+        "path": "docs/requirements/REQ-008.md"
+      },
+      {
+        "digest": "806360e02a4274e5751537a6963ec1a570540a74e86eea8f697325ccedd10dc9",
+        "label": "artifact-contracts Design",
+        "path": "docs/designs/responsibilities/artifact-contracts.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "classification",
+      "questionForm": "choice",
+      "value": "Design行",
+      "probabilityDistribution": {
+        "REQ行": 0.42,
+        "Design行": 0.58
+      }
+    },
+    {
+      "questionId": "separation_needed",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.19,
+        "false": 0.81
+      }
+    }
+  ],
+  "confidence": 0.17,
+  "finalResult": {
+    "results": [
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "classification",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "separation_needed",
+        "value": false
+      }
+    ]
+  }
+}

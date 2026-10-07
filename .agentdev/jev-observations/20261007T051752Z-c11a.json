@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261007T051752Z-c11a",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "session-supervisor 正規RU生成主体化に伴う REQ 操作帰属（REQ-008-051）",
+  "sourceRevision": "0b442b1edfc1c2323e4b5303be14b914cd4bc274",
+  "durationMs": 1459,
+  "inputTokens": 1411,
+  "inputs": {
+    "requestDigest": "cdc9e6e14971ca2ee0faa7b05aef1ebf99a923fe5a01bd75222ea0dc28e3d895",
+    "references": [
+      {
+        "digest": "7d73422a62941b6d945b5d765bb92a061fa7e8daece4731170d6bf34a942f26d",
+        "label": "REQ-008 要件定義ファイル",
+        "path": "docs/requirements/REQ-008.md"
+      },
+      {
+        "digest": "806360e02a4274e5751537a6963ec1a570540a74e86eea8f697325ccedd10dc9",
+        "label": "artifact-contracts Design",
+        "path": "docs/designs/responsibilities/artifact-contracts.md"
+      },
+      {
+        "digest": "b68d0102ef55d29822ecabcc1d0f1d220c5ee8dbdd46e5afeb3fee78cdb5087e",
+        "label": "RU-0181",
+        "path": ".agentdev/backlog/req-units/RU-0181.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "match_operation",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 1,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "match_certainty_needed",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.08,
+        "false": 0.92
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "match_operation",
+        "value": "UPDATE"
+      },
+      {
+        "questionId": "match_certainty_needed",
+        "value": false
+      }
+    ]
+  }
+}
