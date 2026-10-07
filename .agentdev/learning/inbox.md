@@ -382,3 +382,57 @@
 - **タグ**: `#worktree` `#windows` `#long-path` `#cleanup`
 
 ---
+
+## prepare_definition_pr の definitionEdits は既存ファイル置換のみを支持し新規ファイル作成（REQ create OU）を表現できない
+
+- **問題事象**: case-open STEP-4 の機械工程 script（prepare_definition_pr.ts）の definitionEdits は「対象パス・旧文・新文の完全一致一意指定」であり、新規 REQ ファイルの作成（ACT-REQ-001 operation: create）を直接表現できない。worktree 内 readTextFile 失敗が definition-edit fail になる
+- **発生局面**: 運用（case-open STEP-4。Case #3530 の REQ-103 新設）
+- **検知方法**: script 入力契約（DefinitionEdit 型）と applyDefinitionEdit の実装確認
+- **根本原因**: 機械工程 script の編集プリミティブが置換系のみで create 系の表現を持たない
+- **自律対応内容**: worktree 作成と新規ファイルの内容適用をモデル側の Definition Package 適用として実施し、script 呼び出しは既存 worktree 再利用（期待 branch 上）+ definitionEdits 空 + stage/commit/generate_indexes/check_integrity/traceability ゲート実行に使用した。全ゲート成功を script 報告 JSON で確認
+- **ユーザー確認有無**: なし（機械工程の実行経路選択。ゲート省略なし）
+- **Decision/REQ/spec影響**: なし（case-open Design「機械工程の script 呼び出し契約」の動作範囲の知見。契約変更は別途候補）
+- **横展開観点**: create 系 OU を含む Definition Package では、worktree+ファイル適用をモデル側で行い script に検証・commit を担わせる構成が現行の現実解
+- **再発条件**: operation: create の artifact_action を含む draft で prepare_definition_pr.ts を definitionEdits 主体で実行する場合
+- **予防策候補**: prepare_definition_pr への create 系編集（新規ファイル contents）の入力表現追加（別途候補）
+- **想定反映先**: agentdev-workflow-case-open scripts README または Design「機械工程の script 呼び出し契約」節
+- **関連**: Case #3530・PR #3531
+- **タグ**: `#case-open` `#definition-pr` `#script-contract`
+
+---
+
+## 新規 REQ の Definition PR では missing-design 0 件ゲートのため design 役割宣言の割当てが発生する（draft に design アクションが無くても）
+
+- **問題事象**: REQ-103 新設の Definition PR で、traceability check の missing-design 0 件ゲート（増分ベース・新規行のみ）のため、draft の artifact_actions に design アクションが存在しないまま 31 行の design 役割宣言の割当て先決定が必要になった
+- **発生局面**: 運用（case-open STEP-3/STEP-4。Case #3530）
+- **検知方法**: traceability check --req（新規行限定）の missing-design findings と case-open reference（definition-pr-and-idempotency.md 手順4）の突合
+- **根本原因**: 新規 REQ 行は作成時点で design 対応宣言を持たず、ゲートは宣言追随を Definition Package 構成要素として要求する。割当て先の決定は各行の主題ドメイン→既存 Design の対応判断を伴う
+- **自律対応内容**: 各要件行の主題ドメインが現時点で正規所有する Design 文書へ design 役割 ADF-COVERS 宣言を 1 行追記（11 ファイル・修飾注記付き。REQ-100/101/102 の先行例と同型）。宣言は全面再評価（REQ-103-016/-017）の処遇確定時に参照追随で更新する旨を PR 本文の判断記録へ明記
+- **ユーザー確認有無**: なし（ゲート契約の機械的要求への追随。新規規範確定は含まない）
+- **Decision/REQ/spec影響**: なし（既存ゲート契約の適用）
+- **横展開観点**: 新規 REQ を含む draft の case-open では、design 宣言割当ての作業分量を見積もりに含めるべき。行数が多い REQ では複数 Design への分割割当てが自然に発生する
+- **再発条件**: 新規 REQ（複数行）の Definition PR を作成する場合
+- **予防策候補**: req-define の draft 段階での design 対応先行確認（任意）または case-open Design への割当て手順の明文化
+- **想定反映先**: case-open Design「意味変更行の design 対応事前確認」節（新規行版の割当て手順）
+- **関連**: Case #3530・PR #3531
+- **タグ**: `#traceability` `#missing-design` `#definition-pr`
+
+---
+
+## 先行 merge が main の check_integrity を赤化したまま Case 投入が進行し Definition PR の品質ゲートで初検出される
+
+- **問題事象**: f48f2d9a（#3527 マージ）で追加された skill 参照ファイル内の repo-root scripts/ パス参照（wave-composition-purity.test.ts）が、skill 相対解決では到達不能なため reference-path-existence NG として main に残存。Case #3530 の Definition PR の check_integrity ゲート（commit 済み HEAD 実行）で初めて block として顕在化した
+- **発生局面**: 運用（case-open STEP-4 品質ゲート。Case #3530）
+- **検知方法**: prepare_definition_pr.ts の check_integrity step fail（exit 1、2 new unmanaged NG）とレポートの ReferencePath NG 確認
+- **根本原因**: Case 投入〜merge 時の検査が当該 NG を検出しないまま main に取り込まれ、次の Definition 系 PR の commit 後実行ゲートで初めて delta NG として顕在化する
+- **自律対応内容**: 本 Case の変更対象外であることを確認した上で、provenance（issue-3527-commit-f48f2d9a-case-3530-definition-pr）付きで ng-baseline.json へ一時吸収し、参照形式の是正を本 Case の case-run（RA-002 領域）で実施する計画を PR 本文の判断記録へ記録。ゲート通過後の実測で exit 0 を確認
+- **ユーザー確認有無**: なし（既存 baseline 機構の provenance 付き適用。v2:REQ-0161-005 の manifest 契約どおり）
+- **Decision/REQ/spec影響**: なし（既存 NG baseline 機構の適用）
+- **横展開観点**: merge 前検査で coverage が無い検査系（commit 後実行を要する frontmatter 突合系等）の NG は次の Definition PR まで潜在する。全件列挙型 gate の fail は「既知欠陥・環境依存・当該変更起因」の3分類で分離する運用が有効
+- **再発条件**: commit 済み HEAD 前提の検査項目が、merge 時点では実行されない経路で新規 NG を持ち込む場合
+- **予防策候補**: Definition 系 PR の前置で base HEAD との同条件差分実行（既知欠陥分離）の検討
+- **想定反映先**: case-open / case-ready の品質ゲート運用、check_integrity の baseline 運用
+- **関連**: Case #3530・PR #3531・先行 commit f48f2d9a
+- **タグ**: `#check-integrity` `#ng-baseline` `#pre-existing-defect` `#definition-pr`
+
+---
