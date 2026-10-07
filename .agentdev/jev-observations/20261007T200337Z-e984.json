@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261007T200337Z-e984",
+  "workflow": "req103-wave3-correction",
+  "evaluationKind": "realpath-experiment-d",
+  "subject": "REQ-103 障害時契約（未確定→依存後続抑止→復旧後再評価）の実経路検証用閉じた判断",
+  "sourceRevision": "4ce7fa0f",
+  "durationMs": 306,
+  "inputTokens": 815,
+  "inputs": {
+    "requestDigest": "8913651abda46099ed14fb52d98a0b91a6651360675015400085d95e321ef74e"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "req103-suppression-of-dependent-followups",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.67,
+        "false": 0.32999999999999996
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "req103-suppression-of-dependent-followups",
+        "value": true
+      }
+    ]
+  }
+}
