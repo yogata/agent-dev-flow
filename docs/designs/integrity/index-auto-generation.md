@@ -2,12 +2,14 @@
 title: 索引類自動生成 Design
 status: accepted
 created: 2026-07-19
-updated: 2026-10-05
+updated: 2026-10-07
 ---
 <!-- ADF-COVERS(implementation): REQ-001-026, REQ-001-028 -->
 <!-- ADF-COVERS(implementation): REQ-010-011 -->
 <!-- ADF-COVERS(implementation): REQ-059-002, REQ-059-003 -->
 <!-- ADF-COVERS(design): REQ-059-002, REQ-059-003 -->
+<!-- ADF-COVERS(implementation): REQ-103-022 -->
+<!-- ADF-COVERS(verification): REQ-103-022 -->
 
 # 索引類自動生成 Design
 
@@ -221,6 +223,20 @@ generate_indexes.ts の AUTOGEN marker 検出は、行全体が正規のHTMLコ�
 backtick 文脈判定のような部分一致ロジックは併用しない。
 これにより正常な AUTOGEN block 認識の失敗と索引再生成の途中停止を防止する（PR #1718 の HTML コメント構文抽象化による暫定対応と置換）。
 正例（正規マーカー行）、負例（backtick 囲み marker 文字列を含む説明文）、境界例（マーカー行に backtick が隣接する場合）を含む回帰テストが生成スクリプトに付属する。
+
+### 旧語彙・語彙追随変更時の AUTOGEN 再生成（REQ-103-022）
+
+旧語彙（廃止済み command、旧 lifecycle 名、旧成果物名）の除去・語彙追随により現行規範を変更した場合も、索引が実ファイルの状態からずれないことを保つ。語彙追随変更時には本 Design の生成規則に従い AUTOGEN ブロックを再生成し、再生成差分 0 件を検証の合格条件とする。
+
+- 索引派生物は、語彙追随後の実ファイル frontmatter・状態から再生成される。対象は次のとおりである。
+  - `docs/README.md`
+  - `docs/requirements/README.md`
+  - `docs/decisions/README.md`
+  - `docs/designs/README.md`
+  - `docs/designs/quality/req-health-metrics.md`
+  - `docs/designs/integrity/integrity-rule-catalog.md`
+  - `docs/designs/integrity/rule-ownership.md`
+- 語彙追随の検証経路の正は vocabulary-registry.md「旧語彙除去の検証経路（REQ-103-022）」節であり、本 Design は索引再生成の機構契約のみを扱う（重複所有しない）
 
 ### 現在人手管理領域の3領域
 

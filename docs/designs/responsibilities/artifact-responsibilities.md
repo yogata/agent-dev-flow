@@ -6,6 +6,7 @@ updated: "2026-10-07"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-053-040 -->
+<!-- ADF-COVERS(implementation): REQ-103-024 -->
 
 # 成果物責任表
 

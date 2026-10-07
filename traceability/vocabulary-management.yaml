@@ -5,6 +5,10 @@ implementation:
     - REQ-094-007
     - REQ-094-008
     - REQ-094-012
+    # REQ-103-022: 旧語彙対照表（旧コマンド名・旧スキル名・廃止済み概念・IR-065/066 対照）の
+    # 維持により、廃止済み command・旧 lifecycle 名・旧成果物名の現行規範からの除去を恒常的に実現する。
+    # 配置基準と検証経路の正は docs/designs/authoring/vocabulary-registry.md（design 宣言あり）。
+    - REQ-103-022
   .agentdev/config/plugins/agentdev-textlint-guard-prh.yml:
     - REQ-094-009
     # Issue #3500（正式名称統一）: prh 機械辞書への固定置換登録
