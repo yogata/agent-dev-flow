@@ -2,7 +2,7 @@
 title: "IR-041: retired-req-broken-link"
 status: accepted
 created: 2026-08-20
-updated: 2026-10-07
+updated: 2026-10-08
 ---
 
 <!-- ADF-COVERS(verification): REQ-103-021（retired/ パス接頭辞による歴史成果物の到達性の恒久検出） -->

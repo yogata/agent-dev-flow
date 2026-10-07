@@ -2,7 +2,7 @@
 title: "IR-040: retired-req-authority-comment"
 status: accepted
 created: 2026-08-20
-updated: 2026-10-07
+updated: 2026-10-08
 ---
 
 <!-- ADF-COVERS(verification): REQ-103-021（現行 HTML コメントからの retired REQ ID 単独参照排除による誤認防止の恒久検出） -->

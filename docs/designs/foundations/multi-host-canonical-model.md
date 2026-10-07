@@ -2,7 +2,7 @@
 title: マルチホスト原本モデル（共通原本とホスト別接続の分離）
 status: accepted
 created: 2026-10-02
-updated: 2026-10-07
+updated: 2026-10-08
 ---
 <!-- ADF-COVERS(design): REQ-099-001, REQ-099-002, REQ-099-003, REQ-099-004, REQ-099-005, REQ-099-006, REQ-099-007, REQ-099-008, REQ-099-009, REQ-099-010, REQ-099-011, REQ-099-012, REQ-099-013, REQ-099-014, REQ-099-015, REQ-099-016, REQ-099-017, REQ-099-018, REQ-099-019, REQ-099-020 -->
 <!-- ADF-COVERS(design): REQ-002-007, REQ-002-008, REQ-002-009, REQ-002-019, REQ-002-043, REQ-002-045, REQ-002-047（REQ-002-047 の配備形態面。配布依存境界の検査モデル面は runtime-package-boundary.md が維持） -->
