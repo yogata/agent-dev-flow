@@ -668,3 +668,21 @@
 - **タグ**: `#check-integrity` `#ir072` `#freshness` `#squash-merge`
 
 ---
+
+## check_autogen_freshness.ts の --dry-run は freshness 検査を実行しない対象一覧表示であり、検証記録の「dry-run pass」を AUTOGEN 鮮度 gate の本検査として扱うと無検査の green 判定になる
+
+- **問題事象**: 訂正 PR #3547 の検証記録（PR 本文テスト結果）に「AUTOGEN dry-run: WOULD UPDATE 0・exit 0」とあり、case-close 側で同一形態の確認を実行したところ、--dry-run は scan 対象の一覧表示（stdout 先頭に「dry-run: 16 AUTOGEN block targets across 6 files」等）のみで findings 検査・JSON レポートを全く出力しないことが判明した（check_autogen_freshness.ts:623 の usage 記述「List scan targets without running freshness checks」で確認）。--dry-run の exit 0 は「対象一覧が取得できた」ことのみを意味し、drift 検出の合格証拠にならない
+- **発生局面**: case-close STEP-3 の AUTOGEN 鮮度 gate（Case #3538・第2回訂正再 close・DEL-3538-CLOSE-3。merge 直前 HEAD での gate 再実行）
+- **検知方法**: close 側の gate 再実行で autogen-fresh.txt に JSON 本体が存在せず対象一覧表示のみだったことの確認と、check_autogen_freshness.ts の usage・exit 規約（--dry-run は EXIT_OK 固定、本検査は findings.length > 0 で EXIT_NG）の読み戻し
+- **根本原因**: 「dry-run」ラベルから「本検査を軽量化した事前確認」と解釈する先入観に対し、実装は「本検査の完全な省略（対象一覧のプレビュー専用）」であり、PR 本文の検証記録表記（dry-run pass）も本検査に相当しないまま記載されていた
+- **自律対応内容**: close 側で --json 付き本検査（--dry-run なし）を再実行し findings 0・files_scanned 6・exit 0 の green を取得。PR 本文の dry-run 表記は対応記録コメント検証差分で「本検査に相当しない」ことを撤回・置換して記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（checker 実行形態の取り違え是正で、checker・契約側の変更なし）
+- **横展開観点**: 検証コマンドに dry-run / list-only / preview モードがある場合、その出力は本検査の合格証拠にできない。検証記録に「dry-run」とある検査結果を case-close 側で再利用する場合は、そのモードが検査本体を実行する形態かを実装（usage・exit 規約）で確認してから採用する。check_autogen_freshness.ts の AUTOGEN 鮮度 gate 正規形は --json 本検査（前回 close DEL-3538-CLOSE-2 の証跡 autogen-fresh-close.json も findings_count 0 を持つ本検査の JSON であり整合）
+- **再発条件**: AUTOGEN 鮮度 gate を --dry-run 形態で実行した結果（または dry-run 表記の検証記録）を freshness 合格として採用する
+- **予防策候補**: AUTOGEN 鮮度 gate の実行記録には「--dry-run でない（findings_count を含む JSON レポートあり）」ことを必須要素として明記する。case-close STEP-3 の gate 実行手順に「--dry-run は freshness 検査を実行しない」注記の追加候補
+- **想定反映先**: case-close workflow（docs-and-design-promotion の AUTOGEN 鮮度 gate 節）の注記候補・docs-and-design-promotion の checker 実行経路記述
+- **関連**: Case #3538・PR #3547・merge 8b250e33・前回 close DEL-3538-CLOSE-2 の autogen-fresh-close.json（本検査の正例）
+- **タグ**: `#autogen-freshness` `#dry-run` `#checker-実行形態` `#証跡採用`
+
+---
