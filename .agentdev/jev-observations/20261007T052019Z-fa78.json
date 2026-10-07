@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261007T052019Z-fa78",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0181（ADF v4 正規モデル再確定と全面収束）の既存REQ照合判断",
+  "sourceRevision": "0b442b1edfc1c2323e4b5303be14b914cd4bc274",
+  "durationMs": 741,
+  "inputTokens": 1518,
+  "inputs": {
+    "requestDigest": "4929fbbd71882289f0ea7ce7d7e3c79966f602fcc8a2c8bd9968dbc7207dafe0",
+    "references": [
+      {
+        "label": "RU-0181",
+        "path": ".agentdev/backlog/req-units/RU-0181.md",
+        "digest": "b68d0102ef55d29822ecabcc1d0f1d220c5ee8dbdd46e5afeb3fee78cdb5087e"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-operation",
+      "questionForm": "choice",
+      "value": "CREATE（新規REQとして作成）",
+      "probabilityDistribution": {
+        "CREATE（新規REQとして作成）": 0.97,
+        "APPEND（既存REQへ要件行を追加）": 0,
+        "UPDATE（既存REQの要件行を更新）": 0,
+        "REQ操作なし": 0.03
+      }
+    },
+    {
+      "questionId": "q2-confirmation-need",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.46,
+        "false": 0.54
+      }
+    }
+  ],
+  "confidence": 0.96,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-operation",
+        "value": "CREATE（新規REQとして作成）"
+      },
+      {
+        "questionId": "q2-confirmation-need",
+        "value": false
+      }
+    ]
+  }
+}

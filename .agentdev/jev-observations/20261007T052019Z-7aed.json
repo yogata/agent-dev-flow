@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261007T052019Z-7aed",
+  "workflow": "req-define",
+  "evaluationKind": "final-classification-design-separation",
+  "subject": "RU-0181（ADF v4 正規モデル再確定と全面収束）の要件展開最終分類・Design 分離",
+  "sourceRevision": "0b442b1edfc1c2323e4b5303be14b914cd4bc274",
+  "durationMs": 754,
+  "inputTokens": 1731,
+  "inputs": {
+    "requestDigest": "6e1bf6040747abb592feb38cd946addc5e32402690219b0e48124ac31a180a28",
+    "references": [
+      {
+        "label": "RU-0181",
+        "path": ".agentdev/backlog/req-units/RU-0181.md",
+        "digest": "b68d0102ef55d29822ecabcc1d0f1d220c5ee8dbdd46e5afeb3fee78cdb5087e"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-classification",
+      "questionForm": "choice",
+      "value": "REQ行（状態要件として REQ 要件行に保存するのが適切）",
+      "probabilityDistribution": {
+        "REQ行（状態要件として REQ 要件行に保存するのが適切）": 0.84,
+        "Design行（内部構造・規則・判定表であり Design 保存が適切）": 0.16
+      }
+    },
+    {
+      "questionId": "q2-separation-need",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.81,
+        "false": 0.18999999999999995
+      }
+    }
+  ],
+  "confidence": 0.68,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-classification",
+        "value": "REQ行（状態要件として REQ 要件行に保存するのが適切）"
+      },
+      {
+        "questionId": "q2-separation-need",
+        "value": true
+      }
+    ]
+  }
+}
