@@ -57,3 +57,33 @@ REQ / Decision / Design / Implementation / Evidence の意味境界（What/Why/H
 - Implementation: Design を実体化するコード・設定・成果物（実体）
 - Evidence: REQ/acceptance が成立したと確認する根拠（根拠）
 - Decision の結果を REQ/Design の現行状態へ反映することと、Decision 自体を履歴的根拠として保持することを両立させる
+
+## v4 の中核と維持条件（REQ-103-027）
+
+v4 の Standard Operating Model の中核は次の 5 要素である。正規モデル再収束の作業後もこの中核を維持する。
+
+1. 要件に基づく継続的な開発という目的（requirements-driven lifecycle。汎用ワークフローエンジンでない）
+2. 要求の意味の保持（合意した要求の意味・禁止・検証義務が実行と完了判定まで保持され、未達を完了として扱わない）
+3. 判断権限の分離（判断方法・確定権限・副作用実行可否の独立軸。詳細は v4-responsibility-boundaries）
+4. 永続状態と実行安全（durable state の 1 権威、authority 格子、直列化単位、冪等経路）
+5. 証拠連鎖の意味上の性質（Evidence が根拠として成立し、完了判定が証拠と照合される）
+
+維持できないことが判明した場合は、作業内で暗黙に v5 化せず、理由と必要な新規判断事項を提示して停止する。工程名・工程数・内部配置・現在の実現方式の変更だけを中核放棄と判定しない。外部契約の変更は人間に留保された判断として扱う。
+
+## 正規モデル要素と正規所有 Design の対応（REQ-103-001）
+
+本 Design が位置づける正規モデル要素の詳細契約の正規所有者は次のとおりである。旧設計（v3 個別 Design 群）を前提とせず、この対応導線から正規モデルを一意に再構成できる。
+
+| 正規モデル要素 | 正規所有 Design |
+|---|---|
+| 目的・三層責務・Project Contract・情報寿命・中核文書モデル・v4 の中核 | 本 Design |
+| 判断アーキテクチャ（判断方法・確定権限・人間判断境界・障害時契約） | foundations/v4-responsibility-boundaries.md |
+| 公開入口と内部ライフサイクル（語彙・UX・継続ループ） | workflows/v4-standard-lifecycle.md、workflows/v4-collaboration-loop.md |
+| ライフサイクル状態機械 | workflows/v4-lifecycle-state-machine.md |
+| 品質モデル（Quality/Verification/Evidence/Gate） | quality/v4-quality-gate-model.md |
+| durable state と再構成・再実行 | foundations/v4-durable-state-and-recovery.md |
+| runtime 実行（authority・直列化・冪等・fail-closed） | foundations/v4-runtime-execution-model.md |
+| 成果物モデル（REQ/Decision/Design/Implementation/Evidence の意味境界の運用面） | responsibilities/document-type-responsibilities.md、responsibilities/artifact-contracts.md |
+| Project Extensions と安全境界 | foundations/v4-responsibility-boundaries.md「Project Extensions の semantic extension point」節、foundations/project-extensions.md |
+| Intake / Learning / Backlog の責務 | workflows/v4-collaboration-loop.md |
+| 移行・release | foundations/v4-migration-and-release.md |

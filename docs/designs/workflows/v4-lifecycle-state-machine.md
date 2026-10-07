@@ -33,7 +33,7 @@ v4 ライフサイクル状態は、durable state enum（永続状態）と runt
 
 各 durable 状態遷移は次の要素で定義する。
 
-- 遷移 predicate は deterministic gate（機械検証可能。本 Design が所有）と semantic gate（Skill の意味判断。Quality/Verification/Evidence/Gate モデル（v4-quality-gate-model Design）が所有）に分離する
+- 遷移 predicate は deterministic gate（機械検証可能。本 Design が所有）と semantic gate（Skill の意味判断。Quality/Verification/Evidence/Gate モデル（v4-quality-gate-model Design）が所有）に分離する。deterministic gate は決定的処理として、semantic gate は閉じた意味評価または開いた推論として実行される（判断方法3分類の正典: DEC-048、foundations/v4-responsibility-boundaries Design「判断方法3分類の判別基準」節）。gate の実行方式分類（deterministic/semantic）を判断方法の分類として使用しない
 - deterministic gate predicate を Gate モデルの唯一の接続点として宣言する（Quality 段階での Gate 再導出はこの接続点に接続する）
 - 遷移後状態の権威記録先を 1 つ定め、他の記録は投影とする（DEC-038 の 1 権威原則）
 - 遷移の合法性（禁止遷移を含む）は backend 抽象の論理規則として定義し、物理表現（GitHub の Issue 本文・ラベル・close reason、ローカル版の Issue ファイル）への写像は backend 別の物理写像表で与える
