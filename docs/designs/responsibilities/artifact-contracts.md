@@ -534,7 +534,7 @@ session由来RU（`source_type: chat`、`generated_by: session`）の生成、�
 
 ### 生成主体と生成時点
 
-- 生成主体: `req-define` 親エージェント（`generation_actor: req-define-parent`）
+- 生成主体: 実主体に応じて記録する。`req-define` 親エージェントが実際に生成する場合は `generation_actor: req-define-parent`、チャットで内容合意した session 由来 RU を Supervisor が正式に生成・保存する場合は `generation_actor: session-supervisor` とする。担当していない役割を生成主体として記録せず、`session-supervisor` であることだけを理由に今回限りの例外承認を要求しない
 - 生成時点: チャット内合意成立後、req-define 開始前（`generation_stage: pre-req-define`）
 - `agreement_confirmed_at` と `generated_at` は ISO 8601 形式とし、`generated_at >= agreement_confirmed_at` を満たすこと
 - 保存完了前に req-define を開始しないこと
@@ -565,7 +565,7 @@ session由来RU の frontmatter は次を必須とする。
 |---|---|
 | `source_type` | `chat` |
 | `generated_by` | `session` |
-| `generation_actor` | `req-define-parent` |
+| `generation_actor` | 実主体別: `req-define-parent`（req-define 親エージェントが生成）または `session-supervisor`（Supervisor が正式生成・保存） |
 | `agreement_confirmed_at` | ISO 8601 形式の合意成立時刻 |
 | `generation_stage` | `pre-req-define` |
 | `generated_at` | ISO 8601 形式の生成時刻（`>= agreement_confirmed_at`） |
