@@ -526,3 +526,39 @@
 - **タグ**: `#pin-regex` `#regression-test` `#wave-change` `#follow-up-lag` `#fail-classification`
 
 ---
+
+## PR 側で触れていない Jev 検証観測が main 側 .agentdev/jev-observations/ に untracked 残留する場合は正規振る舞いとして放置する
+
+- **問題事象**: worktree コンテキストの委譲実行から Custom Tool agentdev_jev を呼ぶと観測は main リポジトリ側 .agentdev/jev-observations/ に帰着する（.agentdev/README.md 記載の既知振る舞い）。Case 3533（Wave 2-1）の TS-005/TS-006 実経路検証で、PR 側が commit した観測（20261007T094047Z-418b）とは別に main 側へ帰着した観測 20261007T093854Z-2198 が untracked ファイルとして main root に残留した
+- **発生局面**: case-run TS-005/TS-006 実経路検証と case-close の実行前同期（git pull --ff-only）（Case #3533・Epic #3530 Wave 2-1）
+- **検知方法**: main root の git status で untracked 観測ファイルを検出し、PR 変更ファイル一覧（pr_changed_files）との突合
+- **根本原因**: 観測書込先 root は Custom Tool が内部解決し呼出側から指定できないため、Tool 経由の検証と worktree 内実経路（bun -e で engine 直実行）の検証が併用されると観測の帰着先が分岐する
+- **自律対応内容**: main 側帰着観測は Tool 正規振る舞いによる永続化と分類し、削除・移動せず対象外として放置する判断を記録（PR 本文 Findings 節に記録済み）。git pull --ff-only は untracked と PR 変更ファイルのパス非重複（別ファイル）を確認して実行した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（観測保存契約 DEC-044 決定6・.agentdev/README.md の記載と整合）
+- **横展開観点**: Jev 実経路検証を含む Case では、main 側 untracked 観測の残留を前提に重複ファイルチェックを実施する。観測ファイル名には Case ごとの一意性があるため衝突は起きにくいが、同名検証を繰り返す場合は整理判断が必要になり得る
+- **再発条件**: Tool 経由の Jev 評価（main 側帰着）と worktree 内 engine 直実行（PR 側 commit）の併用
+- **予防策候補**: 検証計画時に観測の帰着先（Tool 経由か engine 直実行か）を明示し、PR へ取り込む観測と main 側残留観測を検証差分に区別記録する
+- **想定反映先**: .agentdev/README.md jev-observations 行（既知振る舞いの補強）、Case Issue 工程記録の検証観測記録様式
+- **関連**: Case #3533・PR #3542・観測 20261007T094047Z-418b（PR 側 commit済み）・20261007T093854Z-2198（main 側残留）
+- **タグ**: `#jev` `#observation` `#untracked` `#worktree` `#git-pull`
+
+---
+
+## traceability check の検証差分記録は 9 検査種別の全列挙と summary 突合を要する（一部列挙は corpus 系検査の不計上を見えなくする）
+
+- **問題事象**: Case 3533 の case-run が traceability check を「9 検出項目・exit 0・missing-verification のみ計上」と申告したが、case-close の同内容再実行（merge HEAD 906b6621）では duplicate-inconsistencies 8 件が fail 計上され exit 2 であった。case-run 時点の branch でも ra001 sidecar は存在したため、同 finding は case-run 実行時点でも計上され得た
+- **発生局面**: case-close STEP-2/STEP-3 の traceability check 工程間比較（Case #3533・Epic #3530 Wave 2-1）
+- **検知方法**: 完全形式 --req（対象 11 行）での case-close 独立再実行と、main root 対照実行（d93c900c・duplicate 0 件）による本変更起因の確定
+- **根本原因**: 検証差分の記録が検査種別の部分列挙と終了コード申告に留まり、9 検査種別全件の pass/fail と summary（pass/fail 件数）の突合が工程間で行われないと、corpus 全体系検査（duplicate-inconsistencies 等、--req スコープの影響を受けない検査）の計上差が比較できない
+- **自律対応内容**: case-close 側で 9 種別全件の findings を実測・分類し（missing-design 0・missing-implementation 6 行・missing-verification 11 行・duplicate-inconsistencies 8 件）、main 対照で新規性を確定して検証差分へ記録。duplicate 8 件は Wave 2-5（Issue 3537 完了条件4）へ既知前置引継ぎ、intake inbox へ回収
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（traceability check の出力契約・exit code 契約は変更しない。記録様式の補強候補）
+- **横展開観点**: 後続 Wave の case-close では traceability check 記録を summary pass/fail 件数 + fail 種別全列挙で突合する。missing 系の行数比較（main 対照）は経過状態の前進（宣言解消の進捗）を示す有効な指標になる
+- **再発条件**: --req スコープを case-run より広く取る case-close 実行、または corpus 系検査の計上が工程間で比較されない記録様式
+- **予防策候補**: traceability check の検証差分記録様式に「summary pass/fail + 9 種別全列挙」を必須項目として明記する
+- **想定反映先**: agentdev-workflow-templates の検証差分セクション規約（traceability check 行）、PR テンプレート形式
+- **関連**: Case #3533・PR #3542・intake inbox 2026-10-07-case-3533-duplicate-inconsistencies-sidecar-split.md
+- **タグ**: `#traceability` `#evidence-preservation` `#verification-diff` `#case-close` `#fail-classification`
+
+---
