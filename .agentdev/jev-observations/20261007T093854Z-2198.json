@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261007T093854Z-2198",
+  "workflow": "case-run",
+  "evaluationKind": "jev-failure-path-verification",
+  "subject": "agentdev_jev evaluate の実経路障害系応答",
+  "sourceRevision": "worktree-case-3533-pre-commit",
+  "durationMs": 1518,
+  "inputTokens": 507,
+  "inputs": {
+    "requestDigest": "687941018e2602a47c1317ae770763b889a6d6339baa9593d193b9cecd402215"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-structured-failure",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.56,
+        "false": 0.43999999999999995
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-structured-failure",
+        "value": false,
+        "differenceReason": "evaluation_input_defect"
+      }
+    ]
+  }
+}

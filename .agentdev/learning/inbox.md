@@ -616,3 +616,37 @@
 - **タグ**: `#bun-test` `#timeout-flake` `#integrity-suite` `#workflow-body-contract`
 
 ---
+
+## verification.optional 登録を伴う REQ 新設は検証スコープ判断の記録と policy 登録と恒常手段実体確認を同一変更で行う
+
+- **問題事象**: REQ 新設時に verification 宣言の恒常手段が存在しない行を policy required 既定のまま残すと、Wave 実行時の traceability check で missing-verification が大量残存し、後続 Wave で宣言補完が前置問題化する（REQ-103 では 31 行中 missing-implementation 14 行・missing-verification 19 行が Wave 3 まで残存）
+- **発生局面**: case-run / case-close の traceability check 完全形式実行（Case #3538・REQ-103 全 31 行）
+- **検知方法**: traceability check（--req 完全形式）の missing-implementation / missing-verification findings 件数
+- **根本原因**: REQ 本文への検証スコープ判断の記録（恒常 checker 非設置行の optional 登録判断・恒常 test 割当）が REQ 新設変更に含まれず、policy 登録と実体確認が後工程に持ち越された
+- **自律対応内容**: Wave 3 で全 31 行を「要件行命題 → 実装実体の所在 → 検証手段」の 3 段で実体確認し、実体引用を伴う宣言追加と policy optional 17 行登録（恒常手段ありの 008/009 は required 維持）で解消。check 9 pass 0 fail へ到達
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（REQ-103-016/017・REQ-096-031 前例の様式適用）
+- **横展開観点**: 恒常検証手段が存在しない要件行は、新設時に検証スコープ判断（optional 登録の根拠記録）を REQ 本文と同一変更で行うことで、Wave 実行時の missing 残存と宣言の一括補完を防げる
+- **再発条件**: 検証スコープ判断を含まない REQ 新設＋traceability 完全形式 check を完了条件に持つ Wave 実行
+- **予防策候補**: REQ 新設時の Definition 生成手順に検証スコープ判断節（policy 登録要否と恒常手段割当）の同梱を追加する候補
+- **想定反映先**: req-define / case-ready の Definition 生成契約（REQ-017 系）の見直し候補
+- **関連**: Case #3538・PR #3545・Case #3537
+- **タグ**: `#traceability` `#policy-yaml` `#req-new-creation` `#wave-execution`
+
+## textlint-guard の vendor 依存生成が未生成の環境では bun test ③（plugins 分割）が 9〜10 件 fail する
+
+- **問題事象**: main 側の textlint-guard vendor 依存生成が消えた（未生成の）環境で bun test ③（.opencode/plugins/ + ./scripts/）を実行すると、plugin tests の依存実体不在で 9〜10 件が fail する。依存生成後は既知欠陥 2 件まで回復する
+- **発生局面**: case-run / case-close の full integrity suite bun test ③（Case #3538・DEL-3538-2 で初回 644 pass 10 fail を実測）
+- **検知方法**: bun test ③ の fail 明細が textlint-guard 依存（vendor 未生成案内）に集中していることの確認
+- **根本原因**: vendor は git 管理外（版固定情報のみ管理）のため、環境再構築や掃除で依存実体が消失すると README 必須手順（bun install && bun run build:engine）の再実行まで検証が失敗する
+- **自律対応内容**: main 側で vendor を再生成し、③ を 2 fail（既知の timeout flake と REQ-061-019 pin）まで回復。fail 由来を「依存生成未実施の環境問題」として分類
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（README 必須手順の再実行で解消する既知運用）
+- **横展開観点**: main 側で依存生成が消えた場合の検証失敗は変更起因ではなく環境問題として分類できる。worktree 環境の vendor 未伝播（Case #3533 intake 記録）と合わせ、vendor 存在確認の前置が suite 実行手順の安定条件になる
+- **再発条件**: vendor 未生成状態での bun test ③ 実行
+- **予防策候補**: suite 実行手順への vendor 存在前置確認の明記（既存 intake 2026-10-07-case-3533-textlint-vendor-worktree-env.md と同方向）
+- **想定反映先**: agentdev-quality-gates の bun test 実行形態契約の注記候補
+- **関連**: Case #3538・PR #3545・Case #3533 系の vendor 警告
+- **タグ**: `#textlint-guard` `#vendor` `#bun-test` `#environment`
+
+---

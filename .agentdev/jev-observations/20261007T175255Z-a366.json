@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261007T175255Z-a366",
+  "workflow": "case-run",
+  "evaluationKind": "jev-failure-path-verification-wave3",
+  "subject": "DEL-3538-2 TS-005 障害系実呼び出し再現実測",
+  "sourceRevision": "case-3538-5bf62855",
+  "durationMs": 1766,
+  "inputTokens": 485,
+  "inputs": {
+    "requestDigest": "62397968178cadcf3f6fa83ebb9da0fd66d3f85946a29b4448ff05d4c6b6d6bc"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-ts005-wave3",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.24,
+        "false": 0.76
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-ts005-wave3",
+        "value": false
+      }
+    ]
+  }
+}
