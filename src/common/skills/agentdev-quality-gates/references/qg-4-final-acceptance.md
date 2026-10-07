@@ -497,7 +497,7 @@ QG-4 の traceability check は Design ヘッダの ADF-COVERS 宣言とトレ�
 - トレーサビリティポリシー不在時は全要件行を検証対応必須として扱う安全側既定は維持する
 - checker 実装（--root の意味・検査項目）の変更は本前提手順に含まない。main 側 root での再実行は読取系 check の実行のみで行う
 
-design-save 工程（Design 本体へ要件を反映する保存工程）における Design ヘッダの既存 ADF-COVERS 宣言ブロックの更新要否確認（横断 durable state の書き込み側前提）は `agentdev-design-file-manager` の design-save 手順が定める。
+Design 保存（Design 本体へ要件を反映する case-ready / case-revise 内部責務の保存工程。v4 標準ライフサイクルの語彙）における Design ヘッダの既存 ADF-COVERS 宣言ブロックの更新要否確認（横断 durable state の書き込み側前提）は `agentdev-design-file-manager` の Design 保存手順が定める。
 
 ## 委譲接続点
 

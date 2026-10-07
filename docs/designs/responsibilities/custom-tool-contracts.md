@@ -2,11 +2,11 @@
 title: Custom Tool 操作契約
 status: accepted
 created: 2026-08-24
-updated: 2026-10-04
+updated: 2026-10-08
 ---
 <!-- ADF-COVERS(design): REQ-090-001, REQ-090-002, REQ-090-003, REQ-090-004, REQ-090-009, REQ-090-010, REQ-090-011, REQ-090-012, REQ-090-013, REQ-090-014, REQ-090-015, REQ-090-016, REQ-090-017, REQ-090-018, REQ-090-019, REQ-090-020, REQ-090-021, REQ-090-022, REQ-090-023, REQ-090-024, REQ-090-025, REQ-090-026, REQ-090-027, REQ-090-028, REQ-090-029, REQ-011-033 -->
 <!-- ADF-COVERS(design): REQ-009-051, REQ-052-013, REQ-052-014, REQ-052-015 -->
-<!-- ADF-COVERS(implementation): REQ-103-007, REQ-103-008, REQ-103-009, REQ-103-010, REQ-103-011（REQ-103 障害時契約の Tool 呼出側契約面の実装対応。runtime・durable state 面は各 foundations Design） -->
+<!-- ADF-COVERS(implementation): REQ-103-003, REQ-103-004, REQ-103-005, REQ-103-006, REQ-103-007, REQ-103-008, REQ-103-009, REQ-103-010, REQ-103-011（REQ-103 判断経路・障害時契約の Tool 呼出側契約面の実装対応。agentdev_jev evaluate が閉じた質問への判定を受理し、決定的処理可能部分の機械化・閉包条件・適格性根拠の契約面と not_configured 等の構造化失敗を所有。runtime・durable state 面は各 foundations Design） -->
 <!-- ADF-COVERS(implementation): REQ-011-001, REQ-011-002, REQ-011-003, REQ-011-005, REQ-011-008, REQ-011-009, REQ-011-013, REQ-011-014, REQ-011-015, REQ-011-020, REQ-011-021, REQ-011-022, REQ-011-023, REQ-011-024, REQ-011-031, REQ-011-032, REQ-052-001, REQ-052-002, REQ-052-003, REQ-052-004, REQ-052-005, REQ-052-008, REQ-052-009, REQ-052-010, REQ-052-011 -->
 
 # Custom Tool 操作契約

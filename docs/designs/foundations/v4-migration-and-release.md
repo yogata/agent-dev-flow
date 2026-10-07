@@ -2,10 +2,11 @@
 title: ADF v4 Migration と Release の標準境界
 status: accepted
 created: 2026-09-18
-updated: 2026-10-07
+updated: 2026-10-08
 ---
 
 <!-- ADF-COVERS(design): REQ-103-026, REQ-103-028（REQ-103 の互換維持境界と baseline tag の設計対応面） -->
+<!-- ADF-COVERS(implementation): REQ-103-026, REQ-103-028（REQ-103 の互換維持境界・baseline tag 契約の実現面。tag 実体 baseline-v4-canonical-convergence-20261007 = 72e04cad と TS-016 差分比較実行の正） -->
 
 # ADF v4 Migration と Release の標準境界
 

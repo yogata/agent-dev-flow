@@ -58,3 +58,4 @@ references/crosswalk-inventory.md が所有し、本 Design は分類スキー�
 
 REQ-103-016（評価対象集合の全件処遇判定）と REQ-103-017（keep 以外の反映完了）は一回限り再評価の判定と反映の契約であり、恒常 checker を新設しない（REQ-103-019）。検証スコープポリシー（traceability/policy.yaml）で optional 登録し、各再評価実行時の検証計画（TS-010、TS-013 相当）で検証する。
 REQ-103-020（歴史本文の保持）の verification は IR-015 が、REQ-103-021（誤認防止と到達性）の verification は IR-040 と IR-041 が retired 参照の恒久検出として所有する。
+REQ-103-001〜007、010〜013、026〜031 の verification も一回限りの検証義務（TS-001〜TS-008、TS-015〜TS-017 相当の横断読解・全文検索・照合）であり、恒常 checker を新設しない（REQ-103-019）。policy.yaml で optional 登録する。例外として REQ-103-008（LLM fallback 禁止）と REQ-103-009（判定未確定・依存後続抑止）の verification は agentdev-jev Tool 実装の恒常テスト（src/common/tools/agentdev-jev/tests/engine.test.ts。not_configured・response_invalid の構造化失敗検証）が所有し、optional 登録しない。

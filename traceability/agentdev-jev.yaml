@@ -48,6 +48,8 @@ verification:
     - REQ-090-014
     - REQ-090-016
     - REQ-090-019
+    - REQ-103-008
+    - REQ-103-009
   src/common/tools/agentdev-jev/tests/observation.test.ts:
     - REQ-090-005
     - REQ-090-006
