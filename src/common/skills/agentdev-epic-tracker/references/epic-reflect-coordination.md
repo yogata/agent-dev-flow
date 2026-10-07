@@ -51,7 +51,7 @@ closing 書き込みと取りまとめ反映は、Epic Issue 本文単位（per-
 6. 直列化 gate を解放する
 
 - lock / queue の実装方式は指定しない。同一プロセス内は `createEpicWriteGate`（scripts/lib/epic-reflect.ts）を共有し、プロセス間は gate 取得の協調と再読込ループで同等の排他を実現する
-- case-run(#epic) と Wave 反復制御としての case-auto は Epic Issue 本文へ書き込まない
+- 子 Issue の実行（case-auto stage 3 のインライン case-run）と Wave 反復制御としての case-auto は Epic Issue 本文へ書き込まない
 
 ## 最新取得→マージ→更新の規律
 

@@ -2,6 +2,8 @@ component: agentdev-workflow-case-auto
 implementation:
   src/common/skills/agentdev-workflow-case-auto/SKILL.md:
     - REQ-034-032
+    - REQ-103-014
+    - REQ-103-015
     - REQ-034-047
     - REQ-035-001
     - REQ-094-001
@@ -38,6 +40,8 @@ implementation:
     - REQ-101-011
   src/common/skills/agentdev-workflow-case-auto/references/input-resolution-and-orchestration.md:
     - REQ-030-017
+    - REQ-103-014
+    - REQ-103-015
     - REQ-032-038
     - REQ-034-046
     - REQ-034-047

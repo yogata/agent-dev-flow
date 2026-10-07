@@ -99,8 +99,8 @@ Epic本文の実行構成表は1形式のみである。
 Epic Issue 本文（永続状態）の書き込みは case-close(#epic) が行う（単一書き手）。
 `ready`/ `running` は runtime 実行状態であり、Epic Issue 本文には書き込まれない。
 
-**case-run(#epic) 実行中（merge前、Epic Issue 本文不変）**:
-- 子Issue の実行の生存状況は case-run(#epic) の runtime 状態として追跡（Epic Issue 本文には書き込まない）
+**子 Issue 実行中（case-auto stage 3 のインライン case-run。merge前、Epic Issue 本文不変）**:
+- 子Issue の実行の生存状況は case-auto stage 3 の runtime 状態として追跡（Epic Issue 本文には書き込まない）
 - Epic Issue 本文実行構成表は `pending` のまま
 
 **case-close(#epic) 完了時（merge後、Epic Issue 本文更新）**:
@@ -124,7 +124,7 @@ PR mergeに失敗した場合、Epic状態の整合性を保つ。Epic Issue 本
 
 **merge失敗時の対応**:
 
-| 失敗タイミング | Epic Issue 本文子状態 | case-run(#epic) runtime 状態 | 対応 |
+| 失敗タイミング | Epic Issue 本文子状態 | stage 3 runtime 状態 | 対応 |
 |---|---|---|---|
 | PR作成前（conflict検出） | `pending` | 実行中 | PR作成を停止 |
 | PR作成後、merge前 | `pending` | 実行中 | runtime 状態維持（Epic 本文不変） |
@@ -157,7 +157,7 @@ Epic Issue 本文の書き込みは case-close(#epic) と取りまとめ反映�
 **conflict予防**:
 1. **per-Epic 単一書き手の維持**:
    - Wave 完了時に case-close(#epic) が一括更新（子Issue番号昇順）
-   - case-run(#epic)、Wave 反復制御としての case-auto は Epic Issue 本文に書き込まない
+   - 子 Issue の実行（case-auto stage 3 のインライン case-run）、Wave 反復制御としての case-auto は Epic Issue 本文に書き込まない
 
 2. **更新順序の制御**:
    - 子Issue番号の昇順で更新

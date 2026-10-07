@@ -1,0 +1,10 @@
+component: ra002-lifecycle-responsibility
+verification:
+  docs/requirements/REQ-103.md:
+    - REQ-103-014
+    - REQ-103-015
+    - REQ-103-022
+    - REQ-103-023
+  docs/designs/workflows/v4-standard-lifecycle.md:
+    - REQ-103-014
+    - REQ-103-015

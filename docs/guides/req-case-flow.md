@@ -33,9 +33,9 @@ AI と対話して要件を整理するコマンド。
 
 **入力**: REQ ファイル / 要件doc
 
-**出力**: GitHub Issue
+**出力**: GitHub Issue（Root Case）、Definition Package、設計PR（実変更がある場合のみ）
 
-**Epic 規模判定**: 複数モジュール跨ぎ、PR 肥大化リスク、段階的リリースのいずれかを満たす場合、Epic + 子Issue 構成で実行する。
+**Standard / Epic 構成**: Epic + 子Issue 構成かどうかの判定は case-open ではなく case-ready が所有する（連結成分と依存強度・Epic サイズ・機能的一貫性の3軸判断。正は REQ-061 と case-ready Design）。
 
 ## case-ready
 

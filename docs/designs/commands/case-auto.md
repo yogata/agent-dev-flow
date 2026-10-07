@@ -72,7 +72,7 @@ orchestration 中の警告・確認・選択肢提示に由来する HITL questi
 - Wave 反復制御（Epic Issue 指定時）
   - case-auto が Epic Issue 番号を記録。Epic Issue 本文の実行構成から Wave 構成、各子Issue 状態を読み取る（読み取りのみ。Epic Issue 本文の書き込みは case-close 相当の統合処理の責務）
   - case-auto が現在 Wave の未着手（pending）子Issue を認識し、Epic・Wave・Standard Issue を横断する共有 active Issue task 枠（REQ-034-027。上限・空き枠補充・起動間隔 10 秒は後述「runtime 制御契約」節と v4-runtime-execution-model「runtime 制御ループ」節参照）で各子Issue へインライン case-run を実行。各子Issue の実行担当サブエージェントへ case-auto から直接委譲
-  - case-run は単一 Issue 実行に専念し（REQ-031-015）、Wave 内子Issue の並列起動・fan-out/fan-in の制御は case-auto の orchestration が単一所有する（DEC-041）。case-run(#epic) 由来の独立実行枠は存在しない
+  - case-run は単一 Issue 実行に専念し（REQ-031-015）、Wave 内子Issue の並列起動・fan-out/fan-in の制御は case-auto の orchestration が単一所有する（DEC-041）。case-run に独立実行枠は存在しない
   - 現 Wave の全子Issue の完了（completed-pr / blocked / failed / delegation-unavailable）を待機し、現 Wave の収束（REQ-035-016）を確認する
   - completed-pr の子Issue がある場合、case-close(#epic) 相当の統合処理を Wave 反復を進行させる stage 3 内部処理として実施（統合処理は active Issue task の実行枠を消費しないが共有書き込みの直列化点として扱う。REQ-034-042）
   - 次 Wave の開始は現 Wave の収束（REQ-035-016）と後続 Wave の意味的依存条件の充足（必要な統合・マージの完了を含む。REQ-035-017）の両方を確認してから行う（REQ-034-012）
@@ -168,7 +168,7 @@ case-auto は各工程の結果を次の4状態次元で保持し、集約報告
 
 case-auto は case-open が生成した execution_unit 群（standard | epic の混在）を orchestration 対象とする（REQ-034-018）。
 従来の「単一 Epic の Wave 反復制御」を「複数 execution_unit 群反復制御」へ一般化する。
-case-auto は case-open の判定結果に従い case-run(#epic) / case-run(standard) を起動する（薄いオーケストレーター原則、Issue 階層決定・子 Issue 選択・Epic 化判定の委譲を維持）。
+case-auto は case-open の判定結果に従い、Standard Issue と Epic 子 Issue を単一 Issue の case-run で実行する（Epic 子 Issue は stage 3 のインライン case-run。case-run(#epic) 独立経路は廃止済み。薄いオーケストレーター原則、Issue 階層決定・子 Issue 選択・Epic 化判定の委譲を維持）。
 Issue 階層決定、子 Issue 選択、Epic 化判定の判断ロジックは持たない。
 
 ### 処理単位の一級概念化（現行の責務体制は DEC-036（DEC-038/039 が補完））

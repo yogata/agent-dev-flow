@@ -10,6 +10,7 @@ updated: "2026-10-07"
 <!-- ADF-COVERS(design): REQ-061-003 -->
 <!-- ADF-COVERS(design): REQ-061-010, REQ-061-019, REQ-061-021, REQ-061-038, REQ-061-023, REQ-061-029, REQ-061-030, REQ-061-033, REQ-061-034, REQ-061-035, REQ-061-039, REQ-061-040, REQ-061-047, REQ-061-048, REQ-035-012, REQ-035-018 -->
 <!-- ADF-COVERS(design): REQ-061-041, REQ-061-042, REQ-017-021, REQ-017-022, REQ-017-023, REQ-061-043, REQ-061-044, REQ-061-045, REQ-061-046, REQ-030-023 -->
+<!-- ADF-COVERS(implementation): REQ-103-014 -->
 
 # case-ready Command Design
 
@@ -55,7 +56,7 @@ case-ready の公開契約（入出力、副作用、安全性、承認境界、
 
 本 Design は case-ready 構成判断基準、Wave 構成ルール、execution_unit 構成の依存ヒントと子 Issue 確定後の変更対象重複検出契約（REQ-061-019、REQ-031-027、REQ-035-012）を所有する。
 
-- Wave 構成ルール: 必須依存（意味的依存）で結合した連結成分を Epic 候補とし、技術的依存（L0-L3）は Wave 構成のための情報として連結成分計算から外す。Wave は Epic 内の子 Issue 間の意味的依存 DAG からのみ構成される Epic Issue の実行構成から読み取る内部構造であり、Epic サイズ上限のみを上限とし子 Issue 数の Wave 上限を持たない（REQ-035-006、REQ-061-010、REQ-061-038、REQ-061-047）。Wave 構成は同一の意味的依存関係入力から決定的に導出され、実行上限の数値に依存しない（DEC-041）。Wave 割当は子 Issue 間意味的依存 DAG のトポロジカルレベル割当（各子 Issue の Wave 番号 = 前提列 DAG における最長経路深さ）と一致することを前提とし、依存エッジが存在しない子 Issue 集合はすべて同一 Wave に割り当てる（単一 Wave 前提。依存 0 件なら Wave 数 1 が機械的に導出される）。主題的近さ、ファイル重複、マージ順序の望ましさを Wave 分割の理由として採用せず、これらを理由とする構成は構成検証の最小性検査（REQ-061-048）で拒否する。機械的判定手順は workflows/references/execution-unit-construction.md
+- Wave 構成ルール: 必須依存（意味的依存）で結合した連結成分を Epic 候補とし、技術的依存（L0-L3）は Wave 構成のための情報として連結成分計算から外す。Wave は Epic 内の子 Issue 間の意味的依存 DAG からのみ構成される Epic Issue の実行構成から読み取る内部構造であり、Epic サイズ上限のみを上限とし子 Issue 数の Wave 上限を持たない（REQ-035-006、REQ-061-010、REQ-061-038、REQ-061-047）。Wave 構成は同一の意味的依存関係入力から決定的に導出され、実行上限の数値に依存しない（DEC-041）。Wave 割当は子 Issue 間意味的依存 DAG のトポロジカルレベル割当（各子 Issue の Wave 番号 = 前提列 DAG における最長経路深さ）と一致することを前提とし、依存エッジが存在しない子 Issue 集合はすべて同一 Wave に割り当てる（単一 Wave 前提。依存 0 件なら Wave 数 1 が機械的に導出される）。主題的近さ、ファイル重複、マージ順序の望ましさを Wave 分割の理由として採用せず、これらを理由とする構成は構成検証の最小性検査（REQ-061-048）で拒否する。最小性検査の回帰条件は scripts/self/release/wave-composition-purity.test.ts が機械検査として保持する。機械的判定手順は workflows/references/execution-unit-construction.md
 - 子 Issue 確定後の変更対象重複検出契約: 同一 Wave 内の子 Issue 間の主な変更対象（子 Issue が実行単位として所有する宣言）の重複検出を子 Issue 確定時に実施し、検出結果を実行・統合時の競合リスク情報として Epic の実行構成・Wave 記録へ記録・引き渡す（REQ-061-019、REQ-035-012）。処置は変更対象分割・重複許容（衝突解消の担当とマージ順序の事前記録を含む）とし、Wave 分離を処置に含めない。ファイル重複のみを理由とした Wave 分離を行わず、検出不能の報告義務は維持する（取得不能を無変更・無重複と扱わない）。依存ヒント（同一ファイル衝突の抑制ヒント）は競合リスク信号であり Wave 分離の判断材料としない。実行側の正規所有者表明は case-run Design 吸収節（REQ-031-027）
 
 ## Decision受理評価時の承認記録整合

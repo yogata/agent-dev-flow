@@ -27,7 +27,7 @@ Epic 本文への書き込みは実行構成の状態反映と全体条件評価
 
 ## 常に守る不変条件
 
-- **per-Epic 単一書き手**: Epic Issue 本文の書き込みは per-Epic の単一書き手として排他制御される。書き手は closing 書き込み（case-close(#epic)）と、工程記録の取りまとめによる記録契機別反映の書き込みの2系統であり、両者は同一の排他制御・局所直列化の下で直列化される。case-run(#epic)、Wave 反復制御としての case-auto は書き込まない。独立した子 Issue の作業を全体で直列化しない
+- **per-Epic 単一書き手**: Epic Issue 本文の書き込みは per-Epic の単一書き手として排他制御される。書き手は closing 書き込み（case-close(#epic)）と、工程記録の取りまとめによる記録契機別反映の書き込みの2系統であり、両者は同一の排他制御・局所直列化の下で直列化される。子 Issue の実行（case-auto stage 3 のインライン case-run）、Wave 反復制御としての case-auto は書き込まない。独立した子 Issue の作業を全体で直列化しない
 - **永続状態に書き込む子状態値**: 実行構成表に書き込む子状態値は `pending`/ `completed`/ `blocked`/ `failed` のみ。`ready`/ `running` は runtime 実行状態であり、実行構成表には書き込まれない
 - **べき等性**: 既に `completed`/ `blocked`/ `failed` の実行構成表行は更新対象外（スキップ）。closing 書き込みも取りまとめ書き込みも確定済み終端子状態を上書きしない
 - **一括更新順序**: 複数子Issueの一括更新時は子Issue番号の昇順
@@ -113,7 +113,7 @@ Epic の全体完了判定は子Issueの完了とは区別して評価する。
 5. `pending` を置換（`applyClosingStatus`。子状態4値のみ。PR 番号・URL は付記しない）
 6. `agentdev_gh` の issue_update 操作でEpic本文を更新
 
-`blocked`/ `failed` は case-close が case-run(#epic) の実行結果（`completed-pr`/ `blocked`/ `failed`）から確定して Epic Issue 本文へ反映する終端子状態。
+`blocked`/ `failed` は case-close が子 Issue の実行結果（`completed-pr`/ `blocked`/ `failed`）から確定して Epic Issue 本文へ反映する終端子状態。
 
 ## reference選択表
 

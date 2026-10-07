@@ -76,6 +76,8 @@ implementation:
     - REQ-061-042
   src/common/skills/agentdev-workflow-case-ready/references/execution-structure.md:
     - REQ-035-012
+    - REQ-103-015
+    - REQ-103-022
     - REQ-035-018
     - REQ-061-010
     - REQ-061-019
