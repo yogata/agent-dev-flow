@@ -580,3 +580,39 @@
 - **タグ**: `#case-close` `#evidence-preservation` `#bun-test` `#textlint` `#close-mechanical-steps`
 
 ---
+
+## IR-072 req-updated-freshness は frontmatter updated と commit author date（UTC）の突合のため JST 深夜〜未明の commit 前確定が構造的に不可能
+
+- **問題事象**: RA-005 変更 8 ファイルの frontmatter updated を commit author date（UTC）へ進行する際、JST 2026-10-07 深夜〜10-08 未明の作業では commit の author date が UTC 変換で JST 日付の翌日となり、commit 実行前に updated を IR-072 期待値どおり確定できない。Case #3537 では updated 進行が追随 commit 42e80b71 として分離した
+- **発生局面**: case-run（docs 変更 PR の frontmatter updated 進行。Case #3537・Epic #3530 Wave 2-5）
+- **検知方法**: updated 進行 commit（42e80b71）を主体 commit（93eaae11）から分離せざるを得なかった経過の確認
+- **根本原因**: IR-072 の突合基準が commit author date（UTC）であり、JST の作業日付と UTC 日付が日跨ぎでずれる。updated 進行とその commit を同一 commit にすると、updated 値が commit 実行後まで確定できない循環が生じる
+- **自律対応内容**: updated 進行を単独 commit 42e80b71 に分離し、後続 commit の author date と整合させた上で IR-072 突合を pass させた
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（運用上の回避。IR-072 契約の変更は別判断）
+- **横展開観点**: JST 深夜〜未明の docs 変更では updated 進行が追随 commit になる構造的制約がある。回避案（commit 実行時の local date 設定、IR-072 の時差許容〔updated = author date または author date - 1 日〕）の検討候補
+- **再発条件**: JST 22 時〜翌 9 時台の frontmatter updated 進行を伴う commit
+- **予防策候補**: IR-072 の時差許容の制度化、または updated 進行を日中帯へ誘導する手順上の注記
+- **想定反映先**: IR-072 Design 行（integrity rule）と checker 契約の見直し候補
+- **関連**: Case #3537・PR #3544・commit 42e80b71
+- **タグ**: `#ir-072` `#frontmatter-updated` `#timezone` `#followup-commit`
+
+---
+
+## bun test ③ workflow_body_contract.test.ts はフル suite 実行時に 5 秒 timeout で落ちる flake を持つ
+
+- **問題事象**: scripts/self/case-intake-cross-inspection/workflow_body_contract.test.ts が bun test ③（plugins + scripts フル suite）実行時に 5 秒 timeout で fail する。単独実行では 2.42 秒で pass。Case #3537 の bun test ③ で timeout flake 1 件が発生（fail 明細 5047.00ms。#3535/#3536 の REQ-061-019 pin 文言 fail とは別件）
+- **発生局面**: case-run / case-close の full integrity suite bun test ③（.opencode/plugins/ + ./scripts/。Case #3537）
+- **検知方法**: (fail) 行の実行時間表示（5047.00ms）と単独再実行（13 pass 0 fail）での pass 確認
+- **根本原因**: フル suite 実行時の並列負荷下で個別テストの実行時間が 5 秒 timeout を超過。テスト単体の実行時間（2.42 秒）に対する timeout マージンが不足している
+- **自律対応内容**: 単独再実行で flake と分類し、fail 明細を証跡退避（C:/WINDOWS/TEMP/opencode/test-plugins-3537-final.txt）で記録した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（テスト timeout 設定の見直しは別判断）
+- **横展開観点**: 負荷下で実行時間が伸びるテストは 5 秒既定 timeout で flake 化する。timeout 設定の個別上書きまたは suite 実行の並列度調整の見直し候補
+- **再発条件**: 高負荷環境での bun test ③ フル suite 実行
+- **予防策候補**: 該当テストへの timeout 個別設定、または suite 実行並列度の調整
+- **想定反映先**: workflow_body_contract.test.ts の timeout 設定、bun test 実行形態契約の注記候補
+- **関連**: Case #3537・PR #3544・証跡 test-plugins-3537-final.txt
+- **タグ**: `#bun-test` `#timeout-flake` `#integrity-suite` `#workflow-body-contract`
+
+---
