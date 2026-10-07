@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は41件、提案中の Decision は0件である。
+現行の承認済み Decision は42件、提案中の Decision は0件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -65,6 +65,7 @@
 | DEC-049 | ADF 共通原本とホスト接続領域の分離によるマルチホスト配布モデル | accepted | 2026-10-02 |
 | DEC-050 | deleteBranchOnMerge 設定不備の警告化と操作安全性停止の維持 | accepted | 2026-10-04 |
 | DEC-051 | case-auto stage 3 のスロット型キューへの移行（Wave 収束前提の撤廃） | accepted | 2026-10-06 |
+| DEC-052 | Jev 評価器障害時の判定未確定と依存後続抑止への移行（DEC-044 決定3 の部分置換） | accepted | 2026-10-07 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -118,6 +119,7 @@
 - [DEC-049](DEC-049.md)（ADF 共通原本とホスト接続領域の分離によるマルチホスト配布モデル）
 - [DEC-050](DEC-050.md)（deleteBranchOnMerge 設定不備の警告化と操作安全性停止の維持）
 - [DEC-051](DEC-051.md)（case-auto stage 3 のスロット型キューへの移行（Wave 収束前提の撤廃））
+- [DEC-052](DEC-052.md)（Jev 評価器障害時の判定未確定と依存後続抑止への移行（DEC-044 決定3 の部分置換））
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
@@ -241,6 +243,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-044 | supersedes | DEC-043 | case-ready 実行構造判断の Jev 最終判断採用（Stage 2: 閾値ルーティング）を撤回し、基本判断経路へ復帰。DEC-043 を完全置換 |
 | DEC-044 | supersedes | DEC-040 | 観測契約の一次事実中心再設計による決定4 の置換（決定2 は DEC-046 が置換、決定1・3は維持） |
 | DEC-051 | supersedes | DEC-041 | case-auto stage 3 のスロット型キュー移行による決定5（Wave 収束前提）の置換（決定1〜4は維持） |
+| DEC-052 | supersedes | DEC-044 | Jev 評価器障害時の判定未確定と依存後続抑止への移行による決定3（evaluator 失敗時の reasoning model 経由継続）の部分置換（決定1・2・4〜8は維持。status: accepted 維持） |
 
 ## 関連 REQ
 
@@ -297,6 +300,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-049 | [REQ-099](../requirements/REQ-099.md) | - |
 | DEC-050 | [REQ-030](../requirements/REQ-030.md), [REQ-009](../requirements/REQ-009.md), [REQ-032](../requirements/REQ-032.md) | - |
 | DEC-051 | [REQ-034](../requirements/REQ-034.md), [REQ-035](../requirements/REQ-035.md) | - |
+| DEC-052 | [REQ-090](../requirements/REQ-090.md), [REQ-103](../requirements/REQ-103.md) | - |
 <!-- AUTOGEN:END -->
 
 ## 過去版の履歴基盤

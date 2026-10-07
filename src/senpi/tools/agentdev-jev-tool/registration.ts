@@ -4,7 +4,8 @@
 // （src/common/tools/agentdev-jev/）が所有し、本モジュールは Tool 登録単位と、
 // 引数（host 非依存公開スキーマの参照）、結果・実行 context の変換のみを担う。
 // provider 接続は Tool 本体が動的解決する（adapter パッケージ不在環境では
-// not_configured）。Jev 障害時も Workflow は従来 LLM 経路で継続できる。
+// not_configured）。Jev 障害時の判定・継続契約の正は Custom Tool 操作契約
+// Design「Jev 先行評価」節である。
 
 import {
   AGENTDEV_JEV_PUBLIC_CONTRACTS,
