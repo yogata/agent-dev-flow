@@ -2,8 +2,10 @@
 title: "IR-015: 廃止 REQ 現行参照検出"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-07
 ---
+
+<!-- ADF-COVERS(verification): REQ-103-020（retired REQ が現行要件判断の第一参照として案内されないことの恒久検出） -->
 
 # IR-015: 廃止 REQ 現行参照検出
 
