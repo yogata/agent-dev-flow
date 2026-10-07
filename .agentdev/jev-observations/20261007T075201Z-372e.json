@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261007T075201Z-372e",
+  "workflow": "case-ready",
+  "evaluationKind": "execution-structure-determination",
+  "subject": "Case #3530 operation_units OU-001 の Standard / Epic 確定（3軸判断の総合帰属）",
+  "sourceRevision": "af12b454",
+  "durationMs": 1917,
+  "inputTokens": 1810,
+  "inputs": {
+    "requestDigest": "8844f8d15b3391a4c0285d36c9f262845bfac3cb428935af051006128f436407"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-attribution",
+      "questionForm": "choice",
+      "value": "Epic",
+      "probabilityDistribution": {
+        "Standard": 0.06,
+        "Epic": 0.94
+      }
+    },
+    {
+      "questionId": "q2-dependency-strength",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "関連": 0,
+        "弱": 0,
+        "必須": 1
+      }
+    },
+    {
+      "questionId": "q3-functional-coherence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "分散": 0,
+        "部分的": 0.03,
+        "一貫": 0.97
+      }
+    }
+  ],
+  "confidence": 0.88,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-attribution",
+        "value": "Epic"
+      },
+      {
+        "questionId": "q2-dependency-strength",
+        "value": 2
+      },
+      {
+        "questionId": "q3-functional-coherence",
+        "value": 2
+      }
+    ]
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261007T075430Z-7c51",
+  "workflow": "case-ready",
+  "evaluationKind": "wave-composition-determination",
+  "subject": "Case #3530 Wave 2（RA-001〜RA-005）の並列可否と重複処置",
+  "sourceRevision": "af12b454",
+  "durationMs": 749,
+  "inputTokens": 1825,
+  "inputs": {
+    "requestDigest": "be84ba16d7fccef94b303b53c92c1d391a7a71744db4a46e409053cdf2758816"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-parallel-ok",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.96,
+        "false": 0.040000000000000036
+      }
+    },
+    {
+      "questionId": "q2-duplicate-handling",
+      "questionForm": "choice",
+      "value": "重複許容",
+      "probabilityDistribution": {
+        "変更対象分割": 0.32,
+        "重複許容": 0.68
+      }
+    }
+  ],
+  "confidence": 0.36,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-parallel-ok",
+        "value": true
+      },
+      {
+        "questionId": "q2-duplicate-handling",
+        "value": "重複許容"
+      }
+    ]
+  }
+}
