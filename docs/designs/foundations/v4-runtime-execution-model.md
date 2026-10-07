@@ -2,9 +2,10 @@
 title: ADF v4 Runtime 実行モデル（authority 格子・直列化単位・冪等経路・runtime 制御ループ）
 status: accepted
 created: 2026-09-19
-updated: 2026-10-06
+updated: 2026-10-07
 ---
 <!-- ADF-COVERS(implementation): REQ-035-001, REQ-035-007 -->
+<!-- ADF-COVERS(design): REQ-103-009（REQ-103 の依存後続の副作用・状態遷移抑止の設計対応面。判断契約面は v4-responsibility-boundaries.md） -->
 
 # ADF v4 Runtime 実行モデル（authority 格子・直列化単位・冪等経路・runtime 制御ループ）
 

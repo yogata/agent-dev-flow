@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下61件を第一参照先とする。
+現在の要件判断では、以下62件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -73,6 +73,7 @@
 | [REQ-100](REQ-100.md) | ADF が起票する Issue タイトルの記述規則 |
 | [REQ-101](REQ-101.md) | Case Issue 工程記録モデル |
 | [REQ-102](REQ-102.md) | Git 操作の非対話認証 |
+| [REQ-103](REQ-103.md) | ADF v4 正規モデル再確定と現行規範の全面収束 |
 <!-- AUTOGEN:END -->
 
 ## 廃止済み要件

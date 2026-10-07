@@ -2,10 +2,11 @@
 title: 語彙レジストリ
 status: accepted
 created: 2026-08-20
-updated: 2026-10-03
+updated: 2026-10-07
 ---
 
 <!-- ADF-COVERS(design): REQ-094-008, REQ-094-012 -->
+<!-- ADF-COVERS(design): REQ-103-022（REQ-103 の旧語彙除去の設計対応面） -->
 
 # 語彙レジストリ
 
