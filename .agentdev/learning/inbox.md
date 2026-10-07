@@ -436,3 +436,39 @@
 - **タグ**: `#check-integrity` `#ng-baseline` `#pre-existing-defect` `#definition-pr`
 
 ---
+
+## worktree では textlint final gate が vendor 未伝播で fail-closed 停止するため plugin package 本体実体から --root <worktree> 指定で実行する
+
+- **問題事象**: worktree 環境で textlint final gate（gate.ts --purpose final）を実行すると、`.opencode/plugins/agentdev-textlint-guard/vendor/`（engine bundle・kuromoji 辞書）が worktree に未伝播のため fail-closed 停止した
+- **発生局面**: 実装（case-run の textlint 最終検査。Case #3532・Epic #3530 Wave 1）
+- **検知方法**: gate 実行時の vendor 欠落検知による fail-closed 停止
+- **根本原因**: worktree junction 未伝播の構造的制約が plugins 系 vendor 生成物にも適用される（既存規律の worktree junction 未伝播と同型）
+- **自律対応内容**: plugin package 本体実体（メインリポジトリ）から `--root <worktree>` を指定して実行し検査を完了した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存の fallback 契約と同型の構造的制約の適用）
+- **横展開観点**: `agentdev-git-worktree-test-fallback` が扱う src/ 構造系テスト fallback の対象範囲と同型であり、分類・恒久化の候補
+- **再発条件**: worktree で plugins 系 vendor 依存 checker を実行する場合
+- **予防策候補**: plugins 系 vendor 依存 checker の worktree fallback 分類と恒久化の検討
+- **想定反映先**: agentdev-git-worktree-test-fallback の対象範囲分類、textlint gate 運用
+- **関連**: PR #3539 の learning 第1項
+- **タグ**: `#textlint` `#worktree` `#vendor` `#fallback`
+
+---
+
+## close_mechanical_steps pre-merge の integrityGates 報告は exitCode のみで stdout/stderr 証跡を退避しないため fail 由来分類と件数突合の証跡は実行側で退避が必要
+
+- **問題事象**: case-close STEP-3 の full integrity suite（bun test 3 分割）を close_mechanical_steps pre-merge で実行したところ、分割③で 1 件のテスト timeout が検出されたが script 報告 JSON は各 gate の exitCode のみを記録し、fail 明細・件数サマリー（「Ran N tests across M files」）・stdout/stderr を保存しなかった。機械受理基準の必須記録（件数突合、fail 全件の由来分類の証跡）を生成するため、3 分割を stdout/stderr 分離退避付きで再実行した
+- **発生局面**: 実装（case-close STEP-3 機械工程。Case #3532・Epic #3530 Wave 1）
+- **検知方法**: 報告 JSON の full-integrity-suite step（exitCode 集約のみ）と機械受理基準の記録要件（件数突合・fail 由来分類）の突合
+- **根本原因**: script の StepRecord detail が exitCode 集約のみで、非ゼロ exit 時の由来分類に必要な fail 明細と件数サマリーの証跡退避を報告契約が含まない
+- **自律対応内容**: 正当理由「証跡欠落」で 3 分割を stdout/stderr 分離退避付きで再実行。分割③ 初回 timeout 1 件（「配布物の具体参照排除（RA-003、TS-004）」）を単独再実行（pass・13/1・2.49 秒）→ 分割③ フル再実行（fail 0・654/39）で解消し、実行形態由来（suite 内負荷相互作用）と分類して由来不明 0 件を確定した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: 候補あり（close_mechanical_steps の integrityGates 報告へ stdout/stderr 退避先指定・件数サマリー抽出の追加検討）
+- **横展開観点**: exit code が意味を持つ検証コマンドの機械工程実行では、非ゼロ exit 時の由来分類に必要な明細の退避を実行経路に含める
+- **再発条件**: full integrity suite で fail が発生する close 実行
+- **予防策候補**: close_mechanical_steps 側への証跡退避機能追加（または script 入力へ退避先指定の追加）
+- **想定反映先**: agentdev-workflow-case-close scripts（close_mechanical_steps.ts の報告契約）
+- **関連**: Case #3532・merge commit b84b623e
+- **タグ**: `#case-close` `#full-suite` `#evidence-preservation` `#fail-classification`
+
+---
