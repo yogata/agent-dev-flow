@@ -292,3 +292,21 @@
 - **タグ**: `#zero-targets` `#junction`
 
 ---
+
+## prepare_definition_pr.ts の traceability-check ゲートが case-run/case-ready 段階の未充足（missing-implementation/verification）を含む fail 数で exit 2 を返し、機械工程が failure 終了扱いになる（case-open の正規ゲートは missing-design 0 件）
+
+- **問題事象**: case-open STEP-4 の prepare_definition_pr.ts 実行で、definition-edit・generate_indexes・stage-and-commit・check_integrity がすべて pass した後、traceability-check ステップが exit 2（summary fail=2: missing-implementation / missing-verification）で fail 判定となり、script 全体が exit 1（failure）で終了して proposal PR 本文が空になった。case-open の正規ゲートは missing-design 0 件であり、missing-implementation / missing-verification は case-run（RA 実装）・case-ready（verification 登録）段階の未充足で case-open 段階では必ず未充足になる。coverage --req による design 実測帰着確認（2 件）と併せて意味レビューで継続判断した（Case #3525・PR #3526）
+- **発生局面**: 実装（case-open STEP-4 の Definition PR 機械工程。Case #3525〔REQ-061-047/048 新規行追加〕）
+- **検知方法**: script 報告 JSON の traceability-check step fail（exitCode 2・summary 空）と、同一コマンドの直接実行による実測 JSON（pass=7 fail=2、fail が missing-design 以外のみ）の突合
+- **根本原因**: prepare_definition_pr.ts の traceability-check ステップが exitCode != 0 を一律 fail と扱い、ゲート対象（missing-design 0 件）と check 全体の fail 数（case-run/case-ready 前提の missing-implementation・missing-verification を含む）を区別しないため。PR #3350（REQ-019-003）でも同型の救済（PR 本文への記録と意味レビュー継続）が実施済みの既知パターン
+- **自律対応内容**: (1) worktree 内で check --req REQ-061-047,REQ-061-048 を直接実行し missing-design pass・fail 2 件が missing-design 以外であることを実測。(2) coverage --req で design 対応 2 件の実測帰着（case-ready.md:11）を確認し missing-design 0 件ゲート成立を裏付け。(3) push と PR 作成へ継続し、判定根拠を PR 本文の検証差分セクションへ記録
+- **ユーザー確認有無**: なし（case-auto 配下は親判断解決へ委譲、本件はゲート成立の実測による継続判断）
+- **Decision/REQ/spec影響**: 候補あり（prepare_definition_pr.ts のゲート判定を missing-design のみへ限定する、または --req 対象行の missing-implementation/verification を case-run/case-ready 前提の警告化する恒久対の検討）
+- **横展開観点**: REQ 行新規追加を伴う Definition PR では本偏差が毎回発生する（恒久対がない限り再発）。case-ready の Definition 受入でも同型の判定粒度問題が発生し得る
+- **再発条件**: REQ 行新規追加（implementation/verification 宣言が case-run/case-ready 以後に確定する行）を伴う case-open STEP-4 の機械工程実行
+- **予防策候補**: prepare_definition_pr.ts の traceabilityGate 判定を、stdout JSON の checks.missing-design.status == pass に基づく判定へ変更する（summary 全体の pass/fail でなく）。または入力 JSON へ gate 対象 check 名を明示させる
+- **想定反映先**: agentdev-workflow-case-open scripts（prepare_definition_pr.ts）、case-open Design「機械工程の script 呼び出し契約（RU-0162）」節のゲート判定記述
+- **関連**: Case #3525・PR #3526・commit d7b462ea、同型救済の先行例 PR #3350（Case #3342・REQ-019-003）
+- **タグ**: `#case-open` `#traceability` `#gate-granularity` `#prepare-definition-pr`
+
+---
