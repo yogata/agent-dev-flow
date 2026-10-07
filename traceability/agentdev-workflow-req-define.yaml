@@ -45,6 +45,11 @@ implementation:
     - REQ-096-009
     - REQ-096-023
     - REQ-096-024
+    - REQ-103-007
+    - REQ-103-008
+    - REQ-103-009
+    - REQ-103-010
+    - REQ-103-011
 verification:
   docs/designs/commands/req-define.md:
     - REQ-021-029

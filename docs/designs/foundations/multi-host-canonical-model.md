@@ -2,13 +2,12 @@
 title: マルチホスト原本モデル（共通原本とホスト別接続の分離）
 status: accepted
 created: 2026-10-02
-updated: 2026-10-03
+updated: 2026-10-08
 ---
 <!-- ADF-COVERS(design): REQ-099-001, REQ-099-002, REQ-099-003, REQ-099-004, REQ-099-005, REQ-099-006, REQ-099-007, REQ-099-008, REQ-099-009, REQ-099-010, REQ-099-011, REQ-099-012, REQ-099-013, REQ-099-014, REQ-099-015, REQ-099-016, REQ-099-017, REQ-099-018, REQ-099-019, REQ-099-020 -->
 <!-- ADF-COVERS(design): REQ-002-007, REQ-002-008, REQ-002-009, REQ-002-019, REQ-002-043, REQ-002-045, REQ-002-047（REQ-002-047 の配備形態面。配布依存境界の検査モデル面は runtime-package-boundary.md が維持） -->
 <!-- ADF-COVERS(design): REQ-009-015, REQ-009-016, REQ-009-019, REQ-009-020, REQ-009-036, REQ-009-040, REQ-009-042（link 元原本・installer 配置対象選択面。実行手順詳細は runtime-package-boundary.md・install-script-usability.md が維持） -->
 <!-- ADF-COVERS(design): REQ-018-001（構造系テスト fallback の fallback 先を共通原本へ更新する面） -->
-<!-- ADF-COVERS(design): REQ-045-001（監査対象パスの新構成対応面） -->
 
 # マルチホスト原本モデル（共通原本とホスト別接続の分離）
 

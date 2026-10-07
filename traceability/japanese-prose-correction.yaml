@@ -14,6 +14,11 @@ implementation:
     - REQ-094-006
     - REQ-094-010
     - REQ-094-011
+    - REQ-103-007
+    - REQ-103-008
+    - REQ-103-009
+    - REQ-103-010
+    - REQ-103-011
   src/common/skills/agentdev-decision-guidelines/SKILL.md:
     - REQ-094-001
     - REQ-094-002
@@ -65,4 +70,9 @@ implementation:
     - REQ-094-006
     - REQ-094-010
     - REQ-094-011
+    - REQ-103-007
+    - REQ-103-008
+    - REQ-103-009
+    - REQ-103-010
+    - REQ-103-011
 verification: {}

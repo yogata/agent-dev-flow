@@ -39,7 +39,7 @@ v4 処遇の完全一覧（原本）を所有する。列スキーマと運用�
 | REQ-039 | redefine | ― | 9 | executed | Backlog のループ化。第9段実行 2026-09-20（Case #3022、Definition merge 1ca97324、実装 merge a74cd237/8ced4e4d、learning 6c439a00）。redefine（目的節接続・L13/L34 権威ポインタ張替え） |
 | REQ-041 | redefine | ― | 9 | executed | backlog-auto のループ化。第9段実行 2026-09-20（Case #3022、Definition merge 1ca97324、実装 merge a74cd237/8ced4e4d、learning 6c439a00）。redefine（目的節接続・要件行文言不変）。no-op redefine 判断記録（第4段で要求入口化済みのため本段の目的節接続は実質変更なし・判断記録は Case #3022 本文） |
 | REQ-044 | keep | ― | ― | executed | 標準API委譲の原則は維持。第13段 full validation で維持確認 2026-09-20（Case #3036） |
-| REQ-045 | keep | ― | ― | executed | 網羅監査は第13段で実行。第13段実行 2026-09-20（Case #3036・設計PR #3037 merge cbb3a637・網羅監査レポート docs/reports/integrity/audits/req-045-consistency-audit-20260920.md を commit 12f048e5 で保存） |
+| REQ-045 | keep → retired | ― | ― | executed | 網羅監査は第13段で実行。第13段実行 2026-09-20（Case #3036・設計PR #3037 merge cbb3a637・網羅監査レポート docs/reports/integrity/audits/req-045-consistency-audit-20260920.md を commit 12f048e5 で保存）。その後 RETIRE 2026-10-08（Case #3537・REQ-103-016/017 全面再評価処遇判定。一回限り網羅監査契約の実行完了と REQ-103-029 正規所有への収束。retired/ へ移管・履歴注記で後継と廃止根拠を記録） |
 | REQ-046 | keep → retired | ― | 13 | executed | 移行不変条件。第13段で retire 予約（v4 移行完了後に廃止判定）。第13段実行 2026-09-20（Case #3036・設計PR #3037 merge cbb3a637 で目的節へ retire 予約を追記・網羅監査レポート commit 12f048e5）。その後 RETIRE 2026-10（2026-10 責任境界整理、retired/ へ移管） |
 | REQ-047 | redefine | deterministic code/tool | 8 | executed | 規則所有権の semantic/deterministic 再編。第8段実行 2026-09-20（Case #3011、Definition merge 21434202、実装 merge eac6a5e9/b1207a0f/733eb40d/b0738869、fan-in fix 1befae99）。redefine（目的節接続・要件行文言不変） |
 | REQ-048 | keep | ― | ― | executed | 観測評価ループは維持。第13段 full validation で維持確認 2026-09-20（Case #3036） |

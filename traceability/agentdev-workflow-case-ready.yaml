@@ -104,6 +104,11 @@ implementation:
     - REQ-100-001
     - REQ-100-004
     - REQ-100-006
+    - REQ-103-007
+    - REQ-103-008
+    - REQ-103-009
+    - REQ-103-010
+    - REQ-103-011
   src/common/skills/agentdev-workflow-case-ready/references/readiness-and-cleanup.md:
     - REQ-061-035
     - REQ-061-040

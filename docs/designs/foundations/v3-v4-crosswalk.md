@@ -2,7 +2,7 @@
 title: v3 -> v4 Concept / Artifact Crosswalk
 status: accepted
 created: 2026-09-18
-updated: 2026-10-07
+updated: 2026-10-08
 ---
 
 <!-- ADF-COVERS(design): REQ-103-016, REQ-103-017（REQ-103 の現行規範処遇判定と反映完了の設計対応面） -->
@@ -53,3 +53,8 @@ references/crosswalk-inventory.md が所有し、本 Design は分類スキー�
 
 件数は v3→v4 移行判定時点の確定値であり、処遇記録として保持する。
 正確な内訳は references/crosswalk-inventory.md を正とする。
+
+## 検証スコープ（REQ-103-016/017）
+
+REQ-103-016（評価対象集合の全件処遇判定）と REQ-103-017（keep 以外の反映完了）は一回限り再評価の判定と反映の契約であり、恒常 checker を新設しない（REQ-103-019）。検証スコープポリシー（traceability/policy.yaml）で optional 登録し、各再評価実行時の検証計画（TS-010、TS-013 相当）で検証する。
+REQ-103-020（歴史本文の保持）の verification は IR-015 が、REQ-103-021（誤認防止と到達性）の verification は IR-040 と IR-041 が retired 参照の恒久検出として所有する。
