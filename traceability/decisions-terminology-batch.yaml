@@ -88,9 +88,6 @@ implementation:
     - REQ-094-006
     - REQ-094-010
     - REQ-094-011
-    - REQ-103-016
-    - REQ-103-017
-    - REQ-103-022
   docs/decisions/DEC-014.md:
     - REQ-094-001
     - REQ-094-002
