@@ -650,3 +650,21 @@
 - **タグ**: `#textlint-guard` `#vendor` `#bun-test` `#environment`
 
 ---
+
+## squash merge の author date 保持により merge 後の req-updated-freshness 新規 NG が再発し得る（frontmatter のみの是正 commit が content-change 除外される機械的是正経路）
+
+- **問題事象**: squash merge 後の main 再検査で、merge commit の author date（squash が origin 側 commit の author date を保持）と Design frontmatter updated の不一致が req-updated-freshness（IR-072）の新規 NG として顕在化し得る（本件: merge 546b27db の author date 2026-10-07 と updated 2026-10-08 の 3 Design 分。check_integrity 初回実行で new unmanaged NG 3 として検出）
+- **発生局面**: case-run の check_integrity 初回実行（Case #3538・DEL-3538-3・訂正 PR #3546）
+- **検知方法**: check_integrity の req-updated-freshness NG と merge commit の author date との突合確認（integrity-d3-r2.json）
+- **根本原因**: squash merge は author date を origin 側 commit から保持するため、branch 上で frontmatter updated を更新した変更が merge commit の author date より未来の日付を持つと、author date 基準の鮮度検査と構造的に不一致になる
+- **自律対応内容**: 3 Design（v4-quality-gate-model・custom-tool-contracts・v4-standard-lifecycle）の updated を author date 基準（2026-10-07）へ戻して解消。frontmatter のみの修正 commit は ir072IsFrontmatterOnlyCommit により content-change から除外されるため、機械的是正が成立する（integrity-d3-r3.json で再実行 exit 0・0 new を確認）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（IR-072 の既存是正経路の適用）
+- **横展開観点**: 本訂正 PR #3546 の merge db2093a5 でも同型のズレが再発し得る。merge 後の check_integrity で req-updated-freshness の新規 NG が出た場合、updated の author date 揃え（frontmatter のみの修正 commit）を機械的是正の定型として扱える
+- **再発条件**: branch 上で frontmatter updated を更新した変更を squash merge した後、merge commit の author date 基準で鮮度検査を実行する
+- **予防策候補**: merge 直後の check_integrity 再検査を case-close 側の検証手順に含め、req-updated-freshness 検出時は frontmatter のみの是正 commit で解消する手順の明記
+- **想定反映先**: case-close workflow（docs 検証・merge 後再検査手順）の注記候補
+- **関連**: Case #3538・PR #3546・merge 546b27db・既存エントリ「Definition PR 機械工程の check_integrity を stage-and-commit 前に実行すると IR-072 構造的 fail が必ず再現する」（同型の author date 参照問題）
+- **タグ**: `#check-integrity` `#ir072` `#freshness` `#squash-merge`
+
+---
