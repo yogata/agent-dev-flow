@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261007T224715Z-a8ee",
+  "workflow": "req-define",
+  "evaluationKind": "caller-path-trial-3538",
+  "subject": "既存REQ照合候補要件文（REQ-103-009 引用）のREQ要件行保存適否判断",
+  "sourceRevision": "8262d404",
+  "durationMs": 76,
+  "inputs": {
+    "requestDigest": "18387fe4aedb74cd3699268fba13e7de08f453c16160c16c05060ae87c23c94d"
+  },
+  "failure": {
+    "kind": "network_error",
+    "detail": "Error: gateway responded with HTTP 401: {\"result\":null,\"success\":false,\"errors\":[{\"code\":10000,\"message\":\"Authentication error\"}],\"messages\":[]}"
+  }
+}
