@@ -2,7 +2,7 @@
 title: 文書モデル
 status: accepted
 created: 2026-08-20
-updated: "2026-10-07"
+updated: "2026-10-08"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-001, REQ-001-002, REQ-001-003, REQ-001-004, REQ-001-005, REQ-001-006, REQ-001-007, REQ-001-020, REQ-001-035, REQ-001-038, REQ-001-039, REQ-001-040, REQ-001-041, REQ-001-052, REQ-056-001 -->
 <!-- ADF-COVERS(implementation): REQ-001-066, REQ-001-067, REQ-001-068 -->
@@ -316,7 +316,7 @@ consumer 境界は producer、direct consumer、orchestration pre-reader、inval
   - direct consumer: `{case-open, case-ready, case-revise}` — req_draft を主入力として消費し、REQ/Decision/Design/Issue を生成・確定する command 群。draft type registry の allowed consumers 列と同一
   - orchestration pre-reader: `{case-auto}` — case-open 前だけ req_draft を読み、後続工程の orchestration 入力とする command
   - invalid post-case reader: `{case-auto, case-run, case-close}` — case-open 成功後に req_draft を参照してはならない command 群。case-open 成功後は Issue と Epic を SSoT として単独成立する
-- **緩やかな契約（soft contract）**: API 契約ではなく生成側（producer）の標準。LLM 推論経由で消費され、機械的パースを前提としない（DEC-003）。厳格なスキーマバージョン、JSON Schema、バリデータは導入しない
+- **緩やかな契約（soft contract）**: API 契約ではなく生成側（producer）の標準。LLM 推論経由で消費され、機械的パースを前提としない（DEC-003）。厳格なスキーマバージョン、JSON Schema、バリデータは前提としない。ただし soft contract を機械的処理回避や schema validation 全面禁止の理由として扱わない（REQ-103-013）。存在確認、型、列挙値、ID、参照関係、明示的フィールド等の決定的に扱える部分の機械処理は artifact-contracts の soft contract 再定義と各 checker・Custom Tool 操作契約で許容される
 - **構造化データが正**: 後続工程の権威ある情報源は `# draft-data` fenced YAML block であり、人間可読 Markdown セクション（`# summary` 等）は補助的である（REQ-008-001, REQ-008-002）
 - **一時成果物**: case-open 成功後（Issue/Epic 作成 + VERIFY）は削除されてよい。case-open 成功後は Issue/Epic を SSoT とし、req_draft は存在しない一時成果物となる（REQ-008-015, REQ-008-016）
 - **標準データモデル**: `auto_gate`, `agreed_items`, `artifact_actions`, `realization_actions`, `conflict_resolutions`, `operation_units`, `case_open_hints` を中心フィールドとする（REQ-008-011）。詳細構造は `docs/designs/responsibilities/artifact-contracts.md` の「req_draft 出力構造」を参照
@@ -420,7 +420,7 @@ accepted Decision は意味的に不変とする（REQ-001-056〜060）。
 
 | 文書種別 | 状態遷移 | 備考 |
 |---|---|---|
-| REQ | created → active → superseded / partially superseded | APPEND/UPDATEで拡張する。現行 REQ は `docs/requirements/README.md`、旧世代の履歴資料は tag `v2.11.0` で参照する |
+| REQ | created → active → retired | APPEND/UPDATEで拡張する。廃止済み REQ は `docs/requirements/retired/` へ配置する。現行 REQ は `docs/requirements/README.md`、旧世代（v2:REQ-01XX）の履歴資料は tag `v2.11.0` で参照する |
 | Decision | proposed → accepted → superseded / deprecated | acceptedだけを現行判断の根拠とする |
 | Design | draft → accepted | 新規Designはdraftで作成され、確定時にacceptedへ遷移する。置換済みDesignは現行ツリーへ保持しない |
 | Guide | active → outdated → removed | 規範的権限を持たない |

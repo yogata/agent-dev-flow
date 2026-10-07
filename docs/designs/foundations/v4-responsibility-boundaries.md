@@ -2,11 +2,12 @@
 title: ADF v4 実装責務境界（意味判断 Skill / 決定的処理 code / Harness adapter / Project Extensions）
 status: accepted
 created: 2026-09-18
-updated: 2026-10-07
+updated: 2026-10-08
 ---
 <!-- ADF-COVERS(implementation): REQ-003-021, REQ-003-022, REQ-003-023 -->
 <!-- ADF-COVERS(design): REQ-096-001, REQ-096-002, REQ-096-003, REQ-096-004, REQ-096-005, REQ-096-006, REQ-096-007, REQ-096-008, REQ-096-009, REQ-096-010, REQ-096-011, REQ-096-012, REQ-096-013, REQ-096-014, REQ-096-015, REQ-096-016, REQ-096-017, REQ-096-018, REQ-096-019, REQ-096-020, REQ-096-021, REQ-096-022, REQ-096-023, REQ-096-024, REQ-096-025, REQ-096-026, REQ-096-027, REQ-096-028, REQ-096-029, REQ-096-030, REQ-096-031 -->
 <!-- ADF-COVERS(design): REQ-103-002, REQ-103-003, REQ-103-004, REQ-103-005, REQ-103-006, REQ-103-007, REQ-103-008, REQ-103-010, REQ-103-012（REQ-103 の判断アーキテクチャ・人間判断境界の設計対応面） -->
+<!-- ADF-COVERS(implementation): REQ-103-002, REQ-103-003, REQ-103-004, REQ-103-005, REQ-103-006, REQ-103-012（REQ-103 の判断方法 3 分類判別基準・確定権限 3 分類判定表・閉包条件・採用理由と評価器適格性の記録契約・人間判断引き上げ条件の詳細基準節が契約面の構成実体） -->
 
 # ADF v4 実装責務境界（意味判断 Skill / 決定的処理 code / Harness adapter / Project Extensions）
 

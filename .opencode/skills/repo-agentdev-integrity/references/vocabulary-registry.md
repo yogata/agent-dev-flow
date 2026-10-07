@@ -24,14 +24,14 @@ IR-050（load_skills 誤指定検出）・IR-051（実行主体 skill 表記誤�
 
 | コマンド名 | 種別 | 備考 |
 |------------|------|------|
-| `/agentdev/case-open` | 公開 command | `/agentdev/*` 名前空間 |
-| `/agentdev/case-run` | 公開 command | `/agentdev/*` 名前空間 |
-| `/agentdev/case-close` | 公開 command | `/agentdev/*` 名前空間 |
-| `/agentdev/case-update` | 公開 command | `/agentdev/*` 名前空間 |
+| `/agentdev/case-open` | 内部 lifecycle 段階 | v4 では case-auto 駆動の内部段階（DEC-029・v4-standard-lifecycle）。公開入口は `case-auto` |
+| `/agentdev/case-run` | 内部 lifecycle 段階 | v4 では case-auto 駆動の内部段階（DEC-029・v4-standard-lifecycle） |
+| `/agentdev/case-close` | 内部 lifecycle 段階 | v4 では case-auto 駆動の内部段階（DEC-029・v4-standard-lifecycle） |
+| `/agentdev/case-update` | 廃止済み command | DEC-029 で完全廃止。Definition 変更経路は case-revise |
 | `/agentdev/case-auto` | 公開 command | `/agentdev/*` 名前空間 |
 | `/agentdev/req-define` | 公開 command | `/agentdev/*` 名前空間 |
-| `/agentdev/req-save` | 公開 command | `/agentdev/*` 名前空間 |
-| `/agentdev/design-save` | 公開 command | `/agentdev/*` 名前空間 |
+| `/agentdev/req-save` | 廃止済み command | DEC-029 で公開コマンド廃止。Definition 保存は case-ready / case-revise 内部責務 |
+| `/agentdev/design-save` | 廃止済み command | DEC-029 で公開コマンド廃止。Design 保存は case-ready / case-revise 内部責務 |
 | `/agentdev/intake-capture` | 公開 command | `/agentdev/*` 名前空間 |
 | `/agentdev/intake-from-github` | 公開 command | `/agentdev/*` 名前空間 |
 | `/agentdev/intake-promote` | 公開 command | `/agentdev/*` 名前空間 |

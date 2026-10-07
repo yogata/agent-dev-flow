@@ -89,7 +89,7 @@ const ROW_ANCHORS: Array<[string, string, RegExp]> = [
   ["REQ-061-016", REF_STRUCT_REL, /最新状態を再確認/],
   ["REQ-061-017", REF_EC_REL, /Markdown 行構造（LF、セクション間空行、インデント）を保持/],
   ["REQ-061-018", REF_STRUCT_REL, /構成検証（上限、依存維持、全割当）/],
-  ["REQ-061-019", REF_STRUCT_REL, /重複をファイル単位で前置検出/],
+  ["REQ-061-019", REF_STRUCT_REL, /重複を前置検出/],
   ["REQ-061-020", REF_DEC_REL, /関連REQ宣言（related_reqs）に含まれ、かつ status が proposed/],
   ["REQ-061-021", REF_DEC_REL, /受理可否を評価/],
   ["REQ-061-022", REF_DEC_REL, /重複する状態遷移や承認記録を生成しない/],

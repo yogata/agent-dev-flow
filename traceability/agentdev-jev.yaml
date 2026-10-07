@@ -48,6 +48,11 @@ verification:
     - REQ-090-014
     - REQ-090-016
     - REQ-090-019
+    # REQ-103-008: 障害時の fallback 不在を恒常検証（「provider が throw した失敗は構造化分類される
+    # （自動 retry なし）」「score の正規化不能応答は response_invalid として構造化失敗になる
+    # （level 0 fallback なし）」「provider 未解決時は not_configured（呼出し前判定）」）。
+    # 呼出側 workflow の抑止面は docs/reports/req-103-ac-judgment-wave3.md（今回限り検証）で補完。
+    - REQ-103-008
   src/common/tools/agentdev-jev/tests/observation.test.ts:
     - REQ-090-005
     - REQ-090-006
@@ -65,6 +70,10 @@ verification:
     - REQ-090-015
     - REQ-090-017
     - REQ-090-020
+    # REQ-103-009: 判定未確定の構造化記録と合格化不在を恒常検証（「呼出し開始後の失敗は失敗分類と
+    # 最小 diagnostic を持つ失敗観測を生成する」「失敗観測への最終判断反映は拒否される」）。
+    # 依存後続抑止・独立処理継続の実経路面は docs/reports/req-103-ac-judgment-wave3.md（今回限り検証）で補完。
+    - REQ-103-009
   src/common/tools/agentdev-jev/adapter-cloudflare/tests/config.test.ts:
     - REQ-090-002
     - REQ-090-021

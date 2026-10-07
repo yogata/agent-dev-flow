@@ -62,9 +62,9 @@ Design status を draft から accepted へ昇格する場合、昇格は Design
 
 ---
 
-## ADF-COVERS 宣言ブロックの更新確認（design-save 時）
+## ADF-COVERS 宣言ブロックの更新確認（Design 保存時）
 
-design-save 工程（Design 本体へ要件を反映する保存工程）は、当該 Design ヘッダの既存 ADF-COVERS 宣言ブロックの更新要否（実装対応・検証対応の過不足）を確認対象に含める。
+Design 保存（Design 本体へ要件を反映する case-ready / case-revise 内部責務の保存工程。v4 標準ライフサイクルの語彙）は、当該 Design ヘッダの既存 ADF-COVERS 宣言ブロックの更新要否（実装対応・検証対応の過不足）を確認対象に含める。
 確認結果に基づく宣言ブロックの更新を要する場合、保存工程の一部として反映する。
 
 確認の詳細（確認対象の限定、更新要否の判定観点、反映タイミング）は [references/design-lifecycle-application.md](references/design-lifecycle-application.md) 参照。
@@ -137,7 +137,7 @@ Design 保存内部責務は本スクリプト群を bash 経由で呼び出し�
 
 - 新規 Design 作成時の frontmatter 完全性（`title`, `status: draft`, `created`, `updated`）
 - 既存 Design 追記時の `status` 変更がないこと
-- design-save 工程（Design 本体へ要件を反映する保存工程）での、当該 Design ヘッダの既存 ADF-COVERS 宣言ブロックの更新要否（実装対応・検証対応の過不足）確認の包含と、更新を要する場合の保存工程内反映
+- Design 保存（Design 本体へ要件を反映する case-ready / case-revise 内部責務の保存工程）での、当該 Design ヘッダの既存 ADF-COVERS 宣言ブロックの更新要否（実装対応・検証対応の過不足）確認の包含と、更新を要する場合の保存工程内反映
 - target_area マッチング規則の適用結果（単一マッチ採用、複数マッチ時の warn、未検出時のスキップ + follow-up）
 - Design 固有 script が単一の正規所有者（本スキル）に集約されていること
 - 共通検証を重複実装せず `agentdev-artifact-validation` の公開検証契約へ委譲すること
