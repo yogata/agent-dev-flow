@@ -472,3 +472,39 @@
 - **タグ**: `#case-close` `#full-suite` `#evidence-preservation` `#fail-classification`
 
 ---
+
+## bun test 既定 timeout 5 秒の suite 内負荷相互作用 timeout が Wave 1・Wave 2-2 の 2 Case 連続で再現（単独実行は常に pass）
+
+- **問題事象**: full integrity suite 分割③（`bun test ./.opencode/plugins/ ./scripts/`）で「配布物の具体参照排除（RA-003、TS-004）」テストが Wave 1（#3532）と Wave 2-2（#3534）の 2 Case 連続で timeout fail となった。Wave 1 は 1 回、Wave 2-2 は 2 回のフル再実行を経て 3 回目で fail 0 に解消。同一テストの単独再実行は両 Wave とも pass（2.3〜2.5 秒）で、suite 下の実測（5.2〜5.6 秒）が bun test 既定 timeout（5 秒）をわずかに超えるだけの余裕不足
+- **発生局面**: 検証（case-close STEP-3 full integrity suite。Epic #3530 Wave 1・Wave 2-2）
+- **検知方法**: 分割③ 実行の fail 検出と fail 由来分類手順（単独再実行 → フル再実行）
+- **根本原因**: 該当テスト（エンジン配布ファイルの解析）の実行時間が suite 内の並列負荷で約 2 倍に増幅され、既定 5 秒 timeout に対する余裕が非決定的に尽きる。検査対象はテストで明示的な timeout 設定を持たず、suite 側の負荷相互作用に対する耐性が設計されていない
+- **自律対応内容**: fail 由来分類手順に従い単独再実行（pass）→ フル再実行を繰り返し、3 回目のフル再実行で fail 0 を取得して実行形態由来として解消。各実行の stdout/stderr を分離退避し由来不明 0 件を確定した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: 候補あり（該当テストへの明示 timeout 設定の引き上げ、または該当テストの単独分割実行の恒久化検討）
+- **横展開観点**: suite 内で重い解析を行うテストは既定 timeout の非決定的超過を避けるため明示 timeout を持つべき。単独実行 pass でも suite 実行で timeout するテストは負荷相互作用として恒常的に再現し得る
+- **再発条件**: 該当テストを含む full integrity suite 分割③ の実行
+- **予防策候補**: 該当テストへの明示 timeout 設定（例: 30 秒）、または heavy 解析テストの分割③ 内での先行実行
+- **想定反映先**: scripts/self/case-intake-cross-inspection/workflow_body_contract.test.ts、bun test フル suite 正規形（実行形態契約）の注記
+- **関連**: Case #3534・merge commit 336095b6・Wave 1 の同一テスト timeout 記録（#3532 対応記録コメント）
+- **タグ**: `#bun-test` `#timeout` `#full-suite` `#flaky` `#fail-classification`
+
+---
+
+## PR 本文検証差分の textlint hard 件数申告は件数突合の根拠にならない（集合差分での同一性判定が必要）
+
+- **問題事象**: case-close STEP-3 の textlint final gate で worktree hard 実測 40 件を取得したが、case-run が PR 本文検証差分に申告していた件数は 36 件で不一致。実行条件（同一 branch HEAD 7b0505de・同一規則構成）で件数が異なるため、申告件数単体では既知違反の同一性を判定できなかった
+- **発生局面**: 検証（case-close STEP-3 textlint 最終検査の由来判定。Case #3534・Epic #3530 Wave 2-2）
+- **検知方法**: gate 実測 JSON（path:line:column:ruleId の hard findings 集合）と PR 本文申告件数（36 件）の突合
+- **根本原因**: 件数は集計時点・cache 状態・severity 抽出方法の差で変動し得る一方、検証差分の記録が件数を同一性の根拠として扱いやすい。集合の同一性判定には要素レベルの突合が必要だが、件数申告だけでは再現できない
+- **自律対応内容**: worktree 側と main 側の gate を両方実行し、hard findings を path:line:column:ruleId 鍵で集合差分突合（新規 0 件・除去 0 件の完全一致）を取得。件数差（36 vs 40）は集計差と判断し、集合差分による新規 0 件の判定を本実行で確定した。変更ファイル内の 1 件（case-auto SKILL.md 105 行 prh）は diff hunk 外の既存行で変更行由来 0 件も併せて確認
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存の検証差分記録規約は集合差分判定と矛盾しない。記録様式の補強候補）
+- **横展開観点**: 検証差分の「違反件数」を記録する場合は集合（要素キー）の同一性判定と併記する。件数のみの申告は close 時の由来判定を失敗させ得る
+- **再発条件**: 変更行由来 0 件を件数突合だけで判定する close 実行
+- **予防策候補**: textlint gate の JSON 実測（hard findings 集合）の退避を検証差分の証跡チャネルに含める
+- **想定反映先**: PR 本文テンプレートの検証差分セクション記録様式（textlint 行）、agentdev-workflow-templates
+- **関連**: Case #3534・merge commit 336095b6
+- **タグ**: `#textlint` `#evidence-preservation` `#verification-diff` `#case-close`
+
+---
