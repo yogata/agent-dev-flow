@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-inspect-docs
-description: "inspect-docs command の workflow 実装本体。docs 全体（REQ/Decision/Design/guides/README）の意味整合性診断、配布物整合性検査、検出事項の inbox 出力と git 永続化を所有する（read-only-diagnostic 型、STEP model 対象外）。USE FOR: inspect-docs 実行時の workflow 制御（スキャン対象収集・REQ 体系・文書種別別意味診断・配布物整合性検査・検出事項出力・永続化）。DO NOT USE FOR: 診断対象ファイルの直接修正、検出事項の分類・採用・処分、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "inspect-docs workflow 本体。docs 全体の意味整合性と配布物を診断し、finding を inbox に保存して永続化する（read-only）。USE FOR: 対象収集、REQ/文書種別診断、配布検査、finding 出力。DO NOT USE FOR: 対象修正、finding 分類・処分、単独起動（/agentdev/* command 経由で利用）。"
 ---
 
 # inspect-docs workflow スキル
