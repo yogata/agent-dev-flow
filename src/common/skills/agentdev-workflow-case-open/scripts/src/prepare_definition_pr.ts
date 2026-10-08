@@ -401,20 +401,33 @@ export function runPrepareDefinitionPr(
     if (input.traceabilityGate) {
       const check = runSpec(runner, input.traceabilityGate);
       let summary = "";
-      if (check.exitCode === 0) {
+      let gateFailed = check.exitCode !== 0;
+      if (check.exitCode === 0 || check.exitCode === 2) {
         try {
-          const parsed = JSON.parse(check.stdout) as { summary?: { pass?: number; fail?: number } };
+          const parsed = JSON.parse(check.stdout) as {
+            summary?: { pass?: number; fail?: number };
+            checks?: Record<string, { status?: string; findings?: readonly { reqId?: string }[] }>;
+          };
           summary = `pass=${parsed.summary?.pass ?? "?"} fail=${parsed.summary?.fail ?? "?"}`;
+          const targetedReqIds = input.traceabilityReqIds ?? [];
+          gateFailed = Object.entries(parsed.checks ?? {}).some(([name, result]) => {
+            if (result.status !== "fail") return false;
+            if (name !== "missing-design") return true;
+            return targetedReqIds.length === 0 || result.findings?.some(
+              (finding) => finding.reqId !== undefined && targetedReqIds.includes(finding.reqId),
+            ) === true;
+          });
         } catch {
           summary = "report parse failed";
+          gateFailed = true;
         }
       }
       steps.push({
         name: "traceability-check",
-        status: check.exitCode === 0 ? "pass" : "fail",
+        status: gateFailed ? "fail" : "pass",
         detail: { exitCode: check.exitCode, summary, reqIds: input.traceabilityReqIds ?? [] },
       });
-      if (check.exitCode !== 0) {
+      if (gateFailed) {
         warnings.push("traceability check failed");
         return assembleReport(false, steps, diff, warnings, proposal);
       }

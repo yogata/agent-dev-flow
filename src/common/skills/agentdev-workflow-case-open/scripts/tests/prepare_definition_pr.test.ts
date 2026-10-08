@@ -54,6 +54,7 @@ function fakeRunner(overrides: {
   existingWorktrees?: string[];
   currentBranch?: string;
   files?: Record<string, string>;
+  traceabilityReport?: string;
 } = {}): MechanicalRunner & { calls: { command: string; args: readonly string[]; cwd: string }[]; written: Record<string, string> } {
   const calls: { command: string; args: readonly string[]; cwd: string }[] = [];
   const written: Record<string, string> = {};
@@ -76,6 +77,13 @@ function fakeRunner(overrides: {
       }
       if (spec.command === "git" && spec.args[0] === "rev-parse") {
         result.stdout = "abc123\n";
+      }
+      if (spec.command === "bun" && spec.args.includes("traceability-check")) {
+        result.stdout = overrides.traceabilityReport ?? JSON.stringify({
+          summary: { pass: 9, fail: 0 },
+          checks: { "missing-design": { status: "pass", findings: [] } },
+        });
+        if (overrides.traceabilityReport !== undefined) result.exitCode = 2;
       }
       return result;
     },
@@ -179,6 +187,33 @@ describe("機械工程の実行（worktree・編集・品質ゲート・明示�
     const report = runPrepareDefinitionPr(input(), runner);
     expect(report.result.exitCategory).toBe("failure");
     expect(decideExitCode(report)).toBe(1);
+  });
+
+  test("missing-design の対象 REQ 欠落がなければ既存 findings の exit 2 で停止しない", () => {
+    const runner = fakeRunner({
+      traceabilityReport: JSON.stringify({
+        summary: { pass: 7, fail: 2 },
+        checks: {
+          "missing-design": { status: "fail", findings: [{ reqId: "REQ-OTHER-001" }] },
+        },
+      }),
+    });
+    const report = runPrepareDefinitionPr(input(), runner);
+    expect(report.result.steps.find((step) => step.name === "traceability-check")?.status).toBe("pass");
+  });
+
+  test("missing-design の対象 REQ 欠落があれば停止する", () => {
+    const runner = fakeRunner({
+      traceabilityReport: JSON.stringify({
+        summary: { pass: 7, fail: 1 },
+        checks: {
+          "missing-design": { status: "fail", findings: [{ reqId: "REQ-NNNN-NNN" }] },
+        },
+      }),
+    });
+    const report = runPrepareDefinitionPr(input(), runner);
+    expect(report.result.steps.find((step) => step.name === "traceability-check")?.status).toBe("fail");
+    expect(report.result.exitCategory).toBe("failure");
   });
 
   test("check_integrity 失敗時は以後の工程を省略せず途中結果とともに失敗を返す", () => {
