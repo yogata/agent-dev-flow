@@ -11090,7 +11090,7 @@ function ir072IsFrontmatterOnlyCommit(root: string, relPath: string, sha: string
     before = execFileSync(
       "git",
       ["show", `${sha}^:${relPath}`],
-      { cwd: root, encoding: "utf-8", windowsHide: true },
+      { cwd: root, encoding: "utf-8", windowsHide: true, stdio: ["ignore", "pipe", "ignore"] },
     ) as string;
   } catch {
     return false; // root commit・新規ファイルは内容変更扱い
