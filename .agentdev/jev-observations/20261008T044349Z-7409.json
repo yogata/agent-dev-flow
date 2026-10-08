@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261008T044349Z-7409",
+  "workflow": "inspect-promote",
+  "evaluationKind": "provisional-classification",
+  "subject": "inspect-promote 暫定分類（今回 28件中の境界 8 finding）の promote/defer/reject 判定",
+  "sourceRevision": "eef19d68",
+  "durationMs": 1204,
+  "inputTokens": 2782,
+  "inputs": {
+    "requestDigest": "fed66d59e6dcd2bf74f52ed7319b30e5475f3a2a54794a0c2299cc32faa3eeee",
+    "references": [
+      {
+        "digest": "5bb7d30841531c19ff1573e7897caf109514ddc4eeb400ee28dd9388d2040a59",
+        "label": "inspect-docs-finding-20261008T025952Z",
+        "path": ".agentdev/inspect/inbox/inspect-docs-finding-20261008T025952Z.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "f01-f02-classification",
+      "questionForm": "choice",
+      "value": "promote",
+      "probabilityDistribution": {
+        "promote": 1,
+        "defer": 0,
+        "reject": 0
+      }
+    },
+    {
+      "questionId": "f03-classification",
+      "questionForm": "choice",
+      "value": "promote",
+      "probabilityDistribution": {
+        "promote": 1,
+        "defer": 0,
+        "reject": 0
+      }
+    },
+    {
+      "questionId": "f04-classification",
+      "questionForm": "choice",
+      "value": "promote",
+      "probabilityDistribution": {
+        "promote": 0.99,
+        "defer": 0.01,
+        "reject": 0
+      }
+    },
+    {
+      "questionId": "f05-f06-classification",
+      "questionForm": "choice",
+      "value": "promote",
+      "probabilityDistribution": {
+        "promote": 0.99,
+        "defer": 0.01,
+        "reject": 0
+      }
+    },
+    {
+      "questionId": "f09-f10-classification",
+      "questionForm": "choice",
+      "value": "reject",
+      "probabilityDistribution": {
+        "promote": 0,
+        "defer": 0,
+        "reject": 1
+      }
+    },
+    {
+      "questionId": "f19-f20-classification",
+      "questionForm": "choice",
+      "value": "promote",
+      "probabilityDistribution": {
+        "promote": 0.68,
+        "defer": 0.07,
+        "reject": 0.25
+      }
+    },
+    {
+      "questionId": "f26-f28-classification",
+      "questionForm": "choice",
+      "value": "promote",
+      "probabilityDistribution": {
+        "promote": 0.94,
+        "defer": 0.01,
+        "reject": 0.05
+      }
+    },
+    {
+      "questionId": "old-defer-classification",
+      "questionForm": "choice",
+      "value": "defer",
+      "probabilityDistribution": {
+        "promote": 0,
+        "defer": 1,
+        "reject": 0
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "f01-f02-classification",
+        "value": "promote"
+      },
+      {
+        "questionId": "f03-classification",
+        "value": "promote"
+      },
+      {
+        "questionId": "f04-classification",
+        "value": "promote"
+      },
+      {
+        "questionId": "f05-f06-classification",
+        "value": "promote"
+      },
+      {
+        "questionId": "f09-f10-classification",
+        "value": "reject"
+      },
+      {
+        "questionId": "f19-f20-classification",
+        "value": "promote"
+      },
+      {
+        "questionId": "f26-f28-classification",
+        "value": "promote"
+      },
+      {
+        "questionId": "old-defer-classification",
+        "value": "defer"
+      }
+    ]
+  }
+}

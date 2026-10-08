@@ -16,6 +16,7 @@
 - defer 継続: 下記 14 件（次サイクル再評価）
 - 2026-09-29 実施（backlog-auto stage 2 inspect 系統、--auto なし）記載修正・再評価: RQ-08 は対象行が REQ-034 行再編で移動したため target を REQ-034-007 へ更新（defer 継続・自律確定）。RQ-13 の対象に行再編由来の欠番（REQ-034 008/009）と REQ-090 008 を追記。RQ-17 は REQ-090 Stage 1 完了宣言が git log・REQ-090 本文とも確認できないため defer 継続（ユーザー確認済み）。その他 12 件は再評価条件未充足のため defer 継続（自律確定）
 - 2026-10-05 実施（backlog-auto stage 2 inspect 系統、--auto なし、親直列化スロット）再評価: RQ-14 は解消確認により reject・即時削除（自律確定）: REQ-053 の行 ID は 040 までで 041/042 は手段分離編集で消滅、REQ-053-041/042 の出現は 0 件を実確認（20260929T170714Z RQ-02 と同一対象。親診断 20261004T162140Z の解消判定と一致、Jev 分類 reject 意見一致）。RQ-04/RQ-08/RQ-09/RQ-13/RQ-15/RQ-16/DS-03/DC-02/DC-04/DC-06/DC-07/GD-02/GD-03 は再評価条件未充足のため defer 継続（自律確定）。却下理由の詳細は commit message に記録
+- 2026-10-08 実施（backlog-auto stage 2 inspect 系統、--auto なし）統合解消: RQ-15（REQ-090.md:26 実装詳細）と RQ-17（REQ-090.md:19 Case 固有作業指示残留）は 20261008T025952Z F-05/F-06 の横断 cleanup anchor 成果物（promoted/finding-20261008-req-row-impl-detail-cleanup-anchor.md）へ統合し defer 解消（adversarial-review Stream A 指摘の同一行・同型指摘による。RQ-15 の target :26 は F-05 対象と同一行）。残りの defer 項目は引き続き本ファイルで defer 継続。うち RQ-01/RQ-04/RQ-06/RQ-16（要件行への実装詳細混入の同型群）は cleanup anchor 成果物の統合対象一覧に記載され、anchor 処置時に一括扱いとなる
 
 ## 検出事項リスト（defer 残置分）
 

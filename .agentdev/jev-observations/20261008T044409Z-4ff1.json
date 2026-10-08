@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261008T044409Z-4ff1",
+  "workflow": "inspect-promote",
+  "evaluationKind": "review-trigger",
+  "subject": "inspect-promote 暫定分類（28 finding、promote 17・defer 9・reject 2）に対する adversarial-review 発動条件判定",
+  "sourceRevision": "eef19d68",
+  "durationMs": 383,
+  "inputTokens": 978,
+  "inputs": {
+    "requestDigest": "fbc0545e772b51f5aafd19131255f7ac72edaadb2c3f9df54d2d4e0fc669da90",
+    "references": []
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "review-trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.94,
+        "false": 0.06000000000000005
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "review-trigger",
+        "value": true
+      }
+    ]
+  }
+}
