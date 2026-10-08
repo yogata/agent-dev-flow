@@ -410,13 +410,16 @@ export function runPrepareDefinitionPr(
           };
           summary = `pass=${parsed.summary?.pass ?? "?"} fail=${parsed.summary?.fail ?? "?"}`;
           const targetedReqIds = input.traceabilityReqIds ?? [];
-          gateFailed = Object.entries(parsed.checks ?? {}).some(([name, result]) => {
-            if (result.status !== "fail") return false;
-            if (name !== "missing-design") return true;
-            return targetedReqIds.length === 0 || result.findings?.some(
-              (finding) => finding.reqId !== undefined && targetedReqIds.includes(finding.reqId),
-            ) === true;
-          });
+          const checks = parsed.checks ?? {};
+          gateFailed =
+            Object.keys(checks).length === 0 ||
+            Object.entries(checks).some(([name, result]) => {
+              if (result.status !== "fail") return false;
+              if (name !== "missing-design") return true;
+              return targetedReqIds.length === 0 || result.findings?.some(
+                (finding) => finding.reqId !== undefined && targetedReqIds.includes(finding.reqId),
+              ) === true;
+            });
         } catch {
           summary = "report parse failed";
           gateFailed = true;

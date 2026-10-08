@@ -216,6 +216,15 @@ describe("機械工程の実行（worktree・編集・品質ゲート・明示�
     expect(report.result.exitCategory).toBe("failure");
   });
 
+  test("checks を含まない報告 JSON では終了コードに関わらず停止する（fail-closed）", () => {
+    const runner = fakeRunner({
+      traceabilityReport: JSON.stringify({ summary: { pass: 7, fail: 2 } }),
+    });
+    const report = runPrepareDefinitionPr(input(), runner);
+    expect(report.result.steps.find((step) => step.name === "traceability-check")?.status).toBe("fail");
+    expect(report.result.exitCategory).toBe("failure");
+  });
+
   test("check_integrity 失敗時は以後の工程を省略せず途中結果とともに失敗を返す", () => {
     const runner = fakeRunner();
     const originalRun = runner.run.bind(runner);
