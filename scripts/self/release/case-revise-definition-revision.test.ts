@@ -67,7 +67,7 @@ function extractHeadingSection(markdown: string, heading: string): string {
 const ROW_ANCHORS: Array<[string, string, RegExp]> = [
   ["REQ-062-001", SKILL_REL, /再合意済みの Definition 変更の既存 Case への反映/],
   ["REQ-062-002", REF_REV_REL, /新しい要求、Decision、対象範囲を生成しない/],
-  ["REQ-062-003", REF_REV_REL, /実変更なし（差分が空）: Definition Amendment PR を作成せず/],
+  ["REQ-062-003", REF_REV_REL, /実変更なし（差分が空）: 設計修正PRを作成せず/],
   ["REQ-062-004", REF_IMPACT_REL, /影響なしと確認できた完了済み Issue は巻き戻さず/],
   ["REQ-062-005", REF_REV_REL, /重複生成しない/],
   ["REQ-062-006", REF_HANDOFF_REL, /execution contract \/ execution structure 再確定は case-ready を経由する/],
@@ -123,7 +123,7 @@ describe("case-revise workflow skill structure", () => {
 
   test("declares the no-change branch (no empty Definition Amendment PR)", () => {
     expect(doc).toMatch(/実変更なし時は case-ready 引き継ぎへ/);
-    expect(doc).toMatch(/空の Definition Amendment PR を作る経路は存在しない/);
+    expect(doc).toMatch(/空の PR を作る経路は存在しない/);
   });
 
   test("adds no case-revise-specific case state", () => {
@@ -186,12 +186,12 @@ describe("Idempotency key enumeration agreement (TS-008)", () => {
     // REQ-062-005 forbids duplicate generation of the same re-agreed
     // Definition Amendment PR. The Design enumeration that owns the duplicate
     // detection keys must name the Definition Amendment PR.
-    expect(designSection).toContain("Definition Amendment PR");
+    expect(designSection).toContain("設計修正PR");
   });
 
   test("Design contract pins the Definition Amendment PR creation condition and no-rollback", () => {
     const structure = extractHeadingSection(designDoc, "## 内部構成");
-    expect(structure).toMatch(/実変更がなければ Definition Amendment PR を作成せず case-ready へ移行する/);
+    expect(structure).toMatch(/実変更がなければ Definition の修正を反映する PR を作成せず case-ready へ移行する/);
     const idempotency = extractHeadingSection(designDoc, "## 冪等性");
     expect(idempotency).toMatch(/中断済み成果物は巻き戻さない/);
   });

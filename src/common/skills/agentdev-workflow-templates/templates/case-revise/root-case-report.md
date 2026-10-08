@@ -17,4 +17,4 @@ case-revise 完了
   - 分類: {intake/learning}
   - 保存結果: {成功/失敗（理由）}
 検証結果: OK
-次の段階: case-auto が内部 lifecycle で case-ready へ継続（Definition Amendment PR 受入と execution contract / execution structure 再確定は case-ready 段階が実行する。blocked 時は Root Case 指定による再開〔経路解決は Root Case の正規状態、Epic 実行構成、既存成果物、実行の生存状況の照合で行う〕）
+次の段階: case-auto が内部 lifecycle で case-ready へ継続（設計修正PR受入と execution contract / execution structure 再確定は case-ready 段階が実行する。blocked 時は Root Case 指定による再開〔経路解決は Root Case の正規状態、Epic 実行構成、既存成果物、実行の生存状況の照合で行う〕）

@@ -78,7 +78,7 @@ orchestration stage モデルの 4-stage 化により、stage 1（case-open / ca
 本プロトコルの bg task 破棄回復（ライフサイクル分離原則、成果物状態の区別、回復パターン適用）は、stage 3（case-run 子 task）に限定せず、stage 1 / 2 / 4 の並列委譲の子 task へも、case-auto の bg task 破棄回復契約（commit 済み PR 未作成状態と未コミット変更残存状態の区別と対応する回復パターン適用）の適用範囲拡張として適用する。
 
 - stage 1 / 2 / 4 の委譲子 task は worktree を作成・保持しないため、成果物状態の区別の証跡は当該委譲工程の成果物の durable state（Issue / PR の存在と状態）で行う。worktree の `git status` による3状態分類は stage 3 の case-run 子 task に固有の手順であり、stage 1 / 2 / 4 では成果物種別へ読み替える
-- 読み替えの対応: stage 1（case-open / case-revise）は Root Case Issue の確立有無、Definition Amendment PR の作成有無を区別する。stage 2（case-ready）は設計PRの作成有無、merge 完了・未完了を区別する。stage 4（case-close）は PR merge 完了・未完了、Issue close 完了・未完了を区別する
+- 読み替えの対応: stage 1（case-open / case-revise）は Root Case Issue の確立有無、設計修正PRの作成有無を区別する。stage 2（case-ready）は設計PRの作成有無、merge 完了・未完了を区別する。stage 4（case-close）は PR merge 完了・未完了、Issue close 完了・未完了を区別する
 - 区別された状態に対応する回復パターン（成果物引き継ぎ、代行処理、pending 戻し）を適用する。子 task のライフサイクル事象と成果物のライフサイクルを分離する原則（前述）は各 stage 共通とする
 - 状態 (c)（回復対象なし）と判定した場合は当該子 task を pending へ戻す（委譲起動不能時の pending 戻し契約）。delegation-unavailable 起因の pending 戻し対象は当該実行の後続 stage から除外して再開時に扱う（case-auto 実行契約）
 
