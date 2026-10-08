@@ -85,3 +85,35 @@
 - **関連**: Issue #3552、.agentdev/extensions/skills/agentdev-workflow-case-open.yaml、agentdev-git-worktree reference「書込み guard 運用指針」
 - **タグ**: `#write-guard` `#fail-closed` `#yomiyasu` `#temp-file-placement`
 
+
+## case-open が Definition PR へ yomiyasu 適用記録を残さず case-ready 受入ゲートが merge を抑止した
+
+- **問題事象**: case-ready STEP-1 の acceptance_gates 前置確認で、Definition PR #3551（docs 配下の日本語追記 2 件を含む）の本文・コメントに yomiyasu 適用記録（対象、実施結果、保持した指摘理由）が存在せず、merge を実行できずに blocked 停止した
+- **発生局面**: 実装（case-ready STEP-1 受入検査。case-auto stage 2 からの委譲実行）
+- **検知方法**: acceptance_gates[2]（yomiyasu 適用記録が PR 上に存在すること。不足時はマージせず対象文章の修正へ差し戻し）の前置確認で pr_read 本文と comment_list の双方に記録が見つからなかった
+- **根本原因**: case-open 側（PR 作成者）が yomiyasu-application-before-write rule の記録義務（既存 PR 検証欄等への最小限記録）を履行しないまま PR を作成した。適用の実施有無と記録の存在が別管理で、記録が存在しないと適用済みを証明できない構造
+- **自律対応内容**: merge を実行せず既存 PR、draft、RU 3 件を保持したまま blocked 停止。停止記録コメント（停止理由、受入検査実行結果、再開条件）を Root Case #3550 へ投稿した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存 acceptance_gates 契約の適用。契約変更なし）
+- **横展開観点**: docs 配下の日本語変更を含む Definition PR を作成する全 case-open 実行。PR 作成直後に yomiyasu 適用記録コメントを投稿するまでを case-open STEP-4 の完了条件として扱うと、case-ready の再委譲往復を防げる
+- **再発条件**: case-open が yomiyasu 適用を実施・未実施のいずれであっても記録コメントを投稿せず PR を作成した場合
+- **予防策候補**: case-open 側 reference（definition-pr-and-idempotency.md）の PR 作成手順へ「docs 配下日本語変更を含む PR では作成直後に yomiyasu 適用記録を PR へ記録する」工程の追加
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md の PR 作成節、.agentdev/extensions/skills/agentdev-workflow-case-open.yaml の rules 表現補足
+- **関連**: Issue #3550、PR #3551、.agentdev/extensions/skills/agentdev-workflow-case-ready.yaml（acceptance_gates[2]）
+- **タグ**: `#case-ready` `#case-open` `#yomiyasu` `#acceptance-gates` `#definition-pr`
+
+## accept_definition_checks の overlap summary が空の detection_unavailable を true と表示した
+
+- **問題事象**: case-ready STEP-1 の accept_definition_checks script 実行で、overlap-cross-check の summary が「detection_unavailable=true」と表示した。エンジン（inspect_cross_dependencies.ts）の直接実行では detection_unavailable は空配列で、検出不能は発生していなかった
+- **発生局面**: 実装（case-ready STEP-1 受入検査の機械工程）
+- **検知方法**: script 報告 JSON の summary と、同一入力でのエンジン直接実行による報告 JSON の突合
+- **根本原因**: accept_definition_checks.ts の summary 組み立てが `parsed.detection_unavailable != null` 判定で、空配列も存在扱いして true 表示になる（ゲート判定は exitCode のみで影響なし。表示欠陥）
+- **自律対応内容**: エンジン報告 JSON の直接読取で検出不能 0 件を実測確認し、表示欠陥として学びへ記録した（script 本体は修正していない）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（表示欠陥の記録。契約変更なし）
+- **横展開観点**: accept_definition_checks script の報告 JSON を意味レビューする全 case-ready / case-revise 実行。summary の detection_unavailable 表示は前提としてエンジン報告の直接確認で裏付けを取る
+- **再発条件**: detection_unavailable が空配列のまま script 経由の summary を読む場合（常時）
+- **予防策候補**: summary 組み立てを `Array.isArray(v) && v.length > 0` 判定へ修正する。合わせて script のユニットテストへ空配列ケースの追加
+- **想定反映先**: src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts の summary 組み立て箇所と scripts/tests/accept_definition_checks.test.ts
+- **関連**: Issue #3550、src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts（runAcceptDefinitionChecks の overlapSummary 組み立て）
+- **タグ**: `#case-ready` `#accept-definition-checks` `#overlap-cross-check` `#display-defect`
