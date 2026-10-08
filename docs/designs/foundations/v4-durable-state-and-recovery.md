@@ -2,7 +2,7 @@
 title: ADF v4 durable state と再構成・恢復（配置表・権威移行・部分失敗調整）
 status: accepted
 created: 2026-09-19
-updated: 2026-10-07
+updated: 2026-10-08
 ---
 <!-- ADF-COVERS(design): REQ-090-006 -->
 <!-- ADF-COVERS(design): REQ-103-011（REQ-103 の評価再実行・再開経路の設計対応面） -->
@@ -84,3 +84,14 @@ input-resolution-and-durable-state、step-reference-contract 等、v3 関連 Des
 ## ADF 実行識別情報の記録契約
 
 workflow-contracts Design から迁移した契約（REQ-048-001〜005 被覆）。実行単位・委譲単位・Case・GitHub Issue・PR・ADF 成果物を最小限の識別子で相関可能とする。実行識別情報を独立した Issue 本文物項目として生成しない。機械検出可能識別子（Issue 番号、PR 番号、adf_case、DEL-{N}-{n} 形式の SSoT コメントヘッダ等）を優先し、識別子間の対応は Issue 構造（親Epic 参照、Epic 実行構成、対象範囲の対象要件）と PR から再構成する。harness 生履歴は読取専用の補助情報とし、harness 内部識別子を正規状態としない。既存情報から導出できる対応付け情報を優先し、新しい必須 field の追加判断は DEC-001 決定4 に従う。adf_* field 系の縮小は導出可能性監査に基づく。PR への関係の正と取得方法は一つに定め、Case の作業ブランチ（head branch）に紐づく PR の検索を唯一の正規取得経路とする。Issue 本文への PR 番号保存による第二の取得経路を作らない。
+
+検証差分の checker 別必須要素と件数突合系 gate の実行契約を次のとおり定める。
+
+件数突合系 gate（textlint の hard 件数・traceability の計数等）は、まとめて 1 回の実行結果の引用で済ませず、gate 種別ごとに個別に実行し、各実行の出力を証跡として退避する。
+
+検証差分の checker 別必須要素は次のとおり。
+
+- textlint 系 checker: hard findings の集合を JSON 形式で実測退避する（対象ファイル数・violation 数・内訳の機械的再構成が可能な形式）。
+- traceability 系 checker: summary（pass/fail 計数）と 9 種の検出分類をすべて列挙する（0 件の分類も省略しない）。
+
+上記要素は検証差分記録の必須構成であり、checker 出力側の契約（check_integrity 等）と区分を保って相互参照する。件数突合系 gate の個別実行記録と証跡退避（case-close 検証差分）は本節の記録契約に従って完結する。
