@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261008T050429Z-1218",
+  "workflow": "backlog-review",
+  "evaluationKind": "ru-composition",
+  "subject": "24 成果物→13 RU 構成案（統合5・分割1）の妥当性と review 必要性",
+  "sourceRevision": "61756808",
+  "durationMs": 1188,
+  "inputTokens": 1587,
+  "inputs": {
+    "requestDigest": "54f0dd7013e4b82872dfd1eaf26e019c7e1b9d7725fb1948dde25f2277d7bcdf"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "terminology-merge",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.51,
+        "false": 0.49
+      }
+    },
+    {
+      "questionId": "learning-split",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.85,
+        "false": 0.15000000000000002
+      }
+    },
+    {
+      "questionId": "depends-on-validity",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.43,
+        "false": 0.5700000000000001
+      }
+    },
+    {
+      "questionId": "review-trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.78,
+        "false": 0.21999999999999997
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "terminology-merge",
+        "value": true
+      },
+      {
+        "questionId": "learning-split",
+        "value": true
+      },
+      {
+        "questionId": "depends-on-validity",
+        "value": true,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "review-trigger",
+        "value": true
+      }
+    ]
+  }
+}
