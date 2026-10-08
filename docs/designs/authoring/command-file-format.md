@@ -37,7 +37,7 @@ Command は公開interface（入出力契約・ガードレール）と workflow
 workflow 手順本体は Workflow Skill へ移行し、Command に重複残存しない。
 workflow への参照は Workflow Skill 名レベルとする（REQ-002-017）。
 
-workflow dispatch 先および委譲先 skill の責務分類（semantic 担当 / deterministic 委譲先 / 知識提供）は DEC-036 の分類と `../workflows/workflow-skill-model.md` の機械分類規則に従う。command 定義は分類語彙を再掲しない。委譲契約の原本は `../workflows/v4-delegation-contracts.md` が所有する。
+workflow dispatch 先および委譲先 skill の責務分類（意味判断担当 / 決定的処理委譲先 / 知識提供）は `../foundations/v4-responsibility-boundaries.md` の分類と `../workflows/workflow-skill-model.md` の機械分類規則に従う。command 定義は分類語彙を再掲しない。委譲契約の原本は `../workflows/v4-delegation-contracts.md` が所有する。
 
 ## extensions 手順
 
