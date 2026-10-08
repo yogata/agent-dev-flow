@@ -2,7 +2,7 @@
 title: `agentdev-git-worktree` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 <!-- ADF-COVERS(implementation): REQ-018-002 -->
 <!-- ADF-COVERS(design): REQ-102-001, REQ-102-002, REQ-102-003, REQ-102-004, REQ-018-002, REQ-030-022 -->
