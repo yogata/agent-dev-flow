@@ -531,6 +531,12 @@ artifact_actions の適用（case-ready / case-revise の Definition 保存）�
 
 この検証は case-open の Definition Package 生成時（適用直前照合）と case-ready の Definition 適用時に実行する。
 
+### update operation の置換範囲と重複見出し検査
+
+update 操作の置換範囲は target_area の見出し行を含む。見出し行自体を置換対象とする場合、旧見出し行を old 文として指定し、新見出し行を含む置換結果を適用する。
+
+適用後、対象文書内に同名見出しの重複が発生していないことを検査する。重複が検出された場合は適用を差し止め、判断を要する差分として扱う。
+
 ## RU アーティファクト契約（session由来RU）
 
 session由来RU（`source_type: chat`、`generated_by: session`）の生成、承認、保存、永続化の追跡可能な二段階手続きを定義する。
