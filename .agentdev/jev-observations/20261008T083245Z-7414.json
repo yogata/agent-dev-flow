@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261008T083245Z-7414",
+  "workflow": "case-ready",
+  "evaluationKind": "standard-or-epic-attribution",
+  "subject": "Case #3548 実行構成判断（operation_units OU-001〜005 の依存グラフと3軸判断）",
+  "sourceRevision": "40b3093615eb18a132186a4712425fa096216e00",
+  "durationMs": 1570,
+  "inputTokens": 1186,
+  "inputs": {
+    "requestDigest": "cf8d3cf18fc4aafbc8f451a4a93c2bcd0e3eb11d2119294cf4d972362977ba21",
+    "references": [
+      {
+        "digest": "ae8931503a5d265223a952a79618b6b0eb8079453ef4fab51a0c9903fa526015",
+        "label": "req-draft",
+        "path": ".agentdev/drafts/req-draft-vocabulary-policy.md"
+      },
+      {
+        "digest": "b638aa77eead5324356b64780f45dc8246c8fc2e2ab838a834e16be5b8aeaea2",
+        "label": "RU-0182",
+        "path": ".agentdev/backlog/req-units/RU-0182.md"
+      },
+      {
+        "digest": "a8dccd1bf7ad77bba87d8817e878d57b416f216a7b5150d2aa0d9aaae1763177",
+        "label": "RU-0183",
+        "path": ".agentdev/backlog/req-units/RU-0183.md"
+      },
+      {
+        "digest": "dd0a14d70479087c518998106567cf3cdbdd580df8ed868cd66359c7267ff7ed",
+        "label": "RU-0184",
+        "path": ".agentdev/backlog/req-units/RU-0184.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-attribution",
+      "questionForm": "choice",
+      "value": "Epic（Child Issue と Wave / 依存構造を作成する）",
+      "probabilityDistribution": {
+        "Standard（Root Case 自身を単一 execution unit とし Child Issue を作成しない）": 0.12,
+        "Epic（Child Issue と Wave / 依存構造を作成する）": 0.88
+      }
+    },
+    {
+      "questionId": "q2-dependency-strength",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "関連（同じ領域だが実行依存なし）": 0.01,
+        "弱（実行順序の推奨はあるが並列可）": 0.02,
+        "必須（一方が他方なしでは成立しない）": 0.97
+      }
+    },
+    {
+      "questionId": "q3-functional-coherence",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "分散（共通主題なし）": 0.08000000000000002,
+        "部分的（関連するが単一主題ではない）": 0.6900000000000001,
+        "一貫（単一の機能的主題）": 0.23000000000000004
+      }
+    }
+  ],
+  "confidence": 0.76,
+  "finalResult": {
+    "results": [
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "q1-attribution",
+        "value": "Standard（Root Case 自身を単一 execution unit とし Child Issue を作成しない）"
+      },
+      {
+        "questionId": "q2-dependency-strength",
+        "value": 2
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "q3-functional-coherence",
+        "value": 2
+      }
+    ]
+  }
+}
