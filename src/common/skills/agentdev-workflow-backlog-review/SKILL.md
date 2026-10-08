@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-backlog-review
-description: "backlog-review command の workflow 実装本体。採用済み成果物（intake/learning/inspect の promoted）の検出・読込・分析・暫定分類、統合・分割判定・depends_on 依存解決、docs/knowledge/ 知識文書直接保存・重複・陳腐化した知識の削除・保留を含む backlog 自体の処置の確定、adversarial-review、ユーザー承認、矛盾検出、RU 生成・成功成果物削除、git 永続化の各 STEP を独立 resume point として所有する。USE FOR: backlog-review 実行時の workflow 制御。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "backlog-review workflow 本体。採用済み成果物の分析・分類、統合/分割と依存解決、知識文書や backlog の処置、review・承認、矛盾検出、RU 生成・削除、永続化を独立 resume point として制御する。USE FOR: backlog-review の工程制御。DO NOT USE FOR: 単独起動（対応する /agentdev/* command 経由で利用）。"
 ---
 
 # backlog-review workflow スキル
