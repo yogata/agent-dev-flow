@@ -2,9 +2,10 @@
 title: textlint 品質基盤
 status: accepted
 created: 2026-09-09
-updated: 2026-10-05
+updated: 2026-10-08
 ---
 <!-- ADF-COVERS(implementation): REQ-053-024, REQ-053-025, REQ-053-026, REQ-053-027, REQ-053-028, REQ-053-031, REQ-053-032, REQ-053-035, REQ-053-036, REQ-010-075, REQ-029-012 -->
+<!-- ADF-COVERS(design): REQ-053-004, REQ-053-024 -->
 <!-- ADF-COVERS(design): REQ-029-012（依存と配布節が版固定情報配布・導入時生成の design 実体） -->
 <!-- ADF-COVERS(design): REQ-053-016, REQ-053-032, REQ-053-041, REQ-053-042, REQ-053-043, REQ-053-044, REQ-053-045, REQ-053-046, REQ-053-047, REQ-053-048（最終検査節とファイル単位結果の再利用と同一性条件節が design 実体） -->
 
@@ -54,6 +55,8 @@ ADF 本体の追加設定は src/common/commands/**/*.md、src/common/skills/**/
 標準構成には textlint-rule-preset-ja-technical-writing、@textlint-ja/textlint-rule-preset-ai-writing、textlint-rule-prh を含める。
 固定置換できない禁止表現は既存の pattern または NG-word 系の規則で検出と修正指針を提供する。
 標準構成へプロジェクトが所有する native textlint/prh 形式の用語規則を追加合成する。
+
+prh の語彙置換は散文に適用する。REQ テーブル行（`| REQ-{NNN}-{MMM} |` 形式）では prh の finding を除外し、要件文言を一般の文章置換で変更しない。除外は prh に限り、同じ行で他の textlint 規則が出す finding は保持する。回帰テストは要件行での除外と散文での正しい検出を確認する。
 用語の接続によって標準規則または標準対象を無効化しない。
 一般の textlint 設定に含まれる ignore や規則の無効化設定を、標準構成の上書きとして取り込まない。
 標準規則の個別設定は ADF の共通構成が所有し、文書全体の実測で校正する。

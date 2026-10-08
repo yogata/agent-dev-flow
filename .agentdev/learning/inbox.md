@@ -117,3 +117,35 @@
 - **想定反映先**: src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts の summary 組み立て箇所と scripts/tests/accept_definition_checks.test.ts
 - **関連**: Issue #3550、src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts（runAcceptDefinitionChecks の overlapSummary 組み立て）
 - **タグ**: `#case-ready` `#accept-definition-checks` `#overlap-cross-check` `#display-defect`
+
+## targeted docs guard の worktree 実行で --root に MSYS 形式パスを渡すと TARGET-EMPTY で誤検出する
+
+- **問題事象**: worktree での targeted docs guard コミット前実行で、--root に bash の $(pwd)（MSYS 形式 /c/...）を渡すと files_checked 0 で TARGET-EMPTY が表示された
+- **発生局面**: case-run 実装（worktree 内での検証実行）
+- **検知方法**: targeted docs guard の stdout（files_checked 0）と実変更 3 ファイルの突合
+- **根本原因**: MSYS 形式パス（/c/...）が script の root 解決で実在ディレクトリとして解決されず、検査対象が空になった（解決経路の詳細は未検証）
+- **自律対応内容**: --root を $(pwd -W)（Windows 形式）に変更して再実行し、files_checked 3・failures 0 で pass を取得。初回の TARGET-EMPTY 1件は実行環境誤りとして検証結果から無効化
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree 内で --root を明示指定する全検査 script（check_integrity、traceability check、generate_indexes 等）の実行手順
+- **再発条件**: bash の $(pwd) をそのまま --root へ渡す場合（常時）
+- **予防策候補**: 検査手順 reference に $(pwd -W) の使用を明記する。cli_utils 側で MSYS 形式パスを検出した場合に入力エラーとして報告する案もある
+- **想定反映先**: src/common/skills/agentdev-workflow-case-run の検証手順 reference、src/common/skills/repo-agentdev-integrity/scripts/cli_utils.ts
+- **関連**: Issue #3552、PR #3557
+- **タグ**: `#case-run` `#targeted-docs-guard` `#msys` `#worktree` `#windows`
+
+## 長時間機械工程は shell 既定 timeout の foreground 実行で打ち切られるため背景起動と証跡ファイル退避で実行する
+
+- **問題事象**: case-close 機械工程 script（mergeable ポーリング+traceability+フル suite 3 分割+textlint 最終 gate、実測約 7.5 分）を foreground の bash ツール呼び出しで起動したところ、既定 timeout 120s で tool 呼び出しが切断された
+- **発生局面**: case-close 実装（機械工程 script 実行）
+- **検知方法**: shell tool の timeout メタデータ出力（terminated command after exceeding timeout 120000 ms）
+- **根本原因**: 機械工程の実測所要時間（suite ① 286.66s + ③ 173.11s + textlint gate が合計 460s 超え）が tool 呼び出し既定 timeout を大きく超える。打ち切りが子プロセス（bun）の即時 kill を伴わない Windows 環境の挙動を事前に想定していなかった
+- **自律対応内容**: 機械工程の各 gate 出力を spawnSync から `.agentdev/tmp/` 配下の stdout/stderr 分離ファイルへ退避する input を組んだ上で、`(bun script --input in.json > report.json 2> report.err; echo $? > report.exit) &` の形式で背景起動した。tool 呼び出し切断後も bun プロセスが生存して完了し、report.exit の出現で完了を検知して報告 JSON と全 gate 証跡を回収した（Issue 3548 の case-close で実証）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: full integrity suite、textlint 全件走査、AUTOGEN 再生成など 120s を超え得る機械工程全般。証跡の stdout/stderr 分離退避と exit code ファイル化を前提にすれば、切断耐性のある実行形態になる
+- **再発条件**: 長時間機械工程を foreground 実行し、かつ証跡退避がメモリ（spawnSync の stdout 捕捉）のみの場合。その場合は打ち切りと同時に証跡が失われる
+- **予防策候補**: 長時間機械工程の実行指示には timeout 明示指定（600s 標準）に加え、背景起動+証跡ファイル退避+exit ファイルポーリングの実行形態を標準候補として併記する
+- **想定反映先**: case-close / case-run の機械工程実行手順（references または docs/knowledge）
+- **関連**: Issue 3548、src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts
+- **タグ**: `#case-close` `#mechanical-steps` `#harness` `#timeout`
