@@ -46,7 +46,7 @@ v4 ライフサイクル状態は、durable state enum（永続状態）と runt
 
 - 設計PRの isDraft 異常: 正規 lifecycle 外の例外状態として扱い、検出時に blocked へ遷移する
 - delegation-unavailable の後方遷移: 実行未試行として子Issue を pending へ戻す後方遷移とする。試行の有無は runtime 制御ループ側の属性で区別する
-- blocked の resume: resume は Root Case 指定の入口関数とし、工程別の resume_command 属性を持たない。経路解決は Root Case の正規状態、Epic 実行構成、既存成果物（設計PR、Definition Amendment PR、実装PR）、実行の生存状況の照合で行う。blocked から closed への直接遷移は禁止する
+- blocked の resume: resume は Root Case 指定の入口関数とし、工程別の resume_command 属性を持たない。経路解決は Root Case の正規状態、Epic 実行構成、既存成果物（設計PR、設計修正PR、実装PR）、実行の生存状況の照合で行う。blocked から closed への直接遷移は禁止する
 - user-decision-required: case-run result enum の状態ではなく、既存結果に付随する停止理由分類として維持する（REQ-014-012 準拠）
 - 再試行カウンタ（コンフリクト解消 Level 2/3 の試行回数）と外部状態ポーリング（mergeable UNKNOWN 等）は状態機械の遷移 predicate ではなく runtime 制御ループとして区別し、ADF v4 Runtime 実行モデル Design 側に位置づける
 
@@ -58,7 +58,7 @@ v4 ライフサイクル状態は、durable state enum（永続状態）と runt
 | case-ready | defining -> ready（Definition 受入・merge、execution contract 確定、ready 遷移、draft 削除） |
 | case-run | ready -> running（実行委譲、result 受領） |
 | case-close | running -> closing -> closed（QG-4、PR マージ、チェックボックス確定、クローズ） |
-| case-revise | 定義変更ループの再入口（Definition Amendment PR -> case-ready 相当への復帰） |
+| case-revise | 定義変更ループの再入口（設計修正PR -> case-ready 相当への復帰） |
 
 本表は写像であり、v3 command 定義の置換・廃止を実行するものではない。公開 UX は 2 中心フロー（req-define -> case-auto、backlog-auto -> req-define -> case-auto）のままである（DEC-033）。
 
@@ -66,7 +66,7 @@ v4 ライフサイクル状態は、durable state enum（永続状態）と runt
 
 次の v3 現行状態を全体像の部分ビューとして位置づける。記述は v3 現行状態に限定し、後続 Sequence 段階での再定義を先取りしない。
 
-- 設計PR lifecycle（通常 PR、isDraft 確認、merge、Definition Amendment PR）
+- 設計PR lifecycle（通常 PR、isDraft 確認、merge、設計修正PR）
 - Design status（draft/accepted、frontmatter 欠落時の暗黙 accepted 扱い）
 - Decision status（proposed/accepted/superseded/deprecated）
 - RU/採用済み成果物/draft lifecycle（draft -> Definition Package -> 削除/保持）
