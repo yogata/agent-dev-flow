@@ -182,6 +182,10 @@ PR 本文テンプレートに、検証の構造化記録を行う「検証差�
 - case-run の検証行は実行担当サブエージェントが PR 作成時に PR 本文へ記録する（実行工程: case-run）
 - case-close の検証行（QG-4 完了条件評価、docs 検証、配布依存境界 最終 gate、トレーサビリティ独立再検査等）は対応記録コメントへ本セクションと同一形式で記録する（実行工程: case-close）。前段階（case-run）の PR 本文記録との差分で各 finding を分類する
 
+#### 検証証跡の必須要素
+
+件数突合系の gate は、種類ごとに実行する。各実行の `stdout` と `stderr` を分けて保存し、検証差分には保存先、終了コード、checker の版、検査範囲、実行環境を記録する。checker 固有の追加要件は v4-durable-state-and-recovery Design「ADF 実行識別情報の記録契約」節に従う。
+
 #### 共存と所有境界
 
 - 本セクションは case-run の PR 本文 Findings セクション（intake / learning 小見出し）を置換せず共存する。検証で発見した intake / learning 候補は Findings セクションへ記録し、本セクションには検証種別・検証結果・finding 差分を記録する
@@ -296,4 +300,3 @@ work_type 判定基準と固有ルールは `agentdev-workflow-lifecycle` を参
 
 - [agentdev-req-file-manager](../agentdev-req-file-manager/SKILL.md)（REQファイル管理。doc_requirement.md テンプレート）
 - [agentdev-decision-file-manager](../agentdev-decision-file-manager/SKILL.md)（Decisionファイル管理。doc_decision.md テンプレート）
-

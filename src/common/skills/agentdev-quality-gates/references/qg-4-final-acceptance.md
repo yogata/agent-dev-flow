@@ -278,6 +278,8 @@ case-run が提示した検査対象、期待結果、除外条件、合格申�
 
 ## bun test フル suite 正規形（実行形態契約）
 
+`workflow_body_contract.test.ts` は配布 Skill 本文を複数回読み込んで検査する。同テストには明示的なタイムアウトを設定し、負荷確認では単体実行とフル suite の所要時間を分けて記録する。
+
 full integrity suite 合格判定に用いる bun test フル suite の実行形態を、次のとおり正規形として確定する。
 本契約は QG-4 の実行形態要件であり、実行環境の前提（worktree 構造的制約、依存パッケージ未伝播）は `agentdev-git-worktree` の worktree 構造的制約を参照する。
 フル suite の実行は「正規ランナー構成確認 → 分割実行」の順で行い、構成確認を最初の前置ステップとする。

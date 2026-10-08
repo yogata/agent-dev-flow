@@ -9,6 +9,9 @@ implementation:
     - REQ-101-004
     - REQ-101-006
     - REQ-101-007
+    - REQ-007-011
+  src/common/skills/agentdev-workflow-templates/templates/pr_desc.md:
+    - REQ-007-011
   src/common/skills/agentdev-workflow-templates/templates/case-open/root-case.md:
     - REQ-101-002
     - REQ-101-003

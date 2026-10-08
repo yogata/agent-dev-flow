@@ -6563,6 +6563,10 @@ describe("IR-072 req-updated-freshness (REQ-010-068)", () => {
     ).toHaveLength(0);
   });
 
+  it("suppresses expected stderr from parent lookups for newly added files", () => {
+    expect(getIr072JsonRun().stderr).not.toContain("fatal:");
+  });
+
   it("detects a stale updated left behind by a later content change (違反例)", () => {
     const collected = ir072Collect();
     const stale = collected.ng.find((f) => f.file.includes("REQ-932"));

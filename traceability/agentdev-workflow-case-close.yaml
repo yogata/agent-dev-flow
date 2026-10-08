@@ -50,9 +50,11 @@ implementation:
     - REQ-100-007
   src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts:
     - REQ-032-019
+    - REQ-007-011
 verification:
   src/common/skills/agentdev-workflow-case-close/scripts/tests/close_mechanical_steps.test.ts:
     - REQ-032-019
+    - REQ-007-011
   src/common/skills/agentdev-workflow-case-close/scripts/tests/final-acceptance.test.ts:
     - REQ-032-031
     - REQ-032-032

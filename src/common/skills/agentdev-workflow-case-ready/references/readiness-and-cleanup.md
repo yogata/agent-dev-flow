@@ -51,6 +51,10 @@ Definition 変更が docs 文言を期待するテスト（リポジトリ固有
 - 成功後に draft（`.agentdev/drafts/req-draft-*.md`）と RU（`.agentdev/backlog/req-units/RU-*.md`）を削除する
 - blocked、failed、中断した場合は draft / RU を保持する
 - **Form Zero**: 削除（`git rm`）と明示パス指定 commit は script 内の同一工程で完結し、削除と commit の間に別操作（staging の追加変更、他ファイルの stage 等）を挟まない。削除対象は明示パス指定であり、スイープ操作（`git add -A` 等）は行わない。手順の参照先は `agentdev-git-worktree` references `git-common-procedures.md` 手順 3（既存のまま）である
+- **削除操作の前置確認**: 削除操作の実行前に次の 3 点を確認する。パス生成の誤りが git rm 失敗、失敗の見逃し、履歴操作によるステージ汚染へ連鎖した実害の防止である
+  1. 削除対象パスの実在確認: 生成した削除対象パスが実在することを確認してから script を呼び出す（RU 番号の桁数生成誤り等により、実在しないパスを削除対象に含めない）
+  2. git rm 失敗時のステージ確認: script が git rm で失敗した場合は、失敗を確認せずに後続操作へ進まず、`git status --short` でステージ汚染の有無を確認してから再試行する
+  3. 履歴操作前の状態確認: reset --hard 等の履歴操作を実行する前に tracked / untracked の状態を確認し、削除ステージが capture commit 等の別 commit に混入しないことを確認する
 
 ### 設計側 worktree・ローカル設計系ブランチの削除
 

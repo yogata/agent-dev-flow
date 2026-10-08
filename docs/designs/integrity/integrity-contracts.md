@@ -2,7 +2,7 @@
 title: 整合性契約
 status: accepted
 created: 2026-08-20
-updated: 2026-10-05
+updated: 2026-10-08
 ---
 <!-- ADF-COVERS(implementation): REQ-010-006 -->
 <!-- ADF-COVERS(implementation): REQ-036-022 -->
@@ -405,6 +405,18 @@ baseline は `category` / `check` / `file` / `evidence` の4組を bucket key �
 | 更新実行者 | agent-dev-flow リポジトリの maintainer。PR を経由して更新する |
 | 更新実行手順 | `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts --update-ng-baseline`（`check_extensions.ts` も同様）は現行 NG 全体を無条件に再生成して取り込まない。承認済み差分に由来ラベル（`provenance`）と理由（`reason`）を付与して baseline entry へ追加する。追加対象でない既存未管理 NG は baseline へ取り込まず実修復対象として残す。更新後は `--json` 実行で新規 NG が 0 件になることを確認する |
 | 更新非対象 | 当該変更に直接起因する新規 NG。これらは baseline 更新で隠蔽せず、必ず実装修復を行う。既存未管理 NG は baseline 更新だけで解決済み扱いとせず、修復候補として追跡可能な状態を維持する |
+
+### stderr 集計サマリとレポート本文の件数対応（集計定義）
+
+stderr の `NG baseline applied` 行が報告する 3 計数（baseline-known、approved additions、new unmanaged NG）と、レポート本文のサマリ表（OK / NG / Warning / Info）は、同じ結果集合の異なる集計視点である。両者を突合する際の件数の数え方は次のとおり定める。
+
+- **new unmanaged NG（stderr）**: baseline 適用後に `ng` / `warning` レベルのまま残った finding の合計（entry 単位）。`warning` レベルの新規 finding も含む合算値であり、NG レベルのみの件数ではない
+- **レポート本文のサマリ表**: レベル別（NG / Warning / Info）に分けて計上する。NG は `ng` レベルかつ finding_level が observation 以外の件数、Warning は `warning` レベルかつ finding_level が observation 以外の件数である。参考情報扱い（observation）の finding はサマリ表の NG / Warning いずれにも計上しない
+- **突合の成立条件**: stderr の new unmanaged NG ≥ レポート本文サマリの NG + Warning の合計。主な差分経路は、新規 `warning` レベル finding が stderr 表記では「NG」に含まれることである（サマリ表では Warning 行へ分離計上される）
+- **部分降格の不在**: baseline 超過 bucket は部分降格しない。超過 bucket に属する finding は baseline 計上分を含む全件が `ng` / `warning` レベルを維持する
+- **突合手順（乖離再現条件）**: new unmanaged NG が 1 件以上の実行で、stderr の new unmanaged NG とレポート本文サマリの NG + Warning の和、さらに `--json` 出力の `results` による `level` 別・`finding_level` 別内訳を突き合わせる。乖離が観測された場合は `--json` の results で内訳を機械的に再構成して由来を分類する。new unmanaged NG が 0 件の実行では乖離表示は発生しない
+
+この集計定義は、stderr サマリの件数とレポート本文の明細行数の乖離（例: 報告 8 件に対し本文 NG 行 7 行）の読み替え基準である。stderr の表記を「NG レベルのみの件数」と解釈して突合した場合に生じる見かけ上の乖離は、本節の集計定義に基づいて分類する。
 
 RuntimeReference baseline（IR-055、前節）は heuristic 違反の段階導入を目的とし、本 NG baseline は strict 違反（`ng` / `warning`）の既知集合を管理して「既知違反の解消」により strict pass を到達可能にすることを目的とする。
 両 baseline は独立に運用し、相互に影響しない。

@@ -149,3 +149,35 @@
 - **想定反映先**: case-close / case-run の機械工程実行手順（references または docs/knowledge）
 - **関連**: Issue 3548、src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts
 - **タグ**: `#case-close` `#mechanical-steps` `#harness` `#timeout`
+
+## check_integrity フル run の所要時間がテスト timeout 60,000ms と同程度で IR-055 回帰テストが負荷により timeout し得る
+
+- **問題事象**: check_integrity フル run の所要時間（実測 45〜61 秒）が check_integrity.test.ts の 60,000ms テスト timeout と同程度であり、実リポジトリ共有 run の初回初期化を担うテスト（IR-055 実修復回帰 describe 先頭、60000ms 指定）が負荷により timeout し得る。Case #3550 の前回停止時にも timeout 1 件が発生し、対照実行により負荷依存境界と診断された
+- **発生局面**: 検証（case-run / case-close の full integrity suite 実行）
+- **検知方法**: bun test の IR-055 対象テストが 60 秒で timeout（checker 子プロセス exitCode=-1）。full check 単独実行の所要時間実測（worktree 58.0s / main root 61.0s / 最終 45.5s）との突合
+- **根本原因**: 共有 full run の起動コスト（58〜61s）を 1 テストが初回初期化として負担する構造の負荷依存境界。checker 本体は全実行で exit 0・0 new NG であり checker の不具合ではない
+- **自律対応内容**: 対照実行で checker 自体の健全性を確認し、timeout を checker 不具合と分類しない旨を検証差分へ記録。suite 全体の再実行で非再現を確認
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（診断と記録のみ。契約変更なし）
+- **横展開観点**: check_integrity を子プロセス起動するテスト全般。テスト timeout が共有 run の起動コストと同程度のテストは負荷で不安定化する
+- **再発条件**: 高負荷環境（並行 suite 実行、低速ディスク）で check_integrity.test.ts 全体を実行した場合
+- **予防策候補**: 当該テストの timeout 余裕拡大、または共有 full run の起動をテスト timeout 計測外へ分離
+- **想定反映先**: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts の IR-055 回帰 describe、docs/knowledge への実行負荷注記候補
+- **関連**: Issue #3550、PR #3558 検証差分（IR-055 timeout 診断行）
+- **タグ**: `#check-integrity` `#test-timeout` `#load-dependency` `#ir-055`
+
+## close_mechanical_steps の件数突合系 gate 報告が gate stdout を上限なしで報告 JSON へ保持する
+
+- **問題事象**: close_mechanical_steps.ts の件数突合系 gate 報告は gate stdout を上限なしで報告 JSON へ保持する（runner maxBuffer 64MB が実効上限）。gate 出力が巨大化した場合、報告 JSON が肥大化し証跡退避・読み戻しに支障し得る
+- **発生局面**: 検証（case-close 機械工程 script の報告 JSON 意味レビュー。独立 review の Security lane 指摘）
+- **検知方法**: 独立 review の Security lane による報告 JSON サイズ上限の指摘
+- **根本原因**: 報告 JSON の integrity stdout 保持が AG-005 の契約（stdout への退避）を実現する構造である一方、証跡サイズ上限・要約保持の契約が未定義
+- **自律対応内容**: 現行は実効上限（maxBuffer 64MB）内で動作することを確認し、契約化候補として learning へ記録（本体修正は実施していない）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（候補記録のみ。契約変更なし）
+- **横展開観点**: spawnSync で stdout を報告 JSON へ流し込む機械工程 script 全般（prepare_definition_pr、accept_definition_checks 等）
+- **再発条件**: gate 出力が数 MB を超える変更（大規模 corpus への checker 拡張等）で機械工程を実行した場合
+- **予防策候補**: 証跡サイズ上限または要約保持（先頭 N 行と件数サマリ）の契約化。上限超過時は退避ファイル参照へ誘導する
+- **想定反映先**: src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts の報告 JSON 契約（case-close Design 機械工程節）への補足候補
+- **関連**: Issue #3550、PR #3558 Findings（learning 2 件目）
+- **タグ**: `#close-mechanical-steps` `#report-size` `#max-buffer` `#evidence-contract`

@@ -6,9 +6,11 @@
 // 配布物本文に保持されていること、および比較手続きの単一実装配置
 // （RA-001）と具体パス排除（RA-003、TS-004）を検証する。
 
-import { describe, expect, test } from "bun:test";
+import { describe, expect, setDefaultTimeout, test } from "bun:test";
 import * as fs from "node:fs";
 import * as path from "node:path";
+
+setDefaultTimeout(30_000);
 
 const REPO_ROOT = path.resolve(import.meta.dir, "..", "..", "..");
 const CASE_OPEN_SKILL = path.join(
