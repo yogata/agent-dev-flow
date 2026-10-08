@@ -10,6 +10,8 @@ updated: "2026-10-08"
 <!-- ADF-COVERS(design): REQ-001-005, REQ-001-006, REQ-034-019 -->
 <!-- ADF-COVERS(design): REQ-001-067, REQ-001-068, REQ-056-001 -->
 <!-- ADF-COVERS(design): REQ-103-023（REQ-103 の docs 全体整合の設計対応面） -->
+<!-- ADF-COVERS(design): REQ-059-006 -->
+<!-- ADF-COVERS(implementation): REQ-059-006 -->
 
 # 文書モデル
 
@@ -286,6 +288,17 @@ frontmatter形式は`patterns.md`が所有する。
 - statusがない既存Designは後方互換のため`accepted`相当として扱う
 - 置換済みDesignは現行Designツリーへ保持しない。置換時は旧Designを現行ツリーから除外し、履歴はGit、Issue、Decision等の既存履歴手段から確認する
 - Design専用の安定ID体系は持たず、Designの識別は文書配置パスによる（REQ-001-008）
+### retired 文書への言及の保持基準
+
+retired REQ・Decision への言及の保持・置換は次の基準で判定する。
+
+- 歴史的説明として必要な言及（意思決定当時の根拠・経緯の引用）: 本文保持
+- 現行契約参照と読める言及（現行仕様の根拠としての参照）: 現行側への置換
+
+判定材料は、言及先が当該文書の意思決定の根拠として当時の文脈で引用されているかである。保持基準の要件上の定義は REQ-059（related_reqs 宣言契約）が所有し、本節が詳細基準を所有する。
+
+保持基準違反の検出は、誤検知（歴史的説明の保持対象）を判定材料なしに機械検出できないため、docs-check（IR-015）への自動検出追加は行わず、inspect-docs 意味診断による順守確認に委ねる。
+
 ### Decision ライフサイクル詳細
 
 Decision 関係モデル（relates-to / supersedes / reaffirms）、粒度管理、健全性評価モデルの詳細は `decision-lifecycle.md` が正規所有する。
