@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261008T065803Z-7bfb",
+  "workflow": "req-define",
+  "evaluationKind": "draft-composition-review",
+  "subject": "13 RU→4 draft 構成と artifact/realization 分割の契約適合",
+  "sourceRevision": "50606d6d",
+  "durationMs": 1862,
+  "inputTokens": 986,
+  "inputs": {
+    "requestDigest": "3074c045cc534025e252a19a43237af0a9e9dcf957a2948a24578337ce38a536"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "batch-composition",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.87,
+        "false": 0.13
+      }
+    },
+    {
+      "questionId": "action-contract",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.81,
+        "false": 0.18999999999999995
+      }
+    },
+    {
+      "questionId": "review-trigger",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.27,
+        "false": 0.73
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "batch-composition",
+        "value": true
+      },
+      {
+        "questionId": "action-contract",
+        "value": true
+      },
+      {
+        "questionId": "review-trigger",
+        "value": true,
+        "differenceReason": "semantic_disagreement"
+      }
+    ]
+  }
+}
