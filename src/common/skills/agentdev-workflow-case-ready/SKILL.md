@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-ready
-description: "内部 lifecycle 段階 case-ready の workflow 実装本体。設計PR受入（忠実性・整合性・品質検査の確認、isDraft 確認と blocked 停止、自動確定・merge、HITL 停止）、canonical Definition 再取得、Decision 受理評価（accepted 遷移）、execution contract 確定、Standard / Epic 確定（3軸判断、Child Issue / Wave / 依存構造生成、Wave 重複前置検出）、トレーサビリティ完全性ゲート、ready 遷移、draft / RU 削除、冪等再実行を所有する。USE FOR: case-ready 実行時の workflow 制御。DO NOT USE FOR: 単独起動（case-auto の内部 lifecycle orchestration から起動される内部段階である）、Root Case 確立・Definition Package 生成・設計PR作成（case-open 側の責務）、実装実行（case-run 側の責務）、PR マージ判定・完了条件チェックボックス評価（case-close 側の責務）。"
+description: "case-ready workflow 本体。Definition PR 受入、canonical Definition 再取得、Decision 受理、execution contract と Standard/Epic 構造確定、traceability gate、ready 遷移、draft/RU 削除、冪等再実行を制御する。USE FOR: case-ready の工程制御。DO NOT USE FOR: 単独起動（case-auto 内部段階）、Root Case/Definition PR 作成（case-open）、実装（case-run）、PR 完了判定（case-close）。"
 ---
 
 
