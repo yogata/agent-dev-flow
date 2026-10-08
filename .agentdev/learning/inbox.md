@@ -37,3 +37,19 @@
 - **関連**: Issue #3548、commit 9929404b・e6707290、Issue #3550 の学び（search インデックス遅延）と同系統の並行実行 contingency
 - **タグ**: `#case-open` `#jev-observation` `#parallel-case-open` `#commit-message-accuracy`
 
+## prepare_definition_pr script の品質ゲートを worktree cwd で組み立て junction 未伝播で traceability-check が実行不能になる
+
+- **問題事象**: case-open STEP-4 の prepare_definition_pr script 呼び出しで、traceabilityGate の cwd を worktree root に組み立てたところ、worktree 内 .opencode/skills/ に agentdev-traceability が存在せず（junction 未伝播。repo-agentdev-integrity のみ実在）、check.ts 実行が exit 1 で失敗し、script 全体が failure 終了した（commit fad8e0c2 までの工程は成功済み）
+- **発生局面**: 実装（case-open STEP-4 機械工程の script 呼び出し。case-auto stage 1 からの委譲実行）
+- **検知方法**: script 報告 JSON の traceability-check step が status fail（exit 1、summary 空）で終了。worktree 内 .opencode/skills/ の実測で agentdev-traceability 不在を確認
+- **根本原因**: worktree 構造的制約（agentdev-* junction は worktree へ伝播しない）は既知で reference に fallback 手順（main root 実体 + --root 指定）が記載されているが、script 入力の GateCommandSpec を組み立てる段階で「実行コマンドの解決は main root」「検査対象の --root は worktree」の2層を混同し、両方を worktree cwd に置いた
+- **自律対応内容**: 冪等再実行規律に従い、適用済み工程（worktree・edits・commit）を再実行せず不足分のみ補完した。traceability check を main root の実体（.opencode/skills/agentdev-traceability/scripts/src/check.ts）で --root <worktree> 指定により実行し 9/9 pass を確認。generate_indexes の派生物（docs/README.md）が stage 対象外で残っていたため、明示パス commit を追加実行（077bf06f）し、check_integrity を commit 済み HEAD で再実行して pass を確認
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存 fallback 手順の適用。契約変更なし）
+- **横展開観点**: prepare_definition_pr script へ GateCommandSpec を渡す全 case-open / case-revise 実行。実行コマンドの解決 cwd と検査対象 --root の2層を区別して組み立てる
+- **再発条件**: worktree 内実行前提の GateCommandSpec（cwd = worktree root、command に junction 系 .opencode/skills パス）で script を呼び出した場合
+- **予防策候補**: junction 系 checker（agentdev-traceability 等）を用いる gate は cwd = repoRoot（main root 実体）+ args に --root <worktree> を渡す形式で組み立てる。generate_indexes が派生物を自動更新する場合、Decision/REQ 変更を伴う Case では派生物パス（docs/README.md 等）を stagePaths に明示包含する
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md「機械工程の script 呼び出し（prepare_definition_pr）」節への補足候補
+- **関連**: Issue #3549、PR #3554、src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts、commit fad8e0c2・077bf06f
+- **タグ**: `#case-open` `#worktree` `#junction-unpropagated` `#traceability-check` `#prepare-definition-pr`
+
