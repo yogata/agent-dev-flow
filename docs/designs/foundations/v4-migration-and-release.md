@@ -16,6 +16,8 @@ updated: 2026-10-08
 
 Freeze source -> separate migration worktree -> semantic inventory/mapping -> target canonical paths への v4 state 構築 -> v4 validation -> cutover。
 
+互換維持は正規モデルとの整合を保つための手段である。現行 v4 の実装、文書、accepted Decision との互換維持だけを理由として、正規モデルと矛盾する構造を残さない（REQ-103-026）。OpenCode/Senpi、GitHub/ローカル Issue 等の現在提供する能力は維持を出発点とし、能力自体の廃止案は失う用途と効果を示して個別の人間判断へ戻す。
+
 - source のその場破壊禁止
 - 一時 staging（.agentdev-v4/ 等）は cutover 後に canonical candidate として残さない一時的なものである
 - cutover 後の Project には canonical ADF state を一つだけ存在させる

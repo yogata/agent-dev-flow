@@ -2,7 +2,7 @@
 title: ADF v4 Quality / Verification / Evidence / Gate モデル
 status: accepted
 created: 2026-09-18
-updated: 2026-10-07
+updated: 2026-10-08
 ---
 
 <!-- ADF-COVERS(implementation): REQ-003-013, REQ-007-006, REQ-007-007, REQ-007-008, REQ-007-009, REQ-054-003 -->
@@ -90,7 +90,7 @@ Quality Policy / Verification Obligation / Verifier / Evidence / Gate の定義�
 
 ### v3 quality-gates Design からの吸収
 
-v3 quality/quality-gates.md は本 Design により supersede される。本 Design が引き継ぐ意味契約は次のとおり。
+v3 quality/quality-gates.md は本 Design により supersede 済みである。本 Design が引き継ぐ意味契約は次のとおり。
 
 - QG-1〜QG-4 の各判定の意味契約（再導出結果表の Verification Obligation 列）
 - 機械化境界表（機械的検証 / 推論ベース検証 / サブエージェント委譲 / ユーザー判断の区分）
