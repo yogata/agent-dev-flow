@@ -2,10 +2,10 @@
 title: req-define Design
 status: accepted
 created: 2026-06-21
-updated: "2026-10-05"
+updated: "2026-10-08"
 ---
-<!-- ADF-COVERS(implementation): REQ-008-018, REQ-008-019, REQ-008-020, REQ-008-021, REQ-008-023, REQ-008-024, REQ-008-025, REQ-008-026, REQ-008-027, REQ-008-028, REQ-008-029, REQ-008-030, REQ-008-031, REQ-008-034, REQ-008-035, REQ-008-038, REQ-008-039, REQ-008-040, REQ-008-042, REQ-008-043, REQ-008-044, REQ-008-045, REQ-008-046, REQ-008-050, REQ-008-051, REQ-008-054, REQ-008-058 -->
-<!-- ADF-COVERS(design): REQ-008-061, REQ-008-062, REQ-004-056, REQ-004-057, REQ-004-058, REQ-004-059, REQ-004-060, REQ-004-062, REQ-004-063 -->
+<!-- ADF-COVERS(implementation): REQ-008-018, REQ-008-019, REQ-008-020, REQ-008-021, REQ-008-023, REQ-008-024, REQ-008-025, REQ-008-026, REQ-008-027, REQ-008-028, REQ-008-029, REQ-008-030, REQ-008-031, REQ-008-034, REQ-008-035, REQ-008-038, REQ-008-039, REQ-008-040, REQ-008-042, REQ-008-043, REQ-008-044, REQ-008-045, REQ-008-046, REQ-008-050, REQ-008-051, REQ-008-054, REQ-008-058, REQ-008-059 -->
+<!-- ADF-COVERS(design): REQ-008-059, REQ-008-061, REQ-008-062, REQ-004-056, REQ-004-057, REQ-004-058, REQ-004-059, REQ-004-060, REQ-004-062, REQ-004-063 -->
 
 <!-- ADF-COVERS(implementation): REQ-021-011, REQ-021-022 -->
 <!-- ADF-COVERS(design): REQ-021-012, REQ-021-023, REQ-021-028, REQ-021-029 -->
@@ -421,7 +421,7 @@ case-open が default branch 最新化後に evidence の path/section を再確
 `review_dispositions` は optional な soft-contract である。
 本フィールドを持たない旧ドラフトを Definition 保存内部責務（case-ready / case-revise）、case-open は入力として拒否しない（DEC-003 準拠）。
 
-## 未確定内容の auto_ready 抑止（REQ-004-047）
+## 未確定内容の auto_ready 抑止（REQ-008-059）
 
 req-define は、後続工程で決定する必要がある未確定事項、必須内容の欠落、暫定プレースホルダーが `agreed_items` または `artifact_actions` に残る場合、`auto_gate.auto_ready` を `true` にしないこと（REQ-004-047）。
 本抑止は REQ-008-030（`artifact_actions` の `content` 完全確定）の強制機構として働く。
