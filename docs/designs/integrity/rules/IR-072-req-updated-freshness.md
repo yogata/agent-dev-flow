@@ -2,7 +2,7 @@
 title: "IR-072: req-updated-freshness"
 status: accepted
 created: 2026-09-29
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # IR-072: req-updated-freshness

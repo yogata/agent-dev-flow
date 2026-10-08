@@ -15,7 +15,7 @@ import {
 } from "../src/close_mechanical_steps";
 
 function gate(name: string, cwd = "<repo>/.worktrees/100-case"): GateCommandSpec {
-  return { name, command: "bun", args: ["./checker.ts"], cwd, timeoutMs: 60000 };
+  return { name, command: "bun", args: ["./checker.ts", name], cwd, timeoutMs: 60000 };
 }
 
 function preMergeInput(overrides: Partial<CloseMechanicalInput> = {}): CloseMechanicalInput {
@@ -62,6 +62,9 @@ function fakeRunner(overrides: {
       if (spec.command === "git" && spec.args[0] === "diff") {
         result.stdout = "";
       }
+      if (spec.args.includes("check_autogen_freshness")) {
+        result.stdout = JSON.stringify({ compared: 4, changed: 0 });
+      }
       return result;
     },
     readTextFile(absolutePath) {
@@ -89,6 +92,16 @@ describe("入力検証（品質ゲートの省略禁止）", () => {
   test("必須品質ゲートが揃った入力を受領する", () => {
     const validated = validateInput(preMergeInput() as unknown as Record<string, unknown>);
     expect(validated.phase).toBe("pre-merge");
+  });
+});
+
+describe("件数突合 gate の報告保持", () => {
+  test("gate の stdout 報告を機械工程レポートに含める", () => {
+    const report = runCloseMechanicalSteps(preMergeInput(), fakeRunner());
+    const integrity = report.result.steps.find((step) => step.name === "full-integrity-suite");
+    expect(integrity?.detail).toMatchObject({
+      check_autogen_freshness: { exitCode: 0, stdout: JSON.stringify({ compared: 4, changed: 0 }) },
+    });
   });
 });
 

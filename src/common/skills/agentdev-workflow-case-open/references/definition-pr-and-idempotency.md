@@ -33,6 +33,11 @@ STEP-4 の機械工程（専用 worktree 作成、Definition branch 作成、REQ
 3. 提案本文と報告内容の意味レビューはモデルが担当する。警告の重要度評価、実変更判定の確定、PR 作成の可否判断はモデルが行う
 4. 冪等再実行: script は既存 worktree を検出した場合は期待 branch 上のとき再利用し、別 branch のとき失敗を返す。再実行時は編集旧文の不在（適用済み）を失敗として報告するため、再実行前に報告 JSON と git 状態から適用済みの工程を確認し、不足分のみを入力 JSON に含める
 
+#### traceability check の gate 判定仕様と計測日収束
+
+- **gate 判定仕様**: traceability check の gate 判定は、終了コードの一律比較ではなく報告 JSON の checks 各検査種別の status で行う。traceability check の終了コードは 9 種検査全体の合否であり、case-run / case-ready 段階の前提である missing-implementation / missing-verification の既存欠落を含むため、case-open の正規ゲート（対象 REQ 行の missing-design 0 件）と意味が一致しない。判定は対象 REQ 行を gate 対象として入力に宣言した上で、missing-design は対象 REQ 行の findings が 0 件のとき pass、1 件以上のとき fail とする。missing-design 以外の検査種別は status: fail のとき fail とする。対象 REQ 行外の missing-design（既存欠落の既知債務）は gate 判定を変更せず、本工程の失敗へ読み替えない
+- **計測日収束**: `generate_indexes` は commit 前配置で実行されるため、req-metrics の計測日は commit author date からの導出の関係で 1 日遅れの値になり得る。計測日が対象ファイルの最終内容変更日とずれた場合は、同一 PR 内で派生物を再生成・再 commit して収束させる。計測日のずれを内容変更として扱わない
+
 #### worktree 実行時の junction 伝播状態確認（機械工程の前置）
 
 機械工程の script 呼び出しと品質ゲート実行の前に、worktree 内 `.opencode/` の実在構成を実測し、junction 伝播状態を確認する。
