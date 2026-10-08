@@ -53,3 +53,35 @@
 - **関連**: Issue #3549、PR #3554、src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts、commit fad8e0c2・077bf06f
 - **タグ**: `#case-open` `#worktree` `#junction-unpropagated` `#traceability-check` `#prepare-definition-pr`
 
+## prepare_definition_pr の generate_indexes 派生物が stagePaths 外で残り追加 commit で補正した
+
+- **問題事象**: case-open STEP-4 の prepare_definition_pr script 実行で、generate_indexes が派生物（docs/designs/quality/req-health-metrics.md の REQ 行数 AUTOGEN）を自動更新したが、入力の stagePaths に含めておらず、Definition commit（3727aafa）から漏れて working tree に dirty 残存した
+- **発生局面**: 実装（case-open STEP-4 機械工程。case-auto stage 1 からの委譲実行）
+- **検知方法**: script 報告 JSON の diff.changedFiles に stagePaths 外の req-health-metrics.md が含まれていることを意味レビューで確認
+- **根本原因**: generate_indexes の派生物変化は script 実行後に確定するため、呼出側が入力 JSON を組み立てる時点では派生物パスの変化有無を確定できない構造的ギャップ（stagePaths は実行前の入力として固定される）
+- **自律対応内容**: 派生物の diff 内容（REQ-008 行数 61→62、REQ-059 行数 5→6）を確認し、明示パス指定で追加 commit（441bddbd）して派生物を同一 PR に包含。check_integrity と traceability check を commit 済み HEAD で再実行し pass を確認
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（reference の Evidence 契約「派生物が同一 PR に含まれること」への遵守補正）
+- **横展開観点**: 既存学び（generate_indexes 派生物の stagePaths 明示包含）の予防策を適用した実行でも、REQ 行数系 AUTOGEN（req-health-metrics.md）は事前特定が難しい。changedFiles の後段確認と追加 commit を標準 contingency として扱う
+- **再発条件**: REQ 行追加・Decision 変更を伴い generate_indexes が REQ 行数系 AUTOGEN（req-health-metrics.md 等）を更新する Definition 編集
+- **予防策候補**: prepare_definition_pr 実行後の changedFiles 突合を標準手順化し、stagePaths 外の派生物を自動検出した場合は明示パス commit で補正する（既存学びの docs/README.md と req-health-metrics.md を合わせた派生物候補一覧の整備）
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md の機械工程節への補足候補
+- **関連**: Issue #3552、PR #3555、commit 3727aafa・441bddbd、既存学び「prepare_definition_pr script の品質ゲートを worktree cwd で組み立て…」（docs/README.md 同型）
+- **タグ**: `#case-open` `#generate-indexes` `#stage-paths` `#derived-artifact` `#prepare-definition-pr`
+
+## yomiyasu 検査専用本文ファイルの workspace 外作成指示が書込み guard に fail-closed ブロックされ project root 内へ切替した
+
+- **問題事象**: case-open STEP-2 の extension rule（yomiyasu-application-before-write）に従い Root Case 本文候補を「非永続領域〔一時ディレクトリ等のリポジトリ外〕」へ Write しようとしたところ、agentdev-textlint-guard の workspace 外書込み guard が fail-closed ブロックした
+- **発生局面**: 実装（case-open STEP-2 Root Case 本文候補生成の yomiyasu lint 前段）
+- **検知方法**: Write ツールが guard 拒否（write targets a path outside the project root; blocked per fail-closed）を返した
+- **根本原因**: extension rule の指示（検査専用本文ファイルをリポジトリ外へ作成）と workspace 外書込み guard（fail-closed）が環境上衝突する。rule 側は guard の存在を前提にしていない
+- **自律対応内容**: guard の解除・迂回を行わず、AGENTS.md の標準手段切替指針に従い project root 内の git 管理対象外領域（.agentdev/integrity/reports/）へ検査専用ファイルを配置して lint を実行し、検査後に削除した（inspect_cross_dependencies scripts/README.md の一時ファイル置き場所方針と同一準拠）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（動作基準の遵守。契約変更なし）
+- **横展開観点**: 検査専用一時ファイルが必要な全工程（yomiyasu lint、横断依存検査入力 JSON、prepare_definition_pr 入力 JSON）。workspace 外書込み guard が有効な環境では project root 内非管理領域を既定の置き場所とする
+- **再発条件**: workspace 外書込み guard が有効な環境で、extension rule や手順文書がリポジトリ外への一時ファイル作成を指示した場合
+- **予防策候補**: extension rule（yomiyasu-application-before-write）の手順表現を「リポジトリ外がブロックされる環境では project root 内の git 管理対象外領域へ切替する」旨へ補足する
+- **想定反映先**: .agentdev/extensions/skills/agentdev-workflow-case-open.yaml の rules 表現補足、docs/knowledge/ への切替パターン記録候補
+- **関連**: Issue #3552、.agentdev/extensions/skills/agentdev-workflow-case-open.yaml、agentdev-git-worktree reference「書込み guard 運用指針」
+- **タグ**: `#write-guard` `#fail-closed` `#yomiyasu` `#temp-file-placement`
+
