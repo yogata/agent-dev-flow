@@ -31,7 +31,7 @@ import { canonicalJson, compareStrings, sha256FileHex, sha256Hex } from "./hash.
 import { PRH_DICTIONARY_RELATIVE_PATH, defaultPrhDictionaryPath, type RuleComposition } from "./rules.ts";
 
 /** 結果正規化の版。結果の保存・照合・集約の正規化手順を変えるときは上げる。 */
-export const RESULT_NORMALIZATION_VERSION = 1;
+export const RESULT_NORMALIZATION_VERSION = 2;
 
 /** 追跡可能な検査条件（同一性判定の入力）。trackable: true で判別する。 */
 export interface InspectionConditions {
