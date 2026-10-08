@@ -138,6 +138,41 @@ describe("プロジェクト用語の検出と構造除外（TS-002）", () => {
     if (prose.ok) expect(prose.result.findings.some((f) => f.ruleId === "prh" && f.replacement === "設計PR")).toBe(true);
   });
 
+  test("同一ファイルの REQ 行では prh のみ抑止し、他規則の REQ 行 finding と散文 prh は保持する", async () => {
+    const root = makeProject();
+    writeTermDict(root, [
+      "version: 1",
+      "rules:",
+      "  - expected: 設計PR",
+      "    pattern: /Definition PR/",
+    ].join("\n"));
+    const prepared = await prepareInspection(root);
+    expect(prepared.ok).toBe(true);
+    if (!prepared.ok) return;
+
+    // 行 3 = REQ テーブル行、行 5 = 散文。両行に prh 語と prh 以外の hard 規則を混在させ、抑止が prh だけである方向を固定する。
+    const mixed = [
+      "# 見出し",
+      "",
+      "| REQ-083-001 | Definition PR（ﾌﾙﾈｰﾑ表記）を作成する。 |",
+      "",
+      "散文でも Definition PR（ｶｲｼｮﾎﾝ表記）を扱う。",
+    ].join("\n");
+    const r = await inspectText(prepared, root, "docs/REQ-083.md", mixed);
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    const reqRowLine = 3;
+    const proseLine = 5;
+
+    const prh = r.result.findings.filter((f) => f.ruleId === "prh");
+    expect(prh.some((f) => f.line === reqRowLine)).toBe(false);
+    expect(prh.some((f) => f.line === proseLine && f.replacement === "設計PR")).toBe(true);
+
+    const nonPrh = r.result.findings.filter((f) => f.ruleId !== "prh");
+    expect(nonPrh.some((f) => f.ruleId === "preset-ja-technical-writing/no-hankaku-kana" && f.line === reqRowLine && f.severity === "hard")).toBe(true);
+    expect(nonPrh.some((f) => f.ruleId === "preset-ja-technical-writing/no-hankaku-kana" && f.line === proseLine)).toBe(true);
+  });
+
   test("辞書なしでも標準規則は有効（REQ-053-024）", async () => {
     const root = makeProject();
     const prepared = await prepareInspection(root);
