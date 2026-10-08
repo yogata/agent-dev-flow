@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-intake-capture
-description: "intake-capture command の workflow 実装本体。ユーザーの手動入力から intake item を生成し、`.agentdev/intake/inbox/` へ保存、git 永続化、完了報告までの保存専用 workflow を所有する（capture-only 型、STEP model 対象外）。USE FOR: intake-capture 実行時の workflow 実行（入力受領・item 生成・ファイル名生成・実行前同期・保存・git 永続化・完了報告）。DO NOT USE FOR: 採用可否の判断・review・分類・振り分け、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "intake-capture workflow。本体は手動入力から item を生成し、inbox へ保存、git 永続化、報告まで行う（capture-only）。USE FOR: 入力受領、item/filename 生成、同期、保存、永続化、報告。DO NOT USE FOR: 採用判断、review、分類、振り分け、単独起動（/agentdev/* command 経由で利用）。"
 ---
 
 # intake-capture workflow スキル
