@@ -1,6 +1,6 @@
 ---
 name: agentdev-epic-tracker
-description: "Updates the parent Epic Issue execution-structure table (| Wave | Issue | 前提 | 状態 |, child status 4 values) and reflects coordination progress per record triggers under the per-Epic exclusive write gate. USE FOR: case-close Epic status writes (pending→completed/blocked/failed), coordination status reflection per record trigger (hold/decision_change/completion), retry pending reset, per-Epic serialization between closing and coordination writes, lost-update prevention via latest-fetch/merge/update, overall completion evaluation. DO NOT USE FOR: creating Epics, non-Epic Issues, general Issue operations."
+description: "Updates the parent Epic execution table and reflects coordination triggers under a per-Epic write gate. USE FOR: case-close status writes, hold/decision_change/completion reflection, retry reset, serialized updates, lost-update prevention, overall completion evaluation. DO NOT USE FOR: creating Epics, non-Epic Issues, general Issue operations."
 ---
 
 # Epic 実行構成追跡（Epic Status Tracker）

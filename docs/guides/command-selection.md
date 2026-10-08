@@ -10,7 +10,7 @@
 |-----------|-------------|------|
 | 要件を整理したい | `/agentdev/req-define` | 要件doc（draft） |
 | 要件docから Case を開始する | `/agentdev/case-auto` | Root Case、Definition Package と実行構造 |
-| REQ ファイルまたは要件docがある | `/agentdev/case-auto`（内部 lifecycle の case-open 段階） | GitHub Issue |
+| REQ ファイルまたは要件docがある | `/agentdev/case-auto`（内部 lifecycle の case-open 段階） | Root Case GitHub Issue |
 | Root Case Issue がある | `/agentdev/case-auto`（Root Case 指定） | 実装済みブランチ + PR |
 | Root Case Issue があり PR が未マージ | `/agentdev/case-auto`（内部 lifecycle の case-close 段階） | マージ済み + クローズ済み |
 | 再合意済み Definition の変更を既存 Case に反映 | `/agentdev/case-auto`（例外経路 case-revise → case-ready を駆動） | Amendment と再確定済み Definition |

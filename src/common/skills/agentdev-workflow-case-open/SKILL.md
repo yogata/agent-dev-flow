@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-open
-description: "case-open（内部 lifecycle 段階）の workflow 実装本体。Root Case 確立、Definition Package 生成と関連付け、実変更判定と設計PR作成（Case 単位 1 件）、冪等再実行、STEP-5 横断依存検査、deviation capture（Split Rule 分類）を所有する。USE FOR: case-open 実行時の workflow 制御（Root Case 確立・Definition Package 生成・実変更判定と設計PR作成・冪等再実行・横断依存検査・deviation capture）。DO NOT USE FOR: 単独起動（case-auto の内部 lifecycle orchestration から起動される内部段階である）、execution contract 確定・Standard / Epic 最終確定・Child Issue / Wave 作成・RU 削除・proposed Decision 受理評価（case-ready 側の責務）。"
+description: "case-open workflow 本体。Root Case と Definition Package を確立し、変更判定、Case ごとの設計PR、冪等再実行、横断依存検査、deviation capture を制御する。USE FOR: case-open の工程制御。DO NOT USE FOR: 単独起動（case-auto 内部段階）、execution contract、Standard/Epic と子Issue/Wave の確定、RU 削除、Decision 受理（case-ready の責務）。"
 ---
 
 

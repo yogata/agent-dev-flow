@@ -20,7 +20,8 @@ Custom Tool `agentdev_gh`（書き込みは Tool 内部の読み戻し検証で�
 
 | トピック | 参照先 |
 |----------|--------|
-| Issue 操作の安全性手順（標準呼出形式、作成後確認、Parent/Child リンク確認、Epic テーブル更新、前後内容比較、VERIFY 連携、禁止事項、取りまとめ反映の部分成功区別と読み戻し再試行） | `references/issue-operation-safety.md` |
+| Issue 操作の安全性手順（操作別手順、リンク確認、Epic 更新、前後比較、部分成功回復） | `references/issue-operation-safety.md` |
+| 起動環境障害の診断・回復、障害中断からの再開 | `references/issue-operation-recovery.md` |
 
 ## 動作指針
 

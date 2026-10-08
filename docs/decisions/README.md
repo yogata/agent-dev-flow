@@ -7,6 +7,7 @@
 
 基本原則、管理方式、リリース条件は DEC-001 を基準とする。
 個別 REQ/Design は憲章の原則へ照らして位置づく。
+DEC-018 は欠番であり、対応する Decision ファイルは存在しない。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
 現行の承認済み Decision は42件、提案中の Decision は0件である。

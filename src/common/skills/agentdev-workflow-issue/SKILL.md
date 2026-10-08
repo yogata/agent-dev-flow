@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-issue
-description: "issue command の workflow 実装本体。自然言語の指示と会話文脈から追跡Issueの操作種別を判定し、Capability Skill（agentdev-issue-tracking）の操作知識に従い Custom Tool（agentdev_gh）経由で追跡Issueを操作する対話型 workflow を所有する（対話操作完結型、STEP model 対象外）。USE FOR: issue 実行時の workflow 実行（入力受領・操作種別判定・対象追跡Issue特定・課題化判定・Tool 操作実行・完了報告）。DO NOT USE FOR: 追跡Issueの論理スキーマ・操作知識（agentdev-issue-tracking の責務）、GitHub I/O の実行手続き（agentdev_gh の責務）、Case Issue の操作（case-open/case-run/case-close/case-revise の責務）、Decision/REQ/Design 等の正規成果物の更新実行、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "issue command workflow。自然言語と会話文脈から追跡Issue操作を判定し、agentdev-issue-tracking の知識に従って agentdev_gh 経由で操作する。USE FOR: issue の入力判定、対象特定、課題化判定、操作、報告。DO NOT USE FOR: 論理スキーマ（agentdev-issue-tracking）、GitHub I/O（agentdev_gh）、Case Issue や正規成果物の更新、単独起動（/agentdev/* command 経由で利用）。"
 ---
 
 # issue workflow スキル

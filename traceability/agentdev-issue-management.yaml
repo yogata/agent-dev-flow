@@ -3,8 +3,6 @@ implementation:
   src/common/skills/agentdev-issue-management/references/issue-operation-safety.md:
     - REQ-049-020
     - REQ-011-033
-    - REQ-052-014
-    - REQ-052-015
     - REQ-095-001
     - REQ-095-002
     - REQ-095-003
@@ -12,6 +10,9 @@ implementation:
     - REQ-100-006
     - REQ-101-011
     - REQ-101-013
+  src/common/skills/agentdev-issue-management/references/issue-operation-recovery.md:
+    - REQ-052-014
+    - REQ-052-015
     - REQ-102-001
     - REQ-102-002
     - REQ-102-004
@@ -29,12 +30,13 @@ implementation:
 verification:
   src/common/skills/agentdev-issue-management/references/issue-operation-safety.md:
     - REQ-049-020
-    - REQ-052-014
-    - REQ-052-015
     - REQ-095-001
     - REQ-095-002
     - REQ-100-001
     - REQ-100-006
+  src/common/skills/agentdev-issue-management/references/issue-operation-recovery.md:
+    - REQ-052-014
+    - REQ-052-015
   src/common/skills/agentdev-issue-management/scripts/tests/reconcile.test.ts:
     - REQ-101-011
     - REQ-101-013
