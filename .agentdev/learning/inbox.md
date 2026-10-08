@@ -117,3 +117,19 @@
 - **想定反映先**: src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts の summary 組み立て箇所と scripts/tests/accept_definition_checks.test.ts
 - **関連**: Issue #3550、src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts（runAcceptDefinitionChecks の overlapSummary 組み立て）
 - **タグ**: `#case-ready` `#accept-definition-checks` `#overlap-cross-check` `#display-defect`
+
+## targeted docs guard の worktree 実行で --root に MSYS 形式パスを渡すと TARGET-EMPTY で誤検出する
+
+- **問題事象**: worktree での targeted docs guard コミット前実行で、--root に bash の $(pwd)（MSYS 形式 /c/...）を渡すと files_checked 0 で TARGET-EMPTY が表示された
+- **発生局面**: case-run 実装（worktree 内での検証実行）
+- **検知方法**: targeted docs guard の stdout（files_checked 0）と実変更 3 ファイルの突合
+- **根本原因**: MSYS 形式パス（/c/...）が script の root 解決で実在ディレクトリとして解決されず、検査対象が空になった（解決経路の詳細は未検証）
+- **自律対応内容**: --root を $(pwd -W)（Windows 形式）に変更して再実行し、files_checked 3・failures 0 で pass を取得。初回の TARGET-EMPTY 1件は実行環境誤りとして検証結果から無効化
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree 内で --root を明示指定する全検査 script（check_integrity、traceability check、generate_indexes 等）の実行手順
+- **再発条件**: bash の $(pwd) をそのまま --root へ渡す場合（常時）
+- **予防策候補**: 検査手順 reference に $(pwd -W) の使用を明記する。cli_utils 側で MSYS 形式パスを検出した場合に入力エラーとして報告する案もある
+- **想定反映先**: src/common/skills/agentdev-workflow-case-run の検証手順 reference、src/common/skills/repo-agentdev-integrity/scripts/cli_utils.ts
+- **関連**: Issue #3552、PR #3557
+- **タグ**: `#case-run` `#targeted-docs-guard` `#msys` `#worktree` `#windows`
