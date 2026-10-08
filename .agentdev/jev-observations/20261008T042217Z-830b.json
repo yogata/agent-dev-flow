@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261008T042217Z-830b",
+  "workflow": "intake-promote",
+  "evaluationKind": "provisional-classification",
+  "subject": "intake-promote 暫定分類の境界 8 item（I1・I2・I3・I5・I7・I9・I12・I14）の採用/保留/却下判定",
+  "sourceRevision": "c8645fe4",
+  "durationMs": 259,
+  "inputTokens": 2664,
+  "inputs": {
+    "requestDigest": "cf59add50230d4cfc299d3111d14d681d198705e5a81bef4cbcb145d74429d0f",
+    "references": [
+      {
+        "digest": "f64a5e6a930cefe9f69272fca51f8c926b0aff5a12b6a5cf004c8a6e729fe363",
+        "label": "I1 amendment-terminology",
+        "path": ".agentdev/intake/inbox/2026-10-07-case-3507-amendment-terminology.md"
+      },
+      {
+        "digest": "c2fa6969124971308187e1d39c7c0d8e3aab1f878afe53119b4d85a9df28ae78",
+        "label": "I2 baseline-textlint",
+        "path": ".agentdev/intake/inbox/2026-10-07-case-3507-baseline-textlint.md"
+      },
+      {
+        "digest": "9123af0f9ef630ded783367dc1e965ba63037e792132013fbd14d60b2d0cd5ed",
+        "label": "I3 delegation-reference-path",
+        "path": ".agentdev/intake/inbox/2026-10-07-case-3507-delegation-reference-path.md"
+      },
+      {
+        "digest": "0c5dcaea36d140a219f0b801f058c01d364d3d83578af149b93fdfb397a1bfcf",
+        "label": "I5 textlint-vendor-worktree-env",
+        "path": ".agentdev/intake/inbox/2026-10-07-case-3533-textlint-vendor-worktree-env.md"
+      },
+      {
+        "digest": "18f49bd22828b8cfa02a0a527a34c995cb9a1b7cccc57bb43ad3d237c81566ea",
+        "label": "I7 old-vocabulary-residual-ra004",
+        "path": ".agentdev/intake/inbox/2026-10-07-case-3535-old-vocabulary-residual-ra004.md"
+      },
+      {
+        "digest": "4b162bbb6b7bec58697418c9620c297e39513835992bc6d65b83a6887559ff67",
+        "label": "I9 design-save-disposal",
+        "path": ".agentdev/intake/inbox/2026-10-07-case-3536-design-save-disposal-req-103-016.md"
+      },
+      {
+        "digest": "4d57ca17131c4180ac03ec5a8d0113a10053dc4227155467e8cd89f67aad2dc7",
+        "label": "I12 vocabulary-registry-ir050-051",
+        "path": ".agentdev/intake/inbox/2026-10-07-case-3536-vocabulary-registry-ir050-051-entry-model.md"
+      },
+      {
+        "digest": "7407f0ebcfdc1b50922b638589b50e4cde0819a2001ca4641914c3f18aab8181",
+        "label": "I14 dec-013-related-reqs",
+        "path": ".agentdev/intake/inbox/2026-10-08-case-3537-dec-013-related-reqs-req-028.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "i1-classification",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.93,
+        "保留": 0.07,
+        "却下": 0
+      }
+    },
+    {
+      "questionId": "i2-classification",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.99,
+        "保留": 0.01,
+        "却下": 0
+      }
+    },
+    {
+      "questionId": "i3-classification",
+      "questionForm": "choice",
+      "value": "却下",
+      "probabilityDistribution": {
+        "採用": 0,
+        "保留": 0,
+        "却下": 1
+      }
+    },
+    {
+      "questionId": "i5-classification",
+      "questionForm": "choice",
+      "value": "却下",
+      "probabilityDistribution": {
+        "採用": 0,
+        "保留": 0,
+        "却下": 1
+      }
+    },
+    {
+      "questionId": "i7-classification",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.97,
+        "保留": 0.01,
+        "却下": 0.02
+      }
+    },
+    {
+      "questionId": "i9-classification",
+      "questionForm": "choice",
+      "value": "却下",
+      "probabilityDistribution": {
+        "採用": 0,
+        "保留": 0,
+        "却下": 1
+      }
+    },
+    {
+      "questionId": "i12-classification",
+      "questionForm": "choice",
+      "value": "却下",
+      "probabilityDistribution": {
+        "採用": 0,
+        "保留": 0,
+        "却下": 1
+      }
+    },
+    {
+      "questionId": "i14-classification",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.97,
+        "保留": 0.02,
+        "却下": 0.01
+      }
+    }
+  ],
+  "confidence": 0.89,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "i1-classification",
+        "value": "採用"
+      },
+      {
+        "questionId": "i2-classification",
+        "value": "採用"
+      },
+      {
+        "questionId": "i3-classification",
+        "value": "却下"
+      },
+      {
+        "questionId": "i5-classification",
+        "value": "却下"
+      },
+      {
+        "questionId": "i7-classification",
+        "value": "採用"
+      },
+      {
+        "questionId": "i9-classification",
+        "value": "却下"
+      },
+      {
+        "questionId": "i12-classification",
+        "value": "却下"
+      },
+      {
+        "questionId": "i14-classification",
+        "value": "採用"
+      }
+    ]
+  }
+}

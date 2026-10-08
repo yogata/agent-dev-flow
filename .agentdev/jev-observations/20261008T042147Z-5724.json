@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261008T042147Z-5724",
+  "workflow": "intake-promote",
+  "evaluationKind": "item-evaluation",
+  "subject": "intake-promote 暫定分類の境界 8 item（I1・I2・I3・I5・I7・I9・I12・I14）の Review 観点別重要度評価",
+  "sourceRevision": "c8645fe4",
+  "durationMs": 1172,
+  "inputTokens": 3076,
+  "inputs": {
+    "requestDigest": "cebf0a8f6274bef2e6572941e1a3ea9dd2677e9267ee2a4be15534d4515539f6",
+    "references": [
+      {
+        "label": "I1 amendment-terminology",
+        "path": ".agentdev/intake/inbox/2026-10-07-case-3507-amendment-terminology.md",
+        "digest": "f64a5e6a930cefe9f69272fca51f8c926b0aff5a12b6a5cf004c8a6e729fe363"
+      },
+      {
+        "label": "I2 baseline-textlint",
+        "path": ".agentdev/intake/inbox/2026-10-07-case-3507-baseline-textlint.md",
+        "digest": "c2fa6969124971308187e1d39c7c0d8e3aab1f878afe53119b4d85a9df28ae78"
+      },
+      {
+        "label": "I3 delegation-reference-path",
+        "path": ".agentdev/intake/inbox/2026-10-07-case-3507-delegation-reference-path.md",
+        "digest": "9123af0f9ef630ded783367dc1e965ba63037e792132013fbd14d60b2d0cd5ed"
+      },
+      {
+        "label": "I5 textlint-vendor-worktree-env",
+        "path": ".agentdev/intake/inbox/2026-10-07-case-3533-textlint-vendor-worktree-env.md",
+        "digest": "0c5dcaea36d140a219f0b801f058c01d364d3d83578af149b93fdfb397a1bfcf"
+      },
+      {
+        "label": "I7 old-vocabulary-residual-ra004",
+        "path": ".agentdev/intake/inbox/2026-10-07-case-3535-old-vocabulary-residual-ra004.md",
+        "digest": "18f49bd22828b8cfa02a0a527a34c995cb9a1b7cccc57bb43ad3d237c81566ea"
+      },
+      {
+        "label": "I9 design-save-disposal",
+        "path": ".agentdev/intake/inbox/2026-10-07-case-3536-design-save-disposal-req-103-016.md",
+        "digest": "4b162bbb6b7bec58697418c9620c297e39513835992bc6d65b83a6887559ff67"
+      },
+      {
+        "label": "I12 vocabulary-registry-ir050-051",
+        "path": ".agentdev/intake/inbox/2026-10-07-case-3536-vocabulary-registry-ir050-051-entry-model.md",
+        "digest": "4d57ca17131c4180ac03ec5a8d0113a10053dc4227155467e8cd89f67aad2dc7"
+      },
+      {
+        "label": "I14 dec-013-related-reqs",
+        "path": ".agentdev/intake/inbox/2026-10-08-case-3537-dec-013-related-reqs-req-028.md",
+        "digest": "7407f0ebcfdc1b50922b638589b50e4cde0819a2001ca4641914c3f18aab8181"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "i1-evaluation",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0.01,
+        "中": 0.19,
+        "高": 0.8
+      }
+    },
+    {
+      "questionId": "i2-evaluation",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0.01,
+        "中": 0.33,
+        "高": 0.66
+      }
+    },
+    {
+      "questionId": "i3-evaluation",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "低": 0.95,
+        "中": 0.04,
+        "高": 0.01
+      }
+    },
+    {
+      "questionId": "i5-evaluation",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "低": 0.99,
+        "中": 0.01,
+        "高": 0
+      }
+    },
+    {
+      "questionId": "i7-evaluation",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.04,
+        "中": 0.62,
+        "高": 0.34
+      }
+    },
+    {
+      "questionId": "i9-evaluation",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "低": 0.99,
+        "中": 0.01,
+        "高": 0
+      }
+    },
+    {
+      "questionId": "i12-evaluation",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "低": 0.98,
+        "中": 0.01,
+        "高": 0.01
+      }
+    },
+    {
+      "questionId": "i14-evaluation",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0.01,
+        "中": 0.3,
+        "高": 0.69
+      }
+    }
+  ],
+  "confidence": 0.69,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "i1-evaluation",
+        "value": 2
+      },
+      {
+        "questionId": "i2-evaluation",
+        "value": 2
+      },
+      {
+        "questionId": "i3-evaluation",
+        "value": 0
+      },
+      {
+        "questionId": "i5-evaluation",
+        "value": 0
+      },
+      {
+        "questionId": "i7-evaluation",
+        "value": 1
+      },
+      {
+        "questionId": "i9-evaluation",
+        "value": 0
+      },
+      {
+        "questionId": "i12-evaluation",
+        "value": 0
+      },
+      {
+        "questionId": "i14-evaluation",
+        "value": 2
+      }
+    ]
+  }
+}

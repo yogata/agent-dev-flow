@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261008T042237Z-97da",
+  "workflow": "intake-promote",
+  "evaluationKind": "review-trigger",
+  "subject": "intake-promote 暫定分類（15 item、採用7・却下8・保留0）に対する adversarial-review 発動条件判定",
+  "sourceRevision": "c8645fe4",
+  "durationMs": 469,
+  "inputTokens": 1282,
+  "inputs": {
+    "requestDigest": "7992539c52ef409f99bef55c42dea712449ef17b22d13dff735df0fd086773e6",
+    "references": []
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "review-trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.91,
+        "false": 0.08999999999999997
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "review-trigger",
+        "value": true
+      }
+    ]
+  }
+}
