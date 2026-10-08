@@ -164,6 +164,8 @@ Design は 3 層構造（commands / skills / workflows）と基盤 6 ドメイ�
 - [Workflow Skill Model](designs/workflows/workflow-skill-model.md)
 - [サブエージェント委譲契約（v4）](designs/workflows/v4-delegation-contracts.md)
 - [キャプチャ境界](designs/workflows/capture-boundaries.md)
+- [Issue タイトル記述規則](designs/workflows/issue-title-policy.md)
+- [Case Issue 工程記録モデル](designs/workflows/issue-lifecycle-records.md)
 - [execution_unit 構成アルゴリズム参照](designs/workflows/references/execution-unit-construction.md)
 - [ADF v4 標準ライフサイクル](designs/workflows/v4-standard-lifecycle.md)
 - [ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応）](designs/workflows/v4-lifecycle-state-machine.md)
@@ -195,6 +197,7 @@ status（draft / accepted）を含む完全一覧は [Design インデックス]
 - [ADF v4 Traceability モデル](designs/foundations/v4-traceability-model.md)
 - [v3 -> v4 Concept / Artifact Crosswalk](designs/foundations/v3-v4-crosswalk.md)
 - [ADF v4 Migration と Release の標準境界](designs/foundations/v4-migration-and-release.md)
+- [マルチホスト原本モデル（共通原本とホスト別接続の分離）](designs/foundations/multi-host-canonical-model.md)
 - [ADF v4 durable state と再構成・恢復（配置表・権威移行・部分失敗調整）](designs/foundations/v4-durable-state-and-recovery.md)
 - [ADF v4 Runtime 実行モデル（authority 格子・直列化単位・冪等経路・runtime 制御ループ）](designs/foundations/v4-runtime-execution-model.md)
 
@@ -214,6 +217,7 @@ status（draft / accepted）を含む完全一覧は [Design インデックス]
 - [REQ 健全性メトリクス](designs/quality/req-health-metrics.md)
 - [Design 健全性メトリクス](designs/quality/design-health-metrics.md)
 - [ADF v4 Quality / Verification / Evidence / Gate モデル](designs/quality/v4-quality-gate-model.md)
+- [textlint 品質基盤](designs/quality/textlint-quality-runtime.md)
 
 #### integrity/（整合性契約、ルール）
 
@@ -231,6 +235,7 @@ status（draft / accepted）を含む完全一覧は [Design インデックス]
 - [テスト影響範囲検出 gate](designs/integrity/test-impact-detection-gate.md)
 - [checker 実行契約と検出基盤規則](designs/integrity/checker-execution-contracts.md)
 - [決定的破損検査クラス](designs/integrity/content-corruption-checker.md)
+- [既知不備センチネル検査](designs/integrity/prose-quality-sentinel-checks.md)
 
 #### local/（ローカル版 Design）
 
