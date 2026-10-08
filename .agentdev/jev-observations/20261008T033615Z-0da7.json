@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261008T033615Z-0da7",
+  "workflow": "learning-promote",
+  "evaluationKind": "disposal-determination",
+  "subject": "learning-promote 2026-10-08 廃棄判定境界8単位（C2/C3/C5/U11/U14/U15/U18/U19）",
+  "sourceRevision": "8dbac623",
+  "durationMs": 2006,
+  "inputTokens": 2766,
+  "inputs": {
+    "requestDigest": "934dfa8a3f5d33eeb6d38897158d8f77a095e6e3265a932eae60300dec08e89b",
+    "references": [
+      {
+        "digest": "978851b4adc97fd40134227fdcf778dd12ff000c6851b07c2b6fb44c44d73b9d",
+        "label": "learning-inbox",
+        "path": ".agentdev/learning/inbox.md"
+      },
+      {
+        "digest": "cebd9bac3a010f061eab7a3eb61ea61b23893bca5c4bb3715b0e5aa9eba9c568",
+        "label": "learning-deferred",
+        "path": ".agentdev/learning/deferred.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-c2-disposal",
+      "questionForm": "choice",
+      "value": "promote_区分5_既存対策の更新",
+      "probabilityDistribution": {
+        "promote_区分5_既存対策の更新": 0.75,
+        "deferred": 0.25
+      }
+    },
+    {
+      "questionId": "q-c3-disposal",
+      "questionForm": "choice",
+      "value": "promote_区分5_既存対策の更新",
+      "probabilityDistribution": {
+        "promote_区分5_既存対策の更新": 0.69,
+        "deferred": 0.31
+      }
+    },
+    {
+      "questionId": "q-c5-disposal",
+      "questionForm": "choice",
+      "value": "promote_区分5_既存対策の更新",
+      "probabilityDistribution": {
+        "promote_区分5_既存対策の更新": 0.6,
+        "deferred": 0.4
+      }
+    },
+    {
+      "questionId": "q-u11-disposal",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "promote_区分5_既存対策の更新": 0.43,
+        "deferred": 0.57
+      }
+    },
+    {
+      "questionId": "q-u14-disposal",
+      "questionForm": "choice",
+      "value": "promote_区分5_既存対策の更新",
+      "probabilityDistribution": {
+        "promote_区分5_既存対策の更新": 0.79,
+        "deferred": 0.21
+      }
+    },
+    {
+      "questionId": "q-u15-disposal",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "promote_区分5_既存対策の更新": 0.16,
+        "deferred": 0.84
+      }
+    },
+    {
+      "questionId": "q-u18-disposal",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "promote_区分5_既存対策の更新": 0.11,
+        "deferred": 0.89
+      }
+    },
+    {
+      "questionId": "q-u19-disposal",
+      "questionForm": "choice",
+      "value": "promote_区分5_既存対策の更新",
+      "probabilityDistribution": {
+        "promote_区分5_既存対策の更新": 0.64,
+        "deferred": 0.36
+      }
+    }
+  ],
+  "confidence": 0.5,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-c2-disposal",
+        "value": "deferred",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q-c3-disposal",
+        "value": "deferred",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q-c5-disposal",
+        "value": "deferred",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q-u11-disposal",
+        "value": "deferred"
+      },
+      {
+        "questionId": "q-u14-disposal",
+        "value": "deferred",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q-u15-disposal",
+        "value": "deferred"
+      },
+      {
+        "questionId": "q-u18-disposal",
+        "value": "deferred"
+      },
+      {
+        "questionId": "q-u19-disposal",
+        "value": "promote_区分5_既存対策の更新"
+      }
+    ]
+  }
+}

@@ -3148,3 +3148,530 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **処分判定**: deferred（2026-10-07 自律確定。8軸合計 22/40。既存 knowledge 文書 windows-powershell-bulk-io-corruption.md が本体をカバー）
 
 ---
+
+---
+
+## Definition PR 機械工程の check_integrity を stage-and-commit 前に実行すると IR-072 構造的 fail が必ず再現する（対策の先行適用は手動 commit より工程順序修正が冪等再実行と整合する）
+
+- **問題事象**: case-open STEP-4 の prepare_definition_pr.ts 実行で、definition-edit（REQ frontmatter updated を適用日へ更新）の直後に check_integrity を実行すると、IR-072（req-updated-freshness）が「updated=適用日 vs 最終内容変更 commit author date=旧日付」の構造的不一致で fail した（NG 20 件。PR #3483・ce6bd072 と同型の再現）
+- **発生局面**: 実装（case-open STEP-4 の Definition PR 機械工程。Case #3507）
+- **検知方法**: script 報告 JSON の check_integrity step fail（exit 1）と中断レポート（.agentdev/integrity/reports/ の integrity-report）の NG 内容突合
+- **根本原因**: check_integrity の updated 突合は git log author date を参照するため、未 commit 変更を含む working tree では git log に変更が反映されず構造的に不一致となる。検査側で未 commit 変更を除外する対応は検査ロジックの複雑化のため不採用（draft CR-005 で確定済み）であり、工程順序（check_integrity を stage-and-commit の後に配置）の修正が正の対策
+- **自律対応内容**: (1) draft の stop_conditions（自己言及注意）に従い contingency を選択した。手動 commit → 冪等再実行は stage-and-commit が nothing-to-commit で非 0 になり script 契約と噛み合わないため、RA-009 の工程順序修正（check_integrity・traceability-check を stage-and-commit 後へ移動。dry-run では skip 警告）を script と単体テストへ先行適用した。(2) 既存 worktree・branch を再利用し definitionEdits を空にした冪等再実行で commit と check_integrity pass を確定した。(3) 先行適用分は main working tree 未 commit のまま PR 本文 Findings セクションへ記録し、stage 3 の RA-009 本実装への取り込みを明示した
+- **ユーザー確認有無**: なし（draft 合意内の contingency 選択。delegation 停止条件が両経路を認可）
+- **Decision/REQ/spec影響**: なし（RA-009 として既に Definition PR #3508 へ反映済みの対策の先行適用。追加の Decision/REQ 変更なし）
+- **横展開観点**: 突合型検査（git log 参照系）を機械工程に組込む場合は、検査対象の commit 状態が検査時点で確定していることを工程順序で保証する。fail 時の contingency は「手動 commit → 再実行」よりも「対策の先行適用 → 冪等再実行」が script の stage-and-commit 契約と整合する
+- **再発条件**: git log 参照系検査を、対象ファイル編集後かつ commit 前に実行する工程順序。draft の自己言及注意が存在しない Case でも同じ fail を起こす
+- **予防策候補**: RA-009 本実装（Definition PR #3508 の merge 後）で解消する。単体テストの工程順序期待値も同時に更新する（先行適用済み。stage 3 で期待値重複変更に注意）
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/scripts/prepare_definition_pr.ts（先行適用済み）、definition-pr-and-idempotency.md の工程順序記述（RA-003/008/009 と同一バッチで直列適用）
+- **関連**: Case #3507、Definition PR #3508、commit 3bba60df/3b87450e、PR #3483（過去事例）
+- **タグ**: `#ir072` `#check-integrity` `#process-order` `#idempotent-rerun`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 26/40。Case #3507 RA-009 の工程順序契約が definition-pr-and-idempotency.md:29 へ反映済み）
+
+---
+
+## 意味変更行の design 対応事前確認の省略は case-ready の missing-design ゲートで fail-closed になるが、省略自体が PR 記録から判別できない
+
+- **問題事象**: case-ready が REQ-061-045（coverage 既存行対象。本 Case の新ルール）に従い coverage 確認の対象を更新行へ拡大したところ、REQ-015-002/003（AG-003 による文言排他化＝意味変更行）が design 対応 0 件であることが traceability check（fail-closed 完全性判定）で検出された。case-ready Design「意味変更行の design 対応事前確認」節のとおり、design 対応が欠落する意味変更行は case-open が artifact_actions（artifact: design）へ組込むべきであり、組込み漏れの Definition PR は ready 不遷移・case-open 差し戻しとなる。Definition PR #3508 は case-open 時の check 対象 10 行（新規 7 行＋design 対応あり更新行 3 行）で missing-design pass を記録していたため、この欠落は case-ready 初回検出となった
+- **発生局面**: Definition 受入（case-ready STEP-1 受入検査／STEP-2 準備の traceability check。Case #3507）
+- **検知方法**: check --req 13 行（case-open 対象 10 行＋REQ-015-002/003・REQ-062-003）での missing-design findings 3 行
+- **根本原因**: missing-design 0 件ゲート（増分ベース）と意味変更行の coverage 事前確認（coverage --req）が別手順であり、事前確認の実行記録（coverage 結果・design 対応有無の実測帰着・組込み可否判断）を Definition PR 本文へ残す要求が存在しない。update 対象行の選定が design 対応有無を暗黙基準にすると、欠落既存行が対象から黙示的に外れ、ゲートの自己無保証になる
+- **自律対応内容**: (1) REQ-062-003 を表記統一のみ（意味変更行に非該当）としてゲート対象外と判断し、REQ-015-002/003 を差し戻し原因行として確定した。(2) Definition PR #3508 を保持し merge を中止した。(3) Root Case #3507 へ差し戻し記録をコメントした。(4) 本学びを inbox へ capture した
+- **ユーザー確認有無**: なし（case-ready Design L45/L57 と SKILL 分岐の fail-closed 適用であり、正規経路の機械的適用）
+- **Decision/REQ/spec影響**: なし（現行契約の適用。ただし事前確認の記録要求の追加は REQ/Design 変更余地あり）
+- **横展開観点**: 増分ベースのゲートと事前確認が別手順の構造では、対象選定基準（増分か意味変更か）と実行記録の両方が明示されないと欠落行がゲートを素通りする。coverage（advisory）と check（fail-closed）の役割分担（root-case-and-definition-package.md 手順 4.5）を意味変更行にも明示適用し、coverage 実測帰着を検証記録へ残す
+- **再発条件**: 既存行の意味変更を含む Definition Package で、意味変更行が design 対応 0 件かつ check 対象から外れて Definition PR が作成される
+- **予防策候補**: root-case-and-definition-package.md 手順 4 へ「coverage --req の実行記録（design 対応有無の実測帰着と組込み可否判断）を PR 本文検証差分へ残す」要求の追加を検討する。case-ready Design の「事前確認を省略した Case は停止し得る」を、省略の判別可能性（記録要求）と併記する
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/root-case-and-definition-package.md（手順 4）、docs/designs/commands/case-ready.md（意味変更行の design 対応事前確認節）
+- **関連**: Case #3507、Definition PR #3508、REQ-015-002/003、REQ-061-045、case-ready Design「意味変更行の design 対応事前確認」節
+- **タグ**: `#missing-design` `#coverage` `#semantic-change-row` `#fail-closed`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 26/40。事前確認と確認記録要求は root-case-and-definition-package.md L57/L108 に既存（残りは記録場所明示のみ））
+
+---
+
+## 構成検証を GitHub Issue 作成後に実行した（execution-structure 契約は作成前実行を要求）
+
+- **問題事象**: case-ready STEP-5 の構成検証（Epic サイズ上限・必須依存維持・全割当）を、子 Issue 9 件の GitHub Issue 作成後に実施した。execution-structure 契約は「構成確定後かつ GitHub Issue 作成前に構成検証を実行する。上限超過または構成不備を検出した場合は停止する（Issue を作成しない）」を要求する。結果は合格（子 Issue 9 件で上限 10 未満・必須依存 0 エッジで前提列整合・21 OU + 13 RA + 16 TS 全割当）で構成不備は生じなかったが、不備検出時に Issue 作成を止める保護が機能しない順序だった
+- **発生局面**: 運用（case-ready STEP-5 実行構造確定。Case #3507）
+- **検知方法**: Epic Issue 本文更新の実装中に execution-structure reference の「GitHub Issue 作成前」条件を再確認し自検知
+- **根本原因**: 構成確定と Issue 作成を連続実行する計画で、構成検証を独立した前置ステップとして組み込んでいなかった。上限計算・割当突合が決定的計算で済むため検証を後回しにした
+- **自律対応内容**: 作成後に構成検証を実行し合格を確認。構成不備なしのため Issue 是正は不要と判断し、本 deviation を capture
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（実行順序の遵守漏れ。契約変更なし）
+- **横展開観点**: 「X を実行する前に Y を検証し、不備なら X を行わない」型の契約では、Y を X と同一の作業ブロックに置かず前置ステップとして明示実行する。決定的計算で済む検証ほど後回しになりやすい
+- **再発条件**: 作成系操作（Issue 作成・commit・push）の直前に要求される検証を、作成系操作と同一ブロックで後置実行する場合
+- **予防策候補**: execution-structure 手順で構成検証を独立した前置ステップ（検証合格を Issue 作成の開始条件とする）として明記する
+- **想定反映先**: agentdev-workflow-case-ready の execution-structure 運用（手順明記は case-ready Design 所有）
+- **関連**: Case #3507 case-ready 実行（Definition merge ad22ea16 後）
+- **タグ**: `#execution-structure` `#case-ready` `#ordering-violation` `#structure-verification`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 15/40。execution-structure 契約自体が作成前実行を要求（遵守漏れ・実害未観測））
+
+---
+
+## PR #3519: 検査起動位置と変更済みコードの所在を一致させる
+
+- **問題事象**: 作業領域側の変更を検証する際、mainの実体から起動すると未変更コードが実行された。
+- **発生局面**: 実装
+- **検知方法**: PR本文の検証記録と起動位置の照合。
+- **根本原因**: 検査対象rootと実行するコードの所在を区別していなかった。
+- **自律対応内容**: 作業領域内の変更済みchecker実体から起動して再検査した。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし。既存の起動位置規律の適用事例。
+- **横展開観点**: checker自身を変更する検証に適用する。
+- **再発条件**: main側の実体から変更済み作業領域を検査する場合。
+- **予防策候補**: 対象rootと実行コードの所在を別々に確認する。
+- **想定反映先**: worktreeの検査起動手順。
+- **関連**: https://github.com/yogata/agent-dev-flow/pull/3519 の learning 第1項。
+- **タグ**: `#checker` `#worktree`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 15/40。既存の起動位置規律の適用事例（entry 自身が明記））
+
+---
+
+## PR #3519: 依存の参照先がない場合は作業領域で整備する
+
+- **問題事象**: main側の依存ディレクトリが空または不在で、junctionによる依存参照が成立しなかった。
+- **発生局面**: 実装
+- **検知方法**: 依存ディレクトリの存在確認。
+- **根本原因**: 参照先が生成されていない状態でjunction方式を選択した。
+- **自律対応内容**: 既存手順に従い対象packageでbun installを実施した。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし。既存の一意決定手順の適用。
+- **横展開観点**: 新しい作業領域の型検査と依存解決。
+- **再発条件**: main側node_modulesが不在の環境。
+- **予防策候補**: 整備方法選択前に参照先の存在を確認する。
+- **想定反映先**: worktreeの依存整備手順。
+- **関連**: https://github.com/yogata/agent-dev-flow/pull/3519 の learning 第2項。
+- **タグ**: `#dependencies` `#worktree`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 20/40。worktree-operations.md L168-175 に整備手段の選択基準が既存）
+
+---
+
+## PR #3520: Bun固有APIに依存するcheckerはBunで実行する
+
+- **問題事象**: nodeの型除去経路で配布依存境界checkerを起動すると失敗した。
+- **発生局面**: 実装
+- **検知方法**: import.meta.pathが未定義になる起動失敗。
+- **根本原因**: Bun固有APIへの依存をNodeの実行経路で代替した。
+- **自律対応内容**: Bun経路へ切り替えて検査を完了した。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし。既存の安定実行経路契約の適用。
+- **横展開観点**: 個別checkerの実行経路選択。
+- **再発条件**: Bun依存checkerをNodeから起動する場合。
+- **予防策候補**: ランタイム依存を確認してから証跡取得用の起動方法を選ぶ。
+- **想定反映先**: checker実行手順。
+- **関連**: https://github.com/yogata/agent-dev-flow/pull/3520 の learning 第1項。
+- **タグ**: `#bun` `#checker`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 18/40。既存の安定実行経路契約の適用・ENOENT 即検知）
+
+---
+
+## PR #3520: 走査件数と違反列を分けて比較する
+
+- **問題事象**: 同じcheckerでも作業領域とmainで走査件数が406対407となった。
+- **発生局面**: 実装
+- **検知方法**: 検査結果の件数比較。
+- **根本原因**: 作業領域には第三者取得Skillが投影されていなかった。
+- **自律対応内容**: failuresとhitsで違反を比較し、件数差を環境差として記録した。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: baselineと異なる投影環境の検査。
+- **再発条件**: 作業領域とmainで投影状態が異なる場合。
+- **予防策候補**: 件数を環境ラベルと併記し、違反列と混同しない。
+- **想定反映先**: 検査結果の比較手順。
+- **関連**: https://github.com/yogata/agent-dev-flow/pull/3520 の learning 第2項。
+- **タグ**: `#baseline` `#scan-scope`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 25/40。環境ラベル+由来3分類（worktree-operations.md L178-179）と zero-targets 知見（deferred L2526/L2624）でカバー。残りは記録様式細則）
+
+---
+
+## PR #3523: テストのinline宣言とsidecar追加の整合を確認する
+
+- **問題事象**: 既存テストへsidecarで検証対応を追加するとduplicate-inconsistenciesが発生した。
+- **発生局面**: 実装
+- **検知方法**: 対象行に限定したtraceability check。
+- **根本原因**: 既存inline宣言とsidecarの対象集合が一致しなかった。
+- **自律対応内容**: inline宣言のない新規テストへ分離し、sidecarを単一情報源とした。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし。既存の宣言集合一致規律の適用。
+- **横展開観点**: anchorテストへの要件行追加。
+- **再発条件**: 既存inline宣言を確認せずsidecarだけを追加する場合。
+- **予防策候補**: テスト配置前に宣言集合を照合する。
+- **想定反映先**: traceability宣言登録手順。
+- **関連**: https://github.com/yogata/agent-dev-flow/pull/3523 の learning 第1項。
+- **タグ**: `#traceability` `#sidecar`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 19/40。inline×sidecar 集合一致規律（root-case-and-definition-package.md 手順 1.5(5)/4.6）+ deferred L2506 の適用事例）
+
+---
+
+## PR #3523: cwd依存テストはリポジトリrootから実行する
+
+- **問題事象**: integrity scripts配下をcwdにした実行で4件のENOENTが発生した。
+- **発生局面**: 実装
+- **検知方法**: issue_tracking_list.test.tsの失敗とroot起点の再実行。
+- **根本原因**: テストがsrc/commonへの相対パスをcwd起点で解決していた。
+- **自律対応内容**: 作業領域rootへcwdを合わせ、22テスト合格を確認した。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし。既存の実行形態契約の適用。
+- **横展開観点**: 複数packageを含むsuiteの実行位置。
+- **再発条件**: scripts配下から相対パス依存テストを実行する場合。
+- **予防策候補**: root cwdと./付きパスを記録して実行する。
+- **想定反映先**: フルsuite実行手順。
+- **関連**: https://github.com/yogata/agent-dev-flow/pull/3523 の learning 第2項。
+- **タグ**: `#cwd` `#test-runner`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 18/40。既存の実行形態契約（REQ-060 系）の適用）
+
+---
+
+## PR #3523: 依存生成物と新規ファイルによる走査件数差を説明する
+
+- **問題事象**: 配布依存境界checkerの走査件数がbaselineと異なった。
+- **発生局面**: 実装
+- **検知方法**: 対象集合の比較。
+- **根本原因**: vendor生成物の有無と新規テスト追加が対象集合を変えた。
+- **自律対応内容**: 件数差の原因を特定し、違反数0と環境ラベルを併記した。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし。
+- **横展開観点**: 依存生成を伴う検査のbaseline比較。
+- **再発条件**: vendor生成状態や対象ファイル数が異なる場合。
+- **予防策候補**: failuresとhitsを主指標とし、件数差の原因も保持する。
+- **想定反映先**: 配布依存境界の検査記録。
+- **関連**: https://github.com/yogata/agent-dev-flow/pull/3523 の learning 第3項。
+- **タグ**: `#vendor` `#scan-scope`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 25/40。同 C3（件数差の環境差分類））
+
+---
+
+## PR #3524: link投影の対象0件は検査不能として扱う
+
+- **問題事象**: 作業領域でlinkプロファイルの検査対象が0件となりexit1を返した。
+- **発生局面**: 実装
+- **検知方法**: zero-targets:linkのadapter-failure。
+- **根本原因**: 作業領域へSkillのjunction投影が伝播していなかった。
+- **自律対応内容**: sourceの作業領域実測とlinkのmain環境参照を分けて記録した。
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし。既存のfallback契約の適用。
+- **横展開観点**: 投影状態の異なる作業領域の検査。
+- **再発条件**: junction未伝播の作業領域でlinkのみを実行する場合。
+- **予防策候補**: 対象0件をclean扱いせず、主証拠と環境参照を区別する。
+- **想定反映先**: 配布依存境界checkerのfallback運用。
+- **関連**: https://github.com/yogata/agent-dev-flow/pull/3524 の learning。
+- **タグ**: `#zero-targets` `#junction`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 25/40。同 C3（zero-targets は検査不能扱い。deferred L2526/L2624））
+
+---
+
+## Windows git-bash 環境で cmd //c mklink /J がサイレント失敗する（bun -e fs.symlinkSync は確実に動作する）
+
+- **問題事象**: worktree の node_modules 未伝播時に `cmd //c mklink /J` で junction を作成したところ、標準出力にエラーを出さず junction が作成されないサイレント失敗が発生した（Case #3525）
+- **発生局面**: 実装（worktree での bun test フル suite 実行前置。Case #3525）
+- **検知方法**: lstatSync/realpathSync での junction 実在・参照先確認
+- **根本原因**: git-bash 経由の cmd 呼び出しでの mklink /J は環境によりエラーが握り潰される
+- **自律対応内容**: `bun -e "fs.symlinkSync(target, path, 'junction')"` へ切替え、作成後に realpathSync で参照先を検証
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存の junction 作成手順の実行経路選択の知見）
+- **横展開観点**: worktree node_modules 未伝播時の依存整備（junction 作成手順）に mklink 経路のサイレント失敗リスクを記録する価値
+- **再発条件**: git-bash 経由で mklink /J を実行する場合
+- **予防策候補**: junction 作成は bun -e fs.symlinkSync を標準とし、作成後に lstatSync で symlink 判定を検証する
+- **想定反映先**: worktree の依存整備手順（node_modules junction）
+- **関連**: Case #3525・PR #3527 の learning 第1項
+- **タグ**: `#windows` `#junction` `#mklink` `#worktree`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 28/40。worktree-operations.md L150-163 が node fs.symlinkSync 正規手段を規定済み（残りは git-bash mklink サイレント失敗モードの追記のみ））
+
+---
+
+## scripts/self/release 配下のテストは公式 typecheck 対象範囲外であり distribution-boundary tsconfig 相当の strict 指定で既出 strict エラー 14 件が存在する
+
+- **問題事象**: scripts/self/release/wave-composition-purity.test.ts を distribution-boundary tsconfig と同一 strict 指定で typecheck すると、既存コード領域（L122-127・TS-001 系）に strict 系エラー（TS18047/18048/2532/2554）14 件が存在する。HEAD 版を同条件で実行した結果と同一集合・行オフセット対応で既存起因（Case #3525）
+- **発生局面**: 実装（QG-4 の typecheck 実行。Case #3525）
+- **検知方法**: tsc --noEmit（distribution-boundary tsconfig と同一 strict 指定）の実行
+- **根本原因**: scripts/self/release 配下は公式 typecheck 対象範囲外であり strict 指定での検査が未整備
+- **自律対応内容**: 新規型エラー 0（既出集合との一致）を確認して継続。型チェック対象範囲の整備は別案件候補として記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存の対象範囲設定の事実確認）
+- **横展開観点**: typecheck 対象範囲外のテストへ strict 指定で検査する場合、HEAD 版との同一集合比較で新規起因を分離する
+- **再発条件**: scripts/self/release 配下を strict 指定で typecheck する場合
+- **予防策候補**: 対象範囲の整備（tsconfig 追加または除外の明記）を別案件として検討
+- **想定反映先**: typecheck 対象範囲の整備案件（候補）
+- **関連**: Case #3525・PR #3527 の learning 第2項
+- **タグ**: `#typecheck` `#strict` `#test-scope`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 14/40。実害未観測（既出 14 件・新規 0）・別案件候補（entry 自身が明記））
+
+---
+
+## textlint 最終検査の gate fail は worktree と main HEAD の差分実行で本 Case 変更起因の新規 NG 0 件を証明して既知欠陥として分類できる
+
+- **問題事象**: case-close STEP-3 の textlint 最終検査（gate.ts --root worktree --purpose independent）が hard violations 40 件で fail した。検出は prh 訳語表（Definition PR → 設計PR 等）の既存文書 17 ファイルへの違反で、本 Case 変更ファイル 3 件は 1 件も含まない（Case #3525）
+- **発生局面**: 実装（case-close STEP-3 textlint-final-check gate。Case #3525）
+- **検知方法**: close_mechanical_steps.ts の textlint-final-check step fail（exit 1）と gate.ts 個別再実行の stdout JSON 突合
+- **根本原因**: gate は対象 root 全件の拒否対象違反ゼロを合格条件とするため、リポジトリ既存の prh 違反が worktree 指定実行でも検出される
+- **自律対応内容**: main HEAD 2b8bcd2 で同条件実行し同一 40 hard・同一 17 ファイルを確認。変更ファイルへの hard 違反 0 件と合わせて fail 由来分類「既知欠陥」を確定し、対応記録コメントの検証差分へ記録して継続
+- **ユーザー確認有無**: なし（fail 由来3分類〔既知欠陥・環境依存・当該変更起因〕の契約適用）
+- **Decision/REQ/spec影響**: なし（既存の checker 実測契約の適用）
+- **横展開観点**: 全件列挙型 gate が既存欠陥で fail する場合、同一条件の base HEAD 実行との差分で新規 NG 起因を分離する
+- **再発条件**: 既存文書に拒否対象違反が残存する状態で、worktree root 指定の textlint gate を実行する close
+- **予防策候補**: prh 訳語表違反 40 件の恒久対処（別途候補）。または textlint gate への baseline 機構の検討
+- **想定反映先**: case-close の textlint 最終検査運用、textlint prh 辞書整備案件（候補）
+- **関連**: Case #3525・PR #3527 merge commit f48f2d9a、対応記録コメント（検証差分）
+- **タグ**: `#textlint` `#known-defect` `#diff-execution` `#case-close`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 27/40。対照実行・由来3分類規律（worktree-operations.md L178-179）が本質をカバー。prh 恒久対処は並行 intake（case-3536）へ委ね）
+
+---
+
+## 長パスを含む worktree は git worktree remove が Filename too long で失敗するため node fs.rmSync で削除する
+
+- **問題事象**: textlint vendor・node_modules junction を含む worktree（3525-fix）の削除で `git worktree remove` が「Filename too long」で exit 255 失敗。worktree 登録は解除されたがディレクトリが残存した（Case #3525）
+- **発生局面**: 運用（case-close STEP-6-1 worktree 削除。Case #3525）
+- **検知方法**: git worktree remove のエラー出力と worktree list・ディレクトリ実在確認
+- **根本原因**: worktree 内の深いパス（検査ツール配下の依存物等）が Windows MAX_PATH を超過し git 内部の削除が失敗する
+- **自律対応内容**: `bun -e fs.rmSync(path, {recursive: true, force: true})` で残存ディレクトリを削除し、削除完了を確認（junction はリンク自体のみ削除され参照先は無傷）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存の削除手順の実行経路選択の知見。--force 不使用の原則は変更しない）
+- **横展開観点**: worktree remove の Filename too long 失敗時は、worktree list から登録解除を確認してから残存ディレクトリを node 側で削除する
+- **再発条件**: Windows 環境で深いパスの依存物を含む worktree を削除する場合
+- **予防策候補**: worktree-operations の削除手順へ「remove 失敗時の登録解除確認と node rmSync フォールバック」を明記する価値
+- **想定反映先**: agentdev-git-worktree references worktree-operations.md（削除失敗時の対処）
+- **関連**: Case #3525・merge commit f48f2d9a
+- **タグ**: `#worktree` `#windows` `#long-path` `#cleanup`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 28/40。worktree-operations.md L458-478 に prune→rmSync→消滅確認と Filename too long フォールバックが既存（adversarial-review 実測）。適用事例）
+
+---
+
+## prepare_definition_pr の definitionEdits は既存ファイル置換のみを支持し新規ファイル作成（REQ create OU）を表現できない
+
+- **問題事象**: case-open STEP-4 の機械工程 script（prepare_definition_pr.ts）の definitionEdits は「対象パス・旧文・新文の完全一致一意指定」であり、新規 REQ ファイルの作成（ACT-REQ-001 operation: create）を直接表現できない。worktree 内 readTextFile 失敗が definition-edit fail になる
+- **発生局面**: 運用（case-open STEP-4。Case #3530 の REQ-103 新設）
+- **検知方法**: script 入力契約（DefinitionEdit 型）と applyDefinitionEdit の実装確認
+- **根本原因**: 機械工程 script の編集プリミティブが置換系のみで create 系の表現を持たない
+- **自律対応内容**: worktree 作成と新規ファイルの内容適用をモデル側の Definition Package 適用として実施し、script 呼び出しは既存 worktree 再利用（期待 branch 上）+ definitionEdits 空 + stage/commit/generate_indexes/check_integrity/traceability ゲート実行に使用した。全ゲート成功を script 報告 JSON で確認
+- **ユーザー確認有無**: なし（機械工程の実行経路選択。ゲート省略なし）
+- **Decision/REQ/spec影響**: なし（case-open Design「機械工程の script 呼び出し契約」の動作範囲の知見。契約変更は別途候補）
+- **横展開観点**: create 系 OU を含む Definition Package では、worktree+ファイル適用をモデル側で行い script に検証・commit を担わせる構成が現行の現実解
+- **再発条件**: operation: create の artifact_action を含む draft で prepare_definition_pr.ts を definitionEdits 主体で実行する場合
+- **予防策候補**: prepare_definition_pr への create 系編集（新規ファイル contents）の入力表現追加（別途候補）
+- **想定反映先**: agentdev-workflow-case-open scripts README または Design「機械工程の script 呼び出し契約」節
+- **関連**: Case #3530・PR #3531
+- **タグ**: `#case-open` `#definition-pr` `#script-contract`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 22/40。回避経路確立済み・script 契約の create 系対応が変わるタイミングで再評価）
+
+---
+
+## 新規 REQ の Definition PR では missing-design 0 件ゲートのため design 役割宣言の割当てが発生する（draft に design アクションが無くても）
+
+- **問題事象**: REQ-103 新設の Definition PR で、traceability check の missing-design 0 件ゲート（増分ベース・新規行のみ）のため、draft の artifact_actions に design アクションが存在しないまま 31 行の design 役割宣言の割当て先決定が必要になった
+- **発生局面**: 運用（case-open STEP-3/STEP-4。Case #3530）
+- **検知方法**: traceability check --req（新規行限定）の missing-design findings と case-open reference（definition-pr-and-idempotency.md 手順4）の突合
+- **根本原因**: 新規 REQ 行は作成時点で design 対応宣言を持たず、ゲートは宣言追随を Definition Package 構成要素として要求する。割当て先の決定は各行の主題ドメイン→既存 Design の対応判断を伴う
+- **自律対応内容**: 各要件行の主題ドメインが現時点で正規所有する Design 文書へ design 役割 ADF-COVERS 宣言を 1 行追記（11 ファイル・修飾注記付き。REQ-100/101/102 の先行例と同型）。宣言は全面再評価（REQ-103-016/-017）の処遇確定時に参照追随で更新する旨を PR 本文の判断記録へ明記
+- **ユーザー確認有無**: なし（ゲート契約の機械的要求への追随。新規規範確定は含まない）
+- **Decision/REQ/spec影響**: なし（既存ゲート契約の適用）
+- **横展開観点**: 新規 REQ を含む draft の case-open では、design 宣言割当ての作業分量を見積もりに含めるべき。行数が多い REQ では複数 Design への分割割当てが自然に発生する
+- **再発条件**: 新規 REQ（複数行）の Definition PR を作成する場合
+- **予防策候補**: req-define の draft 段階での design 対応先行確認（任意）または case-open Design への割当て手順の明文化
+- **想定反映先**: case-open Design「意味変更行の design 対応事前確認」節（新規行版の割当て手順）
+- **関連**: Case #3530・PR #3531
+- **タグ**: `#traceability` `#missing-design` `#definition-pr`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 22/40。REQ-100/101/102 と同型の慣行・宣言系 deferred 知識3件（L1502/L1522/L1540））
+
+---
+
+## 先行 merge が main の check_integrity を赤化したまま Case 投入が進行し Definition PR の品質ゲートで初検出される
+
+- **問題事象**: f48f2d9a（#3527 マージ）で追加された skill 参照ファイル内の repo-root scripts/ パス参照（wave-composition-purity.test.ts）が、skill 相対解決では到達不能なため reference-path-existence NG として main に残存。Case #3530 の Definition PR の check_integrity ゲート（commit 済み HEAD 実行）で初めて block として顕在化した
+- **発生局面**: 運用（case-open STEP-4 品質ゲート。Case #3530）
+- **検知方法**: prepare_definition_pr.ts の check_integrity step fail（exit 1、2 new unmanaged NG）とレポートの ReferencePath NG 確認
+- **根本原因**: Case 投入〜merge 時の検査が当該 NG を検出しないまま main に取り込まれ、次の Definition 系 PR の commit 後実行ゲートで初めて delta NG として顕在化する
+- **自律対応内容**: 本 Case の変更対象外であることを確認した上で、provenance（issue-3527-commit-f48f2d9a-case-3530-definition-pr）付きで ng-baseline.json へ一時吸収し、参照形式の是正を本 Case の case-run（RA-002 領域）で実施する計画を PR 本文の判断記録へ記録。ゲート通過後の実測で exit 0 を確認
+- **ユーザー確認有無**: なし（既存 baseline 機構の provenance 付き適用。v2:REQ-0161-005 の manifest 契約どおり）
+- **Decision/REQ/spec影響**: なし（既存 NG baseline 機構の適用）
+- **横展開観点**: merge 前検査で coverage が無い検査系（commit 後実行を要する frontmatter 突合系等）の NG は次の Definition PR まで潜在する。全件列挙型 gate の fail は「既知欠陥・環境依存・当該変更起因」の3分類で分離する運用が有効
+- **再発条件**: commit 済み HEAD 前提の検査項目が、merge 時点では実行されない経路で新規 NG を持ち込む場合
+- **予防策候補**: Definition 系 PR の前置で base HEAD との同条件差分実行（既知欠陥分離）の検討
+- **想定反映先**: case-open / case-ready の品質ゲート運用、check_integrity の baseline 運用
+- **関連**: Case #3530・PR #3531・先行 commit f48f2d9a
+- **タグ**: `#check-integrity` `#ng-baseline` `#pre-existing-defect` `#definition-pr`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 27/40。同 C4（merge 前検査 coverage なし検査系の NG 持込み））
+
+---
+
+## worktree では textlint final gate が vendor 未伝播で fail-closed 停止するため plugin package 本体実体から --root <worktree> 指定で実行する
+
+- **問題事象**: worktree 環境で textlint final gate（gate.ts --purpose final）を実行すると、`.opencode/plugins/agentdev-textlint-guard/vendor/`（engine bundle・kuromoji 辞書）が worktree に未伝播のため fail-closed 停止した
+- **発生局面**: 実装（case-run の textlint 最終検査。Case #3532・Epic #3530 Wave 1）
+- **検知方法**: gate 実行時の vendor 欠落検知による fail-closed 停止
+- **根本原因**: worktree junction 未伝播の構造的制約が plugins 系 vendor 生成物にも適用される（既存規律の worktree junction 未伝播と同型）
+- **自律対応内容**: plugin package 本体実体（メインリポジトリ）から `--root <worktree>` を指定して実行し検査を完了した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存の fallback 契約と同型の構造的制約の適用）
+- **横展開観点**: `agentdev-git-worktree-test-fallback` が扱う src/ 構造系テスト fallback の対象範囲と同型であり、分類・恒久化の候補
+- **再発条件**: worktree で plugins 系 vendor 依存 checker を実行する場合
+- **予防策候補**: plugins 系 vendor 依存 checker の worktree fallback 分類と恒久化の検討
+- **想定反映先**: agentdev-git-worktree-test-fallback の対象範囲分類、textlint gate 運用
+- **関連**: PR #3539 の learning 第1項
+- **タグ**: `#textlint` `#worktree` `#vendor` `#fallback`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 27/40。worktree-operations.md L167/L202・qg-4:332/451 が規定済み・並行 intake（case-3533）と重複）
+
+---
+
+## Wave 変更が回帰検査の pin 文言追随漏れを生む類型は Wave ごとに横断点検が必要
+
+- **問題事象**: Wave 2-2 merge 336095b6 が execution-structure.md の Wave 内重複前置検出語彙を「主な変更対象（宣言）の重複」へ変更した際、回帰検査 pin 文言の追随を wave-composition-purity.test.ts のみに限定して case-ready-definition-readiness.test.ts（REQ-061-019 pin 文言）が漏れた。bun test 分割③ が決定的 fail となり、Wave 2-3 case-close の full integrity suite で初検出された（Wave 2-2 case-close 実行時点では main が未マージのため検出不能）
+- **発生局面**: 先行 Wave 変更後の後続 Wave close 検証（full integrity suite。Case #3535・Epic #3530 Wave 2-3）
+- **検知方法**: bun test 分割③ の 1 fail と由来分類手順（baseline 72e04cad 静的突合で baseline では pass・main HEAD 086667c0 で単独再現・本変更非接触を機械確認）
+- **根本原因**: pin 文言（正規表現による正規文書の文言 pin）は、正規文書の語彙変更と同一 Wave で機械的に追随検出されない。Wave が同一構成内の複数回帰検査ファイルへ同種の pin 文言を持つ前提が、追随先列挙の手順として明文化されていない
+- **自律対応内容**: fail 由来分類を既知欠陥（先行 Wave 由来・本変更起因なし）として確定し、修正候補を intake inbox へ保存して後続 Wave へ引き継いだ。merge 実行自体は fail 由来が本変更外であることの機械根拠（baseline 静的突合 + main 単独再現 + 変更 diff 非接触突合）を検証差分に記録して継続した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: 候補あり（Wave 語彙変更時に pin 文言追随先を列挙する手順、または pin 文言を語彙の正規所有から機械導出する仕組みの検討）
+- **横展開観点**: 同一 Wave 構成での類似追随漏れ（PR #3541 Findings の IR-072 類型）と合わせ、Wave 3 横断検証（Issue 3538）で pin 文言・frontmatter 鮮度等の追随漏れを横断点検するのが望ましい。pin 文言を含む回帰検査が複数ファイルに分散している状態での語彙変更は、変更対象外領域の検査も壊し得る
+- **再発条件**: 正規文書語彙を pin する回帰検査が複数存在する状態での Wave 内語彙変更
+- **予防策候補**: Wave 完了条件に「pin 文言追随先の列挙確認」を追加、または pin 文言の機械導出（ REQ 宣言からの生成）
+- **想定反映先**: scripts/self/release/case-ready-definition-readiness.test.ts（修正自体は intake item）、Wave 3 横断検証（Issue 3538）の確認項目、bun test フル suite 正規形の fail 由来分類注記
+- **関連**: Case #3534・merge commit 336095b6・Case #3535・merge commit 27d7eb77・intake inbox 2026-10-07-case-3535-pin-regex-stale-case-ready-readiness.md
+- **タグ**: `#pin-regex` `#regression-test` `#wave-change` `#follow-up-lag` `#fail-classification`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 21/40。並行 intake（case-3535 pin-regex）と重複）
+
+---
+
+## PR 側で触れていない Jev 検証観測が main 側 .agentdev/jev-observations/ に untracked 残留する場合は正規振る舞いとして放置する
+
+- **問題事象**: worktree コンテキストの委譲実行から Custom Tool agentdev_jev を呼ぶと観測は main リポジトリ側 .agentdev/jev-observations/ に帰着する（.agentdev/README.md 記載の既知振る舞い）。Case 3533（Wave 2-1）の TS-005/TS-006 実経路検証で、PR 側が commit した観測（20261007T094047Z-418b）とは別に main 側へ帰着した観測 20261007T093854Z-2198 が untracked ファイルとして main root に残留した
+- **発生局面**: case-run TS-005/TS-006 実経路検証と case-close の実行前同期（git pull --ff-only）（Case #3533・Epic #3530 Wave 2-1）
+- **検知方法**: main root の git status で untracked 観測ファイルを検出し、PR 変更ファイル一覧（pr_changed_files）との突合
+- **根本原因**: 観測書込先 root は Custom Tool が内部解決し呼出側から指定できないため、Tool 経由の検証と worktree 内実経路（bun -e で engine 直実行）の検証が併用されると観測の帰着先が分岐する
+- **自律対応内容**: main 側帰着観測は Tool 正規振る舞いによる永続化と分類し、削除・移動せず対象外として放置する判断を記録（PR 本文 Findings 節に記録済み）。git pull --ff-only は untracked と PR 変更ファイルのパス非重複（別ファイル）を確認して実行した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（観測保存契約 DEC-044 決定6・.agentdev/README.md の記載と整合）
+- **横展開観点**: Jev 実経路検証を含む Case では、main 側 untracked 観測の残留を前提に重複ファイルチェックを実施する。観測ファイル名には Case ごとの一意性があるため衝突は起きにくいが、同名検証を繰り返す場合は整理判断が必要になり得る
+- **再発条件**: Tool 経由の Jev 評価（main 側帰着）と worktree 内 engine 直実行（PR 側 commit）の併用
+- **予防策候補**: 検証計画時に観測の帰着先（Tool 経由か engine 直実行か）を明示し、PR へ取り込む観測と main 側残留観測を検証差分に区別記録する
+- **想定反映先**: .agentdev/README.md jev-observations 行（既知振る舞いの補強）、Case Issue 工程記録の検証観測記録様式
+- **関連**: Case #3533・PR #3542・観測 20261007T094047Z-418b（PR 側 commit済み）・20261007T093854Z-2198（main 側残留）
+- **タグ**: `#jev` `#observation` `#untracked` `#worktree` `#git-pull`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 14/40。.agentdev/README.md jev-observations 行に既記載（既知振る舞い））
+
+---
+
+## IR-072 req-updated-freshness は frontmatter updated と commit author date（UTC）の突合のため JST 深夜〜未明の commit 前確定が構造的に不可能
+
+- **問題事象**: RA-005 変更 8 ファイルの frontmatter updated を commit author date（UTC）へ進行する際、JST 2026-10-07 深夜〜10-08 未明の作業では commit の author date が UTC 変換で JST 日付の翌日となり、commit 実行前に updated を IR-072 期待値どおり確定できない。Case #3537 では updated 進行が追随 commit 42e80b71 として分離した
+- **発生局面**: case-run（docs 変更 PR の frontmatter updated 進行。Case #3537・Epic #3530 Wave 2-5）
+- **検知方法**: updated 進行 commit（42e80b71）を主体 commit（93eaae11）から分離せざるを得なかった経過の確認
+- **根本原因**: IR-072 の突合基準が commit author date（UTC）であり、JST の作業日付と UTC 日付が日跨ぎでずれる。updated 進行とその commit を同一 commit にすると、updated 値が commit 実行後まで確定できない循環が生じる
+- **自律対応内容**: updated 進行を単独 commit 42e80b71 に分離し、後続 commit の author date と整合させた上で IR-072 突合を pass させた
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（運用上の回避。IR-072 契約の変更は別判断）
+- **横展開観点**: JST 深夜〜未明の docs 変更では updated 進行が追随 commit になる構造的制約がある。回避案（commit 実行時の local date 設定、IR-072 の時差許容〔updated = author date または author date - 1 日〕）の検討候補
+- **再発条件**: JST 22 時〜翌 9 時台の frontmatter updated 進行を伴う commit
+- **予防策候補**: IR-072 の時差許容の制度化、または updated 進行を日中帯へ誘導する手順上の注記
+- **想定反映先**: IR-072 Design 行（integrity rule）と checker 契約の見直し候補
+- **関連**: Case #3537・PR #3544・commit 42e80b71
+- **タグ**: `#ir-072` `#frontmatter-updated` `#timezone` `#followup-commit`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 20/40。実害軽微・運用回避確立・checker 契約変更は req-define 別判断）
+
+---
+
+## textlint-guard の vendor 依存生成が未生成の環境では bun test ③（plugins 分割）が 9〜10 件 fail する
+
+- **問題事象**: main 側の textlint-guard vendor 依存生成が消えた（未生成の）環境で bun test ③（.opencode/plugins/ + ./scripts/）を実行すると、plugin tests の依存実体不在で 9〜10 件が fail する。依存生成後は既知欠陥 2 件まで回復する
+- **発生局面**: case-run / case-close の full integrity suite bun test ③（Case #3538・DEL-3538-2 で初回 644 pass 10 fail を実測）
+- **検知方法**: bun test ③ の fail 明細が textlint-guard 依存（vendor 未生成案内）に集中していることの確認
+- **根本原因**: vendor は git 管理外（版固定情報のみ管理）のため、環境再構築や掃除で依存実体が消失すると README 必須手順（bun install && bun run build:engine）の再実行まで検証が失敗する
+- **自律対応内容**: main 側で vendor を再生成し、③ を 2 fail（既知の timeout flake と REQ-061-019 pin）まで回復。fail 由来を「依存生成未実施の環境問題」として分類
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（README 必須手順の再実行で解消する既知運用）
+- **横展開観点**: main 側で依存生成が消えた場合の検証失敗は変更起因ではなく環境問題として分類できる。worktree 環境の vendor 未伝播（Case #3533 intake 記録）と合わせ、vendor 存在確認の前置が suite 実行手順の安定条件になる
+- **再発条件**: vendor 未生成状態での bun test ③ 実行
+- **予防策候補**: suite 実行手順への vendor 存在前置確認の明記（既存 intake 2026-10-07-case-3533-textlint-vendor-worktree-env.md と同方向）
+- **想定反映先**: agentdev-quality-gates の bun test 実行形態契約の注記候補
+- **関連**: Case #3538・PR #3545・Case #3533 系の vendor 警告
+- **タグ**: `#textlint-guard` `#vendor` `#bun-test` `#environment`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 27/40。同 C5（vendor 未生成・再生成前置は worktree-operations.md L167））
+
+---
+
+## squash merge の author date 保持により merge 後の req-updated-freshness 新規 NG が再発し得る（frontmatter のみの是正 commit が content-change 除外される機械的是正経路）
+
+- **問題事象**: squash merge 後の main 再検査で、merge commit の author date（squash が origin 側 commit の author date を保持）と Design frontmatter updated の不一致が req-updated-freshness（IR-072）の新規 NG として顕在化し得る（本件: merge 546b27db の author date 2026-10-07 と updated 2026-10-08 の 3 Design 分。check_integrity 初回実行で new unmanaged NG 3 として検出）
+- **発生局面**: case-run の check_integrity 初回実行（Case #3538・DEL-3538-3・訂正 PR #3546）
+- **検知方法**: check_integrity の req-updated-freshness NG と merge commit の author date との突合確認（integrity-d3-r2.json）
+- **根本原因**: squash merge は author date を origin 側 commit から保持するため、branch 上で frontmatter updated を更新した変更が merge commit の author date より未来の日付を持つと、author date 基準の鮮度検査と構造的に不一致になる
+- **自律対応内容**: 3 Design（v4-quality-gate-model・custom-tool-contracts・v4-standard-lifecycle）の updated を author date 基準（2026-10-07）へ戻して解消。frontmatter のみの修正 commit は ir072IsFrontmatterOnlyCommit により content-change から除外されるため、機械的是正が成立する（integrity-d3-r3.json で再実行 exit 0・0 new を確認）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（IR-072 の既存是正経路の適用）
+- **横展開観点**: 本訂正 PR #3546 の merge db2093a5 でも同型のズレが再発し得る。merge 後の check_integrity で req-updated-freshness の新規 NG が出た場合、updated の author date 揃え（frontmatter のみの修正 commit）を機械的是正の定型として扱える
+- **再発条件**: branch 上で frontmatter updated を更新した変更を squash merge した後、merge commit の author date 基準で鮮度検査を実行する
+- **予防策候補**: merge 直後の check_integrity 再検査を case-close 側の検証手順に含め、req-updated-freshness 検出時は frontmatter のみの是正 commit で解消する手順の明記
+- **想定反映先**: case-close workflow（docs 検証・merge 後再検査手順）の注記候補
+- **関連**: Case #3538・PR #3546・merge 546b27db・既存エントリ「Definition PR 機械工程の check_integrity を stage-and-commit 前に実行すると IR-072 構造的 fail が必ず再現する」（同型の author date 参照問題）
+- **タグ**: `#check-integrity` `#ir072` `#freshness` `#squash-merge`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 26/40。既存是正経路（frontmatter のみ是正 commit の content-change 除外）を entry 自身が適用済み・実害軽微）
+
+---
+
+## check_autogen_freshness.ts の --dry-run は freshness 検査を実行しない対象一覧表示であり、検証記録の「dry-run pass」を AUTOGEN 鮮度 gate の本検査として扱うと無検査の green 判定になる
+
+- **問題事象**: 訂正 PR #3547 の検証記録（PR 本文テスト結果）に「AUTOGEN dry-run: WOULD UPDATE 0・exit 0」とあり、case-close 側で同一形態の確認を実行したところ、--dry-run は scan 対象の一覧表示（stdout 先頭に「dry-run: 16 AUTOGEN block targets across 6 files」等）のみで findings 検査・JSON レポートを全く出力しないことが判明した（check_autogen_freshness.ts:623 の usage 記述「List scan targets without running freshness checks」で確認）。--dry-run の exit 0 は「対象一覧が取得できた」ことのみを意味し、drift 検出の合格証拠にならない
+- **発生局面**: case-close STEP-3 の AUTOGEN 鮮度 gate（Case #3538・第2回訂正再 close・DEL-3538-CLOSE-3。merge 直前 HEAD での gate 再実行）
+- **検知方法**: close 側の gate 再実行で autogen-fresh.txt に JSON 本体が存在せず対象一覧表示のみだったことの確認と、check_autogen_freshness.ts の usage・exit 規約（--dry-run は EXIT_OK 固定、本検査は findings.length > 0 で EXIT_NG）の読み戻し
+- **根本原因**: 「dry-run」ラベルから「本検査を軽量化した事前確認」と解釈する先入観に対し、実装は「本検査の完全な省略（対象一覧のプレビュー専用）」であり、PR 本文の検証記録表記（dry-run pass）も本検査に相当しないまま記載されていた
+- **自律対応内容**: close 側で --json 付き本検査（--dry-run なし）を再実行し findings 0・files_scanned 6・exit 0 の green を取得。PR 本文の dry-run 表記は対応記録コメント検証差分で「本検査に相当しない」ことを撤回・置換して記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（checker 実行形態の取り違え是正で、checker・契約側の変更なし）
+- **横展開観点**: 検証コマンドに dry-run / list-only / preview モードがある場合、その出力は本検査の合格証拠にできない。検証記録に「dry-run」とある検査結果を case-close 側で再利用する場合は、そのモードが検査本体を実行する形態かを実装（usage・exit 規約）で確認してから採用する。check_autogen_freshness.ts の AUTOGEN 鮮度 gate 正規形は --json 本検査（前回 close DEL-3538-CLOSE-2 の証跡 autogen-fresh-close.json も findings_count 0 を持つ本検査の JSON であり整合）
+- **再発条件**: AUTOGEN 鮮度 gate を --dry-run 形態で実行した結果（または dry-run 表記の検証記録）を freshness 合格として採用する
+- **予防策候補**: AUTOGEN 鮮度 gate の実行記録には「--dry-run でない（findings_count を含む JSON レポートあり）」ことを必須要素として明記する。case-close STEP-3 の gate 実行手順に「--dry-run は freshness 検査を実行しない」注記の追加候補
+- **想定反映先**: case-close workflow（docs-and-design-promotion の AUTOGEN 鮮度 gate 節）の注記候補・docs-and-design-promotion の checker 実行経路記述
+- **関連**: Case #3538・PR #3547・merge 8b250e33・前回 close DEL-3538-CLOSE-2 の autogen-fresh-close.json（本検査の正例）
+- **タグ**: `#autogen-freshness` `#dry-run` `#checker-実行形態` `#証跡採用`
+
+- **移動日**: 2026-10-08
+- **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 28/40。docs-check 正規形（--dry-run なし本実行）が既存）
+
+---
