@@ -181,3 +181,35 @@
 - **想定反映先**: src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts の報告 JSON 契約（case-close Design 機械工程節）への補足候補
 - **関連**: Issue #3550、PR #3558 Findings（learning 2 件目）
 - **タグ**: `#close-mechanical-steps` `#report-size` `#max-buffer` `#evidence-contract`
+
+## Git Bash へ引用符なし Windows パスを渡すと誤 root の対象 0 実行が生成される
+
+- **問題事象**: worktree 検証で Git Bash 経由の checker 実行に引用符なし Windows パス（バックスラッシュ含む）を渡したところ、パス先頭要素が別解釈され誤 root で対象 0 件の実行が成功扱いで完了した。無効実行を合格証拠として扱えば false clean になる
+- **発生局面**: 検証（Case #3549 case-run の integrity checker 実行と独立 review の実行検査）
+- **検知方法**: 実行結果が対象 0 件であることと、変更対象ファイルが実在することの矛盾。正規 root（`git rev-parse --show-toplevel` の実取得）との照合
+- **根本原因**: 引用符なし Windows パスは shell のパス解釈（バックスラッシュ エスケープ、MSYS パス変換）で意図しないパスへ変換される。対象 0 件の実行は checker 側では失敗として検出されない
+- **自律対応内容**: 正規 root の実取得・対象非空の確認・raw stdout/stderr 分離保存を検証の標準前置として区別した。迷走パスの生成物と準備 script は証跡領域（`.agentdev/tmp/case-3549/` 配下）へ移動して保持し、無効実行を破棄せず由来明示した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（checker 実行契約 Design の既存規律「引用符付きパス・実在 root 確認」の適用確認。契約変更なし）
+- **横展開観点**: bash 経由で `--root` 等のパス引数を取る checker・script 実行全般（check_integrity、traceability check、配布境界 checker 等）
+- **再発条件**: Windows + MSYS bash 環境で引用符なしバックスラッシュ パスを checker へ渡した場合
+- **予防策候補**: パス引数は必ず引用符付きで渡す、実行前に対象非空を確認する、checker の zero-targets を無効実行として扱う既存契約の適用を徹底する
+- **想定反映先**: docs/knowledge の checker 実行手順注記候補、checker 実行契約 Design「実行形態規律（集約）」節の補足候補
+- **関連**: Issue #3549、PR #3559 Findings（learning）
+- **タグ**: `#windows-path-quoting` `#msys-bash` `#zero-targets` `#false-clean`
+
+## 検証 timeout の非再現は原因を断定せず不明のまま保持する
+
+- **問題事象**: Case #3549 の Bun test suite で IR-055 回帰テストが 60000ms timeout で 1 fail（フル suite と単独再実行の両方で再現）、その後の同一環境全体再実行では非再現。途中報告で「単独で非再現」と誤記し訂正した。原因（負荷起因、環境差等）は確定できていない
+- **発生局面**: 検証（case-run の full integrity suite 実行と途中報告訂正）
+- **検知方法**: suite 全体再実行での fail 件数変化（1 → 0）と、fail 0 でも旧 FAIL の raw 証跡が保持されていること
+- **根本原因**: timeout は一時的負荷や環境状態に依存し得るため、単一の再実行結果から因果を確定できない。Case #3550 の learning（負荷依存境界の診断）と整合するが、本件は個別の再現非再現からは断定材料がない
+- **自律対応内容**: 途中報告の誤記を PR 本文で明示訂正した。旧 FAIL 2 件（フル suite 1 件・単独 1 件）は pre-existing と分類せず「原因未確定」として raw 証跡ごと保持し、採用証拠は最新の規律適合実行（fail 0）へ限定した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（fail 由来分類契約「由来不明を合格根拠にしない」の適用確認。契約変更なし）
+- **横展開観点**: timeout 起因 fail の報告・訂正・証跡保持全般
+- **再発条件**: 非決定的 timeout fail が後続実行で非再現になった場合
+- **予防策候補**: 途中報告の訂正は PR 本文へ明示する、非再現でも旧 FAIL 証跡を削除しない、原因を推測で断定しない
+- **想定反映先**: QG-4 reference「fail 由来分類」節の運用例補足候補
+- **関連**: Issue #3549、PR #3559 テスト結果節（IR-055 訂正記録）、Issue #3550 の learning（負荷依存境界）
+- **タグ**: `#timeout-nonreproducible` `#ir-055` `#evidence-retention` `#report-correction`
