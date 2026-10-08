@@ -117,6 +117,27 @@ describe("プロジェクト用語の検出と構造除外（TS-002）", () => {
     if (r.ok) expect(r.result.findings.filter((f) => f.ruleId === "prh")).toHaveLength(0);
   });
 
+  test("要件行では置換を抑止し、散文では同じ語を検出する", async () => {
+    const root = makeProject();
+    writeTermDict(root, [
+      "version: 1",
+      "rules:",
+      "  - expected: 設計PR",
+      "    pattern: /Definition PR/",
+    ].join("\n"));
+    const prepared = await prepareInspection(root);
+    expect(prepared.ok).toBe(true);
+    if (!prepared.ok) return;
+
+    const requirement = await inspectText(prepared, root, "docs/REQ-083.md", "| REQ-083-001 | Definition PR を作成する。 |\n");
+    expect(requirement.ok).toBe(true);
+    if (requirement.ok) expect(requirement.result.findings.filter((f) => f.ruleId === "prh")).toHaveLength(0);
+
+    const prose = await inspectText(prepared, root, "docs/a.md", "Definition PR を作成する。\n");
+    expect(prose.ok).toBe(true);
+    if (prose.ok) expect(prose.result.findings.some((f) => f.ruleId === "prh" && f.replacement === "設計PR")).toBe(true);
+  });
+
   test("辞書なしでも標準規則は有効（REQ-053-024）", async () => {
     const root = makeProject();
     const prepared = await prepareInspection(root);
