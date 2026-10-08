@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-close
-description: "内部 lifecycle 段階 case-close の workflow 実装本体。PR マージ（squash merge 先 main、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase）、同期時のリスク事前検出、QG-4 最終完了判定ゲート、docs 検証・Design 確定、Capture 回収（PR 本文→intake/learning 分離）、Epic Wave クローズを所有する。USE FOR: case-close 実行時の workflow 制御（単一 Issue クローズ・Epic Wave クローズ・PR マージ・QG-4・Design 確定・Capture 回収）。DO NOT USE FOR: 単独起動（case-auto の内部 lifecycle orchestration から起動される内部段階である）。"
+description: "case-close workflow 本体。PR merge と conflict 対応、同期リスク検出、QG-4、docs 検証、Design 確定、Capture 回収、Epic Wave クローズを制御する。USE FOR: case-close の完了判定・PR merge・Design/Capture 処理。DO NOT USE FOR: 単独起動（case-auto 内部段階）。"
 ---
 
 
