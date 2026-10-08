@@ -122,20 +122,27 @@ export async function inspectText(
     // （例: preset-ai-writing/ai-tech-writing-guideline）、数値だけでは
     // 助言対象の規則が拒否対象へ昇格してしまう。
     const hardRuleIds = new Set(prepared.composition.hardRuleIds);
-    const findings = lintResult.messages.map((m): InspectionFinding => {
-      const range = normalizeRange(m.range, m.fix?.range ?? null);
-      const numeric = classifySeverity(m.severity);
-      return {
-        path: rootRelativePath,
-        line: m.line,
-        column: m.column,
-        ruleId: m.ruleId,
-        message: m.message,
-        excerpt: extractExcerpt(text, range),
-        replacement: m.fix?.text ?? null,
-        severity: hardRuleIds.has(m.ruleId) ? "hard" : numeric === "hard" ? "advice" : numeric,
-      };
-    });
+    const requirementRowLines = new Set(
+      text
+        .split(/\r?\n/)
+        .flatMap((line, index) => (/^\s*\|\s*REQ-\d{3}-\d{3}\s*\|/.test(line) ? [index + 1] : [])),
+    );
+    const findings = lintResult.messages
+      .filter((message) => !(message.ruleId === "prh" && requirementRowLines.has(message.line ?? 0)))
+      .map((m): InspectionFinding => {
+        const range = normalizeRange(m.range, m.fix?.range ?? null);
+        const numeric = classifySeverity(m.severity);
+        return {
+          path: rootRelativePath,
+          line: m.line,
+          column: m.column,
+          ruleId: m.ruleId,
+          message: m.message,
+          excerpt: extractExcerpt(text, range),
+          replacement: m.fix?.text ?? null,
+          severity: hardRuleIds.has(m.ruleId) ? "hard" : numeric === "hard" ? "advice" : numeric,
+        };
+      });
     findings.sort((a, b) => a.line - b.line || a.column - b.column || a.ruleId.localeCompare(b.ruleId));
     return {
       ok: true,

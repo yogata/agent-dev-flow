@@ -7,7 +7,7 @@ description: 要件docまたはRoot Caseを入力として内部lifecycle（case
 要件doc または Root Case Issue を入力として内部 lifecycle（case-open → case-ready → case-run → case-close、例外経路 case-revise → case-ready）を順次自走実行し、repo 内の変更に限りマージまで進める標準実行コマンドである。
 要求入口は req-define（手動要求入口）と backlog-auto（要求蓄積入口）の2つであり、両経路の実行は本コマンドへ合流する。
 標準導線は req-define 完了直後の単一要件doc を引数とした起動であり、引数なし起動時は `.agentdev/drafts/req-draft-*.md` 全件を処理する。
-GitHub Issue 入力時は Root Case 指定により、Root Case の正規状態、Epic 実行構成、既存成果物（設計PR・Definition Amendment PR・実装PR）、実行の生存状況の照合で通常経路と例外経路を解決する。再合意済み Definition 変更の未適用が確認された場合は例外経路 case-revise → case-ready を駆動する。
+GitHub Issue 入力時は Root Case 指定により、Root Case の正規状態、Epic 実行構成、既存成果物（設計PR・設計修正PR・実装PR）、実行の生存状況の照合で通常経路と例外経路を解決する。再合意済み Definition 変更の未適用が確認された場合は例外経路 case-revise → case-ready を駆動する。
 
 ## 入力
 

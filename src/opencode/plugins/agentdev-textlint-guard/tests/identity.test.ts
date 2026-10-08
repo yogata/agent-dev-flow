@@ -104,7 +104,8 @@ describe("検査条件の同一性（TS-002）", () => {
     const c = await prepareWithConditions(root);
     expect(c.conditions.trackable).toBe(true);
     if (!c.conditions.trackable) return;
-    expect(c.conditions.resultNormalizationVersion).toBe(1);
+    // REQ 行 prh 抑制の導入で正規化手順が変わり、旧版への後退は stale キャッシュ誤報告を再発させる。
+    expect(c.conditions.resultNormalizationVersion).toBe(2);
   });
 
   test("検査条件を追跡できない場合は trackable: false を返し、再利用せず実検査へ戻る", async () => {
