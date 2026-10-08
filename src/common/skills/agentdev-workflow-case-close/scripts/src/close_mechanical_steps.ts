@@ -388,11 +388,11 @@ export function runCloseMechanicalSteps(
       });
     }
 
-    const integrityResults: Record<string, { exitCode: number }> = {};
+    const integrityResults: Record<string, { exitCode: number; stdout: string }> = {};
     let integrityFail = false;
     for (const gate of input.integrityGates ?? []) {
       const result = runSpec(runner, gate);
-      integrityResults[gate.name] = { exitCode: result.exitCode };
+      integrityResults[gate.name] = { exitCode: result.exitCode, stdout: result.stdout };
       if (result.exitCode !== 0) integrityFail = true;
     }
     steps.push({
