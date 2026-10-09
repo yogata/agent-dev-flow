@@ -10,6 +10,7 @@ case-close command の workflow 実装本体である。
 PR マージから Issue クローズ、Capture 回収、ドメイン状態永続化、完了報告までの制御構造、QG-4 最終完了判定ゲート（完了条件チェックボックス評価・更新）、Design 状態評価（棚卸し制、draft → accepted 昇格）、Epic Wave クローズ（E1〜E6、単一書き手）を所有する。
 squash merge 先は main とし、同期時のリスク事前検出を行う。
 Case 状態モデルでは active から closed への遷移を担い、停止時は Root Case 指定の再開入口（case-close）を停止報告へ記録する（Root Case の status は実行継続のまま active を維持する。失敗・未完了はマージ結果等の記録で表現する）。再開時は Root Case 指定による経路解決（正規状態、実行構成、既存成果物、実行の生存状況の照合）に従い未完了 STEP を続行する。
+完了判定は最終的な要求充足の根拠を確認し、PR のマージや Issue の終了だけを根拠に完了と宣言しない。外部副作用は成果物の作成と区別し、確認済みの権限・安全条件を満たす範囲に限定する。
 
 case-close command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 
