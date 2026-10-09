@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261009T135155Z-58e2",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0195 核心（完遂判定の強制）の既存REQ照合帰属",
+  "sourceRevision": "v5.0.0(025b2547)+RU-0195(2026-10-09T22:40:00+09:00)",
+  "durationMs": 1547,
+  "inputTokens": 1727,
+  "inputs": {
+    "requestDigest": "012751a32e896b765a32e0fc9225c0a71693207b72d2fbd4fba7cdc5f705e178",
+    "references": [
+      {
+        "label": "RU-0195",
+        "path": ".agentdev/backlog/req-units/RU-0195.md",
+        "digest": "a71da0004754f288fe3c2104496420908005085bd293021841e4565a8b6b7b53"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1",
+      "questionForm": "choice",
+      "value": "CREATE（新規REQの新設）",
+      "probabilityDistribution": {
+        "CREATE（新規REQの新設）": 0.96,
+        "APPEND（既存REQへの要件行追加）": 0.03,
+        "UPDATE（既存要件行の再定義）": 0.01,
+        "REQ操作なし（Design等で対応）": 0
+      }
+    },
+    {
+      "questionId": "q2",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.27,
+        "false": 0.73
+      }
+    }
+  ],
+  "confidence": 0.95,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1",
+        "value": "CREATE（新規REQの新設）"
+      },
+      {
+        "questionId": "q2",
+        "value": false
+      }
+    ]
+  }
+}

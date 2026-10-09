@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261009T135631Z-4406",
+  "workflow": "req-define",
+  "evaluationKind": "final-classification-design-separation",
+  "subject": "完遂判定の実行構造のREQ/Design帰属と分離要否",
+  "sourceRevision": "v5.0.0(025b2547)+RU-0195(2026-10-09T22:40:00+09:00)",
+  "durationMs": 1058,
+  "inputTokens": 1389,
+  "inputs": {
+    "requestDigest": "ca39eab65fd2a9da204f42ca18a8a7b4bfe2242fa84f1c5297bbbcbf9360ba35",
+    "references": [
+      {
+        "digest": "a71da0004754f288fe3c2104496420908005085bd293021841e4565a8b6b7b53",
+        "label": "RU-0195",
+        "path": ".agentdev/backlog/req-units/RU-0195.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1",
+      "questionForm": "choice",
+      "value": "Design行帰属（内部構造・規則として Design に保存する）",
+      "probabilityDistribution": {
+        "REQ行帰属（要件行として REQ に保存する）": 0,
+        "Design行帰属（内部構造・規則として Design に保存する）": 1
+      }
+    },
+    {
+      "questionId": "q2",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.97,
+        "false": 0.030000000000000027
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1",
+        "value": "Design行帰属（内部構造・規則として Design に保存する）"
+      },
+      {
+        "questionId": "q2",
+        "value": true
+      }
+    ]
+  }
+}
