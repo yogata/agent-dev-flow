@@ -8,13 +8,13 @@ updated: "2026-10-09"
 <!-- ADF-COVERS(design): REQ-012-026, REQ-012-027, REQ-012-028, REQ-012-029, REQ-012-030, REQ-012-031, REQ-012-032, REQ-012-033, REQ-012-034, REQ-012-035, REQ-012-036, REQ-012-037, REQ-012-038, REQ-012-039, REQ-012-040, REQ-012-041, REQ-012-042, REQ-012-054, REQ-012-052, REQ-012-053, REQ-012-056, REQ-012-057, REQ-012-058, REQ-012-059, REQ-002-048 -->
 <!-- ADF-COVERS(implementation): REQ-012-027, REQ-012-028, REQ-012-029, REQ-012-030, REQ-012-031, REQ-012-032, REQ-012-033, REQ-012-034, REQ-012-035, REQ-012-036, REQ-012-037, REQ-012-038, REQ-012-039, REQ-012-040, REQ-012-041, REQ-012-042 -->
 <!-- ADF-COVERS(design): REQ-106-001, REQ-106-002, REQ-106-003, REQ-106-004, REQ-106-005, REQ-106-006, REQ-106-007, REQ-106-008, REQ-106-009, REQ-107-001, REQ-107-002, REQ-107-003, REQ-107-004, REQ-107-005, REQ-107-006, REQ-107-007, REQ-107-008 -->
-<!-- ADF-COVERS(implementation): REQ-106-001, REQ-106-002, REQ-106-003, REQ-106-004, REQ-106-005, REQ-106-006, REQ-106-007, REQ-106-008, REQ-106-009, REQ-107-001, REQ-107-002, REQ-107-003, REQ-107-004, REQ-107-005, REQ-107-006, REQ-107-007, REQ-107-008（v5 変更影響・追跡品質検証の設計・構成実体は v4-traceability-model の v5 語義更新として RA-001 が後続 OU で所有する） -->
+<!-- ADF-COVERS(implementation): REQ-106-001, REQ-106-002, REQ-106-003, REQ-106-004, REQ-106-005, REQ-106-006, REQ-106-007, REQ-106-008, REQ-106-009, REQ-107-001, REQ-107-002, REQ-107-003, REQ-107-004, REQ-107-005, REQ-107-006, REQ-107-007, REQ-107-008（v5 変更影響・追跡品質検証の設計・構成実体は本 Design 本文の v5 語義更新節が所有する） -->
 
 # ADF v4 Traceability モデル（Change / Evidence 中心）
 
-位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）までは v3 を正とする。当該段階での置換実行をもって権威は本 Design へ移行する。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施する。
+位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）までは v3 を正とする。当該段階での置換実行をもって権威は本 Design へ移行する。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施する。あわせて本 Design は REQ-107（ADF v5 工程間追跡と品質検証の責務分離）と DEC-054（ADF v5 追跡・品質検証モデル）に基づく v5 追跡語義（標準関係、設計根拠対応の条件付き化、構造検査と意味品質検証の分離）を、v4 語義の搬送範囲とともに所有する。
 
-本 Design は DEC-037（Traceability の Change / Evidence 中心への再中心化）の Design 実体である。モデル要素、完全性規則、保存方式、直接走査、用語政策の所有対応は吸収節に定める。
+本 Design は DEC-037（Traceability の Change / Evidence 中心への再中心化）の Design 実体である。DEC-037 の標準関係構造（covers 単独の標準コア関係）は DEC-054 が covers と採用された隣接工程間対応へ拡張した。モデル要素、完全性規則、保存方式、直接走査、用語政策の所有対応は吸収節に定める。
 
 ## 4 問いへの回答能力
 
@@ -49,6 +49,18 @@ Traceability の主目的は次の 4 問いに答えられることである。
 | fail-open | 実行不能を処理の妨げにしない契約 | 検出不能の旨を報告して継続する |
 | advisory | 結果に強制力を持たない助言 | 採否は判断者が決める。空結果を証明として扱わない |
 
+## 標準関係の構造（v5 語義）
+
+本 Design が扱う標準関係は、covers 対応関係と、プロジェクトの採用した工程に基づく隣接工程間の対応関係である（REQ-012-027、REQ-107-001）。
+
+- **covers 対応関係**: 成果物が要件へ明示的に対応する対応関係。decision / design / implementation / verification の 4 役割を持つ
+- **採用された隣接工程間対応**: プロジェクトの採用した隣接工程の成果物・追跡単位を明示的に関連付ける対応関係。上流と下流を双方向に追跡できる（REQ-107-001）。宣言と保存は採用規約機構（v5-adopted-conventions Design「宣言と保存」節）が所有し、物理形式は REQ-107 適用範囲の対象外とする。機械解決の実装面は後続の実装 Design が所有する
+
+標準関係の境界は次の 2 条である。
+
+- 採用された隣接工程間対応は有界な標準関係である。多数の関係型の持ち込み（REQ-012-039）や汎用の関係拡張機構の新設（REQ-012-040）に該当しない
+- すべての成果物に要件との重複した直接対応を必須とせず、採用された隣接工程間対応で追跡できる（REQ-107-002）。実装・検証の要件側直接対応の義務（実装成果物 1 件以上、検証対応必須行の検証手段 1 件以上）は REQ-012-032 が維持する。存在しない詳細工程への対応を強制しない。未採用の参照例の工程を判定基準に含めない点は、v5-adopted-conventions Design「未採用参照例を欠落と誤判定しない判定規則」節に従う
+
 ## 永続情報と導出可能情報の分離
 
 v4 の意味モデルから永続すべき関係（Change の Evidence・impact、要求実現関係）と導出可能な関係を分離する基準。現行 sidecar/policy/checker 形式を前提とせず、DEC-030 機構のうち拡張して搬送する範囲と再導出する範囲の判定。
@@ -60,7 +72,7 @@ v4 の意味モデルから永続すべき関係（Change の Evidence・impact�
 
 | 区分 | 対象 | 根拠 |
 |---|---|---|
-| 永続 | covers 対応関係（decision / design / implementation / verification の 4 役割） | 要件実現関係は Change をまたいで恒常的に参照される（REQ-012-027、REQ-012-028） |
+| 永続 | covers 対応関係（decision / design / implementation / verification の 4 役割）と採用された隣接工程間の対応関係 | 要件実現関係と採用された隣接工程間の追跡関係は Change をまたいで恒常的に参照される（REQ-012-027、REQ-012-028、REQ-107-001） |
 | 永続 | トレーサビリティポリシー（traceability/policy.yaml の検証対応要否） | 検証対応要否は宣言であるため導出できない（REQ-012-051） |
 | 導出 | 影響範囲（impact の実行結果） | 正規成果物の直接走査からその場で再計算できる（REQ-012-048） |
 | 導出 | Evidence 実行結果（Issue / PR / QG の記録） | Issue / PR / QG が所有し、DEC-038 の durable state 配置に従う（REQ-021-019） |
@@ -85,16 +97,16 @@ global completeness の位置づけ（診断・影響分析の必要性から co
 
 | 層 | 対象 scope | 判定性格 | 運用 |
 |---|---|---|---|
-| lifecycle gate completeness | 対象要件行 scope（当該 Case の対象要件行） | fail-closed（case-ready のトレーサビリティ完全性ゲート、case-close の QG-4） | 対象要件行の design 対応、implementation 対応、検証対応（policy が required と判定する行）の欠落を不合格とする（REQ-021-018、REQ-021-024、REQ-021-025） |
+| lifecycle gate completeness | 対象要件行 scope（当該 Case の対象要件行） | fail-closed（case-ready のトレーサビリティ完全性ゲート、case-close の QG-4） | 対象要件行の設計根拠対応（プロジェクトの採用した工程・成果物規約が要求するもの。独立 Design 文書を必須とする採用の場合は Design 対応）、implementation 対応、検証対応（policy が required と判定する行）の欠落を不合格とする（REQ-021-018、REQ-021-024、REQ-021-025） |
 | corpus completeness | corpus 全体（全現行要件行） | advisory・fail-open（診断指標の数値追跡） | 計数を v4 移行期間の既知債務として追跡し、到達目標状態の診断に使う。lifecycle gate の判定に使用しない |
 
 ### 解釈 clause
 
-REQ-012-029（実装対応）、REQ-012-030（検証対応・policy が required と判定する行）、REQ-012-031（Design 対応）は corpus の到達目標状態を規定する要件行である。lifecycle gate での判定対象（対象要件行 scope）は REQ-021-018、REQ-021-024、REQ-021-025 が所有する。REQ 行の文言変更を伴う再定義は後続段階（第8段以降）に留保する。
+REQ-012-029（実装対応）、REQ-012-030（検証対応・policy が required と判定する行）、REQ-012-031（設計根拠対応）は corpus の到達目標状態を規定する要件行である。lifecycle gate での判定対象（対象要件行 scope）は REQ-021-018、REQ-021-024、REQ-021-025 が所有する。REQ-012-031 は、プロジェクトの採用した工程・成果物規約が認める適切な成果物から設計内容と根拠を確認できることを規定し、独立した Design 文書の存在を一律の必須条件としない。Design 対応の欠落計上は、採用規約が独立 Design 文書を必須とする採用の場合に限る。現行の移行期デフォルト（REQ-105-008。本リポジトリの現に実効している運用は独立 Design 文書を要求する）では、全現行要件行が計上対象として解決される。REQ 行の文言変更を伴う再定義は REQ-107 定義適用（REQ-012-027/031/032/047、REQ-021-018/024/025 等の行 ID 不変再定義）として完了済みである。
 
 ### corpus 債務方針
 
-missing-design 942 件と missing-implementation 111 件（2026-09-19 時点の baseline @54c0fde3）は v4 移行期間の既知債務である。corpus 値の是正は第13段 full validation で評価し、lifecycle gate を阻害しない。corpus 計数の増減は診断指標として追跡する。
+missing-design 942 件と missing-implementation 111 件（2026-09-19 時点の baseline @54c0fde3）は v4 移行期間の既知債務である。missing-design の計上は、採用規約が独立 Design 文書を必須とする採用の場合の Design 対応欠落として語義づけられる（解釈 clause 参照）。corpus 値の是正は第13段 full validation で評価し、lifecycle gate を阻害しない。corpus 計数の増減は診断指標として追跡する。
 
 ## Evidence 第一級の位置づけ
 
@@ -103,9 +115,18 @@ missing-design 942 件と missing-implementation 111 件（2026-09-19 時点の 
 - Q3 への回答は、verification 役割の coverage と Evidence ソースの識別子結合の合成で行う
 - 識別子結合は、検証手段の対応関係（REQ 行 ID と verification 役割）と実行結果の記録（Issue 番号、PR 番号、Gate 実行記録）を結び付ける。結合の永続化は Issue / PR / QG 側が担う
 
+## 構造検査と意味品質検証の分離
+
+本 Design が扱う構造検査（check、対応関係の存在と参照整合の検査）と、要求内容の充足を確認する意味的品質検証は、別の責務である（REQ-107-004、REQ-107-005、DEC-054）。
+
+- check の pass は、対応関係の構造整合（関係の存在、参照先の解決、宣言形式の妥当性）に関する判定である。対応関係の存在だけで、要求内容の充足（意味的品質）を合格としない
+- トレーサビリティ機構に恒久的な意味品質検証ゲートを追加しない（DEC-054）。意味的品質検証は各工程の内容確認と最終受入（REQ-107-007）が別責務として所有する
+- 見出しや説明節の存在だけで孤立設計事項として一律に不合格としない（REQ-107-005）。設計根拠対応の判定は採用規約が要求する成果物の成立に基づき、文書内の見出しや説明節の存在を機械的な合格条件・不合格条件にしない
+- 追跡関係の粒度（グループ化、範囲宣言）によって、グループ内の個別に有効な要求・受け入れ条件の検証義務を消さない（REQ-107-006）。check の計上と lifecycle gate の判定は子要件行単位を維持する
+
 ## 用語
 
-- TIM（最小トレーサビリティモデル）は、v4 Traceability モデルの要求実現関係部分（covers 対応関係、4 役割、対応完全性規則）の旧設計名称である。単なる旧称ではなく、本 Design の要求実現関係部分を指す包摂型の用語橋である。既存文書の TIM 語は本 Design の当該部分を読むものとして解釈する
+- TIM（最小トレーサビリティモデル）は、v4 Traceability モデルの要求実現関係部分（covers 対応関係、採用された隣接工程間対応、4 役割、対応完全性規則）の旧設計名称である。単なる旧称ではなく、本 Design の要求実現関係部分を指す包摂型の用語橋である。既存文書の TIM 語は本 Design の当該部分を読むものとして解釈する。TIM の標準コア関係の語義は REQ-107 定義適用に伴い、covers 単独から covers と採用された隣接工程間対応（標準関係の構造節）へ更新済みである
 - 日本語本文の正式用語は「対応関係」「対応付け」を用いる（DEC-017 決定5 の維持、REQ-012-042）。coverage / covers は機械識別子または外部標準との対応説明に限定する
 
 ## traceability-model.md からの吸収節
@@ -123,5 +144,5 @@ missing-design 942 件と missing-implementation 111 件（2026-09-19 時点の 
 
 ## 関係
 
-- 本 Design は DEC-037 の Design 実体である
+- 本 Design は DEC-037 の Design 実体である。DEC-037 の標準関係構造（covers 単独の標準コア関係）は DEC-054 が covers と採用された隣接工程間対応へ拡張した（部分置換）。拡張後の語義は本 Design の標準関係の構造節が所有する
 - foundations/traceability-model.md は crosswalk 第7段の実行（物理削除）をもって権威を本 Design へ移行する。移行までの間は両 Design の要求実現関係部分の宣言が重複する（移行期間の許容状態）

@@ -6,6 +6,7 @@ updated: "2026-10-09"
 ---
 
 <!-- ADF-COVERS(design): REQ-012-027, REQ-012-028, REQ-012-033, REQ-012-042, REQ-012-045, REQ-012-046, REQ-012-047, REQ-012-048, REQ-012-051, REQ-012-054, REQ-012-055 -->
+<!-- ADF-COVERS(design): REQ-107-001, REQ-107-002, REQ-107-003, REQ-107-004, REQ-107-005, REQ-107-006 -->
 <!-- ADF-COVERS(design): REQ-012-043, REQ-012-044, REQ-012-049, REQ-012-050 -->
 <!-- ADF-COVERS(design): REQ-106-001, REQ-106-002, REQ-106-003, REQ-106-004, REQ-106-005, REQ-106-006, REQ-106-007 -->
 <!-- ADF-COVERS(implementation): REQ-012-030, REQ-012-043, REQ-012-044, REQ-012-045, REQ-012-046, REQ-012-047, REQ-012-048, REQ-012-049, REQ-012-050, REQ-012-051 -->
@@ -13,7 +14,8 @@ updated: "2026-10-09"
 
 ## 目的
 
-標準配布スキル `agentdev-traceability` は、ADF v4 Traceability モデル（foundations/v4-traceability-model.md）に基づき、要件と成果物の明示的な対応関係について coverage、impact、check の3能力を提供する。
+標準配布スキル `agentdev-traceability` は、ADF v4 Traceability モデル（foundations/v4-traceability-model.md。v5 追跡語義を含む）に基づき、要件と成果物の明示的な対応関係について coverage、impact、check の3能力を提供する。
+標準関係は covers 対応関係に加え、プロジェクトの採用した工程に基づく隣接工程間の対応関係を有界な標準関係として含む（REQ-012-027、REQ-107-001）。
 正規成果物を直接走査し、対応関係をその場で解決する（REQ-012、DEC-037。直接走査は旧 DEC-017 決定2 の維持として DEC-037 配下で搬送され、前身機能の廃止と移行の経緯は旧 DEC-017 が記録する）。
 
 ## 適用対象
@@ -23,6 +25,7 @@ updated: "2026-10-09"
 
 ## 対応関係データの取得と正規化
 
+- 本 skill が解決する標準関係の語義は、covers 対応関係と採用された隣接工程間対応である（v4-traceability-model Design「標準関係の構造（v5 語義）」節）。covers 対応関係は本節の sidecar・inline declaration から解決する。採用された隣接工程間対応の宣言と保存は採用規約機構（v5-adopted-conventions Design）が所有し、機械解決の実装面は後続の実装 Design が所有するため、本 skill の現行解決対象は covers 対応関係である
 - 対応関係データの正規情報源は、リポジトリ top-level `traceability/` 配下の component / package 単位 sidecar（`traceability/<component-slug>.yaml`）と検証スコープポリシー（`traceability/policy.yaml`）、および producer-only artifact に許容された inline declaration とする
 - sidecar と policy.yaml のスキーマは ADF v4 Traceability モデル（foundations/v4-traceability-model.md）が所有する。本 skill は sidecar を読み込み、component、artifact パス、role、要件行 ID の組を論理的な対応関係へ正規化する。本 skill は ADF 自身の個別 REQ と個別成果物との対応データを保持しない
 - inline declaration は `ADF-COVERS(<role>): <REQ-ID>{, <REQ-ID>}*` 形式（role は decision / design / implementation / verification、REQ-ID は `REQ-{NNNN}-{MMM}` 形式の要件行ID）とし、producer-only artifact の各ファイル種別のコメント記法（Markdown は HTML コメント、TypeScript は `//` 等）の内部に1行で記述する。マーカー文字列 `ADF-COVERS(...)` 自体はファイル種別に依存しない。consumer distribution closure（src/opencode/**）に含まれる成果物では使用しない
@@ -78,16 +81,27 @@ impact は明示的な対応関係に基づく再確認候補取得であり、�
 - 未知の成果物役割（decision / design / implementation / verification 以外の role）
 - 存在しない要件行への参照（sidecar、inline declaration、policy.yaml の optional 列挙を含む）
 - 存在しない、または取得不能な artifact path（sidecar 参照先のファイル不在・読取不能を含む）
-- Design 対応の欠落（現行要件行で0件。全現行要件行が計上対象）
+- 隣接工程間対応を含む対応関係の参照不整合（関係の存在と参照整合の検査。採用された隣接工程間対応の機械解決の実装面が確定するまで、本項目は covers 対応関係の参照整合として解決する）
+- プロジェクトの採用した工程・成果物規約が要求する設計根拠対応の欠落（独立 Design 文書を必須とする採用の場合は Design 対応の欠落。現行の移行期デフォルトでは独立 Design 文書を必須とする運用が実効しているため、全現行要件行が計上対象として解決される）
 - 実装対応の欠落（現行要件行で0件。全現行要件行が計上対象）
 - 検証対応の欠落（検証スコープポリシーが required と判定する現行要件行で0件。Decision 対応の欠落は計上しない）
 - 検証スコープポリシーの不正（`traceability/policy.yaml` のスキーマ違反、default 値不正、optional 列挙の要件行 ID 形式違反、存在しない要件行の列挙、policy 読取不能）
-- 同一論理関係の不整合な重複（同一 artifact パス × role × 要件行 ID の組み合わせが sidecar と inline declaration の間、または同一情報源内で矛盾する状態）
+- 同一対応関係の重複宣言の不整合（同一 artifact パス × role × 要件行 ID の組み合わせが sidecar と inline declaration の間、または同一情報源内で矛盾する状態）
+
+check は構造検査（対応関係の存在と参照整合）のみを担い、check の pass は要求内容の充足（意味的品質）の証明ではない（REQ-107-004）。トレーサビリティ機構に恒久的な意味品質検証ゲートを追加しない（DEC-054、REQ-107-005）。見出しや説明節の存在だけで孤立設計事項として一律に不合格としない。計上は子要件行 ID 単位であり、追跡関係の粒度（グループ化、範囲宣言）によって、グループ内の個別に有効な要求・受け入れ条件の計上と検証義務を消さない（REQ-107-006）。
 
 検証スコープポリシーは `traceability/policy.yaml` から解決する。
 policy.yaml が存在しない場合、全現行要件行を検証対応 required として扱う（未指定 = required の安全側既定）。
 policy.yaml が読取不能またはスキーマ不適合の場合、検証対応の要否判定を不能として当該検査を不合格にする（完全性判定不能を合格として扱わない）。
 Decision 対応の欠落は不合格としない。
+
+## 正規成果物の棚卸しと宣言外候補の発見
+
+正規成果物を、宣言済みの対応関係と独立に確認（棚卸し）できる（REQ-107-003）。棚卸しは coverage・check の宣言解析を入力にせず、正規成果物の直接走査（README 索引、正規成果物の直接読取、`rg` 等の探索）で行う。
+
+- 宣言外の実在成果物・追跡候補は、発見候補（advisory・fail-open）として扱う。発見候補を対応関係の欠落と誤判定しない
+- 宣言されていない成果物の不在は正である。採用されていない参照例の工程・成果物を判定基準に含めない点は、v5-adopted-conventions Design「未採用参照例を欠落と誤判定しない判定規則」節に従う
+- 棚卸しの結果は候補提供であり、対応関係の作成・修正の最終判断は各工程（case-open、case-run、Design 確定工程）が所有する
 
 ## advisory 能力と品質ゲートとしての check の境界
 
@@ -95,6 +109,7 @@ Decision 対応の欠落は不合格としない。
 - coverage / impact を補助情報として利用する工程では、当該機能の不在または実行失敗のみを理由に workflow を恒常停止させず、独立した正規成果物確認へ fallback できる（fail-open）
 - workflow が対応完全性を完了条件として要求する時点（case-ready の ready 遷移条件、case-close の最終完全性検査）では、check が正常に完全性判定できていない状態（実行不能、読取不能、判定不能）を pass として扱わない（fail-closed）
 - 「対応関係が完全である」と「完全性を検査できなかった」を区別して返す
+- 対応関係の存在（構造検査）と要求内容の充足（意味的品質検証）は別の責務である。対応関係が完全に存在しても要求内容の充足を合格とせず、構造検査と意味的品質検証を同一のゲートに統合しない（REQ-107-004、DEC-054）
 
 ## 実装構成
 
@@ -107,6 +122,8 @@ Decision 対応の欠落は不合格としない。
 
 - ワークフロー統合の工程割り当て（REQ-021、各 command Design）
 - 性能の数値基準（受け入れ基準を設けない）
+- トレーサビリティ機構への意味品質検証ゲートの追加（DEC-054 が禁止する。構造検査と意味的品質検証の分離は本 Design が契約として維持する）
+- 採用された隣接工程間対応の宣言・保存・機械解決の実装面（採用規約機構と後続の実装 Design が所有する）
 
 ## v4 責務分類
 
