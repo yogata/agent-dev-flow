@@ -2,10 +2,10 @@
 title: agentdev-design-file-manager Design
 status: accepted
 created: 2026-07-22
-updated: 2026-10-07
+updated: 2026-10-09
 ---
 
-<!-- ADF-COVERS(design): REQ-021-013, REQ-021-026 -->
+<!-- ADF-COVERS(design): REQ-021-013, REQ-021-026, REQ-012-031（Design action 不在の要件行の保存処理を Design 保存内部責務が阻害しない設計判断） -->
 
 # agentdev-design-file-manager Design
 
@@ -115,6 +115,7 @@ docs 横断診断、証拠構造、finding 出力契約は `agentdev-doc-diagnos
 - target_area マッチング規則の適用結果（単一マッチ、複数マッチ時の warn、未検出時のスキップ + follow-up）
 - `append` 操作時の anchor マッチング、placement 別挙動の適用結果、挿入後の Markdown 構造破損がないこと
 - Design 本文が詳細仕様の置き場として成立しているか（現在形での現在構成の記述、検証可能な構成要素（スキーマ、ライフサイクル、判定表、enum 等）の具体化、リポジトリ内部設計文書としての位置づけ）。要件（満たすべき成果）と意思決定の経緯は REQ/Decision への移送候補として提示する（文書種別責務の原本は document-type-responsibilities Design）
+- 対象要件行の設計根拠対応の成立を独立した Design 文書の存在に一律依存させないこと（REQ-012-031）。Design action が存在しない要件行の保存処理を失敗扱いにせず、設計根拠対応の成立判定は case-ready の ready 遷移ゲートが担う
 - 共通検証委譲の結果（`agentdev-artifact-validation` 公開検証契約経由）
 - `docs/designs/README.md` の新規 Design エントリ登録（REQ-001-004）
 

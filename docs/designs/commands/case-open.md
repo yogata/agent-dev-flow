@@ -2,7 +2,7 @@
 title: case-open Design
 status: accepted
 created: 2026-06-21
-updated: "2026-10-07"
+updated: "2026-10-09"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-004, REQ-030-005, REQ-030-006, REQ-030-007, REQ-030-008, REQ-030-009, REQ-030-010, REQ-030-011, REQ-030-015 -->
@@ -123,9 +123,9 @@ Definition Package の生成・転記（STEP-2 / STEP-3）は、対象要件行�
 agentdev-traceability の coverage --req による当該行の design 対応有無の事前確認を実施する。
 事前確認で design 対応が欠落する意味変更行を検出した場合は、当該行の design 対応を
 artifact_actions（artifact: design）へ組込んだ上で合意を完了する。事前確認を省略した Case は
-case-ready の lifecycle gate completeness（fail-closed）で停止し得る（missing-design 既知債務の範囲で
-発生余地がある）。missing-design 0 件ゲートが増分ベース（新規行のみ）であることへの予防手順として
-位置づける。
+case-ready の lifecycle gate completeness（fail-closed）で停止し得る。プロジェクトの採用した
+工程・成果物規約が要求する設計根拠対応の欠落ゲート（missing-design、REQ-021-024）への
+予防手順として位置づける。
 
 ## review_dispositions の消費
 
@@ -147,7 +147,7 @@ case-open は、上流工程（req-define）で確定した対象要件と実行
 実行契約は実行契約候補（realization_actions 等の Definition Package 構成要素）として引き継がれ、確定は case-ready が行う。
 
 - req-define と重複して一般的な変更影響探索や依存関係探索を行い、対象範囲を再決定しない
-- 対象要件行に検証対応要否の未分類行が残る場合も Root Case の確立を妨げない（REQ-021-024）。検証対応要否の最終ゲートは case-ready が所有する
+- 対象要件行に設計根拠対応が未成立の行、または検証対応要否の未分類行が残る場合も Root Case の確立を妨げない（REQ-021-024）。設計根拠対応の成立判定と検証対応要否の最終ゲートは case-ready が所有する
 - 引き継ぎ情報に欠落があり実行契約候補の構成が不能な場合は、req-define へ差し戻す
 
 ## 参照する横断 Design
