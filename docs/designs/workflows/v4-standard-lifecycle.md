@@ -2,10 +2,12 @@
 title: ADF v4 標準ライフサイクル（語彙直交性・公開 UX・req-define 入口・継続コラボレーションループ）
 status: accepted
 created: 2026-09-18
-updated: 2026-10-07
+updated: "2026-10-09"
 ---
 <!-- ADF-COVERS(design): REQ-001-053, REQ-001-054, REQ-004-018, REQ-004-054, REQ-004-055, REQ-005-001, REQ-005-005, REQ-005-006, REQ-005-007, REQ-005-008, REQ-005-010, REQ-005-011, REQ-005-029, REQ-006-114, REQ-030-016, REQ-031-031, REQ-032-028, REQ-034-001, REQ-034-039, REQ-061-036, REQ-062-009 -->
 <!-- ADF-COVERS(design): REQ-103-014, REQ-103-015, REQ-103-030（REQ-103 のライフサイクル責務単一所有・Wave 語彙・領域別並列化の設計対応面） -->
+<!-- ADF-COVERS(design): REQ-108-001, REQ-108-002, REQ-108-003, REQ-108-004, REQ-108-005, REQ-108-006, REQ-108-007, REQ-108-008, REQ-108-009, REQ-108-010, REQ-108-011, REQ-108-012 -->
+<!-- ADF-COVERS(implementation): REQ-108-001, REQ-108-002, REQ-108-003, REQ-108-004, REQ-108-005, REQ-108-006, REQ-108-007, REQ-108-008, REQ-108-009, REQ-108-010, REQ-108-011, REQ-108-012（v5 有限実行・責務再編の構成実体は v4-standard-lifecycle の後継更新として RA-007 が後続 OU で所有する。現行実行契約の正は REQ-108-012 が維持する） -->
 
 # ADF v4 標準ライフサイクル（語彙直交性・公開 UX・req-define 入口・継続コラボレーションループ）
 
