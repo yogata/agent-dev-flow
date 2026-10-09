@@ -1,10 +1,4 @@
 component: agentdev-workflow-case-revise
-design:
-  docs/designs/commands/case-revise.md:
-    - REQ-062-006
-    - REQ-101-017
-    - REQ-101-018
-    - REQ-101-019
 implementation:
   src/common/skills/agentdev-workflow-case-revise/SKILL.md:
     - REQ-062-001
