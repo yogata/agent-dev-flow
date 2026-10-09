@@ -9,6 +9,7 @@ description: "内部 lifecycle 段階 case-revise の workflow 実装本体。�
 case-revise command の workflow 実装本体である。
 req-define で再合意済みの Definition 変更の既存 Case への反映、設計修正PRの冪等作成、Epic 完了済み Issue の影響再評価、case-ready への引き継ぎまでの制御構造を所有する。
 case-revise は新しい要求、Decision、対象範囲を自身では決定せず、意味判断は req-define が所有する。
+上流の問題は上流の無断書換えではなく正規改訂と影響再評価へ接続する。
 
 case-revise command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}）。
 

@@ -12,6 +12,7 @@ case-run 本体は orchestration に専念し、実装実行そのものは行�
 
 case-run は常に単一 Issue を処理し、Epic や Wave を処理対象とする実行契約は廃止されている。
 Wave 実行制御（Wave 構成の読み取り、現在 Wave 判定、fan-out/fan-in、子 Issue 並列起動、共有 active Issue task 枠）は case-auto の orchestration stage 3 が単一所有し、case-run 経由で case-auto の管理外の実行枠（独立実行枠）を生成できない。
+委譲内では実行範囲、入力、権限、検証条件を当該 Issue 本文と正規契約から実行中に確認できる。
 
 case-run command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}）。
 

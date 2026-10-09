@@ -2,7 +2,7 @@
 title: サブエージェント委譲契約（v4）
 status: accepted
 created: 2026-09-20
-updated: "2026-10-04"
+updated: "2026-10-09"
 ---
 <!-- ADF-COVERS(implementation): REQ-002-033, REQ-002-034 -->
 <!-- ADF-COVERS(implementation): REQ-003-001, REQ-003-002, REQ-003-003, REQ-003-004, REQ-003-006, REQ-003-011, REQ-003-012, REQ-003-014, REQ-003-020 -->
@@ -249,12 +249,22 @@ case-auto の MUST NOT DO を「実質的 Design / REQ / Decision 内容編集�
 req-define の委譲契約セクションは、各委譲について実行主体分類表を必須テンプレートとして含む。
 本分類軸は v2:ADR-0107 の成果物種別（command / skill / template / script）とは直交する。
 
+本節が実行主体分類表の正規所有 Design である（v4 -> v5 crosswalk Design「分類スキーマ」節および責務再編系 Design からの参照は本節へ付け替える）。類似仕様の実行主体分類表を他 Design へ重複新設しない。
+
 | 分類 | 意味 | 例 |
 |---|---|---|
 | adapter skill | 委譲契約、プロンプト構成、起動仕様をカプセル化した skill | `agentdev-case-run-execution-adapter` |
 | command | `/agentdev/*` 公開コマンド自体を起動主体として扱う場合 | `case-open` / `case-ready` / `case-revise` |
 | subagent | 委譲で起動されるエージェント型 | 実行担当サブエージェント（AGENTS.md で選定） |
 | harness | case-run 実行ハーネス（外部実行基盤） | 外部実行基盤（AGENTS.md で選定） |
+
+## 有限実行と委譲契約の接続（REQ-108）
+
+本節は委譲契約と ADF v5 有限実行（REQ-108）の接続を所有する。
+
+- 委譲時最小契約（inputs、side_effect_boundary、output_contract、capture_handoff）は、実行範囲、入力、権限、検証条件をその実行中に確認できる有限実行（REQ-108-001）の確認経路である。case 系の実装委譲では result 4状態契約が実行状態と処理固有結果を区別して返す。
+- 実行境界は要求・設計の正規情報を再所有しない（REQ-108-004）。委譲先は委譲時最小契約で与えられた inputs と正規成果物から再構成された SSoT に基づき、要求・設計の意味を自身の永続状態として複製しない。
+- v5 の実行モデルの実現確定までの間、本 Design の委譲時最小契約の骨格（inputs、side_effect_boundary、output_contract、capture_handoff）は変更しない（REQ-108-012 移行期権威行）。実行主体分類表の所有も本節が維持する。
 
 ## case-open push タイミング（REQ-003-003）
 

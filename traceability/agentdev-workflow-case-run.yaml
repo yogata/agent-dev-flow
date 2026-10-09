@@ -13,6 +13,7 @@ implementation:
     - REQ-031-032
     - REQ-101-008
     - REQ-101-014
+    - REQ-108-001
   src/common/skills/agentdev-workflow-case-run/references/delegation-and-result.md:
     - REQ-014-016
     - REQ-017-022

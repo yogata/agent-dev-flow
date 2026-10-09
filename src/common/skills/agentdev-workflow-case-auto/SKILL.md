@@ -9,6 +9,7 @@ case-auto command の workflow 実装本体である。
 要件doc または Issue番号から case-open → case-ready → case-run → case-close を順次自走し（req-define で再合意済みの Definition 変更がある場合は case-revise → case-ready → case-run → case-close の例外経路）、repo 内変更に限りマージまで完了する制御構造を所有する。
 orchestration stage モデル、クリーンアップ検証ゲート、Wave 反復制御、bounded parent decision resolution、コンフリクト解消 Level 2/3、停止理由分類、adversarial-review 由来の停止伝播を統合する。
 人間に留保された判断（新しい目的・価値・優先順位・対象範囲・外部契約・受け入れ条件・恒久規範、または既存正規契約だけでは解決不能な規範間優先関係の新規確定を要する判断）が必要となった場合は blocked とし、Root Case 指定の正規再開経路で req-define を再開入口として停止報告する（req-define の壁打ちを自動化しない）。
+stage 3 の共有 active Issue task 枠による実行制御は Wave や親子 Issue の個数から独立した実行制御であり、Wave は意味的な依存関係のまとまりとして扱う。v5 の実行モデルの実現確定まで本スキルの orchestration が現行実行経路の正である。
 
 case-auto command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する。
 

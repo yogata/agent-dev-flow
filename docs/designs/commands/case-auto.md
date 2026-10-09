@@ -2,7 +2,7 @@
 title: case-auto Design
 status: accepted
 created: 2026-06-21
-updated: "2026-10-07"
+updated: "2026-10-09"
 ---
 <!-- ADF-COVERS(implementation): REQ-015-012 -->
 <!-- ADF-COVERS(implementation): REQ-100-004 -->
@@ -13,6 +13,7 @@ updated: "2026-10-07"
 <!-- ADF-COVERS(verification): REQ-034-037, REQ-034-038 -->
 <!-- ADF-COVERS(implementation): REQ-003-017, REQ-003-018, REQ-006-108, REQ-034-002, REQ-034-003, REQ-034-007, REQ-034-010, REQ-034-011, REQ-034-012, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-018, REQ-034-019, REQ-034-020, REQ-034-021, REQ-034-022, REQ-034-023, REQ-034-024, REQ-034-025, REQ-034-026, REQ-034-027, REQ-034-028, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-034, REQ-034-035, REQ-034-036 -->
 <!-- ADF-COVERS(design): REQ-101-017, REQ-032-038 -->
+<!-- ADF-COVERS(design): REQ-108-002, REQ-108-008, REQ-108-012 -->
 
 # case-auto Design
 
@@ -465,6 +466,16 @@ orchestration における受け入れ義務保存の実行時投影。
 - 子 Issue の完了は当該子が負う必須完了条件で判定する。親に残る横断義務の未完了だけを理由に、条件を満たした子 Issue の終了を禁止しない。親の横断義務は Wave 収束・Epic/Root の最終終了時に評価する（Wave 収束と依存充足の両条件 gate への接続）。
 - 子からの義務投影不完全・検証不能の申告は停止伝播として扱い、完了伝播を阻止する。必須条件の未達・未証明を Gate 全体の warn 等で通過させない。
 - 誤完了拒否判定が、実際の進行・終了を許可する同じ経路で機能することを回帰試験で確認する（模擬判定のみの検証で達成としない）。
+
+## 有限実行の実行境界と責務分割への接続（REQ-108）
+
+本節は case-auto orchestration と ADF v5 有限実行（REQ-108）の接続を所有する。
+
+- 実行境界（REQ-108-001）: case 系各工程の委譲は委譲時最小契約（inputs、side_effect_boundary、output_contract、capture_handoff）により、実行範囲、入力、権限、検証条件をその実行中に確認できる有限実行として成立する。確認経路の正は v4-delegation-contracts Design「委譲時最小契約」節であり、本節は重複定義しない。
+- 責務分割（REQ-108-002）: case 系内部 lifecycle の各段階は v5 の責務分割語彙へ次のとおり対応する。case-open は Issue 協調（Root Case 確立）、case-ready は設計確定（execution contract と実行構造の確定）、case-run は実装・構築、case-close は検証と後処理（完了判定・マージ・Capture 回収）。各段階の独立終了の要件（設計形成が実装や Issue 作成を強制されずに独立終了できる）は現行では lifecycle 駆動の順序制御の下で実現しており、工程独立実行への接続は v5 の実行モデルの実現確定後に行う。
+- Wave の意味（REQ-108-008）: Wave は意味的な依存関係のまとまりである。Wave 構成は意味的依存 DAG から決定的に導出される実行構成の記録単位であり、runtime 上の batch や一時直列化を Wave 分割として永続化しない（「runtime 制御契約」節）。
+- 並列実行上限の実行制御独立（REQ-108-008、DEC-051 継承）: 共有 active Issue task 数の上限は Wave の個数や親子 Issue の個数から独立した実行制御であり（「並列実行の判定」「runtime 制御契約」節が正）、Epic・Wave・Standard Issue・case-run 呼び出しごとの独立した実行枠を設けない。
+- 移行期権威行（REQ-108-012）: v5 の実行モデルの実現確定までの間、本 Design と現行の実行契約（REQ-005、REQ-006、REQ-030〜032、REQ-034、REQ-035、REQ-061、REQ-062）が実行経路の正である。v5 モデルと両立しない現行要件行の再定義は、v4 -> v5 crosswalk（[../foundations/references/v4-v5-crosswalk.md](../foundations/references/v4-v5-crosswalk.md)）が優先順位を付けて棚卸し対象として管理し、本 Design は対象行の再定義を実行しない。
 
 ## See Also
 

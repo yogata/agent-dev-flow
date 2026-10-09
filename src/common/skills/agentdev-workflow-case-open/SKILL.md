@@ -9,6 +9,7 @@ description: "case-open workflow 本体。Root Case と Definition Package を�
 case-open command の workflow 実装本体である。
 合意済み要件doc（構造化 `draft-data`）から Root Case 確立、Definition Package 生成と Root Case 関連付け、実変更判定と設計PR作成、冪等再実行、deviation captureまでの制御構造を所有する。
 execution contract の確定、Standard / Epic の最終確定、Child Issue / Wave の作成、RU 削除、proposed Decision の受理評価は行わない（case-ready 実行契約 REQ へ移管）。
+Root Case 確立は価値がある有限作業における Issue の必要時利用であり、case-open 自身は要求・設計の正規情報を再所有しない（合意済み入力の反映に限定する）。
 
 case-open command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}）。
 

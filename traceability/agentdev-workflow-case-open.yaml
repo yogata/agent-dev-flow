@@ -21,6 +21,7 @@ implementation:
     - REQ-083-003
     - REQ-100-001
     - REQ-100-006
+    - REQ-108-004
   src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md:
     - REQ-083-001
     - REQ-030-017

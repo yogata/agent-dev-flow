@@ -2,9 +2,10 @@
 title: backlog-auto Design
 status: accepted
 created: 2026-08-17
-updated: "2026-09-20"
+updated: "2026-10-09"
 ---
 <!-- ADF-COVERS(implementation): REQ-041-001, REQ-041-002, REQ-041-003, REQ-041-004, REQ-041-005, REQ-041-006, REQ-041-007, REQ-041-008, REQ-041-009, REQ-041-010, REQ-041-011, REQ-041-012, REQ-041-013, REQ-041-014, REQ-041-015, REQ-041-016 -->
+<!-- ADF-COVERS(design): REQ-108-011 -->
 
 # backlog-auto Design
 
@@ -42,6 +43,14 @@ updated: "2026-09-20"
 
 - 実行順序は inspect-docs → 昇格3系統（learning-promote、intake-promote、inspect-promote）→ backlog-review の順とし、工程間の開始条件ゲートを制御する
 - workflow 実装本体（orchestration stage 構成、直列化契約、fan-in 判定、resume 契約）は Workflow Skill（`agentdev-workflow-backlog-auto`）が所有し、本 Design はこれらを複製しない
+
+## 有限実行における要求蓄積入口の維持（REQ-108-011）
+
+本節は backlog 系と ADF v5 有限実行（REQ-108）の接続を所有する。
+
+- backlog-auto は backlog-driven の要求入口であり、Intake・Learning・Backlog を継続的な発見・改善と要件化への接続能力として維持する（REQ-108-011）。発見・学習情報は必要な評価と承認（昇格3系統の HITL、backlog-review の承認）を経て RU となり、req-define → case-auto へ渡される。実行から生じた改善情報も Capture 経路で同じ循環へ戻る。
+- 旧公開コマンド名や旧内部状態の維持を合否条件としない（REQ-108-011）。v5 の実行モデルの実現確定に伴う公開経路の再構成があっても、発見から要件化・実行・検証への接続能力の維持が本 Design の合格条件である。
+- v5 の実行モデルの実現確定までの間、本節の運用は現行の実行契約（REQ-108-012 移行期権威行）の下で行う。循環の実現手段の v5 向け処遇は v4 -> v5 crosswalk（[../foundations/references/v4-v5-crosswalk.md](../foundations/references/v4-v5-crosswalk.md)）の棚卸し対象として管理する。
 
 ## 参照する横断 Design
 

@@ -9,6 +9,7 @@ description: "case-ready workflow 本体。Definition PR 受入、canonical Defi
 case-ready command の workflow 実装本体である。
 設計PR受入、canonical Definition 再取得、Decision 受理評価、execution contract 確定、Standard / Epic 確定、トレーサビリティ完全性ゲート、ready 遷移、draft / RU 削除、冪等再実行までの制御構造を所有する。
 case-ready は Definition 確定境界として単一責務を保ち、REQ / Decision / Design の保存実体は Capability Skill へ委譲する（保存手続きを実装しない）。
+Wave は意味的な依存関係のまとまりとして扱い、Wave 構成の導出は実行上限の数値に依存しない。
 
 case-ready command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}）。
 
