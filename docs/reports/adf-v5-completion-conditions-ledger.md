@@ -198,6 +198,42 @@ G4 の反例 14 種は反例投入ハーネス（bun test、REQ-060 実行形態
 
 偽陽性を検出した場合、対象機能の判定ではなく検証器側を fail として扱い、本節へ fail 記録を追記する（REQ-110-003）。
 
+## 独立検証の記録（REQ-110-004）
+
+REQ-110-004（実装担当と区別された検証担当による独立検証）の実現として、v5-completion-judgment Design「独立検証の手続き」節に従い、実装委譲（DEL-3577-1／DEL-3578-1／DEL-3579-1）とは別の検証専用委譲が Wave-1 成果（完遂判定器・完遂条件台帳・反例投入ハーネス・タグ・版運用・移行照合）を元データ（REQ・Decision・Design・証跡実体）から再評価した。本節はその由来情報つき証拠であり、実装側の合格報告の再掲ではない。実装側 PR 本文（#3581／#3582／#3583）は突合対象として証跡実体参照したのみであり、本節の数値と結果は検証専用セッションの新規観測である。
+
+### 由来情報
+
+| 由来要素 | 値 |
+|---|---|
+| 実行セッション | 検証専用委譲 DEL-3580-1（Epic #3575 Wave-2・Issue #3580。実装委譲 DEL-3577-1／DEL-3578-1／DEL-3579-1 と区別された別セッション） |
+| 作成主体 | 検証専用委譲。委譲種別の参考分類は gate_check（書き込み禁止・正規状態を操作しない）+ 決定的検査の Script 優先 + 意味評価の semantic_review（v4-delegation-contracts Design） |
+| 検証実施時刻 | 2026-10-10 03:31 〜 03:50 JST（UTC: 2026-10-09T18:31Z 〜 18:50Z） |
+| 実行環境 | Windows（win32）・bun 1.3.6・worktree .worktrees/3580-feature（作成元 origin/main @ 6fa6e76a） |
+| 入力参照（元データ・直接読取） | docs/requirements/REQ-110.md、docs/decisions/DEC-057.md、docs/designs/quality/v5-completion-judgment.md、docs/reports/adf-v5-completion-conditions-ledger.md、docs/requirements/REQ-104.md〜REQ-109.md（いずれも worktree @ 6fa6e76a で直接読取） |
+| 入力参照（証跡実体・コード） | .opencode/skills/repo-agentdev-integrity/scripts/check_completion_judgment_path.ts（#3577・merge commit e094c2eb）、scripts/completion-judgment/ 配下 7 ファイル（case-catalog・isolation・counterexample_harness.test・false_positive.test・ledger_coverage.test は #3578・f8623787、tag_version_procedure・migration_continuity は #3579・55d37246。いずれも worktree @ 6fa6e76a で直接読取） |
+| 入力参照（証跡実体・PR 本文） | Wave-1 実装側 PR 本文 #3581／#3582／#3583。突合対象として読取したのみであり、合格報告の転記は行っていない |
+
+### 独立検証の結果
+
+| 検証ID | 検証内容 | 検証方法 | 結果 | 観測証跡 |
+|---|---|---|---|---|
+| IV-1 | 前提確認: 完遂判定器の存在と実行可能性 | 判定器 CLI 再実行（bun ./.opencode/skills/repo-agentdev-integrity/scripts/check_completion_judgment_path.ts、cwd=worktree root、./ prefix 付き、exit code・列挙件数・bypass を観測） | ok=true、bypass=0、trigger points 80（single-path 42・exempted 38）、roots_scanned 4・files_scanned 618・reference_lines 2585、exit 0 | 本委譲セッションの新規観測。stdout/stderr を .agentdev/tmp/ へ UTF-8 明示で退避（PR 作成後に削除。本行が一次記録） |
+| IV-2 | 前提確認: bun test 実行可能性（3分割正規形） | suite ①（repo-agentdev-integrity scripts・timeout 600000ms・278.0s）、suite ②（src/common/skills・0.4s）、suite ③（scripts・125.5s）＋main root 実体からの読取専用補完（.opencode/plugins・38.5s）。全て stdout/stderr を spawnSync + writeFileSync（UTF-8 明示）で退避 | ①2798 pass・0 fail／②353 pass・0 fail／③304 pass・0 fail／補完 352 pass・0 fail。全て exit 0。fail 0 件のため由来分類の記録対象なし（IR-055 系 timeout flake も未発生） | 本委譲セッションの新規観測。bun-test-suite-summary.json ほか .agentdev/tmp/ 退避（PR 作成後に削除） |
+| IV-3 | 台帳様式の照合（7 記録要素・58 義務行対応表・G4 反例 14 種） | Design「完遂条件台帳の様式」節・「G4 反例カタログ（期待挙動表）」節と台帳本文の直接照合＋ledger_coverage.test.ts（suite ① 内）の pass 観測 | 記録要素 7 項目、対応要件行割当表 58 行（追加行 6 行含む）、ゲート行 G0〜G10 の 11 行、反例 14 種の行順・期待挙動が Design と一致 | 本委譲セッションの直接照合＋suite ① ledger_coverage pass |
+| IV-4 | 反例カタログ正投影の再評価（Design 本体・台帳・コードの三重照合） | case-catalog.ts の 14 反例を Design 期待挙動表・台帳反例表と行順で直接照合。識別規則が REQ 義務行から導出され、実行結果から生成しない構造であることをコード読取で確認。counterexample_harness.test.ts の三重照合 test pass を観測 | 行順・名称・期待挙動（reject 8・reserve 3・recover 2・verifier-fail 1・計 14）が三者で一致。識別規則の根拠義務行は台帳反例表と一致 | 本委譲セッションの直接照合 |
+| IV-5 | 隔離環境の正規状態非破壊構造 | isolation.ts 直接読取（OS 一時ディレクトリ配下限定の isInsideOsTempDir・cleanup・模擬宣言は採用規約機構へ非接続）＋suite ① 内隔離 test の pass 観測 | 構造的に正規状態へ書き込まない（REQ-110-002・Design「独立検証の手続き」節の書込み禁止型委譲の前提に適合） | 本委譲セッションの直接照合 |
+| IV-6 | 検証器偽陽性確認手続きの再評価 | false_positive.test.ts と verifyDetector の直接読取（正常系投入と反例投入の双方で false-pass／false-fail を検出し、偽陽性注入シミュレーションで verifier-fail 経路を実証する構造）＋suite ① pass 観測 | REQ-110-003・Design「検証器偽陽性の確認手順」節に適合。台帳「検証器偽陽性の確認記録」節の 3 確認項目と手続きが対応 | 本委譲セッションの直接照合 |
+| IV-7 | 迂回経路反証検査の再評価 | 判定器の SCAN_ROOTS（src・.opencode・docs/designs・scripts の 4 root）と See Also 参照行検出対象外の扱いをコード直接照合＋IV-1 の再実行結果 | Design「迂回経路の反証検査」節の列挙対象・検出対象外の扱い・bypass 0 件の合格条件に適合 | 本委譲セッションの直接照合＋IV-1 |
+| IV-8 | タグ固定点の独立確認 | git rev-parse "v5.0.0^{commit}"（読取専用・自セッション実行）と tag_version_procedure.ts のコード読取（読取照合のみでタグの作成・移動・削除を行わない構造） | v5.0.0 → 025b25474fd6143da6627c5e80c4b17f09a4e11c（固定点 025b2547 と一致・タグ移動なし）。REQ-110-007・Design「タグ・版運用手順」節に適合 | 本委譲セッションの新規観測 |
+| IV-9 | traceability check（REQ-110-004・9 検出項目） | agentdev-traceability の check（main root 実体・読取専用。--root worktree --req REQ-110-004） | 9 検出項目すべて pass・0 fail・exit 0。verification policy は REQ-110-004 を optional 指定（missing-verification 計上対象外）で整合 | 本委譲セッションの新規観測 |
+| IV-10 | 実装側報告との突合（自セッション観測との一致確認） | Wave-1 実装側 PR 本文（#3581／#3582／#3583）の報告値と IV-1／IV-2 の自セッション観測を突合 | suite ②・③・plugins 補完は pass/fail 完全一致。判定器は構造値（起動点 80・42/38・bypass 0）一致。suite ① は fail 0 で一致（pass 数増分は #3578/#3579 由来の追加テスト分。files_scanned の差 614→618 は worktree 投影構成差による環境値） | 本委譲セッションの突合記録 |
+
+### 独立検証で確認した不一致・反例
+
+- blocked 判定事由となる Wave-1 成果の欠陥（検証器・guard・台帳の欠陥）は検出しなかった。
+- 参考記録: Wave-1 実装側 PR #3582 本文の検証差分セクション（完了条件 2 照合行）の反例内訳表記が「reject 7・reserve 3・recover 2・verifier-fail 1」となっているが、恒久成果物（case-catalog.ts・台帳反例表・Design 期待挙動表）の正は reject 8・reserve 3・recover 2・verifier-fail 1（計 14）であり三者で一致する。PR 本文の一時報告チャネル上の表記差異のみであり、恒久成果物・台帳・検証結果への影響はない。
+
 ## See Also
 
 - REQ-110（完遂判定の強制）、DEC-057（単一正規完遂経路と機械的拒否）
