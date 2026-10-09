@@ -17,7 +17,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 61件、廃止済み: 19件
+現行 REQ: 67件、廃止済み: 19件
 <!-- AUTOGEN:END -->
 
 現行要件は61件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
@@ -90,6 +90,12 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [REQ-101](requirements/REQ-101.md) | Case Issue 工程記録モデル |
 | [REQ-102](requirements/REQ-102.md) | Git 操作の非対話認証 |
 | [REQ-103](requirements/REQ-103.md) | ADF v4 正規モデル再確定と現行規範の全面収束 |
+| [REQ-104](requirements/REQ-104.md) | ADF v5 基盤要件（共通責務とプロジェクト別工程構成） |
+| [REQ-105](requirements/REQ-105.md) | ADF v5 成果物の意味と工程別正式確定 |
+| [REQ-106](requirements/REQ-106.md) | ADF v5 差分・変更影響と増分更新 |
+| [REQ-107](requirements/REQ-107.md) | ADF v5 工程間追跡と品質検証の責務分離 |
+| [REQ-108](requirements/REQ-108.md) | ADF v5 有限実行とワークフロー責務再編 |
+| [REQ-109](requirements/REQ-109.md) | ADF v5 移行と互換性の境界 |
 <!-- AUTOGEN:END -->
 
 - [要件インデックス](requirements/README.md)
@@ -132,11 +138,11 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-030](decisions/DEC-030.md) | トレーサビリティ標準機能への一般化と producer / consumer 境界の確立（superseded by DEC-037） |
 | [DEC-031](decisions/DEC-031.md) | ADF v4 Standard Operating Model の採用とプロセス・実装の責務分離 |
 | [DEC-032](decisions/DEC-032.md) | ADF 責務の三層モデルと Project Contract の論理ビュー・情報寿命モデル |
-| [DEC-033](decisions/DEC-033.md) | ADF v4 公開運用モデル（UX 2入口収斂・内部 lifecycle・継続コラボレーションループ・学習昇格ガード） |
-| [DEC-034](decisions/DEC-034.md) | v4 の移行・release 標準境界（非破壊移行原則・v4.0.0-rc.1 cutover・self-hosting） |
+| [DEC-033](decisions/DEC-033.md) | ADF v4 公開運用モデル（UX 2入口収斂・内部 lifecycle・継続コラボレーションループ・学習昇格ガード）（superseded by DEC-055〔Wave を実行スケジューリング単位とする規定を DEC-055 が置換（Wave＝意味的な依存関係のまとまり、並列上限は独立した実行制御）。UX 2入口収斂、内部 lifecycle、継続コラボレーションループ、学習昇格ガード、work_type/scale/Epic の規定は維持する〕） |
+| [DEC-034](decisions/DEC-034.md) | v4 の移行・release 標準境界（非破壊移行原則・v4.0.0-rc.1 cutover・self-hosting）（superseded by DEC-056〔v4→v5 移行への手順・切替構成の直接適用を DEC-056 が置換。非破壊移行原則（決定1）と検証重視は維持する。決定2・3の v4.0.0-rc.1 cutover と v4.0.0 release 条件は v3→v4 移行の歴史的記録として維持する〕） |
 | [DEC-035](decisions/DEC-035.md) | v4 Quality / Verification / Evidence / Gate モデルへの分解 |
 | [DEC-036](decisions/DEC-036.md) | 意味 Skill と決定的実装の責務分離および Harness/Backend adapter 境界（superseded by DEC-048〔決定(1)（deterministic 処理／semantic 判断の二分法）は DEC-048 が部分置換。決定(2)（Harness/Backend adapter 境界）のうち配備形態（原本配置・投影モデル）に関する部分は DEC-049（ADF 共通原本とホスト接続領域の分離）が部分置換する。責務境界（semantic contract と実行機構の分離）、adapter 追加契機、決定(3)（Project Extensions の位置づけ）は本 Decision が維持する（status: accepted 維持）。semantic 6 項目・deterministic 11 項目の列挙の後継は foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節が所有する。〕） |
-| [DEC-037](decisions/DEC-037.md) | Traceability の Change / Evidence 中心への再中心化 |
+| [DEC-037](decisions/DEC-037.md) | Traceability の Change / Evidence 中心への再中心化（superseded by DEC-054〔トレーサビリティモデルの標準関係構造（Design への定義権委譲を前提とした covers 単独の標準コア関係を含む）を DEC-054 が拡張（covers＋採用された隣接工程間対応）。直接走査、標準能力（coverage/impact/check）、用語政策の各決定は維持する〕） |
 | [DEC-038](decisions/DEC-038.md) | ADF v4 durable state 配置と再構成の契約（状態権威・証跡分離・非原子調整原則） |
 | [DEC-039](decisions/DEC-039.md) | ADF v4 authority・副作用統制と冪等・並行性モデル |
 | [DEC-040](decisions/DEC-040.md) | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化）（superseded by DEC-044〔決定4 は DEC-044 が置換。決定2 は DEC-046 が置換。決定1・3は維持〕） |
@@ -152,6 +158,10 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-050](decisions/DEC-050.md) | deleteBranchOnMerge 設定不備の警告化と操作安全性停止の維持 |
 | [DEC-051](decisions/DEC-051.md) | case-auto stage 3 のスロット型キューへの移行（Wave 収束前提の撤廃） |
 | [DEC-052](decisions/DEC-052.md) | Jev 評価器障害時の判定未確定と依存後続抑止への移行（DEC-044 決定3 の部分置換） |
+| [DEC-053](decisions/DEC-053.md) | ADF v5 工程・成果物モデル（共通責務・参照モデル工程・成果物の意味と正式確定） |
+| [DEC-054](decisions/DEC-054.md) | ADF v5 追跡・品質検証モデル（隣接工程間対応・構造/意味分離・差分影響評価） |
+| [DEC-055](decisions/DEC-055.md) | ADF v5 有限実行と責務再編（工程独立実行・Issue 必要時利用・Wave の意味的依存グループ化） |
+| [DEC-056](decisions/DEC-056.md) | ADF v5 移行と互換性の境界（後方互換非必須・意味保存移行・未処理改善情報の継続） |
 <!-- AUTOGEN:END -->
 
 ## 設計（Design）
