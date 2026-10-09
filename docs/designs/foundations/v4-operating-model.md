@@ -8,7 +8,7 @@ updated: "2026-10-09"
 <!-- ADF-COVERS(design): REQ-103-001, REQ-103-020, REQ-103-021, REQ-103-027（REQ-103 の v4 正規モデル・情報寿命・中核維持の設計対応面） -->
 <!-- ADF-COVERS(implementation): REQ-103-001, REQ-103-027（REQ-103 の正規モデル要素と正規所有 Design の対応表と「v4 の中核と維持条件」節が、正規モデル一意説明・中核 5 要素維持契約の構成実体） -->
 <!-- ADF-COVERS(implementation): REQ-103-029, REQ-103-030, REQ-103-031（REQ-103 の有限完了・並列化と横断整合確認・AC 個別判定の完了記録面。判定記録本体は docs/reports/req-103-ac-judgment-wave3.md。並列実行基盤実体は agentdev-workflow-case-auto 側） -->
-<!-- ADF-COVERS(design): REQ-104-001, REQ-104-002, REQ-104-003, REQ-104-004, REQ-104-005, REQ-104-006, REQ-104-007, REQ-105-001, REQ-105-002, REQ-105-003, REQ-105-004, REQ-105-005, REQ-105-006, REQ-105-007, REQ-105-008 -->
+<!-- ADF-COVERS(design): REQ-104-001, REQ-104-002, REQ-104-005, REQ-104-006, REQ-104-007, REQ-105-001, REQ-105-002, REQ-105-003, REQ-105-004, REQ-105-005, REQ-105-006, REQ-105-007（採用済み工程・成果物の解決と保持、移行期デフォルトの設計対応は foundations/v5-adopted-conventions.md が所有する） -->
 <!-- ADF-COVERS(implementation): REQ-104-001, REQ-104-002, REQ-104-003, REQ-104-004, REQ-104-005, REQ-104-006, REQ-104-007, REQ-105-001, REQ-105-002, REQ-105-003, REQ-105-004, REQ-105-005, REQ-105-006, REQ-105-007, REQ-105-008（v5 基盤要件の設計・構成実体は v4-operating-model の後継更新として RA-003/RA-004 が後続 OU で所有する） -->
 
 # ADF v4 Operating Model（目的・三層責務・Project Contract・寿命・文書モデル）

@@ -210,6 +210,7 @@ status（draft / accepted）を含む完全一覧は [Design インデックス]
 - [マルチホスト原本モデル（共通原本とホスト別接続の分離）](designs/foundations/multi-host-canonical-model.md)
 - [ADF v4 durable state と再構成・恢復（配置表・権威移行・部分失敗調整）](designs/foundations/v4-durable-state-and-recovery.md)
 - [ADF v4 Runtime 実行モデル（authority 格子・直列化単位・冪等経路・runtime 制御ループ）](designs/foundations/v4-runtime-execution-model.md)
+- [ADF v5 採用規約機構（採用済み工程・成果物規約の宣言・保存・解決）](designs/foundations/v5-adopted-conventions.md)
 
 #### responsibilities/（文書種別、成果物責務）
 
