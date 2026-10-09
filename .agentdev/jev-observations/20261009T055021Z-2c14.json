@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261009T055021Z-2c14",
+  "workflow": "case-ready",
+  "evaluationKind": "scope-overlap-detection",
+  "subject": "Root Case #3560（既存オープン Issue との対象範囲交差判定）",
+  "sourceRevision": "7b297fbc",
+  "durationMs": 244,
+  "inputTokens": 897,
+  "inputs": {
+    "requestDigest": "5af06e8dec395d7a7e9d2f40cebdf243eaec75b68dde8d54ff925dad39784401"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-scope-overlap",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.43,
+        "false": 0.5700000000000001
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-scope-overlap",
+        "value": false
+      }
+    ]
+  }
+}

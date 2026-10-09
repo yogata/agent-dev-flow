@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261009T054744Z-29cf",
+  "workflow": "case-ready",
+  "evaluationKind": "standard-epic-attribution",
+  "subject": "Root Case #3560（ADF v5.0.0 世代交代要件。6 OU 単一連結成分の実行構造帰属判断）",
+  "sourceRevision": "7b297fbc",
+  "durationMs": 1275,
+  "inputTokens": 2033,
+  "inputs": {
+    "requestDigest": "3f8378288cf68318ef7760aa176b1899d0e02c82f29f7994fa532d01f8589f2c"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-attribution",
+      "questionForm": "choice",
+      "value": "Epic",
+      "probabilityDistribution": {
+        "Standard": 0.03,
+        "Epic": 0.97
+      }
+    },
+    {
+      "questionId": "q2-dependency-strength",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "関連": 0.01,
+        "弱": 0.01,
+        "必須": 0.98
+      }
+    },
+    {
+      "questionId": "q3-functional-coherence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "分散": 0.01,
+        "部分的": 0.31,
+        "一貫": 0.6799999999999999
+      }
+    }
+  ],
+  "confidence": 0.94,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-attribution",
+        "value": "Epic"
+      },
+      {
+        "questionId": "q2-dependency-strength",
+        "value": 2
+      },
+      {
+        "questionId": "q3-functional-coherence",
+        "value": 2
+      }
+    ]
+  }
+}
