@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261009T155440Z-78b2",
+  "workflow": "case-ready",
+  "evaluationKind": "scope-overlap-detection",
+  "subject": "Case #3575 の Epic・Child Issue 構成と既存オープン Issue とのスコープ重複判定",
+  "sourceRevision": "050874c9",
+  "durationMs": 279,
+  "inputTokens": 647,
+  "inputs": {
+    "requestDigest": "fcd6365238ae7ccfbb6d4fd92172f263667bf78af6fa4ac9281d338060e4eceb"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "scope-overlap",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.13,
+        "false": 0.87
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "scope-overlap",
+        "value": false
+      }
+    ]
+  }
+}

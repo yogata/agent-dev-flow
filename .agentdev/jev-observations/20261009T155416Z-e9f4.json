@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261009T155416Z-e9f4",
+  "workflow": "case-ready",
+  "evaluationKind": "wave-structure-judgment",
+  "subject": "Case #3575 Epic 構成の Wave 構成判断（並列可否・重複処置）",
+  "sourceRevision": "050874c9",
+  "durationMs": 631,
+  "inputTokens": 1182,
+  "inputs": {
+    "requestDigest": "af32e758e219a57a86ea89fff1810a5cd18042921822b65012bf1a896393c7f9"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "parallel-ok",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.94,
+        "false": 0.06000000000000005
+      }
+    },
+    {
+      "questionId": "overlap-disposition",
+      "questionForm": "choice",
+      "value": "重複許容（衝突解消の担当とマージ順序の事前記録を含む）",
+      "probabilityDistribution": {
+        "変更対象分割": 0.1,
+        "重複許容（衝突解消の担当とマージ順序の事前記録を含む）": 0.9
+      }
+    }
+  ],
+  "confidence": 0.8,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "parallel-ok",
+        "value": true
+      },
+      {
+        "questionId": "overlap-disposition",
+        "value": "重複許容（衝突解消の担当とマージ順序の事前記録を含む）"
+      }
+    ]
+  }
+}

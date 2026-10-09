@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261009T155309Z-793e",
+  "workflow": "case-ready",
+  "evaluationKind": "standard-epic-attribution",
+  "subject": "Case #3575（ADF v5 完遂判定強制）の実行構造確定（Standard / Epic 確定・3軸判断）",
+  "sourceRevision": "050874c9",
+  "durationMs": 1317,
+  "inputTokens": 1678,
+  "inputs": {
+    "requestDigest": "631490176e0a4af774d743654d9b4eca1b8dd8cea4d047289744478bfc4b81d4"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-attribution",
+      "questionForm": "choice",
+      "value": "Epic",
+      "probabilityDistribution": {
+        "Standard": 0.04,
+        "Epic": 0.96
+      }
+    },
+    {
+      "questionId": "dependency-strength",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "関連 = 同じ領域だが実行依存なし": 0.02,
+        "弱 = 実行順序の推奨はあるが並列可": 0.02,
+        "必須 = 一方が他方なしでは成立しない": 0.96
+      }
+    },
+    {
+      "questionId": "functional-coherence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "分散 = 共通主題なし": 0,
+        "部分的 = 関連するが単一主題ではない": 0,
+        "一貫 = 単一の機能的主題": 1
+      }
+    }
+  ],
+  "confidence": 0.92,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-attribution",
+        "value": "Epic"
+      },
+      {
+        "questionId": "dependency-strength",
+        "value": 2
+      },
+      {
+        "questionId": "functional-coherence",
+        "value": 2
+      }
+    ]
+  }
+}
