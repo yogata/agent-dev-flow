@@ -188,6 +188,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | foundations/v4-migration-and-release.md | accepted | ADF v4 Migration と Release の標準境界 | 標準 migration pattern（非破壊移行原則）、RC tag 運用と cutover sequence、pilot migration と v4.0.0 final 条件、v3-baseline と rollback anchor。移行アーキテクチャの原則の正は DEC-034 |
 | foundations/v4-durable-state-and-recovery.md | accepted | ADF v4 durable state と再構成・恢復（配置表・権威移行・部分失敗調整） | durable state の 5 分類と配置表、状態と証跡の分離、導出可能情報の判定基準、再構成優先順位の全実行単位への一般化、権威移行点、部分失敗の調整の定義 |
 | foundations/v4-runtime-execution-model.md | accepted | ADF v4 Runtime 実行モデル（authority 格子・直列化単位・冪等経路・runtime 制御ループ） | 副作用 4 分類と authority 格子、直列化単位 5 種、冪等経路、直列化違反・競合検出時の意味論、runtime 制御ループ、fail-closed 適用範囲の定義 |
+| foundations/v5-adopted-conventions.md | draft | ADF v5 採用規約機構（採用済み工程・成果物規約の宣言・保存・解決） | 採用済み工程・工程間関係・必須成果物（採用規約）の宣言・保存・解決機構、移行期デフォルトとの接続、未採用参照例を欠落と誤判定しない判定規則の定義 |
 
 #### responsibilities/（文書種別、成果物責務）
 
