@@ -10,7 +10,7 @@
 DEC-018 は欠番であり、対応する Decision ファイルは存在しない。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は46件、提案中の Decision は1件である。
+現行の承認済み Decision は47件、提案中の Decision は0件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -71,7 +71,7 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 | DEC-054 | ADF v5 追跡・品質検証モデル（隣接工程間対応・構造/意味分離・差分影響評価） | accepted | 2026-10-09 |
 | DEC-055 | ADF v5 有限実行と責務再編（工程独立実行・Issue 必要時利用・Wave の意味的依存グループ化） | accepted | 2026-10-09 |
 | DEC-056 | ADF v5 移行と互換性の境界（後方互換非必須・意味保存移行・未処理改善情報の継続） | accepted | 2026-10-09 |
-| DEC-057 | ADF v5 完遂判定の強制（単一の正規完遂経路への集約と迂回経路の機械的拒否） | proposed | 2026-10-10 |
+| DEC-057 | ADF v5 完遂判定の強制（単一の正規完遂経路への集約と迂回経路の機械的拒否） | accepted | 2026-10-10 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -130,12 +130,12 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 - [DEC-054](DEC-054.md)（ADF v5 追跡・品質検証モデル（隣接工程間対応・構造/意味分離・差分影響評価））
 - [DEC-055](DEC-055.md)（ADF v5 有限実行と責務再編（工程独立実行・Issue 必要時利用・Wave の意味的依存グループ化））
 - [DEC-056](DEC-056.md)（ADF v5 移行と互換性の境界（後方互換非必須・意味保存移行・未処理改善情報の継続））
+- [DEC-057](DEC-057.md)（ADF v5 完遂判定の強制（単一の正規完遂経路への集約と迂回経路の機械的拒否））
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
-- [DEC-057](DEC-057.md)（ADF v5 完遂判定の強制（単一の正規完遂経路への集約と迂回経路の機械的拒否））
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
