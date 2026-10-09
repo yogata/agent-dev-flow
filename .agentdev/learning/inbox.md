@@ -309,3 +309,115 @@
 - **想定反映先**: case-open reference（definition-pr-and-idempotency.md）への baseline 手順補足候補
 - **関連**: Root Case #3575、PR #3576、.opencode/skills/repo-agentdev-integrity/baselines/ng-baseline.json
 - **タグ**: `#check-integrity` `#ng-baseline` `#proposed-decision` `#case-open`
+
+## bun test の実行サマリ（pass・fail 行）は stderr へ出力され stdout のみ退避では pass・fail 証跡が失われる
+
+- **問題事象**: spawnSync による bun test 証跡退避で stdout のみ退避した際、実行サマリ（pass・fail 行）が記録されず pass・fail 証跡が失われた。初回実行で事象を確認し stderr 退避を追加した
+- **発生局面**: 検証（Epic #3575 Wave-1、Issue #3577 case-run 実装実行）
+- **検知方法**: 退避した stdout ファイルに実行サマリが不在であることの確認
+- **根本原因**: bun test は実行サマリ（pass・fail 行）を stdout ではなく stderr へ出力する
+- **自律対応内容**: spawnSync による証跡退避で stdout と stderr の双方を退避するよう修正し、以後の検証で pass・fail 証跡を保持した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（証跡退避手順の補正。契約変更なし）
+- **横展開観点**: bun test を spawnSync 等で実行し証跡を退避する全検証工程
+- **再発条件**: spawnSync で bun test を実行し stdout のみを退避した場合
+- **予防策候補**: bun test の証跡退避では stdout と stderr の双方を退避する（stderr に実行サマリが含まれる）
+- **想定反映先**: 検証証跡退避手順への補足候補
+- **関連**: Epic #3575、Issue #3577、PR #3581
+- **タグ**: `#bun-test` `#stderr` `#evidence-capture` `#case-run`
+
+## worktree の bun test 分割実行で .opencode/plugins が junction 未伝播により対象欠落になり main root 実体からの読取専用補完実行で補う
+
+- **問題事象**: worktree root で bun test 分割③（./.opencode/plugins/ ./scripts/）を実行したところ、.opencode/plugins が junction 未伝播で対象欠落になり、bun test は残る ./scripts/ のみで成立した
+- **発生局面**: 検証（Epic #3575 Wave-1、Issue #3577/#3578/#3579 case-run 実装実行）
+- **検知方法**: bun test の対象ファイル数観測と plugins 配下 test が実行されないことの確認
+- **根本原因**: worktree へ .opencode/skills/agentdev-* および plugins の junction は伝播しない既知の環境差（構造的制約）
+- **自律対応内容**: plugins 部分は main root 実体からの読取専用補完実行（352 pass・0 fail）で補い、worktree への書込みを行わなかった（委譲契約どおり）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既知環境差への contingency 適用。契約変更なし）
+- **横展開観点**: worktree 内で bun test 全対象を要求する全検証工程
+- **再発条件**: worktree root で .opencode/plugins 配下の test を実行する場合
+- **予防策候補**: plugins 配下の test は main root 実体からの読取専用補完実行で補完する（worktree への書込みなし）
+- **想定反映先**: worktree 検証手順・bun test 実行形態契約への補足候補
+- **関連**: Epic #3575、Issue #3577、PR #3581、既存学び「worktree の junction 未伝播」系（case-open traceability gate と同根の構造的制約）
+- **タグ**: `#bun-test` `#worktree` `#junction-unpropagated` `#evidence-capture`
+
+## 恒久 typecheck 対象外ファイルの潜在型エラーは一時 tsconfig での依存込み検査で検出する
+
+- **問題事象**: lib/glob_walk.ts に noUncheckedIndexedAccess 設定下での潜在型エラー（segments 末尾要素の undefined 可能性）が残存していた。恒久 typecheck では検出されない状態で共有 lib に混入していた
+- **発生局面**: 実装（Epic #3575 Wave-1、Issue #3577 case-run 実装実行）
+- **検知方法**: 新規 checker を対象とした一時 tsconfig による typecheck 実行
+- **根本原因**: repo-local integrity scripts の恒久 typecheck 対象は distribution-boundary subset に限定され、対象外ファイルの型エラーは恒久 typecheck では検出されない
+- **自律対応内容**: glob_walk.ts の型エラーを非動作変更で解消し同一 PR に含めた（新規 checker の typecheck 依存の解消）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（typecheck 手順の補正。契約変更なし）
+- **横展開観点**: repo-local integrity scripts 配下の新規 .ts 追加全般
+- **再発条件**: 恒久 typecheck 対象外ファイルに依存する新規 checker を追加した場合
+- **予防策候補**: 新規 checker を typecheck する場合は一時 tsconfig（package compilerOptions 踏襲）で依存込み検査を実施する
+- **想定反映先**: repo-agentdev-integrity scripts の typecheck 手順への補足候補
+- **関連**: Epic #3575、Issue #3577、PR #3581
+- **タグ**: `#typecheck` `#no-unchecked-indexed-access` `#integrity-scripts` `#case-run`
+
+## bash から cmd リダイレクト構文（2>nul）を使用すると nul という名前の実ファイルが生成される
+
+- **問題事象**: bash から cmd を呼ぶ際の `2>nul` リダイレクト構文が cmd ではなく bash に解釈され、`nul` という名前の実ファイルが生成された（本委譲内で発生・検出・削除済み）
+- **発生局面**: 実装（Epic #3575 Wave-1、Issue #3578 case-run 実装実行）
+- **検知方法**: `nul` 実ファイルの生成確認
+- **根本原因**: `2>nul` は cmd のリダイレクト構文だが、bash では `nul` を通常ファイル名として解釈する
+- **自律対応内容**: 生成された nul ファイルを削除し、標準手段（node fs・spawnSync）へ従った
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（Windows 環境の実行規律の遵守。契約変更なし）
+- **横展開観点**: Windows 環境の bash セッション全般（AGENTS.md の標準手段指針と同型の環境規律）
+- **再発条件**: bash 内で cmd リダイレクト構文を使用した場合
+- **予防策候補**: Windows 環境では cmd リダイレクト構文を bash 内で使用しない。標準手段（node fs・spawnSync）へ従う
+- **想定反映先**: Windows 環境の実行規律文書（windows-powershell-bulk-io-corruption 系知識）への補足候補
+- **関連**: Epic #3575、Issue #3578、PR #3582
+- **タグ**: `#bash` `#cmd-redirect` `#windows` `#case-run`
+
+## bun 同梱の tsc.exe は lib 型定義を解決できず配列メソッドのコールバックが暗黙 any 化する（TS7006 偽発報）
+
+- **問題事象**: bun 同梱の tsc.exe で TS7006（暗黙 any）の偽発報が発生した。既存コード（current_refs.test.ts）でも TS2307 が再現することで環境依存と切り分けた
+- **発生局面**: 検証（Epic #3575 Wave-1、Issue #3578 case-run 実装実行）
+- **検知方法**: 既存コードでの同種エラー再現による環境依存切り分け
+- **根本原因**: bun 同梱の tsc.exe は lib 型定義が解決できず typeRoots が不十分
+- **自律対応内容**: typescript 5.9.3 を一時環境（project root 外）へ導入し typeRoots を明示指定して正確な型検査を実施した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（typecheck 手順の補正。契約変更なし）
+- **横展開観点**: repo-local integrity scripts 配下の .ts 型検査全般
+- **再発条件**: bun x tsc 等の bun 同梱 tsc で typecheck を実行した場合
+- **予防策候補**: 正確な型検査には typescript を一時環境（project root 外）へ導入して typeRoots を明示指定する
+- **想定反映先**: typecheck 手順への補足候補
+- **関連**: Epic #3575、Issue #3578、PR #3582
+- **タグ**: `#typecheck` `#bun-tsc` `#typescript` `#ts7006`
+
+## 実リポジトリ実走査系の回帰テストは timeout 境界上にあり退避比較と時間序列再計測で環境起因を切り分けてから再実行する
+
+- **問題事象**: 分割①の初回実行で IR-055 実修復回帰テスト（timeout 60s）が 1 件 timeout により fail（2741 pass / 1 fail・exit 1）を記録した
+- **発生局面**: 検証（Epic #3575 Wave-1、Issue #3579 case-run 実装実行）
+- **検知方法**: 単独再実行と、新規 4 ファイルの退避有無比較・時間序列再計測（あり① 65.18s fail→あり③ 57.29s pass、なし①② 57.32s/55.77s pass）
+- **根本原因**: 実行時間が 55〜65s で timeout 60s の境界上にあり、新規ファイル作成直後の初回実行は AV deep scan 相当の環境要因で timeout し得る。IR-055 走査対象は配布物 .md であり本 PR の新規 .ts は検出対象外
+- **自律対応内容**: 修正はせず再検証を実行し、分割①再実行で 2742 pass・0 fail・exit 0 を確認。初回 fail の exit 1 と再検証結果の双方を PR 本文へ記録した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（timeout flake の切り分け手順の補正。契約変更なし）
+- **横展開観点**: 実リポジトリ実走査系の回帰テスト全般（IR-055 delta 検査等）
+- **再発条件**: timeout 60s 境界付近の実行時間の test を新規ファイル作成直後に実行した場合
+- **予防策候補**: timeout 検出時は対象ファイルの退避による有無比較と時間序列での再計測（同じ入力で 3 回以上）で環境起因かを切り分けてから再実行する。pre-existing の重さと本 PR 起因を区別する
+- **想定反映先**: bun test 実行形態契約・timeout 規律への補足候補
+- **関連**: Epic #3575、Issue #3579、PR #3583、PR #3582 の timeout flake 学びと同系統
+- **タグ**: `#bun-test` `#timeout-flake` `#ir055` `#environment-dependent`
+
+## bun test・証跡スクリプトの相対パス指定は cwd 依存であり検証コマンドの実行ごとに cwd を root に統一する
+
+- **問題事象**: scripts package 配下の cwd から root 相対パスの証跡スクリプトを呼ぶと Module not found になった（本検証の初回で事象を確認）
+- **発生局面**: 検証（Epic #3575 Wave-1、Issue #3579 case-run 実装実行）
+- **検知方法**: Module not found エラー
+- **根本原因**: bun test・証跡スクリプトの相対パス指定は cwd 依存であり（REQ-060 repo root 起 cwd）、package 配下 cwd では root 相対パスが解決できない
+- **自律対応内容**: 検証コマンドの実行ごとに cwd を worktree root に統一した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（検証実行手順の補正。契約変更なし）
+- **横展開観点**: 連続検証バッチ全般（異なる cwd を混在させやすい）
+- **再発条件**: scripts package 配下等の cwd から root 相対パスの証跡スクリプト・bun test を実行した場合
+- **予防策候補**: 検証コマンドの実行ごとに cwd を worktree root に統一することを、連続検証バッチの中でも再確認する
+- **想定反映先**: 検証実行手順（REQ-060 実行形態）への補足候補
+- **関連**: Epic #3575、Issue #3579、PR #3583
+- **タグ**: `#bun-test` `#cwd` `#relative-path` `#evidence-capture`
