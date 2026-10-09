@@ -10,7 +10,7 @@
 DEC-018 は欠番であり、対応する Decision ファイルは存在しない。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は42件、提案中の Decision は4件である。
+現行の承認済み Decision は46件、提案中の Decision は0件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -67,10 +67,10 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 | DEC-050 | deleteBranchOnMerge 設定不備の警告化と操作安全性停止の維持 | accepted | 2026-10-04 |
 | DEC-051 | case-auto stage 3 のスロット型キューへの移行（Wave 収束前提の撤廃） | accepted | 2026-10-06 |
 | DEC-052 | Jev 評価器障害時の判定未確定と依存後続抑止への移行（DEC-044 決定3 の部分置換） | accepted | 2026-10-07 |
-| DEC-053 | ADF v5 工程・成果物モデル（共通責務・参照モデル工程・成果物の意味と正式確定） | proposed | 2026-10-09 |
-| DEC-054 | ADF v5 追跡・品質検証モデル（隣接工程間対応・構造/意味分離・差分影響評価） | proposed | 2026-10-09 |
-| DEC-055 | ADF v5 有限実行と責務再編（工程独立実行・Issue 必要時利用・Wave の意味的依存グループ化） | proposed | 2026-10-09 |
-| DEC-056 | ADF v5 移行と互換性の境界（後方互換非必須・意味保存移行・未処理改善情報の継続） | proposed | 2026-10-09 |
+| DEC-053 | ADF v5 工程・成果物モデル（共通責務・参照モデル工程・成果物の意味と正式確定） | accepted | 2026-10-09 |
+| DEC-054 | ADF v5 追跡・品質検証モデル（隣接工程間対応・構造/意味分離・差分影響評価） | accepted | 2026-10-09 |
+| DEC-055 | ADF v5 有限実行と責務再編（工程独立実行・Issue 必要時利用・Wave の意味的依存グループ化） | accepted | 2026-10-09 |
+| DEC-056 | ADF v5 移行と互換性の境界（後方互換非必須・意味保存移行・未処理改善情報の継続） | accepted | 2026-10-09 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -125,15 +125,15 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 - [DEC-050](DEC-050.md)（deleteBranchOnMerge 設定不備の警告化と操作安全性停止の維持）
 - [DEC-051](DEC-051.md)（case-auto stage 3 のスロット型キューへの移行（Wave 収束前提の撤廃））
 - [DEC-052](DEC-052.md)（Jev 評価器障害時の判定未確定と依存後続抑止への移行（DEC-044 決定3 の部分置換））
+- [DEC-053](DEC-053.md)（ADF v5 工程・成果物モデル（共通責務・参照モデル工程・成果物の意味と正式確定））
+- [DEC-054](DEC-054.md)（ADF v5 追跡・品質検証モデル（隣接工程間対応・構造/意味分離・差分影響評価））
+- [DEC-055](DEC-055.md)（ADF v5 有限実行と責務再編（工程独立実行・Issue 必要時利用・Wave の意味的依存グループ化））
+- [DEC-056](DEC-056.md)（ADF v5 移行と互換性の境界（後方互換非必須・意味保存移行・未処理改善情報の継続））
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
-- [DEC-053](DEC-053.md)（ADF v5 工程・成果物モデル（共通責務・参照モデル工程・成果物の意味と正式確定））
-- [DEC-054](DEC-054.md)（ADF v5 追跡・品質検証モデル（隣接工程間対応・構造/意味分離・差分影響評価））
-- [DEC-055](DEC-055.md)（ADF v5 有限実行と責務再編（工程独立実行・Issue 必要時利用・Wave の意味的依存グループ化））
-- [DEC-056](DEC-056.md)（ADF v5 移行と互換性の境界（後方互換非必須・意味保存移行・未処理改善情報の継続））
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
