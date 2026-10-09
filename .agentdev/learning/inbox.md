@@ -293,3 +293,19 @@
 - **想定反映先**: agentdev-traceability の check 実行手順・証跡取得手順への補足候補
 - **関連**: Epic #3560、Issue #3565、PR #3572
 - **タグ**: `#traceability-check` `#nondeterministic` `#observation-stability` `#case-run`
+
+## proposed Decision を Definition PR で新規作成した場合の accepted-adr-only-citation は NG baseline 登録が必要
+
+- **問題事象**: Definition PR（case-open STEP-4）で新規 Decision（DEC-057、status: proposed）を作成し、同一 PR 内の Design 文書（v4-quality-gate-model.md、v5-completion-judgment.md）から引用したところ、check_integrity の accepted-adr-only-citation が「Non-accepted Decision DEC-057 (status: proposed) cited」の Warning 2件として計上され、NG baseline 未登録の新規 finding は Warning であっても「new unmanaged NG (delta, exit code driver)」として check_integrity が exit 1 になった
+- **発生局面**: 実装（case-open STEP-4 機械工程の check_integrity gate。問題クラス: checker delta 判定の回避）
+- **検知方法**: prepare_definition_pr.ts 実行内の check_integrity fail（exitCode 1）と integrity レポートの Warning 行
+- **根本原因**: accepted-adr-only-citation の検出は docs/designs/** 等での non-accepted Decision 引用を Warning 化し、NG baseline（ng-baseline.json）未登録の新規 finding は delta 判定で exit code driver になる。proposed Decision の新規作成と引用は Definition PR の正規構成であるが、baseline 登録手順が case-open reference に記述されていない
+- **自律対応内容**: ng-baseline.json の既存 provenance「proposed-decision-citation」運用を発見し、additions manifest（--update-ng-baseline --ng-baseline-additions）で DEC-057 引用 2件を provenance: proposed-decision-citation として登録した（PR #3576）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存 baseline 運用の適用。契約変更なし）
+- **横展開観点**: 新規 Decision を proposed で作成し既存正規成果物から引用する全 Definition PR
+- **再発条件**: proposed Decision を新規作成し docs/designs/** の文書から引用する Definition PR で、baseline 登録を欠いた場合
+- **予防策候補**: proposed Decision の引用を含む Definition PR では、case-open STEP-4 の check_integrity fail 時に provenance: proposed-decision-citation での baseline 追加を標準手順として実施する。case-ready の受理評価（accepted 遷移）後に baseline エントリの解消判断（棚卸し）が後続で必要になる点を含めて管理する
+- **想定反映先**: case-open reference（definition-pr-and-idempotency.md）への baseline 手順補足候補
+- **関連**: Root Case #3575、PR #3576、.opencode/skills/repo-agentdev-integrity/baselines/ng-baseline.json
+- **タグ**: `#check-integrity` `#ng-baseline` `#proposed-decision` `#case-open`
