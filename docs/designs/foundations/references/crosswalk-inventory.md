@@ -2,6 +2,8 @@
 
 位置づけ: 本ファイルは v3-v4-crosswalk Design の references であり、現行 v3 成果物の
 v4 処遇の完全一覧（原本）を所有する。列スキーマと運用規則は親 Design を参照。
+v4 から v5 への移行の対照基準（意味インベントリ・処遇一覧の先例）としても参照される
+（v4-migration-and-release Design「v4 → v5 移行手順と検証」節）。
 
 ## REQ（移行判定時点 53）
 
