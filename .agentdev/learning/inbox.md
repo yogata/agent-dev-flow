@@ -245,3 +245,35 @@
 - **想定反映先**: case-open Design ゲート判定仕様節と prepare_definition_pr.ts の判定ロジックの整合確認候補（intake に分離）
 - **関連**: Issue #3560、PR #3561
 - **タグ**: `#case-open-step4` `#traceability-gate` `#missing-implementation` `#known-debt` `#contrast-run`
+
+## REQ 行の再定義と Design 散文記述の同世代乖離は機械検出されにくいため同一 Case 対象範囲で解消する
+
+- **問題事象**: case-open Design「意味変更行の design 対応事前確認」節に「missing-design 0 件ゲートが増分ベース（新規行のみ）」という、現行の対象要件行全体ゲートとは乖離した陳腐化記述が残存していた。REQ 行の文言が Design 側の REQ 行 ID 直接参照を持たない散文で言及される場合、inspect-docs DRIFT 診断の自動検出対象になりにくい
+- **発生局面**: 実装（Epic #3560 Wave-2、Issue #3563 case-run 実装実行。問題クラス: 文書陳腐化）
+- **検知方法**: REQ-105 実現面の実装で case-open Design 該当節を確認した際の記述発見（機械検出ではなく意味確認）
+- **根本原因**: REQ 行の再定義時に、当該行を REQ 行 ID 直接参照なしの散文で言及する Design 記述の同世代更新が機械検出対象にならず残存する
+- **自律対応内容**: case-open Design の該当節を現行のゲート意味（採用規約が要求する設計根拠対応の欠落ゲートへの予防手順）へ更新した（PR #3569）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（文書の現行ゲート意味への更新。契約変更なし）
+- **横展開観点**: REQ 行を散文で参照する記述を持つ全 command/skill Design。REQ 行再定義を含む Definition 変更全体
+- **再発条件**: REQ 行の再定義を含む Definition 変更で、当該行を散文で参照する Design 記述が更新対象から漏れた場合
+- **予防策候補**: REQ 行の再定義を含む Definition 変更では、当該行を参照する Design 散文記述の同世代乖離解消を同一 Case の対象範囲に含める運用を継続する。機械検出の追加は対象外（必要になった場合に追跡Issue で育成）
+- **想定反映先**: inspect-docs DRIFT 診断の検出対象候補（追跡Issue 育成時）、case-open Design 記述整合
+- **関連**: Epic #3560、Issue #3563、PR #3569
+- **タグ**: `#doc-drift` `#req-line-redefine` `#gate-description` `#case-run`
+
+## ADF-COVERS inline 宣言の追加時に既存 sidecar 宣言との重複が発生する
+
+- **問題事象**: 正規成果物へ ADF-COVERS 宣言（inline）を追加した際、既存 traceability sidecar（traceability/ 配下 yaml）の design 宣言との不整合（重複）が発生した
+- **発生局面**: 実装（Epic #3560 Wave-2、Issue #3564 case-run 実装実行。問題クラス: 対応宣言の二重管理）
+- **検知方法**: Design 宣言追加時の既存 sidecar 実在確認での検出
+- **根本原因**: 対応宣言が inline（正規成果物）と top-level sidecar（traceability/ 配下）の両情報源で管理され、宣言変更時に他方の確認を欠くと重複が残る
+- **自律対応内容**: producer 側の inline 優先規則に従い、traceability/agentdev-workflow-case-revise.yaml の重複する design 宣言を inline 宣言へ集約した（PR #3570）。既存の対応関係は inline 宣言に保持
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存の inline 優先規則の適用。契約変更なし）
+- **横展開観点**: ADF-COVERS 宣言を含む正規成果物の編集全般（inline と sidecar の両方を管理対象とする宣言変更）
+- **再発条件**: inline 宣言の追加・変更を sidecar 実在確認なしで実施した場合
+- **予防策候補**: 宣言変更前に inline と sidecar の両情報源を確認し、既存の inline 優先規則で単一化する
+- **想定反映先**: agentdev-traceability の対応宣言管理手順への補足候補
+- **関連**: Epic #3560、Issue #3564、PR #3570、traceability/agentdev-workflow-case-revise.yaml
+- **タグ**: `#adf-covers` `#inline-declaration` `#sidecar` `#duplicate-declaration`
