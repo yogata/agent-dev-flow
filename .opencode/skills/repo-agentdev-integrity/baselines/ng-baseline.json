@@ -1,7 +1,7 @@
 {
   "version": 1,
   "rule_id": "NG-BASELINE",
-  "generated_at": "2026-10-07",
+  "generated_at": "2026-10-09",
   "entries": [
     {
       "category": "ADR",
@@ -209,6 +209,24 @@
       "count": 1,
       "provenance": "legacy",
       "reason": "index-auto-generation.md による superseded DEC-007 の歴史的引用（main 既知 warning）。本 case 対象範囲外のため正規管理下で追跡"
+    },
+    {
+      "category": "Decision",
+      "check": "accepted-adr-only-citation",
+      "file": "docs/designs/quality/v4-quality-gate-model.md",
+      "evidence": "DEC-057",
+      "count": 1,
+      "provenance": "proposed-decision-citation",
+      "reason": "proposed-decision-citation: proposed Decision DEC-057 を根拠として引用する意図的な記述（draft 合意内容 ACT-DESIGN-004 の投影）。case-ready の受理評価（accepted 遷移）後に解消する。本 Case（Root Case #3575）の Definition 変更。"
+    },
+    {
+      "category": "Decision",
+      "check": "accepted-adr-only-citation",
+      "file": "docs/designs/quality/v5-completion-judgment.md",
+      "evidence": "DEC-057",
+      "count": 1,
+      "provenance": "proposed-decision-citation",
+      "reason": "proposed-decision-citation: proposed Decision DEC-057 を根拠として引用する意図的な記述（draft 合意内容 ACT-DESIGN-003 See Also の投影）。case-ready の受理評価（accepted 遷移）後に解消する。本 Case（Root Case #3575）の Definition 変更。"
     },
     {
       "category": "Decision",
