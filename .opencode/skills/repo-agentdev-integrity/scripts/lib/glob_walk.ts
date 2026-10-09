@@ -58,7 +58,7 @@ function collectGlobMatches(
   }
   for (const match of matches) {
     const segments = [...prefix, ...match.replace(/\\/g, "/").split("/")];
-    const name = segments[segments.length - 1];
+    const name = segments[segments.length - 1] ?? "";
     if (opts?.skipDirNames?.some((d) => segments.slice(0, -1).includes(d))) continue;
     if (opts?.extensions && !opts.extensions.some((e) => name.endsWith(e))) continue;
     if (opts?.filesOnly) {
