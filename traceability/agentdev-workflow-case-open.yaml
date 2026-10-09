@@ -2,6 +2,7 @@ component: agentdev-workflow-case-open
 implementation:
   src/common/skills/agentdev-workflow-case-open/SKILL.md:
     - REQ-021-024
+    - REQ-107-006
     - REQ-030-001
     - REQ-030-002
     - REQ-030-003
