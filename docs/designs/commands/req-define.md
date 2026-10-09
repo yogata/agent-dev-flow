@@ -507,6 +507,7 @@ auto_gate:
 ## トレーサビリティ能力の利用
 
 req-define は、既存の明示的な対応関係（`agentdev-traceability` の coverage）と impact を変更影響候補の確認に利用できる（REQ-021-011）。
+あわせて、既存の下流成果物が依拠した上流の状態と現在の上流状態の比較に基づく差分候補を利用できる。取得機構は agentdev-traceability Design「impact 拡張（差分候補）」節を参照する。
 問い合わせ結果は候補提供であり、CREATE, APPEND, UPDATE, SPLIT, MERGE, 意味的重複, canonical owner の最終判断は正規成果物本文と独立探索手段（README 索引、正規成果物の直接読取、`glob`, `grep`, `rg` 等）での確認後に下す。
 
 - トレーサビリティ情報だけで変更対象、正規所有者、対象範囲を確定しない
@@ -614,4 +615,3 @@ review の finding は Decision判断、要件doc生成の成果物へ反映可�
 review はドラフト保存より前に実行する。
 ドラフト保存が req-define の最初の副作用（`.agentdev/drafts/req-draft-{topic-slug}.md` のファイル作成）であるため、review は最初の副作用の前に挿入される。
 review の結果、要件候補が変更された場合は、ドラフト保存で保存されるドラフトへ反映する。
-
