@@ -277,3 +277,19 @@
 - **想定反映先**: agentdev-traceability の対応宣言管理手順への補足候補
 - **関連**: Epic #3560、Issue #3564、PR #3570、traceability/agentdev-workflow-case-revise.yaml
 - **タグ**: `#adf-covers` `#inline-declaration` `#sidecar` `#duplicate-declaration`
+
+## traceability check の unknown-req-refs findings が一時的に非決定的計上を示す
+
+- **問題事象**: traceability check CLI の実行で、bun install 直後の観測時に unknown-req-refs findings が 43〜82 件の非決定的計上を示した。連続 5 回の再実行で 0 件に安定し、最終判定は 0 件。根本原因は断定できず（corpus 走査のファイル集合変動要因の特定は後続調査候補）
+- **発生局面**: 検証（Epic #3560 Wave-3、Issue #3565 case-run 実装実行。問題クラス: 証跡取得時の観測不安定）
+- **検知方法**: 同一入力での check 再実行による結果の変動（単発観測と連続再実行の比較）
+- **根本原因**: 断定できず。bun install 直後の一時期間に findings 計上が非決定的になる観測あり
+- **自律対応内容**: 単発観測で判定せず、連続再実行（5 回）による安定化確認を観測手順として実施し、最終判定を 0 件で確定した（PR #3572）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（観測手順の運用対応。契約変更なし）
+- **横展開観点**: traceability check 等の checker CLI を証跡取得に使う全検証工程
+- **再発条件**: checker CLI の非決定的計上を単発観測で判定した場合
+- **予防策候補**: 非決定的な checker 結果を観測した場合は単発観測で判定せず、連続再実行による安定化確認を観測手順に組み込む
+- **想定反映先**: agentdev-traceability の check 実行手順・証跡取得手順への補足候補
+- **関連**: Epic #3560、Issue #3565、PR #3572
+- **タグ**: `#traceability-check` `#nondeterministic` `#observation-stability` `#case-run`
