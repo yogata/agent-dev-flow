@@ -10,6 +10,7 @@ updated: "2026-10-09"
 <!-- ADF-COVERS(implementation): REQ-021-011, REQ-021-022 -->
 <!-- ADF-COVERS(design): REQ-021-011 -->
 <!-- ADF-COVERS(design): REQ-021-012, REQ-021-023, REQ-021-028, REQ-021-029 -->
+<!-- ADF-COVERS(design): REQ-012-031（設計根拠対応の条件付き意味節が、設計根拠対応の成立を独立 Design 文書の存在に一律依存させない設計判断） -->
 <!-- ADF-COVERS(implementation): REQ-015-004 -->
 <!-- ADF-COVERS(implementation): REQ-004-001, REQ-004-002, REQ-004-004, REQ-004-010, REQ-004-014, REQ-004-015, REQ-004-016, REQ-004-017, REQ-004-018, REQ-004-019, REQ-004-020, REQ-004-022, REQ-004-023, REQ-004-034, REQ-004-035, REQ-004-036, REQ-004-037, REQ-004-038, REQ-004-039, REQ-004-042, REQ-004-043, REQ-004-046, REQ-004-047, REQ-004-048, REQ-004-049, REQ-004-050, REQ-004-051, REQ-004-052, REQ-004-053, REQ-008-022, REQ-008-032, REQ-008-033, REQ-008-041, REQ-008-047, REQ-008-048, REQ-008-049, REQ-008-052, REQ-008-053 -->
 
@@ -163,6 +164,10 @@ req-define は次の7項目を判定し、`artifact_actions`、`operation_units`
 REQ 影響なしと確定した変更からは `artifact_actions` の `artifact: req` エントリを生成しない（REQ-004-033）。
 代わりに `artifact: design` エントリのみを生成し、Design への配置のみを行う。
 Design action には前項「Design action への分類根拠出力」を適用する。
+
+### 設計根拠対応の条件付き意味（REQ-012-031）
+
+req-define は対象要件行の設計根拠対応の成立を独立した Design 文書の存在に一律依存させない。Design 対応の生成判断は、プロジェクトの採用した工程・成果物規約が認める適切な成果物を前提に行い、Design action が存在しない要件行の展開と draft 生成を阻害しない。設計根拠対応の欠落の検出は REQ-021 が所有する工程ゲート（case-ready の ready 遷移ゲート、case-close の QG-4）が担う（REQ-012-031）。
 
 ### 分類根拠の引き継ぎ
 

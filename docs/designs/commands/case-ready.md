@@ -2,10 +2,11 @@
 title: case-ready Design
 status: accepted
 created: 2026-09-14
-updated: "2026-10-07"
+updated: "2026-10-09"
 ---
 
 <!-- ADF-COVERS(design): REQ-021-024 -->
+<!-- ADF-COVERS(design): REQ-012-031（保存実体節が Definition 保存時点での設計根拠対応の未成立は保存を阻害しないことの design 対応） -->
 <!-- ADF-COVERS(design): REQ-004-061 -->
 <!-- ADF-COVERS(design): REQ-061-003 -->
 <!-- ADF-COVERS(design): REQ-061-010, REQ-061-019, REQ-061-021, REQ-061-038, REQ-061-023, REQ-061-029, REQ-061-030, REQ-061-033, REQ-061-034, REQ-061-035, REQ-061-039, REQ-061-040, REQ-061-047, REQ-061-048, REQ-035-012, REQ-035-018 -->
@@ -29,9 +30,9 @@ case-ready の公開契約（入出力、副作用、安全性、承認境界、
 
 - Definition 受入: 設計PRの忠実性確認（req-define 合意内容との投影検査）、整合性検査、品質検査、merge 前の Draft 状態確認（pr_read の isDraft、REQ-061-032）。人間に留保された判断（REQ-096-005）の新規確定が不要で、既存の正規契約から導出できる解消と委譲された裁量の範囲内の判断（作業仮定の明示を含む）である場合は追加承認なしで自動確定・merge。人間に留保された判断（REQ-096-005）を新規に確定する必要がある場合、または既存の安全境界が要求する操作承認を要する場合は停止し HITL とする（REQ-061-003）。人間判断への移送の判定は語の使用（新しい Decision、意味変更、対象範囲の確定、意味的な不整合の解消）だけで行わず、当該判断が REQ-096-005 の留保事項に該当するか否かで行う。判断の難易度、確信度、評価器間の不一致、結果状態、唯一解でないことだけを理由として人間判断へ移送しない（REQ-096-003、REQ-096-004、REQ-096-006）。停止理由は REQ-096-012 の原因分類へ対応させる。proposed Decision の受理評価は REQ-061-021 の導出ベース判定を維持する
 - overlap 突合（REQ-061-039）: 設計PR受入は、draft の宣言変更ファイル集合（artifact_actions の target 集合）と pr_changed_files 実報告の差分検査（overlap 突合）を含む。スタック構造（PR が兄弟 Case の commit を含む）や宣言・実報告の乖離を検出した場合は警告し、隔離 worktree での差分再構成手順に従って救済する。実効 squash diff が自 Case 分に収まった場合もスタック検出の警告は省略しない（スタック底が最後 merge の場合に空 diff / 同一領域競合となるリスクのため）
-- 保存実体: REQ / Decision / Design の保存は req-file-manager、decision-file-manager、design-file-manager、artifact-validation へ委譲する。case-ready 自身は保存手続きを実装しない。REQ の保存では Design 対応が未成立の要件行が残っても保存を失敗させない（Design 対応の成立判定は ready 遷移ゲートの責務）
-- canonical 再取得: merge 後に canonical Definition を再取得し、traceability check を機械実行する（REQ-061-023）。check は inline declaration と top-level `traceability/` 配下の sidecar を同じ論理的な対応関係へ正規化した対応関係全体を検査対象とする。missing-design を検出した場合は case-open への差し戻し経路を扱う
-- Design 対応ゲート: 対象 Definition の要件行ごとに Design 対応が 1 件以上存在することを ready 遷移の必要条件とする（missing-design 残存時は ready へ遷移させない）。verification policy（`traceability/policy.yaml`）との整合も同一の check で検証し、verification policy の不正を検出した場合は ready へ遷移させない
+- 保存実体: REQ / Decision / Design の保存は req-file-manager、decision-file-manager、design-file-manager、artifact-validation へ委譲する。case-ready 自身は保存手続きを実装しない。REQ の保存では設計根拠対応が未成立の要件行が残っても保存を失敗させない（REQ-012-031。設計根拠対応の成立判定は ready 遷移ゲートの責務）
+- canonical 再取得: merge 後に canonical Definition を再取得し、traceability check を機械実行する（REQ-061-023）。check は inline declaration と top-level `traceability/` 配下の sidecar を同じ論理的な対応関係へ正規化した対応関係全体を検査対象とする。プロジェクトの採用した工程・成果物規約が要求する設計根拠対応の欠落（missing-design）を検出した場合は case-open への差し戻し経路を扱う
+- Design 対応ゲート: 対象 Definition の要件行ごとに、プロジェクトの採用した工程・成果物規約が要求する設計根拠対応（独立 Design 文書を必須とする採用の場合は Design 対応 1 件以上）が存在することを ready 遷移の必要条件とする（REQ-021-024、REQ-061-023。欠落残存時は ready へ遷移させない）。判定条件の前提となる工程・成果物規約は、採用済み規約から解決する（`../foundations/v5-adopted-conventions.md`）。採用宣言が存在しない間は移行期デフォルト（REQ-105-008）として当該プロジェクトの現に実効している運用を用い、採用機構の実装前でも判定経路は一意に解決する。verification policy（`traceability/policy.yaml`）との整合も同一の check で検証し、verification policy の不正を検出した場合は ready へ遷移させない
 - 検証対応の作成責務: required 行の verification 対応の作成・更新は case-run が担い、missing-verification を含む対応完全性の最終検査は case-close の QG-4 が担う（REQ-021-015、REQ-021-018）。case-ready の ready 遷移条件に verification 対応の完全性を含めない。policy の既定値は required であり、optional は policy の明示指定のみで成立する。新規要件行を含む Definition は、その行の verification 対応が case-run で作成される前の状態で ready を通過できる
 - 実行契約の確定: canonical Definition の確定後に、対象範囲（対象要件、主な変更対象、対象外）、関連 REQ/Decision/Design への必要な参照、実現方針（再判断してはならない合意がある場合のみ）、完了条件（条件、検証方法、合格条件、達成状態のチェックボックス形式と必要な品質検証の統合）を Issue 本文の対応する章へ確定する（REQ-017-001〜005）。work_type、scale、ユーザー明示 review 発動契約、Issue 構成の分類を Issue 本文の正規契約として確定しない
 - 実行構造確定: 連結成分、3軸判断、単独根の Standard 化、構成検証（Epic サイズ上限、意味的依存の維持〔DAG 整合〕、全 operation_unit の Wave 割当）、子 Issue 確定後の変更対象重複検出（詳細は本 Design「v3 epic-wave-model Design からの吸収」節）。Epic の実行構成（子 Issue、Wave、意味的依存、子状態）は一つの表（`| Wave | Issue | 前提 | 状態 |`）として確定する。Wave は意味的依存 DAG のみから構成され、Wave サイズに実行時並列数・同時実行上限を適用しない（DEC-041、REQ-061-010、REQ-061-038）
@@ -43,7 +44,7 @@ case-ready の公開契約（入出力、副作用、安全性、承認境界、
 - 対象設計PRが GitHub Draft PR（isDraft: true）の場合（pr_merge を実行せず blocked で停止。draft 解除の自動実行や正規 Tool 外の操作による復旧は行わない。REQ-061-032）
 - 設計PRの CI / 品質検査失敗（ready 不遷移、既存 PR 保持で再実行可能）
 - 人間に留保された判断（REQ-096-005）の新規確定が必要、または既存の安全境界が要求する操作承認を要する場合（HITL。REQ-061-003）
-- canonical Definition の要件行に Design 対応が 0 件の行が残る場合（missing-design 検出、ready 不遷移、case-open への差し戻し）
+- canonical Definition の要件行に、プロジェクトの採用した工程・成果物規約が要求する設計根拠対応が欠落する行が残る場合（missing-design 検出、ready 不遷移、case-open への差し戻し。REQ-021-024）
 - `traceability/policy.yaml` の不正を check が検出した場合（ready 不遷移。required 行の verification 対応欠落（missing-verification）は case-close の QG-4 最終完全性検査の対象であり、ready 不遷移条件に含めない）
 - 構成検証の上限超過または構成不備
 - proposed Decision の受理が正規契約から導出できず受理評価を確定できない（proposed のまま ready 不遷移。REQ-061-021 の導出ベース判定を維持）

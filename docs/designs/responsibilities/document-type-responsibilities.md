@@ -38,6 +38,12 @@ REQ/Decision/Design/guides の役割定義、記述対象、記述対象外の�
 
 README は agent-dev-flow リポジトリの構成要素（identity、参照先リンク、最小限のクイックスタート）であり、索引構成として扱う。コマンド選択の入口表は `docs/guides/command-selection.md` が一元所有する。README は REQ/Decision/Design/guide と並ぶ基準境界対象ではなく README.md の構造要件に従う。
 
+### 成果物の意味境界の運用面と工程別正式確定（REQ-088-006、REQ-105）
+
+REQ、Decision、Design、Implementation、Evidence の意味境界の基盤モデル定義は `../foundations/v4-operating-model.md`「中核文書モデル」節が正規所有する。本 Design はその運用面（文書種別ごとの責務、配置基準、対応関係の表現方法）を所有し、[artifact-contracts.md](artifact-contracts.md) は成果物間の入出力と操作契約を扱う副次参照である。
+
+工程別の成果物の正式確定と最終的な要求充足は別判定である（REQ-105）。文書種別のライフサイクル上の確定（Design の accepted 遷移、REQ の現行要件への採用、Decision の accepted 遷移）は当該工程の成果物の正式確定を表し、それをもって最終的な要求充足済みと判定しない。最終的な要求充足の判定は case-close の QG-4 最終完了判定（REQ-021-025、REQ-032）が所有する。ゲートが判定条件の前提とする工程・成果物規約は、プロジェクトが採用した採用済み規約から解決し、採用宣言が存在しない間は移行期デフォルト（REQ-105-008）として当該プロジェクトの現に実効している運用を用いる（`../foundations/v5-adopted-conventions.md`）。
+
 ### 新規文書作成時の分類判断ツリー <!-- REQ-001 -->
 
 新規文書を作成する際の分類判断フロー。

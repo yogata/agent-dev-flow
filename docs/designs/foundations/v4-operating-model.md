@@ -62,6 +62,12 @@ REQ / Decision / Design / Implementation / Evidence の意味境界（What/Why/H
 - Evidence: REQ/acceptance が成立したと確認する根拠（根拠）
 - Decision の結果を REQ/Design の現行状態へ反映することと、Decision 自体を履歴的根拠として保持することを両立させる
 
+### 意味境界の正規所有と工程別正式確定の区別（REQ-088-006、REQ-105）
+
+上記 5 要素の意味境界は、本節が ADF の基盤モデル定義として正規所有する（REQ-088-006）。運用面（文書種別ごとの責務、配置基準、対応関係の表現方法）は responsibilities/document-type-responsibilities.md が所有し、responsibilities/artifact-contracts.md は成果物間の入出力と操作契約を扱う副次参照である。意味境界の判定を成果物間契約の側から再定義せず、基盤モデル定義と運用面から到達する構造を維持する。
+
+工程別の成果物の正式確定と最終的な要求充足は別判定であり、この区別は本節の所有対象ではなく、REQ-105（ADF v5 成果物の意味と工程別正式確定）が所有する。各工程の成果物は当該工程の要求充足、上流整合、必要な検証の成立をもって後続工程を待たずに正式確定でき（REQ-105-006）、設計成果物の正式確定をもって最終的な要求充足済みと判定しない（REQ-105-007）。最終的な要求充足の判定は case-close の QG-4 最終完了判定が所有する。ゲートが判定条件の前提とする工程・成果物規約は、プロジェクトが採用した採用済み規約から解決し、採用宣言が存在しない間は移行期デフォルト（REQ-105-008）として当該プロジェクトの現に実効している運用を用いる（foundations/v5-adopted-conventions.md「採用規約の構成要素」「移行期デフォルトとの接続」参照）。
+
 ## v4 の中核と維持条件（REQ-103-027）
 
 v4 の Standard Operating Model の中核は次の 5 要素である。正規モデル再収束の作業後もこの中核を維持する。
@@ -87,7 +93,7 @@ v4 の Standard Operating Model の中核は次の 5 要素である。正規モ
 | 品質モデル（Quality/Verification/Evidence/Gate） | quality/v4-quality-gate-model.md |
 | durable state と再構成・再実行 | foundations/v4-durable-state-and-recovery.md |
 | runtime 実行（authority・直列化・冪等・fail-closed） | foundations/v4-runtime-execution-model.md |
-| 成果物モデル（REQ/Decision/Design/Implementation/Evidence の意味境界の運用面） | responsibilities/document-type-responsibilities.md、responsibilities/artifact-contracts.md |
+| 成果物モデル（REQ/Decision/Design/Implementation/Evidence の意味境界の運用面） | responsibilities/document-type-responsibilities.md（正規参照。responsibilities/artifact-contracts.md は成果物間の入出力・操作契約の副次参照） |
 | Project Extensions と安全境界 | foundations/v4-responsibility-boundaries.md「Project Extensions の semantic extension point」節、foundations/project-extensions.md |
 | Intake / Learning / Backlog の責務 | workflows/v4-collaboration-loop.md |
 | 移行・release | foundations/v4-migration-and-release.md |
