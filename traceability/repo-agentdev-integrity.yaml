@@ -6,3 +6,17 @@ implementation:
     - REQ-103-022
   .opencode/skills/repo-agentdev-integrity/data/skill-projection-manifest.yaml:
     - REQ-010-079
+  .opencode/skills/repo-agentdev-integrity/scripts/completion-judgment/case-catalog.ts:
+    - REQ-110-002
+    - REQ-110-003
+  .opencode/skills/repo-agentdev-integrity/scripts/completion-judgment/isolation.ts:
+    - REQ-110-002
+  .opencode/skills/repo-agentdev-integrity/scripts/completion-judgment/counterexample_harness.test.ts:
+    - REQ-110-002
+  .opencode/skills/repo-agentdev-integrity/scripts/completion-judgment/false_positive.test.ts:
+    - REQ-110-003
+verification:
+  .opencode/skills/repo-agentdev-integrity/scripts/completion-judgment/counterexample_harness.test.ts:
+    - REQ-110-002
+  .opencode/skills/repo-agentdev-integrity/scripts/completion-judgment/false_positive.test.ts:
+    - REQ-110-003
