@@ -1,0 +1,226 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261009T031554Z-a23e",
+  "workflow": "req-define",
+  "evaluationKind": "step3-existing-req-matching",
+  "subject": "ADF v5.0.0 要件プール6RUの既存REQ照合帰属判断（CREATE/APPEND/UPDATE/REQ操作なし）",
+  "sourceRevision": "db85d596ac64c1c7dcd0e28b1bdd3fe0387405a3",
+  "durationMs": 2052,
+  "inputTokens": 3975,
+  "inputs": {
+    "requestDigest": "caef735bd58bee3f138ea724ee1fe1f9461148b724c67aca90835f5c32de482e",
+    "references": [
+      {
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "label": "RU01 core-process-model",
+        "path": ".agentdev/backlog/adf-v5-ru-revised-01-core-process-model.md"
+      },
+      {
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "label": "RU02 artifact-design-finalization",
+        "path": ".agentdev/backlog/adf-v5-ru-revised-02-artifact-design-finalization.md"
+      },
+      {
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "label": "RU03 change-impact-incremental-update",
+        "path": ".agentdev/backlog/adf-v5-ru-revised-03-change-impact-incremental-update.md"
+      },
+      {
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "label": "RU04 traceability-quality-verification",
+        "path": ".agentdev/backlog/adf-v5-ru-revised-04-traceability-quality-verification.md"
+      },
+      {
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "label": "RU05 workflow-responsibility-reorganization",
+        "path": ".agentdev/backlog/adf-v5-ru-revised-05-workflow-responsibility-reorganization.md"
+      },
+      {
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "label": "RU06 v5-migration-compatibility",
+        "path": ".agentdev/backlog/adf-v5-ru-revised-06-v5-migration-compatibility.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "ru01-primary-op",
+      "questionForm": "choice",
+      "value": "CREATE",
+      "probabilityDistribution": {
+        "CREATE": 1,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "ru02-primary-op",
+      "questionForm": "choice",
+      "value": "CREATE",
+      "probabilityDistribution": {
+        "CREATE": 0.86,
+        "APPEND": 0.01,
+        "UPDATE": 0.13,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "ru03-primary-op",
+      "questionForm": "choice",
+      "value": "CREATE",
+      "probabilityDistribution": {
+        "CREATE": 0.99,
+        "APPEND": 0,
+        "UPDATE": 0.01,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "ru04-primary-op",
+      "questionForm": "choice",
+      "value": "CREATE",
+      "probabilityDistribution": {
+        "CREATE": 0.98,
+        "APPEND": 0.01,
+        "UPDATE": 0.01,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "ru05-primary-op",
+      "questionForm": "choice",
+      "value": "CREATE",
+      "probabilityDistribution": {
+        "CREATE": 1,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "ru06-primary-op",
+      "questionForm": "choice",
+      "value": "CREATE",
+      "probabilityDistribution": {
+        "CREATE": 1,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "ru01-confirm-needed",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.46,
+        "false": 0.54
+      }
+    },
+    {
+      "questionId": "ru02-confirm-needed",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.66,
+        "false": 0.33999999999999997
+      }
+    },
+    {
+      "questionId": "ru03-confirm-needed",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.5,
+        "false": 0.5
+      }
+    },
+    {
+      "questionId": "ru04-confirm-needed",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.54,
+        "false": 0.45999999999999996
+      }
+    },
+    {
+      "questionId": "ru05-confirm-needed",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.35,
+        "false": 0.65
+      }
+    },
+    {
+      "questionId": "ru06-confirm-needed",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.44,
+        "false": 0.56
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "ru01-primary-op",
+        "value": "CREATE"
+      },
+      {
+        "questionId": "ru02-primary-op",
+        "value": "CREATE"
+      },
+      {
+        "questionId": "ru03-primary-op",
+        "value": "CREATE"
+      },
+      {
+        "questionId": "ru04-primary-op",
+        "value": "CREATE"
+      },
+      {
+        "questionId": "ru05-primary-op",
+        "value": "CREATE"
+      },
+      {
+        "questionId": "ru06-primary-op",
+        "value": "CREATE"
+      },
+      {
+        "questionId": "ru01-confirm-needed",
+        "value": false
+      },
+      {
+        "questionId": "ru02-confirm-needed",
+        "value": false,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "ru03-confirm-needed",
+        "value": false,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "ru04-confirm-needed",
+        "value": false,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "ru05-confirm-needed",
+        "value": false
+      },
+      {
+        "questionId": "ru06-confirm-needed",
+        "value": false
+      }
+    ]
+  }
+}

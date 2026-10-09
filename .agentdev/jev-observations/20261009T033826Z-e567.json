@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261009T033826Z-e567",
+  "workflow": "req-define",
+  "evaluationKind": "step4-final-classification-design-separation",
+  "subject": "ADF v5.0.0 要件プール組成結果（4 OU・新規52行・更新12行）の最終分類・Design分離判断",
+  "sourceRevision": "db85d596ac64c1c7dcd0e28b1bdd3fe0387405a3",
+  "durationMs": 1426,
+  "inputTokens": 2613,
+  "inputs": {
+    "requestDigest": "5e1ead7f52bcb21cd572e48617be7d624b7ad765d07af38d292e76f75b911dd7",
+    "references": [
+      {
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "label": "RU01 core-process-model",
+        "path": ".agentdev/backlog/adf-v5-ru-revised-01-core-process-model.md"
+      },
+      {
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "label": "RU02 artifact-design-finalization",
+        "path": ".agentdev/backlog/adf-v5-ru-revised-02-artifact-design-finalization.md"
+      },
+      {
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "label": "RU03 change-impact-incremental-update",
+        "path": ".agentdev/backlog/adf-v5-ru-revised-03-change-impact-incremental-update.md"
+      },
+      {
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "label": "RU04 traceability-quality-verification",
+        "path": ".agentdev/backlog/adf-v5-ru-revised-04-traceability-quality-verification.md"
+      },
+      {
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "label": "RU05 workflow-responsibility-reorganization",
+        "path": ".agentdev/backlog/adf-v5-ru-revised-05-workflow-responsibility-reorganization.md"
+      },
+      {
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "label": "RU06 v5-migration-compatibility",
+        "path": ".agentdev/backlog/adf-v5-ru-revised-06-v5-migration-compatibility.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "ou1-attribution",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.94,
+        "Design行": 0.06
+      }
+    },
+    {
+      "questionId": "ou2-attribution",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.98,
+        "Design行": 0.02
+      }
+    },
+    {
+      "questionId": "ou3-attribution",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.98,
+        "Design行": 0.02
+      }
+    },
+    {
+      "questionId": "ou4-attribution",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.99,
+        "Design行": 0.01
+      }
+    },
+    {
+      "questionId": "ou1-separation-needed",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.17,
+        "false": 0.83
+      }
+    },
+    {
+      "questionId": "ou2-separation-needed",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.2,
+        "false": 0.8
+      }
+    },
+    {
+      "questionId": "ou3-separation-needed",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.2,
+        "false": 0.8
+      }
+    },
+    {
+      "questionId": "ou4-separation-needed",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.21,
+        "false": 0.79
+      }
+    }
+  ],
+  "confidence": 0.88,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "ou1-attribution",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "ou2-attribution",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "ou3-attribution",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "ou4-attribution",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "ou1-separation-needed",
+        "value": false
+      },
+      {
+        "questionId": "ou2-separation-needed",
+        "value": false
+      },
+      {
+        "questionId": "ou3-separation-needed",
+        "value": false
+      },
+      {
+        "questionId": "ou4-separation-needed",
+        "value": false
+      }
+    ]
+  }
+}
