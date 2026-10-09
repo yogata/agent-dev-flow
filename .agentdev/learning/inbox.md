@@ -213,3 +213,35 @@
 - **想定反映先**: QG-4 reference「fail 由来分類」節の運用例補足候補
 - **関連**: Issue #3549、PR #3559 テスト結果節（IR-055 訂正記録）、Issue #3550 の learning（負荷依存境界）
 - **タグ**: `#timeout-nonreproducible` `#ir-055` `#evidence-retention` `#report-correction`
+
+## prepare_definition_pr の definitionEdits は既存ファイル置換のみで新規ファイル作成を表現できない
+
+- **問題事象**: case-open STEP-4 の機械工程 script（prepare_definition_pr.ts）の definitionEdits は「worktree root 相対パス + 旧文完全一致置換」のみを受理し、新規 REQ/DEC ファイル 10 件の作成を入力 JSON で表現できなかった。script 内の worktree 作成後に新規ファイルを配置する順序関係が contract 上の単一箇所になく、worktree を agentdev-git-worktree 標準手順（type=definition）で前置作成し、新規ファイルを node writeFileSync で配置した上で script を呼び出す前段構成になった
+- **発生局面**: case-open STEP-4 機械工程（Case #3560、新規 REQ 6 件 + DEC 4 件を含む Definition 変更）
+- **検知方法**: draft の artifact_actions に create 操作が 10 件ある一方、script 入力契約の DefinitionEdit 型が oldText 置換のみであることの突合
+- **根本原因**: 機械工程 script 契約は既存 docs 行の編集（REQ 行置換）を主対象に設計され、create 操作（新規ファイル）を definitionEdits の表現に含めない。実行経路の組み立て側で create 前段を補う必要がある
+- **自律対応内容**: worktree を標準手順で前置作成し、draft から content を抽出して新規 10 ファイルを worktree 内へ UTF-8 で配置した上で、script を既存ファイル編集 + 品質ゲート + stage・commit の 1 回呼び出しで実行した。script の worktree-create step は既存 worktree を branch 確認の上で再利用するため前置作成と冪等整合する
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（運用構成の記録。script 契約変更なし）
+- **横展開観点**: 新規 REQ/DEC を含む Definition 変更の case-open 全般。prepare_definition_pr と同型の機械工程 script（工程別個別 script）全般
+- **再発条件**: artifact_actions に create 操作を含む Case の case-open STEP-4 を実行した場合
+- **予防策候補**: 新規ファイル配置の前段手順を case-open references の実行手順として明記する、または script 入力契約に create 操作を追加する（後者は REQ/Design 変更を伴うため intake へ分離）
+- **想定反映先**: case-open Design「機械工程の script 呼び出し契約」節の補足候補、references/definition-pr-and-idempotency.md の手順補足候補
+- **関連**: Issue #3560、PR #3561
+- **タグ**: `#case-open-step4` `#definition-pr` `#new-files` `#script-contract-gap`
+
+## case-open traceability gate は script 判定が missing-design 以外の fail を無条件失敗にし Design 意図と乖離する
+
+- **問題事象**: case-open STEP-4 の traceability gate で、対象 REQ 行の missing-design が 0 件（正規ゲート成立）にもかかわらず、missing-implementation の 1 件（REQ-088-006、main HEAD 変更前から存在する既存欠落、対照実行で同一 findings）が script 判定で gate fail になった。case-open Design のゲート判定仕様は「case-open の正規ゲート（対象 REQ 行の missing-design 0 件）」と「missing-implementation / missing-verification の既存欠落は case-run / case-ready 段階の前提」を定め、既存欠落を case-open ゲート対象外とする意図と乖離する
+- **発生局面**: case-open STEP-4 の PR 作成前ゲート判定（Case #3560）
+- **検知方法**: script 終了コード 1 と traceability check 報告（pass=8 fail=1、fail は missing-implementation のみ）の突合、main HEAD での同一定 REQ 行 check の対照実行
+- **根本原因**: prepare_definition_pr.ts の gate 判定実装は「missing-design 以外の status: fail は無条件 gate fail」としており、Design 判定仕様の既存欠落除外（missing-design の対象行 findings のみを判定）より広く失敗と判定する
+- **自律対応内容**: 既存欠落の補完は RA-003（後続 OU、実現面）の範囲であり scope 紀律上実施せず、対象 REQ 行 64 行の missing-design 0 件（正規ゲート成立）を対照実行で確認した上で、missing-implementation の既存欠落を warn として報告に記録し PR 作成へ進んだ。fail を pass へ変換しない（既存欠落は case-ready の lifecycle gate completeness と後続 OU が所有する既知債務として保持）
+- **ユーザー確認有無**: なし（case-auto 配下のため親判断解決への委譲対象として報告に含めた）
+- **Decision/REQ/spec影響**: なし（運用判断の記録。script 実装と Design 仕様の乖離は未解決）
+- **横展開観点**: traceability gate を実行する case-open STEP-4 と case-ready トレーサビリティ完全性ゲート（同一エンジン共有）
+- **再発条件**: 対象 REQ 行に design 宣言はあるが implementation 未対応の行（既存欠落）を含む Definition 変更で case-open を実行した場合
+- **予防策候補**: script gate 判定を Design 判定仕様へ整合させる（missing-design の対象行 findings のみを判定）か、ゲート判定仕様側で script 実装の現行動作を正とするかのどちらかを確定する。確定までの間は対照実行（main HEAD の同一定 check）で既存欠落と変更起因欠落を分離して報告する
+- **想定反映先**: case-open Design ゲート判定仕様節と prepare_definition_pr.ts の判定ロジックの整合確認候補（intake に分離）
+- **関連**: Issue #3560、PR #3561
+- **タグ**: `#case-open-step4` `#traceability-gate` `#missing-implementation` `#known-debt` `#contrast-run`
