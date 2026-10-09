@@ -10,7 +10,7 @@
 DEC-018 は欠番であり、対応する Decision ファイルは存在しない。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は46件、提案中の Decision は0件である。
+現行の承認済み Decision は46件、提案中の Decision は1件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -71,6 +71,7 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 | DEC-054 | ADF v5 追跡・品質検証モデル（隣接工程間対応・構造/意味分離・差分影響評価） | accepted | 2026-10-09 |
 | DEC-055 | ADF v5 有限実行と責務再編（工程独立実行・Issue 必要時利用・Wave の意味的依存グループ化） | accepted | 2026-10-09 |
 | DEC-056 | ADF v5 移行と互換性の境界（後方互換非必須・意味保存移行・未処理改善情報の継続） | accepted | 2026-10-09 |
+| DEC-057 | ADF v5 完遂判定の強制（単一の正規完遂経路への集約と迂回経路の機械的拒否） | proposed | 2026-10-10 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -134,6 +135,7 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
+- [DEC-057](DEC-057.md)（ADF v5 完遂判定の強制（単一の正規完遂経路への集約と迂回経路の機械的拒否））
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -314,6 +316,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-054 | [REQ-106](../requirements/REQ-106.md), [REQ-107](../requirements/REQ-107.md), [REQ-012](../requirements/REQ-012.md), [REQ-021](../requirements/REQ-021.md) | - |
 | DEC-055 | [REQ-108](../requirements/REQ-108.md) | - |
 | DEC-056 | [REQ-109](../requirements/REQ-109.md), [REQ-009](../requirements/REQ-009.md) | - |
+| DEC-057 | [REQ-110](../requirements/REQ-110.md), [REQ-032](../requirements/REQ-032.md), [REQ-104](../requirements/REQ-104.md), [REQ-105](../requirements/REQ-105.md), [REQ-106](../requirements/REQ-106.md), [REQ-107](../requirements/REQ-107.md), [REQ-108](../requirements/REQ-108.md), [REQ-109](../requirements/REQ-109.md) | - |
 <!-- AUTOGEN:END -->
 
 ## 過去版の履歴基盤

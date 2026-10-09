@@ -211,6 +211,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | quality/design-health-metrics.md | accepted | Design 健全性メトリクス | Design 肥大化、放置、ドメイン分類適合の定量閾値 |
 | quality/textlint-quality-runtime.md | accepted | textlint 品質基盤 | 文章表層品質の共通実行基盤（プロジェクト解決、設定読込み、対象解決、規則構成、文章検査、結果整形）。書込み前検査と最終検査の共通化、Plugin と単独実行入口の2入口 |
 | quality/v4-quality-gate-model.md | accepted | ADF v4 Quality / Verification / Evidence / Gate モデル | Quality Policy / Verification Obligation / Verifier / Evidence / Gate の 5 概念分解、Gate = 状態遷移 predicate 契約、v4 standard lifecycle からの Gate 再導出手順、Verifier 分類の定義、統制種別必要性の正規節（REQ-103-018） |
+| [quality/v5-completion-judgment.md](quality/v5-completion-judgment.md) | draft | ADF v5 完遂判定経路（完遂条件体系・反例カタログ・台帳様式・独立検証・迂回拒否の実行構造） | REQ-110（完遂判定の強制）と DEC-057（単一の正規完遂経路と迂回経路の機械的拒否）の実行構造を所有する完遂判定経路 Design。完遂条件体系（G0〜G10・4領域構成）の台帳様式、G4 反例カタログ、独立検証の手続き、迂回経路の反証検査、検証器偽陽性の確認手順、タグ・版運用手順、移行検証の手順、保証の限界の記録様式を所有する。QG-4 の Verification Obligation 拡張として完遂条件体系を定義し、新たな Gate を追加しない（v4-quality-gate-model の QG 群所有規定に従う） |
 
 #### integrity/（整合性契約、ルール）
 

@@ -2,10 +2,11 @@
 title: アーティファクト契約
 status: accepted
 created: 2026-08-20
-updated: "2026-10-08"
+updated: "2026-10-10"
 ---
 <!-- ADF-COVERS(implementation): REQ-002-005, REQ-002-006, REQ-002-016, REQ-002-034 -->
 <!-- ADF-COVERS(design): REQ-103-013, REQ-103-024, REQ-103-025（REQ-103 の soft contract 再定義・実現物整合・入力忠実性の設計対応面） -->
+<!-- ADF-COVERS(design): REQ-008-051（REQ-008-051 の generation_actor 列挙化に伴う RU アーティファクト契約更新の設計対応面） -->
 <!-- ADF-COVERS(implementation): REQ-103-013（REQ-103 の soft contract 再定義面。soft contract の定義（LLM 解釈必須・機械的処理回避・schema 全面禁止の理由として扱わない）を本 Design の契約節が構成実体として所有する。決定的処理可能部分の機械処理は各 Tool・checker・sidecar schema が分担） -->
 
 # アーティファクト契約
@@ -544,7 +545,7 @@ session由来RU（`source_type: chat`、`generated_by: session`）の生成、�
 
 ### 生成主体と生成時点
 
-- 生成主体: `req-define` 親エージェント（`generation_actor: req-define-parent`）
+- 生成主体: `req-define` 親エージェントまたは Supervisor（Hermes 監督セッション）。`generation_actor` に `req-define-parent` / `supervisor` のいずれかを記録する
 - 生成時点: チャット内合意成立後、req-define 開始前（`generation_stage: pre-req-define`）
 - `agreement_confirmed_at` と `generated_at` は ISO 8601 形式とし、`generated_at >= agreement_confirmed_at` を満たすこと
 - 保存完了前に req-define を開始しないこと
@@ -575,7 +576,7 @@ session由来RU の frontmatter は次を必須とする。
 |---|---|
 | `source_type` | `chat` |
 | `generated_by` | `session` |
-| `generation_actor` | `req-define-parent` |
+| `generation_actor` | `req-define-parent` / `supervisor` のいずれか（RU 起案主体の記録。`req-define` 親エージェントと、合意成立後の session 内で Supervisor が起案する経路の双方を正規とする。二段階承認は値にかかわらず等しく適用する） |
 | `agreement_confirmed_at` | ISO 8601 形式の合意成立時刻 |
 | `generation_stage` | `pre-req-define` |
 | `generated_at` | ISO 8601 形式の生成時刻（`>= agreement_confirmed_at`） |
