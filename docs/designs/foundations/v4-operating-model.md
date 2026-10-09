@@ -5,6 +5,7 @@ created: 2026-09-18
 updated: "2026-10-09"
 ---
 <!-- ADF-COVERS(design): REQ-088-001, REQ-088-002, REQ-088-003, REQ-088-004, REQ-088-005, REQ-088-006, REQ-088-007 -->
+<!-- ADF-COVERS(implementation): REQ-088-006（REQ、Decision、Design、Implementation、Evidence の意味境界の正規所有の構成実体は本 Design「中核文書モデル」節そのものである） -->
 <!-- ADF-COVERS(design): REQ-103-001, REQ-103-020, REQ-103-021, REQ-103-027（REQ-103 の v4 正規モデル・情報寿命・中核維持の設計対応面） -->
 <!-- ADF-COVERS(implementation): REQ-103-001, REQ-103-027（REQ-103 の正規モデル要素と正規所有 Design の対応表と「v4 の中核と維持条件」節が、正規モデル一意説明・中核 5 要素維持契約の構成実体） -->
 <!-- ADF-COVERS(implementation): REQ-103-029, REQ-103-030, REQ-103-031（REQ-103 の有限完了・並列化と横断整合確認・AC 個別判定の完了記録面。判定記録本体は docs/reports/req-103-ac-judgment-wave3.md。並列実行基盤実体は agentdev-workflow-case-auto 側） -->
