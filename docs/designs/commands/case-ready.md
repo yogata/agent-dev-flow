@@ -2,7 +2,7 @@
 title: case-ready Design
 status: accepted
 created: 2026-09-14
-updated: "2026-10-09"
+updated: "2026-10-10"
 ---
 
 <!-- ADF-COVERS(design): REQ-021-024 -->
@@ -10,6 +10,7 @@ updated: "2026-10-09"
 <!-- ADF-COVERS(design): REQ-004-061 -->
 <!-- ADF-COVERS(design): REQ-061-003 -->
 <!-- ADF-COVERS(design): REQ-061-010, REQ-061-019, REQ-061-021, REQ-061-038, REQ-061-023, REQ-061-029, REQ-061-030, REQ-061-033, REQ-061-034, REQ-061-035, REQ-061-039, REQ-061-040, REQ-061-047, REQ-061-048, REQ-035-012, REQ-035-018 -->
+<!-- ADF-COVERS(design): REQ-061-007, REQ-061-013（Epic 確定と Child Issue 生成の必須性撤廃に伴う設計対応面。coverage --req 実査で design 欠落を確認済み） -->
 <!-- ADF-COVERS(design): REQ-061-041, REQ-061-042, REQ-017-021, REQ-017-022, REQ-017-023, REQ-061-043, REQ-061-044, REQ-061-045, REQ-061-046, REQ-030-023 -->
 <!-- ADF-COVERS(implementation): REQ-103-014 -->
 

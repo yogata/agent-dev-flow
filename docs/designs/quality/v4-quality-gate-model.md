@@ -2,7 +2,7 @@
 title: ADF v4 Quality / Verification / Evidence / Gate モデル
 status: accepted
 created: 2026-09-18
-updated: 2026-10-08
+updated: 2026-10-10
 ---
 
 <!-- ADF-COVERS(implementation): REQ-003-013, REQ-007-006, REQ-007-007, REQ-007-008, REQ-007-009, REQ-054-003 -->
@@ -112,6 +112,13 @@ QG-2 / QG-4 の Verification Obligation への受け入れ義務保存の拡張�
 - 完了条件単位の評価区分（pass / fail / blocked / not applicable）は完了条件単位の評価であり、Gate の判定値（pass / warn / fail / partial）への写像は正規所有契約（判定値と遷移接続）が定める。必須条件の未達・未証明を Gate 全体の warn で通過させない。
 - QG-4 の評価は case-run が提示した検査対象、期待結果、除外条件、合格申告をそのまま最終基準として利用しない。実装結果から検証基準を逆算せず、正規契約側から検証義務を形成する。
 - 検証義務導出の判断方法は REQ-096 の3分類（決定的処理、閉じた意味評価、開いた推論）に従い、単純な全ツリー検索等の単一手段をすべての検証義務へ一般化しない。
+
+## QG-4 完遂判定義務（v5 完遂条件体系）
+
+QG-4 の Verification Obligation に ADF v5 完遂条件体系（G0〜G10、4領域構成）を追加する（REQ-110、DEC-057）。
+完了条件単位の評価（pass / fail / blocked / not applicable）と Gate 判定値への写像は既存の正規所有契約に従う。
+完遂条件の台帳様式・反例カタログ・独立検証・迂回拒否の実行構造は v5-completion-judgment Design（quality ドメイン）が所有する。
+新たな Gate は追加しない。
 
 ## Verifier 分類
 
