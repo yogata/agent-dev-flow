@@ -501,3 +501,19 @@
 - **想定反映先**: .agentdev/extensions/skills/agentdev-workflow-case-open.yaml の yomiyasu-application-before-write rule 文面、および同等 rule を持つ他 workflow extension
 - **関連**: Case #3605、検査入力置き場所指針（src/common/skills/agentdev-workflow-case-open/scripts/README.md「検査入力 JSON の置き場所指針」節）
 - **タグ**: `#write-guard` `#fail-closed` `#yomiyasu-lint` `#temp-file`
+
+## coverage カンマ連結の union 結果を行単位 design 対応の帰着証明に使えず case-ready で missing-design 10 行が検出された
+
+- **問題事象**: case-open が Definition PR #3608 の検証差分に「対象 REQ 行（REQ-050-002/003/005/015・REQ-058-001/004/005/006/008/012・REQ-099-012）の design 対応は multi-host-canonical-model.md への実在を coverage 実測済み」と記録したが、case-ready STEP-2 で対象 REQ 行 11 行を --req 宣言して traceability check を機械実行したところ missing-design 10 行（REQ-050-002/003/005/015、REQ-058-001/004/005/006/008/012）が検出され、受入ゲートが merge を抑止した。coverage 単行実測では REQ-050-002 の design 対応 0 件（implementation 1・verification 2）、design 対応 1 件は REQ-099-012 のみ（multi-host-canonical-model.md line 7 宣言）であり、REQ-050-009 以外の 10 行の design 宣言は repo 全体走査でも存在しなかった
+- **発生局面**: 検証（case-ready STEP-1 受入検査の traceability gate 判定。case-auto stage 2 からの委譲実行）
+- **検知方法**: gate 判定仕様（missing-design は対象 REQ 行の findings が 0 件のとき pass、1 件以上のとき fail）に基づく check 実行（--req 宣言付き、exit 2・summary pass=9 fail=2）の findings と、coverage 単行実行（REQ-050-002: counts.design=0、REQ-099-012: counts.design=1）の突合
+- **根本原因**: coverage --req へのカンマ連結指定は 11 行分の union の関係一覧を返し、counts.design=1 は REQ-099-012 の実在のみを意味する。行単位の design 対応帰着は coverage 単行実行または check の missing-design findings で確認する必要がある。union の design 計上 1 件を「対象 REQ 行全体の design 対応実在」と解釈した
+- **自律対応内容**: merge を実行せず既存 PR・draft・RU を保持したまま case-open 差し戻しで停止した。対象 REQ 行内の missing-design は gate 判定仕様の「対象 REQ 行外の既存債務」除外に該当しないため gate fail を維持し、対照実行（origin/main と findings 完全一致・本変更起因 0 件）は変更起因性の評価に使用したが gate 判定基準は緩和しなかった。PR への yomiyasu 適用記録欠落（acceptance_gates）は case-ready 側で適用を実施・記録（comment 追記）して解消済み
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存ゲート契約の適用。契約変更なし）
+- **横展開観点**: coverage --req カンマ連結を design 対応確認に使う全工程（case-open の missing-design 0 件ゲート、case-ready のトレーサビリティ完全性ゲート）。行単位帰着の証明は coverage 単行実行か check findings で行う
+- **再発条件**: 複数 REQ 行をカンマ連結で coverage 実行し、counts.design の計上有無で design 対応実在を判定した場合
+- **予防策候補**: design 対応の行単位確認は coverage の単行実行または check --req の missing-design findings で実施する。union 結果の counts.design は帰着証明に使わない。case-ready の完全性ゲートは対象 REQ 行を --req 宣言して check する契約どおり実行する
+- **想定反映先**: case-open reference（definition-pr-and-idempotency.md）missing-design 0 件ゲート節の確認手順補足候補
+- **関連**: Case #3605、PR #3608、commit e9a65d50、既存エントリ「traceability gate の既存債務 fail は対照実行で変更起因 0 件を機械証明してから PR 作成可否を意味判断する」（同 Case の case-open 側記録）
+- **タグ**: `#case-ready` `#traceability-gate` `#missing-design` `#coverage-union` `#gate-blocking`
