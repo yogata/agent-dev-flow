@@ -171,6 +171,89 @@ describe("FN-1: 子完了と親横断義務の分離", () => {
 });
 
 // ---------------------------------------------------------------------------
+// 申告と受入の分離（受入評価結果の消費）
+// ---------------------------------------------------------------------------
+
+describe("申告と受入の分離（受入評価結果の消費）", () => {
+  test("受入評価が拒否している子は申告が合格でも完了しない", () => {
+    const result = canCompleteChild({
+      ...satisfiedChild("#3005"),
+      acceptance: { closeAllowed: false, rejectionReason: "acceptance-denied:必須未達残存" },
+    });
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toContain("受入評価が完了を許可していない");
+  });
+
+  test("受入評価が許可している子は申告と同一の経路で完了する", () => {
+    const result = canCompleteChild({
+      ...satisfiedChild("#3006"),
+      acceptance: { closeAllowed: true },
+    });
+    expect(result.allowed).toBe(true);
+  });
+
+  test("受入評価の結果が未提供の子は従来どおり申告で完了判定する", () => {
+    const result = canCompleteChild(satisfiedChild("#3007"));
+    expect(result.allowed).toBe(true);
+  });
+
+  test("受入評価が拒否している子は依存充足しない（Wave クローズ進行停止）", () => {
+    const result = isDependencySatisfied({
+      dependencyProviders: [
+        {
+          ...satisfiedChild("#dep-a"),
+          acceptance: { closeAllowed: false, rejectionReason: "acceptance-denied" },
+        },
+      ],
+    });
+    expect(result.satisfied).toBe(false);
+    expect(result.blockers).toContain("dependency-not-satisfied:#dep-a");
+  });
+
+  test("受入評価が拒否している子は Wave 収束に含まれず Epic の最終終了も阻止される", () => {
+    const deniedChild: ChildExecutionRecord = {
+      ...satisfiedChild("#3008"),
+      acceptance: { closeAllowed: false, rejectionReason: "acceptance-denied" },
+    };
+    const result = canCloseEpic({
+      children: [satisfiedChild("#1"), deniedChild],
+      crossObligations: [{ obligationId: "X-1", satisfied: true }],
+    });
+    expect(result.allowed).toBe(false);
+    expect(result.blockers).toContain("child-not-complete:#3008");
+  });
+
+  test("Epic 自身の受入評価が拒否している場合、横断義務が成立していても最終終了しない", () => {
+    const result = canCloseEpic({
+      children: [satisfiedChild("#1"), satisfiedChild("#2")],
+      crossObligations: [{ obligationId: "X-1", satisfied: true }],
+      epicAcceptance: { closeAllowed: false, rejectionReason: "acceptance-denied" },
+    });
+    expect(result.allowed).toBe(false);
+    expect(result.blockers.some((b) => b.startsWith("epic-acceptance-denied:"))).toBe(true);
+  });
+
+  test("Epic 自身の受入評価が許可している場合は既存契約どおり最終終了する", () => {
+    const result = canCloseEpic({
+      children: [satisfiedChild("#1"), satisfiedChild("#2")],
+      crossObligations: [{ obligationId: "X-1", satisfied: true }],
+      epicAcceptance: { closeAllowed: true },
+    });
+    expect(result.allowed).toBe(true);
+  });
+
+  test("子は子の必須条件と子の受入評価で判定し、親の受入評価を子の完了判定に含めない", () => {
+    // 親（Epic）の受入評価が拒否されていても、子自体の完了判定は子の条件のみで行う
+    // （子完了と親横断義務の分離の評価範囲維持）。
+    const childResult = canCompleteChild({
+      ...satisfiedChild("#1"),
+      acceptance: { closeAllowed: true },
+    });
+    expect(childResult.allowed).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // 依存充足ゲート（スロット型キュー投入）
 // ---------------------------------------------------------------------------
 

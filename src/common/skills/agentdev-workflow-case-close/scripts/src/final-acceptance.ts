@@ -11,6 +11,14 @@
  *   検証方法変更の同等性を構造的検査で検証する
  * - 必須完了条件に未達が1件でも存在する場合、close を許可しない
  *   （必須未達を Gate 全体の warn 等で通過させない）
+ * - 受入評価の母集団（終了対象の正規完了条件の取得状態）を入力に受け、
+ *   条件の取得失敗・必須条件があるのに判定配列が空・正規契約上の完了条件なしの
+ *   3状態を区別する（前二者は close を拒否し、後者は根拠付きで既存契約どおり
+ *   処遇する）。母集団情報の欠落、必須条件の判定欠落・重複を検出して close を
+ *   拒否する。母集団は終了対象の正規完了条件から独立取得した情報であり、
+ *   実行担当の報告（照合入力）から作らない
+ * - pass 判定は判定根拠の正規契約導出と証拠の意味命題立証が明示的に確認されて
+ *   いることを要求し、未設定（grounds の欠落入力）を許可の根拠にしない
  * - 子 Issue の完了は当該子が負う必須条件のみで判定し、親に残る横断義務の
  *   未完了を子の終了判定に含めない。親の横断義務は Epic/Root の最終終了時のみ
  *   評価する
@@ -85,12 +93,65 @@ export interface CrossObligation {
   satisfied: boolean;
 }
 
+/**
+ * 受入評価の母集団（終了対象の正規完了条件）の取得状態。
+ * 完了条件チェックボックス抽出（close_mechanical_steps.ts の抽出フェーズ）等が
+ * 正規完了条件から独立取得した情報であり、実行担当の報告から作らない。
+ */
+export interface ConditionPopulation {
+  /**
+   * 正規完了条件の機械的抽出または読取に成功したか。false（条件の取得失敗）
+   * は close を拒否する（fail-closed）。抽出失敗を「条件なし」へ変換しない。
+   */
+  extractionSucceeded: boolean;
+  /**
+   * 正規契約上の完了条件総数。取得成功時のみ確定する。取得失敗時は
+   * null（不明）とし、0（条件なし）に変換しない。
+   */
+  contractConditionCount: number | null;
+  /** 正規契約上の必須完了条件数。取得失敗時は null。 */
+  contractRequiredCount: number | null;
+  /**
+   * 正規必須完了条件の識別子一覧。提供された場合、判定配列との対応照合で
+   * 必須条件の判定欠落・重複を検出する。未提供の場合は必須条件数の突合で
+   * 欠落を検出する。
+   */
+  contractRequiredConditionIds?: readonly string[];
+  /**
+   * 正規契約上の完了条件が存在しないことの根拠（contractConditionCount が 0
+   * の場合に正として要求する）。根拠が正規契約から説明できない空の抽出を
+   * 「条件なし」として扱わない。
+   */
+  emptyBasis?: string;
+}
+
+/**
+ * 母集団の空状態の区分。条件の取得失敗、必須条件があるのに判定配列が空、
+ * 正規契約上の完了条件なしの3状態を区別する。
+ */
+export type PopulationState =
+  /** 母集団情報が入力に存在しない。 */
+  | "population-missing"
+  /** 条件の取得失敗。 */
+  | "extraction-failed"
+  /** 必須条件が存在するのに判定配列が空。 */
+  | "required-conditions-no-verdicts"
+  /** 正規契約上の完了条件なし。 */
+  | "no-conditions-in-contract"
+  /** 母集団あり・判定あり。 */
+  | "populated";
+
 /** 評価対象の種別。子 Issue の完了判定と Epic/Root の終了判定で分離する。 */
 export type SubjectKind = "child-issue" | "epic" | "root-case";
 
 /** 完了条件単位最終評価の入力。 */
 export interface FinalAcceptanceInput {
   subjectKind: SubjectKind;
+  /**
+   * 受入評価の母集団（終了対象の正規完了条件の取得状態）。実行担当の報告では
+   * なく、正規完了条件から独立取得した情報を渡す。未提供は close を拒否する。
+   */
+  population: ConditionPopulation;
   verdicts: readonly ConditionVerdict[];
   /**
    * 親横断義務。Epic/Root の最終終了時のみ評価し、子 Issue の完了判定では
@@ -107,7 +168,19 @@ export interface AcceptanceViolation {
 }
 
 export type ViolationCode =
-  /** 判定根拠が正規契約から導出されていない（自己申告依存）。 */
+  /** 母集団情報が入力に存在しない（母集団の独立取得が行われていない）。 */
+  | "population-missing"
+  /** 正規完了条件の機械的抽出または読取に失敗した。 */
+  | "condition-source-unavailable"
+  /** 必須条件が存在するのに判定配列が空。 */
+  | "required-condition-verdict-empty"
+  /** 正規契約上の完了条件なしの根拠が正として存在しない。 */
+  | "empty-population-without-basis"
+  /** 正規必須完了条件に対応する判定が存在しない（判定欠落・未判定）。 */
+  | "verdict-missing-for-contract-condition"
+  /** 同一条件への判定が重複している。 */
+  | "duplicate-condition-verdicts"
+  /** 判定根拠が正規契約から導出されていない（自己申告依存・未確認を含む）。 */
   | "verdict-derived-from-self-report"
   /** not applicable に正規契約上の根拠がない。 */
   | "not-applicable-without-contract-basis"
@@ -134,13 +207,124 @@ export interface FinalAcceptanceResult {
    * 影響しない。
    */
   blockingCrossObligations: string[];
+  /** 母集団の空状態の区分（取得失敗・判定空・条件なしの3状態の区別）。 */
+  populationState: PopulationState;
+}
+
+/**
+ * 受入評価の母集団（正規完了条件の取得状態）を検査し、3空状態を区別して
+ * 違反を返す。
+ *
+ * - 母集団情報の欠落 → population-missing（close 拒否）
+ * - 条件の取得失敗 → condition-source-unavailable（close 拒否。fail-closed。
+ *   抽出失敗を「条件なし」へ変換しない）
+ * - 完了条件 0 件 → 根拠（emptyBasis）が正として存在すれば既存契約どおりの
+ *   処遇に委ね、根拠がなければ empty-population-without-basis（close 拒否）
+ * - 必須条件があるのに判定配列が空 → required-condition-verdict-empty
+ * - 必須条件の判定欠落・重複（ID 一覧または必須条件数との突合）→
+ *   verdict-missing-for-contract-condition / duplicate-condition-verdicts
+ */
+function inspectPopulation(
+  population: ConditionPopulation | undefined,
+  verdicts: readonly ConditionVerdict[],
+): AcceptanceViolation[] {
+  if (population === undefined) {
+    return [
+      {
+        code: "population-missing",
+        conditionId: "population",
+        detail: "母集団情報（正規完了条件の取得状態）が入力に存在しない。正規完了条件から母集団を独立取得して受入評価を実行する",
+      },
+    ];
+  }
+  if (
+    population.extractionSucceeded !== true ||
+    population.contractConditionCount === null ||
+    population.contractRequiredCount === null
+  ) {
+    return [
+      {
+        code: "condition-source-unavailable",
+        conditionId: "population",
+        detail: "正規完了条件の機械的抽出または読取に失敗している（取得失敗を条件なしや判定対象から除外へ変換せず、fail-closed で close を拒否する）",
+      },
+    ];
+  }
+  if (population.contractConditionCount === 0) {
+    if (
+      typeof population.emptyBasis !== "string" ||
+      population.emptyBasis.length === 0
+    ) {
+      return [
+        {
+          code: "empty-population-without-basis",
+          conditionId: "population",
+          detail: "正規契約上の完了条件が存在しないことの根拠が正として存在しない（空の抽出を条件なしとして受理できない）",
+        },
+      ];
+    }
+    return [];
+  }
+  const violations: AcceptanceViolation[] = [];
+  if (population.contractRequiredCount > 0 && verdicts.length === 0) {
+    violations.push({
+      code: "required-condition-verdict-empty",
+      conditionId: "population",
+      detail: `必須完了条件が ${population.contractRequiredCount} 件存在するのに判定配列が空である（空の判定入力を許可扱いにしない）`,
+    });
+    return violations;
+  }
+  if (population.contractRequiredConditionIds !== undefined) {
+    const requiredIds = new Set(population.contractRequiredConditionIds);
+    const seen = new Map<string, number>();
+    for (const verdict of verdicts) {
+      seen.set(verdict.conditionId, (seen.get(verdict.conditionId) ?? 0) + 1);
+    }
+    for (const id of requiredIds) {
+      if (!seen.has(id)) {
+        violations.push({
+          code: "verdict-missing-for-contract-condition",
+          conditionId: id,
+          detail: "正規必須完了条件に対応する判定が存在しない（照合入力から必須条件を削除しても母集団から欠落を検出する）",
+        });
+      }
+    }
+    for (const verdict of verdicts) {
+      if (verdict.required && requiredIds.has(verdict.conditionId)) {
+        if ((seen.get(verdict.conditionId) ?? 0) > 1) {
+          violations.push({
+            code: "duplicate-condition-verdicts",
+            conditionId: verdict.conditionId,
+            detail: "同一条件への判定が重複している（重複した判定で必須条件の欠落を隠せない）",
+          });
+        }
+      }
+    }
+    return violations;
+  }
+  const requiredVerdictIds = new Set(
+    verdicts.filter((v) => v.required).map((v) => v.conditionId),
+  );
+  if (requiredVerdictIds.size < population.contractRequiredCount) {
+    violations.push({
+      code: "verdict-missing-for-contract-condition",
+      conditionId: "population",
+      detail: `必須完了条件 ${population.contractRequiredCount} 件に対して必須判定が ${requiredVerdictIds.size} 件しか存在しない（照合入力から必須条件を削除しても母集団の必須条件数との突合で欠落を検出する）`,
+    });
+  }
+  return violations;
 }
 
 /**
  * 完了条件単位の判定レコード群を構造的に検査し、close 可否を決定的に判定する。
  *
+ * - 母集団（正規完了条件の取得状態）を検査し、条件の取得失敗・必須条件がある
+ *   のに判定配列が空を close 拒否にし、正規契約上の完了条件なしを根拠付きで
+ *   既存契約どおりに処遇する（3空状態の区別）
  * - pass 判定には証拠・根拠の性質検査を適用する（fail / blocked は未達として
- *   集約され、証拠検査の対象にならない）
+ *   集約され、証拠検査の対象にならない）。pass は判定根拠の正規契約導出と
+ *   証拠の意味命題立証が明示的に確認されていることを要求し、未設定（grounds
+ *   の欠落入力）を許可の根拠にしない
  * - not applicable は正規契約上の根拠を要求する
  * - 必須条件の未達（fail / blocked / not-applicable）は1件でも close を拒否する
  * - 子 Issue では親横断義務を参照せず、Epic/Root では最終終了時に評価する
@@ -151,22 +335,26 @@ export function evaluateFinalAcceptance(
   const violations: AcceptanceViolation[] = [];
   const blockingUnmet: string[] = [];
 
+  violations.push(
+    ...inspectPopulation(input.population, input.verdicts),
+  );
+
   for (const verdict of input.verdicts) {
     const g = verdict.grounds;
 
     if (verdict.category === "pass") {
-      if (g.derivedFromContract === false) {
+      if (g.derivedFromContract !== true) {
         violations.push({
           code: "verdict-derived-from-self-report",
           conditionId: verdict.conditionId,
-          detail: "判定根拠が正規契約から導出・照合されていない（実装 diff や自己申告だけを最終基準にしている）",
+          detail: "判定根拠が正規契約から導出・照合されていない（未設定の欠落入力を含む。実装 diff や自己申告だけを最終基準にしている）",
         });
       }
-      if (g.evidenceProvesSemanticProposition === false) {
+      if (g.evidenceProvesSemanticProposition !== true) {
         violations.push({
           code: "evidence-formal-match-only",
           conditionId: verdict.conditionId,
-          detail: "条件ID一致・テスト名類似・関連ファイル検査といった形式的一致のみを達成証拠としている",
+          detail: "条件ID一致・テスト名類似・関連ファイル検査といった形式的一致のみを達成証拠としている（意味対応評価の未設定の欠落入力を含む）",
         });
       }
       if (
@@ -241,5 +429,30 @@ export function evaluateFinalAcceptance(
     blockingUnmet.length === 0 &&
     blockingCrossObligations.length === 0;
 
-  return { closeAllowed, violations, blockingUnmet, blockingCrossObligations };
+  const population = input.population;
+  const populationState: PopulationState = (() => {
+    if (population === undefined) return "population-missing";
+    if (
+      population.extractionSucceeded !== true ||
+      population.contractConditionCount === null ||
+      population.contractRequiredCount === null
+    ) {
+      return "extraction-failed";
+    }
+    if (population.contractConditionCount === 0) {
+      return "no-conditions-in-contract";
+    }
+    if (population.contractRequiredCount > 0 && input.verdicts.length === 0) {
+      return "required-conditions-no-verdicts";
+    }
+    return "populated";
+  })();
+
+  return {
+    closeAllowed,
+    violations,
+    blockingUnmet,
+    blockingCrossObligations,
+    populationState,
+  };
 }

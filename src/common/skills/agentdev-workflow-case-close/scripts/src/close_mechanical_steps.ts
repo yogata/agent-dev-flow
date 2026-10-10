@@ -3,11 +3,15 @@
 // 工程別 script。契約の正は case-close Design「機械工程の script 呼び出し契約」節）。
 //
 // mergeable ポーリング、squash merge 前後のローカル状態検査、Epic 実行構成表の
-// 解析と状態更新、完了条件チェックボックス評価の機械的抽出、AUTOGEN 再生成差分
-// 検出、full integrity suite の起動と結果集約、worktree/branch クリーンアップを
-// 1 script の呼び出しに束ねる。GitHub I/O（pr_merge、issue_close、Issue 本文更新）
+// 解析と状態更新、完了条件チェックボックス評価の機械的抽出（受入評価の母集団
+// 導出と final-acceptance.ts の evaluateFinalAcceptance への接続を兼ねる）、
+// AUTOGEN 再生成差分検出、full integrity suite の起動と結果集約、worktree/branch
+// クリーンアップを1 script の呼び出しに束ねる。受入評価の拒否・未確定は報告
+// JSON（diff.acceptanceEvaluation と isCloseOperationPermitted）を通じて既存の
+// 終了操作（STEP-5 の issue_close、E1〜E6 の Epic 終了・Wave クローズ）の実行
+// 抑制として消費される。GitHub I/O（pr_merge、issue_close、Issue 本文更新）
 // は行わない（読み取り系 gh pr view のみ）。意味判断（警告の重要度評価、Design
-// 確定判断、未達判定の確定）はモデルが担当する。
+// 確定判断、未達判定の確定、完了条件単位の判定入力の組み立て）はモデルが担当する。
 //
 // 入力: `--input` に機械工程入力 JSON ファイル。出力: stdout に報告 JSON
 // （実行結果・差分・警告・提案本文の4要素）。終了コード: 成功 0、要判断 2、
@@ -26,6 +30,14 @@ import {
   replaceChildStatus,
   type PersistedStatus,
 } from "../../../agentdev-epic-tracker/scripts/lib/tracking-table.ts";
+import {
+  evaluateFinalAcceptance,
+  type ConditionPopulation,
+  type ConditionVerdict,
+  type CrossObligation,
+  type FinalAcceptanceResult,
+  type SubjectKind,
+} from "./final-acceptance.ts";
 
 const USAGE = `usage: bun ./src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts --input <input.json>
   --input  機械工程入力 JSON（phase、worktree_root、PR番号、品質ゲート実行仕様等）`;
@@ -74,6 +86,10 @@ export interface CloseMechanicalInput {
   integrityGates?: readonly GateCommandSpec[];
   textlintGate?: GateCommandSpec;
   cleanup?: { removeWorktree: boolean; removeBranch: string | null };
+  acceptanceSubjectKind?: SubjectKind;
+  acceptanceVerdicts?: readonly ConditionVerdict[];
+  acceptanceCrossObligations?: readonly CrossObligation[];
+  acceptanceEmptyBasis?: string;
 }
 
 export interface StepRecord {
@@ -183,6 +199,67 @@ export function extractCompletionCheckboxes(
 }
 
 /**
+ * 完了条件チェックボックス抽出の結果から受入評価の母集団を導出する
+ * （抽出フェーズが母集団導出を兼ねる。case-close Design「機械工程の script
+ * 呼び出し契約」節）。抽出失敗は extractionSucceeded: false とし、空の抽出を
+ * 「条件なし」へ変換しない（0 件抽出は emptyBasis を根拠に主張される）。
+ * 完了条件チェックボックスはすべて必須完了条件であるため、総数を必須数として
+ * 扱う。
+ */
+export function deriveAcceptancePopulation(
+  extraction: { total: number } | null,
+  emptyBasis?: string,
+): ConditionPopulation {
+  if (extraction === null) {
+    return {
+      extractionSucceeded: false,
+      contractConditionCount: null,
+      contractRequiredCount: null,
+    };
+  }
+  return {
+    extractionSucceeded: true,
+    contractConditionCount: extraction.total,
+    contractRequiredCount: extraction.total,
+    emptyBasis: extraction.total === 0 ? emptyBasis : undefined,
+  };
+}
+
+/** 報告 JSON に含める受入評価の結果（母集団・判定・拒否理由）。 */
+export interface AcceptanceEvaluationReport {
+  determined: boolean;
+  population: ConditionPopulation;
+  closeAllowed?: boolean;
+  populationState?: string;
+  violations?: unknown;
+  blockingUnmet?: readonly string[];
+  blockingCrossObligations?: readonly string[];
+}
+
+/**
+ * 報告 JSON から終了操作（issue_close、Epic 終了、Wave クローズ）の実行可否を
+ * 決定的に判定する。既存終了経路（case-close STEP-5、E1〜E6）が消費する gate
+ * であり、受入評価の拒否・未確定は終了操作の前提を満たさない。
+ */
+export function isCloseOperationPermitted(
+  report: CloseMechanicalReport,
+): { permitted: boolean; reason?: string } {
+  const evaluation = report.diff.acceptanceEvaluation as
+    | AcceptanceEvaluationReport
+    | undefined;
+  if (evaluation === undefined || evaluation.determined !== true) {
+    return { permitted: false, reason: "acceptance-evaluation-undetermined" };
+  }
+  if (evaluation.closeAllowed !== true) {
+    return { permitted: false, reason: "acceptance-denied" };
+  }
+  if (report.result.exitCategory === "failure") {
+    return { permitted: false, reason: "mechanical-failure" };
+  }
+  return { permitted: true };
+}
+
+/**
  * 実行構成表から現在 Wave を特定する（投入順序に依存しない決定的導出）。
  * 現在 Wave は非終端（pending）行を含む最小 Wave 番号。全行が終端状態の場合は
  * null（反復完遂）。
@@ -274,6 +351,44 @@ function runSpec(runner: MechanicalRunner, spec: GateCommandSpec): CommandResult
   return runner.run({ command: spec.command, args: spec.args, cwd: spec.cwd, timeoutMs: spec.timeoutMs });
 }
 
+function runAcceptanceEvaluation(
+  input: CloseMechanicalInput,
+  population: ConditionPopulation,
+  steps: StepRecord[],
+): AcceptanceEvaluationReport {
+  if (input.acceptanceVerdicts === undefined) {
+    // 判定入力未提供時は受入評価は未確定（未確定は終了操作の前提を満たさない）。
+    return { determined: false, population };
+  }
+  const evaluation = evaluateFinalAcceptance({
+    subjectKind: input.acceptanceSubjectKind ?? "child-issue",
+    population,
+    verdicts: input.acceptanceVerdicts,
+    crossObligations: input.acceptanceCrossObligations,
+  });
+  steps.push({
+    name: "final-acceptance-evaluation",
+    status: evaluation.closeAllowed ? "pass" : "fail",
+    detail: {
+      subjectKind: input.acceptanceSubjectKind ?? "child-issue",
+      closeAllowed: evaluation.closeAllowed,
+      populationState: evaluation.populationState,
+      violations: evaluation.violations,
+      blockingUnmet: evaluation.blockingUnmet,
+      blockingCrossObligations: evaluation.blockingCrossObligations,
+    },
+  });
+  return {
+    determined: true,
+    population,
+    closeAllowed: evaluation.closeAllowed,
+    populationState: evaluation.populationState,
+    violations: evaluation.violations,
+    blockingUnmet: evaluation.blockingUnmet,
+    blockingCrossObligations: evaluation.blockingCrossObligations,
+  };
+}
+
 /** 機械工程を実行し、報告 JSON を返す（省略なし。失敗時は fail step を含める）。 */
 export function runCloseMechanicalSteps(
   input: CloseMechanicalInput,
@@ -326,12 +441,13 @@ export function runCloseMechanicalSteps(
     if (dirty) warnings.push("worktree has uncommitted changes before squash merge");
     if (!branchOk) warnings.push("worktree is not on the expected branch");
 
+    let extraction: ReturnType<typeof extractCompletionCheckboxes> | null = null;
     if (input.issueBodyPath) {
       // CRLF→LF 正規化の前置。Windows CRLF 既定環境で issueBodyPath ファイルが
       // CRLF で書き出されても checkbox 認識が欠落しないようにするため、
       // 読取直後（checkbox 抽出前）のこの位置で入力契約を満たす。
       const body = runner.readTextFile(input.issueBodyPath).replace(/\r\n/g, "\n");
-      const extraction = extractCompletionCheckboxes(body);
+      extraction = extractCompletionCheckboxes(body);
       steps.push({
         name: "completion-checkbox-extraction",
         status: "pass",
@@ -345,6 +461,19 @@ export function runCloseMechanicalSteps(
         detail: { reason: "issueBodyPath is required for machine extraction" },
       });
     }
+
+    // 抽出フェーズが受入評価の母集団導出を兼ねる。抽出失敗は
+    // extractionSucceeded: false の母集団になり、受入評価で fail-closed に
+    // 拒否される（空の抽出を「条件なし」へ変換しない）。
+    const acceptancePopulation = deriveAcceptancePopulation(
+      extraction,
+      input.acceptanceEmptyBasis,
+    );
+    diff.acceptanceEvaluation = runAcceptanceEvaluation(
+      input,
+      acceptancePopulation,
+      steps,
+    );
 
     if (input.generateIndexesGate) {
       const gen = runSpec(runner, input.generateIndexesGate);
