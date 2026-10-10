@@ -3150,6 +3150,9 @@ describe("NG baseline path bucket key normalization (Issue #2206, OU-0008)", () 
 // 既存未管理 NG を実修復した後の状態を保持することを検証する。
 // baseline 更新だけで未解決参照を info へ降格していないこと（REQ-0108-264
 // 段階導入の精神、Issue #1782 完了条件）を回帰テストとして固定する。
+// per-test timeout は suite 並列負荷下の実測 62.9 秒を上回る 180 秒とする（既定 60 秒上限の
+// 引上げのみ・検証内容の変更なし。停止コメント 6095764533 再開条件1の case-auto 判断
+// 「タイムアウト上限を suite 正規形に適合させる」に基づく差し戻し修正 DEL-3590-2）。
 
 describe("IR-055 runtime-unresolved-reference 実修復回帰 (Issue #1782)", () => {
   it("配布物に新規（delta from baseline）runtime-unresolved-reference 違反がないこと", () => {
@@ -3179,7 +3182,7 @@ describe("IR-055 runtime-unresolved-reference 実修復回帰 (Issue #1782)", ()
         (r.finding_level === "strict" || r.finding_level === "heuristic"),
     );
     expect(newViolations.length).toBe(0);
-  }, 60000);
+  }, 180000);
 
   it("baseline-known runtime-unresolved-reference が閾値以下であること（修復後の上限）", () => {
     // 修復時点での baseline-known 数を上限として固定する。この値を超える場合、
@@ -3198,7 +3201,7 @@ describe("IR-055 runtime-unresolved-reference 実修復回帰 (Issue #1782)", ()
     );
     // 修復完了時点の実績値。将来の削減を許容し、増加を拒否する。
     expect(baselineKnown.length).toBeLessThanOrEqual(548);
-  }, 60000);
+  }, 180000);
 });
 
 // ─── NG21 N16/N17 是正回帰テスト（Issue #2245, OU-0009, RU-0054） ──────────
