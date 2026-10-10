@@ -469,3 +469,35 @@
 - **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md「traceability check の gate 判定仕様と計測日収束」節の補足候補
 - **関連**: Case #3603、PR #3607、commit 4c91e6bb・8e4dd22e・1fa6a312、既存エントリ「prepare_definition_pr の generate_indexes 派生物が stagePaths 外で残り追加 commit で補正した」（派生物事後追随の隣接系統）
 - **タグ**: `#case-open-step4` `#generate-indexes` `#measurement-date` `#ir-072` `#frontmatter-updated`
+
+## traceability gate の既存債務 fail は対照実行で変更起因 0 件を機械証明してから PR 作成可否を意味判断する
+
+- **問題事象**: case-open STEP-4 の prepare_definition_pr 実行で traceability-check step が fail を返した（exitCode 2、summary pass=9 fail=2。fail 検査種別は missing-design・missing-implementation）。traceabilityReqIds は REQ 行変更なし Case のため空配列であり missing-design は gate 非対象だが、script 実装は missing-design 以外の status fail（missing-implementation 92 件）を一律 gate fail にした
+- **発生局面**: case-open STEP-4 機械工程（Case #3605。REQ 行変更なし・Design 節更新のみの bugfix Definition PR）
+- **検知方法**: script 報告 JSON の traceability-check step fail と warnings「traceability check failed」（worktree 作成・Definition 編集・generate_indexes・stage-and-commit・check_integrity は pass の途中結果）
+- **根本原因**: gate 判定仕様 reference は missing-implementation / missing-verification を「case-run / case-ready 段階の前提である既存欠落」として case-open 正規ゲート（対象 REQ 行の missing-design 0 件）の意味外に置くが、missing-design 以外の status fail を一律 gate fail にする script 実装との間で既存債務の救済手順が明文化されていない（明示救済は対象 REQ 行外の missing-design のみ）
+- **自律対応内容**: 変更前後の対照実行（worktree HEAD と main HEAD で check.ts --root を切替実行）により status・findings が完全一致（missing-implementation 92 件含め差分 0）を機械証明し、本変更起因の検出悪化 0 件を根拠に PR 作成可と意味判断した（SKILL.md STEP-4 手順 3 のモデル責務）。対照実行は STEP-3 手順 4.5 の正規手順（変更前後の check 結果の対照による検出差分の変更起因分離）の gate 判定への適用。判断と証跡は PR #3608 本文の検証差分へ記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存手順内の対照実行適用。契約変更なし）
+- **横展開観点**: REQ 行変更なし・実装対応を持たない Definition PR（bugfix / docs_chore）を作成する全 case-open / case-revise 実行。corpus 既存債務残存下で script が gate fail を返した場合のモデル意味判断の手順例
+- **再発条件**: corpus に missing-implementation 等の既存債務が残存する状態で、REQ 行変更なし・実装対応を持たない Definition PR を作成する場合
+- **予防策候補**: gate 判定仕様に「missing-design 以外の fail についても、対照実行で変更前後の findings 差分 0 件を機械証明した場合は既存債務として本工程の失敗へ読み替えない」旨の対照救済手順の明文化
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md「traceability check の gate 判定仕様と計測日収束」節の対照救済補足候補
+- **関連**: Case #3605、PR #3608、commit e9a65d50、既存エントリ「prepare_definition_pr の計測日収束は 2 段検出になり frontmatter updated 追随まで同一 PR 内で完了する」（同 reference の隣接系統）
+- **タグ**: `#case-open-step4` `#traceability-gate` `#contrast-run` `#existing-debt`
+
+## yomiyasu lint 一時ファイルの workspace 外書込みは guard fail-closed でブロックされるため project root 内除外領域へ切替する
+
+- **問題事象**: extension rule（agentdev-workflow-case-open の yomiyasu-application-before-write）の指示どおり GitHub 文章の lint 用一時ファイルを C:\WINDOWS\TEMP\opencode（事前承認済み temp 領域）へ作成しようとしたところ、agentdev-textlint-guard の workspace 外書込み guard が fail-closed ブロックした
+- **発生局面**: case-open STEP-2 Root Case 本文候補・STEP-4 PR 本文の書込み前推敲（lint 用一時ファイル作成）
+- **検知方法**: write ツールの guard 拒否メッセージ（write targets a path outside the project root; blocked per fail-closed）
+- **根本原因**: extension rule の「非永続領域〔一時ディレクトリ等のリポジトリ外〕」指示と workspace 外書込み guard の fail-closed 契約が衝突する。inspect_cross_dependencies scripts README の検査入力置き場所指針（project root 内限定・commit 対象外・検査後削除）は同一問題への既存解答だが、lint 一時ファイルの指示に反映されていない
+- **自律対応内容**: guard の解除・迂回を行わず、置き場所を project root 内の git 管理対象外領域 .agentdev/integrity/reports/ へ変更して切替し、検査後に削除した（Root Case 本文・PR 本文とも同経路）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存の置き場所指針への準拠切替。契約変更なし）
+- **横展開観点**: 書込み前推敲（REQ-098）で lint 用一時ファイルを作る全工程（case-open、case-ready、case-run の PR 本文等）。workspace 外一時ディレクトリを指示する extension rule 適用時に同様の guard ブロックが発生し得る
+- **再発条件**: extension rule・reference が workspace 外一時領域を指示し、guard が project root 外書込みを fail-closed で拒否する環境の組み合わせ
+- **予防策候補**: yomiyasu application の extension rule 文面に「一時ファイル置き場所は project root 内の git 管理対象外領域（例: .agentdev/integrity/reports/）に限定し、検査後に削除する」旨の代替指示を追加する
+- **想定反映先**: .agentdev/extensions/skills/agentdev-workflow-case-open.yaml の yomiyasu-application-before-write rule 文面、および同等 rule を持つ他 workflow extension
+- **関連**: Case #3605、検査入力置き場所指針（src/common/skills/agentdev-workflow-case-open/scripts/README.md「検査入力 JSON の置き場所指針」節）
+- **タグ**: `#write-guard` `#fail-closed` `#yomiyasu-lint` `#temp-file`
