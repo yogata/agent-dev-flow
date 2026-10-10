@@ -17,6 +17,7 @@ updated: 2026-10-11
 <!-- ADF-COVERS(design): REQ-050-009 -->
 <!-- ADF-COVERS(design): REQ-091-001, REQ-091-002, REQ-091-003, REQ-091-004, REQ-091-005 -->
 <!-- ADF-COVERS(design): REQ-053-044（repo-local Plugin の配布・投影契約節が保存済みファイル単位結果の配布・投影除外 design 実体） -->
+<!-- ADF-COVERS(design): REQ-050-002, REQ-050-003, REQ-050-005, REQ-050-015, REQ-058-001, REQ-058-004, REQ-058-005, REQ-058-006, REQ-058-008, REQ-058-012（ジャンクション状態の判定と自己修復節が両公開入口・両ホスト・全モードの正本一致検査の design 実体） -->
 
 # 実行時パッケージ境界
 
