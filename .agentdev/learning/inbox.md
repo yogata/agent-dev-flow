@@ -565,3 +565,67 @@
 - **想定反映先**: インストーラ・投影系 Case の検証設計。特定の正規所有 Design 節は未特定
 - **関連**: Case #3605、PR #3612、テストファイル冒頭の既存制約記載
 - **タグ**: `#junction` `#windows` `#failure-injection` `#os-constraint` `#installer`
+
+## GitHub は MERGED PR の mergeable を UNKNOWN 固定で返すため merge 後の機械工程再実行では mergeable-polling が常時 warn になる
+
+- **問題事象**: 受入評価付きの close_mechanical_steps.ts pre-merge 再実行を PR merge 後に行ったところ、gh pr view の mergeable が UNKNOWN 固定（mergeStateStatus も UNKNOWN）で、ポーリング上限まで待機しても MERGEABLE に遷移せず mergeable-polling step が warn（needs-judgment）になった
+- **発生局面**: case-close STEP-5-2（issue_close 前の受入評価確認で pre-merge 機械工程を受入評価付きで再実行。Issue #3604 2 回目 case-close）
+- **検知方法**: 機械工程報告 JSON の mergeable-polling step warn と、gh pr view の state=MERGED 表示の突き合わせ
+- **根本原因**: GitHub は merge 済み PR の mergeability を再計算しない。mergeable フィールドは open PR の mergeability のみを反映する
+- **自律対応内容**: warn を「MERGED PR の既知挙動」として意味レビューで記録し（merge は既に完了済みのため終了操作に影響しない）、polling を maxAttempts 1 の単回観測構成にして無駄な待機を回避した。isCloseOperationPermitted は failure でない限り permitted を返すため受入評価の確定（closeAllowed=true）は妨げられない
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存契約内の warn 意味レビュー。契約変更なし）
+- **横展開観点**: merge 後に機械工程・mergeable ポーリングを含む検証を再実行する全工程（受入評価再実行、post-merge 検証）
+- **再発条件**: merge 済み PR に対して mergeable-polling を含む機械工程を実行した場合
+- **予防策候補**: merge 済み PR では polling を単回観測構成にするか、phase post-merge で polling を skip する入力構成を取る。warn の意味レビューでは state=MERGED を必ず併記する
+- **想定反映先**: case-close 機械工程の script 呼び出し契約（mergeable-polling の post-merge 取扱い）への補足候補
+- **関連**: Case #3604、PR #3611、merge commit 30eb0612、worktree .agentdev/tmp/q3604-cc2-mechanical-acceptance.out（当該報告。worktree remove 済みのため恒久記録は Issue コメント）
+- **タグ**: `#mergeable` `#github-api` `#post-merge` `#case-close` `#mergeable-polling`
+
+## close_mechanical_steps.ts / record-comments.ts は Bun 固有 API（import.meta.path / import.meta.dir）を持つため node --experimental-strip-types では動作せず正規ランナーは bun
+
+- **問題事象**: stdout 証跡の安定実行経路（モジュール import 経由の node --experimental-strip-types）で close_mechanical_steps.ts を実行すると、CLI 入口の isDirectExecution 判定で import.meta.path が undefined になり path.resolve(undefined) の ERR_INVALID_ARG_TYPE で起動失敗した。record-comments.ts も import.meta.dir の同問題で node 実行が不可能
+- **発生局面**: case-close STEP-2/3/5（機械工程実行と記録コメント検証。Issue #3604 2 回目 case-close）
+- **検知方法**: node --experimental-strip-types 実行の stderr に ERR_INVALID_ARG_TYPE: The paths[0] argument must be of type string. Received undefined
+- **根本原因**: import.meta.path / import.meta.dir は Bun 固有 API であり、node の ESM loader では undefined になる。これらの script は bun を正規ランナーとして実装されている
+- **自律対応内容**: ランナーを bun へ切替（bun run 経由の CLI 実行は実経路実証の実績どおり stdout を取得できた）し、stdout・stderr の分離退避は spawnSync（node -e）経由の fs.writeFileSync UTF-8 明示書き出しで行った。実行ランナーと退避手段を分離して契約（安定実行経路）と実績を両立
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（checker 実行契約の例外経路〔bun CLI 実行時は process.exit 前の flush を保証する手順〕の範囲内で実績ベースの切替）
+- **横展開観点**: import.meta.path / import.meta.dir を使う skill scripts 全般（case-close / case-run / workflow 系 script）を node で実行しようとする全工程
+- **再発条件**: Bun 固有 API を使う script を node --experimental-strip-types の標準経路で実行した場合
+- **予防策候補**: script 実行前に import.meta.path / import.meta.dir の有無を確認し、Bun 固有 API がある場合は bun を正規ランナーとして指定する（usage 行の表記は正の情報源）
+- **想定反映先**: checker 実行契約 Design「安定実行経路」節の bun CLI 例外経路への実例補足候補
+- **関連**: Case #3604、src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts:659（import.meta.path）、src/common/skills/agentdev-workflow-case-run/scripts/record-comments.ts:51（import.meta.dir）
+- **タグ**: `#bun` `#node-strip-types` `#runtime-compat` `#stdout-evidence` `#case-close`
+
+## targeted docs guard（check_changed_docs.ts）は workflow 分類で skill 配下 references .md を計上対象外とし明示 --files 指定でも files checked に含まれない
+
+- **問題事象**: case-auto skill 配下 references 3 件の文言修正を含む PR で、check_changed_docs.ts の case-run 分類実行でも明示 --files 指定でも references .md が files_checked に含まれなかった（case-run 分類での実測）
+- **発生局面**: case-run（DEL-3604-2、PR #3611 の検証差分記録より capture）
+- **検知方法**: files_checked の内容と検査対象変更ファイルの突合
+- **根本原因**: targeted docs guard の workflow 分類では skill 配下 references .md が計上対象外になっている。skill 文書の表層検査は textlint gate が代替被覆する
+- **自律対応内容**: case-close 分類での 8 ファイル明示指定実行で failures 0 / warnings 0 を確認（files_checked 8 は scripts/tests/yaml で references を含まない構成）。case-close 分類での references 計上挙動の差分有無は本 Case の対象範囲外として追跡しない
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: skill 配下 references を変更する Case 全般の docs 検証計画。references の表層品質は textlint gate で確認する運用を前提にする
+- **再発条件**: skill 配下 references の変更を targeted docs guard の files_checked で検証しようとした場合
+- **予防策候補**: references 変更の表層検査は textlint gate（全文検査）に委譲し、files_checked に references が含まれないことを検証計画の前提として記載する
+- **想定反映先**: targeted-docs-guard-implementation Design（計上対象外の明示）への補足候補
+- **関連**: Case #3604、PR #3611（Findings / Capture候補 learning 由来）
+- **タグ**: `#targeted-docs-guard` `#references` `#files-checked` `#case-run`
+
+## check_changed_docs.ts の --workflow 受容値は req-save / design-save / case-run / case-close / docs-check で case-auto を指定すると usage エラーで拒否される
+
+- **問題事象**: --workflow case-auto を指定すると usage エラーで拒否された（fail-closed 動作の確認済み）
+- **発生局面**: case-run（DEL-3604-2、PR #3611 の検証差分記録より capture）
+- **検知方法**: usage エラーの実測
+- **根本原因**: --workflow 受容値に case-auto が存在しない（受容値: req-save / design-save / case-run / case-close / docs-check）
+- **自律対応内容**: fail-closed 動作を確認し、case-close 実行時は --workflow case-close を使用
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: check_changed_docs.ts を workflow ごとに使い分ける全工程
+- **再発条件**: --workflow に case-auto 等の未受容値を指定した場合
+- **予防策候補**: workflow 名は checker の受容値一覧から選択する（case-auto の検証は case-run / case-close 分類で実施する）
+- **想定反映先**: targeted docs guard の実行手順（workflow 値一覧の参照先）への補足候補
+- **関連**: Case #3604、PR #3611（Findings / Capture候補 learning 由来）
+- **タグ**: `#targeted-docs-guard` `#workflow-value` `#fail-closed` `#case-run`
