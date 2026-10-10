@@ -405,3 +405,51 @@
 - **想定反映先**: v4-migration-and-release Design「v4 → v5 移行手順と検証」節の実現面補足候補（PR #3600 Design確定候補と合流）
 - **関連**: Epic #3585、PR #3600 Findings・Design確定候補
 - **タグ**: `#v5-migration` `#staging` `#os-temp` `#worktree-isolation` `#non-destructive`
+
+## 新規配布 skill の junction 反映は worktree 委譲の残余となり 4層検証を区別記録して merge 後に case-close が解消した
+
+- **問題事象**: worktree 環境では新規配布 skill の junction が self-sync apply 未実行のため不在になる。merge 後の正規反映手順が残余となる場合、4層検証の合格判定を「ソース側実動作済み」だけで完了させると配置物層の未検証が見逃される
+- **発生局面**: 検証（Epic #3585 Wave-3・PR #3602 の TS-015 4層区別検証）
+- **検知方法**: main root の .opencode/skills/ で新規2 skill（agentdev-adopted-conventions・agentdev-artifact-semantics）の junction 不在観測（PR #3602 V-15）
+- **根本原因**: 新規配布物の junction 作成は正規機構（self-sync.ps1 apply）の実行が必要で、worktree 内での同期系スクリプト実行は禁止のため委譲スコープ外として残余になった
+- **自律対応内容**: 4層検証を「既存 projection 対象 = 反映・実動作済み / 新規 skill = ソース側で実動作済み・配置物反映は残余」と区別して PR 本文 §6 に記録。merge 後に case-close が self-sync apply 相当の junction 追加作成（既存 junction 非変更）と配置物経由の CLI 実動作検証（resolve.ts / classify.ts・読み取り専用・環境ラベル付き・両者 exit 0）を実行して解消
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（運用記録。契約変更なし）
+- **横展開観点**: 新規配布物（skill・plugin・command）を作成する委譲実行と、TS-015 相当の4層検証を行う全工程
+- **再発条件**: 新規配布物作成を含む委譲で merge 後の反映実行の権限と時点が契約に明示されない場合
+- **予防策候補**: 新規配布物作成を含む委譲では、merge 後の self-sync apply 実行の権限と時点を委譲契約または case-close 手順に明示する
+- **想定反映先**: case-close workflow 手順（self-sync apply 相当の残余解消ステップ候補）、agentdev-git-worktree の worktree 構造的制約 knowledge
+- **関連**: Epic #3585、PR #3602 Findings（learning 1件目）・既存エントリ「worktree 環境の link profile 配布依存境界検査は junction 未伝播で zero-targets」
+- **タグ**: `#junction` `#self-sync` `#distribution-boundary` `#four-layer-verification` `#delegation-contract`
+
+## vendor 依存生成を要する plugin の worktree 初回テストは依存未生成で fail-closed になり生成済み/未生成の判別前置が必要
+
+- **問題事象**: vendor 依存生成（bun install + build:engine）が必要な plugin（agentdev-textlint-guard 等）のテストを worktree 初回実行すると依存未生成で 76 fail を観測した。README 正規手順の依存生成実行後は 184 pass / 0 fail に反転した
+- **発生局面**: 検証（Epic #3585 Wave-3・PR #3602 の TS-005 既存品質検査維持確認・V-11）
+- **検知方法**: textlint plugin tests 初回実行の 76 fail と依存生成後の 184 pass への反転（fail-closed 動作は契約どおり）
+- **根本原因**: plugin package の依存実体（vendor 配下）は git 非管理・導入時生成であり、実行環境の生成状態の判別手順が検証手順書に明記されていない
+- **自律対応内容**: README 正規手順の依存生成（bun install・bun run build:engine・いずれも exit 0）を実行して解消し、検証差分に修正済み finding として記録（checker 本体・README は未修正）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存手順の適用。契約変更なし）
+- **横展開観点**: vendor 依存生成を要する plugin package を検査・テストする全工程（worktree・新規 clone 環境）
+- **再発条件**: 依存未生成環境で plugin 依存テストを実行した場合（常時 fail-closed）
+- **予防策候補**: 依存生成済み環境と未生成環境の判別手順（vendor 配下の bundle・辞書の存在確認）を検証手順書に明記する
+- **想定反映先**: README「開発者セットアップ（textlint 依存の生成）」節、checker 実行契約 Design の前置確認候補
+- **関連**: Epic #3585、PR #3602 検証差分 V-11（修正済み finding 1件）
+- **タグ**: `#vendor-dependency` `#textlint-guard` `#fail-closed` `#worktree` `#dependency-generation`
+
+## artifact-validation check-entry-existence.ts の positional 引数契約は実行例不在で初回実行者が誤りやすい
+
+- **問題事象**: artifact-validation check-entry-existence.ts の positional 引数契約を初回実行時に誤り、exit 1 を観測した（引数指定ミス・I/O 契約どおりに修正して合格）
+- **発生局面**: 検証（Epic #3585 Wave-3・PR #3602 の TS-005 既存品質検査確認・V-14）
+- **検知方法**: 初回実行 exit 1 と、契約に従った引数修正後の exit 0（ok: true・found 2）の対比
+- **根本原因**: checker の positional 引数契約の実行例が README に明記されておらず初回実行者が誤りやすい
+- **自律対応内容**: 正しい引数契約へ修正して再実行し pass を取得（検証差分に修正済み finding として記録。checker 本体・README は未修正）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: artifact-validation 系 checker を初回実行する全工程。PR #3597 の check_distribution_boundary.ts 引数指摘と同系統の学びパターン
+- **再発条件**: 実行例のない checker を初回実行した場合
+- **予防策候補**: check-entry-existence.ts README への実行例追記（positional 引数契約の明示）
+- **想定反映先**: agentdev-artifact-validation scripts 配下 checker README・usage 表記候補
+- **関連**: Epic #3585、PR #3602 検証差分 V-14・既存エントリ「配布依存境界 checker の CLI 引数形式は --profile P <repoRoot>」（同系統先例）
+- **タグ**: `#cli-usage` `#artifact-validation` `#readme` `#fail-closed`
