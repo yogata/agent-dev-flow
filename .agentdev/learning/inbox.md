@@ -533,3 +533,19 @@
 - **想定反映先**: workflow skill 系実装 Case の試験整備手順（pin 検査追加時の前置確認）。特定の正規所有 Design 節は未特定
 - **関連**: Case #3604、PR #3610、commit 6bf77516（fix-and-reverify 実施）
 - **タグ**: `#reference-pin` `#test-expectation` `#fix-and-reverify` `#case-run`
+
+## close_mechanical_steps.ts の integrity suite step は stdout のみ保持するため bun test の件数サマリー（stderr）は script 外で分離退避する
+
+- **問題事象**: case-close pre-merge の close_mechanical_steps.ts 実行で、full-integrity-suite step の報告 JSON には各 bun test 分割の stdout（`bun test v1.3.6` の 2 行のみ）と終了コードしか残らず、件数サマリー（`Ran N tests across M files`）と fail 詳細が報告から消失した。bun test v1.3.6 はテスト結果・件数サマリーを stderr へ出力する
+- **発生局面**: 実装（case-close STEP-2/3 機械工程。case-auto stage からの委譲実行）
+- **検知方法**: 報告 JSON の full-integrity-suite stdout が 2 行しかないことと、機械受理基準（件数突合の記録が必須受理由件）との突き合わせ
+- **根本原因**: close_mechanical_steps.ts の integrityResults は `{ exitCode, stdout }` のみを保持し stderr を捨てる。bun test の証跡（fail 詳細・件数サマリー）は stderr 側にあるため、script 単体の report では機械受理基準の記録が成立しない
+- **自律対応内容**: 証跡欠落を正当理由として 3 cwd 分割を stdout・stderr 分離退避付き（`>stdout.log 2>stderr.log`）で script 外再実行し、件数突合（3910 tests across 187 files、fail 0）を記録してから機械受理判定を実施した。merge 直前 HEAD での再実測（base 移動検出後）でも同形式で退避
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存の機械受理基準と再実行条件〔証跡欠落〕の適用。契約変更なし）
+- **横展開観点**: spawnSync 経由で bun test / checker を起動して report を組み立てる工程全般（case-close 機械工程、case-run 前置検査）。stderr に出力するランナー（bun test 全般）をラップする script は同構造の欠落を起こし得る
+- **再発条件**: bun test 等の stderr 出力ランナーを close_mechanical_steps.ts の integrityGates 等で実行し、report JSON だけを証跡として受理した場合
+- **予防策候補**: bun test を含む検証実行では起動時に stdout・stderr 分離退避を常時付与し、件数突合は stderr 退避ファイルを根拠にする。script 側で integrityResults に stderr を保持する拡張（または report への件数サマリー抽出）が後続是正候補
+- **想定反映先**: case-close 機械工程の script 呼び出し契約（integrity suite step の証跡保持要件）への補足候補
+- **関連**: Case #3603、PR #3609、merge commit 1861cac9、既存エントリ「reference pin 検査の期待値は文面の step 名・関数名に依存し、実手順の記述を事前 grep して組み立てる」（同一 script の case-run 側記録）
+- **タグ**: `#case-close` `#bun-test` `#stderr-evidence` `#machine-acceptance` `#traceability`
