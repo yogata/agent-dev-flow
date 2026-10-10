@@ -1,0 +1,14 @@
+{
+  "name": "agentdev-adopted-conventions-scripts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Deterministic resolver for adopted conventions (adopted processes, process relations, required artifacts): declaration parsing, transition-default connection, and the non-adoption / no-pass-by-absence judgment rules. Pure functions, argv input, stdout JSON output.",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "@types/bun": "^1.3.0"
+  }
+}
