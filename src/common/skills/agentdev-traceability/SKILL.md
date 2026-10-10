@@ -77,6 +77,7 @@ description: Requirement-artifact traceability (coverage, impact, check) resolvi
 |---|---|---|---|
 | `src/coverage.ts` | coverage | `--root` + `--req` または `--artifact` | 要件起点: 役割付き対応関係の全件（`relations`, `counts`, `truncated: false`）/ 成果物起点: 当該成果物の対応要件（`relations`, `emptyResult`） |
 | `src/impact.ts` | impact | `--root` + `--req` または `--artifact` | 要件起点: 再確認候補 / 成果物起点: `viaRequirements` + `recheckCandidates`。空結果は `emptyResult: true` と `note`（影響なしの証明ではない旨）で明示 |
+| `src/relied-diff.ts` | impact 拡張（差分候補） | `--root`（依拠版 `--relied`、現行版 `--head`、対象 `--paths`、下流 `--downstream`、証拠対象版 `--evidence-basis`、代替確認の根拠記録 `--basis-note`） | 依拠版に基づく影響分類（`impacts` の4区分 `update` / `up-to-date` / `create` / `unverified` と根拠 `basis`、中間変更の伝播対象 `propagationRequired`）、下流不在の `create`（`downstream`）、再利用証拠の上流整合（`evidence`）、全体反映完了判定（`fullyPropagated`: yes / no / undetermined）。比較基準（依拠版）を特定できない場合は分類を実行せず `fullyPropagated: undetermined` を返す（根拠なしに「影響なし」・「完了」と判定しない） |
 | `src/check.ts` | check | `--root`（任意: `--req` で完全性検査対象限定、`--artifact` で根拠検査追加） | 9種検査の `checks`（項目ごと pass / fail と findings）、`summary` |
 
 check の9種検査: `malformed-declarations`（sidecar および inline declaration の形式・構文違反）、`unknown-roles`（未知の成果物役割）、`unknown-req-refs`（存在しない要件行への参照。sidecar、inline declaration、policy.yaml の optional 列挙を含む）、`invalid-artifact-paths`（存在しない、または取得不能な artifact path）、`missing-design`（Design 対応の欠落。現行要件行で0件）、`missing-implementation`（実装対応の欠落。現行要件行で0件）、`missing-verification`（検証対応の欠落。検証スコープポリシーが required と判定する現行要件行のみ計上）、`policy-invalid`（検証スコープポリシーの不正。schema 違反、default 値不正、optional 列挙の要件行 ID 形式違反、存在しない要件行の列挙、policy 読取不能）、`duplicate-inconsistencies`（同一論理関係の不整合な重複。同一 artifact パス × role × 要件行 ID の組み合わせが sidecar と inline declaration の間、または同一情報源内で矛盾する状態）。
@@ -108,6 +109,9 @@ bun .opencode/skills/agentdev-traceability/scripts/src/impact.ts --root <repo-ro
 
 # impact: 成果物起点（成果物 ↔ 要件 ↔ 成果物の再確認候補）
 bun .opencode/skills/agentdev-traceability/scripts/src/impact.ts --root <repo-root> --artifact src/<path/to/artifact>.ts
+
+# impact 拡張（差分候補）: 依拠版に基づく影響分類（依拠版は正規成果物・承認・検証記録・Git 履歴から確認して指定する。工程開始時点のコミットやタグを機械的に仮定しない）
+bun .opencode/skills/agentdev-traceability/scripts/src/relied-diff.ts --root <repo-root> --relied <commit> --paths <p1,p2> --downstream <path> --evidence-basis <commit>
 
 # check: コーパス全体
 bun .opencode/skills/agentdev-traceability/scripts/src/check.ts --root <repo-root>
