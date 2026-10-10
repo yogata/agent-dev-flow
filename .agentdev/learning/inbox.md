@@ -341,3 +341,67 @@
 - **想定反映先**: src/common/skills/agentdev-workflow-case-ready/references（execution-contract.md・execution-structure.md）の本文書込み工程への yomiyasu 前置補足候補、.agentdev/extensions/skills/agentdev-workflow-case-ready.yaml の rules 表現補足
 - **関連**: Issue #3585、.agentdev/extensions/skills/agentdev-workflow-case-ready.yaml（yomiyasu-application-before-write）、Issue #3550 の learning（acceptance_gates による yomiyasu 記録抑止と同系統の適用タイミング問題）
 - **タグ**: `#case-ready` `#yomiyasu` `#application-timing` `#retroactive-application` `#extension-rules`
+
+## worktree 環境の link profile 配布依存境界検査は junction 未伝播で zero-targets（無効実行）になり main root 読取専用実行が実質経路になる
+
+- **問題事象**: worktree 内では .opencode/skills/agentdev-* と .opencode/commands/agentdev/ の junction が未伝播のため、link profile の配布依存境界 checker が scan target 0 件（zero-targets pre-warning または fail-closed の invalid execution）で無効実行になる。merge 前の新規配布物の link projection 検査は構造上実施できない
+- **発生局面**: 検証（Epic #3585 Wave-2 の 6 PR 全てで同型観測。PR #3595・#3596・#3597・#3598・#3599・#3600）
+- **検知方法**: checker の zero-targets pre-warning または zero-targets:link による fail-closed 拒否（無効実行を合格扱いにしない契約どおりの動作）
+- **根本原因**: worktree 構造的制約（agentdev-* junction は worktree へ伝播しない）。link profile の走査対象は .opencode 配下の projection であり worktree には存在しない
+- **自律対応内容**: 各 PR とも checker の zero-targets を無効分類として記録し、メインリポジトリルート（main HEAD・環境ラベル付き・読み取り専用参照）での link profile 実行へ切替して検査を成立させた。merge 後の link 反映は正規配布機構（junction 自動反映）で成立することを source profile + IR-068 manifest 登録 + junction 規約観測で代替担保
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既知環境制約の運用適用。契約変更なし）
+- **横展開観点**: worktree で link profile を用いる全検証工程。link projection の対象集合（配布物一覧）が不変の変更では main baseline での構造整合確認と併用する運用が実績あり。checker が zero-targets を検出して警告する挙動は既存知識の確認事項
+- **再発条件**: worktree 内で link profile の checker を実行した場合（常時）
+- **予防策候補**: link 検査実行形態の規約化（worktree では無効実行・main root 読取専用参照を正経路とする明記）、および worktree 環境でも link profile を走査可能にする導入手順（self-sync 相当の環境操作は worktree 内実行禁止のため worktree 外での適用）の検討。docs/knowledge/worktree-environment-fail-classification の具体例としても価値あり
+- **想定反映先**: checker 実行契約 Design「link profile 実効実行要件」節の運用補足候補、docs/knowledge への具体例記録候補
+- **関連**: Epic #3585、PR #3595・#3596・#3597・#3598・#3599・#3600 の検証差分
+- **タグ**: `#worktree` `#link-profile` `#zero-targets` `#distribution-boundary` `#junction-unpropagated`
+
+## 成果物 frontmatter の複数行プレーンスカラーは Bun.YAML.parse の保証サブセット外で解析失敗し単純 scalar 行サブセット解析が安全
+
+- **問題事象**: 既存 SKILL.md frontmatter の description が複数行プレーンスカラーを含み、Bun.YAML.parse で解析失敗した（実動作で検出）
+- **発生局面**: 実装（Epic #3585 Wave-2、PR #3599 の agentdev-artifact-semantics 判定器 roles.ts 実装時）
+- **検知方法**: 実在 SKILL.md を入力にした classify の実動作でパース失敗を観測
+- **根本原因**: 成果物 frontmatter の記述様式（複数行プレーンスカラー）と Bun.YAML.parse の保証サブセットの乖離。決定的コードが frontmatter を消費する場合、ランナー側の YAML 実装差に依存する
+- **自律対応内容**: 本判定器では単純 scalar 行サブセット解析を採用し、理由コメントを記載（PR #3599）。Bun.YAML.parse への依存を避け解析失敗時に unclassified 報告（fail-closed）へ接続
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（実装内の防御。契約変更なし）
+- **横展開観点**: 成果物 frontmatter を決定的コードで消費する全実装（判定器・checker・採用規約解決器等）
+- **再発条件**: 複数行プレーンスカラーを含む既存成果物 frontmatter を Bun.YAML.parse で解析した場合
+- **予防策候補**: frontmatter を消費する決定的コードは単純 scalar 行サブセット解析を採用する。解析失敗は unclassified・判断留保等の fail-closed 出力へ接続する
+- **想定反映先**: agentdev-artifact-semantics の roles.ts 実装注記（記録済み）、frontmatter を消費する新規 checker の実装規約候補
+- **関連**: Epic #3585、PR #3599
+- **タグ**: `#yaml` `#frontmatter` `#bun` `#deterministic-code` `#fail-closed`
+
+## 配布依存境界 checker の CLI 引数形式は --profile P <repoRoot> であり README への実行例追記が改善候補
+
+- **問題事象**: 配布依存境界 checker の CLI 引数形式（--profile source <repoRoot>）を誤解し、profile 名を positional repoRoot として渡して zero-targets を観測した。checker は fail-closed で拒否したため被害はなかったが、実行例が README に明記されておらず初回実行者が引数順序を誤る余地がある
+- **発生局面**: 検証（Epic #3585 Wave-2、PR #3597 の checker 初回実行時）
+- **検知方法**: zero-targets 観測と実際の引数の突合（fail-closed 拒否により誤実行が合格扱いにならないことを確認）
+- **根本原因**: checker README に CLI 引数順序（--profile は値フラグ、repoRoot は positional）の実行例がない
+- **自律対応内容**: 正しい引数形式へ修正して再実行し pass を取得。改善候補として本学びを記録（checker 本体は未修正）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 配布依存境界 checker（--profile source/link）を実行する全工程（case-run STEP-S5、case-close STEP-3-1 / E4-1）
+- **再発条件**: checker README を参照せずに初回実行した場合
+- **予防策候補**: checker README への実行例追記（bun .opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary.ts --profile source <repoRoot> --json 形式）
+- **想定反映先**: .opencode/skills/repo-agentdev-integrity/scripts 配下の checker README・usage 表記候補
+- **関連**: Epic #3585、PR #3597 Findings
+- **タグ**: `#distribution-boundary` `#cli-usage` `#readme` `#fail-closed`
+
+## 移行 staging の構築先は OS 標準 TEMP（runtime-package-boundary の承認済み一時領域カテゴリ）が worktree 隔離と非破壊判定の両立の正解パターン
+
+- **問題事象**: v4→v5 移行の非破壊 staging 構築で、staging が移行元 root 内部なら拒否する（非破壊判定）と worktree 隔離（worktree 内に root の外が存在しない）の両立を誤りやすく、staging 配置先の選択が実行者ごとに揺れ得る
+- **発生局面**: 実装（Epic #3585 Wave-2、PR #3600 の v5-migration ツール設計・検証時）
+- **検知方法**: runtime-package-boundary の承認済み一時領域カテゴリ（OS 標準 TEMP）と build-staging の staging 内部拒否契約の突合
+- **根本原因**: worktree 環境では移行元 root の外が OS 標準 TEMP しかなく、配置先の規約が明文化されていないと誤配置が起こり得る
+- **自律対応内容**: OS 標準 TEMP への staging 構築を正解パターンとして検証を実施（copy 454 件・移行元非破壊確認済み・冪等再実行で同一結果）し、capture 候補として記録（PR #3600）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存 Design の承認済みカテゴリ適用。契約変更なし）
+- **横展開観点**: 移行・検証で非破壊 staging を構築する全ツール・全工程（v4-migration 先例を含む consumer 系ツール）
+- **再発条件**: worktree 環境で staging 配置先を未規定のまま選択した場合
+- **予防策候補**: staging 構築先は OS 標準 TEMP を既定とする旨を移行系ツールの README・Design へ明記する
+- **想定反映先**: v4-migration-and-release Design「v4 → v5 移行手順と検証」節の実現面補足候補（PR #3600 Design確定候補と合流）
+- **関連**: Epic #3585、PR #3600 Findings・Design確定候補
+- **タグ**: `#v5-migration` `#staging` `#os-temp` `#worktree-isolation` `#non-destructive`
