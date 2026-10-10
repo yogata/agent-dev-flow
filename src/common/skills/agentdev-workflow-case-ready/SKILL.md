@@ -10,6 +10,7 @@ case-ready command の workflow 実装本体である。
 設計PR受入、canonical Definition 再取得、Decision 受理評価、execution contract 確定、Standard / Epic 確定、トレーサビリティ完全性ゲート、ready 遷移、draft / RU 削除、冪等再実行までの制御構造を所有する。
 case-ready は Definition 確定境界として単一責務を保ち、REQ / Decision / Design の保存実体は Capability Skill へ委譲する（保存手続きを実装しない）。
 Wave は意味的な依存関係のまとまりとして扱い、Wave 構成の導出は実行上限の数値に依存しない。
+本スキルが確定する設計（設計PR受入・Decision 受理・canonical Definition 確定）は、v5 責務分割における設計確定の責務である。v5 有限実行モード（case-auto 実行契約）では、この設計確定は後続の実装構築・Issue 協調を強制されずに独立終了できる。段階案件では本工程の確定完了をもって工程単独の確定・終了が成立し、設計確定と最終的な要求充足の判定は別に扱う。現行 v4 標準モードでは ready 遷移後に case-run へ進行する現行実行経路を維持する。
 
 case-ready command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}）。
 
