@@ -253,6 +253,32 @@ function Get-JunctionTarget {
     return $item.Target
 }
 
+function Test-JunctionTargetMatchesSource {
+    <#
+    .SYNOPSIS
+        junction の解決先が正本解決パス（Get-TargetSourcePath の現行正本解決）と一致するか
+        判定する（両公開入口・両ホスト・全モード共通の正本一致検査。「ジャンクション状態の
+        判定と自己修復」Design 参照）。リンク先実体が存在しない場合（broken）は解決に失敗
+        するため不一致扱いとなり、管理物確定は Test-ManagedProjectionJunction /
+        Test-ManagedSenpiJunction が reparse data のリンク先文字列で行う。
+    #>
+    param([string]$JunctionFullName, [string]$SourcePath)
+    $targetObj = Get-JunctionTarget -Path $JunctionFullName
+    $targetList = @($targetObj) | ForEach-Object { [string]$_ } | Where-Object { $_ }
+    if ($targetList.Count -eq 0) { return $false }
+    $expectedFull = [System.IO.Path]::GetFullPath($SourcePath).TrimEnd('\', '/')
+    foreach ($target in $targetList) {
+        $resolved = $null
+        try {
+            $resolved = (Resolve-Path -LiteralPath $target -ErrorAction Stop).Path
+        } catch {
+            $resolved = $target
+        }
+        if ($resolved.TrimEnd('\', '/') -ieq $expectedFull) { return $true }
+    }
+    return $false
+}
+
 function Get-TargetSourcePath {
     <#
     .SYNOPSIS
@@ -868,11 +894,19 @@ if ($Mode -eq 'dry-run') {
             $expectedSource = Join-Path $SenpiHostSourceDir $senpiRel
             if (Test-Junction -Path $targetPath) {
                 $actualTarget = Get-JunctionTarget -Path $targetPath
-                if ($actualTarget -and (Test-Path -LiteralPath $actualTarget)) {
+                if (Test-JunctionTargetMatchesSource -JunctionFullName $targetPath -SourcePath $expectedSource) {
                     Write-Host "[OK] Already junctioned: .senpi/$senpiRel"
+                } elseif (Test-ManagedSenpiJunction -JunctionName $senpiRel -JunctionFullName $targetPath) {
+                    # wrong target（管理物）: 旧正本・消失済み正本を含む修復対象（REQ-058-004）
+                    if ($actualTarget -and (Test-Path -LiteralPath (@($actualTarget) | Select-Object -First 1))) {
+                        Write-Host "[WOULD REMOVE] Wrong-target junction: .senpi/$senpiRel (actual: $actualTarget)"
+                    } else {
+                        Write-Host "[WOULD REMOVE] Broken junction: .senpi/$senpiRel"
+                    }
+                    Write-Host "[WOULD ADD] Re-create junction: .senpi/$senpiRel -> $expectedSource"
                 } else {
-                    Write-Host "[WOULD REMOVE] Broken junction: .senpi/$senpiRel"
-                    Write-Host "[WOULD ADD] Re-create junction: .senpi/$senpiRel"
+                    # wrong target（管理物と確認できない）: 予測せず保持を報告する
+                    Write-Host "[ERROR] Unmanaged junction at managed path (apply would keep it and report a conflict): .senpi/$senpiRel (actual: $actualTarget)"
                 }
             } elseif (Test-Path -LiteralPath $targetPath) {
                 Write-Host "[ERROR] Path exists and is not a junction: .senpi/$senpiRel"
@@ -885,11 +919,19 @@ if ($Mode -eq 'dry-run') {
         if (Test-Junction -Path $targetPath) {
             $actualTarget = Get-JunctionTarget -Path $targetPath
             $expectedSource = Get-TargetSourcePath -RelPath $relPath
-            if ($actualTarget -and (Test-Path -LiteralPath $actualTarget)) {
+            if (Test-JunctionTargetMatchesSource -JunctionFullName $targetPath -SourcePath $expectedSource) {
                 Write-Host "[OK] Already junctioned: $relPath"
+            } elseif (Test-ManagedProjectionJunction -JunctionRel $relPath -JunctionFullName $targetPath) {
+                # wrong target（管理物）: 旧正本・消失済み正本を含む修復対象（REQ-058-004、REQ-099-012）
+                if ($actualTarget -and (Test-Path -LiteralPath (@($actualTarget) | Select-Object -First 1))) {
+                    Write-Host "[WOULD REMOVE] Wrong-target junction: $relPath (actual: $actualTarget)"
+                } else {
+                    Write-Host "[WOULD REMOVE] Broken junction: $relPath"
+                }
+                Write-Host "[WOULD ADD] Re-create junction: $relPath -> $expectedSource"
             } else {
-                Write-Host "[WOULD REMOVE] Broken junction: $relPath"
-                Write-Host "[WOULD ADD] Re-create junction: $relPath"
+                # wrong target（管理物と確認できない）: 予測せず保持を報告する
+                Write-Host "[ERROR] Unmanaged junction at managed path (apply would keep it and report a conflict): $relPath (actual: $actualTarget)"
             }
         } elseif (Test-Path -LiteralPath $targetPath) {
             Write-Host "[ERROR] Path exists and is not a junction: $relPath"
@@ -1035,6 +1077,8 @@ if ($Mode -eq 'apply') {
     # Step 3: Selective Junction Creation (OpenCode scope and Senpi scope)
     Write-Host ''
     Write-Host '--- Junctions ---'
+    # 管理物と確認できない junction の衝突記録（修復はせず保持し、最後に非正常終了する）
+    $applyConflicts = [System.Collections.Generic.List[string]]::new()
     foreach ($relPath in $targets) {
         $senpiRel = Resolve-SenpiTargetRel -TargetEntry $relPath
         if ($null -ne $senpiRel) {
@@ -1042,17 +1086,27 @@ if ($Mode -eq 'apply') {
             $sourcePath = Join-Path $SenpiHostSourceDir $senpiRel
 
             if (Test-Junction -Path $targetPath) {
-                $actualTarget = Get-JunctionTarget -Path $targetPath
-                if ($actualTarget -and (Test-Path -LiteralPath $actualTarget) -and ((Resolve-Path -LiteralPath $actualTarget).Path -eq (Resolve-Path -LiteralPath $sourcePath).Path)) {
+                if (Test-JunctionTargetMatchesSource -JunctionFullName $targetPath -SourcePath $sourcePath) {
                     Write-Host "[OK] Already junctioned: .senpi/$senpiRel"
                     continue
-                } else {
-                    Write-Host "[ACTION] Removing broken junction: .senpi/$senpiRel"
+                } elseif (Test-ManagedSenpiJunction -JunctionName $senpiRel -JunctionFullName $targetPath) {
+                    $actualTarget = Get-JunctionTarget -Path $targetPath
+                    if ($actualTarget -and (Test-Path -LiteralPath (@($actualTarget) | Select-Object -First 1))) {
+                        Write-Host "[ACTION] Removing junction (wrong target): .senpi/$senpiRel"
+                    } else {
+                        Write-Host "[ACTION] Removing broken junction: .senpi/$senpiRel"
+                    }
                     cmd /c "rmdir `"$targetPath`"" 2>&1
                     if ($LASTEXITCODE -ne 0) {
-                        Write-Error "[ERROR] Failed to remove broken junction: .senpi/$senpiRel"
+                        Write-Error "[ERROR] Failed to remove junction: .senpi/$senpiRel"
                         exit 1
                     }
+                } else {
+                    # wrong target（管理物と確認できない）: 自動置換せず保持して衝突報告する
+                    $actualTarget = Get-JunctionTarget -Path $targetPath
+                    Write-Host "[ERROR] Unmanaged junction at managed path (kept, not replaced): .senpi/$senpiRel (actual: $actualTarget)"
+                    $applyConflicts.Add(".senpi/$senpiRel")
+                    continue
                 }
             } elseif (Test-Path -LiteralPath $targetPath) {
                 Write-Error "[ERROR] Path exists and is not a junction: .senpi/$senpiRel"
@@ -1072,17 +1126,29 @@ if ($Mode -eq 'apply') {
         $sourcePath = Get-TargetSourcePath -RelPath $relPath
 
         if (Test-Junction -Path $targetPath) {
-            $actualTarget = Get-JunctionTarget -Path $targetPath
-            if ($actualTarget -and (Test-Path -LiteralPath $actualTarget)) {
+            if (Test-JunctionTargetMatchesSource -JunctionFullName $targetPath -SourcePath $sourcePath) {
                 Write-Host "[OK] Already junctioned: $relPath"
                 continue
-            } else {
-                Write-Host "[ACTION] Removing broken junction: $relPath"
+            } elseif (Test-ManagedProjectionJunction -JunctionRel $relPath -JunctionFullName $targetPath) {
+                # wrong target（管理物）: 旧正本・消失済み正本を含む修復対象（REQ-099-012）。
+                # check で検出された乖離をここで解消する（REQ-050-015）。
+                $actualTarget = Get-JunctionTarget -Path $targetPath
+                if ($actualTarget -and (Test-Path -LiteralPath (@($actualTarget) | Select-Object -First 1))) {
+                    Write-Host "[ACTION] Removing junction (wrong target): $relPath"
+                } else {
+                    Write-Host "[ACTION] Removing broken junction: $relPath"
+                }
                 cmd /c "rmdir `"$targetPath`"" 2>&1
                 if ($LASTEXITCODE -ne 0) {
-                    Write-Error "[ERROR] Failed to remove broken junction: $relPath"
+                    Write-Error "[ERROR] Failed to remove junction: $relPath"
                     exit 1
                 }
+            } else {
+                # wrong target（管理物と確認できない）: 自動置換せず保持して衝突報告する
+                $actualTarget = Get-JunctionTarget -Path $targetPath
+                Write-Host "[ERROR] Unmanaged junction at managed path (kept, not replaced): $relPath (actual: $actualTarget)"
+                $applyConflicts.Add($relPath)
+                continue
             }
         } elseif (Test-Path -LiteralPath $targetPath) {
             Write-Error "[ERROR] Path exists and is not a junction: $relPath"
@@ -1171,6 +1237,14 @@ if ($Mode -eq 'apply') {
     if ($applyRemoveFailures.Count -gt 0) {
         Write-Host ''
         Write-Host "[ERROR] $($applyRemoveFailures.Count) stale artifact(s) could not be removed: $($applyRemoveFailures -join ', ')"
+        exit 1
+    }
+
+    # 管理物と確認できない junction の衝突は自動置換せず保持済み。既存の非正常終了を
+    # 維持する（「ジャンクション状態の判定と自己修復」Design 表、REQ-058-008）。
+    if ($applyConflicts.Count -gt 0) {
+        Write-Host ''
+        Write-Host "[ERROR] $($applyConflicts.Count) junction(s) at managed paths are not managed by AgentDevFlow and were kept (conflict): $($applyConflicts -join ', ')"
         exit 1
     }
 
