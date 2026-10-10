@@ -30,6 +30,7 @@ generated_at: 2026-10-03
 skills:
   - agentdev-adversarial-review
   - agentdev-architecture-advisory
+  - agentdev-artifact-semantics
   - agentdev-artifact-validation
   - agentdev-backlog-integration
   - agentdev-case-run-execution-adapter
