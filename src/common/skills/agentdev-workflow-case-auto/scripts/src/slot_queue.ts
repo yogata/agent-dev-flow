@@ -13,7 +13,9 @@
  * - 共有 active Issue task 枠（上限は入力で受け取る。既定値は case-auto Design
  *   が所有する数値）を超える投入を行わない
  * - 同一 Issue の二重起動を行わない。active・完了済み（outcome pass で完了）・
- *   状態不明の対象は投入しない
+ *   状態不明の対象は投入しない。受入評価が拒否している子（acceptance 拒否の
+ *   outcome pass 対象）は完了済みと分類せず、修正・再検証へ戻す対象として
+ *   新規投入もしない（acceptance-refused。受入評価の拒否結果の消費）
  * - 依存関係のある Definition merge の排他を維持する（統合処理が進行中の間、
  *   当該統合に依存する投入を保留する）
  */
@@ -76,6 +78,7 @@ export type NotAdmittedReason =
   | "no-active-slot"
   | "already-active"
   | "already-completed"
+  | "acceptance-refused"
   | "state-unknown"
   | "definition-merge-exclusive";
 
@@ -118,6 +121,10 @@ export function planSlotAdmissions(input: SlotQueueInput): SlotAdmissionPlan {
       continue;
     }
     if (status === "outcome-determined" && record.outcome === "pass") {
+      if (record.acceptance?.closeAllowed === false) {
+        notAdmitted.push({ issue: candidate.issue, reason: "acceptance-refused" });
+        continue;
+      }
       notAdmitted.push({ issue: candidate.issue, reason: "already-completed" });
       continue;
     }

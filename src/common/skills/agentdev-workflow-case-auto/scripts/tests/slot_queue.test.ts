@@ -13,6 +13,7 @@ function satisfied(issue: string): ChildExecutionRecord {
     status: "outcome-determined",
     outcome: "pass",
     ownRequiredConditionsMet: true,
+    acceptance: { closeAllowed: true },
   };
 }
 
@@ -162,6 +163,36 @@ describe("再開時の二重起動防止と状態管理", () => {
     expect(plan.admissions).toEqual([]);
     expect(plan.notAdmitted).toEqual([
       { issue: "#100", reason: "already-completed" },
+    ]);
+  });
+
+  test("受入評価が拒否している子は完了済みと分類せず投入しない（拒否結果の消費）", () => {
+    const plan = planSlotAdmissions({
+      candidates: [candidate("#100")],
+      records: recordsOf({
+        ...satisfied("#100"),
+        acceptance: { closeAllowed: false, rejectionReason: "acceptance-denied:必須未達残存" },
+      }),
+      activeIssues: [],
+    });
+    expect(plan.admissions).toEqual([]);
+    expect(plan.notAdmitted).toEqual([
+      { issue: "#100", reason: "acceptance-refused" },
+    ]);
+  });
+
+  test("受入評価が拒否している依存先は依存充足せず、後続の子も投入しない", () => {
+    const plan = planSlotAdmissions({
+      candidates: [candidate("#200", ["#100"])],
+      records: recordsOf({
+        ...satisfied("#100"),
+        acceptance: { closeAllowed: false, rejectionReason: "acceptance-denied" },
+      }),
+      activeIssues: [],
+    });
+    expect(plan.admissions).toEqual([]);
+    expect(plan.notAdmitted).toEqual([
+      { issue: "#200", reason: "dependency-not-satisfied" },
     ]);
   });
 
