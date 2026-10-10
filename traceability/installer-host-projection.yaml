@@ -8,6 +8,13 @@ implementation:
     - REQ-009-042
     - REQ-029-012
     - REQ-097-002
+    - REQ-050-015
+    - REQ-058-001
+    - REQ-058-004
+    - REQ-058-005
+    - REQ-058-006
+    - REQ-058-008
+    - REQ-058-012
   scripts/self-sync.ps1:
     - REQ-099-010
     - REQ-099-011
@@ -15,6 +22,13 @@ implementation:
     - REQ-099-020
     - REQ-029-012
     - REQ-097-002
+    - REQ-050-015
+    - REQ-058-001
+    - REQ-058-004
+    - REQ-058-005
+    - REQ-058-006
+    - REQ-058-008
+    - REQ-058-012
   scripts/consumer/archive/install.ps1:
     - REQ-029-012
     - REQ-097-002
