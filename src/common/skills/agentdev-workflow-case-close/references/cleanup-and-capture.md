@@ -40,7 +40,8 @@
 1. **完了記録コメントの投稿**: 記録種別=完了の工程記録コメントテンプレート（`agentdev-workflow-templates` 選定）を用いて本文を組み立て、投稿前に記録コメント検証スクリプト（`agentdev-workflow-case-run` の scripts/record-comments.ts、決定的処理）で基本項目と種別別必須項目（完了=判定根拠）を検査する（fail-closed。検証不備の本文は投稿しない）。検証詳細自体は重複記載せず成果物（PR 本文、対応記録コメント）を参照する。Custom Tool `agentdev_gh` の comment_create で投稿し、読み戻し検証（Tool VERIFY）に委任する
 2. **本文結果セクションの更新**: 成果物、残件の扱いを results セクションとして同スクリプト（結果セクション構築と既存本文への適用）で組み立て、Custom Tool `agentdev_gh` の issue_update で更新し、読み戻し検証（Tool VERIFY）に委任する。終了状態は進行状況の正規状態が正であり、最終判定とその根拠を結果章に重複保存しない（必要な判断根拠はコメントおよび PR の証拠）。本文に結果セクションが存在しない場合は本文末尾へ追加する（既存セクションの順序と内容は保持）
 3. **対応記録コメントの投稿**（既存の選定ルールに従う work_type 別対応記録。完了記録コメントとの間で検証詳細を重複記載しない）
-4. **Issue クローズ**: `agentdev_gh` の issue_close 操作（理由: completed）
+4. **受入評価結果の確認（issue_close 実行前、進行禁止）**: Issue クローズの前に、STEP-2 の完了条件単位の最終評価（`scripts/src/final-acceptance.ts` の `evaluateFinalAcceptance`）と終了操作許可判定（`scripts/src/close_mechanical_steps.ts` の `isCloseOperationPermitted`、機械工程の報告 JSON から決定的に判定）の結果を確認する。受入評価が拒否（closeAllowed が false）または未確定（判定入力の組み立て前に機械工程が停止した等）の場合は issue_close を実行せず、拒否理由と未成立条件を既存証拠チャネルへ記録して修正・再検証（case-run 差し戻し等の正規所有工程）へ戻す。受入評価の許可を終了操作の前提条件として扱い、拒否結果を保持したまま issue_close を実行しない
+5. **Issue クローズ**: `agentdev_gh` の issue_close 操作（理由: completed）
 
 ### Result
 

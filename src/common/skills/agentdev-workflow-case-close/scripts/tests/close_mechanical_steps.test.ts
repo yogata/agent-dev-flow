@@ -1,11 +1,15 @@
 import { describe, expect, test } from "bun:test";
+import * as fs from "fs";
+import * as path from "path";
 
 import {
   applyEpicChildStatusUpdates,
   assembleReport,
   decideExitCode,
+  deriveAcceptancePopulation,
   deriveCurrentWave,
   extractCompletionCheckboxes,
+  isCloseOperationPermitted,
   runCloseMechanicalSteps,
   validateInput,
   type CloseMechanicalInput,
@@ -13,6 +17,20 @@ import {
   type GateCommandSpec,
   type MechanicalRunner,
 } from "../src/close_mechanical_steps";
+import type { ConditionVerdict } from "../src/final-acceptance";
+
+function findRepoRoot(start: string): string {
+  let dir = path.resolve(start);
+  for (let i = 0; i < 20; i++) {
+    if (fs.existsSync(path.join(dir, "src", "common"))) return dir;
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return path.resolve(start);
+}
+
+const REPO_ROOT = findRepoRoot(import.meta.dir);
 
 function gate(name: string, cwd = "<repo>/.worktrees/100-case"): GateCommandSpec {
   return { name, command: "bun", args: ["./checker.ts", name], cwd, timeoutMs: 60000 };
@@ -350,5 +368,243 @@ describe("報告 JSON の4要素組み立て", () => {
     // 終了コードは step の成否から決定する。警告メッセージのみの報告は要判断ではなく
     // 成功（警告の重要度評価はモデルが報告 JSON の意味レビューで行う）。
     expect(decideExitCode(report)).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 受入評価の接続（母集団導出 → evaluateFinalAcceptance → 終了操作抑制）
+// ---------------------------------------------------------------------------
+
+/** 正当な pass 判定の標本（final-acceptance.ts の契約に揃える）。 */
+function soundPass(conditionId: string): ConditionVerdict {
+  return {
+    conditionId,
+    required: true,
+    category: "pass",
+    grounds: {
+      derivedFromContract: true,
+      evidenceProvesSemanticProposition: true,
+    },
+  };
+}
+
+describe("抽出フェーズの母集団導出（deriveAcceptancePopulation）", () => {
+  test("抽出成功は正規完了条件の取得状態を母集団へ反映する", () => {
+    const population = deriveAcceptancePopulation({ total: 3 });
+    expect(population).toEqual({
+      extractionSucceeded: true,
+      contractConditionCount: 3,
+      contractRequiredCount: 3,
+      emptyBasis: undefined,
+    });
+  });
+
+  test("抽出失敗は extractionSucceeded: false の母集団になり、0 件（条件なし）へ変換しない", () => {
+    const population = deriveAcceptancePopulation(null);
+    expect(population).toEqual({
+      extractionSucceeded: false,
+      contractConditionCount: null,
+      contractRequiredCount: null,
+    });
+  });
+
+  test("0 件抽出は emptyBasis を根拠に主張され、根拠なしでは条件なしとして受理されない", () => {
+    const withoutBasis = deriveAcceptancePopulation({ total: 0 });
+    expect(withoutBasis.extractionSucceeded).toBe(true);
+    expect(withoutBasis.contractConditionCount).toBe(0);
+    expect(withoutBasis.emptyBasis).toBeUndefined();
+    const withBasis = deriveAcceptancePopulation({ total: 0 }, "正規契約上の完了条件なし");
+    expect(withBasis.emptyBasis).toBe("正規契約上の完了条件なし");
+  });
+});
+
+describe("受入評価の実経路接続（final-acceptance-evaluation step と終了操作抑制）", () => {
+  test("判定入力が未提供の場合は受入評価は未確定として報告され、終了操作は許可されない", () => {
+    const runner = fakeRunner({ issueBody: "- [ ] 条件1\n- [x] 条件2\n" });
+    const report = runCloseMechanicalSteps(preMergeInput(), runner);
+    const evaluation = report.diff.acceptanceEvaluation as {
+      determined: boolean;
+      population: { contractConditionCount: number };
+    };
+    expect(evaluation.determined).toBe(false);
+    expect(evaluation.population.contractConditionCount).toBe(2);
+    expect(isCloseOperationPermitted(report)).toEqual({
+      permitted: false,
+      reason: "acceptance-evaluation-undetermined",
+    });
+  });
+
+  test("拒否入力は final-acceptance-evaluation step を失敗にし、報告に母集団・判定・拒否理由を含め、終了操作を抑止する", () => {
+    const runner = fakeRunner({ issueBody: "- [ ] 条件1\n- [ ] 条件2\n" });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [
+          soundPass("AC-1"),
+          { conditionId: "AC-2", required: true, category: "fail", grounds: {} },
+        ],
+      }),
+      runner,
+    );
+    const evaluationStep = report.result.steps.find(
+      (s) => s.name === "final-acceptance-evaluation",
+    );
+    expect(evaluationStep?.status).toBe("fail");
+    const evaluation = report.diff.acceptanceEvaluation as {
+      determined: boolean;
+      closeAllowed: boolean;
+      population: { contractConditionCount: number; contractRequiredCount: number };
+      blockingUnmet: string[];
+    };
+    expect(evaluation.determined).toBe(true);
+    expect(evaluation.closeAllowed).toBe(false);
+    expect(evaluation.population).toEqual({
+      extractionSucceeded: true,
+      contractConditionCount: 2,
+      contractRequiredCount: 2,
+      emptyBasis: undefined,
+    });
+    expect(evaluation.blockingUnmet).toEqual(["AC-2"]);
+    expect(report.result.exitCategory).toBe("failure");
+    expect(decideExitCode(report)).toBe(1);
+    expect(isCloseOperationPermitted(report)).toEqual({
+      permitted: false,
+      reason: "acceptance-denied",
+    });
+  });
+
+  test("証拠が揃った対象は同一の実経路で終了操作を許可する（正常終了）", () => {
+    const runner = fakeRunner({ issueBody: "- [ ] 条件1\n- [ ] 条件2\n" });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1"), soundPass("AC-2")],
+      }),
+      runner,
+    );
+    const evaluationStep = report.result.steps.find(
+      (s) => s.name === "final-acceptance-evaluation",
+    );
+    expect(evaluationStep?.status).toBe("pass");
+    expect(decideExitCode(report)).toBe(0);
+    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+  });
+
+  test("不足で停止した対象は修正後、同一の実経路の再検証で終了操作を許可する（fix-and-reverify）", () => {
+    const denied = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [
+          soundPass("AC-1"),
+          { conditionId: "AC-2", required: true, category: "blocked", grounds: {} },
+        ],
+      }),
+      fakeRunner({ issueBody: "- [ ] 条件1\n- [ ] 条件2\n" }),
+    );
+    expect(isCloseOperationPermitted(denied).permitted).toBe(false);
+    const reverified = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1"), soundPass("AC-2")],
+      }),
+      fakeRunner({ issueBody: "- [ ] 条件1\n- [ ] 条件2\n" }),
+    );
+    expect(isCloseOperationPermitted(reverified)).toEqual({ permitted: true });
+  });
+
+  test("拒否・未確定の実経路では終了操作（issue_close 相当の gh 書込み）が呼び出されない", () => {
+    const runner = fakeRunner({ issueBody: "- [ ] 条件1\n" });
+    const denied = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [
+          { conditionId: "AC-1", required: true, category: "fail", grounds: {} },
+        ],
+      }),
+      runner,
+    );
+    expect(isCloseOperationPermitted(denied).permitted).toBe(false);
+    // 報告 JSON に記録される gh 呼び出しは読み取り系（gh pr view）のみで、
+    // issue_close・Issue 本文更新等の書込みを script が発行しない（agentdev_gh 境界）。
+    for (const call of runner.calls.filter((c) => c.command === "gh")) {
+      expect(call.args.slice(0, 2)).toEqual(["pr", "view"]);
+    }
+    const undetermined = runCloseMechanicalSteps(
+      preMergeInput(),
+      fakeRunner({ issueBody: "" }),
+    );
+    const evaluation = undetermined.diff.acceptanceEvaluation as { determined: boolean };
+    expect(evaluation.determined).toBe(false);
+    expect(isCloseOperationPermitted(undetermined).permitted).toBe(false);
+  });
+
+  test("機械工程が失敗している場合は受入評価が許可でも終了操作を許可しない", () => {
+    const runner = fakeRunner({
+      worktreeStatus: " M docs/x.md\n",
+      issueBody: "- [ ] 条件1\n",
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    expect(report.result.exitCategory).toBe("failure");
+    expect(isCloseOperationPermitted(report)).toEqual({
+      permitted: false,
+      reason: "mechanical-failure",
+    });
+  });
+
+  test("Epic ルートの受入評価は subjectKind epic で実行される", () => {
+    const runner = fakeRunner({ issueBody: "" });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceSubjectKind: "epic",
+        acceptanceVerdicts: [],
+        acceptanceEmptyBasis: undefined,
+      }),
+      runner,
+    );
+    const evaluation = report.diff.acceptanceEvaluation as {
+      closeAllowed: boolean;
+      populationState: string;
+    };
+    // Epic Issue の抽出 0 件（本文に完了条件チェックボックスなし）は根拠なしでは
+    // 条件なしとして受理されない（fail-closed）。
+    expect(evaluation.closeAllowed).toBe(false);
+    expect(evaluation.populationState).toBe("no-conditions-in-contract");
+    const evaluationStep = report.result.steps.find(
+      (s) => s.name === "final-acceptance-evaluation",
+    );
+    expect((evaluationStep?.detail as { subjectKind?: string }).subjectKind).toBe("epic");
+  });
+
+  test("実経路の reference pin: STEP-2 と STEP-5 が終了操作許可判定を実手順として参照する", () => {
+    const step2 = fs.readFileSync(
+      path.join(
+        REPO_ROOT,
+        "src",
+        "common",
+        "skills",
+        "agentdev-workflow-case-close",
+        "references",
+        "issue-resolution-and-qg4.md",
+      ),
+      "utf-8",
+    );
+    const step5 = fs.readFileSync(
+      path.join(
+        REPO_ROOT,
+        "src",
+        "common",
+        "skills",
+        "agentdev-workflow-case-close",
+        "references",
+        "cleanup-and-capture.md",
+      ),
+      "utf-8",
+    );
+    for (const reference of [step2, step5]) {
+      expect(reference).toContain("close_mechanical_steps.ts");
+      expect(reference).toContain("isCloseOperationPermitted");
+    }
+    expect(step2).toContain("受入評価の母集団導入と終了操作への接続");
+    expect(step2).toContain("evaluateFinalAcceptance");
+    expect(step5).toContain("受入評価結果の確認");
+    expect(step2).toContain("completion-checkbox-extraction");
   });
 });
