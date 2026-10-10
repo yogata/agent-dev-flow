@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261010T050827Z-46fe",
+  "workflow": "case-ready",
+  "evaluationKind": "wave-configuration",
+  "subject": "Root Case #3585 Epic Wave-2（OU-0002〜0007）の並列可否",
+  "sourceRevision": "05d6d9e0",
+  "durationMs": 351,
+  "inputTokens": 1316,
+  "inputs": {
+    "requestDigest": "a26510f8d67ee7b3907ba56443f74c75e03bddc9e067145ad350ef57d67922dc",
+    "references": [
+      {
+        "digest": "c62232f4406f9b27891cf44b58352080a19fd2f4f600ae7116edc48eb7571b63",
+        "label": "draft-data",
+        "path": ".agentdev/drafts/req-draft-adf-v5-reimplementation-from-v500.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-wave-parallel",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.95,
+        "false": 0.050000000000000044
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-wave-parallel",
+        "value": true
+      }
+    ]
+  }
+}

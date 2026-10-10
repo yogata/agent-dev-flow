@@ -309,3 +309,35 @@
 - **想定反映先**: .agentdev/extensions/skills/agentdev-workflow-case-open.yaml の yomiyasu-application-before-write rule（配布物更新を伴うため req-define 再合意経路で評価）
 - **関連**: Issue #3585、.agentdev/extensions/skills/agentdev-workflow-case-open.yaml、src/common/skills/agentdev-workflow-case-open/scripts/README.md「検査入力 JSON の置き場所指針」節（同種制約の先例）
 - **タグ**: `#case-open` `#write-guard` `#yomiyasu-lint` `#temp-file` `#fail-closed`
+
+## case-ready 横断依存検査の初回入力で Root Case を非 Epic 扱いにし対応関係領域の実体が不完全なまま警告が発生した
+
+- **問題事象**: case-ready STEP-6 の横断依存検査（inspect_cross_dependencies.ts）で、初回入力では Root Case（Epic 化済み管理 Issue）を epic_ref: null（Standard 扱い）として渡したため、同一パス重複の Wave 内委譲（isWaveInternal）が作動せず 4 件の同一パス警告が発生した。また対応関係領域（adf-covers-declarations）の file_paths に traceability sidecar のみを渡したため、REQ-104〜109 の design 対応（inline 宣言・docs/designs/** に存在）が未登録と誤判定し、条件 (b) の重複需要 9 Case 分が報告された
+- **発生局面**: 検証（case-ready STEP-6 横断依存検査。case-auto stage 2 からの委譲実行。Issue #3585）
+- **検知方法**: エンジン報告の wave_internal_delegated_paths が空・condition_a 4 件・condition_b case_count 9 という結果と、Epic 配下 9 Case の入力実態との突合。エンジン実装（isWaveInternal は全メンバーが同一非 null epic_ref を持つ場合のみ委譲）の確認
+- **根本原因**: (1) Root Case（Epic 化管理 Issue）の epic_ref の与え方の解釈が未確定のまま null を選択した、(2) 対応関係領域の実体解決を sidecar に限定し、design 対応が inline 宣言（docs/designs/** の ADF-COVERS）に存在することを coverage 実行前に特定していなかった
+- **自律対応内容**: 入力を修正（current_case.epic_ref = "#3585"、対応関係領域の file_paths に coverage.ts で取得した REQ-104〜109 の design 対応 11 ファイルを追加）して再実行した。再実行では wave_internal_delegated_paths に 4 パスが委譲記録され、condition_a 0 件・condition_b 0 件・detection_unavailable なしで検査成立。エンジンは同一入力から同一報告を返すため再実行は冪等
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（検査入力の構成修正。エンジン・契約変更なし）
+- **横展開観点**: case-ready STEP-6 の横断依存検査を実行する全工程。Epic 化済み Root Case を current_case とする入力では epic_ref に自身の Epic 参照を設定する。対応関係領域の file_paths は sidecar と design 対応の inline 宣言ファイル（coverage で取得可能）の和集合とする
+- **再発条件**: Epic 化済み Root Case で横断依存検査を実行し、epic_ref を null のまま渡した場合、または対応関係領域を sidecar のみで解決した場合
+- **予防策候補**: case-ready 側 reference（readiness-and-cleanup.md）の横断依存検査節へ入力構成の補足（Epic 化済み Root Case の epic_ref 扱い、対応関係領域の実体解決に coverage を使う手順）を追加する
+- **想定反映先**: src/common/skills/agentdev-workflow-case-ready/references/readiness-and-cleanup.md「横断依存検査（ゲート横断次元）」節への補足候補
+- **関連**: Issue #3585、.opencode/skills/agentdev-workflow-case-open/scripts/lib/cross_dependency_engine.ts（isWaveInternal）、scripts/README.md（共有領域の読取方式）
+- **タグ**: `#case-ready` `#cross-dependency` `#inspection-input` `#epic-ref` `#shared-areas`
+
+## case-ready で GitHub 本文書込みを yomiyasu 適用より先行させ STEP-6 で遡及 lint・指摘確認を行った
+
+- **問題事象**: case-ready STEP-4 / STEP-5 の Root Case 本文更新（issue_update 2 回）と子 Issue 作成（issue_create 8 件）を、extension rule（yomiyasu-application-before-write）の「agentdev_gh へ渡す前に推敲」より先行して実施した。STEP-6 で rule 存在に気づき、書込み済み 9 Issue 本文の取得 → lint 実行 → 指摘確認の遡及適用で補正した
+- **発生局面**: 実装（case-ready STEP-4 / 5 / 6。case-auto stage 2 からの委譲実行。Issue #3585）
+- **検知方法**: STEP-6 の検証ゲート作業中に extension yaml の rules 節（GitHub 文章は agentdev_gh へ渡す前に推敲）を確認し、書込み済み本文への適用が未実施であることの発見
+- **根本原因**: case-ready 側の工程手順は extension rules の適用タイミングを本文書込み工程（STEP-4 / STEP-5）に紐づけて明示しておらず、工程実行者が rules 節を検証ゲート工程で初めて確認するまで気づかない構造。本事象は事後の遡及適用で実害は生じなかったが、rule の正規位置（書込み前）からの逸脱である
+- **自律対応内容**: 書込み済み 9 Issue 本文を gh issue view で取得し、MSYS /tmp パスを cygpath -w で Windows 実パスへ変換して yomiyasu_lint.py を実行。指摘は全件「英単語・識別子と日本語の境界半角空白」の WARN のみであり、識別子境界の空白は ADF 正規文書の標準記法（REQ-094・既存本文実績）として保持理由を記録し修正不要と確認した。ready 遷移の進行状況変更は状態のみの変更のため再推敲不要条項で扱った
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（rule の適用タイミング逸脱の遡及補正。契約変更なし）
+- **横展開観点**: GitHub 本文を書き込む全 workflow 工程（case-open / case-ready / case-run / case-close、capability skill 経由含む）。extension rules の読込を工程入口（STEP-1 前置確認）で実施し、本文書込み工程の前に yomiyasu 適用を置く運用に統一すると逸脱を防げる
+- **再発条件**: extension rules 節を本文書込み工程の前に確認せず、検証ゲートや後段工程で初めて rules に気づく場合
+- **予防策候補**: workflow skill 側 STEP 手順に「extension rules 確認」の前置を明示する。yomiyasu 適用を本文構成（一時ファイル作成）の直後に配置する
+- **想定反映先**: src/common/skills/agentdev-workflow-case-ready/references（execution-contract.md・execution-structure.md）の本文書込み工程への yomiyasu 前置補足候補、.agentdev/extensions/skills/agentdev-workflow-case-ready.yaml の rules 表現補足
+- **関連**: Issue #3585、.agentdev/extensions/skills/agentdev-workflow-case-ready.yaml（yomiyasu-application-before-write）、Issue #3550 の learning（acceptance_gates による yomiyasu 記録抑止と同系統の適用タイミング問題）
+- **タグ**: `#case-ready` `#yomiyasu` `#application-timing` `#retroactive-application` `#extension-rules`
