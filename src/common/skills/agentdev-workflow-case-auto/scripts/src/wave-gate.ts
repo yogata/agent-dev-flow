@@ -15,9 +15,10 @@
  *   判定し、親に残る横断義務の未完了を理由に条件を満たした子の終了を禁止しない
  * - 申告と受入の分離: 子の実行担当の合格申告（ownRequiredConditionsMet）は申告
  *   として扱い、受入側（case-close が正規完了条件から独立実行した受入評価）の
- *   結果が提供されている場合はその結果を消費する。受入評価が拒否している子は
- *   申告が合格でも完了伝播させず、Epic の最終終了判定でも Epic 自身の受入評価
- *   の拒否を blocker にする
+ *   結果が提供されていなければ完了・最終終了を許可しない（未確認の拒否。受入
+ *   評価未提供は acceptance-missing / epic-acceptance-missing として拒否する）。
+ *   受入評価が拒否している子は申告が合格でも完了伝播させず、Epic の最終終了判定
+ *   でも Epic 自身の受入評価の拒否を blocker にする
  * - 義務投影不完全・検証不能申告の停止伝播: 当該申告がある子は完了伝播させず、
  *   依存先からの依存充足・Epic の終了を阻止する
  * - Epic/Root の最終終了は全子完了と親横断義務成立の両方を条件とする
@@ -49,7 +50,9 @@ export type ObligationDefect =
 /**
  * 受入側（case-close が正規完了条件から独立実行した受入評価）の結果。
  * 実行担当の合格申告（ownRequiredConditionsMet）とは別の照合対象であり、
- * 申告の正ではない。
+ * 申告の正ではない。受入評価が確定していない対象は本結果を設定しない。
+ * canCompleteChild / canCloseEpic は本結果が未提供の場合を
+ * acceptance-missing / epic-acceptance-missing として許可せず拒否する。
  */
 export interface AcceptanceResult {
   /** 受入評価（final-acceptance.ts の evaluateFinalAcceptance）の close 可否。 */
@@ -67,7 +70,10 @@ export interface ChildExecutionRecord {
   ownRequiredConditionsMet?: boolean;
   /** 義務投影不完全・検証不能の申告。 */
   obligationDefect?: ObligationDefect;
-  /** 受入評価の結果（提供された場合、申告と独立に完了判定へ消費する）。 */
+  /**
+   * 受入評価の結果（完了判定の必須入力。未提供の場合は canCompleteChild が
+   * acceptance-missing で完了を拒否し、申告だけでは完了を許可しない）。
+   */
   acceptance?: AcceptanceResult;
 }
 
@@ -156,8 +162,10 @@ export function isDependencySatisfied(
  * 当該子が負う必須完了条件の成立のみで判定する。親横断義務は入力に含まれず、
  * 親の横断義務の未完了を理由に条件を満たした子の終了を禁止しない。
  * 義務投影不完全・検証不能の申告がある子は停止伝播として完了伝播を阻止する。
- * 受入評価の結果（acceptance）が提供されている場合は申告（ownRequiredConditionsMet）
- * と独立に消費し、受入評価が拒否している子は申告が合格でも完了しない。
+ * 受入評価の結果（acceptance）は完了判定の必須入力であり、申告
+ * （ownRequiredConditionsMet）が合格しても受入評価の結果が未提供の場合は
+ * acceptance-missing として完了しない。受入評価が拒否している子は申告が
+ * 合格でも完了しない。
  */
 export function canCompleteChild(
   child: ChildExecutionRecord,
@@ -166,15 +174,6 @@ export function canCompleteChild(
     return {
       allowed: false,
       reason: "義務投影不完全・検証不能の申告がある子は停止伝播として扱い、完了伝播させない",
-    };
-  }
-  if (
-    child.acceptance !== undefined &&
-    child.acceptance.closeAllowed !== true
-  ) {
-    return {
-      allowed: false,
-      reason: `受入評価が完了を許可していない（申告と受入の分離。${child.acceptance.rejectionReason ?? "拒否理由未記録"}）`,
     };
   }
   if (
@@ -187,6 +186,19 @@ export function canCompleteChild(
       reason: "子が負う必須完了条件が全て成立していない",
     };
   }
+  if (child.acceptance === undefined) {
+    return {
+      allowed: false,
+      reason:
+        "acceptance-missing:受入評価の結果（case-close が正規完了条件から独立実行した受入評価）が提供されていないため、実行担当の合格申告だけでは完了を許可しない（申告と受入の分離）",
+    };
+  }
+  if (child.acceptance.closeAllowed !== true) {
+    return {
+      allowed: false,
+      reason: `受入評価が完了を許可していない（申告と受入の分離。${child.acceptance.rejectionReason ?? "拒否理由未記録"}）`,
+    };
+  }
   return { allowed: true };
 }
 
@@ -195,7 +207,11 @@ export interface EpicCloseGateInput {
   children: readonly ChildExecutionRecord[];
   /** Epic/Root 自身が負う横断義務の成立状態。最終終了時に評価する。 */
   crossObligations: readonly CrossObligationState[];
-  /** Epic 自身の受入評価結果（親横断義務を含む Epic 最終終了時の受入評価）。 */
+  /**
+   * Epic 自身の受入評価結果（親横断義務を含む Epic 最終終了時の受入評価。
+   * 最終終了判定の必須入力。未提供の場合は canCloseEpic が
+   * epic-acceptance-missing で最終終了を拒否する）。
+   */
   epicAcceptance?: AcceptanceResult;
 }
 
@@ -204,16 +220,20 @@ export interface EpicCloseGateInput {
  *
  * 全子 Issue の完了と親横断義務の成立の両方を条件とする。条件を満たした子の
  * 完了を親横断義務の未完了だけで阻止しない一方、Epic/Root 自身は親の横断義務が
- * 成立するまで終了しない。Epic 自身の受入評価（epicAcceptance）が提供されて
- * いる場合はその結果を消費し、受入評価が拒否している Epic は横断義務が成立して
- * いても最終終了しない。
+ * 成立するまで終了しない。Epic 自身の受入評価（epicAcceptance）は最終終了判定の
+ * 必須入力であり、未提供の場合は epic-acceptance-missing として最終終了しない。
+ * 受入評価が拒否している Epic は横断義務が成立していても最終終了しない。
  */
 export function canCloseEpic(
   input: EpicCloseGateInput,
 ): { allowed: boolean; blockers: string[] } {
   const blockers: string[] = [];
 
-  if (input.epicAcceptance !== undefined && input.epicAcceptance.closeAllowed !== true) {
+  if (input.epicAcceptance === undefined) {
+    blockers.push(
+      "epic-acceptance-missing:Epic 自身の受入評価の結果（case-close が正規完了条件から独立実行した受入評価）が提供されていないため、最終終了を許可しない（申告と受入の分離）",
+    );
+  } else if (input.epicAcceptance.closeAllowed !== true) {
     blockers.push(
       `epic-acceptance-denied:${input.epicAcceptance.rejectionReason ?? "拒否理由未記録"}`,
     );

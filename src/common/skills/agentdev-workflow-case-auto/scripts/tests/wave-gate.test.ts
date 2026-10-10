@@ -49,8 +49,19 @@ function findRepoRoot(start: string): string {
 
 const REPO_ROOT = findRepoRoot(import.meta.dir);
 
-/** 条件を満たした子 Issue の標本。 */
+/** 条件を満たし、受入評価が許可した子 Issue の標本（完了可能な状態）。 */
 function satisfiedChild(issue: string): ChildExecutionRecord {
+  return {
+    issue,
+    status: "outcome-determined",
+    outcome: "pass",
+    ownRequiredConditionsMet: true,
+    acceptance: { closeAllowed: true },
+  };
+}
+
+/** 条件を満たした申告だけを行い、受入評価の結果が未提供の子 Issue の標本。 */
+function claimedChild(issue: string): ChildExecutionRecord {
   return {
     issue,
     status: "outcome-determined",
@@ -132,7 +143,7 @@ describe("FP-10: dispatch 入口での旧実行契約抑止", () => {
 // ---------------------------------------------------------------------------
 
 describe("FN-1: 子完了と親横断義務の分離", () => {
-  test("条件を満たした子 Issue は親横断義務の未完了だけを理由に終了禁止されない", () => {
+  test("条件を満たし受入評価が許可した子 Issue は親横断義務の未完了だけを理由に終了禁止されない", () => {
     // canCompleteChild の入力には親横断義務が存在しない（構造的に分離）。
     // 条件を満たした子は親の状態に関わらず完了を許可される。
     const result = canCompleteChild(satisfiedChild("#3447"));
@@ -145,6 +156,7 @@ describe("FN-1: 子完了と親横断義務の分離", () => {
       status: "outcome-determined",
       outcome: "pass",
       ownRequiredConditionsMet: false,
+      acceptance: { closeAllowed: true },
     });
     expect(unmet.allowed).toBe(false);
 
@@ -192,9 +204,13 @@ describe("申告と受入の分離（受入評価結果の消費）", () => {
     expect(result.allowed).toBe(true);
   });
 
-  test("受入評価の結果が未提供の子は従来どおり申告で完了判定する", () => {
-    const result = canCompleteChild(satisfiedChild("#3007"));
-    expect(result.allowed).toBe(true);
+  test("受入評価の結果が未提供の子は合格申告だけでは完了しない（未確認の拒否。再開反例の回帰）", () => {
+    // Issue #3604 再開（コメント 6100391579）の Supervisor probe 反例:
+    // canCompleteChild({issue:"probe",status:"outcome-determined",outcome:"pass",ownRequiredConditionsMet:true})
+    // が allowed:true を返す欠陥の回帰テスト。
+    const probe = canCompleteChild(claimedChild("probe"));
+    expect(probe.allowed).toBe(false);
+    expect(probe.reason).toContain("acceptance-missing");
   });
 
   test("受入評価が拒否している子は依存充足しない（Wave クローズ進行停止）", () => {
@@ -208,6 +224,14 @@ describe("申告と受入の分離（受入評価結果の消費）", () => {
     });
     expect(result.satisfied).toBe(false);
     expect(result.blockers).toContain("dependency-not-satisfied:#dep-a");
+  });
+
+  test("受入評価の結果が未提供の依存先（合格申告済み）は依存充足しない", () => {
+    const result = isDependencySatisfied({
+      dependencyProviders: [claimedChild("#dep-c")],
+    });
+    expect(result.satisfied).toBe(false);
+    expect(result.blockers).toContain("dependency-not-satisfied:#dep-c");
   });
 
   test("受入評価が拒否している子は Wave 収束に含まれず Epic の最終終了も阻止される", () => {
@@ -231,6 +255,15 @@ describe("申告と受入の分離（受入評価結果の消費）", () => {
     });
     expect(result.allowed).toBe(false);
     expect(result.blockers.some((b) => b.startsWith("epic-acceptance-denied:"))).toBe(true);
+  });
+
+  test("Epic 自身の受入評価が未提供の場合は子と横断義務が成立していても最終終了しない", () => {
+    const result = canCloseEpic({
+      children: [satisfiedChild("#1"), satisfiedChild("#2")],
+      crossObligations: [{ obligationId: "X-1", satisfied: true }],
+    });
+    expect(result.allowed).toBe(false);
+    expect(result.blockers.some((b) => b.startsWith("epic-acceptance-missing:"))).toBe(true);
   });
 
   test("Epic 自身の受入評価が許可している場合は既存契約どおり最終終了する", () => {
@@ -381,12 +414,13 @@ describe("Epic 系の最終終了判定", () => {
     expect(result.blockers.filter((b) => b.startsWith("child-not-complete:"))).toEqual([]);
   });
 
-  test("親横断義務が成立すれば Epic は終了できる", () => {
+  test("親横断義務が成立すれば Epic は終了できる（Epic 自身の受入評価が許可の場合）", () => {
     const result = canCloseEpic({
       children: [satisfiedChild("#3442"), satisfiedChild("#3443")],
       crossObligations: [
         { obligationId: "epic-cross-verification", satisfied: true },
       ],
+      epicAcceptance: { closeAllowed: true },
     });
     expect(result.allowed).toBe(true);
   });
@@ -410,13 +444,14 @@ describe("Epic 系の最終終了判定", () => {
     expect(withDefect.blockers).toContain("child-not-complete:#2");
   });
 
-  test("全子完了と親横断義務成立の両方を満たすときのみ Epic が終了する", () => {
+  test("全子完了と親横断義務成立の両方を満たし Epic 自身の受入評価が許可するときのみ Epic が終了する", () => {
     const result = canCloseEpic({
       children: [satisfiedChild("#1"), satisfiedChild("#2"), satisfiedChild("#3")],
       crossObligations: [
         { obligationId: "X-1", satisfied: true },
         { obligationId: "X-2", satisfied: true },
       ],
+      epicAcceptance: { closeAllowed: true },
     });
     expect(result.allowed).toBe(true);
     expect(result.blockers).toEqual([]);

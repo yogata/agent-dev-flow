@@ -72,6 +72,7 @@ verification:
   src/common/skills/agentdev-workflow-case-auto/scripts/tests/wave-gate.test.ts:
     - REQ-032-038
   src/common/skills/agentdev-workflow-case-auto/scripts/tests/slot_queue.test.ts:
+    - REQ-032-038
     - REQ-034-012
     - REQ-034-040
     - REQ-035-017
