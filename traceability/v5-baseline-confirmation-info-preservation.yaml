@@ -1,0 +1,9 @@
+component: v5-baseline-confirmation-info-preservation
+implementation:
+  docs/knowledge/v5-baseline-confirmation-info-preservation.md:
+    - REQ-109-007
+    - REQ-109-008
+verification:
+  docs/knowledge/v5-baseline-confirmation-info-preservation.md:
+    - REQ-109-007
+    - REQ-109-008
