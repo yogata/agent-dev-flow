@@ -453,3 +453,19 @@
 - **想定反映先**: agentdev-artifact-validation scripts 配下 checker README・usage 表記候補
 - **関連**: Epic #3585、PR #3602 検証差分 V-14・既存エントリ「配布依存境界 checker の CLI 引数形式は --profile P <repoRoot>」（同系統先例）
 - **タグ**: `#cli-usage` `#artifact-validation` `#readme` `#fail-closed`
+
+## prepare_definition_pr の計測日収束は 2 段検出になり frontmatter updated 追随まで同一 PR 内で完了する
+
+- **問題事象**: case-open STEP-4 の prepare_definition_pr script 実行で、REQ 行変更を伴う Definition commit の後に check_integrity が 2 段階で異なる NG を返した。1 段目は index-generation-consistency（req-metrics 計測日 AUTOGEN が commit 前配置実行により 1 日遅れで残存。current=計測日: 2026-10-09、expected=計測日: 2026-10-11）、計測日収束 commit で解消した後、2 段目として req-updated-freshness（IR-072。frontmatter updated 2026-10-09 が last content-change commit date 2026-10-11 と不一致）が新規 NG として検出された
+- **発生局面**: case-open STEP-4 機械工程（Case #3603。REQ 行変更〔同数置換〕を伴い req-health-metrics.md の派生物変化は計測日のみ）
+- **検知方法**: script 報告 JSON の check_integrity step fail（stderrTail の 1 new unmanaged NG）と、worktree 内での check_integrity 再実行による NG 種別特定の 2 回
+- **根本原因**: generate_indexes の commit 前配置実行では計測日が commit author date の導出から 1 日遅れになり得る（reference「計測日収束」に明記）。計測日 AUTOGEN 行の再 commit は content 変更として commit date を進めるため、IR-072 の req-updated-freshness が frontmatter updated の追随を 2 段目として要求する。計測日収束手順は「派生物を再生成・再 commit」までを明示し、frontmatter updated 追随までを明示していない
+- **自律対応内容**: 計測日収束 commit（generate_indexes --root <worktree> 再実行 → req-health-metrics.md の計測日 1 行のみを明示パス commit）の後、frontmatter updated を commit date へ進める追随 commit を node writeFileSync（UTF-8 明示）で実施し、check_integrity を commit 済み HEAD で再実行して 0 new unmanaged NG（exit 0）を確認。両者とも内容変更ではなく計測日・メタデータの収束であり PR 本文にその旨を記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（reference の計測日収束手順と IR-072 契約の適用。契約変更なし）
+- **横展開観点**: REQ 行変更を伴う Definition 編集で req-metrics 計測日 AUTOGEN が更新される全 case-open / case-revise 実行。計測日が更新される変更では frontmatter updated 追随まで含めて「計測日収束完了」と扱う
+- **再発条件**: Definition commit に req-health-metrics.md の計測日 AUTOGEN 更新（content 変更と判定される）を含む場合
+- **予防策候補**: case-open reference の計測日収束手順に「計測日収束 commit 後に req-updated-freshness（IR-072）が frontmatter updated 追随を要求する 2 段構造になり得る。両方を同一 PR 内の追加 commit で収束させる」旨の補足を追加する
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md「traceability check の gate 判定仕様と計測日収束」節の補足候補
+- **関連**: Case #3603、PR #3607、commit 4c91e6bb・8e4dd22e・1fa6a312、既存エントリ「prepare_definition_pr の generate_indexes 派生物が stagePaths 外で残り追加 commit で補正した」（派生物事後追随の隣接系統）
+- **タグ**: `#case-open-step4` `#generate-indexes` `#measurement-date` `#ir-072` `#frontmatter-updated`
