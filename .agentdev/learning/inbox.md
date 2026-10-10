@@ -517,3 +517,19 @@
 - **想定反映先**: case-open reference（definition-pr-and-idempotency.md）missing-design 0 件ゲート節の確認手順補足候補
 - **関連**: Case #3605、PR #3608、commit e9a65d50、既存エントリ「traceability gate の既存債務 fail は対照実行で変更起因 0 件を機械証明してから PR 作成可否を意味判断する」（同 Case の case-open 側記録）
 - **タグ**: `#case-ready` `#traceability-gate` `#missing-design` `#coverage-union` `#gate-blocking`
+
+## reference pin 検査の期待値は文面の step 名・関数名に依存し、実手順の記述を事前 grep して組み立てる
+
+- **問題事象**: close_mechanical_steps.test.ts の STEP-2 reference pin 検査の初回実行で 1 fail。pin 期待値が実手順の記述（`completion-checkbox-extraction step` という step 名）と不一致だった。STEP-2 の手順は step 名で機械抽出を参照しており、関数名（extractCompletionCheckboxes）は本文に現れない
+- **発生局面**: 検証（case-run。PR #3610 の試験整備）
+- **検知方法**: bun test close_mechanical_steps.test.ts 初回実行の pin 検査 fail（exit 1）
+- **根本原因**: reference pin 検査（expect(reference).toContain(...)）の期待値を、実手順の記述を事前確認せずに関数名ベースで組み立てた
+- **自律対応内容**: fix-and-reverify で pin 期待値を実手順の記述（step 名・既存 pin 文字列）と一致するよう修正し、再検証で 28 pass / 0 fail を確認
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（pin 期待値の修正のみ。pin 文字列の維持契約は変更なし）
+- **横展開観点**: reference pin 検査を追加する全 Case（workflow skill 系の実装 Case 全般）。pin の期待値は文面の step 名・関数名に依存する
+- **再発条件**: 実手順の記述を事前 grep せずに pin 期待値を組み立てた場合
+- **予防策候補**: pin を追加する際は実手順の記述（step 名・既存 pin 文字列）を事前 grep して期待値を組み立てる
+- **想定反映先**: workflow skill 系実装 Case の試験整備手順（pin 検査追加時の前置確認）。特定の正規所有 Design 節は未特定
+- **関連**: Case #3604、PR #3610、commit 6bf77516（fix-and-reverify 実施）
+- **タグ**: `#reference-pin` `#test-expectation` `#fix-and-reverify` `#case-run`
