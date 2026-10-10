@@ -1,0 +1,47 @@
+component: agentdev-artifact-semantics
+implementation:
+  src/common/skills/agentdev-artifact-semantics/SKILL.md:
+    - REQ-105-001
+    - REQ-105-002
+    - REQ-105-004
+    - REQ-105-005
+    - REQ-105-006
+    - REQ-105-007
+    - REQ-105-008
+  src/common/skills/agentdev-artifact-semantics/scripts/lib/conventions.ts:
+    - REQ-105-002
+    - REQ-105-003
+    - REQ-105-008
+  src/common/skills/agentdev-artifact-semantics/scripts/lib/design-basis.ts:
+    - REQ-105-002
+    - REQ-105-003
+    - REQ-105-004
+  src/common/skills/agentdev-artifact-semantics/scripts/lib/finalization.ts:
+    - REQ-105-006
+    - REQ-105-007
+  src/common/skills/agentdev-artifact-semantics/scripts/lib/roles.ts:
+    - REQ-105-001
+    - REQ-105-005
+  src/common/skills/agentdev-artifact-semantics/scripts/src/classify.ts:
+    - REQ-105-001
+    - REQ-105-005
+  src/common/skills/agentdev-artifact-semantics/scripts/src/design-basis.ts:
+    - REQ-105-002
+    - REQ-105-003
+    - REQ-105-004
+    - REQ-105-008
+  src/common/skills/agentdev-artifact-semantics/scripts/src/finalize.ts:
+    - REQ-105-006
+    - REQ-105-007
+verification:
+  src/common/skills/agentdev-artifact-semantics/scripts/tests/design-basis.test.ts:
+    - REQ-105-002
+    - REQ-105-003
+    - REQ-105-004
+    - REQ-105-008
+  src/common/skills/agentdev-artifact-semantics/scripts/tests/finalization.test.ts:
+    - REQ-105-006
+    - REQ-105-007
+  src/common/skills/agentdev-artifact-semantics/scripts/tests/roles.test.ts:
+    - REQ-105-001
+    - REQ-105-005
