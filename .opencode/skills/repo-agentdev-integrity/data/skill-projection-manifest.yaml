@@ -29,6 +29,7 @@ generated_at: 2026-10-03
 
 skills:
   - agentdev-adversarial-review
+  - agentdev-adopted-conventions
   - agentdev-architecture-advisory
   - agentdev-artifact-validation
   - agentdev-backlog-integration

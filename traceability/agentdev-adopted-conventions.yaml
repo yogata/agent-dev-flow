@@ -1,0 +1,48 @@
+component: agentdev-adopted-conventions
+implementation:
+  src/common/skills/agentdev-adopted-conventions/SKILL.md:
+  - REQ-104-001
+  - REQ-104-002
+  - REQ-104-003
+  - REQ-104-004
+  src/common/skills/agentdev-adopted-conventions/scripts/README.md:
+  - REQ-104-003
+  src/common/skills/agentdev-adopted-conventions/scripts/lib/schema.ts:
+  - REQ-104-003
+  - REQ-104-005
+  - REQ-104-007
+  src/common/skills/agentdev-adopted-conventions/scripts/lib/parse.ts:
+  - REQ-104-003
+  src/common/skills/agentdev-adopted-conventions/scripts/lib/resolve.ts:
+  - REQ-104-001
+  - REQ-104-002
+  - REQ-104-003
+  - REQ-104-006
+  src/common/skills/agentdev-adopted-conventions/scripts/lib/judge.ts:
+  - REQ-104-004
+  - REQ-104-005
+  - REQ-104-006
+  - REQ-104-007
+  src/common/skills/agentdev-adopted-conventions/scripts/lib/cli.ts:
+  - REQ-104-003
+  src/common/skills/agentdev-adopted-conventions/scripts/src/resolve.ts:
+  - REQ-104-003
+  src/common/skills/agentdev-adopted-conventions/scripts/src/evaluate.ts:
+  - REQ-104-004
+  - REQ-104-006
+verification:
+  src/common/skills/agentdev-adopted-conventions/scripts/tests/acceptance.test.ts:
+  - REQ-104-001
+  - REQ-104-002
+  - REQ-104-003
+  - REQ-104-004
+  - REQ-104-005
+  - REQ-104-006
+  src/common/skills/agentdev-adopted-conventions/scripts/tests/resolve.test.ts:
+  - REQ-104-003
+  - REQ-104-005
+  - REQ-104-007
+  src/common/skills/agentdev-adopted-conventions/scripts/tests/judge.test.ts:
+  - REQ-104-004
+  - REQ-104-006
+  - REQ-104-007
