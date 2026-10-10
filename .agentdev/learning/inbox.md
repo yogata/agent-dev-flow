@@ -549,3 +549,19 @@
 - **想定反映先**: case-close 機械工程の script 呼び出し契約（integrity suite step の証跡保持要件）への補足候補
 - **関連**: Case #3603、PR #3609、merge commit 1861cac9、既存エントリ「reference pin 検査の期待値は文面の step 名・関数名に依存し、実手順の記述を事前 grep して組み立てる」（同一 script の case-run 側記録）
 - **タグ**: `#case-close` `#bun-test` `#stderr-evidence` `#machine-acceptance` `#traceability`
+
+## ジャンクションの削除阻止は本環境の OS 動作上作れず、修復系の失敗注入は作成失敗（親ディレクトリ Add 拒否 ACL）で行う
+
+- **問題事象**: 受入条件6 の検証方法「可能な最小の失敗注入（修復の除去・作成の失敗）」のうち、修復の「除去」失敗を注入する手段が本環境（Windows 11）の OS 動作上存在しない。junction の削除阻止をハンドル排他（FILE_SHARE_NONE ディレクトリハンドル）・CWD 保持プロセス・読み取り専用属性・ACL Delete 拒否（icacls /deny）の 4 手段で検証したが、いずれも `cmd /c rmdir` による reparse point 除去を阻止できなかった
+- **発生局面**: case-run 実装後検証（Issue #3605 受入条件6 の失敗注入検証）
+- **検知方法**: 除去失敗注入の hypothesis 検証（hypothesis-*.ps1）が全手段で「削除成功」となり、阻止手段の不在が確定した段
+- **根本原因**: Windows の reparse point 除去（rmdir）は、開いているハンドル・CWD 保持・読み取り専用属性・ACL Delete 拒否のいずれでも阻止されない OS 側の挙動であり、通常ファイルの排他制約とは異なる
+- **自律対応内容**: 検証方法が「修復の除去・作成の失敗」のいずれかを許容する契約であることを確認し、可能な最小の失敗注入として修復の「作成」失敗（親ディレクトリへの Add 拒否 ACL）を採用。実公開入口 install.ps1 の実修復経路で非正常終了維持・回復後収束・旧側確認用ファイル保持・修復範囲のリンク限定（差分）までを 11 アサーションで検証し、PR 本文 Findings に 4 手法の不可能性証明を記録
+- **ユーザー確認有無**: なし（検証方法の契約上の許容範囲内の選択。case-close QG-4 で照合済み）
+- **Decision/REQ/spec影響**: なし（検証方法文言「修復の除去・作成の失敗」の許容範囲内。テストファイル冒頭の既存制約記載と同一根拠）
+- **横展開観点**: Windows で reparse point / junction の削除失敗を前提とする検証・テストを設計する全 Case。実ファイルの排他ハンドルで失敗伝播を検証する既存方針（TS-004(3)）と同じ根拠で、reparse point は対象外
+- **再発条件**: reparse point の削除阻止を前提としたテスト設計をした場合
+- **予防策候補**: reparse point 系の失敗注入は作成側（親ディレクトリ ACL、パス長、既存衝突等）で設計する
+- **想定反映先**: インストーラ・投影系 Case の検証設計。特定の正規所有 Design 節は未特定
+- **関連**: Case #3605、PR #3612、テストファイル冒頭の既存制約記載
+- **タグ**: `#junction` `#windows` `#failure-injection` `#os-constraint` `#installer`
