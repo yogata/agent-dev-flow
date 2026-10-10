@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261010T035839Z-9364",
+  "workflow": "req-define",
+  "evaluationKind": "step3-4-classification",
+  "subject": "ADF v5.0.0基点再実装RU（logical_key: adf-v5-reimplementation-from-v500）のREQ操作帰属・最終分類判断",
+  "sourceRevision": "v5.0.0 (025b25474fd6143da6627c5e80c4b17f09a4e11c) + RU 2026-10-10（RU作業仮定のGitHub取得時点。req-defineはgitコマンド禁止のため作業開始時再確認は実行側責務）",
+  "durationMs": 2063,
+  "inputTokens": 2371,
+  "inputs": {
+    "requestDigest": "464940236227e58e88103cddd89d814a2332e1d5ccf4ea4598efac6c39eea504",
+    "references": [
+      {
+        "label": "入力RU（session由来）",
+        "path": ".agentdev/backlog/req-units/RU-draft-adf-v5-reimplementation-from-v500-2026-10-10-revised.md",
+        "digest": "2ebb7b85fe5f5bf484c898767159195c0a1faae9f7c0ef53ccaf42167df5ec72"
+      }
+    ],
+    "snapshot": "判定事実の要約は state に記載のとおり（実ファイル検索結果: REQ67件現行・REQ-104〜109は52行・DEC-053〜056 accepted・crosswalk棚卸し6行・REQ-110/DEC-057不在）"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-existing-req-matching",
+      "questionForm": "choice",
+      "value": "REQ操作なし（本draftはREQ/Decision/Designへの保存操作を持たない）",
+      "probabilityDistribution": {
+        "CREATE（新規REQ/Decision/Designファイル作成を含む）": 0,
+        "APPEND（既存REQ/Decision/Designへの追記を含む）": 0,
+        "UPDATE（既存REQ/Decision/Design行・セクションの変更を含む）": 0,
+        "REQ操作なし（本draftはREQ/Decision/Designへの保存操作を持たない）": 1
+      }
+    },
+    {
+      "questionId": "q1b-match-confirmation-need",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.31,
+        "false": 0.69
+      }
+    },
+    {
+      "questionId": "q2-final-classification",
+      "questionForm": "choice",
+      "value": "非帰属（実現面・プログラム合意としてdraftのagreed_items/realization_actions/test_strategy構造が保持し、本draftではREQ行にもDesign行にも保存しない）",
+      "probabilityDistribution": {
+        "REQ行（要件行としてREQファイルへ保存すべき）": 0,
+        "Design行（内部構造・規則としてDesignへ保存すべき）": 0,
+        "非帰属（実現面・プログラム合意としてdraftのagreed_items/realization_actions/test_strategy構造が保持し、本draftではREQ行にもDesign行にも保存しない）": 1
+      }
+    },
+    {
+      "questionId": "q2b-design-separation-need",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.32,
+        "false": 0.6799999999999999
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-existing-req-matching",
+        "value": "REQ操作なし（本draftはREQ/Decision/Designへの保存操作を持たない）"
+      },
+      {
+        "questionId": "q1b-match-confirmation-need",
+        "value": false
+      },
+      {
+        "questionId": "q2-final-classification",
+        "value": "非帰属（実現面・プログラム合意としてdraftのagreed_items/realization_actions/test_strategy構造が保持し、本draftではREQ行にもDesign行にも保存しない）"
+      },
+      {
+        "questionId": "q2b-design-separation-need",
+        "value": false
+      }
+    ]
+  }
+}
