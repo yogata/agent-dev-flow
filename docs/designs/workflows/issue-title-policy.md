@@ -2,7 +2,7 @@
 title: Issue タイトル記述規則（issue-title-policy）
 status: accepted
 created: 2026-10-03
-updated: 2026-10-04
+updated: 2026-10-11
 ---
 <!-- ADF-COVERS(design): REQ-100-001, REQ-100-002, REQ-100-003, REQ-100-004, REQ-100-005, REQ-100-006, REQ-100-007, REQ-100-008 -->
 
@@ -23,13 +23,14 @@ ADF が起票する Issue タイトルの具体書式を所有する単一参照
 |---|---|---|
 | 実行構造確定前の Root Case / Standard Case | `Case: 主題` | case-open が Root Case を起票する時点 |
 | Epic として確定した管理 Issue（Root Case） | `Epic: 主題` | case-ready が Epic 構成を確定した時点（`Case:` から更新） |
-| Epic 配下の子 Issue | `Wave-N: 主題` | case-ready が子 Issue を作成する時点（N = 所属 Epic 内の確定済み Wave 番号） |
+| Epic 配下の子 Issue | `[Epic #<親番号>] Wave-N: 主題` | case-ready が子 Issue を作成する時点（N = 所属 Epic 内の確定済み Wave 番号、<親番号> = 親 Epic の Issue 番号） |
 | 追跡Issue（role: tracking） | `Tracking: 主題` | 追跡Issue起票経路（/agentdev/issue、各 workflow の起票） |
 
 - 子 Issue の書式に `Task:` を使用しない
-- `Wave-N` の N は所属表示であり、実行制御の正ではない。所属の正は Epic の実行構成が所有する。タイトル解析から実行順序を決定しない
+- `[Epic #<親番号>]` は表示用の親 Epic 識別子である。親子関係・実行可否の正は Epic 本文の実行構成であり、タイトル解析から親子関係・実行順序を決定しない
+- `Wave-N` の N は所属表示であり、実行制御の正ではない。所属の正は Epic の実行構成が所有する
 - 実運用に別 Epic が存在する経路もこの表の役割に沿って命名する（Root Case と別 Epic の統合は本 Design の対象外）
-- 適用は GitHub・ローカル版（agentdev_gh local）の両起票経路に及ぶ。ローカル版 case file の title フィールドも同一の書式に従う
+- 適用は GitHub・ローカル版（agentdev_gh local）の両起票経路に及ぶ。ローカル版 case file の title フィールドも同一の書式に従う。ローカル版の親番号は既存ローカル Issue 番号（`issue-0042` なら `42`）をゼロ埋めなしで使用し、GitHub 側の Issue 番号や新しい識別子を要求しない。保存識別子（`issue-0042` 等）と採番は変更しない
 
 ## 主題の書き方
 
@@ -46,9 +47,10 @@ ADF が起票する Issue タイトルの具体書式を所有する単一参照
 
 ## Wave 投影
 
-- 子 Issue には確定済みの所属 Wave を先頭に置き `Wave-N: 主題` に統一する
+- 子 Issue には確定済みの所属 Wave を `[Epic #<親番号>] Wave-N: 主題` の形式で先頭に置いて統一する
+- `[Epic #<親番号>]` の親番号は子 Issue 作成時点の正規構成（Epic 実行構成）が示す親 Epic の番号である。複数の Epic に同じ Wave 番号の子 Issue が存在する場合も、親番号表示で所属先を区別できる
 - Wave 番号は所属 Epic 内でのみ有効。同じ Wave 内の順序・並列可否・開始条件は Epic の実行構成が所有する
-- 所属の正は Epic の実行構成であり、タイトルは所属の表示である。正規の構成変更で所属 Wave が変わる場合はタイトルを同期する（Epic 実行構成と子 Issue タイトルの一致）
+- 所属の正は Epic の実行構成であり、タイトルは所属の表示である。正規の構成変更で親 Epic または所属 Wave が変わる場合はタイトルを同期する（Epic 実行構成と子 Issue タイトルの一致）
 - 独立 Case を同じ case-auto 起動という理由だけで Wave 化しない
 - 実行枠の都合による一時分割・待機・再開は番号変更の理由にしない
 
@@ -56,13 +58,15 @@ ADF が起票する Issue タイトルの具体書式を所有する単一参照
 
 工程名（case-open / case-ready 等）、現在状態（実行中・再開待ち・完了等）、OU/RA/AG/ACT/TS の羅列、REQ/Decision 番号の羅列、親 Issue 番号、投入識別子（intake/learning 等の投入元識別子）、topic_slug、ファイル一覧、検証件数、実測値。これらは本文の既存の対応欄へ保持する。識別子除去で再開・冪等照合を壊さない（冪等照合は本文の識別情報・安定した検索キーで行う）。ファイル名・コマンド名自体が主題ならその名前は残せる。
 
+親 Issue 番号の除去は子 Issue タイトル先頭の `[Epic #<親番号>]` 表示に限り例外とする。この例外は子 Issue の先頭表示に限定され、他の Issue 種別（Case・Epic・Tracking）のタイトルや、子 Issue の主題部分への親 Issue 番号の付与には適用しない。
+
 ## 付与と更新の場面
 
 - case-open: 合意済みの対象・目的から `Case: 主題` を生成する
-- case-ready: 確定構造に沿って Root Case の接頭辞を更新し（Epic 確定時 `Epic: 主題` へ）、子 Issue へ `Wave-N: 主題` を付与する。既存の構造契約に従い、タイトル規則のために構造を変更しない
+- case-ready: 確定構造に沿って Root Case の接頭辞を更新し（Epic 確定時 `Epic: 主題` へ）、子 Issue へ `[Epic #<親番号>] Wave-N: 主題` を付与する（issue_create / issue_update の既存経路を使用）。既存の構造契約に従い、タイトル規則のために構造を変更しない
 - case-run / case-close: 状態の進行・停止・完了だけではタイトルを変更しない。case-close の PR タイトル事前変更は PR に対する操作であり、Issue タイトル不変と区別する
 - 追跡Issue起票・更新: 確認された主題に基づき `Tracking: 主題` を生成する
-- 再構成（case-ready / case-revise）: 所属 Wave が変わる正規の構成変更時にのみ子 Issue タイトルを同期する
+- 再構成（case-ready / case-revise）: 親 Epic または所属 Wave が変わる正規の構成変更時にのみ子 Issue タイトルを同期する（case-revise は影響有無の判定とマーキングのみを担い、構成再確定とタイトル同期は case-ready が担う）。同期後は読み戻しで一致を確認し、不一致・更新失敗を同期完了としない
 
 更新理由は誤記・曖昧さの修正、合意済み対象・目的変更、役割 / Wave 構成確定または変更に限定する。タイトルの書換えで未合意の範囲変更を隠さない。同じ対象の再利用は安定識別情報（Issue 番号・冪等キー）で行い、タイトル修正を理由に新規 Issue を作らない。
 
@@ -72,7 +76,8 @@ ADF が起票する Issue タイトルの具体書式を所有する単一参照
 
 - `Case: 再開時に既存Issueを再利用し重複作成を防ぐ`
 - `Epic: ADFをOpenCodeとSenpiで共通利用できる構成へ移行する`
-- `Wave-2: インストーラーを両ホストの配置に対応させる`
+- `[Epic #3585] Wave-2: 差分・変更影響・増分更新を実現する`（GitHub 版。親 Epic #3585 の Wave-2 の子 Issue）
+- `[Epic #42] Wave-2: インストーラーを両ホストの配置に対応させる`（ローカル版。親 `issue-0042` の Wave-2 の子 Issue。親番号はゼロ埋めなしの既存ローカル番号）
 - `Tracking: 再開後に同じ変更のIssueが重複作成される`
 - `Tracking: 出力ログの文字化けの原因を調査する`（未確定原因の断定を避ける例）
 
