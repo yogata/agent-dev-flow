@@ -1,6 +1,6 @@
-# check 結果の解釈と coverage / impact の利用方法
+# check 結果の解釈と coverage / impact / links / inventory / reuse の利用方法
 
-本 reference は、check の9検出項目の finding の読み方と解消手順、および coverage / impact の利用方法と結果の読み方を提供する。
+本 reference は、check の11検出項目の finding の読み方と解消手順、および coverage / impact / links / inventory / reuse の利用方法と結果の読み方を提供する。
 検査契約の正本は producer 側リポジトリの `agentdev-traceability` Design と ADF v4 Traceability モデル Design（v4-traceability-model、docs/designs/<foundations/v4-traceability-model>.md）が所有する。本 reference は正本を参照して使うための解釈手順を記述し、規範の独立定義を行わない。
 
 ## check の実行と出力の読み方
@@ -9,6 +9,7 @@ check は `src/check.ts` を `--root <repo-root>` 付きで実行する。出力
 
 - `checks`: 検査項目（`kind`）ごとに `status`（`pass` / `fail`）と `findings` を返す
 - `summary`: pass / fail の件数
+- `structuralOnly`: 常に `true`。check は構造検査（対応関係の存在と参照整合）のみを担い、check の pass は要求内容の充足（意味的品質）の証明ではない。check 合格を完了判定へ直結させない
 - 終了コード: 検査 fail ありは 2、実行エラーは 1
 
 読み方の原則:
@@ -17,7 +18,7 @@ check は `src/check.ts` を `--root <repo-root>` 付きで実行する。出力
 - `--req` で完全性検査（missing 系）の対象を限定できる。対象行は1つずつ列挙する（`..` 範囲構文は展開されない）
 - 実行不能・読取不能・判定不能の状態を合格として扱わない（fail-closed）。対応完全性を完了条件とする工程では、check が「完全性を検査できなかった」状態と「対応関係が完全である」状態を区別して扱う
 
-## 9検出項目の finding 解釈
+## 11検出項目の finding 解釈
 
 | kind | 意味 | 主な原因と解消手順 |
 |---|---|---|
@@ -30,6 +31,8 @@ check は `src/check.ts` を `--root <repo-root>` 付きで実行する。出力
 | `missing-verification` | 検証対応の欠落（検証スコープポリシーが required と判定する現行要件行のみ計上） | 恒続的な検証手段を用意し検証対応を追加する。恒続的に検証可能な対象を持たない行のみ、検証スコープポリシー（`traceability/policy.yaml`）の `optional` へ明示登録する |
 | `policy-invalid` | 検証スコープポリシーの不正（schema 違反、default 値不正、optional 列挙の要件行 ID 形式違反、存在しない要件行の列挙、policy 読取不能） | `traceability/policy.yaml` を正規 schema へ修正する。policy の不正は検証対応の要否判定全体を不能にするため、他の missing 系判定の前に解消する |
 | `duplicate-inconsistencies` | 同一 artifact パス × role × 要件行 ID の組み合わせが sidecar と inline declaration の間、または同一情報源内で矛盾する状態 | 保持したい保存方式へ統一する（sidecar と inline の重複の整理、または同一情報源内の矛盾の解消）。移行中の矛盾は移行完了時に解消する |
+| `malformed-links` | 隣接工程間対応の宣言形式・構文違反（inline 宣言の形式不備・不明方向、sidecar links セクションの schema 不正） | 宣言行・sidecar links セクションを正規形式へ修正する。書式は本スキル SKILL.md「links 宣言」節と references/sidecar-and-policy.md。方向は upstream（下流→上流）のみ許容する |
+| `dangling-links` | links の source / target 参照先の不存在 | 参照先パスを成果物の現行リポジトリ相対パスへ更新する。成果物を削除した場合は links 対応ごと整理する。参照先が採用されていない参照例の成果物である場合は links 対応を削除してよい |
 
 補足:
 
@@ -94,3 +97,30 @@ impact は変更時の再確認候補を提示する能力であり、coverage �
 - 探索範囲は成果物 ↔ 要件 ↔ 成果物（固定2ホップ）であり、任意深度のグラフ探索を行わない
 - 出力の読み方: 成果物起点では `viaRequirements`（経由要件）と `recheckCandidates`（再確認候補）を返す
 - 空結果は「影響なし」の証明として扱わない。空結果である旨（`emptyResult: true` と note）を明示して受け取り、判断は呼出側の工程が行う
+
+## links の利用方法
+
+links は採用された隣接工程間対応の双方向追跡であり、advisory で fail-open である。
+
+- `--artifact <path>` で、当該成果物の `upstream`（宣言そのまま・下流→上流）と `downstream`（逆引き・上流→下流）を固定 1 ホップで返す。任意深度のグラフ探索を行わない
+- 空結果は「隣接工程が存在しない」ことの証明ではない。links 宣言の不在は採用されていない詳細工程への対応を強制せず、check の不合格にも計上しない
+- 出力の読み方: `upstream` / `downstream` が相手側の成果物パスと宣言種別（`origin`）の列挙、`emptyResult` が双方向とも空である旨の明示
+- links 対応は covers の対応完全性の代替にならない。links で追跡をグループ化しても、グループ内の個別に有効な要求・受け入れ条件の covers 計上と検証義務は消えない
+
+## inventory の利用方法
+
+inventory は正規成果物の棚卸しと宣言外候補の発見であり、advisory で fail-open である。
+
+- `--root` のみで実行し、直接走査で発見した実在成果物（`corpusArtifacts`）と、covers・links いずれの宣言にも現れない実在成果物の発見候補（`discoveredCandidates`）を返す
+- 発見候補を対応関係の欠落と誤判定しない。採用されていない参照例の成果物・対応不要の成果物を含み得る。棚卸しの結果は候補提供であり、対応関係の作成・修正の最終判断は各工程が行う
+- 出力の読み方: `declaredArtifacts` が covers 宣言に現れる artifact 集合、`linkedArtifacts` が links 宣言に現れる source / target 集合。`note` に解釈の注意が常に付く
+- 棚卸しの結果を対応完全性の合格条件にしない（完全性判定は check の責務）
+
+## reuse の利用方法
+
+reuse は変更前の証拠を再利用する場合の構造的適用可否確認であり、構造検査のみを担い、適用可否を合格判定しない。
+
+- `--evidence <path>` で証拠成果物の存在・読取可能性、証拠自身の対応関係（`declaredRelations`）、links の双方向（`upstreamArtifacts` / `downstreamArtifacts`）を列挙する。`--revision` で証拠の版識別子を結果に記録できる（解決・比較は行わない）
+- `manualConfirmation` に構造検査で解決しない確認事項（版の適合、条件の適合）を返す。これらの確認を経ない証拠再利用を変更反映完了の根拠にしない
+- 実装上の局所試験（構造検査・局所テスト等）に合格しても、対象の受け入れ条件に関する最終的な実証が不足する場合は完了と判定しない。最終受入は現在有効な条件から必要な検証を各工程が独立に評価する
+- 出力の読み方: `structuralStatus` が `confirmed` の場合は対象が存在し宣言関係を列挙した状態を示す（適用可否の合格ではない）。`evidence-not-found` の場合は証拠そのものが現在の走査対象に存在しない

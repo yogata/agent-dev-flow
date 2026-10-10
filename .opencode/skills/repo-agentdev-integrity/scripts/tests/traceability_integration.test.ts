@@ -102,9 +102,9 @@ describe("派生 Graph が存在しない状態での3能力の動作（AC-001�
     const known = currentRequirementLineIds(ROOT);
     expect(known).toContain("REQ-910-001");
     const report = runChecks(scan, known, { completenessReqIds: ["REQ-910-001"] });
-    // 9種検査（missing-design / policy-invalid / duplicate-inconsistencies 追加に伴い 7 → 9。
+    // 11種検査（links 系 2検査追加に伴い 9 → 11。
     // フィクスチャに sidecar・policy はなく pass）
-    expect(report.summary).toEqual({ pass: 9, fail: 0 });
+    expect(report.summary).toEqual({ pass: 11, fail: 0 });
   });
 });
 
