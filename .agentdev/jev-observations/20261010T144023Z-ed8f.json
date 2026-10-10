@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261010T144023Z-ed8f",
+  "workflow": "req-define",
+  "evaluationKind": "step3-existing-req-matching",
+  "subject": "RU-0197/0198/0199一括処理の既存REQ照合操作分類",
+  "sourceRevision": "4aca4660f31e85e0246f65fada1f18ad99a349bc",
+  "durationMs": 1580,
+  "inputTokens": 2607,
+  "inputs": {
+    "requestDigest": "27e229d1a4814aace8b9388e96a128550e7fe3dc3d3c8df76f55fef9b8852e61",
+    "references": [
+      {
+        "label": "RU-0197 子Issueタイトル親Epic表示",
+        "path": ".agentdev/backlog/req-units/RU-0197.md",
+        "digest": "1ada7cffdc0c641783d0945c97367822cbf343a8230369aca36190dbda0dcd45"
+      },
+      {
+        "label": "RU-0198 ジャンクション正本一致同期",
+        "path": ".agentdev/backlog/req-units/RU-0198.md",
+        "digest": "c5099801bc782b25c594d951c925089878b99331b65e29eaf774ce76d0f14e08"
+      },
+      {
+        "label": "RU-0199 受入終了経路接続是正",
+        "path": ".agentdev/backlog/req-units/RU-0199.md",
+        "digest": "a4ce831f9fe3ad9e449bddbb558b2b1c073553e4adc2b09cdd1264dac9b906b6"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "ru0197-operation",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 1,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "ru0197-confidence",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.15,
+        "false": 0.85
+      }
+    },
+    {
+      "questionId": "ru0198-operation",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1
+      }
+    },
+    {
+      "questionId": "ru0198-confidence",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.24,
+        "false": 0.76
+      }
+    },
+    {
+      "questionId": "ru0199-operation",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0.02,
+        "REQ操作なし": 0.98
+      }
+    },
+    {
+      "questionId": "ru0199-confidence",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.24,
+        "false": 0.76
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "ru0197-operation",
+        "value": "UPDATE"
+      },
+      {
+        "questionId": "ru0197-confidence",
+        "value": false
+      },
+      {
+        "questionId": "ru0198-operation",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "ru0198-confidence",
+        "value": false
+      },
+      {
+        "questionId": "ru0199-operation",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "ru0199-confidence",
+        "value": false
+      }
+    ]
+  }
+}

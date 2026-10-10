@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261010T144133Z-4676",
+  "workflow": "req-define",
+  "evaluationKind": "step4-requirement-classification",
+  "subject": "RU-0197/0198/0199一括処理の要件展開最終分類とDesign分離要否",
+  "sourceRevision": "4aca4660f31e85e0246f65fada1f18ad99a349bc",
+  "durationMs": 655,
+  "inputTokens": 2432,
+  "inputs": {
+    "requestDigest": "df41ba152e3ecf3f8e0afec50045d24ee9bcca8d1e2821547c781268626dbf9e",
+    "references": [
+      {
+        "digest": "1ada7cffdc0c641783d0945c97367822cbf343a8230369aca36190dbda0dcd45",
+        "label": "RU-0197 子Issueタイトル親Epic表示",
+        "path": ".agentdev/backlog/req-units/RU-0197.md"
+      },
+      {
+        "digest": "c5099801bc782b25c594d951c925089878b99331b65e29eaf774ce76d0f14e08",
+        "label": "RU-0198 ジャンクション正本一致同期",
+        "path": ".agentdev/backlog/req-units/RU-0198.md"
+      },
+      {
+        "digest": "a4ce831f9fe3ad9e449bddbb558b2b1c073553e4adc2b09cdd1264dac9b906b6",
+        "label": "RU-0199 受入終了経路接続是正",
+        "path": ".agentdev/backlog/req-units/RU-0199.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "ru0197-classification",
+      "questionForm": "choice",
+      "value": "REQ行とDesign行の両方を更新",
+      "probabilityDistribution": {
+        "REQ行のみ更新": 0,
+        "Design行のみ更新": 0,
+        "REQ行とDesign行の両方を更新": 1,
+        "REQ行・Design行とも更新なし（実装のみ）": 0
+      }
+    },
+    {
+      "questionId": "ru0197-design-separation",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.95,
+        "false": 0.050000000000000044
+      }
+    },
+    {
+      "questionId": "ru0198-classification",
+      "questionForm": "choice",
+      "value": "Design行のみ更新",
+      "probabilityDistribution": {
+        "REQ行のみ更新": 0,
+        "Design行のみ更新": 1,
+        "REQ行とDesign行の両方を更新": 0,
+        "REQ行・Design行とも更新なし（実装のみ）": 0
+      }
+    },
+    {
+      "questionId": "ru0198-design-separation",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.94,
+        "false": 0.06000000000000005
+      }
+    },
+    {
+      "questionId": "ru0199-classification",
+      "questionForm": "choice",
+      "value": "Design行のみ更新",
+      "probabilityDistribution": {
+        "REQ行のみ更新": 0,
+        "Design行のみ更新": 1,
+        "REQ行とDesign行の両方を更新": 0,
+        "REQ行・Design行とも更新なし（実装のみ）": 0
+      }
+    },
+    {
+      "questionId": "ru0199-design-separation",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.94,
+        "false": 0.06000000000000005
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "ru0197-classification",
+        "value": "REQ行とDesign行の両方を更新"
+      },
+      {
+        "questionId": "ru0197-design-separation",
+        "value": true
+      },
+      {
+        "questionId": "ru0198-classification",
+        "value": "Design行のみ更新"
+      },
+      {
+        "questionId": "ru0198-design-separation",
+        "value": true
+      },
+      {
+        "questionId": "ru0199-classification",
+        "value": "Design行のみ更新"
+      },
+      {
+        "questionId": "ru0199-design-separation",
+        "value": true
+      }
+    ]
+  }
+}
