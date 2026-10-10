@@ -21,12 +21,19 @@ function writeFixture(rel: string, lines: readonly string[]): void {
   writeFileSync(filePath, lines.join("\n") + "\n", "utf-8");
 }
 
+// フィクスチャ用の covers 宣言行生成。テストソース内にマーカー文字列を直接記述すると
+// TIM コーパス走査（.ts 拡張子走査）で実宣言として誤検出されるため、
+// テンプレート埋め込み経由で組み立てる。
+function decl(role: string, ids: string): string {
+  return `<!-- ADF-COVERS(${role}): ${ids} -->`;
+}
+
 beforeAll(() => {
   mkdirSync(ROOT, { recursive: true });
   // 証拠成果物（covers 宣言 + links 宣言を保持する）
   writeFixture("docs/reports-archived/prior-run.md", [
     "# 前回検証記録",
-    "<!-- ADF-COVERS(verification): REQ-900-401 -->",
+    decl("verification", "REQ-900-401"),
     "<!-- ADF-LINKS(upstream): docs/designs/ru-spec.md -->",
   ]);
   // 証拠の上流成果物
