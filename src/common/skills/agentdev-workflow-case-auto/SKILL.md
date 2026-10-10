@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-auto
-description: "case-auto command の workflow 実装本体。case-open → case-ready → case-run → case-close（例外経路: case-revise → case-ready → case-run → case-close）の自走 orchestration、orchestration stage モデル、クリーンアップ検証ゲート、stage 3 スロット型キュー制御（共有 active Issue task 枠・空き枠補充・状態管理・再開時二重起動防止・依存充足ゲート単独条件の完了即次投入・委譲前重複実行時検出・段階派遣の single-flight 保護）、HITL question のスキップ可能キュー、bounded parent decision resolution、コンフリクト解消 Level 2/3、停止理由分類、adversarial-review 由来の停止伝播、Root Case 指定の再開入口（req-define）での停止、結果集約を所有する。USE FOR: case-auto 実行時の workflow 制御（入力解決・工程分岐・orchestration・停止検出・停止理由分類）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "case-auto command の workflow 実装本体。case-open → case-ready → case-run → case-close（例外経路: case-revise → case-ready → case-run → case-close）の自走 orchestration、orchestration stage モデル、クリーンアップ検証ゲート、stage 3 スロット型キュー制御（共有 active Issue task 枠・空き枠補充・状態管理・再開時二重起動防止・依存充足ゲート単独条件の完了即次投入・委譲前重複実行時検出・段階派遣の single-flight 保護）、HITL question のスキップ可能キュー、bounded parent decision resolution、コンフリクト解消 Level 2/3、停止理由分類、adversarial-review 由来の停止伝播、Root Case 指定の再開入口（req-define）での停止、v5 有限実行モード契約（v5 責務分割・小規模連続実行・設計確定独立終了・移行期区別）、結果集約を所有する。USE FOR: case-auto 実行時の workflow 制御（入力解決・工程分岐・orchestration・停止検出・停止理由分類）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # case-auto workflow スキル
@@ -10,6 +10,7 @@ case-auto command の workflow 実装本体である。
 orchestration stage モデル、クリーンアップ検証ゲート、Wave 反復制御、bounded parent decision resolution、コンフリクト解消 Level 2/3、停止理由分類、adversarial-review 由来の停止伝播を統合する。
 人間に留保された判断（新しい目的・価値・優先順位・対象範囲・外部契約・受け入れ条件・恒久規範、または既存正規契約だけでは解決不能な規範間優先関係の新規確定を要する判断）が必要となった場合は blocked とし、Root Case 指定の正規再開経路で req-define を再開入口として停止報告する（req-define の壁打ちを自動化しない）。
 stage 3 の共有 active Issue task 枠による実行制御は Wave や親子 Issue の個数から独立した実行制御であり、Wave は意味的な依存関係のまとまりとして扱う。v5 の実行モデルの実現確定まで本スキルの orchestration が現行実行経路の正である。
+v5 有限実行と責務再編（正規判断と要件行の対応は Decision 関連宣言と repository top-level `traceability/` 配下 sidecar を参照）の実現面として、v5 有限実行モード契約（責務分割対応・小規模連続実行・設計確定独立終了・移行期区別）を「v5 有限実行モード」節に所有する。
 
 case-auto command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する。
 
@@ -95,6 +96,43 @@ case-auto workflow は次の8 STEP で構成する。
   - **Wave 表現**: Wave 表現は子 Issue 数の上限を持たない（Epic サイズ上限のみ適用）。runtime 上の batch や一時直列化を Wave 分割として永続化しない
 - クリーンアップ検証ゲート（ドラフト残存、RU 残存の検証）を stage 2 の対象群収束後・stage 3 開始前に実行し、stage 2 を正常完了した対象について残存を検出した場合は停止する。stage 2 が blocked / failed / 中断等で正常完了していない対象について、既存 lifecycle 契約に従って保持された draft / RU を cleanup 違反として扱わない（case-auto 実行契約）
 - Epic execution_unit の Wave 間および最終 Wave の case-close(#epic) は Wave 反復を進行・完結させる stage 3 内部の状態遷移処理であり、stage 4 の開始とみなさない。Epic execution_unit の stage 3 完了は後続 Wave が残存しない状態への Wave 反復の完遂であり、stage 3 完了判定は既存 Epic/Wave workflow の execution_unit 完了状態基準に従い、その内部ロジックを複製しない。stage 4 では追加の case-close を行わない。stage の分類は orchestration 上の位置づけにより行い、command 名単独では分類しない（case-auto Design「ドラフト間並列実行モデル」）
+
+## v5 有限実行モード（開発中経路・移行期）
+
+v5 有限実行とワークフロー責務再編（正規判断は Decision 関連宣言、要件行との対応は repository top-level `traceability/` 配下 sidecar を参照）の実現面として、責務分割と有限実行のモード契約を本スキルが所有する。
+v5 の実行モデルの実現確定までの間、v4 標準モード（現行 orchestration、Root Case 必須の現行実行契約）が実行経路の正である（移行期権威行。正規定義は v4-v5-crosswalk Design 参照）。
+本モードは開発中の v5 経路であり、現行の正規利用経路（v4 標準モード）と区別して運用する。本モードの存在は crosswalk 棚卸し対象行の再定義を実行した扱いにならず、標準経路を置換せず、新たな公開実行経路の新設を伴わない。既存の委譲・隔離・並列実行・再開・最大自走・確定時検証の機能を失わず、巨大な実行状態を別名の巨大な状態へ置換えない。
+
+### v5 責務分割と現行工程の対応
+
+v5 の責務語彙（要求確定、設計確定、実装・構築、検証、Issue 協調、後処理）は次の現行工程・能力へ対応する。対応は責務の対応であり、v5 モードでのみ使える別実装を導入しない。
+
+| v5 責務 | 対応する現行工程・能力 | 正規所有 |
+|---|---|---|
+| 要求確定 | 壁打ち合意と draft 確定 | `agentdev-workflow-req-define` |
+| 設計確定 | case-open 実変更判定と設計PR作成、case-ready 設計PR受入・確定 | case-open / case-ready |
+| 実装・構築 | case-run（実行担当サブエージェント委譲） | case-run |
+| 検証 | case-run 委譲内検証（品質ゲート・test-fix ループ）、case-close QG-4 | case-run / case-close |
+| Issue 協調 | case-open Root Case 確立、case-ready 実行構造（Epic / Child Issue / Wave）確定、orchestration stage 制御 | case-open / case-ready / case-auto |
+| 後処理 | case-close（マージ・クローズ・Capture 回収・永続化） | case-close |
+
+### モード契約
+
+- **v4 標準モード（現行正・既定）**: 従来どおり case-open → case-ready → case-run → case-close を駆動する。Root Case 確立、Definition Package、実行構造確定は現行実行契約のとおりであり、crosswalk 棚卸し対象行は移行期権威行の保護下で現行どおり正である
+- **v5 小規模連続実行モード**: 小規模の変更を入力として、Epic および GitHub Issue の生成を必須とせず、要求・設計の確認、実装・構築、検証、結果報告と改善情報回収（Capture 候補の PR 本文記録）までを連続実行する。単一対象を縦切りで実行し、Root Case / Epic / Child Issue を生成しない。実行範囲、入力、権限、検証条件を実行中に確認できる状態で実行する。実装・検証・PR 作成の手順と副作用境界は case-run 委譲契約（result 4状態、worktree 隔離、3点ゲート）を準用し、成果物は PR で表出する。完了判定は要求充足の根拠（検証証拠）を確認した上で行い、PR マージや Issue 終了などの作業状態だけを完了の根拠にしない。Issue を生成しない場合でも検証証拠の記録（PR 本文の検証差分セクション）と Capture 回収の後処理を省略しない
+- **v5 設計確定モード**: 確定済み要件を入力とする設計形成を実行し、設計確定（case-open 実変更判定・設計PR作成、case-ready 設計PR受入・確定相当）で独立終了する。後続の実装構築・Issue 協調を強制されない。確定済み設計は canonical 成果物（docs/ Design・Decision）として永続化され、後続工程の正規入力となる。設計確定と最終的な要求充足の判定は別に扱う
+- **Issue 必要時利用**: 追跡・委譲・分割・再開の価値がある有限作業では v4 標準モードと同一の Issue 利用経路を利用する。実行境界は要求・設計の正規情報を再所有しない
+- **上流問題の接続**: v5 モードの実行で上流（要求・設計）の問題が判明した場合は、上流の無断書換えを行わず、req-define 再合意（正規改訂経路）と影響再評価へ接続する
+- **再開**: v5 モードの中断・再開は既存の再開プロトコル（resume protocol）に従い、会話内の一時記憶に依存せず、既存の正規入力（REQ / Decision / Design / docs）と実行情報（worktree、ブランチ、PR、commit）から再開点を再構成する
+- **依存未充足の後続開始禁止**: 意味的依存が未充足の後続作業を、先行作業の停止だけを理由に開始しない。v5 モードの後続開始判定にも stage 3 の依存充足ゲートと同一の判定基準（blocked、failed、delegation-unavailable を依存充足とみなさない）を適用する
+- **並列上限**: v5 モードでも共有 active Issue task 枠（上限 5）による実行制御を Wave や親子 Issue の個数から独立した実行制御として扱う
+- **外部副作用**: v5 モードでも外部副作用は成果物の作成と区別し、既存の自走境界ガードレール（自走対象外操作・remote branch 削除限定・repo 内変更のみ）に従う
+- **改善循環**: v5 モードの実行から生じた発見・学習情報は既存の intake / learning / backlog 循環（Capture 回収 → promote → backlog-review → req-define）へ同じ経路で還元する
+
+### モード選択と移行期区別
+
+- モードは case-auto 起動時の明示指定で選択する（省略時は v4 標準モード）。v4 標準モードの遷移・判定・停止条件を v5 モードのために変更しない。実行記録では採用したモードを区別して報告する
+- v5 の実行モデルの実現確定（正式切替）は crosswalk 棚卸し記録の処遇に従う正規改訂経路で行い、本モードの運用実績だけを根拠に棚卸し対象行を書換えない
 
 ## 下位 Workflow Skill 連携（上位 orchestrator）
 
