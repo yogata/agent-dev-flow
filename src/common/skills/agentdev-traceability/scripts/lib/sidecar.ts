@@ -13,6 +13,8 @@
 //   （artifact パス、role、要件行 ID）へ正規化される
 
 import { COVER_ROLES, type CoverRole } from "./declarations.ts";
+import { parseSidecarLinks } from "./links.ts";
+import type { LinkRelation, LinkIssue } from "./links.ts";
 
 export const TRACEABILITY_DIR = "traceability";
 
@@ -38,6 +40,10 @@ export interface SidecarIssue {
 export interface SidecarParseResult {
   readonly component: string;
   readonly relations: readonly SidecarRelation[];
+  /** トップレベル links キーから正規化した隣接工程間対応（covers 対応関係とは別系統）。 */
+  readonly links: readonly LinkRelation[];
+  /** links セクションの解析 issues。 */
+  readonly linkIssues: readonly LinkIssue[];
   readonly issues: readonly SidecarIssue[];
 }
 
@@ -62,7 +68,8 @@ function parseSidecarObject(file: string, value: Record<string, unknown>): Sidec
       detail: "トップレベルキー component は必須の非空文字列（v4-traceability-model Design の sidecar schema）",
     });
   }
-  const roleKeys = Object.keys(value).filter((k) => k !== "component");
+  const linksResult = parseSidecarLinks(file, value["links"]);
+  const roleKeys = Object.keys(value).filter((k) => k !== "component" && k !== "links");
   for (const roleKey of roleKeys) {
     if (!isCoverRole(roleKey)) {
       issues.push({
@@ -125,11 +132,18 @@ function parseSidecarObject(file: string, value: Record<string, unknown>): Sidec
       });
     }
   }
-  return { component: typeof component === "string" ? component : "", relations, issues };
+  return {
+    component: typeof component === "string" ? component : "",
+    relations,
+    links: linksResult.links,
+    linkIssues: linksResult.issues,
+    issues,
+  };
 }
 
 /**
  * sidecar 本文を解析し、論理対応関係（role、artifact パス、要件行 ID）へ正規化する。
+ * トップレベル links キーは隣接工程間対応として別系統で正規化する。
  * YAML 解析失敗は invalid-syntax、schema 不適合は invalid-schema として報告する
  * （silent skip 禁止）。issue とならない範囲の対応関係は引き続き返す。
  */
@@ -141,6 +155,8 @@ export function parseSidecar(file: string, content: string): SidecarParseResult 
     return {
       component: "",
       relations: [],
+      links: [],
+      linkIssues: [],
       issues: [
         {
           reason: "invalid-syntax",
@@ -155,6 +171,8 @@ export function parseSidecar(file: string, content: string): SidecarParseResult 
     return {
       component: "",
       relations: [],
+      links: [],
+      linkIssues: [],
       issues: [
         {
           reason: "invalid-schema",

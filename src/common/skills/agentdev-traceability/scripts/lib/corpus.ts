@@ -21,6 +21,8 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { parseDeclarations } from "./declarations.ts";
 import type { CoverDeclaration, DeclarationIssue } from "./declarations.ts";
+import { parseLinkDeclarations } from "./links.ts";
+import type { LinkRelation, LinkIssue } from "./links.ts";
 import { parseSidecar, TRACEABILITY_DIR } from "./sidecar.ts";
 import type { SidecarIssue } from "./sidecar.ts";
 
@@ -49,6 +51,15 @@ export interface SidecarMissingArtifact {
   readonly sidecarFile: string;
 }
 
+export interface LinkMissingArtifact {
+  /** 存在しない links 参照先（source または target）のリポジトリ相対パス。 */
+  readonly artifact: string;
+  /** 参照先を宣言する側（sidecar links の source、または inline 宣言ファイルの target）。 */
+  readonly linkFile: string;
+  /** 参照の役目（source: 下流側 / target: 上流側）。 */
+  readonly role: "source" | "target";
+}
+
 export interface ScanResult {
   readonly declarations: readonly CoverDeclaration[];
   readonly issues: readonly DeclarationIssue[];
@@ -56,6 +67,12 @@ export interface ScanResult {
   readonly sidecarIssues: readonly SidecarIssue[];
   /** sidecar が参照する artifact のうち存在しないもの（check の invalid-artifact-paths 入力）。 */
   readonly sidecarMissingArtifacts: readonly SidecarMissingArtifact[];
+  /** 隣接工程間対応（inline 宣言 + sidecar links 正規化分）。 */
+  readonly links: readonly LinkRelation[];
+  /** links 宣言の解析 issues（形式不備・不明方向・sidecar links schema 不正）。 */
+  readonly linkIssues: readonly LinkIssue[];
+  /** links の source / target のうち存在しないもの（check の dangling-links 入力）。 */
+  readonly linkMissingArtifacts: readonly LinkMissingArtifact[];
   readonly unreadableFiles: readonly string[];
   readonly fileCount: number;
 }
@@ -114,7 +131,7 @@ export function enumerateCorpusFiles(
   return out.sort();
 }
 
-function enumerateSidecarFiles(root: string): readonly string[] {
+export function enumerateSidecarFiles(root: string): readonly string[] {
   const out: string[] = [];
   walkFiles(
     root.replaceAll("\\", "/").replace(/\/$/, ""),
@@ -138,6 +155,9 @@ export function scanCorpus(root: string, options: ScanOptions = {}): ScanResult 
   const issues: DeclarationIssue[] = [];
   const sidecarIssues: SidecarIssue[] = [];
   const sidecarMissingArtifacts: SidecarMissingArtifact[] = [];
+  const links: LinkRelation[] = [];
+  const linkIssues: LinkIssue[] = [];
+  const linkMissingArtifacts: LinkMissingArtifact[] = [];
   const unreadableFiles: string[] = [];
   const files = enumerateCorpusFiles(root, options);
   for (const rel of files) {
@@ -147,6 +167,9 @@ export function scanCorpus(root: string, options: ScanOptions = {}): ScanResult 
       const parsed = parseDeclarations(rel, content);
       declarations.push(...parsed.declarations);
       issues.push(...parsed.issues);
+      const parsedLinks = parseLinkDeclarations(rel, content);
+      links.push(...parsedLinks.links);
+      linkIssues.push(...parsedLinks.issues);
     } catch {
       unreadableFiles.push(rel);
     }
@@ -178,6 +201,24 @@ export function scanCorpus(root: string, options: ScanOptions = {}): ScanResult 
           sidecarMissingArtifacts.push({ artifact: relation.artifact, sidecarFile: rel });
         }
       }
+      links.push(...parsed.links);
+      linkIssues.push(...parsed.linkIssues);
+      for (const link of parsed.links) {
+        for (const [path, role] of [
+          [link.source, "source"],
+          [link.target, "target"],
+        ] as const) {
+          let targetStat;
+          try {
+            targetStat = statSync(join(root, path));
+          } catch {
+            targetStat = undefined;
+          }
+          if (targetStat === undefined || !targetStat.isFile()) {
+            linkMissingArtifacts.push({ artifact: path, linkFile: rel, role });
+          }
+        }
+      }
     } catch {
       sidecarIssues.push({
         reason: "unreadable-sidecar",
@@ -186,11 +227,27 @@ export function scanCorpus(root: string, options: ScanOptions = {}): ScanResult 
       });
     }
   }
+  for (const link of links) {
+    if (link.origin !== "inline") continue;
+    // inline 宣言の source は宣言ファイル自身（実在自明）。target のみ存在確認する
+    let targetStat;
+    try {
+      targetStat = statSync(join(root, link.target));
+    } catch {
+      targetStat = undefined;
+    }
+    if (targetStat === undefined || !targetStat.isFile()) {
+      linkMissingArtifacts.push({ artifact: link.target, linkFile: link.source, role: "target" });
+    }
+  }
   return {
     declarations,
     issues,
     sidecarIssues,
     sidecarMissingArtifacts,
+    links,
+    linkIssues,
+    linkMissingArtifacts,
     unreadableFiles,
     fileCount: files.length,
   };

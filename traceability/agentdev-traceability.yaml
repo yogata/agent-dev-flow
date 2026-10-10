@@ -5,18 +5,33 @@ implementation:
     - REQ-012-057
     - REQ-012-058
     - REQ-029-011
+    - REQ-107-001
+    - REQ-107-002
+    - REQ-107-007
   src/common/skills/agentdev-traceability/references/check-interpretation.md:
     - REQ-012-058
+    - REQ-107-005
+    - REQ-107-007
   src/common/skills/agentdev-traceability/references/sidecar-and-policy.md:
     - REQ-012-058
     - REQ-030-024
   src/common/skills/agentdev-traceability/scripts/lib/check.ts:
     - REQ-012-056
+    - REQ-107-004
+    - REQ-107-005
+    - REQ-107-006
+    - REQ-107-007
   src/common/skills/agentdev-traceability/scripts/lib/corpus.ts:
     - REQ-012-054
     - REQ-012-055
   src/common/skills/agentdev-traceability/scripts/lib/declarations.ts:
     - REQ-012-054
+  src/common/skills/agentdev-traceability/scripts/lib/inventory.ts:
+    - REQ-107-003
+  src/common/skills/agentdev-traceability/scripts/lib/links.ts:
+    - REQ-107-001
+    - REQ-107-002
+    - REQ-107-004
   src/common/skills/agentdev-traceability/scripts/lib/relied_diff.ts:
     - REQ-106-001
     - REQ-106-002
@@ -27,6 +42,8 @@ implementation:
     - REQ-106-007
     - REQ-106-008
     - REQ-106-009
+  src/common/skills/agentdev-traceability/scripts/lib/reuse.ts:
+    - REQ-107-008
   src/common/skills/agentdev-traceability/scripts/lib/sidecar.ts:
     - REQ-012-053
   src/common/skills/agentdev-traceability/scripts/lib/verification_scope.ts:
@@ -35,6 +52,11 @@ implementation:
     - REQ-021-030
   src/common/skills/agentdev-traceability/scripts/src/coverage.ts:
     - REQ-021-030
+  src/common/skills/agentdev-traceability/scripts/src/inventory.ts:
+    - REQ-107-003
+  src/common/skills/agentdev-traceability/scripts/src/links.ts:
+    - REQ-107-001
+    - REQ-107-002
   src/common/skills/agentdev-traceability/scripts/src/relied-diff.ts:
     - REQ-106-001
     - REQ-106-002
@@ -45,10 +67,34 @@ implementation:
     - REQ-106-007
     - REQ-106-008
     - REQ-106-009
+  src/common/skills/agentdev-traceability/scripts/src/reuse.ts:
+    - REQ-107-008
   traceability/policy.yaml:
     - REQ-002-048
     - REQ-096-031
+links:
+  upstream:
+    src/common/skills/agentdev-traceability/scripts/lib/check.ts:
+      - docs/designs/skills/agentdev-traceability.md
+    src/common/skills/agentdev-traceability/scripts/lib/inventory.ts:
+      - docs/designs/skills/agentdev-traceability.md
+    src/common/skills/agentdev-traceability/scripts/lib/links.ts:
+      - docs/designs/foundations/v4-traceability-model.md
+      - docs/designs/skills/agentdev-traceability.md
+    src/common/skills/agentdev-traceability/scripts/lib/reuse.ts:
+      - docs/designs/foundations/v4-traceability-model.md
 verification:
+  .opencode/skills/repo-agentdev-integrity/scripts/tests/traceability_inventory.test.ts:
+    - REQ-107-003
+  .opencode/skills/repo-agentdev-integrity/scripts/tests/traceability_links.test.ts:
+    - REQ-107-001
+    - REQ-107-002
+    - REQ-107-004
+    - REQ-107-005
+    - REQ-107-006
+    - REQ-107-007
+  .opencode/skills/repo-agentdev-integrity/scripts/tests/traceability_reuse.test.ts:
+    - REQ-107-008
   src/common/skills/agentdev-traceability/scripts/src/check.ts:
     - REQ-012-058
     - REQ-012-059

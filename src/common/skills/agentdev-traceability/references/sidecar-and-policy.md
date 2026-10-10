@@ -46,6 +46,24 @@ sidecar へ対応宣言（artifact パス × role × 要件行 ID）を追加す
 
 事前確認を省略して producer 本体の実装を隣接層の sidecar へ宣言すると、check（`duplicate-inconsistencies`）の検出後に所属訂正と check 再実行の手戻りが発生する。検出機構（`duplicate-inconsistencies`）は事後検知として機能しており、本確認ステップは作成時の予防であり、検出機構の代替にも変更にもしない。
 
+## sidecar の links セクション（隣接工程間対応）の書式
+
+sidecar は covers 対応関係に加え、プロジェクトの採用した隣接工程間の対応関係（links）をトップレベルキー `links` で保持できる。
+
+```yaml
+component: <component-slug>
+links:
+  upstream:
+    <source パス（下流側成果物）>:
+      - <target パス（上流側成果物）>
+```
+
+- 方向キーは `upstream`（下流→上流）のみ許容する。上流→下流の追跡は links 能力の逆引きで行い、双方向の宣言を要求しない
+- source / target は POSIX 区切りのリポジトリ相対パスで記述する
+- links セクションの schema 不正・不明方向は check（`malformed-links`）の検出対象、参照先の不存在は `dangling-links` の検出対象とする
+- links の完全性検査は存在しない。links セクションの不在は不合格に計上せず、採用されていない参照例の工程・成果物への対応を強制しない
+- links 対応は covers の対応完全性（missing-*）の代替にならない
+
 ## inline 宣言行の記述形式（ID 列挙のみ）
 
 producer 側成果物の inline 宣言行（ADF-COVERS 宣言）は、対応する要件行 ID の列挙のみを含む1行コメントとして記述する。

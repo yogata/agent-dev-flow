@@ -1,4 +1,4 @@
-// check の9種検査（agentdev-traceability Design「公開能力 check」の実装）。
+// check の11種検査（agentdev-traceability Design「公開能力 check」の実装）。
 //
 // 1. malformed-declarations: 不正な対応関係記述（inline 宣言の形式・構文違反 +
 //    sidecar の形式・構文違反）
@@ -15,8 +15,16 @@
 // 9. duplicate-inconsistencies: 同一論理関係の不整合な重複（同一 artifact パス ×
 //    role × 要件行 ID の組み合わせが sidecar と inline declaration の間、または
 //    同一情報源内で矛盾する状態）
+// 10. malformed-links: 採用された隣接工程間対応（links）の宣言形式・構文違反
+//     （inline 宣言の形式不備・不明方向、sidecar links セクションの schema 不正）
+// 11. dangling-links: links の source / target 参照先の不存在
 //
 // Decision 対応の欠落は不合格に計上しない（対応完全性規則の任意役割）。
+// links の完全性検査は存在しない（links 宣言の不在は不合格に計上せず、採用されて
+// いない詳細工程への対応を強制しない）。links 対応は missing-* 判定の入力にしない
+// （グループ化しても子要件行単位の検証義務が消えない）。
+// check は構造検査（対応関係の存在と参照整合）のみを担い、pass は要求内容の
+// 充足（意味的品質）の証明ではない。出力の structuralOnly がその境界を明示する。
 // policy の要否判定が実行不能な場合、または sidecar の解析が実行不能な場合、
 // 対応完全性の合格を返さない（fail-closed、agentdev-traceability Design
 // 「advisory 能力と品質ゲートとしての check の境界」）。
@@ -34,7 +42,9 @@ export type CheckKind =
   | "missing-implementation"
   | "missing-verification"
   | "policy-invalid"
-  | "duplicate-inconsistencies";
+  | "duplicate-inconsistencies"
+  | "malformed-links"
+  | "dangling-links";
 
 export interface CheckFinding {
   readonly file?: string;
@@ -64,6 +74,11 @@ export interface CheckReport {
   readonly completenessScope: "all" | readonly string[];
   /** policy の要否判定が実行不能か（fail-closed 判定の根拠）。 */
   readonly verificationPolicyUnavailable: boolean;
+  /**
+   * check は構造検査（対応関係の存在と参照整合）のみを担い、pass は要求内容の
+   * 充足（意味的品質）の証明ではない。常に true。
+   */
+  readonly structuralOnly: true;
 }
 
 export interface CheckOptions {
@@ -112,10 +127,11 @@ function item(kind: CheckKind, findings: readonly CheckFinding[]): CheckResultIt
 }
 
 /**
- * 9種検査を実行する。scan は正規成果物の直接走査結果（sidecar 正規化分を含む）、
+ * 11種検査を実行する。scan は正規成果物の直接走査結果（sidecar 正規化分を含む）、
  * knownReqIds は現行要件行ID。verificationPolicy を省略した場合（policy 不在と同等）、
  * 全要件行が検証対応必須となる。policy の要否判定が実行不能、または sidecar の
  * 解析が実行不能な場合、対応完全性の合格を返さない（fail-closed）。
+ * links 対応は missing-* 判定の入力にせず、links の完全性検査は存在しない。
  */
 export function runChecks(
   scan: ScanResult,
@@ -234,6 +250,20 @@ export function runChecks(
 
   const duplicateFindings = detectDuplicateInconsistencies(scan);
 
+  const malformedLinks: CheckFinding[] = scan.linkIssues.map((i) => ({
+    file: i.file,
+    ...(i.line !== undefined ? { line: i.line } : {}),
+    ...(i.text !== undefined ? { text: i.text } : {}),
+    reason: i.reason,
+    detail: i.detail,
+  }));
+  const danglingLinks: CheckFinding[] = scan.linkMissingArtifacts.map((m) => ({
+    artifact: m.artifact,
+    reason: m.role === "source" ? "link-source-not-found" : "link-target-not-found",
+    ...(m.linkFile !== m.artifact ? { file: m.linkFile } : {}),
+    detail: `隣接工程間対応の参照先（${m.role}）が存在しない`,
+  }));
+
   const checks: Record<CheckKind, CheckResultItem> = {
     "malformed-declarations": item("malformed-declarations", malformed),
     "unknown-roles": item("unknown-roles", unknownRoles),
@@ -244,6 +274,8 @@ export function runChecks(
     "missing-verification": item("missing-verification", missingVerification),
     "policy-invalid": item("policy-invalid", policyInvalid),
     "duplicate-inconsistencies": item("duplicate-inconsistencies", duplicateFindings),
+    "malformed-links": item("malformed-links", malformedLinks),
+    "dangling-links": item("dangling-links", danglingLinks),
   };
 
   const values = Object.values(checks);
@@ -256,6 +288,7 @@ export function runChecks(
     summary,
     completenessScope: options.completenessReqIds ?? "all",
     verificationPolicyUnavailable: policyUnavailable,
+    structuralOnly: true,
   };
 }
 

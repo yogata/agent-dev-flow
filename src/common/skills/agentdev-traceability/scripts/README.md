@@ -10,25 +10,31 @@ scripts/
 ├── tsconfig.json
 ├── lib/
 │   ├── declarations.ts       # ADF-COVERS 対応宣言の解析（4役割、正規宣言位置の行単位パターン照合、prose 対象外、意味推定なし）
-│   ├── sidecar.ts            # traceability/ 配下 sidecar の読み込みと論理対応関係への正規化（最小データ、YAML 標準 API 委譲）
+│   ├── links.ts              # ADF-LINKS 隣接工程間対応宣言の解析（inline 宣言 + sidecar links セクション、upstream 方向のみ）
+│   ├── sidecar.ts            # traceability/ 配下 sidecar の読み込みと論理対応関係への正規化（covers + links、最小データ、YAML 標準 API 委譲）
 │   ├── corpus.ts             # 正規成果物コーパスの直接走査（inline .md/.ts + traceability/ 配下 sidecar YAML、派生 Graph 非依存）
 │   ├── requirements.ts       # 現行要件行ID（docs/requirements/REQ-{NNNN}.md）の収集
 │   ├── verification_scope.ts # 検証スコープポリシー（traceability/policy.yaml）の解析・解決（不在時は全行必須、fail-closed）
 │   ├── query.ts              # coverage・impact の公開契約（純粋関数、4役割の役割付き対応関係）
-│   ├── check.ts              # check の9種検査（純粋関数、Decision 欠落非計上、実行不能時不合格）
+│   ├── check.ts              # check の11種検査（純粋関数、Decision 欠落非計上、links 完全性検査なし、structuralOnly）
+│   ├── inventory.ts          # 棚卸し（直接走査での宣言外候補発見、advisory）
+│   ├── reuse.ts              # 証拠再利用の構造的適用可否確認（合格判定なし、manualConfirmation 明示）
 │   └── cli_utils.ts          # argv 解析、JSON 出力、エラー終了
 └── src/
     ├── coverage.ts       # CLI: coverage
     ├── impact.ts         # CLI: impact
-    └── check.ts          # CLI: check
+    ├── check.ts          # CLI: check
+    ├── links.ts          # CLI: links（隣接工程間対応の双方向追跡）
+    ├── inventory.ts      # CLI: inventory（棚卸し）
+    └── reuse.ts          # CLI: reuse（証拠再利用確認）
 ```
 
-`lib/`（解析コア）と `src/`（CLI）の分離により、coverage、impact、check の外部契約を変えずに、将来キャッシュまたは索引を追加できる。
+`lib/`（解析コア）と `src/`（CLI）の分離により、coverage、impact、check、links、inventory、reuse の外部契約を変えずに、将来キャッシュまたは索引を追加できる。
 ユニットテスト（宣言解析に架空の concrete 要件行ID を必要とするため producer 側の非配布領域へ配置）は producer 側リポジトリの検証スイート（`traceability_*.test.ts`）が担う。
 
 ## I/O 契約（共通）
 
-- 入力: argv（`--root`, `--req`, `--artifact`）
+- 入力: argv（`--root`, `--req`, `--artifact`, `--evidence`）
 - 出力: stdout に JSON
 - エラー: 非ゼロ終了コード + stderr にエラーメッセージ（check は検査 fail ありで終了コード 2、実行エラーで 1）
 - 決定性: 同一コーパスから同一の列挙順（名前順）・同一の JSON を返す
@@ -60,6 +66,15 @@ bun src/impact.ts --root <repo-root> --artifact src/<path/to/artifact>.ts
 bun src/check.ts --root <repo-root>
 bun src/check.ts --root <repo-root> --req REQ-{NNNN}-{MMM},REQ-{NNNN}-{MMM}
 bun src/check.ts --root <repo-root> --artifact docs/designs/<path/to/artifact>.md
+
+# links（隣接工程間対応の双方向追跡）
+bun src/links.ts --root <repo-root> --artifact <repo-relative-path>
+
+# inventory（棚卸しと宣言外候補の発見）
+bun src/inventory.ts --root <repo-root>
+
+# reuse（証拠再利用の構造的適用可否確認）
+bun src/reuse.ts --root <repo-root> --evidence <repo-relative-path> --revision <identifier>
 ```
 
 各 CLI の詳細な出力契約は親 SKILL.md の「公開操作契約（スクリプト一覧）」参照。
