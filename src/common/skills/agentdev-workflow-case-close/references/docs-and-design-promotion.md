@@ -124,6 +124,8 @@ QG-4 の full integrity suite 合格基準により検証スイート全体（bu
 - **実行コマンド**: `bun test ./.opencode/skills/<integrity-detector-skill>/scripts/`。`./` prefix 付きで対象ディレクトリを明示指定する（必須ステップ）
 - **timeout 明示指定**: bun test フル suite 全体実行を含む検証の実行指示は、実行 timeout を明示指定する。全体実行の実測所要時間は既定 timeout を超え得るため、**300〜600 秒の指定を標準**とする。timeout 未指定（既定値での打ち切り）で全体実行を打ち切った結果を fail 証跡として扱わない
 - **N/M 件数突合**: 実行結果の「Ran N tests across M files」の N/M 件数突合を実施する（必須ステップ）。直前実績と比較して件数が急減していないかの妥当性を検証する。固定値の期待値化は行わない
+- **stdout・stderr 分離退避の常時付与**: stderr 出力ランナー（bun test 等の検証ランナー）を含む検証の実行には、stdout と stderr の分離退避（stdout.log / stderr.log の分離ファイル退避）を常時付与する。分離退避の接続点は stderr 出力ランナーの検証実行（script 外の直接実行）である。機械工程 script 呼び出し自体のリダイレクトラップは現行 runner（spawnSync 既定の stdio pipe）が bun test の stderr を内部捕捉するため証跡成立手段にならない
+- **件数突合の根拠**: 「Ran N tests across M files」の N/M 件数突合の根拠は stderr 退避ファイル（件数サマリーの出力先）に置く。検証差分には既存の検証差分記録規約（agentdev-workflow-templates SKILL.md 検証差分セクション）に従い、保存先・終了コード・checker の版・検査範囲・実行環境を記録し、保存先と根拠ファイルを明記する。報告 JSON 単体を件数突合の受理根拠にしない
 - **証拠記録**: 実行 cwd と起動コマンド形式（prefix・パス指定を含む）を PR 本文のテスト結果の証拠へ明記する
 - **cwd 依存テスト混在スイートの運用注記**: 対象スイートには cwd 依存テストが混在するため、カレントディレクトトリビアな実行（`bun test` 単体等）で代替しない
 - **QG-4 checker 実測の実施時点**: full integrity suite および個別 checker の実測は、merge 直前の origin/main 取り込み済み branch HEAD で実施する。検出した新規 NG の出所が自 Case 変更であることを evidence として記録し、provenance-tracked baseline への登録漏れを検査する（詳細3要素は `agentdev-quality-gates` references `qg-4-final-acceptance.md`「QG-4 checker 実測手順（merge 直前 HEAD・evidence 化・baseline 登録漏れ検査）」節を参照）
