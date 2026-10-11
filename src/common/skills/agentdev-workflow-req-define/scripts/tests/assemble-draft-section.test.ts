@@ -57,6 +57,20 @@ describe("assembleDraftSection replace", () => {
     if (!result.ok) expect(result.reason).toContain("ambiguous");
   });
 
+  test("detects level-mixed duplicate headings without interpreting order", () => {
+    const result = assembleDraftSection({
+      operation: "replace", target_file: "doc.md", target_area: "## Target",
+      old_text: "old phrase", new_text: "new phrase",
+    }, `${original}\n### Target\nmisplaced\n`);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.reason).toContain("ambiguous");
+      expect(result.match_count).toBe(2);
+      expect(result.checks.pre[0]?.detail).toContain("matches: 2");
+    }
+  });
+
   test("rejects an unexpected old-text count", () => {
     const result = assembleDraftSection({
       operation: "replace", target_file: "doc.md", target_area: "Target",
