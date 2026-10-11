@@ -145,6 +145,13 @@ review_dispositions:
       checked_at_commit: null  # req-define 生成時は null。case-open が確認 commit SHA を記録する
     related_removed_items: []  # 本判断により除外された関連項目の識別子リスト（該当なし時は空リスト）
 
+# assembly_evidence: 局所修正・追記の組立検査証拠。optional soft-contract
+# scripts/src/assemble-draft-section.ts の戻り値 evidence を1操作1エントリで記録する
+# 寿命は当該定義実行とその再開まで。生の組立入力・出力や一時スクリプトは drafts 配下へ置かない
+# 再開時は現在条件照合（scripts/src/evidence-match.ts）ですべて一致した有効な証拠だけを再利用する
+# 欠落時に後続工程は draft を拒否しない（soft contract）
+assembly_evidence: []
+
 # case_open_hints: case-open 構成生成への参考情報（Issue 階層は case-open が決定する）
 case_open_hints:
   epic_needed: false            # 単一 Issue で完結する場合は false

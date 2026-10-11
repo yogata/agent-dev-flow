@@ -6,8 +6,11 @@ implementation:
     - REQ-004-060
     - REQ-004-062
     - REQ-004-063
+  src/common/skills/agentdev-workflow-req-define/scripts/src/evidence-match.ts:
+    - REQ-004-060
   src/common/skills/agentdev-workflow-req-define/references/adversarial-review-integration.md:
     - REQ-004-058
+    - REQ-004-060
   src/common/skills/agentdev-workflow-req-define/references/draft-generation.md:
     - REQ-004-058
     - REQ-004-059
@@ -59,3 +62,12 @@ verification:
     - REQ-090-027
     - REQ-090-028
     - REQ-090-029
+  src/common/skills/agentdev-workflow-req-define/scripts/tests/assemble-draft-section.test.ts:
+    - REQ-004-058
+    - REQ-004-059
+    - REQ-004-062
+  src/common/skills/agentdev-workflow-req-define/scripts/tests/evidence-match.test.ts:
+    - REQ-004-060
+  src/common/skills/agentdev-workflow-req-define/scripts/tests/real-path-assembly.test.ts:
+    - REQ-004-058
+    - REQ-004-060
