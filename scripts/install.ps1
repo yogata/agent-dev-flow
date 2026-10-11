@@ -99,13 +99,6 @@
     ./scripts/install.ps1 -Mode apply -Hosts senpi
 #>
 
-# ADF-COVERS(implementation): REQ-050-001, REQ-050-002, REQ-050-004, REQ-050-005, REQ-050-006, REQ-050-007, REQ-050-008, REQ-050-013
-# ADF-COVERS(implementation): REQ-052-007, REQ-052-008, REQ-011-006
-# ADF-COVERS(implementation): REQ-058-001, REQ-058-002, REQ-058-003, REQ-058-004, REQ-058-005, REQ-058-006, REQ-058-007, REQ-058-008, REQ-058-009, REQ-058-010, REQ-058-011, REQ-058-012
-# ADF-COVERS(implementation): REQ-050-015
-# ADF-COVERS(implementation): REQ-099-010, REQ-099-011, REQ-099-012
-# ADF-COVERS(implementation): REQ-009-040, REQ-009-042
-
 #Requires -Version 7.0
 
 param(
