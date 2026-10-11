@@ -2,7 +2,7 @@
 title: case-open Design
 status: accepted
 created: 2026-06-21
-updated: "2026-10-11"
+updated: "2026-10-12"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-004, REQ-030-005, REQ-030-006, REQ-030-007, REQ-030-008, REQ-030-009, REQ-030-010, REQ-030-011, REQ-030-015 -->
@@ -12,6 +12,7 @@ updated: "2026-10-11"
 <!-- ADF-COVERS(implementation): REQ-049-005 -->
 <!-- ADF-COVERS(implementation): REQ-083-002 -->
 <!-- ADF-COVERS(design): REQ-030-014, REQ-030-017, REQ-030-018, REQ-030-022 -->
+<!-- ADF-COVERS(design): REQ-030-025, REQ-030-026 -->
 <!-- ADF-COVERS(design): REQ-030-019, REQ-030-020, REQ-030-021, REQ-030-024 -->
 <!-- ADF-COVERS(design): REQ-083-002, REQ-083-003 -->
 
@@ -82,6 +83,12 @@ case-open STEP-4（実変更判定と設計PR作成）の機械工程（専用 w
 - 意味判断（停止判断、deviation 分類、adversarial review、警告の重要度評価）はモデルが担当し続け、script は機械的に確定した手順のみを実行する
 - workflow skill 参照文面（references/*.md）は、LLM が bash コマンドを逐次実行する指示から script 呼び出しと報告 JSON 解釈へ置き換えて短縮する
 - 本契約は Definition 編集（DefinitionEdit による対象パス + 旧文完全一致置換）の script 適用について規定するものであり、新規 REQ/Decision ファイルの worktree 内前置作成（agentdev-git-worktree 標準手順 type=definition による前置作成、node writeFileSync による UTF-8 明示配置）を排除しない。前置作成済みファイルは script の冪等再利用（branch 確認済み worktree 再利用）と整合して扱う。前置作成の具体的手順は配布 reference（definition-pr-and-idempotency.md）の STEP-4 手順が所有する
+
+### 検査入力と実行証拠の接続
+
+REQ-030-025/026の実現は既存の工程別実行器・入力型・下位検査契約を再利用する。標準出力と標準エラーは全文を保持し、終了コード、対象版、実行条件（実行コマンド、引数、作業ディレクトリ、指定された実行上限と検査設定）と対応付けて、一回の検査の報告として保存・消費する。末尾抜粋や集計要約だけで原結果を代替しない。既存の実行記録を用い、終了コードや証拠の再取得のみを目的とする同一条件の全再実行を行わない。
+
+既知の検査入力は既存入力型と下位コマンドの契約から固定生成し、必須項目、対象、パス、許容値、必須引数を高価な検査の前に検証する。形状検査だけでなく不正workflow値等の下位引数も拒否する。兄弟実行器と結果消費の規律をそろえ、単一Case専用処理や任意コマンドの汎用解釈器を作らない。既存の計測日二段収束・派生物処理とcommit境界・版変更後の必要検査はそのまま維持する。
 
 ## 所有関係と委譲
 

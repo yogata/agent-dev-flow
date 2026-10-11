@@ -2,10 +2,11 @@
 title: backlog-auto Design
 status: accepted
 created: 2026-08-17
-updated: "2026-10-09"
+updated: "2026-10-12"
 ---
 <!-- ADF-COVERS(implementation): REQ-041-001, REQ-041-002, REQ-041-003, REQ-041-004, REQ-041-005, REQ-041-006, REQ-041-007, REQ-041-008, REQ-041-009, REQ-041-010, REQ-041-011, REQ-041-012, REQ-041-013, REQ-041-014, REQ-041-015, REQ-041-016 -->
 <!-- ADF-COVERS(design): REQ-108-011 -->
+<!-- ADF-COVERS(design): REQ-041-017 -->
 
 # backlog-auto Design
 
@@ -43,6 +44,12 @@ updated: "2026-10-09"
 
 - 実行順序は inspect-docs → 昇格3系統（learning-promote、intake-promote、inspect-promote）→ backlog-review の順とし、工程間の開始条件ゲートを制御する
 - workflow 実装本体（orchestration stage 構成、直列化契約、fan-in 判定、resume 契約）は Workflow Skill（`agentdev-workflow-backlog-auto`）が所有し、本 Design はこれらを複製しない
+
+## 昇格3系統の実並列と競合排他の接続
+
+REQ-041-017の成立は系統別の起動と活動区間の実観測で確認する。親orchestratorが既存の委譲手段へ3系統の独立読取・分析を並列接続し、共有書込み・Git操作・利用者対話の競合要求だけを排他する。提供元不調やGit競合を理由に系統全体を直列化しない。子workflowの内部分類・評価・承認は子側の正規責務に残す。
+
+既存referenceの直列化キューの報告項目を再定義せず、排他の担当・操作要求・実行順序・解除・結果回収の実記録を既存記録へ接続する。失敗・停止時も解除と結果回収を確認し、独立兄弟を連鎖停止しない。全対象収束の工程間gateは変更しない。新しい全工程制御基盤・台帳・スケジューラ基盤は追加しない。
 
 ## 有限実行における要求蓄積入口の維持（REQ-108-011）
 
