@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261011T154254Z-f1d1",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0200〜0203 のREQ帰属判断（APPEND/CREATE/REQ操作なし）",
+  "sourceRevision": "79b047d41e49f9613a2056fab7272b894fca488e",
+  "durationMs": 1549,
+  "inputTokens": 2202,
+  "inputs": {
+    "requestDigest": "7381fcc03ab976f7217f6723227c5f9ef2381617fdc5785b4ff0703b48f901fb",
+    "references": [
+      {
+        "label": "RU-0200",
+        "path": ".agentdev/backlog/req-units/RU-0200.md",
+        "digest": "5da0cbc51f2dac363d6125d8132664210489bba2f463e66bd9625d978ae2a0be"
+      },
+      {
+        "label": "RU-0201",
+        "path": ".agentdev/backlog/req-units/RU-0201.md",
+        "digest": "d6e6c7a2859cf48b9c0a2e791db56f2459ebc05d59fa4623f9ba027ff9364f9f"
+      },
+      {
+        "label": "RU-0202",
+        "path": ".agentdev/backlog/req-units/RU-0202.md",
+        "digest": "09eec11523f067df966f13f3bb4fa22ed0f50c51ad90aad7288e7f60c47328c4"
+      },
+      {
+        "label": "RU-0203",
+        "path": ".agentdev/backlog/req-units/RU-0203.md",
+        "digest": "71aaf12f6194bd63147f0269dc0da23e065e9ee858286267043297f43a5d4db3"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-ru0200-target",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "APPEND": 0.72,
+        "CREATE": 0.28,
+        "UPDATE": 0,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "q2-ru0201-target",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "APPEND": 0.96,
+        "CREATE": 0.01,
+        "UPDATE": 0.03,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "q3-ru0202-target",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "APPEND": 0.95,
+        "CREATE": 0.02,
+        "UPDATE": 0.03,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "q4-ru0203-target",
+      "questionForm": "choice",
+      "value": "CREATE",
+      "probabilityDistribution": {
+        "CREATE": 1,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "q5-matching-confidence",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.34,
+        "false": 0.6599999999999999
+      }
+    }
+  ],
+  "confidence": 0.63,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-ru0200-target",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "q2-ru0201-target",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "q3-ru0202-target",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "q4-ru0203-target",
+        "value": "CREATE"
+      },
+      {
+        "questionId": "q5-matching-confidence",
+        "value": false
+      }
+    ]
+  }
+}
