@@ -2,7 +2,7 @@
 title: req-define Design
 status: accepted
 created: 2026-06-21
-updated: "2026-10-09"
+updated: "2026-10-12"
 ---
 <!-- ADF-COVERS(implementation): REQ-008-018, REQ-008-019, REQ-008-020, REQ-008-021, REQ-008-023, REQ-008-024, REQ-008-025, REQ-008-026, REQ-008-027, REQ-008-028, REQ-008-029, REQ-008-030, REQ-008-031, REQ-008-034, REQ-008-035, REQ-008-038, REQ-008-039, REQ-008-040, REQ-008-042, REQ-008-043, REQ-008-044, REQ-008-045, REQ-008-046, REQ-008-050, REQ-008-051, REQ-008-054, REQ-008-058, REQ-008-059 -->
 <!-- ADF-COVERS(design): REQ-008-059, REQ-008-061, REQ-008-062, REQ-004-056, REQ-004-057, REQ-004-058, REQ-004-059, REQ-004-060, REQ-004-062, REQ-004-063 -->
@@ -113,6 +113,8 @@ req-define は Workflow Skill と手順番号を複製せず、公開目的、�
 3. 最終分類への上書き値も7値のいずれかであること
 
 7値の定義、検出時の具体的挙動は backlog-review.md「tentative_classification フィールド仕様」を参照すること。
+
+## 組立検査証拠の同一実行内引継ぎ
 
 ## 調査委譲の全文機械抽出・安全な書込み・独立作業の並列化
 

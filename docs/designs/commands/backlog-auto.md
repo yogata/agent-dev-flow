@@ -2,10 +2,11 @@
 title: backlog-auto Design
 status: accepted
 created: 2026-08-17
-updated: "2026-10-09"
+updated: "2026-10-12"
 ---
 <!-- ADF-COVERS(implementation): REQ-041-001, REQ-041-002, REQ-041-003, REQ-041-004, REQ-041-005, REQ-041-006, REQ-041-007, REQ-041-008, REQ-041-009, REQ-041-010, REQ-041-011, REQ-041-012, REQ-041-013, REQ-041-014, REQ-041-015, REQ-041-016 -->
 <!-- ADF-COVERS(design): REQ-108-011 -->
+<!-- ADF-COVERS(design): REQ-041-017 -->
 
 # backlog-auto Design
 
@@ -43,6 +44,8 @@ updated: "2026-10-09"
 
 - 実行順序は inspect-docs → 昇格3系統（learning-promote、intake-promote、inspect-promote）→ backlog-review の順とし、工程間の開始条件ゲートを制御する
 - workflow 実装本体（orchestration stage 構成、直列化契約、fan-in 判定、resume 契約）は Workflow Skill（`agentdev-workflow-backlog-auto`）が所有し、本 Design はこれらを複製しない
+
+## 昇格3系統の実並列と競合排他の接続
 
 ## 有限実行における要求蓄積入口の維持（REQ-108-011）
 

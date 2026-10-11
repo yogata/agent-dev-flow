@@ -2,14 +2,14 @@
 title: case-ready Design
 status: accepted
 created: 2026-09-14
-updated: "2026-10-09"
+updated: "2026-10-12"
 ---
 
 <!-- ADF-COVERS(design): REQ-021-024 -->
 <!-- ADF-COVERS(design): REQ-012-031（保存実体節が Definition 保存時点での設計根拠対応の未成立は保存を阻害しないことの design 対応） -->
 <!-- ADF-COVERS(design): REQ-004-061 -->
 <!-- ADF-COVERS(design): REQ-061-003 -->
-<!-- ADF-COVERS(design): REQ-061-010, REQ-061-019, REQ-061-021, REQ-061-038, REQ-061-023, REQ-061-029, REQ-061-030, REQ-061-033, REQ-061-034, REQ-061-035, REQ-061-039, REQ-061-040, REQ-061-047, REQ-061-048, REQ-035-012, REQ-035-018 -->
+<!-- ADF-COVERS(design): REQ-061-010, REQ-061-019, REQ-061-021, REQ-061-038, REQ-061-023, REQ-061-029, REQ-061-030, REQ-061-033, REQ-061-034, REQ-061-035, REQ-061-039, REQ-061-040, REQ-061-047, REQ-061-048, REQ-061-049, REQ-061-050, REQ-035-012, REQ-035-018 -->
 <!-- ADF-COVERS(design): REQ-061-041, REQ-061-042, REQ-017-021, REQ-017-022, REQ-017-023, REQ-061-043, REQ-061-044, REQ-061-045, REQ-061-046, REQ-030-023 -->
 <!-- ADF-COVERS(implementation): REQ-103-014 -->
 
@@ -88,3 +88,5 @@ case-ready の機械工程（設計PRの忠実性・整合性・品質検査の�
 - 入力 JSON / 報告 JSON / 終了コードの契約、品質ゲートの script 内実行（省略禁止）、inspect_cross_dependencies.ts と同じ作り（共通基盤不作成）、意味判断のモデル担当は、case-open Design「機械工程の script 呼び出し契約（RU-0162）」節と同一の規律に従う
 - 報告 JSON には検査結果、再生成差分、警告、提案する Issue/PR 本文を含め、モデルは報告 JSON の意味レビューと agentdev_gh による I/O 実行のみを担う
 - workflow skill 参照文面は script 呼び出しと報告 JSON 解釈へ置き換えて短縮する
+
+## 受入検査入力と実行証拠の接続
