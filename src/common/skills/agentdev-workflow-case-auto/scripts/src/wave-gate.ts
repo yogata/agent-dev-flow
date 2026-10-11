@@ -23,6 +23,12 @@
  *   依存先からの依存充足・Epic の終了を阻止する
  * - Epic/Root の最終終了は全子完了と親横断義務成立の両方を条件とする
  *
+ * - 修復完了から再委託への接続: blocked / failed / delegation-unavailable で
+ *   結果確定した対象の再投入は、正規の修復と再開条件の充足が確認された
+ *   対象（repairReady の観測状態付き）に限定する。修復確認は対象観測状態の
+ *   1フラグであり、新しい結果状態を追加しない。修復確認済み対象は無関係な
+ *   兄弟の実行・結果回収の状態を理由に投入を後ろ倒ししない
+ *
  * 新しい結果状態・新しい品質ゲートを追加しない。判定値は既存の実行結果 4状態
  * （pass / blocked / failed / delegation-unavailable）と対象観測状態のみで
  * 表現する。
@@ -75,6 +81,13 @@ export interface ChildExecutionRecord {
    * acceptance-missing で完了を拒否し、申告だけでは完了を許可しない）。
    */
   acceptance?: AcceptanceResult;
+  /**
+   * 正規の修復と再開条件の充足が確認された対象か（修復後再委託の観測状態）。
+   * blocked / failed / delegation-unavailable で結果確定した対象を再投入する
+   * 場合に必須とする（未確認の再投入は repair-not-confirmed で拒否する）。
+   * 新しい結果状態ではなく対象観測状態の1フラグとして表現する。
+   */
+  repairReady?: boolean;
 }
 
 /** Epic/Root が負う横断義務の成立状態。 */

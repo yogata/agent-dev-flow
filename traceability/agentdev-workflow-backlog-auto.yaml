@@ -1,0 +1,9 @@
+component: agentdev-workflow-backlog-auto
+implementation:
+  src/common/skills/agentdev-workflow-backlog-auto/references/stage-execution.md:
+    - REQ-041-017
+  src/common/skills/agentdev-workflow-backlog-auto/references/fan-in-and-reporting.md:
+    - REQ-041-017
+verification:
+  src/common/skills/agentdev-workflow-backlog-auto/tests/serialization-queue-pins.test.ts:
+    - REQ-041-017

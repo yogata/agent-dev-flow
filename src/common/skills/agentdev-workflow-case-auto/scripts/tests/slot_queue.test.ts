@@ -270,3 +270,85 @@ describe("投入順序の決定性と Epic 実行構成表の状態整合", () =
     expect(classify(orderA).completed).toEqual(["#1"]);
   });
 });
+
+describe("修復完了から再委託への接続（修復後再委託）", () => {
+  function repaired(issue: string): ChildExecutionRecord {
+    return { issue, status: "outcome-determined", outcome: "blocked", repairReady: true };
+  }
+
+  test("結果確定（非 pass）の対象は修復と再開条件の充足が未確認のままでは投入しない", () => {
+    for (const outcome of ["blocked", "failed", "delegation-unavailable"] as const) {
+      const plan = planSlotAdmissions({
+        candidates: [candidate("#400")],
+        records: recordsOf(outcomeOf("#400", outcome)),
+        activeIssues: [],
+      });
+      expect(plan.admissions).toEqual([]);
+      expect(plan.notAdmitted).toEqual([
+        { issue: "#400", reason: "repair-not-confirmed" },
+      ]);
+    }
+  });
+
+  test("修復確認済み対象は依存充足と空き枠があれば投入する", () => {
+    const plan = planSlotAdmissions({
+      candidates: [candidate("#400")],
+      records: recordsOf(repaired("#400")),
+      activeIssues: [],
+    });
+    expect(plan.admissions).toEqual(["#400"]);
+    expect(plan.notAdmitted).toEqual([]);
+  });
+
+  test("修復確認済み対象は無関係な兄弟の実行中・結果回収中の状態を理由に後ろ倒ししない", () => {
+    // #500 は実行中、#501 は結果確定で回収待ちの兄弟の模擬。
+    const plan = planSlotAdmissions({
+      candidates: [candidate("#400")],
+      records: recordsOf(
+        repaired("#400"),
+        { issue: "#500", status: "active" },
+        outcomeOf("#501", "failed"),
+      ),
+      activeIssues: ["#500"],
+    });
+    expect(plan.admissions).toEqual(["#400"]);
+    expect(plan.activeAfterPlan).toEqual(["#500", "#400"]);
+  });
+
+  test("修復確認済み対象でも active な対象は二重起動しない", () => {
+    const plan = planSlotAdmissions({
+      candidates: [candidate("#400")],
+      records: recordsOf(repaired("#400")),
+      activeIssues: ["#400"],
+    });
+    expect(plan.admissions).toEqual([]);
+    expect(plan.notAdmitted).toEqual([
+      { issue: "#400", reason: "already-active" },
+    ]);
+  });
+
+  test("修復確認済み対象でも完了済み（pass）の対象は完了済み再実行しない", () => {
+    const plan = planSlotAdmissions({
+      candidates: [candidate("#400")],
+      records: recordsOf({ ...satisfied("#400"), repairReady: true }),
+      activeIssues: [],
+    });
+    expect(plan.admissions).toEqual([]);
+    expect(plan.notAdmitted).toEqual([
+      { issue: "#400", reason: "already-completed" },
+    ]);
+  });
+
+  test("修復確認済み対象でも空き枠がなければ投入を保留する（上限の維持）", () => {
+    const plan = planSlotAdmissions({
+      candidates: [candidate("#400")],
+      records: recordsOf(repaired("#400")),
+      activeIssues: ["#1", "#2", "#3", "#4", "#5"],
+      maxActive: 5,
+    });
+    expect(plan.admissions).toEqual([]);
+    expect(plan.notAdmitted).toEqual([
+      { issue: "#400", reason: "no-active-slot" },
+    ]);
+  });
+});
