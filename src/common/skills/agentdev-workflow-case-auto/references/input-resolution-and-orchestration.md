@@ -181,7 +181,7 @@ stage 3 の実行制御は case-auto が単一所有し、次の runtime 制御�
 3. **状態管理**: Issue 実行の状態を pending、ready、active、実行結果確定で区別して管理する
 4. **再開**: 再開時は既存の active task を計上し、同一 Issue の二重起動と上限超過を防ぐ。状態不明の task は終了確認まで実行枠を解放せず、完了済み Issue を未完了に戻さない
 5. **統合処理**: 統合処理（マージ・クローズ相当）は active Issue task の実行枠を消費しないが、共有書き込みの直列化点として扱う
-6. **依存充足ゲートとスロット型キュー**: 子 Issue の開始は当該子 Issue に必要な全ての意味的依存条件の充足（必要な統合・マージの完了を含む）のみを条件とし、Wave 収束（全子 Issue の実行結果確定）を後続の子 Issue 開始の前提としない（完了即次投入のスロット型キュー）。blocked、failed、delegation-unavailable は依存充足とはみなさない。依存充足の決定的判定は `agentdev-workflow-case-auto` スキル配下の実行コード `scripts/src/wave-gate.ts` の決定的関数 `isDependencySatisfied`（依存先の完了判定は `canCompleteChild` の再利用。判定ロジックの新規作成を行わない）で行い、投入計画（空き枠補充・二重起動防止・依存関係のある Definition merge の排他維持を含む）は `scripts/src/slot_queue.ts` の決定的関数 `planSlotAdmissions` で行う。Wave 収束の判定 `isWaveConverged` は Wave 構成の記録単位としての進行評価と Epic/Root 終了側の判定に用い、投入開始の前提とはしない
+6. **依存充足ゲートとスロット型キュー**: 子 Issue の開始は当該子 Issue に必要な全ての意味的依存条件の充足（必要な統合・マージの完了を含む）のみを条件とし、Wave 収束（全子 Issue の実行結果確定）を後続の子 Issue 開始の前提としない（完了即次投入のスロット型キュー）。blocked、failed、delegation-unavailable は依存充足とはみなさない。依存充足の決定的判定は `agentdev-workflow-case-auto` スキル配下の実行コード `scripts/src/wave-gate.ts` の決定的関数 `isDependencySatisfied`（依存先の完了判定は `canCompleteChild` の再利用。判定ロジックの新規作成を行わない）で行い、投入計画（空き枠補充・二重起動防止・依存関係のある Definition merge の排他維持・修復と再開条件の充足が未確認の結果確定対象の再投入拒否を含む）は `scripts/src/slot_queue.ts` の決定的関数 `planSlotAdmissions` で行う。Wave 収束の判定 `isWaveConverged` は Wave 構成の記録単位としての進行評価と Epic/Root 終了側の判定に用い、投入開始の前提とはしない
 7. **子完了と親横断義務の分離**: 子 Issue の完了は当該子が負う必須完了条件の成立のみで判定し、親に残る横断義務の未完了を理由に条件を満たした子 Issue の終了を禁止しない。親の横断義務は Wave 収束・Epic/Root の最終終了時に評価する。子完了判定は `canCompleteChild`（親横断義務を入力に含まない）で行い、Epic/Root の最終終了判定は `canCloseEpic`（全子完了と親横断義務成立の両方を要求）で行う。同一モジュール `scripts/src/wave-gate.ts` の決定的関数であり、子の終了と親の終了が同じ経路の関数で分離判定される
 8. **dispatch 入口での旧実行契約抑止**: orchestration の dispatch 入口で、影響する合意変更が下流消費成果物へ反映され読み戻しが確認されるまで、旧実行契約に基づく新規 dispatch を行わない。各対象の dispatch 起動の前に合意変更の反映・読み戻し確認状態を照合し、未確認の場合は `canDispatchNewExecution`（`scripts/src/wave-gate.ts`）が拒否した対象を dispatch 対象から外し、停止報告に反映する
 9. **義務投影不完全・検証不能申告の停止伝播**: 子 Issue からの義務投影不完全・検証不能の申告は停止伝播として扱い、当該子の完了伝播を阻止する。申告子は `canCompleteChild` が完了を拒否し、依存先である子の `isDependencySatisfied` の blocker として後続子 Issue の投入も阻止する。必須条件の未達・未証明を Gate 全体の warn 等で通過させない。あわせて申告と受入の分離として、実行担当の合格申告（`ownRequiredConditionsMet`）は申告として扱い、受入側（case-close が正規完了条件から独立実行した受入評価）の結果（子は `acceptance`、Epic 自身は `epicAcceptance`）を完了伝播・最終終了判定の必須入力として取得し、`canCompleteChild`・`canCloseEpic` が申告と独立に消費する。受入評価の結果は case-close 受入評価（`close_mechanical_steps.ts` の final-acceptance-evaluation 報告 JSON）から取得して対象の実行観測レコードへ設定し、受入評価の結果が提供されていない子は `canCompleteChild` が acceptance-missing で完了を拒否し、`epicAcceptance` が未提供の場合は `canCloseEpic` が epic-acceptance-missing で最終終了を拒否する（未確認の拒否。合格申告だけで許可へ既定しない）。受入評価が拒否している子は申告が合格でも完了伝播させず（Wave クローズの進行停止、修正・再検証へ戻す。例外を投げず、黙って許可もしない）、受入評価が拒否している Epic は横断義務が成立していても最終終了しない。子は子の必須条件と子の受入評価で判定し、親の受入評価を子の完了判定に含めない（評価範囲の維持）
@@ -193,6 +193,8 @@ stage 3 の実行制御は case-auto が単一所有し、次の runtime 制御�
     - **新規派遣のブロックと既存派遣の再利用**: 進行中派遣の存在を検出した場合、後行の派遣要求（同一 orchestration 対象への case-ready 起動、子 Issue 起票を含む再派遣）は新規派遣を発行せずブロックする。後行側は既存派遣の完了または状態確定を待機し、その結果（Issue/PR 番号、結果状態）を合流して次工程の入力とする。既存派遣の存在だけを理由に他対象の進行を停止せず、stage 全体の直列化を行わない（競合する共有書き込み部分のみの局所直列化の範囲で処理する）
     - **子 Issue 起票の冪等前置**: 子 Issue の新規作成は、作成前に既存オープン Issue の検索（重複検知）を前置する。検索は Epic Issue 本文の実行構成表と当該 Epic 配下のオープン Issue 一覧の突合で行い、同一内容・同一対象を識別する既存オープン Issue が存在する場合は新規起票を行わず、既存 Issue の再利用を優先する。既存 Issue が識別できない場合のみ新規起票する
     - **二重派遣検知時の是正フロー**: 二重派遣（同一対象への重複起動・重複子 Issue 起票）を検知した場合、後行インスタンスは先行インスタンスの最終状態（PR の有無、Issue 完了状態、commit・実行記録）を確認してから是正に着手する。重複して起票された子 Issue は対応を残存側へ集約して無力化した上でクローズし、先行インスタンスの実行結果（PR、commit、完了記録）を自動破棄しない。先行結果の破棄を伴う是正（rebase・削除等の実行結果喪失を伴う処理）は行わず、残存側に結果を引き継いで収束させる。是正の内容と対象は当該 orchestration 対象の実行記録（完了報告・停止報告）に記録する
+
+14. **修復完了から再委託への接続**: blocked、failed、delegation-unavailable で結果確定した対象は、正規の修復と再開条件の充足を確認した上で、修復確認済みの観測状態（`repairReady`。`scripts/src/slot_queue.ts` の `planSlotAdmissions` が消費する対象観測状態の1フラグであり、新しい結果状態ではない）を付けて既存の投入判断へ接続する。修復確認のない対象の再投入は投入判断が `repair-not-confirmed` で拒否する（fail-closed）。修復確認済み対象は無関係な兄弟の実行・結果回収の状態を理由に再委譲の開始を後ろ倒しにしない（兄弟の結果回収は競合する共有書き込みの局所直列化の最小単位としてのみ扱い、投入判断の条件としない。横断補充は必須）。再委託でも二重起動防止（`already-active`、`already-completed` の既存拒否）と共有 active Issue task 枠の上限は維持する。修復完了の確認から再委譲の起動までの境界記録（対象識別子付きタイムスタンプまたは等価の bg task ID・Issue status 遷移記録）を対象別・stage 別観測証跡の記録形式へ含める
 
 #### Wave 反復制御（case-auto 直接制御、stage 3 内部処理）
 
@@ -251,7 +253,7 @@ case-open の判定結果に従う。
 
 - `case_auto_started_at`、入力モード、工程順序
 - 各工程の起動結果（Issue/PR番号）、RU パス、capture 対象情報
-- L1 工程別タイムスタンプ、orchestration stage 別結果、対象別・stage 別の開始/完了観測証跡（対象識別子付きタイムスタンプまたは等価の bg task ID・Issue status 遷移記録）
+- L1 工程別タイムスタンプ、orchestration stage 別結果、対象別・stage 別の開始/完了観測証跡（対象識別子付きタイムスタンプまたは等価の bg task ID・Issue status 遷移記録）、修復完了の確認から再委託の起動までの境界記録（修復確認済み対象の再委託）
 - 起動時対象集合の安定識別子（ローカル一時実行状態。draft / RU 削除後も対象集合を同一集合として識別し、削除だけを理由に対象を消失させない）
 - bg task 状態、結果状態4次元
 

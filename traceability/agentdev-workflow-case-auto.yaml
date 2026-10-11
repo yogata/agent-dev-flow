@@ -29,10 +29,12 @@ implementation:
     - REQ-032-038
     - REQ-034-012
     - REQ-035-017
+    - REQ-041-017
   src/common/skills/agentdev-workflow-case-auto/scripts/src/slot_queue.ts:
     - REQ-034-012
     - REQ-034-040
     - REQ-035-017
+    - REQ-041-017
   src/common/skills/agentdev-workflow-case-auto/references/conflict-resolution-and-reporting.md:
     - REQ-034-021
     - REQ-032-038
@@ -52,6 +54,7 @@ implementation:
     - REQ-034-046
     - REQ-034-047
     - REQ-061-039
+    - REQ-041-017
   src/common/skills/agentdev-workflow-case-auto/references/stop-and-decision-resolution.md:
     - REQ-032-038
     - REQ-096-001
@@ -76,5 +79,6 @@ verification:
     - REQ-034-012
     - REQ-034-040
     - REQ-035-017
+    - REQ-041-017
   .opencode/skills/repo-agentdev-integrity/scripts/agreement_change_acknowledgment.test.ts:
     - REQ-101-009

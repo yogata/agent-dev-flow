@@ -16,6 +16,11 @@
  *   状態不明の対象は投入しない。受入評価が拒否している子（acceptance 拒否の
  *   outcome pass 対象）は完了済みと分類せず、修正・再検証へ戻す対象として
  *   新規投入もしない（acceptance-refused。受入評価の拒否結果の消費）
+ * - blocked / failed / delegation-unavailable で結果確定した対象の再投入
+ *   （修復後再委託）は、正規の修復と再開条件の充足が確認された対象
+ *   （repairReady の観測状態付き）に限定する（repair-not-confirmed）。
+ *   修復確認済み対象は無関係な兄弟の実行・結果回収の状態を理由に投入を
+ *   後ろ倒ししない（兄弟の状態は投入判断の条件としない）
  * - 依存関係のある Definition merge の排他を維持する（統合処理が進行中の間、
  *   当該統合に依存する投入を保留する）
  */
@@ -80,7 +85,8 @@ export type NotAdmittedReason =
   | "already-completed"
   | "acceptance-refused"
   | "state-unknown"
-  | "definition-merge-exclusive";
+  | "definition-merge-exclusive"
+  | "repair-not-confirmed";
 
 function statusOf(
   record: ChildExecutionRecord | undefined,
@@ -126,6 +132,14 @@ export function planSlotAdmissions(input: SlotQueueInput): SlotAdmissionPlan {
         continue;
       }
       notAdmitted.push({ issue: candidate.issue, reason: "already-completed" });
+      continue;
+    }
+    if (
+      status === "outcome-determined" &&
+      record.outcome !== "pass" &&
+      record.repairReady !== true
+    ) {
+      notAdmitted.push({ issue: candidate.issue, reason: "repair-not-confirmed" });
       continue;
     }
     if (
