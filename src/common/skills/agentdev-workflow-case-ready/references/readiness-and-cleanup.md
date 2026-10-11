@@ -27,6 +27,11 @@
 - **検出源取得不能時**: canonical Definition または未クローズ Case 群の取得に失敗した場合、共有領域実ファイルの読取に失敗した場合は、比較を省略せず検出不能として報告する（検査入力の `source_failures` と報告の `detection_unavailable` による）
 - **Epic 経路の委譲境界**: Epic 経路の Wave 内重複（同一 Epic 配下の子 Issue 間）は Wave 構成の重複前置検出（execution-structure の前置検出）へ委譲し二重検査としない。Epic をまたぐ Case 間の重複は本検査が検出対象とする
 - **冪等再実行時の再提示**: 再実行時も本検査を再実行し、警告を再提示する（エンジンは同一入力から同一の報告を返す）
+- **検査入力の構成規律**: 検査入力 JSON の構成は次の規律に従う。Epic 化済み Root Case での入力構成誤り（epic_ref: null、sidecar のみの file_paths）が condition (a)(b) の偽陽性警告と修正再実行の往復を生んだ実測（Case #3585）の解消が目的である
+  - (1) Epic 化済み Root Case を current_case として検査する場合、検査入力の epic_ref には当該 Epic の識別子を設定する。null は Standard 扱いとなり、同一パス重複の Wave 内委譲判定（isWaveInternal。全メンバーが同一非 null epic_ref の場合のみ委譲）が作動しないため、Epic 運用時の epic_ref: null は誤りとして扱う
+  - (2) 対応関係領域（adf-covers-declarations）の file_paths は、traceability sidecar と design 対応 inline 宣言ファイル（docs/designs/** の ADF-COVERS 宣言）の和集合として構成する。sidecar のみを渡すと inline 宣言に存在する design 対応が未登録と誤判定され、condition (b) の重複需要の偽陽性を生む。和集合の取得は coverage による design 対応ファイル列挙で行う
+  - (3) 入力修正後の再実行は冪等であること（エンジンは同一入力から同一報告を返す）を観測事実として明記する
+  - (4) 検査入力 JSON の置き場所は既存の置き場所指針（case-open スキル scripts/README.md「検査入力 JSON の置き場所指針」節）に従う
 
 ### docs 文言期待テスト影響確認（Definition 品質検査）
 
