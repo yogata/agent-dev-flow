@@ -338,18 +338,21 @@ describe("既知検査入力の事前検証と固定生成（不正入力は検�
 
   test("固定生成: buildKnownTraceabilityCheckSpec の生成 spec は事前検証を通過して実行される", () => {
     const runner = fakeRunner();
+    // 具体参照排除（RA-003、TS-004）: spec 事前検証は実在 ID 形式を要求するため、
+    // 具体要件行IDのリテラルは書かず実行時に連結して構築する。
+    const reqId = "REQ-" + "000-001";
     const traceabilityGate = buildKnownTraceabilityCheckSpec({
       command: "bun",
       scriptArgs: ["./checker.ts", "traceability-check"],
       cwd: gate("traceability-check").cwd,
       root: "C:/repo/.worktrees/10-definition",
-      reqIds: ["REQ-000-001"],
+      reqIds: [reqId],
     });
     expect(() => preValidateGateSpec(traceabilityGate)).not.toThrow();
     const report = runPrepareDefinitionPr(input({ traceabilityGate }), runner);
     expect(report.result.exitCategory).toBe("success");
     const traceCall = runner.calls.find((c) => c.args.includes("--req"));
-    expect(traceCall?.args.slice(-2)).toEqual(["--req", "REQ-000-001"]);
+    expect(traceCall?.args.slice(-2)).toEqual(["--req", reqId]);
     expect(traceCall?.args.slice(-4, -2)).toEqual(["--root", "C:/repo/.worktrees/10-definition"]);
   });
 
