@@ -84,3 +84,19 @@
 - **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md（gate 判定仕様節の補足）
 - **関連**: Case #3628、PR #3631、docs/designs/commands/case-run.md、traceability check --req REQ-035-021
 - **タグ**: `#workflow-deviation` `#traceability-gate` `#definition-pr`
+
+## check_integrity --update-ir055-baseline が既存エントリの provenance と warning_total_cap を保持せず再生成する
+
+- **問題事象**: case-open STEP-4 の機械工程で本変更起因の IR-055 新規違反（workflow skill reference 追記文の `docs/designs/` 誘導参照）を baseline 管理へ回すため `check_integrity.ts --update-ir055-baseline` を実行したところ、baseline 差分が「新規エントリの追加」にとどまらず、既存エントリから classification / reason（provenance 由来記述）が削除され、warning_total_cap（58）が消失し、同一ファイルの既存エントリ（repo-*）が新規違反パターン（docs/designs/）への置換対象として失われた
+- **発生局面**: 実装（case-open STEP-4 機械工程の check_integrity fail 対処、worktree 内での baseline 再生成実行時）
+- **検知方法**: 再生成後の `git diff`（worktree 内）で baseline json の既存エントリの reason 消失・cap 消失・エントリ置換を確認
+- **根本原因**: `--update-ir055-baseline` は「現在の違反集合から baseline を生成する」コマンドであり、既存 baseline の provenance 付フィールド（classification / reason）と warning_total_cap を入力として読み込んで保存する設計ではない。既存 provenance を維持した部分更新の用途には適合しない
+- **自律対応内容**: 再生成結果を採用せず baseline を HEAD へ revert し、既存エントリ群を保持したまま新規エントリ 1 件（file × pattern × severity × count × classification: baseline × provenance reason）を node スクリプトによる手動追記で最小変更として追加した。追加後の check_integrity 再実行は pass（NG 0 / Warning 0、entries 27・cap 58 を維持）で、既存 provenance は破壊していない
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: baseline 系の `--update-*` コマンドを使う場合は全再生成（現状スナップショット化）と部分追記（provenance 保持）のどちらの操作が目的かを先に区別する。既存 provenance を維持する用途では手動エントリ追加（node の JSON 読書）が最小変更経路である
+- **再発条件**: check_integrity の IR-055 baseline（または同型の provenance 付き baseline）に対し、既存 provenance を維持したまま新規違反を承認追加しようとして `--update-ir055-baseline` を実行したとき、毎回再発する
+- **予防策候補**: case-open STEP-4 機械工程手順（definition-pr-and-idempotency.md）の traceability gate 対処手順へ「IR-055 baseline への承認追加は手動エントリ追加で行い、`--update-ir055-baseline` は full 再生成用途と区別する」旨の追記。または baseline 更新コマンド側の provenance 保持化（実装変更は別 Case 範囲）
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md（check_integrity 対処手順）
+- **関連**: Case #3627、PR #3633、commit 05d392b6（baseline 手動追加 commit）、.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts（--update-ir055-baseline 実装）
+- **タグ**: `#baseline` `#ir-055` `#provenance` `#workflow-deviation`
