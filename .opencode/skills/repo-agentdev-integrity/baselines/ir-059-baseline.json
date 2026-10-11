@@ -3,12 +3,5 @@
   "rule_id": "IR-059",
   "generated_at": "2026-09-07",
   "description": "IR-059 distribution reference boundary known-violations baseline",
-  "entries": [
-    {
-      "file": "src/opencode/commands/agentdev/templates/req-define/req-draft.md",
-      "category": "concrete-id",
-      "matched": "DEC-003",
-      "count": 1
-    }
-  ]
+  "entries": []
 }
