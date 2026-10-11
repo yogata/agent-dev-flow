@@ -12,6 +12,7 @@
 - STEP-S2: Issue 抽出・確認・判定
 - STEP-S3: Worktree 作成・ブランチ準備・前置 gate 群
 - 配布物本体 ADF-COVERS 宣言の除去可否判定（cleanup 判定）
+- 並列兄弟 branch 実差分交差確認（commit・push 前置）
 - verify-only closure の検証実行と SSoT コメント記録
 - STEP-S6: worktree クリーンアップ確認・完了報告
 
@@ -165,6 +166,45 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 ### Resume-Idempotency
 
 - worktree・ブランチ既存時は作成をスキップする。gate 群は再実行可能であり、同一 worktree 状態に対して同一判定を返す
+
+## 並列兄弟 branch 実差分交差確認（commit・push 前置）
+
+### Purpose
+
+同一 Wave 内で並列実行する子 Issue が、commit・push の前に、並列実行中の兄弟 branch の変更ファイルとの実差分交差確認を行う。実差分の交差をマージ直前でなく commit・push 前の時点で競合リスク情報として可視化し、調整決定の前置と case-close Level 1 rebase への引継ぎ記録を早期化する。正規原本は case-run command Design「並列兄弟 branch 実差分交差確認（commit・push 前置）」節であり、本工程はその実行時手順である。
+
+実施位置は STEP-S4 の委譲内で、実行担当サブエージェントが commit・push する直前（commit 前 3 検査と同一位置）とする。case-run の前置 gate 群（STEP-S3）は委譲開始前に実行されるため当該時点では自 branch の変更ファイルが存在せず、実施位置にならない（前置 gate での実施を前提とした手順としない）。
+
+### Preconditions
+
+- STEP-S4 の委譲内で、実装が完了し commit・push の直前に達していること
+- 対象 Issue が同一 Wave 内の並列実行に属すること（発動条件）
+
+### Procedure
+
+1. **発動条件判定**: 同一 Wave 内で並列実行中の兄弟 Issue が存在する場合のみ実施する。単独実行（兄弟 Issue なし）の場合は発動条件不成立としてスキップする
+2. **自 branch の変更ファイル集合の取得**: merge-base 起点の `git diff --name-only` で自 branch の変更ファイル集合を取得し、パスを正規化して比較対象とする
+3. **兄弟 branch の変更ファイル集合の取得**: 並列実行中の兄弟 Issue の branch について、merge-base 起点の `git diff --name-only` で変更ファイル集合を取得し、パスを正規化する
+4. **交差判定**: 自 branch と兄弟 branch の変更ファイル集合の交差を判定する
+5. **交差検出時の警告と調整記録**: 交差検出時はエラーではなく競合リスク情報として警告を投入者（case-auto 配下では親判断解決）へ提示し、次の2点を調整決定として調整記録として実行記録へ残す:
+   - (1) マージ順序の調整決定
+   - (2) 変更対象の所有正当の確認
+   調整記録は case-close のコンフリクト解消（Level 1 rebase）担当契約へ引き継ぐ。マージ順序調整・Level 1 rebase 担当の引き継ぎ先は case-close の現行契約を維持する
+6. **兄弟 branch 状態取得不能時の報告**: 兄弟 branch の状態が取得不能な場合は検査省略とせず、取得不能として報告する（検出不能は交差なしを意味しない）
+
+### 宣言ベース前置検出との補完関係
+
+宣言ベースの Wave 重複前置検出（case-ready Design「v3 epic-wave-model Design からの吸収」節を正規参照点とする）とは補完関係にあり置換しない。交差未検出であっても宣言ベース前置検出の結果を無効化しない。
+
+### Completion Verification
+
+- 実施した場合は交差判定結果が実行記録へ残っていること。交差ありの場合は調整記録（マージ順序の調整決定、変更対象の所有正当の確認）が残っていること
+- 発動条件不成立の場合は兄弟 Issue なしの根拠が確認できること
+- 兄弟 branch 状態の取得不能時は、検査省略として扱わず取得不能として報告済みであること
+
+### Resume-Idempotency
+
+- 交差確認は読取検査であり、同一 branch 状態に対して同一判定を返す。調整記録は実行記録の一部であり、再実行時に重複記録しない
 
 ## 配布物本体 ADF-COVERS 宣言の除去可否判定（cleanup 判定）
 
