@@ -249,7 +249,7 @@ export function runAcceptDefinitionChecks(
       if (overlap.exitCode === 0) {
         try {
           const parsed = JSON.parse(overlap.stdout) as { warnings?: unknown[]; detection_unavailable?: unknown };
-          overlapSummary = `warnings=${parsed.warnings?.length ?? 0} detection_unavailable=${parsed.detection_unavailable != null}`;
+          overlapSummary = `warnings=${parsed.warnings?.length ?? 0} detection_unavailable=${Array.isArray(parsed.detection_unavailable) && parsed.detection_unavailable.length > 0}`;
         } catch {
           overlapSummary = "report parse failed";
         }
