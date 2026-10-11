@@ -2,12 +2,19 @@ import { describe, expect, test } from "bun:test";
 
 import {
   assembleReport,
+  buildGateEvidence,
+  buildKnownGenerateIndexesSpec,
+  buildKnownOverlapCheckSpec,
+  buildKnownTraceabilityCheckSpec,
+  buildKnownWorkflowIntegrityGateSpec,
   decideExitCode,
+  preValidateGateSpec,
   runAcceptDefinitionChecks,
   validateInput,
   type AcceptDefinitionInput,
   type CommandResult,
   type GateCommandSpec,
+  type GateExecutionEvidence,
   type MechanicalRunner,
 } from "../src/accept_definition_checks";
 
@@ -225,5 +232,207 @@ describe("報告 JSON の4要素組み立て", () => {
     );
     expect(Object.keys(report).sort()).toEqual(["diff", "proposal", "result", "warnings"]);
     expect(decideExitCode(report)).toBe(0);
+  });
+});
+
+describe("検査証拠の一括保存と結果消費（標準出力・標準エラー・終了コード・対象版・実行条件）", () => {
+  test("整合性検査の stdout・stderr 全文と実行条件・対象版を一回の実行から detail へ保存する", () => {
+    const runner = fakeRunner();
+    const originalRun = runner.run.bind(runner);
+    runner.run = (spec) => {
+      if (spec.command === "bun" && spec.args.includes("check_changed_docs")) {
+        return { exitCode: 0, stdout: "", stderr: "integrity report only in stderr" };
+      }
+      return originalRun(spec);
+    };
+    const report = runAcceptDefinitionChecks(acceptanceInput(), runner);
+    const step = report.result.steps.find((s) => s.name === "definition-acceptance-checks");
+    const saved = step?.detail["check_changed_docs"] as GateExecutionEvidence;
+    expect(saved.exitCode).toBe(0);
+    expect(saved.stdout).toBe("");
+    expect(saved.stderr).toBe("integrity report only in stderr");
+    expect(saved.targetRevision).toBe("abc123");
+    expect(saved.executedCommand.command).toBe("bun");
+    expect(saved.executedCommand.args).toContain("check_changed_docs");
+    expect(saved.executedCommand.cwd).toBe(gate("check_changed_docs").cwd);
+    expect(saved.executedCommand.timeoutMs).toBe(60000);
+  });
+
+  test("traceability check の stdout 報告全文を summary 文字列に代えて保存せず併せて保持する", () => {
+    const traceabilityGate = buildKnownTraceabilityCheckSpec({
+      command: "bun",
+      scriptArgs: ["./checker.ts", "traceability-check"],
+      cwd: gate("traceability-check").cwd,
+      root: "C:/repo",
+      reqIds: ["REQ-061-049"],
+    });
+    const report = runAcceptDefinitionChecks(acceptanceInput({ traceabilityGate }), fakeRunner());
+    const step = report.result.steps.find((s) => s.name === "traceability-check");
+    expect(step?.detail.stdout).toBe(JSON.stringify({ summary: { pass: 9, fail: 0 } }));
+    expect(step?.detail.summary).toBe("pass=9 fail=0");
+    expect(step?.detail.targetRevision).toBe("abc123");
+    expect(step?.detail.targetPaths).toEqual(["C:/repo"]);
+  });
+
+  test("非ゼロ終了の整合性検査は証拠を保存し、後続ゲートを実行しない（後続抑止の維持）", () => {
+    const runner = fakeRunner({ integrityFailGate: "check_integrity" });
+    const report = runAcceptDefinitionChecks(acceptanceInput(), runner);
+    const saved = report.result.steps[0]?.detail["check_integrity"] as GateExecutionEvidence;
+    expect(saved.exitCode).toBe(3);
+    expect(saved.stderr).toBe("integrity NG");
+    expect(runner.calls.filter((c) => c.args.includes("overlap-cross-dependencies"))).toHaveLength(0);
+    expect(runner.calls.filter((c) => c.args.includes("traceability-check"))).toHaveLength(0);
+  });
+
+  test("同一条件の検査の再実行が発生しない（各ゲート1回、対象版取得1回）", () => {
+    const runner = fakeRunner();
+    runAcceptDefinitionChecks(acceptanceInput(), runner);
+    expect(runner.calls.filter((c) => c.args.includes("check_integrity"))).toHaveLength(1);
+    expect(runner.calls.filter((c) => c.args.includes("check_changed_docs"))).toHaveLength(1);
+    expect(runner.calls.filter((c) => c.args.includes("traceability-check"))).toHaveLength(1);
+    expect(runner.calls.filter((c) => c.args.includes("overlap-cross-dependencies"))).toHaveLength(1);
+    expect(runner.calls.filter((c) => c.command === "git" && c.args[0] === "rev-parse")).toHaveLength(1);
+  });
+
+  test("ff-only merge 失敗時に標準エラーの全文を保存する（末尾切り捨てに代えない）", () => {
+    const longStderr = `prefix-${"E".repeat(500)}`;
+    const runner = fakeRunner({ ffMergeFails: true });
+    const originalRun = runner.run.bind(runner);
+    runner.run = (spec) => {
+      if (spec.command === "git" && spec.args[0] === "merge") {
+        return { exitCode: 1, stdout: "", stderr: longStderr };
+      }
+      return originalRun(spec);
+    };
+    const report = runAcceptDefinitionChecks(cleanupInput(), runner);
+    const step = report.result.steps.find((s) => s.name === "canonical-reacquisition");
+    expect(step?.detail.stderr).toBe(longStderr);
+    expect((step?.detail.stderrTail as string).length).toBe(400);
+  });
+});
+
+describe("既知検査入力の事前検証と固定生成（不正入力は検査を開始せず拒否）", () => {
+  test("不正な --req 値（範囲構文）の gate spec で高価な検査を開始せず拒否する", () => {
+    const runner = fakeRunner();
+    const traceabilityGate: GateCommandSpec = {
+      ...gate("traceability-check"),
+      args: ["./checker.ts", "--req", "REQ-061-001..REQ-061-050"],
+    };
+    expect(() => runAcceptDefinitionChecks(acceptanceInput({ traceabilityGate }), runner)).toThrow(/--req/);
+    expect(runner.calls).toHaveLength(0);
+  });
+
+  test("--req の不正形式を検査を開始せず拒否する", () => {
+    const runner = fakeRunner();
+    const traceabilityGate: GateCommandSpec = {
+      ...gate("traceability-check"),
+      args: ["./checker.ts", "--req", "REQ-061-1"],
+    };
+    expect(() => runAcceptDefinitionChecks(acceptanceInput({ traceabilityGate }), runner)).toThrow(/--req/);
+    expect(runner.calls).toHaveLength(0);
+  });
+
+  test("非空必須 flag の空値を検査を開始せず拒否する", () => {
+    const runner = fakeRunner();
+    const traceabilityGate: GateCommandSpec = {
+      ...gate("traceability-check"),
+      args: ["./checker.ts", "--root", ""],
+    };
+    expect(() => runAcceptDefinitionChecks(acceptanceInput({ traceabilityGate }), runner)).toThrow(/--root/);
+    expect(runner.calls).toHaveLength(0);
+  });
+
+  test("正当な入力では必要検査が実行される（固定生成 spec の実経路）", () => {
+    const runner = fakeRunner();
+    const traceabilityGate = buildKnownTraceabilityCheckSpec({
+      command: "bun",
+      scriptArgs: ["./checker.ts"],
+      cwd: gate("traceability-check").cwd,
+      root: "C:/repo",
+      reqIds: ["REQ-061-049", "REQ-061-050"],
+    });
+    const report = runAcceptDefinitionChecks(acceptanceInput({ traceabilityGate }), runner);
+    expect(report.result.exitCategory).toBe("success");
+    const traceCall = runner.calls.find((c) => c.args.includes("--req"));
+    expect(traceCall?.args.slice(-2)).toEqual(["--req", "REQ-061-049,REQ-061-050"]);
+  });
+
+  test("固定生成: 下位契約の許容集合外 workflow 値を検査 spec の生成時に拒否する", () => {
+    expect(() =>
+      buildKnownWorkflowIntegrityGateSpec({
+        command: "bun",
+        scriptArgs: ["./check_changed_docs.ts"],
+        cwd: "C:/repo",
+        workflow: "design-sav",
+        allowedWorkflowValues: ["req-save", "design-save", "case-run", "case-close", "docs-check"],
+        root: "C:/repo",
+      }),
+    ).toThrow(/workflow value is rejected/);
+  });
+
+  test("固定生成: 許容集合内の workflow 値の spec は事前検証を通過して実行される", () => {
+    const runner = fakeRunner();
+    const spec = buildKnownWorkflowIntegrityGateSpec({
+      command: "bun",
+      scriptArgs: ["./check_changed_docs.ts"],
+      cwd: "C:/repo",
+      workflow: "design-save",
+      allowedWorkflowValues: ["req-save", "design-save", "case-run", "case-close", "docs-check"],
+      root: "C:/repo",
+    });
+    expect(() => preValidateGateSpec(spec)).not.toThrow();
+    const report = runAcceptDefinitionChecks(acceptanceInput({ integrityGates: [spec] }), runner);
+    expect(report.result.exitCategory).toBe("success");
+    const call = runner.calls.find((c) => c.args.includes("--workflow"));
+    expect(call?.args).toEqual(["./check_changed_docs.ts", "--workflow", "design-save", "--root", "C:/repo"]);
+  });
+
+  test("固定生成: buildKnownTraceabilityCheckSpec は REQ 行 ID 形式を生成時に検証する", () => {
+    expect(() =>
+      buildKnownTraceabilityCheckSpec({
+        command: "bun",
+        scriptArgs: ["./checker.ts"],
+        cwd: "C:/repo",
+        root: "C:/repo",
+        reqIds: ["REQ-061-49"],
+      }),
+    ).toThrow(/invalid requirement row id/);
+  });
+
+  test("固定生成: overlap と generate_indexes の spec は下位契約に沿った args を持つ", () => {
+    const overlap = buildKnownOverlapCheckSpec({
+      command: "bun",
+      scriptArgs: ["./inspect_cross_dependencies.ts"],
+      cwd: "C:/repo",
+      inputPath: "input.json",
+      root: "C:/repo",
+    });
+    expect(overlap.name).toBe("overlap-cross-check");
+    expect(overlap.args).toEqual(["./inspect_cross_dependencies.ts", "--input", "input.json", "--root", "C:/repo"]);
+    const gen = buildKnownGenerateIndexesSpec({ command: "bun", scriptArgs: ["./generate_indexes.ts"], cwd: "C:/repo" });
+    expect(gen.name).toBe("generate_indexes");
+    expect(gen.args).toEqual(["./generate_indexes.ts"]);
+  });
+
+  test("必須品質ゲートの省略拒否は入力検証（validateInput）で行われる", () => {
+    const base = acceptanceInput() as unknown as Record<string, unknown>;
+    expect(() => validateInput({ ...base, traceabilityGate: undefined })).toThrow(/omission forbidden/);
+  });
+});
+
+describe("実行証跡の構築（buildGateEvidence）", () => {
+  test("実行条件・終了コード・標準出力・標準エラー・対象版・対象パスを記録する", () => {
+    const spec: GateCommandSpec = { ...gate("traceability-check"), args: ["./checker.ts", "--root", "C:/repo", "traceability-check"] };
+    const evidence = buildGateEvidence(
+      spec,
+      { exitCode: 2, stdout: "report", stderr: "warn" },
+      "abc123",
+    );
+    expect(evidence.exitCode).toBe(2);
+    expect(evidence.stdout).toBe("report");
+    expect(evidence.stderr).toBe("warn");
+    expect(evidence.targetRevision).toBe("abc123");
+    expect(evidence.targetPaths).toEqual(["C:/repo"]);
+    expect(evidence.executedCommand.timeoutMs).toBe(60000);
   });
 });

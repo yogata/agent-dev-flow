@@ -27,6 +27,7 @@ implementation:
     - REQ-083-001
     - REQ-030-017
     - REQ-030-021
+    - REQ-030-026
     - REQ-061-046
   src/common/skills/agentdev-workflow-case-open/references/root-case-and-definition-package.md:
     - REQ-030-015
@@ -66,6 +67,8 @@ implementation:
   src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts:
     - REQ-030-017
     - REQ-030-021
+    - REQ-030-025
+    - REQ-030-026
     - REQ-061-046
 verification:
   src/common/skills/agentdev-workflow-case-open/references/root-case-and-definition-package.md:
@@ -76,4 +79,6 @@ verification:
   src/common/skills/agentdev-workflow-case-open/scripts/tests/prepare_definition_pr.test.ts:
     - REQ-030-017
     - REQ-030-021
+    - REQ-030-025
+    - REQ-030-026
     - REQ-061-046
