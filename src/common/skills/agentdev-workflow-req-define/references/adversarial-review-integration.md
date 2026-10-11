@@ -24,7 +24,7 @@
 
 ### Procedure
 
-review に進む前に、ドラフトの構造検査、決定的組立、組立後の差分検査をこの順で完了する（詳細と戻り値契約は [draft-generation.md](draft-generation.md)「決定的な局所組立・検査」を参照）。その後に意味レビューを行い、accepted finding の反映後は構造検査・組立・差分検査を再実行してから意味を再評価する。検査証拠は入力ハッシュと検査範囲が同一の場合のみ再利用し、結果と戻り値を draft の証拠として保持する。
+review に進む前に、ドラフトの構造検査、決定的組立、組立後の差分検査をこの順で完了する（詳細と戻り値契約は [draft-generation.md](draft-generation.md)「決定的な局所組立・検査」を参照）。その後に意味レビューを行い、accepted finding の反映後は構造検査・組立・差分検査を再実行してから意味を再評価する。検査証拠は draft-data 内の `assembly_evidence` へ記録し、再開時は現在条件照合（`evidence-match.ts`）で有効な証拠のみ再利用する。欠損・不一致の証拠は検証済みと扱わず、影響する検査を再実行してから意味レビューへ進む。
 
 req-define は adversarial-review を原則実行する（default-on）。
 発動条件判定と review 呼出を分離する。

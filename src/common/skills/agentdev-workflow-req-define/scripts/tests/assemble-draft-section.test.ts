@@ -1,5 +1,7 @@
 import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
 import {
+  ASSEMBLY_CHECKER,
   assembleDraftSection,
   findTargetAreaHeadings,
   headingMatchesTarget,
@@ -86,5 +88,62 @@ describe("assembleDraftSection append", () => {
     }, "## Target\nbody\n");
 
     expect(result.ok).toBe(false);
+  });
+});
+
+describe("assembly evidence", () => {
+  const original = "# Doc\n\n## Target\n\nold phrase\nkeep this\n\n## Other\nuntouched\n";
+
+  test("identifies the checker, version, settings, and result-affecting references", () => {
+    const result = assembleDraftSection({
+      operation: "replace",
+      target_file: "doc.md",
+      target_area: "## Target",
+      old_text: "old phrase",
+      new_text: "new phrase",
+    }, original, "2026-01-01T00:00:00.000Z");
+    if (!result.ok) throw new Error("expected success");
+
+    expect(result.evidence.checker).toEqual(ASSEMBLY_CHECKER);
+    expect(result.evidence.result_affecting_references.heading_match_rule).toContain("search-target-area.ts");
+    expect(result.evidence.result_affecting_references.scan_scope).toContain("target section");
+  });
+
+  test("records pre/post check summary and compact diff in the evidence", () => {
+    const result = assembleDraftSection({
+      operation: "append",
+      target_file: "doc.md",
+      anchor: "Target",
+      content: "new item",
+    }, original, "2026-01-01T00:00:00.000Z");
+    if (!result.ok) throw new Error("expected success");
+
+    expect(result.evidence.checks_summary.pre.all_ok).toBe(true);
+    expect(result.evidence.checks_summary.post.all_ok).toBe(true);
+    expect(result.evidence.checks_summary.pre.count).toBe(result.checks.pre.length);
+    expect(result.evidence.checks_summary.post.count).toBe(result.checks.post.length);
+    expect(result.evidence.diff_compact.added).toBe(result.diff_summary.added);
+    expect(result.evidence.diff_compact.removed).toBe(result.diff_summary.removed);
+    expect(result.evidence.diff_compact.changed_lines_count).toBe(result.diff_summary.changed_lines_count);
+  });
+
+  test("keeps the checker version in sync with the package version", () => {
+    const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf-8")) as { version: string };
+    const checkerVersion: string = ASSEMBLY_CHECKER.version;
+    expect(checkerVersion).toBe(pkg.version);
+  });
+
+  test("does not carry raw assembled content into the evidence", () => {
+    const result = assembleDraftSection({
+      operation: "replace",
+      target_file: "doc.md",
+      target_area: "## Target",
+      old_text: "old phrase",
+      new_text: "new phrase",
+    }, original, "2026-01-01T00:00:00.000Z");
+    if (!result.ok) throw new Error("expected success");
+
+    expect(JSON.stringify(result.evidence)).not.toContain("old phrase");
+    expect(JSON.stringify(result.evidence)).not.toContain("new phrase");
   });
 });

@@ -25,6 +25,39 @@ export type AssembleInput = {
 export type CheckResult = { name: string; ok: boolean; detail: string };
 export type HeadingMatch = { line: number; text: string; level: number; heading: string };
 
+/** 組立検査器の識別。evidence-match.ts の再開時照合で版・設定不一致を検査再実行の根拠とする。 */
+export const ASSEMBLY_CHECKER = {
+  name: "assemble-draft-section",
+  version: "0.1.0", // scripts/package.json の version と同期（tests で突合）
+  settings: {
+    heading_match: "exact-after-normalization",
+    old_text_count_check: true,
+  },
+} as const;
+
+/** 結果に影響する参照対象の識別（Design「組立検査証拠の同一実行内引継ぎ」節）。 */
+export type ResultAffectingReferences = {
+  heading_match_rule: string;
+  scan_scope: string;
+};
+
+/**
+ * 組立検査証拠。draft-data 内 `assembly_evidence` へ記録する論理記録であり
+ * 生の組立入力・出力を含まない。checks_summary と diff_compact は
+ * 前後検査結果と差分の論理サマリ。
+ */
+export type AssemblyEvidence = {
+  target_file: string;
+  target_content_sha256: string;
+  check_scope: { heading: string; start_line: number; end_line: number };
+  execution_conditions: { operation: Operation; edit_sha256: string; expected_old_count: number | null };
+  checker: typeof ASSEMBLY_CHECKER;
+  result_affecting_references: ResultAffectingReferences;
+  checks_summary: { pre: { count: number; all_ok: boolean }; post: { count: number; all_ok: boolean } };
+  diff_compact: { changed_lines_count: number; added: number; removed: number };
+  executed_at: string;
+};
+
 export type AssembleRejected = {
   ok: false;
   operation: Operation;
@@ -48,13 +81,7 @@ export type AssembleSuccess = {
     removed: number;
     hunks: Array<{ start_line: number; before: string[]; after: string[] }>;
   };
-  evidence: {
-    target_file: string;
-    target_content_sha256: string;
-    check_scope: { heading: string; start_line: number; end_line: number };
-    execution_conditions: { operation: Operation; edit_sha256: string; expected_old_count: number | null };
-    executed_at: string;
-  };
+  evidence: AssemblyEvidence;
   written: boolean;
   assembled_content: string;
 };
@@ -222,6 +249,16 @@ export function assembleDraftSection(
       target_content_sha256: sha256(original),
       check_scope: { heading: heading.heading, start_line: heading.line, end_line: end },
       execution_conditions: { operation: input.operation, edit_sha256: sha256(editMaterial), expected_old_count: input.operation === "replace" ? input.expected_old_count ?? 1 : null },
+      checker: ASSEMBLY_CHECKER,
+      result_affecting_references: {
+        heading_match_rule: "search-target-area.ts compatible: normalizeTargetArea + exact match only",
+        scan_scope: "target section only",
+      },
+      checks_summary: {
+        pre: { count: pre.length, all_ok: pre.every((check) => check.ok) },
+        post: { count: post.length, all_ok: post.every((check) => check.ok) },
+      },
+      diff_compact: { changed_lines_count: diff.changed_lines_count, added: diff.added, removed: diff.removed },
       executed_at: executedAt,
     },
     written: false,
