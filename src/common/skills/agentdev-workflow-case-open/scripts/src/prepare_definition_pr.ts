@@ -34,6 +34,27 @@ export interface CommandResult {
   stderr: string;
 }
 
+/**
+ * 1回の検査実行から保存する実行証跡。標準出力・標準エラーは全文を保持し、
+ * 末尾抜粋や集計要約で原結果を代替しない。実行条件は実行コマンド・引数・
+ * 作業ディレクトリ・指定された実行上限と対応付けて記録する。
+ */
+export interface GateExecutionEvidence {
+  executedCommand: {
+    command: string;
+    args: readonly string[];
+    cwd: string;
+    timeoutMs?: number;
+  };
+  exitCode: number;
+  stdout: string;
+  stderr: string;
+  /** 検査対象の版（実行時点の HEAD。取得できない場合は空文字）。 */
+  targetRevision: string;
+  /** 既知パス引数（--root、--input、--artifact、--files）から解決できた検査対象パス。 */
+  targetPaths: readonly string[];
+}
+
 /** script が外部処理を呼び出す経路。単体テストでは偽 runner を注入する。 */
 export interface MechanicalRunner {
   run(spec: CommandSpec): CommandResult;
@@ -186,6 +207,167 @@ export function validateInput(value: unknown): PrepareDefinitionPrInput {
   };
 }
 
+/**
+ * 既知 flag の値契約（配布下位検査の契約由来）。未知 flag は検証対象外とする。
+ */
+export interface KnownArgContract {
+  flag: string;
+  values?: readonly string[];
+  pattern?: RegExp;
+  nonEmpty?: boolean;
+}
+
+export const KNOWN_GATE_ARG_CONTRACTS: readonly KnownArgContract[] = [
+  { flag: "--req", pattern: /^(REQ-\d{3}-\d{3})(,REQ-\d{3}-\d{3})*$/ },
+  { flag: "--profile", values: ["source", "link"] },
+  { flag: "--fail-level", values: ["strict", "warning"] },
+  { flag: "--workflow", pattern: /^[a-z][a-z0-9-]*$/ },
+  { flag: "--root", nonEmpty: true },
+  { flag: "--input", nonEmpty: true },
+  { flag: "--artifact", nonEmpty: true },
+  { flag: "--evidence", nonEmpty: true },
+  { flag: "--revision", nonEmpty: true },
+  { flag: "--files", nonEmpty: true },
+  { flag: "--base-ref", nonEmpty: true },
+];
+
+/** 検査対象パスとして解決対象とする既知パス引数。 */
+const PATH_FLAG_CONTRACTS = ["--root", "--input", "--artifact", "--files"] as const;
+
+/** 報告 JSON に記録する意味のある flag の値を抽出する（--flag value / --flag=value の両形式）。 */
+export function extractFlagValue(args: readonly string[], flag: string): string | null {
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (arg === flag && args[i + 1] !== undefined) {
+      return args[i + 1] ?? null;
+    }
+    if (arg.startsWith(`${flag}=`)) {
+      return arg.slice(flag.length + 1);
+    }
+  }
+  return null;
+}
+
+/**
+ * 既知 gate 入力の事前検証。高価な検査の開始前に必須引数・対象・パス・許容値を
+ * 検証し、不正値は検査を開始せず MechanicalInputError で拒否する。形状検査だけでなく
+ * 下位引数の値（--req の範囲構文、許容集合外の値等）も拒否する。未知 flag は
+ * 検証対象外とし、任意コマンドの汎用解釈器を作らない。
+ */
+export function preValidateGateSpec(spec: GateCommandSpec): void {
+  for (const contract of KNOWN_GATE_ARG_CONTRACTS) {
+    const value = extractFlagValue(spec.args, contract.flag);
+    if (value === null) continue;
+    if (contract.nonEmpty === true && value.trim().length === 0) {
+      fail(`${contract.flag} requires a non-empty value`);
+    }
+    if (contract.values && !contract.values.includes(value)) {
+      fail(`${contract.flag} must be one of: ${contract.values.join(", ")} (got: ${value})`);
+    }
+    if (contract.pattern && !contract.pattern.test(value)) {
+      fail(`${contract.flag} value does not match the subordinate command contract: ${value}`);
+    }
+  }
+}
+
+/** 既知の下位検査の呼出形態（実体パスの解決は呼び出し側手順が行う）。 */
+export interface KnownGateInvocation {
+  command: string;
+  scriptArgs: readonly string[];
+  cwd: string;
+  timeoutMs?: number;
+}
+
+export interface KnownWorkflowGateInput extends KnownGateInvocation {
+  workflow: string;
+  /** 下位 checker 契約が定める --workflow 値の許容集合。 */
+  allowedWorkflowValues: readonly string[];
+  root: string;
+}
+
+export interface KnownTraceabilityGateInput extends KnownGateInvocation {
+  root: string;
+  reqIds: readonly string[];
+}
+
+function toGateSpec(
+  name: string,
+  invocation: KnownGateInvocation,
+  trailingArgs: readonly string[],
+): GateCommandSpec {
+  return {
+    name,
+    command: invocation.command,
+    args: [...invocation.scriptArgs, ...trailingArgs],
+    cwd: invocation.cwd,
+    ...(invocation.timeoutMs !== undefined ? { timeoutMs: invocation.timeoutMs } : {}),
+  };
+}
+
+function requireReqIdList(reqIds: readonly string[]): string {
+  for (const id of reqIds) {
+    if (!/^REQ-\d{3}-\d{3}$/.test(id)) {
+      fail(`invalid requirement row id: ${id}`);
+    }
+  }
+  return reqIds.join(",");
+}
+
+/** workflow 値付き integrity gate（check_changed_docs 等の下位契約）を既知入力型から固定生成する。 */
+export function buildKnownWorkflowIntegrityGateSpec(input: KnownWorkflowGateInput): GateCommandSpec {
+  if (!input.allowedWorkflowValues.includes(input.workflow)) {
+    fail(`workflow value is rejected by the subordinate checker contract (allowed: ${input.allowedWorkflowValues.join(", ")}): ${input.workflow}`);
+  }
+  return toGateSpec("integrity-check", input, ["--workflow", input.workflow, "--root", input.root]);
+}
+
+/** traceability check の gate spec を既知入力型と下位契約から固定生成する。 */
+export function buildKnownTraceabilityCheckSpec(input: KnownTraceabilityGateInput): GateCommandSpec {
+  return toGateSpec("traceability-check", input, ["--root", input.root, "--req", requireReqIdList(input.reqIds)]);
+}
+
+/** generate_indexes の gate spec を既知入力型から固定生成する。 */
+export function buildKnownGenerateIndexesSpec(input: KnownGateInvocation): GateCommandSpec {
+  return toGateSpec("generate_indexes", input, []);
+}
+
+/** check_integrity の gate spec を既知入力型から固定生成する。 */
+export function buildKnownCheckIntegritySpec(input: KnownGateInvocation): GateCommandSpec {
+  return toGateSpec("check_integrity", input, []);
+}
+
+function resolveTargetPaths(args: readonly string[]): string[] {
+  const found: string[] = [];
+  for (const flag of PATH_FLAG_CONTRACTS) {
+    const value = extractFlagValue(args, flag);
+    if (value !== null && value.trim().length > 0) {
+      found.push(value);
+    }
+  }
+  return found;
+}
+
+/** 1回の検査実行から実行証跡を構築する（終了コード取得のための再実行を不要にする）。 */
+export function buildGateEvidence(
+  spec: GateCommandSpec,
+  result: CommandResult,
+  targetRevision: string,
+): GateExecutionEvidence {
+  return {
+    executedCommand: {
+      command: spec.command,
+      args: spec.args,
+      cwd: spec.cwd,
+      ...(spec.timeoutMs !== undefined ? { timeoutMs: spec.timeoutMs } : {}),
+    },
+    exitCode: result.exitCode,
+    stdout: result.stdout,
+    stderr: result.stderr,
+    targetRevision,
+    targetPaths: resolveTargetPaths(spec.args),
+  };
+}
+
 /** 編集をファイル内容へ適用する（旧文は完全一致・一意。該当なしは失敗）。 */
 export function applyDefinitionEdit(content: string, edit: DefinitionEdit): string {
   const first = content.indexOf(edit.oldText);
@@ -244,6 +426,10 @@ export function runPrepareDefinitionPr(
   const worktreeAbs = path.resolve(repoRoot, input.worktreeRoot);
   const worktreeCwd = worktreeAbs;
 
+  for (const spec of [input.generateIndexesGate, input.checkIntegrityGate, input.traceabilityGate]) {
+    if (spec != null) preValidateGateSpec(spec);
+  }
+
   const worktreeList = runner.run({ command: "git", args: ["worktree", "list", "--porcelain"], cwd: repoRoot });
   const normalize = (p: string): string => path.resolve(p).replace(/\\/g, "/").toLowerCase();
   const worktreeExists = worktreeList.stdout
@@ -280,6 +466,9 @@ export function runPrepareDefinitionPr(
 
   let editFail = false;
   const editedPaths: string[] = [];
+  const preCommitRevision = runner
+    .run({ command: "git", args: ["rev-parse", "HEAD"], cwd: worktreeCwd })
+    .stdout.trim();
   for (const edit of input.definitionEdits) {
     const abs = path.resolve(worktreeCwd, edit.path);
     let content: string;
@@ -330,6 +519,7 @@ export function runPrepareDefinitionPr(
         exitCode: gen.exitCode,
         executed: input.requiresIndexRegeneration,
         stderrTail: gen.exitCode === 0 ? "" : gen.stderr.trim().slice(-400),
+        ...buildGateEvidence(input.generateIndexesGate, gen, preCommitRevision),
       },
     });
     if (gen.exitCode !== 0) {
@@ -377,6 +567,7 @@ export function runPrepareDefinitionPr(
         stagedPaths: input.stagePaths,
         head,
         stderrTail: commit.exitCode === 0 ? "" : commit.stderr.trim().slice(-400),
+        stderr: commit.exitCode === 0 ? "" : commit.stderr.trim(),
       },
     });
     if (commit.exitCode !== 0) {
@@ -390,7 +581,11 @@ export function runPrepareDefinitionPr(
       steps.push({
         name: "check_integrity",
         status: check.exitCode === 0 ? "pass" : "fail",
-        detail: { exitCode: check.exitCode, stderrTail: check.exitCode === 0 ? "" : check.stderr.trim().slice(-400) },
+        detail: {
+          exitCode: check.exitCode,
+          stderrTail: check.exitCode === 0 ? "" : check.stderr.trim().slice(-400),
+          ...buildGateEvidence(input.checkIntegrityGate, check, head),
+        },
       });
       if (check.exitCode !== 0) {
         warnings.push("check_integrity failed");
@@ -428,7 +623,12 @@ export function runPrepareDefinitionPr(
       steps.push({
         name: "traceability-check",
         status: gateFailed ? "fail" : "pass",
-        detail: { exitCode: check.exitCode, summary, reqIds: input.traceabilityReqIds ?? [] },
+        detail: {
+          exitCode: check.exitCode,
+          summary,
+          reqIds: input.traceabilityReqIds ?? [],
+          ...buildGateEvidence(input.traceabilityGate, check, head),
+        },
       });
       if (gateFailed) {
         warnings.push("traceability check failed");

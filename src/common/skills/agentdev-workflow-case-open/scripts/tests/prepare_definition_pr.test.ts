@@ -3,12 +3,19 @@ import { describe, expect, test } from "bun:test";
 import {
   applyDefinitionEdit,
   assembleReport,
+  buildGateEvidence,
+  buildKnownCheckIntegritySpec,
+  buildKnownGenerateIndexesSpec,
+  buildKnownTraceabilityCheckSpec,
+  buildKnownWorkflowIntegrityGateSpec,
   decideExitCode,
+  preValidateGateSpec,
   runPrepareDefinitionPr,
   validateInput,
   type CommandResult,
   type DefinitionEdit,
   type GateCommandSpec,
+  type GateExecutionEvidence,
   type MechanicalRunner,
   type PrepareDefinitionPrInput,
 } from "../src/prepare_definition_pr";
@@ -265,5 +272,118 @@ describe("報告 JSON の4要素組み立て", () => {
     );
     expect(Object.keys(report).sort()).toEqual(["diff", "proposal", "result", "warnings"]);
     expect(decideExitCode(report)).toBe(2);
+  });
+});
+
+describe("検査証拠の一括保存と結果消費（標準出力・標準エラー・終了コード・対象版・実行条件）", () => {
+  test("generate_indexes と check_integrity の stdout・stderr 全文と対象版・実行条件を保存する", () => {
+    const runner = fakeRunner();
+    const originalRun = runner.run.bind(runner);
+    runner.run = (spec) => {
+      if (spec.command === "bun" && spec.args.includes("check_integrity")) {
+        return { exitCode: 3, stdout: "", stderr: "integrity full report" };
+      }
+      return originalRun(spec);
+    };
+    const report = runPrepareDefinitionPr(input(), runner);
+    const gen = report.result.steps.find((s) => s.name === "generate_indexes");
+    expect(gen?.detail.executedCommand).toMatchObject({ command: "bun", cwd: gate("generate_indexes").cwd });
+    expect(gen?.detail.targetRevision).toBe("abc123");
+    const check = report.result.steps.find((s) => s.name === "check_integrity");
+    expect(check?.detail.exitCode).toBe(3);
+    expect(check?.detail.stderr).toBe("integrity full report");
+    expect(check?.detail.stderrTail).toBe("integrity full report");
+    expect(check?.detail.targetRevision).toBe("abc123");
+    expect(decideExitCode(report)).toBe(1);
+  });
+
+  test("traceability check の stdout 報告全文を summary 文字列に代えて保存せず併せて保持する", () => {
+    const runner = fakeRunner();
+    const report = runPrepareDefinitionPr(input(), runner);
+    const step = report.result.steps.find((s) => s.name === "traceability-check");
+    expect((step?.detail.stdout as string).length).toBeGreaterThan(0);
+    expect((step?.detail.executedCommand as GateExecutionEvidence["executedCommand"]).args).toContain("traceability-check");
+    expect(step?.detail.targetRevision).toBe("abc123");
+  });
+
+  test("同一条件の検査の再実行が発生しない（各ゲート1回、対象版取得1回）", () => {
+    const runner = fakeRunner();
+    runPrepareDefinitionPr(input(), runner);
+    expect(runner.calls.filter((c) => c.command === "bun" && c.args.includes("generate_indexes"))).toHaveLength(1);
+    expect(runner.calls.filter((c) => c.command === "bun" && c.args.includes("check_integrity"))).toHaveLength(1);
+    expect(runner.calls.filter((c) => c.command === "bun" && c.args.includes("traceability-check"))).toHaveLength(1);
+    expect(runner.calls.filter((c) => c.command === "git" && c.args[0] === "rev-parse")).toHaveLength(2);
+  });
+});
+
+describe("既知検査入力の事前検証と固定生成（不正入力は検査を開始せず拒否）", () => {
+  test("不正な --req 値（範囲構文）の gate spec で worktree 操作等の副作用を開始せず拒否する", () => {
+    const runner = fakeRunner();
+    const traceabilityGate: GateCommandSpec = {
+      ...gate("traceability-check"),
+      args: ["./checker.ts", "--req", "REQ-NNNN-NNN..REQ-NNNN-NNM"],
+    };
+    expect(() => runPrepareDefinitionPr(input({ traceabilityGate }), runner)).toThrow(/--req/);
+    expect(runner.calls).toHaveLength(0);
+  });
+
+  test("非空必須 flag の空値を検査を開始せず拒否する", () => {
+    const runner = fakeRunner();
+    const broken = input({
+      checkIntegrityGate: { ...gate("check_integrity"), args: ["./checker.ts", "--root", ""] },
+    });
+    expect(() => runPrepareDefinitionPr(broken, runner)).toThrow(/--root/);
+    expect(runner.calls).toHaveLength(0);
+  });
+
+  test("固定生成: buildKnownTraceabilityCheckSpec の生成 spec は事前検証を通過して実行される", () => {
+    const runner = fakeRunner();
+    const traceabilityGate = buildKnownTraceabilityCheckSpec({
+      command: "bun",
+      scriptArgs: ["./checker.ts", "traceability-check"],
+      cwd: gate("traceability-check").cwd,
+      root: "C:/repo/.worktrees/10-definition",
+      reqIds: ["REQ-000-001"],
+    });
+    expect(() => preValidateGateSpec(traceabilityGate)).not.toThrow();
+    const report = runPrepareDefinitionPr(input({ traceabilityGate }), runner);
+    expect(report.result.exitCategory).toBe("success");
+    const traceCall = runner.calls.find((c) => c.args.includes("--req"));
+    expect(traceCall?.args.slice(-2)).toEqual(["--req", "REQ-000-001"]);
+    expect(traceCall?.args.slice(-4, -2)).toEqual(["--root", "C:/repo/.worktrees/10-definition"]);
+  });
+
+  test("固定生成: 下位契約の許容集合外 workflow 値を検査 spec の生成時に拒否する", () => {
+    expect(() =>
+      buildKnownWorkflowIntegrityGateSpec({
+        command: "bun",
+        scriptArgs: ["./check_changed_docs.ts"],
+        cwd: gate("check_integrity").cwd,
+        workflow: "case-reaady",
+        allowedWorkflowValues: ["req-save", "design-save", "case-run", "case-close", "docs-check"],
+        root: "C:/repo",
+      }),
+    ).toThrow(/workflow value is rejected/);
+  });
+
+  test("固定生成: check_integrity と generate_indexes の spec は既知 gate 名を持つ", () => {
+    const integrity = buildKnownCheckIntegritySpec({ command: "bun", scriptArgs: ["./check_integrity.ts"], cwd: "C:/repo" });
+    expect(integrity.name).toBe("check_integrity");
+    expect(integrity.args).toEqual(["./check_integrity.ts"]);
+    const gen = buildKnownGenerateIndexesSpec({ command: "bun", scriptArgs: ["./generate_indexes.ts"], cwd: "C:/repo" });
+    expect(gen.name).toBe("generate_indexes");
+    expect(gen.args).toEqual(["./generate_indexes.ts"]);
+  });
+
+  test("実行証跡: buildGateEvidence は実行条件と対象パスを記録する", () => {
+    const evidence = buildGateEvidence(
+      gate("traceability-check"),
+      { exitCode: 0, stdout: "report", stderr: "" },
+      "abc123",
+    );
+    expect(evidence.exitCode).toBe(0);
+    expect(evidence.stdout).toBe("report");
+    expect(evidence.targetRevision).toBe("abc123");
+    expect(evidence.executedCommand.timeoutMs).toBe(60000);
   });
 });

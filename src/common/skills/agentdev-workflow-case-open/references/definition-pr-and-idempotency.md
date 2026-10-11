@@ -34,6 +34,14 @@ STEP-4 の機械工程（専用 worktree 作成、Definition branch 作成、REQ
 4. 冪等再実行: script は既存 worktree を検出した場合は期待 branch 上のとき再利用し、別 branch のとき失敗を返す。再実行時は編集旧文の不在（適用済み）を失敗として報告するため、再実行前に報告 JSON と git 状態から適用済みの工程を確認し、不足分のみを入力 JSON に含める
 5. 新規 REQ/Decision ファイルを含む Definition 変更では、当該ファイルを script 呼び出しの前段で手動配置する。agentdev-git-worktree 標準手順（type=definition）による worktree 前置作成の後、node の writeFileSync による UTF-8 明示で worktree 内へ配置し、script の冪等再利用（branch 確認済み worktree 再利用）と整合して扱う。本手順は DefinitionEdit の入力契約（path / oldText / newText の旧文完全一致置換）を拡張せず、DefinitionEdit への create 操作は追加しない
 
+#### 品質ゲート入力の固定生成と事前検証、検査証拠の保存
+
+品質ゲート実行仕様（GateCommandSpec）の入力 JSON は、既知入力型と下位検査の契約から固定生成する。
+
+- **固定生成**: traceability check、workflow 値付き integrity gate 等の既知ゲートは、script 配下の固定生成関数（`buildKnownTraceabilityCheckSpec`、`buildKnownWorkflowIntegrityGateSpec`、`buildKnownCheckIntegritySpec`、`buildKnownGenerateIndexesSpec`）で既知入力型の値（root、REQ 行 ID、workflow 値とその下位契約の許容集合）から組み立てる。workflow 値は下位 checker 契約の許容集合から選択し、許容集合外の値は spec の生成時に拒否される。REQ 行 ID は生成時に形式検証される
+- **事前検証**: script は高価な検査と worktree 操作の開始前に、既知 flag 契約（--req は REQ 行 ID の個別カンマ列挙のみで範囲構文は非対応、--profile は source と link、--workflow は形式妥当性、--root と --input 等のパス引数は非空）に従い各 gate spec を検証する。不正な値は検査を開始せず終了コード 1 で拒否する。正当な入力では必要検査が実行される。未知 flag は検証対象外であり、任意コマンドの汎用解釈器は作らない
+- **検査証拠の保存**: 報告 JSON の各 step detail には、標準出力・標準エラーの全文、終了コード、対象版（実行時点の HEAD を targetRevision）、実行条件（実行コマンド・引数・作業ディレクトリ・実行上限を executedCommand）を同じ検査実行から保存する。末尾切り捨て（stderrTail）と要約（summary）は既存 field として併存するが、原結果の全文は detail で確認できる。終了コードや証拠の再取得を目的とした同一条件の再実行を行わない。非ゼロ終了の整合性検査は証拠を保存した上で後続ゲートを実行しない（後続抑止の維持）
+
 #### traceability check の gate 判定仕様と計測日収束
 
 - **gate 判定仕様**: traceability check の gate 判定は、終了コードの一律比較ではなく報告 JSON の checks 各検査種別の status で行う。traceability check の終了コードは 9 種検査全体の合否であり、case-run / case-ready 段階の前提である missing-implementation / missing-verification の既存欠落を含むため、case-open の正規ゲート（対象 REQ 行の missing-design 0 件）と意味が一致しない。判定は対象 REQ 行を gate 対象として入力に宣言した上で、missing-design は対象 REQ 行の findings が 0 件のとき pass、1 件以上のとき fail とする。missing-design 以外の検査種別は status: fail のとき fail とする。対象 REQ 行外の missing-design（既存欠落の既知債務）は gate 判定を変更せず、本工程の失敗へ読み替えない。対象 REQ 行外の既存債務（corpus 全体の missing-implementation 等）により gate fail となった場合は、対照救済手順を適用できる。対照救済は worktree HEAD と main HEAD の両方で check を実行し、findings が完全一致・差分 0 件であることを機械証明して本変更起因の検出悪化 0 件を根拠づけ、PR 作成可と判断する手順である。対照救済は既存債務を本工程の失敗へ読み替えないことを機械証明する手続であり、対象 REQ 行内の missing-design には適用しない。いずれの補足も「fail を pass へ変換しない」原則と整合する。対照救済の判断と証跡は PR 本文の検証差分へ記録する
