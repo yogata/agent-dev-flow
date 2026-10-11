@@ -100,3 +100,19 @@
 - **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md（check_integrity 対処手順）
 - **関連**: Case #3627、PR #3633、commit 05d392b6（baseline 手動追加 commit）、.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts（--update-ir055-baseline 実装）
 - **タグ**: `#baseline` `#ir-055` `#provenance` `#workflow-deviation`
+
+## prepare_definition_pr が Design 追記の見出しのみを適用し本文段落を欠落させ、PR 検証欄が verbatim 適用を誤主張する
+
+- **問題事象**: case-open STEP-4 の Definition PR（Case #3642 / PR #3643）で、artifact_actions（ACT-DESIGN-001〜004）の Design 追記が節見出し行のみ適用され、合意済み本文段落 7 段落が PR 差分に存在しなかった。PR 本文の検証欄は「artifact_actions の合意済み content を verbatim で適用した」と記載しており、適用実態と検証記録が不一致だった
+- **発生局面**: 実装（case-open STEP-4 の Definition 編集・PR 作成。case-ready STEP-1 の忠実性検査で検出）
+- **検知方法**: case-ready の忠実性機械検査（draft の ACT content と PR branch ファイルの verbatim 包含突合）で 4/7 ACT が MISSING と判定。git diff で見出し+空行のみ追加され本文不在を確認
+- **根本原因**: 検証記録が組立の dry-run 証拠（assembly_verification の edit_sha256）の再確認ではなく、適用予定内容の記述になっており、適用後の成果物への突合が行われていなかった。見出しだけ適用される部分適用モードが prepare_definition_pr 側で発生しても検出ゲートが存在しなかった
+- **自律対応内容**: case-ready 側で draft の検証済み組立条件（assemble-draft-section.ts、target_sha256/edit_sha256 突合）により Design 4 ファイルを事前状態へ復元の上で再適用し、修復 commit 430a1928 で既存 PR を再利用して受入検査 4 ゲートを再実行の上 merge した。PR 本文の検証記録と yomiyasu 記録を実態に合わせて訂正した
+- **ユーザー確認有無**: なし（既存 PR 再利用の修復経路。人間に留保された判断の新規確定なし）
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: Definition 適用系 script の報告・PR 記録は「適用予定」ではなく「適用後成果物の機械突合証跡」でなければならない。verbatim 適用の主張には適用後ファイルへの包含突合（または edit_sha256 再現）を伴う
+- **再発条件**: prepare_definition_pr（または同型の Definition 適用 script）が anchor 節への追記で見出し行のみを適用し、適用後突合を行わずに PR を作成するとき、Design 追記系の artifact_action で毎回発生し得る
+- **予防策候補**: case-open STEP-4 の受入検査へ「artifact_actions の content と適用後ファイルの verbatim 包含突合（7/7 CHECK）」を追加する。または prepare_definition_pr の報告 JSON へ適用後 file sha256 を含め case-ready が突合できる形にする
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md（STEP-4 手順への適用後突合追加）、src/common/skills/agentdev-workflow-case-ready/references/definition-acceptance.md（忠実性確認の機械手順明文化）
+- **関連**: Case #3642、PR #3643、修復 commit 430a1928、.agentdev/drafts の assembly_verification 記録（draft は case-ready 成功後に削除済み。証跡は PR #3643 本文の検証差分へ記録）
+- **タグ**:   

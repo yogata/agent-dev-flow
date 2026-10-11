@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261011T180756Z-5624",
+  "workflow": "case-ready",
+  "evaluationKind": "scope-overlap-detection",
+  "subject": "Case #3642 と既存オープン Issue のスコープ交差",
+  "sourceRevision": "d94551cba0cb6fe85814df55044d7337767eea17",
+  "durationMs": 387,
+  "inputTokens": 926,
+  "inputs": {
+    "requestDigest": "71e24999841d6ee17f87e111eb1e1ef1fb864fb1c69fbd8b12ffa81dc9110617",
+    "references": [
+      {
+        "digest": "927f16c784fbca1972ffd3ba2575111da5ef87ae591dfba31f55e58c33986890",
+        "label": "req_draft",
+        "path": ".agentdev/drafts/req-draft-adf-impl-start-latency-reduction.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-overlap-exists",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.13,
+        "false": 0.87
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-overlap-exists",
+        "value": false
+      }
+    ]
+  }
+}
