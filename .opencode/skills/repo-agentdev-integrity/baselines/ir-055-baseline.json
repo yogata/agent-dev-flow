@@ -210,6 +210,14 @@
       "count": 2,
       "classification": "baseline",
       "reason": "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）"
+    },
+    {
+      "file": "src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md",
+      "pattern": "docs/designs/",
+      "severity": "heuristic",
+      "count": 1,
+      "classification": "baseline",
+      "reason": "意図的残存: AG-001 合意内容の派生物例示（docs/designs/quality/req-health-metrics.md の REQ 行数 AUTOGEN）を reference へ明文化する誘導参照として保持（provenance: Case #3627・2026-10-11 case-open 時に approved 登録）"
     }
   ],
   "warning_total_cap": 58
