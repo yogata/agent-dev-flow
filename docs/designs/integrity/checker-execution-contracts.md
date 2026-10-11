@@ -64,6 +64,7 @@ checker の新規実装・修正時に適用するパターンマッチと網羅
 - em-dash 導入時のゲート方針: em-dash（—）を配布文書へ導入する場合は、意図しない異言語文字・記号の混入を検出する既存 checker の許容更新（導入対象の明示）を同一 PR で行うことを方針とする。checker 実装自体の変更は別 Case の責務であり、本 Design は方針のみを所有する
 - check_integrity の typecheck 対象外範囲: check_integrity（docs-check）の typecheck 対象は現行の対象範囲に限定し、配布 skill scripts 全体への対象拡張は行わない（対象拡張は本方針の対象外）。対象範囲の拡張判断は別途設計判断を要する
 - traceability corpus の走査対象方針: traceability corpus の一次走査対象は、リポジトリ top-level `traceability/` 配下の YAML ファイル（component / package 単位 sidecar、`policy.yaml`）とする。sidecar と policy.yaml は対応関係と検証スコープの正規情報源であり、拡張子 `.yaml` / `.yml` を走査対象へ追加する。inline declaration（producer-only artifact の ADF-COVERS 宣言行）の走査対象拡張子は現行の `.md`、`.ts` を維持する。inline declaration は producer-only serialization であり、対応関係の完全性判定は sidecar を正規情報源として行うため、inline 走査の拡張子制限が完全性判定を制限しない
+- 宣言配置規約（対象外拡張子ファイルの対応宣言）: inline 宣言の走査対象は拡張子 .md / .ts の producer-only artifact のみであり（現行の走査対象方針を維持）、対象外拡張子のファイル（.ps1 等のスクリプト）の implementation / design 対応は top-level traceability/ 配下の sidecar へ宣言する。対象外拡張子ファイル内の ADF-COVERS 形式コメントは正規の対応宣言として扱わず、新規に配置しない。既存の対象外拡張子ファイル内の同形式コメントは sidecar 宣言への集約後に撤去する
 - docs/reports（履歴参照領域）: `docs/reports/` 配下（監査・評価・観測の Report）は履歴記録領域として各検出の対象から除外する。IR-067 の docs/reports 免除・REQ-053-039（歴史記録是正対象外）と同一の位置づけであり、traceability corpus の走査対象からも除外する。Report 文書内の REQ 行 ID 参照は歴史記録として対応関係管理対象外とする
 
 ## baseline 退避物と BaselineFile の役割分離と合否判定基準
