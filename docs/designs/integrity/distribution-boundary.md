@@ -8,6 +8,7 @@ updated: "2026-10-03"
 <!-- ADF-COVERS(implementation): REQ-009-045 -->
 <!-- ADF-COVERS(implementation): REQ-029-001, REQ-029-002, REQ-029-003, REQ-029-004, REQ-029-005, REQ-029-006, REQ-029-007, REQ-029-008 -->
 <!-- ADF-COVERS(design): REQ-029-010, REQ-029-011 -->
+<!-- ADF-COVERS(design): REQ-029-001, REQ-029-002, REQ-029-003, REQ-029-004, REQ-029-005, REQ-029-006, REQ-029-007, REQ-029-008 -->
 <!-- ADF-COVERS(design): REQ-031-032 -->
 
 # 配布依存境界 Design
