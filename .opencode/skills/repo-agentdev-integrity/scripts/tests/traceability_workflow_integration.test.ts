@@ -261,8 +261,8 @@ describe("case-ready トレーサビリティ完全性ゲート契約（REQ-061-
 describe("REQ 保存・Root Case 確立の対応不在非阻害（REQ-021-012、REQ-021-024、TS-010）", () => {
   it("case-open 本文が Design 対応未成立でも Root Case 確立を妨げないことを記述する", () => {
     const skill = read("src/common/skills/agentdev-workflow-case-open/SKILL.md");
-    expect(skill.includes("Design 対応が未成立でも Root Case の確立を妨げない")).toBe(true);
-    expect(skill.includes("Design 対応の成立判定（トレーサビリティ完全性ゲート）は case-ready が所有する")).toBe(true);
+    expect(skill.includes("設計根拠対応が未成立でも Root Case の確立を妨げない")).toBe(true);
+    expect(skill.includes("設計根拠対応の成立判定（トレーサビリティ完全性ゲート）は case-ready が所有する")).toBe(true);
   });
 
   it("req-define 本文が対応作成除外と保存非阻害を記述する（REQ-021-012）", () => {
