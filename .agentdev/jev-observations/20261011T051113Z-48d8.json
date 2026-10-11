@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261011T051113Z-48d8",
+  "workflow": "backlog-auto/inspect-promote",
+  "evaluationKind": "adversarial-review-trigger",
+  "subject": "inspect inbox 新規 1件 暫定分類（promote6・defer11・file-level defer）の adversarial-review 発動条件",
+  "sourceRevision": "beb76dbc03d0d45deb4ad487c7b9a45b2ea78982",
+  "durationMs": 748,
+  "inputTokens": 865,
+  "inputs": {
+    "requestDigest": "2d0fe8a51c140e70ad8750c262a834a67695c94e024e4adf172bedf4573d06a4",
+    "references": [
+      {
+        "digest": "3f8271a1f6abf219dbfe9f0da0ddfa64ff41fa3b42324707efd7464783dcf4a0",
+        "label": "検出事項ファイル 20261011T033142Z（17 findings）",
+        "path": ".agentdev/inspect/inbox/inspect-docs-finding-20261011T033142Z.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "review_trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.95,
+        "false": 0.050000000000000044
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "review_trigger",
+        "value": true
+      }
+    ]
+  }
+}
