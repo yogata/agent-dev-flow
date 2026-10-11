@@ -137,6 +137,22 @@ describe("受入検査 phase（忠実性・整合性・品質検査、overlap �
     expect(overlapCall?.cwd).toBe("C:/repo");
   });
 
+  test("detection_unavailable が空配列のとき summary は detection_unavailable=true を表示しない", () => {
+    const runner = fakeRunner({ overlapReport: { warnings: [], detection_unavailable: [] } });
+    const report = runAcceptDefinitionChecks(acceptanceInput(), runner);
+    const overlap = report.result.steps.find((s) => s.name === "overlap-cross-check");
+    expect(overlap?.status).toBe("pass");
+    expect(overlap?.detail.summary).toBe("warnings=0 detection_unavailable=false");
+  });
+
+  test("detection_unavailable が1件以上の要素を持つとき summary は detection_unavailable=true を表示する", () => {
+    const runner = fakeRunner({ overlapReport: { warnings: [], detection_unavailable: ["engine-x"] } });
+    const report = runAcceptDefinitionChecks(acceptanceInput(), runner);
+    const overlap = report.result.steps.find((s) => s.name === "overlap-cross-check");
+    expect(overlap?.status).toBe("pass");
+    expect(overlap?.detail.summary).toBe("warnings=0 detection_unavailable=true");
+  });
+
   test("AUTOGEN 再生成差分を検出した場合は警告とともに要判断を返す（復元を実施）", () => {
     const runner = fakeRunner({ autogenDiff: " docs/README.md | 2 +-\n" });
     const report = runAcceptDefinitionChecks(acceptanceInput(), runner);
