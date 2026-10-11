@@ -65,12 +65,6 @@
     ./scripts/self-sync.ps1 -Mode apply -Hosts both
 #>
 
-# ADF-COVERS(implementation): REQ-050-001, REQ-050-003, REQ-050-005, REQ-050-006, REQ-050-007
-# ADF-COVERS(implementation): REQ-052-007, REQ-052-008
-# ADF-COVERS(implementation): REQ-058-001, REQ-058-002, REQ-058-003, REQ-058-004, REQ-058-005, REQ-058-006, REQ-058-007, REQ-058-008, REQ-058-009, REQ-058-010, REQ-058-011, REQ-058-012
-# ADF-COVERS(implementation): REQ-050-015
-# ADF-COVERS(implementation): REQ-099-010, REQ-099-011, REQ-099-012
-
 #Requires -Version 7.0
 
 param(

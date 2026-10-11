@@ -36,3 +36,67 @@
 - **想定反映先**: agentdev-issue-management（issue-operation-safety.md の search トークン選択性指針）または agentdev-workflow-case-open SKILL 本文の冪等分岐節
 - **関連**: Root Case #3625、src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md、docs/designs/workflows/issue-title-policy.md
 - **タグ**: `#gh-workaround` `#idempotency`
+
+## 配布 reference 追記に docs/designs/ 等の具参照を含めると IR-055 が新規 delta として検出される
+
+- **問題事象**: case-open STEP-4 の Definition 編集（case-ready 配布 reference readiness-and-cleanup.md への横断依存検査入力構成規律追記）において、追記文面に「docs/designs/** の ADF-COVERS 宣言」という docs/designs/ 具参照を含めた。prepare_definition_pr.ts の check_integrity ゲートで IR-055 runtime-unresolved-reference の新規 delta（baseline 未登録）1 件が検出され、ゲートが fail した
+- **発生局面**: 実装（case-open STEP-4 の機械工程、check_integrity ゲート実行）
+- **検知方法**: prepare_definition_pr.ts 報告 JSON の check_integrity step status: fail（exit 1、1 new unmanaged NG）。手動再実行の JSON 報告で新規 warning の message「New heuristic violation: docs/designs/ reference 'docs/designs/' detected (IR-055 delta from baseline)」を確認
+- **根本原因**: 配布物（src/common/**）は runtime 投影先（.opencode/ 等）から docs/designs/ を直接参照できない（配布物具体参照禁止、IR-055）。追記文面を draft 合意文（AG-001）から転記する際、合意文の docs/designs/** 表記をそのまま持ち込んだ
+- **自律対応内容**: 追記の該当箇所を抽象化参照（「Design 文書に配置された ADF-COVERS 宣言」）へ修正し、既存 worktree 再利用で不足分のみ再実行（definition-edit、stage-and-commit、check_integrity、traceability-check）して pass を確認した。修正を Definition PR #3630（commit fde2c95d）へ含めた
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 配布物へ docs 配下の Design/REQ 内容を転記する場合は、docs/designs/・docs/requirements/ 等のパス文字列を具参照として書かず抽象化参照に置き換える。AGENTS.md・reference・SKILL の編集で docs 配下パスを引用する際も同様
+- **再発条件**: 配布物（src/common/** 等の配布対象）への docs 配下パスを含む文面の追記・転記を行ったとき
+- **予防策候補**: docs 配下パス文字列を配布物へ書く前に IR-055（runtime-unresolved-reference）の検出対象であることを確認する。転記時に「正規成果物の Design 文書」「該当 Design」等の抽象化参照へ置換する運用
+- **想定反映先**: 配布物編集を伴う workflow skill（case-run / case-open references）への具参照禁止の注記。yomiyasu 拡張 rule の指摘候補への追加は learning-promote での昇華判断に委ねる
+- **関連**: Root Case #3629、Definition PR #3630、src/common/skills/agentdev-workflow-case-ready/references/readiness-and-cleanup.md、docs/designs/integrity/rules/IR-055-runtime-unresolved-reference.md
+- **タグ**: `#integrity` `#distribution-boundary`
+
+## 横断依存検査の共有領域 autogen-req-index に req-row-mentions を使うと REQ 単位集計索引との不一致で未登録需要が生じる
+
+- **問題事象**: case-open STEP-5 の横断依存検査で、AUTOGEN 対象索引（req-health-metrics.md、requirements/README.md）を共有領域 kind req-row-mentions（行 ID 出現照合）として構成したところ、REQ 行を追加しない Case（本 Case REQ-061-029 を含む 7 Case）の対象行が索引本文に出現しないため「未登録行の重複需要」として警告対象に上がった（condition (b) case_count 7）
+- **発生局面**: 実装（case-open STEP-5 の横断依存検査、検査入力 JSON の shared_areas 構成）
+- **検知方法**: inspect_cross_dependencies.ts の報告 JSON（condition_b.autogen-req-index.demand_cases）と共有領域の性質（req-metrics は REQ 単位集計で行 ID を保持しない）の突合（手動確認）
+- **根本原因**: AUTOGEN 索引への「REQ 行登録需要」は行 ID 登録ではなく REQ 追加起因の索引再生成需要であり、行 ID 出現照合（req-row-mentions）とは意味が不一致。共有領域の kind 選択が領域の登録形態と対応していない
+- **自律対応内容**: 警告をエラー扱いにせず gate_effect: none のままゲート遷移へ影響させず、警告の意味レビューで構成起因の需要と評価して完了報告へ記録した。対応関係領域（adf-covers-declarations）は AG-001 (2) の和集合構成（sidecar 59 + inline 宣言 41）を適用し、本 Case（REQ-061-029）は対応関係領域・policy とも登録済みで需要 0 件、condition (a) も 0 件を確認
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 横断依存検査の shared_areas 構成では、領域の登録形態（行単位リストか対応宣言か全文出現か）と engine の kind の意味を対応させてから file_paths を決める。AUTOGEN 索引のような派生物索引を共有領域に加える場合の需要定義は昇華判断へ委ねる
+- **再発条件**: AUTOGEN 対象索引等の派生物索引を req-row-mentions で共有領域に構成して検査したとき
+- **予防策候補**: shared_areas の kind と登録形態の対応表を scripts/README.md へ追記する案は learning-promote での昇華判断に委ねる。検査構成時は対象行が領域に現れる形式（行 ID 登録か集計か）を先に確認する
+- **想定反映先**: agentdev-workflow-case-open scripts/README.md（検査入力 JSON の共有領域構成ガイド）または workflow 契約 Design「Case 投入時の横断依存検査契約」節
+- **関連**: Root Case #3629、.agentdev/drafts/req-draft-case-ready-cross-dep-input-composition.md（AG-001 (2)）、src/common/skills/agentdev-workflow-case-open/scripts/lib/cross_dependency_types.ts
+- **タグ**: `#cross-dependency` `#false-positive`
+
+## 新規 REQ 行の設計PRで traceability gate が対象行の missing-implementation/verification を構造的に fail 計上する
+
+- **問題事象**: case-open STEP-4 の prepare_definition_pr.ts 呼び出しで、新規 REQ 行（REQ-035-021）追加の Definition 変更に対し traceability gate が fail を報告した（pass=9 fail=2）。fail の内訳は対象行 REQ-035-021 の missing-implementation / missing-verification であり、case-open の正規ゲートである missing-design（対象行）は pass していた
+- **発生局面**: 実装（case-open STEP-4 機械工程、Definition branch での traceability check 実行時）
+- **検知方法**: prepare_definition_pr.ts の報告 JSON の traceability-check step が status: fail を返したため、check を再実行して checks 各検査種別の内訳（missing-design pass、missing-implementation fail、missing-verification fail、形式検査系 8 種全件 pass）を確認した
+- **根本原因**: STEP-4 reference の gate 判定仕様は「missing-design 以外の検査種別は status: fail のとき fail とする」を script 実装が文字どおり適用する一方、gate 判定仕様の冒頭は「case-run / case-ready 段階の前提である missing-implementation / missing-verification の既存欠落を含むため、case-open の正規ゲート（対象 REQ 行の missing-design 0 件）と意味が一致しない」と規定する。新規 REQ 行の設計PR 段階では対象行の implementation / verification 宣言は構造的に存在しないため script の gate 判定が必ず fail になることが手順上明文化されていない
+- **自律対応内容**: case-open の正規ゲート（対象行の missing-design 0 件）を gate 判定仕様の冒頭規定から導出して合格と判定し、missing-implementation / missing-verification を case-run / case-ready 段階で解消される既知の未完了（realization_actions として保持）として実行記録と PR 本文へ記録した上で PR 作成へ進んだ。coverage --req REQ-035-021 で design 対応の case-run.md 宣言への帰着を併用確認した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（本体変更は行わない。gate 判定仕様の文言と script 実装の解離の明文化余地を学びとして記録）
+- **横展開観点**: 工程の正規ゲートと機械検査の全体合否（終了コード）が解離する場面では、報告 JSON の検査種別内訳を確認して工程ゲートの意味へ帰着させて判定する
+- **再発条件**: 新規 REQ 行（または新規 Decision）を Definition branch に追加する設計PR を case-open が作成し、script の traceability gate 判定が対象行の missing-implementation / missing-verification を含めて fail を返すとき、毎回再発する
+- **予防策候補**: STEP-4 reference（definition-pr-and-idempotency.md）の gate 判定仕様節へ「新規 REQ 行の設計PR では対象行の missing-implementation / missing-verification の fail が構造的に発生する（case-run / case-ready 段階の前提欠落であり case-open では解消不可能）」旨の明文化を追加する。script 側の判定対象変更は既存契約の変更を伴うため reference 側の明文化が最小の予防策
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md（gate 判定仕様節の補足）
+- **関連**: Case #3628、PR #3631、docs/designs/commands/case-run.md、traceability check --req REQ-035-021
+- **タグ**: `#workflow-deviation` `#traceability-gate` `#definition-pr`
+
+## check_integrity --update-ir055-baseline が既存エントリの provenance と warning_total_cap を保持せず再生成する
+
+- **問題事象**: case-open STEP-4 の機械工程で本変更起因の IR-055 新規違反（workflow skill reference 追記文の `docs/designs/` 誘導参照）を baseline 管理へ回すため `check_integrity.ts --update-ir055-baseline` を実行したところ、baseline 差分が「新規エントリの追加」にとどまらず、既存エントリから classification / reason（provenance 由来記述）が削除され、warning_total_cap（58）が消失し、同一ファイルの既存エントリ（repo-*）が新規違反パターン（docs/designs/）への置換対象として失われた
+- **発生局面**: 実装（case-open STEP-4 機械工程の check_integrity fail 対処、worktree 内での baseline 再生成実行時）
+- **検知方法**: 再生成後の `git diff`（worktree 内）で baseline json の既存エントリの reason 消失・cap 消失・エントリ置換を確認
+- **根本原因**: `--update-ir055-baseline` は「現在の違反集合から baseline を生成する」コマンドであり、既存 baseline の provenance 付フィールド（classification / reason）と warning_total_cap を入力として読み込んで保存する設計ではない。既存 provenance を維持した部分更新の用途には適合しない
+- **自律対応内容**: 再生成結果を採用せず baseline を HEAD へ revert し、既存エントリ群を保持したまま新規エントリ 1 件（file × pattern × severity × count × classification: baseline × provenance reason）を node スクリプトによる手動追記で最小変更として追加した。追加後の check_integrity 再実行は pass（NG 0 / Warning 0、entries 27・cap 58 を維持）で、既存 provenance は破壊していない
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: baseline 系の `--update-*` コマンドを使う場合は全再生成（現状スナップショット化）と部分追記（provenance 保持）のどちらの操作が目的かを先に区別する。既存 provenance を維持する用途では手動エントリ追加（node の JSON 読書）が最小変更経路である
+- **再発条件**: check_integrity の IR-055 baseline（または同型の provenance 付き baseline）に対し、既存 provenance を維持したまま新規違反を承認追加しようとして `--update-ir055-baseline` を実行したとき、毎回再発する
+- **予防策候補**: case-open STEP-4 機械工程手順（definition-pr-and-idempotency.md）の traceability gate 対処手順へ「IR-055 baseline への承認追加は手動エントリ追加で行い、`--update-ir055-baseline` は full 再生成用途と区別する」旨の追記。または baseline 更新コマンド側の provenance 保持化（実装変更は別 Case 範囲）
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md（check_integrity 対処手順）
+- **関連**: Case #3627、PR #3633、commit 05d392b6（baseline 手動追加 commit）、.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts（--update-ir055-baseline 実装）
+- **タグ**: `#baseline` `#ir-055` `#provenance` `#workflow-deviation`
