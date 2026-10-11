@@ -116,3 +116,67 @@
 - **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md（STEP-4 手順への適用後突合追加）、src/common/skills/agentdev-workflow-case-ready/references/definition-acceptance.md（忠実性確認の機械手順明文化）
 - **関連**: Case #3642、PR #3643、修復 commit 430a1928、.agentdev/drafts の assembly_verification 記録（draft は case-ready 成功後に削除済み。証跡は PR #3643 本文の検証差分へ記録）
 - **タグ**:   
+
+## 実行担当サブエージェントの起動 API が露出しない環境では case-run STEP-S4 の委譲起動が成立しない
+
+- **問題事象**: 本実行環境は call_omo_agent が explore/librarian の research 用のみを露出し、実装担当サブエージェントの起動 API（category deep / unspecified-high）が露出しない。case-run STEP-S4 の委譲起動がこの環境では成立しなかった
+- **発生局面**: 実装（case-run STEP-S4。Epic #3642 Wave 1、Issue #3645 の実行）
+- **検知方法**: 委譲起動前の能力検出（実行担当型 category の起動 API 不在の確認）
+- **根本原因**: 実行環境の harness が research 用サブエージェントのみを露出し、実装担当 category の起動 API を露出していない
+- **自律対応内容**: identity 契約に従い case-run 主体が委譲契約（result 4状態・3点ゲート・worktree 隔離・test-fix ループ）を適用した上で実装を完遂した（self-apply。harness-delegation reference「委譲起動不能時の事前判定経路」に従う）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（委譲契約の自己適用であり、配布 SKILL の委譲契約の変更ではない）
+- **横展開観点**: PR #3649（Issue #3644）の delegation-join-formation 記録も同型観測。委譲起動 API の露出有無を AGENTS.md のハーネス選定へ明記する改善候補
+- **再発条件**: 実装担当サブエージェントが非露出の harness で case-run STEP-S4 の委譲を行うとき
+- **予防策候補**: AGENTS.md ハーネス選定への委譲起動 API 露出有無の明記、委譲起動前能力検出の常時実施
+- **想定反映先**: AGENTS.md（ハーネス選定節）、harness-delegation reference
+- **関連**: PR #3648（Issue #3645）、PR #3649、Epic #3642 Wave 1
+- **タグ**: `#harness` `#delegation`
+
+## node_modules 未伝播の worktree で tsc 型検査が bun:test / node 型未解決となる
+
+- **問題事象**: worktree 環境で tsc 型検査が bun:test / node 型未解決となる（node_modules 未伝播環境で bun:test の型解決源が不在。bun test は組込みランナーのため動作する）
+- **発生局面**: 実装（case-run の typecheck 実行。Issue #3646 の実行）
+- **検知方法**: typecheck 実行時の TS エラー（bun:test / node 型未解決）の出力と環境起因の確認
+- **根本原因**: node_modules 未伝播の worktree では bun:test / node の型解決源が存在しない
+- **自律対応内容**: 型エラーを実装側 0 件と環境起因（テスト側の型未解決のみ）に分類し、main root での同一検査で補完検証した。品質メトリクスへ環境ラベル付きで記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 型検査の環境ラベル記録に「型解決源の有無」を含める改善候補
+- **再発条件**: node_modules 未伝播の worktree で bun:test を import するテストを含む typecheck を実行したとき
+- **予防策候補**: 環境ラベルへの型解決源の有無の記録、typecheck は main root（node_modules 伝播あり）で実行する運用
+- **想定反映先**: agentdev-git-worktree（worktree 構造的制約の注記候補）
+- **関連**: PR #3650（Issue #3646）
+- **タグ**: `#worktree` `#typecheck`
+
+## worktree の .opencode 投影の skill 伝播が不均一で checker 実行経路が skill ごとに分岐する
+
+- **問題事象**: worktree の .opencode 投影に repo-agentdev-integrity は存在するが agentdev-traceability が未伝播で、checker 実行経路が skill ごとに main root / worktree で分岐した
+- **発生局面**: 実装（case-run の traceability check 実行。Issue #3646 の実行）
+- **検知方法**: traceability check 実行時の worktree 投影への checker 配置不在の検出
+- **根本原因**: worktree 投影（junction / 実体化）の伝播状態が skill ごとに不均一
+- **自律対応内容**: main root の .opencode 投影から checker を実行し、検査対象は worktree HEAD を --root 明示して検証した。検証差分の環境ラベルへ実行経路の分岐を記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: checker 実行経路の環境ラベル（実行起点 root と検査対象 root の区別）を検証差分へ残す
+- **再発条件**: worktree 投影に未伝播の skill の checker を worktree 内で実行しようとしたとき
+- **予防策候補**: checker 実行前に投影の伝播状態を確認し、main root 実行 + --root 明示への統一運用
+- **想定反映先**: agentdev-git-worktree（worktree 投影の伝播状態確認手順の候補）
+- **関連**: PR #3650（Issue #3646）
+- **タグ**: `#worktree` `#traceability`
+
+## case-run 直接実行時に実装着手時刻を初手で計測せず進行状況の開始日時を設定できなかった
+
+- **問題事象**: case-run 単一セッション内での直接実行時、実装着手（STEP-S4a 開始）時刻を初手で計測せず、進行状況の開始日時を正確に設定できなかった（実測は commit 03:44:21 と PR 作成 03:52:48 のみ。L2 タイムスタンプ内訳も着手起点の実測なし）
+- **発生局面**: 実装（case-run STEP-S5 進行状況更新。Issue #3646 の実行）
+- **検知方法**: 進行状況セクション更新時の開始日時の欠落確認
+- **根本原因**: 着手時刻の初手計測が手順に組み込まれておらず、後追いでは commit / PR 作成時刻しか実測できない
+- **自律対応内容**: 開始日時を N/A（実測併記）として記録し、計測欠落を learning 候補として明記した。Issue 本文の開始日時は case-close でも N/A（実測併記）のまま維持した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: L2 タイムスタンプ計測の着手起点の実測が未整備。実装着手の最初の操作で時刻を記録する初手計測の導入候補
+- **再発条件**: case-run 単一セッションでの直接実行（self-apply）で着手時刻を記録せずに実装を開始したとき
+- **予防策候補**: STEP-S4 開始時の初手で date 実行と時刻記録を手順化する
+- **想定反映先**: agentdev-workflow-case-run（STEP-S4 手順の初手計測明記候補）
+- **関連**: PR #3650（Issue #3646）、Issue #3646 本文 進行状況
+- **タグ**: `#measurement` `#workflow-deviation`
