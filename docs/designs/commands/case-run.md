@@ -2,11 +2,11 @@
 title: case-run Design
 status: accepted
 created: 2026-06-21
-updated: "2026-10-07"
+updated: "2026-10-11"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-015, REQ-021-016, REQ-021-017, REQ-021-019, REQ-021-020, REQ-021-022, REQ-035-002 -->
-<!-- ADF-COVERS(design): REQ-021-015, REQ-021-016, REQ-031-006, REQ-031-015, REQ-031-016, REQ-031-027, REQ-031-033, REQ-031-034, REQ-031-035, REQ-035-012 -->
+<!-- ADF-COVERS(design): REQ-021-015, REQ-021-016, REQ-031-006, REQ-031-015, REQ-031-016, REQ-031-027, REQ-031-033, REQ-031-034, REQ-031-035, REQ-035-012, REQ-035-021 -->
 <!-- ADF-COVERS(design): REQ-031-001, REQ-031-002, REQ-031-003, REQ-031-004, REQ-031-005, REQ-031-007, REQ-031-008, REQ-031-009, REQ-031-010, REQ-031-011, REQ-031-013, REQ-031-014, REQ-031-017, REQ-031-018, REQ-031-019, REQ-031-020, REQ-031-021, REQ-031-022, REQ-031-023, REQ-031-024, REQ-031-025, REQ-031-026, REQ-031-028 -->
 <!-- ADF-COVERS(implementation): REQ-015-010, REQ-015-011 -->
 <!-- ADF-COVERS(implementation): REQ-017-007, REQ-017-008, REQ-017-010, REQ-017-011, REQ-017-013, REQ-017-016 -->
@@ -104,6 +104,16 @@ Workflow Skill は常に単一 Issue 実行（single workflow）として動作�
 - 前置 gate 群（委譲の STEP-S3 相当、子Issue ごとの Epic Wave 委譲にも同一契約で適用）: worktree precondition gate、QG-3 前置 staleness check、docs/** 変更時の targeted docs guard、配布依存境界 事前 gate、AUTOGEN 索引再生成 前置 gate（S3-6）を適用する。AUTOGEN 索引再生成 前置 gate は、PR 対象ファイルに AUTOGEN 生成元文書（REQ、Decision、Design 実ファイル群）の変更を含む場合、AUTOGEN 索引の再生成を委譲に先行して強制する
 - 配布依存境界の最終変更経路 gate（S5-1）: result が `completed-pr` の場合、クリーンアップに進む前に、実装後の実際の worktree HEAD に対して最終 gate を行う（実行担当サブエージェントが追加した変更も含めて検査する）。本 gate は src 側（原本）と `.opencode` 側（投影）の双方反映検証を要求する
 - tmp 残存確認: 正常終了を前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないことをクリーンアップ工程で確認する。workflow 側で生成した `.agentdev/tmp/` 一時ファイルは当該実行内で削除し、Custom Tool 由来の一時ファイルは Tool が操作ごとに自動削除する
+
+#### 並列兄弟 branch 実差分交差確認（commit・push 前置）
+
+同一 Wave 内で兄弟 Issue が並列実行中の子 Issue は、commit・push の前、委譲先の実行担当サブエージェントが commit・push する直前（commit 前 3 検査と同一位置）に、実差分交差確認を実施する。case-run の前置 gate 群（STEP-S3）は委譲開始前に実行されるため当該時点では自 branch の変更ファイルが存在せず、実施位置にはならない（前置 gate での実施を前提した記述にしない）。
+
+対象は、並列実行中の兄弟 branch の変更ファイル集合（merge-base 起点の git diff --name-only で取得。パスは正規化して比較）と自 branch の変更ファイル集合の交差である。
+
+交差検出時はエラーではなく競合リスク情報として警告を投入者（case-auto 配下では親判断解決）へ提示し、調整決定（マージ順序・所有正当）を調整記録として実行記録へ残し、case-close の Level 1 rebase 担当契約へ引き継ぐ。単独実行（兄弟 Issue なし）の場合は発動条件不成立としてスキップする。兄弟 branch の状態が取得不能な場合は検査省略とせず取得不能として報告する（検出不能は交差なしを意味しない）。
+
+宣言ベースの Wave 重複前置検出（case-ready Design「v3 epic-wave-model Design からの吸収」節、REQ-061-019・REQ-035-012）とは補完関係にあり置換しない。交差未検出であっても宣言ベース前置検出の結果を無効化しない。
 
 #### 配布物変更時の commit 前3検査工程
 
