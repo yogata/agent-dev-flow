@@ -82,7 +82,7 @@ case-open workflow は次の6 STEP で構成する。
 case-open は、上流工程（req-define）で確定した対象要件を実行契約候補（realization_actions 等の Definition Package 構成要素）として Root Case へ引き継ぐ。
 
 - req-define と重複して一般的な変更影響探索や依存関係探索を行い、対象範囲を再決定しない
-- 対象要件行に Design 対応が未成立でも Root Case の確立を妨げない。Design 対応の成立判定（トレーサビリティ完全性ゲート）は case-ready が所有する
+- 対象要件行の設計根拠対応が未成立でも Root Case の確立を妨げない。設計根拠対応の成立判定（トレーサビリティ完全性ゲート）は case-ready が所有する
 - 引き継ぎ情報に欠落があり実行契約候補の構成が不能な場合は、req-define へ差し戻す
 
 ## 共通制約
