@@ -331,7 +331,7 @@ describe("段階ゲートの工程契約文言（3 Workflow Skill）", () => {
       file: "src/common/skills/agentdev-workflow-case-open/SKILL.md",
       // REQ-030 縮小後: case-open は Design 対応が未成立でも Root Case 確立を妨げない（REQ-021-024）。
       // Design 対応の成立判定（トレーサビリティ完全性ゲート）は case-ready が所有する。
-      phrases: ["対象要件行に Design 対応が未成立でも Root Case の確立を妨げない"],
+      phrases: ["対象要件行の設計根拠対応が未成立でも Root Case の確立を妨げない"],
     },
     {
       file: "src/common/skills/agentdev-workflow-case-close/SKILL.md",
