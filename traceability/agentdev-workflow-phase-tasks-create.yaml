@@ -1,0 +1,35 @@
+component: agentdev-workflow-phase-tasks-create
+implementation:
+  src/common/skills/agentdev-workflow-phase-tasks-create/SKILL.md:
+  - REQ-110-001
+  - REQ-110-002
+  - REQ-110-003
+  - REQ-110-011
+  - REQ-110-012
+  - REQ-104-008
+  src/common/commands/agentdev/phase-tasks-create.md:
+  - REQ-110-001
+  - REQ-110-002
+  - REQ-110-003
+  - REQ-110-011
+  - REQ-110-012
+  - REQ-104-008
+verification:
+  src/common/skills/agentdev-workflow-phase-tasks-create/SKILL.md:
+  - REQ-110-001
+  - REQ-110-002
+  - REQ-110-003
+  - REQ-110-011
+  - REQ-110-012
+  - REQ-104-008
+  src/common/commands/agentdev/phase-tasks-create.md:
+  - REQ-110-001
+  - REQ-110-002
+  - REQ-110-003
+  - REQ-110-011
+  - REQ-110-012
+  - REQ-104-008
+links:
+  upstream:
+    src/common/skills/agentdev-workflow-phase-tasks-create/SKILL.md:
+    - docs/designs/workflows/v51-phase-driven-collaboration-model.md
