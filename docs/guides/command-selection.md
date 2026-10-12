@@ -1,6 +1,6 @@
 # コマンド選択
 
-<!-- ADF-COVERS(implementation): REQ-001-055 -->
+<!-- ADF-COVERS(implementation): REQ-001-055, REQ-111-009, REQ-111-013 -->
 
 現在の状態から、次に実行すべきコマンドを選ぶための入口表。
 
@@ -68,3 +68,4 @@ work_type（bugfix / feature / maintenance / docs_chore）による固定判定�
 - `/agentdev/case-auto` は標準実行コマンド。要求入口 2 つ（`/agentdev/req-define`、`/agentdev/backlog-auto`）から合流する標準経路（`/agentdev/req-define` → `/agentdev/case-auto`）を構成する
 - `/agentdev/backlog-auto` は backlog 整理サイクル（検出→昇格→統合）を1回で実行する backlog-driven の要求入口。整理結果は `/agentdev/req-define` → `/agentdev/case-auto` へ接続する
 - inspect-docs、learning-promote、intake-promote、inspect-promote、backlog-review は単独実行できるコマンドである
+- 工程駆動実行は、テーマ初回形成、テーマ更新、正規成果物への反映、独立レビューの4操作と利用者判断による工程遷移からなる経路であり、標準経路とは別経路として併存する（将来実装予定）。対応する公開コマンドは未実装のため本表には未登録であり、後継経路の実現・採用まで現行経路（本表）が正である。変更駆動の実行に工程駆動の操作や遷移を前置しない

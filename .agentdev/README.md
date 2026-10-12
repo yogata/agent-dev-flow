@@ -66,5 +66,6 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-001�
 - [REQ-001](../docs/requirements/REQ-001.md): 文書体系と持続可能な基準構造（domain state、案内層、基準境界）
 - [REQ-002](../docs/requirements/REQ-002.md): 配布成果物の責務境界（drafts 配置、配布境界）
 - [REQ-008](../docs/requirements/REQ-008.md): 一時成果物ライフサイクル（intake / learning / backlog lifecycle）
+- [REQ-111](../docs/requirements/REQ-111.md): ADF v5.1 工程遷移・独立レビューと変更駆動併存（工程駆動実行は変更駆動経路と別経路として併存する移行期の経路。対応する状態は後継経路の実現・採用時に本表へ追加する）
 - [DEC-001](../docs/decisions/DEC-001.md): AgentDevFlow 憲章（namespace、基本原則）
 - [DEC-005](../docs/decisions/DEC-005.md): Project Extensions Architecture（`.agentdev/extensions/**`）。superseded by DEC-006（extensions 機構の配置規約は現行のまま、DEC-006 が inspect-extensions 廃止と extension 検査の責務分離により部分置換）

@@ -1,4 +1,4 @@
-<!-- ADF-COVERS(implementation): REQ-050-014, REQ-005-010, REQ-029-012 -->
+<!-- ADF-COVERS(implementation): REQ-050-014, REQ-005-010, REQ-029-012, REQ-111-013 -->
 # agent-dev-flow
 
 AgentDevFlow は AI エージェントによる開発ワークフローを支えるプラグインである。
@@ -15,6 +15,8 @@ AgentDevFlow は AI エージェントによる開発ワークフローを支え
 要求の継続的な蓄積・整理は `/agentdev/backlog-auto`（要求蓄積入口）から始め、生成された RU を req-define に渡す。
 `case-auto` は内部 lifecycle（case-open、case-ready、case-run、case-close、例外経路 case-revise）を駆動し、Definition の保存・確定と実行構造の確定もその内部責務として実行する。
 再合意済みの Definition 変更は req-define で再合意した後、`case-auto` が例外経路（case-revise → case-ready）を解決して反映する。
+
+工程駆動実行は、テーマ初回形成、テーマ更新、正規成果物への反映、独立レビューの4操作と利用者判断による工程遷移からなる将来実装予定の経路であり、上記の変更駆動経路と別経路として併存する。後継経路の実現・採用まで現行の変更駆動経路が正であり、変更駆動の実行に工程駆動の操作や遷移を前置しない。
 
 ## 開発者セットアップ（textlint 依存の生成）
 
