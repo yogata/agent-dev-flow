@@ -1,0 +1,20 @@
+component: v51-guidance-coexistence
+implementation:
+  .agentdev/README.md:
+    - REQ-111-013
+verification:
+  README.md:
+    - REQ-111-013
+  src/common/commands/agentdev/README.md:
+    - REQ-111-009
+    - REQ-111-010
+    - REQ-111-013
+  docs/guides/command-selection.md:
+    - REQ-111-009
+    - REQ-111-013
+  docs/guides/artifacts-and-state.md:
+    - REQ-111-013
+  .agentdev/README.md:
+    - REQ-111-013
+  docs/designs/foundations/references/v4-v5-crosswalk.md:
+    - REQ-111-013
