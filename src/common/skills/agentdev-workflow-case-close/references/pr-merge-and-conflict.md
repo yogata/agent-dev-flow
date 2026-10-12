@@ -103,6 +103,17 @@ squash merge がコンフリクトで失敗した場合（STEP-4-3 のリトラ�
 - rebase 解消編集は `git rebase --continue` の前に `git add` で stage 確定し、squash merge 再実行の前に worktree が clean であることを確認する（`agentdev-git-worktree`「Merge Conflict 対応パターン」参照。stage 前の `--continue` は解消編集の squash merge 内容からの欠落を招く）
 - merge 後は main 上で再検証する（該当検査を main HEAD で再実行し、rebase 解消編集の取り込みを確認する）
 
+## ローカル版 PR マージ（取り込み）の手順
+
+ローカル版（consumer-generated 環境）では GitHub PR が存在しないため、ローカル版 case-close がローカル Git 上で取り込み（merge / squash 方式）を実行する。GitHub 版 STEP-4 の PR マージに相当する副作用の実行主体はローカル版 case-close であり、Custom Tool `agentdev_gh` は取り込みを実行しない（記録の正確性の保証 VERIFY を担う）。
+
+1. **取り込みの実行**: ローカル Git 上で、取り込み先ブランチ（squash merge 先に相当、通常 main）へ取り込み元ブランチの変更を merge または squash 方式で取り込む
+2. **結果コミットハッシュの実測**: `git rev-parse HEAD` 等で取り込み結果のコミットハッシュを実測する
+3. **マージ結果の記録**: `agentdev_gh` の pr_merge 操作へ commitHash を渡して `## マージ結果` へ記録する。Tool は渡されたコミットハッシュのローカル Git 実在を確認（VERIFY）してから記録する
+4. **失敗・未完了時**: pr_merge を呼び出さず、ローカルIssueの `status` を `blocked` に更新し、理由を `## 残課題` に記録する
+
+必須記録項目（実行した操作、関連するコミットハッシュ、実行日時、結果）の正は Design `docs/designs/local/local-case-file.md`「マージ結果の記録方針」節である。
+
 ## Evidence
 
 - squash merge 先（main）の確認結果、base 移動判定結果（fetch 後の origin/main 先端 hash と merge-base 比較）、mergeable 状態とポーリング記録、mergeStateStatus（CLEAN）判定結果、merge 結果と HEAD commit hash、対応記録コメントの VERIFY 結果、先行 commit 検出・処理結果、rebase 試行結果

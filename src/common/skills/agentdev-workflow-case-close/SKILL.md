@@ -86,7 +86,7 @@ gate 違反時は両ルートとも PR マージを停止する。
 本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
 
 - `agentdev-quality-gates`: QG-4 Final Acceptance Gate、観点8 PR対象範囲 vs 全体 判定マトリクス
-- Custom Tool `agentdev_gh`: PR merge / pr_mergeable（UNKNOWN ポーリングは workflow 側）/ Issue close
+- Custom Tool `agentdev_gh`: PR merge / pr_mergeable（UNKNOWN ポーリングは workflow 側）/ Issue close。ローカル版の pr_merge は取り込み結果の記録（commitHash 実在 VERIFY 含む）であり、取り込み実行の主体は case-close である（references/pr-merge-and-conflict.md「ローカル版 PR マージ（取り込み）の手順」節）
 - `agentdev-git-worktree`: 重複ファイルチェック、squash merge 後分岐ハンドリング、コンフリクト解消 rebase パス、worktree 削除、実行前同期リスク検出
 - `agentdev-epic-tracker`: Epic Issue 本文実行構成表、E1〜E6 詳細、子Issue 状態 enum、Epic 自動クローズ判定
 - `agentdev-design-file-manager`: Design status 昇格（draft → accepted）、design-lifecycle-application
