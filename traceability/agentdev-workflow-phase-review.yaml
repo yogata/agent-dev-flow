@@ -1,0 +1,15 @@
+component: agentdev-workflow-phase-review
+implementation:
+  src/common/skills/agentdev-workflow-phase-review/SKILL.md:
+    - REQ-111-001
+    - REQ-111-011
+  src/common/commands/agentdev/phase-review.md:
+    - REQ-111-001
+    - REQ-111-011
+verification:
+  src/common/skills/agentdev-workflow-phase-review/SKILL.md:
+    - REQ-111-001
+    - REQ-111-011
+  src/common/commands/agentdev/phase-review.md:
+    - REQ-111-001
+    - REQ-111-011

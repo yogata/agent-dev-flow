@@ -1,0 +1,30 @@
+component: agentdev-workflow-phase-transition
+implementation:
+  src/common/skills/agentdev-workflow-phase-transition/SKILL.md:
+    - REQ-111-002
+    - REQ-111-003
+    - REQ-111-004
+    - REQ-111-005
+    - REQ-111-011
+  src/common/commands/agentdev/phase-transition.md:
+    - REQ-111-002
+    - REQ-111-003
+    - REQ-111-004
+    - REQ-111-005
+    - REQ-111-011
+  src/common/skills/agentdev-workflow-phase-transition/scripts/lib/store.ts:
+    - REQ-111-003
+  src/common/skills/agentdev-workflow-phase-transition/scripts/lib/successor.ts:
+    - REQ-111-004
+verification:
+  src/common/skills/agentdev-workflow-phase-transition/SKILL.md:
+    - REQ-111-002
+    - REQ-111-003
+    - REQ-111-004
+    - REQ-111-005
+    - REQ-111-011
+  src/common/skills/agentdev-workflow-phase-transition/scripts/tests/transition-state.test.ts:
+    - REQ-111-002
+    - REQ-111-003
+    - REQ-111-004
+    - REQ-111-005
