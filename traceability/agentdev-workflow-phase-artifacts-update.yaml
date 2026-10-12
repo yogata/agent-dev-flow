@@ -1,0 +1,27 @@
+component: agentdev-workflow-phase-artifacts-update
+implementation:
+  src/common/skills/agentdev-workflow-phase-artifacts-update/SKILL.md:
+  - REQ-110-007
+  - REQ-110-008
+  - REQ-110-009
+  - REQ-110-015
+  src/common/commands/agentdev/phase-artifacts-update.md:
+  - REQ-110-007
+  - REQ-110-008
+  - REQ-110-009
+  - REQ-110-015
+verification:
+  src/common/skills/agentdev-workflow-phase-artifacts-update/SKILL.md:
+  - REQ-110-007
+  - REQ-110-008
+  - REQ-110-009
+  - REQ-110-015
+  src/common/commands/agentdev/phase-artifacts-update.md:
+  - REQ-110-007
+  - REQ-110-008
+  - REQ-110-009
+  - REQ-110-015
+links:
+  upstream:
+    src/common/skills/agentdev-workflow-phase-artifacts-update/SKILL.md:
+    - docs/designs/workflows/v51-phase-driven-collaboration-model.md
