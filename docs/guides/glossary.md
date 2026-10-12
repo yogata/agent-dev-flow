@@ -96,8 +96,8 @@ GitHub Issue/PR を使わない個人利用環境向けの AgentDevFlow 利用�
 | ローカル版 OpenCode | GitHub Issue/PR を使わない個人利用環境向けの AgentDevFlow 利用形態。link mode により GitHub 版 AgentDevFlow の原本を `.opencode/` 配下へ接続して利用する |
 | 仕様管理リポジトリ | AgentDevFlow 本体リポジトリ（agent-dev-flow）。ローカル版 link 先の原本を保持する |
 | 導入先リポジトリ | ローカル版 OpenCode を導入する利用側リポジトリ。`consumer-generated` リポジトリ種別に対応 |
-| consumer-generated | ローカル版 OpenCode を導入するリポジトリ種別。`.opencode/tools/agentdev-gh/`（Custom Tool `agentdev_gh` の実行ディレクトリ）が `src/opencode-local/agentdev-gh/`（Local 実装）への link として解決されることで判定される（Design `runtime-package-boundary.md`） |
-| `src/opencode-local/` | ローカル版 link 先原本領域。AgentDevFlow 本体リポジトリに配置され、`README.md` と `agentdev-gh/` のみを保持する。IR-047 でディレクトリ構成を検証 |
-| link mode | ローカル版導入方式。`.opencode/` 配下を src 配下へ接続し、原本をそのまま利用する。`agentdev-gh` だけを `src/opencode-local/agentdev-gh/` から差し替える |
+| consumer-generated | ローカル版 OpenCode を導入するリポジトリ種別。`.opencode/tools/agentdev-gh/`（Custom Tool `agentdev_gh` の実行ディレクトリ）が `src/common/tools/agentdev-gh/local/`（Local 実装）への link として解決されることで判定される（Design `runtime-package-boundary.md`） |
+| `src/common/tools/agentdev-gh/local/` | ローカル版 Custom Tool `agentdev_gh` の Local 実装の原本。AgentDevFlow 本体リポジトリの共通原本領域に配置され、`runner-local.ts` とローカルIssue操作用定義（`case-schema/`）を保持する。通常版の同期・インストールの配布対象から除外する（REQ-009-016） |
+| link mode | ローカル版導入方式。`.opencode/` 配下を src 配下へ接続し、原本をそのまま利用する。`agentdev-gh` だけを `src/common/tools/agentdev-gh/local/` から差し替える |
 | link target 確認 | ローカル版 link 設定前に `.opencode/` 配下の各パスが意図した link target へ解決されることを確認する安全機構。意図しない link target へ解決される場合は link 設定を停止する |
 | Local backend | ローカル版 OpenCode のバックエンド区分。GitHub backend（GitHub Issue/PR を使う通常運用）との差分として Design `v4-lifecycle-state-machine.md` で定義される。SSoT は GitHub Issue/PR ではなくローカルIssue（`.agentdev/issues/issue-{NNNN}.md`）となる |
