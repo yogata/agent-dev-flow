@@ -10,7 +10,7 @@
 DEC-018 は欠番であり、対応する Decision ファイルは存在しない。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は47件、提案中の Decision は1件である。
+現行の承認済み Decision は48件、提案中の Decision は0件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -72,7 +72,7 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 | DEC-055 | ADF v5 有限実行と責務再編（工程独立実行・Issue 必要時利用・Wave の意味的依存グループ化） | accepted | 2026-10-09 |
 | DEC-056 | ADF v5 移行と互換性の境界（後方互換非必須・意味保存移行・未処理改善情報の継続） | accepted | 2026-10-09 |
 | DEC-057 | 工程駆動コラボレーションモデル（検討テーマ・外部検討・段階形成）の採用 | accepted | 2026-10-12 |
-| DEC-058 | 工程遷移と双経路併存モデルの採用（REQ-005-001/010/011 改訂を含む） | proposed | 2026-10-12 |
+| DEC-058 | 工程遷移と双経路併存モデルの採用（REQ-005-001/010/011 改訂を含む） | accepted | 2026-10-12 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -132,12 +132,12 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 - [DEC-055](DEC-055.md)（ADF v5 有限実行と責務再編（工程独立実行・Issue 必要時利用・Wave の意味的依存グループ化））
 - [DEC-056](DEC-056.md)（ADF v5 移行と互換性の境界（後方互換非必須・意味保存移行・未処理改善情報の継続））
 - [DEC-057](DEC-057.md)（工程駆動コラボレーションモデル（検討テーマ・外部検討・段階形成）の採用）
+- [DEC-058](DEC-058.md)（工程遷移と双経路併存モデルの採用（REQ-005-001/010/011 改訂を含む））
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
-- [DEC-058](DEC-058.md)（工程遷移と双経路併存モデルの採用（REQ-005-001/010/011 改訂を含む））
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
