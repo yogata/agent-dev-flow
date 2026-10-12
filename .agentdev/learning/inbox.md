@@ -212,3 +212,19 @@
 - **想定反映先**: `src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md`、`src/common/skills/agentdev-workflow-case-open/scripts/lib/definition-traceability-gate.ts` と各 stage consumer のテスト
 - **関連**: Root Case #3653、PR #3655、前回同種の観測 Case #3628 / PR #3631、`.agentdev/integrity/reports/2026-10-12-case3653-traceability-check.json`
 - **タグ**: `#workflow-deviation` `#traceability-gate` `#definition-pr`
+
+## case-ready cleanup script が trim 後の先頭列判定で未ステージ modified を staged と誤判定する
+
+- **問題事象**: case-ready STEP-7 の cleanup script（accept_definition_checks.ts canonical-and-cleanup phase）で、git status --short を行単位 trim 後に先頭列で staged 判定する実装のため、worktree-only の未ステージ modified（兄弟 Case 所有の RU-0002 ドラフト）が staged と誤判定され、staged-entries-check の fail-closed で commit が停止した
+- **発生局面**: 実装（case-ready STEP-7 draft/RU 削除 commit、Root Case #3653）
+- **検知方法**: script 報告 JSON の draft-ru-removal-commit fail（stagedEntries に未ステージ modified が混入）
+- **根本原因**: trim() 後の先頭列参照では XY 2列形式の X（staged 状態）と Y（worktree 状態）が区別できず、X が空白（未ステージ）の行が staged 扱いになる
+- **自律対応内容**: 対象ファイルのみ一時 stash して再実行したが、前回実行の git rm 済みで working tree から消えた removals に対して git rm が pathspec 不一致で停止する2段障害が発生。最終的に staged entries check（removals 2件のみ staged、他は未ステージ）を手動確認し、script と同一の明示パス指定 commit で完了した（90733116）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: git status --short の X/Y 2列形式を自前解析する checker は trim 前の列位置で X と Y を区別する。working tree から消えた removals への再 git rm は pathspec 不一致になるため、git rm 前提の cleanup script 再実行は冪等でない
+- **再発条件**: cleanup 実行時点でワークツリーに無関係な未ステージ modified が存在するとき。および git rm が部分適用された状態で同一 script を再実行したとき
+- **予防策候補**: status 解析を trim 前の列位置（[0] と [1]）で判定する修正、またはインデックスの削除状態確認を前置した git rm の冪等化
+- **想定反映先**: src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts（staged-entries-check の列判定）
+- **関連**: Root Case #3653、case-ready Design「機械工程の script 呼び出し契約」節
+- **タグ**:  
