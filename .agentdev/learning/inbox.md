@@ -292,3 +292,19 @@
 - **想定反映先**: agentdev-workflow-case-run（検証手順の補完検査明記候補）、docs-check 関係 reference
 - **関連**: PR #3663（Wave-1 #3660、Findings/Capture候補 learning セクションの記録）
 - **タグ**: `#checker-execution` `#verification-coverage`
+
+## case-auto 親が case-close 委譲を起動する際の指示で Design 状態評価（棚卸し制）が漏れ、Design が draft のまま Epic クローズに至った
+
+- **問題事象**: 両 v51 Design（工程駆動コラボレーションモデル、工程遷移・併存モデル）が status draft のまま両 Epic がクローズされた。Design README 横断 Design 一覧への行登録も case-ready で漏れていた
+- **発生局面**: case-auto stage 4（case-close 委譲指示の組み立て）
+- **検知方法**: STEP-8 完了報告前の親側最終検証。Epic 本文の「status: draft は case-close の docs 検証・Design 確定工程で扱う」記載から Design frontmatter の実状態を確認し draft 残存を検出
+- **根本原因**: case-close 最終委譲の MUST DO に Design 状態評価（棚卸し制）・昇格を含めなかった。Epic ルートの E4-3「Design 状態評価の Wave 内集約」を委譲指示へ明示的に列挙していなかった。委譲先は指示された項目のみを実行するため、指示漏れはそのまま工程漏れになる
+- **自律対応内容**: 親が case-close STEP-3-2 相当の棚卸し評価を実施し、両 Design を accepted へ昇格、Design README 一覧へ登録、既存本文の textlint prh 違反 1 件を是正、昇格証跡（4 必須項目）と Design確定候補の見送り記録を対応記録コメントへ保存（commit ee2a1bd1）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（case-close Design 状態評価の契約どおりの回復）
+- **横展開観点**: case-close 委譲指示の MUST DO は当該 STEP/EStep の全責務（Design 状態評価・capture 回収・worktree cleanup 等）を明示列挙する必要がある。委譲プロンプトの構築は workflow skill の STEP 表を網羅確認してから行う
+- **再発条件**: case-auto 親が case-close 委譲を指示するときに Design 状態評価を指示項目から落とした場合
+- **予防策候補**: case-close 委譲指示テンプレートに Design 状態評価（棚卸し制）と Design README status 列更新を必須項目として含める
+- **想定反映先**: case-auto Design「委譲指示の構築規律（case-ready・case-close の並列委譲起動）」節、agentdev-workflow-case-close references
+- **関連**: #3653/#3654 最終 case-close、commit ee2a1bd1、コメント 6131559584 / 6131562314
+- **タグ**: `#delegation-instructions` `#design-lifecycle`
