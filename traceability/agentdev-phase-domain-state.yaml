@@ -17,6 +17,7 @@ implementation:
     - REQ-110-010
     - REQ-110-013
     - REQ-110-014
+    - REQ-111-013
 verification:
   .opencode/skills/repo-agentdev-integrity/scripts/tests/phase_domain_state.test.ts:
     - REQ-110-001

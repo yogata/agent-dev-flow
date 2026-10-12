@@ -1,7 +1,4 @@
 component: v51-guidance-coexistence
-implementation:
-  .agentdev/README.md:
-    - REQ-111-013
 verification:
   README.md:
     - REQ-111-013

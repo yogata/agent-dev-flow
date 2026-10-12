@@ -18,6 +18,7 @@ implementation:
   - REQ-104-002
   - REQ-104-003
   - REQ-104-006
+  - REQ-104-008
   src/common/skills/agentdev-adopted-conventions/scripts/lib/judge.ts:
   - REQ-104-004
   - REQ-104-005
@@ -42,6 +43,7 @@ verification:
   - REQ-104-003
   - REQ-104-005
   - REQ-104-007
+  - REQ-104-008
   src/common/skills/agentdev-adopted-conventions/scripts/tests/judge.test.ts:
   - REQ-104-004
   - REQ-104-006
