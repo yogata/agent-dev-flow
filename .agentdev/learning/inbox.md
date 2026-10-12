@@ -228,3 +228,67 @@
 - **想定反映先**: src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts（staged-entries-check の列判定）
 - **関連**: Root Case #3653、case-ready Design「機械工程の script 呼び出し契約」節
 - **タグ**:  
+
+## 実領域実ファイルへの読戻し突合検証は原状保持→検証→復元突合を1実行で完結させる
+
+- **問題事象**: Wave-1（#3657）の実領域読戻し突合検証（identity.yaml への値書込→読戻し突合）で、中間のデバッグ書込により原状（YAML コメント付き初期状態）を失い、作成内容からの再復元が必要になった
+- **発生局面**: 実装（Wave-1 完了条件の実領域読戻し突合、`.agentdev/phase/identity.yaml`）
+- **検知方法**: 検証後の原状復元時に初期状態の YAML コメントが消失していることを確認（手動）
+- **根本原因**: 検証 script が書込前に原状を変数へ保持せず、書込と復元を複数回の実行に分割したため、中間実行の書込が原状を上書きした
+- **自律対応内容**: 作成内容から初期状態を再構成して復元し、恒久検証（phase_domain_state.test.ts）で領域契約を固定した。以降の Wave-2 検証ではテンポラリ複製での動的検証と原状保持・復元突合のセットで実行した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: one-off 検証での実領域書込は、テンポラリ複製での動的検証と原状保持（変数へ先読み）→検証→復元→復元突合の1実行完結をセットで行う。domain state の実ファイルを直接書換する検証は原状のコメント・書式まで含めて保持する
+- **再発条件**: 実保存先のファイルを検証用に書換する one-off 検証で、原状の全文（コメント・書式を含む）を保持せずに複数回の書込・復元を実行したとき
+- **予防策候補**: 検証 script の最初に readFileSync で原状全文を変数へ保持し、最後に writeFileSync→再読込→原状との突合までを1プロセスで完結させる。復元突合は文字列一致で判定する
+- **想定反映先**: domain state 実領域を検証対象にする workflow skill（agentdev-workflow-phase-* 系）の検証手順、repo-agentdev-integrity の phase_domain_state.test.ts の補足注記
+- **関連**: PR #3664（Wave-1 #3657、Findings/Capture候補 learning セクションの記録）、.agentdev/phase/identity.yaml
+- **タグ**: `#verification-safety` `#domain-state` 
+
+## bun は Git Bash 形式パス（/c/...）を解決せず ENOENT で fail-closed する
+
+- **問題事象**: Windows の Git Bash 由来パス（`/c/...` 形式）を bun CLI 実行の引数（`--root`、スクリプトパス等）へ渡すと、bun は MSYS パス変換を行わず ENOENT で非ゼロ終了する。実行自体は正しくてもパス形式由来の失敗に見える
+- **発生局面**: 実装（検証コマンド実行。Wave-3 #3662 の scripts CLI 実環境検証）
+- **検知方法**: bun 実行時の ENOENT 非ゼロ終了と、同コマンドの Windows 形式パス指定での成功（手動確認）
+- **根本原因**: bun は Git Bash 形式パス（`/c/...`）を解決しない。Git Bash 上でも bun へ渡す引数は Windows 形式パス（`C:/...`）である必要がある
+- **自律対応内容**: 検証コマンドのパス指定を Windows 形式へ統一して再実行し合格した。実行失敗を検証対象の品質問題と誤分類せず実行形態由来と区別して記録した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: bun を使う checker・検証 CLI の実行では、パス形式由来の失敗を対象品質の失敗と誤分類し得る。実行形態の失敗はコマンド形式の切替で再実行して区別する
+- **再発条件**: Windows 環境の Git Bash セッションから bun CLI へ `/c/...` 形式のパス引数を渡したとき
+- **予防策候補**: checker-execution-contracts.md の bun 実行形態契約へ Windows パス形式の注記追加を検討。検証コマンドのパス引数は `C:/...` 形式で統一する
+- **想定反映先**: checker 実行契約を定める workflow skill reference（checker-execution-contracts.md 等）の bun 実行形態節
+- **関連**: PR #3668（Wave-3 #3662、Findings/Capture候補 learning セクションの記録）
+- **タグ**: `#bun` `#windows-path`
+
+## traceability check を --root . の相対指定で実行すると cwd が root になり全 REQ 対応を欠落と誤判定する
+
+- **問題事象**: traceability check を `--root .` の相対指定で実行した初回が失敗し、全 REQ の design/implementation/verification が欠落と誤判定された
+- **発生局面**: 実装（検証コマンド実行。Wave-1 #3660 の traceability check）
+- **検知方法**: check 結果の全行欠落という異常な結果（手動確認）
+- **根本原因**: `--root .` の相対指定は実行時 cwd（scripts ディレクトリ）を root として解決されるため、対象リポジトリ直下の成果物が不在の状態として走査される
+- **自律対応内容**: root を絶対パス指定へ変更して再実行し合格した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: checker の root 系引数は相対指定だと起動元 cwd に依存して解決される。検証の再現性のため root は絶対パス指定が安全
+- **再発条件**: scripts ディレクトリ配下を cwd に checker を相対 root 指定で実行したとき
+- **予防策候補**: checker 実行手順の root 引数は絶対パス指定に統一する
+- **想定反映先**: agentdev-traceability の check 実行手順を参照する workflow skill reference
+- **関連**: PR #3663（Wave-1 #3660、Findings/Capture候補 learning セクションの記録）
+- **タグ**: `#checker-execution` `#traceability`
+
+## checker の workflow profile で case-run は src/common/** と .agentdev/** が検査対象外となり配布 command README 編集の検査が漏れ得る
+
+- **問題事象**: case-run の check_changed_docs（workflow profile）は src/common/** と .agentdev/** を検査対象外とするため、配布 command README（src/common/commands/agentdev/README.md 等）を編集した Case では当該ファイルが targeted docs guard の対象にならず検査漏れが発生し得る
+- **発生局面**: 実装（検証コマンド実行。Wave-1 #3660 の案内文書編集検証）
+- **検知方法**: profile の appliesTo 対象外判定と検査範囲の突合（手動確認）
+- **根本原因**: workflow profile の検査対象範囲と編集対象パス（配布物側案内文書）が一致しない構造である。profile の仕様どおりの挙動であり欠陥ではないが、補完検査の必要性が手順に明文化されていない
+- **自律対応内容**: check_content_corruption（決定的破損検査）で補完検査を実施し合格を確認した。検証差分へ環境ラベル付きで記録した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: checker の profile による検査対象外は「検査不要」ではなく「別の checker での補完検査が必要」を意味する。編集パスと appliesTo の突合を検証計画時に行う
+- **再発条件**: case-run で配布 command README 等の profile 対象外パスを編集した Case の検証を実行したとき
+- **予防策候補**: 編集対象パスが workflow profile の appliesTo 外である場合の check_content_corruption 補完検査を検証手順へ明記する
+- **想定反映先**: agentdev-workflow-case-run（検証手順の補完検査明記候補）、docs-check 関係 reference
+- **関連**: PR #3663（Wave-1 #3660、Findings/Capture候補 learning セクションの記録）
+- **タグ**: `#checker-execution` `#verification-coverage`
