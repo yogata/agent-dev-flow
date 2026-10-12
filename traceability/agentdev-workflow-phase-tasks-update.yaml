@@ -1,0 +1,27 @@
+component: agentdev-workflow-phase-tasks-update
+implementation:
+  src/common/skills/agentdev-workflow-phase-tasks-update/SKILL.md:
+  - REQ-110-003
+  - REQ-110-004
+  - REQ-110-005
+  - REQ-110-014
+  src/common/commands/agentdev/phase-tasks-update.md:
+  - REQ-110-003
+  - REQ-110-004
+  - REQ-110-005
+  - REQ-110-014
+verification:
+  src/common/skills/agentdev-workflow-phase-tasks-update/SKILL.md:
+  - REQ-110-003
+  - REQ-110-004
+  - REQ-110-005
+  - REQ-110-014
+  src/common/commands/agentdev/phase-tasks-update.md:
+  - REQ-110-003
+  - REQ-110-004
+  - REQ-110-005
+  - REQ-110-014
+links:
+  upstream:
+    src/common/skills/agentdev-workflow-phase-tasks-update/SKILL.md:
+    - docs/designs/workflows/v51-phase-driven-collaboration-model.md
