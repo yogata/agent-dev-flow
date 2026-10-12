@@ -21,6 +21,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { spawnSync } from "node:child_process";
+import { consumeDefinitionTraceability, type DeferredObligation } from "../../../agentdev-workflow-case-open/scripts/lib/definition-traceability-gate.ts";
 
 const USAGE = `usage: bun ./src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts --input <input.json>
   --input  機械工程入力 JSON（phase、品質ゲート実行仕様、削除対象パス等）`;
@@ -410,6 +411,7 @@ export function runAcceptDefinitionChecks(
   const warnings: string[] = [];
   const diff: Record<string, unknown> = {};
   const proposal: Record<string, string> = {};
+  let deferredTraceabilityObligations: readonly DeferredObligation[] = [];
   const repoRoot = path.resolve(input.repoRoot);
 
   if (input.phase === "acceptance-checks") {
@@ -496,32 +498,37 @@ export function runAcceptDefinitionChecks(
 
     if (input.traceabilityGate) {
       const check = runSpec(runner, input.traceabilityGate);
-      let summary = "";
-      if (check.exitCode === 0) {
-        try {
-          const parsed = JSON.parse(check.stdout) as { summary?: { pass?: number; fail?: number } };
-          summary = `pass=${parsed.summary?.pass ?? "?"} fail=${parsed.summary?.fail ?? "?"}`;
-        } catch {
-          summary = "report parse failed";
-        }
-      }
+      const reqFilter = extractFlagValue(input.traceabilityGate.args, "--req");
+      const consumption = consumeDefinitionTraceability({
+        exitCode: check.exitCode,
+        stdout: check.stdout,
+        targetReqIds: reqFilter === null ? [] : reqFilter.split(","),
+      });
+      const deferred = consumption.deferredObligations;
+      deferredTraceabilityObligations = deferred;
       steps.push({
         name: "traceability-check",
-        status: check.exitCode === 0 ? "pass" : "fail",
+        status: consumption.status,
         detail: {
-          exitCode: check.exitCode,
-          summary,
+          summary: consumption.summary,
+          deferredObligations: deferred,
           ...buildGateEvidence(input.traceabilityGate, check, targetRevision),
         },
       });
-      if (check.exitCode !== 0) {
-        warnings.push("traceability check failed");
+      if (consumption.blocking) {
+        warnings.push(`traceability readiness gate failed: ${consumption.reason ?? consumption.summary}`);
         return assembleReport(input.phase, steps, diff, warnings, proposal);
+      }
+      if (deferred.length > 0) {
+        warnings.push("missing-implementation and missing-verification remain raw checker failures; case-ready defers them to case-run and case-close");
       }
     }
 
     proposal.acceptance_summary = [
       `Definition PR #${input.prNumber} の受入検査（忠実性・整合性・品質検査、overlap 突合、AUTOGEN 再生成差分検出、traceability check）を script 内で実行した。`,
+      ...(deferredTraceabilityObligations.length > 0
+        ? [`checker の missing-implementation / missing-verification は raw fail のまま case-run / case-close へ deferred: ${deferredTraceabilityObligations.map((obligation) => `${obligation.check} (${obligation.reqIds.join(", ")})`).join("; ")}`]
+        : []),
       "意味レビューと受理判断はモデルが行う。",
     ].join("\n");
     return assembleReport(input.phase, steps, diff, warnings, proposal);
