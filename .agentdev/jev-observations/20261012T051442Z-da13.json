@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261012T051442Z-da13",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0001/RU-0002（ADF v5.1.0 工程駆動2RU）の既存REQ照合判断",
+  "sourceRevision": "324d76f4093c482a2e4dabc862c9bf71ff7ec4e7",
+  "durationMs": 2368,
+  "inputTokens": 3037,
+  "inputs": {
+    "requestDigest": "ee0d031a8de689a56ba0c82c50f09eaf4bfbb9e6183175fbb34f9b8157aeabbc",
+    "references": [
+      {
+        "label": "RU-0001",
+        "path": ".agentdev/backlog/req-units/RU-0001.md",
+        "digest": "4661595b79733e0b48b98315f8de003f95b238abbd94128051b2fbce835b9622"
+      },
+      {
+        "label": "RU-0002",
+        "path": ".agentdev/backlog/req-units/RU-0002.md",
+        "digest": "99c80c9aafca2a006432f8218c8f5d5caaf47197130654a4799efecb25c508c9"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-ru0001-operation",
+      "questionForm": "choice",
+      "value": "CREATE（新規REQとして作成）",
+      "probabilityDistribution": {
+        "CREATE（新規REQとして作成）": 0.66,
+        "APPEND（既存REQへ要件行を追加）": 0.34,
+        "UPDATE（既存REQの要件行を更新）": 0,
+        "REQ操作なし（REQ操作を伴わない帰属）": 0
+      }
+    },
+    {
+      "questionId": "q2-ru0001-confirmation-need",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.55,
+        "false": 0.44999999999999996
+      }
+    },
+    {
+      "questionId": "q3-ru0002-operation",
+      "questionForm": "choice",
+      "value": "UPDATE（既存REQの要件行を更新）",
+      "probabilityDistribution": {
+        "CREATE（新規REQとして作成）": 0.13,
+        "APPEND（既存REQへ要件行を追加）": 0.12,
+        "UPDATE（既存REQの要件行を更新）": 0.75,
+        "REQ操作なし（REQ操作を伴わない帰属）": 0
+      }
+    },
+    {
+      "questionId": "q4-ru0002-confirmation-need",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.53,
+        "false": 0.47
+      }
+    }
+  ],
+  "confidence": 0.55,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-ru0001-operation",
+        "value": "CREATE（新規REQとして作成）"
+      },
+      {
+        "questionId": "q2-ru0001-confirmation-need",
+        "value": false,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q3-ru0002-operation",
+        "value": "CREATE（新規REQとして作成）",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q4-ru0002-confirmation-need",
+        "value": false,
+        "differenceReason": "semantic_disagreement"
+      }
+    ]
+  }
+}
