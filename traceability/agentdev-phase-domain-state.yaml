@@ -1,0 +1,36 @@
+component: agentdev-phase-domain-state
+implementation:
+  .agentdev/phase/README.md:
+    - REQ-110-010
+    - REQ-110-013
+    - REQ-110-014
+  .agentdev/phase/identity.yaml:
+    - REQ-110-001
+  .agentdev/phase/themes.md:
+    - REQ-110-004
+    - REQ-110-014
+  .agentdev/phase/pending.md:
+    - REQ-110-004
+  .agentdev/README.md:
+    - REQ-110-001
+    - REQ-110-004
+    - REQ-110-010
+    - REQ-110-013
+    - REQ-110-014
+verification:
+  .opencode/skills/repo-agentdev-integrity/scripts/tests/phase_domain_state.test.ts:
+    - REQ-110-001
+    - REQ-110-004
+    - REQ-110-010
+    - REQ-110-013
+    - REQ-110-014
+links:
+  upstream:
+    .agentdev/phase/README.md:
+      - docs/designs/workflows/v51-phase-driven-collaboration-model.md
+    .agentdev/phase/identity.yaml:
+      - docs/designs/workflows/v51-phase-driven-collaboration-model.md
+    .agentdev/phase/themes.md:
+      - docs/designs/workflows/v51-phase-driven-collaboration-model.md
+    .agentdev/phase/pending.md:
+      - docs/designs/workflows/v51-phase-driven-collaboration-model.md
