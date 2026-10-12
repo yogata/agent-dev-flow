@@ -17,3 +17,6 @@ implementation:
   - REQ-096-023
   src/common/commands/agentdev/README.md:
   - REQ-096-023
+  - REQ-111-009
+  - REQ-111-010
+  - REQ-111-013
