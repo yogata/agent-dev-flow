@@ -308,3 +308,19 @@
 - **想定反映先**: case-auto Design「委譲指示の構築規律（case-ready・case-close の並列委譲起動）」節、agentdev-workflow-case-close references
 - **関連**: #3653/#3654 最終 case-close、commit ee2a1bd1、コメント 6131559584 / 6131562314
 - **タグ**: `#delegation-instructions` `#design-lifecycle`
+
+## 配布物（workflow reference 等）への REQ ID 直記は配布境界 concrete-id 検出で違反になり、参照は Design パス＋節名へ一本化する
+
+- **問題事象**: 配布対象の workflow reference 等へ REQ ID 直記（例: `（REQ-009-033）`）を含めて配布依存境界 checker を実行すると、concrete-id カテゴリの違反として検出される。配布物に正規 REQ 行 ID を直接埋め込む書き方は検査で排除すべき形になる
+- **発生局面**: case-run 実装検証（PR #3669 の case-close reference 編集、実装中の配布境界 checker 実行）
+- **検知方法**: check_distribution_boundary.ts（--profile source）の findings で concrete-id 違反として報告（`pr-merge-and-conflict.md` L113 相当、1 件）
+- **根本原因**: 配布物は正規成果物の ID 空間から独立して配布されるため、REQ ID 直記は配布先で参照先を解決できない。参照の正は Design パス＋節名（REQ の対応関係は正規成果物側の declaration/sidecar が持つ）
+- **自律対応内容**: 該当行の REQ ID 直記を Design パス参照へ一本化して解消済み（PR #3669 修正 4、merge commit 5958fe7e 配下で違反 0 を確認）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（配布境界 checker の既存契約どおりの挙動）
+- **横展開観点**: 配布対象ディレクトリ（src/common/**）配下の docs（SKILL.md、references、README）を編集するすべての Case で同様の違反が発生し得る。編集後に checker を実行してから報告する
+- **再発条件**: 配布物へ REQ ID や Decision ID 等の正規成果物 concrete ID を直記して配布依存境界 checker を実行したとき
+- **予防策候補**: 配布物編集時の参照様式として Design パス＋節名参照を原則とし、実装前の reference 記述段階で concrete ID 直記を避ける
+- **想定反映先**: agentdev-workflow-case-run（検証手順の配布境界違反対処）、workflow-skill-model 系 Design の配布物記述規約
+- **関連**: PR #3669（Case #3670、Findings/Capture候補 learning セクションの記録）、merge commit 5958fe7e
+- **タグ**: `#distribution-boundary` `#concrete-id`
