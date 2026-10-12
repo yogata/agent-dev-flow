@@ -157,6 +157,8 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [workflows/v4-collaboration-loop.md](workflows/v4-collaboration-loop.md) | accepted | ADF v4 継続コラボレーションループ | 循環の各段責務（Observe・Integrate 定義、実現手段対応表）、Learning 評価結果 7 系統、昇格ガード、.agentdev/ 状態領域の整合、v3 backlog-artifact-lifecycle Design からの吸収 |
 | [workflows/issue-title-policy.md](workflows/issue-title-policy.md) | accepted | Issue タイトル記述規則 | ADF が起票する Issue タイトルの具体書式の単一参照点（役割別書式判定表、主題原則、Wave 投影、除外情報、付与と更新の場面、生成例） |
 | [workflows/issue-lifecycle-records.md](workflows/issue-lifecycle-records.md) | accepted | Case Issue 工程記録モデル | Case Issue 本文・コメント・Case Epic の工程記録の物理様式と運用プロトコルの正（本文構成、進行状態写像、記録契機、記録コメント項目、部分成功回復、Epic 反映と per-Epic 排他制御）。REQ-101 の design 対応 |
+| [workflows/v51-phase-driven-collaboration-model.md](workflows/v51-phase-driven-collaboration-model.md) | accepted | ADF v5.1 工程駆動コラボレーションモデル | 検討テーマの育成管理、外部AI検討の持出しと戻り受理、正規成果物への段階形成と工程全体像の再構成の利用契約（REQ-110、REQ-104-008 の design 対応） |
+| [workflows/v51-phase-transition-and-coexistence-model.md](workflows/v51-phase-transition-and-coexistence-model.md) | accepted | ADF v5.1 工程遷移・独立レビューと双経路併存モデル | 利用者判断による工程遷移、独立レビュー、有限作業からの実装・検証接続、変更駆動経路との併存（REQ-111 の design 対応） |
 
 ### 基盤 Design 一覧（6 ドメイン配下）
 

@@ -1,6 +1,6 @@
 ---
 title: ADF v5.1 工程駆動コラボレーションモデル（v51-phase-driven-collaboration-model）
-status: draft
+status: accepted
 created: 2026-10-12
 updated: 2026-10-13
 ---
