@@ -1,0 +1,41 @@
+component: agentdev-phase-theme-collaboration
+implementation:
+  src/common/skills/agentdev-phase-theme-collaboration/SKILL.md:
+  - REQ-110-001
+  - REQ-110-004
+  - REQ-110-006
+  - REQ-110-007
+  - REQ-110-009
+  - REQ-110-013
+  - REQ-110-014
+  - REQ-110-015
+  src/common/skills/agentdev-phase-theme-collaboration/scripts/lib/receive.ts:
+  - REQ-110-007
+  - REQ-110-009
+  - REQ-110-015
+  src/common/skills/agentdev-phase-theme-collaboration/scripts/lib/handoff.ts:
+  - REQ-110-006
+  src/common/skills/agentdev-phase-theme-collaboration/scripts/lib/sections.ts:
+  - REQ-110-004
+  - REQ-110-005
+  - REQ-110-014
+  src/common/skills/agentdev-phase-theme-collaboration/scripts/src/received.ts:
+  - REQ-110-013
+verification:
+  src/common/skills/agentdev-phase-theme-collaboration/scripts/tests/receive.test.ts:
+  - REQ-110-007
+  - REQ-110-009
+  - REQ-110-015
+  src/common/skills/agentdev-phase-theme-collaboration/scripts/tests/handoff.test.ts:
+  - REQ-110-006
+  src/common/skills/agentdev-phase-theme-collaboration/scripts/tests/sections.test.ts:
+  - REQ-110-004
+  - REQ-110-005
+  - REQ-110-014
+  src/common/skills/agentdev-phase-theme-collaboration/scripts/tests/received.test.ts:
+  - REQ-110-013
+links:
+  upstream:
+    src/common/skills/agentdev-phase-theme-collaboration/SKILL.md:
+    - docs/designs/workflows/v51-phase-driven-collaboration-model.md
+    - .agentdev/phase/README.md
