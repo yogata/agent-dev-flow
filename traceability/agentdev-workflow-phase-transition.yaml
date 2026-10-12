@@ -5,6 +5,7 @@ implementation:
     - REQ-111-003
     - REQ-111-004
     - REQ-111-005
+    - REQ-111-007
     - REQ-111-011
   src/common/commands/agentdev/phase-transition.md:
     - REQ-111-002

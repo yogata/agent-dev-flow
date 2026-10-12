@@ -5,6 +5,7 @@ implementation:
   - REQ-110-008
   - REQ-110-009
   - REQ-110-015
+  - REQ-111-008
   src/common/commands/agentdev/phase-artifacts-update.md:
   - REQ-110-007
   - REQ-110-008
@@ -16,6 +17,7 @@ verification:
   - REQ-110-008
   - REQ-110-009
   - REQ-110-015
+  - REQ-111-008
   src/common/commands/agentdev/phase-artifacts-update.md:
   - REQ-110-007
   - REQ-110-008

@@ -20,6 +20,12 @@ implementation:
     - REQ-108-007
     - REQ-108-008
     - REQ-108-012
+    - REQ-111-006
+    - REQ-111-007
+    - REQ-111-009
+    - REQ-111-010
+    - REQ-111-011
+    - REQ-111-012
   src/common/skills/agentdev-workflow-case-auto/scripts/src/records-report.ts:
     - REQ-034-021
     - REQ-101-008
@@ -65,6 +71,13 @@ implementation:
     - REQ-096-015
     - REQ-101-009
 verification:
+  src/common/skills/agentdev-workflow-case-auto/SKILL.md:
+    - REQ-111-006
+    - REQ-111-007
+    - REQ-111-009
+    - REQ-111-010
+    - REQ-111-011
+    - REQ-111-012
   src/common/skills/agentdev-workflow-case-auto/scripts/tests/records-report.test.ts:
     - REQ-034-021
     - REQ-101-008
