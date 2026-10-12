@@ -17,6 +17,7 @@ req-define command は公開 interface（入出力契約・ガードレール）
 
 - ユーザーの自然言語による要求説明（機能追加、bug report 等）
 - GitHub Issue URL（既存Issueの場合）、エラー・ログ・障害情報、外部課題、finding
+- 工程駆動で形成・反映済みの正規成果物（canonical REQ/Decision/Design）への後続変更要求。工程駆動の操作や遷移を前置必須とせず、本 workflow から直接受理する（参照専用入力）
 - ユーザーが明示した入力ファイル（設計メモ、調査メモ、RU `.agentdev/backlog/req-units/RU-*.md` 等、参照専用）
 - エラー・障害入力では、現象理解 → 原因分析 → 期待状態 → 影響分析 → 要求化の必要性の評価経路を経て REQ/Decision/Design へ接続する（`v4-standard-lifecycle` Design「req-define の入力意味と要件化責務」節）
 - Definition 保存内部責務の SPLIT 検出時の検出事項、inspect-skills 診断結果の検出事項
