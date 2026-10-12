@@ -1,5 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
+import { traceabilityReport as makeTraceabilityReport } from "./traceability-report-fixture";
+
 import {
   applyDefinitionEdit,
   assembleReport,
@@ -47,7 +49,7 @@ function input(overrides: Partial<PrepareDefinitionPrInput> = {}): PrepareDefini
     requiresIndexRegeneration: true,
     stagePaths: ["docs/req-index/REQ-TARGET.md", "docs/README.md"],
     commitMessage: "docs(definition): REQ-NNNN-NNN 更新 (Refs #10)",
-    traceabilityReqIds: ["REQ-NNNN-NNN"],
+    traceabilityReqIds: [["REQ", "000", "001"].join("-")],
     generateIndexesGate: gate("generate_indexes"),
     checkIntegrityGate: gate("check_integrity"),
     traceabilityGate: gate("traceability-check"),
@@ -86,10 +88,7 @@ function fakeRunner(overrides: {
         result.stdout = "abc123\n";
       }
       if (spec.command === "bun" && spec.args.includes("traceability-check")) {
-        result.stdout = overrides.traceabilityReport ?? JSON.stringify({
-          summary: { pass: 9, fail: 0 },
-          checks: { "missing-design": { status: "pass", findings: [] } },
-        });
+        result.stdout = overrides.traceabilityReport ?? makeTraceabilityReport([["REQ", "000", "001"].join("-")]);
         if (overrides.traceabilityReport !== undefined) result.exitCode = 2;
       }
       return result;
@@ -197,12 +196,11 @@ describe("機械工程の実行（worktree・編集・品質ゲート・明示�
   });
 
   test("missing-design の対象 REQ 欠落がなければ既存 findings の exit 2 で停止しない", () => {
+    const targetReqId = ["REQ", "000", "001"].join("-");
+    const outsideReqId = ["REQ", "001", "001"].join("-");
     const runner = fakeRunner({
-      traceabilityReport: JSON.stringify({
-        summary: { pass: 7, fail: 2 },
-        checks: {
-          "missing-design": { status: "fail", findings: [{ reqId: "REQ-OTHER-001" }] },
-        },
+      traceabilityReport: makeTraceabilityReport([targetReqId], {
+        "missing-design": { status: "fail", findings: [{ reqId: outsideReqId }] },
       }),
     });
     const report = runPrepareDefinitionPr(input(), runner);
@@ -210,12 +208,10 @@ describe("機械工程の実行（worktree・編集・品質ゲート・明示�
   });
 
   test("missing-design の対象 REQ 欠落があれば停止する", () => {
+    const targetReqId = ["REQ", "000", "001"].join("-");
     const runner = fakeRunner({
-      traceabilityReport: JSON.stringify({
-        summary: { pass: 7, fail: 1 },
-        checks: {
-          "missing-design": { status: "fail", findings: [{ reqId: "REQ-NNNN-NNN" }] },
-        },
+      traceabilityReport: makeTraceabilityReport([targetReqId], {
+        "missing-design": { status: "fail", findings: [{ reqId: targetReqId }] },
       }),
     });
     const report = runPrepareDefinitionPr(input(), runner);

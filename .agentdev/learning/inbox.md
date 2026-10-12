@@ -196,3 +196,19 @@
 - **想定反映先**: docs/designs/workflows/ の効果測定関係 Design または learning pipeline での昇華判断
 - **関連**: Epic #3642、Issue #3647、PR #3652（TS-008 効果目標と適用先セクション）
 - **タグ**: `#measurement` `#performance-goal`
+
+## 新規REQ行の traceability raw fail を工程別 gate が区別できず Definition PR の進行が止まる
+
+- **問題事象**: Root Case #3653 の case-open STEP-4 で、新規 REQ-110 の15行と REQ-104-008 を対象にした traceability check が終了コード2、pass 9 / fail 2 を返した。fail は対象行の missing-implementation と missing-verification で、missing-design は pass し、形式検査系も全件 pass だった
+- **発生局面**: 実装（case-open STEP-4 の Definition branch に対する品質ゲート実行時）
+- **検知方法**: `prepare_definition_pr` の traceability-check 報告 JSON と保存済み raw checker 結果を照合し、検査種別ごとの status を確認した
+- **根本原因**: 新規 REQ 行の実装・検証対応は case-run / case-ready が所有するため Definition 段階では未成立である。一方、共通 checker の全体終了コードを工程別に解釈する consumer がなく、Definition 段階の正規条件である設計対応と、後続工程の未完了義務を分離できていなかった
+- **自律対応内容**: 利用者の明示承認後、raw checker の終了コードと findings を変更せず、case-open と case-ready の stage consumer が工程別に結果を分類する実装と回帰テストを追加した。implementation / verification findings は未完了として保持し、Definition 段階の判定で成功扱いしないことを確認した。case-open scripts 31件、case-ready scripts 30件が pass し、raw 結果を PR #3655 に記録した
+- **ユーザー確認有無**: あり（Definition-stage gate consumer の修正を明示承認）
+- **Decision/REQ/spec影響**: canonical REQ と Decision の変更なし。case-open の Definition PR gate reference と workflow consumer の工程別判定を整合させた
+- **横展開観点**: Traceability checker の raw findings は保持したまま、gate consumer が当該工程の責任範囲と後続工程の義務を区別する。検査器の全体 status を単純に工程の成否へ転用しない
+- **再発条件**: 新規 REQ 行を Definition PR に追加し、implementation / verification 対応が未成立のまま共通 traceability checker を実行する一方、工程別 gate consumer が同種の未完了を区別しない場合
+- **予防策候補**: Definition、readiness、implementation、final-completion 各工程で gate consumer の対象検査と deferred obligation の扱いを回帰テストで固定し、raw checker 証跡と工程判定を別々に記録する
+- **想定反映先**: `src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md`、`src/common/skills/agentdev-workflow-case-open/scripts/lib/definition-traceability-gate.ts` と各 stage consumer のテスト
+- **関連**: Root Case #3653、PR #3655、前回同種の観測 Case #3628 / PR #3631、`.agentdev/integrity/reports/2026-10-12-case3653-traceability-check.json`
+- **タグ**: `#workflow-deviation` `#traceability-gate` `#definition-pr`

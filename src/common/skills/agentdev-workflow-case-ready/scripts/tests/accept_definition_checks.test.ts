@@ -1,5 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
+import { traceabilityReportFromArgs } from "../../../agentdev-workflow-case-open/scripts/tests/traceability-report-fixture";
+
 import {
   assembleReport,
   buildGateEvidence,
@@ -18,11 +20,11 @@ import {
   type MechanicalRunner,
 } from "../src/accept_definition_checks";
 
-function gate(name: string): GateCommandSpec {
+function gate(name: string, args: readonly string[] = ["./checker.ts", "--gate", name]): GateCommandSpec {
   return {
     name,
     command: "bun",
-    args: ["./checker.ts", "--gate", name],
+    args,
     cwd: "C:/repo",
     timeoutMs: 60000,
   };
@@ -35,7 +37,13 @@ function acceptanceInput(overrides: Partial<AcceptDefinitionInput> = {}): Accept
     branch: "definition/issue-10",
     prNumber: 20,
     integrityGates: [gate("check_integrity"), gate("check_changed_docs")],
-    traceabilityGate: gate("traceability-check"),
+    traceabilityGate: gate("traceability-check", [
+      "./traceability-check.ts",
+      "--root",
+      "C:/repo",
+      "--req",
+      ["REQ", "061", "023"].join("-"),
+    ]),
     overlapGate: gate("overlap-cross-dependencies"),
     generateIndexesGate: gate("generate_indexes"),
     autogenDerivedPaths: ["docs/README.md", "docs/decisions/README.md"],
@@ -67,8 +75,8 @@ function fakeRunner(overrides: {
       if (spec.command === "bun" && spec.args.includes("overlap-cross-dependencies")) {
         result.stdout = JSON.stringify(overrides.overlapReport ?? { warnings: [] });
       }
-      if (spec.command === "bun" && spec.args.includes("traceability-check")) {
-        result.stdout = JSON.stringify({ summary: { pass: 9, fail: 0 } });
+      if (spec.command === "bun" && spec.args.includes("--req")) {
+        result.stdout = traceabilityReportFromArgs(spec.args);
       }
       if (spec.command === "bun" && overrides.integrityFailGate && spec.args.includes(overrides.integrityFailGate)) {
         result.exitCode = 3;
@@ -268,8 +276,8 @@ describe("検査証拠の一括保存と結果消費（標準出力・標準エ�
     });
     const report = runAcceptDefinitionChecks(acceptanceInput({ traceabilityGate }), fakeRunner());
     const step = report.result.steps.find((s) => s.name === "traceability-check");
-    expect(step?.detail.stdout).toBe(JSON.stringify({ summary: { pass: 9, fail: 0 } }));
-    expect(step?.detail.summary).toBe("pass=9 fail=0");
+    expect(step?.detail.stdout).toBe(traceabilityReportFromArgs(traceabilityGate.args));
+    expect(step?.detail.summary).toBe("pass=11 fail=0");
     expect(step?.detail.targetRevision).toBe("abc123");
     expect(step?.detail.targetPaths).toEqual(["C:/repo"]);
   });
@@ -289,7 +297,7 @@ describe("検査証拠の一括保存と結果消費（標準出力・標準エ�
     runAcceptDefinitionChecks(acceptanceInput(), runner);
     expect(runner.calls.filter((c) => c.args.includes("check_integrity"))).toHaveLength(1);
     expect(runner.calls.filter((c) => c.args.includes("check_changed_docs"))).toHaveLength(1);
-    expect(runner.calls.filter((c) => c.args.includes("traceability-check"))).toHaveLength(1);
+    expect(runner.calls.filter((c) => c.args.some((arg) => arg.includes("traceability-check")))).toHaveLength(1);
     expect(runner.calls.filter((c) => c.args.includes("overlap-cross-dependencies"))).toHaveLength(1);
     expect(runner.calls.filter((c) => c.command === "git" && c.args[0] === "rev-parse")).toHaveLength(1);
   });
@@ -352,6 +360,13 @@ describe("既知検査入力の事前検証と固定生成（不正入力は検�
       reqIds: ["REQ-061-049", "REQ-061-050"],
     });
     const report = runAcceptDefinitionChecks(acceptanceInput({ traceabilityGate }), runner);
+    expect(report.result.steps[3]?.detail.stdout).toBe(traceabilityReportFromArgs(traceabilityGate.args));
+    expect(report.result.steps.map((step) => [step.name, step.status])).toEqual([
+      ["definition-acceptance-checks", "pass"],
+      ["overlap-cross-check", "pass"],
+      ["autogen-regeneration-diff", "pass"],
+      ["traceability-check", "pass"],
+    ]);
     expect(report.result.exitCategory).toBe("success");
     const traceCall = runner.calls.find((c) => c.args.includes("--req"));
     expect(traceCall?.args.slice(-2)).toEqual(["--req", "REQ-061-049,REQ-061-050"]);

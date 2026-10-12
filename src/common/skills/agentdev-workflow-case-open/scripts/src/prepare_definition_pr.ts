@@ -17,6 +17,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { spawnSync } from "node:child_process";
+import { consumeDefinitionTraceability, type DeferredObligation } from "../lib/definition-traceability-gate.ts";
 
 const USAGE = `usage: bun ./src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts --input <input.json>
   --input  機械工程入力 JSON（worktree、branch、Definition 編集内容、品質ゲート実行仕様等）`;
@@ -422,6 +423,7 @@ export function runPrepareDefinitionPr(
   const warnings: string[] = [];
   const diff: Record<string, unknown> = {};
   const proposal: Record<string, string> = {};
+  let deferredTraceabilityObligations: readonly DeferredObligation[] = [];
   const repoRoot = path.resolve(input.repoRoot);
   const worktreeAbs = path.resolve(repoRoot, input.worktreeRoot);
   const worktreeCwd = worktreeAbs;
@@ -595,44 +597,30 @@ export function runPrepareDefinitionPr(
 
     if (input.traceabilityGate) {
       const check = runSpec(runner, input.traceabilityGate);
-      let summary = "";
-      let gateFailed = check.exitCode !== 0;
-      if (check.exitCode === 0 || check.exitCode === 2) {
-        try {
-          const parsed = JSON.parse(check.stdout) as {
-            summary?: { pass?: number; fail?: number };
-            checks?: Record<string, { status?: string; findings?: readonly { reqId?: string }[] }>;
-          };
-          summary = `pass=${parsed.summary?.pass ?? "?"} fail=${parsed.summary?.fail ?? "?"}`;
-          const targetedReqIds = input.traceabilityReqIds ?? [];
-          const checks = parsed.checks ?? {};
-          gateFailed =
-            Object.keys(checks).length === 0 ||
-            Object.entries(checks).some(([name, result]) => {
-              if (result.status !== "fail") return false;
-              if (name !== "missing-design") return true;
-              return targetedReqIds.length === 0 || result.findings?.some(
-                (finding) => finding.reqId !== undefined && targetedReqIds.includes(finding.reqId),
-              ) === true;
-            });
-        } catch {
-          summary = "report parse failed";
-          gateFailed = true;
-        }
-      }
+      const consumption = consumeDefinitionTraceability({
+        exitCode: check.exitCode,
+        stdout: check.stdout,
+        targetReqIds: input.traceabilityReqIds ?? [],
+      });
+      const deferred = consumption.deferredObligations;
+      const status = consumption.status;
+      deferredTraceabilityObligations = deferred;
       steps.push({
         name: "traceability-check",
-        status: gateFailed ? "fail" : "pass",
+        status,
         detail: {
-          exitCode: check.exitCode,
-          summary,
+          summary: consumption.summary,
           reqIds: input.traceabilityReqIds ?? [],
+          deferredObligations: deferred,
           ...buildGateEvidence(input.traceabilityGate, check, head),
         },
       });
-      if (gateFailed) {
-        warnings.push("traceability check failed");
+      if (consumption.blocking) {
+        warnings.push(`traceability stage gate failed: ${consumption.reason ?? consumption.summary}`);
         return assembleReport(false, steps, diff, warnings, proposal);
+      }
+      if (deferred.length > 0) {
+        warnings.push("missing-implementation and missing-verification remain raw checker failures and are deferred to case-run and case-close");
       }
     }
   }
@@ -649,7 +637,10 @@ export function runPrepareDefinitionPr(
     "",
     "## 検証",
     "",
-    "- generate_indexes / check_integrity / traceability check: 本 script 実行内で成功",
+    "- generate_indexes / check_integrity: 本 script 実行内で成功",
+    deferredTraceabilityObligations.length === 0
+      ? "- traceability stage gate: 対象 REQ の Design 対応と構造・policy 検査に合格"
+      : `- traceability stage gate: Design 対応と構造・policy 検査に合格。checker の missing-implementation / missing-verification は raw fail のまま case-run / case-close へ deferred: ${deferredTraceabilityObligations.map((obligation) => `${obligation.check} (${obligation.reqIds.join(", ")})`).join("; ")}`,
   ].join("\n");
 
   return assembleReport(input.dryRun === true, steps, diff, warnings, proposal);
