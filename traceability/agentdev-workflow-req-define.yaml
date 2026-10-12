@@ -28,6 +28,9 @@ implementation:
     - REQ-021-028
     - REQ-021-029
     - REQ-098-010
+    - REQ-111-006
+    - REQ-111-009
+    - REQ-111-010
   src/common/skills/agentdev-workflow-req-define/references/draft-generation.md:
     - REQ-008-061
   src/common/skills/agentdev-workflow-req-define/references/requirement-development.md:
@@ -57,6 +60,13 @@ implementation:
 verification:
   docs/designs/commands/req-define.md:
     - REQ-021-029
+  src/common/skills/agentdev-workflow-req-define/SKILL.md:
+    - REQ-111-006
+    - REQ-111-009
+    - REQ-111-010
+  src/common/commands/agentdev/req-define.md:
+    - REQ-111-009
+    - REQ-111-010
   src/common/skills/agentdev-workflow-req-define/references/requirement-development.md:
     - REQ-090-024
     - REQ-090-027
