@@ -16,7 +16,7 @@ AgentDevFlow は AI エージェントによる開発ワークフローを支え
 `case-auto` は内部 lifecycle（case-open、case-ready、case-run、case-close、例外経路 case-revise）を駆動し、Definition の保存・確定と実行構造の確定もその内部責務として実行する。
 再合意済みの Definition 変更は req-define で再合意した後、`case-auto` が例外経路（case-revise → case-ready）を解決して反映する。
 
-工程駆動実行は、テーマ初回形成、テーマ更新、正規成果物への反映、独立レビューの4操作と利用者判断による工程遷移からなる将来実装予定の経路であり、上記の変更駆動経路と別経路として併存する。後継経路の実現・採用まで現行の変更駆動経路が正であり、変更駆動の実行に工程駆動の操作や遷移を前置しない。
+工程駆動実行は、テーマ初回形成（`/agentdev/phase-tasks-create`）、テーマ更新（`/agentdev/phase-tasks-update`）、正規成果物への反映（`/agentdev/phase-artifacts-update`）、独立レビュー（`/agentdev/phase-review`）の4操作と利用者判断による工程遷移（`/agentdev/phase-transition`）からなる経路であり、上記の変更駆動経路と別経路として併存する。後継経路の実現・採用まで現行の変更駆動経路が正であり、変更駆動の実行に工程駆動の操作や遷移を前置しない。
 
 ## 開発者セットアップ（textlint 依存の生成）
 
@@ -44,4 +44,4 @@ bun install && bun run build:engine
 配布コマンドの索引。
 詳細な選び方は上表の[コマンド選択](docs/guides/command-selection.md)、各コマンドの入出力は[コマンドリファレンス](src/common/commands/agentdev/README.md)を参照する。
 
-`/agentdev/req-define`、`/agentdev/backlog-auto`、`/agentdev/case-auto`、`/agentdev/intake-capture`、`/agentdev/intake-from-github`、`/agentdev/intake-promote`、`/agentdev/learning-promote`、`/agentdev/backlog-review`、`/agentdev/inspect-docs`、`/agentdev/inspect-skills`、`/agentdev/inspect-promote`、`/agentdev/issue`、`/agentdev/third-party-sync`
+`/agentdev/req-define`、`/agentdev/backlog-auto`、`/agentdev/case-auto`、`/agentdev/intake-capture`、`/agentdev/intake-from-github`、`/agentdev/intake-promote`、`/agentdev/learning-promote`、`/agentdev/backlog-review`、`/agentdev/inspect-docs`、`/agentdev/inspect-skills`、`/agentdev/inspect-promote`、`/agentdev/issue`、`/agentdev/third-party-sync`、`/agentdev/phase-tasks-create`、`/agentdev/phase-tasks-update`、`/agentdev/phase-artifacts-update`、`/agentdev/phase-review`、`/agentdev/phase-transition`

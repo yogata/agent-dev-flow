@@ -29,6 +29,18 @@
 | 要件docから Root Case 確立〜マージまでを一括実行したい / 既存 Root Case Issue の番号、URL から再開したい | `/agentdev/case-auto` | マージ済み + クローズ済み |
 | backlog整理サイクル（検出→昇格→統合）を1回で実行したい | `/agentdev/backlog-auto` | 検出事項、採用済み成果物、`RU-*.md` |
 
+## 工程駆動実行（変更駆動経路と併存する別経路）
+
+| 現在の状態 | 次のコマンド | 出力 |
+|-----------|-------------|------|
+| 工程の検討テーマを初回形成したい | `/agentdev/phase-tasks-create` | テーマ初回形成の結果（テーマ一覧、参考候補と既知の必須事項の区別） |
+| テーマの追加・具体化・分割・統合・廃止をしたい | `/agentdev/phase-tasks-update` | テーマ更新の結果（変更理由、旧新対応、未決事項の引継ぎ） |
+| 外部検討の採用済みの戻り内容を正規成果物へ反映したい | `/agentdev/phase-artifacts-update` | 反映の結果と受領記録（衝突・未確認・保存失敗の区別） |
+| 正規成果物群を独立レビューしたい、工程全体像を再構成したい | `/agentdev/phase-review` | 4区分に分けた所見と工程全体像（セッション内出力） |
+| 工程を完了として次へ進めたい | `/agentdev/phase-transition` | 遷移の記録結果 |
+
+> 工程駆動実行は標準経路とは別経路として併存する。後継経路の実現・採用まで現行の変更駆動経路が正であり、変更駆動の実行に工程駆動の操作や遷移を前置しない。各操作は単独で起動でき、他の工程操作や遷移操作を前置しない。
+
 ## リポジトリメンテナンス（AgentDevFlow 本体リポジトリのみ）
 
 | 現在の状態 | 次のコマンド | 出力 |
@@ -68,4 +80,4 @@ work_type（bugfix / feature / maintenance / docs_chore）による固定判定�
 - `/agentdev/case-auto` は標準実行コマンド。要求入口 2 つ（`/agentdev/req-define`、`/agentdev/backlog-auto`）から合流する標準経路（`/agentdev/req-define` → `/agentdev/case-auto`）を構成する
 - `/agentdev/backlog-auto` は backlog 整理サイクル（検出→昇格→統合）を1回で実行する backlog-driven の要求入口。整理結果は `/agentdev/req-define` → `/agentdev/case-auto` へ接続する
 - inspect-docs、learning-promote、intake-promote、inspect-promote、backlog-review は単独実行できるコマンドである
-- 工程駆動実行は、テーマ初回形成、テーマ更新、正規成果物への反映、独立レビューの4操作と利用者判断による工程遷移からなる経路であり、標準経路とは別経路として併存する（将来実装予定）。対応する公開コマンドは未実装のため本表には未登録であり、後継経路の実現・採用まで現行経路（本表）が正である。変更駆動の実行に工程駆動の操作や遷移を前置しない
+- 工程駆動実行の入口は上の「工程駆動実行（変更駆動経路と併存する別経路）」節の表である。変更駆動の実行に工程駆動の操作や遷移を前置しない
