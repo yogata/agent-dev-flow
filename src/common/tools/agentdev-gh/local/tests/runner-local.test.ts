@@ -11,6 +11,7 @@
 
 
 import { describe, expect, test } from "bun:test";
+import { spawnSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import {
@@ -24,6 +25,23 @@ import type { GhRunnerReply, GhRunnerRequest } from "../../runner.ts";
 
 function makeIssuesDir(): string {
   return fs.mkdtempSync(path.join(import.meta.dir, "tmp-local-runner-"));
+}
+
+/**
+ * 実運用構造（`<repoRoot>/.agentdev/issues/`）の一時 git リポジトリを作成し、
+ * init commit を 1 件作成してそのハッシュを返す（pr_merge のコミット実在 VERIFY 用）。
+ */
+function makeGitIssuesDir(): { root: string; issuesDir: string; commitHash: string } {
+  const root = fs.mkdtempSync(path.join(import.meta.dir, "tmp-local-git-"));
+  fs.mkdirSync(path.join(root, ".agentdev", "issues"), { recursive: true });
+  const git = (args: string[]): string => {
+    const r = spawnSync("git", args, { cwd: root, encoding: "utf8" });
+    if (r.status !== 0) throw new Error(`git ${args.join(" ")} failed: ${r.stderr}`);
+    return typeof r.stdout === "string" ? r.stdout.trim() : "";
+  };
+  git(["init"]);
+  git(["-c", "user.name=t", "-c", "user.email=t@example.com", "commit", "--allow-empty", "-m", "init"]);
+  return { root, issuesDir: path.join(root, ".agentdev", "issues"), commitHash: git(["rev-parse", "HEAD"]) };
 }
 
 function makeEnv(issuesDir: string): GhToolEnv {
@@ -878,7 +896,7 @@ describe("LocalRunner: PR 系操作の role: case 限定", () => {
     for (const request of [
       { operation: "pr_create", args: { title: "P", body: "b", base: "main", head: "f", number: 1 } },
       { operation: "pr_read", args: { number: 1 } },
-      { operation: "pr_merge", args: { number: 1, method: "squash" } },
+      { operation: "pr_merge", args: { number: 1, method: "squash", commitHash: "0".repeat(40) } },
       { operation: "pr_changed_files", args: { number: 1 } },
       { operation: "pr_mergeable", args: { number: 1 } },
     ] as GhRunnerRequest[]) {
@@ -909,19 +927,78 @@ describe("LocalRunner: PR 系操作の role: case 限定", () => {
     fs.rmSync(issuesDir, { recursive: true, force: true });
   });
 
-  test("pr_merge はマージ結果セクションへ記録する（REQ-009-033 の記録経路）", async () => {
-    const issuesDir = makeIssuesDir();
+  test("pr_merge はマージ結果セクションへ記録する（REQ-009-033 の記録経路・commitHash VERIFY 含む）", async () => {
+    const { root, issuesDir, commitHash } = makeGitIssuesDir();
     await run(issuesDir, { operation: "issue_create", args: { title: "Case", body: "b", labels: [], role: "case" } });
     await run(issuesDir, {
       operation: "pr_create",
       args: { title: "PR", body: "本文", base: "main", head: "feature/x" },
     });
-    const merged = await run(issuesDir, { operation: "pr_merge", args: { number: 1, method: "squash" } });
+    const merged = await run(issuesDir, {
+      operation: "pr_merge",
+      args: { number: 1, method: "squash", commitHash, base: "main", head: "feature/x" },
+    });
     expect(merged.ok).toBe(true);
+    if (merged.ok) {
+      expect((merged.payload as Record<string, unknown>).merged).toBe(true);
+    }
     const raw = readIssueFile(issuesDir, 1);
     expect(raw).toContain("## マージ結果");
     expect(raw).toContain("結果: PASS");
-    fs.rmSync(issuesDir, { recursive: true, force: true });
+    expect(raw).toContain(`コミットハッシュ: ${commitHash}`);
+    expect(raw).toContain("取り込み先ブランチ: main");
+    expect(raw).toContain("取り込み元ブランチ: feature/x");
+    fs.rmSync(root, { recursive: true, force: true });
+  });
+
+  test("pr_merge は commitHash 欠落を invalid-input で拒否する", async () => {
+    const { root, issuesDir } = makeGitIssuesDir();
+    await run(issuesDir, { operation: "issue_create", args: { title: "Case", body: "b", labels: [], role: "case" } });
+    const reply = await run(issuesDir, { operation: "pr_merge", args: { number: 1, method: "squash" } });
+    expect(reply.ok).toBe(false);
+    if (!reply.ok) {
+      expect(reply.failureClass).toBe("invalid-input");
+      expect(reply.error).toContain("commitHash");
+    }
+    expect(readIssueFile(issuesDir, 1)).not.toContain("## マージ結果");
+    fs.rmSync(root, { recursive: true, force: true });
+  });
+
+  test("pr_merge は実在しないコミットハッシュを拒否し、ローカルIssueファイルを変更しない（fail-closed）", async () => {
+    const { root, issuesDir } = makeGitIssuesDir();
+    await run(issuesDir, { operation: "issue_create", args: { title: "Case", body: "b", labels: [], role: "case" } });
+    const before = readIssueFile(issuesDir, 1);
+    const reply = await run(issuesDir, {
+      operation: "pr_merge",
+      args: { number: 1, commitHash: "0".repeat(40) },
+    });
+    expect(reply.ok).toBe(false);
+    if (!reply.ok) {
+      expect(reply.failureClass).toBe("operation-failed");
+      expect(reply.error).toContain("existing commit");
+    }
+    expect(readIssueFile(issuesDir, 1)).toBe(before);
+    fs.rmSync(root, { recursive: true, force: true });
+  });
+
+  test("pr_merge は二重記録を拒否する（実在コミット入力でも操作を拒否する）", async () => {
+    const { root, issuesDir, commitHash } = makeGitIssuesDir();
+    await run(issuesDir, { operation: "issue_create", args: { title: "Case", body: "b", labels: [], role: "case" } });
+    await run(issuesDir, {
+      operation: "pr_create",
+      args: { title: "PR", body: "本文", base: "main", head: "feature/x" },
+    });
+    const first = await run(issuesDir, { operation: "pr_merge", args: { number: 1, commitHash } });
+    expect(first.ok).toBe(true);
+    const before = readIssueFile(issuesDir, 1);
+    const second = await run(issuesDir, { operation: "pr_merge", args: { number: 1, commitHash } });
+    expect(second.ok).toBe(false);
+    if (!second.ok) {
+      expect(second.failureClass).toBe("operation-failed");
+      expect(second.error).toContain("already has a merge result");
+    }
+    expect(readIssueFile(issuesDir, 1)).toBe(before);
+    fs.rmSync(root, { recursive: true, force: true });
   });
 
   test("失敗時の取り込み結果は issue_update 全文反映で記録できる（status は実行継続のまま維持）", async () => {
