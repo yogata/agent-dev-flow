@@ -34,6 +34,7 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { spawnSync } from "node:child_process";
 import type {
   GhRunner,
   GhRunnerFailureClass,
@@ -1369,25 +1370,57 @@ export class LocalRunner implements GhRunner {
     return { ok: true, payload: { number, url: this.issuePath(number) } };
   }
 
+  /**
+   * コミットハッシュがローカルIssueルート（`.agentdev/issues/` を含むリポジトリルート）の
+   * git リポジトリに commit 型として実在することを確認する（VERIFY）。
+   * 実在しない場合、git 実行自体の失敗（git 不在、リポジトリ不在）も含めて
+   * operation-failed を返す。確認に成功した場合は null を返す。
+   */
+  private verifyCommitExists(commitHash: string): GhRunnerReply | null {
+    const repoRoot = path.resolve(this.issuesDir, "..", "..");
+    const r = spawnSync("git", ["cat-file", "-t", commitHash], { cwd: repoRoot, encoding: "utf8" });
+    const type = typeof r.stdout === "string" ? r.stdout.trim() : "";
+    if (r.status !== 0 || type !== "commit") {
+      const detail = r.error !== null && r.error !== undefined ? ` (spawnSync: ${r.error.message})` : "";
+      return this.fail(
+        `pr_merge requires commitHash that resolves to an existing commit in the local git repository: ${commitHash}${detail}`,
+      );
+    }
+    return null;
+  }
+
   private prMerge(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
     if (number === null) return this.fail("pr_merge requires number");
-    const method = typeof args.method === "string" ? args.method : "merge";
     const target = this.requireCaseIssue(number);
     if (!("parsed" in target)) return target;
+    if (this.hasMergeResult(target.parsed)) {
+      return this.fail(`local issue already has a merge result: ${issueFileName(number)}`);
+    }
+    const commitHash = typeof args.commitHash === "string" && args.commitHash.length > 0 ? args.commitHash : null;
+    if (commitHash === null) {
+      return this.fail("pr_merge requires commitHash", 0, "invalid-input");
+    }
+    // 取り込みの実行主体はローカル版 case-close。本操作は記録の正確性の保証として
+    // 実測コミットのローカル Git 実在を確認（VERIFY）してから記録する（fail-closed）。
+    const notVerified = this.verifyCommitExists(commitHash);
+    if (notVerified !== null) return notVerified;
+    const method = typeof args.method === "string" ? args.method : "merge";
+    const base = typeof args.base === "string" && args.base.length > 0 ? args.base : null;
+    const head = typeof args.head === "string" && args.head.length > 0 ? args.head : null;
     const timestamp = isoNow(this.now);
     const record = [
       "",
       HEADING_MERGE_RESULT,
       "",
       `- 操作: ローカル取り込み（merge 方式: ${method}）`,
+      `- コミットハッシュ: ${commitHash}`,
+      ...(base !== null ? [`- 取り込み先ブランチ: ${base}`] : []),
+      ...(head !== null ? [`- 取り込み元ブランチ: ${head}`] : []),
       `- 実行日時: ${timestamp}`,
       `- 結果: PASS`,
       "",
     ].join("\n");
-    if (this.hasMergeResult(target.parsed)) {
-      return this.fail(`local issue already has a merge result: ${issueFileName(number)}`);
-    }
     this.writeIssue(number, `${target.parsed.raw.replace(/\n+$/, "")}\n${record}`);
     return { ok: true, payload: { number, merged: true } };
   }
