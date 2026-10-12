@@ -2,7 +2,7 @@
 title: ADF v4 標準ライフサイクル（語彙直交性・公開 UX・req-define 入口・継続コラボレーションループ）
 status: accepted
 created: 2026-09-18
-updated: "2026-10-09"
+updated: "2026-10-13"
 ---
 <!-- ADF-COVERS(design): REQ-001-053, REQ-001-054, REQ-004-018, REQ-004-054, REQ-004-055, REQ-005-001, REQ-005-005, REQ-005-006, REQ-005-007, REQ-005-008, REQ-005-010, REQ-005-011, REQ-005-029, REQ-006-114, REQ-030-016, REQ-031-031, REQ-032-028, REQ-034-001, REQ-034-039, REQ-061-036, REQ-062-009 -->
 <!-- ADF-COVERS(design): REQ-103-014, REQ-103-015, REQ-103-030（REQ-103 のライフサイクル責務単一所有・Wave 語彙・領域別並列化の設計対応面） -->
@@ -26,9 +26,11 @@ updated: "2026-10-09"
 
 ## 公開 UX と内部 lifecycle の分離
 
-2 中心フロー（req-define -> case-auto、backlog-auto -> req-define -> case-auto）の定義、case-open/case-ready/case-run/case-close/case-revise の内部 lifecycle 状態への回収、内部状態遷移の全体像（状態機械の詳細）。
+変更駆動の2中心フロー（req-define → case-auto、backlog-auto → req-define → case-auto）は変更駆動経路として維持する。工程駆動実行の公開経路（4操作と利用者判断による工程遷移）は独立した経路として併存し、case-auto の内部 lifecycle と区別する。
 
-- 内部状態遷移を利用者が正しい順に手動実行する UX を標準としない
+- 変更駆動経路は既存の外部的な作業結果と検証義務を引き続き成立させる。工程駆動の操作や工程遷移を前置必須としない
+- 工程駆動の公開操作はテーマ初回形成、テーマ更新、正規成果物への反映、独立レビューであり、利用者判断による工程遷移とともに工程駆動実行へ分類する
+- case-open、case-ready、case-run、case-close、case-revise は変更駆動の case-auto が駆動する内部 lifecycle であり、利用者が手動で順次実行する公開 UX としない
 
 ## req-define の入力意味と要件化責務
 
@@ -63,6 +65,9 @@ Observe -> Intake/Learning -> Backlog -> req-define -> REQ/Decision/Design -> ca
 | Verification / QG | 各配置点の Gate（QG-1〜QG-4 と工程内 gate 群） | quality/v4-quality-gate-model.md |
 | merge / close | case-close | REQ-032、commands/case-close.md |
 | revise / resume | revise: case-revise、resume: case-auto（Root Case 指定入口） | REQ-062、REQ-034、v4-lifecycle-state-machine |
+| 工程駆動のテーマ操作・工程遷移 | 工程駆動経路の対応する公開操作 | REQ-111、v51-phase-transition-and-coexistence-model |
+| 工程駆動の正規成果物保存・確定 | 工程駆動経路の対応する確定操作（成果物種別ごとの正規所有境界を維持） | REQ-111、v51-phase-transition-and-coexistence-model |
+| 工程駆動 Design の draft から accepted への昇格 | 工程駆動経路の設計確定操作 | REQ-111、v51-phase-transition-and-coexistence-model |
 
 ## Wave、意味的依存、実行並列上限、競合情報の一意定義（REQ-103-015）
 
