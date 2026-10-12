@@ -17,7 +17,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 68件、廃止済み: 19件
+現行 REQ: 69件、廃止済み: 19件
 <!-- AUTOGEN:END -->
 
 現行要件は68件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
@@ -97,6 +97,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [REQ-108](requirements/REQ-108.md) | ADF v5 有限実行とワークフロー責務再編 |
 | [REQ-109](requirements/REQ-109.md) | ADF v5 移行と互換性の境界 |
 | [REQ-110](requirements/REQ-110.md) | ADF v5.1 工程駆動コラボレーション（検討テーマ・外部検討と正規成果物の段階形成） |
+| [REQ-111](requirements/REQ-111.md) | ADF v5.1 工程遷移・独立レビューと変更駆動併存 |
 <!-- AUTOGEN:END -->
 
 - [要件インデックス](requirements/README.md)
@@ -164,6 +165,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-055](decisions/DEC-055.md) | ADF v5 有限実行と責務再編（工程独立実行・Issue 必要時利用・Wave の意味的依存グループ化） |
 | [DEC-056](decisions/DEC-056.md) | ADF v5 移行と互換性の境界（後方互換非必須・意味保存移行・未処理改善情報の継続） |
 | [DEC-057](decisions/DEC-057.md) | 工程駆動コラボレーションモデル（検討テーマ・外部検討・段階形成）の採用 |
+| [DEC-058](decisions/DEC-058.md) | 工程遷移と双経路併存モデルの採用（REQ-005-001/010/011 改訂を含む） |
 <!-- AUTOGEN:END -->
 
 ## 設計（Design）
