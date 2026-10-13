@@ -166,3 +166,19 @@
 - **想定反映先**: case-ready / case-run / case-close reference の状態遷移手順。learning-promote での判断
 - **関連**: .agentdev/learning/inbox.md、Issue #3674、Custom Tool agentdev_gh（issue_update 契約）
 - **タグ**: `#case-ready` `#agentdev_gh` `#CaseIssue`
+
+## case-ready 機械工程の traceability gate --req フィルタは Case の対象要件行に限定し触れた REQ の全行を渡さない
+
+- **問題事象**: case-ready 受入機械工程（accept_definition_checks.ts acceptance-checks phase）の traceability gate に、Case が参照する REQ ファイルの全要件行（REQ-006-105〜114・9行）を --req フィルタへ渡したところ、REQ 要件行を1行も変更しない docs_chore Case に対して missing-design 7行（REQ-006-105/106/107/108/109/111/113）を検出し、gate fail（traceability readiness gate failed）で機械工程が途中停止した
+- **発生局面**: 設計PR受入（case-ready STEP-1 機械工程。並行 case-ready 委譲実行。Case #3675 / PR #3689）
+- **検知方法**: accept_definition_checks.ts の報告 JSON で traceability-check step status=fail・blocking reason「a targeted REQ row has no Design correspondence」（後続ゲート抑止も作動）
+- **根本原因**: 対象要件行が空集合（要件行の追加・意味変更なし・docs_chore）である Case の gate フィルタに、触れた REQ ファイルの全行を渡したため、本 Case が対象としない行の corpus 既存債務が blocking 判定の対象に混入した。gate の正しいスコープは「対象 Case の要件行」であり、変更対象 REQ ファイルの全行ではない
+- **自律対応内容**: 対象要件行 0 行の解釈へ修正し、同一 findings が main HEAD（db78a1c0・merge 前対照）でも完全再現することを機械証明して base 起因既存債務と確定。本 Case 対象行の missing-design 0 件・policy 有効（verificationPolicyUnavailable: false・policy-invalid pass）で gate 合格と判定し、merge を続行した
+- **ユーザー確認有無**: なし（委譲時に check_integrity 対照救済の前提が親から付与済み。対象行スコープの解釈は対照機械証明で裏付け）
+- **Decision/REQ/spec影響**: なし（STEP-2/STEP-6 gate の「対象要件行」スコープの既存契約どおりの運用）
+- **横展開観点**: 要件行を変更しない docs_chore / bugfix Case の case-ready・case-open 機械工程全般に適用可能。--req フィルタの構成は draft の要件行変更差分から導出し、REQ ファイル単位で全行を列挙しない
+- **再発条件**: case-ready（または case-open）機械工程の traceability gate で、要件行を変更しない Case に REQ ファイル全行の --req フィルタを渡す場合
+- **予防策候補**: case-ready reference（definition-acceptance.md）に「--req フィルタは Case の対象要件行に限定（要件行変更なし Case では空集合。空集合時は policy 有効性確認で gate 合格判定）」を明記する。learning-promote での判断
+- **想定反映先**: agentdev-workflow-case-ready references/definition-acceptance.md（STEP-2 traceability check 節）。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Case #3675、PR #3689
+- **タグ**: `#case-ready` `#traceability` `#gate` `#docs_chore`
