@@ -52,3 +52,53 @@
 - **想定反映先**: case-open スキル reference（definition-pr-and-idempotency.md の stagePaths・派生物 contingency 手順節）または prepare_definition_pr script 拡張。learning-promote での判断
 - **関連**: .agentdev/learning/inbox.md、PR #3690、Issue #3681、commit e43bb977、scripts/src/prepare_definition_pr.ts
 - **タグ**: `#case-open` `#generate_indexes` `#REQ採番`
+
+
+## agentdev_gh の操作別入力契約の差異（issue_read は labels 非対応）で Tool 呼出が invalid-input になる
+
+- **問題事象**: case-open STEP-5 の冪等検出・横断依存検査のため issue_read で未クローズ Case 群の本文を取得した際、issue_list と同じ呼出形式（labels フィールド付き request）を流用したところ、issue_read の入力契約が labels を unknown-field として拒否し invalid-input（retryable）で失敗した
+- **発生局面**: 実装（case-open STEP-5。並行 case-open 委譲実行）
+- **検知方法**: agentdev_gh の failure 応答（kind: invalid-input、detail: unknown-field [labels]、contingency に gh CLI 読取系 fallback を提示）
+- **根本原因**: agentdev_gh の操作カタログは操作ごとに独立した入力契約を持ち、issue_list（labels 許容）と issue_read（labels 非対応）で許容フィールドが異なる。呼出側が操作間で共通のリクエスト形状を想定すると契約違反になる
+- **自律対応内容**: labels フィールドを除去した最小契約形式（number のみ）で再試行し、12 件の Issue 本文取得に成功した。読取系操作の入力検証エラーは冪等であり、failure detail の契約指示に従った入力修正で解決する
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存 Tool 契約の遵守。影響の記録のみ）
+- **横展開観点**: agentdev_gh の全操作呼出で、操作別契約の必須・許容フィールドを事前に確認する規律が同様に適用可能。書込み系では fail-closed で作成前に止まるが、読取系でも同様の事前確認が無駄な再試行を防ぐ
+- **再発条件**: 複数操作を連続呼出する workflow で、1つの操作のリクエスト形状を別操作へ流用する場合
+- **予防策候補**: workflow skill の reference 手順に、操作別入力契約の最小フィールド構成（issue_read は number のみ等）を明記する。learning-promote での判断
+- **想定反映先**: case-open スキル reference（definition-pr-and-idempotency.md の冪等検出手順、root-case-and-definition-package.md の横断依存検査手順）または agentdev-issue-management。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Issue #3676、Custom Tool agentdev_gh（issue_read 契約）
+- **タグ**: `#case-open` `#agentdev_gh` `#入力契約`
+
+
+## REQ 行なし bugfix Case の traceability gate 対象行に implementation covers 行集合を選ぶと design 対応欠落の既存債務で fail する
+
+- **問題事象**: case-open STEP-4 の REQ 行変更なし Design 語彙修正 Case で、traceability check の対象行（traceabilityReqIds）に本変更対象 Design の implementation covers 行 11 件（inline ADF-COVERS(implementation) 宣言）を指定したところ、missing-design が 8 行（REQ-007-002/003/005、REQ-017-003、REQ-048-001/002/008/016）で fail した。これらの行は現行 corpus で design 対応を持たない既存状態であり、本変更起因ではない
+- **発生局面**: 実装（case-open STEP-4 品質ゲート。並行 case-open 委譲実行）
+- **検知方法**: traceability check 報告の missing-design findings（対象行集合と reqId の突合）と、coverage --req による design 対応帰着の実測（本 Design は design covers を1行も担わない）
+- **根本原因**: Design ファイルの implementation covers 宣言行集合は「design 対応を持つ行集合」と一致しない。Design が design 対応を担うのは inline ADF-COVERS(design) 宣言または sidecar design セクションを持つ場合のみであり、本 Design（agentdev-workflow-templates.md）は implementation 宣言のみで design 対応を持たない。traceability gate の missing-design 0 件ゲートは「対象行の design 対応が完全であること」を要求するため、design 対応を持たない行を対象集合に含めると既存債務が fail として顕在化する
+- **自律対応内容**: coverage 実測で本変更対象 Design が design 対応を担わないことを確認し、対象行集合を「本 Design が対応関係を宣言する中で design 対応を持つ 3 行（REQ-014-016、REQ-100-005、REQ-100-008）」へ修正して再実行し、missing-design 0 件・11 check 全 pass で gate 判定を完了した。対象外 8 行の design 欠落は REQ-021-024 の既存債務として case-ready へ引き継ぐ旨を記録した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存 gate 判定仕様の対象行選択の運用知見。REQ 行を持たない Case の対象行決定は reference に未明文化）
+- **横展開観点**: REQ 行変更なしの bugfix Design 変更 Case（target_req: null）全般に適用可能。traceabilityReqIds は「本変更で design 関係が変わり得る行」＝「本変更対象 Design が design 対応を担う行、または design 対応を持つ対応宣言行」を選択する
+- **再発条件**: REQ 行なしの Design 変更 Case で、対象 Design の implementation covers 行集合を traceabilityReqIds に流用する場合
+- **予防策候補**: definition-pr-and-idempotency.md に REQ 行なし Case の traceabilityReqIds 選択基準（design 対応を持つ行集合を coverage 実測で特定）を明文化する。learning-promote での判断
+- **想定反映先**: case-open スキル reference（definition-pr-and-idempotency.md の gate 判定仕様節）。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Issue #3676、PR #3691、scripts/lib/definition-traceability-gate.ts
+- **タグ**: `#case-open` `#traceability` `#対象行選択`
+
+## Windows Git Bash の /tmp リダイレクト先を node スクリプトが読めず ENOENT になる
+
+- **問題事象**: case-open STEP-4 の yomiyasu lint 前処理で、bash の /tmp へ diff をリダイレクトした後、node スクリプトから同一 /tmp パスを fs.readFileSync で読むと ENOENT で失敗した。bash（Git Bash）の /tmp は Windows 側の一時領域へ仮想的にマップされる一方、node は /tmp をカレントドライブ直下の実パスとして解決するため両者のパス空間が一致しない
+- **発生局面**: 実装（case-open STEP-4 の編集 diff 抽出と yomiyasu_lint.py への検査対象渡し。並行 case-open 委譲実行）
+- **検知方法**: node の ENOENT（syscall: open、path: C:WINDOWSTEMPopencodediff-wt.txt を期待して /tmp を解決した失敗）と、リダイレクト直後の ls では /tmp ファイルが実在する対比
+- **根本原因**: Git Bash の /tmp 仮想マッピングと node の Windows パス解決の不一致。エンコーディング破損問題（PowerShell 系の既知知識）とは別系統のパス解決問題
+- **自律対応内容**: リダイレクト先を C:/WINDOWS/TEMP/opencode 配下の明示 Windows パスへ変更し、bash と node の双方から同一実パスで参照する形へ切替して解決した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: bash と node/python を同一ファイル経由で連結する工程全般（lint 前処理、検査入力 JSON 生成、diff 抽出）に適用可能。workspace 外一時領域を使う工程では明示 Windows パスへ統一する
+- **再発条件**: Windows 環境で bash の /tmp を経由して bash と node/python 間で一時ファイルを受け渡す場合
+- **予防策候補**: bash と他言語実行基盤を連結する工程手順では、一時ファイルの受け渡し先を AGENTS.md の承認済み一時領域（C:WINDOWSTEMPopencode）の明示 Windows パスへ統一する規律を reference 側へ明記する
+- **想定反映先**: workflow skill 共通の環境前提 reference または agentdev-git-worktree reference の Windows 環境注意。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Case #3675、docs/knowledge/windows-powershell-bulk-io-corruption.md（PowerShell 系の別系統問題）
+- **タグ**:   
