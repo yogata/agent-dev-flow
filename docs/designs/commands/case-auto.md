@@ -2,7 +2,7 @@
 title: case-auto Design
 status: accepted
 created: 2026-06-21
-updated: "2026-10-09"
+updated: "2026-10-13"
 ---
 <!-- ADF-COVERS(implementation): REQ-015-012 -->
 <!-- ADF-COVERS(implementation): REQ-100-004 -->
@@ -228,6 +228,7 @@ stage 2（case-ready 委譲起動）と stage 4（case-close 委譲起動）の�
 - 競合する共有書込み（main への merge、push、採番、AUTOGEN 索引更新、同一 Epic Issue 本文更新）は競合対象を特定した上で当該部分のみ直列化し、競合の存在を隠さない
 - 並列起動が1件も成立しない場合は「並列起動不能」停止に従い、逐次実行による成功偽装をしない
 - 委譲指示の静的検査（指示文言の確認）、局所排他の検証、実 workflow の並列実行確認（対象別の起動・処理・終了証跡）を区別する。静的検査だけを実行時の並列性の証明として扱わない
+- stage 4（case-close 委譲起動）の委譲指示の MUST DO には、Design 状態評価（対象 REQ に関係する draft Design の棚卸し制）と Design README（docs/designs/README.md）status 列更新を必須項目として含める。委譲指示は、委譲先 workflow skill が契約する STEP 表と MUST DO 義務を網羅確認してから構築し、指示から落ちた工程が委譲先で実行されないことを前提に項目漏れを作らない。本項目は case-close の Design 状態評価契約（REQ-032-024〜026）の実行を委譲指示構築側で確実にする規律であり、case-close 側の棚卸し評価手順は変更しない
 
 ### blocked 部分停止、ready 継続判定フロー
 
