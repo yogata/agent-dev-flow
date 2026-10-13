@@ -567,23 +567,40 @@ export function runAcceptDefinitionChecks(
     diff.head = head;
     return assembleReport(input.phase, steps, diff, warnings, proposal);
   }
-  const rm = runner.run({ command: "git", args: ["rm", "--", ...removals], cwd: repoRoot });
-  if (rm.exitCode !== 0) {
-    steps.push({
-      name: "draft-ru-removal-commit",
-      status: "fail",
-      detail: { stage: "git rm", stderr: rm.stderr.trim() },
-    });
-    warnings.push("git rm of draft/RU paths failed");
-    return assembleReport(input.phase, steps, diff, warnings, proposal);
+  // 冪等化前置き: git rm の前にインデックスの削除状態を確認する。
+  // 前回実行の git rm 済みでインデックスから消えたパスは pathspec 不一致で停止するため
+  // rm 対象から除外し skip を記録する。
+  const removalTargets: string[] = [];
+  const removalSkips: string[] = [];
+  for (const path of removals) {
+    const indexed = runner.run({ command: "git", args: ["ls-files", "--", path], cwd: repoRoot });
+    if (indexed.exitCode === 0 && indexed.stdout.trim().length > 0) {
+      removalTargets.push(path);
+    } else {
+      removalSkips.push(path);
+    }
+  }
+  if (removalTargets.length > 0) {
+    const rm = runner.run({ command: "git", args: ["rm", "--", ...removalTargets], cwd: repoRoot });
+    if (rm.exitCode !== 0) {
+      steps.push({
+        name: "draft-ru-removal-commit",
+        status: "fail",
+        detail: { stage: "git rm", targets: removalTargets, skippedPaths: removalSkips, stderr: rm.stderr.trim() },
+      });
+      warnings.push("git rm of draft/RU paths failed");
+      return assembleReport(input.phase, steps, diff, warnings, proposal);
+    }
   }
   const staged = runner.run({ command: "git", args: ["status", "--short"], cwd: repoRoot });
+  // git status --short の各行は "XY <path>" の2列形式。trim 前の raw 行の列位置で判定する
+  // （trim すると未ステージ行〔X 列が空白〕の先頭列が Y 列にずれ、staged と誤判定する）。
   const stagedEntries = staged.stdout
     .split("\n")
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0);
-  // インデックスへステージされた行のみが対象（先頭列が空白=未ステージ、"??"=未追跡は除外）。
-  const stagedOnly = stagedEntries.filter((entry) => entry[0] !== " " && entry[0] !== "?");
+    .map((line) => line.replace(/\r$/, ""))
+    .filter((line) => line.length >= 2);
+  // インデックスへステージされた行のみが対象（X 列〔line[0]〕が空白=未ステージ、"??"=未追跡は除外。Y 列〔line[1]〕は working tree 側）。
+  const stagedOnly = stagedEntries.filter((line) => line[0] !== " " && line[0] !== "?");
   const foreignStaged = stagedOnly.filter(
     (entry) => !removals.some((target) => entry.endsWith(target)),
   );
@@ -591,7 +608,7 @@ export function runAcceptDefinitionChecks(
     steps.push({
       name: "draft-ru-removal-commit",
       status: "fail",
-      detail: { stage: "staged-entries-check", stagedEntries, removals },
+      detail: { stage: "staged-entries-check", stagedEntries, removals, skippedPaths: removalSkips },
     });
     warnings.push("staged entries outside the removal paths detected (wait and re-confirm before commit)");
     return assembleReport(input.phase, steps, diff, warnings, proposal);
@@ -604,7 +621,8 @@ export function runAcceptDefinitionChecks(
     name: "draft-ru-removal-commit",
     status: commit.exitCode === 0 ? "pass" : "fail",
     detail: {
-      removedPaths: removals,
+      removedPaths: removalTargets,
+      skippedPaths: removalSkips,
       head: commitHead,
       stderrTail: commit.exitCode === 0 ? "" : commit.stderr.trim().slice(-400),
       stderr: commit.exitCode === 0 ? "" : commit.stderr.trim(),
@@ -613,7 +631,7 @@ export function runAcceptDefinitionChecks(
   if (commit.exitCode !== 0) {
     warnings.push("draft/RU removal commit failed");
   }
-  diff.removedPaths = removals;
+  diff.removedPaths = removalTargets;
   diff.head = commitHead;
 
   return assembleReport(input.phase, steps, diff, warnings, proposal);

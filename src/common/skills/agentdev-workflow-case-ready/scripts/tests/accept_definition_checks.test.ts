@@ -65,6 +65,8 @@ function fakeRunner(overrides: {
   autogenDiff?: string;
   integrityFailGate?: string;
   ffMergeFails?: boolean;
+  indexedPaths?: readonly string[];
+  statusOutput?: string;
 } = {}): MechanicalRunner & { calls: { command: string; args: readonly string[]; cwd: string }[] } {
   const calls: { command: string; args: readonly string[]; cwd: string }[] = [];
   return {
@@ -91,6 +93,12 @@ function fakeRunner(overrides: {
       }
       if (spec.command === "git" && spec.args[0] === "rev-parse") {
         result.stdout = "abc123\n";
+      }
+      if (spec.command === "git" && spec.args[0] === "ls-files") {
+        result.stdout = overrides.indexedPaths?.includes(spec.args.at(-1) ?? "") ? `${spec.args.at(-1)}\n` : "";
+      }
+      if (spec.command === "git" && spec.args[0] === "status") {
+        result.stdout = overrides.statusOutput ?? "D  .agentdev/drafts/req-draft-case-x.md\nD  .agentdev/backlog/req-units/RU-0001.md\n";
       }
       return result;
     },
@@ -191,7 +199,7 @@ describe("受入検査 phase（忠実性・整合性・品質検査、overlap �
 
 describe("canonical 再取得 phase（merge 後 canonical 再取得、draft/RU 削除 commit）", () => {
   test("fetch と ff-only merge で canonical を再取得し、明示パス指定で draft/RU を削除 commit する", () => {
-    const runner = fakeRunner();
+    const runner = fakeRunner({ indexedPaths: [".agentdev/drafts/req-draft-case-x.md", ".agentdev/backlog/req-units/RU-0001.md"] });
     const report = runAcceptDefinitionChecks(cleanupInput(), runner);
     const stepNames = report.result.steps.map((s) => s.name);
     expect(stepNames).toEqual(["canonical-reacquisition", "draft-ru-removal-commit"]);
@@ -213,7 +221,7 @@ describe("canonical 再取得 phase（merge 後 canonical 再取得、draft/RU �
   });
 
   test("削除対象以外のステージを検出した場合は commit を行わず待機を報告する（被害側防御）", () => {
-    const runner = fakeRunner();
+    const runner = fakeRunner({ indexedPaths: [".agentdev/drafts/req-draft-case-x.md", ".agentdev/backlog/req-units/RU-0001.md"] });
     const originalRun = runner.run.bind(runner);
     runner.run = (spec) => {
       if (spec.command === "git" && spec.args[0] === "status") {
@@ -226,6 +234,29 @@ describe("canonical 再取得 phase（merge 後 canonical 再取得、draft/RU �
     const commitCall = runner.calls.find((c) => c.command === "git" && c.args[0] === "commit");
     expect(commitCall).toBeUndefined();
     expect(report.warnings.join("\n")).toContain("wait and re-confirm");
+  });
+
+  test("未ステージ modified の XY 行は X 列が空白のため staged 扱いしない", () => {
+    const runner = fakeRunner({
+      indexedPaths: [".agentdev/drafts/req-draft-case-x.md", ".agentdev/backlog/req-units/RU-0001.md"],
+      statusOutput: "D  .agentdev/drafts/req-draft-case-x.md\n M docs/unrelated.md\nD  .agentdev/backlog/req-units/RU-0001.md\n",
+    });
+
+    const report = runAcceptDefinitionChecks(cleanupInput(), runner);
+
+    expect(report.result.exitCategory).toBe("success");
+    expect(runner.calls.some((call) => call.command === "git" && call.args[0] === "commit")).toBe(true);
+  });
+
+  test("既にインデックスから削除済みの removal は git rm 対象から除外して skip を報告する", () => {
+    const runner = fakeRunner({ indexedPaths: [".agentdev/backlog/req-units/RU-0001.md"] });
+
+    const report = runAcceptDefinitionChecks(cleanupInput(), runner);
+    const rmCall = runner.calls.find((call) => call.command === "git" && call.args[0] === "rm");
+    const cleanupStep = report.result.steps.find((step) => step.name === "draft-ru-removal-commit");
+
+    expect(rmCall?.args).toEqual(["rm", "--", ".agentdev/backlog/req-units/RU-0001.md"]);
+    expect(cleanupStep?.detail.skippedPaths).toEqual([".agentdev/drafts/req-draft-case-x.md"]);
   });
 });
 
