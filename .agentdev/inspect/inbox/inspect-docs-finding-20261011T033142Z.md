@@ -32,6 +32,14 @@ REQ の6観点（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）を fan-in で確認�
 
 lint_skills の Warning 8件は explainer / explainer-book / first-reader / yomiyasu の trigger 記述に関するもの。third-party 由来の非 agentdev Skill への warning であり、policy 上の根拠を確認せず契約違反へ格上げしない。
 
+## 処理記録（2026-10-13 inspect-promote、backlog-auto stage 2）
+
+- promote 5件（RQ04・DS01・DS06/GR01・GR02・DS08〔20261013 DS12 成果物へ統合〕）→ `.agentdev/inspect/promoted/finding-20261013-*.md` へ保存・本ファイルから削除
+- reject 2件（既存追跡への包含により却下・即時削除）: GR03（docs/README.md DEC 表 supersede 注記 4行拡大。既知 F-21〔defer 継続中〕の範囲拡大報告のみで新規成果物を持たず、F-21 側再評価対象へ統合）、LINT01（3 Skill description 上限超過。既存追跡 RU-0018 層1〔lint_skills description 予算超過〕が同一対象を管理中）
+- defer 10件（本ファイルに残置）: RQ03・RQ07・DS02・DS03・DS04・DS05・GR04・GR05・GR06・MECH01
+- 分類は Jev 先行評価（観測 20261013T094553Z-2a11）＋ adversarial-review 2 stream（分類妥当性・証拠適合）convergence 後に全件自律確定（HITL 対象なし・破壊的変更なし）
+- Jev 乖離の処置: DS02/DS03/DS04/DS05 は promote 暫定から defer へ変更（RA-007 実在未確認・様式改善・redirect 対象範囲判断未了・意図的限定記述の可能性により採否未確定。differenceReason: semantic_disagreement）、MECH01 は reject 暫定から defer へ変更（実行契約の恒久化は再発防止知見〔learning 送付候補〕。differenceReason: semantic_disagreement）
+
 ## 検出事項リスト
 
 ### RQ03
@@ -45,17 +53,6 @@ lint_skills の Warning 8件は explainer / explainer-book / first-reader / yomi
 - ng_classification: 今回修正対象候補（両行は今回の delta で変更された）。
 - notes: 行番号を固定しない REQ 番号参照を意図している可能性がある。
 
-### RQ04
-- category: superseded Decision への無注記参照
-- target: `docs/requirements/REQ-006.md:38`
-- evidence: 「Definition 保存工程（case-ready / case-revise 内部責務。DEC-029）」と記載。同 REQ の他箇所は DEC-033 を参照し、DEC-029 は DEC-033 に supersede されている。
-- severity: medium
-- confidence: high
-- source_of_truth: accepted DEC-033
-- recommended_route: 表現是正候補。DEC-033 へ更新するか、DEC-029 が supersede 済みであることを明記する。
-- ng_classification: 今回修正対象候補（対象行は今回の delta で変更された）。
-- notes: DEC-029 が導入した境界の歴史的引用を意図した可能性はある。
-
 ### RQ07
 - category: DRIFT（用語の孤立残存）
 - target: `docs/requirements/REQ-061.md:52`
@@ -66,17 +63,6 @@ lint_skills の Warning 8件は explainer / explainer-book / first-reader / yomi
 - recommended_route: 表現是正候補。用語を統一するか、check の識別子なら Design 側の定義を明示する。
 - ng_classification: 今回修正対象候補（同一変更 wave 内の用語統一漏れ）。
 - notes: `missing-design` が機械検査の finding 識別子である可能性があり、実装との照合が必要。
-
-### DS01
-- category: Design 宣言と本文実体の乖離、責務境界の観察
-- target: `docs/designs/foundations/v4-traceability-model.md:10-11`、`docs/designs/skills/agentdev-traceability.md:9,11`、`docs/designs/commands/case-revise.md:9`
-- evidence: v4-traceability-model の implementation covers 注記は REQ-106/107 の構成実体を同 Design の v5 語義更新節が所有するとする。しかし REQ-106 の差分影響設計は agentdev-traceability の impact 拡張節に、利用側接続は case-revise に記述される。各ファイルの design covers には scope 修飾がない。
-- severity: medium
-- confidence: high（本文実体の所在）、medium（意図的な多面所有の可能性）
-- source_of_truth: REQ-106、REQ-107、REQ-103-014
-- recommended_route: 表現是正候補。covers の REQ-106 範囲を本文実体に合わせるか、設計面の分担を明示する。
-- ng_classification: 今回修正対象候補（関連 covers 宣言は今回の delta で追加された）。
-- notes: 複数 edge の存在だけを責務重複の根拠にしていない。主根拠は REQ-106 implementation 宣言の注記と実際の本文所在の乖離。scope を明記した複数 edge は本リポジトリの通常パターンであり、重複と断定しない。
 
 ### DS02
 - category: covers 宣言不整合、将来計画の参照
@@ -122,50 +108,6 @@ lint_skills の Warning 8件は explainer / explainer-book / first-reader / yomi
 - ng_classification: pre-existing（DEC-051 wave 由来）。
 - notes: Wave 反復制御節が Epic Issue 指定時の限定記述として残された可能性はある。v4-v5-crosswalk は runtime 制御契約節を現行記述として参照している。
 
-### DS06/GR01
-- category: Wave 用語の現行性乖離
-- target: `docs/designs/workflows/v4-standard-lifecycle.md:24,73`、`docs/guides/glossary.md:75`
-- evidence: v4-standard-lifecycle と glossary は Wave を「実行スケジューリング単位」と現在形で記述する。DEC-055 は Wave を意味的な依存関係のまとまりとする。glossary は上位 Decision の置換内容と不一致であり、v4-v5-crosswalk は lifecycle の用語統合を後続処理として記録している。
-- severity: medium
-- confidence: medium
-- source_of_truth: DEC-055、REQ-108-008、v4-v5-crosswalk の REQ-035-006 処遇記録
-- recommended_route: 表現是正候補。glossary を現行化するか移行期注記を付し、lifecycle の残存語彙は crosswalk の棚卸しと同期する。
-- ng_classification: glossary は今回修正対象候補、lifecycle の語彙は pre-existing（crosswalk 管理下）。
-- notes: REQ-108-012 の移行期実行契約維持により、用語定義の更新時期には判断余地がある。DS05 の制御矛盾とは別の対象である。
-
-### DS08
-- category: Inventory の列挙漏れ
-- target: `docs/designs/foundations/system.md:104,121-139`
-- evidence: 104行目は公開 Command 13件を掲げるが、Inventory 表には12公開 Command と内部 lifecycle 5段階があり、`/agentdev/third-party-sync` の行がない。同ファイルには別節（365行目）で third-party-sync の記述がある。
-- severity: low
-- confidence: high
-- source_of_truth: root README の13コマンド索引、コマンドリファレンス一覧
-- recommended_route: 修正候補。Inventory 表に third-party-sync を追加する。
-- ng_classification: pre-existing（今回の delta は用語置換）。
-- notes: 文書全体での記述欠落ではなく Inventory 表の欠落。
-
-### GR02
-- category: README 導線の現行性
-- target: `docs/README.md:8`、`docs/guides/README.md:18`
-- evidence: 両導線は「第4世代（v4）の現在像」を定義する正規文書を案内し、accepted な v5 基盤 REQ-104〜109 / DEC-053〜056 への導線を含まない。
-- severity: medium
-- confidence: medium
-- source_of_truth: accepted DEC-053〜056、REQ-104〜109
-- recommended_route: 表現是正候補。v5 基盤への導線を追加するか、移行期の v4 実行契約維持と v5 基盤確定を併記する。
-- ng_classification: 今回修正対象候補（v5 delta 由来）。
-- notes: DEC-055 は v5 実現確定まで現行実行契約を維持する。v4 文書の実行上の正当性と v5 基盤への導線欠落は分けて扱う。
-
-### GR03
-- category: README 索引内容過多（既知 F-21 の範囲拡大）
-- target: `docs/README.md:141,142,145,152`
-- evidence: DEC-033/034/037/044 の行に superseded_by の詳細説明がタイトル列へ埋め込まれた。これらは部分置換で status: accepted を維持する Decision。既知 F-21 の対象に加えて4行へ拡大した。
-- severity: medium
-- confidence: high
-- source_of_truth: decision-lifecycle の部分置換規約（status: accepted 維持）
-- recommended_route: F-21 の既存処分を維持し、再評価対象に4行を加える。
-- ng_classification: pre-existing（既知 F-21 と同根、今回の delta で範囲拡大）。
-- notes: F-21 の disposition は変更しない。
-
 ### GR04
 - category: guides の出典非明示
 - target: `docs/guides/command-selection.md:48-56`
@@ -198,17 +140,6 @@ lint_skills の Warning 8件は explainer / explainer-book / first-reader / yomi
 - recommended_route: 追跡Issue育成または表現是正候補。掲載基準を明確化し、後継関係の案内を更新する。
 - ng_classification: pre-existing（以前の置換関係にも未掲載があり、今回3件が加算）。
 - notes: Decision Map は網羅宣言のない手動セクションだが、project-docs-and-specs.md:46 は後継関係の参照点として案内する。
-
-### LINT01
-- category: 配布 Skill の description 上限超過
-- target: `.opencode/skills/agentdev-adopted-conventions/SKILL.md`、`.opencode/skills/agentdev-artifact-semantics/SKILL.md`、`.opencode/skills/agentdev-workflow-case-auto/SKILL.md`
-- evidence: lint_skills AG-005 は個別上限600文字に対し827、701、638文字を検出。description 実長も同値。
-- severity: medium
-- confidence: high
-- source_of_truth: AG-005 / RU-0018 層1
-- recommended_route: 修正候補。Skill description を個別上限内へ短縮する。
-- ng_classification: 今回の検査で確認された検証不通過（発生時期は本診断では特定しない）。
-- notes: Warning 8件の third-party/non-agentdev Skill trigger 欠落は policy 根拠が確認できないため契約違反に数えない。
 
 ### MECH01
 - category: 機械検査の母集団無効

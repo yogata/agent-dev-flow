@@ -44,15 +44,6 @@
 
 ### Design（defer 残置 1件）
 
-#### DS-19: v4-quality-gate-model.md の executed supersede の未遂形記述
-- **category**: 廃止済み成果物の扱い（DS-03 近縁の時制問題）
-- **target**: docs/designs/quality/v4-quality-gate-model.md:90
-- **evidence**: 「v3 quality/quality-gates.md は本 Design により supersede **される**」— crosswalk-inventory.md:134 は第6段 executed 2026-09-19（quality-gates.md 実ファイル削除済み）
-- **severity**: low / **confidence**: low（永続関係宣言の読みも成立）
-- **source_of_truth**: crosswalk-inventory.md（第6段 executed 記録）
-- **recommended_route**: KNOWN DS-03 と同一バッチでの時制整理時に併合判断
-- **ng_classification**: 判断保留（parent 判断により KNOWN バッチ併合可）
-
 ### Decision / guides / README（defer 残置 1件）
 
 #### DC-12: DEC-001 決定5 管理方式表に現行に存在しない `specs` 配置が記載（info 級）
@@ -116,3 +107,4 @@
 - 本ファイルは inspect-docs（backlog-auto stage 1）の検出事項出力である。分類・採用は `/agentdev/inspect-promote`（backlog-auto stage 2 inspect 系統）に委譲する
 - 2026-09-29 実施（backlog-auto stage 2 inspect 系統、--auto なし）: promote 15件（RQ-21/22/23/24/25/26/30・DS-14/15/16/17/18/20・DC-11・GD-04。うち RQ-23/RQ-24/RQ-25/DS-15 は HITL、残り 11件は自律確定）→ promoted/inspect-docs-promoted-20260928T145126Z.md へ原状保存・本ファイルから削除。20260925 F-04 を RQ-26 へ併合（対象同一）。defer 5件（RQ-27/28/29・DS-19・DC-12）は req-define 再壁打ち候補等として本ファイルに残置。RQ-17 は Stage 1 完了宣言が確認できないため 20260926 側で defer 継続（ユーザー確認済み）
 - 2026-10-08 実施（backlog-auto stage 2 inspect 系統、--auto なし）統合解消: DS-19（v4-quality-gate-model.md:90 executed supersede の未遂形記述）は 20261008T025952Z F-13（同一対象・行シフト :90→:93）の成果物（promoted/finding-20261008-supersede-wave-tense-fixes.md）へ統合し defer 解消（adversarial-review Stream A 指摘の同一対象重複による）。残り 4 件（RQ-27/RQ-28/RQ-29・DC-12）は引き続き本ファイルで defer 継続
+- 2026-10-13 実施（backlog-auto stage 2 inspect 系統、--auto なし）解消確認: DS-19 の対象記述は 20261008T025952Z F-11+F-13 成果物（finding-20261008-supersede-wave-tense-fixes.md → RU 経由の是正実装）により「supersede 済みである」へ是正済み（v4-quality-gate-model.md:92 現物実読確認）のため、defer 解消済みの残留セクションを削除（却下理由は commit message に記録）。RQ-27/RQ-28/RQ-29・DC-12 は再評価条件未充足のため defer 継続（自律確定）

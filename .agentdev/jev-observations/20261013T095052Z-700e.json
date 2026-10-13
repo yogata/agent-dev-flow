@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261013T095052Z-700e",
+  "workflow": "backlog-auto/inspect-promote",
+  "evaluationKind": "review-trigger",
+  "subject": "adversarial-review 発動条件判定（手動分類対象36件の争点存否）",
+  "sourceRevision": "499ef68ae384d23ebf59d5a0e5b3671e408084d5",
+  "durationMs": 676,
+  "inputTokens": 1281,
+  "inputs": {
+    "requestDigest": "ed0c6b2192f2a9bb147de9e53c534b5a0e6e407671bbc6551b63cfe1f318f7c2",
+    "references": [
+      {
+        "digest": "3f8271a1f6abf219dbfe9f0da0ddfa64ff41fa3b42324707efd7464783dcf4a0",
+        "label": "検出事項ファイル 20261011T033142Z（17 findings）",
+        "path": ".agentdev/inspect/inbox/inspect-docs-finding-20261011T033142Z.md"
+      },
+      {
+        "digest": "8f94e7133b83ac4177ba22c1cf83c30b08368ccbf752f9cf0f5d8875950a2e86",
+        "label": "検出事項ファイル 20261013T090730Z（19 findings）",
+        "path": ".agentdev/inspect/inbox/inspect-docs-finding-20261013T090730Z.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.93,
+        "false": 0.06999999999999995
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "trigger",
+        "value": true
+      }
+    ]
+  }
+}

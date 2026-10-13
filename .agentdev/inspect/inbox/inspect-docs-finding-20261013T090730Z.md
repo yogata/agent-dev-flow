@@ -32,6 +32,14 @@ REQ の6観点（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）を fan-in で確認�
 | README コマンド索引の実在確認（親実施） | 採用 | root README 索引 18コマンドすべてが src/common/commands/agentdev/ に実在。コマンドリファレンス表（18件）とも完全一致。 |
 | BOM / CRLF-LF 混在確認（親実施） | 採用 | src/common 配布物 md に BOM 付きファイルなし、単一ファイル内改行コード混在なし。 |
 
+## 処理記録（2026-10-13 inspect-promote、backlog-auto stage 2）
+
+- promote 7件（DS09・DS11・DS12〔20261011 DS08 を統合〕・DS13・DS15・GR08・DB01）→ `.agentdev/inspect/promoted/finding-20261013-*.md` へ保存・本ファイルから削除
+- reject 0件
+- defer 12件（本ファイルに残置）: RQ08〜RQ14・DS10・DS14・DS16・GR07・GR09
+- 分類は Jev 先行評価（観測 20261013T094827Z-5dc0・発動判定 20261013T095052Z-700e）＋ adversarial-review 2 stream（分類妥当性・証拠適合）convergence 後に全件自律確定（HITL 対象なし・破壊的変更なし）
+- Jev 乖離の処置: RQ10/RQ11 は promote 暫定から defer へ変更（既知 RQ03 と同 category「第一参照導線の ID 化不足」の処分一貫性）、DS10 は promote 暫定から defer へ変更（REQ-111-011 実体の所有設計判断未了〔本文追加 vs scope 注記〕。Jev defer 0.97 と一致）、DS16 は reject 暫定から defer へ変更（docs-check ルール候補〔検出閾値検討〕の知見として deferred 保持）
+
 ## 検出事項リスト
 
 ### RQ08
@@ -111,17 +119,6 @@ REQ の6観点（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）を fan-in で確認�
 - ng_classification: 今回修正対象候補（今回 delta の新設行）。
 - notes: DEC-042 の backlog-auto 版として意図された強化行の可能性。
 
-### DS09
-- category: Design（一時成果物 RU への現在形参照・所有宣言。参照解決不能リスク）
-- target: `docs/designs/workflows/v51-phase-driven-collaboration-model.md:70`、`docs/designs/workflows/v51-phase-transition-and-coexistence-model.md:54,60`
-- evidence: v51-phase-driven:70「工程駆動ルートの経路別所有境界とDesignのdraftからacceptedへの昇格は、RU-0002 が所有する v4-standard-lifecycle 更新と整合させる」。v51-phase-transition:54「RU-0002 の B01〜B16 と B16 能力群対応表、および TS-001〜TS-014 を検証時参照として用いる」、:60「RU-0001からの統合接続」。一方で `.agentdev/backlog/req-units/` は空（実確認）、REQ-008-010 により RU-0001/RU-0002 は case-ready 成功後の削除済み正当状態。accepted Design が削除済み一時成果物を現在形の所有者・検証時参照として指し、リポジトリ内で解決できない。
-- severity: medium
-- confidence: high（RU 不在・削除契約は事実）/ medium（Case Issue #3654 等への内容退避の意図の可能性）
-- source_of_truth: REQ-008-010、REQ-008-011、v4-standard-lifecycle:69-71（RU-0002 由来の更新は既に本体へ反映済み）
-- recommended_route: 表現是正候補。所有・参照先を永続成果物（v4-standard-lifecycle 本体、v4-v5-crosswalk、Decision 承認記録）へ付け替え、RU は出所の履歴注記に留める。
-- ng_classification: 今回修正対象候補（v51 Design 2件は今回 delta の新規 accept）。
-- notes: 同型の参照は checker-execution-contracts.md:22（RU-0004/RU-0007、背景説明で影響小）、design-health-metrics.md:55（RU-0001 AG-002、pre-existing の出所注記型）にも存在。横断是正として育成する価値がある。
-
 ### DS10
 - category: Design（covers 宣言行と本文実体の乖離: REQ-111-011 の本文不在）
 - target: `docs/designs/workflows/v51-phase-transition-and-coexistence-model.md:8,44-50,54-63`
@@ -133,39 +130,6 @@ REQ の6観点（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）を fan-in で確認�
 - ng_classification: 今回修正対象候補（v51 Design は今回 delta の新規 accept）。
 - notes: 既知 DS01〜DS04 と同型の「宣言・本文不一致」だが対象 REQ 行が新規のため別件。
 
-### DS11
-- category: 横断（実装済み機能の移行期表現の不統一。REQ 担当 F1-3・Decision 担当 F1・Design 担当 FD03 の統合）
-- target: `docs/guides/artifacts-and-state.md:147`、`docs/designs/workflows/v51-phase-transition-and-coexistence-model.md:14,50`、対比: `README.md:19,47`、`docs/guides/command-selection.md:42`、`src/common/commands/agentdev/README.md:14,22-26`、`.agentdev/README.md` phase 行
-- evidence: artifacts-and-state.md:147 は工程駆動実行を「（将来実装予定）」と記す。v51-phase-transition:14「公開操作の最終名、保存方式、具体的なスキル構成は…後続設計が確定する」、:50「具体的な公開名と保存実装は後続の実現設計で確定する」と未来形で記す。一方、同一 delta 窓内の commit ed0dc04d・69573879（2026-10-13）で phase-tasks-create/update、phase-artifacts-update、phase-review、phase-transition の5コマンドと workflow skill 5件が実装済みであり、root README 索引・コマンドリファレンス・command-selection.md:42（「各操作は単独で起動でき」現在形）・v51-phase-driven:25-28（最終名を現在形で定義）は限定なしで現行として案内する。同一経路の実装状態の現在性が導線間で割れている。
-- severity: medium
-- confidence: high（表現不整合は確認済み）/ medium（「将来実装予定」が Local 版適用（REQ-111-011）や正式採用など別の限定を意図する可能性）
-- source_of_truth: REQ-111-011、REQ-111-013、DEC-058、root README 索引（18コマンド）、実装ファイル群
-- recommended_route: 表現是正候補（「将来実装予定」「後続設計で確定」の意図する限定内容を明記し、全ミラー箇所で表記を統一）。
-- ng_classification: 今回修正対象候補（当該記述は今回 delta で追加）。
-- notes: `.agentdev/README.md` phase 行「操作の実装は後続 Wave で導入」も実装済み後は陳腐化する（附随観察）。実装済み範囲の GitHub 版 / Local 版の断定は REQ-111-011 の検証義務の状態次第で保留。
-
-### DS12
-- category: Design（システム仕様の現行性欠落。機械検査 NG 裏付け・expanded-readme-sync）
-- target: `docs/designs/foundations/system.md:104,119-139`
-- evidence: :104 が「公開 Command（13件）」と宣言する一方、src/common/commands/agentdev/ には phase-tasks-create / phase-tasks-update / phase-artifacts-update / phase-review / phase-transition の5配布コマンドが実在し（commit 69573879、2026-10-13）、root README の索引は18コマンド。system.md 全文中の `phase-` 記述は0件（grep 実証）、「工程駆動」の言及も foundations/ 配下では crosswalk のみで system.md に皆無。一覧表（:121-139）は12公開コマンド+内部5段階で、5 phase 行が不在かつ件数宣言13件が実態18件と不整合。
-- severity: medium
-- confidence: high
-- source_of_truth: src/common/commands/agentdev/ 実在ファイル群、root README 配布コマンド索引（18件）、REQ-111-011（両版正規利用経路）
-- recommended_route: 修正候補。system.md の Inventory 一覧表へ5コマンド行を追加し件数宣言を現行化する（工程駆動の節追加要否は owner 判断）。
-- ng_classification: 今回修正対象候補（phase 5コマンド追加に対する system.md 未更新は今回 delta）。
-- notes: 既知 DS08（third-party-sync 行の欠落、12対13）とは別件。本件は phase 5コマンド欠落と件数13対18の不整合。docs-check の expanded-readme-sync が検出済み。附随観察: phase 5コマンドには docs/designs/commands/ 配下の command Design も存在しない（glob 実証）。v51-phase-transition:14,50 の「後続設計で確定」との絡みで Design 未整備の現状が恒久化されないよう DS11 の処置と連動させること。
-
-### DS13
-- category: Design（機械検査NG裏付け: req-updated-freshness・IR-072、2件）
-- target: `docs/designs/local/local-case-file.md:5`、`docs/designs/responsibilities/custom-tool-contracts.md:5`
-- evidence: local-case-file.md は frontmatter `updated: 2026-10-04` に対し最終内容変更が 5958fe7e「ローカル版マージ取り込み保証の実装」2026-10-13（:143-147 のマージ結果節が該当差分）。custom-tool-contracts.md は frontmatter `updated: 2026-10-07` に対し最終内容変更が 321ebf3e「engine 入力契約の pr_merge commitHash 伝播」2026-10-13（:48 の pr_merge 入力契約が該当差分）。いずれも IR-072 違反。
-- severity: low
-- confidence: high
-- source_of_truth: IR-072（docs/designs/integrity/rules/IR-072-req-updated-freshness.md）、git log
-- recommended_route: 修正候補。両 frontmatter updated を 2026-10-13 へ進行。
-- ng_classification: 今回修正対象候補（内容変更は今回 delta）。
-- notes: 機械検査 ReqFreshness NG 2件の裏付け。本文内容と REQ 行の整合は別途問題なし（custom-tool-contracts の内容面は DS15 で別報）。
-
 ### DS14
 - category: Design（covers 宣言の scope 注記欠落）
 - target: `docs/designs/workflows/v4-standard-lifecycle.md:10`
@@ -176,17 +140,6 @@ REQ の6観点（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）を fan-in で確認�
 - recommended_route: 表現是正候補。REQ-111-013 edge に scope 注記を付すか、実体所在を明示。
 - ng_classification: 今回修正対象候補（REQ-111-013 edge は今回 delta で追加）。
 - notes: 既知 DS02/DS03（REQ-108 covers）と同ファイル・同様式だが対象 REQ が REQ-111-013 で新規差分。
-
-### DS15
-- category: Design（両版等価性の例外列挙漏れ）
-- target: `docs/designs/responsibilities/custom-tool-contracts.md:48,70-71`
-- evidence: :48 が「pr_merge はローカル版の取り込み確認情報として commitHash…を受理する。ローカル版では必須として検証し（実在確認）、GitHub 版では受理してマージ動作には使用しない」と版差異を宣言する。一方 :70 は「両版は操作名、入力構造…失敗の意味を同値とする」、:71 の例外明示リストは「ローカル版追跡Issueの通常ラベル非許容」「ローカル版 case の再オープン拒否」「isDraft の値差異」の3件のみで、commitHash の検証・不使用差異が列挙されていない。受理動作の版差異は :71 が列挙を求める種別（受理条件差）に該当する。
-- severity: low
-- confidence: medium
-- source_of_truth: REQ-011-024（物理写像差異の宣言。custom-tool-contracts:60 が宣言義務の先例として適用）、REQ-111-011（commitHash 機構の源と推定）
-- recommended_route: 表現是正候補。:71 の例外明示リストへ commitHash 受理差異を追記。
-- ng_classification: 今回修正対象候補（:48 の契約は今回 delta で追加）。
-- notes: REQ-011 には pr_merge 固有の要件行がなく（REQ-011-030/031/032 は pr_read/pr_create/pr_update）、commitHash 契約の REQ 源が REQ-111-011 であることの明示が無い点も附随観察。
 
 ### DS16
 - category: Design（REQ 要件行の近接言い換え。観察、代替とは断定しない）
@@ -210,17 +163,6 @@ REQ の6観点（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）を fan-in で確認�
 - ng_classification: 今回修正対象候補（DEC-057/058 は今回 delta）。
 - notes: REQ-059（Decision と REQ の関連宣言管理）との関係は追跡対象。
 
-### GR08
-- category: guides（語彙整備: 新規コマンド・用語の案内欠落。REQ 担当 F3-DR1・Decision 担当 F5 の統合）
-- target: `docs/guides/glossary.md:7-28`（コマンド表）および用語各節、`docs/designs/authoring/vocabulary-registry.md`
-- evidence: 他の公開コマンド13件は全て「コマンド」表に掲載される一方、delta で追加された phase 系5コマンドの掲載がない。「工程駆動実行」「変更駆動」「検討テーマ」「テーマ正本」「外部AI検討」「工程遷移」「後継経路」等の REQ-110/111・DEC-057/058 で導入された中核用語も glossary・vocabulary-registry の双方に未登録（grep 0件確認）。delta 内で glossary は更新済み（ローカル版パス修正）だが工程駆動系は未追加。
-- severity: low
-- confidence: high（欠落は事実）/ medium（glossary・語彙レジストリに網羅義務の明文はない）
-- source_of_truth: REQ-110/111、DEC-057/058、src/common/commands/agentdev/README.md:22-26、REQ-094（用語選択基準）
-- recommended_route: 表現是正候補（コマンド表への5コマンド追記と主要用語の追加を検討）。網羅検査は docs-check ルール候補（新 REQ 主要語彙と glossary の差分検査）。
-- ng_classification: 今回修正対象候補（欠落は今回 delta 由来）。
-- notes: glossary は選択掲載スタイルであり、必須欠落とは断定しない。
-
 ### GR09
 - category: guides（内部整合: 追加案内と状態記述の不一致）
 - target: `docs/guides/artifacts-and-state.md:56-62,105,163`（対比: :147）
@@ -231,17 +173,6 @@ REQ の6観点（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）を fan-in で確認�
 - recommended_route: 表現是正候補（phase/ を列挙に加えるか、案内範囲の限定を明記）。
 - ng_classification: 今回修正対象候補（:147 の案内は今回 delta で追加）。
 - notes: drafts/・inspect/・issues/・jev-observations/ の欠落は pre-existing で本件とは分離。
-
-### DB01
-- category: 配布物整合性（delta 由来の配布境界違反群。repo root 実行の機械検査に基づく）
-- target: `src/common/skills/agentdev-phase-theme-collaboration/SKILL.md:96`、`src/common/skills/agentdev-workflow-phase-artifacts-update/SKILL.md:27,83`、`src/common/skills/agentdev-phase-theme-collaboration/scripts/README.md:86,100`、`src/common/skills/agentdev-workflow-case-auto/SKILL.md:129`、`src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md:50,52,55`、`.opencode/skills/repo-agentdev-integrity/data/skill-projection-manifest.yaml`、`.opencode/skills/` 投影
-- evidence: (1) SkillProjection 12 NG: phase 系6スキル（agentdev-phase-theme-collaboration、agentdev-workflow-phase-artifacts-update、agentdev-workflow-phase-review、agentdev-workflow-phase-tasks-create、agentdev-workflow-phase-tasks-update、agentdev-workflow-phase-transition）が skill-projection-manifest.yaml に未登録かつ .opencode/skills/ 投影に不在（ls 実証。規定対処は `scripts/install.ps1 -Mode apply` による junction 再構築）。(2) RuntimeReference NG 3: REQ-106 short-form 参照が phase-theme-collaboration:96、workflow-phase-artifacts-update:27,83 に存在（consumer 環境で解決不能、IR-055 strict）。(3) check_distribution_boundary（repo root、scanned 481）11 failures: 上記 REQ-106×3 に加え、REQ-108-006（case-auto:129）、REQ-021-015/018・REQ-061-023・REQ-021-024（case-open definition-pr:50,52）、IR-072（case-open definition-pr:55）、REQ-060・THEME-001（phase-theme-collaboration scripts/README:86,100）。2026-10-11 実行時は failures 0 であり全て今回 delta で導入。
-- severity: medium
-- confidence: high（機械検査の有効実行結果と ls・grep による実証）
-- source_of_truth: IR-068（skill-projection-manifest）、IR-055（REQ-NNNN 参照禁止）、IR-053 系（distribution reference boundary）、REQ-009-016 系（配布境界）
-- recommended_route: 修正候補（phase 6スキルの manifest 追記と junction 再構築、REQ-106 short-form 参照の自己完結表現への書き換え）。case-open/case-auto の行参照・IR-072 参照は境界規則上の除外運用（baseline 追加）か表現是正かの処遇判断を追跡Issue育成で確定する。
-- ng_classification: 今回修正対象候補（いずれも 2026-10-11 以降の delta）。
-- notes: lint_skills AG-005 NG 3件（description 超過）は既知 LINT01 と同一のため本 finding では処分変更しない。check_integrity は case-open 系を baseline 管理（approved additions）としており、check_distribution_boundary との判定差の整理も追跡課題に含める。
 
 ## 6観点 fan-in 結果
 

@@ -9,20 +9,11 @@
 - 主要新規テーマ: ①配布物参照境界違反（concrete-id 16件、pre-existing）②存在しない `agentdev-doc-writing` スキルの移譲先記述（4ファイル）③DEC-045/046 追加に伴う docs 意味鮮度の取り残し（docs/README 散文・DEC-040 本文注記）④req-impact-map の監査パス・IR 参照陳腐化
 - **処理記録**: 2026-09-27 inspect-promote で promote 18件を promoted/ へ分離、defer 5件残置（本ファイル）。各 defer 事項に再評価条件を付記
 
+**処理記録追記**（2026-10-13 inspect-promote、backlog-auto stage 2、--auto なし）: RQ-17 は 20260926T180630Z 側 RQ-17（同一対象 REQ-090-004・REQ-090.md:19）が 20261008T025952Z F-05/F-06 cleanup anchor 成果物へ統合済みであり、REQ-090-004 行自体も消滅（現行 REQ-090.md:19 は REQ-090-002、grep で「本 Case 内で確定する」記述の実在なし）のため、重複・解消により本ファイルから削除（却下理由は commit message に記録）。RQ-20/DS-13/DC-10/RM-01 は再評価条件未充足のため defer 継続（自律確定）
+
 ## 検出事項リスト（defer 残置 5件）
 
 ### REQ 体系（defer 2件）
-
-#### RQ-17: REQ-090-004 に Case 固有の作業指示が恒久要件行へ残留
-- **category**: MOVE（反映作業そのものの要件行化）／DRIFT
-- **target**: docs/requirements/REQ-090.md:19（REQ-090-004）、:55（対象外欄）
-- **evidence**: 「適用対象19件と適用可否を本 Case 内で確定する3件の判断結論を該当 Workflow の reference へ文書化すること」「課金開始後の実験継続条件の判断（本 Case の失敗条件としない）」—「本 Case 内で」「本 Case の失敗条件」は一時 Case 指示であり、6観点 MOVE シグナル(a)「REQ行が変更後仕様ではなく反映作業そのもの」に該当
-- **severity**: medium / **confidence**: medium
-- **source_of_truth**: REQ-090-006/013（field 名等は実装設計の自由度と宣言する自己境界設定）
-- **recommended_route**: intake（Stage 1 完了後の行の恒久化判断を req-define 壁打ち候補として）
-- **ng_classification**: pre-existing
-- **notes**: Stage 1（Issue A）進行中の意図的暫定記述の可能性が残る。RQ-15（defer、REQ-090-011）と同ファイルの別行
-- **再評価条件**: REQ-090 Stage 1 完了後
 
 #### RQ-20: retired/ 内 14件の status 値が retired / migrated で混在し使い分け基準が未文書化
 - **category**: RETIRE（廃止側メタデータの不統一）
