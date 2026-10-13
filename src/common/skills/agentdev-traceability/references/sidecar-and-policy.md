@@ -46,6 +46,15 @@ sidecar へ対応宣言（artifact パス × role × 要件行 ID）を追加す
 
 事前確認を省略して producer 本体の実装を隣接層の sidecar へ宣言すると、check（`duplicate-inconsistencies`）の検出後に所属訂正と check 再実行の手戻りが発生する。検出機構（`duplicate-inconsistencies`）は事後検知として機能しており、本確認ステップは作成時の予防であり、検出機構の代替にも変更にもしない。
 
+## 同一 artifact × role を跨ぐ宣言の集約規則
+
+複数 Case が同一 artifact パス × role の対応宣言を必要とする場合、sidecar 宣言を複数情報源へ分散させず、既存 sidecar への追加統合を原則とする。本節は別 Case の別 REQ 行宣言の統合方向を規定するものであり、「対応宣言追加前の component / sidecar 対応一覧の事前確認」節の事前突合手順と、「inline 宣言と sidecar の集合一致の適用前確認」節の集合一致確認を置換しない。
+
+- 既存 sidecar 追加原則: ある artifact パス × role の宣言が既存 sidecar に存在する場合、別 Case の新規要件行の宣言は新規 sidecar を作らず、既存 sidecar の該当 role 配下へ要件行を追加統合する。`duplicate-inconsistencies` の単一情報源集約制は、同一 artifact × role の宣言が複数情報源へ分散した場合に REQ 集合が完全一致する場合のみ pass とするため、分散は必ず検出され統合修正の往復を生む
+- 新設許容条件: 追加対象の producer / component の責務境界上、既存 sidecar の component に所属しない artifact の場合は新設を許容する。既存 sidecar への統合が component の命名と内容の恒常的乖離を生む場合は、統合先を新設へ変更できる
+- 統合時の component 名整合: 統合により component の命名と内容が乖離した場合、sidecar ファイル名と component キーを一貫して改名して解消する。sidecar は配布対象外（project 側の開発管理成果物）であるため配布互換性の拘束を受けず、恒常的な乖離は残さない
+- checker との関係: 本規則は適用前の予防規則であり、事後検出は既存の `duplicate-inconsistencies` 検出器が維持する。検出器・検査契約は変更しない
+
 ## sidecar の links セクション（隣接工程間対応）の書式
 
 sidecar は covers 対応関係に加え、プロジェクトの採用した隣接工程間の対応関係（links）をトップレベルキー `links` で保持できる。
