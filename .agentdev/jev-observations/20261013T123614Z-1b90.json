@@ -1,0 +1,256 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261013T123614Z-1b90",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "docs-currentization Batch A（RU-0214〜RU-0220、7件）の既存REQ照合判断",
+  "sourceRevision": "a2417bdb",
+  "durationMs": 765,
+  "inputTokens": 3177,
+  "inputs": {
+    "requestDigest": "bddef6dd1ac5193c62cc987d20106d3ae87592086af3deeb7cf5414819449bd5",
+    "references": [
+      {
+        "label": "RU-0214",
+        "path": ".agentdev/backlog/req-units/RU-0214.md",
+        "digest": "62180bc9b060a577030c0134ca667ebe8c759f56ee047f35c8f0f0712ea8e7ed"
+      },
+      {
+        "label": "RU-0215",
+        "path": ".agentdev/backlog/req-units/RU-0215.md",
+        "digest": "804117906f3fad14f57b957ec9d35ba4af607646e668571f7aac76dbfbe577d8"
+      },
+      {
+        "label": "RU-0216",
+        "path": ".agentdev/backlog/req-units/RU-0216.md",
+        "digest": "e995fb8201977d702597f9f0bf6f7b54800f280720ef59aab1a22b3ed1cf8fc0"
+      },
+      {
+        "label": "RU-0217",
+        "path": ".agentdev/backlog/req-units/RU-0217.md",
+        "digest": "ed7af5246f2f40fd796dc67dba1cfdbb2d95bd9bfe215e267fc2230bcc03f782"
+      },
+      {
+        "label": "RU-0218",
+        "path": ".agentdev/backlog/req-units/RU-0218.md",
+        "digest": "c0477675a55efc72b32254c7251e82a158d9d445ae0730eb7fb01ea023c354df"
+      },
+      {
+        "label": "RU-0219",
+        "path": ".agentdev/backlog/req-units/RU-0219.md",
+        "digest": "11728bf529547631e635872fa436aa5ed7d824e6b1c0aea7361b1673f37ebe40"
+      },
+      {
+        "label": "RU-0220",
+        "path": ".agentdev/backlog/req-units/RU-0220.md",
+        "digest": "e1c561e332292b3bf5cc354e9fa2ee1cf43d962801d3e9f744a79937ac8fe9d6"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-ru0214-op",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 1,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "q2-ru0214-conf",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.08,
+        "false": 0.92
+      }
+    },
+    {
+      "questionId": "q3-ru0215-op",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1
+      }
+    },
+    {
+      "questionId": "q4-ru0215-conf",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.09,
+        "false": 0.91
+      }
+    },
+    {
+      "questionId": "q5-ru0216-op",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1
+      }
+    },
+    {
+      "questionId": "q6-ru0216-conf",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.08,
+        "false": 0.92
+      }
+    },
+    {
+      "questionId": "q7-ru0217-op",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1
+      }
+    },
+    {
+      "questionId": "q8-ru0217-conf",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.09,
+        "false": 0.91
+      }
+    },
+    {
+      "questionId": "q9-ru0218-op",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1
+      }
+    },
+    {
+      "questionId": "q10-ru0218-conf",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.09,
+        "false": 0.91
+      }
+    },
+    {
+      "questionId": "q11-ru0219-op",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1
+      }
+    },
+    {
+      "questionId": "q12-ru0219-conf",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.09,
+        "false": 0.91
+      }
+    },
+    {
+      "questionId": "q13-ru0220-op",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0.01,
+        "REQ操作なし": 0.99
+      }
+    },
+    {
+      "questionId": "q14-ru0220-conf",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.09,
+        "false": 0.91
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-ru0214-op",
+        "value": "UPDATE"
+      },
+      {
+        "questionId": "q2-ru0214-conf",
+        "value": false
+      },
+      {
+        "questionId": "q3-ru0215-op",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q4-ru0215-conf",
+        "value": false
+      },
+      {
+        "questionId": "q5-ru0216-op",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q6-ru0216-conf",
+        "value": false
+      },
+      {
+        "questionId": "q7-ru0217-op",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q8-ru0217-conf",
+        "value": false
+      },
+      {
+        "questionId": "q9-ru0218-op",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q10-ru0218-conf",
+        "value": false
+      },
+      {
+        "questionId": "q11-ru0219-op",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q12-ru0219-conf",
+        "value": false
+      },
+      {
+        "questionId": "q13-ru0220-op",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q14-ru0220-conf",
+        "value": false
+      }
+    ]
+  }
+}

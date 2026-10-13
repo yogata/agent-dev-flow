@@ -1,0 +1,256 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261013T124859Z-3074",
+  "workflow": "req-define",
+  "evaluationKind": "classification-design-separation",
+  "subject": "docs-currentization Batch A（RU-0214〜RU-0220、7件）の最終分類・Design分離",
+  "sourceRevision": "a2417bdb",
+  "durationMs": 1030,
+  "inputTokens": 2568,
+  "inputs": {
+    "requestDigest": "f89b5a56586816631c7ae5a305c3a3c42a30876af093c0e7d77b6ea93b878006",
+    "references": [
+      {
+        "digest": "62180bc9b060a577030c0134ca667ebe8c759f56ee047f35c8f0f0712ea8e7ed",
+        "label": "RU-0214",
+        "path": ".agentdev/backlog/req-units/RU-0214.md"
+      },
+      {
+        "digest": "804117906f3fad14f57b957ec9d35ba4af607646e668571f7aac76dbfbe577d8",
+        "label": "RU-0215",
+        "path": ".agentdev/backlog/req-units/RU-0215.md"
+      },
+      {
+        "digest": "e995fb8201977d702597f9f0bf6f7b54800f280720ef59aab1a22b3ed1cf8fc0",
+        "label": "RU-0216",
+        "path": ".agentdev/backlog/req-units/RU-0216.md"
+      },
+      {
+        "digest": "ed7af5246f2f40fd796dc67dba1cfdbb2d95bd9bfe215e267fc2230bcc03f782",
+        "label": "RU-0217",
+        "path": ".agentdev/backlog/req-units/RU-0217.md"
+      },
+      {
+        "digest": "c0477675a55efc72b32254c7251e82a158d9d445ae0730eb7fb01ea023c354df",
+        "label": "RU-0218",
+        "path": ".agentdev/backlog/req-units/RU-0218.md"
+      },
+      {
+        "digest": "11728bf529547631e635872fa436aa5ed7d824e6b1c0aea7361b1673f37ebe40",
+        "label": "RU-0219",
+        "path": ".agentdev/backlog/req-units/RU-0219.md"
+      },
+      {
+        "digest": "e1c561e332292b3bf5cc354e9fa2ee1cf43d962801d3e9f744a79937ac8fe9d6",
+        "label": "RU-0220",
+        "path": ".agentdev/backlog/req-units/RU-0220.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "c1-ru0214",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 1,
+        "挙動Design": 0,
+        "カタログDesign": 0,
+        "guide": 0
+      }
+    },
+    {
+      "questionId": "s1-ru0214",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.07,
+        "false": 0.9299999999999999
+      }
+    },
+    {
+      "questionId": "c2-ru0215",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0.99,
+        "カタログDesign": 0.01,
+        "guide": 0
+      }
+    },
+    {
+      "questionId": "s2-ru0215",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.07,
+        "false": 0.9299999999999999
+      }
+    },
+    {
+      "questionId": "c3-ru0216",
+      "questionForm": "choice",
+      "value": "guide",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0,
+        "カタログDesign": 0,
+        "guide": 1
+      }
+    },
+    {
+      "questionId": "s3-ru0216",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.08,
+        "false": 0.92
+      }
+    },
+    {
+      "questionId": "c4-ru0217",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 1,
+        "カタログDesign": 0,
+        "guide": 0
+      }
+    },
+    {
+      "questionId": "s4-ru0217",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.08,
+        "false": 0.92
+      }
+    },
+    {
+      "questionId": "c5-ru0218",
+      "questionForm": "choice",
+      "value": "guide",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0,
+        "カタログDesign": 0,
+        "guide": 1
+      }
+    },
+    {
+      "questionId": "s5-ru0218",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.98,
+        "false": 0.020000000000000018
+      }
+    },
+    {
+      "questionId": "c6-ru0219",
+      "questionForm": "choice",
+      "value": "guide",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0,
+        "カタログDesign": 0,
+        "guide": 1
+      }
+    },
+    {
+      "questionId": "s6-ru0219",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.22,
+        "false": 0.78
+      }
+    },
+    {
+      "questionId": "c7-ru0220",
+      "questionForm": "choice",
+      "value": "カタログDesign",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0,
+        "カタログDesign": 1,
+        "guide": 0
+      }
+    },
+    {
+      "questionId": "s7-ru0220",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.12,
+        "false": 0.88
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "c1-ru0214",
+        "value": "REQ"
+      },
+      {
+        "questionId": "s1-ru0214",
+        "value": false
+      },
+      {
+        "questionId": "c2-ru0215",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "s2-ru0215",
+        "value": false
+      },
+      {
+        "questionId": "c3-ru0216",
+        "value": "guide"
+      },
+      {
+        "questionId": "s3-ru0216",
+        "value": false
+      },
+      {
+        "questionId": "c4-ru0217",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "s4-ru0217",
+        "value": false
+      },
+      {
+        "questionId": "c5-ru0218",
+        "value": "guide"
+      },
+      {
+        "questionId": "s5-ru0218",
+        "value": true
+      },
+      {
+        "questionId": "c6-ru0219",
+        "value": "guide"
+      },
+      {
+        "questionId": "s6-ru0219",
+        "value": false
+      },
+      {
+        "questionId": "c7-ru0220",
+        "value": "カタログDesign"
+      },
+      {
+        "questionId": "s7-ru0220",
+        "value": false
+      }
+    ]
+  }
+}
