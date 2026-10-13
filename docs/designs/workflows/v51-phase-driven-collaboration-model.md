@@ -67,7 +67,7 @@ updated: 2026-10-13
 
 テーマ形成・更新、成果物反映の公開操作とWorkflow Skill群は個別の責務に分ける。テーマ正本の管理と外部検討の持出し・戻り受理はCapability Skillが所有する。各公開コマンド、Workflow Skill、Capability Skill、adapter、subagent、harness の具体的な分担は各成果物の設計時に定める。
 
-保存・確定経路の所有境界は変更駆動では case-ready / case-revise が所有する。工程駆動ルートの経路別所有境界とDesignのdraftからacceptedへの昇格は、RU-0002 が所有する v4-standard-lifecycle 更新と整合させる。本 Design はその境界を再定義しない。
+保存・確定経路の所有境界は変更駆動では case-ready / case-revise が所有する。工程駆動ルートの経路別所有境界とDesignのdraftからacceptedへの昇格は、v4-standard-lifecycle の工程駆動対応行（REQ-111、v51-phase-transition-and-coexistence-model 参照）および v4-v5-crosswalk の処遇記録と整合させる。本 Design はその境界を再定義しない。出所: 一時成果物 RU-0002 は case-ready 成功後に削除済みであり、出所記録は v4-v5-crosswalk と DEC-057/058 承認記録に残る。
 
 ## 検証との対応
 
