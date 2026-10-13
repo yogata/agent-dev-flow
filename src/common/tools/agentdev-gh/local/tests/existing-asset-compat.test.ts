@@ -14,7 +14,7 @@ import {
   createLocalRunner,
   type LocalIssueFrontmatter,
 } from "../runner-local.ts";
-import type { GhRunnerRequest } from "../../../runner.ts";
+import type { GhRunnerRequest } from "../../runner.ts";
 
 function makeIssuesDir(): string {
   return fs.mkdtempSync(path.join(import.meta.dir, "tmp-ts004-assets-"));
