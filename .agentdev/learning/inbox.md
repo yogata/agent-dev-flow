@@ -230,3 +230,35 @@
 - **想定反映先**: src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts（autogen-regeneration-diff step）。learning-promote での判断
 - **関連**: .agentdev/learning/inbox.md、Case #3683、PR #3693、src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md（計測日収束契約）
 - **タグ**: `#case-ready` `#script` `#autogen` `#計測日`
+
+## acceptance-checks の integrity gate が PR 非起因の既存債務で fail-closed 抑止すると後続ゲートの script 経由継続手段が不在になる
+
+- **問題事象**: case-ready STEP-1 受入検査（acceptance-checks phase）で check_integrity が PR 非起因の既存債務（IR-055 delta・IR-068・IR-072・expanded-readme-sync 計 16 NG。全て PR 差分外ファイルで #3675 / #3684 の処遇対象）で非ゼロ終了し、script が後続ゲート（overlap-cross-check・autogen-regeneration-diff・traceability-check）を実行せず early-return した。PR 自体の起因違反は 0 件（check_changed_docs は対象 4 ファイルで 0 失敗）だが、後続 3 ゲートを同一 script 呼出で継続する resume 手段が存在しない
+- **発生局面**: 実装（case-ready STEP-1 受入検査。Case #3686、PR #3692 受入）
+- **検知方法**: 受入検査報告 JSON の definition-acceptance-checks step status=fail と保存された check_integrity evidence（16 NG の全文一覧）を意味レビューし、NG 全件のファイルが PR 変更 4 ファイル（pr_changed_files）の外であることを機械照合して PR 起因 0 件と判定
+- **根本原因**: 非ゼロ終了の integrity gate は証拠保存の上で後続ゲート抑止が正（fail-closed 維持）だが、抑止後の継続経路が「修復後の case-ready 再実行」のみで、修復不要な既存債務（base 起因・処遇 Case 起票済み）では後続ゲートを script の証拠契約に乗せたまま継続できない。同一条件再実行の禁止（REQ-030-025 消費規律）と要求の矛盾
+- **自律対応内容**: 実行済み gate の再実行は行わず、抑止されて未実行の 3 ゲート（overlap・generate_indexes + AUTOGEN 差分・traceability check）を個別実行で継続し、同一の証拠項目（終了コード・stdout/stderr・targetRevision edc488d6・実行コマンド）を保存して意味レビューした。traceability は missing-design 0・policy 有効、overlap は警告 1 件（#3679 との同一パス重複・既知）、AUTOGEN 差分なしで merge を継続。前例は Case #3675 の「base 起因の既存債務は本 Case と無関係」の機械証明運用
+- **ユーザー確認有無**: なし（正規契約からの導出。PR 起因 0 件の機械照合に基づく）
+- **Decision/REQ/spec影響**: なし（受入検査の後続ゲート継続手順の明文化は learning-promote での判断）
+- **横展開観点**: 品質ゲート束ね型 script 全般（fail-closed 抑止と再実行禁止の併存）。リポジトリ全体の既存債務が混在する環境での Definition PR 受入全般
+- **再発条件**: check_integrity が PR 非起因の delta NG を持ち続ける環境で case-ready 受入検査を行う場合に毎回再発する（現行 main は IR-055/IR-068/IR-072 の delta 債務が常態）
+- **予防策候補**: accept_definition_checks.ts に「integrity gate 非ゼロ時に、保存した evidence の NG ファイル集合が PR 変更ファイル集合と交差しない場合は integrity step を warn 扱い（pr-attribution-clean 記録付き）で後続ゲートを継続する」決定的判定の追加。learning-promote での判断
+- **想定反映先**: src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts（integrity gate 後続抑止の条件付き継続）と agentdev-workflow-case-ready references/definition-acceptance.md（既存債務時の継続手順）。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Case #3686、PR #3692、Case #3675（既存債務機械証明の前例）、Issue #3684（IR-068/IR-055 債務の処遇 Case）
+- **タグ**: `#case-ready` `#script` `#integrity` `#既存債務`
+
+## Jev evaluate の observationMetadata.references.digest に sha256 以外の値を渡すと観測永続化が失敗し評価単位の観測が欠落する
+
+- **問題事象**: case-ready STEP-5 の Jev 先行評価（Standard / Epic 確定判断）で observationMetadata.references[].digest に "unknown" を渡したところ、評価器は成功（Standard・必須・一貫。confidence 0.76）したが観測永続化が invalid_input（sha256 hex 64 文字必須）で失敗した。評価単位の観測（1 semantic evaluation = 1 observation）が生成されず、observationId も発行されないため observation_write による最終判断の事後追記も不可能
+- **発生局面**: 実装（case-ready STEP-5 実行構造確定の Jev 先行評価。Case #3686）
+- **検知方法**: evaluate 応答の observation.warning（"observation write failed: invalid_input: input reference digest must be a sha256 hex digest"）と .agentdev/jev-observations/ の新規ファイル不在の突合で確定
+- **根本原因**: 再構成可能な入力の参照には sha256 実測値が必須という契約に対し、参照ファイルの digest を未計算のまま placeholder 文字列で渡した。入力検証は評価器成功後に観測書込み時に行われるため、評価結果だけが返り観測が欠落する失敗様式になる
+- **自律対応内容**: 当該評価（Standard / Epic 確定）は観測なしで LLM 最終判断（Standard）を確定し、完了報告に識別可能な warning として記録。後続の 2 評価（スコープ重複 boolean・処置 choice）では node crypto による sha256 実測値を渡して観測永続化と observation_write を完結させた（20261013T160137Z-5179、20261013T160213Z-9eb6）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（観測書込み失敗時の fail-open 維持と warning 明示は既存契約どおり）
+- **横展開観点**: agentdev_jev evaluate の references を渡す 6 系統 Workflow 全般（learning-promote、req-define、case-ready、intake-promote、inspect-promote、backlog-review）。digest 未計算のまま渡す呼出側実装全般
+- **再発条件**: 参照ファイルの sha256 を実測せず placeholder を渡した場合に必発（評価成功・観測欠落のサイレント様式として危険）
+- **予防策候補**: 呼出側手順に「references を渡す場合は事前に node crypto で sha256 を実測する」前置規律の明文化。観測書込み失敗時の warning を workflow 完了報告の必須記録項目とする。learning-promote での判断
+- **想定反映先**: src/common/skills/agentdev-workflow-case-ready/references/execution-structure.md（Jev 評価経路の呼出手順）等の 6 系統 Workflow reference。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Case #3686、.agentdev/jev-observations/20261013T160137Z-5179.json、.agentdev/jev-observations/20261013T160213Z-9eb6.json
+- **タグ**: `#case-ready` `#jev` `#observation` `#input-validation`
