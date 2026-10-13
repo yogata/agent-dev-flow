@@ -102,3 +102,19 @@
 - **想定反映先**: workflow skill 共通の環境前提 reference または agentdev-git-worktree reference の Windows 環境注意。learning-promote での判断
 - **関連**: .agentdev/learning/inbox.md、Case #3675、docs/knowledge/windows-powershell-bulk-io-corruption.md（PowerShell 系の別系統問題）
 - **タグ**:   
+
+## REQ-030-027 の design 宣言を sidecar へ部分集合 mirror で追加すると duplicate-inconsistencies で traceability gate が fail-closed 停止する
+
+- **問題事象**: case-open STEP-4 の Definition 適用で、新規 REQ 行（REQ-030-027）の design 宣言を traceability/agentdev-workflow-case-open.yaml へ `design: docs/designs/commands/case-open.md: [REQ-030-027]` の 1 行のみで追加したところ、traceability check の duplicate-inconsistencies が「同一論理関係（artifact パス × role）の対応宣言が複数情報源で矛盾（情報源: inline 宣言, sidecar）」で fail し、設計PR作成前の fail-closed で停止した。inline ADF-COVERS(design) は同 artifact に 13 関係（REQ-030-014/017〜027、REQ-083-002/003）を宣言しており、sidecar の部分集合 mirror が情報源間の行集合不一致と判定された
+- **発生局面**: 実装（case-open STEP-4 機械工程。並行 case-open 委譲実行。Case #3686 / PR #3692）
+- **検知方法**: prepare_definition_pr.ts の traceability gate（check --req REQ-030-027）が exit 2・duplicate-inconsistencies fail を返し、findings の detail に矛盾する 2 情報源が表示された
+- **根本原因**: sidecar へ design 宣言を新設する場合、同一 artifact × role の行集合は inline 宣言と完全一致する必要がある（整合しない重複は duplicate-inconsistencies の検出対象）。追加対象行だけの部分集合 mirror は「sidecar のみに無い関係」ではなく「inline のみに存在する関係の残存」として集合不一致に計上される。draft の case_open_hints は sidecar design 宣言への追随反映のみを指示し、完全一致 mirror の要件までは指示していなかった
+- **自律対応内容**: 不足分のみの再適用（冪等再実行）として、sidecar design 宣言を inline の 13 関係と完全一致する mirror へ拡張する補正 commit（edc488d6）を DefinitionEdit 旧文完全一致契約の範囲で適用し、traceability gate を pass（missing-design pass、duplicate-inconsistencies pass、missing-implementation/verification のみ deferred）へ復帰させた
+- **ユーザー確認有無**: なし（fail-closed gate の機械的検出に対する機械的修復）
+- **Decision/REQ/spec影響**: なし（REQ-030-024 の集合一致・duplicate-inconsistencies 検出の既存契約どおりの動作）
+- **横展開観点**: sidecar の design 宣言新設は REQ-030-027 のみならず既存 inline 宣言全体との集合一致を要求する。既存 artifact × role への初回 sidecar 宣言追加では、inline 宣言の全関係を機械的に列挙して mirror する手順が同種 gate fail 全般に有効。Issue #3678（同一 artifact × role 宣言の集約規則の明文化 Case）と同根の問題クラスであり、実観測事例として補強になる
+- **再発条件**: draft の case_open_hints が「sidecar design 宣言への追随反映」のみを指示し、inline 宣言との行集合一致要件を明示しないまま case-open STEP-4 を実行する場合
+- **予防策候補**: case-open Design または draft 組立側の hint に「sidecar design 宣言の新設・追加は同一 artifact × role の inline 宣言行集合との完全一致を要件とする」ことを明記する。あるいは REQ-030-024 の適用前集合一致検証（1.5 の (5)）を design 宣言の新設時にも必須化する。learning-promote での判断
+- **想定反映先**: agentdev-traceability references/sidecar-and-policy.md（集約規則節。Issue #3678 の対象）、case-open reference（definition-pr-and-idempotency.md の traceability gate 手順）。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Case #3686、PR #3692、commit edc488d6、Issue #3678（同根問題の規則明文化 Case）
+- **タグ**: `#case-open` `#traceability` `#sidecar` `#fail-closed`
