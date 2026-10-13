@@ -214,3 +214,19 @@
 - **想定反映先**: src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts（overlap 要約生成箇所）と agentdev-workflow-case-ready references の消費側規律。learning-promote での判断
 - **関連**: .agentdev/learning/inbox.md、Case #3682、PR #3685、src/common/skills/agentdev-workflow-case-open/scripts/lib/cross_dependency_types.ts（報告契約）、Issue #3680（同 script の別箇所修正 Case）
 - **タグ**: `#case-ready` `#script` `#overlap` `#gate`
+
+## acceptance-checks の AUTOGEN 再生成差分検出は実行日を跨ぐ並列バッチで計測日 1 行差分の warn を毎回生む
+
+- **問題事象**: case-ready STEP-1 受入検査（acceptance-checks phase）の autogen-regeneration-diff step で、generate_indexes 再実行により docs/designs/quality/req-health-metrics.md の AUTOGEN 計測日行のみが 1 行差分として検出され、script が needs-judgment（exit 2）と「Regeneration diff must be resolved before merge」警告を返した。並列バッチの Case 実行が日付境界を跨ぐたびに同一の warn が再発し、毎回モデルの意味レビュー判断を要する
+- **発生局面**: 実装（case-ready STEP-1 受入検査。Case #3683、並列バッチ Batch D）
+- **検知方法**: 受入検査報告 JSON の autogen-regeneration-diff step status=warn と diffStat（1 insertion, 1 deletion）を確認し、差分実体を再生成後の git diff で照合して計測日行のみであることを実測
+- **根本原因**: 計測日 AUTOGEN は generate_indexes 実行日から導出されるため、PR 作成日と merge 判定日が日付境界を跨ぐと、本 PR 非起因の派生物差分が再生成分の warn として表面化する。計測日のずれは内容変更ではない（definition-pr-and-idempotency.md の計測日収束契約）ため阻塞げではないが、script は差分の有無しか判定できない
+- **自律対応内容**: 差分実体が計測日行のみであることを機械確認し、(1) 本 PR が当該派生物を宣言・変更していないこと（pr_changed_files と ACT-DESIGN-001 宣言の一致）、(2) merge で当該派生物が変化しないこと（branch 版と main 版の非差分確認）を根拠に非阻塞げと判断して merge を継続した。派生物の PR への混入は宣言範囲逸脱となるため行わない
+- **ユーザー確認有無**: なし（正規契約からの導出）
+- **Decision/REQ/spec影響**: なし（計測日収束契約の既存どおり。gate への計測日のみ差分の決定的除外は learning-promote での判断）
+- **横展開観点**: generate_indexes 派生物の AUTOGEN 再生成差分を gate 判定に使う全工程（case-open STEP-4、case-ready STEP-1）。日付境界を跨ぐ長時間バッチ実行全般
+- **再発条件**: PR 作成（generate_indexes 実行）と case-ready 受入検査が日付境界を跨ぎ、かつ計測日 AUTOGEN が再生成対象に含まれる場合
+- **予防策候補**: accept_definition_checks.ts の autogen-regeneration-diff step に「差分が計測日 AUTOGEN 行のみの場合は pass 扱い（警告に計測日のみ差分である旨を記録）」の決定的判定を追加する。learning-promote での判断
+- **想定反映先**: src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts（autogen-regeneration-diff step）。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Case #3683、PR #3693、src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md（計測日収束契約）
+- **タグ**: `#case-ready` `#script` `#autogen` `#計測日`
