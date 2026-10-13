@@ -2,7 +2,7 @@
 title: 実行時パッケージ境界
 status: accepted
 created: 2026-08-20
-updated: 2026-10-11
+updated: 2026-10-13
 ---
 <!-- ADF-COVERS(implementation): REQ-002-007, REQ-002-008, REQ-002-011, REQ-002-019, REQ-002-020, REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-002, REQ-009-003, REQ-009-006, REQ-009-007, REQ-009-008, REQ-009-009, REQ-009-010, REQ-009-011, REQ-009-012, REQ-009-013, REQ-009-014, REQ-009-015, REQ-009-016, REQ-009-017, REQ-009-018, REQ-009-019, REQ-009-020, REQ-009-021, REQ-009-022, REQ-009-023, REQ-009-024, REQ-009-025, REQ-009-035, REQ-009-036, REQ-009-037, REQ-009-038, REQ-009-039, REQ-009-046, REQ-009-047, REQ-009-048, REQ-009-049 -->
@@ -18,6 +18,7 @@ updated: 2026-10-11
 <!-- ADF-COVERS(design): REQ-091-001, REQ-091-002, REQ-091-003, REQ-091-004, REQ-091-005 -->
 <!-- ADF-COVERS(design): REQ-053-044（repo-local Plugin の配布・投影契約節が保存済みファイル単位結果の配布・投影除外 design 実体） -->
 <!-- ADF-COVERS(design): REQ-050-002, REQ-050-003, REQ-050-005, REQ-050-015, REQ-058-001, REQ-058-004, REQ-058-005, REQ-058-006, REQ-058-008, REQ-058-012（ジャンクション状態の判定と自己修復節が両公開入口・両ホスト・全モードの正本一致検査の design 実体） -->
+<!-- ADF-COVERS(design): REQ-112-001, REQ-112-002, REQ-112-003（local ツール package の tsconfig 参照共有と typecheck 検査契約節が design 実体） -->
 
 # 実行時パッケージ境界
 
@@ -485,6 +486,12 @@ wrong target 検出、再作成ロジックは LocalMode と通常版 install �
 ## v4 adapter 境界への接続
 
 本 Design が定義するリポジトリ種別、.opencode/ の意味、link mode、Tools / Plugins の配布・投影は、Harness/Backend adapter 境界（DEC-036）の下で維持される。link 元の原本は共通原本領域（src/common/）へ移行しており、src/opencode/ と src/senpi/ はホスト別接続領域として並列する。配備形態の原本は Decision「ADF 共通原本とホスト接続領域の分離」、配置契約と投影モデルの詳細はマルチホスト原本モデル Design（foundations/multi-host-canonical-model.md）が所有する。ローカル版 Custom Tool の原本は共通原本側の Tool engine 領域に整理され、OpenCode 領域（src/opencode/）への型・schema 参照を持たない（REQ-009-015/016）。
+## local ツール package の tsconfig 参照共有と typecheck 検査契約
+
+ルート package（`src/common/tools/<name>/`）と Local 実装 package（`src/common/tools/<name>/local/`）の `tsconfig.json` を並列に二重管理しない。Local 側の `tsconfig.json` はルート側へ `extends` で参照し、差分は `include` 等の Local 固有設定へ限定する。
+
+Local ツール package の `typecheck` script（`tsc --noEmit`）を本体リポジトリの品質検査経路へ組み込む。組込みのタイミングは、Local package 内の誤 import 修正完了後とし、検査が緑（pass）になる状態を前提条件とする。この契約は Local 版の同期・インストール配布対象からの除外（REQ-009-016）を変更せず、本体リポジトリ内の検査実行の追加である。
+
 
 ## 関連項目（See Also）
 

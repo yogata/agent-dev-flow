@@ -17,10 +17,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 69件、廃止済み: 19件
+現行 REQ: 70件、廃止済み: 19件
 <!-- AUTOGEN:END -->
 
-現行要件は69件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
+現行要件は70件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
 REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）による意図的予約欠番であり、実体は存在しない（[採番管理](designs/foundations/numbering-policy.md) 参照）。
 REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却枠であり、意図的予約欠番として維持する。
 REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全 revert）由来の廃止識別子であり、再利用しない。次の新規 REQ 番号は採番時点で REQ 実ファイル一覧と既知欠番レジストリから決定的採番スクリプト（alloc-req-number.ts）により決定する（[採番管理](designs/foundations/numbering-policy.md) 参照）。
@@ -98,6 +98,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [REQ-109](requirements/REQ-109.md) | ADF v5 移行と互換性の境界 |
 | [REQ-110](requirements/REQ-110.md) | ADF v5.1 工程駆動コラボレーション（検討テーマ・外部検討と正規成果物の段階形成） |
 | [REQ-111](requirements/REQ-111.md) | ADF v5.1 工程遷移・独立レビューと変更駆動併存 |
+| [REQ-112](requirements/REQ-112.md) | local package tsconfig 二重管理統合・typecheck gate 組込みの方針決定 |
 <!-- AUTOGEN:END -->
 
 - [要件インデックス](requirements/README.md)
