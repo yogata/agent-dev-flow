@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261013T092332Z-489a",
+  "workflow": "intake-promote",
+  "evaluationKind": "adversarial-review-trigger",
+  "subject": "adversarial-review 発動条件判定（暫定分類 採用6・保留1・却下0）",
+  "sourceRevision": "499ef68a",
+  "durationMs": 691,
+  "inputTokens": 1102,
+  "inputs": {
+    "requestDigest": "b48423215287e5386461c3324307579af19f45bd989da43aa38169f08608fcf3",
+    "references": [
+      {
+        "digest": "606f08cfb3030912176e8c690b6a54c6f1c6cecba1e2edeebe04bcda49db5931",
+        "label": "i1",
+        "path": ".agentdev/intake/inbox/2026-10-11-traceability-gate-new-req-row.md"
+      },
+      {
+        "digest": "ee1844de441afb619b795c0e65c56cbd85f0c7ebd2ef78a9635928457e52a9ff",
+        "label": "i2",
+        "path": ".agentdev/intake/inbox/2026-10-13-bun-test-engine-tree-req-id-literal.md"
+      },
+      {
+        "digest": "bea8c12ea059c6bd16becd1c3488e75723537852e8d5de7a2b1dfccc992ef5c6",
+        "label": "i3",
+        "path": ".agentdev/intake/inbox/2026-10-13-local-tsconfig-ts2307-existing-asset-compat.md"
+      },
+      {
+        "digest": "de96beff9586d0fa7cd3427961f6e0461ed6ee33aa3dbbe962055a12d06a1af4",
+        "label": "i4",
+        "path": ".agentdev/intake/inbox/2026-10-13-opencode-local-legacy-vocabulary-remnants.md"
+      },
+      {
+        "digest": "966d4f5d1cec1da58192936b5d3a4104156dcfb50a421e97518996eb8ca22841",
+        "label": "i5",
+        "path": ".agentdev/intake/inbox/2026-10-13-req-110-test-strategy-table-missing.md"
+      },
+      {
+        "digest": "e72dc73ea9605e2521c53a9147de13117efcc0f3a2a5201884e999cc1e19c608",
+        "label": "i6",
+        "path": ".agentdev/intake/inbox/2026-10-13-textlint-prh-definition-pr-term.md"
+      },
+      {
+        "digest": "d4ee5c1805f683bd62555ace7d1d9133028c33729cbfbb1493a62460ab4768ba",
+        "label": "i7",
+        "path": ".agentdev/intake/inbox/2026-10-13-traceability-sidecar-aggregation-rule.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "review-trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.95,
+        "false": 0.050000000000000044
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "review-trigger",
+        "value": true
+      }
+    ]
+  }
+}

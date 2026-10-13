@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261013T092029Z-d42d",
+  "workflow": "intake-promote",
+  "evaluationKind": "preliminary-classification",
+  "subject": "intake inbox 7件の暫定分類（採用/保留/却下）",
+  "sourceRevision": "499ef68a",
+  "durationMs": 264,
+  "inputTokens": 2089,
+  "inputs": {
+    "requestDigest": "0265e6ff300c8090148ab1b0a42523d9f0d5fe92d79c141cac15678fa0ecba54",
+    "references": [
+      {
+        "digest": "606f08cfb3030912176e8c690b6a54c6f1c6cecba1e2edeebe04bcda49db5931",
+        "label": "i1",
+        "path": ".agentdev/intake/inbox/2026-10-11-traceability-gate-new-req-row.md"
+      },
+      {
+        "digest": "ee1844de441afb619b795c0e65c56cbd85f0c7ebd2ef78a9635928457e52a9ff",
+        "label": "i2",
+        "path": ".agentdev/intake/inbox/2026-10-13-bun-test-engine-tree-req-id-literal.md"
+      },
+      {
+        "digest": "bea8c12ea059c6bd16becd1c3488e75723537852e8d5de7a2b1dfccc992ef5c6",
+        "label": "i3",
+        "path": ".agentdev/intake/inbox/2026-10-13-local-tsconfig-ts2307-existing-asset-compat.md"
+      },
+      {
+        "digest": "de96beff9586d0fa7cd3427961f6e0461ed6ee33aa3dbbe962055a12d06a1af4",
+        "label": "i4",
+        "path": ".agentdev/intake/inbox/2026-10-13-opencode-local-legacy-vocabulary-remnants.md"
+      },
+      {
+        "digest": "966d4f5d1cec1da58192936b5d3a4104156dcfb50a421e97518996eb8ca22841",
+        "label": "i5",
+        "path": ".agentdev/intake/inbox/2026-10-13-req-110-test-strategy-table-missing.md"
+      },
+      {
+        "digest": "e72dc73ea9605e2521c53a9147de13117efcc0f3a2a5201884e999cc1e19c608",
+        "label": "i6",
+        "path": ".agentdev/intake/inbox/2026-10-13-textlint-prh-definition-pr-term.md"
+      },
+      {
+        "digest": "d4ee5c1805f683bd62555ace7d1d9133028c33729cbfbb1493a62460ab4768ba",
+        "label": "i7",
+        "path": ".agentdev/intake/inbox/2026-10-13-traceability-sidecar-aggregation-rule.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "i1-class",
+      "questionForm": "choice",
+      "value": "保留",
+      "probabilityDistribution": {
+        "採用": 0,
+        "保留": 1,
+        "却下": 0
+      }
+    },
+    {
+      "questionId": "i2-class",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.97,
+        "保留": 0.02,
+        "却下": 0.01
+      }
+    },
+    {
+      "questionId": "i3-class",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 1,
+        "保留": 0,
+        "却下": 0
+      }
+    },
+    {
+      "questionId": "i4-class",
+      "questionForm": "choice",
+      "value": "却下",
+      "probabilityDistribution": {
+        "採用": 0.18,
+        "保留": 0.1,
+        "却下": 0.72
+      }
+    },
+    {
+      "questionId": "i5-class",
+      "questionForm": "choice",
+      "value": "保留",
+      "probabilityDistribution": {
+        "採用": 0.16,
+        "保留": 0.83,
+        "却下": 0.01
+      }
+    },
+    {
+      "questionId": "i6-class",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.97,
+        "保留": 0.02,
+        "却下": 0.01
+      }
+    },
+    {
+      "questionId": "i7-class",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.88,
+        "保留": 0.12,
+        "却下": 0
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "i1-class",
+        "value": "保留"
+      },
+      {
+        "questionId": "i2-class",
+        "value": "採用"
+      },
+      {
+        "questionId": "i3-class",
+        "value": "採用"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "i4-class",
+        "value": "採用"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "i5-class",
+        "value": "採用"
+      },
+      {
+        "questionId": "i6-class",
+        "value": "採用"
+      },
+      {
+        "questionId": "i7-class",
+        "value": "採用"
+      }
+    ]
+  }
+}
