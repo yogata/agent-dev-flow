@@ -50,6 +50,7 @@ skills:
   - agentdev-issue-tracking
   - agentdev-learning-capture
   - agentdev-learning-pipeline
+  - agentdev-phase-theme-collaboration
   - agentdev-project-extensions
   - agentdev-quality-gates
   - agentdev-req-analysis
@@ -76,6 +77,11 @@ skills:
   - agentdev-workflow-learning-promote
   - agentdev-workflow-lifecycle
   - agentdev-workflow-orchestration
+  - agentdev-workflow-phase-artifacts-update
+  - agentdev-workflow-phase-review
+  - agentdev-workflow-phase-tasks-create
+  - agentdev-workflow-phase-tasks-update
+  - agentdev-workflow-phase-transition
   - agentdev-workflow-req-define
   - agentdev-workflow-routing
   - agentdev-workflow-templates
