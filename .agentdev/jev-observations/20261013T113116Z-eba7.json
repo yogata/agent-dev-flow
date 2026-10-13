@@ -1,0 +1,408 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261013T113116Z-eba7",
+  "workflow": "backlog-review",
+  "evaluationKind": "backlog-review.step3.merge-split",
+  "subject": "採用済み成果物20件の統合・分割判定（backlog-review STEP-3）",
+  "sourceRevision": "7af443e9",
+  "durationMs": 1438,
+  "inputTokens": 5125,
+  "inputs": {
+    "requestDigest": "3aedd2ceb84b08eb26f7a954c9deeefa13043c0d070ae371aa91f38756cab350",
+    "references": [
+      {
+        "digest": "e184a1678e5dae33b257a6e72a482eecfad15ec2d2afe70cad9bb8e556ae5942",
+        "label": "i1",
+        "path": ".agentdev/intake/promoted/2026-10-13-bun-test-engine-tree-req-id-literal.md"
+      },
+      {
+        "digest": "35117a8bb15d53a3f61e71a898f50ca7aa01885626a6088ac169cf327b207f8f",
+        "label": "i2",
+        "path": ".agentdev/intake/promoted/2026-10-13-local-tsconfig-ts2307-existing-asset-compat.md"
+      },
+      {
+        "digest": "7e0f97ae713f4f3a83a5c49de49f0d4ad95a3c92c5ac30625913fcd7082bee95",
+        "label": "i3",
+        "path": ".agentdev/intake/promoted/2026-10-13-opencode-local-legacy-vocabulary-remnants.md"
+      },
+      {
+        "digest": "5eb84790b6ca73db8cb9c584151460d38078e8b9d72ddee740762fb0c737cd9b",
+        "label": "i4",
+        "path": ".agentdev/intake/promoted/2026-10-13-req-110-test-strategy-table-missing.md"
+      },
+      {
+        "digest": "bee046ad74196d27ef8c447229be8a7952f15bc93dbe88088d7123d7ba8fdfa2",
+        "label": "i5",
+        "path": ".agentdev/intake/promoted/2026-10-13-textlint-prh-definition-pr-term.md"
+      },
+      {
+        "digest": "a9cb47d5965244c0769cc7d97c26d8b81d384a5fef9aef8e685f7592839bd577",
+        "label": "i6",
+        "path": ".agentdev/intake/promoted/2026-10-13-traceability-sidecar-aggregation-rule.md"
+      },
+      {
+        "digest": "e7c42e13c250ae180d0d8fa0318d6f11ec4ca7bc25a289632205cc7644ab97a0",
+        "label": "l1",
+        "path": ".agentdev/learning/promoted/procedure-case-open-step4-artifact-actions-applied-verification.md"
+      },
+      {
+        "digest": "a6568b39e79e5b6e2427ef8922bf243fb1a595f6e04938ff1981f1d634f105f0",
+        "label": "l2",
+        "path": ".agentdev/learning/promoted/fix-accept-definition-checks-status-column-parse.md"
+      },
+      {
+        "digest": "dabf59a9c73b1df81f33993c403931213d9a54052f887837bf30c201dcec4979",
+        "label": "l3",
+        "path": ".agentdev/learning/promoted/procedure-case-auto-stage4-case-close-delegation-design-status-review.md"
+      },
+      {
+        "digest": "1f65fc3f5cf66a2d4ae25abb0e084bde527bd341b7732ac2e6db5b1290c472ea",
+        "label": "s1",
+        "path": ".agentdev/inspect/promoted/finding-20261013-superseded-dec029-ref.md"
+      },
+      {
+        "digest": "adc0e3e5a54efff02277ac2420dd8effd35ec3b1e01d695d7291c4ac1d556f8a",
+        "label": "s2",
+        "path": ".agentdev/inspect/promoted/finding-20261013-covers-req106-body-mismatch.md"
+      },
+      {
+        "digest": "dc652c45d8118520f1b84bb2303d2704283b59f5078f74eff5e16c33ce813fc8",
+        "label": "s3",
+        "path": ".agentdev/inspect/promoted/finding-20261013-wave-glossary-dec055.md"
+      },
+      {
+        "digest": "5966ffbc788a9cdf2a892f8e79dab5a560bdbebf94711f5061d89c3a135be5da",
+        "label": "s4",
+        "path": ".agentdev/inspect/promoted/finding-20261013-v5-foundation-readme-links.md"
+      },
+      {
+        "digest": "a2dc739a3b4d5b5c72a654a5da099861ac06cc68f3eb5cf86b3010b001efabcc",
+        "label": "s5",
+        "path": ".agentdev/inspect/promoted/finding-20261013-deleted-ru-reference.md"
+      },
+      {
+        "digest": "35b75d4d13c578b0e2f5362ab9ce40a4bce002fb78ff3713c9727efa8ee171df",
+        "label": "s6",
+        "path": ".agentdev/inspect/promoted/finding-20261013-phase-impl-status-expression.md"
+      },
+      {
+        "digest": "62414a41268f971a614092694f7a7f9bac2fc6b6d0d408896411fe65259c4070",
+        "label": "s7",
+        "path": ".agentdev/inspect/promoted/finding-20261013-system-md-inventory-currentization.md"
+      },
+      {
+        "digest": "803a370585d6fe9dda760265137c440c435584e91366ba90961ff32980e30f5f",
+        "label": "s8",
+        "path": ".agentdev/inspect/promoted/finding-20261013-design-frontmatter-updated.md"
+      },
+      {
+        "digest": "3598e40d774bc48a204a01c082139747947a124eb6c336c15e0b39465190efcc",
+        "label": "s9",
+        "path": ".agentdev/inspect/promoted/finding-20261013-tool-contract-exception-list.md"
+      },
+      {
+        "digest": "2be2723ac4714b0983cf456bcd23518129a5271cf4a312ea8c1368a4fd1eb2e6",
+        "label": "s10",
+        "path": ".agentdev/inspect/promoted/finding-20261013-glossary-vocabulary-followup.md"
+      },
+      {
+        "digest": "d3759154d6bfb16876c87cad59a241b86c119935f174e95f9717ea4bbd3c1e8c",
+        "label": "s11",
+        "path": ".agentdev/inspect/promoted/finding-20261013-distribution-boundary-delta.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "ms-i1",
+      "questionForm": "choice",
+      "value": "1:1（統合・分割不要）",
+      "probabilityDistribution": {
+        "統合（N:1）": 0,
+        "分割（1:N）": 0,
+        "1:1（統合・分割不要）": 1
+      }
+    },
+    {
+      "questionId": "ms-i2",
+      "questionForm": "choice",
+      "value": "分割（1:N）",
+      "probabilityDistribution": {
+        "統合（N:1）": 0,
+        "分割（1:N）": 0.93,
+        "1:1（統合・分割不要）": 0.07
+      }
+    },
+    {
+      "questionId": "ms-i3",
+      "questionForm": "choice",
+      "value": "1:1（統合・分割不要）",
+      "probabilityDistribution": {
+        "統合（N:1）": 0.3,
+        "分割（1:N）": 0.11,
+        "1:1（統合・分割不要）": 0.59
+      }
+    },
+    {
+      "questionId": "ms-i4",
+      "questionForm": "choice",
+      "value": "1:1（統合・分割不要）",
+      "probabilityDistribution": {
+        "統合（N:1）": 0.01,
+        "分割（1:N）": 0.09,
+        "1:1（統合・分割不要）": 0.9
+      }
+    },
+    {
+      "questionId": "ms-i5",
+      "questionForm": "choice",
+      "value": "1:1（統合・分割不要）",
+      "probabilityDistribution": {
+        "統合（N:1）": 0.1,
+        "分割（1:N）": 0.24,
+        "1:1（統合・分割不要）": 0.66
+      }
+    },
+    {
+      "questionId": "ms-i6",
+      "questionForm": "choice",
+      "value": "1:1（統合・分割不要）",
+      "probabilityDistribution": {
+        "統合（N:1）": 0.04,
+        "分割（1:N）": 0.04,
+        "1:1（統合・分割不要）": 0.92
+      }
+    },
+    {
+      "questionId": "ms-l1",
+      "questionForm": "choice",
+      "value": "1:1（統合・分割不要）",
+      "probabilityDistribution": {
+        "統合（N:1）": 0.01,
+        "分割（1:N）": 0.03,
+        "1:1（統合・分割不要）": 0.96
+      }
+    },
+    {
+      "questionId": "ms-l2",
+      "questionForm": "choice",
+      "value": "分割（1:N）",
+      "probabilityDistribution": {
+        "統合（N:1）": 0.01,
+        "分割（1:N）": 0.51,
+        "1:1（統合・分割不要）": 0.48
+      }
+    },
+    {
+      "questionId": "ms-l3",
+      "questionForm": "choice",
+      "value": "1:1（統合・分割不要）",
+      "probabilityDistribution": {
+        "統合（N:1）": 0,
+        "分割（1:N）": 0,
+        "1:1（統合・分割不要）": 1
+      }
+    },
+    {
+      "questionId": "ms-s1",
+      "questionForm": "choice",
+      "value": "1:1（統合・分割不要）",
+      "probabilityDistribution": {
+        "統合（N:1）": 0,
+        "分割（1:N）": 0.01,
+        "1:1（統合・分割不要）": 0.99
+      }
+    },
+    {
+      "questionId": "ms-s2",
+      "questionForm": "choice",
+      "value": "1:1（統合・分割不要）",
+      "probabilityDistribution": {
+        "統合（N:1）": 0.16,
+        "分割（1:N）": 0.07,
+        "1:1（統合・分割不要）": 0.77
+      }
+    },
+    {
+      "questionId": "ms-s3",
+      "questionForm": "choice",
+      "value": "統合（N:1）",
+      "probabilityDistribution": {
+        "統合（N:1）": 0.5,
+        "分割（1:N）": 0.03,
+        "1:1（統合・分割不要）": 0.47
+      }
+    },
+    {
+      "questionId": "ms-s4",
+      "questionForm": "choice",
+      "value": "1:1（統合・分割不要）",
+      "probabilityDistribution": {
+        "統合（N:1）": 0.09,
+        "分割（1:N）": 0.01,
+        "1:1（統合・分割不要）": 0.9
+      }
+    },
+    {
+      "questionId": "ms-s5",
+      "questionForm": "choice",
+      "value": "統合（N:1）",
+      "probabilityDistribution": {
+        "統合（N:1）": 0.49,
+        "分割（1:N）": 0.03,
+        "1:1（統合・分割不要）": 0.48
+      }
+    },
+    {
+      "questionId": "ms-s6",
+      "questionForm": "choice",
+      "value": "統合（N:1）",
+      "probabilityDistribution": {
+        "統合（N:1）": 0.49,
+        "分割（1:N）": 0.03,
+        "1:1（統合・分割不要）": 0.48
+      }
+    },
+    {
+      "questionId": "ms-s7",
+      "questionForm": "choice",
+      "value": "1:1（統合・分割不要）",
+      "probabilityDistribution": {
+        "統合（N:1）": 0.02,
+        "分割（1:N）": 0.01,
+        "1:1（統合・分割不要）": 0.97
+      }
+    },
+    {
+      "questionId": "ms-s8",
+      "questionForm": "choice",
+      "value": "統合（N:1）",
+      "probabilityDistribution": {
+        "統合（N:1）": 0.54,
+        "分割（1:N）": 0.12,
+        "1:1（統合・分割不要）": 0.34
+      }
+    },
+    {
+      "questionId": "ms-s9",
+      "questionForm": "choice",
+      "value": "統合（N:1）",
+      "probabilityDistribution": {
+        "統合（N:1）": 0.64,
+        "分割（1:N）": 0.01,
+        "1:1（統合・分割不要）": 0.35
+      }
+    },
+    {
+      "questionId": "ms-s10",
+      "questionForm": "choice",
+      "value": "統合（N:1）",
+      "probabilityDistribution": {
+        "統合（N:1）": 0.72,
+        "分割（1:N）": 0.06,
+        "1:1（統合・分割不要）": 0.22
+      }
+    },
+    {
+      "questionId": "ms-s11",
+      "questionForm": "choice",
+      "value": "分割（1:N）",
+      "probabilityDistribution": {
+        "統合（N:1）": 0.01,
+        "分割（1:N）": 0.93,
+        "1:1（統合・分割不要）": 0.06
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "ms-i1",
+        "value": "1:1（統合・分割不要）"
+      },
+      {
+        "questionId": "ms-i2",
+        "value": "分割（1:N）"
+      },
+      {
+        "questionId": "ms-i3",
+        "value": "1:1（統合・分割不要）"
+      },
+      {
+        "questionId": "ms-i4",
+        "value": "1:1（統合・分割不要）"
+      },
+      {
+        "questionId": "ms-i5",
+        "value": "1:1（統合・分割不要）"
+      },
+      {
+        "questionId": "ms-i6",
+        "value": "1:1（統合・分割不要）"
+      },
+      {
+        "questionId": "ms-l1",
+        "value": "1:1（統合・分割不要）"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "ms-l2",
+        "value": "1:1（統合・分割不要）"
+      },
+      {
+        "questionId": "ms-l3",
+        "value": "1:1（統合・分割不要）"
+      },
+      {
+        "questionId": "ms-s1",
+        "value": "1:1（統合・分割不要）"
+      },
+      {
+        "questionId": "ms-s2",
+        "value": "1:1（統合・分割不要）"
+      },
+      {
+        "questionId": "ms-s3",
+        "value": "統合（N:1）"
+      },
+      {
+        "questionId": "ms-s4",
+        "value": "1:1（統合・分割不要）"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "ms-s5",
+        "value": "1:1（統合・分割不要）"
+      },
+      {
+        "questionId": "ms-s6",
+        "value": "統合（N:1）"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "ms-s7",
+        "value": "統合（N:1）"
+      },
+      {
+        "questionId": "ms-s8",
+        "value": "統合（N:1）"
+      },
+      {
+        "questionId": "ms-s9",
+        "value": "統合（N:1）"
+      },
+      {
+        "questionId": "ms-s10",
+        "value": "統合（N:1）"
+      },
+      {
+        "questionId": "ms-s11",
+        "value": "分割（1:N）"
+      }
+    ]
+  }
+}

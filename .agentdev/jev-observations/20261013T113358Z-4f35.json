@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261013T113358Z-4f35",
+  "workflow": "backlog-review",
+  "evaluationKind": "backlog-review.step3.dependency-resolution",
+  "subject": "RU 構成案 19件の depends_on 並べ替え可能性検証（backlog-review STEP-3）",
+  "sourceRevision": "7af443e9",
+  "durationMs": 765,
+  "inputTokens": 1987,
+  "inputs": {
+    "requestDigest": "81f8c9537d7f37adbc15b3acdebc3d2c5ca7ddcb95067080963947d30f090e30"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "dr-1",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.89,
+        "false": 0.10999999999999999
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "dr-1",
+        "value": true
+      }
+    ]
+  }
+}
