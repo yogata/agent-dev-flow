@@ -2,7 +2,7 @@
 title: ADF v5.1 工程遷移・独立レビューと双経路併存モデル
 status: accepted
 created: 2026-10-12
-updated: 2026-10-13
+updated: 2026-10-14
 ---
 
 <!-- ADF-COVERS(design): REQ-111-001, REQ-111-002, REQ-111-003, REQ-111-004, REQ-111-005, REQ-111-006, REQ-111-007, REQ-111-008, REQ-111-009, REQ-111-010, REQ-111-011, REQ-111-012, REQ-111-013 -->
