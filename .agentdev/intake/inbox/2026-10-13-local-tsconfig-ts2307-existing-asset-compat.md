@@ -23,3 +23,4 @@ DEL-3670-RUN 受領検証 TS-003 (Case #3670) で、`src/common/tools/agentdev-g
 - 観測元: Case #3670、PR #3669 (DEL-3670-RUN 受領検証 TS-003、2026-10-13)
 - 証拠: `C:/Users/ogatay/AppData/Local/hermes/cache/scratch/rev-b15-r2/ts003-observations.md` (local tsconfig typecheck exit 2、TS2307 1 件)。agentdev-gh ルート tsconfig は同時刻の typecheck で 0 エラー (exit 0)
 - 関連: PR #3669 本文 Findings セクション (pre-existing 区別記録)、同種修正の実績 commit 19cfa730
+- 再観測: Case #3671、PR #3672 (DEL-3671-CLOSE capture、2026-10-13)。base commit (ae2802f7) と merge 後 main (321ebf3e) の両方で L17 誤 import が未修復のまま再確認。PR #3672 本文 Findings でも「別途修正候補」と区別記録。観測元 2 Case 化により再現性が強化された
