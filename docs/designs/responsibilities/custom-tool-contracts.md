@@ -2,7 +2,7 @@
 title: Custom Tool 操作契約
 status: accepted
 created: 2026-08-24
-updated: 2026-10-07
+updated: 2026-10-13
 ---
 <!-- ADF-COVERS(design): REQ-090-001, REQ-090-002, REQ-090-003, REQ-090-004, REQ-090-009, REQ-090-010, REQ-090-011, REQ-090-012, REQ-090-013, REQ-090-014, REQ-090-015, REQ-090-016, REQ-090-017, REQ-090-018, REQ-090-019, REQ-090-020, REQ-090-021, REQ-090-022, REQ-090-023, REQ-090-024, REQ-090-025, REQ-090-026, REQ-090-027, REQ-090-028, REQ-090-029, REQ-011-033 -->
 <!-- ADF-COVERS(design): REQ-009-051, REQ-052-013, REQ-052-014, REQ-052-015 -->
@@ -69,6 +69,7 @@ VERIFY 適用（READ / WRITE 分離）:
 GitHub版 / Local版等価性:
 - 両版は操作名、入力構造、出力構造（pr_read の isDraft を含む）、Comment 識別概念（commentId の役割と公開型）、Issue の論理状態遷移、READ / WRITE の成功意味、失敗の意味を同値とする
 - 物理写像に起因する値域差異（ローカル版追跡Issueの通常ラベル非許容。agentdev-issue-tracking Design の値域定義に従う）と、role: case の状態モデルに起因する受理条件差（ローカル版 case の再オープン拒否。ローカルIssue共通スキーマ Design の状態遷移に従う）、および Local 版が GitHub Draft PR に相当する状態を持たないことによる isDraft の値差異（Local 版は常に false。REQ-011-032）は、本 Design が例外として明示する
+- pr_merge の入力契約に起因する受理条件差（ローカル版は commitHash を取り込み確認情報として必須検証〔実在確認〕し、GitHub 版は受理してマージ動作に使用しない。:48 の宣言に対応）は、本 Design が例外として明示する
 
 操作カタログの完全列挙（16操作）は契約テストで固定し、対象外機能の追加を検出する。
 

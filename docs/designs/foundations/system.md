@@ -2,7 +2,7 @@
 title: システム仕様
 status: accepted
 created: 2026-08-20
-updated: "2026-10-09"
+updated: "2026-10-13"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-033 -->
 <!-- ADF-COVERS(implementation): REQ-002-009, REQ-002-010, REQ-002-012 -->
@@ -101,7 +101,7 @@ case-run（内部 lifecycle 段階）が QG-1〜QG-3（ローカル検証、CI �
 
 ## Workflow Architecture Inventory
 
-公開 Command（13件）と内部 lifecycle 段階（case-* 5 段階）の Workflow Architecture Inventory を恒久カタログとして統合する。
+公開 Command（18件）と内部 lifecycle 段階（case-* 5 段階）の Workflow Architecture Inventory を恒久カタログとして統合する。
 各Command の11分析軸（公開契約・主要処理段階・分岐・副作用・HITL・並列性・resume・durable state・Harness依存・Capability依存・内部workflow候補）を記載する。
 個別Workflow Skill 移行（Wave 2）および Capability Skill 抽出の参照証拠とする。
 
@@ -137,6 +137,12 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 | `/agentdev/inspect-skills` | Command/Skill 定義 | 検出事項 | inspect |
 | `/agentdev/inspect-promote` | 検出事項 | 採用済み成果物 | inspect |
 | `/agentdev/issue` | 自然言語による課題管理の指示 | 追跡Issue の作成・更新・検索・参照（Tool 操作契約経由） | 横断（課題管理） |
+| `/agentdev/third-party-sync` | 対象 Skill 名（省略時は全件）、dry-run 指定 | 取得結果報告（対象一覧、取得成否、配置パス、管理外衝突の検出状況） | third-party |
+| `/agentdev/phase-tasks-create` | 自然言語による形成指示（工程目的、対象範囲、既知制約） | テーマ初回形成の結果（テーマ識別と一覧、参考候補と既知の必須事項の区別） | phase（工程駆動） |
+| `/agentdev/phase-tasks-update` | 自然言語による更新指示（追加・具体化・分割・統合・廃止） | テーマ更新の結果（変更理由、旧新対応、未決事項の引継ぎ） | phase（工程駆動） |
+| `/agentdev/phase-artifacts-update` | 自然言語による反映指示と戻り入力 | 反映の結果（反映した項目と反映先、衝突・未確認・保存失敗の区別、受領記録の保存先） | phase（工程駆動） |
+| `/agentdev/phase-review` | 自然言語によるレビュー・全体像の指示 | 4区分（確定違反・証拠不足・推測・未採用改善候補）に分けた所見と工程全体像（セッション内出力） | phase（工程駆動） |
+| `/agentdev/phase-transition` | 自然言語による遷移の指示 | 遷移の記録結果（記録先、後続工程の解決結果、前工程の過去工程化の伝達） | phase（工程駆動） |
 
 ### `/agentdev/req-define`
 
