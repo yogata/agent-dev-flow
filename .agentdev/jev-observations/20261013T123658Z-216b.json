@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261013T123658Z-216b",
+  "workflow": "req-define",
+  "evaluationKind": "req-expansion-classification",
+  "subject": "req-define Batch C 要件展開の最終分類・Design 分離（RU-0208/RU-0210/RU-0211/RU-0213）",
+  "sourceRevision": "a2417bdb",
+  "durationMs": 394,
+  "inputTokens": 2489,
+  "inputs": {
+    "requestDigest": "04380ccd82b8aec2ddf0616366eb8d6a674c04e272306791f45e81d6c1ca1c3c",
+    "references": [
+      {
+        "digest": "af2199c3d8b453b2d6a4488e7564634d506ce64bbd270c2647b4a8d48abc3927",
+        "label": "RU-0208",
+        "path": ".agentdev/backlog/req-units/RU-0208.md"
+      },
+      {
+        "digest": "529c50546eeba6ec4521fb41b8027e2b10e684db5965c8fbdafb7771bb242f75",
+        "label": "RU-0210",
+        "path": ".agentdev/backlog/req-units/RU-0210.md"
+      },
+      {
+        "digest": "d2cccc78f25ec1b3f7a9531b691cde1e5e0d7f57aa8664d65d6d4dc761c5ac01",
+        "label": "RU-0211",
+        "path": ".agentdev/backlog/req-units/RU-0211.md"
+      },
+      {
+        "digest": "e4459cc0caf06ab73f5fa19f33a99c6f4616774e6e23187c1e92b3d3d57bcc20",
+        "label": "RU-0213",
+        "path": ".agentdev/backlog/req-units/RU-0213.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-ru0208-class",
+      "questionForm": "choice",
+      "value": "REQ 行のみ",
+      "probabilityDistribution": {
+        "REQ 行のみ": 1,
+        "Design 行のみ": 0,
+        "REQ 行と Design 行の両方": 0,
+        "REQ・Design とも変更なし（実現面のみ）": 0
+      }
+    },
+    {
+      "questionId": "q1-ru0208-sep",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.07,
+        "false": 0.9299999999999999
+      }
+    },
+    {
+      "questionId": "q2-ru0210-class",
+      "questionForm": "choice",
+      "value": "REQ・Design とも変更なし（実現面のみ）",
+      "probabilityDistribution": {
+        "REQ 行のみ": 0,
+        "Design 行のみ": 0,
+        "REQ 行と Design 行の両方": 0,
+        "REQ・Design とも変更なし（実現面のみ）": 1
+      }
+    },
+    {
+      "questionId": "q2-ru0210-sep",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.09,
+        "false": 0.91
+      }
+    },
+    {
+      "questionId": "q3-ru0211-class",
+      "questionForm": "choice",
+      "value": "REQ 行と Design 行の両方",
+      "probabilityDistribution": {
+        "REQ 行のみ": 0,
+        "Design 行のみ": 0,
+        "REQ 行と Design 行の両方": 1,
+        "REQ・Design とも変更なし（実現面のみ）": 0
+      }
+    },
+    {
+      "questionId": "q3-ru0211-sep",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.95,
+        "false": 0.050000000000000044
+      }
+    },
+    {
+      "questionId": "q4-ru0213-class",
+      "questionForm": "choice",
+      "value": "Design 行のみ",
+      "probabilityDistribution": {
+        "REQ 行のみ": 0,
+        "Design 行のみ": 1,
+        "REQ 行と Design 行の両方": 0,
+        "REQ・Design とも変更なし（実現面のみ）": 0
+      }
+    },
+    {
+      "questionId": "q4-ru0213-sep",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.83,
+        "false": 0.17000000000000004
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-ru0208-class",
+        "value": "REQ 行のみ"
+      },
+      {
+        "questionId": "q1-ru0208-sep",
+        "value": false
+      },
+      {
+        "questionId": "q2-ru0210-class",
+        "value": "REQ・Design とも変更なし（実現面のみ）"
+      },
+      {
+        "questionId": "q2-ru0210-sep",
+        "value": false
+      },
+      {
+        "questionId": "q3-ru0211-class",
+        "value": "REQ 行と Design 行の両方"
+      },
+      {
+        "questionId": "q3-ru0211-sep",
+        "value": true
+      },
+      {
+        "questionId": "q4-ru0213-class",
+        "value": "Design 行のみ"
+      },
+      {
+        "questionId": "q4-ru0213-sep",
+        "value": true
+      }
+    ]
+  }
+}

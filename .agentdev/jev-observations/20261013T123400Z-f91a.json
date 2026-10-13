@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261013T123400Z-f91a",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "req-define Batch C 既存REQ照合（RU-0208/RU-0210/RU-0211/RU-0213）",
+  "sourceRevision": "a2417bdb",
+  "durationMs": 971,
+  "inputTokens": 2083,
+  "inputs": {
+    "requestDigest": "24df0c3d23efe40486d765d5017663aeb7fb66cd4275af96634bb4a6b7d3fd39",
+    "references": [
+      {
+        "label": "RU-0208",
+        "path": ".agentdev/backlog/req-units/RU-0208.md",
+        "digest": "af2199c3d8b453b2d6a4488e7564634d506ce64bbd270c2647b4a8d48abc3927"
+      },
+      {
+        "label": "RU-0210",
+        "path": ".agentdev/backlog/req-units/RU-0210.md",
+        "digest": "529c50546eeba6ec4521fb41b8027e2b10e684db5965c8fbdafb7771bb242f75"
+      },
+      {
+        "label": "RU-0211",
+        "path": ".agentdev/backlog/req-units/RU-0211.md",
+        "digest": "d2cccc78f25ec1b3f7a9531b691cde1e5e0d7f57aa8664d65d6d4dc761c5ac01"
+      },
+      {
+        "label": "RU-0213",
+        "path": ".agentdev/backlog/req-units/RU-0213.md",
+        "digest": "e4459cc0caf06ab73f5fa19f33a99c6f4616774e6e23187c1e92b3d3d57bcc20"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-ru0208-op",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 1,
+        "UPDATE": 0,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "q1-ru0208-conf",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.12,
+        "false": 0.88
+      }
+    },
+    {
+      "questionId": "q2-ru0210-op",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0.01,
+        "REQ操作なし": 0.99
+      }
+    },
+    {
+      "questionId": "q2-ru0210-conf",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.2,
+        "false": 0.8
+      }
+    },
+    {
+      "questionId": "q3-ru0211-op",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 1,
+        "UPDATE": 0,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "q3-ru0211-conf",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.11,
+        "false": 0.89
+      }
+    },
+    {
+      "questionId": "q4-ru0213-op",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1
+      }
+    },
+    {
+      "questionId": "q4-ru0213-conf",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.17,
+        "false": 0.83
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-ru0208-op",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "q1-ru0208-conf",
+        "value": false
+      },
+      {
+        "questionId": "q2-ru0210-op",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q2-ru0210-conf",
+        "value": false
+      },
+      {
+        "questionId": "q3-ru0211-op",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "q3-ru0211-conf",
+        "value": false
+      },
+      {
+        "questionId": "q4-ru0213-op",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q4-ru0213-conf",
+        "value": false
+      }
+    ]
+  }
+}
