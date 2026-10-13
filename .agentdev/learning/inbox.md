@@ -134,3 +134,35 @@
 - **想定反映先**: agentdev-workflow-case-open reference（definition-pr-and-idempotency.md 対照救済手順節）。learning-promote での判断
 - **関連**: .agentdev/learning/inbox.md、Case #3683、PR #3693
 - **タグ**: `#case-open` `#check_integrity` `#evidence`
+
+## workflow extension の yomiyasu 前置適用 rule を読み込む前に GitHub 文章を投稿して事後補完となった
+
+- **問題事象**: case-ready STEP-4 の Root Case 本文更新（実現方針章の新設と完了条件の展開）を agentdev_gh issue_update で実施した際、workflow extension（agentdev-workflow-case-ready.yaml）の rules（GitHub 文章は agentdev_gh へ渡す前に yomiyasu 推敲）を確認せずに投稿した。投稿後に extension を読み込んで rule を認識し、変更散文部分の事後 lint 確認で補完した（指摘 5 件はコード識別子の半角空白とチェックボックス契約構造への指摘で、正当な用語・構造への指摘として理由を記録して保持し修正不要判定）
+- **発生局面**: 実装（case-ready STEP-4 execution contract 確定。単独 case-ready 実行）
+- **検知方法**: STEP-6 の横断依存検査入力構成のため workflow extension（.agentdev/extensions/skills/agentdev-workflow-case-ready.yaml）を読み込んだ時点で rules 存在を再認識（投稿後の事後確認）
+- **根本原因**: STEP 実行手順に workflow extension の rules 確認が必須前処理として組み込まれておらず、GitHub 書込み操作の直前に extension rules を読み込む工程がスキップされた。acceptance_gates は Definition PR 受入検査で参照する前提の運用に寄り、rules 節の参照契機が本文更新操作に結び付いていなかった
+- **自律対応内容**: 変更散文部分（実現方針章・完了条件 3 項目）を検査専用ファイル（workspace 外承認一時領域の明示 Windows パス）へ抽出して yomiyasu_lint.py をファイル引数で実行（通常終了コード 0）、指摘理由を記録して保持。以降の状態のみの更新（STEP-6 ready 遷移の進行状況変更）は再推敲不要条項で継続した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: workflow extension の rules が GitHub 文章への前置処理を要求する全プロジェクトで、case-open / case-run / issue 等 Issue・PR を書き込む工程全般に、書込み直前の extension rules 確認の組込みが同種逸脱全般に有効
+- **再発条件**: workflow extension の rules に GitHub 文章への前置処理が宣言されているプロジェクトで、workflow skill が Issue / PR 本文更新を実行する場合
+- **予防策候補**: workflow skill reference（execution-contract.md「Root Case 本文の更新」節等）に「GitHub 書込み直前の workflow extension rules 確認」手順を明文化する。agentdev-project-extensions の runtime 読み込み契約を STEP 開始時の必須前処理へ位置付ける案も候補。learning-promote での判断
+- **想定反映先**: case-ready reference（execution-contract.md Root Case 本文の更新節）、case-open / case-run 同種手順、agentdev-project-extensions。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Issue #3674、.agentdev/extensions/skills/agentdev-workflow-case-ready.yaml
+- **タグ**: `#case-ready` `#yomiyasu` `#workflow-extension`
+
+## role: case の Root Case の正規状態遷移を trackingState 指定で実行して issue_update が拒否された
+
+- **問題事象**: case-ready STEP-6 の ready 遷移で、role: case の Root Case（#3674）への issue_update に trackingState: ready を指定したところ、operation-failed（detail: issue_update kind/trackingState apply only to tracking issues）で失敗し、同時指定の labels・body 更新も全体として中止された
+- **発生局面**: 実装（case-ready STEP-6 ready 遷移）
+- **検知方法**: agentdev_gh の failure 応答（kind: operation-failed、retryable: true、detail に契約理由）
+- **根本原因**: trackingState は role: tracking の追跡Issue の論理状態であり、role: case の Case Issue は本文の進行状況セクションが正規状態の正（workflows/v4-lifecycle-state-machine Design）。正規状態遷移（open → ready）を本文進行状況の key-value 更新で行うべきところ、tracking 系の操作引数を Case Issue の更新へ混在させた
+- **自律対応内容**: trackingState を除去した issue_update（本文進行状況の正規状態: ready 変更 + work_type ラベル bugfix 付与）で再実行し、成功と VERIFY を確認した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（Custom Tool 操作契約どおりの動作）
+- **横展開観点**: role: case Issue の状態遷移は本文進行状況セクションの更新で行い、trackingState は role: tracking 専用である契約の区別は、case-run（running / blocked / review 遷移）、case-close（closed 遷移）、issue 等 role: case を扱う全工程に適用可能
+- **再発条件**: role: case Issue の正規状態遷移を trackingState 操作引数で実行しようとする場合
+- **予防策候補**: case-ready reference（readiness-and-cleanup.md「ready 遷移」節）に「正規状態の遷移反映は本文進行状況セクションの更新で行い、trackingState 操作引数は role: case に使用しない」を明記する。learning-promote での判断
+- **想定反映先**: case-ready / case-run / case-close reference の状態遷移手順。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Issue #3674、Custom Tool agentdev_gh（issue_update 契約）
+- **タグ**: `#case-ready` `#agentdev_gh` `#CaseIssue`
