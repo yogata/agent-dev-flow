@@ -262,3 +262,87 @@
 - **想定反映先**: src/common/skills/agentdev-workflow-case-ready/references/execution-structure.md（Jev 評価経路の呼出手順）等の 6 系統 Workflow reference。learning-promote での判断
 - **関連**: .agentdev/learning/inbox.md、Case #3686、.agentdev/jev-observations/20261013T160137Z-5179.json、.agentdev/jev-observations/20261013T160213Z-9eb6.json
 - **タグ**: `#case-ready` `#jev` `#observation` `#input-validation`
+
+## agentdev_gh issue_update でバックスラッシュ入り本文（正規表現パターン等）を更新する際、原文 JSON 表現からの逐語複写をせずエスケープを自前で組み立てると本文を破壊する
+
+- **問題事象**: case-close STEP-2 の完了条件チェックボックス更新（issue_update）で、本文中の rg 正規表現パターン `\.\./\.\./\.\./runner` を含む行の `- [ ]` → `- [x]` 置換を、原文の JSON エスケープ列（`\\.\\./`）を複写せず自前で `\/` を付けて再構成した結果、GitHub 上の本文に `\.\.\/` 等の余分なバックスラッシュが混入した。再読込 VERIFY で検出し、原文 JSON 表現の逐語複写に戻す修正で計 2 回の再更新を要した
+- **発生局面**: 実装（case-close STEP-2 完了条件チェックボックス更新。Case #3673）
+- **検知方法**: 更新後の再読込 VERIFY（gh issue view の生本文）で、ストアド本文のパターン表記と初回 issue_read 応答の逐語比較（`\/` 混入件数と `[x]` 件数の突合）
+- **根本原因**: JSON 層のエスケープ（`\\` → `\`、`\/` → `/`）を展開しながら本文を自前で組み立てたため、正規表現内のリテラル列と実際に欲しい列の区別が崩れた。バックスラッシュを含む本文は「送信時に組み立てる」のではなく「初回読取応答の JSON 文字列を検証済みソースとして複写する」対象である
+- **自律対応内容**: 初回 issue_read 応答の body JSON 文字列を逐語複写し、変更をチェックボックス状態 3 行の置換のみに限定して再更新。生本文で `\/` 0 件・`[x]` 3 件を確認して収束
+- **ユーザー確認有無**: なし（再読込 VERIFY による機械確認）
+- **Decision/REQ/spec影響**: なし（Issue 更新時の前後内容比較運用の強化は learning-promote での判断）
+- **横展開観点**: agentdev_gh issue_update / pr_update / comment_create で正規表現・コード断片・Windows パス等のバックスラッシュ入り本文を扱う全 workflow（case-close チェックボックス更新、case-revise の Case 関連 Issue 本文更新、templates 由来本文の転記）
+- **再発条件**: バックスラッシュ入り本文（正規表現パターン、エスケープシーケンス記載）を含む Issue/PR 本文更新で毎回潜在
+- **予防策候補**: issue_update 手順に「変更対象行以外は初回読取応答の JSON 文字列を逐語複写する」「更新後は生本文でバックスラッシュ列の逐語比較を行う」前置規律の明文化。learning-promote での判断
+- **想定反映先**: src/common/skills/agentdev-issue-management/SKILL.md（Issue 更新時の前後内容比較）と src/common/skills/agentdev-workflow-case-close/references/issue-resolution-and-qg4.md（チェックボックス更新手順）。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Case #3673、PR #3694
+- **タグ**: `#case-close` `#agentdev-gh` `#issue-update` `#escaping`
+
+
+## case-close 独立再実行で兄弟 Case 間の同一ファイル pre-existing textlint 違反が重複検出され得る
+
+- **問題事象**: case-close 独立再実行で pre-existing textlint hard 違反 2 件（src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md の L50/L80 の「Definition PR」表記）を検出した。発見時点では未解消だったが、兄弟 Case #3679 の PR #3695（main merge 済み commit 95f771c5）で同箇所が「設計PR」へ置換済みのため解消済みの可能性が高い
+- **発生局面**: 実装（case-close。Case #3678 / PR #3696）
+- **検知方法**: textlint 検査の hard 違反報告（definition-pr-and-idempotency.md L50/L80 の指摘行）
+- **根本原因**: 同一ファイルを複数の並行 Case が検査対象に含むため、片方の Case が修正する前に他方の Case が同じ既存違反を検出する。発見時点の状態を「解消済み可能性の注記なし」で記録すると、既に解消済みの違反に対する再調査・重複修復を後続の読み手が実行し得る
+- **自律対応内容**: 検出時点では未解消であることを記録しつつ、兄弟 Case #3679 の PR #3695（main merge 済み commit 95f771c5）で同箇所が「設計PR」へ置換済みであることを確認し、解消済み可能性の注記を添えて記録した。本 Case での重複修復は行わない
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 並行 Case 実行環境で corpus 既存ファイルの検査を行う工程全般に適用可能。pre-existing 違反の記録には「発見時点の状態」と「他 Case による解消済み可能性（main merge 状況）」の両方を注記する規律が有効
+- **再発条件**: 並行 Case 間で同一ファイルを検査対象に含み、一方が既存違反を修正する前に他方が検査を実行する場合
+- **予防策候補**: pre-existing 違反の検出時に、同一ファイルの他 Case での修正状況（main merge の有無）を確認してから記録する手順を明文化する。learning-promote での判断
+- **想定反映先**: case-close reference（既存債務の扱い手順）または case-open reference（対照救済手順）。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Refs: #3678、Case #3679、PR #3695、commit 95f771c5
+- **タグ**: `#case-close` `#textlint` `#既存債務` `#並行実行`
+
+
+## worktree と main root の両方で同一の check_integrity self-sync 乖離を観測した場合は corpus 既存債務の兆候
+
+- **問題事象**: phase 系スキル 6 件の junction 欠落（check_integrity self-sync 乖離 6 件）を観測した。case-run worktree でも merge 後 main root でも同一の 6 件を観測。兄弟 Case #3684（PR #3701）で投影登録・junction 再構築が実施されたため解消済みの可能性が高いが、観測時点の記録として保持する
+- **発生局面**: 実装（case-close。Case #3678 / PR #3696）
+- **検知方法**: check_integrity の self-sync 乖離報告（phase 系スキル 6 件の junction 欠落）と、worktree・main root 双方での同一結果の突合
+- **根本原因**: 環境差異（worktree vs main root）で乖離内容が変わらず同一であれば、実行環境の問題ではなく corpus 側の構造的欠落（投影登録・junction 未構築の既存債務）である。乖離を環境起因と誤認すると corpus 側の修復が先送りされる
+- **自律対応内容**: 双方環境での同一乖離を根拠に corpus 既存債務の兆候と判定し、修復は兄弟 Case #3684（PR #3701）の投影登録・junction 再構築に委ねて重複修復を回避した。観測時点の記録として学びを残した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: check_integrity 等 corpus 全体検査の乖離分類全般に適用可能。worktree と main root の両方で同一乖離を観測した場合は環境起因でなく corpus 既存債務の兆候として、処遇 Case の起票状況を確認してから修復の要否を判断する
+- **再発条件**: corpus 構造的欠落（投影・junction 未構築等）が存在し、複数環境から同一検査を実行する場合
+- **予防策候補**: check_integrity 乖離の分類手順に「複数環境で同一乖離が観測されるかの確認」前置を追加し、同一なら corpus 既存債務として処遇 Case 起票状況を確認する。learning-promote での判断
+- **想定反映先**: case-close reference（既存債務の扱い手順）または check_integrity 実行手順 reference。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Refs: #3678、Case #3684、PR #3701
+- **タグ**: `#case-close` `#check_integrity` `#既存債務` `#junction`
+
+
+## bun test を 3分割並行実行すると timeout 系の疑似 fail が多発する。並行実行時の fail はまず単独直列再実行で起因分離する
+
+- **問題事象**: bun test を 3 分割並行実行したところ、timeout 系の疑似 fail が多発した（観測 9 件中 6 件が hook/5s timeout 由来）。同一コマンドを単独直列再実行すると解消することを 2 回実証済み
+- **発生局面**: 実装（case-close。Case #3678 / PR #3696）
+- **検知方法**: 並行実行での fail 分布（hook/5s timeout 由来の集中）と、同一コマンドの単独直列再実行での解消の対比
+- **根本原因**: 並行実行形態によるリソース競合で hook timeout（5s）に達する実行が発生し、テスト本体の品質問題ではなく実行形態起因の疑似 fail として顕在化する。実行形態起因と品質起因の判別手順が手順書に明文化されていない
+- **自律対応内容**: 並行実行の fail をそのまま品質問題として扱わず、同一コマンドの単独直列再実行で起因分離する手順を実施し、2 回とも解消を確認した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 検証工程でテストを並行実行する全 Case に適用可能。並行実行時の fail は実行形態起因と品質起因を分離するため、まず単独直列再実行を行い、再現する場合のみ品質問題として扱う判別手順が有効
+- **再発条件**: bun test 等のテストスイートを並行実行し、hook timeout 系の fail が集中する場合
+- **予防策候補**: 検証手順 reference に「並行実行時の fail はまず単独直列再実行で起因分離する（解消すれば実行形態起因、再現すれば品質起因）」判別手順を明文化する。learning-promote での判断
+- **想定反映先**: case-run / case-close reference（検証手順・CI 対応手順）。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Refs: #3678
+- **タグ**: `#case-close` `#bun-test` `#並行実行` `#疑似fail`
+
+
+## worktree 内での textlint gate 実行は plugin 配下の依存生成が前提であり、未生成時は fail-closed 案内の手順どおりで回復できる
+
+- **問題事象**: worktree（.worktrees/3675-impl）内で textlint final gate を実行した際、agentdev-textlint-guard plugin 配下の依存実体（vendor/ 配下）が未生成のため fail-closed で停止した。worktree 構造的制約（node_modules 未伝播）により、main root で生成済みの依存は worktree 側へ引き継がれない
+- **発生局面**: 実装（case-run 検証の textlint final gate 実行。Case #3675 / PR #3698）
+- **検知方法**: textlint gate 実行時の fail-closed 案内メッセージ（依存未生成の指摘）
+- **根本原因**: agentdev-textlint-guard plugin は third-party 依存の実体を git 管理と配布物に含めず、版固定情報（package.json + bun.lock）のみを管理するため、worktree 作成直後の plugin package には依存実体が存在しない
+- **自律対応内容**: 案内メッセージの手順どおり plugin package 配下で bun install && bun run build:engine を実行して依存を生成し、textlint gate を実行できた。回復に追加の判断は不要であった
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存の fail-closed 案内どおりの回復）
+- **横展開観点**: worktree 内で plugin 依存を前提とする検査（textlint gate、導入系 script）を実行する全 Case に適用可能。依存生成の前置を実行手順に組み込むと fail-closed 停止と回復の往復を防げる
+- **再発条件**: worktree 作成直後に plugin 依存を前提とする検査を実行する場合（毎回潜在）
+- **予防策候補**: case-run / case-close reference の検証手順に「worktree 内で textlint gate 等を実行する場合の前置として plugin 配下で bun install && bun run build:engine を実行する」を明記する。learning-promote での判断
+- **想定反映先**: case-run reference（検証手順）、agentdev-git-worktree reference（worktree 構造的制約・bun test 実行環境前提の同種注意）。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Case #3675、PR #3698、README「開発者セットアップ（textlint 依存の生成）」
+- **タグ**: `#case-run` `#textlint` `#worktree` `#依存生成`
