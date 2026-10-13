@@ -97,6 +97,15 @@ ID プレースホルダー（IR-{NNNN} 等）の裸出力は、表の根拠列�
 
 baseline 未整備環境で concrete-id 検出を伴う gate を実行する場合の対照実行による合格判定（新規違反 delta 0 実証）の判定手順は、NG baseline 運用手順（integrity-contracts.md）が正規所有する。本 Design は判定手順を複製せず、参照に留める。
 
+### 検査機構間の baseline 運用の整合と residual 参照の処遇区分
+
+check_distribution_boundary と check_integrity は、重複する検出対象領域で baseline 管理（approved additions）の適用有無が分かれ得る。判定差は baseline 運用の機構統合ではなく、検出エントリごとの処遇区分で解消する。判定差の解消は baseline 参照統合（check_distribution_boundary が check_integrity の baseline を機械的に参照する方式）を行わず、処遇区分のみで運用する。
+
+- **表現是正区分**: 文面が自己完結しており、出典参照の除去または一般化表現への置換で consumer 解決不能性が解消できる参照。配布物本文の記述規則に従い是正する。是正完了後、baseline 残置は concrete-id ベースライン再取得手順で解消する
+- **baseline 追加区分**: 出典明示の情報価値が是正で代替できず、producer 側開発者向けの正規出典として保持する価値が明示承認された参照。個別承認例外として baseline へ登録し、検査から許容する
+
+配布物本文の記述規則（一般化表現、concrete ID 非記載）が原則であり、baseline 追加は例外である。該当エントリが baseline 管理済みの別検査機構で許容されていることだけを baseline 追加の根拠にしない。出典情報の正規保持先は producer 側 traceability/ 配下 sidecar であり、配布物本文へ出典番号を投影しない。
+
 ## 共有 detector と adapter の契約
 
 共有 detector は副作用なし（side-effect-free）とし、複数経路から同一入力に対し同一判定を返す（DEC-014）。
