@@ -100,7 +100,7 @@ execution contract を独立した Issue 本文物項目として生成しない
 
 ### 対象範囲表記の正規形
 
-Issue 本文の対象範囲にローカル版（src/opencode-local 配下等）の references パスを記載する際は、配置領域の接頭辞（src/opencode-local/）を明示し、配布物（.opencode/）の同名パスと区別できる表記を正規形とする（維持）。
+Issue 本文の対象範囲にローカル版（src/common/tools/agentdev-gh/local/ 配下等）の references パスを記載する際は、配置領域の接頭辞（src/common/tools/agentdev-gh/local/）を明示し、配布物（.opencode/）の同名パスと区別できる表記を正規形とする（維持）。現行の配置接頭辞の正は runtime-package-boundary.md Design が所有する。
 
 ### 形式の唯一性
 
