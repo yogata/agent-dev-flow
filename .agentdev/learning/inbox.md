@@ -182,3 +182,19 @@
 - **想定反映先**: agentdev-workflow-case-ready references/definition-acceptance.md（STEP-2 traceability check 節）。learning-promote での判断
 - **関連**: .agentdev/learning/inbox.md、Case #3675、PR #3689
 - **タグ**: `#case-ready` `#traceability` `#gate` `#docs_chore`
+
+## case-ready の条件付き評価では処置 choice を親判断の最終確定後に単独評価として生成する
+
+- **問題事象**: case-ready STEP-5 のスコープ重複判定（逐次経路）で、交差 boolean と処置 choice（スキップ・ユーザー確認）を 1 回の Jev evaluate に一括同梱したため、boolean の最終確定が重複なし（false）で処置 choice の発動条件不成立が確定した後も、choice の評価結果が観測 JSON に非作動値として残った
+- **発生局面**: 実行構造確定（case-ready STEP-5。Case #3681、Standard flow）
+- **検知方法**: observation_write の finalResult 組立時に、処置 choice の確定値（スキップ）が採用された処置ではないことを表現する値域が choice 形式に存在しないことで気づいた（非該当を表す値がない閉集合）
+- **根本原因**: 条件付き評価の発動制御（親判断の最終確定結果が発動条件を満たした場合だけ後続質問を生成し、不成立時は質問も観測も生成しない）に従い、処置 choice を親 boolean の Jev 先行評価完了・LLM 最終判断確定後の別 evaluate 呼出として構成すべきだった。1 evaluate = 1 observation の単位で質問バッチを組む際に親子条件を分離していなかった
+- **自律対応内容**: 観測は評価器実値どおり両問を記録（1:1 契約維持）し、処置 choice が前提不成立で非作動であることを完了報告に明記。観測の書換え・再生成は行わない（識別子安定性契約）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（条件付き評価の発動制御の既存契約どおり。本 entry は運用側の構成ミスの記録）
+- **横展開観点**: 条件付き化された判断単位（Wave 構成判断、スコープ重複処置 choice 等）を持つ全 workflow（case-ready、req-define、backlog-review 等）の Jev 質問バッチ構成に適用可能。親条件依存の choice は親判断確定後の独立 evaluate として構成する
+- **再発条件**: boolean（重複の有無）と処置 choice（分岐後の処置）を同一バッチで evaluate に渡す場合
+- **予防策候補**: case-ready reference（execution-structure.md の判断単位割当て節）に「条件付き choice は親判断の最終確定後の別 evaluate として生成する（質問バッチへの同梱禁止）」を明記する。learning-promote での判断
+- **想定反映先**: agentdev-workflow-case-ready references/execution-structure.md。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Case #3681、.agentdev/jev-observations/20261013T155053Z-99c0.json
+- **タグ**: `#case-ready` `#jev` `#条件付き評価`
