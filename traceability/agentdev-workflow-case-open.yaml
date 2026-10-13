@@ -1,7 +1,19 @@
 component: agentdev-workflow-case-open
 design:
   docs/designs/commands/case-open.md:
+    - REQ-030-014
+    - REQ-030-017
+    - REQ-030-018
+    - REQ-030-019
+    - REQ-030-020
+    - REQ-030-021
+    - REQ-030-022
+    - REQ-030-024
+    - REQ-030-025
+    - REQ-030-026
     - REQ-030-027
+    - REQ-083-002
+    - REQ-083-003
 implementation:
   src/common/skills/agentdev-workflow-case-open/SKILL.md:
     - REQ-021-024
