@@ -118,3 +118,19 @@
 - **想定反映先**: agentdev-traceability references/sidecar-and-policy.md（集約規則節。Issue #3678 の対象）、case-open reference（definition-pr-and-idempotency.md の traceability gate 手順）。learning-promote での判断
 - **関連**: .agentdev/learning/inbox.md、Case #3686、PR #3692、commit edc488d6、Issue #3678（同根問題の規則明文化 Case）
 - **タグ**: `#case-open` `#traceability` `#sidecar` `#fail-closed`
+
+## 対照救済の findings 比較は stdout 全文を正とし report ファイルは実行間で上書きが保証されない
+
+- **問題事象**: case-open STEP-4 の check_integrity 対照救済（対照実行）で、findings の機械比較対象を worktree 内の integrity report ファイル（.agentdev/integrity/reports/<日付>-integrity-report.md）から抽出したところ、stdout では解消済みの NG 行（req-updated-freshness 1 件）が report ファイルには残留し、report ベースの再比較で計測日収束の反映が観測されなかった
+- **発生局面**: 実装（case-open STEP-4 機械工程の品質ゲート評価。並行 case-open 委譲実行。Case #3683 / PR #3693）
+- **検知方法**: stdout 全文ベースの集合比較（NG + Warning 行の sort・差分 0 件）では baseline（main HEAD）と完全一致になったのに対し、report ファイルベースの同比較では旧 NG 行が残存する乖離
+- **根本原因**: report ファイル（実行日時名の md）は checker の書込みタイミング・上書き条件が実行間で保証されず、GateExecutionEvidence.detail.stdout（script が実行証跡として保存した原結果）と内容集合が乖離し得る。対照救済契約（findings が完全一致・差分 0 件の機械証明）の比較対象は stdout 全文が正であり、report ファイルを比較対象にすると stale 内容による誤判定を生じる
+- **自律対応内容**: 比較対象を stdout 全文へ統一し、3 実行（1 回目・収束後・baseline）の NG + Warning 行集合の sort・完全一致（差分 0 件）を機械証明した。収束 commit 後の worktree HEAD と baseline main HEAD の findings が完全一致で、本変更起因の検出悪化 0 件を根拠づけた
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（対照救済手順の既存契約どおりの運用）
+- **横展開観点**: GateExecutionEvidence を保存する機械工程（prepare_definition_pr.ts、close_mechanical_steps.ts 等）を消費する品質ゲート評価全般に適用可能。証拠の消費は detail.stdout の原結果を正とし、実行生成物の別表現（report md、summary、stderrTail）を比較対象にしない
+- **再発条件**: 対照救済や差分証明の実装で、コマンド出力の証跡（stdout）ではなく checker が書き出すファイル（report、JSON 出力ファイル等）を比較対象とする場合
+- **予防策候補**: case-open reference（definition-pr-and-idempotency.md）の対照救済手順に「findings 比較の対象は GateExecutionEvidence.detail.stdout 全文とし、実行生成物ファイルを比較対象にしない」ことを明記する。learning-promote での判断
+- **想定反映先**: agentdev-workflow-case-open reference（definition-pr-and-idempotency.md 対照救済手順節）。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Case #3683、PR #3693
+- **タグ**: `#case-open` `#check_integrity` `#evidence`
