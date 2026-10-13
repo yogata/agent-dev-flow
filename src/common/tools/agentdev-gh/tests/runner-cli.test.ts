@@ -613,6 +613,26 @@ describe("CliRunner: 各操作の API 写像", () => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
+  test("pr_merge は args の commitHash を受理して無視する（GitHub 版ではマージ動作に使用しない）", async () => {
+    const tempDir = makeTempDir();
+    let body = "";
+    const { exec } = fakeExec((call) => {
+      const i = call.args.indexOf("--input");
+      if (i >= 0) body = fs.readFileSync(call.args[i + 1] as string, "utf8");
+      return { status: 0, stdout: JSON.stringify({ merged: true, sha: "abc" }), stderr: "" };
+    });
+    const reply = await run(exec, tempDir, {
+      operation: "pr_merge",
+      args: { number: 9, method: "squash", commitHash: "a".repeat(40) },
+    });
+    expect(reply.ok).toBe(true);
+    if (reply.ok) {
+      expect(reply.payload).toEqual({ number: 9, merged: true });
+    }
+    expect(JSON.parse(body)).toEqual({ merge_method: "squash" });
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
   test("pr_read は isDraft を要求し false（通常 PR）と true（Draft PR）を写像する", async () => {
     for (const isDraft of [false, true]) {
       const tempDir = makeTempDir();

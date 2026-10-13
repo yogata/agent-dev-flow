@@ -202,6 +202,8 @@ export type GhToolRequest =
       readonly operation: "pr_merge";
       readonly number: PrNumber;
       readonly method: "merge" | "squash" | "rebase";
+      /** ローカル版の取り込み確認情報（指定時は実在コミットで検証される）。GitHub 版では受理してマージ動作には使用しない。 */
+      readonly commitHash?: string;
     }
   | { readonly operation: "pr_changed_files"; readonly number: PrNumber }
   | { readonly operation: "pr_mergeable"; readonly number: PrNumber }
