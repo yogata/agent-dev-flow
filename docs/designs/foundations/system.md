@@ -2,7 +2,7 @@
 title: システム仕様
 status: accepted
 created: 2026-08-20
-updated: "2026-10-13"
+updated: "2026-10-14"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-033 -->
 <!-- ADF-COVERS(implementation): REQ-002-009, REQ-002-010, REQ-002-012 -->

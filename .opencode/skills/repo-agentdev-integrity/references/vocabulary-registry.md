@@ -388,3 +388,17 @@ v4 概念語彙の正規定義は `docs/designs/workflows/v4-standard-lifecycle.
 | scale | 変更・実行・協調の規模。特定 work_type に限定しない |
 | Epic | 複数 execution unit の協調管理が必要な変更 |
 | Wave | Epic 内の依存関係と並列実行可能性を表す実行スケジューリング単位 |
+
+## 工程駆動系中核用語（v5.1 意味参照）
+
+工程駆動実行（v5.1）の案内層・正規文書で使用する中核用語7件の正規登録。用語定義の正は `docs/guides/glossary.md`「工程駆動」節と REQ-110、REQ-111、REQ-005 であり、本節は語彙の正規登録のみを行い定義を複製しない。概念の新設であり改名でないため、旧語彙→新語彙の対照行は作成しない（消費する検出規則が存在しない）。
+
+| 用語 | 意味参照 |
+|---|---|
+| 工程駆動実行 | REQ-005-010、docs/guides/glossary.md「工程駆動」節 |
+| 変更駆動 | REQ-005-001、REQ-005-011、docs/guides/glossary.md「工程駆動」節 |
+| 検討テーマ | REQ-110-014、docs/guides/glossary.md「工程駆動」節 |
+| テーマ正本 | REQ-110-014、docs/guides/glossary.md「工程駆動」節 |
+| 外部AI検討 | REQ-110-006/007、docs/guides/glossary.md「工程駆動」節 |
+| 工程遷移 | REQ-111、docs/guides/glossary.md「工程駆動」節 |
+| 後継経路 | REQ-111-013、docs/guides/glossary.md「工程駆動」節 |

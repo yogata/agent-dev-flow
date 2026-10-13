@@ -2,7 +2,7 @@
 title: ADF v5.1 工程駆動コラボレーションモデル（v51-phase-driven-collaboration-model）
 status: accepted
 created: 2026-10-12
-updated: 2026-10-13
+updated: 2026-10-14
 ---
 <!-- ADF-COVERS(design): REQ-110-001, REQ-110-002, REQ-110-003, REQ-110-004, REQ-110-005, REQ-110-006, REQ-110-007, REQ-110-008, REQ-110-009, REQ-110-010, REQ-110-011, REQ-110-012, REQ-110-013, REQ-110-014, REQ-110-015, REQ-104-008 -->
 
