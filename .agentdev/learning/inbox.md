@@ -198,3 +198,19 @@
 - **想定反映先**: agentdev-workflow-case-ready references/execution-structure.md。learning-promote での判断
 - **関連**: .agentdev/learning/inbox.md、Case #3681、.agentdev/jev-observations/20261013T155053Z-99c0.json
 - **タグ**: `#case-ready` `#jev` `#条件付き評価`
+
+## accept_definition_checks の overlap 要約は top-level warnings を読むため常に 0 表示になる。警告提示は保存済み stdout 証跡の機械再解析で確定する
+
+- **問題事象**: case-ready STEP-1 受入検査で accept_definition_checks.ts の overlap-cross-check step の summary が「warnings=0」と表示した一方、同一 step detail に保存された engine 報告 stdout 全文には condition_a warnings=1（#3679 と #3686 の同一パス重複）が記録されていた。summary 文字列を根拠にすると横断依存検査の警告提示記録が欠落する
+- **発生局面**: 実装（case-ready STEP-1 受入検査・STEP-6 横断依存検査の再実行。Case #3682）
+- **検知方法**: STEP-6 で共有エンジン（inspect_cross_dependencies.ts）を直接再実行した報告（condition_a.count=1）と受入検査 summary（warnings=0）の不一致を、保存済み step detail の stdout 全文を JSON.parse して condition_a を照合する機械再解析で確定
+- **根本原因**: accept_definition_checks.ts の overlap 要約生成が報告 JSON の top-level warnings フィールドを読むが、engine 報告契約（cross_dependency_types.ts）は warnings を condition_a.warnings にネストしており top-level は常に不在。parsed.warnings?.length ?? 0 が常に 0 になる
+- **自律対応内容**: summary を捨てて step detail の stdout 全文から engine 報告を再解析し、warning 1 件（本 Case #3682 は非関与。#3679 と #3686 の重複）を提示記録として完了報告へ繰り込んだ。警告は ready 遷移判定を変更しないため gate 判定への影響はなし
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（gate 意味論と報告 JSON 契約の変更は learning-promote での判断に委ねる）
+- **横展開観点**: script 報告の要約文字列（summary・件数文字列）を gate 判定や警告提示の根拠に使う工程全般。definition-acceptance.md が規定するとおり要約は併存情報であり、原結果の全文（step detail の stdout）が正
+- **再発条件**: accept_definition_checks.ts 経由で overlap-cross-check を実行し、engine が 1 件以上の警告を返す場合に毎回再発する（警告 0 件時は偶発的に一致するだけ）
+- **予防策候補**: 要約生成を parsed.condition_a.warnings.length と detection_unavailable の有無から構成する修正。あわせて消費側手順に「警告提示の確定は detail stdout の機械再解析で行う」を明記
+- **想定反映先**: src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts（overlap 要約生成箇所）と agentdev-workflow-case-ready references の消費側規律。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Case #3682、PR #3685、src/common/skills/agentdev-workflow-case-open/scripts/lib/cross_dependency_types.ts（報告契約）、Issue #3680（同 script の別箇所修正 Case）
+- **タグ**: `#case-ready` `#script` `#overlap` `#gate`
