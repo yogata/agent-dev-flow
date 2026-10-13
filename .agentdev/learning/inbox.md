@@ -36,3 +36,19 @@
 - **関連**: .agentdev/learning/inbox.md、PR #3687、Issue #3679、scripts/lib/definition-traceability-gate.ts、Issue #3684（phase 系 NG の処遇 Case）、Issue #3675（frontmatter 鮮度 NG の処遇 Case）
 - **タグ**: `#case-open` `#machine-gate` `#対照救済`
 
+
+## REQ 行追加時に docs/README.md 手動管理区間の要件件数記述が追随漏れし req-range-staleness NG を生む
+
+- **問題事象**: REQ-112 追加の Definition 変更（case-open STEP-4 機械工程）で、generate_indexes は docs/README.md の AUTOGEN ブロック（readme-req-summary-count 等）を 70 件へ更新したが、AUTOGEN 外の手動管理区間の散文記述「現行要件は69件である。」は更新対象外のため 69 が残留し、check_integrity gate が req-range-staleness NG（states 69 active REQs but actual count is 70）で exit 1 fail した。あわせて REQ 行数 AUTOGEN 派生物 docs/designs/quality/req-health-metrics.md が stagePaths 事前包含不能（契約上標準 contingency）で補正 commit を要した
+- **発生局面**: 実装（case-open STEP-4 機械工程の script 呼び出し後の check_integrity gate。並行 case-open 委譲実行）
+- **検知方法**: prepare_definition_pr 報告 JSON の step status（check_integrity: fail、exitCode 1）と NG 明細の req-range-staleness 行
+- **根本原因**: active REQ 件数の記述が docs/README.md に AUTOGEN 対象ブロックと手動管理区間（AUTOGEN 外散文）の2箇所存在し、手動区間は generate_indexes が更新しない。REQ 追加 Case の Definition 編集対象に手動区間が含まれず、REQ 行数 AUTOGEN 派生物も stagePaths へ事前包含できない契約のため初回 gate で必ず不整合が顕在化し得る
+- **自律対応内容**: worktree 内 docs/README.md 手動区間を 70 へ修正し、req-health-metrics.md とともに明示パス指定の補正 commit（Ref: #3681 commit e43bb977）。worktree HEAD / main HEAD の対照再検査で本変更起因の検出悪化 0 件を機械証明し PR #3690 を作成
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（手順の明文化は learning-promote での判断に委ねる）
+- **横展開観点**: REQ 行追加（active REQ 件数変化）を伴う全 Definition 変更 Case に同様に適用可能。docs/README.md 以外にも手動管理区間の件数記述が存在する文書（requirements/README.md の req-active-count は AUTOGEN 対象）がないかの棚卸しが価値を持つ
+- **再発条件**: REQ 行追加を伴う Definition 変更で docs/README.md の手動管理区間を編集対象に含めない場合
+- **予防策候補**: definition-pr-and-idempotency.md に REQ 追加 Case の Definition 編集対象へ docs/README.md 手動管理区間（「現行要件は N 件である」）の追随を含める手順を明文化する。prepare_definition_pr script の stagePaths 既定値へ REQ 行数 AUTOGEN 派生物（req-health-metrics.md、docs/README.md、requirements/README.md）を REQ 追加 Case 向けに予見的に含める拡張も候補
+- **想定反映先**: case-open スキル reference（definition-pr-and-idempotency.md の stagePaths・派生物 contingency 手順節）または prepare_definition_pr script 拡張。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、PR #3690、Issue #3681、commit e43bb977、scripts/src/prepare_definition_pr.ts
+- **タグ**: `#case-open` `#generate_indexes` `#REQ採番`
