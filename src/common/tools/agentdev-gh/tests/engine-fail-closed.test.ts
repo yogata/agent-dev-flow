@@ -485,6 +485,60 @@ describe("操作単位の入力定義（構造化 invalid-input・フィール�
     expect(r.detail).toContain("draft");
     expect(r.runnerCalls).toBe(0);
   });
+
+  test.each([
+    ["非文字列", 123],
+    ["空文字列", ""],
+  ])("pr_merge の commitHash が %s の場合は invalid-field で拒否される", async (_label, commitHash) => {
+    const r = await invalidInput({ operation: "pr_merge", number: 9, method: "merge", commitHash });
+    expect(r.kind).toBe("invalid-input");
+    expect(r.detail).toContain("invalid-field");
+    expect(r.detail).toContain("commitHash");
+    expect(r.runnerCalls).toBe(0);
+  });
+});
+
+describe("pr_merge の commitHash 伝播（ローカル版取り込み確認情報）", () => {
+  function mergedRunner(): FakeRunner {
+    return new FakeRunner(async (request) => {
+      if (request.operation === "pr_merge") {
+        return { ok: true, payload: { number: request.args.number, merged: true } };
+      }
+      return {
+        ok: true,
+        payload: { number: 9, title: "T", body: "B", state: "merged", mergeable: "UNKNOWN", isDraft: false },
+      };
+    });
+  }
+
+  async function runPrMerge(rawRequest: unknown): Promise<{ ok: boolean; runner: FakeRunner }> {
+    const runner = mergedRunner();
+    const env = buildGhToolEnv(VALID_CONFIG, okProber, runner);
+    if (!env.ok) throw new Error("env build failed");
+    const result = await runAgentdevGhOperation(env.env, rawRequest);
+    return { ok: result.ok, runner };
+  }
+
+  test("commitHash 付き pr_merge は VERIFY を通過し runner args へ commitHash を伝播する", async () => {
+    const { ok, runner } = await runPrMerge({
+      operation: "pr_merge",
+      number: 9,
+      method: "squash",
+      commitHash: "a".repeat(40),
+    });
+    expect(ok).toBe(true);
+    expect(runner.requests[0]?.args).toEqual({
+      number: 9,
+      method: "squash",
+      commitHash: "a".repeat(40),
+    });
+  });
+
+  test("commitHash なし pr_merge は従来どおり VERIFY を通過し args に commitHash を含まない", async () => {
+    const { ok, runner } = await runPrMerge({ operation: "pr_merge", number: 9, method: "merge" });
+    expect(ok).toBe(true);
+    expect(runner.requests[0]?.args).toEqual({ number: 9, method: "merge" });
+  });
 });
 
 describe("issue_update の追跡軸保持 VERIFY（部分更新不変条件）", () => {

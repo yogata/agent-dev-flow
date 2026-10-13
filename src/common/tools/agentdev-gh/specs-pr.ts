@@ -217,7 +217,7 @@ const prMergeSpec: OperationSpec = {
   operation: "pr_merge",
   validate(raw): ValidateOutcome {
     if (!isRecord(raw)) return missingNumberOutcome("pr_merge");
-    const unknown = checkUnknownFields(raw, ["operation", "number", "method"]);
+    const unknown = checkUnknownFields(raw, ["operation", "number", "method", "commitHash"]);
     if (unknown !== null) return unknown;
     if (raw.number === undefined) return missingNumberOutcome("pr_merge");
     const number = positiveInt(raw.number);
@@ -243,11 +243,39 @@ const prMergeSpec: OperationSpec = {
         },
       };
     }
-    return { ok: true, request: { operation: "pr_merge", number: prNumber(number), method } };
+    // commitHash は任意フィールド（ローカル版の取り込み確認情報）。
+    // 指定時は非空文字列のみ受理し、GitHub 版 runner は値をマージ動作に使用しない。
+    const commitHash = raw.commitHash === undefined ? null : str(raw.commitHash);
+    if (raw.commitHash !== undefined && (commitHash === null || commitHash.length === 0)) {
+      return {
+        ok: false,
+        error: {
+          code: "invalid-field",
+          field: "commitHash",
+          detail: "commitHash must be a non-empty string when present",
+        },
+      };
+    }
+    return {
+      ok: true,
+      request: {
+        operation: "pr_merge",
+        number: prNumber(number),
+        method,
+        ...(commitHash !== null ? { commitHash } : {}),
+      },
+    };
   },
   buildRequest(request): GhRunnerRequest {
     const r = request as Extract<GhToolRequest, { operation: "pr_merge" }>;
-    return { operation: "pr_merge", args: { number: r.number, method: r.method } };
+    return {
+      operation: "pr_merge",
+      args: {
+        number: r.number,
+        method: r.method,
+        ...(r.commitHash !== undefined ? { commitHash: r.commitHash } : {}),
+      },
+    };
   },
   parseSuccess(payload): GhToolSuccess | null {
     if (!isRecord(payload)) return null;
