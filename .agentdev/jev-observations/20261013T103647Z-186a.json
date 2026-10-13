@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261013T103647Z-186a",
+  "workflow": "learning-promote",
+  "evaluationKind": "sublimation-possibility",
+  "subject": "promote 候補3単位の昇華可能性（2026-10-13 backlog-auto stage 2）",
+  "sourceRevision": "e2c4901bcaadf82a5c38fadfc2741caa778f32d4",
+  "durationMs": 778,
+  "inputTokens": 1393,
+  "inputs": {
+    "requestDigest": "c738defd2d4926c56ffee7b14765996ea0c90ea41ef777fc282039fe72103191",
+    "references": [
+      {
+        "digest": "07d957ec97fc065118223672ac822d9b79e2ddb4d194d5151d1f3a0a18e43158",
+        "label": "inbox.md（未処理エントリ20件）",
+        "path": ".agentdev/learning/inbox.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "s-u5",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.4,
+        "false": 0.6
+      }
+    },
+    {
+      "questionId": "s-u7",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.33,
+        "false": 0.6699999999999999
+      }
+    },
+    {
+      "questionId": "s-u10",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.67,
+        "false": 0.32999999999999996
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "s-u5",
+        "value": true
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "s-u7",
+        "value": true
+      },
+      {
+        "questionId": "s-u10",
+        "value": true
+      }
+    ]
+  }
+}

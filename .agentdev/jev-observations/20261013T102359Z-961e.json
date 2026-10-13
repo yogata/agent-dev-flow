@@ -1,0 +1,391 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261013T102359Z-961e",
+  "workflow": "learning-promote",
+  "evaluationKind": "problem-classification",
+  "subject": "inbox 20エントリの問題クラス分類（2026-10-13 backlog-auto stage 2）",
+  "sourceRevision": "e2c4901bcaadf82a5c38fadfc2741caa778f32d4",
+  "durationMs": 936,
+  "inputTokens": 4483,
+  "inputs": {
+    "requestDigest": "936dd43253e4e7c9aa8bb5464fdfd6d74c16229f0495a0e7331514d658f2a22a",
+    "references": [
+      {
+        "digest": "07d957ec97fc065118223672ac822d9b79e2ddb4d194d5151d1f3a0a18e43158",
+        "label": "inbox.md（未処理エントリ20件）",
+        "path": ".agentdev/learning/inbox.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "e1-class",
+      "questionForm": "choice",
+      "value": "単独",
+      "probabilityDistribution": {
+        "KA1": 0,
+        "KA2": 0,
+        "KA3": 0,
+        "KA4": 0,
+        "KA5": 0,
+        "KA6": 0,
+        "単独": 1
+      }
+    },
+    {
+      "questionId": "e2-class",
+      "questionForm": "choice",
+      "value": "単独",
+      "probabilityDistribution": {
+        "KA1": 0,
+        "KA2": 0,
+        "KA3": 0,
+        "KA4": 0,
+        "KA5": 0,
+        "KA6": 0,
+        "単独": 1
+      }
+    },
+    {
+      "questionId": "e3-class",
+      "questionForm": "choice",
+      "value": "KA2",
+      "probabilityDistribution": {
+        "KA1": 0,
+        "KA2": 0.99,
+        "KA3": 0,
+        "KA4": 0,
+        "KA5": 0,
+        "KA6": 0,
+        "単独": 0.01
+      }
+    },
+    {
+      "questionId": "e4-class",
+      "questionForm": "choice",
+      "value": "単独",
+      "probabilityDistribution": {
+        "KA1": 0.11,
+        "KA2": 0,
+        "KA3": 0,
+        "KA4": 0,
+        "KA5": 0,
+        "KA6": 0,
+        "単独": 0.89
+      }
+    },
+    {
+      "questionId": "e5-class",
+      "questionForm": "choice",
+      "value": "KA1",
+      "probabilityDistribution": {
+        "KA1": 1,
+        "KA2": 0,
+        "KA3": 0,
+        "KA4": 0,
+        "KA5": 0,
+        "KA6": 0,
+        "単独": 0
+      }
+    },
+    {
+      "questionId": "e6-class",
+      "questionForm": "choice",
+      "value": "単独",
+      "probabilityDistribution": {
+        "KA1": 0,
+        "KA2": 0,
+        "KA3": 0,
+        "KA4": 0,
+        "KA5": 0,
+        "KA6": 0,
+        "単独": 1
+      }
+    },
+    {
+      "questionId": "e7-class",
+      "questionForm": "choice",
+      "value": "単独",
+      "probabilityDistribution": {
+        "KA1": 0.01,
+        "KA2": 0,
+        "KA3": 0,
+        "KA4": 0,
+        "KA5": 0,
+        "KA6": 0,
+        "単独": 0.99
+      }
+    },
+    {
+      "questionId": "e8-class",
+      "questionForm": "choice",
+      "value": "KA6",
+      "probabilityDistribution": {
+        "KA1": 0,
+        "KA2": 0,
+        "KA3": 0,
+        "KA4": 0,
+        "KA5": 0,
+        "KA6": 1,
+        "単独": 0
+      }
+    },
+    {
+      "questionId": "e9-class",
+      "questionForm": "choice",
+      "value": "KA3",
+      "probabilityDistribution": {
+        "KA1": 0,
+        "KA2": 0,
+        "KA3": 1,
+        "KA4": 0,
+        "KA5": 0,
+        "KA6": 0,
+        "単独": 0
+      }
+    },
+    {
+      "questionId": "e10-class",
+      "questionForm": "choice",
+      "value": "KA3",
+      "probabilityDistribution": {
+        "KA1": 0,
+        "KA2": 0,
+        "KA3": 1,
+        "KA4": 0,
+        "KA5": 0,
+        "KA6": 0,
+        "単独": 0
+      }
+    },
+    {
+      "questionId": "e11-class",
+      "questionForm": "choice",
+      "value": "KA5",
+      "probabilityDistribution": {
+        "KA1": 0,
+        "KA2": 0,
+        "KA3": 0,
+        "KA4": 0,
+        "KA5": 1,
+        "KA6": 0,
+        "単独": 0
+      }
+    },
+    {
+      "questionId": "e12-class",
+      "questionForm": "choice",
+      "value": "KA5",
+      "probabilityDistribution": {
+        "KA1": 0,
+        "KA2": 0,
+        "KA3": 0,
+        "KA4": 0,
+        "KA5": 0.99,
+        "KA6": 0,
+        "単独": 0.01
+      }
+    },
+    {
+      "questionId": "e13-class",
+      "questionForm": "choice",
+      "value": "KA1",
+      "probabilityDistribution": {
+        "KA1": 1,
+        "KA2": 0,
+        "KA3": 0,
+        "KA4": 0,
+        "KA5": 0,
+        "KA6": 0,
+        "単独": 0
+      }
+    },
+    {
+      "questionId": "e14-class",
+      "questionForm": "choice",
+      "value": "単独",
+      "probabilityDistribution": {
+        "KA1": 0,
+        "KA2": 0,
+        "KA3": 0,
+        "KA4": 0,
+        "KA5": 0,
+        "KA6": 0,
+        "単独": 1
+      }
+    },
+    {
+      "questionId": "e15-class",
+      "questionForm": "choice",
+      "value": "単独",
+      "probabilityDistribution": {
+        "KA1": 0,
+        "KA2": 0,
+        "KA3": 0,
+        "KA4": 0,
+        "KA5": 0,
+        "KA6": 0,
+        "単独": 1
+      }
+    },
+    {
+      "questionId": "e16-class",
+      "questionForm": "choice",
+      "value": "KA4",
+      "probabilityDistribution": {
+        "KA1": 0,
+        "KA2": 0,
+        "KA3": 0,
+        "KA4": 1,
+        "KA5": 0,
+        "KA6": 0,
+        "単独": 0
+      }
+    },
+    {
+      "questionId": "e17-class",
+      "questionForm": "choice",
+      "value": "KA4",
+      "probabilityDistribution": {
+        "KA1": 0.01,
+        "KA2": 0,
+        "KA3": 0,
+        "KA4": 0.98,
+        "KA5": 0,
+        "KA6": 0,
+        "単独": 0.01
+      }
+    },
+    {
+      "questionId": "e18-class",
+      "questionForm": "choice",
+      "value": "単独",
+      "probabilityDistribution": {
+        "KA1": 0.01,
+        "KA2": 0,
+        "KA3": 0,
+        "KA4": 0.02,
+        "KA5": 0,
+        "KA6": 0,
+        "単独": 0.97
+      }
+    },
+    {
+      "questionId": "e19-class",
+      "questionForm": "choice",
+      "value": "単独",
+      "probabilityDistribution": {
+        "KA1": 0,
+        "KA2": 0,
+        "KA3": 0,
+        "KA4": 0,
+        "KA5": 0,
+        "KA6": 0.1,
+        "単独": 0.9
+      }
+    },
+    {
+      "questionId": "e20-class",
+      "questionForm": "choice",
+      "value": "KA2",
+      "probabilityDistribution": {
+        "KA1": 0,
+        "KA2": 1,
+        "KA3": 0,
+        "KA4": 0,
+        "KA5": 0,
+        "KA6": 0,
+        "単独": 0
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "e1-class",
+        "value": "単独"
+      },
+      {
+        "questionId": "e2-class",
+        "value": "単独"
+      },
+      {
+        "questionId": "e3-class",
+        "value": "KA2"
+      },
+      {
+        "questionId": "e4-class",
+        "value": "単独"
+      },
+      {
+        "questionId": "e5-class",
+        "value": "KA1"
+      },
+      {
+        "questionId": "e6-class",
+        "value": "単独"
+      },
+      {
+        "questionId": "e7-class",
+        "value": "単独"
+      },
+      {
+        "differenceReason": "deterministic_override",
+        "questionId": "e8-class",
+        "value": "単独"
+      },
+      {
+        "questionId": "e9-class",
+        "value": "KA3"
+      },
+      {
+        "questionId": "e10-class",
+        "value": "KA3"
+      },
+      {
+        "questionId": "e11-class",
+        "value": "KA5"
+      },
+      {
+        "questionId": "e12-class",
+        "value": "KA5"
+      },
+      {
+        "questionId": "e13-class",
+        "value": "KA1"
+      },
+      {
+        "questionId": "e14-class",
+        "value": "単独"
+      },
+      {
+        "questionId": "e15-class",
+        "value": "単独"
+      },
+      {
+        "questionId": "e16-class",
+        "value": "KA4"
+      },
+      {
+        "questionId": "e17-class",
+        "value": "KA4"
+      },
+      {
+        "questionId": "e18-class",
+        "value": "単独"
+      },
+      {
+        "questionId": "e19-class",
+        "value": "単独"
+      },
+      {
+        "questionId": "e20-class",
+        "value": "KA2"
+      }
+    ]
+  }
+}

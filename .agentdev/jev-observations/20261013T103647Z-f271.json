@@ -1,0 +1,326 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261013T103647Z-f271",
+  "workflow": "learning-promote",
+  "evaluationKind": "disposition",
+  "subject": "15問題クラスの処分区分判定（2026-10-13 backlog-auto stage 2）",
+  "sourceRevision": "e2c4901bcaadf82a5c38fadfc2741caa778f32d4",
+  "durationMs": 701,
+  "inputTokens": 4763,
+  "inputs": {
+    "requestDigest": "04e9e43ff64c04b3b76f9abe9b3e37e08a92cf2c45b0a9c01e34957ac6ea2ae0",
+    "references": [
+      {
+        "digest": "07d957ec97fc065118223672ac822d9b79e2ddb4d194d5151d1f3a0a18e43158",
+        "label": "inbox.md（未処理エントリ20件）",
+        "path": ".agentdev/learning/inbox.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "dis-ka1",
+      "questionForm": "choice",
+      "value": "7 rejected",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0,
+        "2 恒久契約候補（Decision）": 0,
+        "3 恒久契約候補（Design）": 0.01,
+        "4 project knowledge": 0.01,
+        "5 既存対策の更新": 0.02,
+        "6 deferred": 0.02,
+        "7 rejected": 0.71,
+        "duplicate": 0.23
+      }
+    },
+    {
+      "questionId": "dis-ka2",
+      "questionForm": "choice",
+      "value": "5 既存対策の更新",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.01,
+        "2 恒久契約候補（Decision）": 0.01,
+        "3 恒久契約候補（Design）": 0.03,
+        "4 project knowledge": 0.1,
+        "5 既存対策の更新": 0.48,
+        "6 deferred": 0.11,
+        "7 rejected": 0.19,
+        "duplicate": 0.07
+      }
+    },
+    {
+      "questionId": "dis-ka3",
+      "questionForm": "choice",
+      "value": "7 rejected",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0,
+        "2 恒久契約候補（Decision）": 0,
+        "3 恒久契約候補（Design）": 0.01,
+        "4 project knowledge": 0.09,
+        "5 既存対策の更新": 0.03,
+        "6 deferred": 0.04,
+        "7 rejected": 0.59,
+        "duplicate": 0.24
+      }
+    },
+    {
+      "questionId": "dis-ka4",
+      "questionForm": "choice",
+      "value": "5 既存対策の更新",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0,
+        "2 恒久契約候補（Decision）": 0,
+        "3 恒久契約候補（Design）": 0.0101010101010101,
+        "4 project knowledge": 0.050505050505050504,
+        "5 既存対策の更新": 0.8181818181818181,
+        "6 deferred": 0.1212121212121212,
+        "7 rejected": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "dis-ka5",
+      "questionForm": "choice",
+      "value": "5 既存対策の更新",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0,
+        "2 恒久契約候補（Decision）": 0,
+        "3 恒久契約候補（Design）": 0.02,
+        "4 project knowledge": 0.04,
+        "5 既存対策の更新": 0.77,
+        "6 deferred": 0.17,
+        "7 rejected": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "dis-u1",
+      "questionForm": "choice",
+      "value": "7 rejected",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.01,
+        "2 恒久契約候補（Decision）": 0.02,
+        "3 恒久契約候補（Design）": 0.1,
+        "4 project knowledge": 0.03,
+        "5 既存対策の更新": 0.14,
+        "6 deferred": 0.04,
+        "7 rejected": 0.54,
+        "duplicate": 0.12
+      }
+    },
+    {
+      "questionId": "dis-u2",
+      "questionForm": "choice",
+      "value": "5 既存対策の更新",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0,
+        "2 恒久契約候補（Decision）": 0.01,
+        "3 恒久契約候補（Design）": 0.06,
+        "4 project knowledge": 0.02,
+        "5 既存対策の更新": 0.76,
+        "6 deferred": 0.15,
+        "7 rejected": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "dis-u3",
+      "questionForm": "choice",
+      "value": "3 恒久契約候補（Design）",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.01,
+        "2 恒久契約候補（Decision）": 0.01,
+        "3 恒久契約候補（Design）": 0.34,
+        "4 project knowledge": 0.16,
+        "5 既存対策の更新": 0.26,
+        "6 deferred": 0.21,
+        "7 rejected": 0.01,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "dis-u4",
+      "questionForm": "choice",
+      "value": "5 既存対策の更新",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.01,
+        "2 恒久契約候補（Decision）": 0.02,
+        "3 恒久契約候補（Design）": 0.06,
+        "4 project knowledge": 0.1,
+        "5 既存対策の更新": 0.62,
+        "6 deferred": 0.19,
+        "7 rejected": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "dis-u5",
+      "questionForm": "choice",
+      "value": "5 既存対策の更新",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0,
+        "2 恒久契約候補（Decision）": 0,
+        "3 恒久契約候補（Design）": 0.03,
+        "4 project knowledge": 0,
+        "5 既存対策の更新": 0.97,
+        "6 deferred": 0,
+        "7 rejected": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "dis-u6",
+      "questionForm": "choice",
+      "value": "6 deferred",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0,
+        "2 恒久契約候補（Decision）": 0,
+        "3 恒久契約候補（Design）": 0,
+        "4 project knowledge": 0,
+        "5 既存対策の更新": 0,
+        "6 deferred": 1,
+        "7 rejected": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "dis-u7",
+      "questionForm": "choice",
+      "value": "3 恒久契約候補（Design）",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.07,
+        "2 恒久契約候補（Decision）": 0.03,
+        "3 恒久契約候補（Design）": 0.5,
+        "4 project knowledge": 0.03,
+        "5 既存対策の更新": 0.32,
+        "6 deferred": 0.04,
+        "7 rejected": 0.01,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "dis-u8",
+      "questionForm": "choice",
+      "value": "7 rejected",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.03,
+        "2 恒久契約候補（Decision）": 0.04,
+        "3 恒久契約候補（Design）": 0.1,
+        "4 project knowledge": 0.19,
+        "5 既存対策の更新": 0.14,
+        "6 deferred": 0.16,
+        "7 rejected": 0.21000000000000002,
+        "duplicate": 0.13
+      }
+    },
+    {
+      "questionId": "dis-u9",
+      "questionForm": "choice",
+      "value": "6 deferred",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0,
+        "2 恒久契約候補（Decision）": 0,
+        "3 恒久契約候補（Design）": 0,
+        "4 project knowledge": 0,
+        "5 既存対策の更新": 0,
+        "6 deferred": 1,
+        "7 rejected": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "dis-u10",
+      "questionForm": "choice",
+      "value": "5 既存対策の更新",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0,
+        "2 恒久契約候補（Decision）": 0,
+        "3 恒久契約候補（Design）": 0.02,
+        "4 project knowledge": 0,
+        "5 既存対策の更新": 0.98,
+        "6 deferred": 0,
+        "7 rejected": 0,
+        "duplicate": 0
+      }
+    }
+  ],
+  "confidence": 0.67,
+  "finalResult": {
+    "results": [
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "dis-ka1",
+        "value": "6 deferred"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "dis-ka2",
+        "value": "6 deferred"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "dis-ka3",
+        "value": "6 deferred"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "dis-ka4",
+        "value": "6 deferred"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "dis-ka5",
+        "value": "6 deferred"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "dis-u1",
+        "value": "6 deferred"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "dis-u2",
+        "value": "6 deferred"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "dis-u3",
+        "value": "6 deferred"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "dis-u4",
+        "value": "6 deferred"
+      },
+      {
+        "questionId": "dis-u5",
+        "value": "5 既存対策の更新"
+      },
+      {
+        "questionId": "dis-u6",
+        "value": "6 deferred"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "dis-u7",
+        "value": "5 既存対策の更新"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "dis-u8",
+        "value": "6 deferred"
+      },
+      {
+        "questionId": "dis-u9",
+        "value": "6 deferred"
+      },
+      {
+        "questionId": "dis-u10",
+        "value": "5 既存対策の更新"
+      }
+    ]
+  }
+}

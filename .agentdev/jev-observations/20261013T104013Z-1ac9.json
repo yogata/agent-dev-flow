@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261013T104013Z-1ac9",
+  "workflow": "learning-promote",
+  "evaluationKind": "sublimation-possibility",
+  "subject": "promote 候補 KA5 の昇華可能性（2026-10-13 backlog-auto stage 2）",
+  "sourceRevision": "e2c4901bcaadf82a5c38fadfc2741caa778f32d4",
+  "durationMs": 766,
+  "inputTokens": 963,
+  "inputs": {
+    "requestDigest": "0c0d060467c8d852ea5c834b720f0d04a7cfda009ffdf1fb702f640448a20879",
+    "references": [
+      {
+        "digest": "07d957ec97fc065118223672ac822d9b79e2ddb4d194d5151d1f3a0a18e43158",
+        "label": "inbox.md（未処理エントリ20件）",
+        "path": ".agentdev/learning/inbox.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "s-ka5",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.12,
+        "false": 0.88
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "s-ka5",
+        "value": false
+      }
+    ]
+  }
+}
