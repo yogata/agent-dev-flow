@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261013T124639Z-47bc",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "Batch B 4件（RU-0204/0205/0207/0209・test/lint 資産 bugfix）の既存REQ照合",
+  "sourceRevision": "a2417bdb",
+  "durationMs": 1029,
+  "inputTokens": 2155,
+  "inputs": {
+    "requestDigest": "cd987fd7b45910e6a05fefdfdc43a3d6c03790a0bdff3e6a246900588ce52ced",
+    "references": [
+      {
+        "label": "RU-0204",
+        "path": ".agentdev/backlog/req-units/RU-0204.md",
+        "digest": "96314b802a64fc62c961045b3203c42bd58e6a778231d6200366c47416ebb1a7"
+      },
+      {
+        "label": "RU-0205",
+        "path": ".agentdev/backlog/req-units/RU-0205.md",
+        "digest": "062446b54a704bc5eebf96574141e24522ded805b42207a140bd160057bcef5f"
+      },
+      {
+        "label": "RU-0207",
+        "path": ".agentdev/backlog/req-units/RU-0207.md",
+        "digest": "99a90e289ebedadfdfecc7aa0ce5dcadc1e14f025bcdd2d658f8afe99f07caa4"
+      },
+      {
+        "label": "RU-0209",
+        "path": ".agentdev/backlog/req-units/RU-0209.md",
+        "digest": "be3081feb6dd7c1161f023787f15af8d524bea7a154d1d0a380674b4ff71db6f"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-match-ru0204",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1
+      }
+    },
+    {
+      "questionId": "q-match-ru0205",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1
+      }
+    },
+    {
+      "questionId": "q-match-ru0207",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1
+      }
+    },
+    {
+      "questionId": "q-match-ru0209",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1
+      }
+    },
+    {
+      "questionId": "q-conf-ru0204",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.28,
+        "false": 0.72
+      }
+    },
+    {
+      "questionId": "q-conf-ru0205",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.17,
+        "false": 0.83
+      }
+    },
+    {
+      "questionId": "q-conf-ru0207",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.25,
+        "false": 0.75
+      }
+    },
+    {
+      "questionId": "q-conf-ru0209",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.31,
+        "false": 0.69
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-match-ru0204",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q-match-ru0205",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q-match-ru0207",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q-match-ru0209",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q-conf-ru0204",
+        "value": false
+      },
+      {
+        "questionId": "q-conf-ru0205",
+        "value": false
+      },
+      {
+        "questionId": "q-conf-ru0207",
+        "value": false
+      },
+      {
+        "questionId": "q-conf-ru0209",
+        "value": false
+      }
+    ]
+  }
+}
