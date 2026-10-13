@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261013T123043Z-71b2",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "Batch D 担当 RU 4件（RU-0206/RU-0212/RU-0221/RU-0222）の既存REQ照合判断",
+  "sourceRevision": "a2417bdb",
+  "durationMs": 1019,
+  "inputTokens": 3006,
+  "inputs": {
+    "requestDigest": "01e37db6d5165a221780c88cb5ae5753c81c1a2341a8b25529aa2e2d961e5e8a",
+    "references": [
+      {
+        "label": "RU-0206",
+        "path": ".agentdev/backlog/req-units/RU-0206.md",
+        "digest": "e15700e15a4a220ccc9e9582704c4a9dba5b8fca17b2052a4e942315ccb8032f"
+      },
+      {
+        "label": "RU-0212",
+        "path": ".agentdev/backlog/req-units/RU-0212.md",
+        "digest": "5965a0c8d836e0648966a5875f0160bcea05e9c08b4be9868e1cc2a3ae7b7311"
+      },
+      {
+        "label": "RU-0221",
+        "path": ".agentdev/backlog/req-units/RU-0221.md",
+        "digest": "dba72fe2aafa557a8988ae1175a7d824cd42d3131c633c576d4f7a30f58972eb"
+      },
+      {
+        "label": "RU-0222",
+        "path": ".agentdev/backlog/req-units/RU-0222.md",
+        "digest": "1f97bacacbffe7143a25d722c7484064ed2fc1c6f4cadaca76784db37378d5db"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-op-ru0206",
+      "questionForm": "choice",
+      "value": "CREATE",
+      "probabilityDistribution": {
+        "CREATE": 0.98,
+        "APPEND": 0.02,
+        "UPDATE": 0,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "q-confirm-ru0206",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.55,
+        "false": 0.44999999999999996
+      }
+    },
+    {
+      "questionId": "q-op-ru0212",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1
+      }
+    },
+    {
+      "questionId": "q-confirm-ru0212",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.5,
+        "false": 0.5
+      }
+    },
+    {
+      "questionId": "q-op-ru0221",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1
+      }
+    },
+    {
+      "questionId": "q-confirm-ru0221",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.49,
+        "false": 0.51
+      }
+    },
+    {
+      "questionId": "q-op-ru0222",
+      "questionForm": "choice",
+      "value": "CREATE",
+      "probabilityDistribution": {
+        "CREATE": 0.53,
+        "APPEND": 0.36,
+        "UPDATE": 0.09,
+        "REQ操作なし": 0.02
+      }
+    },
+    {
+      "questionId": "q-confirm-ru0222",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.56,
+        "false": 0.43999999999999995
+      }
+    }
+  ],
+  "confidence": 0.97,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-op-ru0206",
+        "value": "CREATE"
+      },
+      {
+        "questionId": "q-confirm-ru0206",
+        "value": false,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q-op-ru0212",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q-confirm-ru0212",
+        "value": false,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q-op-ru0221",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q-confirm-ru0221",
+        "value": false
+      },
+      {
+        "questionId": "q-op-ru0222",
+        "value": "REQ操作なし",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q-confirm-ru0222",
+        "value": false,
+        "differenceReason": "semantic_disagreement"
+      }
+    ]
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261013T123424Z-0da9",
+  "workflow": "req-define",
+  "evaluationKind": "final-classification-design-separation",
+  "subject": "Batch D 担当 RU 4件の最終分類・Design 分離判断",
+  "sourceRevision": "a2417bdb",
+  "durationMs": 348,
+  "inputTokens": 2346,
+  "inputs": {
+    "requestDigest": "d4a7edb6833f83784ac47c64be5cf5945648ae2da6b16babb2ebe01c12c02d15",
+    "references": [
+      {
+        "digest": "e15700e15a4a220ccc9e9582704c4a9dba5b8fca17b2052a4e942315ccb8032f",
+        "label": "RU-0206",
+        "path": ".agentdev/backlog/req-units/RU-0206.md"
+      },
+      {
+        "digest": "5965a0c8d836e0648966a5875f0160bcea05e9c08b4be9868e1cc2a3ae7b7311",
+        "label": "RU-0212",
+        "path": ".agentdev/backlog/req-units/RU-0212.md"
+      },
+      {
+        "digest": "dba72fe2aafa557a8988ae1175a7d824cd42d3131c633c576d4f7a30f58972eb",
+        "label": "RU-0221",
+        "path": ".agentdev/backlog/req-units/RU-0221.md"
+      },
+      {
+        "digest": "1f97bacacbffe7143a25d722c7484064ed2fc1c6f4cadaca76784db37378d5db",
+        "label": "RU-0222",
+        "path": ".agentdev/backlog/req-units/RU-0222.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-cls-ru0206",
+      "questionForm": "choice",
+      "value": "REQ 行",
+      "probabilityDistribution": {
+        "REQ 行": 0.95,
+        "Design 行": 0.05
+      }
+    },
+    {
+      "questionId": "q-sep-ru0206",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.79,
+        "false": 0.20999999999999996
+      }
+    },
+    {
+      "questionId": "q-sep-ru0212",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.2,
+        "false": 0.8
+      }
+    },
+    {
+      "questionId": "q-sep-ru0221",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.31,
+        "false": 0.69
+      }
+    },
+    {
+      "questionId": "q-cls-ru0222",
+      "questionForm": "choice",
+      "value": "Design 行",
+      "probabilityDistribution": {
+        "REQ 行": 0.01,
+        "Design 行": 0.99
+      }
+    },
+    {
+      "questionId": "q-sep-ru0222",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.86,
+        "false": 0.14
+      }
+    }
+  ],
+  "confidence": 0.9,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-cls-ru0206",
+        "value": "REQ 行"
+      },
+      {
+        "questionId": "q-sep-ru0206",
+        "value": true
+      },
+      {
+        "questionId": "q-sep-ru0212",
+        "value": false
+      },
+      {
+        "questionId": "q-sep-ru0221",
+        "value": false
+      },
+      {
+        "questionId": "q-cls-ru0222",
+        "value": "Design 行"
+      },
+      {
+        "questionId": "q-sep-ru0222",
+        "value": true
+      }
+    ]
+  }
+}
