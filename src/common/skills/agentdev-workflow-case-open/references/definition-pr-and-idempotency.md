@@ -33,6 +33,7 @@ STEP-4 の機械工程（専用 worktree 作成、Definition branch 作成、REQ
 3. 提案本文と報告内容の意味レビューはモデルが担当する。警告の重要度評価、実変更判定の確定、PR 作成の可否判断はモデルが行う
 4. 冪等再実行: script は既存 worktree を検出した場合は期待 branch 上のとき再利用し、別 branch のとき失敗を返す。再実行時は編集旧文の不在（適用済み）を失敗として報告するため、再実行前に報告 JSON と git 状態から適用済みの工程を確認し、不足分のみを入力 JSON に含める
 5. 新規 REQ/Decision ファイルを含む Definition 変更では、当該ファイルを script 呼び出しの前段で手動配置する。agentdev-git-worktree 標準手順（type=definition）による worktree 前置作成の後、node の writeFileSync による UTF-8 明示で worktree 内へ配置し、script の冪等再利用（branch 確認済み worktree 再利用）と整合して扱う。本手順は DefinitionEdit の入力契約（path / oldText / newText の旧文完全一致置換）を拡張せず、DefinitionEdit への create 操作は追加しない
+6. **artifact_actions 適用後の verbatim 包含突合**: script の正常終了後、PR 作成前に、当該 Case の合意済み `artifact_actions` のうち適用済みと扱う全 action の `content` を突合する。追記・置換の各 edit について適用後ファイルを読み、合意済み content の各段落・各行が逐語的に含まれることを機械的検索で確認する。節見出しだけが存在して本文段落が欠落している場合や、置換によって既存記述が黙示的に欠落している場合は不成立とする。不成立時は PR を作成せず停止する（fail-closed）。欠落を再適用する場合は DefinitionEdit の旧文完全一致契約に従う。再実行前に報告 JSON と git 状態から適用済み工程を確認し、不足分だけを処理する既存の冪等再実行手順を維持する。突合成立後の PR 本文の検証記録には、適用後成果物への突合結果を根拠として記載する。適用予定内容だけを適用済みの証拠として記録しない
 
 #### 品質ゲート入力の固定生成と事前検証、検査証拠の保存
 
