@@ -113,7 +113,7 @@ squash merge がコンフリクトで失敗した場合（STEP-4-3 のリトラ�
 4. **マージ結果の記録**: `agentdev_gh` の pr_merge 操作へ commitHash を渡して `## マージ結果` へ記録する。Tool は渡されたコミットハッシュのローカル Git 実在を確認（VERIFY）してから記録する
 5. **失敗・未完了時**: pr_merge を呼び出さず、ローカルIssueの `status` を `blocked` に更新し、理由を `## 残課題` に記録する
 
-必須記録項目（実行した操作、関連するコミットハッシュ、実行日時、結果）の正は Design `docs/designs/local/local-case-file.md`「マージ結果の記録方針」節である。
+必須記録項目（実行した操作、関連するコミットハッシュ、実行日時、結果）の正は、ローカルIssue共通スキーマ Design「マージ結果の記録方針」節である。
 
 ## Evidence
 

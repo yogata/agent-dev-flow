@@ -10,7 +10,7 @@ function step4Section(content: string): string {
   return content.slice(start, end);
 }
 
-describe("STEP-4 verbatim 包含突合手順の規定（REQ-030-027）", () => {
+describe("STEP-4 verbatim 包含突合手順の規定", () => {
   const content = readFileSync(REFERENCE_PATH, "utf8");
   const step4 = step4Section(content);
 
