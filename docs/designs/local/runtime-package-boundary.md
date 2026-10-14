@@ -19,6 +19,7 @@ updated: 2026-10-13
 <!-- ADF-COVERS(design): REQ-053-044（repo-local Plugin の配布・投影契約節が保存済みファイル単位結果の配布・投影除外 design 実体） -->
 <!-- ADF-COVERS(design): REQ-050-002, REQ-050-003, REQ-050-005, REQ-050-015, REQ-058-001, REQ-058-004, REQ-058-005, REQ-058-006, REQ-058-008, REQ-058-012（ジャンクション状態の判定と自己修復節が両公開入口・両ホスト・全モードの正本一致検査の design 実体） -->
 <!-- ADF-COVERS(design): REQ-112-001, REQ-112-002, REQ-112-003（local ツール package の tsconfig 参照共有と typecheck 検査契約節が design 実体） -->
+<!-- ADF-COVERS(design): REQ-050-014（scripts 公開入口と内部配置節の旧公開入口3本現役導線禁止条項が design 実体） -->
 
 # 実行時パッケージ境界
 
@@ -274,6 +275,7 @@ scripts/ 直下の公開入口と内部配置の構成（REQ-050-001、REQ-050-0
 - 内部配置: consumer 専用の内部処理は `scripts/consumer/` 配下、self-hosting 固有の配布・検証処理は `scripts/self/release/` 配下、保守処理は `scripts/self/maintenance/` 配下
 - release 生成、信頼境界検証、self-hosting 保守処理、単体実行しない内部共通処理を scripts/ 直下に配置しない
 - 具体的な内部ファイル分割は、公開契約と依存境界を変えない範囲で実装時に調整できる
+- 旧公開入口3本（`scripts/install-consumer-opencode.ps1`、`scripts/check-consumer-opencode.ps1`、`scripts/sync-self-opencode.ps1`）を現役導線として残さない。歴史的説明を除き、旧公開入口名を利用者へ実行させる記述を現行の README・Guide・REQ・Design・Decision・実行手順に残さない。現行文書群の是正と残存例の分類は REQ-050-014 が所有する
 
 ### supervisor-bridge の配置と境界（REQ-091 design 被覆の本文）
 
