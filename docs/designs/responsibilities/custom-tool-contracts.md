@@ -4,10 +4,10 @@ status: accepted
 created: 2026-08-24
 updated: 2026-10-14
 ---
-<!-- ADF-COVERS(design): REQ-090-001, REQ-090-002, REQ-090-003, REQ-090-004, REQ-090-009, REQ-090-010, REQ-090-011, REQ-090-012, REQ-090-013, REQ-090-014, REQ-090-015, REQ-090-016, REQ-090-017, REQ-090-018, REQ-090-019, REQ-090-020, REQ-090-021, REQ-090-022, REQ-090-023, REQ-090-024, REQ-090-025, REQ-090-026, REQ-090-027, REQ-090-028, REQ-090-029, REQ-011-033 -->
+<!-- ADF-COVERS(design): REQ-090-001, REQ-090-002, REQ-090-003, REQ-090-004, REQ-090-009, REQ-090-010, REQ-090-011, REQ-090-012, REQ-090-013, REQ-090-014, REQ-090-015, REQ-090-016, REQ-090-017, REQ-090-018, REQ-090-019, REQ-090-020, REQ-090-021, REQ-090-022, REQ-090-023, REQ-090-024, REQ-090-025, REQ-090-026, REQ-090-027, REQ-090-028, REQ-090-029, REQ-011-022, REQ-011-025, REQ-011-026, REQ-011-033 -->
 <!-- ADF-COVERS(design): REQ-009-051, REQ-052-013, REQ-052-014, REQ-052-015 -->
 <!-- ADF-COVERS(implementation): REQ-103-007, REQ-103-008, REQ-103-009, REQ-103-010, REQ-103-011（REQ-103 障害時契約の Tool 呼出側契約面の実装対応。runtime・durable state 面は各 foundations Design） -->
-<!-- ADF-COVERS(implementation): REQ-011-001, REQ-011-002, REQ-011-003, REQ-011-005, REQ-011-008, REQ-011-009, REQ-011-013, REQ-011-014, REQ-011-015, REQ-011-020, REQ-011-021, REQ-011-022, REQ-011-023, REQ-011-024, REQ-011-031, REQ-011-032, REQ-052-001, REQ-052-002, REQ-052-003, REQ-052-004, REQ-052-005, REQ-052-008, REQ-052-009, REQ-052-010, REQ-052-011 -->
+<!-- ADF-COVERS(implementation): REQ-011-001, REQ-011-002, REQ-011-003, REQ-011-005, REQ-011-008, REQ-011-009, REQ-011-013, REQ-011-014, REQ-011-015, REQ-011-020, REQ-011-021, REQ-011-022, REQ-011-023, REQ-011-024, REQ-011-025, REQ-011-026, REQ-011-031, REQ-011-032, REQ-052-001, REQ-052-002, REQ-052-003, REQ-052-004, REQ-052-005, REQ-052-008, REQ-052-009, REQ-052-010, REQ-052-011 -->
 
 # Custom Tool 操作契約
 
@@ -31,7 +31,7 @@ Git、GitHub、外部ソース（URL、Git リポジトリ等）からの取得�
 - 入力契約違反は invalid-input とし、外部操作の失敗・検証未了・Tool 異常と同一分類に集約しない
 
 runner 応答 before 契約（追跡軸保持 VERIFY の実行前状態接合）:
-- issue_update、issue_reopen の追跡軸保持 VERIFY は、副作用後の読み戻しのみでは自己保持できない実行前状態を必要とするため、runner の成功応答 payload は実行前状態（before）を正規化済み導出値として含める。含める導出値は state、labels、role、kind、trackingState、closeReason とし、正規化規則は契約型（contracts.ts）と追跡スキーマ（tracking-schema.ts）の実装に従う
+- issue_update、issue_reopen の追跡軸保持 VERIFY は、副作用後の読み戻しのみでは自己保持できない実行前状態を必要とするため、runner の成功応答 payload は実行前状態（before）を正規化済み導出値として含める。含める導出値は state、labels、role、closeReason とし、正規化規則は契約型（contracts.ts）と追跡スキーマ（tracking-schema.ts）の実装に従う
 - runner と engine の間の内部契約を拡張する場合は、GitHub 版と Local 版へ同時に反映する。Local 版の実装が未完了の間は、最低限の型整合を維持し、当該操作の VERIFY は fail-closed で verification-incomplete として返ることを許容する
 
 ## 対象操作の境界（初期セット）
@@ -46,8 +46,8 @@ runner 応答 before 契約（追跡軸保持 VERIFY の実行前状態接合）
 - pr_read の拡張: 成功結果に Pull Request 本文（body）と Pull Request の Draft 状態を表す boolean（isDraft）を含む。GitHub backend は対象 Pull Request の実際の Draft 状態を isDraft に写像し、Local backend は false を返す（REQ-011-032）。本文の論理的な範囲はローカル版の物理写像（ローカルIssue共通スキーマ Design）に従い、読み取りと更新が round-trip 可能な同一の論理範囲（ローカル版ではマージ前確認・Design確定候補・Findings / Capture候補の3セクション群の直列化）とする
 - pr_update: title と body を対象とする項目単位の部分更新操作。指定されていない項目は保持し、更新後は読み戻しによって要求値の反映を確認する。ローカル版では Pull Request タイトルの正をマージ前確認セクション内の PR タイトル行とし、pr_update の title は同行を置換する
 - pr_merge の入力契約: pr_merge はローカル版の取り込み確認情報として commitHash（文字列、任意フィールド）を受理する。ローカル版では必須として検証し（実在確認）、GitHub 版では受理してマージ動作には使用しない
-- issue_update の部分更新不変条件: 変更を要求していない追跡Issue軸（role、kind、trackingState）を保持する。VERIFY の照合対象は追跡軸の完全一致と要求通常ラベルの包含とし、確認時点での第三者による通常ラベル追加を不変条件違反として失敗扱いにしない
-- issue_reopen の追跡Issue状態遷移: agentdev-issue-tracking Design が所有する再オープン遷移（クローズ済み→検討中）を Tool が状態ラベルの機械適用によって実現する。kind と通常ラベルを保持し、Case Issue には追跡状態遷移を適用しない。既に open の追跡Issueへの再オープンは要求的状態の確認をもって冪等に成功とする
+- issue_update の部分更新不変条件: 変更を要求していない追跡Issue軸（role）を保持する。VERIFY の照合対象は追跡軸の完全一致と要求通常ラベルの包含とし、確認時点での第三者による通常ラベル追加を不変条件違反として失敗扱いにしない
+- issue_reopen の追跡Issue取扱い: 再オープンによって role と通常ラベルを保持する。追跡状態の再オープン遷移（クローズ済み→検討中）は本文の状態保持節の更新として呼出側が行い、Tool は追跡状態遷移を機械適用しない。Case Issue には追跡状態遷移を適用しない。既に open の追跡Issueへの再オープンは要求的状態の確認をもって冪等に成功とする
 
 VERIFY 適用（READ / WRITE 分離）:
 - WRITE 操作（issue_create、issue_update、issue_close、issue_reopen、comment_create、comment_update、comment_delete、pr_create、pr_update、pr_merge）: 副作用そのものを読み戻し、要求した状態の反映と保持対象不変条件の維持を確認する。Comment WRITE は対象 Comment の存在・本文で判定し、Issue / Pull Request の open / closed 状態を成功証拠として使用しない
