@@ -592,3 +592,19 @@
 - **想定反映先**: agentdev-git-worktree references の bun test 実行環境前提節。learning-promote での判断
 - **関連**: Case #3718、PR #3720 本文 learning 3 件目、main root `src/senpi/tools/agentdev-gh-tool/bun.lock`（untracked 残存の同型事例）
 - **タグ**: `#bun` `#worktree` `#依存整備` `#lockfile`
+
+## worktree での bun test 分割①は環境負荷で timeout 系テストが非決定的 fail し得る。由来分離は「timeout メッセージ確認 → ファイル単体再実行 → 分割全体の同一条件再実行」の順で行う
+
+- **問題事象**: Case #3719（DEL-3719-1）で、worktree での bun test 分割①（integrity suite）を変更直後に実行した際、5 秒 timeout を持つ fixture git init を伴う checker 起動テストが 6172ms 超過で 1 件非決定的 fail した。同一条件の再実行では 0 fail が再現
+- **発生局面**: case-run 実行時の full integrity suite 分割① 実行（worktree・並列負荷下）
+- **検知方法**: fail 詳細の timeout メッセージ確認 → ファイル単体再実行（30 pass / 0 fail / 7.67 秒）→ 分割全体の同一条件再実行（2909 pass / 0 fail / exit 0）で再現性を確認
+- **根本原因**: worktree 環境の suite 並列負荷により、明示 timeout 5 秒の fixture git init 依存テストが環境負荷由来で超過する。テスト自体の欠陥ではない
+- **自律対応内容**: 由来分離の3手順を順に実行し、再実行で 0 fail が再現されたため環境差由来として記録（fail 由来分類: 環境依存）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree で bun test 分割実行を行う全工程（case-run・case-close の full integrity suite）
+- **再発条件**: worktree 環境で明示 timeout の短い fixture 依存テストを suite 並列負荷下で実行した場合
+- **予防策候補**: 由来分離手順（timeout メッセージ確認 → 単体再実行 → 分割同一条件再実行）の実例として docs/knowledge/worktree-environment-fail-classification.md と整合する運用を維持。learning-promote での判断
+- **想定反映先**: worktree-environment-fail-classification 知識文書の実例追記候補。learning-promote での判断
+- **関連**: Case #3719、PR #3721 本文 learning 1 件目、docs/knowledge/worktree-environment-fail-classification.md、Case #3718 の timeout 追加前例
+- **タグ**: `#bun-test` `#worktree` `#timeout` `#由来分離`
