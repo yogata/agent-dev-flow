@@ -167,16 +167,16 @@ export interface StepResult {
 }
 
 /**
- * Tool 操作契約の主要操作一連（起票・読取・更新・状態遷移・コメント）を
+ * Tool 操作契約の主要操作一連（起票・読取・更新・コメント）を
  * 呼び出し順序依存の系列として返す。tracking Issue 1 件を起票してから
- * 読取 → 状態更新 → コメント CRUD → クローズ → 再オープンの順に遷移する。
- * commentId の物理形はバックエンドごとに異なるため、commentRef で与える。
+ * 読取 → 部分更新（role 不変条件）→ コメント CRUD → クローズ → 再オープンの順に
+ * 遷移する。commentId の物理形はバックエンドごとに異なるため、commentRef で与える。
  */
 export function mainOperationSequence(commentRef: string): OperationStep[] {
   return [
-    { operation: "issue_create", args: { title: "統合試験 追跡Issue", body: "TS-003 本文", labels: [], role: "tracking", kind: "task" } },
+    { operation: "issue_create", args: { title: "統合試験 追跡Issue", body: "TS-003 本文", labels: [], role: "tracking" } },
     { operation: "issue_read", args: { number: 1 } },
-    { operation: "issue_update", args: { number: 1, trackingState: "in-discussion" } },
+    { operation: "issue_update", args: { number: 1, title: "統合試験 追跡Issue 更新後" } },
     { operation: "comment_create", args: { number: 1, body: "検討経過 1 件目" } },
     { operation: "comment_list", args: { number: 1 } },
     { operation: "comment_update", args: { commentId: commentRef, body: "検討経過 更新後" } },

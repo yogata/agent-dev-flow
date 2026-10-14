@@ -28,7 +28,7 @@
 //   - 出力 URL = ローカルIssueファイルの絶対パス（GitHub 実装の URL に代わる一意識別子）
 //   - 本文の内容Routing（テンプレート展開等）は本 Tool の責務外（REQ-011-020）
 //
-// 物理写像（role/kind/状態と frontmatter/ラベルの対応）の機械適用は
+// 物理写像（role/状態と frontmatter/ラベルの対応）の機械適用は
 // Tool 本体の tracking-schema.ts が所有する写像表に従う。
 
 
@@ -42,16 +42,10 @@ import type {
   GhRunnerRequest,
 } from "../runner.ts";
 import {
-  LOCAL_TRACKING_LABEL_VALUES,
   LOCAL_TRACKING_STATUS_VALUES,
-  parseTrackingKind,
-  parseTrackingState,
   REOPEN_TRACKING_STATE,
-  TRACKING_KINDS,
   type CloseReason,
   type IssueRole,
-  type TrackingKind,
-  type TrackingState,
 } from "../tracking-schema.ts";
 
 const ISSUE_FILE_PREFIX = "issue-";
@@ -109,9 +103,14 @@ export function localStatusValues(role: IssueRole): readonly string[] {
   return role === "tracking" ? LOCAL_TRACKING_STATUS_VALUES : CASE_STATUS_VALUES;
 }
 
-/** role ごとの labels 値域（同上）。 */
+/**
+ * role ごとの labels 値域（同上）。tracking の labels 値域検証（kind 4値から
+ * ちょうど1つ）は廃止済みであり、既存 kind トークン付き資産の読取を壊さないため
+ * 機械検証対象外（空集合）とする。起票・更新の受理面は issueCreate / issueUpdate が
+ * 通常ラベル非許容の値域差異として処理する。
+ */
 export function localLabelValues(role: IssueRole): readonly string[] {
-  return role === "tracking" ? LOCAL_TRACKING_LABEL_VALUES : CASE_LABEL_VALUES;
+  return role === "tracking" ? [] : CASE_LABEL_VALUES;
 }
 
 /** role ごとの終端 status。 */
@@ -140,18 +139,14 @@ export function validateLocalIssue(
   if (!localStatusValues(fm.role).includes(fm.status)) {
     errors.push(`status '${fm.status}' is not in the ${fm.role} status values`);
   }
-  const labelValues = localLabelValues(fm.role);
-  for (const label of fm.labels) {
-    if (!labelValues.includes(label)) {
-      errors.push(`label '${label}' is not in the ${fm.role} label values`);
-    }
-  }
-  if (fm.role === "tracking") {
-    const kindLabels = fm.labels.filter((l) =>
-      (TRACKING_KINDS as readonly string[]).includes(l),
-    );
-    if (kindLabels.length !== 1) {
-      errors.push("tracking issues require exactly one kind label");
+  // tracking の labels 値域検証（kind 4値からちょうど1つ）は廃止済み。
+  // 既存 kind トークン付き資産の読取互換を維持するため検証しない。
+  if (fm.role === "case") {
+    const labelValues = localLabelValues(fm.role);
+    for (const label of fm.labels) {
+      if (!labelValues.includes(label)) {
+        errors.push(`label '${label}' is not in the ${fm.role} label values`);
+      }
     }
   }
   const terminal = localTerminalStatuses(fm.role).includes(fm.status);
@@ -549,30 +544,21 @@ export class LocalRunner implements GhRunner {
     return isTerminal(role, status) ? "closed" : "open";
   }
 
-  private trackingMetaOf(parsed: ParsedIssue): {
-    kind: TrackingKind | null;
-    trackingState: TrackingState | null;
+  /** close reason（ローカル版は tracking / case とも導出しない。終端 reason は 検討経過 の履歴が保持する）。 */
+  private trackingMetaOf(): {
     closeReason: CloseReason | null;
   } {
-    if (parsed.fm.role !== "tracking") {
-      return { kind: null, trackingState: null, closeReason: null };
-    }
-    const kind = parseTrackingKind(parsed.fm.labels.find((l) =>
-      (TRACKING_KINDS as readonly string[]).includes(l),
-    ));
-    return { kind, trackingState: parsed.fm.status as TrackingState, closeReason: null };
+    return { closeReason: null };
   }
 
   /** 実行前状態（before）。issue_update / issue_reopen の応答へ含め、VERIFY の照合基準とする。 */
   private beforeFrom(parsed: ParsedIssue): Record<string, unknown> {
     const state = this.issueState(parsed.fm.role, parsed.fm.status);
-    const meta = this.trackingMetaOf(parsed);
+    const meta = this.trackingMetaOf();
     return {
       state: state ?? "open",
       labels: [...parsed.fm.labels],
       role: parsed.fm.role,
-      kind: meta.kind,
-      trackingState: meta.trackingState,
       closeReason: meta.closeReason,
     };
   }
@@ -646,15 +632,13 @@ export class LocalRunner implements GhRunner {
     const body = typeof args.body === "string" ? args.body : null;
     if (title === null || body === null) return this.fail("issue_create requires title and body");
     const role: IssueRole = args.role === "tracking" ? "tracking" : "case";
-    const kind = args.kind === undefined ? null : parseTrackingKind(args.kind);
-    if (args.kind !== undefined && kind === null) {
-      return this.fail("issue_create received an invalid kind");
-    }
     const labels = Array.isArray(args.labels)
       ? args.labels.filter((l): l is string => typeof l === "string")
       : [];
-    if (role === "tracking" && kind === null) {
-      return this.fail("tracking issue_create requires a kind");
+    // ローカル版の値域差異: tracking の通常ラベル非許容（kind も Tool 操作契約から
+    // 削減済み）。起票時の labels は空配列のみを受理する。
+    if (role === "tracking" && labels.length > 0) {
+      return this.fail("tracking issue_create accepts an empty labels array only");
     }
     const labelValues = localLabelValues(role);
     for (const label of labels) {
@@ -662,7 +646,7 @@ export class LocalRunner implements GhRunner {
         return this.fail(`label '${label}' is not in the ${role} label values`);
       }
     }
-    const finalLabels = role === "tracking" && kind !== null ? [kind] : labels;
+    const finalLabels = labels;
     const number = this.nextIssueNumber();
     const timestamp = isoNow(this.now);
     const initialStatus = role === "tracking" ? "created" : "open";
@@ -687,7 +671,7 @@ export class LocalRunner implements GhRunner {
     if (c === null) return this.fail(`local issue not found: ${issueFileName(number)}`);
     const state = this.issueState(c.parsed.fm.role, c.parsed.fm.status);
     if (state === null) return this.fail(`unknown issue status: ${c.parsed.fm.status}`);
-    const meta = this.trackingMetaOf(c.parsed);
+    const meta = this.trackingMetaOf();
     return {
       ok: true,
       payload: {
@@ -697,8 +681,6 @@ export class LocalRunner implements GhRunner {
         state,
         labels: c.parsed.fm.labels,
         role: c.parsed.fm.role,
-        kind: meta.kind,
-        trackingState: meta.trackingState,
         closeReason: meta.closeReason,
       },
     };
@@ -707,18 +689,6 @@ export class LocalRunner implements GhRunner {
   private issueUpdate(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
     if (number === null) return this.fail("issue_update requires number");
-    const kind = args.kind === undefined ? null : parseTrackingKind(args.kind);
-    if (args.kind !== undefined && kind === null) {
-      return this.fail("issue_update received an invalid kind");
-    }
-    const trackingState =
-      args.trackingState === undefined ? null : parseTrackingState(args.trackingState);
-    if (
-      args.trackingState !== undefined &&
-      (trackingState === null || trackingState === "closed")
-    ) {
-      return this.fail("issue_update trackingState must be a non-terminal state");
-    }
     const c = this.readIssue(number);
     if (c === null) return this.fail(`local issue not found: ${issueFileName(number)}`);
     const fm = c.parsed.fm;
@@ -736,10 +706,6 @@ export class LocalRunner implements GhRunner {
       return { ok: true, payload: { number, url: this.issuePath(number), before: this.beforeFrom(c.parsed) } };
     }
 
-    if ((kind !== null || trackingState !== null) && fm.role !== "tracking") {
-      return this.fail("issue_update kind/trackingState apply only to tracking issues");
-    }
-
     const nextFm = {
       id: fm.id,
       title: fm.title,
@@ -755,34 +721,24 @@ export class LocalRunner implements GhRunner {
       nextFm.title = args.title;
       changed = true;
     }
-    if (kind !== null) {
-      nextFm.labels = [kind];
-      changed = true;
-    }
-    if (trackingState !== null) {
-      nextFm.status = trackingState;
-      changed = true;
-    }
     if (Array.isArray(args.labels)) {
       const labels = args.labels.filter((l): l is string => typeof l === "string");
-      const labelValues = localLabelValues(fm.role);
-      for (const label of labels) {
-        if (!labelValues.includes(label)) {
-          return this.fail(`label '${label}' is not in the ${fm.role} label values`);
+      // ローカル版の値域差異: tracking の通常ラベル非許容。labels は空配列のみ受理する。
+      if (fm.role === "case") {
+        const labelValues = localLabelValues(fm.role);
+        for (const label of labels) {
+          if (!labelValues.includes(label)) {
+            return this.fail(`label '${label}' is not in the ${fm.role} label values`);
+          }
         }
+      } else if (labels.length > 0) {
+        return this.fail("tracking issue_update accepts an empty labels array only");
       }
-      if (fm.role === "tracking") {
-        const currentKind = nextFm.labels.find((l) =>
-          (TRACKING_KINDS as readonly string[]).includes(l),
-        );
-        nextFm.labels = currentKind !== undefined ? [currentKind, ...labels] : labels;
-      } else {
-        nextFm.labels = labels;
-      }
+      nextFm.labels = labels;
       changed = true;
     }
     if (!changed) {
-      return this.fail("issue_update requires title, body, labels, kind, or trackingState");
+      return this.fail("issue_update requires title, body, or labels");
     }
     const validation = validateLocalIssue(nextFm, issueFileName(number));
     if (!validation.valid) {
@@ -830,16 +786,7 @@ export class LocalRunner implements GhRunner {
 
   private issueList(args: Record<string, unknown>): GhRunnerReply {
     const role = args.role === "tracking" || args.role === "case" ? args.role : null;
-    const kind = args.kind === undefined ? null : parseTrackingKind(args.kind);
-    if (args.kind !== undefined && kind === null) {
-      return this.fail("issue_list received an invalid kind");
-    }
     const state = args.state === "open" || args.state === "closed" ? args.state : null;
-    const trackingState =
-      args.trackingState === undefined ? null : parseTrackingState(args.trackingState);
-    if (args.trackingState !== undefined && trackingState === null) {
-      return this.fail("issue_list received an invalid trackingState");
-    }
     const labels = Array.isArray(args.labels)
       ? args.labels.filter((l): l is string => typeof l === "string")
       : [];
@@ -857,11 +804,9 @@ export class LocalRunner implements GhRunner {
       if (!validation.valid) continue;
       const issueState = this.issueState(parsed.fm.role, parsed.fm.status);
       if (issueState === null) continue;
-      const meta = this.trackingMetaOf(parsed);
+      const meta = this.trackingMetaOf();
       if (role !== null && parsed.fm.role !== role) continue;
-      if (kind !== null && meta.kind !== kind) continue;
       if (state !== null && issueState !== state) continue;
-      if (trackingState !== null && meta.trackingState !== trackingState) continue;
       if (labels.length > 0 && !labels.every((l) => parsed.fm.labels.includes(l))) continue;
       if (search !== null && !parsed.fm.title.includes(search)) continue;
       issues.push({
@@ -871,8 +816,6 @@ export class LocalRunner implements GhRunner {
         state: issueState,
         labels: parsed.fm.labels,
         role: parsed.fm.role,
-        kind: meta.kind,
-        trackingState: meta.trackingState,
         closeReason: meta.closeReason,
       });
     }

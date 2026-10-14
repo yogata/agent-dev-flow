@@ -6,9 +6,13 @@
 //
 // 写像の意味（role の 2 値、kind の 4 値、状態の 6 値と三段写像）は論理スキーマ
 // 一元管理 Design の確定事項に従う。本モジュールは機械適用のみを行い、写像の
-// 意味判断を新規に所有しない。状態の三段写像（追跡Issue 6状態、GitHub
-// open/closed、Tool issue_close reason の対応）は次のとおり:
-//   起票/検討中/保留/実行準備完了/解決済み -> open（クローズしない）
+// 意味判断を新規に所有しない。GitHub 物理ラベルによる追跡軸の機械識別は role
+// のみであり、kind と非終端追跡Issue状態は GitHub ラベルへ写像せず、追跡Issue
+// 本文標準構造の項目（kind、状態保持節）として表現する。旧追跡軸ラベルは廃止
+// 済みであり、正規起票経路から再作成・付与しない。状態の三段写像
+// （追跡Issue 6状態、GitHub open/closed、Tool issue_close reason の対応）は次のとおり:
+//   起票/検討中/保留/実行準備完了/解決済み -> open（クローズしない。非終端状態は
+//     本文の状態保持節で保持し、Tool は状態ラベルを付与・導出しない）
 //   クローズ済み（反映完了）              -> closed / completed
 //   クローズ済み（反映不要の確認完了）      -> closed / not_planned
 
@@ -46,7 +50,7 @@ export const TRACKING_STATES: readonly TrackingState[] = [
   "closed",
 ];
 
-/** kind の全値域。 */
+/** kind の全値域（論理値。Tool 操作契約の受理・導出には使用しない）。 */
 export const TRACKING_KINDS: readonly TrackingKind[] = [
   "problem",
   "idea",
@@ -63,67 +67,19 @@ export const TRACKING_KINDS: readonly TrackingKind[] = [
  * 本ラベルを欠く Issue は role: case として機械判定する（既存 Case Issue は
  * role ラベルを持たないため、付与の有無のみで role を判定できる）。
  */
-export const TRACKING_ROLE_LABEL = "agentdev-tracking";
+export const TRACKING_ROLE_LABEL = "tracking";
 
-/** kind の物理ラベルの接頭辞。`agentdev-kind/problem` の形式。 */
-const KIND_LABEL_PREFIX = "agentdev-kind/";
-
-/** 追跡Issue状態（非終端）の物理ラベルの接頭辞。`agentdev-tracking-status/on-hold` の形式。 */
-const TRACKING_STATUS_LABEL_PREFIX = "agentdev-tracking-status/";
-
-/** kind の論理値を物理ラベルへ写像する。 */
-export function kindToLabel(kind: TrackingKind): string {
-  return `${KIND_LABEL_PREFIX}${kind}`;
-}
-
-/** 非終端追跡Issue状態の論理値を物理ラベルへ写像する。 */
-export function trackingStateToLabel(state: TrackingState): string | null {
-  if (!NON_TERMINAL_TRACKING_STATES.includes(state)) return null;
-  return `${TRACKING_STATUS_LABEL_PREFIX}${state}`;
-}
-
-/** 物理ラベルから kind 論理値を逆写像する。該当なしは null。 */
-export function labelToKind(label: string): TrackingKind | null {
-  if (!label.startsWith(KIND_LABEL_PREFIX)) return null;
-  const value = label.slice(KIND_LABEL_PREFIX.length);
-  return (TRACKING_KINDS as readonly string[]).includes(value)
-    ? (value as TrackingKind)
-    : null;
-}
-
-/** 物理ラベルから非終端追跡Issue状態を逆写像する。該当なしは null。 */
-export function labelToTrackingState(label: string): TrackingState | null {
-  if (!label.startsWith(TRACKING_STATUS_LABEL_PREFIX)) return null;
-  const value = label.slice(TRACKING_STATUS_LABEL_PREFIX.length);
-  return (NON_TERMINAL_TRACKING_STATES as readonly string[]).includes(value)
-    ? (value as TrackingState)
-    : null;
-}
-
-/** 追跡Issueの物理ラベル群（role、kind、非終端状態）を一括して剥がした残りのラベル。 */
+/** role 物理ラベルを剥がした残りのラベル（通常ラベル）。 */
 export function stripTrackingLabels(labels: readonly string[]): string[] {
-  return labels.filter(
-    (l) =>
-      l !== TRACKING_ROLE_LABEL &&
-      !l.startsWith(KIND_LABEL_PREFIX) &&
-      !l.startsWith(TRACKING_STATUS_LABEL_PREFIX),
-  );
+  return labels.filter((l) => l !== TRACKING_ROLE_LABEL);
 }
 
 /**
  * 追跡Issueとして付与すべき物理ラベル群を構成する。
- * 既存ラベルのうち追跡Issue軸のラベルは置換し、それ以外は保持する。
+ * role 物理ラベルのみを追跡軸として付与し、既存ラベル（通常ラベル）を保持する。
  */
-export function buildTrackingLabels(
-  currentLabels: readonly string[],
-  kind: TrackingKind,
-  state: TrackingState,
-): string[] {
-  const stateLabel = trackingStateToLabel(state);
-  const kept = stripTrackingLabels(currentLabels);
-  const next = [TRACKING_ROLE_LABEL, kindToLabel(kind)];
-  if (stateLabel !== null) next.push(stateLabel);
-  return [...new Set([...next, ...kept])];
+export function buildTrackingLabels(currentLabels: readonly string[]): string[] {
+  return [...new Set([TRACKING_ROLE_LABEL, ...stripTrackingLabels(currentLabels)])];
 }
 
 // ---------------------------------------------------------------------------
@@ -135,55 +91,21 @@ export function deriveRole(labels: readonly string[]): IssueRole {
   return labels.includes(TRACKING_ROLE_LABEL) ? "tracking" : "case";
 }
 
-/** GitHub REST メタデータから kind を導出する。 */
-export function deriveKind(labels: readonly string[]): TrackingKind | null {
-  for (const l of labels) {
-    const kind = labelToKind(l);
-    if (kind !== null) return kind;
-  }
-  return null;
-}
-
 /**
- * GitHub REST メタデータから追跡Issue状態を導出する（三段写像の機械適用）。
- * closed は state_reason によらずクローズ済み。closeReason に反映完了
- * （completed）と反映不要（not_planned）の別を返す。
+ * GitHub state と state_reason からクローズ済みの close reason を導出する。
+ * 非終端（open）と Case Issue は null を返す。非終端の現在状態は本文の状態保持節
+ * が保持し、Tool は導出しない（三段写像の機械適用）。
  */
-export function deriveTrackingState(
+export function deriveCloseReason(
   labels: readonly string[],
   state: "open" | "closed",
   stateReason: string | null | undefined,
-): { trackingState: TrackingState | null; closeReason: CloseReason | null } {
-  if (deriveRole(labels) !== "tracking") {
-    return { trackingState: null, closeReason: null };
-  }
+): CloseReason | null {
+  if (deriveRole(labels) !== "tracking") return null;
   if (state === "closed") {
-    return {
-      trackingState: "closed",
-      closeReason: stateReason === "not_planned" ? "not_planned" : "completed",
-    };
+    return stateReason === "not_planned" ? "not_planned" : "completed";
   }
-  for (const l of labels) {
-    const s = labelToTrackingState(l);
-    if (s !== null) return { trackingState: s, closeReason: null };
-  }
-  return { trackingState: "created", closeReason: null };
-}
-
-/** 論理値の文字列表現を検証して TrackingState へ落とす。不正は null。 */
-export function parseTrackingState(value: unknown): TrackingState | null {
-  return typeof value === "string" &&
-      (TRACKING_STATES as readonly string[]).includes(value)
-    ? (value as TrackingState)
-    : null;
-}
-
-/** 論理値の文字列表現を検証して TrackingKind へ落とす。不正は null。 */
-export function parseTrackingKind(value: unknown): TrackingKind | null {
-  return typeof value === "string" &&
-      (TRACKING_KINDS as readonly string[]).includes(value)
-    ? (value as TrackingKind)
-    : null;
+  return null;
 }
 
 /** 論理値の文字列表現を検証して IssueRole へ落とす。不正は null。 */
@@ -197,16 +119,12 @@ export function parseIssueRole(value: unknown): IssueRole | null {
 
 /**
  * ローカルIssueの frontmatter トークン。role と追跡Issue状態は論理値と同一
- * トークンを採用し、kind は labels へ素の値として格納する（ローカルIssue
- * 共通スキーマの role 条件付きスキーマに従う）。
+ * トークンを採用する（ローカルIssue共通スキーマの role 条件付きスキーマに従う）。
  */
 export const LOCAL_ROLE_TOKENS: readonly IssueRole[] = ["tracking", "case"];
 
 /** ローカルIssue（role: tracking）の status 値域。論理状態トークンと同一。 */
 export const LOCAL_TRACKING_STATUS_VALUES: readonly TrackingState[] = TRACKING_STATES;
-
-/** ローカルIssue（role: tracking）の labels 値域（kind と同値）。 */
-export const LOCAL_TRACKING_LABEL_VALUES: readonly TrackingKind[] = TRACKING_KINDS;
 
 /** 再オープン後の追跡Issue状態（クローズ済みからの再検討）。 */
 export const REOPEN_TRACKING_STATE: TrackingState = "in-discussion";

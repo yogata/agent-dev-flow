@@ -14,7 +14,6 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { createCliRunner, type GhExec, type GhSpawnError } from "../runner-cli.ts";
 import { issueNumber } from "../contracts.ts";
-import { kindToLabel } from "../tracking-schema.ts";
 import { buildGhToolEnv } from "../engine.ts";
 import { runAgentdevGhOperation } from "../index.ts";
 import type { GhRunnerReply, GhRunnerRequest } from "../runner.ts";
@@ -253,15 +252,13 @@ describe("CliRunner: 各操作の API 写像", () => {
         state: "open",
         labels: ["bug"],
         role: "case",
-        kind: null,
-        trackingState: null,
         closeReason: null,
       });
     }
     expect(calls[0]?.args).toContain("repos/owner/repo/issues/7");
   });
 
-  test("issue_read は追跡Issueラベルから role/kind/trackingState を導出する", async () => {
+  test("issue_read は role 物理ラベルから role を導出する", async () => {
     const { exec } = fakeExec(() => ({
       status: 0,
       stdout: JSON.stringify({
@@ -269,11 +266,7 @@ describe("CliRunner: 各操作の API 写像", () => {
         title: "追跡",
         body: "B",
         state: "open",
-        labels: [
-          { name: "agentdev-tracking" },
-          { name: "agentdev-kind/risk" },
-          { name: "agentdev-tracking-status/on-hold" },
-        ],
+        labels: [{ name: "tracking" }],
         state_reason: null,
       }),
       stderr: "",
@@ -283,8 +276,6 @@ describe("CliRunner: 各操作の API 写像", () => {
     if (reply.ok) {
       const payload = reply.payload as Record<string, unknown>;
       expect(payload.role).toBe("tracking");
-      expect(payload.kind).toBe("risk");
-      expect(payload.trackingState).toBe("on-hold");
       expect(payload.closeReason).toBeNull();
     }
   });
@@ -297,7 +288,7 @@ describe("CliRunner: 各操作の API 写像", () => {
         title: "追跡",
         body: "B",
         state: "closed",
-        labels: [{ name: "agentdev-tracking" }, { name: "agentdev-kind/task" }],
+        labels: [{ name: "tracking" }],
         state_reason: "not_planned",
       }),
       stderr: "",
@@ -306,12 +297,11 @@ describe("CliRunner: 各操作の API 写像", () => {
     expect(reply.ok).toBe(true);
     if (reply.ok) {
       const payload = reply.payload as Record<string, unknown>;
-      expect(payload.trackingState).toBe("closed");
       expect(payload.closeReason).toBe("not_planned");
     }
   });
 
-  test("issue_create は role/kind を物理ラベルへ写像して投入する", async () => {
+  test("issue_create は role 物理ラベルを付与して投入する", async () => {
     const tempDir = makeTempDir();
     let body = "";
     const { exec } = fakeExec((call) => {
@@ -325,19 +315,37 @@ describe("CliRunner: 各操作の API 写像", () => {
     });
     const reply = await run(exec, tempDir, {
       operation: "issue_create",
-      args: { title: "課題", body: "B", labels: [], role: "tracking", kind: "problem" },
+      args: { title: "課題", body: "B", labels: [], role: "tracking" },
     });
     expect(reply.ok).toBe(true);
     const parsed = JSON.parse(body) as Record<string, unknown>;
-    expect(parsed.labels).toEqual([
-      "agentdev-tracking",
-      "agentdev-kind/problem",
-      "agentdev-tracking-status/created",
-    ]);
+    expect(parsed.labels).toEqual(["tracking"]);
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
-  test("issue_update は追跡Issueの状態ラベルを現状取得の上で置換する", async () => {
+  test("issue_create は指定通常ラベルを保持し role 物理ラベルを重複なく付与する", async () => {
+    const tempDir = makeTempDir();
+    let body = "";
+    const { exec } = fakeExec((call) => {
+      const i = call.args.indexOf("--input");
+      if (i >= 0) body = fs.readFileSync(call.args[i + 1] as string, "utf8");
+      return {
+        status: 0,
+        stdout: JSON.stringify({ number: 43, html_url: "https://example/i/43" }),
+        stderr: "",
+      };
+    });
+    const reply = await run(exec, tempDir, {
+      operation: "issue_create",
+      args: { title: "課題", body: "B", labels: ["priority", "tracking"], role: "tracking" },
+    });
+    expect(reply.ok).toBe(true);
+    const parsed = JSON.parse(body) as Record<string, unknown>;
+    expect(parsed.labels).toEqual(["tracking", "priority"]);
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test("issue_update は通常ラベル置換でも role 物理ラベルを復元する", async () => {
     const tempDir = makeTempDir();
     const patches: string[] = [];
     const { exec, calls } = fakeExec((call) => {
@@ -357,11 +365,7 @@ describe("CliRunner: 各操作の API 写像", () => {
           title: "追跡",
           body: "B",
           state: "open",
-          labels: [
-            { name: "agentdev-tracking" },
-            { name: "agentdev-kind/idea" },
-            { name: "agentdev-tracking-status/created" },
-          ],
+          labels: [{ name: "tracking" }, { name: "old-label" }],
           state_reason: null,
         }),
         stderr: "",
@@ -369,43 +373,16 @@ describe("CliRunner: 各操作の API 写像", () => {
     });
     const reply = await run(exec, tempDir, {
       operation: "issue_update",
-      args: { number: 8, trackingState: "on-hold" },
+      args: { number: 8, labels: ["new-label"] },
     });
     expect(reply.ok).toBe(true);
     const patch = JSON.parse(patches[0] ?? "") as Record<string, unknown>;
-    expect(patch.labels).toEqual([
-      "agentdev-tracking",
-      "agentdev-kind/idea",
-      "agentdev-tracking-status/on-hold",
-    ]);
+    expect(patch.labels).toEqual(["tracking", "new-label"]);
     expect(calls.some((c) => c.args.includes("repos/owner/repo/issues/8"))).toBe(true);
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
-  test("issue_update は case の Issue への kind 指定を拒否する", async () => {
-    const tempDir = makeTempDir();
-    const { exec } = fakeExec(() => ({
-      status: 0,
-      stdout: JSON.stringify({
-        number: 7,
-        title: "T",
-        body: "B",
-        state: "open",
-        labels: [{ name: "bug" }],
-        state_reason: null,
-      }),
-      stderr: "",
-    }));
-    const reply = await run(exec, tempDir, {
-      operation: "issue_update",
-      args: { number: 7, kind: "problem" },
-    });
-    expect(reply.ok).toBe(false);
-    if (!reply.ok) expect(reply.error).toContain("tracking issues");
-    fs.rmSync(tempDir, { recursive: true, force: true });
-  });
-
-  test("issue_list は PR を除外し role/kind/trackingState で絞り込む", async () => {
+  test("issue_list は PR を除外し role で絞り込む", async () => {
     const issue = (
       n: number,
       labels: string[],
@@ -425,9 +402,9 @@ describe("CliRunner: 各操作の API 写像", () => {
       status: 0,
       stdout: JSON.stringify([
         issue(1, ["enhancement"], "open", null, false),
-        issue(2, ["agentdev-tracking", "agentdev-kind/risk", "agentdev-tracking-status/on-hold"], "open", null, false),
-        issue(3, ["agentdev-tracking", "agentdev-kind/task"], "closed", "completed", false),
-        issue(4, ["agentdev-tracking"], "open", null, true),
+        issue(2, ["tracking"], "open", null, false),
+        issue(3, ["tracking"], "closed", "completed", false),
+        issue(4, ["tracking"], "open", null, true),
       ]),
       stderr: "",
     }));
@@ -440,8 +417,6 @@ describe("CliRunner: 各操作の API 写像", () => {
       const payload = reply.payload as Record<string, unknown>;
       const issues = payload.issues as Record<string, unknown>[];
       expect(issues.map((i) => i.number)).toEqual([2, 3]);
-      expect(issues[0]?.trackingState).toBe("on-hold");
-      expect(issues[1]?.trackingState).toBe("closed");
       expect(issues[1]?.closeReason).toBe("completed");
     }
   });
@@ -482,8 +457,6 @@ describe("CliRunner: 各操作の API 写像", () => {
           state: "closed",
           labels: ["bug"],
           role: "case",
-          kind: null,
-          trackingState: null,
           closeReason: null,
         },
       });
@@ -938,18 +911,13 @@ function trackingIssue(overrides: Partial<StubIssue> = {}): StubIssue {
     body: "B",
     state: "open",
     state_reason: null,
-    labels: [
-      "agentdev-tracking",
-      "agentdev-kind/risk",
-      "agentdev-tracking-status/on-hold",
-      "priority",
-    ],
+    labels: ["tracking", "priority"],
     ...overrides,
   };
 }
 
 describe("CliRunner + engine: issue_update の追跡軸保持（部分更新不変条件・TS-001）", () => {
-  test("(a) labels のみ更新で追跡軸が保持され Case 化しない", async () => {
+  test("(a) labels のみ更新で追跡軸（role）が保持され Case 化しない", async () => {
     const tempDir = makeTempDir();
     const stub = githubStub({ issues: [trackingIssue()] });
     const result = await runOp(stub.exec, tempDir, {
@@ -962,60 +930,52 @@ describe("CliRunner + engine: issue_update の追跡軸保持（部分更新不�
     expect(read.ok).toBe(true);
     if (read.ok && read.success.operation === "issue_read") {
       expect(read.success.role).toBe("tracking");
-      expect(read.success.kind).toBe("risk");
-      expect(read.success.trackingState).toBe("on-hold");
-      expect(read.success.labels).toContain("enhancement");
-      expect(read.success.labels).not.toContain("priority");
-      expect(read.success.labels).toContain("agentdev-kind/risk");
-      expect(read.success.labels).toContain("agentdev-tracking-status/on-hold");
+      expect(read.success.labels).toEqual(["tracking", "enhancement"]);
     }
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
-  test("(b) kind のみ更新で状態軸と通常ラベルが保持される", async () => {
+  test("(b) title のみ更新で role と通常ラベルが保持される", async () => {
     const tempDir = makeTempDir();
     const stub = githubStub({ issues: [trackingIssue()] });
     const result = await runOp(stub.exec, tempDir, {
       operation: "issue_update",
       number: 8,
-      kind: "task",
+      title: "更新後",
     });
     expect(result.ok).toBe(true);
     const read = await runOp(stub.exec, tempDir, { operation: "issue_read", number: 8 });
     expect(read.ok).toBe(true);
     if (read.ok && read.success.operation === "issue_read") {
-      expect(read.success.kind).toBe("task");
-      expect(read.success.trackingState).toBe("on-hold");
+      expect(read.success.title).toBe("更新後");
       expect(read.success.role).toBe("tracking");
-      expect(read.success.labels).toContain("priority");
-      expect(read.success.labels).not.toContain("agentdev-kind/risk");
+      expect(read.success.labels).toEqual(["tracking", "priority"]);
     }
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
-  test("(c) trackingState のみ更新で kind と通常ラベルが保持される", async () => {
+  test("(c) body のみ更新で role と通常ラベルが保持される", async () => {
     const tempDir = makeTempDir();
     const stub = githubStub({ issues: [trackingIssue()] });
     const result = await runOp(stub.exec, tempDir, {
       operation: "issue_update",
       number: 8,
-      trackingState: "ready",
+      body: "更新本文",
     });
     expect(result.ok).toBe(true);
     const read = await runOp(stub.exec, tempDir, { operation: "issue_read", number: 8 });
     expect(read.ok).toBe(true);
     if (read.ok && read.success.operation === "issue_read") {
-      expect(read.success.trackingState).toBe("ready");
-      expect(read.success.kind).toBe("risk");
+      expect(read.success.body).toBe("更新本文");
       expect(read.success.role).toBe("tracking");
-      expect(read.success.labels).toContain("priority");
+      expect(read.success.labels).toEqual(["tracking", "priority"]);
     }
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 });
 
 describe("CliRunner + engine: issue_reopen の状態遷移（TS-002）", () => {
-  test("クローズ済み追跡Issueは in-discussion へ遷移し kind と通常ラベルを保持する", async () => {
+  test("クローズ済み追跡Issueの reopen は role と通常ラベルを保持し状態ラベルを再付与しない", async () => {
     const tempDir = makeTempDir();
     const stub = githubStub({
       issues: [
@@ -1023,7 +983,6 @@ describe("CliRunner + engine: issue_reopen の状態遷移（TS-002）", () => {
           number: 9,
           state: "closed",
           state_reason: "completed",
-          labels: ["agentdev-tracking", "agentdev-kind/task", "agentdev-tracking-status/resolved", "priority"],
         }),
       ],
     });
@@ -1033,20 +992,12 @@ describe("CliRunner + engine: issue_reopen の状態遷移（TS-002）", () => {
     expect(read.ok).toBe(true);
     if (read.ok && read.success.operation === "issue_read") {
       expect(read.success.state).toBe("open");
-      expect(read.success.trackingState).toBe("in-discussion");
-      expect(read.success.kind).toBe("task");
-      expect(read.success.labels).toContain("priority");
-      expect(read.success.labels).toContain("agentdev-tracking-status/in-discussion");
-      expect(read.success.labels).not.toContain("agentdev-tracking-status/resolved");
+      expect(read.success.role).toBe("tracking");
+      expect(read.success.labels).toEqual(["tracking", "priority"]);
     }
     const patch = stub.patches.find((p) => p.path === "repos/owner/repo/issues/9");
     expect(patch?.body.state).toBe("open");
-    expect(patch?.body.labels).toEqual([
-      "agentdev-tracking",
-      "agentdev-kind/task",
-      "agentdev-tracking-status/in-discussion",
-      "priority",
-    ]);
+    expect(patch?.body.labels).toBeUndefined();
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
@@ -1056,7 +1007,7 @@ describe("CliRunner + engine: issue_reopen の状態遷移（TS-002）", () => {
       issues: [
         trackingIssue({
           number: 11,
-          labels: ["agentdev-tracking", "agentdev-kind/idea", "agentdev-tracking-status/in-discussion"],
+          labels: ["tracking", "priority"],
         }),
       ],
     });
@@ -1182,25 +1133,25 @@ describe("CliRunner + engine: 一覧完全性（TS-008 / TS-009）", () => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
-  test("issue_list は狭いフィルタ（kind）をサーバ側絞り込みクエリへ推送する", async () => {
+  test("issue_list は role フィルタ（tracking）をサーバ側絞り込みクエリへ推送する", async () => {
     const tempDir = makeTempDir();
     const stub = githubStub({
       issues: [
-        trackingIssue({ number: 1, labels: ["agentdev-tracking", "agentdev-kind/problem"] }),
-        trackingIssue({ number: 2, labels: ["agentdev-tracking", "agentdev-kind/risk"] }),
+        trackingIssue({ number: 1, labels: ["tracking"] }),
+        trackingIssue({ number: 2, labels: ["tracking"] }),
         { number: 3, title: "case", body: "B", state: "open", state_reason: null, labels: ["bug"] },
       ],
     });
     const result = await runOp(stub.exec, tempDir, {
       operation: "issue_list",
-      kind: "problem",
+      role: "tracking",
     });
     expect(result.ok).toBe(true);
     if (result.ok && result.success.operation === "issue_list") {
-      expect(result.success.issues.map((i) => i.number)).toEqual([issueNumber(1)]);
+      expect(result.success.issues.map((i) => i.number)).toEqual([issueNumber(1), issueNumber(2)]);
     }
     expect(
-      stub.requests.some((r) => r.includes("labels=agentdev-kind%2Fproblem")),
+      stub.requests.some((r) => r.includes("labels=tracking")),
     ).toBe(true);
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
@@ -1238,20 +1189,18 @@ describe("CliRunner + engine: issue_list の search サーバ側推送（REQ-011
         trackingIssue({
           number: 1,
           title: "issue_list search pushdown",
-          labels: ["agentdev-tracking", "agentdev-kind/problem", "agentdev-tracking-status/created"],
+          labels: ["tracking"],
         }),
         trackingIssue({
           number: 2,
           title: "無関係なタイトル",
-          labels: ["agentdev-tracking", "agentdev-kind/problem", "agentdev-tracking-status/created"],
+          labels: ["tracking"],
         }),
       ],
     });
     const result = await runOp(stub.exec, tempDir, {
       operation: "issue_list",
       role: "tracking",
-      kind: "problem",
-      trackingState: "created",
       state: "open",
       search: "pushdown",
     });
@@ -1268,9 +1217,7 @@ describe("CliRunner + engine: issue_list の search サーバ側推送（REQ-011
     expect(q).toContain("state:open");
     expect(q).toContain("pushdown");
     expect(q).toContain("in:title");
-    expect(q).toContain(`label:${kindToLabel("problem")}`);
-    expect(q).toContain("label:agentdev-tracking");
-    expect(q).toContain("label:agentdev-tracking-status/created");
+    expect(q).toContain("label:tracking");
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 

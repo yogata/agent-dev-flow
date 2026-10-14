@@ -47,9 +47,9 @@ Issue 本文、タイトルを書き込む操作（issue_create、issue_update�
 
 追跡Issue（role: tracking）の操作では、次の 3 規則を標準呼出形式に重ねて適用する。規則の正は `agentdev-issue-tracking` SKILL.md「Tool 呼出の 3 規則（tracking 軸限定）」節であり、本節は安全手続き側の適用形を定める（agentdev_gh 内部実装の変更は前提としない）。
 
-- **labels 省略**: `issue_create` は labels 必須（空配列も明示）。`issue_update` で labels を省略した場合、Tool は追跡軸（role、kind、状態）のラベルを維持する
+- **labels 省略**: `issue_create` は labels 必須（空配列も明示）。`issue_update` で labels を省略した場合、Tool は追跡軸（role）のラベルを維持する
 - **read-back 確認**: 書き込み系操作の成功応答は Tool 内部の読み戻し検証済みであり、成功応答をもって反映確認として扱う。機械的な同一内容の再読込を重複実行しない
-- **論理値指定**: role、kind、trackingState は Tool 操作契約の論理値で指定し、物理ラベル名を呼出側から指定しない
+- **論理値指定**: role は Tool 操作契約の論理値で指定し、物理ラベル名を呼出側から指定しない。kind と追跡Issue状態は本文標準構造の項目として本文へ表現する
 
 verification-incomplete（読み戻し検証失敗）時は、Tool は検証失敗として成功を返さない（fail-closed）。同一内容リトライ → 読み取り操作で現在状態を確認しての内容再生成 → 停止とユーザー報告、の順で復帰する（自動的な代替手段へ切替えない）。
 
@@ -58,7 +58,7 @@ verification-incomplete（読み戻し検証失敗）時は、Tool は検証失�
 `issue_list` 操作を Issue 検索に使う場合、次の 2 規律を標準呼出形式に重ねて適用する。規律の正は `agentdev-issue-tracking` Design「確定事項」の物理写像表（issue_list の labels 引数の規律）であり、本節は安全手続き側の適用形を定める。
 
 - **search 併用必須**: `issue_list` を closed 等の広範 filter で実行する場合、`search` 引数（冪等キー語、REQ 番号、topic_slug 等の絞り込みキー）を必ず併用する。広範 filter を `search` なしで実行すると、closed Case 群等の累積 population の増加により、Tool 完全一覧契約の安全ページ上限へ構造的に到達して operation-failed となる
-- **labels 引数は tracking 論理値専用（規律と受理能力の区別）**: `labels` 引数は ADF 呼出側の使用規律として追跡Issue論理軸（role、kind、trackingState）の物理マッピング入力に用いる。Tool の受理能力としては、Case 物理ラベル名（enhancement、bug、docs 等の通常ラベル）を `labels` 引数へ指定した絞り込みも有効であり（クライアント再フィルタ）、0 件帰着や無効にはならない。Case Issue は role: case と機械判定されるため、通常ラベルでは Case Issue を論理軸で絞り込めない。受理能力の存在は ADF 呼出側の使用規律の解禁を意味せず、新たな拒否機構も設けられていない。Case Issue の絞り込みは `labels` 引数を使用せず、`search` 引数と state の組み合わせで行う
+- **labels 引数は tracking 論理値専用（規律と受理能力の区別）**: `labels` 引数は ADF 呼出側の使用規律として追跡Issue論理軸（role）の物理マッピング入力に用いる。Tool の受理能力としては、Case 物理ラベル名（enhancement、bug、docs 等の通常ラベル）を `labels` 引数へ指定した絞り込みも有効であり（クライアント再フィルタ）、0 件帰着や無効にはならない。Case Issue は role: case と機械判定されるため、通常ラベルでは Case Issue を論理軸で絞り込めない。受理能力の存在は ADF 呼出側の使用規律の解禁を意味せず、新たな拒否機構も設けられていない。Case Issue の絞り込みは `labels` 引数を使用せず、`search` 引数と state の組み合わせで行う
 
 ### search トークンの選択性指針
 
@@ -109,7 +109,7 @@ closed 等の広範囲な population を実測する場合は、`search` なし�
 
 ### issue_update の引数制約
 
-- `issue_update` は `role` を受理しない（`unknown-field` 失敗）。`role` の設定は `issue_create` 専用であり、`issue_update` は tracking 操作として `kind` と非終端の `trackingState` を受理する。`trackingState` への終端値 `closed` の指定は失敗し、クローズは `issue_close` を使用する。`kind` と `trackingState` は追跡Issue（role: tracking）にのみ適用され、Case Issue への指定は失敗する。`issue_update` で `labels` を省略した場合は追跡軸の現行値が維持される
+- `issue_update` は `role` を受理しない（`unknown-field` 失敗）。`role` の設定は `issue_create` 専用である。kind と trackingState も Tool 操作契約から削減済みであり、`unknown-field` 失敗となる（本文標準構造への集約。追跡Issue状態の遷移は本文の状態保持節の更新として呼出側が行い、Tool は機械適用しない）。`issue_update` で `labels` を省略した場合は追跡軸（role）の現行値が維持される
 - `invalid-input`（`unknown-field`）の構造化失敗は同一引数で再試行せず、不正な引数を修正してから再実行する
 
 ## 操作・role 別の受理フィールド対応表
@@ -119,10 +119,10 @@ closed 等の広範囲な population を実測する場合は、`search` なし�
 | フィールド | issue_create | issue_update | issue_list | 備考 |
 |---|---|---|---|---|
 | `role` | 受理（tracking / case） | **不受理**（unknown-field 失敗） | 受理（絞り込み論理軸） | role の設定は起票時のみ。既存 Issue の role は変更しない |
-| `kind` | `role: tracking` のとき受理（それ以外は `kind requires role 'tracking'` 失敗） | 受理（tracking 操作。Case Issue への適用は失敗） | 受理（tracking 軸絞り込み） | `role: case`（Case Issue）では kind は導出されない |
-| `trackingState` | **不受理**（unknown-field 失敗。起票時の状態指定は不可） | 受理（非終端状態のみ。終端値 `closed` は `issue_close` を使用） | 受理（tracking 軸絞り込み） | Case Issue（role: case）には適用されない |
-| `labels` | 必須（空配列も明示） | 省略時は追跡軸ラベル維持 | tracking 論理軸写像入力専用 | Case Issue の work_type（maintenance 等）を通常ラベル（物理ラベル）として `labels` へ指定できる運用は任意であり、付与義務と起票時の既定付与は設けない |
-| `role` と `kind` の同時指定 | tracking のとき可 | 不可（`role` が不受理のため） | 可（tracking 軸） | `role: case` と `kind` の同時指定は起票失敗の代表例である |
+| `kind` | **不受理**（unknown-field 失敗。本文標準構造の kind 項目として本文へ表現する） | **不受理**（unknown-field 失敗） | **不受理**（unknown-field 失敗） | kind の Tool 操作契約上の受理・導出・絞り込みは削減済み |
+| `trackingState` | **不受理**（unknown-field 失敗。起票時の状態は本文標準構造の状態保持節の初期値 起票 として本文へ生成する） | **不受理**（unknown-field 失敗。状態遷移は本文の状態保持節の更新として呼出側が行う。クローズは `issue_close` を使用） | **不受理**（unknown-field 失敗） | 追跡Issue状態の Tool 機械適用は廃止済み |
+| `labels` | 必須（空配列も明示） | 省略時は追跡軸（role）ラベル維持 | tracking 論理軸写像入力専用 | Case Issue の work_type（maintenance 等）を通常ラベル（物理ラベル）として `labels` へ指定できる運用は任意であり、付与義務と起票時の既定付与は設けない |
+| `role` と `labels` の同時指定 | tracking のとき可 | 不可（`role` が不受理のため） | 可（tracking 軸） | `role: case` と `labels` の組み合わせは起票時に Case Issue の work_type を指定する形として受理される |
 
 ## gh CLI 読取補完の規律（ラベルなし列挙＋タイトル・本文確認）
 

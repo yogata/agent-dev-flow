@@ -58,7 +58,7 @@ async function run(issuesDir: string, request: GhRunnerRequest) {
 }
 
 describe("TS-004 既存資産の読み書き（追加変換なし）", () => {
-  test("現行スキーマの tracking 資産は role/kind/trackingState/state を導出され、更新で本文・コメント実体が不変", async () => {
+  test("現行スキーマの tracking 資産は role/state を導出され、更新で本文・コメント実体が不変", async () => {
     const issuesDir = makeIssuesDir();
     const original = [
       fmText({ id: "issue-0007", title: "既存追跡", status: "in-discussion", labels: ["task"], comment_seq: 2 }),
@@ -85,8 +85,6 @@ describe("TS-004 既存資産の読み書き（追加変換なし）", () => {
       const p = read.payload as Record<string, unknown>;
       expect(p.title).toBe("既存追跡");
       expect(p.role).toBe("tracking");
-      expect(p.kind).toBe("task");
-      expect(p.trackingState).toBe("in-discussion");
       expect(p.state).toBe("open");
       expect(p.body).toBe(original);
     }
@@ -189,14 +187,14 @@ describe("TS-004 採番空間の維持", () => {
 });
 
 describe("TS-004 状態写像の逸脱なし（tracking 6 状態）", () => {
-  test("tracking の status 値域 6 状態は issue_read の trackingState と GitHub 三段写像へ逸脱なく導出される", async () => {
-    const states: { status: string; expectedTrackingState: string; expectedState: string; closedAt: string }[] = [
-      { status: "created", expectedTrackingState: "created", expectedState: "open", closedAt: "" },
-      { status: "in-discussion", expectedTrackingState: "in-discussion", expectedState: "open", closedAt: "" },
-      { status: "on-hold", expectedTrackingState: "on-hold", expectedState: "open", closedAt: "" },
-      { status: "ready", expectedTrackingState: "ready", expectedState: "open", closedAt: "" },
-      { status: "resolved", expectedTrackingState: "resolved", expectedState: "open", closedAt: "" },
-      { status: "closed", expectedTrackingState: "closed", expectedState: "closed", closedAt: "2026-09-03T09:00:00+09:00" },
+  test("tracking の status 値域 6 状態は issue_read の state 三段写像へ逸脱なく導出される", async () => {
+    const states: { status: string; expectedState: string; closedAt: string }[] = [
+      { status: "created", expectedState: "open", closedAt: "" },
+      { status: "in-discussion", expectedState: "open", closedAt: "" },
+      { status: "on-hold", expectedState: "open", closedAt: "" },
+      { status: "ready", expectedState: "open", closedAt: "" },
+      { status: "resolved", expectedState: "open", closedAt: "" },
+      { status: "closed", expectedState: "closed", closedAt: "2026-09-03T09:00:00+09:00" },
     ];
     const issuesDir = makeIssuesDir();
     for (const [i, s] of states.entries()) {
@@ -219,7 +217,6 @@ describe("TS-004 状態写像の逸脱なし（tracking 6 状態）", () => {
       expect(read.ok).toBe(true);
       if (read.ok) {
         const p = read.payload as Record<string, unknown>;
-        expect(p.trackingState).toBe(s.expectedTrackingState);
         expect(p.state).toBe(s.expectedState);
       }
     }
