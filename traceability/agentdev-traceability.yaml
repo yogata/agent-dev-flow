@@ -101,6 +101,9 @@ verification:
     - REQ-096-031
     - REQ-103-024
     - REQ-103-025
+    - REQ-112-001
+    - REQ-112-002
+    - REQ-112-003
   .opencode/skills/repo-agentdev-integrity/scripts/tests/traceability_relied_diff.test.ts:
     - REQ-106-001
     - REQ-106-002

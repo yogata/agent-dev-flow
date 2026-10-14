@@ -11,6 +11,7 @@ updated: 2026-10-13
 <!-- ADF-COVERS(implementation): REQ-050-001, REQ-050-002, REQ-050-003, REQ-050-004, REQ-050-005, REQ-050-006, REQ-050-007, REQ-050-008, REQ-050-010, REQ-050-013 -->
 <!-- ADF-COVERS(implementation): REQ-052-007（scripts/consumer/archive/install.ps1、scripts/install.ps1 の宣言を docs 正規配置先へ移管） -->
 <!-- ADF-COVERS(implementation): REQ-029-012, REQ-029-013（textlint guard 依存実体の版固定情報解決と 3rd-party 依存の通知） -->
+<!-- ADF-COVERS(implementation): REQ-112-001, REQ-112-002, REQ-112-003（local ツール package の tsconfig 参照共有と typecheck 検査契約節が implementation 実体） -->
 <!-- ADF-COVERS(design): REQ-029-012, REQ-029-013（本体リポジトリ sync 節と 3rd-party 依存の通知小節が design 実体） -->
 <!-- 注: install/self-sync 各 ps1（scripts/）は走査対象拡張子外のため、導入器実装行の宣言は本 Design（正規仕様所有者）へ配置。実装実体は scripts/install.ps1、scripts/self-sync.ps1（内部処理は scripts/consumer/、scripts/self/ 配下） -->
 <!-- ADF-COVERS(design): REQ-002-047 -->
