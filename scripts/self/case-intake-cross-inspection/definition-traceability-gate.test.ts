@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { consumeDefinitionTraceability } from "../lib/definition-traceability-gate";
+import { consumeDefinitionTraceability } from "../../../src/common/skills/agentdev-workflow-case-open/scripts/lib/definition-traceability-gate.ts";
 
 const CHECK_KINDS = [
   "malformed-declarations",
