@@ -100,6 +100,9 @@ about: テスト
 | test |
 `;
 
+// spawnSync で子プロセスを起動するテストは、suite 並列負荷下で子プロセス起動が既定 5 秒の
+// テスト timeout を超え kill され stdout 空となり得るため、全テストへ明示 timeout を設定する
+// （check_integrity.test.ts IR-055 回帰の DEL-3590-2 差し戻し修正と同一方式・検証内容の変更なし）。
 function runScript(
   args: string[],
   cwd?: string,
@@ -165,7 +168,7 @@ describe("check_templates.ts", () => {
     it("exits with code 0", () => {
       const result = runScript(["--help"]);
       expect(result.exitCode).toBe(0);
-    });
+    }, 60000);
 
     it("stdout contains usage information", () => {
       const result = runScript(["--help"]);
@@ -174,19 +177,19 @@ describe("check_templates.ts", () => {
       expect(result.stdout).toContain("--help");
       expect(result.stdout).toContain("--json");
       expect(result.stdout).toContain("--dry-run");
-    });
+    }, 60000);
   });
 
   describe("--dry-run flag", () => {
     it("exits with code 0 using existing worktree templates", () => {
       const result = runScript(["--dry-run"]);
       expect(result.exitCode).toBe(0);
-    });
+    }, 60000);
 
     it("produces markdown output by default", () => {
       const result = runScript(["--dry-run"]);
       expect(result.stdout).toContain("check_templates Report");
-    });
+    }, 60000);
   });
 
   describe("--json flag", () => {
@@ -205,7 +208,7 @@ describe("check_templates.ts", () => {
       expect(parsed.summary).toHaveProperty("ng");
       expect(parsed.summary).toHaveProperty("warning");
       expect(parsed.summary).toHaveProperty("info");
-    });
+    }, 60000);
   });
 
   describe("valid template directory", () => {
@@ -232,7 +235,7 @@ describe("check_templates.ts", () => {
           r.check === "Unresolved placeholders" && r.level === "ng",
       );
       expect(placeholderNg).toBeUndefined();
-    });
+    }, 60000);
   });
 
   describe("missing frontmatter", () => {
@@ -254,7 +257,7 @@ describe("check_templates.ts", () => {
           r.message.includes("Missing frontmatter"),
       );
       expect(frontmatterNg).toBeDefined();
-    });
+    }, 60000);
   });
 
   describe("bad naming convention", () => {
@@ -272,7 +275,7 @@ describe("check_templates.ts", () => {
           r.message.includes("does not match known naming pattern"),
       );
       expect(namingWarn).toBeDefined();
-    });
+    }, 60000);
   });
 
   describe("unresolved placeholders", () => {
@@ -292,7 +295,7 @@ describe("check_templates.ts", () => {
           r.check === "Unresolved placeholders" && r.level === "ng",
       );
       expect(placeholderNg.length).toBeGreaterThan(0);
-    });
+    }, 60000);
   });
 
   describe("table structure mismatch", () => {
@@ -314,7 +317,7 @@ describe("check_templates.ts", () => {
           r.message.includes("column mismatch"),
       );
       expect(tableNg).toBeDefined();
-    });
+    }, 60000);
   });
 
   describe("exit codes", () => {
@@ -330,7 +333,7 @@ describe("check_templates.ts", () => {
 
       const result = runScript([], TEMP_ROOT);
       expect(result.exitCode).toBe(2);
-    });
+    }, 60000);
 
     it("returns exit code 1 when issues are detected", () => {
       const templatesDir = setupFixtureDir();
@@ -342,7 +345,7 @@ describe("check_templates.ts", () => {
 
       const result = runScript([], TEMP_ROOT);
       expect(result.exitCode).toBe(1);
-    });
+    }, 60000);
   });
 
   describe("worktree hollowing skip (junction 未伝播, REQ-018)", () => {
@@ -391,7 +394,7 @@ describe("check_templates.ts", () => {
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain("worktree");
       expect(result.stdout).toContain("skip");
-    });
+    }, 60000);
 
     it("emits a valid JSON report in skip mode", () => {
       const result = runScript(["--json"], SKIP_TEMP_ROOT);
@@ -401,6 +404,6 @@ describe("check_templates.ts", () => {
       expect(parsed.scanned.templates).toBe(0);
       expect(parsed.summary.warning).toBe(1);
       expect(parsed.results.length).toBe(1);
-    });
+    }, 60000);
   });
 });

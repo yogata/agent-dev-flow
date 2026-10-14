@@ -11,6 +11,7 @@
 // - 自然言語操作入口の網羅（11 操作種別）と GitHub 実装詳細の非要求
 
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
+import { spawnSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import {
@@ -557,7 +558,19 @@ describe("ローカルIssueの role 条件付きスキーマ（単一採番空�
   });
 
   it("マージ結果セクションへの記録と blocked 更新が同一契約で構成できる", async () => {
-    const issuesDir = makeIssuesDir();
+    // ローカル版 pr_merge は commitHash 必須（実在 VERIFY 含む）ため、
+    // 実運用構造（<repoRoot>/.agentdev/issues/）の一時 git リポジトリで実在コミットを準備する。
+    const root = fs.mkdtempSync(path.join(SCRATCH, "git-"));
+    fs.mkdirSync(path.join(root, ".agentdev", "issues"), { recursive: true });
+    const git = (args: string[]): string => {
+      const r = spawnSync("git", args, { cwd: root, encoding: "utf8" });
+      if (r.status !== 0) throw new Error(`git ${args.join(" ")} failed: ${r.stderr}`);
+      return typeof r.stdout === "string" ? r.stdout.trim() : "";
+    };
+    git(["init"]);
+    git(["-c", "user.name=t", "-c", "user.email=t@example.com", "commit", "--allow-empty", "-m", "init"]);
+    const commitHash = git(["rev-parse", "HEAD"]);
+    const issuesDir = path.join(root, ".agentdev", "issues");
     const env = localEnv(issuesDir);
     await runAgentdevGhOperation(env, {
       operation: "issue_create",
@@ -577,6 +590,7 @@ describe("ローカルIssueの role 条件付きスキーマ（単一採番空�
       operation: "pr_merge",
       number: 1,
       method: "squash",
+      commitHash,
     });
     expect(merged.ok).toBe(true);
     const raw = fs.readFileSync(path.join(issuesDir, "issue-0001.md"), "utf8");
