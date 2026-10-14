@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261014T102341Z-9f1d",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0224・RU-0225 既存REQ照合（docs-check 正常化・bun test 全テスト正常化）",
+  "sourceRevision": "9115bbedd8bfa560608dc74ddfc74403ccf14bb1",
+  "durationMs": 2403,
+  "inputTokens": 1895,
+  "inputs": {
+    "requestDigest": "229cfb651a25668b2d957052e80a278c82f952c2cca620fe5f5fa20bdb66441c",
+    "references": [
+      {
+        "label": "RU-0224",
+        "path": ".agentdev/backlog/req-units/RU-0224.md",
+        "digest": "d77a0d5432aeb2addb060e3f665458989f2d1887dbf81166a8f825c1a1cfd510"
+      },
+      {
+        "label": "RU-0225",
+        "path": ".agentdev/backlog/req-units/RU-0225.md",
+        "digest": "d1fb167ab7685ef266e47fad6382169d28272613129ac43cf69043c940b7ca8e"
+      },
+      {
+        "label": "REQ-010",
+        "path": "docs/requirements/REQ-010.md",
+        "digest": "85f33f5db5926436048bb8e67a4a3c8a1592563c75f1f99bc05ad4f4098cd486"
+      },
+      {
+        "label": "REQ-060",
+        "path": "docs/requirements/REQ-060.md",
+        "digest": "d95f218331d92e6d8f9bcea940e067e98153dca5fee66ac638f3212b6f01e2f7"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-ru0224-attribution",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0.04,
+        "REQ操作なし": 0.96
+      }
+    },
+    {
+      "questionId": "q2-ru0224-confirmation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.1,
+        "false": 0.9
+      }
+    },
+    {
+      "questionId": "q3-ru0225-attribution",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0.01,
+        "REQ操作なし": 0.99
+      }
+    },
+    {
+      "questionId": "q4-ru0225-confirmation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.24,
+        "false": 0.76
+      }
+    }
+  ],
+  "confidence": 0.95,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-ru0224-attribution",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q2-ru0224-confirmation",
+        "value": false
+      },
+      {
+        "questionId": "q3-ru0225-attribution",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q4-ru0225-confirmation",
+        "value": false
+      }
+    ]
+  }
+}
