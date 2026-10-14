@@ -512,3 +512,83 @@
 - **想定反映先**: agentdev-workflow-case-open references/definition-pr-and-idempotency.md の STEP-4 冪等再実行手順、prepare_definition_pr.ts の validateInput。learning-promote での判断
 - **関連**: Case #3710、src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts
 - **タグ**: `#case-open` `#機械工程` `#冪等再実行` `#入力重複`
+
+## close_mechanical_steps の integrityGates に bun test を渡す場合 GateCommandSpec の bash ラップで分離退避が成立するが timeoutMs はリトライ込み所要で設定する
+
+- **問題事象**: case-close（Case #3718）の pre-merge 機械工程で、integrityGates の bun test を bash -c ラップ（stdout/stderr を `>` `2>` で分離退避）で渡したところ、flaky 由来のリトライ構成（1 回目 fail → 2 回目再実行）の gate 全体所要が約 678 秒となり、spawnSync の timeoutMs 600000 を超過。spawnSync が status=null を返し script 側 `exitCode: result.status ?? 1` で fail 扱いになった（2 回目の bun test 自体は 0 fail で成功していた）
+- **発生局面**: case-close 実行時の機械工程・入力仕様
+- **検知方法**: 報告 JSON の full-integrity-suite step が exit 1 だが、退避ファイル（リトライ先の stderr log）には 2909 pass / 0 fail が記録済みで結果が矛盾
+- **根本原因**: bash -c ラップの gate 所要は bun test 実行 + sleep + リトライ実行の合計であり、timeoutMs を単一 bun test 実行の所要（実測 ~350 秒）で見積もった
+- **自律対応内容**: split1 gate の timeoutMs を 1200000（リトライ込み上限）へ変更し再実行、全 step pass・exitCategory success で収束
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: close_mechanical_steps.ts に bash ラップ gate を渡す全実行。timeoutMs は gate コマンド全体（ラップ内の全処理）の所要に対して設定する
+- **再発条件**: bash -c ラップ内で複数回の bun test 実行（リトライ構成）を行い、timeoutMs を単一実行分で設定した場合
+- **予防策候補**: リトライ構成の gate では所要上限 = 単一実行実測 × (1 + リトライ回数) + 余裕で timeoutMs を算出する指針を reference へ追記。learning-promote での判断
+- **想定反映先**: agentdev-workflow-case-close references/docs-and-design-promotion.md の checker 実行手順。learning-promote での判断
+- **関連**: Case #3718、src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts
+- **タグ**: `#bun-test` `#証跡` `#機械工程` `#timeout`
+
+## bash pipe 経由の checker 実行で $? を見ると pipe の最後のコマンドの終了コードになる
+
+- **問題事象**: case-close（Case #3718）で traceability check を `bun check.ts --root . 2>&1 | tail -5; echo "exit=$?"` で実行したところ `exit=0` を観測したが、実際には check は exit 2（corpus の missing 系 findings）だった。`$?` は pipe の最後のコマンド tail の終了コードであり bun の終了コードではなかった
+- **発生局面**: case-close 実行時の検証実行
+- **検知方法**: script（spawnSync）経由の同一 check が exit 2 を返したこととの矛盾を、pipe を使わない再実行で確認
+- **根本原因**: bash の pipe では `$?` が最後のコマンドの終了コードになる（PIPESTATUS を見ない限り各コマンドの終了コードは伝播しない）
+- **自律対応内容**: pipe を使わない直接実行で exit code を再確認し、以後の checker 実行は spawnSync 直接実行（status/stdout/stderr 分離取得）に統一
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: bash で checker を実行して合否判定する全工程。exit code を根拠にする実行は pipe を経由させない
+- **再発条件**: `cmd | head/tail; echo $?` 形式で checker を実行して exit を読んだ場合
+- **予防策候補**: checker 実行の証跡形式（spawnSync + fs.writeFileSync 分離退避）を標準とする規律の再確認。learning-promote での判断
+- **想定反映先**: checker 実行契約の手順接続節（docs-and-design-promotion.md）。learning-promote での判断
+- **関連**: Case #3718、docs/knowledge/checker-cli-stdout-loss-on-windows-bun.md
+- **タグ**: `#bash` `#checker` `#exit-code` `#検証実行`
+
+## worktree で spawnSync 型テストの既定 5 秒 timeout が suite 並列負荷下で再発する（3 事例目・check_test_impact と gate.test）
+
+- **問題事象**: Case #3718 の bun test 3 分割実行で、check_test_impact.test.ts と agentdev-textlint-guard gate.test.ts の spawnSync 型テストが `this test timed out after 5000ms` で fail（実測 5234〜6266ms）。同一 HEAD での単独再実行は全て PASS、フル再実行では fail テストが入れ替わる非決定的状態依存 fail。PR #3720 で修復した check_templates の障害モードと同一系統
+- **発生局面**: case-run / case-close 実行時のテスト実行
+- **検知方法**: 分割実行の stderr 退避ファイルの `(fail)` 行と `timed out after 5000ms` 表記、fail テストの入れ替わり
+- **根本原因**: spawnSync で子プロセスを起動するテストの既定 timeout 5 秒は、suite 並列負荷下のファイル IO・プロセス起動遅延で容易に超過する。テスト資産側に明示 timeout がない
+- **自律対応内容**: 単独再実行 PASS・フル再実行（リトライ）0 fail で由来分類（pre-existing・再現性不安定）を確定し、マージ後 main 再実行でも同手順で 0 fail 証跡を取得
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（checker 実行契約 Design への追記候補は Design 確定候補として見送り記録済み。対応記録コメント検証差分参照）
+- **横展開観点**: spawnSync 型テストを持つ全テスト資産。check_test_impact.test.ts・gate.test.ts は明示 timeout 追加の修正対象候補
+- **再発条件**: suite 並列負荷下で spawnSync 型テストを実行した場合
+- **予防策候補**: spawnSync 型テストへの明示 timeout 60 秒追加（DEL-3590-2・#3718 check_templates の前例と同一方式）。learning-promote での判断
+- **想定反映先**: checker 実行契約 Design「実行系の実機制約（node/bun）」節（Design 追記候補）。learning-promote での判断
+- **関連**: Case #3718、PR #3720 本文 learning 2 件目、DEL-3590-2 前例
+- **タグ**: `#bun-test` `#spawn-sync` `#再現性不安定` `#timeout`
+
+## Windows の spawnSync で証跡退避ランナー等を動かす場合 MSYS 由来の POSIX 形式 cwd は uv_spawn が ENOENT で失敗する
+
+- **問題事象**: Case #3718（DEL-3718-1）で、Windows 環境の spawnSync を使う証跡退避ランナー等に MSYS bash 由来の POSIX 形式 cwd（`/c/...`）を渡すと `uv_spawn` が ENOENT で失敗した。PATH 経由の実行可能ファイル解決自体は cwd が正しければ機能する
+- **発生局面**: case-run 実行時の検証実行（Windows）
+- **検知方法**: spawnSync の ENOENT エラーと、同一コマンドの Windows ネイティブパス渡しでの成功
+- **根本原因**: Windows の uv_spawn は POSIX 形式パスを実在ディレクトリとして解決できない
+- **自律対応内容**: cwd を Windows ネイティブパスへ変換して実行し証跡退避を成立させた
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: Windows + MSYS bash 環境で spawnSync を使う検証ランナー・機械工程全般
+- **再発条件**: bash セッション由来の `/c/...` 形式パスを spawnSync の cwd に渡した場合
+- **予防策候補**: spawnSync への cwd 渡しは Windows ネイティブパスへ正規化する前置を入れる。learning-promote での判断
+- **想定反映先**: checker 実行契約の手順接続、windows-checker-msys-path 関連知識。learning-promote での判断
+- **関連**: Case #3718、PR #3720 本文 learning 1 件目、docs/knowledge/windows-checker-msys-path-argument.md
+- **タグ**: `#windows` `#spawn-sync` `#msys` `#証跡`
+
+## worktree での package 単位 bun install は bun.lock 未存在 package で lockfile を新規生成する副作用がある
+
+- **問題事象**: Case #3718（DEL-3718-1）の worktree 依存整備で、package 単位 `bun install` を実行した際、bun.lock が存在しない package では bun.lock が新規生成された（git 管理対象外の新規 untracked として出現）
+- **発生局面**: case-run 実行時の依存整備（worktree）
+- **検知方法**: 整備後の `git status` 確認で bun.lock の新規出現を検出
+- **根本原因**: bun install は bun.lock 未存在時に lockfile を生成するのが既定動作。整備手段の副作用として無条件に発生する
+- **自律対応内容**: 整備後の `git status` 確認と不要 lockfile の復元（削除）を実施
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree で bun install を実行する全工程（case-run 依存整備、検証前置）
+- **再発条件**: bun.lock 未存在の package 境界で worktree 内 bun install を実行した場合
+- **予防策候補**: 依存整備手順に「整備後 git status で lockfile 新規生成を確認し不要なら復元」を前置として明記。learning-promote での判断
+- **想定反映先**: agentdev-git-worktree references の bun test 実行環境前提節。learning-promote での判断
+- **関連**: Case #3718、PR #3720 本文 learning 3 件目、main root `src/senpi/tools/agentdev-gh-tool/bun.lock`（untracked 残存の同型事例）
+- **タグ**: `#bun` `#worktree` `#依存整備` `#lockfile`
