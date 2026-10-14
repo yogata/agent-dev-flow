@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261014T105654Z-1b61",
+  "workflow": "case-ready",
+  "evaluationKind": "standard-or-epic-attribution",
+  "subject": "Case #3717 実行構成判断（operation_units OU-001〜002 の依存グラフと3軸判断）",
+  "sourceRevision": "33f070da6f49dbdeef753ceedc6f6a5eaae24b98",
+  "durationMs": 1579,
+  "inputTokens": 1890,
+  "inputs": {
+    "requestDigest": "f5b2d3eea111c89abbd5aa31950daba932c6277843109bb59fafbe0f3d0cbd25",
+    "references": [
+      {
+        "label": "draft-data（operation_units・case_open_hints 原本）",
+        "path": ".agentdev/drafts/req-draft-docs-check-and-bun-test-normalization.md",
+        "digest": "4d46dedb8b46693ea063d2acac1ffcf94a5e02991bee915908efde4d4e486f84"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-attribution",
+      "questionForm": "choice",
+      "value": "Epic（Child Issue と Wave / 依存構造を作成する）",
+      "probabilityDistribution": {
+        "Standard（Root Case 自身を単一 execution unit とし Child Issue を作成しない）": 0.03,
+        "Epic（Child Issue と Wave / 依存構造を作成する）": 0.97
+      }
+    },
+    {
+      "questionId": "q2-dependency-strength",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "関連（同じ領域だが実行依存なし）": 0,
+        "弱（実行順序の推奨はあるが並列可）": 0.12,
+        "必須（一方が他方なしでは成立しない）": 0.88
+      }
+    },
+    {
+      "questionId": "q3-functional-coherence",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "分散（共通主題なし）": 0.01,
+        "部分的（関連するが単一主題ではない）": 0.9,
+        "一貫（単一の機能的主題）": 0.09
+      }
+    }
+  ],
+  "confidence": 0.94,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-attribution",
+        "value": "Epic（Child Issue と Wave / 依存構造を作成する）"
+      },
+      {
+        "questionId": "q2-dependency-strength",
+        "value": 2
+      },
+      {
+        "questionId": "q3-functional-coherence",
+        "value": 1
+      }
+    ]
+  }
+}
