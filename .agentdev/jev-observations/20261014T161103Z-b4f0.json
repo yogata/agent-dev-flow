@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261014T161103Z-b4f0",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0226 QG-4 最終受入規範と case-close 機械工程の整合（既存REQ照合）",
+  "sourceRevision": "0d9c9055ab228bd94206d9171af4af1041cb9403",
+  "durationMs": 1785,
+  "inputTokens": 1759,
+  "inputs": {
+    "requestDigest": "13b1c0975ccd562a14cf765c451b380586f1c13ef287469ba07f1786e1976afb",
+    "references": [
+      {
+        "digest": "ee82e708b5623f351552283ab20099290c182bc726a762d6233d86c31f3b0244",
+        "label": "RU-0226",
+        "path": ".agentdev/backlog/req-units/RU-0226.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-ru0226-attribution",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0.02,
+        "APPEND": 0.97,
+        "UPDATE": 0.01,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "q2-ru0226-confirmation",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.65,
+        "false": 0.35
+      }
+    }
+  ],
+  "confidence": 0.96,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-ru0226-attribution",
+        "value": "APPEND"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "q2-ru0226-confirmation",
+        "value": false
+      }
+    ]
+  }
+}

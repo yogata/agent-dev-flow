@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261014T161235Z-10ae",
+  "workflow": "req-define",
+  "evaluationKind": "final-classification-design-separation",
+  "subject": "RU-0226 QG-4 最終受入規範と case-close 機械工程の整合（最終分類・Design分離）",
+  "sourceRevision": "0d9c9055ab228bd94206d9171af4af1041cb9403",
+  "durationMs": 1223,
+  "inputTokens": 2154,
+  "inputs": {
+    "requestDigest": "0c4e597ee88b400c4f8d076be8caa4c2b04b00eea898ffc356452f6a9dfe11c2",
+    "references": [
+      {
+        "digest": "ee82e708b5623f351552283ab20099290c182bc726a762d6233d86c31f3b0244",
+        "label": "RU-0226",
+        "path": ".agentdev/backlog/req-units/RU-0226.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-class-ru0226-invariant",
+      "questionForm": "choice",
+      "value": "REQ 行（既存 REQ への帰属）",
+      "probabilityDistribution": {
+        "REQ 行（既存 REQ への帰属）": 1,
+        "Design 行（Design 保存へ帰属）": 0,
+        "REQ操作なし（実現面のみ）": 0
+      }
+    },
+    {
+      "questionId": "q-class-ru0226-correspondence",
+      "questionForm": "choice",
+      "value": "Design 行（Design 保存へ帰属）",
+      "probabilityDistribution": {
+        "REQ 行（既存 REQ への帰属）": 0,
+        "Design 行（Design 保存へ帰属）": 1,
+        "REQ操作なし（実現面のみ）": 0
+      }
+    },
+    {
+      "questionId": "q-class-ru0226-realization",
+      "questionForm": "choice",
+      "value": "REQ操作なし（実現面のみ）",
+      "probabilityDistribution": {
+        "REQ 行（既存 REQ への帰属）": 0,
+        "Design 行（Design 保存へ帰属）": 0,
+        "REQ操作なし（実現面のみ）": 1
+      }
+    },
+    {
+      "questionId": "q-sep-ru0226-invariant",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.11,
+        "false": 0.89
+      }
+    },
+    {
+      "questionId": "q-sep-ru0226-correspondence",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.96,
+        "false": 0.040000000000000036
+      }
+    },
+    {
+      "questionId": "q-sep-ru0226-realization",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.07,
+        "false": 0.9299999999999999
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-class-ru0226-invariant",
+        "value": "REQ 行（既存 REQ への帰属）"
+      },
+      {
+        "questionId": "q-class-ru0226-correspondence",
+        "value": "Design 行（Design 保存へ帰属）"
+      },
+      {
+        "questionId": "q-class-ru0226-realization",
+        "value": "REQ操作なし（実現面のみ）"
+      },
+      {
+        "questionId": "q-sep-ru0226-invariant",
+        "value": false
+      },
+      {
+        "questionId": "q-sep-ru0226-correspondence",
+        "value": true
+      },
+      {
+        "questionId": "q-sep-ru0226-realization",
+        "value": false
+      }
+    ]
+  }
+}
