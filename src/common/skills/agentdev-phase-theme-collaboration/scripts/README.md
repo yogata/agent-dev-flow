@@ -83,7 +83,7 @@ bun src/received.ts --dir <received-dir> [--theme <THEME-NNN>]
 ```yaml
 ---
 receivedAt: 2026-10-13T09:00:00Z
-theme: THEME-001
+theme: THEME-NNN
 purpose: "持出し時の目的"
 question: "持出し時の問い"
 references: ["docs/designs/..."]
@@ -97,7 +97,7 @@ references: ["docs/designs/..."]
 ## テストと型検査
 
 ```bash
-# repo root 起 cwd で実行（REQ-060 の実行形態）
+# repo root 起 cwd で実行
 bun test ./src/common/skills/agentdev-phase-theme-collaboration/scripts/tests/
 
 # 型検査（本ディレクトリを cwd として実行）
