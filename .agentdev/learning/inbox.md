@@ -380,3 +380,71 @@
 - **想定反映先**: case-open / case-run reference（対応宣言作成手順）または agentdev-traceability reference（集約規則への参照導線）。learning-promote での判断
 - **関連**: .agentdev/learning/inbox.md、Case #3681、PR #3708、traceability/agentdev-traceability.yaml、docs/requirements/REQ-112.md
 - **タグ**: `#case-run` `#traceability` `#対応宣言` `#集約規則`
+
+
+## bun test 分割① の既存 fail 2 件（IR-055・ローカルIssue pr_merge テスト）は baseline 既存欠陥で別単位追跡が必要
+
+- **問題事象**: bun test 分割①（integrity suite）の IR-055 runtime-unresolved-reference 実修復回帰テストと、ローカルIssue role 条件付きスキーマの pr_merge テスト（issue_tracking_list.test.ts）が常時 fail する。baseline（origin/main f6a842da）でも同一 fail 名が再現する既存欠陥である。case-close 独立再検査（Case #3674）で単独再実行（188 pass / 1 fail・21 pass / 1 fail）と baseline 再現確認の両方で安定再現を確認した
+- **発生局面**: 検証（bun test フル suite 実行。Case #3674 / PR #3697）
+- **検知方法**: bun test 分割① 実行の fail（2907 pass / 2 fail）。単独再実行と baseline detached worktree 再現確認で由来分類
+- **根本原因**: baseline commit 時点から存在する既存欠陥。IR-055 は delta from baseline 違反 4 件の実修復回帰、pr_merge テストは runAgentdevGhOperation の pr_merge で ok=false となる実装不整合
+- **自律対応内容**: fail 全件の由来分類で pre-existing と分類し、baseline detached worktree での同一 fail 名再現で裏付けた。修復は本 Case の完了条件から除外し、追跡Issue #3702 を起票して別単位で追跡した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（修復管理は追跡Issue #3702。本 Case は正式な受け入れ条件変更として処理済み）
+- **横展開観点**: baseline 既存 fail が存在する suite で「fail 0 件」を完了条件とする Case は達成不能になる。完了条件の定義時に baseline 状態を確認する
+- **再発条件**: baseline commit に既存 fail が存在するまま新しい Case が fail 0 件の絶対条件を負う場合
+- **予防策候補**: 起票時の bun test 全体実行（baseline 対照）で既存 fail の有無を確認し、既存 fail は別単位 Issue で追跡する前置を入れる。learning-promote での判断
+- **想定反映先**: case-open / req-define の完了条件定義手順。learning-promote での判断
+- **関連**: 追跡Issue #3702、Case #3674、PR #3697、issue_tracking_list.test.ts、check_integrity.test.ts
+- **タグ**: `#bun-test` `#baseline` `#既存fail` `#由来分類`
+
+
+## launcher protected-path テストはフル suite 負荷時のみ git commit タイムアウトで fail する flaky
+
+- **問題事象**: launcher protected-path テストがフル suite 実行時のみ git commit タイムアウト（60 秒）で fail し、単独実行では baseline・本 worktree の両方で pass する。Case #3674 の case-run 実行では fail したが、case-close 独立再検査のフル suite では fail 未出現（pass）だった
+- **発生局面**: 検証（bun test 分割① フル suite 実行。Case #3674）
+- **検知方法**: フル suite 実行の fail と単独再実行での pass の不一致。再現性確認で flaky と判定
+- **根本原因**: フル suite 負荷時のサンドボックス初期化（git commit 60 秒タイムアウト）が要因の疑い。状態依存・負荷依存の非決定的失敗
+- **自律対応内容**: 単独再実行で pass することを baseline・本 worktree の両方で確認し、フル suite 実行時の一時環境要因として無効分類した。後続のフル suite で fail 未出現だったことで flaky 判定を維持した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: flaky 判定は単独再実行とフル再実行の両記録（単独→フルの順序）で状態依存性を確認してから分類する
+- **再発条件**: フル suite 負荷時にサンドボックス初期化の git commit が 60 秒を超える場合
+- **予防策候補**: 該当テストの git commit 処理に明示的 timeout 緩和またはリトライを入れる。learning-promote での判断
+- **想定反映先**: 該当テスト実装（launcher protected-path テスト）または checker 実行契約 Design の flaky 扱い基準。learning-promote での判断
+- **関連**: Case #3674、PR #3697
+- **タグ**: `#bun-test` `#flaky` `#タイムアウト`
+
+
+## 補完領域の textlint 系 76 fail は vendored 依存未生成が原因で baseline と完全同一の既存 fail として残存する
+
+- **問題事象**: 補完実行（./src/opencode/ ./src/senpi/ ./src/common/tools/ ./src/common/guards/ ./src/third-party/）の textlint-guard 系 76 fail が baseline と件数・テスト名とも完全一致のまま残存する。vendored engine bundle・プロジェクト用語・prh 辞書等が主体
+- **発生局面**: 検証（bun test 補完実行。Case #3674）
+- **検知方法**: 補完実行の fail（737 pass / 76 fail）と baseline 再現確認（fail 集合 diff 完全一致）
+- **根本原因**: vendored 依存（textlint engine 等）が plugin package 配下で事前生成されていない状態。生成前置（bun install && bun run build:engine）未実施の環境では fail する構造
+- **自律対応内容**: baseline 再現確認で pre-existing と分類し、本 Case の完了条件から除外した（追跡Issue #3702 の追跡範囲）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: フル suite 実行の前置として vendored 依存の事前生成を確認する手順が必須である現状の在庫
+- **再発条件**: plugin package 配下の vendor/ 未生成で textlint 系テストを実行する場合
+- **予防策候補**: フル suite 正規形の依存パッケージ前置に vendored 依存生成の確認を組込む。learning-promote での判断
+- **想定反映先**: agentdev-quality-gates reference（bun test フル suite 正規形の依存前置）・README 開発者セットアップ。learning-promote での判断
+- **関連**: 追跡Issue #3702、Case #3674、PR #3697、src/opencode/plugins/agentdev-textlint-guard/
+- **タグ**: `#bun-test` `#textlint` `#vendored-dependency` `#baseline`
+
+
+## baseline 既存 fail 存在下の「bun test 全体 fail 0 件」絶対完了条件は達成不能になる。baseline 対照＋由来分類への基準変更が先行例
+
+- **問題事象**: baseline（origin/main HEAD）時点で既存 fail が存在する構造で、「bun test 全体が fail 0 件」という絶対完了条件を持つ Case が、本 Case 変更単独では達成不能になった。Case #3674 の初回 QG-4 判定で fail と判定され停止した
+- **発生局面**: レビュー（case-close STEP-2 QG-4 達成判定。Case #3674）
+- **検知方法**: QG-4 判定での完了条件3 未達判定（fail 合計 79 件残存）。suite 全体絶対判定と baseline 相対判定の乖離
+- **根本原因**: 完了条件が suite 全体の絶対判定として定義され、baseline 既存 fail の分離が考慮されていなかった。本 Case の起因事象（ENGINE_TREE 検査常時 1 fail）は解消済みでも、他の既存 fail が条件達成を阻害した
+- **自律対応内容**: case-close は baseline waiver を行わず親判断へ停止した（停止記録 6152686604）。その後 req-define 再合意・case-revise 経路で完了条件3 を baseline 対照＋QG-4 fail 由来分類基準へ正式変更し（反映記録 6158011276）、case-close が新基準で QG-4 判定を再実施して合格させた（pre-existing 78・変更由来 0・由来不明 0）
+- **ユーザー確認有無**: あり（再合意は利用者レビュー確定）
+- **Decision/REQ/spec影響**: あり（baseline 対照＋由来分類を含む完了条件の先行例を形成。QG-4 契約の例外運用ではなく正式な受け入れ条件変更として扱う）
+- **横展開観点**: baseline 相対判定を含む完了条件は、機械受理基準（由来分類・baseline 再現確認）を伴う形で定義する
+- **再発条件**: baseline 既存 fail が存在する状態で fail 0 件の絶対条件を負う Case
+- **予防策候補**: 完了条件の fail 件数条件には baseline 対照の前提を明示する。learning-promote での判断
+- **想定反映先**: req-define / case-ready の完了条件定義ガイド、agentdev-quality-gates reference。learning-promote での判断
+- **関連**: Case #3674、停止記録 6152686604、反映記録 6158011276、追跡Issue #3702、PR #3697
+- **タグ**: `#qg-4` `#完了条件` `#baseline対照` `#由来分類`
