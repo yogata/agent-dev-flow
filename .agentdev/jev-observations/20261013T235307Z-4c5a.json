@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261013T235307Z-4c5a",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "停止中4 Root Case 再合意バッチ＋表現是正bugfix の既存REQ照合（案1: #3674、案2: #3676、案3a: #3681 REQ-112、案3b: 後続要件、案4: #3683、案5: 表現是正）",
+  "sourceRevision": "6e5207b7ef7721080e9e487089fd00e6c62b7e69",
+  "durationMs": 1655,
+  "inputTokens": 3140,
+  "inputs": {
+    "requestDigest": "09d4ce98f775c443d7317dbf9423fc33698b533d0780d55936b9bac5276f5837",
+    "references": [
+      {
+        "digest": "31b2d06d84b5cc79bf35a201aed4e23c55d5bd8d9ec9e7351d0b853a0e5173e6",
+        "label": "REQ-112（更新対象候補）",
+        "path": "docs/requirements/REQ-112.md"
+      },
+      {
+        "digest": "bfcb8c327616179bffa4e0a64f43c808aa617362e05accb2f233ed783e51c186",
+        "label": "REQ-050（REQ-050-014 所有REQ）",
+        "path": "docs/requirements/REQ-050.md"
+      },
+      {
+        "digest": "feaa60259c055df1a89ed70e3b30edfd223bbf12f6b9dc8b141e931254b4c08a",
+        "label": "runtime-package-boundary（Design 補完対象）",
+        "path": "docs/designs/local/runtime-package-boundary.md"
+      },
+      {
+        "digest": "9b2dca1aa8aba4a172b0c8605e44da9a7971008fe2ea4f4168164aa2a34b2189",
+        "label": "distribution-boundary（#3683 確定済み Design）",
+        "path": "docs/designs/integrity/distribution-boundary.md"
+      }
+    ],
+    "snapshot": "Issue状態: #3674 running(bugfix, PR#3697 open/MERGEABLE, worktree 3674-impl温存, 停止コメント6152686604), #3676 ready(bugfix, worktree 3676-impl保持差分, 停止コメント6151758044), #3681 ready(停止コメント6151728527), #3683 running(maintenance, 再判定コメント6155280852)。誤import修正 #3673 closed(前提完了)。表現是正対象: check_distribution_boundary source profile 実測8failures=6行4ファイル。"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-3674-op",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1
+      }
+    },
+    {
+      "questionId": "q2-3674-conf",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.2,
+        "false": 0.8
+      }
+    },
+    {
+      "questionId": "q3-3676-op",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0.01,
+        "UPDATE": 0.01,
+        "REQ操作なし": 0.98
+      }
+    },
+    {
+      "questionId": "q4-3676-conf",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.81,
+        "false": 0.18999999999999995
+      }
+    },
+    {
+      "questionId": "q5-3681-req112-op",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 1,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "q6-3681-req112-conf",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.78,
+        "false": 0.21999999999999997
+      }
+    },
+    {
+      "questionId": "q7-3681-followup-op",
+      "questionForm": "choice",
+      "value": "CREATE",
+      "probabilityDistribution": {
+        "CREATE": 1,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "q8-3681-followup-conf",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.82,
+        "false": 0.18000000000000005
+      }
+    },
+    {
+      "questionId": "q9-3683-op",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1
+      }
+    },
+    {
+      "questionId": "q10-3683-conf",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.82,
+        "false": 0.18000000000000005
+      }
+    },
+    {
+      "questionId": "q11-expression-op",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0.03,
+        "APPEND": 0.02,
+        "UPDATE": 0,
+        "REQ操作なし": 0.95
+      }
+    },
+    {
+      "questionId": "q12-expression-conf",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.54,
+        "false": 0.45999999999999996
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-3674-op",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q2-3674-conf",
+        "value": false
+      },
+      {
+        "questionId": "q3-3676-op",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q4-3676-conf",
+        "value": false,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q5-3681-req112-op",
+        "value": "UPDATE"
+      },
+      {
+        "questionId": "q6-3681-req112-conf",
+        "value": false,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q7-3681-followup-op",
+        "value": "CREATE"
+      },
+      {
+        "questionId": "q8-3681-followup-conf",
+        "value": false,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q9-3683-op",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q10-3683-conf",
+        "value": false,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q11-expression-op",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q12-expression-conf",
+        "value": false,
+        "differenceReason": "semantic_disagreement"
+      }
+    ]
+  }
+}

@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261013T235419Z-97d1",
+  "workflow": "req-define",
+  "evaluationKind": "classification-design-separation",
+  "subject": "再合意バッチの要件展開における最終分類・Design 分離（t1: 旧公開入口契約の Design 補完、t2: REQ-112-001/002 受け入れ条件の記録突合化、t3: 後続要件の実装義務行、t4: REQ-112 適用範囲の v5 検討事項注記）",
+  "sourceRevision": "6e5207b7ef7721080e9e487089fd00e6c62b7e69",
+  "durationMs": 976,
+  "inputTokens": 2308,
+  "inputs": {
+    "requestDigest": "7f85b98fc701a352028e96fc7abb04c663992d526e4f6743a0691ebbc1117d4b",
+    "references": [
+      {
+        "digest": "31b2d06d84b5cc79bf35a201aed4e23c55d5bd8d9ec9e7351d0b853a0e5173e6",
+        "label": "REQ-112",
+        "path": "docs/requirements/REQ-112.md"
+      },
+      {
+        "digest": "bfcb8c327616179bffa4e0a64f43c808aa617362e05accb2f233ed783e51c186",
+        "label": "REQ-050（REQ-050-014）",
+        "path": "docs/requirements/REQ-050.md"
+      },
+      {
+        "digest": "feaa60259c055df1a89ed70e3b30edfd223bbf12f6b9dc8b141e931254b4c08a",
+        "label": "runtime-package-boundary（補完対象 Design）",
+        "path": "docs/designs/local/runtime-package-boundary.md"
+      }
+    ],
+    "snapshot": "runtime-package-boundary.md の ADF-COVERS(design) 宣言済み範囲: REQ-050-009, REQ-050-002/003/005/015, REQ-058系, REQ-112-001〜003等（REQ-050-014 は未宣言・missing-design）。Design行には ADF-COVERS(design) 宣言による design 実体の指定を伴う。"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "t1-3676-class",
+      "questionForm": "choice",
+      "value": "Design行",
+      "probabilityDistribution": {
+        "REQ行": 0.38,
+        "Design行": 0.62
+      }
+    },
+    {
+      "questionId": "t1-3676-separate",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.34,
+        "false": 0.6599999999999999
+      }
+    },
+    {
+      "questionId": "t2-3681-class",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.85,
+        "Design行": 0.15
+      }
+    },
+    {
+      "questionId": "t2-3681-separate",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.13,
+        "false": 0.87
+      }
+    },
+    {
+      "questionId": "t3-3681-followup-class",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.99,
+        "Design行": 0.01
+      }
+    },
+    {
+      "questionId": "t3-3681-followup-separate",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.22,
+        "false": 0.78
+      }
+    },
+    {
+      "questionId": "t4-3681-note-class",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.96,
+        "Design行": 0.04
+      }
+    },
+    {
+      "questionId": "t4-3681-note-separate",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.06,
+        "false": 0.94
+      }
+    }
+  ],
+  "confidence": 0.24,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "t1-3676-class",
+        "value": "Design行"
+      },
+      {
+        "questionId": "t1-3676-separate",
+        "value": false
+      },
+      {
+        "questionId": "t2-3681-class",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "t2-3681-separate",
+        "value": false
+      },
+      {
+        "questionId": "t3-3681-followup-class",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "t3-3681-followup-separate",
+        "value": false
+      },
+      {
+        "questionId": "t4-3681-note-class",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "t4-3681-note-separate",
+        "value": false
+      }
+    ]
+  }
+}
