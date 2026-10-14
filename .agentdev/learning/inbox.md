@@ -496,3 +496,19 @@
 - **想定反映先**: agentdev-workflow-case-close references/docs-and-design-promotion.md の full integrity suite 節、close_mechanical_steps.ts の input 指針。learning-promote での判断
 - **関連**: Case #3704、scripts/src/close_mechanical_steps.ts（agentdev-workflow-case-close）
 - **タグ**: `#bun-test` `#証跡` `#機械工程` `#件数突合`
+
+## prepare_definition_pr の入力 JSON を段階構築した際 definitionEdits が重複し旧文不在 fail が発生する
+
+- **問題事象**: case-open STEP-4 で prepare_definition_pr.ts の入力 JSON を、updated 行編集のベース構築と draft 抽出による本文編集マージの 2 段階で構築したところ、同一行編集（frontmatter updated）が definitionEdits に二重に入り、2 回目の適用で旧文不在（not found）fail 5 件が報告され、script が stage・commit 前に停止した
+- **発生局面**: case-open 実行時の機械工程・入力組み立て
+- **検知方法**: script 報告 JSON の definition-edit fail 5 件（各ファイル 1 回）と、worktree 内 git diff で全実 edits が適用済みであることの突合不一致
+- **根本原因**: 入力 JSON の段階的構築で段階間の edits 重複検証（同一 path + 同一 oldText の重複排除）を行わなかった
+- **自律対応内容**: 報告 JSON と git 状態から適用済み工程を確認し、不足分なしとして definitionEdits を空にした冪等再実行（既存 worktree の期待 branch 再利用）で残り工程（generate_indexes、明示パス指定 stage・commit、check_integrity、traceability check）を実行して収束させた
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: prepare_definition_pr を model が手動組み立てで実行する case-open 実行全般。definitionEdits の構築は (path, oldText) 組の一意性検証と重複排除を通してから script へ渡す
+- **再発条件**: 入力 JSON を複数段階（ベース + マージ）で構築して同一ファイルの同一行編集を二重に含めた場合
+- **予防策候補**: definitionEdits 構築後に (path, oldText) 組で重複排除する前置検査を加える。script 入力検証側で重複 edits を拒否する案もある。learning-promote での判断
+- **想定反映先**: agentdev-workflow-case-open references/definition-pr-and-idempotency.md の STEP-4 冪等再実行手順、prepare_definition_pr.ts の validateInput。learning-promote での判断
+- **関連**: Case #3710、src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts
+- **タグ**: `#case-open` `#機械工程` `#冪等再実行` `#入力重複`
