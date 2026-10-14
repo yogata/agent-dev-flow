@@ -346,3 +346,37 @@
 - **想定反映先**: case-run reference（検証手順）、agentdev-git-worktree reference（worktree 構造的制約・bun test 実行環境前提の同種注意）。learning-promote での判断
 - **関連**: .agentdev/learning/inbox.md、Case #3675、PR #3698、README「開発者セットアップ（textlint 依存の生成）」
 - **タグ**: `#case-run` `#textlint` `#worktree` `#依存生成`
+
+
+## squash merge 後のローカルブランチ削除は git cherry 判定でも git branch -d が拒否され得る。main 取込の実測確認後に -D を使う
+
+- **問題事象**: case-close STEP-6 のクリーンアップで、squash merge 済み PR（Case #3676 / PR #3707）のローカルブランチ fix/issue-3676 を削除しようとしたところ、git branch -d が「not fully merged」で拒否された。直前の git cherry origin/main <branch> は `-` prefix（patch 相当が main に含まれる）を返しており、patch-id 等価判定と merge-base 判定の結果が乖離した。case-ready の記録先例（Case #3705 の definition-amend ブランチ削除）は「git cherry 確認後 git branch -d で削除」だったが、同一手順でも拒否され得る
+- **発生局面**: 運用（case-close STEP-6 クリーンアップ。Case #3676 / PR #3707 merge commit 367263fe）
+- **検知方法**: git branch -d の拒否メッセージ（error: the branch 'fix/issue-3676' is not fully merged）
+- **根本原因**: squash merge は merge commit を作らないため、ブランチのコミットは main の歴史から到達可能でない。git branch -d の削除可否判定は祖先到達可能性（merge-base）基準であり、git cherry の patch-id 等価判定とは別基準。到達可能でない限り -d は内容取込済みでも拒否する
+- **自律対応内容**: 対象変更ファイル（scripts/self/release/scripts-layout.test.ts）の git diff（ブランチ vs origin/main）が空であることを実測確認（exit 0・差分なし）し、cherry 判定と合わせて main 取込を二重確認した上で git branch -D で削除した。削除後、branch --list 空・git ls-remote 空（remote は deleteBranchOnMerge 削除済み）を確認した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存クリーンアップ手順の範囲内。--delete-branch 使用禁止制約は維持）
+- **横展開観点**: squash merge を採用する全 Case の case-close クリーンアップ（worktree/ブランチ削除）に毎回適用可能。先例の手順をそのまま踏襲せず、-d 拒否は squash merge では通常系として扱う
+- **再発条件**: squash merge 後にローカルブランチを git branch -d で削除する場合（毎回）
+- **予防策候補**: case-close / git-worktree のクリーンアップ手順に「squash merge 後のブランチ削除は -d 拒否を前提に、変更内容が main に含まれることの実測確認（git cherry + 対象ファイル diff 空）をした上で -D を使用する」を明記する。learning-promote での判断
+- **想定反映先**: case-close reference（cleanup-and-capture.md のクリーンアップ手順）、agentdev-git-worktree reference（worktree-operations.md のブランチクリーンアップ）。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Case #3676、PR #3707、commit 367263fe、Case #3705（case-ready 記録 6158565722 の先例手順）
+- **タグ**: `#case-close` `#git` `#squash-merge` `#ブランチ削除`
+
+
+## 対応宣言の新規 sidecar 作成は既存情報源との duplicate-inconsistencies を生む。作成前に同一 artifact × role の集約規則を確認する
+
+- **問題事象**: REQ-112-001〜003 の implementation・verification 対応宣言を、実行計画の想定どおり traceability/ 配下の新規 sidecar へ作成しようとしたところ、初回の traceability check (exit 2) で duplicate-inconsistencies 3 件が検出された
+- **発生局面**: 実装（case-run 対応宣言作成。Case #3681 / PR #3708）
+- **検知方法**: 対応宣言作成後の traceability check の fail（exit 2、duplicate-inconsistencies 3 件。同一 artifact × role の既存情報源との分散指摘）
+- **根本原因**: 同一 artifact × role の対応宣言が既存情報源（inline 宣言と agentdev-traceability.yaml）と新規 sidecar に二重に分散し、集約規則違反となった。計画段階で既存情報源の有無と集約規則の参照を省略していた
+- **自律対応内容**: agentdev-traceability reference「同一 artifact × role を跨ぐ宣言の集約規則」に従い、新規 sidecar を作成せず既存情報源（inline 宣言 3 件と agentdev-traceability.yaml 1 件）へ追加統合した。統合後の再実行で 11 検査全 pass（exit 0）を確認した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: トレーサビリティ対応宣言を新規に追加する全 Case に適用可能。宣言作成の前に同一 artifact × role の既存情報源（inline 宣言、既存 sidecar、agentdev-traceability.yaml）を確認し、新規 sidecar の作成は集約規則上必要な場合に限定する
+- **再発条件**: 実行計画が新規 sidecar 作成を前提とし、既存集約規則を確認せずに対応宣言を作成する場合
+- **予防策候補**: case-open / case-run の実行計画作成時に、対応宣言の追加方法として既存情報源の集約規則を参照する前置を入れる。learning-promote での判断
+- **想定反映先**: case-open / case-run reference（対応宣言作成手順）または agentdev-traceability reference（集約規則への参照導線）。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Case #3681、PR #3708、traceability/agentdev-traceability.yaml、docs/requirements/REQ-112.md
+- **タグ**: `#case-run` `#traceability` `#対応宣言` `#集約規則`

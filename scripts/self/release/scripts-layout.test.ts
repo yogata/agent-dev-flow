@@ -183,13 +183,13 @@ describe("scripts layout / current documents reference only the new entries (REQ
     }
   }
 
-  test("user-facing markdown under README, docs/guides, src/opencode, src/opencode-local has no retired-entry reference", () => {
+  test("user-facing markdown under README, docs/guides, src/opencode, and local agentdev-gh has no retired-entry reference", () => {
     const roots = [
       "README.md",
       "README-INSTALL.md",
       "docs/guides",
       "src/opencode",
-      "src/opencode-local",
+      "src/common/tools/agentdev-gh/local",
     ];
     const offenders: string[] = [];
     for (const root of roots) {
