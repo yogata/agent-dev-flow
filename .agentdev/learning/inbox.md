@@ -448,3 +448,51 @@
 - **想定反映先**: req-define / case-ready の完了条件定義ガイド、agentdev-quality-gates reference。learning-promote での判断
 - **関連**: Case #3674、停止記録 6152686604、反映記録 6158011276、追跡Issue #3702、PR #3697
 - **タグ**: `#qg-4` `#完了条件` `#baseline対照` `#由来分類`
+
+## bash パイプ経路の終了コード観測は checker 本体の終了コードではない
+
+- **問題事象**: case-close の検証で traceability check（check.ts）の終了コードを `bun run … | head` の後の `$?` で観測したところ EXIT=0 と表示された。実際には check.ts は summary.fail > 0 で意図的に exit 2 を返しており、観測した 0 はパイプ先 head の終了コードだった。誤って合格と解釈するところだった
+- **発生局面**: case-close 実行時の checker 個別実行・実装
+- **検知方法**: spawnSync による同一コマンド再実行で status=2 が出力され、bash パイプ経路の観測値と矛盾した
+- **根本原因**: bash の `$?` はパイプライン最終コマンド（head）の終了コードを保持する。checker 本体の終了コードは pipefail 未設定では失われる
+- **自律対応内容**: spawnSync（stdio 分離・status 取得）で checker を再実行し、status と stdout を分離して観測した。以降の checker 実行はパイプを経由させず、stdout/stderr 分離退避で証跡を成立させた
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: checker 個別実行の終了コード観測全般（exit code が意味を持つ checker は既知）。パイプ経由の観測で合格扱いにしない
+- **再発条件**: 終了コードを検証根拠にする実行を `| head` 等のパイプ付きで実行した場合
+- **予防策候補**: 終了コード観測を伴う検証実行はパイプを使わず、出力確認は退避ファイル読み戻しで行う
+- **想定反映先**: checker 実行契約 Design「安定実行経路」節の補足、docs/knowledge。learning-promote での判断
+- **関連**: Case #3704、agentdev-traceability check.ts
+- **タグ**: `#bun` `#終了コード` `#パイプ` `#検証実行`
+
+## node 経路では Bun.YAML 依存 checker が全 YAML 解析に失敗し疑似 fail が大量発生する
+
+- **問題事象**: traceability check.ts を node --experimental-strip-types で実行したところ、YAML 解析が全件失敗し（Bun is not defined）、malformed-declarations 69 件・policy-invalid 1 件・missing 系の大量検出という疑似 fail を出力した（summary pass 6 / fail 5）
+- **発生局面**: case-close 実行時の checker 個別実行・実装
+- **検知方法**: case-run 記録（pass 8 / fail 3）と実行結果の大幅な不一致。findings の detail が「YAML 解析に失敗した（Bun is not defined）」であることを確認した
+- **根本原因**: check.ts の YAML 解析は Bun ランタイム API（Bun.YAML）に依存する。node 経路（安定実行経路の import 実行）では Bun が存在しないため解析が失敗する
+- **自律対応内容**: bun 依存 checker は bun 経路で実行する契約へ戻し、bun run + spawnSync 分離取得で再実行した。その結果 case-run 記録どおり pass 8 / fail 3（links 系 0・policy-invalid 0・malformed-declarations 0）を確認した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: Bun.YAML を使う checker は全部 node へ移行できない。「安定実行経路」は bun 非依存 checker に限定して適用する
+- **再発条件**: Bun.YAML 依存 checker を node --experimental-strip-types で実行した場合
+- **予防策候補**: checker 個別実行前に Bun 依存（Bun.* 参照）を確認する前置を checker 実行手順に加える。learning-promote での判断
+- **想定反映先**: checker 実行契約 Design「Bun 依存 checker の実行経路」節、agentdev-traceability の実行手順。learning-promote での判断
+- **関連**: Case #3704、agentdev-traceability scripts/src/check.ts
+- **タグ**: `#bun` `#BunYAML` `#checker実行経路` `#疑似fail`
+
+## close_mechanical_steps.ts の bun test 記録は stdout のみで機械受理基準の根拠にならない
+
+- **問題事象**: case-close の pre-merge 機械工程 script（close_mechanical_steps.ts）が full-integrity-suite の detail に記録するのは bun test の stdout 先頭行のみで、件数サマリー（Ran N tests across M files、stderr 出力）と fail 明細が欠落した。script の報告 JSON 単体では件数突合・fail 由来分類の証拠が成立しなかった
+- **発生局面**: case-close 実行時の機械工程・実装
+- **検知方法**: script 報告 JSON の full-integrity-suite step が exit 1 を返したが、fail の明細・件数が報告内に存在せず、由来分類が不能だった
+- **根本原因**: script の runner（spawnSync pipe）は bun test の stderr を内部捕捉するが、integrityResults へは stdout のみを保存する設計である（検証差分セクション規約は分離退避の接続点を stderr 出力ランナーの直接実行と定義しており、現行設計どおり）
+- **自律対応内容**: 規約どおり bun test 3 分割を外部で stdout/stderr 分離退避付き（`>` と `2>`）に再実行し、件数突合（2909/115、591/43、700/44）と fail 3 件の由来分類（pre-existing 2・状態依存 1・本変更起因 0）の証跡を退避ファイルで成立させた
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 機械工程 script を使う他の close（Epic Wave ルート）でも同じ二重実行が必要になる
+- **再発条件**: close_mechanical_steps.ts（phase pre-merge）の integrityGates に bun test を指定した場合
+- **予防策候補**: bun test は script 経由ではなく直接実行（分離退避付き）を標準とし、script への integrityGates 指定は mergeable ポーリング等の他工程に限定する。learning-promote での判断
+- **想定反映先**: agentdev-workflow-case-close references/docs-and-design-promotion.md の full integrity suite 節、close_mechanical_steps.ts の input 指針。learning-promote での判断
+- **関連**: Case #3704、scripts/src/close_mechanical_steps.ts（agentdev-workflow-case-close）
+- **タグ**: `#bun-test` `#証跡` `#機械工程` `#件数突合`
