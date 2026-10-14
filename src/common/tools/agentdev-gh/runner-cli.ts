@@ -415,8 +415,14 @@ export class CliRunner implements GhRunner {
 
     let nextLabels: string[] | null = null;
     if (labelsRequested !== null) {
+      // labels 要求に role 物理ラベルを含む場合は role 変更要求として扱う
+      // （labels 要求に追跡軸が含まれるため追跡軸は要求対象内）。
+      // 含まない場合は要求対象外の追跡軸（role）を現状から復元する（部分更新不変条件）。
+      const roleRequested = labelsRequested.includes(TRACKING_ROLE_LABEL)
+        ? "tracking"
+        : meta.role;
       nextLabels =
-        meta.role === "tracking"
+        roleRequested === "tracking"
           ? buildTrackingLabels(labelsRequested)
           : [...labelsRequested];
     }

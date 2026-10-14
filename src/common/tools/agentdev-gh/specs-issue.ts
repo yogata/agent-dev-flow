@@ -21,6 +21,7 @@ import {
   deriveRole,
   parseIssueRole,
   stripTrackingLabels,
+  TRACKING_ROLE_LABEL,
   type CloseReason,
   type IssueRole,
 } from "./tracking-schema.ts";
@@ -378,18 +379,27 @@ const issueUpdateSpec: OperationSpec = {
     if (req.title !== undefined && str(issue.title) !== req.title) return false;
     if (req.body !== undefined && str(issue.body) !== req.body) return false;
     // 部分更新不変条件: 要求対象外の追跡軸（role）の維持を実行前状態（before）と
-    // 一致で照合する。通常ラベルは要求包含のみ確認し、確認時点での第三者による
+    // 一致で照合する。labels 要求に role 物理ラベルを含む場合は role 変更要求として
+    // role = tracking の反映を要求する（labels 要求に追跡軸が含まれるため追跡軸は
+    // 要求対象内）。通常ラベルは要求包含のみ確認し、確認時点での第三者による
     // 追加を不変条件違反として失敗扱いにしない。
     const before = beforeMeta(payload);
     if (before === null) return false;
     const after = parseTrackingMeta(issue);
     if (after === null) return false;
-    if (after.role !== before.role) return false;
+    const roleRequested =
+      req.labels !== undefined && req.labels.includes(TRACKING_ROLE_LABEL);
+    if (roleRequested) {
+      if (after.role !== "tracking") return false;
+    } else if (after.role !== before.role) {
+      return false;
+    }
     if (req.labels !== undefined) {
       const current = stringArray(issue.labels);
       if (current === null) return false;
       const kept = stripTrackingLabels(current);
-      if (!req.labels.every((l) => kept.includes(l))) return false;
+      const requestedNormal = req.labels.filter((l) => l !== TRACKING_ROLE_LABEL);
+      if (!requestedNormal.every((l) => kept.includes(l))) return false;
     }
     return true;
   },

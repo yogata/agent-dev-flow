@@ -972,6 +972,53 @@ describe("CliRunner + engine: issue_update の追跡軸保持（部分更新不�
     }
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
+
+  test("(d) labels に role 物理ラベルを含む要求は role 変更要求として tracking を付与する（role: case → tracking）", async () => {
+    const tempDir = makeTempDir();
+    const stub = githubStub({
+      issues: [
+        {
+          number: 13,
+          title: "旧Case",
+          body: "B",
+          state: "open",
+          state_reason: null,
+          labels: ["bugfix", "maintenance"],
+        },
+      ],
+    });
+    const result = await runOp(stub.exec, tempDir, {
+      operation: "issue_update",
+      number: 13,
+      labels: ["tracking", "bugfix", "maintenance"],
+    });
+    expect(result.ok).toBe(true);
+    const read = await runOp(stub.exec, tempDir, { operation: "issue_read", number: 13 });
+    expect(read.ok).toBe(true);
+    if (read.ok && read.success.operation === "issue_read") {
+      expect(read.success.role).toBe("tracking");
+      expect(read.success.labels).toEqual(["tracking", "bugfix", "maintenance"]);
+    }
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test("(e) role: tracking の labels 置換に role 物理ラベルが含まれる場合は重複なく単一付与される", async () => {
+    const tempDir = makeTempDir();
+    const stub = githubStub({ issues: [trackingIssue()] });
+    const result = await runOp(stub.exec, tempDir, {
+      operation: "issue_update",
+      number: 8,
+      labels: ["tracking", "enhancement"],
+    });
+    expect(result.ok).toBe(true);
+    const read = await runOp(stub.exec, tempDir, { operation: "issue_read", number: 8 });
+    expect(read.ok).toBe(true);
+    if (read.ok && read.success.operation === "issue_read") {
+      expect(read.success.role).toBe("tracking");
+      expect(read.success.labels).toEqual(["tracking", "enhancement"]);
+    }
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
 });
 
 describe("CliRunner + engine: issue_reopen の状態遷移（TS-002）", () => {
