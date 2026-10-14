@@ -1,6 +1,6 @@
 ---
 name: agentdev-adopted-conventions
-description: Deterministic resolver for adopted conventions (adopted processes, process relations, required artifacts): declaration parsing, transition-default connection, and the non-adoption / no-pass-by-absence judgment rules. USE FOR: resolving a project's adopted processes and required artifacts as the basis of target work, judging artifact presence without counting un-adopted reference examples as missing, blocking pass-by-absence for required artifacts, keeping obligations across process splits/merges/omissions, running both single-process and end-to-end execution from one common-duty model. DO NOT USE FOR: authoring or editing the declaration itself as a policy decision, system-model design content, WBS/schedule/progress management, permanent process-progress ledgers, workflow orchestration, traceability coverage checks.
+description: Deterministic resolver for adopted conventions (processes, relations, required artifacts): declaration parsing, transition-default connection, no-pass-by-absence judgment. USE FOR: resolving adopted processes and required artifacts, presence judgment without counting un-adopted refs as missing, blocking pass-by-absence, obligations across splits/merges/omissions, single-process and end-to-end execution from one duty model. DO NOT USE FOR: authoring/editing declarations, system-model design, schedule/progress management, progress ledgers, workflow orchestration, traceability coverage.
 ---
 
 # agentdev-adopted-conventions

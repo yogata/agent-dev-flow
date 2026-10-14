@@ -1,6 +1,6 @@
 ---
 name: agentdev-artifact-semantics
-description: Deterministic assessment of artifact semantics (requirement/decision/design/implementation/verification) and phase-wise formal finalization. USE FOR: classifying artifact roles from self-declaration or placement conventions, resolving adopted conventions with the migration-period default, assessing design basis against adopted conventions (independent-design vs alternative-artifact, missing-basis detection), and judging phase finalization with a separate requirement-satisfaction outcome. DO NOT USE FOR: covers-relation analysis itself (agentdev-traceability owns declaration parsing and coverage), semantic judgement of design validity, editing REQ/Decision/Design files, workflow orchestration.
+description: Deterministic assessment of artifact semantics (requirement/decision/design/implementation/verification) and phase formalization. USE FOR: classifying artifact roles from declaration or placement, resolving adopted conventions with migration-period default, assessing design basis (independent-design vs alternative-artifact, missing-basis), judging phase finalization and requirement satisfaction separately. DO NOT USE FOR: covers-relation analysis (agentdev-traceability owns declaration parsing), semantic judgement of design validity, editing REQ/Decision/Design files, workflow orchestration.
 ---
 
 # agentdev-artifact-semantics
