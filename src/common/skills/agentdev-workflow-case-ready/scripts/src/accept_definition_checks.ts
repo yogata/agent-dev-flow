@@ -186,6 +186,7 @@ const PATH_FLAG_CONTRACTS = ["--root", "--input", "--artifact", "--files"] as co
 export function extractFlagValue(args: readonly string[], flag: string): string | null {
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
+    if (arg === undefined) continue;
     if (arg === flag && args[i + 1] !== undefined) {
       return args[i + 1] ?? null;
     }
@@ -443,8 +444,17 @@ export function runAcceptDefinitionChecks(
       let overlapSummary = "";
       if (overlap.exitCode === 0) {
         try {
-          const parsed = JSON.parse(overlap.stdout) as { warnings?: unknown[]; detection_unavailable?: unknown };
-          overlapSummary = `warnings=${parsed.warnings?.length ?? 0} detection_unavailable=${Array.isArray(parsed.detection_unavailable) && parsed.detection_unavailable.length > 0}`;
+          // 要約は engine 報告 JSON 契約（CrossDependencyInspectionReport）に従う。
+          // warnings は condition_a 配下の構造化警告結果であり、報告に存在しない
+          // top-level warnings を参照しない（REQ-061-051）。
+          const parsed = JSON.parse(overlap.stdout) as {
+            condition_a?: { warnings?: unknown };
+            detection_unavailable?: unknown;
+          };
+          const warnings = parsed.condition_a?.warnings;
+          const warningCount = Array.isArray(warnings) ? warnings.length : 0;
+          const unavailableCount = Array.isArray(parsed.detection_unavailable) ? parsed.detection_unavailable.length : 0;
+          overlapSummary = `warnings=${warningCount} detection_unavailable=${unavailableCount}`;
         } catch {
           overlapSummary = "report parse failed";
         }
@@ -453,7 +463,6 @@ export function runAcceptDefinitionChecks(
         name: "overlap-cross-check",
         status: overlap.exitCode === 0 ? "pass" : "fail",
         detail: {
-          exitCode: overlap.exitCode,
           summary: overlapSummary,
           ...buildGateEvidence(input.overlapGate, overlap, targetRevision),
         },
@@ -484,7 +493,6 @@ export function runAcceptDefinitionChecks(
         name: "autogen-regeneration-diff",
         status: gen.exitCode === 0 ? (diffOutput.length > 0 ? "warn" : "pass") : "fail",
         detail: {
-          exitCode: gen.exitCode,
           diffStat: diffOutput,
           ...buildGateEvidence(input.generateIndexesGate, gen, targetRevision),
         },

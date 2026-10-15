@@ -48,6 +48,7 @@ workflow extension（`.agentdev/extensions/skills/*.yaml`）に acceptance_gates
 品質ゲートの実行（integrity gates、overlap 突合、AUTOGEN 再生成差分検出、traceability check）は、工程別 script `scripts/src/accept_definition_checks.ts`（phase: acceptance-checks）の 1 呼び出しで行う。
 
 - **検査証拠の保存**: 報告 JSON の各 step detail には、標準出力・標準エラーの全文、終了コード、対象版（実行時点の HEAD を targetRevision）、実行条件（実行コマンド・引数・作業ディレクトリ・実行上限を executedCommand）を同じ検査実行から保存する。要約（summary）や件数文字列は既存 field として併存するが、原結果の全文は detail で確認できる。終了コードや証拠の再取得を目的とした同一条件の再実行を行わない。非ゼロ終了の integrity gate は証拠を保存した上で後続ゲートを実行しない（後続抑止の維持）
+- **overlap 突合の要約確認と stdout 原証跡検査（consumer 側の規律）**: overlap-cross-check step の summary は、engine 報告 JSON 契約（CrossDependencyInspectionReport）に従い condition_a.warnings と detection_unavailable を実件数で反映する（REQ-061-051）。consumer は警告の有無を確認する際、summary の件数文字列だけで判断せず、同じ step detail に保存された engine 報告 JSON の stdout 原証跡を読み、警告の内容（重複パス、検出不能源とその理由）を確認する。要約は確認の入口であり、原結果の全文による確認を省略しない
 - **品質ゲート入力の固定生成と事前検証**: gate 実行仕様（GateCommandSpec）は、既知入力型と下位検査の契約から固定生成する（script 配下の `buildKnownTraceabilityCheckSpec`、`buildKnownWorkflowIntegrityGateSpec`、`buildKnownOverlapCheckSpec`、`buildKnownGenerateIndexesSpec`）。script は高価な検査の開始前に既知 flag 契約（--req は REQ 行 ID の個別カンマ列挙のみ、--profile は source と link、--workflow は形式妥当性、--root と --input 等のパス引数は非空）に従い各 gate spec を検証し、不正な値は検査を開始せず終了コード 1 で拒否する。正当な入力では必要検査が実行される。未知 flag は検証対象外であり、任意コマンドの汎用解釈器は作らない
 - **境界の維持**: 本機械工程は既存の受入判断（忠実性・整合性・品質検査）と必須ゲートを維持し、判断材料の保存と結果消費の規律を追加提供する。意味判断はモデルが担当する
 
