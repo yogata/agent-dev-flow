@@ -1,4 +1,5 @@
 // ADF-COVERS(verification): REQ-002-013, REQ-002-014, REQ-002-015, REQ-002-018, REQ-050-016
+// ADF-COVERS(implementation): REQ-010-082
 /**
  * Skill structure linter for AgentDevFlow.
  * Validates all skill directories under .opencode/skills/ for structural
@@ -458,6 +459,74 @@ function applyLintSkillsBaseline(
   return { demoted, delta };
 }
 
+// ===== NG/warning 区別 summary と実行環境差記録（REQ-010-082 / AG-012）=====
+//
+// summary 出力に検証不通過（NG）と傾向管理（warning）の区別を明示し、warning
+// 存在時の運用（集約予算の漸進回収、git 管理外ローカルユーザースキルの環境差
+// 記録）を note として出力する。determineExitCode の warning 駆動 exit 1 は
+// 変更しない（warning の無視・抑制による隠蔽を行わない）。
+//
+// git 管理外ローカルユーザースキル: main root の projection（.opencode/skills）
+// は gitignore の `.opencode/skills/*` 除外対象であり、`repo-*/`（tracked 例外的）と
+// junction 先 src/common/skills 配下に存在するスキルのみ管理対象。distributed
+// layout（projection 走査 かつ src/common/skills 存在）でこの条件に当てはまらない
+// スキルは main root 実行時のみ検出される環境差として記録する（baseline 登録・
+// 無視は行わず、走査対象を維持する）。
+
+const LOCAL_SKILL_ENV_LABEL =
+  "[実行環境差: git 管理外ローカルスキル (main root 実行時のみ検出)]";
+
+function listGitUnmanagedLocalSkills(
+  repoRoot: string,
+  skillsDir: string,
+): Set<string> {
+  const local = new Set<string>();
+  const projectionSkillsDir = path.join(repoRoot, ".opencode", "skills");
+  const sourceSkillsDir = path.join(repoRoot, "src", "common", "skills");
+  if (skillsDir !== projectionSkillsDir) return local;
+  if (!fs.existsSync(sourceSkillsDir)) return local;
+  for (const sd of listSkillDirs(projectionSkillsDir)) {
+    if (sd.name.startsWith("repo-")) continue;
+    if (fs.existsSync(path.join(sourceSkillsDir, sd.name))) continue;
+    local.add(sd.name);
+  }
+  return local;
+}
+
+function annotateLocalSkillFindings(
+  results: CheckResult[],
+  localSkills: Set<string>,
+): void {
+  if (localSkills.size === 0) return;
+  for (const r of results) {
+    if (r.level !== "ng" && r.level !== "warning") continue;
+    if (!r.file || !localSkills.has(r.file)) continue;
+    if (r.message.startsWith(LOCAL_SKILL_ENV_LABEL)) continue;
+    r.message = `${LOCAL_SKILL_ENV_LABEL} ${r.message}`;
+  }
+}
+
+function buildSummaryNotes(
+  localWarningCount: number,
+  localSkillNames: string[],
+  aggregateBudgetWarning: boolean,
+): string[] {
+  const notes: string[] = [
+    "NG は検証不通過、Warning は傾向管理として区別して報告する（REQ-010-082）。Warning 存在時も無視・抑制による隠蔽は行わず、Warning も exit code 1 を駆動する。",
+  ];
+  if (aggregateBudgetWarning) {
+    notes.push(
+      "description 集約予算超過（warning）の解消は、次回 skill 変更時の top 層からの description 削減による漸進回収とする（REQ-010-082 の運用方針。一括削減は行わない）。",
+    );
+  }
+  if (localWarningCount > 0) {
+    notes.push(
+      `git 管理外ローカルユーザースキル起因の warning: ${localWarningCount} 件（${localSkillNames.join(", ")}。main root 実行時のみ検出の実行環境差。baseline 登録・無視は行わず、走査対象を維持する）。`,
+    );
+  }
+  return notes;
+}
+
 function lintSkill(
   skillDir: string,
   dirName: string,
@@ -802,6 +871,21 @@ function main(): void {
     );
   }
 
+  const localSkillSet = listGitUnmanagedLocalSkills(repoRoot, skillsDir);
+  annotateLocalSkillFindings(allResults, localSkillSet);
+  const localWarningResults = allResults.filter(
+    (r): r is CheckResult & { file: string } =>
+      r.level === "warning" &&
+      typeof r.file === "string" &&
+      localSkillSet.has(r.file),
+  );
+  const localWarningNames = [
+    ...new Set(localWarningResults.map((r) => r.file)),
+  ].sort();
+  const aggregateBudgetWarning = allResults.some(
+    (r) => r.check === "description aggregate budget" && r.level === "warning",
+  );
+
   const summary: ScanSummary = computeSummary(allResults);
   const report: IntegrityReport = {
     timestamp: new Date().toISOString(),
@@ -809,6 +893,11 @@ function main(): void {
     profile: DEFAULT_PROFILE,
     scanned: { skills: skillDirs.length, ag005_skills: agSkillCount },
     summary,
+    summaryNotes: buildSummaryNotes(
+      localWarningResults.length,
+      localWarningNames,
+      aggregateBudgetWarning,
+    ),
     results: allResults,
   };
 
