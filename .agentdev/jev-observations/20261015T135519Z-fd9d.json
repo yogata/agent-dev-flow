@@ -1,0 +1,273 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261015T135519Z-fd9d",
+  "workflow": "req-define",
+  "evaluationKind": "classification-design-separation",
+  "subject": "backlog-auto 一気通貫 20261015T180807JST stage4: REQ 保存候補 8 RU の最終分類・Design 分離",
+  "sourceRevision": "062eb87473916e006b3abe71476b509849d641e8",
+  "durationMs": 840,
+  "inputTokens": 3456,
+  "inputs": {
+    "requestDigest": "ca11f06d442298c80a8dbf26ebec2cd3c00623cf23a1704ae61942ec2d3ea96f",
+    "references": [
+      {
+        "digest": "ca137b06c5fe93e4b6f6a4396e4f300fa100914359a28cd199f483d3086f4e9e",
+        "label": "RU-0001",
+        "path": ".agentdev/backlog/req-units/RU-0001.md"
+      },
+      {
+        "digest": "b9684a11c6a4b9c57eb353c5852d0a094132d358e1c9fa06d088b5c61a05ee29",
+        "label": "RU-0002",
+        "path": ".agentdev/backlog/req-units/RU-0002.md"
+      },
+      {
+        "digest": "e7202b9def61f78b205713c13d137458722e1cf57441fa1cbbad59c1a2e569fe",
+        "label": "RU-0004",
+        "path": ".agentdev/backlog/req-units/RU-0004.md"
+      },
+      {
+        "digest": "8335b527f78d2c4312dfa8744439c153238fbf55dfe5a98f0becd60099eda3a3",
+        "label": "RU-0008",
+        "path": ".agentdev/backlog/req-units/RU-0008.md"
+      },
+      {
+        "digest": "d413bde54a35944416232f29b871a22cdc3c403e5ffd9306d74be5f558a52fb5",
+        "label": "RU-0009",
+        "path": ".agentdev/backlog/req-units/RU-0009.md"
+      },
+      {
+        "digest": "6a7f677e8344218bb6a1e7e678b24cf64c4685737e1ac57d324ef2bd0bff6a66",
+        "label": "RU-0010",
+        "path": ".agentdev/backlog/req-units/RU-0010.md"
+      },
+      {
+        "digest": "132a66486fa3cfb01d92f0c954db7f6b92c1dfa9ecff653467f161702f43d4e9",
+        "label": "RU-0011",
+        "path": ".agentdev/backlog/req-units/RU-0011.md"
+      },
+      {
+        "digest": "b198ec4d0bd7459979e96395445a0968948b2a77bf4fd7105436d167df6d9807",
+        "label": "RU-0014",
+        "path": ".agentdev/backlog/req-units/RU-0014.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "ru01-class",
+      "questionForm": "choice",
+      "value": "REQ 行",
+      "probabilityDistribution": {
+        "REQ 行": 0.98,
+        "Design 行": 0.02
+      }
+    },
+    {
+      "questionId": "ru01-sep",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.68,
+        "false": 0.31999999999999995
+      }
+    },
+    {
+      "questionId": "ru02-class",
+      "questionForm": "choice",
+      "value": "REQ 行",
+      "probabilityDistribution": {
+        "REQ 行": 0.96,
+        "Design 行": 0.04
+      }
+    },
+    {
+      "questionId": "ru02-sep",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.79,
+        "false": 0.20999999999999996
+      }
+    },
+    {
+      "questionId": "ru04-class",
+      "questionForm": "choice",
+      "value": "REQ 行",
+      "probabilityDistribution": {
+        "REQ 行": 0.67,
+        "Design 行": 0.33
+      }
+    },
+    {
+      "questionId": "ru04-sep",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.67,
+        "false": 0.32999999999999996
+      }
+    },
+    {
+      "questionId": "ru08-class",
+      "questionForm": "choice",
+      "value": "REQ 行",
+      "probabilityDistribution": {
+        "REQ 行": 0.72,
+        "Design 行": 0.28
+      }
+    },
+    {
+      "questionId": "ru08-sep",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.65,
+        "false": 0.35
+      }
+    },
+    {
+      "questionId": "ru09-class",
+      "questionForm": "choice",
+      "value": "REQ 行",
+      "probabilityDistribution": {
+        "REQ 行": 0.86,
+        "Design 行": 0.14
+      }
+    },
+    {
+      "questionId": "ru09-sep",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.78,
+        "false": 0.21999999999999997
+      }
+    },
+    {
+      "questionId": "ru10-class",
+      "questionForm": "choice",
+      "value": "REQ 行",
+      "probabilityDistribution": {
+        "REQ 行": 0.82,
+        "Design 行": 0.18
+      }
+    },
+    {
+      "questionId": "ru10-sep",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.7,
+        "false": 0.30000000000000004
+      }
+    },
+    {
+      "questionId": "ru11-class",
+      "questionForm": "choice",
+      "value": "REQ 行",
+      "probabilityDistribution": {
+        "REQ 行": 0.55,
+        "Design 行": 0.45
+      }
+    },
+    {
+      "questionId": "ru11-sep",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.82,
+        "false": 0.18000000000000005
+      }
+    },
+    {
+      "questionId": "ru14-class",
+      "questionForm": "choice",
+      "value": "REQ 行",
+      "probabilityDistribution": {
+        "REQ 行": 0.82,
+        "Design 行": 0.18
+      }
+    },
+    {
+      "questionId": "ru14-sep",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.84,
+        "false": 0.16000000000000003
+      }
+    }
+  ],
+  "confidence": 0.96,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "ru01-class",
+        "value": "REQ 行"
+      },
+      {
+        "questionId": "ru01-sep",
+        "value": true
+      },
+      {
+        "questionId": "ru02-class",
+        "value": "REQ 行"
+      },
+      {
+        "questionId": "ru02-sep",
+        "value": true
+      },
+      {
+        "questionId": "ru04-class",
+        "value": "REQ 行"
+      },
+      {
+        "questionId": "ru04-sep",
+        "value": true
+      },
+      {
+        "questionId": "ru08-class",
+        "value": "REQ 行"
+      },
+      {
+        "questionId": "ru08-sep",
+        "value": true
+      },
+      {
+        "questionId": "ru09-class",
+        "value": "REQ 行"
+      },
+      {
+        "questionId": "ru09-sep",
+        "value": true
+      },
+      {
+        "questionId": "ru10-class",
+        "value": "REQ 行"
+      },
+      {
+        "questionId": "ru10-sep",
+        "value": true
+      },
+      {
+        "questionId": "ru11-class",
+        "value": "REQ 行"
+      },
+      {
+        "questionId": "ru11-sep",
+        "value": true
+      },
+      {
+        "questionId": "ru14-class",
+        "value": "REQ 行"
+      },
+      {
+        "questionId": "ru14-sep",
+        "value": true
+      }
+    ]
+  }
+}
