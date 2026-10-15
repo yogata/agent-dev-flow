@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261015T024508Z-d21a",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0227 backlog-auto一気通貫実行・パッチリリース自動化の既存REQ照合",
+  "sourceRevision": "3d8718cc63171e5f77a455fee31c41402e614f6e",
+  "durationMs": 1644,
+  "inputTokens": 2096,
+  "inputs": {
+    "requestDigest": "d3d6c21a158afdab7329e572fddcfa22604e590ddb4c71b23b9deaafa11160c0",
+    "references": [
+      {
+        "digest": "124f38ed2ae6be0963b202c462e63148bbee2ed98fbfcce9f33918cc0e40bc2c",
+        "label": "RU-0227",
+        "path": ".agentdev/backlog/req-units/RU-0227.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-e2e-contract",
+      "questionForm": "choice",
+      "value": "CREATE（新規REQとして新設）",
+      "probabilityDistribution": {
+        "CREATE（新規REQとして新設）": 0.99,
+        "APPEND（REQ-041へ要件行追加）": 0.01,
+        "UPDATE（REQ-041既存行の意味変更）": 0,
+        "REQ操作なし（Design/Decisionのみで対応）": 0
+      }
+    },
+    {
+      "questionId": "q2-req041-exclusion",
+      "questionForm": "choice",
+      "value": "UPDATE（対象外行を除去し目的に接続を記載）",
+      "probabilityDistribution": {
+        "UPDATE（対象外行を除去し目的に接続を記載）": 0.98,
+        "CREATEのみ（REQ-041は無変更）": 0,
+        "APPEND（REQ-041に要件行を追加）": 0.01,
+        "REQ操作なし": 0.01
+      }
+    },
+    {
+      "questionId": "q3-reuse-set",
+      "questionForm": "choice",
+      "value": "REQ操作なし（再利用参照のみ）",
+      "probabilityDistribution": {
+        "REQ操作なし（再利用参照のみ）": 0.99,
+        "UPDATE（意味変更が必要）": 0,
+        "APPEND（追記が必要）": 0.01,
+        "CREATE（別REQに切り出す必要）": 0
+      }
+    },
+    {
+      "questionId": "q4-matching-confidence",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.38,
+        "false": 0.62
+      }
+    }
+  ],
+  "confidence": 0.99,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-e2e-contract",
+        "value": "CREATE（新規REQとして新設）"
+      },
+      {
+        "questionId": "q2-req041-exclusion",
+        "value": "UPDATE（対象外行を除去し目的に接続を記載）"
+      },
+      {
+        "questionId": "q3-reuse-set",
+        "value": "REQ操作なし（再利用参照のみ）"
+      },
+      {
+        "questionId": "q4-matching-confidence",
+        "value": false
+      }
+    ]
+  }
+}

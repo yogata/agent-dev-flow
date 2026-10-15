@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261015T024533Z-9111",
+  "workflow": "req-define",
+  "evaluationKind": "final-classification-design-separation",
+  "subject": "RU-0227 一気通貫実行要件の最終分類・Design分離",
+  "sourceRevision": "3d8718cc63171e5f77a455fee31c41402e614f6e",
+  "durationMs": 235,
+  "inputTokens": 1542,
+  "inputs": {
+    "requestDigest": "b53ae898a527199ffe2911f5c664b1d8f29f8e8d4066e188e344accbfba8722c",
+    "references": [
+      {
+        "digest": "124f38ed2ae6be0963b202c462e63148bbee2ed98fbfcce9f33918cc0e40bc2c",
+        "label": "RU-0227",
+        "path": ".agentdev/backlog/req-units/RU-0227.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-outcome-rows",
+      "questionForm": "choice",
+      "value": "REQ行（新REQに成果定義として保存）",
+      "probabilityDistribution": {
+        "REQ行（新REQに成果定義として保存）": 0.91,
+        "Design行（Designに内部構造として保存）": 0,
+        "一部分離（成果定義はREQ行、内部構造はDesign行）": 0.09
+      }
+    },
+    {
+      "questionId": "q2-design-separation",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.96,
+        "false": 0.040000000000000036
+      }
+    },
+    {
+      "questionId": "q3-decision-candidate",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.94,
+        "false": 0.06000000000000005
+      }
+    }
+  ],
+  "confidence": 0.86,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-outcome-rows",
+        "value": "REQ行（新REQに成果定義として保存）"
+      },
+      {
+        "questionId": "q2-design-separation",
+        "value": true
+      },
+      {
+        "questionId": "q3-decision-candidate",
+        "value": true
+      }
+    ]
+  }
+}
