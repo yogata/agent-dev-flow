@@ -25,20 +25,11 @@ import type {
 } from "./runner.ts";
 import {
   buildTrackingLabels,
-  deriveKind,
+  deriveCloseReason,
   deriveRole,
-  deriveTrackingState,
-  kindToLabel,
-  parseTrackingKind,
-  parseTrackingState,
-  stripTrackingLabels,
-  trackingStateToLabel,
-  REOPEN_TRACKING_STATE,
   TRACKING_ROLE_LABEL,
   type CloseReason,
   type IssueRole,
-  type TrackingKind,
-  type TrackingState,
 } from "./tracking-schema.ts";
 
 /** spawnSync 実行の異常情報（起動不能・シグナル終了等の要因）。 */
@@ -310,28 +301,8 @@ export class CliRunner implements GhRunner {
       state,
       labels: meta.labels,
       role: meta.role,
-      kind: meta.kind,
-      trackingState: meta.trackingState,
       closeReason: meta.closeReason,
     };
-  }
-
-  /**
-   * 追跡Issueのラベル構成。kind ラベルを持たない追跡Issue（過渡的状態）は
-   * kind ラベルを新設せず、role と状態ラベルのみを保持して再構成する。
-   */
-  private trackingLabelsFor(
-    currentLabels: readonly string[],
-    kind: TrackingKind | null,
-    state: TrackingState,
-  ): string[] {
-    if (kind === null) {
-      const stateLabel = trackingStateToLabel(state);
-      const next = [TRACKING_ROLE_LABEL];
-      if (stateLabel !== null) next.push(stateLabel);
-      return [...new Set([...next, ...stripTrackingLabels(currentLabels)])];
-    }
-    return buildTrackingLabels(currentLabels, kind, state);
   }
 
   // ---------------------------------------------------------------------
@@ -353,8 +324,6 @@ export class CliRunner implements GhRunner {
   private trackingMetaFrom(rec: Record<string, unknown>): {
     labels: string[];
     role: IssueRole;
-    kind: TrackingKind | null;
-    trackingState: TrackingState | null;
     closeReason: CloseReason | null;
   } | null {
     const state = normalizeIssueState(rec.state);
@@ -362,17 +331,14 @@ export class CliRunner implements GhRunner {
     const labels = this.labelNames(rec);
     if (labels === null) return null;
     const reason = str(rec.state_reason);
-    const derived = deriveTrackingState(
-      labels,
-      state,
-      reason === "completed" || reason === "not_planned" ? reason : null,
-    );
     return {
       labels,
       role: deriveRole(labels),
-      kind: deriveKind(labels),
-      trackingState: derived.trackingState,
-      closeReason: derived.closeReason,
+      closeReason: deriveCloseReason(
+        labels,
+        state,
+        reason === "completed" || reason === "not_planned" ? reason : null,
+      ),
     };
   }
 
@@ -380,14 +346,8 @@ export class CliRunner implements GhRunner {
     const labels = Array.isArray(args.labels)
       ? args.labels.filter((l): l is string => typeof l === "string")
       : [];
-    const kind = parseTrackingKind(args.kind);
     const role = args.role === "tracking" ? "tracking" : "case";
-    let finalLabels = labels;
-    if (role === "tracking") {
-      finalLabels = kind !== null
-        ? buildTrackingLabels(labels, kind, "created")
-        : [...new Set([TRACKING_ROLE_LABEL, ...labels])];
-    }
+    const finalLabels = role === "tracking" ? buildTrackingLabels(labels) : labels;
     return this.apiWithInput("POST", `repos/${this.repo}/issues`, {
       title: args.title,
       body: args.body,
@@ -425,8 +385,6 @@ export class CliRunner implements GhRunner {
           state,
           labels: meta.labels,
           role: meta.role,
-          kind: meta.kind,
-          trackingState: meta.trackingState,
           closeReason: meta.closeReason,
         },
       };
@@ -438,21 +396,12 @@ export class CliRunner implements GhRunner {
     if (number === null) {
       return this.fail("issue_update requires number", 0, "invalid-input");
     }
-    const kind = args.kind === undefined ? null : parseTrackingKind(args.kind);
-    if (args.kind !== undefined && kind === null) {
-      return this.fail("issue_update received an invalid kind", 0, "invalid-input");
-    }
-    const trackingState =
-      args.trackingState === undefined ? null : parseTrackingState(args.trackingState);
-    if (args.trackingState !== undefined && (trackingState === null || trackingState === "closed")) {
-      return this.fail("issue_update trackingState must be a non-terminal state", 0, "invalid-input");
-    }
     const labelsRequested = Array.isArray(args.labels)
       ? args.labels.filter((l): l is string => typeof l === "string")
       : null;
 
     // 常に現状を取得する。応答の before は VERIFY の追跡軸保持照合の基準であり、
-    // ラベル再構成は要求対象外の追跡軸を現状から復元する（部分更新不変条件）。
+    // 通常ラベル置換は要求対象外の追跡軸（role）を現状から復元する（部分更新不変条件）。
     const current = this.apiGet(`repos/${this.repo}/issues/${number}`, (rec) => ({
       ok: true as const,
       payload: rec,
@@ -464,18 +413,18 @@ export class CliRunner implements GhRunner {
     const before = this.beforeFrom(rec);
     if (before === null) return this.fail("issue update cannot read current labels", 0);
 
-    if ((kind !== null || trackingState !== null) && meta.role !== "tracking") {
-      return this.fail("issue_update kind/trackingState apply only to tracking issues", 0);
-    }
     let nextLabels: string[] | null = null;
-    if (kind !== null || trackingState !== null || labelsRequested !== null) {
-      const base = labelsRequested ?? stripTrackingLabels(meta.labels);
-      const currentKind = kind ?? meta.kind;
-      const currentState = trackingState ?? (meta.trackingState ?? "created");
+    if (labelsRequested !== null) {
+      // labels 要求に role 物理ラベルを含む場合は role 変更要求として扱う
+      // （labels 要求に追跡軸が含まれるため追跡軸は要求対象内）。
+      // 含まない場合は要求対象外の追跡軸（role）を現状から復元する（部分更新不変条件）。
+      const roleRequested = labelsRequested.includes(TRACKING_ROLE_LABEL)
+        ? "tracking"
+        : meta.role;
       nextLabels =
-        meta.role === "tracking"
-          ? this.trackingLabelsFor(base, currentKind, currentState)
-          : base;
+        roleRequested === "tracking"
+          ? buildTrackingLabels(labelsRequested)
+          : [...labelsRequested];
     }
 
     const body: Record<string, unknown> = {};
@@ -526,16 +475,7 @@ export class CliRunner implements GhRunner {
 
   private issueList(args: Record<string, unknown>): GhRunnerReply {
     const role = args.role === "tracking" || args.role === "case" ? args.role : null;
-    const kind = args.kind === undefined ? null : parseTrackingKind(args.kind);
-    if (args.kind !== undefined && kind === null) {
-      return this.fail("issue_list received an invalid kind", 0, "invalid-input");
-    }
     const state = args.state === "open" || args.state === "closed" ? args.state : null;
-    const trackingState =
-      args.trackingState === undefined ? null : parseTrackingState(args.trackingState);
-    if (args.trackingState !== undefined && trackingState === null) {
-      return this.fail("issue_list received an invalid trackingState", 0, "invalid-input");
-    }
     const labels =
       Array.isArray(args.labels)
         ? args.labels.filter((l): l is string => typeof l === "string")
@@ -543,14 +483,9 @@ export class CliRunner implements GhRunner {
     const search = typeof args.search === "string" && args.search.length > 0 ? args.search : null;
 
     // フィルタ可能な軸はサーバ側絞り込みクエリへ推送し、安全上限への到達可能性を
-    // 低減する。追跡軸（kind、非終端状態、role=tracking）は物理ラベルへ写像して推送する。
-    const serverState = state ?? (trackingState === "closed" ? "closed" : "all");
+    // 低減する。追跡軸（role=tracking）は物理ラベルへ写像して推送する。
+    const serverState = state ?? "all";
     const serverLabels = [...labels];
-    if (kind !== null) serverLabels.push(kindToLabel(kind));
-    if (trackingState !== null && trackingState !== "closed") {
-      const stateLabel = trackingStateToLabel(trackingState);
-      if (stateLabel !== null) serverLabels.push(stateLabel);
-    }
     if (role === "tracking") serverLabels.push(TRACKING_ROLE_LABEL);
     // search 指定時は search/issues エンドポイントへ推送し、
     // 安全ページ上限到達前に結果集合をサーバ側で絞り込む。
@@ -603,8 +538,6 @@ export class CliRunner implements GhRunner {
       const meta = this.trackingMetaFrom(rec);
       if (meta === null) continue;
       if (role !== null && meta.role !== role) continue;
-      if (kind !== null && meta.kind !== kind) continue;
-      if (trackingState !== null && meta.trackingState !== trackingState) continue;
       if (labels.length > 0 && !labels.every((l) => meta.labels.includes(l))) continue;
       issues.push({
         number,
@@ -613,8 +546,6 @@ export class CliRunner implements GhRunner {
         state: issueState,
         labels: meta.labels,
         role: meta.role,
-        kind: meta.kind,
-        trackingState: meta.trackingState,
         closeReason: meta.closeReason,
       });
     }
@@ -631,28 +562,19 @@ export class CliRunner implements GhRunner {
     if (number === null) {
       return this.fail("issue_reopen requires number", 0, "invalid-input");
     }
-    // クローズ済み追跡Issueは状態ラベルの再付与（closed → in-discussion）によって
-    // 再オープン遷移を機械適用する。open 済みの場合は要求的状態の確認のみで
-    // 冪等に成功させ、Case Issue には追跡状態遷移を適用しない。
+    // 再オープンは role と通常ラベルを保持する。追跡状態の再オープン遷移は本文の
+    // 状態保持節の更新として呼出側が行い、Tool は状態ラベルの再付与による遷移を
+    // 機械適用しない。open 済みの場合は要求的状態の確認のみで冪等に成功させる。
     const current = this.apiGet(`repos/${this.repo}/issues/${number}`, (rec) => ({
       ok: true as const,
       payload: rec,
     }));
     if (!current.ok) return current;
     const rec = current.payload as Record<string, unknown>;
-    const meta = this.trackingMetaFrom(rec);
-    if (meta === null) return this.fail("issue reopen cannot read current labels", 0);
     const before = this.beforeFrom(rec);
     if (before === null) return this.fail("issue reopen cannot read current labels", 0);
 
     const body: Record<string, unknown> = { state: "open", state_reason: null };
-    if (meta.role === "tracking" && meta.trackingState === "closed") {
-      body.labels = this.trackingLabelsFor(
-        meta.labels,
-        meta.kind,
-        REOPEN_TRACKING_STATE,
-      );
-    }
     return this.apiWithInput("PATCH", `repos/${this.repo}/issues/${number}`, body, (rec2) => {
       const state = normalizeIssueState(rec2.state);
       if (state !== "open") {

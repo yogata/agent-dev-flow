@@ -152,7 +152,6 @@ export type GhToolRequest =
       readonly body: string;
       readonly labels: readonly string[];
       readonly role?: "tracking" | "case";
-      readonly kind?: "problem" | "idea" | "task" | "risk";
     }
   | { readonly operation: "issue_read"; readonly number: IssueNumber }
   | {
@@ -161,13 +160,6 @@ export type GhToolRequest =
       readonly title?: string;
       readonly body?: string;
       readonly labels?: readonly string[];
-      readonly kind?: "problem" | "idea" | "task" | "risk";
-      readonly trackingState?:
-        | "created"
-        | "in-discussion"
-        | "on-hold"
-        | "ready"
-        | "resolved";
     }
   | {
       readonly operation: "issue_close";
@@ -177,15 +169,7 @@ export type GhToolRequest =
   | {
       readonly operation: "issue_list";
       readonly role?: "tracking" | "case";
-      readonly kind?: "problem" | "idea" | "task" | "risk";
       readonly state?: "open" | "closed";
-      readonly trackingState?:
-        | "created"
-        | "in-discussion"
-        | "on-hold"
-        | "ready"
-        | "resolved"
-        | "closed";
       readonly labels?: readonly string[];
       readonly search?: string;
     }
@@ -242,15 +226,6 @@ export type GhToolSuccess =
       readonly state: "open" | "closed";
       readonly labels: readonly string[];
       readonly role: "tracking" | "case";
-      readonly kind: "problem" | "idea" | "task" | "risk" | null;
-      readonly trackingState:
-        | "created"
-        | "in-discussion"
-        | "on-hold"
-        | "ready"
-        | "resolved"
-        | "closed"
-        | null;
       readonly closeReason: "completed" | "not_planned" | null;
     }
   | {
@@ -347,15 +322,6 @@ export interface IssueListItem {
   readonly state: "open" | "closed";
   readonly labels: readonly string[];
   readonly role: "tracking" | "case";
-  readonly kind: "problem" | "idea" | "task" | "risk" | null;
-  readonly trackingState:
-    | "created"
-    | "in-discussion"
-    | "on-hold"
-    | "ready"
-    | "resolved"
-    | "closed"
-    | null;
   readonly closeReason: "completed" | "not_planned" | null;
 }
 

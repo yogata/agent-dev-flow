@@ -15,10 +15,11 @@ export const AGENTDEV_GH_REQUEST_PROPERTY_SCHEMA = {
     "(issue_create, issue_read, issue_update, issue_close, pr_create, pr_read, pr_merge, pr_changed_files, " +
     "pr_mergeable, pr_update, issue_list, issue_reopen, comment_create, comment_list, comment_update, " +
     "comment_delete). " +
-    "Tracking-issue operations expose logical values (role, kind, trackingState); physical label mapping " +
-    "is applied inside the tool. Comments are a shared logical resource of issues and pull requests, " +
-    "identified by commentId (public type: string). Side-effect operations are verified by read-back " +
-    "before success is returned (fail-closed).",
+    "Tracking-issue operations expose the logical role; physical label mapping " +
+    "is applied inside the tool. Tracking-issue kind and non-terminal state are held in the issue body " +
+    "standard structure, not accepted or derived by the tool. Comments are a shared logical resource " +
+    "of issues and pull requests, identified by commentId (public type: string). Side-effect operations " +
+    "are verified by read-back before success is returned (fail-closed).",
   properties: {
     operation: {
       type: "string",
@@ -51,17 +52,6 @@ export const AGENTDEV_GH_REQUEST_PROPERTY_SCHEMA = {
       type: "string",
       enum: ["tracking", "case"],
       description: "Logical issue role for issue_create / issue_list.",
-    },
-    kind: {
-      type: "string",
-      enum: ["problem", "idea", "task", "risk"],
-      description: "Logical tracking-issue kind for issue_create / issue_update / issue_list.",
-    },
-    trackingState: {
-      type: "string",
-      enum: ["created", "in-discussion", "on-hold", "ready", "resolved", "closed"],
-      description:
-        "Logical tracking-issue state. issue_update accepts non-terminal states only; issue_list accepts all.",
     },
     state: {
       type: "string",

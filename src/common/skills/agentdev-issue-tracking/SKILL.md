@@ -11,7 +11,7 @@ description: 追跡Issue（課題、ToDo、アイデア、リスク等の未解�
 ## 責務と境界
 
 - 追跡Issueは GitHub Issue を Case Issue（req/case パイプラインの実行票）と共有する管理単位であり、論理 role（tracking / case）により区別される。role、kind、状態と状態遷移、物理マッピング、本文標準構造の正は追跡Issue論理スキーマ一元管理 Design が所有し、本スキルはその運用記述を提供する
-- 追跡Issueへの I/O は Custom Tool `agentdev_gh` の操作契約（issue_create、issue_read、issue_update、comment_create、comment_list、issue_close、issue_list、issue_reopen）経由でのみ行う。Comment の更新（comment_update）、削除（comment_delete）は Comment 利用規律（後述）に従う場合に限り利用する。ラベル名等の物理値への写像は Tool 内実装が機械適用するため、本スキルおよび上位層は論理値（role、kind、状態）のみを扱う
+- 追跡Issueへの I/O は Custom Tool `agentdev_gh` の操作契約（issue_create、issue_read、issue_update、comment_create、comment_list、issue_close、issue_list、issue_reopen）経由でのみ行う。Comment の更新（comment_update）、削除（comment_delete）は Comment 利用規律（後述）に従う場合に限り利用する。ラベル名等の物理値への写像は Tool 内実装が機械適用するため、本スキルおよび上位層は論理 role を Tool 操作契約で扱い、kind と追跡Issue状態は本文標準構造の項目として表現する
 - GitHub 版ではリポジトリ内に課題ファイルを作成し、commit しない。ローカル版は同一の操作契約でローカルIssueが読み書きされる（Tool が差し替わるため、本スキルは環境差を意識しない）
 - Issue の存在自体を Agent の実行許可としない。追跡Issueを実行票へ直接変質させない。実行が確定した場合は req-define 等の正規要件化・設計経路へ引き継ぎ、Case Issue の生成は case-open が行う
 - 解決結果の正規成果物への反映は、当該成果物を所有する能力へ委譲する。本スキルは結論、反映先、反映状態の追跡に徹する
@@ -33,6 +33,8 @@ description: 追跡Issue（課題、ToDo、アイデア、リスク等の未解�
 追跡Issue本文は次のセクションを標準構造として保持する。起票時に反映先・クローズ確認を含めない（反映先の決め打ち回避）。不要なセクションは省略できる。
 
 - 件名（title）
+- kind（problem、idea、task、risk のいずれかを示す項目）
+- 状態保持節（非終端追跡Issue状態の現在値を保持する。起票時の初期値は 起票）
 - 背景
 - 影響
 - 関連成果物
@@ -44,38 +46,40 @@ description: 追跡Issue（課題、ToDo、アイデア、リスク等の未解�
 - 反映先と反映状態（解決後に記録）
 - 関連 Case Issue への参照（実行確定時に記録）
 
+kind と非終端状態は GitHub ラベルへ写像せず、本文標準構造の項目（kind、状態保持節）として表現する。Tool 操作契約は kind と trackingState を受理・導出しない（契約外フィールドは副作用発生前に invalid-input で拒否される）。起票時には本文標準構造の kind 項目と状態保持節の初期値（起票）を本文へ生成すること。
+
 ## 状態遷移と Tool 操作の対応
 
 | 操作 | Tool 操作契約 | 状態遷移 |
 |---|---|---|
-| 起票 | `issue_create`（role: tracking、kind 指定。labels は必須引数のため空配列も明示する） | （新規）→ 起票 |
-| 更新 | `issue_update`（title、body、labels） | 状態不変 |
+| 起票 | `issue_create`（role: tracking。labels は必須引数のため空配列も明示する。本文標準構造の kind 項目と状態保持節の初期値を本文へ生成する） | （新規）→ 起票 |
+| 更新 | `issue_update`（title、body、labels。本文の状態保持節の更新は本文更新として行う） | 状態不変 |
 | 検討経過の追加 | `comment_create`（number、body 付き） | 状態不変 |
-| 検討中への遷移 | `issue_update`（trackingState 指定） | 起票/保留/実行準備完了 → 検討中 |
-| 保留 | `issue_update`（trackingState 指定） | → 保留（保留理由と再評価条件を本文へ整備） |
-| 実行準備完了 | `issue_update`（trackingState 指定） | → 実行準備完了 |
-| 解決 | `issue_update`（trackingState 指定） | → 解決済み（解決結論を本文へ記録） |
+| 検討中への遷移 | `issue_update`（本文の状態保持節を検討中へ更新） | 起票/保留/実行準備完了 → 検討中 |
+| 保留 | `issue_update`（本文の状態保持節を保留へ更新。保留理由と再評価条件を本文へ整備） | → 保留 |
+| 実行準備完了 | `issue_update`（本文の状態保持節を実行準備完了へ更新） | → 実行準備完了 |
+| 解決 | `issue_update`（本文の状態保持節を解決済みへ更新。解決結論を本文へ記録） | → 解決済み |
 | クローズ | `issue_close`（reason: completed / not_planned） | 解決済み等 → クローズ済み |
 | 再オープン | `issue_reopen` | クローズ済み → 検討中 |
-| 検索・参照 | `issue_list`（絞り込み軸 role、kind、state、trackingState、labels、search を Tool へ指定して列挙）、`issue_read`、`comment_list`（Comment の時系列読取） | - |
+| 検索・参照 | `issue_list`（絞り込み軸 role、state、labels、search を Tool へ指定して列挙）、`issue_read`、`comment_list`（Comment の時系列読取） | - |
 
 クローズの reason は、反映完了によるクローズで `completed`、対応不要の確認完了を経由したクローズで `not_planned` を使う。
 
-再オープンはクローズ済みから検討中（in-discussion、再検討）へ遷移させる。再オープンによって kind と通常ラベルを失わない。GitHub 版では Tool が状態ラベルの再付与によって遷移を機械適用する。ローカル版は role: case のローカルIssueに対する reopen を拒否する（role: case の状態遷移は終端状態からの遷移を定義しないため）。
+再オープンはクローズ済みから検討中（in-discussion、再検討）へ遷移させる。再オープンによって role と通常ラベルを失わない。追跡状態の遷移は本文の状態保持節の更新として呼出側が行い、Tool は状態ラベルの再付与による遷移を機械適用しない。ローカル版は role: case のローカルIssueに対する reopen を拒否する（role: case の状態遷移は終端状態からの遷移を定義しないため）。
 
-`issue_list` の絞り込み軸（role、kind、state、trackingState、labels、search）は呼出引数として指定し、Tool がサーバ側の絞り込みクエリとして解決する。Tool は必要なページをすべて取得して完全一覧として返すため上位層はページングを指定せず、安全上の上限によって完全取得できない場合は不完全な一覧を成功結果として返さない。
+`issue_list` の絞り込み軸（role、state、labels、search）は呼出引数として指定し、Tool がサーバ側の絞り込みクエリとして解決する。Tool は必要なページをすべて取得して完全一覧として返すため上位層はページングを指定せず、安全上の上限によって完全取得できない場合は不完全な一覧を成功結果として返さない。
 
 ## Tool 呼出の 3 規則（tracking 軸限定）
 
 追跡Issue（role: tracking）の操作で、Tool 呼出形式に起因する失敗と検証漏れを予防するため、次の 3 規則を適用する。本節の規則は追跡軸の操作に限定する（Case Issue の操作手続きは case-open / case-run / case-close 側の参照先に従う）。Tool 内部実装の変更を前提とせず、呼出形式の運用で予防・復帰する。
 
-1. **labels 省略の取扱い**: `issue_create` の labels 引数は操作契約上必須であり、ラベルを付けない場合も空配列を明示する。`issue_update` で labels を省略した場合、Tool は追跡軸（role、kind、状態）のラベルを維持する。呼出側で追跡軸の物理ラベル名を指定・除去して写像を再実装しない
+1. **labels 省略の取扱い**: `issue_create` の labels 引数は操作契約上必須であり、ラベルを付けない場合も空配列を明示する。`issue_update` で labels を省略した場合、Tool は追跡軸（role）のラベルを維持する。呼出側で追跡軸の物理ラベル名を指定・除去して写像を再実装しない
 2. **read-back 確認**: 書き込み系操作（`issue_create`、`issue_update`、`comment_create`、`issue_close`、`issue_reopen` 等）の成功応答は Tool 内部の読み戻し検証済みである。呼出側は成功応答をもって反映確認として扱い、機械的な同一内容の再読込を重複実行しない（状態遷移の意味確認など、読み取りに独立の目的がある場合はこの限りでない）
-3. **論理値指定**: role、kind、trackingState は Tool 操作契約の論理値で指定する。物理ラベル名を呼出側から指定しない（物理ラベル写像は Tool 内実装の責務）
+3. **論理値指定**: role は Tool 操作契約の論理値で指定する。kind と追跡Issue状態は本文標準構造の項目として本文へ表現し、物理ラベル名を呼出側から指定しない（物理ラベル写像は Tool 内実装の責務）
 
 ### 操作・role 別の受理フィールド対応表と gh 読取補完規律への参照
 
-操作別の受理フィールド差異（`role` は issue_create / issue_list 専用、`kind` は `role: tracking` 専用で `role: case` では不受理、Case Issue の work_type は物理ラベルを `labels` へ指定）は、受理フィールド対応表として安全手続き側の `agentdev-issue-management` references `issue-operation-safety.md`「操作・role 別の受理フィールド対応表」節へ集約する。呼出側はその対応表から受理可否を確認する。
+操作別の受理フィールド差異（`role` は issue_create / issue_list 専用、kind と trackingState は Tool 操作契約から削減済みで本文標準構造へ集約、Case Issue の work_type は物理ラベルを `labels` へ指定）は、受理フィールド対応表として安全手続き側の `agentdev-issue-management` references `issue-operation-safety.md`「操作・role 別の受理フィールド対応表」節へ集約する。呼出側はその対応表から受理可否を確認する。
 
 gh CLI による読取補完（Case の正規識別に `case` ラベルを使用せず、ラベルフィルタの結果の完全性を保証しない）は、ラベルなし列挙＋タイトル・本文確認の規律で行う。正は同 reference「gh CLI 読取補完の規律（ラベルなし列挙＋タイトル・本文確認）」節である。
 
@@ -110,7 +114,7 @@ Comment 更新・削除の適用可否判断規律の正は本節の操作知識
 
 1. **候補判定**: 現在の作業で解決できず、かつ将来の設計、実装、検証、合意等に影響する未解決事項かを判定する。すべての疑問、一時的な覚え書き、一時エラーを課題化しない
 2. **事前解決の試行**: 正規成果物の確認等によってその場で解決可能な疑問は、課題化前に解決を試みる
-3. **既存追跡Issue検索**: `issue_list`（role、kind、search 等の絞り込み軸を Tool へ指定）で既存追跡Issueを検索し、重複起票を避ける。同一論点の既存追跡Issueがある場合は重複起票せず、既存追跡Issueへの統合・参照を提案する
+3. **既存追跡Issue検索**: `issue_list`（role、search 等の絞り込み軸を Tool へ指定）で既存追跡Issueを検索し、重複起票を避ける。同一論点の既存追跡Issueがある場合は重複起票せず、既存追跡Issueへの統合・参照を提案する
 4. **件名の生成**: 確認された主題に基づき Tracking 接頭辞書式の件名を生成する。書式の具体と主題原則は `<workflows/issue-title-policy>` Design（Issue タイトル記述規則）を参照し、本スキルでは書式を複製しない
 
 正規成果物または現在の会話で結論が確定している事項は、その結果を追跡Issueへ反映できる。ユーザー合意が必要な設計判断を課題管理側だけで確定しない。
@@ -120,13 +124,13 @@ Comment 更新・削除の適用可否判断規律の正は本節の操作知識
 本スキルは共有能力であり、人間向け公開入口（`/agentdev/issue` command）の明示実行を利用の必須条件としない。
 
 - 要件定義、設計、レビュー、実装、検証等の各 workflow、各 skill は、未解決事項を認識した場合に本スキルの知識を直接利用し、Tool 操作契約経由で追跡Issueの操作を行える
-- 保留中の追跡Issueは `issue_list`（trackingState による状態絞り込みを Tool へ指定）で到達できる。関連する作業、設計、レビュー、分析を行う際に再評価条件の成立を確認する
+- 保留中の追跡Issueは `issue_list`（search による絞り込み）や `issue_read`（本文の状態保持節の確認）で到達できる。関連する作業、設計、レビュー、分析を行う際に再評価条件の成立を確認する
 - 本スキルの利用にあたり新規の承認点を追加しない。既存の承認、判断境界（ユーザー合意が必要な設計判断を本スキルが勝手に確定しない等）は維持する
 
 ## 禁止事項
 
 - 追跡Issueの操作に、サブコマンド、ラベル名、Issue Type、Field 名等の GitHub 実装詳細の把握をユーザーに要求しないこと
-- 物理ラベルへの写像（role、kind、状態とラベルの対応）を本スキルや上位層で再実装しないこと（Tool 操作契約の論理値を使うこと）
+- 物理ラベルへの写像（role とラベルの対応）を本スキルや上位層で再実装しないこと（Tool 操作契約の論理値を使うこと）
 - GitHub 版でリポジトリ内に課題ファイルを作成し、commit しないこと
 - ローカル版のローカルIssueの保存先を直接読み書きしないこと（Tool 操作契約経由のみ）
 - 追跡Issueを Case Issue（実行票）へ直接変質させないこと。実行は req-define 等の正規経路へ引き継ぐこと

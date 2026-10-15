@@ -1,6 +1,11 @@
 component: agentdev-issue-tracking
 implementation:
   src/common/skills/agentdev-issue-tracking/SKILL.md:
+    - REQ-049-002
+    - REQ-049-003
+    - REQ-011-022
+    - REQ-011-025
+    - REQ-011-026
     - REQ-095-001
     - REQ-095-002
     - REQ-100-001

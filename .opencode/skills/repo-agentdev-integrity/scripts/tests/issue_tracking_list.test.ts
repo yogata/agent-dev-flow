@@ -26,14 +26,9 @@ import {
 import type { GhRunner, GhRunnerReply, GhRunnerRequest } from "../../../../../src/common/tools/agentdev-gh/runner.ts";
 import {
   buildTrackingLabels,
-  deriveKind,
+  deriveCloseReason,
   deriveRole,
-  deriveTrackingState,
-  kindToLabel,
-  labelToKind,
-  labelToTrackingState,
   stripTrackingLabels,
-  TRACKING_KINDS,
   TRACKING_ROLE_LABEL,
   TRACKING_STATES,
 } from "../../../../../src/common/tools/agentdev-gh/tracking-schema.ts";
@@ -87,18 +82,15 @@ function fakeGithubRunner(issues: Map<number, Record<string, unknown>>): GhRunne
         (issue.labels as { name: string }[]).map((l) => l.name);
       const beforeOf = (issue: Record<string, unknown>): Record<string, unknown> => {
         const labels = labelNamesOf(issue);
-        const derived = deriveTrackingState(
-          labels,
-          issue.state as "open" | "closed",
-          issue.state_reason as string | null,
-        );
         return {
           state: issue.state,
           labels,
           role: deriveRole(labels),
-          kind: deriveKind(labels),
-          trackingState: derived.trackingState,
-          closeReason: derived.closeReason,
+          closeReason: deriveCloseReason(
+            labels,
+            issue.state as "open" | "closed",
+            issue.state_reason as string | null,
+          ),
         };
       };
       switch (request.operation) {
@@ -130,17 +122,11 @@ function fakeGithubRunner(issues: Map<number, Record<string, unknown>>): GhRunne
               state: issue.state,
               labels: labelNamesOf(issue),
               role: deriveRole(labelNamesOf(issue)),
-              kind: deriveKind(labelNamesOf(issue)),
-              trackingState: deriveTrackingState(
+              closeReason: deriveCloseReason(
                 labelNamesOf(issue),
                 issue.state as "open" | "closed",
                 issue.state_reason as string | null,
-              ).trackingState,
-              closeReason: deriveTrackingState(
-                labelNamesOf(issue),
-                issue.state as "open" | "closed",
-                issue.state_reason as string | null,
-              ).closeReason,
+              ),
               stateReason: issue.state_reason,
             },
           };
@@ -175,15 +161,6 @@ function fakeGithubRunner(issues: Map<number, Record<string, unknown>>): GhRunne
           const before = beforeOf(issue);
           issue.state = "open";
           issue.state_reason = null;
-          if (before.role === "tracking" && before.trackingState === "closed") {
-            // CliRunner 相当の再オープン遷移の機械適用（role/kind/通常ラベル保持）
-            const next2 = [TRACKING_ROLE_LABEL];
-            const kind = before.kind as string | null;
-            if (kind !== null) next2.push(kindToLabel(kind as never));
-            next2.push("agentdev-tracking-status/in-discussion");
-            const normal = stripTrackingLabels(before.labels as string[]);
-            issue.labels = ghLabelNames([...new Set([...next2, ...normal])]);
-          }
           return { ok: true, payload: { number, state: "open", before } };
         }
         case "issue_list": {
@@ -242,7 +219,7 @@ describe("Tool 操作契約の追跡Issue操作（カタログと契約）", () 
     expect(GH_TOOL_OPERATION_CATALOG.find((e) => e.operation === "issue_reopen")?.kind).toBe("side-effect");
   });
 
-  it("issue_read は role/kind/trackingState/closeReason を含むメタデータを返す", async () => {
+  it("issue_read は role/closeReason を含むメタデータを返す", async () => {
     const issues = new Map<number, Record<string, unknown>>([
       [7, {
         number: 7,
@@ -250,7 +227,7 @@ describe("Tool 操作契約の追跡Issue操作（カタログと契約）", () 
         body: "B",
         state: "open",
         state_reason: null,
-        labels: ghLabelNames([TRACKING_ROLE_LABEL, kindToLabel("risk"), "agentdev-tracking-status/on-hold"]),
+        labels: ghLabelNames([TRACKING_ROLE_LABEL, "priority"]),
       }],
     ]);
     const result = await runAgentdevGhOperation(ghEnv(fakeGithubRunner(issues)), {
@@ -260,14 +237,8 @@ describe("Tool 操作契約の追跡Issue操作（カタログと契約）", () 
     expect(result.ok).toBe(true);
     if (result.ok && result.success.operation === "issue_read") {
       expect(result.success.role).toBe("tracking");
-      expect(result.success.kind).toBe("risk");
-      expect(result.success.trackingState).toBe("on-hold");
       expect(result.success.closeReason).toBeNull();
-      expect(result.success.labels).toEqual([
-        TRACKING_ROLE_LABEL,
-        "agentdev-kind/risk",
-        "agentdev-tracking-status/on-hold",
-      ]);
+      expect(result.success.labels).toEqual([TRACKING_ROLE_LABEL, "priority"]);
     }
   });
 
@@ -336,58 +307,25 @@ describe("Tool 操作契約の追跡Issue操作（カタログと契約）", () 
 
 describe("物理写像の機械適用（写像表の単一所有）", () => {
   it("role は物理ラベルの有無で機械判定できる", () => {
-    expect(deriveRole([TRACKING_ROLE_LABEL, kindToLabel("problem")])).toBe("tracking");
+    expect(deriveRole([TRACKING_ROLE_LABEL])).toBe("tracking");
     expect(deriveRole(["enhancement", "feature"])).toBe("case");
     expect(deriveRole([])).toBe("case");
   });
 
-  it("kind は 4 値をラベルへ双方向に写像する", () => {
-    for (const kind of TRACKING_KINDS) {
-      expect(labelToKind(kindToLabel(kind))).toBe(kind);
-    }
-    expect(labelToKind("enhancement")).toBeNull();
-    expect(labelToKind(TRACKING_ROLE_LABEL)).toBeNull();
-  });
-
   it("状態の三段写像に従って GitHub state と close reason を導出する", () => {
     for (const state of ["created", "in-discussion", "on-hold", "ready", "resolved"] as const) {
-      const r = deriveTrackingState(
-        [TRACKING_ROLE_LABEL, "agentdev-tracking-status/" + state],
-        "open",
-        null,
-      );
-      expect(r.trackingState).toBe(state);
-      expect(r.closeReason).toBeNull();
+      expect(deriveCloseReason([TRACKING_ROLE_LABEL], "open", null)).toBeNull();
+      expect(state).toBeDefined();
     }
-    expect(deriveTrackingState([TRACKING_ROLE_LABEL], "closed", "completed")).toEqual({
-      trackingState: "closed",
-      closeReason: "completed",
-    });
-    expect(deriveTrackingState([TRACKING_ROLE_LABEL], "closed", "not_planned")).toEqual({
-      trackingState: "closed",
-      closeReason: "not_planned",
-    });
-    expect(deriveTrackingState(["feature"], "closed", "completed").trackingState).toBeNull();
+    expect(deriveCloseReason([TRACKING_ROLE_LABEL], "closed", "completed")).toBe("completed");
+    expect(deriveCloseReason([TRACKING_ROLE_LABEL], "closed", "not_planned")).toBe("not_planned");
+    expect(deriveCloseReason(["feature"], "closed", "completed")).toBeNull();
   });
 
-  it("追跡Issue軸のラベル構成は既存ラベルを保持して置換する", () => {
-    const next = buildTrackingLabels(
-      [TRACKING_ROLE_LABEL, "agentdev-kind/idea", "agentdev-tracking-status/created", "priority"],
-      "risk",
-      "on-hold",
-    );
-    expect(next).toEqual([
-      TRACKING_ROLE_LABEL,
-      "agentdev-kind/risk",
-      "agentdev-tracking-status/on-hold",
-      "priority",
-    ]);
-  });
-
-  it("ラベルへの状態写像は非終端状態のみを受け付ける", () => {
-    expect(labelToTrackingState("agentdev-tracking-status/resolved")).toBe("resolved");
-    expect(labelToTrackingState("agentdev-tracking-status/closed")).toBeNull();
-    expect(labelToTrackingState("agentdev-kind/risk")).toBeNull();
+  it("追跡Issue軸のラベル構成は role 物理ラベルのみを追跡軸として付与し既存ラベルを保持する", () => {
+    expect(buildTrackingLabels(["priority"])).toEqual([TRACKING_ROLE_LABEL, "priority"]);
+    expect(buildTrackingLabels([TRACKING_ROLE_LABEL, "priority"])).toEqual([TRACKING_ROLE_LABEL, "priority"]);
+    expect(stripTrackingLabels([TRACKING_ROLE_LABEL, "priority"])).toEqual(["priority"]);
   });
 
   it("追跡Issue状態は 6 値（起票、検討中、保留、実行準備完了、解決済み、クローズ済み）", () => {
@@ -426,16 +364,16 @@ describe("ローカルIssueの role 条件付きスキーマ（単一採番空�
       "closed",
       "cancelled",
     ]);
-    expect([...localLabelValues("tracking")]).toEqual(["problem", "idea", "task", "risk"]);
+    expect([...localLabelValues("tracking")]).toEqual([]);
     expect([...localLabelValues("case")]).toContain("feature");
     expect([...localTerminalStatuses("tracking")]).toEqual(["closed"]);
     expect([...localTerminalStatuses("case")]).toEqual(["closed", "cancelled"]);
   });
 
-  it("追跡Issueは kind をちょうど1つ、終端状態は closed_at を要求する", () => {
+  it("tracking の labels 値域検証は廃止済みで、終端状態は closed_at を要求する", () => {
     expect(validateLocalIssue(fm({}), "issue-0001.md").valid).toBe(true);
-    expect(validateLocalIssue(fm({ labels: [] }), "issue-0001.md").valid).toBe(false);
-    expect(validateLocalIssue(fm({ labels: ["risk", "task"] }), "issue-0001.md").valid).toBe(false);
+    expect(validateLocalIssue(fm({ labels: [] }), "issue-0001.md").valid).toBe(true);
+    expect(validateLocalIssue(fm({ labels: ["risk", "task"] }), "issue-0001.md").valid).toBe(true);
     expect(validateLocalIssue(fm({ status: "closed", closed_at: "" }), "issue-0001.md").valid).toBe(false);
     expect(
       validateLocalIssue(fm({ status: "closed", closed_at: "2026-08-25T00:00:00Z" }), "issue-0001.md").valid,
@@ -459,7 +397,6 @@ describe("ローカルIssueの role 条件付きスキーマ（単一採番空�
       body: "b",
       labels: [],
       role: "tracking",
-      kind: "task",
     });
     expect(tracking2.ok).toBe(true);
     if (tracking2.ok && case1.ok) {
@@ -477,14 +414,12 @@ describe("ローカルIssueの role 条件付きスキーマ（単一採番空�
       body: "## 背景\n\n本文",
       labels: [],
       role: "tracking",
-      kind: "idea",
     });
     expect(created.ok).toBe(true);
 
     const listed = await runAgentdevGhOperation(env, {
       operation: "issue_list",
       role: "tracking",
-      kind: "idea",
     });
     expect(listed.ok).toBe(true);
     if (listed.ok && listed.success.operation === "issue_list") {
@@ -492,12 +427,12 @@ describe("ローカルIssueの role 条件付きスキーマ（単一採番空�
       expect(listed.success.issues[0]?.role).toBe("tracking");
     }
 
-    const resolved = await runAgentdevGhOperation(env, {
+    const updated = await runAgentdevGhOperation(env, {
       operation: "issue_update",
       number: 1,
-      trackingState: "resolved",
+      title: "論点 更新後",
     });
-    expect(resolved.ok).toBe(true);
+    expect(updated.ok).toBe(true);
     const closed = await runAgentdevGhOperation(env, {
       operation: "issue_close",
       number: 1,
@@ -520,7 +455,6 @@ describe("ローカルIssueの role 条件付きスキーマ（単一採番空�
       body: "b",
       labels: [],
       role: "tracking",
-      kind: "risk",
     });
     const onlyTracking = await runAgentdevGhOperation(env, {
       operation: "pr_create",

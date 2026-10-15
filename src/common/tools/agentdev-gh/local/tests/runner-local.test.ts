@@ -106,25 +106,25 @@ describe("LocalRunner: ローカルIssueの作成と採番", () => {
     fs.rmSync(issuesDir, { recursive: true, force: true });
   });
 
-  test("issue_create は role: tracking を kind 付きで作成し初期状態 起票 を与える", async () => {
+  test("issue_create は role: tracking を初期状態 起票 で作成する", async () => {
     const issuesDir = makeIssuesDir();
     const reply = await run(issuesDir, {
       operation: "issue_create",
-      args: { title: "リスク", body: "本文", labels: [], role: "tracking", kind: "risk" },
+      args: { title: "リスク", body: "本文", labels: [], role: "tracking" },
     });
     expect(reply.ok).toBe(true);
     const raw = readIssueFile(issuesDir, 1);
     expect(raw).toContain("role: tracking");
     expect(raw).toContain("status: created");
-    expect(raw).toContain("labels: [risk]");
+    expect(raw).toContain("labels: []");
     fs.rmSync(issuesDir, { recursive: true, force: true });
   });
 
-  test("tracking の issue_create は kind 欠落を拒否する", async () => {
+  test("tracking の issue_create は通常ラベル指定を拒否する（ローカル版の値域差異）", async () => {
     const issuesDir = makeIssuesDir();
     const reply = await run(issuesDir, {
       operation: "issue_create",
-      args: { title: "無印", body: "本文", labels: [], role: "tracking" },
+      args: { title: "無印", body: "本文", labels: ["feature"], role: "tracking" },
     });
     expect(reply.ok).toBe(false);
     fs.rmSync(issuesDir, { recursive: true, force: true });
@@ -133,7 +133,7 @@ describe("LocalRunner: ローカルIssueの作成と採番", () => {
   test("採番は role をまたぐ単一空間（既存最大 + 1、欠番再利用なし）", async () => {
     const issuesDir = makeIssuesDir();
     await run(issuesDir, { operation: "issue_create", args: { title: "A", body: "a", labels: [], role: "case" } });
-    await run(issuesDir, { operation: "issue_create", args: { title: "B", body: "b", labels: [], role: "tracking", kind: "task" } });
+    await run(issuesDir, { operation: "issue_create", args: { title: "B", body: "b", labels: [], role: "tracking" } });
     fs.rmSync(path.join(issuesDir, "issue-0001.md"));
     const reply = await run(issuesDir, {
       operation: "issue_create",
@@ -165,19 +165,16 @@ describe("LocalRunner: role 条件付きスキーマの機械検証", () => {
     ).toBe(false);
   });
 
-  test("tracking の labels は kind 4値からちょうど1つを要求する", () => {
+  test("tracking の labels 値域検証は廃止済みで既存 kind トークン付き資産の読取を壊さない", () => {
+    expect(
+      validateLocalIssue(baseFm({ role: "tracking", status: "created", labels: [] }), "issue-0001.md").valid,
+    ).toBe(true);
     expect(
       validateLocalIssue(baseFm({ role: "tracking", status: "created", labels: ["risk"] }), "issue-0001.md").valid,
     ).toBe(true);
     expect(
-      validateLocalIssue(baseFm({ role: "tracking", status: "created", labels: [] }), "issue-0001.md").valid,
-    ).toBe(false);
-    expect(
       validateLocalIssue(baseFm({ role: "tracking", status: "created", labels: ["risk", "task"] }), "issue-0001.md").valid,
-    ).toBe(false);
-    expect(
-      validateLocalIssue(baseFm({ role: "tracking", status: "created", labels: ["feature"] }), "issue-0001.md").valid,
-    ).toBe(false);
+    ).toBe(true);
   });
 
   test("case の status と labels は case 値域から選択される", () => {
@@ -215,11 +212,11 @@ describe("LocalRunner: issue_read / issue_update / issue_list", () => {
     const issuesDir = makeIssuesDir();
     await run(issuesDir, {
       operation: "issue_create",
-      args: { title: "保留中", body: "本文", labels: [], role: "tracking", kind: "problem" },
+      args: { title: "保留中", body: "本文", labels: [], role: "tracking" },
     });
     await run(issuesDir, {
       operation: "issue_update",
-      args: { number: 1, trackingState: "on-hold" },
+      args: { number: 1, title: "保留中 更新後" },
     });
     const reply = await run(issuesDir, { operation: "issue_read", args: { number: 1 } });
     expect(reply.ok).toBe(true);
@@ -227,31 +224,25 @@ describe("LocalRunner: issue_read / issue_update / issue_list", () => {
       const payload = reply.payload as Record<string, unknown>;
       expect(payload.state).toBe("open");
       expect(payload.role).toBe("tracking");
-      expect(payload.kind).toBe("problem");
-      expect(payload.trackingState).toBe("on-hold");
+      expect(payload.closeReason).toBeNull();
       expect(String(payload.body).startsWith("---\n")).toBe(true);
     }
     fs.rmSync(issuesDir, { recursive: true, force: true });
   });
 
-  test("issue_update の trackingState は追跡Issue以外へ適用できず、終端状態は拒否する", async () => {
+  test("issue_update は status を変更せず、role: tracking への通常ラベル指定を拒否する", async () => {
     const issuesDir = makeIssuesDir();
     await run(issuesDir, { operation: "issue_create", args: { title: "C", body: "b", labels: [], role: "case" } });
-    const onCase = await run(issuesDir, {
-      operation: "issue_update",
-      args: { number: 1, trackingState: "resolved" },
-    });
-    expect(onCase.ok).toBe(false);
-
     await run(issuesDir, {
       operation: "issue_create",
-      args: { title: "T", body: "b", labels: [], role: "tracking", kind: "idea" },
+      args: { title: "T", body: "b", labels: [], role: "tracking" },
     });
-    const terminal = await run(issuesDir, {
+    const tracked = await run(issuesDir, {
       operation: "issue_update",
-      args: { number: 2, trackingState: "closed" },
+      args: { number: 2, labels: ["feature"] },
     });
-    expect(terminal.ok).toBe(false);
+    expect(tracked.ok).toBe(false);
+    expect(readIssueFile(issuesDir, 2)).toContain("status: created");
     fs.rmSync(issuesDir, { recursive: true, force: true });
   });
 
@@ -297,13 +288,11 @@ describe("LocalRunner: issue_read / issue_update / issue_list", () => {
     fs.rmSync(issuesDir, { recursive: true, force: true });
   });
 
-  test("issue_list は role/kind/trackingState/state で絞り込む", async () => {
+  test("issue_list は role/state で絞り込む", async () => {
     const issuesDir = makeIssuesDir();
     await run(issuesDir, { operation: "issue_create", args: { title: "Case A", body: "b", labels: ["feature"], role: "case" } });
-    await run(issuesDir, { operation: "issue_create", args: { title: "保留", body: "b", labels: [], role: "tracking", kind: "problem" } });
-    await run(issuesDir, { operation: "issue_update", args: { number: 2, trackingState: "on-hold" } });
-    await run(issuesDir, { operation: "issue_create", args: { title: "解決", body: "b", labels: [], role: "tracking", kind: "idea" } });
-    await run(issuesDir, { operation: "issue_update", args: { number: 3, trackingState: "resolved" } });
+    await run(issuesDir, { operation: "issue_create", args: { title: "保留", body: "b", labels: [], role: "tracking" } });
+    await run(issuesDir, { operation: "issue_create", args: { title: "解決", body: "b", labels: [], role: "tracking" } });
 
     const tracking = await run(issuesDir, { operation: "issue_list", args: { role: "tracking" } });
     expect(tracking.ok).toBe(true);
@@ -311,20 +300,14 @@ describe("LocalRunner: issue_read / issue_update / issue_list", () => {
       const issues = (tracking.payload as Record<string, unknown>).issues as Record<string, unknown>[];
       expect(issues.map((i) => i.number)).toEqual([2, 3]);
     }
-    const onHold = await run(issuesDir, {
+    const openOnly = await run(issuesDir, {
       operation: "issue_list",
-      args: { role: "tracking", trackingState: "on-hold" },
+      args: { role: "tracking", state: "open" },
     });
-    expect(onHold.ok).toBe(true);
-    if (onHold.ok) {
-      const issues = (onHold.payload as Record<string, unknown>).issues as Record<string, unknown>[];
-      expect(issues.map((i) => i.number)).toEqual([2]);
-    }
-    const risky = await run(issuesDir, { operation: "issue_list", args: { kind: "risk" } });
-    expect(risky.ok).toBe(true);
-    if (risky.ok) {
-      const issues = (risky.payload as Record<string, unknown>).issues as Record<string, unknown>[];
-      expect(issues.length).toBe(0);
+    expect(openOnly.ok).toBe(true);
+    if (openOnly.ok) {
+      const issues = (openOnly.payload as Record<string, unknown>).issues as Record<string, unknown>[];
+      expect(issues.map((i) => i.number)).toEqual([2, 3]);
     }
     const cases = await run(issuesDir, { operation: "issue_list", args: { role: "case" } });
     expect(cases.ok).toBe(true);
@@ -360,7 +343,7 @@ describe("LocalRunner: Comment CRUD（c{NN} 物理写像）", () => {
     const issuesDir = makeIssuesDir();
     await run(issuesDir, {
       operation: "issue_create",
-      args: { title: "T", body: "本文", labels: [], role: "tracking", kind: "problem" },
+      args: { title: "T", body: "本文", labels: [], role: "tracking" },
     });
     const created = await run(issuesDir, {
       operation: "comment_create",
@@ -388,7 +371,7 @@ describe("LocalRunner: Comment CRUD（c{NN} 物理写像）", () => {
     const issuesDir = makeIssuesDir();
     await run(issuesDir, {
       operation: "issue_create",
-      args: { title: "T", body: "本文", labels: [], role: "tracking", kind: "problem" },
+      args: { title: "T", body: "本文", labels: [], role: "tracking" },
     });
     await run(issuesDir, {
       operation: "issue_create",
@@ -421,7 +404,7 @@ describe("LocalRunner: Comment CRUD（c{NN} 物理写像）", () => {
     const issuesDir = makeIssuesDir();
     await run(issuesDir, {
       operation: "issue_create",
-      args: { title: "T", body: "本文", labels: [], role: "tracking", kind: "task" },
+      args: { title: "T", body: "本文", labels: [], role: "tracking" },
     });
     await run(issuesDir, { operation: "comment_create", args: { number: 1, body: "1件目" } });
     await run(issuesDir, { operation: "comment_create", args: { number: 1, body: "2件目" } });
@@ -454,7 +437,7 @@ describe("LocalRunner: Comment CRUD（c{NN} 物理写像）", () => {
     const issuesDir = makeIssuesDir();
     await run(issuesDir, {
       operation: "issue_create",
-      args: { title: "T", body: "本文", labels: [], role: "tracking", kind: "idea" },
+      args: { title: "T", body: "本文", labels: [], role: "tracking" },
     });
     await run(issuesDir, { operation: "comment_create", args: { number: 1, body: "1件目" } });
     await run(issuesDir, { operation: "comment_create", args: { number: 1, body: "2件目" } });
@@ -508,7 +491,7 @@ describe("LocalRunner: Comment CRUD（c{NN} 物理写像）", () => {
     const issuesDir = makeIssuesDir();
     await run(issuesDir, {
       operation: "issue_create",
-      args: { title: "T", body: "本文", labels: [], role: "tracking", kind: "problem" },
+      args: { title: "T", body: "本文", labels: [], role: "tracking" },
     });
     await run(issuesDir, { operation: "comment_create", args: { number: 1, body: "日本語コメント" } });
     await run(issuesDir, { operation: "comment_update", args: { commentId: "issue-0001-c01", body: "修正コメント" } });
@@ -643,7 +626,7 @@ describe("LocalRunner: Comment CRUD（c{NN} 物理写像）", () => {
     const issuesDir = makeIssuesDir();
     await run(issuesDir, {
       operation: "issue_create",
-      args: { title: "T", body: "本文", labels: [], role: "tracking", kind: "problem" },
+      args: { title: "T", body: "本文", labels: [], role: "tracking" },
     });
     const missingIssue = await run(issuesDir, { operation: "comment_list", args: { number: 9 } });
     expect(missingIssue.ok).toBe(false);
@@ -830,7 +813,7 @@ describe("LocalRunner: クローズと再オープン", () => {
     const issuesDir = makeIssuesDir();
     await run(issuesDir, {
       operation: "issue_create",
-      args: { title: "T", body: "b", labels: [], role: "tracking", kind: "task" },
+      args: { title: "T", body: "b", labels: [], role: "tracking" },
     });
     const completed = await run(issuesDir, {
       operation: "issue_close",
@@ -858,7 +841,7 @@ describe("LocalRunner: クローズと再オープン", () => {
     const issuesDir = makeIssuesDir();
     await run(issuesDir, {
       operation: "issue_create",
-      args: { title: "T", body: "b", labels: [], role: "tracking", kind: "problem" },
+      args: { title: "T", body: "b", labels: [], role: "tracking" },
     });
     await run(issuesDir, { operation: "issue_close", args: { number: 1 } });
     const reopened = await run(issuesDir, { operation: "issue_reopen", args: { number: 1 } });
@@ -879,7 +862,8 @@ describe("LocalRunner: クローズと再オープン", () => {
     if (notClosed.ok) {
       const before = (notClosed.payload as Record<string, unknown>).before as Record<string, unknown>;
       expect(before.state).toBe("open");
-      expect(before.trackingState).toBe("in-discussion");
+      expect(before.role).toBe("tracking");
+      expect(before.closeReason).toBeNull();
     }
     expect(readIssueFile(issuesDir, 1)).toContain("status: in-discussion");
     fs.rmSync(issuesDir, { recursive: true, force: true });
@@ -891,7 +875,7 @@ describe("LocalRunner: PR 系操作の role: case 限定", () => {
     const issuesDir = makeIssuesDir();
     await run(issuesDir, {
       operation: "issue_create",
-      args: { title: "T", body: "b", labels: [], role: "tracking", kind: "problem" },
+      args: { title: "T", body: "b", labels: [], role: "tracking" },
     });
     for (const request of [
       { operation: "pr_create", args: { title: "P", body: "b", base: "main", head: "f", number: 1 } },
@@ -912,7 +896,7 @@ describe("LocalRunner: PR 系操作の role: case 限定", () => {
     await run(issuesDir, { operation: "issue_create", args: { title: "Case", body: "b", labels: [], role: "case" } });
     await run(issuesDir, {
       operation: "issue_create",
-      args: { title: "Tracking", body: "b", labels: [], role: "tracking", kind: "idea" },
+      args: { title: "Tracking", body: "b", labels: [], role: "tracking" },
     });
     const reply = await run(issuesDir, {
       operation: "pr_create",
@@ -1017,7 +1001,7 @@ describe("LocalRunner: PR 系操作の role: case 限定", () => {
 });
 
 describe("LocalRunner: engine 経由の VERIFY（追跡Issueライフサイクル）", () => {
-  test("起票→保留→解決→クローズ→再オープンが読み戻し検証を通る", async () => {
+  test("起票→クローズ→再オープンが読み戻し検証を通る", async () => {
     const issuesDir = makeIssuesDir();
     const env = makeEnv(issuesDir);
 
@@ -1027,34 +1011,8 @@ describe("LocalRunner: engine 経由の VERIFY（追跡Issueライフサイク�
       body: "## 背景\n\n本文",
       labels: [],
       role: "tracking",
-      kind: "risk",
     });
     expect(created.ok).toBe(true);
-
-    const held = await runAgentdevGhOperation(env, {
-      operation: "issue_update",
-      number: 1,
-      trackingState: "on-hold",
-    });
-    expect(held.ok).toBe(true);
-
-    const resolved = await runAgentdevGhOperation(env, {
-      operation: "issue_update",
-      number: 1,
-      trackingState: "resolved",
-    });
-    expect(resolved.ok).toBe(true);
-
-    const readResolved = await runAgentdevGhOperation(env, {
-      operation: "issue_read",
-      number: 1,
-    });
-    expect(readResolved.ok).toBe(true);
-    if (readResolved.ok && readResolved.success.operation === "issue_read") {
-      const s = readResolved.success;
-      expect(s.trackingState).toBe("resolved");
-      expect(s.state).toBe("open");
-    }
 
     const closed = await runAgentdevGhOperation(env, {
       operation: "issue_close",
@@ -1071,7 +1029,7 @@ describe("LocalRunner: engine 経由の VERIFY（追跡Issueライフサイク�
     if (readClosed.ok && readClosed.success.operation === "issue_read") {
       const s = readClosed.success;
       expect(s.state).toBe("closed");
-      expect(s.trackingState).toBe("closed");
+      expect(s.closeReason).toBeNull();
     }
 
     const reopened = await runAgentdevGhOperation(env, {
@@ -1088,7 +1046,7 @@ describe("LocalRunner: engine 経由の VERIFY（追跡Issueライフサイク�
     if (readReopened.ok && readReopened.success.operation === "issue_read") {
       const s = readReopened.success;
       expect(s.state).toBe("open");
-      expect(s.trackingState).toBe("in-discussion");
+      expect(s.closeReason).toBeNull();
     }
     fs.rmSync(issuesDir, { recursive: true, force: true });
   });
@@ -1104,7 +1062,6 @@ describe("LocalRunner: GitHub 版共通契約 parity（TS-015）", () => {
       body: "本文",
       labels: [],
       role: "tracking",
-      kind: "task",
     });
     expect(created.ok).toBe(true);
 

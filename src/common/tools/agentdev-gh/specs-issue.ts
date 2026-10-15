@@ -17,19 +17,14 @@ import {
 import type { GhRunner, GhRunnerRequest } from "./runner.ts";
 import type { InputContractError, OperationSpec, ValidateOutcome } from "./engine.ts";
 import {
-  deriveKind,
+  deriveCloseReason,
   deriveRole,
-  deriveTrackingState,
   parseIssueRole,
-  parseTrackingKind,
-  parseTrackingState,
   stripTrackingLabels,
+  TRACKING_ROLE_LABEL,
   type CloseReason,
   type IssueRole,
-  type TrackingKind,
-  type TrackingState,
 } from "./tracking-schema.ts";
-import { REOPEN_TRACKING_STATE } from "./tracking-schema.ts";
 
 function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === "object" && v !== null;
@@ -50,14 +45,6 @@ function stringArray(v: unknown): string[] | null {
 
 function parseRole(v: unknown): IssueRole | null {
   return parseIssueRole(v);
-}
-
-function parseKind(v: unknown): TrackingKind | null {
-  return parseTrackingKind(v);
-}
-
-function parseState(v: unknown): TrackingState | null {
-  return parseTrackingState(v);
 }
 
 function parseCloseReason(v: unknown): CloseReason | null {
@@ -116,8 +103,6 @@ function checkUnknownFields(
 /** issue_read / issue_list 共通の追跡Issueメタデータ導出（応答の自己整合の部品）。 */
 function parseTrackingMeta(rec: Record<string, unknown>): {
   role: IssueRole;
-  kind: TrackingKind | null;
-  trackingState: TrackingState | null;
   closeReason: CloseReason | null;
 } | null {
   const labels = stringArray(rec.labels);
@@ -128,32 +113,18 @@ function parseTrackingMeta(rec: Record<string, unknown>): {
   const explicitRole = roleAbsent ? null : parseRole(rec.role);
   if (!roleAbsent && explicitRole === null) return null;
   const role = explicitRole ?? deriveRole(labels);
-  const kindAbsent = rec.kind === undefined || rec.kind === null;
-  const explicitKind = kindAbsent ? null : parseKind(rec.kind);
-  if (!kindAbsent && explicitKind === null) return null;
-  const stateAbsent = rec.trackingState === undefined || rec.trackingState === null;
-  const explicitState = stateAbsent ? null : parseState(rec.trackingState);
-  if (!stateAbsent && explicitState === null) return null;
   const reasonAbsent = rec.closeReason === undefined || rec.closeReason === null;
   const explicitReason = reasonAbsent ? null : parseCloseReason(rec.closeReason);
   if (!reasonAbsent && explicitReason === null) return null;
-  const derived = deriveTrackingState(labels, state, str(rec.stateReason));
-  if (role !== "tracking") {
-    return { role: "case", kind: null, trackingState: null, closeReason: null };
-  }
   return {
     role,
-    kind: explicitKind ?? deriveKind(labels),
-    trackingState: explicitState ?? derived.trackingState,
-    closeReason: derived.closeReason ?? explicitReason,
+    closeReason: deriveCloseReason(labels, state, str(rec.stateReason)) ?? explicitReason,
   };
 }
 
 /** 実行応答 payload 内の実行前状態（before）。issue_update / issue_reopen の照合基準。 */
 function beforeMeta(payload: unknown): {
   role: IssueRole;
-  kind: TrackingKind | null;
-  trackingState: TrackingState | null;
   labels: string[];
 } | null {
   if (!isRecord(payload) || !isRecord(payload.before)) return null;
@@ -161,7 +132,7 @@ function beforeMeta(payload: unknown): {
   if (meta === null) return null;
   const labels = stringArray(payload.before.labels);
   if (labels === null) return null;
-  return { ...meta, labels };
+  return { role: meta.role, labels };
 }
 
 // 出力 URL: GitHub 実装は https URL、Local 実装（Case ファイル）は絶対パスを識別子として返す（REQ-{NNNN}-{NNN}）。
@@ -197,7 +168,6 @@ const issueCreateSpec: OperationSpec = {
       "body",
       "labels",
       "role",
-      "kind",
     ]);
     if (unknown !== null) return unknown;
     const title = str(raw.title);
@@ -223,7 +193,6 @@ const issueCreateSpec: OperationSpec = {
       body: string;
       labels: string[];
       role?: "tracking" | "case";
-      kind?: TrackingKind;
     } = { operation: "issue_create", title, body, labels: raw.labels };
     if (raw.role !== undefined) {
       const role = parseRole(raw.role);
@@ -231,16 +200,6 @@ const issueCreateSpec: OperationSpec = {
         return invalidFieldOutcome("role", "role must be 'tracking' or 'case'");
       }
       request.role = role;
-    }
-    if (raw.kind !== undefined) {
-      if (request.role !== "tracking") {
-        return invalidFieldOutcome("kind", "kind requires role 'tracking'");
-      }
-      const kind = parseKind(raw.kind);
-      if (kind === null) {
-        return invalidFieldOutcome("kind", "kind must be problem, idea, task, or risk");
-      }
-      request.kind = kind;
     }
     return { ok: true, request };
   },
@@ -253,7 +212,6 @@ const issueCreateSpec: OperationSpec = {
         body: r.body,
         labels: r.labels,
         role: r.role ?? "case",
-        kind: r.kind,
       },
     };
   },
@@ -272,7 +230,6 @@ const issueCreateSpec: OperationSpec = {
     if (str(issue.state) !== "open" || str(issue.title) !== req.title) return false;
     if (req.role === "tracking") {
       if (parseRole(issue.role) !== "tracking") return false;
-      if (req.kind !== undefined && parseKind(issue.kind) !== req.kind) return false;
     }
     return true;
   },
@@ -302,8 +259,6 @@ function parseIssueRead(payload: unknown, number: number): GhToolSuccess | null 
     state,
     labels,
     role: meta.role,
-    kind: meta.kind,
-    trackingState: meta.trackingState,
     closeReason: meta.closeReason,
   };
 }
@@ -357,8 +312,6 @@ const issueUpdateSpec: OperationSpec = {
       "title",
       "body",
       "labels",
-      "kind",
-      "trackingState",
     ]);
     if (unknown !== null) return unknown;
     if (raw.number === undefined) return missingFieldOutcome("issue_update", "number");
@@ -378,32 +331,11 @@ const issueUpdateSpec: OperationSpec = {
     if (raw.labels !== undefined && labels === null) {
       return invalidFieldOutcome("labels", "labels must be an array of strings");
     }
-    const kind = raw.kind === undefined ? null : parseKind(raw.kind);
-    if (raw.kind !== undefined && kind === null) {
-      return invalidFieldOutcome("kind", "kind must be problem, idea, task, or risk");
-    }
-    const trackingState =
-      raw.trackingState === undefined ? null : parseState(raw.trackingState);
-    if (raw.trackingState !== undefined && trackingState === null) {
-      return invalidFieldOutcome(
-        "trackingState",
-        "trackingState must be a tracking state value",
-      );
-    }
-    if (trackingState === "closed") {
-      return invalidFieldOutcome(
-        "trackingState",
-        "issue_update accepts non-terminal tracking states only (use issue_close)",
-      );
-    }
-    if (
-      title === null && body === null && labels === null &&
-      kind === null && trackingState === null
-    ) {
+    if (title === null && body === null && labels === null) {
       return invalidOutcome({
         code: "empty-update",
         field: "title",
-        detail: "specify at least one of title, body, labels, kind, trackingState",
+        detail: "specify at least one of title, body, labels",
       });
     }
     const request = {
@@ -415,14 +347,10 @@ const issueUpdateSpec: OperationSpec = {
       title?: string;
       body?: string;
       labels?: string[];
-      kind?: TrackingKind;
-      trackingState?: Exclude<TrackingState, "closed">;
     };
     if (title !== null) request.title = title;
     if (body !== null) request.body = body;
     if (labels !== null) request.labels = labels;
-    if (kind !== null) request.kind = kind;
-    if (trackingState !== null) request.trackingState = trackingState;
     return { ok: true, request };
   },
   buildRequest(request): GhRunnerRequest {
@@ -434,8 +362,6 @@ const issueUpdateSpec: OperationSpec = {
         title: r.title,
         body: r.body,
         labels: r.labels,
-        kind: r.kind,
-        trackingState: r.trackingState,
       },
     };
   },
@@ -452,24 +378,28 @@ const issueUpdateSpec: OperationSpec = {
     if (issue === null) return false;
     if (req.title !== undefined && str(issue.title) !== req.title) return false;
     if (req.body !== undefined && str(issue.body) !== req.body) return false;
-    // 部分更新不変条件: 要求対象外の追跡軸（role、kind、trackingState）の維持を
-    // 実行前状態（before）と完全一致で照合する。通常ラベルは要求包含のみ確認し、
-    // 確認時点での第三者による追加を不変条件違反として失敗扱いにしない。
+    // 部分更新不変条件: 要求対象外の追跡軸（role）の維持を実行前状態（before）と
+    // 一致で照合する。labels 要求に role 物理ラベルを含む場合は role 変更要求として
+    // role = tracking の反映を要求する（labels 要求に追跡軸が含まれるため追跡軸は
+    // 要求対象内）。通常ラベルは要求包含のみ確認し、確認時点での第三者による
+    // 追加を不変条件違反として失敗扱いにしない。
     const before = beforeMeta(payload);
     if (before === null) return false;
     const after = parseTrackingMeta(issue);
     if (after === null) return false;
-    if (after.role !== before.role) return false;
-    const expectedKind = req.kind !== undefined ? req.kind : before.kind;
-    if (after.kind !== expectedKind) return false;
-    const expectedState =
-      req.trackingState !== undefined ? req.trackingState : before.trackingState;
-    if (after.trackingState !== expectedState) return false;
+    const roleRequested =
+      req.labels !== undefined && req.labels.includes(TRACKING_ROLE_LABEL);
+    if (roleRequested) {
+      if (after.role !== "tracking") return false;
+    } else if (after.role !== before.role) {
+      return false;
+    }
     if (req.labels !== undefined) {
       const current = stringArray(issue.labels);
       if (current === null) return false;
       const kept = stripTrackingLabels(current);
-      if (!req.labels.every((l) => kept.includes(l))) return false;
+      const requestedNormal = req.labels.filter((l) => l !== TRACKING_ROLE_LABEL);
+      if (!requestedNormal.every((l) => kept.includes(l))) return false;
     }
     return true;
   },
@@ -528,9 +458,7 @@ const issueListSpec: OperationSpec = {
     const unknown = checkUnknownFields(raw, [
       "operation",
       "role",
-      "kind",
       "state",
-      "trackingState",
       "labels",
       "search",
     ]);
@@ -538,9 +466,7 @@ const issueListSpec: OperationSpec = {
     const request = { operation: "issue_list" } as {
       operation: "issue_list";
       role?: IssueRole;
-      kind?: TrackingKind;
       state?: "open" | "closed";
-      trackingState?: TrackingState;
       labels?: string[];
       search?: string;
     };
@@ -551,28 +477,11 @@ const issueListSpec: OperationSpec = {
       }
       request.role = role;
     }
-    if (raw.kind !== undefined) {
-      const kind = parseKind(raw.kind);
-      if (kind === null) {
-        return invalidFieldOutcome("kind", "kind must be problem, idea, task, or risk");
-      }
-      request.kind = kind;
-    }
     if (raw.state !== undefined) {
       if (raw.state !== "open" && raw.state !== "closed") {
         return invalidFieldOutcome("state", "state must be 'open' or 'closed'");
       }
       request.state = raw.state;
-    }
-    if (raw.trackingState !== undefined) {
-      const trackingState = parseState(raw.trackingState);
-      if (trackingState === null) {
-        return invalidFieldOutcome(
-          "trackingState",
-          "trackingState must be a tracking state value",
-        );
-      }
-      request.trackingState = trackingState;
     }
     if (raw.labels !== undefined) {
       const labels = stringArray(raw.labels);
@@ -596,9 +505,7 @@ const issueListSpec: OperationSpec = {
       operation: "issue_list",
       args: {
         role: r.role,
-        kind: r.kind,
         state: r.state,
-        trackingState: r.trackingState,
         labels: r.labels,
         search: r.search,
       },
@@ -626,8 +533,6 @@ const issueListSpec: OperationSpec = {
         state,
         labels,
         role: meta.role,
-        kind: meta.kind,
-        trackingState: meta.trackingState,
         closeReason: meta.closeReason,
       });
     }
@@ -673,19 +578,15 @@ const issueReopenSpec: OperationSpec = {
     const issue = await readIssue(runner, reopened.number);
     if (issue === null) return false;
     if (str(issue.state) !== "open") return false;
-    // 再オープン遷移: クローズ済み追跡Issueは in-discussion へ遷移し、kind と
-    // 通常ラベルを保持する。Case Issue には追跡状態遷移を適用しない。
-    // open 済み追跡Issueへの再実行は現状維持のまま冪等に成功する。
+    // 再オープン遷移: role と通常ラベルを保持する。追跡状態の再オープン遷移は
+    // 本文の状態保持節の更新として呼出側が行い、Tool は状態ラベルの再付与による
+    // 遷移を機械適用しない。Case Issue には追跡状態遷移を適用しない。
+    // open 済み追跡Issueへの再実行は冪等に成功する。
     const before = beforeMeta(payload);
     if (before === null) return false;
     const after = parseTrackingMeta(issue);
     if (after === null) return false;
     if (after.role !== before.role) return false;
-    if (before.role !== "tracking") return true;
-    const expected =
-      before.trackingState === "closed" ? REOPEN_TRACKING_STATE : before.trackingState;
-    if (after.trackingState !== expected) return false;
-    if (after.kind !== before.kind) return false;
     const afterLabels = stringArray(issue.labels);
     if (afterLabels === null) return false;
     const beforeNormal = stripTrackingLabels(before.labels);

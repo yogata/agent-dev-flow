@@ -90,17 +90,15 @@ describe("公開スキーマと実行時 validator の一致性（実行時受�
   /** 各操作の実行時 validator を通過する代表要求（validator 受理の最小証拠コーパス）。 */
   const VALID_CORPUS: Record<string, unknown>[] = [
     { operation: "issue_create", title: "T", body: "B", labels: ["bug"] },
-    { operation: "issue_create", title: "T", body: "B", labels: [], role: "tracking", kind: "risk" },
+    { operation: "issue_create", title: "T", body: "B", labels: [], role: "tracking" },
     { operation: "issue_read", number: 7 },
     { operation: "issue_update", number: 7, title: "T" },
     { operation: "issue_update", number: 7, body: "B" },
     { operation: "issue_update", number: 7, labels: ["bug"] },
-    { operation: "issue_update", number: 7, kind: "problem" },
-    { operation: "issue_update", number: 7, trackingState: "ready" },
     { operation: "issue_close", number: 7 },
     { operation: "issue_close", number: 7, reason: "not_planned" },
     { operation: "issue_list" },
-    { operation: "issue_list", role: "tracking", kind: "idea", state: "open", trackingState: "ready", labels: ["x"], search: "語" },
+    { operation: "issue_list", role: "tracking", state: "open", labels: ["x"], search: "語" },
     { operation: "issue_reopen", number: 7 },
     { operation: "pr_create", title: "P", body: "B", base: "main", head: "feature/x" },
     { operation: "pr_read", number: 9 },
@@ -168,7 +166,7 @@ describe("実行（注入 runner による成功・失敗）", () => {
         if (request.operation === "issue_read") {
           return {
             ok: true,
-            payload: { number: 7, title: "T", body: "B", state: "open", labels: [], role: "case", kind: null, trackingState: null, closeReason: null },
+            payload: { number: 7, title: "T", body: "B", state: "open", labels: [], role: "case", closeReason: null },
           };
         }
         return { ok: false, error: "unexpected op", exitCode: 1, failureClass: "operation-failed" };
@@ -191,7 +189,7 @@ describe("実行（注入 runner による成功・失敗）", () => {
           if (request.operation === "issue_create") {
             return { ok: true, payload: { number: 8, url: "https://example/i/8" } };
           }
-          return { ok: true, payload: { number: 8, title: "different", body: "B", state: "open", labels: [], role: "case", kind: null, trackingState: null, closeReason: null } };
+          return { ok: true, payload: { number: 8, title: "different", body: "B", state: "open", labels: [], role: "case", closeReason: null } };
         }),
     };
     const def = createAgentdevGhToolDefinition(failing);
@@ -324,7 +322,7 @@ describe("ローカル版差し替え（投影パスの Local 実装検出）", 
         "  return {",
         "    async run(request) {",
         "      if (request.operation === \"issue_read\") {",
-        "        return { ok: true, payload: { number: 1, title: \"LOCAL\", body: \"B\", state: \"open\", labels: [], role: \"case\", kind: null, trackingState: null, closeReason: null } };",
+        "        return { ok: true, payload: { number: 1, title: \"LOCAL\", body: \"B\", state: \"open\", labels: [], role: \"case\", closeReason: null } };",
         "      }",
         "      return { ok: false, error: \"local stub: unsupported op\", exitCode: null };",
         "    },",
@@ -351,7 +349,7 @@ describe("ローカル版差し替え（投影パスの Local 実装検出）", 
       createRunner: () =>
         fakeRunner(async (request) => {
           if (request.operation === "issue_read") {
-            return { ok: true, payload: { number: 2, title: "GITHUB", body: "B", state: "open", labels: [], role: "case", kind: null, trackingState: null, closeReason: null } };
+            return { ok: true, payload: { number: 2, title: "GITHUB", body: "B", state: "open", labels: [], role: "case", closeReason: null } };
           }
           return { ok: false, error: "unexpected", exitCode: 1, failureClass: "operation-failed" };
         }),

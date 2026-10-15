@@ -184,10 +184,10 @@ describe("外部操作の失敗（operation-failed）と失敗分類の分離", 
     if (!result.ok) assertFailureKind(result.failure, "operation-failed");
   });
 
-  test("runner の入力契約違反クラスは invalid-input に分類される", async () => {
+  test("runner の入力契約違反クラスは operation-failed のまま invalid-input に集約されない", async () => {
     const runner = new FakeRunner(async () => ({
       ok: false,
-      error: "issue_update kind/trackingState apply only to tracking issues",
+      error: "issue_update requires a positive issue number",
       exitCode: 0,
       failureClass: "operation-failed",
     }));
@@ -197,7 +197,7 @@ describe("外部操作の失敗（operation-failed）と失敗分類の分離", 
     const result = await runAgentdevGhOperation(env.env, {
       operation: "issue_update",
       number: 7,
-      kind: "problem",
+      title: "T",
     });
     expect(result.ok).toBe(false);
     if (!result.ok) assertFailureKind(result.failure, "operation-failed");
@@ -347,14 +347,14 @@ describe("入力解釈と実行の正常系", () => {
           payload: {
             number: 7,
             url: "https://example/i/7",
-            before: { state: "open", labels: [], role: "case", kind: null, trackingState: null, closeReason: null },
+            before: { state: "open", labels: [], role: "case", closeReason: null },
           },
         };
       }
       // 読み戻し: title のみ反映済み、body は旧のまま（body が検証対象なら失敗する）
       return {
         ok: true,
-        payload: { number: 7, title: "new-title", body: "old-body", state: "open", labels: [], role: "case", kind: null, trackingState: null, closeReason: null },
+        payload: { number: 7, title: "new-title", body: "old-body", state: "open", labels: [], role: "case", closeReason: null },
       };
     });
     const env = buildGhToolEnv(VALID_CONFIG, okProber, runner);
@@ -383,13 +383,13 @@ describe("入力解釈と実行の正常系", () => {
           payload: {
             number: 7,
             url: "https://example/i/7",
-            before: { state: "open", labels: [], role: "case", kind: null, trackingState: null, closeReason: null },
+            before: { state: "open", labels: [], role: "case", closeReason: null },
           },
         };
       }
       return {
         ok: true,
-        payload: { number: 7, title: "new-title", body: "new-body", state: "open", labels: [], role: "case", kind: null, trackingState: null, closeReason: null },
+        payload: { number: 7, title: "new-title", body: "new-body", state: "open", labels: [], role: "case", closeReason: null },
       };
     });
     const env = buildGhToolEnv(VALID_CONFIG, okProber, runner);
@@ -411,7 +411,7 @@ describe("入力解釈と実行の正常系", () => {
       }
       return {
         ok: true,
-        payload: { number: 7, title: "T", body: "B", state: "open", labels: [], role: "case", kind: null, trackingState: null, closeReason: null },
+        payload: { number: 7, title: "T", body: "B", state: "open", labels: [], role: "case", closeReason: null },
       };
     });
     const env = buildGhToolEnv(VALID_CONFIG, okProber, runner);
@@ -469,12 +469,25 @@ describe("操作単位の入力定義（構造化 invalid-input・フィール�
   test.each([
     ["issue_update の空更新は empty-update で拒否される", { operation: "issue_update", number: 7 }, "empty-update"],
     ["pr_update の空更新は empty-update で拒否される", { operation: "pr_update", number: 7 }, "empty-update"],
-    ["issue_update の終端 trackingState は invalid-field で拒否される", { operation: "issue_update", number: 7, trackingState: "closed" }, "invalid-field"],
     ["comment_create の空 body は invalid-field で拒否される", { operation: "comment_create", number: 7, body: "" }, "invalid-field"],
   ])("%s", async (_label, rawRequest, code) => {
     const r = await invalidInput(rawRequest);
     expect(r.kind).toBe("invalid-input");
     expect(r.detail).toContain(code);
+    expect(r.runnerCalls).toBe(0);
+  });
+
+  test.each([
+    ["issue_create の契約外 kind は副作用発生前に unknown-field で拒否される", { operation: "issue_create", title: "T", body: "B", labels: [], kind: "task" }, "kind"],
+    ["issue_update の契約外 kind は副作用発生前に unknown-field で拒否される", { operation: "issue_update", number: 7, kind: "task" }, "kind"],
+    ["issue_update の契約外 trackingState は副作用発生前に unknown-field で拒否される", { operation: "issue_update", number: 7, trackingState: "on-hold" }, "trackingState"],
+    ["issue_list の契約外 kind は副作用発生前に unknown-field で拒否される", { operation: "issue_list", kind: "task" }, "kind"],
+    ["issue_list の契約外 trackingState は副作用発婚前に unknown-field で拒否される", { operation: "issue_list", trackingState: "on-hold" }, "trackingState"],
+  ])("%s", async (_label, rawRequest, field) => {
+    const r = await invalidInput(rawRequest);
+    expect(r.kind).toBe("invalid-input");
+    expect(r.detail).toContain("unknown-field");
+    expect(r.detail).toContain(field);
     expect(r.runnerCalls).toBe(0);
   });
 
@@ -544,15 +557,13 @@ describe("pr_merge の commitHash 伝播（ローカル版取り込み確認情�
 describe("issue_update の追跡軸保持 VERIFY（部分更新不変条件）", () => {
   const BEFORE = {
     state: "open",
-    labels: ["agentdev-tracking", "agentdev-kind/risk", "agentdev-tracking-status/on-hold", "priority"],
+    labels: ["tracking", "priority"],
     role: "tracking",
-    kind: "risk",
-    trackingState: "on-hold",
     closeReason: null,
   };
 
-  test("labels のみ更新で追跡ラベルが剥離した場合（旧挙動）は verification-incomplete となる", async () => {
-    // 修正前の CliRunner 挙動: labels のみ更新で追跡ラベルが剥離し Case 化しても
+  test("labels のみ更新で role ラベルが剥離した場合（旧挙動）は verification-incomplete となる", async () => {
+    // 修正前の CliRunner 挙動: labels のみ更新で role ラベルが剥離し Case 化しても
     // VERIFY が通過してしまった。before 基準の照合はこれを検出する。
     const runner = new FakeRunner(async (request) => {
       if (request.operation === "issue_update") {
@@ -561,7 +572,7 @@ describe("issue_update の追跡軸保持 VERIFY（部分更新不変条件）",
           payload: { number: 8, url: "https://example/i/8", before: BEFORE },
         };
       }
-      // 読み戻し: 追跡ラベルが剥離し role が case 化した応答
+      // 読み戻し: role ラベルが剥離し role が case 化した応答
       return {
         ok: true,
         payload: {
@@ -571,8 +582,6 @@ describe("issue_update の追跡軸保持 VERIFY（部分更新不変条件）",
           state: "open",
           labels: ["enhancement"],
           role: "case",
-          kind: null,
-          trackingState: null,
           closeReason: null,
         },
       };
@@ -604,16 +613,8 @@ describe("issue_update の追跡軸保持 VERIFY（部分更新不変条件）",
           title: "追跡",
           body: "B",
           state: "open",
-          labels: [
-            "agentdev-tracking",
-            "agentdev-kind/risk",
-            "agentdev-tracking-status/on-hold",
-            "enhancement",
-            "priority",
-          ],
+          labels: ["tracking", "enhancement", "priority"],
           role: "tracking",
-          kind: "risk",
-          trackingState: "on-hold",
           closeReason: null,
         },
       };
@@ -631,7 +632,7 @@ describe("issue_update の追跡軸保持 VERIFY（部分更新不変条件）",
 });
 
 describe("issue_reopen の状態遷移 VERIFY", () => {
-  test("クローズ済み追跡Issueの reopen は in-discussion 遷移・kind/通常ラベル保持を確認して成功する", async () => {
+  test("クローズ済み追跡Issueの reopen は role/通常ラベル保持を確認して成功する", async () => {
     const runner = new FakeRunner(async (request) => {
       if (request.operation === "issue_reopen") {
         return {
@@ -641,10 +642,8 @@ describe("issue_reopen の状態遷移 VERIFY", () => {
             state: "open",
             before: {
               state: "closed",
-              labels: ["agentdev-tracking", "agentdev-kind/task"],
+              labels: ["tracking", "priority"],
               role: "tracking",
-              kind: "task",
-              trackingState: "closed",
               closeReason: "completed",
             },
           },
@@ -657,10 +656,8 @@ describe("issue_reopen の状態遷移 VERIFY", () => {
           title: "T",
           body: "B",
           state: "open",
-          labels: ["agentdev-tracking", "agentdev-kind/task", "agentdev-tracking-status/in-discussion", "priority"],
+          labels: ["tracking", "priority"],
           role: "tracking",
-          kind: "task",
-          trackingState: "in-discussion",
           closeReason: null,
           stateReason: null,
         },
@@ -676,7 +673,7 @@ describe("issue_reopen の状態遷移 VERIFY", () => {
     expect(result.ok).toBe(true);
   });
 
-  test("クローズ済み追跡Issueが in-discussion へ遷移していない場合は成功しない", async () => {
+  test("reopen で通常ラベルが失われた場合は成功しない", async () => {
     const runner = new FakeRunner(async (request) => {
       if (request.operation === "issue_reopen") {
         return {
@@ -686,10 +683,8 @@ describe("issue_reopen の状態遷移 VERIFY", () => {
             state: "open",
             before: {
               state: "closed",
-              labels: ["agentdev-tracking", "agentdev-kind/task"],
+              labels: ["tracking", "priority"],
               role: "tracking",
-              kind: "task",
-              trackingState: "closed",
               closeReason: "completed",
             },
           },
@@ -702,10 +697,8 @@ describe("issue_reopen の状態遷移 VERIFY", () => {
           title: "T",
           body: "B",
           state: "open",
-          labels: ["agentdev-tracking", "agentdev-kind/task"],
+          labels: ["tracking"],
           role: "tracking",
-          kind: "task",
-          trackingState: "created",
           closeReason: null,
           stateReason: null,
         },
@@ -734,8 +727,6 @@ describe("issue_reopen の状態遷移 VERIFY", () => {
               state: "closed",
               labels: ["bug"],
               role: "case",
-              kind: null,
-              trackingState: null,
               closeReason: null,
             },
           },
@@ -750,8 +741,6 @@ describe("issue_reopen の状態遷移 VERIFY", () => {
           state: "open",
           labels: ["bug"],
           role: "case",
-          kind: null,
-          trackingState: null,
           closeReason: null,
           stateReason: null,
         },
@@ -777,10 +766,8 @@ describe("issue_reopen の状態遷移 VERIFY", () => {
             state: "open",
             before: {
               state: "open",
-              labels: ["agentdev-tracking", "agentdev-kind/idea", "agentdev-tracking-status/in-discussion"],
+              labels: ["tracking", "priority"],
               role: "tracking",
-              kind: "idea",
-              trackingState: "in-discussion",
               closeReason: null,
             },
           },
@@ -793,10 +780,8 @@ describe("issue_reopen の状態遷移 VERIFY", () => {
           title: "T",
           body: "B",
           state: "open",
-          labels: ["agentdev-tracking", "agentdev-kind/idea", "agentdev-tracking-status/in-discussion"],
+          labels: ["tracking", "priority"],
           role: "tracking",
-          kind: "idea",
-          trackingState: "in-discussion",
           closeReason: null,
           stateReason: null,
         },
