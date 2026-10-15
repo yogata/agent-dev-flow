@@ -87,5 +87,6 @@ execution contract 確定時に、Definition の対象要件行と受け入れ�
 ## Root Case 本文の更新
 
 - execution contract の反映は Issue 本文の該当セクション置換で行い、Markdown 行構造（LF、セクション間空行、インデント）を保持する
+- Issue 本文の書込み前に extension rules の前置読込として、project extension（`.agentdev/extensions/skills/agentdev-workflow-case-ready.yaml`）の rules を解決し、rules が要求する前処理（yomiyasu rule に基づく推敲・lint 等）を書込み前に適用する（不在・破損時は `agentdev-project-extensions` の契約に従い標準動作を継続する）。rules の解決を書込みの後段に配置し、投稿後の遡及適用になる配置順序違反を発生させない。投稿後の検査を前置規律の代替にしない
 - 本文はファイル経由で扱い、Custom Tool `agentdev_gh` の操作引数として渡す
 - 更新前後の内容を比較し、意図しないセクション欠落を検出した場合は更新を取りやめて停止する
