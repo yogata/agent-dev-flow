@@ -239,6 +239,7 @@ const PATH_FLAG_CONTRACTS = ["--root", "--input", "--artifact", "--files"] as co
 export function extractFlagValue(args: readonly string[], flag: string): string | null {
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
+    if (arg === undefined) continue;
     if (arg === flag && args[i + 1] !== undefined) {
       return args[i + 1] ?? null;
     }
@@ -518,7 +519,6 @@ export function runPrepareDefinitionPr(
       name: "generate_indexes",
       status: gen.exitCode === 0 ? "pass" : "fail",
       detail: {
-        exitCode: gen.exitCode,
         executed: input.requiresIndexRegeneration,
         stderrTail: gen.exitCode === 0 ? "" : gen.stderr.trim().slice(-400),
         ...buildGateEvidence(input.generateIndexesGate, gen, preCommitRevision),
@@ -584,7 +584,6 @@ export function runPrepareDefinitionPr(
         name: "check_integrity",
         status: check.exitCode === 0 ? "pass" : "fail",
         detail: {
-          exitCode: check.exitCode,
           stderrTail: check.exitCode === 0 ? "" : check.stderr.trim().slice(-400),
           ...buildGateEvidence(input.checkIntegrityGate, check, head),
         },
