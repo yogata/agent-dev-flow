@@ -190,6 +190,8 @@ export function validateInput(value: unknown): PrepareDefinitionPrInput {
   if (missing.length > 0) {
     fail(`required quality gates are missing from input (omission forbidden): ${missing.join(", ")}`);
   }
+  const traceabilityGate = requireGateSpec(v.traceabilityGate, "traceabilityGate");
+  validateTraceabilityReqIds(v.traceabilityReqIds, traceabilityGate);
   return {
     repoRoot: v.repoRoot as string,
     worktreeRoot: v.worktreeRoot as string,
@@ -200,12 +202,41 @@ export function validateInput(value: unknown): PrepareDefinitionPrInput {
     requiresIndexRegeneration: v.requiresIndexRegeneration === true,
     stagePaths: v.stagePaths as readonly string[],
     commitMessage: v.commitMessage as string,
-    traceabilityReqIds: Array.isArray(v.traceabilityReqIds) ? (v.traceabilityReqIds as readonly string[]) : [],
+    traceabilityReqIds: v.traceabilityReqIds as readonly string[],
     generateIndexesGate: requireGateSpec(v.generateIndexesGate, "generateIndexesGate"),
     checkIntegrityGate: requireGateSpec(v.checkIntegrityGate, "checkIntegrityGate"),
-    traceabilityGate: requireGateSpec(v.traceabilityGate, "traceabilityGate"),
+    traceabilityGate,
     dryRun: v.dryRun === true,
   };
+}
+
+const REQ_ROW_ID_PATTERN = /^REQ-\d{3}-\d{3}$/;
+
+/**
+ * 判定対象 REQ 集合（traceabilityReqIds）の存在・有効性を実行前に検証する（fail-closed）。
+ * 欠落・空・形式不正・gate 実行範囲（--req 指定）との不整合は、検査や worktree 操作を
+ * 開始せず MechanicalInputError で拒否する。空配列への暗黙正規化は行わない。
+ */
+function validateTraceabilityReqIds(
+  value: unknown,
+  traceabilityGate: GateCommandSpec,
+): void {
+  if (!Array.isArray(value)) {
+    fail("input.traceabilityReqIds is required when the traceability gate is enabled (implicit normalization to an empty array is not allowed)");
+  }
+  const reqIds = value as readonly unknown[];
+  if (reqIds.length === 0) {
+    fail("input.traceabilityReqIds must be a non-empty array");
+  }
+  for (const id of reqIds) {
+    if (typeof id !== "string" || !REQ_ROW_ID_PATTERN.test(id)) {
+      fail(`input.traceabilityReqIds contains an invalid requirement row id: ${String(id)}`);
+    }
+  }
+  const gateReqScope = extractFlagValue(traceabilityGate.args, "--req");
+  if (gateReqScope !== reqIds.join(",")) {
+    fail(`input.traceabilityReqIds does not match the traceability gate execution scope (--req): declared=[${reqIds.join(", ")}], gate=${gateReqScope ?? "(absent)"}`);
+  }
 }
 
 /**

@@ -32,6 +32,15 @@ function gate(name: string): GateCommandSpec {
   };
 }
 
+const DEFAULT_TRACEABILITY_REQ_ID = ["REQ", "000", "001"].join("-");
+
+function traceabilityGateSpec(): GateCommandSpec {
+  return {
+    ...gate("traceability-check"),
+    args: ["./checker.ts", "--gate", "traceability-check", "--req", DEFAULT_TRACEABILITY_REQ_ID],
+  };
+}
+
 const EDIT: DefinitionEdit = {
   path: "docs/req-index/REQ-TARGET.md",
   oldText: "| REQ-NNNN-NNN | 旧文 |",
@@ -49,10 +58,10 @@ function input(overrides: Partial<PrepareDefinitionPrInput> = {}): PrepareDefini
     requiresIndexRegeneration: true,
     stagePaths: ["docs/req-index/REQ-TARGET.md", "docs/README.md"],
     commitMessage: "docs(definition): REQ-NNNN-NNN 更新 (Refs #10)",
-    traceabilityReqIds: [["REQ", "000", "001"].join("-")],
+    traceabilityReqIds: [DEFAULT_TRACEABILITY_REQ_ID],
     generateIndexesGate: gate("generate_indexes"),
     checkIntegrityGate: gate("check_integrity"),
-    traceabilityGate: gate("traceability-check"),
+    traceabilityGate: traceabilityGateSpec(),
     ...overrides,
   };
 }
@@ -123,9 +132,47 @@ describe("入力検証（品質ゲートの省略禁止・明示パス stage）"
     expect(() => validateInput(broken as unknown as Record<string, unknown>)).toThrow(/stagePaths/);
   });
 
+  test("判定対象 REQ 集合の欠落を gate 実行前に拒否する（暗黙の空配列正規化をしない）", () => {
+    const base = input() as unknown as Record<string, unknown>;
+    const broken = { ...base, traceabilityReqIds: undefined };
+    expect(() => validateInput(broken)).toThrow(/traceabilityReqIds is required/);
+  });
+
+  test("判定対象 REQ 集合の空配列を gate 実行前に拒否する", () => {
+    const broken = input({ traceabilityReqIds: [] });
+    expect(() => validateInput(broken as unknown as Record<string, unknown>)).toThrow(/traceabilityReqIds must be a non-empty array/);
+  });
+
+  test("判定対象 REQ 集合と gate 実行範囲（--req）の不整合を gate 実行前に拒否する", () => {
+    const otherReqId = ["REQ", "000", "002"].join("-");
+    const traceabilityGate: GateCommandSpec = {
+      ...gate("traceability-check"),
+      args: ["./checker.ts", "--gate", "traceability-check", "--req", otherReqId],
+    };
+    const broken = input({ traceabilityGate });
+    expect(() => validateInput(broken as unknown as Record<string, unknown>))
+      .toThrow(/does not match the traceability gate execution scope/);
+  });
+
+  test("gate spec に --req 指定がない入力を不整合として gate 実行前に拒否する", () => {
+    const traceabilityGate: GateCommandSpec = {
+      ...gate("traceability-check"),
+      args: ["./checker.ts", "--gate", "traceability-check"],
+    };
+    const broken = input({ traceabilityGate });
+    expect(() => validateInput(broken as unknown as Record<string, unknown>))
+      .toThrow(/does not match the traceability gate execution scope/);
+  });
+
+  test("判定対象 REQ 集合に形式不正な REQ 行 ID が含まれる入力を gate 実行前に拒否する", () => {
+    const broken = input({ traceabilityReqIds: ["REQ-NNNN-NNN"] });
+    expect(() => validateInput(broken as unknown as Record<string, unknown>)).toThrow(/invalid requirement row id/);
+  });
+
   test("正規入力を受領する", () => {
     const validated = validateInput(input() as unknown as Record<string, unknown>);
     expect(validated.branch).toBe("definition/issue-10");
+    expect(validated.traceabilityReqIds).toEqual([DEFAULT_TRACEABILITY_REQ_ID]);
   });
 });
 
