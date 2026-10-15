@@ -98,6 +98,7 @@ describe("launcher / publish-after-verify ordering (parent blocker #1, #8)", () 
     // exits 5, then a candidate that adds the trust root only. The
     // launcher's verify MUST fail and the output dir MUST be empty.
     const repo = makeTmpDir("trust-pav-repo-");
+    writeFix(repo, ".gitattributes", "* text=auto eol=lf\n");
     try {
       execFileSync("git", ["init", "-q", "-b", "main"], { cwd: repo });
       execFileSync("git", ["config", "user.email", "t@t"], { cwd: repo });

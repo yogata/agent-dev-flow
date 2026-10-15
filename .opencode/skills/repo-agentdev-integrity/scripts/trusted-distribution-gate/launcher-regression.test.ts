@@ -42,6 +42,7 @@ function opts(repo: string, base: string, candidate: string, outName: string, ex
 describe("launcher / real first-bootstrap base to candidate (parent defect #5)", () => {
   test("seed mode succeeds when base has no trust-root files and candidate adds them", () => {
     const repo = makeTmpDir("trust-bootstrap-repo-");
+    writeFix(repo, ".gitattributes", "* text=auto eol=lf\n");
     try {
       // Step 1: create a base commit with only the source projection files,
       // NONE of the trust-root files. This mirrors the agent-dev-flow
@@ -122,6 +123,7 @@ describe("launcher / real first-bootstrap base to candidate (parent defect #5)",
     // Same setup as above; without bootstrap_mode, candidate-added protected
     // paths are fatal in final mode (parent defect #4).
     const repo = makeTmpDir("trust-bootstrap-strict-");
+    writeFix(repo, ".gitattributes", "* text=auto eol=lf\n");
     try {
       execFileSync("git", ["init", "-q", "-b", "main"], { cwd: repo });
       execFileSync("git", ["config", "user.email", "t@t"], { cwd: repo });

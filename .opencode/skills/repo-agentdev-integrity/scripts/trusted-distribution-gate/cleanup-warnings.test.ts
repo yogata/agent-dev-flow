@@ -52,6 +52,7 @@ describe("cleanup warning preservation / per-call injected remover", () => {
 
   test("physical mismatch + per-call remover throw: exit_code===3, summary has INJECTED, no archive", () => {
     const repo = makeTmpDir("trust-cw-mm-repo-");
+    writeFix(repo, ".gitattributes", "* text=auto eol=lf\n");
     try {
       execFileSync("git", ["init", "-q", "-b", "main"], { cwd: repo });
       execFileSync("git", ["config", "user.email", "t@t"], { cwd: repo });
@@ -122,6 +123,7 @@ describe("cleanup warning preservation / per-call injected remover", () => {
 describe("launcher / both-missing protected bootstrap scripts in seed mode", () => {
   function buildFixtureWithoutBootstrap(missing: string[]): { repo: string; base: string; candidate: string } {
     const repo = makeTmpDir("trust-bm-");
+    writeFix(repo, ".gitattributes", "* text=auto eol=lf\n");
     execFileSync("git", ["init", "-q", "-b", "main"], { cwd: repo });
     execFileSync("git", ["config", "user.email", "t@t"], { cwd: repo });
     execFileSync("git", ["config", "user.name", "t"], { cwd: repo });

@@ -122,6 +122,7 @@ function makeConsumerRepo(zipCheckout: boolean, localSource = false): string {
   execFileSync("git", ["config", "user.name", "t"], { cwd: root });
   if (!zipCheckout) {
     const plugin = path.join(root, ".agentdev-plugin");
+    fs.writeFileSync(path.join(plugin, ".gitattributes"), "* text=auto eol=lf\n", "utf-8");
     execFileSync("git", ["init", "-q", "-b", "main"], { cwd: plugin });
     execFileSync("git", ["config", "user.email", "t@t"], { cwd: plugin });
     execFileSync("git", ["config", "user.name", "t"], { cwd: plugin });

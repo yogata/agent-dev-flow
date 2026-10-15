@@ -26,6 +26,7 @@ function makeRepo(): { repo: string; head: string } {
   const repo = path.join(TMP_ROOT, `repo-${Math.random().toString(36).slice(2, 8)}`);
   fs.mkdirSync(repo, { recursive: true });
   execFileSync("git", ["init", "-q", "-b", "main"], { cwd: repo });
+  fs.writeFileSync(path.join(repo, ".gitattributes"), "* text=auto eol=lf\n", "utf-8");
   execFileSync("git", ["config", "user.email", "t@t"], { cwd: repo });
   execFileSync("git", ["config", "user.name", "t"], { cwd: repo });
   if (process.platform === "win32") {
