@@ -398,6 +398,28 @@ describe("formatMarkdownReport", () => {
     expect(md).toContain("| Info | 0 |");
   });
 
+  it("renders summaryNotes after the summary table when present (REQ-010-082)", () => {
+    const notesReport: IntegrityReport = {
+      ...report,
+      summaryNotes: [
+        "NG は検証不通過、Warning は傾向管理として区別して報告する（REQ-010-082）。",
+      ],
+    };
+    const md = formatMarkdownReport(notesReport);
+    expect(md).toContain("| NG | 1 |");
+    expect(md).toContain(
+      "- NG は検証不通過、Warning は傾向管理として区別して報告する（REQ-010-082）。",
+    );
+    expect(md.indexOf("| NG | 1 |")).toBeLessThan(
+      md.indexOf("- NG は検証不通過"),
+    );
+  });
+
+  it("does not render summary notes when absent (other checkers unaffected)", () => {
+    const md = formatMarkdownReport(report);
+    expect(md).not.toContain("- NG は検証不通過");
+  });
+
   it("contains detail section for non-ok results", () => {
     const md = formatMarkdownReport(report);
     expect(md).toContain("## 詳細");

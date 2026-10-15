@@ -33,6 +33,7 @@ interface JsonReport {
   script: string;
   scanned: Record<string, number>;
   summary: { ok: number; ng: number; warning: number; info: number };
+  summaryNotes?: string[];
   results: Array<{
     category: string;
     check: string;
@@ -705,6 +706,7 @@ describe("lint_skills.ts", () => {
       expect(found[0].message).toContain("350*9");
       expect(report.summary).toBeDefined();
       expect(result.exitCode).toBe(1);
+      expect(report.summaryNotes?.join("\n")).toContain("漸進回収");
     });
 
     it("emits ok results for a fully compliant environment", async () => {
@@ -863,6 +865,132 @@ describe("lint_skills.ts", () => {
       } finally {
         fs.rmSync(deltaEnv.tempDir, { recursive: true, force: true });
       }
+    });
+  });
+
+  // ----- REQ-010-082: summary NG/warning 区別と実行環境差記録 -----
+
+  describe("REQ-010-082: NG/warning distinction and local-skill env labels", () => {
+    let env: { tempDir: string; scriptPath: string };
+
+    const NO_TRIGGER_MD = (name: string): string => `\
+---
+name: ${name}
+description: A skill missing the trigger conventions
+---
+
+## See Also
+`;
+
+    beforeAll(() => {
+      // distributed layout: projection 走査（sentinel 存在）+ src/common/skills 存在。
+      // explainer-local は projection のみ（src に無い・repo- 接頭辞なし）→
+      // git 管理外ローカルスキル。repo-mytool は repo- 接頭辞で管理対象扱い。
+      // sentinel（agentdev-workflow-templates）は src 側にも存在する管理対象
+      // （実配置では junction 先 src/common/skills 配下）。
+      env = setupTempEnv([
+        {
+          name: "agentdev-workflow-templates",
+          content: VALID_SKILL_MD.replace(
+            /agentdev-test-valid/g,
+            "agentdev-workflow-templates",
+          ),
+        },
+        {
+          name: "explainer-local",
+          content: NO_TRIGGER_MD("explainer-local"),
+        },
+        { name: "repo-mytool", content: NO_TRIGGER_MD("repo-mytool") },
+      ]);
+      const srcSkillsDir = path.join(env.tempDir, "src", "common", "skills");
+      const sentinelSrcDir = path.join(
+        srcSkillsDir,
+        "agentdev-workflow-templates",
+      );
+      fs.mkdirSync(sentinelSrcDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(sentinelSrcDir, "SKILL.md"),
+        VALID_SKILL_MD.replace(
+          /agentdev-test-valid/g,
+          "agentdev-workflow-templates",
+        ),
+      );
+      const srcSkillDir = path.join(
+        srcSkillsDir,
+        "agentdev-src-filler",
+      );
+      fs.mkdirSync(srcSkillDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(srcSkillDir, "SKILL.md"),
+        VALID_SKILL_MD.replace(/agentdev-test-valid/g, "agentdev-src-filler"),
+      );
+      tempDirs.push(env.tempDir);
+    });
+
+    it("labels findings of git-unmanaged local skills as execution environment differences and keeps them as warnings", async () => {
+      const result = await runScript(env.scriptPath, ["--json"]);
+      const report: JsonReport = JSON.parse(result.stdout);
+
+      const localUseFor = report.results.filter(
+        (r) => r.check === "USE FOR trigger" && r.file === "explainer-local",
+      );
+      expect(localUseFor.length).toBe(1);
+      expect(localUseFor[0].level).toBe("warning");
+      expect(localUseFor[0].message).toContain(
+        "[実行環境差: git 管理外ローカルスキル (main root 実行時のみ検出)]",
+      );
+      expect(localUseFor[0].message).toContain("Missing USE FOR trigger");
+
+      const localDoNotUseFor = report.results.filter(
+        (r) =>
+          r.check === "DO NOT USE FOR trigger" && r.file === "explainer-local",
+      );
+      expect(localDoNotUseFor.length).toBe(1);
+      expect(localDoNotUseFor[0].level).toBe("warning");
+      expect(localDoNotUseFor[0].message).toContain(
+        "[実行環境差: git 管理外ローカルスキル (main root 実行時のみ検出)]",
+      );
+
+      // repo- 接頭辞（tracked 例外的）のスキルは環境差ラベルを付けない
+      const managedUseFor = report.results.filter(
+        (r) => r.check === "USE FOR trigger" && r.file === "repo-mytool",
+      );
+      expect(managedUseFor.length).toBe(1);
+      expect(managedUseFor[0].level).toBe("warning");
+      expect(managedUseFor[0].message).not.toContain("実行環境差");
+
+      // warning の隠蔽を行わない: warning は summary に計上され exit 1 を駆動する
+      expect(report.summary.warning).toBe(4);
+      expect(result.exitCode).toBe(1);
+    });
+
+    it("emits the NG/warning distinction note and the local-skill env note in summaryNotes", async () => {
+      const result = await runScript(env.scriptPath, ["--json"]);
+      const report: JsonReport = JSON.parse(result.stdout);
+      const notes = report.summaryNotes ?? [];
+
+      expect(notes.join("\n")).toContain(
+        "NG は検証不通過、Warning は傾向管理として区別して報告する（REQ-010-082）",
+      );
+      expect(notes.join("\n")).toContain(
+        "git 管理外ローカルユーザースキル起因の warning: 2 件（explainer-local",
+      );
+      expect(notes.join("\n")).toContain("baseline 登録・無視は行わず");
+      // 集約予算 warning が無い環境では漸進回収 note を出さない
+      expect(notes.join("\n")).not.toContain("漸進回収");
+    });
+
+    it("renders the distinction notes in the markdown summary without changing the table", async () => {
+      const result = await runScript(env.scriptPath, []);
+      expect(result.exitCode).toBe(1);
+      expect(result.stdout).toContain("## サマリ");
+      expect(result.stdout).toContain("| Warning | 4 |");
+      expect(result.stdout).toContain(
+        "- NG は検証不通過、Warning は傾向管理として区別して報告する（REQ-010-082）",
+      );
+      expect(result.stdout).toContain(
+        "git 管理外ローカルユーザースキル起因の warning: 2 件",
+      );
     });
   });
 });

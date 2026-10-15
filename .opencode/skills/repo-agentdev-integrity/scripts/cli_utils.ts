@@ -1,4 +1,4 @@
-// ADF-COVERS(implementation): REQ-044-001, REQ-044-003
+// ADF-COVERS(implementation): REQ-044-001, REQ-044-003, REQ-010-082
 /**
  * CLI utilities for AgentDevFlow validator scripts.
  * Provides common argument parsing, output formatting, and exit code constants.
@@ -96,6 +96,10 @@ export interface IntegrityReport {
   environment?: IntegrityEnvironment;
   scanned: Record<string, number>;
   summary: ScanSummary;
+  // REQ-010-082: summary の NG（検証不通過）/ Warning（傾向管理）の区別と
+  // warning 存在時の運用方針を出力へ明示する checker 側 note（任意。未指定の
+  // checker の出力形式は不変）。
+  summaryNotes?: string[];
   results: CheckResult[];
 }
 
@@ -485,6 +489,12 @@ export function formatMarkdownReport(report: IntegrityReport): string {
   lines.push(`| NG | ${report.summary.ng} |`);
   lines.push(`| Warning | ${report.summary.warning} |`);
   lines.push(`| Info | ${report.summary.info} |`);
+  if (report.summaryNotes && report.summaryNotes.length > 0) {
+    lines.push("");
+    for (const note of report.summaryNotes) {
+      lines.push(`- ${note}`);
+    }
+  }
   lines.push("");
 
   const routingCategories = new Map<
