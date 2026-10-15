@@ -1,0 +1,637 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261015T101814Z-dcbe",
+  "workflow": "learning-promote",
+  "evaluationKind": "disposal-judgment",
+  "subject": "2026-10-15 learning promote 31判断単位の処分区分判定",
+  "sourceRevision": "38bc58c7",
+  "durationMs": 735,
+  "inputTokens": 6499,
+  "inputs": {
+    "requestDigest": "5923a90d509082870d24c38e694d4d0b519ac7f76f1f326e26d337da0048dc32"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "d-C1",
+      "questionForm": "choice",
+      "value": "3",
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0.91,
+        "4": 0.03,
+        "5": 0,
+        "6": 0.060000000000000005,
+        "7": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "d-C2",
+      "questionForm": "choice",
+      "value": "3",
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0.62,
+        "4": 0.01,
+        "5": 0.34,
+        "6": 0.03,
+        "7": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "d-C3",
+      "questionForm": "choice",
+      "value": "5",
+      "probabilityDistribution": {
+        "1": 0.11,
+        "2": 0,
+        "3": 0.1,
+        "4": 0,
+        "5": 0.78,
+        "6": 0.01,
+        "7": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "d-C4",
+      "questionForm": "choice",
+      "value": "5",
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0.61,
+        "6": 0.37,
+        "7": 0,
+        "duplicate": 0.02
+      }
+    },
+    {
+      "questionId": "d-C5",
+      "questionForm": "choice",
+      "value": "5",
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0.03,
+        "4": 0.01,
+        "5": 0.74,
+        "6": 0.22,
+        "7": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "d-C6",
+      "questionForm": "choice",
+      "value": "5",
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0.05,
+        "4": 0,
+        "5": 0.83,
+        "6": 0.12,
+        "7": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "d-C7",
+      "questionForm": "choice",
+      "value": "6",
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0.15,
+        "4": 0.01,
+        "5": 0.31,
+        "6": 0.53,
+        "7": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "d-C8",
+      "questionForm": "choice",
+      "value": "5",
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0.05,
+        "5": 0.87,
+        "6": 0.08,
+        "7": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "d-E1",
+      "questionForm": "choice",
+      "value": "6",
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0.0101010101010101,
+        "4": 0.3333333333333333,
+        "5": 0.0606060606060606,
+        "6": 0.5656565656565656,
+        "7": 0,
+        "duplicate": 0.0303030303030303
+      }
+    },
+    {
+      "questionId": "d-E3",
+      "questionForm": "choice",
+      "value": "5",
+      "probabilityDistribution": {
+        "1": 0.010000000000000002,
+        "2": 0,
+        "3": 0.07000000000000002,
+        "4": 0.010000000000000002,
+        "5": 0.6900000000000001,
+        "6": 0.21000000000000002,
+        "7": 0,
+        "duplicate": 0.010000000000000002
+      }
+    },
+    {
+      "questionId": "d-E4",
+      "questionForm": "choice",
+      "value": "3",
+      "probabilityDistribution": {
+        "1": 0.02,
+        "2": 0.01,
+        "3": 0.35,
+        "4": 0.18,
+        "5": 0.23,
+        "6": 0.14,
+        "7": 0.01,
+        "duplicate": 0.06
+      }
+    },
+    {
+      "questionId": "d-E8",
+      "questionForm": "choice",
+      "value": "5",
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0.03,
+        "4": 0,
+        "5": 0.96,
+        "6": 0.01,
+        "7": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "d-E9",
+      "questionForm": "choice",
+      "value": "5",
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0.0101010101010101,
+        "4": 0.0101010101010101,
+        "5": 0.6969696969696969,
+        "6": 0.2828282828282828,
+        "7": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "d-E10",
+      "questionForm": "choice",
+      "value": "5",
+      "probabilityDistribution": {
+        "1": 0.010101010101010102,
+        "2": 0,
+        "3": 0.07070707070707072,
+        "4": 0.09090909090909091,
+        "5": 0.5656565656565657,
+        "6": 0.14141414141414144,
+        "7": 0.020202020202020204,
+        "duplicate": 0.10101010101010102
+      }
+    },
+    {
+      "questionId": "d-E12",
+      "questionForm": "choice",
+      "value": "5",
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.01,
+        "3": 0.13,
+        "4": 0.09,
+        "5": 0.53,
+        "6": 0.22,
+        "7": 0,
+        "duplicate": 0.01
+      }
+    },
+    {
+      "questionId": "d-E13",
+      "questionForm": "choice",
+      "value": "3",
+      "probabilityDistribution": {
+        "1": 0.18,
+        "2": 0.01,
+        "3": 0.5,
+        "4": 0.03,
+        "5": 0.21,
+        "6": 0.04,
+        "7": 0.01,
+        "duplicate": 0.02
+      }
+    },
+    {
+      "questionId": "d-E14",
+      "questionForm": "choice",
+      "value": "5",
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0.0202020202020202,
+        "4": 0.0101010101010101,
+        "5": 0.8181818181818181,
+        "6": 0.1414141414141414,
+        "7": 0,
+        "duplicate": 0.0101010101010101
+      }
+    },
+    {
+      "questionId": "d-E16",
+      "questionForm": "choice",
+      "value": "3",
+      "probabilityDistribution": {
+        "1": 0.08,
+        "2": 0.01,
+        "3": 0.62,
+        "4": 0.12,
+        "5": 0.05,
+        "6": 0.12,
+        "7": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "d-E17",
+      "questionForm": "choice",
+      "value": "5",
+      "probabilityDistribution": {
+        "1": 0.030000000000000002,
+        "2": 0.010000000000000002,
+        "3": 0.22000000000000003,
+        "4": 0.21000000000000002,
+        "5": 0.42000000000000004,
+        "6": 0.11000000000000001,
+        "7": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "d-E18",
+      "questionForm": "choice",
+      "value": "5",
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0.02,
+        "4": 0.05,
+        "5": 0.48,
+        "6": 0.11,
+        "7": 0.03,
+        "duplicate": 0.31
+      }
+    },
+    {
+      "questionId": "d-E19",
+      "questionForm": "choice",
+      "value": "5",
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0.01,
+        "4": 0.11,
+        "5": 0.73,
+        "6": 0.15,
+        "7": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "d-E22",
+      "questionForm": "choice",
+      "value": "5",
+      "probabilityDistribution": {
+        "1": 0.05,
+        "2": 0.01,
+        "3": 0.11,
+        "4": 0.35,
+        "5": 0.43,
+        "6": 0.04,
+        "7": 0,
+        "duplicate": 0.01
+      }
+    },
+    {
+      "questionId": "d-E29",
+      "questionForm": "choice",
+      "value": "5",
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0.97,
+        "6": 0.02,
+        "7": 0,
+        "duplicate": 0.01
+      }
+    },
+    {
+      "questionId": "d-E30",
+      "questionForm": "choice",
+      "value": "5",
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0,
+        "3": 0.12,
+        "4": 0.02,
+        "5": 0.81,
+        "6": 0.04,
+        "7": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "d-E31",
+      "questionForm": "choice",
+      "value": "5",
+      "probabilityDistribution": {
+        "1": 0.06,
+        "2": 0.01,
+        "3": 0.37,
+        "4": 0.04,
+        "5": 0.44,
+        "6": 0.06,
+        "7": 0,
+        "duplicate": 0.02
+      }
+    },
+    {
+      "questionId": "d-E32",
+      "questionForm": "choice",
+      "value": "3",
+      "probabilityDistribution": {
+        "1": 0.03,
+        "2": 0.01,
+        "3": 0.4,
+        "4": 0.34,
+        "5": 0.03,
+        "6": 0.19,
+        "7": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "d-E36",
+      "questionForm": "choice",
+      "value": "4",
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0,
+        "3": 0.02,
+        "4": 0.66,
+        "5": 0.16,
+        "6": 0.11,
+        "7": 0.01,
+        "duplicate": 0.03
+      }
+    },
+    {
+      "questionId": "d-E38",
+      "questionForm": "choice",
+      "value": "5",
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0.02,
+        "4": 0,
+        "5": 0.97,
+        "6": 0.01,
+        "7": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "d-E39",
+      "questionForm": "choice",
+      "value": "6",
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0,
+        "3": 0.05,
+        "4": 0.11,
+        "5": 0.05,
+        "6": 0.77,
+        "7": 0,
+        "duplicate": 0.01
+      }
+    },
+    {
+      "questionId": "d-E40",
+      "questionForm": "choice",
+      "value": "3",
+      "probabilityDistribution": {
+        "1": 0.16,
+        "2": 0.01,
+        "3": 0.63,
+        "4": 0.02,
+        "5": 0.13,
+        "6": 0.04,
+        "7": 0,
+        "duplicate": 0.01
+      }
+    },
+    {
+      "questionId": "d-E41",
+      "questionForm": "choice",
+      "value": "3",
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0,
+        "3": 0.67,
+        "4": 0.05,
+        "5": 0.16,
+        "6": 0.1,
+        "7": 0,
+        "duplicate": 0.01
+      }
+    }
+  ],
+  "confidence": 0.9,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "d-C1",
+        "value": "duplicate",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-C2",
+        "value": "6",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-C3",
+        "value": "5"
+      },
+      {
+        "questionId": "d-C4",
+        "value": "duplicate",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-C5",
+        "value": "5"
+      },
+      {
+        "questionId": "d-C6",
+        "value": "duplicate",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-C7",
+        "value": "duplicate",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-C8",
+        "value": "6",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-E1",
+        "value": "6"
+      },
+      {
+        "questionId": "d-E3",
+        "value": "5"
+      },
+      {
+        "questionId": "d-E4",
+        "value": "duplicate",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-E8",
+        "value": "duplicate",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-E9",
+        "value": "5"
+      },
+      {
+        "questionId": "d-E10",
+        "value": "duplicate",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-E12",
+        "value": "duplicate",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-E13",
+        "value": "5",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-E14",
+        "value": "6",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-E16",
+        "value": "duplicate",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-E17",
+        "value": "6",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-E18",
+        "value": "6",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-E19",
+        "value": "6",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-E22",
+        "value": "duplicate",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-E29",
+        "value": "duplicate",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-E30",
+        "value": "duplicate",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-E31",
+        "value": "6",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-E32",
+        "value": "6",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-E36",
+        "value": "6",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-E38",
+        "value": "6",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-E39",
+        "value": "6"
+      },
+      {
+        "questionId": "d-E40",
+        "value": "5",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-E41",
+        "value": "duplicate",
+        "differenceReason": "semantic_disagreement"
+      }
+    ]
+  }
+}

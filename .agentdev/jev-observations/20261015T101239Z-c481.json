@@ -1,0 +1,481 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261015T101239Z-c481",
+  "workflow": "learning-promote",
+  "evaluationKind": "eight-axis-evaluation",
+  "subject": "単独エントリ E31/E32/E36/E38 の8軸評価（発生件数軸を除く7軸）",
+  "sourceRevision": "38bc58c7",
+  "durationMs": 564,
+  "inputTokens": 3565,
+  "inputs": {
+    "requestDigest": "f20f9fbde8dcb16ac983d4fd28036d668ae2a5965bf30dcb785b61a70c9acc55"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "E31-impact",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 軽微": 0.01,
+        "2 小": 0.2,
+        "3 中": 0.59,
+        "4 大": 0.19,
+        "5 致命的": 0.01
+      }
+    },
+    {
+      "questionId": "E31-transfer",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 固有": 0.02,
+        "2 限定": 0.33,
+        "3 中程度": 0.3,
+        "4 高い": 0.29,
+        "5 汎用": 0.06
+      }
+    },
+    {
+      "questionId": "E31-clarity",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 不明": 0,
+        "2 曖昧": 0,
+        "3 概要あり": 0.01,
+        "4 明確": 0.71,
+        "5 自足的整備済": 0.28
+      }
+    },
+    {
+      "questionId": "E31-automation",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 困難": 0,
+        "2 低い": 0.01,
+        "3 可能": 0.02,
+        "4 容易": 0.45,
+        "5 即自動化可": 0.52
+      }
+    },
+    {
+      "questionId": "E31-reuse",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 低い": 0.02,
+        "2 やや低い": 0.17,
+        "3 中程度": 0.28,
+        "4 高い": 0.48,
+        "5 高い": 0.05
+      }
+    },
+    {
+      "questionId": "E31-recurrence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 極低": 0.03,
+        "2 低い": 0.38,
+        "3 中程度": 0.31,
+        "4 高い": 0.26,
+        "5 ほぼ確実": 0.02
+      }
+    },
+    {
+      "questionId": "E31-costbenefit",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 割高": 0.01,
+        "2 やや割高": 0.04,
+        "3 妥当": 0.19,
+        "4 良い": 0.53,
+        "5 良い": 0.23
+      }
+    },
+    {
+      "questionId": "E32-impact",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 軽微": 0.03,
+        "2 小": 0.49,
+        "3 中": 0.42,
+        "4 大": 0.06,
+        "5 致命的": 0
+      }
+    },
+    {
+      "questionId": "E32-transfer",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 固有": 0.01,
+        "2 限定": 0.18,
+        "3 中程度": 0.25,
+        "4 高い": 0.45,
+        "5 汎用": 0.11
+      }
+    },
+    {
+      "questionId": "E32-clarity",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 不明": 0,
+        "2 曖昧": 0.02,
+        "3 概要あり": 0.16,
+        "4 明確": 0.77,
+        "5 自足的整備済": 0.05
+      }
+    },
+    {
+      "questionId": "E32-automation",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 困難": 0.02,
+        "2 低い": 0.16,
+        "3 可能": 0.31,
+        "4 容易": 0.45,
+        "5 即自動化可": 0.06
+      }
+    },
+    {
+      "questionId": "E32-reuse",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 低い": 0.03,
+        "2 やや低い": 0.24,
+        "3 中程度": 0.38,
+        "4 高い": 0.33,
+        "5 高い": 0.02
+      }
+    },
+    {
+      "questionId": "E32-recurrence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 極低": 0.01,
+        "2 低い": 0.23,
+        "3 中程度": 0.45,
+        "4 高い": 0.3,
+        "5 ほぼ確実": 0.01
+      }
+    },
+    {
+      "questionId": "E32-costbenefit",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 割高": 0.02,
+        "2 やや割高": 0.05,
+        "3 妥当": 0.22,
+        "4 良い": 0.43,
+        "5 良い": 0.28
+      }
+    },
+    {
+      "questionId": "E36-impact",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "1 軽微": 0.85,
+        "2 小": 0.15,
+        "3 中": 0,
+        "4 大": 0,
+        "5 致命的": 0
+      }
+    },
+    {
+      "questionId": "E36-transfer",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 固有": 0.01,
+        "2 限定": 0.42,
+        "3 中程度": 0.31,
+        "4 高い": 0.23,
+        "5 汎用": 0.03
+      }
+    },
+    {
+      "questionId": "E36-clarity",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 不明": 0,
+        "2 曖昧": 0.01,
+        "3 概要あり": 0.13,
+        "4 明確": 0.79,
+        "5 自足的整備済": 0.07
+      }
+    },
+    {
+      "questionId": "E36-automation",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 困難": 0.010000000000000002,
+        "2 低い": 0.09000000000000001,
+        "3 可能": 0.24000000000000002,
+        "4 容易": 0.5800000000000001,
+        "5 即自動化可": 0.08000000000000002
+      }
+    },
+    {
+      "questionId": "E36-reuse",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 低い": 0.03,
+        "2 やや低い": 0.31,
+        "3 中程度": 0.38,
+        "4 高い": 0.26,
+        "5 高い": 0.02
+      }
+    },
+    {
+      "questionId": "E36-recurrence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 極低": 0.05,
+        "2 低い": 0.42,
+        "3 中程度": 0.32,
+        "4 高い": 0.19,
+        "5 ほぼ確実": 0.02
+      }
+    },
+    {
+      "questionId": "E36-costbenefit",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 割高": 0.03,
+        "2 やや割高": 0.06,
+        "3 妥当": 0.15,
+        "4 良い": 0.39,
+        "5 良い": 0.37
+      }
+    },
+    {
+      "questionId": "E38-impact",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 軽微": 0.04,
+        "2 小": 0.34,
+        "3 中": 0.47,
+        "4 大": 0.14,
+        "5 致命的": 0.01
+      }
+    },
+    {
+      "questionId": "E38-transfer",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 固有": 0.02,
+        "2 限定": 0.31,
+        "3 中程度": 0.32,
+        "4 高い": 0.3,
+        "5 汎用": 0.05
+      }
+    },
+    {
+      "questionId": "E38-clarity",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 不明": 0,
+        "2 曖昧": 0,
+        "3 概要あり": 0.03,
+        "4 明確": 0.84,
+        "5 自足的整備済": 0.13
+      }
+    },
+    {
+      "questionId": "E38-automation",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 困難": 0.01,
+        "2 低い": 0.03,
+        "3 可能": 0.1,
+        "4 容易": 0.6,
+        "5 即自動化可": 0.26
+      }
+    },
+    {
+      "questionId": "E38-reuse",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 低い": 0.04,
+        "2 やや低い": 0.25,
+        "3 中程度": 0.33,
+        "4 高い": 0.34,
+        "5 高い": 0.04
+      }
+    },
+    {
+      "questionId": "E38-recurrence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 極低": 0.01,
+        "2 低い": 0.26,
+        "3 中程度": 0.44,
+        "4 高い": 0.28,
+        "5 ほぼ確実": 0.01
+      }
+    },
+    {
+      "questionId": "E38-costbenefit",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 割高": 0.02,
+        "2 やや割高": 0.06,
+        "3 妥当": 0.33,
+        "4 良い": 0.39,
+        "5 良い": 0.2
+      }
+    }
+  ],
+  "confidence": 0.64,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "E31-automation",
+        "value": 4,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "E31-clarity",
+        "value": 3
+      },
+      {
+        "questionId": "E31-costbenefit",
+        "value": 3
+      },
+      {
+        "questionId": "E31-impact",
+        "value": 2
+      },
+      {
+        "questionId": "E31-recurrence",
+        "value": 3,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "E31-reuse",
+        "value": 3,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "E31-transfer",
+        "value": 2
+      },
+      {
+        "questionId": "E32-automation",
+        "value": 3,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "E32-clarity",
+        "value": 3
+      },
+      {
+        "questionId": "E32-costbenefit",
+        "value": 3
+      },
+      {
+        "questionId": "E32-impact",
+        "value": 2
+      },
+      {
+        "questionId": "E32-recurrence",
+        "value": 3,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "E32-reuse",
+        "value": 3,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "E32-transfer",
+        "value": 3,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "E36-automation",
+        "value": 3
+      },
+      {
+        "questionId": "E36-clarity",
+        "value": 3
+      },
+      {
+        "questionId": "E36-costbenefit",
+        "value": 3
+      },
+      {
+        "questionId": "E36-impact",
+        "value": 0
+      },
+      {
+        "questionId": "E36-recurrence",
+        "value": 2
+      },
+      {
+        "questionId": "E36-reuse",
+        "value": 2
+      },
+      {
+        "questionId": "E36-transfer",
+        "value": 2
+      },
+      {
+        "questionId": "E38-automation",
+        "value": 4,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "E38-clarity",
+        "value": 3
+      },
+      {
+        "questionId": "E38-costbenefit",
+        "value": 3
+      },
+      {
+        "questionId": "E38-impact",
+        "value": 2
+      },
+      {
+        "questionId": "E38-recurrence",
+        "value": 3,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "E38-reuse",
+        "value": 3,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "E38-transfer",
+        "value": 2
+      }
+    ]
+  }
+}

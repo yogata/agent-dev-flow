@@ -4526,3 +4526,392 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **移動日**: 2026-10-13
 
 ---
+
+---
+## 並行 case-open 実行下で共通 Jev 観測の先行 commit が兄弟 Case に先取され commit メッセージと実体が乖離した
+
+- **問題事象**: case-open STEP-1 の先行明示パス commit で、draft と共通 Jev 観測（Batch 単位観測 2件）を add 後に commit したところ、commit 実体は draft のみ（1 file）で、メッセージ「RU-0210 由来 draft と req-define Jev 観測を永続化」と乖離した。Jev 観測 2件は並行兄弟 Case（RU-0208 由来、commit 8f224096）が先に commit しており、本 Case の commit 実行時点で既に tracked だった
+- **発生局面**: 実装（case-open STEP-1 引き継ぎ判定。並行 case-open 委譲実行）
+- **検知方法**: commit 後の git show --stat と git ls-files による実体確認（1 file changed と ls-files 登録の突合）
+- **根本原因**: 複数の並行 Case が同一の Batch 単位 Jev 観測ファイルを消費対象として検出・commit する構造のため、add と commit の間に兄弟 Case の commit が挟まると、自 Case の commit pathspec から対象が外れる race 状態になる。先行 commit 手順は add 直後のステージ実体確認を含まない
+- **自律対応内容**: commit 実体を git show --stat / git ls-files で確認し、Jev 観測は兄弟 Case の commit（8f224096）で既に永続化済みであることを確認して受け入れた。amend によるメッセージ修正は並行 push 競合の危険があるため実施せず、乖離を WARNING 記録として残した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: Batch 単位の共通観測を複数 Case が消費する構成では、commit 実行直前にステージ内容（git diff --cached --stat 等）とメッセージの一致を確認する運用が同種 race 全般に有効
+- **再発条件**: 並行 case-open で同一 Jev 観測（Batch 共通観測）を複数 Case が検出・commit 対象に含め、一方が先に commit した場合
+- **予防策候補**: 先行明示パス commit 手順に、commit 実行直前のステージ実体確認（git diff --cached --name-only と意図対象の突合）と、実体が空になった対象の除外を組込む。あるいは共通観測の検出時に既に tracked な分を add 前に除外する
+- **想定反映先**: case-open スキル reference（handoff.md の先行 commit 手順）または learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、commit 9f7c8ffe（draft のみ）、commit 8f224096（兄弟 Case による Jev 観測 commit）、Issue #3678
+- **タグ**: `#case-open` `#git` `#並行実行`
+- **移動日**: 2026-10-15
+
+## prepare_definition_pr の check_integrity gate が base 起因の既存債務で fail した場合の対照救済と残ゲート消費の手順が reference にない
+
+- **問題事象**: case-open STEP-4 の prepare_definition_pr 実行で、自 Case 変更と無関係の既存債務（base revision 起因の NG 16件）により check_integrity gate が exit 1 で fail し、後続抑止により traceability gate が未実行のまま script が終了した。設計PR 作成は失敗ではなく、手順上の扱いが reference に定義されていなかった
+- **発生局面**: 実装（case-open STEP-4 機械工程の script 呼び出し。並行 case-open 委譲実行）
+- **検知方法**: script 報告 JSON の step status（check_integrity: fail、exitCode 1、NG 明細）と、NG 16件の全件が本 Case 対象ファイル外（phase 系 skill・system.md 同期・frontmatter 鮮度）であることの突合
+- **根本原因**: check_integrity はコーパス全体の既存債務を検出するため、base で既に NG があると本変更起因でなくても必ず fail する。traceability gate 判定仕様には対照救済（worktree HEAD と main HEAD の両方で check を実行し findings 完全一致を機械証明）の規定があるが、check_integrity 向けの対照救済と、後続抑止で止まった残ゲート（traceability check）の消費手順は reference（definition-pr-and-idempotency.md）に明文化されていない。script は one-shot 設計のため、再実行すると definitionEdits の再適用（旧文不在失敗）になる
+- **自律対応内容**: base revision（branch 作成元 origin/main HEAD）の detached worktree で check_integrity を再実行し、NG findings 16件が完全一致・差分 0 件であることを機械証明して本変更起因の検出悪化 0 件を根拠づけ（traceability gate 判定仕様の対照救済を準用）、証拠を PR 本文へ記録した。残ゲートは消費関数 consumeDefinitionTraceability（script lib の単一実装）を checker 実行結果へ直接適用して判定（pass=11 fail=0、deferred なし）し、報告 JSON の check_integrity 提案本文「check_integrity: 本 script 実行内で成功」を意味レビューで訂正して PR 作成可と判断した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存契約の準用。手順の明文化は learning-promote での判断に委ねる）
+- **横展開観点**: コーパス全体を検査する必須ゲート（check_integrity、docs-check 等）を Case 専用 machine 工程で実行する構成全般に、base 対照による既存債務分離と、後続抑止時の残ゲート消費手順（単一実装の消費関数の直接適用）が同様に適用可能
+- **再発条件**: Case 変更と無関係の既存 NG が base に存在する状態で、prepare_definition_pr 等の one-shot machine 工程 script がコーパス全体検査を実行する場合
+- **予防策候補**: definition-pr-and-idempotency.md へ、check_integrity gate の対照救済手順（base 対照の実施方法・証拠の PR 記録）と、後続抑止時の残ゲート消費手順（lib 消費関数の単一実装適用、definitionEdits 再適用の回避）を明文化する。あるいは script 側で base 対照比較を内蔵し報告に含める
+- **想定反映先**: case-open スキル reference（definition-pr-and-idempotency.md の gate 判定仕様節）または prepare_definition_pr script の拡張。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、PR #3687、Issue #3679、scripts/lib/definition-traceability-gate.ts、Issue #3684（phase 系 NG の処遇 Case）、Issue #3675（frontmatter 鮮度 NG の処遇 Case）
+- **タグ**: `#case-open` `#machine-gate` `#対照救済`
+- **移動日**: 2026-10-15
+
+
+
+
+
+
+
+## Windows Git Bash の /tmp リダイレクト先を node スクリプトが読めず ENOENT になる
+
+- **問題事象**: case-open STEP-4 の yomiyasu lint 前処理で、bash の /tmp へ diff をリダイレクトした後、node スクリプトから同一 /tmp パスを fs.readFileSync で読むと ENOENT で失敗した。bash（Git Bash）の /tmp は Windows 側の一時領域へ仮想的にマップされる一方、node は /tmp をカレントドライブ直下の実パスとして解決するため両者のパス空間が一致しない
+- **発生局面**: 実装（case-open STEP-4 の編集 diff 抽出と yomiyasu_lint.py への検査対象渡し。並行 case-open 委譲実行）
+- **検知方法**: node の ENOENT（syscall: open、path: C:WINDOWSTEMPopencodediff-wt.txt を期待して /tmp を解決した失敗）と、リダイレクト直後の ls では /tmp ファイルが実在する対比
+- **根本原因**: Git Bash の /tmp 仮想マッピングと node の Windows パス解決の不一致。エンコーディング破損問題（PowerShell 系の既知知識）とは別系統のパス解決問題
+- **自律対応内容**: リダイレクト先を C:/WINDOWS/TEMP/opencode 配下の明示 Windows パスへ変更し、bash と node の双方から同一実パスで参照する形へ切替して解決した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: bash と node/python を同一ファイル経由で連結する工程全般（lint 前処理、検査入力 JSON 生成、diff 抽出）に適用可能。workspace 外一時領域を使う工程では明示 Windows パスへ統一する
+- **再発条件**: Windows 環境で bash の /tmp を経由して bash と node/python 間で一時ファイルを受け渡す場合
+- **予防策候補**: bash と他言語実行基盤を連結する工程手順では、一時ファイルの受け渡し先を AGENTS.md の承認済み一時領域（C:WINDOWSTEMPopencode）の明示 Windows パスへ統一する規律を reference 側へ明記する
+- **想定反映先**: workflow skill 共通の環境前提 reference または agentdev-git-worktree reference の Windows 環境注意。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Case #3675、docs/knowledge/windows-powershell-bulk-io-corruption.md（PowerShell 系の別系統問題）
+- **タグ**:
+- **移動日**: 2026-10-15
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## acceptance-checks の AUTOGEN 再生成差分検出は実行日を跨ぐ並列バッチで計測日 1 行差分の warn を毎回生む
+
+- **問題事象**: case-ready STEP-1 受入検査（acceptance-checks phase）の autogen-regeneration-diff step で、generate_indexes 再実行により docs/designs/quality/req-health-metrics.md の AUTOGEN 計測日行のみが 1 行差分として検出され、script が needs-judgment（exit 2）と「Regeneration diff must be resolved before merge」警告を返した。並列バッチの Case 実行が日付境界を跨ぐたびに同一の warn が再発し、毎回モデルの意味レビュー判断を要する
+- **発生局面**: 実装（case-ready STEP-1 受入検査。Case #3683、並列バッチ Batch D）
+- **検知方法**: 受入検査報告 JSON の autogen-regeneration-diff step status=warn と diffStat（1 insertion, 1 deletion）を確認し、差分実体を再生成後の git diff で照合して計測日行のみであることを実測
+- **根本原因**: 計測日 AUTOGEN は generate_indexes 実行日から導出されるため、PR 作成日と merge 判定日が日付境界を跨ぐと、本 PR 非起因の派生物差分が再生成分の warn として表面化する。計測日のずれは内容変更ではない（definition-pr-and-idempotency.md の計測日収束契約）ため阻塞げではないが、script は差分の有無しか判定できない
+- **自律対応内容**: 差分実体が計測日行のみであることを機械確認し、(1) 本 PR が当該派生物を宣言・変更していないこと（pr_changed_files と ACT-DESIGN-001 宣言の一致）、(2) merge で当該派生物が変化しないこと（branch 版と main 版の非差分確認）を根拠に非阻塞げと判断して merge を継続した。派生物の PR への混入は宣言範囲逸脱となるため行わない
+- **ユーザー確認有無**: なし（正規契約からの導出）
+- **Decision/REQ/spec影響**: なし（計測日収束契約の既存どおり。gate への計測日のみ差分の決定的除外は learning-promote での判断）
+- **横展開観点**: generate_indexes 派生物の AUTOGEN 再生成差分を gate 判定に使う全工程（case-open STEP-4、case-ready STEP-1）。日付境界を跨ぐ長時間バッチ実行全般
+- **再発条件**: PR 作成（generate_indexes 実行）と case-ready 受入検査が日付境界を跨ぎ、かつ計測日 AUTOGEN が再生成対象に含まれる場合
+- **予防策候補**: accept_definition_checks.ts の autogen-regeneration-diff step に「差分が計測日 AUTOGEN 行のみの場合は pass 扱い（警告に計測日のみ差分である旨を記録）」の決定的判定を追加する。learning-promote での判断
+- **想定反映先**: src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts（autogen-regeneration-diff step）。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Case #3683、PR #3693、src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md（計測日収束契約）
+- **タグ**: `#case-ready` `#script` `#autogen` `#計測日`
+- **移動日**: 2026-10-15
+
+## acceptance-checks の integrity gate が PR 非起因の既存債務で fail-closed 抑止すると後続ゲートの script 経由継続手段が不在になる
+
+- **問題事象**: case-ready STEP-1 受入検査（acceptance-checks phase）で check_integrity が PR 非起因の既存債務（IR-055 delta・IR-068・IR-072・expanded-readme-sync 計 16 NG。全て PR 差分外ファイルで #3675 / #3684 の処遇対象）で非ゼロ終了し、script が後続ゲート（overlap-cross-check・autogen-regeneration-diff・traceability-check）を実行せず early-return した。PR 自体の起因違反は 0 件（check_changed_docs は対象 4 ファイルで 0 失敗）だが、後続 3 ゲートを同一 script 呼出で継続する resume 手段が存在しない
+- **発生局面**: 実装（case-ready STEP-1 受入検査。Case #3686、PR #3692 受入）
+- **検知方法**: 受入検査報告 JSON の definition-acceptance-checks step status=fail と保存された check_integrity evidence（16 NG の全文一覧）を意味レビューし、NG 全件のファイルが PR 変更 4 ファイル（pr_changed_files）の外であることを機械照合して PR 起因 0 件と判定
+- **根本原因**: 非ゼロ終了の integrity gate は証拠保存の上で後続ゲート抑止が正（fail-closed 維持）だが、抑止後の継続経路が「修復後の case-ready 再実行」のみで、修復不要な既存債務（base 起因・処遇 Case 起票済み）では後続ゲートを script の証拠契約に乗せたまま継続できない。同一条件再実行の禁止（REQ-030-025 消費規律）と要求の矛盾
+- **自律対応内容**: 実行済み gate の再実行は行わず、抑止されて未実行の 3 ゲート（overlap・generate_indexes + AUTOGEN 差分・traceability check）を個別実行で継続し、同一の証拠項目（終了コード・stdout/stderr・targetRevision edc488d6・実行コマンド）を保存して意味レビューした。traceability は missing-design 0・policy 有効、overlap は警告 1 件（#3679 との同一パス重複・既知）、AUTOGEN 差分なしで merge を継続。前例は Case #3675 の「base 起因の既存債務は本 Case と無関係」の機械証明運用
+- **ユーザー確認有無**: なし（正規契約からの導出。PR 起因 0 件の機械照合に基づく）
+- **Decision/REQ/spec影響**: なし（受入検査の後続ゲート継続手順の明文化は learning-promote での判断）
+- **横展開観点**: 品質ゲート束ね型 script 全般（fail-closed 抑止と再実行禁止の併存）。リポジトリ全体の既存債務が混在する環境での Definition PR 受入全般
+- **再発条件**: check_integrity が PR 非起因の delta NG を持ち続ける環境で case-ready 受入検査を行う場合に毎回再発する（現行 main は IR-055/IR-068/IR-072 の delta 債務が常態）
+- **予防策候補**: accept_definition_checks.ts に「integrity gate 非ゼロ時に、保存した evidence の NG ファイル集合が PR 変更ファイル集合と交差しない場合は integrity step を warn 扱い（pr-attribution-clean 記録付き）で後続ゲートを継続する」決定的判定の追加。learning-promote での判断
+- **想定反映先**: src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts（integrity gate 後続抑止の条件付き継続）と agentdev-workflow-case-ready references/definition-acceptance.md（既存債務時の継続手順）。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Case #3686、PR #3692、Case #3675（既存債務機械証明の前例）、Issue #3684（IR-068/IR-055 債務の処遇 Case）
+- **タグ**: `#case-ready` `#script` `#integrity` `#既存債務`
+- **移動日**: 2026-10-15
+
+
+
+## agentdev_gh issue_update でバックスラッシュ入り本文（正規表現パターン等）を更新する際、原文 JSON 表現からの逐語複写をせずエスケープを自前で組み立てると本文を破壊する
+
+- **問題事象**: case-close STEP-2 の完了条件チェックボックス更新（issue_update）で、本文中の rg 正規表現パターン `\.\./\.\./\.\./runner` を含む行の `- [ ]` → `- [x]` 置換を、原文の JSON エスケープ列（`\\.\\./`）を複写せず自前で `\/` を付けて再構成した結果、GitHub 上の本文に `\.\.\/` 等の余分なバックスラッシュが混入した。再読込 VERIFY で検出し、原文 JSON 表現の逐語複写に戻す修正で計 2 回の再更新を要した
+- **発生局面**: 実装（case-close STEP-2 完了条件チェックボックス更新。Case #3673）
+- **検知方法**: 更新後の再読込 VERIFY（gh issue view の生本文）で、ストアド本文のパターン表記と初回 issue_read 応答の逐語比較（`\/` 混入件数と `[x]` 件数の突合）
+- **根本原因**: JSON 層のエスケープ（`\\` → `\`、`\/` → `/`）を展開しながら本文を自前で組み立てたため、正規表現内のリテラル列と実際に欲しい列の区別が崩れた。バックスラッシュを含む本文は「送信時に組み立てる」のではなく「初回読取応答の JSON 文字列を検証済みソースとして複写する」対象である
+- **自律対応内容**: 初回 issue_read 応答の body JSON 文字列を逐語複写し、変更をチェックボックス状態 3 行の置換のみに限定して再更新。生本文で `\/` 0 件・`[x]` 3 件を確認して収束
+- **ユーザー確認有無**: なし（再読込 VERIFY による機械確認）
+- **Decision/REQ/spec影響**: なし（Issue 更新時の前後内容比較運用の強化は learning-promote での判断）
+- **横展開観点**: agentdev_gh issue_update / pr_update / comment_create で正規表現・コード断片・Windows パス等のバックスラッシュ入り本文を扱う全 workflow（case-close チェックボックス更新、case-revise の Case 関連 Issue 本文更新、templates 由来本文の転記）
+- **再発条件**: バックスラッシュ入り本文（正規表現パターン、エスケープシーケンス記載）を含む Issue/PR 本文更新で毎回潜在
+- **予防策候補**: issue_update 手順に「変更対象行以外は初回読取応答の JSON 文字列を逐語複写する」「更新後は生本文でバックスラッシュ列の逐語比較を行う」前置規律の明文化。learning-promote での判断
+- **想定反映先**: src/common/skills/agentdev-issue-management/SKILL.md（Issue 更新時の前後内容比較）と src/common/skills/agentdev-workflow-case-close/references/issue-resolution-and-qg4.md（チェックボックス更新手順）。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Case #3673、PR #3694
+- **タグ**: `#case-close` `#agentdev-gh` `#issue-update` `#escaping`
+- **移動日**: 2026-10-15
+
+
+## case-close 独立再実行で兄弟 Case 間の同一ファイル pre-existing textlint 違反が重複検出され得る
+
+- **問題事象**: case-close 独立再実行で pre-existing textlint hard 違反 2 件（src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md の L50/L80 の「Definition PR」表記）を検出した。発見時点では未解消だったが、兄弟 Case #3679 の PR #3695（main merge 済み commit 95f771c5）で同箇所が「設計PR」へ置換済みのため解消済みの可能性が高い
+- **発生局面**: 実装（case-close。Case #3678 / PR #3696）
+- **検知方法**: textlint 検査の hard 違反報告（definition-pr-and-idempotency.md L50/L80 の指摘行）
+- **根本原因**: 同一ファイルを複数の並行 Case が検査対象に含むため、片方の Case が修正する前に他方の Case が同じ既存違反を検出する。発見時点の状態を「解消済み可能性の注記なし」で記録すると、既に解消済みの違反に対する再調査・重複修復を後続の読み手が実行し得る
+- **自律対応内容**: 検出時点では未解消であることを記録しつつ、兄弟 Case #3679 の PR #3695（main merge 済み commit 95f771c5）で同箇所が「設計PR」へ置換済みであることを確認し、解消済み可能性の注記を添えて記録した。本 Case での重複修復は行わない
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 並行 Case 実行環境で corpus 既存ファイルの検査を行う工程全般に適用可能。pre-existing 違反の記録には「発見時点の状態」と「他 Case による解消済み可能性（main merge 状況）」の両方を注記する規律が有効
+- **再発条件**: 並行 Case 間で同一ファイルを検査対象に含み、一方が既存違反を修正する前に他方が検査を実行する場合
+- **予防策候補**: pre-existing 違反の検出時に、同一ファイルの他 Case での修正状況（main merge の有無）を確認してから記録する手順を明文化する。learning-promote での判断
+- **想定反映先**: case-close reference（既存債務の扱い手順）または case-open reference（対照救済手順）。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Refs: #3678、Case #3679、PR #3695、commit 95f771c5
+- **タグ**: `#case-close` `#textlint` `#既存債務` `#並行実行`
+- **移動日**: 2026-10-15
+
+
+## worktree と main root の両方で同一の check_integrity self-sync 乖離を観測した場合は corpus 既存債務の兆候
+
+- **問題事象**: phase 系スキル 6 件の junction 欠落（check_integrity self-sync 乖離 6 件）を観測した。case-run worktree でも merge 後 main root でも同一の 6 件を観測。兄弟 Case #3684（PR #3701）で投影登録・junction 再構築が実施されたため解消済みの可能性が高いが、観測時点の記録として保持する
+- **発生局面**: 実装（case-close。Case #3678 / PR #3696）
+- **検知方法**: check_integrity の self-sync 乖離報告（phase 系スキル 6 件の junction 欠落）と、worktree・main root 双方での同一結果の突合
+- **根本原因**: 環境差異（worktree vs main root）で乖離内容が変わらず同一であれば、実行環境の問題ではなく corpus 側の構造的欠落（投影登録・junction 未構築の既存債務）である。乖離を環境起因と誤認すると corpus 側の修復が先送りされる
+- **自律対応内容**: 双方環境での同一乖離を根拠に corpus 既存債務の兆候と判定し、修復は兄弟 Case #3684（PR #3701）の投影登録・junction 再構築に委ねて重複修復を回避した。観測時点の記録として学びを残した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: check_integrity 等 corpus 全体検査の乖離分類全般に適用可能。worktree と main root の両方で同一乖離を観測した場合は環境起因でなく corpus 既存債務の兆候として、処遇 Case の起票状況を確認してから修復の要否を判断する
+- **再発条件**: corpus 構造的欠落（投影・junction 未構築等）が存在し、複数環境から同一検査を実行する場合
+- **予防策候補**: check_integrity 乖離の分類手順に「複数環境で同一乖離が観測されるかの確認」前置を追加し、同一なら corpus 既存債務として処遇 Case 起票状況を確認する。learning-promote での判断
+- **想定反映先**: case-close reference（既存債務の扱い手順）または check_integrity 実行手順 reference。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Refs: #3678、Case #3684、PR #3701
+- **タグ**: `#case-close` `#check_integrity` `#既存債務` `#junction`
+- **移動日**: 2026-10-15
+
+
+## bun test を 3分割並行実行すると timeout 系の疑似 fail が多発する。並行実行時の fail はまず単独直列再実行で起因分離する
+
+- **問題事象**: bun test を 3 分割並行実行したところ、timeout 系の疑似 fail が多発した（観測 9 件中 6 件が hook/5s timeout 由来）。同一コマンドを単独直列再実行すると解消することを 2 回実証済み
+- **発生局面**: 実装（case-close。Case #3678 / PR #3696）
+- **検知方法**: 並行実行での fail 分布（hook/5s timeout 由来の集中）と、同一コマンドの単独直列再実行での解消の対比
+- **根本原因**: 並行実行形態によるリソース競合で hook timeout（5s）に達する実行が発生し、テスト本体の品質問題ではなく実行形態起因の疑似 fail として顕在化する。実行形態起因と品質起因の判別手順が手順書に明文化されていない
+- **自律対応内容**: 並行実行の fail をそのまま品質問題として扱わず、同一コマンドの単独直列再実行で起因分離する手順を実施し、2 回とも解消を確認した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 検証工程でテストを並行実行する全 Case に適用可能。並行実行時の fail は実行形態起因と品質起因を分離するため、まず単独直列再実行を行い、再現する場合のみ品質問題として扱う判別手順が有効
+- **再発条件**: bun test 等のテストスイートを並行実行し、hook timeout 系の fail が集中する場合
+- **予防策候補**: 検証手順 reference に「並行実行時の fail はまず単独直列再実行で起因分離する（解消すれば実行形態起因、再現すれば品質起因）」判別手順を明文化する。learning-promote での判断
+- **想定反映先**: case-run / case-close reference（検証手順・CI 対応手順）。learning-promote での判断
+- **関連**: .agentdev/learning/inbox.md、Refs: #3678
+- **タグ**: `#case-close` `#bun-test` `#並行実行` `#疑似fail`
+- **移動日**: 2026-10-15
+
+
+
+
+
+
+
+
+
+
+
+## bun test 分割① の既存 fail 2 件（IR-055・ローカルIssue pr_merge テスト）は baseline 既存欠陥で別単位追跡が必要
+
+- **問題事象**: bun test 分割①（integrity suite）の IR-055 runtime-unresolved-reference 実修復回帰テストと、ローカルIssue role 条件付きスキーマの pr_merge テスト（issue_tracking_list.test.ts）が常時 fail する。baseline（origin/main f6a842da）でも同一 fail 名が再現する既存欠陥である。case-close 独立再検査（Case #3674）で単独再実行（188 pass / 1 fail・21 pass / 1 fail）と baseline 再現確認の両方で安定再現を確認した
+- **発生局面**: 検証（bun test フル suite 実行。Case #3674 / PR #3697）
+- **検知方法**: bun test 分割① 実行の fail（2907 pass / 2 fail）。単独再実行と baseline detached worktree 再現確認で由来分類
+- **根本原因**: baseline commit 時点から存在する既存欠陥。IR-055 は delta from baseline 違反 4 件の実修復回帰、pr_merge テストは runAgentdevGhOperation の pr_merge で ok=false となる実装不整合
+- **自律対応内容**: fail 全件の由来分類で pre-existing と分類し、baseline detached worktree での同一 fail 名再現で裏付けた。修復は本 Case の完了条件から除外し、追跡Issue #3702 を起票して別単位で追跡した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（修復管理は追跡Issue #3702。本 Case は正式な受け入れ条件変更として処理済み）
+- **横展開観点**: baseline 既存 fail が存在する suite で「fail 0 件」を完了条件とする Case は達成不能になる。完了条件の定義時に baseline 状態を確認する
+- **再発条件**: baseline commit に既存 fail が存在するまま新しい Case が fail 0 件の絶対条件を負う場合
+- **予防策候補**: 起票時の bun test 全体実行（baseline 対照）で既存 fail の有無を確認し、既存 fail は別単位 Issue で追跡する前置を入れる。learning-promote での判断
+- **想定反映先**: case-open / req-define の完了条件定義手順。learning-promote での判断
+- **関連**: 追跡Issue #3702、Case #3674、PR #3697、issue_tracking_list.test.ts、check_integrity.test.ts
+- **タグ**: `#bun-test` `#baseline` `#既存fail` `#由来分類`
+- **移動日**: 2026-10-15
+
+
+## launcher protected-path テストはフル suite 負荷時のみ git commit タイムアウトで fail する flaky
+
+- **問題事象**: launcher protected-path テストがフル suite 実行時のみ git commit タイムアウト（60 秒）で fail し、単独実行では baseline・本 worktree の両方で pass する。Case #3674 の case-run 実行では fail したが、case-close 独立再検査のフル suite では fail 未出現（pass）だった
+- **発生局面**: 検証（bun test 分割① フル suite 実行。Case #3674）
+- **検知方法**: フル suite 実行の fail と単独再実行での pass の不一致。再現性確認で flaky と判定
+- **根本原因**: フル suite 負荷時のサンドボックス初期化（git commit 60 秒タイムアウト）が要因の疑い。状態依存・負荷依存の非決定的失敗
+- **自律対応内容**: 単独再実行で pass することを baseline・本 worktree の両方で確認し、フル suite 実行時の一時環境要因として無効分類した。後続のフル suite で fail 未出現だったことで flaky 判定を維持した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: flaky 判定は単独再実行とフル再実行の両記録（単独→フルの順序）で状態依存性を確認してから分類する
+- **再発条件**: フル suite 負荷時にサンドボックス初期化の git commit が 60 秒を超える場合
+- **予防策候補**: 該当テストの git commit 処理に明示的 timeout 緩和またはリトライを入れる。learning-promote での判断
+- **想定反映先**: 該当テスト実装（launcher protected-path テスト）または checker 実行契約 Design の flaky 扱い基準。learning-promote での判断
+- **関連**: Case #3674、PR #3697
+- **タグ**: `#bun-test` `#flaky` `#タイムアウト`
+- **移動日**: 2026-10-15
+
+
+
+
+
+## baseline 既存 fail 存在下の「bun test 全体 fail 0 件」絶対完了条件は達成不能になる。baseline 対照＋由来分類への基準変更が先行例
+
+- **問題事象**: baseline（origin/main HEAD）時点で既存 fail が存在する構造で、「bun test 全体が fail 0 件」という絶対完了条件を持つ Case が、本 Case 変更単独では達成不能になった。Case #3674 の初回 QG-4 判定で fail と判定され停止した
+- **発生局面**: レビュー（case-close STEP-2 QG-4 達成判定。Case #3674）
+- **検知方法**: QG-4 判定での完了条件3 未達判定（fail 合計 79 件残存）。suite 全体絶対判定と baseline 相対判定の乖離
+- **根本原因**: 完了条件が suite 全体の絶対判定として定義され、baseline 既存 fail の分離が考慮されていなかった。本 Case の起因事象（ENGINE_TREE 検査常時 1 fail）は解消済みでも、他の既存 fail が条件達成を阻害した
+- **自律対応内容**: case-close は baseline waiver を行わず親判断へ停止した（停止記録 6152686604）。その後 req-define 再合意・case-revise 経路で完了条件3 を baseline 対照＋QG-4 fail 由来分類基準へ正式変更し（反映記録 6158011276）、case-close が新基準で QG-4 判定を再実施して合格させた（pre-existing 78・変更由来 0・由来不明 0）
+- **ユーザー確認有無**: あり（再合意は利用者レビュー確定）
+- **Decision/REQ/spec影響**: あり（baseline 対照＋由来分類を含む完了条件の先行例を形成。QG-4 契約の例外運用ではなく正式な受け入れ条件変更として扱う）
+- **横展開観点**: baseline 相対判定を含む完了条件は、機械受理基準（由来分類・baseline 再現確認）を伴う形で定義する
+- **再発条件**: baseline 既存 fail が存在する状態で fail 0 件の絶対条件を負う Case
+- **予防策候補**: 完了条件の fail 件数条件には baseline 対照の前提を明示する。learning-promote での判断
+- **想定反映先**: req-define / case-ready の完了条件定義ガイド、agentdev-quality-gates reference。learning-promote での判断
+- **関連**: Case #3674、停止記録 6152686604、反映記録 6158011276、追跡Issue #3702、PR #3697
+- **タグ**: `#qg-4` `#完了条件` `#baseline対照` `#由来分類`
+- **移動日**: 2026-10-15
+
+
+
+
+
+
+
+## prepare_definition_pr の入力 JSON を段階構築した際 definitionEdits が重複し旧文不在 fail が発生する
+
+- **問題事象**: case-open STEP-4 で prepare_definition_pr.ts の入力 JSON を、updated 行編集のベース構築と draft 抽出による本文編集マージの 2 段階で構築したところ、同一行編集（frontmatter updated）が definitionEdits に二重に入り、2 回目の適用で旧文不在（not found）fail 5 件が報告され、script が stage・commit 前に停止した
+- **発生局面**: case-open 実行時の機械工程・入力組み立て
+- **検知方法**: script 報告 JSON の definition-edit fail 5 件（各ファイル 1 回）と、worktree 内 git diff で全実 edits が適用済みであることの突合不一致
+- **根本原因**: 入力 JSON の段階的構築で段階間の edits 重複検証（同一 path + 同一 oldText の重複排除）を行わなかった
+- **自律対応内容**: 報告 JSON と git 状態から適用済み工程を確認し、不足分なしとして definitionEdits を空にした冪等再実行（既存 worktree の期待 branch 再利用）で残り工程（generate_indexes、明示パス指定 stage・commit、check_integrity、traceability check）を実行して収束させた
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: prepare_definition_pr を model が手動組み立てで実行する case-open 実行全般。definitionEdits の構築は (path, oldText) 組の一意性検証と重複排除を通してから script へ渡す
+- **再発条件**: 入力 JSON を複数段階（ベース + マージ）で構築して同一ファイルの同一行編集を二重に含めた場合
+- **予防策候補**: definitionEdits 構築後に (path, oldText) 組で重複排除する前置検査を加える。script 入力検証側で重複 edits を拒否する案もある。learning-promote での判断
+- **想定反映先**: agentdev-workflow-case-open references/definition-pr-and-idempotency.md の STEP-4 冪等再実行手順、prepare_definition_pr.ts の validateInput。learning-promote での判断
+- **関連**: Case #3710、src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts
+- **タグ**: `#case-open` `#機械工程` `#冪等再実行` `#入力重複`
+- **移動日**: 2026-10-15
+
+## close_mechanical_steps の integrityGates に bun test を渡す場合 GateCommandSpec の bash ラップで分離退避が成立するが timeoutMs はリトライ込み所要で設定する
+
+- **問題事象**: case-close（Case #3718）の pre-merge 機械工程で、integrityGates の bun test を bash -c ラップ（stdout/stderr を `>` `2>` で分離退避）で渡したところ、flaky 由来のリトライ構成（1 回目 fail → 2 回目再実行）の gate 全体所要が約 678 秒となり、spawnSync の timeoutMs 600000 を超過。spawnSync が status=null を返し script 側 `exitCode: result.status ?? 1` で fail 扱いになった（2 回目の bun test 自体は 0 fail で成功していた）
+- **発生局面**: case-close 実行時の機械工程・入力仕様
+- **検知方法**: 報告 JSON の full-integrity-suite step が exit 1 だが、退避ファイル（リトライ先の stderr log）には 2909 pass / 0 fail が記録済みで結果が矛盾
+- **根本原因**: bash -c ラップの gate 所要は bun test 実行 + sleep + リトライ実行の合計であり、timeoutMs を単一 bun test 実行の所要（実測 ~350 秒）で見積もった
+- **自律対応内容**: split1 gate の timeoutMs を 1200000（リトライ込み上限）へ変更し再実行、全 step pass・exitCategory success で収束
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: close_mechanical_steps.ts に bash ラップ gate を渡す全実行。timeoutMs は gate コマンド全体（ラップ内の全処理）の所要に対して設定する
+- **再発条件**: bash -c ラップ内で複数回の bun test 実行（リトライ構成）を行い、timeoutMs を単一実行分で設定した場合
+- **予防策候補**: リトライ構成の gate では所要上限 = 単一実行実測 × (1 + リトライ回数) + 余裕で timeoutMs を算出する指針を reference へ追記。learning-promote での判断
+- **想定反映先**: agentdev-workflow-case-close references/docs-and-design-promotion.md の checker 実行手順。learning-promote での判断
+- **関連**: Case #3718、src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts
+- **タグ**: `#bun-test` `#証跡` `#機械工程` `#timeout`
+- **移動日**: 2026-10-15
+
+
+
+## worktree で spawnSync 型テストの既定 5 秒 timeout が suite 並列負荷下で再発する（3 事例目・check_test_impact と gate.test）
+
+- **問題事象**: Case #3718 の bun test 3 分割実行で、check_test_impact.test.ts と agentdev-textlint-guard gate.test.ts の spawnSync 型テストが `this test timed out after 5000ms` で fail（実測 5234〜6266ms）。同一 HEAD での単独再実行は全て PASS、フル再実行では fail テストが入れ替わる非決定的状態依存 fail。PR #3720 で修復した check_templates の障害モードと同一系統
+- **発生局面**: case-run / case-close 実行時のテスト実行
+- **検知方法**: 分割実行の stderr 退避ファイルの `(fail)` 行と `timed out after 5000ms` 表記、fail テストの入れ替わり
+- **根本原因**: spawnSync で子プロセスを起動するテストの既定 timeout 5 秒は、suite 並列負荷下のファイル IO・プロセス起動遅延で容易に超過する。テスト資産側に明示 timeout がない
+- **自律対応内容**: 単独再実行 PASS・フル再実行（リトライ）0 fail で由来分類（pre-existing・再現性不安定）を確定し、マージ後 main 再実行でも同手順で 0 fail 証跡を取得
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（checker 実行契約 Design への追記候補は Design 確定候補として見送り記録済み。対応記録コメント検証差分参照）
+- **横展開観点**: spawnSync 型テストを持つ全テスト資産。check_test_impact.test.ts・gate.test.ts は明示 timeout 追加の修正対象候補
+- **再発条件**: suite 並列負荷下で spawnSync 型テストを実行した場合
+- **予防策候補**: spawnSync 型テストへの明示 timeout 60 秒追加（DEL-3590-2・#3718 check_templates の前例と同一方式）。learning-promote での判断
+- **想定反映先**: checker 実行契約 Design「実行系の実機制約（node/bun）」節（Design 追記候補）。learning-promote での判断
+- **関連**: Case #3718、PR #3720 本文 learning 2 件目、DEL-3590-2 前例
+- **タグ**: `#bun-test` `#spawn-sync` `#再現性不安定` `#timeout`
+- **移動日**: 2026-10-15
+
+## Windows の spawnSync で証跡退避ランナー等を動かす場合 MSYS 由来の POSIX 形式 cwd は uv_spawn が ENOENT で失敗する
+
+- **問題事象**: Case #3718（DEL-3718-1）で、Windows 環境の spawnSync を使う証跡退避ランナー等に MSYS bash 由来の POSIX 形式 cwd（`/c/...`）を渡すと `uv_spawn` が ENOENT で失敗した。PATH 経由の実行可能ファイル解決自体は cwd が正しければ機能する
+- **発生局面**: case-run 実行時の検証実行（Windows）
+- **検知方法**: spawnSync の ENOENT エラーと、同一コマンドの Windows ネイティブパス渡しでの成功
+- **根本原因**: Windows の uv_spawn は POSIX 形式パスを実在ディレクトリとして解決できない
+- **自律対応内容**: cwd を Windows ネイティブパスへ変換して実行し証跡退避を成立させた
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: Windows + MSYS bash 環境で spawnSync を使う検証ランナー・機械工程全般
+- **再発条件**: bash セッション由来の `/c/...` 形式パスを spawnSync の cwd に渡した場合
+- **予防策候補**: spawnSync への cwd 渡しは Windows ネイティブパスへ正規化する前置を入れる。learning-promote での判断
+- **想定反映先**: checker 実行契約の手順接続、windows-checker-msys-path 関連知識。learning-promote での判断
+- **関連**: Case #3718、PR #3720 本文 learning 1 件目、docs/knowledge/windows-checker-msys-path-argument.md
+- **タグ**: `#windows` `#spawn-sync` `#msys` `#証跡`
+- **移動日**: 2026-10-15
+
+## worktree での package 単位 bun install は bun.lock 未存在 package で lockfile を新規生成する副作用がある
+
+- **問題事象**: Case #3718（DEL-3718-1）の worktree 依存整備で、package 単位 `bun install` を実行した際、bun.lock が存在しない package では bun.lock が新規生成された（git 管理対象外の新規 untracked として出現）
+- **発生局面**: case-run 実行時の依存整備（worktree）
+- **検知方法**: 整備後の `git status` 確認で bun.lock の新規出現を検出
+- **根本原因**: bun install は bun.lock 未存在時に lockfile を生成するのが既定動作。整備手段の副作用として無条件に発生する
+- **自律対応内容**: 整備後の `git status` 確認と不要 lockfile の復元（削除）を実施
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree で bun install を実行する全工程（case-run 依存整備、検証前置）
+- **再発条件**: bun.lock 未存在の package 境界で worktree 内 bun install を実行した場合
+- **予防策候補**: 依存整備手順に「整備後 git status で lockfile 新規生成を確認し不要なら復元」を前置として明記。learning-promote での判断
+- **想定反映先**: agentdev-git-worktree references の bun test 実行環境前提節。learning-promote での判断
+- **関連**: Case #3718、PR #3720 本文 learning 3 件目、main root `src/senpi/tools/agentdev-gh-tool/bun.lock`（untracked 残存の同型事例）
+- **タグ**: `#bun` `#worktree` `#依存整備` `#lockfile`
+- **移動日**: 2026-10-15
+
+## worktree での bun test 分割①は環境負荷で timeout 系テストが非決定的 fail し得る。由来分離は「timeout メッセージ確認 → ファイル単体再実行 → 分割全体の同一条件再実行」の順で行う
+
+- **問題事象**: Case #3719（DEL-3719-1）で、worktree での bun test 分割①（integrity suite）を変更直後に実行した際、5 秒 timeout を持つ fixture git init を伴う checker 起動テストが 6172ms 超過で 1 件非決定的 fail した。同一条件の再実行では 0 fail が再現
+- **発生局面**: case-run 実行時の full integrity suite 分割① 実行（worktree・並列負荷下）
+- **検知方法**: fail 詳細の timeout メッセージ確認 → ファイル単体再実行（30 pass / 0 fail / 7.67 秒）→ 分割全体の同一条件再実行（2909 pass / 0 fail / exit 0）で再現性を確認
+- **根本原因**: worktree 環境の suite 並列負荷により、明示 timeout 5 秒の fixture git init 依存テストが環境負荷由来で超過する。テスト自体の欠陥ではない
+- **自律対応内容**: 由来分離の3手順を順に実行し、再実行で 0 fail が再現されたため環境差由来として記録（fail 由来分類: 環境依存）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree で bun test 分割実行を行う全工程（case-run・case-close の full integrity suite）
+- **再発条件**: worktree 環境で明示 timeout の短い fixture 依存テストを suite 並列負荷下で実行した場合
+- **予防策候補**: 由来分離手順（timeout メッセージ確認 → 単体再実行 → 分割同一条件再実行）の実例として docs/knowledge/worktree-environment-fail-classification.md と整合する運用を維持。learning-promote での判断
+- **想定反映先**: worktree-environment-fail-classification 知識文書の実例追記候補。learning-promote での判断
+- **関連**: Case #3719、PR #3721 本文 learning 1 件目、docs/knowledge/worktree-environment-fail-classification.md、Case #3718 の timeout 追加前例
+- **タグ**: `#bun-test` `#worktree` `#timeout` `#由来分離`
+- **移動日**: 2026-10-15
+
+## bun test 分割実行の件数突合は node_modules 除外の実在テストファイル数で行う（node_modules 含みの数え上げで分割①②の件数申告混同が発生）
+
+- **問題事象**: Case #3722（DEL-3722-1）の前委譲 SSoT が「分割①: 2909 pass」と申告したが、実測では 2909 は分割②（repo-agentdev-integrity scripts）の件数で、分割①（src/common/skills）は 596 pass / 42 files だった。件数突合の乖離として検証差分に記録された
+- **発生局面**: case-run 実装（SSoT 記録・件数突合）
+- **検知方法**: DEL-3722-2 の再実行で分割①の件数突合をやり直した際、申告件数と実測件数の乖離を検出
+- **根本原因**: `find src/common/skills -name "*.test.ts"` が scripts package 配下 node_modules 内の重複テストファイルを含んで数えた（210 件）。実在テストファイルは node_modules 除外で 42 件
+- **自律対応内容**: 実測で分割① 596 pass / 42 files・分割② 2909 pass を再取得し、件数突合を node_modules 除外の実ファイル数（42 件と全数一致）でやり直し、前委譲の合格申告を撤回・訂正した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: bun test 分割実行の件数突合全般（QG-4 機械受理基準10項目の「件数突合の記録」）
+- **再発条件**: テストファイル数の数え上げを node_modules を含むパス探索で行い、件数突合に使用した場合
+- **予防策候補**: bun test 正規形の件数突合手順に「テストファイル数の数え上げは node_modules 除外の実在テストファイル数で行う」を明記。learning-promote での判断
+- **想定反映先**: agentdev-quality-gates の QG-4 件数突合手順（references/qg-4-final-acceptance.md）。learning-promote での判断
+- **関連**: Case #3722、PR #3724 本文 learning 1 件目、Issue コメント 6181896538（前委譲 SSoT 撤回）
+- **タグ**: `#bun-test` `#件数突合` `#node-modules` `#ssot`
+- **移動日**: 2026-10-15
+
+## LSP 診断の 3000ms タイムアウト時は tsc --noEmit（package tsconfig・strict）が同等の静的検査として機能する
+
+- **問題事象**: 本リポジトリの大規模 TS ファイル（close_mechanical_steps.ts・close_mechanical_steps.test.ts 等）で lsp_diagnostics が 3000ms タイムアウトし、DEL-3722-1・DEL-3722-2 の 2 委譲連続で同一事象が発生した
+- **発生局面**: case-run 実装の静的検査
+- **検知方法**: lsp_diagnostics のタイムアウト応答（各委譲で 2 回試行・2 委譲で再現）
+- **根本原因**: 大規模 TS ファイルへの LSP 初期化・解析が 3000ms のタイムアウト内に収まらない
+- **自律対応内容**: tsc --noEmit（package tsconfig・strict・noUnusedLocals・src+tests 含む）を代替の静的検査として実行し、本変更由来エラー 0 件を確認した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: LSP 診断を品質 gate に組み込む工程全般（case-run 静的検査）
+- **再発条件**: 大規模 TS ファイルを lsp_diagnostics で検査した場合
+- **予防策候補**: LSP タイムアウト時の代替手段（tsc --noEmit・package tsconfig 基準）と記録要領を静的検査手順へ明記。learning-promote での判断
+- **想定反映先**: case-run 静的検証手順、LSP 運用関連知識候補。learning-promote での判断
+- **関連**: Case #3722、PR #3724 本文 learning 2 件目、PR #3724 品質メトリクス表 LSP 診断行
+- **タグ**: `#lsp` `#tsc` `#静的検査` `#タイムアウト`
+- **移動日**: 2026-10-15

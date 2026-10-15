@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261015T095512Z-f301",
+  "workflow": "learning-promote",
+  "evaluationKind": "problem-class-classification",
+  "subject": "2026-10-15 learning inbox 41エントリの問題クラス帰属（バッチ3/4: e22〜e31）",
+  "sourceRevision": "38bc58c7",
+  "durationMs": 419,
+  "inputTokens": 3205,
+  "inputs": {
+    "requestDigest": "61994105e34fde5b4afef78223bee3ca594c60c252cd9c7e9571fd4b8064034c"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "e22",
+      "questionForm": "choice",
+      "value": "U",
+      "probabilityDistribution": {
+        "C1": 0,
+        "C2": 0,
+        "C3": 0.01,
+        "C4": 0,
+        "C5": 0,
+        "C6": 0,
+        "C7": 0.01,
+        "C8": 0,
+        "U": 0.98
+      }
+    },
+    {
+      "questionId": "e23",
+      "questionForm": "choice",
+      "value": "C6",
+      "probabilityDistribution": {
+        "C1": 0,
+        "C2": 0,
+        "C3": 0,
+        "C4": 0,
+        "C5": 0,
+        "C6": 0.96,
+        "C7": 0,
+        "C8": 0,
+        "U": 0.04
+      }
+    },
+    {
+      "questionId": "e24",
+      "questionForm": "choice",
+      "value": "C3",
+      "probabilityDistribution": {
+        "C1": 0,
+        "C2": 0,
+        "C3": 0.99,
+        "C4": 0,
+        "C5": 0,
+        "C6": 0,
+        "C7": 0,
+        "C8": 0,
+        "U": 0.01
+      }
+    },
+    {
+      "questionId": "e25",
+      "questionForm": "choice",
+      "value": "C2",
+      "probabilityDistribution": {
+        "C1": 0,
+        "C2": 0.93,
+        "C3": 0,
+        "C4": 0,
+        "C5": 0,
+        "C6": 0,
+        "C7": 0,
+        "C8": 0,
+        "U": 0.07
+      }
+    },
+    {
+      "questionId": "e26",
+      "questionForm": "choice",
+      "value": "C4",
+      "probabilityDistribution": {
+        "C1": 0,
+        "C2": 0,
+        "C3": 0,
+        "C4": 0.98,
+        "C5": 0,
+        "C6": 0,
+        "C7": 0,
+        "C8": 0,
+        "U": 0.02
+      }
+    },
+    {
+      "questionId": "e27",
+      "questionForm": "choice",
+      "value": "C3",
+      "probabilityDistribution": {
+        "C1": 0,
+        "C2": 0,
+        "C3": 0.98,
+        "C4": 0,
+        "C5": 0.01,
+        "C6": 0,
+        "C7": 0,
+        "C8": 0,
+        "U": 0.01
+      }
+    },
+    {
+      "questionId": "e28",
+      "questionForm": "choice",
+      "value": "C1",
+      "probabilityDistribution": {
+        "C1": 0.99,
+        "C2": 0,
+        "C3": 0,
+        "C4": 0,
+        "C5": 0,
+        "C6": 0,
+        "C7": 0,
+        "C8": 0,
+        "U": 0.01
+      }
+    },
+    {
+      "questionId": "e29",
+      "questionForm": "choice",
+      "value": "U",
+      "probabilityDistribution": {
+        "C1": 0.01,
+        "C2": 0,
+        "C3": 0,
+        "C4": 0.24,
+        "C5": 0,
+        "C6": 0,
+        "C7": 0,
+        "C8": 0.02,
+        "U": 0.73
+      }
+    },
+    {
+      "questionId": "e30",
+      "questionForm": "choice",
+      "value": "U",
+      "probabilityDistribution": {
+        "C1": 0.29,
+        "C2": 0.02,
+        "C3": 0,
+        "C4": 0,
+        "C5": 0,
+        "C6": 0.01,
+        "C7": 0.01,
+        "C8": 0,
+        "U": 0.67
+      }
+    },
+    {
+      "questionId": "e31",
+      "questionForm": "choice",
+      "value": "U",
+      "probabilityDistribution": {
+        "C1": 0,
+        "C2": 0,
+        "C3": 0,
+        "C4": 0,
+        "C5": 0,
+        "C6": 0.01,
+        "C7": 0,
+        "C8": 0,
+        "U": 0.99
+      }
+    }
+  ],
+  "confidence": 0.98,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "e22",
+        "value": "U"
+      },
+      {
+        "questionId": "e23",
+        "value": "C6"
+      },
+      {
+        "questionId": "e24",
+        "value": "C3"
+      },
+      {
+        "questionId": "e25",
+        "value": "C2"
+      },
+      {
+        "questionId": "e26",
+        "value": "C4"
+      },
+      {
+        "questionId": "e27",
+        "value": "C3"
+      },
+      {
+        "questionId": "e28",
+        "value": "C1"
+      },
+      {
+        "questionId": "e29",
+        "value": "U"
+      },
+      {
+        "questionId": "e30",
+        "value": "U"
+      },
+      {
+        "questionId": "e31",
+        "value": "U"
+      }
+    ]
+  }
+}

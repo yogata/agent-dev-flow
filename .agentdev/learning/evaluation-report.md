@@ -1,86 +1,90 @@
 # 評価レポート
 
 ## メタデータ
-- **実行日時**: 2026-10-13（backlog-auto stage 2 learning 系統として実行。4 回目・再開実行）
-- **対象エントリ数**: 20 件（inbox: 20 件〔実行指示は 19 件だが durable state の実ファイルが SSoT で 20 件。実ファイルに従う〕, deferred: 210 エントリ〔grep 見出し 214 - 構造ヘッダー 4〕）
-- **判定結果**: promote 3 単位/3 エントリ（全て区分 5 既存対策の更新）+ deferred 12 単位/17 エントリ。reject 0・duplicate 0
-- **再開起点**: promoted/ 空・inbox 20 エントリ残存・promoted 実績なしのため再開プロトコルどおり STEP-1 から再実施。旧 evaluation-report（2026-10-11 実行分の 39 エントリ）は承認証跡ではないため本実行で上書き
-- **分析体制**: 全 20 エントリの読取・問題クラス分類・8軸評価・既存対策照合（正規文書への grep 実測 8 件）を親が直接実施（委譲なし）
-- **Jev 先行評価**: 採用（evaluate 6 回・observation_write 5 回。逐次経路どおり Jev 結果と確率分布を情報として LLM 推論し最終判断を観測へ反映。差異は differenceReason 付きで記録。Jev 返却値の scale 外値 1 件〔ka3-impact=0〕は evaluation_input_defect として scale 内へ是正）
-- **STEP-4 adversarial-review**: 発動条件判定を本 report 反映後に実施（結果は「STEP-4」節）
-- **HITL**: 0 件（全 20 エントリ自律確定。詳細は「自律確定記録」節）
 
-## 処分判定基準
+- **実行日時**: 2026-10-15（backlog-auto stage 2 learning 系統。再開実行）
+- **基準 revision**: 38bc58c7（durable state 記録と同期後の HEAD の一致を確認。2026-10-15T21:08:48+09:00 に `git pull --ff-only` を実行し、`Already up to date.`（exit 0）。
+- **時刻**: 親 run 開始 2026-10-15T18:08:07+09:00。learning 系統の最初の Jev observation 2026-10-15T18:53:38+09:00（親開始時刻と区別）。今回の再開は2026-10-15T20:55:09+09:00、同期ゲート到達は2026-10-15T21:05:08+09:00。
+- **対象エントリ数**: inbox 41 件、deferred 227 件（見出し231行のうち4行は様式・説明見出し）
+- **問題クラス数**: 31（8 クラスター + 23 単独。クラスターは根本原因・再発条件・予防策の一致で限定）
+- **Jev**: 分類 4 評価・8軸評価 8 評価・処分区分 1 評価・昇華可能性 1 評価を durable observations から再構成。8軸は finalResult を用い、score の値は scale index + 1 として換算。発生件数は inbox 内同一問題クラス数から決定的に導出。
+- **旧 report**: 10/13 実行の別の20件を対象にしたため、本レポートで置換。
+- **extension**: `.agentdev/extensions/skills/agentdev-workflow-learning-promote.yaml` は 5 セクションすべて空。
 
-8軸合計は参考値であり、質的基準との複合で判定した。(a) 実害未観測の観測記録、適用済み・既存文書（docs/knowledge 含む）で対策規定済み、fail-closed 防御機構の作動事例、成果物の自足性が低い軽微補足 → deferred 優先。(b) fix gap 保有（既存対策の陳腐化・不備・適用漏れが正規文書への grep 実測で確認された）で予防策が正規反映先への明示補足・是正候補に帰着し、実害観測がある → promote。deferred プール内に同主題先行エントリがある場合、duplicate 区分ではなく既存エントリの再発観測として deferred で処理し、新エントリ側の処分判定に再発関係を記録する（既存エントリ本文は原子的移動中に編集しない）。
+## 判定基準
 
-## 20 エントリ評価表
+処分はスコアのみで決めず、既存恒久対策の現状、実害、情報の自足性、昇華可能性、既存プールとの関係を併せて評価した。Jev の結果は助言であり、結果を機械的に採択しない。Disposition 5 は既存対策のギャップが具体的に確認できた場合のみ promote する。十分な恒久対策により既に網羅されているものだけ duplicate とし、deferred に似た記録があるだけでは duplicate にしない。Decision 候補は禁止条件ゲート（技術判断の欠如、command 仕様、運用規則等）により全単位で除外。
 
-8軸表記: 発生/影響/横展/反映先/自動化/再利用/再発/費対 = 合計/40。（P 統合）はクラス値を代表エントリに記載し統合先単位に帰属することを示す。
+## 問題クラス評価・処分
 
-| # | エントリ概要 | 単位 | 8軸 | 処分 | 根拠（1 行） | deferred/duplicate 照合 |
-|---|---|---|---|---|---|---|
-| 1 | issue_create で role:case に kind 渡し拒否（Root Case #3623） | u1 | 1/1/2/3/3/2/2/3 = 17 | deferred | Tool fail-fast が作動し即解消・issue-operation-safety.md L61 に role/kind 論理軸の使用規律あり | なし |
-| 2 | 冪等検索 search トークンに topic_slug 単独使用で検出不能（Root Case #3625） | u2 | 1/1/2/3/2/3/2/3 = 17 | deferred | STEP-5 冪等再確認で回収・実害未発生・選択性指針への補足は軽微 | deferred 同主題近接（search index 遅延・別観点） |
-| 3 | 配布 reference 追記に docs/designs/ 具参照で IR-055 delta（PR #3630） | （KA2 統合）22 | deferred | IR-055 検出器が fail-closed で検出・即修正済み・転記時規律は恒久文書に不在（grep 0 実測）だが防御は機能中 | deferred に配布境界系多数 |
-| 4 | shared_areas に req-row-mentions 使用で未登録需要警告（Root Case #3629） | u3 | 1/1/2/3/3/3/2/3 = 18 | deferred | gate 影響なし・意味レビューで完了・kind 対応表欠落は軽微改善 | なし |
-| 5 | 新規 REQ 行設計PRで traceability gate が構造的 fail（Case #3628） | （KA1 統合）25 | deferred | definition-pr-and-idempotency.md L47-54 に工程別 gate 判定仕様が規定済み・gate consumer 実装済み（#3653）で解消済み | エントリ 13 と同一問題の 1 事例目 |
-| 6 | --update-ir055-baseline が provenance・cap 破壊（PR #3633） | u4 | 1/1/2/3/3/2/3/3 = 18 | deferred | revert 復旧・単発・実害一時的（検知・回復可能） | deferred に baseline 系多数 |
-| 7 | prepare_definition_pr が見出しのみ適用し本文欠落・verbatim 誤主張（Case #3642 / PR #3643） | u5 | （P1）19/40 | promote P1 | L78 の意味レビュー規定のみで適用後成果物への突合手順なし（grep 実測）・実害（PR 差分本文不在・検証記録不一致・修復 1 回） | なし |
-| 8 | 実装担当サブエージェント起動 API 非露出で委譲不成立（Issue #3645） | u6 | 1/2/2/3/3/3/3/3 = 20 | deferred | deferred L421（ADR-0127 フォールバック連続発動・2026-07-06 移動分）の同型先行の再発観測 | deferred 同主題先行（L421）の再発 |
-| 9 | node_modules 未伝播 worktree で tsc 型未解決（Issue #3646） | （KA3 統合）21 | deferred | worktree-operations.md L108-174 に依存整備前提・tsc 型解決前提の詳細規定済み（grep 実測） | deferred L1297 近接 |
-| 10 | worktree .opencode 投影 skill 伝播不均一で checker 経路分岐（Issue #3646） | （KA3 統合） | deferred | definition-pr-and-idempotency.md L58-64 に junction 伝播確認・main root 実行手順規定済み | deferred L3945 近接 |
-| 11 | case-run 直接実行時に着手時刻を初手計測せず（Issue #3646） | （KA5 統合）19 | deferred | case-run SKILL.md L116-117 に開始日時初回設定規定あり（大部分カバー）・self-apply 初手手順の欠落は軽微補足・成果物自足性低 | なし |
-| 12 | TS-008 効果評価目標未達・残遅延未帰属（Issue #3647） | （KA5 統合） | deferred | after 計測の構造的不可能性は Design 改善候補で現時点では具体性不足・実害は記録欠落のみ | なし |
-| 13 | 新規 REQ 行 traceability raw fail を工程別 gate が区別できず進行停止（Case #3653 / PR #3655） | （KA1 統合） | deferred | gate consumer 実装追加（ユーザー明示承認）で解消済み・reference 規定済み | エントリ 5 と同一問題の 2 事例目 |
-| 14 | cleanup script が trim 後先頭列判定で staged 誤判定（Root Case #3653） | u7 | （P2）18/40 | promote P2 | accept_definition_checks.ts L583-586 に trim 後 entry[0] 参照の実装バグが現存（実測）・実害（commit 停止 1 回・2 段障害 1 回） | なし |
-| 15 | 実領域読戻し突合検証で原状喪失（Wave-1 #3657） | u8 | 1/2/2/3/3/2/2/3 = 18 | deferred | 恒久検証（phase_domain_state.test.ts）追加済み・単発・判断基準（原状保持→検証→復元突合）を含むため prune 禁止系 | なし |
-| 16 | bun が Git Bash パス（/c/...）を解決せず ENOENT（Wave-3 #3662） | （KA4 統合）20 | deferred | docs/knowledge/windows-checker-msys-path-argument.md L11 に機構と C:/ 形式推奨を規定済み（grep 実測）・即解消 | deferred L3756/L3798 近接 |
-| 17 | traceability check --root . 相対指定で全 REQ 欠落誤判定（Wave-1 #3660） | （KA4 統合） | deferred | 絶対パス推奨は docs/knowledge 規定済み・機構説明の補足は軽微 | deferred L3336 近接 |
-| 18 | checker workflow profile 対象外パスの検査漏れ（Wave-1 #3660） | u9 | 1/1/2/3/3/2/2/3 = 17 | deferred | deferred L4176（targeted docs guard は skill 配下 references を計上対象外・2026-10-11 移動分）の同型先行の再発観測・補完検査で対処済み | deferred 同主題先行（L4176）の再発 |
-| 19 | case-close 委譲指示に Design 状態評価漏れ・draft のまま Epic クローズ（#3653/#3654 最終 case-close） | u10 | （P3）21/40 | promote P3 | case-auto.md L223-230「委譲指示の構築規律」節に Design 状態評価の必須項目列挙なし（grep 実測）・実害（Design draft 残存で Epic クローズ・回復済み） | なし |
-| 20 | 配布物への REQ ID 直記で配布境界 concrete-id 違反（PR #3669） | （KA2 統合） | deferred | check_distribution_boundary concrete-id 検出器が fail-closed で検出・即修正済み（merge commit 5958fe7e 配下違反 0） | エントリ 3 と同一問題の 2 事例目 |
+軸順: 発生件数 / 影響度 / 横展開性 / 反映先明確度 / 自動化適性 / プロジェクト固有知識再利用性 / 再発可能性 / 費用対効果。各行末の加重合計は満点40（/40）。E番号は inbox 見出しの出現順（E1〜E41）。
 
-## promote 単位（3 単位/3 エントリ）
+| 単位 | エントリ | 8軸 | 処分 | 根拠・既存対策照合 |
+|---|---|---:|---|---|
+| C1 | E28,E33 checker を pipe に通した終了コード誤認 | 2/2/3/3/3/3/2/3 = 21 | duplicate | `docs/knowledge/windows-checker-observation-discipline.md` L13 は `$?` が pipeline の末尾 command を返すと明記し、pipe なし実行または `PIPESTATUS` による観測を要求する。症状・予防策とも一致するため新しい成果物を生成しない。 |
+| C2 | E20,E25,E34,E37 並列負荷時の test timeout と由来分離 | 3/3/4/4/4/4/4/4 = 30 | deferred | `docs/knowledge/windows-bun-test-spawn-timeout-classification.md` L11-L21 は timeout の単独再実行、実測ベースの test timeout 設定、suite 負荷下の main HEAD 対照を規定し、E20/E34/E37を覆う。一方 E25 は test 内 git commit の60秒 child timeoutであり、既存知識の test runner timeout と同一対策が十分か確認できない。安全側にliving poolへ残す。 |
+| C3 | E24,E27 baseline fail と完了条件の由来分離 | 2/4/4/4/3/4/4/4 = 29 | deferred | QG-4 の既存 fail 由来分類、baseline 対照の知識がある。今回も起票済みIssue等の個別運用記録で、既存規則の適用事例か規範追加が要るかを十分に分離できない。 |
+| C4 | E21,E26 worktree / package の textlint vendor 未生成 | 2/1/3/4/4/4/4/4 = 26 | duplicate | `README.md` の開発者向け依存生成手順、`agentdev-git-worktree/references/worktree-operations.md` L114、L167 が worktree 未伝播と再生成を明示する。候補本文 deferred L3532/L3616 も読戻し確認し、回復まで含めて現行の恒久手順が十分であることを確認。 |
+| C5 | E2,E15 PR 非起因 gate fail 時の対照・残ゲート | 2/4/4/4/4/4/4/4 = 30 | deferred | `definition-pr-and-idempotency.md` に check_integrity の base 対照はあるが、case-ready 側の早期 return 後に残 gate を安全に消費する契約の整備は明瞭でない。一方、fail-closed 制約と後続 gate 消費方法の合意が必要で、安易な緩和はしない。 |
+| C6 | E7,E23 traceability 対応宣言の集約・集合一致 | 2/3/3/4/5/4/4/4 = 29 | duplicate | `agentdev-traceability/references/sidecar-and-policy.md` L39-L56 と L134-L142 が、既存情報源の事前確認、同一 artifact × role の集約、inline/sidecar 集合の両方向一致を明示する。両例ともその既存規則に従った機械修正であり追加規範を要しない。 |
+| C7 | E5,E11 Case 対象の traceability target 行選択 | 2/3/3/4/4/4/4/4 = 28 | duplicate | case-open の `references/root-case-and-definition-package.md` L56-L58 は REQ 変更行・意味変更行の coverage 対象を定め、case-ready の `references/definition-acceptance.md` L92-L95 は canonical Definition の Case 対象要件行に check を限定する。E5/E11 はともに既存 gate 範囲の選択ミスで、対策は既存契約にある。 |
+| C8 | E6,E35 Windows/Bash と Node・spawnSync 間のパス表現不一致 | 2/1/4/4/4/4/4/3 = 26 | deferred | 2事例とも Windows 上で Bash/MSYS 由来のパスを Node 系プロセスに渡し、対象ファイルまたは cwd の解決に失敗。Windows native path を使う回避は共通するが、呼出し形態の網羅性は既存知識へ明確に反映されていない。 |
+| E1 | 並行 case-open の共通 Jev 観測 partial commit | 1/1/3/4/3/3/3/3 = 21 | deferred | deferred L3700 の同根観測があるが、既存の learning 記録は正規対策そのものではない。再発関係を明記し、先行 commit 直前の staged 内容と message の突合を次回評価する。 |
+| E3 | REQ追加時 README 手動件数の追随漏れ | 1/3/3/4/3/3/4/4 = 25 | promote（既存対策更新） | `docs/README.md` には AUTOGEN ブロック外の「現行要件は N 件」文が残る。`generate_indexes` はその文を更新しない。deferred L2486 に同じ現象の先行観測があり、本 inbox で70件目の追加時に再発したため既存対策の適用ギャップが具体化している。 |
+| E4 | agentdev_gh 操作別入力契約（issue_read labels 不可） | 1/2/3/4/3/2/3/3 = 21 | duplicate | `src/common/tools/agentdev-gh/contracts.ts` L156 の `issue_read` 入力型は `{operation, number}` のみ。labels 付き要求を schema が拒否するのは既存の fail-closed 操作別契約で完全に検出される。 |
+| E8 | 対照救済の比較対象は report file でなく stdout 原証跡 | 1/3/3/4/4/3/4/4 = 26 | duplicate | `case-open/references/definition-pr-and-idempotency.md` L44 は同じ検査実行の stdout/stderr 全文を step detail に保存し、summary を原結果の代替にしないと明記する。対照救済も findings 完全一致で判定するため、report file を証拠にしない既存の原証跡規律が当該誤りを覆う。 |
+| E9 | extension rule 読込前に GitHub 本文を投稿 | 1/2/3/4/4/3/4/4 = 25 | promote（既存対策更新） | workflow extension の実行時ロード能力はある一方、本文書込み前に rules を必須確認する手順が case-ready の当該書込み手順に見当たらない（grep 実測）。投稿後の遡及検査ではなく前置規律を検討できる自足した候補。 |
+| E10 | Root Case state 更新に trackingState を誤指定 | 1/2/2/4/3/2/2/3 = 19 | duplicate | `agentdev-issue-management/references/issue-operation-safety.md` L112-L123 と `agentdev-issue-tracking/SKILL.md` L49 は trackingState を Tool 引数から除き、Case/追跡Issue の状態を本文標準構造へ保持することを明記。誤引数は Tool が副作用前に拒否する。 |
+| E12 | 親判断が確定する前に条件付き Jev choice を生成 | 1/2/4/4/3/3/4/3 = 24 | duplicate | `case-ready/references/execution-structure.md` L74-L87 は親判断の最終確定後に条件付き質問を生成し、条件不成立なら後続質問・観測を作らない契約を明記する。 |
+| E13 | overlap 警告 summary が top-level warnings を読む | 1/3/2/4/4/3/5/4 = 26 | promote（既存対策更新） | `accept_definition_checks.ts` L441-L459 を実測。engine の warnings は condition_a 配下だが要約は `parsed.warnings` を読んで常に0となる。実装不備と実害が具体的、修正境界がスクリプトの summary 箇所に局在。 |
+| E14 | AUTOGEN 計測日だけの差分で受入検査が warn | 1/2/3/4/4/3/5/4 = 26 | deferred | 既存の計測日収束規約がある一方、時間差だけの差分を自動で pass にするかは gate 意味論を変える。実害の緊急性はなく、決定的除外を自律採用しない。 |
+| E16 | Jev references digest が SHA-256 形式でない | 1/4/4/4/4/3/3/4 = 27 | duplicate | `docs/designs/responsibilities/custom-tool-contracts.md`「Jev 先行評価」契約は再構成可能な入力参照を digest 付きで扱い、`agentdev_jev` の受理 schema は SHA-256 hex 64文字を要求する。Tool の観測永続化失敗 warning はこの契約どおりであり、caller が placeholder を送った事例を新しい対策として重複しない。 |
+| E17 | issue_update 本文のバックスラッシュ逐語性 | 1/3/3/4/4/4/3/4 = 26 | deferred | Issue更新時の前後比較規律はあるが、JSON の raw 表現からの逐語コピーという追加安全策が規定済みかは確認できず、ただし既存契約の外部更新だけでなく適用手順の不足を精査要。 |
+| E18 | 並行 Case で同じ pre-existing textlint を重複検出 | 1/2/3/4/4/3/4/4 = 25 | deferred | worktree/main 対照と既存債務記録の契約が存在。兄弟 Case の修正済み状況確認の細部は補足候補だが、対策を恒久化すべき範囲は未確定。 |
+| E19 | worktree/main で同一 self-sync 乖離なら corpus 債務 | 1/4/4/4/3/4/4/4 = 28 | deferred | `docs/knowledge/worktree-preexisting-violation-main-crosscheck.md` L9-L19 は worktree の違反と main の解消状況を照合する規律を与えるが、「同一 self-sync 乖離なら corpus 側の構造欠落」という適用基準や処遇 Case 確認までは明記しない。追加判断を確定せずliving poolに保持。 |
+| E22 | squash merge 後 git branch -d 拒否 | 1/2/4/4/4/3/5/4 = 27 | duplicate | `agentdev-git-worktree/references/worktree-operations.md` L490-L504 は squash 後の `-D` を PR MERGED 状態と branch 構成別の `git cherry` / `git diff` 実測の両条件で限定許可し、不成立時は停止する。E22 の安全確認は既存の削除境界で覆われる。 |
+| E29 | Bun.YAML 依存 checker の node 実行 | 1/3/3/4/4/4/4/4 = 27 | duplicate | `checker-execution-contracts.md` に Bun 固有 API 依存 checker は Bun で実行する契約があり、Bun.YAML を node で動かせない点を既に包摂する。 |
+| E30 | close_mechanical_steps が bun test stdout 先頭のみ保存 | 1/3/3/4/4/4/4/4 = 27 | duplicate | `agentdev-quality-gates/references/qg-4-final-acceptance.md` L127-L128 は機械工程 script 内の spawnSync 証跡を bun test 件数の根拠にせず、bun test を script 外で stdout/stderr 分離実行することを明記。entry の対応はこの既存手順と一致。 |
+| E31 | definitionEdits を二段階構築して重複 | 1/3/3/4/5/4/4/4 = 28 | deferred | 冪等再実行、旧文完全一致は既存規則。重複編集の前置検証を script に追加するか、組立て手順で防ぐかの実現判断は未確定。 |
+| E32 | wrapped retries の合計時間を timeoutMs に含める | 1/3/4/4/4/4/4/4 = 28 | deferred | `timeoutMs` は実行全体を制限する既存契約だが、retry 回数と余裕を織り込む算定規則は固定されていない。単独実測だけで具体値を規範化しない。 |
+| E36 | bun install により lockfile が新規生成 | 1/1/3/4/4/3/3/4 = 23 | deferred | package/管理状態に依存する1観測。不要ファイルの status 確認は安全規律として有効だが、全 package 向けの恒久ルールに一般化するだけの範囲根拠が不足。 |
+| E38 | bun test 分割の件数と実テストファイル数が乖離 | 1/3/3/4/5/4/4/4 = 28 | deferred | `agentdev-quality-gates` の件数突合規則が存在。node_modules を含む探索が主因であり、現行契約への追記が必要かを再発証拠に応じて判断する。 |
+| E39 | LSP timeout 時に tsc --noEmit で型検査証拠を得る | 1/3/4/4/4/4/4/4 = 28 | deferred | tsc と LSP が完全同等ではなく、型検査対象・診断対象の差を保つ必要がある。代替受入れ条件を自動確定する証拠が不足。 |
+| E40 | prepare_definition_pr に traceabilityReqIds 不在で target scope fail | 1/3/4/4/5/4/4/4 = 29 | promote（既存対策更新） | `prepare_definition_pr.ts` L168-L208 で optional 不在を空配列へ正規化し、L603/L613 で gate 判定に使う。別の `--req` 指定だけでは判定集合にならない。入力整合性の不足・実害・想定修正が具体的。 |
+| E41 | Design の言い換え適用で verbatim 包含不成立 | 1/3/3/4/4/4/4/4 = 27 | duplicate | REQ-030-027 の合意済み content と適用後成果物の逐語包含確認（verbatim）を既存 Design 契約が要求しており、事象は既存契約の適用不履行。 |
 
-| 単位 | 成果物 | エントリ | 8軸 | 反映先（情報候補） |
-|---|---|---|---|---|
-| P1 | promoted/procedure-case-open-step4-artifact-actions-applied-verification.md | 7 | 19/40 | definition-pr-and-idempotency.md STEP-4 受入検査（適用後突合の追加） |
-| P2 | promoted/fix-accept-definition-checks-status-column-parse.md | 14 | 18/40 | accept_definition_checks.ts staged-entries-check の列判定（trim 前の列位置参照への修正候補） |
-| P3 | promoted/procedure-case-auto-stage4-case-close-delegation-design-status-review.md | 19 | 21/40 | case-auto Design「委譲指示の構築規律」節（Design 状態評価・README status 列更新の必須項目化） |
+### 未分類・入力正規化
 
-## deferred 単位（12 単位/17 エントリ）
+なし。41 件すべて13項目形式相当。E6 の空タグおよび欠損日付は推測補完せず、元 inbox は変更していない。
 
-評価表の「deferred」17 行のとおり。いずれも deferred.md の living pool で維持し、次回 learning-promote 実行時に再評価する。エントリ 8・18 は deferred プールの同主題先行エントリ（L421・L4176）への再発であり、処分判定に再発関係を記録して移動する（既存エントリ本文は編集しない。統合は次回再評価時）。
+### 処分サマリ（STEP-3候補）
 
-## duplicate 判定
+- promote: 4 単位 / 4 entries（E3、E9、E13、E40）
+- deferred: 14 単位 / 20 entries
+- duplicate: 17 entries（C1:2、C4:2、C6:2、C7:2、E4、E8、E10、E12、E16、E22、E29、E30、E41）
+- rejected: 0
+- promote entries の除外理由（Decision 候補）: 全件 command 仕様・手続き/実装是正であり、アーキテクチャ技術選択を含まない。
 
-deferred プール 210 エントリとの照合（タグ・見出しトークンによる候補選択と候補本文突合。直近 20 エントリ常に候補）で duplicate 0 件。
+## STEP-4 adversarial-review
 
-## Decision 候補除外記録
+- 発動判定: 発動（inbox 41件。空でなく、単一かつ確実な重複でもない）。
+- review 呼出: explore 2本と librarian 2本の独立 challenge stream を試みたが、3本は provider の usage limit 後に fallback model `openai/gpt-6.1-luna` が解決できず失敗し、残る1本は実行枠待ちから取消した。成果を返した stream はなく、これ以上 retry しない。silent skip はせず、利用不能として記録する。
+- review 状態: 未完了。独立 Reviewer / Reviewee の challenge、相互反証、convergence audit は成立せず、レビュー結果を合意済みとして扱わない。provider 利用不能を報告し、caller failure fallback と既存 HITL 判定へ移行した。
+- caller failure fallback: review 利用不能を報告し、従来フローへ進む。候補処分は評価器単独で確定せず、現行の正規契約・実測対策で帰着可能な範囲のみ自律確定する。新規の目的、範囲、受入条件、fail-closed 挙動は変更しない。
+- review で特に検証が要る争点（review 未成立のため結果を得ていない領域）: C2 の E25 child-process timeout を含むクラス統合妥当性、C5 の fail-closed を保った残ゲート実行、E17 の JSON 逐語転記手順と既存 snapshot/VERIFY の境界。未確定事項は deferred とした。
+- 戻しループ: finding 未反映のため未発動。
+- STEP-5 自律確定: promote 4単位/4件、deferred 14単位/20件、duplicate 13単位/17件、reject 0。合計41件。
+- 処分判定の HITL: 0件。promotion は req-define/backlog-review 向けの提案ステージに限り、REQ/Decision/Design・受入条件の変更、gate 緩和、破壊的削除は行わない。恒久手順で覆う重複は duplicate、根拠が不十分または安全境界の再評価が必要な件は deferred とする。人間に留保された目的・優先順位・範囲・外部契約の新規確定を要する項目は確認されなかった。別途の破壊的 prune 承認は未取得。
+- unresolved: 独立 review は利用不能で完了を主張しない。caller failure fallback に従い、恒久契約から導出できる処置を自律確定し、根拠・対策範囲が不十分な項目は deferred とした。ユーザー留保の目的・範囲・受入条件・gate 規範を新たに確定していない。
 
-- **対象 item**: 全 15 単位（KA1〜KA5、u1〜u10）。いずれも Decision 候補から除外
-- **除外理由**: 「command仕様」「運用ルール」（技術判断不在）。全単位が作業手順の明文化・実装是正・検証規律の補足であり、アーキテクチャ上の決定・技術選定・設計判断を含まない
-- **根拠事実**: promote 3 単位は既存手順・script 実装・Design 節への補足・是正候補であり、技術的トレードオフ判断を含まない。deferred 12 単位も同様に観測記録・作業規律・環境知見である
-- **代替反映先候補**: 各単位の「反映先（情報候補）」のとおり（REQ/Design/配布skill reference/配布script）
-- **「実害観測」の解釈（review 合意）**: 実害観測は、検知不能または回復不能を含む実質的被害（PR 進行停止・成果物の検証記録不一致・成果物品質問題の顕在化等）を指す。即時検知・回復可能な一時的破壊（baseline revert 復旧等）は本基準の実害観測に含めない（u4 判定の解釈根拠）
+## 実行証跡
 
-## STEP-4 adversarial-review 発動条件判定の記録
-
-- **発動条件判定**: true（evaluation-report.md 反映済み・skip 条件〔inbox 空・1件のみで既存対策との重複が確実〕非該当。Jev 観測 20261013T104513Z-0685 true 0.93、LLM 最終判断と一致。inbox 20 エントリ・deterministic 計数は state として渡し済み）
-- **review 実施**: 実施した。外部対論エージェントが非露出の環境のため本実行主体が3役（Orchestrator / Reviewer / Reviewee）を自己適用で実施（inbox エントリ 8 の harness-delegation「委譲起動不能時の事前判定経路」の前例に従う）。review 対象は evaluation-report.md のみ。不可逆処理（inbox → deferred 移動、prune、commit/push）は未実行の状態で実施
-- **本質的争点 4 件と合意結果**:
-  - 争点A: 8軸低スコア（18〜21/40）単位の promote 妥当性。Reviewer 反証「RU 化コストに見合わない」。Reviewee「判定基準 (b) はスコアではなく fix gap 実測 + 実害観測 + 正規反映先への帰着で判定」。合意: promote 維持。成果物には「実害は解消済み・fix gap は規定欠落のみ」の限定を明記する（accepted F1）
-  - 争点B: 対応済みエントリ（KA1・u8）の deferred 維持と living pool 肥大化。合意: deferred 維持を維持しつつ、両単位を次回再評価時の prune 優先候補として記録する（accepted F2）
-  - 争点C: 判定基準の「実害観測」解釈（u4 の baseline 破壊を実害に含めるか）。合意: 解釈を「実質的被害（検知・回復不能を含む）」へ限定して基準節へ補記（accepted F3）。u4 は単発性・8軸低スコアを根拠に質的複合判定で deferred 維持
-  - 争点D: deferred 同型先行（L421・L4176）への再発の統合時期。合意: 規定どおり再発関係の記録のみで deferred 維持、既存エントリ本文は不変、統合は次回再評価時（accepted F4・変更なし）
-- **evaluation-report 戻しループ**: 処分帰属（promote/deferred の割当て）の変更は発生しなかったため STEP-2 戻しループは発動しない。停止条件（新証拠・新前提・異なる failure condition・未評価範囲のいずれも伴わない）を満たし STEP-5 へ進む
-- **unresolved**: 0 件
-- **accepted findings の反映**: F1 は STEP-6 の promoted 成果物生成時に反映、F2・F3 は本 report へ反映済み（F3 は「処分判定基準」節の補記）、F4 は規定運用の確認のみ
-
-## 自律確定記録（STEP-5）
-
-- **自律確定範囲**: 全 20 エントリ（promote 3・deferred 17）。処分は正規契約（処分の質的基準・区分 5 / 区分 6）からの導出で確定
-- **HITL 不要理由**: (1) promote 3 エントリは fix gap の実測確認（definition-pr-and-idempotency.md L78・accept_definition_checks.ts L583-586・case-auto.md L223-230 の grep 実測）と実害観測に基づき、区分 5（既存対策の更新）への帰属が正規基準から導出可能。(2) deferred 17 エントリは既存規定・docs/knowledge カバー（grep 実測 8 件）、fail-closed 防御機構の作動事例、deferred 同型先行の再発観測、軽微補足等の実測根拠を有し、区分 6（deferred）への帰属が正規基準から導出可能。(3) 破壊的変更なし（inbox クリアは手順規定の標準操作〔ヘッダーのみクリア〕であり破壊的変更に該当しない。prune は staged 3 エントリのみで証拠は promoted 成果物の「元learning item / 根拠」セクションに保存）。(4) extension 読込: workflow-extension（.agentdev/extensions/skills/agentdev-workflow-learning-promote.yaml）は version/kind/id のみで 5 セクション空配列であり、追加 rules/checks/acceptance_gates/must_not なし。HITL 判断確定原則への extension 上書きなし。(5) ユーザー明示の判断要求・人間判断への引き上げ条件該当項目は検出されなかった
-- **次回再評価時の prune 優先候補（accepted F2）**: KA1（エントリ 5・13。対応済み・reference 恒久化済み）、u8（エントリ 15。恒久検証追加済み）。次回 learning-promote の promote 内部分析フェーズ時 prune の判定材料として本記録を用いる
-- **証跡**: 本 evaluation-report + promoted 成果物 3 件 + deferred.md 追記 + inbox.md クリア（STEP-6 の永続化成果物が承認証跡）
+- deferred 見出し索引: 227 entries。全41 inbox entries について tag 一致140件、title-token 追加候補41件の本文を読み、重複なしの候補計181件を比較。直近20 entries も確認し、候補0件の inbox entry はなかった。
+- 既存対策の実測: `grep` と正規文書/knowledge の直接読取で評価表各行を再確認。C1/C4/C6/C7、E4/E8/E10/E12/E16/E22/E29/E30/E41 は恒久契約・knowledge の該当条項を確認して duplicate とした。E3 は deferred L2486 の先行観測と AUTOGEN 外の README 件数記述を実測して再発 gap と判断。E9 対象書込み手順、E13/E40 現行 source も再読。
+- Jev final judgments: 承認済み `observation_write` により `20261015T101814Z-dcbe.json`（処分区分31件）と `20261015T102028Z-8467.json`（昇華可能性31件）へ最終判断を追記。evaluator 結果を保持し、差異には `semantic_disagreement` を分類して読み戻し確認した。
+- 同期キュー操作: 2026-10-15T21:08:48+09:00 開始、21:08:49+09:00 完了。`git pull --ff-only` は `Already up to date.`（exit 0）、HEAD は `38bc58c7` のまま。専有同期スロットは解放済み。
+- STEP-6 準備済み: promote 4件の成果物を `.agentdev/learning/promoted/` に生成。atomic move procedure に従って inbox 全41件を deferred に追記し、各項目へ移動日を付し、追記件数・見出し数・日付数を照合した後に inbox を header のみにクリアした。移動前 deferred 227実エントリ + 41件 = 268実エントリ（見出し272行、構造見出し4行）。空タグ1件の末尾空白だけを除去し、項目値は空のまま保持。
+- prune 実績: 2026-10-15T21:16:33+09:00 のユーザー承認は「今回の21件のみ」。staged E3/E9/E13/E40 と duplicate C1(E28,E33)、C4(E21,E26)、C6(E7,E23)、C7(E5,E11)、E4/E8/E10/E12/E16/E22/E29/E30/E41 の計21件だけを `.agentdev/learning/deferred.md` から削除。4つの promoted 成果物は保持。read-back で移動済み41件中21件が不在、残るdeferred20件が移動日付きで存在し、HEAD 時点の旧deferred 227件の本文 prefix が byte-for-byte 保持されることを検証した。結果は old 227 + current deferred 20 = 247実エントリ（見出し251行、構造見出し4行）。inbox は header のみ。
+- 次の git 永続化候補パス（prune 後の最終差分を再確認してから対象確定）: `.agentdev/learning/evaluation-report.md`, `.agentdev/learning/deferred.md`, `.agentdev/learning/inbox.md`, `.agentdev/learning/promoted/existing-measure-update-req-count-prose-sync.md`, `.agentdev/learning/promoted/existing-measure-update-extension-rules-before-issue-write.md`, `.agentdev/learning/promoted/existing-measure-update-overlap-warning-summary.md`, `.agentdev/learning/promoted/existing-measure-update-traceability-target-ids.md`, `.agentdev/jev-observations/20261015T095338Z-9c80.json`, `.agentdev/jev-observations/20261015T095425Z-9f0c.json`, `.agentdev/jev-observations/20261015T095512Z-f301.json`, `.agentdev/jev-observations/20261015T095608Z-6ced.json`, `.agentdev/jev-observations/20261015T095958Z-5d54.json`, `.agentdev/jev-observations/20261015T100237Z-a16d.json`, `.agentdev/jev-observations/20261015T100435Z-31e3.json`, `.agentdev/jev-observations/20261015T100604Z-1ea4.json`, `.agentdev/jev-observations/20261015T101003Z-b48b.json`, `.agentdev/jev-observations/20261015T101127Z-6ec0.json`, `.agentdev/jev-observations/20261015T101239Z-c481.json`, `.agentdev/jev-observations/20261015T101346Z-e910.json`, `.agentdev/jev-observations/20261015T101814Z-dcbe.json`, `.agentdev/jev-observations/20261015T102028Z-8467.json`。未処理の `.agentdev/learning/learning-promote-2026-10-15-resume.md`、他 run の untracked observations、および inspect/intake の変更は候補パスに含めない。
+- commit message（親キューの後続 commit grant 後のみ）: `chore(agentdev): promote learning findings`
+- 状態: WARN / pending user persistence approval（STEP-1〜5完了、STEP-6 の成果物生成・deferred move・承認済み21件 prune 完了。STEP-4 は caller failure fallback、独立 review 未完了の警告を保持。同期は成功済み。パスと差分の確認後、git add/commit/push の別途許可を待つ。これらは未実施）。

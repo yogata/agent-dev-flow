@@ -1,0 +1,225 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261015T095608Z-6ced",
+  "workflow": "learning-promote",
+  "evaluationKind": "problem-class-classification",
+  "subject": "2026-10-15 learning inbox 41エントリの問題クラス帰属（バッチ4/4: e32〜e41）",
+  "sourceRevision": "38bc58c7",
+  "durationMs": 248,
+  "inputTokens": 3426,
+  "inputs": {
+    "requestDigest": "f9a6dfd382bc15a20657d3e794b7d06a9df3d2904380918fde769fad0a89cf18"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "e32",
+      "questionForm": "choice",
+      "value": "C2",
+      "probabilityDistribution": {
+        "C1": 0.04,
+        "C2": 0.63,
+        "C3": 0,
+        "C4": 0,
+        "C5": 0,
+        "C6": 0,
+        "C7": 0,
+        "C8": 0,
+        "U": 0.33
+      }
+    },
+    {
+      "questionId": "e33",
+      "questionForm": "choice",
+      "value": "C1",
+      "probabilityDistribution": {
+        "C1": 0.98,
+        "C2": 0,
+        "C3": 0,
+        "C4": 0,
+        "C5": 0,
+        "C6": 0,
+        "C7": 0,
+        "C8": 0,
+        "U": 0.02
+      }
+    },
+    {
+      "questionId": "e34",
+      "questionForm": "choice",
+      "value": "C2",
+      "probabilityDistribution": {
+        "C1": 0,
+        "C2": 0.92,
+        "C3": 0,
+        "C4": 0,
+        "C5": 0,
+        "C6": 0,
+        "C7": 0,
+        "C8": 0,
+        "U": 0.08
+      }
+    },
+    {
+      "questionId": "e35",
+      "questionForm": "choice",
+      "value": "C8",
+      "probabilityDistribution": {
+        "C1": 0,
+        "C2": 0,
+        "C3": 0,
+        "C4": 0,
+        "C5": 0,
+        "C6": 0,
+        "C7": 0,
+        "C8": 0.96,
+        "U": 0.04
+      }
+    },
+    {
+      "questionId": "e36",
+      "questionForm": "choice",
+      "value": "U",
+      "probabilityDistribution": {
+        "C1": 0,
+        "C2": 0,
+        "C3": 0,
+        "C4": 0.22,
+        "C5": 0,
+        "C6": 0,
+        "C7": 0,
+        "C8": 0,
+        "U": 0.78
+      }
+    },
+    {
+      "questionId": "e37",
+      "questionForm": "choice",
+      "value": "C2",
+      "probabilityDistribution": {
+        "C1": 0,
+        "C2": 0.94,
+        "C3": 0,
+        "C4": 0,
+        "C5": 0,
+        "C6": 0,
+        "C7": 0,
+        "C8": 0,
+        "U": 0.06
+      }
+    },
+    {
+      "questionId": "e38",
+      "questionForm": "choice",
+      "value": "U",
+      "probabilityDistribution": {
+        "C1": 0.01,
+        "C2": 0.02,
+        "C3": 0,
+        "C4": 0.1,
+        "C5": 0,
+        "C6": 0.02,
+        "C7": 0.09,
+        "C8": 0,
+        "U": 0.76
+      }
+    },
+    {
+      "questionId": "e39",
+      "questionForm": "choice",
+      "value": "U",
+      "probabilityDistribution": {
+        "C1": 0,
+        "C2": 0.19,
+        "C3": 0,
+        "C4": 0,
+        "C5": 0,
+        "C6": 0,
+        "C7": 0,
+        "C8": 0,
+        "U": 0.81
+      }
+    },
+    {
+      "questionId": "e40",
+      "questionForm": "choice",
+      "value": "U",
+      "probabilityDistribution": {
+        "C1": 0,
+        "C2": 0,
+        "C3": 0.01,
+        "C4": 0,
+        "C5": 0,
+        "C6": 0.01,
+        "C7": 0.36,
+        "C8": 0,
+        "U": 0.62
+      }
+    },
+    {
+      "questionId": "e41",
+      "questionForm": "choice",
+      "value": "C6",
+      "probabilityDistribution": {
+        "C1": 0,
+        "C2": 0,
+        "C3": 0,
+        "C4": 0,
+        "C5": 0,
+        "C6": 0.58,
+        "C7": 0.01,
+        "C8": 0,
+        "U": 0.41
+      }
+    }
+  ],
+  "confidence": 0.58,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "e32",
+        "value": "U",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "e33",
+        "value": "C1"
+      },
+      {
+        "questionId": "e34",
+        "value": "C2"
+      },
+      {
+        "questionId": "e35",
+        "value": "C8"
+      },
+      {
+        "questionId": "e36",
+        "value": "U"
+      },
+      {
+        "questionId": "e37",
+        "value": "C2"
+      },
+      {
+        "questionId": "e38",
+        "value": "U"
+      },
+      {
+        "questionId": "e39",
+        "value": "U"
+      },
+      {
+        "questionId": "e40",
+        "value": "U"
+      },
+      {
+        "questionId": "e41",
+        "value": "U",
+        "differenceReason": "semantic_disagreement"
+      }
+    ]
+  }
+}
