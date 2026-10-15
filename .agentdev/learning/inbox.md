@@ -640,3 +640,35 @@
 - **想定反映先**: case-run 静的検証手順、LSP 運用関連知識候補。learning-promote での判断
 - **関連**: Case #3722、PR #3724 本文 learning 2 件目、PR #3724 品質メトリクス表 LSP 診断行
 - **タグ**: `#lsp` `#tsc` `#静的検査` `#タイムアウト`
+
+## prepare_definition_pr 入力 JSON に traceabilityReqIds を設定しないと traceability gate 判定が target scope 検査で fail する
+
+- **問題事象**: case-open STEP-4（Case #3725）で prepare_definition_pr.ts の入力 JSON に traceabilityGate（--req 引数付き gate spec）を設定したまま input.traceabilityReqIds を未設定のまま script を実行したところ、traceability-check step が「target REQ row scope is absent or invalid」で fail となり、script は traceability check を実行せず後続抑止で停止した（2 回）
+- **発生局面**: 実装（case-open STEP-4 機械工程の script 入力 JSON 組立て）
+- **検知方法**: script 報告 JSON の steps 内 traceability-check:fail と warnings（consumeDefinitionTraceability の fail 理由文字列）
+- **根本原因**: buildKnownTraceabilityCheckSpec が組み込む --req 引数（検査実行の対象限定）と、gate 判定で使う input.traceabilityReqIds（判定の対象行集合）は別フィールドであり、組立て側で後者を設定しないまま前者だけを設定した。validateInput は traceabilityReqIds を未指定でも空配列に暗黙正規化するため、入力検証では検出されない
+- **自律対応内容**: commit 済み HEAD に対して traceability check を同一条件で実行し、gate 判定を script 配下の単一実装 consumeDefinitionTraceability の import による機械判定で完了した（判定実装を複製しない）。以降の入力 JSON 組立てで traceabilityReqIds を gate spec と同時に設定するように組み立て手順を修正した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: prepare_definition_pr / accept_definition_checks 等の gate 入力組み立て全般（case-open、case-revise、case-ready）
+- **再発条件**: gate spec の --req と判定対象集合（traceabilityReqIds / targetReqIds）を別々に設定する入力型で、片方だけを設定した場合
+- **予防策候補**: script 入力検証で traceabilityGate 存在時の traceabilityReqIds 非空を要求する、または gate spec の --req から判定対象集合を導出する。learning-promote での判断
+- **想定反映先**: agentdev-workflow-case-open scripts（prepare_definition_pr の入力検証）、references/definition-pr-and-idempotency.md の入力 JSON 組立て手順。learning-promote での判断
+- **関連**: Case #3725、PR #3726
+- **タグ**: `#case-open` `#prepare_definition_pr` `#traceability-gate` `#入力検証`
+
+## Design 更新をセクション統合（言い換え）で適用すると artifact_actions 適用後の verbatim 包含突合が不成立になる
+
+- **問題事象**: case-open STEP-4（Case #3725）で Design 2 件の更新を、draft content の意味を既存セクションへ統合する言い換え付き編集で適用した結果、REQ-030-027 の verbatim 包含突合で合意 content 行が逐語不一致（行 ID 変換以外の表記差分）となり突合不成立を検出した。置換によって draft の記述を黙示的に言い換えた状態が適用後成果物に残った
+- **発生局面**: 実装（case-open STEP-4 の Design 編集内容組立てと適用後突合）
+- **検知方法**: verbatim 包含突合の機械的検索（draft content 各行の適用後成果物への逐語包含確認）で MISSING 行を検出
+- **根本原因**: artifact_actions の content を「適用内容の指示」と解釈して既存セクション構造へ再構成した。契約上 content は「合意済み本文」であり、適用後成果物へ行単位で逐語的に含まれることが要求される（new: プレースホルダの採番解決のような合意済み変換のみが例外）
+- **自律対応内容**: draft content を逐語含む正規セクション（一気通貫実行の拡張／一気通貫実行の実行構造）を Design 2 件へ追加し、DEC-059 の 2 箇所の表記を draft 変換表記へ補正した。突合を再実行して 57 行全成立を確認した後に PR を作成した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: artifact_actions の content 適用全般（case-open、case-revise の definitionEdits 組立て、case-ready の保存内部責務）
+- **再発条件**: draft content を指示的に解釈してセクション統合・要約・言い換えで適用した場合
+- **予防策候補**: definitionEdits 組立ての時点で「content 行をそのまま含めるセクション」を先に設計し、セクションへの統合編集は content と矛盾しない追加分のみに限定する手順を明記。learning-promote での判断
+- **想定反映先**: case-open Design「artifact_actions 適用後の verbatim 包含突合」節の運用補足、references/definition-pr-and-idempotency.md。learning-promote での判断
+- **関連**: Case #3725、PR #3726
+- **タグ**: `#case-open` `#verbatim` `#artifact_actions` `#design`
