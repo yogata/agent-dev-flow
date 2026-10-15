@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下71件を第一参照先とする。
+現在の要件判断では、以下72件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -83,6 +83,7 @@
 | [REQ-111](REQ-111.md) | ADF v5.1 工程遷移・独立レビューと変更駆動併存 |
 | [REQ-112](REQ-112.md) | local package tsconfig 二重管理統合・typecheck gate 組込みの方針決定 |
 | [REQ-113](REQ-113.md) | local package tsconfig 統合・typecheck 組込みの実装 |
+| [REQ-114](REQ-114.md) | backlog-auto 一気通貫実行とパッチリリース実行契約 |
 <!-- AUTOGEN:END -->
 
 ## 廃止済み要件
