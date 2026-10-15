@@ -35,6 +35,11 @@ implementation:
   src/common/skills/agentdev-workflow-backlog-auto/tests/fixtures/applied-projects/local-issue/manifest.json:
     - REQ-114-013
 verification:
+  src/common/skills/agentdev-workflow-backlog-auto/tests/completion-model.test.ts:
+    - REQ-114-002
+    - REQ-114-007
+  src/common/skills/agentdev-workflow-backlog-auto/tests/resume-model.test.ts:
+    - REQ-114-006
   src/common/skills/agentdev-workflow-backlog-auto/tests/serialization-queue-pins.test.ts:
     - REQ-041-017
   src/common/skills/agentdev-workflow-backlog-auto/tests/end-to-end-contract.test.ts:
