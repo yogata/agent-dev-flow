@@ -24,6 +24,7 @@ const TMP_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), "trust-gbr-"));
 
 beforeAll(() => {
   execSync("git init -q -b main", { cwd: TMP_ROOT });
+  fs.writeFileSync(path.join(TMP_ROOT, ".gitattributes"), "* text=auto eol=lf\n", "utf-8");
   execSync('git config user.email "t@t"', { cwd: TMP_ROOT });
   execSync('git config user.name "t"', { cwd: TMP_ROOT });
   fs.writeFileSync(path.join(TMP_ROOT, "regular.md"), "# hi\n");
