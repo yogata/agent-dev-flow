@@ -5,9 +5,11 @@
 // mergeable ポーリング、squash merge 前後のローカル状態検査、Epic 実行構成表の
 // 解析と状態更新、完了条件チェックボックス評価の機械的抽出（受入評価の母集団
 // 導出と final-acceptance.ts の evaluateFinalAcceptance への接続を兼ねる）、
-// AUTOGEN 再生成差分検出、full integrity suite の起動と結果集約、worktree/branch
-// クリーンアップを1 script の呼び出しに束ねる。受入評価の拒否・未確定は報告
-// JSON（diff.acceptanceEvaluation と isCloseOperationPermitted）を通じて既存の
+// AUTOGEN 再生成差分検出、full integrity suite の起動と結果集約（fail 全件の
+// 由来分類と機械受理基準の記録完備の検証を含む）、worktree/branch
+// クリーンアップを1 script の呼び出しに束ねる。受入評価の拒否・未確定と機械
+// 受理基準の拒否は報告 JSON（diff.acceptanceEvaluation、
+// diff.integrityMachineAcceptance と isCloseOperationPermitted）を通じて既存の
 // 終了操作（STEP-5 の issue_close、E1〜E6 の Epic 終了・Wave クローズ）の実行
 // 抑制として消費される。GitHub I/O（pr_merge、issue_close、Issue 本文更新）
 // は行わない（読み取り系 gh pr view のみ）。意味判断（警告の重要度評価、Design
@@ -70,6 +72,60 @@ export interface GateCommandSpec {
   timeoutMs?: number;
 }
 
+/** full integrity suite の fail 1件あたりの由来分類記録（機械受理基準の受理由件5・7に対応）。 */
+export interface IntegrityFailureOrigin {
+  /** fail が発生した gate 名（integrityGates の GateCommandSpec.name と突合する）。 */
+  gate: string;
+  /** fail の識別子（テスト名、checker 名等の provenance）。 */
+  failureId: string;
+  /** 由来分類。pre-existing は baseline 再現確認記録を必須とする。 */
+  origin: "changed" | "pre-existing" | "execution-form" | "unknown";
+  /** pre-existing 分類の baseline 再現確認（ワークツリー変更ゼロの baseline commit での同一 fail 再現確認。detached worktree 標準手順）。 */
+  baselineReproduction?: {
+    baselineCommit: string;
+    method: "detached-worktree";
+    sameFailureReproduced: boolean;
+  };
+  /** 既知欠陥の登録済み参照。機械受理基準の記録一式が PR 本文検証差分セクションへ登録済みであることを示す。 */
+  registeredInVerificationRecord: boolean;
+}
+
+/**
+ * full integrity suite の機械受理基準（QG-4 最終受入規範の受理由件10項目）に対応する
+ * 検証結果記録の入力契約。fail 全件の由来分類と、分類記録以外の記録完備（正規ランナー
+ * 構成確認、正規形実行、環境ラベル、件数突合、baseline 基準、終了コード、ランナー版、
+ * 検査範囲）を保持する。fail が 0 件の場合は省略可能。
+ */
+export interface IntegrityMachineAcceptanceRecord {
+  /** fail 全件の由来分類（受理由件5）。 */
+  failureOrigins: readonly IntegrityFailureOrigin[];
+  records: {
+    /** 正規ランナー構成確認の記録（受理由件1）。 */
+    runnerConstitutionConfirmed: boolean;
+    /** 正規形実行の記録（受理由件2）。 */
+    standardFormExecutionRecorded: boolean;
+    /** 環境ラベルの記録（受理由件3）。 */
+    environmentLabelRecorded: boolean;
+    /** 件数突合の記録（受理由件4）。 */
+    countReconciliationRecorded: boolean;
+    /** baseline 基準の明示（受理由件6）。 */
+    baselineReferenceCommitRecorded: boolean;
+    /** 終了コードの記録（非変換。受理由件8）。 */
+    exitCodesRecordedWithoutConversion: boolean;
+    /** 実行ランナー版の記録（受理由件9）。 */
+    runnerVersionRecorded: boolean;
+    /** 検査範囲の記録（受理由件10）。 */
+    inspectionScopeRecorded: boolean;
+  };
+}
+
+/** 機械受理基準の検証で検出した違反。 */
+export interface MachineAcceptanceViolation {
+  code: string;
+  gate?: string;
+  failureId?: string;
+}
+
 export interface CloseMechanicalInput {
   phase: "pre-merge" | "post-merge";
   worktreeRoot: string;
@@ -84,6 +140,7 @@ export interface CloseMechanicalInput {
   autogenDerivedPaths?: readonly string[];
   traceabilityGate?: GateCommandSpec;
   integrityGates?: readonly GateCommandSpec[];
+  integrityMachineAcceptance?: IntegrityMachineAcceptanceRecord;
   textlintGate?: GateCommandSpec;
   cleanup?: { removeWorktree: boolean; removeBranch: string | null };
   acceptanceSubjectKind?: SubjectKind;
@@ -234,6 +291,81 @@ export interface AcceptanceEvaluationReport {
   violations?: unknown;
   blockingUnmet?: readonly string[];
   blockingCrossObligations?: readonly string[];
+}
+
+/**
+ * full integrity suite の fail に対する機械受理基準（QG-4 最終受入規範の受理由件10項目）
+ * の記録完備を検証する。規範が合格として認める結果（記録完備・由来不明 0・既知欠陥登録
+ * 済みで pre-existing 分類済み fail を含む）を合格として扱い、機械受理基準の記録欠落、
+ * 由来不明 fail の残存、未登録の既知欠陥を合格の根拠にする結果を fail-closed で拒否する。
+ * 検証ランナーの非ゼロ終了コードを成功へ変換せず、分類記録の検証は終了コードの変換では
+ * なく独立の判定層として重ねる。
+ */
+export function evaluateIntegrityMachineAcceptance(
+  record: IntegrityMachineAcceptanceRecord | undefined,
+  failedGateNames: readonly string[],
+): { accepted: boolean; violations: readonly MachineAcceptanceViolation[] } {
+  const recordMissing =
+    record === undefined ||
+    !Array.isArray(record.failureOrigins) ||
+    typeof record.records !== "object" ||
+    record.records === null;
+  if (recordMissing) {
+    if (failedGateNames.length > 0) {
+      return { accepted: false, violations: [{ code: "machine-acceptance-record-missing" }] };
+    }
+    return { accepted: true, violations: [] };
+  }
+  const violations: MachineAcceptanceViolation[] = [];
+  const classifiedGates = new Set(record.failureOrigins.map((f) => f.gate));
+  for (const gate of failedGateNames) {
+    if (!classifiedGates.has(gate)) {
+      violations.push({ code: "uncovered-failure-origin", gate });
+    }
+  }
+  for (const origin of record.failureOrigins) {
+    if (origin.origin === "unknown") {
+      violations.push({ code: "unknown-origin-failure-remains", failureId: origin.failureId });
+    }
+    if (origin.origin === "pre-existing") {
+      const reproduction = origin.baselineReproduction;
+      if (
+        reproduction === undefined ||
+        reproduction.method !== "detached-worktree" ||
+        reproduction.sameFailureReproduced !== true ||
+        typeof reproduction.baselineCommit !== "string" ||
+        reproduction.baselineCommit.length === 0
+      ) {
+        violations.push({
+          code: "pre-existing-baseline-reproduction-missing",
+          failureId: origin.failureId,
+        });
+      }
+    }
+    if (origin.registeredInVerificationRecord !== true) {
+      violations.push({ code: "unregistered-known-defect", failureId: origin.failureId });
+    }
+  }
+  const records = record.records;
+  const recordRequirements: readonly {
+    key: keyof IntegrityMachineAcceptanceRecord["records"];
+    code: string;
+  }[] = [
+    { key: "runnerConstitutionConfirmed", code: "record-missing:runner-constitution" },
+    { key: "standardFormExecutionRecorded", code: "record-missing:standard-form-execution" },
+    { key: "environmentLabelRecorded", code: "record-missing:environment-label" },
+    { key: "countReconciliationRecorded", code: "record-missing:count-reconciliation" },
+    { key: "baselineReferenceCommitRecorded", code: "record-missing:baseline-reference-commit" },
+    { key: "exitCodesRecordedWithoutConversion", code: "record-missing:exit-codes" },
+    { key: "runnerVersionRecorded", code: "record-missing:runner-version" },
+    { key: "inspectionScopeRecorded", code: "record-missing:inspection-scope" },
+  ];
+  for (const requirement of recordRequirements) {
+    if (records[requirement.key] !== true) {
+      violations.push({ code: requirement.code });
+    }
+  }
+  return { accepted: violations.length === 0, violations };
 }
 
 /**
@@ -518,17 +650,38 @@ export function runCloseMechanicalSteps(
     }
 
     const integrityResults: Record<string, { exitCode: number; stdout: string }> = {};
-    let integrityFail = false;
+    const failedGateNames: string[] = [];
     for (const gate of input.integrityGates ?? []) {
       const result = runSpec(runner, gate);
       integrityResults[gate.name] = { exitCode: result.exitCode, stdout: result.stdout };
-      if (result.exitCode !== 0) integrityFail = true;
+      if (result.exitCode !== 0) failedGateNames.push(gate.name);
     }
+    // 分類記録の検証は終了コードの変換ではなく独立の判定層。機械受理基準を満たす
+    // 記録で分類済み fail が残る場合は規範の判定に従い受理し、記録欠落・由来不明
+    // fail の残存・未登録の既知欠陥は fail-closed で拒否する。非ゼロ終了コードは
+    // 各 gate の記録として変換せず保持する。
+    const machineAcceptance = evaluateIntegrityMachineAcceptance(
+      input.integrityMachineAcceptance,
+      failedGateNames,
+    );
     steps.push({
       name: "full-integrity-suite",
-      status: integrityFail ? "fail" : "pass",
-      detail: integrityResults,
+      status: machineAcceptance.accepted ? "pass" : "fail",
+      detail: {
+        ...integrityResults,
+        machineAcceptance: {
+          accepted: machineAcceptance.accepted,
+          violations: machineAcceptance.violations,
+          failedGateNames,
+        },
+      },
     });
+    diff.integrityMachineAcceptance = {
+      accepted: machineAcceptance.accepted,
+      violations: machineAcceptance.violations,
+      failedGateNames,
+      failureOrigins: input.integrityMachineAcceptance?.failureOrigins ?? [],
+    };
 
     if (input.textlintGate) {
       const lint = runSpec(runner, input.textlintGate);

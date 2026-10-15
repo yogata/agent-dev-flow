@@ -15,6 +15,8 @@ import {
   type CloseMechanicalInput,
   type CommandResult,
   type GateCommandSpec,
+  type IntegrityFailureOrigin,
+  type IntegrityMachineAcceptanceRecord,
   type MechanicalRunner,
 } from "../src/close_mechanical_steps";
 import type { ConditionVerdict } from "../src/final-acceptance";
@@ -58,6 +60,7 @@ function fakeRunner(overrides: {
   currentBranch?: string;
   issueBody?: string;
   epicBody?: string;
+  integrityExitCodes?: Record<string, number>;
 } = {}): MechanicalRunner & { calls: { command: string; args: readonly string[]; cwd: string }[] } {
   const calls: { command: string; args: readonly string[]; cwd: string }[] = [];
   return {
@@ -82,6 +85,9 @@ function fakeRunner(overrides: {
       }
       if (spec.args.includes("check_autogen_freshness")) {
         result.stdout = JSON.stringify({ compared: 4, changed: 0 });
+      }
+      for (const [gateName, exitCode] of Object.entries(overrides.integrityExitCodes ?? {})) {
+        if (spec.args.includes(gateName)) result.exitCode = exitCode;
       }
       return result;
     },
@@ -120,6 +126,230 @@ describe("件数突合 gate の報告保持", () => {
     expect(integrity?.detail).toMatchObject({
       check_autogen_freshness: { exitCode: 0, stdout: JSON.stringify({ compared: 4, changed: 0 }) },
     });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// full integrity suite の機械受理基準（受理由件に従う判定と拒否経路の維持）
+// ---------------------------------------------------------------------------
+
+/** 機械受理基準の記録フラグ（受理由件1, 2, 3, 4, 6, 8, 9, 10）を全て揃えた標本。 */
+function completeMachineAcceptanceRecords(): IntegrityMachineAcceptanceRecord["records"] {
+  return {
+    runnerConstitutionConfirmed: true,
+    standardFormExecutionRecorded: true,
+    environmentLabelRecorded: true,
+    countReconciliationRecorded: true,
+    baselineReferenceCommitRecorded: true,
+    exitCodesRecordedWithoutConversion: true,
+    runnerVersionRecorded: true,
+    inspectionScopeRecorded: true,
+  };
+}
+
+/** pre-existing 分類済み fail の標本（baseline 再現確認と登録済み参照を持つ）。 */
+function classifiedPreExistingFailure(gate: string): IntegrityFailureOrigin {
+  return {
+    gate,
+    failureId: "known-suite-failure",
+    origin: "pre-existing",
+    baselineReproduction: {
+      baselineCommit: "7bc435b76d20f74018bb8a32a746e2e1bf5abd60",
+      method: "detached-worktree",
+      sameFailureReproduced: true,
+    },
+    registeredInVerificationRecord: true,
+  };
+}
+
+describe("full integrity suite の機械受理基準（受理由件に従う判定と拒否経路の維持）", () => {
+  test("(a) 記録完備で pre-existing 分類済み fail を含む入力は規範の受理経路どおり close を許可する", () => {
+    const runner = fakeRunner({
+      issueBody: "- [ ] 条件1\n- [x] 条件2\n",
+      integrityExitCodes: { check_integrity: 1 },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        integrityMachineAcceptance: {
+          failureOrigins: [classifiedPreExistingFailure("check_integrity")],
+          records: completeMachineAcceptanceRecords(),
+        },
+        acceptanceVerdicts: [soundPass("AC-1"), soundPass("AC-2")],
+      }),
+      runner,
+    );
+    const step = report.result.steps.find((s) => s.name === "full-integrity-suite");
+    expect(step?.status).toBe("pass");
+    // 検証ランナーの非ゼロ終了コードは成功へ変換されず、受理由件8の記録として保持される。
+    expect(
+      (step?.detail as Record<string, { exitCode: number; stdout: string }>).check_integrity,
+    ).toEqual({
+      exitCode: 1,
+      stdout: "",
+    });
+    const diff = report.diff.integrityMachineAcceptance as {
+      accepted: boolean;
+      failedGateNames: string[];
+    };
+    expect(diff.accepted).toBe(true);
+    expect(diff.failedGateNames).toEqual(["check_integrity"]);
+    expect(report.result.exitCategory).toBe("success");
+    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+  });
+
+  test("(b) 由来不明 fail が残存する入力は fail-closed で拒否する", () => {
+    const runner = fakeRunner({
+      issueBody: "- [ ] 条件1\n",
+      integrityExitCodes: { check_integrity: 1 },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        integrityMachineAcceptance: {
+          failureOrigins: [
+            {
+              gate: "check_integrity",
+              failureId: "unexplained-failure",
+              origin: "unknown",
+              registeredInVerificationRecord: true,
+            },
+          ],
+          records: completeMachineAcceptanceRecords(),
+        },
+        acceptanceVerdicts: [soundPass("AC-1")],
+      }),
+      runner,
+    );
+    const step = report.result.steps.find((s) => s.name === "full-integrity-suite");
+    expect(step?.status).toBe("fail");
+    const diff = report.diff.integrityMachineAcceptance as {
+      accepted: boolean;
+      violations: { code: string }[];
+    };
+    expect(diff.accepted).toBe(false);
+    expect(diff.violations.map((v) => v.code)).toContain("unknown-origin-failure-remains");
+    expect(isCloseOperationPermitted(report)).toEqual({
+      permitted: false,
+      reason: "mechanical-failure",
+    });
+  });
+
+  test("(c) fail 残存時に機械受理基準の記録が欠落する入力は記録欠落として拒否する", () => {
+    const missingRecord = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      fakeRunner({
+        issueBody: "- [ ] 条件1\n",
+        integrityExitCodes: { check_integrity: 1 },
+      }),
+    );
+    const missingStep = missingRecord.result.steps.find(
+      (s) => s.name === "full-integrity-suite",
+    );
+    expect(missingStep?.status).toBe("fail");
+    const missingDiff = missingRecord.diff.integrityMachineAcceptance as {
+      violations: { code: string }[];
+    };
+    expect(missingDiff.violations).toEqual([{ code: "machine-acceptance-record-missing" }]);
+    expect(isCloseOperationPermitted(missingRecord).permitted).toBe(false);
+
+    const incompleteRecords = runCloseMechanicalSteps(
+      preMergeInput({
+        integrityMachineAcceptance: {
+          failureOrigins: [classifiedPreExistingFailure("check_integrity")],
+          records: { ...completeMachineAcceptanceRecords(), countReconciliationRecorded: false },
+        },
+        acceptanceVerdicts: [soundPass("AC-1")],
+      }),
+      fakeRunner({
+        issueBody: "- [ ] 条件1\n",
+        integrityExitCodes: { check_integrity: 1 },
+      }),
+    );
+    const incompleteDiff = incompleteRecords.diff.integrityMachineAcceptance as {
+      violations: { code: string }[];
+    };
+    expect(incompleteDiff.violations.map((v) => v.code)).toContain(
+      "record-missing:count-reconciliation",
+    );
+    expect(isCloseOperationPermitted(incompleteRecords).permitted).toBe(false);
+
+    const noReproduction = runCloseMechanicalSteps(
+      preMergeInput({
+        integrityMachineAcceptance: {
+          failureOrigins: [
+            { ...classifiedPreExistingFailure("check_integrity"), baselineReproduction: undefined },
+          ],
+          records: completeMachineAcceptanceRecords(),
+        },
+        acceptanceVerdicts: [soundPass("AC-1")],
+      }),
+      fakeRunner({
+        issueBody: "- [ ] 条件1\n",
+        integrityExitCodes: { check_integrity: 1 },
+      }),
+    );
+    const noReproductionDiff = noReproduction.diff.integrityMachineAcceptance as {
+      violations: { code: string }[];
+    };
+    expect(noReproductionDiff.violations.map((v) => v.code)).toContain(
+      "pre-existing-baseline-reproduction-missing",
+    );
+    expect(isCloseOperationPermitted(noReproduction).permitted).toBe(false);
+  });
+
+  test("(d) 未登録の既知欠陥を合格の根拠とする入力は拒否する", () => {
+    const runner = fakeRunner({
+      issueBody: "- [ ] 条件1\n",
+      integrityExitCodes: { check_integrity: 1 },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        integrityMachineAcceptance: {
+          failureOrigins: [
+            {
+              ...classifiedPreExistingFailure("check_integrity"),
+              registeredInVerificationRecord: false,
+            },
+          ],
+          records: completeMachineAcceptanceRecords(),
+        },
+        acceptanceVerdicts: [soundPass("AC-1")],
+      }),
+      runner,
+    );
+    const step = report.result.steps.find((s) => s.name === "full-integrity-suite");
+    expect(step?.status).toBe("fail");
+    const diff = report.diff.integrityMachineAcceptance as {
+      violations: { code: string }[];
+    };
+    expect(diff.violations.map((v) => v.code)).toContain("unregistered-known-defect");
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("分類記録が非ゼロ終了 gate を被覆しない入力は被覆外 gate として拒否する", () => {
+    const runner = fakeRunner({
+      issueBody: "- [ ] 条件1\n",
+      integrityExitCodes: { check_integrity: 1, check_autogen_freshness: 2 },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        integrityMachineAcceptance: {
+          failureOrigins: [classifiedPreExistingFailure("check_integrity")],
+          records: completeMachineAcceptanceRecords(),
+        },
+        acceptanceVerdicts: [soundPass("AC-1")],
+      }),
+      runner,
+    );
+    const diff = report.diff.integrityMachineAcceptance as {
+      accepted: boolean;
+      violations: { code: string; gate?: string }[];
+    };
+    expect(diff.accepted).toBe(false);
+    expect(diff.violations).toContainEqual({
+      code: "uncovered-failure-origin",
+      gate: "check_autogen_freshness",
+    });
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
   });
 });
 
