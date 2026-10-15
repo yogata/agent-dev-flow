@@ -12,6 +12,7 @@
 - defer 8件（本ファイルに残置）: F-07・F-12・F-14・F-15・F-21・F-23・F-24・F-25
 - 旧 defer 項目の統合解消: DS-19（20260928T145126Z）は F-13 に、RQ-15/RQ-17（20260926T180630Z）は F-05 cleanup anchor に統合（各ファイルに注記追記）
 - 分類は adversarial-review 2 stream（Stream A 分類妥当性・Stream B 証拠適合/成果物化適性）の convergence 後に自律確定（HITL 対象なし・破壊的変更なし）
+- 2026-10-15 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: F-07〔REQ-030-024〕/F-12/F-14/F-15/F-21/F-23/F-24/F-25 は再評価条件未充足のため defer 継続（自律確定）: F-07 の REQ-030.md:43 は 85680dab 変更後も対象記述存続・文意不変。F-21 の docs/README.md DEC 表は ea3d6e0a で REQ-114/DEC-059 反映済み（DEC-059 行 :177 実在）だが supersede 注記全文埋め込みの構図は不変。F-12/F-14/F-15/F-23/F-24/F-25 は対象ファイル delta 不変
 
 ## 残置 defer 検出事項リスト
 

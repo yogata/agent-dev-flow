@@ -11,6 +11,8 @@
 
 **処理記録追記**（2026-10-13 inspect-promote、backlog-auto stage 2、--auto なし）: RQ-17 は 20260926T180630Z 側 RQ-17（同一対象 REQ-090-004・REQ-090.md:19）が 20261008T025952Z F-05/F-06 cleanup anchor 成果物へ統合済みであり、REQ-090-004 行自体も消滅（現行 REQ-090.md:19 は REQ-090-002、grep で「本 Case 内で確定する」記述の実在なし）のため、重複・解消により本ファイルから削除（却下理由は commit message に記録）。RQ-20/DS-13/DC-10/RM-01 は再評価条件未充足のため defer 継続（自律確定）
 
+**処理記録追記**（2026-10-15 inspect-promote、backlog-auto stage 2 inspect 系統、--auto なし）: RQ-20/DS-13/DC-10/RM-01 は再評価条件未充足のため defer 継続（自律確定）: 対象ファイル（retired status 値・designs/README.md・decisions/README.md Decision Map・root README クイックスタート）は delta 窓（2026-10-12 以降）で対象記述不変
+
 ## 検出事項リスト（defer 残置 5件）
 
 ### REQ 体系（defer 2件）

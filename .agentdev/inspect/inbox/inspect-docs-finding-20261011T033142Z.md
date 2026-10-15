@@ -39,6 +39,7 @@ lint_skills の Warning 8件は explainer / explainer-book / first-reader / yomi
 - defer 10件（本ファイルに残置）: RQ03・RQ07・DS02・DS03・DS04・DS05・GR04・GR05・GR06・MECH01
 - 分類は Jev 先行評価（観測 20261013T094553Z-2a11）＋ adversarial-review 2 stream（分類妥当性・証拠適合）convergence 後に全件自律確定（HITL 対象なし・破壊的変更なし）
 - Jev 乖離の処置: DS02/DS03/DS04/DS05 は promote 暫定から defer へ変更（RA-007 実在未確認・様式改善・redirect 対象範囲判断未了・意図的限定記述の可能性により採否未確定。differenceReason: semantic_disagreement）、MECH01 は reject 暫定から defer へ変更（実行契約の恒久化は再発防止知見〔learning 送付候補〕。differenceReason: semantic_disagreement）
+- 2026-10-15 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: RQ03/RQ07・DS02〜DS05・GR04/GR05/GR06・MECH01 は再評価条件未充足のため defer 継続（自律確定）: DS05 の case-auto.md Wave 収束待機記述（:77-79）とスロット型キュー（:214-218）の不整合は 85680dab 変更後も残存を現物確認。DS02/DS03 の v4-standard-lifecycle covers は 85680dab で frontmatter のみ変更（20261015T093252Z 確認と一致）。RQ03 の REQ-009/REQ-088・RQ07 の REQ-061・GR04/GR05/GR06 対象は不変。MECH01 は repo root 実行手順は是正済み（20261013T090730Z・20261015T093252Z の機械検査証拠表で有効結果を2回確認）、実行契約の恒久化〔learning 送付候補〕は未実施のため defer 継続
 
 ## 検出事項リスト
 

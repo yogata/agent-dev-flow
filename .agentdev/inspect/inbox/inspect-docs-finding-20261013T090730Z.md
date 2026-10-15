@@ -39,6 +39,7 @@ REQ の6観点（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）を fan-in で確認�
 - defer 12件（本ファイルに残置）: RQ08〜RQ14・DS10・DS14・DS16・GR07・GR09
 - 分類は Jev 先行評価（観測 20261013T094827Z-5dc0・発動判定 20261013T095052Z-700e）＋ adversarial-review 2 stream（分類妥当性・証拠適合）convergence 後に全件自律確定（HITL 対象なし・破壊的変更なし）
 - Jev 乖離の処置: RQ10/RQ11 は promote 暫定から defer へ変更（既知 RQ03 と同 category「第一参照導線の ID 化不足」の処分一貫性）、DS10 は promote 暫定から defer へ変更（REQ-111-011 実体の所有設計判断未了〔本文追加 vs scope 注記〕。Jev defer 0.97 と一致）、DS16 は reject 暫定から defer へ変更（docs-check ルール候補〔検出閾値検討〕の知見として deferred 保持）
+- 2026-10-15 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: RQ08〜RQ14・DS10/DS14/DS16・GR07/GR09 は再評価条件未充足のため defer 継続（自律確定）: 20261015T093252Z の既知 defer 照合と同結果（RQ08 crosswalk :80 は 85680dab で frontmatter のみ変更で不変、DS10 covers と本文欠落状態維持、DS14 REQ-111-013 edge 注記なしのまま、DS16 維持、GR07 は第3例〔DEC-059.md:17、6b63ba24 由来〕をカテゴリ延伸として記録、GR09 の .agentdev/phase/ 列挙は不在のまま）
 
 ## 検出事項リスト
 
