@@ -2,14 +2,14 @@
 title: case-ready Design
 status: accepted
 created: 2026-09-14
-updated: "2026-10-12"
+updated: "2026-10-16"
 ---
 
 <!-- ADF-COVERS(design): REQ-021-024 -->
 <!-- ADF-COVERS(design): REQ-012-031（保存実体節が Definition 保存時点での設計根拠対応の未成立は保存を阻害しないことの design 対応） -->
 <!-- ADF-COVERS(design): REQ-004-061 -->
 <!-- ADF-COVERS(design): REQ-061-003 -->
-<!-- ADF-COVERS(design): REQ-061-010, REQ-061-019, REQ-061-021, REQ-061-038, REQ-061-023, REQ-061-029, REQ-061-030, REQ-061-033, REQ-061-034, REQ-061-035, REQ-061-039, REQ-061-040, REQ-061-047, REQ-061-048, REQ-061-049, REQ-061-050, REQ-035-012, REQ-035-018 -->
+<!-- ADF-COVERS(design): REQ-061-010, REQ-061-019, REQ-061-021, REQ-061-038, REQ-061-023, REQ-061-029, REQ-061-030, REQ-061-033, REQ-061-034, REQ-061-035, REQ-061-039, REQ-061-040, REQ-061-047, REQ-061-048, REQ-061-049, REQ-061-050, REQ-061-051, REQ-035-012, REQ-035-018 -->
 <!-- ADF-COVERS(design): REQ-061-041, REQ-061-042, REQ-017-021, REQ-017-022, REQ-017-023, REQ-061-043, REQ-061-044, REQ-061-045, REQ-061-046, REQ-030-023 -->
 <!-- ADF-COVERS(implementation): REQ-103-014 -->
 
@@ -91,4 +91,4 @@ case-ready の機械工程（設計PRの忠実性・整合性・品質検査の�
 
 ## 受入検査入力と実行証拠の接続
 
-REQ-061-049/050の受入検査は、case-open Design「検査入力と実行証拠の接続」と同じ保存・生成・事前検証の規律に従う。既存の報告が終了コードだけ、または要約だけとなる箇所でも、stdout/stderr全文・終了コード・対象版・実行条件を一回の検査から保持し結果消費へ渡す。既存受入判断と必須ゲートを置換しない。epic_ref設定とsidecar/inline和集合の既存入力構成規律は維持し重複追加しない。索引生成や版変更後の必要再検証は省かない。
+REQ-061-049/050の受入検査は、case-open Design「検査入力と実行証拠の接続」と同じ保存・生成・事前検証の規律に従う。既存の報告が終了コードだけ、または要約だけとなる箇所でも、stdout/stderr全文・終了コード・対象版・実行条件を一回の検査から保持し結果消費へ渡す。既存受入判断と必須ゲートを置換しない。epic_ref設定とsidecar/inline和集合の既存入力構成規律は維持し重複追加しない。索引生成や版変更後の必要再検証は省かない。要約生成（REQ-061-051）は engine 報告 JSON の構造化警告結果（condition_a.warnings、detection_unavailable）を実件数どおり反映し、報告に存在しないフィールドの参照と unavailable の 0 件誤表示を行わない。

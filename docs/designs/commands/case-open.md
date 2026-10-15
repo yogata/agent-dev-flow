@@ -2,7 +2,7 @@
 title: case-open Design
 status: accepted
 created: 2026-06-21
-updated: "2026-10-14"
+updated: "2026-10-16"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-004, REQ-030-005, REQ-030-006, REQ-030-007, REQ-030-008, REQ-030-009, REQ-030-010, REQ-030-011, REQ-030-015 -->
@@ -12,7 +12,7 @@ updated: "2026-10-14"
 <!-- ADF-COVERS(implementation): REQ-049-005 -->
 <!-- ADF-COVERS(implementation): REQ-083-002 -->
 <!-- ADF-COVERS(design): REQ-030-014, REQ-030-017, REQ-030-018, REQ-030-022 -->
-<!-- ADF-COVERS(design): REQ-030-025, REQ-030-026 -->
+<!-- ADF-COVERS(design): REQ-030-025, REQ-030-026, REQ-030-028, REQ-030-029 -->
 <!-- ADF-COVERS(design): REQ-030-027 -->
 <!-- ADF-COVERS(design): REQ-030-019, REQ-030-020, REQ-030-021, REQ-030-024 -->
 <!-- ADF-COVERS(design): REQ-083-002, REQ-083-003 -->
@@ -80,6 +80,8 @@ case-open STEP-4（実変更判定と設計PR作成）の機械工程（専用 w
 - 報告 JSON: 実行結果（各処理の成否）、差分、警告、提案する Issue/PR 本文を stdout へ返す。提案本文の採否と報告内容の意味レビューはモデルが担当する
 - 終了コード: 成功は 0、要判断・失敗は非 0 を区別する。script は処理を省略せず、失敗時は途中結果とともに非 0 で終了する
 - 既存の品質ゲート（check_integrity、traceability check、generate_indexes 差分検出）は script 内で実行し、省略しない
+- traceability gate を有効にする入力では、判定対象 REQ 集合（traceabilityReqIds）の存在と有効性を gate 実行前に検証する（REQ-030-028）。欠落・空・不整合入力は fail-closed で報告し、空配列への暗黙正規化で入力不備を隠蔽しない
+- REQ 追加を伴う Definition Package 生成時は、docs/README.md 手動管理区間の件数記述の照合を初回の変更・検証範囲に含め（REQ-030-029）、REQ 行数由来の派生物が stage paths に事前包含できない場合は既存の事後突合 contingency 手順に従う
 - script の実装は inspect_cross_dependencies.ts と同じ作りに従い、共通基盤は作らない
 - 意味判断（停止判断、deviation 分類、adversarial review、警告の重要度評価）はモデルが担当し続け、script は機械的に確定した手順のみを実行する
 - workflow skill 参照文面（references/*.md）は、LLM が bash コマンドを逐次実行する指示から script 呼び出しと報告 JSON 解釈へ置き換えて短縮する

@@ -2,7 +2,7 @@
 title: 実行時パッケージ境界
 status: accepted
 created: 2026-08-20
-updated: 2026-10-14
+updated: 2026-10-16
 ---
 <!-- ADF-COVERS(implementation): REQ-002-007, REQ-002-008, REQ-002-011, REQ-002-019, REQ-002-020, REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-002, REQ-009-003, REQ-009-006, REQ-009-007, REQ-009-008, REQ-009-009, REQ-009-010, REQ-009-011, REQ-009-012, REQ-009-013, REQ-009-014, REQ-009-015, REQ-009-016, REQ-009-017, REQ-009-018, REQ-009-019, REQ-009-020, REQ-009-021, REQ-009-022, REQ-009-023, REQ-009-024, REQ-009-025, REQ-009-035, REQ-009-036, REQ-009-037, REQ-009-038, REQ-009-039, REQ-009-046, REQ-009-047, REQ-009-048, REQ-009-049 -->
@@ -48,7 +48,7 @@ AgentDevFlow の実行時パッケージ境界を定義し、本体リポジト�
 | `consumer-local` | 非 AgentDevFlow OpenCode プロジェクト | 独自 command/skill のみ | プロジェクトローカルカスタマイズ専用 | 実験的リポジトリ |
 | `consumer-generated` | ローカル版 OpenCode 導入リポジトリ | ローカル版 OpenCode を導入する利用側リポジトリ | link mode による AgentDevFlow 実行時位置（Custom Tool `agentdev_gh` の実行ディレクトリのみ `src/common/tools/agentdev-gh/local/` から接続） | 個人利用環境のローカルリポジトリ |
 
-`consumer-generated` はローカル版 OpenCode を link mode で導入する利用側リポジトリである（REQ-009, REQ-009, REQ-009）。
+`consumer-generated` はローカル版 OpenCode を link mode で導入する利用側リポジトリである（REQ-009）。
 `.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を共通原本 `src/common/` 配下へ接続し、Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけを `src/common/tools/agentdev-gh/local/`（Local 実装）へ接続する。
 詳細は本 Design の「link mode 接続手順技術詳細」を参照。
 
@@ -485,7 +485,7 @@ wrong target 検出、再作成ロジックは LocalMode と通常版 install �
 | スキル | 区分 | 備考 |
 |--------|------|------|
 | `agentdev-*` 全 27 件 | 配布物依存 | `src/common/skills/` 配下、`agentdev-*` グロブで自動 junction |
-| `repo-agentdev-integrity` | repo-local 専用 | `/repo/docs-check` 実行スキル。REQ-001 の `repo-*` 卡out 対象。検証スクリプトを呼び出す command は DEC-006 により3 command（`docs-check`, `inspect-skills`, `inspect-promote`）へ正規化済み。これらが `repo-agentdev-integrity/scripts/*.ts` を呼び出すが、当該参照は consumer 環境で実行時欠落する別課題（本 Design の対象外） |
+| `repo-agentdev-integrity` | repo-local 専用 | `/repo/docs-check` 実行スキル。REQ-001 の `repo-*` carve-out 対象。検証スクリプトを呼び出す command は DEC-006 により3 command（`docs-check`, `inspect-skills`, `inspect-promote`）へ正規化済み。これらが `repo-agentdev-integrity/scripts/*.ts` を呼び出すが、当該参照は consumer 環境で実行時欠落する別課題（本 Design の対象外） |
 
 ## v4 adapter 境界への接続
 

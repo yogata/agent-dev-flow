@@ -2,7 +2,7 @@
 title: "決定的破損検査クラス"
 status: accepted
 created: "2026-08-30"
-updated: "2026-10-03"
+updated: "2026-10-16"
 ---
 
 <!-- ADF-COVERS(design): REQ-010-071, REQ-053-012 -->
@@ -25,7 +25,7 @@ checker 実装と回帰テストは本 Design の契約を実装・固定する�
 REQ-010-071 が要求する docs-check 実行時の「配布 command・skill 全体」への適用をこの走査範囲で満たす。
 docs design 本文の追加により、docs corpus の表層品質を機械検査で担保する。
 
-### 検出対象（10 検出カテゴリ）
+### 検出対象（11 検出カテゴリ）
 
 | rule_id | 検出対象 | REQ 参照 |
 |---|---|---|
@@ -39,6 +39,7 @@ docs design 本文の追加により、docs corpus の表層品質を機械検�
 | `foreign-script` | 意図しない異言語文字（日本語・英語コーパス外の文字スクリプト） | REQ-053-009 |
 | `simplified-chinese` | 簡体字検出（簡体字↔日本語字形ペア辞書による決定的照合） | REQ-053-009 |
 | `stale-reference` | 既知形式の参照残骸（retired 配下パスへのリンク、`ADR-NNN` 旧形式、`REQ-0108-NNN` 旧ナンバリング） | REQ-053-010 |
+| `known-corruption-literal` | 既知混入形の確定一致検出（混入実績由来の文字列列挙による決定的照合。初期列挙: 「卡out」） | REQ-053-009、REQ-010-083 |
 
 機械判定不能な項目（明らかな誤字等）は対象外であり、査読観点で扱う。
 
@@ -48,7 +49,7 @@ docs design 本文の追加により、docs corpus の表層品質を機械検�
 
 | 平面 | 対象行 | 適用カテゴリ |
 |---|---|---|
-| 文字平面（charScan） | frontmatter を除く全行（fence 内・HTML コメント内を含む） | `control-char`、`invalid-unicode`、`foreign-script` |
+| 文字平面（charScan） | frontmatter を除く全行（fence 内・HTML コメント内を含む） | `control-char`、`invalid-unicode`、`foreign-script`、`known-corruption-literal` |
 | 構造平面（structural） | frontmatter、fenced code block、HTML コメント領域を除く本文行 | 上記以外の全カテゴリ |
 
 frontmatter は機械データ平面であるため全検出対象から除外する。
@@ -124,6 +125,15 @@ CJK 統合漢字は `foreign-script` の対象外としつつ、簡体字専用�
 現行走査対象（配布 command・skill 本文、docs design 本文）に「项」（U+9879）を含むファイルは存在しない（Case #3243 の混入は手動是正済み）ため、本追加により新規の許容例エントリは不要である。
 本節の列挙自体が簡体字形を実例として含むため、既存許容例（本 Design × simplified-chinese、rationale: 簡体字検出シグナル自体が簡体字形を実例として列挙する Design 記述）の範囲に含まれ、新規違反を生じない。
 
+### 既知混入形の確定一致検出（known-corruption-literal）
+
+- 検出対象: 混入実績由来の確定一致文字列（初期登録: 「卡out」。docs/designs/local/runtime-package-boundary.md DS23 実績）
+- 検出平面: 文字平面（charScan）に準拠（frontmatter を除く全行）
+- 列挙管理: 本 Design 節が列挙の正であり、checker 実装は列挙に従い、列挙外の除外を独自に追加しない。混入実績発生時に列挙へ追記する
+- 許容例: 確定一致のため誤検出は構造的に発生しない（正当な「カード」等の片仮名語は「卡out」文字列に一致しない）
+- 差分化記録: foreign-script は CJK 統合漢字を対象外とし、simplified-chinese は簡体字↔日本語字形ペア（異字形前提）であるため、「卡」等の同字形混入は両カテゴリで検出不能である。本シグナルは列挙後確認ではなく決定的検査クラス（REQ-053-012）の確定一致として位置づける
+- 回帰テスト: 「卡out」を含む fixture で検出されること、正当な日本語文で検出されないことを fixture 追加で固定する
+
 ### 既知形式の参照残骸（stale-reference）
 
 - retired 配下パスへのリンク target（`requirements/retired/`、`retired/REQ-` 前置）
@@ -149,6 +159,7 @@ rationale はいずれも例示由来（検出ルール自体が破損形・異�
 - docs/designs/integrity/rules/IR-066-legacy-path-removed-name.md × stale-reference: REQ-0108-NNN 旧ナンバリング検出ルール自体が旧形式を実例として列挙するルール定義
 - docs/designs/integrity/rules/IR-069-req-number-gap-recorded.md × stale-reference: 採番例外記録の文脈で旧ナンバリング REQ-0108-194 を歴史的根拠として引用
 - docs/designs/integrity/content-corruption-checker.md × stale-reference: stale-reference 検出カテゴリの説明が旧ナンバリング形式参照を実例として列挙し、IR-069 許容例と同一の旧ナンバリング引用を含む Design 記述（自己言及）
+- docs/designs/integrity/content-corruption-checker.md × known-corruption-literal: 既知混入形確定一致シグナル自体が混入形（卡out）を実例として列挙する Design 記述
 
 追加運用:
 許容例を追加する場合は、対象ファイル・rule_id・根拠（意図的使用の理由）を本節に追記した上で checker の列挙に反映する。
