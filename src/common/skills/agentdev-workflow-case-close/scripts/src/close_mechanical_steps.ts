@@ -72,13 +72,13 @@ export interface GateCommandSpec {
   timeoutMs?: number;
 }
 
-/** full integrity suite の fail 1件あたりの由来分類記録（機械受理基準の受理由件5・7に対応）。 */
+/** full integrity suite の fail 1件あたりの由来分類記録（fail 単位の1:1対応。受理由件5・7）。 */
 export interface IntegrityFailureOrigin {
   /** fail が発生した gate 名（integrityGates の GateCommandSpec.name と突合する）。 */
   gate: string;
-  /** fail の識別子（テスト名、checker 名等の provenance）。 */
+  /** fail の識別子（テスト名、checker 名等の provenance。同一 gate 内で一意）。 */
   failureId: string;
-  /** 由来分類。pre-existing は baseline 再現確認記録を必須とする。 */
+  /** 由来分類。機械受理基準の4分類。pre-existing は baseline 再現確認記録、execution-form は規律適合再実行結果の採用記録を実体として必須とする。 */
   origin: "changed" | "pre-existing" | "execution-form" | "unknown";
   /** pre-existing 分類の baseline 再現確認（ワークツリー変更ゼロの baseline commit での同一 fail 再現確認。detached worktree 標準手順）。 */
   baselineReproduction?: {
@@ -86,37 +86,57 @@ export interface IntegrityFailureOrigin {
     method: "detached-worktree";
     sameFailureReproduced: boolean;
   };
-  /** 既知欠陥の登録済み参照。機械受理基準の記録一式が PR 本文検証差分セクションへ登録済みであることを示す。 */
-  registeredInVerificationRecord: boolean;
+  /** execution-form 分類の規律適合再実行結果の採用記録。当該実行結果を合格の根拠にせず、規律適合後の再実行結果を採用したことを示す実体。 */
+  conformanceReexecution?: {
+    /** 適合再実行の証跡所在（stdout/stderr 退避先等）。 */
+    evidencePath: string;
+    /** 適合再実行の終了コード（検証コマンド自体の生値。変換禁止）。 */
+    exitCode: number;
+    /** 適合再実行で fail が解消したか。解消しない場合は改めて由来分類し直すため、false は受理されない。 */
+    resolvedAfterConformingRerun: boolean;
+  };
+  /** 既知欠陥登録（機械受理基準の記録一式の登録。PR 本文検証差分セクション）の所在参照。空参照は未登録として拒否する。 */
+  registrationRef: string;
+}
+
+/** 1分割実行の実行記録（受理由件2・4・8・10の記録実体）。 */
+export interface IntegritySuiteRunRecord {
+  /** 分割の識別子（分割①②③等。一意）。 */
+  split: string;
+  /** 起動コマンド（./ prefix 付きパス指定）。 */
+  command: string;
+  /** 実行 cwd。 */
+  cwd: string;
+  /** 件数サマリー（Ran N tests across M files 等。受理由件4）。 */
+  testCountSummary: string;
+  /** 検証コマンド自体の終了コード（生値。変換禁止。受理由件8）。 */
+  exitCode: number;
+  /** 検査範囲（./ prefix 付き対象指定。環境差を含む実施範囲。受理由件10）。 */
+  scope: string;
 }
 
 /**
  * full integrity suite の機械受理基準（QG-4 最終受入規範の受理由件10項目）に対応する
- * 検証結果記録の入力契約。fail 全件の由来分類と、分類記録以外の記録完備（正規ランナー
- * 構成確認、正規形実行、環境ラベル、件数突合、baseline 基準、終了コード、ランナー版、
- * 検査範囲）を保持する。fail が 0 件の場合は省略可能。
+ * 検証結果記録の入力契約。boolean 申告ではなく記録実体を保持し、機械側は実体の
+ * 存在・形式・件数突合を検証する（fail 全件の由来分類、分類レコードの形式、
+ * 観測 fail 件数との1:1突合、正規ランナー構成、正規形実行、環境ラベル、baseline
+ * 基準、ランナー版）。fail が 0 件の場合は省略可能。
  */
 export interface IntegrityMachineAcceptanceRecord {
-  /** fail 全件の由来分類（受理由件5）。 */
+  /** fail 全件の由来分類（受理由件5）。fail 単位のレコード（1 fail = 1 レコード）。 */
   failureOrigins: readonly IntegrityFailureOrigin[];
-  records: {
-    /** 正規ランナー構成確認の記録（受理由件1）。 */
-    runnerConstitutionConfirmed: boolean;
-    /** 正規形実行の記録（受理由件2）。 */
-    standardFormExecutionRecorded: boolean;
-    /** 環境ラベルの記録（受理由件3）。 */
-    environmentLabelRecorded: boolean;
-    /** 件数突合の記録（受理由件4）。 */
-    countReconciliationRecorded: boolean;
-    /** baseline 基準の明示（受理由件6）。 */
-    baselineReferenceCommitRecorded: boolean;
-    /** 終了コードの記録（非変換。受理由件8）。 */
-    exitCodesRecordedWithoutConversion: boolean;
-    /** 実行ランナー版の記録（受理由件9）。 */
-    runnerVersionRecorded: boolean;
-    /** 検査範囲の記録（受理由件10）。 */
-    inspectionScopeRecorded: boolean;
-  };
+  /** gate ごとの観測 fail 件数（件数突合の基準実体。受理由件4・5）。 */
+  observedFailCounts: readonly { gate: string; failCount: number }[];
+  /** 正規ランナー構成確認の記録実体（受理由件1。確認結果と判定した正規ランナー）。 */
+  runnerConstitution: { confirmedRunner: string; basis: string };
+  /** 正規形実行の記録実体（受理由件2。分割ごとに1レコード）。 */
+  suiteRunRecords: readonly IntegritySuiteRunRecord[];
+  /** 環境ラベルの記録実体（受理由件3。実行環境・junction 伝播状態・依存パッケージ状態の3要素）。 */
+  environmentLabel: { runtime: string; junctionPropagation: string; dependencies: string };
+  /** 由来判定の基準 baseline commit の明示（受理由件6。remediation 開始前の baseline commit）。 */
+  baselineReferenceCommit: string;
+  /** 実行ランナー版の記録（受理由件9）。 */
+  runnerVersion: string;
 }
 
 /** 機械受理基準の検証で検出した違反。 */
@@ -124,6 +144,14 @@ export interface MachineAcceptanceViolation {
   code: string;
   gate?: string;
   failureId?: string;
+  expected?: number;
+  actual?: number;
+}
+
+/** 機械受理判定の入力となる gate 実行結果（実際の実行から取得した実体）。 */
+export interface IntegrityGateResult {
+  name: string;
+  exitCode: number;
 }
 
 export interface CloseMechanicalInput {
@@ -295,42 +323,133 @@ export interface AcceptanceEvaluationReport {
 
 /**
  * full integrity suite の fail に対する機械受理基準（QG-4 最終受入規範の受理由件10項目）
- * の記録完備を検証する。規範が合格として認める結果（記録完備・由来不明 0・既知欠陥登録
- * 済みで pre-existing 分類済み fail を含む）を合格として扱い、機械受理基準の記録欠落、
- * 由来不明 fail の残存、未登録の既知欠陥を合格の根拠にする結果を fail-closed で拒否する。
+ * の記録完備を検証する。boolean や申告フラグに依存せず、記録実体の存在・形式・件数突合を
+ * 検証する。規範が合格として認める結果（記録実体完備・由来不明 0・既知欠陥登録済みで
+ * pre-existing 分類済み fail を含む）を合格として扱い、機械受理基準の記録欠落、由来不明
+ * fail の残存、未登録の既知欠陥を合格の根拠にする結果を fail-closed で拒否する。
  * 検証ランナーの非ゼロ終了コードを成功へ変換せず、分類記録の検証は終了コードの変換では
  * なく独立の判定層として重ねる。
  */
 export function evaluateIntegrityMachineAcceptance(
   record: IntegrityMachineAcceptanceRecord | undefined,
-  failedGateNames: readonly string[],
+  gateResults: readonly IntegrityGateResult[],
 ): { accepted: boolean; violations: readonly MachineAcceptanceViolation[] } {
+  const failedGates = gateResults.filter((g) => g.exitCode !== 0);
   const recordMissing =
-    record === undefined ||
+    typeof record !== "object" ||
+    record === null ||
     !Array.isArray(record.failureOrigins) ||
-    typeof record.records !== "object" ||
-    record.records === null;
+    !Array.isArray(record.observedFailCounts) ||
+    !Array.isArray(record.suiteRunRecords);
   if (recordMissing) {
-    if (failedGateNames.length > 0) {
+    if (failedGates.length > 0) {
       return { accepted: false, violations: [{ code: "machine-acceptance-record-missing" }] };
     }
     return { accepted: true, violations: [] };
   }
   const violations: MachineAcceptanceViolation[] = [];
-  const classifiedGates = new Set(record.failureOrigins.map((f) => f.gate));
-  for (const gate of failedGateNames) {
-    if (!classifiedGates.has(gate)) {
-      violations.push({ code: "uncovered-failure-origin", gate });
+  const executedGateNames = new Set(gateResults.map((g) => g.name));
+  const failedGateNames = new Set(failedGates.map((g) => g.name));
+
+  // 観測 fail 件数（件数突合の基準実体。受理由件4）の形式検証。
+  const failCountByGate = new Map<string, number>();
+  for (const observed of record.observedFailCounts) {
+    const valid =
+      typeof observed === "object" &&
+      observed !== null &&
+      typeof observed.gate === "string" &&
+      observed.gate.length > 0 &&
+      typeof observed.failCount === "number" &&
+      Number.isInteger(observed.failCount) &&
+      observed.failCount >= 0;
+    if (!valid) {
+      violations.push({
+        code: "observed-fail-count-invalid",
+        gate: typeof (observed as { gate?: unknown })?.gate === "string" ? (observed as { gate: string }).gate : undefined,
+      });
+      continue;
+    }
+    if (failCountByGate.has(observed.gate)) {
+      violations.push({ code: "observed-fail-count-duplicate", gate: observed.gate });
+      continue;
+    }
+    failCountByGate.set(observed.gate, observed.failCount);
+  }
+
+  // gate 実行結果との実体突合: 非ゼロ終了 gate は観測 fail 件数を必要とし、
+  // ゼロ終了 gate への fail 件数付与は矛盾として拒否する。
+  for (const gate of failedGates) {
+    const failCount = failCountByGate.get(gate.name);
+    if (failCount === undefined || failCount < 1) {
+      violations.push({ code: "uncovered-failure-origin", gate: gate.name });
     }
   }
+  for (const [gate, failCount] of failCountByGate) {
+    if (!executedGateNames.has(gate)) {
+      violations.push({ code: "observed-fail-count-for-unexecuted-gate", gate });
+    } else if (!failedGateNames.has(gate) && failCount > 0) {
+      violations.push({
+        code: "fail-count-conflicts-with-passing-gate",
+        gate,
+        expected: 0,
+        actual: failCount,
+      });
+    }
+  }
+
+  // fail 単位の分類完備（受理由件5）。1 gate 内の fail 全件に1:1の分類レコードを
+  // 要求し、由来不明・未分類の fail 残存は拒否する。
+  const originCountByGate = new Map<string, number>();
+  const seenOrigins = new Set<string>();
   for (const origin of record.failureOrigins) {
+    if (typeof origin !== "object" || origin === null || typeof origin.gate !== "string" || origin.gate.length === 0) {
+      violations.push({ code: "failure-origin-record-invalid" });
+      continue;
+    }
+    originCountByGate.set(origin.gate, (originCountByGate.get(origin.gate) ?? 0) + 1);
+    const key = `${origin.gate}::${String(origin.failureId)}`;
+    if (
+      typeof origin.failureId !== "string" ||
+      origin.failureId.length === 0 ||
+      seenOrigins.has(key)
+    ) {
+      violations.push({
+        code: seenOrigins.has(key) ? "duplicate-failure-origin" : "failure-origin-record-invalid",
+        gate: origin.gate,
+        failureId: typeof origin.failureId === "string" ? origin.failureId : undefined,
+      });
+      if (seenOrigins.has(key)) continue;
+    }
+    seenOrigins.add(key);
+    if (!executedGateNames.has(origin.gate)) {
+      violations.push({ code: "failure-origin-for-unexecuted-gate", gate: origin.gate });
+    } else if (!failedGateNames.has(origin.gate)) {
+      violations.push({
+        code: "failure-origin-conflicts-with-passing-gate",
+        gate: origin.gate,
+        failureId: origin.failureId,
+      });
+    }
+    if (
+      origin.origin !== "changed" &&
+      origin.origin !== "pre-existing" &&
+      origin.origin !== "execution-form" &&
+      origin.origin !== "unknown"
+    ) {
+      violations.push({
+        code: "failure-origin-classification-invalid",
+        gate: origin.gate,
+        failureId: origin.failureId,
+      });
+    }
     if (origin.origin === "unknown") {
       violations.push({ code: "unknown-origin-failure-remains", failureId: origin.failureId });
     }
     if (origin.origin === "pre-existing") {
       const reproduction = origin.baselineReproduction;
       if (
-        reproduction === undefined ||
+        typeof reproduction !== "object" ||
+        reproduction === null ||
         reproduction.method !== "detached-worktree" ||
         reproduction.sameFailureReproduced !== true ||
         typeof reproduction.baselineCommit !== "string" ||
@@ -342,28 +461,102 @@ export function evaluateIntegrityMachineAcceptance(
         });
       }
     }
-    if (origin.registeredInVerificationRecord !== true) {
+    if (origin.origin === "execution-form") {
+      const reexecution = origin.conformanceReexecution;
+      if (
+        typeof reexecution !== "object" ||
+        reexecution === null ||
+        typeof reexecution.evidencePath !== "string" ||
+        reexecution.evidencePath.length === 0 ||
+        typeof reexecution.exitCode !== "number" ||
+        reexecution.resolvedAfterConformingRerun !== true
+      ) {
+        violations.push({
+          code: "execution-form-reexecution-not-adopted",
+          failureId: origin.failureId,
+        });
+      }
+    }
+    if (typeof origin.registrationRef !== "string" || origin.registrationRef.length === 0) {
       violations.push({ code: "unregistered-known-defect", failureId: origin.failureId });
     }
   }
-  const records = record.records;
-  const recordRequirements: readonly {
-    key: keyof IntegrityMachineAcceptanceRecord["records"];
-    code: string;
-  }[] = [
-    { key: "runnerConstitutionConfirmed", code: "record-missing:runner-constitution" },
-    { key: "standardFormExecutionRecorded", code: "record-missing:standard-form-execution" },
-    { key: "environmentLabelRecorded", code: "record-missing:environment-label" },
-    { key: "countReconciliationRecorded", code: "record-missing:count-reconciliation" },
-    { key: "baselineReferenceCommitRecorded", code: "record-missing:baseline-reference-commit" },
-    { key: "exitCodesRecordedWithoutConversion", code: "record-missing:exit-codes" },
-    { key: "runnerVersionRecorded", code: "record-missing:runner-version" },
-    { key: "inspectionScopeRecorded", code: "record-missing:inspection-scope" },
-  ];
-  for (const requirement of recordRequirements) {
-    if (records[requirement.key] !== true) {
-      violations.push({ code: requirement.code });
+
+  // 件数突合（受理由件4・5）: fail 総数と分類レコード数の gate 単位の一致。
+  const reconciledGates = new Set([...failCountByGate.keys(), ...originCountByGate.keys()]);
+  for (const gate of reconciledGates) {
+    const observed = failCountByGate.get(gate);
+    const classified = originCountByGate.get(gate) ?? 0;
+    if (observed !== undefined && observed !== classified) {
+      violations.push({
+        code: "failure-origin-count-mismatch",
+        gate,
+        expected: observed,
+        actual: classified,
+      });
     }
+  }
+
+  // 記録実体の存在・形式検証（受理由件1・2・3・6・9・10。boolean 申告ではなく実体）。
+  const constitution = record.runnerConstitution;
+  if (
+    typeof constitution !== "object" ||
+    constitution === null ||
+    typeof constitution.confirmedRunner !== "string" ||
+    constitution.confirmedRunner.length === 0 ||
+    typeof constitution.basis !== "string" ||
+    constitution.basis.length === 0
+  ) {
+    violations.push({ code: "record-missing:runner-constitution" });
+  }
+  if (record.suiteRunRecords.length === 0) {
+    violations.push({ code: "record-missing:standard-form-execution" });
+  }
+  const seenSplits = new Set<string>();
+  for (const run of record.suiteRunRecords) {
+    const valid =
+      typeof run === "object" &&
+      run !== null &&
+      typeof run.split === "string" &&
+      run.split.length > 0 &&
+      !seenSplits.has(run.split) &&
+      typeof run.command === "string" &&
+      run.command.length > 0 &&
+      typeof run.cwd === "string" &&
+      run.cwd.length > 0 &&
+      typeof run.testCountSummary === "string" &&
+      run.testCountSummary.length > 0 &&
+      typeof run.exitCode === "number" &&
+      typeof run.scope === "string" &&
+      run.scope.length > 0;
+    if (!valid) {
+      violations.push({
+        code: seenSplits.has(String((run as IntegritySuiteRunRecord | null)?.split))
+          ? "duplicate-suite-run-record"
+          : "suite-run-record-invalid",
+      });
+      continue;
+    }
+    seenSplits.add(run.split);
+  }
+  const label = record.environmentLabel;
+  if (
+    typeof label !== "object" ||
+    label === null ||
+    typeof label.runtime !== "string" ||
+    label.runtime.length === 0 ||
+    typeof label.junctionPropagation !== "string" ||
+    label.junctionPropagation.length === 0 ||
+    typeof label.dependencies !== "string" ||
+    label.dependencies.length === 0
+  ) {
+    violations.push({ code: "record-missing:environment-label" });
+  }
+  if (typeof record.baselineReferenceCommit !== "string" || record.baselineReferenceCommit.length === 0) {
+    violations.push({ code: "record-missing:baseline-reference-commit" });
+  }
+  if (typeof record.runnerVersion !== "string" || record.runnerVersion.length === 0) {
+    violations.push({ code: "record-missing:runner-version" });
   }
   return { accepted: violations.length === 0, violations };
 }
@@ -650,19 +843,19 @@ export function runCloseMechanicalSteps(
     }
 
     const integrityResults: Record<string, { exitCode: number; stdout: string }> = {};
-    const failedGateNames: string[] = [];
+    const gateResults: IntegrityGateResult[] = [];
     for (const gate of input.integrityGates ?? []) {
       const result = runSpec(runner, gate);
       integrityResults[gate.name] = { exitCode: result.exitCode, stdout: result.stdout };
-      if (result.exitCode !== 0) failedGateNames.push(gate.name);
+      gateResults.push({ name: gate.name, exitCode: result.exitCode });
     }
     // 分類記録の検証は終了コードの変換ではなく独立の判定層。機械受理基準を満たす
-    // 記録で分類済み fail が残る場合は規範の判定に従い受理し、記録欠落・由来不明
+    // 記録実体で分類済み fail が残る場合は規範の判定に従い受理し、記録欠落・由来不明
     // fail の残存・未登録の既知欠陥は fail-closed で拒否する。非ゼロ終了コードは
     // 各 gate の記録として変換せず保持する。
     const machineAcceptance = evaluateIntegrityMachineAcceptance(
       input.integrityMachineAcceptance,
-      failedGateNames,
+      gateResults,
     );
     steps.push({
       name: "full-integrity-suite",
@@ -672,14 +865,15 @@ export function runCloseMechanicalSteps(
         machineAcceptance: {
           accepted: machineAcceptance.accepted,
           violations: machineAcceptance.violations,
-          failedGateNames,
+          failedGateNames: gateResults.filter((g) => g.exitCode !== 0).map((g) => g.name),
         },
       },
     });
     diff.integrityMachineAcceptance = {
       accepted: machineAcceptance.accepted,
       violations: machineAcceptance.violations,
-      failedGateNames,
+      failedGateNames: gateResults.filter((g) => g.exitCode !== 0).map((g) => g.name),
+      observedFailCounts: input.integrityMachineAcceptance?.observedFailCounts ?? [],
       failureOrigins: input.integrityMachineAcceptance?.failureOrigins ?? [],
     };
 
