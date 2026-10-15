@@ -55,6 +55,7 @@ STEP-4 の機械工程（専用 worktree 作成、Definition branch 作成、REQ
   対象行外の既存債務（corpus 全体の missing-implementation 等）が他の既存経路で gate fail を生じた場合の対照救済は、従来の契約に従う。対照救済は worktree HEAD と main HEAD の両方で check を実行し、findings が完全一致・差分 0 件であることを機械証明して本変更起因の検出悪化 0 件を根拠づけ、PR 作成可と判断する手順である。新規対象行の missing-implementation / missing-verification をこの救済へ読み替えず、raw failure を case-run / case-close の deferred obligations として記録する。証拠は PR 本文へ残す。
 - **計測日収束**: `generate_indexes` は commit 前配置で実行されるため、req-metrics の計測日は commit author date からの導出の関係で 1 日遅れの値になり得る。計測日が対象ファイルの最終内容変更日とずれた場合は、同一 PR 内で派生物を再生成・再 commit して収束させる。計測日のずれを内容変更として扱わない。計測日収束は 2 段検出であり、(a) req-metrics の計測日 AUTOGEN 更新と (b) req-updated-freshness による frontmatter updated 追随の両方を同一 PR 内の追加 commit で収束させて初めて「計測日収束完了」と扱う
 - **generate_indexes 派生物の事後突合**: generate_indexes の派生物（docs/README.md、docs/designs/quality/req-health-metrics.md の REQ 行数 AUTOGEN 等）は script 実行後に確定するため、stagePaths への事前包含は構造的に不能である。commit 後の changedFiles 事後突合と stagePaths 外派生物の明示パス指定による補正 commit を標準 contingency として扱う。本補正は既存の工程順序契約（check_integrity / traceability-check は commit 後実行、generate_indexes は commit 前配置維持）と矛盾しない
+- **docs/README.md 手動管理区間の件数照合**: REQ 追加を伴う Definition Package 生成時は、docs/README.md 手動管理区間の件数記述の照合を初回の変更・検証範囲に含める。generate_indexes は AUTOGEN ブロック（`readme-req-summary-count` 等）のみを更新し、ブロック外の本文に手動で記述された件数（例: AUTOGEN ブロック直後に続く「現行要件はN件である」等の記述）は更新しないため、REQ 追加で AUTOGEN 件数が変化した場合は手動管理区間の記述が旧件数のまま残り得る。script 実行後、AUTOGEN ブロック内の件数と手動管理区間の件数記述を機械検索で突合し、不一致を検出した場合は docs/README.md の明示パス指定補正 commit で手動管理区間を新件数へ追随させる。検出・補正・証跡を PR 本文の検証記録へ残す。件数不一致の残存を成功扱いにしない（fail-closed）。事後突合と明示パス指定補正 commit は「generate_indexes 派生物の事後突合」の標準 contingency と同一手順であり、REQ 行数由来の派生物が stage paths に事前包含できない場合もこれに従う
 
 #### worktree 実行時の junction 伝播状態確認（機械工程の前置）
 
@@ -137,6 +138,7 @@ STEP-4 の機械工程（専用 worktree 作成、Definition branch 作成、REQ
 
 - 実変更判定根拠（canonical Definition との差分）、作成した PR 番号、既存成果物の検出結果
 - REQ 行変更または Decision 変更を伴う場合の `generate_indexes.ts` 実行結果、再生成された派生物一覧、および派生物が同一 PR に含まれることの確認結果
+- REQ 追加を伴う Definition 変更時の docs/README.md 手動管理区間件数照合の実行証跡（AUTOGEN ブロック件数と手動管理区間の機械検索突合結果、不一致検出時の検出内容と明示パス指定補正 commit の記録）
 - head branch push の実行証跡（push 出力による refspec 確認結果、push 済み HEAD hash と remote branch 名。実変更時のみ）
 - 並行 case-open 実行時の PR 作成前隔離検査実行証跡（merge-base / diff --stat の結果、救済実施時は差分再構成の記録）
 - 横断依存検査の実行証跡（検査入力、エンジンの報告 JSON、投入者への選択肢提示とその応答）
@@ -148,6 +150,7 @@ STEP-4 の機械工程（専用 worktree 作成、Definition branch 作成、REQ
 - 実変更がある Case について設計PRが 1 件であること
 - 実変更がある Case について、pr_create の前段で head branch push が実行され、push 先 refspec の確認が記録されていること
 - REQ 行変更を伴う Case について、PR 作成前の missing-design 0 件ゲート確認が行われていること
+- REQ 追加を伴う Definition Package 生成時、docs/README.md 手動管理区間の件数照合が手順上必須として実行され、派生物補正の証跡が残っていること（REQ 追加のない Case では適用なし）
 - 並行 case-open 実行時に、PR 作成前隔離検査（自 Case 差分のみ・明示パスステージ・1-writer 侵害検知時の早期断念）が実行されていること
 - 再実行時に Root Case と設計PRの件数が増加しないこと
 - 再利用判定が instruction 単位・Issue 節単位の完了度照合に基づいていること（ファイル単位の近似照合で部分完了を完了扱いにしていないこと）
