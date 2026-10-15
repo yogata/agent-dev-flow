@@ -1,0 +1,370 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261015T130350Z-78c4",
+  "workflow": "backlog-review",
+  "evaluationKind": "step2-tentative-classification",
+  "subject": "Case #3725 backlog-auto stage 3 RU化対象15成果物の暫定分類（backlog-review STEP-2。DS25は保留処置のため対象外）",
+  "sourceRevision": "6704dcea122a95ad4e03656fc0b3f7c9f542b706",
+  "durationMs": 1833,
+  "inputTokens": 5157,
+  "inputs": {
+    "requestDigest": "9a107d6b26572b08c1f768bea4b3ca09170a666b7ce142d3a8e88436cb2af727",
+    "references": [
+      {
+        "digest": "654c5e25814e8a74ecfd3fa92c9083108f4b49c3c32e951199abf69198f0327a",
+        "label": "learning req-count-prose-sync",
+        "path": ".agentdev/learning/promoted/existing-measure-update-req-count-prose-sync.md"
+      },
+      {
+        "digest": "ca6d351c67d3d21248a0257e613ca45668ac0aef9b373f3ae7715633e5b1f7df",
+        "label": "learning extension-rules-before-issue-write",
+        "path": ".agentdev/learning/promoted/existing-measure-update-extension-rules-before-issue-write.md"
+      },
+      {
+        "digest": "4fc9f3a03b5069a4e6fc9d8a9e39ae876b7e8c47122f09d734586ea7f984d3ca",
+        "label": "learning overlap-warning-summary",
+        "path": ".agentdev/learning/promoted/existing-measure-update-overlap-warning-summary.md"
+      },
+      {
+        "digest": "f05edc7c69ed882755cf68041c36a5ba59585968e86c33909f913105fb797e55",
+        "label": "learning traceability-target-ids",
+        "path": ".agentdev/learning/promoted/existing-measure-update-traceability-target-ids.md"
+      },
+      {
+        "digest": "848df02c2e118461ca9302eb1ca765cde66db9b50c92f869cc4e6d95b447fef0",
+        "label": "intake traceability-gate-new-req-row",
+        "path": ".agentdev/intake/promoted/2026-10-11-traceability-gate-new-req-row.md"
+      },
+      {
+        "digest": "0a251eb1221d90feb3878fb50eeb58f98e965057e2d29099eda3c57503ac9bdb",
+        "label": "intake overlap-summary-misreport",
+        "path": ".agentdev/intake/promoted/2026-10-13-case-ready-overlap-summary-misreport.md"
+      },
+      {
+        "digest": "7ef11bb346226ecbdddc3df9fbd78c08e572829a736892e5c59d8c60312de303",
+        "label": "intake issue-create-labels-required",
+        "path": ".agentdev/intake/promoted/2026-10-13-issue-create-labels-required.md"
+      },
+      {
+        "digest": "cddf497181ea283a9a14afa4018b3c7801d8125374d5f3e2cfae3ff5c7f4b3b1",
+        "label": "intake bun-test-regressions-ir055",
+        "path": ".agentdev/intake/promoted/2026-10-14-bun-test-existing-regressions-ir055.md"
+      },
+      {
+        "digest": "7121e5117bb155182f230728d72398a4e703fd5f3c2d987861b95fb67029ed45",
+        "label": "intake ir068-projection-manifest",
+        "path": ".agentdev/intake/promoted/2026-10-14-ir068-phase-skills-missing-projection-manifest.md"
+      },
+      {
+        "digest": "2dc26085f4abfdb484c06bfe3f1abe3fb93e2ee63c569e5ecc6b02d266381ae0",
+        "label": "intake prepare-definition-pr-type-errors",
+        "path": ".agentdev/intake/promoted/2026-10-14-prepare-definition-pr-type-errors.md"
+      },
+      {
+        "digest": "0874508407a1e17f011daca25716619cb8442ae289e530ecefc1de50bcb1d035",
+        "label": "intake req-frontmatter-freshness-exit1",
+        "path": ".agentdev/intake/promoted/2026-10-14-req-frontmatter-freshness-exit1.md"
+      },
+      {
+        "digest": "b585519207872306eece6a65ce887c390c7368f3ebcf5a9ed7cd7b36afff7fcb",
+        "label": "intake ir072-updated-stale-batch",
+        "path": ".agentdev/intake/promoted/2026-10-14-ir072-frontmatter-updated-stale-batch.md"
+      },
+      {
+        "digest": "ca0fa722a3b526b9aa571cdb1b47700a32b69581dd0155657c82a37a99629ea0",
+        "label": "intake lint-skills-budget-warning",
+        "path": ".agentdev/intake/promoted/2026-10-15-lint-skills-aggregate-budget-warning.md"
+      },
+      {
+        "digest": "6fcfdbafc30b95fc837df700ee9cd2f448773ca7282680faf129c39bb472d998",
+        "label": "inspect backlog-auto-design-prose-fixes",
+        "path": ".agentdev/inspect/promoted/finding-20261015-backlog-auto-design-prose-fixes.md"
+      },
+      {
+        "digest": "a5115b1ef98038248a7e1e524f15bc5a1400b186fb7792d6c4aa5f9d05a80ae2",
+        "label": "inspect runtime-package-boundary-prose-fixes",
+        "path": ".agentdev/inspect/promoted/finding-20261015-runtime-package-boundary-prose-fixes.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "cls-L1",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.64,
+        "挙動Design": 0.08,
+        "カタログDesign": 0,
+        "guide": 0.08,
+        "learning維持": 0.17,
+        "作業記録": 0.03,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "cls-L2",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.81,
+        "挙動Design": 0.11,
+        "カタログDesign": 0,
+        "guide": 0.01,
+        "learning維持": 0.06,
+        "作業記録": 0.01,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "cls-L3",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.72,
+        "挙動Design": 0.14,
+        "カタログDesign": 0,
+        "guide": 0,
+        "learning維持": 0.11,
+        "作業記録": 0.03,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "cls-L4",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.76,
+        "挙動Design": 0.15,
+        "カタログDesign": 0,
+        "guide": 0.01,
+        "learning維持": 0.07,
+        "作業記録": 0.01,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "cls-I1",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.43,
+        "挙動Design": 0.18,
+        "カタログDesign": 0.01,
+        "guide": 0.37,
+        "learning維持": 0,
+        "作業記録": 0.01,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "cls-I2",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.65,
+        "挙動Design": 0.31,
+        "カタログDesign": 0,
+        "guide": 0,
+        "learning維持": 0.01,
+        "作業記録": 0.02,
+        "対象外": 0.01
+      }
+    },
+    {
+      "questionId": "cls-I3",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.47,
+        "挙動Design": 0.44,
+        "カタログDesign": 0.01,
+        "guide": 0.06,
+        "learning維持": 0,
+        "作業記録": 0.01,
+        "対象外": 0.01
+      }
+    },
+    {
+      "questionId": "cls-I4",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.68,
+        "挙動Design": 0.1,
+        "カタログDesign": 0.01,
+        "guide": 0.01,
+        "learning維持": 0,
+        "作業記録": 0.11,
+        "対象外": 0.09
+      }
+    },
+    {
+      "questionId": "cls-I5",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.66,
+        "挙動Design": 0.24,
+        "カタログDesign": 0.05,
+        "guide": 0.01,
+        "learning維持": 0,
+        "作業記録": 0.02,
+        "対象外": 0.02
+      }
+    },
+    {
+      "questionId": "cls-I6",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.67,
+        "挙動Design": 0.25,
+        "カタログDesign": 0,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0.03,
+        "対象外": 0.05
+      }
+    },
+    {
+      "questionId": "cls-I7",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.88,
+        "挙動Design": 0.1,
+        "カタログDesign": 0,
+        "guide": 0.01,
+        "learning維持": 0,
+        "作業記録": 0.01,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "cls-I8",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.88,
+        "挙動Design": 0.04,
+        "カタログDesign": 0,
+        "guide": 0.05,
+        "learning維持": 0,
+        "作業記録": 0.02,
+        "対象外": 0.01
+      }
+    },
+    {
+      "questionId": "cls-I9",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.87,
+        "挙動Design": 0.06,
+        "カタログDesign": 0,
+        "guide": 0.06,
+        "learning維持": 0,
+        "作業記録": 0.01,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "cls-S1",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0,
+        "挙動Design": 0.99,
+        "カタログDesign": 0,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0.01
+      }
+    },
+    {
+      "questionId": "cls-S2",
+      "questionForm": "choice",
+      "value": "挙動Design",
+      "probabilityDistribution": {
+        "REQ": 0.02,
+        "挙動Design": 0.86,
+        "カタログDesign": 0,
+        "guide": 0.07,
+        "learning維持": 0,
+        "作業記録": 0.01,
+        "対象外": 0.04
+      }
+    }
+  ],
+  "confidence": 0.58,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "cls-L1",
+        "value": "REQ"
+      },
+      {
+        "questionId": "cls-L2",
+        "value": "REQ"
+      },
+      {
+        "questionId": "cls-L3",
+        "value": "REQ"
+      },
+      {
+        "questionId": "cls-L4",
+        "value": "REQ"
+      },
+      {
+        "questionId": "cls-I1",
+        "value": "REQ"
+      },
+      {
+        "questionId": "cls-I2",
+        "value": "REQ"
+      },
+      {
+        "questionId": "cls-I3",
+        "value": "REQ"
+      },
+      {
+        "questionId": "cls-I4",
+        "value": "REQ"
+      },
+      {
+        "questionId": "cls-I5",
+        "value": "REQ"
+      },
+      {
+        "questionId": "cls-I6",
+        "value": "REQ"
+      },
+      {
+        "questionId": "cls-I7",
+        "value": "REQ"
+      },
+      {
+        "questionId": "cls-I8",
+        "value": "REQ"
+      },
+      {
+        "questionId": "cls-I9",
+        "value": "REQ"
+      },
+      {
+        "questionId": "cls-S1",
+        "value": "挙動Design"
+      },
+      {
+        "questionId": "cls-S2",
+        "value": "挙動Design"
+      }
+    ]
+  }
+}

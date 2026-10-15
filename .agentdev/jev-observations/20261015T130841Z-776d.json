@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261015T130841Z-776d",
+  "workflow": "backlog-review",
+  "evaluationKind": "step3-depends-reorderability",
+  "subject": "Case #3725 backlog-auto stage 3 RU構成案14件のdepends_on並べ替え可能性検証（backlog-review STEP-3）",
+  "sourceRevision": "6704dcea122a95ad4e03656fc0b3f7c9f542b706",
+  "durationMs": 764,
+  "inputTokens": 1158,
+  "inputs": {
+    "requestDigest": "dc6e56beab3515d6284b50637b731a2e7a60d1da223e6e86aa5e35102a4a3dff",
+    "references": [
+      {
+        "digest": "4fc9f3a03b5069a4e6fc9d8a9e39ae876b7e8c47122f09d734586ea7f984d3ca",
+        "label": "learning overlap-warning-summary",
+        "path": ".agentdev/learning/promoted/existing-measure-update-overlap-warning-summary.md"
+      },
+      {
+        "digest": "0a251eb1221d90feb3878fb50eeb58f98e965057e2d29099eda3c57503ac9bdb",
+        "label": "intake overlap-summary-misreport",
+        "path": ".agentdev/intake/promoted/2026-10-13-case-ready-overlap-summary-misreport.md"
+      },
+      {
+        "digest": "0874508407a1e17f011daca25716619cb8442ae289e530ecefc1de50bcb1d035",
+        "label": "intake req-frontmatter-freshness-exit1",
+        "path": ".agentdev/intake/promoted/2026-10-14-req-frontmatter-freshness-exit1.md"
+      },
+      {
+        "digest": "b585519207872306eece6a65ce887c390c7368f3ebcf5a9ed7cd7b36afff7fcb",
+        "label": "intake ir072-updated-stale-batch",
+        "path": ".agentdev/intake/promoted/2026-10-14-ir072-frontmatter-updated-stale-batch.md"
+      },
+      {
+        "digest": "a5115b1ef98038248a7e1e524f15bc5a1400b186fb7792d6c4aa5f9d05a80ae2",
+        "label": "inspect runtime-package-boundary-prose-fixes",
+        "path": ".agentdev/inspect/promoted/finding-20261015-runtime-package-boundary-prose-fixes.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "dep-reorder",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.95,
+        "false": 0.050000000000000044
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "dep-reorder",
+        "value": true
+      }
+    ]
+  }
+}

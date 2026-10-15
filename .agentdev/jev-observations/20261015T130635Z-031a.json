@@ -1,0 +1,313 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261015T130635Z-031a",
+  "workflow": "backlog-review",
+  "evaluationKind": "step3-merge-split",
+  "subject": "Case #3725 backlog-auto stage 3 RU化対象15成果物の統合・分割判定（backlog-review STEP-3）",
+  "sourceRevision": "6704dcea122a95ad4e03656fc0b3f7c9f542b706",
+  "durationMs": 902,
+  "inputTokens": 3269,
+  "inputs": {
+    "requestDigest": "f5ba9bb821c8864cd23c888c2c580faeaa653d4db44b09736a2efca092f91046",
+    "references": [
+      {
+        "digest": "654c5e25814e8a74ecfd3fa92c9083108f4b49c3c32e951199abf69198f0327a",
+        "label": "learning req-count-prose-sync",
+        "path": ".agentdev/learning/promoted/existing-measure-update-req-count-prose-sync.md"
+      },
+      {
+        "digest": "ca6d351c67d3d21248a0257e613ca45668ac0aef9b373f3ae7715633e5b1f7df",
+        "label": "learning extension-rules-before-issue-write",
+        "path": ".agentdev/learning/promoted/existing-measure-update-extension-rules-before-issue-write.md"
+      },
+      {
+        "digest": "4fc9f3a03b5069a4e6fc9d8a9e39ae876b7e8c47122f09d734586ea7f984d3ca",
+        "label": "learning overlap-warning-summary",
+        "path": ".agentdev/learning/promoted/existing-measure-update-overlap-warning-summary.md"
+      },
+      {
+        "digest": "f05edc7c69ed882755cf68041c36a5ba59585968e86c33909f913105fb797e55",
+        "label": "learning traceability-target-ids",
+        "path": ".agentdev/learning/promoted/existing-measure-update-traceability-target-ids.md"
+      },
+      {
+        "digest": "848df02c2e118461ca9302eb1ca765cde66db9b50c92f869cc4e6d95b447fef0",
+        "label": "intake traceability-gate-new-req-row",
+        "path": ".agentdev/intake/promoted/2026-10-11-traceability-gate-new-req-row.md"
+      },
+      {
+        "digest": "0a251eb1221d90feb3878fb50eeb58f98e965057e2d29099eda3c57503ac9bdb",
+        "label": "intake overlap-summary-misreport",
+        "path": ".agentdev/intake/promoted/2026-10-13-case-ready-overlap-summary-misreport.md"
+      },
+      {
+        "digest": "7ef11bb346226ecbdddc3df9fbd78c08e572829a736892e5c59d8c60312de303",
+        "label": "intake issue-create-labels-required",
+        "path": ".agentdev/intake/promoted/2026-10-13-issue-create-labels-required.md"
+      },
+      {
+        "digest": "cddf497181ea283a9a14afa4018b3c7801d8125374d5f3e2cfae3ff5c7f4b3b1",
+        "label": "intake bun-test-regressions-ir055",
+        "path": ".agentdev/intake/promoted/2026-10-14-bun-test-existing-regressions-ir055.md"
+      },
+      {
+        "digest": "7121e5117bb155182f230728d72398a4e703fd5f3c2d987861b95fb67029ed45",
+        "label": "intake ir068-projection-manifest",
+        "path": ".agentdev/intake/promoted/2026-10-14-ir068-phase-skills-missing-projection-manifest.md"
+      },
+      {
+        "digest": "2dc26085f4abfdb484c06bfe3f1abe3fb93e2ee63c569e5ecc6b02d266381ae0",
+        "label": "intake prepare-definition-pr-type-errors",
+        "path": ".agentdev/intake/promoted/2026-10-14-prepare-definition-pr-type-errors.md"
+      },
+      {
+        "digest": "0874508407a1e17f011daca25716619cb8442ae289e530ecefc1de50bcb1d035",
+        "label": "intake req-frontmatter-freshness-exit1",
+        "path": ".agentdev/intake/promoted/2026-10-14-req-frontmatter-freshness-exit1.md"
+      },
+      {
+        "digest": "b585519207872306eece6a65ce887c390c7368f3ebcf5a9ed7cd7b36afff7fcb",
+        "label": "intake ir072-updated-stale-batch",
+        "path": ".agentdev/intake/promoted/2026-10-14-ir072-frontmatter-updated-stale-batch.md"
+      },
+      {
+        "digest": "ca0fa722a3b526b9aa571cdb1b47700a32b69581dd0155657c82a37a99629ea0",
+        "label": "intake lint-skills-budget-warning",
+        "path": ".agentdev/intake/promoted/2026-10-15-lint-skills-aggregate-budget-warning.md"
+      },
+      {
+        "digest": "6fcfdbafc30b95fc837df700ee9cd2f448773ca7282680faf129c39bb472d998",
+        "label": "inspect backlog-auto-design-prose-fixes",
+        "path": ".agentdev/inspect/promoted/finding-20261015-backlog-auto-design-prose-fixes.md"
+      },
+      {
+        "digest": "a5115b1ef98038248a7e1e524f15bc5a1400b186fb7792d6c4aa5f9d05a80ae2",
+        "label": "inspect runtime-package-boundary-prose-fixes",
+        "path": ".agentdev/inspect/promoted/finding-20261015-runtime-package-boundary-prose-fixes.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "mrg-L1",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0.07,
+        "分割": 0.05,
+        "1:1": 0.88
+      }
+    },
+    {
+      "questionId": "mrg-L2",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0.02,
+        "分割": 0.03,
+        "1:1": 0.95
+      }
+    },
+    {
+      "questionId": "mrg-L3",
+      "questionForm": "choice",
+      "value": "統合",
+      "probabilityDistribution": {
+        "統合": 0.97,
+        "分割": 0,
+        "1:1": 0.03
+      }
+    },
+    {
+      "questionId": "mrg-L4",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0.33,
+        "分割": 0.01,
+        "1:1": 0.66
+      }
+    },
+    {
+      "questionId": "mrg-I1",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0.33,
+        "分割": 0.01,
+        "1:1": 0.66
+      }
+    },
+    {
+      "questionId": "mrg-I2",
+      "questionForm": "choice",
+      "value": "統合",
+      "probabilityDistribution": {
+        "統合": 0.96,
+        "分割": 0,
+        "1:1": 0.04
+      }
+    },
+    {
+      "questionId": "mrg-I3",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0.06,
+        "分割": 0.02,
+        "1:1": 0.92
+      }
+    },
+    {
+      "questionId": "mrg-I4",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0.17,
+        "分割": 0.11,
+        "1:1": 0.72
+      }
+    },
+    {
+      "questionId": "mrg-I5",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0.12,
+        "分割": 0.01,
+        "1:1": 0.87
+      }
+    },
+    {
+      "questionId": "mrg-I6",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0.02,
+        "分割": 0.01,
+        "1:1": 0.97
+      }
+    },
+    {
+      "questionId": "mrg-I7",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0.02,
+        "分割": 0,
+        "1:1": 0.98
+      }
+    },
+    {
+      "questionId": "mrg-I8",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0.04,
+        "分割": 0.01,
+        "1:1": 0.95
+      }
+    },
+    {
+      "questionId": "mrg-I9",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0.05,
+        "分割": 0.03,
+        "1:1": 0.92
+      }
+    },
+    {
+      "questionId": "mrg-S1",
+      "questionForm": "choice",
+      "value": "統合",
+      "probabilityDistribution": {
+        "統合": 0.6,
+        "分割": 0.01,
+        "1:1": 0.39
+      }
+    },
+    {
+      "questionId": "mrg-S2",
+      "questionForm": "choice",
+      "value": "分割",
+      "probabilityDistribution": {
+        "統合": 0,
+        "分割": 0.97,
+        "1:1": 0.03
+      }
+    }
+  ],
+  "confidence": 0.82,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "mrg-L1",
+        "value": "1:1"
+      },
+      {
+        "questionId": "mrg-L2",
+        "value": "1:1"
+      },
+      {
+        "questionId": "mrg-L3",
+        "value": "統合"
+      },
+      {
+        "questionId": "mrg-L4",
+        "value": "1:1"
+      },
+      {
+        "questionId": "mrg-I1",
+        "value": "1:1"
+      },
+      {
+        "questionId": "mrg-I2",
+        "value": "統合"
+      },
+      {
+        "questionId": "mrg-I3",
+        "value": "1:1"
+      },
+      {
+        "questionId": "mrg-I4",
+        "value": "1:1"
+      },
+      {
+        "questionId": "mrg-I5",
+        "value": "1:1"
+      },
+      {
+        "questionId": "mrg-I6",
+        "value": "1:1"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "mrg-I7",
+        "value": "統合"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "mrg-I8",
+        "value": "統合"
+      },
+      {
+        "questionId": "mrg-I9",
+        "value": "1:1"
+      },
+      {
+        "differenceReason": "evaluation_input_defect",
+        "questionId": "mrg-S1",
+        "value": "1:1"
+      },
+      {
+        "questionId": "mrg-S2",
+        "value": "分割"
+      }
+    ]
+  }
+}

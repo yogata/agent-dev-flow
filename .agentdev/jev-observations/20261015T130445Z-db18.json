@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261015T130445Z-db18",
+  "workflow": "backlog-review",
+  "evaluationKind": "step2-knowledge-disposition",
+  "subject": "Case #3725 backlog-auto stage 3 docs/knowledge 処置候補判定（DS25）",
+  "sourceRevision": "6704dcea122a95ad4e03656fc0b3f7c9f542b706",
+  "durationMs": 284,
+  "inputTokens": 1364,
+  "inputs": {
+    "requestDigest": "18474d681113b5d68c6a6559d1c88c46df4793ec809f0e38b0af822890b8cf39",
+    "references": [
+      {
+        "digest": "d22aa59ea9bbf3960386914b12edf0872be0f603f2cc46afb71db7bcc3179d8d",
+        "label": "inspect case-close-release-support-candidate",
+        "path": ".agentdev/inspect/promoted/finding-20261015-case-close-release-support-candidate.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "know-ds25",
+      "questionForm": "choice",
+      "value": "保留",
+      "probabilityDistribution": {
+        "保存": 0.07,
+        "削除": 0,
+        "保留": 0.93
+      }
+    }
+  ],
+  "confidence": 0.89,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "know-ds25",
+        "value": "保留"
+      }
+    ]
+  }
+}
