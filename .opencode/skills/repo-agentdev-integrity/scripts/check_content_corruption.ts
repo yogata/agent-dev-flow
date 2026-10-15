@@ -1,4 +1,4 @@
-// ADF-COVERS(implementation): REQ-010-071, REQ-053-012
+// ADF-COVERS(implementation): REQ-010-071, REQ-010-083, REQ-053-012
 // check_content_corruption.ts
 //
 // Deterministic content corruption checker (REQ-010-071). Scans the bodies of
@@ -13,6 +13,8 @@
 //   - control-char:       C0/C1 control characters other than \t \n \r
 //   - invalid-unicode:    BOM, U+FFFD, noncharacters, PUA, zero-width chars
 //   - foreign-script:     unintended foreign-script characters (REQ-053-009)
+//   - known-corruption-literal: known mixed-in literal strings from incident
+//                         records (REQ-053-009, REQ-010-083)
 //   - stale-reference:    known-form residual references (retired paths,
 //                         legacy ADR-/REQ-0108- id forms)
 //
@@ -38,6 +40,7 @@ export type CorruptionRuleId =
   | "invalid-unicode"
   | "foreign-script"
   | "simplified-chinese"
+  | "known-corruption-literal"
   | "stale-reference";
 
 export interface CorruptionFinding {
@@ -67,6 +70,7 @@ const RULE_IDS: readonly CorruptionRuleId[] = [
   "invalid-unicode",
   "foreign-script",
   "simplified-chinese",
+  "known-corruption-literal",
   "stale-reference",
 ];
 
@@ -171,6 +175,12 @@ export const ALLOWED_USAGE: AllowedUsageEntry[] = [
     rationale:
       "stale-reference 検出カテゴリの説明が旧ナンバリング形式参照を実例として列挙し、IR-069 許容例と同一の旧ナンバリング引用を含む Design 記述（自己言及）",
   },
+  {
+    file: "docs/designs/integrity/content-corruption-checker.md",
+    rule_id: "known-corruption-literal",
+    rationale:
+      "既知混入形確定一致シグナル自体が混入形（卡out）を実例として列挙する Design 記述",
+  },
 ];
 
 function isAllowedUsage(file: string, ruleId: CorruptionRuleId): boolean {
@@ -226,6 +236,17 @@ const SIMPLIFIED_CHINESE_RE = new RegExp(
   `[${SIMPLIFIED_CHINESE_PAIRS.map((p) => p.simplified).join("")}]`,
   "g",
 );
+
+// ---------------------------------------------------------------------------
+// known-corruption-literal: fixed-match detection of literal strings observed
+// as real mixed-in corruption (content-corruption-checker Design
+// 「既知混入形の確定一致検出（known-corruption-literal）」). The literal
+// enumeration is owned by the Design section; the checker follows it and adds
+// no exclusion of its own. Fixed-match, so legitimate katakana words
+// (カード etc.) never match structurally.
+// ---------------------------------------------------------------------------
+
+const KNOWN_CORRUPTION_LITERALS: readonly string[] = ["卡out"];
 
 // ---------------------------------------------------------------------------
 // Line partitioning: frontmatter, fenced blocks, HTML comments
@@ -491,6 +512,24 @@ export function checkFile(fileRel: string, repoRoot: string): CorruptionFinding[
                   ? `Simplified-Chinese glyph U+${m[0].codePointAt(0)!.toString(16).toUpperCase().padStart(4, "0")} '${m[0]}' (Japanese glyph: '${SIMPLIFIED_CHINESE_PAIRS.find((p) => p.simplified === m[0])?.japanese ?? "?"}') (REQ-053-009).`
                   : `Foreign-script character U+${m[0].codePointAt(0)!.toString(16).toUpperCase().padStart(5, "0")} outside the Japanese/English corpus (REQ-053-009).`,
         });
+      }
+    }
+    // known-corruption-literal: fixed-match over the character plane. All
+    // occurrences of an enumerated literal are reported (same plane and
+    // frontmatter exemption as the other character-level rules).
+    if (!isAllowedUsage(fileRel, "known-corruption-literal")) {
+      for (const literal of KNOWN_CORRUPTION_LITERALS) {
+        let idx = lineText.indexOf(literal);
+        while (idx !== -1) {
+          findings.push({
+            rule_id: "known-corruption-literal",
+            file,
+            line: no,
+            matched: literal,
+            description: `Known corruption literal '${literal}' (fixed-match of an incident-record mixed-in string; enumeration owner: content-corruption-checker Design) (REQ-053-009, REQ-010-083).`,
+          });
+          idx = lineText.indexOf(literal, idx + literal.length);
+        }
       }
     }
   }

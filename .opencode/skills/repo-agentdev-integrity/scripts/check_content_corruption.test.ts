@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-010-071, REQ-053-012
+// ADF-COVERS(verification): REQ-010-071, REQ-010-083, REQ-053-012
 /**
  * Regression tests for check_content_corruption.ts (REQ-010-071).
  *
@@ -37,6 +37,7 @@ const ALL_RULE_IDS: readonly CorruptionRuleId[] = [
   "invalid-unicode",
   "foreign-script",
   "simplified-chinese",
+  "known-corruption-literal",
   "stale-reference",
 ];
 
@@ -150,6 +151,10 @@ describe("違反例（REQ-010-068 violation cases）", () => {
     {
       rule: "foreign-script",
       content: "# タイトル\n\n異言語 привет 混入。\n",
+    },
+    {
+      rule: "known-corruption-literal",
+      content: "# タイトル\n\n卡out という混入形が本文にある。\n",
     },
     {
       rule: "stale-reference",
@@ -488,5 +493,82 @@ describe("簡体字検出（simplified-chinese, RU-0144 signal, Case #3166 RA-00
     }
     const keys = new Set(ALLOWED_USAGE.map((e) => `${e.file}\t${e.rule_id}`));
     expect(keys.size).toBe(ALLOWED_USAGE.length);
+  });
+});
+
+describe("既知混入形の確定一致検出（known-corruption-literal, REQ-010-083）", () => {
+  const repoRoot = path.resolve(import.meta.dir, "..", "..", "..", "..");
+
+  test("detects the enumerated literal with its occurrences", () => {
+    withFixture(
+      { [SKILL]: "# タイトル\n\n卡out 形混入。もう一つ 卡out がある。\n" },
+      (root) => {
+        const findings = findingsOf(checkContentCorruption(root), "known-corruption-literal");
+        expect(findings.length).toBe(2);
+        expect(findings.every((f) => f.matched === "卡out")).toBe(true);
+        expect(findings[0].description).toContain("REQ-010-083");
+      },
+    );
+  });
+
+  test("does not flag legitimate katakana words (カード) or normal Japanese", () => {
+    withFixture(
+      { [SKILL]: "# タイトル\n\nカードを処理する。カードは正当な片仮名語で、全 findings が 0 である。\n" },
+      (root) => {
+        const report = checkContentCorruption(root);
+        expect(report.ok).toBe(true);
+        expect(report.findings).toEqual([]);
+      },
+    );
+  });
+
+  test("differentiation: a standalone 卡 (U+5361) is not covered by any existing detection plane (AG-015)", () => {
+    withFixture(
+      { [SKILL]: "# タイトル\n\n卡 字形単独の混入は既存平面で検出されない。\n" },
+      (root) => {
+        const report = checkContentCorruption(root);
+        expect(findingsOf(report, "foreign-script")).toEqual([]);
+        expect(findingsOf(report, "simplified-chinese")).toEqual([]);
+        expect(report.findings).toEqual([]);
+      },
+    );
+  });
+
+  test("frontmatter plane is exempt (character-plane parity)", () => {
+    withFixture(
+      { [SKILL]: "---\nname: 卡out fixture\n---\n\n# タイトル\n\n本文は正常。\n" },
+      (root) => {
+        expect(findingsOf(checkContentCorruption(root), "known-corruption-literal")).toEqual([]);
+      },
+    );
+  });
+
+  test("the Design self-citation allowance suppresses only the Design file", () => {
+    const entry = ALLOWED_USAGE.find(
+      (e) =>
+        e.file === "docs/designs/integrity/content-corruption-checker.md" &&
+        e.rule_id === "known-corruption-literal",
+    );
+    expect(entry).toBeDefined();
+    const rationaleOwnerLinePrefix =
+      "- docs/designs/integrity/content-corruption-checker.md × known-corruption-literal: ";
+    const designSectionPath = path.join(
+      repoRoot,
+      "docs",
+      "designs",
+      "integrity",
+      "content-corruption-checker.md",
+    );
+    const rationaleOwnerLine = fs
+      .readFileSync(designSectionPath, "utf-8")
+      .split(/\r?\n/)
+      .find((l) => l.startsWith(rationaleOwnerLinePrefix));
+    expect(rationaleOwnerLine).toBeDefined();
+    expect(entry!.rationale).toBe(rationaleOwnerLine!.slice(rationaleOwnerLinePrefix.length));
+    const designFileFindings = checkFile(
+      "docs/designs/integrity/content-corruption-checker.md",
+      repoRoot,
+    );
+    expect(designFileFindings.filter((f) => f.rule_id === "known-corruption-literal")).toEqual([]);
   });
 });
