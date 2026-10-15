@@ -28,7 +28,7 @@ canonical Definition との実変更を判定し、実変更がある場合の�
 
 STEP-4 の機械工程（専用 worktree 作成、Definition branch 作成、REQ 行編集、`generate_indexes`、明示パス指定 stage・commit、`check_integrity`、traceability check まで）は、工程別 script 1 回の呼び出しで実行する。後段 2 検査（`check_integrity`、traceability check）は commit 済み HEAD に対して実行する（frontmatter updated と git log author date の突合型検査は、未 commit 変更が含まれる working tree では構造的に不一致となるため）。実装は本スキル配下の `scripts/src/prepare_definition_pr.ts`。契約の正は case-open Design「機械工程の script 呼び出し契約」節である。
 
-1. 入力 JSON を組みて script を 1 回呼び出す: `bun ./src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts --input <input.json>`。入力 JSON には worktree root、Definition branch 名、base ref、Root Case 識別子、Definition 編集内容（対象パス・旧文・新文の完全一致一意指定）、品質ゲート実行仕様（generate_indexes / check_integrity / traceability check。省略は入力検証で拒否される）、明示パス指定 stage 対象、commit message を含める
+1. 入力 JSON を組みて script を 1 回呼び出す: `bun ./src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts --input <input.json>`。入力 JSON には worktree root、Definition branch 名、base ref、Root Case 識別子、Definition 編集内容（対象パス・旧文・新文の完全一致一意指定）、品質ゲート実行仕様（generate_indexes / check_integrity / traceability check。省略は入力検証で拒否される）、判定対象 REQ 集合（traceabilityReqIds。traceability check の gate 実行範囲 `--req` 指定と同一集合であることを前提とし、欠落・空・形式不正・`--req` との不整合は入力検証で拒否される）、明示パス指定 stage 対象、commit message を含める
 2. 報告 JSON を解釈する。報告は実行結果（工程別 step の成否）、差分（変更ファイル・HEAD）、警告、提案する Issue/PR 本文の4要素を持つ。終了コードは成功 0、要判断 2、失敗 1。script は処理を省略せず、失敗時は途中結果とともに非 0 で終了する。空の結果や既定値で成功扱いにしない
 3. 提案本文と報告内容の意味レビューはモデルが担当する。警告の重要度評価、実変更判定の確定、PR 作成の可否判断はモデルが行う
 4. 冪等再実行: script は既存 worktree を検出した場合は期待 branch 上のとき再利用し、別 branch のとき失敗を返す。再実行時は編集旧文の不在（適用済み）を失敗として報告するため、再実行前に報告 JSON と git 状態から適用済みの工程を確認し、不足分のみを入力 JSON に含める
