@@ -1,0 +1,13 @@
+{
+  "form": "local-issue",
+  "issueTracking": "local",
+  "releaseConditionAdoption": "project-own",
+  "releaseConditionScope": "active-targets-from-this-set-only",
+  "adoptedInitialVersionRule": "patch-from-formal-tag",
+  "releaseChannel": ["git-tag"],
+  "publishRoute": {
+    "gitTagPush": "local-only-or-noninteractive-git-auth",
+    "additionalArtifacts": "none"
+  },
+  "notes": "ローカルIssue適用プロジェクトの代表形態。リリース公開先はローカルリポジトリ完結の git タグであり、追加公開成果物は持たない。"
+}

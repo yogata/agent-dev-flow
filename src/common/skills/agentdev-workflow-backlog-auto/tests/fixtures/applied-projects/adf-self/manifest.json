@@ -1,0 +1,13 @@
+{
+  "form": "adf-self",
+  "issueTracking": "github",
+  "releaseConditionAdoption": "improvement-cycle-patch",
+  "releaseConditionScope": "active-targets-from-this-set-only",
+  "adoptedInitialVersionRule": null,
+  "releaseChannel": ["git-tag", "github-release"],
+  "publishRoute": {
+    "gitTagPush": "noninteractive-git-auth",
+    "additionalArtifacts": "prepare-then-approved-route"
+  },
+  "notes": "ADF本体の代表形態。改善サイクル・パッチ級のリリース条件適用（一式由来の活性対象に限定）を採用する。初期バージョン規則の採用は宣言しない（基準なし初期状態の停止検証に使用する）。"
+}

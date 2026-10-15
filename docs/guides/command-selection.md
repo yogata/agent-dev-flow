@@ -28,6 +28,7 @@
 | 検出事項を分類したい | `/agentdev/inspect-promote` | 採用済み成果物 |
 | 要件docから Root Case 確立〜マージまでを一括実行したい / 既存 Root Case Issue の番号、URL から再開したい | `/agentdev/case-auto` | マージ済み + クローズ済み |
 | backlog整理サイクル（検出→昇格→統合）を1回で実行したい | `/agentdev/backlog-auto` | 検出事項、採用済み成果物、`RU-*.md` |
+| backlog整理サイクルからパッチリリース作成までを一気通貫で接続実行したい | `/agentdev/backlog-auto`（一気通貫実行） | 一気通貫の実行結果報告（全体完了判定結果、リリース結果または保留理由） |
 
 ## 工程駆動実行（変更駆動経路と併存する別経路）
 
@@ -78,6 +79,6 @@ work_type（bugfix / feature / maintenance / docs_chore）による固定判定�
 - Intake / Learning パイプラインの詳細は [Intake / Learning / Backlog フロー](intake-learning-backlog-flow.md) を参照
 - 追跡Issue（`/agentdev/issue`）は Intake / Learning、Decision、RU とは別系統の課題管理である。詳細は [Intake / Learning / Backlog フロー](intake-learning-backlog-flow.md) の「追跡Issue（別系統）」節を参照
 - `/agentdev/case-auto` は標準実行コマンド。要求入口 2 つ（`/agentdev/req-define`、`/agentdev/backlog-auto`）から合流する標準経路（`/agentdev/req-define` → `/agentdev/case-auto`）を構成する
-- `/agentdev/backlog-auto` は backlog 整理サイクル（検出→昇格→統合）を1回で実行する backlog-driven の要求入口。整理結果は `/agentdev/req-define` → `/agentdev/case-auto` へ接続する
+- `/agentdev/backlog-auto` は backlog 整理サイクル（検出→昇格→統合）を1回で実行する backlog-driven の要求入口。承認確定した RU 一式がある場合、一気通貫実行として `/agentdev/req-define` → `/agentdev/case-auto` へ自動接続し、一式全体の完了判定とパッチリリース作成まで進める（利用者判断境界は維持。手動の `/agentdev/req-define` 起動も従来どおり利用可能）
 - inspect-docs、learning-promote、intake-promote、inspect-promote、backlog-review は単独実行できるコマンドである
 - 工程駆動実行の入口は上の「工程駆動実行（変更駆動経路と併存する別経路）」節の表である。変更駆動の実行に工程駆動の操作や遷移を前置しない

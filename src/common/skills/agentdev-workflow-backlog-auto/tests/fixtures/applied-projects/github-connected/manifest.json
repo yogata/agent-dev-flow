@@ -1,0 +1,13 @@
+{
+  "form": "github-connected",
+  "issueTracking": "github",
+  "releaseConditionAdoption": "project-own",
+  "releaseConditionScope": "active-targets-from-this-set-only",
+  "adoptedInitialVersionRule": "patch-from-formal-tag",
+  "releaseChannel": ["git-tag", "github-release"],
+  "publishRoute": {
+    "gitTagPush": "noninteractive-git-auth",
+    "additionalArtifacts": "prepare-then-approved-route"
+  },
+  "notes": "GitHub 接続型適用プロジェクトの代表形態。プロジェクト固有のリリース条件採用と初期バージョン規則（正式タグ基準のパッチ進行）を宣言する。"
+}

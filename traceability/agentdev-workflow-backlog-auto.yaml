@@ -2,8 +2,54 @@ component: agentdev-workflow-backlog-auto
 implementation:
   src/common/skills/agentdev-workflow-backlog-auto/references/stage-execution.md:
     - REQ-041-017
+    - REQ-114-006
   src/common/skills/agentdev-workflow-backlog-auto/references/fan-in-and-reporting.md:
     - REQ-041-017
+    - REQ-114-001
+    - REQ-114-012
+    - REQ-114-015
+  src/common/skills/agentdev-workflow-backlog-auto/references/end-to-end-execution.md:
+    - REQ-114-001
+    - REQ-114-002
+    - REQ-114-003
+    - REQ-114-004
+    - REQ-114-005
+    - REQ-114-006
+    - REQ-114-007
+    - REQ-114-008
+    - REQ-114-009
+    - REQ-114-010
+    - REQ-114-011
+    - REQ-114-012
+    - REQ-114-015
+  src/common/commands/agentdev/backlog-auto.md:
+    - REQ-114-001
+    - REQ-114-010
+    - REQ-114-011
+    - REQ-114-012
+    - REQ-114-014
+  src/common/skills/agentdev-workflow-backlog-auto/tests/fixtures/applied-projects/adf-self/manifest.json:
+    - REQ-114-013
+  src/common/skills/agentdev-workflow-backlog-auto/tests/fixtures/applied-projects/github-connected/manifest.json:
+    - REQ-114-013
+  src/common/skills/agentdev-workflow-backlog-auto/tests/fixtures/applied-projects/local-issue/manifest.json:
+    - REQ-114-013
 verification:
   src/common/skills/agentdev-workflow-backlog-auto/tests/serialization-queue-pins.test.ts:
     - REQ-041-017
+  src/common/skills/agentdev-workflow-backlog-auto/tests/end-to-end-contract.test.ts:
+    - REQ-114-001
+    - REQ-114-002
+    - REQ-114-003
+    - REQ-114-004
+    - REQ-114-005
+    - REQ-114-006
+    - REQ-114-007
+    - REQ-114-008
+    - REQ-114-009
+    - REQ-114-010
+    - REQ-114-011
+    - REQ-114-012
+    - REQ-114-013
+    - REQ-114-014
+    - REQ-114-015

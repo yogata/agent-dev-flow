@@ -99,6 +99,9 @@ Intake/Learning 両方の採用済み成果物を RU に統合する。
 `/agentdev/backlog-review` は分析と統合結果をユーザーに確認する（HITL）。
 承認後に直接 RU を生成する。
 
+生成された RU 一式は `/agentdev/backlog-auto` の一気通貫実行で req-define → case-auto へ自動接続され、一式全体の完了判定とパッチリリース作成まで進む（利用者判断境界は維持）。
+手動の `/agentdev/req-define` 起動も従来どおり利用可能である。
+
 ### RU の粒度
 
 - N:1（複数の採用済み成果物を 1 RU に統合）可能
