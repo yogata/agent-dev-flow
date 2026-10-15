@@ -448,11 +448,15 @@ baseline 系 durable state（baseline commit、baseline 期待値・許容リス
 5. fail 全件の由来分類: fail が 0 件、または全 fail に由来分類（変更由来 / pre-existing / 実行形態由来 / 不明）が付与され、由来不明が 0 件であり、実行形態由来と分類した fail については実行形態規律へ適合させて再実行した結果の採用が記録されていること
 6. baseline 基準の明示: 由来判定が remediation 開始前の baseline commit 基準で行われたことが記録されていること
 7. pre-existing fail の baseline 再現確認の記録: pre-existing と分類した fail がある場合、ワークツリー変更ゼロの baseline commit で同一テストを再実行した同一 fail 再現確認の記録が存在すること。baseline 再現確認は detached worktree による baseline 比較（`agentdev-git-worktree` worktree-operations「git stash 運用手順（一時退避）」の detached worktree 標準手順、stash を使わない）で実施したことが記録から確認できること。単独→フル再実行の証拠順序と同一環境件数比較の実施は「fail 由来分類」節の証跡手順に従う
-8. 終了コードの記録: 各分割実行の終了コードが記録されていること。記録する終了コードは検証コマンド自体の終了コードであり、表示用のパイプや後続処理の終了コードへの変換を行わない。非ゼロ終了・timeout 打ち切り・切断した実行結果を pass 証拠として扱わない
+8. 終了コードの記録: 各分割実行の終了コードが記録されていること。記録する終了コードは検証コマンド自体の終了コードであり、表示用のパイプや後続処理の終了コードへの変換を行わない。非ゼロ終了・timeout 打ち切り・切断した実行結果を pass 証拠として扱わない。この禁止は、由来分類記録を欠く生の実行結果単独を pass 証拠としない意味として適用する
 9. 実行ランナー版の記録: 実行した正規ランナーの版（bun のバージョン等）が記録されていること。必要な版境界（ランナー版変更後に該当する再検証）を判別できる情報とする
 10. 検査範囲の記録: 各分割実行の対象ディレクトリ（`./` prefix 付き指定）と実施範囲が記録されていること。worktree での分割③ 対象欠落（plugins 未伝播）等の環境差を含む実施範囲が記録から判別できること。検査範囲が欠落した実行結果を完全な合格証拠として扱わない
 
 いずれかの記録が欠落する場合、由来不明の fail が残存する場合、未登録の既知欠陥を合格の根拠にする場合は fail とする。
+
+#### bun test suite fail の既知欠陥登録様式（機械受理基準の記録一式）
+
+bun test suite の fail に対する既知欠陥の登録様式は、本節の機械受理基準の受理由件の記録一式（受理条件5の fail 全件の由来分類記録・受理条件7の pre-existing fail の baseline 再現確認記録・provenance・件数記録）とする。恒久台帳は新設せず、既存の PR 本文検証差分セクションが当該記録一式の登録として機能する。checker NG の provenance 付き NG baseline 登録（「QG-4 checker 実測手順」節）と bun test suite fail の登録様式は並列な既知欠陥登録経路であり、未登録の既知欠陥を合格の根拠にする結果の拒否は文言変更後も維持する。
 
 ## QG-4 checker 実測手順（merge 直前 HEAD・evidence 化・baseline 登録漏れ検査）
 

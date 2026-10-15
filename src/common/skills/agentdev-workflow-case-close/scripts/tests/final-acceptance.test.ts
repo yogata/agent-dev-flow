@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-032-031, REQ-032-032, REQ-032-033, REQ-032-034, REQ-032-035, REQ-032-036, REQ-032-037, REQ-032-038
+// ADF-COVERS(verification): REQ-032-031, REQ-032-032, REQ-032-033, REQ-032-034, REQ-032-035, REQ-032-036, REQ-032-037, REQ-032-038, REQ-032-039
 /**
  * Full-route regression for the case-close QG-4 per-completion-condition final
  * acceptance determination (REQ-032-031 ... REQ-032-038).
@@ -120,6 +120,26 @@ describe("実経路接続の参照関係", () => {
     expect(qg4Reference).toContain("### 12. 完了条件単位の最終評価と非循環証拠");
     expect(qg4Reference).toContain("scripts/src/final-acceptance.ts");
     expect(qg4Reference).toContain("evaluateFinalAcceptance");
+  });
+
+  test("QG-4 gate reference の機械受理基準が由来分類済み fail を含む受理経路と3つの拒否経路を規定する", () => {
+    // 受理条件8の解釈明確化: 非ゼロ終了等の pass 証拠禁止は由来分類記録を欠く
+    // 生の実行結果単独を指し、分類記録を完備した受理経路と混同しない。
+    expect(qg4Reference).toContain(
+      "この禁止は、由来分類記録を欠く生の実行結果単独を pass 証拠としない意味として適用する",
+    );
+    // bun test suite fail の既知欠陥登録様式は機械受理基準の記録一式であり、
+    // 恒久台帳は新設せず PR 本文検証差分が登録として機能する。
+    expect(qg4Reference).toContain(
+      "#### bun test suite fail の既知欠陥登録様式（機械受理基準の記録一式）",
+    );
+    expect(qg4Reference).toContain(
+      "恒久台帳は新設せず、既存の PR 本文検証差分セクションが当該記録一式の登録として機能する",
+    );
+    // 記録欠落・由来不明 fail の残存・未登録の既知欠陥の拒否は維持される。
+    expect(qg4Reference).toContain(
+      "いずれかの記録が欠落する場合、由来不明の fail が残存する場合、未登録の既知欠陥を合格の根拠にする場合は fail とする。",
+    );
   });
 
   test("case-close STEP-3 reference が証拠の追跡可能性保持を既存証拠チャネルで要求する", () => {
