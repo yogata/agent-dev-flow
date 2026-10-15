@@ -69,6 +69,7 @@ implementation:
     - REQ-061-045
     - REQ-061-046
     - REQ-061-050
+    - REQ-061-051
     - REQ-083-001
     - REQ-096-001
     - REQ-096-002
@@ -76,6 +77,7 @@ implementation:
   src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts:
     - REQ-061-049
     - REQ-061-050
+    - REQ-061-051
   src/common/skills/agentdev-workflow-case-ready/references/execution-contract.md:
     - REQ-017-021
     - REQ-017-022
@@ -131,6 +133,7 @@ verification:
   src/common/skills/agentdev-workflow-case-ready/scripts/tests/accept_definition_checks.test.ts:
     - REQ-061-049
     - REQ-061-050
+    - REQ-061-051
   src/common/skills/agentdev-workflow-case-ready/references/readiness-and-cleanup.md:
     - REQ-061-034
     - REQ-061-035

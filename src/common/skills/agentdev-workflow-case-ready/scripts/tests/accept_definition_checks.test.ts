@@ -75,7 +75,9 @@ function fakeRunner(overrides: {
       calls.push({ command: spec.command, args: spec.args, cwd: spec.cwd });
       const result: CommandResult = { exitCode: 0, stdout: "", stderr: "" };
       if (spec.command === "bun" && spec.args.includes("overlap-cross-dependencies")) {
-        result.stdout = JSON.stringify(overrides.overlapReport ?? { warnings: [] });
+        result.stdout = JSON.stringify(
+          overrides.overlapReport ?? { condition_a: { warnings: [] }, detection_unavailable: [] },
+        );
       }
       if (spec.command === "bun" && spec.args.includes("--req")) {
         result.stdout = traceabilityReportFromArgs(spec.args);
@@ -160,20 +162,41 @@ describe("受入検査 phase（忠実性・整合性・品質検査、overlap �
     expect(overlapCall?.cwd).toBe("C:/repo");
   });
 
-  test("detection_unavailable が空配列のとき summary は detection_unavailable=true を表示しない", () => {
-    const runner = fakeRunner({ overlapReport: { warnings: [], detection_unavailable: [] } });
+  test("detection_unavailable が空配列のとき summary は 0 件を表示する", () => {
+    const runner = fakeRunner({ overlapReport: { condition_a: { warnings: [] }, detection_unavailable: [] } });
     const report = runAcceptDefinitionChecks(acceptanceInput(), runner);
     const overlap = report.result.steps.find((s) => s.name === "overlap-cross-check");
     expect(overlap?.status).toBe("pass");
-    expect(overlap?.detail.summary).toBe("warnings=0 detection_unavailable=false");
+    expect(overlap?.detail.summary).toBe("warnings=0 detection_unavailable=0");
   });
 
-  test("detection_unavailable が1件以上の要素を持つとき summary は detection_unavailable=true を表示する", () => {
-    const runner = fakeRunner({ overlapReport: { warnings: [], detection_unavailable: ["engine-x"] } });
+  test("detection_unavailable が1件のとき summary は実件数を表示する", () => {
+    const runner = fakeRunner({
+      overlapReport: {
+        condition_a: { warnings: [] },
+        detection_unavailable: [{ source: "issue", ref: "#999", reason: "fetch failed" }],
+      },
+    });
     const report = runAcceptDefinitionChecks(acceptanceInput(), runner);
     const overlap = report.result.steps.find((s) => s.name === "overlap-cross-check");
     expect(overlap?.status).toBe("pass");
-    expect(overlap?.detail.summary).toBe("warnings=0 detection_unavailable=true");
+    expect(overlap?.detail.summary).toBe("warnings=0 detection_unavailable=1");
+  });
+
+  test("要約は engine 報告 JSON 契約の condition_a.warnings と detection_unavailable を実件数で反映する（TS-001）", () => {
+    const runner = fakeRunner({
+      overlapReport: {
+        condition_a: {
+          warnings: [{ path: "src/a.ts", cases: ["#101", "#102"] }],
+          count: 1,
+        },
+        detection_unavailable: [{ source: "issue", ref: "#999", reason: "fetch failed" }],
+      },
+    });
+    const report = runAcceptDefinitionChecks(acceptanceInput(), runner);
+    const overlap = report.result.steps.find((s) => s.name === "overlap-cross-check");
+    expect(overlap?.status).toBe("pass");
+    expect(overlap?.detail.summary).toBe("warnings=1 detection_unavailable=1");
   });
 
   test("AUTOGEN 再生成差分を検出した場合は警告とともに要判断を返す（復元を実施）", () => {
