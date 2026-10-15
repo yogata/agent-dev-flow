@@ -2,10 +2,11 @@
 title: agentdev-workflow-backlog-auto Design
 status: accepted
 created: 2026-08-17
-updated: 2026-10-03
+updated: 2026-10-15
 ---
 <!-- ADF-COVERS(implementation): REQ-041-003, REQ-041-004, REQ-041-005, REQ-041-006, REQ-041-009, REQ-041-010, REQ-041-011, REQ-041-012, REQ-041-013, REQ-041-014, REQ-041-015 -->
 <!-- ADF-COVERS(implementation): REQ-041-002, REQ-041-003, REQ-041-004, REQ-041-005, REQ-041-006, REQ-041-007, REQ-041-008, REQ-041-009, REQ-041-010, REQ-041-011, REQ-041-012, REQ-041-013, REQ-041-014, REQ-041-015, REQ-041-016 -->
+<!-- ADF-COVERS(design): REQ-114-001, REQ-114-002, REQ-114-003, REQ-114-004, REQ-114-005, REQ-114-006, REQ-114-007, REQ-114-008, REQ-114-009, REQ-114-010, REQ-114-011, REQ-114-012, REQ-114-013, REQ-114-014, REQ-114-015 -->
 
 # agentdev-workflow-backlog-auto Design
 
@@ -21,7 +22,7 @@ backlog-auto command の workflow 実装本体。
 
 ## 提供する判断、操作
 
-- orchestration stage 構成（stage 1: inspect-docs 単独直列実行、stage 2: 昇格3系統、stage 3: backlog-review）
+- orchestration stage 構成（stage 1: inspect-docs 単独直列実行、stage 2: 昇格3系統、stage 3: backlog-review、stage 4〜7: 一気通貫実行の接続）
 - 直列化契約（Git 同期、commit、push、共有成果物への競合書き込み、ユーザー対話の排他）
 - fan-in 判定（backlog-review 開始条件、部分停止時の独立系統継続）
 - resume 契約（子ワークフローの既存再開契約の利用、トップレベル進行状態の管理）
@@ -38,6 +39,10 @@ backlog-auto command の workflow 実装本体。
 - stage 1: inspect-docs（単独、直列実行）
 - stage 2: 昇格3系統（learning-promote、intake-promote、inspect-promote。安全に並行可能な処理は並行実行、Git 操作、共有成果物への競合書き込み、ユーザー対話は直列化）
 - stage 3: backlog-review（stage 2 全系統の正常完了または対象なし終了後に開始）
+- stage 4: 要件定義接続（単一 req-define 実行、入力は一式 RU の明示列挙、単一要件doc 確定）
+- stage 5: 実行接続（要件doc 明示指定の単一 case-auto 実行）
+- stage 6: 全体完了判定（set-state 義務スナップショットと要件定義・実行対象・検証結果の突合）
+- stage 7: リリース（基準点再確認、版番導出、タグ付与、追加公開物準備、結果記録）
 
 ### 直列化契約
 
@@ -69,6 +74,36 @@ backlog-auto command の workflow 実装本体。
 - 各工程は子ワークフローの既存再開契約（durable state、STEP model）を利用する
 - トップレベルの進行状態は既存 STEP model / durable state 契約に従い管理する
 - inspect-docs は STEP model 対象外（中断時は先頭から再実行）
+
+### set-state 永続化形式
+
+- 一式識別子、必須要求と受け入れ義務のスナップショット、RU・要件doc・operation_unit・実行単位の対応表（統合・分割を含む）、基準点情報（最後の正式リリース、開始コミット ID）、進捗、リリース状態（未着手／保留理由／完了）を記録する
+- 配置は `.agentdev/` 配下で req-units/drafts の外（REQ-034-020 ゲート対象外）とし、全体完了とリリース完了まで保持する
+
+### 単一書き手規則
+
+- set-state への書込みは同一 backlog-auto 実行に限定し、backlog-auto の二重起動に対しては既存の single-flight 保護に準じて排除する
+
+### 基準点確認手続
+
+- 正式 SemVer タグの列挙、リリース対象コミットの祖先到達判定、最大版算出（SemVer 順序比較）、到達可能 0 件・基準なしの場合の停止と利用者判断要求、開始コミット ID の記録を含む
+
+### 全体完了突合手続
+
+- set-state の義務スナップショットと、要件doc の review_dispositions・Issue 完了条件・検証証跡との突合により、過不足なく対応し必要な検証結果が成立していることを確認する
+- Issue 数・PR merge 状態のみで完了判定しない
+
+### リリース手順シーケンスと再開経路
+
+- リリース時点の正式タグ再確認、版番導出、対象コミット確定（一式の全マージ完遂時点の main HEAD）と無関係コミット混入検知（開始コミット..対象コミットの差分と一式分実変更の突合）、タグ作成、（採用方式があれば）追加公開物、結果記録の順
+- 各段階の中断・失敗時は既存結果の読み戻しにより未完了段階から再開する（タグ不移動・再作成なし・第二番号なし）
+- backlog-auto 再実行は set-state から完遂済み Case を検出し全体完了判定以降から再開する
+- 停止報告には case-auto 単独の再開入口（REQ-034-038）に加えて一式再開経路（backlog-auto 再実行）を併記する
+
+### 委譲
+
+- 子ワークフロー（req-define、case-auto、整理サイクル各コマンド）への委譲は既存の委譲契約に従う
+- 公開操作のうち Custom Tool カタログに含まれない操作はワークフローが準備までを行い、実行は承認後の所定経路とする
 
 ### 実装分類
 
