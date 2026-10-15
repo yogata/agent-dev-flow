@@ -6409,6 +6409,7 @@ function buildIr072Fixture(root: string): void {
   );
 
   ir072Git(root, ["init"]);
+  writeFileSync(join(root, ".gitattributes"), "* text=auto eol=lf\n", "utf-8");
   ir072Git(root, ["config", "user.name", "ir072-fixture"]);
   ir072Git(root, ["config", "user.email", "ir072-fixture@example.invalid"]);
   ir072CommitAll(root, "ir072 fixture commit 1", "2025-01-15T10:00:00+09:00");

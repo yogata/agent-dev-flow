@@ -354,6 +354,7 @@ describe("deriveReqMetricsMeasureDate", () => {
       recursive: true,
     });
     execSync("git init -q -b main", { cwd: root });
+    fs.writeFileSync(path.join(root, ".gitattributes"), "* text=auto eol=lf\n", "utf-8");
     execSync('git config user.email "t@t"', { cwd: root });
     execSync('git config user.name "t"', { cwd: root });
 
