@@ -446,7 +446,8 @@ export function runAcceptDefinitionChecks(
         try {
           // 要約は engine 報告 JSON 契約（CrossDependencyInspectionReport）に従う。
           // warnings は condition_a 配下の構造化警告結果であり、報告に存在しない
-          // top-level warnings を参照しない（REQ-061-051）。
+          // top-level warnings を参照しない。対応要件行は repository top-level の
+          // traceability sidecar（agentdev-workflow-case-ready.yaml）を正とする。
           const parsed = JSON.parse(overlap.stdout) as {
             condition_a?: { warnings?: unknown };
             detection_unavailable?: unknown;
