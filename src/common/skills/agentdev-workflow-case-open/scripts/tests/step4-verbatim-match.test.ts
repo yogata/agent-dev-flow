@@ -38,4 +38,12 @@ describe("STEP-4 verbatim 包含突合手順の規定", () => {
     expect(step4).toContain("冪等再実行手順を維持する");
     expect(step4).toContain("欠落を再適用する場合は DefinitionEdit の旧文完全一致契約に従う");
   });
+
+  test("docs/README.md 手動管理区間の件数照合手順が規定されている", () => {
+    expect(step4).toContain("docs/README.md 手動管理区間の件数照合");
+    expect(step4).toContain("初回の変更・検証範囲に含める");
+    expect(step4).toContain("機械検索で突合し");
+    expect(step4).toContain("明示パス指定補正 commit");
+    expect(step4).toContain("件数不一致の残存を成功扱いにしない");
+  });
 });
