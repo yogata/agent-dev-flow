@@ -168,15 +168,6 @@
     {
       "category": "Decision",
       "check": "accepted-adr-only-citation",
-      "file": "docs/designs/commands/backlog-auto.md",
-      "evidence": "DEC-059",
-      "count": 1,
-      "provenance": "proposed-decision-citation",
-      "reason": "proposed-decision-citation: proposed Decision DEC-059 を根拠として引用する意図的な記述。case-open は Decision を proposed で保存し、case-ready の受理評価（REQ-061-021）で accepted 昇格するまでの承認（Case #3725）"
-    },
-    {
-      "category": "Decision",
-      "check": "accepted-adr-only-citation",
       "file": "docs/designs/commands/case-auto.md",
       "evidence": "DEC-015",
       "count": 1,
@@ -272,15 +263,6 @@
       "count": 1,
       "provenance": "proposed-decision-citation",
       "reason": "proposed-decision-citation: proposed Decision DEC-008 を根拠として引用する意図的な記述。Decision の accepted 昇格または SPEC 再構成（OU-009）で解消するまでの承認（Issue #2136 NG21 外 warning 分類）"
-    },
-    {
-      "category": "Decision",
-      "check": "accepted-adr-only-citation",
-      "file": "docs/requirements/REQ-114.md",
-      "evidence": "DEC-059",
-      "count": 1,
-      "provenance": "proposed-decision-citation",
-      "reason": "proposed-decision-citation: proposed Decision DEC-059 を根拠として引用する意図的な記述。case-open は Decision を proposed で保存し、case-ready の受理評価（REQ-061-021）で accepted 昇格するまでの承認（Case #3725）"
     },
     {
       "category": "IndexGenerationConsistency",
