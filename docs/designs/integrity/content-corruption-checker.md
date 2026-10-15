@@ -5,7 +5,7 @@ created: "2026-08-30"
 updated: "2026-10-16"
 ---
 
-<!-- ADF-COVERS(design): REQ-010-071, REQ-053-012 -->
+<!-- ADF-COVERS(design): REQ-010-071, REQ-010-083, REQ-053-012 -->
 
 # 決定的破損検査クラス
 

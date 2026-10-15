@@ -2,13 +2,13 @@
 title: 整合性契約
 status: accepted
 created: 2026-08-20
-updated: 2026-10-09
+updated: 2026-10-16
 ---
 <!-- ADF-COVERS(implementation): REQ-010-006 -->
 <!-- ADF-COVERS(implementation): REQ-036-022 -->
 <!-- ADF-COVERS(implementation): REQ-007-010 -->
 <!-- ADF-COVERS(implementation): REQ-099-020 -->
-<!-- ADF-COVERS(design): REQ-010-080 -->
+<!-- ADF-COVERS(design): REQ-010-080, REQ-010-081 -->
 
 # 整合性契約
 
@@ -269,6 +269,10 @@ DEC-001 決定4 の7条件:
 新規 IR 登録時に `integrity-rule-catalog.md`「新規カテゴリ追加判定フロー（REQ-010-005）」へ従い gate を実施する。
 catalog エントリ追加前に (a) を、blocking IR の場合は (b) も確認する。
 gate 不合格の場合は新規 IR 登録を取り下げ、retired REQ-028-013「IR 件数削減数で評価しない」に従い別途 backlog → RU → req-define → case-open → case-ready 経路で提起する。
+
+### frontmatter updated 鮮度債務の検出時運用（REQ-010-081）
+
+frontmatter `updated` 鮮度債務（req-updated-freshness、req-range-staleness、IR-072）の検出時は、是正を実施単位・タイミングの運用判断に従って扱う。検出時都度の是正チケット扱いを既定とし、REQ 操作を伴わない Case での鮮度違反は自 Case 起因分離証明を要する一括是正候補として check_integrity 補正 commit の標準 contingency に位置づける。鮮度検査の緩和・迂回と updated の乖離恒久化は行わない。
 
 ## 一時移行検査 registry（retired REQ-028-006 から移管）
 
