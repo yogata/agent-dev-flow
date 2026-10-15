@@ -190,6 +190,7 @@ describe("agentdev-textlint-guard distribution / consumer install (TS-005 / TS-0
         execFileSync("git", ["config", "user.name", "t"], { cwd: root });
         if (gitCloneStyle) {
           const plugin = path.join(root, ".agentdev-plugin");
+          fs.writeFileSync(path.join(plugin, ".gitattributes"), "* text=auto eol=lf\n", "utf-8");
           execFileSync("git", ["init", "-q", "-b", "main"], { cwd: plugin });
           execFileSync("git", ["config", "user.email", "t@t"], { cwd: plugin });
           execFileSync("git", ["config", "user.name", "t"], { cwd: plugin });
