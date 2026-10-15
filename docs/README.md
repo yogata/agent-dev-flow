@@ -22,10 +22,10 @@ accepted な v5 基盤と v5.1 の正規文書への導線は次のとおりで�
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 71件、廃止済み: 19件
+現行 REQ: 72件、廃止済み: 19件
 <!-- AUTOGEN:END -->
 
-現行要件は71件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
+現行要件は72件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
 REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）による意図的予約欠番であり、実体は存在しない（[採番管理](designs/foundations/numbering-policy.md) 参照）。
 REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却枠であり、意図的予約欠番として維持する。
 REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全 revert）由来の廃止識別子であり、再利用しない。次の新規 REQ 番号は採番時点で REQ 実ファイル一覧と既知欠番レジストリから決定的採番スクリプト（alloc-req-number.ts）により決定する（[採番管理](designs/foundations/numbering-policy.md) 参照）。
@@ -105,6 +105,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [REQ-111](requirements/REQ-111.md) | ADF v5.1 工程遷移・独立レビューと変更駆動併存 |
 | [REQ-112](requirements/REQ-112.md) | local package tsconfig 二重管理統合・typecheck gate 組込みの方針決定 |
 | [REQ-113](requirements/REQ-113.md) | local package tsconfig 統合・typecheck 組込みの実装 |
+| [REQ-114](requirements/REQ-114.md) | backlog-auto 一気通貫実行とパッチリリース実行契約 |
 <!-- AUTOGEN:END -->
 
 - [要件インデックス](requirements/README.md)
@@ -173,6 +174,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-056](decisions/DEC-056.md) | ADF v5 移行と互換性の境界（後方互換非必須・意味保存移行・未処理改善情報の継続） |
 | [DEC-057](decisions/DEC-057.md) | 工程駆動コラボレーションモデル（検討テーマ・外部検討・段階形成）の採用 |
 | [DEC-058](decisions/DEC-058.md) | 工程遷移と双経路併存モデルの採用（REQ-005-001/010/011 改訂を含む） |
+| [DEC-059](decisions/DEC-059.md) | backlog-auto 一気通貫実行のパッチリリース規則 |
 <!-- AUTOGEN:END -->
 
 ## 設計（Design）
