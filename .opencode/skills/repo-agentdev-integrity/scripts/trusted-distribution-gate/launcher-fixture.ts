@@ -84,6 +84,7 @@ function listTrustRootModules(): string[] {
  */
 export function makeFixtureRepo(): string {
   const repo = makeTmpDir("trust-test-repo-");
+  writeFix(repo, ".gitattributes", "* text=auto eol=lf\n");
   execFileSync("git", ["init", "-q", "-b", "main"], { cwd: repo });
   execFileSync("git", ["config", "user.email", "t@t"], { cwd: repo });
   execFileSync("git", ["config", "user.name", "t"], { cwd: repo });
