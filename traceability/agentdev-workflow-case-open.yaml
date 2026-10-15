@@ -12,6 +12,8 @@ design:
     - REQ-030-025
     - REQ-030-026
     - REQ-030-027
+    - REQ-030-028
+    - REQ-030-029
     - REQ-083-002
     - REQ-083-003
 implementation:

@@ -2,7 +2,7 @@
 title: checker 実行契約と検出基盤規則
 status: accepted
 created: 2026-08-15
-updated: 2026-10-11
+updated: 2026-10-16
 ---
 <!-- ADF-COVERS(implementation): REQ-002-035 -->
 <!-- ADF-COVERS(implementation): REQ-010-062 -->
@@ -12,7 +12,7 @@ updated: 2026-10-11
 <!-- ADF-COVERS(design): REQ-061-037 -->
 <!-- ADF-COVERS(implementation): REQ-060-006 -->
 <!-- ADF-COVERS(design): REQ-007-016, REQ-060-001, REQ-060-002, REQ-060-003, REQ-060-007 -->
-<!-- ADF-COVERS(design): REQ-010-078, REQ-010-079 -->
+<!-- ADF-COVERS(design): REQ-010-078, REQ-010-079, REQ-010-082 -->
 <!-- ADF-COVERS(implementation): REQ-010-078, REQ-010-079 -->
 
 # checker 実行契約と検出基盤規則
@@ -163,6 +163,7 @@ IR-055 warning 総数 ratchet（ir-055-baseline.json の warning_total_cap 比�
 - warning 総数が warning_total_cap を超過した場合は、明細再取得（check_integrity.ts 実行による実測）で起因を特定してから処置する。起因の分類は true positive（当該箇所の是正）と baseline-known（provenance 付き baseline または恒久免除レジストリ baselines/exemptions.json への追加）の2系統とする
 - warning_total_cap の引上げは --raise-warning-cap 明示フラグ経由のみ許容する。無条件の cap 引上げを禁止する。baseline 値（entries の count）は check_integrity.ts 実行の実測値に更新し、cap 値を実測に併せ替えない
 - baseline エントリおよび恒久免除レジストリへの追加は、provenance（起因の由来、正当化の参照先 rationale_ref、適用日）付きでのみ許容する。無条件 baseline 追加を禁止する
+- checker 出力（lint_skills 等を含む）は、検証不通過（NG）と傾向管理（warning）を summary で区別して報告する（REQ-010-082）。warning 存在時の運用（集約予算の漸進回収、git 管理外ローカルユーザースキルの環境差記録）は warning の無視・抑制による隠蔽を行わず、運用方針として確定して運用する
 
 ## 対象外
 
