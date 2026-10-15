@@ -150,6 +150,7 @@ function buildMinimalFixture(root: string): void {
 // Initialize the fixture as a git repository so --base-ref HEAD produces an
 // empty diff. Required by the "empty base-ref diff -> WARNING" regression.
 function initGitFixture(root: string): void {
+  writeFileSync(join(root, ".gitattributes"), "* text=auto eol=lf\n", "utf-8");
   execSync("git init -q", { cwd: root });
   execSync('git config user.email "test@example.com"', { cwd: root });
   execSync('git config user.name "test"', { cwd: root });
@@ -718,6 +719,7 @@ describe("Issue #2349 TS-004: Design status 2値 (REQ-001-025)", () => {
 // SPEC targeted-docs-guard-implementation.md「full_docs_check_recommended 条件」節。
 
 function setupGitFixture(root: string): string {
+  writeFileSync(join(root, ".gitattributes"), "* text=auto eol=lf\n", "utf-8");
   execSync("git init -q", { cwd: root });
   execSync('git config user.email "test@example.com"', { cwd: root });
   execSync('git config user.name "test"', { cwd: root });
