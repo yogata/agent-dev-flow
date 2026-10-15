@@ -608,3 +608,35 @@
 - **想定反映先**: worktree-environment-fail-classification 知識文書の実例追記候補。learning-promote での判断
 - **関連**: Case #3719、PR #3721 本文 learning 1 件目、docs/knowledge/worktree-environment-fail-classification.md、Case #3718 の timeout 追加前例
 - **タグ**: `#bun-test` `#worktree` `#timeout` `#由来分離`
+
+## bun test 分割実行の件数突合は node_modules 除外の実在テストファイル数で行う（node_modules 含みの数え上げで分割①②の件数申告混同が発生）
+
+- **問題事象**: Case #3722（DEL-3722-1）の前委譲 SSoT が「分割①: 2909 pass」と申告したが、実測では 2909 は分割②（repo-agentdev-integrity scripts）の件数で、分割①（src/common/skills）は 596 pass / 42 files だった。件数突合の乖離として検証差分に記録された
+- **発生局面**: case-run 実装（SSoT 記録・件数突合）
+- **検知方法**: DEL-3722-2 の再実行で分割①の件数突合をやり直した際、申告件数と実測件数の乖離を検出
+- **根本原因**: `find src/common/skills -name "*.test.ts"` が scripts package 配下 node_modules 内の重複テストファイルを含んで数えた（210 件）。実在テストファイルは node_modules 除外で 42 件
+- **自律対応内容**: 実測で分割① 596 pass / 42 files・分割② 2909 pass を再取得し、件数突合を node_modules 除外の実ファイル数（42 件と全数一致）でやり直し、前委譲の合格申告を撤回・訂正した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: bun test 分割実行の件数突合全般（QG-4 機械受理基準10項目の「件数突合の記録」）
+- **再発条件**: テストファイル数の数え上げを node_modules を含むパス探索で行い、件数突合に使用した場合
+- **予防策候補**: bun test 正規形の件数突合手順に「テストファイル数の数え上げは node_modules 除外の実在テストファイル数で行う」を明記。learning-promote での判断
+- **想定反映先**: agentdev-quality-gates の QG-4 件数突合手順（references/qg-4-final-acceptance.md）。learning-promote での判断
+- **関連**: Case #3722、PR #3724 本文 learning 1 件目、Issue コメント 6181896538（前委譲 SSoT 撤回）
+- **タグ**: `#bun-test` `#件数突合` `#node-modules` `#ssot`
+
+## LSP 診断の 3000ms タイムアウト時は tsc --noEmit（package tsconfig・strict）が同等の静的検査として機能する
+
+- **問題事象**: 本リポジトリの大規模 TS ファイル（close_mechanical_steps.ts・close_mechanical_steps.test.ts 等）で lsp_diagnostics が 3000ms タイムアウトし、DEL-3722-1・DEL-3722-2 の 2 委譲連続で同一事象が発生した
+- **発生局面**: case-run 実装の静的検査
+- **検知方法**: lsp_diagnostics のタイムアウト応答（各委譲で 2 回試行・2 委譲で再現）
+- **根本原因**: 大規模 TS ファイルへの LSP 初期化・解析が 3000ms のタイムアウト内に収まらない
+- **自律対応内容**: tsc --noEmit（package tsconfig・strict・noUnusedLocals・src+tests 含む）を代替の静的検査として実行し、本変更由来エラー 0 件を確認した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: LSP 診断を品質 gate に組み込む工程全般（case-run 静的検査）
+- **再発条件**: 大規模 TS ファイルを lsp_diagnostics で検査した場合
+- **予防策候補**: LSP タイムアウト時の代替手段（tsc --noEmit・package tsconfig 基準）と記録要領を静的検査手順へ明記。learning-promote での判断
+- **想定反映先**: case-run 静的検証手順、LSP 運用関連知識候補。learning-promote での判断
+- **関連**: Case #3722、PR #3724 本文 learning 2 件目、PR #3724 品質メトリクス表 LSP 診断行
+- **タグ**: `#lsp` `#tsc` `#静的検査` `#タイムアウト`
