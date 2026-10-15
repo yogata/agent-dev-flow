@@ -24,6 +24,10 @@ canonical Definition との実変更を判定し、実変更がある場合の�
 
 ### STEP-4: 実変更判定と設計PR作成
 
+#### extension rules の前置読込（最初の書込みより前）
+
+設計PR作成に伴う最初の docs 編集・PR 本文作成・GitHub 書込みに先立って、project extension（`.agentdev/extensions/skills/agentdev-workflow-case-open.yaml`）の rules を解決する（不在・破損時は `agentdev-project-extensions` の契約に従い標準動作を継続する）。rules が要求する前処理（yomiyasu rule に基づく推敲・lint 等）は各 rule の when 条件に従い、本 STEP 以降の最初の該当書込みの前に適用済みとする。rules の解決を最初の書込みの後段に配置し、投稿後の遡及適用になる配置順序違反を発生させない。投稿後の検査（配布依存境界 checker、integrity 検査等）を前置規律の代替にしない。STEP-2 で rules を解決済みの再実行でも、書込み対象が変わった場合は再解決する。
+
 #### 機械工程の script 呼び出し（prepare_definition_pr）
 
 STEP-4 の機械工程（専用 worktree 作成、Definition branch 作成、REQ 行編集、`generate_indexes`、明示パス指定 stage・commit、`check_integrity`、traceability check まで）は、工程別 script 1 回の呼び出しで実行する。後段 2 検査（`check_integrity`、traceability check）は commit 済み HEAD に対して実行する（frontmatter updated と git log author date の突合型検査は、未 commit 変更が含まれる working tree では構造的に不一致となるため）。実装は本スキル配下の `scripts/src/prepare_definition_pr.ts`。契約の正は case-open Design「機械工程の script 呼び出し契約」節である。

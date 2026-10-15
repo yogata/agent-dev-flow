@@ -47,6 +47,7 @@ implementation:
     - REQ-030-026
     - REQ-030-027
     - REQ-061-046
+    - REQ-017-024
   src/common/skills/agentdev-workflow-case-open/references/root-case-and-definition-package.md:
     - REQ-030-015
     - REQ-030-017
