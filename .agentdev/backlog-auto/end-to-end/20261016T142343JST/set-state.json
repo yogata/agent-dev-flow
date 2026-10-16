@@ -168,10 +168,20 @@
     "stage4_要件定義": "完了(単一req-define実行 2026-10-16T15:00頃-15:40頃 HITL停止→回答→resume完了。要件doc .agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md 554行 auto_ready:true・work_type:docs_chore・scale:large・AG9/ACT6/CR3/OU9/TS9/RA8/RD9。壁打ちHITL質問5件 2026-10-16 利用者回答確定: Q1=方向B(DEC-059文言明確化・決定内容不変・Q1=B回答を明示承認記録とする), Q2=両方(case-run委譲契約+learning-capture baseline明記), Q3=両方(script改善+回帰テスト/STEP-5-2保全確認明記), Q4=統合維持(9RU→9OU 1:1), Q5=Epicなし・OU単位Issue並列(REQ-114-004準拠)。要件doc分割なし=再スコープなし。adversarial-review 収束・Jev観測 20261016T055056Z-2396(finalResult 4問全true))",
     "stage5_実行": "完了(単一case-auto 2026-10-16T15:00-16:25 HITL停止なし。Root Case #3758・Definition PR #3759 squash merge 112eca7f・draft+RU削除 ff37fd45・子Issue 9件 #3760-3768〔Epicなし・全Wave-1〕全完了: PR merge 7件〔#3769 e373d178/#3770 67393213/#3771 9780b138/#3772 b073d550+fix #3775 273c1510/#3773 080c6f52/#3774 a11be32a〕+ verify-only closure 3件〔#3762/#3764/#3765 SSoTコメント〕・case-close QG-4全[x]・Capture b8781d08。実行主体メモ: 本ハーネスに実行委譲サブエージェント起動API不在のため委譲工程をインライン自己適用〔前回runと同一機序・4状態result/3点ゲート/worktree隔離/PR証跡は準用〕、直列実行の事実はlearning inboxへCapture済み)",
     "stage6_全体完了判定": "完了(2026-10-16 親による突合。義務スナップショット9RU×対応表×検証証跡の突合: 証跡 .agentdev/backlog-auto/end-to-end/20261016T142343JST/evidence/ で8ゲート全exit0〔bun test 3分割 4318pass/0fail・check_integrity exit0 NG0・traceability pass/fail=11/0 missing-design/implementation/verification全pass findings空・配布依存境界 failures0・textlint exit0・targeted exit0〕。親の現物スポット検証: RU-0001 delegation-and-result.md回収手順条項実在・RU-0002/0003 traceability missing全解消・RU-0003 RQ17 REQ-114-014括弧内要約REQ-039-001準拠是正実在・RU-0004 learning-capture SKILL.md baseline明記条項+Design条項実在・RU-0005 DEC-059文言明確化・規則内容不変・RU-0006 16./17.連番解消・RU-0007 2段分離試験+判定基準実在・RU-0008 applySection末尾境界改善+回帰テスト実在(24test)・RU-0009 STEP-4-6 merge後重複行実検査明記。義務の過不足なし・検証成立→全体完遂と判定)",
-    "stage7_リリース": "未着手"
+    "stage7_リリース": "完了(2026-10-16。基準点再確認→版番号 v5.1.2〔パッチ+1〕→対象コミット fbfddce8 確定・混入検知2件〔前Case #3725由来〕利用者承認で包含→lightweight タグ作成・origin main push(b8781d08..fbfddce8)・タグ push 完了〔local/remote 同一 hash 実測・タグ不移動〕→リリースノート草稿準備→GitHub Release は公開権限確認後の所定経路〔未公開〕)"
   },
   "リリース状態": {
-    "状態": "未"
+    "状態": "リリース済み",
+    "版番号": "5.1.2",
+    "タグ名": "v5.1.2",
+    "タグ対象コミット": "fbfddce84f4622495ceae92ba0fa310c2232ef62",
+    "タグ形式": "lightweight",
+    "push": "完了(origin refs/tags/v5.1.2 = fbfddce8 実測・タグ不移動)",
+    "基準点再確認": "2026-10-16 stage7 実施時点で v5.1.1 @17cce65b が SemVer 最大かつ HEAD 到達可能・remote 実在を再実測",
+    "混入コミット検知": "2件検出(ffa59eac PR #3727・5c78cbf1 = 前Case #3725 由来の v5.1.1 タグ後 merge 分)→2026-10-16 利用者承認(Q1=このままリリース)で包含",
+    "リリース条件確認": "2026-10-16 利用者承認(Q1=リリース実施・Q2=タグ作成+push+草稿)",
+    "リリースノート草稿": ".agentdev/backlog-auto/end-to-end/20261016T142343JST/release-notes-draft-v5.1.2.md",
+    "GitHub Release": "未公開(公開権限確認後の所定経路)"
   },
   "単一書き手": "backlog-auto実行 20261016T142343JST (single-flight: 進行中set-stateは本実行のみ。前回 20261015T180807JST は完了状態のため非該当)",
   "保留": [],
