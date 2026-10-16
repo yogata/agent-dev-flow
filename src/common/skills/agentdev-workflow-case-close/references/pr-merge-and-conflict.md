@@ -103,6 +103,14 @@ squash merge がコンフリクトで失敗した場合（STEP-4-3 のリトラ�
 - rebase 解消編集は `git rebase --continue` の前に `git add` で stage 確定し、squash merge 再実行の前に worktree が clean であることを確認する（`agentdev-git-worktree`「Merge Conflict 対応パターン」参照。stage 前の `--continue` は解消編集の squash merge 内容からの欠落を招く）
 - merge 後は main 上で再検証する（該当検査を main HEAD で再実行し、rebase 解消編集の取り込みを確認する）
 
+### STEP-4-6: merge 後重複行実検査（取り込み受理の最終確認）
+
+同一ファイル接触 PR を直列に連続マージした場合、GitHub squash merge は無音畳み込み（trivial 重複 auto-resolve）を行うことがあり、mergeStateStatus が CLEAN でも本文の重複行（同一内容行の二重計上）が混入し得る。CLEAN 判定（mergeStateStatus）単独では取り込み受理とせず、merge 後に次の実検査を前置する。
+
+1. **merge 後重複行実検査**: 同一ファイル接触 PR のマージ後、main HEAD 上で該当行カウントを grep 等で確認する。対象行は、直列に連続マージした PR 間で接触した同一ファイル内の、両 PR が追記・変更した特定可能な行（見出し、条項行、宣言行等）とする。カウントが意図した件数（1 件）を超える場合は重複混入として取り込みを受理せず、重複解消（revert と再適用、または該当行の整理 commit）を実施してから再検査する
+2. **STEP-4-4「内容重複確認」との目的差**: STEP-4-4 はローカル先行 commit と remote squash commit の内容重複確認（`git pull --ff-only` 失敗予防目的）である。本検査（STEP-4-6）は merge 後 main 本文の重複行検出（GitHub squash merge の無音畳み込み検出目的）であり、両者は目的・対象・時点が異なるため互相代替しない
+3. **CLEAN 判定単独受理禁止**: STEP-4-2 の mergeable UNKNOWN ポーリングで CLEAN を確認しても、本検査の実施を省略しない。直列化運用は既存どおり維持し、mergeable ポーリング契約（10 秒間隔・上限 60 秒）と STEP-4-4 / STEP-4-5 の既存手順は変更しない
+
 ## ローカル版 PR マージ（取り込み）の手順
 
 ローカル版（consumer-generated 環境）では GitHub PR が存在しないため、ローカル版 case-close がローカル Git 上で取り込み（merge / squash 方式）を実行する。GitHub 版 STEP-4 の PR マージに相当する副作用の実行主体はローカル版 case-close であり、Custom Tool `agentdev_gh` は取り込みを実行しない（記録の正確性の保証 VERIFY を担う）。
