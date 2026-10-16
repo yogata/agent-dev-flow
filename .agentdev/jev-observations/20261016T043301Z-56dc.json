@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261016T043301Z-56dc",
+  "workflow": "learning-promote",
+  "evaluationKind": "disposition-category",
+  "subject": "adversarial-review 反映後の E1/E5/E7 処分再判定と E7 軸訂正",
+  "sourceRevision": "5c78cbf17f62628093196da61574d3c01caffc39",
+  "durationMs": 844,
+  "inputTokens": 2128,
+  "inputs": {
+    "requestDigest": "1716a60d262f2a9fc9fcdd29549536f17a2df15a2199f0474042fffc0c74004d",
+    "references": [
+      {
+        "digest": "b4e4e2ca7a6b95bf0eef5e13f6ef5389657230d593fe778ae1e35f2e0da29013",
+        "label": "inbox",
+        "path": ".agentdev/learning/inbox.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "d-e1",
+      "questionForm": "choice",
+      "value": "5 既存対策の更新",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.03,
+        "2 恒久契約候補（Decision）": 0.01,
+        "3 恒久契約候補（Design）": 0.01,
+        "4 project knowledge": 0,
+        "5 既存対策の更新": 0.9299999999999999,
+        "6 deferred": 0,
+        "7 rejected": 0.01,
+        "duplicate": 0.01
+      }
+    },
+    {
+      "questionId": "d-e5",
+      "questionForm": "choice",
+      "value": "7 rejected",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.03,
+        "2 恒久契約候補（Decision）": 0.02,
+        "3 恒久契約候補（Design）": 0.01,
+        "4 project knowledge": 0.11,
+        "5 既存対策の更新": 0.01,
+        "6 deferred": 0.16,
+        "7 rejected": 0.59,
+        "duplicate": 0.07
+      }
+    },
+    {
+      "questionId": "d-e7",
+      "questionForm": "choice",
+      "value": "7 rejected",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.02,
+        "2 恒久契約候補（Decision）": 0.01,
+        "3 恒久契約候補（Design）": 0.01,
+        "4 project knowledge": 0.01,
+        "5 既存対策の更新": 0.11,
+        "6 deferred": 0,
+        "7 rejected": 0.43,
+        "duplicate": 0.41
+      }
+    },
+    {
+      "questionId": "u-e7",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.25,
+        "false": 0.75
+      }
+    },
+    {
+      "questionId": "e7-反映先明確度",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1=不明": 0.01,
+        "2=曖昧": 0.01,
+        "3=概要あり": 0.01,
+        "4=明確": 0.17,
+        "5=自足的に整備済": 0.8
+      }
+    }
+  ],
+  "confidence": 0.92,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "d-e1",
+        "value": "5 既存対策の更新"
+      },
+      {
+        "questionId": "d-e5",
+        "value": "6 deferred",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-e7",
+        "value": "duplicate",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "u-e7",
+        "value": false
+      },
+      {
+        "questionId": "e7-反映先明確度",
+        "value": 3,
+        "differenceReason": "semantic_disagreement"
+      }
+    ]
+  }
+}

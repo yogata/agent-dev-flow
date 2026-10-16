@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261016T040937Z-5edc",
+  "workflow": "learning-promote",
+  "evaluationKind": "eight-axis-scoring",
+  "subject": "E1 agentdev_gh exit 66 障害クラスの8軸評価（発生件数除く7軸）",
+  "sourceRevision": "5c78cbf17f62628093196da61574d3c01caffc39",
+  "durationMs": 563,
+  "inputTokens": 1898,
+  "inputs": {
+    "requestDigest": "397cb2040aad1e457b18640eec0571f76a49c1ea7d8be0188db0b344bc5a24ab",
+    "references": [
+      {
+        "digest": "b4e4e2ca7a6b95bf0eef5e13f6ef5389657230d593fe778ae1e35f2e0da29013",
+        "label": "inbox",
+        "path": ".agentdev/learning/inbox.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "e1-影響度",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1=軽微": 0,
+        "2=小": 0,
+        "3=中": 0.03,
+        "4=大": 0.88,
+        "5=致命的": 0.09
+      }
+    },
+    {
+      "questionId": "e1-横展開性",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1=固有": 0.02,
+        "2=限定": 0.52,
+        "3=中程度": 0.24,
+        "4=高い": 0.21,
+        "5=汎用": 0.01
+      }
+    },
+    {
+      "questionId": "e1-反映先明確度",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1=不明": 0,
+        "2=曖昧": 0,
+        "3=概要あり": 0.03,
+        "4=明確": 0.79,
+        "5=自足的に整備済": 0.18
+      }
+    },
+    {
+      "questionId": "e1-自動化適性",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1=困難": 0.01,
+        "2=低い": 0.11,
+        "3=可能": 0.52,
+        "4=容易": 0.34,
+        "5=即自動化可": 0.02
+      }
+    },
+    {
+      "questionId": "e1-再利用性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1=低い": 0.01,
+        "2=やや低い": 0.07,
+        "3=中程度": 0.16,
+        "4=高い": 0.7,
+        "5=高い": 0.06
+      }
+    },
+    {
+      "questionId": "e1-再発可能性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1=極低": 0,
+        "2=低い": 0,
+        "3=中程度": 0,
+        "4=高い": 0.55,
+        "5=ほぼ確実": 0.45
+      }
+    },
+    {
+      "questionId": "e1-費用対効果",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1=割高": 0,
+        "2=やや割高": 0.02,
+        "3=妥当": 0.08,
+        "4=良い": 0.77,
+        "5=良い": 0.13
+      }
+    }
+  ],
+  "confidence": 0.9,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "e1-影響度",
+        "value": 3
+      },
+      {
+        "questionId": "e1-横展開性",
+        "value": 2
+      },
+      {
+        "questionId": "e1-反映先明確度",
+        "value": 3
+      },
+      {
+        "questionId": "e1-自動化適性",
+        "value": 2
+      },
+      {
+        "questionId": "e1-再利用性",
+        "value": 3
+      },
+      {
+        "questionId": "e1-再発可能性",
+        "value": 3
+      },
+      {
+        "questionId": "e1-費用対効果",
+        "value": 3
+      }
+    ]
+  }
+}

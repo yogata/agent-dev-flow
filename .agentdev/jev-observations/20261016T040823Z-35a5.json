@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261016T040823Z-35a5",
+  "workflow": "learning-promote",
+  "evaluationKind": "problem-classification",
+  "subject": "inbox 8エントリの問題クラス帰属（backlog-auto stage 2 learning 系統 run 20261016T122446JST）",
+  "sourceRevision": "5c78cbf17f62628093196da61574d3c01caffc39",
+  "durationMs": 737,
+  "inputTokens": 4652,
+  "inputs": {
+    "requestDigest": "79665a45ae10d783a20587778c5e17e3fa58cb86cc837a3990d7f47c27015f18",
+    "references": [
+      {
+        "digest": "b4e4e2ca7a6b95bf0eef5e13f6ef5389657230d593fe778ae1e35f2e0da29013",
+        "label": "inbox",
+        "path": ".agentdev/learning/inbox.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "cls-e1",
+      "questionForm": "choice",
+      "value": "C1: agentdev_gh Custom Tool が plugin ホスト環境でのみ gh を無出力・非ゼロ終了させる障害",
+      "probabilityDistribution": {
+        "C1: agentdev_gh Custom Tool が plugin ホスト環境でのみ gh を無出力・非ゼロ終了させる障害": 0.99,
+        "C2: 配布物本文への concrete ID 直書きの配布依存境界検出": 0,
+        "C3: 一時 Git fixture が .gitattributes を継承しない改行差分警告": 0,
+        "C4: lint_skills 環境差判定の distributed layout 限定": 0,
+        "C5: 一括是正 Issue の起票時と実行時の実測乖離": 0,
+        "C6: squash merge の軽微な行重複 auto-resolve": 0,
+        "C7: 型定義解決先未指定の ad-hoc 型検証失敗誤認": 0,
+        "C8: applySection セクション置換の後続コメント消失": 0,
+        "単独（上記クラスのいずれとも根本原因・再発条件・予防策を共有しない）": 0.01
+      }
+    },
+    {
+      "questionId": "cls-e2",
+      "questionForm": "choice",
+      "value": "C2: 配布物本文への concrete ID 直書きの配布依存境界検出",
+      "probabilityDistribution": {
+        "C1: agentdev_gh Custom Tool が plugin ホスト環境でのみ gh を無出力・非ゼロ終了させる障害": 0,
+        "C2: 配布物本文への concrete ID 直書きの配布依存境界検出": 0.99,
+        "C3: 一時 Git fixture が .gitattributes を継承しない改行差分警告": 0,
+        "C4: lint_skills 環境差判定の distributed layout 限定": 0,
+        "C5: 一括是正 Issue の起票時と実行時の実測乖離": 0,
+        "C6: squash merge の軽微な行重複 auto-resolve": 0,
+        "C7: 型定義解決先未指定の ad-hoc 型検証失敗誤認": 0,
+        "C8: applySection セクション置換の後続コメント消失": 0,
+        "単独（上記クラスのいずれとも根本原因・再発条件・予防策を共有しない）": 0.01
+      }
+    },
+    {
+      "questionId": "cls-e3",
+      "questionForm": "choice",
+      "value": "C3: 一時 Git fixture が .gitattributes を継承しない改行差分警告",
+      "probabilityDistribution": {
+        "C1: agentdev_gh Custom Tool が plugin ホスト環境でのみ gh を無出力・非ゼロ終了させる障害": 0,
+        "C2: 配布物本文への concrete ID 直書きの配布依存境界検出": 0,
+        "C3: 一時 Git fixture が .gitattributes を継承しない改行差分警告": 1,
+        "C4: lint_skills 環境差判定の distributed layout 限定": 0,
+        "C5: 一括是正 Issue の起票時と実行時の実測乖離": 0,
+        "C6: squash merge の軽微な行重複 auto-resolve": 0,
+        "C7: 型定義解決先未指定の ad-hoc 型検証失敗誤認": 0,
+        "C8: applySection セクション置換の後続コメント消失": 0,
+        "単独（上記クラスのいずれとも根本原因・再発条件・予防策を共有しない）": 0
+      }
+    },
+    {
+      "questionId": "cls-e4",
+      "questionForm": "choice",
+      "value": "C4: lint_skills 環境差判定の distributed layout 限定",
+      "probabilityDistribution": {
+        "C1: agentdev_gh Custom Tool が plugin ホスト環境でのみ gh を無出力・非ゼロ終了させる障害": 0,
+        "C2: 配布物本文への concrete ID 直書きの配布依存境界検出": 0,
+        "C3: 一時 Git fixture が .gitattributes を継承しない改行差分警告": 0,
+        "C4: lint_skills 環境差判定の distributed layout 限定": 1,
+        "C5: 一括是正 Issue の起票時と実行時の実測乖離": 0,
+        "C6: squash merge の軽微な行重複 auto-resolve": 0,
+        "C7: 型定義解決先未指定の ad-hoc 型検証失敗誤認": 0,
+        "C8: applySection セクション置換の後続コメント消失": 0,
+        "単独（上記クラスのいずれとも根本原因・再発条件・予防策を共有しない）": 0
+      }
+    },
+    {
+      "questionId": "cls-e5",
+      "questionForm": "choice",
+      "value": "C5: 一括是正 Issue の起票時と実行時の実測乖離",
+      "probabilityDistribution": {
+        "C1: agentdev_gh Custom Tool が plugin ホスト環境でのみ gh を無出力・非ゼロ終了させる障害": 0,
+        "C2: 配布物本文への concrete ID 直書きの配布依存境界検出": 0,
+        "C3: 一時 Git fixture が .gitattributes を継承しない改行差分警告": 0,
+        "C4: lint_skills 環境差判定の distributed layout 限定": 0,
+        "C5: 一括是正 Issue の起票時と実行時の実測乖離": 1,
+        "C6: squash merge の軽微な行重複 auto-resolve": 0,
+        "C7: 型定義解決先未指定の ad-hoc 型検証失敗誤認": 0,
+        "C8: applySection セクション置換の後続コメント消失": 0,
+        "単独（上記クラスのいずれとも根本原因・再発条件・予防策を共有しない）": 0
+      }
+    },
+    {
+      "questionId": "cls-e6",
+      "questionForm": "choice",
+      "value": "C6: squash merge の軽微な行重複 auto-resolve",
+      "probabilityDistribution": {
+        "C1: agentdev_gh Custom Tool が plugin ホスト環境でのみ gh を無出力・非ゼロ終了させる障害": 0,
+        "C2: 配布物本文への concrete ID 直書きの配布依存境界検出": 0,
+        "C3: 一時 Git fixture が .gitattributes を継承しない改行差分警告": 0,
+        "C4: lint_skills 環境差判定の distributed layout 限定": 0,
+        "C5: 一括是正 Issue の起票時と実行時の実測乖離": 0,
+        "C6: squash merge の軽微な行重複 auto-resolve": 1,
+        "C7: 型定義解決先未指定の ad-hoc 型検証失敗誤認": 0,
+        "C8: applySection セクション置換の後続コメント消失": 0,
+        "単独（上記クラスのいずれとも根本原因・再発条件・予防策を共有しない）": 0
+      }
+    },
+    {
+      "questionId": "cls-e7",
+      "questionForm": "choice",
+      "value": "C7: 型定義解決先未指定の ad-hoc 型検証失敗誤認",
+      "probabilityDistribution": {
+        "C1: agentdev_gh Custom Tool が plugin ホスト環境でのみ gh を無出力・非ゼロ終了させる障害": 0,
+        "C2: 配布物本文への concrete ID 直書きの配布依存境界検出": 0,
+        "C3: 一時 Git fixture が .gitattributes を継承しない改行差分警告": 0,
+        "C4: lint_skills 環境差判定の distributed layout 限定": 0,
+        "C5: 一括是正 Issue の起票時と実行時の実測乖離": 0,
+        "C6: squash merge の軽微な行重複 auto-resolve": 0,
+        "C7: 型定義解決先未指定の ad-hoc 型検証失敗誤認": 1,
+        "C8: applySection セクション置換の後続コメント消失": 0,
+        "単独（上記クラスのいずれとも根本原因・再発条件・予防策を共有しない）": 0
+      }
+    },
+    {
+      "questionId": "cls-e8",
+      "questionForm": "choice",
+      "value": "C8: applySection セクション置換の後続コメント消失",
+      "probabilityDistribution": {
+        "C1: agentdev_gh Custom Tool が plugin ホスト環境でのみ gh を無出力・非ゼロ終了させる障害": 0,
+        "C2: 配布物本文への concrete ID 直書きの配布依存境界検出": 0,
+        "C3: 一時 Git fixture が .gitattributes を継承しない改行差分警告": 0,
+        "C4: lint_skills 環境差判定の distributed layout 限定": 0,
+        "C5: 一括是正 Issue の起票時と実行時の実測乖離": 0,
+        "C6: squash merge の軽微な行重複 auto-resolve": 0,
+        "C7: 型定義解決先未指定の ad-hoc 型検証失敗誤認": 0,
+        "C8: applySection セクション置換の後続コメント消失": 1,
+        "単独（上記クラスのいずれとも根本原因・再発条件・予防策を共有しない）": 0
+      }
+    }
+  ],
+  "confidence": 0.99,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "cls-e1",
+        "value": "C1: agentdev_gh Custom Tool が plugin ホスト環境でのみ gh を無出力・非ゼロ終了させる障害"
+      },
+      {
+        "questionId": "cls-e2",
+        "value": "C2: 配布物本文への concrete ID 直書きの配布依存境界検出"
+      },
+      {
+        "questionId": "cls-e3",
+        "value": "C3: 一時 Git fixture が .gitattributes を継承しない改行差分警告"
+      },
+      {
+        "questionId": "cls-e4",
+        "value": "C4: lint_skills 環境差判定の distributed layout 限定"
+      },
+      {
+        "questionId": "cls-e5",
+        "value": "C5: 一括是正 Issue の起票時と実行時の実測乖離"
+      },
+      {
+        "questionId": "cls-e6",
+        "value": "C6: squash merge の軽微な行重複 auto-resolve"
+      },
+      {
+        "questionId": "cls-e7",
+        "value": "C7: 型定義解決先未指定の ad-hoc 型検証失敗誤認"
+      },
+      {
+        "questionId": "cls-e8",
+        "value": "C8: applySection セクション置換の後続コメント消失"
+      }
+    ]
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261016T041451Z-1161",
+  "workflow": "learning-promote",
+  "evaluationKind": "sublimation-possibility",
+  "subject": "8問題クラスの恒久契約への昇華可能性",
+  "sourceRevision": "5c78cbf17f62628093196da61574d3c01caffc39",
+  "durationMs": 605,
+  "inputTokens": 1594,
+  "inputs": {
+    "requestDigest": "5a9076f3bd623e68490692fef77af2d47092514d02f2f4148a1643361cb0ca86",
+    "references": [
+      {
+        "digest": "b4e4e2ca7a6b95bf0eef5e13f6ef5389657230d593fe778ae1e35f2e0da29013",
+        "label": "inbox",
+        "path": ".agentdev/learning/inbox.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "u-e1",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.92,
+        "false": 0.07999999999999996
+      }
+    },
+    {
+      "questionId": "u-e2",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.07,
+        "false": 0.9299999999999999
+      }
+    },
+    {
+      "questionId": "u-e3",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.93,
+        "false": 0.06999999999999995
+      }
+    },
+    {
+      "questionId": "u-e4",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.93,
+        "false": 0.06999999999999995
+      }
+    },
+    {
+      "questionId": "u-e5",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.07,
+        "false": 0.9299999999999999
+      }
+    },
+    {
+      "questionId": "u-e6",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.94,
+        "false": 0.06000000000000005
+      }
+    },
+    {
+      "questionId": "u-e7",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.94,
+        "false": 0.06000000000000005
+      }
+    },
+    {
+      "questionId": "u-e8",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.94,
+        "false": 0.06000000000000005
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "u-e1",
+        "value": true
+      },
+      {
+        "questionId": "u-e2",
+        "value": false
+      },
+      {
+        "questionId": "u-e3",
+        "value": true
+      },
+      {
+        "questionId": "u-e4",
+        "value": true
+      },
+      {
+        "questionId": "u-e5",
+        "value": false
+      },
+      {
+        "questionId": "u-e6",
+        "value": true
+      },
+      {
+        "questionId": "u-e7",
+        "value": true
+      },
+      {
+        "questionId": "u-e8",
+        "value": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261016T041820Z-ddfa",
+  "workflow": "learning-promote",
+  "evaluationKind": "adversarial-review-trigger",
+  "subject": "learning-promote STEP-4 adversarial-review 発動条件判定",
+  "sourceRevision": "5c78cbf17f62628093196da61574d3c01caffc39",
+  "durationMs": 649,
+  "inputTokens": 670,
+  "inputs": {
+    "requestDigest": "f1583a3ce3c8a5e103a8d4f042d538710d8ebaa1d22c3877435b3b17ec0d0d93",
+    "references": [
+      {
+        "digest": "b4e4e2ca7a6b95bf0eef5e13f6ef5389657230d593fe778ae1e35f2e0da29013",
+        "label": "inbox",
+        "path": ".agentdev/learning/inbox.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-review-trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.8,
+        "false": 0.19999999999999996
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-review-trigger",
+        "value": true
+      }
+    ]
+  }
+}

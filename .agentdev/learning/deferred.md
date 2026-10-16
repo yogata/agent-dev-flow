@@ -2363,6 +2363,7 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **処分判定**: deferred（2026-09-25 ユーザーHITL承認。intake item が infra-transient 停止分類・回復経路・spawn 分離を先行処理するため promoted 生成はしない。learning 固有の残余知見〔前置死活チェック・durable checkpoint・無出力早期死亡の切り分け・fail-closed 契約の運用特性記録要否〕を living pool で維持。再評価条件: intake item の消化完了時・同種 gh spawn 故障の再発時）
 - **追記（2026-09-27 amendment・A-2）**: 2026-09-27 に3回目の再発（並行 case-open 2セッションで全操作が gh exited with 66 で持続失敗・Root Case 2件が blocked 停止）。inbox 側2件の観測は本エントリと duplicate 判定で統合（症状・回復経路・予防策が一致）。予防策候補の反映先文書（docs/guides/consumer-project-setup.md 等）への反映は 2026-09-27 時点で未実施
 - **追記（2026-10-07 duplicate 統合・4回目再発）**: 2026-10-06 に4回目の再発（agentdev_gh 全操作が gh exit 66・stderr 空で失敗、RU-0162 の case-open が blocked 停止）。inbox エントリ（2026-10-06 capture）を duplicate 判定で統合（症状・再発条件・予防策候補が一致。ホスト再起動による plugin 再初期化を再開条件として提唱）。予防策候補の反映は未実施のまま。4回再発のため、次回 learning-promote で本エントリ自体の知識文書化（docs/knowledge 候補: agentdev_gh 障害の再開手順・起動時疎通確認）を再評価する
+- **追記（2026-10-16 統合・5回目再発）**: Case #3725 closure capture（backlog-auto run 20261015T180807JST stage5）で5回目の再発（agentdev_gh issue_list 2回・issue_create 4回が gh exit 66・stderr 空で失敗、bash 直叩き gh と bun CliRunner 直接実行は成功）。inbox エントリを本エントリと同現象で統合し、新知見（bash 直叩き + bun CliRunner 直接実行の2段分離試験）は既存対策の更新として昇華済み（promoted: `.agentdev/learning/promoted/existing-measure-update-agentdev-gh-spawn-failure-isolation.md`。learning-promote 2026-10-16。review で REQ-052-014/015 と issue-operation-recovery.md〔2026-10-09 整備、gh exit 66 例外手順・再起動回復・委譲前疎通確認を含む〕が既存恒久対策として実在することを実測。残 gap は診断手順への2段分離試験明記と failFromExec detail 提案）
 
 ---
 
@@ -4915,3 +4916,64 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **関連**: Case #3722、PR #3724 本文 learning 2 件目、PR #3724 品質メトリクス表 LSP 診断行
 - **タグ**: `#lsp` `#tsc` `#静的検査` `#タイムアウト`
 - **移動日**: 2026-10-15
+
+---
+
+## 一時 Git リポジトリ（テスト fixture）には親リポジトリの .gitattributes が継承されない
+
+
+- **問題事象**: bun test の一時 Git fixture で LF→CRLF warning が 633 件発生。親リポジトリの .gitattributes（* text=auto eol=lf）は init した一時リポジトリへ継承されないため、core.autocrlf=true の環境で差分警告が出る
+- **発生局面**: case-run（Epic #3732 / 子 Issue #3741 / AG-006、Case #3729、PR #3750）
+- **検知方法**: bun test 分割実行の stderr（LF will be replaced by CRLF 警告 500 + 133 件）
+- **根本原因**: git init で生成される一時リポジトリは属性ファイルを親から引き継がない
+- **自律対応内容**: 12 fixture に初回 add/commit 前へ .gitattributes（* text=auto eol=lf）15 行を配置。core.autocrlf・core.safecrlf 等の利用者設定変更や stderr 抑制は行わない。autocrlf=true 分離設定プローブで baseline 16 件 → 本 tree 0 件の因果を実証
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 一時 Git fixture を使うテストでは、属性依存の検証がある場合に fixture 側へ属性を配置する。環境設定の抑制で警告を消さない
+- **再発条件**: autocrlf=true 等の環境差がある Windows 環境で一時 Git fixture テストを実行した場合
+- **予防策候補**: fixture 雛形テンプレートへの .gitattributes 同梱
+- **想定反映先**: fixture 追加時の留意（trusted-distribution-gate launcher-fixture.ts 等の既存パターン踏襲）
+- **関連**: PR #3750（merge commit 8c3e1d56）、Case #3729
+- **タグ**: `#git` `#fixture` `#windows` `#改行コード`
+- **処分判定**: deferred（learning-promote 2026-10-16 自律確定。単発1件・実害は警告のみで対応済み・反映先曖昧。Jev は project knowledge を最上位候補としたが出現1件・影響軽微を理由に deferred〔semantic_disagreement 記録済み〕。再評価条件: 同種警告の再発時、fixture 雛形テンプレート化の機会発生時）
+- **移動日**: 2026-10-16
+---
+
+## lint_skills 環境差判定の検出条件は distributed layout に限定される
+
+
+- **問題事象**: なし（実装側の設計知識の記録）。lint_skills の git 管理外ローカルユーザースキル検出（実行環境差ラベル付与）は、projection 走査かつ src/common/skills 存在の distributed layout でのみ発動する。src を持たない pure-fixture 環境では環境差判定が発動しない
+- **発生局面**: case-run（Epic #3732 / 子 Issue #3743 / REQ-010-082、Case #3729、PR #3749）
+- **検知方法**: 実装時の判定条件確認（listGitUnmanagedLocalSkills）
+- **根本原因**: 構造制約（テスト fixture の構造）による設計上の限定
+- **自律対応内容**: 実運用影響なしとして記録のみ
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 将来 projection 構成が変わる場合（例: repo- 接頭辞規約の変更）は .gitignore の .opencode/skills/* 除外 + repo-*/ 例外的追跡との対応で判定規約の追随更新が必要
+- **再発条件**: projection 構成変更時に判定規約を更新しなかった場合
+- **予防策候補**: projection 構成変更時の checker 判定規約の追随確認
+- **想定反映先**: .opencode/skills/repo-agentdev-integrity/scripts/lint_skills.ts の判定規約変更時
+- **関連**: PR #3749（merge commit b6656c80）、REQ-010-082、Case #3729
+- **タグ**: `#integrity` `#lint_skills` `#環境差`
+- **処分判定**: deferred（learning-promote 2026-10-16 自律確定。実運用影響なしの設計知識で projection 構成変更時のみ有意。lint_skills.ts L471-477/L524 による in-code 自己文書化あり。再評価条件: projection 構成〔repo- 接頭辞規約・.gitignore 除外〕の変更時）
+- **移動日**: 2026-10-16
+---
+
+## 一括是正スイープ Issue が「対象実測 0 件」で完了する形態がある（委譲時の前提扱い禁止）
+
+
+- **問題事象**: frontmatter updated 鮮度債務の一括是正スイープ（IR-072 11件・strict 10件・heuristic 1件の起票時実測）が、実行時点では先行 commit（85680dab・647451be）により既に 0 件へ収束しており、是正対象 0 件で完了した
+- **発生局面**: case-run（Epic #3732 / 子 Issue #3740 / AG-004、Case #3729、PR #3748）
+- **検知方法**: 実施時 check_integrity 実測（req-updated-freshness strict 0 mismatch・IR-072 0 件）
+- **根本原因**: AG-005「検出時都度進行」運用が複数 Case で自然に機能し、起票から実行までの間に債務が解消された
+- **自律対応内容**: 是正不要の実測結論を記録し、REQ-010-081 の implementation 宣言追記（missing-implementation 解消）のみを実施
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 同型 Issue（frontmatter スイープ等の一括是正）の委譲では、「是正不要収束の可能性」を実施時実測前に前提として扱わない。実測→対象確定→是正の順序を維持する
+- **再発条件**: 起票時実測に依存した対象一覧を委譲し、実行時点の実測を省略した場合
+- **予防策候補**: 実施時実測の必須化を委譲プロンプトへ明記（既存の AG 条項どおり）
+- **想定反映先**: learning-capture の委譲計画条項
+- **関連**: PR #3748（merge commit 9df78904）、REQ-010-081、Case #3729
+- **タグ**: `#鮮度` `#運用`
+- **処分判定**: deferred（learning-promote 2026-10-16 自律確定〔adversarial-review 反映で duplicate から変更〕。実害なしの正常動作記録。恒久的委譲規律〔REQ-003 の実測条項・AG 条項の恒久性・learning-capture 委譲計画条項〕は実在確認できず、pool 先行記録「backlog 統合バッチの旧スナップショット分析」は根本原因が別のため同クラスに数えない。再評価条件: 同型スイープ Issue の再発時、委譲時実測の恒久化機会発生時）
+- **移動日**: 2026-10-16
