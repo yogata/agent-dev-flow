@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261016T040541Z-c0bf",
+  "workflow": "intake-promote",
+  "evaluationKind": "adversarial-review-trigger",
+  "subject": "intake-promote STEP-2 adversarial-review 発動条件判定（inbox 5件・採用4件・却下1件）",
+  "sourceRevision": "5c78cbf1",
+  "durationMs": 1046,
+  "inputTokens": 1356,
+  "inputs": {
+    "requestDigest": "fa775f5eb1f4246eff14c73ca23e7dbf48925e9850a628e24608aec33172a0e8"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.85,
+        "false": 0.15000000000000002
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "trigger",
+        "value": true
+      }
+    ]
+  }
+}

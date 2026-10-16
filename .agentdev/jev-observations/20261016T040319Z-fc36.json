@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261016T040319Z-fc36",
+  "workflow": "intake-promote",
+  "evaluationKind": "item-evaluation",
+  "subject": "intake inbox 5件のReview観点評価（妥当性・影響・緊急度）",
+  "sourceRevision": "5c78cbf1",
+  "durationMs": 1134,
+  "inputTokens": 3664,
+  "inputs": {
+    "requestDigest": "0ac8a5d8484d463b889ea5b123710eb065beabf4ae4473f6d71442e0fe9cea99"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "i1-validity",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0.01,
+        "中": 0.36,
+        "高": 0.63
+      }
+    },
+    {
+      "questionId": "i1-impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.02,
+        "中": 0.72,
+        "高": 0.26
+      }
+    },
+    {
+      "questionId": "i1-urgency",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.1,
+        "中": 0.87,
+        "高": 0.03
+      }
+    },
+    {
+      "questionId": "i2-validity",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.02,
+        "中": 0.73,
+        "高": 0.25
+      }
+    },
+    {
+      "questionId": "i2-impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.07,
+        "中": 0.77,
+        "高": 0.16
+      }
+    },
+    {
+      "questionId": "i2-urgency",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.21,
+        "中": 0.78,
+        "高": 0.01
+      }
+    },
+    {
+      "questionId": "i3-validity",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "低": 0.97,
+        "中": 0.02,
+        "高": 0.01
+      }
+    },
+    {
+      "questionId": "i3-impact",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "低": 0.97,
+        "中": 0.02,
+        "高": 0.01
+      }
+    },
+    {
+      "questionId": "i3-urgency",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "低": 0.98,
+        "中": 0.01,
+        "高": 0.01
+      }
+    },
+    {
+      "questionId": "i4-validity",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.07,
+        "中": 0.48,
+        "高": 0.45
+      }
+    },
+    {
+      "questionId": "i4-impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.27,
+        "中": 0.43,
+        "高": 0.3
+      }
+    },
+    {
+      "questionId": "i4-urgency",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.42,
+        "中": 0.56,
+        "高": 0.02
+      }
+    },
+    {
+      "questionId": "i5-validity",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.01,
+        "中": 0.69,
+        "高": 0.3
+      }
+    },
+    {
+      "questionId": "i5-impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.08,
+        "中": 0.88,
+        "高": 0.04
+      }
+    },
+    {
+      "questionId": "i5-urgency",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.11,
+        "中": 0.88,
+        "高": 0.01
+      }
+    }
+  ],
+  "confidence": 0.43,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "i1-validity",
+        "value": 2
+      },
+      {
+        "questionId": "i1-impact",
+        "value": 1
+      },
+      {
+        "questionId": "i1-urgency",
+        "value": 1
+      },
+      {
+        "questionId": "i2-validity",
+        "value": 1
+      },
+      {
+        "questionId": "i2-impact",
+        "value": 1
+      },
+      {
+        "questionId": "i2-urgency",
+        "value": 1
+      },
+      {
+        "questionId": "i3-validity",
+        "value": 0
+      },
+      {
+        "questionId": "i3-impact",
+        "value": 0
+      },
+      {
+        "questionId": "i3-urgency",
+        "value": 0
+      },
+      {
+        "questionId": "i4-validity",
+        "value": 1
+      },
+      {
+        "questionId": "i4-impact",
+        "value": 1
+      },
+      {
+        "questionId": "i4-urgency",
+        "value": 1
+      },
+      {
+        "questionId": "i5-validity",
+        "value": 1
+      },
+      {
+        "questionId": "i5-impact",
+        "value": 1
+      },
+      {
+        "questionId": "i5-urgency",
+        "value": 1
+      }
+    ]
+  }
+}
