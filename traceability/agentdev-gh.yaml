@@ -5,6 +5,7 @@ implementation:
     - REQ-011-030
     - REQ-083-001
     - REQ-083-004
+    - REQ-114-016
   src/common/tools/agentdev-gh/engine.ts:
     - REQ-011-028
     - REQ-011-029
@@ -17,6 +18,7 @@ implementation:
     - REQ-011-033
     - REQ-052-014
     - REQ-083-001
+    - REQ-114-016
   src/common/tools/agentdev-gh/specs-issue.ts:
     - REQ-011-022
     - REQ-011-025
@@ -25,6 +27,8 @@ implementation:
     - REQ-011-030
     - REQ-083-001
     - REQ-083-005
+  src/common/tools/agentdev-gh/specs-release.ts:
+    - REQ-114-016
   src/common/tools/agentdev-gh/local/case-schema/case-file.md:
     - REQ-100-001
   src/common/tools/agentdev-gh/local/case-schema/rules/status.yaml:
@@ -35,6 +39,7 @@ verification:
   src/common/tools/agentdev-gh/tests/contracts.test.ts:
     - REQ-011-022
     - REQ-011-023
+    - REQ-114-016
   src/common/tools/agentdev-gh/tests/engine-fail-closed.test.ts:
     - REQ-011-023
     - REQ-011-025
@@ -48,3 +53,4 @@ verification:
     - REQ-011-030
     - REQ-011-033
     - REQ-052-014
+    - REQ-114-016

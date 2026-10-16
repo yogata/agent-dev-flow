@@ -35,13 +35,16 @@ export function prNumber(n: number): PrNumber {
 }
 
 /**
- * 操作名。Design「対象操作の境界（初期セット）」が所有する16操作
+ * 操作名。Design「対象操作の境界」が所有する19操作
  * （基本操作10: issue_create、issue_read、issue_update、issue_close、pr_create、
  * pr_read、pr_merge、pr_changed_files、pr_mergeable、pr_update、
  * 追跡Issue操作2: issue_list、issue_reopen、
- * Comment 操作4: comment_create、comment_list、comment_update、comment_delete）。
+ * Comment 操作4: comment_create、comment_list、comment_update、comment_delete、
+ * Release 操作3: release_create、release_list、release_read）。
  * Comment は Issue と Pull Request の会話コメントを同一の論理リソースとして扱い、
  * commentId（公開型は文字列）で対象識別する。
+ * Release 操作は GitHub 接続専用（Local 版は構造化失敗）であり、公開モード
+ * （draft の解除、publish 相当フィールド）を入力契約に含めない。
  */
 export const GH_TOOL_OPERATIONS = [
   "issue_create",
@@ -60,6 +63,9 @@ export const GH_TOOL_OPERATIONS = [
   "comment_list",
   "comment_update",
   "comment_delete",
+  "release_create",
+  "release_list",
+  "release_read",
 ] as const;
 
 export type GhToolOperation = (typeof GH_TOOL_OPERATIONS)[number];
@@ -124,6 +130,9 @@ export const GH_TOOL_OPERATION_CATALOG: readonly OperationCatalogEntry[] = [
   readOnly("comment_list"),
   sideEffect("comment_update"),
   sideEffect("comment_delete"),
+  sideEffect("release_create"),
+  readOnly("release_list"),
+  readOnly("release_read"),
 ];
 
 /** fail-closed 4異常系と運用上の失敗種別。 */
@@ -209,7 +218,21 @@ export type GhToolRequest =
       readonly commentId: string;
       readonly body: string;
     }
-  | { readonly operation: "comment_delete"; readonly commentId: string };
+  | { readonly operation: "comment_delete"; readonly commentId: string }
+  | {
+      /**
+       * Release 草稿作成（GitHub 接続専用）。公開モード（draft の解除）を
+       * 入力契約に含めない。内部実装は常に草稿（draft）として作成し、公開は
+       * 本操作の対象外（利用者が草稿作成とは別に明確に認めた場合に限る）。
+       */
+      readonly operation: "release_create";
+      readonly tagName: string;
+      readonly title: string;
+      readonly body: string;
+      readonly prerelease: boolean;
+    }
+  | { readonly operation: "release_list" }
+  | { readonly operation: "release_read"; readonly tagName: string };
 
 /** 操作成功（出力）。構造化結果（番号、URL 等）のみを公開する。 */
 export type GhToolSuccess =
@@ -300,6 +323,28 @@ export type GhToolSuccess =
   | {
       readonly operation: "comment_delete";
       readonly commentId: string;
+    }
+  | {
+      /** Release 草稿作成の成功。draft は常に true（公開モードは入力契約に存在しない）。 */
+      readonly operation: "release_create";
+      readonly tagName: string;
+      readonly url: string;
+      readonly draft: true;
+      readonly prerelease: boolean;
+    }
+  | {
+      readonly operation: "release_list";
+      readonly releases: readonly ReleaseListItem[];
+    }
+  | {
+      /** Release 読み戻しの成功。対応する Release が存在しない場合は失敗（operation-failed）。 */
+      readonly operation: "release_read";
+      readonly tagName: string;
+      readonly title: string;
+      readonly body: string;
+      readonly draft: boolean;
+      readonly prerelease: boolean;
+      readonly url: string;
     };
 
 /**
@@ -323,6 +368,15 @@ export interface IssueListItem {
   readonly labels: readonly string[];
   readonly role: "tracking" | "case";
   readonly closeReason: "completed" | "not_planned" | null;
+}
+
+/** release_list の一覧エントリ（版タグと Release の対応確認用の正規化結果）。 */
+export interface ReleaseListItem {
+  readonly tagName: string;
+  readonly title: string;
+  readonly draft: boolean;
+  readonly prerelease: boolean;
+  readonly url: string;
 }
 
 /** 操作結果（保証と失敗を型で強制する）。 */

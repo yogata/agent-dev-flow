@@ -73,10 +73,11 @@ describe("コマンド定義の公開 interface 拡張 pin", () => {
     expect(COMMAND).toContain("一気通貫の実行結果報告（工程別結果、全体完了判定結果、リリース結果または保留理由、再開経路を含む共通実行契約形式）");
   });
 
-  test("副作用に set-state とリリース時の git タグ作成・push と追加公開成果物の準備物作成が宣言されている", () => {
+  test("副作用に set-state とリリース時の git タグ作成・push と追加公開成果物の対応が宣言されている", () => {
     expect(COMMAND).toContain("set-state の作成・更新（`.agentdev/` 配下、req-units と draft の配置外）");
     expect(COMMAND).toContain("git タグ作成・push（リリース時。版番号・リリース条件・公開操作はパッチリリース規則の Decision に従う）");
-    expect(COMMAND).toContain("追加公開成果物の準備物作成（リリースノート草稿・対象確認");
+    expect(COMMAND).toContain("追加公開成果物の対応（ADF本体では GitHub Release の草稿作成・読み戻しまでを Custom Tool カタログ経路で実行する");
+    expect(COMMAND).toContain("公開は利用者が草稿作成とは別に明確に認めた場合に限る。カタログに含まれない操作の実行は承認後の所定経路）");
   });
 
   test("HITL 境界節が既存境界の維持と一気通貫実行の利用者判断境界（基準点・リリース条件・公開権限）を宣言している", () => {
@@ -258,27 +259,38 @@ describe("end-to-end-execution reference の手順 pin", () => {
     expect(END_TO_END).toContain("突合の正は set-state の義務スナップショットと対応表であり、RU・要件doc が削除済みでも突合は set-state から復元して実行する");
   });
 
-  test("リリース手順シーケンスが再確認・版番導出・差分突合・タグ作成・追加公開物・結果記録の順で手順化されている", () => {
+  test("リリース手順シーケンスが再確認・版番導出・差分突合・タグ作成・Release 記録・結果記録の順で手順化されている", () => {
     expect(END_TO_END).toContain("1. 基準点再確認: リリース時点で正式 SemVer タグを再確認する。開始時基準より新しい正式タグが存在する場合は、その最大版から版番号を導出し直す。既存タグとの衝突、タグの移動、二重採番は行わない");
     expect(END_TO_END).toContain("2. 版番導出: 最後の正式リリースからパッチ番号を1つだけ進めた版を確定する（major/minor への自動振り分け、同一実行での二つの版番号の消費を行わない）。導出版と同一のタグが既に存在する場合は衝突として報告し、版番号を再消費せず停止する");
     expect(END_TO_END).toContain("3. 対象コミット確定と無関係コミット混入検知: リリース対象コミット（一式の全マージ完遂時点の main HEAD）を確定する。開始コミット..対象コミットの差分と、set-state の対応表から導出する一式分の実変更（一式の実行単位が生んだマージ済み変更）を突合し、一式に帰属しない無関係コミットの混入を検出した場合は報告して利用者判断を求める（タグ付与の可否は利用者判断）");
     expect(END_TO_END).toContain("4. タグ作成: リリース対象コミットに導出版のタグを作成する。タグ作成済みを検出した場合は作成を省略し、タグの移動・再作成を行わない");
-    expect(END_TO_END).toContain("5. 追加公開物:");
+    expect(END_TO_END).toContain("5. 追加公開物（Release 記録）:");
+    expect(END_TO_END).toContain("次の Release 記録手順を Custom Tool 操作カタログ（release_create、release_list、release_read）経由で実行する");
+    expect(END_TO_END).toContain("1. 版タグ列挙: 対象プロジェクトの版タグ（正式 SemVer タグと RC タグ）を列挙する。非 SemVer のベースラインタグは対応対象から除外する");
+    expect(END_TO_END).toContain("2. 対応確認: release_list で全 Release を読み取り、版タグごとの対応（同名 Release の有無、draft・prerelease 状態）を確認する。既存 Release がある版タグは作成を省略する（同一タグへの二つ目の Release を作らない）");
+    expect(END_TO_END).toContain("3. 欠落タグの補完（該当時のみ）: リモートに存在しない既存版タグは、注釈付きの元のタグを上書きしない通常 push で送り、git ls-remote --tags でリモートとローカルのタグ識別子が一致することを確認してから草稿を作る。force push による解消を行わない");
+    expect(END_TO_END).toContain("4. 草稿作成: 対応のない版タグへ release_create で草稿を作成する。RC 版タグは prerelease: true で作成する。Release タイトルは版タグ名とする。作成に失敗した場合はタグを移動・再作成せず、Release が欠けているため工程を完了できない旨を報告して停止する");
+    expect(END_TO_END).toContain("5. 読み戻し確認: release_list（必要に応じて release_read）で全版タグと Release の 1:1 対応を再読取して確認するまで、Release 記録工程を完了としない。同一タグ名の Release が2件検出された場合は削除せずに読み戻し結果を報告して停止する");
     expect(END_TO_END).toContain("6. 結果記録:");
   });
 
-  test("公開操作の実行経路が非対話認証経路・カタログ外操作の迂回禁止・権限不足時のリリース完了としないことを手順化している", () => {
+  test("公開操作の実行経路が非対話認証経路・Release 操作のカタログ経路限定・公開モード非包含・権限不足時のリリース完了としないことを手順化している", () => {
     expect(END_TO_END).toContain("リモートへの push は Git 操作の非対話認証経路の契約に従う（対話認証を待機せず、資格情報の値を解析証拠やログへ出力しない）");
-    expect(END_TO_END).toContain("GitHub Release 等の追加公開成果物の作成は Custom Tool カタログに含まれない操作である。workflow はリリースノート草稿・確認の準備までを行い、実行は公開権限の確認後の所定経路（利用者の実行、または承認された操作経路）とする。カタログ外操作を迂回しない".replace("リリースノート草稿・確認の準備", "リリースノート草稿・対象確認の準備"));
+    expect(END_TO_END).toContain("GitHub Release の作成・読み戻しは Custom Tool 操作カタログの Release 操作（release_create、release_list、release_read）経由でのみ行う");
+    expect(END_TO_END).toContain("release_create の入力契約に公開モード（draft の解除、publish 相当フィールド）は含まれず、契約外の公開指定フィールドを含む要求は副作用発生前に入力契約違反として拒否される");
+    expect(END_TO_END).toContain("公開は利用者が草稿作成とは別に明確に認めた場合に限る。生 gh コマンドによる Release 書き込み（カタログ外書き込み経路）を迂回しない");
     expect(END_TO_END).toContain("公開方式・権限・必要な環境が不足する場合は、対象と理由を報告し、リリース完了としない");
   });
 
-  test("異常系の取扱い表が対象なし・実変更なし・初期状態・到達不能・公開不能の各ケースを定義している", () => {
+  test("異常系の取扱い表が対象なし・実変更なし・初期状態・到達不能・公開不能・Release 草稿失敗・Release 重複・タグ push 失敗の各ケースを定義している", () => {
     expect(END_TO_END).toContain("| RU 0 件 | stage 4〜7 を開始せず、一式不在の旨を報告する。リリースは作成しない |");
     expect(END_TO_END).toContain("| リリース対象となる実変更なし | 完遂判定の結果、一式に対応する実変更（マージ済み変更）が存在しない場合はリリースを作成せず報告する |");
     expect(END_TO_END).toContain("| 正式なバージョン基準なし（初期状態） |");
     expect(END_TO_END).toContain("| 到達可能な正式タグ 0 件 |");
     expect(END_TO_END).toContain("| 公開方式・権限・環境の不足 | 対象と理由を報告し、リリース完了としない。完遂済み・リリース保留（理由記録）として扱う |");
+    expect(END_TO_END).toContain("| Release 草稿作成の失敗 | タグを移動・再作成せず、Release が欠けているため工程を完了できない旨を報告して停止する。再開時は既存のタグと Release を使い、同一タグへ二つ目の Release を作らない |");
+    expect(END_TO_END).toContain("| 同一タグ名の Release が2件検出 | 削除・変更せずに読み戻し結果を報告して停止する（重複解消は利用者判断） |");
+    expect(END_TO_END).toContain("| 欠落タグの push 失敗または識別子不一致 | force push による解消を行わず、失敗内容と識別子の差異を報告して停止する（草稿は作成しない） |");
   });
 
   test("一式再開経路が完遂済み Case の stage 6 以降からの再開と case-auto 単独の再開入口契約の非変更を宣言している", () => {

@@ -28,7 +28,7 @@ backlog-auto command は公開 interface（入出力契約、ガードレール�
 - 各子ワークフローの既存副作用（`.agentdev/` 配下の成果物作成、削除、git commit / push、ユーザー対話）を子コマンド公開契約どおりに発生させる
 - set-state の作成・更新（`.agentdev/` 配下、req-units と draft の配置外。set-state 永続化契約に従う）
 - git タグ作成・push（リリース時。版番号・リリース条件・公開操作はパッチリリース規則の Decision に従う）
-- 追加公開成果物の準備物作成（リリースノート草稿・対象確認。Custom Tool カタログに含まれない操作の実行は承認後の所定経路）
+- 追加公開成果物の対応（ADF本体では GitHub Release の草稿作成・読み戻しまでを Custom Tool カタログ経路で実行する。公開は利用者が草稿作成とは別に明確に認めた場合に限る。カタログに含まれない操作の実行は承認後の所定経路）
 - 当該 Workflow Skill は worktree root 配下以外を編集しない
 
 ## 制御平面（STEP 一覧）
@@ -49,7 +49,7 @@ STEP 番号は既存 STEP（STEP-1〜6）の契約を維持したままの追加
 | STEP-8 | stage 4: 要件定義接続 | set-state 初期化済み | 単一要件doc 確定（単一 req-define 実行、入力は一式 RU の明示列挙） | [references/end-to-end-execution.md](references/end-to-end-execution.md) |
 | STEP-9 | stage 5: 実行接続 | 要件doc 確定 | 単一 case-auto 実行の完了または停止（要件doc 明示指定） | [references/end-to-end-execution.md](references/end-to-end-execution.md) |
 | STEP-10 | stage 6: 全体完了判定 | case-auto 完了、または再開時に set-state 上で実行済みと確定 | 完遂 / 未完遂判定（義務スナップショットと対応表による突合） | [references/end-to-end-execution.md](references/end-to-end-execution.md) |
-| STEP-11 | stage 7: リリース | 完遂、リリース条件・公開権限の成立 | タグ作成、追加公開物準備、リリース状態記録 / 完遂済み・リリース保留 | [references/end-to-end-execution.md](references/end-to-end-execution.md) |
+| STEP-11 | stage 7: リリース | 完遂、リリース条件・公開権限の成立 | タグ作成、Release 草稿作成・読み戻し確認、リリース状態記録 / 完遂済み・リリース保留 | [references/end-to-end-execution.md](references/end-to-end-execution.md) |
 
 ### STEP 間の依存と分岐
 

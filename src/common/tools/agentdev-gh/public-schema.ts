@@ -14,12 +14,14 @@ export const AGENTDEV_GH_REQUEST_PROPERTY_SCHEMA = {
     "Structured GitHub issue/PR operation request. See the agentdev_gh operation contract " +
     "(issue_create, issue_read, issue_update, issue_close, pr_create, pr_read, pr_merge, pr_changed_files, " +
     "pr_mergeable, pr_update, issue_list, issue_reopen, comment_create, comment_list, comment_update, " +
-    "comment_delete). " +
+    "comment_delete, release_create, release_list, release_read). " +
     "Tracking-issue operations expose the logical role; physical label mapping " +
     "is applied inside the tool. Tracking-issue kind and non-terminal state are held in the issue body " +
     "standard structure, not accepted or derived by the tool. Comments are a shared logical resource " +
     "of issues and pull requests, identified by commentId (public type: string). Side-effect operations " +
-    "are verified by read-back before success is returned (fail-closed).",
+    "are verified by read-back before success is returned (fail-closed). Release operations are " +
+    "GitHub-connected only; release_create creates a draft Release and has no publish mode in its " +
+    "input contract (publish requires separate explicit user approval).",
   properties: {
     operation: {
       type: "string",
@@ -36,11 +38,11 @@ export const AGENTDEV_GH_REQUEST_PROPERTY_SCHEMA = {
       type: "string",
       description: "Comment identifier for comment_update / comment_delete (public type: string).",
     },
-    title: { type: "string", description: "Title for issue_create / issue_update / pr_create / pr_update." },
+    title: { type: "string", description: "Title for issue_create / issue_update / pr_create / pr_update / release_create." },
     body: {
       type: "string",
       description:
-        "Markdown body for write operations (issues, PRs, comments).",
+        "Markdown body for write operations (issues, PRs, comments, releases).",
     },
     labels: {
       type: "array",
@@ -67,6 +69,14 @@ export const AGENTDEV_GH_REQUEST_PROPERTY_SCHEMA = {
     base: { type: "string", description: "Base branch for pr_create." },
     head: { type: "string", description: "Head branch for pr_create." },
     method: { type: "string", enum: ["merge", "squash", "rebase"], description: "Merge method for pr_merge." },
+    tagName: {
+      type: "string",
+      description: "Existing version tag name for release_create / release_read (tag↔Release correspondence).",
+    },
+    prerelease: {
+      type: "boolean",
+      description: "Create the draft Release as a prerelease for release_create (RC tags require true).",
+    },
   },
   required: ["operation"],
   additionalProperties: false,

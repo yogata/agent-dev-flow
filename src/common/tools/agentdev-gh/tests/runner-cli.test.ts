@@ -690,11 +690,21 @@ interface StubPr {
   isDraft: boolean;
 }
 
+interface StubRelease {
+  id: number;
+  tag_name: string;
+  name: string | null;
+  body: string;
+  draft: boolean;
+  prerelease: boolean;
+}
+
 interface GithubStub {
   readonly exec: GhExec;
   readonly issues: StubIssue[];
   readonly comments: StubComment[];
   readonly prs: StubPr[];
+  readonly releases: StubRelease[];
   readonly requests: string[];
   readonly patches: { readonly path: string; readonly body: Record<string, unknown> }[];
   /** true にすると comments 一覧 GET を 500 エラーにする（読み戻し失敗の注入用）。 */
@@ -724,22 +734,37 @@ function commentJson(comment: StubComment): Record<string, unknown> {
   };
 }
 
+function releaseJson(release: StubRelease): Record<string, unknown> {
+  return {
+    id: release.id,
+    tag_name: release.tag_name,
+    name: release.name,
+    body: release.body,
+    draft: release.draft,
+    prerelease: release.prerelease,
+    html_url: `https://example/r/${release.id}`,
+  };
+}
+
 const NOT_FOUND = { status: 1, stdout: "", stderr: "gh: Not Found (HTTP 404)" };
 
 function githubStub(init: {
   issues?: StubIssue[];
   comments?: StubComment[];
   prs?: StubPr[];
+  releases?: StubRelease[];
 }): GithubStub {
   const issues = init.issues ?? [];
   const comments = init.comments ?? [];
   const prs = init.prs ?? [];
+  const releases = init.releases ?? [];
   const requests: string[] = [];
   const patches: { path: string; body: Record<string, unknown> }[] = [];
   const stub: GithubStub = {
     issues,
     comments,
     prs,
+    releases,
     requests,
     patches,
     failCommentsList: false,
@@ -886,6 +911,40 @@ function githubStub(init: {
           stdout: JSON.stringify({ number: n, html_url: `https://example/p/${n}` }),
           stderr: "",
         };
+      }
+      if (path === "repos/owner/repo/releases" && method === "GET") {
+        const perPage = Number.parseInt(params.get("per_page") ?? "100", 10);
+        const page = Number.parseInt(params.get("page") ?? "1", 10);
+        const slice = releases.slice((page - 1) * perPage, page * perPage);
+        return { status: 0, stdout: JSON.stringify(slice.map(releaseJson)), stderr: "" };
+      }
+      if (path === "repos/owner/repo/releases" && method === "POST") {
+        if (inputBody.draft !== true) {
+          return { status: 1, stdout: "", stderr: "stub: release create must be draft" };
+        }
+        if (typeof inputBody.tag_name !== "string" || inputBody.tag_name.length === 0) {
+          return { status: 1, stdout: "", stderr: "stub: release create requires tag_name" };
+        }
+        if (releases.some((r) => r.tag_name === inputBody.tag_name)) {
+          return { status: 1, stdout: "", stderr: `gh: tag already has an existing release (HTTP 422)` };
+        }
+        const release: StubRelease = {
+          id: releases.length + 1,
+          tag_name: inputBody.tag_name,
+          name: typeof inputBody.name === "string" ? inputBody.name : null,
+          body: typeof inputBody.body === "string" ? inputBody.body : "",
+          draft: true,
+          prerelease: inputBody.prerelease === true,
+        };
+        releases.push(release);
+        return { status: 0, stdout: JSON.stringify(releaseJson(release)), stderr: "" };
+      }
+      const releaseTagMatch = /^repos\/owner\/repo\/releases\/tags\/(.+)$/.exec(path ?? "");
+      if (releaseTagMatch !== null && method === "GET") {
+        const tag = decodeURIComponent(releaseTagMatch[1] ?? "");
+        const release = releases.find((r) => r.tag_name === tag);
+        if (release === undefined) return NOT_FOUND;
+        return { status: 0, stdout: JSON.stringify(releaseJson(release)), stderr: "" };
       }
       return { status: 1, stdout: "", stderr: `stub: unhandled ${method} ${rawPath}` };
     },
@@ -1538,6 +1597,139 @@ describe("CliRunner + engine: Comment CRUD（TS-012 / TS-014）", () => {
     const reply = await run(exec, tempDir, { operation: "issue_read", args: { number: 5 } });
     expect(reply.ok).toBe(false);
     if (!reply.ok) expect(reply.failureClass).toBe("enforcement-crashed");
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+});
+
+describe("CliRunner + engine: Release 操作（draft 固定・一覧読取・読み戻し）", () => {
+  test("release_create は常に draft: true を GitHub API へ投入し読み戻しで draft と prerelease を確認する", async () => {
+    const tempDir = makeTempDir();
+    const stub = githubStub({});
+    const result = await runOp(stub.exec, tempDir, {
+      operation: "release_create",
+      tagName: "v4.0.0-rc.1",
+      title: "v4.0.0-rc.1",
+      body: "リリースノート本文",
+      prerelease: true,
+    });
+    expect(result.ok).toBe(true);
+    const created = stub.patches.find((p) => p.path === "repos/owner/repo/releases");
+    expect(created).toBeDefined();
+    expect(created?.body.draft).toBe(true);
+    expect(created?.body.prerelease).toBe(true);
+    expect(created?.body.tag_name).toBe("v4.0.0-rc.1");
+    expect(stub.releases).toHaveLength(1);
+    expect(stub.releases[0]?.draft).toBe(true);
+    if (result.ok && result.success.operation === "release_create") {
+      expect(result.success.draft).toBe(true);
+      expect(result.success.prerelease).toBe(true);
+    }
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test("release_create の読み戻しで draft が解除されていた場合は verification-incomplete", async () => {
+    const tempDir = makeTempDir();
+    const stub = githubStub({});
+    const innerExec = stub.exec;
+    const unwrappedExec: GhExec = (file, args) => {
+      const r = innerExec(file, args);
+      if (r.status === 0 && args.some((a) => a === "repos/owner/repo/releases/tags/v1.2.3")) {
+        const payload = JSON.parse(r.stdout) as Record<string, unknown>;
+        payload.draft = false;
+        return { ...r, stdout: JSON.stringify(payload) };
+      }
+      return r;
+    };
+    const result = await runOp(unwrappedExec, tempDir, {
+      operation: "release_create",
+      tagName: "v1.2.3",
+      title: "t",
+      body: "b",
+      prerelease: false,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.failure.kind).toBe("verification-incomplete");
+      expect(result.failure.retryable).toBe(false);
+    }
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test("release_list は draft を含む全 Release をタグ対応付きで正規化して返す", async () => {
+    const tempDir = makeTempDir();
+    const stub = githubStub({
+      releases: [
+        { id: 3, tag_name: "v2.0.0", name: "v2.0.0", body: "b3", draft: false, prerelease: false },
+        { id: 1, tag_name: "v1.0.0", name: null, body: "b1", draft: false, prerelease: false },
+        { id: 4, tag_name: "v4.0.0-rc.2", name: "v4.0.0-rc.2", body: "b4", draft: true, prerelease: true },
+      ],
+    });
+    const result = await runOp(stub.exec, tempDir, { operation: "release_list" });
+    expect(result.ok).toBe(true);
+    if (result.ok && result.success.operation === "release_list") {
+      expect(result.success.releases).toHaveLength(3);
+      const tags = result.success.releases.map((r) => r.tagName);
+      expect(tags).toContain("v2.0.0");
+      expect(tags).toContain("v1.0.0");
+      expect(tags).toContain("v4.0.0-rc.2");
+      const rc = result.success.releases.find((r) => r.tagName === "v4.0.0-rc.2");
+      expect(rc?.draft).toBe(true);
+      expect(rc?.prerelease).toBe(true);
+      const untitled = result.success.releases.find((r) => r.tagName === "v1.0.0");
+      expect(untitled?.title).toBe("");
+    }
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test("release_read はタグ対応の Release を返し、対応不在は operation-failed", async () => {
+    const tempDir = makeTempDir();
+    const stub = githubStub({
+      releases: [
+        { id: 1, tag_name: "v1.0.0", name: "v1.0.0", body: "b", draft: false, prerelease: false },
+      ],
+    });
+    const found = await runOp(stub.exec, tempDir, {
+      operation: "release_read",
+      tagName: "v1.0.0",
+    });
+    expect(found.ok).toBe(true);
+    if (found.ok && found.success.operation === "release_read") {
+      expect(found.success.tagName).toBe("v1.0.0");
+      expect(found.success.draft).toBe(false);
+    }
+    const missing = await runOp(stub.exec, tempDir, {
+      operation: "release_read",
+      tagName: "v9.9.9",
+    });
+    expect(missing.ok).toBe(false);
+    if (!missing.ok) {
+      expect(missing.failure.kind).toBe("operation-failed");
+      expect(missing.failure.retryable).toBe(true);
+    }
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test("同一タグへの release_create 再試行（既存 Release 重複）は operation-failed", async () => {
+    const tempDir = makeTempDir();
+    const stub = githubStub({});
+    const first = await runOp(stub.exec, tempDir, {
+      operation: "release_create",
+      tagName: "v1.2.3",
+      title: "t",
+      body: "b",
+      prerelease: false,
+    });
+    expect(first.ok).toBe(true);
+    const duplicate = await runOp(stub.exec, tempDir, {
+      operation: "release_create",
+      tagName: "v1.2.3",
+      title: "t",
+      body: "b",
+      prerelease: false,
+    });
+    expect(duplicate.ok).toBe(false);
+    if (!duplicate.ok) expect(duplicate.failure.kind).toBe("operation-failed");
+    expect(stub.releases).toHaveLength(1);
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 });
