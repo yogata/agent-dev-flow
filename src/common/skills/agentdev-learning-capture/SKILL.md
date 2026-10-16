@@ -72,6 +72,10 @@ learning は「改善提案そのもの」ではなく「改善提案へ昇華�
 単一の観測が同時に learning item と intake item の両方を生み出す場合、本スキルは learning item のみを生成し、intake item の生成は `/agentdev/intake-capture` に委ねる。
 1つの観測から得られた知見を単一エントリに混在させてはならない（capture-boundaries.md の split rule に準拠）。
 
+## 計測前提を含む記録の baseline 明記（採番時点）
+
+テスト結果・検査件数・fail 数・計測値等の計測前提を含む学びを記録する場合は、採番（記録作成）時点の baseline を問題事象または根本原因の記述に明記する。明記する要素は、計測対象の commit hash（またはタグ）、計測日時、計測範囲（実行コマンドと対象）である。契約の正は v4-delegation-contracts Design「委譲制約」の着手時再計測前置条項であり、本明記は learning 記録から起票された子 Issue が着手時に起票前提の陳腐化を判定できる材料を確保する記録側の運用である。baseline 未明記の計測前提は、着手時再計測を前置しない限り陳腐化判定材料として成立しない。
+
 ## reference選択表
 
 通常経路で全 reference を無条件読込しない。
