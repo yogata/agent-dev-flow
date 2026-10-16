@@ -36,3 +36,19 @@
 - **想定反映先**: 配布依存境界 Design・checker 実行契約
 - **関連**: PR #3775（Findings に同一記録）
 - **タグ**: #配布依存境界 #gate #e2e
+
+## case-ready canonical-and-cleanup の ff-only merge が squash merge 後の分岐で失敗（Case #3776）
+
+- **問題事象**: case-ready STEP-7 の工程別 script（accept_definition_checks.ts、phase: canonical-and-cleanup）が pr_merge（squash）直後の main で「git fetch origin main → merge --ff-only origin/main」を実行したが、ローカル main に case-open 由来の draft 永続化 commit（未 push、5abf6f06）が残っていたため分岐（Diverging branches）となり ff-only merge が失敗した（baseline: main HEAD bb6b7e0c の直前、Case #3776、2026-10-16、Case #3776 の case-ready 実行）
+- **発生局面**: case-ready STEP-7（canonical 再取得と draft/RU 削除）
+- **検知方法**: script 報告 JSON の canonical-reacquisition step が fail（exit 1、stderr に「Diverging branches can't be fast-forwarded, aborting」）
+- **根本原因**: case-open が draft 永続化 commit をローカル main に積んだまま設計PR（squash merge）を作成するため、squash merge 後の origin/main とローカル main は常に分岐する構造になっている。canonical-and-cleanup の ff-only 経路はこの分岐を想定していない
+- **自律対応内容**: agentdev-git-worktree の squash merge 後分岐ハンドリング手順（git-common-procedures.md 手順 8）で重複分析（ローカル先行 commit の draft ファイルと squash commit の docs 9ファイルの重複なし＝独立変更）を実施した後、git rebase origin/main でローカル先行 commit を再適用し canonical 同期を成立させた（重複ゼロのため conflict なしで自動解決）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（正規手順の適用で解消。script の ff-only 経路と自工程 merge method（squash）の構造不整合という改善余地の記録のみ）
+- **横展開観点**: case-revise 由来の設計修正PR squash merge 後の case-ready 再実行、および同一 Case での draft 永続化 commit 残存の全ケースで同一条件が再現し得る
+- **再発条件**: ローカル main に未 push の commit がある状態で pr_merge（squash）を完了し、case-ready の canonical-and-cleanup（removalPaths の有無にかかわらず）を呼び出した場合
+- **予防策候補**: canonical-and-cleanup script への分岐検出時の rebase フォールバック組込み、または case-ready 手順の script 呼出前に分岐ハンドリング手順 8 を前置する運用規律の明記
+- **想定反映先**: agentdev-workflow-case-ready scripts（accept_definition_checks.ts）、case-ready workflow skill references（readiness-and-cleanup.md）
+- **関連**: Case Issue #3776、src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts、src/common/skills/agentdev-git-worktree/references/git-common-procedures.md（手順 8）
+- **タグ**: #git-workaround #case-ready #squash-merge
