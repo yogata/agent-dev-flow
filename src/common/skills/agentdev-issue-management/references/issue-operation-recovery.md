@@ -25,6 +25,12 @@
   - spawnSync エラー種別（起動不能時に出力される）
 2. `gh auth status` で gh CLI の認証状態を確認する。未認証の場合は `gh auth login` で認証する。`gh auth login` は gh CLI の API 認証を設定する対話的な案内であり、実行環境側で人間が行う操作に位置づける。一方、Git 操作（push を含むドメイン状態永続化）の認証は非対話経路で設定済みであることを前提とし、その設定手順と認証方式の選定規律は実行環境側が正規所有する（AGENTS.md「ハーネス選定」の非対話認証参照行と実行環境知識文書 `docs/knowledge/git-noninteractive-auth.md`）。Git 操作の認証失敗・対話要求・タイムアウトの検出と報告は `agentdev-git-worktree` の domain state 永続化プロシージャ（`references/git-common-procedures.md`「2. ドメイン状態永続化」の push 失敗時の認証起因分類）に従う。資格情報の値を解析証拠やログへ出力しない。
 3. `gh repo view --json nameWithOwner` を手動実行し、gh CLI 単体でのリポジトリ解決可否を切り分ける。
+4. 手順 3 で解消しない起動環境障害（gh exit 66・stderr 空等）では、2 段分離試験で runner 契約と実行環境の正常性を切り分ける。diagnostic 出力に資格情報等の機密値を含めない。
+
+   - 手順 1（bash 直叩き）: bash から同一引数の gh を直接実行する（例: `gh repo view --json nameWithOwner`）。Custom Tool `agentdev_gh` を経由しない単体実行である
+   - 手順 2（runner 経路）: bun から runner と同一の spawnSync 経路で実行する（CliRunner 直接実行。`src/common/tools/agentdev-gh` の CliRunner を同一引数で起動し、Custom Tool 本体と同じ経路で gh を呼び出す）
+   - 判定基準: bash 成功 + runner 経路失敗 → plugin ホスト環境差（runner の spawnSync 経路・plugin ホスト側の環境依存）。bash も失敗 → 実行環境側の問題（gh CLI・認証・ネットワーク等）。両方成功する場合は当該障害が経路固有の一時事象と判定し、診断手順 1〜3 の要点記録とともに再発観測へ残す
+   - 境界: 本試験は読み取り系の切り分けであり、書込み操作の gh CLI 代替禁止（fail-closed 契約）を変更しない。runner-cli.ts の failFromExec detail 文言拡張は REQ-052-014「最小限の detail」契約の維持のため行わない（失敗分類値域 config-uninterpretable / enforcement-crashed / operation-failed は不変）
 
 ### 回復手段（harness 再起動）
 
