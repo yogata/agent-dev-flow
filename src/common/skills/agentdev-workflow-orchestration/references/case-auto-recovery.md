@@ -34,6 +34,8 @@ case-auto 親ループは当該子 task の worktree で `git status` を実行�
 状態 (a) は rebase、push、PR 作成代行、`completed-pr` 記録、case-close 合流の順に進む。
 PR 作成代行は case-auto 親ループの責務であり、子 task 側で再び委譲を起こさない。
 
+回収側の記録規律（同一 worktree 複数委譲〔中断→回収〕の回収）: 契約の正は v4-delegation-contracts Design「委譲制約」の回収側条項である。回収 PR の作成代行時は、PR 本文の実行識別情報（DEL 識別子）と検証差分に中断側委譲と回収側委譲の両方の記録を併記し、完了扱いの前に中断側で生成済みの成果物と回収側成果物の内容同一性を機械確認（diff 空）する。機械確認が成立しない回収 PR は完了扱いとしない（重複 PR 完了扱いの二重計上の防止）。手順面の詳細は `agentdev-workflow-case-run` references（delegation-and-result）「同一 worktree 複数委譲（中断→回収）の回収手順」を参照する。
+
 状態 (b) は作業意図整合確認ステップを必須とする。
 未コミット変更の帰属は安全上の懸念になるため、変更内容が子 task の case-run 作業意図（Issue の受け入れ条件、実装計画）と整合するかを確認する。
 整合確認ができた場合のみ commit、push、PR 作成を代行する。

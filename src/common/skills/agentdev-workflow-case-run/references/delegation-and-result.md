@@ -59,6 +59,7 @@
 - **case-run 本体は実装方針を生成・審査しない**: 実装方針の形成、adversarial-review 呼出、結果反映は委譲内で adapter の委譲契約に従い、最初の実装変更前に実施する。case-run 本体が実装方針を生成、保持、審査するステップを新設しない。委譲 result（4状態）のみで委譲内の結果を受領する
 - **adapter 委譲内 adversarial-review**: 発動条件判定と review 呼出は adapter 委譲内で実行担当サブエージェントが分離して実施する。default-on、skip 条件（実装方針が自明で意味的決定が存在しない場合）該当時は省略して従来フローを継続する。ユーザーが review の実施を明示的に指示した場合は通常のユーザー指示としてその場で実行する（専用の検出・フラグ・Issue 本文への専用保存・後工程への専用伝播・skip 条件の専用上書き処理を持たない）。skip 時は判定理由と代替自己反証（却下案・緩和策・unresolved なしの確認）を PR 本文へ必須記録する（silent skip の防止）。実装方針限定、blocked 遷移（(1) 既確定文書の変更・追加・撤回が必要、(2) 要件・仕様問題の検出、(3) unresolved な本質的争点またはユーザー判断事項が残る）の詳細は `agentdev-case-run-execution-adapter` 参照
 - **background 委譲の起動消失の回復**: background 委譲の起動直後消失を検知した場合、durable state（worktree の git status、PR 存在、Issue コメント）で実行の帰属を確認する。実行未試行と判定した場合は同期実行によらず background での再委譲（親 orchestration が所有する起動間隔契約に従う）を行い、background 再委譲の起動失敗が継続する場合は、Design が所有する再試行計上契約に基づき delegation-unavailable として再開可能な停止報告へ確定する。実行中断と判定した場合の継続判断も当該 durable state に基づく。実行並列上限（共有 active Issue task 枠）は case-auto orchestration stage 3 が単一所有する（詳細は `agentdev-case-run-execution-adapter` 参照）
+- **同一 worktree 複数委譲（中断→回収）の回収手順**: 同一 worktree への複数委譲（中断側委譲の中断後、回収側委譲で作業を引き継ぐ構成）では、契約の正である v4-delegation-contracts Design「委譲制約」の回収側条項に従い、次の 2 点を手順として実行する。（1）記録併記: 回収側は、回収 PR 本文の実行識別情報（DEL 識別子）と検証差分に、中断側委譲と回収側委譲の両方の記録を併記する（委譲識別情報ブロックの転記と検証差分セクションの行を両委譲分で保持する）。（2）機械確認前置: 回収側の完了扱いの前に、中断側で生成済みの成果物と回収側成果物の内容同一性を機械確認（diff 空）することを前置条件とする。重複 PR が発生した場合、機械確認が成立しない回収 PR を完了扱いとしない。本手順は委譲時最小契約・委譲種別・result 4 状態との整合の下で運用し、完了扱いの二重計上を防ぐ
 
 ### Result
 
