@@ -1,12 +1,12 @@
 //
 // 操作契約の契約テスト。
 //
-// Design custom-tool-contracts.md が所有する対象操作の境界（16操作カタログ）と、
+// Design custom-tool-contracts.md が所有する対象操作の境界（19操作カタログ）と、
 // 操作カタログの契約整合（副作用分類、継続契約）を完全列挙で固定する。
 // 対象外 GitHub 機能（Issue 削除、PR close/reopen、review、inline review comment、
-// assignee、milestone、Projects、lock/unlock、pin/unpin 等）の追加は列挙固定に
-// よって検出される。廃止済みの issue_comment（二重モード操作）も禁止対象として
-// 固定する。
+// assignee、milestone、Projects、lock/unlock、pin/unpin、Release 公開・更新・削除
+// 等の公開モード系操作）の追加は列挙固定によって検出される。廃止済みの
+// issue_comment（二重モード操作）も禁止対象として固定する。
 
 
 import { describe, expect, test } from "bun:test";
@@ -24,7 +24,7 @@ import {
 } from "../index.ts";
 
 describe("操作カタログ（Design 対象操作との一致）", () => {
-  test("16操作カタログを完全列挙で固定する", () => {
+  test("19操作カタログを完全列挙で固定する", () => {
     expect([...GH_TOOL_OPERATIONS]).toEqual([
       "issue_create",
       "issue_read",
@@ -42,10 +42,13 @@ describe("操作カタログ（Design 対象操作との一致）", () => {
       "comment_list",
       "comment_update",
       "comment_delete",
+      "release_create",
+      "release_list",
+      "release_read",
     ]);
   });
 
-  test("16操作カタログは Comment 4操作と pr_update を含む", () => {
+  test("19操作カタログは Comment 4操作と pr_update と Release 3操作を含む", () => {
     const catalog = new Set(GH_TOOL_OPERATIONS);
     for (const op of [
       "comment_create",
@@ -53,12 +56,15 @@ describe("操作カタログ（Design 対象操作との一致）", () => {
       "comment_update",
       "comment_delete",
       "pr_update",
+      "release_create",
+      "release_list",
+      "release_read",
     ]) {
       expect(catalog.has(op as (typeof GH_TOOL_OPERATIONS)[number])).toBe(true);
     }
   });
 
-  test("対象外操作（削除・review・管理系 GitHub 機能・廃止済み issue_comment）はカタログへ追加されていない", () => {
+  test("対象外操作（削除・review・管理系 GitHub 機能・廃止済み issue_comment・Release 公開モード系）はカタログへ追加されていない", () => {
     const catalog = new Set<string>(GH_TOOL_OPERATIONS);
     const forbidden = [
       "issue_delete",
@@ -77,6 +83,10 @@ describe("操作カタログ（Design 対象操作との一致）", () => {
       "pr_draft_update",
       "pr_base_update",
       "issue_comment",
+      "release_publish",
+      "release_update",
+      "release_delete",
+      "release_create_published",
     ];
     for (const op of forbidden) {
       expect(catalog.has(op)).toBe(false);
@@ -97,6 +107,14 @@ describe("操作カタログ（Design 対象操作との一致）", () => {
     expect(kindOf("comment_delete")).toBe("side-effect");
     expect(kindOf("comment_list")).toBe("read-only");
     expect(kindOf("pr_update")).toBe("side-effect");
+  });
+
+  test("Release 草稿作成は side-effect、Release 一覧読取・読み戻しは read-only", () => {
+    const kindOf = (op: string) =>
+      GH_TOOL_OPERATION_CATALOG.find((e) => e.operation === op)?.kind;
+    expect(kindOf("release_create")).toBe("side-effect");
+    expect(kindOf("release_list")).toBe("read-only");
+    expect(kindOf("release_read")).toBe("read-only");
   });
 });
 
@@ -142,6 +160,61 @@ describe("登録構造", () => {
   test("Tool 名と説明が非空で公開されている", () => {
     expect(AGENTDEV_GH_TOOL_NAME).toBe("agentdev_gh");
     expect(AGENTDEV_GH_TOOL_DESCRIPTION.length).toBeGreaterThan(0);
+  });
+});
+
+describe("Release 操作の入力契約（公開モード非包含）", () => {
+  const specOf = (op: string) => {
+    const spec = AGENTDEV_GH_OPERATION_SPECS.find((s) => s.operation === op);
+    if (spec === undefined) throw new Error(`spec missing for operation: ${op}`);
+    return spec;
+  };
+
+  test("release_create は公開相当フィールド（draft、published 等）を含む要求を副作用発生前に拒否する", () => {
+    const spec = specOf("release_create");
+    for (const extra of ["draft", "published", "publish", "make_latest"]) {
+      const raw = {
+        operation: "release_create",
+        tagName: "v1.2.3",
+        title: "t",
+        body: "b",
+        prerelease: false,
+        [extra]: true,
+      };
+      const validated = spec.validate(raw);
+      expect(validated.ok).toBe(false);
+      if (!validated.ok) {
+        expect(validated.error.code).toBe("unknown-field");
+        expect(validated.error.field).toBe(extra);
+      }
+    }
+  });
+
+  test("release_create の正常要求は受理し、prerelease は boolean で必須", () => {
+    const spec = specOf("release_create");
+    const ok = spec.validate({
+      operation: "release_create",
+      tagName: "v1.2.3-rc.1",
+      title: "t",
+      body: "",
+      prerelease: true,
+    });
+    expect(ok.ok).toBe(true);
+    for (const invalid of [
+      { operation: "release_create", tagName: "v", title: "t", body: "b", prerelease: "yes" },
+      { operation: "release_create", tagName: "v", title: "t", body: "b" },
+      { operation: "release_create", tagName: "", title: "t", body: "b", prerelease: true },
+    ]) {
+      expect(spec.validate(invalid).ok).toBe(false);
+    }
+  });
+
+  test("release_list は引数を受け付けず、release_read は tagName を必須とする", () => {
+    expect(specOf("release_list").validate({ operation: "release_list" }).ok).toBe(true);
+    expect(specOf("release_list").validate({ operation: "release_list", tagName: "v1" }).ok).toBe(false);
+    expect(specOf("release_read").validate({ operation: "release_read", tagName: "v1.2.3" }).ok).toBe(true);
+    expect(specOf("release_read").validate({ operation: "release_read" }).ok).toBe(false);
+    expect(specOf("release_read").validate({ operation: "release_read", draft: true }).ok).toBe(false);
   });
 });
 

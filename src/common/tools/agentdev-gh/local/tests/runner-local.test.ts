@@ -1172,3 +1172,24 @@ describe("LocalRunner: GitHub 版共通契約 parity（TS-015）", () => {
     fs.rmSync(issuesDir, { recursive: true, force: true });
   });
 });
+
+describe("LocalRunner: Release 操作（GitHub 接続専用例外）", () => {
+  test("Release 3操作はローカル環境では副作用を実行せず operation-failed を返す", async () => {
+    const issuesDir = makeIssuesDir();
+    const env = makeEnv(issuesDir);
+    const requests: unknown[] = [
+      { operation: "release_create", tagName: "v1.2.3", title: "t", body: "b", prerelease: false },
+      { operation: "release_list" },
+      { operation: "release_read", tagName: "v1.2.3" },
+    ];
+    for (const request of requests) {
+      const result = await runAgentdevGhOperation(env, request);
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.failure.kind).toBe("operation-failed");
+        expect(result.failure.detail).toContain("no GitHub Release equivalent state");
+      }
+    }
+    fs.rmSync(issuesDir, { recursive: true, force: true });
+  });
+});

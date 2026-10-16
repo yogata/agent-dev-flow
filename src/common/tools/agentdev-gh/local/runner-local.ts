@@ -41,6 +41,7 @@ import type {
   GhRunnerReply,
   GhRunnerRequest,
 } from "../runner.ts";
+import type { GhToolOperation } from "../contracts.ts";
 import {
   LOCAL_TRACKING_STATUS_VALUES,
   REOPEN_TRACKING_STATE,
@@ -479,6 +480,15 @@ export class LocalRunner implements GhRunner {
     return { ok: false, error, exitCode, failureClass };
   }
 
+  // Release 操作は GitHub 接続専用の例外（custom-tool-contracts Design が明示）。
+  // ローカル環境では GitHub Release 相当の状態を持たないため、副作用を実行せず
+  // 構造化失敗（operation-failed）を返す。
+  private releaseUnsupported(operation: GhToolOperation): GhRunnerReply {
+    return this.fail(
+      `${operation} is GitHub-connected only; the local environment has no GitHub Release equivalent state`,
+    );
+  }
+
   private issuePath(number: number): string {
     return path.join(this.issuesDir, issueFileName(number));
   }
@@ -620,6 +630,10 @@ export class LocalRunner implements GhRunner {
         return this.commentUpdate(args);
       case "comment_delete":
         return this.commentDelete(args);
+      case "release_create":
+      case "release_list":
+      case "release_read":
+        return this.releaseUnsupported(request.operation);
     }
   }
 

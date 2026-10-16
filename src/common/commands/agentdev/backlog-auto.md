@@ -22,7 +22,7 @@ backlog 整理サイクル（inspect-docs による文書診断、learning、int
 - 各子コマンドの既存副作用（`.agentdev/` 配下の成果物作成・削除、git commit/push、ユーザー対話）を子コマンド公開契約どおりに発生させる
 - set-state の作成・更新（`.agentdev/` 配下、req-units と draft の配置外）
 - git タグ作成・push（リリース時。版番号・リリース条件・公開操作はパッチリリース規則の Decision に従う）
-- 追加公開成果物の準備物作成（リリースノート草稿・対象確認。Custom Tool カタログに含まれない操作の実行は承認後の所定経路）
+- 追加公開成果物の対応（ADF本体では GitHub Release の草稿作成・読み戻しまでを Custom Tool カタログ経路で実行する。公開は利用者が草稿作成とは別に明確に認めた場合に限る。カタログに含まれない操作の実行は承認後の所定経路）
 
 ## HITL 境界
 

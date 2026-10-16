@@ -165,6 +165,12 @@ export class CliRunner implements GhRunner {
         return this.commentUpdate(request.args);
       case "comment_delete":
         return this.commentDelete(request.args);
+      case "release_create":
+        return this.releaseCreate(request.args);
+      case "release_list":
+        return this.releaseList(request.args);
+      case "release_read":
+        return this.releaseRead(request.args);
     }
   }
 
@@ -842,6 +848,114 @@ export class CliRunner implements GhRunner {
       return this.failFromExec(r);
     }
     return { ok: true, payload: { commentId: String(id), number } };
+  }
+
+  // ---------------------------------------------------------------------
+  // Release 系（GitHub 接続専用。入力契約に公開モードは存在せず、
+  // 作成は常に草稿（draft）として行う。公開は本 Tool の操作対象外）
+  // ---------------------------------------------------------------------
+
+  /** GitHub Release API の応答要素を操作契約の正規化形へ写像する。 */
+  private releaseItemFrom(rec: Record<string, unknown>): Record<string, unknown> | null {
+    const tagName = str(rec.tag_name);
+    const url = str(rec.html_url);
+    if (typeof rec.draft !== "boolean" || typeof rec.prerelease !== "boolean") return null;
+    // Release タイトル（API の name）は省略可能なため、欠落時は空文字へ正規化する。
+    const title = str(rec.name) ?? "";
+    if (tagName === null || tagName.length === 0 || url === null) return null;
+    return { tagName, title, body: str(rec.body) ?? "", draft: rec.draft, prerelease: rec.prerelease, url };
+  }
+
+  private releaseCreate(args: Record<string, unknown>): GhRunnerReply {
+    const tagName = str(args.tagName);
+    const title = str(args.title);
+    const body = str(args.body);
+    if (tagName === null || tagName.length === 0 || title === null || body === null) {
+      return this.fail("release_create requires tagName, title, and body", 0, "invalid-input");
+    }
+    if (typeof args.prerelease !== "boolean") {
+      return this.fail("release_create requires a boolean prerelease", 0, "invalid-input");
+    }
+    // draft: true は内部実装の固定値。公開モードは入力契約に含めない
+    // （操作契約の Release 操作節と対応 sidecar を正とする）。
+    return this.apiWithInput("POST", `repos/${this.repo}/releases`, {
+      tag_name: tagName,
+      name: title,
+      body,
+      prerelease: args.prerelease,
+      draft: true,
+    }, (rec) => {
+      const item = this.releaseItemFrom(rec);
+      if (item === null) {
+        return this.fail("release create reply missing tag_name/html_url", 0);
+      }
+      if (item.draft !== true) {
+        return this.fail("release create reply is not a draft", 0);
+      }
+      return { ok: true, payload: item };
+    });
+  }
+
+  private releaseList(_args: Record<string, unknown>): GhRunnerReply {
+    const reply = this.fetchAllReleases();
+    if (!reply.ok) return reply;
+    return { ok: true, payload: { releases: reply.payload } };
+  }
+
+  private releaseRead(args: Record<string, unknown>): GhRunnerReply {
+    const tagName = str(args.tagName);
+    if (tagName === null || tagName.length === 0) {
+      return this.fail("release_read requires tagName", 0, "invalid-input");
+    }
+    // GitHub API の草稿参照制約（GET /releases/tags/{tag} は published のみ）を
+    // runner 境界内で吸収するため、一覧取得から対象タグを引く（draft も取得可能）。
+    const reply = this.fetchAllReleases();
+    if (!reply.ok) return reply;
+    const releases = reply.payload as Record<string, unknown>[];
+    const found = releases.find((r) => r.tagName === tagName);
+    if (found === undefined) {
+      return this.fail(`no release found for tag ${tagName}`, 0);
+    }
+    return { ok: true, payload: found };
+  }
+
+  /** 全 Release の一覧取得（ページング）。draft を含む正規化形（正規化配列）で返す。 */
+  private fetchAllReleases(): GhRunnerReply {
+    const collected: Record<string, unknown>[] = [];
+    for (let page = 1; page <= LIST_MAX_PAGES; page++) {
+      const r = this.apiGetAny(
+        `repos/${this.repo}/releases?per_page=${LIST_PER_PAGE}&page=${page}`,
+        (payload) => {
+          if (!Array.isArray(payload)) {
+            return this.fail("releases reply is not an array", 0);
+          }
+          return { ok: true, payload };
+        },
+      );
+      if (!r.ok) return r;
+      const list = r.payload as unknown[];
+      for (const entry of list) {
+        if (!isRecord(entry)) return this.fail("release entry is not an object", 0);
+        collected.push(entry);
+      }
+      if (list.length < LIST_PER_PAGE) break;
+      if (page === LIST_MAX_PAGES) {
+        return this.fail(
+          `release_list reached the safety page limit (${LIST_MAX_PAGES} pages of ${LIST_PER_PAGE}); retry with a narrower target`,
+          0,
+          "operation-failed",
+        );
+      }
+    }
+    const releases: Record<string, unknown>[] = [];
+    for (const entry of collected) {
+      const item = this.releaseItemFrom(entry);
+      if (item === null) {
+        return this.fail("release entry missing tag_name/html_url or draft/prerelease flags", 0);
+      }
+      releases.push(item);
+    }
+    return { ok: true, payload: releases };
   }
 }
 
