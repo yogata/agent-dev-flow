@@ -8,7 +8,7 @@ updated: 2026-10-16
 <!-- ADF-COVERS(implementation): REQ-036-022 -->
 <!-- ADF-COVERS(implementation): REQ-007-010 -->
 <!-- ADF-COVERS(implementation): REQ-099-020 -->
-<!-- ADF-COVERS(design): REQ-010-080, REQ-010-081 -->
+<!-- ADF-COVERS(design): REQ-010-007, REQ-010-008, REQ-010-080, REQ-010-081 -->
 
 # 整合性契約
 
