@@ -1,0 +1,29 @@
+Targeted Docs Guard — workflow: case-close
+files checked: 15
+  docs/decisions/DEC-059.md
+  docs/designs/integrity/integrity-contracts.md
+  docs/designs/local/local-case-file.md
+  docs/designs/skills/agentdev-issue-tracking.md
+  docs/designs/skills/agentdev-workflow-backlog-auto.md
+  docs/designs/workflows/v4-delegation-contracts.md
+  docs/requirements/REQ-114.md
+  src/common/skills/agentdev-issue-management/references/issue-operation-recovery.md
+  src/common/skills/agentdev-learning-capture/SKILL.md
+  src/common/skills/agentdev-workflow-case-close/references/cleanup-and-capture.md
+  src/common/skills/agentdev-workflow-case-close/references/pr-merge-and-conflict.md
+  src/common/skills/agentdev-workflow-case-run/references/delegation-and-result.md
+  src/common/skills/agentdev-workflow-case-run/scripts/record-comments.ts
+  src/common/skills/agentdev-workflow-case-run/scripts/tests/record-comments.test.ts
+  src/common/skills/agentdev-workflow-orchestration/references/case-auto-recovery.md
+coupled files checked: 3
+  docs/README.md
+  docs/designs/README.md
+  docs/requirements/README.md
+failures: 0
+warnings: 0
+doc_map_update_required: false
+design_readme_update_required: false
+requirements_readme_update_required: false
+full_docs_check_recommended: false
+extensions_check_required: false
+docInputsCheckRequired: true

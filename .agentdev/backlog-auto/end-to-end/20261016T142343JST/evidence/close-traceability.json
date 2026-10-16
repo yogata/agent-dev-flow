@@ -1,0 +1,85 @@
+{
+  "checks": {
+    "malformed-declarations": {
+      "kind": "malformed-declarations",
+      "status": "pass",
+      "findings": []
+    },
+    "unknown-roles": {
+      "kind": "unknown-roles",
+      "status": "pass",
+      "findings": []
+    },
+    "unknown-req-refs": {
+      "kind": "unknown-req-refs",
+      "status": "pass",
+      "findings": []
+    },
+    "invalid-artifact-paths": {
+      "kind": "invalid-artifact-paths",
+      "status": "pass",
+      "findings": []
+    },
+    "missing-design": {
+      "kind": "missing-design",
+      "status": "pass",
+      "findings": []
+    },
+    "missing-implementation": {
+      "kind": "missing-implementation",
+      "status": "pass",
+      "findings": []
+    },
+    "missing-verification": {
+      "kind": "missing-verification",
+      "status": "pass",
+      "findings": []
+    },
+    "policy-invalid": {
+      "kind": "policy-invalid",
+      "status": "pass",
+      "findings": []
+    },
+    "duplicate-inconsistencies": {
+      "kind": "duplicate-inconsistencies",
+      "status": "pass",
+      "findings": []
+    },
+    "malformed-links": {
+      "kind": "malformed-links",
+      "status": "pass",
+      "findings": []
+    },
+    "dangling-links": {
+      "kind": "dangling-links",
+      "status": "pass",
+      "findings": []
+    }
+  },
+  "summary": {
+    "pass": 11,
+    "fail": 0
+  },
+  "completenessScope": [
+    "REQ-114-001",
+    "REQ-114-002",
+    "REQ-114-003",
+    "REQ-114-004",
+    "REQ-114-005",
+    "REQ-114-006",
+    "REQ-114-007",
+    "REQ-114-008",
+    "REQ-114-009",
+    "REQ-114-010",
+    "REQ-114-011",
+    "REQ-114-012",
+    "REQ-114-013",
+    "REQ-114-014",
+    "REQ-114-015",
+    "REQ-010-007",
+    "REQ-010-008",
+    "REQ-009-029"
+  ],
+  "verificationPolicyUnavailable": false,
+  "structuralOnly": true
+}

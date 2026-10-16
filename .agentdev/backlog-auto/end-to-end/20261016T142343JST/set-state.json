@@ -143,15 +143,15 @@
   ],
   "対応表": {
     "初期状態": [
-      { "ru_id": "RU-0001", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-001", "実行単位": null },
-      { "ru_id": "RU-0002", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-002", "実行単位": null },
-      { "ru_id": "RU-0003", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-003", "実行単位": null },
-      { "ru_id": "RU-0004", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-004", "実行単位": null },
-      { "ru_id": "RU-0005", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-005", "実行単位": null },
-      { "ru_id": "RU-0006", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-006", "実行単位": null },
-      { "ru_id": "RU-0007", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-007", "実行単位": null },
-      { "ru_id": "RU-0008", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-008", "実行単位": null },
-      { "ru_id": "RU-0009", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-009", "実行単位": null }
+      { "ru_id": "RU-0001", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-001", "実行単位": { "子Issue": 3760, "Epic": null } },
+      { "ru_id": "RU-0002", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-002", "実行単位": { "子Issue": 3761, "Epic": null } },
+      { "ru_id": "RU-0003", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-003", "実行単位": { "子Issue": 3762, "Epic": null } },
+      { "ru_id": "RU-0004", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-004", "実行単位": { "子Issue": 3763, "Epic": null } },
+      { "ru_id": "RU-0005", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-005", "実行単位": { "子Issue": 3764, "Epic": null } },
+      { "ru_id": "RU-0006", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-006", "実行単位": { "子Issue": 3765, "Epic": null } },
+      { "ru_id": "RU-0007", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-007", "実行単位": { "子Issue": 3766, "Epic": null } },
+      { "ru_id": "RU-0008", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-008", "実行単位": { "子Issue": 3767, "Epic": null } },
+      { "ru_id": "RU-0009", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-009", "実行単位": { "子Issue": 3768, "Epic": null } }
     ]
   },
   "基準点情報": {
@@ -166,8 +166,8 @@
   "進捗": {
     "整理サイクル": "完了(stage1 inspect-docs 2026-10-16T12:25-12:51 検出8件・正常終了, stage2 昇格3系統並列 12:52-14:07 全系統自律確定 commits 099e5022/636b1e2b/1c2e7153, stage3 backlog-review 14:07-14:19 分析・RU構成案・adversarial-review収束→HITL承認〔2026-10-16 Q1(a) 9RU承認・Q2(a) DS25 RU化・Q3(a) 削除承認〕→STEP-6 矛盾なし→STEP-7 RU-0001..0009生成・promoted 10件削除・commit a8c688fd)",
     "stage4_要件定義": "完了(単一req-define実行 2026-10-16T15:00頃-15:40頃 HITL停止→回答→resume完了。要件doc .agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md 554行 auto_ready:true・work_type:docs_chore・scale:large・AG9/ACT6/CR3/OU9/TS9/RA8/RD9。壁打ちHITL質問5件 2026-10-16 利用者回答確定: Q1=方向B(DEC-059文言明確化・決定内容不変・Q1=B回答を明示承認記録とする), Q2=両方(case-run委譲契約+learning-capture baseline明記), Q3=両方(script改善+回帰テスト/STEP-5-2保全確認明記), Q4=統合維持(9RU→9OU 1:1), Q5=Epicなし・OU単位Issue並列(REQ-114-004準拠)。要件doc分割なし=再スコープなし。adversarial-review 収束・Jev観測 20261016T055056Z-2396(finalResult 4問全true))",
-    "stage5_実行": "未着手",
-    "stage6_全体完了判定": "未着手",
+    "stage5_実行": "完了(単一case-auto 2026-10-16T15:00-16:25 HITL停止なし。Root Case #3758・Definition PR #3759 squash merge 112eca7f・draft+RU削除 ff37fd45・子Issue 9件 #3760-3768〔Epicなし・全Wave-1〕全完了: PR merge 7件〔#3769 e373d178/#3770 67393213/#3771 9780b138/#3772 b073d550+fix #3775 273c1510/#3773 080c6f52/#3774 a11be32a〕+ verify-only closure 3件〔#3762/#3764/#3765 SSoTコメント〕・case-close QG-4全[x]・Capture b8781d08。実行主体メモ: 本ハーネスに実行委譲サブエージェント起動API不在のため委譲工程をインライン自己適用〔前回runと同一機序・4状態result/3点ゲート/worktree隔離/PR証跡は準用〕、直列実行の事実はlearning inboxへCapture済み)",
+    "stage6_全体完了判定": "完了(2026-10-16 親による突合。義務スナップショット9RU×対応表×検証証跡の突合: 証跡 .agentdev/backlog-auto/end-to-end/20261016T142343JST/evidence/ で8ゲート全exit0〔bun test 3分割 4318pass/0fail・check_integrity exit0 NG0・traceability pass/fail=11/0 missing-design/implementation/verification全pass findings空・配布依存境界 failures0・textlint exit0・targeted exit0〕。親の現物スポット検証: RU-0001 delegation-and-result.md回収手順条項実在・RU-0002/0003 traceability missing全解消・RU-0003 RQ17 REQ-114-014括弧内要約REQ-039-001準拠是正実在・RU-0004 learning-capture SKILL.md baseline明記条項+Design条項実在・RU-0005 DEC-059文言明確化・規則内容不変・RU-0006 16./17.連番解消・RU-0007 2段分離試験+判定基準実在・RU-0008 applySection末尾境界改善+回帰テスト実在(24test)・RU-0009 STEP-4-6 merge後重複行実検査明記。義務の過不足なし・検証成立→全体完遂と判定)",
     "stage7_リリース": "未着手"
   },
   "リリース状態": {

@@ -1,0 +1,12 @@
+bun test v1.3.6 (d530ed99)
+
+src\opencode\plugins\agentdev-textlint-guard\tests\parallel.test.ts:
+[TS-009] all-recompute sequential(min=4604.533299999999ms median=4637.175949999999ms) parallel(min=1570.0650000000005ms median=1628.9201500000008ms)
+
+src\opencode\plugins\agentdev-textlint-guard\tests\runs.test.ts:
+[TS-009] no-reuse(min=64.8621000000021ms median=65.10440000000017ms) reuse(min=31.19680000000153ms median=31.75970000000234ms)
+
+ 700 pass
+ 0 fail
+ 176531 expect() calls
+Ran 700 tests across 44 files. [141.36s]
