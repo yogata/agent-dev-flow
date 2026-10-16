@@ -876,7 +876,8 @@ export class CliRunner implements GhRunner {
     if (typeof args.prerelease !== "boolean") {
       return this.fail("release_create requires a boolean prerelease", 0, "invalid-input");
     }
-    // draft: true は内部実装の固定値。公開モードは入力契約に含めない（REQ-114-016）。
+    // draft: true は内部実装の固定値。公開モードは入力契約に含めない
+    // （操作契約の Release 操作節と対応 sidecar を正とする）。
     return this.apiWithInput("POST", `repos/${this.repo}/releases`, {
       tag_name: tagName,
       name: title,
