@@ -939,13 +939,6 @@ function githubStub(init: {
         releases.push(release);
         return { status: 0, stdout: JSON.stringify(releaseJson(release)), stderr: "" };
       }
-      const releaseTagMatch = /^repos\/owner\/repo\/releases\/tags\/(.+)$/.exec(path ?? "");
-      if (releaseTagMatch !== null && method === "GET") {
-        const tag = decodeURIComponent(releaseTagMatch[1] ?? "");
-        const release = releases.find((r) => r.tag_name === tag);
-        if (release === undefined) return NOT_FOUND;
-        return { status: 0, stdout: JSON.stringify(releaseJson(release)), stderr: "" };
-      }
       return { status: 1, stdout: "", stderr: `stub: unhandled ${method} ${rawPath}` };
     },
   };
@@ -1633,9 +1626,12 @@ describe("CliRunner + engine: Release 操作（draft 固定・一覧読取・読
     const innerExec = stub.exec;
     const unwrappedExec: GhExec = (file, args) => {
       const r = innerExec(file, args);
-      if (r.status === 0 && args.some((a) => a === "repos/owner/repo/releases/tags/v1.2.3")) {
-        const payload = JSON.parse(r.stdout) as Record<string, unknown>;
-        payload.draft = false;
+      const isReleaseList = args.includes("repos/owner/repo/releases?per_page=100&page=1");
+      if (r.status === 0 && isReleaseList) {
+        const payload = JSON.parse(r.stdout) as Record<string, unknown>[];
+        for (const entry of payload) {
+          if (entry.tag_name === "v1.2.3") entry.draft = false;
+        }
         return { ...r, stdout: JSON.stringify(payload) };
       }
       return r;

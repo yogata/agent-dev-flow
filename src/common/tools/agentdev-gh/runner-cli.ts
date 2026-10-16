@@ -896,8 +896,30 @@ export class CliRunner implements GhRunner {
   }
 
   private releaseList(_args: Record<string, unknown>): GhRunnerReply {
-    // 完全一覧: 必要なページをすべて取得する。安全上限到達時は不完全な一覧を
-    // 成功結果として返さず、再試行可能な失敗とする。
+    const reply = this.fetchAllReleases();
+    if (!reply.ok) return reply;
+    return { ok: true, payload: { releases: reply.payload } };
+  }
+
+  private releaseRead(args: Record<string, unknown>): GhRunnerReply {
+    const tagName = str(args.tagName);
+    if (tagName === null || tagName.length === 0) {
+      return this.fail("release_read requires tagName", 0, "invalid-input");
+    }
+    // GitHub API の草稿参照制約（GET /releases/tags/{tag} は published のみ）を
+    // runner 境界内で吸収するため、一覧取得から対象タグを引く（draft も取得可能）。
+    const reply = this.fetchAllReleases();
+    if (!reply.ok) return reply;
+    const releases = reply.payload as Record<string, unknown>[];
+    const found = releases.find((r) => r.tagName === tagName);
+    if (found === undefined) {
+      return this.fail(`no release found for tag ${tagName}`, 0);
+    }
+    return { ok: true, payload: found };
+  }
+
+  /** 全 Release の一覧取得（ページング）。draft を含む正規化形（正規化配列）で返す。 */
+  private fetchAllReleases(): GhRunnerReply {
     const collected: Record<string, unknown>[] = [];
     for (let page = 1; page <= LIST_MAX_PAGES; page++) {
       const r = this.apiGetAny(
@@ -932,23 +954,7 @@ export class CliRunner implements GhRunner {
       }
       releases.push(item);
     }
-    return { ok: true, payload: { releases } };
-  }
-
-  private releaseRead(args: Record<string, unknown>): GhRunnerReply {
-    const tagName = str(args.tagName);
-    if (tagName === null || tagName.length === 0) {
-      return this.fail("release_read requires tagName", 0, "invalid-input");
-    }
-    // タグに対応する Release が存在しない場合は gh api が非ゼロ終了となり
-    // failFromExec（operation-failed）へ写像される。
-    return this.apiGet(`repos/${this.repo}/releases/tags/${encodeURIComponent(tagName)}`, (rec) => {
-      const item = this.releaseItemFrom(rec);
-      if (item === null) {
-        return this.fail("release reply missing tag_name/html_url or draft/prerelease flags", 0);
-      }
-      return { ok: true, payload: item };
-    });
+    return { ok: true, payload: releases };
   }
 }
 

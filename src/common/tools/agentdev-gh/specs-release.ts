@@ -48,6 +48,36 @@ function releaseReadRunnerRequest(tagName: string): GhRunnerRequest {
   return { operation: "release_read", args: { tagName } };
 }
 
+// 草稿作成直後の一覧反映には読み取り伝播遅延があり得るため、verify は
+// 短い待機付きの再照合で吸収する。重複（2件以上）は遅延で解消されないため即失敗。
+const VERIFY_READBACK_DELAYS_MS = [400, 1200, 2500];
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/** 一覧読取による草稿の読み戻し照合（伝播遅延吸収の再照合を含む）。 */
+async function readBackDraftByList(
+  runner: GhRunner,
+  tagName: string,
+): Promise<Record<string, unknown> | null> {
+  for (let attempt = 0; attempt <= VERIFY_READBACK_DELAYS_MS.length; attempt++) {
+    if (attempt > 0) {
+      await delay(VERIFY_READBACK_DELAYS_MS[attempt - 1] ?? 0);
+    }
+    const reply = await runner.run({ operation: "release_list", args: {} });
+    if (!reply.ok || !isRecord(reply.payload) || !Array.isArray(reply.payload.releases)) {
+      continue;
+    }
+    const matches = reply.payload.releases.filter(
+      (v: unknown) => isRecord(v) && str(v.tagName) === tagName,
+    );
+    if (matches.length > 1) return null;
+    if (matches.length === 1) return matches[0] as Record<string, unknown>;
+  }
+  return null;
+}
+
 /** runner 応答から正規化済み Release 読み取り結果を取り出す（照合用）。 */
 function readRelease(
   runner: GhRunner,
@@ -137,7 +167,9 @@ const releaseCreateSpec: OperationSpec = {
   },
   async verify(runner, request, _success) {
     const req = request as Extract<GhToolRequest, { operation: "release_create" }>;
-    const release = await readRelease(runner, req.tagName);
+    // 草稿はタグ参照取得（release_read 相当）では取得できないため、
+    // 一覧読取（release_list 相当）による読み戻し照合を行う（draft を含む）。
+    const release = await readBackDraftByList(runner, req.tagName);
     if (release === null) return false;
     if (release.draft !== true) return false;
     return release.prerelease === req.prerelease;
