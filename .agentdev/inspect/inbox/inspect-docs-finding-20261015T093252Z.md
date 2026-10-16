@@ -36,40 +36,9 @@ STEP-2 の意味診断は REQ 体系・Design・Decision/guides/README/knowledge
 - 分類は Jev 先行評価（観測 20261015T094749Z-77ac、confidence 0.91・全15項目 top-1 妥当）＋ adversarial-review 2 stream（分類妥当性・証拠適合〔promote 5件の対象行を現物実読で確認〕）convergence 後に 13件を自律確定（破壊的変更なし）。Jev 乖離の処置: DS18 は promote 0.46 / defer 変更 0.42 の近接対抗を Stream A で検証の結果、採否（inspect-promote 責務）と統合判断（backlog-review 責務）の分離により promote 維持と合意（成果物に REQ-114 反映群との同根注記を付す）
 - defer 分の再評価条件: DB02・DS17・DS19・RQ17・GR10 は Case #3725 完了時（解消未了なら promote 再分類）、DS22・GR11 は docs-check ルール候補の実装検討時
 - 旧 defer 71件は全件 defer 継続（自律確定）: 各 finding ファイルへ再評価記録を追記。delta 窓（2026-10-12 以降）と旧 defer 対象の交差 8件を現物確認し、うち 7件は対象記述不変、RQ-36（20260929T165249Z）は REQ-008 が 97 行（診断時 61 行比増加）のため次回 SPLIT 正式計測時に含める注記を追記
+- 2026-10-16 実施（backlog-auto stage 2 inspect 系統、--auto なし）分類確定: reject 2件（DB02・GR10。解消確認により対応不要・即時削除。ffa59eac で backlog-auto 配布物〔command description・ガードレール・SKILL.md〕と guides/root README の REQ-114 stage 4-7 反映を現物確認）/ promote 3件（DS17・DS19・RQ17。事前宣言の再評価条件「Case #3725 完了時（解消未了なら promote 再分類）」が発火〔GitHub 照会で closed・closedAt 2026-10-16T01:11:40Z〕し gap 未解消のため、promoted/finding-20261016-req114-doc-fix-candidates.md へ保存・本ファイルから削除。修正方向は未決のまま後続検討へ）/ defer 継続 2件（DS22・GR11。docs-check ルール候補の実装検討時が再評価条件で未発火）。分類は Jev 先行評価（観測 20261016T041350Z-3c9e）＋ adversarial-review 2 stream（証拠系・権限系）convergence 後に全件自律確定（HITL 対象なし）
 
 ## 検出事項リスト
-
-### DB02
-- category: 配布物統合性（責務整合: Design と配布物本文の乖離）
-- target: `src/common/commands/agentdev/backlog-auto.md`（description:2、不変条件:29-36、ガードレール:44）、`src/common/skills/agentdev-workflow-backlog-auto/SKILL.md`（description:3）
-- evidence: 配布物は backlog 整理サイクル（stage 1〜3）のみを記述する。一方、正規 Design（`docs/designs/commands/backlog-auto.md`、`docs/designs/skills/agentdev-workflow-backlog-auto.md`。いずれも status: accepted、updated 2026-10-15）は ADF-COVERS(design) で REQ-114（全行/公開 interface 行）を所有し、orchestration stage 4〜7（要件定義接続・実行接続・全体完了判定・リリース）を定義済み。command 本文ガードレール「req-define、case-ready、GitHub Issue / PR 作成を自動起動しない」（:44）は Design stage 4（単一 req-define 実行）・stage 5（case-auto 実行）と字面上衝突する読みを生じる。ワークフロー skill description も「stage 3: backlog-review、fan-in 判定、停止伝播、resume 契約」までで stage 4-7 に言及しない。配布物内の REQ-114/一気通貫 言及は 0 件（親 grep 実測、3担当の確認とも一致）。
-- severity: medium
-- confidence: high（言及欠落は機械的に一意確認。Case 進行中の未同期という解釈の余地は処置側）
-- source_of_truth: REQ-114-001/014（現行 REQ）、commands/backlog-auto.md Design 目的節・covers（REQ-114-001/010/011/012/014）、skills Design stage 構成（:25、:39-45、:115）
-- recommended_route: 表現是正候補（配布物の description・不変条件・ガードレールへの REQ-114 stage 4-7 反映）。本 Case（#3725）の後続 Wave 対象と解される。Case 完了時に解消されていなければ残留乖離として扱う。
-- ng_classification: 今回修正対象（ea3d6e0a で Design のみ先行確定し配布物が未追随。Case #3725 進行中の未同期）。
-- notes: 配布物本文の構造診断は inspect-skills 領域の近接。DB02 起点の配布物更新と GR10（案内層）・DS17〜DS19（Design covers 実体）は同根の REQ-114 反映未完了群。
-
-### DS17
-- category: Design（covers 宣言と本文実体の不一致: REQ-114-013 実体なし）
-- target: `docs/designs/skills/agentdev-workflow-backlog-auto.md:9`（covers）、本文 112-121
-- evidence: covers 行は REQ-114-001〜015 全行を宣言。しかし REQ-114-013「ADF本体、GitHub 接続型適用プロジェクト、ローカルIssue適用プロジェクトの各採用形態で…共通の E2E 挙動が確認可能」に対応する本文記述がなく、2 Design とも「E2E」「採用形態」の出現 0 件（grep 実測）。
-- severity: low
-- confidence: medium
-- source_of_truth: REQ-114-013
-- recommended_route: 追跡Issue育成（実体節の追加、または covers から REQ-114-013 を外す判断。検証義務行を design covers に含める役割設定自体の見直しを含む）。
-- ng_classification: 今回修正対象（ea3d6e0a の新規 covers 追加分）。
-- notes: REQ-114-013 は検証主体の行であり、宣言側の問題か本文欠落かの切り分けは後続判断事項。
-
-### DS19
-- category: Design（covers 宣言と本文実体の部分不一致: REQ-114-005/-012部分/-015）
-- target: `docs/designs/skills/agentdev-workflow-backlog-auto.md:9,116,118`、`docs/designs/commands/backlog-auto.md:10,77`
-- evidence: REQ-114-005「再スコープ」の語が本文になし（:116「対応表（統合・分割を含む）」が部分受皿）。REQ-114-012「RU 0 件またはリリース対象となる実変更がない場合はリリースを作成せず報告」が本文になし（基準点 0 件の停止 :118 と「完遂済み・リリース保留」commands:77 は存在）。REQ-114-015（REQ-041 完了扱い範囲の限定）の明示実体なし（commands:72「所有する実行契約は REQ-114」で間接受けの可能性）。
-- severity: low
-- confidence: medium
-- source_of_truth: REQ-114-005/012/015
-- recommended_route: 追跡Issue育成。
-- ng_classification: 今回修正対象（新規 covers に対する部分実体欠落）。
 
 ### DS22
 - category: Design（covers 宣言様式: 集合の包含重複）
@@ -84,27 +53,6 @@ STEP-2 の意味診断は REQ 体系・Design・Decision/guides/README/knowledge
 ### RQ15 処理結果（reject / no-action）
 
 - 重複所見を却下し、REQ-114 の受け入れ条件を維持する。DEC-059 への委譲と既存の安全境界を保つ現行構造を確認したため、REQ-114 を縮小せず、追加 artifact・変更・後続作業を起こさない。
-
-### RQ17
-- category: REQ 体系（参照の要約表現と原文の差。参照整合性自体は成立）
-- target: `docs/requirements/REQ-114.md:29` vs `docs/requirements/REQ-039.md:19`
-- evidence: REQ-114-014「REQ-039-001（backlog-review は自動的な要件化を行わない）は…」／REQ-039-001 原文「backlog-review は採用済み成果物を分析、統合し、ユーザー承認を経て RU（要件ユニット）を生成すること。プロジェクト知識候補については docs/knowledge/ への知識文書保存（REQ-056）を…」。意味的接続は成立するが、括弧内要約は原文の言い換えとして不正確（原文は「ユーザー承認を経る」ことの要求であり、知識文書保存という別の正規完了経路も含む）。
-- severity: low
-- confidence: medium
-- source_of_truth: 現行 REQ-039-001
-- recommended_route: 表現是正候補（括弧内を「ユーザー承認を経て RU を生成する」等の原文準拠へ）。
-- ng_classification: 今回修正対象候補（REQ-114 新規行）だが severity low。
-
-### GR10
-- category: guides／README（案内層に REQ-114 一気通貫契約の未反映。矛盾ではなく未反映）
-- target: `docs/guides/command-selection.md:30,81`、`docs/guides/quickstart.md:4`、`docs/guides/glossary.md:21`、`README.md:15`（root、delta で未変更）
-- evidence: 案内層の backlog-auto 記述はいずれも REQ-041 整理サイクル形のみ（command-selection.md:30 入口表「backlog整理サイクル（検出→昇格→統合）を1回で実行したい」、:81 補足、root README「生成された RU を req-define に渡す」）。REQ-114 の単一起動拡張（一気通貫実行）への到達導線が案内層のどこにもない（docs/guides + root README の REQ-114/DEC-059/一気通貫 grep 0 件）。guides の現行記述自体は REQ-041 契約として正であり矛盾なし。
-- severity: low
-- confidence: high（未反映の事実）。所見化の要否判断を含め medium
-- source_of_truth: REQ-114-001（現行 REQ・72件表掲載）、REQ-041（所有権分割）、DEC-059（accepted）
-- recommended_route: 追跡Issue育成（REQ-114 の配布物反映〔DB02〕と E2E 実測（REQ-114-013）の成立を契機とした入口表行追加・glossary 語義更新）。
-- ng_classification: 要ヒューマンレビュー（guides の現行記述は誤りでない。実装前の経路を案内しない現行規律からは据え置き妥当、現行化追跡として有効）。
-- notes: 配布物側の未反映は DB02。glossary の REQ-114 由来語彙未登録は既知 GR08 カテゴリの延伸として GR08 処置（defer）に統合。
 
 ### GR11
 - category: README（AUTOGEN ブロック外での件数散文複製。潜在リスク・現行違反なし）

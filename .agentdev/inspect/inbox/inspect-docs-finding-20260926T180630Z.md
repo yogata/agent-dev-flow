@@ -19,6 +19,7 @@
 - 2026-10-08 実施（backlog-auto stage 2 inspect 系統、--auto なし）統合解消: RQ-15（REQ-090.md:26 実装詳細）と RQ-17（REQ-090.md:19 Case 固有作業指示残留）は 20261008T025952Z F-05/F-06 の横断 cleanup anchor 成果物（promoted/finding-20261008-req-row-impl-detail-cleanup-anchor.md）へ統合し defer 解消（adversarial-review Stream A 指摘の同一行・同型指摘による。RQ-15 の target :26 は F-05 対象と同一行）。残りの defer 項目は引き続き本ファイルで defer 継続。うち RQ-01/RQ-04/RQ-06/RQ-16（要件行への実装詳細混入の同型群）は cleanup anchor 成果物の統合対象一覧に記載され、anchor 処置時に一括扱いとなる
 - 2026-10-13 実施（backlog-auto stage 2 inspect 系統、--auto なし）重複整理: RQ-15 は 20261008T025952Z F-05/F-06 cleanup anchor 成果物への統合済み（上記 2026-10-08 審議記録どおり）のため、本ファイルの重複セクションを削除（却下理由は commit message に記録）。RQ-04/RQ-08/RQ-09/RQ-13/RQ-16/DS-03/DC-02/DC-04/DC-06/DC-07/GD-02/GD-03 は再評価条件未充足のため defer 継続（自律確定）
 - 2026-10-15 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: RQ-04/RQ-08/RQ-09/RQ-13/RQ-16/DS-03/DC-02/DC-04/DC-06/DC-07/GD-02/GD-03 は再評価条件未充足のため defer 継続（自律確定）: delta 窓（2026-10-12 以降）と対象行の交差確認で対象記述不変（GD-02/GD-03 の guides 対象は d89506c8 以降不変、DC-07/DC-10/DC-13 の decisions/README.md は 6b63ba24 で baseline・accepted ビュー・関連 REQ 表のみ更新で Map・欠番節不変、RQ-16 対象行の変化は RQ16 統合注記を当該セクションに追記済み）
+- 2026-10-16 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: RQ-04/RQ-08/RQ-09/RQ-13/RQ-16/DS-03/DC-02/DC-04/DC-06/DC-07/GD-02/GD-03 は再評価条件未充足のため defer 継続（自律確定）: 38bc58c7..636b1e2b の delta に対象ファイルは含まれず（intake-learning-backlog-flow.md のみ :102-103 に一気通貫案内が追加されたが GD-03 対象節 :53-54・:86-87・:109-121 は不変を現物確認）。Jev 観測 20261016T041350Z-3c9e
 
 ## 検出事項リスト（defer 残置分）
 

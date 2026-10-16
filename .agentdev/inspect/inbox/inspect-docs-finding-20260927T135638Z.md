@@ -13,6 +13,8 @@
 
 **処理記録追記**（2026-10-15 inspect-promote、backlog-auto stage 2 inspect 系統、--auto なし）: RQ-20/DS-13/DC-10/RM-01 は再評価条件未充足のため defer 継続（自律確定）: 対象ファイル（retired status 値・designs/README.md・decisions/README.md Decision Map・root README クイックスタート）は delta 窓（2026-10-12 以降）で対象記述不変
 
+**処理記録追記**（2026-10-16 inspect-promote、backlog-auto stage 2 inspect 系統、--auto なし）: RQ-20/DS-13/DC-10 は再評価条件未充足のため defer 継続（自律確定）: 対象ファイル（retired status 値・designs/README.md・decisions/README.md Decision Map）は 38bc58c7..636b1e2b の delta 外で不変。RM-01 の再評価条件「root README 編集時（次サイクル reject 候補）」は発火（ffa59eac で root README:15 に一気通貫説明追記）したが、指摘対象の動作説明詳細は編集後も存続・拡張しており解消未了のため defer 継続（自律確定。adversarial-review 2 stream 収束）
+
 ## 検出事項リスト（defer 残置 5件）
 
 ### REQ 体系（defer 2件）
