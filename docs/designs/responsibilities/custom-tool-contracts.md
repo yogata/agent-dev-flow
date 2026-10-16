@@ -2,7 +2,7 @@
 title: Custom Tool 操作契約
 status: accepted
 created: 2026-08-24
-updated: 2026-10-14
+updated: 2026-10-16
 ---
 <!-- ADF-COVERS(design): REQ-090-001, REQ-090-002, REQ-090-003, REQ-090-004, REQ-090-009, REQ-090-010, REQ-090-011, REQ-090-012, REQ-090-013, REQ-090-014, REQ-090-015, REQ-090-016, REQ-090-017, REQ-090-018, REQ-090-019, REQ-090-020, REQ-090-021, REQ-090-022, REQ-090-023, REQ-090-024, REQ-090-025, REQ-090-026, REQ-090-027, REQ-090-028, REQ-090-029, REQ-011-022, REQ-011-025, REQ-011-026, REQ-011-033 -->
 <!-- ADF-COVERS(design): REQ-009-051, REQ-052-013, REQ-052-014, REQ-052-015 -->
@@ -36,10 +36,11 @@ runner 応答 before 契約（追跡軸保持 VERIFY の実行前状態接合）
 
 ## 対象操作の境界（初期セット）
 
-操作カタログを以下の16操作として定義する。
+操作カタログを以下の19操作として定義する。
 
 - 基本操作: issue_create、issue_read、issue_update、issue_close、pr_create、pr_read、pr_merge、pr_changed_files、pr_mergeable、pr_update
 - 追跡Issue操作: issue_list、issue_reopen
+- Release 操作: release_create、release_list、release_read。Release 草稿作成（release_create）はタグ名、タイトル、本文、prerelease を入力とする WRITE であり、作成後の読み戻しでタグ対応・draft 状態・prerelease を VERIFY する。Release 一覧読取（release_list）と Release 読み戻し（release_read）は READ であり、タグと Release の対応確認用に正規化して返す。入力契約に公開モード（draft の解除、publish 相当のフィールド）を含めず、契約外の公開指定フィールドを含む要求は副作用発生前に入力契約違反として拒否する
 - Comment 操作: comment_create、comment_list、comment_update、comment_delete。Comment は Issue と Pull Request の会話コメントを同一の論理リソースとして扱う。comment_list の各要素は commentId、body、createdAt、updatedAt、url を返す。comment_update と comment_delete は commentId を対象識別子として使用する。commentId の公開型は文字列とし、GitHub 実装は数値コメント id を文字列化する
 - 廃止済み操作: issue_comment（body あり＝追加、body なし＝読取の二重モード）は正規操作カタログから除去済みであり、ADF 内部の呼出元は Comment 操作への移行が完了している。GitHub 版・Local 版のいずれの実装にも issue_comment は存在せず、廃止は確定している。外部 consumer 環境が更新前の runner を保持する間に旧 runner 側で issue_comment が動作し得るが、それは本 Design の操作契約の対象外である
 - pr_create の入力契約: Pull Request 作成は GitHub Draft PR を生成する入力（draft）を公開契約に含まない。契約外の draft フィールドを含む要求は副作用発生前に REQ-011-028 の入力契約違反として拒否する（REQ-011-031）。Draft 状態は pr_read による観測対象であり、作成・更新操作での指定・変更の対象としない
@@ -50,8 +51,8 @@ runner 応答 before 契約（追跡軸保持 VERIFY の実行前状態接合）
 - issue_reopen の追跡Issue取扱い: 再オープンによって role と通常ラベルを保持する。追跡状態の再オープン遷移（クローズ済み→検討中）は本文の状態保持節の更新として呼出側が行い、Tool は追跡状態遷移を機械適用しない。Case Issue には追跡状態遷移を適用しない。既に open の追跡Issueへの再オープンは要求的状態の確認をもって冪等に成功とする
 
 VERIFY 適用（READ / WRITE 分離）:
-- WRITE 操作（issue_create、issue_update、issue_close、issue_reopen、comment_create、comment_update、comment_delete、pr_create、pr_update、pr_merge）: 副作用そのものを読み戻し、要求した状態の反映と保持対象不変条件の維持を確認する。Comment WRITE は対象 Comment の存在・本文で判定し、Issue / Pull Request の open / closed 状態を成功証拠として使用しない
-- READ 操作（issue_read、issue_list、comment_list、pr_read、pr_changed_files、pr_mergeable）: 取得結果の構造と契約上必要な意味的整合性を確認する。時間変化し得る値（mergeable、isDraft 等）について連続読取の一致を要求せず、取得時点の状態を正規化して返す。pr_mergeable は単一読取の正規化結果を返し、直後の再読取との一致確認を行わない
+- WRITE 操作（issue_create、issue_update、issue_close、issue_reopen、comment_create、comment_update、comment_delete、pr_create、pr_update、pr_merge、release_create）: 副作用そのものを読み戻し、要求した状態の反映と保持対象不変条件の維持を確認する。Comment WRITE は対象 Comment の存在・本文で判定し、Issue / Pull Request の open / closed 状態を成功証拠として使用しない
+- READ 操作（issue_read、issue_list、comment_list、pr_read、pr_changed_files、pr_mergeable、release_list、release_read）: 取得結果の構造と契約上必要な意味的整合性を確認する。時間変化し得る値（mergeable、isDraft 等）について連続読取の一致を要求せず、取得時点の状態を正規化して返す。pr_mergeable は単一読取の正規化結果を返し、直後の再読取との一致確認を行わない
 
 一覧完全性:
 - issue_list と comment_list は Tool 内部で必要なページをすべて取得し、完全一覧として返す。上位層は GitHub API のページングを指定しない
@@ -70,8 +71,9 @@ GitHub版 / Local版等価性:
 - 両版は操作名、入力構造、出力構造（pr_read の isDraft を含む）、Comment 識別概念（commentId の役割と公開型）、Issue の論理状態遷移、READ / WRITE の成功意味、失敗の意味を同値とする
 - 物理写像に起因する値域差異（ローカル版追跡Issueの通常ラベル非許容。agentdev-issue-tracking Design の値域定義に従う）と、role: case の状態モデルに起因する受理条件差（ローカル版 case の再オープン拒否。ローカルIssue共通スキーマ Design の状態遷移に従う）、および Local 版が GitHub Draft PR に相当する状態を持たないことによる isDraft の値差異（Local 版は常に false。REQ-011-032）は、本 Design が例外として明示する
 - pr_merge の入力契約に起因する受理条件差（ローカル版は commitHash を取り込み確認情報として必須検証〔実在確認〕し、GitHub 版は受理してマージ動作に使用しない。:48 の宣言に対応）は、本 Design が例外として明示する
+- Release 操作（release_create、release_list、release_read）は GitHub 接続専用とし、Local 版は構造化失敗（operation-failed。ローカル環境では GitHub Release 相当の状態を持たない旨を詳細に含む）を返す。失敗分類は既存の値域を維持する。この例外は本 Design が明示する
 
-操作カタログの完全列挙（16操作）は契約テストで固定し、対象外機能の追加を検出する。
+操作カタログの完全列挙（19操作）は契約テストで固定し、対象外機能の追加を検出する。
 
 「third-party Skill 取得」操作契約:
 
