@@ -398,6 +398,54 @@ describe("本文進行状況・結果セクションの構築と適用", () => {
     expect(idxProgress).toBeGreaterThan(next.indexOf("## 作業ログ"));
     expect(next.trimEnd().endsWith("- 終了日時: N/A")).toBe(true);
   });
+
+  test("applySection は文書末尾セクション置換で後続する HTML コメント群を消費しない", () => {
+    const trailingComments = [
+      "<!-- case-open 記録 2026-10-16: Root Case 起票 -->",
+      "<!-- case-ready 記録 2026-10-16: 設計PR 受入 -->",
+    ];
+    const existing = [
+      "# Issue",
+      "",
+      "## 進行状況",
+      "",
+      "- 正規状態: open",
+      "- 開始日時: N/A",
+      "- 終了日時: N/A",
+      "",
+      ...trailingComments,
+      "",
+    ].join("\n");
+    const next = applySection(existing, buildProgressSection({
+      canonicalState: "ready",
+      startDate: "2026-10-16 10:00 JST",
+      endDate: "N/A",
+    }));
+    expect(next).toContain("- 開始日時: 2026-10-16 10:00 JST");
+    for (const comment of trailingComments) {
+      expect(next).toContain(comment);
+    }
+    expect(next.match(/## 進行状況/g)?.length).toBe(1);
+  });
+
+  test("applySection は未閉鎖コメント断片を後続領域とみなさずセクション内容として置換する", () => {
+    const existing = [
+      "# Issue",
+      "",
+      "## 進行状況",
+      "",
+      "- 正規状態: open",
+      "",
+      "断片コメントの開始のみ <!--",
+    ].join("\n");
+    const next = applySection(existing, buildProgressSection({
+      canonicalState: "running",
+      startDate: "2026-10-04 05:25 JST",
+      endDate: "N/A",
+    }));
+    expect(next).toContain("- 開始日時: 2026-10-04 05:25 JST");
+    expect(next).not.toContain("断片コメントの開始のみ");
+  });
 });
 
 describe("工程記録の取りまとめ反映の規定（SKILL.md 構造照合）", () => {

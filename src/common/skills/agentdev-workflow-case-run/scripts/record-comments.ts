@@ -200,6 +200,9 @@ export function buildResultSection(input: ResultSectionInput): string {
 
 // 既存本文へセクションを適用する。同名セクションが存在する場合は置換、
 // 存在しない場合は本文末尾へ追加する。既存セクションの順序と内容は保持する。
+// 置換対象セクションの後に「## 」見出しが現れない（文書末尾セクションの）場合、
+// 後続する HTML コメント・注記を置換対象から除外する（endIndex 初期値 lines.length
+// による後続コメント群の消費を防ぐ境界検出）。
 export function applySection(existingBody: string, sectionMarkdown: string): string {
   const heading = sectionMarkdown.split("\n", 1)[0]?.replace(/^##\s*/, "").trim() ?? "";
   const lines = existingBody.replace(/\n+$/, "\n").split("\n");
@@ -214,6 +217,12 @@ export function applySection(existingBody: string, sectionMarkdown: string): str
         break;
       }
     }
+    if (endIndex === lines.length) {
+      const trailingStart = trailingCommentStartIndex(lines, startIndex);
+      if (trailingStart !== null) {
+        endIndex = trailingStart;
+      }
+    }
     const before = lines.slice(0, startIndex).join("\n").replace(/\n+$/, "");
     const after = lines.slice(endIndex).join("\n");
     return `${before}\n${sectionMarkdown.replace(/\n+$/, "\n")}${after.startsWith("\n") ? after : `\n${after}`}`;
@@ -221,4 +230,33 @@ export function applySection(existingBody: string, sectionMarkdown: string): str
 
   const base = existingBody.replace(/\n+$/, "");
   return `${base}\n${sectionMarkdown.replace(/\n+$/, "\n")}`;
+}
+
+// 文書末尾から逆走し、空行と完了した HTML コメントブロック（`<!--` 〜 `-->`）の
+// 連続領域の開始位置を返す。後続する HTML コメント・注記が存在しない場合、
+// コメントブロックの開始が置換対象セクションの見出し位置まで到達した場合、
+// 未閉鎖のコメント断片で停止した場合は null（セクション本文を後続領域と誤認しない）。
+function trailingCommentStartIndex(lines: readonly string[], sectionStartIndex: number): number | null {
+  let i = lines.length;
+  let sawComment = false;
+  while (i > sectionStartIndex + 1) {
+    const line = lines[i - 1] ?? "";
+    if (line.trim() === "") {
+      i -= 1;
+      continue;
+    }
+    if (!line.trim().endsWith("-->")) {
+      break;
+    }
+    let open = i - 1;
+    while (open > sectionStartIndex && !(lines[open]?.includes("<!--") ?? false)) {
+      open -= 1;
+    }
+    if (open <= sectionStartIndex || !(lines[open]?.includes("<!--") ?? false)) {
+      break;
+    }
+    i = open;
+    sawComment = true;
+  }
+  return sawComment ? i : null;
 }
