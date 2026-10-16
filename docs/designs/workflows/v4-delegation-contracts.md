@@ -2,7 +2,7 @@
 title: サブエージェント委譲契約（v4）
 status: accepted
 created: 2026-09-20
-updated: "2026-10-09"
+updated: "2026-10-16"
 ---
 <!-- ADF-COVERS(implementation): REQ-002-033, REQ-002-034 -->
 <!-- ADF-COVERS(implementation): REQ-003-001, REQ-003-002, REQ-003-003, REQ-003-004, REQ-003-006, REQ-003-011, REQ-003-012, REQ-003-014, REQ-003-020 -->
@@ -104,7 +104,7 @@ delegation_type は参考分類であり、Command 本文での使用は任意�
 
 GitHub I/O を伴う委譲の Custom Tool 経路: 委譲先サブエージェントは GitHub Issue / PR 操作を Custom Tool（`agentdev_gh`）の操作契約経由で実行する。driver 経由で委譲された場合も同じ経路であり、起動手段（driver、実行制御パラメータ）の差異を Tool 操作契約の利用方式に反映しない。生 gh コマンドの直接実行（WRITE）は正規経路としない（custom-tool-contracts Design「迂回防止」）。
 
-## 委譲制約（6）
+## 委譲制約（9）
 
 | 制約 | 説明 |
 |---|---|
@@ -114,6 +114,9 @@ GitHub I/O を伴う委譲の Custom Tool 経路: 委譲先サブエージェン
 | 成果物本文の verbatim | Issue本文、PR本文、commit message、保存対象ファイル本文、テンプレート成果物はそのまま（verbatim）返す |
 | 判定結果の圧縮 | 判定結果、調査過程、中間ログ、読解メモは要約、成果物パス、根拠、親判断事項、capture候補へ圧縮して返す |
 | Script 優先 | 単純な決定的検査は Script 優先。非決定的処理（意味レビュー、分類、抽出等）にサブエージェント委譲を適用 |
+| 同一 worktree 複数委譲（中断→回収）の記録併記 | 回収側は、回収 PR 本文の実行識別情報（DEL 識別子）と検証差分に、中断側委譲と回収側委譲の両方の記録を併記する。手順面は、委譲時最小契約・委譲種別・result 4 状態との整合の下で、case-run / orchestration 配布 skill references が本 Design を参照して記述する |
+| 回収側完了扱い前の機械確認 | 回収側の完了扱いの前に、中断側で生成済みの成果物と回収側成果物の内容同一性を機械確認（diff 空）することを前置条件とする。重複 PR が発生した場合、機械確認が成立しない回収 PR を完了扱いとしない |
+| 既存 fail 前提子 Issue の着手時再計測 | 委譲プロンプトまたは Issue 本文の前提記述が既存 fail の計測結果を含む子 Issue は、着手時に現行 main で再計測を前置する。再計測により起票前提の陳腐化を検知した場合、実行担当サブエージェントは前提の再評価を委譲元へ返し（blocked result または前提記録の修正）、陳腐化した前提で実装・検証を進めない。再計測の実行形態（テスト実行形態）は既存契約に従う |
 
 ## case 実行責務の 4 用語と委譲（REQ-006、REQ-011-017、REQ-011-018）
 

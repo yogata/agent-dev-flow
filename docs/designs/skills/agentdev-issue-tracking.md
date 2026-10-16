@@ -45,7 +45,7 @@ updated: 2026-10-16
 14. **Comment 更新・削除の利用規律（新規）**: comment_update と comment_delete は Comment を管理する汎用操作として Tool に提供される。追跡Issueの検討経過コメントへの適用は、時系列履歴の整合を損なわない範囲（誤記修正、機密情報の除去、重複の統合、直前誤投稿の訂正等）に限る。適用可否の判断規律の正は agentdev-issue-tracking Capability Skill の操作知識が単一参照点として所有し、操作能力を利用する workflow はこれに従う。本項は検討経過コメントが正規の時系列履歴である要件（REQ-049-012）との整合境界を定める
 15. **issue_list の labels 引数の規律（物理写像の入力方向）**: issue_list 操作の labels 引数は、追跡Issue論理軸（role）の物理マッピング入力として使用する呼出側規律である。Tool の受理能力としては通常ラベル（enhancement、bug 等）による絞り込みも有効（クライアント再フィルタ）であり、Case Issue は role: case と機械判定されるため通常ラベルでは Case Issue を論理軸で絞り込めない。能力の存在は ADF 呼出側の使用規律の解禁を意味しない。Case Issue の絞り込みは labels 引数を使用せず、search 引数（冪等キー語、REQ 番号、topic_slug 等の絞り込みキー）と state の組み合わせで行う。closed 等の広範 filter を search なしで実行すると、累積 population により完全一覧契約の安全上の上限へ到達し operation-failed となる。操作手順面の適用形は agentdev-issue-management の issue-operation-safety.md が定める
 16. **issue_create の labels 引数の必須契約（呼出側規律）**: labels は Tool 契約上の必須フィールドであり、起票時は空配列以上を渡す。付与するラベル値の選択は任意である（検索・整理用ラベルの任意付与契約は値の選択を指し、フィールド存在を免除しない）。起票時の既定付与は設けず、呼出側が都度判断する（REQ-095-004）。
-16. **件名（title）の書式**: 件名の文字列書式（役割別接頭辞・主題原則）の正は workflows/issue-title-policy Design が単一参照点として所有する。本 Design は件名を論理スキーマ項目として保持し、書式を複製して定義しない
+17. **件名（title）の書式**: 件名の文字列書式（役割別接頭辞・主題原則）の正は workflows/issue-title-policy Design が単一参照点として所有する。本 Design は件名を論理スキーマ項目として保持し、書式を複製して定義しない
 
 ## v4 責務分類
 
