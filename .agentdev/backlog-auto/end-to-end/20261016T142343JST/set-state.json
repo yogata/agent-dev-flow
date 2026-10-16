@@ -1,0 +1,179 @@
+{
+  "一式識別子": "20261016T142343JST",
+  "backlog_auto_started_at": "2026-10-16T12:24:46+09:00",
+  "set_state_created_at": "2026-10-16T14:23:43+09:00",
+  "義務スナップショット": [
+    {
+      "ru_id": "RU-0001",
+      "path": ".agentdev/backlog/req-units/RU-0001.md",
+      "logical_key": "RU-0001",
+      "必須要求": "同一 worktree 複数委譲（中断→回収）において、PR 本文に両委譲の実行識別情報（DEL 識別子）・検証差分を併記し、回収側の完了扱い前に内容同一性の機械確認（diff 空）を前置する規律を、v4-delegation-contracts Design および case-run 関連 workflow 手順へ条項化する。",
+      "受け入れ義務": [
+        "中断→回収時に PR 本文への両委譲記録が規律として明記されている。",
+        "回収側の完了扱いの前に diff 空の機械確認が前置条件として規定されている。",
+        "重複 PR 発生時に完了扱いが二重にならない規律が既存の委譲・回収手順と矛盾なく記述されている。"
+      ],
+      "tentative_classification": "REQ",
+      "sources": [
+        ".agentdev/intake/promoted/2026-10-16-multi-delegation-recovery-record-keeping.md"
+      ]
+    },
+    {
+      "ru_id": "RU-0002",
+      "path": ".agentdev/backlog/req-units/RU-0002.md",
+      "logical_key": "RU-0002",
+      "必須要求": "REQ-010-007 / REQ-010-008 / REQ-009-029 の 3 行について design covers 欠落を解消する。対応 Design 文書の特定または作成、traceability/ 配下 sidecar への covers 登録、正式 check_integrity による再確認を前置する。",
+      "受け入れ義務": [
+        "3 行が missing-design で検出されなくなる（正式 check_integrity で確認）。",
+        "3 行それぞれに design covers の到達先（既存 Design 特定または新規作成）が記録されている。",
+        "追加した covers が traceability/ 配下 sidecar に正規形式で登録されている。"
+      ],
+      "tentative_classification": "REQ",
+      "sources": [
+        ".agentdev/intake/promoted/2026-10-16-req010-007-008-req009-029-missing-design.md"
+      ]
+    },
+    {
+      "ru_id": "RU-0003",
+      "path": ".agentdev/backlog/req-units/RU-0003.md",
+      "logical_key": "RU-0003",
+      "必須要求": "REQ-114 未充足の解消。REQ-114-001〜015 全行の implementation/verification covers 付与と実現 Case 起票、DS17（REQ-114-013 の Design 本文実体追加か covers 縮小）、DS19（REQ-114-005/012/015 の本文節追加か covers 縮小）、RQ17（REQ-114-014 括弧内要約の REQ-039-001 原文準拠是正）、反映未完了群 DB02/DS17/DS19 の処理判断再評価。",
+      "受け入れ義務": [
+        "REQ-114-001〜015 全行が missing-implementation / missing-verification で検出されなくなる（正式 check_integrity で確認）。",
+        "REQ-114-013 / 005 / 012 / 015 の Design 本文実体追加または covers 範囲見直しが確定・反映されている（DS17・DS19 解消）。",
+        "REQ-114-014 の括弧内要約が REQ-039-001 原文準拠の表現に是正されている（RQ17 解消）。",
+        "反映未完了群 DB02/DS17/DS19 の処理判断が記録されている。"
+      ],
+      "tentative_classification": "REQ",
+      "sources": [
+        ".agentdev/intake/promoted/2026-10-16-req114-implementation-verification-missing.md",
+        ".agentdev/inspect/promoted/finding-20261016-req114-doc-fix-candidates.md"
+      ]
+    },
+    {
+      "ru_id": "RU-0004",
+      "path": ".agentdev/backlog/req-units/RU-0004.md",
+      "logical_key": "RU-0004",
+      "必須要求": "既存 fail を前提とする子 Issue の着手時に現行 main での再計測を前置する条項を、case-run 委譲プロンプトおよび/または learning-capture の計測前提 baseline 明記条項へ追加する（反映先の選択は req-define で確定）。",
+      "受け入れ義務": [
+        "着手時再計測前置の規律が明記されている（case-run 委譲プロンプト、learning-capture 条項、または両方）。",
+        "learning-capture を反映先に選択した場合、計測前提を含む記録への採番時点 baseline 明記の規律が確定している。",
+        "陳腐化した前提を検知した場合の取り扱いが既存の委譲契約と矛盾なく扱えることが確認されている。"
+      ],
+      "tentative_classification": "REQ",
+      "sources": [
+        ".agentdev/intake/promoted/2026-10-16-stale-premise-remeasure-before-start.md"
+      ]
+    },
+    {
+      "ru_id": "RU-0005",
+      "path": ".agentdev/backlog/req-units/RU-0005.md",
+      "logical_key": "RU-0005",
+      "必須要求": "DEC-059 L49「case-close のリリース手順」への言及と case-close Design（リリース記述 0 件・grep 実測）の対応を確定する。方向A（case-close Design への受け皿節追加）または方向B（DEC-059 文言の後続工程総称としての明確化）を req-define の壁打ち・HITL で確定し、参照宙吊りを解消する。REQ-114 を含む要件・設計の変更は範囲外。",
+      "受け入れ義務": [
+        "「case-close のリリース手順」の所在が確定している。",
+        "確定した方向に応じて case-close Design または DEC-059 のいずれか一方が正規手続きで更新され、参照宙吊りが解消されている。",
+        "REQ-114 を含む他の要件・設計への変更が発生していないことが確認されている。"
+      ],
+      "tentative_classification": "REQ",
+      "sources": [
+        ".agentdev/inspect/promoted/finding-20261015-case-close-release-support-candidate.md"
+      ]
+    },
+    {
+      "ru_id": "RU-0006",
+      "path": ".agentdev/backlog/req-units/RU-0006.md",
+      "logical_key": "RU-0006",
+      "必須要求": "docs/designs/skills/agentdev-issue-tracking.md:47-48 の重複「16.」を連番へ再採番し、以降の番号ずれを解消する（機械的に一意の表層修正）。",
+      "受け入れ義務": [
+        "該当番号リストが連番になっている（重複「16.」の解消）。",
+        "再採番により項目の意味・順序・内容が変更されていないことが確認されている。",
+        "本文内に番号を起点とした参照がある場合、参照先の整合が保たれている。"
+      ],
+      "tentative_classification": "REQ",
+      "sources": [
+        ".agentdev/inspect/promoted/finding-20261016-issue-tracking-design-list-renumber.md"
+      ]
+    },
+    {
+      "ru_id": "RU-0007",
+      "path": ".agentdev/backlog/req-units/RU-0007.md",
+      "logical_key": "RU-0007",
+      "必須要求": "issue-operation-recovery.md の診断手順へ 2 段分離試験（手順1: bash 直叩き gh、手順2: bun による CliRunner 直接実行）と判定基準（bash 成功+runner 失敗→plugin ホスト環境差、bash も失敗→実行環境側）を追記する。runner-cli.ts failFromExec detail 文言拡張は REQ-052-014「最小限の detail」契約範囲内の情報候補とする。",
+      "受け入れ義務": [
+        "2 段分離試験が診断手順として明記されている。",
+        "障害発生時の判定基準が記載されている。",
+        "REQ-052-014 の失敗分類値域不変・fail-closed 維持に影響しないことが検証されている。"
+      ],
+      "tentative_classification": "REQ",
+      "sources": [
+        ".agentdev/learning/promoted/existing-measure-update-agentdev-gh-spawn-failure-isolation.md"
+      ]
+    },
+    {
+      "ru_id": "RU-0008",
+      "path": ".agentdev/backlog/req-units/RU-0008.md",
+      "logical_key": "RU-0008",
+      "必須要求": "record-comments.ts applySection の末尾セクション境界改善（置換対象セクション後の HTML コメント・注記を置換対象から除外）+ record-comments.test.ts 回帰テスト追加、および cleanup-and-capture.md STEP-5-2 への適用前セクション後コンテンツ保全確認の明記（実現先の選択は req-define の変更影響分析で確定）。",
+      "受け入れ義務": [
+        "末尾セクション置換でセクション後の HTML コメントが消失しないことが回帰テストで検証されている。",
+        "STEP-5-2 手順に適用前の保全確認が明記されている（script 改善と併用または代替のいずれかの形で）。",
+        "既存の applySection 挙動（同名セクション置換・不在時末尾追加）が破壊されていないことが既存テストで確認されている。"
+      ],
+      "tentative_classification": "REQ",
+      "sources": [
+        ".agentdev/learning/promoted/existing-measure-update-applysection-content-preservation.md"
+      ]
+    },
+    {
+      "ru_id": "RU-0009",
+      "path": ".agentdev/backlog/req-units/RU-0009.md",
+      "logical_key": "RU-0009",
+      "必須要求": "pr-merge-and-conflict.md GitHub 版 STEP-4 の取り込み確認手順へ、同一ファイル接触 PR を連続マージした場合の merge 後重複行実検査を明記する。STEP-4-4「内容重複確認」との目的差を区別し、CLEAN 判定単独では取り込み受理としない規律を明記する。",
+      "受け入れ義務": [
+        "同一ファイル接触 PR 連続マージ時の merge 後重複行実検査が取り込み確認手順に明記されている。",
+        "STEP-4-4 の「内容重複確認」との目的差が区別して記載されている。",
+        "CLEAN 判定単独では取り込み受理としない規律が明記されている。"
+      ],
+      "tentative_classification": "REQ",
+      "sources": [
+        ".agentdev/learning/promoted/existing-measure-update-post-merge-duplicate-line-check.md"
+      ]
+    }
+  ],
+  "対応表": {
+    "初期状態": [
+      { "ru_id": "RU-0001", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-001", "実行単位": null },
+      { "ru_id": "RU-0002", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-002", "実行単位": null },
+      { "ru_id": "RU-0003", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-003", "実行単位": null },
+      { "ru_id": "RU-0004", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-004", "実行単位": null },
+      { "ru_id": "RU-0005", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-005", "実行単位": null },
+      { "ru_id": "RU-0006", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-006", "実行単位": null },
+      { "ru_id": "RU-0007", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-007", "実行単位": null },
+      { "ru_id": "RU-0008", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-008", "実行単位": null },
+      { "ru_id": "RU-0009", "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md", "operation_unit": "OU-009", "実行単位": null }
+    ]
+  },
+  "基準点情報": {
+    "最後の正式リリース": {
+      "版番号": "5.1.1",
+      "タグ名": "v5.1.1",
+      "タグ対象コミット": "17cce65b7ec7b6a92e1cb0cced725044425d2ccd"
+    },
+    "開始コミットID": "5c78cbf17f62628093196da61574d3c01caffc39",
+    "基準点確定手続証跡": "正式SemVer列挙→HEAD祖先到達判定(v5.1.1 reachable exit 0。開始時点 2026-10-16T12:24 HEAD=5c78cbf1 と set-state作成時点 2026-10-16T14:23 HEAD=a8c688fd の両方で実測)→数値順序最大版 v5.1.1"
+  },
+  "進捗": {
+    "整理サイクル": "完了(stage1 inspect-docs 2026-10-16T12:25-12:51 検出8件・正常終了, stage2 昇格3系統並列 12:52-14:07 全系統自律確定 commits 099e5022/636b1e2b/1c2e7153, stage3 backlog-review 14:07-14:19 分析・RU構成案・adversarial-review収束→HITL承認〔2026-10-16 Q1(a) 9RU承認・Q2(a) DS25 RU化・Q3(a) 削除承認〕→STEP-6 矛盾なし→STEP-7 RU-0001..0009生成・promoted 10件削除・commit a8c688fd)",
+    "stage4_要件定義": "完了(単一req-define実行 2026-10-16T15:00頃-15:40頃 HITL停止→回答→resume完了。要件doc .agentdev/drafts/req-draft-backlog-auto-e2e-20261016T142343JST.md 554行 auto_ready:true・work_type:docs_chore・scale:large・AG9/ACT6/CR3/OU9/TS9/RA8/RD9。壁打ちHITL質問5件 2026-10-16 利用者回答確定: Q1=方向B(DEC-059文言明確化・決定内容不変・Q1=B回答を明示承認記録とする), Q2=両方(case-run委譲契約+learning-capture baseline明記), Q3=両方(script改善+回帰テスト/STEP-5-2保全確認明記), Q4=統合維持(9RU→9OU 1:1), Q5=Epicなし・OU単位Issue並列(REQ-114-004準拠)。要件doc分割なし=再スコープなし。adversarial-review 収束・Jev観測 20261016T055056Z-2396(finalResult 4問全true))",
+    "stage5_実行": "未着手",
+    "stage6_全体完了判定": "未着手",
+    "stage7_リリース": "未着手"
+  },
+  "リリース状態": {
+    "状態": "未"
+  },
+  "単一書き手": "backlog-auto実行 20261016T142343JST (single-flight: 進行中set-stateは本実行のみ。前回 20261015T180807JST は完了状態のため非該当)",
+  "保留": [],
+  "判断変更記録": []
+}
