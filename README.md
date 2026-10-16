@@ -12,7 +12,7 @@ AgentDevFlow は AI エージェントによる開発ワークフローを支え
 /agentdev/case-auto     # 要件doc または Root Case から Definition 確定・実装・PR 作成・マージ・クローズまで自走する（標準実行コマンド）
 ```
 
-要求の継続的な蓄積・整理は `/agentdev/backlog-auto`（要求蓄積入口）から始め、生成された RU を req-define に渡す。
+要求の継続的な蓄積・整理は `/agentdev/backlog-auto`（要求蓄積入口）から始める。生成された RU 一式は backlog-auto の一気通貫実行で req-define → case-auto へ自動接続され、一式全体の完了判定とパッチリリース作成まで進む（利用者判断境界は維持。手動の `/agentdev/req-define` → `/agentdev/case-auto` 経路も従来どおり利用可能）。
 `case-auto` は内部 lifecycle（case-open、case-ready、case-run、case-close、例外経路 case-revise）を駆動し、Definition の保存・確定と実行構造の確定もその内部責務として実行する。
 再合意済みの Definition 変更は req-define で再合意した後、`case-auto` が例外経路（case-revise → case-ready）を解決して反映する。
 

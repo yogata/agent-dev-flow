@@ -1,7 +1,7 @@
 <!-- ADF-COVERS(implementation): REQ-005-010 -->
 # クイックスタート
 
-要件定義からマージまでの標準フロー。要求入口は `req-define`（requirements-driven）と `backlog-auto`（backlog-driven）の 2 つであり、実行は標準実行コマンド `case-auto` へ合流する。
+要件定義からマージまでの標準フロー。要求入口は `req-define`（requirements-driven）と `backlog-auto`（backlog-driven）の 2 つであり、実行は標準実行コマンド `case-auto` へ合流する。`backlog-auto` は承認確定した RU 一式を要件定義・実行・全体完了判定・パッチリリース作成まで一気通貫で接続する（利用者判断境界は維持）。
 
 ```
 /agentdev/req-define    # 要件を壁打ちする

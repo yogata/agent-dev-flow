@@ -2,6 +2,7 @@
 
 > 本 reference は `agentdev-workflow-backlog-auto` SKILL.md の制御平面（STEP 一覧）STEP-1, STEP-2, STEP-3 詳細である。
 > 開始時刻記録と進行状態初期化、stage 1（inspect-docs 単独直列実行）、stage 2（昇格3系統の並行実行と直列化契約）を提供する。
+> stage 4〜7（一気通貫実行）の詳細は [end-to-end-execution.md](end-to-end-execution.md) を参照する。
 
 ## 目次
 
@@ -42,6 +43,7 @@ STEP-6（完了報告）での所要時間算出の基準として使用する�
 | stage 2 intake 系統 | `.agentdev/intake/inbox/` と `.agentdev/intake/promoted/` の実ファイル状態、分類確定状態 | `agentdev-workflow-intake-promote` の既存再開契約に委譲 |
 | stage 2 inspect 系統 | `.agentdev/inspect/inbox/`、`.agentdev/inspect/promoted/`、auto-promote-log | `agentdev-workflow-inspect-promote` の既存再開契約に委譲 |
 | stage 3（backlog-review） | 各 `promoted/` 残存成果物、`.agentdev/backlog/req-units/` の `RU-*.md` 実ファイルと frontmatter | `agentdev-workflow-backlog-review` の既存再開契約に委譲 |
+| stage 4〜7（一気通貫実行） | set-state 実ファイル（`.agentdev/backlog-auto/end-to-end/` 配下の一式識別子別 state） | set-state 永続化契約と一式再開経路に従う。詳細は `end-to-end-execution.md` を参照 |
 
 初回起動（未実行）と判定した場合は stage 1 から開始する。
 
@@ -88,7 +90,7 @@ inspect-docs を単独直列実行し、docs 全体の意味整合診断の検�
 結果の分類:
 
 - 正常終了（検出事項ファイル群の生成、または検出事項0件の完了）→ stage 2 開始条件成立、STEP-3 へ
-- blocked / failed → 下流工程（stage 2、stage 3）を開始せず STEP-6 へ（停止報告）
+- blocked / failed → 下流工程（stage 2、stage 3、stage 4〜7）を開始せず STEP-6 へ（停止報告）
 
 inspect-docs の既存ガードレール（診断専用、検出事項ファイル生成以外の副作用禁止）を変更しない。
 
