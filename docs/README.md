@@ -175,6 +175,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-057](decisions/DEC-057.md) | 工程駆動コラボレーションモデル（検討テーマ・外部検討・段階形成）の採用 |
 | [DEC-058](decisions/DEC-058.md) | 工程遷移と双経路併存モデルの採用（REQ-005-001/010/011 改訂を含む） |
 | [DEC-059](decisions/DEC-059.md) | backlog-auto 一気通貫実行のパッチリリース規則 |
+| [DEC-060](decisions/DEC-060.md) | ADF本体の GitHub Release 記録と公開承認境界 |
 <!-- AUTOGEN:END -->
 
 ## 設計（Design）

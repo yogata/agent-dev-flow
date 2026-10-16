@@ -6,7 +6,7 @@ updated: 2026-10-16
 ---
 <!-- ADF-COVERS(implementation): REQ-041-003, REQ-041-004, REQ-041-005, REQ-041-006, REQ-041-009, REQ-041-010, REQ-041-011, REQ-041-012, REQ-041-013, REQ-041-014, REQ-041-015 -->
 <!-- ADF-COVERS(implementation): REQ-041-002, REQ-041-003, REQ-041-004, REQ-041-005, REQ-041-006, REQ-041-007, REQ-041-008, REQ-041-009, REQ-041-010, REQ-041-011, REQ-041-012, REQ-041-013, REQ-041-014, REQ-041-015, REQ-041-016 -->
-<!-- ADF-COVERS(design): REQ-114-001, REQ-114-002, REQ-114-003, REQ-114-004, REQ-114-005, REQ-114-006, REQ-114-007, REQ-114-008, REQ-114-009, REQ-114-010, REQ-114-011, REQ-114-012, REQ-114-013, REQ-114-014, REQ-114-015 -->
+<!-- ADF-COVERS(design): REQ-114-001, REQ-114-002, REQ-114-003, REQ-114-004, REQ-114-005, REQ-114-006, REQ-114-007, REQ-114-008, REQ-114-009, REQ-114-010, REQ-114-011, REQ-114-012, REQ-114-013, REQ-114-014, REQ-114-015, REQ-114-016, REQ-114-017 -->
 
 # agentdev-workflow-backlog-auto Design
 
@@ -99,6 +99,9 @@ backlog-auto command の workflow 実装本体。
 - 各段階の中断・失敗時は既存結果の読み戻しにより未完了段階から再開する（タグ不移動・再作成なし・第二番号なし）
 - backlog-auto 再実行は set-state から完遂済み Case を検出し全体完了判定以降から再開する
 - 停止報告には case-auto 単独の再開入口（REQ-034-038）に加えて一式再開経路（backlog-auto 再実行）を併記する
+- リリース記録対応（REQ-114-016、REQ-114-017）: タグをリモートへ送った後、版タグ（正式 SemVer タグと RC タグ。非 SemVer ベースラインタグは除外）をすべて列挙し、対応する Release の有無を Custom Tool の Release 読取で確認する。対応する Release のない版タグへ草稿を作る（RC 版タグは prerelease 有効）。既存の Release は対象外とし本文・公開状態を変更しない。作成後、GitHub から読み戻して版タグと Release の対応（同名 Release の存在、draft・prerelease 状態）を確認するまで Release 工程を完了としない
+- リリース記録の異常系: 草稿作成の失敗時、および読み戻しで同名 Release が2件検出された場合は、既存を削除せず報告して停止する（利用者判断）。リモートに存在しない既存の版タグは、注釈付きタグを通常の push（非 force）で送り、リモートとローカルのタグ識別子一致を確認してから草稿を作る。push の拒否（リモートに同名タグが異なるオブジェクトで存在する場合等）は失敗として報告し、force による解消を行わない
+- リリース記録の重複作成防止: 草稿作成前に存在確認を行い、再開時は既存 Release を検出して作成を省略する
 
 ### 委譲
 

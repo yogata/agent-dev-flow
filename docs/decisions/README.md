@@ -10,7 +10,7 @@
 DEC-018 は欠番であり、対応する Decision ファイルは存在しない。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は49件、提案中の Decision は0件である。
+現行の承認済み Decision は49件、提案中の Decision は1件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -74,6 +74,7 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 | DEC-057 | 工程駆動コラボレーションモデル（検討テーマ・外部検討・段階形成）の採用 | accepted | 2026-10-12 |
 | DEC-058 | 工程遷移と双経路併存モデルの採用（REQ-005-001/010/011 改訂を含む） | accepted | 2026-10-12 |
 | DEC-059 | backlog-auto 一気通貫実行のパッチリリース規則 | accepted | 2026-10-15 |
+| DEC-060 | ADF本体の GitHub Release 記録と公開承認境界 | proposed | 2026-10-16 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -140,6 +141,7 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
+- [DEC-060](DEC-060.md)（ADF本体の GitHub Release 記録と公開承認境界）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -323,6 +325,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-057 | [REQ-110](../requirements/REQ-110.md), [REQ-104](../requirements/REQ-104.md) | - |
 | DEC-058 | [REQ-111](../requirements/REQ-111.md), [REQ-005](../requirements/REQ-005.md) | - |
 | DEC-059 | [REQ-114](../requirements/REQ-114.md) | - |
+| DEC-060 | [REQ-114](../requirements/REQ-114.md) | - |
 <!-- AUTOGEN:END -->
 
 ## 過去版の履歴基盤
